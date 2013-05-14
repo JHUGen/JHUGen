@@ -1,0 +1,730 @@
+%
+% latex grav ; dvips -Ppdf -t letter -G0 grav
+% tar -cvzf grav.gz -T tar.list
+% tar -xvzf grav.gz
+%
+%\documentclass[showpacs,aps,superscriptaddress,letterpaper,nofootinbib]{revtex4}
+\documentclass[aps,superscriptaddress,nofootinbib]{revtex4}
+%\documentclass[preprint,aps,superscriptaddress]{revtex4}
+%\documentclass[12pt,tightenlines,aps,preprint,twocolumn,showpacs,nofootinbib,floatfix]{revtex4}
+
+\usepackage{graphicx}
+\usepackage{epsfig}
+\usepackage{float}
+\usepackage{cprotect}
+%\usepackage{amsmath}
+
+\begin{document}
+
+\vspace{0.6cm}
+
+\title{ 
+\large
+Manual for the JHU generator
+}
+\maketitle
+\begin{center}
+\small
+For simulation of a single-produced resonance at hadron colliders \\
+(version 3.1.1, release date April 27, 2012) \\
+\normalsize
+\end{center}
+
+
+
+\noindent
+The generator from \cite{Gao:2010qx,Bolognesi:2012} is a model-independent generator for studying spin and parity properties of new resonances.  
+Please cite \cite{Gao:2010qx,Bolognesi:2012} if using the generator.  
+
+The code can be downloaded from \cite{thesite}.  
+The generator outputs LHE files which can be passed to parton shower programs for hadronization.  
+The generator purposely does not output sensible cross-sections but rather deals with numbers of events which can be compared for different signal hypotheses.
+
+Additionally, the package now includes code for computing the matrix elements standalone which can be used in a numerical matrix element analysis.  
+
+\vspace{0.5cm}
+\begin{center}
+\line(1,0){250}
+\end{center}
+\vspace{0.5cm}
+\tableofcontents
+\begin{center}
+%\line(1,0){250}
+\end{center}
+\vspace{0.5cm}
+
+\newpage
+
+\section{ Installation }
+
+\noindent
+Register and download the package from \verb|www.pha.jhu.edu/spin| and untar the file.  Go to the directory \verb|JHUGenerator| where the code exists for generating events with the JHU Generator. In the \verb|makefile|, you have two options for compiler, \verb|Comp = ifort| or \verb|Comp = gfort|.  Then simply compile with:
+\begin{verbatim}
+$ make
+\end{verbatim}
+
+\section{ Configuration }
+
+There are two ways to configure the program, either from the command line or in the file \verb|mod_Parameters.F90|.  The command line configurables are defined in the file \verb|main.F90|.  When one change the fortran code directly, one should also recompile the code for changes to take effect.  In general, command-line configuration handles general event properties while the configuration file handles all of the couplings and physics handles.
+
+\subsection{ Command line configuration }
+
+The list of command line configurables and the default values are (also defined in the \verb|README|):
+
+\begin{verbatim}
+   - Collider=x    (Collider: 1=LHC, 2=Tevatron), default value:1
+   - VegasNc1=x    (number of evaluations), default value:5000000
+   - PChannel=x    (partonic channel: 0=glu+glu, 1=quark+antiquark, 2=both), default value:2
+   - PDFSet=x      (parton distr. functions, 1=CTEQ6L1 (2001), 2=MSTW(2008),  
+   					2xx=MSTW with eigenvector set xx=01..40), default=1
+   - DecayMode1=x  (decay mode for vector boson 1), default x=0 
+   - DecayMode2=x  (decay mode for vector boson 2), default x=0
+                  x=0:  X-> Z1 Z2, Z1->2l,
+                  x=1:  X-> Z1 Z2, Z1->2q,
+                  x=2:  X-> Z1 Z2, Z1->2tau,
+                  x=3:  X-> Z1 Z2, Z1->2nu,
+                  x=4:  X-> W1 W2, W1->lnu,
+                  x=5:  X-> W1 W2, W1->2q,
+                  x=6:  X-> W1 W2, W1->taunu
+                  x=7:  X-> gamma gamma 
+                  x=8:  Z --> l+ l- (l=e,mu,tau)
+                  x=9:  Z --> anything
+                  x=10: W --> l nu_l (l=e,mu,tau)
+                  x=11: W --> anyting                                    
+   - DataFile=x    (name of the output file), default value: "output"
+   - Process=x     (gives the resonance spin 0,1 or 2)
+   - OffXVV=xyz    (only applies to Higgs production, x,y,z can be 1 or 0 indicating real off-shellness 
+   					for Higgs, Z/W boson 1/2, resp.), default 000 if a parameter is not specified
+   - Unweighted=x  (generates weighted or unweighted events), default value: ".true." 
+   - ReadLHE="x"   (allows NLO production of spin-0 particles by reading in 
+                    LHE file from NLO generator, e.g., POWHEG)
+\end{verbatim}
+
+\noindent
+A few more details on some particular parameters:
+
+\begin{itemize}
+\item {\verb|VegasNc1|}: This is the number of evaluations for the program to make, NOT the number of events generated.  The efficiency depends on the set of parameters one uses.
+\item {\verb|OffXVV|}: The program does not work for $ZZ$ or $WW$ if you set them to be on-shell (\verb|OffXVV="\*00"|) and the mass of the $X$ resonance to be below the $m_{VV}$ threshold.  In general, the more off-shell the process, or the more "1" you have, the less efficient the \verb|VegasNc1| evaluations are.  Specifically, if you are interested then, in producing a resonance with mass below threshold $m_{VV}$ with a very narrow resonance, it is most efficient to generate with \verb|OffXVV="011"|
+\item \verb|PChannel|: This parameter is only meaningful in the spin-2 case.  For spin-0, production is possible only via the $gg$ process and for spin-1, production is only possible via the $q\bar{q}$ process.
+\item \verb|DecayMode2=7| note: Valid for spin-0 and spin-2, only OffXVV=000 or 100 are possible.  
+\end{itemize}
+
+\noindent
+Then, as an example of running the generator, you could do:
+
+\begin{verbatim}
+./JHUGen Collider=1 Process=0 VegasNc1=100000 PChannel=0 OffXVV=011 DecayMode1=0 DecayMode2=0 \\
+		Unweighted=.true. DataFile=test1
+\end{verbatim}
+
+\begin{center}
+\line(1,0){250}
+\end{center}
+\noindent
+\footnotesize
+{\it N.B.}
+There is a beta-version of the generator which has improved efficiency for the generation.  However, it is currently only available for gluon-gluon initiated processes.
+It is by default turned off, but it can be accessed in the file \verb|main.F90|.  The beta version is currently still under validation. 
+\begin{verbatim}
+logical,parameter :: useBetaVersion=.false.
+\end{verbatim}
+\normalsize
+\begin{center}
+\line(1,0){250}
+\end{center}
+
+\subsection{ Configuration in parameter file  }
+
+The \verb|mod_Parameters.F90|, one does all the configuration of the couplings of the resonance.
+
+\subsubsection{ General parameters }
+
+\noindent
+Each generation run is different when this is \verb|.true.| 
+
+\begin{verbatim}
+seed_random = .true.
+\end{verbatim}
+
+\noindent
+In the case when \verb|PChannel=2| for a spin-2 resonance, the user can define the ratio of the production of gg and $q\bar{q}$ production.
+
+\begin{verbatim}
+fix_channels_ratio = .true.
+channels_ratio_fix = 0.25d0    ! desired ratio of
+                               ! N_qq/(N_qq+N_gg)
+\end{verbatim}
+
+\noindent
+{\it Only for the 4l final state}, one can include interference effects between the leptons ({\it N.B. This feature is yet to be fully validated}).  The interference is controlled by the parameter:
+\begin{verbatim}
+includeInterference=.false.
+\end{verbatim}
+
+
+\noindent
+The remaining parameters are more-or-less self-explanatory.
+
+\begin{verbatim}
+! we are using units of 100GeV, i.e. Lambda=10 is 1TeV
+M_Z     = 91.1876d0 *GeV      ! Z boson mass (PDG-2011)
+Ga_Z    = 2.4952d0  *GeV      ! Z boson width(PDG-2011)
+M_W     = 80.399d0  *GeV      ! W boson mass (PDG-2011)
+Ga_W    = 2.085d0   *GeV      ! W boson width(PDG-2011)
+M_Reso  = 125d0     *GeV      ! X resonance mass (spin 0, spin 1, spin 2)
+Ga_Reso = 5d0       *GeV      ! X resonance width
+Lambda  = 1000d0    *GeV      ! Lambda coupling enters in two places
+							 	! overal scale for x-section and in power suppressed
+								! operators/formfactors (former r).
+alpha_QED = 1d0/128.0d0       ! el.magn. coupling
+sitW = dsqrt(0.23119d0)       ! sin(Theta_Weinberg) (PDG-2008)
+Mu_Fact = M_Reso              ! pdf factorization scale
+LHC_Energy=7000d0  *GeV       ! LHC hadronic center of mass energy
+TEV_Energy=1960d0  *GeV       ! Tevatron hadronic center of mass energy
+
+Br_Z_up = 0.1657d0  ! branching fraction Ga(up)/Ga(hadronic)
+Br_Z_ch = 0.1657d0  ! branching fraction Ga(charm)/Ga(hadronic)
+Br_Z_dn = 0.2229d0  ! branching fraction Ga(down)/Ga(hadronic)
+Br_Z_st = 0.2229d0  ! branching fraction Ga(strange)/Ga(hadronic)
+Br_Z_bo = 1d0-Br_Z_up-Br_Z_ch-Br_Z_dn-Br_Z_st  ! branching fraction Ga(bottom)/Ga(hadronic)
+\end{verbatim}
+\subsubsection{ Spin-0 parameters }
+
+\noindent
+The \verb|*hg*| parameters control the coupling of a spin-0 resonance to gluons in the production mechanism.  The \verb|*hz*| parameters control the decay.  In practice, the production parameters are not having a large effect since angular corrections from the production mechanism are lost for spinless particles.  
+One has the options to set the spin-0 couplings either from Eq.(9) or Eq.(11) from Ref.~\cite{Bolognesi:2012}.  To switch between the two, use the parameter \verb|generate_as|.
+
+\begin{verbatim}
+
+   logical, public, parameter :: generate_as = .false.
+
+!-- parameters that define on-shell spin 0 coupling to SM fields, see note Eq.(1)
+   complex(8), public, parameter :: ahg1 = (1.0d0,0d0)
+   complex(8), public, parameter :: ahg2 = (0.0d0,0d0)
+   complex(8), public, parameter :: ahg3 = (0.0d0,0d0)  ! pseudoscalar
+   complex(8), public, parameter :: ahz1 = (1.0d0,0d0)
+   complex(8), public, parameter :: ahz2 = (0.0d0,0d0)  
+   complex(8), public, parameter :: ahz3 = (0.0d0,0d0)  ! pseudoscalar
+
+!-- parameters that define off-shell spin 0 coupling to SM fields, see note Eq.(2)
+   complex(8), public, parameter :: ghg2 = (1.0d0,0d0)
+   complex(8), public, parameter :: ghg3 = (0.0d0,0d0)
+   complex(8), public, parameter :: ghg4 = (0.0d0,0d0)   ! pseudoscalar
+   complex(8), public, parameter :: ghz1 = (1.0d0,0d0)
+   complex(8), public, parameter :: ghz2 = (0.0d0,0d0)
+   complex(8), public, parameter :: ghz3 = (0.0d0,0d0)
+   complex(8), public, parameter :: ghz4 = (0.0d0,0d0)   ! pseudoscalar 
+\end{verbatim}
+
+\subsubsection{ Spin-1 parameters }
+
+The parameters below represent the couplings given in Eq.~(16) from Ref.~\cite{Bolognesi:2012}. The \verb|*left*| and \verb|*right*| parameters control the production of the spin-1 resonance while the \verb|*_v| and \verb|*_a| parameters control the decay.
+
+\begin{verbatim}
+!---parameters that define spin 1 coupling to SM fields, see note
+   complex(8), public, parameter :: zprime_qq_left  = (1.0d0,0d0)   !  see note Eq. (4)
+   complex(8), public, parameter :: zprime_qq_right = (0.0d0,0d0) 
+   complex(8), public, parameter :: zprime_zz_v =  (1.0d0,0d0)!  =1 for JP=1-
+   complex(8), public, parameter :: zprime_zz_a =  (0.0d0,0d0)!  =1 for JP=1+
+\end{verbatim}   
+
+\subsubsection{ Spin-2 parameters }
+
+\noindent
+The \verb|a*| parameters control the coupling of a spin-2 resonance to gluons in the production mechanism.  The \verb|b*| and \verb|c*| parameters control the decay.
+One has the options to set the spin-2 couplings either from Eq.(18) or Eq.(19) from Ref.~\cite{Bolognesi:2012}.  To switch between the two, use the parameter \verb|generate_bis|.
+
+\begin{verbatim}
+  logical, public, parameter :: generate_bis = .true.
+  logical, public, parameter :: use_dynamic_MG = .true. ! .true. (=default), 
+													    ! the spin-2 resonance mass with MG^2=(p1+p2)^2, otherwise fixed at M_Reso^2. 
+
+  complex(8), public, parameter :: a1 = (1.0d0,0d0)    ! g1  -- c.f. note
+  complex(8), public, parameter :: a2 = (0.0d0,0d0)    ! g2
+  complex(8), public, parameter :: a3 = (0.0d0,0d0)    ! g3
+  complex(8), public, parameter :: a4 = (0.0d0,0d0)    ! g4
+  complex(8), public, parameter :: a5 = (0.0d0,0d0)    ! pseudoscalar, g8
+
+  complex(8), public, parameter :: graviton_qq_left  = (1.0d0,0d0)! graviton coupling to quarks
+  complex(8), public, parameter :: graviton_qq_right = (1.0d0,0d0)
+
+  complex(8), public, parameter :: b1 = (1.0d0,0d0)  
+  complex(8), public, parameter :: b2 = (0.0d0,0d0)
+  complex(8), public, parameter :: b3 = (0.0d0,0d0)
+  complex(8), public, parameter :: b4 = (0.0d0,0d0)
+  complex(8), public, parameter :: b5 = (0.0d0,0d0)
+  complex(8), public, parameter :: b6 = (0.0d0,0d0)
+  complex(8), public, parameter :: b7 = (0.0d0,0d0)
+  complex(8), public, parameter :: b8 = (0.0d0,0d0)
+  complex(8), public, parameter :: b9 = (0.0d0,0d0)  
+  complex(8), public, parameter :: b10 =(0.0d0,0d0)  
+
+
+  complex(8), public, parameter  :: c1 = (1.0d0,0d0)
+  complex(8), public, parameter  :: c2 = (0.0d0,0d0)
+  complex(8), public, parameter  :: c3 = (0.0d0,0d0)
+  complex(8), public, parameter  :: c41= (0.0d0,0d0)
+  complex(8), public, parameter  :: c42= (0.0d0,0d0)
+  complex(8), public, parameter  :: c5 = (0.0d0,0d0)
+  complex(8), public, parameter  :: c6 = (0.0d0,0d0) 
+  complex(8), public, parameter  :: c7 = (0.0d0,0d0) 
+\end{verbatim}
+
+\section{ Examples }
+
+\noindent
+The below examples are not meant to be a complete set, but rather some interesting and relevant cases.  
+In many cases, the example is not the only way to produce such a scenario.
+
+\subsection{ $J^P = 0^+_m$ resonance, $X \to ZZ~{\rm or}~WW$}
+\label{sec:exA}
+
+\begin{verbatim}
+   logical, public, parameter :: generate_as = .true.
+
+   complex(8), public, parameter :: ahg1 = (1.0d0,0d0)
+   complex(8), public, parameter :: ahg2 = (0.0d0,0d0)
+   complex(8), public, parameter :: ahg3 = (0.0d0,0d0)  ! pseudoscalar
+   complex(8), public, parameter :: ahz1 = (1.0d0,0d0)
+   complex(8), public, parameter :: ahz2 = (0.0d0,0d0)  
+   complex(8), public, parameter :: ahz3 = (0.0d0,0d0)  ! pseudoscalar
+\end{verbatim}
+
+\subsection{ $J^P = 0^-_m$ resonance, $X \to ZZ~{\rm or}~WW$}
+\label{sec:exB}
+
+\begin{verbatim}
+   logical, public, parameter :: generate_as = .true.
+
+   complex(8), public, parameter :: ahg1 = (1.0d0,0d0)
+   complex(8), public, parameter :: ahg2 = (0.0d0,0d0)
+   complex(8), public, parameter :: ahg3 = (0.0d0,0d0)  ! pseudoscalar
+   complex(8), public, parameter :: ahz1 = (0.0d0,0d0)
+   complex(8), public, parameter :: ahz2 = (0.0d0,0d0)  
+   complex(8), public, parameter :: ahz3 = (1.0d0,0d0)  ! pseudoscalar
+\end{verbatim}
+
+\subsection{ $J^P = 0^+_m$ resonance, $X \to \gamma \gamma$}
+\label{sec:exC}
+
+In practice, the example $X \to \gamma \gamma$ from this section, Sec.~\ref{sec:exC} and the next Sec.~\ref{sec:exD} are 
+kinematically the same but are presented only to illustrate how one takes care of this final state.  
+
+\begin{verbatim}
+   logical, public, parameter :: generate_as = .false.
+
+   complex(8), public, parameter :: ghg2 = (1.0d0,0d0)
+   complex(8), public, parameter :: ghg3 = (0.0d0,0d0)
+   complex(8), public, parameter :: ghg4 = (0.0d0,0d0)   ! pseudoscalar
+   complex(8), public, parameter :: ghz1 = (0.0d0,0d0)
+   complex(8), public, parameter :: ghz2 = (1.0d0,0d0)
+   complex(8), public, parameter :: ghz3 = (0.0d0,0d0)
+   complex(8), public, parameter :: ghz4 = (0.0d0,0d0)   ! pseudoscalar 
+\end{verbatim}
+
+\subsection{ $J^P = 0^-_m$ resonance, $X \to \gamma \gamma$}
+\label{sec:exD}
+
+\begin{verbatim}
+   logical, public, parameter :: generate_as = .false.
+
+   complex(8), public, parameter :: ghg2 = (1.0d0,0d0)
+   complex(8), public, parameter :: ghg3 = (0.0d0,0d0)
+   complex(8), public, parameter :: ghg4 = (0.0d0,0d0)   ! pseudoscalar
+   complex(8), public, parameter :: ghz1 = (0.0d0,0d0)
+   complex(8), public, parameter :: ghz2 = (0.0d0,0d0)
+   complex(8), public, parameter :: ghz3 = (0.0d0,0d0)
+   complex(8), public, parameter :: ghz4 = (1.0d0,0d0)   ! pseudoscalar 
+\end{verbatim}
+
+\subsection{ $J^P = 2^+_m$ resonance, $X \to ZZ~{\rm or}~WW~{\rm or}~\gamma \gamma$}
+
+\begin{verbatim}
+
+  complex(8), public, parameter :: a1 = (1.0d0,0d0)    ! g1  -- c.f. draft
+  complex(8), public, parameter :: a2 = (0.0d0,0d0)    ! g2
+  complex(8), public, parameter :: a3 = (0.0d0,0d0)    ! g3
+  complex(8), public, parameter :: a4 = (0.0d0,0d0)    ! g4
+  complex(8), public, parameter :: a5 = (0.0d0,0d0)    ! pseudoscalar, g8
+  complex(8), public, parameter :: graviton_qq_left  = (1.0d0,0d0)! graviton coupling to quarks
+  complex(8), public, parameter :: graviton_qq_right = (1.0d0,0d0)
+  
+  logical, public, parameter :: generate_bis = .true.
+  logical, public, parameter :: use_dynamic_MG = .true.
+
+  complex(8), public, parameter :: b1 = (1.0d0,0d0)
+  complex(8), public, parameter :: b2 = (0.0d0,0d0)
+  complex(8), public, parameter :: b3 = (0.0d0,0d0)
+  complex(8), public, parameter :: b4 = (0.0d0,0d0)
+  complex(8), public, parameter :: b5 = (1.0d0,0d0)
+  complex(8), public, parameter :: b6 = (0.0d0,0d0)
+  complex(8), public, parameter :: b7 = (0.0d0,0d0)
+  complex(8), public, parameter :: b8 = (0.0d0,0d0)
+  complex(8), public, parameter :: b9 = (0.0d0,0d0)
+  complex(8), public, parameter :: b10 =(0.0d0,0d0) 
+
+\end{verbatim}
+
+\subsection{Cross-section calculation and fraction notation}
+
+For a vector boson coupling, we can represent the four independent parameters by two  fractions 
+($f_{g2}$ and $f_{g4}$) and two phases ($\phi_{g2}$ and $\phi_{g4}$), defined for the $HZZ$
+and $HWW$ couplings as follows (ignoring $g_3$)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\begin{eqnarray}
+&& f_{gi} =  \frac{|g^{}_{i}|^2\sigma_i}{|g^{}_{1}|^2\sigma_1+|g^{}_{2}|^2\sigma_2+|g^{}_{4}|^2\sigma_4}\,;
+~~~~~~~~~
+ \phi_{gi} = \arg\left(\frac{g_i}{g_1}\right)\,.
+\nonumber
+\label{eq:fractions}
+\end{eqnarray}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+In order to obtain the cross-sections $\sigma_i$ corresponding to the $g^{}_{i}=1$ coupling, 
+generate large enough (e.g. {\tt VegasNc1=1000000}) number of unweighted events
+({\tt Unweighted=0}) with the corresponding couplings setup ($g^{}_{i}=1$, $g^{}_{j\ne i}=0$).
+
+%%%%%%%%%%%
+\section{ JHU Generator Matrix Elements (JHUGenME)}
+
+After extracting the code, you can go to the directory \verb|JHUGenME| to find code for computing matrix elements directly.  
+To compile the code, simple do:
+\begin{verbatim}
+$ make
+\end{verbatim}
+
+\noindent
+\bf Please take note: The setup is configured for \verb|gfort + gcc version 4.1.2 20080704 (Red Hat 4.1.2-50)| and it is highly dependent on the compiler version.  Please configure for your own setup accordingly.  {\rm (Using \verb|'nm'| command will help decipher the module names you will need)}\\
+\\
+\rm
+\noindent
+The usage of the package is straight-forward and an example is given in \verb|testprogram.c|.  
+There are 6 main modules allowing both specific production process and production-independent calculation:
+\begin{itemize}
+\item "modhiggs\_\_evalamp\_gg\_h\_vv": spin-0 matrix elements for $gg$ initiated processes
+\item "modzprime\_\_evalamp\_qqb\_zprime\_vv": spin-1 matrix elements for $q\bar{q}$ initiated processes
+\item "modgraviton\_\_evalamp\_gg\_g\_vv:" spin-2 matrix elements for $gg$ initiated processes
+\item "modgraviton\_\_evalamp\_qqb\_g\_vv": spin-2 matrix elements for $q\bar{q}$ initiated processes
+\item "modzprime\_\_evalamp\_zprime\_vv": spin-1 matrix elements production-independent
+\item "modgraviton\_\_evalamp\_g\_vv": spin-2 matrix elements production-independent
+
+\end{itemize}
+
+The inputs are the 4-vectors of the incoming patrons and outgoing particles in the CM frame of the object $X$.  
+In addition the mass and width of the resonance are required as well as the ID of the outgoing particles.  
+Finally the last set of inputs are the couplings themselves.  They are arrays for parameters for a given spin hypothesis
+which mirror the parameters configurable in \verb|mod_Parameters.F90|.  
+As an example, the arrays are initialized in \verb|testprogram.c| as:
+\begin{verbatim}
+  double Hggcoupl[3][2];
+  double Hvvcoupl[4];
+  double Zqqcoupl[2];
+  double Zvvcoupl[2];
+  double Gqqcoupl[2];
+  double Gggcoupl[5];
+  double Gvvcoupl[10];
+\end{verbatim}
+
+
+%%%%%%%%%%%
+
+\section{ Release notes }
+
+\noindent
+In going from \verb|v2.2.6| to \verb|v3.1.1|, the updates are as follows:
+
+To \verb|JHUGenerator|:
+\begin{itemize}
+\item Capability reading LHE files with Higgs boson production, allows NLO production of spin-0;
+\item Extended the list of final state combinations;
+\item Log messages, lhe file headers, and minor cleanup.
+\end{itemize}
+
+To \verb|JHUGenME|:
+\begin{itemize}
+\item Production-independent JHUGenME for spin-0, 1, 2;
+\item Complex couplings in JHUGenME input.
+\end{itemize}
+
+\noindent
+In going from \verb|v2.2.3| to \verb|v2.2.6|, the updates are as follows:
+\begin{itemize}
+\item A small fix which corrects the {\it relative fraction} between the $2e2\mu$ and $4e$/$4\mu$ channels when using interference
+\item beta version is still under development
+\item $q\bar{q} \to$ spin-2 production is more safely performed with settings \verb|PChannel = 2| and $q\bar{q}$ fraction = 1.
+\end{itemize}
+
+\noindent
+In going from \verb|v2.1.3| to \verb|v2.2.3|, the updates are as follows:
+\begin{itemize}
+\item Fix interference and randomization in the {\it{beta}} version
+\item Add the \verb|JHUGenME| modules
+\item Small change for compilation on Mac OSX platforms
+\item Fix for tau masses in $W$ decays
+\end{itemize}
+
+\noindent
+In going from \verb|v2.0.2| to \verb|v2.1.x|, the updates are as follows:
+
+\begin{itemize}
+\item Histograms are written in file (default: ./data/output.dat) and no longer on the screen.  How to understand the histogram data and how to plot is briefly described in the output.dat file.
+\item Added tau masses
+\item Added lepton interference in the ZZ4l final state
+\item Added switch \verb|generate_as| to choose couplings in spin-0 case (works for on- and off-shell resonance). The default is ".false.".
+\item Added the possibility to change graviton-quark couplings. The new parameters are \verb|graviton_qq_left|, \verb|graviton_qq_right| and correspond to $0.5*(1-\gamma^5)$ and $0.5*(1+\gamma^5)$ helicity projectors, respectively. Up to now the coupling was always vector-like. This is also the new default, \verb|graviton_qq_left = graviton_qq_right =1|.
+\item The random seed is now fixed with gfortran.
+\item The call "./JHUGen help" prints out all available command line options
+\item Added new command line option "Unweighted=0 or 1" (default is 1)
+\end{itemize}
+
+\clearpage
+\appendix
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Specific configurations}
+
+We define configurations for certain models which are defined in Table~1 of~\cite{Bolognesi:2012}.
+
+%%%-------- 0+
+\subsection{"SM-like spin-zero", $0^+$}
+
+\footnotesize
+\begin{verbatim}
+!-- parameters that define on-shell spin 0 coupling to SM fields, see note
+   logical, public, parameter :: generate_as = .false.
+   complex(8), public, parameter :: ahg1 = (1.0d0,0d0)
+   complex(8), public, parameter :: ahg2 = (0.0d0,0d0)
+   complex(8), public, parameter :: ahg3 = (0.0d0,0d0)  ! pseudoscalar
+   complex(8), public, parameter :: ahz1 = (1.0d0,0d0)
+   complex(8), public, parameter :: ahz2 = (0.0d0,0d0)  ! this coupling does not contribute for gamma+gamma final states
+   complex(8), public, parameter :: ahz3 = (0.0d0,0d0)  ! pseudoscalar
+
+!-- parameters that define off-shell spin 0 coupling to SM fields, see note
+   complex(8), public, parameter :: ghg2 = (1.0d0,0d0)
+   complex(8), public, parameter :: ghg3 = (0.0d0,0d0)
+   complex(8), public, parameter :: ghg4 = (0.0d0,0d0)   ! pseudoscalar
+   complex(8), public, parameter :: ghz1 = (1.0d0,0d0)
+   complex(8), public, parameter :: ghz2 = (0.0d0,0d0)
+   complex(8), public, parameter :: ghz3 = (0.0d0,0d0)
+   complex(8), public, parameter :: ghz4 = (0.0d0,0d0)   ! pseudoscalar 
+\end{verbatim}
+\normalsize
+
+%%%-------- 0+h
+\subsection{"Higher order spin-zero", $0_h^+$}
+
+\footnotesize
+\begin{verbatim}
+!-- parameters that define on-shell spin 0 coupling to SM fields, see note
+   logical, public, parameter :: generate_as = .false.
+   complex(8), public, parameter :: ahg1 = (1.0d0,0d0)
+   complex(8), public, parameter :: ahg2 = (0.0d0,0d0)
+   complex(8), public, parameter :: ahg3 = (0.0d0,0d0)  ! pseudoscalar
+   complex(8), public, parameter :: ahz1 = (1.0d0,0d0)
+   complex(8), public, parameter :: ahz2 = (0.0d0,0d0)  ! this coupling does not contribute for gamma+gamma final states
+   complex(8), public, parameter :: ahz3 = (0.0d0,0d0)  ! pseudoscalar
+
+!-- parameters that define off-shell spin 0 coupling to SM fields, see note
+   complex(8), public, parameter :: ghg2 = (1.0d0,0d0)
+   complex(8), public, parameter :: ghg3 = (0.0d0,0d0)
+   complex(8), public, parameter :: ghg4 = (0.0d0,0d0)   ! pseudoscalar
+   complex(8), public, parameter :: ghz1 = (0.0d0,0d0)
+   complex(8), public, parameter :: ghz2 = (1.0d0,0d0)
+   complex(8), public, parameter :: ghz3 = (0.0d0,0d0)
+   complex(8), public, parameter :: ghz4 = (0.0d0,0d0)   ! pseudoscalar 
+\end{verbatim}
+\normalsize
+
+%%%-------- 0-
+\subsection{"Pseudoscalar spin-zero", $0^-$}
+
+\footnotesize
+\begin{verbatim}
+!-- parameters that define on-shell spin 0 coupling to SM fields, see note
+   logical, public, parameter :: generate_as = .false.
+   complex(8), public, parameter :: ahg1 = (1.0d0,0d0)
+   complex(8), public, parameter :: ahg2 = (0.0d0,0d0)
+   complex(8), public, parameter :: ahg3 = (0.0d0,0d0)  ! pseudoscalar
+   complex(8), public, parameter :: ahz1 = (1.0d0,0d0)
+   complex(8), public, parameter :: ahz2 = (0.0d0,0d0)  ! this coupling does not contribute for gamma+gamma final states
+   complex(8), public, parameter :: ahz3 = (0.0d0,0d0)  ! pseudoscalar
+
+!-- parameters that define off-shell spin 0 coupling to SM fields, see note
+   complex(8), public, parameter :: ghg2 = (0.0d0,0d0)
+   complex(8), public, parameter :: ghg3 = (0.0d0,0d0)
+   complex(8), public, parameter :: ghg4 = (1.0d0,0d0)   ! pseudoscalar
+   complex(8), public, parameter :: ghz1 = (0.0d0,0d0)
+   complex(8), public, parameter :: ghz2 = (0.0d0,0d0)
+   complex(8), public, parameter :: ghz3 = (0.0d0,0d0)
+   complex(8), public, parameter :: ghz4 = (1.0d0,0d0)   ! pseudoscalar 
+\end{verbatim}
+\normalsize
+
+%%%-------- 1-
+\subsection{"Vector spin-one", $1^-$}
+
+\footnotesize
+\begin{verbatim}
+!---parameters that define spin 1 coupling to SM fields, see note
+   complex(8), public, parameter :: zprime_qq_left  = (1.0d0,0d0)
+   complex(8), public, parameter :: zprime_qq_right = (0.0d0,0d0)
+   complex(8), public, parameter :: zprime_zz_v =  (1.0d0,0d0)!  =1 for JP=1-
+   complex(8), public, parameter :: zprime_zz_a =  (0.0d0,0d0)!  =1 for JP=1+
+\end{verbatim}
+\normalsize
+
+%%%-------- 1+
+\subsection{"Pseudovector spin-one", $1^+$}
+
+\footnotesize
+\begin{verbatim}
+!---parameters that define spin 1 coupling to SM fields, see note
+   complex(8), public, parameter :: zprime_qq_left  = (1.0d0,0d0)
+   complex(8), public, parameter :: zprime_qq_right = (0.0d0,0d0)
+   complex(8), public, parameter :: zprime_zz_v =  (0.0d0,0d0)!  =1 for JP=1-
+   complex(8), public, parameter :: zprime_zz_a =  (1.0d0,0d0)!  =1 for JP=1+
+\end{verbatim}
+\normalsize
+
+%%%-------- 2+
+\subsection{"Minimal Graviton, spin-two", $2^+$}
+
+N.B. If an exclusive production mode is desired (e.g. $q\bar{q}$ or $gg$), this is handled at command-line configuration level via the \verb|PChannel| variable.
+
+\footnotesize
+\begin{verbatim}
+!-- parameters that define spin 2 coupling to SM fields, see note
+! minimal coupling corresponds to a1 = b1 = b5 = 1 everything else 0
+  complex(8), public, parameter :: a1 = (1.0d0,0d0)    ! g1  -- c.f. draft
+  complex(8), public, parameter :: a2 = (0.0d0,0d0)    ! g2
+  complex(8), public, parameter :: a3 = (0.0d0,0d0)    ! g3
+  complex(8), public, parameter :: a4 = (0.0d0,0d0)    ! g4
+  complex(8), public, parameter :: a5 = (0.0d0,0d0)    ! pseudoscalar, g8
+  complex(8), public, parameter :: graviton_qq_left  = (1.0d0,0d0)! graviton coupling to quarks
+  complex(8), public, parameter :: graviton_qq_right = (1.0d0,0d0)
+
+!-- see mod_Graviton
+  logical, public, parameter :: generate_bis = .true.
+  logical, public, parameter :: use_dynamic_MG = .true.
+
+  complex(8), public, parameter :: b1 = (1.0d0,0d0)    !  all b' below are g's in the draft
+  complex(8), public, parameter :: b2 = (0.0d0,0d0)
+  complex(8), public, parameter :: b3 = (0.0d0,0d0)
+  complex(8), public, parameter :: b4 = (0.0d0,0d0)
+  complex(8), public, parameter :: b5 = (1.0d0,0d0)
+  complex(8), public, parameter :: b6 = (0.0d0,0d0)
+  complex(8), public, parameter :: b7 = (0.0d0,0d0)
+  complex(8), public, parameter :: b8 = (0.0d0,0d0)
+  complex(8), public, parameter :: b9 = (0.0d0,0d0)
+  complex(8), public, parameter :: b10 =(0.0d0,0d0)  ! this coupling does not contribute for gamma+gamma final states
+
+
+  complex(8), public, parameter  :: c1 = (1.0d0,0d0)
+  complex(8), public, parameter  :: c2 = (0.0d0,0d0)
+  complex(8), public, parameter  :: c3 = (0.0d0,0d0)
+  complex(8), public, parameter  :: c41= (0.0d0,0d0)
+  complex(8), public, parameter  :: c42= (0.0d0,0d0)
+  complex(8), public, parameter  :: c5 = (0.0d0,0d0)
+  complex(8), public, parameter  :: c6 = (0.0d0,0d0)
+  complex(8), public, parameter  :: c7 = (0.0d0,0d0)
+\end{verbatim}
+\normalsize
+
+%%%-------- 2+h
+\subsection{"Higher order Graviton, spin-two", $2^+_h$}
+
+\footnotesize
+\begin{verbatim}
+!-- parameters that define spin 2 coupling to SM fields, see note
+! minimal coupling corresponds to a1 = b1 = b5 = 1 everything else 0
+  complex(8), public, parameter :: a1 = (0.0d0,0d0)    ! g1  -- c.f. draft
+  complex(8), public, parameter :: a2 = (0.0d0,0d0)    ! g2
+  complex(8), public, parameter :: a3 = (0.0d0,0d0)    ! g3
+  complex(8), public, parameter :: a4 = (1.0d0,0d0)    ! g4
+  complex(8), public, parameter :: a5 = (0.0d0,0d0)    ! pseudoscalar, g8
+  complex(8), public, parameter :: graviton_qq_left  = (1.0d0,0d0)! graviton coupling to quarks
+  complex(8), public, parameter :: graviton_qq_right = (1.0d0,0d0)
+
+!-- see mod_Graviton
+  logical, public, parameter :: generate_bis = .true.
+  logical, public, parameter :: use_dynamic_MG = .true.
+
+  complex(8), public, parameter :: b1 = (0.0d0,0d0)    !  all b' below are g's in the draft
+  complex(8), public, parameter :: b2 = (0.0d0,0d0)
+  complex(8), public, parameter :: b3 = (0.0d0,0d0)
+  complex(8), public, parameter :: b4 = (1.0d0,0d0)
+  complex(8), public, parameter :: b5 = (0.0d0,0d0)
+  complex(8), public, parameter :: b6 = (0.0d0,0d0)
+  complex(8), public, parameter :: b7 = (0.0d0,0d0)
+  complex(8), public, parameter :: b8 = (0.0d0,0d0)
+  complex(8), public, parameter :: b9 = (0.0d0,0d0)
+  complex(8), public, parameter :: b10 =(0.0d0,0d0)  ! this coupling does not contribute for gamma+gamma final states
+
+
+  complex(8), public, parameter  :: c1 = (1.0d0,0d0)
+  complex(8), public, parameter  :: c2 = (0.0d0,0d0)
+  complex(8), public, parameter  :: c3 = (0.0d0,0d0)
+  complex(8), public, parameter  :: c41= (0.0d0,0d0)
+  complex(8), public, parameter  :: c42= (0.0d0,0d0)
+  complex(8), public, parameter  :: c5 = (0.0d0,0d0)
+  complex(8), public, parameter  :: c6 = (0.0d0,0d0)
+  complex(8), public, parameter  :: c7 = (0.0d0,0d0)
+\end{verbatim}
+\normalsize
+
+%%%-------- 2-h
+\subsection{"Higher order Graviton, spin-two", $2^-_h$}
+
+\footnotesize
+\begin{verbatim}
+!-- parameters that define spin 2 coupling to SM fields, see note
+! minimal coupling corresponds to a1 = b1 = b5 = 1 everything else 0
+  complex(8), public, parameter :: a1 = (0.0d0,0d0)    ! g1  -- c.f. draft
+  complex(8), public, parameter :: a2 = (0.0d0,0d0)    ! g2
+  complex(8), public, parameter :: a3 = (0.0d0,0d0)    ! g3
+  complex(8), public, parameter :: a4 = (0.0d0,0d0)    ! g4
+  complex(8), public, parameter :: a5 = (1.0d0,0d0)    ! pseudoscalar, g8
+  complex(8), public, parameter :: graviton_qq_left  = (1.0d0,0d0)! graviton coupling to quarks
+  complex(8), public, parameter :: graviton_qq_right = (1.0d0,0d0)
+
+!-- see mod_Graviton
+  logical, public, parameter :: generate_bis = .true.
+  logical, public, parameter :: use_dynamic_MG = .true.
+
+  complex(8), public, parameter :: b1 = (0.0d0,0d0)    !  all b' below are g's in the draft
+  complex(8), public, parameter :: b2 = (0.0d0,0d0)
+  complex(8), public, parameter :: b3 = (0.0d0,0d0)
+  complex(8), public, parameter :: b4 = (0.0d0,0d0)
+  complex(8), public, parameter :: b5 = (0.0d0,0d0)
+  complex(8), public, parameter :: b6 = (0.0d0,0d0)
+  complex(8), public, parameter :: b7 = (0.0d0,0d0)
+  complex(8), public, parameter :: b8 = (1.0d0,0d0)
+  complex(8), public, parameter :: b9 = (0.0d0,0d0)
+  complex(8), public, parameter :: b10 =(0.0d0,0d0)  ! this coupling does not contribute for gamma+gamma final states
+
+
+  complex(8), public, parameter  :: c1 = (1.0d0,0d0)
+  complex(8), public, parameter  :: c2 = (0.0d0,0d0)
+  complex(8), public, parameter  :: c3 = (0.0d0,0d0)
+  complex(8), public, parameter  :: c41= (0.0d0,0d0)
+  complex(8), public, parameter  :: c42= (0.0d0,0d0)
+  complex(8), public, parameter  :: c5 = (0.0d0,0d0)
+  complex(8), public, parameter  :: c6 = (0.0d0,0d0)
+  complex(8), public, parameter  :: c7 = (0.0d0,0d0)
+\end{verbatim}
+\normalsize
+
+
+\begin{thebibliography}{99}
+\bibitem{Gao:2010qx}
+Y.Y. Gao, A. V. Gritsan, Z.J. Guo, K. Melnikov, M. Schulze and N. V. Tran, "Spin-Determination of Single-Produced Resonances at Hadron Colliders". Phys. Rev. D {\bf 81}, 075022 (2010). arXiv:1001.3396 [hep-ph].
+\bibitem{Bolognesi:2012}
+S. Bolognesi, Y.Y. Gao, A. V. Gritsan, K. Melnikov, M. Schulze, N. V. Tran and A. Whitbeck, "On the Spin and Parity of Single-Produced Resonance at the LHC". arXiv:1208.4018 [hep-ph].
+\bibitem{thesite}
+See webpage: www.pha.jhu.edu/spin
+\end{thebibliography}
+
+\end{document}

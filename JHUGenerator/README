@@ -1,0 +1,83 @@
+Program: JHUGenerator
+
+source code: Fortran 90 and C
+compiler: ifort or f95 (gfortran), gcc
+makefile contains the switch "Comp" which can be set to "gfort" or "ifort" for compilation with f95 or ifort, respectively.
+
+to compile the code: make
+executable file: ./JHUGen
+
+command line parameters:
+   Collider=x    (Collider: 1=LHC, 2=Tevatron), default value:1
+   VegasNc1=x    (number of evaluations), default value:5000000
+   PChannel=x    (partonic channel: 0=glu+glu, 1=quark+antiquark, 2=both), default value:2
+   PDFSet=x      (parton distr. functions, 1=CTEQ6L1 (2001), 2=MSTW(2008),  2xx=MSTW with eigenvector set xx=01..40), default=1
+   DecayMode1=x  (decay mode for vector boson 1), default x=0 
+   DecayMode2=x  (decay mode for vector boson 2), default x=0
+                  x=0:  X-> Z1 Z2, Z1->2l,
+                  x=1:  X-> Z1 Z2, Z1->2q,
+                  x=2:  X-> Z1 Z2, Z1->2tau,
+                  x=3:  X-> Z1 Z2, Z1->2nu,
+                  x=4:  X-> W1 W2, W1->lnu,
+                  x=5:  X-> W1 W2, W1->2q,
+                  x=6:  X-> W1 W2, W1->taunu
+                  x=7:  X-> gamma gamma 
+                  x=8:  Z --> l+ l- (l=e,mu,tau)
+                  x=9:  Z --> anything
+                  x=10: W --> l nu_l (l=e,mu,tau)
+                  x=11: W --> anyting                  
+   DataFile=x    (name of the output file), default value: "output"
+   Process=x     (gives the resonance spin 0,1 or 2)
+   OffXVV=xyz    (only applies to Higgs production, x,y,z can be 1 or 0 indicating real off-shellness for Higgs, Z/W boson 1/2, resp.), default 000
+   if a parameter is not specified, the default value is chosen
+   ReadLHE="x"   (allows NLO production of spin-0 particles by reading in LHE file from NLO generator, e.g., POWHEG)
+   
+example call:
+   ./JHUGen Collider=1 Process=0 VegasNc1=100000 PChannel=0 OffXVV=011 DecayMode1=0 DecayMode2=0 DataFile=test1
+   * out-of-the-box: output datafile example is "data/outputTest.lhe" and terminal output is "data/outputTest_terminal.txt"
+
+
+setting parameters to identify resonance properties:
+*All other parameters in mod_Parameters.f90 (selected parameters described below)
+	- seed_random: seed for generation can be set to random
+	- fix_channels_ratio/channels_ratio_fix: with PChannel=2, one can fix the ratio of gg to qqbar production
+	- m_Z,m_W,m_Reso: mass of Z and X particles
+	- Ga_Z,Ga_W,Ga_Reso: width of Z and X particles
+	- LHC_Energy: energy of LHC
+
+	All couplings are given in the file where they are defined in the paper (http://arxiv.org/abs/1001.3396)
+	Dimensionless couplings are given in Eq.2 (spin 0), Eq.4 (spin 1), Eq.5 [b's] and Eq.6 [c's] (spin 2)
+	Example Scenarios given in Table I.
+
+OffXVV=1XX note:
+      Eq.(7) uses m_V as the pole mass of the Z/W
+      "use_dynamic_MG" in mod_Parameters.F90 =>  
+      .true. (=default), the spin-2 resonance mass with MG^2=(p1+p2)^2, otherwise fixed at M_Reso^2. 
+
+DecayMode2=7 note:
+       Valid for spin-0 and spin-2, only OffXVV=000 or 100 are possible
+       photon couplings c3,c4,c7 are parameters to be specified (M_V=0 and g_9=0 in Eq.(7))
+
+-----------------------------------------
+file descriptions
+-----------------------------------------
+
+main file: main.f90
+  some initializations and call to MC routine
+
+input parameter:  mod_Parameters.f90
+  note that energies are defined in units of 100GeV, i.e. Energy=0.5d0 means 50GeV, alternatively Energy=50d0*GeV can be used
+  after changing one of these parameters the program needs to be recompiled!
+
+cross section file: mod_CrossSection.f90, mod_Graviton.f90, mod_Zprime.f90, mod_Higgs.f90,
+  the call to the rountine that writes out events is "WriteOutEvent(...)" in mod_CrossSection.f90,
+  the routine itself can be found in mod_Kinematics.f90
+
+
+-----------------------------------------
+Release notes...
+-----------------------------------------
+
+V2.0.2: Update random seed for gfort
+
+
