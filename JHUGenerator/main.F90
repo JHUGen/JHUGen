@@ -623,12 +623,12 @@ real(8) :: yRnd(1:22),Res,dum,EMcheck(1:4)
 real(8) :: AcceptedEvent(1:4,1:4),Ehat
 real(8) :: MomExt(1:4,1:4),MomHiggs(1:4),MomGlu(1:4,1:3),Mass(1:4),pH2sq
 integer :: tries, nParticle, MY_IDUP(1:10), ICOLUP(1:2,1:10)
-character(len=*),parameter :: POWHEG_Fmt0 = "(6X,I2)"
+character(len=*),parameter :: POWHEG_Fmt0 = "(6X,I2,A160)"
 character(len=*),parameter :: POWHEG_Fmt1 = "(6X,I2,4X,I3,4X,I3,3X,I3,1X,I3,3X,I3,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9)"
 logical :: FirstEvent,M_ResoSet
 integer :: nline,LHE_IDUP(1:4),LHE_ICOLUP(1:2,1:4),LHE_ICOLUP_Glu(1:2,1:3),LHE_IDUP_Glu(1:3),intDummy,Nevent
 integer :: EventNumPart,nglu
-character(len=30) :: firstfew
+character(len=160) :: FirstLines,EventInfoLine
 character(len=160) :: EventLine(1:4)
 integer :: n,clock,i,stat
 integer, dimension(:), allocatable :: gfort_seed
@@ -658,13 +658,21 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
      FirstEvent = .false.
      M_ResoSet=.false.
      do while ( .not.FirstEvent )
-        read(16,fmt="(A20)",IOSTAT=stat,END=99) firstfew
-        if( firstfew(1:5).eq."hmass" ) then 
-               read(firstfew(6:13),fmt="(F7.0)") M_Reso
+        read(16,fmt="(A160)",IOSTAT=stat,END=99) FirstLines
+        if( FirstLines(1:5).eq."hmass" ) then 
+               read(FirstLines(6:13),fmt="(F7.0)") M_Reso
                M_Reso = M_Reso*GeV!  convert to units of 100GeV
                M_ResoSet=.true.
-        elseif( firstfew(1:7).eq."<event>" ) then 
+        endif
+        if( FirstLines(1:7).eq."<event>" ) then 
                FirstEvent=.true.
+        else
+            if( importPOWHEG_LHEinit ) then 
+                if( FirstLines(1:17).eq."<LesHouchesEvents" .or. FirstLines(1:4).eq."<!--" ) then
+                else
+                  write(io_LHEOutFile,"(A)") trim(firstlines)
+                endif
+            endif
         endif
      enddo
      if( .not. M_ResoSet ) then
@@ -704,8 +712,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
      do while ( .true. ) 
          NEvent=NEvent + 1
 
-         read(16,fmt=POWHEG_Fmt0) EventNumPart!  read number of particle from the first line after <event>
-
+         read(16,fmt=POWHEG_Fmt0) EventNumPart,EventInfoLine!  read number of particle from the first line after <event> and other info
 !        read event lines
          do nline=1,EventNumPart
             read(16,fmt="(A160)") EventLine(nline)
@@ -736,12 +743,13 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
             endif
          enddo
 
+! !        reject event if M_Reso and pH2sq deviate by more than 20 GeV 
+!          if( abs( M_Reso - pH2sq) .gt. 20d0*GeV ) then
+!               write(io_stdout,"(2X,A,2F10.4)")  "WARNING: Higgs mass and momentum squared deviate by more than 20 GeV!",pH2sq*100d0,M_Reso*100d0
+!               write(io_LogFile,"(2X,A,2F10.4)") "WARNING: Higgs mass and momentum squared deviate by more than 20 GeV!",pH2sq*100d0,M_Reso*100d0
+!               cycle
+!          endif
 
-         if( abs( M_Reso - pH2sq) .gt. 20d0*GeV ) then
-              write(io_stdout,"(2X,A,2F10.4)")  "WARNING: Higgs mass and momentum squared deviate by more than 20 GeV!",pH2sq*100d0,M_Reso*100d0
-              write(io_LogFile,"(2X,A,2F10.4)") "WARNING: Higgs mass and momentum squared deviate by more than 20 GeV!",pH2sq*100d0,M_Reso*100d0
-              cycle
-         endif
          EMcheck(1:4) = MomGlu(1:4,1) + MomGlu(1:4,2) - MomHiggs(1:4)
          if( nglu.eq.3 ) EMcheck(1:4) = EMcheck(1:4) - MomGlu(1:4,3)
          if( any(abs(EMcheck(1:4)).gt.1d0*GeV) ) then
@@ -766,14 +774,14 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                     MY_IDUP(1) = convertLHEreverse(LHE_IDUP_Glu(1))
                     MY_IDUP(2) = convertLHEreverse(LHE_IDUP_Glu(2))
                     ICOLUP(1:2,1:2) = LHE_ICOLUP_Glu(1:2,1:2)!  overwrite inital colors with POWHEG ones
-                    call WriteOutEvent((/MomGlu(1:4,1),MomGlu(1:4,2),AcceptedEvent(1:4,1),AcceptedEvent(1:4,2),AcceptedEvent(1:4,3),AcceptedEvent(1:4,4)/),MY_IDUP(1:9),ICOLUP(1:2,1:9))
+                    call WriteOutEvent((/MomGlu(1:4,1),MomGlu(1:4,2),AcceptedEvent(1:4,1),AcceptedEvent(1:4,2),AcceptedEvent(1:4,3),AcceptedEvent(1:4,4)/),MY_IDUP(1:9),ICOLUP(1:2,1:9),EventInfoLine=EventInfoLine)
              elseif(EventNumPart.eq.4) then
                     MY_IDUP(1) = convertLHEreverse(LHE_IDUP_Glu(1))!  overwrite inital ID's with POWHEG ones
                     MY_IDUP(2) = convertLHEreverse(LHE_IDUP_Glu(2))
                     MY_IDUP(10)= convertLHEreverse(LHE_IDUP_Glu(3))
                     ICOLUP(1:2,1:2) = LHE_ICOLUP_Glu(1:2,1:2)!  overwrite inital colors with POWHEG ones
                     ICOLUP(1:2,10)  = LHE_ICOLUP_Glu(1:2,3)  !  set third parton color
-                    call WriteOutEvent((/MomGlu(1:4,1),MomGlu(1:4,2),AcceptedEvent(1:4,1),AcceptedEvent(1:4,2),AcceptedEvent(1:4,3),AcceptedEvent(1:4,4)/),MY_IDUP(1:10),ICOLUP(1:2,1:10),MomRealGlu=MomGlu(1:4,3))
+                    call WriteOutEvent((/MomGlu(1:4,1),MomGlu(1:4,2),AcceptedEvent(1:4,1),AcceptedEvent(1:4,2),AcceptedEvent(1:4,3),AcceptedEvent(1:4,4)/),MY_IDUP(1:10),ICOLUP(1:2,1:10),MomRealGlu=MomGlu(1:4,3),EventInfoLine=EventInfoLine)
              endif
              if( mod(AccepCounter,5000).eq.0 ) then
                   call cpu_time(time_int)
@@ -787,10 +795,10 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
 
 
 !        skip event lines 
-         read(16,fmt="(A7)",IOSTAT=stat,END=99) firstfew! skip <\event>
+         read(16,fmt="(A7)",IOSTAT=stat,END=99) FirstLines! skip <\event>
 !          if( stat.lt.0 ) exit
-         read(16,fmt="(A30)",IOSTAT=stat,END=99) firstfew!   skip <event> or </LesHouchesEvents>
-         if( firstfew(1:30).eq."</LesHouchesEvents>" ) exit
+         read(16,fmt="(A30)",IOSTAT=stat,END=99) FirstLines!   skip <event> or </LesHouchesEvents>
+         if( FirstLines(1:30).eq."</LesHouchesEvents>" ) exit
          if( NEvent.eq. VegasNc1 ) exit
 
      enddo
@@ -1056,17 +1064,35 @@ implicit none
     if( unweighted ) then 
         write(io_LHEOutFile ,'(A)') '<LesHouchesEvents version="1.0">'
         write(io_LHEOutFile ,'(A)') '<!--'
-!        write(io_LHEOutFile ,'(A)') 'Output from the JHUGenerator described in arXiv:1001.3396 [hep-ph],arXiv:1208.4018 [hep-ph]'
         write(io_LHEOutFile ,'(A,A6,A)') 'Output from the JHUGenerator ',trim(JHUGen_Version),' described in arXiv:1001.3396 [hep-ph],arXiv:1208.4018 [hep-ph]'
+
         write(io_LHEOutFile ,'(A)') ''
 
         call WriteParameters(io_LHEOutFile)
 
-        write(io_LHEOutFile ,'(A)') '-->'
-        write(io_LHEOutFile ,'(A)') '<init>'
-        write(io_LHEOutFile ,'(A,2F24.16,A)') '2212 2212',(Collider_Energy*50d0),(Collider_Energy*50d0),' 0 0 10042 10042 3  1'
-        write(io_LHEOutFile ,'(A)') '0.43538820803E-02  0.72559367904E-05  0.87076000000E-07 100'
-        write(io_LHEOutFile ,'(A)') '</init>'
+        if( ReadLHEFile .and. importPOWHEG_LHEinit ) then
+            write(io_LHEOutFile ,'(A)') '------------------------------------------------------'
+        else
+            write(io_LHEOutFile ,'(A)') '-->'
+            write(io_LHEOutFile ,'(A)') '<init>'
+            write(io_LHEOutFile ,'(A,2F24.16,A)') '2212 2212',(Collider_Energy*50d0),(Collider_Energy*50d0),' 0 0 10042 10042 3  1' 
+! in order of appearance:  (see also http://arxiv.org/abs/hep-ph/0109068 and http://arxiv.org/abs/hep-ph/0609017)
+! (*) incoming particle1 (2212=proton), incoming particle2, 
+! (*) energies of colliding particles, 
+! (*) out-dated pdf information for colliding particles (supposed to be 0), 
+! (*) pdf code of LHAGLUE for colliding particles (10042=CTEQ6Ll, MSTW2008=21000,21041-21080)    
+! (*) weighting strategy (3=accept all weights, otherwise=see LHE manuals)
+! (*) number of process types to be accepted (default=1, otherwise=see manual)
+! 
+            write(io_LHEOutFile ,'(A)') '0.43538820803E-02  0.72559367904E-05  1.00000000000E-00 100'
+! in order of appearance: 
+! (*) total cross section in pb
+! (*) stat. error in the total cross section in pb
+! (*) maximum weight
+! (*) list of all user process ID's
+            write(io_LHEOutFile ,'(A)') '</init>'
+        endif
+
     endif
   
 END SUBROUTINE

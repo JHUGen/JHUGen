@@ -21,11 +21,12 @@ contains
 
 
 
-SUBROUTINE WriteOutEvent(Mom,MY_IDUP,ICOLUP,MomRealGlu)
+SUBROUTINE WriteOutEvent(Mom,MY_IDUP,ICOLUP,MomRealGlu,EventInfoLine)
 use ModParameters
 implicit none
 real(8) :: Mom(1:4,1:6)
 real(8),optional :: MomRealGlu(1:4)
+character(len=160),optional :: EventInfoLine
 real(8) :: Spin, Lifetime
 real(8) :: XFV(1:4), Z1FV(1:4), Z2FV(1:4)
 real(8) :: MomDummy(1:4,1:7)
@@ -38,8 +39,8 @@ real(8) :: ntRnd
 character(len=*),parameter :: fmt1 = "(I3,X,I2,X,I2,X,I2,X,I3,X,I3,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7)"
 
 
-! For description of the LHE format see http://arxiv.org/abs/hep-ph/0109068
-! The LHE numbering scheme can be found here: http://pdg.lbl.gov/mc_particle_id_contents.html
+! For description of the LHE format see http://arxiv.org/abs/hep-ph/0109068 and http://arxiv.org/abs/hep-ph/0609017
+! The LHE numbering scheme can be found here: http://pdg.lbl.gov/mc_particle_id_contents.html and http://lhapdf.hepforge.org/manual#tth_sEcA
 
 
 ! DebugCounter(0)=DebugCounter(0)+1
@@ -72,9 +73,9 @@ endif
 
 IDPRUP=100
 XWGTUP=1.
-SCALUP=1000.
+SCALUP=Mu_Fact * 100d0
 AQEDUP=alpha_QED
-AQCDUP=0d0
+AQCDUP=0.11d0
 
 ISTUP(1) = -1
 ISTUP(2) = -1
@@ -242,8 +243,18 @@ endif
 
 
 write(io_LHEOutFile,"(A)") "<event>"
-write(io_LHEOutFile,"(X,I2,X,I3,X,1PE13.7,X,1PE13.7,X,1PE13.7,X,1PE13.7)") NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
+if( .not. ReadLHEFile ) write(io_LHEOutFile,"(X,I2,X,I3,X,1PE13.7,X,1PE13.7,X,1PE13.7,X,1PE13.7)") NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
+! in order of appearance:
+! (*) number of particles in the event
+! (*) process ID (user defined)
+! (*) weighted or unweighted events: +1=unweighted, otherwise= see manual
+! (*) pdf factorization scale in GeV
+! (*) alpha_QED coupling for this event 
+! (*) alpha_s coupling for this event
 
+
+if( ReadLHEFile .and. .not. importPOWHEG_LHEinit ) write(io_LHEOutFile,"(X,I2,X,I3,X,1PE13.7,X,1PE13.7,X,1PE13.7,X,1PE13.7)") NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
+if( ReadLHEFile .and. importPOWHEG_LHEinit .and. present(EventInfoLine) ) write(io_LHEOutFile,"(X,I2,X,A)") NUP,trim(EventInfoLine)
 
 ! parton_a
 i=1

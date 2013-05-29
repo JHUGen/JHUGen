@@ -23,7 +23,7 @@
       integer, intent(in) :: MY_IDUP(6:9)
       complex(dp) :: A(1:4)
       integer :: i1,i2,i3,i4,ordering(1:4)
-      real(dp) :: aL1,aR1,aL2,aR2
+      real(dp) :: aL1,aR1,aL2,aR2,sum2
       real(dp) :: gZ_sq
       real(dp) :: prefactor, Lambda_inv
       real(dp), parameter :: symmFact=1d0/2d0
@@ -157,6 +157,7 @@ enddo
 !       call SH_EMEPEMEP((/-P(1:4,1)-P(1:4,2),P(1:4,3),P(1:4,4),P(1:4,5),P(1:4,6)/)*100d0,sum2)
 ! else
 !       call SH_EMEPEMEP_NOINT((/-P(1:4,1)-P(1:4,2),P(1:4,3),P(1:4,4),P(1:4,5),P(1:4,6)/)*100d0,sum2)
+!       call SH_TAMTAPTAMTAP_NOINT((/-P(1:4,1)-P(1:4,2),P(1:4,3),P(1:4,4),P(1:4,5),P(1:4,6)/)*100d0,sum2)
 ! endif
 ! sum2=sum2* cdabs( (0d0,1d0)/dcmplx(2d0*scr(p(:,1),p(:,2))-M_Reso**2,M_Reso*Ga_Reso) *  dconjg((0d0,1d0)/dcmplx(2d0*scr(p(:,1),p(:,2))-M_Reso**2,M_Reso*Ga_Reso)) ) 
 ! sum2=sum2/100d0**2/100d0**2
@@ -168,7 +169,6 @@ enddo
 ! print *, "checker 2",sum2
 ! print *, "checker 1/2",sum/sum2
 ! pause
-
 
 
 
@@ -949,6 +949,8 @@ enddo
   end function pol_mless2
 
 
+
+
   function pol_dk2mom(plepton,antilepton,i,outgoing)
   use ModMisc
   implicit none
@@ -964,16 +966,13 @@ enddo
 
     Ub(:)=ubar0(plepton,i)
     V(:)=v0(antilepton,-i)
-
-! print *, "ubar spinor",plepton
-! print *, "v spinor   ",antilepton
-
     !---Now return in Kirill's notation  1=E,2=px,3=py,4=pz
     !   This is an expression for (-i)/qsq* (-i) Ub(+/-)) Gamma^\mu V(-/+)
     pol_dk2mom(1)=-(Ub(2)*V(4)+V(2)*Ub(4)+Ub(1)*V(3)+V(1)*Ub(3))
     pol_dk2mom(2)=-(-Ub(1)*V(4)+V(1)*Ub(4)-Ub(2)*V(3)+V(2)*Ub(3))
     pol_dk2mom(3)=-ci*(Ub(1)*V(4)+V(1)*Ub(4)-Ub(2)*V(3)-V(2)*Ub(3))
     pol_dk2mom(4)=-(Ub(2)*V(4)-V(2)*Ub(4)-Ub(1)*V(3)+V(1)*Ub(3))
+
 
     do j=1,4
        pol_dk2mom(j)=pol_dk2mom(j)/qsq
@@ -987,33 +986,35 @@ enddo
   end function pol_dk2mom
 
 
-   !     ubar spinor, massless
 
+
+
+
+
+
+
+!     ubar spinor, massless
   function ubar0(p,i)
+  implicit none
     complex(dp), intent(in) :: p(4)
-    integer, intent(in)       :: i
-    ! -------------------------------
+    integer, intent(in) :: i
     complex(dp) :: ubar0(4)
     complex(dp) :: fc, fc2
-    real(dp)    :: p0,px,py,pz
+    real(dp)    :: p0,px,py,pz,mass
 
-!^^^IFmp
-!    p0=(p(1)+conjg(p(1)))/two
-!    px=(p(2)+conjg(p(2)))/two
-!    py=(p(3)+conjg(p(3)))/two
-!    pz=(p(4)+conjg(p(4)))/two
-!^^^ELSE
+
     p0=real(p(1),dp)
     px=real(p(2),dp)
     py=real(p(3),dp)
     pz=real(p(4),dp)
-!^^^END
+    mass=dsqrt(dabs(p0**2-px**2-py**2-pz**2))
+    if( mass.lt.1d-4 ) mass=0d0
+
 
     fc2 = p0 + pz
     fc=sqrt(fc2)
 
     if (abs(fc2).gt. tol) then
-
        if (i.eq.1) then
           ubar0(1)=czero
           ubar0(2)=czero
@@ -1027,7 +1028,6 @@ enddo
        else
           stop 'ubar0: i out of range'
        endif
-
     else
        if (i.eq.1) then
           ubar0(1) = czero
@@ -1045,36 +1045,47 @@ enddo
     endif
 
 
+!       if (i.eq.1) then 
+!           ubar0(1)=dcmplx(mass,0d0)/fc
+!           ubar0(2)=czero
+!           ubar0(3)=fc
+!           ubar0(4)=dcmplx(px,-py)/fc
+!       elseif (i.eq.-1) then 
+!           ubar0(1)=dcmplx(px,py)/fc
+!           ubar0(2)=-fc
+!           ubar0(3)=czero
+!           ubar0(4)=-dcmplx(mass,0d0)/fc
+!        else
+!           stop 'ubar0: i out of range'
+!       endif 
+
+
+
   end function ubar0
 
 
 
   ! -- v0  spinor, massless
   function v0(p,i)
+  implicit none
     complex(dp), intent(in) :: p(4)
     integer, intent(in)       :: i
-    ! -------------------------------
     complex(dp) :: v0(4)
     complex(dp) :: fc2, fc
-    real(dp)    :: p0,px,py,pz
+    real(dp)    :: p0,px,py,pz,mass
 
-!^^^IFmp
-!    p0=(p(1)+conjg(p(1)))/two
-!    px=(p(2)+conjg(p(2)))/two
-!    py=(p(3)+conjg(p(3)))/two
-!    pz=(p(4)+conjg(p(4)))/two
-!^^^ELSE
     p0=real(p(1),dp)
     px=real(p(2),dp)
     py=real(p(3),dp)
     pz=real(p(4),dp)
-!^^^END
+    mass=dsqrt(dabs(p0**2-px**2-py**2-pz**2))
+    if( mass.lt.1d-4 ) mass=0d0
+
 
     fc2 = p0 + pz
     fc=sqrt(fc2)
 
     if (abs(fc2).gt. tol) then
-
        if (i.eq.1) then
           v0(1)=czero
           v0(2)=czero
@@ -1088,9 +1099,7 @@ enddo
        else
           stop 'v0: i out of range'
        endif
-
     else
-
        if (i.eq.1) then
           v0(1)=czero
           v0(2)=czero
@@ -1104,10 +1113,297 @@ enddo
        else
           stop 'v0: i out of range'
        endif
-
     endif
 
+
+!       if (i.eq.+1) then 
+!           v0(1)=czero
+!           v0(2)=dcmplx(mass,0d0)/fc
+!           v0(3)=dcmplx(px,-py)/fc
+!           v0(4)=-fc
+!       elseif (i.eq.-1) then
+!           v0(1)=fc
+!           v0(2)=dcmplx(px,py)/fc
+!           v0(3)=dcmplx(-mass,0d0)/fc
+!           v0(4)=czero
+!        else
+!           stop 'v0: i out of range'
+!       endif
+
+
+
   end function v0
+
+
+
+
+
+
+  ! -- v  spinor, massive (from HELAS)
+  FUNCTION vspi(p,pol)
+  implicit none
+  complex(dp), intent(in) :: p(1:4)
+  integer, intent(in)     :: pol
+  complex(dp) :: vspi(1:4),chi(1:2)
+  real(dp)    :: p0,px,py,pz,pabs,omegaP,omegaM
+
+
+    p0=real(p(1),dp)
+    px=real(p(2),dp)
+    py=real(p(3),dp)
+    pz=real(p(4),dp)
+    pabs = sqrt( px**2+py**2+pz**2 )
+  
+    omegaP = sqrt(abs( p0+pabs ))
+    omegaM = sqrt(abs( p0-pabs ))
+
+
+    if( pol.eq.+1 ) then
+        chi(1) =-px + (0.0_dp,1.0_dp)*py ! this is chi-
+        chi(2) = pabs + pz
+        chi(1:2) = chi(1:2)/sqrt(abs(2.0_dp*pabs*(pabs+pz)))
+
+        vspi(1:2) = -pol * omegaP * chi(1:2)
+        vspi(3:4) = +pol * omegaM * chi(1:2)
+    elseif( pol.eq.-1 ) then
+        chi(1) = pabs + pz ! this is chi+
+        chi(2) = px + (0.0_dp,1.0_dp)*py
+        chi(1:2) = chi(1:2)/sqrt(abs(2.0_dp*pabs*(pabs+pz)))
+
+        vspi(1:2) = -pol * omegaM * chi(1:2)
+        vspi(3:4) = +pol * omegaP * chi(1:2)
+    else
+        print *,  'vspi: pol out of range'
+        stop
+    endif
+    
+
+  RETURN
+  END FUNCTION vspi
+
+
+  ! -- u  spinor, massive (from HELAS)
+  FUNCTION uspi(p,pol)
+  implicit none
+  complex(dp), intent(in) :: p(1:4)
+  integer, intent(in)     :: pol
+  complex(dp) :: uspi(1:4),chi(1:2)
+  real(dp)    :: p0,px,py,pz,pabs,omegaP,omegaM
+
+
+    p0=real(p(1),dp)
+    px=real(p(2),dp)
+    py=real(p(3),dp)
+    pz=real(p(4),dp)
+    pabs = sqrt( px**2+py**2+pz**2 )
+  
+    omegaP = sqrt(abs( p0+pabs ))
+    omegaM = sqrt(abs( p0-pabs ))
+
+    if( pol.eq.+1 ) then
+        chi(1) = pabs + pz ! this is chi+
+        chi(2) = px + (0.0_dp,1.0_dp)*py
+        chi(1:2) = chi(1:2)/sqrt(abs(2.0_dp*pabs*(pabs+pz)))
+
+        uspi(1:2) = omegaM * chi(1:2)
+        uspi(3:4) = omegaP * chi(1:2)
+    elseif( pol.eq.-1 ) then
+        chi(1) =-px + (0.0_dp,1.0_dp)*py ! this is chi-
+        chi(2) = pabs + pz
+        chi(1:2) = chi(1:2)/sqrt(abs(2.0_dp*pabs*(pabs+pz)))
+
+        uspi(1:2) = omegaP * chi(1:2)
+        uspi(3:4) = omegaM * chi(1:2)
+    else
+        print *,  'uspi: pol out of range'
+        stop
+    endif
+    
+
+  RETURN
+  END FUNCTION uspi
+
+
+  ! -- ubar  spinor, massive (from HELAS)
+  FUNCTION ubarspi(p,pol)
+  implicit none
+  complex(dp), intent(in) :: p(1:4)
+  integer, intent(in)     :: pol
+  complex(dp) :: uspi_tmp(1:4),ubarspi(1:4)
+
+    uspi_tmp(1:4) = uspi(p,pol)
+    ubarspi(1) = dconjg(uspi_tmp(3))
+    ubarspi(2) = dconjg(uspi_tmp(4))
+    ubarspi(3) = dconjg(uspi_tmp(1))
+    ubarspi(4) = dconjg(uspi_tmp(2))
+
+  RETURN
+  END FUNCTION ubarspi
+
+
+
+
+          subroutine vSpiDIRAC(p,m,i,f)!   Dirac spinor, massive  (from TOPAZ)
+          implicit none
+          integer i
+          real(8) m
+          complex(8) p(4)
+          complex(8) f(4),fc
+          real(8) p0,px,py,pz,fc2
+
+          p0=dreal(p(1))
+          px=dreal(p(2))
+          py=dreal(p(3))
+          pz=dreal(p(4))
+
+          fc2 = p0+m
+          fc=cdsqrt(dcmplx(fc2))
+!           fc=dsqrt(fc2)
+
+          if (i.eq.1) then
+            f(1)=pz*fc/fc2
+            f(2)=(px+(0d0,1d0)*py)*fc/fc2
+            f(3)=fc
+            f(4)=dcmplx(0d0,0d0)
+          elseif (i.eq.-1) then
+            f(1)=(px-(0d0,1d0)*py)*fc/fc2
+            f(2)=-pz*fc/fc2
+            f(3)=dcmplx(0d0,0d0)
+            f(4)=fc
+          else
+              print *, "wrong helicity setting in vspi"
+              stop
+          endif
+
+          return
+          end SUBROUTINE
+
+
+
+          subroutine ubarSpiDIRAC(p,m,i,f)!   Dirac spinor, massive  (from TOPAZ)
+          implicit none
+          integer i
+          real(8) m
+          complex(8) p(4)
+          complex(8) f(4),fc
+          real(8)  p0,px,py,pz,fc2
+
+          p0=dreal(p(1))
+          px=dreal(p(2))
+          py=dreal(p(3))
+          pz=dreal(p(4))
+
+          fc2=p0+m
+          fc=cdsqrt( dcmplx(fc2))
+!           fc=dsqrt(fc2)
+
+          if (i.eq.1) then
+            f(1)=fc
+            f(2)=dcmplx(0d0,0d0)
+            f(3)=-1d0*pz*fc/fc2
+            f(4)=-(px-(0d0,1d0)*py)*fc/fc2
+          elseif (i.eq.-1) then
+            f(1)=dcmplx(0d0,0d0)
+            f(2)=fc
+            f(3)=-(px+(0d0,1d0)*py)*fc/fc2
+            f(4)=pz*fc/fc2
+          else
+              print *, "wrong helicity setting in ubarSpi"
+              stop
+          endif
+
+          return
+          end subroutine
+
+
+
+
+
+      function vbqq(sp1,sp2)!  (from TOPAZ)
+      implicit none
+      complex(8), intent(in) :: sp1(:), sp2(:)
+      integer :: i
+      complex(8) :: vbqq(4)
+      complex(8) :: sp1a(4)
+      real(8) :: va(1:4,1:4)
+
+         va(1,1:4)=(/+1d0,0d0,0d0,0d0/)      
+         va(2,1:4)=(/0d0,-1d0,0d0,0d0/)      
+         va(3,1:4)=(/0d0,0d0,-1d0,0d0/)      
+         va(4,1:4)=(/0d0,0d0,0d0,-1d0/)
+
+          do i=1,4
+             call spb2(sp1,dcmplx(va(i,1:4)),sp1a)
+             vbqq(i) = sp1a(1)*sp2(1)+sp1a(2)*sp2(2)+sp1a(3)*sp2(3)+sp1a(4)*sp2(4)
+          enddo
+
+      end function vbqq
+
+
+
+         subroutine spb2(sp,v,f)!  (from TOPAZ)
+         implicit none
+         integer i,i1,i2,i3,Dv,Ds,imax
+         double complex sp(4),v(4),f(4)
+         double complex x0(4,4),xx(4,4),xy(4,4)
+         double complex xz(4,4),x5(4,4)
+         double complex y1,y2,y3,y4,bp,bm,cp,cm
+
+
+           Ds=4
+           Dv=4
+           imax = Ds/4
+
+           do i=1,imax
+           i1= 1+4*(i-1)
+           i2=i1+3
+
+           y1=sp(i1)
+           y2=sp(i1+1)
+           y3=sp(i1+2)
+           y4=sp(i1+3)
+
+           x0(1,i)=y1
+           x0(2,i)=y2
+           x0(3,i)=-y3
+           x0(4,i)=-y4
+
+           xx(1,i) = -y4
+           xx(2,i) = -y3
+           xx(3,i) = y2
+           xx(4,i) = y1
+
+           xy(1,i)=dcmplx(0d0,-1d0)*y4
+           xy(2,i)=dcmplx(0d0,1d0)*y3
+           xy(3,i)=dcmplx(0d0,1d0)*y2
+           xy(4,i)=dcmplx(0d0,-1d0)*y1
+
+           xz(1,i)=-y3
+           xz(2,i)=y4
+           xz(3,i)=y1
+           xz(4,i)=-y2
+
+           x5(1,i)=y3
+           x5(2,i)=y4
+           x5(3,i)=y1
+           x5(4,i)=y2
+
+           enddo
+
+           if (Dv.eq.4) then
+
+           do i=1,4
+
+           f(i)=v(1)*x0(i,1)-v(2)*xx(i,1)-v(3)*xy(i,1)-v(4)*xz(i,1)
+
+           enddo
+
+           endif
+
+           return
+           end SUBROUTINE
+
+
 
 
 

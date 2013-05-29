@@ -3,7 +3,7 @@ implicit none
 save
 ! 
 ! 
-character(len=6),parameter :: JHUGen_Version="v3.1.1"
+character(len=6),parameter :: JHUGen_Version="v3.1.2"
 !  
 ! 
 integer, public :: Collider, PDFSet,PChannel,Process,DecayMode1,DecayMode2
@@ -24,9 +24,13 @@ character(len=100) :: LHEProdFile
 logical, public, parameter :: seed_random = .true.
 
 logical, public, parameter :: fix_channels_ratio = .true.
+
 real(8), public, parameter :: channels_ratio_fix = 0.25d0    ! desired ratio of
                                                              ! N_qq/(N_qq+N_gg)
-logical, public, parameter :: includeInterference=.false.    ! include interference effecs in ZZ production with decays to 4 leptons
+logical, public, parameter :: includeInterference = .false.    ! include interference effecs in ZZ production with decays to 4 leptons
+
+logical, public, parameter :: importPOWHEG_LHEinit = .true.
+
 
 real(8),public :: GlobalMax=-1d99
 real(8),public :: GlobalMin=+1d99
@@ -49,7 +53,7 @@ real(8), public, parameter :: Lambda  = 1000d0    *GeV      ! Lambda coupling en
                                                             ! overal scale for x-section and in power suppressed
                                                             ! operators/formfactors (former r).
 
-real(8), public, parameter :: m_tau = 1.777d0  *GeV           ! tau lepton mass
+real(8), public, parameter :: m_tau = 1.777d0  *GeV         ! tau lepton mass
 
 real(8), public, parameter :: alpha_QED = 1d0/128.0d0       ! el.magn. coupling
 real(8), public, parameter :: sitW = dsqrt(0.23119d0)       ! sin(Theta_Weinberg) (PDG-2008)

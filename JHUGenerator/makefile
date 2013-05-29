@@ -6,7 +6,7 @@ VegasDir = $(Here)/vegas
 
 # compiler options, Comp=ifort/gfort
 Opt  = Yes
-Comp = ifort
+Comp = gfort
 
 
 
@@ -74,8 +74,22 @@ PSGenObj = $(ObjectDir)/genps.o \
            $(ObjectDir)/boost.o
 
 
+# MadGraphDep = h_emepemep.f \
+#               h_emepemep_noint.f \
+#               h_tamtaptamtap.f \
+#               h_tamtaptamtap_noint.f \
+#               switchmom.f
 
-JHUGenerator: $(PSGenObj) $(VegasObj) $(PDFObj) $(MainObj)
+# MadGraphObj = $(ObjectDir)/h_emepemep.o \
+#               $(ObjectDir)/h_tamtaptamtap.o \
+#               $(ObjectDir)/h_emepemep_noint.o \
+#               $(ObjectDir)/h_tamtaptamtap_noint.o \
+#               $(ObjectDir)/switchmom.o \
+#               $(HOME)/lib/HELAS-3.0/libdhelas3.ifc90.a
+
+
+
+JHUGenerator: $(PSGenObj) $(VegasObj) $(PDFObj)  $(MainObj)
 	@echo " linking"
 	@echo " executable file is "$(Exec) "compiled with "$(Comp)
 	@echo " "
@@ -101,6 +115,12 @@ $(PSGenObj): $(PSGenDep)
 	@echo " compiling phase space generator"
 	$(ccomp) -c $(PSGenDep)
 	mv *.o $(ObjectDir)
+
+
+# $(MadGraphObj): $(MadGraphDep)
+# 	@echo " compiling MG files"
+# 	$(fcomp) -O0 -c $(MadGraphDep) -I/home/schulze/lib/HELAS-3.0/
+# 	mv *.o $(ObjectDir)
 
 
 

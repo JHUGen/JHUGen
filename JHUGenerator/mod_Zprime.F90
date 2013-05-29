@@ -139,6 +139,8 @@ enddo
 enddo
 enddo
 
+!  sum ~ GeV~-8
+!  prefactor ~ GeV^0
          sum = sum*prefactor
 
       end subroutine
@@ -161,7 +163,7 @@ enddo
       l4=ordering(4)
 
       s  = two*scr(p(:,1),p(:,2))
-      propG = one/dcmplx(s - M_Reso**2,M_Reso*Ga_Reso)
+      propG = s/dcmplx(s - M_Reso**2,M_Reso*Ga_Reso)
 
 
 !       s = two*scr(p(:,3),p(:,4))
@@ -207,8 +209,10 @@ enddo
 
 
 
-         call qqZprimeZZampl(pin,sp,A(1))
+         call qqZprimeZZampl(pin,sp,A(1)) 
 
+! A(1) ~ GeV^-2
+! propG*propZ1*propZ2 ~  GeV^-2
          A(1) = A(1) * propG*propZ1*propZ2
 
       end subroutine
@@ -313,8 +317,6 @@ enddo
        res= - e1_e3*e4_q3*xxx1*yyy1    &
             - e1_e4*e3_q4*xxx1*yyy1    &
             - et1(e1,e3,e4,q3)*xxx1*yyy2 + et1(e1,e3,e4,q4)*xxx1*yyy2
-
-
 
 
 !       e3 = pol_mass(q3,dreal(cdsqrt(sc(q3,q3))),-1) 

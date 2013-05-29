@@ -264,11 +264,11 @@ enddo
                     aL1=0d0
                     aR1=0d0
               endif
-              prefactor = prefactor *(one/two*M_V*Ga_V)**2
+!               prefactor = prefactor *(one/two*M_V*Ga_V)**2
          elseif( IsAWDecay(DecayMode1) ) then !  W decay
               aL1 = bL
               aR1 = bR
-              prefactor = prefactor *(one/two*M_V*Ga_V)**2
+!               prefactor = prefactor *(one/two*M_V*Ga_V)**2
          elseif( IsAPhoton(DecayMode1) ) then !  photon decay
               aL1=1d0
               aR1=1d0
@@ -372,7 +372,7 @@ enddo
 
 
       s  = 2d0 * scr(p(:,1),p(:,2))
-      propG = one/dcmplx(s - M_Reso**2,M_Reso*Ga_Reso)
+      propG = s/dcmplx(s - M_Reso**2,M_Reso*Ga_Reso)
 
 
          pin(1,:) = p(:,1)
