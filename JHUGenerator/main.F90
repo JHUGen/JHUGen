@@ -1071,7 +1071,7 @@ implicit none
         call WriteParameters(io_LHEOutFile)
 
         if( ReadLHEFile .and. importPOWHEG_LHEinit ) then
-            write(io_LHEOutFile ,'(A)') '------------------------------------------------------'
+            write(io_LHEOutFile ,'(A)') ''
         else
             write(io_LHEOutFile ,'(A)') '-->'
             write(io_LHEOutFile ,'(A)') '<init>'

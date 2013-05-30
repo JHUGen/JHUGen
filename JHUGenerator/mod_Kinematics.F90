@@ -198,7 +198,7 @@ endif
 tmp = MomDummy(1,3)*MomDummy(1,3)-MomDummy(2,3)*MomDummy(2,3)-MomDummy(3,3)*MomDummy(3,3)-MomDummy(4,3)*MomDummy(4,3)
 if( tmp.lt. -1d-3 ) print *, "Error 6: large negative mass!",tmp
 L12Mass = dSQRT(dABS(tmp))
-if( L12Mass.lt.1d-5 ) then
+if( L12Mass.lt.1d-6 ) then
 L12Mass=0d0
 endif
 if( tmp.lt.0d0 ) then
@@ -208,7 +208,7 @@ endif
 tmp = MomDummy(1,4)*MomDummy(1,4)-MomDummy(2,4)*MomDummy(2,4)-MomDummy(3,4)*MomDummy(3,4)-MomDummy(4,4)*MomDummy(4,4)
 if( tmp.lt. -1d-3 ) print *, "Error 7: large negative mass!",tmp
 L11Mass = dSQRT(dABS(tmp))
-if( L11Mass.lt.1d-5 ) then
+if( L11Mass.lt.1d-6 ) then
 L11Mass=0d0
 endif
 if( tmp.lt.0d0 ) then
@@ -218,7 +218,7 @@ endif
 tmp = MomDummy(1,5)*MomDummy(1,5)-MomDummy(2,5)*MomDummy(2,5)-MomDummy(3,5)*MomDummy(3,5)-MomDummy(4,5)*MomDummy(4,5)
 if( tmp.lt. -1d-3 ) print *, "Error 8: large negative mass!",tmp
 L22Mass = dSQRT(dABS(tmp))
-if( L22Mass.lt.1d-5 ) then
+if( L22Mass.lt.1d-6 ) then
 L22Mass=0d0
 endif
 if( tmp.lt.0d0 ) then
@@ -228,7 +228,7 @@ endif
 tmp = MomDummy(1,6)*MomDummy(1,6)-MomDummy(2,6)*MomDummy(2,6)-MomDummy(3,6)*MomDummy(3,6)-MomDummy(4,6)*MomDummy(4,6)
 if( tmp.lt. -1d-3 ) print *, "Error 9: large negative mass!",tmp
 L21Mass = dSQRT(dABS(tmp))
-if( L21Mass.lt.1d-5 ) then
+if( L21Mass.lt.1d-6 ) then
 L21Mass=0d0
 endif
 if( tmp.lt.0d0 ) then

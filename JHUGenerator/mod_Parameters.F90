@@ -3,7 +3,7 @@ implicit none
 save
 ! 
 ! 
-character(len=6),parameter :: JHUGen_Version="v3.1.4"
+character(len=6),parameter :: JHUGen_Version="v3.1.5"
 !  
 ! 
 integer, public :: Collider, PDFSet,PChannel,Process,DecayMode1,DecayMode2
@@ -53,7 +53,9 @@ real(8), public, parameter :: Lambda  = 1000d0    *GeV      ! Lambda coupling en
                                                             ! overal scale for x-section and in power suppressed
                                                             ! operators/formfactors (former r).
 
-real(8), public, parameter :: m_tau = 1.777d0  *GeV         ! tau lepton mass
+real(8), public, parameter :: m_el = 0.00051100d0  *GeV         ! electron mass
+real(8), public, parameter :: m_mu = 0.10566d0  *GeV              ! muon mass
+real(8), public, parameter :: m_tau = 1.7768d0  *GeV                ! tau mass
 
 real(8), public, parameter :: alpha_QED = 1d0/128.0d0       ! el.magn. coupling
 real(8), public, parameter :: sitW = dsqrt(0.23119d0)       ! sin(Theta_Weinberg) (PDG-2008)
@@ -372,11 +374,11 @@ integer :: Part
   if( Part.eq.Glu_ ) then
       getMass = 0d0
   elseif( abs(Part).eq.abs(ElM_) ) then
-      getMass = 0d0
+      getMass = m_el
   elseif( abs(Part).eq.abs(MuM_) ) then
-      getMass = 0d0
+      getMass = m_mu
   elseif( abs(Part).eq.abs(TaM_) ) then
-      getMass = m_Tau
+      getMass = m_tau
   elseif( abs(Part).eq.abs(NuE_) ) then
       getMass = 0d0
   elseif( abs(Part).eq.abs(NuM_) ) then
