@@ -49,8 +49,8 @@ complex(8) :: Gggcoupl(1:5),Gqqcoupl(1:2),Gzzcoupl(1:10)
    print *, ""
    call EvalAmp_qqb_Zprime_VV(p(1:4,1:6),M_Reso,Ga_Reso,Zqqcoupl,Zzzcoupl,MY_IDUP(6:9),MatElSq)
    print *, "Matr.el. squared (spin-1)",MatElSq
-   print *, "result should be (spin-1)",0.0020357978978982D0
-   print *, "ratio",MatElSq/0.0020357978978982D0
+   print *, "result should be (spin-1)",0.0020357978978982D0*1.25d0**4
+   print *, "ratio",MatElSq/(0.0020357978978982D0*1.25d0**4)
    print *, ""
    call EvalAmp_gg_G_VV(p(1:4,1:6),M_Reso,Ga_Reso,Gggcoupl,Gzzcoupl,MY_IDUP(6:9),MatElSq)
    print *, "Matr.el. squared (gg spin-2)",MatElSq
@@ -59,8 +59,8 @@ complex(8) :: Gggcoupl(1:5),Gqqcoupl(1:2),Gzzcoupl(1:10)
    print *, ""
    call EvalAmp_qqb_G_VV(p(1:4,1:6),M_Reso,Ga_Reso,Gqqcoupl,Gzzcoupl,MY_IDUP(6:9),MatElSq)
    print *, "Matr.el. squared (qq spin-2)",MatElSq
-   print *, "result should be (qq spin-2)",0.0004838377647021d0
-   print *, "ratio",MatElSq/0.0004838377647021d0
+   print *, "result should be (qq spin-2)",0.0004838377647021d0*1.25d0**4
+   print *, "ratio",MatElSq/(0.0004838377647021d0*1.25d0**4)
    print *, ""
 
 

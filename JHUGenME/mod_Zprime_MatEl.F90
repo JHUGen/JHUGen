@@ -166,7 +166,7 @@ enddo
       l4=ordering(4)
 
       s  = two*scr(p(:,1),p(:,2))
-      propG = one/dcmplx(s - M_Reso**2,M_Reso*Ga_Reso)
+      propG = s/dcmplx(s - M_Reso**2,M_Reso*Ga_Reso)
 
 
 !       s = two*scr(p(:,3),p(:,4))

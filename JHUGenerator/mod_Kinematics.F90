@@ -149,23 +149,24 @@ do c=1,4
 enddo
 
 
-! check energy-momentum conservation
-tmp=Mom(1,1)+Mom(1,2)-Mom(1,3)-Mom(1,4)-Mom(1,5)-Mom(1,6)
-if( present(MomRealGlu) ) tmp=tmp-MomRealGlu(1)
-if( abs(tmp)/Mom(1,1).gt.1d-5 ) print *, "Error 0: energy-momentum violation!",abs(tmp)/Mom(1,1)
+! check energy-momentum conservation when we don't use "adjusted kinematics"
+if( (OffShellV1).or.(OffShellV2).or.(IsAPhoton(DecayMode1)) ) then
+    tmp=Mom(1,1)+Mom(1,2)-Mom(1,3)-Mom(1,4)-Mom(1,5)-Mom(1,6)
+    if( present(MomRealGlu) ) tmp=tmp-MomRealGlu(1)
+    if( abs(tmp)/Mom(1,1).gt.1d-5 ) print *, "Error 0: energy-momentum violation!",abs(tmp)/Mom(1,1)
 
-tmp=Mom(2,1)+Mom(2,2)-Mom(2,3)-Mom(2,4)-Mom(2,5)-Mom(2,6)
-if( present(MomRealGlu) ) tmp=tmp-MomRealGlu(2)
-if( abs(tmp)/Mom(1,1).gt.1d-5 ) print *, "Error 0: energy-momentum violation!",abs(tmp)/Mom(1,1)
+    tmp=Mom(2,1)+Mom(2,2)-Mom(2,3)-Mom(2,4)-Mom(2,5)-Mom(2,6)
+    if( present(MomRealGlu) ) tmp=tmp-MomRealGlu(2)
+    if( abs(tmp)/Mom(1,1).gt.1d-5 ) print *, "Error 0: energy-momentum violation!",abs(tmp)/Mom(1,1)
 
-tmp=Mom(3,1)+Mom(3,2)-Mom(3,3)-Mom(3,4)-Mom(3,5)-Mom(3,6)
-if( present(MomRealGlu) ) tmp=tmp-MomRealGlu(3)
-if( abs(tmp)/Mom(1,1).gt.1d-5 ) print *, "Error 0: energy-momentum violation!",abs(tmp)/Mom(1,1)
+    tmp=Mom(3,1)+Mom(3,2)-Mom(3,3)-Mom(3,4)-Mom(3,5)-Mom(3,6)
+    if( present(MomRealGlu) ) tmp=tmp-MomRealGlu(3)
+    if( abs(tmp)/Mom(1,1).gt.1d-5 ) print *, "Error 0: energy-momentum violation!",abs(tmp)/Mom(1,1)
 
-tmp=Mom(4,1)+Mom(4,2)-Mom(4,3)-Mom(4,4)-Mom(4,5)-Mom(4,6)
-if( present(MomRealGlu) ) tmp=tmp-MomRealGlu(4)
-if( abs(tmp)/Mom(1,1).gt.1d-5 ) print *, "Error 0: energy-momentum violation!",abs(tmp)/Mom(1,1)
-
+    tmp=Mom(4,1)+Mom(4,2)-Mom(4,3)-Mom(4,4)-Mom(4,5)-Mom(4,6)
+    if( present(MomRealGlu) ) tmp=tmp-MomRealGlu(4)
+    if( abs(tmp)/Mom(1,1).gt.1d-5 ) print *, "Error 0: energy-momentum violation!",abs(tmp)/Mom(1,1)
+endif
 
 
 ! calculating and checking masses
