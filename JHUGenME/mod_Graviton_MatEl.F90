@@ -385,7 +385,7 @@ enddo
 
 
       s  = 2d0 * scr(p(:,1),p(:,2))
-      propG = s/dcmplx(s - M_Reso**2,M_Reso*Ga_Reso)
+      propG = s/dcmplx(s - M_Reso**2,M_Reso*Ga_Reso)       /(M_Reso**2)
 
 
          pin(1,:) = p(:,1)

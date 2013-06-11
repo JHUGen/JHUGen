@@ -102,8 +102,8 @@ int main(void){
  __modzprime_MOD_evalamp_qqb_zprime_vv(P, &MReso,  &GaReso, Zqqcoupl, Zvvcoupl, MYIDUP, &MatElSq);
  printf("\n ");
  printf("Matr.el. squared (spin-1): %20.17e \n ",MatElSq);
- printf("result should be (spin-1): %20.17e \n ",0.0020357978978982*1.25*1.25*1.25*1.25);
- printf("ratio: %20.17e \n ",MatElSq/(0.0020357978978982*1.25*1.25*1.25*1.25));
+ printf("result should be (spin-1): %20.17e \n ",0.0020357978978982);
+ printf("ratio: %20.17e \n ",MatElSq/0.0020357978978982);
 
   __modgraviton_MOD_evalamp_gg_g_vv(P, &MReso,  &GaReso, Gggcoupl, Gvvcoupl, MYIDUP, &MatElSq);
  printf("\n ");
@@ -114,8 +114,8 @@ int main(void){
   __modgraviton_MOD_evalamp_qqb_g_vv(P, &MReso,  &GaReso, Gqqcoupl, Gvvcoupl, MYIDUP, &MatElSq);
  printf("\n ");
  printf("Matr.el. squared (qq spin-2): %20.17e \n ",MatElSq);
- printf("result should be (qq spin-2): %20.17e \n ",0.0004838377647021*1.25*1.25*1.25*1.25);
- printf("ratio: %20.17e \n ",MatElSq/(0.0004838377647021*1.25*1.25*1.25*1.25));
+ printf("result should be (qq spin-2): %20.17e \n ",0.0004838377647021);
+ printf("ratio: %20.17e \n ",MatElSq/0.0004838377647021);
 
 
 
