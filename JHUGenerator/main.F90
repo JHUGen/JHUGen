@@ -46,7 +46,7 @@ use ModParameters
 use ModKinematics
 implicit none
 character :: arg*(120)
-integer :: NumArgs,NArg,OffShell_XVV,iunwgt,CountArg
+integer :: NumArgs,NArg,OffShell_XVV,iunwgt,CountArg,iinterf
 
    Collider=1
    VegasIt1=-1
@@ -59,9 +59,10 @@ integer :: NumArgs,NArg,OffShell_XVV,iunwgt,CountArg
    DecayMode2=0  ! Z/W-
    Process = 0   ! select 0, 1 or 2 to represent the spin of the resonance
    Unweighted =.true.
-   OffShell_XVV=000! 000: X,V1,V2 on-shell; 010: X,V2 on-shell, V1 off-shell; and so on
+   OffShell_XVV=011! 000: X,V1,V2 on-shell; 010: X,V2 on-shell, V1 off-shell; and so on
    LHEProdFile=""
    ReadLHEFile=.false.
+   iinterf = -1
 
 ! !       DecayMode=0:  Z --> l+ l- (l=e,mu)
 ! !       DecayMode=1:  Z --> q qbar (q=u,d,c,s,b)
@@ -137,6 +138,9 @@ integer :: NumArgs,NArg,OffShell_XVV,iunwgt,CountArg
         else
             Unweighted = .true.
         endif
+    elseif( arg(1:7) .eq."Interf=" ) then
+        read(arg(8:8),*) iinterf
+        CountArg = CountArg + 1
     elseif( arg(1:8) .eq."ReadLHE=" ) then
         read(arg(9:108),"(A)") LHEProdFile
         ReadLHEFile=.true.
@@ -187,6 +191,36 @@ integer :: NumArgs,NArg,OffShell_XVV,iunwgt,CountArg
     elseif( IsAPhoton(DecayMode1) ) then
        M_V = 0d0
        Ga_V= 0d0    
+    endif
+
+    if( ((DecayMode1.eq.0) .and. (DecayMode2.eq.0)) .or.  &
+        ((DecayMode1.eq.2) .and. (DecayMode2.eq.2)) .or.  &
+        ((DecayMode1.eq.8) .and. (DecayMode2.eq.8)) .or.  &
+        ((DecayMode1.eq.9) .and. (DecayMode2.eq.9)) .or.  &
+        ((DecayMode1.eq.0) .and. (DecayMode2.eq.8)) .or.  &
+        ((DecayMode1.eq.0) .and. (DecayMode2.eq.9)) .or.  &
+        ((DecayMode1.eq.2) .and. (DecayMode2.eq.8)) .or.  &
+        ((DecayMode1.eq.2) .and. (DecayMode2.eq.9)) .or.  &
+        ((DecayMode1.eq.8) .and. (DecayMode2.eq.9)) .or.  &
+        ((DecayMode2.eq.0) .and. (DecayMode1.eq.0)) .or.  &
+        ((DecayMode2.eq.0) .and. (DecayMode1.eq.8)) .or.  &
+        ((DecayMode2.eq.0) .and. (DecayMode1.eq.9)) .or.  &
+        ((DecayMode2.eq.2) .and. (DecayMode1.eq.8)) .or.  &
+        ((DecayMode2.eq.2) .and. (DecayMode1.eq.9)) .or.  &
+        ((DecayMode2.eq.8) .and. (DecayMode1.eq.9))       ) then !  allow interference
+            if( iinterf.eq.-1 ) then!  set default interference switch
+                if( M_Reso.gt.2d0*M_Z ) then
+                    includeInterference = .false.
+                else
+                    includeInterference = .true.
+                endif
+            elseif( iinterf.eq.0 ) then! overwrite default and use user selection
+                includeInterference = .false.
+            else
+                includeInterference = .true.
+            endif
+    else
+        includeInterference = .false.   ! no interference if decay mode does not allow 4 same flavor leptons
     endif
 
     if( IsAZDecay(DecayMode1) .and. IsAWDecay(DecayMode2) ) then
@@ -1290,6 +1324,7 @@ implicit none
         write(io_stdout,"(4X,A)") "VegasNc0:   number of evaluations for integrand scan"
         write(io_stdout,"(4X,A)") "VegasNc1:   number of evaluations for accept-reject sampling"
         write(io_stdout,"(4X,A)") "Unweighted: 0=weighted events, 1=unweighted events"
+        write(io_stdout,"(4X,A)") "Interf:     0=neglect interference for 4f final states, 1=include interference"
         write(io_stdout,"(4X,A)") "DataFile:   LHE output file"
         write(io_stdout,"(4X,A)") "ReadLHE:    LHE input file from POWHEG (only spin-0)"
         write(io_stdout,*) ""

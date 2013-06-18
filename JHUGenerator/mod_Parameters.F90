@@ -3,8 +3,8 @@ implicit none
 save
 ! 
 ! 
-character(len=6),parameter :: JHUGen_Version="v3.1.7"
-!  
+character(len=6),parameter :: JHUGen_Version="v3.1.8"
+! 
 ! 
 integer, public :: Collider, PDFSet,PChannel,Process,DecayMode1,DecayMode2
 integer, public :: VegasIt1,VegasNc0,VegasNc1,VegasNc2,Collider_Energy
@@ -27,7 +27,8 @@ logical, public, parameter :: fix_channels_ratio = .true.
 
 real(8), public, parameter :: channels_ratio_fix = 0.25d0    ! desired ratio of
                                                              ! N_qq/(N_qq+N_gg)
-logical, public, parameter :: includeInterference = .false.    ! include interference effecs in ZZ production with decays to 4 leptons
+logical, public :: includeInterference! include interference effecs in ZZ production with decays to 4 leptons
+! Since v.3.1.8 this is no longer a constant. It can be set through command line "Interf=0,1", otherwise a default value is used
 
 logical, public, parameter :: importPOWHEG_LHEinit = .true.
 

@@ -28,7 +28,9 @@ command line parameters:
                   x=11: W --> anyting                  
    DataFile=x    (name of the output file), default value: "output"
    Process=x     (gives the resonance spin 0,1 or 2)
-   OffXVV=xyz    (only applies to Higgs production, x,y,z can be 1 or 0 indicating real off-shellness for Higgs, Z/W boson 1/2, resp.), default 000
+   MReso=yyy.xx  (resonance mass, default=126.00)
+   OffXVV=xyz    (only applies to Higgs production, x,y,z can be 1 or 0 indicating real off-shellness for Higgs, Z/W boson 1/2, resp.), default 011
+   Interf=x      (0=neglect interference for 4f final states, 1=include interference, default= 0 above threshold, 1 below threshold )
    if a parameter is not specified, the default value is chosen
    ReadLHE="x"   (allows NLO production of spin-0 particles by reading in LHE file from NLO generator, e.g., POWHEG)
    
