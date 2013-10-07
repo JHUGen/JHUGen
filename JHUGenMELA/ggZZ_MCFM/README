@@ -1,0 +1,60 @@
+#========================================================
+# Instruction for using the JHUGenME
+# NOTE the following instructions works out of the 
+# box for lxplus-sl5 machines
+#========================================================
+
+1. Check out the code
+
+wget http://yygao.web.cern.ch/yygao/JHUGenME.tar.gz
+tar -xf JHUGenME.tar.gz
+
+
+2. set up the enviorment  to compile the code 
+
+cd JHUGenME/
+source setup_matrixelement.sh
+
+3. compile code
+
+make clean   # absolutely needed
+make
+
+Instructions on getting a MCFM library is at the end of this file. 
+
+4. run code
+
+root -l -b -q testME.C+ >& output_test.txt  &
+
+You should see the output_text.txt the same as in output_ref.txt 
+
+#========================================================
+#Instruction on compiling the MCFM library for MCFM 6.6
+#========================================================
+
+1. Download MCFM and prepare the install makefile
+
+wget http://mcfm.fnal.gov/mcfm-6.6.tar.gz
+tar -xf MCFM-6.6.tar.gz
+cd MCFM-6.6/
+./Install
+
+2. Add the fortran code that calcualtes the sum of HZZ and ggZZ amplitudes include interference
+
+ cp ../JHUGenME/gg_ZZ_int.f  src/HZZ/
+
+3. Modify makefile 
+
+1) Add the extra library needed in the HZZFILES 
+gg_ZZ_int.o \
+
+2) Modfiy the fortran code tags to output library
+ 
+FFLAGS 	= -fno-automatic -fno-f2c -O0 -fPIC -g -I$(INCPATH) -I$(TENSORREDDIR)/Include -Iobj
+F90FLAGS = -fno-automatic -fno-f2c -O2 -fPIC -g -I$(INCPATH) -Iobj -Jobj
+
+4. compile the package and export the libarry
+
+make
+cd obj
+g++ -Wl,-soname,libmcfm_6p6.so -shared -o libmcfm_6p6.so *.o  

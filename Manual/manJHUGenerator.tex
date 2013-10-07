@@ -26,15 +26,15 @@ Manual for the JHU generator
 \begin{center}
 \small
 For simulation of a single-produced resonance at hadron colliders \\
-(version 3.1.8, release date June 18, 2013) \\
+(version 4.0.1, release date October 7, 2013) \\
 \normalsize
 \end{center}
 
 
 
 \noindent
-The generator from \cite{Gao:2010qx,Bolognesi:2012} is a model-independent generator for studying spin and parity properties of new resonances.  
-Please cite \cite{Gao:2010qx,Bolognesi:2012} if using the generator.  
+The generator from \cite{Gao:2010qx,Bolognesi:2012,Anderson:2013} is a model-independent generator for studying spin and parity properties of new resonances.  
+Please cite \cite{Gao:2010qx,Bolognesi:2012,Anderson:2013} if using the generator.  
 
 The code can be downloaded from \cite{thesite}.  
 The generator outputs LHE files which can be passed to parton shower programs for hadronization.  
@@ -109,6 +109,7 @@ A few more details on some particular parameters:
 \item {\verb|OffXVV|}: The program does not work for $ZZ$ or $WW$ if you set them to be on-shell (\verb|OffXVV="\*00"|) and the mass of the $X$ resonance to be below the $m_{VV}$ threshold.  In general, the more off-shell the process, or the more "1" you have, the less efficient the \verb|VegasNc1| evaluations are.  Specifically, if you are interested then, in producing a resonance with mass below threshold $m_{VV}$ with a very narrow resonance, it is most efficient to generate with \verb|OffXVV="011"|
 \item \verb|PChannel|: This parameter is only meaningful in the spin-2 case.  For spin-0, production is possible only via the $gg$ process and for spin-1, production is only possible via the $q\bar{q}$ process.
 \item \verb|DecayMode2=7| note: Valid for spin-0 and spin-2, only OffXVV=000 or 100 are possible.  
+\item \verb|VegasNc| note: \verb|VegasNc1| allows the user to set the number of tries for the reject/accept method, \verb|VegasNc2| allows the user to let the program run until the number of events is generated
 \end{itemize}
 
 \noindent
@@ -398,9 +399,11 @@ generate large enough (e.g. {\tt VegasNc1=1000000}) number of weighted events
 ({\tt Unweighted=0}) with the corresponding couplings setup ($g^{}_{i}=1$, $g^{}_{j\ne i}=0$).
 
 %%%%%%%%%%%
-\section{ JHU Generator Matrix Elements (JHUGenME)}
+\section{ JHU Generator Matrix Elements (JHUGenMELA)}
 
-After extracting the code, you can go to the directory \verb|JHUGenME| to find code for computing matrix elements directly.  
+\subsection{Native matrix elements}
+
+After extracting the code, you can go to the directory \verb|JHUGenMELA| to find code for computing matrix elements directly.  
 To compile the code, simple do:
 \begin{verbatim}
 $ make
@@ -438,6 +441,7 @@ As an example, the arrays are initialized in \verb|testprogram.c| as:
   double Gvvcoupl[10][2];
 \end{verbatim}
 
+\subsection{Interface with MCFM}
 
 %%%%%%%%%%%
 
@@ -452,7 +456,7 @@ To JHUGenerator:
 \item Possibility to read in VBF LHE event files
 \end{itemize}
 
-To JHUGenME:
+To JHUGenMELA:
 \begin{itemize}
 \item Interface with the MCFM program for ggZZ process
 \item Matrix elements for VBF and Hjj processes
@@ -470,10 +474,10 @@ To \verb|JHUGenerator|:
 \item Updates to deal with non-zero lepton masses, lhe file format, and adjust default settings (e.g. lepton interference applied by default and can be configured in command line)
 \end{itemize}
 
-To \verb|JHUGenME|:
+To \verb|JHUGenMELA|:
 \begin{itemize}
-\item Production-independent JHUGenME for spin-0, 1, 2;
-\item Complex couplings in JHUGenME input.
+\item Production-independent JHUGenMELA for spin-0, 1, 2;
+\item Complex couplings in JHUGenMELA input.
 \end{itemize}
 
 \noindent
@@ -488,7 +492,7 @@ In going from \verb|v2.2.3| to \verb|v2.2.6|, the updates are as follows:
 In going from \verb|v2.1.3| to \verb|v2.2.3|, the updates are as follows:
 \begin{itemize}
 \item Fix interference and randomization in the {\it{beta}} version
-\item Add the \verb|JHUGenME| modules
+\item Add the \verb|JHUGenMELA| modules
 \item Small change for compilation on Mac OSX platforms
 \item Fix for tau masses in $W$ decays
 \end{itemize}
@@ -750,7 +754,9 @@ N.B. If an exclusive production mode is desired (e.g. $q\bar{q}$ or $gg$), this 
 \bibitem{Gao:2010qx}
 Y.Y. Gao, A. V. Gritsan, Z.J. Guo, K. Melnikov, M. Schulze and N. V. Tran, "Spin-Determination of Single-Produced Resonances at Hadron Colliders". Phys. Rev. D {\bf 81}, 075022 (2010). arXiv:1001.3396 [hep-ph].
 \bibitem{Bolognesi:2012}
-S. Bolognesi, Y.Y. Gao, A. V. Gritsan, K. Melnikov, M. Schulze, N. V. Tran and A. Whitbeck, "On the Spin and Parity of Single-Produced Resonance at the LHC". arXiv:1208.4018 [hep-ph].
+S. Bolognesi, Y.Y. Gao, A. V. Gritsan, K. Melnikov, M. Schulze, N. V. Tran and A. Whitbeck, "On the Spin and Parity of Single-Produced Resonance at the LHC". Phys. Rev. D {\bf 86}, 095031 (2012).  arXiv:1208.4018 [hep-ph].
+\bibitem{Anderson:2013}
+I. Anderson, S. Bolognesi, F. Caola, Y.Y. Gao, A. V. Gritsan, C. B. Martin, K. Melnikov, M. Schulze, N. V. Tran, A. Whitbeck, Y. Zhou, "Constraining anomalous HVV interactions at proton and lepton colliders". arXiv:1309.4819 [hep-ph].
 \bibitem{thesite}
 See webpage: www.pha.jhu.edu/spin
 \end{thebibliography}
