@@ -3,14 +3,15 @@ implicit none
 save
 ! 
 ! 
-character(len=6),parameter :: JHUGen_Version="v3.1.8"
+character(len=6),parameter :: JHUGen_Version="v4.0.0"
 ! 
 ! 
 integer, public :: Collider, PDFSet,PChannel,Process,DecayMode1,DecayMode2
 integer, public :: VegasIt1,VegasNc0,VegasNc1,VegasNc2,Collider_Energy
 integer, public :: VegasIt1_default,VegasNc0_default,VegasNc1_default,VegasNc2_default
+real(8), public :: VegasSeed
 integer, public :: NumHistograms
-logical, public :: unweighted,OffShellReson,OffShellV1,OffShellV2,ReadLHEFile
+logical, public :: unweighted,OffShellReson,OffShellV1,OffShellV2,ReadLHEFile,ReadCSmax
 integer(8), public :: EvalCounter=0
 integer(8), public :: RejeCounter=0
 integer(8), public :: AccepCounter=0
@@ -23,15 +24,15 @@ character(len=100) :: LHEProdFile
 
 logical, public, parameter :: seed_random = .true.
 
-logical, public, parameter :: fix_channels_ratio = .true.
+logical, public, parameter :: fix_channels_ratio = .false.
 
-real(8), public, parameter :: channels_ratio_fix = 0.25d0    ! desired ratio of
-                                                             ! N_qq/(N_qq+N_gg)
+real(8), public, parameter :: channels_ratio_fix = 0.25d0    ! desired ratio of  N_qq/(N_qq+N_gg)
 logical, public :: includeInterference! include interference effecs in ZZ production with decays to 4 leptons
 ! Since v.3.1.8 this is no longer a constant. It can be set through command line "Interf=0,1", otherwise a default value is used
 
 logical, public, parameter :: importPOWHEG_LHEinit = .true.
 
+logical, public, parameter :: writeWeightedLHE = .true. 
 
 real(8),public :: GlobalMax=-1d99
 real(8),public :: GlobalMin=+1d99
@@ -58,12 +59,21 @@ real(8), public, parameter :: m_el = 0.00051100d0  *GeV         ! electron mass
 real(8), public, parameter :: m_mu = 0.10566d0  *GeV              ! muon mass
 real(8), public, parameter :: m_tau = 1.7768d0  *GeV                ! tau mass
 
+
+real(8), public, parameter :: Gf = 1.16639d-5/GeV**2        ! fermi constant
+real(8), public, parameter :: vev = 1.0d0/sqrt(Gf*sqrt(2.0d0))
+real(8), public, parameter :: gwsq = 4.0d0 * M_W**2/vev**2  ! weak constant squared
 real(8), public, parameter :: alpha_QED = 1d0/128.0d0       ! el.magn. coupling
+real(8), public, parameter :: alphas = 0.13229060d0         ! strong coupling
 real(8), public, parameter :: sitW = dsqrt(0.23119d0)       ! sin(Theta_Weinberg) (PDG-2008)
 real(8), public            :: Mu_Fact                       ! pdf factorization scale (set to M_Reso in main.F90)
 real(8), public, parameter :: LHC_Energy=8000d0  *GeV       ! LHC hadronic center of mass energy
 real(8), public, parameter :: TEV_Energy=1960d0  *GeV       ! Tevatron hadronic center of mass energy
 
+real(8), public, parameter :: ptjetcut = 15d0*GeV           ! jet min pt
+real(8), public, parameter :: Rjet = 0.5d0                  ! jet deltaR, antikt algorithm 
+
+!----------------------------------------------------------------------------------------------------
 
 ! absolute branching fraction (taken from PDG-2012)
 real(8), public, parameter :: Br_Z_ll   = 10.10d0*percent                             ! leptonic Z branching
@@ -120,10 +130,27 @@ real(8), public, parameter :: Brhadr_W_cs = Br_W_cs/Br_W_hadr                   
    complex(8), public, parameter :: ghg2 = (1.0d0,0d0)
    complex(8), public, parameter :: ghg3 = (0.0d0,0d0)
    complex(8), public, parameter :: ghg4 = (0.0d0,0d0)   ! pseudoscalar
-   complex(8), public, parameter :: ghz1 = (1.0d0,0d0)
+   complex(8), public, parameter :: ghz1 = (2.0d0,0d0)
    complex(8), public, parameter :: ghz2 = (0.0d0,0d0)
    complex(8), public, parameter :: ghz3 = (0.0d0,0d0)
    complex(8), public, parameter :: ghz4 = (0.0d0,0d0)   ! pseudoscalar 
+
+!-- parameters that define q^2 dependent form factors
+   complex(8), public, parameter :: ghg2_prime = (0.0d0,0d0)
+   complex(8), public, parameter :: ghg3_prime = (0.0d0,0d0)
+   complex(8), public, parameter :: ghg4_prime = (0.0d0,0d0)
+   complex(8), public, parameter :: ghz1_prime = (0.0d0,0d0)
+   complex(8), public, parameter :: ghz2_prime = (0.0d0,0d0)
+   complex(8), public, parameter :: ghz3_prime = (0.0d0,0d0)
+   complex(8), public, parameter :: ghz4_prime = (0.0d0,0d0)
+   real(8),    public, parameter :: Lambda_g2 = 10000d0*GeV
+   real(8),    public, parameter :: Lambda_g3 = 10000d0*GeV
+   real(8),    public, parameter :: Lambda_g4 = 10000d0*GeV
+   real(8),    public, parameter :: Lambda_z1 = 10000d0*GeV
+   real(8),    public, parameter :: Lambda_z2 = 10000d0*GeV
+   real(8),    public, parameter :: Lambda_z3 = 10000d0*GeV
+   real(8),    public, parameter :: Lambda_z4 = 10000d0*GeV
+
 
 !---parameters that define spin 1 coupling to SM fields, see note
    complex(8), public, parameter :: zprime_qq_left  = (1.0d0,0d0)
@@ -210,6 +237,9 @@ integer, public, target :: Wp_  = 13
 integer, public, target :: NuE_ = 14
 integer, public, target :: NuM_ = 15
 integer, public, target :: NuT_ = 16
+integer, public, target :: Hig_ = 25
+integer, public, target :: Zpr_ = 32
+integer, public, target :: Gra_ = 39
 
 integer, public, target :: AUp_  = -1
 integer, public, target :: ADn_  = -2
@@ -232,7 +262,7 @@ real(8), public, parameter :: pisq = pi**2
 real(8), public, parameter :: one = 1.0d0, mone = -1.0d0
 real(8), public, parameter :: half  = 0.5d0,two = 2.0d0
 real(8), public, parameter :: zero  = 0.0d0
-complex(8), parameter, public :: czero = 0.0d0
+complex(8), parameter, public :: czero = (0.0d0,0.0d0) 
 complex(8), parameter, public :: cone = 1.0d0
 complex(8), parameter, public :: ci=(0.0d0,1.0d0)
 complex(8), parameter, public :: ne=(0.0d0,1.0d0)
@@ -242,6 +272,7 @@ integer,parameter :: io_LHEOutFile=14
 integer,parameter :: io_HistoFile=15
 integer,parameter :: io_LHEInFile=16
 integer,parameter :: io_LogFile=17
+integer,parameter :: io_CSmaxFile=18
 
 integer, public :: DebugCounter(0:10) = 0
 
@@ -352,6 +383,12 @@ integer :: Part
       convertLHE =-24
   elseif( Part.eq.Pho_) then
       convertLHE =22
+  elseif( Part.eq.Hig_) then
+      convertLHE =25
+  elseif( Part.eq.Zpr_) then
+      convertLHE =32
+  elseif( Part.eq.Gra_) then
+      convertLHE =39
   elseif( Part.lt.-9000) then
       convertLHE =Part
   else
@@ -498,6 +535,31 @@ integer :: PartType
      IsAQuark=.false.
   endif
 
+
+END FUNCTION
+
+
+
+
+FUNCTION SU2flip(Part)
+implicit none
+integer :: SU2flip
+integer :: Part
+
+
+  if( abs(Part).eq.Up_ ) then
+      SU2flip = sign(1,Part)*Dn_
+  elseif( abs(Part).eq.Dn_ ) then
+      SU2flip = sign(1,Part)*Up_
+  elseif( abs(Part).eq.Chm_ ) then
+      SU2flip = sign(1,Part)*Str_
+  elseif( abs(Part).eq.Str_ ) then
+      SU2flip = sign(1,Part)*Chm_
+  elseif( abs(Part).eq.Bot_ ) then
+      SU2flip = sign(1,Part)*Top_
+  elseif( abs(Part).eq.Top_ ) then
+      SU2flip = sign(1,Part)*Bot_
+  endif
 
 END FUNCTION
 

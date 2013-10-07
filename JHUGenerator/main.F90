@@ -1,5 +1,6 @@
-! If you use this program please cite Phys.Rev. D81 (2010) 075022; arXiv:1001.3396 [hep-ph].
-!                                 and Phys.Rev. D86 (2012) 095031; arXiv:1208.4018 [hep-ph]
+! If you use this program please cite Phys.Rev. D81 (2010) 075022; arXiv:1001.3396 [hep-ph],
+!                                     Phys.Rev. D86 (2012) 095031; arXiv:1208.4018 [hep-ph],
+!                                 and                              arXiv:1309.4819 [hep-ph].
 PROGRAM JHUGenerator
 use ModParameters
 use ModKinematics
@@ -35,6 +36,7 @@ logical,parameter :: useBetaVersion=.false.! this should be set to .false.
    write(io_stdout,*) " Done"
 
 
+
 END PROGRAM
 
 
@@ -62,6 +64,7 @@ integer :: NumArgs,NArg,OffShell_XVV,iunwgt,CountArg,iinterf
    OffShell_XVV=011! 000: X,V1,V2 on-shell; 010: X,V2 on-shell, V1 off-shell; and so on
    LHEProdFile=""
    ReadLHEFile=.false.
+   ReadCSmax=.false.
    iinterf = -1
 
 ! !       DecayMode=0:  Z --> l+ l- (l=e,mu)
@@ -85,7 +88,6 @@ integer :: NumArgs,NArg,OffShell_XVV,iunwgt,CountArg,iinterf
 #elif compiler==2
    NumArgs = COMMAND_ARGUMENT_COUNT()
 #endif
-
 
    CountArg = 0
    do NArg=1,NumArgs
@@ -144,6 +146,9 @@ integer :: NumArgs,NArg,OffShell_XVV,iunwgt,CountArg,iinterf
     elseif( arg(1:8) .eq."ReadLHE=" ) then
         read(arg(9:108),"(A)") LHEProdFile
         ReadLHEFile=.true.
+        CountArg = CountArg + 1
+    elseif( arg(1:9) .eq."ReadCSmax" ) then
+        ReadCSmax=.true.
         CountArg = CountArg + 1
     endif
    enddo
@@ -228,10 +233,10 @@ integer :: NumArgs,NArg,OffShell_XVV,iunwgt,CountArg,iinterf
        stop
     endif
 
-    if( IsAZDecay(DecayMode1) .and. IsAPhoton(DecayMode2) ) then
-       print *, " DecayMode1=",DecayMode1," and DecayMode2=",DecayMode2," are not allowed."
-       stop
-    endif
+!     if( IsAZDecay(DecayMode1) .and. IsAPhoton(DecayMode2) ) then
+!        print *, " DecayMode1=",DecayMode1," and DecayMode2=",DecayMode2," are not allowed."
+!        stop
+!     endif
 
     if( IsAWDecay(DecayMode1) .and. IsAZDecay(DecayMode2) ) then
        print *, " DecayMode1=",DecayMode1," and DecayMode2=",DecayMode2," are not allowed."
@@ -243,7 +248,20 @@ integer :: NumArgs,NArg,OffShell_XVV,iunwgt,CountArg,iinterf
        stop
     endif
 
-    if( IsAPhoton(DecayMode1) .and. .not.IsAPhoton(DecayMode2) ) then
+    if( IsAPhoton(DecayMode1) .and. (IsAZDecay(DecayMode2) .or. IsAWDecay(DecayMode2)) ) then
+       print *, " DecayMode1=",DecayMode1," and DecayMode2=",DecayMode2," are not allowed."
+       print *, " Please try swapping the decay modes."
+       stop
+    endif
+
+    if( IsAPhoton(DecayMode2) .and. (IsAZDecay(DecayMode1) .or. IsAWDecay(DecayMode1)) ) then! require OffXVV=010 for Z+photon
+       if( .not. ((.not.OffShellReson) .and. OffShellV1 .and. (.not.OffShellV2)) ) then
+          print *, "OffXVV has to be 010 for Z+photon production"
+          stop
+       endif
+    endif
+
+    if( IsAPhoton(DecayMode2) .and. (.not.IsAPhoton(DecayMode1) .and. .not. IsAZDecay(DecayMode1)) ) then
        print *, " DecayMode1=",DecayMode1," and DecayMode2=",DecayMode2," are not allowed."
        stop
     endif
@@ -312,7 +330,7 @@ SUBROUTINE InitParameters
 use ModParameters
 implicit none
 
-IF( COLLIDER.EQ.1 ) THEN
+IF( COLLIDER.EQ.1) THEN 
   Collider_Energy  = LHC_Energy
 ELSEIF( COLLIDER.EQ.2 ) THEN
   Collider_Energy  = TEV_Energy
@@ -352,6 +370,24 @@ include "vegas_common.f"
           VegasNc2_default = 10000
       endif
 
+      !- HVBF
+      if(Process.eq.60) then
+         NDim = 5
+         NDim = NDim + 2 ! sHat integration
+         VegasIt1_default = 5
+         VegasNc0_default = 100000
+         VegasNc1_default = 500000
+         VegasNc2_default = 10000
+      endif
+      !- Hjj, gluon fusion
+      if(Process.eq.61) then
+         NDim = 5
+         NDim = NDim + 2 ! sHat integration
+         VegasIt1_default = 5
+         VegasNc0_default = 100000
+         VegasNc1_default = 500000
+         VegasNc2_default = 10000
+      endif
 
       if( unweighted ) then
           NDim = NDim + 1  ! random number which decides if event is accepted
@@ -377,7 +413,7 @@ real(8) :: VG_Result,VG_Error,VG_Chi2
 real(8) :: yRnd(1:22)
 real(8) :: dum, RES(-5:5,-5:5)
 logical :: warmup
-integer :: i, i1, PChannel_aux, PChannel_aux1
+integer :: i, i1, j1,PChannel_aux, PChannel_aux1,NHisto
 include 'csmaxvalue.f'
 integer :: n,clock
 integer, dimension(:), allocatable :: gfort_seed
@@ -385,10 +421,13 @@ integer, dimension(:), allocatable :: gfort_seed
 
 if( VegasIt1.eq.-1 ) VegasIt1 = VegasIt1_default
 if( VegasNc0.eq.-1 ) VegasNc0 = VegasNc0_default
-if( VegasNc1.eq.-1 .and. VegasNc2.eq.-1) then 
+if( VegasNc1.eq.-1 .and. VegasNc2.eq.-1 .and.  (unweighted) ) then 
       VegasNc1 = VegasNc1_default
       VegasNc2 = VegasNc2_default
 endif
+if( VegasNc1.eq.-1 .and.  .not. (unweighted) ) VegasNc1 = VegasNc1_default
+if( VegasNc2.eq.-1 .and.  .not. (unweighted) ) VegasNc2 = VegasNc2_default
+
 
 
    warmup = .false.
@@ -399,8 +438,53 @@ endif
 
 if (unweighted.eqv..false.) then  !----------------------- weighted events
 
-  call vegas(EvalWeighted,VG_Result,VG_Error,VG_Chi2)    ! usual call of vegas for weighted events
 
+    if (seed_random) then 
+#if compiler==1
+        call random_seed()
+#elif compiler==2
+        call random_seed(size=n)
+        allocate(gfort_seed(n))
+        call system_clock(count=clock)
+        gfort_seed = clock + 37 * (/ (i - 1, i = 1, n) /)
+        call random_seed(put = gfort_seed)
+        deallocate(gfort_seed)        
+#endif
+        call random_number(VegasSeed)
+        VegasSeed = - abs( VegasSeed*10000d0 )
+    else
+        VegasSeed = -19d0
+    endif
+    idum = int(VegasSeed)
+
+  ! WARM-UP RUN
+  itmx = VegasIt1
+  ncall= VegasNc1
+
+  if (Process.eq.60 .or. Process.eq.61) then
+     call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
+  else
+     call vegas(EvalWeighted,VG_Result,VG_Error,VG_Chi2)    ! usual call of vegas for weighted events
+  endif
+
+  !DATA RUN
+  call ClearHisto()
+  close(io_LHEOutFile)
+  if( writeWeightedLHE ) open(unit=io_LHEOutFile,file=trim(DataFile)//'.lhe',form='formatted',access= 'sequential',status='replace')
+  EvalCounter=0
+  RejeCounter=0
+  AccepCounter=0
+  AlertCounter=0
+
+  avgcs = 0d0
+
+  itmx = 1
+  ncall= VegasNc2
+  if (process.eq.60 .or. process.eq.61) then 
+     call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
+  else
+     call vegas1(EvalWeighted,VG_Result,VG_Error,VG_Chi2)    ! usual call of vegas for weighted events
+  endif
 
 
 elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
@@ -421,33 +505,50 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
     endif
 
 
-    print *, " finding maximal weight with ",VegasNc0," evaluations"
-    do i=1,VegasNc0
-        call random_number(yRnd)
-        if (PChannel_aux.eq.0.or.PChannel_aux.eq.2) then
-            PChannel= 0
-            RES = 0d0
-            dum = EvalUnWeighted(yRnd,.false.,RES)
-            VG(0,0) = VG(0,0) + RES(0,0)
-        endif
+    if( .not. ReadCSmax ) then
+        print *, " finding maximal weight with ",VegasNc0," evaluations"
+        do i=1,VegasNc0
+            call random_number(yRnd)
+            if (Process.eq.60 .or. Process.eq.61) then
+                RES = 0d0
+                dum = EvalUnWeighted_HJJ(yRnd,.false.,RES)
+                VG = VG + RES
+            else
+                if (PChannel_aux.eq.0.or.PChannel_aux.eq.2) then
+                    PChannel= 0
+                    RES = 0d0
+                    dum = EvalUnWeighted(yRnd,.false.,RES)
+                    VG(0,0) = VG(0,0) + RES(0,0)
+                endif
+                if(PChannel_aux.eq.1.or.PChannel_aux.eq.2) then
+                    PChannel = 1
+                    RES = 0d0
+                    dum = EvalUnWeighted(yRnd,.false.,RES)
+                    VG = VG + RES
+                endif
+            endif
+            PChannel = PChannel_aux
+        enddo
 
-        if(PChannel_aux.eq.1.or.PChannel_aux.eq.2) then
-            PChannel = 1
-            RES = 0d0
-            dum = EvalUnWeighted(yRnd,.false.,RES)
-            VG = VG + RES
-        endif
-
-        PChannel = PChannel_aux
-    enddo
-
+        open(unit=io_CSmaxFile,file='CSmax.bin',form='unformatted',status='replace')
+        WRITE(io_CSmaxFile) CSMAX
+        close(io_CSmaxFile)
+    else
+        open(unit=io_CSmaxFile,file='CSmax.bin',form='unformatted')
+        READ(io_CSmaxFile) CSMAX
+        close(io_CSmaxFile)
+    endif
 
 
-    csmax   = 1.5d0*csmax    !  adjustment factors, can be choosen  separately channel/by/channel
+     csmax   = 1.5d0*csmax    !  adjustment factors, can be choosen  separately channel/by/channel
 !      do i1=-5,5
-!          print *, i1, csmax(i1,-i1), VG(i1,-i1)
+!      do j1=-5,5
+!          print *, i1,j1, csmax(i1,j1), VG(i1,j1)
+!      enddo
 !      enddo
 !      pause
+
+
 
 !------------------adj_par fixes by how much the quark-induced channels need to be adjusted
 
@@ -455,8 +556,9 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
         adj_par = VG(0,0)/(VG(-5,5)+VG(-4,4)+VG(-3,3)+VG(-2,2)+VG(-1,1)  &
                 + VG(1,-1)+VG(2,-2)+VG(3,-3)+VG(4,-4)+VG(5,-5))*channels_ratio_fix/(one-channels_ratio_fix)
     else
-        adj_par = 100000
+        adj_par = 1d0
     endif
+
 
 !--- rescale the gluon induced channel
     csmax(0,0) = csmax(0,0)/adj_par
@@ -488,16 +590,27 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
         print *, " generating events with ",VegasNc1," tries"
         do i=1,VegasNc1
             call random_number(yRnd)
-            dum = EvalUnWeighted(yRnd,.true.,RES)! RES is a dummy here
+	    if (Process.eq.60 .or. Process.eq.61) then
+                dum = EvalUnWeighted_HJJ(yRnd,.true.,RES)! RES is a dummy here
+	    else
+                dum = EvalUnWeighted(yRnd,.true.,RES)! RES is a dummy here
+            endif
         enddo
-
     elseif( VegasNc2.ne.-1 ) then
         print *, " generating ",VegasNc2," events"
         do while( AccepCounter.lt.VegasNc2 )
               call random_number(yRnd)
-              dum = EvalUnWeighted(yRnd,.true.,RES)! RES is a dummy here
+	      if (Process.eq.60 .or. Process.eq.61) then
+		  dum = EvalUnWeighted_HJJ(yRnd,.true.,RES)! RES is a dummy here
+	      else
+		  dum = EvalUnWeighted(yRnd,.true.,RES)! RES is a dummy here
+	      endif
+!              if( AccepCounter.gt.0 .and. mod(AccepCounter,10).eq.0 ) then
+!                   call cpu_time(time_int)
+!                   write(io_stdout,*)  AccepCounter," events accepted (",time_int-time_start, ") seconds"
+! !                   write(io_LogFile,*) AccepCounter," events accepted (",time_int-time_start, ") seconds"
+!              endif
         enddo
-
     else
         print *, "ERROR: VegasNc1 and VegasNc2 must not be set at the same time"
         stop
@@ -655,12 +768,12 @@ include 'csmaxvalue.f'
 real(8) :: VG_Result,VG_Error,VG_Chi2
 real(8) :: yRnd(1:22),Res,dum,EMcheck(1:4)
 real(8) :: AcceptedEvent(1:4,1:4),Ehat
-real(8) :: MomExt(1:4,1:4),MomHiggs(1:4),MomGlu(1:4,1:3),Mass(1:4),pH2sq
-integer :: tries, nParticle, MY_IDUP(1:10), ICOLUP(1:2,1:10)
+real(8) :: MomExt(1:4,1:5),MomHiggs(1:4),MomGlu(1:4,1:4),Mass(1:4),pH2sq
+integer :: tries, nParticle, MY_IDUP(1:11), ICOLUP(1:2,1:11)
 character(len=*),parameter :: POWHEG_Fmt0 = "(6X,I2,A160)"
 character(len=*),parameter :: POWHEG_Fmt1 = "(6X,I2,4X,I3,4X,I3,3X,I3,1X,I3,3X,I3,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9)"
 logical :: FirstEvent,M_ResoSet
-integer :: nline,LHE_IDUP(1:4),LHE_ICOLUP(1:2,1:4),LHE_ICOLUP_Glu(1:2,1:3),LHE_IDUP_Glu(1:3),intDummy,Nevent
+integer :: nline,LHE_IDUP(1:4),LHE_ICOLUP(1:2,1:4),LHE_ICOLUP_Glu(1:2,1:4),LHE_IDUP_Glu(1:4),intDummy,Nevent
 integer :: EventNumPart,nglu
 character(len=160) :: FirstLines,EventInfoLine
 character(len=160) :: EventLine(1:4)
@@ -730,7 +843,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
           call random_number(yRnd)
           dum = EvalUnWeighted_withoutProduction(yRnd,.false.,EHat,Res,AcceptedEvent,MY_IDUP(1:9),ICOLUP(1:2,1:9))
       enddo
-      csmax(0,0)   = 1.5d0*csmax(0,0)    !  savety factor
+      csmax(0,0)   = 1.5d0*csmax(0,0)    !  savety buffer
 
 
 
@@ -751,8 +864,8 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
          do nline=1,EventNumPart
             read(16,fmt="(A160)") EventLine(nline)
          enddo
-         if( EventNumPart.ne.3 .and. EventNumPart.ne.4 ) then
-            print *, "ERROR: number of particles in LHE input file is neither 3 nor 4",EventNumPart
+         if( EventNumPart.ne.3 .and. EventNumPart.ne.4.and. EventNumPart.ne.5 ) then
+            print *, "ERROR: number of particles in LHE input file is neither 3 nor 4,5",EventNumPart
             stop
          endif
 
@@ -786,6 +899,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
 
          EMcheck(1:4) = MomGlu(1:4,1) + MomGlu(1:4,2) - MomHiggs(1:4)
          if( nglu.eq.3 ) EMcheck(1:4) = EMcheck(1:4) - MomGlu(1:4,3)
+         if( nglu.eq.4 ) EMcheck(1:4) = EMcheck(1:4) - MomGlu(1:4,3) - MomGlu(1:4,4)
          if( any(abs(EMcheck(1:4)).gt.1d0*GeV) ) then
               print *, "ERROR: energy momentum violation while reading LHE production momenta.",EMcheck(1:4)
               stop
@@ -804,18 +918,27 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
              call boost(AcceptedEvent(1:4,2),MomHiggs(1:4),pH2sq)
              call boost(AcceptedEvent(1:4,3),MomHiggs(1:4),pH2sq)
              call boost(AcceptedEvent(1:4,4),MomHiggs(1:4),pH2sq)
-             if(EventNumPart.eq.3) then
+             if(EventNumPart.eq.3) then!  gg-> H LO event
                     MY_IDUP(1) = convertLHEreverse(LHE_IDUP_Glu(1))
                     MY_IDUP(2) = convertLHEreverse(LHE_IDUP_Glu(2))
                     ICOLUP(1:2,1:2) = LHE_ICOLUP_Glu(1:2,1:2)!  overwrite inital colors with POWHEG ones
                     call WriteOutEvent((/MomGlu(1:4,1),MomGlu(1:4,2),AcceptedEvent(1:4,1),AcceptedEvent(1:4,2),AcceptedEvent(1:4,3),AcceptedEvent(1:4,4)/),MY_IDUP(1:9),ICOLUP(1:2,1:9),EventInfoLine=EventInfoLine)
-             elseif(EventNumPart.eq.4) then
+             elseif(EventNumPart.eq.4) then! gg-> H+g NLO event
                     MY_IDUP(1) = convertLHEreverse(LHE_IDUP_Glu(1))!  overwrite inital ID's with POWHEG ones
                     MY_IDUP(2) = convertLHEreverse(LHE_IDUP_Glu(2))
                     MY_IDUP(10)= convertLHEreverse(LHE_IDUP_Glu(3))
                     ICOLUP(1:2,1:2) = LHE_ICOLUP_Glu(1:2,1:2)!  overwrite inital colors with POWHEG ones
                     ICOLUP(1:2,10)  = LHE_ICOLUP_Glu(1:2,3)  !  set third parton color
                     call WriteOutEvent((/MomGlu(1:4,1),MomGlu(1:4,2),AcceptedEvent(1:4,1),AcceptedEvent(1:4,2),AcceptedEvent(1:4,3),AcceptedEvent(1:4,4)/),MY_IDUP(1:10),ICOLUP(1:2,1:10),MomRealGlu=MomGlu(1:4,3),EventInfoLine=EventInfoLine)
+             elseif(EventNumPart.eq.5) then! VBF or Hjj LO event
+                    MY_IDUP(1) = convertLHEreverse(LHE_IDUP_Glu(1))!  overwrite inital ID's with POWHEG ones
+                    MY_IDUP(2) = convertLHEreverse(LHE_IDUP_Glu(2))
+                    MY_IDUP(10)= convertLHEreverse(LHE_IDUP_Glu(3))
+                    MY_IDUP(11)= convertLHEreverse(LHE_IDUP_Glu(4))
+                    ICOLUP(1:2,1:2) = LHE_ICOLUP_Glu(1:2,1:2)!  overwrite inital colors with POWHEG ones
+                    ICOLUP(1:2,10)  = LHE_ICOLUP_Glu(1:2,3)  !  set third parton color
+                    ICOLUP(1:2,11)  = LHE_ICOLUP_Glu(1:2,4)  !  set forth parton color
+                    call WriteOutEvent((/MomGlu(1:4,1),MomGlu(1:4,2),AcceptedEvent(1:4,1),AcceptedEvent(1:4,2),AcceptedEvent(1:4,3),AcceptedEvent(1:4,4)/),MY_IDUP(1:11),ICOLUP(1:2,1:11),MomRealGlu=MomGlu(1:4,3),MomRealGlu2=MomGlu(1:4,4),EventInfoLine=EventInfoLine)
              endif
              if( mod(AccepCounter,5000).eq.0 ) then
                   call cpu_time(time_int)
@@ -885,6 +1008,7 @@ logical :: dirresult
       open(unit=io_LHEOutFile,file=trim(DataFile)//'.lhe',form='formatted',access= 'sequential',status='replace')        ! LHE event file
       open(unit=io_HistoFile, file=trim(DataFile)//'.dat',form='formatted',access= 'sequential',status='replace')        ! histogram file
    else
+      if( writeWeightedLHE ) open(unit=io_LHEOutFile,file=trim(DataFile)//'.lhe',form='formatted',access= 'sequential',status='replace')        ! LHE event file
       open(unit=io_HistoFile,file=trim(DataFile)//'.dat',form='formatted',access= 'sequential',status='replace')         ! histogram file
    endif
    open(unit=io_LogFile,file=trim(DataFile)//'.log',form='formatted',access= 'sequential',status='replace')              ! log file
@@ -936,13 +1060,23 @@ RETURN
 END SUBROUTINE
 
 
-
-
-
-
-
-
 SUBROUTINE InitHisto()
+use modParameters
+implicit none
+
+  if( Process.eq.60 .or. Process.eq.61 ) then
+     call InitHisto_HVBF()
+  else
+     call InitHisto_HZZ()
+  endif
+
+RETURN
+END SUBROUTINE
+
+
+
+
+SUBROUTINE InitHisto_HZZ()
 use ModMisc
 use ModKinematics
 use ModParameters
@@ -1090,12 +1224,74 @@ END SUBROUTINE
 
 
 
+SUBROUTINE InitHisto_HVBF()
+use ModMisc
+use ModKinematics
+use ModParameters
+implicit none
+integer :: AllocStatus,NHisto
+
+          it_sav = 1
+          NumHistograms = 2
+          if( .not.allocated(Histo) ) then
+                allocate( Histo(1:NumHistograms), stat=AllocStatus  )
+                if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
+          endif
+
+          Histo(1)%Info   = "m_jj"
+          Histo(1)%NBins  = 40
+          Histo(1)%BinSize= 50d0*GeV
+          Histo(1)%LowVal = 0d0
+          Histo(1)%SetScale= 1d0/GeV
+
+          Histo(2)%Info   = "dphi_jj"
+          Histo(2)%NBins  = 25
+          Histo(2)%BinSize= 0.125d0
+          Histo(2)%LowVal = 0d0
+          Histo(2)%SetScale= 1d0
+
+!           Histo(3)%Info   = "log(MEsq)"
+!           Histo(3)%NBins  = 11
+!           Histo(3)%BinSize= 1d0
+!           Histo(3)%LowVal = -10d0
+!           Histo(3)%SetScale= 1d0
+! 
+!           Histo(4)%Info   = "log(MEsq*pdf)"
+!           Histo(4)%NBins  = 11
+!           Histo(4)%BinSize= 1d0
+!           Histo(4)%LowVal = -10d0
+!           Histo(4)%SetScale= 1d0
+
+  do NHisto=1,NumHistograms
+      Histo(NHisto)%Value(:) = 0d0
+      Histo(NHisto)%Value2(:)= 0d0
+      Histo(NHisto)%Hits(:)  = 0
+  enddo
+
+
+RETURN
+END SUBROUTINE
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 SUBROUTINE InitOutput
 use ModParameters
 implicit none
 
-    if( unweighted ) then 
+    if( (unweighted) .or. ( (.not.unweighted) .and. (writeWeightedLHE) )  ) then 
         write(io_LHEOutFile ,'(A)') '<LesHouchesEvents version="1.0">'
         write(io_LHEOutFile ,'(A)') '<!--'
         write(io_LHEOutFile ,'(A,A6,A)') 'Output from the JHUGenerator ',trim(JHUGen_Version),' described in arXiv:1001.3396 [hep-ph],arXiv:1208.4018 [hep-ph]'
@@ -1109,13 +1305,17 @@ implicit none
         else
             write(io_LHEOutFile ,'(A)') '-->'
             write(io_LHEOutFile ,'(A)') '<init>'
-            write(io_LHEOutFile ,'(A,2F24.16,A)') '2212 2212',(Collider_Energy*50d0),(Collider_Energy*50d0),' 0 0 10042 10042 3  1' 
+            if( (.not.unweighted) .and. (writeWeightedLHE) ) then
+                write(io_LHEOutFile ,'(A,2F24.16,A)') '2212 2212',(Collider_Energy*50d0),(Collider_Energy*50d0),' 0 0 10042 10042 4  1' 
+            else
+                write(io_LHEOutFile ,'(A,2F24.16,A)') '2212 2212',(Collider_Energy*50d0),(Collider_Energy*50d0),' 0 0 10042 10042 3  1' 
+            endif
 ! in order of appearance:  (see also http://arxiv.org/abs/hep-ph/0109068 and http://arxiv.org/abs/hep-ph/0609017)
 ! (*) incoming particle1 (2212=proton), incoming particle2, 
 ! (*) energies of colliding particles, 
 ! (*) out-dated pdf information for colliding particles (supposed to be 0), 
 ! (*) pdf code of LHAGLUE for colliding particles (10042=CTEQ6Ll, MSTW2008=21000,21041-21080)    
-! (*) weighting strategy (3=accept all weights, otherwise=see LHE manuals)
+! (*) weighting strategy (3=unweighted events, 4=weighted events,  otherwise=see LHE manuals)
 ! (*) number of process types to be accepted (default=1, otherwise=see manual)
 ! 
             write(io_LHEOutFile ,'(A)') '0.43538820803E-02  0.72559367904E-05  1.00000000000E-00 100'
@@ -1138,7 +1338,7 @@ SUBROUTINE FinalizeOutput
 use ModParameters
 implicit none
 
-    if( unweighted ) then 
+    if( (unweighted) .or. ( (.not.unweighted) .and. (writeWeightedLHE) )  ) then 
         write(io_LHEOutFile ,'(A)') '</LesHouchesEvents>'
     endif
   
@@ -1147,11 +1347,17 @@ END SUBROUTINE
 
 
 
+
 SUBROUTINE WriteParameters(TheUnit)
 use ModParameters
 implicit none
 integer :: TheUnit
+character :: arg*(200)
 
+    call Get_Command(arg)
+    write(TheUnit,"(3X,A)") ""
+    write(TheUnit,"(3X,A,A)") "Command line: ",trim(arg)
+    write(TheUnit,"(3X,A)") ""
 
     write(TheUnit,"(3X,A)") "Input Parameter:"
     if( Collider.eq.1 ) write(TheUnit,"(4X,A,1F8.2)") "Collider: P-P, sqrt(s)=",Collider_Energy*100d0
@@ -1159,6 +1365,8 @@ integer :: TheUnit
     if( Process.eq.0 ) write(TheUnit,"(4X,A,F7.2,A,F6.3)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( Process.eq.1 ) write(TheUnit,"(4X,A,F7.2,A,F6.3)") "Resonance: spin=1, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( Process.eq.2 ) write(TheUnit,"(4X,A,F7.2,A,F6.3)") "Resonance: spin=2, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
+    if( Process.eq.60) write(TheUnit,"(4X,A,F7.2,A,F6.3)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
+    if( Process.eq.61) write(TheUnit,"(4X,A,F7.2,A,F6.3)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( ReadLHEFile ) write(TheUnit,"(4X,A)") "           (This is ReadLHEFile mode. Resonance mass is read from LHE input file.)"
     write(TheUnit,"(4X,A,I2,2X,A,I2)") "DecayMode1:",DecayMode1, "DecayMode2:",DecayMode2
     if( IsAZDecay(DecayMode1) .or. IsAZDecay(DecayMode2) ) write(TheUnit,"(4X,A,F6.3,A,F6.4)") "Z-boson: mass=",M_Z*100d0,", width=",Ga_Z*100d0
@@ -1174,9 +1382,10 @@ integer :: TheUnit
     endif
     write(TheUnit,"(4X,A,L)") "Interference: ",includeInterference
 
+    if( .not. seed_random ) write(TheUnit,"(4X,A)") "NOTE: seed_random==FALSE (switched off)"
 
     write(TheUnit,"(4X,A)") ""
-    if( Process.eq.0 ) then
+    if( Process.eq.0 .or. Process.eq.60 .or. Process.eq.61 ) then
         write(TheUnit,"(4X,A)") "spin-0-VV couplings: "
         write(TheUnit,"(6X,A,L)") "generate_as=",generate_as
         if( generate_as ) then 
@@ -1346,10 +1555,11 @@ integer :: TheUnit
     write(TheUnit,"(A90)") " *                                                                                     *"
     write(TheUnit,"(A90)") " *   Spin and parity determination of single-produced resonances at hadron colliders   *"
     write(TheUnit,"(A90)") " *                                                                                     *"
-    write(TheUnit,"(A90)") " *                      S. Bolognesi, Y. Gao, A. Gritsan, Z. Guo,                      *"
-    write(TheUnit,"(A90)") " *                    K. Melnikov, M. Schulze, N. Tran, A. Whitbeck                    *"
+    write(TheUnit,"(A90)") " *         I. Anderson, S. Bolognesi, F. Caola, Y. Gao, A. Gritsan, C. Martin,         *"
+    write(TheUnit,"(A90)") " *           Z. Guo, K. Melnikov, M. Schulze, N. Tran, A. Whitbeck, Y. Zhou            *"
     write(TheUnit,"(A90)") " *                Phys.Rev. D81 (2010) 075022;  arXiv:1001.3396 [hep-ph]               *"
     write(TheUnit,"(A90)") " *                Phys.Rev. D86 (2012) 095031;  arXiv:1208.4018 [hep-ph]               *"
+    write(TheUnit,"(A90)") " *                                              arXiv:1309.4819 [hep-ph]               *"
     write(TheUnit,"(A90)") " *                                                                                     *"
     write(TheUnit,"(A90)") " ***************************************************************************************"
     write(TheUnit,"(A90)") " "

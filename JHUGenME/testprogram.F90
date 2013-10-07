@@ -2,19 +2,24 @@ PROGRAM TestProgram
 use modHiggs
 use modZprime
 use modGraviton
+use modHiggsJJ
 implicit none
-real(8) :: p(4,6),MatElSq,M_Reso,Ga_Reso
+real(8) :: p(4,6),p5(4,5),MatElSq,M_Reso,Ga_Reso,MatElSqPDF(-5:5,-5:5),check_vbf(-5:5,-5:5),check_sbf(-5:5,-5:5)
 integer :: MY_IDUP(6:9)
 real(8),  parameter :: GeV=1d0/100d0
+real(8),  parameter :: LHCEnergy=8000d0 * GeV
+real(8),  parameter :: alphas = 0.13229060d0
 complex(8) :: Hggcoupl(1:3),Hzzcoupl(1:4)
 complex(8) :: Zqqcoupl(1:2),Zzzcoupl(1:2)
 complex(8) :: Gggcoupl(1:5),Gqqcoupl(1:2),Gzzcoupl(1:10)
+integer :: i, j
+
 
 ! input unit = GeV/100 such that 125GeV is 1.25 in the code
   M_Reso  = 125d0 * GeV
-  Ga_Reso = 0.1d0 * GeV
+  Ga_Reso = 0.1d0 * GeV 
   Hggcoupl(1:3) = (/ (1d0,0d0), (0d0,0d0), (0d0,0d0) /)
-  Hzzcoupl(1:4) = (/ (1d0,0d0), (0d0,0d0), (0d0,0d0), (0d0,0d0) /)
+  Hzzcoupl(1:4) = (/ (2d0,0d0), (0d0,0d0), (0d0,0d0), (0d0,0d0) /)
   Zqqcoupl(1:2) = (/ (1d0,0d0), (1d0,0d0) /)
   Zzzcoupl(1:2) = (/ (0d0,0d0), (1d0,0d0) /)
   Gggcoupl(1:5) = (/ (1d0,0d0), (0d0,0d0), (0d0,0d0), (0d0,0d0), (0d0,0d0) /)
@@ -23,7 +28,7 @@ complex(8) :: Gggcoupl(1:5),Gqqcoupl(1:2),Gzzcoupl(1:10)
  
  
 ! particle ID: +7=e+,  -7=e-,  +8=mu+,  -8=mu-
-  MY_IDUP(6:9) = (/+7,-7,+7,-7/)
+  MY_IDUP(6:9) = (/+7,-7,+8,-8/)
 
 ! p(1:4,i) = (E(i),px(i),py(i),pz(i))
 ! i=1,2: glu1,glu2 (outgoing convention)
@@ -43,6 +48,7 @@ complex(8) :: Gggcoupl(1:5),Gqqcoupl(1:2),Gzzcoupl(1:10)
 
 
    call EvalAmp_gg_H_VV(p(1:4,1:6),M_Reso,Ga_Reso,Hggcoupl,Hzzcoupl,MY_IDUP(6:9),MatElSq)
+   MatElSq = MatElSq/4d0 !-- g1=2 -> g1=1
    print *, "Matr.el. squared (spin-0)",MatElSq
    print *, "result should be (spin-0)",0.0045682366425370D0
    print *, "ratio",MatElSq/0.0045682366425370D0
@@ -89,6 +95,7 @@ complex(8) :: Gggcoupl(1:5),Gqqcoupl(1:2),Gzzcoupl(1:10)
   print *, ""
 
 
+  MY_IDUP(6:9) = (/+7,-7,+8,-8/)
   print *, "PS point 4 (no production dynamics)"
   p(1:4,1) = (/   -1.2500000000000000d0,    0.0000000000000000d0,    0.0000000000000000d0,    0.0000000000000000d0   /)
   p(1:4,2) = (/    1.0000000000000000d9,    1.0000000000000000d9,    1.0000000000000000d9,    1.0000000000000000d9   /)  ! DUMMY
@@ -106,7 +113,68 @@ complex(8) :: Gggcoupl(1:5),Gqqcoupl(1:2),Gzzcoupl(1:10)
   print *, "Matr.el. squared (spin-2)",MatElSq
   print *, "result should be (spin-2)",1.68408821989468668d-010
   print *, "ratio",MatElSq/1.68408821989468668d-010
+  print *, ''
 
+  !-- CHECK HIGGS PLUS 2-JETS AMPLITUDES
+  p5(:,1) = LHCEnergy/2d0 * (/1d0,0d0,0d0,1d0/)
+  p5(:,2) = LHCEnergy/2d0 * (/1d0,0d0,0d0,-1d0/)
+  p5(:,3)= (/ 265.78337209227107d0, 53.577941071379172d0, 43.898955201800788d0, -256.59907802539107d0 /) * GeV
+  p5(:,4)= (/ 65.134095396202554d0, 47.285375822916357d0, 16.204053233736069d0, -41.760894089631499d0 /) * GeV
+  p5(:,5)= (/ 3113.9932387500899d0, -100.86331689429554d0, -60.103008435536857d0, -3109.2672948241925d0 /) * GeV
+
+  print *, 'WBF, SM couplings'
+  Hzzcoupl(1:4) = (/ (2d0,0d0), (0d0,0d0), (0d0,0d0), (0d0,0d0) /)
+  call EvalAmp_WBFH(p5,Hzzcoupl,MatElSqPDF)
+  include './checkWBF_SM.dat'
+  do i = -5,5
+     do j = -5,5
+        print *, 'Matr.el. squared, WBF',MatElSqPDF(i,j)
+        print *, 'result should be, WBF',check_vbf(i,j)
+        print *, ''
+     enddo
+  enddo
+
+  print *, 'WBF, non standard couplings'
+  Hzzcoupl(1:4) = (/ (1d0,2d0), (3d0,4d0), (5d0,6d0), (7d0,8d0) /)
+  call EvalAmp_WBFH(p5,Hzzcoupl,MatElSqPDF)
+  include './checkWBF_1-8.dat'
+  do i = -5,5
+     do j = -5,5
+        print *, 'Matr.el. squared, WBF',MatElSqPDF(i,j)
+        print *, 'result should be, WBF',check_vbf(i,j)
+        print *, ''
+     enddo
+  enddo
+
+  print *, ''
+  print *, 'SBF, SM couplings'
+  Hggcoupl(1:3) = (/(1d0,0d0), (0d0,0d0), (0d0,0d0) /)
+  call EvalAmp_SBFH(p5,Hggcoupl,MatElSqPDF)
+  MatElSqPDF = MatElSqPDF * (2d0/3d0*alphas**2)**2 !-- (alphas/sixpi * gs^2)^2
+  include './checkSBF_SM.dat'
+  do i = -5,5
+     do j = -5,5
+        print *, 'i,j', i,j
+        print *, 'Matr.el. squared, SBF',MatElSqPDF(i,j)
+        print *, 'result should be, SBF',check_sbf(i,j)
+     enddo
+  enddo
+
+  print *, ''
+  print *, 'SBF, generic couplings'
+  Hggcoupl(1:3) = (/(1d0,2d0), (0d0,0d0), (3d0,4d0) /)
+  call EvalAmp_SBFH(p5,Hggcoupl,MatElSqPDF)
+  MatElSqPDF = MatElSqPDF * (2d0/3d0*alphas**2)**2 !-- (alphas/sixpi * gs^2)^2
+  include './checkSBF_1-4.dat'
+  do i = -5,5
+     do j = -5,5
+        print *, 'i,j', i,j
+        print *, 'Matr.el. squared, SBF',MatElSqPDF(i,j)
+        print *, 'result should be, SBF',check_sbf(i,j)
+     enddo
+  enddo
 
 
 END PROGRAM
+
+

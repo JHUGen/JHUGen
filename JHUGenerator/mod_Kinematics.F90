@@ -21,18 +21,20 @@ contains
 
 
 
-SUBROUTINE WriteOutEvent(Mom,MY_IDUP,ICOLUP,MomRealGlu,EventInfoLine)
+
+SUBROUTINE WriteOutEvent(Mom,MY_IDUP,ICOLUP,MomRealGlu,MomRealGlu2,EventWeight,EventInfoLine)
 use ModParameters
 implicit none
 real(8) :: Mom(1:4,1:6)
-real(8),optional :: MomRealGlu(1:4)
+real(8),optional :: MomRealGlu(1:4),MomRealGlu2(1:4)
+real(8),optional :: EventWeight
 character(len=160),optional :: EventInfoLine
 real(8) :: Spin, Lifetime
 real(8) :: XFV(1:4), Z1FV(1:4), Z2FV(1:4)
-real(8) :: MomDummy(1:4,1:7)
-real(8) :: Part1Mass,Part2Mass,XMass,V1Mass,V2Mass,L11Mass,L12Mass,L21Mass,L22Mass,tmp,GluMass
+real(8) :: MomDummy(1:4,1:8)
+real(8) :: Part1Mass,Part2Mass,XMass,V1Mass,V2Mass,L11Mass,L12Mass,L21Mass,L22Mass,tmp,GluMass,GluMass2
 integer :: a,b,c
-integer :: MY_IDUP(:),LHE_IDUP(1:10),i,ISTUP(1:10),MOTHUP(1:2,1:10),ICOLUP(:,:)
+integer :: MY_IDUP(:),LHE_IDUP(1:11),i,ISTUP(1:11),MOTHUP(1:2,1:11),ICOLUP(:,:)
 integer :: NUP,IDPRUP
 real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP
 real(8) :: ntRnd
@@ -64,15 +66,23 @@ do i=1,9
 enddo
 
 ! NUP changes for gamma gamma final state
-if (LHE_IDUP(4).eq.22) then
+if ( LHE_IDUP(4).eq.22 .and. LHE_IDUP(5).eq.22 ) then! photon+photon FS
     NUP=5
-else
+elseif ( LHE_IDUP(4).ne.22 .and. LHE_IDUP(5).eq.22 ) then! Z+photon FS
+    NUP=7
+else! ZZ or WW FS
     NUP=9
 endif
 
 
+
 IDPRUP=100
-XWGTUP=1.
+if( present(EventWeight) ) then
+    XWGTUP=EventWeight
+else
+    XWGTUP=1.0d0
+endif
+
 SCALUP=Mu_Fact * 100d0
 AQEDUP=alpha_QED
 AQCDUP=0.11d0
@@ -87,10 +97,17 @@ ISTUP(7) = 1
 ISTUP(8) = 1
 ISTUP(9) = 1
 
-if (LHE_IDUP(4).eq.22) then
+if ( LHE_IDUP(4).eq.22 .and. LHE_IDUP(5).eq.22 ) then! photon+photon FS
     ISTUP(4) = 1
     ISTUP(5) = 1
+elseif ( LHE_IDUP(4).ne.22 .and. LHE_IDUP(5).eq.22 ) then! Z+photon FS
+    ISTUP(4) = 2
+    ISTUP(5) = 1
+    ISTUP(6) = 1
+    ISTUP(7) = 1
 endif
+
+
 
 
 MOTHUP(1,1) = 0
@@ -124,9 +141,21 @@ if( present(MomRealGlu) ) then ! add additional gluon
     MomDummy(4,7) = 100.0d0*MomRealGlu(4)
 endif
 
+if( present(MomRealGlu2) ) then ! add additional parton (VBF/Hjj case)
+    NUP=NUP+1
+    LHE_IDUP(11) = convertLHE( MY_IDUP(11) )
+    ISTUP(11) = 1
+    MOTHUP(1,11) = 1
+    MOTHUP(2,11) = 2
+    MomDummy(1,8) = 100.0d0*MomRealGlu2(1)
+    MomDummy(2,8) = 100.0d0*MomRealGlu2(2)
+    MomDummy(3,8) = 100.0d0*MomRealGlu2(3)
+    MomDummy(4,8) = 100.0d0*MomRealGlu2(4)
+endif
+
 
 ! Added by Nhan
-if( Process.eq.0 ) LHE_IDUP(3) = 25
+LHE_IDUP(3) = 25
 if( Process.eq.1 ) LHE_IDUP(3) = 32
 if( Process.eq.2 ) LHE_IDUP(3) = 39
 Lifetime = 0.0d0
@@ -150,7 +179,7 @@ enddo
 
 
 ! check energy-momentum conservation when we don't use "adjusted kinematics"
-if( (OffShellV1).or.(OffShellV2).or.(IsAPhoton(DecayMode1)) ) then
+if( (OffShellV1).or.(OffShellV2).or.(IsAPhoton(DecayMode2       )) ) then
     tmp=Mom(1,1)+Mom(1,2)-Mom(1,3)-Mom(1,4)-Mom(1,5)-Mom(1,6)
     if( present(MomRealGlu) ) tmp=tmp-MomRealGlu(1)
     if( abs(tmp)/Mom(1,1).gt.1d-5 ) print *, "Error 0: energy-momentum violation!",abs(tmp)/Mom(1,1)
@@ -242,6 +271,12 @@ if( present(MomRealGlu) ) then ! add additional gluon, can be off-shell in POWHE
     GluMass = dSQRT(dabs(tmp))
 endif
 
+if( present(MomRealGlu2) ) then ! add additional gluon, can be off-shell in POWHEG
+    tmp = MomDummy(1,8)*MomDummy(1,8)-MomDummy(2,8)*MomDummy(2,8)-MomDummy(3,8)*MomDummy(3,8)-MomDummy(4,8)*MomDummy(4,8)
+!     if( tmp.lt. -1d-3 ) print *, "Error 10: large negative mass!",tmp
+    GluMass2 = dSQRT(dabs(tmp))
+endif
+
 
 write(io_LHEOutFile,"(A)") "<event>"
 if( .not. ReadLHEFile ) write(io_LHEOutFile,"(X,I2,X,I3,X,1PE13.7,X,1PE13.7,X,1PE13.7,X,1PE13.7)") NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
@@ -307,6 +342,11 @@ if( present(MomRealGlu) ) then
     write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,7),MomDummy(1,7),GluMass,Lifetime,Spin
 endif
 
+if( present(MomRealGlu2) ) then
+    i=11
+    write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,8),MomDummy(1,8),GluMass2,Lifetime,Spin
+endif
+
 
 write(io_LHEOutFile,"(A)") "</event>"
 
@@ -327,6 +367,141 @@ write(io_LHEOutFile,"(A)") "</event>"
 END SUBROUTINE
 
 
+
+
+
+SUBROUTINE WriteOutEvent_HVBF(Mom,MY_IDUP,ICOLUP,MomRealGlu,EventWeight,EventInfoLine)
+use ModParameters
+implicit none
+real(8) :: Mom(1:4,1:5)
+real(8),optional :: MomRealGlu(1:4)
+character(len=160),optional :: EventInfoLine
+real(8),optional :: EventWeight
+real(8) :: Spin, Lifetime
+! real(8) :: XFV(1:4), Z1FV(1:4), Z2FV(1:4)
+real(8) :: MomDummy(1:4,1:5)
+real(8) :: Part1Mass,Part2Mass,Part3Mass,Part4Mass,XMass
+integer :: a,b,c
+integer :: MY_IDUP(:),LHE_IDUP(1:10),i,ISTUP(1:10),MOTHUP(1:2,1:10),ICOLUP(:,:)
+integer :: NUP,IDPRUP
+real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP
+real(8) :: ntRnd
+character(len=*),parameter :: fmt1 = "(I3,X,I2,X,I2,X,I2,X,I3,X,I3,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7)"
+
+
+! For description of the LHE format see http://arxiv.org/abs/hep-ph/0109068 and http://arxiv.org/abs/hep-ph/0609017
+! The LHE numbering scheme can be found here: http://pdg.lbl.gov/mc_particle_id_contents.html and http://lhapdf.hepforge.org/manual#tth_sEcA
+
+
+do i=1,5
+    LHE_IDUP(i) = convertLHE( MY_IDUP(i) )
+enddo
+
+
+
+IDPRUP=100
+SCALUP=Mu_Fact * 100d0
+AQEDUP=alpha_QED
+AQCDUP=0.11d0
+
+ISTUP(1) = -1
+ISTUP(2) = -1
+ISTUP(3) = 1
+ISTUP(4) = 1
+ISTUP(5) = 1
+
+
+! this is not correct: intermediate VV's need to be added
+MOTHUP(1,1) = 0
+MOTHUP(2,1) = 0
+MOTHUP(1,2) = 0
+MOTHUP(2,2) = 0
+MOTHUP(1,3) = 1
+MOTHUP(2,3) = 1
+MOTHUP(1,4) = 2
+MOTHUP(2,4) = 2
+MOTHUP(1,5) = 1
+MOTHUP(2,5) = 2
+
+
+NUP=5
+
+if( present(EventWeight) ) then
+    XWGTUP=EventWeight
+else
+    XWGTUP=1.0d0
+endif
+
+Lifetime = 0.0d0
+Spin = 1.0d0
+
+do a=1,5
+    MomDummy(1,a) = 100.0d0*Mom(1,a)
+    MomDummy(2,a) = 100.0d0*Mom(2,a)
+    MomDummy(3,a) = 100.0d0*Mom(3,a)
+    MomDummy(4,a) = 100.0d0*Mom(4,a)
+enddo
+
+! do b=1,4
+!     Z1FV(b) = MomDummy(b,1)-MomDummy(b,3)
+!     Z2FV(b) = MomDummy(b,2)+MomDummy(b,4)
+! enddo
+
+
+Part1Mass = 0d0
+Part2Mass = 0d0
+Part3Mass = 0d0
+Part4Mass = 0d0
+XMass = M_Reso* 100d0
+
+
+
+write(io_LHEOutFile,"(A)") "<event>"
+if( .not. ReadLHEFile ) write(io_LHEOutFile,"(X,I2,X,I3,X,1PE13.7,X,1PE13.7,X,1PE13.7,X,1PE13.7)") NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
+! in order of appearance:
+! (*) number of particles in the event
+! (*) process ID (user defined)
+! (*) weighted or unweighted events: +1=unweighted, otherwise= see manual
+! (*) pdf factorization scale in GeV
+! (*) alpha_QED coupling for this event 
+! (*) alpha_s coupling for this event
+
+
+
+! parton_a
+i=1
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),Part1Mass,Lifetime,Spin
+
+! parton_b
+i=2
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),Part2Mass,Lifetime,Spin
+
+! j1
+i=3
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),Part3Mass,Lifetime,Spin
+
+! j2
+i=4
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),Part4Mass,Lifetime,Spin
+
+! H
+i=5
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),XMass,Lifetime,Spin
+
+
+write(io_LHEOutFile,"(A)") "</event>"
+
+
+
+END SUBROUTINE
+
+
+
+
+
+
+
+
 SUBROUTINE EvalPhasespace_VDecay(VMom,MV,ML1,ML2,xRndPS,MomDK,PSWgt)
 use ModMisc
 use ModParameters
@@ -339,18 +514,76 @@ integer,parameter :: N2=2
 real(8),parameter :: PiWgt2 = (2d0*Pi)**(4-N2*3) * (4d0*Pi)**(N2-1)
 
 
+   if( MV.ne.0d0 ) then
       call genps(2,MV,xRndPS(1:2),(/ML1,ML2/),MomDK(1:4,1:2),PSWgt2)
-
 !     boost all guys to the V boson frame:
       call boost(MomDK(1:4,1),VMom(1:4),MV)
       call boost(MomDK(1:4,2),VMom(1:4),MV)
       PSWgt = PSWgt2*PiWgt2
+   else! this is for photons
+      MomDK(1:4,1) = VMom(1:4)
+      MomDK(1:4,2) = 0d0
+   endif
+
 
 RETURN
 END SUBROUTINE
 
 
+SUBROUTINE EvalPhasespace_VBF(EHat,M_H,xRndPS,Mom,PSWgt)
+  use modParameters
+  use modMisc
+  implicit none
+  real(8), intent(in) :: Ehat, M_H, xRndPS(5)
+  real(8), intent(out) :: Mom(1:4,1:5), PSWgt
+  real(8) :: slocal, mhsq, emax, x7, x8, x9, x10, x13
+  real(8) :: E6, cos2, sin2, phi2, cos6, sin6, phi6, qhsq, PSWup, PSWdn, PSWdc
+  real(8) :: qh(4), n6(4)
 
+  Mom = zero
+  PSWgt = zero
+
+  x7 = xRndPS(1)
+  x8 = xRndPS(2)
+  x9 = xRndPS(3)
+  x10 = xRndPS(4)
+  x13 = xRndPS(5)
+
+  slocal = Ehat**2
+  mhsq = m_H**2
+
+  cos2 = one-two*x7
+  sin2 = dsqrt(dabs(one-cos2**2))
+  phi2 = two*pi * x8
+  cos6 = -one + two*x9
+  sin6 = dsqrt(dabs(one-cos6**2))
+  phi6 = two*pi * x10
+  qhsq = mhsq + (slocal-mhsq)*x13
+
+  emax = (slocal-qhsq)/(two*Ehat)
+  
+  Mom(:,1) = Ehat/two * (/one,zero,zero,one/)
+  Mom(:,2) = Ehat/two * (/one,zero,zero,-one/)
+
+  Mom(:,3) = emax * (/one,sin2*dcos(phi2),sin2*dsin(phi2),cos2/)
+  
+  qh = Mom(:,1)+Mom(:,2)-Mom(:,3)
+  n6 = (/one,sin6*dcos(phi6),sin6*dsin(phi6),cos6/)
+  E6 = (qhsq-mhsq)/two/MinkowskyProduct(qh,n6)
+
+  Mom(:,4) = E6 * n6(:)
+
+  Mom(:,5) = Mom(:,1)+Mom(:,2)-Mom(:,3)-Mom(:,4) !-- Higgs momentum
+
+  !-- PS weight below
+  PSWup = one/8.0d0/pi * (one-qhsq/slocal)
+  PSWdn = E6/4.0d0/pi/MinkowskyProduct(qh,n6)
+  PSWdc = one !-- no decay for the time being
+
+  PSWgt = PSWup * PSWdn * PSWdc * (slocal-mhsq)/(two*pi)
+  
+  RETURN
+END SUBROUTINE EvalPhasespace_VBF
 
 
 SUBROUTINE EvalPhasespace_2to2(EHat,Masses,xRndPS,Mom,PSWgt)
@@ -567,8 +800,6 @@ real(8) :: CosPhi_LepPZ,InvM_Lep,CosPhi_LepPlanes,CosThetaZ,CosThetaStar
 
 
 
-
-
 !   compute pT of leptons in the lab frame
       pT_lepP = get_PT(MomLept(1:4,2))
       pT_lepM = get_PT(MomLept(1:4,3))
@@ -693,7 +924,6 @@ real(8) :: CosPhi_LepPZ,InvM_Lep,CosPhi_LepPlanes,CosThetaZ,CosThetaStar
       NBin(6)  = WhichBin(6,Phi1)
       NBin(7)  = WhichBin(7,CosTheta1)
       NBin(8)  = WhichBin(8,Phi)
-
 if( mz1.gt.mz2 ) then 
       NBin(9)  = WhichBin(9,mZ2)
       NBin(10) = WhichBin(10,mZ1)
@@ -701,7 +931,8 @@ else
       NBin(9)  = WhichBin(9,mZ1)
       NBin(10) = WhichBin(10,mZ2)
 endif
-
+!       NBin(9)  = WhichBin(9,mZ2)   ! for PS output
+!       NBin(10) = WhichBin(10,mZ1)
       NBin(11) = WhichBin(11,mReso)
 
 
@@ -709,6 +940,111 @@ endif
 
 RETURN
 END SUBROUTINE
+
+
+
+
+
+SUBROUTINE Kinematics_HVBF(NumPart,MomExt,MomDK,applyPSCut,NBin)
+use ModMisc
+use ModParameters
+implicit none
+real(8) :: MomExt(:,:),MomDK(:,:), mZ1, mZ2, MReso
+real(8) :: MomLepP(1:4),MomLepM(1:4),MomBoost(1:4),BeamAxis(1:4),ScatteringAxis(1:4),dummy(1:4)
+real(8) :: MomLept(1:4,1:4),MomLeptX(1:4,1:4),MomLeptPlane1(2:4),MomLeptPlane2(2:4),MomBeamScatterPlane(2:4)
+logical :: applyPSCut
+integer :: NumPart,NBin(:)
+real(8) :: m_jj,y_j1,y_j2,dphi_jj
+
+
+       applyPSCut = .false.
+ 
+       m_jj = get_MInv( MomExt(1:4,3)+MomExt(1:4,4) )
+       y_j1 = get_eta(MomExt(1:4,3))
+       y_j2 = get_eta(MomExt(1:4,4))
+
+!        if( abs(y_j1).lt.1d0 .or. abs(y_j2).lt.1d0 .or. y_j1*y_j2.gt.0d0 ) then
+!           applyPSCut=.true.
+!           return
+!        endif
+
+       dphi_jj = abs( Get_PHI(MomExt(1:4,3)) - Get_PHI(MomExt(1:4,4)) )
+       if( dphi_jj.gt.Pi ) dphi_jj=2d0*Pi-dphi_jj
+
+
+ !     binning
+       NBin(:) = 1
+       NBin(1)  = WhichBin(1,m_jj)
+       NBin(2)  = WhichBin(2,dphi_jj)
+
+
+RETURN
+END SUBROUTINE
+
+
+
+
+
+
+
+
+SUBROUTINE Kinematics_HJJ(NumPart,MomExt,applyPSCut,NBin)
+use ModMisc
+use ModParameters
+implicit none
+real(8) :: MomExt(:,:),mZ1, mZ2, MReso
+real(8) :: MomLepP(1:4),MomLepM(1:4),MomBoost(1:4),BeamAxis(1:4),ScatteringAxis(1:4),dummy(1:4)
+real(8) :: MomLept(1:4,1:4),MomLeptX(1:4,1:4),MomLeptPlane1(2:4),MomLeptPlane2(2:4),MomBeamScatterPlane(2:4)
+logical :: applyPSCut
+integer :: NumPart,NBin(:),NumHadr,JetList(1:2),NJEt,PartList(1:2)
+real(8) :: pT_lepM,pT_lepP,y_lepM,y_lepP,MomFerm(1:4),MomZ2(1:4),MomReso(1:4),CosTheta1,Phi,Phi1,signPhi,signPhi1
+real(8) :: CosPhi_LepPZ,InvM_Lep,CosPhi_LepPlanes,CosThetaZ,CosThetaStar
+real(8) :: pT_3, pT_4,MomHadr(1:4,1:2),MomJet(1:4,1:2),pT_j1,pT_j2,m_jj,dphi_jj
+
+
+
+applyPSCut = .false.
+
+
+    NJet=0
+    MomHadr(1:4,1:2)=MomExt(1:4,3:4)
+    NumHadr=2
+    PartList=(/1,2/)
+    JetList(1:2) = (/1,2/)
+    MomJet(1:4,1:2) = MomHadr(1:4,1:2)
+    call JetAlgo_kt(Rjet,PartList(1:NumHadr),MomHadr(1:4,1:NumHadr),NJet,JetList(1:NumHadr),MomJet(1:4,1:NumHadr)) ! hard protojets in beam pipe are counted as jets
+    call pT_order(NumHadr,MomJet(1:4,1:NumHadr))! pT-order
+
+
+    if( Njet.ne.2 ) then
+      applyPSCut=.true.
+      return
+    endif
+
+    pT_j1 = get_PT(momjet(1:4,1))
+    pT_j2 = get_PT(momjet(1:4,2))
+
+    if( pT_j1.lt.ptjetcut .or. pT_j2.lt.ptjetcut ) then
+      applyPSCut=.true.
+      return
+    endif
+
+
+
+       m_jj = get_MInv( MomJet(1:4,1)+MomJet(1:4,2) )
+
+       dphi_jj = abs( Get_PHI(MomJet(1:4,1)) - Get_PHI(MomJet(1:4,2)) )
+       if( dphi_jj.gt.Pi ) dphi_jj=2d0*Pi-dphi_jj
+
+
+ !     binning
+       NBin(1)  = WhichBin(1,m_jj)
+       NBin(2)  = WhichBin(2,dphi_jj)
+
+
+RETURN
+END SUBROUTINE
+
 
 
 
@@ -1454,6 +1790,7 @@ ELSEIF( COLLIDER.EQ.2 ) THEN
         pdf(Bot_,2)  = bot(2)              * swPDF_b
         pdf(ABot_,2) = bot(2)              * swPDF_b
         pdf(0,2)     = glu(2)              * swPDF_g
+
 ENDIF
 
 RETURN
@@ -1483,6 +1820,104 @@ double precision Q,xsave,qsave,Ctq6Pdf,D,U
          Q=qsave
 RETURN
 END SUBROUTINE
+
+
+RECURSIVE SUBROUTINE JetAlgo_kt(Rsep_jet,PartonList,MomParton,NJet,JetList,MomJet)  ! initial call must have NJet=0 and MomJet(1:4,:) = MomPartons(1:4,:)
+use ModMisc
+use ModParameters
+implicit none
+integer :: PartonList(:), JetList(:)
+real(8) :: MomParton(:,:)
+integer :: NJet
+real(8) :: MomJet(:,:)
+real(8) :: Rsep_jet
+integer :: NParton,i,j,k,dii_minp,dij_minp,ij(1:120,1:2)  ! max. partons=8, (8-1)! =5040  ! max. partons=6, (6-1)! =120
+real(8) :: dii(1:6),dij(1:120),Rij,dii_min,dij_min!,eta(1:5),phi(1:5)
+
+
+NParton = size(PartonList)
+if( NParton.eq.0 ) then
+    return
+elseif( NParton.eq.1 ) then
+!   print *, "HARD JET", PartonList(NParton)
+   NJet = NJet +1
+   JetList(NJet) = PartonList(NParton)
+   return
+endif
+
+!generate dii, dij
+do i=1,NParton
+   dii(i) = get_PT2(MomParton(1:4,PartonList(i)))**(-1d0)
+enddo
+
+k=0
+do i=1,NParton-1
+do j=i+1,NParton
+   k = k+1
+   Rij = get_R( MomParton(1:4,PartonList(i)), MomParton(1:4,PartonList(j)) )
+   dij(k) = dmin1(dii(i),dii(j)) * (Rij/Rsep_jet)**2
+   ij(k,1)=i
+   ij(k,2)=j
+enddo
+enddo
+!!print *, dii(1:NParton)
+!!print *, dij(1:k)
+
+
+! find minima
+dii_min=dii(1)
+dii_minp=1
+do i=2,NParton
+  if( dii(i).lt.dii_min ) then
+    dii_min = dii(i)
+    dii_minp= i
+  endif
+enddo
+
+dij_min=dij(1)
+dij_minp=1
+do i=2,k
+  if( dij(i).lt.dij_min ) then
+    dij_min = dij(i)
+    dij_minp= i
+  endif
+enddo
+
+
+if( dii_min.lt.dij_min ) then ! no recombination
+   NJet = NJet +1
+   k=0
+!   print *, "HARD JET", PartonList(dii_minp)
+   JetList(NJet) = PartonList(dii_minp)
+   MomJet(1:4,PartonList(dii_minp)) = MomParton(1:4,PartonList(dii_minp))
+   do i=1,NParton!  remove momenta dii_minp from parton list
+      if( i.eq.dii_minp ) cycle
+      k=k+1
+      PartonList(k) = PartonList(i)
+   enddo
+   call JetAlgo_kt(Rsep_jet,PartonList(1:k),MomParton(:,:),NJet,JetList(:),MomJet(:,:))
+else ! recombination of dij(dij_min)
+!    if( RecombPrescr.eq.1 ) then
+!         MomJet(1:4,PartonList(ij(dij_minp,1))) = EllisSoperComb(MomJet(1:4,PartonList(ij(dij_minp,1))),MomJet(1:4,PartonList(ij(dij_minp,2))))   ! Ellis-Soper combination
+!    else
+        MomJet(1:4,PartonList(ij(dij_minp,1))) = MomJet(1:4,PartonList(ij(dij_minp,1))) + MomJet(1:4,PartonList(ij(dij_minp,2)))                 ! four vector addition
+!    endif
+   MomJet(1:4,PartonList(ij(dij_minp,2))) = 0d0
+   k=0
+!   print *, "RECOMB.",PartonList(ij(dij_minp,1)),PartonList(ij(dij_minp,2))
+   do i=1,NParton!  remove momenta j from parton list
+      if( i.eq.ij(dij_minp,2) ) then
+         cycle
+      endif
+      k=k+1
+      PartonList(k) = PartonList(i)
+   enddo
+   call JetAlgo_kt(Rsep_jet,PartonList(1:k),MomJet(:,:),NJet,JetList(:),MomJet(:,:))
+endif
+
+return
+END SUBROUTINE
+
 
 
 

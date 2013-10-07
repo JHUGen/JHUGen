@@ -1,4 +1,44 @@
-include './variables.F90'
+real(8),  parameter :: GeV=1d0/100d0
+real(8),  parameter :: M_Z     = 91.1876d0 *GeV      ! Z boson mass (PDG-2011)
+real(8),  parameter :: Ga_Z    = 2.4952d0  *GeV      ! Z boson width(PDG-2011)
+real(8),  parameter :: M_W     = 80.399d0  *GeV      ! W boson mass (PDG-2011)
+real(8),  parameter :: Ga_W    = 2.085d0   *GeV      ! W boson width(PDG-2011)
+! ! ! real(8),  parameter :: M_Reso  = 125d0     *GeV      ! X resonance mass (spin 0, spin 1, spin 2)
+! ! ! real(8),  parameter :: Ga_Reso = 0.1d0     *GeV      ! X resonance width
+real(8),  parameter :: Lambda  = 1000d0    *GeV      ! Lambda coupling enters in two places
+                                                            ! overal scale for x-section and in power suppressed
+                                                            ! operators/formfactors (former r).
+
+real(8),  parameter :: m_tau = 1.8d0  *GeV           ! tau lepton mass
+
+real(8),  parameter :: alpha_QED = 1d0/128d0       ! el.magn. coupling
+real(8),  parameter :: sitW = dsqrt(0.23119d0)       ! sin(Theta_Weinberg) (PDG-2008)
+real(8), parameter :: xw = sitW**2                   !-- sin^2(thetaw)
+real(8), parameter :: twosc = sqrt(4d0*xw*(1d0-xw)) !-- two*sin(thetaw)*cos(thetaw)
+
+integer, parameter :: nf = 5                         ! numbers of active flavors, for H+jets
+  
+!-- below: to have the properly normalized VBF cross sections. 
+!-- ignore and set couplfac to 1 if only ratio are needed
+real(8), parameter :: Gf = 1.16639d-5/GeV**2 !-- to match Markus notation
+real(8), parameter :: gwsq = 4d0 * dsqrt(2d0) * M_W**2 * Gf
+real(8), parameter :: vev = 1d0/dsqrt(Gf*sqrt(2d0))
+real(8), parameter :: couplfac = gwsq**2/2d0 * vev
+!-- end block
+
+!-- relative weights for W and Z VBF
+real(8), parameter :: couplfac_ww = couplfac*1d0
+real(8), parameter :: couplfac_zz = couplfac*2d0*xw/(1d0-xw)
+
+!-- correct coupling for gluon fusion, set to 1 if only ratio needed, 
+!-- use the proper alpha_s and g_s**2 if absolute normalization is needed
+!real(8), parameter :: couplfac_ggh = 4.73855664689531059E-005/GeV !-- gsq*as/(six*pi*vev)
+!real(8), parameter :: couplfac_ggh = 3.4358474520240733E-005 !--cteq6me
+real(8), parameter :: couplfac_ggh = 4.1502282747116387E-005/GeV !--cteq6l1
+
+real(8), parameter :: mwsq = m_w**2
+real(8), parameter :: mzsq = m_z**2
+
 
 !-- parameters that define on-shell spin 0 coupling to SM fields, see note
    logical,  parameter :: generate_as = .false.! this cannot be changed
@@ -81,6 +121,15 @@ real(8),  parameter :: bR = 0d0
 
 real(8),  parameter :: fbGeV2=0.389379d12/(100d0**2)
 real(8),  parameter :: SymmFac=1d0/2d0, SpinAvg=1d0/4d0, QuarkColAvg=1d0/3d0, GluonColAvg=1d0/8d0
+
+real(8), parameter :: CF = 4d0/3d0
+real(8), parameter :: CA = 3d0
+real(8), parameter :: xn = 3d0
+
+real(8), parameter :: avegg = 1d0/256d0
+real(8), parameter :: aveqg = 1d0/96d0
+real(8), parameter :: aveqq = 1d0/36d0
+
 integer,  target :: Up_  = 1
 integer,  target :: Dn_  = 2
 integer,  target :: Chm_ = 3
@@ -118,26 +167,33 @@ real(8),  parameter :: sqrt2 = 1.4142135623730950488016887242096980786d0
 real(8),  parameter :: pisq = pi**2
 real(8),  parameter :: one = 1.0d0, mone = -1.0d0
 real(8),  parameter :: half  = 0.5d0,two = 2.0d0
+real(8),  parameter :: three = 3d0,four = 4d0
 real(8),  parameter :: zero  = 0.0d0
-complex(8), parameter :: czero = 0.0d0
+complex(8), parameter :: czero = (0.0d0,0d0)
 complex(8), parameter :: cone = 1.0d0
 complex(8), parameter :: ci=(0.0d0,1.0d0)
 complex(8), parameter :: ne=(0.0d0,1.0d0)
 
 
+integer,parameter :: DecayMode1=0
+integer,parameter :: DecayMode2=0
+logical,parameter :: includeInterference=.true.
+logical,parameter :: OffShellReson=.true.
 real(8) :: M_V,Ga_V
+! real(8) :: scr
+! complex(8) :: sc,et1,pol_mless2,POL_DK2MOM
+integer, parameter  :: dp = selected_real_kind(15)
 real(8), parameter :: tol = 0.0000001d0
 
-
-    if( DecayMode1.le.3 ) then
-       M_V = M_Z
-       Ga_V= Ga_Z
-    elseif( (DecayMode1.ge.4) .and. (DecayMode1.le.6) ) then
-       M_V = M_W
-       Ga_V= Ga_W    
-    elseif( DecayMode1.eq.7 ) then
-       M_V = 0d0
-       Ga_V= 0d0    
-    endif
+!    if( DecayMode1.le.3 ) then
+!       M_V = M_Z
+!       Ga_V= Ga_Z
+!    elseif( (DecayMode1.ge.4) .and. (DecayMode1.le.6) ) then
+!       M_V = M_W
+!       Ga_V= Ga_W    
+!    elseif( DecayMode1.eq.7 ) then
+!       M_V = 0d0
+!       Ga_V= 0d0    
+!    endif
 
 

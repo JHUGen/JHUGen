@@ -6,7 +6,7 @@ VegasDir = $(Here)/vegas
 
 # compiler options, Comp=ifort/gfort
 Opt  = Yes
-Comp = ifort
+Comp = gfort
 
 
 
@@ -45,6 +45,7 @@ MainDep = mod_Misc.F90 \
           mod_Graviton.F90 \
           mod_Higgs.F90 \
           mod_Zprime.F90 \
+          mod_HiggsJJ.F90 \
           mod_CrossSection.F90 \
           main.F90
 
@@ -55,6 +56,7 @@ MainObj = $(ObjectDir)/mod_Misc.o \
           $(ObjectDir)/mod_Graviton.o \
           $(ObjectDir)/mod_Higgs.o \
           $(ObjectDir)/mod_Zprime.o \
+          $(ObjectDir)/mod_HiggsJJ.o \
           $(ObjectDir)/mod_CrossSection.o \
           $(ObjectDir)/main.o
 
@@ -128,6 +130,7 @@ clean:
 	@echo " deleting executable, object and module files"
 	rm -f objects/*.o
 	rm -f modules/*.mod
+	rm -f modules/*.f90
 	rm -f *.mod
 	rm -f $(Exec)
 

@@ -2,6 +2,7 @@ MODULE ModMisc
 implicit none
 
 
+
 INTERFACE OPERATOR (.dot.)
    MODULE PROCEDURE MinkowskyProduct
    MODULE PROCEDURE MinkowskyProductC
@@ -142,6 +143,71 @@ RETURN
 END FUNCTION
 
 
+SUBROUTINE pT_order(N,Mom)
+implicit none
+integer :: N
+real(8) :: Mom(1:4,1:N),Mom_Tmp(1:4,1:N),pTList(1:N)
+integer :: i,MomOrder(1:N)
+
+
+    if(N.lt.1) return
+    do i=1,N
+      pTList(i) = get_PT(Mom(1:4,i))
+      MomOrder(i) = i
+    enddo
+
+    call BubleSort(N,pTList(1:N),MomOrder(1:N))
+
+    Mom_Tmp(1:4,1:N) = Mom(1:4,1:N)
+    do i=1,N
+        Mom(1:4,i) = Mom_Tmp(1:4,MomOrder(i))
+    enddo
+
+END SUBROUTINE
+
+
+
+
+SUBROUTINE BubleSort(N,X, IY)
+IMPLICIT NONE
+integer n
+real(8) x(1:n)
+integer iy(1:n)
+real(8) temp
+integer i, j, jmax, itemp
+
+      jmax=n-1
+      do i=1,n-1
+         temp=1d38
+         do j=1,jmax
+            if(x(j).gt.x(j+1)) cycle
+              temp=x(j)
+              x(j)=x(j+1)
+              x(j+1)=temp
+              itemp=iy(j)
+              iy(j)=iy(j+1)
+              iy(j+1)=itemp
+         enddo
+         if(temp.eq.1d38) return
+         jmax=jmax-1
+       enddo
+
+! check the routine
+! real(8) :: x(1:10)
+! integer :: iy(1:10)
+!     x(1:10) = (/3d0,62d0,2d0,78d0,32d0,87d0,1d0,199d0,4d0,73d0/)
+!     iy(1:10) = (/1,2,3,4,5,6,7,8,9,10/)
+!     print *, x(:)
+!     call  BubleSort(10,X(1:10), IY)
+!     print *, x(:)
+!     print *, iy(:)
+!     stop
+
+return
+END SUBROUTINE
+
+
+
 
 SUBROUTINE Error(Message,ErrNum)
 implicit none
@@ -167,10 +233,21 @@ real(8) :: x
    else
       IsNaN=.false.
    endif
+RETURN
 END FUNCTION
 
 
 
+
+SUBROUTINE swapi(i,j)
+implicit none
+integer :: i,j,temp
+
+    temp=j
+    j=i
+    i=temp
+
+END SUBROUTINE
 
 
 END MODULE
