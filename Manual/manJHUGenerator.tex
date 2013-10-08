@@ -206,16 +206,12 @@ Br_Z_bo = 1d0-Br_Z_up-Br_Z_ch-Br_Z_dn-Br_Z_st  ! branching fraction Ga(bottom)/G
 \noindent
 The \verb|*hg*| parameters control the coupling of a spin-0 resonance to gluons in the production mechanism.  The \verb|*hz*| parameters control the decay.  In practice, the production parameters are not having a large effect since angular corrections from the production mechanism are lost for spinless particles.  
 One has the options to set the spin-0 couplings either from Eq.(9) or Eq.(11) from Ref.~\cite{Bolognesi:2012}.  To switch between the two, use the parameter \verb|generate_as|.  
-For the parameters in Eq.(9) from Ref.~\cite{Bolognesi:2012}, we now allow for $q^2$ dependent form factors as described in Eq.(3) of~\cite{Anderson:2013}.
-The full parameterization is given as:
-\begin{verbatim}
+For the parameters in Eq.(9) from Ref.~\cite{Bolognesi:2012}, we now allow for $q^2$ dependent form factors as described in Eq.(3) of~\cite{Anderson:2013} as:
 
-ghz1_dyn = ghz1 + ghz1_prime * Lambda_z1**4/( Lambda_z1**2 + abs(q3_q3) )/( Lambda_z1**2 + abs(q4_q4))
-ghz2_dyn = ghz2 + ghz2_prime * Lambda_z2**4/( Lambda_z2**2 + abs(q3_q3) )/( Lambda_z2**2 + abs(q4_q4))
-ghz3_dyn = ghz3 + ghz3_prime * Lambda_z3**4/( Lambda_z3**2 + abs(q3_q3) )/( Lambda_z3**2 + abs(q4_q4))
-ghz4_dyn = ghz4 + ghz4_prime * Lambda_z4**4/( Lambda_z4**2 + abs(q3_q3) )/( Lambda_z4**2 + abs(q4_q4))
-
-\end{verbatim}
+\[
+g_i(q_1^2,q_2^2) = g_i^{\rm SM} + g_i' \times \frac{\Lambda_i^4}{(\Lambda_i^2 + |q_1^2|)(\Lambda_i^2 + |q_2^2|)}
+\]
+\noindent
 All parameters can be modified in \verb|mod_Parameters.F90| by:
 \begin{verbatim}
 
