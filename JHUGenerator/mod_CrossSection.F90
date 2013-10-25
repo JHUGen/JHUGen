@@ -1,11 +1,12 @@
 MODULE ModCrossSection
 implicit none
-integer, parameter,private :: LHA2M(-6:6) = (/-5,-6,-3,-4,-1,-2,0,2,1,4,3,6,5/)
+integer, parameter,private :: LHA2M_pdf(-6:6) = (/-5,-6,-3,-4,-1,-2,0 ,2,1,4,3,6,5/)
+integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6,5/)
 
 contains
 
 
- Function EvalWeighted_HJJ(yRnd,VgsWgt)
+ FUNCTION EvalWeighted_HJJ(yRnd,VgsWgt)
  use ModKinematics
  use ModParameters
  use ModHiggsjj
@@ -64,7 +65,7 @@ contains
    LO_Res_Unpol = 0d0
    do i = -5,5
       do j = -5,5
-         LO_Res_Unpol = LO_Res_Unpol + me2(i,j)*pdf(LHA2M(i),1)*pdf(LHA2M(j),2)
+         LO_Res_Unpol = LO_Res_Unpol + me2(i,j)*pdf(LHA2M_pdf(i),1)*pdf(LHA2M_pdf(j),2)
       enddo
    enddo
 
@@ -83,15 +84,14 @@ contains
 
 
 
-   RETURN
-
- end Function EvalWeighted_HJJ
-
+ RETURN
+ END FUNCTION EvalWeighted_HJJ
 
 
 
 
- Function EvalUnWeighted_HJJ(yRnd,genEvt,RES)
+
+ FUNCTION EvalUnWeighted_HJJ(yRnd,genEvt,RES)
  use ModKinematics
  use ModParameters
  use ModHiggsjj
@@ -157,9 +157,10 @@ IF( GENEVT ) THEN
 
    if( Process.eq.60 ) then
       call EvalAmp_WBFH_UnSymm_SA(MomExt,(/ghz1,ghz2,ghz3,ghz4/),me2)
-      MY_IDUP(1:5)  = (/LHA2M(ifound),LHA2M(jfound),SU2flip(LHA2M(ifound)),SU2flip(LHA2M(jfound)),Hig_/)
-      if( abs(SU2flip(ifound)).eq.Top_ ) MY_IDUP(3) = LHA2M(ifound)
-      if( abs(SU2flip(jfound)).eq.Top_ ) MY_IDUP(4) = LHA2M(jfound)
+
+      MY_IDUP(1:5)  = (/LHA2M_ID(ifound),LHA2M_ID(jfound),SU2flip(LHA2M_ID(ifound)),SU2flip(LHA2M_ID(jfound)),Hig_/)
+      if( abs(MY_IDUP(3)).eq.Top_ ) MY_IDUP(3) = LHA2M_ID(ifound)
+      if( abs(MY_IDUP(4)).eq.Top_ ) MY_IDUP(4) = LHA2M_ID(jfound)
       if( (MomExt(4,1)*MomExt(4,3).lt.0d0) .and. (MomExt(4,2)*MomExt(4,4).lt.0d0) ) call swapi(MY_IDUP(3),MY_IDUP(4))
       ICOLUP(1:2,1) = (/501,000/)
       ICOLUP(1:2,2) = (/502,000/)
@@ -169,7 +170,7 @@ IF( GENEVT ) THEN
    elseif( Process.eq.61 ) then
       call EvalAmp_SBFH_UnSymm_SA(MomExt,(/ghg2,ghg3,ghg4/),me2)
       me2 = me2 * (2d0/3d0*alphas**2)**2 !-- (alphas/sixpi gs^2)^2
-      MY_IDUP(1:5)  = (/LHA2M(ifound),LHA2M(jfound),LHA2M(ifound),LHA2M(jfound),Hig_/)
+      MY_IDUP(1:5)  = (/LHA2M_ID(ifound),LHA2M_ID(jfound),LHA2M_ID(ifound),LHA2M_ID(jfound),Hig_/)
       if( (MomExt(4,1)*MomExt(4,3).lt.0d0) .and. (MomExt(4,2)*MomExt(4,4).lt.0d0) ) call swapi(MY_IDUP(3),MY_IDUP(4))
       ICOLUP(1:2,1) = (/501,000/)
       ICOLUP(1:2,2) = (/502,000/)
@@ -179,7 +180,7 @@ IF( GENEVT ) THEN
    endif
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt 
 
-   LO_Res_Unpol =  me2(ifound,jfound) * pdf(LHA2M(ifound),1)*pdf(LHA2M(jfound),2)
+   LO_Res_Unpol =  me2(ifound,jfound) * pdf(LHA2M_pdf(ifound),1)*pdf(LHA2M_pdf(jfound),2)
    EvalUnWeighted_HJJ = LO_Res_Unpol * PreFac
 
    if( ifound.eq.0 .and. jfound.eq.0 ) then
@@ -198,17 +199,14 @@ IF( GENEVT ) THEN
          do NHisto=1,NumHistograms
                call intoHisto(NHisto,NBin(NHisto),1d0)  ! CS_Max is the integration volume
          enddo
-
          AccepCounter = AccepCounter + 1
          call WriteOutEvent_HVBF((/MomExt(1:4,1),MomExt(1:4,2),MomExt(1:4,3),MomExt(1:4,4),MomExt(1:4,5)/),MY_IDUP(1:5),ICOLUP(1:2,1:5))
-
       else
           RejeCounter = RejeCounter + 1
       endif
 
+
 ELSE! NOT GENEVT
-
-
 
 
    if( Process.eq.60 ) then
@@ -226,7 +224,7 @@ ELSE! NOT GENEVT
    do i = -5,5
       do j = -5,5
 
-         LO_Res_Unpol = me2(i,j)*pdf(LHA2M(i),1)*pdf(LHA2M(j),2) * PreFac
+         LO_Res_Unpol = me2(i,j)*pdf(LHA2M_pdf(i),1)*pdf(LHA2M_pdf(j),2) * PreFac
 
          EvalUnWeighted_HJJ = EvalUnWeighted_HJJ  + LO_Res_Unpol 
 
@@ -241,23 +239,16 @@ ELSE! NOT GENEVT
 
 ENDIF! GENEVT
 
-   
+
+ RETURN
+ END FUNCTION EvalUnWeighted_HJJ
 
 
 
 
 
 
-   RETURN
-
- end Function EvalUnWeighted_HJJ
-
-
-
-
-
-
- Function EvalWeighted(yRnd,VgsWgt)    ! this is a function which is only for computations
+ FUNCTION EvalWeighted(yRnd,VgsWgt)    ! this is a function which is only for computations
  use ModKinematics                     ! with weighted events
  use ModParameters
  use ModGraviton
@@ -297,13 +288,11 @@ ENDIF! GENEVT
 !    IDUP(7)  -->  MomDK(:,1)  -->  ubar-spinor
 !    IDUP(8)  -->  MomDK(:,4)  -->     v-spinor
 !    IDUP(9)  -->  MomDK(:,3)  -->  ubar-spinor
-
     call VVBranchings(MY_IDUP(4:9),ICOLUP(1:2,6:9))
     MY_IDUP(1:3) = 0
-
-  yz1 = yRnd(10)
-  yz2 = yRnd(11)
-  offzchannel = yRnd(12) ! variable to decide which Z is ``on''- and which Z is off- the mass-shell 
+    yz1 = yRnd(10)
+    yz2 = yRnd(11)
+    offzchannel = yRnd(12) ! variable to decide which Z is ``on''- and which Z is off- the mass-shell 
   if ((OffShellV1.eqv..true.).and.(OffShellV2.eqv..true.)) then
         if(M_Reso.gt.2d0*M_V) then
             EZ_max = EHat
@@ -466,7 +455,6 @@ ENDIF! GENEVT
 
 ! EvalWeighted = PreFac  ! for PS output   (only run 1 iteration without vegas adaptation)
 
-
     endif
 
    if (PChannel.eq.1.or.PChannel.eq.2) then
@@ -518,7 +506,7 @@ ENDIF! GENEVT
    endif
 
 
-   if( writeWeightedLHE ) then 
+   if( writeWeightedLHE .and. (.not. warmup) ) then
       if( (OffShellV1).or.(OffShellV2).or.(IsAPhoton(DecayMode2))   ) then
             call WriteOutEvent((/MomExt(1:4,1),MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(1:9),ICOLUP(1:2,1:9),EventWeight=EvalWeighted)
       else
@@ -526,24 +514,35 @@ ENDIF! GENEVT
       endif
    endif
 
-
-
       do NHisto=1,NumHistograms-7
           call intoHisto(NHisto,NBin(NHisto),EvalWeighted*VgsWgt)
       enddo
-      if( abs(MY_IDUP(6)).eq.ElP_ .and. abs(MY_IDUP(7)).eq.ElP_ .and. abs(MY_IDUP(8)).eq.ElP_ .and. abs(MY_IDUP(9)).eq.ElP_ ) call intoHisto(12,NBin(12),EvalWeighted*VgsWgt)
-      if( abs(MY_IDUP(6)).eq.MuP_ .and. abs(MY_IDUP(7)).eq.MuP_ .and. abs(MY_IDUP(8)).eq.MuP_ .and. abs(MY_IDUP(9)).eq.MuP_ ) call intoHisto(13,NBin(13),EvalWeighted*VgsWgt)
-      if( abs(MY_IDUP(6)).eq.taP_ .and. abs(MY_IDUP(7)).eq.taP_ .and. abs(MY_IDUP(8)).eq.taP_ .and. abs(MY_IDUP(9)).eq.taP_ ) call intoHisto(14,NBin(14),EvalWeighted*VgsWgt)
 
-      if( abs(MY_IDUP(6)).eq.ElP_ .and. abs(MY_IDUP(7)).eq.ElP_ .and. abs(MY_IDUP(8)).eq.muP_ .and. abs(MY_IDUP(9)).eq.muP_ ) call intoHisto(15,NBin(15),EvalWeighted*VgsWgt)
-      if( abs(MY_IDUP(6)).eq.muP_ .and. abs(MY_IDUP(7)).eq.muP_ .and. abs(MY_IDUP(8)).eq.ElP_ .and. abs(MY_IDUP(9)).eq.ElP_ ) call intoHisto(15,NBin(15),EvalWeighted*VgsWgt)
+!       this is for z decays
+!       if( abs(MY_IDUP(6)).eq.ElP_ .and. abs(MY_IDUP(7)).eq.ElP_ .and. abs(MY_IDUP(8)).eq.ElP_ .and. abs(MY_IDUP(9)).eq.ElP_ ) call intoHisto(12,NBin(12),EvalWeighted*VgsWgt)
+!       if( abs(MY_IDUP(6)).eq.MuP_ .and. abs(MY_IDUP(7)).eq.MuP_ .and. abs(MY_IDUP(8)).eq.MuP_ .and. abs(MY_IDUP(9)).eq.MuP_ ) call intoHisto(13,NBin(13),EvalWeighted*VgsWgt)
+!       if( abs(MY_IDUP(6)).eq.taP_ .and. abs(MY_IDUP(7)).eq.taP_ .and. abs(MY_IDUP(8)).eq.taP_ .and. abs(MY_IDUP(9)).eq.taP_ ) call intoHisto(14,NBin(14),EvalWeighted*VgsWgt)
+! 
+!       if( abs(MY_IDUP(6)).eq.ElP_ .and. abs(MY_IDUP(7)).eq.ElP_ .and. abs(MY_IDUP(8)).eq.muP_ .and. abs(MY_IDUP(9)).eq.muP_ ) call intoHisto(15,NBin(15),EvalWeighted*VgsWgt)
+!       if( abs(MY_IDUP(6)).eq.muP_ .and. abs(MY_IDUP(7)).eq.muP_ .and. abs(MY_IDUP(8)).eq.ElP_ .and. abs(MY_IDUP(9)).eq.ElP_ ) call intoHisto(15,NBin(15),EvalWeighted*VgsWgt)
+! 
+!       if( abs(MY_IDUP(6)).eq.ElP_ .and. abs(MY_IDUP(7)).eq.ElP_ .and. abs(MY_IDUP(8)).eq.taP_ .and. abs(MY_IDUP(9)).eq.taP_ ) call intoHisto(16,NBin(16),EvalWeighted*VgsWgt)
+!       if( abs(MY_IDUP(6)).eq.taP_ .and. abs(MY_IDUP(7)).eq.taP_ .and. abs(MY_IDUP(8)).eq.ElP_ .and. abs(MY_IDUP(9)).eq.ElP_ ) call intoHisto(16,NBin(16),EvalWeighted*VgsWgt)
+! 
+!       if( abs(MY_IDUP(6)).eq.taP_ .and. abs(MY_IDUP(7)).eq.taP_ .and. abs(MY_IDUP(8)).eq.MuP_ .and. abs(MY_IDUP(9)).eq.MuP_ ) call intoHisto(17,NBin(17),EvalWeighted*VgsWgt)
+!       if( abs(MY_IDUP(6)).eq.MuP_ .and. abs(MY_IDUP(7)).eq.MuP_ .and. abs(MY_IDUP(8)).eq.taP_ .and. abs(MY_IDUP(9)).eq.taP_ ) call intoHisto(17,NBin(17),EvalWeighted*VgsWgt)
 
-      if( abs(MY_IDUP(6)).eq.ElP_ .and. abs(MY_IDUP(7)).eq.ElP_ .and. abs(MY_IDUP(8)).eq.taP_ .and. abs(MY_IDUP(9)).eq.taP_ ) call intoHisto(16,NBin(16),EvalWeighted*VgsWgt)
-      if( abs(MY_IDUP(6)).eq.taP_ .and. abs(MY_IDUP(7)).eq.taP_ .and. abs(MY_IDUP(8)).eq.ElP_ .and. abs(MY_IDUP(9)).eq.ElP_ ) call intoHisto(16,NBin(16),EvalWeighted*VgsWgt)
+!       this is for w decays
+!       if( abs(MY_IDUP(6)).eq.ElP_ .and. abs(MY_IDUP(9)).eq.ElP_ ) call intoHisto(12,NBin(12),EvalWeighted*VgsWgt)
+!       if( abs(MY_IDUP(6)).eq.MuP_ .and. abs(MY_IDUP(9)).eq.MuP_ ) call intoHisto(13,NBin(13),EvalWeighted*VgsWgt)
+!       if( abs(MY_IDUP(6)).eq.taP_ .and. abs(MY_IDUP(9)).eq.taP_ ) call intoHisto(14,NBin(14),EvalWeighted*VgsWgt)
+! 
+!       if( abs(MY_IDUP(6)).eq.ElP_.and. abs(MY_IDUP(9)).eq.muP_) call intoHisto(15,NBin(15),EvalWeighted*VgsWgt)
+!       if( abs(MY_IDUP(6)).eq.muP_.and. abs(MY_IDUP(9)).eq.ElP_) call intoHisto(15,NBin(15),EvalWeighted*VgsWgt)
 
-      if( abs(MY_IDUP(6)).eq.taP_ .and. abs(MY_IDUP(7)).eq.taP_ .and. abs(MY_IDUP(8)).eq.MuP_ .and. abs(MY_IDUP(9)).eq.MuP_ ) call intoHisto(17,NBin(17),EvalWeighted*VgsWgt)
-      if( abs(MY_IDUP(6)).eq.MuP_ .and. abs(MY_IDUP(7)).eq.MuP_ .and. abs(MY_IDUP(8)).eq.taP_ .and. abs(MY_IDUP(9)).eq.taP_ ) call intoHisto(17,NBin(17),EvalWeighted*VgsWgt)
+
       call intoHisto(18,NBin(18),EvalWeighted*VgsWgt)
+
 
       xBin(1) = WhichXBin(1,yrnd(1))
       xBin(2) = WhichXBin(2,yrnd(2))
@@ -617,9 +616,6 @@ include 'csmaxvalue.f'
 !    IDUP(8)  -->  MomDK(:,4)  -->     v-spinor
 !    IDUP(9)  -->  MomDK(:,3)  -->  ubar-spinor
    call VVBranchings(MY_IDUP(4:9),ICOLUP(1:2,6:9))
-
-
-
 ! if(  my_idup(6).eq.my_idup(8)) return! for 2e2mu   ! noi+ 0.92591989,     i+ 0.92775679,   i- 0.14072385,     ix+ 3.2770660  ix-  0.88181581E-02
 ! if(  my_idup(6).ne.my_idup(8)) return! for 4mu/4e  ! noi+ 0.92608512,     i+ 1.01761060,   i- 0.12915384,     ix+  3.5925481 ix-  0.80721147E-02
 !                                                            50/50%              48/52%         52/48%               48%                52%
@@ -936,8 +932,6 @@ IF( GENEVT ) THEN
    endif
 
    PreFac = 2d0 * fbGeV2 * FluxFac * sHatJacobi * PSWgt * SymmFac
-   if( abs(MY_IDUP(6)).ge.1 .and. abs(MY_IDUP(6)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
-   if( abs(MY_IDUP(8)).ge.1 .and. abs(MY_IDUP(8)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
    EvalUnWeighted = LO_Res_Unpol * PreFac
 
       if( EvalUnWeighted.gt. CS_max) then
@@ -950,20 +944,29 @@ IF( GENEVT ) THEN
          do NHisto=1,NumHistograms-7
                call intoHisto(NHisto,NBin(NHisto),1d0)  ! CS_Max is the integration volume
          enddo
-	if( abs(MY_IDUP(6)).eq.ElP_ .and. abs(MY_IDUP(7)).eq.ElP_ .and. abs(MY_IDUP(8)).eq.ElP_ .and. abs(MY_IDUP(9)).eq.ElP_ ) call intoHisto(12,1,1d0)
-	if( abs(MY_IDUP(6)).eq.MuP_ .and. abs(MY_IDUP(7)).eq.MuP_ .and. abs(MY_IDUP(8)).eq.MuP_ .and. abs(MY_IDUP(9)).eq.MuP_ ) call intoHisto(13,1,1d0)
-	if( abs(MY_IDUP(6)).eq.taP_ .and. abs(MY_IDUP(7)).eq.taP_ .and. abs(MY_IDUP(8)).eq.taP_ .and. abs(MY_IDUP(9)).eq.taP_ ) call intoHisto(14,1,1d0)
 
-	if( abs(MY_IDUP(6)).eq.ElP_ .and. abs(MY_IDUP(7)).eq.ElP_ .and. abs(MY_IDUP(8)).eq.muP_ .and. abs(MY_IDUP(9)).eq.muP_ ) call intoHisto(15,1,1d0)
-	if( abs(MY_IDUP(6)).eq.muP_ .and. abs(MY_IDUP(7)).eq.muP_ .and. abs(MY_IDUP(8)).eq.ElP_ .and. abs(MY_IDUP(9)).eq.ElP_ ) call intoHisto(15,1,1d0)
+!       this is for z decays
+! 	if( abs(MY_IDUP(6)).eq.ElP_ .and. abs(MY_IDUP(7)).eq.ElP_ .and. abs(MY_IDUP(8)).eq.ElP_ .and. abs(MY_IDUP(9)).eq.ElP_ ) call intoHisto(12,1,1d0)
+! 	if( abs(MY_IDUP(6)).eq.MuP_ .and. abs(MY_IDUP(7)).eq.MuP_ .and. abs(MY_IDUP(8)).eq.MuP_ .and. abs(MY_IDUP(9)).eq.MuP_ ) call intoHisto(13,1,1d0)
+! 	if( abs(MY_IDUP(6)).eq.taP_ .and. abs(MY_IDUP(7)).eq.taP_ .and. abs(MY_IDUP(8)).eq.taP_ .and. abs(MY_IDUP(9)).eq.taP_ ) call intoHisto(14,1,1d0)
+! 
+! 	if( abs(MY_IDUP(6)).eq.ElP_ .and. abs(MY_IDUP(7)).eq.ElP_ .and. abs(MY_IDUP(8)).eq.muP_ .and. abs(MY_IDUP(9)).eq.muP_ ) call intoHisto(15,1,1d0)
+! 	if( abs(MY_IDUP(6)).eq.muP_ .and. abs(MY_IDUP(7)).eq.muP_ .and. abs(MY_IDUP(8)).eq.ElP_ .and. abs(MY_IDUP(9)).eq.ElP_ ) call intoHisto(15,1,1d0)
+! 
+! 	if( abs(MY_IDUP(6)).eq.ElP_ .and. abs(MY_IDUP(7)).eq.ElP_ .and. abs(MY_IDUP(8)).eq.taP_ .and. abs(MY_IDUP(9)).eq.taP_ ) call intoHisto(16,1,1d0)
+! 	if( abs(MY_IDUP(6)).eq.taP_ .and. abs(MY_IDUP(7)).eq.taP_ .and. abs(MY_IDUP(8)).eq.ElP_ .and. abs(MY_IDUP(9)).eq.ElP_ ) call intoHisto(16,1,1d0)
+! 
+! 	if( abs(MY_IDUP(6)).eq.taP_ .and. abs(MY_IDUP(7)).eq.taP_ .and. abs(MY_IDUP(8)).eq.MuP_ .and. abs(MY_IDUP(9)).eq.MuP_ ) call intoHisto(17,1,1d0)
+! 	if( abs(MY_IDUP(6)).eq.MuP_ .and. abs(MY_IDUP(7)).eq.MuP_ .and. abs(MY_IDUP(8)).eq.taP_ .and. abs(MY_IDUP(9)).eq.taP_ ) call intoHisto(17,1,1d0)
+!       this is for w decays
+!       if( abs(MY_IDUP(6)).eq.ElP_ .and. abs(MY_IDUP(9)).eq.ElP_ ) call intoHisto(12,1,1d0)
+!       if( abs(MY_IDUP(6)).eq.MuP_ .and. abs(MY_IDUP(9)).eq.MuP_ ) call intoHisto(13,1,1d0)
+!       if( abs(MY_IDUP(6)).eq.taP_ .and. abs(MY_IDUP(9)).eq.taP_ ) call intoHisto(14,1,1d0)
+! 
+!       if( abs(MY_IDUP(6)).eq.ElP_.and. abs(MY_IDUP(9)).eq.muP_) call intoHisto(15,1,1d0)
+!       if( abs(MY_IDUP(6)).eq.muP_.and. abs(MY_IDUP(9)).eq.ElP_) call intoHisto(15,1,1d0)
 
-	if( abs(MY_IDUP(6)).eq.ElP_ .and. abs(MY_IDUP(7)).eq.ElP_ .and. abs(MY_IDUP(8)).eq.taP_ .and. abs(MY_IDUP(9)).eq.taP_ ) call intoHisto(16,1,1d0)
-	if( abs(MY_IDUP(6)).eq.taP_ .and. abs(MY_IDUP(7)).eq.taP_ .and. abs(MY_IDUP(8)).eq.ElP_ .and. abs(MY_IDUP(9)).eq.ElP_ ) call intoHisto(16,1,1d0)
-
-	if( abs(MY_IDUP(6)).eq.taP_ .and. abs(MY_IDUP(7)).eq.taP_ .and. abs(MY_IDUP(8)).eq.MuP_ .and. abs(MY_IDUP(9)).eq.MuP_ ) call intoHisto(17,1,1d0)
-	if( abs(MY_IDUP(6)).eq.MuP_ .and. abs(MY_IDUP(7)).eq.MuP_ .and. abs(MY_IDUP(8)).eq.taP_ .and. abs(MY_IDUP(9)).eq.taP_ ) call intoHisto(17,1,1d0)
-	call intoHisto(18,NBin(18),1d0)
-
+      call intoHisto(18,NBin(18),1d0)
 
 
          AccepCounter = AccepCounter + 1
@@ -983,7 +986,6 @@ ELSE! NOT GENEVT
 
    if (PChannel.eq.0.or.PChannel.eq.2) then
       PDFFac = pdf(0,1) * pdf(0,2)
-
       if (Process.eq.0) then
             if( ML1.gt.1d-6 .or. ML2.gt.1d-6 .or. ML3.gt.1d-6 .or. ML4.gt.1d-6 ) then
                call EvalPhasespace_VDecay(MomExt(1:4,3),MZ1,0d0,0d0,yRnd(5:6),MomDK_massless(1:4,1:2),PSWgt2)
@@ -1014,9 +1016,6 @@ ELSE! NOT GENEVT
 
 
       PreFac = 2d0 * fbGeV2 * FluxFac * sHatJacobi * PSWgt * PDFFac * SymmFac
-      if( abs(MY_IDUP(6)).ge.1 .and. abs(MY_IDUP(6)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
-      if( abs(MY_IDUP(8)).ge.1 .and. abs(MY_IDUP(8)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
-
       EvalUnWeighted = LO_Res_Unpol * PreFac
       RES(0,0) = EvalUnWeighted
 
@@ -1538,7 +1537,7 @@ include 'csmaxvalue.f'
 
 
 
-   MY_IDUP(3)= 0
+   MY_IDUP(3)= Hig_
 !    particle associations:
 !    
 !    IDUP(6)  -->  MomDK(:,2)  -->     v-spinor
