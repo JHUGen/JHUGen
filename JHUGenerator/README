@@ -27,12 +27,12 @@ command line parameters:
                   x=10: W --> l nu_l (l=e,mu,tau)
                   x=11: W --> anyting                  
    DataFile=x    (name of the output file), default value: "output"
-   Process=x     (gives the resonance spin 0,1 or 2)
+   Process=x     (gives the resonance spin 0,1 or 2, or 60=weakVBF, 61=pp->Hjj)
    MReso=yyy.xx  (resonance mass, default=126.00)
    OffXVV=xyz    (only applies to Higgs production, x,y,z can be 1 or 0 indicating real off-shellness for Higgs, Z/W boson 1/2, resp.), default 011
    Interf=x      (0=neglect interference for 4f final states, 1=include interference, default= 0 above threshold, 1 below threshold )
    if a parameter is not specified, the default value is chosen
-   ReadLHE="x"   (allows NLO production of spin-0 particles by reading in LHE file from NLO generator, e.g., POWHEG)
+   ReadLHE="x"   (allows LO/NLO production of spin-0 particles by reading in LHE file from LO/NLO generator, e.g., POWHEG)
    
 example call:
    ./JHUGen Collider=1 Process=0 VegasNc1=100000 PChannel=0 OffXVV=011 DecayMode1=0 DecayMode2=0 DataFile=test1
@@ -74,12 +74,5 @@ input parameter:  mod_Parameters.f90
 cross section file: mod_CrossSection.f90, mod_Graviton.f90, mod_Zprime.f90, mod_Higgs.f90,
   the call to the rountine that writes out events is "WriteOutEvent(...)" in mod_CrossSection.f90,
   the routine itself can be found in mod_Kinematics.f90
-
-
------------------------------------------
-Release notes...
------------------------------------------
-
-V2.0.2: Update random seed for gfort
 
 

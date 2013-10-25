@@ -13,7 +13,6 @@ real(8) :: VG_Result,VG_Error
 logical,parameter :: useBetaVersion=.false.! this should be set to .false.
 
 
-
    call GetCommandlineArgs()
    call InitPDFs()
    call InitHisto()
@@ -34,8 +33,6 @@ logical,parameter :: useBetaVersion=.false.! this should be set to .false.
    call FinalizeOutput()
    call CloseFiles()
    write(io_stdout,*) " Done"
-
-
 
 END PROGRAM
 
@@ -412,7 +409,6 @@ include "vegas_common.f"
 real(8) :: VG_Result,VG_Error,VG_Chi2
 real(8) :: yRnd(1:22)
 real(8) :: dum, RES(-5:5,-5:5)
-logical :: warmup
 integer :: i, i1, j1,PChannel_aux, PChannel_aux1,NHisto
 include 'csmaxvalue.f'
 integer :: n,clock
@@ -460,6 +456,7 @@ if (unweighted.eqv..false.) then  !----------------------- weighted events
   ! WARM-UP RUN
   itmx = VegasIt1
   ncall= VegasNc1
+  warmup = .true.
 
   if (Process.eq.60 .or. Process.eq.61) then
      call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
@@ -468,9 +465,8 @@ if (unweighted.eqv..false.) then  !----------------------- weighted events
   endif
 
   !DATA RUN
-  call ClearHisto()
-  close(io_LHEOutFile)
-  if( writeWeightedLHE ) open(unit=io_LHEOutFile,file=trim(DataFile)//'.lhe',form='formatted',access= 'sequential',status='replace')
+  call ClearHisto()   
+  warmup = .false.
   EvalCounter=0
   RejeCounter=0
   AccepCounter=0
@@ -507,6 +503,7 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
 
     if( .not. ReadCSmax ) then
         print *, " finding maximal weight with ",VegasNc0," evaluations"
+        warmup = .true.
         do i=1,VegasNc0
             call random_number(yRnd)
             if (Process.eq.60 .or. Process.eq.61) then
@@ -586,6 +583,7 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
     endif
 
     call cpu_time(time_start)
+    warmup = .true.
     if( VegasNc1.ne.-1 ) then
         print *, " generating events with ",VegasNc1," tries"
         do i=1,VegasNc1
@@ -651,7 +649,6 @@ include "vegas_common.f"
 real(8) :: VG_Result,VG_Error,VG_Chi2
 real(8) :: yRnd(1:22)
 real(8) :: dum, RES(-5:5,-5:5)
-logical :: warmup
 integer :: i, i1, PChannel_aux, PChannel_aux1,n1,n2,n3,n4
 include 'csmaxvalue.f'
 integer :: n,clock
@@ -765,21 +762,35 @@ use ModParameters
 use ModMisc
 implicit none
 include 'csmaxvalue.f'
+integer,parameter :: maxpart=6!=max.partons; this parameter should match the one in WriteOutEvent of mod_Kinematics
 real(8) :: VG_Result,VG_Error,VG_Chi2
 real(8) :: yRnd(1:22),Res,dum,EMcheck(1:4)
-real(8) :: AcceptedEvent(1:4,1:4),Ehat
-real(8) :: MomExt(1:4,1:5),MomHiggs(1:4),MomGlu(1:4,1:4),Mass(1:4),pH2sq
-integer :: tries, nParticle, MY_IDUP(1:11), ICOLUP(1:2,1:11)
+real(8) :: AcceptedEvent(1:4,1:maxpart),Ehat
+real(8) :: MomExt(1:4,1:maxpart),MomHiggs(1:4),MomParton(1:4,1:maxpart),Mass(1:maxpart),pH2sq
+integer :: tries, nParticle, MY_IDUP(1:7+maxpart), ICOLUP(1:2,1:7+maxpart)
 character(len=*),parameter :: POWHEG_Fmt0 = "(6X,I2,A160)"
 character(len=*),parameter :: POWHEG_Fmt1 = "(6X,I2,4X,I3,4X,I3,3X,I3,1X,I3,3X,I3,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9)"
+character(len=*),parameter :: JHUGen_Fmt0 = "(2X,I2,A160)"
+character(len=*),parameter :: JHUGen_Fmt1 = "(I3,X,I2,X,I2,X,I2,X,I3,X,I3,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7)"
+character(len=150) :: InputFmt0,InputFmt1
 logical :: FirstEvent,M_ResoSet
-integer :: nline,LHE_IDUP(1:4),LHE_ICOLUP(1:2,1:4),LHE_ICOLUP_Glu(1:2,1:4),LHE_IDUP_Glu(1:4),intDummy,Nevent
-integer :: EventNumPart,nglu
+integer :: nline,LHE_IDUP(1:maxpart+3),LHE_ICOLUP(1:2,1:maxpart+3),LHE_ICOLUP_Part(1:2,1:maxpart),LHE_IDUP_Part(1:maxpart),intDummy,Nevent
+integer :: EventNumPart,nparton
 character(len=160) :: FirstLines,EventInfoLine
-character(len=160) :: EventLine(1:4)
+character(len=160) :: EventLine(1:maxpart+3)
 integer :: n,clock,i,stat
 integer, dimension(:), allocatable :: gfort_seed
+integer,parameter :: InputLHEFormat = 1  !  1=POWHEG, 2=JHUGen
 
+
+
+if(InputLHEFormat.eq.1) then
+  InputFmt0 = trim(POWHEG_Fmt0)
+  InputFmt1 = trim(POWHEG_Fmt1)
+else
+  InputFmt0 = trim(JHUGen_Fmt0)
+  InputFmt1 = trim(JHUGen_Fmt1)
+endif
 
 if( VegasIt1.eq.-1 ) VegasIt1 = VegasIt1_default
 if( VegasNc0.eq.-1 ) VegasNc0 = VegasNc0_default
@@ -800,7 +811,6 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
     endif
 
 
-
 !    search for line with first event
      FirstEvent = .false.
      M_ResoSet=.false.
@@ -814,7 +824,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
         if( FirstLines(1:7).eq."<event>" ) then 
                FirstEvent=.true.
         else
-            if( importPOWHEG_LHEinit ) then 
+            if( importExternal_LHEinit ) then
                 if( FirstLines(1:17).eq."<LesHouchesEvents" .or. FirstLines(1:4).eq."<!--" ) then
                 else
                   write(io_LHEOutFile,"(A)") trim(firstlines)
@@ -831,7 +841,6 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
      endif
      write(io_stdout,"(A)") ""
      write(io_LogFile,"(A)") ""
-
 
 
 
@@ -858,32 +867,30 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
      NEvent=0
      do while ( .true. ) 
          NEvent=NEvent + 1
-
-         read(16,fmt=POWHEG_Fmt0) EventNumPart,EventInfoLine!  read number of particle from the first line after <event> and other info
+         read(16,fmt=InputFmt0) EventNumPart,EventInfoLine!  read number of particle from the first line after <event> and other info
 !        read event lines
          do nline=1,EventNumPart
             read(16,fmt="(A160)") EventLine(nline)
          enddo
-         if( EventNumPart.ne.3 .and. EventNumPart.ne.4.and. EventNumPart.ne.5 ) then
-            print *, "ERROR: number of particles in LHE input file is neither 3 nor 4,5",EventNumPart
-            stop
+         if( EventNumPart.lt.3 .or. EventNumPart.gt.maxpart ) then
+            call Error("ERROR: number of particles in LHE input exceeds allowed limit",EventNumPart)
          endif
 
- !       convert event lines into variables assuming that Higgs is always in 3rd place
-         nglu = 0 
+ !       convert event lines into variables assuming that the Higgs resonance has ID 25
+         nparton = 0
          do nline=1,EventNumPart
-            read(EventLine(nline),fmt=POWHEG_Fmt1) LHE_IDUP(nline),intDummy,intDummy,intDummy,LHE_ICOLUP(1,nline),LHE_ICOLUP(2,nline),MomExt(2,nline),MomExt(3,nline),MomExt(4,nline),MomExt(1,nline),Mass(nline)
+            read(EventLine(nline),fmt=InputFmt1) LHE_IDUP(nline),intDummy,intDummy,intDummy,LHE_ICOLUP(1,nline),LHE_ICOLUP(2,nline),MomExt(2,nline),MomExt(3,nline),MomExt(4,nline),MomExt(1,nline),Mass(nline)
             MomExt(1:4,nline) = MomExt(1:4,nline)*GeV!  convert to units of 100GeV
             Mass(nline) = Mass(nline)*GeV            !  convert to units of 100GeV
 
             if( abs(LHE_IDUP(nline)).eq.25 ) then!   select the Higgs (ID=25, h0)
                   MomHiggs(1:4) = MomExt(1:4,nline)
                   pH2sq = dsqrt(abs(MomHiggs(1:4).dot.MomHiggs(1:4)))
-            elseif( abs(LHE_IDUP(nline)).eq.21 .or. (abs(LHE_IDUP(nline)).ge.1 .and. abs(LHE_IDUP(nline)).le.5) ) then!   select the gluons (ID=21) or quarks (ID=1,.,5)
-                  nglu = nglu + 1
-                  MomGlu(1:4,nglu) = MomExt(1:4,nline)
-                  LHE_IDUP_Glu(nglu) = LHE_IDUP(nline)
-                  LHE_ICOLUP_Glu(1:2,nglu) = LHE_ICOLUP(1:2,nline)
+            elseif( (abs(LHE_IDUP(nline)).eq.21) .or. (abs(LHE_IDUP(nline)).ge.1 .and. abs(LHE_IDUP(nline)).le.5) ) then!   select the gluons (ID=21) or quarks (ID=1,.,5)
+                  nparton = nparton + 1
+                  MomParton(1:4,nparton) = MomExt(1:4,nline)
+                  LHE_IDUP_Part(nparton) = LHE_IDUP(nline)
+                  LHE_ICOLUP_Part(1:2,nparton) = LHE_ICOLUP(1:2,nline)
              else
                   print *, "ERROR: unknown particle in LHE input file",LHE_IDUP(nline)
                   stop
@@ -897,14 +904,14 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
 !               cycle
 !          endif
 
-         EMcheck(1:4) = MomGlu(1:4,1) + MomGlu(1:4,2) - MomHiggs(1:4)
-         if( nglu.eq.3 ) EMcheck(1:4) = EMcheck(1:4) - MomGlu(1:4,3)
-         if( nglu.eq.4 ) EMcheck(1:4) = EMcheck(1:4) - MomGlu(1:4,3) - MomGlu(1:4,4)
+         EMcheck(1:4) = MomParton(1:4,1) + MomParton(1:4,2) - MomHiggs(1:4)
+         do n=3,nparton
+             EMcheck(1:4) = EMcheck(1:4) - MomParton(1:4,n)
+         enddo
          if( any(abs(EMcheck(1:4)).gt.1d0*GeV) ) then
-              print *, "ERROR: energy momentum violation while reading LHE production momenta.",EMcheck(1:4)
-              stop
+              print *, EMcheck(1:4)
+              call Error("ERROR: energy momentum violation while reading LHE production momenta.",nparton)
          endif
-
 
 !         accept/reject sampling for H->VV decay contribution
           EHat = pH2sq
@@ -918,28 +925,16 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
              call boost(AcceptedEvent(1:4,2),MomHiggs(1:4),pH2sq)
              call boost(AcceptedEvent(1:4,3),MomHiggs(1:4),pH2sq)
              call boost(AcceptedEvent(1:4,4),MomHiggs(1:4),pH2sq)
-             if(EventNumPart.eq.3) then!  gg-> H LO event
-                    MY_IDUP(1) = convertLHEreverse(LHE_IDUP_Glu(1))
-                    MY_IDUP(2) = convertLHEreverse(LHE_IDUP_Glu(2))
-                    ICOLUP(1:2,1:2) = LHE_ICOLUP_Glu(1:2,1:2)!  overwrite inital colors with POWHEG ones
-                    call WriteOutEvent((/MomGlu(1:4,1),MomGlu(1:4,2),AcceptedEvent(1:4,1),AcceptedEvent(1:4,2),AcceptedEvent(1:4,3),AcceptedEvent(1:4,4)/),MY_IDUP(1:9),ICOLUP(1:2,1:9),EventInfoLine=EventInfoLine)
-             elseif(EventNumPart.eq.4) then! gg-> H+g NLO event
-                    MY_IDUP(1) = convertLHEreverse(LHE_IDUP_Glu(1))!  overwrite inital ID's with POWHEG ones
-                    MY_IDUP(2) = convertLHEreverse(LHE_IDUP_Glu(2))
-                    MY_IDUP(10)= convertLHEreverse(LHE_IDUP_Glu(3))
-                    ICOLUP(1:2,1:2) = LHE_ICOLUP_Glu(1:2,1:2)!  overwrite inital colors with POWHEG ones
-                    ICOLUP(1:2,10)  = LHE_ICOLUP_Glu(1:2,3)  !  set third parton color
-                    call WriteOutEvent((/MomGlu(1:4,1),MomGlu(1:4,2),AcceptedEvent(1:4,1),AcceptedEvent(1:4,2),AcceptedEvent(1:4,3),AcceptedEvent(1:4,4)/),MY_IDUP(1:10),ICOLUP(1:2,1:10),MomRealGlu=MomGlu(1:4,3),EventInfoLine=EventInfoLine)
-             elseif(EventNumPart.eq.5) then! VBF or Hjj LO event
-                    MY_IDUP(1) = convertLHEreverse(LHE_IDUP_Glu(1))!  overwrite inital ID's with POWHEG ones
-                    MY_IDUP(2) = convertLHEreverse(LHE_IDUP_Glu(2))
-                    MY_IDUP(10)= convertLHEreverse(LHE_IDUP_Glu(3))
-                    MY_IDUP(11)= convertLHEreverse(LHE_IDUP_Glu(4))
-                    ICOLUP(1:2,1:2) = LHE_ICOLUP_Glu(1:2,1:2)!  overwrite inital colors with POWHEG ones
-                    ICOLUP(1:2,10)  = LHE_ICOLUP_Glu(1:2,3)  !  set third parton color
-                    ICOLUP(1:2,11)  = LHE_ICOLUP_Glu(1:2,4)  !  set forth parton color
-                    call WriteOutEvent((/MomGlu(1:4,1),MomGlu(1:4,2),AcceptedEvent(1:4,1),AcceptedEvent(1:4,2),AcceptedEvent(1:4,3),AcceptedEvent(1:4,4)/),MY_IDUP(1:11),ICOLUP(1:2,1:11),MomRealGlu=MomGlu(1:4,3),MomRealGlu2=MomGlu(1:4,4),EventInfoLine=EventInfoLine)
-             endif
+
+             MY_IDUP(1) = convertLHEreverse(LHE_IDUP_Part(1))! overwrite inital ID with external ones
+             MY_IDUP(2) = convertLHEreverse(LHE_IDUP_Part(2))
+             ICOLUP(1:2,1:2) = LHE_ICOLUP_Part(1:2,1:2)!  overwrite inital colors with external ones
+             do n=3,nparton
+                MY_IDUP(7+n)= convertLHEreverse(LHE_IDUP_Part(n))
+                ICOLUP(1:2,7+n) = LHE_ICOLUP_Part(1:2,n)!  overwrite final colors with external ones
+             enddo
+             call WriteOutEvent((/MomParton(1:4,1),MomParton(1:4,2),AcceptedEvent(1:4,1),AcceptedEvent(1:4,2),AcceptedEvent(1:4,3),AcceptedEvent(1:4,4)/), &
+                                MY_IDUP(1:7+nparton),ICOLUP(1:2,1:7+nparton),MomFSPartons=MomParton(1:4,3:nparton),EventInfoLine=EventInfoLine)
              if( mod(AccepCounter,5000).eq.0 ) then
                   call cpu_time(time_int)
                   write(io_stdout,*)  NEvent," events accepted (",time_int-time_start, ") seconds"
@@ -1300,7 +1295,7 @@ implicit none
 
         call WriteParameters(io_LHEOutFile)
 
-        if( ReadLHEFile .and. importPOWHEG_LHEinit ) then
+        if( ReadLHEFile .and. importExternal_LHEinit ) then
             write(io_LHEOutFile ,'(A)') ''
         else
             write(io_LHEOutFile ,'(A)') '-->'
@@ -1328,7 +1323,8 @@ implicit none
         endif
 
     endif
-  
+
+
 END SUBROUTINE
 
 
@@ -1519,7 +1515,7 @@ implicit none
         write(io_stdout,*) ""
         write(io_stdout,"(2X,A)") "Command line arguments:"
         write(io_stdout,"(4X,A)") "Collider:   1=LHC, 2=Tevatron"
-        write(io_stdout,"(4X,A)") "Process:    0=spin-0, 1=spin-1, 2=spin-2 resonance"
+        write(io_stdout,"(4X,A)") "Process:    0=spin-0, 1=spin-1, 2=spin-2 resonance, 60=weakVBF, 61=pp->Hjj"
         write(io_stdout,"(4X,A)") "MReso:      resonance mass (default=126.00), format: yyy.xx"
         write(io_stdout,"(4X,A)") "DecayMode1: decay mode for vector boson 1 (Z/W+/gamma)"
         write(io_stdout,"(4X,A)") "DecayMode2: decay mode for vector boson 2 (Z/W-/gamma)"
@@ -1535,7 +1531,7 @@ implicit none
         write(io_stdout,"(4X,A)") "Unweighted: 0=weighted events, 1=unweighted events"
         write(io_stdout,"(4X,A)") "Interf:     0=neglect interference for 4f final states, 1=include interference"
         write(io_stdout,"(4X,A)") "DataFile:   LHE output file"
-        write(io_stdout,"(4X,A)") "ReadLHE:    LHE input file from POWHEG (only spin-0)"
+        write(io_stdout,"(4X,A)") "ReadLHE:    LHE input file from external file (only spin-0)"
         write(io_stdout,*) ""
 
 END SUBROUTINE

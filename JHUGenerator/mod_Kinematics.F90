@@ -22,22 +22,24 @@ contains
 
 
 
-SUBROUTINE WriteOutEvent(Mom,MY_IDUP,ICOLUP,MomRealGlu,MomRealGlu2,EventWeight,EventInfoLine)
+SUBROUTINE WriteOutEvent(Mom,MY_IDUP,ICOLUP,MomFSPartons,EventWeight,EventInfoLine)
 use ModParameters
+use modMisc
 implicit none
 real(8) :: Mom(1:4,1:6)
-real(8),optional :: MomRealGlu(1:4),MomRealGlu2(1:4)
+integer,parameter :: maxpart=6! this parameter should match the one in main.F90
+real(8),optional :: MomFSPartons(:,:)
 real(8),optional :: EventWeight
 character(len=160),optional :: EventInfoLine
 real(8) :: Spin, Lifetime
 real(8) :: XFV(1:4), Z1FV(1:4), Z2FV(1:4)
-real(8) :: MomDummy(1:4,1:8)
-real(8) :: Part1Mass,Part2Mass,XMass,V1Mass,V2Mass,L11Mass,L12Mass,L21Mass,L22Mass,tmp,GluMass,GluMass2
-integer :: a,b,c
-integer :: MY_IDUP(:),LHE_IDUP(1:11),i,ISTUP(1:11),MOTHUP(1:2,1:11),ICOLUP(:,:)
+real(8) :: MomDummy(1:4,1:4+maxpart)
+real(8) :: Part1Mass,Part2Mass,XMass,V1Mass,V2Mass,L11Mass,L12Mass,L21Mass,L22Mass,tmp,PartonMass(1:4+maxpart)
+integer :: a,b,c,NumFSPartons
+integer :: MY_IDUP(:),ICOLUP(:,:)
+integer :: LHE_IDUP(1:7+maxpart),i,ISTUP(1:7+maxpart),MOTHUP(1:2,1:7+maxpart)
 integer :: NUP,IDPRUP
 real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP
-real(8) :: ntRnd
 character(len=*),parameter :: fmt1 = "(I3,X,I2,X,I2,X,I2,X,I3,X,I3,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7)"
 
 
@@ -129,37 +131,27 @@ MOTHUP(2,8) = 5
 MOTHUP(1,9) = 5
 MOTHUP(2,9) = 5
 
-if( present(MomRealGlu) ) then ! add additional gluon
-    NUP=NUP+1
-    LHE_IDUP(10) = convertLHE( MY_IDUP(10) )
-    ISTUP(10) = 1
-    MOTHUP(1,10) = 1
-    MOTHUP(2,10) = 2
-    MomDummy(1,7) = 100.0d0*MomRealGlu(1)
-    MomDummy(2,7) = 100.0d0*MomRealGlu(2)
-    MomDummy(3,7) = 100.0d0*MomRealGlu(3)
-    MomDummy(4,7) = 100.0d0*MomRealGlu(4)
-endif
-
-if( present(MomRealGlu2) ) then ! add additional parton (VBF/Hjj case)
-    NUP=NUP+1
-    LHE_IDUP(11) = convertLHE( MY_IDUP(11) )
-    ISTUP(11) = 1
-    MOTHUP(1,11) = 1
-    MOTHUP(2,11) = 2
-    MomDummy(1,8) = 100.0d0*MomRealGlu2(1)
-    MomDummy(2,8) = 100.0d0*MomRealGlu2(2)
-    MomDummy(3,8) = 100.0d0*MomRealGlu2(3)
-    MomDummy(4,8) = 100.0d0*MomRealGlu2(4)
+NumFSPartons=0
+if( present(MomFSPartons) ) then ! add additional FS partons
+    NumFSPartons = size(MomFSPartons,2)
+    do a=1,NumFSPartons
+       NUP=NUP+1
+       LHE_IDUP(9+a) = convertLHE( MY_IDUP(9+a  ) )
+       ISTUP(9+a) = 1
+       MOTHUP(1:2,9+a) = (/ mod(a,2)+1,mod(a,2)+1  /) !  = (1,1), (2,2), (1,1), ...
+       MomDummy(1,6+a) = 100.0d0*MomFSPartons(1,a)
+       MomDummy(2,6+a) = 100.0d0*MomFSPartons(2,a)
+       MomDummy(3,6+a) = 100.0d0*MomFSPartons(3,a)
+       MomDummy(4,6+a) = 100.0d0*MomFSPartons(4,a)
+    enddo
 endif
 
 
-! Added by Nhan
 LHE_IDUP(3) = 25
 if( Process.eq.1 ) LHE_IDUP(3) = 32
 if( Process.eq.2 ) LHE_IDUP(3) = 39
 Lifetime = 0.0d0
-Spin = 1.0d0
+Spin = 0.0d0
 
 do a=1,6
     MomDummy(1,a) = 100.0d0*Mom(1,a)
@@ -168,129 +160,95 @@ do a=1,6
     MomDummy(4,a) = 100.0d0*Mom(4,a)
 enddo
 
-do b=1,4
+do b=1,4! V boson momenta
     Z1FV(b) = MomDummy(b,3)+MomDummy(b,4)
     Z2FV(b) = MomDummy(b,5)+MomDummy(b,6)
 enddo
 
-do c=1,4
+do c=1,4! X resonance momentum
     XFV(c) = Z1FV(c) + Z2FV(c)
 enddo
 
 
 ! check energy-momentum conservation when we don't use "adjusted kinematics"
-if( (OffShellV1).or.(OffShellV2).or.(IsAPhoton(DecayMode2       )) ) then
-    tmp=Mom(1,1)+Mom(1,2)-Mom(1,3)-Mom(1,4)-Mom(1,5)-Mom(1,6)
-    if( present(MomRealGlu) ) tmp=tmp-MomRealGlu(1)
-    if( abs(tmp)/Mom(1,1).gt.1d-5 ) print *, "Error 0: energy-momentum violation!",abs(tmp)/Mom(1,1)
-
-    tmp=Mom(2,1)+Mom(2,2)-Mom(2,3)-Mom(2,4)-Mom(2,5)-Mom(2,6)
-    if( present(MomRealGlu) ) tmp=tmp-MomRealGlu(2)
-    if( abs(tmp)/Mom(1,1).gt.1d-5 ) print *, "Error 0: energy-momentum violation!",abs(tmp)/Mom(1,1)
-
-    tmp=Mom(3,1)+Mom(3,2)-Mom(3,3)-Mom(3,4)-Mom(3,5)-Mom(3,6)
-    if( present(MomRealGlu) ) tmp=tmp-MomRealGlu(3)
-    if( abs(tmp)/Mom(1,1).gt.1d-5 ) print *, "Error 0: energy-momentum violation!",abs(tmp)/Mom(1,1)
-
-    tmp=Mom(4,1)+Mom(4,2)-Mom(4,3)-Mom(4,4)-Mom(4,5)-Mom(4,6)
-    if( present(MomRealGlu) ) tmp=tmp-MomRealGlu(4)
-    if( abs(tmp)/Mom(1,1).gt.1d-5 ) print *, "Error 0: energy-momentum violation!",abs(tmp)/Mom(1,1)
+if( (OffShellV1).or.(OffShellV2).or.(IsAPhoton(DecayMode2)) ) then
+    do c=1,4! loop over components of 4-momentum
+          tmp=Mom(c,1)+Mom(c,2)-Mom(c,3)-Mom(c,4)-Mom(c,5)-Mom(c,6)
+          do a=1,NumFSPartons
+              tmp=tmp-MomFSPartons(c,a)
+          enddo
+          if( abs(tmp)/Mom(1,1).gt.1d-5 ) print *, "Error: energy-momentum violation!",c,abs(tmp)/Mom(1,1)
+    enddo
 endif
 
 
 ! calculating and checking masses
-tmp = MomDummy(1,1)*MomDummy(1,1)-MomDummy(2,1)*MomDummy(2,1)-MomDummy(3,1)*MomDummy(3,1)-MomDummy(4,1)*MomDummy(4,1)
+tmp = (MomDummy(1:4,1)).dot.(MomDummy(1:4,1))
 if( tmp.lt. -1d-3 ) print *, "Error 1: large negative mass!",tmp
 Part1Mass = dSQRT(dabs(tmp))
 
-tmp = MomDummy(1,2)*MomDummy(1,2)-MomDummy(2,2)*MomDummy(2,2)-MomDummy(3,2)*MomDummy(3,2)-MomDummy(4,2)*MomDummy(4,2)
+tmp = (MomDummy(1:4,2)).dot.(MomDummy(1:4,2))
 if( tmp.lt. -1d-3 ) print *, "Error 2: large negative mass!",tmp
 Part2Mass = dSQRT(dabs(tmp))
 
-tmp = XFV(1)*XFV(1)-XFV(2)*XFV(2)-XFV(3)*XFV(3)-XFV(4)*XFV(4)
+tmp = (XFV(1:4)).dot.(XFV(1:4))
 if( tmp.lt. -1d-3 ) print *, "Error 3: large negative mass!",tmp
 XMass = dSQRT(dabs(tmp))
 
-tmp = Z1FV(1)*Z1FV(1)-Z1FV(2)*Z1FV(2)-Z1FV(3)*Z1FV(3)-Z1FV(4)*Z1FV(4)
+tmp = (Z1FV(1:4)).dot.(Z1FV(1:4))
 if( tmp.lt. -1d-3 ) print *, "Error 4: large negative mass!",tmp
 V1Mass = dSQRT(dabs(tmp))
-if( V1Mass.lt.1d-5 ) then
-V1Mass=0d0
-endif
+if( V1Mass.lt.1d-5 ) V1Mass=0d0
 
-tmp = Z2FV(1)*Z2FV(1)-Z2FV(2)*Z2FV(2)-Z2FV(3)*Z2FV(3)-Z2FV(4)*Z2FV(4)
+tmp = (Z2FV(1:4)).dot.(Z2FV(1:4))
 if( tmp.lt. -1d-3 ) print *, "Error 5: large negative mass!",tmp
 V2Mass = dSQRT(dabs(tmp))
-if( V2Mass.lt.1d-5 ) then
-V2Mass=0d0
-endif
+if( V2Mass.lt.1d-5 ) V2Mass=0d0
 
-tmp = MomDummy(1,3)*MomDummy(1,3)-MomDummy(2,3)*MomDummy(2,3)-MomDummy(3,3)*MomDummy(3,3)-MomDummy(4,3)*MomDummy(4,3)
+tmp = (MomDummy(1:4,3)).dot.(MomDummy(1:4,3))
 if( tmp.lt. -1d-3 ) print *, "Error 6: large negative mass!",tmp
 L12Mass = dSQRT(dABS(tmp))
-if( L12Mass.lt.1d-6 ) then
-L12Mass=0d0
-endif
-if( tmp.lt.0d0 ) then
-MomDummy(1,3) = MomDummy(1,3) + 1d-7
-endif
+if( L12Mass.lt.1d-6 ) L12Mass=0d0
+if( tmp.lt.0d0 ) MomDummy(1,3) = MomDummy(1,3) + 1d-7
 
-tmp = MomDummy(1,4)*MomDummy(1,4)-MomDummy(2,4)*MomDummy(2,4)-MomDummy(3,4)*MomDummy(3,4)-MomDummy(4,4)*MomDummy(4,4)
+tmp = (MomDummy(1:4,4)).dot.(MomDummy(1:4,4))
 if( tmp.lt. -1d-3 ) print *, "Error 7: large negative mass!",tmp
 L11Mass = dSQRT(dABS(tmp))
-if( L11Mass.lt.1d-6 ) then
-L11Mass=0d0
-endif
-if( tmp.lt.0d0 ) then
-MomDummy(1,4) = MomDummy(1,4) + 1d-7
-endif
+if( L11Mass.lt.1d-6 ) L11Mass=0d0
+if( tmp.lt.0d0 ) MomDummy(1,4) = MomDummy(1,4) + 1d-7
 
-tmp = MomDummy(1,5)*MomDummy(1,5)-MomDummy(2,5)*MomDummy(2,5)-MomDummy(3,5)*MomDummy(3,5)-MomDummy(4,5)*MomDummy(4,5)
+tmp = (MomDummy(1:4,5)).dot.(MomDummy(1:4,5))
 if( tmp.lt. -1d-3 ) print *, "Error 8: large negative mass!",tmp
 L22Mass = dSQRT(dABS(tmp))
-if( L22Mass.lt.1d-6 ) then
-L22Mass=0d0
-endif
-if( tmp.lt.0d0 ) then
-MomDummy(1,5) = MomDummy(1,5) + 1d-7
-endif
+if( L22Mass.lt.1d-6 ) L22Mass=0d0
+if( tmp.lt.0d0 ) MomDummy(1,5) = MomDummy(1,5) + 1d-7
 
-tmp = MomDummy(1,6)*MomDummy(1,6)-MomDummy(2,6)*MomDummy(2,6)-MomDummy(3,6)*MomDummy(3,6)-MomDummy(4,6)*MomDummy(4,6)
+tmp = (MomDummy(1:4,6)).dot.(MomDummy(1:4,6))
 if( tmp.lt. -1d-3 ) print *, "Error 9: large negative mass!",tmp
 L21Mass = dSQRT(dABS(tmp))
-if( L21Mass.lt.1d-6 ) then
-L21Mass=0d0
-endif
-if( tmp.lt.0d0 ) then
-MomDummy(1,6) = MomDummy(1,6) + 1d-7
-endif
+if( L21Mass.lt.1d-6 ) L21Mass=0d0
+if( tmp.lt.0d0 ) MomDummy(1,6) = MomDummy(1,6) + 1d-7
 
-if( present(MomRealGlu) ) then ! add additional gluon, can be off-shell in POWHEG
-    tmp = MomDummy(1,7)*MomDummy(1,7)-MomDummy(2,7)*MomDummy(2,7)-MomDummy(3,7)*MomDummy(3,7)-MomDummy(4,7)*MomDummy(4,7)
-!     if( tmp.lt. -1d-3 ) print *, "Error 10: large negative mass!",tmp
-    GluMass = dSQRT(dabs(tmp))
-endif
+do a=1,NumFSPartons
+    tmp = (MomDummy(1:4,6+a)).dot.(MomDummy(1:4,6+a))
+    PartonMass(a) = dSQRT(dabs(tmp))
+enddo
 
-if( present(MomRealGlu2) ) then ! add additional gluon, can be off-shell in POWHEG
-    tmp = MomDummy(1,8)*MomDummy(1,8)-MomDummy(2,8)*MomDummy(2,8)-MomDummy(3,8)*MomDummy(3,8)-MomDummy(4,8)*MomDummy(4,8)
-!     if( tmp.lt. -1d-3 ) print *, "Error 10: large negative mass!",tmp
-    GluMass2 = dSQRT(dabs(tmp))
-endif
 
 
 write(io_LHEOutFile,"(A)") "<event>"
-if( .not. ReadLHEFile ) write(io_LHEOutFile,"(X,I2,X,I3,X,1PE13.7,X,1PE13.7,X,1PE13.7,X,1PE13.7)") NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
-! in order of appearance:
-! (*) number of particles in the event
-! (*) process ID (user defined)
-! (*) weighted or unweighted events: +1=unweighted, otherwise= see manual
-! (*) pdf factorization scale in GeV
-! (*) alpha_QED coupling for this event 
-! (*) alpha_s coupling for this event
-
-
-if( ReadLHEFile .and. .not. importPOWHEG_LHEinit ) write(io_LHEOutFile,"(X,I2,X,I3,X,1PE13.7,X,1PE13.7,X,1PE13.7,X,1PE13.7)") NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
-if( ReadLHEFile .and. importPOWHEG_LHEinit .and. present(EventInfoLine) ) write(io_LHEOutFile,"(X,I2,X,A)") NUP,trim(EventInfoLine)
+if( ReadLHEFile .and. importExternal_LHEinit .and. present(EventInfoLine) ) then
+   write(io_LHEOutFile,"(X,I2,X,A)") NUP,trim(EventInfoLine)
+else
+   write(io_LHEOutFile,"(X,I2,X,I3,X,1PE13.7,X,1PE13.7,X,1PE13.7,X,1PE13.7)") NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
+!  in order of appearance:
+!  (*) number of particles in the event
+!  (*) process ID (user defined)
+!  (*) weighted or unweighted events: +1=unweighted, otherwise= see manual
+!  (*) pdf factorization scale in GeV
+!  (*) alpha_QED coupling for this event
+!  (*) alpha_s coupling for this event
+endif
 
 ! parton_a
 i=1
@@ -337,20 +295,12 @@ if (LHE_IDUP(i).gt.-9000) then
 write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,6),MomDummy(1,6),L21Mass,Lifetime,Spin
 endif
 
-if( present(MomRealGlu) ) then
-    i=10
-    write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,7),MomDummy(1,7),GluMass,Lifetime,Spin
-endif
-
-if( present(MomRealGlu2) ) then
-    i=11
-    write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,8),MomDummy(1,8),GluMass2,Lifetime,Spin
-endif
-
+! additional F.S. partons
+do a=1,NumFSPartons
+    write(io_LHEOutFile,fmt1) LHE_IDUP(9+a),ISTUP(9+a), MOTHUP(1,9+a),MOTHUP(2,9+a), ICOLUP(1,9+a),ICOLUP(2,9+a),MomDummy(2:4,6+a),MomDummy(1,6+a),PartonMass(a),Lifetime,Spin
+enddo
 
 write(io_LHEOutFile,"(A)") "</event>"
-
-
 
 
 ! print * ,"check ", LHE_IDUP(6),MomDummy(1:4,4)
@@ -385,7 +335,6 @@ integer :: a,b,c
 integer :: MY_IDUP(:),LHE_IDUP(1:10),i,ISTUP(1:10),MOTHUP(1:2,1:10),ICOLUP(:,:)
 integer :: NUP,IDPRUP
 real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP
-real(8) :: ntRnd
 character(len=*),parameter :: fmt1 = "(I3,X,I2,X,I2,X,I2,X,I3,X,I3,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7)"
 
 
@@ -396,7 +345,6 @@ character(len=*),parameter :: fmt1 = "(I3,X,I2,X,I2,X,I2,X,I3,X,I3,X,1PE14.7,X,1
 do i=1,5
     LHE_IDUP(i) = convertLHE( MY_IDUP(i) )
 enddo
-
 
 
 IDPRUP=100
@@ -433,7 +381,7 @@ else
 endif
 
 Lifetime = 0.0d0
-Spin = 1.0d0
+Spin = 0.0d0
 
 do a=1,5
     MomDummy(1,a) = 100.0d0*Mom(1,a)

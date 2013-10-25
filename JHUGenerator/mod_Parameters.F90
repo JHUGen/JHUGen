@@ -3,7 +3,7 @@ implicit none
 save
 ! 
 ! 
-character(len=6),parameter :: JHUGen_Version="v4.0.0"
+character(len=6),parameter :: JHUGen_Version="v4.0.4"
 ! 
 ! 
 integer, public :: Collider, PDFSet,PChannel,Process,DecayMode1,DecayMode2
@@ -18,6 +18,7 @@ integer(8), public :: AccepCounter=0
 integer(8), public :: AlertCounter=0
 integer(8), public :: AccepCounter_part(-5:5,-5:5)=0
 real(8) :: time_start,time_end,time_int
+logical, public :: warmup
 character(len=100) :: DataFile
 character(len=100) :: LogFile
 character(len=100) :: LHEProdFile
@@ -30,9 +31,9 @@ real(8), public, parameter :: channels_ratio_fix = 0.25d0    ! desired ratio of 
 logical, public :: includeInterference! include interference effecs in ZZ production with decays to 4 leptons
 ! Since v.3.1.8 this is no longer a constant. It can be set through command line "Interf=0,1", otherwise a default value is used
 
-logical, public, parameter :: importPOWHEG_LHEinit = .true.
+logical, public, parameter :: importExternal_LHEinit = .true.
 
-logical, public, parameter :: writeWeightedLHE = .true. 
+logical, public, parameter :: writeWeightedLHE = .false. 
 
 real(8),public :: GlobalMax=-1d99
 real(8),public :: GlobalMin=+1d99
