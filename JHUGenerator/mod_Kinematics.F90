@@ -1111,33 +1111,63 @@ use ModParameters
 implicit none
 real(8) :: xRnd
 integer :: ZAnyBranching
+real(8),parameter :: Ncol=3d0
+real(8),parameter :: xxxx=1d0/21d0
+real(8),parameter :: yyyy=Ncol*xxxx
 
-  if( xRnd .le. Br_Z_uu ) then
+  if( xRnd .le. yyyy ) then
       ZAnyBranching = Up_
-  elseif(xRnd .le. Br_Z_uu+Br_Z_cc) then
+  elseif(xRnd .le. yyyy+yyyy) then
       ZAnyBranching = Chm_
-  elseif(xRnd .le. Br_Z_uu+Br_Z_cc+Br_Z_dd) then
+  elseif(xRnd .le. yyyy+yyyy+yyyy) then
       ZAnyBranching = Dn_
-  elseif(xRnd .le. Br_Z_uu+Br_Z_cc+Br_Z_dd+Br_Z_ss) then
+  elseif(xRnd .le. yyyy+yyyy+yyyy+yyyy) then
       ZAnyBranching = Str_
-  elseif(xRnd .le. Br_Z_uu+Br_Z_cc+Br_Z_dd+Br_Z_ss+Br_Z_bb) then
+  elseif(xRnd .le. yyyy+yyyy+yyyy+yyyy+yyyy) then
       ZAnyBranching = Bot_
-  elseif(xRnd .le. Br_Z_uu+Br_Z_cc+Br_Z_dd+Br_Z_ss+Br_Z_bb+Br_Z_ee) then
+  elseif(xRnd .le. yyyy+yyyy+yyyy+yyyy+yyyy+xxxx) then
       ZAnyBranching = ElM_
-  elseif(xRnd .le. Br_Z_uu+Br_Z_cc+Br_Z_dd+Br_Z_ss+Br_Z_bb+Br_Z_ee+Br_Z_mm) then
+  elseif(xRnd .le. yyyy+yyyy+yyyy+yyyy+yyyy+xxxx+xxxx) then
       ZAnyBranching = MuM_
-  elseif(xRnd .le. Br_Z_uu+Br_Z_cc+Br_Z_dd+Br_Z_ss+Br_Z_bb+Br_Z_ee+Br_Z_mm+Br_Z_tt) then
+  elseif(xRnd .le. yyyy+yyyy+yyyy+yyyy+yyyy+xxxx+xxxx+xxxx) then
       ZAnyBranching = TaM_
-  elseif(xRnd .le. Br_Z_uu+Br_Z_cc+Br_Z_dd+Br_Z_ss+Br_Z_bb+Br_Z_ee+Br_Z_mm+Br_Z_tt+Br_Z_nn) then
+  elseif(xRnd .le. yyyy+yyyy+yyyy+yyyy+yyyy+xxxx+xxxx+xxxx+xxxx) then
       ZAnyBranching = NuE_
-  elseif(xRnd .le. Br_Z_uu+Br_Z_cc+Br_Z_dd+Br_Z_ss+Br_Z_bb+Br_Z_ee+Br_Z_mm+Br_Z_tt+Br_Z_nn+Br_Z_nn) then
+  elseif(xRnd .le. yyyy+yyyy+yyyy+yyyy+yyyy+xxxx+xxxx+xxxx+xxxx+xxxx) then
       ZAnyBranching = NuM_
-  elseif(xRnd .le. Br_Z_uu+Br_Z_cc+Br_Z_dd+Br_Z_ss+Br_Z_bb+Br_Z_ee+Br_Z_mm+Br_Z_tt+Br_Z_nn+Br_Z_nn+Br_Z_nn) then
+  elseif(xRnd .le. yyyy+yyyy+yyyy+yyyy+yyyy+xxxx+xxxx+xxxx+xxxx+xxxx+xxxx) then
       ZAnyBranching = NuT_
   else
       print *, "error ",xRnd
       stop
   endif
+
+!   if( xRnd .le. Br_Z_uu ) then
+!       ZAnyBranching = Up_
+!   elseif(xRnd .le. Br_Z_uu+Br_Z_cc) then
+!       ZAnyBranching = Chm_
+!   elseif(xRnd .le. Br_Z_uu+Br_Z_cc+Br_Z_dd) then
+!       ZAnyBranching = Dn_
+!   elseif(xRnd .le. Br_Z_uu+Br_Z_cc+Br_Z_dd+Br_Z_ss) then
+!       ZAnyBranching = Str_
+!   elseif(xRnd .le. Br_Z_uu+Br_Z_cc+Br_Z_dd+Br_Z_ss+Br_Z_bb) then
+!       ZAnyBranching = Bot_
+!   elseif(xRnd .le. Br_Z_uu+Br_Z_cc+Br_Z_dd+Br_Z_ss+Br_Z_bb+Br_Z_ee) then
+!       ZAnyBranching = ElM_
+!   elseif(xRnd .le. Br_Z_uu+Br_Z_cc+Br_Z_dd+Br_Z_ss+Br_Z_bb+Br_Z_ee+Br_Z_mm) then
+!       ZAnyBranching = MuM_
+!   elseif(xRnd .le. Br_Z_uu+Br_Z_cc+Br_Z_dd+Br_Z_ss+Br_Z_bb+Br_Z_ee+Br_Z_mm+Br_Z_tt) then
+!       ZAnyBranching = TaM_
+!   elseif(xRnd .le. Br_Z_uu+Br_Z_cc+Br_Z_dd+Br_Z_ss+Br_Z_bb+Br_Z_ee+Br_Z_mm+Br_Z_tt+Br_Z_nn) then
+!       ZAnyBranching = NuE_
+!   elseif(xRnd .le. Br_Z_uu+Br_Z_cc+Br_Z_dd+Br_Z_ss+Br_Z_bb+Br_Z_ee+Br_Z_mm+Br_Z_tt+Br_Z_nn+Br_Z_nn) then
+!       ZAnyBranching = NuM_
+!   elseif(xRnd .le. Br_Z_uu+Br_Z_cc+Br_Z_dd+Br_Z_ss+Br_Z_bb+Br_Z_ee+Br_Z_mm+Br_Z_tt+Br_Z_nn+Br_Z_nn+Br_Z_nn) then
+!       ZAnyBranching = NuT_
+!   else
+!       print *, "error ",xRnd
+!       stop
+!   endif
 
 ! print *, "checker 5",Br_Z_uu+Br_Z_cc+Br_Z_dd+Br_Z_ss+Br_Z_bb+Br_Z_ee+Br_Z_mm+Br_Z_tt+Br_Z_nn+Br_Z_nn+Br_Z_nn
 

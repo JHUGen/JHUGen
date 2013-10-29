@@ -350,9 +350,9 @@ enddo
       yyy2 = ahz2
       yyy3 = ahz3
     else
-      ghg2_dyn = ghg2   +   ghg2_prime * Lambda_g2**4/( Lambda_g2**2 + 0d0 )/( Lambda_g2**2 + 0d0)
-      ghg3_dyn = ghg3   +   ghg3_prime * Lambda_g3**4/( Lambda_g3**2 + 0d0 )/( Lambda_g3**2 + 0d0)
-      ghg4_dyn = ghg4   +   ghg4_prime * Lambda_g4**4/( Lambda_g4**2 + 0d0 )/( Lambda_g4**2 + 0d0)
+      ghg2_dyn = ghg2
+      ghg3_dyn = ghg3
+      ghg4_dyn = ghg4
       ghz1_dyn = ghz1   +   ghz1_prime * Lambda_z1**4/( Lambda_z1**2 + abs(q3_q3) )/( Lambda_z1**2 + abs(q4_q4))
       ghz2_dyn = ghz2   +   ghz2_prime * Lambda_z2**4/( Lambda_z2**2 + abs(q3_q3) )/( Lambda_z2**2 + abs(q4_q4))
       ghz3_dyn = ghz3   +   ghz3_prime * Lambda_z3**4/( Lambda_z3**2 + abs(q3_q3) )/( Lambda_z3**2 + abs(q4_q4))
@@ -384,9 +384,9 @@ enddo
       yyy2 = -2*ahz1 !ahz2  ! gauge invariance fixes ahz2 in this case
       yyy3 = ahz3
     else
-      ghg2_dyn = ghg2   +   ghg2_prime * Lambda_g2**4/( Lambda_g2**2 + 0d0 )/( Lambda_g2**2 + 0d0)
-      ghg3_dyn = ghg3   +   ghg3_prime * Lambda_g3**4/( Lambda_g3**2 + 0d0 )/( Lambda_g3**2 + 0d0)
-      ghg4_dyn = ghg4   +   ghg4_prime * Lambda_g4**4/( Lambda_g4**2 + 0d0 )/( Lambda_g4**2 + 0d0)
+      ghg2_dyn = ghg2
+      ghg3_dyn = ghg3
+      ghg4_dyn = ghg4
       ghz1_dyn = ghz1   +   ghz1_prime * Lambda_z1**4/( Lambda_z1**2 + abs(q3_q3) )/( Lambda_z1**2 + abs(q4_q4))
       ghz2_dyn = ghz2   +   ghz2_prime * Lambda_z2**4/( Lambda_z2**2 + abs(q3_q3) )/( Lambda_z2**2 + abs(q4_q4))
       ghz3_dyn = ghz3   +   ghz3_prime * Lambda_z3**4/( Lambda_z3**2 + abs(q3_q3) )/( Lambda_z3**2 + abs(q4_q4))
@@ -527,9 +527,9 @@ enddo
       yyy2 = ahz2
       yyy3 = ahz3
     else
-      ghg2_dyn = ghg2   +   ghg2_prime * Lambda_g2**4/( Lambda_g2**2 + 0d0 )/( Lambda_g2**2 + 0d0)
-      ghg3_dyn = ghg3   +   ghg3_prime * Lambda_g3**4/( Lambda_g3**2 + 0d0 )/( Lambda_g3**2 + 0d0)
-      ghg4_dyn = ghg4   +   ghg4_prime * Lambda_g4**4/( Lambda_g4**2 + 0d0 )/( Lambda_g4**2 + 0d0)
+      ghg2_dyn = ghg2
+      ghg3_dyn = ghg3
+      ghg4_dyn = ghg4
       ghz1_dyn = ghz1   +   ghz1_prime * Lambda_z1**4/( Lambda_z1**2 + abs(q3_q3) )/( Lambda_z1**2 + abs(q4_q4))
       ghz2_dyn = ghz2   +   ghz2_prime * Lambda_z2**4/( Lambda_z2**2 + abs(q3_q3) )/( Lambda_z2**2 + abs(q4_q4))
       ghz3_dyn = ghz3   +   ghz3_prime * Lambda_z3**4/( Lambda_z3**2 + abs(q3_q3) )/( Lambda_z3**2 + abs(q4_q4))
@@ -561,9 +561,9 @@ enddo
       yyy2 = -2*ahz1 !ahz2  ! gauge invariance fixes ahz2 in this case
       yyy3 = ahz3
     else
-      ghg2_dyn = ghg2   +   ghg2_prime * Lambda_g2**4/( Lambda_g2**2 + 0d0 )/( Lambda_g2**2 + 0d0)
-      ghg3_dyn = ghg3   +   ghg3_prime * Lambda_g3**4/( Lambda_g3**2 + 0d0 )/( Lambda_g3**2 + 0d0)
-      ghg4_dyn = ghg4   +   ghg4_prime * Lambda_g4**4/( Lambda_g4**2 + 0d0 )/( Lambda_g4**2 + 0d0)
+      ghg2_dyn = ghg2
+      ghg3_dyn = ghg3
+      ghg4_dyn = ghg4
       ghz1_dyn = ghz1   +   ghz1_prime * Lambda_z1**4/( Lambda_z1**2 + abs(q3_q3) )/( Lambda_z1**2 + abs(q4_q4))
       ghz2_dyn = ghz2   +   ghz2_prime * Lambda_z2**4/( Lambda_z2**2 + abs(q3_q3) )/( Lambda_z2**2 + abs(q4_q4))
       ghz3_dyn = ghz3   +   ghz3_prime * Lambda_z3**4/( Lambda_z3**2 + abs(q3_q3) )/( Lambda_z3**2 + abs(q4_q4))
