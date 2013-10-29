@@ -34,6 +34,9 @@ logical,parameter :: useBetaVersion=.false.! this should be set to .false.
    call CloseFiles()
    write(io_stdout,*) " Done"
 
+! print *,  debugcounter(:)
+
+
 END PROGRAM
 
 
@@ -1399,6 +1402,10 @@ character :: arg*(200)
             write(TheUnit,"(6X,A,2F7.4,A1)") "ghz2=",ghz2,"i"
             write(TheUnit,"(6X,A,2F7.4,A1)") "ghz3=",ghz3,"i"
             write(TheUnit,"(6X,A,2F7.4,A1)") "ghz4=",ghz4,"i"
+            write(TheUnit,"(6X,A,2F7.4,A2,4X,A,1PE12.4)") "ghz1_prime=",ghz1_prime,"i,","Lambda_z1=",Lambda_z1*100d0
+            write(TheUnit,"(6X,A,2F7.4,A2,4X,A,1PE12.4)") "ghz2_prime=",ghz2_prime,"i,","Lambda_z2=",Lambda_z2*100d0
+            write(TheUnit,"(6X,A,2F7.4,A2,4X,A,1PE12.4)") "ghz3_prime=",ghz3_prime,"i,","Lambda_z3=",Lambda_z3*100d0
+            write(TheUnit,"(6X,A,2F7.4,A2,4X,A,1PE12.4)") "ghz4_prime=",ghz4_prime,"i,","Lambda_z4=",Lambda_z4*100d0
         endif
     elseif( Process.eq.1 ) then
         write(TheUnit,"(4X,A)") "spin-1-VV couplings: "
@@ -1519,7 +1526,7 @@ implicit none
         write(io_stdout,"(4X,A)") "MReso:      resonance mass (default=126.00), format: yyy.xx"
         write(io_stdout,"(4X,A)") "DecayMode1: decay mode for vector boson 1 (Z/W+/gamma)"
         write(io_stdout,"(4X,A)") "DecayMode2: decay mode for vector boson 2 (Z/W-/gamma)"
-        write(io_stdout,"(4X,A)") "              0=Z->2l,  1=Z->2q, 2=Z->2tau, 3=Z->2nu,"
+        write(io_stdout,"(4X,A)") "              0=Z->2l,  1=Z->2q, 2=Z->2tau, 3=Z->3nu,"
         write(io_stdout,"(4X,A)") "              4=W->lnu, 5=W->2q, 6=W->taunu,"
         write(io_stdout,"(4X,A)") "              7=gamma, 8=Z->2l+2tau,"
         write(io_stdout,"(4X,A)") "              9=Z->anything, 10=W->lnu+taunu, 11=W->anything"

@@ -969,6 +969,12 @@ IF( GENEVT ) THEN
       call intoHisto(18,NBin(18),1d0)
 
 
+! debugcounter(0)=debugcounter(0)+1
+! if(  abs(MY_IDUP(6)).ge.7 .and.  abs(MY_IDUP(6)).le.16  ) debugcounter(1)=debugcounter(1)+1
+! if(  abs(MY_IDUP(8)).ge.7 .and.  abs(MY_IDUP(8)).le.16  ) debugcounter(2)=debugcounter(2)+1
+! if(  (abs(MY_IDUP(8)).ge.7 .and.  abs(MY_IDUP(8)).le.16) .and.  (abs(MY_IDUP(6)).ge.7 .and.  abs(MY_IDUP(6)).le.16)  ) debugcounter(3)=debugcounter(3)+1
+
+
          AccepCounter = AccepCounter + 1
          AccepCounter_part = AccepCounter_part  + parton
          if( (OffShellV1).or.(OffShellV2).or.(IsAPhoton(DecayMode2)) ) then
@@ -979,7 +985,6 @@ IF( GENEVT ) THEN
       else
           RejeCounter = RejeCounter + 1
       endif
-
 
 ELSE! NOT GENEVT
 
@@ -1059,8 +1064,8 @@ ELSE! NOT GENEVT
 
       LO_Res_Unpol1 = LO_Res_Unpol1 * SpinAvg * QuarkColAvg**2
       LO_Res_Unpol2 = LO_Res_Unpol2 * SpinAvg * QuarkColAvg**2
-      if( abs(MY_IDUP(6)).ge.1 .and. abs(MY_IDUP(6)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
-      if( abs(MY_IDUP(8)).ge.1 .and. abs(MY_IDUP(8)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
+!       if( abs(MY_IDUP(6)).ge.1 .and. abs(MY_IDUP(6)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
+!       if( abs(MY_IDUP(8)).ge.1 .and. abs(MY_IDUP(8)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
       PreFac = 2d0 * fbGeV2 * FluxFac * sHatJacobi * PSWgt *   SymmFac
 
       do i1 = -5,5
@@ -1465,8 +1470,6 @@ include 'csmaxvalue.f'
    endif
 
    PreFac = 2d0 * fbGeV2 * FluxFac * sHatJacobi * PSWgt * PDFFac * SymmFac
-   if( abs(MY_IDUP(6)).ge.1 .and. abs(MY_IDUP(6)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
-   if( abs(MY_IDUP(8)).ge.1 .and. abs(MY_IDUP(8)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
    EvalUnWeighted_BETA = LO_Res_Unpol * PreFac
 
       if( EvalUnWeighted_BETA .gt. globalMax) then
@@ -1739,8 +1742,8 @@ ELSE! NOT GENEVT
       endif
 
       PreFac = 2d0 * fbGeV2 * sHatJacobi * PSWgt * SymmFac
-      if( abs(MY_IDUP(6)).ge.1 .and. abs(MY_IDUP(6)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
-      if( abs(MY_IDUP(8)).ge.1 .and. abs(MY_IDUP(8)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
+!       if( abs(MY_IDUP(6)).ge.1 .and. abs(MY_IDUP(6)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
+!       if( abs(MY_IDUP(8)).ge.1 .and. abs(MY_IDUP(8)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
       EvalUnWeighted_withoutProduction = LO_Res_Unpol * PreFac
       Res = EvalUnWeighted_withoutProduction
 

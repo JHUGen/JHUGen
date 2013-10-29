@@ -3,7 +3,7 @@ implicit none
 save
 ! 
 ! 
-character(len=6),parameter :: JHUGen_Version="v4.1.1"
+character(len=6),parameter :: JHUGen_Version="v4.0.5"
 ! 
 ! 
 integer, public :: Collider, PDFSet,PChannel,Process,DecayMode1,DecayMode2
@@ -131,22 +131,16 @@ real(8), public, parameter :: Brhadr_W_cs = Br_W_cs/Br_W_hadr                   
    complex(8), public, parameter :: ghg2 = (1.0d0,0d0)
    complex(8), public, parameter :: ghg3 = (0.0d0,0d0)
    complex(8), public, parameter :: ghg4 = (0.0d0,0d0)   ! pseudoscalar
-   complex(8), public, parameter :: ghz1 = (2.0d0,0d0)
+   complex(8), public, parameter :: ghz1 = (1.0d0,0d0)
    complex(8), public, parameter :: ghz2 = (0.0d0,0d0)
    complex(8), public, parameter :: ghz3 = (0.0d0,0d0)
    complex(8), public, parameter :: ghz4 = (0.0d0,0d0)   ! pseudoscalar 
 
 !-- parameters that define q^2 dependent form factors
-   complex(8), public, parameter :: ghg2_prime = (0.0d0,0d0)
-   complex(8), public, parameter :: ghg3_prime = (0.0d0,0d0)
-   complex(8), public, parameter :: ghg4_prime = (0.0d0,0d0)
    complex(8), public, parameter :: ghz1_prime = (0.0d0,0d0)
    complex(8), public, parameter :: ghz2_prime = (0.0d0,0d0)
    complex(8), public, parameter :: ghz3_prime = (0.0d0,0d0)
    complex(8), public, parameter :: ghz4_prime = (0.0d0,0d0)
-   real(8),    public, parameter :: Lambda_g2 = 10000d0*GeV
-   real(8),    public, parameter :: Lambda_g3 = 10000d0*GeV
-   real(8),    public, parameter :: Lambda_g4 = 10000d0*GeV
    real(8),    public, parameter :: Lambda_z1 = 10000d0*GeV
    real(8),    public, parameter :: Lambda_z2 = 10000d0*GeV
    real(8),    public, parameter :: Lambda_z3 = 10000d0*GeV
