@@ -847,6 +847,7 @@ enddo
       complex(dp) :: yyy1,yyy2,yyy3,yyy4
       real(dp) :: q34
       real(dp) :: MG, MZ3, MZ4, q3_q3, q4_q4
+      complex(dp) :: ghz1_dyn,ghz2_dyn,ghz3_dyn,ghz4_dyn
 
 
 
@@ -886,11 +887,16 @@ enddo
         yyy2 = ahz2
         yyy3 = ahz3
       else
-        yyy1 = ghz1*M_V**2/MG**2 &  ! in this line M_V is indeed correct, not a misprint
-             + ghz2*(MG**2-MZ3**2-MZ4**2)/MG**2 &
-             + ghz3/Lambda**2*(MG**2-MZ3**2-MZ4**2)*(MG**2-MZ4**2-MZ3**2)/4d0/MG**2
-        yyy2 = -2d0*ghz2-ghz3/2d0/Lambda**2*(MG**2-MZ3**2-MZ4**2)
-        yyy3 = -2d0*ghz4
+        ghz1_dyn = ghz1   +   ghz1_prime * Lambda_z1**4/( Lambda_z1**2 + abs(q3_q3) )/( Lambda_z1**2 + abs(q4_q4))
+        ghz2_dyn = ghz2   +   ghz2_prime * Lambda_z2**4/( Lambda_z2**2 + abs(q3_q3) )/( Lambda_z2**2 + abs(q4_q4))
+        ghz3_dyn = ghz3   +   ghz3_prime * Lambda_z3**4/( Lambda_z3**2 + abs(q3_q3) )/( Lambda_z3**2 + abs(q4_q4))
+        ghz4_dyn = ghz4   +   ghz4_prime * Lambda_z4**4/( Lambda_z4**2 + abs(q3_q3) )/( Lambda_z4**2 + abs(q4_q4))
+
+        yyy1 = ghz1_dyn*M_V**2/MG**2 &  ! in this line M_V is indeed correct, not a misprint
+             + ghz2_dyn*(MG**2-MZ3**2-MZ4**2)/MG**2 &
+             + ghz3_dyn/Lambda**2*(MG**2-MZ3**2-MZ4**2)*(MG**2-MZ4**2-MZ3**2)/4d0/MG**2
+        yyy2 = -2d0*ghz2_dyn-ghz3_dyn/2d0/Lambda**2*(MG**2-MZ3**2-MZ4**2)
+        yyy3 = -2d0*ghz4_dyn
       endif
 
       res = e3_e4*M_Reso**2*yyy1       &
@@ -905,11 +911,11 @@ enddo
         yyy2 = -2*ahz1 !ahz2  ! gauge invariance fixes ahz2 in this case
         yyy3 = ahz3
       else
-        yyy1 = ghz1*M_V**2/MG**2 &  ! in this line M_V is indeed correct, not a misprint
-            + ghz2*(MG**2-MZ3**2-MZ4**2)/MG**2 &
-            + ghz3/Lambda**2*(MG**2-MZ3**2-MZ4**2)*(MG**2-MZ4**2-MZ3**2)/4d0/MG**2
-        yyy2 = -2d0*ghz2-ghz3/2d0/Lambda**2*(MG**2-MZ3**2-MZ4**2)
-        yyy3 = -2d0*ghz4
+        yyy1 = ghz1_dyn*M_V**2/MG**2 &  ! in this line M_V is indeed correct, not a misprint
+             + ghz2_dyn*(MG**2-MZ3**2-MZ4**2)/MG**2 &
+             + ghz3_dyn/Lambda**2*(MG**2-MZ3**2-MZ4**2)*(MG**2-MZ4**2-MZ3**2)/4d0/MG**2
+        yyy2 = -2d0*ghz2_dyn-ghz3_dyn/2d0/Lambda**2*(MG**2-MZ3**2-MZ4**2)
+        yyy3 = -2d0*ghz4_dyn
       endif
 
       res = e3_e4*M_Reso**2*yyy1       &

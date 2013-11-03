@@ -34,8 +34,6 @@ logical,parameter :: useBetaVersion=.false.! this should be set to .false.
    call CloseFiles()
    write(io_stdout,*) " Done"
 
-! print *,  debugcounter(:)
-
 
 END PROGRAM
 

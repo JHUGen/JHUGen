@@ -508,9 +508,9 @@ ENDIF! GENEVT
 
    if( writeWeightedLHE .and. (.not. warmup) ) then
       if( (OffShellV1).or.(OffShellV2).or.(IsAPhoton(DecayMode2))   ) then
-            call WriteOutEvent((/MomExt(1:4,1),MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(1:9),ICOLUP(1:2,1:9),EventWeight=EvalWeighted)
+            call WriteOutEvent((/MomExt(1:4,1),MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(1:9),ICOLUP(1:2,1:9),EventWeight=EvalWeighted*VgsWgt)
       else
-            call WriteOutEvent((/MomExt_f(1:4,1),MomExt_f(1:4,2),MomDK_f(1:4,1),MomDK_f(1:4,2),MomDK_f(1:4,3),MomDK_f(1:4,4)/),MY_IDUP(1:9),ICOLUP(1:2,1:9),EventWeight=EvalWeighted)
+            call WriteOutEvent((/MomExt_f(1:4,1),MomExt_f(1:4,2),MomDK_f(1:4,1),MomDK_f(1:4,2),MomDK_f(1:4,3),MomDK_f(1:4,4)/),MY_IDUP(1:9),ICOLUP(1:2,1:9),EventWeight=EvalWeighted*VgsWgt)
       endif
    endif
 
@@ -620,7 +620,6 @@ include 'csmaxvalue.f'
 ! if(  my_idup(6).ne.my_idup(8)) return! for 4mu/4e  ! noi+ 0.92608512,     i+ 1.01761060,   i- 0.12915384,     ix+  3.5925481 ix-  0.80721147E-02
 !                                                            50/50%              48/52%         52/48%               48%                52%
 
-
   yz1 = yRnd(10)
   yz2 = yRnd(11)
   offzchannel = yRnd(15) ! variable to decide which Z is ``on''- and which Z is off- the mass-shell
@@ -713,7 +712,7 @@ include 'csmaxvalue.f'
       PSWgt = PSWgt * PSWgt2*PSWgt3
 
       if( (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9))  ) then! introduce this momentum flip to allow proper mapping of integrand with Z-poles at MZ2=(p2+p3)^2 and MZ2=(p1+p4)^2
-          if( yrnd(13).gt.0.5d0 ) call swapmom( MomDK(1:4,1),MomDK(1:4,3) )
+          if( yrnd(16).gt.0.5d0 ) call swapmom( MomDK(1:4,1),MomDK(1:4,3) )
 !           PSWgt = PSWgt * 2d0
       endif
     elseif( IsAPhoton(DecayMode1) .and. IsAPhoton(DecayMode2) ) then
@@ -798,7 +797,7 @@ IF( GENEVT ) THEN
                call EvalPhasespace_VDecay(MomExt(1:4,3),MZ1,0d0,0d0,yRnd(5:6),MomDK_massless(1:4,1:2),PSWgt2)
                call EvalPhasespace_VDecay(MomExt(1:4,4),MZ2,0d0,0d0,yRnd(7:8),MomDK_massless(1:4,3:4),PSWgt3)
                if( (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then
-                  if( yrnd(13).gt.0.5d0 ) call swapmom( MomDK_massless(1:4,1),MomDK_massless(1:4,3) )
+                  if( yrnd(16).gt.0.5d0 ) call swapmom( MomDK_massless(1:4,1),MomDK_massless(1:4,3) )
                endif
                call EvalAmp_gg_H_VV( (/-MomExt(1:4,1),-MomExt(1:4,2),MomDK_massless(1:4,1),MomDK_massless(1:4,2),MomDK_massless(1:4,3),MomDK_massless(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol)
             else
@@ -810,7 +809,7 @@ IF( GENEVT ) THEN
                call EvalPhasespace_VDecay(MomExt(1:4,3),MZ1,0d0,0d0,yRnd(5:6),MomDK_massless(1:4,1:2),PSWgt2)
                call EvalPhasespace_VDecay(MomExt(1:4,4),MZ2,0d0,0d0,yRnd(7:8),MomDK_massless(1:4,3:4),PSWgt3)
                if( (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then
-                  if( yrnd(13).gt.0.5d0 ) call swapmom( MomDK_massless(1:4,1),MomDK_massless(1:4,3) )
+                  if( yrnd(16).gt.0.5d0 ) call swapmom( MomDK_massless(1:4,1),MomDK_massless(1:4,3) )
                endif
                call EvalAmp_gg_G_VV( (/-MomExt(1:4,1),-MomExt(1:4,2),MomDK_massless(1:4,1),MomDK_massless(1:4,2),MomDK_massless(1:4,3),MomDK_massless(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol)
             else
@@ -828,7 +827,7 @@ IF( GENEVT ) THEN
                call EvalPhasespace_VDecay(MomExt(1:4,3),MZ1,0d0,0d0,yRnd(5:6),MomDK_massless(1:4,1:2),PSWgt2)
                call EvalPhasespace_VDecay(MomExt(1:4,4),MZ2,0d0,0d0,yRnd(7:8),MomDK_massless(1:4,3:4),PSWgt3)
                if( (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then
-                  if( yrnd(13).gt.0.5d0 ) call swapmom( MomDK_massless(1:4,1),MomDK_massless(1:4,3) )
+                  if( yrnd(16).gt.0.5d0 ) call swapmom( MomDK_massless(1:4,1),MomDK_massless(1:4,3) )
                endif
                call EvalAmp_qqb_Zprime_VV((/-MomExt(1:4,1),-MomExt(1:4,2),MomDK_massless(1:4,1),MomDK_massless(1:4,2),MomDK_massless(1:4,3),MomDK_massless(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol1)
                call EvalAmp_qqb_Zprime_VV((/-MomExt(1:4,2),-MomExt(1:4,1),MomDK_massless(1:4,1),MomDK_massless(1:4,2),MomDK_massless(1:4,3),MomDK_massless(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol2)
@@ -842,7 +841,7 @@ IF( GENEVT ) THEN
                call EvalPhasespace_VDecay(MomExt(1:4,3),MZ1,0d0,0d0,yRnd(5:6),MomDK_massless(1:4,1:2),PSWgt2)
                call EvalPhasespace_VDecay(MomExt(1:4,4),MZ2,0d0,0d0,yRnd(7:8),MomDK_massless(1:4,3:4),PSWgt3)
                if( (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then
-                  if( yrnd(13).gt.0.5d0 ) call swapmom( MomDK_massless(1:4,1),MomDK_massless(1:4,3) )
+                  if( yrnd(16).gt.0.5d0 ) call swapmom( MomDK_massless(1:4,1),MomDK_massless(1:4,3) )
                endif
                call EvalAmp_qqb_G_VV((/-MomExt(1:4,1),-MomExt(1:4,2),MomDK_massless(1:4,1),MomDK_massless(1:4,2),MomDK_massless(1:4,3),MomDK_massless(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol1)
                call EvalAmp_qqb_G_VV((/-MomExt(1:4,2),-MomExt(1:4,1),MomDK_massless(1:4,1),MomDK_massless(1:4,2),MomDK_massless(1:4,3),MomDK_massless(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol2)
@@ -974,6 +973,7 @@ IF( GENEVT ) THEN
 ! if(  abs(MY_IDUP(8)).ge.7 .and.  abs(MY_IDUP(8)).le.16  ) debugcounter(2)=debugcounter(2)+1
 ! if(  (abs(MY_IDUP(8)).ge.7 .and.  abs(MY_IDUP(8)).le.16) .and.  (abs(MY_IDUP(6)).ge.7 .and.  abs(MY_IDUP(6)).le.16)  ) debugcounter(3)=debugcounter(3)+1
 
+! if( (MY_IDUP(6)).eq.(MY_IDUP(8)) ) debugcounter(1)=debugcounter(1)+1
 
          AccepCounter = AccepCounter + 1
          AccepCounter_part = AccepCounter_part  + parton
@@ -996,7 +996,7 @@ ELSE! NOT GENEVT
                call EvalPhasespace_VDecay(MomExt(1:4,3),MZ1,0d0,0d0,yRnd(5:6),MomDK_massless(1:4,1:2),PSWgt2)
                call EvalPhasespace_VDecay(MomExt(1:4,4),MZ2,0d0,0d0,yRnd(7:8),MomDK_massless(1:4,3:4),PSWgt3)
                if( (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then
-                  if( yrnd(13).gt.0.5d0 ) call swapmom( MomDK_massless(1:4,1),MomDK_massless(1:4,3) )
+                  if( yrnd(16).gt.0.5d0 ) call swapmom( MomDK_massless(1:4,1),MomDK_massless(1:4,3) )
                endif
                call EvalAmp_gg_H_VV( (/-MomExt(1:4,1),-MomExt(1:4,2),MomDK_massless(1:4,1),MomDK_massless(1:4,2),MomDK_massless(1:4,3),MomDK_massless(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol)
             else
@@ -1008,7 +1008,7 @@ ELSE! NOT GENEVT
                call EvalPhasespace_VDecay(MomExt(1:4,3),MZ1,0d0,0d0,yRnd(5:6),MomDK_massless(1:4,1:2),PSWgt2)
                call EvalPhasespace_VDecay(MomExt(1:4,4),MZ2,0d0,0d0,yRnd(7:8),MomDK_massless(1:4,3:4),PSWgt3)
                if( (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then
-                  if( yrnd(13).gt.0.5d0 ) call swapmom( MomDK_massless(1:4,1),MomDK_massless(1:4,3) )
+                  if( yrnd(16).gt.0.5d0 ) call swapmom( MomDK_massless(1:4,1),MomDK_massless(1:4,3) )
                endif
                call EvalAmp_gg_G_VV( (/-MomExt(1:4,1),-MomExt(1:4,2),MomDK_massless(1:4,1),MomDK_massless(1:4,2),MomDK_massless(1:4,3),MomDK_massless(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol)
             else
@@ -1035,7 +1035,7 @@ ELSE! NOT GENEVT
                call EvalPhasespace_VDecay(MomExt(1:4,3),MZ1,0d0,0d0,yRnd(5:6),MomDK_massless(1:4,1:2),PSWgt2)
                call EvalPhasespace_VDecay(MomExt(1:4,4),MZ2,0d0,0d0,yRnd(7:8),MomDK_massless(1:4,3:4),PSWgt3)
                if( (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then
-                  if( yrnd(13).gt.0.5d0 ) call swapmom( MomDK_massless(1:4,1),MomDK_massless(1:4,3) )
+                  if( yrnd(16).gt.0.5d0 ) call swapmom( MomDK_massless(1:4,1),MomDK_massless(1:4,3) )
                endif
                call EvalAmp_qqb_Zprime_VV((/-MomExt(1:4,1),-MomExt(1:4,2),MomDK_massless(1:4,1),MomDK_massless(1:4,2),MomDK_massless(1:4,3),MomDK_massless(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol1)
                call EvalAmp_qqb_Zprime_VV((/-MomExt(1:4,2),-MomExt(1:4,1),MomDK_massless(1:4,1),MomDK_massless(1:4,2),MomDK_massless(1:4,3),MomDK_massless(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol2)
@@ -1049,7 +1049,7 @@ ELSE! NOT GENEVT
                call EvalPhasespace_VDecay(MomExt(1:4,3),MZ1,0d0,0d0,yRnd(5:6),MomDK_massless(1:4,1:2),PSWgt2)
                call EvalPhasespace_VDecay(MomExt(1:4,4),MZ2,0d0,0d0,yRnd(7:8),MomDK_massless(1:4,3:4),PSWgt3)
                if( (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then
-                  if( yrnd(13).gt.0.5d0 ) call swapmom( MomDK_massless(1:4,1),MomDK_massless(1:4,3) )
+                  if( yrnd(16).gt.0.5d0 ) call swapmom( MomDK_massless(1:4,1),MomDK_massless(1:4,3) )
                endif
                call EvalAmp_qqb_G_VV((/-MomExt(1:4,1),-MomExt(1:4,2),MomDK_massless(1:4,1),MomDK_massless(1:4,2),MomDK_massless(1:4,3),MomDK_massless(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol1)
                call EvalAmp_qqb_G_VV((/-MomExt(1:4,2),-MomExt(1:4,1),MomDK_massless(1:4,1),MomDK_massless(1:4,2),MomDK_massless(1:4,3),MomDK_massless(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol2)
@@ -1350,7 +1350,7 @@ include 'csmaxvalue.f'
                call EvalPhasespace_VDecay(MomExt(1:4,3),MZ1,0d0,0d0,yRnd(5:6),MomDK_massless(1:4,1:2),PSWgt2)
                call EvalPhasespace_VDecay(MomExt(1:4,4),MZ2,0d0,0d0,yRnd(7:8),MomDK_massless(1:4,3:4),PSWgt3)
                if( (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then
-                  if( yrnd(13).gt.0.5d0 ) call swapmom( MomDK_massless(1:4,1),MomDK_massless(1:4,3) )
+                  if( yrnd(16).gt.0.5d0 ) call swapmom( MomDK_massless(1:4,1),MomDK_massless(1:4,3) )
                endif
                call EvalAmp_gg_H_VV( (/-MomExt(1:4,1),-MomExt(1:4,2),MomDK_massless(1:4,1),MomDK_massless(1:4,2),MomDK_massless(1:4,3),MomDK_massless(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol)
             else
@@ -1362,7 +1362,7 @@ include 'csmaxvalue.f'
                call EvalPhasespace_VDecay(MomExt(1:4,3),MZ1,0d0,0d0,yRnd(5:6),MomDK_massless(1:4,1:2),PSWgt2)
                call EvalPhasespace_VDecay(MomExt(1:4,4),MZ2,0d0,0d0,yRnd(7:8),MomDK_massless(1:4,3:4),PSWgt3)
                if( (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then
-                  if( yrnd(13).gt.0.5d0 ) call swapmom( MomDK_massless(1:4,1),MomDK_massless(1:4,3) )
+                  if( yrnd(16).gt.0.5d0 ) call swapmom( MomDK_massless(1:4,1),MomDK_massless(1:4,3) )
                endif
                call EvalAmp_gg_G_VV( (/-MomExt(1:4,1),-MomExt(1:4,2),MomDK_massless(1:4,1),MomDK_massless(1:4,2),MomDK_massless(1:4,3),MomDK_massless(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol)
             else
@@ -1442,7 +1442,7 @@ include 'csmaxvalue.f'
                call EvalPhasespace_VDecay(MomExt(1:4,3),MZ1,0d0,0d0,yRnd(5:6),MomDK_massless(1:4,1:2),PSWgt2)
                call EvalPhasespace_VDecay(MomExt(1:4,4),MZ2,0d0,0d0,yRnd(7:8),MomDK_massless(1:4,3:4),PSWgt3)
                if( (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then
-                  if( yrnd(13).gt.0.5d0 ) call swapmom( MomDK_massless(1:4,1),MomDK_massless(1:4,3) )
+                  if( yrnd(16).gt.0.5d0 ) call swapmom( MomDK_massless(1:4,1),MomDK_massless(1:4,3) )
                endif
                call EvalAmp_qqb_Zprime_VV((/-MomExt(1:4,1),-MomExt(1:4,2),MomDK_massless(1:4,1),MomDK_massless(1:4,2),MomDK_massless(1:4,3),MomDK_massless(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol1)
                call EvalAmp_qqb_Zprime_VV((/-MomExt(1:4,2),-MomExt(1:4,1),MomDK_massless(1:4,1),MomDK_massless(1:4,2),MomDK_massless(1:4,3),MomDK_massless(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol2)
@@ -1456,7 +1456,7 @@ include 'csmaxvalue.f'
                call EvalPhasespace_VDecay(MomExt(1:4,3),MZ1,0d0,0d0,yRnd(5:6),MomDK_massless(1:4,1:2),PSWgt2)
                call EvalPhasespace_VDecay(MomExt(1:4,4),MZ2,0d0,0d0,yRnd(7:8),MomDK_massless(1:4,3:4),PSWgt3)
                if( (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then
-                  if( yrnd(13).gt.0.5d0 ) call swapmom( MomDK_massless(1:4,1),MomDK_massless(1:4,3) )
+                  if( yrnd(16).gt.0.5d0 ) call swapmom( MomDK_massless(1:4,1),MomDK_massless(1:4,3) )
                endif
                call EvalAmp_qqb_G_VV((/-MomExt(1:4,1),-MomExt(1:4,2),MomDK_massless(1:4,1),MomDK_massless(1:4,2),MomDK_massless(1:4,3),MomDK_massless(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol1)
                call EvalAmp_qqb_G_VV((/-MomExt(1:4,2),-MomExt(1:4,1),MomDK_massless(1:4,1),MomDK_massless(1:4,2),MomDK_massless(1:4,3),MomDK_massless(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol2)
@@ -1645,7 +1645,7 @@ include 'csmaxvalue.f'
       PSWgt = PSWgt * PSWgt2*PSWgt3
 
       if( (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then! introduce this momentum flip to allow proper mapping of integrand with Z-poles at MZ2=(p2+p3)^2 and MZ2=(p1+p4)^2
-          if( yrnd(13).gt.0.5d0 ) call swapmom( MomDK(1:4,1),MomDK(1:4,3) )
+          if( yrnd(16).gt.0.5d0 ) call swapmom( MomDK(1:4,1),MomDK(1:4,3) )
 !           PSWgt = PSWgt * 2d0
       endif
     else
@@ -1682,7 +1682,7 @@ IF( GENEVT ) THEN
                call EvalPhasespace_VDecay(MomExt(1:4,3),MZ1,0d0,0d0,yRnd(5:6),MomDK_massless(1:4,1:2),PSWgt2)
                call EvalPhasespace_VDecay(MomExt(1:4,4),MZ2,0d0,0d0,yRnd(7:8),MomDK_massless(1:4,3:4),PSWgt3)
                if( (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then
-                  if( yrnd(13).gt.0.5d0 ) call swapmom( MomDK_massless(1:4,1),MomDK_massless(1:4,3) )
+                  if( yrnd(16).gt.0.5d0 ) call swapmom( MomDK_massless(1:4,1),MomDK_massless(1:4,3) )
                endif
                call EvalAmp_H_VV( (/-MomExt(1:4,1)-MomExt(1:4,2),(/0d0,0d0,0d0,0d0/),MomDK_massless(1:4,1),MomDK_massless(1:4,2),MomDK_massless(1:4,3),MomDK_massless(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol)
             else
@@ -1692,8 +1692,8 @@ IF( GENEVT ) THEN
 
 
       PreFac = 2d0 * fbGeV2 * sHatJacobi * PSWgt * SymmFac
-      if( abs(MY_IDUP(6)).ge.1 .and. abs(MY_IDUP(6)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
-      if( abs(MY_IDUP(8)).ge.1 .and. abs(MY_IDUP(8)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
+!       if( abs(MY_IDUP(6)).ge.1 .and. abs(MY_IDUP(6)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
+!       if( abs(MY_IDUP(8)).ge.1 .and. abs(MY_IDUP(8)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
       EvalUnWeighted_withoutProduction = LO_Res_Unpol * PreFac
 
       CS_max = csmax(0,0)
@@ -1733,7 +1733,7 @@ ELSE! NOT GENEVT
                call EvalPhasespace_VDecay(MomExt(1:4,3),MZ1,0d0,0d0,yRnd(5:6),MomDK_massless(1:4,1:2),PSWgt2)
                call EvalPhasespace_VDecay(MomExt(1:4,4),MZ2,0d0,0d0,yRnd(7:8),MomDK_massless(1:4,3:4),PSWgt3)
                if( (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then
-                  if( yrnd(13).gt.0.5d0 ) call swapmom( MomDK_massless(1:4,1),MomDK_massless(1:4,3) )
+                  if( yrnd(16).gt.0.5d0 ) call swapmom( MomDK_massless(1:4,1),MomDK_massless(1:4,3) )
                endif
                call EvalAmp_H_VV( (/-MomExt(1:4,1)-MomExt(1:4,2),(/0d0,0d0,0d0,0d0/),MomDK_massless(1:4,1),MomDK_massless(1:4,2),MomDK_massless(1:4,3),MomDK_massless(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol)
          else
@@ -1763,278 +1763,6 @@ END FUNCTION
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-! subroutine EvalCS_un(yRnd,RES)
-! use ModKinematics
-! use ModParameters
-! use ModGraviton
-! use ModHiggs
-! use ModZprime
-! use ModMisc
-! #if compiler==1
-! use ifport
-! #endif
-! implicit none
-! real(8) :: RES(-5:5,-5:5)
-! real(8) :: EvalCS,LO_Res_Unpol_old,LO_Res_Unpol,yRnd(1:22),VgsWgt
-! real(8) :: eta1,eta2,tau,x1,x2,sHatJacobi,PreFac,FluxFac,PDFFac
-! real(8) :: pdf(-6:6,1:2)
-! integer :: NBin(1:11),NHisto,i, i1,Z1DKFlavor,Z2DKFlavor
-! real(8) :: EHat,PSWgt,PSWgt2,PSWgt3
-! real(8) :: MomExt(1:4,1:4),MomDK(1:4,1:4)
-! real(8) :: MomExt_f(1:4,1:4), MomDK_f(1:4,1:4),yz1,yz2,EZ_max,dr,MZ1,MZ2
-! real(8) :: offzchannel
-! logical :: applyPSCut
-! include 'csmaxvalue.f'
-!
-!    RES = 0d0
-!
-!
-!    EvalCS = 0d0
-!    if(OffShellReson) then
-!       call PDFMapping(10,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
-!    else
-!       call PDFMapping(12,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
-!    endif
-!    EvalCounter = EvalCounter+1
-!
-!    if( DecayMode.eq.0 ) then
-!       Z1DKFlavor = ElM_
-!       Z2DKFlavor = MuM_
-!       yz1 = yRnd(10)
-!       yz2 = yRnd(11)
-!    offzchannel = yRnd(12) ! variable to decide which Z is ``on''- and which Z is off- the mass-shell
-!    elseif( DecayMode.eq.1 ) then
-!       Z1DKFlavor = ElM_
-!       Z2DKFlavor = ZQBranching( yRnd(12) )
-!       yz1 = yRnd(10)
-!       yz2 = yRnd(11)
-!     offzchannel = yRnd(13) ! variable to decide which Z is ``on''- and which Z is off- the mass-shell
-!    endif
-!
-!
-! !---- new stuff
-!
-!
-!
-!     if ((OffShellV1.eqv..true.).and.(OffShellV2.eqv..true.)) then
-!
-!         if(M_Reso.gt.2d0*M_V) then
-!
-!
-!         EZ_max = EHat
-!         dr = datan((EZ_max**2-M_V**2)/(Ga_V*M_V)) + datan(M_V/Ga_V)
-!         MZ1 = dsqrt( M_V*Ga_V * dtan(dr*yz1-datan(M_V/Ga_V)) + M_V**2 )
-!         sHatJacobi = sHatJacobi * dr/(Ga_V*M_V) * ( (MZ1**2 - M_V**2)**2 + M_V**2*Ga_V**2 )
-!
-!         EZ_max = EHat - MZ1*0.99
-!         dr = datan((EZ_max**2-M_V**2)/(Ga_V*M_V)) + datan(M_V/Ga_V)
-!         MZ2 = dsqrt( M_V*Ga_V * dtan(dr*yz2-datan(M_V/Ga_V)) + M_V**2 )
-!         sHatJacobi = sHatJacobi*dr/(Ga_V*M_V)*( (MZ2**2 - M_V**2)**2 + M_V**2*Ga_V**2 )
-!
-!         elseif(M_Reso.lt.2d0*M_V) then
-!
-!
-!         if (offzchannel.le.0.5d0) then
-!
-!         EZ_max = EHat
-!         dr = datan((EZ_max**2-M_V**2)/(Ga_V*M_V)) + datan(M_V/Ga_V)
-!         MZ1 = dsqrt( M_V*Ga_V * dtan(dr*yz1-datan(M_V/Ga_V)) + M_V**2 )
-!       MZ2 = abs(EHat - MZ1*0.999999999999999d0)*dsqrt(abs(dble(yz2)))
-!
-!         sHatJacobi = sHatJacobi * dr/(Ga_V*M_V) * 1d0/(  &
-!         1d0/((MZ1**2 - M_V**2)**2 + M_V**2*Ga_V**2 )     &
-!         + 1d0/((MZ2**2 - M_V**2)**2 + M_V**2*Ga_V**2 ) )
-!
-!          sHatJacobi = sHatJacobi *(EHat - MZ1*0.999)**2
-!
-!         elseif(offzchannel.gt.0.5d0) then
-!
-!         EZ_max = EHat
-!         dr = datan((EZ_max**2-M_V**2)/(Ga_V*M_V)) + datan(M_V/Ga_V)
-!         MZ2 = dsqrt( M_V*Ga_V * dtan(dr*yz2-datan(M_V/Ga_V)) + M_V**2 )
-!
-!       MZ1 = abs(EHat - MZ2*0.999999999999999d0)*dsqrt(abs(dble(yz1)))
-!
-!
-!         sHatJacobi = sHatJacobi * dr/(Ga_V*M_V) * 1d0/( &
-!         1d0/((MZ1**2 - M_V**2)**2 + M_V**2*Ga_V**2 )    &
-!         + 1d0/((MZ2**2 - M_V**2)**2 + M_V**2*Ga_V**2 ) )
-!
-!          sHatJacobi = sHatJacobi *(EHat - MZ2*0.999)**2
-!
-!
-!       endif
-!       endif
-!
-!         elseif((OffShellV1.eqv..false.).and.(OffShellV2.eqv..true.)) then
-!
-!         MZ1 = M_V
-!
-!         if(M_Reso.gt.2d0*M_V) then
-!         EZ_max = EHat - MZ1*0.99
-!         dr = datan((EZ_max**2-M_V**2)/(Ga_V*M_V)) + datan(M_V/Ga_V)
-!         MZ2 = dsqrt( M_V*Ga_V * dtan(dr*yz2-datan(M_V/Ga_V)) + M_V**2 )
-!         sHatJacobi = sHatJacobi*dr/(Ga_V*M_V)*( (MZ2**2 - M_V**2)**2 + M_V**2*Ga_V**2 )
-!          else
-!        MZ2 = abs(EHat - MZ1*0.999999999999999d0)*dsqrt(abs(dble(yz2)))
-!         sHatJacobi = sHatJacobi *(EHat - MZ1*0.999)**2
-!
-!       endif
-!
-!         elseif((OffShellV1.eqv..true.).and.(OffShellV2.eqv..false.)) then
-!
-!         MZ2 = M_V
-!
-!         if(M_Reso.gt.2d0*M_V) then
-!         EZ_max = EHat - MZ2*0.99
-!         dr = datan((EZ_max**2-M_V**2)/(Ga_V*M_V)) + datan(M_V/Ga_V)
-!         MZ1 = dsqrt( M_V*Ga_V * dtan(dr*yz1-datan(M_V/Ga_V)) + M_V**2 )
-!         sHatJacobi = sHatJacobi*dr/(Ga_V*M_V)*( (MZ1**2 - M_V**2)**2 + M_V**2*Ga_V**2 )
-!
-!          else
-!        MZ1 = abs(EHat - MZ2*0.999999999999999d0)*dsqrt(abs(dble(yz2)))
-!         sHatJacobi = sHatJacobi *(EHat - MZ2*0.999)**2
-!
-!       endif
-!
-!        elseif((OffShellV1.eqv..false.).and.(OffShellV2.eqv..false.)) then
-!
-!                 MZ1 = M_V
-!                 MZ2 = M_V
-!
-!
-!          endif
-!
-!
-!
-!
-!     if( MZ1+MZ2.gt.EHat ) then!NEW
-!       EvalCS = 0d0
-!       return
-!     endif
-!
-!
-!
-!    call EvalPhaseSpace_2to2(EHat,(/MZ1,MZ2/),yRnd(3:4),MomExt(1:4,1:4),PSWgt)
-!    call boost2Lab(eta1,eta2,4,MomExt(1:4,1:4))
-!    call EvalPhasespace_VDecay(MomExt(1:4,3),MZ1,yRnd(5:6),MomDK(1:4,1:2),PSWgt2)
-!    call EvalPhasespace_VDecay(MomExt(1:4,4),MZ2,yRnd(7:8),MomDK(1:4,3:4),PSWgt3)
-!    PSWgt = PSWgt * PSWgt2*PSWgt3
-!
-!     if( OffShellV1.or.OffShellV2 ) then!NEW
-!         call Kinematics(4,MomExt,MomDK,applyPSCut,NBin)
-!     else
-!         call AdjustKinematics(eta1,eta2,MomExt,MomDK,yRnd(9),yRnd(10),yRnd(11),MomExt_f,MomDK_f)
-!         call Kinematics(4,MomExt_f,MomDK_f,applyPSCut,NBin)
-!     endif
-!
-!
-!    if( applyPSCut ) then
-!       EvalCS = 0d0
-!       return
-!    endif
-!
-!    call setPDFs(eta1,eta2,Mu_Fact,pdf)
-!    FluxFac = 1d0/(2d0*EHat**2)
-!
-!
-!    if (PChannel.eq.0.or.PChannel.eq.2) then
-!       PDFFac = pdf(0,1) * pdf(0,2)
-!       if (Process.eq.0) then
-!       call EvalAmp_gg_H_VV( (/-MomExt(1:4,1),-MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),Z1DKFlavor,Z2DKFlavor,LO_Res_Unpol)
-!       elseif(Process.eq.2) then
-!       call EvalAmp_gg_G_VV( (/-MomExt(1:4,1),-MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),Z1DKFlavor,Z2DKFlavor,LO_Res_Unpol)
-! !     call EvalAmp_gg_G_VV_old( (/-MomExt(1:4,1),-MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),LO_Res_Unpol)
-!       endif
-!
-!       LO_Res_Unpol = LO_Res_Unpol * SpinAvg * GluonColAvg**2
-!
-!    PreFac = 2d0 * fbGeV2 * FluxFac * sHatJacobi * PSWgt * PDFFac * SymmFac
-!
-!     EvalCS = LO_Res_Unpol * PreFac
-!     RES(0,0) = EvalCS
-!
-!     if (EvalCS.gt.csmax(0,0)) then
-!         csmax(0,0) = EvalCS
-! !     print *, offzchannel,MZ1, MZ2, LO_Res_Unpol,sHatJacobi,  csmax(0,0)
-! !     pause
-!     endif
-!
-!     endif
-!
-!    if (PChannel.eq.1.or.PChannel.eq.2) then
-!
-!
-!       if (Process.eq.1) then
-!       call EvalAmp_qqb_Zprime_VV((/-MomExt(1:4,1),-MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),Z1DKFlavor,Z2DKFlavor,LO_Res_Unpol)
-!       elseif(Process.eq.2) then
-!       call EvalAmp_qqb_G_VV((/-MomExt(1:4,1),-MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),Z1DKFlavor,Z2DKFlavor,LO_Res_Unpol)
-!       endif
-!
-!       LO_Res_Unpol = LO_Res_Unpol * SpinAvg * QuarkColAvg**2
-!       PreFac = 2d0 * fbGeV2 * FluxFac * sHatJacobi * PSWgt *   SymmFac
-!
-!       do i1 = -5,5
-!
-!          if (i1.eq.-5) then
-!           PDFFac = pdf(Bot_,2)*pdf(ABot_,1)
-!          elseif(i1.eq.-4) then
-!           PDFFac = pdf(Chm_,2)*pdf(AChm_,1)
-!          elseif(i1.eq.-3) then
-!           PDFFac = pdf(Str_,2)*pdf(AStr_,1)
-!          elseif(i1.eq.-2) then
-!           PDFFac = pdf(Up_,2) *pdf(AUp_,1)
-!          elseif(i1.eq.-1) then
-!           PDFFac = pdf(Dn_,2) *pdf(ADn_,1)
-!          elseif (i1.eq.0) then
-!           PDFFac = 0d0
-!          elseif (i1.eq.1) then
-!           PDFFac = pdf(Dn_,1) *pdf(ADn_,2)
-!          elseif (i1.eq.2) then
-!           PDFFac = pdf(Up_,1) *pdf(AUp_,2)
-!          elseif(i1.eq.3) then
-!           PDFFac = pdf(Str_,1)*pdf(AStr_,2)
-!          elseif(i1.eq.4) then
-!           PDFFac = pdf(Chm_,1)*pdf(AChm_,2)
-!           elseif(i1.eq.5) then
-!           PDFFac = pdf(Bot_,1)*pdf(ABot_,2)
-!           endif
-!
-!    EvalCS = LO_Res_Unpol * PreFac *PDFFac
-!    RES(i1,-i1) = EvalCS
-!
-!     if (EvalCS.gt.csmax(i1,-i1)) csmax(i1,-i1) = EvalCS
-!
-!     enddo
-!
-!    endif
-!
-! ! if(EvalCS.lt.minCS) minCS=EvalCS
-! ! if(EvalCS.gt.maxCS) maxCS=EvalCS
-! ! avgCS = avgCS + EvalCS
-! RETURN
-! END subroutine
 
 END MODULE ModCrossSection
 
