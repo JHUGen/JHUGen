@@ -73,7 +73,7 @@ The list of command line configurables and the default values are (also defined 
 
 \begin{verbatim}
    - Collider=x    (Collider: 1=LHC, 2=Tevatron), default value:1
-   - VegasNc1=x    (number of evaluations), default value:5000000
+   - VegasNc0,1,2 =x (number of evaluations)
    - PChannel=x    (partonic channel: 0=glu+glu, 1=quark+antiquark, 2=both), default value:2
    - PDFSet=x      (parton distr. functions, 1=CTEQ6L1 (2001), 2=MSTW(2008),  
    					2xx=MSTW with eigenvector set xx=01..40), default=1
@@ -105,7 +105,7 @@ The list of command line configurables and the default values are (also defined 
 A few more details on some particular parameters:
 
 \begin{itemize}
-\item {\verb|VegasNc1|}: This is the number of evaluations for the program to make, NOT the number of events generated.  The efficiency depends on the set of parameters one uses.
+\item {\verb|VegasNc0,1,2|}: For unweighted event generation VegasNc0 specifies the number of evaluations for the initial integrand scan.  The actual event generation is controlled by either VegasNc1 or VegasNc2. VegasNc1 specifies the number of tries in the accept/reject phase and VegasNc2 is the number of generated events. When generating unweighted events in ReadLHE mode, both VegasNc1 or VegasNc2 can be used to specify the number of generated events. For the generation of weighted events VegasNc1 specifies the number of evaluations for each of 5 iterations during the initial integrand scan. VegasNc2 gives the (approximate) number of generated weighted events.
 \item {\verb|OffXVV|}: The program does not work for $ZZ$ or $WW$ if you set them to be on-shell (\verb|OffXVV="\*00"|) and the mass of the $X$ resonance to be below the $m_{VV}$ threshold.  In general, the more off-shell the process, or the more "1" you have, the less efficient the \verb|VegasNc1| evaluations are.  Specifically, if you are interested then, in producing a resonance with mass below threshold $m_{VV}$ with a very narrow resonance, it is most efficient to generate with \verb|OffXVV="011"|
 \item \verb|PChannel|: This parameter is only meaningful in the spin-2 case.  For spin-0, production is possible only via the $gg$ process and for spin-1, production is only possible via the $q\bar{q}$ process.
 \item \verb|DecayMode2=7| note: Valid for spin-0 and spin-2, only OffXVV=000 or 100 are possible.  
@@ -417,7 +417,7 @@ and $HWW$ couplings as follows (ignoring $g_3$)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 In order to obtain the cross-sections $\sigma_i$ corresponding to the $g^{}_{i}=1$ coupling, 
-generate large enough (e.g. {\tt VegasNc1=1000000}) number of weighted events
+generate large enough (e.g. VegasNc1=1000000, VegasNc2=50000000) number of weighted
 ({\tt Unweighted=0}) with the corresponding couplings setup ($g^{}_{i}=1$, $g^{}_{j\ne i}=0$).
 
 %%%%%%%%%%%
@@ -470,6 +470,16 @@ Instructions for setting up the JHUGenMELA with MCFM are in the file \verb|JHUGe
 %%%%%%%%%%%
 
 \section{ Release notes }
+
+\noindent
+In going from \verb|v4.2.x| to \verb|v4.3.x|, the updates are as follows:
+
+\begin{itemize}
+\item update LHE index of partons in VBF production and LHE conversion
+\item update couplings for higher dimensions in spin-2
+\item beta version of VH generator
+\item synchronize JHUGenMELA with the generator
+\end{itemize}
 
 \noindent
 In going from \verb|v4.0.x| to \verb|v4.2.x|, the updates are as follows:
