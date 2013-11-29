@@ -3,11 +3,12 @@ implicit none
 save
 ! 
 ! 
-character(len=6),parameter :: JHUGen_Version="v4.2.1"
+character(len=6),parameter :: JHUGen_Version="v4.2.5"
 ! 
 ! 
 integer, public :: Collider, PDFSet,PChannel,Process,DecayMode1,DecayMode2
-integer, public :: VegasIt1,VegasNc0,VegasNc1,VegasNc2,Collider_Energy
+integer, public :: VegasIt1,VegasNc0,VegasNc1,VegasNc2
+real(8), public :: Collider_Energy
 integer, public :: VegasIt1_default,VegasNc0_default,VegasNc1_default,VegasNc2_default
 real(8), public :: VegasSeed
 integer, public :: NumHistograms
@@ -50,8 +51,8 @@ real(8), public, parameter :: M_Z     = 91.1876d0 *GeV      ! Z boson mass (PDG-
 real(8), public, parameter :: Ga_Z    = 2.4952d0  *GeV      ! Z boson width(PDG-2011)
 real(8), public, parameter :: M_W     = 80.399d0  *GeV      ! W boson mass (PDG-2011)
 real(8), public, parameter :: Ga_W    = 2.085d0   *GeV      ! W boson width(PDG-2011)
-real(8), public            :: M_Reso  = 126d0     *GeV      ! X resonance mass (spin 0, spin 1, spin 2)     (carefule: no longer a parameter, can be overwritten by command line argument)
-real(8), public, parameter :: Ga_Reso = 0.1d0     *GeV      ! X resonance width
+real(8), public            :: M_Reso  = 125.6d0   *GeV      ! X resonance mass (spin 0, spin 1, spin 2)     (carefule: no longer a parameter, can be overwritten by command line argument)
+real(8), public, parameter :: Ga_Reso = 0.00415d0 *GeV      ! X resonance width
 real(8), public, parameter :: Lambda  = 1000d0    *GeV      ! Lambda coupling enters in two places
                                                             ! overal scale for x-section and in power suppressed
                                                             ! operators/formfactors (former r).
@@ -70,7 +71,10 @@ real(8), public, parameter :: sitW = dsqrt(0.23119d0)       ! sin(Theta_Weinberg
 real(8), public            :: Mu_Fact                       ! pdf factorization scale (set to M_Reso in main.F90)
 real(8), public, parameter :: LHC_Energy=8000d0  *GeV       ! LHC hadronic center of mass energy
 real(8), public, parameter :: TEV_Energy=1960d0  *GeV       ! Tevatron hadronic center of mass energy
-
+real(8), public, parameter :: ILC_Energy=250d0  *GeV        ! Linear collider center of mass energy
+real(8), public, parameter :: POL_A = 0d0                   !e+ polarization. 0: no polarization, 100: helicity = 1, -100: helicity = -1
+real(8), public, parameter :: POL_B = 0d0                   !e- polarization. 0: no polarization, 100: helicity = 1, -100: helicity = -1
+logical, public, parameter :: H_DK =.true.                 !default to false so H in V > VH (Process = 50) does not decay
 real(8), public, parameter :: ptjetcut = 15d0*GeV           ! jet min pt
 real(8), public, parameter :: Rjet = 0.5d0                  ! jet deltaR, antikt algorithm 
 
@@ -131,16 +135,32 @@ real(8), public, parameter :: Brhadr_W_cs = Br_W_cs/Br_W_hadr                   
    complex(8), public, parameter :: ghg2 = (1.0d0,0d0)
    complex(8), public, parameter :: ghg3 = (0.0d0,0d0)
    complex(8), public, parameter :: ghg4 = (0.0d0,0d0)   ! pseudoscalar
-   complex(8), public, parameter :: ghz1 = (1.0d0,0d0)
+   complex(8), public, parameter :: ghz1 = (2.0d0,0d0)
    complex(8), public, parameter :: ghz2 = (0.0d0,0d0)
    complex(8), public, parameter :: ghz3 = (0.0d0,0d0)
    complex(8), public, parameter :: ghz4 = (0.0d0,0d0)   ! pseudoscalar 
 
 !-- parameters that define q^2 dependent form factors
    complex(8), public, parameter :: ghz1_prime = (0.0d0,0d0)
+   complex(8), public, parameter :: ghz1_prime2= (0.0d0,0d0)
+   complex(8), public, parameter :: ghz1_prime3= (0.0d0,0d0)
+   complex(8), public, parameter :: ghz1_prime4= (0.0d0,0d0)
+
    complex(8), public, parameter :: ghz2_prime = (0.0d0,0d0)
+   complex(8), public, parameter :: ghz2_prime2= (0.0d0,0d0)
+   complex(8), public, parameter :: ghz2_prime3= (0.0d0,0d0)
+   complex(8), public, parameter :: ghz2_prime4= (0.0d0,0d0)
+
    complex(8), public, parameter :: ghz3_prime = (0.0d0,0d0)
+   complex(8), public, parameter :: ghz3_prime2= (0.0d0,0d0)
+   complex(8), public, parameter :: ghz3_prime3= (0.0d0,0d0)
+   complex(8), public, parameter :: ghz3_prime4= (0.0d0,0d0)
+
    complex(8), public, parameter :: ghz4_prime = (0.0d0,0d0)
+   complex(8), public, parameter :: ghz4_prime2= (0.0d0,0d0)
+   complex(8), public, parameter :: ghz4_prime3= (0.0d0,0d0)
+   complex(8), public, parameter :: ghz4_prime4= (0.0d0,0d0)
+
    real(8),    public, parameter :: Lambda_z1 = 10000d0*GeV
    real(8),    public, parameter :: Lambda_z2 = 10000d0*GeV
    real(8),    public, parameter :: Lambda_z3 = 10000d0*GeV
@@ -155,8 +175,8 @@ real(8), public, parameter :: Brhadr_W_cs = Br_W_cs/Br_W_hadr                   
 
 !-- parameters that define spin 2 coupling to SM fields, see note
 ! minimal coupling corresponds to a1 = b1 = b5 = 1 everything else 0
-  complex(8), public, parameter :: a1 = (1.0d0,0d0)    ! g1  -- c.f. draft
-  complex(8), public, parameter :: a2 = (0.0d0,0d0)    ! g2
+  complex(8), public, parameter :: a1 = (0.0d0,0d0)    ! g1  -- c.f. draft
+  complex(8), public, parameter :: a2 = (1.0d0,0d0)    ! g2
   complex(8), public, parameter :: a3 = (0.0d0,0d0)    ! g3
   complex(8), public, parameter :: a4 = (0.0d0,0d0)    ! g4
   complex(8), public, parameter :: a5 = (0.0d0,0d0)    ! pseudoscalar, g8
@@ -167,11 +187,11 @@ real(8), public, parameter :: Brhadr_W_cs = Br_W_cs/Br_W_hadr                   
   logical, public, parameter :: generate_bis = .true.
   logical, public, parameter :: use_dynamic_MG = .true.
 
-  complex(8), public, parameter :: b1 = (1.0d0,0d0)    !  all b' below are g's in the draft
-  complex(8), public, parameter :: b2 = (0.0d0,0d0)
+  complex(8), public, parameter :: b1 = (0.0d0,0d0)    !  all b' below are g's in the draft
+  complex(8), public, parameter :: b2 = (1.0d0,0d0)
   complex(8), public, parameter :: b3 = (0.0d0,0d0)
   complex(8), public, parameter :: b4 = (0.0d0,0d0)
-  complex(8), public, parameter :: b5 = (1.0d0,0d0)
+  complex(8), public, parameter :: b5 = (0.0d0,0d0)
   complex(8), public, parameter :: b6 = (0.0d0,0d0)
   complex(8), public, parameter :: b7 = (0.0d0,0d0)
   complex(8), public, parameter :: b8 = (0.0d0,0d0)
@@ -276,6 +296,33 @@ integer, public :: DebugCounter(0:10) = 0
 contains
 
 
+FUNCTION CKM(id1,id2)
+implicit none
+real(8) :: CKM
+integer :: id1, id2
+if((id1.eq.convertLHE(Up_)  .and.  id2.eq.convertLHE(Dn_))  .or.  (id1.eq.convertLHE(Dn_)  .and.  id2.eq.convertLHE(Up_)))then
+  CKM= 0.97427d0
+elseif((id1.eq.convertLHE(Up_)  .and.  id2.eq.convertLHE(Str_))  .or.  (id1.eq.convertLHE(Str_)  .and.  id2.eq.convertLHE(Up_)))then
+  CKM= 0.22534d0
+elseif((id1.eq.convertLHE(Up_)  .and.  id2.eq.convertLHE(Bot_))  .or.  (id1.eq.convertLHE(Bot_)  .and.  id2.eq.convertLHE(Up_)))then
+  CKM= 0.00351d0
+elseif((id1.eq.convertLHE(Chm_)  .and.  id2.eq.convertLHE(Dn_))  .or.  (id1.eq.convertLHE(Dn_)  .and.  id2.eq.convertLHE(Chm_)))then
+  CKM= 0.22520d0
+elseif((id1.eq.convertLHE(Chm_)  .and.  id2.eq.convertLHE(Str_))  .or.  (id1.eq.convertLHE(Str_)  .and.  id2.eq.convertLHE(Chm_)))then
+  CKM= 0.97344d0
+elseif((id1.eq.convertLHE(Chm_)  .and.  id2.eq.convertLHE(Bot_))  .or.  (id1.eq.convertLHE(Bot_)  .and.  id2.eq.convertLHE(Chm_)))then
+  CKM= 0.0412d0
+!elseif((id1.eq.convertLHE(Top_)  .and.  id2.eq.convertLHE(Dn_))  .or.  (id1.eq.convertLHE(Dn_)  .and.  id2.eq.convertLHE(Top_)))then
+!  CKM= 0.22520d0 
+!elseif((id1.eq.convertLHE(Top_)  .and.  id2.eq.convertLHE(Str_))  .or.  (id1.eq.convertLHE(Str_)  .and.  id2.eq.convertLHE(Top_)))then
+!  CKM= 0.0404d0
+!elseif((id1.eq.convertLHE(Top_)  .and.  id2.eq.convertLHE(Bot_))  .or.  (id1.eq.convertLHE(Bot_)  .and.  id2.eq.convertLHE(Top_)))then
+!  CKM= 0.999146
+else
+  CKM= 1d0
+endif
+
+END FUNCTION
 
 
 
@@ -306,6 +353,30 @@ integer :: Part
       convertLHEreverse = ABot_
   elseif( Part.eq.21 ) then
       convertLHEreverse = Glu_
+  elseif( Part.eq.11 ) then
+      convertLHEreverse = ElM_
+  elseif( Part.eq.-11 ) then
+      convertLHEreverse = ElP_
+  elseif( Part.eq.13 ) then
+      convertLHEreverse = MuM_
+  elseif( Part.eq.-13 ) then
+      convertLHEreverse = MuP_
+  elseif( Part.eq.15 ) then
+      convertLHEreverse = TaM_
+  elseif( Part.eq.-15 ) then
+      convertLHEreverse = TaP_
+  elseif( Part.eq.12 ) then
+      convertLHEreverse = NuE_
+  elseif( Part.eq.-12) then
+      convertLHEreverse = ANuE_
+  elseif( Part.eq.14) then
+      convertLHEreverse = NuM_
+  elseif( Part.eq.-14) then
+      convertLHEreverse = ANuM_
+  elseif( Part.eq.16 ) then
+      convertLHEreverse = NuT_
+  elseif( Part.eq.-16) then
+      convertLHEreverse = ANuT_
   else
       print *, "MYLHE format not implemented for ",Part
       stop
@@ -400,7 +471,7 @@ END FUNCTION
 
 FUNCTION getMass(Part)
 implicit none
-real :: getMass
+real(8) :: getMass
 integer :: Part
 
 

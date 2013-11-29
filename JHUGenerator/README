@@ -8,7 +8,7 @@ to compile the code: make
 executable file: ./JHUGen
 
 command line parameters:
-   Collider=x    (Collider: 1=LHC, 2=Tevatron), default value:1
+   Collider=x    (Collider: 1=LHC, 2=Tevatron, 0=e+e-), default value:1
    VegasNc1=x    (number of evaluations), default value:5000000
    PChannel=x    (partonic channel: 0=glu+glu, 1=quark+antiquark, 2=both), default value:2
    PDFSet=x      (parton distr. functions, 1=CTEQ6L1 (2001), 2=MSTW(2008),  2xx=MSTW with eigenvector set xx=01..40), default=1
@@ -27,7 +27,7 @@ command line parameters:
                   x=10: W --> l nu_l (l=e,mu,tau)
                   x=11: W --> anyting                  
    DataFile=x    (name of the output file), default value: "output"
-   Process=x     (gives the resonance spin 0,1 or 2, or 60=weakVBF, 61=pp->Hjj)
+   Process=x     (gives the resonance spin 0,1 or 2, or 50=pp/ee->VH, 60=weakVBF, 61=pp->Hjj)
    MReso=yyy.xx  (resonance mass, default=126.00)
    OffXVV=xyz    (only applies to Higgs production, x,y,z can be 1 or 0 indicating real off-shellness for Higgs, Z/W boson 1/2, resp.), default 011
    Interf=x      (0=neglect interference for 4f final states, 1=include interference, default= 0 above threshold, 1 below threshold )

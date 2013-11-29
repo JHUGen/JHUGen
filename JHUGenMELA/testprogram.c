@@ -12,7 +12,7 @@ int main(void){
   double MatElSq;
   int MYIDUP[4];
   double Hggcoupl[3][2];
-  double Hvvcoupl[4][2];
+  double Hvvcoupl[20][2];
   double Zqqcoupl[2][2];
   double Zvvcoupl[2][2];
   double Gqqcoupl[2][2];
@@ -20,12 +20,28 @@ int main(void){
   double Gvvcoupl[10][2];
 
   Hggcoupl[0][0]=1.0;  Hggcoupl[0][1]=0.0;   // first/second number is the real/imaginary part
-  Hggcoupl[1][0]=0.0;  Hggcoupl[1][1]=0.0;  
+  Hggcoupl[1][0]=0.0;  Hggcoupl[1][1]=0.0;   
   Hggcoupl[2][0]=0.0;  Hggcoupl[2][1]=0.0;  
   Hvvcoupl[0][0]=1.0;  Hvvcoupl[0][1]=0.0;  
   Hvvcoupl[1][0]=0.0;  Hvvcoupl[1][1]=0.0;  
   Hvvcoupl[2][0]=0.0;  Hvvcoupl[2][1]=0.0;  
   Hvvcoupl[3][0]=0.0;  Hvvcoupl[3][1]=0.0;  
+  Hvvcoupl[4][0]=0.0;  Hvvcoupl[4][1]=0.0;    //  ghz1_prime
+  Hvvcoupl[5][0]=0.0;  Hvvcoupl[5][1]=0.0;    //  ghz1_prime2
+  Hvvcoupl[6][0]=0.0;  Hvvcoupl[6][1]=0.0;    //  ghz1_prime3
+  Hvvcoupl[7][0]=0.0;  Hvvcoupl[7][1]=0.0;    //  ghz1_prime4
+  Hvvcoupl[8][0]=0.0;  Hvvcoupl[8][1]=0.0;    //  ghz2_prime
+  Hvvcoupl[9][0]=0.0;  Hvvcoupl[9][1]=0.0;    //  ghz2_prime2
+  Hvvcoupl[10][0]=0.0; Hvvcoupl[10][1]=0.0;   //  ghz2_prime3
+  Hvvcoupl[11][0]=0.0; Hvvcoupl[11][1]=0.0;   //  ghz2_prime4
+  Hvvcoupl[12][0]=0.0; Hvvcoupl[12][1]=0.0;   //  ghz3_prime 
+  Hvvcoupl[13][0]=0.0; Hvvcoupl[13][1]=0.0;   //  ghz3_prime2 
+  Hvvcoupl[14][0]=0.0; Hvvcoupl[14][1]=0.0;   //  ghz3_prime3
+  Hvvcoupl[15][0]=0.0; Hvvcoupl[15][1]=0.0;   //  ghz3_prime4
+  Hvvcoupl[16][0]=0.0; Hvvcoupl[16][1]=0.0;   //  ghz4_prime
+  Hvvcoupl[17][0]=0.0; Hvvcoupl[17][1]=0.0;   //  ghz4_prime2
+  Hvvcoupl[18][0]=0.0; Hvvcoupl[18][1]=0.0;   //  ghz4_prime3
+  Hvvcoupl[19][0]=0.0; Hvvcoupl[19][1]=0.0;   //  ghz4_prime4
 
   Zqqcoupl[0][0]=1.0;  Zqqcoupl[0][1]=0.0;   // first/second number is the real/imaginary part
   Zqqcoupl[1][0]=1.0;  Zqqcoupl[1][1]=0.0;

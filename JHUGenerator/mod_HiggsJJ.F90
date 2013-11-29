@@ -510,17 +510,30 @@ contains
 
     kcoupl = q1q2/lambda**2
 
-    vvcoupl_prime(1) = vvcoupl(1) + ghz1_prime * &
-         lambda_z1**4/(lambda_z1**2 + abs(sprod(j1,j2)))/(lambda_z1**2 + abs(sprod(j3,j4)))
+    vvcoupl_prime(1) = vvcoupl(1)   &
+       + ghz1_prime * lambda_z1**4/(lambda_z1**2 + abs(sprod(j1,j2)))/(lambda_z1**2 + abs(sprod(j3,j4)))  &
+       + ghz1_prime2* ( abs(sprod(j1,j2)) + abs(sprod(j3,j4)) )/lambda_z1**2  &
+       + ghz1_prime3* ( abs(sprod(j1,j2)) + abs(sprod(j3,j4)) )**2/lambda_z1**4  &
+       + ghz1_prime4* ( abs(sprod(j1,j2)) * abs(sprod(j3,j4)) )/lambda_z1**4 
 
-    vvcoupl_prime(2) = vvcoupl(2) + ghz2_prime * &
-         lambda_z2**4/(lambda_z2**2 + abs(sprod(j1,j2)))/(lambda_z2**2 + abs(sprod(j3,j4)))
+    vvcoupl_prime(2) = vvcoupl(2)   &
+       + ghz2_prime * lambda_z2**4/(lambda_z2**2 + abs(sprod(j1,j2)))/(lambda_z2**2 + abs(sprod(j3,j4)))  &
+       + ghz2_prime2* ( abs(sprod(j1,j2)) + abs(sprod(j3,j4)) )/lambda_z2**2  &
+       + ghz2_prime3* ( abs(sprod(j1,j2)) + abs(sprod(j3,j4)) )**2/lambda_z2**4  &
+       + ghz2_prime4* ( abs(sprod(j1,j2)) * abs(sprod(j3,j4)) )/lambda_z2**4 
 
-    vvcoupl_prime(3) = vvcoupl(3) + ghz3_prime * &
-         lambda_z3**4/(lambda_z3**2 + abs(sprod(j1,j2)))/(lambda_z3**2 + abs(sprod(j3,j4)))
+    vvcoupl_prime(3) = vvcoupl(3)   &
+       + ghz3_prime * lambda_z3**4/(lambda_z3**2 + abs(sprod(j1,j2)))/(lambda_z3**2 + abs(sprod(j3,j4)))  &
+       + ghz3_prime2* ( abs(sprod(j1,j2)) + abs(sprod(j3,j4)) )/lambda_z3**2  &
+       + ghz3_prime3* ( abs(sprod(j1,j2)) + abs(sprod(j3,j4)) )**2/lambda_z3**4  &
+       + ghz3_prime4* ( abs(sprod(j1,j2)) * abs(sprod(j3,j4)) )/lambda_z3**4 
 
-    vvcoupl_prime(4) = vvcoupl(4) + ghz4_prime * &
-         lambda_z4**4/(lambda_z4**2 + abs(sprod(j1,j2)))/(lambda_z4**2 + abs(sprod(j3,j4)))
+    vvcoupl_prime(4) = vvcoupl(4)   &
+       + ghz4_prime * lambda_z4**4/(lambda_z4**2 + abs(sprod(j1,j2)))/(lambda_z4**2 + abs(sprod(j3,j4)))  &
+       + ghz4_prime2* ( abs(sprod(j1,j2)) + abs(sprod(j3,j4)) )/lambda_z4**2  &
+       + ghz4_prime3* ( abs(sprod(j1,j2)) + abs(sprod(j3,j4)) )**2/lambda_z4**4  &
+       + ghz4_prime4* ( abs(sprod(j1,j2)) * abs(sprod(j3,j4)) )/lambda_z4**4 
+
 
     a1 = vvcoupl_prime(1) * mv**2/mhsq + vvcoupl_prime(2) * two * q1q2/mhsq + vvcoupl_prime(3) * kcoupl * q1q2/mhsq
     a2 = -two * vvcoupl_prime(2) - kcoupl * vvcoupl_prime(3)

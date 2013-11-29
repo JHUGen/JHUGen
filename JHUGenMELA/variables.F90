@@ -23,12 +23,28 @@ logical, parameter :: includeInterference=.false.
 logical, parameter :: OffShellReson=.true.
 
 !-- momentum-dependent form factors
-complex(8), parameter :: ghz1_prime = (0d0,0d0)
-complex(8), parameter :: ghz2_prime = (0d0,0d0)
-complex(8), parameter :: ghz3_prime = (0d0,0d0)
-complex(8), parameter :: ghz4_prime = (0d0,0d0)
+complex(8) :: ghz1_prime 
+complex(8) :: ghz1_prime2
+complex(8) :: ghz1_prime3
+complex(8) :: ghz1_prime4
+
+complex(8) :: ghz2_prime 
+complex(8) :: ghz2_prime2
+complex(8) :: ghz2_prime3
+complex(8) :: ghz2_prime4
+
+complex(8) :: ghz3_prime 
+complex(8) :: ghz3_prime2
+complex(8) :: ghz3_prime3
+complex(8) :: ghz3_prime4
+
+complex(8) :: ghz4_prime 
+complex(8) :: ghz4_prime2
+complex(8) :: ghz4_prime3
+complex(8) :: ghz4_prime4
 
 real(8), parameter :: lambda_z1 = 10000d0 * GeV
 real(8), parameter :: lambda_z2 = 10000d0 * GeV
 real(8), parameter :: lambda_z3 = 10000d0 * GeV
 real(8), parameter :: lambda_z4 = 10000d0 * GeV
+
