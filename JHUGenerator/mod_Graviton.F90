@@ -126,7 +126,7 @@ do i4 = 1,2
 
 
          if( (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then
-             sum = sum + symmFact * (cdabs( A(1)*dconjg(A(1)) ) + cdabs( A(2)*dconjg(A(2)) ))
+             sum = sum + symmFact * (cdabs( A(1)*dconjg(A(1)) ) +  cdabs( A(2)*dconjg(A(2)) ))
              if( i3.eq.i4 ) sum = sum + symmFact * 2d0*dreal(A(1)*dconjg(A(2)))  
          else
              sum = sum + cdabs( A(1)*dconjg(A(1)) )
@@ -439,7 +439,7 @@ enddo
       complex(dp) :: e3_q4,e4_q3
       complex(dp) :: q1(4),q2(4),q3(4),q4(4),q(4)
       complex(dp) :: e1(4),e2(4),e3(4),e4(4)
-      complex(dp) :: yyy1,yyy2,yyy3,yyy41,yyy42,yyy5,yyy6,yyy7
+      complex(dp) :: yyy1,yyy2,yyy3,yyy41,yyy42,yyy5,yyy6,yyy7,yyy4
       real(dp) :: q34,MG,MZ3,MZ4
       real(dp) :: rr
 
@@ -501,8 +501,10 @@ enddo
 
       if (generate_bis) then
           rr = q34/Lambda**2
-          yyy1 = q34*(b1   + b2*rr*(one + two*M_V**2/q34+ M_V**4/q34**2)  + b5*M_V**2/q34)
-          yyy2 = -b1/two + b3*rr*(1d0-M_V**2/q34) + two*b4*rr+b7*rr*M_V**2/q34
+!           yyy1 = q34*(b1 + b2*rr*(one + two*M_V**2/q34+ M_V**4/q34**2)  + b5*M_V**2/q34)
+          yyy1 = q34*(b1 + b2*rr*(one+MZ3**2/q34)*(one+MZ4**2/q34)  + b5*M_V**2/q34)
+!           yyy2 = -b1/two + b3*rr*(1d0-M_V**2/q34) + two*b4*rr+b7*rr*M_V**2/q34
+          yyy2 = -b1/two + b3*rr*(1d0-(MZ3**2+MZ4**2)/(2d0*q34)) + two*b4*rr+b7*rr*M_V**2/q34
           yyy3 = (-b2/two - b3- two*b4)*rr/q34
 !           yyy4 = -b1 - b2*rr -(b2+b3+b6)*rr*M_V**2/q34
           yyy41 = -b1 - b2*(q34+MZ3**2)/Lambda**2 - b3*MZ4**2/Lambda**2 - b6*M_V**2/Lambda**2
@@ -628,7 +630,7 @@ enddo
       complex(dp) :: e3_q4,e4_q3
       complex(dp) :: q1(4),q2(4),q3(4),q4(4),q(4)
       complex(dp) :: e1(4),e2(4),e3(4),e4(4)
-      complex(dp) :: xxx1,xxx2,xxx3,xxx4,yyy1,yyy2,yyy3,yyy41,yyy42,yyy5,yyy6
+      complex(dp) :: xxx1,xxx2,xxx3,xxx4,yyy1,yyy2,yyy3,yyy4,yyy41,yyy42,yyy5,yyy6
       complex(dp) :: yyy7
       real(dp) :: q34,MZ3,MZ4,MG
       logical :: new
@@ -699,8 +701,10 @@ enddo
 
       if (generate_bis) then
           rr = q34/Lambda**2! kappa for FS
-          yyy1 = q34*(b1 + b2*rr*(one + two*M_V**2/q34+ M_V**4/q34**2)   + b5*M_V**2/q34)
-          yyy2 = -b1/two + b3*rr*(one-M_V**2/q34) + two*b4*rr + b7*rr*M_V**2/q34
+! !           yyy1 = q34*(b1 + b2*rr*(one + two*M_V**2/q34+ M_V**4/q34**2)   + b5*M_V**2/q34)
+          yyy1 = q34*(b1 + b2*rr*(one+MZ3**2/q34)*(one+MZ4**2/q34)  + b5*M_V**2/q34)
+!           yyy2 = -b1/two + b3*rr*(one-M_V**2/q34) + two*b4*rr + b7*rr*M_V**2/q34
+          yyy2 = -b1/two + b3*rr*(1d0-(MZ3**2+MZ4**2)/(2d0*q34)) + two*b4*rr+b7*rr*M_V**2/q34
           yyy3 = (-b2/two - b3- two*b4)*rr/q34
 !           yyy4 = -b1 - b2*rr -(b2+b3+b6)*rr*M_V**2/q34
           yyy41 = -b1 - b2*(q34+MZ3**2)/Lambda**2 - b3*MZ4**2/Lambda**2 - b6*M_V**2/Lambda**2
@@ -710,7 +714,6 @@ enddo
           yyy6 = b9 * M_V**2/Lambda**2
 !           yyy7 = b10*rr*MG**2/q34
           yyy7 = b10 * MG**2 * M_V**2/Lambda**4
-
       else
           yyy1 = q34*c1/2d0
           yyy2 = c2
@@ -934,6 +937,7 @@ enddo
 !           e1_e2*MG**2*yyy5*xxx2 + 1.D0/3.D0*et1(e3,e4,q3,q4)*e1_e2* &
 !           MG**2*yyy5*xxx1 + 4.D0*et1(e3,e4,q3,q4)*e1_q3*e2_q3*yyy5*xxx1
 
+! print *, "old res GG",res
 
 
 !   this is the new code that includes couplings yyy41 and yyy42 instead of yyy4
@@ -1150,10 +1154,7 @@ enddo
         &    et1(e3,e4,q3,q4)*e1_q3*e2_q3*yyy5*xxx1
 
 
-
-
-
-! print *, "res GG",res
+! print *, "new res GG",res
 ! pause
 
 

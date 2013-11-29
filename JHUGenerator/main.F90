@@ -185,6 +185,20 @@ integer :: NumArgs,NArg,OffShell_XVV,iunwgt,CountArg,iinterf
 !         print *, "off shell Z/W's only allowed for spin 0,2 resonance"
 ! !         stop
 !     endif
+
+    if(Process.eq.50)then
+      DecayMode2=DecayMode1
+      if(Collider.eq.2)then
+        print *, "Collider 2 not available for VH"
+        stop
+      endif
+    endif
+    if( (IsAZDecay(DecayMode1).eqv..false.) .and. (Collider.ne.1) ) then
+      print *, "WH with Collider 1 only"
+      stop
+    endif
+
+
     if( IsAZDecay(DecayMode1) ) then
        M_V = M_Z
        Ga_V= Ga_Z
@@ -332,6 +346,8 @@ IF( COLLIDER.EQ.1) THEN
   Collider_Energy  = LHC_Energy
 ELSEIF( COLLIDER.EQ.2 ) THEN
   Collider_Energy  = TEV_Energy
+ELSEIF( COLLIDER.EQ.0 ) THEN
+  Collider_Energy  = ILC_Energy
 ENDIF
 
 END SUBROUTINE
@@ -380,6 +396,15 @@ include "vegas_common.f"
       !- Hjj, gluon fusion
       if(Process.eq.61) then
          NDim = 5
+         NDim = NDim + 2 ! sHat integration
+         VegasIt1_default = 5
+         VegasNc0_default = 100000
+         VegasNc1_default = 500000
+         VegasNc2_default = 10000
+      endif
+      !- VHiggs
+      if(Process.eq.50) then
+         NDim = 17
          NDim = NDim + 2 ! sHat integration
          VegasIt1_default = 5
          VegasNc0_default = 100000
@@ -461,6 +486,8 @@ if (unweighted.eqv..false.) then  !----------------------- weighted events
 
   if (Process.eq.60 .or. Process.eq.61) then
      call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
+  elseif (Process.eq.50) then
+     call vegas(EvalWeighted_VHiggs,VG_Result,VG_Error,VG_Chi2)
   else
      call vegas(EvalWeighted,VG_Result,VG_Error,VG_Chi2)    ! usual call of vegas for weighted events
   endif
@@ -479,6 +506,8 @@ if (unweighted.eqv..false.) then  !----------------------- weighted events
   ncall= VegasNc2
   if (process.eq.60 .or. process.eq.61) then 
      call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
+  elseif (Process.eq.50) then
+     call vegas1(EvalWeighted_VHiggs,VG_Result,VG_Error,VG_Chi2)
   else
      call vegas1(EvalWeighted,VG_Result,VG_Error,VG_Chi2)    ! usual call of vegas for weighted events
   endif
@@ -510,6 +539,10 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
             if (Process.eq.60 .or. Process.eq.61) then
                 RES = 0d0
                 dum = EvalUnWeighted_HJJ(yRnd,.false.,RES)
+                VG = VG + RES
+            elseif (Process.eq.50) then
+                RES = 0d0
+                dum = EvalUnWeighted_VHiggs(yRnd,.false.,RES)
                 VG = VG + RES
             else
                 if (PChannel_aux.eq.0.or.PChannel_aux.eq.2) then
@@ -591,6 +624,8 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
             call random_number(yRnd)
 	    if (Process.eq.60 .or. Process.eq.61) then
                 dum = EvalUnWeighted_HJJ(yRnd,.true.,RES)! RES is a dummy here
+            elseif (Process.eq.50) then
+                dum = EvalUnWeighted_VHiggs(yRnd,.true.,RES)! RES is a dummy here
 	    else
                 dum = EvalUnWeighted(yRnd,.true.,RES)! RES is a dummy here
             endif
@@ -601,6 +636,8 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
               call random_number(yRnd)
 	      if (Process.eq.60 .or. Process.eq.61) then
 		  dum = EvalUnWeighted_HJJ(yRnd,.true.,RES)! RES is a dummy here
+              elseif (Process.eq.50) then
+                  dum = EvalUnWeighted_VHiggs(yRnd,.true.,RES)! RES is a dummy here
 	      else
 		  dum = EvalUnWeighted(yRnd,.true.,RES)! RES is a dummy here
 	      endif
@@ -775,9 +812,11 @@ character(len=*),parameter :: JHUGen_Fmt0 = "(2X,I2,A160)"
 character(len=*),parameter :: JHUGen_Fmt1 = "(I3,X,I2,X,I2,X,I2,X,I3,X,I3,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7)"
 character(len=150) :: InputFmt0,InputFmt1
 logical :: FirstEvent,M_ResoSet
-integer :: nline,LHE_IDUP(1:maxpart+3),LHE_ICOLUP(1:2,1:maxpart+3),LHE_ICOLUP_Part(1:2,1:maxpart),LHE_IDUP_Part(1:maxpart),intDummy,Nevent
+integer :: nline,intDummy,Nevent
+integer :: LHE_IDUP(1:maxpart+3),   LHE_ICOLUP(1:2,1:maxpart+3),   LHE_MOTHUP(1:2,1:maxpart+3)
+integer :: LHE_IDUP_Part(1:maxpart),LHE_ICOLUP_Part(1:2,1:maxpart),LHE_MOTHUP_Part(1:2,1:maxpart+3)
 integer :: EventNumPart,nparton
-character(len=160) :: FirstLines,EventInfoLine
+character(len=160) :: FirstLines,EventInfoLine,PDFLine
 character(len=160) :: EventLine(1:maxpart+3)
 integer :: n,clock,i,stat
 integer, dimension(:), allocatable :: gfort_seed
@@ -880,7 +919,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
  !       convert event lines into variables assuming that the Higgs resonance has ID 25
          nparton = 0
          do nline=1,EventNumPart
-            read(EventLine(nline),fmt=InputFmt1) LHE_IDUP(nline),intDummy,intDummy,intDummy,LHE_ICOLUP(1,nline),LHE_ICOLUP(2,nline),MomExt(2,nline),MomExt(3,nline),MomExt(4,nline),MomExt(1,nline),Mass(nline)
+            read(EventLine(nline),fmt=InputFmt1) LHE_IDUP(nline),intDummy,LHE_MOTHUP(1,nline),LHE_MOTHUP(2,nline),LHE_ICOLUP(1,nline),LHE_ICOLUP(2,nline),MomExt(2,nline),MomExt(3,nline),MomExt(4,nline),MomExt(1,nline),Mass(nline)
             MomExt(1:4,nline) = MomExt(1:4,nline)*GeV!  convert to units of 100GeV
             Mass(nline) = Mass(nline)*GeV            !  convert to units of 100GeV
 
@@ -892,11 +931,19 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                   MomParton(1:4,nparton) = MomExt(1:4,nline)
                   LHE_IDUP_Part(nparton) = LHE_IDUP(nline)
                   LHE_ICOLUP_Part(1:2,nparton) = LHE_ICOLUP(1:2,nline)
+                  LHE_MOTHUP_Part(1:2,nparton) = LHE_MOTHUP(1:2,nline)
              else
                   print *, "ERROR: unknown particle in LHE input file",LHE_IDUP(nline)
                   stop
             endif
          enddo
+!        read optional pdf line
+         read(16,fmt="(A160)",IOSTAT=stat,END=99) PDFLine(1:160)
+         if( .not. PDFLine(1:4).eq."#pdf") then
+             PDFLine(:)=""
+             backspace(16)
+         endif
+
 
 ! !        reject event if M_Reso and pH2sq deviate by more than 20 GeV 
 !          if( abs( M_Reso - pH2sq) .gt. 20d0*GeV ) then
@@ -935,7 +982,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                 ICOLUP(1:2,7+n) = LHE_ICOLUP_Part(1:2,n)!  overwrite final colors with external ones
              enddo
              call WriteOutEvent((/MomParton(1:4,1),MomParton(1:4,2),AcceptedEvent(1:4,1),AcceptedEvent(1:4,2),AcceptedEvent(1:4,3),AcceptedEvent(1:4,4)/), &
-                                MY_IDUP(1:7+nparton),ICOLUP(1:2,1:7+nparton),MomFSPartons=MomParton(1:4,3:nparton),EventInfoLine=EventInfoLine)
+                                MY_IDUP(1:7+nparton),ICOLUP(1:2,1:7+nparton),MomFSPartons=MomParton(1:4,3:nparton),EventInfoLine=EventInfoLine,PDFLine=PDFLine,MOTHUP_Parton=LHE_MOTHUP_Part)
              if( mod(AccepCounter,5000).eq.0 ) then
                   call cpu_time(time_int)
                   write(io_stdout,*)  NEvent," events accepted (",time_int-time_start, ") seconds"
@@ -945,7 +992,6 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
              print *, "rejected event after ",tries-1," evaluations"
              AlertCounter = AlertCounter + 1 
           endif
-
 
 !        skip event lines 
          read(16,fmt="(A7)",IOSTAT=stat,END=99) FirstLines! skip <\event>
@@ -1062,6 +1108,8 @@ implicit none
 
   if( Process.eq.60 .or. Process.eq.61 ) then
      call InitHisto_HVBF()
+  elseif (Process.eq.50) then
+     call InitHisto_VHiggs()
   else
      call InitHisto_HZZ()
   endif
@@ -1271,6 +1319,83 @@ END SUBROUTINE
 
 
 
+SUBROUTINE InitHisto_VHiggs()
+use ModMisc
+use ModKinematics
+use ModParameters
+implicit none
+integer :: AllocStatus,NHisto
+
+          it_sav = 1
+          NumHistograms = 9
+          if( .not.allocated(Histo) ) then
+                allocate( Histo(1:NumHistograms), stat=AllocStatus  )
+                if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
+          endif
+
+          Histo(1)%Info   = "m(jj)"
+          Histo(1)%NBins  = 40
+          Histo(1)%BinSize= 10d0
+          Histo(1)%LowVal = 0d0
+          Histo(1)%SetScale= 1d0
+
+          Histo(2)%Info   = "m(ll)"
+          Histo(2)%NBins  = 40
+          Histo(2)%BinSize= 10d0
+          Histo(2)%LowVal = 0d0
+          Histo(2)%SetScale= 1d0
+
+          Histo(3)%Info   = "pt(V)"
+          Histo(3)%NBins  = 40
+          Histo(3)%BinSize= 10d0
+          Histo(3)%LowVal = 0d0
+          Histo(3)%SetScale= 1d0
+
+          Histo(4)%Info   = "pt(H)"
+          Histo(4)%NBins  = 40
+          Histo(4)%BinSize= 10d0
+          Histo(4)%LowVal = 0d0
+          Histo(4)%SetScale= 1d0
+
+          Histo(5)%Info   = "m(V*)"   ! scattering angle of Z in resonance rest frame
+          Histo(5)%NBins  = 40
+          Histo(5)%BinSize= 10d0
+          Histo(5)%LowVal = 0d0
+          Histo(5)%SetScale= 1d0
+
+          Histo(6)%Info   = "costheta1"
+          Histo(6)%NBins  = 40
+          Histo(6)%BinSize= 0.1d0
+          Histo(6)%LowVal = -1d0
+          Histo(6)%SetScale= 1d0
+
+          Histo(7)%Info   = "costheta2"
+          Histo(7)%NBins  = 40
+          Histo(7)%BinSize= 0.1d0
+          Histo(7)%LowVal = -1d0
+          Histo(7)%SetScale= 1d0
+
+          Histo(8)%Info   = "phistar1"
+          Histo(8)%NBins  = 40
+          Histo(8)%BinSize= 0.2d0
+          Histo(8)%LowVal = -3.2d0
+          Histo(8)%SetScale= 1d0
+
+          Histo(9)%Info   = "phi"
+          Histo(9)%NBins  = 40
+          Histo(9)%BinSize= 0.2d0
+          Histo(9)%LowVal = -3.2d0
+          Histo(9)%SetScale= 1d0
+
+  do NHisto=1,NumHistograms
+      Histo(NHisto)%Value(:) = 0d0
+      Histo(NHisto)%Value2(:)= 0d0
+      Histo(NHisto)%Hits(:)  = 0
+  enddo
+
+
+RETURN
+END SUBROUTINE
 
 
 
@@ -1290,7 +1415,7 @@ implicit none
     if( (unweighted) .or. ( (.not.unweighted) .and. (writeWeightedLHE) )  ) then 
         write(io_LHEOutFile ,'(A)') '<LesHouchesEvents version="1.0">'
         write(io_LHEOutFile ,'(A)') '<!--'
-        write(io_LHEOutFile ,'(A,A6,A)') 'Output from the JHUGenerator ',trim(JHUGen_Version),' described in arXiv:1001.3396 [hep-ph],arXiv:1208.4018 [hep-ph]'
+        write(io_LHEOutFile ,'(A,A6,A)') 'Output from the JHUGenerator ',trim(JHUGen_Version),' described in arXiv:1001.3396 [hep-ph],arXiv:1208.4018 [hep-ph],arXiv:1309.4819 [hep-ph]'
 
         write(io_LHEOutFile ,'(A)') ''
 
@@ -1357,6 +1482,7 @@ character :: arg*(200)
     write(TheUnit,"(3X,A)") ""
 
     write(TheUnit,"(3X,A)") "Input Parameter:"
+    if( Collider.eq.0 ) write(TheUnit,"(4X,A,1F8.2)") "Collider: e+ e-, sqrt(s)=",Collider_Energy*100d0
     if( Collider.eq.1 ) write(TheUnit,"(4X,A,1F8.2)") "Collider: P-P, sqrt(s)=",Collider_Energy*100d0
     if( Collider.eq.2 ) write(TheUnit,"(4X,A,1F8.2)") "Collider: P-Pbar, sqrt(s)=",Collider_Energy*100d0
     if( Process.eq.0 ) write(TheUnit,"(4X,A,F7.2,A,F6.3)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
@@ -1364,6 +1490,7 @@ character :: arg*(200)
     if( Process.eq.2 ) write(TheUnit,"(4X,A,F7.2,A,F6.3)") "Resonance: spin=2, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( Process.eq.60) write(TheUnit,"(4X,A,F7.2,A,F6.3)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( Process.eq.61) write(TheUnit,"(4X,A,F7.2,A,F6.3)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
+    if( Process.eq.50) write(TheUnit,"(4X,A,F7.2,A,F6.3)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( ReadLHEFile ) write(TheUnit,"(4X,A)") "           (This is ReadLHEFile mode. Resonance mass is read from LHE input file.)"
     write(TheUnit,"(4X,A,I2,2X,A,I2)") "DecayMode1:",DecayMode1, "DecayMode2:",DecayMode2
     if( IsAZDecay(DecayMode1) .or. IsAZDecay(DecayMode2) ) write(TheUnit,"(4X,A,F6.3,A,F6.4)") "Z-boson: mass=",M_Z*100d0,", width=",Ga_Z*100d0
@@ -1382,64 +1509,64 @@ character :: arg*(200)
     if( .not. seed_random ) write(TheUnit,"(4X,A)") "NOTE: seed_random==FALSE (switched off)"
 
     write(TheUnit,"(4X,A)") ""
-    if( Process.eq.0 .or. Process.eq.60 .or. Process.eq.61 ) then
+    if( Process.eq.0 .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.50 ) then
         write(TheUnit,"(4X,A)") "spin-0-VV couplings: "
         write(TheUnit,"(6X,A,L)") "generate_as=",generate_as
         if( generate_as ) then 
-            write(TheUnit,"(6X,A,2F7.4,A1)") "ahg1=",ahg1,"i"
-            write(TheUnit,"(6X,A,2F7.4,A1)") "ahg2=",ahg2,"i"
-            write(TheUnit,"(6X,A,2F7.4,A1)") "ahg3=",ahg3,"i"
-            write(TheUnit,"(6X,A,2F7.4,A1)") "ahz1=",ahz1,"i"
-            write(TheUnit,"(6X,A,2F7.4,A1)") "ahz2=",ahz2,"i"
-            write(TheUnit,"(6X,A,2F7.4,A1)") "ahz3=",ahz3,"i"
+            write(TheUnit,"(6X,A,2E15.8,A1)") "ahg1=",ahg1,"i"
+            write(TheUnit,"(6X,A,2E15.8,A1)") "ahg2=",ahg2,"i"
+            write(TheUnit,"(6X,A,2E15.8,A1)") "ahg3=",ahg3,"i"
+            write(TheUnit,"(6X,A,2E15.8,A1)") "ahz1=",ahz1,"i"
+            write(TheUnit,"(6X,A,2E15.8,A1)") "ahz2=",ahz2,"i"
+            write(TheUnit,"(6X,A,2E15.8,A1)") "ahz3=",ahz3,"i"
         else
-            write(TheUnit,"(6X,A,2F7.4,A1)") "ghg2=",ghg2,"i"
-            write(TheUnit,"(6X,A,2F7.4,A1)") "ghg3=",ghg3,"i"
-            write(TheUnit,"(6X,A,2F7.4,A1)") "ghg4=",ghg4,"i"
-            write(TheUnit,"(6X,A,2F7.4,A1)") "ghz1=",ghz1,"i"
-            write(TheUnit,"(6X,A,2F7.4,A1)") "ghz2=",ghz2,"i"
-            write(TheUnit,"(6X,A,2F7.4,A1)") "ghz3=",ghz3,"i"
-            write(TheUnit,"(6X,A,2F7.4,A1)") "ghz4=",ghz4,"i"
-            write(TheUnit,"(6X,A,2F7.4,A2,4X,A,1PE12.4)") "ghz1_prime=",ghz1_prime,"i,","Lambda_z1=",Lambda_z1*100d0
-            write(TheUnit,"(6X,A,2F7.4,A2,4X,A,1PE12.4)") "ghz2_prime=",ghz2_prime,"i,","Lambda_z2=",Lambda_z2*100d0
-            write(TheUnit,"(6X,A,2F7.4,A2,4X,A,1PE12.4)") "ghz3_prime=",ghz3_prime,"i,","Lambda_z3=",Lambda_z3*100d0
-            write(TheUnit,"(6X,A,2F7.4,A2,4X,A,1PE12.4)") "ghz4_prime=",ghz4_prime,"i,","Lambda_z4=",Lambda_z4*100d0
+            write(TheUnit,"(6X,A,2E15.8,A1)") "ghg2=",ghg2,"i"
+            write(TheUnit,"(6X,A,2E15.8,A1)") "ghg3=",ghg3,"i"
+            write(TheUnit,"(6X,A,2E15.8,A1)") "ghg4=",ghg4,"i"
+            write(TheUnit,"(6X,A,2E15.8,A1)") "ghz1=",ghz1,"i"
+            write(TheUnit,"(6X,A,2E15.8,A1)") "ghz2=",ghz2,"i"
+            write(TheUnit,"(6X,A,2E15.8,A1)") "ghz3=",ghz3,"i"
+            write(TheUnit,"(6X,A,2E15.8,A1)") "ghz4=",ghz4,"i"
+            write(TheUnit,"(6X,A,2E15.8,A2,4X,A,1PE12.4)") "ghz1_prime=",ghz1_prime,"i,","Lambda_z1=",Lambda_z1*100d0
+            write(TheUnit,"(6X,A,2E15.8,A2,4X,A,1PE12.4)") "ghz2_prime=",ghz2_prime,"i,","Lambda_z2=",Lambda_z2*100d0
+            write(TheUnit,"(6X,A,2E15.8,A2,4X,A,1PE12.4)") "ghz3_prime=",ghz3_prime,"i,","Lambda_z3=",Lambda_z3*100d0
+            write(TheUnit,"(6X,A,2E15.8,A2,4X,A,1PE12.4)") "ghz4_prime=",ghz4_prime,"i,","Lambda_z4=",Lambda_z4*100d0
         endif
     elseif( Process.eq.1 ) then
         write(TheUnit,"(4X,A)") "spin-1-VV couplings: "
-        write(TheUnit,"(6X,A,2F7.4,A1)") "zprime_qq_left =",zprime_qq_left,"i"
-        write(TheUnit,"(6X,A,2F7.4,A1)") "zprime_qq_right=",zprime_qq_right,"i"
-        write(TheUnit,"(6X,A,2F7.4,A1)") "zprime_zz_1=",zprime_zz_1,"i"
-        write(TheUnit,"(6X,A,2F7.4,A1)") "zprime_zz_2=",zprime_zz_2,"i"
+        write(TheUnit,"(6X,A,2E15.8,A1)") "zprime_qq_left =",zprime_qq_left,"i"
+        write(TheUnit,"(6X,A,2E15.8,A1)") "zprime_qq_right=",zprime_qq_right,"i"
+        write(TheUnit,"(6X,A,2E15.8,A1)") "zprime_zz_1=",zprime_zz_1,"i"
+        write(TheUnit,"(6X,A,2E15.8,A1)") "zprime_zz_2=",zprime_zz_2,"i"
     elseif( Process.eq.2 ) then
         write(TheUnit,"(4X,A)") "spin-2-VV couplings: "
         write(TheUnit,"(6X,A,L)") "generate_bis=",generate_bis
         write(TheUnit,"(6X,A,L)") "use_dynamic_MG=",use_dynamic_MG
-        write(TheUnit,"(6X,A,2F7.4,A1)") "a1=",a1,"i"
-        write(TheUnit,"(6X,A,2F7.4,A1)") "a2=",a2,"i"
-        write(TheUnit,"(6X,A,2F7.4,A1)") "a3=",a3,"i"
-        write(TheUnit,"(6X,A,2F7.4,A1)") "a4=",a4,"i"
-        write(TheUnit,"(6X,A,2F7.4,A1)") "a5=",a5,"i"
+        write(TheUnit,"(6X,A,2E15.8,A1)") "a1=",a1,"i"
+        write(TheUnit,"(6X,A,2E15.8,A1)") "a2=",a2,"i"
+        write(TheUnit,"(6X,A,2E15.8,A1)") "a3=",a3,"i"
+        write(TheUnit,"(6X,A,2E15.8,A1)") "a4=",a4,"i"
+        write(TheUnit,"(6X,A,2E15.8,A1)") "a5=",a5,"i"
         if( generate_bis ) then 
-            write(TheUnit,"(6X,A,2F7.4,A1)") "b1 =",b1,"i"
-            write(TheUnit,"(6X,A,2F7.4,A1)") "b2= ",b2,"i"
-            write(TheUnit,"(6X,A,2F7.4,A1)") "b3 =",b3,"i"
-            write(TheUnit,"(6X,A,2F7.4,A1)") "b4 =",b4,"i"
-            write(TheUnit,"(6X,A,2F7.4,A1)") "b5 =",b5,"i"
-            write(TheUnit,"(6X,A,2F7.4,A1)") "b6 =",b6,"i"
-            write(TheUnit,"(6X,A,2F7.4,A1)") "b7 =",b7,"i"
-            write(TheUnit,"(6X,A,2F7.4,A1)") "b8 =",b8,"i"
-            write(TheUnit,"(6X,A,2F7.4,A1)") "b9 =",b9,"i"
-            write(TheUnit,"(6X,A,2F7.4,A1)") "b10=",b10,"i"
+            write(TheUnit,"(6X,A,2E15.8,A1)") "b1 =",b1,"i"
+            write(TheUnit,"(6X,A,2E15.8,A1)") "b2= ",b2,"i"
+            write(TheUnit,"(6X,A,2E15.8,A1)") "b3 =",b3,"i"
+            write(TheUnit,"(6X,A,2E15.8,A1)") "b4 =",b4,"i"
+            write(TheUnit,"(6X,A,2E15.8,A1)") "b5 =",b5,"i"
+            write(TheUnit,"(6X,A,2E15.8,A1)") "b6 =",b6,"i"
+            write(TheUnit,"(6X,A,2E15.8,A1)") "b7 =",b7,"i"
+            write(TheUnit,"(6X,A,2E15.8,A1)") "b8 =",b8,"i"
+            write(TheUnit,"(6X,A,2E15.8,A1)") "b9 =",b9,"i"
+            write(TheUnit,"(6X,A,2E15.8,A1)") "b10=",b10,"i"
         else
-            write(TheUnit,"(6X,A,2F7.4,A1)") "c1 =",c1,"i"
-            write(TheUnit,"(6X,A,2F7.4,A1)") "c2 =",c2,"i"
-            write(TheUnit,"(6X,A,2F7.4,A1)") "c3 =",c3,"i"
-            write(TheUnit,"(6X,A,2F7.4,A1)") "c41 =",c41,"i"
-            write(TheUnit,"(6X,A,2F7.4,A1)") "c42 =",c42,"i"
-            write(TheUnit,"(6X,A,2F7.4,A1)") "c5 =",c5,"i"
-            write(TheUnit,"(6X,A,2F7.4,A1)") "c6 =",c6,"i"
-            write(TheUnit,"(6X,A,2F7.4,A1)") "c7 =",c7,"i"
+            write(TheUnit,"(6X,A,2E15.8,A1)") "c1 =",c1,"i"
+            write(TheUnit,"(6X,A,2E15.8,A1)") "c2 =",c2,"i"
+            write(TheUnit,"(6X,A,2E15.8,A1)") "c3 =",c3,"i"
+            write(TheUnit,"(6X,A,2E15.8,A1)") "c41 =",c41,"i"
+            write(TheUnit,"(6X,A,2E15.8,A1)") "c42 =",c42,"i"
+            write(TheUnit,"(6X,A,2E15.8,A1)") "c5 =",c5,"i"
+            write(TheUnit,"(6X,A,2E15.8,A1)") "c6 =",c6,"i"
+            write(TheUnit,"(6X,A,2E15.8,A1)") "c7 =",c7,"i"
         endif
     endif
     write(TheUnit,"(6X,A,2F8.1,A1)") "Lambda=",Lambda*100d0
@@ -1519,8 +1646,8 @@ implicit none
 
         write(io_stdout,*) ""
         write(io_stdout,"(2X,A)") "Command line arguments:"
-        write(io_stdout,"(4X,A)") "Collider:   1=LHC, 2=Tevatron"
-        write(io_stdout,"(4X,A)") "Process:    0=spin-0, 1=spin-1, 2=spin-2 resonance, 60=weakVBF, 61=pp->Hjj"
+        write(io_stdout,"(4X,A)") "Collider:   1=LHC, 2=Tevatron, 0=e+e-"
+        write(io_stdout,"(4X,A)") "Process:    0=spin-0, 1=spin-1, 2=spin-2 resonance, 50=pp/ee->VH, 60=weakVBF, 61=pp->Hjj"
         write(io_stdout,"(4X,A)") "MReso:      resonance mass (default=126.00), format: yyy.xx"
         write(io_stdout,"(4X,A)") "DecayMode1: decay mode for vector boson 1 (Z/W+/gamma)"
         write(io_stdout,"(4X,A)") "DecayMode2: decay mode for vector boson 2 (Z/W-/gamma)"

@@ -9,7 +9,7 @@ integer :: MY_IDUP(6:9)
 real(8),  parameter :: GeV=1d0/100d0
 real(8),  parameter :: LHCEnergy=8000d0 * GeV
 real(8),  parameter :: alphas = 0.13229060d0
-complex(8) :: Hggcoupl(1:3),Hzzcoupl(1:4)
+complex(8) :: Hggcoupl(1:3),Hzzcoupl(1:20)
 complex(8) :: Zqqcoupl(1:2),Zzzcoupl(1:2)
 complex(8) :: Gggcoupl(1:5),Gqqcoupl(1:2),Gzzcoupl(1:10)
 integer :: i, j
@@ -20,6 +20,7 @@ integer :: i, j
   Ga_Reso = 0.1d0 * GeV 
   Hggcoupl(1:3) = (/ (1d0,0d0), (0d0,0d0), (0d0,0d0) /)
   Hzzcoupl(1:4) = (/ (2d0,0d0), (0d0,0d0), (0d0,0d0), (0d0,0d0) /)
+  Hzzcoupl(5:20)= (1d0,0d0) ! momentum dependent couplings (ghz1_prime,ghz1_prime2,...,ghz4_prime3,ghz4_prime4)
   Zqqcoupl(1:2) = (/ (1d0,0d0), (1d0,0d0) /)
   Zzzcoupl(1:2) = (/ (0d0,0d0), (1d0,0d0) /)
   Gggcoupl(1:5) = (/ (1d0,0d0), (0d0,0d0), (0d0,0d0), (0d0,0d0), (0d0,0d0) /)
@@ -68,8 +69,6 @@ integer :: i, j
    print *, "result should be (qq spin-2)",0.0004838377647021d0
    print *, "ratio",MatElSq/0.0004838377647021d0
    print *, ""
-
-
 
 
 
