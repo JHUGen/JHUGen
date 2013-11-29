@@ -9,7 +9,7 @@ executable file: ./JHUGen
 
 command line parameters:
    Collider=x    (Collider: 1=LHC, 2=Tevatron, 0=e+e-), default value:1
-   VegasNc1=x    (number of evaluations), default value:5000000
+   VegasNc0,1,2 =x (number of evaluations)
    PChannel=x    (partonic channel: 0=glu+glu, 1=quark+antiquark, 2=both), default value:2
    PDFSet=x      (parton distr. functions, 1=CTEQ6L1 (2001), 2=MSTW(2008),  2xx=MSTW with eigenvector set xx=01..40), default=1
    DecayMode1=x  (decay mode for vector boson 1), default x=0 
