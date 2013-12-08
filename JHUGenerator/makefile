@@ -16,7 +16,7 @@ ifeq ($(Comp),gfort)
  else
     OptOpts  = -O0
  endif
- fcomp = f95 $(OptOpts) -ffree-line-length-none -I$(VegasDir) -J$(ModuleDir) -Dcompiler=2
+ fcomp = f95 $(OptOpts) -ffree-line-length-none -I$(VegasDir) -I$(ModuleDir) -J$(ModuleDir) -Dcompiler=2
 endif
 
 
