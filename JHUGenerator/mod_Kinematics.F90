@@ -40,7 +40,7 @@ integer :: a,b,c,NumFSPartons
 integer :: MY_IDUP(:),ICOLUP(:,:)
 integer :: LHE_IDUP(1:7+maxpart),i,ISTUP(1:7+maxpart),MOTHUP(1:2,1:7+maxpart)
 integer :: NUP,IDPRUP
-real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP
+real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP,mZ1,mZ2
 character(len=*),parameter :: fmt1 = "(I3,X,I2,X,I2,X,I2,X,I3,X,I3,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7)"
 
 
@@ -165,7 +165,7 @@ LHE_IDUP(3) = 25
 if( Process.eq.1 ) LHE_IDUP(3) = 32
 if( Process.eq.2 ) LHE_IDUP(3) = 39
 Lifetime = 0.0d0
-Spin = 0.0d0
+Spin = 1.0d0
 
 do a=1,6
     MomDummy(1,a) = 100.0d0*Mom(1,a)
@@ -249,6 +249,15 @@ do a=1,NumFSPartons
 enddo
 
 
+!  associte lepton pairs to MOTHUP
+if( (IsAZDecay(DecayMode1)).and.(IsAZDecay(DecayMode2)) .and. abs(LHE_IDUP(7)).eq.abs(LHE_IDUP(9)) ) then 
+    mZ1 = Get_MInv( Mom(1:4,3)+Mom(1:4,4) )
+    mZ2 = Get_MInv( Mom(1:4,3)+Mom(1:4,6) )
+    if( dabs(mZ2-m_V) .lt. dabs(mZ1-m_V)  ) then
+        call swapi(MOTHUP(1,6),MOTHUP(1,9))
+        call swapi(MOTHUP(2,6),MOTHUP(2,9))
+    endif
+endif
 
 write(io_LHEOutFile,"(A)") "<event>"
 if( ReadLHEFile .and. importExternal_LHEinit .and. present(EventInfoLine) ) then
@@ -399,7 +408,7 @@ else
 endif
 
 Lifetime = 0.0d0
-Spin = 0.0d0
+Spin = 1.0d0
 
 do a=1,5
     MomDummy(1,a) = 100.0d0*Mom(1,a)
@@ -471,9 +480,9 @@ double precision, intent(in) :: four_momentum(1:7,1:4), beam_momentum(2,4), inv_
 double precision, intent(in) :: beam_h(2)
 double precision helicity(7)
 integer, intent(in) :: id(7)
-integer :: beam_id(2), ICOLUP(2,2)
-double precision :: EventWeight
-!real(8) :: Spin, Lifetime
+integer :: beam_id(2), ICOLUP(4,2)
+real(8) :: EventWeight
+real(8) :: Spin
 integer :: i
 integer :: NUP,IDPRUP
 real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP
@@ -500,33 +509,54 @@ if( .not. ReadLHEFile ) write(io_LHEOutFile,"(X,I2,X,I3,X,1PE13.7,X,1PE13.7,X,1P
 !    beam_id(2)=2212
 !endif
 helicity(1:3)=0d0
-if(beam_id(1).gt.0)then
-    ICOLUP(1,1)=501
+Spin = 1.0d0
+
+if(COLLIDER.eq.0)then
+  ICOLUP=0
+else
+  if(beam_id(1).gt.0)then
+    ICOLUP(1,1)=503
     ICOLUP(1,2)=0
     ICOLUP(2,1)=0
-    ICOLUP(2,2)=501
-else
+    ICOLUP(2,2)=503
+  else
     ICOLUP(1,1)=0
-    ICOLUP(1,2)=501
-    ICOLUP(2,1)=501
+    ICOLUP(1,2)=503
+    ICOLUP(2,1)=503
     ICOLUP(2,2)=0
+  endif
 endif
+
+if((id(4).eq.convertLHE(Up_)).or.(id(4).eq.convertLHE(Dn_)).or.(id(4).eq.convertLHE(Str_)).or.(id(4).eq.convertLHE(Chm_)).or.(id(4).eq.convertLHE(Bot_)))then
+    ICOLUP(3,1)=502
+    ICOLUP(3,2)=0
+    ICOLUP(4,1)=0
+    ICOLUP(4,2)=502
+elseif((id(4).eq.convertLHE(AUp_)).or.(id(4).eq.convertLHE(ADn_)).or.(id(4).eq.convertLHE(AStr_)).or.(id(4).eq.convertLHE(AChm_)).or.(id(4).eq.convertLHE(ABot_)))then
+    ICOLUP(3,1)=0
+    ICOLUP(3,2)=502
+    ICOLUP(4,1)=502
+    ICOLUP(4,2)=0
+else
+    ICOLUP(3:4,1:2)=0
+endif
+
 do i=1,2
-    write(io_LHEOutFile,fmt1) beam_id(i), -1,0,0,ICOLUP(i,1),ICOLUP(i,2),beam_momentum(i,2:4), beam_momentum(i,1), 0d0, 0., beam_h(i)
+    write(io_LHEOutFile,fmt1) beam_id(i), -1,0,0,ICOLUP(i,1),ICOLUP(i,2),beam_momentum(i,2:4), beam_momentum(i,1), 0.0d0, 0.0d0, spin
 enddo
 
-write(io_LHEOutFile,fmt1) id(2), 2,1,2,0,0,four_momentum(2,2:4), four_momentum(2,1), inv_mass(2), 0., helicity(2)
+write(io_LHEOutFile,fmt1) id(2), 2,1,2,0,0,four_momentum(2,2:4), four_momentum(2,1), inv_mass(2), 0.0d0, spin
 
-write(io_LHEOutFile,fmt1) id(3), 2,1,2,0,0,four_momentum(3,2:4), four_momentum(3,1), inv_mass(3), 0., helicity(3)
+write(io_LHEOutFile,fmt1) id(3), 2,1,2,0,0,four_momentum(3,2:4), four_momentum(3,1), inv_mass(3), 0.0d0, spin
 
-write(io_LHEOutFile,fmt1) id(4), 1,3,3,0,0,four_momentum(4,2:4), four_momentum(4,1), inv_mass(4), 0., helicity(4)
+write(io_LHEOutFile,fmt1) id(4), 1,3,3,ICOLUP(3,1),ICOLUP(3,2),four_momentum(4,2:4), four_momentum(4,1), inv_mass(4), 0.0d0, spin
 
-write(io_LHEOutFile,fmt1) id(5), 1,3,3,0,0,four_momentum(5,2:4), four_momentum(5,1), inv_mass(5), 0., helicity(5)
+write(io_LHEOutFile,fmt1) id(5), 1,3,3,ICOLUP(4,1),ICOLUP(4,2),four_momentum(5,2:4), four_momentum(5,1), inv_mass(5), 0.0d0, spin
 
 if(H_DK.eqv..true.)then
-write(io_LHEOutFile,fmt1) id(6), 1,4,4,502,0,four_momentum(6,2:4), four_momentum(6,1), inv_mass(6), 0., helicity(6)
+write(io_LHEOutFile,fmt1) id(6), 1,4,4,501,0,four_momentum(6,2:4), four_momentum(6,1), inv_mass(6), 0.0d0, spin
 
-write(io_LHEOutFile,fmt1) id(7), 1,4,4,0,502,four_momentum(7,2:4), four_momentum(7,1), inv_mass(7), 0., helicity(7)  
+write(io_LHEOutFile,fmt1) id(7), 1,4,4,0,501,four_momentum(7,2:4), four_momentum(7,1), inv_mass(7), 0.0d0, spin
 endif
 write(io_LHEOutFile,"(A)") "</event>"
 
@@ -1339,16 +1369,19 @@ use ModParameters
 implicit none
 real(8) :: xRnd
 integer :: ZQuaBranching
+real(8),parameter :: Ncol=3d0
+real(8),parameter :: xxxx=1d0/15d0
+real(8),parameter :: yyyy=Ncol*xxxx
 
-  if( xRnd .le. Brhadr_Z_uu ) then
+  if( xRnd .le. yyyy ) then
       ZQuaBranching = Up_
-  elseif(xRnd .le. Brhadr_Z_uu+Brhadr_Z_cc) then
+  elseif(xRnd .le. yyyy+yyyy) then
       ZQuaBranching = Chm_
-  elseif(xRnd .le. Brhadr_Z_uu+Brhadr_Z_cc+Brhadr_Z_dd) then
+  elseif(xRnd .le. yyyy+yyyy+yyyy) then
       ZQuaBranching = Dn_
-  elseif(xRnd .le. Brhadr_Z_uu+Brhadr_Z_cc+Brhadr_Z_dd+Brhadr_Z_ss) then
+  elseif(xRnd .le. yyyy+yyyy+yyyy+yyyy) then
       ZQuaBranching = Str_
-  elseif(xRnd .le. Brhadr_Z_uu+Brhadr_Z_cc+Brhadr_Z_dd+Brhadr_Z_ss+Brhadr_Z_bb) then
+  elseif(xRnd .le. yyyy+yyyy+yyyy+yyyy+yyyy) then
       ZQuaBranching = Bot_
   else
       print *, "error ",xRnd
@@ -1900,7 +1933,7 @@ real(8) :: etamin, Ymax, Y, Ymin
       Y = Ymin + yrnd(2)*(Ymax-Ymin)
       eta1 = (z-1d0)/(z-yRnd(1))*dexp(Y)
       eta2 = (z-1d0)/(z-yRnd(1))*dexp(-Y)
-      sHatJacobi = 2d0*(z-1d0)**2/(z-yRnd(1))**3
+      sHatJacobi = 2d0*(z-1d0)**2/(z-yRnd(1))**3*(Ymax-Ymin)
   elseif( MapType.eq.15 ) then! W-Higgs associate production   
       etamin = (M_Reso+M_W-2d0*Ga_W)/Collider_Energy
       z = 1d0/(1d0-etamin)
@@ -1911,7 +1944,7 @@ real(8) :: etamin, Ymax, Y, Ymin
       Y = Ymin + yrnd(2)*(Ymax-Ymin)
       eta1 = (z-1d0)/(z-yRnd(1))*dexp(Y)
       eta2 = (z-1d0)/(z-yRnd(1))*dexp(-Y)
-      sHatJacobi = 2d0*(z-1d0)**2/(z-yRnd(1))**3
+      sHatJacobi = 2d0*(z-1d0)**2/(z-yRnd(1))**3*(Ymax-Ymin)
   else
       call Error("PDF mapping not available")
   endif
@@ -2186,9 +2219,9 @@ END SUBROUTINE
 
 
 
-      subroutine PHASESPACEGEN(yRnd,four_momentum,inv_mass,mass,PSWgt)
-
-      implicit none
+subroutine PHASESPACEGEN(yRnd,four_momentum,inv_mass,mass,PSWgt)
+!use modMisc
+implicit none
 
       double precision, intent(in) :: yRnd(1:20),mass(7,2)
       double precision phi, beta, gamma
@@ -2200,12 +2233,13 @@ END SUBROUTINE
       real(8), intent(out) :: PSWgt,inv_mass(7)
 ! 1=E, 2,3,4=p_x,y,z
 !psg_mass(mass, width)
-      double precision cm_abs3p(7), lab_abs3p(7)
+      double precision cm_abs3p(7)
       double precision cm_sin_theta(7), cm_cos_theta(7)
       double precision cm_sin_phi(7), cm_cos_phi(7)
 !use Cauchy distribution as an approximation of the relativistic 
 !Breit-Wigner distribution for the invariant mass of 2 and 3?
       logical, parameter :: breit_wigner = .true.
+      real(8) :: jacobian2, jacobian3
 
 !1111111111111111111111111111111111111111
 !invariant mass of 1
@@ -2215,13 +2249,15 @@ END SUBROUTINE
       if(breit_wigner.eqv..false.)then
         inv_mass(2) = yRnd(12)
         inv_mass(3) = yRnd(13)*(1d0-inv_mass(2))
-        
-        inv_mass(2) = inv_mass(2) * inv_mass(1)  
+        jacobian3 = (1d0-inv_mass(2))
+        inv_mass(2) = inv_mass(2) * inv_mass(1)
+        jacobian2 = inv_mass(1)
         inv_mass(3) = inv_mass(3) * inv_mass(1)
+        jacobian3 = jacobian3 * inv_mass(1)
       else
 !if using Breit-Wigner distribution
-        inv_mass(2) = BW_mass(yRnd(12),mass(2,1), mass(2,2), inv_mass(1))
-        inv_mass(3) = BW_mass(yRnd(13),mass(3,1), mass(3,2), inv_mass(1)-inv_mass(2))
+        inv_mass(2) = dsqrt(bw_sq(yRnd(12),mass(2,1), mass(2,2), inv_mass(1)**2, jacobian2))
+        inv_mass(3) = dsqrt(bw_sq(yRnd(13),mass(3,1), mass(3,2), (inv_mass(1)-inv_mass(2))**2, jacobian3))
       endif
 
 !2222222222222222222222222222222222222222
@@ -2275,23 +2311,17 @@ END SUBROUTINE
       four_momentum(4,3)=cm_abs3p(4)*cm_sin_theta(4)*cm_sin_phi(4)
       four_momentum(4,4)=cm_abs3p(4)*cm_cos_theta(4)
 !boost the 4-momentum of 4 to the lab frame
-      do i=1,4
-        temp_vector(i) = four_momentum(4,i)
-        temp_boost(i) = four_momentum(2,i)
-      enddo
+      temp_vector = four_momentum(4,:)
+      temp_boost = four_momentum(2,:)
 
       call LORENTZ(temp_vector, temp_boost)
 
-      do i=1,4
-        four_momentum(4,i) = temp_vector(i)
-      enddo
+      four_momentum(4,:) = temp_vector
 !555555555555555555555555555555555555555
 !invariant mass of 5
       inv_mass(5)=0d0
 !4-momentum of 5 (lab frame) by energy-momentum conservation
-      do i=1,4
-            four_momentum(5,i)=four_momentum(2,i)-four_momentum(4,i)
-      enddo
+      four_momentum(5,:)=four_momentum(2,:)-four_momentum(4,:)
 !66666666666666666666666666666666666666
 !invariant mass of 6
       inv_mass(6)=0d0
@@ -2314,27 +2344,24 @@ END SUBROUTINE
       four_momentum(6,3)=cm_abs3p(6)*cm_sin_theta(6)*cm_sin_phi(6)
       four_momentum(6,4)=cm_abs3p(6)*cm_cos_theta(6)
 !boost the 4-momentum of 6 to the lab frame
-      do i=1,4
-        temp_vector(i) = four_momentum(6,i)
-        temp_boost(i) = four_momentum(3,i)
-      enddo
+      temp_vector(:) = four_momentum(6,:)
+      temp_boost(:) = four_momentum(3,:)
 
       call LORENTZ(temp_vector, temp_boost)
 
-      do i=1,4
-        four_momentum(6,i) = temp_vector(i)
-      enddo
+      four_momentum(6,:) = temp_vector
 !77777777777777777777777777777777777777777
 !invariant mass of 7
       inv_mass(7)=0d0     
 !4-momentum of 7 (lab frame) by energy-momentum conservation
-      do i=1,4
-            four_momentum(7,i)=four_momentum(3,i)-four_momentum(6,i)
-      enddo
+      four_momentum(7,:)=four_momentum(3,:)-four_momentum(6,:)
 
-      PSWgt = cm_abs3p(2) * cm_abs3p(4) * cm_abs3p(6) / inv_mass(1) &
-             * 0.00001276470173067728700d0 !4pi^3/4^3/2pi^8
+      PSWgt = jacobian2*jacobian3*cm_abs3p(2)/(4d0*pi)/inv_mass(1)/(8d0*pi)**2/(2*pi)**2
 
+!do i=4,7
+!print *, dsqrt(dabs(four_momentum(i,:).dot.four_momentum(i,:)))
+!enddo
+!pause
       return
       end subroutine PHASESPACEGEN
 
@@ -2343,25 +2370,21 @@ END SUBROUTINE
 
 
 
-!inv_mass_fnc()
-!generate invariant mass according to the Cauchy distribution, with
-!range (0, maxf), center massf, and width widthf.
-      double precision function BW_mass(yrand,mass_fnc, width_fnc, max_fnc)
-      implicit none
-      double precision, intent(in) :: yrand
-      double precision mass_fnc, width_fnc, max_fnc, uniform, uni_min,uni_max
-      double precision, parameter :: Pi = 3.14159265358979323846d0
+function bw_sq(x, m, ga, smax, jacobian)
+implicit none
+real(8) :: bw_sq
+real(8), intent(in) :: m, ga, smax
+real(8) :: xmin, xmax, x
+real(8), intent(out) :: jacobian
 
-!set range of random number based on phase space availability
-      uni_min=0.5d0+datan((0d0-mass_fnc)*2d0/width_fnc)/Pi
-      uni_max=0.5d0+datan((max_fnc-mass_fnc)*2d0/width_fnc)/Pi
-!scale the random number into the proper range set above
-      uniform=yrand*(uni_max-uni_min)+uni_min
-!set the inveriant mass using the proper random number
-      BW_mass=width_fnc/2d0*dtan(Pi*(uniform-0.5d0))+mass_fnc
-      return
+xmin=-datan(m/ga)/m/ga
+xmax=-datan((-smax+m**2)/ga/m)/ga/m
+x=x*(xmax-xmin)+xmin
+bw_sq=m**2+dtan(x*ga*m)*ga*m
+jacobian=(ga*m)**2*(1d0+dtan(ga*m*x)**2) * (xmax-xmin)
 
-      END FUNCTION BW_mass
+return
+end function bw_sq
 
 
 
@@ -2393,8 +2416,7 @@ END SUBROUTINE
 
       beta_sq = beta(2)**2+beta(3)**2+beta(4)**2
 
-  if(beta_sq.gt.epsilon)then
-
+  if(beta_sq.ge.epsilon)then
 
       gamma = 1d0/dsqrt(1d0-beta_sq)
 

@@ -3,7 +3,7 @@ implicit none
 save
 ! 
 ! 
-character(len=6),parameter :: JHUGen_Version="v4.2.5"
+character(len=6),parameter :: JHUGen_Version="v4.3.1"
 ! 
 ! 
 integer, public :: Collider, PDFSet,PChannel,Process,DecayMode1,DecayMode2
@@ -22,7 +22,7 @@ real(8) :: time_start,time_end,time_int
 logical, public :: warmup
 character(len=100) :: DataFile
 character(len=100) :: LogFile
-character(len=100) :: LHEProdFile
+character(len=500) :: LHEProdFile
 
 logical, public, parameter :: seed_random = .true.
 
@@ -34,7 +34,7 @@ logical, public :: includeInterference! include interference effecs in ZZ produc
 
 logical, public, parameter :: importExternal_LHEinit = .true.
 
-logical, public, parameter :: writeWeightedLHE = .false. 
+logical, public, parameter :: writeWeightedLHE = .true. 
 
 real(8),public :: GlobalMax=-1d99
 real(8),public :: GlobalMin=+1d99
@@ -69,7 +69,7 @@ real(8), public, parameter :: alpha_QED = 1d0/128.0d0       ! el.magn. coupling
 real(8), public, parameter :: alphas = 0.13229060d0         ! strong coupling
 real(8), public, parameter :: sitW = dsqrt(0.23119d0)       ! sin(Theta_Weinberg) (PDG-2008)
 real(8), public            :: Mu_Fact                       ! pdf factorization scale (set to M_Reso in main.F90)
-real(8), public, parameter :: LHC_Energy=8000d0  *GeV       ! LHC hadronic center of mass energy
+real(8), public, parameter :: LHC_Energy=14000d0  *GeV       ! LHC hadronic center of mass energy
 real(8), public, parameter :: TEV_Energy=1960d0  *GeV       ! Tevatron hadronic center of mass energy
 real(8), public, parameter :: ILC_Energy=250d0  *GeV        ! Linear collider center of mass energy
 real(8), public, parameter :: POL_A = 0d0                   !e+ polarization. 0: no polarization, 100: helicity = 1, -100: helicity = -1
