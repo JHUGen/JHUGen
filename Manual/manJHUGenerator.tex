@@ -26,7 +26,7 @@ Manual for the JHU generator
 \begin{center}
 \small
 For simulation of a single-produced resonance at hadron colliders \\
-(version 4.2.1, release date November 2, 2013) \\
+(version 4.3.1, release date December 10, 2013) \\
 \normalsize
 \end{center}
 
@@ -72,7 +72,7 @@ There are two ways to configure the program, either from the command line or in 
 The list of command line configurables and the default values are (also defined in the \verb|README|):
 
 \begin{verbatim}
-   - Collider=x    (Collider: 1=LHC, 2=Tevatron), default value:1
+   - Collider=x    (Collider: 1=LHC, 2=Tevatron, 0 = ILC), default value:1
    - VegasNc0,1,2 =x (number of evaluations)
    - PChannel=x    (partonic channel: 0=glu+glu, 1=quark+antiquark, 2=both), default value:2
    - PDFSet=x      (parton distr. functions, 1=CTEQ6L1 (2001), 2=MSTW(2008),  
@@ -93,6 +93,7 @@ The list of command line configurables and the default values are (also defined 
                   x=11: W --> anyting                                    
    - DataFile=x    (name of the output file), default value: "output"
    - Process=x     (gives the resonance spin 0,1 or 2, gg production; \\
+   	                50 = VH production of spin-0 \\
                     60 = VBF production of spin-0; 61 = Hjj QCD)
    - OffXVV=xyz    (only applies to Higgs production, x,y,z can be 1 or 0 indicating real off-shellness 
    					for Higgs, Z/W boson 1/2, resp.), default 000 if a parameter is not specified
@@ -120,6 +121,10 @@ Then, as an example of running the generator, you could do:
 \begin{verbatim}
 ./JHUGen Collider=1 Process=0 VegasNc2=100000 PChannel=0 OffXVV=011 DecayMode1=0 DecayMode2=0 \\
 		Unweighted=.true. DataFile=test1
+\end{verbatim}
+- VH:
+\begin{verbatim}
+./JHUGen Collider=1 Process=50 Unweighted=1 VegasNc2=100000 OffXVV=011 DataFile=test2 
 \end{verbatim}
 - VBF:
 \begin{verbatim}
