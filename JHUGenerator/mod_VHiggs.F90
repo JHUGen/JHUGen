@@ -191,14 +191,15 @@ contains
           endif
           current2=current2*gFFZ
 
-!nu nu Z vertex for final state        
+!nu nu~ Z vertex for final state        
         else if((abs(id(4)).eq.12).or.(abs(id(4)).eq.14).or.(abs(id(4)).eq.16))then
           current2=(0.5d0*T3nL - QnL*sitW**2) *Vcurrent2 -(0.5d0*T3nL)*Acurrent2
-          current2=Vcurrent2*gFFZ
+          current2=current2*gFFZ
 
         else
         current2=0d0
         print *, "invalid final state"!, id(4:5)
+        stop
         endif
 
       endif
@@ -849,7 +850,6 @@ contains
 
 !     print *, pdg_code1,h1,dble(pdg_code1)*h1,'!'
       if( (dble(pdg_code1)*h1) .lt. 0d0)then
-!       print *, 'fuck'
 !       print *, Acurrent
         do mu=1,4
           Acurrent(mu)=-dconjg(Acurrent(mu))

@@ -76,7 +76,7 @@ integer :: NumArgs,NArg,OffShell_XVV,iunwgt,CountArg,iinterf
 ! !       DecayMode=8:  Z --> l+ l- (l=e,mu,tau)
 ! !       DecayMode=9:  Z --> anything
 ! !       DecayMode=10: W --> l nu_l (l=e,mu,tau)
-! !       DecayMode=11: W --> anyting
+! !       DecayMode=11: W --> anything
 
    DataFile="./data/output"
 
@@ -389,7 +389,7 @@ include "vegas_common.f"
          NDim = 5
          NDim = NDim + 2 ! sHat integration
          VegasIt1_default = 5
-         VegasNc0_default = 100000
+         VegasNc0_default = 10000000
          VegasNc1_default = 500000
          VegasNc2_default = 10000
       endif
@@ -398,7 +398,7 @@ include "vegas_common.f"
          NDim = 5
          NDim = NDim + 2 ! sHat integration
          VegasIt1_default = 5
-         VegasNc0_default = 100000
+         VegasNc0_default = 10000000
          VegasNc1_default = 500000
          VegasNc2_default = 10000
       endif
@@ -407,7 +407,7 @@ include "vegas_common.f"
          NDim = 17
          NDim = NDim + 2 ! sHat integration
          VegasIt1_default = 5
-         VegasNc0_default = 100000
+         VegasNc0_default = 10000000
          VegasNc1_default = 500000
          VegasNc2_default = 10000
       endif
@@ -636,8 +636,8 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
               call random_number(yRnd)
 	      if (Process.eq.60 .or. Process.eq.61) then
 		  dum = EvalUnWeighted_HJJ(yRnd,.true.,RES)! RES is a dummy here
-              elseif (Process.eq.50) then
-                  dum = EvalUnWeighted_VHiggs(yRnd,.true.,RES)! RES is a dummy here
+        elseif (Process.eq.50) then
+            dum = EvalUnWeighted_VHiggs(yRnd,.true.,RES)! RES is a dummy here
 	      else
 		  dum = EvalUnWeighted(yRnd,.true.,RES)! RES is a dummy here
 	      endif
@@ -1335,55 +1335,55 @@ integer :: AllocStatus,NHisto
 
           Histo(1)%Info   = "m(jj)"
           Histo(1)%NBins  = 40
-          Histo(1)%BinSize= 10d0
-          Histo(1)%LowVal = 0d0
+          Histo(1)%BinSize= 20d0/40
+          Histo(1)%LowVal = 115d0
           Histo(1)%SetScale= 1d0
 
           Histo(2)%Info   = "m(ll)"
           Histo(2)%NBins  = 40
-          Histo(2)%BinSize= 10d0
-          Histo(2)%LowVal = 0d0
+          Histo(2)%BinSize= 20d0/40
+          Histo(2)%LowVal = 75d0
           Histo(2)%SetScale= 1d0
 
           Histo(3)%Info   = "pt(V)"
           Histo(3)%NBins  = 40
-          Histo(3)%BinSize= 10d0
+          Histo(3)%BinSize= 300d0/40d0
           Histo(3)%LowVal = 0d0
           Histo(3)%SetScale= 1d0
 
           Histo(4)%Info   = "pt(H)"
           Histo(4)%NBins  = 40
-          Histo(4)%BinSize= 10d0
+          Histo(4)%BinSize= 300d0/40d0
           Histo(4)%LowVal = 0d0
           Histo(4)%SetScale= 1d0
 
           Histo(5)%Info   = "m(V*)"   ! scattering angle of Z in resonance rest frame
           Histo(5)%NBins  = 40
-          Histo(5)%BinSize= 10d0
-          Histo(5)%LowVal = 0d0
+          Histo(5)%BinSize= 300d0/40d0
+          Histo(5)%LowVal = 200d0
           Histo(5)%SetScale= 1d0
 
           Histo(6)%Info   = "costheta1"
           Histo(6)%NBins  = 40
-          Histo(6)%BinSize= 0.1d0
+          Histo(6)%BinSize= 2d0/40d0
           Histo(6)%LowVal = -1d0
           Histo(6)%SetScale= 1d0
 
           Histo(7)%Info   = "costheta2"
           Histo(7)%NBins  = 40
-          Histo(7)%BinSize= 0.1d0
+          Histo(7)%BinSize= 2d0/40d0
           Histo(7)%LowVal = -1d0
           Histo(7)%SetScale= 1d0
 
           Histo(8)%Info   = "phistar1"
           Histo(8)%NBins  = 40
-          Histo(8)%BinSize= 0.2d0
+          Histo(8)%BinSize= 6.4d0/40d0
           Histo(8)%LowVal = -3.2d0
           Histo(8)%SetScale= 1d0
 
           Histo(9)%Info   = "phi"
           Histo(9)%NBins  = 40
-          Histo(9)%BinSize= 0.2d0
+          Histo(9)%BinSize= 6.4d0/40d0
           Histo(9)%LowVal = -3.2d0
           Histo(9)%SetScale= 1d0
 
