@@ -74,7 +74,7 @@ real(8), public, parameter :: TEV_Energy=1960d0  *GeV       ! Tevatron hadronic 
 real(8), public, parameter :: ILC_Energy=250d0  *GeV        ! Linear collider center of mass energy
 real(8), public, parameter :: POL_A = 0d0                   !e+ polarization. 0: no polarization, 100: helicity = 1, -100: helicity = -1
 real(8), public, parameter :: POL_B = 0d0                   !e- polarization. 0: no polarization, 100: helicity = 1, -100: helicity = -1
-logical, public, parameter :: H_DK =.true.                  !default to false so H in V > VH (Process = 50) does not decay
+logical, public, parameter :: H_DK =.false.                  !default to false so H in V > VH (Process = 50) does not decay
 real(8), public, parameter :: ptjetcut = 15d0*GeV           ! jet min pt
 real(8), public, parameter :: Rjet = 0.5d0                  ! jet deltaR, antikt algorithm 
 
