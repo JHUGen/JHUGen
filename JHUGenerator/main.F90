@@ -1513,60 +1513,72 @@ character :: arg*(200)
         write(TheUnit,"(4X,A)") "spin-0-VV couplings: "
         write(TheUnit,"(6X,A,L)") "generate_as=",generate_as
         if( generate_as ) then 
-            write(TheUnit,"(6X,A,2E15.8,A1)") "ahg1=",ahg1,"i"
-            write(TheUnit,"(6X,A,2E15.8,A1)") "ahg2=",ahg2,"i"
-            write(TheUnit,"(6X,A,2E15.8,A1)") "ahg3=",ahg3,"i"
-            write(TheUnit,"(6X,A,2E15.8,A1)") "ahz1=",ahz1,"i"
-            write(TheUnit,"(6X,A,2E15.8,A1)") "ahz2=",ahz2,"i"
-            write(TheUnit,"(6X,A,2E15.8,A1)") "ahz3=",ahz3,"i"
+            write(TheUnit,"(6X,A,2E16.8,A1)") "ahg1=",ahg1,"i"
+            write(TheUnit,"(6X,A,2E16.8,A1)") "ahg2=",ahg2,"i"
+            write(TheUnit,"(6X,A,2E16.8,A1)") "ahg3=",ahg3,"i"
+            write(TheUnit,"(6X,A,2E16.8,A1)") "ahz1=",ahz1,"i"
+            write(TheUnit,"(6X,A,2E16.8,A1)") "ahz2=",ahz2,"i"
+            write(TheUnit,"(6X,A,2E16.8,A1)") "ahz3=",ahz3,"i"
         else
-            write(TheUnit,"(6X,A,2E15.8,A1)") "ghg2=",ghg2,"i"
-            write(TheUnit,"(6X,A,2E15.8,A1)") "ghg3=",ghg3,"i"
-            write(TheUnit,"(6X,A,2E15.8,A1)") "ghg4=",ghg4,"i"
-            write(TheUnit,"(6X,A,2E15.8,A1)") "ghz1=",ghz1,"i"
-            write(TheUnit,"(6X,A,2E15.8,A1)") "ghz2=",ghz2,"i"
-            write(TheUnit,"(6X,A,2E15.8,A1)") "ghz3=",ghz3,"i"
-            write(TheUnit,"(6X,A,2E15.8,A1)") "ghz4=",ghz4,"i"
-            write(TheUnit,"(6X,A,2E15.8,A2,4X,A,1PE12.4)") "ghz1_prime=",ghz1_prime,"i,","Lambda_z1=",Lambda_z1*100d0
-            write(TheUnit,"(6X,A,2E15.8,A2,4X,A,1PE12.4)") "ghz2_prime=",ghz2_prime,"i,","Lambda_z2=",Lambda_z2*100d0
-            write(TheUnit,"(6X,A,2E15.8,A2,4X,A,1PE12.4)") "ghz3_prime=",ghz3_prime,"i,","Lambda_z3=",Lambda_z3*100d0
-            write(TheUnit,"(6X,A,2E15.8,A2,4X,A,1PE12.4)") "ghz4_prime=",ghz4_prime,"i,","Lambda_z4=",Lambda_z4*100d0
+            write(TheUnit,"(6X,A,2E16.8,A1)") "ghg2=",ghg2,"i"
+            write(TheUnit,"(6X,A,2E16.8,A1)") "ghg3=",ghg3,"i"
+            write(TheUnit,"(6X,A,2E16.8,A1)") "ghg4=",ghg4,"i"
+            write(TheUnit,"(6X,A,2E16.8,A1)") "ghz1=",ghz1,"i"
+            write(TheUnit,"(6X,A,2E16.8,A1)") "ghz2=",ghz2,"i"
+            write(TheUnit,"(6X,A,2E16.8,A1)") "ghz3=",ghz3,"i"
+            write(TheUnit,"(6X,A,2E16.8,A1)") "ghz4=",ghz4,"i"
+            if( cdabs(ghz1_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz1_prime= ",ghz1_prime ,"i,","Lambda_z1=",Lambda_z1*100d0
+            if( cdabs(ghz1_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz1_prime2=",ghz1_prime2,"i,","Lambda_z1=",Lambda_z1*100d0
+            if( cdabs(ghz1_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz1_prime3=",ghz1_prime3,"i,","Lambda_z1=",Lambda_z1*100d0
+            if( cdabs(ghz1_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz1_prime4=",ghz1_prime4,"i,","Lambda_z1=",Lambda_z1*100d0
+            if( cdabs(ghz2_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz2_prime= ",ghz2_prime ,"i,","Lambda_z2=",Lambda_z2*100d0
+            if( cdabs(ghz2_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz2_prime2=",ghz2_prime2,"i,","Lambda_z2=",Lambda_z2*100d0
+            if( cdabs(ghz2_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz2_prime3=",ghz2_prime3,"i,","Lambda_z2=",Lambda_z2*100d0
+            if( cdabs(ghz2_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz2_prime4=",ghz2_prime4,"i,","Lambda_z2=",Lambda_z2*100d0
+            if( cdabs(ghz3_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz3_prime= ",ghz3_prime ,"i,","Lambda_z3=",Lambda_z3*100d0
+            if( cdabs(ghz3_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz3_prime2=",ghz3_prime2,"i,","Lambda_z3=",Lambda_z3*100d0
+            if( cdabs(ghz3_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz3_prime3=",ghz3_prime3,"i,","Lambda_z3=",Lambda_z3*100d0
+            if( cdabs(ghz3_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz3_prime4=",ghz3_prime4,"i,","Lambda_z3=",Lambda_z3*100d0
+            if( cdabs(ghz4_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz4_prime= ",ghz4_prime ,"i,","Lambda_z4=",Lambda_z4*100d0
+            if( cdabs(ghz4_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz4_prime2=",ghz4_prime2,"i,","Lambda_z4=",Lambda_z4*100d0
+            if( cdabs(ghz4_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz4_prime3=",ghz4_prime3,"i,","Lambda_z4=",Lambda_z4*100d0
+            if( cdabs(ghz4_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz4_prime4=",ghz4_prime4,"i,","Lambda_z4=",Lambda_z4*100d0
         endif
     elseif( Process.eq.1 ) then
         write(TheUnit,"(4X,A)") "spin-1-VV couplings: "
-        write(TheUnit,"(6X,A,2E15.8,A1)") "zprime_qq_left =",zprime_qq_left,"i"
-        write(TheUnit,"(6X,A,2E15.8,A1)") "zprime_qq_right=",zprime_qq_right,"i"
-        write(TheUnit,"(6X,A,2E15.8,A1)") "zprime_zz_1=",zprime_zz_1,"i"
-        write(TheUnit,"(6X,A,2E15.8,A1)") "zprime_zz_2=",zprime_zz_2,"i"
+        write(TheUnit,"(6X,A,2E16.8,A1)") "zprime_qq_left =",zprime_qq_left,"i"
+        write(TheUnit,"(6X,A,2E16.8,A1)") "zprime_qq_right=",zprime_qq_right,"i"
+        write(TheUnit,"(6X,A,2E16.8,A1)") "zprime_zz_1=",zprime_zz_1,"i"
+        write(TheUnit,"(6X,A,2E16.8,A1)") "zprime_zz_2=",zprime_zz_2,"i"
     elseif( Process.eq.2 ) then
         write(TheUnit,"(4X,A)") "spin-2-VV couplings: "
         write(TheUnit,"(6X,A,L)") "generate_bis=",generate_bis
         write(TheUnit,"(6X,A,L)") "use_dynamic_MG=",use_dynamic_MG
-        write(TheUnit,"(6X,A,2E15.8,A1)") "a1=",a1,"i"
-        write(TheUnit,"(6X,A,2E15.8,A1)") "a2=",a2,"i"
-        write(TheUnit,"(6X,A,2E15.8,A1)") "a3=",a3,"i"
-        write(TheUnit,"(6X,A,2E15.8,A1)") "a4=",a4,"i"
-        write(TheUnit,"(6X,A,2E15.8,A1)") "a5=",a5,"i"
+        write(TheUnit,"(6X,A,2E16.8,A1)") "a1=",a1,"i"
+        write(TheUnit,"(6X,A,2E16.8,A1)") "a2=",a2,"i"
+        write(TheUnit,"(6X,A,2E16.8,A1)") "a3=",a3,"i"
+        write(TheUnit,"(6X,A,2E16.8,A1)") "a4=",a4,"i"
+        write(TheUnit,"(6X,A,2E16.8,A1)") "a5=",a5,"i"
         if( generate_bis ) then 
-            write(TheUnit,"(6X,A,2E15.8,A1)") "b1 =",b1,"i"
-            write(TheUnit,"(6X,A,2E15.8,A1)") "b2= ",b2,"i"
-            write(TheUnit,"(6X,A,2E15.8,A1)") "b3 =",b3,"i"
-            write(TheUnit,"(6X,A,2E15.8,A1)") "b4 =",b4,"i"
-            write(TheUnit,"(6X,A,2E15.8,A1)") "b5 =",b5,"i"
-            write(TheUnit,"(6X,A,2E15.8,A1)") "b6 =",b6,"i"
-            write(TheUnit,"(6X,A,2E15.8,A1)") "b7 =",b7,"i"
-            write(TheUnit,"(6X,A,2E15.8,A1)") "b8 =",b8,"i"
-            write(TheUnit,"(6X,A,2E15.8,A1)") "b9 =",b9,"i"
-            write(TheUnit,"(6X,A,2E15.8,A1)") "b10=",b10,"i"
+            write(TheUnit,"(6X,A,2E16.8,A1)") "b1 =",b1,"i"
+            write(TheUnit,"(6X,A,2E16.8,A1)") "b2= ",b2,"i"
+            write(TheUnit,"(6X,A,2E16.8,A1)") "b3 =",b3,"i"
+            write(TheUnit,"(6X,A,2E16.8,A1)") "b4 =",b4,"i"
+            write(TheUnit,"(6X,A,2E16.8,A1)") "b5 =",b5,"i"
+            write(TheUnit,"(6X,A,2E16.8,A1)") "b6 =",b6,"i"
+            write(TheUnit,"(6X,A,2E16.8,A1)") "b7 =",b7,"i"
+            write(TheUnit,"(6X,A,2E16.8,A1)") "b8 =",b8,"i"
+            write(TheUnit,"(6X,A,2E16.8,A1)") "b9 =",b9,"i"
+            write(TheUnit,"(6X,A,2E16.8,A1)") "b10=",b10,"i"
         else
-            write(TheUnit,"(6X,A,2E15.8,A1)") "c1 =",c1,"i"
-            write(TheUnit,"(6X,A,2E15.8,A1)") "c2 =",c2,"i"
-            write(TheUnit,"(6X,A,2E15.8,A1)") "c3 =",c3,"i"
-            write(TheUnit,"(6X,A,2E15.8,A1)") "c41 =",c41,"i"
-            write(TheUnit,"(6X,A,2E15.8,A1)") "c42 =",c42,"i"
-            write(TheUnit,"(6X,A,2E15.8,A1)") "c5 =",c5,"i"
-            write(TheUnit,"(6X,A,2E15.8,A1)") "c6 =",c6,"i"
-            write(TheUnit,"(6X,A,2E15.8,A1)") "c7 =",c7,"i"
+            write(TheUnit,"(6X,A,2E16.8,A1)") "c1 =",c1,"i"
+            write(TheUnit,"(6X,A,2E16.8,A1)") "c2 =",c2,"i"
+            write(TheUnit,"(6X,A,2E16.8,A1)") "c3 =",c3,"i"
+            write(TheUnit,"(6X,A,2E16.8,A1)") "c41 =",c41,"i"
+            write(TheUnit,"(6X,A,2E16.8,A1)") "c42 =",c42,"i"
+            write(TheUnit,"(6X,A,2E16.8,A1)") "c5 =",c5,"i"
+            write(TheUnit,"(6X,A,2E16.8,A1)") "c6 =",c6,"i"
+            write(TheUnit,"(6X,A,2E16.8,A1)") "c7 =",c7,"i"
         endif
     endif
     write(TheUnit,"(6X,A,2F8.1,A1)") "Lambda=",Lambda*100d0

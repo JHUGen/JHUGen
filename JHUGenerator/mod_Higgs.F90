@@ -849,7 +849,7 @@ enddo
          pin(1,:) = p(:,1)
 
 !-------- -1 == left, 1 == right
-         if( .not.IsAPhoton(DecayMode1) ) then 
+         if( (.not.IsAPhoton(DecayMode1)) .and. (.not.IsAPhoton(DecayMode2)) ) then
             pin(3,:) = p(:,l1)+p(:,l2)
             pin(4,:) = p(:,l3)+p(:,l4)
             sp(3,:) = pol_dk2mom(dcmplx(p(:,l1)),dcmplx(p(:,l2)),-3+2*i3)  ! ubar(l1), v(l2)
@@ -860,7 +860,7 @@ enddo
             propZ1 = s/dcmplx(s - M_V**2,M_V*Ga_V)
             s = scr(p(:,l3)+p(:,l4),p(:,l3)+p(:,l4))
             propZ2 = s/dcmplx(s - M_V**2,M_V*Ga_V)
-         elseif( IsAPhoton(DecayMode1) ) then 
+         elseif( IsAPhoton(DecayMode1) .and. IsAPhoton(DecayMode2) ) then
             pin(3,:) = p(:,l1)
             pin(4,:) = p(:,l3)
             sp(3,:) = pol_mless2(dcmplx(p(:,l1)),-3+2*i3,'out')  ! photon
@@ -869,6 +869,16 @@ enddo
 !             sp(4,1:4)=pin(4,1:4)
             propz1=1d0
             propz2=1d0
+         elseif( (.not.IsAPhoton(DecayMode1)) .and. (IsAPhoton(DecayMode2)) ) then
+            pin(3,:) = p(:,l1)+p(:,l2)
+            pin(4,:) = p(:,l3)
+            sp(3,:) = pol_dk2mom(dcmplx(p(:,l1)),dcmplx(p(:,l2)),-3+2*i3)  ! ubar(l1), v(l2)
+            sp(3,:) = -sp(3,:) + pin(3,:)*( sc(sp(3,:),dcmplx(pin(3,:))) )/scr(pin(3,:),pin(3,:))! full propagator numerator
+            sp(4,:) = pol_mless2(dcmplx(p(:,l3)),-3+2*i4,'out')  ! photon
+!             sp(4,1:4)=pin(4,1:4); print *, "this checks gauge invariance"
+            s = scr(p(:,l1)+p(:,l2),p(:,l1)+p(:,l2))
+            propZ1 = s/dcmplx(s - M_V**2,M_V*Ga_V)
+            propZ2=1d0
          endif
 
 
@@ -928,7 +938,8 @@ enddo
 
 
 !---- data that defines couplings
-  if( IsAZDecay(DecayMode1) .or. IsAWDecay(DecayMode1) ) then! decay into Z's or W's
+  if( (IsAZDecay(DecayMode1) .or. IsAWDecay(DecayMode1)) .and. (IsAZDecay(DecayMode2) .or. IsAWDecay(DecayMode2)) ) then! decay into ZZ's or WW's
+
 
       if( generate_as ) then 
         yyy1 = ahz1
@@ -964,13 +975,31 @@ enddo
           + et1(e3,e4,q3,q4)*yyy3 
 
 
-  elseif( IsAPhoton(DecayMode1) ) then! decay into photons
+  elseif( (IsAPhoton(DecayMode1)) .and. (IsAPhoton(DecayMode2)) ) then! decay into photons
 
       if( generate_as ) then 
         yyy1 = ahz1
         yyy2 = -2*ahz1 !ahz2  ! gauge invariance fixes ahz2 in this case
         yyy3 = ahz3
       else
+
+        ghz1_dyn = ghz1   +   ghz1_prime * Lambda_z1**4/( Lambda_z1**2 + abs(q3_q3) )/( Lambda_z1**2 + abs(q4_q4)) &
+                          +   ghz1_prime2* ( abs(q3_q3)+abs(q4_q4) )/Lambda_z1**2                                  &
+                          +   ghz1_prime3* ( abs(q3_q3)+abs(q4_q4) )**2/Lambda_z1**4                               &
+                          +   ghz1_prime4* ( abs(q3_q3)*abs(q4_q4) )/Lambda_z1**4
+        ghz2_dyn = ghz2   +   ghz2_prime * Lambda_z2**4/( Lambda_z2**2 + abs(q3_q3) )/( Lambda_z2**2 + abs(q4_q4)) &
+                          +   ghz2_prime2* ( abs(q3_q3)+abs(q4_q4) )/Lambda_z2**2                                  &
+                          +   ghz2_prime3* ( abs(q3_q3)+abs(q4_q4) )**2/Lambda_z2**4                               &
+                          +   ghz2_prime4* ( abs(q3_q3)*abs(q4_q4) )/Lambda_z2**4
+        ghz3_dyn = ghz3   +   ghz3_prime * Lambda_z3**4/( Lambda_z3**2 + abs(q3_q3) )/( Lambda_z3**2 + abs(q4_q4)) &
+                          +   ghz3_prime2* ( abs(q3_q3)+abs(q4_q4) )/Lambda_z3**2                                  &
+                          +   ghz3_prime3* ( abs(q3_q3)+abs(q4_q4) )**2/Lambda_z3**4                               &
+                          +   ghz3_prime4* ( abs(q3_q3)*abs(q4_q4) )/Lambda_z3**4
+        ghz4_dyn = ghz4   +   ghz4_prime * Lambda_z4**4/( Lambda_z4**2 + abs(q3_q3) )/( Lambda_z4**2 + abs(q4_q4)) &
+                          +   ghz4_prime2* ( abs(q3_q3)+abs(q4_q4) )/Lambda_z4**2                                  &
+                          +   ghz4_prime3* ( abs(q3_q3)+abs(q4_q4) )**2/Lambda_z4**4                               &
+                          +   ghz4_prime4* ( abs(q3_q3)*abs(q4_q4) )/Lambda_z4**4
+
         yyy1 = ghz1_dyn*M_V**2/MG**2 &  ! in this line M_V is indeed correct, not a misprint
              + ghz2_dyn*(MG**2-MZ3**2-MZ4**2)/MG**2 &
              + ghz3_dyn/Lambda**2*(MG**2-MZ3**2-MZ4**2)*(MG**2-MZ4**2-MZ3**2)/4d0/MG**2
@@ -982,6 +1011,22 @@ enddo
           + e3_q4*e4_q3*yyy2           &
           + et1(e3,e4,q3,q4)*yyy3 
 
+
+  elseif( (IsAZDecay(DecayMode1) .or. IsAWDecay(DecayMode1)) .and. (IsAPhoton(DecayMode2)) ) then! decay into Z+photon
+    if( generate_as ) then
+      yyy1 = ahz1
+      yyy2 = -2*ahz1*MG**2/(MG**2-MZ3**2)
+      yyy3 = ahz3
+    else
+      yyy1 = 0 * ghz1*M_V**2/MG**2 &  ! removed ghz1 dependence because it does not contribute
+           + ghz2*(MG**2-MZ3**2-MZ4**2)/MG**2 &
+           + ghz3/Lambda**2*(MG**2-MZ3**2-MZ4**2)*(MG**2-MZ4**2-MZ3**2)/4d0/MG**2
+      yyy2 = (-2d0*ghz2-ghz3/2d0/Lambda**2*(MG**2-MZ3**2-MZ4**2) )
+      yyy3 = -2d0*ghz4
+    endif
+      res = e3_e4*M_Reso**2*yyy1                  &
+          + e3_q4*e4_q3*yyy2                      &
+          + et1(e3,e4,q3,q4)*yyy3
 
 
   endif

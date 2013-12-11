@@ -3,7 +3,7 @@ implicit none
 save
 ! 
 ! 
-character(len=6),parameter :: JHUGen_Version="v4.3.1"
+character(len=6),parameter :: JHUGen_Version="v4.3.2"
 ! 
 ! 
 integer, public :: Collider, PDFSet,PChannel,Process,DecayMode1,DecayMode2
@@ -34,7 +34,7 @@ logical, public :: includeInterference! include interference effecs in ZZ produc
 
 logical, public, parameter :: importExternal_LHEinit = .true.
 
-logical, public, parameter :: writeWeightedLHE = .true. 
+logical, public, parameter :: writeWeightedLHE = .false. 
 
 real(8),public :: GlobalMax=-1d99
 real(8),public :: GlobalMin=+1d99
@@ -74,7 +74,7 @@ real(8), public, parameter :: TEV_Energy=1960d0  *GeV       ! Tevatron hadronic 
 real(8), public, parameter :: ILC_Energy=250d0  *GeV        ! Linear collider center of mass energy
 real(8), public, parameter :: POL_A = 0d0                   !e+ polarization. 0: no polarization, 100: helicity = 1, -100: helicity = -1
 real(8), public, parameter :: POL_B = 0d0                   !e- polarization. 0: no polarization, 100: helicity = 1, -100: helicity = -1
-logical, public, parameter :: H_DK =.true.                 !default to false so H in V > VH (Process = 50) does not decay
+logical, public, parameter :: H_DK =.true.                  !default to false so H in V > VH (Process = 50) does not decay
 real(8), public, parameter :: ptjetcut = 15d0*GeV           ! jet min pt
 real(8), public, parameter :: Rjet = 0.5d0                  ! jet deltaR, antikt algorithm 
 
