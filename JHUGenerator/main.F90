@@ -45,7 +45,7 @@ SUBROUTINE GetCommandlineArgs()
 use ModParameters
 use ModKinematics
 implicit none
-character :: arg*(120)
+character :: arg*(500)
 integer :: NumArgs,NArg,OffShell_XVV,iunwgt,CountArg,iinterf
 
    Collider=1
@@ -142,7 +142,7 @@ integer :: NumArgs,NArg,OffShell_XVV,iunwgt,CountArg,iinterf
         read(arg(8:8),*) iinterf
         CountArg = CountArg + 1
     elseif( arg(1:8) .eq."ReadLHE=" ) then
-        read(arg(9:108),"(A)") LHEProdFile
+        read(arg(9:500),"(A)") LHEProdFile
         ReadLHEFile=.true.
         CountArg = CountArg + 1
     elseif( arg(1:9) .eq."ReadCSmax" ) then
@@ -1474,7 +1474,7 @@ SUBROUTINE WriteParameters(TheUnit)
 use ModParameters
 implicit none
 integer :: TheUnit
-character :: arg*(200)
+character :: arg*(500)
 
     call Get_Command(arg)
     write(TheUnit,"(3X,A)") ""
