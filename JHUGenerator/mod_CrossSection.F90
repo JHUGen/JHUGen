@@ -2742,7 +2742,7 @@ include 'csmaxvalue.f'
        endif
 
   elseif((OffShellV1.eqv..false.).and.(OffShellV2.eqv..true.)) then
-        MZ1 = M_V
+        MZ1 = getMass(MY_IDUP(4))
         if(M_Reso.gt.2d0*M_V) then
             EZ_max = EHat - MZ1*0.99
             dr = datan((EZ_max**2-M_V**2)/(Ga_V*M_V)) + datan(M_V/Ga_V)
@@ -2754,7 +2754,7 @@ include 'csmaxvalue.f'
         endif
 
   elseif((OffShellV1.eqv..true.).and.(OffShellV2.eqv..false.)) then
-        MZ2 = M_V
+        MZ2 = getMass(MY_IDUP(5))
         if(M_Reso.gt.2d0*M_V) then
             EZ_max = EHat - MZ2*0.99
             dr = datan((EZ_max**2-M_V**2)/(Ga_V*M_V)) + datan(M_V/Ga_V)
@@ -2766,8 +2766,8 @@ include 'csmaxvalue.f'
         endif
 
   elseif((OffShellV1.eqv..false.).and.(OffShellV2.eqv..false.)) then
-        MZ1 = M_V
-        MZ2 = M_V
+        MZ1 = getMass(MY_IDUP(4))
+        MZ2 = getMass(MY_IDUP(5))
   endif
 
 
@@ -2781,7 +2781,7 @@ include 'csmaxvalue.f'
 
 
    call EvalPhaseSpace_2to2(EHat,(/MZ1,MZ2/),yRnd(3:4),MomExt(1:4,1:4),PSWgt)
-   if( .not.IsAPhoton(DecayMode1) ) then ! don't decay the photon
+   if( .not.IsAPhoton(DecayMode1) .and. .not.IsAPhoton(DecayMode2) ) then ! don't decay the photon
       ML1 = getMass(MY_IDUP(7))
       ML2 = getMass(MY_IDUP(6))
       ML3 = getMass(MY_IDUP(9))
@@ -2799,10 +2799,22 @@ include 'csmaxvalue.f'
           if( yrnd(16).gt.0.5d0 ) call swapmom( MomDK(1:4,1),MomDK(1:4,3) )
 !           PSWgt = PSWgt * 2d0
       endif
-    else
+    elseif( IsAPhoton(DecayMode1) .and. IsAPhoton(DecayMode2) ) then
         ML1=0d0; ML2=0d0; ML3=0d0; ML4=0d0
         MomDK(1:4,1) = MomExt(1:4,3)
         MomDK(1:4,2) = 0d0
+        MomDK(1:4,3) = MomExt(1:4,4)
+        MomDK(1:4,4) = 0d0
+    elseif( .not.IsAPhoton(DecayMode1) .and. IsAPhoton(DecayMode2) ) then
+        ML1 = getMass(MY_IDUP(7))
+        ML2 = getMass(MY_IDUP(6))
+        ML3=0d0; ML4=0d0
+        if( (MZ1.lt.ML1+ML2) ) then
+            EvalUnWeighted_withoutProduction = 0d0
+            return
+        endif
+        call EvalPhasespace_VDecay(MomExt(1:4,3),MZ1,ML1,ML2,yRnd(5:6),MomDK(1:4,1:2),PSWgt2)
+        PSWgt = PSWgt * PSWgt2
         MomDK(1:4,3) = MomExt(1:4,4)
         MomDK(1:4,4) = 0d0
    endif
@@ -2892,7 +2904,7 @@ ELSE! NOT GENEVT
          endif
       endif
 
-      PreFac = 2d0 * fbGeV2 * sHatJacobi * PSWgt * SymmFac
+     PreFac = 2d0 * fbGeV2 * sHatJacobi * PSWgt * SymmFac
 !       if( abs(MY_IDUP(6)).ge.1 .and. abs(MY_IDUP(6)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
 !       if( abs(MY_IDUP(8)).ge.1 .and. abs(MY_IDUP(8)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
       EvalUnWeighted_withoutProduction = LO_Res_Unpol * PreFac
