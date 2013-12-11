@@ -103,6 +103,7 @@ The list of command line configurables and the default values are (also defined 
                    after generating VBF, H+JJ, or VH production with the JHU generator), 
                    default value: Ò.false." 
    - InputLHEFormat="x"   (LHE format is different for 1=POWHEG, 2=JHUGen), default value: 1 
+   - writeWeightedLHE="x" (produces an LHE file when running in weighted mode, can be large), default value: ".false."
 \end{verbatim}   
    
 \noindent
@@ -239,7 +240,7 @@ real(8), public, parameter :: Rjet = 0.5d0                  ! jet deltaR, antikt
 \subsubsection{ Spin-0 parameters }
 
 \noindent
-{\it N.B.  The parameters "ptjetcut" and "Rjet" only apply to Process=60,61 when using the "writeWeightedLHE=.true.".}
+{\it N.B.  The parameters "ptjetcut" and "Rjet" only apply to Process=60,61.}
 
 \noindent
 The \verb|*hg*| parameters control the coupling of a spin-0 resonance to gluons in the production mechanism.  The \verb|*hz*| parameters control the decay.  In practice, the production parameters are not having a large effect since angular corrections from the production mechanism are lost for spinless particles.  
