@@ -77,7 +77,6 @@ c
 !          include 'gridinfo.f'
          include 'maxwt.f'
          parameter(mprod=50*mxdim)
-         COMMON/ranno/idum
          dimension d(50,mxdim),di(50,mxdim),xin(50),r(50),
      1   dx(mxdim),dt(mxdim),x(mxdim),kg(mxdim),ia(mxdim)
          data ndmx/50/,alph/1.5d0/,one/1d0/,mds/1/
