@@ -1,0 +1,4 @@
+AuthUserFile /home/www/htdocs/spin/Generator/.htpasswd
+AuthType Basic
+AuthName "Registration required, please send email to ntran@fnal.gov"
+Require valid-user

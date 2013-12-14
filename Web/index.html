@@ -1,0 +1,126 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <meta content="text/html; charset=ISO-8859-1"
+      http-equiv="Content-Type">
+    <title>JHU Generator</title>
+  </head>
+  <body style=" color: rgb(0, 0, 0); background-color: rgb(255, 255,
+    255);" alink="#EE0000" link="#0000EE" vlink="#551A8B">
+    <table style="background-color: rgb(255, 255, 255); font-family:
+      Lucida Grande;" border="0" width="100%">
+      <tbody>
+        <tr>
+          <td> <a href="index.html"> <img alt=""
+                src="droppedImage.png" style="border: 0px solid; border:
+                0px solid; height: 256px; width: 367px;"> </a> </td>
+          <td>
+            <div align="right"> <font size="4"><span style="color:
+                  rgb(51, 51, 255);"> MC Generator based on the papers:</span><br>
+                &nbsp;</font><br>
+              <font size="+1">"Spin-Determination of Single-Produced
+                Resonances at Hadron Colliders"&nbsp;&nbsp; </font><br>
+              <font size="-1">Yanyan Gao, Andrei V. Gritsan, Zijin Guo,
+                Kirill Melnikov, Markus Schulze and Nhan V.
+                Tran&nbsp;&nbsp;&nbsp; </font><br>
+              <font style="font-family: Lucida Sans Unicode;" size="-1"><a
+                  href="http://arxiv.org/abs/1001.3396">http://arxiv.org/abs/1001.3396</a>&nbsp;&nbsp;&nbsp;
+
+              </font><br>
+              <br>
+              <font size="+1">"On the Spin and Parity of a
+                Single-Produced Resonance at the LHC"&nbsp;&nbsp; </font><br>
+              <font style="font-family: Lucida Sans Unicode;" size="-1">Sara
+                Bolognesi, Yanyan Gao, Andrei V. Gritsan, Kirill
+                Melnikov, Markus Schulze, Nhan V. Tran and Andrew
+                Whitbeck&nbsp;&nbsp;&nbsp; </font><br>
+              <font style="font-family: Lucida Sans Unicode;" size="-1"><a
+                  href="http://arxiv.org/abs/1208.4018">http://arxiv.org/abs/1208.4018&nbsp;</a>&nbsp;&nbsp;
+              </font><br>
+               <br>
+                <font size="+1">"Constraining anomalous HVV interactions at proton and lepton colliders"&nbsp;&nbsp; </font><br>
+                <font style="font-family: Lucida Sans Unicode;" size="-1">Ian Anderson, Sara Bolognesi, Fabrizio Caola, Yanyan Gao, Andrei V. Gritsan, Christopher B. Martin,&nbsp;&nbsp;&nbsp; <br> Kirill Melnikov, Markus Schulze, Nhan V. Tran, Andrew Whitbeck, Yaofu Zhou&nbsp;&nbsp;&nbsp; </font><br>
+                <font style="font-family: Lucida Sans Unicode;" size="-1"><a
+                    href="http://arxiv.org/abs/1309.4819">http://arxiv.org/abs/1309.4819&nbsp;</a>&nbsp;&nbsp;
+                </font><br>
+              <br>
+              <font size="-1">contacts: Markus Schulze, Nhan Tran (<a
+                  href="mailto:ntran@fnal.gov,schulze@pha.jhu.edu">email us</a>)</font><br>            
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <center style="font-family: Lucida Grande; background-color:
+      rgb(255, 204, 204);">
+      <hr> <a href="index.html">Home</a> <a
+        href="Generator/Download.html">Download (requires registration)</a>
+      <a href="manJHUGenerator.v4.3.2.pdf">Manual</a><br>
+      <hr> </center>
+      <font style="font-family: Lucida Grande;" size="-1"><br>
+              <span style="text-decoration: underline;">References:</span><br>
+              Please reference the above papers and refer to "JHU generator" when using the simulation
+              program and "MELA" when using the matrix element likelihood analysis technique. The latter 
+          was also introduced in [<a href="http://www.sciencedirect.com/science/article/pii/S0370269312008581">1</a>,&nbsp;<a href="http://prl.aps.org/abstract/PRL/v110/i8/e081803">2</a>]. The matrix element package (MELA) also depends on MCFM 
+              libraries for background parameterization which should be referenced [<a href="http://mcfm.fnal.gov">3</a>] when used. <br>
+          </font><br>
+          </font>
+          <hr><br>      
+    <font style="font-family:Lucida Grande;" size="+1"><font
+        style="color: rgb(51, 51, 255);" size="+1">Generator for pp &#8594; X &#8594; VV, VBF, X+JJ, pp &#8594; VX, ee &#8594; VX 
+        <br>
+    </font><font style="font-family: Lucida Grande;" size="-1">
+        <font style="font-family: Lucida Grande;" size="-1"><br>
+        <span style="text-decoration: underline;">Description:</span><br>
+        A generator giving parton-level information including full spin and polarization correlations for the processes ab &#8594; X &#8594; VV (V=Z,W,gamma), VBF, X+JJ, pp &#8594; VX, ee &#8594; VX. The Fortran program produces a single-produced X resonance via either the gluon fusion, qqbar, VBF, or VH processes for either the Tevatron, the LHC, or an e+e- collider. The resonance X can be a spin-zero, -one, or -two particle with general couplings defined in the study. The output is in the LHE format and can be input to any parton showering program. Please see the manual file for further technical details.
+        <br>
+        <br>
+        <span style="text-decoration: underline;">Requirements:</span> <br>
+        ifort (Intel Fortran compiler) or gfortran (part of gcc) <br>
+        <br>
+        <span style="text-decoration: underline;">Download: </span><br>
+        To <a href="Generator/Download.html">download</a> with the
+        latest version please register so that we may update you with
+        changes and updates to the code. <br>
+      </font><br>
+    </font>
+    <hr><br>
+    <font style="font-family: Lucida Grande;" size="+1"><font
+        style="color: rgb(51, 51, 255);" size="+1">Code for a general
+        spin-J resonance angular distribution in pp &#8594; X
+        &#8594; VV</font><font
+        style="font-family: Lucida Grande;" size="-1"><br>
+        <br>
+      </font></font><font style="font-family:Lucida Grande;" size="+1"><font
+        style="font-family: Lucida Grande;" size="-1"><span
+          style="text-decoration: underline;">Description:</span></font></font><br>
+    <font style="font-family: Lucida Grande;" size="+1"><font
+        style="font-family: Lucida Grande;" size="-1"> Mathematica code
+        which gives the full 5D angular distribution for a general
+        spin-J resonance given the input J.<br>
+        <br>
+      </font></font><font style="font-family:Lucida Grande;" size="+1"><font
+        style="font-family: Lucida Grande;" size="-1"><span
+          style="text-decoration: underline;">Download:<br>
+        </span></font></font><font style="font-family:Lucida Grande;"
+      size="+1"><font style="font-family: Lucida Grande;" size="-1"><a
+          href="Generator/Master_spin.nb">Master_spin.nb</a><br>
+      </font><br>
+    </font> <font style="font-family:Lucida Grande;" size="+2"> </font>
+    <font style="font-family:Lucida Grande;" size="+2"> </font>
+        <hr><br>
+        <font style="font-family: Lucida Grande;" size="+1"><font
+            style="color: rgb(51, 51, 255);" size="+1">Analytic fits of partonic luminosity functions</font><font
+                style="font-family: Lucida Grande;" size="-1"><br>
+                <br>
+        <font style="font-family: Lucida Grande;" size="-1"><font
+            style="font-family: Lucida Grande;" size="-1"> 
+            Simple and fast parametric code for simulating analytic partonic luminosity for gg and qqbar(') initial states. <br>
+            <a href="analyticPartonLuminosities.C"> Download C code </a> <br>
+            <br>
+          <td> <a href="anaPDFs.png"> <img alt=""
+                src="anaPDFs.png" style="border: 0px solid; border:
+                0px solid; width: 300px;"> </a> </td>
+          <td>            
+  </body>
+</html>
