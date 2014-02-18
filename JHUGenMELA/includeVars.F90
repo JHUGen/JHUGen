@@ -1,5 +1,10 @@
 include './variables.F90'
 
+   integer, parameter :: ZZMode=00,ZgsMode=01,gsZMode=02,gsgsMode=03
+   integer, parameter :: WWMode=10
+   integer, parameter :: ggMode=20
+   integer, parameter :: ZgMode=30,gsgMode=31
+
 !-- parameters that define on-shell spin 0 coupling to SM fields, see note
    logical,  parameter :: generate_as = .false.! this cannot be changed
    complex(8),  parameter :: ahg1 = (1.0d0,0d0)! these parameters are not used
@@ -18,7 +23,14 @@ include './variables.F90'
    complex(8) :: ghz3
    complex(8) :: ghz4  ! pseudoscalar
 
+   complex(8) :: ghzgs2  
+   complex(8) :: ghzgs3  
+   complex(8) :: ghzgs4  
+   complex(8) :: ghgsgs2 
+   complex(8) :: ghgsgs3 
+   complex(8) :: ghgsgs4 
 
+   real(8),parameter :: MPhotonCutoff = 4d0*GeV
 
 
 !---parameters that define spin 1 coupling to SM fields, see note
@@ -80,6 +92,14 @@ real(8),  parameter :: aL_QDn =-2d0*sitW**2*(-1d0/3d0)-1d0
 real(8),  parameter :: bL = dsqrt(2d0)*dsqrt(1d0-sitW**2)
 real(8),  parameter :: bR = 0d0
 
+real(8), parameter :: cR_lep = -2d0*sitW*dsqrt(1d0-sitW**2)*(-1d0)
+real(8), parameter :: cL_lep = -2d0*sitW*dsqrt(1d0-sitW**2)*(-1d0)
+real(8), parameter :: cR_neu = -2d0*sitW*dsqrt(1d0-sitW**2)*(0d0)
+real(8), parameter :: cL_neu = -2d0*sitW*dsqrt(1d0-sitW**2)*(0d0)
+real(8), parameter :: cR_QUp = -2d0*sitW*dsqrt(1d0-sitW**2)*(2d0/3d0)
+real(8), parameter :: cL_QUp = -2d0*sitW*dsqrt(1d0-sitW**2)*(2d0/3d0)
+real(8), parameter :: cR_QDn = -2d0*sitW*dsqrt(1d0-sitW**2)*(-1d0/3d0)
+real(8), parameter :: cL_QDn = -2d0*sitW*dsqrt(1d0-sitW**2)*(-1d0/3d0)
 
 real(8),  parameter :: fbGeV2=0.389379d12/(100d0**2)
 real(8),  parameter :: SymmFac=1d0/2d0, SpinAvg=1d0/4d0, QuarkColAvg=1d0/3d0, GluonColAvg=1d0/8d0

@@ -80,6 +80,8 @@ contains
       double complex g_mu_nu(4,4), pp(4,4), epp(4,4)
       double complex VVX0(4,4)
       double complex PROP1, PROP2, PROP3, qq, gVVP, gVVS1, gVVS2, gFFZ, gFFW
+      double complex ghz1_dyn,ghz2_dyn,ghz3_dyn,ghz4_dyn
+      double precision q3_q3,q4_q4
 
 
 
@@ -172,7 +174,7 @@ contains
           else
             current2=(0.5d0*T3lL - QlL*sitW**2) *Vcurrent2 -(0.5d0*T3lL)*Acurrent2
           endif
-          current2=current2*gFFZ
+          current2=current2*gFFZ*dsqrt(scale_alpha_Z_ll)
 !u u~ Z vertex for final state
         else if((abs(id(4)).eq.2).or.(abs(id(4)).eq.4))then
           if((id(4)*helicity(4)).gt.0d0)then
@@ -180,7 +182,7 @@ contains
           else
             current2=(0.5d0*T3uL - QuL*sitW**2) *Vcurrent2 -(0.5d0*T3uL)*Acurrent2
           endif
-          current2=current2*gFFZ
+          current2=current2*gFFZ*dsqrt(scale_alpha_Z_uu)
 
 !d d~ Z vertex for final state
         else if((abs(id(4)).eq.1).or.(abs(id(4)).eq.3).or.(abs(id(4)).eq.5))then
@@ -189,12 +191,12 @@ contains
           else
             current2=(0.5d0*T3dL - QdL*sitW**2) *Vcurrent2 -(0.5d0*T3dL)*Acurrent2
           endif
-          current2=current2*gFFZ
+          current2=current2*gFFZ*dsqrt(scale_alpha_Z_dd)
 
 !nu nu~ Z vertex for final state        
         else if((abs(id(4)).eq.12).or.(abs(id(4)).eq.14).or.(abs(id(4)).eq.16))then
           current2=(0.5d0*T3nL - QnL*sitW**2) *Vcurrent2 -(0.5d0*T3nL)*Acurrent2
-          current2=current2*gFFZ
+          current2=current2*gFFZ*dsqrt(scale_alpha_Z_nn)
 
         else
         current2=0d0
@@ -210,11 +212,32 @@ contains
    
 
 !ZZX vertex
-      gVVS1 = ghz1*(mass(1,1)**2) + qq * ( 2d0*ghz2 + ghz3*qq/(Lambda*1d2) )
+      q3_q3 = four_momentum(1,1)*four_momentum(1,1) -four_momentum(1,2)*four_momentum(1,2) -four_momentum(1,3)*four_momentum(1,3) -four_momentum(1,4)*four_momentum(1,4)
+      q4_q4 = four_momentum(2,1)*four_momentum(2,1) -four_momentum(2,2)*four_momentum(2,2) -four_momentum(2,3)*four_momentum(2,3) -four_momentum(2,4)*four_momentum(2,4)
+      ghz1_dyn = ghz1   +   ghz1_prime * Lambda_z1**4/( Lambda_z1**2 + abs(q3_q3) )/( Lambda_z1**2 + abs(q4_q4))  &
+                        +   ghz1_prime2* ( abs(q3_q3)+abs(q4_q4) )/Lambda_z1**2                                   &
+                        +   ghz1_prime3* ( abs(q3_q3)+abs(q4_q4) )**2/Lambda_z1**4                                &
+                        +   ghz1_prime4* ( abs(q3_q3)*abs(q4_q4) )/Lambda_z1**4                                   &
+                        +   ghz1_prime5* ( abs(q3_q3)-abs(q4_q4) )/Lambda_z1**2
+      ghz2_dyn = ghz2   +   ghz2_prime * Lambda_z2**4/( Lambda_z2**2 + abs(q3_q3) )/( Lambda_z2**2 + abs(q4_q4))  &
+                        +   ghz2_prime2* ( abs(q3_q3)+abs(q4_q4) )/Lambda_z2**2                                   &
+                        +   ghz2_prime3* ( abs(q3_q3)+abs(q4_q4) )**2/Lambda_z2**4                                &
+                        +   ghz2_prime4* ( abs(q3_q3)*abs(q4_q4) )/Lambda_z2**4                                   & 
+                        +   ghz2_prime5* ( abs(q3_q3)-abs(q4_q4) )/Lambda_z2**2
+      ghz3_dyn = ghz3   +   ghz3_prime * Lambda_z3**4/( Lambda_z3**2 + abs(q3_q3) )/( Lambda_z3**2 + abs(q4_q4))  &
+                        +   ghz3_prime2* ( abs(q3_q3)+abs(q4_q4) )/Lambda_z3**2                                   &
+                        +   ghz3_prime3* ( abs(q3_q3)+abs(q4_q4) )**2/Lambda_z3**4                                &
+                        +   ghz3_prime4* ( abs(q3_q3)*abs(q4_q4) )/Lambda_z3**4                                   &
+                        +   ghz3_prime5* ( abs(q3_q3)-abs(q4_q4) )/Lambda_z3**2
+      ghz4_dyn = ghz4   +   ghz4_prime * Lambda_z4**4/( Lambda_z4**2 + abs(q3_q3) )/( Lambda_z4**2 + abs(q4_q4))  &
+                        +   ghz4_prime2* ( abs(q3_q3)+abs(q4_q4) )/Lambda_z4**2                                   &
+                        +   ghz4_prime3* ( abs(q3_q3)+abs(q4_q4) )**2/Lambda_z4**4                                &
+                        +   ghz4_prime4* ( abs(q3_q3)*abs(q4_q4) )/Lambda_z4**4                                   &
+                        +   ghz4_prime5* ( abs(q3_q3)-abs(q4_q4) )/Lambda_z4**2
 
-      gVVS2 = -( 2d0*ghz2 + ghz3*qq/(Lambda*1d2) )
-
-      gVVP = -2d0*ghz4
+      gVVS1 = ghz1_dyn*(mass(1,1)**2) + qq * ( 2d0*ghz2_dyn + ghz3_dyn*qq/(Lambda*1d2) )
+      gVVS2 = -( 2d0*ghz2_dyn + ghz3_dyn*qq/(Lambda*1d2) )
+      gVVP = -2d0*ghz4_dyn
 
       VVX0 = 0d0
       if(gVVS1.ne.0d0)then

@@ -1,60 +1,51 @@
 #========================================================
-# Instruction for using the JHUGenME
-# NOTE the following instructions works out of the 
-# box for lxplus-sl5 machines
+# Instruction for using the JHUGenMELA/ggZZ_MCFM
+# NOTE the instructions need lxplus at cern
+# contact Yanyan Gao (Yanyan.Gao@cern.ch)
 #========================================================
 
-1. Check out the code
+1. set up the enviorment in JHUGenMELA/ggZZ_MCFM/
 
-wget http://yygao.web.cern.ch/yygao/JHUGenME.tar.gz
-tar -xf JHUGenME.tar.gz
+* choose sl5 or sl6 by doing one of the following
+
+source setup_matrixelement_sl5.sh # for sl5 machines
+source setup_matrixelement_sl6.sh # for sl6 machines
+
+2. Make the MCFM library outside of the JHUGenMELA/ggZZ_MCFM
+
+   1) Download MCFM 
+   
+   cd ../
+   wget http://mcfm.fnal.gov/mcfm-6.7.tar.gz
+   tar -xf MCFM-6.7.tar.gz
+   cd MCFM/
+
+   2) Modify makefile: replace the gfortran code tags to output library
+
+    FFLAGS 	= -fno-automatic -fno-f2c -O0 -fPIC -g -I$(INCPATH) -I$(TENSORREDDIR)/Include -Iobj
+    F90FLAGS = -fno-automatic -fno-f2c -O2 -fPIC -g -I$(INCPATH) -Iobj -Jobj
+
+   3) Modify the makefile in QCDLoop/ql and QCDLoop/ff, adding the -fPIC in FFLAGS
+
+      FFLAGS  = -g -fPIC
+
+   4) compile the package and export the libarry
+   
+    ./Install
+    make
+    cd obj/
+    g++ -Wl,-soname,libmcfm_6p7.so -shared -o libmcfm_6p7.so *.o ../QCDLoop/ql/ql*.o ../QCDLoop/ql/a*.o ../QCDLoop/ff/*.o  
+
+   5) copy library libmcfm_6p7.so to the JHUGenMELA/ggZZ_MCFM/ area
 
 
-2. set up the enviorment  to compile the code 
-
-cd JHUGenME/
-source setup_matrixelement.sh
-
-3. compile code
+3. go back to JHUGenMELA/ggZZ_MCFM/ and compile the MELA code
 
 make clean   # absolutely needed
 make
 
-Instructions on getting a MCFM library is at the end of this file. 
+4. run test script based on one event
 
-4. run code
+root -l -b -q testME.C+
 
-root -l -b -q testME.C+ >& output_test.txt  &
-
-You should see the output_text.txt the same as in output_ref.txt 
-
-#========================================================
-#Instruction on compiling the MCFM library for MCFM 6.6
-#========================================================
-
-1. Download MCFM and prepare the install makefile
-
-wget http://mcfm.fnal.gov/mcfm-6.6.tar.gz
-tar -xf MCFM-6.6.tar.gz
-cd MCFM-6.6/
-./Install
-
-2. Add the fortran code that calcualtes the sum of HZZ and ggZZ amplitudes include interference
-
- cp ../JHUGenME/gg_ZZ_int.f  src/HZZ/
-
-3. Modify makefile 
-
-1) Add the extra library needed in the HZZFILES 
-gg_ZZ_int.o \
-
-2) Modfiy the fortran code tags to output library
- 
-FFLAGS 	= -fno-automatic -fno-f2c -O0 -fPIC -g -I$(INCPATH) -I$(TENSORREDDIR)/Include -Iobj
-F90FLAGS = -fno-automatic -fno-f2c -O2 -fPIC -g -I$(INCPATH) -Iobj -Jobj
-
-4. compile the package and export the libarry
-
-make
-cd obj
-g++ -Wl,-soname,libmcfm_6p6.so -shared -o libmcfm_6p6.so *.o  
+* The output is in "output.txt", which should be identical to the reference "output_ref.txt"

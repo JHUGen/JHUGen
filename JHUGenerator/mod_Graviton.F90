@@ -506,9 +506,9 @@ enddo
 !           yyy2 = -b1/two + b3*rr*(1d0-M_V**2/q34) + two*b4*rr+b7*rr*M_V**2/q34
           yyy2 = -b1/two + b3*rr*(1d0-(MZ3**2+MZ4**2)/(2d0*q34)) + two*b4*rr+b7*rr*M_V**2/q34
           yyy3 = (-b2/two - b3- two*b4)*rr/q34
-!           yyy4 = -b1 - b2*rr -(b2+b3+b6)*rr*M_V**2/q34
-          yyy41 = -b1 - b2*(q34+MZ3**2)/Lambda**2 - b3*MZ4**2/Lambda**2 - b6*M_V**2/Lambda**2
-          yyy42 = -b1 - b2*(q34+MZ4**2)/Lambda**2 - b3*MZ3**2/Lambda**2 - b6*M_V**2/Lambda**2
+!           yyy4 = -b1 - b2*rr -(b2+b3+2d0*b6)*rr*M_V**2/q34
+          yyy41 = -b1 - b2*(q34+MZ3**2)/Lambda**2 - b3*MZ4**2/Lambda**2 - 2d0*b6*M_V**2/Lambda**2
+          yyy42 = -b1 - b2*(q34+MZ4**2)/Lambda**2 - b3*MZ3**2/Lambda**2 - 2d0*b6*M_V**2/Lambda**2
           yyy5 = two*b8*rr*MG**2/q34
 !           yyy6 = b9
           yyy6 = b9 * M_V**2/Lambda**2
@@ -706,9 +706,9 @@ enddo
 !           yyy2 = -b1/two + b3*rr*(one-M_V**2/q34) + two*b4*rr + b7*rr*M_V**2/q34
           yyy2 = -b1/two + b3*rr*(1d0-(MZ3**2+MZ4**2)/(2d0*q34)) + two*b4*rr+b7*rr*M_V**2/q34
           yyy3 = (-b2/two - b3- two*b4)*rr/q34
-!           yyy4 = -b1 - b2*rr -(b2+b3+b6)*rr*M_V**2/q34
-          yyy41 = -b1 - b2*(q34+MZ3**2)/Lambda**2 - b3*MZ4**2/Lambda**2 - b6*M_V**2/Lambda**2
-          yyy42 = -b1 - b2*(q34+MZ4**2)/Lambda**2 - b3*MZ3**2/Lambda**2 - b6*M_V**2/Lambda**2
+!           yyy4 = -b1 - b2*rr -(b2+b3+2d0*b6)*rr*M_V**2/q34
+          yyy41 = -b1 - b2*(q34+MZ3**2)/Lambda**2 - b3*MZ4**2/Lambda**2 - 2d0*b6*M_V**2/Lambda**2
+          yyy42 = -b1 - b2*(q34+MZ4**2)/Lambda**2 - b3*MZ3**2/Lambda**2 - 2d0*b6*M_V**2/Lambda**2
           yyy5 = two*b8*rr*MG**2/q34
 !           yyy6 = b9
           yyy6 = b9 * M_V**2/Lambda**2

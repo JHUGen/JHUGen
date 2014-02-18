@@ -20,28 +20,38 @@ real(8), parameter :: sitW = dsqrt(0.23119d0)       ! sin(Theta_Weinberg) (PDG-2
 integer, parameter :: DecayMode1=0
 integer, parameter :: DecayMode2=0
 logical, parameter :: includeInterference=.false.
-logical, parameter :: OffShellReson=.true.
+logical, parameter :: OffShellReson=.false.
+logical, parameter :: includeGammaStar = .false. 
+
 
 !-- momentum-dependent form factors
+complex(8) :: ghg2_dyn
+complex(8) :: ghg3_dyn
+complex(8) :: ghg4_dyn
+
 complex(8) :: ghz1_prime 
 complex(8) :: ghz1_prime2
 complex(8) :: ghz1_prime3
 complex(8) :: ghz1_prime4
+complex(8) :: ghz1_prime5
 
 complex(8) :: ghz2_prime 
 complex(8) :: ghz2_prime2
 complex(8) :: ghz2_prime3
 complex(8) :: ghz2_prime4
+complex(8) :: ghz2_prime5
 
 complex(8) :: ghz3_prime 
 complex(8) :: ghz3_prime2
 complex(8) :: ghz3_prime3
 complex(8) :: ghz3_prime4
+complex(8) :: ghz3_prime5
 
 complex(8) :: ghz4_prime 
 complex(8) :: ghz4_prime2
 complex(8) :: ghz4_prime3
 complex(8) :: ghz4_prime4
+complex(8) :: ghz4_prime5
 
 real(8), parameter :: lambda_z1 = 10000d0 * GeV
 real(8), parameter :: lambda_z2 = 10000d0 * GeV

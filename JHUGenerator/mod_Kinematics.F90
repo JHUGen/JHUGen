@@ -467,6 +467,11 @@ write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(
 write(io_LHEOutFile,"(A)") "</event>"
 
 
+! if( dabs(MomDummy(2,1)+MomDummy(2,2)+MomDummy(2,3)+MomDummy(2,4)+MomDummy(2,5)).gt. 1d-10 ) then
+!     print *, "checker",MomDummy(2,1)+MomDummy(2,2)+MomDummy(2,3)+MomDummy(2,4)+MomDummy(2,5)
+!     pause
+! endif
+
 
 END SUBROUTINE
 
@@ -486,7 +491,10 @@ real(8) :: Spin
 integer :: i
 integer :: NUP,IDPRUP
 real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP
-character(len=*),parameter :: fmt1 = "(i9,5i5,5e19.11,f3.0,f4.0)"
+! character(len=*),parameter :: fmt1 = "(i9,5i5,5e19.11,f3.0,f4.0)"
+character(len=*),parameter :: fmt1 = "(I3,X,I2,X,I2,X,I2,X,I3,X,I3,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7)"
+
+
 
 IDPRUP=100
 SCALUP=Mu_Fact * 100d0
@@ -547,7 +555,11 @@ enddo
 
 write(io_LHEOutFile,fmt1) id(2), 2,1,2,0,0,four_momentum(2,2:4), four_momentum(2,1), inv_mass(2), 0.0d0, spin
 
-write(io_LHEOutFile,fmt1) id(3), 2,1,2,0,0,four_momentum(3,2:4), four_momentum(3,1), inv_mass(3), 0.0d0, spin
+if(H_DK.eqv..true.)then    ! QUESTION MARKUS TO YAOFU: Why are these lines uncommented??
+  write(io_LHEOutFile,fmt1) id(3), 2,1,2,0,0,four_momentum(3,2:4), four_momentum(3,1), inv_mass(3), 0.0d0, spin
+else
+  write(io_LHEOutFile,fmt1) id(3), 1,1,2,0,0,four_momentum(3,2:4), four_momentum(3,1), inv_mass(3), 0.0d0, spin
+endif
 
 write(io_LHEOutFile,fmt1) id(4), 1,3,3,ICOLUP(3,1),ICOLUP(3,2),four_momentum(4,2:4), four_momentum(4,1), inv_mass(4), 0.0d0, spin
 
@@ -816,14 +828,14 @@ SUBROUTINE Kinematics(NumPart,MomExt,MomDK,applyPSCut,NBin)
 use ModMisc
 use ModParameters
 implicit none
-real(8) :: MomExt(:,:),MomDK(:,:), mZ1, mZ2, MReso
+real(8) :: MomExt(:,:),MomDK(:,:), mZ1, mZ2, MReso, ml12,ml34,ml14,ml32
 real(8) :: MomLepP(1:4),MomLepM(1:4),MomBoost(1:4),BeamAxis(1:4),ScatteringAxis(1:4),dummy(1:4)
 real(8) :: MomLept(1:4,1:4),MomLeptX(1:4,1:4),MomLeptPlane1(2:4),MomLeptPlane2(2:4),MomBeamScatterPlane(2:4)
 logical :: applyPSCut
 integer :: NumPart,NBin(:)
 real(8) :: pT_lepM,pT_lepP,y_lepM,y_lepP,MomFerm(1:4),MomZ2(1:4),MomReso(1:4),CosTheta1,Phi,Phi1,signPhi,signPhi1
 real(8) :: CosPhi_LepPZ,InvM_Lep,CosPhi_LepPlanes,CosThetaZ,CosThetaStar
-
+real(8),parameter :: Rsep_ll=0.2d0
 
 !  W^+/Z(MomExt(:,3))    -->    e^+(MomDK(:,2)) + nu_e(MomDK(:,1))       /   e^+(MomDK(:,2)) + e^-(MomDK(:,1))
 !  W^-/Z(MomExt(:,4))    -->    e^-(MomDK(:,3)) + nubar_e(MomDK(:,4))    /   e^-(MomDK(:,3)) + e^+(MomDK(:,4))
@@ -866,6 +878,10 @@ real(8) :: CosPhi_LepPZ,InvM_Lep,CosPhi_LepPlanes,CosThetaZ,CosThetaStar
       mZ1 = sqrt(abs( 2d0*(MomLept(1:4,1).dot.MomLept(1:4,2))  ))
       mZ2 = sqrt(abs( 2d0*(MomLept(1:4,3).dot.MomLept(1:4,4))  ))
 
+      ml12 = mZ1
+      ml34 = mZ2
+      ml14 = sqrt(abs( 2d0*(MomLept(1:4,1).dot.MomLept(1:4,4))  ))
+      ml32 = sqrt(abs( 2d0*(MomLept(1:4,3).dot.MomLept(1:4,2))  ))
 
 
 !   compute pT of leptons in the lab frame
@@ -877,7 +893,32 @@ real(8) :: CosPhi_LepPZ,InvM_Lep,CosPhi_LepPlanes,CosThetaZ,CosThetaStar
 
 
 
-
+!       if( includeGammaStar ) then ! cut out collinear singularity when intermediate photons are present
+!           if( get_R(MomLept(1:4,1),MomLept(1:4,2)).lt.Rsep_ll ) then
+!               applyPSCut = .true.
+!               return
+!           endif
+!           if( get_R(MomLept(1:4,1),MomLept(1:4,3)).lt.Rsep_ll ) then
+!               applyPSCut = .true.
+!               return
+!           endif
+!           if( get_R(MomLept(1:4,1),MomLept(1:4,4)).lt.Rsep_ll ) then
+!               applyPSCut = .true.
+!               return
+!           endif
+!           if( get_R(MomLept(1:4,2),MomLept(1:4,3)).lt.Rsep_ll ) then
+!               applyPSCut = .true.
+!               return
+!           endif
+!           if( get_R(MomLept(1:4,2),MomLept(1:4,4)).lt.Rsep_ll ) then
+!               applyPSCut = .true.
+!               return
+!           endif
+!           if( get_R(MomLept(1:4,3),MomLept(1:4,4)).lt.Rsep_ll ) then
+!               applyPSCut = .true.
+!               return
+!           endif
+!       endif
 
 
 ! construct cos(theta1): angle between direction of fermion from Z1 and negative direction of opposite Z in Z1 rest frame
@@ -999,12 +1040,13 @@ else
       NBin(9)  = WhichBin(9,mZ1)
       NBin(10) = WhichBin(10,mZ2)
 endif
-!       NBin(9)  = WhichBin(9,mZ2)   ! for PS output
-!       NBin(10) = WhichBin(10,mZ1)
       NBin(11) = WhichBin(11,mReso)
+      NBin(12) = WhichBin(12,ml12)
+      NBin(13) = WhichBin(13,ml34)
+      NBin(14) = WhichBin(14,ml14)
+      NBin(15) = WhichBin(15,ml32)
 
-
-      NBin(12:18) = 1!  this is for the l+/l- total cross sections
+      NBin(16:18) = 1!  this is for the l+/l- total cross sections
 
 RETURN
 END SUBROUTINE
@@ -1402,35 +1444,79 @@ implicit none
 real(8) :: xRnd
 integer :: ZAnyBranching
 real(8),parameter :: Ncol=3d0
-real(8),parameter :: xxxx=1d0/21d0
-real(8),parameter :: yyyy=Ncol*xxxx
+real(8),parameter :: xx=1d0/21d0
+real(8),parameter :: yy=Ncol*xx
 
-  if( xRnd .le. yyyy ) then
+
+  if( xRnd .le. yy ) then
       ZAnyBranching = Up_
-  elseif(xRnd .le. yyyy+yyyy) then
+  elseif(xRnd .le. 2*yy ) then
       ZAnyBranching = Chm_
-  elseif(xRnd .le. yyyy+yyyy+yyyy) then
+  elseif(xRnd .le. 2*yy+yy ) then
       ZAnyBranching = Dn_
-  elseif(xRnd .le. yyyy+yyyy+yyyy+yyyy) then
+  elseif(xRnd .le. 2*yy+2*yy ) then
       ZAnyBranching = Str_
-  elseif(xRnd .le. yyyy+yyyy+yyyy+yyyy+yyyy) then
+  elseif(xRnd .le. 2*yy+3*yy ) then
       ZAnyBranching = Bot_
-  elseif(xRnd .le. yyyy+yyyy+yyyy+yyyy+yyyy+xxxx) then
+  elseif(xRnd .le. yy*(2+3) + xx ) then
       ZAnyBranching = ElM_
-  elseif(xRnd .le. yyyy+yyyy+yyyy+yyyy+yyyy+xxxx+xxxx) then
+  elseif(xRnd .le. yy*(2+3) + xx*2 ) then
       ZAnyBranching = MuM_
-  elseif(xRnd .le. yyyy+yyyy+yyyy+yyyy+yyyy+xxxx+xxxx+xxxx) then
+  elseif(xRnd .le. yy*(2+3) + xx*3 ) then
       ZAnyBranching = TaM_
-  elseif(xRnd .le. yyyy+yyyy+yyyy+yyyy+yyyy+xxxx+xxxx+xxxx+xxxx) then
+  elseif(xRnd .le. yy*(2+3)+xx*3 + xx ) then
       ZAnyBranching = NuE_
-  elseif(xRnd .le. yyyy+yyyy+yyyy+yyyy+yyyy+xxxx+xxxx+xxxx+xxxx+xxxx) then
+  elseif(xRnd .le. yy*(2+3)+xx*3 + xx*2 ) then
       ZAnyBranching = NuM_
-  elseif(xRnd .le. yyyy+yyyy+yyyy+yyyy+yyyy+xxxx+xxxx+xxxx+xxxx+xxxx+xxxx) then
+  elseif(xRnd .le. yy*(2+3)+xx*3 + xx*3 ) then
       ZAnyBranching = NuT_
   else
       print *, "error ",xRnd
       stop
   endif
+
+
+!   if( xRnd .le. yy*scale_alpha_Z_uu ) then
+!       ZAnyBranching = Up_
+!   elseif(xRnd .le. 2*yy*scale_alpha_Z_uu ) then
+!       ZAnyBranching = Chm_
+!   elseif(xRnd .le. 2*yy*scale_alpha_Z_uu+yy*scale_alpha_Z_dd ) then
+!       ZAnyBranching = Dn_
+!   elseif(xRnd .le. 2*yy*scale_alpha_Z_uu+2*yy*scale_alpha_Z_dd ) then
+!       ZAnyBranching = Str_
+!   elseif(xRnd .le. 2*yy*scale_alpha_Z_uu+3*yy*scale_alpha_Z_dd ) then
+!       ZAnyBranching = Bot_
+!   elseif(xRnd .le. yy*(2*scale_alpha_Z_uu+3*scale_alpha_Z_dd) + xx*scale_alpha_Z_ll ) then
+!       ZAnyBranching = ElM_
+!   elseif(xRnd .le. yy*(2*scale_alpha_Z_uu+3*scale_alpha_Z_dd) + xx*2*scale_alpha_Z_ll ) then
+!       ZAnyBranching = MuM_
+!   elseif(xRnd .le. yy*(2*scale_alpha_Z_uu+3*scale_alpha_Z_dd) + xx*3*scale_alpha_Z_ll ) then
+!       ZAnyBranching = TaM_
+!   elseif(xRnd .le. yy*(2*scale_alpha_Z_uu+3*scale_alpha_Z_dd)+xx*3*scale_alpha_Z_ll + xx*scale_alpha_Z_nn ) then
+!       ZAnyBranching = NuE_
+!   elseif(xRnd .le. yy*(2*scale_alpha_Z_uu+3*scale_alpha_Z_dd)+xx*3*scale_alpha_Z_ll + xx*2*scale_alpha_Z_nn ) then
+!       ZAnyBranching = NuM_
+!   elseif(xRnd .le. yy*(2*scale_alpha_Z_uu+3*scale_alpha_Z_dd)+xx*3*scale_alpha_Z_ll + xx*3*scale_alpha_Z_nn ) then
+!       ZAnyBranching = NuT_
+!   else
+!       print *, "error ",xRnd
+!       stop
+!   endif
+
+
+! print *, "check Z->anything",yy*scale_alpha_Z_uu
+! print *, "check Z->anything",2*yy*scale_alpha_Z_uu
+! print *, "check Z->anything",2*yy*scale_alpha_Z_uu+yy*scale_alpha_Z_dd
+! print *, "check Z->anything",2*yy*scale_alpha_Z_uu+2*yy*scale_alpha_Z_dd
+! print *, "check Z->anything",2*yy*scale_alpha_Z_uu+3*yy*scale_alpha_Z_dd
+! print *, "check Z->anything",yy*(2*scale_alpha_Z_uu+3*scale_alpha_Z_dd) + xx*scale_alpha_Z_ll
+! print *, "check Z->anything",yy*(2*scale_alpha_Z_uu+3*scale_alpha_Z_dd) + xx*2*scale_alpha_Z_ll
+! print *, "check Z->anything",yy*(2*scale_alpha_Z_uu+3*scale_alpha_Z_dd) + xx*3*scale_alpha_Z_ll
+! print *, "check Z->anything",yy*(2*scale_alpha_Z_uu+3*scale_alpha_Z_dd)+xx*3*scale_alpha_Z_ll + xx*scale_alpha_Z_nn
+! print *, "check Z->anything",yy*(2*scale_alpha_Z_uu+3*scale_alpha_Z_dd)+xx*3*scale_alpha_Z_ll + xx*2*scale_alpha_Z_nn
+! print *, "check Z->anything",yy*(2*scale_alpha_Z_uu+3*scale_alpha_Z_dd)+xx*3*scale_alpha_Z_ll + xx*3*scale_alpha_Z_nn 
+! pause
+
 
 !   if( xRnd .le. Br_Z_uu ) then
 !       ZAnyBranching = Up_
@@ -1549,28 +1635,26 @@ use ModParameters
 implicit none
 real(8) :: xRnd
 integer :: WAnyBranching
+real(8),parameter :: Ncol=3d0
+real(8),parameter :: xx=1d0/9d0
+real(8),parameter :: yy=Ncol*xx
 
-  if( xRnd .le. Br_W_ud ) then
+
+  if( xRnd .le. yy ) then
       WAnyBranching = Up_
-  elseif(xRnd .le. Br_W_ud+Br_W_cs ) then
+  elseif(xRnd .le. 2*yy ) then
       WAnyBranching = Chm_
-  elseif(xRnd .le. Br_W_ud+Br_W_cs+Br_W_en ) then
+  elseif(xRnd .le. 2*yy+xx ) then
       WAnyBranching = ElM_
-  elseif(xRnd .le. Br_W_ud+Br_W_cs+Br_W_en+Br_W_mn ) then
+  elseif(xRnd .le. 2*yy+2*xx ) then
       WAnyBranching = MuM_
-  elseif(xRnd .le. Br_W_ud+Br_W_cs+Br_W_en+Br_W_mn+Br_W_tn ) then
+  elseif(xRnd .le. 2*yy+3*xx ) then
       WAnyBranching = TaM_
   else
       print *, "error ",xRnd
       stop
   endif
 
-
-! print *, "checker 9",Br_W_ud
-! print *, "checker 9",Br_W_ud+Br_W_cs
-! print *, "checker 9",Br_W_ud+Br_W_cs+Br_W_en
-! print *, "checker 9",Br_W_ud+Br_W_cs+Br_W_en+Br_W_mn
-! print *, "checker 9",Br_W_ud+Br_W_cs+Br_W_en+Br_W_mn+Br_W_tn
 
 RETURN
 END FUNCTION
@@ -1768,6 +1852,48 @@ END SUBROUTINE
 
 
 
+
+SUBROUTINE BranchingCounter(MY_IDUP)
+use ModParameters
+implicit none
+integer :: MY_IDUP(6:9)
+
+
+    if( IsAZDecay(DecayMode1) ) then
+        if(  all(MY_IDUP(6:7)-(/ElP_,ElM_/).eq.0) &
+        .or. all(MY_IDUP(6:7)-(/MuP_,MuM_/).eq.0) &
+        .or. all(MY_IDUP(6:7)-(/TaP_,TaM_/).eq.0) &
+          )  Br_Z_ll_counter=Br_Z_ll_counter+1 
+
+        if(  all(MY_IDUP(6:7)-(/ANuE_,NuE_/).eq.0) &
+        .or. all(MY_IDUP(6:7)-(/ANuM_,NuM_/).eq.0) &
+        .or. all(MY_IDUP(6:7)-(/ANuT_,NuT_/).eq.0) &
+          )  Br_Z_inv_counter=Br_Z_inv_counter+1 
+
+        if(  all(MY_IDUP(6:7)-(/ADn_,Dn_/).eq.0) &
+        .or. all(MY_IDUP(6:7)-(/AStr_,Str_/).eq.0) &
+        .or. all(MY_IDUP(6:7)-(/ABot_,Bot_/).eq.0) &
+          )  Br_Z_dd_counter=Br_Z_dd_counter+1 
+
+        if(  all(MY_IDUP(6:7)-(/AUp_,Up_/).eq.0) &
+        .or. all(MY_IDUP(6:7)-(/AChm_,Chm_/).eq.0) &
+          )  Br_Z_uu_counter=Br_Z_uu_counter+1 
+
+    elseif( IsAWDecay(DecayMode1) ) then
+        if(  all(MY_IDUP(6:7)-(/ElP_,NuE_/).eq.0) &
+        .or. all(MY_IDUP(6:7)-(/MuP_,NuM_/).eq.0) &
+        .or. all(MY_IDUP(6:7)-(/TaP_,NuT_/).eq.0) &
+          )  Br_W_ll_counter=Br_W_ll_counter+1 
+
+        if(  all(MY_IDUP(6:7)-(/ADn_,Up_/).eq.0) &
+        .or. all(MY_IDUP(6:7)-(/AStr_,Chm_/).eq.0) &
+          )  Br_W_ud_counter=Br_W_ud_counter+1 
+
+    elseif( IsAPhoton(DecayMode1) ) then
+    endif
+
+RETURN
+END SUBROUTINE
 
 
 

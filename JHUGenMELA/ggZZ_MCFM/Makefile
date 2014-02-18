@@ -11,9 +11,6 @@ else
 CMSROOT = ./
 ROOFITINCLUDE = 
 RM  = /bin/rm
-ifdef CMSSW_VERSION
-	ROOFITINCLUDE = $(shell scramv1 tool info roofitcore | grep INCLUDE | sed 's/^INCLUDE=/-I/')
-endif
 INCLUDE = -I$(CMSROOT) $(ROOFITINCLUDE)
 
 FORTRAN = gfortran
@@ -23,7 +20,7 @@ CC = g++
 CFLAGS = -Wall -Wno-unused-function -g -O2 -fPIC -lm -lgfortran $(shell root-config --cflags) $(INCLUDE) $(EXTRACFLAGS)
 
 LINKER = g++
-LINKERFLAGS = $(shell root-config --ldflags) mod_Higgs_MatEl.o mod_Graviton_MatEl.o mod_Zprime_MatEl.o mod_Higgsjj_MatEl.o mod_HiggsVBF.o
+LINKERFLAGS = $(shell root-config --ldflags) mod_Higgs_MatEl.o mod_Graviton_MatEl.o mod_Zprime_MatEl.o mod_HiggsJJ_MatEl.o
 
 ifeq ($(shell root-config --platform),macosx)
 ifdef CMSSW_RELEASE_BASE
@@ -40,37 +37,31 @@ LIB = libME.so
 
 .PHONY: all help compile clean cms2env
 
-libs: mod_Higgs_MatEl.o mod_Graviton_MatEl.o mod_Zprime_MatEl.o mod_Higgsjj_MatEl.o mod_HiggsVBF.o $(LIB)
+libs: mod_Higgs_MatEl.o mod_Graviton_MatEl.o mod_Zprime_MatEl.o mod_HiggsJJ_MatEl.o $(LIB)
 
-mod_Higgs_MatEl.o: mod_Higgs_MatEl.F90 includeVars.F90
+mod_Higgs_MatEl.o: ../mod_Higgs_MatEl.F90 ../includeVars.F90
 	@echo $(fcomp)
 	@echo " "
-	@echo " compiling mod_Higgs_MatEl.F90 includeVars.F90 with "$(FORTRAN)
-	$(FORTRAN) $(FFLAGS) -c mod_Higgs_MatEl.F90  -lm
+	@echo " compiling ../mod_Higgs_MatEl.F90 ../includeVars.F90 with "$(FORTRAN)
+	$(FORTRAN) $(FFLAGS) -c ../mod_Higgs_MatEl.F90  -lm
 
-mod_Graviton_MatEl.o: mod_Graviton_MatEl.F90 includeVars.F90
+mod_Graviton_MatEl.o: ../mod_Graviton_MatEl.F90 ../includeVars.F90
 	@echo $(fcomp)
 	@echo " "
-	@echo " compiling mod_Graviton_MatEl.F90 includeVars.F90 with "$(FORTRAN)
-	$(FORTRAN) $(FFLAGS) -c mod_Graviton_MatEl.F90  -lm
+	@echo " compiling ../mod_Graviton_MatEl.F90 ../includeVars.F90 with "$(FORTRAN)
+	$(FORTRAN) $(FFLAGS) -c ../mod_Graviton_MatEl.F90  -lm
 
-mod_Zprime_MatEl.o: mod_Zprime_MatEl.F90 includeVars.F90
+mod_Zprime_MatEl.o: ../mod_Zprime_MatEl.F90 ../includeVars.F90
 	@echo $(fcomp)
 	@echo " "
-	@echo " compiling mod_Zprime_MatEl.F90 includeVars.F90 with "$(FORTRAN)
-	$(FORTRAN) $(FFLAGS) -c mod_Zprime_MatEl.F90  -lm
+	@echo " compiling ../mod_Zprime_MatEl.F90 ../includeVars.F90 with "$(FORTRAN)
+	$(FORTRAN) $(FFLAGS) -c ../mod_Zprime_MatEl.F90  -lm
 
-mod_Higgsjj_MatEl.o: mod_Higgsjj_MatEl.F90
+mod_HiggsJJ_MatEl.o: ../mod_HiggsJJ_MatEl.F90
 	@echo $(fcomp)
 	@echo " "
-	@echo " compiling mod_Higgsjj_MatEl.F90 with "$(FORTRAN)
-	$(FORTRAN) $(FFLAGS) -c mod_Higgsjj_MatEl.F90 -lm
-
-mod_HiggsVBF.o: mod_HiggsVBF.F90
-	@echo $(fcomp)
-	@echo " "
-	@echo " compiling mod_HiggsVBF.F90 with "$(FORTRAN)
-	$(FORTRAN) $(FFLAGS) -c mod_HiggsVBF.F90  -lm
+	@echo " compiling ../mod_HiggsJJ_MatEl.F90 with "$(FORTRAN)
+	$(FORTRAN) $(FFLAGS) -c ../mod_HiggsJJ_MatEl.F90 -lm
 
 $(LIB):	$(OBJECTS) 
 	$(QUIET) echo "Linking $(LIB)"; \

@@ -63,6 +63,7 @@ integer :: NumArgs,NArg,OffShell_XVV,iunwgt,CountArg,iinterf
    LHEProdFile=""
    ReadLHEFile=.false.
    ReadCSmax=.false.
+   GenerateEvents=.false.
    iinterf = -1
 
 ! !       DecayMode=0:  Z --> l+ l- (l=e,mu)
@@ -147,6 +148,10 @@ integer :: NumArgs,NArg,OffShell_XVV,iunwgt,CountArg,iinterf
         CountArg = CountArg + 1
     elseif( arg(1:9) .eq."ReadCSmax" ) then
         ReadCSmax=.true.
+        CountArg = CountArg + 1
+    elseif( arg(1:9) .eq."GenEvents" ) then
+        GenerateEvents=.true.
+        Unweighted=.false.
         CountArg = CountArg + 1
     endif
    enddo
@@ -458,7 +463,7 @@ if( VegasNc2.eq.-1 .and.  .not. (unweighted) ) VegasNc2 = VegasNc2_default
 
    PChannel_aux = PChannel
 
-if (unweighted.eqv..false.) then  !----------------------- weighted events
+if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !----------------------- weighted events
 
 
     if (seed_random) then 
@@ -479,38 +484,45 @@ if (unweighted.eqv..false.) then  !----------------------- weighted events
     endif
     idum = int(VegasSeed)
 
-  ! WARM-UP RUN
-  itmx = VegasIt1
-  ncall= VegasNc1
-  warmup = .true.
+    if( (GenerateEvents.eqv..true.) ) then
+        itmx = 1
+        ncall= VegasNc1
+        call vegas(EvalOnlyPS,VG_Result,VG_Error,VG_Chi2)
+        return
+    endif
 
-  if (Process.eq.60 .or. Process.eq.61) then
-     call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
-  elseif (Process.eq.50) then
-     call vegas(EvalWeighted_VHiggs,VG_Result,VG_Error,VG_Chi2)
-  else
-     call vegas(EvalWeighted,VG_Result,VG_Error,VG_Chi2)    ! usual call of vegas for weighted events
-  endif
+    ! WARM-UP RUN
+    itmx = VegasIt1
+    ncall= VegasNc1
+    warmup = .true.
 
-  !DATA RUN
-  call ClearHisto()   
-  warmup = .false.
-  EvalCounter=0
-  RejeCounter=0
-  AccepCounter=0
-  AlertCounter=0
+    if (Process.eq.60 .or. Process.eq.61) then
+      call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
+    elseif (Process.eq.50) then
+      call vegas(EvalWeighted_VHiggs,VG_Result,VG_Error,VG_Chi2)
+    else
+      call vegas(EvalWeighted,VG_Result,VG_Error,VG_Chi2)    ! usual call of vegas for weighted events
+    endif
 
-  avgcs = 0d0
+    !DATA RUN
+    call ClearHisto()   
+    warmup = .false.
+    EvalCounter=0
+    RejeCounter=0
+    AccepCounter=0
+    AlertCounter=0
 
-  itmx = 1
-  ncall= VegasNc2
-  if (process.eq.60 .or. process.eq.61) then 
-     call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
-  elseif (Process.eq.50) then
-     call vegas1(EvalWeighted_VHiggs,VG_Result,VG_Error,VG_Chi2)
-  else
-     call vegas1(EvalWeighted,VG_Result,VG_Error,VG_Chi2)    ! usual call of vegas for weighted events
-  endif
+    avgcs = 0d0
+
+    itmx = 1
+    ncall= VegasNc2
+    if (process.eq.60 .or. process.eq.61) then 
+      call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
+    elseif (Process.eq.50) then
+      call vegas1(EvalWeighted_VHiggs,VG_Result,VG_Error,VG_Chi2)
+    else
+      call vegas1(EvalWeighted,VG_Result,VG_Error,VG_Chi2)    ! usual call of vegas for weighted events
+    endif
 
 
 elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
@@ -666,10 +678,10 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
         print *, "ALERT: The number of rejected events with too small CSMAX exceeds 1%."
         print *, "       Increase CSMAX in main.F90."
     endif
+    write(io_stdout,*)  " event generation rate (events/sec)",dble(AccepCounter)/(time_end-time_start)
 
   endif! unweighted
 
-  write(io_stdout,*)  " event generation rate (events/sec)",dble(AccepCounter)/(time_end-time_start)
 
 return
 END SUBROUTINE
@@ -780,9 +792,10 @@ enddo
    print *, "time (sec)",time_end-time_start
    print *, "rate (events/sec)",dble(AccepCounter)/(time_end-time_start)
 
+   write(io_stdout,*)  " event generation rate (events/sec)",dble(AccepCounter)/(time_end-time_start)
+
 endif
 
-   write(io_stdout,*)  " event generation rate (events/sec)",dble(AccepCounter)/(time_end-time_start)
 
 
 return
@@ -805,7 +818,7 @@ real(8) :: VG_Result,VG_Error,VG_Chi2
 real(8) :: yRnd(1:22),Res,dum,EMcheck(1:4)
 real(8) :: AcceptedEvent(1:4,1:maxpart),Ehat
 real(8) :: MomExt(1:4,1:maxpart),MomHiggs(1:4),MomParton(1:4,1:maxpart),Mass(1:maxpart),pH2sq
-integer :: tries, nParticle, MY_IDUP(1:7+maxpart), ICOLUP(1:2,1:7+maxpart)
+integer :: tries, nParticle, MY_IDUP(1:7+maxpart), ICOLUP(1:2,1:7+maxpart),IntExt
 character(len=*),parameter :: POWHEG_Fmt0 = "(6X,I2,A160)"
 character(len=*),parameter :: POWHEG_Fmt1 = "(6X,I2,4X,I3,4X,I3,3X,I3,1X,I3,3X,I3,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9)"
 character(len=*),parameter :: JHUGen_Fmt0 = "(2X,I2,A160)"
@@ -913,28 +926,28 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
             read(16,fmt="(A160)") EventLine(nline)
          enddo
          if( EventNumPart.lt.3 .or. EventNumPart.gt.maxpart ) then
-            call Error("ERROR: number of particles in LHE input exceeds allowed limit",EventNumPart)
+            call Error("Number of particles in LHE input exceeds allowed limit",EventNumPart)
          endif
 
  !       convert event lines into variables assuming that the Higgs resonance has ID 25
          nparton = 0
          do nline=1,EventNumPart
-            read(EventLine(nline),fmt=InputFmt1) LHE_IDUP(nline),intDummy,LHE_MOTHUP(1,nline),LHE_MOTHUP(2,nline),LHE_ICOLUP(1,nline),LHE_ICOLUP(2,nline),MomExt(2,nline),MomExt(3,nline),MomExt(4,nline),MomExt(1,nline),Mass(nline)
+            read(EventLine(nline),fmt=InputFmt1) LHE_IDUP(nline),IntExt,LHE_MOTHUP(1,nline),LHE_MOTHUP(2,nline),LHE_ICOLUP(1,nline),LHE_ICOLUP(2,nline),MomExt(2,nline),MomExt(3,nline),MomExt(4,nline),MomExt(1,nline),Mass(nline)
+            if( IntExt.ne.-1 .and. IntExt.ne.+1 ) cycle ! remove internal particles
             MomExt(1:4,nline) = MomExt(1:4,nline)*GeV!  convert to units of 100GeV
             Mass(nline) = Mass(nline)*GeV            !  convert to units of 100GeV
-
             if( abs(LHE_IDUP(nline)).eq.25 ) then!   select the Higgs (ID=25, h0)
                   MomHiggs(1:4) = MomExt(1:4,nline)
                   pH2sq = dsqrt(abs(MomHiggs(1:4).dot.MomHiggs(1:4)))
-            elseif( (abs(LHE_IDUP(nline)).eq.21) .or. (abs(LHE_IDUP(nline)).ge.1 .and. abs(LHE_IDUP(nline)).le.5) ) then!   select the gluons (ID=21) or quarks (ID=1,.,5)
+!             elseif( (abs(LHE_IDUP(nline)).eq.21) .or. (abs(LHE_IDUP(nline)).ge.1 .and. abs(LHE_IDUP(nline)).le.5) ) then!   select the gluons (ID=21) or quarks (ID=1,.,5)
+            else
                   nparton = nparton + 1
                   MomParton(1:4,nparton) = MomExt(1:4,nline)
                   LHE_IDUP_Part(nparton) = LHE_IDUP(nline)
                   LHE_ICOLUP_Part(1:2,nparton) = LHE_ICOLUP(1:2,nline)
                   LHE_MOTHUP_Part(1:2,nparton) = LHE_MOTHUP(1:2,nline)
-             else
-                  print *, "ERROR: unknown particle in LHE input file",LHE_IDUP(nline)
-                  stop
+!              else
+!                   call Error("Unknown particle in LHE input file",LHE_IDUP(nline))
             endif
          enddo
 !        read optional pdf line
@@ -958,7 +971,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
          enddo
          if( any(abs(EMcheck(1:4)).gt.1d0*GeV) ) then
               print *, EMcheck(1:4)
-              call Error("ERROR: energy momentum violation while reading LHE production momenta.",nparton)
+              call Error("energy momentum violation while reading LHE production momenta.",nparton)
          endif
 
 !         accept/reject sampling for H->VV decay contribution
@@ -1050,7 +1063,7 @@ logical :: dirresult
       open(unit=io_LHEOutFile,file=trim(DataFile)//'.lhe',form='formatted',access= 'sequential',status='replace')        ! LHE event file
       open(unit=io_HistoFile, file=trim(DataFile)//'.dat',form='formatted',access= 'sequential',status='replace')        ! histogram file
    else
-      if( writeWeightedLHE ) open(unit=io_LHEOutFile,file=trim(DataFile)//'.lhe',form='formatted',access= 'sequential',status='replace')        ! LHE event file
+      if( (writeWeightedLHE) .or. (GenerateEvents) ) open(unit=io_LHEOutFile,file=trim(DataFile)//'.lhe',form='formatted',access= 'sequential',status='replace')        ! LHE event file
       open(unit=io_HistoFile,file=trim(DataFile)//'.dat',form='formatted',access= 'sequential',status='replace')         ! histogram file
    endif
    open(unit=io_LogFile,file=trim(DataFile)//'.log',form='formatted',access= 'sequential',status='replace')              ! log file
@@ -1200,29 +1213,53 @@ integer :: AllocStatus,NHisto
           Histo(11)%LowVal = 0d0*GeV
           Histo(11)%SetScale= 1d0/GeV
 
-          Histo(12)%Info   = "total ee cross section"
-          Histo(12)%NBins  = 1
-          Histo(12)%BinSize= 1d0
-          Histo(12)%LowVal =  0d0
-          Histo(12)%SetScale= 1d0
+          Histo(12)%Info   = "mLep12 invariant mass"
+          Histo(12)%NBins  = 200
+          Histo(12)%BinSize= 0.5d0*GeV
+          Histo(12)%LowVal = 00d0*GeV
+          Histo(12)%SetScale= 1d0/GeV
 
-          Histo(13)%Info   = "total mm cross section"
-          Histo(13)%NBins  = 1
-          Histo(13)%BinSize= 1d0
-          Histo(13)%LowVal = 0d0
-          Histo(13)%SetScale= 1d0
+          Histo(13)%Info   = "mLep34 invariant mass"
+          Histo(13)%NBins  = 200
+          Histo(13)%BinSize= 0.5d0*GeV
+          Histo(13)%LowVal = 00d0*GeV
+          Histo(13)%SetScale= 1d0/GeV
 
-          Histo(14)%Info   = "total tt cross section"
-          Histo(14)%NBins  = 1
-          Histo(14)%BinSize= 1d0
-          Histo(14)%LowVal = 0d010
-          Histo(14)%SetScale= 1d0
+          Histo(14)%Info   = "mLep14 invariant mass"
+          Histo(14)%NBins  = 200
+          Histo(14)%BinSize= 0.5d0*GeV
+          Histo(14)%LowVal = 00d0*GeV
+          Histo(14)%SetScale= 1d0/GeV
 
-          Histo(15)%Info   = "total em cross section"
-          Histo(15)%NBins  = 1
-          Histo(15)%BinSize= 1d0
-          Histo(15)%LowVal = 0d0
-          Histo(15)%SetScale= 1d0
+          Histo(15)%Info   = "mLep23 invariant mass"
+          Histo(15)%NBins  = 200
+          Histo(15)%BinSize= 0.5d0*GeV
+          Histo(15)%LowVal = 00d0*GeV
+          Histo(15)%SetScale= 1d0/GeV
+
+!           Histo(12)%Info   = "total ee cross section"
+!           Histo(12)%NBins  = 1
+!           Histo(12)%BinSize= 1d0
+!           Histo(12)%LowVal =  0d0
+!           Histo(12)%SetScale= 1d0
+! 
+!           Histo(13)%Info   = "total mm cross section"
+!           Histo(13)%NBins  = 1
+!           Histo(13)%BinSize= 1d0
+!           Histo(13)%LowVal = 0d0
+!           Histo(13)%SetScale= 1d0
+! 
+!           Histo(14)%Info   = "total tt cross section"
+!           Histo(14)%NBins  = 1
+!           Histo(14)%BinSize= 1d0
+!           Histo(14)%LowVal = 0d010
+!           Histo(14)%SetScale= 1d0
+! 
+!           Histo(15)%Info   = "total em cross section"
+!           Histo(15)%NBins  = 1
+!           Histo(15)%BinSize= 1d0
+!           Histo(15)%LowVal = 0d0
+!           Histo(15)%SetScale= 1d0
 
           Histo(16)%Info   = "total et cross section"
           Histo(16)%NBins  = 1
@@ -1462,6 +1499,16 @@ implicit none
 
     if( (unweighted) .or. ( (.not.unweighted) .and. (writeWeightedLHE) )  ) then 
         write(io_LHEOutFile ,'(A)') '</LesHouchesEvents>'
+
+        write(io_LogFile,'(A)') ''
+        write(io_LogFile,'(A,I9)') 'Accepted Events: ',AccepCounter
+        write(io_LogFile,'(A)') 'Branchings:'
+        write(io_LogFile,'(12X,A,F6.3,A,F6.3,A)') 'Br_Z_ll_counter  ',dble(Br_Z_ll_counter)/AccepCounter *100d0," %    +/-",dsqrt(dble(Br_Z_ll_counter))/AccepCounter *100d0," %"
+        write(io_LogFile,'(12X,A,F6.3,A,F6.3,A)') 'Br_Z_inv_counter ',dble(Br_Z_inv_counter)/AccepCounter*100d0," %    +/-",dsqrt(dble(Br_Z_inv_counter))/AccepCounter *100d0," %"
+        write(io_LogFile,'(12X,A,F6.3,A,F6.3,A)') 'Br_Z_uu_counter  ',dble(Br_Z_uu_counter)/AccepCounter *100d0," %    +/-",dsqrt(dble(Br_Z_uu_counter))/AccepCounter *100d0," %"
+        write(io_LogFile,'(12X,A,F6.3,A,F6.3,A)') 'Br_Z_dd_counter  ',dble(Br_Z_dd_counter)/AccepCounter *100d0," %    +/-",dsqrt(dble(Br_Z_dd_counter))/AccepCounter *100d0," %"
+        write(io_LogFile,'(12X,A,F6.3,A,F6.3,A)') 'Br_W_ll_counter  ',dble(Br_W_ll_counter)/AccepCounter *100d0," %    +/-",dsqrt(dble(Br_W_ll_counter))/AccepCounter *100d0," %"
+        write(io_LogFile,'(12X,A,F6.3,A,F6.3,A)') 'Br_W_ud_counter  ',dble(Br_W_ud_counter)/AccepCounter *100d0," %    +/-",dsqrt(dble(Br_W_ud_counter))/AccepCounter *100d0," %"
     endif
   
 END SUBROUTINE
@@ -1505,6 +1552,7 @@ character :: arg*(500)
         write(TheUnit,"(4X,A,L)") "Unweighted: ",Unweighted
     endif
     write(TheUnit,"(4X,A,L)") "Interference: ",includeInterference
+    if( (IsAZDecay(DecayMode1)) .or. (IsAZDecay(DecayMode2))  ) write(TheUnit,"(4X,A,L)") "Intermediate off-shell photons: ",includeGammaStar
 
     if( .not. seed_random ) write(TheUnit,"(4X,A)") "NOTE: seed_random==FALSE (switched off)"
 
@@ -1527,6 +1575,14 @@ character :: arg*(500)
             write(TheUnit,"(6X,A,2E16.8,A1)") "ghz2=",ghz2,"i"
             write(TheUnit,"(6X,A,2E16.8,A1)") "ghz3=",ghz3,"i"
             write(TheUnit,"(6X,A,2E16.8,A1)") "ghz4=",ghz4,"i"
+            if( (includeGammaStar .and. ((IsAZDecay(DecayMode1)) .or. (IsAZDecay(DecayMode2)))) ) then
+                write(TheUnit,"(6X,A,2E16.8,A1)") "ghzgs2=",ghzgs2,"i"
+                write(TheUnit,"(6X,A,2E16.8,A1)") "ghzgs3=",ghzgs3,"i"
+                write(TheUnit,"(6X,A,2E16.8,A1)") "ghzgs4=",ghzgs4,"i"
+                write(TheUnit,"(6X,A,2E16.8,A1)") "ghgsgs2=",ghgsgs2,"i"
+                write(TheUnit,"(6X,A,2E16.8,A1)") "ghgsgs3=",ghgsgs3,"i"
+                write(TheUnit,"(6X,A,2E16.8,A1)") "ghgsgs4=",ghgsgs4,"i"
+            endif
             if( cdabs(ghz1_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz1_prime= ",ghz1_prime ,"i,","Lambda_z1=",Lambda_z1*100d0
             if( cdabs(ghz1_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz1_prime2=",ghz1_prime2,"i,","Lambda_z1=",Lambda_z1*100d0
             if( cdabs(ghz1_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz1_prime3=",ghz1_prime3,"i,","Lambda_z1=",Lambda_z1*100d0
@@ -1672,6 +1728,7 @@ implicit none
         write(io_stdout,"(4X,A)") "PDFSet:     1=CTEQ6L1(2001), 2=MSTW(2008),  2xx=MSTW with eigenvector set xx=01..40)"
         write(io_stdout,"(4X,A)") "VegasNc0:   number of evaluations for integrand scan"
         write(io_stdout,"(4X,A)") "VegasNc1:   number of evaluations for accept-reject sampling"
+        write(io_stdout,"(4X,A)") "VegasNc2:   number of events for accept-reject sampling"
         write(io_stdout,"(4X,A)") "Unweighted: 0=weighted events, 1=unweighted events"
         write(io_stdout,"(4X,A)") "Interf:     0=neglect interference for 4f final states, 1=include interference"
         write(io_stdout,"(4X,A)") "DataFile:   LHE output file"
