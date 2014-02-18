@@ -153,15 +153,32 @@ extern "C" {
   void qqb_zz_(double* p, double* msq);
   void gen4_(double* r, double* p, double* wt4);  //r(22) p(4,12)
 
+  //#define gg_zz_int_ gg_zz_int_
+  //void gg_zz_int_(double* p, double* msq);
+
+  //#define gg_zz_int_freenorm_ gg_zz_int_freenorm_
+  //void gg_zz_int_freenorm_(double* p, double hcoupl[2], double* msq);
+
+  // processes for the 128, 129, 131, 132 
+  // from src/Procdep/lowint.f
+  
+  // 128:
+  #define gg_hzz_tb_ gg_hzz_tb_
+  void gg_hzz_tb_(double* p, double* msq); 
+ 
+  // 129
   #define gg_zz_int_ gg_zz_int_
   void gg_zz_int_(double* p, double* msq);
-
-  #define gg_zz_int_freenorm_ gg_zz_int_freenorm_
-  void gg_zz_int_freenorm_(double* p, double hcoupl[2], double* msq);
-
+   
+  // 131
+  #define gg_zz_all_ gg_zz_all_
+  void gg_zz_all_(double* p, double* msq);
+  
+  // 132 
   #define gg_zz_ gg_zz_
   void gg_zz_(double* p, double* msq);
-
+  
+  
   // For H->WW
   void gen4h_(double* r, double* p, double* wt4);  //r(22) p(4,12)
 

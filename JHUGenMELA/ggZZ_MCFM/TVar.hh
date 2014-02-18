@@ -51,22 +51,16 @@ public:
     HZZ_4l_MIXCP = 17,
     HJJNONVBF = 18,
     HJJVBF = 19,
+    GGZZTOT_4l = 20,
+    GGZZINT_4l = 21,
     Null
   };
   enum LeptonFlavor{
-    Flavor_Dummy = 0, // legacy code runs on 1/2/3
+    Flavor_Dummy = 0, 
     Flavor_4e    = 1,
     Flavor_4mu   = 2,
     Flavor_2e2mu = 3    
   };
-  enum SuperMelaSyst{
-    SMSyst_None      = 0, // nominal value
-    SMSyst_ScaleUp   = 1, //Scale Uncertaintie
-    SMSyst_ScaleDown = 2,
-    SMSyst_ResUp     = 3, // Resolution Uncertainty
-    SMSyst_ResDown   = 4
-  };
-
 
   //---------------------------------
   // Function
@@ -112,7 +106,11 @@ public:
       return TString("HJJNONVBF");
     else if(temp==TVar::HJJVBF ) 
       return TString("HJJVBF");
-    else 
+    else if(temp==TVar::GGZZTOT_4l   ) 
+      return TString("GGZZ_total_4l");
+   else if(temp==TVar::GGZZINT_4l   ) 
+      return TString("GGZZ_interference_4l");
+   else 
       return TString("UnKnown");
   };
   ClassDef(TVar,0)
@@ -164,11 +162,6 @@ struct event_type{
 };
 struct anomcoup{
 	   double delg1_z, delg1_g, lambda_g, lambda_z, delk_g, delk_z_,tevscale;
-};
-
-struct EffHist{
-  TH2F* els_eff_mc;
-  TH2F* mus_eff_mc;
 };
 
 #endif

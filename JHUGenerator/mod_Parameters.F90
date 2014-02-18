@@ -3,7 +3,7 @@ implicit none
 save
 ! 
 ! 
-character(len=6),parameter :: JHUGen_Version="v4.3.2"
+character(len=6),parameter :: JHUGen_Version="v4.5.2"
 ! 
 ! 
 integer, public :: Collider, PDFSet,PChannel,Process,DecayMode1,DecayMode2
@@ -12,7 +12,7 @@ real(8), public :: Collider_Energy
 integer, public :: VegasIt1_default,VegasNc0_default,VegasNc1_default,VegasNc2_default
 real(8), public :: VegasSeed
 integer, public :: NumHistograms
-logical, public :: unweighted,OffShellReson,OffShellV1,OffShellV2,ReadLHEFile,ReadCSmax
+logical, public :: unweighted,OffShellReson,OffShellV1,OffShellV2,ReadLHEFile,ReadCSmax,GenerateEvents
 integer(8), public :: EvalCounter=0
 integer(8), public :: RejeCounter=0
 integer(8), public :: AccepCounter=0
@@ -23,30 +23,31 @@ logical, public :: warmup
 character(len=100) :: DataFile
 character(len=100) :: LogFile
 character(len=500) :: LHEProdFile
+logical, public :: includeInterference
+real(8), public :: M_V,Ga_V
+real(8), public, parameter :: GeV=1d0/100d0 ! we are using units of 100GeV, i.e. Lambda=10 is 1TeV 
+real(8), public, parameter :: percent=1d0/100d0
+real(8),public :: GlobalMax=-1d99
+real(8),public :: GlobalMin=+1d99
+integer,parameter :: NPart=200
+real(8),public :: PartitionMax(0:NPart,0:NPart)=-1d99
+real(8),public :: minCS=1d10,maxCS=0d0,avgCS=0d0
+
 
 logical, public, parameter :: seed_random = .true.
 
 logical, public, parameter :: fix_channels_ratio = .false.
 
 real(8), public, parameter :: channels_ratio_fix = 0.25d0    ! desired ratio of  N_qq/(N_qq+N_gg)
-logical, public :: includeInterference! include interference effecs in ZZ production with decays to 4 leptons
-! Since v.3.1.8 this is no longer a constant. It can be set through command line "Interf=0,1", otherwise a default value is used
 
 logical, public, parameter :: importExternal_LHEinit = .true.
 
 logical, public, parameter :: writeWeightedLHE = .false. 
 
-real(8),public :: GlobalMax=-1d99
-real(8),public :: GlobalMin=+1d99
-integer,parameter :: NPart=200
-real(8),public :: PartitionMax(0:NPart,0:NPart)=-1d99
+logical, public, parameter :: includeGammaStar = .false. 
 
+real(8),parameter :: MPhotonCutoff = 4d0*GeV
 
-real(8),public :: minCS=1d10,maxCS=0d0,avgCS=0d0
-! we are using units of 100GeV, i.e. Lambda=10 is 1TeV
-real(8), public, parameter :: GeV=1d0/100d0
-real(8), public, parameter :: percent=1d0/100d0
-real(8), public :: M_V,Ga_V
 real(8), public, parameter :: M_Z     = 91.1876d0 *GeV      ! Z boson mass (PDG-2011)
 real(8), public, parameter :: Ga_Z    = 2.4952d0  *GeV      ! Z boson width(PDG-2011)
 real(8), public, parameter :: M_W     = 80.399d0  *GeV      ! W boson mass (PDG-2011)
@@ -58,8 +59,8 @@ real(8), public, parameter :: Lambda  = 1000d0    *GeV      ! Lambda coupling en
                                                             ! operators/formfactors (former r).
 
 real(8), public, parameter :: m_el = 0.00051100d0  *GeV         ! electron mass
-real(8), public, parameter :: m_mu = 0.10566d0  *GeV              ! muon mass
-real(8), public, parameter :: m_tau = 1.7768d0  *GeV                ! tau mass
+real(8), public, parameter :: m_mu = 0.10566d0  *GeV            ! muon mass
+real(8), public, parameter :: m_tau = 1.7768d0  *GeV            ! tau mass
 
 
 real(8), public, parameter :: Gf = 1.16639d-5/GeV**2        ! fermi constant
@@ -69,7 +70,7 @@ real(8), public, parameter :: alpha_QED = 1d0/128.0d0       ! el.magn. coupling
 real(8), public, parameter :: alphas = 0.13229060d0         ! strong coupling
 real(8), public, parameter :: sitW = dsqrt(0.23119d0)       ! sin(Theta_Weinberg) (PDG-2008)
 real(8), public            :: Mu_Fact                       ! pdf factorization scale (set to M_Reso in main.F90)
-real(8), public, parameter :: LHC_Energy=14000d0  *GeV       ! LHC hadronic center of mass energy
+real(8), public, parameter :: LHC_Energy=13000d0  *GeV       ! LHC hadronic center of mass energy
 real(8), public, parameter :: TEV_Energy=1960d0  *GeV       ! Tevatron hadronic center of mass energy
 real(8), public, parameter :: ILC_Energy=250d0  *GeV        ! Linear collider center of mass energy
 real(8), public, parameter :: POL_A = 0d0                   !e+ polarization. 0: no polarization, 100: helicity = 1, -100: helicity = -1
@@ -120,6 +121,23 @@ real(8), public, parameter :: Brhadr_Z_bb = Br_Z_bb/Br_Z_hadr                   
 real(8), public, parameter :: Brhadr_W_ud = Br_W_ud/Br_W_hadr                         ! W branching fraction Ga(up)/Ga(hadronic)
 real(8), public, parameter :: Brhadr_W_cs = Br_W_cs/Br_W_hadr                         ! W branching fraction Ga(chm)/Ga(hadronic)
 
+real(8), public, parameter :: scale_alpha_Z_uu = 1.04282d0 ! scaling factor of alpha (~partial width) for Z > u u~, c c~
+real(8), public, parameter :: scale_alpha_Z_dd = 1.04282d0 ! scaling factor of alpha (~partial width) for Z > d d~, s s~, b b~
+real(8), public, parameter :: scale_alpha_Z_ll = 1d0       ! scaling factor of alpha (~partial width) for Z > l+ l-
+real(8), public, parameter :: scale_alpha_Z_nn = 1d0       ! scaling factor of alpha (~partial width) for Z > nu nu~
+real(8), public, parameter :: scale_alpha_W_ud = 1.0993819d0 ! scaling factor of alpha (~partial width) for W > u d, c s
+real(8), public, parameter :: scale_alpha_W_ln = 1d0       ! scaling factor of alpha (~partial width) for W > l nu
+! sum rule
+! 1 = 3*Br_Z_nn + 3*Br_Z_ee + 2*Br_Z_uu + 3*Br_Z_dd
+!
+! sum rule with scaling factors
+! 1 = 3*(Br_Z_nn*scale_alpha_Z_nn) + 3*(Br_Z_ee*scale_alpha_Z_ll) + 2*(Br_Z_uu*scale_alpha_Z_uu) + 3*(Br_Z_dd*scale_alpha_Z_dd)
+integer, public :: Br_Z_ll_counter=0
+integer, public :: Br_Z_inv_counter=0
+integer, public :: Br_Z_uu_counter=0
+integer, public :: Br_Z_dd_counter=0
+integer, public :: Br_W_ll_counter=0
+integer, public :: Br_W_ud_counter=0
 
 
 !-- parameters that define on-shell spin 0 coupling to SM fields, see note
@@ -140,26 +158,38 @@ real(8), public, parameter :: Brhadr_W_cs = Br_W_cs/Br_W_hadr                   
    complex(8), public, parameter :: ghz3 = (0.0d0,0d0)
    complex(8), public, parameter :: ghz4 = (0.0d0,0d0)   ! pseudoscalar 
 
+   complex(8), public, parameter :: ghzgs2  = (0.00d0,0d0)
+   complex(8), public, parameter :: ghzgs3  = (0.00d0,0d0)
+   complex(8), public, parameter :: ghzgs4  = (0.00d0,0d0)
+   complex(8), public, parameter :: ghgsgs2 = (0.00d0,0d0)
+   complex(8), public, parameter :: ghgsgs3 = (0.00d0,0d0)
+   complex(8), public, parameter :: ghgsgs4 = (0.00d0,0d0)
+
+
 !-- parameters that define q^2 dependent form factors
    complex(8), public, parameter :: ghz1_prime = (0.0d0,0d0)
    complex(8), public, parameter :: ghz1_prime2= (0.0d0,0d0)
    complex(8), public, parameter :: ghz1_prime3= (0.0d0,0d0)
    complex(8), public, parameter :: ghz1_prime4= (0.0d0,0d0)
+   complex(8), public, parameter :: ghz1_prime5= (0.0d0,0d0)
 
    complex(8), public, parameter :: ghz2_prime = (0.0d0,0d0)
    complex(8), public, parameter :: ghz2_prime2= (0.0d0,0d0)
    complex(8), public, parameter :: ghz2_prime3= (0.0d0,0d0)
    complex(8), public, parameter :: ghz2_prime4= (0.0d0,0d0)
+   complex(8), public, parameter :: ghz2_prime5= (0.0d0,0d0)
 
    complex(8), public, parameter :: ghz3_prime = (0.0d0,0d0)
    complex(8), public, parameter :: ghz3_prime2= (0.0d0,0d0)
    complex(8), public, parameter :: ghz3_prime3= (0.0d0,0d0)
    complex(8), public, parameter :: ghz3_prime4= (0.0d0,0d0)
+   complex(8), public, parameter :: ghz3_prime5= (0.0d0,0d0)
 
    complex(8), public, parameter :: ghz4_prime = (0.0d0,0d0)
    complex(8), public, parameter :: ghz4_prime2= (0.0d0,0d0)
    complex(8), public, parameter :: ghz4_prime3= (0.0d0,0d0)
    complex(8), public, parameter :: ghz4_prime4= (0.0d0,0d0)
+   complex(8), public, parameter :: ghz4_prime5= (0.0d0,0d0)
 
    real(8),    public, parameter :: Lambda_z1 = 10000d0*GeV
    real(8),    public, parameter :: Lambda_z2 = 10000d0*GeV
@@ -210,8 +240,8 @@ real(8), public, parameter :: Brhadr_W_cs = Br_W_cs/Br_W_hadr                   
 
 
 ! V-f-fbar couplings:
-!   g_R(f) = -e*sw/cw*Q(f)               = e/2/sw/cw * a(b)R,
-!   g_L(f) =  e/sw/cw*T3(f) -sw/cw*Q(f)  = e/2/sw/cw * a(b)L
+!   g_R(f) = -e*sw/cw*Q(f)               = e/2/sw/cw * a(b,c)R,
+!   g_L(f) = -e*sw/cw*Q(f) + e/sw/cw*T3(f) = e/2/sw/cw * a(b,c)L
 ! with
 !   aR(f) = -2*sw**2*Q(f),
 !   aL(f) = -2*sw**2*Q(f) + 2*T3(f).
@@ -219,12 +249,17 @@ real(8), public, parameter :: Brhadr_W_cs = Br_W_cs/Br_W_hadr                   
 ! and
 !   bR = 0
 !   bL = dsqrt(2)*cw
-! for V = W-boson.
+! for V = W-boson
+! and
+!   cR = -2*sw*cw*Q(f)
+!   cL = -2*sw*cw*Q(f)
+! for V = photon*
+!
+!
 real(8), public, parameter :: aR_lep =-2d0*sitW**2*(-1d0)
 real(8), public, parameter :: aL_lep =-2d0*sitW**2*(-1d0)-1d0
 real(8), public, parameter :: aR_neu =-2d0*sitW**2*(0d0)
 real(8), public, parameter :: aL_neu =-2d0*sitW**2*(0d0)+1d0
-
 real(8), public, parameter :: aR_QUp =-2d0*sitW**2*(2d0/3d0)
 real(8), public, parameter :: aL_QUp =-2d0*sitW**2*(2d0/3d0)+1d0
 real(8), public, parameter :: aR_QDn =-2d0*sitW**2*(-1d0/3d0)
@@ -233,6 +268,14 @@ real(8), public, parameter :: aL_QDn =-2d0*sitW**2*(-1d0/3d0)-1d0
 real(8), public, parameter :: bL = dsqrt(2d0)*dsqrt(1d0-sitW**2)
 real(8), public, parameter :: bR = 0d0
 
+real(8), public, parameter :: cR_lep = -2d0*sitW*dsqrt(1d0-sitW**2)*(-1d0)
+real(8), public, parameter :: cL_lep = -2d0*sitW*dsqrt(1d0-sitW**2)*(-1d0)
+real(8), public, parameter :: cR_neu = -2d0*sitW*dsqrt(1d0-sitW**2)*(0d0)
+real(8), public, parameter :: cL_neu = -2d0*sitW*dsqrt(1d0-sitW**2)*(0d0)
+real(8), public, parameter :: cR_QUp = -2d0*sitW*dsqrt(1d0-sitW**2)*(2d0/3d0)
+real(8), public, parameter :: cL_QUp = -2d0*sitW*dsqrt(1d0-sitW**2)*(2d0/3d0)
+real(8), public, parameter :: cR_QDn = -2d0*sitW*dsqrt(1d0-sitW**2)*(-1d0/3d0)
+real(8), public, parameter :: cL_QDn = -2d0*sitW*dsqrt(1d0-sitW**2)*(-1d0/3d0)
 
 real(8), public, parameter :: fbGeV2=0.389379d12/(100d0**2)
 real(8), public, parameter :: SymmFac=1d0/2d0, SpinAvg=1d0/4d0, QuarkColAvg=1d0/3d0, GluonColAvg=1d0/8d0
@@ -293,7 +336,11 @@ integer, public :: DebugCounter(0:10) = 0
 
 
 
-contains
+
+
+CONTAINS
+
+
 
 
 FUNCTION CKM(id1,id2)
@@ -301,7 +348,7 @@ implicit none
 real(8) :: CKM
 integer :: id1, id2
 if((id1.eq.convertLHE(Up_)  .and.  id2.eq.convertLHE(Dn_))  .or.  (id1.eq.convertLHE(Dn_)  .and.  id2.eq.convertLHE(Up_)))then
-  CKM= 0.97427d0
+  CKM= 0.97427d0 * dsqrt(scale_alpha_W_ud)
 elseif((id1.eq.convertLHE(Up_)  .and.  id2.eq.convertLHE(Str_))  .or.  (id1.eq.convertLHE(Str_)  .and.  id2.eq.convertLHE(Up_)))then
   CKM= 0.22534d0
 elseif((id1.eq.convertLHE(Up_)  .and.  id2.eq.convertLHE(Bot_))  .or.  (id1.eq.convertLHE(Bot_)  .and.  id2.eq.convertLHE(Up_)))then
@@ -309,20 +356,21 @@ elseif((id1.eq.convertLHE(Up_)  .and.  id2.eq.convertLHE(Bot_))  .or.  (id1.eq.c
 elseif((id1.eq.convertLHE(Chm_)  .and.  id2.eq.convertLHE(Dn_))  .or.  (id1.eq.convertLHE(Dn_)  .and.  id2.eq.convertLHE(Chm_)))then
   CKM= 0.22520d0
 elseif((id1.eq.convertLHE(Chm_)  .and.  id2.eq.convertLHE(Str_))  .or.  (id1.eq.convertLHE(Str_)  .and.  id2.eq.convertLHE(Chm_)))then
-  CKM= 0.97344d0
+  CKM= 0.97344d0 * dsqrt(scale_alpha_W_ud)
 elseif((id1.eq.convertLHE(Chm_)  .and.  id2.eq.convertLHE(Bot_))  .or.  (id1.eq.convertLHE(Bot_)  .and.  id2.eq.convertLHE(Chm_)))then
   CKM= 0.0412d0
 !elseif((id1.eq.convertLHE(Top_)  .and.  id2.eq.convertLHE(Dn_))  .or.  (id1.eq.convertLHE(Dn_)  .and.  id2.eq.convertLHE(Top_)))then
-!  CKM= 0.22520d0 
+!  CKM= 0.22520d0
 !elseif((id1.eq.convertLHE(Top_)  .and.  id2.eq.convertLHE(Str_))  .or.  (id1.eq.convertLHE(Str_)  .and.  id2.eq.convertLHE(Top_)))then
 !  CKM= 0.0404d0
 !elseif((id1.eq.convertLHE(Top_)  .and.  id2.eq.convertLHE(Bot_))  .or.  (id1.eq.convertLHE(Bot_)  .and.  id2.eq.convertLHE(Top_)))then
 !  CKM= 0.999146
 else
-  CKM= 1d0
+  CKM= 1d0 * dsqrt(scale_alpha_W_ln)
 endif
 
 END FUNCTION
+
 
 
 
