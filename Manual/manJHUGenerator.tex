@@ -1,18 +1,16 @@
 %
-% latex grav ; dvips -Ppdf -t letter -G0 grav
-% tar -cvzf grav.gz -T tar.list
-% tar -xvzf grav.gz
 %
-%\documentclass[showpacs,aps,superscriptaddress,letterpaper,nofootinbib]{revtex4}
 \documentclass[aps,superscriptaddress,nofootinbib]{revtex4}
-%\documentclass[preprint,aps,superscriptaddress]{revtex4}
-%\documentclass[12pt,tightenlines,aps,preprint,twocolumn,showpacs,nofootinbib,floatfix]{revtex4}
-
+% \documentclass[12pt]{article}
 \usepackage{graphicx}
 \usepackage{epsfig}
 \usepackage{float}
-\usepackage{cprotect}
+% % \usepackage{cprotect}
 %\usepackage{amsmath}
+
+% \textwidth18cm
+% \addtolength{\oddsidemargin}{-2cm}
+% \addtolength{\evensidemargin}{-2cm}
 
 \begin{document}
 
@@ -26,7 +24,7 @@ Manual for the JHU generator
 \begin{center}
 \small
 For simulation of a single-produced resonance at hadron colliders \\
-(version 4.3.2, release date December 12, 2013) \\
+(version 4.5.2, release date February 16, 2014) \\
 \normalsize
 \end{center}
 
@@ -66,44 +64,35 @@ $ make
 
 \section{ Configuration }
 
-There are two ways to configure the program, either from the command line or in the file \verb|mod_Parameters.F90|.  For documentation from the command line, one can use \verb|JHUGen help|.  In addition, the command line configurables are defined in the file \verb|main.F90|.  When one change the fortran code directly, one should also recompile the code for changes to take effect.  In general, command-line configuration handles general event properties while the configuration file handles all of the couplings and physics handles.
+There are two ways to configure the program, from the command line and in the file \verb|mod_Parameters.F90|.  For documentation from the command line, one can use \verb|JHUGen help|.  In addition, the command line configurables are defined in the file \verb|main.F90|.  When one change the fortran code directly, one should also recompile the code for changes to take effect.  In general, command-line configuration handles general event properties while the configuration file handles all of the couplings and physics handles.
 
 \subsection{ Command line configuration }
 
 The list of command line configurables and the default values are (also defined in the \verb|README|):
 
 \begin{verbatim}
-   - Collider=x    (Collider: 1= $pp$, e.g LHC, 2= $p\bar{p}$, e.g. Tevatron, 0 = $e^+e^-$, e.g ILC), 
-                   default value:1
-   - VegasNc0,1,2 =x (number of evaluations)
-   - PChannel=x    (partonic channel: 0=glu+glu, 1=quark+antiquark, 2=both), default value:2
-   - PDFSet=x      (parton distr. functions, 1=CTEQ6L1 (2001), 2=MSTW(2008),  
-   					2xx=MSTW with eigenvector set xx=01..40), default=1
-   - DecayMode1=x  (decay mode for vector boson 1), default x=0 
-   - DecayMode2=x  (decay mode for vector boson 2), default x=0
-                  x=0:  X-> Z1 Z2, Z1->2l,
-                  x=1:  X-> Z1 Z2, Z1->2q,
-                  x=2:  X-> Z1 Z2, Z1->2tau,
-                  x=3:  X-> Z1 Z2, Z1->2nu,
-                  x=4:  X-> W1 W2, W1->lnu,
-                  x=5:  X-> W1 W2, W1->2q,
-                  x=6:  X-> W1 W2, W1->taunu
-                  x=7:  X-> gamma gamma 
-                  x=8:  Z --> l+ l- (l=e,mu,tau)
-                  x=9:  Z --> anything
-                  x=10: W --> l nu_l (l=e,mu,tau)
-                  x=11: W --> anything                                    
-   - DataFile=x    (name of the output file), default value: "output"
-   - Process=x     (gives the resonance spin 0,1 or 2, or 50=pp/ee->VH, 60=weakVBF, 61=pp->Hjj)
-   - OffXVV=xyz    (only applies to Higgs production, x,y,z can be 1 or 0 indicating real off-shellness 
-   					for Higgs, Z/W boson 1/2, resp.), default 011 if a parameter is not specified
-   - Unweighted=x  (generates weighted or unweighted events), default value: ".true." 
-   - ReadLHE="x"   (allows NLO production of spin-0 particles by reading in LHE file 
-                   from NLO generator, e.g., POWHEG,   or allows generating spin-0 particle decay 
-                   after generating VBF, H+JJ, or VH production with the JHU generator), 
-                   default value: Ò.false." 
-   - InputLHEFormat="x"   (LHE format is different for 1=POWHEG, 2=JHUGen), default value: 1 
-   - writeWeightedLHE="x" (produces an LHE file when running in weighted mode, can be large), default value: ".false."
+    Collider:   1=LHC, 2=Tevatron, 0=e+e-
+    Process:    0=spin-0, 1=spin-1, 2=spin-2 resonance, 50=pp/ee->VH,
+                60=weakVBF, 61=pp->Hjj
+    MReso:      resonance mass (default=126.00), format: yyy.xx
+    DecayMode1: decay mode for vector boson 1 (Z/W+/gamma)
+    DecayMode2: decay mode for vector boson 2 (Z/W-/gamma)
+                  0=Z->2l,  1=Z->2q, 2=Z->2tau, 3=Z->3nu,
+                  4=W->lnu, 5=W->2q, 6=W->taunu,
+                  7=gamma, 8=Z->2l+2tau,
+                  9=Z->anything, 10=W->lnu+taunu, 11=W->anything
+    PChannel:   0=g+g, 1=q+qb, 2=both
+    OffXVV:     off-shell option for resonance(X),or vector bosons(VV)
+    PDFSet:     1=CTEQ6L1(2001),  2=MSTW(2008),  
+                                2xx=MSTW with eigenvector set xx=01..40)
+    VegasNc0:   number of evaluations for integrand scan
+    VegasNc1:   number of evaluations for accept-reject sampling
+    VegasNc2:   number of events for accept-reject sampling
+    Unweighted: 0=weighted events, 1=unweighted events
+    Interf:     0=neglect interference for 4f final states, 
+                1=include interference
+    DataFile:   LHE output file
+    ReadLHE:    LHE input file from external file (only spin-0)
 \end{verbatim}   
    
 \noindent
@@ -114,7 +103,7 @@ A few more details on some particular parameters:
 \item {\verb|OffXVV|}: The program does not work for $ZZ$ or $WW$ if you set them to be on-shell (\verb|OffXVV="000"|) and the mass of the $X$ resonance to be below the $m_{VV}$ threshold.  In general, the more off-shell the process, or the more "1" you have, the less efficient the \verb|VegasNc1| evaluations are.  Specifically, if you are interested then, in producing a resonance with mass below threshold $m_{VV}$ with a very narrow resonance, it is most efficient to generate with \verb|OffXVV="011"|
 \item \verb|PChannel|: This parameter is only meaningful in the spin-2 case.  For spin-0, production is possible only via the $gg$ process and for spin-1, production is only possible via the $q\bar{q}$ process.
 \item \verb|DecayMode2=7| note: Valid for spin-0 and spin-2, only OffXVV=000 or 100 are possible.  
-\item \verb|VegasNc| note: \verb|VegasNc1| allows the user to set the number of tries for the reject/accept method, \verb|VegasNc2| allows the user to let the program run until the number of events is generated
+\item \verb|VegasNc| note: \verb|VegasNc1| allows the user to set the number of tries for the reject/accept method, \verb|VegasNc2| allows the user to let the program run until the number of events is generated.
 \end{itemize}
 
 \noindent
@@ -188,16 +177,34 @@ channels_ratio_fix = 0.25d0    ! desired ratio of
                                ! N_qq/(N_qq+N_gg)
 \end{verbatim}
 
+
+\noindent
+For final states with a Z-boson decaying into $f\bar f$, intermediate off-shell photons can be included by switching 
+\begin{verbatim}
+logical, public, parameter :: includeGammaStar = .false. 
+\end{verbatim}
+to the value \verb|.true.|. In such case, a lower cut on the photon invariant mass has to be placed in order to avoid the
+collinear singularity. This cutoff parameter is controlled by
+\begin{verbatim}
+real(8),parameter :: MPhotonCutoff = 4d0*GeV.
+\end{verbatim}
+
+
 \noindent
 {\it Only for final states with 4 same flavor fermions }, one can include interference effects between the leptons.  The interference is controlled by the command line parameter:
 \begin{verbatim}
 Interf=0 or 1
 \end{verbatim}
 
-
 \noindent
-The remaining parameters are more-or-less self-explanatory.
+For the generation of weighted events (command line \verb|Unweighted=0|) an LHE output file is created if
+\begin{verbatim}
+logical, public, parameter :: writeWeightedLHE = .false. 
+\end{verbatim}
+is set to \verb|.true.|.
 
+
+The remaining parameters are more-or-less self-explanatory:
 \begin{verbatim}
 ! we are using units of 100GeV, i.e. Lambda=10 is 1TeV
 real(8), public, parameter :: GeV=1d0/100d0
@@ -236,30 +243,52 @@ real(8), public, parameter :: POL_B = 0d0                   !e- polarization. 0:
 logical, public, parameter :: H_DK =.true.                  !default to false so H in 
                                                              V > VH (Process = 50) does not decay
 real(8), public, parameter :: ptjetcut = 15d0*GeV           ! jet min pt
-real(8), public, parameter :: Rjet = 0.5d0                  ! jet deltaR, antikt algorithm \end{verbatim}
+real(8), public, parameter :: Rjet = 0.5d0                  ! jet deltaR, antikt algorithm 
+\end{verbatim}
+
+
+\noindent
+The branching fractions of $Z$ and $W$ bosons depend on the above input parameter and can slightly vary from the given PDG measurements.
+Those branchings can be rescaled with the parameters below.
+\begin{verbatim}
+real(8), public, parameter :: scale_alpha_Z_uu = 1.04282d0 ! scaling factor of alpha (~partial width) for Z > u u~, c c~
+real(8), public, parameter :: scale_alpha_Z_dd = 1.04282d0 ! scaling factor of alpha (~partial width) for Z > d d~, s s~, b b~
+real(8), public, parameter :: scale_alpha_Z_ll = 1d0       ! scaling factor of alpha (~partial width) for Z > l+ l-
+real(8), public, parameter :: scale_alpha_Z_nn = 1d0       ! scaling factor of alpha (~partial width) for Z > nu nu~
+real(8), public, parameter :: scale_alpha_W_ud = 1.0993819d0 ! scaling factor of alpha (~partial width) for W > u d, c s
+real(8), public, parameter :: scale_alpha_W_ln = 1d0       ! scaling factor of alpha (~partial width) for W > l nu
+\end{verbatim}
+These default values rescale the branchings to include the NLO QCD corrections ($1+\alpha_s/\pi$).
+
 \subsubsection{ Spin-0 parameters }
 
 \noindent
 {\it N.B.  The parameters "ptjetcut" and "Rjet" only apply to Process=60,61.}
 
 \noindent
-The \verb|*hg*| parameters control the coupling of a spin-0 resonance to gluons in the production mechanism.  The \verb|*hz*| parameters control the decay.  In practice, the production parameters are not having a large effect since angular corrections from the production mechanism are lost for spinless particles.  
-One has the options to set the spin-0 couplings either from Eq.(9) or Eq.(11) from Ref.~\cite{Bolognesi:2012}.  To switch between the two, use the parameter \verb|generate_as|.  
+The \verb|*hg*| parameters control the coupling of a spin-0 resonance to gluons in the production mechanism.  
+In practice, the production parameters are not having a large effect since angular corrections from the production mechanism are lost for spinless particles.  
+The \verb|*hz*| parameters control the decay into $Z$ and $W$ bosons.  
+One has the options to set the spin-0 couplings either from Eq.(9) or Eq.(11) from Ref.~\cite{Bolognesi:2012}.  
+To switch between the two, use the parameter \verb|generate_as|.  
 %For the parameters in Eq.(9) from Ref.~\cite{Bolognesi:2012}, we now allow for $q^2$ dependent form factors as described in Eq.(3) of~\cite{Anderson:2013} as:
-We now allow for $q^2$ dependent form factors as described in Ref.~\cite{Bolognesi:2012} and given in more detail in the equation below:
-%\[
-%g_i(q_1^2,q_2^2) = g_i^{\rm SM} + g_i' \times \frac{\Lambda_i^4}{(\Lambda_i^2 + |q_1^2|)(\Lambda_i^2 + |q_2^2|)}
-%\]
+We now allow for $q^2$ dependent form factors as described in Ref.~\cite{Anderson:2013} and given in more detail in the equation below:
 \[
-g_i(q_1^2,q_2^2) = g_i^{\rm SM} 
-+ g_i' \frac{\Lambda_i^4}{(\Lambda_i^2 + |q_1^2|)(\Lambda_i^2 + |q_2^2|)}
+g_i(q_1^2,q_2^2) = 
+g_i^{\rm SM} 
++ g_i' \frac{\Lambda_i^4}{(\Lambda_i^2 + |q_1^2|)(\Lambda_i^2 + |q_2^2|)} 
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+\]
+\[
 + g_i'' \frac{(|q_1^2|+|q_2^2|)}{\Lambda_i^2}
-+ g_i''' \frac{(|q_1^2|+|q_2^2|)^2}{\Lambda_i^4}
++ g_i''' \frac{(|q_1^2|-|q_2^2|)}{\Lambda_i^2}
 + g_i'''' \frac{|q_1^2| \, |q_2^2|}{\Lambda_i^4}
++ g_i''''' \frac{(|q_1^2|^2+|q_2^2|^2)}{\Lambda_i^4}
++ g_i'''''' \frac{(|q_1^2|^2-|q_2^2|^2)}{\Lambda_i^4}
 \]
 \noindent
 The user has the option to choose between these functional forms, 
-where the term multiplying $g_i'$ corresponds to the full functional form and the $g_i''... g_i''''$ correspond to an expansion in $\Lambda^2$
+where the term multiplying $g_i'$ corresponds to the full functional form and the $g_i''... g_i'''''' $ correspond to an expansion in $\Lambda^2$.
 All parameters can be modified in \verb|mod_Parameters.F90| by:
 \begin{verbatim}
 
@@ -307,6 +336,19 @@ All parameters can be modified in \verb|mod_Parameters.F90| by:
    real(8),    public, parameter :: Lambda_z3 = 10000d0*GeV
    real(8),    public, parameter :: Lambda_z4 = 10000d0*GeV   
 \end{verbatim}
+
+If the switch \verb|includeGammaStar| is set to \verb|.true.| then intermediate off-shell photons are included for $Z$ boson final states. 
+Their couplings to the spin-0 resonance are controlled by separate parameters,
+\begin{verbatim}
+   complex(8), public, parameter :: ghzgs2  = (0.00d0,0d0)
+   complex(8), public, parameter :: ghzgs3  = (0.00d0,0d0)
+   complex(8), public, parameter :: ghzgs4  = (0.00d0,0d0)
+   complex(8), public, parameter :: ghgsgs2 = (0.00d0,0d0)
+   complex(8), public, parameter :: ghgsgs3 = (0.00d0,0d0)
+   complex(8), public, parameter :: ghgsgs4 = (0.00d0,0d0)
+\end{verbatim}
+where the first three correspond to $Z\gamma^*$ couplings and the latter three corresponds to $\gamma^* \gamma^*$ interactions.
+These two sets of parameters also controll the coupling strength in final states with on-shell photons, i.e. $Z\gamma$ and $\gamma\gamma$.
 
 \subsubsection{ Spin-1 parameters }
 
@@ -408,10 +450,9 @@ kinematically the same but are presented only to illustrate how one takes care o
    complex(8), public, parameter :: ghg2 = (1.0d0,0d0)
    complex(8), public, parameter :: ghg3 = (0.0d0,0d0)
    complex(8), public, parameter :: ghg4 = (0.0d0,0d0)   ! pseudoscalar
-   complex(8), public, parameter :: ghz1 = (0.0d0,0d0)
-   complex(8), public, parameter :: ghz2 = (1.0d0,0d0)
-   complex(8), public, parameter :: ghz3 = (0.0d0,0d0)
-   complex(8), public, parameter :: ghz4 = (0.0d0,0d0)   ! pseudoscalar 
+   complex(8), public, parameter :: ghgsgs2 = (1.0d0,0d0)
+   complex(8), public, parameter :: ghgsgs3 = (0.0d0,0d0)
+   complex(8), public, parameter :: ghgsgs4 = (0.0d0,0d0)   ! pseudoscalar 
 \end{verbatim}
 
 \subsection{ $J^P = 0^-_m$ resonance, $X \to \gamma \gamma$}
@@ -423,10 +464,9 @@ kinematically the same but are presented only to illustrate how one takes care o
    complex(8), public, parameter :: ghg2 = (1.0d0,0d0)
    complex(8), public, parameter :: ghg3 = (0.0d0,0d0)
    complex(8), public, parameter :: ghg4 = (0.0d0,0d0)   ! pseudoscalar
-   complex(8), public, parameter :: ghz1 = (0.0d0,0d0)
-   complex(8), public, parameter :: ghz2 = (0.0d0,0d0)
-   complex(8), public, parameter :: ghz3 = (0.0d0,0d0)
-   complex(8), public, parameter :: ghz4 = (1.0d0,0d0)   ! pseudoscalar 
+   complex(8), public, parameter :: ghgsgs2 = (1.0d0,0d0)
+   complex(8), public, parameter :: ghgsgs3 = (0.0d0,0d0)
+   complex(8), public, parameter :: ghgsgs4 = (0.0d0,0d0)   ! pseudoscalar 
 \end{verbatim}
 
 \subsection{ $J^P = 2^+_m$ resonance, $X \to ZZ~{\rm or}~WW~{\rm or}~\gamma \gamma$}
@@ -530,7 +570,16 @@ Instructions for setting up the JHUGenMELA with MCFM are in the file \verb|JHUGe
 \section{ Release notes }
 
 \noindent
+In going from \verb|v4.3.2| to \verb|v4.5.2|, the updates are as follows:
 
+\begin{itemize}
+\item add an option of intermediate photons for the modes with Z-bosons
+\item more flexibility for $q^2$-dependent form factors
+\item option of hadronic branching rescaling (NLO QCD corrections) for inclusive decays
+\item synchronize JHUGenMELA with the generator and with MCFM library v6.7
+\end{itemize}
+
+\noindent
 In going from \verb|v4.2.1| to \verb|v4.3.2|, the updates are as follows:
 
 \begin{itemize}
