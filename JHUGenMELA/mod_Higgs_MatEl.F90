@@ -652,10 +652,10 @@
       xxx1 = ghg2_dyn+ghg3_dyn/4d0/Lambda**2*MG**2
       xxx3 = -2d0*ghg4_dyn
       yyy1 =                          &  ! removed ghz1 dependence because it does not contribute
-           + ghz2_dyn*(MG**2-MZ3**2-MZ4**2)/MG**2 &
-           + ghz3_dyn/Lambda**2*(MG**2-MZ3**2-MZ4**2)*(MG**2-MZ4**2-MZ3**2)/4d0/MG**2
-      yyy2 = -2d0*ghz2_dyn-ghz3_dyn/2d0/Lambda**2*(MG**2-MZ3**2-MZ4**2) 
-      yyy3 = -2d0*ghz4_dyn
+           + ghzgs2_dyn*(MG**2-MZ3**2-MZ4**2)/MG**2 &
+           + ghzgs3_dyn/Lambda**2*(MG**2-MZ3**2-MZ4**2)*(MG**2-MZ4**2-MZ3**2)/4d0/MG**2
+      yyy2 = -2d0*ghzgs2_dyn-ghzgs3_dyn/2d0/Lambda**2*(MG**2-MZ3**2-MZ4**2) 
+      yyy3 = -2d0*ghzgs4_dyn
     endif
 
 
