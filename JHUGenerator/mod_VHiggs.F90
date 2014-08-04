@@ -214,26 +214,38 @@ contains
 !ZZX vertex
       q3_q3 = four_momentum(1,1)*four_momentum(1,1) -four_momentum(1,2)*four_momentum(1,2) -four_momentum(1,3)*four_momentum(1,3) -four_momentum(1,4)*four_momentum(1,4)
       q4_q4 = four_momentum(2,1)*four_momentum(2,1) -four_momentum(2,2)*four_momentum(2,2) -four_momentum(2,3)*four_momentum(2,3) -four_momentum(2,4)*four_momentum(2,4)
+
       ghz1_dyn = ghz1   +   ghz1_prime * Lambda_z1**4/( Lambda_z1**2 + abs(q3_q3) )/( Lambda_z1**2 + abs(q4_q4))  &
                         +   ghz1_prime2* ( abs(q3_q3)+abs(q4_q4) )/Lambda_z1**2                                   &
-                        +   ghz1_prime3* ( abs(q3_q3)+abs(q4_q4) )**2/Lambda_z1**4                                &
-                        +   ghz1_prime4* ( abs(q3_q3)*abs(q4_q4) )/Lambda_z1**4                                   &
-                        +   ghz1_prime5* ( abs(q3_q3)-abs(q4_q4) )/Lambda_z1**2
+                        +   ghz1_prime3* ( abs(q3_q3)-abs(q4_q4) )/Lambda_z1**2                                   &
+                        +   ghz1_prime4* (     inv_mass(3)**2    )/Lambda_Q**2                                    &
+                        +   ghz1_prime5* ( abs(q3_q3)**2+abs(q4_q4)**2 )/Lambda_z1**4                             &
+                        +   ghz1_prime6* ( abs(q3_q3)**2-abs(q4_q4)**2 )/Lambda_z1**4                             &
+                        +   ghz1_prime7* ( abs(q3_q3)*abs(q4_q4) )      /Lambda_z1**4
+
       ghz2_dyn = ghz2   +   ghz2_prime * Lambda_z2**4/( Lambda_z2**2 + abs(q3_q3) )/( Lambda_z2**2 + abs(q4_q4))  &
                         +   ghz2_prime2* ( abs(q3_q3)+abs(q4_q4) )/Lambda_z2**2                                   &
-                        +   ghz2_prime3* ( abs(q3_q3)+abs(q4_q4) )**2/Lambda_z2**4                                &
-                        +   ghz2_prime4* ( abs(q3_q3)*abs(q4_q4) )/Lambda_z2**4                                   & 
-                        +   ghz2_prime5* ( abs(q3_q3)-abs(q4_q4) )/Lambda_z2**2
+                        +   ghz2_prime3* ( abs(q3_q3)-abs(q4_q4) )/Lambda_z2**2                                   &
+                        +   ghz2_prime4* (       inv_mass(3)**2  )/Lambda_Q**2                                    &
+                        +   ghz2_prime5* ( abs(q3_q3)**2+abs(q4_q4)**2 )/Lambda_z2**4                             &
+                        +   ghz2_prime6* ( abs(q3_q3)**2-abs(q4_q4)**2 )/Lambda_z2**4                             &
+                        +   ghz2_prime7* ( abs(q3_q3)*abs(q4_q4) )      /Lambda_z2**4
+
       ghz3_dyn = ghz3   +   ghz3_prime * Lambda_z3**4/( Lambda_z3**2 + abs(q3_q3) )/( Lambda_z3**2 + abs(q4_q4))  &
                         +   ghz3_prime2* ( abs(q3_q3)+abs(q4_q4) )/Lambda_z3**2                                   &
-                        +   ghz3_prime3* ( abs(q3_q3)+abs(q4_q4) )**2/Lambda_z3**4                                &
-                        +   ghz3_prime4* ( abs(q3_q3)*abs(q4_q4) )/Lambda_z3**4                                   &
-                        +   ghz3_prime5* ( abs(q3_q3)-abs(q4_q4) )/Lambda_z3**2
+                        +   ghz3_prime3* ( abs(q3_q3)-abs(q4_q4) )/Lambda_z3**2                                   &
+                        +   ghz3_prime4* (       inv_mass(3)**2  )/Lambda_Q**2                                    &
+                        +   ghz3_prime5* ( abs(q3_q3)**2+abs(q4_q4)**2 )/Lambda_z3**4                             &
+                        +   ghz3_prime6* ( abs(q3_q3)**2-abs(q4_q4)**2 )/Lambda_z3**4                             &
+                        +   ghz3_prime7* ( abs(q3_q3)*abs(q4_q4) )      /Lambda_z3**4
+
       ghz4_dyn = ghz4   +   ghz4_prime * Lambda_z4**4/( Lambda_z4**2 + abs(q3_q3) )/( Lambda_z4**2 + abs(q4_q4))  &
                         +   ghz4_prime2* ( abs(q3_q3)+abs(q4_q4) )/Lambda_z4**2                                   &
-                        +   ghz4_prime3* ( abs(q3_q3)+abs(q4_q4) )**2/Lambda_z4**4                                &
-                        +   ghz4_prime4* ( abs(q3_q3)*abs(q4_q4) )/Lambda_z4**4                                   &
-                        +   ghz4_prime5* ( abs(q3_q3)-abs(q4_q4) )/Lambda_z4**2
+                        +   ghz4_prime3* ( abs(q3_q3)-abs(q4_q4) )/Lambda_z4**2                                   &
+                        +   ghz4_prime4* (        inv_mass(3)**2 )/Lambda_Q**2                                    &
+                        +   ghz4_prime5* ( abs(q3_q3)**2+abs(q4_q4)**2 )/Lambda_z4**4                             &
+                        +   ghz4_prime6* ( abs(q3_q3)**2-abs(q4_q4)**2 )/Lambda_z4**4                             &
+                        +   ghz4_prime7* ( abs(q3_q3)*abs(q4_q4) )      /Lambda_z4**4
 
       gVVS1 = ghz1_dyn*(mass(1,1)**2) + qq * ( 2d0*ghz2_dyn + ghz3_dyn*qq/(Lambda*1d2) )
       gVVS2 = -( 2d0*ghz2_dyn + ghz3_dyn*qq/(Lambda*1d2) )

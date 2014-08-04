@@ -1,6 +1,6 @@
 ! If you use this program please cite Phys.Rev. D81 (2010) 075022; arXiv:1001.3396 [hep-ph],
 !                                     Phys.Rev. D86 (2012) 095031; arXiv:1208.4018 [hep-ph],
-!                                 and                              arXiv:1309.4819 [hep-ph].
+!                                 and Phys.Rev. D89 (2014) 035007; arXiv:1309.4819 [hep-ph].
 PROGRAM JHUGenerator
 use ModParameters
 use ModKinematics
@@ -1728,7 +1728,6 @@ implicit none
         write(io_stdout,"(4X,A)") "PDFSet:     1=CTEQ6L1(2001), 2=MSTW(2008),  2xx=MSTW with eigenvector set xx=01..40)"
         write(io_stdout,"(4X,A)") "VegasNc0:   number of evaluations for integrand scan"
         write(io_stdout,"(4X,A)") "VegasNc1:   number of evaluations for accept-reject sampling"
-        write(io_stdout,"(4X,A)") "VegasNc2:   number of events for accept-reject sampling"
         write(io_stdout,"(4X,A)") "Unweighted: 0=weighted events, 1=unweighted events"
         write(io_stdout,"(4X,A)") "Interf:     0=neglect interference for 4f final states, 1=include interference"
         write(io_stdout,"(4X,A)") "DataFile:   LHE output file"
@@ -1754,9 +1753,9 @@ integer :: TheUnit
     write(TheUnit,"(A90)") " *                                                                                     *"
     write(TheUnit,"(A90)") " *         I. Anderson, S. Bolognesi, F. Caola, Y. Gao, A. Gritsan, C. Martin,         *"
     write(TheUnit,"(A90)") " *           Z. Guo, K. Melnikov, M. Schulze, N. Tran, A. Whitbeck, Y. Zhou            *"
-    write(TheUnit,"(A90)") " *                Phys.Rev. D81 (2010) 075022;  arXiv:1001.3396 [hep-ph]               *"
-    write(TheUnit,"(A90)") " *                Phys.Rev. D86 (2012) 095031;  arXiv:1208.4018 [hep-ph]               *"
-    write(TheUnit,"(A90)") " *                                              arXiv:1309.4819 [hep-ph]               *"
+    write(TheUnit,"(A90)") " *                Phys.Rev. D81 (2010) 075022;  arXiv:1001.3396 [hep-ph],              *"
+    write(TheUnit,"(A90)") " *                Phys.Rev. D86 (2012) 095031;  arXiv:1208.4018 [hep-ph],              *"
+    write(TheUnit,"(A90)") " *                Phys.Rev. D89 (2014) 035007;  arXiv:1309.4819 [hep-ph].              *"
     write(TheUnit,"(A90)") " *                                                                                     *"
     write(TheUnit,"(A90)") " ***************************************************************************************"
     write(TheUnit,"(A90)") " "

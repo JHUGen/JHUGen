@@ -14,7 +14,7 @@ real(8), parameter :: vev = 1.0d0/dsqrt(Gf*dsqrt(2.0d0))
 real(8), parameter :: gwsq = 4.0d0 * M_W**2/vev**2  ! weak constant squared
 real(8), parameter :: alpha_QED = 1d0/128.0d0       ! el.magn. coupling
 real(8), parameter :: alphas = 0.13229060d0         ! strong coupling
-real(8), parameter :: sitW = dsqrt(0.23119d0)       ! sin(Theta_Weinberg) (PDG-2008)
+real(8), parameter :: sitW = dsqrt(0.22264585341299603d0)       ! sin(Theta_Weinberg) (PDG-2008)
 
 
 integer, parameter :: DecayMode1=0
@@ -34,27 +34,42 @@ complex(8) :: ghz1_prime2
 complex(8) :: ghz1_prime3
 complex(8) :: ghz1_prime4
 complex(8) :: ghz1_prime5
+complex(8) :: ghz1_prime6
+complex(8) :: ghz1_prime7
 
 complex(8) :: ghz2_prime 
 complex(8) :: ghz2_prime2
 complex(8) :: ghz2_prime3
 complex(8) :: ghz2_prime4
 complex(8) :: ghz2_prime5
+complex(8) :: ghz2_prime6
+complex(8) :: ghz2_prime7
 
 complex(8) :: ghz3_prime 
 complex(8) :: ghz3_prime2
 complex(8) :: ghz3_prime3
 complex(8) :: ghz3_prime4
 complex(8) :: ghz3_prime5
+complex(8) :: ghz3_prime6
+complex(8) :: ghz3_prime7
 
 complex(8) :: ghz4_prime 
 complex(8) :: ghz4_prime2
 complex(8) :: ghz4_prime3
 complex(8) :: ghz4_prime4
 complex(8) :: ghz4_prime5
+complex(8) :: ghz4_prime6
+complex(8) :: ghz4_prime7
+
+complex(8) :: ghzgs1_prime2
 
 real(8), parameter :: lambda_z1 = 10000d0 * GeV
 real(8), parameter :: lambda_z2 = 10000d0 * GeV
 real(8), parameter :: lambda_z3 = 10000d0 * GeV
 real(8), parameter :: lambda_z4 = 10000d0 * GeV
+real(8), parameter :: lambda_z5 = 10000d0 * GeV
+real(8), parameter :: lambda_Q  = 10000d0 * GeV
+
+
+
 

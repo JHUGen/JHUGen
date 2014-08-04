@@ -9,7 +9,7 @@ integer :: MY_IDUP(6:9)
 real(8),  parameter :: GeV=1d0/100d0
 real(8),  parameter :: LHCEnergy=8000d0 * GeV
 real(8),  parameter :: alphas = 0.13229060d0
-complex(8) :: Hggcoupl(1:3),Hzzcoupl(1:30)
+complex(8) :: Hggcoupl(1:3),Hzzcoupl(1:39),Hwwcoupl(1:32)
 complex(8) :: Zqqcoupl(1:2),Zzzcoupl(1:2)
 complex(8) :: Gggcoupl(1:5),Gqqcoupl(1:2),Gzzcoupl(1:10)
 integer :: i, j
@@ -21,7 +21,7 @@ integer :: i, j
   Hggcoupl(1:3) = (/ (1d0,0d0), (0d0,0d0), (0d0,0d0) /)
   Hzzcoupl(1:4) = (/ (2d0,0d0), (0d0,0d0), (0d0,0d0), (0d0,0d0) /)
   Hzzcoupl(5:10)= (/ (1d0,0d0), (0d0,0d0), (0d0,0d0), (0d0,0d0), (0d0,0d0), (0d0,0d0)/) ! couplings for intermediate photons (ghzgs2,..,ghzgs4,ghgsgs2,..,ghgsgs4)
-  Hzzcoupl(11:30)= (0d0,0d0) ! momentum dependent couplings (ghz1_prime,ghz1_prime2,...,ghz4_prime3,ghz4_prime4,ghz4_prime5)
+  Hzzcoupl(11:39)= (0d0,0d0) ! momentum dependent couplings (ghz1_prime,ghz1_prime2,..,ghz4_prime3,ghz4_prime4,ghz4_prime5,ghzgs1_prime2,ghz1_prime6,..,ghz4_prime7)
   Zqqcoupl(1:2) = (/ (1d0,0d0), (1d0,0d0) /)
   Zzzcoupl(1:2) = (/ (0d0,0d0), (1d0,0d0) /)
   Gggcoupl(1:5) = (/ (1d0,0d0), (0d0,0d0), (0d0,0d0), (0d0,0d0), (0d0,0d0) /)
@@ -117,6 +117,13 @@ integer :: i, j
 
 
   !-- CHECK HIGGS PLUS 2-JETS AMPLITUDES
+
+  Hzzcoupl(1:4) = (/ (2d0,0d0), (0d0,0d0), (0d0,0d0), (0d0,0d0) /)
+  Hzzcoupl(5:32)= (0d0,0d0) ! momentum dependent couplings (ghz1_prime,ghz1_prime2,..,ghz4_prime3,ghz4_prime4,ghz4_prime5,ghz1_prime6,..,ghz4_prime7)
+  Hwwcoupl(1:32) = (0d0,0d0) ! only used in WBF: if all zero then WWH couplings are set equal to ZZH couplings
+
+
+
   p5(:,1) = LHCEnergy/2d0 * (/1d0,0d0,0d0,1d0/)
   p5(:,2) = LHCEnergy/2d0 * (/1d0,0d0,0d0,-1d0/)
   p5(:,3)= (/ 265.78337209227107d0, 53.577941071379172d0, 43.898955201800788d0, -256.59907802539107d0 /) * GeV
@@ -125,7 +132,7 @@ integer :: i, j
 
   print *, 'WBF, SM couplings'
   Hzzcoupl(1:4) = (/ (2d0,0d0), (0d0,0d0), (0d0,0d0), (0d0,0d0) /)
-  call EvalAmp_WBFH(p5,Hzzcoupl,MatElSqPDF)
+  call EvalAmp_WBFH(p5,Hzzcoupl(1:32),Hwwcoupl(1:32),MatElSqPDF)
   include './checkWBF_SM.dat'
   do i = -5,5
      do j = -5,5
@@ -137,7 +144,7 @@ integer :: i, j
 
   print *, 'WBF, non standard couplings'
   Hzzcoupl(1:4) = (/ (1d0,2d0), (3d0,4d0), (5d0,6d0), (7d0,8d0) /)
-  call EvalAmp_WBFH(p5,Hzzcoupl,MatElSqPDF)
+  call EvalAmp_WBFH(p5,Hzzcoupl,Hwwcoupl(1:32),MatElSqPDF)
   include './checkWBF_1-8.dat'
   do i = -5,5
      do j = -5,5

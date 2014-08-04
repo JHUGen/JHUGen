@@ -44,7 +44,7 @@ contains
    FluxFac = 1d0/(2d0*EHat**2)
 
    if (process.eq.60) then
-      call EvalAmp_WBFH_UnSymm_SA(MomExt,(/ghz1,ghz2,ghz3,ghz4/),me2)
+      call EvalAmp_WBFH_UnSymm_SA(MomExt,(/ghz1,ghz2,ghz3,ghz4/),(/ghw1,ghw2,ghw3,ghw4/),me2)
       MY_IDUP(1:5)  = (/Up_,Up_,Up_,Up_,Hig_/)
       ICOLUP(1:2,1) = (/501,000/)
       ICOLUP(1:2,2) = (/502,000/)
@@ -159,7 +159,7 @@ IF( GENEVT ) THEN
 1313 continue
 
    if( Process.eq.60 ) then
-      call EvalAmp_WBFH_UnSymm_SA(MomExt,(/ghz1,ghz2,ghz3,ghz4/),me2)
+      call EvalAmp_WBFH_UnSymm_SA(MomExt,(/ghz1,ghz2,ghz3,ghz4/),(/ghw1,ghw2,ghw3,ghw4/),me2)
 
       MY_IDUP(1:2)= (/LHA2M_ID(ifound),LHA2M_ID(jfound)/)
       if( MY_IDUP(1).gt.0 ) then ! quark
@@ -300,7 +300,7 @@ ELSE! NOT GENEVT
 
 
    if( Process.eq.60 ) then
-      call EvalAmp_WBFH_UnSymm_SA(MomExt,(/ghz1,ghz2,ghz3,ghz4/),me2)
+      call EvalAmp_WBFH_UnSymm_SA(MomExt,(/ghz1,ghz2,ghz3,ghz4/),(/ghw1,ghw2,ghw3,ghw4/),me2)
 
    elseif( Process.eq.61 ) then
       call EvalAmp_SBFH_UnSymm_SA(MomExt,(/ghg2,ghg3,ghg4/),me2)
