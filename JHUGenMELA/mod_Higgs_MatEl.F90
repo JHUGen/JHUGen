@@ -18,7 +18,7 @@
       implicit none
       real(dp), intent(out) ::  res
       real(dp), intent(in) :: p(4,6),M_Reso,Ga_Reso
-      complex(dp) :: ggcoupl(1:3),vvcoupl(1:30)
+      complex(dp) :: ggcoupl(1:3),vvcoupl(1:39)
       integer, intent(in) :: MY_IDUP(6:9)
       complex(dp) :: A_VV(1:8)
       integer :: i1,i2,i3,i4,VVMode
@@ -106,7 +106,7 @@
      implicit none
      integer :: ordering(1:4),VVMode,i1,i2,i3,i4,l1,l2,l3,l4,MY_IDUP(6:9)
      real(dp) :: p(1:4,1:6),M_Reso,Ga_Reso
-     complex(dp) :: ggcoupl(1:3),vvcoupl(1:30)
+     complex(dp) :: ggcoupl(1:3),vvcoupl(1:39)
      complex(dp) :: propG, propZ1, propZ2
      real(dp) :: s, pin(4,4)
      complex(dp) :: A(1:1), sp(4,4)
@@ -172,15 +172,10 @@
               sp(3,:) = -sp(3,:) + pin(3,:)*( sc(sp(3,:),dcmplx(pin(3,:))) )/scr(pin(3,:),pin(3,:))! full propagator numerator
               sp(4,:) = pol_dk2mom(dcmplx(p(:,l3)),dcmplx(p(:,l4)),-3+2*i4)  ! ubar(l3), v(l4)
               sp(4,:) = -sp(4,:) + pin(4,:)*( sc(sp(4,:),dcmplx(pin(4,:))) )/scr(pin(4,:),pin(4,:))! full propagator numerator
-!print *, "ubar, v, ubar, v"
-!print *, "masses",scr(p(:,l1),p(:,l1)),scr(p(:,l2),p(:,l2)),scr(p(:,l3),p(:,l3)),scr(p(:,l4),p(:,l4))
-!print *, "check", sc(sp(3,:),dcmplx(pin(3,:))), sc(sp(4,:),dcmplx(pin(4,:)))
-!pause
               s = scr(p(:,l1)+p(:,l2),p(:,l1)+p(:,l2))
               propZ1 = s/dcmplx(s - M_V**2,M_V*Ga_V)
               s = scr(p(:,l3)+p(:,l4),p(:,l3)+p(:,l4))
               propZ2 = s/dcmplx(s - M_V**2,M_V*Ga_V)
-
          elseif( VVMode.eq.WWMode ) then 
 !        WW DECAYS
               aL1 = bL
@@ -193,10 +188,6 @@
               sp(3,:) = -sp(3,:) + pin(3,:)*( sc(sp(3,:),dcmplx(pin(3,:))) )/scr(pin(3,:),pin(3,:))! full propagator numerator
               sp(4,:) = pol_dk2mom(dcmplx(p(:,l3)),dcmplx(p(:,l4)),-3+2*i4)  ! ubar(l3), v(l4)
               sp(4,:) = -sp(4,:) + pin(4,:)*( sc(sp(4,:),dcmplx(pin(4,:))) )/scr(pin(4,:),pin(4,:))! full propagator numerator
-!print *, "ubar, v, ubar, v"
-!print *, "masses",scr(p(:,l1),p(:,l1)),scr(p(:,l2),p(:,l2)),scr(p(:,l3),p(:,l3)),scr(p(:,l4),p(:,l4))
-!print *, "check", sc(sp(3,:),dcmplx(pin(3,:))), sc(sp(4,:),dcmplx(pin(4,:)))
-!pause
               s = scr(p(:,l1)+p(:,l2),p(:,l1)+p(:,l2))
               propZ1 = s/dcmplx(s - M_V**2,M_V*Ga_V)
               s = scr(p(:,l3)+p(:,l4),p(:,l3)+p(:,l4))
@@ -424,15 +415,7 @@
          endif
 
 
-!          if( OffShellReson ) then
-!               if( includeGammaStar ) then
-!                     print *,"gs not yet implemented"
-!                     stop
-!               endif
-!               call ggOffHZZampl(pin,sp,M_Reso,Ga_Reso,ggcoupl,vvcoupl,A(1))
-!          else
-              call ggHZZampl(VVMode,pin,sp,M_Reso,Ga_Reso,ggcoupl,vvcoupl,A(1))
-!          endif
+         call ggHZZampl(VVMode,pin,sp,M_Reso,Ga_Reso,ggcoupl,vvcoupl,A(1))
 
          if (i3.eq.1) then
             A(1) = aL1 * A(1)
@@ -447,6 +430,8 @@
          A(1) = A(1) * propG*propZ1*propZ2
 
 
+
+
      end subroutine
 
 
@@ -457,7 +442,7 @@
       implicit none
       integer, intent(in) :: VVMode
       real(dp), intent(in) :: p(4,4),M_Reso,Ga_Reso
-      complex(dp) :: ggcoupl(1:3),vvcoupl(1:30)
+      complex(dp) :: ggcoupl(1:3),vvcoupl(1:39)
       complex(dp), intent(in) :: sp(4,4)
       complex(dp), intent(out) :: res
       complex(dp) :: e1_e2, e1_e3, e1_e4
@@ -475,7 +460,7 @@
       complex(dp) :: xxx1,xxx2,xxx3,yyy1,yyy2,yyy3,yyy4
       real(dp) :: q34
       real(dp) :: MG, MZ3, MZ4, q3_q3, q4_q4
-      complex(dp) :: ghz1_dyn,ghz2_dyn,ghz3_dyn,ghz4_dyn
+      complex(dp) :: ghz1_dyn,ghz2_dyn,ghz3_dyn,ghz4_dyn,ghz5_dyn
       complex(dp) :: ghzgs2_dyn,ghzgs3_dyn,ghzgs4_dyn,ghgsgs2_dyn,ghgsgs3_dyn,ghgsgs4_dyn
       include "includeVars.F90"
 
@@ -518,6 +503,18 @@
       ghz4_prime4= vvcoupl(29)
       ghz4_prime5= vvcoupl(30)
 
+      ghzgs1_prime2= vvcoupl(31)
+
+      ghz1_prime6  = vvcoupl(32)
+      ghz1_prime7  = vvcoupl(33)
+      ghz2_prime6  = vvcoupl(34)
+      ghz2_prime7  = vvcoupl(35)
+      ghz3_prime6  = vvcoupl(36)
+      ghz3_prime7  = vvcoupl(37)
+      ghz4_prime6  = vvcoupl(38)
+      ghz4_prime7  = vvcoupl(39)
+      
+      
       res = 0d0
 
       q1 = dcmplx(p(1,:),0d0)
@@ -579,24 +576,36 @@
       ghg4_dyn = ghg4
       ghz1_dyn = ghz1   +   ghz1_prime * Lambda_z1**4/( Lambda_z1**2 + abs(q3_q3) )/( Lambda_z1**2 + abs(q4_q4))  &
                         +   ghz1_prime2* ( abs(q3_q3)+abs(q4_q4) )/Lambda_z1**2                                   &
-                        +   ghz1_prime3* ( abs(q3_q3)+abs(q4_q4) )**2/Lambda_z1**4                                &
-                        +   ghz1_prime4* ( abs(q3_q3)*abs(q4_q4) )/Lambda_z1**4                                   &
-                        +   ghz1_prime5* ( abs(q3_q3)-abs(q4_q4) )/Lambda_z1**2
+                        +   ghz1_prime3* ( abs(q3_q3)-abs(q4_q4) )/Lambda_z1**2                                   &
+                        +   ghz1_prime4* (          MG**2        )/Lambda_Q**2                                    &
+                        +   ghz1_prime5* ( abs(q3_q3)**2+abs(q4_q4)**2 )/Lambda_z1**4                             &
+                        +   ghz1_prime6* ( abs(q3_q3)**2-abs(q4_q4)**2 )/Lambda_z1**4                             &
+                        +   ghz1_prime7* ( abs(q3_q3)*abs(q4_q4) )      /Lambda_z1**4
+
       ghz2_dyn = ghz2   +   ghz2_prime * Lambda_z2**4/( Lambda_z2**2 + abs(q3_q3) )/( Lambda_z2**2 + abs(q4_q4))  &
                         +   ghz2_prime2* ( abs(q3_q3)+abs(q4_q4) )/Lambda_z2**2                                   &
-                        +   ghz2_prime3* ( abs(q3_q3)+abs(q4_q4) )**2/Lambda_z2**4                                &
-                        +   ghz2_prime4* ( abs(q3_q3)*abs(q4_q4) )/Lambda_z2**4                                   & 
-                        +   ghz2_prime5* ( abs(q3_q3)-abs(q4_q4) )/Lambda_z2**2
+                        +   ghz2_prime3* ( abs(q3_q3)-abs(q4_q4) )/Lambda_z2**2                                   &
+                        +   ghz2_prime4* (          MG**2        )/Lambda_Q**2                                    &
+                        +   ghz2_prime5* ( abs(q3_q3)**2+abs(q4_q4)**2 )/Lambda_z2**4                             &
+                        +   ghz2_prime6* ( abs(q3_q3)**2-abs(q4_q4)**2 )/Lambda_z2**4                             &
+                        +   ghz2_prime7* ( abs(q3_q3)*abs(q4_q4) )      /Lambda_z2**4
+
       ghz3_dyn = ghz3   +   ghz3_prime * Lambda_z3**4/( Lambda_z3**2 + abs(q3_q3) )/( Lambda_z3**2 + abs(q4_q4))  &
                         +   ghz3_prime2* ( abs(q3_q3)+abs(q4_q4) )/Lambda_z3**2                                   &
-                        +   ghz3_prime3* ( abs(q3_q3)+abs(q4_q4) )**2/Lambda_z3**4                                &
-                        +   ghz3_prime4* ( abs(q3_q3)*abs(q4_q4) )/Lambda_z3**4                                   &
-                        +   ghz3_prime5* ( abs(q3_q3)-abs(q4_q4) )/Lambda_z3**2
+                        +   ghz3_prime3* ( abs(q3_q3)-abs(q4_q4) )/Lambda_z3**2                                   &
+                        +   ghz3_prime4* (          MG**2        )/Lambda_Q**2                                    &
+                        +   ghz3_prime5* ( abs(q3_q3)**2+abs(q4_q4)**2 )/Lambda_z3**4                             &
+                        +   ghz3_prime6* ( abs(q3_q3)**2-abs(q4_q4)**2 )/Lambda_z3**4                             &
+                        +   ghz3_prime7* ( abs(q3_q3)*abs(q4_q4) )      /Lambda_z3**4
+
       ghz4_dyn = ghz4   +   ghz4_prime * Lambda_z4**4/( Lambda_z4**2 + abs(q3_q3) )/( Lambda_z4**2 + abs(q4_q4))  &
                         +   ghz4_prime2* ( abs(q3_q3)+abs(q4_q4) )/Lambda_z4**2                                   &
-                        +   ghz4_prime3* ( abs(q3_q3)+abs(q4_q4) )**2/Lambda_z4**4                                &
-                        +   ghz4_prime4* ( abs(q3_q3)*abs(q4_q4) )/Lambda_z4**4                                   &
-                        +   ghz4_prime5* ( abs(q3_q3)-abs(q4_q4) )/Lambda_z4**2
+                        +   ghz4_prime3* ( abs(q3_q3)-abs(q4_q4) )/Lambda_z4**2                                   &
+                        +   ghz4_prime4* (          MG**2        )/Lambda_Q**2                                    &
+                        +   ghz4_prime5* ( abs(q3_q3)**2+abs(q4_q4)**2 )/Lambda_z4**4                             &
+                        +   ghz4_prime6* ( abs(q3_q3)**2-abs(q4_q4)**2 )/Lambda_z4**4                             &
+                        +   ghz4_prime7* ( abs(q3_q3)*abs(q4_q4) )      /Lambda_z4**4
+
       ghzgs2_dyn = ghzgs2
       ghzgs3_dyn = ghzgs3
       ghzgs4_dyn = ghzgs4
@@ -616,12 +625,11 @@
       xxx1 = ghg2_dyn+ghg3_dyn/4d0/Lambda**2*MG**2
       xxx3 = -2d0*ghg4_dyn
       yyy1 = ghz1_dyn*M_V**2/MG**2 &  ! in this line M_V is indeed correct, not a misprint
-           + ghz2_dyn*(MG**2-MZ3**2-MZ4**2)/MG**2 &
+           + ghz2_dyn*(MG**2-MZ3**2-MZ4**2)/MG**2  &
            + ghz3_dyn/Lambda**2*(MG**2-MZ3**2-MZ4**2)*(MG**2-MZ4**2-MZ3**2)/4d0/MG**2
       yyy2 = -2d0*ghz2_dyn-ghz3_dyn/2d0/Lambda**2*(MG**2-MZ3**2-MZ4**2)
       yyy3 = -2d0*ghz4_dyn
     endif
-
 
   elseif( (VVMode.eq.ggMode) .or. (VVMode.eq.gsgsMode)  .or. (VVMode.eq.gsgMode) ) then! decay (gamma-gamma) OR (gamma*-gamma*) OR (gamma*-gamma)
     if( generate_as ) then 
@@ -654,62 +662,14 @@
       yyy1 =                          &  ! removed ghz1 dependence because it does not contribute
            + ghzgs2_dyn*(MG**2-MZ3**2-MZ4**2)/MG**2 &
            + ghzgs3_dyn/Lambda**2*(MG**2-MZ3**2-MZ4**2)*(MG**2-MZ4**2-MZ3**2)/4d0/MG**2
+      if( (VVMode.eq.gsZMode) ) then
+           yyy1 = yyy1 + ghzgs1_prime2/Lambda_z5**2*MZ3**2*M_Z**2/MG**2!   MZ3=q^2_gamma
+      else
+           yyy1 = yyy1 + ghzgs1_prime2/Lambda_z5**2*MZ4**2*M_Z**2/MG**2!   MZ4=q^2_gamma
+      endif           
       yyy2 = -2d0*ghzgs2_dyn-ghzgs3_dyn/2d0/Lambda**2*(MG**2-MZ3**2-MZ4**2) 
       yyy3 = -2d0*ghzgs4_dyn
     endif
-
-
-! !   elseif( VVMode.eq.gsZMode ) then! decay via gamma* Z
-! !     if( generate_as ) then 
-! !       xxx1 = ahg1
-! !       xxx3 = ahg3
-! !       yyy1 = ahz1
-! !       yyy2 = ahz2
-! !       yyy3 = ahz3
-! !     else
-! !       xxx1 = ghg2_dyn+ghg3_dyn/4d0/Lambda**2*MG**2
-! !       xxx3 = -2d0*ghg4_dyn
-! !       yyy1 =                          &  ! removed ghz1 dependence because it does not contribute
-! !            + ghzgs2_dyn*(MG**2-MZ3**2-MZ4**2)/MG**2 &
-! !            + ghzgs3_dyn/Lambda**2*(MG**2-MZ3**2-MZ4**2)*(MG**2-MZ4**2-MZ3**2)/4d0/MG**2
-! !       yyy2 = -2d0*ghzgs2_dyn-ghzgs3_dyn/2d0/Lambda**2*(MG**2-MZ3**2-MZ4**2)
-! !       yyy3 = -2d0*ghzgs4_dyn
-! !     endif
-! ! 
-! !   elseif( VVMode.eq.ZgsMode ) then! decay via Z gamma*
-! !     if( generate_as ) then 
-! !       xxx1 = ahg1
-! !       xxx3 = ahg3
-! !       yyy1 = ahz1
-! !       yyy2 = ahz2
-! !       yyy3 = ahz3
-! !     else
-! !       xxx1 = ghg2+ghg3/4d0/Lambda**2*MG**2
-! !       xxx3 = -2d0*ghg4
-! !       yyy1 =                          &  ! removed ghz1 dependence because it does not contribute
-! !            + ghzgs2_dyn*(MG**2-MZ3**2-MZ4**2)/MG**2 &
-! !            + ghzgs3_dyn/Lambda**2*(MG**2-MZ3**2-MZ4**2)*(MG**2-MZ4**2-MZ3**2)/4d0/MG**2
-! !       yyy2 = -2d0*ghzgs2_dyn-ghzgs3_dyn/2d0/Lambda**2*(MG**2-MZ3**2-MZ4**2)
-! !       yyy3 = -2d0*ghzgs4_dyn
-! !     endif
-! 
-!   elseif( VVMode.eq.gsgsMode) then! decay via gamma* gamma*
-!     if( generate_as ) then 
-!       xxx1 = ahg1
-!       xxx3 = ahg3
-!       yyy1 = ahz1
-!       yyy2 = ahz2
-!       yyy3 = ahz3
-!     else
-!       xxx1 = ghg2+ghg3/4d0/Lambda**2*MG**2
-!       xxx3 = -2d0*ghg4
-!       yyy1 =                          &  ! removed ghz1 dependence because it does not contribute
-!            + ghgsgs2_dyn*(MG**2-MZ3**2-MZ4**2)/MG**2 &
-!            + ghgsgs3_dyn/Lambda**2*(MG**2-MZ3**2-MZ4**2)*(MG**2-MZ4**2-MZ3**2)/4d0/MG**2
-!       yyy2 = -2d0*ghgsgs2_dyn-ghgsgs3_dyn/2d0/Lambda**2*(MG**2-MZ3**2-MZ4**2)
-!       yyy3 = -2d0*ghgsgs4_dyn
-!     endif
-
   endif
 
   res = e1_e2*e3_e4*M_Reso**4*yyy1*xxx1                  &
@@ -728,221 +688,6 @@
 
 
 
-!       subroutine ggOffHZZampl(p,sp,M_Reso,Ga_Reso,ggcoupl,vvcoupl,res)
-!       implicit none
-!       real(dp), intent(in) :: p(4,4),M_Reso,Ga_Reso
-!       complex(dp) :: ggcoupl(1:3),vvcoupl(1:30)
-!       complex(dp), intent(in) :: sp(4,4)
-!       complex(dp), intent(out) :: res
-!       complex(dp) :: e1_e2, e1_e3, e1_e4
-!       complex(dp) :: e2_e3, e2_e4
-!       complex(dp) :: e3_e4
-!       complex(dp) :: q_q
-!       complex(dp) :: q1_q2,q1_q3,q1_q4
-!       complex(dp) :: q2_q3,q2_q4
-!       complex(dp) :: q3_q4
-!       complex(dp) :: q1_e3,q1_e4,q2_e3,q2_e4
-!       complex(dp) :: e1_q3,e1_q4,e2_q3,e2_q4
-!       complex(dp) :: e3_q4,e4_q3
-!       complex(dp) :: q1(4),q2(4),q3(4),q4(4),q(4)
-!       complex(dp) :: e1(4),e2(4),e3(4),e4(4)
-!       complex(dp) :: xxx1,xxx2,xxx3,yyy1,yyy2,yyy3,yyy4
-!       real(dp) :: q34, MG, MZ3, MZ4, q3_q3, q4_q4
-!       complex(dp) :: ghz1_dyn,ghz2_dyn,ghz3_dyn,ghz4_dyn
-!       include "includeVars.F90"
-! 
-!       res = 0d0
-! 
-!       ghg2 =  ggcoupl(1) 
-!       ghg3 =  ggcoupl(2) 
-!       ghg4 =  ggcoupl(3) 
-!       ghz1 =  vvcoupl(1) 
-!       ghz2 =  vvcoupl(2) 
-!       ghz3 =  vvcoupl(3) 
-!       ghz4 =  vvcoupl(4) 
-! 
-!       ghz1_prime = vvcoupl(5) 
-!       ghz1_prime2= vvcoupl(6) 
-!       ghz1_prime3= vvcoupl(7) 
-!       ghz1_prime4= vvcoupl(8)
-!       ghz1_prime5= vvcoupl(9)
-! 
-!       ghz2_prime = vvcoupl(10) 
-!       ghz2_prime2= vvcoupl(11)
-!       ghz2_prime3= vvcoupl(12)
-!       ghz2_prime4= vvcoupl(13)
-!       ghz2_prime5= vvcoupl(14)
-! 
-!       ghz3_prime = vvcoupl(15)
-!       ghz3_prime2= vvcoupl(16)
-!       ghz3_prime3= vvcoupl(17)
-!       ghz3_prime4= vvcoupl(18)
-!       ghz3_prime5= vvcoupl(19)
-! 
-!       ghz4_prime = vvcoupl(20)
-!       ghz4_prime2= vvcoupl(21)
-!       ghz4_prime3= vvcoupl(22)
-!       ghz4_prime4= vvcoupl(23)
-!       ghz4_prime5= vvcoupl(24)
-! 
-!       q1 = dcmplx(p(1,:),0d0)
-!       q2 = dcmplx(p(2,:),0d0)
-!       q3 = dcmplx(p(3,:),0d0)
-!       q4 = dcmplx(p(4,:),0d0)
-! 
-! 
-!       e1 = sp(1,:)
-!       e2 = sp(2,:)
-!       e3 = sp(3,:)
-!       e4 = sp(4,:)
-! 
-!       q = -q1-q2
-! 
-!       q_q =sc(q,q)
-!       q3_q3 = sc(q3,q3)
-!       q4_q4 = sc(q4,q4)
-! 
-! 
-!       if (cdabs(q_q).lt.-0.1d0.or.(q3_q3).lt.-0.1d0.or.(q4_q4).lt.-0.1d0) return  ! if negative invariant masses return zero
-!       MG =dsqrt(cdabs(q_q))
-!       MZ3=dsqrt(dabs(q3_q3))
-!       MZ4=dsqrt(dabs(q4_q4))
-! 
-!       q1_q2 = sc(q1,q2)
-!       q1_q3 = sc(q1,q3)
-!       q1_q4 = sc(q1,q4)
-!       q2_q3 = sc(q2,q3)
-!       q2_q4 = sc(q2,q4)
-!       q3_q4 = sc(q3,q4)
-! 
-! 
-! 
-!       e1_e2 = sc(e1,e2)
-!       e1_e3 = sc(e1,e3)
-!       e1_e4 = sc(e1,e4)
-! 
-!       e2_e3 = sc(e2,e3)
-!       e2_e4 = sc(e2,e4)
-! 
-!       e3_e4 = sc(e3,e4)
-! 
-!       q1_e3 = sc(q1,e3)
-!       q1_e4 = sc(q1,e4)
-!       q2_e3 = sc(q2,e3)
-!       q2_e4 = sc(q2,e4)
-!       e1_q3 = sc(e1,q3)
-!       e1_q4 = sc(e1,q4)
-!       e2_q3 = sc(e2,q3)
-!       e2_q4 = sc(e2,q4)
-!       e3_q4 = sc(e3,q4)
-!       e4_q3 = sc(e4,q3)
-! 
-! 
-! !---- data that defines couplings
-!   if( DecayMode1.le.6 ) then! decay into Z's or W's
-! 
-!     if( generate_as ) then 
-!       xxx1 = ahg1
-!       xxx3 = ahg3
-!       yyy1 = ahz1
-!       yyy2 = ahz2
-!       yyy3 = ahz3
-!     else
-!       ghz1_dyn = ghz1   +   ghz1_prime * Lambda_z1**4/( Lambda_z1**2 + abs(q3_q3) )/( Lambda_z1**2 + abs(q4_q4)) &
-!                         +   ghz1_prime2* ( abs(q3_q3)+abs(q4_q4) )/Lambda_z1**2                                   &
-!                         +   ghz1_prime3* ( abs(q3_q3)+abs(q4_q4) )**2/Lambda_z1**4                                &
-!                         +   ghz1_prime4* ( abs(q3_q3)*abs(q4_q4) )/Lambda_z1**4                                  &
-!                         +   ghz1_prime5* ( abs(q3_q3)-abs(q4_q4) )/Lambda_z1**2
-!       ghz2_dyn = ghz2   +   ghz2_prime * Lambda_z2**4/( Lambda_z2**2 + abs(q3_q3) )/( Lambda_z2**2 + abs(q4_q4)) &
-!                         +   ghz2_prime2* ( abs(q3_q3)+abs(q4_q4) )/Lambda_z2**2                                   &
-!                         +   ghz2_prime3* ( abs(q3_q3)+abs(q4_q4) )**2/Lambda_z2**4                                &
-!                         +   ghz2_prime4* ( abs(q3_q3)*abs(q4_q4) )/Lambda_z2**4                                   &
-!                         +   ghz2_prime5* ( abs(q3_q3)-abs(q4_q4) )/Lambda_z2**2
-!       ghz3_dyn = ghz3   +   ghz3_prime * Lambda_z3**4/( Lambda_z3**2 + abs(q3_q3) )/( Lambda_z3**2 + abs(q4_q4)) &
-!                         +   ghz3_prime2* ( abs(q3_q3)+abs(q4_q4) )/Lambda_z3**2                                   &
-!                         +   ghz3_prime3* ( abs(q3_q3)+abs(q4_q4) )**2/Lambda_z3**4                                &
-!                         +   ghz3_prime4* ( abs(q3_q3)*abs(q4_q4) )/Lambda_z3**4                                   &
-!                         +   ghz3_prime5* ( abs(q3_q3)-abs(q4_q4) )/Lambda_z3**2
-!       ghz4_dyn = ghz4   +   ghz4_prime * Lambda_z4**4/( Lambda_z4**2 + abs(q3_q3) )/( Lambda_z4**2 + abs(q4_q4)) &
-!                         +   ghz4_prime2* ( abs(q3_q3)+abs(q4_q4) )/Lambda_z4**2                                   &
-!                         +   ghz4_prime3* ( abs(q3_q3)+abs(q4_q4) )**2/Lambda_z4**4                                &
-!                         +   ghz4_prime4* ( abs(q3_q3)*abs(q4_q4) )/Lambda_z4**4                                   &
-!                         +   ghz4_prime5* ( abs(q3_q3)-abs(q4_q4) )/Lambda_z4**2
-! 
-!       xxx1 = ghg2+ghg3/4d0/Lambda**2*MG**2
-!       xxx3 = -2d0*ghg4
-!       yyy1 = ghz1_dyn*M_V**2/MG**2 &  ! in this line M_V is indeed correct, not a misprint
-!            + ghz2_dyn*(MG**2-MZ3**2-MZ4**2)/MG**2 &
-!            + ghz3_dyn/Lambda**2*(MG**2-MZ3**2-MZ4**2)*(MG**2-MZ4**2-MZ3**2)/4d0/MG**2
-!       yyy2 = -2d0*ghz2_dyn-ghz3_dyn/2d0/Lambda**2*(MG**2-MZ3**2-MZ4**2)
-!       yyy3 = -2d0*ghz4_dyn
-!     endif
-! 
-!      res = e1_e2*e3_e4*MG**4*yyy1*xxx1                    &
-!          + e1_e2*e3_q4*e4_q3*MG**2*yyy2*xxx1              &
-!          + et1(e1,e2,q1,q2)*e3_e4*MG**2*yyy1*xxx3         &
-!          + et1(e1,e2,q1,q2)*e3_q4*e4_q3*yyy2*xxx3         &
-!          + et1(e1,e2,q1,q2)*et1(e3,e4,q3,q4)*yyy3*xxx3    &
-!          + et1(e3,e4,q3,q4)*e1_e2*M_Reso**2*yyy3*xxx1
-! 
-! 
-!   elseif( DecayMode1.eq.7 ) then! decay into photons
-! 
-! 
-!     if( generate_as ) then 
-!       xxx1 = ahg1
-!       xxx3 = ahg3
-!       yyy1 = ahz1
-!       yyy2 = -2*ahz1 !ahz2  ! gauge invariance fixes ahz2 in this case
-!       yyy3 = ahz3
-!     else
-!       ghz1_dyn = ghz1   +   ghz1_prime * Lambda_z1**4/( Lambda_z1**2 + abs(q3_q3) )/( Lambda_z1**2 + abs(q4_q4)) &
-!                         +   ghz1_prime2* ( abs(q3_q3)+abs(q4_q4) )/Lambda_z1**2                                   &
-!                         +   ghz1_prime3* ( abs(q3_q3)+abs(q4_q4) )**2/Lambda_z1**4                                &
-!                         +   ghz1_prime4* ( abs(q3_q3)*abs(q4_q4) )/Lambda_z1**4                                   &
-!                         +   ghz1_prime5* ( abs(q3_q3)-abs(q4_q4) )/Lambda_z1**2
-!       ghz2_dyn = ghz2   +   ghz2_prime * Lambda_z2**4/( Lambda_z2**2 + abs(q3_q3) )/( Lambda_z2**2 + abs(q4_q4)) &
-!                         +   ghz2_prime2* ( abs(q3_q3)+abs(q4_q4) )/Lambda_z2**2                                   &
-!                         +   ghz2_prime3* ( abs(q3_q3)+abs(q4_q4) )**2/Lambda_z2**4                                &
-!                         +   ghz2_prime4* ( abs(q3_q3)*abs(q4_q4) )/Lambda_z2**4                                  &
-!                         +   ghz2_prime5* ( abs(q3_q3)-abs(q4_q4) )/Lambda_z2**2
-!       ghz3_dyn = ghz3   +   ghz3_prime * Lambda_z3**4/( Lambda_z3**2 + abs(q3_q3) )/( Lambda_z3**2 + abs(q4_q4)) &
-!                         +   ghz3_prime2* ( abs(q3_q3)+abs(q4_q4) )/Lambda_z3**2                                   &
-!                         +   ghz3_prime3* ( abs(q3_q3)+abs(q4_q4) )**2/Lambda_z3**4                                &
-!                         +   ghz3_prime4* ( abs(q3_q3)*abs(q4_q4) )/Lambda_z3**4                                   &
-!                         +   ghz3_prime5* ( abs(q3_q3)-abs(q4_q4) )/Lambda_z3**2
-!       ghz4_dyn = ghz4   +   ghz4_prime * Lambda_z4**4/( Lambda_z4**2 + abs(q3_q3) )/( Lambda_z4**2 + abs(q4_q4)) &
-!                         +   ghz4_prime2* ( abs(q3_q3)+abs(q4_q4) )/Lambda_z4**2                                   &
-!                         +   ghz4_prime3* ( abs(q3_q3)+abs(q4_q4) )**2/Lambda_z4**4                                &
-!                         +   ghz4_prime4* ( abs(q3_q3)*abs(q4_q4) )/Lambda_z4**4                                   &
-!                         +   ghz4_prime5* ( abs(q3_q3)-abs(q4_q4) )/Lambda_z4**2
-! 
-!       xxx1 = ghg2+ghg3/4d0/Lambda**2*MG**2
-!       xxx3 = -2d0*ghg4
-!       yyy1 = ghz1_dyn*M_V**2/MG**2 &  ! in this line M_V is indeed correct, not a misprint
-!            + ghz2_dyn*(MG**2-MZ3**2-MZ4**2)/MG**2 &
-!            + ghz3_dyn/Lambda**2*(MG**2-MZ3**2-MZ4**2)*(MG**2-MZ4**2-MZ3**2)/4d0/MG**2
-!       yyy2 = -2d0*ghz2_dyn-ghz3_dyn/2d0/Lambda**2*(MG**2-MZ3**2-MZ4**2)
-!       yyy3 = -2d0*ghz4_dyn
-!     endif
-! 
-!      res = e1_e2*e3_e4*MG**4*yyy1*xxx1                    &
-!          + e1_e2*e3_q4*e4_q3*MG**2*yyy2*xxx1              &
-!          + et1(e1,e2,q1,q2)*e3_e4*MG**2*yyy1*xxx3         &
-!          + et1(e1,e2,q1,q2)*e3_q4*e4_q3*yyy2*xxx3         &
-!          + et1(e1,e2,q1,q2)*et1(e3,e4,q3,q4)*yyy3*xxx3    &
-!          + et1(e3,e4,q3,q4)*e1_e2*M_Reso**2*yyy3*xxx1
-! 
-!   endif
-! 
-! 
-!       end subroutine ggOffHZZampl
-
-
-
-
-
-
 
 
 
@@ -954,7 +699,7 @@
       real(dp), intent(out) ::  res
       real(dp), intent(in) :: p(4,6),M_Reso,Ga_Reso
       integer, intent(in) :: MY_IDUP(6:9)
-      complex(dp) :: ggcoupl(1:3),vvcoupl(1:30)
+      complex(dp) :: ggcoupl(1:3),vvcoupl(1:39)
       complex(dp) :: A_VV(1:8)
       integer :: i3,i4,VVMode
       real(dp) :: gZ_sq
@@ -1042,7 +787,7 @@
      implicit none
      integer :: ordering(1:4),VVMode,i3,i4,l1,l2,l3,l4,MY_IDUP(6:9)
      real(dp) :: p(1:4,1:6),M_Reso,Ga_Reso
-     complex(dp) :: ggcoupl(1:3),vvcoupl(1:30)
+     complex(dp) :: ggcoupl(1:3),vvcoupl(1:39)
      complex(dp) :: propZ1, propZ2
      real(dp) :: s, pin(4,4), aL1,aR1,aL2,aR2
      complex(dp) :: A(1:1), sp(3:4,4)    
@@ -1098,10 +843,6 @@
               sp(3,:) = -sp(3,:) + pin(3,:)*( sc(sp(3,:),dcmplx(pin(3,:))) )/scr(pin(3,:),pin(3,:))! full propagator numerator
               sp(4,:) = pol_dk2mom(dcmplx(p(:,l3)),dcmplx(p(:,l4)),-3+2*i4)  ! ubar(l3), v(l4)
               sp(4,:) = -sp(4,:) + pin(4,:)*( sc(sp(4,:),dcmplx(pin(4,:))) )/scr(pin(4,:),pin(4,:))! full propagator numerator
-!print *, "ubar, v, ubar, v"
-!print *, "masses",scr(p(:,l1),p(:,l1)),scr(p(:,l2),p(:,l2)),scr(p(:,l3),p(:,l3)),scr(p(:,l4),p(:,l4))
-!print *, "check", sc(sp(3,:),dcmplx(pin(3,:))), sc(sp(4,:),dcmplx(pin(4,:)))
-!pause
               s = scr(p(:,l1)+p(:,l2),p(:,l1)+p(:,l2))
               propZ1 = s/dcmplx(s - M_V**2,M_V*Ga_V)
               s = scr(p(:,l3)+p(:,l4),p(:,l3)+p(:,l4))
@@ -1119,10 +860,6 @@
               sp(3,:) = -sp(3,:) + pin(3,:)*( sc(sp(3,:),dcmplx(pin(3,:))) )/scr(pin(3,:),pin(3,:))! full propagator numerator
               sp(4,:) = pol_dk2mom(dcmplx(p(:,l3)),dcmplx(p(:,l4)),-3+2*i4)  ! ubar(l3), v(l4)
               sp(4,:) = -sp(4,:) + pin(4,:)*( sc(sp(4,:),dcmplx(pin(4,:))) )/scr(pin(4,:),pin(4,:))! full propagator numerator
-!print *, "ubar, v, ubar, v"
-!print *, "masses",scr(p(:,l1),p(:,l1)),scr(p(:,l2),p(:,l2)),scr(p(:,l3),p(:,l3)),scr(p(:,l4),p(:,l4))
-!print *, "check", sc(sp(3,:),dcmplx(pin(3,:))), sc(sp(4,:),dcmplx(pin(4,:)))
-!pause
               s = scr(p(:,l1)+p(:,l2),p(:,l1)+p(:,l2))
               propZ1 = s/dcmplx(s - M_V**2,M_V*Ga_V)
               s = scr(p(:,l3)+p(:,l4),p(:,l3)+p(:,l4))
@@ -1376,7 +1113,7 @@
       implicit none
       integer, intent(in) :: VVMode
       real(dp), intent(in) :: p(4,4),M_Reso,Ga_Reso
-      complex(dp) :: ggcoupl(1:3),vvcoupl(1:30)
+      complex(dp) :: ggcoupl(1:3),vvcoupl(1:39)
       complex(dp), intent(in) :: sp(3:4,4)
       complex(dp), intent(out) :: res
       complex(dp) :: e3_e4
@@ -1404,7 +1141,7 @@
 
       ghzgs2  = vvcoupl(5) 
       ghzgs3  = vvcoupl(6)  
-      ghzgs4  = vvcoupl(7)  
+      ghzgs4  = vvcoupl(7)
       ghgsgs2 = vvcoupl(8)
       ghgsgs3 = vvcoupl(9) 
       ghgsgs4 = vvcoupl(10)       
@@ -1432,6 +1169,17 @@
       ghz4_prime3= vvcoupl(28)
       ghz4_prime4= vvcoupl(29)
       ghz4_prime5= vvcoupl(30)
+
+      ghzgs1_prime2= vvcoupl(31)  
+
+      ghz1_prime6  = vvcoupl(32)
+      ghz1_prime7  = vvcoupl(33)
+      ghz2_prime6  = vvcoupl(34)
+      ghz2_prime7  = vvcoupl(35)
+      ghz3_prime6  = vvcoupl(36)
+      ghz3_prime7  = vvcoupl(37)
+      ghz4_prime6  = vvcoupl(38)
+      ghz4_prime7  = vvcoupl(39)
 
 
       res = 0d0
@@ -1464,26 +1212,39 @@
 
 
 !---- data that defines couplings
-      ghz1_dyn = ghz1   +   ghz1_prime * Lambda_z1**4/( Lambda_z1**2 + abs(q3_q3) )/( Lambda_z1**2 + abs(q4_q4)) &
+      ghz1_dyn = ghz1   +   ghz1_prime * Lambda_z1**4/( Lambda_z1**2 + abs(q3_q3) )/( Lambda_z1**2 + abs(q4_q4))  &
                         +   ghz1_prime2* ( abs(q3_q3)+abs(q4_q4) )/Lambda_z1**2                                   &
-                        +   ghz1_prime3* ( abs(q3_q3)+abs(q4_q4) )**2/Lambda_z1**4                                &
-                        +   ghz1_prime4* ( abs(q3_q3)*abs(q4_q4) )/Lambda_z1**4                                 &
-                        +   ghz1_prime5* ( abs(q3_q3)-abs(q4_q4) )/Lambda_z1**2
-      ghz2_dyn = ghz2   +   ghz2_prime * Lambda_z2**4/( Lambda_z2**2 + abs(q3_q3) )/( Lambda_z2**2 + abs(q4_q4)) &
+                        +   ghz1_prime3* ( abs(q3_q3)-abs(q4_q4) )/Lambda_z1**2                                   &
+                        +   ghz1_prime4* (          MG**2        )/Lambda_Q**2                                    &
+                        +   ghz1_prime5* ( abs(q3_q3)**2+abs(q4_q4)**2 )/Lambda_z1**4                             &
+                        +   ghz1_prime6* ( abs(q3_q3)**2-abs(q4_q4)**2 )/Lambda_z1**4                             &
+                        +   ghz1_prime7* ( abs(q3_q3)*abs(q4_q4) )      /Lambda_z1**4 
+
+      ghz2_dyn = ghz2   +   ghz2_prime * Lambda_z2**4/( Lambda_z2**2 + abs(q3_q3) )/( Lambda_z2**2 + abs(q4_q4))  &
                         +   ghz2_prime2* ( abs(q3_q3)+abs(q4_q4) )/Lambda_z2**2                                   &
-                        +   ghz2_prime3* ( abs(q3_q3)+abs(q4_q4) )**2/Lambda_z2**4                                &
-                        +   ghz2_prime4* ( abs(q3_q3)*abs(q4_q4) )/Lambda_z2**4                                  &
-                        +   ghz2_prime5* ( abs(q3_q3)-abs(q4_q4) )/Lambda_z2**2
-      ghz3_dyn = ghz3   +   ghz3_prime * Lambda_z3**4/( Lambda_z3**2 + abs(q3_q3) )/( Lambda_z3**2 + abs(q4_q4)) &
+                        +   ghz2_prime3* ( abs(q3_q3)-abs(q4_q4) )/Lambda_z2**2                                   &
+                        +   ghz2_prime4* (          MG**2        )/Lambda_Q**2                                    &
+                        +   ghz2_prime5* ( abs(q3_q3)**2+abs(q4_q4)**2 )/Lambda_z2**4                             &
+                        +   ghz2_prime6* ( abs(q3_q3)**2-abs(q4_q4)**2 )/Lambda_z2**4                             &
+                        +   ghz2_prime7* ( abs(q3_q3)*abs(q4_q4) )      /Lambda_z2**4
+
+      ghz3_dyn = ghz3   +   ghz3_prime * Lambda_z3**4/( Lambda_z3**2 + abs(q3_q3) )/( Lambda_z3**2 + abs(q4_q4))  &
                         +   ghz3_prime2* ( abs(q3_q3)+abs(q4_q4) )/Lambda_z3**2                                   &
-                        +   ghz3_prime3* ( abs(q3_q3)+abs(q4_q4) )**2/Lambda_z3**4                                &
-                        +   ghz3_prime4* ( abs(q3_q3)*abs(q4_q4) )/Lambda_z3**4                                &
-                        +   ghz3_prime5* ( abs(q3_q3)-abs(q4_q4) )/Lambda_z3**2
-      ghz4_dyn = ghz4   +   ghz4_prime * Lambda_z4**4/( Lambda_z4**2 + abs(q3_q3) )/( Lambda_z4**2 + abs(q4_q4)) &
+                        +   ghz3_prime3* ( abs(q3_q3)-abs(q4_q4) )/Lambda_z3**2                                   &
+                        +   ghz3_prime4* (          MG**2        )/Lambda_Q**2                                    &
+                        +   ghz3_prime5* ( abs(q3_q3)**2+abs(q4_q4)**2 )/Lambda_z3**4                             &
+                        +   ghz3_prime6* ( abs(q3_q3)**2-abs(q4_q4)**2 )/Lambda_z3**4                             &
+                        +   ghz3_prime7* ( abs(q3_q3)*abs(q4_q4) )      /Lambda_z3**4
+
+      ghz4_dyn = ghz4   +   ghz4_prime * Lambda_z4**4/( Lambda_z4**2 + abs(q3_q3) )/( Lambda_z4**2 + abs(q4_q4))  &
                         +   ghz4_prime2* ( abs(q3_q3)+abs(q4_q4) )/Lambda_z4**2                                   &
-                        +   ghz4_prime3* ( abs(q3_q3)+abs(q4_q4) )**2/Lambda_z4**4                                &
-                        +   ghz4_prime4* ( abs(q3_q3)*abs(q4_q4) )/Lambda_z4**4                                  &
-                        +   ghz4_prime5* ( abs(q3_q3)-abs(q4_q4) )/Lambda_z4**2
+                        +   ghz4_prime3* ( abs(q3_q3)-abs(q4_q4) )/Lambda_z4**2                                   &
+                        +   ghz4_prime4* (          MG**2        )/Lambda_Q**2                                    &
+                        +   ghz4_prime5* ( abs(q3_q3)**2+abs(q4_q4)**2 )/Lambda_z4**4                             &
+                        +   ghz4_prime6* ( abs(q3_q3)**2-abs(q4_q4)**2 )/Lambda_z4**4                             &
+                        +   ghz4_prime7* ( abs(q3_q3)*abs(q4_q4) )      /Lambda_z4**4
+
+
       ghzgs2_dyn = ghzgs2
       ghzgs3_dyn = ghzgs3
       ghzgs4_dyn = ghzgs4
@@ -1527,6 +1288,11 @@
             yyy1 =                                &  ! removed ghz1 dependence because it does not contribute
                 + ghzgs2_dyn*(MG**2-MZ3**2-MZ4**2)/MG**2 &
                 + ghzgs3_dyn/Lambda**2*(MG**2-MZ3**2-MZ4**2)*(MG**2-MZ4**2-MZ3**2)/4d0/MG**2
+            if( (VVMode.eq.gsZMode) ) then
+                yyy1 = yyy1 + ghzgs1_prime2/Lambda_z5**2*MZ3**2*M_Z**2/MG**2                
+            else
+                yyy1 = yyy1 + ghzgs1_prime2/Lambda_z5**2*MZ4**2*M_Z**2/MG**2                
+            endif
             yyy2 = (-2d0*ghzgs2_dyn-ghzgs3_dyn/2d0/Lambda**2*(MG**2-MZ3**2-MZ4**2) )
             yyy3 = -2d0*ghzgs4_dyn
           endif

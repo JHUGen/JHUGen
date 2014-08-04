@@ -233,9 +233,9 @@ contains
 
 
 
-  subroutine EvalAmp_WBFH(pin,vvcoupl,res)
+  subroutine EvalAmp_WBFH(pin,vvcoupl,wwcoupl,res)
     real(dp), intent(in) :: pin(4,5)
-    complex(dp), intent(in) :: vvcoupl(24)
+    complex(dp), intent(in) :: vvcoupl(32),wwcoupl(32)
     real(dp), intent(out) :: res(-5:5,-5:5)
     real(dp) :: shad, sqrts, x1, x2, etot, pztot
     real(dp) :: p(4,5), sprod(4,4)
@@ -258,8 +258,8 @@ contains
 
     call spinoru(4,(/-p(:,1),-p(:,2),p(:,3),p(:,4)/),za,zb,sprod)
 
-    call EvalAmp_WBFH_UnSymm(1,2,3,4,vvcoupl,za,zb,sprod,res1)
-    call EvalAmp_WBFH_UnSymm(1,2,4,3,vvcoupl,za,zb,sprod,res2)
+    call EvalAmp_WBFH_UnSymm(1,2,3,4,vvcoupl,wwcoupl,za,zb,sprod,res1)
+    call EvalAmp_WBFH_UnSymm(1,2,4,3,vvcoupl,wwcoupl,za,zb,sprod,res2)
     
     res = (res1+res2)/2.0_dp
 
@@ -268,9 +268,12 @@ contains
   end subroutine EvalAmp_WBFH
 
 
-  subroutine EvalAmp_WBFH_UnSymm(i1,i2,i3,i4,vvcoupl,za,zb,sprod,res)
+
+
+
+  subroutine EvalAmp_WBFH_UnSymm(i1,i2,i3,i4,vvcoupl,wwcoupl,za,zb,sprod,res)
     integer, intent(in) :: i1,i2,i3,i4
-    complex(dp), intent(in) :: vvcoupl(24), za(4,4), zb(4,4)
+    complex(dp), intent(in) :: vvcoupl(32),wwcoupl(32), za(4,4), zb(4,4)! wwcoupl is only used (for H->WW) if it includes non-zero values
     real(dp), intent(in) :: sprod(4,4)
     real(dp), intent(out) :: res(-5:5,-5:5)
     complex(dp) :: amp_z(-1:1,-1:1), amp_z_b(-1:1,-1:1)
@@ -354,8 +357,11 @@ contains
     do iflip = 1, 2 
        !-- ud -> ud
        amp_z = A0_VV_4f(i4,j2,i3,j1,vvcoupl,za,zb,sprod,m_z,ga_z)
-       amp_w = -A0_VV_4f(i4,j1,i3,j2,vvcoupl,za,zb,sprod,m_w,ga_w)
-
+       if( all(cdabs(wwcoupl(:)).lt.1d-15) ) then
+          amp_w = -A0_VV_4f(i4,j1,i3,j2,vvcoupl,za,zb,sprod,m_w,ga_w)
+       else
+          amp_w = -A0_VV_4f(i4,j1,i3,j2,wwcoupl,za,zb,sprod,m_w,ga_w) 
+       endif
        restmp = ((abs(amp_z(-1,-1))**2) * Ld * Lu + &
             (abs(amp_z(-1,+1))**2) * Ld * Ru + &
             (abs(amp_z(+1,-1))**2) * Rd * Lu + &
@@ -375,7 +381,12 @@ contains
 
        !-- ubdb -> ubdb
        amp_z = A0_VV_4f(j2,i4,j1,i3,vvcoupl,za,zb,sprod,m_z,ga_z)
-       amp_w = -A0_VV_4f(j1,i4,j2,i3,vvcoupl,za,zb,sprod,m_w,ga_w)
+       if( all(cdabs(wwcoupl(:)).lt.1d-15) ) then
+          amp_w = -A0_VV_4f(j1,i4,j2,i3,vvcoupl,za,zb,sprod,m_w,ga_w)
+       else
+          amp_w = -A0_VV_4f(j1,i4,j2,i3,wwcoupl,za,zb,sprod,m_w,ga_w) 
+       endif
+
 
        restmp = ((abs(amp_z(-1,-1))**2) * Ld * Lu + &
             (abs(amp_z(-1,+1))**2) * Ld * Ru + &
@@ -406,7 +417,11 @@ contains
 
        !--uub -> uub // ddb
        amp_z = A0_VV_4f(i3,j1,j2,i4,vvcoupl,za,zb,sprod,m_z,ga_z)
-       amp_w = A0_VV_4f(i3,j1,j2,i4,vvcoupl,za,zb,sprod,m_w,ga_w)
+       if( all(cdabs(wwcoupl(:)).lt.1d-15) ) then
+          amp_w = A0_VV_4f(i3,j1,j2,i4,vvcoupl,za,zb,sprod,m_w,ga_w)
+       else
+          amp_w = A0_VV_4f(i3,j1,j2,i4,wwcoupl,za,zb,sprod,m_w,ga_w) 
+       endif
        restmp = ((abs(amp_z(-1,-1))**2) * Lu * Lu + &
             (abs(amp_z(-1,+1))**2) * Lu * Ru + &
             (abs(amp_z(+1,-1))**2) * Ru * Lu + &
@@ -490,7 +505,11 @@ contains
 
        !-- non-symmetric qq processes
        amp_z = A0_VV_4f(i3,j1,i4,j2,vvcoupl,za,zb,sprod,m_z,ga_z)
-       amp_w = A0_VV_4f(i3,j2,i4,j1,vvcoupl,za,zb,sprod,m_w,ga_w)
+       if( all(cdabs(wwcoupl(:)).lt.1d-15) ) then
+          amp_w = A0_VV_4f(i3,j2,i4,j1,vvcoupl,za,zb,sprod,m_w,ga_w)
+       else
+          amp_w = A0_VV_4f(i3,j2,i4,j1,wwcoupl,za,zb,sprod,m_w,ga_w) 
+       endif
        
        !--uc -> uc
        restmp = ((abs(amp_z(-1,-1))**2) * Lu * Lu + &
@@ -534,7 +553,11 @@ contains
 
        !-- qbqb processes
        amp_z = A0_VV_4f(j1,i3,j2,i4,vvcoupl,za,zb,sprod,m_z,ga_z)
-       amp_w = A0_VV_4f(j1,i4,j2,i3,vvcoupl,za,zb,sprod,m_w,ga_w)
+       if( all(cdabs(wwcoupl(:)).lt.1d-15) ) then
+          amp_w = A0_VV_4f(j1,i4,j2,i3,vvcoupl,za,zb,sprod,m_w,ga_w)
+       else
+          amp_w = A0_VV_4f(j1,i4,j2,i3,wwcoupl,za,zb,sprod,m_w,ga_w) 
+       endif
 
        !--ubcb -> ubcb
        restmp = ((abs(amp_z(-1,-1))**2) * Lu * Lu + &
@@ -606,7 +629,7 @@ contains
   function A0_VV_4f(j1,j2,j3,j4,vvcoupl,za,zb,sprod,mv,ga_v)
     complex(dp) :: A0_VV_4f(-1:1,-1:1)
     integer :: j1,j2,j3,j4
-    complex(dp) :: vvcoupl(24), za(4,4), zb(4,4)
+    complex(dp) :: vvcoupl(32), za(4,4), zb(4,4)
     real(dp) :: mv, ga_v
     real(dp) :: sprod(4,4)
     real(dp) :: mhsq, q1q2, kcoupl
@@ -648,33 +671,54 @@ contains
     ghz4_prime4= vvcoupl(23)
     ghz4_prime5= vvcoupl(24)
 
+    ghz1_prime6= vvcoupl(25)
+    ghz1_prime7= vvcoupl(26)
+
+    ghz2_prime6= vvcoupl(27)
+    ghz2_prime7= vvcoupl(28)
+
+    ghz3_prime6= vvcoupl(29)
+    ghz3_prime7= vvcoupl(30)
+
+    ghz4_prime6= vvcoupl(31)
+    ghz4_prime7= vvcoupl(32)
+
+
     vvcoupl_prime(1) = vvcoupl(1)   &
        + ghz1_prime * lambda_z1**4/(lambda_z1**2 + abs(sprod(j1,j2)))/(lambda_z1**2 + abs(sprod(j3,j4)))  &
        + ghz1_prime2* ( abs(sprod(j1,j2)) + abs(sprod(j3,j4)) )/lambda_z1**2  &
-       + ghz1_prime3* ( abs(sprod(j1,j2)) + abs(sprod(j3,j4)) )**2/lambda_z1**4  &
-       + ghz1_prime4* ( abs(sprod(j1,j2)) * abs(sprod(j3,j4)) )/lambda_z1**4   &
-       + ghz1_prime5* ( abs(sprod(j1,j2)) - abs(sprod(j3,j4)) )/lambda_z1**2
+       + ghz1_prime3* ( abs(sprod(j1,j2)) - abs(sprod(j3,j4)) )/lambda_z1**2  &
+       + ghz1_prime4* ( mhsq )/lambda_Q**2                                    &
+       + ghz1_prime5* ( abs(sprod(j1,j2))**2 + abs(sprod(j3,j4))**2 )/lambda_z1**4  &
+       + ghz1_prime6* ( abs(sprod(j1,j2))**2 - abs(sprod(j3,j4))**2 )/lambda_z1**4  &
+       + ghz1_prime7* ( abs(sprod(j1,j2))    * abs(sprod(j3,j4))    )/lambda_z1**4 
 
     vvcoupl_prime(2) = vvcoupl(2)   &
        + ghz2_prime * lambda_z2**4/(lambda_z2**2 + abs(sprod(j1,j2)))/(lambda_z2**2 + abs(sprod(j3,j4)))  &
        + ghz2_prime2* ( abs(sprod(j1,j2)) + abs(sprod(j3,j4)) )/lambda_z2**2  &
-       + ghz2_prime3* ( abs(sprod(j1,j2)) + abs(sprod(j3,j4)) )**2/lambda_z2**4  &
-       + ghz2_prime4* ( abs(sprod(j1,j2)) * abs(sprod(j3,j4)) )/lambda_z2**4   &
-       + ghz2_prime5* ( abs(sprod(j1,j2)) - abs(sprod(j3,j4)) )/lambda_z2**2
+       + ghz2_prime3* ( abs(sprod(j1,j2)) - abs(sprod(j3,j4)) )/lambda_z2**2  &
+       + ghz2_prime4* ( mhsq )/lambda_Q**2                                    &
+       + ghz2_prime5* ( abs(sprod(j1,j2))**2 + abs(sprod(j3,j4))**2 )/lambda_z2**4  &
+       + ghz2_prime6* ( abs(sprod(j1,j2))**2 - abs(sprod(j3,j4))**2 )/lambda_z2**4  &
+       + ghz2_prime7* ( abs(sprod(j1,j2))    * abs(sprod(j3,j4))    )/lambda_z2**4 
 
     vvcoupl_prime(3) = vvcoupl(3)   &
        + ghz3_prime * lambda_z3**4/(lambda_z3**2 + abs(sprod(j1,j2)))/(lambda_z3**2 + abs(sprod(j3,j4)))  &
        + ghz3_prime2* ( abs(sprod(j1,j2)) + abs(sprod(j3,j4)) )/lambda_z3**2  &
-       + ghz3_prime3* ( abs(sprod(j1,j2)) + abs(sprod(j3,j4)) )**2/lambda_z3**4  &
-       + ghz3_prime4* ( abs(sprod(j1,j2)) * abs(sprod(j3,j4)) )/lambda_z3**4   &
-       + ghz3_prime5* ( abs(sprod(j1,j2)) - abs(sprod(j3,j4)) )/lambda_z3**2
+       + ghz3_prime3* ( abs(sprod(j1,j2)) - abs(sprod(j3,j4)) )/lambda_z3**2  &
+       + ghz3_prime4* ( mhsq )/lambda_Q**2                                    &
+       + ghz3_prime5* ( abs(sprod(j1,j2))**2 + abs(sprod(j3,j4))**2 )/lambda_z3**4  &
+       + ghz3_prime6* ( abs(sprod(j1,j2))**2 - abs(sprod(j3,j4))**2 )/lambda_z3**4  &
+       + ghz3_prime7* ( abs(sprod(j1,j2))    * abs(sprod(j3,j4))    )/lambda_z3**4 
 
     vvcoupl_prime(4) = vvcoupl(4)   &
        + ghz4_prime * lambda_z4**4/(lambda_z4**2 + abs(sprod(j1,j2)))/(lambda_z4**2 + abs(sprod(j3,j4)))  &
        + ghz4_prime2* ( abs(sprod(j1,j2)) + abs(sprod(j3,j4)) )/lambda_z4**2  &
-       + ghz4_prime3* ( abs(sprod(j1,j2)) + abs(sprod(j3,j4)) )**2/lambda_z4**4  &
-       + ghz4_prime4* ( abs(sprod(j1,j2)) * abs(sprod(j3,j4)) )/lambda_z4**4  &
-       + ghz4_prime5* ( abs(sprod(j1,j2)) - abs(sprod(j3,j4)) )/lambda_z4**2
+       + ghz4_prime3* ( abs(sprod(j1,j2)) - abs(sprod(j3,j4)) )/lambda_z4**2  &
+       + ghz4_prime4* ( mhsq )/lambda_Q**2                                    &
+       + ghz4_prime5* ( abs(sprod(j1,j2))**2 + abs(sprod(j3,j4))**2 )/lambda_z4**4  &
+       + ghz4_prime6* ( abs(sprod(j1,j2))**2 - abs(sprod(j3,j4))**2 )/lambda_z4**4  &
+       + ghz4_prime7* ( abs(sprod(j1,j2))    * abs(sprod(j3,j4))    )/lambda_z4**4 
 
     a1 = vvcoupl_prime(1) * mv**2/mhsq + vvcoupl_prime(2) * two * q1q2/mhsq + vvcoupl_prime(3) * kcoupl * q1q2/mhsq
     a2 = -two * vvcoupl_prime(2) - kcoupl * vvcoupl_prime(3)

@@ -22,7 +22,7 @@ endif
 
 ifeq ($(Comp),ifort)
  ifeq ($(Opt),Yes)
-    OptOpts  = -O2 -vec-report0
+    OptOpts  = -O2 -vec-report0 -diag-disable remark
  else
     OptOpts  = -O0 -implicitnone -zero -check bounds -check pointer -warn interfaces -ftrapuv
  endif
