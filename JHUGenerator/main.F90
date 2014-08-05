@@ -1,6 +1,6 @@
 ! If you use this program please cite Phys.Rev. D81 (2010) 075022; arXiv:1001.3396 [hep-ph],
 !                                     Phys.Rev. D86 (2012) 095031; arXiv:1208.4018 [hep-ph],
-!                                 and                              arXiv:1309.4819 [hep-ph].
+!                                 and Phys.Rev. D89 (2014) 035007; arXiv:1309.4819 [hep-ph].
 PROGRAM JHUGenerator
 use ModParameters
 use ModKinematics
@@ -1754,9 +1754,9 @@ integer :: TheUnit
     write(TheUnit,"(A90)") " *                                                                                     *"
     write(TheUnit,"(A90)") " *         I. Anderson, S. Bolognesi, F. Caola, Y. Gao, A. Gritsan, C. Martin,         *"
     write(TheUnit,"(A90)") " *           Z. Guo, K. Melnikov, M. Schulze, N. Tran, A. Whitbeck, Y. Zhou            *"
-    write(TheUnit,"(A90)") " *                Phys.Rev. D81 (2010) 075022;  arXiv:1001.3396 [hep-ph]               *"
-    write(TheUnit,"(A90)") " *                Phys.Rev. D86 (2012) 095031;  arXiv:1208.4018 [hep-ph]               *"
-    write(TheUnit,"(A90)") " *                                              arXiv:1309.4819 [hep-ph]               *"
+    write(TheUnit,"(A90)") " *                Phys.Rev. D81 (2010) 075022;  arXiv:1001.3396 [hep-ph],              *"
+    write(TheUnit,"(A90)") " *                Phys.Rev. D86 (2012) 095031;  arXiv:1208.4018 [hep-ph],              *"
+    write(TheUnit,"(A90)") " *                Phys.Rev. D89 (2014) 035007;  arXiv:1309.4819 [hep-ph].              *"
     write(TheUnit,"(A90)") " *                                                                                     *"
     write(TheUnit,"(A90)") " ***************************************************************************************"
     write(TheUnit,"(A90)") " "

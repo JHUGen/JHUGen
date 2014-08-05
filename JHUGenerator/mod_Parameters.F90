@@ -3,7 +3,7 @@ implicit none
 save
 ! 
 ! 
-character(len=6),parameter :: JHUGen_Version="v4.5.2"
+character(len=6),parameter :: JHUGen_Version="v4.7.0"
 ! 
 ! 
 integer, public :: Collider, PDFSet,PChannel,Process,DecayMode1,DecayMode2
@@ -59,8 +59,8 @@ real(8), public, parameter :: Lambda  = 1000d0    *GeV      ! Lambda coupling en
                                                             ! operators/formfactors (former r).
 
 real(8), public, parameter :: m_el = 0.00051100d0  *GeV         ! electron mass
-real(8), public, parameter :: m_mu = 0.10566d0  *GeV            ! muon mass
-real(8), public, parameter :: m_tau = 1.7768d0  *GeV            ! tau mass
+real(8), public, parameter :: m_mu = 0.10566d0     *GeV         ! muon mass
+real(8), public, parameter :: m_tau = 1.7768d0     *GeV         ! tau mass
 
 
 real(8), public, parameter :: Gf = 1.16639d-5/GeV**2        ! fermi constant
@@ -70,12 +70,12 @@ real(8), public, parameter :: alpha_QED = 1d0/128.0d0       ! el.magn. coupling
 real(8), public, parameter :: alphas = 0.13229060d0         ! strong coupling
 real(8), public, parameter :: sitW = dsqrt(0.23119d0)       ! sin(Theta_Weinberg) (PDG-2008)
 real(8), public            :: Mu_Fact                       ! pdf factorization scale (set to M_Reso in main.F90)
-real(8), public, parameter :: LHC_Energy=13000d0  *GeV       ! LHC hadronic center of mass energy
+real(8), public, parameter :: LHC_Energy=13000d0  *GeV      ! LHC hadronic center of mass energy
 real(8), public, parameter :: TEV_Energy=1960d0  *GeV       ! Tevatron hadronic center of mass energy
 real(8), public, parameter :: ILC_Energy=250d0  *GeV        ! Linear collider center of mass energy
 real(8), public, parameter :: POL_A = 0d0                   !e+ polarization. 0: no polarization, 100: helicity = 1, -100: helicity = -1
 real(8), public, parameter :: POL_B = 0d0                   !e- polarization. 0: no polarization, 100: helicity = 1, -100: helicity = -1
-logical, public, parameter :: H_DK =.false.                  !default to false so H in V > VH (Process = 50) does not decay
+logical, public, parameter :: H_DK =.false.                 !default to false so H in V > VH (Process = 50) does not decay
 real(8), public, parameter :: ptjetcut = 15d0*GeV           ! jet min pt
 real(8), public, parameter :: Rjet = 0.5d0                  ! jet deltaR, antikt algorithm 
 
@@ -123,10 +123,10 @@ real(8), public, parameter :: Brhadr_W_cs = Br_W_cs/Br_W_hadr                   
 
 real(8), public, parameter :: scale_alpha_Z_uu = 1.04282d0 ! scaling factor of alpha (~partial width) for Z > u u~, c c~
 real(8), public, parameter :: scale_alpha_Z_dd = 1.04282d0 ! scaling factor of alpha (~partial width) for Z > d d~, s s~, b b~
-real(8), public, parameter :: scale_alpha_Z_ll = 1d0       ! scaling factor of alpha (~partial width) for Z > l+ l-
-real(8), public, parameter :: scale_alpha_Z_nn = 1d0       ! scaling factor of alpha (~partial width) for Z > nu nu~
+real(8), public, parameter :: scale_alpha_Z_ll = 1d0 ! scaling factor of alpha (~partial width) for Z > l+ l-
+real(8), public, parameter :: scale_alpha_Z_nn = 1d0 ! scaling factor of alpha (~partial width) for Z > nu nu~
 real(8), public, parameter :: scale_alpha_W_ud = 1.0993819d0 ! scaling factor of alpha (~partial width) for W > u d, c s
-real(8), public, parameter :: scale_alpha_W_ln = 1d0       ! scaling factor of alpha (~partial width) for W > l nu
+real(8), public, parameter :: scale_alpha_W_ln = 1d0 ! scaling factor of alpha (~partial width) for W > l nu
 ! sum rule
 ! 1 = 3*Br_Z_nn + 3*Br_Z_ee + 2*Br_Z_uu + 3*Br_Z_dd
 !
@@ -172,29 +172,40 @@ integer, public :: Br_W_ud_counter=0
    complex(8), public, parameter :: ghz1_prime3= (0.0d0,0d0)
    complex(8), public, parameter :: ghz1_prime4= (0.0d0,0d0)
    complex(8), public, parameter :: ghz1_prime5= (0.0d0,0d0)
+   complex(8), public, parameter :: ghz1_prime6= (0.0d0,0d0)
+   complex(8), public, parameter :: ghz1_prime7= (0.0d0,0d0)
 
    complex(8), public, parameter :: ghz2_prime = (0.0d0,0d0)
    complex(8), public, parameter :: ghz2_prime2= (0.0d0,0d0)
    complex(8), public, parameter :: ghz2_prime3= (0.0d0,0d0)
    complex(8), public, parameter :: ghz2_prime4= (0.0d0,0d0)
    complex(8), public, parameter :: ghz2_prime5= (0.0d0,0d0)
+   complex(8), public, parameter :: ghz2_prime6= (0.0d0,0d0)
+   complex(8), public, parameter :: ghz2_prime7= (0.0d0,0d0)
 
    complex(8), public, parameter :: ghz3_prime = (0.0d0,0d0)
    complex(8), public, parameter :: ghz3_prime2= (0.0d0,0d0)
    complex(8), public, parameter :: ghz3_prime3= (0.0d0,0d0)
    complex(8), public, parameter :: ghz3_prime4= (0.0d0,0d0)
    complex(8), public, parameter :: ghz3_prime5= (0.0d0,0d0)
+   complex(8), public, parameter :: ghz3_prime6= (0.0d0,0d0)
+   complex(8), public, parameter :: ghz3_prime7= (0.0d0,0d0)
 
    complex(8), public, parameter :: ghz4_prime = (0.0d0,0d0)
    complex(8), public, parameter :: ghz4_prime2= (0.0d0,0d0)
    complex(8), public, parameter :: ghz4_prime3= (0.0d0,0d0)
    complex(8), public, parameter :: ghz4_prime4= (0.0d0,0d0)
    complex(8), public, parameter :: ghz4_prime5= (0.0d0,0d0)
-
+   complex(8), public, parameter :: ghz4_prime6= (0.0d0,0d0)
+   complex(8), public, parameter :: ghz4_prime7= (0.0d0,0d0)
+   complex(8), public, parameter :: ghzgs1_prime2= (0.0d0,0d0)
+   
    real(8),    public, parameter :: Lambda_z1 = 10000d0*GeV
    real(8),    public, parameter :: Lambda_z2 = 10000d0*GeV
    real(8),    public, parameter :: Lambda_z3 = 10000d0*GeV
    real(8),    public, parameter :: Lambda_z4 = 10000d0*GeV
+   real(8),    public, parameter :: Lambda_z5 = 10000d0*GeV
+   real(8),    public, parameter :: Lambda_Q  = 10000d0*GeV
 
 
 !---parameters that define spin 1 coupling to SM fields, see note
@@ -237,6 +248,57 @@ integer, public :: Br_W_ud_counter=0
   complex(8), public, parameter  :: c5 = (0.0d0,0d0)
   complex(8), public, parameter  :: c6 = (0.0d0,0d0)  ! this coupling does not contribute to gamma+gamma final states
   complex(8), public, parameter  :: c7 = (0.0d0,0d0)  ! this coupling does not contribute to gamma+gamma final states
+
+
+
+
+
+!-- extra couplings for weak boson fusion when WW-spin-0 couplings are required to be different from ZZ-spin-0
+!-- note: if all couplings below are set to zero, WW-spin-0 and ZZ-spin-0 couplings are assumed to be equal
+   complex(8), public, parameter :: ghw1 = (0.0d0,0d0)
+   complex(8), public, parameter :: ghw2 = (0.0d0,0d0)
+   complex(8), public, parameter :: ghw3 = (0.0d0,0d0)
+   complex(8), public, parameter :: ghw4 = (0.0d0,0d0)
+
+!-- parameters that define q^2 dependent form factors in WBF WW-spin-0 case described above
+   complex(8), public, parameter :: ghw1_prime = (0.0d0,0d0)
+   complex(8), public, parameter :: ghw1_prime2= (0.0d0,0d0)
+   complex(8), public, parameter :: ghw1_prime3= (0.0d0,0d0)
+   complex(8), public, parameter :: ghw1_prime4= (0.0d0,0d0)
+   complex(8), public, parameter :: ghw1_prime5= (0.0d0,0d0)
+   complex(8), public, parameter :: ghw1_prime6= (0.0d0,0d0)
+   complex(8), public, parameter :: ghw1_prime7= (0.0d0,0d0)
+
+   complex(8), public, parameter :: ghw2_prime = (0.0d0,0d0)
+   complex(8), public, parameter :: ghw2_prime2= (0.0d0,0d0)
+   complex(8), public, parameter :: ghw2_prime3= (0.0d0,0d0)
+   complex(8), public, parameter :: ghw2_prime4= (0.0d0,0d0)
+   complex(8), public, parameter :: ghw2_prime5= (0.0d0,0d0)
+   complex(8), public, parameter :: ghw2_prime6= (0.0d0,0d0)
+   complex(8), public, parameter :: ghw2_prime7= (0.0d0,0d0)
+
+   complex(8), public, parameter :: ghw3_prime = (0.0d0,0d0)
+   complex(8), public, parameter :: ghw3_prime2= (0.0d0,0d0)
+   complex(8), public, parameter :: ghw3_prime3= (0.0d0,0d0)
+   complex(8), public, parameter :: ghw3_prime4= (0.0d0,0d0)
+   complex(8), public, parameter :: ghw3_prime5= (0.0d0,0d0)
+   complex(8), public, parameter :: ghw3_prime6= (0.0d0,0d0)
+   complex(8), public, parameter :: ghw3_prime7= (0.0d0,0d0)
+
+   complex(8), public, parameter :: ghw4_prime = (0.0d0,0d0)
+   complex(8), public, parameter :: ghw4_prime2= (0.0d0,0d0)
+   complex(8), public, parameter :: ghw4_prime3= (0.0d0,0d0)
+   complex(8), public, parameter :: ghw4_prime4= (0.0d0,0d0)
+   complex(8), public, parameter :: ghw4_prime5= (0.0d0,0d0)
+   complex(8), public, parameter :: ghw4_prime6= (0.0d0,0d0)
+   complex(8), public, parameter :: ghw4_prime7= (0.0d0,0d0)
+   
+   real(8),    public, parameter :: Lambda_w1 = 10000d0*GeV
+   real(8),    public, parameter :: Lambda_w2 = 10000d0*GeV
+   real(8),    public, parameter :: Lambda_w3 = 10000d0*GeV
+   real(8),    public, parameter :: Lambda_w4 = 10000d0*GeV
+   real(8),    public, parameter :: Lambda_w5 = 10000d0*GeV
+
 
 
 ! V-f-fbar couplings:

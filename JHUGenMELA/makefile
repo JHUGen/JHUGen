@@ -1,4 +1,4 @@
-Comp = ifort
+Comp = gfort
 
 ifeq ($(Comp),ifort)
 fcomp = ifort -fpp -O2 -vec-report0 -Dcompiler=1
@@ -18,9 +18,9 @@ Testprogram: mod_Higgs_MatEl.o mod_Zprime_MatEl.o mod_Graviton_MatEl.o mod_Higgs
 	@echo " compiling and linking testprogram.F90 with "$(Comp)
 	$(fcomp) -o testF testprogram.F90 -lm mod_Higgs_MatEl.o mod_Zprime_MatEl.o mod_Graviton_MatEl.o mod_HiggsJJ_MatEl.o
 	@echo " "
-#	@echo " compiling and linking testprogram.c with gcc"
-#	$(ccomp) -o testC testprogram.c   -lm  -lgfortran  mod_Higgs_MatEl.o mod_Zprime_MatEl.o mod_Graviton_MatEl.o
-#	@echo " "
+	@echo " compiling and linking testprogram.c with gcc"
+	$(ccomp) -o testC testprogram.c -lm -lgfortran mod_Higgs_MatEl.o mod_Zprime_MatEl.o mod_Graviton_MatEl.o
+	@echo " "
 
 
 
