@@ -34,27 +34,42 @@ complex(8) :: ghz1_prime2
 complex(8) :: ghz1_prime3
 complex(8) :: ghz1_prime4
 complex(8) :: ghz1_prime5
+complex(8) :: ghz1_prime6
+complex(8) :: ghz1_prime7
 
 complex(8) :: ghz2_prime 
 complex(8) :: ghz2_prime2
 complex(8) :: ghz2_prime3
 complex(8) :: ghz2_prime4
 complex(8) :: ghz2_prime5
+complex(8) :: ghz2_prime6
+complex(8) :: ghz2_prime7
 
 complex(8) :: ghz3_prime 
 complex(8) :: ghz3_prime2
 complex(8) :: ghz3_prime3
 complex(8) :: ghz3_prime4
 complex(8) :: ghz3_prime5
+complex(8) :: ghz3_prime6
+complex(8) :: ghz3_prime7
 
 complex(8) :: ghz4_prime 
 complex(8) :: ghz4_prime2
 complex(8) :: ghz4_prime3
 complex(8) :: ghz4_prime4
 complex(8) :: ghz4_prime5
+complex(8) :: ghz4_prime6
+complex(8) :: ghz4_prime7
+
+complex(8) :: ghzgs1_prime2
 
 real(8), parameter :: lambda_z1 = 10000d0 * GeV
 real(8), parameter :: lambda_z2 = 10000d0 * GeV
 real(8), parameter :: lambda_z3 = 10000d0 * GeV
 real(8), parameter :: lambda_z4 = 10000d0 * GeV
+real(8), parameter :: lambda_z5 = 10000d0 * GeV
+real(8), parameter :: lambda_Q  = 10000d0 * GeV
+
+
+
 

@@ -24,7 +24,7 @@ Manual for the JHU generator
 \begin{center}
 \small
 For simulation of a single-produced resonance at hadron colliders \\
-(version 4.5.2, release date February 16, 2014) \\
+(version 4.7.0, release date August 11, 2014) \\
 \normalsize
 \end{center}
 
@@ -280,11 +280,12 @@ g_i^{\rm SM}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 \]
 \[
-+ g_i'' \frac{(|q_1^2|+|q_2^2|)}{\Lambda_i^2}
-+ g_i''' \frac{(|q_1^2|-|q_2^2|)}{\Lambda_i^2}
-+ g_i'''' \frac{|q_1^2| \, |q_2^2|}{\Lambda_i^4}
-+ g_i''''' \frac{(|q_1^2|^2+|q_2^2|^2)}{\Lambda_i^4}
-+ g_i'''''' \frac{(|q_1^2|^2-|q_2^2|^2)}{\Lambda_i^4}
++ g_i^{\prime 2}  \frac{(|q_1^2|+|q_2^2|)}{\Lambda_i^2}
++ g_i^{\prime 3}  \frac{(|q_1^2|-|q_2^2|)}{\Lambda_i^2}
++ g_i^{\prime 4}  \frac{|(q_1+q_2)^2|}{\Lambda_Q^2}
++ g_i^{\prime 5}  \frac{(|q_1^2|^2+|q_2^2|^2)}{\Lambda_i^4}
++ g_i^{\prime 6}  \frac{(|q_1^2|^2-|q_2^2|^2)}{\Lambda_i^4}
++ g_i^{\prime 7}  \frac{|q_1^2| \, |q_2^2|}{\Lambda_i^4}
 \]
 \noindent
 The user has the option to choose between these functional forms, 
@@ -315,26 +316,39 @@ All parameters can be modified in \verb|mod_Parameters.F90| by:
    complex(8), public, parameter :: ghz1_prime2= (0.0d0,0d0)
    complex(8), public, parameter :: ghz1_prime3= (0.0d0,0d0)
    complex(8), public, parameter :: ghz1_prime4= (0.0d0,0d0)
+   complex(8), public, parameter :: ghz1_prime5= (0.0d0,0d0)
+   complex(8), public, parameter :: ghz1_prime6= (0.0d0,0d0)
+   complex(8), public, parameter :: ghz1_prime7= (0.0d0,0d0)
 
    complex(8), public, parameter :: ghz2_prime = (0.0d0,0d0)
    complex(8), public, parameter :: ghz2_prime2= (0.0d0,0d0)
    complex(8), public, parameter :: ghz2_prime3= (0.0d0,0d0)
    complex(8), public, parameter :: ghz2_prime4= (0.0d0,0d0)
+   complex(8), public, parameter :: ghz2_prime5= (0.0d0,0d0)
+   complex(8), public, parameter :: ghz2_prime6= (0.0d0,0d0)
+   complex(8), public, parameter :: ghz2_prime7= (0.0d0,0d0)
 
    complex(8), public, parameter :: ghz3_prime = (0.0d0,0d0)
    complex(8), public, parameter :: ghz3_prime2= (0.0d0,0d0)
    complex(8), public, parameter :: ghz3_prime3= (0.0d0,0d0)
    complex(8), public, parameter :: ghz3_prime4= (0.0d0,0d0)
+   complex(8), public, parameter :: ghz3_prime5= (0.0d0,0d0)
+   complex(8), public, parameter :: ghz3_prime6= (0.0d0,0d0)
+   complex(8), public, parameter :: ghz3_prime7= (0.0d0,0d0)
 
    complex(8), public, parameter :: ghz4_prime = (0.0d0,0d0)
    complex(8), public, parameter :: ghz4_prime2= (0.0d0,0d0)
    complex(8), public, parameter :: ghz4_prime3= (0.0d0,0d0)
    complex(8), public, parameter :: ghz4_prime4= (0.0d0,0d0)
+   complex(8), public, parameter :: ghz3_prime5= (0.0d0,0d0)
+   complex(8), public, parameter :: ghz3_prime6= (0.0d0,0d0)
+   complex(8), public, parameter :: ghz3_prime7= (0.0d0,0d0)
 
    real(8),    public, parameter :: Lambda_z1 = 10000d0*GeV
    real(8),    public, parameter :: Lambda_z2 = 10000d0*GeV
    real(8),    public, parameter :: Lambda_z3 = 10000d0*GeV
    real(8),    public, parameter :: Lambda_z4 = 10000d0*GeV   
+   real(8),    public, parameter :: Lambda_Q  = 10000d0*GeV   
 \end{verbatim}
 
 If the switch \verb|includeGammaStar| is set to \verb|.true.| then intermediate off-shell photons are included for $Z$ boson final states. 
@@ -349,6 +363,22 @@ Their couplings to the spin-0 resonance are controlled by separate parameters,
 \end{verbatim}
 where the first three correspond to $Z\gamma^*$ couplings and the latter three corresponds to $\gamma^* \gamma^*$ interactions.
 These two sets of parameters also controll the coupling strength in final states with on-shell photons, i.e. $Z\gamma$ and $\gamma\gamma$.
+The anomalous coupling involving the off-shell photon momentum (in $\gamma^* Z$ interactions)
+\[
+g_1' \frac{ q^2_\gamma }{ \Lambda_2^{Z\gamma} } m_Z^2 \epsilon^*_1 \epsilon^*_2
+\]
+is set by
+\begin{verbatim}
+   complex(8), public, parameter :: ghzgs1_prime2= (0.0d0,0d0)
+   real(8),    public, parameter :: Lambda_z5 = 10000d0*GeV.
+\end{verbatim}
+
+In the weak vector boson fusion process we also allow for different $ZZH$ and $WWH$ couplings. 
+Per default, they are assumed to be equal, set by the {\tt ghzi} and {\tt ghzi\_primej} couplings.
+If any of the {\tt ghwi} or {\tt ghwi\_primej} couplings is different from zero,
+their value will be used instead for the $WWH$ interactions.
+
+
 
 \subsubsection{ Spin-1 parameters }
 
@@ -568,6 +598,20 @@ Instructions for setting up the JHUGenMELA with MCFM are in the file \verb|JHUGe
 %%%%%%%%%%%
 
 \section{ Release notes }
+
+
+\noindent
+In going from \verb|v4.5.2| to \verb|v4.7.1|, the updates are as follows:
+
+\begin{itemize}
+\item more flexibility for $q^2$-dependent form factors
+\item separate couplings for ZZH and WWH in weak boson fusion
+\item add new process: pp->H+jet (Process=62)
+\item JHUGenMELA: extended MCFM ggHZZ matrix elements by anomalous couplings
+\item JHUGenMELA: add matrix elements for H+jet and V+H
+\end{itemize}
+
+
 
 \noindent
 In going from \verb|v4.3.2| to \verb|v4.5.2|, the updates are as follows:
@@ -911,9 +955,9 @@ N.B. If an exclusive production mode is desired (e.g. $q\bar{q}$ or $gg$), this 
 \bibitem{Gao:2010qx}
 Y.Y. Gao, A. V. Gritsan, Z.J. Guo, K. Melnikov, M. Schulze and N. V. Tran, "Spin-Determination of Single-Produced Resonances at Hadron Colliders". Phys. Rev. D {\bf 81}, 075022 (2010). arXiv:1001.3396 [hep-ph].
 \bibitem{Bolognesi:2012}
-S. Bolognesi, Y.Y. Gao, A. V. Gritsan, K. Melnikov, M. Schulze, N. V. Tran and A. Whitbeck, "On the Spin and Parity of Single-Produced Resonance at the LHC". Phys. Rev. D {\bf 86}, 095031 (2012).  arXiv:1208.4018 [hep-ph].
+S. Bolognesi, Y.Y. Gao, A. V. Gritsan, K. Melnikov, M. Schulze, N. V. Tran and A. Whitbeck, "On the Spin and Parity of Single-Produced Resonance at the LHC". Phys. Rev. D {\bf 86}, 095031 (2012). arXiv:1208.4018 [hep-ph].
 \bibitem{Anderson:2013}
-I. Anderson, S. Bolognesi, F. Caola, Y.Y. Gao, A. V. Gritsan, C. B. Martin, K. Melnikov, M. Schulze, N. V. Tran, A. Whitbeck, Y. Zhou, "Constraining anomalous HVV interactions at proton and lepton colliders". arXiv:1309.4819 [hep-ph].
+I. Anderson, S. Bolognesi, F. Caola, Y.Y. Gao, A. V. Gritsan, C. B. Martin, K. Melnikov, M. Schulze, N. V. Tran, A. Whitbeck, Y. Zhou, "Constraining anomalous HVV interactions at proton and lepton colliders". Phys. Rev. D {\bf 89}, 035007 (2014). arXiv:1309.4819 [hep-ph].
 \bibitem{thesite}
 See webpage: www.pha.jhu.edu/spin
 \end{thebibliography}
