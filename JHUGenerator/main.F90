@@ -1728,6 +1728,7 @@ implicit none
         write(io_stdout,"(4X,A)") "PDFSet:     1=CTEQ6L1(2001), 2=MSTW(2008),  2xx=MSTW with eigenvector set xx=01..40)"
         write(io_stdout,"(4X,A)") "VegasNc0:   number of evaluations for integrand scan"
         write(io_stdout,"(4X,A)") "VegasNc1:   number of evaluations for accept-reject sampling"
+        write(io_stdout,"(4X,A)") "VegasNc2:   number of events for accept-reject sampling"
         write(io_stdout,"(4X,A)") "Unweighted: 0=weighted events, 1=unweighted events"
         write(io_stdout,"(4X,A)") "Interf:     0=neglect interference for 4f final states, 1=include interference"
         write(io_stdout,"(4X,A)") "DataFile:   LHE output file"
