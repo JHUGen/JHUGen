@@ -124,9 +124,21 @@ void testME() {
   float phi1 = 1.8828257;
   int mflavor = 3; 
 
+	double couplingvals[SIZE_HVV_FREENORM] = {0};
+	double selfDHggcoupl[SIZE_HVV][2] = {{0}};
+	double selfDHvvcoupl_VBF[SIZE_HVV_VBF][2] = {{0}};
+	double selfDHwwcoupl_VBF[SIZE_HWW_VBF][2] = {{0}};
+	double selfDHvvcoupl[SIZE_HVV][2] = {{0}};
+	double selfDZqqcoupl[SIZE_ZQQ][2] = {{0}};
+	double selfDZvvcoupl[SIZE_ZVV][2] = {{0}};
+	double selfDGqqcoupl[SIZE_GQQ][2] = {{0}};
+	double selfDGggcoupl[SIZE_GGG][2] = {{0}};
+	double selfDGvvcoupl[SIZE_GVV][2] = {{0}};
+
   // Create the instance of TEvtProb to calculate the differential cross-section
-  TEvtProb Xcal2;  
+  TEvtProb Xcal2(4000);
   hzz4l_event_type hzz4l_event;
+  Xcal2.ResetMCFM_EWKParameters(1.16639E-05,7.81751E-03,79.956049884402844,91.1876);
 
   // set four momenta
   vector<TLorentzVector> p;
@@ -186,17 +198,17 @@ void testME() {
   // finish event information
 
   // ==== Begin the differential cross-section calculation
-  Xcal2.SetHiggsMass(zzmass);
+  Xcal2.SetHiggsMass(zzmass,0.004);
   // calculate the ZZ using MCFM
   Xcal2.SetMatrixElement(TVar::MCFM);
   if ( mflavor < 3  )
-    dXsec_ZZ_MCFM = Xcal2.XsecCalc(TVar::ZZ_4e, TVar::GG, hzz4l_event,verbosity);
+    dXsec_ZZ_MCFM = Xcal2.XsecCalc(TVar::bkgZZ, TVar::ZZQQB, hzz4l_event,verbosity,couplingvals,selfDHvvcoupl,selfDZqqcoupl,selfDZvvcoupl,selfDGqqcoupl,selfDGggcoupl,selfDGvvcoupl);
   else 
-    dXsec_ZZ_MCFM = Xcal2.XsecCalc(TVar::ZZ_2e2m, TVar::GG, hzz4l_event,verbosity);
-  dXsec_GGZZ_MCFM = Xcal2.XsecCalc(TVar::GGZZ_4l, TVar::GG, hzz4l_event,verbosity);
-  dXsec_HZZ_MCFM = Xcal2.XsecCalc(TVar::HZZ_4l, TVar::GG, hzz4l_event,verbosity);
-  dXsec_GGZZTOT_MCFM = Xcal2.XsecCalc(TVar::GGZZTOT_4l, TVar::GG, hzz4l_event,verbosity);
-  dXsec_GGZZINT_MCFM = Xcal2.XsecCalc(TVar::GGZZINT_4l, TVar::GG, hzz4l_event,verbosity);
+    dXsec_ZZ_MCFM = Xcal2.XsecCalc(TVar::bkgZZ, TVar::ZZQQB, hzz4l_event,verbosity,couplingvals,selfDHvvcoupl,selfDZqqcoupl,selfDZvvcoupl,selfDGqqcoupl,selfDGggcoupl,selfDGvvcoupl);
+  dXsec_GGZZ_MCFM = Xcal2.XsecCalc(TVar::bkgZZ, TVar::ZZGG, hzz4l_event,verbosity,couplingvals,selfDHvvcoupl,selfDZqqcoupl,selfDZvvcoupl,selfDGqqcoupl,selfDGggcoupl,selfDGvvcoupl);
+  dXsec_HZZ_MCFM = Xcal2.XsecCalc(TVar::HSMHiggs, TVar::ZZGG, hzz4l_event,verbosity,couplingvals,selfDHvvcoupl,selfDZqqcoupl,selfDZvvcoupl,selfDGqqcoupl,selfDGggcoupl,selfDGvvcoupl);
+  dXsec_GGZZTOT_MCFM = Xcal2.XsecCalc(TVar::bkgZZ_SMHiggs, TVar::ZZGG, hzz4l_event,verbosity,couplingvals,selfDHvvcoupl,selfDZqqcoupl,selfDZvvcoupl,selfDGqqcoupl,selfDGggcoupl,selfDGvvcoupl);
+  dXsec_GGZZINT_MCFM = dXsec_GGZZTOT_MCFM - dXsec_HZZ_MCFM - dXsec_GGZZ_MCFM;
 
   if ( verbosity >= TVar::INFO ) {
     std::cout << "total HZZ+ggZZ (132 + 128 + 129) = " << dXsec_GGZZ_MCFM + dXsec_HZZ_MCFM + dXsec_GGZZINT_MCFM 
@@ -209,46 +221,46 @@ void testME() {
   Xcal2.SetMatrixElement(TVar::JHUGen);
 
   // 0+ 
-  dXsec_HZZ_JHU =  Xcal2.XsecCalc(TVar::HZZ_4l, TVar::GG, hzz4l_event,verbosity);
+  dXsec_HZZ_JHU =  Xcal2.XsecCalc(TVar::HSMHiggs, TVar::ZZGG, hzz4l_event,verbosity,couplingvals,selfDHvvcoupl,selfDZqqcoupl,selfDZvvcoupl,selfDGqqcoupl,selfDGggcoupl,selfDGvvcoupl);
 
   // 0-
-  dXsec_PSHZZ_JHU = Xcal2.XsecCalc(TVar::PSHZZ_4l, TVar::GG, hzz4l_event,verbosity);
+  dXsec_PSHZZ_JHU = Xcal2.XsecCalc(TVar::H0minus, TVar::ZZGG, hzz4l_event,verbosity,couplingvals,selfDHvvcoupl,selfDZqqcoupl,selfDZvvcoupl,selfDGqqcoupl,selfDGggcoupl,selfDGvvcoupl);
 
   // 0h+
-  dXsec_HDHZZ_JHU = Xcal2.XsecCalc(TVar::HDHZZ_4l, TVar::GG, hzz4l_event,verbosity);
+  dXsec_HDHZZ_JHU = Xcal2.XsecCalc(TVar::H0hplus, TVar::ZZGG, hzz4l_event,verbosity,couplingvals,selfDHvvcoupl,selfDZqqcoupl,selfDZvvcoupl,selfDGqqcoupl,selfDGggcoupl,selfDGvvcoupl);
 
   // 0 mix cp
-  dXsec_HZZ_MIXCP_JHU = Xcal2.XsecCalc(TVar::HZZ_4l_MIXCP, TVar::GG, hzz4l_event,verbosity);
+//  dXsec_HZZ_MIXCP_JHU = Xcal2.XsecCalc(TVar::D_g1g4, TVar::ZZGG, hzz4l_event,verbosity,couplingvals,selfDHvvcoupl,selfDZqqcoupl,selfDZvvcoupl,selfDGqqcoupl,selfDGggcoupl,selfDGvvcoupl);
 
   // 1-
-  dXsec_VZZ_JHU = Xcal2.XsecCalc(TVar::VZZ_4l, TVar::QQB, hzz4l_event,verbosity);    
+  dXsec_VZZ_JHU = Xcal2.XsecCalc(TVar::H1minus, TVar::ZZQQB, hzz4l_event,verbosity,couplingvals,selfDHvvcoupl,selfDZqqcoupl,selfDZvvcoupl,selfDGqqcoupl,selfDGggcoupl,selfDGvvcoupl);    
 
   // 1+
-  dXsec_AVZZ_JHU = Xcal2.XsecCalc(TVar::AVZZ_4l, TVar::QQB, hzz4l_event,verbosity);   
+  dXsec_AVZZ_JHU = Xcal2.XsecCalc(TVar::H1plus, TVar::ZZQQB, hzz4l_event,verbosity,couplingvals,selfDHvvcoupl,selfDZqqcoupl,selfDZvvcoupl,selfDGqqcoupl,selfDGggcoupl,selfDGvvcoupl);   
 
   // 1- decay only
-  dXsec_VZZ_DECAY_JHU = Xcal2.XsecCalc(TVar::VZZ_4l, TVar::INDEPENDENT, hzz4l_event,verbosity); 
+  dXsec_VZZ_DECAY_JHU = Xcal2.XsecCalc(TVar::H1minus, TVar::ZZINDEPENDENT, hzz4l_event,verbosity,couplingvals,selfDHvvcoupl,selfDZqqcoupl,selfDZvvcoupl,selfDGqqcoupl,selfDGggcoupl,selfDGvvcoupl); 
 
   // 1+ decay only 
-  dXsec_AVZZ_DECAY_JHU = Xcal2.XsecCalc(TVar::AVZZ_4l, TVar::INDEPENDENT, hzz4l_event,verbosity); 
+  dXsec_AVZZ_DECAY_JHU = Xcal2.XsecCalc(TVar::H1plus, TVar::ZZINDEPENDENT, hzz4l_event,verbosity,couplingvals,selfDHvvcoupl,selfDZqqcoupl,selfDZvvcoupl,selfDGqqcoupl,selfDGggcoupl,selfDGvvcoupl); 
 
   // 2m+ (gg production) 
-  dXsec_TZZ_JHU = Xcal2.XsecCalc(TVar::TZZ_4l, TVar::GG, hzz4l_event,verbosity);
+  dXsec_TZZ_JHU = Xcal2.XsecCalc(TVar::H2_g1g5, TVar::ZZGG, hzz4l_event,verbosity,couplingvals,selfDHvvcoupl,selfDZqqcoupl,selfDZvvcoupl,selfDGqqcoupl,selfDGggcoupl,selfDGvvcoupl);
   
   // 2m+ (qqbar production)
-  dXsec_QQB_TZZ_JHU = Xcal2.XsecCalc(TVar::TZZ_4l,TVar::QQB, hzz4l_event,verbosity);
+  dXsec_QQB_TZZ_JHU = Xcal2.XsecCalc(TVar::H2_g1g5,TVar::ZZQQB, hzz4l_event,verbosity,couplingvals,selfDHvvcoupl,selfDZqqcoupl,selfDZvvcoupl,selfDGqqcoupl,selfDGggcoupl,selfDGvvcoupl);
   
   // 2m+ decay only
-  dXsec_TZZ_DECAY_JHU = Xcal2.XsecCalc(TVar::TZZ_4l, TVar::INDEPENDENT, hzz4l_event,verbosity);
+  dXsec_TZZ_DECAY_JHU = Xcal2.XsecCalc(TVar::H2_g1g5, TVar::ZZINDEPENDENT, hzz4l_event,verbosity,couplingvals,selfDHvvcoupl,selfDZqqcoupl,selfDZvvcoupl,selfDGqqcoupl,selfDGggcoupl,selfDGvvcoupl);
 
   // 2h-
-  dXsec_PTZZ_2hminus_JHU = Xcal2.XsecCalc(TVar::PTZZ_2hminus_4l, TVar::GG, hzz4l_event,verbosity);
+  dXsec_PTZZ_2hminus_JHU = Xcal2.XsecCalc(TVar::H2_g8, TVar::ZZGG, hzz4l_event,verbosity,couplingvals,selfDHvvcoupl,selfDZqqcoupl,selfDZvvcoupl,selfDGqqcoupl,selfDGggcoupl,selfDGvvcoupl);
 
   // 2h+
-  dXsec_TZZ_2hplus_JHU = Xcal2.XsecCalc(TVar::TZZ_2hplus_4l, TVar::GG, hzz4l_event,verbosity);
+  dXsec_TZZ_2hplus_JHU = Xcal2.XsecCalc(TVar::H2_g4, TVar::ZZGG, hzz4l_event,verbosity,couplingvals,selfDHvvcoupl,selfDZqqcoupl,selfDZvvcoupl,selfDGqqcoupl,selfDGggcoupl,selfDGvvcoupl);
 
   // 2b+
-  dXsec_TZZ_2bplus_JHU = Xcal2.XsecCalc(TVar::TZZ_2bplus_4l, TVar::GG, hzz4l_event,verbosity);
+  dXsec_TZZ_2bplus_JHU = Xcal2.XsecCalc(TVar::H2_g5, TVar::ZZGG, hzz4l_event,verbosity,couplingvals,selfDHvvcoupl,selfDZqqcoupl,selfDZvvcoupl,selfDGqqcoupl,selfDGggcoupl,selfDGvvcoupl);
 
   // H+jj
   // calculate the p4 of the H + 2jets, boosted to have 0 pT
@@ -268,8 +280,8 @@ void testME() {
     std::cout << "========================================\n";
   }
 
-  dXsec_HJJ_JHU = Xcal2.XsecCalcXJJ(TVar::HJJNONVBF, p4, verbosity);
-  dXsec_HJJVBF_JHU = Xcal2.XsecCalcXJJ(TVar::HJJVBF, p4, verbosity);
+  dXsec_HJJ_JHU = Xcal2.XsecCalcXJJ(TVar::HSMHiggs,TVar::JJGG, p4, verbosity,selfDHggcoupl,selfDHvvcoupl_VBF,selfDHwwcoupl_VBF);
+  dXsec_HJJVBF_JHU = Xcal2.XsecCalcXJJ(TVar::HSMHiggs,TVar::JJVBF, p4, verbosity,selfDHggcoupl,selfDHvvcoupl_VBF,selfDHwwcoupl_VBF);
 
   if ( verbosity >= TVar::INFO ) { 
     FILE *output = fopen("output.txt", "w");
