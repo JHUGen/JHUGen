@@ -16,9 +16,9 @@ source setup_matrixelement_sl6.sh # for sl6 machines
    1) Download MCFM 
    
    cd ../
-   wget http://mcfm.fnal.gov/mcfm-6.7.tar.gz
-   tar -xf MCFM-6.7.tar.gz
-   cd MCFM/
+   wget http://mcfm.fnal.gov/MCFM-6.8.tar.gz
+   tar -xf MCFM-6.8.tar.gz
+   cd MCFM-6.8/
 
    2) Modify makefile: replace the gfortran code tags to output library
 
@@ -29,14 +29,21 @@ source setup_matrixelement_sl6.sh # for sl6 machines
 
       FFLAGS  = -g -fPIC
 
-   4) compile the package and export the libarry
+   4) Copy contents of JHUGenMELA/ZZ_MCFM/src/ into MCFM-6.8/src/.
+
+   5) Add following lines in MCFM-6.8/makefile:
+      Under "ZZFILES = \":
+                           gg_ZZ_int_freenorm.o \
+                           qqb_zz_stu.o \
+
+   6) Compile the package and export the libarry
    
     ./Install
     make
     cd obj/
-    g++ -Wl,-soname,libmcfm_6p7.so -shared -o libmcfm_6p7.so *.o ../QCDLoop/ql/ql*.o ../QCDLoop/ql/a*.o ../QCDLoop/ff/*.o  
+    g++ -Wl,-soname,libmcfm_6p8.so -shared -o libmcfm_6p8.so *.o ../QCDLoop/ql/ql*.o ../QCDLoop/ql/a*.o ../QCDLoop/ff/*.o  
 
-   5) copy library libmcfm_6p7.so to the JHUGenMELA/ggZZ_MCFM/ area
+   7) Copy library libmcfm_6p8.so to the JHUGenMELA/ggZZ_MCFM/ area
 
 
 3. go back to JHUGenMELA/ggZZ_MCFM/ and compile the MELA code
