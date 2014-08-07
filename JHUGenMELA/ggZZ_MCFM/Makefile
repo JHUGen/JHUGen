@@ -15,9 +15,11 @@ INCLUDE = -I$(CMSROOT) $(ROOFITINCLUDE)
 
 FORTRAN = gfortran
 FFLAGS = -O3 -ffree-line-length-none -Dcompiler=2 -fPIC
+#FFLAGS = -fno-automatic -fno-f2c -O2 -fPIC -g -ffree-line-length-none
 
 CC = g++
-CFLAGS = -Wall -Wno-unused-function -g -O2 -fPIC -lm -lgfortran $(shell root-config --cflags) $(INCLUDE) $(EXTRACFLAGS)
+#CFLAGS = -Wall -Wno-unused-function -g -O2 -fPIC -lm -lgfortran $(shell root-config --cflags) $(INCLUDE) $(EXTRACFLAGS)
+CFLAGS = -fPIC -ansi -D_GNU_SOURCE -g -O2  $(shell root-config --cflags) $(INCLUDE) $(EXTRACFLAGS)
 
 LINKER = g++
 LINKERFLAGS = $(shell root-config --ldflags) mod_Higgs_MatEl.o mod_Graviton_MatEl.o mod_Zprime_MatEl.o mod_HiggsJJ_MatEl.o

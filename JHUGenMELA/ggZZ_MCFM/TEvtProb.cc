@@ -21,7 +21,7 @@ using namespace std;
 //-----------------------------------------------------------------------------
 // Constructors and Destructor
 //-----------------------------------------------------------------------------
-TEvtProb::TEvtProb(double ebeam ):EBEAM(ebeam){
+TEvtProb::TEvtProb(double ebeam):EBEAM(ebeam){
   mcfm_init_((char *)"input.DAT",(char *)"./");
   SetEwkCouplingParameters();
   SetHiggsMass();
