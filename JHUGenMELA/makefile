@@ -5,7 +5,7 @@ fcomp = ifort -fpp -O2 -vec-report0 -Dcompiler=1
 # fcomp = ifort -fpp -O0 -vec-report0 -Dcompiler=1
 endif
 ifeq ($(Comp),gfort)
-fcomp = gfortran -O3 -ffree-line-length-none -Dcompiler=2
+fcomp = f95 -O3 -ffree-line-length-none -Dcompiler=2
 endif
 
 ccomp = gcc
