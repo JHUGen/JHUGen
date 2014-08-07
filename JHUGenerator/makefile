@@ -6,7 +6,7 @@ VegasDir = $(Here)/vegas
 
 # compiler options, Comp=ifort/gfort
 Opt  = Yes
-Comp = gfort
+Comp = ifort
 
 
 
@@ -46,6 +46,7 @@ MainDep = mod_Misc.F90 \
           mod_Higgs.F90 \
           mod_Zprime.F90 \
           mod_HiggsJJ.F90 \
+          mod_HiggsJ.F90 \
           mod_VHiggs.F90 \
           mod_CrossSection.F90 \
           main.F90
@@ -58,6 +59,7 @@ MainObj = $(ObjectDir)/mod_Misc.o \
           $(ObjectDir)/mod_Higgs.o \
           $(ObjectDir)/mod_Zprime.o \
           $(ObjectDir)/mod_HiggsJJ.o \
+          $(ObjectDir)/mod_HiggsJ.o \
           $(ObjectDir)/mod_VHiggs.o \
           $(ObjectDir)/mod_CrossSection.o \
           $(ObjectDir)/main.o

@@ -1,27 +1,41 @@
-!--YaofuZhou-----------------------------------------
+! For the amplitude squared for the following process,
+! q/e+(1) q'/e-(2) > Z/W(3) > Z/W(4) H(5), Z/W(4) > l-/nu(6) l+/nu~(7), H(5) > b(8) b~(9)
+! call EvalAmp_VHiggs(id,helicity,MomExt,mass,me2)
+! id = PDG code in integer type.
+! helicity = +/-1 in double precision type.
+! Example:
+! id(1:9) = (/-11, 11, 23, 23, 25, 11, -11, 5, -5/)
+! helicity(1:9) = (/1d0, -1d0, 0d0, 0d0, 0d0, 1d0, -1d0, 1d0, 1d0/)
+! for a e+ e- > Z > Z H, Z > e- e+, H > b b~
+
 module ModVHiggs
-  use ModParameters
   implicit none
   private
-  real(8), parameter :: T3lL= -0.5d0
-  real(8), parameter :: T3lR=  0d0
-  real(8), parameter :: T3nL=  0.5d0
-  real(8), parameter :: T3uL= 0.5d0
-  real(8), parameter :: T3uR= 0d0
-  real(8), parameter :: T3dL= -0.5d0
-  real(8), parameter :: T3dR= 0d0
-  real(8), parameter :: QlL = -1d0
-  real(8), parameter :: QlR = -1d0
-  real(8), parameter :: QnL =  0d0
-  real(8), parameter :: QuL = 0.66666666666666666666666666667d0
-  real(8), parameter :: QuR = 0.66666666666666666666666666667d0
-  real(8), parameter :: QdL = -0.33333333333333333333333333333d0
-  real(8), parameter :: QdR = -0.33333333333333333333333333333d0
+    !-- general definitions, to be merged with Markus final structure
+  integer, parameter  :: dp = selected_real_kind(15)
+
+  include './variables.F90'
+
+  real(dp), parameter :: pi =3.141592653589793238462643383279502884197d0
+  real(dp), parameter :: T3lL= -0.5d0
+  real(dp), parameter :: T3lR=  0d0
+  real(dp), parameter :: T3nL=  0.5d0
+  real(dp), parameter :: T3uL= 0.5d0
+  real(dp), parameter :: T3uR= 0d0
+  real(dp), parameter :: T3dL= -0.5d0
+  real(dp), parameter :: T3dR= 0d0
+  real(dp), parameter :: QlL = -1d0
+  real(dp), parameter :: QlR = -1d0
+  real(dp), parameter :: QnL =  0d0
+  real(dp), parameter :: QuL = 0.66666666666666666666666666667d0
+  real(dp), parameter :: QuR = 0.66666666666666666666666666667d0
+  real(dp), parameter :: QdL = -0.33333333333333333333333333333d0
+  real(dp), parameter :: QdR = -0.33333333333333333333333333333d0
 
   !spin-0 couplings
-  real(8), parameter :: gFFS=1d0
-  real(8), parameter :: gFFP=0d0
-  real(8), parameter :: b_Yukawa=4.18d0*GeV
+  real(dp), parameter :: gFFS=1d0
+  real(dp), parameter :: gFFP=0d0
+  real(dp), parameter :: b_Yukawa=4.18d0*GeV
 
   !----- notation for subroutines
   public :: EvalAmp_VHiggs
@@ -30,23 +44,29 @@ contains
 
 
 
-  subroutine EvalAmp_VHiggs(id,helicity,MomExt,inv_mass,mass,me2)
-      real(8), intent(in) :: MomExt(1:4,1:9) !beam_momentum(2,4),four_momentum(7,4)
-      !real(8) :: MomExt(1:4,1:9)
-      real(8), intent(in) :: inv_mass(9)
-      !real(8) :: inv_mass(9)
-      real(8), intent(out) :: me2
-      real(8), intent(in) :: helicity(9)!, beam_h(2)
-      real(8), intent(in) ::  mass(9,2) !(mass, width)
-      integer, intent(in) ::  id(9)
-      complex(8) amplitude
+subroutine EvalAmp_VHiggs(id,helicity,MomExt,Hzzcoupl,mass,me2)
+      real(dp), intent(in) :: MomExt(1:4,1:9) !beam_momentum(2,4),four_momentum(7,4)
+      complex(dp) :: Hzzcoupl(1:30)
+      !real(dp) :: MomExt(1:4,1:9)
+      real(dp) :: inv_mass(9)
+      !real(dp) :: inv_mass(9)
+      real(dp), intent(out) :: me2
+      real(dp), intent(in) :: helicity(9)!, beam_h(2)
+      real(dp), intent(in) :: mass(9,2) !(mass, width)
+      integer, intent(in) :: id(9)
+      integer :: i
+      complex(dp) amplitude
+      inv_mass=0d0
+      do i=3,5
+        inv_mass(i) = dsqrt(MomExt(1,i)**2 - MomExt(2,i)**2 - MomExt(3,i)**2 - MomExt(4,i)**2)
+      enddo
 
-      amplitude=MATRIXELEMENT0(MomExt,inv_mass,mass,helicity,id)
+      amplitude=MATRIXELEMENT0(MomExt,inv_mass,mass,helicity,id,Hzzcoupl)
       me2=dble(amplitude*dconjg(amplitude))
-
+!print *, me2, helicity(1:2), helicity(6:7)
     return
 
-  end subroutine EvalAmp_VHiggs
+end subroutine EvalAmp_VHiggs
 
 
 
@@ -62,28 +82,66 @@ contains
 
 !
 
-      complex(8) function MATRIXELEMENT0(MomExt,inv_mass,mass,helicity,id)
+      complex(dp) function MATRIXELEMENT0(MomExt,inv_mass,mass,helicity,id,Hzzcoupl)
 
       implicit none
 
-      complex(8) dMATRIXELEMENT
-      real(8), intent(in) :: MomExt(1:4,1:9) !,four_momentum(7,4)
-      real(8), intent(in) :: inv_mass(9)
-      real(8), intent(in) ::  mass(9,2)
-      !real(8), intent(in) ::  beam_momentum(2,4)
-      real(8), intent(in) ::  helicity(9)!, beam_h(2) !helicities
+      complex(dp) dMATRIXELEMENT
+      real(dp), intent(in) :: MomExt(1:4,1:9) !,four_momentum(7,4)
+      complex(8), intent(in) :: Hzzcoupl(1:30)
+      real(dp), intent(in) :: inv_mass(9)
+      real(dp) ::  mass(9,2)
+      !real(dp), intent(in) ::  beam_momentum(2,4)
+      real(dp), intent(in) ::  helicity(9)!, beam_h(2) !helicities
       integer, intent(in) ::  id(9)!, beam_id(2)
 
       integer mu1,mu2,mu3,mu4,lambda1,lambda2
-      complex(8) PVVX0P      
-      complex(8) Vcurrent1(4), Acurrent1(4), current1(4), Vcurrent2(4)
-      complex(8) Acurrent2(4), current2(4),POL1(3,4), POL2(3,4)
-      complex(8) g_mu_nu(4,4), pp(4,4), epp(4,4)
-      complex(8) VVX0(4,4)
-      complex(8) PROP1, PROP2, PROP3, qq, gVVP, gVVS1, gVVS2, gFFZ, gFFW
-      complex(8) ghz1_dyn,ghz2_dyn,ghz3_dyn,ghz4_dyn
-      real(8) q3_q3,q4_q4
+      complex(dp) PVVX0P      
+      complex(dp) Vcurrent1(4), Acurrent1(4), current1(4), Vcurrent2(4)
+      complex(dp) Acurrent2(4), current2(4),POL1(3,4), POL2(3,4)
+      complex(dp) g_mu_nu(4,4), pp(4,4), epp(4,4)
+      complex(dp) VVX0(4,4)
+      complex(dp) PROP1, PROP2, PROP3, qq, gVVP, gVVS1, gVVS2, gFFZ, gFFW
+      complex(dp) ghz1_dyn,ghz2_dyn,ghz3_dyn,ghz4_dyn
+      real(dp) q3_q3,q4_q4
+      complex(dp) ghz1, ghz2, ghz3, ghz4
+      
+      if(id(3).eq.23)then
+        mass(3,1)=M_Z
+        mass(4,1)=M_Z
+        mass(3,2)=Ga_Z
+        mass(4,2)=Ga_Z
+      else
+        mass(3,1)=M_W
+        mass(4,1)=M_W
+        mass(3,2)=Ga_W
+        mass(4,2)=Ga_W
+      endif
 
+      ghz1 = Hzzcoupl(1)
+      ghz2 = Hzzcoupl(2)
+      ghz3 = Hzzcoupl(3)
+      ghz4 = Hzzcoupl(4)
+      ghz1_prime = Hzzcoupl(11)
+      ghz1_prime2 = Hzzcoupl(12)
+      ghz1_prime3 = Hzzcoupl(13)
+      ghz1_prime4 = Hzzcoupl(14)
+      ghz1_prime5 = Hzzcoupl(15)
+      ghz2_prime = Hzzcoupl(16)
+      ghz2_prime2 = Hzzcoupl(17)
+      ghz2_prime3 = Hzzcoupl(18)
+      ghz2_prime4 = Hzzcoupl(19)
+      ghz2_prime5 = Hzzcoupl(20)
+      ghz3_prime = Hzzcoupl(21)
+      ghz3_prime2 = Hzzcoupl(22)
+      ghz3_prime3 = Hzzcoupl(23)
+      ghz3_prime4 = Hzzcoupl(24)
+      ghz3_prime5 = Hzzcoupl(25)
+      ghz4_prime = Hzzcoupl(26)
+      ghz4_prime2 = Hzzcoupl(27)
+      ghz4_prime3 = Hzzcoupl(28)
+      ghz4_prime4 = Hzzcoupl(29)
+      ghz4_prime5 = Hzzcoupl(30)
 
 
       gFFZ = (0d0,1d0)*dsqrt(4d0*pi*alpha_QED/(1d0-sitW**2))/sitW
@@ -125,11 +183,11 @@ contains
 !WH
       if((id(1)+id(2)).ne.0)then
         if((id(1)*helicity(1)).le.0d0)then
-          current1=Vcurrent1*gFFW*CKM(id(1),id(2))
+          current1=Vcurrent1*gFFW*CKM(abs(id(1)),abs(id(2)))
         else
           current1=0d0
         endif
-        current2=Vcurrent2*gFFW*CKM(id(6),id(7))
+        current2=Vcurrent2*gFFW*CKM(abs(id(6)),abs(id(7)))
 
 !ZH
       else if((abs(id(1)).eq.11).or.(abs(id(1)).eq.13))then
@@ -239,7 +297,7 @@ contains
       gVVS1 = ghz1_dyn*(mass(3,1)**2) + qq * ( 2d0*ghz2_dyn + ghz3_dyn*qq/Lambda )
       gVVS2 = -( 2d0*ghz2_dyn + ghz3_dyn*qq/Lambda )
       gVVP = -2d0*ghz4_dyn
-
+      
       VVX0 = 0d0
       if(gVVS1.ne.0d0)then
         call VVS1(g_mu_nu)
@@ -291,23 +349,6 @@ contains
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 !ANGLES.F
 !VERSION 20130531
 !
@@ -317,13 +358,13 @@ contains
 
       subroutine ANGLES(sincos, vector)
       implicit none
-!     real(8) Pi
-      real(8) Twopi, Fourpi, epsilon
+!     real(dp) Pi
+      real(dp) Twopi, Fourpi, epsilon
 !     parameter( Pi = 3.14159265358979323846d0 )
       parameter( Twopi = 2d0 * Pi )
       parameter( Fourpi = 4d0 * Pi )
       parameter( epsilon = 1d-13 ) !a small quantity slightly above machine precision
-      real(8) sincos(4), vector(4), abs3p, phi
+      real(dp) sincos(4), vector(4), abs3p, phi
 !sincos(1)=cos(theta)
 !sincos(2)=sin(theta)
 !sincos(3)=cos(phi)
@@ -368,21 +409,6 @@ contains
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 !ANTISYMMETRIC2.F
 !VERSION 20130702
 
@@ -391,16 +417,16 @@ contains
       subroutine ANTISYMMETRIC2(p1,p2,epp)
 
       implicit none
-!     real(8) Pi
-      real(8) Twopi, Fourpi, epsilon
+!     real(dp) Pi
+      real(dp) Twopi, Fourpi, epsilon
 !     parameter( Pi = 3.14159265358979323846d0 )
       parameter( Twopi = 2d0 * Pi )
       parameter( Fourpi = 4d0 * Pi )
       parameter( epsilon = 1d-13 ) !a small quantity slightly above machine precision
 
-      complex(8) p1(4), p2(4)
-      complex(8) epp(4,4)
-!      real(8) ANTISYMMETRIC
+      complex(dp) p1(4), p2(4)
+      complex(dp) epp(4,4)
+!      real(dp) ANTISYMMETRIC
       integer i,j,k,l
 
 !      external ANTISYMMETRIC
@@ -432,16 +458,6 @@ contains
 
 
 
-
-
-
-
-
-
-
-
-
-
 !ANTISYMMETRIC.F
 !VERSION 20130618
 
@@ -449,7 +465,7 @@ contains
 !tensor.
 !ANTISYMMETRIC(0,1,2,3)=1.
 
-      real(8) function ANTISYMMETRIC(i,j,k,l)
+      real(dp) function ANTISYMMETRIC(i,j,k,l)
 
       implicit none
 !     include '../COMMON.INI'
@@ -467,19 +483,6 @@ contains
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 !CONTRA_FIELD_TENSOR.F
 !VERSION 20130630
 
@@ -489,15 +492,15 @@ contains
       subroutine CONTRA_FIELD_TENSOR(POL, T_mu_nu)
 
       implicit none
-!     real(8) Pi
-      real(8) Twopi, Fourpi, epsilon
+!     real(dp) Pi
+      real(dp) Twopi, Fourpi, epsilon
 !     parameter( Pi = 3.14159265358979323846d0 )
       parameter( Twopi = 2d0 * Pi )
       parameter( Fourpi = 4d0 * Pi )
       parameter( epsilon = 1d-13 ) !a small quantity slightly above machine precision
-      complex(8) epep(4,4),emem(4,4),epe0(4,4),eme0(4,4),e0e0(4,4)
-      complex(8) epem(4,4),e0ep(4,4),e0em(4,4),emep(4,4)
-      complex(8) POL(3,4), T_mu_nu(5,4,4)
+      complex(dp) epep(4,4),emem(4,4),epe0(4,4),eme0(4,4),e0e0(4,4)
+      complex(dp) epem(4,4),e0ep(4,4),e0em(4,4),emep(4,4)
+      complex(dp) POL(3,4), T_mu_nu(5,4,4)
       
       call CONTRA_OUTER(POL(1,:), POL(1,:), epep)
       call CONTRA_OUTER(POL(2,:), POL(2,:), emem)
@@ -532,29 +535,6 @@ contains
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 !CONTRA_OUTER.F
 !VERSION 20130620
 
@@ -565,8 +545,8 @@ contains
 
       implicit none
 !     include '../COMMON.INI'
-      complex(8) p1(4), p2(4)
-      complex(8) pp(4,4)
+      complex(dp) p1(4), p2(4)
+      complex(dp) pp(4,4)
       integer mu, nu
 
       do mu=1,4
@@ -586,18 +566,6 @@ contains
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 !COVARIANT_FIELD_TENSOR.F
 !VERSION 20130630
 
@@ -607,15 +575,15 @@ contains
       subroutine COVARIANT_FIELD_TENSOR(POL, T_mu_nu)
 
       implicit none
-!     real(8) Pi
-      real(8) Twopi, Fourpi, epsilon
+!     real(dp) Pi
+      real(dp) Twopi, Fourpi, epsilon
 !     parameter( Pi = 3.14159265358979323846d0 )
       parameter( Twopi = 2d0 * Pi )
       parameter( Fourpi = 4d0 * Pi )
       parameter( epsilon = 1d-13 ) !a small quantity slightly above machine precision
-      complex(8) epep(4,4),emem(4,4),epe0(4,4),eme0(4,4),e0e0(4,4)
-      complex(8) epem(4,4),e0ep(4,4),e0em(4,4),emep(4,4)
-      complex(8) POL(3,4), T_mu_nu(5,4,4)
+      complex(dp) epep(4,4),emem(4,4),epe0(4,4),eme0(4,4),e0e0(4,4)
+      complex(dp) epem(4,4),e0ep(4,4),e0em(4,4),emep(4,4)
+      complex(dp) POL(3,4), T_mu_nu(5,4,4)
       
       call COVARIANT_OUTER(POL(1,:), POL(1,:), epep)
       call COVARIANT_OUTER(POL(2,:), POL(2,:), emem)
@@ -648,15 +616,6 @@ contains
 
 
 
-
-
-
-
-
-
-
-
-
 !COVARIANT_OUTER.F
 !VERSION 20130620
 
@@ -667,8 +626,8 @@ contains
 
       implicit none
 !     include '../COMMON.INI'
-      complex(8) p1(4), p2(4)
-      complex(8) pp(4,4)
+      complex(dp) p1(4), p2(4)
+      complex(dp) pp(4,4)
       integer mu, nu
 
       do mu=1,4
@@ -691,33 +650,17 @@ contains
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 !COVARIANT_VECTOR.F
 !VERSION 20130703
 
 !returns the component of the COVARIANT vector for given 4-vector
 !and Lorentz index.
 
-      complex(8) function COVARIANT_VECTOR(p,mu)
+      complex(dp) function COVARIANT_VECTOR(p,mu)
 
       implicit none
 
-      complex(8) p(4)
+      complex(dp) p(4)
       integer mu
 
       if(mu.ne.1)then
@@ -738,33 +681,19 @@ contains
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 !FFP.A
 !VERSION 20130522
 
 !returns i.Psi~(p1,s1).gamma5.Psi(p2,s2) for massless states
 
-      complex(8) function FFP(pdg_code1, p1, h1, pdg_code2, p2, h2)
+      complex(dp) function FFP(pdg_code1, p1, h1, pdg_code2, p2, h2)
 
       implicit none
-      real(8), parameter :: epsilon = 1d-13 !a small quantity slightly above machine precision
+      real(dp), parameter :: epsilon = 1d-13 !a small quantity slightly above machine precision
       
-      real(8) p1(4), p2(4), h1, h2
+      real(dp) p1(4), p2(4), h1, h2
       integer pdg_code1, pdg_code2
-      real(8) sqrt_pp1Dpp2
+      real(dp) sqrt_pp1Dpp2
 
       if( ( dble(pdg_code1) *h1* dble(pdg_code2) *h2 ).gt.0d0)then
         FFP=0d0
@@ -798,17 +727,6 @@ contains
 
 
 
-
-
-
-
-
-
-
-
-
-
-
 !FFA.F
 !VERSION 20130523
 
@@ -818,12 +736,12 @@ contains
       subroutine FFA(pdg_code1, p1, h1, pdg_code2, p2, h2, Acurrent)
 
       implicit none
-      real(8), parameter :: epsilon = 1d-13 !a small quantity slightly above machine precision
+      real(dp), parameter :: epsilon = 1d-13 !a small quantity slightly above machine precision
       
-      real(8) p1(4), p2(4), h1, h2
+      real(dp) p1(4), p2(4), h1, h2
       integer pdg_code1, pdg_code2
-      real(8) sqrt_pp1Dpp2, sqrt_pp1Xpp2
-      complex(8) Acurrent(4)
+      real(dp) sqrt_pp1Dpp2, sqrt_pp1Xpp2
+      complex(dp) Acurrent(4)
       integer mu
 
       if( ( dble(pdg_code1) *h1* dble(pdg_code2) *h2 ).lt.0d0)then
@@ -891,29 +809,19 @@ contains
 
 
 
-
-
-
-
-
-
-
-
-
-
 !FFS.F
 !VERSION 20130522
 
 !returns Psi~(p1,s1).Psi(p2,s2) for massless states
 
-      complex(8) function FFS(pdg_code1, p1, h1, pdg_code2, p2, h2)
+      complex(dp) function FFS(pdg_code1, p1, h1, pdg_code2, p2, h2)
 
       implicit none
-      real(8), parameter :: epsilon = 1d-13 !a small quantity slightly above machine precision
+      real(dp), parameter :: epsilon = 1d-13 !a small quantity slightly above machine precision
       
-      real(8) p1(4), p2(4), h1, h2
+      real(dp) p1(4), p2(4), h1, h2
       integer pdg_code1, pdg_code2
-      real(8) sqrt_pp1Dpp2
+      real(dp) sqrt_pp1Dpp2
 
       if( ( dble(pdg_code1) *h1* dble(pdg_code2) *h2 ).gt.0d0)then
         FFS=0d0
@@ -946,15 +854,6 @@ contains
 
 
 
-
-
-
-
-
-
-
-
-
 !FFV.F
 !VERSION 20130523
 
@@ -964,12 +863,12 @@ contains
       subroutine FFV(pdg_code1, p1, h1, pdg_code2, p2, h2, Vcurrent)
 
       implicit none
-      real(8), parameter :: epsilon = 1d-13 !a small quantity slightly above machine precision
+      real(dp), parameter :: epsilon = 1d-13 !a small quantity slightly above machine precision
       
-      real(8) p1(4), p2(4), h1, h2
+      real(dp) p1(4), p2(4), h1, h2
       integer pdg_code1, pdg_code2
-      real(8) sqrt_pp1Dpp2, sqrt_pp1Xpp2
-      complex(8) Vcurrent(4)
+      real(dp) sqrt_pp1Dpp2, sqrt_pp1Xpp2
+      complex(dp) Vcurrent(4)
       integer mu
 
       if( ( dble(pdg_code1) *h1* dble(pdg_code2) *h2 ).lt.0d0)then
@@ -1032,42 +931,20 @@ contains
 
 
 
-
-
-
-
-
-
-
-
-
-
 !INNER.F
 !VERSION 20130620
 
 !returns the (complex) inner product of p1 and p2, p1_mu p2^nu.
 
-      complex(8) function INNER(p1,p2)
+      complex(dp) function INNER(p1,p2)
 
       implicit none
-      complex(8) p1(4), p2(4)
+      complex(dp) p1(4), p2(4)
 
       INNER = p1(1)*p2(1) - p1(2)*p2(2) - p1(3)*p2(3) - p1(4)*p2(4)
 
       return
       END function INNER
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -1091,9 +968,9 @@ contains
 
       implicit none
 
-      real(8) vector(4), boost(4) 
-      real(8) lambda(4,4), vector_copy(4)
-      real(8) beta(2:4), beta_sq, gamma
+      real(dp) vector(4), boost(4) 
+      real(dp) lambda(4,4), vector_copy(4)
+      real(dp) beta(2:4), beta_sq, gamma
       integer i,j
 
       do i=2,4
@@ -1139,23 +1016,11 @@ contains
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 !KRONECKER_DELTA.F
 
 !KRONECKER_DELTA(i,j)
 !A function that returns 1 if i=j, and 0 otherwise.
-      real(8) function KRONECKER_DELTA(i,j)
+      real(dp) function KRONECKER_DELTA(i,j)
       integer i,j
       if(i.eq.j)then
         KRONECKER_DELTA = 1d0
@@ -1176,53 +1041,13 @@ contains
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 !METRIC.F
 !VERSION 20130524
 
 !in METRIC returns the element of the Minkovski metric, with
 !signature (1,-1,-1,-1), for given (_mu, _nu) or given (^mu, ^nu).
 
-      real(8) function METRIC(mu,nu)
+      real(dp) function METRIC(mu,nu)
 
       implicit none
       integer mu, nu
@@ -1247,20 +1072,6 @@ contains
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 !`.F
 !VERSION 20130524
 
@@ -1270,8 +1081,8 @@ contains
       subroutine POLARIZATION(p, POL)
 
       implicit none
-      real(8) p(4), sincos(4), inv_mass, abs3p
-      complex(8) POL(3,4)
+      real(dp) p(4), sincos(4), inv_mass, abs3p
+      complex(dp) POL(3,4)
 !     integer lambda, mu
       
       call ANGLES(sincos, p)
@@ -1306,21 +1117,6 @@ contains
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 !POLARIZATIONA.F
 !VERSION 20130529
 
@@ -1330,8 +1126,8 @@ contains
       subroutine POLARIZATIONA(p, POL)
 
       implicit none
-      real(8) p(4), sincos(4), inv_mass, abs3p
-      complex(8) POL(2,4)
+      real(dp) p(4), sincos(4), inv_mass, abs3p
+      complex(dp) POL(2,4)
       
       call ANGLES(sincos, p)
 
@@ -1358,25 +1154,6 @@ contains
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 !POLARIZATIONX.F
 !VERSION 20130529
 
@@ -1387,8 +1164,8 @@ contains
       subroutine POLARIZATIONX(p, POL)
 
       implicit none
-      real(8) p(4), sincos(4), inv_mass, abs3p
-      complex(8) POL(3,4)
+      real(dp) p(4), sincos(4), inv_mass, abs3p
+      complex(dp) POL(3,4)
 !     integer lambda, mu
       
       call ANGLES(sincos, p)
@@ -1424,27 +1201,6 @@ contains
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 !PROPAGATOR.F
 !VERSION 20130522
 !
@@ -1452,10 +1208,10 @@ contains
 !without tensor structure (numerator), given mass, invariant mass
 !and width.
 
-      complex(8) function PROPAGATOR(inv_mass, mass, width)
+      complex(dp) function PROPAGATOR(inv_mass, mass, width)
       implicit none
 
-      real(8) inv_mass, mass, width
+      real(dp) inv_mass, mass, width
 
 !not assuming auto-conversion
 !     PROPAGATOR = (0d0,1d0)/(dcmplx(inv_mass**2,0d0)
@@ -1475,24 +1231,6 @@ contains
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 !VVP.F
 !VERSION 20130524
 
@@ -1501,9 +1239,9 @@ contains
       subroutine VVP(p1,p2,epp)
 
       implicit none
-      real(8) p1(4), p2(4)
-      complex(8) epp(4,4)
-!      real(8) ANTISYMMETRIC
+      real(dp) p1(4), p2(4)
+      complex(dp) epp(4,4)
+!      real(dp) ANTISYMMETRIC
       integer i,j,k,l
 
 !      external ANTISYMMETRIC
@@ -1533,18 +1271,6 @@ contains
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 !VVS1.F
 !VERSION 20130524
 
@@ -1553,7 +1279,7 @@ contains
       subroutine VVS1(g_mu_nu)
 
       implicit none
-      complex(8) g_mu_nu(4,4)
+      complex(dp) g_mu_nu(4,4)
 
       g_mu_nu = 0d0
 
@@ -1572,22 +1298,6 @@ contains
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 !VVS2.F
 !VERSION 20130524
 
@@ -1596,8 +1306,8 @@ contains
       subroutine VVS2(p1,p2,pp)
 
       implicit none
-      real(8) p1(4), p2(4)
-      complex(8) pp(4,4)
+      real(dp) p1(4), p2(4)
+      complex(dp) pp(4,4)
       integer mu, nu
 
       do mu=1,4
@@ -1618,18 +1328,35 @@ contains
 
 
 
+FUNCTION CKM(id1in,id2in)
+implicit none
+real(8) :: CKM
+integer :: id1, id2, id1in, id2in
+id1 = abs(id1in)
+id2 = abs(id2in)
+if((id1.eq.2  .and.  id2.eq.1)  .or.  (id1.eq.1  .and.  id2.eq.2))then
+  CKM= 0.97427d0! * dsqrt(scale_alpha_W_ud)
+elseif((id1.eq.2  .and.  id2.eq.3)  .or.  (id1.eq.3  .and.  id2.eq.2))then
+  CKM= 0.22534d0
+elseif((id1.eq.2  .and.  id2.eq.1)  .or.  (id1.eq.1  .and.  id2.eq.2))then
+  CKM= 0.00351d0
+elseif((id1.eq.4  .and.  id2.eq.1)  .or.  (id1.eq.1  .and.  id2.eq.4))then
+  CKM= 0.22520d0
+elseif((id1.eq.4  .and.  id2.eq.3)  .or.  (id1.eq.3  .and.  id2.eq.4))then
+  CKM= 0.97344d0! * dsqrt(scale_alpha_W_cs)
+elseif((id1.eq.4  .and.  id2.eq.1)  .or.  (id1.eq.1  .and.  id2.eq.4))then
+  CKM= 0.0412d0
+!elseif((id1.eq.convertLHE(Top_)  .and.  id2.eq.convertLHE(Dn_))  .or.  (id1.eq.convertLHE(Dn_)  .and.  id2.eq.convertLHE(Top_)))then
+!  CKM= 0.22520d0
+!elseif((id1.eq.convertLHE(Top_)  .and.  id2.eq.3)  .or.  (id1.eq.3  .and.  id2.eq.convertLHE(Top_)))then
+!  CKM= 0.0404d0
+!elseif((id1.eq.convertLHE(Top_)  .and.  id2.eq.convertLHE(Bot_))  .or.  (id1.eq.convertLHE(Bot_)  .and.  id2.eq.convertLHE(Top_)))then
+!  CKM= 0.999146
+else
+  CKM= 1d0! * dsqrt(scale_alpha_W_ln)
+endif
 
-
-
-
-
-
-
-
-
-
-
-
+END FUNCTION
 
 
 

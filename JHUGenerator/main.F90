@@ -407,6 +407,15 @@ include "vegas_common.f"
          VegasNc1_default = 500000
          VegasNc2_default = 10000
       endif
+      !- Hj, gluon fusion
+      if(Process.eq.62) then
+         NDim = 5+1 !1 for color flow ramdomization in gg > Hg
+         NDim = NDim + 2 ! sHat integration
+         VegasIt1_default = 5
+         VegasNc0_default = 10000000
+         VegasNc1_default = 500000
+         VegasNc2_default = 10000
+      endif
       !- VHiggs
       if(Process.eq.50) then
          NDim = 17
@@ -498,6 +507,8 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
 
     if (Process.eq.60 .or. Process.eq.61) then
       call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
+    elseif (Process.eq.62) then
+      call vegas(EvalWeighted_HJ,VG_Result,VG_Error,VG_Chi2)
     elseif (Process.eq.50) then
       call vegas(EvalWeighted_VHiggs,VG_Result,VG_Error,VG_Chi2)
     else
@@ -518,6 +529,8 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
     ncall= VegasNc2
     if (process.eq.60 .or. process.eq.61) then 
       call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
+    elseif (process.eq.62 .or. process.eq.61) then 
+      call vegas1(EvalWeighted_HJ,VG_Result,VG_Error,VG_Chi2)
     elseif (Process.eq.50) then
       call vegas1(EvalWeighted_VHiggs,VG_Result,VG_Error,VG_Chi2)
     else
@@ -551,6 +564,10 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
             if (Process.eq.60 .or. Process.eq.61) then
                 RES = 0d0
                 dum = EvalUnWeighted_HJJ(yRnd,.false.,RES)
+                VG = VG + RES
+            elseif (Process.eq.62) then
+                RES = 0d0
+                dum = EvalUnWeighted_HJ(yRnd,.false.,RES)
                 VG = VG + RES
             elseif (Process.eq.50) then
                 RES = 0d0
@@ -634,11 +651,13 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
         print *, " generating events with ",VegasNc1," tries"
         do i=1,VegasNc1
             call random_number(yRnd)
-	    if (Process.eq.60 .or. Process.eq.61) then
+      if (Process.eq.60 .or. Process.eq.61) then
                 dum = EvalUnWeighted_HJJ(yRnd,.true.,RES)! RES is a dummy here
-            elseif (Process.eq.50) then
+      elseif (Process.eq.62) then
+                dum = EvalUnWeighted_HJ(yRnd,.true.,RES)! RES is a dummy here
+      elseif (Process.eq.50) then
                 dum = EvalUnWeighted_VHiggs(yRnd,.true.,RES)! RES is a dummy here
-	    else
+      else
                 dum = EvalUnWeighted(yRnd,.true.,RES)! RES is a dummy here
             endif
         enddo
@@ -646,13 +665,15 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
         print *, " generating ",VegasNc2," events"
         do while( AccepCounter.lt.VegasNc2 )
               call random_number(yRnd)
-	      if (Process.eq.60 .or. Process.eq.61) then
-		  dum = EvalUnWeighted_HJJ(yRnd,.true.,RES)! RES is a dummy here
+        if (Process.eq.60 .or. Process.eq.61) then
+      dum = EvalUnWeighted_HJJ(yRnd,.true.,RES)! RES is a dummy here
+        elseif (Process.eq.62) then
+      dum = EvalUnWeighted_HJ(yRnd,.true.,RES)! RES is a dummy here
         elseif (Process.eq.50) then
             dum = EvalUnWeighted_VHiggs(yRnd,.true.,RES)! RES is a dummy here
-	      else
-		  dum = EvalUnWeighted(yRnd,.true.,RES)! RES is a dummy here
-	      endif
+        else
+      dum = EvalUnWeighted(yRnd,.true.,RES)! RES is a dummy here
+        endif
 !              if( AccepCounter.gt.0 .and. mod(AccepCounter,10).eq.0 ) then
 !                   call cpu_time(time_int)
 !                   write(io_stdout,*)  AccepCounter," events accepted (",time_int-time_start, ") seconds"
@@ -1121,6 +1142,8 @@ implicit none
 
   if( Process.eq.60 .or. Process.eq.61 ) then
      call InitHisto_HVBF()
+  elseif( Process.eq.62) then
+     call InitHisto_HJ()
   elseif (Process.eq.50) then
      call InitHisto_VHiggs()
   else
@@ -1305,6 +1328,42 @@ END SUBROUTINE
 
 
 
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+SUBROUTINE InitHisto_HJ()
+use ModMisc
+use ModKinematics
+use ModParameters
+implicit none
+integer :: AllocStatus,NHisto
+
+          it_sav = 1
+          NumHistograms = 1
+          if( .not.allocated(Histo) ) then
+                allocate( Histo(1:NumHistograms), stat=AllocStatus  )
+                if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
+          endif
+
+          Histo(1)%Info   = "pT_j1"
+          Histo(1)%NBins  = 40
+          Histo(1)%BinSize= 10d0*GeV
+          Histo(1)%LowVal = 0d0
+          Histo(1)%SetScale= 1d0/GeV
+
+
+  do NHisto=1,NumHistograms
+      Histo(NHisto)%Value(:) = 0d0
+      Histo(NHisto)%Value2(:)= 0d0
+      Histo(NHisto)%Hits(:)  = 0
+  enddo
+
+RETURN
+END SUBROUTINE
+
+
+
+
+
+
 SUBROUTINE InitHisto_HVBF()
 use ModMisc
 use ModKinematics
@@ -1371,56 +1430,56 @@ integer :: AllocStatus,NHisto
           endif
 
           Histo(1)%Info   = "m(jj)"
-          Histo(1)%NBins  = 40
-          Histo(1)%BinSize= 20d0/40
-          Histo(1)%LowVal = 115d0
-          Histo(1)%SetScale= 1d0
+          Histo(1)%NBins  = 80
+          Histo(1)%BinSize= 20d0*GeV/80d0
+          Histo(1)%LowVal = 115d0*GeV
+          Histo(1)%SetScale= 1d0/GeV
 
           Histo(2)%Info   = "m(ll)"
-          Histo(2)%NBins  = 40
-          Histo(2)%BinSize= 20d0/40
-          Histo(2)%LowVal = 75d0
-          Histo(2)%SetScale= 1d0
+          Histo(2)%NBins  = 80
+          Histo(2)%BinSize= 20d0*GeV/80d0
+          Histo(2)%LowVal = 75d0*GeV
+          Histo(2)%SetScale= 1d0/GeV
 
           Histo(3)%Info   = "pt(V)"
-          Histo(3)%NBins  = 40
-          Histo(3)%BinSize= 300d0/40d0
-          Histo(3)%LowVal = 0d0
-          Histo(3)%SetScale= 1d0
+          Histo(3)%NBins  = 80
+          Histo(3)%BinSize= 300d0*GeV/80d0
+          Histo(3)%LowVal = 0d0*GeV
+          Histo(3)%SetScale= 1d0/GeV
 
           Histo(4)%Info   = "pt(H)"
-          Histo(4)%NBins  = 40
-          Histo(4)%BinSize= 300d0/40d0
-          Histo(4)%LowVal = 0d0
-          Histo(4)%SetScale= 1d0
+          Histo(4)%NBins  = 80
+          Histo(4)%BinSize= 300d0*GeV/80d0
+          Histo(4)%LowVal = 0d0*GeV
+          Histo(4)%SetScale= 1d0/GeV
 
           Histo(5)%Info   = "m(V*)"   ! scattering angle of Z in resonance rest frame
-          Histo(5)%NBins  = 40
-          Histo(5)%BinSize= 300d0/40d0
-          Histo(5)%LowVal = 200d0
-          Histo(5)%SetScale= 1d0
+          Histo(5)%NBins  = 80
+          Histo(5)%BinSize= 300d0*GeV/80d0
+          Histo(5)%LowVal = 200d0*GeV
+          Histo(5)%SetScale= 1d0/GeV
 
           Histo(6)%Info   = "costheta1"
-          Histo(6)%NBins  = 40
-          Histo(6)%BinSize= 2d0/40d0
+          Histo(6)%NBins  = 80
+          Histo(6)%BinSize= 2d0/80d0
           Histo(6)%LowVal = -1d0
           Histo(6)%SetScale= 1d0
 
           Histo(7)%Info   = "costheta2"
-          Histo(7)%NBins  = 40
-          Histo(7)%BinSize= 2d0/40d0
+          Histo(7)%NBins  = 80
+          Histo(7)%BinSize= 2d0/80d0
           Histo(7)%LowVal = -1d0
           Histo(7)%SetScale= 1d0
 
           Histo(8)%Info   = "phistar1"
-          Histo(8)%NBins  = 40
-          Histo(8)%BinSize= 6.4d0/40d0
+          Histo(8)%NBins  = 80
+          Histo(8)%BinSize= 6.4d0/80d0
           Histo(8)%LowVal = -3.2d0
           Histo(8)%SetScale= 1d0
 
           Histo(9)%Info   = "phi"
-          Histo(9)%NBins  = 40
-          Histo(9)%BinSize= 6.4d0/40d0
+          Histo(9)%NBins  = 80
+          Histo(9)%BinSize= 6.4d0/80d0
           Histo(9)%LowVal = -3.2d0
           Histo(9)%SetScale= 1d0
 
@@ -1464,9 +1523,17 @@ implicit none
             write(io_LHEOutFile ,'(A)') '-->'
             write(io_LHEOutFile ,'(A)') '<init>'
             if( (.not.unweighted) .and. (writeWeightedLHE) ) then
+              if(Collider.eq.0)then
+                write(io_LHEOutFile ,'(A,2F24.16,A)') ' -11   11',(Collider_Energy*50d0),(Collider_Energy*50d0),' 0 0     0     0 4  1' 
+              else
                 write(io_LHEOutFile ,'(A,2F24.16,A)') '2212 2212',(Collider_Energy*50d0),(Collider_Energy*50d0),' 0 0 10042 10042 4  1' 
+              endif
             else
+              if(Collider.eq.0)then
+                write(io_LHEOutFile ,'(A,2F24.16,A)') ' -11   11',(Collider_Energy*50d0),(Collider_Energy*50d0),' 0 0     0     0 3  1' 
+              else
                 write(io_LHEOutFile ,'(A,2F24.16,A)') '2212 2212',(Collider_Energy*50d0),(Collider_Energy*50d0),' 0 0 10042 10042 3  1' 
+              endif
             endif
 ! in order of appearance:  (see also http://arxiv.org/abs/hep-ph/0109068 and http://arxiv.org/abs/hep-ph/0609017)
 ! (*) incoming particle1 (2212=proton), incoming particle2, 
@@ -1557,7 +1624,7 @@ character :: arg*(500)
     if( .not. seed_random ) write(TheUnit,"(4X,A)") "NOTE: seed_random==FALSE (switched off)"
 
     write(TheUnit,"(4X,A)") ""
-    if( Process.eq.0 .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.50 ) then
+    if( Process.eq.0 .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.62.or. Process.eq.50 ) then
         write(TheUnit,"(4X,A)") "spin-0-VV couplings: "
         write(TheUnit,"(6X,A,L)") "generate_as=",generate_as
         if( generate_as ) then 
