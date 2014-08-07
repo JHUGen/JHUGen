@@ -15,7 +15,8 @@
 // nflavors constants.f 
 enum {nf=5};
 // maxpart constants.f 
-enum {mxpart=12};
+enum {mxpart=14}; // MCFM 6.8: CAUTION!!! IMPORTANT TO CHECK WHEN UPDATING MCFM!!!
+//enum {mxpart=12}; // MCFM 6.7
 //mxdim.f
 enum {ndims=22};
 
@@ -29,6 +30,10 @@ extern "C" {
  extern struct {
    int nproc;
  } nproc_;
+
+ extern struct {
+   bool verbose;
+ } verbose_;
 
 
  #define bveg1_mcfm_ bveg1_
@@ -75,12 +80,21 @@ extern "C" {
         double cutoff;
  } cutoff_;
 
+ extern struct{
+        double amz;
+ } couple_;
 
  extern struct{
    double Gf_inp,aemmz_inp,xw_inp,wmass_inp,zmass_inp;
  } ewinput_;
 
+ extern struct {
+   double gsq, as, ason2pi, ason4pi;
+ } qcdcouple_;
 
+ extern struct {
+   double Gf,gw,xw,gwsq,esq,vevsq;
+ } ewcouple_;
 
  extern   struct {
    double delg1_z, delg1_g, lambda_g, lambda_z, delk_g, delk_z,tevscale;
@@ -98,18 +112,36 @@ extern "C" {
            twidth,
            tauwidth,
            mtausq,mcsq,mbsq;
-  } masses_mcfm_;
+ } masses_mcfm_;
+
+
+  extern  struct{
+      double LambdaBSM,Lambda_z1,Lambda_z2,Lambda_z3,Lambda_z4;
+	  double Lambda_Q;
+
+      double ghz1[2];double ghz2[2];double ghz3[2];double ghz4[2]; // No additional q2 dependence
+      double ghz1_prime[2];double ghz2_prime[2];double ghz3_prime[2];double ghz4_prime[2]; // Dipole ansatz
+      double ghz1_prime2[2];double ghz2_prime2[2];double ghz3_prime2[2];double ghz4_prime2[2]; // |q1**2| + |q2**2|
+      double ghz1_prime3[2];double ghz2_prime3[2];double ghz3_prime3[2];double ghz4_prime3[2]; // |q1**2| - |q2**2|
+      double ghz1_prime4[2];double ghz2_prime4[2];double ghz3_prime4[2];double ghz4_prime4[2]; // (q1 + q2)**2
+      double ghz1_prime5[2];double ghz2_prime5[2];double ghz3_prime5[2];double ghz4_prime5[2]; // q1**4 + q2**4
+      double ghz1_prime6[2];double ghz2_prime6[2];double ghz3_prime6[2];double ghz4_prime6[2]; // q1**4 - q2**4
+      double ghz1_prime7[2];double ghz2_prime7[2];double ghz3_prime7[2];double ghz4_prime7[2]; // |q1**2| * |q2**2|
+
+      bool AllowAnomalousCouplings;
+ } spinzerohiggs_anomcoupl_;
+
+
 
 //mcfm/src/Inc/zcouple.F
-
   extern struct{
     double l[nf],r[nf],q1,l1,r1,q2,l2,r2,le,ln,re,rn,sin2w;
   } zcouple_;
 
-
   extern struct{
     int nwz;
   } nwz_;
+
   extern  struct {
     double taumin;
   } taumin_;
@@ -117,6 +149,19 @@ extern "C" {
   extern  struct {
     double sqrts;
   } energy_;
+
+  extern  struct {
+    int nlooprun;
+  } nlooprun_;
+
+  extern  struct {
+    int nflav;
+  } nflav_;
+
+  extern  struct {
+    char pdlabel[7];
+  } pdlabel_;
+
 //---------------------------------
 // function
 //---------------------------------
@@ -126,13 +171,16 @@ extern "C" {
   // Initialization
   //##############
   // #define mcfm_init_ mcfm_init_
-  void   mcfm_init_(char * inputfile, char* workdir);
+  void   mcfm_init_(char* inputfile, char* workdir);
   void   chooser_();
   void   coupling_();
+  void   coupling2_();
   
   //mcfm/src/Need/boost.F
   void boost_mcfm_(double* mass,double* p1,double* p_in,double* p_out);
 
+// Dynamic alpha_s calculator
+  double alphas_(double* q, double* amz, int* nloop);
 
   //##############
   // ME calculator
@@ -152,33 +200,24 @@ extern "C" {
   #define qqb_zz_ qqb_zz_
   void qqb_zz_(double* p, double* msq);
   void gen4_(double* r, double* p, double* wt4);  //r(22) p(4,12)
+  #define qqb_zz_stu_ qqb_zz_stu_ // Custom qqb->ZZ for different s, t, u channels
+  void qqb_zz_stu_(double* p, double* msq, int* channeltoggle);
 
-  //#define gg_zz_int_ gg_zz_int_
-  //void gg_zz_int_(double* p, double* msq);
-
-  //#define gg_zz_int_freenorm_ gg_zz_int_freenorm_
-  //void gg_zz_int_freenorm_(double* p, double hcoupl[2], double* msq);
-
-  // processes for the 128, 129, 131, 132 
-  // from src/Procdep/lowint.f
-  
-  // 128:
-  #define gg_hzz_tb_ gg_hzz_tb_
-  void gg_hzz_tb_(double* p, double* msq); 
- 
-  // 129
   #define gg_zz_int_ gg_zz_int_
   void gg_zz_int_(double* p, double* msq);
-   
-  // 131
+
+  #define gg_zz_int_freenorm_ gg_zz_int_freenorm_
+  void gg_zz_int_freenorm_(double* p, double hcoupl[2], double *msq); 
+
+  #define gg_hzz_tb_ gg_hzz_tb_
+  void gg_hzz_tb_(double* p, double* msq);
+  #define gg_zz_hpi_ gg_zz_hpi_ // Only H+interf, no |gg->ZZ|**2
+  void gg_zz_hpi_(double* p, double* msq);
   #define gg_zz_all_ gg_zz_all_
   void gg_zz_all_(double* p, double* msq);
-  
-  // 132 
   #define gg_zz_ gg_zz_
   void gg_zz_(double* p, double* msq);
-  
-  
+
   // For H->WW
   void gen4h_(double* r, double* p, double* wt4);  //r(22) p(4,12)
 
@@ -219,8 +258,6 @@ extern "C" {
 
   #define qqb_w_g_ qqb_w_g_
   void qqb_w_g_(double* p, double* msq);
-
-
   
 }
 

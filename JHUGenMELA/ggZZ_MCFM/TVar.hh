@@ -1,16 +1,33 @@
 #ifndef EvtProb_VAR
 #define EvtProb_VAR
 
+#include <cstring>
+#include <string>
 #include <TLorentzVector.h>
 #include "TH2F.h"
 #include "TH1F.h"
 
-#define EBEAM 4000.00
+//#define EBEAM 4000.00
 #define fbGeV2 0.389379E12
 #define smallnumber 1e-15
 #define sixteen_2Pi_to_8 3.88650230418250561e+07
-#define   eight_2Pi_to_5 7.83410393050320417e+04
-#define    four_2Pi_to_2 39.478417604357432
+#define eight_2Pi_to_5 7.83410393050320417e+04
+#define four_2Pi_to_2 39.478417604357432
+//---------------------------------
+// Coupling array sizes
+//---------------------------------
+#define SIZE_HVV 39
+#define SIZE_HVV_VBF 32
+#define SIZE_HWW_VBF 32
+#define SIZE_HGG 3
+#define SIZE_ZQQ 2
+#define SIZE_ZVV 2
+#define SIZE_GQQ 2
+#define SIZE_GGG 5
+#define SIZE_GVV 10
+#define SIZE_HVV_FREENORM 2
+
+
 class TVar{
 public:
   enum VerbosityLevel {
@@ -25,96 +42,159 @@ public:
     ANALYTICAL = 3
   };
   enum Production{
-    GG = 0,
-    QQB = 1,
-    INDEPENDENT=2
+    ZZGG = 0,
+    ZZQQB = 1,
+    ZZQQB_STU = 2,
+    ZZQQB_S = 3,
+    ZZQQB_TU = 4,
+    ZZINDEPENDENT= 5,
+    JJGG = 6,
+    JJVBF = 7,
+    JJVH = 8//analytical
+  };
+  enum LeptonInterference{
+    DefaultLeptonInterf = 0,
+    InterfOn = 1,
+    InterfOff=2
   };
 
   enum Process{
-    ZZ_2e2m  =0, // eemm
-    HZZ_4l   =1, // 0+
-    PSHZZ_4l =2, // 0-
-    TZZ_4l =3,   // spin 2 couplings have to set in TEvtProb.cc
-    VZZ_4l =4,   // spin 1 couplings have to set in TEvtProb.cc
-    ZZ_4e    =5,
-    GGZZ_4l = 6,
-    AVZZ_4l = 7,
-    QQB_TZZ_4l = 8,
-    HDHZZ_4l = 9, // 0h+
-    TZZ_DECAY_4l = 10,
-    VZZ_DECAY_4l = 11,
-    AVZZ_DECAY_4l = 12,
-    PTZZ_2hminus_4l = 13, // 2h-
-    TZZ_2hplus_4l = 14, // 2h+
-    TZZ_2bplus_4l = 15, // 2b+
-    SummedBackgrounds = 16, // SuperMela Background standin process.
-    HZZ_4l_MIXCP = 17,
-    HJJNONVBF = 18,
-    HJJVBF = 19,
-    GGZZTOT_4l = 20,
-    GGZZINT_4l = 21,
+
+    HSMHiggs          = 0,    //0+, replacing HZZ_4l, when production is ZZGG, replacing HJJNONVBF/HJJVBF/HJJVH, when production is JJGG/JJVBF/JJVH. Call this for MCFM |H|**2.
+    H0minus           = 1,    //0-, replacing PSHZZ_4l, when production is ZZGG, replacing PSHJJNONVBF/PSHJJVBF/PSHJJVH when production is JJGG/JJVBF/JJVH
+    H0hplus           = 2,    //0h+, replacing HDHZZ_4l
+
+    H1minus           = 3,    //1-, replacing VZZ_4l
+    H1plus            = 4,    //1+, replacing AVZZ_4l
+
+    H2_g8             = 5,    //2h-, replacing PTZZ_2hminus_4l	
+    H2_g4             = 6,    //2h+, replacing TZZ_2hplus_4l
+    H2_g5             = 7,    //2b+, replacing TZZ_2bplus_4l 
+    H2_g1g5           = 8,    //2m+, replacing TZZ_4l 
+		H2_g2					= 9, // 2h2+
+		H2_g3					= 10, // 2h3+
+		H2_g6					= 11, // 2h6+
+		H2_g7					= 12, // 2h7+
+		H2_g9					= 13, // 2h9-
+		H2_g10				= 14, // 2h10-
+
+
+    bkgZZ              = 15,    //qq->ZZ, replacing ZZ_2e2m & ZZ_4e, when production is ZZQQB, replacing GGZZ_4l when production is ggZZ, replacing SummedBackgrounds for superMela calculation 
+	bkgZZ_SMHiggs      =16,    //ggZZ+SMHiggs, ggZZ always calculated by MCFM, ME stands for SMHiggs ME, JHUGen: MCFM ggZZ + JHUGen SMHiggs, MCFM: MCFM (ggZZ+ SMHiggs) 
+
+    H0_g1prime2       = 17,   //g1=0, g1prime2=-12046.01, replacing H_g1prime2	
+
+    /***For interaction terms **/
+    D_g1g4            = 18,   //D_CP
+    D_g1g4_pi_2       = 19,   //D_CP_T
+    D_g1g2            = 20,   //D_int
+    D_g1g2_pi_2       = 21,   //D_int_T
+    D_g1g1prime2      = 22,   //D_int_lambda1	
+
+    /***** Self Defined******/
+    SelfDefine_spin0  = 23,
+    SelfDefine_spin1  = 24,
+    SelfDefine_spin2  = 25,
+		/**** For width ***/
+		D_gg10						= 26,
+		
+		H0_Zgs 						= 27,
+		H0_gsgs 					= 28,
+		D_zzzg						= 29,
+		D_zzgg						= 30,
+
+		H0_Zgs_PS 					= 31,
+		H0_gsgs_PS 					= 32,
+		D_zzzg_PS						= 33,
+		D_zzgg_PS						= 34,
+		
+		H0_Zgsg1prime2						= 35,
+		D_zzzg_g1prime2						= 36,
+		D_zzzg_g1prime2_pi_2						= 37,
+
+	/*** Are these ones still used? ***/
+    //  QQB_TZZ_4l = 8,
+    //  TZZ_DECAY_4l = 10,
+    //  VZZ_DECAY_4l = 11,
+    //  AVZZ_DECAY_4l = 12,
+    //  HZZ_4l_MIXCP = 17,
+
     Null
   };
   enum LeptonFlavor{
-    Flavor_Dummy = 0, 
+    Flavor_Dummy = 0, // legacy code runs on 1/2/3
     Flavor_4e    = 1,
     Flavor_4mu   = 2,
     Flavor_2e2mu = 3    
+  };
+  enum SuperMelaSyst{
+    SMSyst_None      = 0, // nominal value
+    SMSyst_ScaleUp   = 1, //Scale Uncertaintie
+    SMSyst_ScaleDown = 2,
+    SMSyst_ResUp     = 3, // Resolution Uncertainty
+    SMSyst_ResDown   = 4
   };
 
   //---------------------------------
   // Function
   //---------------------------------
-  static TString ProcessName(int temp){ 
-    if(temp==TVar::ZZ_2e2m   ) 
-      return TString("ZZ_2e2m");
-    if(temp==TVar::ZZ_4e   ) 
-      return TString("ZZ_4e");
-    if(temp==TVar::GGZZ_4l   ) 
-      return TString("GGZZ_4l");
-    else if(temp==TVar::HZZ_4l   ) 
-      return TString("HZZ_4l");
-    else if(temp==TVar::PSHZZ_4l   ) 
-      return TString("PSHZZ_4l");
-    else if(temp==TVar::HDHZZ_4l   ) 
-      return TString("HDHZZ_4l");
-    else if(temp==TVar::TZZ_4l   ) 
-      return TString("TZZ_2mplus_4l");
-    else if(temp==TVar::QQB_TZZ_4l   ) 
-      return TString("QQB_TZZ_2mplus_4l");
-    else if(temp==TVar::TZZ_DECAY_4l   ) 
-      return TString("TZZ_decay_2mplus_4l");
-    else if(temp==TVar::VZZ_4l   ) 
-      return TString("VZZ_4l");
-    else if(temp==TVar::AVZZ_4l   ) 
-      return TString("AVZZ_4l");
-    else if(temp==TVar::VZZ_DECAY_4l   ) 
-      return TString("VZZ_decay_4l");
-    else if(temp==TVar::AVZZ_DECAY_4l   ) 
-      return TString("AVZZ_decay_4l");
-    else if(temp==TVar::PTZZ_2hminus_4l   ) 
-      return TString("PTZZ_2hminus_4l");
-    else if(temp==TVar::TZZ_2hplus_4l   ) 
-      return TString("TZZ_2hplus_4l");
-    else if(temp==TVar::TZZ_2bplus_4l   ) 
-      return TString("TZZ_2bplus_4l");
-    else if(temp==TVar::SummedBackgrounds   ) 
-      return TString("SummedBackgrounds");
-    else if(temp==TVar::HZZ_4l_MIXCP   ) 
-      return TString("HZZ_4l_MIXCP");
-    else if(temp==TVar::HJJNONVBF ) 
-      return TString("HJJNONVBF");
-    else if(temp==TVar::HJJVBF ) 
-      return TString("HJJVBF");
-    else if(temp==TVar::GGZZTOT_4l   ) 
-      return TString("GGZZ_total_4l");
-   else if(temp==TVar::GGZZINT_4l   ) 
-      return TString("GGZZ_interference_4l");
-   else 
-      return TString("UnKnown");
+  static TString ProcessName(int temp){
+    if     (temp==TVar::HSMHiggs          ) return TString ("HSMHiggs");
+    else if(temp==TVar::H0minus           ) return TString ("H0minus");           
+    else if(temp==TVar::H0hplus           ) return TString ("H0hplus");          
+                                                                               
+    else if(temp==TVar::H1minus           ) return TString ("H1minus");           
+    else if(temp==TVar::H1plus            ) return TString ("H1plus");            
+                                                                               
+    else if(temp==TVar::H2_g8             ) return TString ("H2_g8");             
+    else if(temp==TVar::H2_g4             ) return TString ("H2_g4");             
+    else if(temp==TVar::H2_g5             ) return TString ("H2_g5");             
+    else if(temp==TVar::H2_g1g5           ) return TString ("H2_g1g5");           
+    else if(temp == TVar::H2_g2 					) return TString ("H2_g2");
+    else if(temp == TVar::H2_g3 					) return TString ("H2_g3");
+    else if(temp == TVar::H2_g6 					) return TString ("H2_g6");
+    else if(temp == TVar::H2_g7 					) return TString ("H2_g7");
+    else if(temp == TVar::H2_g9 					) return TString ("H2_g9");
+    else if(temp == TVar::H2_g10    		  ) return TString ("H2_g10");
+                                                                               
+                                                                               
+    else if(temp==TVar::bkgZZ             ) return TString ("bkgZZ");             
+	else if(temp==TVar::bkgZZ_SMHiggs     ) return TString ("bkgZZ_SMHiggs");     
+                                                                               
+    else if(temp==TVar::H0_g1prime2       ) return TString ("H0_g1prime2");       
+                                                                               
+    else if(temp==TVar::D_g1g4            ) return TString ("D_g1g4");            
+    else if(temp==TVar::D_g1g4_pi_2       ) return TString ("D_g1g4_pi_2");       
+    else if(temp==TVar::D_g1g2            ) return TString ("D_g1g2");            
+    else if(temp==TVar::D_g1g2_pi_2       ) return TString ("D_g1g2_pi_2");       
+    else if(temp==TVar::D_g1g1prime2      ) return TString ("D_g1g1prime2");      
+                                                                               
+    else if(temp==TVar::SelfDefine_spin0  ) return TString ("SelfDefine_spin0");  
+    else if(temp==TVar::SelfDefine_spin1  ) return TString ("SelfDefine_spin1");  
+    else if(temp==TVar::SelfDefine_spin2  ) return TString ("SelfDefine_spin2");  
+
+	else if(temp==TVar::D_gg10  ) return TString ("D_gg10");  
+
+	else if(temp==TVar::H0_Zgs  ) return TString ("H0_Zgs");  
+	else if(temp==TVar::H0_gsgs  ) return TString ("H0_gsgs");  
+	else if(temp==TVar::D_zzzg  ) return TString ("D_zzzg");  
+	else if(temp==TVar::D_zzgg  ) return TString ("D_zzgg");  
+
+	else if(temp==TVar::H0_Zgs_PS  ) return TString ("H0_Zgs_PS");  
+	else if(temp==TVar::H0_gsgs_PS  ) return TString ("H0_gsgs_PS");  
+	else if(temp==TVar::D_zzzg_PS  ) return TString ("D_zzzg_PS");  
+	else if(temp==TVar::D_zzgg_PS  ) return TString ("D_zzgg_PS");  
+
+	else if(temp==TVar::H0_Zgsg1prime2  ) return TString ("H0_Zgsg1prime2");  
+	else if(temp==TVar::D_zzzg_g1prime2  ) return TString ("D_zzzg_g1prime2");  
+
+    else return TString ("UnKnown");
   };
+
+  inline virtual ~TVar(){};
   ClassDef(TVar,0)
 };
+
 
 struct branch_particle {
   int   PdgCode   ;
@@ -128,14 +208,14 @@ struct branch_particle {
 
 };
 static const TString branch_format_particle =
- "PdgCode/I:"
- "Charge/I:"
- "Px/D:"
- "Py/D:"
- "Pz/D:"
- "E/D:"
- "Eta/D:"
- "Phi/D";
+  "PdgCode/I:"
+  "Charge/I:"
+  "Px/D:"
+  "Py/D:"
+  "Pz/D:"
+  "E/D:"
+  "Eta/D:"
+  "Phi/D";
 
 // in development
 struct hzz4l_event_type{
@@ -144,13 +224,6 @@ struct hzz4l_event_type{
   double Xsec   [10];
   double XsecErr[10];  
 };
-// in development
-struct xjj_event_type{
-  TLorentzVector p[3]; // p[0] and p[1] for the two jets and p[2] for the resonance X
-  double Xsec   [10];
-  double XsecErr[10];  
-};
-
 struct mcfm_event_type{
   int PdgCode[6];
   TLorentzVector p[6];
@@ -161,7 +234,12 @@ struct event_type{
   double PSWeight;
 };
 struct anomcoup{
-	   double delg1_z, delg1_g, lambda_g, lambda_z, delk_g, delk_z_,tevscale;
+  double delg1_z, delg1_g, lambda_g, lambda_z, delk_g, delk_z_,tevscale;
 };
+struct EffHist{
+  TH2F* els_eff_mc;
+  TH2F* mus_eff_mc;
+};
+
 
 #endif
