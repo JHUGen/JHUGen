@@ -2,9 +2,14 @@ PROGRAM TestProgram
 use modHiggs
 use modZprime
 use modGraviton
+use modHiggsJ
 use modHiggsJJ
+use modVHiggs
 implicit none
-real(8) :: p(4,6),p5(4,5),MatElSq,M_Reso,Ga_Reso,MatElSqPDF(-5:5,-5:5),check_vbf(-5:5,-5:5),check_sbf(-5:5,-5:5)
+integer, parameter :: LHA2M_PDF(-6:6) = (/-5,-6,-3,-4,-1,-2,0 ,2,1,4,3,6,5/)
+real(8) :: helicity(9), mass(9,2)
+integer :: id(9)
+real(8) :: p(4,6),p5(4,5),p4(4,4),p9(4,9),MatElSq,M_Reso,Ga_Reso,MatElSqPDF(-5:5,-5:5),check_vbf(-5:5,-5:5),check_sbf(-5:5,-5:5),check_hj(-5:5,-5:5),check_zh(-5:5,-5:5)
 integer :: MY_IDUP(6:9)
 real(8),  parameter :: GeV=1d0/100d0
 real(8),  parameter :: LHCEnergy=8000d0 * GeV
@@ -115,6 +120,23 @@ integer :: i, j
   print *, "ratio",MatElSq/1.68408821989468668d-010
   print *, ''
 
+  !-- CHECK HIGGS PLUS 1-JET AMPLITUDES
+  p4(:,1)= (/ 9.826663842051664d0,  0.000000000000000d0,  0.000000000000000d0,  9.826663842051664d0 /) * GeV
+  p4(:,2)= (/ 5.92963723700763d2,    0.000000000000000d0,  0.000000000000000d0,  -5.929637237007630d2 /) * GeV
+  p4(:,3)= (/ 5.52029020989556d2,    0.208641889781122d2,  5.997269305284619d0, -5.37252043638601d2  /) * GeV
+  p4(:,4)= (/ 0.507613665532589d2,  -0.208641889781122d2, -5.997269305284619d0, -0.458850162201107d2 /) * GeV
+
+  print *, 'H+J, SM couplings'
+  call EvalAmp_HJ(p4,MatElSqPDF)
+  include './checkHJ_SM.dat'
+  do i = -5,5
+     do j = -5,5
+        print *, 'i,j', i,j
+        print *, 'Matr.el. squared, H+J',MatElSqPDF(i,j)
+        print *, 'result should be, H+J',check_hj(i,j)
+        print *, ''
+     enddo
+  enddo
 
   !-- CHECK HIGGS PLUS 2-JETS AMPLITUDES
 
@@ -180,6 +202,37 @@ integer :: i, j
         print *, 'Matr.el. squared, SBF',MatElSqPDF(i,j)
         print *, 'result should be, SBF',check_sbf(i,j)
      enddo
+  enddo
+  print *, ''
+
+  !-- CHECK HIGGS PLUS Z AMPLITUDES
+  p9(:,1)= (/ 307.006915483657d0,  0.000000000000000d0,  0.000000000000000d0,  307.006915483657d0 /) * GeV
+  p9(:,2)= (/ 307.006915483657d0,  0.000000000000000d0,  0.000000000000000d0, -307.006915483657d0 /) * GeV
+  p9(:,3)= (/ 614.013830967315d0,  0.000000000000000d0,  0.000000000000000d0,  0.000000000000000d0 /) * GeV
+  p9(:,4)= (/ 301.227135255720d0,  189.793200249019d0,  21.0235633708835d0, -213.887554776503d0  /) * GeV
+  p9(:,5)= (/ 312.786695711595d0, -189.793200249019d0, -21.0235633708835d0,  213.887554776503d0  /) * GeV
+  p9(:,6)= (/ 208.998953735946d0,  160.376261395938d0,  38.7454165525643d0, -128.291894286234d0  /) * GeV
+  p9(:,7)= (/ 92.2281815197731d0,  29.4169388530806d0, -17.7218531816808d0, -85.5956604902683d0  /) * GeV
+  p9(:,8)= (/ 217.267213637600d0, -181.141761229703d0, -16.0543247336901d0,  118.890551002984d0  /) * GeV
+  p9(:,9)= (/ 95.5194820739952d0, -8.65143901931573d0, -4.96923863719339d0,  94.9970037735190d0  /) * GeV
+  print *, 'H+Z, Z > l- l+, H > b b~, SM couplings'
+  helicity=(/ 1d0, -1d0,  0d0,  0d0,  0d0,  1d0, -1d0,  1d0,  1d0 /)
+  id(3:9)=(/ 23, 23, 25, 11, -11, 5, -5 /)
+  mass(5,1)=M_Reso
+  mass(5,2)=Ga_Reso
+  Hzzcoupl(1:4) = (/ (2d0,0d0), (0d0,0d0), (0d0,0d0), (0d0,0d0) /)
+  include './checkZH_SM.dat'
+  do i = -6,6
+    j = -i
+    !id(1:2) = (/LHA2M_PDF(i),LHA2M_PDF(j)/)
+    id(1:2) = (/i,j/)
+    if (abs(LHA2M_PDF(i)).ne.6 .and. abs(LHA2M_PDF(j)).ne.6. .and. i.ne.0)then
+      call EvalAmp_VHiggs(id,helicity,p9,Hzzcoupl,mass,MatElSqPDF(i,j))
+      print *, 'i,j', i,j
+      print *, 'Matr.el. squared, H+Z',MatElSqPDF(i,j)
+      print *, 'result should be, H+Z',check_zh(i,j)
+      print *, ''
+    endif
   enddo
 
 

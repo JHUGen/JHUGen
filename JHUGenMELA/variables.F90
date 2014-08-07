@@ -70,6 +70,10 @@ real(8), parameter :: lambda_z4 = 10000d0 * GeV
 real(8), parameter :: lambda_z5 = 10000d0 * GeV
 real(8), parameter :: lambda_Q  = 10000d0 * GeV
 
-
-
-
+real(8), parameter :: scale_alpha_Z_uu = 1.04282d0 ! scaling factor of alpha (~partial width) for Z > u u~
+real(8), parameter :: scale_alpha_Z_dd = 1.04282d0 ! scaling factor of alpha (~partial width) for Z > d d~
+real(8), parameter :: scale_alpha_Z_ll = 1d0 ! scaling factor of alpha (~partial width) for Z > l+ l-
+real(8), parameter :: scale_alpha_Z_nn = 1d0 ! scaling factor of alpha (~partial width) for Z > nu nu~
+real(8), parameter :: scale_alpha_W_ud = 1.0993819d0 ! scaling factor of alpha (~partial width) for W > u d
+real(8), parameter :: scale_alpha_W_cs = 1.0993819d0 ! scaling factor of alpha (~partial width) for W > c s
+real(8), parameter :: scale_alpha_W_ln = 1d0 ! scaling factor of alpha (~partial width) for W > l nu
