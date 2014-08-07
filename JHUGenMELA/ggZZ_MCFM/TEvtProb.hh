@@ -53,7 +53,6 @@ public:
   //---------------------------------------------------------------------------
   // Constructors and Destructor
   //---------------------------------------------------------------------------
-  TEvtProb() {};
   TEvtProb(double ebeam = 4000); // sqrt(s)/2*1000
   ~TEvtProb();
   
@@ -87,7 +86,7 @@ public:
   // this appears to be some kind of 
   // way of setting MCFM parameters through
   // an interface defined in TMCFM.hh
-  void SetHiggsMass(double mass=125.6, float wHiggs=4.15e-3);
+  void SetHiggsMass(double mass=125.6, float wHiggs=-1);
   ClassDef(TEvtProb,0);
 };
 

@@ -44,6 +44,7 @@ source setup_matrixelement_sl6.sh # for sl6 machines
     g++ -Wl,-soname,libmcfm_6p8.so -shared -o libmcfm_6p8.so *.o ../QCDLoop/ql/ql*.o ../QCDLoop/ql/a*.o ../QCDLoop/ff/*.o  
 
    7) Copy library libmcfm_6p8.so to the JHUGenMELA/ggZZ_MCFM/ area
+          ---> Sample file compiled for SLC5/6 gcc 4.6.2+ is provided.
 
 
 3. go back to JHUGenMELA/ggZZ_MCFM/ and compile the MELA code
