@@ -44,9 +44,9 @@ contains
 
 
 
-subroutine EvalAmp_VHiggs(id,helicity,MomExt,Hzzcoupl,mass,me2)
+subroutine EvalAmp_VHiggs(id,helicity,MomExt,vvcoupl,mass,me2)
       real(dp), intent(in) :: MomExt(1:4,1:9) !beam_momentum(2,4),four_momentum(7,4)
-      complex(dp) :: Hzzcoupl(1:30)
+      complex(dp) :: vvcoupl(32)
       !real(dp) :: MomExt(1:4,1:9)
       real(dp) :: inv_mass(9)
       !real(dp) :: inv_mass(9)
@@ -61,7 +61,7 @@ subroutine EvalAmp_VHiggs(id,helicity,MomExt,Hzzcoupl,mass,me2)
         inv_mass(i) = dsqrt(MomExt(1,i)**2 - MomExt(2,i)**2 - MomExt(3,i)**2 - MomExt(4,i)**2)
       enddo
 
-      amplitude=MATRIXELEMENT0(MomExt,inv_mass,mass,helicity,id,Hzzcoupl)
+      amplitude=MATRIXELEMENT0(MomExt,inv_mass,mass,helicity,id,vvcoupl)
       me2=dble(amplitude*dconjg(amplitude))
 !print *, me2, helicity(1:2), helicity(6:7)
     return
@@ -82,13 +82,13 @@ end subroutine EvalAmp_VHiggs
 
 !
 
-      complex(dp) function MATRIXELEMENT0(MomExt,inv_mass,mass,helicity,id,Hzzcoupl)
+      complex(dp) function MATRIXELEMENT0(MomExt,inv_mass,mass,helicity,id,vvcoupl)
 
       implicit none
 
       complex(dp) dMATRIXELEMENT
       real(dp), intent(in) :: MomExt(1:4,1:9) !,four_momentum(7,4)
-      complex(8), intent(in) :: Hzzcoupl(1:30)
+      complex(8), intent(in) :: vvcoupl(32)
       real(dp), intent(in) :: inv_mass(9)
       real(dp) ::  mass(9,2)
       !real(dp), intent(in) ::  beam_momentum(2,4)
@@ -118,30 +118,46 @@ end subroutine EvalAmp_VHiggs
         mass(4,2)=Ga_W
       endif
 
-      ghz1 = Hzzcoupl(1)
-      ghz2 = Hzzcoupl(2)
-      ghz3 = Hzzcoupl(3)
-      ghz4 = Hzzcoupl(4)
-      ghz1_prime = Hzzcoupl(11)
-      ghz1_prime2 = Hzzcoupl(12)
-      ghz1_prime3 = Hzzcoupl(13)
-      ghz1_prime4 = Hzzcoupl(14)
-      ghz1_prime5 = Hzzcoupl(15)
-      ghz2_prime = Hzzcoupl(16)
-      ghz2_prime2 = Hzzcoupl(17)
-      ghz2_prime3 = Hzzcoupl(18)
-      ghz2_prime4 = Hzzcoupl(19)
-      ghz2_prime5 = Hzzcoupl(20)
-      ghz3_prime = Hzzcoupl(21)
-      ghz3_prime2 = Hzzcoupl(22)
-      ghz3_prime3 = Hzzcoupl(23)
-      ghz3_prime4 = Hzzcoupl(24)
-      ghz3_prime5 = Hzzcoupl(25)
-      ghz4_prime = Hzzcoupl(26)
-      ghz4_prime2 = Hzzcoupl(27)
-      ghz4_prime3 = Hzzcoupl(28)
-      ghz4_prime4 = Hzzcoupl(29)
-      ghz4_prime5 = Hzzcoupl(30)
+      ghz1 = vvcoupl(1)
+      ghz2 = vvcoupl(2)
+      ghz3 = vvcoupl(3)
+      ghz4 = vvcoupl(4)
+
+      ghz1_prime = vvcoupl(5) 
+      ghz1_prime2= vvcoupl(6) 
+      ghz1_prime3= vvcoupl(7) 
+      ghz1_prime4= vvcoupl(8)
+      ghz1_prime5= vvcoupl(9)
+
+      ghz2_prime = vvcoupl(10) 
+      ghz2_prime2= vvcoupl(11)
+      ghz2_prime3= vvcoupl(12)
+      ghz2_prime4= vvcoupl(13)
+      ghz2_prime5= vvcoupl(14)
+
+      ghz3_prime = vvcoupl(15)
+      ghz3_prime2= vvcoupl(16)
+      ghz3_prime3= vvcoupl(17)
+      ghz3_prime4= vvcoupl(18)
+      ghz3_prime5= vvcoupl(19)
+
+      ghz4_prime = vvcoupl(20)
+      ghz4_prime2= vvcoupl(21)
+      ghz4_prime3= vvcoupl(22)
+      ghz4_prime4= vvcoupl(23)
+      ghz4_prime5= vvcoupl(24)
+
+      ghz1_prime6= vvcoupl(25)
+      ghz1_prime7= vvcoupl(26)
+
+      ghz2_prime6= vvcoupl(27)
+      ghz2_prime7= vvcoupl(28)
+
+      ghz3_prime6= vvcoupl(29)
+      ghz3_prime7= vvcoupl(30)
+
+      ghz4_prime6= vvcoupl(31)
+      ghz4_prime7= vvcoupl(32)
 
 
       gFFZ = (0d0,1d0)*dsqrt(4d0*pi*alpha_QED/(1d0-sitW**2))/sitW
@@ -275,24 +291,32 @@ end subroutine EvalAmp_VHiggs
       q4_q4 = inv_mass(4)**2
       ghz1_dyn = ghz1   +   ghz1_prime * Lambda_z1**4/( Lambda_z1**2 + abs(q3_q3) )/( Lambda_z1**2 + abs(q4_q4))  &
                         +   ghz1_prime2* ( abs(q3_q3)+abs(q4_q4) )/Lambda_z1**2                                   &
-                        +   ghz1_prime3* ( abs(q3_q3)+abs(q4_q4) )**2/Lambda_z1**4                                &
-                        +   ghz1_prime4* ( abs(q3_q3)*abs(q4_q4) )/Lambda_z1**4                                   &
-                        +   ghz1_prime5* ( abs(q3_q3)-abs(q4_q4) )/Lambda_z1**2
+                        +   ghz1_prime3* ( abs(q3_q3)-abs(q4_q4) )/Lambda_z1**2                                   &
+                        +   ghz1_prime4* inv_mass(5)**2 / Lambda_z1**2                                            &
+                        +   ghz1_prime5* ( abs(q3_q3)**2+abs(q4_q4)**2 )/Lambda_z1**4                             &
+                        +   ghz1_prime6* ( abs(q3_q3)**2-abs(q4_q4)**2 )/Lambda_z1**4                             &
+                        +   ghz1_prime7* ( abs(q3_q3)*abs(q4_q4) )/Lambda_z1**4
       ghz2_dyn = ghz2   +   ghz2_prime * Lambda_z2**4/( Lambda_z2**2 + abs(q3_q3) )/( Lambda_z2**2 + abs(q4_q4))  &
                         +   ghz2_prime2* ( abs(q3_q3)+abs(q4_q4) )/Lambda_z2**2                                   &
-                        +   ghz2_prime3* ( abs(q3_q3)+abs(q4_q4) )**2/Lambda_z2**4                                &
-                        +   ghz2_prime4* ( abs(q3_q3)*abs(q4_q4) )/Lambda_z2**4                                   & 
-                        +   ghz2_prime5* ( abs(q3_q3)-abs(q4_q4) )/Lambda_z2**2
+                        +   ghz2_prime3* ( abs(q3_q3)-abs(q4_q4) )/Lambda_z2**2                                   &
+                        +   ghz2_prime4* inv_mass(5)**2 / Lambda_z2**2                                            &
+                        +   ghz2_prime5* ( abs(q3_q3)**2+abs(q4_q4)**2 )/Lambda_z2**4                             &
+                        +   ghz2_prime6* ( abs(q3_q3)**2-abs(q4_q4)**2 )/Lambda_z2**4                             &
+                        +   ghz2_prime7* ( abs(q3_q3)*abs(q4_q4) )/Lambda_z4**4
       ghz3_dyn = ghz3   +   ghz3_prime * Lambda_z3**4/( Lambda_z3**2 + abs(q3_q3) )/( Lambda_z3**2 + abs(q4_q4))  &
                         +   ghz3_prime2* ( abs(q3_q3)+abs(q4_q4) )/Lambda_z3**2                                   &
-                        +   ghz3_prime3* ( abs(q3_q3)+abs(q4_q4) )**2/Lambda_z3**4                                &
-                        +   ghz3_prime4* ( abs(q3_q3)*abs(q4_q4) )/Lambda_z3**4                                   &
-                        +   ghz3_prime5* ( abs(q3_q3)-abs(q4_q4) )/Lambda_z3**2
+                        +   ghz3_prime3* ( abs(q3_q3)-abs(q4_q4) )/Lambda_z3**2                                   &
+                        +   ghz3_prime4* inv_mass(5)**2 / Lambda_z3**2                                            &
+                        +   ghz3_prime5* ( abs(q3_q3)**2+abs(q4_q4)**2 )/Lambda_z3**4                             &
+                        +   ghz3_prime6* ( abs(q3_q3)**2-abs(q4_q4)**2 )/Lambda_z3**4                             &
+                        +   ghz3_prime7* ( abs(q3_q3)*abs(q4_q4) )/Lambda_z3**4
       ghz4_dyn = ghz4   +   ghz4_prime * Lambda_z4**4/( Lambda_z4**2 + abs(q3_q3) )/( Lambda_z4**2 + abs(q4_q4))  &
                         +   ghz4_prime2* ( abs(q3_q3)+abs(q4_q4) )/Lambda_z4**2                                   &
-                        +   ghz4_prime3* ( abs(q3_q3)+abs(q4_q4) )**2/Lambda_z4**4                                &
-                        +   ghz4_prime4* ( abs(q3_q3)*abs(q4_q4) )/Lambda_z4**4                                   &
-                        +   ghz4_prime5* ( abs(q3_q3)-abs(q4_q4) )/Lambda_z4**2
+                        +   ghz4_prime3* ( abs(q3_q3)-abs(q4_q4) )/Lambda_z4**2                                   &
+                        +   ghz4_prime4* inv_mass(5)**2 / Lambda_z4**2                                            &
+                        +   ghz4_prime5* ( abs(q3_q3)**2+abs(q4_q4)**2 )/Lambda_z4**4                             &
+                        +   ghz4_prime6* ( abs(q3_q3)**2-abs(q4_q4)**2 )/Lambda_z4**4                             &
+                        +   ghz4_prime7* ( abs(q3_q3)*abs(q4_q4) )/Lambda_z4**4
 
       gVVS1 = ghz1_dyn*(mass(3,1)**2) + qq * ( 2d0*ghz2_dyn + ghz3_dyn*qq/Lambda )
       gVVS2 = -( 2d0*ghz2_dyn + ghz3_dyn*qq/Lambda )
