@@ -17,11 +17,12 @@ real(8), parameter :: alphas = 0.13229060d0         ! strong coupling
 real(8), parameter :: sitW = dsqrt(0.23119d0)       ! sin(Theta_Weinberg) (PDG-2008)
 
 
-integer, parameter :: DecayMode1=0
-integer, parameter :: DecayMode2=0
-logical, parameter :: includeInterference=.false.
-logical, parameter :: OffShellReson=.false.
-logical, parameter :: includeGammaStar = .false. 
+integer, parameter :: DecayMode1 = 0
+integer, parameter :: DecayMode2 = 0
+logical, parameter :: includeInterference = .false.
+logical, parameter :: OffShellReson = .false.
+logical, parameter :: includeGammaStar = .false.
+logical, parameter :: H_DK = .true.                 ! set to false so H in V* > VH does not decay
 
 
 !-- momentum-dependent form factors
