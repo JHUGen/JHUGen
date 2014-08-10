@@ -285,10 +285,14 @@ contains
       enddo !lambda2
       enddo !lambda1
 
-      MATRIXELEMENT0=MATRIXELEMENT0 *PROP1*PROP2*PROP3 &
-      *(gFFS*FFS(id(8), MomExt(:,8), helicity(8), id(9), MomExt(:,9), helicity(9)) &
-       +gFFP*FFP(id(8), MomExt(:,8), helicity(8), id(9), MomExt(:,9), helicity(9)))&
+      if(H_DK.eqv..false.)then
+        MATRIXELEMENT0=MATRIXELEMENT0 *PROP1*PROP2*PROP3
+      else
+        MATRIXELEMENT0=MATRIXELEMENT0 *PROP1*PROP2*PROP3 &
+        *(gFFS*FFS(id(8), MomExt(:,8), helicity(8), id(9), MomExt(:,9), helicity(9)) &
+         +gFFP*FFP(id(8), MomExt(:,8), helicity(8), id(9), MomExt(:,9), helicity(9)))&
         *(0d0,-1d0)*b_Yukawa/vev
+      endif
 
       return
       END function MATRIXELEMENT0
