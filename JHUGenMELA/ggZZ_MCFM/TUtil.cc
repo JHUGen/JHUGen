@@ -868,7 +868,7 @@ double VHiggsMatEl(TVar::Process process, TVar::Production production, TLorentzV
   vh_ids[4] = 25;
   vh_ids[5] = Vdecay_id[0]; // Handle jet-inclusive ME outside this function
   vh_ids[6] = Vdecay_id[1];
-  cout << "id5: " << vh_ids[5] << "\tid6: " << vh_ids[6] << endl;
+//  cout << "id5: " << vh_ids[5] << "\tid6: " << vh_ids[6] << endl;
 
   if ( verbosity >= TVar::DEBUG ) {
     for(int i=0;i<9;i++) std::cout << "p4[0] = "  << p4[i][0] << ", " <<  p4[i][1] << ", "  <<  p4[i][2] << ", "  <<  p4[i][3] << "\n";

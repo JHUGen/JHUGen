@@ -550,10 +550,20 @@ double TEvtProb::XsecCalcXJJ(TVar::Process proc, TVar::Production production, TL
   p[3].SetPxPyPzE ( p4[1].Px(), p4[1].Py(), p4[1].Pz(), p4[1].E() );
   p[4].SetPxPyPzE ( p4[2].Px(), p4[2].Py(), p4[2].Pz(), p4[2].E() );
 
+	TLorentzVector pCoM = p[2] + p[3] + p[4];
+	double qX = pCoM.X();
+	double qY = pCoM.Y();
+	double qE = pCoM.E();
+	double qPt = (qX*qX+qY*qY);
+	if ( (qPt)>0 ){
+		TVector3 boostV(-qX/qE,-qY/qE,0); // Unit boost vector
+		for(int ipt=2;ipt<5;ipt++) p[ipt].Boost(boostV);
+	}
+
   // assign the right initial momentum
   // assumes the events are boosted to have 0 transverse momenta
-  double sysPz= ( p[2] + p[3] + p[4] ).Pz(); 
-  double sysE = ( p[2] + p[3] + p[4] ).Energy(); 
+  double sysPz= ( pCoM ).Pz(); 
+  double sysE = ( pCoM ).Energy(); 
   double pz0 = (sysE+sysPz)/2.; 
   double pz1 = -(sysE-sysPz)/2.;
   p[0].SetPxPyPzE   (0., 0., pz0, TMath::Abs(pz0));
@@ -603,10 +613,20 @@ double TEvtProb::XsecCalcXJ(TVar::Process proc, TVar::Production production, TLo
   }
   p[4].SetPxPyPzE(0,0,0,0);
 
+	TLorentzVector pCoM = p[2] + p[3];
+	double qX = pCoM.X();
+	double qY = pCoM.Y();
+	double qE = pCoM.E();
+	double qPt = (qX*qX+qY*qY);
+	if ( (qPt)>0 ){
+		TVector3 boostV(-qX/qE,-qY/qE,0); // Unit boost vector
+		for(int ipt=2;ipt<4;ipt++) p[ipt].Boost(boostV);
+	}
+
   // assign the right initial momentum
   // assumes the events are boosted to have 0 transverse momenta
-  double sysPz = ( p[2] + p[3] ).Pz(); 
-  double sysE = ( p[2] + p[3] ).Energy(); 
+  double sysPz = ( pCoM ).Pz(); 
+  double sysE = ( pCoM ).Energy(); 
   double pz0 = (sysE+sysPz)/2.; 
   double pz1 = -(sysE-sysPz)/2.;
   p[0].SetPxPyPzE   (0., 0., pz0, TMath::Abs(pz0));
@@ -664,12 +684,13 @@ double TEvtProb::XsecCalc_VX(TVar::Process proc, TVar::Production production, vh
 	int Vdecay_id[2] = { vh_event.PdgCode[1], vh_event.PdgCode[2] };
 
 	TLorentzVector pCoM = vh_event.p[0] + vh_event.p[1] + vh_event.p[2];
-	double qX = pCoM.Px();
-	double qY = pCoM.Py();
+	double qX = pCoM.X();
+	double qY = pCoM.Y();
+	double qE = pCoM.E();
 	double qPt = (qX*qX+qY*qY);
-	if ( (qX*qX+qY*qY)>0 ){
-		TVector3 boostV(qX/qPt,qY/qPt,0); // Unit boost vector
-		for(int ipt=0;ipt<3;ipt++) vh_event.p[ipt].Boost(-boostV);
+	if ( (qPt)>0 ){
+		TVector3 boostV(-qX/qE,-qY/qE,0); // Unit boost vector
+		for(int ipt=0;ipt<3;ipt++) vh_event.p[ipt].Boost(boostV);
 	}
 
 	// assign the right initial momentum
