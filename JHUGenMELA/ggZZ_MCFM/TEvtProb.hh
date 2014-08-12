@@ -83,6 +83,13 @@ public:
 			 double selfDHvvcoupl[SIZE_HVV_VBF][2],
 			 double selfDHwwcoupl[SIZE_HWW_VBF][2]);
 
+  double XsecCalcXJ(TVar::Process proc, TVar::Production production, TLorentzVector p4[2],
+		     TVar::VerbosityLevel verbosity);
+
+  double XsecCalc_VX(TVar::Process proc, TVar::Production production, vh_event_type &vh_event,
+			TVar::VerbosityLevel verbosity,
+			double selfDHvvcoupl[SIZE_HVV_VBF][2]);
+
   // this appears to be some kind of 
   // way of setting MCFM parameters through
   // an interface defined in TMCFM.hh

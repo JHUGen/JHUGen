@@ -48,9 +48,12 @@ public:
     ZZQQB_S = 3,
     ZZQQB_TU = 4,
     ZZINDEPENDENT= 5,
-    JJGG = 6,
-    JJVBF = 7,
-    JJVH = 8//analytical
+    JJGG = 6, // SBF
+    JJVBF = 7, // WBF
+    JH = 8, // H + 1 jet
+    ZH = 9, // ZH
+    WH = 10 // W(+/-)H
+//
   };
   enum LeptonInterference{
     DefaultLeptonInterf = 0,
@@ -223,6 +226,10 @@ struct hzz4l_event_type{
   TLorentzVector p[4];
   double Xsec   [10];
   double XsecErr[10];  
+};
+struct vh_event_type{ // ME is 2 -> 3
+  int PdgCode[3];
+  TLorentzVector p[3];
 };
 struct mcfm_event_type{
   int PdgCode[6];

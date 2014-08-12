@@ -730,12 +730,16 @@ double HJJMatEl(TVar::Process process, TVar::Production production, const TLoren
     p4[i][2] = p[i].Py()/100.;
     p4[i][3] = p[i].Pz()/100.;
 
-    // use out-going convention for the incoming particles
-    if ( i < 2 ) {
-      for ( int j = 0; j < 4; j++ ) {
-	p4[i][j] = - p4[i][j];
-      }
+    // DO NOT Use out-going convention for the incoming particles for SumMEPDF
+	// For HJJ, the subroutine already does its own calculation for p1, p2, so it does not matter if the sign remains flipped or not.
+	// HJ exclusively takes lab-frame momenta, and p1 and p2 are used with a (-) sign. Thus, the sign would need to be flipped again.
+/*
+	if ( i < 2 ) {
+		for ( int j = 0; j < 4; j++ ) {
+			p4[i][j] = - p4[i][j];
+		}
     }
+*/
   }      
   if ( verbosity >= TVar::DEBUG ) {
     std::cout << "p4[0] = "  << p4[0][0] << ", " <<  p4[0][1] << ", "  <<  p4[0][2] << ", "  <<  p4[0][3] << "\n";   
@@ -752,6 +756,17 @@ double HJJMatEl(TVar::Process process, TVar::Production production, const TLoren
   if ( production == TVar::JJVBF) {
     __modhiggsjj_MOD_evalamp_wbfh(p4, Hvvcoupl, Hwwcoupl, MatElsq);
   }
+  if ( production == TVar::JH) {
+	double pOneJet[4][4] = { { 0 } };
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
+//			if( i<2 ) pOneJet[i][j] = - p4[i][j]; // Revert back to lab-frame momenta
+//			else pOneJet[i][j] = p4[i][j];
+			pOneJet[i][j] = p4[i][j]; // Revert back to lab-frame momenta
+		}
+	}
+	__modhiggsj_MOD_evalamp_hj(pOneJet, MatElsq);
+  }
 
   //    FOTRAN convention    -5    -4   -3   -2   -1    0   1   2   3  4  5
   //     parton flavor      bbar  cbar  sbar ubar dbar  g   d   u   s  c  b
@@ -765,18 +780,178 @@ double HJJMatEl(TVar::Process process, TVar::Production production, const TLoren
     }
   }
   
-  if ( production == TVar::JJGG ){
+  if ( production == TVar::JJGG || production == TVar::JJVBF || production == TVar::JH){
 	return SumMEPDF(p[0], p[1], MatElsq, verbosity, EBEAM);
-    //return MatElsq[5][5];
-  }
-  
-  if ( production == TVar::JJVBF) {
-    //return MatElsq[6][7]+MatElsq[7][6];
-    return SumMEPDF(p[0], p[1], MatElsq, verbosity, EBEAM);
+    //return MatElsq[5][5]; // jjgg
+    //return MatElsq[6][7]+MatElsq[7][6]; // jjvbf
   }
 
   return 0.;
 }
+
+double VHiggsMatEl(TVar::Process process, TVar::Production production, TLorentzVector p[5], int Vdecay_id[2], double MReso, double GaReso, double Hvvcoupl[SIZE_HVV_VBF][2], TVar::VerbosityLevel verbosity, double EBEAM)
+{
+	MReso /=100.0;
+	GaReso /= 100.0;
+
+  // FOTRAN convention -5    -4   -3  -2    -1  0 1 2 3 4 5 
+  //     parton flavor bbar cbar sbar ubar dbar g d u s c b
+  // C++ convention     0     1   2    3    4   5 6 7 8 9 10
+  //2-D matrix is reversed in fortran                                                                                                           
+  // msq[ parton2 ] [ parton1 ]      
+  //      flavor_msq[jj][ii] = fx1[ii]*fx2[jj]*msq[jj][ii];   
+  double MatElsq[nmsq][nmsq];
+  for ( int i = 0; i < nmsq; i++) {
+    for ( int j = 0; j < nmsq; j++ ) {
+      MatElsq[i][j] = 0;
+    }
+  }
+/*
+	0 + 1 -> 2 (V*) -> 3 (V->5+6) + 4 (H->7+8)
+	
+	p[0]:=0
+	p[1]:=1
+	p[2]:=4 (H)
+	p[3]:=5
+	p[4]:=6
+*/
+  TLorentzVector pVH[9];
+  TLorentzVector nullVector(0,0,0,0);
+  for (int i = 0; i < 2; i++) pVH[i] = p[i];
+  pVH[2] = p[0] + p[1]; // V*
+  pVH[4] = p[2]; // H
+  pVH[3] = pVH[2] - pVH[4]; // V
+  pVH[5] = p[3]; // 5
+  pVH[6] = p[4]; // 6
+  for (int i = 7; i < 9; i++) pVH[i] = pVH[4]*0.5; // No Higgs decay is assumed, but conserve momentum in case of any mistake on variables.F90::H_DK=.false.
+
+// Inputs to Fortran
+  double p4[9][4] = { { 0 } };
+  double masses[2][9] = { { 0 } };
+  double helicities[9] = { 0 };
+  int vh_ids[9] = { 0 };
+  // input unit = GeV/100 such that 125GeV is 1.25 in the code
+  // this needs to be applied for all the p4
+  for (int i = 0; i < 9; i++) {
+    p4[i][0] = pVH[i].Energy()/100.;
+    p4[i][1] = pVH[i].Px()/100.;
+    p4[i][2] = pVH[i].Py()/100.;
+    p4[i][3] = pVH[i].Pz()/100.;
+
+    // DO NOT Use out-going convention for the incoming particles for SumMEPDF
+	// VH exclusively takes lab-frame momenta, and p1 and p2 are used with a (-) sign.
+/*
+	if ( i < 2 ) {
+		for ( int j = 0; j < 4; j++ ) {
+			p4[i][j] = - p4[i][j];
+		}
+    }
+*/
+  }
+
+// CAUTION: THESE HARDCODED NUMBERS HAVE TO BE THE SAME AS M/Ga_Z/W IN VARIABLES.F90
+  if (production == TVar::ZH) {
+	  masses[0][2] = 91.1876;
+	  masses[1][2] = 2.4952;
+	  masses[0][3] = masses[0][2];
+	  masses[1][3] = masses[1][2];
+  }
+  if (production == TVar::WH) {
+	  masses[0][2] = 80.399;
+	  masses[1][2] = 2.085;
+	  masses[0][3] = masses[0][2];
+	  masses[1][3] = masses[1][2];
+  }
+  masses[0][4] = MReso; // Higgs
+  masses[1][4] = GaReso; // Higgs
+
+  vh_ids[4] = 25;
+  vh_ids[5] = Vdecay_id[0]; // Handle jet-inclusive ME outside this function
+  vh_ids[6] = Vdecay_id[1];
+  cout << "id5: " << vh_ids[5] << "\tid6: " << vh_ids[6] << endl;
+
+  if ( verbosity >= TVar::DEBUG ) {
+    for(int i=0;i<9;i++) std::cout << "p4[0] = "  << p4[i][0] << ", " <<  p4[i][1] << ", "  <<  p4[i][2] << ", "  <<  p4[i][3] << "\n";
+    for(int i=0;i<9;i++) std::cout << "m(" << i << ") = "  << masses[0][i] << ", " <<  masses[0][i] << "\n";
+//    for(int i=0;i<9;i++) std::cout << "id(" << i << ") = "  << vh_ids[i] << endl;
+  }
+
+  const double allowed_helicities[2] = { -1, 1 };
+  double sumME=0;
+  //    FOTRAN convention    -5    -4   -3   -2   -1    0   1   2   3  4  5
+  //     parton flavor      bbar  cbar  sbar ubar dbar  g   d   u   s  c  b
+  //      C++ convention     0      1    2    3    4    5   6   7   8  9  10
+  for (int h0 = 0; h0 < 2; h0++){
+	  helicities[0] = allowed_helicities[h0];
+	  for (int h1 = 0; h1 < 2; h1++){
+		  helicities[1] = allowed_helicities[h1];
+		  for (int h5 = 0; h5 < 2; h5++){
+			  helicities[5] = allowed_helicities[h5];
+			  helicities[6] = -helicities[5];
+			  for (int incoming1 = -nf; incoming1 <= nf; incoming1++){
+				  if (production == TVar::ZH){
+					  if(incoming1<=0) continue;
+					  vh_ids[0] = incoming1;
+					  vh_ids[1] = -incoming1;
+					  vh_ids[2] = 23;
+					  vh_ids[3] = 23;
+					  double msq=0;
+					  __modvhiggs_MOD_evalamp_vhiggs(vh_ids,helicities,p4,Hvvcoupl,masses,&msq);
+					  MatElsq[incoming1+5][-incoming1+5] += msq * 0.25; // Average over initial states with helicities +-1 only
+					  MatElsq[-incoming1+5][incoming1+5] += msq * 0.25; // Average over initial states with helicities +-1 only
+				  }
+				  else if (production == TVar::WH){
+					  if(incoming1==0) continue;
+
+					  bool useWminus=false;
+					  bool decaysToJets=false;
+
+					  if( vh_ids[5] == -12 || vh_ids[5] == -14 || vh_ids[5] == -16 || vh_ids[5] == -2 || vh_ids[5] == -4 || vh_ids[6] == -2 || vh_ids[6] == -4 ) useWminus=true; // l- nu-bar or anti-up down -type quarks
+					  if( abs(vh_ids[5])<=(nf+1) || abs(vh_ids[6])<=(nf+1) ) decaysToJets=true;
+
+					  if (!useWminus){
+						  if (incoming1 == 2 || incoming1 == 4){ // u or c to d-bar, b-bar or s-bar
+							  for (int incoming2 = -nf; incoming2 < 0; incoming2++){
+								  if( abs(incoming2)==abs(incoming1) ) continue;
+								  vh_ids[0] = incoming1;
+								  vh_ids[1] = incoming2;
+								  vh_ids[2] = 24;
+								  vh_ids[3] = 24;
+								  double msq=0;
+								  __modvhiggs_MOD_evalamp_vhiggs(vh_ids,helicities,p4,Hvvcoupl,masses,&msq);
+								  MatElsq[incoming1+5][incoming2+5] += msq * 0.25; // Average over initial states with helicities +-1 only
+								  MatElsq[incoming2+5][incoming1+5] += msq * 0.25; // Average over initial states with helicities +-1 only
+							  }
+						  }
+						  else continue;
+					  }
+					  else{
+						  if (incoming1 == -2 || incoming1 == -4){ // u-bar or c-bar to d, b or s
+							  for (int incoming2 = 1; incoming2 < nf+1; incoming2++){
+								  if( abs(incoming2)==abs(incoming1) ) continue;
+								  vh_ids[0] = incoming1;
+								  vh_ids[1] = incoming2;
+								  vh_ids[2] = 24;
+								  vh_ids[3] = 24;
+								  double msq=0;
+								  __modvhiggs_MOD_evalamp_vhiggs(vh_ids,helicities,p4,Hvvcoupl,masses,&msq);
+								  MatElsq[incoming1+5][incoming2+5] += msq * 0.25; // Average over initial states with helicities +-1 only
+								  MatElsq[incoming2+5][incoming1+5] += msq * 0.25; // Average over initial states with helicities +-1 only
+							  }
+						  }
+						  else continue;
+					  }
+				  }
+			  }
+		  }
+	  }
+  }
+	
+  
+  sumME = SumMEPDF(p[0], p[1], MatElsq, verbosity, EBEAM);
+  return sumME;
+}
+
 
 // Below code sums over all production parton flavors according to PDF 
 double SumMEPDF(const TLorentzVector p0, const TLorentzVector p1, double msq[nmsq][nmsq],  TVar::VerbosityLevel verbosity, double EBEAM)

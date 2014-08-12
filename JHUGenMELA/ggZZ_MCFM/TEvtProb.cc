@@ -468,7 +468,7 @@ double TEvtProb::XsecCalc(TVar::Process proc, TVar::Production production, const
 	return dXsec;
 }
 
-// Cross-section calculations for H+2j
+// Cross-section calculations for H + 2 jets
 double TEvtProb::XsecCalcXJJ(TVar::Process proc, TVar::Production production, TLorentzVector p4[3], TVar::VerbosityLevel verbosity, double selfDHggcoupl[SIZE_HGG][2], double selfDHvvcoupl[SIZE_HVV_VBF][2], double selfDHwwcoupl[SIZE_HWW_VBF][2]){
   
   // Initialize Process
@@ -570,6 +570,193 @@ double TEvtProb::XsecCalcXJJ(TVar::Process proc, TVar::Production production, TL
     }
   return dXsec;
 }
+
+
+// Cross-section calculations for H (SM) + 1 jet
+double TEvtProb::XsecCalcXJ(TVar::Process proc, TVar::Production production, TLorentzVector p4[2], TVar::VerbosityLevel verbosity){
+
+	  double Hggcoupl[SIZE_HGG][2] = { { 0 } };
+	  double Hvvcoupl[SIZE_HVV_VBF][2] = { { 0 } };
+	  double Hwwcoupl[SIZE_HWW_VBF][2] = { { 0 } };
+
+	// Initialize Process
+	SetProcess(proc);
+	SetProduction(production);
+	//constants
+	//double sqrts = 2.*EBEAM;
+	//double W=sqrts*sqrts;
+
+	// first/second number is the real/imaginary part  
+
+
+  // input kinematics 
+  //  !----- p1 and p2 used to get hadronic s
+  //  !----- P(p1)+P(p2) -> H(p3) + j(p4)
+  // p[0] -> p1
+  // p[1] -> p2
+  // p[2] -> p3
+  // p[3] -> p4
+  // p[4] -> 0
+  TLorentzVector p[5];
+  for (int mom = 0; mom < 2; mom++){
+	  p[mom+2].SetPxPyPzE(p4[mom].Px(), p4[mom].Py(), p4[mom].Pz(), p4[mom].E());
+  }
+  p[4].SetPxPyPzE(0,0,0,0);
+
+  // assign the right initial momentum
+  // assumes the events are boosted to have 0 transverse momenta
+  double sysPz = ( p[2] + p[3] ).Pz(); 
+  double sysE = ( p[2] + p[3] ).Energy(); 
+  double pz0 = (sysE+sysPz)/2.; 
+  double pz1 = -(sysE-sysPz)/2.;
+  p[0].SetPxPyPzE   (0., 0., pz0, TMath::Abs(pz0));
+  p[1].SetPxPyPzE   (0., 0., pz1, TMath::Abs(pz1));
+    
+  
+  // calculate the matrix element squared
+  double dXsec = 0;
+  dXsec = HJJMatEl(proc, production, p, Hggcoupl, Hvvcoupl, Hwwcoupl, verbosity, EBEAM);
+  if (verbosity >= TVar::DEBUG)
+    {
+      std::cout <<"Process " << TVar::ProcessName(proc) << 
+	" TEvtProb::XsecCalc(): dXsec=" << dXsec << "\n";
+    }
+  return dXsec;
+}
+
+
+double TEvtProb::XsecCalc_VX(TVar::Process proc, TVar::Production production, vh_event_type &vh_event,
+			TVar::VerbosityLevel verbosity,
+			double selfDHvvcoupl[SIZE_HVV_VBF][2]
+			){
+
+    //Initialize Process
+    SetProcess(proc);
+    SetProduction(production);
+
+	// 0: Higgs; 1,2: V-daughters
+	// PDG ID for V daughters could be passed as 0. While mothers cannot really be gluons, specifying 0 will mean averaging over u,d,c,s,b.
+	bool inclusiveHadronicJets = (vh_event.PdgCode[1]==0 || vh_event.PdgCode[2]==0);
+	const double N_Q=5.;
+    
+    //constants
+    double sqrts = 2.*EBEAM;
+    double W=sqrts*sqrts;
+    
+    //Weight calculation
+    double flux=1.;
+    double msqjk=0;
+    
+	if (
+		(abs(vh_event.PdgCode[2]) == 12 ||
+		abs(vh_event.PdgCode[2]) == 14 ||
+		abs(vh_event.PdgCode[2]) == 16) && production == TVar::WH
+		){ // First daughter of W has to be a neutrino
+
+		vh_event.p[1] = vh_event.p[1] + vh_event.p[2];
+		vh_event.p[2] = vh_event.p[1] - vh_event.p[2];
+		vh_event.p[1] = vh_event.p[1] - vh_event.p[2];
+		vh_event.PdgCode[1] = vh_event.PdgCode[1] + vh_event.PdgCode[2];
+		vh_event.PdgCode[2] = vh_event.PdgCode[1] - vh_event.PdgCode[2];
+		vh_event.PdgCode[1] = vh_event.PdgCode[1] - vh_event.PdgCode[2];
+	}
+
+	int Vdecay_id[2] = { vh_event.PdgCode[1], vh_event.PdgCode[2] };
+
+	TLorentzVector pCoM = vh_event.p[0] + vh_event.p[1] + vh_event.p[2];
+	double qX = pCoM.Px();
+	double qY = pCoM.Py();
+	double qPt = (qX*qX+qY*qY);
+	if ( (qX*qX+qY*qY)>0 ){
+		TVector3 boostV(qX/qPt,qY/qPt,0); // Unit boost vector
+		for(int ipt=0;ipt<3;ipt++) vh_event.p[ipt].Boost(-boostV);
+	}
+
+	// assign the right initial momentum
+    // assumes the events are boosted to have 0 transverse momenta
+    double sysPz= ( vh_event.p[0] + vh_event.p[1] + vh_event.p[2] ).Pz();
+    double sysE = ( vh_event.p[0] + vh_event.p[1] + vh_event.p[2] ).Energy();
+    double pz0 = (sysE+sysPz)/2.; 
+    double pz1 = -(sysE-sysPz)/2.;
+	TLorentzVector pVH[5];
+	pVH[2].SetPxPyPzE   (vh_event.p[0].Px(), vh_event.p[0].Py(), vh_event.p[0].Pz(), vh_event.p[0].Energy());
+	pVH[3].SetPxPyPzE   (vh_event.p[1].Px(), vh_event.p[1].Py(), vh_event.p[1].Pz(), vh_event.p[1].Energy());
+	pVH[4].SetPxPyPzE   (vh_event.p[2].Px(), vh_event.p[2].Py(), vh_event.p[2].Pz(), vh_event.p[2].Energy());
+	pVH[0].SetPxPyPzE   (0, 0, pz0, TMath::Abs(pz0));
+	pVH[1].SetPxPyPzE   (0, 0, pz1, TMath::Abs(pz1));
+
+	if ( _matrixElement == TVar::JHUGen ) {
+	// Set Couplings at the HVV* vertex
+      double Hvvcoupl[SIZE_HVV_VBF][2] = { { 0 } };
+
+	  // By default set the Spin 0 couplings for SM case
+      Hvvcoupl[0][0]=1.0;  Hvvcoupl[0][1]=0.0;   // first/second number is the real/imaginary part
+      for (int i = 1; i<SIZE_HVV_VBF; i++){ for(int com=0; com<2; com++) Hvvcoupl[i][com] = 0; }
+
+      // 0-
+      if ( proc == TVar::H0minus) {
+		Hvvcoupl[0][0] = 0.0;
+		Hvvcoupl[1][0] = 0.0;
+		Hvvcoupl[2][0] = 0.0;
+		Hvvcoupl[3][0] = 1.0;
+      }
+
+		if ( proc == TVar::SelfDefine_spin0){
+			for(int i=0; i<SIZE_HVV_VBF; i++){
+				for(int j=0;j<2;j++){
+					Hvvcoupl [i][j] = selfDHvvcoupl[i][j];
+				}
+			}
+		}
+		// 0h+
+		if ( proc == TVar::H0hplus) {
+			Hvvcoupl[0][0] = 0.0;
+			Hvvcoupl[1][0] = 1.0;
+			Hvvcoupl[2][0] = 0.0;
+			Hvvcoupl[3][0] = 0.0;
+		}
+		if( proc == TVar::H0_g1prime2){
+			Hvvcoupl[0][0] = 0.;
+			Hvvcoupl[5][0] = -12046.01;
+		}
+
+		if(!inclusiveHadronicJets) msqjk = VHiggsMatEl(proc, production, pVH, Vdecay_id, _hmass, _hwidth, Hvvcoupl, verbosity, EBEAM);
+		else{
+			for (int outgoing1 = -nf; outgoing1 <= nf; outgoing1++){
+				if (production == TVar::ZH){
+					if (outgoing1 <= 0) continue;
+					Vdecay_id[0] = outgoing1;
+					Vdecay_id[1] = -outgoing1;
+					msqjk += (VHiggsMatEl(proc, production, pVH, Vdecay_id, _hmass, _hwidth, Hvvcoupl, verbosity, EBEAM)) / N_Q; // Average over quark flavors
+				}
+				else if (production == TVar::WH){
+					if (outgoing1 == 0) continue;
+					if (outgoing1 == 2 || outgoing1 == 4){ // u or c to d-bar, b-bar or s-bar
+						for (int outgoing2 = -nf; outgoing2 < 0; outgoing2++){
+							if (abs(outgoing2) == abs(outgoing1)) continue;
+							Vdecay_id[0] = outgoing1;
+							Vdecay_id[1] = outgoing2;
+							msqjk += (VHiggsMatEl(proc, production, pVH, Vdecay_id, _hmass, _hwidth, Hvvcoupl, verbosity, EBEAM)) / 12.; // Average over quark flavors; CAUTION about 12: Depends on nf
+						}
+					}
+					if (outgoing1 == -2 || outgoing1 == -4){ // u-bar or c-bar to d, b or s
+						for (int outgoing2 = 1; outgoing2 < nf + 1; outgoing2++){
+							if (abs(outgoing2) == abs(outgoing1)) continue;
+							Vdecay_id[0] = outgoing1;
+							Vdecay_id[1] = outgoing2;
+							msqjk += (VHiggsMatEl(proc, production, pVH, Vdecay_id, _hmass, _hwidth, Hvvcoupl, verbosity, EBEAM)) / 12.; // Average over quark flavors; CAUTION about 12: Depends on nf
+						}
+					}
+				}
+			}
+		}
+	} // end of JHUGen matrix element calculations
+	else{
+		return 0.; // Analytical not implemented yet
+	}
+	return msqjk;
+}
+
 
 // this appears to be some kind of 
 // way of setting MCFM parameters through
