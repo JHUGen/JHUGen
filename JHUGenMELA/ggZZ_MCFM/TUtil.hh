@@ -20,11 +20,12 @@
 #include "TModHiggsMatEl.hh"
 #include "TModGravitonMatEl.hh"
 #include "TModZprimeMatEl.hh"
+// Higgs + 1/2 jets
 #include "TModHiggsJJMatEl.hh"
-// new
 #include "TModHiggsJMatEl.hh"
+// VH
 #include "TModVHiggsMatEl.hh"
-//
+
 
 using namespace std;
 TString DbnEventLepSelName(int i);
