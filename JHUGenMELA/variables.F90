@@ -22,7 +22,7 @@ integer, parameter :: DecayMode2 = 0
 logical, parameter :: includeInterference = .false.
 logical, parameter :: OffShellReson = .false.
 logical, parameter :: includeGammaStar = .false.
-logical, parameter :: H_DK = .true.                 ! set to false so H in V* > VH does not decay
+logical, parameter :: H_DK = .false.                 ! set to false so H in V* > VH does not decay
 
 
 !-- momentum-dependent form factors
