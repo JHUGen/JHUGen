@@ -789,8 +789,16 @@ double HJJMatEl(TVar::Process process, TVar::Production production, const TLoren
   return 0.;
 }
 
-double VHiggsMatEl(TVar::Process process, TVar::Production production, TLorentzVector p[5], int Vdecay_id[2], double MReso, double GaReso, double Hvvcoupl[SIZE_HVV_VBF][2], TVar::VerbosityLevel verbosity, double EBEAM)
+double VHiggsMatEl(TVar::Process process, TVar::Production production, TLorentzVector p[5], TLorentzVector pHdaughter[4], int Vdecay_id[6], double MReso, double GaReso, double Hvvcoupl[SIZE_HVV_VBF][2], TVar::VerbosityLevel verbosity, double EBEAM)
 {
+// Inputs to Fortran
+// The dimensionality [9] should change to [11] once H->4l or 2l2nu is added to the amplitude.
+  double p4[9][4] = { { 0 } };
+  double masses[2][9] = { { 0 } };
+  double helicities[9] = { 0 };
+  int vh_ids[9] = { 0 };
+  int n_HiggsFermions=0;
+
 	MReso /=100.0;
 	GaReso /= 100.0;
 
@@ -816,6 +824,7 @@ double VHiggsMatEl(TVar::Process process, TVar::Production production, TLorentzV
 	p[4]:=6
 */
   TLorentzVector pVH[9];
+//  TLorentzVector pVH[11];
   TLorentzVector nullVector(0,0,0,0);
   for (int i = 0; i < 2; i++) pVH[i] = p[i];
   pVH[2] = p[0] + p[1]; // V*
@@ -823,13 +832,34 @@ double VHiggsMatEl(TVar::Process process, TVar::Production production, TLorentzV
   pVH[3] = pVH[2] - pVH[4]; // V
   pVH[5] = p[3]; // 5
   pVH[6] = p[4]; // 6
-  for (int i = 7; i < 9; i++) pVH[i] = pVH[4]*0.5; // No Higgs decay is assumed, but conserve momentum in case of any mistake on variables.F90::H_DK=.false.
+  if (
+	  pHdaughter[0] != nullVector
+	  && pHdaughter[1] != nullVector
+	  && pHdaughter[2] == nullVector
+	  && pHdaughter[3] == nullVector
+	  ){
+	  for (int i = 7; i < 9; i++) pVH[i] = pHdaughter[i-7]; // Higgs decay to 2 jets, variables.F90::H_DK=.true. should be set.
+//	  for (int i = 9; i < 11; i++) pVH[i] = nullVector;
+	  for (int i = 7; i < 9; i++) vh_ids[i] = Vdecay_id[i-5];
+	  n_HiggsFermions=2;
+  }
+  else if (
+	  pHdaughter[0] != nullVector
+	  && pHdaughter[1] != nullVector
+	  && pHdaughter[2] != nullVector
+	  && pHdaughter[3] != nullVector
+	  ){
+	  for (int i = 7; i < 9; i++) pVH[i] = pHdaughter[2*(i-6)-2]+pHdaughter[2*(i-6)-1]; // Not yet supported fully
+//	  for (int i = 9; i < 11; i++) pVH[i] = pHdaughter[i-7]; // Higgs decay to 4l, variables.F90::H_DK=.true. should be set.
+	  for (int i = 7; i < 9; i++) vh_ids[i] = Vdecay_id[i-5];
+//	  for (int i = 7; i < 11; i++) vh_ids[i] = Vdecay_id[i-5];
+	  n_HiggsFermions=4;
+  }
+  else{
+	  for (int i = 7; i < 9; i++) pVH[i] = pVH[4] * 0.5; // No Higgs decay is assumed, but conserve momentum in case of any mistake on variables.F90::H_DK=.false.
+//	  for (int i = 7; i < 11; i++) pVH[i] = pVH[4] * 0.25; // No Higgs decay is assumed, but conserve momentum in case of any mistake on variables.F90::H_DK=.false.
+  }
 
-// Inputs to Fortran
-  double p4[9][4] = { { 0 } };
-  double masses[2][9] = { { 0 } };
-  double helicities[9] = { 0 };
-  int vh_ids[9] = { 0 };
   // input unit = GeV/100 such that 125GeV is 1.25 in the code
   // this needs to be applied for all the p4
   for (int i = 0; i < 9; i++) {
@@ -851,14 +881,14 @@ double VHiggsMatEl(TVar::Process process, TVar::Production production, TLorentzV
 
 // CAUTION: THESE HARDCODED NUMBERS HAVE TO BE THE SAME AS M/Ga_Z/W IN VARIABLES.F90
   if (production == TVar::ZH) {
-	  masses[0][2] = 91.1876;
-	  masses[1][2] = 2.4952;
+	  masses[0][2] = 91.1876/100.;
+	  masses[1][2] = 2.4952/100.;
 	  masses[0][3] = masses[0][2];
 	  masses[1][3] = masses[1][2];
   }
   if (production == TVar::WH) {
-	  masses[0][2] = 80.399;
-	  masses[1][2] = 2.085;
+	  masses[0][2] = 80.399/100.;
+	  masses[1][2] = 2.085/100.;
 	  masses[0][3] = masses[0][2];
 	  masses[1][3] = masses[1][2];
   }
@@ -896,7 +926,27 @@ double VHiggsMatEl(TVar::Process process, TVar::Production production, TLorentzV
 					  vh_ids[2] = 23;
 					  vh_ids[3] = 23;
 					  double msq=0;
-					  __modvhiggs_MOD_evalamp_vhiggs(vh_ids,helicities,p4,Hvvcoupl,masses,&msq);
+					  if(n_HiggsFermions==0) __modvhiggs_MOD_evalamp_vhiggs(vh_ids,helicities,p4,Hvvcoupl,masses,&msq);
+					  else if(n_HiggsFermions==2){
+						  for (int out1h = 0; out1h < 2; out1h++){
+							  helicities[7] = allowed_helicities[out1h];
+							  helicities[8] = helicities[7];
+							  double msqtemp = 0;
+							  __modvhiggs_MOD_evalamp_vhiggs(vh_ids, helicities, p4, Hvvcoupl, masses, &msqtemp);
+							  msq += msqtemp;
+						  }
+					  }
+					  else if(n_HiggsFermions==4){
+						  for (int out1h = 0; out1h < 2; out1h++){
+							  for (int out2h = 0; out2h < 2; out2h++){
+								  helicities[7] = allowed_helicities[out1h];
+								  helicities[8] = allowed_helicities[out2h];
+								  double msqtemp = 0;
+								  __modvhiggs_MOD_evalamp_vhiggs(vh_ids, helicities, p4, Hvvcoupl, masses, &msqtemp);
+								  msq += msqtemp;
+							  }
+						  }
+					  }
 					  MatElsq[incoming1+5][-incoming1+5] += msq * 0.25; // Average over initial states with helicities +-1 only
 					  MatElsq[-incoming1+5][incoming1+5] += msq * 0.25; // Average over initial states with helicities +-1 only
 				  }
@@ -918,7 +968,27 @@ double VHiggsMatEl(TVar::Process process, TVar::Production production, TLorentzV
 								  vh_ids[2] = 24;
 								  vh_ids[3] = 24;
 								  double msq=0;
-								  __modvhiggs_MOD_evalamp_vhiggs(vh_ids,helicities,p4,Hvvcoupl,masses,&msq);
+								  if(n_HiggsFermions==0) __modvhiggs_MOD_evalamp_vhiggs(vh_ids,helicities,p4,Hvvcoupl,masses,&msq);
+								  else if(n_HiggsFermions==2){
+									  for (int out1h = 0; out1h < 2; out1h++){
+										  helicities[7] = allowed_helicities[out1h];
+										  helicities[8] = helicities[7];
+										  double msqtemp = 0;
+										  __modvhiggs_MOD_evalamp_vhiggs(vh_ids, helicities, p4, Hvvcoupl, masses, &msqtemp);
+										  msq += msqtemp;
+									  }
+								  }
+								  else if(n_HiggsFermions==4){
+									  for (int out1h = 0; out1h < 2; out1h++){
+										  for (int out2h = 0; out2h < 2; out2h++){
+											  helicities[7] = allowed_helicities[out1h];
+											  helicities[8] = allowed_helicities[out2h];
+											  double msqtemp = 0;
+											  __modvhiggs_MOD_evalamp_vhiggs(vh_ids, helicities, p4, Hvvcoupl, masses, &msqtemp);
+											  msq += msqtemp;
+										  }
+									  }
+								  }
 								  MatElsq[incoming1+5][incoming2+5] += msq * 0.25; // Average over initial states with helicities +-1 only
 								  MatElsq[incoming2+5][incoming1+5] += msq * 0.25; // Average over initial states with helicities +-1 only
 							  }
@@ -934,7 +1004,27 @@ double VHiggsMatEl(TVar::Process process, TVar::Production production, TLorentzV
 								  vh_ids[2] = 24;
 								  vh_ids[3] = 24;
 								  double msq=0;
-								  __modvhiggs_MOD_evalamp_vhiggs(vh_ids,helicities,p4,Hvvcoupl,masses,&msq);
+								  if(n_HiggsFermions==0) __modvhiggs_MOD_evalamp_vhiggs(vh_ids,helicities,p4,Hvvcoupl,masses,&msq);
+								  else if(n_HiggsFermions==2){
+									  for (int out1h = 0; out1h < 2; out1h++){
+										  helicities[7] = allowed_helicities[out1h];
+										  helicities[8] = helicities[7];
+										  double msqtemp = 0;
+										  __modvhiggs_MOD_evalamp_vhiggs(vh_ids, helicities, p4, Hvvcoupl, masses, &msqtemp);
+										  msq += msqtemp;
+									  }
+								  }
+								  else if(n_HiggsFermions==4){
+									  for (int out1h = 0; out1h < 2; out1h++){
+										  for (int out2h = 0; out2h < 2; out2h++){
+											  helicities[7] = allowed_helicities[out1h];
+											  helicities[8] = allowed_helicities[out2h];
+											  double msqtemp = 0;
+											  __modvhiggs_MOD_evalamp_vhiggs(vh_ids, helicities, p4, Hvvcoupl, masses, &msqtemp);
+											  msq += msqtemp;
+										  }
+									  }
+								  }
 								  MatElsq[incoming1+5][incoming2+5] += msq * 0.25; // Average over initial states with helicities +-1 only
 								  MatElsq[incoming2+5][incoming1+5] += msq * 0.25; // Average over initial states with helicities +-1 only
 							  }

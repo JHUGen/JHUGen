@@ -300,6 +300,21 @@ void testME() {
   vh_event.p[1] = p4[1];
   vh_event.p[2] = p4[0];
   vh_event.PdgCode[0]=25;
+  TLorentzVector nullVector(0,0,0,0);
+  // Test H->bb decay
+//  vh_event.pHdecay[0].SetPxPyPzE( -231.32407, -64.346307, -140.76433, 404.04106 );
+//  vh_event.pHdecay[1] = p4[2] - vh_event.pHdecay[0];
+//  vh_event.PdgCode_Hdecay[0] = 5;
+//  vh_event.PdgCode_Hdecay[1] = -5;
+  // Test no Higgs decay
+  vh_event.pHdecay[0] = nullVector;
+  vh_event.pHdecay[1] = nullVector;
+  vh_event.pHdecay[2] = nullVector;
+  vh_event.pHdecay[3] = nullVector;
+  vh_event.PdgCode_Hdecay[0] = 0;
+  vh_event.PdgCode_Hdecay[1] = 0;
+  vh_event.PdgCode_Hdecay[2] = 0;
+  vh_event.PdgCode_Hdecay[3] = 0;
 
   vh_event.PdgCode[1]=0;
   vh_event.PdgCode[2]=0;
