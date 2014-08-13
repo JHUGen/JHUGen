@@ -681,7 +681,13 @@ double TEvtProb::XsecCalc_VX(TVar::Process proc, TVar::Production production, vh
 		vh_event.PdgCode[1] = vh_event.PdgCode[1] - vh_event.PdgCode[2];
 	}
 
-	int Vdecay_id[2] = { vh_event.PdgCode[1], vh_event.PdgCode[2] };
+	int Vdecay_id[6] = {
+		vh_event.PdgCode[1], vh_event.PdgCode[2],
+		vh_event.PdgCode_Hdecay[0],
+		vh_event.PdgCode_Hdecay[1],
+		vh_event.PdgCode_Hdecay[2],
+		vh_event.PdgCode_Hdecay[3]
+	};
 
 	TLorentzVector pCoM = vh_event.p[0] + vh_event.p[1] + vh_event.p[2];
 	double qX = pCoM.X();
@@ -691,6 +697,7 @@ double TEvtProb::XsecCalc_VX(TVar::Process proc, TVar::Production production, vh
 	if ( (qPt)>0 ){
 		TVector3 boostV(-qX/qE,-qY/qE,0); // Unit boost vector
 		for(int ipt=0;ipt<3;ipt++) vh_event.p[ipt].Boost(boostV);
+		for(int ipt=0;ipt<4;ipt++) vh_event.pHdecay[ipt].Boost(boostV);
 	}
 
 	// assign the right initial momentum
@@ -700,11 +707,13 @@ double TEvtProb::XsecCalc_VX(TVar::Process proc, TVar::Production production, vh
     double pz0 = (sysE+sysPz)/2.; 
     double pz1 = -(sysE-sysPz)/2.;
 	TLorentzVector pVH[5];
+	TLorentzVector pHdaughter[4];
 	pVH[2].SetPxPyPzE   (vh_event.p[0].Px(), vh_event.p[0].Py(), vh_event.p[0].Pz(), vh_event.p[0].Energy());
 	pVH[3].SetPxPyPzE   (vh_event.p[1].Px(), vh_event.p[1].Py(), vh_event.p[1].Pz(), vh_event.p[1].Energy());
 	pVH[4].SetPxPyPzE   (vh_event.p[2].Px(), vh_event.p[2].Py(), vh_event.p[2].Pz(), vh_event.p[2].Energy());
 	pVH[0].SetPxPyPzE   (0, 0, pz0, TMath::Abs(pz0));
 	pVH[1].SetPxPyPzE   (0, 0, pz1, TMath::Abs(pz1));
+	for(int ipt=0;ipt<4;ipt++) pHdaughter[ipt]=vh_event.pHdecay[ipt];
 
 	if ( _matrixElement == TVar::JHUGen ) {
 	// Set Couplings at the HVV* vertex
@@ -741,14 +750,14 @@ double TEvtProb::XsecCalc_VX(TVar::Process proc, TVar::Production production, vh
 			Hvvcoupl[5][0] = -12046.01;
 		}
 
-		if(!inclusiveHadronicJets) msqjk = VHiggsMatEl(proc, production, pVH, Vdecay_id, _hmass, _hwidth, Hvvcoupl, verbosity, EBEAM);
+		if(!inclusiveHadronicJets) msqjk = VHiggsMatEl(proc, production, pVH, pHdaughter, Vdecay_id, _hmass, _hwidth, Hvvcoupl, verbosity, EBEAM);
 		else{
 			for (int outgoing1 = -nf; outgoing1 <= nf; outgoing1++){
 				if (production == TVar::ZH){
 					if (outgoing1 <= 0) continue;
 					Vdecay_id[0] = outgoing1;
 					Vdecay_id[1] = -outgoing1;
-					msqjk += (VHiggsMatEl(proc, production, pVH, Vdecay_id, _hmass, _hwidth, Hvvcoupl, verbosity, EBEAM)) / N_Q; // Average over quark flavors
+					msqjk += (VHiggsMatEl(proc, production, pVH, pHdaughter, Vdecay_id, _hmass, _hwidth, Hvvcoupl, verbosity, EBEAM)) / N_Q; // Average over quark flavors
 				}
 				else if (production == TVar::WH){
 					if (outgoing1 == 0) continue;
@@ -757,7 +766,7 @@ double TEvtProb::XsecCalc_VX(TVar::Process proc, TVar::Production production, vh
 							if (abs(outgoing2) == abs(outgoing1)) continue;
 							Vdecay_id[0] = outgoing1;
 							Vdecay_id[1] = outgoing2;
-							msqjk += (VHiggsMatEl(proc, production, pVH, Vdecay_id, _hmass, _hwidth, Hvvcoupl, verbosity, EBEAM)) / 12.; // Average over quark flavors; CAUTION about 12: Depends on nf
+							msqjk += (VHiggsMatEl(proc, production, pVH, pHdaughter, Vdecay_id, _hmass, _hwidth, Hvvcoupl, verbosity, EBEAM)) / 12.; // Average over quark flavors; CAUTION about 12: Depends on nf
 						}
 					}
 					if (outgoing1 == -2 || outgoing1 == -4){ // u-bar or c-bar to d, b or s
@@ -765,7 +774,7 @@ double TEvtProb::XsecCalc_VX(TVar::Process proc, TVar::Production production, vh
 							if (abs(outgoing2) == abs(outgoing1)) continue;
 							Vdecay_id[0] = outgoing1;
 							Vdecay_id[1] = outgoing2;
-							msqjk += (VHiggsMatEl(proc, production, pVH, Vdecay_id, _hmass, _hwidth, Hvvcoupl, verbosity, EBEAM)) / 12.; // Average over quark flavors; CAUTION about 12: Depends on nf
+							msqjk += (VHiggsMatEl(proc, production, pVH, pHdaughter, Vdecay_id, _hmass, _hwidth, Hvvcoupl, verbosity, EBEAM)) / 12.; // Average over quark flavors; CAUTION about 12: Depends on nf
 						}
 					}
 				}

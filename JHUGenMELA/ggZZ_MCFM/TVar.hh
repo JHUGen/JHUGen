@@ -229,7 +229,9 @@ struct hzz4l_event_type{
 };
 struct vh_event_type{ // ME is 2 -> 3
   int PdgCode[3];
-  TLorentzVector p[3];
+  TLorentzVector p[3]; // H, V-daughter 1, V-daughter 2
+  TLorentzVector pHdecay[4]; // H-daughter 1, H-daughter 2; optional: H-daughter 3, H-daughter 4
+  int PdgCode_Hdecay[4];
 };
 struct mcfm_event_type{
   int PdgCode[6];
