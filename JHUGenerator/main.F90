@@ -834,7 +834,7 @@ use ModParameters
 use ModMisc
 implicit none
 include 'csmaxvalue.f'
-integer,parameter :: maxpart=6!=max.partons; this parameter should match the one in WriteOutEvent of mod_Kinematics
+integer,parameter :: maxpart=15!=max.partons; this parameter should match the one in WriteOutEvent of mod_Kinematics
 real(8) :: VG_Result,VG_Error,VG_Chi2
 real(8) :: yRnd(1:22),Res,dum,EMcheck(1:4)
 real(8) :: AcceptedEvent(1:4,1:maxpart),Ehat
@@ -844,6 +844,8 @@ character(len=*),parameter :: POWHEG_Fmt0 = "(6X,I2,A160)"
 character(len=*),parameter :: POWHEG_Fmt1 = "(6X,I2,4X,I3,4X,I3,3X,I3,1X,I3,3X,I3,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9)"
 character(len=*),parameter :: JHUGen_Fmt0 = "(2X,I2,A160)"
 character(len=*),parameter :: JHUGen_Fmt1 = "(I3,X,I2,X,I2,X,I2,X,I3,X,I3,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7)"
+character(len=*),parameter :: MadGra_Fmt0 = "(I2,A160)"
+character(len=*),parameter :: MadGra_Fmt1 = "(7X,I3,2X,I3,3X,I2,3X,I2,3X,I3,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1F3.0,X,1F3.0)"
 character(len=150) :: InputFmt0,InputFmt1
 logical :: FirstEvent,M_ResoSet
 integer :: nline,intDummy,Nevent
@@ -854,17 +856,22 @@ character(len=160) :: FirstLines,EventInfoLine,PDFLine
 character(len=160) :: EventLine(1:maxpart+3)
 integer :: n,clock,i,stat
 integer, dimension(:), allocatable :: gfort_seed
-integer,parameter :: InputLHEFormat = 1  !  1=POWHEG, 2=JHUGen
+integer,parameter :: InputLHEFormat = 1  !  1=POWHEG, 2=JHUGen, 3=MadGraph
 
 
 
 if(InputLHEFormat.eq.1) then
   InputFmt0 = trim(POWHEG_Fmt0)
   InputFmt1 = trim(POWHEG_Fmt1)
+elseif(InputLHEFormat.eq.3) then
+  InputFmt0 = trim(MadGra_Fmt0)
+  InputFmt1 = trim(MadGra_Fmt1)
 else
   InputFmt0 = trim(JHUGen_Fmt0)
   InputFmt1 = trim(JHUGen_Fmt1)
 endif
+
+
 
 if( VegasIt1.eq.-1 ) VegasIt1 = VegasIt1_default
 if( VegasNc0.eq.-1 ) VegasNc0 = VegasNc0_default
