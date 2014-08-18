@@ -27,7 +27,7 @@ use ModParameters
 use modMisc
 implicit none
 real(8) :: Mom(1:4,1:6)
-integer,parameter :: maxpart=6! this parameter should match the one in main.F90
+integer,parameter :: maxpart=15! this parameter should match the one in main.F90
 real(8),optional :: MomFSPartons(:,:)
 real(8),optional :: EventWeight
 character(len=160),optional :: EventInfoLine,PDFLine
