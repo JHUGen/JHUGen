@@ -41,7 +41,8 @@ integer :: MY_IDUP(:),ICOLUP(:,:)
 integer :: LHE_IDUP(1:7+maxpart),i,ISTUP(1:7+maxpart),MOTHUP(1:2,1:7+maxpart)
 integer :: NUP,IDPRUP
 real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP,mZ1,mZ2
-character(len=*),parameter :: fmt1 = "(I3,X,I2,X,I2,X,I2,X,I3,X,I3,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7)"
+character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1F3.0,X,1F3.0)"
+
 
 
 ! For description of the LHE format see http://arxiv.org/abs/hep-ph/0109068 and http://arxiv.org/abs/hep-ph/0609017
@@ -165,7 +166,7 @@ LHE_IDUP(3) = 25
 if( Process.eq.1 ) LHE_IDUP(3) = 32
 if( Process.eq.2 ) LHE_IDUP(3) = 39
 Lifetime = 0.0d0
-Spin = 1.0d0
+Spin = 0.1d0
 
 do a=1,6
     MomDummy(1,a) = 100.0d0*Mom(1,a)
@@ -261,9 +262,9 @@ endif
 
 write(io_LHEOutFile,"(A)") "<event>"
 if( ReadLHEFile .and. importExternal_LHEinit .and. present(EventInfoLine) ) then
-   write(io_LHEOutFile,"(X,I2,X,A)") NUP,trim(EventInfoLine)
+   write(io_LHEOutFile,"(I2,X,A)") NUP,trim(EventInfoLine)
 else
-   write(io_LHEOutFile,"(X,I2,X,I3,X,1PE13.7,X,1PE13.7,X,1PE13.7,X,1PE13.7)") NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
+   write(io_LHEOutFile,"(I2,X,I3,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7)") NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
 !  in order of appearance:
 !  (*) number of particles in the event
 !  (*) process ID (user defined)
@@ -292,7 +293,6 @@ write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(
 ! V2
 i=5
 write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),Z2FV(2:4),Z2FV(1),V2Mass,Lifetime,Spin
-
 
 ! decay product 1 (V1): l-, nu or q
 i=7
@@ -347,7 +347,6 @@ END SUBROUTINE
 
 
 
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 SUBROUTINE WriteOutEvent_HJ(Mom,MY_IDUP,ICOLUP,MomRealGlu,EventWeight,EventInfoLine)
 use ModParameters
 implicit none
@@ -363,7 +362,8 @@ integer :: a,b,c
 integer :: MY_IDUP(:),LHE_IDUP(1:10),i,ISTUP(1:10),MOTHUP(1:2,1:10),ICOLUP(:,:)
 integer :: NUP,IDPRUP
 real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP
-character(len=*),parameter :: fmt1 = "(I3,X,I2,X,I2,X,I2,X,I3,X,I3,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7)"
+character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1F3.0,X,1F3.0)"
+
 
 
 ! For description of the LHE format see http://arxiv.org/abs/hep-ph/0109068 and http://arxiv.org/abs/hep-ph/0609017
@@ -405,7 +405,7 @@ else
 endif
 
 Lifetime = 0.0d0
-Spin = 1.0d0
+Spin = 0.1d0
 
 do a=1,4
     MomDummy(1,a) = 100.0d0*Mom(1,a)
@@ -428,7 +428,7 @@ XMass = M_Reso* 100d0
 
 
 write(io_LHEOutFile,"(A)") "<event>"
-if( .not. ReadLHEFile ) write(io_LHEOutFile,"(X,I2,X,I3,X,1PE13.7,X,1PE13.7,X,1PE13.7,X,1PE13.7)") NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
+if( .not. ReadLHEFile ) write(io_LHEOutFile,"(I2,X,I3,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7)") NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
 ! in order of appearance:
 ! (*) number of particles in the event
 ! (*) process ID (user defined)
@@ -487,7 +487,7 @@ use ModParameters
 implicit none
 real(8) :: Mom(1:4,1:5)
 real(8),optional :: MomRealGlu(1:4)
-character(len=160),optional :: EventInfoLine
+character(len=170),optional :: EventInfoLine
 real(8),optional :: EventWeight
 real(8) :: Spin, Lifetime
 ! real(8) :: XFV(1:4), Z1FV(1:4), Z2FV(1:4)
@@ -497,7 +497,8 @@ integer :: a,b,c
 integer :: MY_IDUP(:),LHE_IDUP(1:10),i,ISTUP(1:10),MOTHUP(1:2,1:10),ICOLUP(:,:)
 integer :: NUP,IDPRUP
 real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP
-character(len=*),parameter :: fmt1 = "(I3,X,I2,X,I2,X,I2,X,I3,X,I3,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7)"
+character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1F3.0,X,1F3.0)"
+
 
 
 ! For description of the LHE format see http://arxiv.org/abs/hep-ph/0109068 and http://arxiv.org/abs/hep-ph/0609017
@@ -543,7 +544,7 @@ else
 endif
 
 Lifetime = 0.0d0
-Spin = 1.0d0
+Spin = 0.1d0
 
 do a=1,5
     MomDummy(1,a) = 100.0d0*Mom(1,a)
@@ -567,7 +568,7 @@ XMass = M_Reso* 100d0
 
 
 write(io_LHEOutFile,"(A)") "<event>"
-if( .not. ReadLHEFile ) write(io_LHEOutFile,"(X,I2,X,I3,X,1PE13.7,X,1PE13.7,X,1PE13.7,X,1PE13.7)") NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
+if( .not. ReadLHEFile ) write(io_LHEOutFile,"(I2,X,I3,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7)") NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
 ! in order of appearance:
 ! (*) number of particles in the event
 ! (*) process ID (user defined)
@@ -627,8 +628,9 @@ real(8) :: Spin
 integer :: i
 integer :: NUP,IDPRUP
 real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP
-! character(len=*),parameter :: fmt1 = "(i9,5i5,5e19.11,f3.0,f4.0)"
-character(len=*),parameter :: fmt1 = "(I3,X,I2,X,I2,X,I2,X,I3,X,I3,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7)"
+character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1F3.0,X,1F3.0)"
+
+
 
 MomDummy = MomExt*1d2
 MassDummy = inv_mass*1d2
@@ -647,7 +649,8 @@ endif
     XWGTUP=EventWeight
 
 write(io_LHEOutFile,"(A)") "<event>"
-if( .not. ReadLHEFile ) write(io_LHEOutFile,"(X,I2,X,I3,X,1PE13.7,X,1PE13.7,X,1PE13.7,X,1PE13.7)") NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
+if( .not. ReadLHEFile ) write(io_LHEOutFile,"(I2,X,I3,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7)") NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
+
 
 !if((COLLIDER.ne.0) .and. (unweighted.eqv..false.))then
 !    beam_id(1)=2212
