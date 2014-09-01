@@ -26,4 +26,9 @@ gg->X(2b+)->ZZ:1.4125112e-06
 X(2m+)->ZZ production independent:8.7055518e-16
 H+JJ (SBF): 4.0682736e+03
 H+JJ (WBF): 1.7859282e-02
+H+J: 2.9659023e-02
+ZH leptonic: 3.7934061e+01
+WH leptonic: 8.6722316e+02
+ZH hadronic: 3.9807972e+01
+WH hadronic: 5.3670913e+02
 ===============================================

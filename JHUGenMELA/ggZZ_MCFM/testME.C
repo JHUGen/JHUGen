@@ -112,7 +112,12 @@ void testME() {
   double dXsec_TZZ_2bplus_JHU = 0.;
   double dXsec_HZZ_MIXCP_JHU = 0.;
   double dXsec_HJJ_JHU = 0.;
+  double dXsec_HJ_JHU = 0.;
   double dXsec_HJJVBF_JHU = 0.;
+  double dXsec_ZH_leptonic_JHU = 0.;
+  double dXsec_WH_leptonic_JHU = 0.;
+  double dXsec_ZH_hadronic_JHU = 0.;
+  double dXsec_WH_hadronic_JHU = 0.;
 
   float mzz = 126.; 
   float m1 = 91.471450;
@@ -153,6 +158,7 @@ void testME() {
   hzz4l_event.p[1].SetXYZM(Z1_plus.Px(), Z1_plus.Py(), Z1_plus.Pz(), 0.);
   hzz4l_event.p[2].SetXYZM(Z2_minus.Px(), Z2_minus.Py(), Z2_minus.Pz(), 0.);
   hzz4l_event.p[3].SetXYZM(Z2_plus.Px(), Z2_plus.Py(), Z2_plus.Pz(), 0.);
+
 
 
   // flavor 1 for 4e, 2 for 4m, 3 for 2e2mu  
@@ -283,6 +289,46 @@ void testME() {
   dXsec_HJJ_JHU = Xcal2.XsecCalcXJJ(TVar::HSMHiggs,TVar::JJGG, p4, verbosity,selfDHggcoupl,selfDHvvcoupl_VBF,selfDHwwcoupl_VBF);
   dXsec_HJJVBF_JHU = Xcal2.XsecCalcXJJ(TVar::HSMHiggs,TVar::JJVBF, p4, verbosity,selfDHggcoupl,selfDHvvcoupl_VBF,selfDHwwcoupl_VBF);
 
+  TLorentzVector pOneJet[2];
+  //p[0] for H,  p[1] for j
+  pOneJet[0] = p4[2];
+  pOneJet[1] = p4[0]+p4[1];
+  dXsec_HJ_JHU = Xcal2.XsecCalcXJ(TVar::HSMHiggs,TVar::JH, pOneJet, verbosity);
+
+  vh_event_type vh_event;
+  vh_event.p[0] = p4[2];
+  vh_event.p[1] = p4[1];
+  vh_event.p[2] = p4[0];
+  vh_event.PdgCode[0]=25;
+  TLorentzVector nullVector(0,0,0,0);
+  // Test H->bb decay
+//  vh_event.pHdecay[0].SetPxPyPzE( -231.32407, -64.346307, -140.76433, 404.04106 );
+//  vh_event.pHdecay[1] = p4[2] - vh_event.pHdecay[0];
+//  vh_event.PdgCode_Hdecay[0] = 5;
+//  vh_event.PdgCode_Hdecay[1] = -5;
+  // Test no Higgs decay
+  vh_event.pHdecay[0] = nullVector;
+  vh_event.pHdecay[1] = nullVector;
+  vh_event.pHdecay[2] = nullVector;
+  vh_event.pHdecay[3] = nullVector;
+  vh_event.PdgCode_Hdecay[0] = 0;
+  vh_event.PdgCode_Hdecay[1] = 0;
+  vh_event.PdgCode_Hdecay[2] = 0;
+  vh_event.PdgCode_Hdecay[3] = 0;
+
+  vh_event.PdgCode[1]=0;
+  vh_event.PdgCode[2]=0;
+  dXsec_ZH_hadronic_JHU = Xcal2.XsecCalc_VX(TVar::HSMHiggs,TVar::ZH,vh_event,verbosity,selfDHvvcoupl_VBF);
+  vh_event.PdgCode[1]=0;
+  vh_event.PdgCode[2]=0;
+  dXsec_WH_hadronic_JHU = Xcal2.XsecCalc_VX(TVar::HSMHiggs,TVar::WH,vh_event,verbosity,selfDHvvcoupl_VBF);
+  vh_event.PdgCode[1]=14;
+  vh_event.PdgCode[2]=-14;
+  dXsec_ZH_leptonic_JHU = Xcal2.XsecCalc_VX(TVar::HSMHiggs,TVar::ZH,vh_event,verbosity,selfDHvvcoupl_VBF);
+  vh_event.PdgCode[1]=14;
+  vh_event.PdgCode[2]=-13;
+  dXsec_WH_leptonic_JHU = Xcal2.XsecCalc_VX(TVar::HSMHiggs,TVar::WH,vh_event,verbosity,selfDHvvcoupl_VBF);
+
   if ( verbosity >= TVar::INFO ) { 
     FILE *output = fopen("output.txt", "w");
     fprintf(output, "==========Matrix Element outputs==============\n");
@@ -313,6 +359,11 @@ void testME() {
     fprintf(output, "X(2m+)->ZZ production independent:%7.7e\n",  dXsec_TZZ_DECAY_JHU);
     fprintf(output, "H+JJ (SBF): %7.7e\n", dXsec_HJJ_JHU);
     fprintf(output, "H+JJ (WBF): %7.7e\n", dXsec_HJJVBF_JHU);
+    fprintf(output, "H+J: %7.7e\n", dXsec_HJ_JHU);
+    fprintf(output, "ZH leptonic: %7.7e\n", dXsec_ZH_leptonic_JHU);
+    fprintf(output, "WH leptonic: %7.7e\n", dXsec_WH_leptonic_JHU);
+    fprintf(output, "ZH hadronic: %7.7e\n", dXsec_ZH_hadronic_JHU);
+    fprintf(output, "WH hadronic: %7.7e\n", dXsec_WH_hadronic_JHU);
     fprintf(output, "===============================================\n" );
     fclose(output);
   }
