@@ -40,8 +40,8 @@ integer :: a,b,c,NumFSPartons
 integer :: MY_IDUP(:),ICOLUP(:,:)
 integer :: LHE_IDUP(1:7+maxpart),i,ISTUP(1:7+maxpart),MOTHUP(1:2,1:7+maxpart)
 integer :: NUP,IDPRUP
-real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP,mZ1,mZ2
-character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1F3.0,X,1F3.0)"
+real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP,mZ1,mZ2,HiggsDKLength
+character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0)"
 
 
 
@@ -167,6 +167,8 @@ if( Process.eq.1 ) LHE_IDUP(3) = 32
 if( Process.eq.2 ) LHE_IDUP(3) = 39
 Lifetime = 0.0d0
 Spin = 0.1d0
+call getHiggsDecayLength(HiggsDKLength)
+
 
 do a=1,6
     MomDummy(1,a) = 100.0d0*Mom(1,a)
@@ -284,7 +286,7 @@ write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(
 
 ! X
 i=3
-write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),XFV(2:4),XFV(1),XMass,Lifetime,Spin
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),XFV(2:4),XFV(1),XMass,HiggsDKLength,Spin
 
 ! V1
 i=4
@@ -361,8 +363,8 @@ real(8) :: Part1Mass,Part2Mass,Part3Mass,Part4Mass,XMass
 integer :: a,b,c
 integer :: MY_IDUP(:),LHE_IDUP(1:10),i,ISTUP(1:10),MOTHUP(1:2,1:10),ICOLUP(:,:)
 integer :: NUP,IDPRUP
-real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP
-character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1F3.0,X,1F3.0)"
+real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP,HiggsDKLength
+character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0)"
 
 
 
@@ -406,6 +408,7 @@ endif
 
 Lifetime = 0.0d0
 Spin = 0.1d0
+call getHiggsDecayLength(HiggsDKLength)
 
 do a=1,4
     MomDummy(1,a) = 100.0d0*Mom(1,a)
@@ -449,7 +452,7 @@ write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(
 
 ! H
 i=3
-write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),XMass,Lifetime,Spin
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),XMass,HiggsDKLength,Spin
 
 ! j1
 i=4
@@ -496,8 +499,8 @@ real(8) :: Part1Mass,Part2Mass,Part3Mass,Part4Mass,XMass
 integer :: a,b,c
 integer :: MY_IDUP(:),LHE_IDUP(1:10),i,ISTUP(1:10),MOTHUP(1:2,1:10),ICOLUP(:,:)
 integer :: NUP,IDPRUP
-real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP
-character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1F3.0,X,1F3.0)"
+real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP,HiggsDKLength
+character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0)"
 
 
 
@@ -545,6 +548,7 @@ endif
 
 Lifetime = 0.0d0
 Spin = 0.1d0
+call getHiggsDecayLength(HiggsDKLength)
 
 do a=1,5
     MomDummy(1,a) = 100.0d0*Mom(1,a)
@@ -597,7 +601,7 @@ write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(
 
 ! H
 i=5
-write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),XMass,Lifetime,Spin
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),XMass,HiggsDKLength,Spin
 
 
 write(io_LHEOutFile,"(A)") "</event>"
@@ -627,8 +631,8 @@ real(8) :: EventWeight
 real(8) :: Spin
 integer :: i
 integer :: NUP,IDPRUP
-real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP
-character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1F3.0,X,1F3.0)"
+real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP,HiggsDKLength
+character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0)"
 
 
 
@@ -639,6 +643,9 @@ IDPRUP=100
 SCALUP=Mu_Fact * 100d0
 AQEDUP=alpha_QED
 AQCDUP=0.11d0
+
+call getHiggsDecayLength(HiggsDKLength)
+
 
 if(H_DK.eqv..false.)then
     NUP=6
@@ -693,12 +700,12 @@ do i=1,2
     write(io_LHEOutFile,fmt1) id(i), -1,0,0,ICOLUP(i,1),ICOLUP(i,2),MomDummy(2:4,i), MomDummy(1,i), 0.0d0, 0.0d0, helicity(i)
 enddo
 
-write(io_LHEOutFile,fmt1) id(4), 2,1,2,0,0,MomDummy(2:4,4), MomDummy(1,4), MassDummy(4), 0.0d0, helicity(4)
+write(io_LHEOutFile,fmt1) id(4), 2,1,2,0,0,MomDummy(2:4,4), MomDummy(1,4), MassDummy(4), 0d0, helicity(4)
 
 if(H_DK.eqv..true.)then
-  write(io_LHEOutFile,fmt1) id(5), 2,1,2,0,0,MomDummy(2:4,5), MomDummy(1,5), MassDummy(5), 0.0d0, helicity(5)
+  write(io_LHEOutFile,fmt1) id(5), 2,1,2,0,0,MomDummy(2:4,5), MomDummy(1,5), MassDummy(5), HiggsDKLength, helicity(5)
 else
-  write(io_LHEOutFile,fmt1) id(5), 1,1,2,0,0,MomDummy(2:4,5), MomDummy(1,5), MassDummy(5), 0.0d0, helicity(5)
+  write(io_LHEOutFile,fmt1) id(5), 1,1,2,0,0,MomDummy(2:4,5), MomDummy(1,5), MassDummy(5), HiggsDKLength, helicity(5)
 endif
 
 write(io_LHEOutFile,fmt1) id(6), 1,3,3,ICOLUP(3,1),ICOLUP(3,2),MomDummy(2:4,6), MomDummy(1,6), MassDummy(6), 0.0d0, helicity(6)
@@ -711,7 +718,6 @@ write(io_LHEOutFile,fmt1) id(8), 1,4,4,501,0,MomDummy(2:4,8), MomDummy(1,8), Mas
 write(io_LHEOutFile,fmt1) id(9), 1,4,4,0,501,MomDummy(2:4,9), MomDummy(1,9), MassDummy(9), 0.0d0, helicity(9)
 endif
 write(io_LHEOutFile,"(A)") "</event>"
-
 
 
 END SUBROUTINE
@@ -2172,6 +2178,35 @@ integer :: i,NumPart
       Mom(1,i)= gamma*MomTmp1 - betagamma*MomTmp4
       Mom(4,i)= gamma*MomTmp4 - betagamma*MomTmp1
   enddo
+
+RETURN
+END SUBROUTINE
+
+
+
+SUBROUTINE getHiggsDecayLength(ctau)
+use ModParameters
+implicit none
+real(8) :: x,xp,xpp,Len0,propa,ctau,ctau0
+integer :: loop
+
+
+     ctau  = 0d0
+     ctau0 = HiggsDecayLengthMM
+     if( ctau0.lt.1d-16 ) RETURN
+
+     do loop=1,4000000!  4Mio. tries otherwise return zero
+          call random_number(x)
+          xp = 10*x*ctau0             ! scan between 0..10*ctau0
+
+          propa = dexp( -xp/(ctau0) ) ! the max of propa is 1.0
+          call random_number(xpp)
+          if( xpp.lt.propa ) then!   accept
+                ctau = xp
+                RETURN
+          endif
+     enddo
+
 
 RETURN
 END SUBROUTINE
