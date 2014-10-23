@@ -954,10 +954,10 @@ double VHiggsMatEl(TVar::Process process, TVar::Production production, TLorentzV
 					  if(incoming1==0) continue;
 
 					  bool useWminus=false;
-					  bool decaysToJets=false;
+//					  bool decaysToJets=false;
 
 					  if( vh_ids[5] == -12 || vh_ids[5] == -14 || vh_ids[5] == -16 || vh_ids[5] == -2 || vh_ids[5] == -4 || vh_ids[6] == -2 || vh_ids[6] == -4 ) useWminus=true; // l- nu-bar or anti-up down -type quarks
-					  if( abs(vh_ids[5])<=(nf+1) || abs(vh_ids[6])<=(nf+1) ) decaysToJets=true;
+//					  if( abs(vh_ids[5])<=(nf+1) || abs(vh_ids[6])<=(nf+1) ) decaysToJets=true;
 
 					  if (!useWminus){
 						  if (incoming1 == 2 || incoming1 == 4){ // u or c to d-bar, b-bar or s-bar
