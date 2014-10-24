@@ -24,22 +24,21 @@ Manual for the JHU generator
 \begin{center}
 \small
 For simulation of a single-produced resonance at hadron colliders \\
-(version 4.7.3, release date September 1, 2014) \\
+(version 4.8.0, release date October 22, 2014) \\
 \normalsize
 \end{center}
 
-
-
 \noindent
 The generator from \cite{Gao:2010qx,Bolognesi:2012,Anderson:2013} is a model-independent generator for studying spin and parity properties of new resonances.  
-Please cite \cite{Gao:2010qx,Bolognesi:2012,Anderson:2013} if using the generator.  
-
+Please cite \cite{Gao:2010qx,Bolognesi:2012,Anderson:2013} if using the "JHU generator".  
 The code can be downloaded from \cite{thesite}.  
 The generator outputs LHE files which can be passed to parton shower programs for hadronization.  
-%The generator purposely does not output sensible cross-sections but rather deals with numbers of events which can be compared for different signal hypotheses.
 Only relative values of cross sections are supposed to produce meaningful results, while absolute values are often subject to an arbitrary normalization.
 
-Additionally, the package now includes code for computing the matrix elements standalone which can be used in a numerical matrix element analysis.  
+Additionally, the package includes code for computing the matrix elements standalone which can be used in a numerical matrix element analysis.  
+Please reference the above papers and refer to "MELA" when using the matrix element likelihood analysis technique. 
+The latter was also introduced in Ref.~\cite{Chatrchyan:2012ufa}. The matrix element package (MELA) also depends 
+on MCFM libraries for background parameterization which should be referenced~\cite{Campbell:2010ff} when used. 
 
 \vspace{0.5cm}
 \begin{center}
@@ -52,7 +51,7 @@ Additionally, the package now includes code for computing the matrix elements st
 \end{center}
 \vspace{0.5cm}
 
-\newpage
+%\newpage
 
 \section{ Installation }
 
@@ -601,13 +600,14 @@ Instructions for setting up the JHUGenMELA with MCFM are in the file \verb|JHUGe
 
 
 \noindent
-In going from \verb|v4.5.2| to \verb|v4.7.3|, the updates are as follows:
+In going from \verb|v4.5.2| to \verb|v4.8.0|, the updates are as follows:
 
 \begin{itemize}
 \item more flexibility for $q^2$-dependent form factors
 \item separate couplings for ZZH and WWH in weak boson fusion
-\item add new process: pp->H+jet (Process=62)
+\item add new process: $pp\to H$+jet (Process=62)
 \item extended LHE output format to allow for more digits
+\item synchronize JHUGenMELA with MCFM library v6.8
 \item JHUGenMELA: extended MCFM ggHZZ matrix elements by anomalous couplings
 \item JHUGenMELA: add matrix elements for H+jet and V+H
 \end{itemize}
@@ -961,6 +961,18 @@ S. Bolognesi, Y.Y. Gao, A. V. Gritsan, K. Melnikov, M. Schulze, N. V. Tran and A
 I. Anderson, S. Bolognesi, F. Caola, Y.Y. Gao, A. V. Gritsan, C. B. Martin, K. Melnikov, M. Schulze, N. V. Tran, A. Whitbeck, Y. Zhou, "Constraining anomalous HVV interactions at proton and lepton colliders". Phys. Rev. D {\bf 89}, 035007 (2014). arXiv:1309.4819 [hep-ph].
 \bibitem{thesite}
 See webpage: www.pha.jhu.edu/spin
+\bibitem{Chatrchyan:2012ufa} 
+  S.~Chatrchyan {\it et al.}  [CMS Collaboration],
+  ``Observation of a new boson at a mass of 125 GeV with the CMS experiment at the LHC,''
+  Phys.\ Lett.\ B {\bf 716}, 30 (2012)
+  [arXiv:1207.7235 [hep-ex]].
+\bibitem{Campbell:2010ff} 
+  J.~M.~Campbell and R.~K.~Ellis,
+  ``MCFM for the Tevatron and the LHC,''
+  Nucl.\ Phys.\ Proc.\ Suppl.\  {\bf 205-206}, 10 (2010)
+  [arXiv:1007.3492 [hep-ph]].
+  See also http://mcfm.fnal.gov
+%
 \end{thebibliography}
 
 \end{document}
