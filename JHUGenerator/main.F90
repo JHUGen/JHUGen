@@ -858,7 +858,7 @@ character(len=160) :: FirstLines,EventInfoLine,PDFLine
 character(len=160) :: EventLine(1:maxpart+3)
 integer :: n,clock,i,stat
 integer, dimension(:), allocatable :: gfort_seed
-integer,parameter :: InputLHEFormat = 2  !  1=POWHEG, 2=JHUGen (old format), 3=JHUGen (new format), 4=MadGraph
+integer,parameter :: InputLHEFormat = 1  !  1=POWHEG, 2=JHUGen (old format), 3=JHUGen (new format), 4=MadGraph
 
 
 if(InputLHEFormat.eq.1) then
