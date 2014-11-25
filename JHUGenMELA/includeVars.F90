@@ -77,6 +77,14 @@ include './variables.F90'
 
 
 
+!  couplings for ttbar+H
+   complex(8), parameter :: kappa       = (1d0,0d0)
+   complex(8), parameter :: kappa_tilde = (0d0,0d0) 
+   complex(8), parameter :: couplHTT_right_dyn = m_top/vev/2d0 * ( kappa + (0d0,1d0)*kappa_tilde )
+   complex(8), parameter :: couplHTT_left_dyn  = m_top/vev/2d0 * ( kappa - (0d0,1d0)*kappa_tilde )
+
+
+
 
 
 real(8),  parameter :: aR_lep =-2d0*sitW**2*(-1d0)
@@ -119,6 +127,7 @@ integer,  target :: Wp_  = 13
 integer,  target :: NuE_ = 14
 integer,  target :: NuM_ = 15
 integer,  target :: NuT_ = 16
+integer,  target :: Hig_ = 25
 
 integer,  target :: AUp_  = -1
 integer,  target :: ADn_  = -2
