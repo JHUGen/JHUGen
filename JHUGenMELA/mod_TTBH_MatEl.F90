@@ -185,8 +185,8 @@ SqAmp = 0d0
 
      ExtParticles(1)%Mom(1:4) = Mom(1:4,4)
      ExtParticles(2)%Mom(1:4) = Mom(1:4,5)
-     ExtParticles(3)%Mom(1:4) =-Mom(1:4,1)
-     ExtParticles(4)%Mom(1:4) =-Mom(1:4,2)
+     ExtParticles(3)%Mom(1:4) =-Mom(1:4,1)    *(-1d0)! for MELA we switch back to all-outgoing conventions
+     ExtParticles(4)%Mom(1:4) =-Mom(1:4,2)    *(-1d0)
      ExtParticles(7)%Mom(1:4) = Mom(1:4,3)
 
      call TopDecay(ATop_,Mom(1:4,6:8),ExtParticles(1)%Pol(1:4))
@@ -257,8 +257,8 @@ SqAmp = 0d0
 
      ExtParticles(1)%Mom(1:4) = Mom(1:4,4)
      ExtParticles(2)%Mom(1:4) = Mom(1:4,5)
-     ExtParticles(5)%Mom(1:4) =-Mom(1:4,1)
-     ExtParticles(6)%Mom(1:4) =-Mom(1:4,2)
+     ExtParticles(5)%Mom(1:4) =-Mom(1:4,1)    *(-1d0)! for MELA we switch back to all-outgoing conventions
+     ExtParticles(6)%Mom(1:4) =-Mom(1:4,2)    *(-1d0)
      ExtParticles(7)%Mom(1:4) = Mom(1:4,3)
 
      call TopDecay(ATop_,Mom(1:4,6:8),ExtParticles(1)%Pol(1:4))
