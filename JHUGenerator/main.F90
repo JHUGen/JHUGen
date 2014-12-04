@@ -26,9 +26,15 @@ logical,parameter :: useBetaVersion=.false.! this should be set to .false.
    call WriteParameters(io_LogFile)
    call InitOutput()
    write(io_stdout,*) " Running"
-   if( .not.useBetaVersion .and. .not.ReadLHEFile ) call StartVegas(VG_Result,VG_Error)
-   if( useBetaVersion      .and. .not.ReadLHEFile ) call StartVegas_BETA(VG_Result,VG_Error)
-   if( .not.useBetaVersion .and.      ReadLHEFile ) call StartReadLHE(VG_Result,VG_Error)
+   if( .not.useBetaVersion .and.   ConvertLHEFile ) then
+        call StartConvertLHE(VG_Result,VG_Error)
+   elseif( .not.useBetaVersion .and. .not.ReadLHEFile ) then
+        call StartVegas(VG_Result,VG_Error)
+   elseif( useBetaVersion      .and. .not.ReadLHEFile ) then
+        call StartVegas_BETA(VG_Result,VG_Error)
+   elseif( .not.useBetaVersion .and.      ReadLHEFile ) then
+        call StartReadLHE(VG_Result,VG_Error)
+   endif
    call WriteHisto(VG_Result,VG_Error,time_end-time_start)
    call FinalizeOutput()
    call CloseFiles()
@@ -62,6 +68,7 @@ integer :: NumArgs,NArg,OffShell_XVV,iunwgt,CountArg,iinterf
    OffShell_XVV=011! 000: X,V1,V2 on-shell; 010: X,V2 on-shell, V1 off-shell; and so on
    LHEProdFile=""
    ReadLHEFile=.false.
+   ConvertLHEFile=.false.
    ReadCSmax=.false.
    GenerateEvents=.false.
    iinterf = -1
@@ -145,6 +152,10 @@ integer :: NumArgs,NArg,OffShell_XVV,iunwgt,CountArg,iinterf
     elseif( arg(1:8) .eq."ReadLHE=" ) then
         read(arg(9:500),"(A)") LHEProdFile
         ReadLHEFile=.true.
+        CountArg = CountArg + 1
+    elseif( arg(1:11) .eq."ConvertLHE=" ) then
+        read(arg(12:500),"(A)") LHEProdFile
+        ConvertLHEFile=.true.
         CountArg = CountArg + 1
     elseif( arg(1:9) .eq."ReadCSmax" ) then
         ReadCSmax=.true.
@@ -295,6 +306,10 @@ integer :: NumArgs,NArg,OffShell_XVV,iunwgt,CountArg,iinterf
 
     if( ReadLHEFile .and. Process.ne.0  ) then
         print *, "ReadLHE option is only allowed for spin-0 resonances"
+        stop
+    endif
+    if( ConvertLHEFile .and. Process.ne.0  ) then
+        print *, "ConvertLHE option is only allowed for spin-0 resonances"
         stop
     endif
     if( ReadLHEFile .and. .not. Unweighted ) then
@@ -984,7 +999,8 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
          enddo
 !        read optional pdf line
          read(16,fmt="(A160)",IOSTAT=stat,END=99) PDFLine(1:160)
-         if( .not. PDFLine(1:4).eq."#pdf") then
+!          if( .not. PDFLine(1:4).eq."#pdf") then
+         if( .not. (PDFLine(1:4).eq."#pdf" .or. PDFLine(1:5).eq."#rwgt")) then         
              PDFLine(:)=""
              backspace(16)
          endif
@@ -1082,6 +1098,208 @@ END SUBROUTINE
 
 
 
+SUBROUTINE StartConvertLHE(VG_Result,VG_Error)
+use ModCrossSection
+use ModKinematics
+use ModParameters
+use ModMisc
+implicit none
+include 'csmaxvalue.f'
+integer,parameter :: maxpart=15!=max.partons; this parameter should match the one in WriteOutEvent of mod_Kinematics
+real(8) :: VG_Result,VG_Error,VG_Chi2
+real(8) :: yRnd(1:22),Res,dum,EMcheck(1:4),xRnd
+real(8) :: AcceptedEvent(1:4,1:maxpart),Ehat
+real(8) :: MomExt(1:4,1:maxpart),MomHiggs(1:4),MomParton(1:4,1:maxpart),Mass(1:maxpart),pH2sq
+integer :: tries, nParticle, MY_IDUP(1:7+maxpart), ICOLUP(1:2,1:7+maxpart),IntExt(1:7+maxpart),convertparent
+character(len=*),parameter :: POWHEG_Fmt0 = "(6X,I2,A160)"
+character(len=*),parameter :: POWHEG_Fmt1 = "(5X,I3,4X,I3,4X,I3,3X,I3,1X,I3,3X,I3,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9)"
+character(len=*),parameter :: JHUGen_Fmt0 = "(I2,A160)"
+character(len=*),parameter :: JHUGen_Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0)"
+character(len=*),parameter :: JHUGen_old_Fmt0 = "(2X,I2,A160)"
+character(len=*),parameter :: JHUGen_old_Fmt1 = "(I3,X,I2,X,I2,X,I2,X,I3,X,I3,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7)"
+character(len=*),parameter :: MadGra_Fmt0 = "(I2,A160)"
+character(len=*),parameter :: MadGra_Fmt1 = "(7X,I3,2X,I3,3X,I2,3X,I2,3X,I3,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1F3.0,X,1F3.0)"
+character(len=150) :: InputFmt0,InputFmt1
+logical :: FirstEvent,M_ResoSet
+integer :: nline,intDummy,Nevent
+integer :: LHE_IDUP(1:maxpart+3),   LHE_ICOLUP(1:2,1:maxpart+3),   LHE_MOTHUP(1:2,1:maxpart+3)
+integer :: LHE_IDUP_Part(1:maxpart),LHE_ICOLUP_Part(1:2,1:maxpart),LHE_MOTHUP_Part(1:2,1:maxpart+3)
+integer :: EventNumPart,nparton
+character(len=160) :: FirstLines,EventInfoLine,PDFLine
+character(len=160) :: EventLine(1:maxpart+3)
+integer :: n,clock,i,stat
+integer, dimension(:), allocatable :: gfort_seed
+integer,parameter :: InputLHEFormat = 1  !  1=POWHEG, 2=JHUGen (old format), 3=JHUGen (new format), 4=MadGraph
+
+
+if(InputLHEFormat.eq.1) then
+  InputFmt0 = trim(POWHEG_Fmt0)
+  InputFmt1 = trim(POWHEG_Fmt1)
+elseif(InputLHEFormat.eq.4) then
+  InputFmt0 = trim(MadGra_Fmt0)
+  InputFmt1 = trim(MadGra_Fmt1)
+elseif(InputLHEFormat.eq.2) then
+  InputFmt0 = trim(JHUGen_old_Fmt0)
+  InputFmt1 = trim(JHUGen_old_Fmt1)
+else
+  InputFmt0 = trim(JHUGen_Fmt0)
+  InputFmt1 = trim(JHUGen_Fmt1)
+endif
+
+
+
+if( VegasIt1.eq.-1 ) VegasIt1 = VegasIt1_default
+if( VegasNc0.eq.-1 ) VegasNc0 = VegasNc0_default
+if( VegasNc1.eq.-1 .and. VegasNc2.eq.-1 ) VegasNc1 = VegasNc1_default
+if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
+
+    if (seed_random) then 
+#if compiler==1
+        call random_seed()
+#elif compiler==2
+        call random_seed(size=n)
+        allocate(gfort_seed(n))
+        call system_clock(count=clock)
+        gfort_seed = clock + 37 * (/ (i - 1, i = 1, n) /)
+        call random_seed(put = gfort_seed)
+        deallocate(gfort_seed)        
+#endif
+    endif
+
+
+
+!    search for line with first event
+     FirstEvent = .false.
+     M_ResoSet=.false.
+     do while ( .not.FirstEvent )
+        read(16,fmt="(A160)",IOSTAT=stat,END=99) FirstLines
+        if( FirstLines(1:5).eq."hmass" ) then 
+               read(FirstLines(6:13),fmt="(F7.0)") M_Reso
+               M_Reso = M_Reso*GeV!  convert to units of 100GeV
+               M_ResoSet=.true.
+        endif
+        if( FirstLines(1:7).eq."<event>" ) then 
+               FirstEvent=.true.
+        else
+            if( importExternal_LHEinit ) then
+                if( FirstLines(1:17).eq."<LesHouchesEvents" .or. FirstLines(1:4).eq."<!--" ) then
+                else
+                  write(io_LHEOutFile,"(A)") trim(firstlines)
+                endif
+            endif
+        endif
+     enddo
+     if( .not. M_ResoSet ) then
+        write(io_stdout,"(2X,A,1F7.2)")  "ERROR: Higgs mass could not be read from LHE input file. Assuming default value",M_Reso*100d0
+        write(io_LogFile,"(2X,A,1F7.2)") "ERROR: Higgs mass could not be read from LHE input file. Assuming default value",M_Reso*100d0
+     else
+        write(io_stdout,"(2X,A,1F7.2,A)") "A Higgs mass of ",M_Reso*100d0," GeV was determined from the LHE input file."
+        write(io_LogFile,"(2X,A,1F7.2,A)") "A Higgs mass of ",M_Reso*100d0," GeV was determined from the LHE input file."
+     endif
+     write(io_stdout,"(A)") ""
+     write(io_LogFile,"(A)") ""
+
+
+
+
+     print *, " converting events"
+     call cpu_time(time_start)
+     NEvent=0
+     do while ( .true. ) 
+         NEvent=NEvent + 1
+         read(16,fmt=InputFmt0) EventNumPart,EventInfoLine!  read number of particle from the first line after <event> and other info
+!        read event lines
+         do nline=1,EventNumPart
+            read(16,fmt="(A160)") EventLine(nline)
+         enddo
+         if( EventNumPart.lt.3 .or. EventNumPart.gt.maxpart ) then
+            call Error("Number of particles in LHE input exceeds allowed limit",EventNumPart)
+         endif
+
+ !       convert event lines into variables assuming that the Higgs resonance has ID 25
+         nparton = 0
+         do nline=1,EventNumPart
+            read(EventLine(nline),fmt=InputFmt1) LHE_IDUP(nline),IntExt(nline),LHE_MOTHUP(1,nline),LHE_MOTHUP(2,nline),LHE_ICOLUP(1,nline),LHE_ICOLUP(2,nline),MomExt(2,nline),MomExt(3,nline),MomExt(4,nline),MomExt(1,nline),Mass(nline)
+            if( abs(LHE_IDUP(nline)).eq.25 ) then!   select the Higgs (ID=25, h0)
+                  MomHiggs(1:4) = MomExt(1:4,nline)
+                  pH2sq = dsqrt(abs(MomHiggs(1:4).dot.MomHiggs(1:4)))
+            else
+                  nparton = nparton + 1
+                  MomParton(1:4,nparton) = MomExt(1:4,nline)
+                  LHE_IDUP_Part(nparton) = LHE_IDUP(nline)
+                  LHE_ICOLUP_Part(1:2,nparton) = LHE_ICOLUP(1:2,nline)
+                  LHE_MOTHUP_Part(1:2,nparton) = LHE_MOTHUP(1:2,nline)
+            endif
+            
+            if( IntExt(nline).eq.2 .and. (LHE_IDUP(nline).eq.convertLHE(Z0_) .or. LHE_IDUP(nline).eq.convertLHE(Wp_) .or. LHE_IDUP(nline).eq.convertLHE(Wm_)) ) then
+               convertparent = nline
+            endif 
+         enddo! nline
+         
+         call random_number(xRnd)
+         do nline=1,EventNumPart
+              if( LHE_MOTHUP(1,nline).eq.convertparent .and. LHE_MOTHUP(2,nline).eq.convertparent ) then! found a decay particle
+                  if( LHE_IDUP(convertparent).eq.convertLHE(Z0_) .and. LHE_IDUP(nline).gt.0 ) then
+                         LHE_IDUP(nline) = convertLHE( ZQuaBranching(xRnd) )   
+                         LHE_ICOLUP(1:2,nline) = (/505,0/)
+                  elseif( LHE_IDUP(convertparent).eq.convertLHE(Z0_) .and. LHE_IDUP(nline).lt.0 ) then
+                         LHE_IDUP(nline) = convertLHE( -ZQuaBranching(xRnd) )    
+                         LHE_ICOLUP(1:2,nline) = (/0,505/)                      
+                  elseif( LHE_IDUP(convertparent).eq.convertLHE(Wp_) .and. LHE_IDUP(nline).gt.0 ) then
+                         LHE_IDUP(nline) = convertLHE( WQuaUpBranching(xRnd) )   
+                         LHE_ICOLUP(1:2,nline) = (/505,0/)
+                  elseif( LHE_IDUP(convertparent).eq.convertLHE(Wp_) .and. LHE_IDUP(nline).lt.0 ) then
+                         LHE_IDUP(nline) = convertLHE( - SU2flip(WQuaUpBranching(xRnd)) )  
+                         LHE_ICOLUP(1:2,nline) = (/0,505/)
+                  elseif( LHE_IDUP(convertparent).eq.convertLHE(Wm_) .and. LHE_IDUP(nline).gt.0 ) then
+                         LHE_IDUP(nline) = convertLHE( Su2flip(WQuaUpBranching(xRnd)) )   
+                         LHE_ICOLUP(1:2,nline) = (/505,0/)
+                  elseif( LHE_IDUP(convertparent).eq.convertLHE(Wm_) .and. LHE_IDUP(nline).lt.0 ) then
+                         LHE_IDUP(nline) = convertLHE( -WQuaUpBranching(xRnd) )   
+                         LHE_ICOLUP(1:2,nline) = (/0,505/)
+                  endif
+              endif
+         enddo! nline
+         
+!        read optional pdf line
+         read(16,fmt="(A160)",IOSTAT=stat,END=99) PDFLine(1:160)
+         if( .not. (PDFLine(1:4).eq."#pdf" .or. PDFLine(1:5).eq."#rwgt")) then
+             PDFLine(:)=""
+             backspace(16)
+         endif
+
+         write(io_LHEOutFile,"(A)") "<event>"
+         write(io_LHEOutFile,fmt=InputFmt0) EventNumPart,EventInfoLine!  read number of particle from the first line after <event> and other info
+         do nline=1,EventNumPart
+            write(io_LHEOutFile,fmt=InputFmt1) LHE_IDUP(nline),IntExt(nline),LHE_MOTHUP(1,nline),LHE_MOTHUP(2,nline),LHE_ICOLUP(1,nline),LHE_ICOLUP(2,nline),MomExt(2,nline),MomExt(3,nline),MomExt(4,nline),MomExt(1,nline),Mass(nline)
+         enddo         
+         write(io_LHEOutFile,"(A)") "</event>"
+         
+         
+!        skip event lines 
+         read(16,fmt="(A7)",IOSTAT=stat,END=99) FirstLines! skip <\event>
+!          if( stat.lt.0 ) exit
+         read(16,fmt="(A30)",IOSTAT=stat,END=99) FirstLines!   skip <event> or </LesHouchesEvents>
+         if( FirstLines(1:30).eq."</LesHouchesEvents>" ) exit
+!          if( NEvent.eq. VegasNc1 ) exit
+
+     enddo
+99   continue
+     call cpu_time(time_end)
+
+
+
+     
+
+
+return
+END SUBROUTINE
+
+
+
+
+
+
 SUBROUTINE OpenFiles()
 use ModParameters
 implicit none
@@ -1101,7 +1319,7 @@ logical :: dirresult
    open(unit=io_LogFile,file=trim(DataFile)//'.log',form='formatted',access= 'sequential',status='replace')              ! log file
 
 
-   if( ReadLHEFile ) then 
+   if( ReadLHEFile .or. ConvertLHEFile ) then 
       open(unit=io_LHEInFile,file=trim(LHEProdFile),form='formatted',access= 'sequential',status='old')                  ! LHE input file      
    endif
 

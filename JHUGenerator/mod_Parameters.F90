@@ -3,7 +3,7 @@ implicit none
 save
 ! 
 ! 
-character(len=6),parameter :: JHUGen_Version="v4.8.1"
+character(len=6),parameter :: JHUGen_Version="v4.9.0"
 ! 
 ! 
 integer, public :: Collider, PDFSet,PChannel,Process,DecayMode1,DecayMode2
@@ -12,7 +12,7 @@ real(8), public :: Collider_Energy
 integer, public :: VegasIt1_default,VegasNc0_default,VegasNc1_default,VegasNc2_default
 real(8), public :: VegasSeed
 integer, public :: NumHistograms
-logical, public :: unweighted,OffShellReson,OffShellV1,OffShellV2,ReadLHEFile,ReadCSmax,GenerateEvents
+logical, public :: unweighted,OffShellReson,OffShellV1,OffShellV2,ReadLHEFile,ConvertLHEFile,ReadCSmax,GenerateEvents
 integer(8), public :: EvalCounter=0
 integer(8), public :: RejeCounter=0
 integer(8), public :: AccepCounter=0
@@ -469,6 +469,14 @@ integer :: Part
       convertLHEreverse = Glu_
   elseif( Part.eq.11 ) then
       convertLHEreverse = ElM_
+  elseif( Part.eq.22 ) then
+      convertLHEreverse = Pho_
+  elseif( Part.eq.23 ) then
+      convertLHEreverse = Z0_
+  elseif( Part.eq.24 ) then
+      convertLHEreverse = Wp_
+  elseif( Part.eq.-24 ) then
+      convertLHEreverse = Wm_
   elseif( Part.eq.-11 ) then
       convertLHEreverse = ElP_
   elseif( Part.eq.13 ) then
