@@ -1109,10 +1109,10 @@ integer,parameter :: maxpart=15!=max.partons; this parameter should match the on
 real(8) :: VG_Result,VG_Error,VG_Chi2
 real(8) :: yRnd(1:22),Res,dum,EMcheck(1:4),xRnd
 real(8) :: AcceptedEvent(1:4,1:maxpart),Ehat
-real(8) :: MomExt(1:4,1:maxpart),MomHiggs(1:4),MomParton(1:4,1:maxpart),Mass(1:maxpart),pH2sq
+real(8) :: MomExt(1:4,1:maxpart),MomHiggs(1:4),MomParton(1:4,1:maxpart),Mass(1:maxpart),Spin(1:maxpart),Lifetime(1:maxpart),pH2sq
 integer :: tries, nParticle, MY_IDUP(1:7+maxpart), ICOLUP(1:2,1:7+maxpart),IntExt(1:7+maxpart),convertparent
 character(len=*),parameter :: POWHEG_Fmt0 = "(6X,I2,A160)"
-character(len=*),parameter :: POWHEG_Fmt1 = "(5X,I3,4X,I3,4X,I3,3X,I3,1X,I3,3X,I3,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9)"
+character(len=*),parameter :: POWHEG_Fmt1 = "(5X,I3,4X,I3,4X,I3,3X,I3,1X,I3,3X,I3,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9,1X,1PE12.5,1X,1PE10.3)"
 character(len=*),parameter :: JHUGen_Fmt0 = "(I2,A160)"
 character(len=*),parameter :: JHUGen_Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0)"
 character(len=*),parameter :: JHUGen_old_Fmt0 = "(2X,I2,A160)"
@@ -1219,7 +1219,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
  !       convert event lines into variables assuming that the Higgs resonance has ID 25
          nparton = 0
          do nline=1,EventNumPart
-            read(EventLine(nline),fmt=InputFmt1) LHE_IDUP(nline),IntExt(nline),LHE_MOTHUP(1,nline),LHE_MOTHUP(2,nline),LHE_ICOLUP(1,nline),LHE_ICOLUP(2,nline),MomExt(2,nline),MomExt(3,nline),MomExt(4,nline),MomExt(1,nline),Mass(nline)
+            read(EventLine(nline),fmt=InputFmt1) LHE_IDUP(nline),IntExt(nline),LHE_MOTHUP(1,nline),LHE_MOTHUP(2,nline),LHE_ICOLUP(1,nline),LHE_ICOLUP(2,nline),MomExt(2,nline),MomExt(3,nline),MomExt(4,nline),MomExt(1,nline),Mass(nline),Spin(nline),Lifetime(nline)
             if( abs(LHE_IDUP(nline)).eq.25 ) then!   select the Higgs (ID=25, h0)
                   MomHiggs(1:4) = MomExt(1:4,nline)
                   pH2sq = dsqrt(abs(MomHiggs(1:4).dot.MomHiggs(1:4)))
@@ -1260,30 +1260,44 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                   endif
               endif
          enddo! nline
-         
-!        read optional pdf line
-         read(16,fmt="(A160)",IOSTAT=stat,END=99) PDFLine(1:160)
-         if( .not. (PDFLine(1:4).eq."#pdf" .or. PDFLine(1:5).eq."#rwgt")) then
-             PDFLine(:)=""
-             backspace(16)
-         endif
 
          write(io_LHEOutFile,"(A)") "<event>"
          write(io_LHEOutFile,fmt=InputFmt0) EventNumPart,EventInfoLine!  read number of particle from the first line after <event> and other info
          do nline=1,EventNumPart
-            write(io_LHEOutFile,fmt=InputFmt1) LHE_IDUP(nline),IntExt(nline),LHE_MOTHUP(1,nline),LHE_MOTHUP(2,nline),LHE_ICOLUP(1,nline),LHE_ICOLUP(2,nline),MomExt(2,nline),MomExt(3,nline),MomExt(4,nline),MomExt(1,nline),Mass(nline)
+            write(io_LHEOutFile,fmt=InputFmt1) LHE_IDUP(nline),IntExt(nline),LHE_MOTHUP(1,nline),LHE_MOTHUP(2,nline),LHE_ICOLUP(1,nline),LHE_ICOLUP(2,nline),MomExt(2,nline),MomExt(3,nline),MomExt(4,nline),MomExt(1,nline),Mass(nline),Spin(nline),Lifetime(nline)
          enddo         
-         write(io_LHEOutFile,"(A)") "</event>"
          
-         
-!        skip event lines 
-         read(16,fmt="(A7)",IOSTAT=stat,END=99) FirstLines! skip <\event>
-!          if( stat.lt.0 ) exit
-         read(16,fmt="(A30)",IOSTAT=stat,END=99) FirstLines!   skip <event> or </LesHouchesEvents>
-         if( FirstLines(1:30).eq."</LesHouchesEvents>" ) exit
-!          if( NEvent.eq. VegasNc1 ) exit
+! !        read optional lines
+!          read(16,fmt="(A160)",IOSTAT=stat,END=99) PDFLine(1:160)
+!          if( PDFLine(1:1).ne."#" ) then
+!              PDFLine(:)=""
+!              backspace(16)
+!          else
+!              write(io_LHEOutFile,fmt="(A)") trim(PDFLine)
+!          endif
+!          write(io_LHEOutFile,"(A)") "</event>"         
+!          
+! !        skip event lines 
+!          read(16,fmt="(A7)",IOSTAT=stat,END=99) FirstLines! skip <\event>
+!          read(16,fmt="(A30)",IOSTAT=stat,END=99) FirstLines!   skip <event> or </LesHouchesEvents>
+!          if( FirstLines(1:30).eq."</LesHouchesEvents>" ) exit
 
+
+!        read optional lines
+         do while (.true.) 
+              read(16,fmt="(A160)",IOSTAT=stat,END=99) PDFLine(1:160)
+              if(PDFLine(1:30).eq."</LesHouchesEvents>") then
+                  goto 99
+              elseif( PDFLine(1:8).eq."</event>" ) then
+                  write(io_LHEOutFile,"(A)") "</event>"
+              elseif( PDFLine(1:8).eq."<event>" ) then
+                  exit
+              else
+                  write(io_LHEOutFile,fmt="(A)") trim(PDFLine)
+              endif
+         enddo
      enddo
+     
 99   continue
      call cpu_time(time_end)
 
@@ -2029,6 +2043,7 @@ implicit none
         write(io_stdout,"(4X,A)") "Interf:     0=neglect interference for 4f final states, 1=include interference"
         write(io_stdout,"(4X,A)") "DataFile:   LHE output file"
         write(io_stdout,"(4X,A)") "ReadLHE:    LHE input file from external file (only spin-0)"
+        write(io_stdout,"(4X,A)") "ConvertLHE: LHE input file from external file (only spin-0)"
         write(io_stdout,*) ""
 
 END SUBROUTINE
