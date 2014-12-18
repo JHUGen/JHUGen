@@ -19,6 +19,7 @@ int main(void){
   double Gqqcoupl[2][2];
   double Gggcoupl[5][2];
   double Gvvcoupl[10][2];
+  double TTBHcoupl[2][2];
 
   Hggcoupl[0][0]=1.0;  Hggcoupl[0][1]=0.0;    // ghz2  // first/second number is the real/imaginary part
   Hggcoupl[1][0]=0.0;  Hggcoupl[1][1]=0.0;    // ghz3 
@@ -87,6 +88,8 @@ int main(void){
   Gvvcoupl[8][0]=0.0;  Gvvcoupl[8][1]=0.0;
   Gvvcoupl[9][0]=0.0;  Gvvcoupl[9][1]=0.0;
 
+  TTBHcoupl[0][0]=1.0; TTBHcoupl[0][1]=0.0;   //  kappa
+  TTBHcoupl[1][0]=0.0; TTBHcoupl[1][1]=0.0;   //  kappa_tilde
   
 // particle ID: +7=e+,  -7=e-,  +8=mu+,  -8=mu-
   MYIDUP[0]=+7;
@@ -204,8 +207,6 @@ int main(void){
  printf("ratio: %20.17e \n ",MatElSq/3.50330723427981412e-09);
 
 
-
-
  Ptth[0][0] = -(3.2772203957555925);
  Ptth[0][1] = -(0.0000000000000000);
  Ptth[0][2] = -(0.0000000000000000);
@@ -234,14 +235,14 @@ int main(void){
  MReso = 125.60;
  __modttbh_MOD_initprocess_ttbh(&MReso);
 
- __modttbh_MOD_evalamp_gg_ttbh(Ptth, &MatElSq);
+ __modttbh_MOD_evalamp_gg_ttbh(Ptth, TTBHcoupl ,&MatElSq);
  printf("\n ");
  printf("no production dynamics\n ");
  printf("Matr.el. squared (gg->ttbh): %20.17e \n ",MatElSq);
  printf("result should be (gg->ttbh): %20.17e \n ",9.23970258835623247e-003);
  printf("ratio: %20.17e \n ",MatElSq/9.23970258835623247e-003);
 
- __modttbh_MOD_evalamp_qqb_ttbh(Ptth, &MatElSq);
+ __modttbh_MOD_evalamp_qqb_ttbh(Ptth, TTBHcoupl, &MatElSq);
  printf("\n ");
  printf("no production dynamics\n ");
  printf("Matr.el. squared (qqb->ttbh): %20.17e \n ",MatElSq);

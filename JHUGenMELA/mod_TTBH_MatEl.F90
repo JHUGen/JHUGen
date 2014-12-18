@@ -6,8 +6,7 @@ public :: EvalAmp_GG_TTBH,EvalAmp_QQB_TTBH,InitProcess_TTBH
 
 private
 
-      
-      
+complex(8) :: couplHTT_right_dyn, couplHTT_left_dyn
 integer,parameter :: ColorlessTag = 1
 
 
@@ -171,17 +170,20 @@ END SUBROUTINE
       
 
       
-SUBROUTINE EvalAmp_GG_TTBH(Mom,SqAmp)
+SUBROUTINE EvalAmp_GG_TTBH(Mom,TTBHcoupl,SqAmp)
 ! use ModTopDecay
 implicit none
 real(8) :: Mom(1:4,1:13),SqAmp
-complex(8) :: ResOffSh(1:4,1:2),Res(1:2,1:2)
+complex(8) :: ResOffSh(1:4,1:2),Res(1:2,1:2),TTBHcoupl(1:2)
 complex(8) :: GluPol(1:4,1:2,1:2)
 integer :: hel4,TopHel1,TopHel2,nhel
 real(8),parameter :: c_aa=64.D0/3.D0, c_ab=-8.D0/3.D0
 include 'includeVars.F90'
 SqAmp = 0d0
 
+
+     couplHTT_right_dyn = m_top/vev/2d0 * ( TTBHcoupl(1) + (0d0,1d0)*TTBHcoupl(2) )
+     couplHTT_left_dyn  = m_top/vev/2d0 * ( TTBHcoupl(1) - (0d0,1d0)*TTBHcoupl(2) )
 
      ExtParticles(1)%Mom(1:4) = Mom(1:4,4)
      ExtParticles(2)%Mom(1:4) = Mom(1:4,5)
@@ -243,17 +245,19 @@ END SUBROUTINE
       
 
       
-SUBROUTINE EvalAmp_QQB_TTBH(Mom,SqAmp)
+SUBROUTINE EvalAmp_QQB_TTBH(Mom,TTBHcoupl,SqAmp)
 ! use ModTopDecay
 implicit none
 real(8) :: Mom(1:4,1:13),SqAmp
-complex(8) :: ResOffSh(1:4),Res(1:2)
+complex(8) :: ResOffSh(1:4),Res(1:2),TTBHcoupl(1:2)
 complex(8) :: QuaPol(1:4,1:2,1:2)
 integer :: hel4,TopHel1,TopHel2,nhel
 real(8),parameter :: c_aa=8.0D0
 include 'includeVars.F90'
 SqAmp = 0d0
 
+     couplHTT_right_dyn = m_top/vev/2d0 * ( TTBHcoupl(1) + (0d0,1d0)*TTBHcoupl(2) )
+     couplHTT_left_dyn  = m_top/vev/2d0 * ( TTBHcoupl(1) - (0d0,1d0)*TTBHcoupl(2) )
 
      ExtParticles(1)%Mom(1:4) = Mom(1:4,4)
      ExtParticles(2)%Mom(1:4) = Mom(1:4,5)

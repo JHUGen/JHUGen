@@ -78,10 +78,10 @@ include './variables.F90'
 
 
 !  couplings for ttbar+H
-   complex(8), parameter :: kappa       = (1d0,0d0)
-   complex(8), parameter :: kappa_tilde = (0d0,0d0) 
-   complex(8), parameter :: couplHTT_right_dyn = m_top/vev/2d0 * ( kappa + (0d0,1d0)*kappa_tilde )
-   complex(8), parameter :: couplHTT_left_dyn  = m_top/vev/2d0 * ( kappa - (0d0,1d0)*kappa_tilde )
+!    complex(8), parameter :: kappa       = (1d0,0d0)
+!    complex(8), parameter :: kappa_tilde = (0d0,0d0) 
+!    complex(8), parameter :: couplHTT_right_dyn = m_top/vev/2d0 * ( kappa + (0d0,1d0)*kappa_tilde )
+!    complex(8), parameter :: couplHTT_left_dyn  = m_top/vev/2d0 * ( kappa - (0d0,1d0)*kappa_tilde )
 
 
 
