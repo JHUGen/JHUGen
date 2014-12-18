@@ -1055,12 +1055,30 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
           endif
 
 !        skip event lines 
-         read(16,fmt="(A7)",IOSTAT=stat,END=99) FirstLines! skip <\event>
-!          if( stat.lt.0 ) exit
-         read(16,fmt="(A30)",IOSTAT=stat,END=99) FirstLines!   skip <event> or </LesHouchesEvents>
-         if( FirstLines(1:30).eq."</LesHouchesEvents>" ) exit
-         if( NEvent.eq. VegasNc1 ) exit
+!          read(16,fmt="(A7)",IOSTAT=stat,END=99) FirstLines! skip <\event>
+! !          if( stat.lt.0 ) exit
+!          read(16,fmt="(A30)",IOSTAT=stat,END=99) FirstLines!   skip <event> or </LesHouchesEvents>
+!          if( FirstLines(1:30).eq."</LesHouchesEvents>" ) exit
+!          if( NEvent.eq. VegasNc1 ) exit
 
+         
+
+!        read optional lines
+         do while (.true.) 
+              read(16,fmt="(A160)",IOSTAT=stat,END=99) PDFLine(1:160)
+              if(PDFLine(1:30).eq."</LesHouchesEvents>") then
+                  goto 99
+              elseif( PDFLine(1:8).eq."</event>" ) then
+                  write(io_LHEOutFile,"(A)") "</event>"
+              elseif( PDFLine(1:8).eq."<event>" ) then
+                  exit
+              else
+                  write(io_LHEOutFile,fmt="(A)") trim(PDFLine)
+              endif
+         enddo         
+         
+         
+         
      enddo
 99   continue
      call cpu_time(time_end)
@@ -1234,8 +1252,13 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
             if( IntExt(nline).eq.2 .and. (LHE_IDUP(nline).eq.convertLHE(Z0_) .or. LHE_IDUP(nline).eq.convertLHE(Wp_) .or. LHE_IDUP(nline).eq.convertLHE(Wm_)) ) then
                convertparent = nline
             endif 
+            
+! print *, nline
+! print *, MomExt(1:4,nline)
+! print *, get_MInv(MomExt(1:4,nline))
          enddo! nline
-         
+! pause
+
          call random_number(xRnd)
          do nline=1,EventNumPart
               if( LHE_MOTHUP(1,nline).eq.convertparent .and. LHE_MOTHUP(2,nline).eq.convertparent ) then! found a decay particle
