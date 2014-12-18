@@ -19,6 +19,7 @@ real(8),  parameter :: alphas = 0.13229060d0
 complex(8) :: Hggcoupl(1:3),Hzzcoupl(1:39),Hwwcoupl(1:32)
 complex(8) :: Zqqcoupl(1:2),Zzzcoupl(1:2)
 complex(8) :: Gggcoupl(1:5),Gqqcoupl(1:2),Gzzcoupl(1:10)
+complex(8) :: TTBHcoupl(1:2)
 integer :: i, j
 
 
@@ -254,12 +255,14 @@ integer :: i, j
    p13(1:4,10) = +(/    0.34622959545354920d0,      -2.44789896017240799d-002, -0.32712245562490633d0,      -0.11075473290987667d0         /)
    p13(1:4,11) = +(/     1.1854508301754154d0,       0.43509768908690516d0,      -0.61021720728132500d0,       0.91848714288910793d0        /)
     
+   TTBHcoupl(1) = (1d0,0d0)
+   TTBHcoupl(2) = (0d0,0d0)
 
    m_Reso=125.6d0
    call InitProcess_TTBH(m_Reso)
-   call EvalAmp_GG_TTBH(p13(1:4,1:13),MatElSq)
+   call EvalAmp_GG_TTBH(p13(1:4,1:13),TTBHcoupl,MatElSq)
    print *, 'Matr.el. squared,gg->ttbH',MatElSq,MatElSq/9.23970258835623247d-003
-   call EvalAmp_QQB_TTBH(p13(1:4,1:13),MatElSq)
+   call EvalAmp_QQB_TTBH(p13(1:4,1:13),TTBHcoupl,MatElSq)
    print *, 'Matr.el. squared,qqb->ttbH',MatElSq,MatElSq/5.00600468807961274d-002
 
   
