@@ -343,8 +343,33 @@ write(io_LHEOutFile,"(A)") "</event>"
 ! print * ,"check ", LHE_IDUP(9),L22Mass
 ! pause
 
+RETURN
 END SUBROUTINE
 
+
+
+SUBROUTINE ShiftMass(p1,p2,m1,m2,p1hat,p2hat)
+use ModMisc
+implicit none
+real(8) :: p1(1:4),p2(1:4),m1,m2,p1hat(1:4),p2hat(1:4)
+real(8) :: xi,eta,a,b,c,p1sq,p2sq,p1p2
+
+  p1sq = p1(1:4).dot.p1(1:4)
+  p2sq = p2(1:4).dot.p2(1:4)
+  p1p2 = p1(1:4).dot.p2(1:4)
+
+  a = ( p1sq*p2(1:4) - p2sq*p1(1:4) + p1p2*(p2(1:4)-p1(1:4)) ).dot.( p1sq*p2(1:4) - p2sq*p1(1:4) + p1p2*(p2(1:4)-p1(1:4)) )
+  b = ( p1sq+p2sq+2d0*p1p2+m2**2-m1**2 ) * ( p1p2**2 - p1sq*p2sq )
+  c = 0.25d0*( p1sq+p2sq+2d0*p1p2+m2**2-m1**2 )**2*p1sq - (p1sq+p1p2)**2*m2**2
+  eta = 1d0/2d0/a * ( -b - dsqrt( dabs(b**2 -4d0*a*c) ) )
+  xi = ( p1sq+p2sq+2d0*p1p2 + m2**2 - m1**2 - 2d0*eta*(p2sq+p1p2) )/2d0/( p1sq + p1p2 )
+
+  p2hat(1:4) = xi*p1(1:4) + eta*p2(1:4)
+  p1hat(1:4) = (1d0-xi)*p1(1:4) + (1d0-eta)*p2(1:4)
+
+
+RETURN
+END SUBROUTINE
 
 
 

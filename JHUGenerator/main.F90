@@ -1061,23 +1061,24 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
 !          if( FirstLines(1:30).eq."</LesHouchesEvents>" ) exit
 !          if( NEvent.eq. VegasNc1 ) exit
 
-         
 
 !        read optional lines
+         FirstEvent = .true.
          do while (.true.) 
-              read(16,fmt="(A160)",IOSTAT=stat,END=99) PDFLine(1:160)
-              if(PDFLine(1:30).eq."</LesHouchesEvents>") then
+              read(16,fmt="(A160)",IOSTAT=stat,END=99) EventInfoLine(1:160)
+              if(EventInfoLine(1:30).eq."</LesHouchesEvents>") then
                   goto 99
-              elseif( PDFLine(1:8).eq."</event>" ) then
-                  write(io_LHEOutFile,"(A)") "</event>"
-              elseif( PDFLine(1:8).eq."<event>" ) then
+              elseif( EventInfoLine(1:8).eq."<event>" ) then
                   exit
-              else
-                  write(io_LHEOutFile,fmt="(A)") trim(PDFLine)
+              else!if there are "#" comments
+                  if( FirstEvent ) then 
+                      backspace(io_LHEOutFile)! remove "</event>" from WriteOutEvent
+                      FirstEvent = .false.
+                  endif
+                  write(io_LHEOutFile,fmt="(A)") trim(EventInfoLine)
               endif
          enddo         
-         
-         
+
          
      enddo
 99   continue
@@ -1126,16 +1127,16 @@ include 'csmaxvalue.f'
 integer,parameter :: maxpart=15!=max.partons; this parameter should match the one in WriteOutEvent of mod_Kinematics
 real(8) :: VG_Result,VG_Error,VG_Chi2
 real(8) :: yRnd(1:22),Res,dum,EMcheck(1:4),xRnd
-real(8) :: AcceptedEvent(1:4,1:maxpart),Ehat
-real(8) :: MomExt(1:4,1:maxpart),MomHiggs(1:4),MomParton(1:4,1:maxpart),Mass(1:maxpart),Spin(1:maxpart),Lifetime(1:maxpart),pH2sq
+real(8) :: AcceptedEvent(1:4,1:maxpart),Ehat,pH2sq
+real(8) :: MomExt(1:4,1:maxpart),MomShift(1:4,1:maxpart),MomHiggs(1:4),MomParton(1:4,1:maxpart),Mass(1:maxpart),Spin(1:maxpart),Lifetime(1:maxpart)
 integer :: tries, nParticle, MY_IDUP(1:7+maxpart), ICOLUP(1:2,1:7+maxpart),IntExt(1:7+maxpart),convertparent
-character(len=*),parameter :: POWHEG_Fmt0 = "(6X,I2,A160)"
+character(len=*),parameter :: POWHEG_Fmt0 = "(6X,I2,A120)"
 character(len=*),parameter :: POWHEG_Fmt1 = "(5X,I3,4X,I3,4X,I3,3X,I3,1X,I3,3X,I3,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9,1X,1PE12.5,1X,1PE10.3)"
-character(len=*),parameter :: JHUGen_Fmt0 = "(I2,A160)"
+character(len=*),parameter :: JHUGen_Fmt0 = "(I2,A120)"
 character(len=*),parameter :: JHUGen_Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0)"
 character(len=*),parameter :: JHUGen_old_Fmt0 = "(2X,I2,A160)"
 character(len=*),parameter :: JHUGen_old_Fmt1 = "(I3,X,I2,X,I2,X,I2,X,I3,X,I3,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7)"
-character(len=*),parameter :: MadGra_Fmt0 = "(I2,A160)"
+character(len=*),parameter :: MadGra_Fmt0 = "(I2,A120)"
 character(len=*),parameter :: MadGra_Fmt1 = "(7X,I3,2X,I3,3X,I2,3X,I2,3X,I3,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1F3.0,X,1F3.0)"
 character(len=150) :: InputFmt0,InputFmt1
 logical :: FirstEvent,M_ResoSet
@@ -1143,9 +1144,10 @@ integer :: nline,intDummy,Nevent
 integer :: LHE_IDUP(1:maxpart+3),   LHE_ICOLUP(1:2,1:maxpart+3),   LHE_MOTHUP(1:2,1:maxpart+3)
 integer :: LHE_IDUP_Part(1:maxpart),LHE_ICOLUP_Part(1:2,1:maxpart),LHE_MOTHUP_Part(1:2,1:maxpart+3)
 integer :: EventNumPart,nparton
-character(len=160) :: FirstLines,EventInfoLine,PDFLine
+character(len=160) :: FirstLines
+character(len=120) :: EventInfoLine,PDFLine
 character(len=160) :: EventLine(1:maxpart+3)
-integer :: n,clock,i,stat
+integer :: n,clock,i,stat,DecayParticles(1:2)
 integer, dimension(:), allocatable :: gfort_seed
 integer,parameter :: InputLHEFormat = 1  !  1=POWHEG, 2=JHUGen (old format), 3=JHUGen (new format), 4=MadGraph
 
@@ -1218,8 +1220,6 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
      write(io_LogFile,"(A)") ""
 
 
-
-
      print *, " converting events"
      call cpu_time(time_start)
      NEvent=0
@@ -1252,43 +1252,78 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
             if( IntExt(nline).eq.2 .and. (LHE_IDUP(nline).eq.convertLHE(Z0_) .or. LHE_IDUP(nline).eq.convertLHE(Wp_) .or. LHE_IDUP(nline).eq.convertLHE(Wm_)) ) then
                convertparent = nline
             endif 
-            
 ! print *, nline
 ! print *, MomExt(1:4,nline)
 ! print *, get_MInv(MomExt(1:4,nline))
          enddo! nline
 ! pause
 
+
+
+
+! print *, get_MInv2(MomExt(1:4,5)),get_MInv2(MomExt(1:4,6))
+! call ShiftMass(MomExt(1:4,5),MomExt(1:4,6),0d0,0d0,MomExt(1:4,1),MomExt(1:4,2))
+! print *, get_MInv2(MomExt(1:4,1)),get_MInv2(MomExt(1:4,2))
+! 
+! print *, MomExt(1:4,5)+MomExt(1:4,6) - MomExt(1:4,1)-MomExt(1:4,2)
+! print *, MomExt(1:4,5) - MomExt(1:4,1)
+! print *, MomExt(1:4,6) - MomExt(1:4,2)
+! pause
+
          call random_number(xRnd)
+         MomShift(:,:) = MomExt(:,:)
+         i=1
          do nline=1,EventNumPart
               if( LHE_MOTHUP(1,nline).eq.convertparent .and. LHE_MOTHUP(2,nline).eq.convertparent ) then! found a decay particle
                   if( LHE_IDUP(convertparent).eq.convertLHE(Z0_) .and. LHE_IDUP(nline).gt.0 ) then
                          LHE_IDUP(nline) = convertLHE( ZQuaBranching(xRnd) )   
                          LHE_ICOLUP(1:2,nline) = (/505,0/)
+                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
+                         DecayParticles(i) = nline; i=i+1;
                   elseif( LHE_IDUP(convertparent).eq.convertLHE(Z0_) .and. LHE_IDUP(nline).lt.0 ) then
                          LHE_IDUP(nline) = convertLHE( -ZQuaBranching(xRnd) )    
-                         LHE_ICOLUP(1:2,nline) = (/0,505/)                      
+                         LHE_ICOLUP(1:2,nline) = (/0,505/)
+                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
+                         DecayParticles(i) = nline; i=i+1;                      
                   elseif( LHE_IDUP(convertparent).eq.convertLHE(Wp_) .and. LHE_IDUP(nline).gt.0 ) then
                          LHE_IDUP(nline) = convertLHE( WQuaUpBranching(xRnd) )   
                          LHE_ICOLUP(1:2,nline) = (/505,0/)
+                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
+                         DecayParticles(i) = nline; i=i+1;
                   elseif( LHE_IDUP(convertparent).eq.convertLHE(Wp_) .and. LHE_IDUP(nline).lt.0 ) then
                          LHE_IDUP(nline) = convertLHE( - SU2flip(WQuaUpBranching(xRnd)) )  
                          LHE_ICOLUP(1:2,nline) = (/0,505/)
+                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
+                         DecayParticles(i) = nline; i=i+1;
                   elseif( LHE_IDUP(convertparent).eq.convertLHE(Wm_) .and. LHE_IDUP(nline).gt.0 ) then
                          LHE_IDUP(nline) = convertLHE( Su2flip(WQuaUpBranching(xRnd)) )   
                          LHE_ICOLUP(1:2,nline) = (/505,0/)
+                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
+                         DecayParticles(i) = nline; i=i+1;
                   elseif( LHE_IDUP(convertparent).eq.convertLHE(Wm_) .and. LHE_IDUP(nline).lt.0 ) then
                          LHE_IDUP(nline) = convertLHE( -WQuaUpBranching(xRnd) )   
                          LHE_ICOLUP(1:2,nline) = (/0,505/)
+                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
+                         DecayParticles(i) = nline; i=i+1;
                   endif
               endif
          enddo! nline
-
+         
+         call ShiftMass(MomExt(1:4,DecayParticles(1)),MomExt(1:4,DecayParticles(2)),         &
+                        getMass( convertLHEreverse(LHE_IDUP(DecayParticles(1))) ), getMass( convertLHEreverse(LHE_IDUP(DecayParticles(2))) ),                                                &
+                        MomShift(1:4,DecayParticles(1)),MomShift(1:4,DecayParticles(2)))
+         
+!          print *, get_MInv2(MomShift(1:4,DecayParticles(1)))
+!          print *, get_MInv2(MomShift(1:4,DecayParticles(2)))
+!          print *, MomShift(1:4,DecayParticles(1))
+!          print *, MomShift(1:4,DecayParticles(2))
+!          pause
+         
          write(io_LHEOutFile,"(A)") "<event>"
          write(io_LHEOutFile,fmt=InputFmt0) EventNumPart,EventInfoLine!  read number of particle from the first line after <event> and other info
          do nline=1,EventNumPart
-            write(io_LHEOutFile,fmt=InputFmt1) LHE_IDUP(nline),IntExt(nline),LHE_MOTHUP(1,nline),LHE_MOTHUP(2,nline),LHE_ICOLUP(1,nline),LHE_ICOLUP(2,nline),MomExt(2,nline),MomExt(3,nline),MomExt(4,nline),MomExt(1,nline),Mass(nline),Spin(nline),Lifetime(nline)
-         enddo         
+            write(io_LHEOutFile,fmt=InputFmt1) LHE_IDUP(nline),IntExt(nline),LHE_MOTHUP(1,nline),LHE_MOTHUP(2,nline),LHE_ICOLUP(1,nline),LHE_ICOLUP(2,nline),MomShift(2,nline),MomShift(3,nline),MomShift(4,nline),MomShift(1,nline),Mass(nline),Spin(nline),Lifetime(nline)
+         enddo
          
 ! !        read optional lines
 !          read(16,fmt="(A160)",IOSTAT=stat,END=99) PDFLine(1:160)
@@ -1308,7 +1343,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
 
 !        read optional lines
          do while (.true.) 
-              read(16,fmt="(A160)",IOSTAT=stat,END=99) PDFLine(1:160)
+              read(16,fmt="(A120)",IOSTAT=stat,END=99) PDFLine(1:120)
               if(PDFLine(1:30).eq."</LesHouchesEvents>") then
                   goto 99
               elseif( PDFLine(1:8).eq."</event>" ) then
@@ -1323,11 +1358,6 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
      
 99   continue
      call cpu_time(time_end)
-
-
-
-     
-
 
 return
 END SUBROUTINE
