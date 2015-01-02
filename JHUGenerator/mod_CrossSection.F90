@@ -1253,7 +1253,7 @@ endif
 elseif(DecayMode1.eq.1)then
   id(3)=convertLHE(Z0_)
   id(4)=convertLHE(Z0_)
-  id(6)=convertLHE(ZQuaBranching(yRnd(5)))
+  id(6)=convertLHE(ZQuaBranching_flat(yRnd(5)))
   id(7)=-id(6)
 
 elseif(DecayMode1.eq.2)then

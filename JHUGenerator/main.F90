@@ -40,7 +40,6 @@ logical,parameter :: useBetaVersion=.false.! this should be set to .false.
    call CloseFiles()
    write(io_stdout,*) " Done"
 
-
 END PROGRAM
 
 
@@ -201,6 +200,10 @@ integer :: NumArgs,NArg,OffShell_XVV,iunwgt,CountArg,iinterf
 !         print *, "off shell Z/W's only allowed for spin 0,2 resonance"
 ! !         stop
 !     endif
+
+    if( ConvertLHEFile ) then
+       DecayMode2 = DecayMode1
+    endif 
 
     if(Process.eq.50)then
       DecayMode2=DecayMode1
@@ -1270,42 +1273,211 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
 ! print *, MomExt(1:4,6) - MomExt(1:4,2)
 ! pause
 
+
+
+
+! MARKUS: NOTE converts only Z-->Z and W-->W, and not Z-->W;
+!              converts only to quarks, 2leptons, 3leptons, anything
+!              i.e. DecayMode1=0,4,8,10, 1,5, 9,11
+
          call random_number(xRnd)
          MomShift(:,:) = MomExt(:,:)
          i=1
          do nline=1,EventNumPart
               if( LHE_MOTHUP(1,nline).eq.convertparent .and. LHE_MOTHUP(2,nline).eq.convertparent ) then! found a decay particle
-                  if( LHE_IDUP(convertparent).eq.convertLHE(Z0_) .and. LHE_IDUP(nline).gt.0 ) then
+
+               if( DecayMode1.eq.0 .and. LHE_IDUP(convertparent).eq.convertLHE(Z0_) ) then! convert Z decay products to 2 leptons
+                  if( LHE_IDUP(nline).gt.0 ) then
+                         LHE_IDUP(nline) = convertLHE( ZLepBranching(xRnd) )   
+                         LHE_ICOLUP(1:2,nline) = (/0,0/)
+                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
+                         DecayParticles(i) = nline; i=i+1;
+                  else
+                         LHE_IDUP(nline) = convertLHE( -ZLepBranching(xRnd) )    
+                         LHE_ICOLUP(1:2,nline) = (/0,0/)
+                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
+                         DecayParticles(i) = nline; i=i+1;
+                  endif
+
+               elseif( DecayMode1.eq.4 .and. LHE_IDUP(convertparent).eq.convertLHE(Wp_) ) then! convert W+ decay products to 2 leptons
+                  if( LHE_IDUP(nline).gt.0 ) then
+                         LHE_IDUP(nline) = convertLHE( WLepBranching(xRnd) )   
+                         LHE_ICOLUP(1:2,nline) = (/0,0/)
+                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
+                         DecayParticles(i) = nline; i=i+1;
+                  else
+                         LHE_IDUP(nline) = convertLHE( - SU2flip(WLepBranching(xRnd)) )  
+                         LHE_ICOLUP(1:2,nline) = (/0,0/)
+                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
+                         DecayParticles(i) = nline; i=i+1;
+                  endif
+
+               elseif( DecayMode1.eq.4 .and. LHE_IDUP(convertparent).eq.convertLHE(Wm_) ) then! convert W- decay products to 2 leptons
+                  if( LHE_IDUP(nline).gt.0 ) then
+                         LHE_IDUP(nline) = convertLHE( Su2flip(WLepBranching(xRnd)) )   
+                         LHE_ICOLUP(1:2,nline) = (/0,0/)
+                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
+                         DecayParticles(i) = nline; i=i+1;
+                  else
+                         LHE_IDUP(nline) = convertLHE( -WLepBranching(xRnd) )   
+                         LHE_ICOLUP(1:2,nline) = (/0,0/)
+                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
+                         DecayParticles(i) = nline; i=i+1;
+                  endif
+
+               elseif( DecayMode1.eq.8 .and. LHE_IDUP(convertparent).eq.convertLHE(Z0_) ) then! convert Z decay products to 3 leptons
+                  if( LHE_IDUP(nline).gt.0 ) then
+                         LHE_IDUP(nline) = convertLHE( ZLepPlusTauBranching(xRnd) )   
+                         LHE_ICOLUP(1:2,nline) = (/0,0/)
+                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
+                         DecayParticles(i) = nline; i=i+1;
+                  else
+                         LHE_IDUP(nline) = convertLHE( -ZLepPlusTauBranching(xRnd) )    
+                         LHE_ICOLUP(1:2,nline) = (/0,0/)
+                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
+                         DecayParticles(i) = nline; i=i+1;
+                  endif
+
+               elseif( DecayMode1.eq.10 .and. LHE_IDUP(convertparent).eq.convertLHE(Wp_) ) then! convert W+ decay products to 3 leptons
+                  if( LHE_IDUP(nline).gt.0 ) then
+                         LHE_IDUP(nline) = convertLHE( WLepPlusTauBranching(xRnd) )   
+                         LHE_ICOLUP(1:2,nline) = (/0,0/)
+                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
+                         DecayParticles(i) = nline; i=i+1;
+                  else
+                         LHE_IDUP(nline) = convertLHE( - SU2flip(WLepPlusTauBranching(xRnd)) )  
+                         LHE_ICOLUP(1:2,nline) = (/0,0/)
+                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
+                         DecayParticles(i) = nline; i=i+1;
+                  endif
+
+               elseif( DecayMode1.eq.10 .and. LHE_IDUP(convertparent).eq.convertLHE(Wm_) ) then! convert W- decay products to 3 leptons
+                  if( LHE_IDUP(nline).gt.0 ) then
+                         LHE_IDUP(nline) = convertLHE( Su2flip(WLepPlusTauBranching(xRnd)) )   
+                         LHE_ICOLUP(1:2,nline) = (/0,0/)
+                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
+                         DecayParticles(i) = nline; i=i+1;
+                  else
+                         LHE_IDUP(nline) = convertLHE( -WLepPlusTauBranching(xRnd) )   
+                         LHE_ICOLUP(1:2,nline) = (/0,0/)
+                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
+                         DecayParticles(i) = nline; i=i+1;
+                  endif
+              
+               elseif( DecayMode1.eq.1 .and. LHE_IDUP(convertparent).eq.convertLHE(Z0_) ) then! convert Z decay products to quarks
+                  if( LHE_IDUP(nline).gt.0 ) then
                          LHE_IDUP(nline) = convertLHE( ZQuaBranching(xRnd) )   
                          LHE_ICOLUP(1:2,nline) = (/505,0/)
                          Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
                          DecayParticles(i) = nline; i=i+1;
-                  elseif( LHE_IDUP(convertparent).eq.convertLHE(Z0_) .and. LHE_IDUP(nline).lt.0 ) then
+                  else
                          LHE_IDUP(nline) = convertLHE( -ZQuaBranching(xRnd) )    
                          LHE_ICOLUP(1:2,nline) = (/0,505/)
                          Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
                          DecayParticles(i) = nline; i=i+1;                      
-                  elseif( LHE_IDUP(convertparent).eq.convertLHE(Wp_) .and. LHE_IDUP(nline).gt.0 ) then
+                  endif
+
+               elseif( DecayMode1.eq.5 .and. LHE_IDUP(convertparent).eq.convertLHE(Wp_) ) then! convert W+ decay products to quarks                  
+                  if( LHE_IDUP(nline).gt.0 ) then
                          LHE_IDUP(nline) = convertLHE( WQuaUpBranching(xRnd) )   
                          LHE_ICOLUP(1:2,nline) = (/505,0/)
                          Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
                          DecayParticles(i) = nline; i=i+1;
-                  elseif( LHE_IDUP(convertparent).eq.convertLHE(Wp_) .and. LHE_IDUP(nline).lt.0 ) then
+                  else
                          LHE_IDUP(nline) = convertLHE( - SU2flip(WQuaUpBranching(xRnd)) )  
                          LHE_ICOLUP(1:2,nline) = (/0,505/)
                          Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
                          DecayParticles(i) = nline; i=i+1;
-                  elseif( LHE_IDUP(convertparent).eq.convertLHE(Wm_) .and. LHE_IDUP(nline).gt.0 ) then
+                  endif
+
+               elseif( DecayMode1.eq.5 .and. LHE_IDUP(convertparent).eq.convertLHE(Wm_) ) then! convert W- decay products to quarks                  
+                  if( LHE_IDUP(nline).gt.0 ) then
                          LHE_IDUP(nline) = convertLHE( Su2flip(WQuaUpBranching(xRnd)) )   
                          LHE_ICOLUP(1:2,nline) = (/505,0/)
                          Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
                          DecayParticles(i) = nline; i=i+1;
-                  elseif( LHE_IDUP(convertparent).eq.convertLHE(Wm_) .and. LHE_IDUP(nline).lt.0 ) then
+                  else
                          LHE_IDUP(nline) = convertLHE( -WQuaUpBranching(xRnd) )   
                          LHE_ICOLUP(1:2,nline) = (/0,505/)
                          Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
                          DecayParticles(i) = nline; i=i+1;
                   endif
+              
+               elseif( DecayMode1.eq.9 .and. LHE_IDUP(convertparent).eq.convertLHE(Z0_) ) then! convert Z decay products to quarks and leptons
+                  if( LHE_IDUP(nline).gt.0 ) then
+                         LHE_IDUP(nline) = convertLHE( ZAnyBranching(xRnd) )   
+                         if( IsAQuark(convertLHEreverse(LHE_IDUP(nline))) ) then
+                             LHE_ICOLUP(1:2,nline) = (/505,0/)
+                         else
+                             LHE_ICOLUP(1:2,nline) = (/0,0/)
+                         endif
+                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
+                         DecayParticles(i) = nline; i=i+1;
+                  else
+                         LHE_IDUP(nline) = convertLHE( -ZAnyBranching(xRnd) )    
+                         if( IsAQuark(convertLHEreverse(LHE_IDUP(nline))) ) then
+                             LHE_ICOLUP(1:2,nline) = (/0,505/)
+                         else
+                             LHE_ICOLUP(1:2,nline) = (/0,0/)
+                         endif
+                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
+                         DecayParticles(i) = nline; i=i+1;                      
+                  endif
+
+! branching counter
+! if( abs(convertLHEreverse(LHE_IDUP(nline))).ge.7 .and. abs(convertLHEreverse(LHE_IDUP(nline))).le.9 ) Br_Z_ll_counter=Br_Z_ll_counter+1
+! if( abs(convertLHEreverse(LHE_IDUP(nline))).ge.14 .and. abs(convertLHEreverse(LHE_IDUP(nline))).le.16 ) Br_Z_inv_counter=Br_Z_inv_counter+1
+! if( abs(convertLHEreverse(LHE_IDUP(nline))).eq.Up_ .or.abs(convertLHEreverse(LHE_IDUP(nline))).eq.Chm_ ) Br_Z_uu_counter=Br_Z_uu_counter+1
+! if( abs(convertLHEreverse(LHE_IDUP(nline))).eq.Dn_ .or. abs(convertLHEreverse(LHE_IDUP(nline))).eq.Str_ .or. abs(convertLHEreverse(LHE_IDUP(nline))).eq.Bot_) Br_Z_dd_counter=Br_Z_dd_counter+1
+! EvalCounter=EvalCounter+1
+
+               elseif( DecayMode1.eq.11 .and. LHE_IDUP(convertparent).eq.convertLHE(Wp_) ) then! convert W+ decay products to quarks and leptons        
+!                elseif( DecayMode1.eq.11 ) then! convert W+ decay products to quarks and leptons        
+                  if( LHE_IDUP(nline).gt.0 ) then
+                         LHE_IDUP(nline) = convertLHE( WAnyBranching(xRnd) )   
+                         if( IsAQuark(convertLHEreverse(LHE_IDUP(nline))) ) then
+                              LHE_ICOLUP(1:2,nline) = (/505,0/)
+                         else
+                              LHE_ICOLUP(1:2,nline) = (/0,0/)
+                         endif
+                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
+                         DecayParticles(i) = nline; i=i+1;
+                  else
+                         LHE_IDUP(nline) = convertLHE( - SU2flip(WAnyBranching(xRnd)) )  
+                         if( IsAQuark(convertLHEreverse(LHE_IDUP(nline))) ) then
+                              LHE_ICOLUP(1:2,nline) = (/0,505/)
+                         else
+                              LHE_ICOLUP(1:2,nline) = (/0,0/)
+                         endif                         
+                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
+                         DecayParticles(i) = nline; i=i+1;
+                  endif
+
+               elseif( DecayMode1.eq.11 .and. LHE_IDUP(convertparent).eq.convertLHE(Wm_) ) then! convert W- decay products to quarks                  
+                  if( LHE_IDUP(nline).gt.0 ) then
+                         LHE_IDUP(nline) = convertLHE( Su2flip(WAnyBranching(xRnd)) )   
+                         if( IsAQuark(convertLHEreverse(LHE_IDUP(nline))) ) then
+                              LHE_ICOLUP(1:2,nline) = (/505,0/)
+                         else
+                              LHE_ICOLUP(1:2,nline) = (/0,0/)
+                         endif                         
+                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
+                         DecayParticles(i) = nline; i=i+1;
+                  else
+                         LHE_IDUP(nline) = convertLHE( -WAnyBranching(xRnd) )   
+                         if( IsAQuark(convertLHEreverse(LHE_IDUP(nline))) ) then
+                              LHE_ICOLUP(1:2,nline) = (/0,505/)
+                         else
+                              LHE_ICOLUP(1:2,nline) = (/0,0/)
+                         endif                  
+                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
+                         DecayParticles(i) = nline; i=i+1;
+                  endif
+                  
+               else
+                  call Error("Invalid DecayMode1 in StartConvertLHE")
+               endif! DecayMode
+               
               endif
          enddo! nline
          
@@ -1313,8 +1485,9 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                         getMass( convertLHEreverse(LHE_IDUP(DecayParticles(1))) ), getMass( convertLHEreverse(LHE_IDUP(DecayParticles(2))) ),                                                &
                         MomShift(1:4,DecayParticles(1)),MomShift(1:4,DecayParticles(2)))
          
-!          print *, get_MInv2(MomShift(1:4,DecayParticles(1)))
-!          print *, get_MInv2(MomShift(1:4,DecayParticles(2)))
+!          print *, getMass( convertLHEreverse(LHE_IDUP(DecayParticles(1))) ), getMass( convertLHEreverse(LHE_IDUP(DecayParticles(2))) )
+!          print *, get_MInv(MomShift(1:4,DecayParticles(1)))
+!          print *, get_MInv(MomShift(1:4,DecayParticles(2)))
 !          print *, MomShift(1:4,DecayParticles(1))
 !          print *, MomShift(1:4,DecayParticles(2))
 !          pause
@@ -1813,7 +1986,7 @@ implicit none
 
         call WriteParameters(io_LHEOutFile)
 
-        if( ReadLHEFile .and. importExternal_LHEinit ) then
+        if( (ReadLHEFile .or. ConvertLHEFile) .and. (importExternal_LHEinit) ) then
             write(io_LHEOutFile ,'(A)') ''
         else
             write(io_LHEOutFile ,'(A)') '-->'
@@ -2078,7 +2251,7 @@ implicit none
         write(io_stdout,*) ""
         write(io_stdout,"(2X,A)") "Command line arguments:"
         write(io_stdout,"(4X,A)") "Collider:   1=LHC, 2=Tevatron, 0=e+e-"
-        write(io_stdout,"(4X,A)") "Process:    0=spin-0, 1=spin-1, 2=spin-2 resonance, 50=pp/ee->VH, 60=weakVBF, 61=pp->Hjj"
+        write(io_stdout,"(4X,A)") "Process:    0=spin-0, 1=spin-1, 2=spin-2 resonance, 50=pp/ee->VH, 60=weakVBF, 61=pp->Hjj, 62=pp->Hj"
         write(io_stdout,"(4X,A)") "MReso:      resonance mass (default=126.00), format: yyy.xx"
         write(io_stdout,"(4X,A)") "DecayMode1: decay mode for vector boson 1 (Z/W+/gamma)"
         write(io_stdout,"(4X,A)") "DecayMode2: decay mode for vector boson 2 (Z/W-/gamma)"
