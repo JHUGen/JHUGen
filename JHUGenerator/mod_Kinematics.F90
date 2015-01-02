@@ -1559,6 +1559,7 @@ implicit none
 real(8) :: xRnd
 integer :: ZLepBranching
 
+
   if( xRnd .le. Brlept_Z_ee/(100d0*percent-Brlept_Z_tt) ) then
       ZLepBranching = ElM_
   elseif(xRnd .le. (Brlept_Z_ee+Brlept_Z_mm)/(100d0*percent-Brlept_Z_tt) ) then
@@ -1631,25 +1632,25 @@ END FUNCTION
 
 
 
-FUNCTION ZQuaBranching(xRnd)
+FUNCTION ZQuaBranching_flat(xRnd)
 use ModParameters
 implicit none
 real(8) :: xRnd
-integer :: ZQuaBranching
+integer :: ZQuaBranching_flat
 real(8),parameter :: Ncol=3d0
 real(8),parameter :: xxxx=1d0/15d0
 real(8),parameter :: yyyy=Ncol*xxxx
 
   if( xRnd .le. yyyy ) then
-      ZQuaBranching = Up_
+      ZQuaBranching_flat = Up_
   elseif(xRnd .le. yyyy+yyyy) then
-      ZQuaBranching = Chm_
+      ZQuaBranching_flat = Chm_
   elseif(xRnd .le. yyyy+yyyy+yyyy) then
-      ZQuaBranching = Dn_
+      ZQuaBranching_flat = Dn_
   elseif(xRnd .le. yyyy+yyyy+yyyy+yyyy) then
-      ZQuaBranching = Str_
+      ZQuaBranching_flat = Str_
   elseif(xRnd .le. yyyy+yyyy+yyyy+yyyy+yyyy) then
-      ZQuaBranching = Bot_
+      ZQuaBranching_flat = Bot_
   else
       print *, "error ",xRnd
       stop
@@ -1663,42 +1664,73 @@ END FUNCTION
 
 
 
-
-
-
-
-FUNCTION ZAnyBranching(xRnd)
+FUNCTION ZQuaBranching(xRnd)
 use ModParameters
 implicit none
 real(8) :: xRnd
-integer :: ZAnyBranching
+integer :: ZQuaBranching
+real(8),parameter :: Ncol=3d0
+real(8),parameter :: xxxx=1d0/15d0
+real(8),parameter :: yyyy=Ncol*xxxx
+
+  if( xRnd .le. Brhadr_Z_uu ) then
+      ZQuaBranching = Up_
+  elseif(xRnd .le. Brhadr_Z_uu+Brhadr_Z_cc) then
+      ZQuaBranching = Chm_
+  elseif(xRnd .le. Brhadr_Z_uu+Brhadr_Z_cc+Brhadr_Z_dd) then
+      ZQuaBranching = Dn_
+  elseif(xRnd .le. Brhadr_Z_uu+Brhadr_Z_cc+Brhadr_Z_dd+Brhadr_Z_ss) then
+      ZQuaBranching = Str_
+  elseif(xRnd .le. Brhadr_Z_uu+Brhadr_Z_cc+Brhadr_Z_dd+Brhadr_Z_ss+Brhadr_Z_bb) then
+      ZQuaBranching = Bot_
+  else
+      print *, "error ",xRnd
+      stop
+  endif
+  
+
+RETURN
+END FUNCTION
+
+
+
+
+
+
+
+
+FUNCTION ZAnyBranching_flat(xRnd)
+use ModParameters
+implicit none
+real(8) :: xRnd
+integer :: ZAnyBranching_flat
 real(8),parameter :: Ncol=3d0
 real(8),parameter :: xx=1d0/21d0
 real(8),parameter :: yy=Ncol*xx
 
 
   if( xRnd .le. yy ) then
-      ZAnyBranching = Up_
+      ZAnyBranching_flat = Up_
   elseif(xRnd .le. 2*yy ) then
-      ZAnyBranching = Chm_
+      ZAnyBranching_flat = Chm_
   elseif(xRnd .le. 2*yy+yy ) then
-      ZAnyBranching = Dn_
+      ZAnyBranching_flat = Dn_
   elseif(xRnd .le. 2*yy+2*yy ) then
-      ZAnyBranching = Str_
+      ZAnyBranching_flat = Str_
   elseif(xRnd .le. 2*yy+3*yy ) then
-      ZAnyBranching = Bot_
+      ZAnyBranching_flat = Bot_
   elseif(xRnd .le. yy*(2+3) + xx ) then
-      ZAnyBranching = ElM_
+      ZAnyBranching_flat = ElM_
   elseif(xRnd .le. yy*(2+3) + xx*2 ) then
-      ZAnyBranching = MuM_
+      ZAnyBranching_flat = MuM_
   elseif(xRnd .le. yy*(2+3) + xx*3 ) then
-      ZAnyBranching = TaM_
+      ZAnyBranching_flat = TaM_
   elseif(xRnd .le. yy*(2+3)+xx*3 + xx ) then
-      ZAnyBranching = NuE_
+      ZAnyBranching_flat = NuE_
   elseif(xRnd .le. yy*(2+3)+xx*3 + xx*2 ) then
-      ZAnyBranching = NuM_
+      ZAnyBranching_flat = NuM_
   elseif(xRnd .le. yy*(2+3)+xx*3 + xx*3 ) then
-      ZAnyBranching = NuT_
+      ZAnyBranching_flat = NuT_
   else
       print *, "error ",xRnd
       stop
@@ -1733,49 +1765,81 @@ real(8),parameter :: yy=Ncol*xx
 !   endif
 
 
-! print *, "check Z->anything",yy*scale_alpha_Z_uu
-! print *, "check Z->anything",2*yy*scale_alpha_Z_uu
-! print *, "check Z->anything",2*yy*scale_alpha_Z_uu+yy*scale_alpha_Z_dd
-! print *, "check Z->anything",2*yy*scale_alpha_Z_uu+2*yy*scale_alpha_Z_dd
-! print *, "check Z->anything",2*yy*scale_alpha_Z_uu+3*yy*scale_alpha_Z_dd
-! print *, "check Z->anything",yy*(2*scale_alpha_Z_uu+3*scale_alpha_Z_dd) + xx*scale_alpha_Z_ll
-! print *, "check Z->anything",yy*(2*scale_alpha_Z_uu+3*scale_alpha_Z_dd) + xx*2*scale_alpha_Z_ll
-! print *, "check Z->anything",yy*(2*scale_alpha_Z_uu+3*scale_alpha_Z_dd) + xx*3*scale_alpha_Z_ll
-! print *, "check Z->anything",yy*(2*scale_alpha_Z_uu+3*scale_alpha_Z_dd)+xx*3*scale_alpha_Z_ll + xx*scale_alpha_Z_nn
-! print *, "check Z->anything",yy*(2*scale_alpha_Z_uu+3*scale_alpha_Z_dd)+xx*3*scale_alpha_Z_ll + xx*2*scale_alpha_Z_nn
-! print *, "check Z->anything",yy*(2*scale_alpha_Z_uu+3*scale_alpha_Z_dd)+xx*3*scale_alpha_Z_ll + xx*3*scale_alpha_Z_nn 
-! pause
+
+RETURN
+END FUNCTION
 
 
-!   if( xRnd .le. Br_Z_uu ) then
+
+
+FUNCTION ZAnyBranching(xRnd)
+use ModParameters
+implicit none
+real(8) :: xRnd
+integer :: ZAnyBranching
+
+
+  if( xRnd .le. Br_Z_uu ) then
+      ZAnyBranching = Up_
+  elseif(xRnd .le. Br_Z_uu+Br_Z_cc) then
+      ZAnyBranching = Chm_
+  elseif(xRnd .le. Br_Z_uu+Br_Z_cc+Br_Z_dd) then
+      ZAnyBranching = Dn_
+  elseif(xRnd .le. Br_Z_uu+Br_Z_cc+Br_Z_dd+Br_Z_ss) then
+      ZAnyBranching = Str_
+  elseif(xRnd .le. Br_Z_uu+Br_Z_cc+Br_Z_dd+Br_Z_ss+Br_Z_bb) then
+      ZAnyBranching = Bot_
+  elseif(xRnd .le. Br_Z_uu+Br_Z_cc+Br_Z_dd+Br_Z_ss+Br_Z_bb+Br_Z_ee) then
+      ZAnyBranching = ElM_
+  elseif(xRnd .le. Br_Z_uu+Br_Z_cc+Br_Z_dd+Br_Z_ss+Br_Z_bb+Br_Z_ee+Br_Z_mm) then
+      ZAnyBranching = MuM_
+  elseif(xRnd .le. Br_Z_uu+Br_Z_cc+Br_Z_dd+Br_Z_ss+Br_Z_bb+Br_Z_ee+Br_Z_mm+Br_Z_tt) then
+      ZAnyBranching = TaM_
+  elseif(xRnd .le. Br_Z_uu+Br_Z_cc+Br_Z_dd+Br_Z_ss+Br_Z_bb+Br_Z_ee+Br_Z_mm+Br_Z_tt+Br_Z_nn) then
+      ZAnyBranching = NuE_
+  elseif(xRnd .le. Br_Z_uu+Br_Z_cc+Br_Z_dd+Br_Z_ss+Br_Z_bb+Br_Z_ee+Br_Z_mm+Br_Z_tt+Br_Z_nn+Br_Z_nn) then
+      ZAnyBranching = NuM_
+  elseif(xRnd .le. Br_Z_uu+Br_Z_cc+Br_Z_dd+Br_Z_ss+Br_Z_bb+Br_Z_ee+Br_Z_mm+Br_Z_tt+Br_Z_nn+Br_Z_nn+Br_Z_nn) then
+      ZAnyBranching = NuT_
+  else
+      print *, "error ",xRnd
+      stop
+  endif
+
+
+!   if( xRnd .le. scale_alpha_Z_uu*Br_Z_uu ) then
 !       ZAnyBranching = Up_
-!   elseif(xRnd .le. Br_Z_uu+Br_Z_cc) then
+!   elseif(xRnd .le. scale_alpha_Z_uu*Br_Z_uu+scale_alpha_Z_uu*Br_Z_cc) then
 !       ZAnyBranching = Chm_
-!   elseif(xRnd .le. Br_Z_uu+Br_Z_cc+Br_Z_dd) then
+!   elseif(xRnd .le. scale_alpha_Z_uu*Br_Z_uu+scale_alpha_Z_uu*Br_Z_cc+scale_alpha_Z_dd*Br_Z_dd) then
 !       ZAnyBranching = Dn_
-!   elseif(xRnd .le. Br_Z_uu+Br_Z_cc+Br_Z_dd+Br_Z_ss) then
+!   elseif(xRnd .le. scale_alpha_Z_uu*Br_Z_uu+scale_alpha_Z_uu*Br_Z_cc+scale_alpha_Z_dd*Br_Z_dd+scale_alpha_Z_dd*Br_Z_ss) then
 !       ZAnyBranching = Str_
-!   elseif(xRnd .le. Br_Z_uu+Br_Z_cc+Br_Z_dd+Br_Z_ss+Br_Z_bb) then
+!   elseif(xRnd .le. scale_alpha_Z_uu*Br_Z_uu+scale_alpha_Z_uu*Br_Z_cc+scale_alpha_Z_dd*Br_Z_dd+scale_alpha_Z_dd*Br_Z_ss+scale_alpha_Z_dd*Br_Z_bb) then
 !       ZAnyBranching = Bot_
-!   elseif(xRnd .le. Br_Z_uu+Br_Z_cc+Br_Z_dd+Br_Z_ss+Br_Z_bb+Br_Z_ee) then
+!   elseif(xRnd .le. scale_alpha_Z_uu*Br_Z_uu+scale_alpha_Z_uu*Br_Z_cc+scale_alpha_Z_dd*Br_Z_dd+scale_alpha_Z_dd*Br_Z_ss+scale_alpha_Z_dd*Br_Z_bb+scale_alpha_Z_ll*Br_Z_ee) then
 !       ZAnyBranching = ElM_
-!   elseif(xRnd .le. Br_Z_uu+Br_Z_cc+Br_Z_dd+Br_Z_ss+Br_Z_bb+Br_Z_ee+Br_Z_mm) then
+!   elseif(xRnd .le. scale_alpha_Z_uu*Br_Z_uu+scale_alpha_Z_uu*Br_Z_cc+scale_alpha_Z_dd*Br_Z_dd+scale_alpha_Z_dd*Br_Z_ss+scale_alpha_Z_dd*Br_Z_bb+scale_alpha_Z_ll*Br_Z_ee+scale_alpha_Z_ll*Br_Z_mm) then
 !       ZAnyBranching = MuM_
-!   elseif(xRnd .le. Br_Z_uu+Br_Z_cc+Br_Z_dd+Br_Z_ss+Br_Z_bb+Br_Z_ee+Br_Z_mm+Br_Z_tt) then
+!   elseif(xRnd .le. scale_alpha_Z_uu*Br_Z_uu+scale_alpha_Z_uu*Br_Z_cc+scale_alpha_Z_dd*Br_Z_dd+scale_alpha_Z_dd*Br_Z_ss+scale_alpha_Z_dd*Br_Z_bb+scale_alpha_Z_ll*Br_Z_ee+scale_alpha_Z_ll*Br_Z_mm+scale_alpha_Z_ll*Br_Z_tt) then
 !       ZAnyBranching = TaM_
-!   elseif(xRnd .le. Br_Z_uu+Br_Z_cc+Br_Z_dd+Br_Z_ss+Br_Z_bb+Br_Z_ee+Br_Z_mm+Br_Z_tt+Br_Z_nn) then
+!   elseif(xRnd .le. scale_alpha_Z_uu*Br_Z_uu+scale_alpha_Z_uu*Br_Z_cc+scale_alpha_Z_dd*Br_Z_dd+scale_alpha_Z_dd*Br_Z_ss+scale_alpha_Z_dd*Br_Z_bb+scale_alpha_Z_ll*Br_Z_ee+scale_alpha_Z_ll*Br_Z_mm+scale_alpha_Z_ll*Br_Z_tt+scale_alpha_Z_nn*Br_Z_nn) then
 !       ZAnyBranching = NuE_
-!   elseif(xRnd .le. Br_Z_uu+Br_Z_cc+Br_Z_dd+Br_Z_ss+Br_Z_bb+Br_Z_ee+Br_Z_mm+Br_Z_tt+Br_Z_nn+Br_Z_nn) then
+!   elseif(xRnd .le. scale_alpha_Z_uu*Br_Z_uu+scale_alpha_Z_uu*Br_Z_cc+scale_alpha_Z_dd*Br_Z_dd+scale_alpha_Z_dd*Br_Z_ss+scale_alpha_Z_dd*Br_Z_bb+scale_alpha_Z_ll*Br_Z_ee+scale_alpha_Z_ll*Br_Z_mm+scale_alpha_Z_ll*Br_Z_tt+scale_alpha_Z_nn*Br_Z_nn+scale_alpha_Z_nn*Br_Z_nn) then
 !       ZAnyBranching = NuM_
-!   elseif(xRnd .le. Br_Z_uu+Br_Z_cc+Br_Z_dd+Br_Z_ss+Br_Z_bb+Br_Z_ee+Br_Z_mm+Br_Z_tt+Br_Z_nn+Br_Z_nn+Br_Z_nn) then
+!   elseif(xRnd .le. scale_alpha_Z_uu*Br_Z_uu+scale_alpha_Z_uu*Br_Z_cc+scale_alpha_Z_dd*Br_Z_dd+scale_alpha_Z_dd*Br_Z_ss+scale_alpha_Z_dd*Br_Z_bb+scale_alpha_Z_ll*Br_Z_ee+scale_alpha_Z_ll*Br_Z_mm+scale_alpha_Z_ll*Br_Z_tt+scale_alpha_Z_nn*Br_Z_nn+scale_alpha_Z_nn*Br_Z_nn+scale_alpha_Z_nn*Br_Z_nn) then
 !       ZAnyBranching = NuT_
 !   else
 !       print *, "error ",xRnd
 !       stop
 !   endif
 
-! print *, "checker 5",Br_Z_uu+Br_Z_cc+Br_Z_dd+Br_Z_ss+Br_Z_bb+Br_Z_ee+Br_Z_mm+Br_Z_tt+Br_Z_nn+Br_Z_nn+Br_Z_nn
-
+   
+! print *, "checker ",Br_Z_uu+Br_Z_cc+Br_Z_dd+Br_Z_ss+Br_Z_bb+Br_Z_ee+Br_Z_mm+Br_Z_tt+Br_Z_nn+Br_Z_nn+Br_Z_nn
+! print *, "checker ",scale_alpha_Z_uu*Br_Z_uu+scale_alpha_Z_uu*Br_Z_cc+scale_alpha_Z_dd*Br_Z_dd+scale_alpha_Z_dd*Br_Z_ss+scale_alpha_Z_dd*Br_Z_bb+scale_alpha_Z_ll*Br_Z_ee+scale_alpha_Z_ll*Br_Z_mm+scale_alpha_Z_ll*Br_Z_tt+scale_alpha_Z_nn*Br_Z_nn+scale_alpha_Z_nn*Br_Z_nn+scale_alpha_Z_nn*Br_Z_nn
+! pause
+  
+  
 RETURN
 END FUNCTION
 
@@ -1859,25 +1923,55 @@ END FUNCTION
 
 
 
-FUNCTION WAnyBranching(xRnd)
+FUNCTION WAnyBranching_flat(xRnd)
 use ModParameters
 implicit none
 real(8) :: xRnd
-integer :: WAnyBranching
+integer :: WAnyBranching_flat
 real(8),parameter :: Ncol=3d0
 real(8),parameter :: xx=1d0/9d0
 real(8),parameter :: yy=Ncol*xx
 
 
   if( xRnd .le. yy ) then
-      WAnyBranching = Up_
+      WAnyBranching_flat = Up_
   elseif(xRnd .le. 2*yy ) then
-      WAnyBranching = Chm_
+      WAnyBranching_flat = Chm_
   elseif(xRnd .le. 2*yy+xx ) then
-      WAnyBranching = ElM_
+      WAnyBranching_flat = ElM_
   elseif(xRnd .le. 2*yy+2*xx ) then
-      WAnyBranching = MuM_
+      WAnyBranching_flat = MuM_
   elseif(xRnd .le. 2*yy+3*xx ) then
+      WAnyBranching_flat = TaM_
+  else
+      print *, "error ",xRnd
+      stop
+  endif
+
+
+RETURN
+END FUNCTION
+
+
+
+
+
+FUNCTION WAnyBranching(xRnd)
+use ModParameters
+implicit none
+real(8) :: xRnd
+integer :: WAnyBranching
+
+
+  if( xRnd .le. Br_W_ud ) then
+      WAnyBranching = Up_
+  elseif(xRnd .le. Br_W_ud+Br_W_cs ) then
+      WAnyBranching = Chm_
+  elseif(xRnd .le. Br_W_ud+Br_W_cs+Br_W_en ) then
+      WAnyBranching = ElM_
+  elseif(xRnd .le. Br_W_ud+Br_W_cs+Br_W_en+Br_W_mn ) then
+      WAnyBranching = MuM_
+  elseif(xRnd .le. Br_W_ud+Br_W_cs+Br_W_en+Br_W_mn+Br_W_tn ) then
       WAnyBranching = TaM_
   else
       print *, "error ",xRnd
@@ -1885,6 +1979,25 @@ real(8),parameter :: yy=Ncol*xx
   endif
 
 
+!   if( xRnd .le. scale_alpha_W_ud*Br_W_ud ) then
+!       WAnyBranching = Up_
+!   elseif(xRnd .le. scale_alpha_W_ud*Br_W_ud+scale_alpha_W_cs*Br_W_cs ) then
+!       WAnyBranching = Chm_
+!   elseif(xRnd .le. scale_alpha_W_ud*Br_W_ud+scale_alpha_W_cs*Br_W_cs+scale_alpha_W_ln*Br_W_en ) then
+!       WAnyBranching = ElM_
+!   elseif(xRnd .le. scale_alpha_W_ud*Br_W_ud+scale_alpha_W_cs*Br_W_cs+scale_alpha_W_ln*Br_W_en+scale_alpha_W_ln*Br_W_mn ) then
+!       WAnyBranching = MuM_
+!   elseif(xRnd .le. scale_alpha_W_ud*Br_W_ud+scale_alpha_W_cs*Br_W_cs+scale_alpha_W_ln*Br_W_en+scale_alpha_W_ln*Br_W_mn+scale_alpha_W_ln*Br_W_tn ) then
+!       WAnyBranching = TaM_
+!   else
+!       print *, "error ",xRnd
+!       stop
+!   endif
+
+! print *, "checker 2",Br_W_ud+Br_W_cs+Br_W_en+Br_W_mn+Br_W_tn
+! print *, "checker 2",scale_alpha_W_ud*Br_W_ud+scale_alpha_W_cs*Br_W_cs+scale_alpha_W_ln*Br_W_en+scale_alpha_W_ln*Br_W_mn+scale_alpha_W_ln*Br_W_tn
+! pause
+  
 RETURN
 END FUNCTION
 
@@ -1917,7 +2030,7 @@ real(8) :: DKRnd
    elseif( DecayMode1.eq.1 ) then! Z1->2q
         call random_number(DKRnd)
         MY_IDUP(4) = Z0_
-        DKFlavor = ZQuaBranching( DKRnd )!= Up,Dn,Chm,Str,Bot
+        DKFlavor = ZQuaBranching_flat( DKRnd )!= Up,Dn,Chm,Str,Bot
         MY_IDUP(6) =-DKFlavor
         MY_IDUP(7) =+DKFlavor
         ICOLUP(1:2,6) = (/0,503/)
@@ -1963,7 +2076,7 @@ real(8) :: DKRnd
    elseif( DecayMode1.eq.9 ) then! Z1-> anything
         call random_number(DKRnd)
         MY_IDUP(4) = Z0_
-        DKFlavor = ZAnyBranching( DKRnd )
+        DKFlavor = ZAnyBranching_flat( DKRnd )
         MY_IDUP(6) =-DKFlavor
         MY_IDUP(7) =+DKFlavor
         if(IsAQuark(DKFlavor)) then
@@ -1979,7 +2092,7 @@ real(8) :: DKRnd
    elseif( DecayMode1.eq.11 ) then! W1(+)-> anything
         call random_number(DKRnd)
         MY_IDUP(4) = Wp_
-        DKFlavor = WAnyBranching( DKRnd )
+        DKFlavor = WAnyBranching_flat( DKRnd )
         if(IsAQuark(DKFlavor)) then
            MY_IDUP(6) = -abs(DKFlavor)-1  ! anti-dn flavor  
            MY_IDUP(7) = +abs(DKFlavor)    ! up flavor
@@ -2001,7 +2114,7 @@ real(8) :: DKRnd
    elseif( DecayMode2.eq.1 ) then! Z2->2q
         call random_number(DKRnd)
         MY_IDUP(5) = Z0_
-        DKFlavor = ZQuaBranching( DKRnd )!= Up,Dn,Chm,Str,Bot
+        DKFlavor = ZQuaBranching_flat( DKRnd )!= Up,Dn,Chm,Str,Bot
         MY_IDUP(8) =-DKFlavor
         MY_IDUP(9) =+DKFlavor
         ICOLUP(1:2,8) = (/0,504/)
@@ -2047,7 +2160,7 @@ real(8) :: DKRnd
    elseif( DecayMode2.eq.9 ) then! Z2-> anything
         call random_number(DKRnd)
         MY_IDUP(5) = Z0_
-        DKFlavor = ZAnyBranching( DKRnd )
+        DKFlavor = ZAnyBranching_flat( DKRnd )
         MY_IDUP(8) =-DKFlavor
         MY_IDUP(9) =+DKFlavor
         if(IsAQuark(DKFlavor)) then
@@ -2063,7 +2176,7 @@ real(8) :: DKRnd
    elseif( DecayMode2.eq.11 ) then! W2(-)-> anything
         call random_number(DKRnd)
         MY_IDUP(5) = Wm_
-        DKFlavor = WAnyBranching( DKRnd )
+        DKFlavor = WAnyBranching_flat( DKRnd )
         if(IsAQuark(DKFlavor)) then
            MY_IDUP(8) = -abs(DKFlavor)    ! anti-up flavor
            MY_IDUP(9) = +abs(DKFlavor)+1  ! dn flavor
