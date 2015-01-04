@@ -83,7 +83,7 @@ real(8), public, parameter :: Rjet = 0.5d0                  ! jet deltaR, antikt
 
 !----------------------------------------------------------------------------------------------------
 
-! absolute branching fraction (taken from PDG-2012)
+! absolute branching fraction (taken from PDG-2014)
 real(8), public, parameter :: Br_Z_ll   = 10.10d0*percent                             ! leptonic Z branching
 real(8), public, parameter :: Br_Z_hadr = 69.91d0*percent                             ! hadronic Z branching
 real(8), public, parameter :: Br_Z_inv  = 100d0*percent - Br_Z_ll - Br_Z_hadr         ! invisible Z branching
@@ -92,7 +92,7 @@ real(8), public, parameter :: Br_Z_cc   = 11.6d0*percent                        
 real(8), public, parameter :: Br_Z_dd   = 15.6d0*percent                              ! dn dnbar Z branching
 real(8), public, parameter :: Br_Z_ss   = 15.6d0*percent                              ! str strbar Z branching
 real(8), public, parameter :: Br_Z_bb   = Br_Z_hadr - Br_Z_uu - Br_Z_dd - Br_Z_cc - Br_Z_ss
-real(8), public, parameter :: Br_W_ll   = 32.40d0*percent                             ! leptonic W branching
+real(8), public, parameter :: Br_W_ll   = 32.72d0*percent                             ! leptonic W branching
 real(8), public, parameter :: Br_W_hadr = 100d0*percent - Br_W_ll                     ! hadronic W branching
 
 
@@ -752,6 +752,21 @@ integer :: Part
       SU2flip = sign(1,Part)*Top_
   elseif( abs(Part).eq.Top_ ) then
       SU2flip = sign(1,Part)*Bot_
+  elseif( abs(Part).eq.ElP_ ) then
+      SU2flip = sign(1,Part)*NuE_
+  elseif( abs(Part).eq.MuP_ ) then
+      SU2flip = sign(1,Part)*NuM_
+  elseif( abs(Part).eq.TaP_ ) then
+      SU2flip = sign(1,Part)*NuT_
+  elseif( abs(Part).eq.NuE_ ) then
+      SU2flip = sign(1,Part)*ElP_
+  elseif( abs(Part).eq.NuM_ ) then
+      SU2flip = sign(1,Part)*MuP_
+  elseif( abs(Part).eq.NuT_ ) then
+      SU2flip = sign(1,Part)*TaP_
+  else
+      print *, "Error: Invalid flavor in SU2flip"
+      stop
   endif
 
 END FUNCTION
