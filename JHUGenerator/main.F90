@@ -1299,7 +1299,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                   endif
 
                elseif( DecayMode1.eq.4 .and. LHE_IDUP(convertparent).eq.convertLHE(Wp_) ) then! convert W+ decay products to 2 leptons
-                  if( LHE_IDUP(nline).gt.0 ) then
+                  if( LHE_IDUP(nline).lt.0 ) then
                          LHE_IDUP(nline) = convertLHE( WLepBranching(xRnd) )   
                          LHE_IDUP(nline) = -LHE_IDUP(nline)! converts LepM to LepP
                          LHE_ICOLUP(1:2,nline) = (/0,0/)
@@ -1313,7 +1313,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                   endif
 
                elseif( DecayMode1.eq.4 .and. LHE_IDUP(convertparent).eq.convertLHE(Wm_) ) then! convert W- decay products to 2 leptons
-                  if( LHE_IDUP(nline).gt.0 ) then
+                  if( LHE_IDUP(nline).lt.0 ) then
                          LHE_IDUP(nline) = convertLHE( Su2flip(WLepBranching(xRnd)) )   
                          LHE_ICOLUP(1:2,nline) = (/0,0/)
                          Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
@@ -1340,7 +1340,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                   endif
 
                elseif( DecayMode1.eq.10 .and. LHE_IDUP(convertparent).eq.convertLHE(Wp_) ) then! convert W+ decay products to 3 leptons   
-                  if( LHE_IDUP(nline).gt.0 ) then
+                  if( LHE_IDUP(nline).lt.0 ) then
                          LHE_IDUP(nline) = convertLHE( WLepPlusTauBranching(xRnd) )   
                          LHE_IDUP(nline) = -LHE_IDUP(nline)! converts LepM to LepP
                          LHE_ICOLUP(1:2,nline) = (/0,0/)
@@ -1354,7 +1354,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                   endif
 
                elseif( DecayMode1.eq.10 .and. LHE_IDUP(convertparent).eq.convertLHE(Wm_) ) then! convert W- decay products to 3 leptons
-                  if( LHE_IDUP(nline).gt.0 ) then
+                  if( LHE_IDUP(nline).lt.0 ) then
                          LHE_IDUP(nline) = convertLHE( Su2flip(WLepPlusTauBranching(xRnd)) )   
                          LHE_ICOLUP(1:2,nline) = (/0,0/)
                          Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
@@ -1381,27 +1381,31 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                   endif
 
                elseif( DecayMode1.eq.5 .and. LHE_IDUP(convertparent).eq.convertLHE(Wp_) ) then! convert W+ decay products to quarks                  
-                  if( LHE_IDUP(nline).gt.0 ) then
+                  if( LHE_IDUP(nline).lt.0 ) then
                          LHE_IDUP(nline) = convertLHE( WQuaUpBranching(xRnd) )   
-                         LHE_ICOLUP(1:2,nline) = (/505,0/)
+                         LHE_ICOLUP(1:2,nline) = (/0,505/)
+                         LHE_IDUP(nline) = -LHE_IDUP(nline)
                          Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
                          DecayParticles(i) = nline; i=i+1;
                   else
                          LHE_IDUP(nline) = convertLHE( - SU2flip(WQuaUpBranching(xRnd)) )  
-                         LHE_ICOLUP(1:2,nline) = (/0,505/)
+                         LHE_ICOLUP(1:2,nline) = (/505,0/)
+                         LHE_IDUP(nline) = -LHE_IDUP(nline)
                          Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
                          DecayParticles(i) = nline; i=i+1;
                   endif
 
                elseif( DecayMode1.eq.5 .and. LHE_IDUP(convertparent).eq.convertLHE(Wm_) ) then! convert W- decay products to quarks                  
-                  if( LHE_IDUP(nline).gt.0 ) then
+                  if( LHE_IDUP(nline).lt.0 ) then
                          LHE_IDUP(nline) = convertLHE( Su2flip(WQuaUpBranching(xRnd)) )   
-                         LHE_ICOLUP(1:2,nline) = (/505,0/)
+                         LHE_ICOLUP(1:2,nline) = (/0,505/)
+                         LHE_IDUP(nline) = -LHE_IDUP(nline)
                          Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
                          DecayParticles(i) = nline; i=i+1;
                   else
                          LHE_IDUP(nline) = convertLHE( -WQuaUpBranching(xRnd) )   
-                         LHE_ICOLUP(1:2,nline) = (/0,505/)
+                         LHE_ICOLUP(1:2,nline) = (/505,0/)
+                         LHE_IDUP(nline) = -LHE_IDUP(nline)
                          Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
                          DecayParticles(i) = nline; i=i+1;
                   endif
@@ -1434,11 +1438,12 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
 ! if( abs(convertLHEreverse(LHE_IDUP(nline))).eq.Dn_ .or. abs(convertLHEreverse(LHE_IDUP(nline))).eq.Str_ .or. abs(convertLHEreverse(LHE_IDUP(nline))).eq.Bot_) Br_Z_dd_counter=Br_Z_dd_counter+1
 ! EvalCounter=EvalCounter+1
 
-               elseif( DecayMode1.eq.11 .and. LHE_IDUP(convertparent).eq.convertLHE(Wp_) ) then! convert W+ decay products to quarks and leptons         
-                  if( LHE_IDUP(nline).gt.0 ) then
+               elseif( DecayMode1.eq.11 .and. LHE_IDUP(convertparent).eq.convertLHE(Wp_) ) then! convert W+ decay products to quarks and leptons   
+                  if( LHE_IDUP(nline).lt.0 ) then
                          LHE_IDUP(nline) = convertLHE( WAnyBranching(xRnd) )   
                          if( IsAQuark(convertLHEreverse(LHE_IDUP(nline))) ) then
-                              LHE_ICOLUP(1:2,nline) = (/505,0/)
+                              LHE_ICOLUP(1:2,nline) = (/0,505/)
+                              LHE_IDUP(nline) = -LHE_IDUP(nline)
                          else
                               LHE_ICOLUP(1:2,nline) = (/0,0/)
                               LHE_IDUP(nline) = -LHE_IDUP(nline)! converts LepM to LepP
@@ -1450,7 +1455,8 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                   else
                          LHE_IDUP(nline) = convertLHE( - SU2flip(WAnyBranching(xRnd)) )  
                          if( IsAQuark(convertLHEreverse(LHE_IDUP(nline))) ) then
-                              LHE_ICOLUP(1:2,nline) = (/0,505/)
+                              LHE_ICOLUP(1:2,nline) = (/505,0/)
+                              LHE_IDUP(nline) = -LHE_IDUP(nline)
                          else
                               LHE_ICOLUP(1:2,nline) = (/0,0/)
                          endif                         
@@ -1459,10 +1465,11 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                   endif
 
                elseif( DecayMode1.eq.11 .and. LHE_IDUP(convertparent).eq.convertLHE(Wm_) ) then! convert W- decay products to quarks   
-                  if( LHE_IDUP(nline).gt.0 ) then
+                  if( LHE_IDUP(nline).lt.0 ) then
                          LHE_IDUP(nline) = convertLHE( SU2flip(WAnyBranching(xRnd)) )   
                          if( IsAQuark(convertLHEreverse(LHE_IDUP(nline))) ) then
-                              LHE_ICOLUP(1:2,nline) = (/505,0/)
+                              LHE_ICOLUP(1:2,nline) = (/0,505/)
+                              LHE_IDUP(nline) = -LHE_IDUP(nline)
                          else
                               LHE_ICOLUP(1:2,nline) = (/0,0/)
                          endif                         
@@ -1473,10 +1480,11 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                   else
                          LHE_IDUP(nline) = convertLHE( -WAnyBranching(xRnd) )   
                          if( IsAQuark(convertLHEreverse(LHE_IDUP(nline))) ) then
-                              LHE_ICOLUP(1:2,nline) = (/0,505/)
+                              LHE_ICOLUP(1:2,nline) = (/505,0/)
+                              LHE_IDUP(nline) = -LHE_IDUP(nline)
                          else
                               LHE_ICOLUP(1:2,nline) = (/0,0/)
-                              LHE_IDUP(nline) = -LHE_IDUP(nline)! converts -LepM to +LepM
+                              LHE_IDUP(nline) = -LHE_IDUP(nline)
                          endif                  
                          Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
                          DecayParticles(i) = nline; i=i+1;
