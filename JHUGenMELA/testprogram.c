@@ -9,6 +9,7 @@ int main(void){
   double MReso = 125.0/100.0;
   double GaReso= 0.1/100.0;
   double P[6][4];
+  double Ptth[13][4];
   double MatElSq;
   int MYIDUP[4];
   double Hggcoupl[3][2];
@@ -18,6 +19,7 @@ int main(void){
   double Gqqcoupl[2][2];
   double Gggcoupl[5][2];
   double Gvvcoupl[10][2];
+  double TTBHcoupl[2][2];
 
   Hggcoupl[0][0]=1.0;  Hggcoupl[0][1]=0.0;    // ghz2  // first/second number is the real/imaginary part
   Hggcoupl[1][0]=0.0;  Hggcoupl[1][1]=0.0;    // ghz3 
@@ -86,6 +88,8 @@ int main(void){
   Gvvcoupl[8][0]=0.0;  Gvvcoupl[8][1]=0.0;
   Gvvcoupl[9][0]=0.0;  Gvvcoupl[9][1]=0.0;
 
+  TTBHcoupl[0][0]=1.0; TTBHcoupl[0][1]=0.0;   //  kappa
+  TTBHcoupl[1][0]=0.0; TTBHcoupl[1][1]=0.0;   //  kappa_tilde
   
 // particle ID: +7=e+,  -7=e-,  +8=mu+,  -8=mu-
   MYIDUP[0]=+7;
@@ -203,9 +207,49 @@ int main(void){
  printf("ratio: %20.17e \n ",MatElSq/3.50330723427981412e-09);
 
 
+ Ptth[0][0] = -(3.2772203957555925);
+ Ptth[0][1] = -(0.0000000000000000);
+ Ptth[0][2] = -(0.0000000000000000);
+ Ptth[0][3] = -(3.2772203957555925);
+
+ Ptth[1][0] = -(2.8653204768734621);
+ Ptth[1][1] = -(0.0000000000000000);
+ Ptth[1][2] = -(0.0000000000000000);
+ Ptth[1][3] = -(-2.8653204768734621);
+
+ Ptth[2][0] = +(2.0695031298922770);
+ Ptth[2][1] = +(-1.3995194639860060);
+ Ptth[2][2] = +( 0.4309336522215461);
+ Ptth[2][3] = +(-0.74896506056107459);
+
+ Ptth[3][0] = +(1.910794930996931);
+ Ptth[3][1] = +(0.80690401116821620);
+ Ptth[3][2] = +(-3.12533731972295947e-2);
+ Ptth[3][3] = +(7.85265034749671742e-2);
+
+ Ptth[4][0] = +(2.1622428117398473);
+ Ptth[4][1] = +(0.59261545281778993);
+ Ptth[4][2] = +(-0.39968027902431658);
+ Ptth[4][3] = +(1.0823384759682382);
+
+ MReso = 125.60;
+ __modttbh_MOD_initprocess_ttbh(&MReso);
+
+ __modttbh_MOD_evalamp_gg_ttbh(Ptth, TTBHcoupl ,&MatElSq);
+ printf("\n ");
+ printf("no production dynamics\n ");
+ printf("Matr.el. squared (gg->ttbh): %20.17e \n ",MatElSq);
+ printf("result should be (gg->ttbh): %20.17e \n ",9.23970258835623247e-003);
+ printf("ratio: %20.17e \n ",MatElSq/9.23970258835623247e-003);
+
+ __modttbh_MOD_evalamp_qqb_ttbh(Ptth, TTBHcoupl, &MatElSq);
+ printf("\n ");
+ printf("no production dynamics\n ");
+ printf("Matr.el. squared (qqb->ttbh): %20.17e \n ",MatElSq);
+ printf("result should be (qqb->ttbh): %20.17e \n ",5.00600468807961274e-002);
+ printf("ratio: %20.17e \n ",MatElSq/5.00600468807961274e-002);
 
 
- 
 return 0;
 };
 

@@ -22,9 +22,9 @@ endif
 
 ifeq ($(Comp),ifort)
  ifeq ($(Opt),Yes)
-    OptOpts  = -O2 -vec-report0 -diag-disable remark
+    OptOpts  = -O2 -vec-report0 -diag-disable remark 
  else
-    OptOpts  = -O0 -implicitnone -zero -check bounds -check pointer -warn interfaces -ftrapuv
+    OptOpts  = -O0 -implicitnone -zero -check bounds -check pointer -warn interfaces -ftrapuv  -diag-disable remark 
  endif
  fcomp = ifort -fpp $(OptOpts) -module $(ModuleDir) -I$(VegasDir) -Dcompiler=1
 endif
@@ -42,26 +42,32 @@ Exec = ./JHUGen
 MainDep = mod_Misc.F90 \
           mod_Parameters.F90 \
           mod_Kinematics.F90 \
+          mod_TopDecay.F90 \
           mod_Graviton.F90 \
           mod_Higgs.F90 \
           mod_Zprime.F90 \
           mod_HiggsJJ.F90 \
           mod_HiggsJ.F90 \
           mod_VHiggs.F90 \
+          mod_TTBHiggs.F90 \
           mod_CrossSection.F90 \
+          mod_CrossSection_TTBH.F90 \
           main.F90
 
 # main objects
 MainObj = $(ObjectDir)/mod_Misc.o \
           $(ObjectDir)/mod_Parameters.o \
           $(ObjectDir)/mod_Kinematics.o \
+          $(ObjectDir)/mod_TopDecay.o \
           $(ObjectDir)/mod_Graviton.o \
           $(ObjectDir)/mod_Higgs.o \
           $(ObjectDir)/mod_Zprime.o \
           $(ObjectDir)/mod_HiggsJJ.o \
           $(ObjectDir)/mod_HiggsJ.o \
           $(ObjectDir)/mod_VHiggs.o \
+          $(ObjectDir)/mod_TTBHiggs.o \
           $(ObjectDir)/mod_CrossSection.o \
+          $(ObjectDir)/mod_CrossSection_TTBH.o \
           $(ObjectDir)/main.o
 
 
@@ -85,13 +91,14 @@ PSGenObj = $(ObjectDir)/genps.o \
 #               h_tamtaptamtap.f \
 #               h_tamtaptamtap_noint.f \
 #               switchmom.f
+MadGraphDep = gg_ttbh.f \
+              uub_ttbh.f \
+              switchmom.f
 
-# MadGraphObj = $(ObjectDir)/h_emepemep.o \
-#               $(ObjectDir)/h_tamtaptamtap.o \
-#               $(ObjectDir)/h_emepemep_noint.o \
-#               $(ObjectDir)/h_tamtaptamtap_noint.o \
-#               $(ObjectDir)/switchmom.o \
-#               $(HOME)/lib/HELAS-3.0/libdhelas3.ifc90.a
+MadGraphObj = $(ObjectDir)/gg_ttbh.o \
+              $(ObjectDir)/uub_ttbh.o \
+              $(ObjectDir)/switchmom.o \
+              $(HOME)/lib/HELAS-3.0/libdhelas3.ifc90.a
 
 
 
