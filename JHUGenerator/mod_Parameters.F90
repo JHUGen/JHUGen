@@ -3,10 +3,10 @@ implicit none
 save
 ! 
 ! 
-character(len=6),parameter :: JHUGen_Version="v4.9.5"
+character(len=6),parameter :: JHUGen_Version="v5.1.0"
 ! 
 ! 
-integer, public :: Collider, PDFSet,PChannel,Process,DecayMode1,DecayMode2
+integer, public :: Collider, PDFSet,PChannel,Process,DecayMode1,DecayMode2,TopDecays
 integer, public :: VegasIt1,VegasNc0,VegasNc1,VegasNc2
 real(8), public :: Collider_Energy
 integer, public :: VegasIt1_default,VegasNc0_default,VegasNc1_default,VegasNc2_default
@@ -48,6 +48,8 @@ logical, public, parameter :: includeGammaStar = .false.
 
 real(8),parameter :: MPhotonCutoff = 4d0*GeV
 
+real(8), public, parameter :: M_Top   = 173d0     *GeV      ! 
+real(8), public, parameter :: Ga_Top  = 1.33d0    *GeV      ! 
 real(8), public, parameter :: M_Z     = 91.1876d0 *GeV      ! Z boson mass (PDG-2011)
 real(8), public, parameter :: Ga_Z    = 2.4952d0  *GeV      ! Z boson width(PDG-2011)
 real(8), public, parameter :: M_W     = 80.399d0  *GeV      ! W boson mass (PDG-2011)
@@ -306,6 +308,11 @@ integer, public :: Br_W_ud_counter=0
    real(8),    public, parameter :: Lambda_w4 = 10000d0*GeV
    real(8),    public, parameter :: Lambda_w5 = 10000d0*GeV
 
+!  couplings for ttbar+H
+   complex(8),    public, parameter :: kappa       = (1d0,0d0)
+   complex(8),    public, parameter :: kappa_tilde = (0d0,0d0) 
+   complex(8),    public, parameter :: couplHTT_right_dyn = m_top/vev/2d0 * ( kappa + (0d0,1d0)*kappa_tilde )
+   complex(8),    public, parameter :: couplHTT_left_dyn  = m_top/vev/2d0 * ( kappa - (0d0,1d0)*kappa_tilde )
 
 
 ! V-f-fbar couplings:
@@ -460,6 +467,8 @@ integer :: Part
       convertLHEreverse = Chm_
   elseif( Part.eq.5 ) then
       convertLHEreverse = Bot_
+  elseif( Part.eq.6 ) then
+      convertLHEreverse = Top_
   elseif( Part.eq.-1 ) then
       convertLHEreverse = ADn_
   elseif( Part.eq.-2 ) then
@@ -470,6 +479,8 @@ integer :: Part
       convertLHEreverse = AChm_
   elseif( Part.eq.-5 ) then
       convertLHEreverse = ABot_
+  elseif( Part.eq.-6 ) then
+      convertLHEreverse = ATop_
   elseif( Part.eq.21 ) then
       convertLHEreverse = Glu_
   elseif( Part.eq.11 ) then
@@ -504,6 +515,10 @@ integer :: Part
       convertLHEreverse = NuT_
   elseif( Part.eq.-16) then
       convertLHEreverse = ANuT_
+  elseif( Part.eq.+25) then
+      convertLHEreverse = Hig_
+  elseif( Part.eq.-25) then
+      convertLHEreverse = Hig_
   else
       print *, "MYLHE format not implemented for ",Part
       stop
@@ -522,7 +537,7 @@ integer :: Part
 
   if(     Part.eq.0 ) then
       convertLHE = 0
-  elseif(     Part.eq.Glu_ ) then
+  elseif( Part.eq.Glu_ ) then
       convertLHE = 21
   elseif( Part.eq.ElM_ ) then
       convertLHE = 11
@@ -568,6 +583,10 @@ integer :: Part
       convertLHE = 5
   elseif( Part.eq.ABot_) then
       convertLHE =-5
+  elseif( Part.eq.Top_ ) then
+      convertLHE = 6
+  elseif( Part.eq.ATop_) then
+      convertLHE =-6
   elseif( Part.eq.Z0_) then
       convertLHE =23
   elseif( Part.eq.Wp_) then
@@ -733,6 +752,20 @@ END FUNCTION
 
 
 
+FUNCTION IsABoson(PartType)
+implicit none
+logical :: IsABoson
+integer :: PartType
+
+
+  if( abs(PartType).eq.11 .or. abs(PartType).eq.12 .or. abs(PartType).eq.13 .or. abs(PartType).eq.25 ) then
+     IsABoson = .true.
+  else
+     IsABoson=.false.
+  endif
+
+
+END FUNCTION
 
 FUNCTION SU2flip(Part)
 implicit none

@@ -49,21 +49,6 @@ character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE
 ! The LHE numbering scheme can be found here: http://pdg.lbl.gov/mc_particle_id_contents.html and http://lhapdf.hepforge.org/manual#tth_sEcA
 
 
-! DebugCounter(0)=DebugCounter(0)+1
-! if( abs(MY_IDUP(6)).eq.ElP_ .and. abs(MY_IDUP(7)).eq.ElP_ .and. abs(MY_IDUP(8)).eq.ElP_ .and. abs(MY_IDUP(9)).eq.ElP_ ) DebugCounter(1)=DebugCounter(1)+1
-! if( abs(MY_IDUP(6)).eq.MuP_ .and. abs(MY_IDUP(7)).eq.MuP_ .and. abs(MY_IDUP(8)).eq.MuP_ .and. abs(MY_IDUP(9)).eq.MuP_ ) DebugCounter(2)=DebugCounter(2)+1
-! if( abs(MY_IDUP(6)).eq.taP_ .and. abs(MY_IDUP(7)).eq.taP_ .and. abs(MY_IDUP(8)).eq.taP_ .and. abs(MY_IDUP(9)).eq.taP_ ) DebugCounter(3)=DebugCounter(3)+1
-! 
-! if( abs(MY_IDUP(6)).eq.ElP_ .and. abs(MY_IDUP(7)).eq.ElP_ .and. abs(MY_IDUP(8)).eq.muP_ .and. abs(MY_IDUP(9)).eq.muP_ ) DebugCounter(4)=DebugCounter(4)+1
-! if( abs(MY_IDUP(6)).eq.muP_ .and. abs(MY_IDUP(7)).eq.muP_ .and. abs(MY_IDUP(8)).eq.ElP_ .and. abs(MY_IDUP(9)).eq.ElP_ ) DebugCounter(4)=DebugCounter(4)+1
-! 
-! if( abs(MY_IDUP(6)).eq.ElP_ .and. abs(MY_IDUP(7)).eq.ElP_ .and. abs(MY_IDUP(8)).eq.taP_ .and. abs(MY_IDUP(9)).eq.taP_ ) DebugCounter(5)=DebugCounter(5)+1
-! if( abs(MY_IDUP(6)).eq.taP_ .and. abs(MY_IDUP(7)).eq.taP_ .and. abs(MY_IDUP(8)).eq.ElP_ .and. abs(MY_IDUP(9)).eq.ElP_ ) DebugCounter(5)=DebugCounter(5)+1
-! 
-! if( abs(MY_IDUP(6)).eq.taP_ .and. abs(MY_IDUP(7)).eq.taP_ .and. abs(MY_IDUP(8)).eq.MuP_ .and. abs(MY_IDUP(9)).eq.MuP_ ) DebugCounter(6)=DebugCounter(6)+1
-! if( abs(MY_IDUP(6)).eq.MuP_ .and. abs(MY_IDUP(7)).eq.MuP_ .and. abs(MY_IDUP(8)).eq.taP_ .and. abs(MY_IDUP(9)).eq.taP_ ) DebugCounter(6)=DebugCounter(6)+1
-
-
 
 do i=1,9
     LHE_IDUP(i) = convertLHE( MY_IDUP(i) )
@@ -347,6 +332,143 @@ END SUBROUTINE
 
 
 
+
+SUBROUTINE WriteOutEvent_NEW(NUP,IDUP,ISTUP,MOTHUP,ICOLUP,Mom,HiggsDK_Mom,Mass,iHiggs,HiggsDK_IDUP,HiggsDK_ICOLUP,EventInfoLine,EventWeight)
+use ModParameters
+use modMisc
+implicit none
+real(8) :: Mom(:,:),HiggsDK_Mom(:,:),Mass(:)
+! real(8),optional :: MomFSPartons(:,:)
+real(8),optional :: EventWeight
+character(len=*) :: EventInfoLine
+! integer,optional :: MOTHUP_Parton(:,:)
+real(8) :: Spin, Lifetime, mZ1, mZ2
+integer :: IDUP(:),ISTUP(:),MOTHUP(:,:),ICOLUP(:,:)
+integer :: HiggsDK_IDUP(:),HiggsDK_ICOLUP(:,:),HiggsDK_ISTUP(4:9),HiggsDK_MOTHUP(1:2,4:9)
+integer,parameter :: maxpart=30
+integer :: i,iHiggs
+integer :: NUP,NUP_NEW,IDPRUP
+real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP,HiggsDKLength
+character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0)"
+
+
+
+!   For description of the LHE format see http://arxiv.org/abs/hep-ph/0109068 and http://arxiv.org/abs/hep-ph/0609017
+!   The LHE numbering scheme can be found here: http://pdg.lbl.gov/mc_particle_id_contents.html and http://lhapdf.hepforge.org/manual#tth_sEcA
+
+
+!     assignments:
+!     HiggsDK_Mom(1:4,1) --> HiggsDK_IDUP(4)! V1
+!     HiggsDK_Mom(1:4,2) --> HiggsDK_IDUP(5)! V2
+!     HiggsDK_Mom(1:4,3) --> HiggsDK_IDUP(7)! l- 
+!     HiggsDK_Mom(1:4,4) --> HiggsDK_IDUP(6)! l+
+!     HiggsDK_Mom(1:4,5) --> HiggsDK_IDUP(9)! l-
+!     HiggsDK_Mom(1:4,6) --> HiggsDK_IDUP(8)! l+
+
+    
+    ! NUP changes for gamma gamma final state
+    if ( IsAPhoton(DecayMode1) .and. IsAPhoton(DecayMode2) ) then! photon+photon FS
+        NUP_NEW = 2
+    elseif ( IsAZDecay(DecayMode1) .and. IsAPhoton(DecayMode2) ) then! Z+photon FS
+        NUP_NEW = 4
+    else! ZZ or WW FS
+        NUP_NEW = 6
+    endif
+
+
+    IDPRUP=100
+    if( present(EventWeight) ) then
+        XWGTUP=EventWeight
+    else
+        XWGTUP=1.0d0
+    endif
+    SCALUP=Mu_Fact * 100d0
+    AQEDUP=alpha_QED
+    AQCDUP=0.11d0
+    ISTUP(iHiggs) = 2
+    if ( IsAPhoton(DecayMode1) .and. IsAPhoton(DecayMode2) ) then! photon+photon FS
+        HiggsDK_ISTUP(4:9) = (/1,1,0,0,0,0/)
+        HiggsDK_MOTHUP(1:2,4) = (/iHiggs,iHiggs/)
+        HiggsDK_MOTHUP(1:2,5) = (/iHiggs,iHiggs/)
+        HiggsDK_MOTHUP(1:2,6:9) = 0
+    elseif ( IsAZDecay(DecayMode1) .and. IsAPhoton(DecayMode2) ) then! Z+photon FS
+        HiggsDK_ISTUP(4:9) = (/2,1,1,1,0,0/)
+        HiggsDK_MOTHUP(1:2,4) = (/iHiggs,iHiggs/)
+        HiggsDK_MOTHUP(1:2,5) = (/iHiggs,iHiggs/)
+        HiggsDK_MOTHUP(1:2,6) = (/1,1/) + NUP
+        HiggsDK_MOTHUP(1:2,7) = (/1,1/) + NUP
+        HiggsDK_MOTHUP(1:2,8:9) = 0        
+    else    
+        HiggsDK_ISTUP(4:9) = (/2,2,1,1,1,1/)
+        HiggsDK_MOTHUP(1:2,4) = (/iHiggs,iHiggs/)
+        HiggsDK_MOTHUP(1:2,5) = (/iHiggs,iHiggs/)
+        HiggsDK_MOTHUP(1:2,6) = (/1,1/) + NUP
+        HiggsDK_MOTHUP(1:2,7) = (/1,1/) + NUP
+        HiggsDK_MOTHUP(1:2,8) = (/2,2/) + NUP
+        HiggsDK_MOTHUP(1:2,9) = (/2,2/) + NUP
+    endif
+
+    Lifetime = 0.0d0
+    Spin = 0.1d0
+    call getHiggsDecayLength(HiggsDKLength)
+
+    !  associte lepton pairs to MOTHUP
+    if( (IsAZDecay(DecayMode1)).and.(IsAZDecay(DecayMode2)) .and. abs(HiggsDK_IDUP(7)).eq.abs(HiggsDK_IDUP(9)) ) then 
+        mZ1 = Get_MInv( HiggsDK_Mom(1:4,3)+HiggsDK_Mom(1:4,4) )
+        mZ2 = Get_MInv( HiggsDK_Mom(1:4,3)+HiggsDK_Mom(1:4,6) )
+        if( dabs(mZ2-m_V) .lt. dabs(mZ1-m_V)  ) then
+            call swapi(HiggsDK_MOTHUP(1,6),HiggsDK_MOTHUP(1,9))
+            call swapi(HiggsDK_MOTHUP(2,6),HiggsDK_MOTHUP(2,9))
+        endif
+    endif
+
+    
+    
+    write(io_LHEOutFile,"(A)") "<event>"
+    if( ReadLHEFile .and. importExternal_LHEinit ) then
+      write(io_LHEOutFile,"(I2,X,A)") NUP+NUP_NEW,trim(EventInfoLine)
+    else
+      write(io_LHEOutFile,"(I2,X,I3,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7)") NUP+NUP_NEW,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
+    !  in order of appearance:
+    !  (*) number of particles in the event
+    !  (*) process ID (user defined)
+    !  (*) weighted or unweighted events: +1=unweighted, otherwise= see manual
+    !  (*) pdf factorization scale in GeV
+    !  (*) alpha_QED coupling for this event
+    !  (*) alpha_s coupling for this event
+    endif
+
+    
+!   write out existing particles
+    do i = 1, NUP
+        if( i.eq.iHiggs ) then 
+           write(io_LHEOutFile,fmt1) IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),  &
+                                     Mom(2:4,i)/GeV,Mom(1,i)/GeV, Mass(i)/GeV,HiggsDKLength, Spin           
+        else
+           write(io_LHEOutFile,fmt1) IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),  &
+                                     Mom(2:4,i)/GeV,Mom(1,i)/GeV, Mass(i)/GeV,Lifetime, Spin   
+        endif                          
+                                  
+    enddo
+   
+   
+!   write new intermediate particles and Higgs decay products
+    call swap_mom(HiggsDK_Mom(1:4,3),HiggsDK_Mom(1:4,4))! swap to account for flipped asignments
+    call swap_mom(HiggsDK_Mom(1:4,5),HiggsDK_Mom(1:4,6))! swap to account for flipped asignments
+    do i = 4,4 + (NUP_NEW-1)
+        write(io_LHEOutFile,fmt1) HiggsDK_IDUP(i),HiggsDK_ISTUP(i), HiggsDK_MOTHUP(1,i),HiggsDK_MOTHUP(2,i), HiggsDK_ICOLUP(1,i),HiggsDK_ICOLUP(2,i),  &
+                                  HiggsDK_Mom(2:4,i-3)/GeV,HiggsDK_Mom(1,i-3)/GeV, getMass(convertLHEreverse(HiggsDK_IDUP(i)))/GeV, Lifetime, Spin   
+    enddo
+    
+
+RETURN
+END SUBROUTINE
+
+
+
+
+
+
 SUBROUTINE ShiftMass(p1,p2,m1,m2,p1hat,p2hat)
 use ModMisc
 implicit none
@@ -500,6 +622,133 @@ END SUBROUTINE
 
 
 
+SUBROUTINE WriteOutEvent_TTBH(Mom,MY_IDUP,ICOLUP,EventWeight)
+use ModParameters
+implicit none
+real(8) :: Mom(1:4,1:11)
+real(8),optional :: EventWeight
+integer :: MY_IDUP(1:11),ICOLUP(1:2,1:11),LHE_IDUP(1:11),ISTUP(1:11),MOTHUP(1:2,1:11)
+integer :: NUP,IDPRUP,i
+real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP,Lifetime,Spin,MomDummy(1:4,1:11)
+character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0)"
+integer, parameter :: tbar=4,t=5,Hbos=3,inLeft=1,inRight=2,bbar=6, lepM=7,nubar=8,b=9,lepP=10,nu=11
+
+
+! For description of the LHE format see http://arxiv.org/abs/hep-ph/0109068 and http://arxiv.org/abs/hep-ph/0609017
+! The LHE numbering scheme can be found here: http://pdg.lbl.gov/mc_particle_id_contents.html and http://lhapdf.hepforge.org/manual#tth_sEcA
+
+
+do i=1,11
+    LHE_IDUP(i) = convertLHE( MY_IDUP(i) )
+enddo
+
+
+IDPRUP=100
+SCALUP=Mu_Fact * 100d0
+AQEDUP=alpha_QED
+AQCDUP=0.11d0
+
+ISTUP(1:11) = (/-1,-1,1,2,2,1,1,1,1,1,1/)
+
+
+MOTHUP(1:2,inLeft)  = (/0,0/)
+MOTHUP(1:2,inRight) = (/0,0/)
+MOTHUP(1:2,Hbos)    = (/1,2/)
+MOTHUP(1:2,tbar)    = (/1,2/)
+MOTHUP(1:2,t)       = (/1,2/)
+MOTHUP(1:2,bbar)    = (/4,4/)
+MOTHUP(1:2,lepM)    = (/4,4/)
+MOTHUP(1:2,nubar)   = (/4,4/)
+MOTHUP(1:2,b)       = (/5,5/)
+MOTHUP(1:2,lepP)    = (/5,5/)
+MOTHUP(1:2,nu)      = (/5,5/)
+
+
+NUP=11
+
+if( present(EventWeight) ) then
+    XWGTUP=EventWeight
+else
+    XWGTUP=1.0d0
+endif
+
+Lifetime = 0.0d0
+Spin     = 0.1d0
+
+do i=1,11
+    MomDummy(1,i) = 100.0d0*Mom(1,i)
+    MomDummy(2,i) = 100.0d0*Mom(2,i)
+    MomDummy(3,i) = 100.0d0*Mom(3,i)
+    MomDummy(4,i) = 100.0d0*Mom(4,i)
+enddo
+
+
+
+
+write(io_LHEOutFile,"(A)") "<event>"
+if( .not. ReadLHEFile ) write(io_LHEOutFile,"(I2,X,I3,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7)") NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
+! in order of appearance:
+! (*) number of particles in the event
+! (*) process ID (user defined)
+! (*) weighted or unweighted events: +1=unweighted, otherwise= see manual
+! (*) pdf factorization scale in GeV
+! (*) alpha_QED coupling for this event 
+! (*) alpha_s coupling for this event
+
+
+
+! parton_a
+i=1
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
+
+! parton_b
+i=2
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
+
+! tb
+i=4
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),m_top,Lifetime,Spin
+
+! t
+i=5
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),m_top,Lifetime,Spin
+
+! H
+i=3
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),M_Reso,Lifetime,Spin
+
+! bb
+i=6
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
+
+! e-
+i=7
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
+
+! nub
+i=8
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
+
+! b
+i=9
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
+
+! e+
+i=10
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
+
+! nu
+i=11
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
+
+
+
+write(io_LHEOutFile,"(A)") "</event>"
+
+
+
+
+END SUBROUTINE
 
 
 
@@ -833,7 +1082,7 @@ SUBROUTINE EvalPhasespace_VBF(EHat,M_H,xRndPS,Mom,PSWgt)
   PSWgt = PSWup * PSWdn * PSWdc * (slocal-mhsq)/(two*pi)
   
   RETURN
-END SUBROUTINE EvalPhasespace_VBF
+END SUBROUTINE
 
 
 SUBROUTINE EvalPhasespace_2to2(EHat,Masses,xRndPS,Mom,PSWgt)
@@ -1548,6 +1797,31 @@ double precision, intent(in) :: MomExt(1:4,1:9) !,beam_momentum(2,4),four_moment
 
 RETURN
 END SUBROUTINE Kinematics_VHiggs
+SUBROUTINE Kinematics_TTBH(Mom,applyPSCut,NBin)
+use ModParameters
+use ModMisc
+implicit none
+real(8) :: Mom(1:4,1:11)
+logical :: applyPSCut
+integer :: NBin(:)
+real(8) :: pT_t,pT_H
+integer, parameter :: tbar=4,t=5,Hbos=3,inLeft=1,inRight=2,bbar=6, lepM=7,nubar=8,b=9,lepP=10,nu=11
+
+
+    applyPSCut = .false.
+
+    pT_t = get_PT(Mom(1:4,t))
+    pT_H = get_PT(Mom(1:4,Hbos))
+    
+    
+!   binning
+    NBin(1)  = WhichBin(1,pT_t)
+    NBin(2)  = WhichBin(2,pT_H)
+    
+    
+    
+RETURN
+END SUBROUTINE
 
 
 
@@ -2726,7 +3000,7 @@ END SUBROUTINE
 
 
 
-subroutine EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt)
+SUBROUTINE EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt)
 !use modMisc
 implicit none
 
@@ -2869,8 +3143,80 @@ implicit none
 !enddo
 !pause
 
-      return
-      end subroutine EvalPhaseSpace_VH
+RETURN
+END SUBROUTINE
+
+
+
+
+
+SUBROUTINE EvalPhasespace_2to3M(EHat,Mass,xRndPS,Mom,PSWgt)
+use ModParameters
+implicit none
+real(8) :: EHat
+real(8) :: PSWgt,PSWgt2,PSWgt3,Mass
+real(8) :: xRndPS(1:5)
+real(8) :: Mom(1:4,1:5),TmpMom(1:4)
+! real(8) :: MomDK(1:4,1:6)
+! integer :: NPart,i
+! real(8) :: vel,parx,theta ! for checks
+integer :: Pcol1,Pcol2,Steps
+real(8) :: SingDepth,velo,parx
+real(8),parameter :: NPr=3, PiWgtPr = (2d0*Pi)**(4-NPr*3) * (4d0*Pi)**(NPr-1)
+
+
+!  generate PS: massless + massless --> massive(M) + massive(anti-top) + massive(top)
+  call genps(3,Ehat,xRndPS(1:5),(/Mass,m_Top,m_Top/),Mom(1:4,3:5),PSWgt)
+  PSWgt = PSWgt*PiWgtPr
+
+!   call yeti3(Ehat,xRndPS(1:5),(/m_Top,m_Top,Mass/),Mom(1:4,3:5),PSWgt)
+!   TmpMom(1:4) = Mom(1:4,3)
+!   Mom(1:4,3)  = Mom(1:4,5)
+!   Mom(1:4,5)  = TmpMom(1:4)
+
+!  particles on the beam axis:
+   Mom(1,1) =  EHat*0.5d0
+   Mom(2,1) =  0d0
+   Mom(3,1) =  0d0
+   Mom(4,1) = +EHat*0.5d0
+
+   Mom(1,2) =  EHat*0.5d0
+   Mom(2,2) =  0d0
+   Mom(3,2) =  0d0
+   Mom(4,2) = -EHat*0.5d0
+
+
+return
+END SUBROUTINE
+
+
+
+SUBROUTINE EvalPhasespace_TopDecay(TopMom,xRndPS,MomDK,PSWgt)!  top quark decay phase space
+use ModParameters
+implicit none
+real(8) :: PSWgt,PSWgt2,PSWgt3
+real(8) :: TopMom(1:4),WMom(1:4)
+real(8) :: MomDK(:,:)
+real(8) :: xRndPS(:)
+real(8),parameter :: N2=2, PiWgt2 = (2d0*Pi)**(4-N2*3) * (4d0*Pi)**(N2-1)
+real(8),parameter :: N3=3, PiWgt3 = (2d0*Pi)**(4-N3*3) * (4d0*Pi)**(N3-1)
+real(8),parameter :: N4=4, PiWgt4 = (2d0*Pi)**(4-N4*3) * (4d0*Pi)**(N4-1)
+
+!     MomDK(1:4,i): i= 1:bottom, 2:lepton, 3:neutrino
+      call genps(2,m_Top,xRndPS(1:2),(/0d0,m_W/),MomDK(1:4,1:2),PSWgt2)! top decay
+      WMom(1:4) = MomDK(1:4,2)
+      call genps(2,m_W,xRndPS(3:4),(/0d0,0d0/),MomDK(1:4,2:3),PSWgt3)! W decay
+!     boost leptons to the W frame:
+      call boost(MomDK(1:4,2),WMom(1:4),m_W)
+      call boost(MomDK(1:4,3),WMom(1:4),m_W)
+!     boost all guys to the top frame:
+      call boost(MomDK(1:4,1),TopMom(1:4),m_Top)
+      call boost(MomDK(1:4,2),TopMom(1:4),m_Top)
+      call boost(MomDK(1:4,3),TopMom(1:4),m_Top)
+      PSWgt = PSWgt2*PiWgt2 * PSWgt3*PiWgt2
+
+RETURN
+END SUBROUTINE
 
 
 

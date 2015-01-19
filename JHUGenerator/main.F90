@@ -33,7 +33,8 @@ logical,parameter :: useBetaVersion=.false.! this should be set to .false.
    elseif( useBetaVersion      .and. .not.ReadLHEFile ) then
         call StartVegas_BETA(VG_Result,VG_Error)
    elseif( .not.useBetaVersion .and.      ReadLHEFile ) then
-        call StartReadLHE(VG_Result,VG_Error)
+!         call StartReadLHE(VG_Result,VG_Error)
+        call StartReadLHE_NEW(VG_Result,VG_Error)
    endif
    call WriteHisto(VG_Result,VG_Error,time_end-time_start)
    call FinalizeOutput()
@@ -62,6 +63,7 @@ integer :: NumArgs,NArg,OffShell_XVV,iunwgt,CountArg,iinterf
    PChannel=2
    DecayMode1=0  ! Z/W+
    DecayMode2=0  ! Z/W-
+   TopDecays=1
    Process = 0   ! select 0, 1 or 2 to represent the spin of the resonance
    Unweighted =.true.
    OffShell_XVV=011! 000: X,V1,V2 on-shell; 010: X,V2 on-shell, V1 off-shell; and so on
@@ -133,6 +135,9 @@ integer :: NumArgs,NArg,OffShell_XVV,iunwgt,CountArg,iinterf
         CountArg = CountArg + 1
     elseif( arg(1:11).eq."DecayMode2=" ) then
         read(arg(12:13),*) DecayMode2
+        CountArg = CountArg + 1
+    elseif( arg(1:6).eq."TopDK=" ) then
+        read(arg(7:7),*) TopDecays
         CountArg = CountArg + 1
     elseif( arg(1:7) .eq."OffXVV=" ) then
         read(arg(8:10),*) OffShell_XVV
@@ -381,6 +386,7 @@ SUBROUTINE InitProcess()
 use ModParameters
 use ModMisc
 use ModCrossSection
+use ModTTBHiggs
 implicit none
 include "vegas_common.f"
 
@@ -443,6 +449,16 @@ include "vegas_common.f"
          VegasNc1_default = 500000
          VegasNc2_default = 10000
       endif
+      !- ttbar+H
+      if(Process.eq.80) then
+         call InitProcess_TTBH()
+         NDim = 12
+         NDim = NDim + 2 ! sHat integration
+         VegasIt1_default = 5
+         VegasNc0_default =  100000
+         VegasNc1_default =  500000
+         VegasNc2_default =    1000
+      endif
 
       if( unweighted ) then
           NDim = NDim + 1  ! random number which decides if event is accepted
@@ -460,6 +476,7 @@ END SUBROUTINE
 
 SUBROUTINE StartVegas(VG_Result,VG_Error)
 use ModCrossSection
+use ModCrossSection_TTBH
 use ModKinematics
 use ModParameters
 implicit none
@@ -529,6 +546,8 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
       call vegas(EvalWeighted_HJ,VG_Result,VG_Error,VG_Chi2)
     elseif (Process.eq.50) then
       call vegas(EvalWeighted_VHiggs,VG_Result,VG_Error,VG_Chi2)
+    elseif (Process.eq.80) then
+      call vegas(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
     else
       call vegas(EvalWeighted,VG_Result,VG_Error,VG_Chi2)    ! usual call of vegas for weighted events
     endif
@@ -551,11 +570,14 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
       call vegas1(EvalWeighted_HJ,VG_Result,VG_Error,VG_Chi2)
     elseif (Process.eq.50) then
       call vegas1(EvalWeighted_VHiggs,VG_Result,VG_Error,VG_Chi2)
+    elseif (Process.eq.80) then
+      call vegas(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
     else
       call vegas1(EvalWeighted,VG_Result,VG_Error,VG_Chi2)    ! usual call of vegas for weighted events
     endif
 
 
+    
 elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
 
     VG = zero
@@ -590,6 +612,10 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
             elseif (Process.eq.50) then
                 RES = 0d0
                 dum = EvalUnWeighted_VHiggs(yRnd,.false.,RES)
+                VG = VG + RES
+            elseif (Process.eq.80) then
+                RES = 0d0
+                dum = EvalUnWeighted_TTBH(yRnd,.false.,RES)
                 VG = VG + RES
             else
                 if (PChannel_aux.eq.0.or.PChannel_aux.eq.2) then
@@ -669,13 +695,15 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
         print *, " generating events with ",VegasNc1," tries"
         do i=1,VegasNc1
             call random_number(yRnd)
-      if (Process.eq.60 .or. Process.eq.61) then
-                dum = EvalUnWeighted_HJJ(yRnd,.true.,RES)! RES is a dummy here
-      elseif (Process.eq.62) then
-                dum = EvalUnWeighted_HJ(yRnd,.true.,RES)! RES is a dummy here
-      elseif (Process.eq.50) then
-                dum = EvalUnWeighted_VHiggs(yRnd,.true.,RES)! RES is a dummy here
-      else
+            if (Process.eq.60 .or. Process.eq.61) then
+                      dum = EvalUnWeighted_HJJ(yRnd,.true.,RES)! RES is a dummy here
+            elseif (Process.eq.62) then
+                      dum = EvalUnWeighted_HJ(yRnd,.true.,RES)! RES is a dummy here
+            elseif (Process.eq.50) then
+                      dum = EvalUnWeighted_VHiggs(yRnd,.true.,RES)! RES is a dummy here
+            elseif (Process.eq.80) then
+                      dum = EvalUnWeighted_TTBH(yRnd,.true.,RES)! RES is a dummy here
+            else
                 dum = EvalUnWeighted(yRnd,.true.,RES)! RES is a dummy here
             endif
         enddo
@@ -683,15 +711,17 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
         print *, " generating ",VegasNc2," events"
         do while( AccepCounter.lt.VegasNc2 )
               call random_number(yRnd)
-        if (Process.eq.60 .or. Process.eq.61) then
-      dum = EvalUnWeighted_HJJ(yRnd,.true.,RES)! RES is a dummy here
-        elseif (Process.eq.62) then
-      dum = EvalUnWeighted_HJ(yRnd,.true.,RES)! RES is a dummy here
-        elseif (Process.eq.50) then
-            dum = EvalUnWeighted_VHiggs(yRnd,.true.,RES)! RES is a dummy here
-        else
-      dum = EvalUnWeighted(yRnd,.true.,RES)! RES is a dummy here
-        endif
+              if (Process.eq.60 .or. Process.eq.61) then
+                dum = EvalUnWeighted_HJJ(yRnd,.true.,RES)! RES is a dummy here
+              elseif (Process.eq.62) then
+                dum = EvalUnWeighted_HJ(yRnd,.true.,RES)! RES is a dummy here
+              elseif (Process.eq.50) then
+                  dum = EvalUnWeighted_VHiggs(yRnd,.true.,RES)! RES is a dummy here
+              elseif (Process.eq.80) then
+                  dum = EvalUnWeighted_TTBH(yRnd,.true.,RES)! RES is a dummy here
+              else
+                  dum = EvalUnWeighted(yRnd,.true.,RES)! RES is a dummy here
+              endif
 !              if( AccepCounter.gt.0 .and. mod(AccepCounter,10).eq.0 ) then
 !                   call cpu_time(time_int)
 !                   write(io_stdout,*)  AccepCounter," events accepted (",time_int-time_start, ") seconds"
@@ -1116,6 +1146,239 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
 
 return
 END SUBROUTINE
+
+
+
+
+
+SUBROUTINE StartReadLHE_NEW(VG_Result,VG_Error)
+use ModCrossSection
+use ModKinematics
+use ModParameters
+use ModMisc
+implicit none
+include 'csmaxvalue.f'
+integer,parameter :: maxpart=30!=max.part particles in LHE file; this parameter should match the one in WriteOutEvent of mod_Kinematics
+real(8) :: VG_Result,VG_Error,VG_Chi2
+real(8) :: yRnd(1:22),Res,dum,EMcheck(1:4)
+real(8) :: HiggsDK_Mom(1:4,4:9),Ehat
+real(8) :: MomExt(1:4,1:maxpart),MomHiggs(1:4),Mass(1:maxpart),pH2sq
+integer :: tries, nParticle, HiggsDK_IDUP(1:9), ICOLUP(1:2,1:7+maxpart),LHE_IntExt(1:7+maxpart),HiggsDK_ICOLUP(1:2,1:9)
+character(len=*),parameter :: POWHEG_Fmt0 = "(6X,I2,A160)"
+character(len=*),parameter :: POWHEG_Fmt1 = "(5X,I3,4X,I3,4X,I3,3X,I3,1X,I3,3X,I3,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9)"
+character(len=*),parameter :: JHUGen_Fmt0 = "(I2,A160)"
+character(len=*),parameter :: JHUGen_Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0)"
+character(len=*),parameter :: JHUGen_old_Fmt0 = "(2X,I2,A160)"
+character(len=*),parameter :: JHUGen_old_Fmt1 = "(I3,X,I2,X,I2,X,I2,X,I3,X,I3,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7)"
+character(len=*),parameter :: MadGra_Fmt0 = "(I2,A160)"
+character(len=*),parameter :: MadGra_Fmt1 = "(7X,I3,2X,I3,3X,I2,3X,I2,3X,I3,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1F3.0,X,1F3.0)"
+character(len=150) :: InputFmt0,InputFmt1
+logical :: FirstEvent,M_ResoSet
+integer :: nline,intDummy,Nevent
+integer :: LHE_IDUP(1:maxpart),LHE_ICOLUP(1:2,1:maxpart),LHE_MOTHUP(1:2,1:maxpart)
+integer :: EventNumPart
+character(len=160) :: FirstLines,EventInfoLine,OtherLines
+character(len=160) :: EventLine(1:maxpart)
+integer :: n,clock,i,stat,iHiggs
+integer, dimension(:), allocatable :: gfort_seed
+integer,parameter :: InputLHEFormat = 1  !  1=POWHEG, 2=JHUGen (old format), 3=JHUGen (new format), 4=MadGraph
+
+
+if(InputLHEFormat.eq.1) then
+  InputFmt0 = trim(POWHEG_Fmt0)
+  InputFmt1 = trim(POWHEG_Fmt1)
+elseif(InputLHEFormat.eq.4) then
+  InputFmt0 = trim(MadGra_Fmt0)
+  InputFmt1 = trim(MadGra_Fmt1)
+elseif(InputLHEFormat.eq.2) then
+  InputFmt0 = trim(JHUGen_old_Fmt0)
+  InputFmt1 = trim(JHUGen_old_Fmt1)
+else
+  InputFmt0 = trim(JHUGen_Fmt0)
+  InputFmt1 = trim(JHUGen_Fmt1)
+endif
+
+
+
+if( VegasIt1.eq.-1 ) VegasIt1 = VegasIt1_default
+if( VegasNc0.eq.-1 ) VegasNc0 = VegasNc0_default
+if( VegasNc1.eq.-1 .and. VegasNc2.eq.-1 ) VegasNc1 = VegasNc1_default
+if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
+
+    if (seed_random) then 
+#if compiler==1
+        call random_seed()
+#elif compiler==2
+        call random_seed(size=n)
+        allocate(gfort_seed(n))
+        call system_clock(count=clock)
+        gfort_seed = clock + 37 * (/ (i - 1, i = 1, n) /)
+        call random_seed(put = gfort_seed)
+        deallocate(gfort_seed)        
+#endif
+    endif
+
+
+!    search for line with first event
+     FirstEvent = .false.
+     M_ResoSet=.false.
+     do while ( .not.FirstEvent )
+        read(16,fmt="(A160)",IOSTAT=stat,END=99) FirstLines
+        if( FirstLines(1:5).eq."hmass" ) then 
+               read(FirstLines(6:13),fmt="(F7.0)") M_Reso
+               M_Reso = M_Reso*GeV!  convert to units of 100GeV
+               M_ResoSet=.true.
+        endif
+        if( FirstLines(1:7).eq."<event>" ) then 
+               FirstEvent=.true.
+        else
+            if( importExternal_LHEinit ) then
+                if( FirstLines(1:17).eq."<LesHouchesEvents" .or. FirstLines(1:4).eq."<!--" ) then
+                else
+                  write(io_LHEOutFile,"(A)") trim(firstlines)
+                endif
+            endif
+        endif
+     enddo
+     if( .not. M_ResoSet ) then
+        write(io_stdout,"(2X,A,1F7.2)")  "ERROR: Higgs mass could not be read from LHE input file. Assuming default value",M_Reso*100d0
+        write(io_LogFile,"(2X,A,1F7.2)") "ERROR: Higgs mass could not be read from LHE input file. Assuming default value",M_Reso*100d0
+     else
+        write(io_stdout,"(2X,A,1F7.2,A)") "A Higgs mass of ",M_Reso*100d0," GeV was determined from the LHE input file."
+        write(io_LogFile,"(2X,A,1F7.2,A)") "A Higgs mass of ",M_Reso*100d0," GeV was determined from the LHE input file."
+     endif
+     write(io_stdout,"(A)") ""
+     write(io_LogFile,"(A)") ""
+
+
+
+      print *, " finding maximal weight with ",VegasNc0," points"
+      VG = zero
+      CSmax = zero
+      Ehat = M_Reso! fixing Ehat to M_Reso which should determine the max. of the integrand
+      do tries=1,VegasNc0
+          call random_number(yRnd)
+          dum = EvalUnWeighted_withoutProduction(yRnd,.false.,EHat,Res,HiggsDK_Mom(1:4,6:9),HiggsDK_IDUP,HiggsDK_ICOLUP)
+      enddo
+      csmax(0,0)   = 1.5d0*csmax(0,0)    !  savety buffer
+
+
+
+     print *, " generating events"
+     EvalCounter = 0
+     AccepCounter = 0
+     RejeCounter = 0
+     AccepCounter_part = 0
+     call cpu_time(time_start)
+     NEvent=0
+     do while ( .true. ) 
+         NEvent=NEvent + 1
+         read(16,fmt=InputFmt0) EventNumPart,EventInfoLine!  read number of particle from the first line after <event> and other info
+!        read event lines
+         do nline=1,EventNumPart
+            read(16,fmt="(A160)") EventLine(nline)
+         enddo
+         if( EventNumPart.lt.3 .or. EventNumPart.gt.maxpart ) then
+            call Error("Number of particles in LHE input exceeds allowed limit",EventNumPart)
+         endif
+
+         do nline=1,EventNumPart
+            read(EventLine(nline),fmt=InputFmt1) LHE_IDUP(nline),LHE_IntExt(nline),LHE_MOTHUP(1,nline),LHE_MOTHUP(2,nline),LHE_ICOLUP(1,nline),LHE_ICOLUP(2,nline),MomExt(2,nline),MomExt(3,nline),MomExt(4,nline),MomExt(1,nline),Mass(nline)
+            MomExt(1:4,nline) = MomExt(1:4,nline)*GeV!  convert to units of 100GeV
+            Mass(nline) = Mass(nline)*GeV            !  convert to units of 100GeV
+            if( abs(LHE_IDUP(nline)).eq.25 ) then!   select the Higgs (ID=25, h0)
+                  MomHiggs(1:4) = MomExt(1:4,nline)
+                  pH2sq = dsqrt(abs(MomHiggs(1:4).dot.MomHiggs(1:4)))
+                  iHiggs = nline
+            endif
+         enddo
+         
+!         accept/reject sampling for H->VV decay contribution
+          EHat = pH2sq
+          do tries=1,5000000
+              call random_number(yRnd)
+              dum = EvalUnWeighted_withoutProduction(yRnd,.true.,Ehat,RES,HiggsDK_Mom(1:4,6:9),HiggsDK_IDUP,HiggsDK_ICOLUP)
+              if( Res.ne.0d0 ) exit
+          enddo
+          if( Res.ne.0d0 ) then ! decay event was accepted
+             call boost(HiggsDK_Mom(1:4,6),MomHiggs(1:4),pH2sq)
+             call boost(HiggsDK_Mom(1:4,7),MomHiggs(1:4),pH2sq)
+             call boost(HiggsDK_Mom(1:4,8),MomHiggs(1:4),pH2sq)
+             call boost(HiggsDK_Mom(1:4,9),MomHiggs(1:4),pH2sq)
+             HiggsDK_Mom(1:4,4) = HiggsDK_Mom(1:4,6) + HiggsDK_Mom(1:4,7)
+             HiggsDK_Mom(1:4,5) = HiggsDK_Mom(1:4,8) + HiggsDK_Mom(1:4,9)
+             HiggsDK_IDUP(4) = convertLHE(HiggsDK_IDUP(4))
+             HiggsDK_IDUP(5) = convertLHE(HiggsDK_IDUP(5))
+             HiggsDK_IDUP(6) = convertLHE(HiggsDK_IDUP(6))
+             HiggsDK_IDUP(7) = convertLHE(HiggsDK_IDUP(7))
+             HiggsDK_IDUP(8) = convertLHE(HiggsDK_IDUP(8))
+             HiggsDK_IDUP(9) = convertLHE(HiggsDK_IDUP(9))
+             
+             call WriteOutEvent_NEW(EventNumPart,LHE_IDUP,LHE_IntExt,LHE_MOTHUP,LHE_ICOLUP,MomExt,HiggsDK_Mom,Mass,iHiggs,HiggsDK_IDUP,HiggsDK_ICOLUP,EventInfoLine)
+
+             if( mod(AccepCounter,5000).eq.0 ) then
+                  call cpu_time(time_int)
+                  write(io_stdout,*)  NEvent," events accepted (",time_int-time_start, ") seconds"
+                  write(io_LogFile,*) NEvent," events accepted (",time_int-time_start, ") seconds"
+             endif
+          else! decay event was not accepted after ncall evaluations, read next production event
+             print *, "rejected event after ",tries-1," evaluations"
+             AlertCounter = AlertCounter + 1 
+          endif
+
+
+!        read optional lines
+         FirstEvent = .true.
+         do while (.true.) 
+              read(16,fmt="(A160)",IOSTAT=stat,END=99) OtherLines(1:160)
+              if(OtherLines(1:30).eq."</LesHouchesEvents>") then
+                  goto 99
+              elseif( OtherLines(1:8).eq."</event>" ) then
+                  write(io_LHEOutFile,"(A)") "</event>"
+              elseif( OtherLines(1:8).eq."<event>" ) then
+                  exit
+              else!if there are "#" comments
+                  write(io_LHEOutFile,fmt="(A)") trim(OtherLines)
+              endif
+         enddo         
+
+         
+     enddo
+99   continue
+     call cpu_time(time_end)
+
+
+
+
+    write(io_stdout,*) ""
+    write(io_stdout,*) "Evaluation Counter: ",EvalCounter
+    write(io_stdout,*) "Acceptance Counter: ",AccepCounter
+    write(io_stdout,*) "Rejection  Counter: ",RejeCounter
+    write(io_stdout,*) " Alert  Counter: ",AlertCounter
+    if( dble(AlertCounter)/dble(AccepCounter) .gt. 1d0*percent ) then
+        write(io_stdout,*) "ALERT: The number of rejected events exceeds 1%."
+        write(io_stdout,*) "       Increase CSMAX in main.F90 or VegasNc1."
+    endif
+   write(io_stdout,*)  " event generation rate (events/sec)",dble(AccepCounter)/(time_end-time_start)
+
+    write(io_LogFile,*) ""
+    write(io_LogFile,*) "Evaluation Counter: ",EvalCounter
+    write(io_LogFile,*) "Acceptance Counter: ",AccepCounter
+    write(io_LogFile,*) "Rejection  Counter: ",RejeCounter
+    write(io_LogFile,*) " Alert  Counter: ",AlertCounter
+    if( dble(AlertCounter)/dble(AccepCounter) .gt. 1d0*percent ) then
+        write(io_LogFile,*) "ALERT: The number of rejected events exceeds 1%."
+        write(io_LogFile,*) "       Increase CSMAX in main.F90 or VegasNc1."
+    endif
+   write(io_LogFile,*)  " event generation rate (events/sec)",dble(AccepCounter)/(time_end-time_start)
+
+
+
+return
+END SUBROUTINE
+
+
+
 
 
 
@@ -1631,6 +1894,8 @@ implicit none
      call InitHisto_HJ()
   elseif (Process.eq.50) then
      call InitHisto_VHiggs()
+  elseif (Process.eq.80) then
+     call InitHisto_TTBH()
   else
      call InitHisto_HZZ()
   endif
@@ -1847,6 +2112,41 @@ END SUBROUTINE
 
 
 
+SUBROUTINE InitHisto_TTBH()
+use ModMisc
+use ModKinematics
+use ModParameters
+implicit none
+integer :: AllocStatus,NHisto
+
+          it_sav = 1
+          NumHistograms = 2
+          if( .not.allocated(Histo) ) then
+                allocate( Histo(1:NumHistograms), stat=AllocStatus  )
+                if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
+          endif
+
+          Histo(1)%Info   = "pT_top"
+          Histo(1)%NBins  = 40
+          Histo(1)%BinSize= 10d0*GeV
+          Histo(1)%LowVal = 0d0
+          Histo(1)%SetScale= 1d0/GeV
+
+          Histo(2)%Info   = "pT_H"
+          Histo(2)%NBins  = 40
+          Histo(2)%BinSize= 10d0*GeV
+          Histo(2)%LowVal = 0d0
+          Histo(2)%SetScale= 1d0/GeV
+
+
+  do NHisto=1,NumHistograms
+      Histo(NHisto)%Value(:) = 0d0
+      Histo(NHisto)%Value2(:)= 0d0
+      Histo(NHisto)%Hits(:)  = 0
+  enddo
+
+RETURN
+END SUBROUTINE
 
 
 SUBROUTINE InitHisto_HVBF()
@@ -2090,10 +2390,13 @@ character :: arg*(500)
     if( Process.eq.60) write(TheUnit,"(4X,A,F7.2,A,F6.3)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( Process.eq.61) write(TheUnit,"(4X,A,F7.2,A,F6.3)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( Process.eq.50) write(TheUnit,"(4X,A,F7.2,A,F6.3)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
+    if( Process.eq.80) write(TheUnit,"(4X,A,F7.2,A,F6.3)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( ReadLHEFile ) write(TheUnit,"(4X,A)") "           (This is ReadLHEFile mode. Resonance mass is read from LHE input file.)"
     write(TheUnit,"(4X,A,I2,2X,A,I2)") "DecayMode1:",DecayMode1, "DecayMode2:",DecayMode2
     if( IsAZDecay(DecayMode1) .or. IsAZDecay(DecayMode2) ) write(TheUnit,"(4X,A,F6.3,A,F6.4)") "Z-boson: mass=",M_Z*100d0,", width=",Ga_Z*100d0
     if( IsAWDecay(DecayMode1) .or. IsAWDecay(DecayMode2) ) write(TheUnit,"(4X,A,F6.3,A,F6.4)") "W-boson: mass=",M_W*100d0,", width=",Ga_W*100d0
+    if( Process.eq.80 ) write(TheUnit,"(4X,A,F8.4,A,F6.4)") "Top quark mass=",m_top*100d0,", width=",Ga_top*100d0
+    if( Process.eq.80 ) write(TheUnit,"(4X,A,I2)") "Top quark decay=",TOPDECAYS
 
 
     if( .not.ReadLHEFile ) then
@@ -2267,7 +2570,7 @@ implicit none
         write(io_stdout,*) ""
         write(io_stdout,"(2X,A)") "Command line arguments:"
         write(io_stdout,"(4X,A)") "Collider:   1=LHC, 2=Tevatron, 0=e+e-"
-        write(io_stdout,"(4X,A)") "Process:    0=spin-0, 1=spin-1, 2=spin-2 resonance, 50=pp/ee->VH, 60=weakVBF, 61=pp->Hjj, 62=pp->Hj"
+        write(io_stdout,"(4X,A)") "Process:    0=spin-0, 1=spin-1, 2=spin-2 resonance, 50=pp/ee->VH, 60=weakVBF, 61=pp->Hjj, 80=pp->ttbar+H"
         write(io_stdout,"(4X,A)") "MReso:      resonance mass (default=126.00), format: yyy.xx"
         write(io_stdout,"(4X,A)") "DecayMode1: decay mode for vector boson 1 (Z/W+/gamma)"
         write(io_stdout,"(4X,A)") "DecayMode2: decay mode for vector boson 2 (Z/W-/gamma)"
@@ -2275,6 +2578,7 @@ implicit none
         write(io_stdout,"(4X,A)") "              4=W->lnu, 5=W->2q, 6=W->taunu,"
         write(io_stdout,"(4X,A)") "              7=gamma, 8=Z->2l+2tau,"
         write(io_stdout,"(4X,A)") "              9=Z->anything, 10=W->lnu+taunu, 11=W->anything"
+        write(io_stdout,"(4X,A)") "TopDK:      decay mode for tops in ttbar+H, 0=stable, 1=di-lept, 2=full hadr., 3,4=lepton+jets"
         write(io_stdout,"(4X,A)") "PChannel:   0=g+g, 1=q+qb, 2=both"
         write(io_stdout,"(4X,A)") "OffXVV:     off-shell option for resonance(X),or vector bosons(VV)"
         write(io_stdout,"(4X,A)") "PDFSet:     1=CTEQ6L1(2001), 2=MSTW(2008),  2xx=MSTW with eigenvector set xx=01..40)"
@@ -2305,8 +2609,9 @@ integer :: TheUnit
     write(TheUnit,"(A90)") " *                                                                                     *"
     write(TheUnit,"(A90)") " *   Spin and parity determination of single-produced resonances at hadron colliders   *"
     write(TheUnit,"(A90)") " *                                                                                     *"
-    write(TheUnit,"(A90)") " *         I. Anderson, S. Bolognesi, F. Caola, Y. Gao, A. Gritsan, C. Martin,         *"
-    write(TheUnit,"(A90)") " *           Z. Guo, K. Melnikov, M. Schulze, N. Tran, A. Whitbeck, Y. Zhou            *"
+    write(TheUnit,"(A90)") " *          I. Anderson, S. Bolognesi, F. Caola, Y. Gao, A. Gritsan, C. Martin,        *"
+    write(TheUnit,"(A90)") " *                  Z. Guo, K. Melnikov, U. Sarica, M. Schulze, N. Tran,               *" 
+    write(TheUnit,"(A90)") " *                            A. Whitbeck, M. Xiao, Y. Zhou                            *"
     write(TheUnit,"(A90)") " *                Phys.Rev. D81 (2010) 075022;  arXiv:1001.3396 [hep-ph],              *"
     write(TheUnit,"(A90)") " *                Phys.Rev. D86 (2012) 095031;  arXiv:1208.4018 [hep-ph],              *"
     write(TheUnit,"(A90)") " *                Phys.Rev. D89 (2014) 035007;  arXiv:1309.4819 [hep-ph].              *"
