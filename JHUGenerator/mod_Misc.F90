@@ -152,6 +152,18 @@ RETURN
 END FUNCTION
 
 
+
+SUBROUTINE swap_mom(Mom1,Mom2)
+implicit none
+real(8) :: Mom1(1:4),Mom2(1:4),tmp(1:4)
+
+    tmp(1:4) = Mom2(1:4)
+    Mom2(1:4) = Mom1(1:4)
+    Mom1(1:4) = tmp(1:4)
+
+RETURN
+END SUBROUTINE
+
 SUBROUTINE pT_order(N,Mom)
 implicit none
 integer :: N
