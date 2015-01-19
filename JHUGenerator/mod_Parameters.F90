@@ -3,16 +3,16 @@ implicit none
 save
 ! 
 ! 
-character(len=6),parameter :: JHUGen_Version="v4.8.1"
+character(len=6),parameter :: JHUGen_Version="v5.1.0"
 ! 
 ! 
-integer, public :: Collider, PDFSet,PChannel,Process,DecayMode1,DecayMode2
+integer, public :: Collider, PDFSet,PChannel,Process,DecayMode1,DecayMode2,TopDecays
 integer, public :: VegasIt1,VegasNc0,VegasNc1,VegasNc2
 real(8), public :: Collider_Energy
 integer, public :: VegasIt1_default,VegasNc0_default,VegasNc1_default,VegasNc2_default
 real(8), public :: VegasSeed
 integer, public :: NumHistograms
-logical, public :: unweighted,OffShellReson,OffShellV1,OffShellV2,ReadLHEFile,ReadCSmax,GenerateEvents
+logical, public :: unweighted,OffShellReson,OffShellV1,OffShellV2,ReadLHEFile,ConvertLHEFile,ReadCSmax,GenerateEvents
 integer(8), public :: EvalCounter=0
 integer(8), public :: RejeCounter=0
 integer(8), public :: AccepCounter=0
@@ -48,6 +48,8 @@ logical, public, parameter :: includeGammaStar = .false.
 
 real(8),parameter :: MPhotonCutoff = 4d0*GeV
 
+real(8), public, parameter :: M_Top   = 173d0     *GeV      ! 
+real(8), public, parameter :: Ga_Top  = 1.33d0    *GeV      ! 
 real(8), public, parameter :: M_Z     = 91.1876d0 *GeV      ! Z boson mass (PDG-2011)
 real(8), public, parameter :: Ga_Z    = 2.4952d0  *GeV      ! Z boson width(PDG-2011)
 real(8), public, parameter :: M_W     = 80.399d0  *GeV      ! W boson mass (PDG-2011)
@@ -61,6 +63,7 @@ real(8), public, parameter :: Lambda  = 1000d0    *GeV      ! Lambda coupling en
 real(8), public, parameter :: m_el = 0.00051100d0  *GeV         ! electron mass
 real(8), public, parameter :: m_mu = 0.10566d0     *GeV         ! muon mass
 real(8), public, parameter :: m_tau = 1.7768d0     *GeV         ! tau mass
+real(8), public, parameter :: m_bot = 4.2000d0     *GeV         ! bottom quark mass
 
 real(8), public, parameter :: HiggsDecayLengthMM = 0d0      ! Higgs decay length in [mm]
 real(8), public, parameter :: Gf = 1.16639d-5/GeV**2        ! fermi constant
@@ -82,7 +85,7 @@ real(8), public, parameter :: Rjet = 0.5d0                  ! jet deltaR, antikt
 
 !----------------------------------------------------------------------------------------------------
 
-! absolute branching fraction (taken from PDG-2012)
+! absolute branching fraction (taken from PDG-2014)
 real(8), public, parameter :: Br_Z_ll   = 10.10d0*percent                             ! leptonic Z branching
 real(8), public, parameter :: Br_Z_hadr = 69.91d0*percent                             ! hadronic Z branching
 real(8), public, parameter :: Br_Z_inv  = 100d0*percent - Br_Z_ll - Br_Z_hadr         ! invisible Z branching
@@ -91,7 +94,7 @@ real(8), public, parameter :: Br_Z_cc   = 11.6d0*percent                        
 real(8), public, parameter :: Br_Z_dd   = 15.6d0*percent                              ! dn dnbar Z branching
 real(8), public, parameter :: Br_Z_ss   = 15.6d0*percent                              ! str strbar Z branching
 real(8), public, parameter :: Br_Z_bb   = Br_Z_hadr - Br_Z_uu - Br_Z_dd - Br_Z_cc - Br_Z_ss
-real(8), public, parameter :: Br_W_ll   = 32.40d0*percent                             ! leptonic W branching
+real(8), public, parameter :: Br_W_ll   = 32.72d0*percent                             ! leptonic W branching
 real(8), public, parameter :: Br_W_hadr = 100d0*percent - Br_W_ll                     ! hadronic W branching
 
 
@@ -124,12 +127,16 @@ real(8), public, parameter :: Brhadr_W_cs = Br_W_cs/Br_W_hadr                   
 
 real(8), public, parameter :: scale_alpha_Z_uu = 1.04282d0 ! scaling factor of alpha (~partial width) for Z > u u~, c c~
 real(8), public, parameter :: scale_alpha_Z_dd = 1.04282d0 ! scaling factor of alpha (~partial width) for Z > d d~, s s~, b b~
-real(8), public, parameter :: scale_alpha_Z_ll = 1d0 ! scaling factor of alpha (~partial width) for Z > l+ l-
-real(8), public, parameter :: scale_alpha_Z_nn = 1d0 ! scaling factor of alpha (~partial width) for Z > nu nu~
 real(8), public, parameter :: scale_alpha_W_ud = 1.0993819d0 ! scaling factor of alpha (~partial width) for W > u d
 real(8), public, parameter :: scale_alpha_W_cs = 1.0993819d0 ! scaling factor of alpha (~partial width) for W > c s
-real(8), public, parameter :: scale_alpha_W_ln = 1d0 ! scaling factor of alpha (~partial width) for W > l nu
-! sum rule
+! real(8), public, parameter :: scale_alpha_Z_ll = 1d0 ! scaling factor of alpha (~partial width) for Z > l+ l-
+! real(8), public, parameter :: scale_alpha_Z_nn = 1d0 ! scaling factor of alpha (~partial width) for Z > nu nu~
+! real(8), public, parameter :: scale_alpha_W_ln = 1d0 ! scaling factor of alpha (~partial width) for W > l nu
+real(8), public, parameter :: scale_alpha_Z_ll = (1d0-(Br_Z_uu+Br_Z_cc)*scale_alpha_Z_uu-(Br_Z_dd+Br_Z_ss+Br_Z_bb)*scale_alpha_Z_dd)/(3d0*Br_Z_nn+3d0*Br_Z_ee) ! scaling factor of alpha (~partial width) for Z > l+ l- which restores the total width
+real(8), public, parameter :: scale_alpha_Z_nn = scale_alpha_Z_ll ! scaling factor of alpha (~partial width) for Z > nu nu~ which restores total width
+real(8), public, parameter :: scale_alpha_W_ln = (1d0-Br_W_ud*scale_alpha_W_ud-Br_W_cs*scale_alpha_W_cs)/(3d0*Br_W_en) ! scaling factor of alpha (~partial width) for W > l nu
+!
+! sum rules
 ! 1 = 3*Br_Z_nn + 3*Br_Z_ee + 2*Br_Z_uu + 3*Br_Z_dd
 !
 ! sum rule with scaling factors
@@ -301,6 +308,11 @@ integer, public :: Br_W_ud_counter=0
    real(8),    public, parameter :: Lambda_w4 = 10000d0*GeV
    real(8),    public, parameter :: Lambda_w5 = 10000d0*GeV
 
+!  couplings for ttbar+H
+   complex(8),    public, parameter :: kappa       = (1d0,0d0)
+   complex(8),    public, parameter :: kappa_tilde = (0d0,0d0) 
+   complex(8),    public, parameter :: couplHTT_right_dyn = m_top/vev/2d0 * ( kappa + (0d0,1d0)*kappa_tilde )
+   complex(8),    public, parameter :: couplHTT_left_dyn  = m_top/vev/2d0 * ( kappa - (0d0,1d0)*kappa_tilde )
 
 
 ! V-f-fbar couplings:
@@ -455,6 +467,8 @@ integer :: Part
       convertLHEreverse = Chm_
   elseif( Part.eq.5 ) then
       convertLHEreverse = Bot_
+  elseif( Part.eq.6 ) then
+      convertLHEreverse = Top_
   elseif( Part.eq.-1 ) then
       convertLHEreverse = ADn_
   elseif( Part.eq.-2 ) then
@@ -465,10 +479,20 @@ integer :: Part
       convertLHEreverse = AChm_
   elseif( Part.eq.-5 ) then
       convertLHEreverse = ABot_
+  elseif( Part.eq.-6 ) then
+      convertLHEreverse = ATop_
   elseif( Part.eq.21 ) then
       convertLHEreverse = Glu_
   elseif( Part.eq.11 ) then
       convertLHEreverse = ElM_
+  elseif( Part.eq.22 ) then
+      convertLHEreverse = Pho_
+  elseif( Part.eq.23 ) then
+      convertLHEreverse = Z0_
+  elseif( Part.eq.24 ) then
+      convertLHEreverse = Wp_
+  elseif( Part.eq.-24 ) then
+      convertLHEreverse = Wm_
   elseif( Part.eq.-11 ) then
       convertLHEreverse = ElP_
   elseif( Part.eq.13 ) then
@@ -491,6 +515,10 @@ integer :: Part
       convertLHEreverse = NuT_
   elseif( Part.eq.-16) then
       convertLHEreverse = ANuT_
+  elseif( Part.eq.+25) then
+      convertLHEreverse = Hig_
+  elseif( Part.eq.-25) then
+      convertLHEreverse = Hig_
   else
       print *, "MYLHE format not implemented for ",Part
       stop
@@ -509,7 +537,7 @@ integer :: Part
 
   if(     Part.eq.0 ) then
       convertLHE = 0
-  elseif(     Part.eq.Glu_ ) then
+  elseif( Part.eq.Glu_ ) then
       convertLHE = 21
   elseif( Part.eq.ElM_ ) then
       convertLHE = 11
@@ -555,6 +583,10 @@ integer :: Part
       convertLHE = 5
   elseif( Part.eq.ABot_) then
       convertLHE =-5
+  elseif( Part.eq.Top_ ) then
+      convertLHE = 6
+  elseif( Part.eq.ATop_) then
+      convertLHE =-6
   elseif( Part.eq.Z0_) then
       convertLHE =23
   elseif( Part.eq.Wp_) then
@@ -612,7 +644,7 @@ integer :: Part
   elseif( abs(Part).eq.abs(Str_) ) then
       getMass = 0d0
   elseif( abs(Part).eq.abs(Bot_) ) then
-      getMass = 0d0
+      getMass = m_bot
   elseif( abs(Part).eq.abs(Z0_) ) then
       getMass = M_Z
   elseif( abs(Part).eq.abs(Wp_) ) then
@@ -720,6 +752,20 @@ END FUNCTION
 
 
 
+FUNCTION IsABoson(PartType)
+implicit none
+logical :: IsABoson
+integer :: PartType
+
+
+  if( abs(PartType).eq.11 .or. abs(PartType).eq.12 .or. abs(PartType).eq.13 .or. abs(PartType).eq.25 ) then
+     IsABoson = .true.
+  else
+     IsABoson=.false.
+  endif
+
+
+END FUNCTION
 
 FUNCTION SU2flip(Part)
 implicit none
@@ -739,6 +785,21 @@ integer :: Part
       SU2flip = sign(1,Part)*Top_
   elseif( abs(Part).eq.Top_ ) then
       SU2flip = sign(1,Part)*Bot_
+  elseif( abs(Part).eq.ElP_ ) then
+      SU2flip = sign(1,Part)*NuE_
+  elseif( abs(Part).eq.MuP_ ) then
+      SU2flip = sign(1,Part)*NuM_
+  elseif( abs(Part).eq.TaP_ ) then
+      SU2flip = sign(1,Part)*NuT_
+  elseif( abs(Part).eq.NuE_ ) then
+      SU2flip = sign(1,Part)*ElP_
+  elseif( abs(Part).eq.NuM_ ) then
+      SU2flip = sign(1,Part)*MuP_
+  elseif( abs(Part).eq.NuT_ ) then
+      SU2flip = sign(1,Part)*TaP_
+  else
+      print *, "Error: Invalid flavor in SU2flip"
+      stop
   endif
 
 END FUNCTION

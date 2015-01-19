@@ -3,7 +3,7 @@ implicit none
 integer, parameter,private :: LHA2M_pdf(-6:6) = (/-5,-6,-3,-4,-1,-2,0 ,2,1,4,3,6,5/)
 integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6,5/)
 
-contains
+ CONTAINS
 
 
 Function EvalWeighted_HJ(yRnd,VgsWgt)
@@ -563,7 +563,7 @@ IF( GENEVT ) THEN
    if( ifound.eq.0 .and. jfound.eq.0 ) then
        CS_max = csmax(ifound,jfound) * adj_par 
    else
-       CS_max = csmax(ifound,jfound)   
+       CS_max = csmax(ifound,jfound)
    endif
 
       if( EvalUnWeighted_HJJ.gt. CS_max) then
@@ -1253,7 +1253,7 @@ endif
 elseif(DecayMode1.eq.1)then
   id(3)=convertLHE(Z0_)
   id(4)=convertLHE(Z0_)
-  id(6)=convertLHE(ZQuaBranching(yRnd(5)))
+  id(6)=convertLHE(ZQuaBranching_flat(yRnd(5)))
   id(7)=-id(6)
 
 elseif(DecayMode1.eq.2)then

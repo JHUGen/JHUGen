@@ -21,7 +21,7 @@ module ModVHiggs
   !spin-0 couplings
   real(8), parameter :: gFFS=1d0
   real(8), parameter :: gFFP=0d0
-  real(8), parameter :: b_Yukawa=4.18d0*GeV
+  real(8), parameter :: b_Yukawa=4.18d0*GeV !  MARKUS: is this supposed to be equal to m_bot ? 
 
   !----- notation for subroutines
   public :: EvalAmp_VHiggs

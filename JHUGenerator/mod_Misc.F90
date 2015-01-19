@@ -82,6 +82,15 @@ real(8) ::Mom(1:4),Get_MInv
 RETURN
 END FUNCTION
 
+FUNCTION Get_MInv2(Mom)
+implicit none
+real(8) ::Mom(1:4),Get_MInv2
+
+   Get_MInv2 = Mom(1:4).dot.Mom(1:4)
+
+RETURN
+END FUNCTION
+
 FUNCTION Get_ETA(Mom)
 implicit none
 real(8) ::Mom(1:4),Get_ETA
@@ -142,6 +151,18 @@ real(8) :: eta1,eta2,phi1,phi2,DeltaPhi,r2,delphi
 RETURN
 END FUNCTION
 
+
+
+SUBROUTINE swap_mom(Mom1,Mom2)
+implicit none
+real(8) :: Mom1(1:4),Mom2(1:4),tmp(1:4)
+
+    tmp(1:4) = Mom2(1:4)
+    Mom2(1:4) = Mom1(1:4)
+    Mom1(1:4) = tmp(1:4)
+
+RETURN
+END SUBROUTINE
 
 SUBROUTINE pT_order(N,Mom)
 implicit none
