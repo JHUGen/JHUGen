@@ -241,8 +241,8 @@ if( (IsAZDecay(DecayMode1)).and.(IsAZDecay(DecayMode2)) .and. abs(LHE_IDUP(7)).e
     mZ1 = Get_MInv( Mom(1:4,3)+Mom(1:4,4) )
     mZ2 = Get_MInv( Mom(1:4,3)+Mom(1:4,6) )
     if( dabs(mZ2-m_V) .lt. dabs(mZ1-m_V)  ) then
-        call swapi(MOTHUP(1,6),MOTHUP(1,9))
-        call swapi(MOTHUP(2,6),MOTHUP(2,9))
+        call swapi(MOTHUP(1,6),MOTHUP(1,8))! this used to be swapi(MOTHUP(1,6),MOTHUP(1,9)) which I believe is wrong
+        call swapi(MOTHUP(2,6),MOTHUP(2,8))
     endif
 endif
 
@@ -342,7 +342,7 @@ real(8) :: Mom(:,:),HiggsDK_Mom(:,:),Mass(:)
 real(8),optional :: EventWeight
 character(len=*) :: EventInfoLine
 ! integer,optional :: MOTHUP_Parton(:,:)
-real(8) :: Spin, Lifetime, mZ1, mZ2
+real(8) :: Spin, Lifetime, s34,s56,s36,s45,smallestInv
 integer :: IDUP(:),ISTUP(:),MOTHUP(:,:),ICOLUP(:,:)
 integer :: HiggsDK_IDUP(:),HiggsDK_ICOLUP(:,:),HiggsDK_ISTUP(4:9),HiggsDK_MOTHUP(1:2,4:9)
 integer,parameter :: maxpart=30
@@ -414,14 +414,16 @@ character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE
 
     !  associte lepton pairs to MOTHUP
     if( (IsAZDecay(DecayMode1)).and.(IsAZDecay(DecayMode2)) .and. abs(HiggsDK_IDUP(7)).eq.abs(HiggsDK_IDUP(9)) ) then 
-        mZ1 = Get_MInv( HiggsDK_Mom(1:4,3)+HiggsDK_Mom(1:4,4) )
-        mZ2 = Get_MInv( HiggsDK_Mom(1:4,3)+HiggsDK_Mom(1:4,6) )
-        if( dabs(mZ2-m_V) .lt. dabs(mZ1-m_V)  ) then
-            call swapi(HiggsDK_MOTHUP(1,6),HiggsDK_MOTHUP(1,9))
-            call swapi(HiggsDK_MOTHUP(2,6),HiggsDK_MOTHUP(2,9))
+        s34 = Get_MInv( HiggsDK_Mom(1:4,3)+HiggsDK_Mom(1:4,4) )
+        s56 = Get_MInv( HiggsDK_Mom(1:4,5)+HiggsDK_Mom(1:4,6) )
+        s36 = Get_MInv( HiggsDK_Mom(1:4,3)+HiggsDK_Mom(1:4,6) )
+        s45 = Get_MInv( HiggsDK_Mom(1:4,4)+HiggsDK_Mom(1:4,5) )
+        smallestInv = minloc((/dabs(s34-M_V),dabs(s56-M_V),dabs(s36-M_V),dabs(s45-M_V)/),1)        
+        if( smallestInv.eq.3 .or. smallestInv.eq.4 ) then
+            call swapi(HiggsDK_MOTHUP(1,6),HiggsDK_MOTHUP(1,8))
+            call swapi(HiggsDK_MOTHUP(2,6),HiggsDK_MOTHUP(2,8))
         endif
     endif
-
     
     
     write(io_LHEOutFile,"(A)") "<event>"
@@ -459,7 +461,6 @@ character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE
         write(io_LHEOutFile,fmt1) HiggsDK_IDUP(i),HiggsDK_ISTUP(i), HiggsDK_MOTHUP(1,i),HiggsDK_MOTHUP(2,i), HiggsDK_ICOLUP(1,i),HiggsDK_ICOLUP(2,i),  &
                                   HiggsDK_Mom(2:4,i-3)/GeV,HiggsDK_Mom(1,i-3)/GeV, getMass(convertLHEreverse(HiggsDK_IDUP(i)))/GeV, Lifetime, Spin   
     enddo
-    
 
 RETURN
 END SUBROUTINE
