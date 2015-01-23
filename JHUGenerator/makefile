@@ -5,8 +5,8 @@ PDFDir = $(Here)/pdfs
 VegasDir = $(Here)/vegas
 
 # compiler options, Comp=ifort/gfort
-Opt  = Yes
-Comp = gfort
+Opt  = No
+Comp = ifort
 
 
 

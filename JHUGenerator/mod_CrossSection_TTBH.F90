@@ -8,6 +8,20 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
  CONTAINS
 
 
+!  ./JHUGen  Process=80 TopDK=1 PChannel=0 Unweighted=0  1.4725086
+
+! ./JHUGen  Process=80 TopDK=1 PChannel=1 Unweighted=0   0.70816989
+
+!   ./JHUGen  Process=80 TopDK=1 PChannel=2 Unweighted=0  2.1803083
+
+! ratio gg/qqb = 2.08
+
+! unweighting:
+!   Acceptance  Counter_part:            0                   620
+!   Acceptance  Counter_part:            1                   380
+
+!   Acceptance  Counter_part:            0                  6417
+!   Acceptance  Counter_part:            1                  3583
 
 
 
@@ -148,7 +162,7 @@ integer :: nparton,k,ifound,jfound
 logical :: applyPSCut,genEvt
 include 'csmaxvalue.f'  
 EvalUnWeighted_TTBH = 0d0
-RES(:,:) = 0d0
+! RES(:,:) = 0d0
 
 
    call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
@@ -180,24 +194,29 @@ IF( GENEVT ) THEN
       sumtot = 0d0
       do nparton = -5,5
 !           do j = -5,5
-            sumtot = sumtot + csmax(nparton,-nparton)!   WHY IS THIS CSMAX AND NOT CS ? ! AND SHOULDNT IT RUN FROM -6..6
+!             sumtot = sumtot + csmax(nparton,-nparton)!   WHY IS THIS CSMAX AND NOT CS ? ! AND SHOULDNT IT RUN FROM -6..6
+            sumtot = sumtot + VG(nparton,-nparton)!   WHY IS THIS CSMAX AND NOT CS ? ! AND SHOULDNT IT RUN FROM -6..6
 !           enddo
       enddo
-
+      
+      
       k=0; bound(0)=0d0
       do nparton = -5,5
 !           do j = -5,5
             k=k+1
-            bound(k) = bound(k-1) + csmax(nparton,-nparton)/sumtot
-!             print *, nparton,bound(k)
-!             print *, nparton,csmax(nparton,-nparton)/sumtot
+!             bound(k) = bound(k-1) + csmax(nparton,-nparton)/sumtot
+            bound(k) = bound(k-1) + VG(nparton,-nparton)/sumtot
             if( yRnd(8).gt.bound(k-1) .and. yRnd(8).lt.bound(k)  ) then
                 ifound=nparton; jfound=-nparton;
                 exit
             endif
-!           enddo
+! !           enddo
       enddo
+
+!       put in counter here to see if bound really generates the correct fraction
+!       print *, "Xx ",bound(:)
 !       pause
+      
       
       call setPDFs(eta1,eta2,Mu_Fact,pdf)
 
@@ -209,9 +228,11 @@ IF( GENEVT ) THEN
           if( ifound.eq.0 ) then
               call EvalAmp_GG_TTBH(MomExt,LO_Res_GG_Unpol)
               EvalUnWeighted_TTBH = LO_Res_GG_Unpol * PDFFac1 * PreFac
+              CS_max = CSmax(0,0)
           else
               call EvalAmp_QQB_TTBH(MomExt,LO_Res_QQB_Unpol)
-              EvalUnWeighted_TTBH = LO_Res_GG_Unpol * PDFFac1 * PreFac
+              EvalUnWeighted_TTBH = LO_Res_QQB_Unpol * PDFFac1 * PreFac
+              CS_max = CSmax(ifound,jfound)
           endif
           
       elseif( PChannel.eq.0 ) then
@@ -235,7 +256,7 @@ IF( GENEVT ) THEN
          write(io_stdout,"(2X,A,1PE13.6,1PE13.6)")  "CS_max is too small.",EvalUnWeighted_TTBH, CS_max
          write(io_LogFile,"(2X,A,1PE13.6,1PE13.6)") "CS_max is too small.",EvalUnWeighted_TTBH, CS_max
          AlertCounter = AlertCounter + 1
-         RES = 0d0
+!          RES = 0d0
       elseif( EvalUnWeighted_TTBH .gt. yRnd(16)*CS_max ) then
          AccepCounter = AccepCounter + 1
          if( ifound.eq.0 ) then
