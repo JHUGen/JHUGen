@@ -483,7 +483,7 @@ implicit none
 include "vegas_common.f"
 real(8) :: VG_Result,VG_Error,VG_Chi2
 real(8) :: yRnd(1:22)
-real(8) :: dum, RES(-5:5,-5:5)
+real(8) :: dum, RES(-5:5,-5:5),VG2(-5:5,-5:5)
 integer :: i, i1, j1,PChannel_aux, PChannel_aux1,NHisto
 include 'csmaxvalue.f'
 integer :: n,clock
@@ -581,6 +581,7 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
 elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
 
     VG = zero
+    VG2= zero
     csmax = zero
     if (seed_random) then 
 #if compiler==1
@@ -617,6 +618,7 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
                 RES = 0d0
                 dum = EvalUnWeighted_TTBH(yRnd,.false.,RES)
                 VG = VG + RES
+                VG2 = VG2 + RES**2
             else
                 if (PChannel_aux.eq.0.or.PChannel_aux.eq.2) then
                     PChannel= 0
@@ -643,7 +645,7 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
         close(io_CSmaxFile)
     endif
 
-
+     VG = VG/dble(VegasNc0)
      csmax   = 1.5d0*csmax    !  adjustment factors, can be choosen  separately channel/by/channel
 !      do i1=-5,5
 !      do j1=-5,5
@@ -653,7 +655,20 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
 !      pause
 
 
+!       res(0,0) = 0d0
+!       do j1 = -5,5
+!             res(0,0) = res(0,0) + VG(j1,-j1)!   WHY IS THIS CSMAX AND NOT CS ? ! AND SHOULDNT IT RUN FROM -6..6
+!       enddo
+!       
+! !      do i1=-5,5
+!      do j1=-5,5
+!      i1=-j1
+!          print *, i1,j1, VG(i1,j1) ,VG(i1,j1)/res(0,0)
+! !      enddo
+!      enddo
+!      pause
 
+      
 !------------------adj_par fixes by how much the quark-induced channels need to be adjusted
 
     if (PChannel.eq.2.and.fix_channels_ratio) then
