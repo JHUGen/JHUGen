@@ -357,9 +357,18 @@ END SUBROUTINE
 SUBROUTINE InitPDFs()
 use ModParameters
 implicit none
+character :: pdftable*(100)
+
 
     call SetCtq6(4)  ! 4    CTEQ6L1  Leading Order           0.130**   215** 165    cteq6l1.tbl
 
+    if( PDFSet.eq.3 ) then
+        pdftable(:)="./pdfs/NNPDF23_lo_as_0130.LHgrid"
+    !     pdftable(:)="./pdfs/NNPDF30_lo_as_0130.LHgrid"
+        call NNPDFDriver(pdftable)
+        call NNinitPDF(0)
+    endif
+     
 return
 END SUBROUTINE
 
@@ -2587,7 +2596,7 @@ implicit none
         write(io_stdout,"(4X,A)") "TopDK:      decay mode for tops in ttbar+H, 0=stable, 1=di-lept, 2=full hadr., 3,4=lepton+jets"
         write(io_stdout,"(4X,A)") "PChannel:   0=g+g, 1=q+qb, 2=both"
         write(io_stdout,"(4X,A)") "OffXVV:     off-shell option for resonance(X),or vector bosons(VV)"
-        write(io_stdout,"(4X,A)") "PDFSet:     1=CTEQ6L1(2001), 2=MSTW(2008),  2xx=MSTW with eigenvector set xx=01..40)"
+        write(io_stdout,"(4X,A)") "PDFSet:     1=CTEQ6L1(2001), 2=MSTW(2008),  2xx=MSTW with eigenvector set xx=01..40), 3=NNPDF2.3LO"
         write(io_stdout,"(4X,A)") "VegasNc0:   number of evaluations for integrand scan"
         write(io_stdout,"(4X,A)") "VegasNc1:   number of evaluations for accept-reject sampling"
         write(io_stdout,"(4X,A)") "VegasNc2:   number of events for accept-reject sampling"
