@@ -17,6 +17,8 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
 ! ratio gg/qqb = 2.08
 
 ! unweighting:
+
+! ./JHUGen  Process=80 TopDK=1 PChannel=2 VegasNc0=100000 VegasNc2=1000
 !   Acceptance  Counter_part:            0                   620
 !   Acceptance  Counter_part:            1                   380
 
@@ -221,19 +223,36 @@ IF( GENEVT ) THEN
       call setPDFs(eta1,eta2,Mu_Fact,pdf)
 
       if( PChannel.eq.2 ) then
-          PDFFac1 = pdf(ifound,1)*pdf(jfound,2)
-          CS_max = CSmax(ifound,jfound)
+!           PDFFac1 = pdf(ifound,1)*pdf(jfound,2)
+!           CS_max = CSmax(ifound,jfound)
+!           MY_IDUP(1:5) = (/LHA2M_ID(ifound),LHA2M_ID(jfound),Hig_,ATop_,Top_/)
+!           ICOLUP(1:2,1:11) = 0
+!           if( ifound.eq.0 ) then
+!               call EvalAmp_GG_TTBH(MomExt,LO_Res_GG_Unpol)
+!               EvalUnWeighted_TTBH = LO_Res_GG_Unpol * PDFFac1 * PreFac
+!               CS_max = CSmax(0,0)
+!           else
+!               call EvalAmp_QQB_TTBH(MomExt,LO_Res_QQB_Unpol)
+!               EvalUnWeighted_TTBH = LO_Res_QQB_Unpol * PDFFac1 * PreFac
+!               CS_max = CSmax(ifound,jfound)
+!           endif
+
+          
+          PDFFac1 = pdf(0,1)*pdf(0,2)
+          PDFFac2 = pdf(+1,1)*pdf(-1,2) + pdf(+2,1)*pdf(-2,2) + pdf(+3,1)*pdf(-3,2) + pdf(+4,1)*pdf(-4,2) + pdf(+5,1)*pdf(-5,2)  &
+                  + pdf(-1,1)*pdf(+1,2) + pdf(-2,1)*pdf(+2,2) + pdf(-3,1)*pdf(+3,2) + pdf(-4,1)*pdf(+4,2) + pdf(-5,1)*pdf(+5,2) 
+          CS_max = CSmax(0,0) + CSmax(+1,-1) + CSmax(+2,-2) + CSmax(+3,-3) + CSmax(+4,-4) + CSmax(+5,-5)   &
+                              + CSmax(-1,+1) + CSmax(-2,+2) + CSmax(-3,+3) + CSmax(-4,+4) + CSmax(-5,+5) 
+                              
           MY_IDUP(1:5) = (/LHA2M_ID(ifound),LHA2M_ID(jfound),Hig_,ATop_,Top_/)
           ICOLUP(1:2,1:11) = 0
-          if( ifound.eq.0 ) then
               call EvalAmp_GG_TTBH(MomExt,LO_Res_GG_Unpol)
               EvalUnWeighted_TTBH = LO_Res_GG_Unpol * PDFFac1 * PreFac
-              CS_max = CSmax(0,0)
-          else
               call EvalAmp_QQB_TTBH(MomExt,LO_Res_QQB_Unpol)
-              EvalUnWeighted_TTBH = LO_Res_QQB_Unpol * PDFFac1 * PreFac
-              CS_max = CSmax(ifound,jfound)
-          endif
+              EvalUnWeighted_TTBH = EvalUnWeighted_TTBH   &
+                                  + LO_Res_QQB_Unpol * PDFFac2 * PreFac
+          
+          
           
       elseif( PChannel.eq.0 ) then
           call EvalAmp_GG_TTBH(MomExt,LO_Res_GG_Unpol)
