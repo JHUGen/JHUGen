@@ -232,23 +232,70 @@ int main(void){
  Ptth[4][2] = +(-0.39968027902431658);
  Ptth[4][3] = +(1.0823384759682382);
 
+ Ptth[5][0] = +(1.0151002823876631 );
+ Ptth[5][1] = +(0.96306893538507010 );
+ Ptth[5][2] = +( 0.32070427775393112 );
+ Ptth[5][3] = +(  -8.69340152707267361e-003 );
+
+ Ptth[6][0] = +(0.26916769467215163 );
+ Ptth[6][1] = +(-7.41472049268541988e-002 );
+ Ptth[6][2] = +(0.24741337553749249 );
+ Ptth[6][3] = +( -7.57631933183877115e-002 );
+
+ Ptth[7][0] = +(0.62652695393711610 );
+ Ptth[7][1] = +(-8.20177192899996244e-002 );
+ Ptth[7][2] = +(-0.59937102648865326 );
+ Ptth[7][3] = +( 0.16298309832042757 );
+
+ Ptth[8][0] = +(0.63056238611088244 );
+ Ptth[8][1] = +(0.18199675333260884 );
+ Ptth[8][2] = +(  0.53765938388191470 );
+ Ptth[8][3] = +(0.27460606598900683 );
+
+ Ptth[9][0] = +(0.34622959545354920 );
+ Ptth[9][1] = +(-2.44789896017240799e-002 );
+ Ptth[9][2] = +( -0.32712245562490633 );
+ Ptth[9][3] = +(-0.11075473290987667 );
+
+ Ptth[10][0]= +(1.1854508301754154 );
+ Ptth[10][1]= +( 0.43509768908690516 );
+ Ptth[10][2]= +( -0.61021720728132500 );
+ Ptth[10][3]= +(0.91848714288910793 );
+ 
+ 
  MReso = 125.60;
  __modttbh_MOD_initprocess_ttbh(&MReso);
 
- __modttbh_MOD_evalamp_gg_ttbh(Ptth, TTBHcoupl ,&MatElSq);
- printf("\n ");
- printf("no production dynamics\n ");
- printf("Matr.el. squared (gg->ttbh): %20.17e \n ",MatElSq);
- printf("result should be (gg->ttbh): %20.17e \n ",9.23970258835623247e-003);
- printf("ratio: %20.17e \n ",MatElSq/9.23970258835623247e-003);
+ int TopDecays=1;   // this parameter has to match the one in variables.F90; only for the purpose of this test
+ if( TopDecays==0 ) {  
+      __modttbh_MOD_evalamp_gg_ttbh(Ptth, TTBHcoupl ,&MatElSq);
+      printf("\n ");
+      printf("no production dynamics\n ");
+      printf("Matr.el. squared (gg->ttbh): %20.17e \n ",MatElSq);
+      printf("result should be (gg->ttbh): %20.17e \n ",9.23970258835623247e-003);
+      printf("ratio: %20.17e \n ",MatElSq/9.23970258835623247e-003);
 
- __modttbh_MOD_evalamp_qqb_ttbh(Ptth, TTBHcoupl, &MatElSq);
- printf("\n ");
- printf("no production dynamics\n ");
- printf("Matr.el. squared (qqb->ttbh): %20.17e \n ",MatElSq);
- printf("result should be (qqb->ttbh): %20.17e \n ",5.00600468807961274e-002);
- printf("ratio: %20.17e \n ",MatElSq/5.00600468807961274e-002);
+      __modttbh_MOD_evalamp_qqb_ttbh(Ptth, TTBHcoupl, &MatElSq);
+      printf("\n ");
+      printf("no production dynamics\n ");
+      printf("Matr.el. squared (qqb->ttbh): %20.17e \n ",MatElSq);
+      printf("result should be (qqb->ttbh): %20.17e \n ",5.00600468807961274e-002);
+      printf("ratio: %20.17e \n ",MatElSq/5.00600468807961274e-002);
+ } else {
+      __modttbh_MOD_evalamp_gg_ttbh(Ptth, TTBHcoupl ,&MatElSq);
+      printf("\n ");
+      printf("no production dynamics\n ");
+      printf("Matr.el. squared (gg->ttbh): %20.17e \n ",MatElSq);
+      printf("result should be (gg->ttbh): %20.17e \n ",161.41857569536978);
+      printf("ratio: %20.17e \n ",MatElSq/161.41857569536978);
 
+      __modttbh_MOD_evalamp_qqb_ttbh(Ptth, TTBHcoupl, &MatElSq);
+      printf("\n ");
+      printf("no production dynamics\n ");
+      printf("Matr.el. squared (qqb->ttbh): %20.17e \n ",MatElSq);
+      printf("result should be (qqb->ttbh): %20.17e \n ",597.73846213084539);
+      printf("ratio: %20.17e \n ",MatElSq/597.73846213084539);   
+ }
 
 return 0;
 };

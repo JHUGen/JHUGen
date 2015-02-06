@@ -184,15 +184,21 @@ SqAmp = 0d0
 
      couplHTT_right_dyn = m_top/vev/2d0 * ( TTBHcoupl(1) + (0d0,1d0)*TTBHcoupl(2) )
      couplHTT_left_dyn  = m_top/vev/2d0 * ( TTBHcoupl(1) - (0d0,1d0)*TTBHcoupl(2) )
-
-     ExtParticles(1)%Mom(1:4) = Mom(1:4,4)
-     ExtParticles(2)%Mom(1:4) = Mom(1:4,5)
+     if( TOPDECAYS.EQ.0 ) then
+        ExtParticles(1)%Mom(1:4) = Mom(1:4,4)
+        ExtParticles(2)%Mom(1:4) = Mom(1:4,5)
+        nhel=+1
+     else
+        ExtParticles(1)%Mom(1:4) = Mom(1:4,6)+Mom(1:4,7) +Mom(1:4,8)
+        ExtParticles(2)%Mom(1:4) = Mom(1:4,9)+Mom(1:4,10)+Mom(1:4,11)
+        call TopDecay(ATop_,Mom(1:4,6:8),ExtParticles(1)%Pol(1:4))
+        call TopDecay(Top_,Mom(1:4,9:11),ExtParticles(2)%Pol(1:4))
+        nhel=-1
+     endif
      ExtParticles(3)%Mom(1:4) =-Mom(1:4,1)    *(-1d0)! for MELA we switch back to all-outgoing conventions
      ExtParticles(4)%Mom(1:4) =-Mom(1:4,2)    *(-1d0)
      ExtParticles(7)%Mom(1:4) = Mom(1:4,3)
 
-     call TopDecay(ATop_,Mom(1:4,6:8),ExtParticles(1)%Pol(1:4))
-     call TopDecay(Top_,Mom(1:4,9:11),ExtParticles(2)%Pol(1:4))
      ExtParticles(7)%Pol(1:4) = 1d0
 !    call HDecay(ExtParticles(7),DK_LO,MomExt(1:4,12:13))
      GluPol(1:4,1,1) = pol_mless(ExtParticles(3)%Mom(1:4),+1,outgoing=.true.)
@@ -202,8 +208,6 @@ SqAmp = 0d0
 !      GluPol(1:4,1,1) = ExtParticles(3)%Mom(1:4);  GluPol(1:4,1,2) = ExtParticles(3)%Mom(1:4); print *, "checking gauge invariance"
 
 
-     nhel=-1
-     if( TOPDECAYS.EQ.0 ) nhel=+1
      do TopHel1=-1,nhel,2
      do TopHel2=-1,nhel,2
      if( TOPDECAYS.eq.0 ) then
@@ -259,14 +263,21 @@ SqAmp = 0d0
      couplHTT_right_dyn = m_top/vev/2d0 * ( TTBHcoupl(1) + (0d0,1d0)*TTBHcoupl(2) )
      couplHTT_left_dyn  = m_top/vev/2d0 * ( TTBHcoupl(1) - (0d0,1d0)*TTBHcoupl(2) )
 
-     ExtParticles(1)%Mom(1:4) = Mom(1:4,4)
-     ExtParticles(2)%Mom(1:4) = Mom(1:4,5)
+     if( TOPDECAYS.EQ.0 ) then
+        ExtParticles(1)%Mom(1:4) = Mom(1:4,4)
+        ExtParticles(2)%Mom(1:4) = Mom(1:4,5)
+        nhel=+1
+     else
+        ExtParticles(1)%Mom(1:4) = Mom(1:4,6)+Mom(1:4,7) +Mom(1:4,8)
+        ExtParticles(2)%Mom(1:4) = Mom(1:4,9)+Mom(1:4,10)+Mom(1:4,11)
+        call TopDecay(ATop_,Mom(1:4,6:8),ExtParticles(1)%Pol(1:4))
+        call TopDecay(Top_,Mom(1:4,9:11),ExtParticles(2)%Pol(1:4))
+        nhel=-1
+     endif
      ExtParticles(5)%Mom(1:4) =-Mom(1:4,1)    *(-1d0)! for MELA we switch back to all-outgoing conventions
      ExtParticles(6)%Mom(1:4) =-Mom(1:4,2)    *(-1d0)
      ExtParticles(7)%Mom(1:4) = Mom(1:4,3)
 
-     call TopDecay(ATop_,Mom(1:4,6:8),ExtParticles(1)%Pol(1:4))
-     call TopDecay(Top_,Mom(1:4,9:11),ExtParticles(2)%Pol(1:4))
      ExtParticles(7)%Pol(1:4) = 1d0
 !    call HDecay(ExtParticles(7),DK_LO,MomExt(1:4,12:13))
      call ubarSpi_Dirac(ExtParticles(6)%Mom(1:4),0d0,-1,QuaPol(1:4,1,1))
@@ -275,8 +286,6 @@ SqAmp = 0d0
      call    vSpi_Dirac(ExtParticles(5)%Mom(1:4),0d0,+1,QuaPol(1:4,2,2))    
        
 
-     nhel=-1
-     if( TOPDECAYS.EQ.0 ) nhel=+1
      do TopHel1=-1,nhel,2
      do TopHel2=-1,nhel,2
      if( TOPDECAYS.eq.0 ) then
