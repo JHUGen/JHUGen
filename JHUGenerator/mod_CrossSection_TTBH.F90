@@ -63,6 +63,10 @@ EvalWeighted_TTBH = 0d0
    FluxFac = 1d0/(2d0*EHat**2)
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt
 
+   call Kinematics_TTBH(MomExt,applyPSCut,NBin)
+   if( applyPSCut .or. PSWgt.eq.zero ) return
+
+
 !  MomExt(1:4,1)=(/   3.2772203957555925d0,        0.0000000000000000d0,        0.0000000000000000d0,        3.2772203957555925d0     /)
 !  MomExt(1:4,2)=(/     2.8653204768734621d0,        0.0000000000000000d0,        0.0000000000000000d0,       -2.8653204768734621d0         /)
 !  MomExt(1:4,3)=(/     2.0695031298922770d0,       -1.3995194639860060d0,       0.4309336522215461d0,      -0.74896506056107459d0     /)
@@ -75,8 +79,6 @@ EvalWeighted_TTBH = 0d0
 !  MomExt(1:4,10)=(/    0.34622959545354920d0,      -2.44789896017240799d-002, -0.32712245562490633d0,      -0.11075473290987667d0         /)
 !  MomExt(1:4,11)=(/     1.1854508301754154d0,       0.43509768908690516d0,      -0.61021720728132500d0,       0.91848714288910793d0        /)  
   
-   call Kinematics_TTBH(MomExt,applyPSCut,NBin)
-   if( applyPSCut .or. PSWgt.eq.zero ) return
    
    call setPDFs(eta1,eta2,Mu_Fact,pdf)
    if( PChannel.eq.0 .or. PChannel.eq.2 ) then

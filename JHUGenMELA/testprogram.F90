@@ -7,15 +7,16 @@ use modHiggsJJ
 use modVHiggs
 use modTTBH
 implicit none
+include './variables.F90'
 integer, parameter :: LHA2M_PDF(-6:6) = (/-5,-6,-3,-4,-1,-2,0 ,2,1,4,3,6,5/)
 real(8) :: helicity(9), mass(9,2)
 integer :: id(9)
 real(8) :: p(4,6),p5(4,5),p4(4,4),p9(4,9),p13(4,13)
 real(8) :: MatElSq,M_Reso,Ga_Reso,MatElSqPDF(-5:5,-5:5),check_vbf(-5:5,-5:5),check_sbf(-5:5,-5:5),check_hj(-5:5,-5:5),check_zh(-5:5,-5:5)
 integer :: MY_IDUP(6:9)
-real(8),  parameter :: GeV=1d0/100d0
+! real(8),  parameter :: GeV=1d0/100d0
 real(8),  parameter :: LHCEnergy=8000d0 * GeV
-real(8),  parameter :: alphas = 0.13229060d0
+! real(8),  parameter :: alphas = 0.13229060d0
 complex(8) :: Hggcoupl(1:3),Hzzcoupl(1:39),Hwwcoupl(1:32)
 complex(8) :: Zqqcoupl(1:2),Zzzcoupl(1:2)
 complex(8) :: Gggcoupl(1:5),Gqqcoupl(1:2),Gzzcoupl(1:10)
@@ -254,19 +255,24 @@ integer :: i, j
    p13(1:4,9) = +(/    0.63056238611088244d0,       0.18199675333260884d0,       0.53765938388191470d0,       0.27460606598900683d0         /)  
    p13(1:4,10) = +(/    0.34622959545354920d0,      -2.44789896017240799d-002, -0.32712245562490633d0,      -0.11075473290987667d0         /)
    p13(1:4,11) = +(/     1.1854508301754154d0,       0.43509768908690516d0,      -0.61021720728132500d0,       0.91848714288910793d0        /)
-    
+   
    TTBHcoupl(1) = (1d0,0d0)
    TTBHcoupl(2) = (0d0,0d0)
 
    m_Reso=125.6d0
    call InitProcess_TTBH(m_Reso)
-   call EvalAmp_GG_TTBH(p13(1:4,1:13),TTBHcoupl,MatElSq)
-   print *, 'Matr.el. squared,gg->ttbH',MatElSq,MatElSq/9.23970258835623247d-003
-   call EvalAmp_QQB_TTBH(p13(1:4,1:13),TTBHcoupl,MatElSq)
-   print *, 'Matr.el. squared,qqb->ttbH',MatElSq,MatElSq/5.00600468807961274d-002
-
+   if(TopDecays.eq.0) then 
+      call EvalAmp_GG_TTBH(p13(1:4,1:13),TTBHcoupl,MatElSq)
+      print *, 'Matr.el. squared,gg->ttbH',MatElSq,MatElSq/9.23970258835623247d-003
+      call EvalAmp_QQB_TTBH(p13(1:4,1:13),TTBHcoupl,MatElSq)
+      print *, 'Matr.el. squared,qqb->ttbH',MatElSq,MatElSq/5.00600468807961274d-002
+   else
+      call EvalAmp_GG_TTBH(p13(1:4,1:13),TTBHcoupl,MatElSq)
+      print *, 'Matr.el. squared,gg->ttbH',MatElSq,MatElSq/161.41857569536978d0
+      call EvalAmp_QQB_TTBH(p13(1:4,1:13),TTBHcoupl,MatElSq)
+      print *, 'Matr.el. squared,qqb->ttbH',MatElSq,MatElSq/597.73846213084539d0
+   endif
   
-
 END PROGRAM
 
 
