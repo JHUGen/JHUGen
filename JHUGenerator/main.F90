@@ -495,7 +495,7 @@ real(8) :: yRnd(1:22)
 real(8) :: dum, RES(-5:5,-5:5),VG2(-5:5,-5:5)
 integer :: i, i1, j1,PChannel_aux, PChannel_aux1,NHisto
 include 'csmaxvalue.f'
-integer :: n,clock
+integer :: n,clock,flav1,flav2
 integer, dimension(:), allocatable :: gfort_seed
 
 
@@ -773,6 +773,17 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
     endif
     write(io_stdout,*)  " event generation rate (events/sec)",dble(AccepCounter)/(time_end-time_start)
 
+    
+    write(*,*) ""
+    write(*,"(A)") "                 el              mu             tau             neu              jet"
+    write(*,"(A,5F16.2)") " el ",dble(Br_counter(1,1:5))/dble(AccepCounter)
+    write(*,"(A,5F16.2)") " mu ",dble(Br_counter(2,1:5))/dble(AccepCounter)
+    write(*,"(A,5F16.2)") " tau",dble(Br_counter(3,1:5))/dble(AccepCounter)
+    write(*,"(A,5F16.2)") " neu",dble(Br_counter(4,1:5))/dble(AccepCounter)
+    write(*,"(A,5F16.2)") " jet",dble(Br_counter(5,1:5))/dble(AccepCounter)
+    write(*,*) ""
+    
+    
   endif! unweighted
 
 

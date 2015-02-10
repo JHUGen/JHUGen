@@ -2,12 +2,13 @@ MODULE modTTBH
 IMPLICIT NONE
 
       
-public :: EvalAmp_GG_TTBH,EvalAmp_QQB_TTBH,InitProcess_TTBH
+public :: EvalXSec_PP_TTBH,EvalAmp_GG_TTBH,EvalAmp_QQB_TTBH,InitProcess_TTBH
 
 private
 
 complex(8) :: couplHTT_right_dyn, couplHTT_left_dyn
 integer,parameter :: ColorlessTag = 1
+real(8) :: m_Higgs
 
 
 type :: Particle
@@ -77,6 +78,7 @@ integer :: NumTrees
 integer :: iTree,NumParticles
 include "includeVars.F90"
 
+  m_Higgs = m_Reso
 
 ! gg->ttbar+H
   NumQuarks=2; NumGluons=2; NumBoson=1;
@@ -148,7 +150,7 @@ include "includeVars.F90"
 
   ExtParticles(7)%PartType = Hig_
   ExtParticles(7)%ExtRef   = 7
-  ExtParticles(7)%Mass = m_Reso
+  ExtParticles(7)%Mass = m_Higgs
   ExtParticles(7)%Mass2= ExtParticles(5)%Mass**2
   ExtParticles(7)%Helicity = 0
 
@@ -167,6 +169,58 @@ RETURN
 END SUBROUTINE
   
 
+
+      
+SUBROUTINE EvalXSec_PP_TTBH(Mom,TTBHcoupl,Res)
+! use ModTopDecay
+implicit none
+real(8) :: Mom(1:4,1:13),Res
+complex(8) :: TTBHcoupl(1:2)
+real(8) :: eta1,eta2,Etot,Pztot,MatElSq_GG,MatElSq_QQB,MatElSq_QBQ
+real(8) :: x1,x2,PDFScale,Collider_Energy
+real(8) :: up(1:2),dn(1:2),str(1:2),chm(1:2),bot(1:2),glu(1:2),sbar(1:2),cbar(1:2),bbar(1:2)
+real(8) :: NNpdf(1:2,-6:7) 
+include 'includeVars.F90'
+      
+
+      Collider_Energy = -(Mom(1,1)+Mom(1,2))
+      Etot = Mom(1,3)+Mom(1,4)+Mom(1,5)
+      Pztot= Mom(4,3)+Mom(4,4)+Mom(4,5)
+      x1 = (Etot+Pztot)/Collider_Energy
+      x2 = (Etot-Pztot)/Collider_Energy
+      PDFScale = 0.5d0*( 2d0*m_top + m_Higgs ) * 100d0
+
+      Mom(1:4,1) = x1 * Mom(1:4,1)
+      Mom(1:4,2) = x2 * Mom(1:4,2)
+      call EvalAmp_GG_TTBH(Mom(1:4,1:13),TTBHcoupl,MatElSq_GG)
+      call EvalAmp_QQB_TTBH(Mom(1:4,1:13),TTBHcoupl,MatElSq_QQB)
+      call swap_Mom(Mom(1:4,1),Mom(1:4,2))
+      call EvalAmp_QQB_TTBH(Mom(1:4,1:13),TTBHcoupl,MatElSq_QBQ)
+      
+      call NNevolvePDF(x1,PDFScale,NNpdf(1,-6:7))
+      call NNevolvePDF(x2,PDFScale,NNpdf(2,-6:7))
+!       NNpdf(1,-6:7) = NNpdf(1,-6:7)/x1
+!       NNpdf(2,-6:7) = NNpdf(2,-6:7)/x2
+      up(1:2)  = NNpdf(1:2,+1)
+      dn(1:2)  = NNpdf(1:2,+2)
+      str(1:2) = NNpdf(1:2,+3)
+      chm(1:2) = NNpdf(1:2,+4)
+      bot(1:2) = NNpdf(1:2,+5)
+      glu(1:2) = NNpdf(1:2,+0)
+ 
+      Res = MatElSq_GG  * glu(1)*glu(2)  &   ! GG
+          + MatElSq_QQB * ( up(1)*up(2) + dn(1)*dn(2) + str(1)*str(2) + chm(1)*chm(2) + bot(1)*bot(2) )  &   !  QQB
+          + MatElSq_QBQ * ( up(1)*up(2) + dn(1)*dn(2) + str(1)*str(2) + chm(1)*chm(2) + bot(1)*bot(2) )      !  QBQ
+      Res = Res/x1/x2
+
+!     restore incoming momenta (in all-outgoing convention)
+      Mom(1,1:2) = -0.5d0*Collider_Energy
+      Mom(4,1)   = -0.5d0*Collider_Energy
+      Mom(4,2)   = +0.5d0*Collider_Energy
+  
+RETURN
+END SUBROUTINE
+      
       
 
       
@@ -181,6 +235,7 @@ real(8),parameter :: c_aa=64.D0/3.D0, c_ab=-8.D0/3.D0
 include 'includeVars.F90'
 SqAmp = 0d0
 
+    
 
      couplHTT_right_dyn = m_top/vev/2d0 * ( TTBHcoupl(1) + (0d0,1d0)*TTBHcoupl(2) )
      couplHTT_left_dyn  = m_top/vev/2d0 * ( TTBHcoupl(1) - (0d0,1d0)*TTBHcoupl(2) )
@@ -6136,6 +6191,19 @@ integer :: PartType
 
 END FUNCTION
 
+
+
+
+SUBROUTINE swap_mom(Mom1,Mom2)
+implicit none
+real(8) :: Mom1(1:4),Mom2(1:4),tmp(1:4)
+
+    tmp(1:4) = Mom2(1:4)
+    Mom2(1:4) = Mom1(1:4)
+    Mom1(1:4) = tmp(1:4)
+
+RETURN
+END SUBROUTINE
 
 
 
