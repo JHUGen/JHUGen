@@ -2470,6 +2470,8 @@ IF( GENEVT ) THEN
               flav1 = 4  
           elseif( IsAQuark(MY_IDUP(7)) ) then
               flav1 = 5
+          else! for photons
+              flav1 = 1
           endif
           if( MY_IDUP(9).eq.ElM_ ) then
               flav2 = 1
@@ -2481,6 +2483,8 @@ IF( GENEVT ) THEN
               flav2 = 4  
           elseif( IsAQuark(MY_IDUP(9)) ) then
               flav2 = 5
+          else! for photons
+              flav2 = 1
           endif
           Br_counter(flav1,flav2) = Br_counter(flav1,flav2) + 1         
          
