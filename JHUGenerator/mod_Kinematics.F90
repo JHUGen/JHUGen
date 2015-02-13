@@ -711,15 +711,15 @@ write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(
 
 ! H
 i=3
-write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),M_Reso,Lifetime,Spin
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),M_Reso*100d0,Lifetime,Spin
 
 ! tb
 i=4
-write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),m_top,Lifetime,Spin
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),m_top*100d0,Lifetime,Spin
 
 ! t
 i=5
-write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),m_top,Lifetime,Spin
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),m_top*100d0,Lifetime,Spin
 
 
 if( TopDecays.ne.0 ) then
@@ -2822,15 +2822,33 @@ real(8) :: pdf(-6:6,1:2),NNpdf(1:2,-6:7)
             call NNevolvePDF(x2,PDFScale,NNpdf(2,-6:7))
             NNpdf(1,-6:7) = NNpdf(1,-6:7)/x1
             NNpdf(2,-6:7) = NNpdf(2,-6:7)/x2
-            upv(1:2) = NNpdf(1:2,+1)
-            dnv(1:2) = NNpdf(1:2,+2)
-            usea(1:2)= 0d0
-            dsea(1:2)= 0d0
-            str(1:2) = NNpdf(1:2,+3)
-            chm(1:2) = NNpdf(1:2,+4)
-            bot(1:2) = NNpdf(1:2,+5)
-            glu(1:2) = NNpdf(1:2,+0)
-            phot(1:2)= NNpdf(1:2,+7)
+            
+    !       PROTON CONTENT
+            pdf(Up_,1)   = NNpdf(1,+1)         * swPDF_u
+            pdf(AUp_,1)  = NNpdf(1,-1)         * swPDF_u
+            pdf(Dn_,1)   = NNpdf(1,+2)         * swPDF_d
+            pdf(ADn_,1)  = NNpdf(1,-2)         * swPDF_d
+            pdf(Chm_,1)  = NNpdf(1,+3)         * swPDF_c
+            pdf(AChm_,1) = NNpdf(1,-3)         * swPDF_c
+            pdf(Str_,1)  = NNpdf(1,+4)         * swPDF_s
+            pdf(AStr_,1) = NNpdf(1,-4)         * swPDF_s
+            pdf(Bot_,1)  = NNpdf(1,+5)         * swPDF_b
+            pdf(ABot_,1) = NNpdf(1,-5)         * swPDF_b
+            pdf(0,1)     = NNpdf(1,+0)         * swPDF_g            
+            
+            pdf(Up_,2)   = NNpdf(2,+1)         * swPDF_u
+            pdf(AUp_,2)  = NNpdf(2,-1)         * swPDF_u
+            pdf(Dn_,2)   = NNpdf(2,+2)         * swPDF_d
+            pdf(ADn_,2)  = NNpdf(2,-2)         * swPDF_d
+            pdf(Chm_,2)  = NNpdf(2,+3)         * swPDF_c
+            pdf(AChm_,2) = NNpdf(2,-3)         * swPDF_c
+            pdf(Str_,2)  = NNpdf(2,+4)         * swPDF_s
+            pdf(AStr_,2) = NNpdf(2,-4)         * swPDF_s
+            pdf(Bot_,2)  = NNpdf(2,+5)         * swPDF_b
+            pdf(ABot_,2) = NNpdf(2,-5)         * swPDF_b
+            pdf(0,2)     = NNpdf(2,+0)         * swPDF_g            
+            RETURN
+            
         else
             print *, "PDFSet",PDFSet,"not available!"
             stop
