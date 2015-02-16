@@ -422,10 +422,6 @@ character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE
         if( smallestInv.eq.3 .or. smallestInv.eq.4 ) then
             call swapi(HiggsDK_MOTHUP(1,6),HiggsDK_MOTHUP(1,8))
             call swapi(HiggsDK_MOTHUP(2,6),HiggsDK_MOTHUP(2,8))
-            
-            write(io_LHEOutFile,*) s34,s56
-            write(io_LHEOutFile,*) s36,s45
-            write(io_LHEOutFile,*) "swaped MOTH 6<-->8"
         endif
     endif
     
