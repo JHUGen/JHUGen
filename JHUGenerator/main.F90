@@ -363,8 +363,8 @@ character :: pdftable*(100)
     call SetCtq6(4)  ! 4    CTEQ6L1  Leading Order           0.130**   215** 165    cteq6l1.tbl
 
     if( PDFSet.eq.3 ) then
-        pdftable(:)="./pdfs/NNPDF23_lo_as_0130.LHgrid"
-    !     pdftable(:)="./pdfs/NNPDF30_lo_as_0130.LHgrid"
+!         pdftable(:)="./pdfs/NNPDF23_lo_as_0130.LHgrid"
+        pdftable(:)="./pdfs/NNPDF30_lo_as_0130.LHgrid"
         call NNPDFDriver(pdftable)
         call NNinitPDF(0)
     endif

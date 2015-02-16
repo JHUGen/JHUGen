@@ -366,7 +366,7 @@ int main(void){
  
  
  int someParam=33;
- nnpdfdriver_("./pdfs/NNPDF23_lo_as_0130.LHgrid",&someParam);
+ nnpdfdriver_("./pdfs/NNPDF30_lo_as_0130.LHgrid",&someParam);
  someParam=0;
  nninitpdf_(&someParam);
 
@@ -376,12 +376,13 @@ int main(void){
 
  
   if( TopDecays==1 ) {  
-      __modttbh_MOD_evalxsec_pp_ttbh(Ptth, TTBHcoupl ,&MatElSq);
+      someParam=2;
+      __modttbh_MOD_evalxsec_pp_ttbh(Ptth, TTBHcoupl, &someParam, &MatElSq);
       printf("\n ");
       printf("no production dynamics\n ");
       printf("Matr.el. squared (pp->ttbh): %20.17e \n ",MatElSq);
-      printf("result should be (pp->ttbh): %20.17e \n ",1849.90671287913+2842.07693611093);
-      printf("ratio: %20.17e \n ",MatElSq/(1849.90671287913+2842.07693611093));
+      printf("result should be (pp->ttbh): %20.17e \n ",(1849.90671287913+2842.07693611093)/ 1.1459418466);
+      printf("ratio: %20.17e \n ",MatElSq/(1849.90671287913+2842.07693611093)*1.1459418466);
  }
  
  

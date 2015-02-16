@@ -296,13 +296,13 @@ integer :: i, j
    TTBHcoupl(1) = (1d0,0d0)
    TTBHcoupl(2) = (0d0,0d0)
 
-   call NNPDFDriver("./pdfs/NNPDF23_lo_as_0130.LHgrid",33)
+   call NNPDFDriver("./pdfs/NNPDF30_lo_as_0130.LHgrid",33)
    call NNinitPDF(0)
 !    call InitProcess_TTBH(m_Reso)! done above already
 
    if(TopDecays.eq.1) then   
-        call EvalXSec_PP_TTBH(p13(1:4,1:13),TTBHcoupl,MatElSq)
-        print *, 'Matr.el. squared,gg->ttbH',MatElSq ,MatElSq/( 1849.90671287913d0 + 2842.07693611093d0 )  
+        call EvalXSec_PP_TTBH(p13(1:4,1:13),TTBHcoupl,2,MatElSq)
+        print *, 'Matr.el. squared,gg->ttbH',MatElSq ,MatElSq/( 1849.90671287913d0 + 2842.07693611093d0 ) * 1.14594184663D0
    endif
    
    
