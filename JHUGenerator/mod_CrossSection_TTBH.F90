@@ -65,17 +65,17 @@ EvalWeighted_TTBH = 0d0
    call Kinematics_TTBH(MomExt,applyPSCut,NBin)
    if( applyPSCut .or. PSWgt.eq.zero ) return
 
-   write(*,"(PE21.14,PE21.14,PE21.14,PE21.14)") MomExt(1:4,1)
-   write(*,"(PE21.14,PE21.14,PE21.14,PE21.14)") MomExt(1:4,2)
-   write(*,"(PE21.14,PE21.14,PE21.14,PE21.14)") MomExt(1:4,3)
-   write(*,"(PE21.14,PE21.14,PE21.14,PE21.14)") MomExt(1:4,4)
-   write(*,"(PE21.14,PE21.14,PE21.14,PE21.14)") MomExt(1:4,5)
-   write(*,"(PE21.14,PE21.14,PE21.14,PE21.14)") MomExt(1:4,6)
-   write(*,"(PE21.14,PE21.14,PE21.14,PE21.14)") MomExt(1:4,7)
-   write(*,"(PE21.14,PE21.14,PE21.14,PE21.14)") MomExt(1:4,8)
-   write(*,"(PE21.14,PE21.14,PE21.14,PE21.14)") MomExt(1:4,9)
-   write(*,"(PE21.14,PE21.14,PE21.14,PE21.14)") MomExt(1:4,10)
-   write(*,"(PE21.14,PE21.14,PE21.14,PE21.14)") MomExt(1:4,11)
+!    write(*,"(PE21.14,PE21.14,PE21.14,PE21.14)") MomExt(1:4,1)
+!    write(*,"(PE21.14,PE21.14,PE21.14,PE21.14)") MomExt(1:4,2)
+!    write(*,"(PE21.14,PE21.14,PE21.14,PE21.14)") MomExt(1:4,3)
+!    write(*,"(PE21.14,PE21.14,PE21.14,PE21.14)") MomExt(1:4,4)
+!    write(*,"(PE21.14,PE21.14,PE21.14,PE21.14)") MomExt(1:4,5)
+!    write(*,"(PE21.14,PE21.14,PE21.14,PE21.14)") MomExt(1:4,6)
+!    write(*,"(PE21.14,PE21.14,PE21.14,PE21.14)") MomExt(1:4,7)
+!    write(*,"(PE21.14,PE21.14,PE21.14,PE21.14)") MomExt(1:4,8)
+!    write(*,"(PE21.14,PE21.14,PE21.14,PE21.14)") MomExt(1:4,9)
+!    write(*,"(PE21.14,PE21.14,PE21.14,PE21.14)") MomExt(1:4,10)
+!    write(*,"(PE21.14,PE21.14,PE21.14,PE21.14)") MomExt(1:4,11)
 
    Mu_Fact = 0.5d0*( 2d0*M_top + M_Reso )
    call setPDFs(eta1,eta2,Mu_Fact,pdf)
@@ -96,10 +96,10 @@ EvalWeighted_TTBH = 0d0
    endif
    EvalWeighted_TTBH = EvalWeighted_TTBH * PreFac
    
-print *, "checker",eta1,eta2,ehat,Mu_Fact,FluxFac,pdf(0,1)*pdf(0,2),( PDFFac1 + PDFFac2 )   
-print *, "gg",LO_Res_GG_Unpol         *FluxFac*pdf(0,1)*pdf(0,2)
-print *, "qq",LO_Res_QQB_Unpol        *FluxFac*( PDFFac1 + PDFFac2 )   
-pause
+! print *, "checker",eta1,eta2,ehat,Mu_Fact,FluxFac,pdf(0,1)*pdf(0,2),( PDFFac1 + PDFFac2 )   
+! print *, "gg",LO_Res_GG_Unpol         *FluxFac*pdf(0,1)*pdf(0,2)
+! print *, "qq",LO_Res_QQB_Unpol        *FluxFac*( PDFFac1 + PDFFac2 )   
+! pause
 !       LO_Res_QQB_Unpol = LO_Res_QQB_Unpol/alphas**2*0.13d0**2
 !       LO_Res_GG_Unpol = LO_Res_GG_Unpol/alphas**2*0.13d0**2
 !       MG_MOM(0:3,1) = MomExt(1:4,1)*100d0

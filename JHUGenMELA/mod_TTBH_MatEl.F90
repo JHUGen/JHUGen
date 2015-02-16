@@ -171,10 +171,11 @@ END SUBROUTINE
 
 
       
-SUBROUTINE EvalXSec_PP_TTBH(Mom,TTBHcoupl,Res)
+SUBROUTINE EvalXSec_PP_TTBH(Mom,TTBHcoupl,SelectProcess,Res)
 implicit none
 real(8) :: Mom(1:4,1:13),Res
 complex(8) :: TTBHcoupl(1:2)
+integer :: SelectProcess! 0=gg, 1=qqb, 2=all 
 real(8) :: eta1,eta2,Etot,Pztot,MatElSq_GG,MatElSq_QQB,MatElSq_QBQ
 real(8) :: x1,x2,PDFScale,Collider_Energy,E_CMS
 real(8) :: NNpdf(1:2,-6:7)
@@ -196,10 +197,21 @@ include 'includeVars.F90'
 
       Mom(1:4,1) = x1 * Mom(1:4,1)
       Mom(1:4,2) = x2 * Mom(1:4,2)
-      call EvalAmp_GG_TTBH(Mom(1:4,1:13),TTBHcoupl,MatElSq_GG)
-      call EvalAmp_QQB_TTBH(Mom(1:4,1:13),TTBHcoupl,MatElSq_QQB)
-      call swap_Mom(Mom(1:4,1),Mom(1:4,2))
-      call EvalAmp_QQB_TTBH(Mom(1:4,1:13),TTBHcoupl,MatElSq_QBQ)
+      if( SelectProcess.eq.0 ) then
+          call EvalAmp_GG_TTBH(Mom(1:4,1:13),TTBHcoupl,MatElSq_GG)
+          MatElSq_QQB = 0d0
+          MatElSq_QBQ = 0d0
+      elseif( SelectProcess.eq.1 ) then
+          call EvalAmp_QQB_TTBH(Mom(1:4,1:13),TTBHcoupl,MatElSq_QQB)
+          call swap_Mom(Mom(1:4,1),Mom(1:4,2))
+          call EvalAmp_QQB_TTBH(Mom(1:4,1:13),TTBHcoupl,MatElSq_QBQ)
+          MatElSq_GG = 0d0
+      else
+          call EvalAmp_GG_TTBH(Mom(1:4,1:13),TTBHcoupl,MatElSq_GG)
+          call EvalAmp_QQB_TTBH(Mom(1:4,1:13),TTBHcoupl,MatElSq_QQB)
+          call swap_Mom(Mom(1:4,1),Mom(1:4,2))
+          call EvalAmp_QQB_TTBH(Mom(1:4,1:13),TTBHcoupl,MatElSq_QBQ)
+      endif
       
       call NNevolvePDF(x1,PDFScale,NNpdf(1,-6:7))
       call NNevolvePDF(x2,PDFScale,NNpdf(2,-6:7))

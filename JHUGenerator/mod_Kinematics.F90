@@ -422,6 +422,10 @@ character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE
         if( smallestInv.eq.3 .or. smallestInv.eq.4 ) then
             call swapi(HiggsDK_MOTHUP(1,6),HiggsDK_MOTHUP(1,8))
             call swapi(HiggsDK_MOTHUP(2,6),HiggsDK_MOTHUP(2,8))
+            
+            write(io_LHEOutFile,*) s34,s56
+            write(io_LHEOutFile,*) s36,s45
+            write(io_LHEOutFile,*) "swaped MOTH 6<-->8"
         endif
     endif
     
@@ -450,16 +454,15 @@ character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE
            write(io_LHEOutFile,fmt1) IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),  &
                                      Mom(2:4,i)/GeV,Mom(1,i)/GeV, Mass(i)/GeV,Lifetime, Spin   
         endif                          
-                                  
     enddo
-   
-   
+    
+    
 !   write new intermediate particles and Higgs decay products
     call swap_mom(HiggsDK_Mom(1:4,3),HiggsDK_Mom(1:4,4))! swap to account for flipped asignments
     call swap_mom(HiggsDK_Mom(1:4,5),HiggsDK_Mom(1:4,6))! swap to account for flipped asignments
     do i = 4,4 + (NUP_NEW-1)
         write(io_LHEOutFile,fmt1) HiggsDK_IDUP(i),HiggsDK_ISTUP(i), HiggsDK_MOTHUP(1,i),HiggsDK_MOTHUP(2,i), HiggsDK_ICOLUP(1,i),HiggsDK_ICOLUP(2,i),  &
-                                  HiggsDK_Mom(2:4,i-3)/GeV,HiggsDK_Mom(1,i-3)/GeV, getMass(convertLHEreverse(HiggsDK_IDUP(i)))/GeV, Lifetime, Spin   
+                                  HiggsDK_Mom(2:4,i-3)/GeV,HiggsDK_Mom(1,i-3)/GeV, get_MInv(HiggsDK_Mom(1:4,i-3))/GeV, Lifetime, Spin   
     enddo
 
 RETURN
