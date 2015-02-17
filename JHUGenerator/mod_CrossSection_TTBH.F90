@@ -7,26 +7,8 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
 
  CONTAINS
 
-
-!  ./JHUGen  Process=80 TopDK=1 PChannel=0 Unweighted=0  1.4725086
-
-! ./JHUGen  Process=80 TopDK=1 PChannel=1 Unweighted=0   0.70816989
-
-!   ./JHUGen  Process=80 TopDK=1 PChannel=2 Unweighted=0  2.1803083
-
-! ratio gg/qqb = 2.08
-
-! unweighting:
-
-! ./JHUGen  Process=80 TopDK=1 PChannel=2 VegasNc0=100000 VegasNc2=1000
-!   Acceptance  Counter_part:            0                   620
-!   Acceptance  Counter_part:            1                   380
-
-!   Acceptance  Counter_part:            0                  6417
-!   Acceptance  Counter_part:            1                  3583
-
-
-
+ 
+ 
 
 FUNCTION EvalWeighted_TTBH(yRnd,VgsWgt)
 use ModKinematics
@@ -190,6 +172,7 @@ EvalUnWeighted_TTBH = 0d0
 
    call Kinematics_TTBH(MomExt,applyPSCut,NBin)
    if( applyPSCut .or. PSWgt.eq.zero ) return
+   Mu_Fact = 0.5d0*( 2d0*M_top + M_Reso )   
    
 
 IF( GENEVT ) THEN   
@@ -219,7 +202,6 @@ IF( GENEVT ) THEN
 !       put in counter here to see if bound really generates the correct fraction
 !       print *, "Xx ",bound(:)
 !       pause
-      
       
       call setPDFs(eta1,eta2,Mu_Fact,pdf)
 
@@ -296,7 +278,6 @@ IF( GENEVT ) THEN
 ELSE! NOT GENEVT
 
       call setPDFs(eta1,eta2,Mu_Fact,pdf)
-
       
       if( PChannel.eq.0 .or. PChannel.eq.2 ) then
           call EvalAmp_GG_TTBH(MomExt,LO_Res_GG_Unpol)
@@ -310,7 +291,7 @@ ELSE! NOT GENEVT
       endif
       
       if( PChannel.eq.1 .or. PChannel.eq.2 ) then
-          call EvalAmp_QQB_TTBH(MomExt,LO_Res_QQB_Unpol)
+          call EvalAmp_QQB_TTBH(MomExt,LO_Res_QQB_Unpol)       
           do nparton = -5,5
             if (nparton.eq.-5) then
               PDFFac1 = pdf(Bot_,2)*pdf(ABot_,1)

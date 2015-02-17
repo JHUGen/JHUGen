@@ -2089,6 +2089,15 @@ include 'csmaxvalue.f'
 ! if(  my_idup(6).ne.my_idup(8)) return! for 4mu/4e  ! noi+ 0.92608512,     i+ 1.01761060,   i- 0.12915384,     ix+  3.5925481 ix-  0.80721147E-02
 !                                                            50/50%              48/52%         52/48%               48%                52%
 
+  if( yrnd(16).le.0.5d0  ) then
+      call swapi(MY_IDUP(4),MY_IDUP(5))
+      call swapi(MY_IDUP(6),MY_IDUP(8))
+      call swapi(MY_IDUP(7),MY_IDUP(9))
+      call swapi(ICOLUP(1,6),ICOLUP(1,8))
+      call swapi(ICOLUP(1,7),ICOLUP(1,9))
+      call swapi(ICOLUP(2,6),ICOLUP(2,8))
+      call swapi(ICOLUP(2,7),ICOLUP(2,9))
+  endif
 
   yz1 = yRnd(10)
   yz2 = yRnd(11)
