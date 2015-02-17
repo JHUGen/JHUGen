@@ -243,6 +243,8 @@ if( (IsAZDecay(DecayMode1)).and.(IsAZDecay(DecayMode2)) .and. abs(LHE_IDUP(7)).e
     if( dabs(mZ2-m_V) .lt. dabs(mZ1-m_V)  ) then
         call swapi(MOTHUP(1,6),MOTHUP(1,8))! this used to be swapi(MOTHUP(1,6),MOTHUP(1,9)) which I believe is wrong
         call swapi(MOTHUP(2,6),MOTHUP(2,8))
+        Z1FV(1:4) = MomDummy(1:4,3)+MomDummy(1:4,6)
+        Z2FV(1:4) = MomDummy(1:4,5)+MomDummy(1:4,4)
     endif
 endif
 
@@ -422,6 +424,8 @@ character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE
         if( smallestInv.eq.3 .or. smallestInv.eq.4 ) then
             call swapi(HiggsDK_MOTHUP(1,6),HiggsDK_MOTHUP(1,8))
             call swapi(HiggsDK_MOTHUP(2,6),HiggsDK_MOTHUP(2,8))
+            HiggsDK_Mom(1:4,1) = HiggsDK_Mom(1:4,3)+ HiggsDK_Mom(1:4,6)
+            HiggsDK_Mom(1:4,2) = HiggsDK_Mom(1:4,4)+ HiggsDK_Mom(1:4,5)
         endif
     endif
     
@@ -1446,8 +1450,6 @@ real(8),parameter :: Rsep_ll=0.2d0
       Phi1 = signPhi1 * acos(MomLeptPlane1(2)*MomBeamScatterPlane(2) + MomLeptPlane1(3)*MomBeamScatterPlane(3) + MomLeptPlane1(4)*MomBeamScatterPlane(4))
 
 
-
-
 !     binning
       NBin(1)  = WhichBin(1,pT_lepP)
       NBin(2)  = WhichBin(2,pT_lepM)
@@ -1630,7 +1632,6 @@ applyPSCut = .false.
        NBin(1)  = WhichBin(1,m_jj)
        NBin(2)  = WhichBin(2,dphi_jj)
 
-
 RETURN
 END SUBROUTINE
 
@@ -1798,10 +1799,12 @@ double precision, intent(in) :: MomExt(1:4,1:9) !,beam_momentum(2,4),four_moment
      Nbin(8)  = WhichBin(8,phistar1)
      Nbin(9)  = WhichBin(9,phi)
 
-
-
 RETURN
 END SUBROUTINE Kinematics_VHiggs
+
+
+
+
 SUBROUTINE Kinematics_TTBH(Mom,applyPSCut,NBin)
 use ModParameters
 use ModMisc
