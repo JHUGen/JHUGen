@@ -190,8 +190,8 @@ include 'includeVars.F90'
           Etot = Mom(1,3) + Mom(1,6)+Mom(1,7)+Mom(1,8) + Mom(1,9)+Mom(1,10)+Mom(1,11)
           Pztot= Mom(4,3) + Mom(4,6)+Mom(4,7)+Mom(4,8) + Mom(4,9)+Mom(4,10)+Mom(4,11)
       endif
-      x1 = (Etot+Pztot)/Collider_Energy
-      x2 = (Etot-Pztot)/Collider_Energy
+      x1 = (Etot+Pztot * sign(1d0,Mom(4,2)) )/Collider_Energy
+      x2 = (Etot-Pztot * sign(1d0,Mom(4,2)) )/Collider_Energy
       E_CMS = dsqrt(x1*x2)*Collider_Energy
       PDFScale = 0.5d0*( 2d0*m_top + m_Higgs ) * 100d0
 
@@ -203,14 +203,12 @@ include 'includeVars.F90'
           MatElSq_QBQ = 0d0
       elseif( SelectProcess.eq.1 ) then
           call EvalAmp_QQB_TTBH(Mom(1:4,1:13),TTBHcoupl,MatElSq_QQB)
-          call swap_Mom(Mom(1:4,1),Mom(1:4,2))
-          call EvalAmp_QQB_TTBH(Mom(1:4,1:13),TTBHcoupl,MatElSq_QBQ)
+          MatElSq_QBQ = MatElSq_QQB
           MatElSq_GG = 0d0
       else
           call EvalAmp_GG_TTBH(Mom(1:4,1:13),TTBHcoupl,MatElSq_GG)
           call EvalAmp_QQB_TTBH(Mom(1:4,1:13),TTBHcoupl,MatElSq_QQB)
-          call swap_Mom(Mom(1:4,1),Mom(1:4,2))
-          call EvalAmp_QQB_TTBH(Mom(1:4,1:13),TTBHcoupl,MatElSq_QBQ)
+          MatElSq_QBQ = MatElSq_QQB
       endif
       
       call NNevolvePDF(x1,PDFScale,NNpdf(1,-6:7))
@@ -225,11 +223,13 @@ include 'includeVars.F90'
 
 !     restore incoming momenta (in all-outgoing convention)
       Mom(1,1:2) = -0.5d0*Collider_Energy
-      Mom(4,1)   = -0.5d0*Collider_Energy
-      Mom(4,2)   = +0.5d0*Collider_Energy
+      Mom(4,1)   = -0.5d0*Collider_Energy * sign(1d0,Mom(4,2))
+      Mom(4,2)   = +0.5d0*Collider_Energy * sign(1d0,Mom(4,2))
   
 RETURN
 END SUBROUTINE
+
+
 
       
 
@@ -6203,17 +6203,6 @@ END FUNCTION
 
 
 
-
-SUBROUTINE swap_mom(Mom1,Mom2)
-implicit none
-real(8) :: Mom1(1:4),Mom2(1:4),tmp(1:4)
-
-    tmp(1:4) = Mom2(1:4)
-    Mom2(1:4) = Mom1(1:4)
-    Mom1(1:4) = tmp(1:4)
-
-RETURN
-END SUBROUTINE
 
 
 
