@@ -2055,7 +2055,7 @@ real(8) :: MomExt(1:4,1:4),MomDK(1:4,1:4),MomDK_massless(1:4,1:4),MomExt_f(1:4,1
 logical :: applyPSCut,genEvt
 real(8) :: CS_max, channel_ratio
 real(8) :: oneovervolume, bound(1:11), sumtot,yz1,yz2,EZ_max,dr,MZ1,MZ2,ML1,ML2,ML3,ML4
-integer :: parton(-5:5,-5:5), i1, ifound, i2, MY_IDUP(1:9), ICOLUP(1:2,1:9)
+integer :: parton(-5:5,-5:5), i1, ifound, i2, MY_IDUP(1:9), ICOLUP(1:2,1:9),flav1,flav2
 real(8)::ntRnd,ZMass(1:2)
 real(8) :: offzchannel
 include 'vegas_common.f'
@@ -2088,6 +2088,16 @@ include 'csmaxvalue.f'
 ! if(  my_idup(6).eq.my_idup(8)) return! for 2e2mu   ! noi+ 0.92591989,     i+ 0.92775679,   i- 0.14072385,     ix+ 3.2770660  ix-  0.88181581E-02
 ! if(  my_idup(6).ne.my_idup(8)) return! for 4mu/4e  ! noi+ 0.92608512,     i+ 1.01761060,   i- 0.12915384,     ix+  3.5925481 ix-  0.80721147E-02
 !                                                            50/50%              48/52%         52/48%               48%                52%
+
+  if( yrnd(16).le.0.5d0  ) then
+      call swapi(MY_IDUP(4),MY_IDUP(5))
+      call swapi(MY_IDUP(6),MY_IDUP(8))
+      call swapi(MY_IDUP(7),MY_IDUP(9))
+      call swapi(ICOLUP(1,6),ICOLUP(1,8))
+      call swapi(ICOLUP(1,7),ICOLUP(1,9))
+      call swapi(ICOLUP(2,6),ICOLUP(2,8))
+      call swapi(ICOLUP(2,7),ICOLUP(2,9))
+  endif
 
   yz1 = yRnd(10)
   yz2 = yRnd(11)
@@ -2238,9 +2248,9 @@ IF( GENEVT ) THEN
     bound(9)  = bound(8) + csmax(3,-3)/sumtot
     bound(10) = bound(9) + csmax(4,-4)/sumtot
     bound(11) = one
-
-
-
+     
+        
+        
 !   yrnd(13) selects the partonic channel according to its relative contribution to the total cross section
     if (yRnd(13).lt.bound(1)) ifound = 1
     do i1=1,10
@@ -2457,6 +2467,36 @@ IF( GENEVT ) THEN
           else
               call WriteOutEvent((/MomExt_f(1:4,1),MomExt_f(1:4,2),MomDK_f(1:4,1),MomDK_f(1:4,2),MomDK_f(1:4,3),MomDK_f(1:4,4)/),MY_IDUP(1:9),ICOLUP(1:2,1:9))
          endif
+         
+         
+          if( MY_IDUP(7).eq.ElM_ ) then
+              flav1 = 1
+          elseif( MY_IDUP(7).eq.MuM_ ) then
+              flav1 = 2
+          elseif( MY_IDUP(7).eq.TaM_ ) then
+              flav1 = 3
+          elseif( IsANeutrino(MY_IDUP(7)) ) then
+              flav1 = 4  
+          elseif( IsAQuark(MY_IDUP(7)) ) then
+              flav1 = 5
+          else! for photons
+              flav1 = 1
+          endif
+          if( MY_IDUP(9).eq.ElM_ ) then
+              flav2 = 1
+          elseif( MY_IDUP(9).eq.MuM_ ) then
+              flav2 = 2
+          elseif( MY_IDUP(9).eq.TaM_ ) then
+              flav2 = 3
+          elseif( IsANeutrino(MY_IDUP(9)) ) then
+              flav2 = 4  
+          elseif( IsAQuark(MY_IDUP(9)) ) then
+              flav2 = 5
+          else! for photons
+              flav2 = 1
+          endif
+          Br_counter(flav1,flav2) = Br_counter(flav1,flav2) + 1         
+         
       else
           RejeCounter = RejeCounter + 1
       endif

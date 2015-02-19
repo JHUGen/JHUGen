@@ -3,7 +3,7 @@ implicit none
 save
 ! 
 ! 
-character(len=6),parameter :: JHUGen_Version="v5.1.0"
+character(len=6),parameter :: JHUGen_Version="v5.1.5"
 ! 
 ! 
 integer, public :: Collider, PDFSet,PChannel,Process,DecayMode1,DecayMode2,TopDecays
@@ -147,7 +147,7 @@ integer, public :: Br_Z_uu_counter=0
 integer, public :: Br_Z_dd_counter=0
 integer, public :: Br_W_ll_counter=0
 integer, public :: Br_W_ud_counter=0
-
+integer, public :: Br_counter(1:5,1:5)=0
 
 !-- parameters that define on-shell spin 0 coupling to SM fields, see note
    logical, public, parameter :: generate_as = .false.
@@ -747,6 +747,23 @@ integer :: PartType
      IsAQuark=.false.
   endif
 
+END FUNCTION
+
+
+
+
+
+FUNCTION IsANeutrino(PartType)
+implicit none
+logical :: IsANeutrino
+integer :: PartType
+
+
+  if( abs(PartType).ge.14 .and. abs(PartType).le.16 ) then
+     IsANeutrino = .true.
+  else
+     IsANeutrino=.false.
+  endif
 
 END FUNCTION
 

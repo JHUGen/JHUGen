@@ -75,10 +75,12 @@ VegasDep = $(VegasDir)/vegas.f
 VegasObj = $(ObjectDir)/vegas.o
 
 PDFDep   = $(PDFDir)/Cteq61Pdf.f \
-           $(PDFDir)/mstwpdf.f
+           $(PDFDir)/mstwpdf.f \
+           $(PDFDir)/NNPDFDriver.f
 
 PDFObj   = $(ObjectDir)/Cteq61Pdf.o \
-           $(ObjectDir)/mstwpdf.o
+           $(ObjectDir)/mstwpdf.o \
+           $(ObjectDir)/NNPDFDriver.o
 
 PSGenDep = genps.c \
            boost.c

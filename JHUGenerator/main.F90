@@ -357,9 +357,18 @@ END SUBROUTINE
 SUBROUTINE InitPDFs()
 use ModParameters
 implicit none
+character :: pdftable*(100)
+
 
     call SetCtq6(4)  ! 4    CTEQ6L1  Leading Order           0.130**   215** 165    cteq6l1.tbl
 
+    if( PDFSet.eq.3 ) then
+!         pdftable(:)="./pdfs/NNPDF23_lo_as_0130.LHgrid"
+        pdftable(:)="./pdfs/NNPDF30_lo_as_0130.LHgrid"
+        call NNPDFDriver(pdftable)
+        call NNinitPDF(0)
+    endif
+     
 return
 END SUBROUTINE
 
@@ -483,10 +492,10 @@ implicit none
 include "vegas_common.f"
 real(8) :: VG_Result,VG_Error,VG_Chi2
 real(8) :: yRnd(1:22)
-real(8) :: dum, RES(-5:5,-5:5)
+real(8) :: dum, RES(-5:5,-5:5),VG2(-5:5,-5:5)
 integer :: i, i1, j1,PChannel_aux, PChannel_aux1,NHisto
 include 'csmaxvalue.f'
-integer :: n,clock
+integer :: n,clock,flav1,flav2
 integer, dimension(:), allocatable :: gfort_seed
 
 
@@ -581,6 +590,7 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
 elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
 
     VG = zero
+    VG2= zero
     csmax = zero
     if (seed_random) then 
 #if compiler==1
@@ -617,6 +627,7 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
                 RES = 0d0
                 dum = EvalUnWeighted_TTBH(yRnd,.false.,RES)
                 VG = VG + RES
+                VG2 = VG2 + RES**2
             else
                 if (PChannel_aux.eq.0.or.PChannel_aux.eq.2) then
                     PChannel= 0
@@ -643,7 +654,7 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
         close(io_CSmaxFile)
     endif
 
-
+     VG = VG/dble(VegasNc0)
      csmax   = 1.5d0*csmax    !  adjustment factors, can be choosen  separately channel/by/channel
 !      do i1=-5,5
 !      do j1=-5,5
@@ -653,7 +664,20 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
 !      pause
 
 
+!       res(0,0) = 0d0
+!       do j1 = -5,5
+!             res(0,0) = res(0,0) + VG(j1,-j1)!   WHY IS THIS CSMAX AND NOT CS ? ! AND SHOULDNT IT RUN FROM -6..6
+!       enddo
+!       
+! !      do i1=-5,5
+!      do j1=-5,5
+!      i1=-j1
+!          print *, i1,j1, VG(i1,j1) ,VG(i1,j1)/res(0,0)
+! !      enddo
+!      enddo
+!      pause
 
+      
 !------------------adj_par fixes by how much the quark-induced channels need to be adjusted
 
     if (PChannel.eq.2.and.fix_channels_ratio) then
@@ -749,6 +773,17 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
     endif
     write(io_stdout,*)  " event generation rate (events/sec)",dble(AccepCounter)/(time_end-time_start)
 
+    
+    write(*,*) ""
+    write(*,"(A)") "                 el              mu             tau             neu              jet"
+    write(*,"(A,5F16.2)") " el ",dble(Br_counter(1,1:5))/dble(AccepCounter)
+    write(*,"(A,5F16.2)") " mu ",dble(Br_counter(2,1:5))/dble(AccepCounter)
+    write(*,"(A,5F16.2)") " tau",dble(Br_counter(3,1:5))/dble(AccepCounter)
+    write(*,"(A,5F16.2)") " neu",dble(Br_counter(4,1:5))/dble(AccepCounter)
+    write(*,"(A,5F16.2)") " jet",dble(Br_counter(5,1:5))/dble(AccepCounter)
+    write(*,*) ""
+    
+    
   endif! unweighted
 
 
@@ -1380,9 +1415,6 @@ END SUBROUTINE
 
 
 
-
-
-
 SUBROUTINE StartConvertLHE(VG_Result,VG_Error)
 use ModCrossSection
 use ModKinematics
@@ -1562,7 +1594,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                   endif
 
                elseif( DecayMode1.eq.4 .and. LHE_IDUP(convertparent).eq.convertLHE(Wp_) ) then! convert W+ decay products to 2 leptons
-                  if( LHE_IDUP(nline).lt.0 ) then
+                  if( LHE_IDUP(nline).gt.0 ) then
                          LHE_IDUP(nline) = convertLHE( WLepBranching(xRnd) )   
                          LHE_IDUP(nline) = -LHE_IDUP(nline)! converts LepM to LepP
                          LHE_ICOLUP(1:2,nline) = (/0,0/)
@@ -1576,7 +1608,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                   endif
 
                elseif( DecayMode1.eq.4 .and. LHE_IDUP(convertparent).eq.convertLHE(Wm_) ) then! convert W- decay products to 2 leptons
-                  if( LHE_IDUP(nline).lt.0 ) then
+                  if( LHE_IDUP(nline).gt.0 ) then
                          LHE_IDUP(nline) = convertLHE( Su2flip(WLepBranching(xRnd)) )   
                          LHE_ICOLUP(1:2,nline) = (/0,0/)
                          Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
@@ -1603,7 +1635,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                   endif
 
                elseif( DecayMode1.eq.10 .and. LHE_IDUP(convertparent).eq.convertLHE(Wp_) ) then! convert W+ decay products to 3 leptons   
-                  if( LHE_IDUP(nline).lt.0 ) then
+                  if( LHE_IDUP(nline).gt.0 ) then
                          LHE_IDUP(nline) = convertLHE( WLepPlusTauBranching(xRnd) )   
                          LHE_IDUP(nline) = -LHE_IDUP(nline)! converts LepM to LepP
                          LHE_ICOLUP(1:2,nline) = (/0,0/)
@@ -1617,7 +1649,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                   endif
 
                elseif( DecayMode1.eq.10 .and. LHE_IDUP(convertparent).eq.convertLHE(Wm_) ) then! convert W- decay products to 3 leptons
-                  if( LHE_IDUP(nline).lt.0 ) then
+                  if( LHE_IDUP(nline).gt.0 ) then
                          LHE_IDUP(nline) = convertLHE( Su2flip(WLepPlusTauBranching(xRnd)) )   
                          LHE_ICOLUP(1:2,nline) = (/0,0/)
                          Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
@@ -1644,31 +1676,27 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                   endif
 
                elseif( DecayMode1.eq.5 .and. LHE_IDUP(convertparent).eq.convertLHE(Wp_) ) then! convert W+ decay products to quarks                  
-                  if( LHE_IDUP(nline).lt.0 ) then
+                  if( LHE_IDUP(nline).gt.0 ) then
                          LHE_IDUP(nline) = convertLHE( WQuaUpBranching(xRnd) )   
-                         LHE_ICOLUP(1:2,nline) = (/0,505/)
-                         LHE_IDUP(nline) = -LHE_IDUP(nline)
+                         LHE_ICOLUP(1:2,nline) = (/505,0/)
                          Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
                          DecayParticles(i) = nline; i=i+1;
                   else
                          LHE_IDUP(nline) = convertLHE( - SU2flip(WQuaUpBranching(xRnd)) )  
-                         LHE_ICOLUP(1:2,nline) = (/505,0/)
-                         LHE_IDUP(nline) = -LHE_IDUP(nline)
+                         LHE_ICOLUP(1:2,nline) = (/0,505/)
                          Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
                          DecayParticles(i) = nline; i=i+1;
                   endif
 
                elseif( DecayMode1.eq.5 .and. LHE_IDUP(convertparent).eq.convertLHE(Wm_) ) then! convert W- decay products to quarks                  
-                  if( LHE_IDUP(nline).lt.0 ) then
+                  if( LHE_IDUP(nline).gt.0 ) then
                          LHE_IDUP(nline) = convertLHE( Su2flip(WQuaUpBranching(xRnd)) )   
-                         LHE_ICOLUP(1:2,nline) = (/0,505/)
-                         LHE_IDUP(nline) = -LHE_IDUP(nline)
+                         LHE_ICOLUP(1:2,nline) = (/505,0/)
                          Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
                          DecayParticles(i) = nline; i=i+1;
                   else
                          LHE_IDUP(nline) = convertLHE( -WQuaUpBranching(xRnd) )   
-                         LHE_ICOLUP(1:2,nline) = (/505,0/)
-                         LHE_IDUP(nline) = -LHE_IDUP(nline)
+                         LHE_ICOLUP(1:2,nline) = (/0,505/)
                          Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
                          DecayParticles(i) = nline; i=i+1;
                   endif
@@ -1701,12 +1729,11 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
 ! if( abs(convertLHEreverse(LHE_IDUP(nline))).eq.Dn_ .or. abs(convertLHEreverse(LHE_IDUP(nline))).eq.Str_ .or. abs(convertLHEreverse(LHE_IDUP(nline))).eq.Bot_) Br_Z_dd_counter=Br_Z_dd_counter+1
 ! EvalCounter=EvalCounter+1
 
-               elseif( DecayMode1.eq.11 .and. LHE_IDUP(convertparent).eq.convertLHE(Wp_) ) then! convert W+ decay products to quarks and leptons   
-                  if( LHE_IDUP(nline).lt.0 ) then
+               elseif( DecayMode1.eq.11 .and. LHE_IDUP(convertparent).eq.convertLHE(Wp_) ) then! convert W+ decay products to quarks and leptons         
+                  if( LHE_IDUP(nline).gt.0 ) then
                          LHE_IDUP(nline) = convertLHE( WAnyBranching(xRnd) )   
                          if( IsAQuark(convertLHEreverse(LHE_IDUP(nline))) ) then
-                              LHE_ICOLUP(1:2,nline) = (/0,505/)
-                              LHE_IDUP(nline) = -LHE_IDUP(nline)
+                              LHE_ICOLUP(1:2,nline) = (/505,0/)
                          else
                               LHE_ICOLUP(1:2,nline) = (/0,0/)
                               LHE_IDUP(nline) = -LHE_IDUP(nline)! converts LepM to LepP
@@ -1718,8 +1745,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                   else
                          LHE_IDUP(nline) = convertLHE( - SU2flip(WAnyBranching(xRnd)) )  
                          if( IsAQuark(convertLHEreverse(LHE_IDUP(nline))) ) then
-                              LHE_ICOLUP(1:2,nline) = (/505,0/)
-                              LHE_IDUP(nline) = -LHE_IDUP(nline)
+                              LHE_ICOLUP(1:2,nline) = (/0,505/)
                          else
                               LHE_ICOLUP(1:2,nline) = (/0,0/)
                          endif                         
@@ -1728,11 +1754,10 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                   endif
 
                elseif( DecayMode1.eq.11 .and. LHE_IDUP(convertparent).eq.convertLHE(Wm_) ) then! convert W- decay products to quarks   
-                  if( LHE_IDUP(nline).lt.0 ) then
+                  if( LHE_IDUP(nline).gt.0 ) then
                          LHE_IDUP(nline) = convertLHE( SU2flip(WAnyBranching(xRnd)) )   
                          if( IsAQuark(convertLHEreverse(LHE_IDUP(nline))) ) then
-                              LHE_ICOLUP(1:2,nline) = (/0,505/)
-                              LHE_IDUP(nline) = -LHE_IDUP(nline)
+                              LHE_ICOLUP(1:2,nline) = (/505,0/)
                          else
                               LHE_ICOLUP(1:2,nline) = (/0,0/)
                          endif                         
@@ -1743,11 +1768,10 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                   else
                          LHE_IDUP(nline) = convertLHE( -WAnyBranching(xRnd) )   
                          if( IsAQuark(convertLHEreverse(LHE_IDUP(nline))) ) then
-                              LHE_ICOLUP(1:2,nline) = (/505,0/)
-                              LHE_IDUP(nline) = -LHE_IDUP(nline)
+                              LHE_ICOLUP(1:2,nline) = (/0,505/)
                          else
                               LHE_ICOLUP(1:2,nline) = (/0,0/)
-                              LHE_IDUP(nline) = -LHE_IDUP(nline)
+                              LHE_IDUP(nline) = -LHE_IDUP(nline)! converts -LepM to +LepM
                          endif                  
                          Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
                          DecayParticles(i) = nline; i=i+1;
@@ -1813,6 +1837,8 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
 
 return
 END SUBROUTINE
+
+
 
 
 
@@ -2581,7 +2607,7 @@ implicit none
         write(io_stdout,"(4X,A)") "TopDK:      decay mode for tops in ttbar+H, 0=stable, 1=di-lept, 2=full hadr., 3,4=lepton+jets"
         write(io_stdout,"(4X,A)") "PChannel:   0=g+g, 1=q+qb, 2=both"
         write(io_stdout,"(4X,A)") "OffXVV:     off-shell option for resonance(X),or vector bosons(VV)"
-        write(io_stdout,"(4X,A)") "PDFSet:     1=CTEQ6L1(2001), 2=MSTW(2008),  2xx=MSTW with eigenvector set xx=01..40)"
+        write(io_stdout,"(4X,A)") "PDFSet:     1=CTEQ6L1(2001), 2=MSTW(2008),  2xx=MSTW with eigenvector set xx=01..40), 3=NNPDF2.3LO"
         write(io_stdout,"(4X,A)") "VegasNc0:   number of evaluations for integrand scan"
         write(io_stdout,"(4X,A)") "VegasNc1:   number of evaluations for accept-reject sampling"
         write(io_stdout,"(4X,A)") "VegasNc2:   number of events for accept-reject sampling"

@@ -2,12 +2,13 @@ MODULE modTTBH
 IMPLICIT NONE
 
       
-public :: EvalAmp_GG_TTBH,EvalAmp_QQB_TTBH,InitProcess_TTBH
+public :: EvalXSec_PP_TTBH,EvalAmp_GG_TTBH,EvalAmp_QQB_TTBH,InitProcess_TTBH
 
 private
 
 complex(8) :: couplHTT_right_dyn, couplHTT_left_dyn
 integer,parameter :: ColorlessTag = 1
+real(8) :: m_Higgs
 
 
 type :: Particle
@@ -77,6 +78,7 @@ integer :: NumTrees
 integer :: iTree,NumParticles
 include "includeVars.F90"
 
+  m_Higgs = m_Reso
 
 ! gg->ttbar+H
   NumQuarks=2; NumGluons=2; NumBoson=1;
@@ -148,7 +150,7 @@ include "includeVars.F90"
 
   ExtParticles(7)%PartType = Hig_
   ExtParticles(7)%ExtRef   = 7
-  ExtParticles(7)%Mass = m_Reso
+  ExtParticles(7)%Mass = m_Higgs
   ExtParticles(7)%Mass2= ExtParticles(5)%Mass**2
   ExtParticles(7)%Helicity = 0
 
@@ -167,6 +169,68 @@ RETURN
 END SUBROUTINE
   
 
+
+      
+SUBROUTINE EvalXSec_PP_TTBH(Mom,TTBHcoupl,SelectProcess,Res)
+implicit none
+real(8) :: Mom(1:4,1:13),Res
+complex(8) :: TTBHcoupl(1:2)
+integer :: SelectProcess! 0=gg, 1=qqb, 2=all 
+real(8) :: eta1,eta2,Etot,Pztot,MatElSq_GG,MatElSq_QQB,MatElSq_QBQ
+real(8) :: x1,x2,PDFScale,Collider_Energy,E_CMS
+real(8) :: NNpdf(1:2,-6:7)
+include 'includeVars.F90'
+      
+
+      Collider_Energy = -(Mom(1,1)+Mom(1,2))
+      if( TopDecays.eq.0 ) then
+          Etot = Mom(1,3)+Mom(1,4)+Mom(1,5)
+          Pztot= Mom(4,3)+Mom(4,4)+Mom(4,5)
+      else
+          Etot = Mom(1,3) + Mom(1,6)+Mom(1,7)+Mom(1,8) + Mom(1,9)+Mom(1,10)+Mom(1,11)
+          Pztot= Mom(4,3) + Mom(4,6)+Mom(4,7)+Mom(4,8) + Mom(4,9)+Mom(4,10)+Mom(4,11)
+      endif
+      x1 = (Etot+Pztot * sign(1d0,Mom(4,2)) )/Collider_Energy
+      x2 = (Etot-Pztot * sign(1d0,Mom(4,2)) )/Collider_Energy
+      E_CMS = dsqrt(x1*x2)*Collider_Energy
+      PDFScale = 0.5d0*( 2d0*m_top + m_Higgs ) * 100d0
+
+      Mom(1:4,1) = x1 * Mom(1:4,1)
+      Mom(1:4,2) = x2 * Mom(1:4,2)
+      if( SelectProcess.eq.0 ) then
+          call EvalAmp_GG_TTBH(Mom(1:4,1:13),TTBHcoupl,MatElSq_GG)
+          MatElSq_QQB = 0d0
+          MatElSq_QBQ = 0d0
+      elseif( SelectProcess.eq.1 ) then
+          call EvalAmp_QQB_TTBH(Mom(1:4,1:13),TTBHcoupl,MatElSq_QQB)
+          MatElSq_QBQ = MatElSq_QQB
+          MatElSq_GG = 0d0
+      else
+          call EvalAmp_GG_TTBH(Mom(1:4,1:13),TTBHcoupl,MatElSq_GG)
+          call EvalAmp_QQB_TTBH(Mom(1:4,1:13),TTBHcoupl,MatElSq_QQB)
+          MatElSq_QBQ = MatElSq_QQB
+      endif
+      
+      call NNevolvePDF(x1,PDFScale,NNpdf(1,-6:7))
+      call NNevolvePDF(x2,PDFScale,NNpdf(2,-6:7))
+!       NNpdf(1,-6:7) = NNpdf(1,-6:7)/x1
+!       NNpdf(2,-6:7) = NNpdf(2,-6:7)/x2
+ 
+      Res = MatElSq_GG  * NNpdf(1,0)*NNpdf(2,0)  &   ! GG
+          + MatElSq_QQB * ( NNpdf(1,+1)*NNpdf(2,-1) + NNpdf(1,+2)*NNpdf(2,-2) + NNpdf(1,+3)*NNpdf(2,-3) + NNpdf(1,+4)*NNpdf(2,-4) + NNpdf(1,+5)*NNpdf(2,-5) )  &   !  QQB
+          + MatElSq_QBQ * ( NNpdf(1,-1)*NNpdf(2,+1) + NNpdf(1,-2)*NNpdf(2,+2) + NNpdf(1,-3)*NNpdf(2,+3) + NNpdf(1,-4)*NNpdf(2,+4) + NNpdf(1,-5)*NNpdf(2,+5) )      !  QBQ
+      Res = Res/x1/x2/(2d0*E_CMS**2)
+
+!     restore incoming momenta (in all-outgoing convention)
+      Mom(1,1:2) = -0.5d0*Collider_Energy
+      Mom(4,1)   = -0.5d0*Collider_Energy * sign(1d0,Mom(4,2))
+      Mom(4,2)   = +0.5d0*Collider_Energy * sign(1d0,Mom(4,2))
+  
+RETURN
+END SUBROUTINE
+
+
+
       
 
       
@@ -181,18 +245,25 @@ real(8),parameter :: c_aa=64.D0/3.D0, c_ab=-8.D0/3.D0
 include 'includeVars.F90'
 SqAmp = 0d0
 
+    
 
      couplHTT_right_dyn = m_top/vev/2d0 * ( TTBHcoupl(1) + (0d0,1d0)*TTBHcoupl(2) )
      couplHTT_left_dyn  = m_top/vev/2d0 * ( TTBHcoupl(1) - (0d0,1d0)*TTBHcoupl(2) )
-
-     ExtParticles(1)%Mom(1:4) = Mom(1:4,4)
-     ExtParticles(2)%Mom(1:4) = Mom(1:4,5)
+     if( TOPDECAYS.EQ.0 ) then
+        ExtParticles(1)%Mom(1:4) = Mom(1:4,4)
+        ExtParticles(2)%Mom(1:4) = Mom(1:4,5)
+        nhel=+1
+     else
+        ExtParticles(1)%Mom(1:4) = Mom(1:4,6)+Mom(1:4,7) +Mom(1:4,8)
+        ExtParticles(2)%Mom(1:4) = Mom(1:4,9)+Mom(1:4,10)+Mom(1:4,11)
+        call TopDecay(ATop_,Mom(1:4,6:8),ExtParticles(1)%Pol(1:4))
+        call TopDecay(Top_,Mom(1:4,9:11),ExtParticles(2)%Pol(1:4))
+        nhel=-1
+     endif
      ExtParticles(3)%Mom(1:4) =-Mom(1:4,1)    *(-1d0)! for MELA we switch back to all-outgoing conventions
      ExtParticles(4)%Mom(1:4) =-Mom(1:4,2)    *(-1d0)
      ExtParticles(7)%Mom(1:4) = Mom(1:4,3)
 
-     call TopDecay(ATop_,Mom(1:4,6:8),ExtParticles(1)%Pol(1:4))
-     call TopDecay(Top_,Mom(1:4,9:11),ExtParticles(2)%Pol(1:4))
      ExtParticles(7)%Pol(1:4) = 1d0
 !    call HDecay(ExtParticles(7),DK_LO,MomExt(1:4,12:13))
      GluPol(1:4,1,1) = pol_mless(ExtParticles(3)%Mom(1:4),+1,outgoing=.true.)
@@ -202,8 +273,6 @@ SqAmp = 0d0
 !      GluPol(1:4,1,1) = ExtParticles(3)%Mom(1:4);  GluPol(1:4,1,2) = ExtParticles(3)%Mom(1:4); print *, "checking gauge invariance"
 
 
-     nhel=-1
-     if( TOPDECAYS.EQ.0 ) nhel=+1
      do TopHel1=-1,nhel,2
      do TopHel2=-1,nhel,2
      if( TOPDECAYS.eq.0 ) then
@@ -259,14 +328,21 @@ SqAmp = 0d0
      couplHTT_right_dyn = m_top/vev/2d0 * ( TTBHcoupl(1) + (0d0,1d0)*TTBHcoupl(2) )
      couplHTT_left_dyn  = m_top/vev/2d0 * ( TTBHcoupl(1) - (0d0,1d0)*TTBHcoupl(2) )
 
-     ExtParticles(1)%Mom(1:4) = Mom(1:4,4)
-     ExtParticles(2)%Mom(1:4) = Mom(1:4,5)
+     if( TOPDECAYS.EQ.0 ) then
+        ExtParticles(1)%Mom(1:4) = Mom(1:4,4)
+        ExtParticles(2)%Mom(1:4) = Mom(1:4,5)
+        nhel=+1
+     else
+        ExtParticles(1)%Mom(1:4) = Mom(1:4,6)+Mom(1:4,7) +Mom(1:4,8)
+        ExtParticles(2)%Mom(1:4) = Mom(1:4,9)+Mom(1:4,10)+Mom(1:4,11)
+        call TopDecay(ATop_,Mom(1:4,6:8),ExtParticles(1)%Pol(1:4))
+        call TopDecay(Top_,Mom(1:4,9:11),ExtParticles(2)%Pol(1:4))
+        nhel=-1
+     endif
      ExtParticles(5)%Mom(1:4) =-Mom(1:4,1)    *(-1d0)! for MELA we switch back to all-outgoing conventions
      ExtParticles(6)%Mom(1:4) =-Mom(1:4,2)    *(-1d0)
      ExtParticles(7)%Mom(1:4) = Mom(1:4,3)
 
-     call TopDecay(ATop_,Mom(1:4,6:8),ExtParticles(1)%Pol(1:4))
-     call TopDecay(Top_,Mom(1:4,9:11),ExtParticles(2)%Pol(1:4))
      ExtParticles(7)%Pol(1:4) = 1d0
 !    call HDecay(ExtParticles(7),DK_LO,MomExt(1:4,12:13))
      call ubarSpi_Dirac(ExtParticles(6)%Mom(1:4),0d0,-1,QuaPol(1:4,1,1))
@@ -275,8 +351,6 @@ SqAmp = 0d0
      call    vSpi_Dirac(ExtParticles(5)%Mom(1:4),0d0,+1,QuaPol(1:4,2,2))    
        
 
-     nhel=-1
-     if( TOPDECAYS.EQ.0 ) nhel=+1
      do TopHel1=-1,nhel,2
      do TopHel2=-1,nhel,2
      if( TOPDECAYS.eq.0 ) then
@@ -6126,6 +6200,8 @@ integer :: PartType
 
 
 END FUNCTION
+
+
 
 
 
