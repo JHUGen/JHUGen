@@ -241,8 +241,10 @@ if( (IsAZDecay(DecayMode1)).and.(IsAZDecay(DecayMode2)) .and. abs(LHE_IDUP(7)).e
     mZ1 = Get_MInv( Mom(1:4,3)+Mom(1:4,4) )
     mZ2 = Get_MInv( Mom(1:4,3)+Mom(1:4,6) )
     if( dabs(mZ2-m_V) .lt. dabs(mZ1-m_V)  ) then
-        call swapi(MOTHUP(1,6),MOTHUP(1,9))
-        call swapi(MOTHUP(2,6),MOTHUP(2,9))
+        call swapi(MOTHUP(1,6),MOTHUP(1,8))! this used to be swapi(MOTHUP(1,6),MOTHUP(1,9)) which I believe is wrong
+        call swapi(MOTHUP(2,6),MOTHUP(2,8))
+        Z1FV(1:4) = MomDummy(1:4,3)+MomDummy(1:4,6)
+        Z2FV(1:4) = MomDummy(1:4,5)+MomDummy(1:4,4)
     endif
 endif
 
@@ -342,7 +344,7 @@ real(8) :: Mom(:,:),HiggsDK_Mom(:,:),Mass(:)
 real(8),optional :: EventWeight
 character(len=*) :: EventInfoLine
 ! integer,optional :: MOTHUP_Parton(:,:)
-real(8) :: Spin, Lifetime, mZ1, mZ2
+real(8) :: Spin, Lifetime, s34,s56,s36,s45,smallestInv
 integer :: IDUP(:),ISTUP(:),MOTHUP(:,:),ICOLUP(:,:)
 integer :: HiggsDK_IDUP(:),HiggsDK_ICOLUP(:,:),HiggsDK_ISTUP(4:9),HiggsDK_MOTHUP(1:2,4:9)
 integer,parameter :: maxpart=30
@@ -414,14 +416,18 @@ character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE
 
     !  associte lepton pairs to MOTHUP
     if( (IsAZDecay(DecayMode1)).and.(IsAZDecay(DecayMode2)) .and. abs(HiggsDK_IDUP(7)).eq.abs(HiggsDK_IDUP(9)) ) then 
-        mZ1 = Get_MInv( HiggsDK_Mom(1:4,3)+HiggsDK_Mom(1:4,4) )
-        mZ2 = Get_MInv( HiggsDK_Mom(1:4,3)+HiggsDK_Mom(1:4,6) )
-        if( dabs(mZ2-m_V) .lt. dabs(mZ1-m_V)  ) then
-            call swapi(HiggsDK_MOTHUP(1,6),HiggsDK_MOTHUP(1,9))
-            call swapi(HiggsDK_MOTHUP(2,6),HiggsDK_MOTHUP(2,9))
+        s34 = Get_MInv( HiggsDK_Mom(1:4,3)+HiggsDK_Mom(1:4,4) )
+        s56 = Get_MInv( HiggsDK_Mom(1:4,5)+HiggsDK_Mom(1:4,6) )
+        s36 = Get_MInv( HiggsDK_Mom(1:4,3)+HiggsDK_Mom(1:4,6) )
+        s45 = Get_MInv( HiggsDK_Mom(1:4,4)+HiggsDK_Mom(1:4,5) )
+        smallestInv = minloc((/dabs(s34-M_V),dabs(s56-M_V),dabs(s36-M_V),dabs(s45-M_V)/),1)        
+        if( smallestInv.eq.3 .or. smallestInv.eq.4 ) then
+            call swapi(HiggsDK_MOTHUP(1,6),HiggsDK_MOTHUP(1,8))
+            call swapi(HiggsDK_MOTHUP(2,6),HiggsDK_MOTHUP(2,8))
+            HiggsDK_Mom(1:4,1) = HiggsDK_Mom(1:4,3)+ HiggsDK_Mom(1:4,6)
+            HiggsDK_Mom(1:4,2) = HiggsDK_Mom(1:4,4)+ HiggsDK_Mom(1:4,5)
         endif
     endif
-
     
     
     write(io_LHEOutFile,"(A)") "<event>"
@@ -448,18 +454,16 @@ character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE
            write(io_LHEOutFile,fmt1) IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),  &
                                      Mom(2:4,i)/GeV,Mom(1,i)/GeV, Mass(i)/GeV,Lifetime, Spin   
         endif                          
-                                  
     enddo
-   
-   
+    
+    
 !   write new intermediate particles and Higgs decay products
     call swap_mom(HiggsDK_Mom(1:4,3),HiggsDK_Mom(1:4,4))! swap to account for flipped asignments
     call swap_mom(HiggsDK_Mom(1:4,5),HiggsDK_Mom(1:4,6))! swap to account for flipped asignments
     do i = 4,4 + (NUP_NEW-1)
         write(io_LHEOutFile,fmt1) HiggsDK_IDUP(i),HiggsDK_ISTUP(i), HiggsDK_MOTHUP(1,i),HiggsDK_MOTHUP(2,i), HiggsDK_ICOLUP(1,i),HiggsDK_ICOLUP(2,i),  &
-                                  HiggsDK_Mom(2:4,i-3)/GeV,HiggsDK_Mom(1,i-3)/GeV, getMass(convertLHEreverse(HiggsDK_IDUP(i)))/GeV, Lifetime, Spin   
+                                  HiggsDK_Mom(2:4,i-3)/GeV,HiggsDK_Mom(1,i-3)/GeV, get_MInv(HiggsDK_Mom(1:4,i-3))/GeV, Lifetime, Spin   
     enddo
-    
 
 RETURN
 END SUBROUTINE
@@ -663,8 +667,11 @@ MOTHUP(1:2,b)       = (/5,5/)
 MOTHUP(1:2,lepP)    = (/5,5/)
 MOTHUP(1:2,nu)      = (/5,5/)
 
-
-NUP=11
+if( TopDecays.eq.0 ) then
+   NUP = 5
+else
+   NUP=11
+endif
 
 if( present(EventWeight) ) then
     XWGTUP=EventWeight
@@ -686,7 +693,7 @@ enddo
 
 
 write(io_LHEOutFile,"(A)") "<event>"
-if( .not. ReadLHEFile ) write(io_LHEOutFile,"(I2,X,I3,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7)") NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
+write(io_LHEOutFile,"(I2,X,I3,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7)") NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
 ! in order of appearance:
 ! (*) number of particles in the event
 ! (*) process ID (user defined)
@@ -705,42 +712,44 @@ write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(
 i=2
 write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
 
+! H
+i=3
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),M_Reso*100d0,Lifetime,Spin
+
 ! tb
 i=4
-write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),m_top,Lifetime,Spin
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),m_top*100d0,Lifetime,Spin
 
 ! t
 i=5
-write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),m_top,Lifetime,Spin
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),m_top*100d0,Lifetime,Spin
 
-! H
-i=3
-write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),M_Reso,Lifetime,Spin
 
-! bb
-i=6
-write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
+if( TopDecays.ne.0 ) then
+    ! bb
+    i=6
+    write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
 
-! e-
-i=7
-write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
+    ! e-
+    i=7
+    write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
 
-! nub
-i=8
-write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
+    ! nub
+    i=8
+    write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
 
-! b
-i=9
-write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
+    ! b
+    i=9
+    write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
 
-! e+
-i=10
-write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
+    ! e+
+    i=10
+    write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
 
-! nu
-i=11
-write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
-
+    ! nu
+    i=11
+    write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
+endif
 
 
 write(io_LHEOutFile,"(A)") "</event>"
@@ -1441,8 +1450,6 @@ real(8),parameter :: Rsep_ll=0.2d0
       Phi1 = signPhi1 * acos(MomLeptPlane1(2)*MomBeamScatterPlane(2) + MomLeptPlane1(3)*MomBeamScatterPlane(3) + MomLeptPlane1(4)*MomBeamScatterPlane(4))
 
 
-
-
 !     binning
       NBin(1)  = WhichBin(1,pT_lepP)
       NBin(2)  = WhichBin(2,pT_lepM)
@@ -1625,7 +1632,6 @@ applyPSCut = .false.
        NBin(1)  = WhichBin(1,m_jj)
        NBin(2)  = WhichBin(2,dphi_jj)
 
-
 RETURN
 END SUBROUTINE
 
@@ -1793,10 +1799,12 @@ double precision, intent(in) :: MomExt(1:4,1:9) !,beam_momentum(2,4),four_moment
      Nbin(8)  = WhichBin(8,phistar1)
      Nbin(9)  = WhichBin(9,phi)
 
-
-
 RETURN
 END SUBROUTINE Kinematics_VHiggs
+
+
+
+
 SUBROUTINE Kinematics_TTBH(Mom,applyPSCut,NBin)
 use ModParameters
 use ModMisc
@@ -1868,9 +1876,9 @@ integer :: ZLepPlusTauBranching
       stop
   endif
 
-!print *, "checker 3",Brlept_Z_ee
-!print *, "checker 3",Brlept_Z_ee+Brlept_Z_mm
-!print *, "checker 3",Brlept_Z_ee+Brlept_Z_mm+Brlept_Z_tt
+! print *, "checker 3",Brlept_Z_ee
+! print *, "checker 3",Brlept_Z_ee+Brlept_Z_mm
+! print *, "checker 3",Brlept_Z_ee+Brlept_Z_mm+Brlept_Z_tt
 
 RETURN
 END FUNCTION
@@ -2747,7 +2755,7 @@ implicit none
 real(8) :: x1,x2,PDFScale,MuFac
 real(8) :: upv(1:2),dnv(1:2),usea(1:2),dsea(1:2),str(1:2),chm(1:2),bot(1:2),glu(1:2),phot(1:2),sbar(1:2),cbar(1:2),bbar(1:2)
 integer,parameter :: swPDF_u=1, swPDF_d=1, swPDF_c=1, swPDF_s=1, swPDF_b=1, swPDF_g=1
-real(8) :: pdf(-6:6,1:2)
+real(8) :: pdf(-6:6,1:2),NNpdf(1:2,-6:7) 
 
         PDFScale=MuFac*100d0
         if( PDFSet.eq.1 ) then
@@ -2810,6 +2818,39 @@ real(8) :: pdf(-6:6,1:2)
             bot(2)=bot(2)/x2
             glu(2)=glu(2)/x2
             phot(2)=phot(2)/x2
+        elseif( PDFSet.eq.3 ) then
+
+            call NNevolvePDF(x1,PDFScale,NNpdf(1,-6:7))
+            call NNevolvePDF(x2,PDFScale,NNpdf(2,-6:7))
+            NNpdf(1,-6:7) = NNpdf(1,-6:7)/x1
+            NNpdf(2,-6:7) = NNpdf(2,-6:7)/x2
+            
+    !       PROTON CONTENT
+            pdf(Up_,1)   = NNpdf(1,+1)         * swPDF_u
+            pdf(AUp_,1)  = NNpdf(1,-1)         * swPDF_u
+            pdf(Dn_,1)   = NNpdf(1,+2)         * swPDF_d
+            pdf(ADn_,1)  = NNpdf(1,-2)         * swPDF_d
+            pdf(Chm_,1)  = NNpdf(1,+3)         * swPDF_c
+            pdf(AChm_,1) = NNpdf(1,-3)         * swPDF_c
+            pdf(Str_,1)  = NNpdf(1,+4)         * swPDF_s
+            pdf(AStr_,1) = NNpdf(1,-4)         * swPDF_s
+            pdf(Bot_,1)  = NNpdf(1,+5)         * swPDF_b
+            pdf(ABot_,1) = NNpdf(1,-5)         * swPDF_b
+            pdf(0,1)     = NNpdf(1,+0)         * swPDF_g            
+            
+            pdf(Up_,2)   = NNpdf(2,+1)         * swPDF_u
+            pdf(AUp_,2)  = NNpdf(2,-1)         * swPDF_u
+            pdf(Dn_,2)   = NNpdf(2,+2)         * swPDF_d
+            pdf(ADn_,2)  = NNpdf(2,-2)         * swPDF_d
+            pdf(Chm_,2)  = NNpdf(2,+3)         * swPDF_c
+            pdf(AChm_,2) = NNpdf(2,-3)         * swPDF_c
+            pdf(Str_,2)  = NNpdf(2,+4)         * swPDF_s
+            pdf(AStr_,2) = NNpdf(2,-4)         * swPDF_s
+            pdf(Bot_,2)  = NNpdf(2,+5)         * swPDF_b
+            pdf(ABot_,2) = NNpdf(2,-5)         * swPDF_b
+            pdf(0,2)     = NNpdf(2,+0)         * swPDF_g            
+            RETURN
+            
         else
             print *, "PDFSet",PDFSet,"not available!"
             stop
