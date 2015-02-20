@@ -1986,8 +1986,9 @@ implicit none
 real(8) :: xRnd
 integer :: ZAnyBranching_flat
 real(8),parameter :: Ncol=3d0
-real(8),parameter :: xx=1d0/21d0
-real(8),parameter :: yy=Ncol*xx
+real(8),parameter :: xx=1d0/11d0
+! real(8),parameter :: yy=Ncol*xx
+real(8),parameter :: yy=xx
 
 
   if( xRnd .le. yy ) then
@@ -2017,6 +2018,9 @@ real(8),parameter :: yy=Ncol*xx
       stop
   endif
 
+  
+ 
+  
 
 !   if( xRnd .le. yy*scale_alpha_Z_uu ) then
 !       ZAnyBranching = Up_

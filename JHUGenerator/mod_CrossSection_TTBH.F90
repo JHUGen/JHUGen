@@ -181,7 +181,7 @@ IF( GENEVT ) THEN
       do nparton = -5,5
 !           do j = -5,5
 !             sumtot = sumtot + csmax(nparton,-nparton)!   WHY IS THIS CSMAX AND NOT CS ? ! AND SHOULDNT IT RUN FROM -6..6
-            sumtot = sumtot + VG(nparton,-nparton)!   WHY IS THIS CSMAX AND NOT CS ? ! AND SHOULDNT IT RUN FROM -6..6
+            sumtot = sumtot + VG(nparton,-nparton)
 !           enddo
       enddo
       
