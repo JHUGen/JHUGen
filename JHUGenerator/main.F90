@@ -776,15 +776,40 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
     
     write(*,*) ""
     write(*,"(A)") "                 el              mu             tau             neu              jet"
-    write(*,"(A,5F16.2)") " el ",dble(Br_counter(1,1:5))/dble(AccepCounter)
-    write(*,"(A,5F16.2)") " mu ",dble(Br_counter(2,1:5))/dble(AccepCounter)
-    write(*,"(A,5F16.2)") " tau",dble(Br_counter(3,1:5))/dble(AccepCounter)
-    write(*,"(A,5F16.2)") " neu",dble(Br_counter(4,1:5))/dble(AccepCounter)
-    write(*,"(A,5F16.2)") " jet",dble(Br_counter(5,1:5))/dble(AccepCounter)
+    write(*,"(A,5F16.3)") " el ",dble(Br_counter(1,1:5))/dble(AccepCounter)
+    write(*,"(A,5F16.3)") " mu ",dble(Br_counter(2,1:5))/dble(AccepCounter)
+    write(*,"(A,5F16.3)") " tau",dble(Br_counter(3,1:5))/dble(AccepCounter)
+    write(*,"(A,5F16.3)") " neu",dble(Br_counter(4,1:5))/dble(AccepCounter)
+    write(*,"(A,5F16.3)") " jet",dble(Br_counter(5,1:5))/dble(AccepCounter)
     write(*,*) ""
-    
-    
+    write(*,"(A,5F16.3)") "llll: ",(dble(Br_counter(1,1))+dble(Br_counter(2,2))+dble(Br_counter(3,3)))/dble(AccepCounter)
+    write(*,"(A,5F16.3)") "llLL: ",(dble(Br_counter(1,2))+dble(Br_counter(1,3))+  &
+                                    dble(Br_counter(2,1))+dble(Br_counter(2,3))+  &
+                                    dble(Br_counter(3,1))+dble(Br_counter(3,2)))/dble(AccepCounter)
+    write(*,"(A,5F16.3)") "2l2q: ",(dble(Br_counter(1,5))+dble(Br_counter(2,5))+dble(Br_counter(3,5))+  &
+                                    dble(Br_counter(5,1))+dble(Br_counter(5,2))+dble(Br_counter(5,3)) )/dble(AccepCounter)
+       
+    write(*,"(A,5F16.3)") "4l/2q2l: ",(dble(Br_counter(1,2))+dble(Br_counter(1,3))+ dble(Br_counter(1,1))+dble(Br_counter(2,2))+dble(Br_counter(3,3)) &
+                                   + dble(Br_counter(2,1))+dble(Br_counter(2,3))+   &
+                                    dble(Br_counter(3,1))+dble(Br_counter(3,2)))/  &
+                                    (dble(Br_counter(1,5))+dble(Br_counter(2,5))+dble(Br_counter(3,5))+  &
+                                    dble(Br_counter(5,1))+dble(Br_counter(5,2))+dble(Br_counter(5,3)) )
+                                    
+    print *, alpha_QED/12d0*M_Z * (   (aR_lep+aL_lep)**2 + (aR_lep-aL_lep)**2        &
+                                     +(aR_lep+aL_lep)**2 + (aR_lep-aL_lep)**2        &
+                                     +(aR_lep+aL_lep)**2 + (aR_lep-aL_lep)**2        &
+                                     +(aR_neu+aL_neu)**2 + (aR_neu-aL_neu)**2        &
+                                     +(aR_neu+aL_neu)**2 + (aR_neu-aL_neu)**2        &
+                                     +(aR_neu+aL_neu)**2 + (aR_neu-aL_neu)**2        &
+                                     +((aR_Qup+aL_Qup)**2 + (aR_Qup-aL_Qup)**2 )*3d0 *1.0366d0 &
+                                     +((aR_Qdn+aL_Qdn)**2 + (aR_Qdn-aL_Qdn)**2 )*3d0 *1.0366d0 &
+                                     +((aR_Qup+aL_Qup)**2 + (aR_Qup-aL_Qup)**2 )*3d0 *1.0366d0 &
+                                     +((aR_Qdn+aL_Qdn)**2 + (aR_Qdn-aL_Qdn)**2 )*3d0 *1.0366d0 &
+                                     +((aR_Qdn+aL_Qdn)**2 + (aR_Qdn-aL_Qdn)**2 )*3d0 *1.0366d0 *(1d0-3d0/2d0/(M_Z/2d0/m_bot)**2) &
+                                 )/4d0/(one-sitW**2)/sitW**2                        
   endif! unweighted
+  
+  
 
 
 return
@@ -2597,7 +2622,7 @@ implicit none
         write(io_stdout,"(2X,A)") "Command line arguments:"
         write(io_stdout,"(4X,A)") "Collider:   1=LHC, 2=Tevatron, 0=e+e-"
         write(io_stdout,"(4X,A)") "Process:    0=spin-0, 1=spin-1, 2=spin-2 resonance, 50=pp/ee->VH, 60=weakVBF, 61=pp->Hjj, 80=pp->ttbar+H"
-        write(io_stdout,"(4X,A)") "MReso:      resonance mass (default=126.00), format: yyy.xx"
+        write(io_stdout,"(4X,A)") "MReso:      resonance mass (default=125.60), format: yyy.xx"
         write(io_stdout,"(4X,A)") "DecayMode1: decay mode for vector boson 1 (Z/W+/gamma)"
         write(io_stdout,"(4X,A)") "DecayMode2: decay mode for vector boson 2 (Z/W-/gamma)"
         write(io_stdout,"(4X,A)") "              0=Z->2l,  1=Z->2q, 2=Z->2tau, 3=Z->3nu,"
@@ -2607,7 +2632,7 @@ implicit none
         write(io_stdout,"(4X,A)") "TopDK:      decay mode for tops in ttbar+H, 0=stable, 1=di-lept, 2=full hadr., 3,4=lepton+jets"
         write(io_stdout,"(4X,A)") "PChannel:   0=g+g, 1=q+qb, 2=both"
         write(io_stdout,"(4X,A)") "OffXVV:     off-shell option for resonance(X),or vector bosons(VV)"
-        write(io_stdout,"(4X,A)") "PDFSet:     1=CTEQ6L1(2001), 2=MSTW(2008),  2xx=MSTW with eigenvector set xx=01..40), 3=NNPDF2.3LO"
+        write(io_stdout,"(4X,A)") "PDFSet:     1=CTEQ6L1(default), 2=MSTW2008LO,  2xx=MSTW with eigenvector set xx=01..40), 3=NNPDF3.0LO"
         write(io_stdout,"(4X,A)") "VegasNc0:   number of evaluations for integrand scan"
         write(io_stdout,"(4X,A)") "VegasNc1:   number of evaluations for accept-reject sampling"
         write(io_stdout,"(4X,A)") "VegasNc2:   number of events for accept-reject sampling"
@@ -2636,8 +2661,8 @@ integer :: TheUnit
     write(TheUnit,"(A90)") " *   Spin and parity determination of single-produced resonances at hadron colliders   *"
     write(TheUnit,"(A90)") " *                                                                                     *"
     write(TheUnit,"(A90)") " *          I. Anderson, S. Bolognesi, F. Caola, Y. Gao, A. Gritsan, C. Martin,        *"
-    write(TheUnit,"(A90)") " *                  Z. Guo, K. Melnikov, U. Sarica, M. Schulze, N. Tran,               *" 
-    write(TheUnit,"(A90)") " *                            A. Whitbeck, M. Xiao, Y. Zhou                            *"
+    write(TheUnit,"(A90)") " *                Z. Guo, K. Melnikov, H. Roskes, U. Sarica, M. Schulze,               *" 
+    write(TheUnit,"(A90)") " *                   N. Tran, A. Whitbeck, M. Xiao, C. You, Y. Zhou                    *"
     write(TheUnit,"(A90)") " *                Phys.Rev. D81 (2010) 075022;  arXiv:1001.3396 [hep-ph],              *"
     write(TheUnit,"(A90)") " *                Phys.Rev. D86 (2012) 095031;  arXiv:1208.4018 [hep-ph],              *"
     write(TheUnit,"(A90)") " *                Phys.Rev. D89 (2014) 035007;  arXiv:1309.4819 [hep-ph].              *"

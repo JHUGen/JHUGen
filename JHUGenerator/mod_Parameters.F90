@@ -51,7 +51,8 @@ real(8),parameter :: MPhotonCutoff = 4d0*GeV
 real(8), public, parameter :: M_Top   = 173d0     *GeV      ! 
 real(8), public, parameter :: Ga_Top  = 1.33d0    *GeV      ! 
 real(8), public, parameter :: M_Z     = 91.1876d0 *GeV      ! Z boson mass (PDG-2011)
-real(8), public, parameter :: Ga_Z    = 2.4952d0  *GeV      ! Z boson width(PDG-2011)
+! real(8), public, parameter :: Ga_Z    = 2.4952d0  *GeV      ! Z boson width(PDG-2011)
+real(8), public, parameter :: Ga_Z    = 2.5012d0  *GeV      
 real(8), public, parameter :: M_W     = 80.399d0  *GeV      ! W boson mass (PDG-2011)
 real(8), public, parameter :: Ga_W    = 2.085d0   *GeV      ! W boson width(PDG-2011)
 real(8), public            :: M_Reso  = 125.6d0   *GeV      ! X resonance mass (spin 0, spin 1, spin 2)     (carefule: no longer a parameter, can be overwritten by command line argument)
@@ -69,9 +70,10 @@ real(8), public, parameter :: HiggsDecayLengthMM = 0d0      ! Higgs decay length
 real(8), public, parameter :: Gf = 1.16639d-5/GeV**2        ! fermi constant
 real(8), public, parameter :: vev = 1.0d0/sqrt(Gf*sqrt(2.0d0))
 real(8), public, parameter :: gwsq = 4.0d0 * M_W**2/vev**2  ! weak constant squared
-real(8), public, parameter :: alpha_QED = 1d0/128.0d0       ! el.magn. coupling
+real(8), public, parameter :: alpha_QED = 1d0/132.2319d0    ! el.magn. coupling
 real(8), public, parameter :: alphas = 0.13229060d0         ! strong coupling
-real(8), public, parameter :: sitW = dsqrt(0.23119d0)       ! sin(Theta_Weinberg) (PDG-2008)
+! real(8), public, parameter :: sitW = dsqrt(0.23119d0)       ! sin(Theta_Weinberg) (PDG-2008)
+real(8), public, parameter :: sitW = dsqrt(0.222897209d0)      
 real(8), public            :: Mu_Fact                       ! pdf factorization scale (set to M_Reso in main.F90)
 real(8), public, parameter :: LHC_Energy=13000d0  *GeV      ! LHC hadronic center of mass energy
 real(8), public, parameter :: TEV_Energy=1960d0  *GeV       ! Tevatron hadronic center of mass energy
@@ -125,16 +127,16 @@ real(8), public, parameter :: Brhadr_Z_bb = Br_Z_bb/Br_Z_hadr                   
 real(8), public, parameter :: Brhadr_W_ud = Br_W_ud/Br_W_hadr                         ! W branching fraction Ga(up)/Ga(hadronic)
 real(8), public, parameter :: Brhadr_W_cs = Br_W_cs/Br_W_hadr                         ! W branching fraction Ga(chm)/Ga(hadronic)
 
-real(8), public, parameter :: scale_alpha_Z_uu = 1.04282d0 ! scaling factor of alpha (~partial width) for Z > u u~, c c~
-real(8), public, parameter :: scale_alpha_Z_dd = 1.04282d0 ! scaling factor of alpha (~partial width) for Z > d d~, s s~, b b~
+real(8), public, parameter :: scale_alpha_Z_uu = 1.0366d0 ! scaling factor of alpha (~partial width) for Z > u u~, c c~
+real(8), public, parameter :: scale_alpha_Z_dd = 1.0366d0 ! scaling factor of alpha (~partial width) for Z > d d~, s s~, b b~
 real(8), public, parameter :: scale_alpha_W_ud = 1.0993819d0 ! scaling factor of alpha (~partial width) for W > u d
 real(8), public, parameter :: scale_alpha_W_cs = 1.0993819d0 ! scaling factor of alpha (~partial width) for W > c s
-! real(8), public, parameter :: scale_alpha_Z_ll = 1d0 ! scaling factor of alpha (~partial width) for Z > l+ l-
-! real(8), public, parameter :: scale_alpha_Z_nn = 1d0 ! scaling factor of alpha (~partial width) for Z > nu nu~
-! real(8), public, parameter :: scale_alpha_W_ln = 1d0 ! scaling factor of alpha (~partial width) for W > l nu
-real(8), public, parameter :: scale_alpha_Z_ll = (1d0-(Br_Z_uu+Br_Z_cc)*scale_alpha_Z_uu-(Br_Z_dd+Br_Z_ss+Br_Z_bb)*scale_alpha_Z_dd)/(3d0*Br_Z_nn+3d0*Br_Z_ee) ! scaling factor of alpha (~partial width) for Z > l+ l- which restores the total width
-real(8), public, parameter :: scale_alpha_Z_nn = scale_alpha_Z_ll ! scaling factor of alpha (~partial width) for Z > nu nu~ which restores total width
-real(8), public, parameter :: scale_alpha_W_ln = (1d0-Br_W_ud*scale_alpha_W_ud-Br_W_cs*scale_alpha_W_cs)/(3d0*Br_W_en) ! scaling factor of alpha (~partial width) for W > l nu
+real(8), public, parameter :: scale_alpha_Z_ll = 1d0 ! scaling factor of alpha (~partial width) for Z > l+ l-
+real(8), public, parameter :: scale_alpha_Z_nn = 1d0 ! scaling factor of alpha (~partial width) for Z > nu nu~
+real(8), public, parameter :: scale_alpha_W_ln = 1d0 ! scaling factor of alpha (~partial width) for W > l nu
+! real(8), public, parameter :: scale_alpha_Z_ll = (1d0-(Br_Z_uu+Br_Z_cc)*scale_alpha_Z_uu-(Br_Z_dd+Br_Z_ss+Br_Z_bb)*scale_alpha_Z_dd)/(3d0*Br_Z_nn+3d0*Br_Z_ee) ! scaling factor of alpha (~partial width) for Z > l+ l- which restores the total width
+! real(8), public, parameter :: scale_alpha_Z_nn = scale_alpha_Z_ll ! scaling factor of alpha (~partial width) for Z > nu nu~ which restores total width
+! real(8), public, parameter :: scale_alpha_W_ln = (1d0-Br_W_ud*scale_alpha_W_ud-Br_W_cs*scale_alpha_W_cs)/(3d0*Br_W_en) ! scaling factor of alpha (~partial width) for W > l nu
 !
 ! sum rules
 ! 1 = 3*Br_Z_nn + 3*Br_Z_ee + 2*Br_Z_uu + 3*Br_Z_dd
