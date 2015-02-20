@@ -10,9 +10,9 @@ executable file: ./JHUGen
 command line parameters:
    Collider=x    (Collider: 1=LHC, 2=Tevatron, 0=e+e-), default value:1
    Process=x      0=spin-0, 1=spin-1, 2=spin-2 resonance, 50=pp/ee->VH, 60=weakVBF, 61=pp->Hjj, 80=pp->ttbar+H
-   VegasNc0,1,2 =x (number of evaluations)
+   VegasNc0,1,2=x(number of evaluations)
    PChannel=x    (partonic channel: 0=glu+glu, 1=quark+antiquark, 2=both), default value:2
-   PDFSet=x      (parton distr. functions, 1=CTEQ6L1 (2001), 2=MSTW(2008),  2xx=MSTW with eigenvector set xx=01..40), 3=NNPDF2.0LO default=1
+   PDFSet=x      (parton distr. functions, 1=CTEQ6L1(default), 2=MSTW2008LO,  2xx=MSTW with eigenvector set xx=01..40), 3=NNPDF3.0LO
    DecayMode1=x  (decay mode for vector boson 1), default x=0 
    DecayMode2=x  (decay mode for vector boson 2), default x=0
                   x=0:  X-> Z1 Z2, Z1->2l,
@@ -30,11 +30,12 @@ command line parameters:
    TopDK         decay mode for tops in ttbar+H, 0=stable, 1=di-lept, 2=full hadr., 3,4=lepton+jets  
    DataFile=x    (name of the output file), default value: "output"
    Process=x     (gives the resonance spin 0,1 or 2, or 50=pp/ee->VH, 60=weakVBF, 61=pp->Hjj)
-   MReso=yyy.xx  (resonance mass, default=126.00)
+   MReso=yyy.xx  (resonance mass, default=125.60)
    OffXVV=xyz    (only applies to Higgs production, x,y,z can be 1 or 0 indicating real off-shellness for Higgs, Z/W boson 1/2, resp.), default 011
    Interf=x      (0=neglect interference for 4f final states, 1=include interference, default= 0 above threshold, 1 below threshold )
    if a parameter is not specified, the default value is chosen
    ReadLHE="x"   (allows LO/NLO production of spin-0 particles by reading in LHE file from LO/NLO generator, e.g., POWHEG)
+   ConvertLHE:   LHE input file from external file (only spin-0)
    
 example call:
    ./JHUGen Collider=1 Process=0 VegasNc1=100000 PChannel=0 OffXVV=011 DecayMode1=0 DecayMode2=0 DataFile=test1
