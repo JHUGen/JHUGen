@@ -180,11 +180,11 @@
                     aL1=aL_neu    * dsqrt(scale_alpha_Z_nn)
                     aR1=aR_neu    * dsqrt(scale_alpha_Z_nn)
               elseif( abs(MY_IDUP(6)).eq.abs(Up_) .or. abs(MY_IDUP(6)).eq.abs(Chm_) ) then
-                    aL1=aL_QUp    * dsqrt(scale_alpha_Z_uu) * dsqrt(3d0) * dsqrt(2d0)
-                    aR1=aR_QUp    * dsqrt(scale_alpha_Z_uu) * dsqrt(3d0) * dsqrt(2d0)
+                    aL1=aL_QUp    * dsqrt(scale_alpha_Z_uu) 
+                    aR1=aR_QUp    * dsqrt(scale_alpha_Z_uu) 
               elseif( abs(MY_IDUP(6)).eq.abs(Dn_) .or. abs(MY_IDUP(6)).eq.abs(Str_) .or. abs(MY_IDUP(6)).eq.abs(Bot_) ) then
-                    aL1=aL_QDn    * dsqrt(scale_alpha_Z_dd) * dsqrt(3d0) * dsqrt(2d0)
-                    aR1=aR_QDn    * dsqrt(scale_alpha_Z_dd) * dsqrt(3d0) * dsqrt(2d0)
+                    aL1=aL_QDn    * dsqrt(scale_alpha_Z_dd) 
+                    aR1=aR_QDn    * dsqrt(scale_alpha_Z_dd) 
               else
                     aL1=0d0
                     aR1=0d0
@@ -196,11 +196,11 @@
                     aL2=aL_neu    * dsqrt(scale_alpha_Z_nn)
                     aR2=aR_neu    * dsqrt(scale_alpha_Z_nn)
               elseif( abs(MY_IDUP(8)).eq.abs(Up_) .or. abs(MY_IDUP(8)).eq.abs(Chm_) ) then
-                    aL2=aL_QUp    * dsqrt(scale_alpha_Z_uu) * dsqrt(3d0) * dsqrt(2d0)
-                    aR2=aR_QUp    * dsqrt(scale_alpha_Z_uu) * dsqrt(3d0) * dsqrt(2d0)
+                    aL2=aL_QUp    * dsqrt(scale_alpha_Z_uu)
+                    aR2=aR_QUp    * dsqrt(scale_alpha_Z_uu)
               elseif( abs(MY_IDUP(8)).eq.abs(Dn_) .or. abs(MY_IDUP(8)).eq.abs(Str_) .or. abs(MY_IDUP(8)).eq.abs(Bot_) ) then
-                    aL2=aL_QDn    * dsqrt(scale_alpha_Z_dd) * dsqrt(3d0) * dsqrt(2d0)
-                    aR2=aR_QDn    * dsqrt(scale_alpha_Z_dd) * dsqrt(3d0) * dsqrt(2d0)
+                    aL2=aL_QDn    * dsqrt(scale_alpha_Z_dd)
+                    aR2=aR_QDn    * dsqrt(scale_alpha_Z_dd)
               else
                     aL2=0d0
                     aR2=0d0

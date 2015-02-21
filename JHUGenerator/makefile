@@ -6,7 +6,7 @@ VegasDir = $(Here)/vegas
 
 # compiler options, Comp=ifort/gfort
 Opt  = Yes
-Comp = gfort
+Comp = ifort
 
 
 

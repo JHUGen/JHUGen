@@ -387,6 +387,14 @@ ELSEIF( COLLIDER.EQ.0 ) THEN
   Collider_Energy  = ILC_Energy
 ENDIF
 
+
+if( (DecayMode1.eq.8 .and. DecayMode2.eq.9) .or. (DecayMode1.eq.9 .and. DecayMode2.eq.8) ) then
+  scale_alpha_Z_uu = scale_alpha_Z_uu * 2d0
+  scale_alpha_Z_dd = scale_alpha_Z_dd * 2d0
+  scale_alpha_Z_nn = scale_alpha_Z_nn * 2d0
+endif
+
+
 END SUBROUTINE
 
 
@@ -776,11 +784,11 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
     
     write(*,*) ""
     write(*,"(A)") "                 el              mu             tau             neu              jet"
-    write(*,"(A,5F16.3)") " el ",dble(Br_counter(1,1:5))/dble(AccepCounter)
-    write(*,"(A,5F16.3)") " mu ",dble(Br_counter(2,1:5))/dble(AccepCounter)
-    write(*,"(A,5F16.3)") " tau",dble(Br_counter(3,1:5))/dble(AccepCounter)
-    write(*,"(A,5F16.3)") " neu",dble(Br_counter(4,1:5))/dble(AccepCounter)
-    write(*,"(A,5F16.3)") " jet",dble(Br_counter(5,1:5))/dble(AccepCounter)
+    write(*,"(A,5F16.4)") " el ",dble(Br_counter(1,1:5))/dble(AccepCounter)
+    write(*,"(A,5F16.4)") " mu ",dble(Br_counter(2,1:5))/dble(AccepCounter)
+    write(*,"(A,5F16.4)") " tau",dble(Br_counter(3,1:5))/dble(AccepCounter)
+    write(*,"(A,5F16.4)") " neu",dble(Br_counter(4,1:5))/dble(AccepCounter)
+    write(*,"(A,5F16.4)") " jet",dble(Br_counter(5,1:5))/dble(AccepCounter)
     write(*,*) ""
     write(*,"(A,5F16.3)") "llll: ",(dble(Br_counter(1,1))+dble(Br_counter(2,2))+dble(Br_counter(3,3)))/dble(AccepCounter)
     write(*,"(A,5F16.3)") "llLL: ",(dble(Br_counter(1,2))+dble(Br_counter(1,3))+  &
@@ -795,18 +803,18 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
                                     (dble(Br_counter(1,5))+dble(Br_counter(2,5))+dble(Br_counter(3,5))+  &
                                     dble(Br_counter(5,1))+dble(Br_counter(5,2))+dble(Br_counter(5,3)) )
                                     
-    print *, alpha_QED/12d0*M_Z * (   (aR_lep+aL_lep)**2 + (aR_lep-aL_lep)**2        &
-                                     +(aR_lep+aL_lep)**2 + (aR_lep-aL_lep)**2        &
-                                     +(aR_lep+aL_lep)**2 + (aR_lep-aL_lep)**2        &
-                                     +(aR_neu+aL_neu)**2 + (aR_neu-aL_neu)**2        &
-                                     +(aR_neu+aL_neu)**2 + (aR_neu-aL_neu)**2        &
-                                     +(aR_neu+aL_neu)**2 + (aR_neu-aL_neu)**2        &
-                                     +((aR_Qup+aL_Qup)**2 + (aR_Qup-aL_Qup)**2 )*3d0 *1.0366d0 &
-                                     +((aR_Qdn+aL_Qdn)**2 + (aR_Qdn-aL_Qdn)**2 )*3d0 *1.0366d0 &
-                                     +((aR_Qup+aL_Qup)**2 + (aR_Qup-aL_Qup)**2 )*3d0 *1.0366d0 &
-                                     +((aR_Qdn+aL_Qdn)**2 + (aR_Qdn-aL_Qdn)**2 )*3d0 *1.0366d0 &
-                                     +((aR_Qdn+aL_Qdn)**2 + (aR_Qdn-aL_Qdn)**2 )*3d0 *1.0366d0 *(1d0-3d0/2d0/(M_Z/2d0/m_bot)**2) &
-                                 )/4d0/(one-sitW**2)/sitW**2                        
+!     print *, alpha_QED/12d0*M_Z * (   (aR_lep+aL_lep)**2 + (aR_lep-aL_lep)**2        &
+!                                      +(aR_lep+aL_lep)**2 + (aR_lep-aL_lep)**2        &
+!                                      +(aR_lep+aL_lep)**2 + (aR_lep-aL_lep)**2        &
+!                                      +(aR_neu+aL_neu)**2 + (aR_neu-aL_neu)**2        &
+!                                      +(aR_neu+aL_neu)**2 + (aR_neu-aL_neu)**2        &
+!                                      +(aR_neu+aL_neu)**2 + (aR_neu-aL_neu)**2        &
+!                                      +((aR_Qup+aL_Qup)**2 + (aR_Qup-aL_Qup)**2 )*3d0 *1.0366d0 &
+!                                      +((aR_Qdn+aL_Qdn)**2 + (aR_Qdn-aL_Qdn)**2 )*3d0 *1.0366d0 &
+!                                      +((aR_Qup+aL_Qup)**2 + (aR_Qup-aL_Qup)**2 )*3d0 *1.0366d0 &
+!                                      +((aR_Qdn+aL_Qdn)**2 + (aR_Qdn-aL_Qdn)**2 )*3d0 *1.0366d0 &
+!                                      +((aR_Qdn+aL_Qdn)**2 + (aR_Qdn-aL_Qdn)**2 )*3d0 *1.0366d0 *(1d0-3d0/2d0/(M_Z/2d0/m_bot)**2) &
+!                                  )/4d0/(one-sitW**2)/sitW**2                        
   endif! unweighted
   
   
