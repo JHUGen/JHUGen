@@ -173,9 +173,12 @@
 !        ij helicicites: -1 == left, 1 == right
          if( VVMode.eq.ZZMode ) then
 !        ZZ DECAYS
-             if( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_) .or. abs(MY_IDUP(6)).eq.abs(TaM_) ) then
+              if( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_) ) then
                     aL1=aL_lep    * dsqrt(scale_alpha_Z_ll)
                     aR1=aR_lep    * dsqrt(scale_alpha_Z_ll)
+              elseif( abs(MY_IDUP(6)).eq.abs(TaM_) ) then
+                    aL1=aL_lep    * dsqrt(scale_alpha_Z_tt)
+                    aR1=aR_lep    * dsqrt(scale_alpha_Z_tt)
               elseif( abs(MY_IDUP(6)).eq.abs(NuE_) .or. abs(MY_IDUP(6)).eq.abs(NuM_) .or. abs(MY_IDUP(6)).eq.abs(NuT_) ) then
                     aL1=aL_neu    * dsqrt(scale_alpha_Z_nn)
                     aR1=aR_neu    * dsqrt(scale_alpha_Z_nn)
@@ -189,9 +192,12 @@
                     aL1=0d0
                     aR1=0d0
               endif
-              if( abs(MY_IDUP(8)).eq.abs(ElM_) .or. abs(MY_IDUP(8)).eq.abs(MuM_) .or. abs(MY_IDUP(8)).eq.abs(TaM_) ) then
+              if( abs(MY_IDUP(8)).eq.abs(ElM_) .or. abs(MY_IDUP(8)).eq.abs(MuM_)  ) then
                     aL2=aL_lep    * dsqrt(scale_alpha_Z_ll)
                     aR2=aR_lep    * dsqrt(scale_alpha_Z_ll)
+              elseif( abs(MY_IDUP(8)).eq.abs(TaM_) ) then
+                    aL2=aL_lep    * dsqrt(scale_alpha_Z_tt)
+                    aR2=aR_lep    * dsqrt(scale_alpha_Z_tt)
               elseif( abs(MY_IDUP(8)).eq.abs(NuE_) .or. abs(MY_IDUP(8)).eq.abs(NuM_) .or. abs(MY_IDUP(8)).eq.abs(NuT_) ) then
                     aL2=aL_neu    * dsqrt(scale_alpha_Z_nn)
                     aR2=aR_neu    * dsqrt(scale_alpha_Z_nn)
@@ -221,16 +227,28 @@
               if( IsAQuark(MY_IDUP(6)) ) then
                  aL1 = bL * dsqrt(scale_alpha_W_ud)
                  aR1 = bR * dsqrt(scale_alpha_W_ud)! = 0
-              else
+              elseif( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_) ) then
                  aL1 = bL * dsqrt(scale_alpha_W_ln)
                  aR1 = bR * dsqrt(scale_alpha_W_ln)! = 0
+              elseif( abs(MY_IDUP(6)).eq.abs(TaM_) ) then
+                 aL1 = bL * dsqrt(scale_alpha_W_tn)
+                 aR1 = bR * dsqrt(scale_alpha_W_tn)! = 0
+              else
+                    aL1=0d0
+                    aR1=0d0
               endif
               if( IsAQuark(MY_IDUP(8)) ) then
                  aL2 = bL * dsqrt(scale_alpha_W_ud)
                  aR2 = bR * dsqrt(scale_alpha_W_ud)! = 0
-              else
+              elseif( abs(MY_IDUP(9)).eq.abs(ElM_) .or. abs(MY_IDUP(9)).eq.abs(MuM_) ) then
                  aL2 = bL * dsqrt(scale_alpha_W_ln)
                  aR2 = bR * dsqrt(scale_alpha_W_ln)! = 0
+              elseif( abs(MY_IDUP(9)).eq.abs(TaM_) ) then
+                 aL2 = bL * dsqrt(scale_alpha_W_tn)
+                 aR2 = bR * dsqrt(scale_alpha_W_tn)! = 0
+              else
+                    aL2=0d0
+                    aR2=0d0
               endif
               pin(3,:) = p(:,l1)+p(:,l2)
               pin(4,:) = p(:,l3)+p(:,l4)
@@ -245,9 +263,12 @@
 
          elseif( VVMode.eq.ZgMode ) then
 !        Zgamma DECAYS
-              if( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_) .or. abs(MY_IDUP(6)).eq.abs(TaM_) ) then
+              if( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_)  ) then
                     aL1=aL_lep    * dsqrt(scale_alpha_Z_ll)
                     aR1=aR_lep    * dsqrt(scale_alpha_Z_ll)
+              elseif( abs(MY_IDUP(6)).eq.abs(TaM_) ) then
+                    aL1=aL_lep    * dsqrt(scale_alpha_Z_tt)
+                    aR1=aR_lep    * dsqrt(scale_alpha_Z_tt)
               elseif( abs(MY_IDUP(6)).eq.abs(NuE_) .or. abs(MY_IDUP(6)).eq.abs(NuM_) .or. abs(MY_IDUP(6)).eq.abs(NuT_) ) then
                     aL1=aL_neu    * dsqrt(scale_alpha_Z_nn)
                     aR1=aR_neu    * dsqrt(scale_alpha_Z_nn)
@@ -290,7 +311,10 @@
               
          elseif( VVMode.eq.gsgMode ) then
 !        gamma* gamma DECAYS
-              if( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_) .or. abs(MY_IDUP(6)).eq.abs(TaM_) ) then
+              if( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_)  ) then
+                    aL1=cL_lep
+                    aR1=cR_lep
+              elseif( abs(MY_IDUP(6)).eq.abs(TaM_) ) then
                     aL1=cL_lep
                     aR1=cR_lep
               elseif( abs(MY_IDUP(6)).eq.abs(NuE_) .or. abs(MY_IDUP(6)).eq.abs(NuM_) .or. abs(MY_IDUP(6)).eq.abs(NuT_) ) then
@@ -321,7 +345,10 @@
 
          elseif( VVMode.eq.gsZMode ) then
 !        gamma* Z DECAYS
-              if( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_) .or. abs(MY_IDUP(6)).eq.abs(TaM_) ) then
+              if( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_) ) then
+                    aL1=cL_lep
+                    aR1=cR_lep
+              elseif( abs(MY_IDUP(6)).eq.abs(TaM_) ) then
                     aL1=cL_lep
                     aR1=cR_lep
               elseif( abs(MY_IDUP(6)).eq.abs(NuE_) .or. abs(MY_IDUP(6)).eq.abs(NuM_) .or. abs(MY_IDUP(6)).eq.abs(NuT_) ) then
@@ -337,9 +364,12 @@
                     aL1=0d0
                     aR1=0d0
               endif
-              if( abs(MY_IDUP(8)).eq.abs(ElM_) .or. abs(MY_IDUP(8)).eq.abs(MuM_) .or. abs(MY_IDUP(8)).eq.abs(TaM_) ) then
+              if( abs(MY_IDUP(8)).eq.abs(ElM_) .or. abs(MY_IDUP(8)).eq.abs(MuM_) ) then
                     aL2=aL_lep    * dsqrt(scale_alpha_Z_ll)
                     aR2=aR_lep    * dsqrt(scale_alpha_Z_ll)
+              elseif( abs(MY_IDUP(8)).eq.abs(TaM_) ) then
+                    aL2=aL_lep    * dsqrt(scale_alpha_Z_tt)
+                    aR2=aR_lep    * dsqrt(scale_alpha_Z_tt)
               elseif( abs(MY_IDUP(8)).eq.abs(NuE_) .or. abs(MY_IDUP(8)).eq.abs(NuM_) .or. abs(MY_IDUP(8)).eq.abs(NuT_) ) then
                     aL2=aL_neu    * dsqrt(scale_alpha_Z_nn)
                     aR2=aR_neu    * dsqrt(scale_alpha_Z_nn)
@@ -367,9 +397,12 @@
 
          elseif( VVMode.eq.ZgsMode ) then
 !        Z gamma* DECAYS
-              if( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_) .or. abs(MY_IDUP(6)).eq.abs(TaM_) ) then
+              if( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_) ) then
                     aL1=aL_lep    * dsqrt(scale_alpha_Z_ll)
                     aR1=aR_lep    * dsqrt(scale_alpha_Z_ll)
+              elseif( abs(MY_IDUP(6)).eq.abs(TaM_) ) then
+                    aL1=aL_lep    * dsqrt(scale_alpha_Z_tt)
+                    aR1=aR_lep    * dsqrt(scale_alpha_Z_tt)
               elseif( abs(MY_IDUP(6)).eq.abs(NuE_) .or. abs(MY_IDUP(6)).eq.abs(NuM_) .or. abs(MY_IDUP(6)).eq.abs(NuT_) ) then
                     aL1=aL_neu    * dsqrt(scale_alpha_Z_nn)
                     aR1=aR_neu    * dsqrt(scale_alpha_Z_nn)
@@ -383,7 +416,10 @@
                     aL1=0d0
                     aR1=0d0
               endif
-              if( abs(MY_IDUP(8)).eq.abs(ElM_) .or. abs(MY_IDUP(8)).eq.abs(MuM_) .or. abs(MY_IDUP(8)).eq.abs(TaM_) ) then
+              if( abs(MY_IDUP(8)).eq.abs(ElM_) .or. abs(MY_IDUP(8)).eq.abs(MuM_) ) then
+                    aL2=cL_lep
+                    aR2=cR_lep
+              elseif( abs(MY_IDUP(8)).eq.abs(TaM_) ) then
                     aL2=cL_lep
                     aR2=cR_lep
               elseif( abs(MY_IDUP(8)).eq.abs(NuE_) .or. abs(MY_IDUP(8)).eq.abs(NuM_) .or. abs(MY_IDUP(8)).eq.abs(NuT_) ) then
@@ -413,7 +449,10 @@
 
          elseif( VVMode.eq.gsgsMode ) then
 !        gamma* gamma* DECAYS
-              if( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_) .or. abs(MY_IDUP(6)).eq.abs(TaM_) ) then
+              if( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_)  ) then
+                    aL1=cL_lep
+                    aR1=cR_lep
+              elseif( abs(MY_IDUP(6)).eq.abs(TaM_) ) then
                     aL1=cL_lep
                     aR1=cR_lep
               elseif( abs(MY_IDUP(6)).eq.abs(NuE_) .or. abs(MY_IDUP(6)).eq.abs(NuM_) .or. abs(MY_IDUP(6)).eq.abs(NuT_) ) then
@@ -429,7 +468,10 @@
                     aL1=0d0
                     aR1=0d0
               endif
-              if( abs(MY_IDUP(8)).eq.abs(ElM_) .or. abs(MY_IDUP(8)).eq.abs(MuM_) .or. abs(MY_IDUP(8)).eq.abs(TaM_) ) then
+              if( abs(MY_IDUP(8)).eq.abs(ElM_) .or. abs(MY_IDUP(8)).eq.abs(MuM_) ) then
+                    aL2=cL_lep
+                    aR2=cR_lep
+              elseif( abs(MY_IDUP(8)).eq.abs(TaM_) ) then
                     aL2=cL_lep
                     aR2=cR_lep
               elseif( abs(MY_IDUP(8)).eq.abs(NuE_) .or. abs(MY_IDUP(8)).eq.abs(NuM_) .or. abs(MY_IDUP(8)).eq.abs(NuT_) ) then
@@ -828,9 +870,12 @@
 !        ij helicicites: -1 == left, 1 == right
          if( VVMode.eq.ZZMode ) then
 !        ZZ DECAYS
-              if( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_) .or. abs(MY_IDUP(6)).eq.abs(TaM_) ) then
+              if( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_)  ) then
                     aL1=aL_lep    * dsqrt(scale_alpha_Z_ll)
                     aR1=aR_lep    * dsqrt(scale_alpha_Z_ll)
+              elseif( abs(MY_IDUP(6)).eq.abs(TaM_) ) then
+                    aL1=aL_lep    * dsqrt(scale_alpha_Z_tt)
+                    aR1=aR_lep    * dsqrt(scale_alpha_Z_tt)
               elseif( abs(MY_IDUP(6)).eq.abs(NuE_) .or. abs(MY_IDUP(6)).eq.abs(NuM_) .or. abs(MY_IDUP(6)).eq.abs(NuT_) ) then
                     aL1=aL_neu    * dsqrt(scale_alpha_Z_nn)
                     aR1=aR_neu    * dsqrt(scale_alpha_Z_nn)
@@ -844,9 +889,12 @@
                     aL1=0d0
                     aR1=0d0
               endif
-              if( abs(MY_IDUP(8)).eq.abs(ElM_) .or. abs(MY_IDUP(8)).eq.abs(MuM_) .or. abs(MY_IDUP(8)).eq.abs(TaM_) ) then
+              if( abs(MY_IDUP(8)).eq.abs(ElM_) .or. abs(MY_IDUP(8)).eq.abs(MuM_)  ) then
                     aL2=aL_lep    * dsqrt(scale_alpha_Z_ll)
                     aR2=aR_lep    * dsqrt(scale_alpha_Z_ll)
+              elseif( abs(MY_IDUP(8)).eq.abs(TaM_) ) then
+                    aL2=aL_lep    * dsqrt(scale_alpha_Z_tt)
+                    aR2=aR_lep    * dsqrt(scale_alpha_Z_tt)
               elseif( abs(MY_IDUP(8)).eq.abs(NuE_) .or. abs(MY_IDUP(8)).eq.abs(NuM_) .or. abs(MY_IDUP(8)).eq.abs(NuT_) ) then
                     aL2=aL_neu    * dsqrt(scale_alpha_Z_nn)
                     aR2=aR_neu    * dsqrt(scale_alpha_Z_nn)
@@ -876,16 +924,28 @@
               if( IsAQuark(MY_IDUP(6)) ) then
                  aL1 = bL * dsqrt(scale_alpha_W_ud)
                  aR1 = bR * dsqrt(scale_alpha_W_ud)! = 0
-              else
+              elseif( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_) ) then
                  aL1 = bL * dsqrt(scale_alpha_W_ln)
                  aR1 = bR * dsqrt(scale_alpha_W_ln)! = 0
+              elseif( abs(MY_IDUP(6)).eq.abs(TaM_) ) then
+                 aL1 = bL * dsqrt(scale_alpha_W_tn)
+                 aR1 = bR * dsqrt(scale_alpha_W_tn)! = 0
+              else
+                    aL1=0d0
+                    aR1=0d0
               endif
               if( IsAQuark(MY_IDUP(8)) ) then
                  aL2 = bL * dsqrt(scale_alpha_W_ud)
                  aR2 = bR * dsqrt(scale_alpha_W_ud)! = 0
-              else
+              elseif( abs(MY_IDUP(9)).eq.abs(ElM_) .or. abs(MY_IDUP(9)).eq.abs(MuM_) ) then
                  aL2 = bL * dsqrt(scale_alpha_W_ln)
                  aR2 = bR * dsqrt(scale_alpha_W_ln)! = 0
+              elseif( abs(MY_IDUP(9)).eq.abs(TaM_) ) then
+                 aL2 = bL * dsqrt(scale_alpha_W_tn)
+                 aR2 = bR * dsqrt(scale_alpha_W_tn)! = 0
+              else
+                    aL2=0d0
+                    aR2=0d0
               endif
               pin(3,:) = p(:,l1)+p(:,l2)
               pin(4,:) = p(:,l3)+p(:,l4)
@@ -900,9 +960,12 @@
 
          elseif( VVMode.eq.ZgMode ) then
 !        Zgamma DECAYS
-              if( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_) .or. abs(MY_IDUP(6)).eq.abs(TaM_) ) then
+              if( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_) ) then
                     aL1=aL_lep    * dsqrt(scale_alpha_Z_ll)
                     aR1=aR_lep    * dsqrt(scale_alpha_Z_ll)
+              elseif( abs(MY_IDUP(6)).eq.abs(TaM_) ) then
+                    aL1=aL_lep    * dsqrt(scale_alpha_Z_tt)
+                    aR1=aR_lep    * dsqrt(scale_alpha_Z_tt)
               elseif( abs(MY_IDUP(6)).eq.abs(NuE_) .or. abs(MY_IDUP(6)).eq.abs(NuM_) .or. abs(MY_IDUP(6)).eq.abs(NuT_) ) then
                     aL1=aL_neu    * dsqrt(scale_alpha_Z_nn)
                     aR1=aR_neu    * dsqrt(scale_alpha_Z_nn)
@@ -945,7 +1008,10 @@
               
          elseif( VVMode.eq.gsgMode ) then
 !        gamma* gamma DECAYS
-              if( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_) .or. abs(MY_IDUP(6)).eq.abs(TaM_) ) then
+              if( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_) ) then
+                    aL1=cL_lep
+                    aR1=cR_lep
+              elseif( abs(MY_IDUP(6)).eq.abs(TaM_) ) then
                     aL1=cL_lep
                     aR1=cR_lep
               elseif( abs(MY_IDUP(6)).eq.abs(NuE_) .or. abs(MY_IDUP(6)).eq.abs(NuM_) .or. abs(MY_IDUP(6)).eq.abs(NuT_) ) then
@@ -976,7 +1042,10 @@
 
          elseif( VVMode.eq.gsZMode ) then
 !        gamma* Z DECAYS
-              if( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_) .or. abs(MY_IDUP(6)).eq.abs(TaM_) ) then
+              if( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_)  ) then
+                    aL1=cL_lep
+                    aR1=cR_lep
+              elseif( abs(MY_IDUP(6)).eq.abs(TaM_) ) then
                     aL1=cL_lep
                     aR1=cR_lep
               elseif( abs(MY_IDUP(6)).eq.abs(NuE_) .or. abs(MY_IDUP(6)).eq.abs(NuM_) .or. abs(MY_IDUP(6)).eq.abs(NuT_) ) then
@@ -992,9 +1061,12 @@
                     aL1=0d0
                     aR1=0d0
               endif
-              if( abs(MY_IDUP(8)).eq.abs(ElM_) .or. abs(MY_IDUP(8)).eq.abs(MuM_) .or. abs(MY_IDUP(8)).eq.abs(TaM_) ) then
+              if( abs(MY_IDUP(8)).eq.abs(ElM_) .or. abs(MY_IDUP(8)).eq.abs(MuM_) ) then
                     aL2=aL_lep    * dsqrt(scale_alpha_Z_ll)
                     aR2=aR_lep    * dsqrt(scale_alpha_Z_ll)
+              elseif( abs(MY_IDUP(8)).eq.abs(TaM_) ) then
+                    aL2=aL_lep    * dsqrt(scale_alpha_Z_tt)
+                    aR2=aR_lep    * dsqrt(scale_alpha_Z_tt)
               elseif( abs(MY_IDUP(8)).eq.abs(NuE_) .or. abs(MY_IDUP(8)).eq.abs(NuM_) .or. abs(MY_IDUP(8)).eq.abs(NuT_) ) then
                     aL2=aL_neu    * dsqrt(scale_alpha_Z_nn)
                     aR2=aR_neu    * dsqrt(scale_alpha_Z_nn)
@@ -1023,9 +1095,12 @@
 
          elseif( VVMode.eq.ZgsMode ) then
 !        Z gamma* DECAYS
-              if( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_) .or. abs(MY_IDUP(6)).eq.abs(TaM_) ) then
+              if( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_) ) then
                     aL1=aL_lep    * dsqrt(scale_alpha_Z_ll)
                     aR1=aR_lep    * dsqrt(scale_alpha_Z_ll)
+              elseif( abs(MY_IDUP(6)).eq.abs(TaM_) ) then
+                    aL1=aL_lep    * dsqrt(scale_alpha_Z_tt)
+                    aR1=aR_lep    * dsqrt(scale_alpha_Z_tt)
               elseif( abs(MY_IDUP(6)).eq.abs(NuE_) .or. abs(MY_IDUP(6)).eq.abs(NuM_) .or. abs(MY_IDUP(6)).eq.abs(NuT_) ) then
                     aL1=aL_neu    * dsqrt(scale_alpha_Z_nn)
                     aR1=aR_neu    * dsqrt(scale_alpha_Z_nn)
@@ -1039,7 +1114,10 @@
                     aL1=0d0
                     aR1=0d0
               endif
-              if( abs(MY_IDUP(8)).eq.abs(ElM_) .or. abs(MY_IDUP(8)).eq.abs(MuM_) .or. abs(MY_IDUP(8)).eq.abs(TaM_) ) then
+              if( abs(MY_IDUP(8)).eq.abs(ElM_) .or. abs(MY_IDUP(8)).eq.abs(MuM_) ) then
+                    aL2=cL_lep
+                    aR2=cR_lep
+              elseif( abs(MY_IDUP(8)).eq.abs(TaM_) ) then
                     aL2=cL_lep
                     aR2=cR_lep
               elseif( abs(MY_IDUP(8)).eq.abs(NuE_) .or. abs(MY_IDUP(8)).eq.abs(NuM_) .or. abs(MY_IDUP(8)).eq.abs(NuT_) ) then
@@ -1067,9 +1145,13 @@
               propZ2 = 1d0 ! = s/dcmplx(s)
               if( s.lt.MPhotonCutoff**2 ) propZ2=0d0
 
+
          elseif( VVMode.eq.gsgsMode ) then
 !        gamma* gamma* DECAYS
-              if( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_) .or. abs(MY_IDUP(6)).eq.abs(TaM_) ) then
+              if( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_) ) then
+                    aL1=cL_lep
+                    aR1=cR_lep
+              elseif( abs(MY_IDUP(6)).eq.abs(TaM_) ) then
                     aL1=cL_lep
                     aR1=cR_lep
               elseif( abs(MY_IDUP(6)).eq.abs(NuE_) .or. abs(MY_IDUP(6)).eq.abs(NuM_) .or. abs(MY_IDUP(6)).eq.abs(NuT_) ) then
@@ -1085,7 +1167,10 @@
                     aL1=0d0
                     aR1=0d0
               endif
-              if( abs(MY_IDUP(8)).eq.abs(ElM_) .or. abs(MY_IDUP(8)).eq.abs(MuM_) .or. abs(MY_IDUP(8)).eq.abs(TaM_) ) then
+              if( abs(MY_IDUP(8)).eq.abs(ElM_) .or. abs(MY_IDUP(8)).eq.abs(MuM_) ) then
+                    aL2=cL_lep
+                    aR2=cR_lep
+              elseif( abs(MY_IDUP(8)).eq.abs(TaM_) ) then
                     aL2=cL_lep
                     aR2=cR_lep
               elseif( abs(MY_IDUP(8)).eq.abs(NuE_) .or. abs(MY_IDUP(8)).eq.abs(NuM_) .or. abs(MY_IDUP(8)).eq.abs(NuT_) ) then

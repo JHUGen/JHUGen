@@ -389,10 +389,112 @@ ELSEIF( COLLIDER.EQ.0 ) THEN
 ENDIF
 
 
-if( (DecayMode1.eq.8 .and. DecayMode2.eq.9) .or. (DecayMode1.eq.9 .and. DecayMode2.eq.8) ) then
-  scale_alpha_Z_uu = scale_alpha_Z_uu * 2d0
-  scale_alpha_Z_dd = scale_alpha_Z_dd * 2d0
-  scale_alpha_Z_nn = scale_alpha_Z_nn * 2d0
+
+! rescale V branchings to preserve the correct branching proportions in partial decays
+if( (DecayMode1.eq.8 .and. DecayMode2.eq.9) .or.  & 
+    (DecayMode1.eq.9 .and. DecayMode2.eq.8) ) then
+        scale_alpha_Z_uu = scale_alpha_Z_uu * 2d0
+        scale_alpha_Z_dd = scale_alpha_Z_dd * 2d0
+        scale_alpha_Z_nn = scale_alpha_Z_nn * 2d0
+        scale_alpha_Z_ll = scale_alpha_Z_ll * 1d0
+        scale_alpha_Z_tt = scale_alpha_Z_tt * 1d0
+
+
+elseif( (DecayMode1.eq.0 .and. DecayMode2.eq.9) .or.  & 
+        (DecayMode1.eq.9 .and. DecayMode2.eq.0) ) then
+        scale_alpha_Z_uu = scale_alpha_Z_uu * 2d0
+        scale_alpha_Z_dd = scale_alpha_Z_dd * 2d0
+        scale_alpha_Z_nn = scale_alpha_Z_nn * 2d0
+        scale_alpha_Z_ll = scale_alpha_Z_ll * 1d0
+        scale_alpha_Z_tt = scale_alpha_Z_tt * 2d0
+
+
+elseif( (DecayMode1.eq.1 .and. DecayMode2.eq.9) .or.  & 
+        (DecayMode1.eq.9 .and. DecayMode2.eq.1) ) then
+        scale_alpha_Z_uu = scale_alpha_Z_uu * 1d0
+        scale_alpha_Z_dd = scale_alpha_Z_dd * 1d0
+        scale_alpha_Z_nn = scale_alpha_Z_nn * 2d0
+        scale_alpha_Z_ll = scale_alpha_Z_ll * 2d0
+        scale_alpha_Z_tt = scale_alpha_Z_tt * 2d0
+
+
+elseif( (DecayMode1.eq.2 .and. DecayMode2.eq.9) .or.  & 
+        (DecayMode1.eq.9 .and. DecayMode2.eq.2) ) then
+        scale_alpha_Z_uu = scale_alpha_Z_uu * 2d0
+        scale_alpha_Z_dd = scale_alpha_Z_dd * 2d0
+        scale_alpha_Z_nn = scale_alpha_Z_nn * 2d0
+        scale_alpha_Z_ll = scale_alpha_Z_ll * 2d0
+        scale_alpha_Z_tt = scale_alpha_Z_tt * 1d0
+
+
+elseif( (DecayMode1.eq.3 .and. DecayMode2.eq.9) .or.  & 
+        (DecayMode1.eq.9 .and. DecayMode2.eq.3) ) then
+        scale_alpha_Z_uu = scale_alpha_Z_uu * 2d0
+        scale_alpha_Z_dd = scale_alpha_Z_dd * 2d0
+        scale_alpha_Z_nn = scale_alpha_Z_nn * 1d0
+        scale_alpha_Z_ll = scale_alpha_Z_ll * 2d0
+        scale_alpha_Z_tt = scale_alpha_Z_tt * 2d0
+
+elseif( (DecayMode1.eq.8 .and. DecayMode2.eq.0) .or.  & 
+        (DecayMode1.eq.0 .and. DecayMode2.eq.8) ) then
+        scale_alpha_Z_uu = scale_alpha_Z_uu * 1d0
+        scale_alpha_Z_dd = scale_alpha_Z_dd * 1d0
+        scale_alpha_Z_nn = scale_alpha_Z_nn * 1d0
+        scale_alpha_Z_ll = scale_alpha_Z_ll * 1d0
+        scale_alpha_Z_tt = scale_alpha_Z_tt * 2d0
+
+elseif( (DecayMode1.eq.8 .and. DecayMode2.eq.2) .or.  & 
+        (DecayMode1.eq.2 .and. DecayMode2.eq.8) ) then
+        scale_alpha_Z_uu = scale_alpha_Z_uu * 1d0
+        scale_alpha_Z_dd = scale_alpha_Z_dd * 1d0
+        scale_alpha_Z_nn = scale_alpha_Z_nn * 1d0
+        scale_alpha_Z_ll = scale_alpha_Z_ll * 2d0
+        scale_alpha_Z_tt = scale_alpha_Z_tt * 1d0
+
+elseif( (DecayMode1.eq.4 .and. DecayMode2.eq.11) .or.  & 
+        (DecayMode1.eq.11.and. DecayMode2.eq.4) ) then
+        scale_alpha_W_ud = scale_alpha_W_ud * 2d0
+        scale_alpha_W_cs = scale_alpha_W_cs * 2d0
+        scale_alpha_W_ln = scale_alpha_W_ln * 1d0
+        scale_alpha_W_tn = scale_alpha_W_tn * 2d0
+
+
+elseif( (DecayMode1.eq.5 .and. DecayMode2.eq.11) .or.  & 
+        (DecayMode1.eq.11.and. DecayMode2.eq.5) ) then
+        scale_alpha_W_ud = scale_alpha_W_ud * 1d0
+        scale_alpha_W_cs = scale_alpha_W_cs * 1d0
+        scale_alpha_W_ln = scale_alpha_W_ln * 2d0
+        scale_alpha_W_tn = scale_alpha_W_tn * 2d0
+
+elseif( (DecayMode1.eq.6 .and. DecayMode2.eq.11) .or.  & 
+        (DecayMode1.eq.11.and. DecayMode2.eq.6) ) then
+        scale_alpha_W_ud = scale_alpha_W_ud * 2d0
+        scale_alpha_W_cs = scale_alpha_W_cs * 2d0
+        scale_alpha_W_ln = scale_alpha_W_ln * 2d0
+        scale_alpha_W_tn = scale_alpha_W_tn * 1d0
+
+elseif( (DecayMode1.eq.10.and. DecayMode2.eq.11) .or.  & 
+        (DecayMode1.eq.11.and. DecayMode2.eq.10) ) then
+        scale_alpha_W_ud = scale_alpha_W_ud * 2d0
+        scale_alpha_W_cs = scale_alpha_W_cs * 2d0
+        scale_alpha_W_ln = scale_alpha_W_ln * 1d0
+        scale_alpha_W_tn = scale_alpha_W_tn * 1d0
+
+elseif( (DecayMode1.eq.4 .and. DecayMode2.eq.10) .or.  & 
+        (DecayMode1.eq.10.and. DecayMode2.eq.4) ) then
+        scale_alpha_W_ud = scale_alpha_W_ud * 1d0
+        scale_alpha_W_cs = scale_alpha_W_cs * 1d0
+        scale_alpha_W_ln = scale_alpha_W_ln * 1d0
+        scale_alpha_W_tn = scale_alpha_W_tn * 2d0
+
+elseif( (DecayMode1.eq.6 .and. DecayMode2.eq.10) .or.  & 
+        (DecayMode1.eq.10.and. DecayMode2.eq.6) ) then
+        scale_alpha_W_ud = scale_alpha_W_ud * 1d0
+        scale_alpha_W_cs = scale_alpha_W_cs * 1d0
+        scale_alpha_W_ln = scale_alpha_W_ln * 2d0
+        scale_alpha_W_tn = scale_alpha_W_tn * 1d0
+
+
 endif
 
 
@@ -668,8 +770,8 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
 
 
 
-       print *, " gg/qqb ratio = ", VG(0,0)/(VG(+1,-1) + VG(+2,-2) + VG(+3,-3) + VG(+4,-4) + VG(+5,-5)   &
-                                            +VG(-1,+1) + VG(-2,+2) + VG(-3,+3) + VG(-4,+4) + VG(-5,+5))  
+!        print *, " gg/qqb ratio = ", VG(0,0)/(VG(+1,-1) + VG(+2,-2) + VG(+3,-3) + VG(+4,-4) + VG(+5,-5)   &
+!                                             +VG(-1,+1) + VG(-2,+2) + VG(-3,+3) + VG(-4,+4) + VG(-5,+5))  
 
 !------------------adj_par fixes by how much the quark-induced channels need to be adjusted
 
@@ -727,6 +829,7 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
 
     elseif( VegasNc2.ne.-1 ) then
         AccepCounter = 0
+        print *, " generating ",VegasNc2," events"
         do while( AccepCounter.lt.VegasNc2 )
               call random_number(yRnd)
               if (Process.eq.60 .or. Process.eq.61) then
@@ -774,40 +877,45 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
     endif
     write(io_stdout,*)  " event generation rate (events/sec)",dble(AccepCounter)/(time_end-time_start)
 
-    
-    write(*,*) ""
-    write(*,"(A)") "                 el              mu             tau             neu              jet"
-    write(*,"(A,5F16.4)") " el ",dble(Br_counter(1,1:5))/dble(AccepCounter)
-    write(*,"(A,5F16.4)") " mu ",dble(Br_counter(2,1:5))/dble(AccepCounter)
-    write(*,"(A,5F16.4)") " tau",dble(Br_counter(3,1:5))/dble(AccepCounter)
-    write(*,"(A,5F16.4)") " neu",dble(Br_counter(4,1:5))/dble(AccepCounter)
-    write(*,"(A,5F16.4)") " jet",dble(Br_counter(5,1:5))/dble(AccepCounter)
-    write(*,*) ""
-    write(*,"(A,5F16.3)") "llll: ",(dble(Br_counter(1,1))+dble(Br_counter(2,2))+dble(Br_counter(3,3)))/dble(AccepCounter)
-    write(*,"(A,5F16.3)") "llLL: ",(dble(Br_counter(1,2))+dble(Br_counter(1,3))+  &
-                                    dble(Br_counter(2,1))+dble(Br_counter(2,3))+  &
-                                    dble(Br_counter(3,1))+dble(Br_counter(3,2)))/dble(AccepCounter)
-    write(*,"(A,5F16.3)") "2l2q: ",(dble(Br_counter(1,5))+dble(Br_counter(2,5))+dble(Br_counter(3,5))+  &
-                                    dble(Br_counter(5,1))+dble(Br_counter(5,2))+dble(Br_counter(5,3)) )/dble(AccepCounter)
-       
-    write(*,"(A,5F16.3)") "4l/2q2l: ",(dble(Br_counter(1,2))+dble(Br_counter(1,3))+ dble(Br_counter(1,1))+dble(Br_counter(2,2))+dble(Br_counter(3,3)) &
-                                   + dble(Br_counter(2,1))+dble(Br_counter(2,3))+   &
-                                    dble(Br_counter(3,1))+dble(Br_counter(3,2)))/  &
-                                    (dble(Br_counter(1,5))+dble(Br_counter(2,5))+dble(Br_counter(3,5))+  &
-                                    dble(Br_counter(5,1))+dble(Br_counter(5,2))+dble(Br_counter(5,3)) )
-                                    
-!     print *, alpha_QED/12d0*M_Z * (   (aR_lep+aL_lep)**2 + (aR_lep-aL_lep)**2        &
-!                                      +(aR_lep+aL_lep)**2 + (aR_lep-aL_lep)**2        &
-!                                      +(aR_lep+aL_lep)**2 + (aR_lep-aL_lep)**2        &
-!                                      +(aR_neu+aL_neu)**2 + (aR_neu-aL_neu)**2        &
-!                                      +(aR_neu+aL_neu)**2 + (aR_neu-aL_neu)**2        &
-!                                      +(aR_neu+aL_neu)**2 + (aR_neu-aL_neu)**2        &
-!                                      +((aR_Qup+aL_Qup)**2 + (aR_Qup-aL_Qup)**2 )*3d0 *1.0366d0 &
-!                                      +((aR_Qdn+aL_Qdn)**2 + (aR_Qdn-aL_Qdn)**2 )*3d0 *1.0366d0 &
-!                                      +((aR_Qup+aL_Qup)**2 + (aR_Qup-aL_Qup)**2 )*3d0 *1.0366d0 &
-!                                      +((aR_Qdn+aL_Qdn)**2 + (aR_Qdn-aL_Qdn)**2 )*3d0 *1.0366d0 &
-!                                      +((aR_Qdn+aL_Qdn)**2 + (aR_Qdn-aL_Qdn)**2 )*3d0 *1.0366d0 *(1d0-3d0/2d0/(M_Z/2d0/m_bot)**2) &
-!                                  )/4d0/(one-sitW**2)/sitW**2                        
+
+    if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) then
+          write(*,*) ""
+          write(*,"(A)") "                 el              mu             tau             neu              jet"
+          write(*,"(A,5F16.4)") " el ",dble(Br_counter(1,1:5))/dble(AccepCounter)
+          write(*,"(A,5F16.4)") " mu ",dble(Br_counter(2,1:5))/dble(AccepCounter)
+          write(*,"(A,5F16.4)") " tau",dble(Br_counter(3,1:5))/dble(AccepCounter)
+          write(*,"(A,5F16.4)") " neu",dble(Br_counter(4,1:5))/dble(AccepCounter)
+          write(*,"(A,5F16.4)") " jet",dble(Br_counter(5,1:5))/dble(AccepCounter)
+          write(*,*) ""
+          write(*,"(A,5F16.3)") "llll: ",(dble(Br_counter(1,1))+dble(Br_counter(2,2))+dble(Br_counter(3,3)))/dble(AccepCounter)
+          write(*,"(A,5F16.3)") "llLL: ",(dble(Br_counter(1,2))+dble(Br_counter(1,3))+  &
+                                          dble(Br_counter(2,1))+dble(Br_counter(2,3))+  &
+                                          dble(Br_counter(3,1))+dble(Br_counter(3,2)))/dble(AccepCounter)
+          write(*,"(A,5F16.3)") "2l2q: ",(dble(Br_counter(1,5))+dble(Br_counter(2,5))+dble(Br_counter(3,5))+  &
+                                          dble(Br_counter(5,1))+dble(Br_counter(5,2))+dble(Br_counter(5,3)) )/dble(AccepCounter)
+            
+          write(*,"(A,5F16.3)") "4l/2q2l: ",(dble(Br_counter(1,2))+dble(Br_counter(1,3))+ dble(Br_counter(1,1))+dble(Br_counter(2,2))+dble(Br_counter(3,3)) &
+                                        + dble(Br_counter(2,1))+dble(Br_counter(2,3))+   &
+                                          dble(Br_counter(3,1))+dble(Br_counter(3,2)))/  &
+                                          (dble(Br_counter(1,5))+dble(Br_counter(2,5))+dble(Br_counter(3,5))+  &
+                                          dble(Br_counter(5,1))+dble(Br_counter(5,2))+dble(Br_counter(5,3)) )
+                                          
+      !     print *, alpha_QED/12d0*M_Z * (   (aR_lep+aL_lep)**2 + (aR_lep-aL_lep)**2        &
+      !                                      +(aR_lep+aL_lep)**2 + (aR_lep-aL_lep)**2        &
+      !                                      +(aR_lep+aL_lep)**2 + (aR_lep-aL_lep)**2        &
+      !                                      +(aR_neu+aL_neu)**2 + (aR_neu-aL_neu)**2        &
+      !                                      +(aR_neu+aL_neu)**2 + (aR_neu-aL_neu)**2        &
+      !                                      +(aR_neu+aL_neu)**2 + (aR_neu-aL_neu)**2        &
+      !                                      +((aR_Qup+aL_Qup)**2 + (aR_Qup-aL_Qup)**2 )*3d0 *1.0366d0 &
+      !                                      +((aR_Qdn+aL_Qdn)**2 + (aR_Qdn-aL_Qdn)**2 )*3d0 *1.0366d0 &
+      !                                      +((aR_Qup+aL_Qup)**2 + (aR_Qup-aL_Qup)**2 )*3d0 *1.0366d0 &
+      !                                      +((aR_Qdn+aL_Qdn)**2 + (aR_Qdn-aL_Qdn)**2 )*3d0 *1.0366d0 &
+      !                                      +((aR_Qdn+aL_Qdn)**2 + (aR_Qdn-aL_Qdn)**2 )*3d0 *1.0366d0 *(1d0-3d0/2d0/(M_Z/2d0/m_bot)**2) &
+      !                                  )/4d0/(one-sitW**2)/sitW**2      
+
+    endif
+               
+   
   endif! unweighted
   
   
