@@ -493,8 +493,6 @@ elseif( (DecayMode1.eq.6 .and. DecayMode2.eq.10) .or.  &
         scale_alpha_W_cs = scale_alpha_W_cs * 1d0
         scale_alpha_W_ln = scale_alpha_W_ln * 2d0
         scale_alpha_W_tn = scale_alpha_W_tn * 1d0
-
-
 endif
 
 
@@ -1062,26 +1060,20 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
         close(io_CSmaxFile)
     endif
 
-     VG = VG/dble(VegasNc0)
-     csmax   = 1.5d0*csmax    !  adjustment factors, can be choosen  separately channel/by/channel
+   VG = VG/dble(VegasNc0)
+   csmax   = 1.5d0*csmax    !  adjustment factors, can be choosen  separately channel/by/channel
 
 
+   print *, " gg/qqb ratio = ", VG(0,0)/(VG(+1,-1) + VG(+2,-2) + VG(+3,-3) + VG(+4,-4) + VG(+5,-5)   &
+                                       +VG(-1,+1) + VG(-2,+2) + VG(-3,+3) + VG(-4,+4) + VG(-5,+5))  
 
-       print *, " gg/qqb ratio = ", VG(0,0)/(VG(+1,-1) + VG(+2,-2) + VG(+3,-3) + VG(+4,-4) + VG(+5,-5)   &
-                                            +VG(-1,+1) + VG(-2,+2) + VG(-3,+3) + VG(-4,+4) + VG(-5,+5))  
 
-
-!---------
    TotalXSec = sum(  VG(:,:) )
    write(io_stdout,*) "Total xsec",TotalXSec
    do i1=-5,5
         write(io_stdout,*) "partonic fraction", i1,-i1,VG(i1,-i1)/TotalXSec
    enddo
 
-
-!--- rescale the gluon induced channel
-    adj_par = 1d0
-    csmax(0,0) = csmax(0,0)/adj_par
 
 
 !------------------------------- set counts to zero for actual evaluation
@@ -1090,7 +1082,7 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
     AccepCounter = 0
     RejeCounter = 0
     AlertCounter = 0
-    AccepCounter_part = 0
+    AccepCounter_part(:,:) = 0
 
     if (seed_random) then 
 #if compiler==1
@@ -1108,47 +1100,43 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
     call cpu_time(time_start)
     warmup = .true.
 
-
-        RequEvents(-5:+5,-5:+5) = int(VG(-5:+5,-5:+5)/TotalXSec * VegasNc2 )
-        do i1=-5,-1
-              write(io_stdout,*) "requested events", i1,-i1,RequEvents(+i1,-i1)+RequEvents(-i1,+i1)
-        enddo
-        write(io_stdout,*) "requested events", 0,0,RequEvents(0,0)
-
-
-        AccepCounter = 0
-        AccepCounter_part(:,:) = 0
-
-print *, ""
+    RequEvents(-5:+5,-5:+5) = int(VG(-5:+5,-5:+5)/TotalXSec * VegasNc2 )
+    do i1=-5,-1
+         write(io_stdout,*) "requested events", i1,-i1,RequEvents(+i1,-i1)+RequEvents(-i1,+i1)
+    enddo
+    write(io_stdout,*) "requested events", 0,0,RequEvents(0,0)
+    print *, ""
 
 
-         i1=0
-             PChannel = 0
-             print *, " generating ",RequEvents(i1,-i1)," events for gg"
-        do while( AccepCounter_part(+i1,-i1)  .lt. RequEvents(+i1,-i1) )
+    if( PChannel.eq.0 .or. PChannel.eq.2 ) then 
+         PChannel_aux = PChannel
+         PChannel=0
+         print *, " generating ",RequEvents(0,0)," events for gg"
+         do while( AccepCounter_part(+0,0)  .lt. RequEvents(+0,0) )
               call random_number(yRnd)
 
               dum = EvalUnWeighted_TTBH(yRnd,.true.,RES)! RES is a dummy here
 
-              StatusPercent = int(100d0*(AccepCounter_part(i1,-i1))  /  dble(RequEvents(+i1,-i1))  )
+              StatusPercent = int(100d0*(AccepCounter_part(0,0))  /  dble(RequEvents(+0,0))  )
               if( mod(StatusPercent,10).eq.0 .and. LastStatusPercent.ne.StatusPercent ) then
 !                 write(io_stdout,"(X,I3,A)") StatusPercent,"% "
                  write(io_stdout,"(X,I3,A)",advance='no') StatusPercent,"% "
                  flush(io_stdout)
                  LastStatusPercent = StatusPercent
               endif
-        enddo
-        print *, "Done with gg channel ",AccepCounter_part(i1,-i1),AccepCounter
-        print *, ""
+         enddo
+         print *, "Done with gg channel ",AccepCounter_part(0,0),AccepCounter
+         print *, ""
+         PChannel = PChannel_aux
+    endif
 
 
 
-
-
-             PChannel = 1
-             print *, " generating ",(sum(RequEvents(:,:))-RequEvents(0,0) )," events for qqb"
-
-        do while( (sum(AccepCounter_part(:,:))-AccepCounter_part(0,0) ) .lt. (sum(RequEvents(:,:))-RequEvents(0,0)  ) )
+    if( PChannel.eq.1 .or. PChannel.eq.2 ) then 
+         PChannel_aux = PChannel
+         PChannel = 1
+         print *, " generating ",(sum(RequEvents(:,:))-RequEvents(0,0) )," events for qqb"
+         do while( (sum(AccepCounter_part(:,:))-AccepCounter_part(0,0) ) .lt. (sum(RequEvents(:,:))-RequEvents(0,0)  ) )
               call random_number(yRnd)
 
               dum = EvalUnWeighted_TTBH(yRnd,.true.,RES)! RES is a dummy here
@@ -1160,17 +1148,14 @@ print *, ""
                  flush(io_stdout)
                  LastStatusPercent = StatusPercent
               endif
-        enddo
-        print *, "Done with qqb channels ",sum(AccepCounter_part(:,:))-AccepCounter_part(0,0),AccepCounter
-        print *, ""
+         enddo
+         print *, "Done with qqb channels ",sum(AccepCounter_part(:,:))-AccepCounter_part(0,0),AccepCounter
+         print *, ""
+         PChannel = PChannel_aux
+    endif
 
-
-
-    print *, ""
 
     call cpu_time(time_end)
-
-
     print *, " Evaluation Counter: ",EvalCounter
     print *, " Acceptance Counter: ",AccepCounter
     print *, " Rejection  Counter: ",RejeCounter
@@ -1178,6 +1163,7 @@ print *, ""
       print *, " Acceptance  Counter_part: ", i1,-i1, AccepCounter_part(i1,-i1)
     enddo
     print *, " Alert  Counter: ",AlertCounter
+    print *, " gg/qqb ratio = ", dble(AccepCounter_part(0,0))/dble(sum(AccepCounter_part(:,:))-AccepCounter_part(0,0))
     if( dble(AlertCounter)/dble(AccepCounter) .gt. 1d0*percent ) then
         print *, "ALERT: The number of rejected events with too small CSMAX exceeds 1%."
         print *, "       Increase CSMAX in main.F90."

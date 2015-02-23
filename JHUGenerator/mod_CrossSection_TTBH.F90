@@ -199,6 +199,7 @@ IF( GENEVT ) THEN
       if( PChannel.eq.2 ) then
 
 print *, "ERROR"
+stop
 !           PDFFac1 = pdf( LHA2M_pdf(ifound),1) * pdf( LHA2M_pdf(jfound) ,2)!      this does not work because the bound composition of gg and qqb initial states is correct,
 !           CS_max = CSmax(ifound,jfound)                                   !      but gets additionally weighted by efficiencies of gg and qqb IS.
 !           MY_IDUP(1:5) = (/LHA2M_ID(ifound),LHA2M_ID(jfound),Hig_,ATop_,Top_/) ! this screws up the overall composition
