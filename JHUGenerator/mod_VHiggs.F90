@@ -168,13 +168,22 @@ contains
 !f+ f- Z vertex for final states
       if((id(6)+id(7)).eq.0)then
 !l+ l- Z vertex for final state
-        if((abs(id(6)).eq.11).or.(abs(id(6)).eq.13).or.(abs(id(6)).eq.15))then
+        if((abs(id(6)).eq.11).or.(abs(id(6)).eq.13))then
           if((id(6)*helicity(6)).gt.0d0)then
             current2=(0.5d0*T3lR - QlR*sitW**2) *Vcurrent2 -(0.5d0*T3lR)*Acurrent2
           else
             current2=(0.5d0*T3lL - QlL*sitW**2) *Vcurrent2 -(0.5d0*T3lL)*Acurrent2
           endif
-          current2=current2*gFFZ*dsqrt(scale_alpha_Z_ll)
+          current2=current2*gFFZ*dsqrt(scale_alpha_Z_ll)        
+
+!tau+ tau- Z vertex for final state
+        else if((abs(id(6)).eq.15))then
+          if((id(6)*helicity(6)).gt.0d0)then
+            current2=(0.5d0*T3lR - QlR*sitW**2) *Vcurrent2 -(0.5d0*T3lR)*Acurrent2
+          else
+            current2=(0.5d0*T3lL - QlL*sitW**2) *Vcurrent2 -(0.5d0*T3lL)*Acurrent2
+          endif
+          current2=current2*gFFZ*dsqrt(scale_alpha_Z_tt)
 
 !u u~ Z vertex for final state
         else if((abs(id(6)).eq.2).or.(abs(id(6)).eq.4))then
