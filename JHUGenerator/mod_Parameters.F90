@@ -3,7 +3,7 @@ implicit none
 save
 ! 
 ! 
-character(len=6),parameter :: JHUGen_Version="v5.1.9"
+character(len=6),parameter :: JHUGen_Version="v5.1.10"
 ! 
 ! 
 integer, public :: Collider, PDFSet,PChannel,Process,DecayMode1,DecayMode2,TopDecays
@@ -411,6 +411,8 @@ integer,parameter :: io_HistoFile=15
 integer,parameter :: io_LHEInFile=16
 integer,parameter :: io_LogFile=17
 integer,parameter :: io_CSmaxFile=18
+integer,parameter :: io_LHEOutFile2=19
+integer,parameter :: io_LHEOutFile3=20
 
 integer, public :: DebugCounter(0:10) = 0
 
