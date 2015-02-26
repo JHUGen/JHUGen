@@ -29,8 +29,9 @@ logical,parameter :: useBetaVersion=.false.! this should be set to .false.
    if( .not.useBetaVersion .and.   ConvertLHEFile ) then
         call StartConvertLHE(VG_Result,VG_Error)
    elseif( .not.useBetaVersion .and. .not.ReadLHEFile ) then
-        call StartVegas(VG_Result,VG_Error)
-   elseif( useBetaVersion      .and. .not.ReadLHEFile ) then
+        if( Process.ne.80 ) call StartVegas(VG_Result,VG_Error)
+        if( Process.eq.80 ) call StartVegas_NEW(VG_Result,VG_Error)
+   elseif( useBetaVersion .and. .not.ReadLHEFile ) then
         call StartVegas_BETA(VG_Result,VG_Error)
    elseif( .not.useBetaVersion .and.      ReadLHEFile ) then
 !         call StartReadLHE(VG_Result,VG_Error)
@@ -387,6 +388,114 @@ ELSEIF( COLLIDER.EQ.0 ) THEN
   Collider_Energy  = ILC_Energy
 ENDIF
 
+
+
+! rescale V branchings to preserve the correct branching proportions in partial decays
+if( (DecayMode1.eq.8 .and. DecayMode2.eq.9) .or.  & 
+    (DecayMode1.eq.9 .and. DecayMode2.eq.8) ) then
+        scale_alpha_Z_uu = scale_alpha_Z_uu * 2d0
+        scale_alpha_Z_dd = scale_alpha_Z_dd * 2d0
+        scale_alpha_Z_nn = scale_alpha_Z_nn * 2d0
+        scale_alpha_Z_ll = scale_alpha_Z_ll * 1d0
+        scale_alpha_Z_tt = scale_alpha_Z_tt * 1d0
+
+
+elseif( (DecayMode1.eq.0 .and. DecayMode2.eq.9) .or.  & 
+        (DecayMode1.eq.9 .and. DecayMode2.eq.0) ) then
+        scale_alpha_Z_uu = scale_alpha_Z_uu * 2d0
+        scale_alpha_Z_dd = scale_alpha_Z_dd * 2d0
+        scale_alpha_Z_nn = scale_alpha_Z_nn * 2d0
+        scale_alpha_Z_ll = scale_alpha_Z_ll * 1d0
+        scale_alpha_Z_tt = scale_alpha_Z_tt * 2d0
+
+
+elseif( (DecayMode1.eq.1 .and. DecayMode2.eq.9) .or.  & 
+        (DecayMode1.eq.9 .and. DecayMode2.eq.1) ) then
+        scale_alpha_Z_uu = scale_alpha_Z_uu * 1d0
+        scale_alpha_Z_dd = scale_alpha_Z_dd * 1d0
+        scale_alpha_Z_nn = scale_alpha_Z_nn * 2d0
+        scale_alpha_Z_ll = scale_alpha_Z_ll * 2d0
+        scale_alpha_Z_tt = scale_alpha_Z_tt * 2d0
+
+
+elseif( (DecayMode1.eq.2 .and. DecayMode2.eq.9) .or.  & 
+        (DecayMode1.eq.9 .and. DecayMode2.eq.2) ) then
+        scale_alpha_Z_uu = scale_alpha_Z_uu * 2d0
+        scale_alpha_Z_dd = scale_alpha_Z_dd * 2d0
+        scale_alpha_Z_nn = scale_alpha_Z_nn * 2d0
+        scale_alpha_Z_ll = scale_alpha_Z_ll * 2d0
+        scale_alpha_Z_tt = scale_alpha_Z_tt * 1d0
+
+
+elseif( (DecayMode1.eq.3 .and. DecayMode2.eq.9) .or.  & 
+        (DecayMode1.eq.9 .and. DecayMode2.eq.3) ) then
+        scale_alpha_Z_uu = scale_alpha_Z_uu * 2d0
+        scale_alpha_Z_dd = scale_alpha_Z_dd * 2d0
+        scale_alpha_Z_nn = scale_alpha_Z_nn * 1d0
+        scale_alpha_Z_ll = scale_alpha_Z_ll * 2d0
+        scale_alpha_Z_tt = scale_alpha_Z_tt * 2d0
+
+elseif( (DecayMode1.eq.8 .and. DecayMode2.eq.0) .or.  & 
+        (DecayMode1.eq.0 .and. DecayMode2.eq.8) ) then
+        scale_alpha_Z_uu = scale_alpha_Z_uu * 1d0
+        scale_alpha_Z_dd = scale_alpha_Z_dd * 1d0
+        scale_alpha_Z_nn = scale_alpha_Z_nn * 1d0
+        scale_alpha_Z_ll = scale_alpha_Z_ll * 1d0
+        scale_alpha_Z_tt = scale_alpha_Z_tt * 2d0
+
+elseif( (DecayMode1.eq.8 .and. DecayMode2.eq.2) .or.  & 
+        (DecayMode1.eq.2 .and. DecayMode2.eq.8) ) then
+        scale_alpha_Z_uu = scale_alpha_Z_uu * 1d0
+        scale_alpha_Z_dd = scale_alpha_Z_dd * 1d0
+        scale_alpha_Z_nn = scale_alpha_Z_nn * 1d0
+        scale_alpha_Z_ll = scale_alpha_Z_ll * 2d0
+        scale_alpha_Z_tt = scale_alpha_Z_tt * 1d0
+
+elseif( (DecayMode1.eq.4 .and. DecayMode2.eq.11) .or.  & 
+        (DecayMode1.eq.11.and. DecayMode2.eq.4) ) then
+        scale_alpha_W_ud = scale_alpha_W_ud * 2d0
+        scale_alpha_W_cs = scale_alpha_W_cs * 2d0
+        scale_alpha_W_ln = scale_alpha_W_ln * 1d0
+        scale_alpha_W_tn = scale_alpha_W_tn * 2d0
+
+
+elseif( (DecayMode1.eq.5 .and. DecayMode2.eq.11) .or.  & 
+        (DecayMode1.eq.11.and. DecayMode2.eq.5) ) then
+        scale_alpha_W_ud = scale_alpha_W_ud * 1d0
+        scale_alpha_W_cs = scale_alpha_W_cs * 1d0
+        scale_alpha_W_ln = scale_alpha_W_ln * 2d0
+        scale_alpha_W_tn = scale_alpha_W_tn * 2d0
+
+elseif( (DecayMode1.eq.6 .and. DecayMode2.eq.11) .or.  & 
+        (DecayMode1.eq.11.and. DecayMode2.eq.6) ) then
+        scale_alpha_W_ud = scale_alpha_W_ud * 2d0
+        scale_alpha_W_cs = scale_alpha_W_cs * 2d0
+        scale_alpha_W_ln = scale_alpha_W_ln * 2d0
+        scale_alpha_W_tn = scale_alpha_W_tn * 1d0
+
+elseif( (DecayMode1.eq.10.and. DecayMode2.eq.11) .or.  & 
+        (DecayMode1.eq.11.and. DecayMode2.eq.10) ) then
+        scale_alpha_W_ud = scale_alpha_W_ud * 2d0
+        scale_alpha_W_cs = scale_alpha_W_cs * 2d0
+        scale_alpha_W_ln = scale_alpha_W_ln * 1d0
+        scale_alpha_W_tn = scale_alpha_W_tn * 1d0
+
+elseif( (DecayMode1.eq.4 .and. DecayMode2.eq.10) .or.  & 
+        (DecayMode1.eq.10.and. DecayMode2.eq.4) ) then
+        scale_alpha_W_ud = scale_alpha_W_ud * 1d0
+        scale_alpha_W_cs = scale_alpha_W_cs * 1d0
+        scale_alpha_W_ln = scale_alpha_W_ln * 1d0
+        scale_alpha_W_tn = scale_alpha_W_tn * 2d0
+
+elseif( (DecayMode1.eq.6 .and. DecayMode2.eq.10) .or.  & 
+        (DecayMode1.eq.10.and. DecayMode2.eq.6) ) then
+        scale_alpha_W_ud = scale_alpha_W_ud * 1d0
+        scale_alpha_W_cs = scale_alpha_W_cs * 1d0
+        scale_alpha_W_ln = scale_alpha_W_ln * 2d0
+        scale_alpha_W_tn = scale_alpha_W_tn * 1d0
+endif
+
+
 END SUBROUTINE
 
 
@@ -495,7 +604,7 @@ real(8) :: yRnd(1:22)
 real(8) :: dum, RES(-5:5,-5:5),VG2(-5:5,-5:5)
 integer :: i, i1, j1,PChannel_aux, PChannel_aux1,NHisto
 include 'csmaxvalue.f'
-integer :: n,clock,flav1,flav2
+integer :: n,clock,flav1,flav2,StatusPercent,LastStatusPercent=0
 integer, dimension(:), allocatable :: gfort_seed
 
 
@@ -580,7 +689,7 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
     elseif (Process.eq.50) then
       call vegas1(EvalWeighted_VHiggs,VG_Result,VG_Error,VG_Chi2)
     elseif (Process.eq.80) then
-      call vegas(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
+      call vegas1(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
     else
       call vegas1(EvalWeighted,VG_Result,VG_Error,VG_Chi2)    ! usual call of vegas for weighted events
     endif
@@ -656,28 +765,12 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
 
      VG = VG/dble(VegasNc0)
      csmax   = 1.5d0*csmax    !  adjustment factors, can be choosen  separately channel/by/channel
-!      do i1=-5,5
-!      do j1=-5,5
-!          print *, i1,j1, csmax(i1,j1), VG(i1,j1)
-!      enddo
-!      enddo
-!      pause
 
 
-!       res(0,0) = 0d0
-!       do j1 = -5,5
-!             res(0,0) = res(0,0) + VG(j1,-j1)!   WHY IS THIS CSMAX AND NOT CS ? ! AND SHOULDNT IT RUN FROM -6..6
-!       enddo
-!       
-! !      do i1=-5,5
-!      do j1=-5,5
-!      i1=-j1
-!          print *, i1,j1, VG(i1,j1) ,VG(i1,j1)/res(0,0)
-! !      enddo
-!      enddo
-!      pause
 
-      
+!        print *, " gg/qqb ratio = ", VG(0,0)/(VG(+1,-1) + VG(+2,-2) + VG(+3,-3) + VG(+4,-4) + VG(+5,-5)   &
+!                                             +VG(-1,+1) + VG(-2,+2) + VG(-3,+3) + VG(-4,+4) + VG(-5,+5))  
+
 !------------------adj_par fixes by how much the quark-induced channels need to be adjusted
 
     if (PChannel.eq.2.and.fix_channels_ratio) then
@@ -731,7 +824,9 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
                 dum = EvalUnWeighted(yRnd,.true.,RES)! RES is a dummy here
             endif
         enddo
+
     elseif( VegasNc2.ne.-1 ) then
+        AccepCounter = 0
         print *, " generating ",VegasNc2," events"
         do while( AccepCounter.lt.VegasNc2 )
               call random_number(yRnd)
@@ -746,16 +841,23 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
               else
                   dum = EvalUnWeighted(yRnd,.true.,RES)! RES is a dummy here
               endif
-!              if( AccepCounter.gt.0 .and. mod(AccepCounter,10).eq.0 ) then
-!                   call cpu_time(time_int)
-!                   write(io_stdout,*)  AccepCounter," events accepted (",time_int-time_start, ") seconds"
-! !                   write(io_LogFile,*) AccepCounter," events accepted (",time_int-time_start, ") seconds"
-!              endif
+              StatusPercent = int(100d0*AccepCounter/dble(VegasNc2))
+              if( mod(StatusPercent,10).eq.0 .and. LastStatusPercent.ne.StatusPercent ) then
+                 write(io_stdout,"(X,I3,A)") int(100d0*AccepCounter/dble(VegasNc2)),"% "
+!                 write(io_stdout,"(X,I3,A)",advance='no') int(100d0*AccepCounter/dble(VegasNc2)),"% "
+!                 flush(io_stdout)
+                 LastStatusPercent = StatusPercent
+              endif
         enddo
+
+
+
+
     else
         print *, "ERROR: VegasNc1 and VegasNc2 must not be set at the same time"
         stop
     endif
+    print *, ""
 
     call cpu_time(time_end)
 
@@ -773,40 +875,45 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
     endif
     write(io_stdout,*)  " event generation rate (events/sec)",dble(AccepCounter)/(time_end-time_start)
 
-    
-    write(*,*) ""
-    write(*,"(A)") "                 el              mu             tau             neu              jet"
-    write(*,"(A,5F16.3)") " el ",dble(Br_counter(1,1:5))/dble(AccepCounter)
-    write(*,"(A,5F16.3)") " mu ",dble(Br_counter(2,1:5))/dble(AccepCounter)
-    write(*,"(A,5F16.3)") " tau",dble(Br_counter(3,1:5))/dble(AccepCounter)
-    write(*,"(A,5F16.3)") " neu",dble(Br_counter(4,1:5))/dble(AccepCounter)
-    write(*,"(A,5F16.3)") " jet",dble(Br_counter(5,1:5))/dble(AccepCounter)
-    write(*,*) ""
-    write(*,"(A,5F16.3)") "llll: ",(dble(Br_counter(1,1))+dble(Br_counter(2,2))+dble(Br_counter(3,3)))/dble(AccepCounter)
-    write(*,"(A,5F16.3)") "llLL: ",(dble(Br_counter(1,2))+dble(Br_counter(1,3))+  &
-                                    dble(Br_counter(2,1))+dble(Br_counter(2,3))+  &
-                                    dble(Br_counter(3,1))+dble(Br_counter(3,2)))/dble(AccepCounter)
-    write(*,"(A,5F16.3)") "2l2q: ",(dble(Br_counter(1,5))+dble(Br_counter(2,5))+dble(Br_counter(3,5))+  &
-                                    dble(Br_counter(5,1))+dble(Br_counter(5,2))+dble(Br_counter(5,3)) )/dble(AccepCounter)
-       
-    write(*,"(A,5F16.3)") "4l/2q2l: ",(dble(Br_counter(1,2))+dble(Br_counter(1,3))+ dble(Br_counter(1,1))+dble(Br_counter(2,2))+dble(Br_counter(3,3)) &
-                                   + dble(Br_counter(2,1))+dble(Br_counter(2,3))+   &
-                                    dble(Br_counter(3,1))+dble(Br_counter(3,2)))/  &
-                                    (dble(Br_counter(1,5))+dble(Br_counter(2,5))+dble(Br_counter(3,5))+  &
-                                    dble(Br_counter(5,1))+dble(Br_counter(5,2))+dble(Br_counter(5,3)) )
-                                    
-    print *, alpha_QED/12d0*M_Z * (   (aR_lep+aL_lep)**2 + (aR_lep-aL_lep)**2        &
-                                     +(aR_lep+aL_lep)**2 + (aR_lep-aL_lep)**2        &
-                                     +(aR_lep+aL_lep)**2 + (aR_lep-aL_lep)**2        &
-                                     +(aR_neu+aL_neu)**2 + (aR_neu-aL_neu)**2        &
-                                     +(aR_neu+aL_neu)**2 + (aR_neu-aL_neu)**2        &
-                                     +(aR_neu+aL_neu)**2 + (aR_neu-aL_neu)**2        &
-                                     +((aR_Qup+aL_Qup)**2 + (aR_Qup-aL_Qup)**2 )*3d0 *1.0366d0 &
-                                     +((aR_Qdn+aL_Qdn)**2 + (aR_Qdn-aL_Qdn)**2 )*3d0 *1.0366d0 &
-                                     +((aR_Qup+aL_Qup)**2 + (aR_Qup-aL_Qup)**2 )*3d0 *1.0366d0 &
-                                     +((aR_Qdn+aL_Qdn)**2 + (aR_Qdn-aL_Qdn)**2 )*3d0 *1.0366d0 &
-                                     +((aR_Qdn+aL_Qdn)**2 + (aR_Qdn-aL_Qdn)**2 )*3d0 *1.0366d0 *(1d0-3d0/2d0/(M_Z/2d0/m_bot)**2) &
-                                 )/4d0/(one-sitW**2)/sitW**2                        
+
+    if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) then
+          write(*,*) ""
+          write(*,"(A)") "                 el              mu             tau             neu              jet"
+          write(*,"(A,5F16.4)") " el ",dble(Br_counter(1,1:5))/dble(AccepCounter)
+          write(*,"(A,5F16.4)") " mu ",dble(Br_counter(2,1:5))/dble(AccepCounter)
+          write(*,"(A,5F16.4)") " tau",dble(Br_counter(3,1:5))/dble(AccepCounter)
+          write(*,"(A,5F16.4)") " neu",dble(Br_counter(4,1:5))/dble(AccepCounter)
+          write(*,"(A,5F16.4)") " jet",dble(Br_counter(5,1:5))/dble(AccepCounter)
+          write(*,*) ""
+          write(*,"(A,5F16.3)") "llll: ",(dble(Br_counter(1,1))+dble(Br_counter(2,2))+dble(Br_counter(3,3)))/dble(AccepCounter)
+          write(*,"(A,5F16.3)") "llLL: ",(dble(Br_counter(1,2))+dble(Br_counter(1,3))+  &
+                                          dble(Br_counter(2,1))+dble(Br_counter(2,3))+  &
+                                          dble(Br_counter(3,1))+dble(Br_counter(3,2)))/dble(AccepCounter)
+          write(*,"(A,5F16.3)") "2l2q: ",(dble(Br_counter(1,5))+dble(Br_counter(2,5))+dble(Br_counter(3,5))+  &
+                                          dble(Br_counter(5,1))+dble(Br_counter(5,2))+dble(Br_counter(5,3)) )/dble(AccepCounter)
+            
+          write(*,"(A,5F16.3)") "4l/2q2l: ",(dble(Br_counter(1,2))+dble(Br_counter(1,3))+ dble(Br_counter(1,1))+dble(Br_counter(2,2))+dble(Br_counter(3,3)) &
+                                        + dble(Br_counter(2,1))+dble(Br_counter(2,3))+   &
+                                          dble(Br_counter(3,1))+dble(Br_counter(3,2)))/  &
+                                          (dble(Br_counter(1,5))+dble(Br_counter(2,5))+dble(Br_counter(3,5))+  &
+                                          dble(Br_counter(5,1))+dble(Br_counter(5,2))+dble(Br_counter(5,3)) )
+                                          
+      !     print *, alpha_QED/12d0*M_Z * (   (aR_lep+aL_lep)**2 + (aR_lep-aL_lep)**2        &
+      !                                      +(aR_lep+aL_lep)**2 + (aR_lep-aL_lep)**2        &
+      !                                      +(aR_lep+aL_lep)**2 + (aR_lep-aL_lep)**2        &
+      !                                      +(aR_neu+aL_neu)**2 + (aR_neu-aL_neu)**2        &
+      !                                      +(aR_neu+aL_neu)**2 + (aR_neu-aL_neu)**2        &
+      !                                      +(aR_neu+aL_neu)**2 + (aR_neu-aL_neu)**2        &
+      !                                      +((aR_Qup+aL_Qup)**2 + (aR_Qup-aL_Qup)**2 )*3d0 *1.0366d0 &
+      !                                      +((aR_Qdn+aL_Qdn)**2 + (aR_Qdn-aL_Qdn)**2 )*3d0 *1.0366d0 &
+      !                                      +((aR_Qup+aL_Qup)**2 + (aR_Qup-aL_Qup)**2 )*3d0 *1.0366d0 &
+      !                                      +((aR_Qdn+aL_Qdn)**2 + (aR_Qdn-aL_Qdn)**2 )*3d0 *1.0366d0 &
+      !                                      +((aR_Qdn+aL_Qdn)**2 + (aR_Qdn-aL_Qdn)**2 )*3d0 *1.0366d0 *(1d0-3d0/2d0/(M_Z/2d0/m_bot)**2) &
+      !                                  )/4d0/(one-sitW**2)/sitW**2      
+
+    endif
+               
+   
   endif! unweighted
   
   
@@ -814,6 +921,265 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
 
 return
 END SUBROUTINE
+
+
+
+
+
+
+
+
+SUBROUTINE StartVegas_NEW(VG_Result,VG_Error)
+use ModCrossSection
+use ModCrossSection_TTBH
+use ModKinematics
+use ModParameters
+implicit none
+include "vegas_common.f"
+real(8) :: VG_Result,VG_Error,VG_Chi2
+real(8) :: yRnd(1:22)
+real(8) :: dum, RES(-5:5,-5:5),VG2(-5:5,-5:5),ResFrac(-5:5,-5:5),TotalXSec
+integer :: i, i1, j1,PChannel_aux, PChannel_aux1,NHisto,RequEvents(-5:+5,-5:+5)
+include 'csmaxvalue.f'
+integer :: n,sclock,flav1,flav2,StatusPercent,LastStatusPercent=0
+integer, dimension(:), allocatable :: gfort_seed
+
+
+if( VegasIt1.eq.-1 ) VegasIt1 = VegasIt1_default
+if( VegasNc0.eq.-1 ) VegasNc0 = VegasNc0_default
+if( VegasNc1.eq.-1 .and. VegasNc2.eq.-1 .and.  (unweighted) ) then 
+      VegasNc1 = VegasNc1_default
+      VegasNc2 = VegasNc2_default
+endif
+if( VegasNc1.eq.-1 .and.  .not. (unweighted) ) VegasNc1 = VegasNc1_default
+if( VegasNc2.eq.-1 .and.  .not. (unweighted) ) VegasNc2 = VegasNc2_default
+
+
+
+   warmup = .false.
+   itmx = VegasIt1
+   ncall= VegasNc1
+
+   PChannel_aux = PChannel
+
+if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !----------------------- weighted events
+
+
+    if (seed_random) then 
+#if compiler==1
+        call random_seed()
+#elif compiler==2
+        call random_seed(size=n)
+        allocate(gfort_seed(n))
+        call system_clock(count=sclock)
+        gfort_seed = sclock + 37 * (/ (i - 1, i = 1, n) /)
+        call random_seed(put = gfort_seed)
+        deallocate(gfort_seed)        
+#endif
+        call random_number(VegasSeed)
+        VegasSeed = - abs( VegasSeed*10000d0 )
+    else
+        VegasSeed = -19d0
+    endif
+    idum = int(VegasSeed)
+
+
+
+    if( (GenerateEvents.eqv..true.) ) then
+        itmx = 1
+        ncall= VegasNc1
+        call vegas(EvalOnlyPS,VG_Result,VG_Error,VG_Chi2)
+        return
+    endif
+
+
+
+    ! WARM-UP RUN
+    itmx = VegasIt1
+    ncall= VegasNc1
+    warmup = .true.
+    call vegas(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
+
+
+
+    !DATA RUN
+    call ClearHisto()   
+    warmup = .false.
+    EvalCounter=0
+    RejeCounter=0
+    AccepCounter=0
+    AlertCounter=0
+    avgcs = 0d0
+    itmx = 1
+    ncall= VegasNc2
+    call vegas1(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
+
+
+    
+
+
+
+elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
+
+    VG = zero
+    VG2= zero
+    csmax = zero
+    if (seed_random) then 
+#if compiler==1
+        call random_seed()
+#elif compiler==2
+        call random_seed(size=n)
+        allocate(gfort_seed(n))
+        call system_clock(count=sclock)
+        gfort_seed = sclock + 37 * (/ (i - 1, i = 1, n) /)
+        call random_seed(put = gfort_seed)
+        deallocate(gfort_seed)        
+#endif
+    endif
+
+
+    if( .not. ReadCSmax ) then
+        print *, " finding maximal weight with ",VegasNc0," evaluations"
+        warmup = .true.
+        do i=1,VegasNc0
+            call random_number(yRnd)
+
+                RES = 0d0
+                dum = EvalUnWeighted_TTBH(yRnd,.false.,RES)
+                VG = VG + RES
+                VG2 = VG2 + RES**2
+                PChannel = PChannel_aux
+        enddo
+
+        open(unit=io_CSmaxFile,file='CSmax.bin',form='unformatted',status='replace')
+        WRITE(io_CSmaxFile) CSMAX
+        close(io_CSmaxFile)
+    else
+        open(unit=io_CSmaxFile,file='CSmax.bin',form='unformatted')
+        READ(io_CSmaxFile) CSMAX
+        close(io_CSmaxFile)
+    endif
+
+   VG = VG/dble(VegasNc0)
+   csmax   = 1.5d0*csmax    !  adjustment factors, can be choosen  separately channel/by/channel
+
+
+   print *, " gg/qqb ratio = ", VG(0,0)/(VG(+1,-1) + VG(+2,-2) + VG(+3,-3) + VG(+4,-4) + VG(+5,-5)   &
+                                       +VG(-1,+1) + VG(-2,+2) + VG(-3,+3) + VG(-4,+4) + VG(-5,+5))  
+
+
+   TotalXSec = sum(  VG(:,:) )
+   write(io_stdout,*) "Total xsec",TotalXSec
+   do i1=-5,5
+        write(io_stdout,*) "partonic fraction", i1,-i1,VG(i1,-i1)/TotalXSec
+   enddo
+
+
+
+!------------------------------- set counts to zero for actual evaluation
+
+    EvalCounter = 0
+    AccepCounter = 0
+    RejeCounter = 0
+    AlertCounter = 0
+    AccepCounter_part(:,:) = 0
+
+    if (seed_random) then 
+#if compiler==1
+        call random_seed()
+#elif compiler==2
+        call random_seed(size=n)
+        allocate(gfort_seed(n))
+        call system_clock(count=sclock)
+        gfort_seed = sclock + 37 * (/ (i - 1, i = 1, n) /)
+        call random_seed(put = gfort_seed)
+        deallocate(gfort_seed)        
+#endif
+    endif
+
+    call cpu_time(time_start)
+    warmup = .true.
+
+    RequEvents(-5:+5,-5:+5) = int(VG(-5:+5,-5:+5)/TotalXSec * VegasNc2 )
+    do i1=-5,-1
+         write(io_stdout,*) "requested events", i1,-i1,RequEvents(+i1,-i1)+RequEvents(-i1,+i1)
+    enddo
+    write(io_stdout,*) "requested events", 0,0,RequEvents(0,0)
+    print *, ""
+
+
+    if( PChannel.eq.0 .or. PChannel.eq.2 ) then 
+         PChannel_aux = PChannel
+         PChannel=0
+         print *, " generating ",RequEvents(0,0)," events for gg"
+         do while( AccepCounter_part(+0,0)  .lt. RequEvents(+0,0) )
+              call random_number(yRnd)
+
+              dum = EvalUnWeighted_TTBH(yRnd,.true.,RES)! RES is a dummy here
+
+              StatusPercent = int(100d0*(AccepCounter_part(0,0))  /  dble(RequEvents(+0,0))  )
+              if( mod(StatusPercent,10).eq.0 .and. LastStatusPercent.ne.StatusPercent ) then
+!                 write(io_stdout,"(X,I3,A)") StatusPercent,"% "
+                 write(io_stdout,"(X,I3,A)",advance='no') StatusPercent,"% "
+                 flush(io_stdout)
+                 LastStatusPercent = StatusPercent
+              endif
+         enddo
+         print *, "Done with gg channel ",AccepCounter_part(0,0),AccepCounter
+         print *, ""
+         PChannel = PChannel_aux
+    endif
+
+
+
+    if( PChannel.eq.1 .or. PChannel.eq.2 ) then 
+         PChannel_aux = PChannel
+         PChannel = 1
+         print *, " generating ",(sum(RequEvents(:,:))-RequEvents(0,0) )," events for qqb"
+         do while( (sum(AccepCounter_part(:,:))-AccepCounter_part(0,0) ) .lt. (sum(RequEvents(:,:))-RequEvents(0,0)  ) )
+              call random_number(yRnd)
+
+              dum = EvalUnWeighted_TTBH(yRnd,.true.,RES)! RES is a dummy here
+
+              StatusPercent = int(  100d0*( sum(AccepCounter_part(:,:)) - AccepCounter_part(0,0) )  /  dble(  sum(RequEvents(:,:)) - RequEvents(0,0)  )  )
+              if( mod(StatusPercent,10).eq.0 .and. LastStatusPercent.ne.StatusPercent ) then
+!                 write(io_stdout,"(X,I3,A)") StatusPercent,"% "
+                 write(io_stdout,"(X,I3,A)",advance='no') StatusPercent,"% "
+                 flush(io_stdout)
+                 LastStatusPercent = StatusPercent
+              endif
+         enddo
+         print *, "Done with qqb channels ",sum(AccepCounter_part(:,:))-AccepCounter_part(0,0),AccepCounter
+         print *, ""
+         PChannel = PChannel_aux
+    endif
+
+
+    call cpu_time(time_end)
+    print *, " Evaluation Counter: ",EvalCounter
+    print *, " Acceptance Counter: ",AccepCounter
+    print *, " Rejection  Counter: ",RejeCounter
+    do i1=-5,+5
+      print *, " Acceptance  Counter_part: ", i1,-i1, AccepCounter_part(i1,-i1)
+    enddo
+    print *, " Alert  Counter: ",AlertCounter
+    print *, " gg/qqb ratio = ", dble(AccepCounter_part(0,0))/dble(sum(AccepCounter_part(:,:))-AccepCounter_part(0,0))
+    if( dble(AlertCounter)/dble(AccepCounter) .gt. 1d0*percent ) then
+        print *, "ALERT: The number of rejected events with too small CSMAX exceeds 1%."
+        print *, "       Increase CSMAX in main.F90."
+    endif
+    write(io_stdout,*)  " event generation rate (events/sec)",dble(AccepCounter)/(time_end-time_start)
+
+                     
+  endif! unweighted
+  
+  
+
+
+return
+END SUBROUTINE
+
+
 
 
 
