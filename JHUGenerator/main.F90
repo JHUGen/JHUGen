@@ -2236,6 +2236,95 @@ END SUBROUTINE
 
 
 
+! SUBROUTINE ScrambleLHE(Infile,Outfile)
+! use ModParameters
+! use ModMisc
+! implicit none
+! character(len=*),parameter :: POWHEG_Fmt0 = "(6X,I2,A160)"
+! character(len=*),parameter :: POWHEG_Fmt1 = "(5X,I3,4X,I3,4X,I3,3X,I3,1X,I3,3X,I3,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9)"
+! character(len=*),parameter :: JHUGen_Fmt0 = "(I2,A160)"
+! character(len=*),parameter :: JHUGen_Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0)"
+! character(len=*),parameter :: JHUGen_old_Fmt0 = "(2X,I2,A160)"
+! character(len=*),parameter :: JHUGen_old_Fmt1 = "(I3,X,I2,X,I2,X,I2,X,I3,X,I3,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7)"
+! character(len=*),parameter :: MadGra_Fmt0 = "(I2,A160)"
+! character(len=*),parameter :: MadGra_Fmt1 = "(7X,I3,2X,I3,3X,I2,3X,I2,3X,I3,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1F3.0,X,1F3.0)"
+! character(len=150) :: InputFmt0,InputFmt1
+! logical :: FirstEvent
+! character(len=160) :: HeaderLines,EventInfoLine,OtherLines
+! character(len=160) :: EventLine(1:maxpart)
+! integer,parameter :: InputLHEFormat = 1  !  1=POWHEG, 2=JHUGen (old format), 3=JHUGen (new format), 4=MadGraph
+! 
+! 
+! if(InputLHEFormat.eq.1) then
+!   InputFmt0 = trim(POWHEG_Fmt0)
+!   InputFmt1 = trim(POWHEG_Fmt1)
+! elseif(InputLHEFormat.eq.4) then
+!   InputFmt0 = trim(MadGra_Fmt0)
+!   InputFmt1 = trim(MadGra_Fmt1)
+! elseif(InputLHEFormat.eq.2) then
+!   InputFmt0 = trim(JHUGen_old_Fmt0)
+!   InputFmt1 = trim(JHUGen_old_Fmt1)
+! else
+!   InputFmt0 = trim(JHUGen_Fmt0)
+!   InputFmt1 = trim(JHUGen_Fmt1)
+! endif
+! 
+! 
+!      open(unit=io_LHEOutFile,file=trim(DataFile)//'.lhe',form='formatted',access= 'sequential') ! in1 (part1)
+!      open(unit=io_LHEOutFile2,file=trim(DataFile)//'.lhe',form='formatted',access= 'sequential')! in2 (part2)
+!      open(unit=io_LHEOutFile3,file=trim(DataFile)//'.new.lhe',form='formatted',access= 'sequential',status='replace')! out
+! 
+! 
+! !    search for line with first event in gg-file
+!      FirstEvent = .false.
+!      do while ( .not.FirstEvent )
+!         read(io_LHEOutFile,fmt="(A160)",IOSTAT=stat,END=99) HeaderLines
+!         if( HeaderLines(1:7).eq."<event>" ) then 
+!                FirstEvent=.true.
+!         endif
+!      enddo
+!      read(io_LHEOutFile,fmt=InputFmt0) EventNumPart,EventInfoLine!  read number of particle from the first line after <event> and other info
+!      do nline=1,EventNumPart!  read event lines
+!         read(io_LHEOutFile,fmt="(A160)") EventLine(nline)
+!      enddo
+!      do nline=1,EventNumPart    
+!         read(EventLine(nline),fmt=InputFmt1) LHE_IDUP(nline),IntExt(nline),LHE_MOTHUP(1,nline),LHE_MOTHUP(2,nline),LHE_ICOLUP(1,nline),LHE_ICOLUP(2,nline),MomExt(2,nline),MomExt(3,nline),MomExt(4,nline),MomExt(1,nline),Mass(nline),Spin(nline),Lifetime(nline)
+!      enddo
+!      if( LHE_IDUP(1).eq.21 .and. LHE_IDUP(2).eq.21 ) then!  gg initial state
+!      endif
+! 
+!      
+!      
+!      
+!      
+!      
+!      
+!      
+! !    search for line with first event in gg-file
+!      FirstEvent = .false.
+!      do while ( .not.FirstEvent )
+!         read(io_LHEOutFile2,fmt="(A160)",IOSTAT=stat,END=99) HeaderLines
+!         if( HeaderLines(1:7).eq."<event>" ) then 
+!                FirstEvent=.true.
+!         endif
+!      enddo
+!      read(io_LHEOutFile2,fmt=InputFmt0) EventNumPart,EventInfoLine!  read number of particle from the first line after <event> and other info
+!      do nline=1,EventNumPart!  read event lines
+!         read(io_LHEOutFile2,fmt="(A160)") EventLine(nline)
+!      enddo
+!      do nline=1,EventNumPart    
+!         read(EventLine(nline),fmt=InputFmt1) LHE_IDUP(nline),IntExt(nline),LHE_MOTHUP(1,nline),LHE_MOTHUP(2,nline),LHE_ICOLUP(1,nline),LHE_ICOLUP(2,nline),MomExt(2,nline),MomExt(3,nline),MomExt(4,nline),MomExt(1,nline),Mass(nline),Spin(nline),Lifetime(nline)
+!      enddo
+!      if( IsAQuark(LHE_IDUP(1)) .and. IsAQuark(LHE_IDUP(2)) ) then!  qq initial state
+!      endif
+!      read(io_LHEOutFile2,fmt="(A160)",IOSTAT=stat,END=99) HeaderLines! read </event> 
+!      
+!      
+!      
+!      
+! 
+! return
+! END SUBROUTINE
 SUBROUTINE OpenFiles()
 use ModParameters
 implicit none
@@ -2808,7 +2897,8 @@ character :: arg*(500)
     if( Process.eq.61) write(TheUnit,"(4X,A,F7.2,A,F6.3)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( Process.eq.50) write(TheUnit,"(4X,A,F7.2,A,F6.3)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( Process.eq.80) write(TheUnit,"(4X,A,F7.2,A,F6.3)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
-    if( ReadLHEFile ) write(TheUnit,"(4X,A)") "           (This is ReadLHEFile mode. Resonance mass is read from LHE input file.)"
+    if( ReadLHEFile )    write(TheUnit,"(4X,A)") "           (This is ReadLHEFile mode. Resonance mass is read from LHE input file.)"
+    if( ConvertLHEFile ) write(TheUnit,"(4X,A)") "           (This is ConvertLHEFile mode. Resonance mass is read from LHE input file.)"
     write(TheUnit,"(4X,A,I2,2X,A,I2)") "DecayMode1:",DecayMode1, "DecayMode2:",DecayMode2
     if( IsAZDecay(DecayMode1) .or. IsAZDecay(DecayMode2) ) write(TheUnit,"(4X,A,F6.3,A,F6.4)") "Z-boson: mass=",M_Z*100d0,", width=",Ga_Z*100d0
     if( IsAWDecay(DecayMode1) .or. IsAWDecay(DecayMode2) ) write(TheUnit,"(4X,A,F6.3,A,F6.4)") "W-boson: mass=",M_W*100d0,", width=",Ga_W*100d0
@@ -2816,7 +2906,7 @@ character :: arg*(500)
     if( Process.eq.80 ) write(TheUnit,"(4X,A,I2)") "Top quark decay=",TOPDECAYS
 
 
-    if( .not.ReadLHEFile ) then
+    if( .not. (ReadLHEFile .or. ConvertLHEFile) ) then
         write(TheUnit,"(4X,A)") ""
         write(TheUnit,"(4X,A,L,L,L)") "OffXVV: ",OffShellReson,OffShellV1,OffShellV2
         write(TheUnit,"(4X,A,I1)") "PChannel: ",PChannel
@@ -2916,7 +3006,7 @@ character :: arg*(500)
     write(TheUnit,"(4X,A)") "LHE output: "//trim(DataFile)//'.lhe'
     write(TheUnit,"(4X,A)") "Histogram output: "//trim(DataFile)//'.dat'
     write(TheUnit,"(4X,A)") "Log file: "//trim(DataFile)//'.log'
-    if( ReadLHEFile ) write(TheUnit,"(4X,A)") "LHE input: "//trim(LHEProdFile)
+    if( ReadLHEFile .or. ConvertLHEFile ) write(TheUnit,"(4X,A)") "LHE input: "//trim(LHEProdFile)
     write(TheUnit,"(4X,A)") ""
 
 
