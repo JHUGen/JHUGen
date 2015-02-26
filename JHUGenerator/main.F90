@@ -1747,27 +1747,33 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                   write(io_stdout,*)  NEvent," events accepted (",time_int-time_start, ") seconds"
                   write(io_LogFile,*) NEvent," events accepted (",time_int-time_start, ") seconds"
              endif
+
           else! decay event was not accepted after ncall evaluations, read next production event
-             print *, "rejected event after ",tries-1," evaluations"
+             print *, "Rejected event after ",tries-1," evaluations"
              AlertCounter = AlertCounter + 1 
           endif
 
 
 !        read optional lines
          FirstEvent = .true.
+         tries = 0
          do while (.true.) 
+              tries = tries +1 
               read(16,fmt="(A160)",IOSTAT=stat,END=99) OtherLines(1:160)
               if(OtherLines(1:30).eq."</LesHouchesEvents>") then
                   goto 99
-              elseif( OtherLines(1:8).eq."</event>" ) then
+              elseif( OtherLines(1:8).eq."</event>" .and. Res.ne.0d0 ) then
                   write(io_LHEOutFile,"(A)") "</event>"
               elseif( OtherLines(1:8).eq."<event>" ) then
                   exit
-              else!if there are "#" comments
+              elseif( Res.ne.0d0 ) then !if there are "#" comments
                   write(io_LHEOutFile,fmt="(A)") trim(OtherLines)
+              elseif( tries.gt.10000000 ) then
+                  write(io_LHEOutFile,"(A)") "</event>"
+                  print *, "ERROR: cannot find </event>"
+                  exit
               endif
          enddo         
-
          
      enddo
 99   continue
