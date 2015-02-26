@@ -366,7 +366,11 @@ contains
       if(dabs(vector(3)).lt.epsilon)then
         phi=0d0
       else
-        phi=datan(vector(3)/vector(2))
+        if(dabs(vector(2)).lt.epsilon)then
+           phi=(TwoPi/2d0)/2d0 * dsign(1d0,vector(3))
+        else
+           phi=datan(vector(3)/vector(2))
+        endif
       endif
 !shift phi so that 0 < phi < 2Pi
       if(vector(2).lt.0d0)then
