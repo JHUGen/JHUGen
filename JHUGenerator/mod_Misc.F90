@@ -77,7 +77,7 @@ FUNCTION Get_MInv(Mom)
 implicit none
 real(8) ::Mom(1:4),Get_MInv
 
-   Get_MInv = dsqrt( Mom(1:4).dot.Mom(1:4) )
+   Get_MInv = dsqrt( dabs(Mom(1:4).dot.Mom(1:4)) )
 
 RETURN
 END FUNCTION

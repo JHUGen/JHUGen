@@ -22,7 +22,7 @@ endif
 
 ifeq ($(Comp),ifort)
  ifeq ($(Opt),Yes)
-    OptOpts  = -O2 -vec-report0 -diag-disable remark 
+    OptOpts  = -O2 -vec-report0 -diag-disable remark
  else
     OptOpts  = -O0 -implicitnone -zero -check bounds -check pointer -warn interfaces -ftrapuv  -diag-disable remark 
  endif
@@ -39,9 +39,21 @@ Exec = ./JHUGen
 
 
 # main dependencies
-MainDep = mod_Misc.F90 \
+MainDep = mod_Kinematics.F90 \
+          mod_CrossSection.F90 \
+          mod_CrossSection_TTBH.F90 \
+          main.F90
+
+# main objects
+MainObj = $(ObjectDir)/mod_Kinematics.o \
+          $(ObjectDir)/mod_CrossSection.o \
+          $(ObjectDir)/mod_CrossSection_TTBH.o \
+          $(ObjectDir)/main.o
+
+
+# amplitude dependencies
+AmpDep = mod_Misc.F90 \
           mod_Parameters.F90 \
-          mod_Kinematics.F90 \
           mod_TopDecay.F90 \
           mod_Graviton.F90 \
           mod_Higgs.F90 \
@@ -49,15 +61,12 @@ MainDep = mod_Misc.F90 \
           mod_HiggsJJ.F90 \
           mod_HiggsJ.F90 \
           mod_VHiggs.F90 \
-          mod_TTBHiggs.F90 \
-          mod_CrossSection.F90 \
-          mod_CrossSection_TTBH.F90 \
-          main.F90
+          mod_TTBHiggs.F90
 
-# main objects
-MainObj = $(ObjectDir)/mod_Misc.o \
+
+# amplitude objects
+AmpObj =  $(ObjectDir)/mod_Misc.o \
           $(ObjectDir)/mod_Parameters.o \
-          $(ObjectDir)/mod_Kinematics.o \
           $(ObjectDir)/mod_TopDecay.o \
           $(ObjectDir)/mod_Graviton.o \
           $(ObjectDir)/mod_Higgs.o \
@@ -65,20 +74,18 @@ MainObj = $(ObjectDir)/mod_Misc.o \
           $(ObjectDir)/mod_HiggsJJ.o \
           $(ObjectDir)/mod_HiggsJ.o \
           $(ObjectDir)/mod_VHiggs.o \
-          $(ObjectDir)/mod_TTBHiggs.o \
-          $(ObjectDir)/mod_CrossSection.o \
-          $(ObjectDir)/mod_CrossSection_TTBH.o \
-          $(ObjectDir)/main.o
-
+          $(ObjectDir)/mod_TTBHiggs.o
 
 VegasDep = $(VegasDir)/vegas.f
 VegasObj = $(ObjectDir)/vegas.o
 
 PDFDep   = $(PDFDir)/Cteq61Pdf.f \
-           $(PDFDir)/mstwpdf.f
+           $(PDFDir)/mstwpdf.f \
+           $(PDFDir)/NNPDFDriver.f
 
 PDFObj   = $(ObjectDir)/Cteq61Pdf.o \
-           $(ObjectDir)/mstwpdf.o
+           $(ObjectDir)/mstwpdf.o \
+           $(ObjectDir)/NNPDFDriver.o
 
 PSGenDep = genps.c \
            boost.c
@@ -102,14 +109,21 @@ MadGraphObj = $(ObjectDir)/gg_ttbh.o \
 
 
 
-JHUGenerator: $(PSGenObj) $(VegasObj) $(PDFObj)  $(MainObj)
+JHUGenerator: $(PSGenObj) $(VegasObj) $(PDFObj) $(AmpObj) $(MainObj)
 	@echo " linking"
 	@echo " executable file is "$(Exec) "compiled with "$(Comp)
 	@echo " "
-	$(fcomp) -o $(Exec) $(MainObj) $(PSGenObj) $(VegasObj) $(PDFObj)
+	$(fcomp) -o $(Exec) $(MainObj) $(AmpObj) $(PSGenObj) $(VegasObj) $(PDFObj)
 
 
-$(MainObj): $(MainDep) $(VegasDep) $(PDFDep)  $(PSGenDep) makefile
+
+$(AmpObj): $(AmpDep) mod_Misc.F90 mod_Parameters.F90 makefile
+	@echo " compiling amplitude routines"
+	$(fcomp) -c $(AmpDep)
+	mv *.o $(ObjectDir)
+
+
+$(MainObj): $(MainDep) $(VegasDep) $(PDFDep) $(PSGenDep) mod_Parameters.F90 makefile
 	@echo " compiling main routines"
 	$(fcomp) -c $(MainDep)
 	mv *.o $(ObjectDir)
