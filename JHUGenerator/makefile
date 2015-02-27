@@ -123,7 +123,7 @@ $(AmpObj): $(AmpDep) mod_Misc.F90 mod_Parameters.F90 makefile
 	mv *.o $(ObjectDir)
 
 
-$(MainObj): $(MainDep) $(VegasDep) $(PDFDep) $(PSGenDep) makefile
+$(MainObj): $(MainDep) $(VegasDep) $(PDFDep) $(PSGenDep) mod_Parameters.F90 makefile
 	@echo " compiling main routines"
 	$(fcomp) -c $(MainDep)
 	mv *.o $(ObjectDir)
