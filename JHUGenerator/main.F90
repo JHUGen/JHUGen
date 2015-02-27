@@ -29,8 +29,9 @@ logical,parameter :: useBetaVersion=.false.! this should be set to .false.
    if( .not.useBetaVersion .and.   ConvertLHEFile ) then
         call StartConvertLHE(VG_Result,VG_Error)
    elseif( .not.useBetaVersion .and. .not.ReadLHEFile ) then
-        call StartVegas(VG_Result,VG_Error)
-   elseif( useBetaVersion      .and. .not.ReadLHEFile ) then
+        if( Process.ne.80 ) call StartVegas(VG_Result,VG_Error)
+        if( Process.eq.80 ) call StartVegas_NEW(VG_Result,VG_Error)
+   elseif( useBetaVersion .and. .not.ReadLHEFile ) then
         call StartVegas_BETA(VG_Result,VG_Error)
    elseif( .not.useBetaVersion .and.      ReadLHEFile ) then
 !         call StartReadLHE(VG_Result,VG_Error)
@@ -357,9 +358,18 @@ END SUBROUTINE
 SUBROUTINE InitPDFs()
 use ModParameters
 implicit none
+character :: pdftable*(100)
+
 
     call SetCtq6(4)  ! 4    CTEQ6L1  Leading Order           0.130**   215** 165    cteq6l1.tbl
 
+    if( PDFSet.eq.3 ) then
+!         pdftable(:)="./pdfs/NNPDF23_lo_as_0130.LHgrid"
+        pdftable(:)="./pdfs/NNPDF30_lo_as_0130.LHgrid"
+        call NNPDFDriver(pdftable)
+        call NNinitPDF(0)
+    endif
+     
 return
 END SUBROUTINE
 
@@ -377,6 +387,114 @@ ELSEIF( COLLIDER.EQ.2 ) THEN
 ELSEIF( COLLIDER.EQ.0 ) THEN
   Collider_Energy  = ILC_Energy
 ENDIF
+
+
+
+! rescale V branchings to preserve the correct branching proportions in partial decays
+if( (DecayMode1.eq.8 .and. DecayMode2.eq.9) .or.  & 
+    (DecayMode1.eq.9 .and. DecayMode2.eq.8) ) then
+        scale_alpha_Z_uu = scale_alpha_Z_uu * 2d0
+        scale_alpha_Z_dd = scale_alpha_Z_dd * 2d0
+        scale_alpha_Z_nn = scale_alpha_Z_nn * 2d0
+        scale_alpha_Z_ll = scale_alpha_Z_ll * 1d0
+        scale_alpha_Z_tt = scale_alpha_Z_tt * 1d0
+
+
+elseif( (DecayMode1.eq.0 .and. DecayMode2.eq.9) .or.  & 
+        (DecayMode1.eq.9 .and. DecayMode2.eq.0) ) then
+        scale_alpha_Z_uu = scale_alpha_Z_uu * 2d0
+        scale_alpha_Z_dd = scale_alpha_Z_dd * 2d0
+        scale_alpha_Z_nn = scale_alpha_Z_nn * 2d0
+        scale_alpha_Z_ll = scale_alpha_Z_ll * 1d0
+        scale_alpha_Z_tt = scale_alpha_Z_tt * 2d0
+
+
+elseif( (DecayMode1.eq.1 .and. DecayMode2.eq.9) .or.  & 
+        (DecayMode1.eq.9 .and. DecayMode2.eq.1) ) then
+        scale_alpha_Z_uu = scale_alpha_Z_uu * 1d0
+        scale_alpha_Z_dd = scale_alpha_Z_dd * 1d0
+        scale_alpha_Z_nn = scale_alpha_Z_nn * 2d0
+        scale_alpha_Z_ll = scale_alpha_Z_ll * 2d0
+        scale_alpha_Z_tt = scale_alpha_Z_tt * 2d0
+
+
+elseif( (DecayMode1.eq.2 .and. DecayMode2.eq.9) .or.  & 
+        (DecayMode1.eq.9 .and. DecayMode2.eq.2) ) then
+        scale_alpha_Z_uu = scale_alpha_Z_uu * 2d0
+        scale_alpha_Z_dd = scale_alpha_Z_dd * 2d0
+        scale_alpha_Z_nn = scale_alpha_Z_nn * 2d0
+        scale_alpha_Z_ll = scale_alpha_Z_ll * 2d0
+        scale_alpha_Z_tt = scale_alpha_Z_tt * 1d0
+
+
+elseif( (DecayMode1.eq.3 .and. DecayMode2.eq.9) .or.  & 
+        (DecayMode1.eq.9 .and. DecayMode2.eq.3) ) then
+        scale_alpha_Z_uu = scale_alpha_Z_uu * 2d0
+        scale_alpha_Z_dd = scale_alpha_Z_dd * 2d0
+        scale_alpha_Z_nn = scale_alpha_Z_nn * 1d0
+        scale_alpha_Z_ll = scale_alpha_Z_ll * 2d0
+        scale_alpha_Z_tt = scale_alpha_Z_tt * 2d0
+
+elseif( (DecayMode1.eq.8 .and. DecayMode2.eq.0) .or.  & 
+        (DecayMode1.eq.0 .and. DecayMode2.eq.8) ) then
+        scale_alpha_Z_uu = scale_alpha_Z_uu * 1d0
+        scale_alpha_Z_dd = scale_alpha_Z_dd * 1d0
+        scale_alpha_Z_nn = scale_alpha_Z_nn * 1d0
+        scale_alpha_Z_ll = scale_alpha_Z_ll * 1d0
+        scale_alpha_Z_tt = scale_alpha_Z_tt * 2d0
+
+elseif( (DecayMode1.eq.8 .and. DecayMode2.eq.2) .or.  & 
+        (DecayMode1.eq.2 .and. DecayMode2.eq.8) ) then
+        scale_alpha_Z_uu = scale_alpha_Z_uu * 1d0
+        scale_alpha_Z_dd = scale_alpha_Z_dd * 1d0
+        scale_alpha_Z_nn = scale_alpha_Z_nn * 1d0
+        scale_alpha_Z_ll = scale_alpha_Z_ll * 2d0
+        scale_alpha_Z_tt = scale_alpha_Z_tt * 1d0
+
+elseif( (DecayMode1.eq.4 .and. DecayMode2.eq.11) .or.  & 
+        (DecayMode1.eq.11.and. DecayMode2.eq.4) ) then
+        scale_alpha_W_ud = scale_alpha_W_ud * 2d0
+        scale_alpha_W_cs = scale_alpha_W_cs * 2d0
+        scale_alpha_W_ln = scale_alpha_W_ln * 1d0
+        scale_alpha_W_tn = scale_alpha_W_tn * 2d0
+
+
+elseif( (DecayMode1.eq.5 .and. DecayMode2.eq.11) .or.  & 
+        (DecayMode1.eq.11.and. DecayMode2.eq.5) ) then
+        scale_alpha_W_ud = scale_alpha_W_ud * 1d0
+        scale_alpha_W_cs = scale_alpha_W_cs * 1d0
+        scale_alpha_W_ln = scale_alpha_W_ln * 2d0
+        scale_alpha_W_tn = scale_alpha_W_tn * 2d0
+
+elseif( (DecayMode1.eq.6 .and. DecayMode2.eq.11) .or.  & 
+        (DecayMode1.eq.11.and. DecayMode2.eq.6) ) then
+        scale_alpha_W_ud = scale_alpha_W_ud * 2d0
+        scale_alpha_W_cs = scale_alpha_W_cs * 2d0
+        scale_alpha_W_ln = scale_alpha_W_ln * 2d0
+        scale_alpha_W_tn = scale_alpha_W_tn * 1d0
+
+elseif( (DecayMode1.eq.10.and. DecayMode2.eq.11) .or.  & 
+        (DecayMode1.eq.11.and. DecayMode2.eq.10) ) then
+        scale_alpha_W_ud = scale_alpha_W_ud * 2d0
+        scale_alpha_W_cs = scale_alpha_W_cs * 2d0
+        scale_alpha_W_ln = scale_alpha_W_ln * 1d0
+        scale_alpha_W_tn = scale_alpha_W_tn * 1d0
+
+elseif( (DecayMode1.eq.4 .and. DecayMode2.eq.10) .or.  & 
+        (DecayMode1.eq.10.and. DecayMode2.eq.4) ) then
+        scale_alpha_W_ud = scale_alpha_W_ud * 1d0
+        scale_alpha_W_cs = scale_alpha_W_cs * 1d0
+        scale_alpha_W_ln = scale_alpha_W_ln * 1d0
+        scale_alpha_W_tn = scale_alpha_W_tn * 2d0
+
+elseif( (DecayMode1.eq.6 .and. DecayMode2.eq.10) .or.  & 
+        (DecayMode1.eq.10.and. DecayMode2.eq.6) ) then
+        scale_alpha_W_ud = scale_alpha_W_ud * 1d0
+        scale_alpha_W_cs = scale_alpha_W_cs * 1d0
+        scale_alpha_W_ln = scale_alpha_W_ln * 2d0
+        scale_alpha_W_tn = scale_alpha_W_tn * 1d0
+endif
+
 
 END SUBROUTINE
 
@@ -483,10 +601,10 @@ implicit none
 include "vegas_common.f"
 real(8) :: VG_Result,VG_Error,VG_Chi2
 real(8) :: yRnd(1:22)
-real(8) :: dum, RES(-5:5,-5:5)
+real(8) :: dum, RES(-5:5,-5:5),VG2(-5:5,-5:5)
 integer :: i, i1, j1,PChannel_aux, PChannel_aux1,NHisto
 include 'csmaxvalue.f'
-integer :: n,clock
+integer :: n,clock,flav1,flav2,StatusPercent,LastStatusPercent=0
 integer, dimension(:), allocatable :: gfort_seed
 
 
@@ -571,7 +689,7 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
     elseif (Process.eq.50) then
       call vegas1(EvalWeighted_VHiggs,VG_Result,VG_Error,VG_Chi2)
     elseif (Process.eq.80) then
-      call vegas(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
+      call vegas1(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
     else
       call vegas1(EvalWeighted,VG_Result,VG_Error,VG_Chi2)    ! usual call of vegas for weighted events
     endif
@@ -581,6 +699,7 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
 elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
 
     VG = zero
+    VG2= zero
     csmax = zero
     if (seed_random) then 
 #if compiler==1
@@ -617,6 +736,7 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
                 RES = 0d0
                 dum = EvalUnWeighted_TTBH(yRnd,.false.,RES)
                 VG = VG + RES
+                VG2 = VG2 + RES**2
             else
                 if (PChannel_aux.eq.0.or.PChannel_aux.eq.2) then
                     PChannel= 0
@@ -643,16 +763,13 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
         close(io_CSmaxFile)
     endif
 
-
+     VG = VG/dble(VegasNc0)
      csmax   = 1.5d0*csmax    !  adjustment factors, can be choosen  separately channel/by/channel
-!      do i1=-5,5
-!      do j1=-5,5
-!          print *, i1,j1, csmax(i1,j1), VG(i1,j1)
-!      enddo
-!      enddo
-!      pause
 
 
+
+!        print *, " gg/qqb ratio = ", VG(0,0)/(VG(+1,-1) + VG(+2,-2) + VG(+3,-3) + VG(+4,-4) + VG(+5,-5)   &
+!                                             +VG(-1,+1) + VG(-2,+2) + VG(-3,+3) + VG(-4,+4) + VG(-5,+5))  
 
 !------------------adj_par fixes by how much the quark-induced channels need to be adjusted
 
@@ -707,7 +824,9 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
                 dum = EvalUnWeighted(yRnd,.true.,RES)! RES is a dummy here
             endif
         enddo
+
     elseif( VegasNc2.ne.-1 ) then
+        AccepCounter = 0
         print *, " generating ",VegasNc2," events"
         do while( AccepCounter.lt.VegasNc2 )
               call random_number(yRnd)
@@ -722,16 +841,23 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
               else
                   dum = EvalUnWeighted(yRnd,.true.,RES)! RES is a dummy here
               endif
-!              if( AccepCounter.gt.0 .and. mod(AccepCounter,10).eq.0 ) then
-!                   call cpu_time(time_int)
-!                   write(io_stdout,*)  AccepCounter," events accepted (",time_int-time_start, ") seconds"
-! !                   write(io_LogFile,*) AccepCounter," events accepted (",time_int-time_start, ") seconds"
-!              endif
+              StatusPercent = int(100d0*AccepCounter/dble(VegasNc2))
+              if( mod(StatusPercent,10).eq.0 .and. LastStatusPercent.ne.StatusPercent ) then
+                 write(io_stdout,"(X,I3,A)") int(100d0*AccepCounter/dble(VegasNc2)),"% "
+!                 write(io_stdout,"(X,I3,A)",advance='no') int(100d0*AccepCounter/dble(VegasNc2)),"% "
+!                 flush(io_stdout)
+                 LastStatusPercent = StatusPercent
+              endif
         enddo
+
+
+
+
     else
         print *, "ERROR: VegasNc1 and VegasNc2 must not be set at the same time"
         stop
     endif
+    print *, ""
 
     call cpu_time(time_end)
 
@@ -749,11 +875,311 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
     endif
     write(io_stdout,*)  " event generation rate (events/sec)",dble(AccepCounter)/(time_end-time_start)
 
+
+    if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) then
+          write(*,*) ""
+          write(*,"(A)") "                 el              mu             tau             neu              jet"
+          write(*,"(A,5F16.4)") " el ",dble(Br_counter(1,1:5))/dble(AccepCounter)
+          write(*,"(A,5F16.4)") " mu ",dble(Br_counter(2,1:5))/dble(AccepCounter)
+          write(*,"(A,5F16.4)") " tau",dble(Br_counter(3,1:5))/dble(AccepCounter)
+          write(*,"(A,5F16.4)") " neu",dble(Br_counter(4,1:5))/dble(AccepCounter)
+          write(*,"(A,5F16.4)") " jet",dble(Br_counter(5,1:5))/dble(AccepCounter)
+          write(*,*) ""
+          write(*,"(A,5F16.3)") "llll: ",(dble(Br_counter(1,1))+dble(Br_counter(2,2))+dble(Br_counter(3,3)))/dble(AccepCounter)
+          write(*,"(A,5F16.3)") "llLL: ",(dble(Br_counter(1,2))+dble(Br_counter(1,3))+  &
+                                          dble(Br_counter(2,1))+dble(Br_counter(2,3))+  &
+                                          dble(Br_counter(3,1))+dble(Br_counter(3,2)))/dble(AccepCounter)
+          write(*,"(A,5F16.3)") "2l2q: ",(dble(Br_counter(1,5))+dble(Br_counter(2,5))+dble(Br_counter(3,5))+  &
+                                          dble(Br_counter(5,1))+dble(Br_counter(5,2))+dble(Br_counter(5,3)) )/dble(AccepCounter)
+            
+          write(*,"(A,5F16.3)") "4l/2q2l: ",(dble(Br_counter(1,2))+dble(Br_counter(1,3))+ dble(Br_counter(1,1))+dble(Br_counter(2,2))+dble(Br_counter(3,3)) &
+                                        + dble(Br_counter(2,1))+dble(Br_counter(2,3))+   &
+                                          dble(Br_counter(3,1))+dble(Br_counter(3,2)))/  &
+                                          (dble(Br_counter(1,5))+dble(Br_counter(2,5))+dble(Br_counter(3,5))+  &
+                                          dble(Br_counter(5,1))+dble(Br_counter(5,2))+dble(Br_counter(5,3)) )
+                                          
+      !     print *, alpha_QED/12d0*M_Z * (   (aR_lep+aL_lep)**2 + (aR_lep-aL_lep)**2        &
+      !                                      +(aR_lep+aL_lep)**2 + (aR_lep-aL_lep)**2        &
+      !                                      +(aR_lep+aL_lep)**2 + (aR_lep-aL_lep)**2        &
+      !                                      +(aR_neu+aL_neu)**2 + (aR_neu-aL_neu)**2        &
+      !                                      +(aR_neu+aL_neu)**2 + (aR_neu-aL_neu)**2        &
+      !                                      +(aR_neu+aL_neu)**2 + (aR_neu-aL_neu)**2        &
+      !                                      +((aR_Qup+aL_Qup)**2 + (aR_Qup-aL_Qup)**2 )*3d0 *1.0366d0 &
+      !                                      +((aR_Qdn+aL_Qdn)**2 + (aR_Qdn-aL_Qdn)**2 )*3d0 *1.0366d0 &
+      !                                      +((aR_Qup+aL_Qup)**2 + (aR_Qup-aL_Qup)**2 )*3d0 *1.0366d0 &
+      !                                      +((aR_Qdn+aL_Qdn)**2 + (aR_Qdn-aL_Qdn)**2 )*3d0 *1.0366d0 &
+      !                                      +((aR_Qdn+aL_Qdn)**2 + (aR_Qdn-aL_Qdn)**2 )*3d0 *1.0366d0 *(1d0-3d0/2d0/(M_Z/2d0/m_bot)**2) &
+      !                                  )/4d0/(one-sitW**2)/sitW**2      
+
+    endif
+               
+   
   endif! unweighted
+  
+  
 
 
 return
 END SUBROUTINE
+
+
+
+
+
+
+
+
+SUBROUTINE StartVegas_NEW(VG_Result,VG_Error)
+use ModCrossSection
+use ModCrossSection_TTBH
+use ModKinematics
+use ModParameters
+implicit none
+include "vegas_common.f"
+real(8) :: VG_Result,VG_Error,VG_Chi2
+real(8) :: yRnd(1:22)
+real(8) :: dum, RES(-5:5,-5:5),VG2(-5:5,-5:5),ResFrac(-5:5,-5:5),TotalXSec
+integer :: i, i1, j1,PChannel_aux, PChannel_aux1,NHisto,RequEvents(-5:+5,-5:+5)
+include 'csmaxvalue.f'
+integer :: n,sclock,flav1,flav2,StatusPercent,LastStatusPercent=0
+integer, dimension(:), allocatable :: gfort_seed
+
+
+if( VegasIt1.eq.-1 ) VegasIt1 = VegasIt1_default
+if( VegasNc0.eq.-1 ) VegasNc0 = VegasNc0_default
+if( VegasNc1.eq.-1 .and. VegasNc2.eq.-1 .and.  (unweighted) ) then 
+      VegasNc1 = VegasNc1_default
+      VegasNc2 = VegasNc2_default
+endif
+if( VegasNc1.eq.-1 .and.  .not. (unweighted) ) VegasNc1 = VegasNc1_default
+if( VegasNc2.eq.-1 .and.  .not. (unweighted) ) VegasNc2 = VegasNc2_default
+
+
+
+   warmup = .false.
+   itmx = VegasIt1
+   ncall= VegasNc1
+
+   PChannel_aux = PChannel
+
+if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !----------------------- weighted events
+
+
+    if (seed_random) then 
+#if compiler==1
+        call random_seed()
+#elif compiler==2
+        call random_seed(size=n)
+        allocate(gfort_seed(n))
+        call system_clock(count=sclock)
+        gfort_seed = sclock + 37 * (/ (i - 1, i = 1, n) /)
+        call random_seed(put = gfort_seed)
+        deallocate(gfort_seed)        
+#endif
+        call random_number(VegasSeed)
+        VegasSeed = - abs( VegasSeed*10000d0 )
+    else
+        VegasSeed = -19d0
+    endif
+    idum = int(VegasSeed)
+
+
+
+    if( (GenerateEvents.eqv..true.) ) then
+        itmx = 1
+        ncall= VegasNc1
+        call vegas(EvalOnlyPS,VG_Result,VG_Error,VG_Chi2)
+        return
+    endif
+
+
+
+    ! WARM-UP RUN
+    itmx = VegasIt1
+    ncall= VegasNc1
+    warmup = .true.
+    call vegas(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
+
+
+
+    !DATA RUN
+    call ClearHisto()   
+    warmup = .false.
+    EvalCounter=0
+    RejeCounter=0
+    AccepCounter=0
+    AlertCounter=0
+    avgcs = 0d0
+    itmx = 1
+    ncall= VegasNc2
+    call vegas1(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
+
+
+    
+
+
+
+elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
+
+    VG = zero
+    VG2= zero
+    csmax = zero
+    if (seed_random) then 
+#if compiler==1
+        call random_seed()
+#elif compiler==2
+        call random_seed(size=n)
+        allocate(gfort_seed(n))
+        call system_clock(count=sclock)
+        gfort_seed = sclock + 37 * (/ (i - 1, i = 1, n) /)
+        call random_seed(put = gfort_seed)
+        deallocate(gfort_seed)        
+#endif
+    endif
+
+
+    if( .not. ReadCSmax ) then
+        print *, " finding maximal weight with ",VegasNc0," evaluations"
+        warmup = .true.
+        do i=1,VegasNc0
+            call random_number(yRnd)
+
+                RES = 0d0
+                dum = EvalUnWeighted_TTBH(yRnd,.false.,RES)
+                VG = VG + RES
+                VG2 = VG2 + RES**2
+                PChannel = PChannel_aux
+        enddo
+
+        open(unit=io_CSmaxFile,file='CSmax.bin',form='unformatted',status='replace')
+        WRITE(io_CSmaxFile) CSMAX
+        close(io_CSmaxFile)
+    else
+        open(unit=io_CSmaxFile,file='CSmax.bin',form='unformatted')
+        READ(io_CSmaxFile) CSMAX
+        close(io_CSmaxFile)
+    endif
+
+   VG = VG/dble(VegasNc0)
+   csmax   = 1.5d0*csmax    !  adjustment factors, can be choosen  separately channel/by/channel
+
+
+   print *, " gg/qqb ratio = ", VG(0,0)/(VG(+1,-1) + VG(+2,-2) + VG(+3,-3) + VG(+4,-4) + VG(+5,-5)   &
+                                       +VG(-1,+1) + VG(-2,+2) + VG(-3,+3) + VG(-4,+4) + VG(-5,+5))  
+
+
+   TotalXSec = sum(  VG(:,:) )
+   write(io_stdout,*) "Total xsec",TotalXSec
+   do i1=-5,5
+        write(io_stdout,*) "partonic fraction", i1,-i1,VG(i1,-i1)/TotalXSec
+   enddo
+
+
+
+!------------------------------- set counts to zero for actual evaluation
+
+    EvalCounter = 0
+    AccepCounter = 0
+    RejeCounter = 0
+    AlertCounter = 0
+    AccepCounter_part(:,:) = 0
+
+    if (seed_random) then 
+#if compiler==1
+        call random_seed()
+#elif compiler==2
+        call random_seed(size=n)
+        allocate(gfort_seed(n))
+        call system_clock(count=sclock)
+        gfort_seed = sclock + 37 * (/ (i - 1, i = 1, n) /)
+        call random_seed(put = gfort_seed)
+        deallocate(gfort_seed)        
+#endif
+    endif
+
+    call cpu_time(time_start)
+    warmup = .true.
+
+    RequEvents(-5:+5,-5:+5) = int(VG(-5:+5,-5:+5)/TotalXSec * VegasNc2 )
+    do i1=-5,-1
+         write(io_stdout,*) "requested events", i1,-i1,RequEvents(+i1,-i1)+RequEvents(-i1,+i1)
+    enddo
+    write(io_stdout,*) "requested events", 0,0,RequEvents(0,0)
+    print *, ""
+
+
+    if( PChannel.eq.0 .or. PChannel.eq.2 ) then 
+         PChannel_aux = PChannel
+         PChannel=0
+         print *, " generating ",RequEvents(0,0)," events for gg"
+         do while( AccepCounter_part(+0,0)  .lt. RequEvents(+0,0) )
+              call random_number(yRnd)
+
+              dum = EvalUnWeighted_TTBH(yRnd,.true.,RES)! RES is a dummy here
+
+              StatusPercent = int(100d0*(AccepCounter_part(0,0))  /  dble(RequEvents(+0,0))  )
+              if( mod(StatusPercent,10).eq.0 .and. LastStatusPercent.ne.StatusPercent ) then
+!                 write(io_stdout,"(X,I3,A)") StatusPercent,"% "
+                 write(io_stdout,"(X,I3,A)",advance='no') StatusPercent,"% "
+                 flush(io_stdout)
+                 LastStatusPercent = StatusPercent
+              endif
+         enddo
+         print *, "Done with gg channel ",AccepCounter_part(0,0),AccepCounter
+         print *, ""
+         PChannel = PChannel_aux
+    endif
+
+
+
+    if( PChannel.eq.1 .or. PChannel.eq.2 ) then 
+         PChannel_aux = PChannel
+         PChannel = 1
+         print *, " generating ",(sum(RequEvents(:,:))-RequEvents(0,0) )," events for qqb"
+         do while( (sum(AccepCounter_part(:,:))-AccepCounter_part(0,0) ) .lt. (sum(RequEvents(:,:))-RequEvents(0,0)  ) )
+              call random_number(yRnd)
+
+              dum = EvalUnWeighted_TTBH(yRnd,.true.,RES)! RES is a dummy here
+
+              StatusPercent = int(  100d0*( sum(AccepCounter_part(:,:)) - AccepCounter_part(0,0) )  /  dble(  sum(RequEvents(:,:)) - RequEvents(0,0)  )  )
+              if( mod(StatusPercent,10).eq.0 .and. LastStatusPercent.ne.StatusPercent ) then
+!                 write(io_stdout,"(X,I3,A)") StatusPercent,"% "
+                 write(io_stdout,"(X,I3,A)",advance='no') StatusPercent,"% "
+                 flush(io_stdout)
+                 LastStatusPercent = StatusPercent
+              endif
+         enddo
+         print *, "Done with qqb channels ",sum(AccepCounter_part(:,:))-AccepCounter_part(0,0),AccepCounter
+         print *, ""
+         PChannel = PChannel_aux
+    endif
+
+
+    call cpu_time(time_end)
+    print *, " Evaluation Counter: ",EvalCounter
+    print *, " Acceptance Counter: ",AccepCounter
+    print *, " Rejection  Counter: ",RejeCounter
+    do i1=-5,+5
+      print *, " Acceptance  Counter_part: ", i1,-i1, AccepCounter_part(i1,-i1)
+    enddo
+    print *, " Alert  Counter: ",AlertCounter
+    print *, " gg/qqb ratio = ", dble(AccepCounter_part(0,0))/dble(sum(AccepCounter_part(:,:))-AccepCounter_part(0,0))
+    if( dble(AlertCounter)/dble(AccepCounter) .gt. 1d0*percent ) then
+        print *, "ALERT: The number of rejected events with too small CSMAX exceeds 1%."
+        print *, "       Increase CSMAX in main.F90."
+    endif
+    write(io_stdout,*)  " event generation rate (events/sec)",dble(AccepCounter)/(time_end-time_start)
+
+                     
+  endif! unweighted
+  
+  
+
+
+return
+END SUBROUTINE
+
+
 
 
 
@@ -1321,27 +1747,33 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                   write(io_stdout,*)  NEvent," events accepted (",time_int-time_start, ") seconds"
                   write(io_LogFile,*) NEvent," events accepted (",time_int-time_start, ") seconds"
              endif
+
           else! decay event was not accepted after ncall evaluations, read next production event
-             print *, "rejected event after ",tries-1," evaluations"
+             print *, "Rejected event after ",tries-1," evaluations"
              AlertCounter = AlertCounter + 1 
           endif
 
 
 !        read optional lines
          FirstEvent = .true.
+         tries = 0
          do while (.true.) 
+              tries = tries +1 
               read(16,fmt="(A160)",IOSTAT=stat,END=99) OtherLines(1:160)
               if(OtherLines(1:30).eq."</LesHouchesEvents>") then
                   goto 99
-              elseif( OtherLines(1:8).eq."</event>" ) then
+              elseif( OtherLines(1:8).eq."</event>" .and. Res.ne.0d0 ) then
                   write(io_LHEOutFile,"(A)") "</event>"
               elseif( OtherLines(1:8).eq."<event>" ) then
                   exit
-              else!if there are "#" comments
+              elseif( Res.ne.0d0 ) then !if there are "#" comments
                   write(io_LHEOutFile,fmt="(A)") trim(OtherLines)
+              elseif( tries.gt.10000000 ) then
+                  write(io_LHEOutFile,"(A)") "</event>"
+                  print *, "ERROR: cannot find </event>"
+                  exit
               endif
          enddo         
-
          
      enddo
 99   continue
@@ -1376,9 +1808,6 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
 
 return
 END SUBROUTINE
-
-
-
 
 
 
@@ -1562,7 +1991,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                   endif
 
                elseif( DecayMode1.eq.4 .and. LHE_IDUP(convertparent).eq.convertLHE(Wp_) ) then! convert W+ decay products to 2 leptons
-                  if( LHE_IDUP(nline).lt.0 ) then
+                  if( LHE_IDUP(nline).gt.0 ) then
                          LHE_IDUP(nline) = convertLHE( WLepBranching(xRnd) )   
                          LHE_IDUP(nline) = -LHE_IDUP(nline)! converts LepM to LepP
                          LHE_ICOLUP(1:2,nline) = (/0,0/)
@@ -1576,7 +2005,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                   endif
 
                elseif( DecayMode1.eq.4 .and. LHE_IDUP(convertparent).eq.convertLHE(Wm_) ) then! convert W- decay products to 2 leptons
-                  if( LHE_IDUP(nline).lt.0 ) then
+                  if( LHE_IDUP(nline).gt.0 ) then
                          LHE_IDUP(nline) = convertLHE( Su2flip(WLepBranching(xRnd)) )   
                          LHE_ICOLUP(1:2,nline) = (/0,0/)
                          Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
@@ -1603,7 +2032,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                   endif
 
                elseif( DecayMode1.eq.10 .and. LHE_IDUP(convertparent).eq.convertLHE(Wp_) ) then! convert W+ decay products to 3 leptons   
-                  if( LHE_IDUP(nline).lt.0 ) then
+                  if( LHE_IDUP(nline).gt.0 ) then
                          LHE_IDUP(nline) = convertLHE( WLepPlusTauBranching(xRnd) )   
                          LHE_IDUP(nline) = -LHE_IDUP(nline)! converts LepM to LepP
                          LHE_ICOLUP(1:2,nline) = (/0,0/)
@@ -1617,7 +2046,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                   endif
 
                elseif( DecayMode1.eq.10 .and. LHE_IDUP(convertparent).eq.convertLHE(Wm_) ) then! convert W- decay products to 3 leptons
-                  if( LHE_IDUP(nline).lt.0 ) then
+                  if( LHE_IDUP(nline).gt.0 ) then
                          LHE_IDUP(nline) = convertLHE( Su2flip(WLepPlusTauBranching(xRnd)) )   
                          LHE_ICOLUP(1:2,nline) = (/0,0/)
                          Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
@@ -1644,31 +2073,27 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                   endif
 
                elseif( DecayMode1.eq.5 .and. LHE_IDUP(convertparent).eq.convertLHE(Wp_) ) then! convert W+ decay products to quarks                  
-                  if( LHE_IDUP(nline).lt.0 ) then
+                  if( LHE_IDUP(nline).gt.0 ) then
                          LHE_IDUP(nline) = convertLHE( WQuaUpBranching(xRnd) )   
-                         LHE_ICOLUP(1:2,nline) = (/0,505/)
-                         LHE_IDUP(nline) = -LHE_IDUP(nline)
+                         LHE_ICOLUP(1:2,nline) = (/505,0/)
                          Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
                          DecayParticles(i) = nline; i=i+1;
                   else
                          LHE_IDUP(nline) = convertLHE( - SU2flip(WQuaUpBranching(xRnd)) )  
-                         LHE_ICOLUP(1:2,nline) = (/505,0/)
-                         LHE_IDUP(nline) = -LHE_IDUP(nline)
+                         LHE_ICOLUP(1:2,nline) = (/0,505/)
                          Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
                          DecayParticles(i) = nline; i=i+1;
                   endif
 
                elseif( DecayMode1.eq.5 .and. LHE_IDUP(convertparent).eq.convertLHE(Wm_) ) then! convert W- decay products to quarks                  
-                  if( LHE_IDUP(nline).lt.0 ) then
+                  if( LHE_IDUP(nline).gt.0 ) then
                          LHE_IDUP(nline) = convertLHE( Su2flip(WQuaUpBranching(xRnd)) )   
-                         LHE_ICOLUP(1:2,nline) = (/0,505/)
-                         LHE_IDUP(nline) = -LHE_IDUP(nline)
+                         LHE_ICOLUP(1:2,nline) = (/505,0/)
                          Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
                          DecayParticles(i) = nline; i=i+1;
                   else
                          LHE_IDUP(nline) = convertLHE( -WQuaUpBranching(xRnd) )   
-                         LHE_ICOLUP(1:2,nline) = (/505,0/)
-                         LHE_IDUP(nline) = -LHE_IDUP(nline)
+                         LHE_ICOLUP(1:2,nline) = (/0,505/)
                          Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
                          DecayParticles(i) = nline; i=i+1;
                   endif
@@ -1701,12 +2126,11 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
 ! if( abs(convertLHEreverse(LHE_IDUP(nline))).eq.Dn_ .or. abs(convertLHEreverse(LHE_IDUP(nline))).eq.Str_ .or. abs(convertLHEreverse(LHE_IDUP(nline))).eq.Bot_) Br_Z_dd_counter=Br_Z_dd_counter+1
 ! EvalCounter=EvalCounter+1
 
-               elseif( DecayMode1.eq.11 .and. LHE_IDUP(convertparent).eq.convertLHE(Wp_) ) then! convert W+ decay products to quarks and leptons   
-                  if( LHE_IDUP(nline).lt.0 ) then
+               elseif( DecayMode1.eq.11 .and. LHE_IDUP(convertparent).eq.convertLHE(Wp_) ) then! convert W+ decay products to quarks and leptons         
+                  if( LHE_IDUP(nline).gt.0 ) then
                          LHE_IDUP(nline) = convertLHE( WAnyBranching(xRnd) )   
                          if( IsAQuark(convertLHEreverse(LHE_IDUP(nline))) ) then
-                              LHE_ICOLUP(1:2,nline) = (/0,505/)
-                              LHE_IDUP(nline) = -LHE_IDUP(nline)
+                              LHE_ICOLUP(1:2,nline) = (/505,0/)
                          else
                               LHE_ICOLUP(1:2,nline) = (/0,0/)
                               LHE_IDUP(nline) = -LHE_IDUP(nline)! converts LepM to LepP
@@ -1718,8 +2142,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                   else
                          LHE_IDUP(nline) = convertLHE( - SU2flip(WAnyBranching(xRnd)) )  
                          if( IsAQuark(convertLHEreverse(LHE_IDUP(nline))) ) then
-                              LHE_ICOLUP(1:2,nline) = (/505,0/)
-                              LHE_IDUP(nline) = -LHE_IDUP(nline)
+                              LHE_ICOLUP(1:2,nline) = (/0,505/)
                          else
                               LHE_ICOLUP(1:2,nline) = (/0,0/)
                          endif                         
@@ -1728,11 +2151,10 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                   endif
 
                elseif( DecayMode1.eq.11 .and. LHE_IDUP(convertparent).eq.convertLHE(Wm_) ) then! convert W- decay products to quarks   
-                  if( LHE_IDUP(nline).lt.0 ) then
+                  if( LHE_IDUP(nline).gt.0 ) then
                          LHE_IDUP(nline) = convertLHE( SU2flip(WAnyBranching(xRnd)) )   
                          if( IsAQuark(convertLHEreverse(LHE_IDUP(nline))) ) then
-                              LHE_ICOLUP(1:2,nline) = (/0,505/)
-                              LHE_IDUP(nline) = -LHE_IDUP(nline)
+                              LHE_ICOLUP(1:2,nline) = (/505,0/)
                          else
                               LHE_ICOLUP(1:2,nline) = (/0,0/)
                          endif                         
@@ -1743,11 +2165,10 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                   else
                          LHE_IDUP(nline) = convertLHE( -WAnyBranching(xRnd) )   
                          if( IsAQuark(convertLHEreverse(LHE_IDUP(nline))) ) then
-                              LHE_ICOLUP(1:2,nline) = (/505,0/)
-                              LHE_IDUP(nline) = -LHE_IDUP(nline)
+                              LHE_ICOLUP(1:2,nline) = (/0,505/)
                          else
                               LHE_ICOLUP(1:2,nline) = (/0,0/)
-                              LHE_IDUP(nline) = -LHE_IDUP(nline)
+                              LHE_IDUP(nline) = -LHE_IDUP(nline)! converts -LepM to +LepM
                          endif                  
                          Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
                          DecayParticles(i) = nline; i=i+1;
@@ -1819,6 +2240,97 @@ END SUBROUTINE
 
 
 
+
+
+! SUBROUTINE ScrambleLHE(Infile,Outfile)
+! use ModParameters
+! use ModMisc
+! implicit none
+! character(len=*),parameter :: POWHEG_Fmt0 = "(6X,I2,A160)"
+! character(len=*),parameter :: POWHEG_Fmt1 = "(5X,I3,4X,I3,4X,I3,3X,I3,1X,I3,3X,I3,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9)"
+! character(len=*),parameter :: JHUGen_Fmt0 = "(I2,A160)"
+! character(len=*),parameter :: JHUGen_Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0)"
+! character(len=*),parameter :: JHUGen_old_Fmt0 = "(2X,I2,A160)"
+! character(len=*),parameter :: JHUGen_old_Fmt1 = "(I3,X,I2,X,I2,X,I2,X,I3,X,I3,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7)"
+! character(len=*),parameter :: MadGra_Fmt0 = "(I2,A160)"
+! character(len=*),parameter :: MadGra_Fmt1 = "(7X,I3,2X,I3,3X,I2,3X,I2,3X,I3,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1F3.0,X,1F3.0)"
+! character(len=150) :: InputFmt0,InputFmt1
+! logical :: FirstEvent
+! character(len=160) :: HeaderLines,EventInfoLine,OtherLines
+! character(len=160) :: EventLine(1:maxpart)
+! integer,parameter :: InputLHEFormat = 1  !  1=POWHEG, 2=JHUGen (old format), 3=JHUGen (new format), 4=MadGraph
+! 
+! 
+! if(InputLHEFormat.eq.1) then
+!   InputFmt0 = trim(POWHEG_Fmt0)
+!   InputFmt1 = trim(POWHEG_Fmt1)
+! elseif(InputLHEFormat.eq.4) then
+!   InputFmt0 = trim(MadGra_Fmt0)
+!   InputFmt1 = trim(MadGra_Fmt1)
+! elseif(InputLHEFormat.eq.2) then
+!   InputFmt0 = trim(JHUGen_old_Fmt0)
+!   InputFmt1 = trim(JHUGen_old_Fmt1)
+! else
+!   InputFmt0 = trim(JHUGen_Fmt0)
+!   InputFmt1 = trim(JHUGen_Fmt1)
+! endif
+! 
+! 
+!      open(unit=io_LHEOutFile,file=trim(DataFile)//'.lhe',form='formatted',access= 'sequential') ! in1 (part1)
+!      open(unit=io_LHEOutFile2,file=trim(DataFile)//'.lhe',form='formatted',access= 'sequential')! in2 (part2)
+!      open(unit=io_LHEOutFile3,file=trim(DataFile)//'.new.lhe',form='formatted',access= 'sequential',status='replace')! out
+! 
+! 
+! !    search for line with first event in gg-file
+!      FirstEvent = .false.
+!      do while ( .not.FirstEvent )
+!         read(io_LHEOutFile,fmt="(A160)",IOSTAT=stat,END=99) HeaderLines
+!         if( HeaderLines(1:7).eq."<event>" ) then 
+!                FirstEvent=.true.
+!         endif
+!      enddo
+!      read(io_LHEOutFile,fmt=InputFmt0) EventNumPart,EventInfoLine!  read number of particle from the first line after <event> and other info
+!      do nline=1,EventNumPart!  read event lines
+!         read(io_LHEOutFile,fmt="(A160)") EventLine(nline)
+!      enddo
+!      do nline=1,EventNumPart    
+!         read(EventLine(nline),fmt=InputFmt1) LHE_IDUP(nline),IntExt(nline),LHE_MOTHUP(1,nline),LHE_MOTHUP(2,nline),LHE_ICOLUP(1,nline),LHE_ICOLUP(2,nline),MomExt(2,nline),MomExt(3,nline),MomExt(4,nline),MomExt(1,nline),Mass(nline),Spin(nline),Lifetime(nline)
+!      enddo
+!      if( LHE_IDUP(1).eq.21 .and. LHE_IDUP(2).eq.21 ) then!  gg initial state
+!      endif
+! 
+!      
+!      
+!      
+!      
+!      
+!      
+!      
+! !    search for line with first event in gg-file
+!      FirstEvent = .false.
+!      do while ( .not.FirstEvent )
+!         read(io_LHEOutFile2,fmt="(A160)",IOSTAT=stat,END=99) HeaderLines
+!         if( HeaderLines(1:7).eq."<event>" ) then 
+!                FirstEvent=.true.
+!         endif
+!      enddo
+!      read(io_LHEOutFile2,fmt=InputFmt0) EventNumPart,EventInfoLine!  read number of particle from the first line after <event> and other info
+!      do nline=1,EventNumPart!  read event lines
+!         read(io_LHEOutFile2,fmt="(A160)") EventLine(nline)
+!      enddo
+!      do nline=1,EventNumPart    
+!         read(EventLine(nline),fmt=InputFmt1) LHE_IDUP(nline),IntExt(nline),LHE_MOTHUP(1,nline),LHE_MOTHUP(2,nline),LHE_ICOLUP(1,nline),LHE_ICOLUP(2,nline),MomExt(2,nline),MomExt(3,nline),MomExt(4,nline),MomExt(1,nline),Mass(nline),Spin(nline),Lifetime(nline)
+!      enddo
+!      if( IsAQuark(LHE_IDUP(1)) .and. IsAQuark(LHE_IDUP(2)) ) then!  qq initial state
+!      endif
+!      read(io_LHEOutFile2,fmt="(A160)",IOSTAT=stat,END=99) HeaderLines! read </event> 
+!      
+!      
+!      
+!      
+! 
+! return
+! END SUBROUTINE
 SUBROUTINE OpenFiles()
 use ModParameters
 implicit none
@@ -2391,7 +2903,8 @@ character :: arg*(500)
     if( Process.eq.61) write(TheUnit,"(4X,A,F7.2,A,F6.3)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( Process.eq.50) write(TheUnit,"(4X,A,F7.2,A,F6.3)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( Process.eq.80) write(TheUnit,"(4X,A,F7.2,A,F6.3)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
-    if( ReadLHEFile ) write(TheUnit,"(4X,A)") "           (This is ReadLHEFile mode. Resonance mass is read from LHE input file.)"
+    if( ReadLHEFile )    write(TheUnit,"(4X,A)") "           (This is ReadLHEFile mode. Resonance mass is read from LHE input file.)"
+    if( ConvertLHEFile ) write(TheUnit,"(4X,A)") "           (This is ConvertLHEFile mode. Resonance mass is read from LHE input file.)"
     write(TheUnit,"(4X,A,I2,2X,A,I2)") "DecayMode1:",DecayMode1, "DecayMode2:",DecayMode2
     if( IsAZDecay(DecayMode1) .or. IsAZDecay(DecayMode2) ) write(TheUnit,"(4X,A,F6.3,A,F6.4)") "Z-boson: mass=",M_Z*100d0,", width=",Ga_Z*100d0
     if( IsAWDecay(DecayMode1) .or. IsAWDecay(DecayMode2) ) write(TheUnit,"(4X,A,F6.3,A,F6.4)") "W-boson: mass=",M_W*100d0,", width=",Ga_W*100d0
@@ -2399,7 +2912,7 @@ character :: arg*(500)
     if( Process.eq.80 ) write(TheUnit,"(4X,A,I2)") "Top quark decay=",TOPDECAYS
 
 
-    if( .not.ReadLHEFile ) then
+    if( .not. (ReadLHEFile .or. ConvertLHEFile) ) then
         write(TheUnit,"(4X,A)") ""
         write(TheUnit,"(4X,A,L,L,L)") "OffXVV: ",OffShellReson,OffShellV1,OffShellV2
         write(TheUnit,"(4X,A,I1)") "PChannel: ",PChannel
@@ -2499,7 +3012,7 @@ character :: arg*(500)
     write(TheUnit,"(4X,A)") "LHE output: "//trim(DataFile)//'.lhe'
     write(TheUnit,"(4X,A)") "Histogram output: "//trim(DataFile)//'.dat'
     write(TheUnit,"(4X,A)") "Log file: "//trim(DataFile)//'.log'
-    if( ReadLHEFile ) write(TheUnit,"(4X,A)") "LHE input: "//trim(LHEProdFile)
+    if( ReadLHEFile .or. ConvertLHEFile ) write(TheUnit,"(4X,A)") "LHE input: "//trim(LHEProdFile)
     write(TheUnit,"(4X,A)") ""
 
 
@@ -2571,7 +3084,7 @@ implicit none
         write(io_stdout,"(2X,A)") "Command line arguments:"
         write(io_stdout,"(4X,A)") "Collider:   1=LHC, 2=Tevatron, 0=e+e-"
         write(io_stdout,"(4X,A)") "Process:    0=spin-0, 1=spin-1, 2=spin-2 resonance, 50=pp/ee->VH, 60=weakVBF, 61=pp->Hjj, 80=pp->ttbar+H"
-        write(io_stdout,"(4X,A)") "MReso:      resonance mass (default=126.00), format: yyy.xx"
+        write(io_stdout,"(4X,A)") "MReso:      resonance mass (default=125.60), format: yyy.xx"
         write(io_stdout,"(4X,A)") "DecayMode1: decay mode for vector boson 1 (Z/W+/gamma)"
         write(io_stdout,"(4X,A)") "DecayMode2: decay mode for vector boson 2 (Z/W-/gamma)"
         write(io_stdout,"(4X,A)") "              0=Z->2l,  1=Z->2q, 2=Z->2tau, 3=Z->3nu,"
@@ -2581,7 +3094,7 @@ implicit none
         write(io_stdout,"(4X,A)") "TopDK:      decay mode for tops in ttbar+H, 0=stable, 1=di-lept, 2=full hadr., 3,4=lepton+jets"
         write(io_stdout,"(4X,A)") "PChannel:   0=g+g, 1=q+qb, 2=both"
         write(io_stdout,"(4X,A)") "OffXVV:     off-shell option for resonance(X),or vector bosons(VV)"
-        write(io_stdout,"(4X,A)") "PDFSet:     1=CTEQ6L1(2001), 2=MSTW(2008),  2xx=MSTW with eigenvector set xx=01..40)"
+        write(io_stdout,"(4X,A)") "PDFSet:     1=CTEQ6L1(default), 2=MSTW2008LO,  2xx=MSTW with eigenvector set xx=01..40), 3=NNPDF3.0LO"
         write(io_stdout,"(4X,A)") "VegasNc0:   number of evaluations for integrand scan"
         write(io_stdout,"(4X,A)") "VegasNc1:   number of evaluations for accept-reject sampling"
         write(io_stdout,"(4X,A)") "VegasNc2:   number of events for accept-reject sampling"
@@ -2610,8 +3123,8 @@ integer :: TheUnit
     write(TheUnit,"(A90)") " *   Spin and parity determination of single-produced resonances at hadron colliders   *"
     write(TheUnit,"(A90)") " *                                                                                     *"
     write(TheUnit,"(A90)") " *          I. Anderson, S. Bolognesi, F. Caola, Y. Gao, A. Gritsan, C. Martin,        *"
-    write(TheUnit,"(A90)") " *                  Z. Guo, K. Melnikov, U. Sarica, M. Schulze, N. Tran,               *" 
-    write(TheUnit,"(A90)") " *                            A. Whitbeck, M. Xiao, Y. Zhou                            *"
+    write(TheUnit,"(A90)") " *                Z. Guo, K. Melnikov, H. Roskes, U. Sarica, M. Schulze,               *" 
+    write(TheUnit,"(A90)") " *                   N. Tran, A. Whitbeck, M. Xiao, C. You, Y. Zhou                    *"
     write(TheUnit,"(A90)") " *                Phys.Rev. D81 (2010) 075022;  arXiv:1001.3396 [hep-ph],              *"
     write(TheUnit,"(A90)") " *                Phys.Rev. D86 (2012) 095031;  arXiv:1208.4018 [hep-ph],              *"
     write(TheUnit,"(A90)") " *                Phys.Rev. D89 (2014) 035007;  arXiv:1309.4819 [hep-ph].              *"

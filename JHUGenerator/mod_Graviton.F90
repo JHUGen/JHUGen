@@ -39,26 +39,40 @@
 
 
          if( IsAZDecay(DecayMode1) ) then!  Z decay
-              if( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_) .or. abs(MY_IDUP(6)).eq.abs(TaM_) ) then
-                    aL1=aL_lep
-                    aR1=aR_lep
+              if( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_) ) then
+                    aL1=aL_lep    * dsqrt(scale_alpha_Z_ll)
+                    aR1=aR_lep    * dsqrt(scale_alpha_Z_ll)
+              elseif( abs(MY_IDUP(6)).eq.abs(TaM_) ) then
+                    aL1=aL_lep    * dsqrt(scale_alpha_Z_tt)
+                    aR1=aR_lep    * dsqrt(scale_alpha_Z_tt)
               elseif( abs(MY_IDUP(6)).eq.abs(NuE_) .or. abs(MY_IDUP(6)).eq.abs(NuM_) .or. abs(MY_IDUP(6)).eq.abs(NuT_) ) then
-                    aL1=aL_neu
-                    aR1=aR_neu
+                    aL1=aL_neu    * dsqrt(scale_alpha_Z_nn)
+                    aR1=aR_neu    * dsqrt(scale_alpha_Z_nn)
               elseif( abs(MY_IDUP(6)).eq.abs(Up_) .or. abs(MY_IDUP(6)).eq.abs(Chm_) ) then
-                    aL1=aL_QUp
-                    aR1=aR_QUp
+                    aL1=aL_QUp    * dsqrt(scale_alpha_Z_uu)
+                    aR1=aR_QUp    * dsqrt(scale_alpha_Z_uu)
               elseif( abs(MY_IDUP(6)).eq.abs(Dn_) .or. abs(MY_IDUP(6)).eq.abs(Str_) .or. abs(MY_IDUP(6)).eq.abs(Bot_) ) then
-                    aL1=aL_QDn
-                    aR1=aR_QDn
+                    aL1=aL_QDn    * dsqrt(scale_alpha_Z_dd)
+                    aR1=aR_QDn    * dsqrt(scale_alpha_Z_dd)
               else
                     aL1=0d0
                     aR1=0d0
               endif
               prefactor = prefactor *(one/two*M_V*Ga_V)**2
          elseif( IsAWDecay(DecayMode1) ) then !  W decay
-              aL1 = bL
-              aR1 = bR
+              if( IsAQuark(MY_IDUP(6)) ) then
+                 aL1 = bL * dsqrt(scale_alpha_W_ud)
+                 aR1 = bR * dsqrt(scale_alpha_W_ud)! = 0
+              elseif( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_) ) then
+                 aL1 = bL * dsqrt(scale_alpha_W_ln)
+                 aR1 = bR * dsqrt(scale_alpha_W_ln)! = 0
+              elseif( abs(MY_IDUP(6)).eq.abs(TaM_) ) then
+                 aL1 = bL * dsqrt(scale_alpha_W_tn)
+                 aR1 = bR * dsqrt(scale_alpha_W_tn)! = 0
+              else
+                    aL1=0d0
+                    aR1=0d0
+              endif
               prefactor = prefactor *(one/two*M_V*Ga_V)**2
          elseif( IsAPhoton(DecayMode1) ) then !  photon "decay"
               aL1=1d0
@@ -70,25 +84,39 @@
          endif
 
          if( IsAZDecay(DecayMode2) ) then!  Z decay
-              if( abs(MY_IDUP(8)).eq.abs(ElM_) .or. abs(MY_IDUP(8)).eq.abs(MuM_) .or. abs(MY_IDUP(8)).eq.abs(TaM_) ) then
-                    aL2=aL_lep
-                    aR2=aR_lep
+              if( abs(MY_IDUP(8)).eq.abs(ElM_) .or. abs(MY_IDUP(8)).eq.abs(MuM_) ) then
+                    aL2=aL_lep    * dsqrt(scale_alpha_Z_ll)
+                    aR2=aR_lep    * dsqrt(scale_alpha_Z_ll)
+              elseif( abs(MY_IDUP(8)).eq.abs(TaM_) ) then
+                    aL2=aL_lep    * dsqrt(scale_alpha_Z_tt)
+                    aR2=aR_lep    * dsqrt(scale_alpha_Z_tt)
               elseif( abs(MY_IDUP(8)).eq.abs(NuE_) .or. abs(MY_IDUP(8)).eq.abs(NuM_) .or. abs(MY_IDUP(8)).eq.abs(NuT_) ) then
-                    aL2=aL_neu
-                    aR2=aR_neu
+                    aL2=aL_neu    * dsqrt(scale_alpha_Z_nn)
+                    aR2=aR_neu    * dsqrt(scale_alpha_Z_nn)
               elseif( abs(MY_IDUP(8)).eq.abs(Up_) .or. abs(MY_IDUP(8)).eq.abs(Chm_) ) then
-                    aL2=aL_QUp
-                    aR2=aR_QUp
+                    aL2=aL_QUp    * dsqrt(scale_alpha_Z_uu)
+                    aR2=aR_QUp    * dsqrt(scale_alpha_Z_uu)
               elseif( abs(MY_IDUP(8)).eq.abs(Dn_) .or. abs(MY_IDUP(8)).eq.abs(Str_) .or. abs(MY_IDUP(8)).eq.abs(Bot_) ) then
-                    aL2=aL_QDn
-                    aR2=aR_QDn
+                    aL2=aL_QDn    * dsqrt(scale_alpha_Z_dd)
+                    aR2=aR_QDn    * dsqrt(scale_alpha_Z_dd)
               else
                     aL2=0d0
                     aR2=0d0
               endif
          elseif( IsAWDecay(DecayMode2) ) then !  W decay
-              aL2 = bL
-              aR2 = bR
+              if( IsAQuark(MY_IDUP(8)) ) then
+                 aL2 = bL * dsqrt(scale_alpha_W_ud)
+                 aR2 = bR * dsqrt(scale_alpha_W_ud)! = 0
+              elseif( abs(MY_IDUP(9)).eq.abs(ElM_) .or. abs(MY_IDUP(9)).eq.abs(MuM_) ) then
+                 aL2 = bL * dsqrt(scale_alpha_W_ln)
+                 aR2 = bR * dsqrt(scale_alpha_W_ln)! = 0
+              elseif( abs(MY_IDUP(9)).eq.abs(TaM_) ) then
+                 aL2 = bL * dsqrt(scale_alpha_W_tn)
+                 aR2 = bR * dsqrt(scale_alpha_W_tn)! = 0
+              else
+                    aL2=0d0
+                    aR2=0d0
+              endif
          elseif( IsAPhoton(DecayMode2) ) then !  photon "decay"
               aL2=1d0
               aR2=1d0  
@@ -248,27 +276,39 @@ enddo
 
 
          if( IsAZDecay(DecayMode1) ) then!  Z decay
-              if( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_) .or. abs(MY_IDUP(6)).eq.abs(TaM_) ) then
-                    aL1=aL_lep
-                    aR1=aR_lep
+              if( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_) ) then
+                    aL1=aL_lep    * dsqrt(scale_alpha_Z_ll)
+                    aR1=aR_lep    * dsqrt(scale_alpha_Z_ll)
+              elseif( abs(MY_IDUP(6)).eq.abs(TaM_) ) then
+                    aL1=aL_lep    * dsqrt(scale_alpha_Z_tt)
+                    aR1=aR_lep    * dsqrt(scale_alpha_Z_tt)
               elseif( abs(MY_IDUP(6)).eq.abs(NuE_) .or. abs(MY_IDUP(6)).eq.abs(NuM_) .or. abs(MY_IDUP(6)).eq.abs(NuT_) ) then
-                    aL1=aL_neu
-                    aR1=aR_neu
+                    aL1=aL_neu    * dsqrt(scale_alpha_Z_nn)
+                    aR1=aR_neu    * dsqrt(scale_alpha_Z_nn)
               elseif( abs(MY_IDUP(6)).eq.abs(Up_) .or. abs(MY_IDUP(6)).eq.abs(Chm_) ) then
-                    aL1=aL_QUp
-                    aR1=aR_QUp
+                    aL1=aL_QUp    * dsqrt(scale_alpha_Z_uu)
+                    aR1=aR_QUp    * dsqrt(scale_alpha_Z_uu)
               elseif( abs(MY_IDUP(6)).eq.abs(Dn_) .or. abs(MY_IDUP(6)).eq.abs(Str_) .or. abs(MY_IDUP(6)).eq.abs(Bot_) ) then
-                    aL1=aL_QDn
-                    aR1=aR_QDn
+                    aL1=aL_QDn    * dsqrt(scale_alpha_Z_dd)
+                    aR1=aR_QDn    * dsqrt(scale_alpha_Z_dd)
               else
                     aL1=0d0
                     aR1=0d0
               endif
-!               prefactor = prefactor *(one/two*M_V*Ga_V)**2
          elseif( IsAWDecay(DecayMode1) ) then !  W decay
-              aL1 = bL
-              aR1 = bR
-!               prefactor = prefactor *(one/two*M_V*Ga_V)**2
+              if( IsAQuark(MY_IDUP(6)) ) then
+                 aL1 = bL * dsqrt(scale_alpha_W_ud)
+                 aR1 = bR * dsqrt(scale_alpha_W_ud)! = 0
+              elseif( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_) ) then
+                 aL1 = bL * dsqrt(scale_alpha_W_ln)
+                 aR1 = bR * dsqrt(scale_alpha_W_ln)! = 0
+              elseif( abs(MY_IDUP(6)).eq.abs(TaM_) ) then
+                 aL1 = bL * dsqrt(scale_alpha_W_tn)
+                 aR1 = bR * dsqrt(scale_alpha_W_tn)! = 0
+              else
+                    aL1=0d0
+                    aR1=0d0
+              endif
          elseif( IsAPhoton(DecayMode1) ) then !  photon decay
               aL1=1d0
               aR1=1d0
@@ -279,25 +319,39 @@ enddo
          endif
 
          if( IsAZDecay(DecayMode2) ) then!  Z decay
-              if( abs(MY_IDUP(8)).eq.abs(ElM_) .or. abs(MY_IDUP(8)).eq.abs(MuM_) .or. abs(MY_IDUP(8)).eq.abs(TaM_) ) then
-                    aL2=aL_lep
-                    aR2=aR_lep
+              if( abs(MY_IDUP(8)).eq.abs(ElM_) .or. abs(MY_IDUP(8)).eq.abs(MuM_) ) then
+                    aL2=aL_lep    * dsqrt(scale_alpha_Z_ll)
+                    aR2=aR_lep    * dsqrt(scale_alpha_Z_ll)
+              elseif( abs(MY_IDUP(8)).eq.abs(TaM_) ) then
+                    aL2=aL_lep    * dsqrt(scale_alpha_Z_tt)
+                    aR2=aR_lep    * dsqrt(scale_alpha_Z_tt)
               elseif( abs(MY_IDUP(8)).eq.abs(NuE_) .or. abs(MY_IDUP(8)).eq.abs(NuM_) .or. abs(MY_IDUP(8)).eq.abs(NuT_) ) then
-                    aL2=aL_neu
-                    aR2=aR_neu
+                    aL2=aL_neu    * dsqrt(scale_alpha_Z_nn)
+                    aR2=aR_neu    * dsqrt(scale_alpha_Z_nn)
               elseif( abs(MY_IDUP(8)).eq.abs(Up_) .or. abs(MY_IDUP(8)).eq.abs(Chm_) ) then
-                    aL2=aL_QUp
-                    aR2=aR_QUp
+                    aL2=aL_QUp    * dsqrt(scale_alpha_Z_uu)
+                    aR2=aR_QUp    * dsqrt(scale_alpha_Z_uu)
               elseif( abs(MY_IDUP(8)).eq.abs(Dn_) .or. abs(MY_IDUP(8)).eq.abs(Str_) .or. abs(MY_IDUP(8)).eq.abs(Bot_) ) then
-                    aL2=aL_QDn
-                    aR2=aR_QDn
+                    aL2=aL_QDn    * dsqrt(scale_alpha_Z_dd)
+                    aR2=aR_QDn    * dsqrt(scale_alpha_Z_dd)
               else
                     aL2=0d0
                     aR2=0d0
               endif
          elseif( IsAWDecay(DecayMode2) ) then !  W decay
-              aL2 = bL
-              aR2 = bR
+              if( IsAQuark(MY_IDUP(8)) ) then
+                 aL2 = bL * dsqrt(scale_alpha_W_ud)
+                 aR2 = bR * dsqrt(scale_alpha_W_ud)! = 0
+              elseif( abs(MY_IDUP(9)).eq.abs(ElM_) .or. abs(MY_IDUP(9)).eq.abs(MuM_) ) then
+                 aL2 = bL * dsqrt(scale_alpha_W_ln)
+                 aR2 = bR * dsqrt(scale_alpha_W_ln)! = 0
+              elseif( abs(MY_IDUP(9)).eq.abs(TaM_) ) then
+                 aL2 = bL * dsqrt(scale_alpha_W_tn)
+                 aR2 = bR * dsqrt(scale_alpha_W_tn)! = 0
+              else
+                    aL2=0d0
+                    aR2=0d0
+              endif
          elseif( IsAPhoton(DecayMode2) ) then !  photon decay
               aL2=1d0
               aR2=1d0  
