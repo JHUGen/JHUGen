@@ -171,11 +171,12 @@ END SUBROUTINE
 
 
       
-SUBROUTINE EvalXSec_PP_TTBH(Mom,TTBHcoupl,SelectProcess,Res)
+SUBROUTINE EvalXSec_PP_TTBH(Mom,TTBHcoupl,TopDecays,SelectProcess,Res)
 implicit none
 real(8) :: Mom(1:4,1:13),Res
 complex(8) :: TTBHcoupl(1:2)
 integer :: SelectProcess! 0=gg, 1=qqb, 2=all 
+integer :: TopDecays! 0=stable, 1=di-leptonic
 real(8) :: eta1,eta2,Etot,Pztot,MatElSq_GG,MatElSq_QQB,MatElSq_QBQ
 real(8) :: x1,x2,PDFScale,Collider_Energy,E_CMS
 real(8) :: NNpdf(1:2,-6:7)
@@ -198,16 +199,16 @@ include 'includeVars.F90'
       Mom(1:4,1) = x1 * Mom(1:4,1)
       Mom(1:4,2) = x2 * Mom(1:4,2)
       if( SelectProcess.eq.0 ) then
-          call EvalAmp_GG_TTBH(Mom(1:4,1:13),TTBHcoupl,MatElSq_GG)
+          call EvalAmp_GG_TTBH(Mom(1:4,1:13),TTBHcoupl,TopDecays,MatElSq_GG)
           MatElSq_QQB = 0d0
           MatElSq_QBQ = 0d0
       elseif( SelectProcess.eq.1 ) then
-          call EvalAmp_QQB_TTBH(Mom(1:4,1:13),TTBHcoupl,MatElSq_QQB)
+          call EvalAmp_QQB_TTBH(Mom(1:4,1:13),TTBHcoupl,TopDecays,MatElSq_QQB)
           MatElSq_QBQ = MatElSq_QQB
           MatElSq_GG = 0d0
       else
-          call EvalAmp_GG_TTBH(Mom(1:4,1:13),TTBHcoupl,MatElSq_GG)
-          call EvalAmp_QQB_TTBH(Mom(1:4,1:13),TTBHcoupl,MatElSq_QQB)
+          call EvalAmp_GG_TTBH(Mom(1:4,1:13),TTBHcoupl,TopDecays,MatElSq_GG)
+          call EvalAmp_QQB_TTBH(Mom(1:4,1:13),TTBHcoupl,TopDecays,MatElSq_QQB)
           MatElSq_QBQ = MatElSq_QQB
       endif
       
@@ -234,10 +235,11 @@ END SUBROUTINE
       
 
       
-SUBROUTINE EvalAmp_GG_TTBH(Mom,TTBHcoupl,SqAmp)
+SUBROUTINE EvalAmp_GG_TTBH(Mom,TTBHcoupl,TopDecays,SqAmp)
 ! use ModTopDecay
 implicit none
 real(8) :: Mom(1:4,1:13),SqAmp
+integer :: TopDecays! 0=stable, 1=di-leptonic
 complex(8) :: ResOffSh(1:4,1:2),Res(1:2,1:2),TTBHcoupl(1:2)
 complex(8) :: GluPol(1:4,1:2,1:2)
 integer :: hel4,TopHel1,TopHel2,nhel
@@ -256,8 +258,8 @@ SqAmp = 0d0
      else
         ExtParticles(1)%Mom(1:4) = Mom(1:4,6)+Mom(1:4,7) +Mom(1:4,8)
         ExtParticles(2)%Mom(1:4) = Mom(1:4,9)+Mom(1:4,10)+Mom(1:4,11)
-        call TopDecay(ATop_,Mom(1:4,6:8),ExtParticles(1)%Pol(1:4))
-        call TopDecay(Top_,Mom(1:4,9:11),ExtParticles(2)%Pol(1:4))
+        call TopDecay(ATop_,Mom(1:4,6:8),TopDecays,ExtParticles(1)%Pol(1:4))
+        call TopDecay(Top_,Mom(1:4,9:11),TopDecays,ExtParticles(2)%Pol(1:4))
         nhel=-1
      endif
      ExtParticles(3)%Mom(1:4) =-Mom(1:4,1)    *(-1d0)! for MELA we switch back to all-outgoing conventions
@@ -314,13 +316,14 @@ END SUBROUTINE
       
 
       
-SUBROUTINE EvalAmp_QQB_TTBH(Mom,TTBHcoupl,SqAmp)
+SUBROUTINE EvalAmp_QQB_TTBH(Mom,TTBHcoupl,TopDecays,SqAmp)
 ! use ModTopDecay
 implicit none
 real(8) :: Mom(1:4,1:13),SqAmp
 complex(8) :: ResOffSh(1:4),Res(1:2),TTBHcoupl(1:2)
 complex(8) :: QuaPol(1:4,1:2,1:2)
 integer :: hel4,TopHel1,TopHel2,nhel
+integer :: TopDecays! 0=stable, 1=di-leptonic
 real(8),parameter :: c_aa=8.0D0
 include 'includeVars.F90'
 SqAmp = 0d0
@@ -335,8 +338,8 @@ SqAmp = 0d0
      else
         ExtParticles(1)%Mom(1:4) = Mom(1:4,6)+Mom(1:4,7) +Mom(1:4,8)
         ExtParticles(2)%Mom(1:4) = Mom(1:4,9)+Mom(1:4,10)+Mom(1:4,11)
-        call TopDecay(ATop_,Mom(1:4,6:8),ExtParticles(1)%Pol(1:4))
-        call TopDecay(Top_,Mom(1:4,9:11),ExtParticles(2)%Pol(1:4))
+        call TopDecay(ATop_,Mom(1:4,6:8),TopDecays,ExtParticles(1)%Pol(1:4))
+        call TopDecay(Top_,Mom(1:4,9:11),TopDecays,ExtParticles(2)%Pol(1:4))
         nhel=-1
      endif
      ExtParticles(5)%Mom(1:4) =-Mom(1:4,1)    *(-1d0)! for MELA we switch back to all-outgoing conventions
@@ -5742,11 +5745,12 @@ END SUBROUTINE
 
  
  
-SUBROUTINE TopDecay(Flavor,Mom,Spinor,TopHel)
+SUBROUTINE TopDecay(Flavor,Mom,TopDecays,Spinor,TopHel)
 implicit none
 real(8) :: Mom(:,:)
 integer :: flavor
 integer,optional :: TopHel
+integer :: TopDecays! 0=stable, 1=di-leptonic
 complex(8) :: Spinor(1:4)
 real(8) :: zeros(1:6),TopMom(1:4),NWAFactor_Top
 complex(8) :: Spi(1:4),BarSpi(1:4),BotSpi(1:4),WCurr(1:4)
