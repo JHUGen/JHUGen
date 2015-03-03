@@ -10,7 +10,7 @@ implicit none
 include './variables.F90'
 integer, parameter :: LHA2M_PDF(-6:6) = (/-5,-6,-3,-4,-1,-2,0 ,2,1,4,3,6,5/)
 real(8) :: helicity(9), mass(9,2)
-integer :: id(9)
+integer :: id(9), TopDecays
 real(8) :: p(4,6),p5(4,5),p4(4,4),p9(4,9),p13(4,13)
 real(8) :: MatElSq,M_Reso,Ga_Reso,MatElSqPDF(-5:5,-5:5),check_vbf(-5:5,-5:5),check_sbf(-5:5,-5:5),check_hj(-5:5,-5:5),check_zh(-5:5,-5:5)
 integer :: MY_IDUP(6:9)
@@ -260,19 +260,20 @@ integer :: i, j
    TTBHcoupl(1) = (1d0,0d0)
    TTBHcoupl(2) = (0d0,0d0)
 
-   m_Reso=125.6d0 * GeV
+   m_Reso=125.6d0 * GeV  
    call InitProcess_TTBH(m_Reso)
-   if(TopDecays.eq.0) then 
-      call EvalAmp_GG_TTBH(p13(1:4,1:13),TTBHcoupl,MatElSq)
+
+   TopDecays = 0
+      call EvalAmp_GG_TTBH(p13(1:4,1:13),TTBHcoupl,TopDecays,MatElSq)
       print *, 'Matr.el. squared,gg->ttbH',MatElSq,MatElSq/9.23970258835623247d-003
-      call EvalAmp_QQB_TTBH(p13(1:4,1:13),TTBHcoupl,MatElSq)
+      call EvalAmp_QQB_TTBH(p13(1:4,1:13),TTBHcoupl,TopDecays,MatElSq)
       print *, 'Matr.el. squared,qqb->ttbH',MatElSq,MatElSq/5.00600468807961274d-002
-   else
-      call EvalAmp_GG_TTBH(p13(1:4,1:13),TTBHcoupl,MatElSq)
+
+   TopDecays = 1
+      call EvalAmp_GG_TTBH(p13(1:4,1:13),TTBHcoupl,TopDecays,MatElSq)
       print *, 'Matr.el. squared,gg->ttbH',MatElSq,MatElSq/161.41857569536978d0
-      call EvalAmp_QQB_TTBH(p13(1:4,1:13),TTBHcoupl,MatElSq)
+      call EvalAmp_QQB_TTBH(p13(1:4,1:13),TTBHcoupl,TopDecays,MatElSq)
       print *, 'Matr.el. squared,qqb->ttbH',MatElSq,MatElSq/597.73846213084539d0
-   endif
   
   
 
@@ -300,10 +301,9 @@ integer :: i, j
    call NNinitPDF(0)
 !    call InitProcess_TTBH(m_Reso)! done above already
 
-   if(TopDecays.eq.1) then   
-        call EvalXSec_PP_TTBH(p13(1:4,1:13),TTBHcoupl,2,MatElSq)
+   TopDecays = 1
+        call EvalXSec_PP_TTBH(p13(1:4,1:13),TTBHcoupl,TopDecays,2,MatElSq)
         print *, 'Matr.el. squared,gg->ttbH',MatElSq ,MatElSq/( 1849.90671287913d0 + 2842.07693611093d0 ) * 1.14594184663D0
-   endif
    
    
   

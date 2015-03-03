@@ -3,7 +3,7 @@ implicit none
 save
 ! 
 ! 
-character(len=6),parameter :: JHUGen_Version="v5.2.0"
+character(len=6),parameter :: JHUGen_Version="v5.2.1"
 ! 
 ! 
 integer, public :: Collider, PDFSet,PChannel,Process,DecayMode1,DecayMode2,TopDecays
@@ -45,6 +45,8 @@ logical, public, parameter :: importExternal_LHEinit = .true.
 logical, public, parameter :: writeWeightedLHE = .false. 
 
 logical, public, parameter :: includeGammaStar = .false. 
+
+logical, public, parameter :: RandomizeWpWm = .true. ! randomize DecayMode1 and DecayMode2 in gg-->H-->WW processes
 
 real(8),parameter :: MPhotonCutoff = 4d0*GeV
 
@@ -792,11 +794,12 @@ integer :: PartType
 
 END FUNCTION
 
+
+
 FUNCTION SU2flip(Part)
 implicit none
 integer :: SU2flip
 integer :: Part
-
 
   if( abs(Part).eq.Up_ ) then
       SU2flip = sign(1,Part)*Dn_
@@ -828,6 +831,28 @@ integer :: Part
   endif
 
 END FUNCTION
+
+
+
+
+FUNCTION ChargeFlip(Part)
+implicit none
+integer :: ChargeFlip
+integer :: Part
+
+  if( (abs(Part).ge.1 .and. abs(Part).le.9)  .or. (abs(Part).ge.13 .and. abs(Part).le.16)) then! quarks, leptons, W's, neutrinos
+      ChargeFlip = -Part
+  elseif( (abs(Part).ge.10 .and. abs(Part).le.12) ) then!  glu,pho,Z0
+      ChargeFlip = +Part
+  elseif( Part.eq.25 .or. Part.eq.32 .or. Part.eq.39 ) then ! Higgs,Zprime,Graviton
+      ChargeFlip = +Part
+  else
+      print *, "Error: Invalid flavor in ChargeFlip"
+      stop
+  endif
+
+END FUNCTION
+
 
 
 

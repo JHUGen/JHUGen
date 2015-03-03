@@ -21,7 +21,6 @@ real(8), parameter :: sitW = dsqrt(0.23119d0)       ! sin(Theta_Weinberg) (PDG-2
 
 integer, parameter :: DecayMode1 = 0
 integer, parameter :: DecayMode2 = 0
-integer, parameter :: TopDecays=1
 logical, parameter :: includeInterference = .false.
 logical, parameter :: OffShellReson = .false.
 logical, parameter :: includeGammaStar = .false.
