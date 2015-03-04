@@ -2088,7 +2088,7 @@ include 'csmaxvalue.f'
 ! if(  my_idup(6).eq.my_idup(8)) return! for 2e2mu   ! noi+ 0.92591989,     i+ 0.92775679,   i- 0.14072385,     ix+ 3.2770660  ix-  0.88181581E-02
 ! if(  my_idup(6).ne.my_idup(8)) return! for 4mu/4e  ! noi+ 0.92608512,     i+ 1.01761060,   i- 0.12915384,     ix+  3.5925481 ix-  0.80721147E-02
 !                                                            50/50%              48/52%         52/48%               48%                52%
-
+   if( (RandomizeVVdecays.eqv..true.) ) then
    if( (MY_IDUP(6).ne.MY_IDUP(8)) .and. (IsAZDecay(DecayMode1)) .and. (IsAZDecay(DecayMode2)) ) then
      if( (yrnd(16).le.0.5d0) ) then
       call swapi(MY_IDUP(4),MY_IDUP(5))
@@ -2099,7 +2099,7 @@ include 'csmaxvalue.f'
       call swapi(ICOLUP(2,6),ICOLUP(2,8))
       call swapi(ICOLUP(2,7),ICOLUP(2,9))
      endif
-  elseif( (RandomizeWpWm.eqv..true.) .and. (IsAWDecay(DecayMode1)) .and. (IsAWDecay(DecayMode2)) ) then
+  elseif( (IsAWDecay(DecayMode1)) .and. (IsAWDecay(DecayMode2)) ) then
      if( (yrnd(16).le.0.5d0) ) then
       MY_IDUP(4) = ChargeFlip(MY_IDUP(4))
       MY_IDUP(5) = ChargeFlip(MY_IDUP(5))
@@ -2121,7 +2121,7 @@ include 'csmaxvalue.f'
       call swapi(ICOLUP(2,7),ICOLUP(2,9))
      endif
   endif
-  
+  endif  
   
   yz1 = yRnd(10)
   yz2 = yRnd(11)
@@ -3088,6 +3088,41 @@ include 'csmaxvalue.f'
 !    IDUP(9)  -->  MomDK(:,3)  -->  ubar-spinor
    call VVBranchings(MY_IDUP(4:9),ICOLUP(1:2,6:9))
 
+   if( (RandomizeVVdecays.eqv..true.) ) then
+   if( (MY_IDUP(6).ne.MY_IDUP(8)) .and. (IsAZDecay(DecayMode1)) .and. (IsAZDecay(DecayMode2)) ) then
+     if( (yrnd(16).le.0.5d0) ) then
+      call swapi(MY_IDUP(4),MY_IDUP(5))
+      call swapi(MY_IDUP(6),MY_IDUP(8))
+      call swapi(MY_IDUP(7),MY_IDUP(9))
+      call swapi(ICOLUP(1,6),ICOLUP(1,8))
+      call swapi(ICOLUP(1,7),ICOLUP(1,9))
+      call swapi(ICOLUP(2,6),ICOLUP(2,8))
+      call swapi(ICOLUP(2,7),ICOLUP(2,9))
+     endif
+  elseif( (IsAWDecay(DecayMode1)) .and. (IsAWDecay(DecayMode2)) ) then
+     if( (yrnd(16).le.0.5d0) ) then
+      MY_IDUP(4) = ChargeFlip(MY_IDUP(4))
+      MY_IDUP(5) = ChargeFlip(MY_IDUP(5))
+      MY_IDUP(6) = ChargeFlip(MY_IDUP(6))
+      MY_IDUP(7) = ChargeFlip(MY_IDUP(7))
+      MY_IDUP(8) = ChargeFlip(MY_IDUP(8))
+      MY_IDUP(9) = ChargeFlip(MY_IDUP(9))      
+      ! if there's a charge flip then the order of particle and anti-particles needs to be flipped, too
+      call swapi(MY_IDUP(6),MY_IDUP(7))
+      call swapi(MY_IDUP(8),MY_IDUP(9))
+     endif 
+     if( (yrnd(17).le.0.5d0) ) then
+      call swapi(MY_IDUP(4),MY_IDUP(5))
+      call swapi(MY_IDUP(6),MY_IDUP(8))
+      call swapi(MY_IDUP(7),MY_IDUP(9))
+      call swapi(ICOLUP(1,6),ICOLUP(1,8))
+      call swapi(ICOLUP(1,7),ICOLUP(1,9))
+      call swapi(ICOLUP(2,6),ICOLUP(2,8))
+      call swapi(ICOLUP(2,7),ICOLUP(2,9))
+     endif
+  endif
+  endif  
+      
 
   eta1=1d0; eta2=1d0
   sHatJacobi = 1d0
@@ -3222,7 +3257,6 @@ include 'csmaxvalue.f'
 
 
 IF( GENEVT ) THEN
-
 
       MY_IDUP(1:2)=(/Glu_,Glu_/)
       ICOLUP(1:2,1) = (/501,502/)
