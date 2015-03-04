@@ -3,7 +3,7 @@ implicit none
 save
 ! 
 ! 
-character(len=6),parameter :: JHUGen_Version="v5.2.1"
+character(len=6),parameter :: JHUGen_Version="v5.2.2"
 ! 
 ! 
 integer, public :: Collider, PDFSet,PChannel,Process,DecayMode1,DecayMode2,TopDecays
@@ -46,9 +46,9 @@ logical, public, parameter :: writeWeightedLHE = .false.
 
 logical, public, parameter :: includeGammaStar = .false. 
 
-logical, public, parameter :: RandomizeWpWm = .true. ! randomize DecayMode1 and DecayMode2 in gg-->H-->WW processes
-
 real(8),parameter :: MPhotonCutoff = 4d0*GeV
+
+logical, public, parameter :: RandomizeVVdecays = .true. ! randomize DecayMode1 and DecayMode2 in H-->VV decays
 
 real(8), public, parameter :: M_Top   = 173d0     *GeV      ! 
 real(8), public, parameter :: Ga_Top  = 1.33d0    *GeV      ! 
