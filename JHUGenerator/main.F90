@@ -1981,12 +1981,12 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                   if( LHE_IDUP(nline).gt.0 ) then
                          LHE_IDUP(nline) = convertLHE( ZLepBranching(xRnd) )   
                          LHE_ICOLUP(1:2,nline) = (/0,0/)
-                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
+                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) ) /GeV
                          DecayParticles(i) = nline; i=i+1;
                   else
                          LHE_IDUP(nline) = convertLHE( -ZLepBranching(xRnd) )    
                          LHE_ICOLUP(1:2,nline) = (/0,0/)
-                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
+                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) ) /GeV
                          DecayParticles(i) = nline; i=i+1;
                   endif
 
@@ -1995,12 +1995,12 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                          LHE_IDUP(nline) = convertLHE( WLepBranching(xRnd) )   
                          LHE_IDUP(nline) = -LHE_IDUP(nline)! converts LepM to LepP
                          LHE_ICOLUP(1:2,nline) = (/0,0/)
-                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
+                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) ) /GeV
                          DecayParticles(i) = nline; i=i+1;
                   else
                          LHE_IDUP(nline) = convertLHE( - SU2flip(WLepBranching(xRnd)) )  
                          LHE_ICOLUP(1:2,nline) = (/0,0/)
-                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
+                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) ) /GeV
                          DecayParticles(i) = nline; i=i+1;
                   endif
 
@@ -2008,13 +2008,13 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                   if( LHE_IDUP(nline).gt.0 ) then
                          LHE_IDUP(nline) = convertLHE( Su2flip(WLepBranching(xRnd)) )   
                          LHE_ICOLUP(1:2,nline) = (/0,0/)
-                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
+                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) ) /GeV
                          DecayParticles(i) = nline; i=i+1;
                   else
                          LHE_IDUP(nline) = convertLHE( -WLepBranching(xRnd) )   
                          LHE_IDUP(nline) = -LHE_IDUP(nline)! converts -LepM to +LepM
                          LHE_ICOLUP(1:2,nline) = (/0,0/)
-                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
+                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) ) /GeV
                          DecayParticles(i) = nline; i=i+1;
                   endif
 
@@ -2022,12 +2022,12 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                   if( LHE_IDUP(nline).gt.0 ) then
                          LHE_IDUP(nline) = convertLHE( ZLepPlusTauBranching(xRnd) )   
                          LHE_ICOLUP(1:2,nline) = (/0,0/)
-                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
+                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) ) /GeV
                          DecayParticles(i) = nline; i=i+1;
                   else
                          LHE_IDUP(nline) = convertLHE( -ZLepPlusTauBranching(xRnd) )    
                          LHE_ICOLUP(1:2,nline) = (/0,0/)
-                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
+                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) ) /GeV
                          DecayParticles(i) = nline; i=i+1;
                   endif
 
@@ -2036,12 +2036,12 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                          LHE_IDUP(nline) = convertLHE( WLepPlusTauBranching(xRnd) )   
                          LHE_IDUP(nline) = -LHE_IDUP(nline)! converts LepM to LepP
                          LHE_ICOLUP(1:2,nline) = (/0,0/)
-                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
+                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) ) /GeV
                          DecayParticles(i) = nline; i=i+1;
                   else
                          LHE_IDUP(nline) = convertLHE( - SU2flip(WLepPlusTauBranching(xRnd)) )  
                          LHE_ICOLUP(1:2,nline) = (/0,0/)
-                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
+                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) ) /GeV
                          DecayParticles(i) = nline; i=i+1;
                   endif
 
@@ -2049,13 +2049,13 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                   if( LHE_IDUP(nline).gt.0 ) then
                          LHE_IDUP(nline) = convertLHE( Su2flip(WLepPlusTauBranching(xRnd)) )   
                          LHE_ICOLUP(1:2,nline) = (/0,0/)
-                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
+                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) ) /GeV
                          DecayParticles(i) = nline; i=i+1;
                   else
                          LHE_IDUP(nline) = convertLHE( -WLepPlusTauBranching(xRnd) )   
                          LHE_IDUP(nline) = -LHE_IDUP(nline)! converts -LepM to +LepM
                          LHE_ICOLUP(1:2,nline) = (/0,0/)
-                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
+                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) ) /GeV
                          DecayParticles(i) = nline; i=i+1;
                   endif
               
@@ -2063,12 +2063,12 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                   if( LHE_IDUP(nline).gt.0 ) then
                          LHE_IDUP(nline) = convertLHE( ZQuaBranching(xRnd) )   
                          LHE_ICOLUP(1:2,nline) = (/505,0/)
-                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
+                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) ) /GeV
                          DecayParticles(i) = nline; i=i+1;
                   else
                          LHE_IDUP(nline) = convertLHE( -ZQuaBranching(xRnd) )    
                          LHE_ICOLUP(1:2,nline) = (/0,505/)
-                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
+                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) ) /GeV
                          DecayParticles(i) = nline; i=i+1;                      
                   endif
 
@@ -2076,12 +2076,12 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                   if( LHE_IDUP(nline).gt.0 ) then
                          LHE_IDUP(nline) = convertLHE( WQuaUpBranching(xRnd) )   
                          LHE_ICOLUP(1:2,nline) = (/505,0/)
-                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
+                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) ) /GeV
                          DecayParticles(i) = nline; i=i+1;
                   else
                          LHE_IDUP(nline) = convertLHE( - SU2flip(WQuaUpBranching(xRnd)) )  
                          LHE_ICOLUP(1:2,nline) = (/0,505/)
-                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
+                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) ) /GeV
                          DecayParticles(i) = nline; i=i+1;
                   endif
 
@@ -2089,12 +2089,12 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                   if( LHE_IDUP(nline).gt.0 ) then
                          LHE_IDUP(nline) = convertLHE( Su2flip(WQuaUpBranching(xRnd)) )   
                          LHE_ICOLUP(1:2,nline) = (/505,0/)
-                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
+                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) ) /GeV
                          DecayParticles(i) = nline; i=i+1;
                   else
                          LHE_IDUP(nline) = convertLHE( -WQuaUpBranching(xRnd) )   
                          LHE_ICOLUP(1:2,nline) = (/0,505/)
-                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
+                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) ) /GeV
                          DecayParticles(i) = nline; i=i+1;
                   endif
               
@@ -2106,7 +2106,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                          else
                              LHE_ICOLUP(1:2,nline) = (/0,0/)
                          endif
-                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
+                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) ) /GeV
                          DecayParticles(i) = nline; i=i+1;
                   else
                          LHE_IDUP(nline) = convertLHE( -ZAnyBranching(xRnd) )    
@@ -2115,7 +2115,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                          else
                              LHE_ICOLUP(1:2,nline) = (/0,0/)
                          endif
-                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
+                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) ) /GeV
                          DecayParticles(i) = nline; i=i+1;                      
                   endif
 
@@ -2135,7 +2135,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                               LHE_ICOLUP(1:2,nline) = (/0,0/)
                               LHE_IDUP(nline) = -LHE_IDUP(nline)! converts LepM to LepP
                          endif
-                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
+                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) ) /GeV
                          DecayParticles(i) = nline; i=i+1;
 !                          print *, "here 2",  -WAnyBranching(xRnd), - SU2flip(WAnyBranching(xRnd))
 !                          pause
@@ -2146,7 +2146,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                          else
                               LHE_ICOLUP(1:2,nline) = (/0,0/)
                          endif                         
-                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
+                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) ) /GeV
                          DecayParticles(i) = nline; i=i+1;
                   endif
 
@@ -2158,7 +2158,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                          else
                               LHE_ICOLUP(1:2,nline) = (/0,0/)
                          endif                         
-                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
+                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) ) /GeV
                          DecayParticles(i) = nline; i=i+1;
 !                          print *, "here", ( SU2flip(WAnyBranching(xRnd)) ),-( -WAnyBranching(xRnd) ) 
 !                          pause
@@ -2170,7 +2170,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                               LHE_ICOLUP(1:2,nline) = (/0,0/)
                               LHE_IDUP(nline) = -LHE_IDUP(nline)! converts -LepM to +LepM
                          endif                  
-                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) )
+                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) ) /GeV
                          DecayParticles(i) = nline; i=i+1;
                   endif
                   

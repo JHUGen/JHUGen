@@ -5312,7 +5312,7 @@ END SUBROUTINE
       complex(8) :: vVq(size(sp)) 
 
 !            vVq = -(0d0,1d0)*( coupl_left*Chir(.true., spi2_(e1,sp)) + coupl_right*Chir(.false., spi2_(e1,sp)) )  
-           vVq = -(0d0,1d0)*( coupl_left*Chir(.false.,sp) + coupl_right*Chir(.true.,sp) )    !?????
+           vVq = -(0d0,1d0)*( coupl_left*Chir(.false.,sp) + coupl_right*Chir(.true.,sp) )
 
            
       return

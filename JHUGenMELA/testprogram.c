@@ -269,36 +269,36 @@ int main(void){
  MReso = 125.60 / 100.0;
  __modttbh_MOD_initprocess_ttbh(&MReso);
 
- int TopDecays=1;   // this parameter has to match the one in variables.F90; only for the purpose of this test
- if( TopDecays==0 ) {  
-      __modttbh_MOD_evalamp_gg_ttbh(Ptth, TTBHcoupl ,&MatElSq);
+ int TopDecays=0;
+      __modttbh_MOD_evalamp_gg_ttbh(Ptth, TTBHcoupl, &TopDecays ,&MatElSq);
       printf("\n ");
       printf("no production dynamics\n ");
       printf("Matr.el. squared (gg->ttbh): %20.17e \n ",MatElSq);
       printf("result should be (gg->ttbh): %20.17e \n ",9.23970258835623247e-003);
       printf("ratio: %20.17e \n ",MatElSq/9.23970258835623247e-003);
 
-      __modttbh_MOD_evalamp_qqb_ttbh(Ptth, TTBHcoupl, &MatElSq);
+      __modttbh_MOD_evalamp_qqb_ttbh(Ptth, TTBHcoupl, &TopDecays, &MatElSq);
       printf("\n ");
       printf("no production dynamics\n ");
       printf("Matr.el. squared (qqb->ttbh): %20.17e \n ",MatElSq);
       printf("result should be (qqb->ttbh): %20.17e \n ",5.00600468807961274e-002);
       printf("ratio: %20.17e \n ",MatElSq/5.00600468807961274e-002);
- } else {
-      __modttbh_MOD_evalamp_gg_ttbh(Ptth, TTBHcoupl ,&MatElSq);
+
+      
+ TopDecays=1;      
+      __modttbh_MOD_evalamp_gg_ttbh(Ptth, TTBHcoupl, &TopDecays ,&MatElSq);
       printf("\n ");
       printf("no production dynamics\n ");
       printf("Matr.el. squared (gg->ttbh): %20.17e \n ",MatElSq);
       printf("result should be (gg->ttbh): %20.17e \n ",161.41857569536978);
       printf("ratio: %20.17e \n ",MatElSq/161.41857569536978);
 
-      __modttbh_MOD_evalamp_qqb_ttbh(Ptth, TTBHcoupl, &MatElSq);
+      __modttbh_MOD_evalamp_qqb_ttbh(Ptth, TTBHcoupl, &TopDecays, &MatElSq);
       printf("\n ");
       printf("no production dynamics\n ");
       printf("Matr.el. squared (qqb->ttbh): %20.17e \n ",MatElSq);
       printf("result should be (qqb->ttbh): %20.17e \n ",597.73846213084539);
       printf("ratio: %20.17e \n ",MatElSq/597.73846213084539);   
- }
 
  
  
@@ -375,16 +375,14 @@ int main(void){
  TopDecays=1;   // this parameter has to match the one in variables.F90; only for the purpose of this test
 
  
-  if( TopDecays==1 ) {  
+  TopDecays=1;
       someParam=2;
-      __modttbh_MOD_evalxsec_pp_ttbh(Ptth, TTBHcoupl, &someParam, &MatElSq);
+      __modttbh_MOD_evalxsec_pp_ttbh(Ptth, TTBHcoupl, &TopDecays, &someParam, &MatElSq);
       printf("\n ");
       printf("no production dynamics\n ");
       printf("Matr.el. squared (pp->ttbh): %20.17e \n ",MatElSq);
       printf("result should be (pp->ttbh): %20.17e \n ",(1849.90671287913+2842.07693611093)/ 1.1459418466);
       printf("ratio: %20.17e \n ",MatElSq/(1849.90671287913+2842.07693611093)*1.1459418466);
- }
- 
  
  
  
