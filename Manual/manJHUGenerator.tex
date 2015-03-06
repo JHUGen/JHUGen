@@ -16,7 +16,7 @@
 
 \vspace{0.6cm}
 
-\title{ 
+\title{
 \large
 Manual for the JHU generator
 }
@@ -24,7 +24,7 @@ Manual for the JHU generator
 \begin{center}
 \small
 For simulation of a single-produced resonance at hadron colliders \\
-(version 4.8.1, release date October 31, 2014) \\
+(version 5.2.2, release date March 6, 2014) \\
 \normalsize
 \end{center}
 
@@ -72,10 +72,10 @@ The list of command line configurables and the default values are (also defined 
 \begin{verbatim}
     Collider:   1=LHC, 2=Tevatron, 0=e+e-
     Process:    0=spin-0, 1=spin-1, 2=spin-2 resonance, 50=pp/ee->VH,
-                60=weakVBF, 61=pp->Hjj
+                60=weakVBF, 61=pp->Hjj, 80=ttH
     MReso:      resonance mass (default=126.00), format: yyy.xx
-    DecayMode1: decay mode for vector boson 1 (Z/W+/gamma)
-    DecayMode2: decay mode for vector boson 2 (Z/W-/gamma)
+    DecayMode1: decay mode for vector boson 1 (Z/W/gamma)
+    DecayMode2: decay mode for vector boson 2 (Z/W/gamma)
                   0=Z->2l,  1=Z->2q, 2=Z->2tau, 3=Z->3nu,
                   4=W->lnu, 5=W->2q, 6=W->taunu,
                   7=gamma, 8=Z->2l+2tau,
@@ -83,7 +83,8 @@ The list of command line configurables and the default values are (also defined 
     PChannel:   0=g+g, 1=q+qb, 2=both
     OffXVV:     off-shell option for resonance(X),or vector bosons(VV)
     PDFSet:     1=CTEQ6L1(2001),  2=MSTW(2008),  
-                                2xx=MSTW with eigenvector set xx=01..40)
+                                2xx=MSTW with eigenvector set xx=01..40,
+                                3=NNPDF2.0LO
     VegasNc0:   number of evaluations for integrand scan
     VegasNc1:   number of evaluations for accept-reject sampling
     VegasNc2:   number of events for accept-reject sampling
@@ -92,17 +93,20 @@ The list of command line configurables and the default values are (also defined 
                 1=include interference
     DataFile:   LHE output file
     ReadLHE:    LHE input file from external file (only spin-0)
+    ConvertLHE: Convert decay of the V from VH production.
+                Use DecayMode1 to specify the decay.
+                (should be a Z or W mode, depending on the input file)
+    TopDK:      For Process=80, 0=leave top quarks as stable, 1=decay top quarks
 \end{verbatim}   
    
 \noindent
 A few more details on some particular parameters:
 
 \begin{itemize}
-\item {\verb|VegasNc0,1,2|}: For unweighted event generation VegasNc0 specifies the number of evaluations for the initial integrand scan.  The actual event generation is controlled by either VegasNc1 or VegasNc2. VegasNc1 specifies the number of tries in the accept/reject phase and VegasNc2 is the number of generated events. When generating unweighted events in ReadLHE mode, both VegasNc1 or VegasNc2 can be used to specify the number of generated events. For the generation of weighted events VegasNc1 specifies the number of evaluations for each of 5 iterations during the initial integrand scan. VegasNc2 gives the (approximate) number of generated weighted events.
+\item {\verb|VegasNc0,1,2|}: For unweighted event generation \verb|VegasNc0| specifies the number of evaluations for the initial integrand scan.  The actual event generation is controlled by either \verb|VegasNc1| or \verb|VegasNc2|. \verb|VegasNc1| specifies the number of tries in the accept/reject phase and \verb|VegasNc2| is the number of generated events. When generating unweighted events in \verb|ReadLHE| mode, both \verb|VegasNc1| or \verb|VegasNc2| can be used to specify the number of generated events. For the generation of weighted events \verb|VegasNc1| specifies the number of evaluations for each of 5 iterations during the initial integrand scan. \verb|VegasNc2| gives the (approximate) number of generated weighted events.
 \item {\verb|OffXVV|}: The program does not work for $ZZ$ or $WW$ if you set them to be on-shell (\verb|OffXVV="000"|) and the mass of the $X$ resonance to be below the $m_{VV}$ threshold.  In general, the more off-shell the process, or the more "1" you have, the less efficient the \verb|VegasNc1| evaluations are.  Specifically, if you are interested then, in producing a resonance with mass below threshold $m_{VV}$ with a very narrow resonance, it is most efficient to generate with \verb|OffXVV="011"|
 \item \verb|PChannel|: This parameter is only meaningful in the spin-2 case.  For spin-0, production is possible only via the $gg$ process and for spin-1, production is only possible via the $q\bar{q}$ process.
-\item \verb|DecayMode2=7| note: Valid for spin-0 and spin-2, only OffXVV=000 or 100 are possible.  
-\item \verb|VegasNc| note: \verb|VegasNc1| allows the user to set the number of tries for the reject/accept method, \verb|VegasNc2| allows the user to let the program run until the number of events is generated.
+\item \verb|DecayMode2=7| note: Valid for spin-0 and spin-2, only OffXVV=000 or 100 are possible.
 \end{itemize}
 
 \noindent
@@ -149,8 +153,8 @@ Then, as an example of running the generator, you could do:
 
 \noindent
 For generating Higgs decay in VBF, H+JJ, or VH production
-modes by the JHU generator or NLO gluon fusion with another generator (e.g. POWHEG), use JHU generator in LHE 
-conversion mode and specify the decay mode of interest (ZZ, WW, gam gam, Z gam), while the SM fermionic decays 
+modes by the JHU generator or NLO gluon fusion with another generator (e.g. POWHEG), use JHU generator in \verb|ReadLHE|
+mode and specify the decay mode of interest (ZZ, WW, gam gam, Z gam), while the SM fermionic decays
 may be generated by Pythia without loss of generality.
 
 \subsection{ Configuration in parameter file  }
@@ -188,6 +192,12 @@ collinear singularity. This cutoff parameter is controlled by
 real(8),parameter :: MPhotonCutoff = 4d0*GeV.
 \end{verbatim}
 
+\noindent
+For $VV$ decay, by default the $V$'s are randomized so that, for example, \verb|DecayMode1=5 DecayMode2=11| will produce all combinations that include at least one hadronic $W$ decay (rather of specifically hadronic decay of the $W^+$).  This can be switched off by changing
+\begin{verbatim}
+logical, public, parameter :: RandomizeVV = .true.
+\end{verbatim}
+to \verb|.false.|.  In this case, \verb|DecayMode1| will refer specifically to the $W^+$ and \verb|DecayMode2| to the $W^-$.  For $ZZ$ decay, this parameter only determines whether the decays of first and second $Z$ written to the LHE file are randomized or not; in this case the only effect is the appearance of the output.
 
 \noindent
 {\it Only for final states with 4 same flavor fermions }, one can include interference effects between the leptons.  The interference is controlled by the command line parameter:
@@ -209,36 +219,47 @@ The remaining parameters are more-or-less self-explanatory:
 real(8), public, parameter :: GeV=1d0/100d0
 real(8), public, parameter :: percent=1d0/100d0
 real(8), public :: M_V,Ga_V
+real(8), public, parameter :: M_Top   = 173d0     *GeV      !
+real(8), public, parameter :: Ga_Top  = 1.33d0    *GeV     !
 real(8), public, parameter :: M_Z     = 91.1876d0 *GeV      ! Z boson mass (PDG-2011)
 real(8), public, parameter :: Ga_Z    = 2.4952d0  *GeV      ! Z boson width(PDG-2011)
 real(8), public, parameter :: M_W     = 80.399d0  *GeV      ! W boson mass (PDG-2011)
 real(8), public, parameter :: Ga_W    = 2.085d0   *GeV      ! W boson width(PDG-2011)
-real(8), public            :: M_Reso  = 125.6d0   *GeV      ! X resonance mass (spin 0, spin 1, spin 2)     (carefule: no longer a parameter, can be overwritten by command line argument)
+real(8), public            :: M_Reso  = 125.6d0   *GeV      ! X resonance mass (spin 0, spin 1,
+                                                            !  spin 2) (careful: no longer a
+                                                            !  parameter, can be overwritten by
+                                                            !  command line argument)
 real(8), public, parameter :: Ga_Reso = 0.00415d0 *GeV      ! X resonance width
-real(8), public, parameter :: Lambda  = 1000d0    *GeV      ! Lambda coupling enters in two places
-                                                            ! overal scale for x-section and in power
-                                                            ! suppressed operators/formfactors (former r).
+real(8), public, parameter :: Lambda  = 1000d0    *GeV      ! Lambda coupling enters in two
+                                                            !  places: overall scale for
+                                                            !  x-section and in power suppressed
+                                                            !  operators/formfactors (former r).
 
-real(8), public, parameter :: m_el = 0.00051100d0  *GeV         ! electron mass
-real(8), public, parameter :: m_mu = 0.10566d0  *GeV              ! muon mass
-real(8), public, parameter :: m_tau = 1.7768d0  *GeV                ! tau mass
+real(8), public, parameter :: m_el = 0.00051100d0  *GeV     ! electron mass
+real(8), public, parameter :: m_mu = 0.10566d0  *GeV        ! muon mass
+real(8), public, parameter :: m_tau = 1.7768d0  *GeV        ! tau mass
+real(8), public, parameter :: m_bot = 4.2000d0     *GeV     ! bottom quark mass
 
 
 real(8), public, parameter :: Gf = 1.16639d-5/GeV**2        ! fermi constant
 real(8), public, parameter :: vev = 1.0d0/sqrt(Gf*sqrt(2.0d0))
 real(8), public, parameter :: gwsq = 4.0d0 * M_W**2/vev**2  ! weak constant squared
-real(8), public, parameter :: alpha_QED = 1d0/128.0d0       ! el.magn. coupling
+real(8), public, parameter :: alpha_QED = 1d0/132.2319d0    ! el.magn. coupling
 real(8), public, parameter :: alphas = 0.13229060d0         ! strong coupling
 real(8), public, parameter :: sitW = dsqrt(0.23119d0)       ! sin(Theta_Weinberg) (PDG-2008)
 real(8), public            :: Mu_Fact                       ! pdf factorization scale 
-                                                              (set to M_Reso in main.F90)
-real(8), public, parameter :: LHC_Energy=14000d0  *GeV       ! LHC hadronic center of mass energy
-real(8), public, parameter :: TEV_Energy=1960d0  *GeV       ! Tevatron hadronic center of mass energy
-real(8), public, parameter :: ILC_Energy=250d0  *GeV        ! Linear collider center of mass energy
-real(8), public, parameter :: POL_A = 0d0                   !e+ polarization. 0: no polarization, 100: 
-                                                             helicity = 1, -100: helicity = -1
-real(8), public, parameter :: POL_B = 0d0                   !e- polarization. 0: no polarization, 100: 
-                                                             helicity = 1, -100: helicity = -1
+                                                            ! (set to M_Reso in main.F90)
+real(8), public, parameter :: LHC_Energy=14000d0  *GeV      ! LHC hadronic center of mass energy
+real(8), public, parameter :: TEV_Energy=1960d0  *GeV       ! Tevatron hadronic center of mass
+                                                            !  energy
+real(8), public, parameter :: ILC_Energy=250d0  *GeV        ! Linear collider center of mass
+                                                            !  energy
+real(8), public, parameter :: POL_A = 0d0                   !e+ polarization. 0: no polarization,
+                                                            !                 100: helicity = 1,
+                                                            !                -100: helicity = -1
+real(8), public, parameter :: POL_B = 0d0                   !e- polarization. 0: no polarization,
+                                                                              100: helicity = 1,
+                                                                              -100: helicity = -1
 logical, public, parameter :: H_DK =.true.                  !default to false so H in 
                                                              V > VH (Process = 50) does not decay
 real(8), public, parameter :: ptjetcut = 15d0*GeV           ! jet min pt
@@ -250,12 +271,26 @@ real(8), public, parameter :: Rjet = 0.5d0                  ! jet deltaR, antikt
 The branching fractions of $Z$ and $W$ bosons depend on the above input parameter and can slightly vary from the given PDG measurements.
 Those branchings can be rescaled with the parameters below.
 \begin{verbatim}
-real(8), public, parameter :: scale_alpha_Z_uu = 1.04282d0 ! scaling factor of alpha (~partial width) for Z > u u~, c c~
-real(8), public, parameter :: scale_alpha_Z_dd = 1.04282d0 ! scaling factor of alpha (~partial width) for Z > d d~, s s~, b b~
-real(8), public, parameter :: scale_alpha_Z_ll = 1d0       ! scaling factor of alpha (~partial width) for Z > l+ l-
-real(8), public, parameter :: scale_alpha_Z_nn = 1d0       ! scaling factor of alpha (~partial width) for Z > nu nu~
-real(8), public, parameter :: scale_alpha_W_ud = 1.0993819d0 ! scaling factor of alpha (~partial width) for W > u d, c s
-real(8), public, parameter :: scale_alpha_W_ln = 1d0       ! scaling factor of alpha (~partial width) for W > l nu
+real(8), public, parameter :: scale_alpha_Z_uu = 1.037560d0 ! scaling factor of alpha
+                                                           ! (~partial width) for Z > u u~, c c~
+real(8), public, parameter :: scale_alpha_Z_dd = 1.037560d0 ! scaling factor of alpha
+                                                           ! (~partial width) for
+                                                           ! Z > d d~, s s~, b b~
+real(8), public, parameter :: scale_alpha_Z_ll = 1d0       ! scaling factor of alpha
+                                                           ! (~partial width) for Z > l+ l-
+                                                           ! (l=e, mu)
+real(8), public, parameter :: scale_alpha_Z_tt = 1d0       ! scaling factor of alpha
+                                                           ! (~partial width) for Z > tau+ tau-
+real(8), public, parameter :: scale_alpha_Z_nn = 1d0       ! scaling factor of alpha
+                                                           ! (~partial width) for Z > nu nu~
+real(8), public, parameter :: scale_alpha_W_ud = 1.038200d0  ! scaling factor of alpha
+                                                             ! (~partial width) for W > u d
+real(8), public, parameter :: scale_alpha_W_cs = 1.038200d0  ! scaling factor of alpha
+                                                             ! (~partial width) for W > c s
+real(8), public, parameter :: scale_alpha_W_ln = 1d0       ! scaling factor of alpha
+                                                           ! (~partial width) for W > l nu
+real(8), public, parameter :: scale_alpha_W_tn = 1d0       ! scaling factor of alpha
+                                                           ! (~partial width) for W > tau nu
 \end{verbatim}
 These default values rescale the branchings to include the NLO QCD corrections ($1+\alpha_s/\pi$).
 
@@ -298,7 +333,8 @@ All parameters can be modified in \verb|mod_Parameters.F90| by:
    complex(8), public, parameter :: ahg2 = (0.0d0,0d0)
    complex(8), public, parameter :: ahg3 = (0.0d0,0d0)  ! pseudoscalar
    complex(8), public, parameter :: ahz1 = (1.0d0,0d0)
-   complex(8), public, parameter :: ahz2 = (0.0d0,0d0)  ! this coupling does not contribute for gamma+gamma final states
+   complex(8), public, parameter :: ahz2 = (0.0d0,0d0)  ! this coupling does not contribute for
+                                                        ! gamma+gamma final states
    complex(8), public, parameter :: ahz3 = (0.0d0,0d0)  ! pseudoscalar
 
 !-- parameters that define off-shell spin 0 coupling to SM fields, see note
@@ -598,6 +634,21 @@ Instructions for setting up the JHUGenMELA with MCFM are in the file \verb|JHUGe
 
 \section{ Release notes }
 
+\noindent
+In going from \verb|4.8.1| to \verb|5.2.2|, the updates are as follows:
+\begin{itemize}
+\item Add \verb|Process=80| for $ttH$ production, with optional top decays including full spin correlations
+\item Add \verb|ConvertLHE| option for converting VH decay to any DecayMode
+\item Add support for NNPDF
+\item Make $\verb|DecayMode1|\ne\verb|DecayMode2|$ equivalent to generating everything and then filtering
+\item Add option for randomizing the $V$'s in $HVV$ decays
+\item Fixes for smoother reading of LHE files:
+\begin{itemize}
+\item Write invariant mass for all particles
+\item Fixes in mother assignment
+\end{itemize}
+\item In \verb|ReadLHE| and \verb|ConvertLHE|, preserve comments and optional tags from the input LHE
+\end{itemize}
 
 \noindent
 In going from \verb|v4.5.2| to \verb|v4.8.1|, the updates are as follows:
