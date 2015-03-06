@@ -245,6 +245,15 @@ if( (IsAZDecay(DecayMode1)).and.(IsAZDecay(DecayMode2)) .and. abs(LHE_IDUP(7)).e
         call swapi(MOTHUP(2,6),MOTHUP(2,8))
         Z1FV(1:4) = MomDummy(1:4,3)+MomDummy(1:4,6)
         Z2FV(1:4) = MomDummy(1:4,5)+MomDummy(1:4,4)
+
+        tmp = (Z1FV(1:4)).dot.(Z1FV(1:4))
+        if( tmp.lt. -1d-3 ) print *, "Error 4: large negative mass!",tmp
+        V1Mass = dSQRT(dabs(tmp))
+        if( V1Mass.lt.1d-5 ) V1Mass=0d0
+        tmp = (Z2FV(1:4)).dot.(Z2FV(1:4))
+        if( tmp.lt. -1d-3 ) print *, "Error 5: large negative mass!",tmp
+        V2Mass = dSQRT(dabs(tmp))
+        if( V2Mass.lt.1d-5 ) V2Mass=0d0
     endif
 endif
 
