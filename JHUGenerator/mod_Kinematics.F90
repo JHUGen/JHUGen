@@ -32,7 +32,7 @@ real(8),optional :: MomFSPartons(:,:)
 real(8),optional :: EventWeight
 character(len=160),optional :: EventInfoLine,PDFLine
 integer,optional :: MOTHUP_Parton(:,:)
-real(8) :: Spin, Lifetime
+real(8) :: Spin, Lifetime,s34,s36,s45,s56,smallestInv
 real(8) :: XFV(1:4), Z1FV(1:4), Z2FV(1:4)
 real(8) :: MomDummy(1:4,1:4+maxpart)
 real(8) :: Part1Mass,Part2Mass,XMass,V1Mass,V2Mass,L11Mass,L12Mass,L21Mass,L22Mass,tmp,PartonMass(1:4+maxpart)
@@ -183,6 +183,26 @@ if( (OffShellV1).or.(OffShellV2).or.(IsAPhoton(DecayMode2)) ) then
 endif
 
 
+
+!  associte lepton pairs to MOTHUP
+if( (IsAZDecay(DecayMode1)).and.(IsAZDecay(DecayMode2)) .and. abs(LHE_IDUP(7)).eq.abs(LHE_IDUP(9)) ) then 
+     s34 = Get_MInv( Mom(1:4,3)+Mom(1:4,4) )
+     s56 = Get_MInv( Mom(1:4,5)+Mom(1:4,6) )
+     s36 = Get_MInv( Mom(1:4,3)+Mom(1:4,6) )
+     s45 = Get_MInv( Mom(1:4,4)+Mom(1:4,5) )
+     smallestInv = minloc((/dabs(s34-M_V),dabs(s56-M_V),dabs(s36-M_V),dabs(s45-M_V)/),1)        
+     if( smallestInv.eq.3 .or. smallestInv.eq.4 ) then
+        call swapi(MOTHUP(1,6),MOTHUP(1,8))
+        call swapi(MOTHUP(2,6),MOTHUP(2,8))
+        Z1FV(1:4) = MomDummy(1:4,3)+MomDummy(1:4,6)
+        Z2FV(1:4) = MomDummy(1:4,5)+MomDummy(1:4,4)
+     endif
+endif
+
+
+
+
+
 ! calculating and checking masses
 tmp = (MomDummy(1:4,1)).dot.(MomDummy(1:4,1))
 if( tmp.lt. -1d-3 ) print *, "Error 1: large negative mass!",tmp
@@ -236,17 +256,9 @@ do a=1,NumFSPartons
 enddo
 
 
-!  associte lepton pairs to MOTHUP
-if( (IsAZDecay(DecayMode1)).and.(IsAZDecay(DecayMode2)) .and. abs(LHE_IDUP(7)).eq.abs(LHE_IDUP(9)) ) then 
-    mZ1 = Get_MInv( Mom(1:4,3)+Mom(1:4,4) )
-    mZ2 = Get_MInv( Mom(1:4,3)+Mom(1:4,6) )
-    if( dabs(mZ2-m_V) .lt. dabs(mZ1-m_V)  ) then
-        call swapi(MOTHUP(1,6),MOTHUP(1,8))! this used to be swapi(MOTHUP(1,6),MOTHUP(1,9)) which I believe is wrong
-        call swapi(MOTHUP(2,6),MOTHUP(2,8))
-        Z1FV(1:4) = MomDummy(1:4,3)+MomDummy(1:4,6)
-        Z2FV(1:4) = MomDummy(1:4,5)+MomDummy(1:4,4)
-    endif
-endif
+
+
+
 
 write(io_LHEOutFile,"(A)") "<event>"
 if( ReadLHEFile .and. importExternal_LHEinit .and. present(EventInfoLine) ) then
