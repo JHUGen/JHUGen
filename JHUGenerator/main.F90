@@ -3082,7 +3082,7 @@ implicit none
         write(io_stdout,*) ""
         write(io_stdout,"(2X,A)") "Command line arguments:"
         write(io_stdout,"(4X,A)") "Collider:   1=LHC, 2=Tevatron, 0=e+e-"
-        write(io_stdout,"(4X,A)") "Process:    0=spin-0, 1=spin-1, 2=spin-2 resonance, 50=pp/ee->VH, 60=weakVBF, 61=pp->Hjj, 80=pp->ttbar+H"
+        write(io_stdout,"(4X,A)") "Process: 0=spin-0, 1=spin-1, 2=spin-2 resonance, 50=pp/ee->VH, 60=weakVBF, 61=pp->Hjj, 62=pp->Hj, 80=pp->ttbar+H"
         write(io_stdout,"(4X,A)") "MReso:      resonance mass (default=125.60), format: yyy.xx"
         write(io_stdout,"(4X,A)") "DecayMode1: decay mode for vector boson 1 (Z/W+/gamma)"
         write(io_stdout,"(4X,A)") "DecayMode2: decay mode for vector boson 2 (Z/W-/gamma)"
