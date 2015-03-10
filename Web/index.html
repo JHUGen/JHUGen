@@ -4,6 +4,24 @@
     <meta content="text/html; charset=ISO-8859-1"
       http-equiv="Content-Type">
     <title>JHU Generator</title>
+    <script type="text/javascript">
+    function UnCrypt(s, shift) {
+    <!-- Decrypts string 's' that has been crypted with shift 'shift' -->
+      var n=0;
+      var r="";
+      for(var i=0;i<s.length;i++) { 
+        n=s.charCodeAt(i); 
+        if (n>=8364) {n = 128;}
+        r += String.fromCharCode(n-(shift)); 
+      }
+      return r;
+    }
+    function changeText(idElement) {
+        var element = document.getElementById('emailus');
+        element.innerHTML = UnCrypt('pvtcpBhpcn0iqx="octmwu0uejwn|gBegtp0ej',+2);
+        element.href = "mailto: "+element.innerHTML;
+    }
+    </script>
   </head>
   <body style=" color: rgb(0, 0, 0); background-color: rgb(255, 255,
     255);" alink="#EE0000" link="#0000EE" vlink="#551A8B">
@@ -44,8 +62,9 @@
                     href="http://arxiv.org/abs/1309.4819">http://arxiv.org/abs/1309.4819&nbsp;</a>&nbsp;&nbsp;
                 </font><br>
               <br>
-              <font size="-1">contacts: Markus Schulze, Nhan Tran (<a
-                  href="mailto:ntran@fnal.gov,schulze@pha.jhu.edu">email us</a>)</font><br>            
+              <font size="-1">contacts: Markus Schulze, Nhan Tran (
+               <a href="#" id="emailus" onClick="javascript:changeText()"> <u>Email Us </u></a>)
+              </font><br>            
             </div>
           </td>
         </tr>
@@ -55,7 +74,7 @@
       rgb(255, 204, 204);">
       <hr> <a href="index.html">Home</a> <a
         href="Generator/Download.html">Download (requires registration)</a>
-      <a href="manJHUGenerator.v4.5.2.pdf">Manual</a><br>
+      <a href="manJHUGenerator.v5.2.3.pdf">Manual</a><br>
       <hr> </center>
       <font style="font-family: Lucida Grande;" size="-1"><br>
               <span style="text-decoration: underline;">References:</span><br>
