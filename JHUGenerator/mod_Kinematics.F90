@@ -704,8 +704,8 @@ do i=1,11
     MomDummy(3,i) = 100.0d0*Mom(3,i)
     MomDummy(4,i) = 100.0d0*Mom(4,i)
 enddo
-    MomDummy(1:4,Wm) = MomDummy(1:4,bbar)+ MomDummy(1:4,lepM)
-    MomDummy(1:4,Wp) = MomDummy(1:4,b)   + MomDummy(1:4,lepP)
+    MomDummy(1:4,Wm) = MomDummy(1:4,nubar)+ MomDummy(1:4,lepM)
+    MomDummy(1:4,Wp) = MomDummy(1:4,nu)   + MomDummy(1:4,lepP)
 
 
 
@@ -746,11 +746,11 @@ if( TopDecays.ne.0 ) then
 
     ! W-
     i=12
-    write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), 0,0 ,MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
+    write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), 0,0 ,MomDummy(2:4,i),MomDummy(1,i),M_W*100d0,Lifetime,Spin
 
     ! W+
     i=13
-    write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), 0,0 ,MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
+    write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), 0,0 ,MomDummy(2:4,i),MomDummy(1,i),M_W*100d0,Lifetime,Spin
 
     ! bb
     i=6
