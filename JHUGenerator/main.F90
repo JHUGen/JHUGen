@@ -2181,7 +2181,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
          enddo! nline
          
          call ShiftMass(MomExt(1:4,DecayParticles(1)),MomExt(1:4,DecayParticles(2)),         &
-                        getMass( convertLHEreverse(LHE_IDUP(DecayParticles(1))) ), getMass( convertLHEreverse(LHE_IDUP(DecayParticles(2))) ),                                                &
+                        getMass( convertLHEreverse(LHE_IDUP(DecayParticles(1))) )/GeV, getMass( convertLHEreverse(LHE_IDUP(DecayParticles(2))) )/GeV,                                                &
                         MomShift(1:4,DecayParticles(1)),MomShift(1:4,DecayParticles(2)))
          
 !          print *, getMass( convertLHEreverse(LHE_IDUP(DecayParticles(1))) ), getMass( convertLHEreverse(LHE_IDUP(DecayParticles(2))) )
