@@ -1314,8 +1314,8 @@ real(8) :: yRnd(1:22),Res,dum,EMcheck(1:4)
 real(8) :: AcceptedEvent(1:4,1:maxpart),Ehat
 real(8) :: MomExt(1:4,1:maxpart),MomHiggs(1:4),MomParton(1:4,1:maxpart),Mass(1:maxpart),pH2sq
 integer :: tries, nParticle, MY_IDUP(1:7+maxpart), ICOLUP(1:2,1:7+maxpart),IntExt
-character(len=*),parameter :: POWHEG_Fmt0 = "(6X,I2,A160)"
-character(len=*),parameter :: POWHEG_Fmt1 = "(6X,I2,4X,I3,4X,I3,3X,I3,1X,I3,3X,I3,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9)"
+character(len=*),parameter :: POWHEG_Fmt0 = "(5X,I2,A160)"
+character(len=*),parameter :: POWHEG_Fmt1 = "(5X,I3,4X,I2,4X,I2,4X,I2,2X,I4,2X,I4,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9)"
 character(len=*),parameter :: JHUGen_Fmt0 = "(I2,A160)"
 character(len=*),parameter :: JHUGen_Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0)"
 character(len=*),parameter :: JHUGen_old_Fmt0 = "(2X,I2,A160)"
@@ -1590,8 +1590,8 @@ real(8) :: yRnd(1:22),Res,dum,EMcheck(1:4)
 real(8) :: HiggsDK_Mom(1:4,4:9),Ehat
 real(8) :: MomExt(1:4,1:maxpart),MomHiggs(1:4),Mass(1:maxpart),pH2sq
 integer :: tries, nParticle, HiggsDK_IDUP(1:9), ICOLUP(1:2,1:7+maxpart),LHE_IntExt(1:7+maxpart),HiggsDK_ICOLUP(1:2,1:9)
-character(len=*),parameter :: POWHEG_Fmt0 = "(6X,I2,A160)"
-character(len=*),parameter :: POWHEG_Fmt1 = "(5X,I3,4X,I3,4X,I3,3X,I3,1X,I3,3X,I3,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9)"
+character(len=*),parameter :: POWHEG_Fmt0 = "(5X,I2,A160)"
+character(len=*),parameter :: POWHEG_Fmt1 = "(5X,I3,4X,I2,4X,I2,4X,I2,2X,I4,2X,I4,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9)"
 character(len=*),parameter :: JHUGen_Fmt0 = "(I2,A160)"
 character(len=*),parameter :: JHUGen_Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0)"
 character(len=*),parameter :: JHUGen_old_Fmt0 = "(2X,I2,A160)"
@@ -1707,7 +1707,6 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
          if( EventNumPart.lt.3 .or. EventNumPart.gt.maxpart ) then
             call Error("Number of particles in LHE input exceeds allowed limit",EventNumPart)
          endif
-
          do nline=1,EventNumPart
             read(EventLine(nline),fmt=InputFmt1) LHE_IDUP(nline),LHE_IntExt(nline),LHE_MOTHUP(1,nline),LHE_MOTHUP(2,nline),LHE_ICOLUP(1,nline),LHE_ICOLUP(2,nline),MomExt(2,nline),MomExt(3,nline),MomExt(4,nline),MomExt(1,nline),Mass(nline)
             MomExt(1:4,nline) = MomExt(1:4,nline)*GeV!  convert to units of 100GeV
@@ -1825,8 +1824,8 @@ real(8) :: yRnd(1:22),Res,dum,EMcheck(1:4),xRnd
 real(8) :: AcceptedEvent(1:4,1:maxpart),Ehat,pH2sq
 real(8) :: MomExt(1:4,1:maxpart),MomShift(1:4,1:maxpart),MomHiggs(1:4),MomParton(1:4,1:maxpart),Mass(1:maxpart),Spin(1:maxpart),Lifetime(1:maxpart)
 integer :: tries, nParticle, MY_IDUP(1:7+maxpart), ICOLUP(1:2,1:7+maxpart),IntExt(1:7+maxpart),convertparent
-character(len=*),parameter :: POWHEG_Fmt0 = "(6X,I2,A120)"
-character(len=*),parameter :: POWHEG_Fmt1 = "(5X,I3,4X,I3,4X,I3,3X,I3,1X,I3,3X,I3,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9,1X,1PE12.5,1X,1PE10.3)"
+character(len=*),parameter :: POWHEG_Fmt0 = "(5X,I2,A160)"
+character(len=*),parameter :: POWHEG_Fmt1 = "(5X,I3,4X,I2,4X,I2,4X,I2,2X,I4,2X,I4,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9,1X,1PE12.5,1X,1PE10.3)"
 character(len=*),parameter :: JHUGen_Fmt0 = "(I2,A120)"
 character(len=*),parameter :: JHUGen_Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0)"
 character(len=*),parameter :: JHUGen_old_Fmt0 = "(2X,I2,A160)"
@@ -2182,7 +2181,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
          enddo! nline
          
          call ShiftMass(MomExt(1:4,DecayParticles(1)),MomExt(1:4,DecayParticles(2)),         &
-                        getMass( convertLHEreverse(LHE_IDUP(DecayParticles(1))) ), getMass( convertLHEreverse(LHE_IDUP(DecayParticles(2))) ),                                                &
+                        getMass( convertLHEreverse(LHE_IDUP(DecayParticles(1))) )/GeV, getMass( convertLHEreverse(LHE_IDUP(DecayParticles(2))) )/GeV,                                                &
                         MomShift(1:4,DecayParticles(1)),MomShift(1:4,DecayParticles(2)))
          
 !          print *, getMass( convertLHEreverse(LHE_IDUP(DecayParticles(1))) ), getMass( convertLHEreverse(LHE_IDUP(DecayParticles(2))) )
@@ -2246,8 +2245,8 @@ END SUBROUTINE
 ! use ModParameters
 ! use ModMisc
 ! implicit none
-! character(len=*),parameter :: POWHEG_Fmt0 = "(6X,I2,A160)"
-! character(len=*),parameter :: POWHEG_Fmt1 = "(5X,I3,4X,I3,4X,I3,3X,I3,1X,I3,3X,I3,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9)"
+! character(len=*),parameter :: POWHEG_Fmt0 = "(5X,I2,A160)"
+! character(len=*),parameter :: POWHEG_Fmt1 = "(5X,I3,4X,I2,4X,I2,4X,I2,2X,I4,2X,I4,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9)"
 ! character(len=*),parameter :: JHUGen_Fmt0 = "(I2,A160)"
 ! character(len=*),parameter :: JHUGen_Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0)"
 ! character(len=*),parameter :: JHUGen_old_Fmt0 = "(2X,I2,A160)"
@@ -3083,7 +3082,7 @@ implicit none
         write(io_stdout,*) ""
         write(io_stdout,"(2X,A)") "Command line arguments:"
         write(io_stdout,"(4X,A)") "Collider:   1=LHC, 2=Tevatron, 0=e+e-"
-        write(io_stdout,"(4X,A)") "Process:    0=spin-0, 1=spin-1, 2=spin-2 resonance, 50=pp/ee->VH, 60=weakVBF, 61=pp->Hjj, 62=pp->Hj, 80=pp->ttbar+H"
+        write(io_stdout,"(4X,A)") "Process: 0=spin-0, 1=spin-1, 2=spin-2 resonance, 50=pp/ee->VH, 60=weakVBF, 61=pp->Hjj, 62=pp->Hj, 80=pp->ttbar+H"
         write(io_stdout,"(4X,A)") "MReso:      resonance mass (default=125.60), format: yyy.xx"
         write(io_stdout,"(4X,A)") "DecayMode1: decay mode for vector boson 1 (Z/W+/gamma)"
         write(io_stdout,"(4X,A)") "DecayMode2: decay mode for vector boson 2 (Z/W-/gamma)"

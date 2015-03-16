@@ -643,11 +643,11 @@ use ModParameters
 implicit none
 real(8) :: Mom(1:4,1:11)
 real(8),optional :: EventWeight
-integer :: MY_IDUP(1:11),ICOLUP(1:2,1:11),LHE_IDUP(1:11),ISTUP(1:11),MOTHUP(1:2,1:11)
+integer :: MY_IDUP(1:11),ICOLUP(1:2,1:11),LHE_IDUP(1:13),ISTUP(1:13),MOTHUP(1:2,1:13)
 integer :: NUP,IDPRUP,i
-real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP,Lifetime,Spin,MomDummy(1:4,1:11)
+real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP,Lifetime,Spin,MomDummy(1:4,1:13)
 character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0)"
-integer, parameter :: tbar=4,t=5,Hbos=3,inLeft=1,inRight=2,bbar=6, lepM=7,nubar=8,b=9,lepP=10,nu=11
+integer, parameter :: tbar=4,t=5,Hbos=3,inLeft=1,inRight=2,bbar=6, lepM=7,nubar=8,b=9,lepP=10,nu=11, Wm=12, Wp=13
 
 
 ! For description of the LHE format see http://arxiv.org/abs/hep-ph/0109068 and http://arxiv.org/abs/hep-ph/0609017
@@ -657,14 +657,15 @@ integer, parameter :: tbar=4,t=5,Hbos=3,inLeft=1,inRight=2,bbar=6, lepM=7,nubar=
 do i=1,11
     LHE_IDUP(i) = convertLHE( MY_IDUP(i) )
 enddo
-
+LHE_IDUP(12) = convertLHE( Wm_ )
+LHE_IDUP(13) = convertLHE( Wp_ )
 
 IDPRUP=100
 SCALUP=Mu_Fact * 100d0
 AQEDUP=alpha_QED
 AQCDUP=0.11d0
 
-ISTUP(1:11) = (/-1,-1,1,2,2,1,1,1,1,1,1/)
+ISTUP(1:13) = (/-1,-1,1,2,2,1,1,1,1,1,1,2,2/)
 
 
 MOTHUP(1:2,inLeft)  = (/0,0/)
@@ -673,16 +674,19 @@ MOTHUP(1:2,Hbos)    = (/1,2/)
 MOTHUP(1:2,tbar)    = (/1,2/)
 MOTHUP(1:2,t)       = (/1,2/)
 MOTHUP(1:2,bbar)    = (/4,4/)
-MOTHUP(1:2,lepM)    = (/4,4/)
-MOTHUP(1:2,nubar)   = (/4,4/)
+MOTHUP(1:2,lepM)    = (/6,6/)
+MOTHUP(1:2,nubar)   = (/6,6/)
 MOTHUP(1:2,b)       = (/5,5/)
-MOTHUP(1:2,lepP)    = (/5,5/)
-MOTHUP(1:2,nu)      = (/5,5/)
+MOTHUP(1:2,lepP)    = (/7,7/)
+MOTHUP(1:2,nu)      = (/7,7/)
+MOTHUP(1:2,Wm)      = (/4,4/)
+MOTHUP(1:2,Wp)      = (/5,5/)
+
 
 if( TopDecays.eq.0 ) then
    NUP = 5
 else
-   NUP=11
+   NUP=13
 endif
 
 if( present(EventWeight) ) then
@@ -700,7 +704,8 @@ do i=1,11
     MomDummy(3,i) = 100.0d0*Mom(3,i)
     MomDummy(4,i) = 100.0d0*Mom(4,i)
 enddo
-
+    MomDummy(1:4,Wm) = MomDummy(1:4,nubar)+ MomDummy(1:4,lepM)
+    MomDummy(1:4,Wp) = MomDummy(1:4,nu)   + MomDummy(1:4,lepP)
 
 
 
@@ -738,6 +743,15 @@ write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(
 
 
 if( TopDecays.ne.0 ) then
+
+    ! W-
+    i=12
+    write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), 0,0 ,MomDummy(2:4,i),MomDummy(1,i),M_W*100d0,Lifetime,Spin
+
+    ! W+
+    i=13
+    write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), 0,0 ,MomDummy(2:4,i),MomDummy(1,i),M_W*100d0,Lifetime,Spin
+
     ! bb
     i=6
     write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
