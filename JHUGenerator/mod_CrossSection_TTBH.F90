@@ -123,22 +123,8 @@ END FUNCTION
 
 
 
-! weighted: this was obtained with mu=m_reso
-! ./JHUGen Process=80 TopDK=1 PChannel=0 Unweighted=0 1.4725086
-! ./JHUGen Process=80 TopDK=1 PChannel=1 Unweighted=0 0.70816989
-! ./JHUGen Process=80 TopDK=1 PChannel=2 Unweighted=0 2.1803083
-! ratio gg/qqb = 2.08
 
-
-! unweighting: this was obtained with mu=0.5d0*( 2d0*M_top + M_Reso )
-! ./JHUGen Process=80 TopDK=1 PChannel=2 VegasNc0=100000 VegasNc2=1000
-! Acceptance Counter_part: 0 620
-! Acceptance Counter_part: 1 380
-! Acceptance Counter_part: 0 6417
-! Acceptance Counter_part: 1 3583
-
-
-FUNCTION EvalUnWeighted_TTBH(yRnd,genEvt,RES)
+FUNCTION EvalUnWeighted_TTBH(yRnd,genEvt,iPartons,RES)
 use ModKinematics
 use ModParameters
 use ModTTBHiggs
@@ -149,16 +135,14 @@ use ifport
 implicit none
 real(8) :: yRnd(1:16),VgsWgt, EvalUnWeighted_TTBH
 real(8) :: pdf(-6:6,1:2),RES(-5:5,-5:5)
-real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi,bound(0:121)
-real(8) :: MomExt(1:4,1:13), PSWgt,PSWgt2,PSWgt3,CS_Max,sumtot
+real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi
+real(8) :: MomExt(1:4,1:13), PSWgt,PSWgt2,PSWgt3,CS_Max
 real(8) :: LO_Res_GG_Unpol,LO_Res_QQB_Unpol,PreFac,PDFFac1,PDFFac2
-integer :: NBin(1:NumHistograms),NHisto
-integer :: MY_IDUP(1:11),ICOLUP(1:2,1:11)
-integer :: nparton,k,ifound,jfound
+integer :: NBin(1:NumHistograms),NHisto,iPartons(1:2)
+integer :: MY_IDUP(1:11),ICOLUP(1:2,1:11),nparton
 logical :: applyPSCut,genEvt
 include 'csmaxvalue.f'  
 EvalUnWeighted_TTBH = 0d0
-! RES(:,:) = 0d0
 
 
    call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
@@ -193,91 +177,38 @@ EvalUnWeighted_TTBH = 0d0
 
 IF( GENEVT ) THEN   
 
-
-
-      if( PChannel.eq.2 ) then
-
-print *, "ERROR"
-stop
-!           PDFFac1 = pdf( LHA2M_pdf(ifound),1) * pdf( LHA2M_pdf(jfound) ,2)!      this does not work because the bound composition of gg and qqb initial states is correct,
-!           CS_max = CSmax(ifound,jfound)                                   !      but gets additionally weighted by efficiencies of gg and qqb IS.
-!           MY_IDUP(1:5) = (/LHA2M_ID(ifound),LHA2M_ID(jfound),Hig_,ATop_,Top_/) ! this screws up the overall composition
-!           ICOLUP(1:2,1:11) = 0
-!           if( ifound.eq.0 ) then
-!               call EvalAmp_GG_TTBH(MomExt,LO_Res_GG_Unpol)
-!               EvalUnWeighted_TTBH = LO_Res_GG_Unpol * PDFFac1 * PreFac
-!               CS_max = CSmax(0,0)
-!           else
-!               call EvalAmp_QQB_TTBH(MomExt,LO_Res_QQB_Unpol)
-!               EvalUnWeighted_TTBH = LO_Res_QQB_Unpol * PDFFac1 * PreFac
-!               CS_max = CSmax(ifound,jfound)
-!           endif
-            
-!          PDFFac1 = pdf(0,1)*pdf(0,2)
-!          PDFFac2 = pdf(+1,1)*pdf(-1,2) + pdf(+2,1)*pdf(-2,2) + pdf(+3,1)*pdf(-3,2) + pdf(+4,1)*pdf(-4,2) + pdf(+5,1)*pdf(-5,2)  &
-!                  + pdf(-1,1)*pdf(+1,2) + pdf(-2,1)*pdf(+2,2) + pdf(-3,1)*pdf(+3,2) + pdf(-4,1)*pdf(+4,2) + pdf(-5,1)*pdf(+5,2) 
-!          CS_max = CSmax(0,0) + CSmax(+1,-1) + CSmax(+2,-2) + CSmax(+3,-3) + CSmax(+4,-4) + CSmax(+5,-5)   &
-!                              + CSmax(-1,+1) + CSmax(-2,+2) + CSmax(-3,+3) + CSmax(-4,+4) + CSmax(-5,+5) 
-!                             
-!          MY_IDUP(1:5) = (/LHA2M_ID(ifound),LHA2M_ID(jfound),Hig_,ATop_,Top_/)
-!          ICOLUP(1:2,1:11) = 0
-!              call EvalAmp_GG_TTBH(MomExt,LO_Res_GG_Unpol)
-!              EvalUnWeighted_TTBH = LO_Res_GG_Unpol * PDFFac1 * PreFac
-!              call EvalAmp_QQB_TTBH(MomExt,LO_Res_QQB_Unpol)
-!              EvalUnWeighted_TTBH = EvalUnWeighted_TTBH   &
-!                                  + LO_Res_QQB_Unpol * PDFFac2 * PreFac
           
-      elseif( PChannel.eq.0 ) then
-          ifound=0; jfound=0
+      if( iPartons(1).eq.0 .and. iPartons(2).eq.0 ) then
+      
           call EvalAmp_GG_TTBH(MomExt,LO_Res_GG_Unpol)
           PDFFac1 = pdf(0,1)*pdf(0,2)
           EvalUnWeighted_TTBH = LO_Res_GG_Unpol * PDFFac1 * PreFac
-          CS_max = CSmax(0,0)
           MY_IDUP(1:5) = (/Glu_,Glu_,Hig_,ATop_,Top_/)
           ICOLUP(1:2,1:11) = 0
           
-      elseif( PChannel.eq.1 ) then
-          sumtot = 0d0
-          do nparton = -5,5
-                if( nparton.eq.0 ) cycle
-                sumtot = sumtot + VG(nparton,-nparton)
-          enddo
-          k=0; bound(:)=0d0
-          ifound=-99; jfound=-99
-          do nparton = -5,5
-            if( nparton.eq.0 ) cycle
-            k=k+1
-            bound(k) = bound(k-1) + VG(nparton,-nparton)/sumtot
-            if( yRnd(8).gt.bound(k-1) .and. yRnd(8).lt.bound(k)  ) then
-                ifound=nparton; jfound=-nparton;
-                exit
-            endif
-          enddo
+      else
 
           call EvalAmp_QQB_TTBH(MomExt,LO_Res_QQB_Unpol)
-          PDFFac1 = pdf( LHA2M_pdf(ifound),1) * pdf( LHA2M_pdf(jfound),2)
+          PDFFac1 = pdf( LHA2M_pdf(iPartons(1)),1) * pdf( LHA2M_pdf(iPartons(2)),2)
           EvalUnWeighted_TTBH = LO_Res_QQB_Unpol * PDFFac1 * PreFac 
-          CS_max = CSmax(ifound,jfound)
-          MY_IDUP(1:5) = (/Up_,AUp_,Hig_,ATop_,Top_/)
+          MY_IDUP(1:5) = (/ LHA2M_pdf(iPartons(1)),LHA2M_pdf(iPartons(2)),Hig_,ATop_,Top_/)
           ICOLUP(1:2,1:11) = 0
+
       endif
-
-
-
+      
+      CS_max = CSmax(iPartons(1),iPartons(2))
       if( EvalUnWeighted_TTBH .gt. CS_max) then
-!         write(io_stdout,"(2X,A,1PE13.6,1PE13.6)")  "CS_max is too small.",EvalUnWeighted_TTBH, CS_max
          write(io_LogFile,"(2X,A,1PE13.6,1PE13.6)") "CS_max is too small.",EvalUnWeighted_TTBH, CS_max
          AlertCounter = AlertCounter + 1
       elseif( EvalUnWeighted_TTBH .gt. yRnd(16)*CS_max ) then
          AccepCounter = AccepCounter + 1
-         AccepCounter_part(ifound,jfound) = AccepCounter_part(ifound,jfound)+1
+         AccepCounter_part(iPartons(1),iPartons(2)) = AccepCounter_part(iPartons(1),iPartons(2))+1
          call WriteOutEvent_TTBH(MomExt,MY_IDUP(1:11),ICOLUP(1:2,1:11))
          do NHisto=1,NumHistograms
                call intoHisto(NHisto,NBin(NHisto),1d0)
          enddo
-      else
-         RejeCounter = RejeCounter + 1
       endif
+      EvalCounter = EvalCounter + 1 
       
 
 
@@ -293,7 +224,7 @@ ELSE! NOT GENEVT
           
           RES(0,0) = EvalUnWeighted_TTBH
           if (EvalUnWeighted_TTBH.gt.csmax(0,0)) then
-              csmax(0,0) = EvalUnWeighted_TTBH
+              CSmax(0,0) = EvalUnWeighted_TTBH
           endif
       endif
       
@@ -325,7 +256,7 @@ ELSE! NOT GENEVT
             endif
             EvalUnWeighted_TTBH = LO_Res_QQB_Unpol * PreFac *PDFFac1
             RES(nparton,-nparton) = EvalUnWeighted_TTBH
-            if (EvalUnWeighted_TTBH.gt.csmax(nparton,-nparton)) csmax(nparton,-nparton) = EvalUnWeighted_TTBH
+            if (EvalUnWeighted_TTBH.gt.csmax(nparton,-nparton)) CSmax(nparton,-nparton) = EvalUnWeighted_TTBH
           enddo
       endif
 
