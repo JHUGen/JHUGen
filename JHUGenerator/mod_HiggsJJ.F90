@@ -175,7 +175,7 @@ contains
     !-- qq->qq, up
     amp_z = A0_VV_4f(4,1,3,2,vvcoupl,za,zb,sprod,m_z,ga_z)
     amp_z_b = -A0_VV_4f(3,1,4,2,vvcoupl,za,zb,sprod,m_z,ga_z)
-
+    
     restmp = ((abs(amp_z(-1,-1))**2+abs(amp_z_b(-1,-1))**2) * Lu**2 + &
          (abs(amp_z(-1,+1))**2+abs(amp_z_b(-1,+1))**2) * Lu * Ru + &
          (abs(amp_z(+1,-1))**2+abs(amp_z_b(+1,-1))**2) * Lu * Ru + &
@@ -635,7 +635,7 @@ contains
     iprop12 = sprod(j1,j2) - mv**2 + ci * mv * ga_v
     iprop34 = sprod(j3,j4) - mv**2 + ci * mv * ga_v
 
-    A0_VV_4f = A0_VV_4f/vev/iprop12/iprop34
+    A0_VV_4f = A0_VV_4f/vev /iprop12/iprop34
 
     return
 
