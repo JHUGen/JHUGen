@@ -29,8 +29,11 @@ logical,parameter :: useBetaVersion=.false.! this should be set to .false.
    if( .not.useBetaVersion .and.   ConvertLHEFile ) then
         call StartConvertLHE(VG_Result,VG_Error)
    elseif( .not.useBetaVersion .and. .not.ReadLHEFile ) then
-        if( Process.ne.80 ) call StartVegas(VG_Result,VG_Error)
-        if( Process.eq.80 ) call StartVegas_NEW(VG_Result,VG_Error)
+        if( Process.eq.80 .or. Process.eq.60 .or. Process.eq.61 ) then
+           call StartVegas_NEW(VG_Result,VG_Error)
+        else
+           call StartVegas(VG_Result,VG_Error)
+        endif
    elseif( useBetaVersion .and. .not.ReadLHEFile ) then
         call StartVegas_BETA(VG_Result,VG_Error)
    elseif( .not.useBetaVersion .and.      ReadLHEFile ) then
@@ -628,22 +631,8 @@ if( VegasNc2.eq.-1 .and.  .not. (unweighted) ) VegasNc2 = VegasNc2_default
 if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !----------------------- weighted events
 
 
-    if (seed_random) then 
-#if compiler==1
-        call random_seed()
-#elif compiler==2
-        call random_seed(size=n)
-        allocate(gfort_seed(n))
-        call system_clock(count=clock)
-        gfort_seed = clock + 37 * (/ (i - 1, i = 1, n) /)
-        call random_seed(put = gfort_seed)
-        deallocate(gfort_seed)        
-#endif
-        call random_number(VegasSeed)
-        VegasSeed = - abs( VegasSeed*10000d0 )
-    else
-        VegasSeed = -19d0
-    endif
+
+    call InitRandomSeed(VegasSeed)
     idum = int(VegasSeed)
 
     if( (GenerateEvents.eqv..true.) ) then
@@ -701,19 +690,8 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
     VG = zero
     VG2= zero
     csmax = zero
-    if (seed_random) then 
-#if compiler==1
-        call random_seed()
-#elif compiler==2
-        call random_seed(size=n)
-        allocate(gfort_seed(n))
-        call system_clock(count=clock)
-        gfort_seed = clock + 37 * (/ (i - 1, i = 1, n) /)
-        call random_seed(put = gfort_seed)
-        deallocate(gfort_seed)        
-#endif
-    endif
 
+    call InitRandomSeed(VegasSeed)
 
     if( .not. ReadCSmax ) then
         print *, " finding maximal weight with ",VegasNc0," evaluations"
@@ -722,7 +700,7 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
             call random_number(yRnd)
             if (Process.eq.60 .or. Process.eq.61) then
                 RES = 0d0
-                dum = EvalUnWeighted_HJJ(yRnd,.false.,RES)
+                dum = EvalUnWeighted_HJJ(yRnd,.false.,(/-99,-99/),RES)
                 VG = VG + RES
             elseif (Process.eq.62) then
                 RES = 0d0
@@ -732,11 +710,6 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
                 RES = 0d0
                 dum = EvalUnWeighted_VHiggs(yRnd,.false.,RES)
                 VG = VG + RES
-            elseif (Process.eq.80) then
-                RES = 0d0
-                dum = EvalUnWeighted_TTBH(yRnd,.false.,RES)
-                VG = VG + RES
-                VG2 = VG2 + RES**2
             else
                 if (PChannel_aux.eq.0.or.PChannel_aux.eq.2) then
                     PChannel= 0
@@ -793,18 +766,7 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
     AlertCounter = 0
     AccepCounter_part = 0
 
-    if (seed_random) then 
-#if compiler==1
-        call random_seed()
-#elif compiler==2
-        call random_seed(size=n)
-        allocate(gfort_seed(n))
-        call system_clock(count=clock)
-        gfort_seed = clock + 37 * (/ (i - 1, i = 1, n) /)
-        call random_seed(put = gfort_seed)
-        deallocate(gfort_seed)        
-#endif
-    endif
+    call InitRandomSeed(VegasSeed)
 
     call cpu_time(time_start)
     warmup = .true.
@@ -813,13 +775,11 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
         do i=1,VegasNc1
             call random_number(yRnd)
             if (Process.eq.60 .or. Process.eq.61) then
-                      dum = EvalUnWeighted_HJJ(yRnd,.true.,RES)! RES is a dummy here
+                      dum = EvalUnWeighted_HJJ(yRnd,.true.,(/-99,-99/),RES)! RES is a dummy here
             elseif (Process.eq.62) then
                       dum = EvalUnWeighted_HJ(yRnd,.true.,RES)! RES is a dummy here
             elseif (Process.eq.50) then
                       dum = EvalUnWeighted_VHiggs(yRnd,.true.,RES)! RES is a dummy here
-            elseif (Process.eq.80) then
-                      dum = EvalUnWeighted_TTBH(yRnd,.true.,RES)! RES is a dummy here
             else
                 dum = EvalUnWeighted(yRnd,.true.,RES)! RES is a dummy here
             endif
@@ -831,13 +791,11 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
         do while( AccepCounter.lt.VegasNc2 )
               call random_number(yRnd)
               if (Process.eq.60 .or. Process.eq.61) then
-                dum = EvalUnWeighted_HJJ(yRnd,.true.,RES)! RES is a dummy here
+                dum = EvalUnWeighted_HJJ(yRnd,.true.,(/-99,-99/),RES)! RES is a dummy here
               elseif (Process.eq.62) then
                 dum = EvalUnWeighted_HJ(yRnd,.true.,RES)! RES is a dummy here
               elseif (Process.eq.50) then
                   dum = EvalUnWeighted_VHiggs(yRnd,.true.,RES)! RES is a dummy here
-              elseif (Process.eq.80) then
-                  dum = EvalUnWeighted_TTBH(yRnd,.true.,RES)! RES is a dummy here
               else
                   dum = EvalUnWeighted(yRnd,.true.,RES)! RES is a dummy here
               endif
@@ -938,11 +896,10 @@ implicit none
 include "vegas_common.f"
 real(8) :: VG_Result,VG_Error,VG_Chi2
 real(8) :: yRnd(1:22)
-real(8) :: dum, RES(-5:5,-5:5),VG2(-5:5,-5:5),ResFrac(-5:5,-5:5),TotalXSec
+real(8) :: dum, RES(-5:5,-5:5),ResFrac(-5:5,-5:5),TotalXSec
 integer :: i, i1, j1,PChannel_aux, PChannel_aux1,NHisto,RequEvents(-5:+5,-5:+5)
 include 'csmaxvalue.f'
-integer :: n,sclock,flav1,flav2,StatusPercent,LastStatusPercent=0
-integer, dimension(:), allocatable :: gfort_seed
+integer :: n,flav1,flav2,StatusPercent
 
 
 if( VegasIt1.eq.-1 ) VegasIt1 = VegasIt1_default
@@ -965,25 +922,8 @@ if( VegasNc2.eq.-1 .and.  .not. (unweighted) ) VegasNc2 = VegasNc2_default
 if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !----------------------- weighted events
 
 
-    if (seed_random) then 
-#if compiler==1
-        call random_seed()
-#elif compiler==2
-        call random_seed(size=n)
-        allocate(gfort_seed(n))
-        call system_clock(count=sclock)
-        gfort_seed = sclock + 37 * (/ (i - 1, i = 1, n) /)
-        call random_seed(put = gfort_seed)
-        deallocate(gfort_seed)        
-#endif
-        call random_number(VegasSeed)
-        VegasSeed = - abs( VegasSeed*10000d0 )
-    else
-        VegasSeed = -19d0
-    endif
+    call InitRandomSeed(VegasSeed)
     idum = int(VegasSeed)
-
-
 
     if( (GenerateEvents.eqv..true.) ) then
         itmx = 1
@@ -993,13 +933,13 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
     endif
 
 
-
     ! WARM-UP RUN
     itmx = VegasIt1
     ncall= VegasNc1
     warmup = .true.
-    call vegas(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
-
+    if( Process.eq.80 ) call vegas(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
+    if( Process.eq.60 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
+    if( Process.eq.61 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
 
 
     !DATA RUN
@@ -1012,45 +952,36 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
     avgcs = 0d0
     itmx = 1
     ncall= VegasNc2
-    call vegas1(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
+    if( Process.eq.80 ) call vegas1(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
+    if( Process.eq.60 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
+    if( Process.eq.61 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
 
 
-    
 
 
 
 elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
 
-    VG = zero
-    VG2= zero
-    csmax = zero
-    if (seed_random) then 
-#if compiler==1
-        call random_seed()
-#elif compiler==2
-        call random_seed(size=n)
-        allocate(gfort_seed(n))
-        call system_clock(count=sclock)
-        gfort_seed = sclock + 37 * (/ (i - 1, i = 1, n) /)
-        call random_seed(put = gfort_seed)
-        deallocate(gfort_seed)        
-#endif
-    endif
+    VG(:,:) = zero
+    CSmax(:,:) = zero
+    call InitRandomSeed(VegasSeed)
 
 
     if( .not. ReadCSmax ) then
         print *, " finding maximal weight with ",VegasNc0," evaluations"
-        warmup = .true.
         do i=1,VegasNc0
-            call random_number(yRnd)
-
-                RES = 0d0
-                dum = EvalUnWeighted_TTBH(yRnd,.false.,RES)
-                VG = VG + RES
-                VG2 = VG2 + RES**2
+                call random_number(yRnd)
+                RES(:,:) = 0d0
+                if( Process.eq.80 ) then
+                    dum = EvalUnWeighted_TTBH(yRnd,.false.,(/-99,-99/),RES)
+                elseif( Process.eq.60 ) then
+                    dum = EvalUnWeighted_HJJ(yRnd,.false.,(/-99,-99/),RES)
+                elseif( Process.eq.61 ) then
+                    dum = EvalUnWeighted_HJJ(yRnd,.false.,(/-99,-99/),RES)
+                endif
+                VG(:,:) = VG(:,:) + RES(:,:)
                 PChannel = PChannel_aux
         enddo
-
         open(unit=io_CSmaxFile,file='CSmax.bin',form='unformatted',status='replace')
         WRITE(io_CSmaxFile) CSMAX
         close(io_CSmaxFile)
@@ -1059,20 +990,30 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
         READ(io_CSmaxFile) CSMAX
         close(io_CSmaxFile)
     endif
+   
+   CSmax(:,:)   = 1.5d0 * CSmax(:,:)    !  adjustment factor
 
-   VG = VG/dble(VegasNc0)
-   csmax   = 1.5d0*csmax    !  adjustment factors, can be choosen  separately channel/by/channel
-
-
-   print *, " gg/qqb ratio = ", VG(0,0)/(VG(+1,-1) + VG(+2,-2) + VG(+3,-3) + VG(+4,-4) + VG(+5,-5)   &
-                                       +VG(-1,+1) + VG(-2,+2) + VG(-3,+3) + VG(-4,+4) + VG(-5,+5))  
-
-
+   VG(:,:) = VG(:,:)/dble(VegasNc0)
    TotalXSec = sum(  VG(:,:) )
+   print *, ""    
    write(io_stdout,*) "Total xsec",TotalXSec
-   do i1=-5,5
-        write(io_stdout,*) "partonic fraction", i1,-i1,VG(i1,-i1)/TotalXSec
-   enddo
+
+
+    RequEvents(:,:)=0
+    do i1=-5,5
+    do j1=-5,5
+         RequEvents(i1,j1) = RequEvents(i1,j1) + int( VG(i1,j1)/TotalXSec * VegasNc2 )
+    enddo
+    enddo
+    
+   
+    do i1=-5,5
+    do j1=-5,5
+         if( VG(i1,j1).gt.1d-9 ) write(io_stdout,"(A,I4,I4,F8.3,I9)") "Fractional partonic xsec ", i1,j1,VG(i1,j1)/TotalXSec,RequEvents(i1,j1)
+    enddo
+    enddo
+   
+
 
 
 
@@ -1084,89 +1025,57 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
     AlertCounter = 0
     AccepCounter_part(:,:) = 0
 
-    if (seed_random) then 
-#if compiler==1
-        call random_seed()
-#elif compiler==2
-        call random_seed(size=n)
-        allocate(gfort_seed(n))
-        call system_clock(count=sclock)
-        gfort_seed = sclock + 37 * (/ (i - 1, i = 1, n) /)
-        call random_seed(put = gfort_seed)
-        deallocate(gfort_seed)        
-#endif
-    endif
-
+    call InitRandomSeed(VegasSeed)
     call cpu_time(time_start)
-    warmup = .true.
 
-    RequEvents(-5:+5,-5:+5) = int(VG(-5:+5,-5:+5)/TotalXSec * VegasNc2 )
-    do i1=-5,-1
-         write(io_stdout,*) "requested events", i1,-i1,RequEvents(+i1,-i1)+RequEvents(-i1,+i1)
+
+    do i1=-5,5!! idea: instead of these 2 do-loop introduce randomized loop
+    do j1=-5,5
+    if(RequEvents(i1,j1).ne.0) then
+          if( (PChannel.eq.0) .and. (abs(i1)+abs(j1).ne.0) ) cycle
+          if( (PChannel.eq.1) .and. i1*j1.eq.0 ) cycle
+          
+          write(io_stdout,*) ""
+          write(io_stdout,*) ""
+          write(io_stdout,"(X,A,I8,A,I4,I4,A)",advance='no') "generating ",RequEvents(i1,j1)," events for channel",i1,j1,":  "
+          flush(io_stdout)
+          do while( AccepCounter_part(i1,j1)  .lt. RequEvents(i1,j1) )
+
+              call random_number(yRnd)
+              if( Process.eq.80 ) then
+                  dum = EvalUnWeighted_TTBH(yRnd,.true.,(/i1,j1/),RES)
+              elseif( Process.eq.60 ) then
+                  dum = EvalUnWeighted_HJJ(yRnd,.true.,(/i1,j1/),RES)
+              elseif( Process.eq.61 ) then
+                  dum = EvalUnWeighted_HJJ(yRnd,.true.,(/i1,j1/),RES)
+              endif
+              
+              StatusPercent = int(100d0*(AccepCounter_part(i1,j1))  /  dble(RequEvents(i1,j1))  )
+              call PrintStatusBar( StatusPercent )
+          enddo
+    endif
     enddo
-    write(io_stdout,*) "requested events", 0,0,RequEvents(0,0)
-    print *, ""
+    enddo    
 
-
-    if( PChannel.eq.0 .or. PChannel.eq.2 ) then 
-         PChannel_aux = PChannel
-         PChannel=0
-         print *, " generating ",RequEvents(0,0)," events for gg"
-         do while( AccepCounter_part(+0,0)  .lt. RequEvents(+0,0) )
-              call random_number(yRnd)
-
-              dum = EvalUnWeighted_TTBH(yRnd,.true.,RES)! RES is a dummy here
-
-              StatusPercent = int(100d0*(AccepCounter_part(0,0))  /  dble(RequEvents(+0,0))  )
-              if( mod(StatusPercent,10).eq.0 .and. LastStatusPercent.ne.StatusPercent ) then
-!                 write(io_stdout,"(X,I3,A)") StatusPercent,"% "
-                 write(io_stdout,"(X,I3,A)",advance='no') StatusPercent,"% "
-                 flush(io_stdout)
-                 LastStatusPercent = StatusPercent
-              endif
-         enddo
-         print *, "Done with gg channel ",AccepCounter_part(0,0),AccepCounter
-         print *, ""
-         PChannel = PChannel_aux
-    endif
-
-
-
-    if( PChannel.eq.1 .or. PChannel.eq.2 ) then 
-         PChannel_aux = PChannel
-         PChannel = 1
-         print *, " generating ",(sum(RequEvents(:,:))-RequEvents(0,0) )," events for qqb"
-         do while( (sum(AccepCounter_part(:,:))-AccepCounter_part(0,0) ) .lt. (sum(RequEvents(:,:))-RequEvents(0,0)  ) )
-              call random_number(yRnd)
-
-              dum = EvalUnWeighted_TTBH(yRnd,.true.,RES)! RES is a dummy here
-
-              StatusPercent = int(  100d0*( sum(AccepCounter_part(:,:)) - AccepCounter_part(0,0) )  /  dble(  sum(RequEvents(:,:)) - RequEvents(0,0)  )  )
-              if( mod(StatusPercent,10).eq.0 .and. LastStatusPercent.ne.StatusPercent ) then
-!                 write(io_stdout,"(X,I3,A)") StatusPercent,"% "
-                 write(io_stdout,"(X,I3,A)",advance='no') StatusPercent,"% "
-                 flush(io_stdout)
-                 LastStatusPercent = StatusPercent
-              endif
-         enddo
-         print *, "Done with qqb channels ",sum(AccepCounter_part(:,:))-AccepCounter_part(0,0),AccepCounter
-         print *, ""
-         PChannel = PChannel_aux
-    endif
-
-
+    
+    
     call cpu_time(time_end)
+    print *, ""
+    print *, ""
     print *, " Evaluation Counter: ",EvalCounter
     print *, " Acceptance Counter: ",AccepCounter
-    print *, " Rejection  Counter: ",RejeCounter
     do i1=-5,+5
-      print *, " Acceptance  Counter_part: ", i1,-i1, AccepCounter_part(i1,-i1)
+    do j1=-5,+5
+      if( AccepCounter_part(i1,j1).ne.0 ) print *, " Acceptance  Counter_part: ", i1,-i1, AccepCounter_part(i1,j1)
+    enddo
     enddo
     print *, " Alert  Counter: ",AlertCounter
     print *, " gg/qqb ratio = ", dble(AccepCounter_part(0,0))/dble(sum(AccepCounter_part(:,:))-AccepCounter_part(0,0))
     if( dble(AlertCounter)/dble(AccepCounter) .gt. 1d0*percent ) then
-        print *, "ALERT: The number of rejected events with too small CSMAX exceeds 1%."
-        print *, "       Increase CSMAX in main.F90."
+        write(io_LogFile,*) "ALERT: The number of rejected events with too small CSMAX exceeds 1%."
+        write(io_LogFile,*) "       Increase CSMAX in main.F90."
+        write(io_stdout, *) "ALERT: The number of rejected events with too small CSMAX exceeds 1%."
+        write(io_stdout, *) "       Increase CSMAX in main.F90."
     endif
     write(io_stdout,*)  " event generation rate (events/sec)",dble(AccepCounter)/(time_end-time_start)
 
@@ -1178,8 +1087,6 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
 
 return
 END SUBROUTINE
-
-
 
 
 
@@ -1255,19 +1162,8 @@ enddo
 
 !pause
    call ClearHisto()
-
-    if (seed_random) then 
-#if compiler==1
-        call random_seed()
-#elif compiler==2
-        call random_seed(size=n)
-        allocate(gfort_seed(n))
-        call system_clock(count=clock)
-        gfort_seed = clock + 37 * (/ (i - 1, i = 1, n) /)
-        call random_seed(put = gfort_seed)
-        deallocate(gfort_seed)        
-#endif
-    endif
+   
+   call InitRandomSeed(VegasSeed)
 
    print *, " generating events"
    call cpu_time(time_start)
@@ -1356,19 +1252,8 @@ if( VegasNc0.eq.-1 ) VegasNc0 = VegasNc0_default
 if( VegasNc1.eq.-1 .and. VegasNc2.eq.-1 ) VegasNc1 = VegasNc1_default
 if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
 
-    if (seed_random) then 
-#if compiler==1
-        call random_seed()
-#elif compiler==2
-        call random_seed(size=n)
-        allocate(gfort_seed(n))
-        call system_clock(count=clock)
-        gfort_seed = clock + 37 * (/ (i - 1, i = 1, n) /)
-        call random_seed(put = gfort_seed)
-        deallocate(gfort_seed)        
-#endif
-    endif
 
+    call InitRandomSeed(VegasSeed)
 
 !    search for line with first event
      FirstEvent = .false.
@@ -1631,19 +1516,7 @@ if( VegasNc0.eq.-1 ) VegasNc0 = VegasNc0_default
 if( VegasNc1.eq.-1 .and. VegasNc2.eq.-1 ) VegasNc1 = VegasNc1_default
 if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
 
-    if (seed_random) then 
-#if compiler==1
-        call random_seed()
-#elif compiler==2
-        call random_seed(size=n)
-        allocate(gfort_seed(n))
-        call system_clock(count=clock)
-        gfort_seed = clock + 37 * (/ (i - 1, i = 1, n) /)
-        call random_seed(put = gfort_seed)
-        deallocate(gfort_seed)        
-#endif
-    endif
-
+    call InitRandomSeed(VegasSeed)
 
 !    search for line with first event
      FirstEvent = .false.
@@ -1867,19 +1740,8 @@ if( VegasNc0.eq.-1 ) VegasNc0 = VegasNc0_default
 if( VegasNc1.eq.-1 .and. VegasNc2.eq.-1 ) VegasNc1 = VegasNc1_default
 if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
 
-    if (seed_random) then 
-#if compiler==1
-        call random_seed()
-#elif compiler==2
-        call random_seed(size=n)
-        allocate(gfort_seed(n))
-        call system_clock(count=clock)
-        gfort_seed = clock + 37 * (/ (i - 1, i = 1, n) /)
-        call random_seed(put = gfort_seed)
-        deallocate(gfort_seed)        
-#endif
-    endif
 
+    call InitRandomSeed(VegasSeed)
 
 
 !    search for line with first event
@@ -3075,6 +2937,53 @@ END SUBROUTINE
 
 
 
+SUBROUTINE InitRandomSeed(TheSeed)
+use modParameters
+implicit none
+integer, dimension(:), allocatable :: gfort_seed
+integer :: n,i,sclock
+real(8) :: TheSeed
+
+    if (seed_random) then 
+#if compiler==1
+        call random_seed()
+#elif compiler==2
+        call random_seed(size=n)
+        allocate(gfort_seed(n))
+        call system_clock(count=sclock)
+        gfort_seed = sclock + 37 * (/ (i - 1, i = 1, n) /)
+        call random_seed(put = gfort_seed)
+        deallocate(gfort_seed)        
+#endif
+        call random_number(TheSeed)
+        TheSeed = - abs( TheSeed*10000d0 )
+    else
+        TheSeed = -19d0
+    endif
+
+
+return
+END SUBROUTINE
+
+
+SUBROUTINE PrintStatusBar(StatusPercent)
+use modParameters
+implicit none
+integer :: StatusPercent
+integer,save :: LastPercent=0
+
+     if( mod(StatusPercent,10).eq.0 .and. LastPercent.ne.StatusPercent ) then
+        write(io_stdout,"(X,I3,A)",advance='no') StatusPercent,"% "
+        flush(io_stdout)
+        LastPercent = StatusPercent
+     endif
+
+return
+END SUBROUTINE
+
+
+
+
 SUBROUTINE PrintCommandLineArgs()
 use modParameters
 implicit none
@@ -3132,5 +3041,6 @@ integer :: TheUnit
     write(TheUnit,"(A90)") " "
 return
 END SUBROUTINE
+
 
 

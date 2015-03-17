@@ -290,6 +290,16 @@ ENDIF! GENEVT
 
 
 
+! ./JHUGen Process=60 PChannel=2 Unweighted=0 DataFile="VBF_uw_all" VegasNc1=200000 VegasNc2=1000000
+! all 3610(10)
+! uu 537(1)
+! dd 343(1)  
+! 0.64
+
+! ./JHUGen Process=60 PChannel=0 Unweighted=1 DataFile="VBF_we_all" VegasNc0=400000 VegasNc2=1000
+! 
+! weighted= 0.66 
+! 
 
 
 
@@ -381,7 +391,7 @@ ENDIF! GENEVT
 
 
 
- FUNCTION EvalUnWeighted_HJJ(yRnd,genEvt,RES)
+ FUNCTION EvalUnWeighted_HJJ(yRnd,genEvt,iPartons,RES)
  use ModKinematics
  use ModParameters
  use ModHiggsjj
@@ -394,8 +404,8 @@ real(8) :: yRnd(:),VgsWgt, EvalUnWeighted_HJJ,RES(-5:5,-5:5)
 real(8) :: pdf(-6:6,1:2)
 real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi
 real(8) :: MomExt(1:4,1:5), PSWgt,MomDK(1:4,1:4)
-real(8) :: me2(-5:5,-5:5),bound(0:121)
-integer :: i,j,k,ifound,jfound
+real(8) :: me2(-5:5,-5:5)
+integer :: i,j,k,iPartons(1:2)
 integer :: MY_IDUP(1:5),ICOLUP(1:2,1:5),NBin(1:NumHistograms),NHisto
 real(8) :: LO_Res_Unpol, PreFac, CS_max, sumtot
 logical :: applyPSCut,genEVT,zz_fusion
@@ -421,34 +431,36 @@ include 'csmaxvalue.f'
    FluxFac = 1d0/(2d0*EHat**2)
    EvalCounter = EvalCounter+1
 
+   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt 
 
 
+   
 IF( GENEVT ) THEN
 
-   sumtot = 0d0
-   do i = -5,5
-      do j = -5,5
-         sumtot = sumtot + csmax(i,j)
-      enddo
-   enddo
+!    sumtot = 0d0
+!    do i = -5,5
+!       do j = -5,5
+!          sumtot = sumtot + csmax(i,j)
+!       enddo
+!    enddo
+!    k=0; bound(0)=0d0
+!    do i = -5,5
+!       do j = -5,5
+!          k=k+1
+!          bound(k) = bound(k-1) + csmax(i,j)/sumtot
+!          if( yRnd(8).gt.bound(k-1) .and. yRnd(8).lt.bound(k)  ) then
+!             ifound=i; jfound=j;
+!             goto 1313
+!          endif
+!       enddo
+!    enddo
+! 1313 continue
 
-   k=0; bound(0)=0d0
-   do i = -5,5
-      do j = -5,5
-         k=k+1
-         bound(k) = bound(k-1) + csmax(i,j)/sumtot
-         if( yRnd(8).gt.bound(k-1) .and. yRnd(8).lt.bound(k)  ) then
-            ifound=i; jfound=j;
-            goto 1313
-         endif
-      enddo
-   enddo
-1313 continue
 
    if( Process.eq.60 ) then
       call EvalAmp_WBFH_UnSymm_SA(MomExt,(/ghz1,ghz2,ghz3,ghz4/),(/ghw1,ghw2,ghw3,ghw4/),me2)
 
-      MY_IDUP(1:2)= (/LHA2M_ID(ifound),LHA2M_ID(jfound)/)
+      MY_IDUP(1:2)= (/LHA2M_ID(iPartons(1)),LHA2M_ID(iPartons(2))/)
       if( MY_IDUP(1).gt.0 ) then ! quark
           ICOLUP(1:2,1) = (/501,000/)
       else! anti-quark
@@ -469,23 +481,23 @@ IF( GENEVT ) THEN
 
       if( ZZ_Fusion ) then
           if( (MomExt(4,1)*MomExt(4,3).lt.0d0) .and. (MomExt(4,2)*MomExt(4,4).lt.0d0) ) then ! wrong configuration --> swap 3 and 4
-             MY_IDUP(3:4)= (/LHA2M_ID(jfound),LHA2M_ID(ifound)/)
+             MY_IDUP(3:4)= (/LHA2M_ID(iPartons(1)),LHA2M_ID(iPartons(2))/)
              ICOLUP(1:2,4) = ICOLUP(1:2,1)
              ICOLUP(1:2,3) = ICOLUP(1:2,2)
           else! 
-             MY_IDUP(3:4)= (/LHA2M_ID(ifound),LHA2M_ID(jfound)/)
+             MY_IDUP(3:4)= (/LHA2M_ID(iPartons(1)),LHA2M_ID(iPartons(2))/)
              ICOLUP(1:2,3) = ICOLUP(1:2,1)
              ICOLUP(1:2,4) = ICOLUP(1:2,2)
           endif
       else! WW fusion
           if( (MomExt(4,1)*MomExt(4,3).lt.0d0) .and. (MomExt(4,2)*MomExt(4,4).lt.0d0) ) then ! wrong configuration --> swap 3 and 4
-             MY_IDUP(3:4)= (/SU2flip(LHA2M_ID(jfound)),SU2flip(LHA2M_ID(ifound))/)
+             MY_IDUP(3:4)= (/SU2flip(LHA2M_ID(iPartons(2))),SU2flip(LHA2M_ID(iPartons(1)))/)
              if( abs(MY_IDUP(3)).eq.Top_ ) MY_IDUP(3) = sign(1,MY_IDUP(3))*Chm_
              if( abs(MY_IDUP(4)).eq.Top_ ) MY_IDUP(4) = sign(1,MY_IDUP(4))*Chm_ 
              ICOLUP(1:2,4) = ICOLUP(1:2,1)
              ICOLUP(1:2,3) = ICOLUP(1:2,2)
           else
-             MY_IDUP(3:4)= (/SU2flip(LHA2M_ID(ifound)),SU2flip(LHA2M_ID(jfound))/)
+             MY_IDUP(3:4)= (/SU2flip(LHA2M_ID(iPartons(1))),SU2flip(LHA2M_ID(iPartons(2)))/)
              if( abs(MY_IDUP(3)).eq.Top_ ) MY_IDUP(3) = sign(1,MY_IDUP(3))*Chm_
              if( abs(MY_IDUP(4)).eq.Top_ ) MY_IDUP(4) = sign(1,MY_IDUP(4))*Chm_ 
              ICOLUP(1:2,3) = ICOLUP(1:2,1)
@@ -495,10 +507,11 @@ IF( GENEVT ) THEN
       MY_IDUP(5)  = Hig_
       ICOLUP(1:2,5) = (/000,000/)
 
+      
    elseif( Process.eq.61 ) then
       call EvalAmp_SBFH_UnSymm_SA(MomExt,(/ghg2,ghg3,ghg4/),me2)
       me2 = me2 * (2d0/3d0*alphas**2)**2 !-- (alphas/sixpi gs^2)^2
-      MY_IDUP(1:5)  = (/LHA2M_ID(ifound),LHA2M_ID(jfound),LHA2M_ID(ifound),LHA2M_ID(jfound),Hig_/)
+      MY_IDUP(1:5)  = (/LHA2M_ID(iPartons(1)),LHA2M_ID(iPartons(2)),LHA2M_ID(iPartons(1)),LHA2M_ID(iPartons(2)),Hig_/)
 
       if( MY_IDUP(1).eq.Glu_ .and. MY_IDUP(2).eq.Glu_ ) then! gg->gg
           ICOLUP(1:2,1) = (/501,502/)
@@ -552,20 +565,19 @@ IF( GENEVT ) THEN
         call swapi(ICOLUP(2,3),ICOLUP(2,4))
       endif
 
-
       ICOLUP(1:2,5) = (/000,000/) 
    endif
-   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt 
 
-   LO_Res_Unpol =  me2(ifound,jfound) * pdf(LHA2M_pdf(ifound),1)*pdf(LHA2M_pdf(jfound),2)
+   LO_Res_Unpol =  me2(iPartons(1),iPartons(2)) * pdf(LHA2M_pdf(iPartons(1)),1)*pdf(LHA2M_pdf(iPartons(2)),2)
    EvalUnWeighted_HJJ = LO_Res_Unpol * PreFac
 
-   if( ifound.eq.0 .and. jfound.eq.0 ) then
-       CS_max = csmax(ifound,jfound) * adj_par 
-   else
-       CS_max = csmax(ifound,jfound)
-   endif
+!    if( iPartons(1).eq.0 .and. iPartons(2).eq.0 ) then
+!        CS_max = csmax(iPartons(1),iPartons(2)) * adj_par 
+!    else
+!        CS_max = csmax(iPartons(1),iPartons(2))
+!    endif
 
+      CS_max = CSmax(iPartons(1),iPartons(2))
       if( EvalUnWeighted_HJJ.gt. CS_max) then
           write(io_stdout,"(2X,A,1PE13.6,1PE13.6)")  "CS_max is too small.",EvalUnWeighted_HJJ, CS_max
           write(io_LogFile,"(2X,A,1PE13.6,1PE13.6)") "CS_max is too small.",EvalUnWeighted_HJJ, CS_max
@@ -577,37 +589,39 @@ IF( GENEVT ) THEN
                call intoHisto(NHisto,NBin(NHisto),1d0)  ! CS_Max is the integration volume
          enddo
          AccepCounter = AccepCounter + 1
+         AccepCounter_part(iPartons(1),iPartons(2)) = AccepCounter_part(iPartons(1),iPartons(2))+1         
          call WriteOutEvent_HVBF((/MomExt(1:4,1),MomExt(1:4,2),MomExt(1:4,3),MomExt(1:4,4),MomExt(1:4,5)/),MY_IDUP(1:5),ICOLUP(1:2,1:5))
       else
           RejeCounter = RejeCounter + 1
       endif
+      EvalCounter = EvalCounter + 1 
 
 
+      
+      
 ELSE! NOT GENEVT
+
+
 
 
    if( Process.eq.60 ) then
       call EvalAmp_WBFH_UnSymm_SA(MomExt,(/ghz1,ghz2,ghz3,ghz4/),(/ghw1,ghw2,ghw3,ghw4/),me2)
-
    elseif( Process.eq.61 ) then
       call EvalAmp_SBFH_UnSymm_SA(MomExt,(/ghg2,ghg3,ghg4/),me2)
       me2 = me2 * (2d0/3d0*alphas**2)**2
-
    endif
-   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt 
 
 
    LO_Res_Unpol = 0d0
    do i = -5,5
       do j = -5,5
 
-         LO_Res_Unpol = me2(i,j)*pdf(LHA2M_pdf(i),1)*pdf(LHA2M_pdf(j),2) * PreFac
-
-         EvalUnWeighted_HJJ = EvalUnWeighted_HJJ  + LO_Res_Unpol 
+          LO_Res_Unpol = me2(i,j)*pdf(LHA2M_pdf(i),1)*pdf(LHA2M_pdf(j),2) * PreFac
+          EvalUnWeighted_HJJ = EvalUnWeighted_HJJ  + LO_Res_Unpol 
 
           RES(i,j) = LO_Res_Unpol
-          if (LO_Res_Unpol.gt.csmax(i,j)) then
-              csmax(i,j) = LO_Res_Unpol
+          if (LO_Res_Unpol.gt.CSmax(i,j)) then
+              CSmax(i,j) = LO_Res_Unpol
           endif
       enddo
    enddo
@@ -617,8 +631,8 @@ ELSE! NOT GENEVT
 ENDIF! GENEVT
 
 
- RETURN
- END FUNCTION EvalUnWeighted_HJJ
+RETURN
+END FUNCTION EvalUnWeighted_HJJ
 
 
 
