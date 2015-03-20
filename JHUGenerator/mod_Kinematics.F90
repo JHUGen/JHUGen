@@ -1838,15 +1838,17 @@ implicit none
 real(8) :: Mom(1:4,1:11)
 logical :: applyPSCut
 integer :: NBin(:)
-real(8) :: pT_t,pT_H
+real(8) :: pT_t,pT_H,pT_tbar
 integer, parameter :: tbar=4,t=5,Hbos=3,inLeft=1,inRight=2,bbar=6, lepM=7,nubar=8,b=9,lepP=10,nu=11
 
 
     applyPSCut = .false.
 
     pT_t = get_PT(Mom(1:4,t))
+    pT_tbar = get_PT(Mom(1:4,tbar))
     pT_H = get_PT(Mom(1:4,Hbos))
     
+    if( m_Top.lt.10d0*GeV  .and. (pT_t.lt.pTjetcut .or. pT_tbar.lt.pTjetcut) ) applyPSCut=.true.
     
 !   binning
     NBin(1)  = WhichBin(1,pT_t)

@@ -3,7 +3,7 @@ implicit none
 save
 ! 
 ! 
-character(len=6),parameter :: JHUGen_Version="v5.3.0"
+character(len=6),parameter :: JHUGen_Version="v5.3.1"
 ! 
 ! 
 integer, public :: Collider, PDFSet,PChannel,Process,DecayMode1,DecayMode2,TopDecays
@@ -84,7 +84,7 @@ real(8), public, parameter :: POL_A = 0d0                   !e+ polarization. 0:
 real(8), public, parameter :: POL_B = 0d0                   !e- polarization. 0: no polarization, 100: helicity = 1, -100: helicity = -1
 logical, public, parameter :: H_DK =.false.                 !default to false so H in V* > VH (Process = 50) does not decay
 !logical, public, parameter :: V_DK =.true.                  !default to true so V in V* > VH (Process = 50) decays
-real(8), public, parameter :: ptjetcut = 15d0*GeV           ! jet min pt
+real(8), public, parameter :: pTjetcut = 15d0*GeV           ! jet min pt
 real(8), public, parameter :: Rjet = 0.5d0                  ! jet deltaR, antikt algorithm 
 
 !----------------------------------------------------------------------------------------------------
