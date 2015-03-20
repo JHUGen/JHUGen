@@ -1066,7 +1066,7 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
     print *, " Acceptance Counter: ",AccepCounter
     do i1=-5,+5
     do j1=-5,+5
-      if( AccepCounter_part(i1,j1).ne.0 ) print *, " Acceptance  Counter_part: ", i1,-i1, AccepCounter_part(i1,j1)
+      if( AccepCounter_part(i1,j1).ne.0 ) print *, " Acceptance  Counter_part: ", i1,j1, AccepCounter_part(i1,j1)
     enddo
     enddo
     print *, " Alert  Counter: ",AlertCounter
