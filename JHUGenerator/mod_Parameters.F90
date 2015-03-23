@@ -3,7 +3,7 @@ implicit none
 save
 ! 
 ! 
-character(len=6),parameter :: JHUGen_Version="v5.3.2"
+character(len=6),parameter :: JHUGen_Version="v5.3.3"
 ! 
 ! 
 integer, public :: Collider, PDFSet,PChannel,Process,DecayMode1,DecayMode2,TopDecays
@@ -50,6 +50,7 @@ real(8),parameter :: MPhotonCutoff = 4d0*GeV
 
 logical, public, parameter :: RandomizeVVdecays = .true. ! randomize DecayMode1 and DecayMode2 in H-->VV decays
 
+integer, public, parameter :: RequestNLeptons = 4       ! requested number of charged leptons in ReadLHE mode  (-1: no request)
 real(8), public, parameter :: M_Top   = 173d0     *GeV      ! 
 real(8), public, parameter :: Ga_Top  = 1.33d0    *GeV      ! 
 real(8), public, parameter :: M_Z     = 91.1876d0 *GeV      ! Z boson mass (PDG-2011)
@@ -154,6 +155,7 @@ integer, public :: Br_Z_dd_counter=0
 integer, public :: Br_W_ll_counter=0
 integer, public :: Br_W_ud_counter=0
 integer, public :: Br_counter(1:5,1:5)=0
+integer, public :: NumLeptInEvent=0
 
 !-- parameters that define on-shell spin 0 coupling to SM fields, see note
    logical, public, parameter :: generate_as = .false.
@@ -776,6 +778,35 @@ integer :: PartType
   endif
 
 END FUNCTION
+FUNCTION IsALHELepton(PartType)! note that lepton means charged lepton here
+implicit none
+logical :: IsALHELepton
+integer :: PartType
+
+
+  if( abs(PartType).eq.11 .or. abs(PartType).eq.13 .or. abs(PartType).eq.15 ) then
+     IsALHELepton = .true.
+  else
+     IsALHELepton=.false.
+  endif
+
+END FUNCTION
+
+
+
+FUNCTION IsALepton(PartType)! note that lepton means charged lepton here
+implicit none
+logical :: IsALepton
+integer :: PartType
+
+
+  if( abs(PartType).eq.ElP_ .or. abs(PartType).eq.MuP_ .or. abs(PartType).eq.TaP_ ) then
+     IsALepton = .true.
+  else
+     IsALepton=.false.
+  endif
+
+END FUNCTION
 
 
 
@@ -792,6 +823,21 @@ integer :: PartType
   endif
 
 
+END FUNCTION
+
+
+FUNCTION CountLeptons( MY_IDUP )
+implicit none
+integer :: MY_IDUP(:),CountLeptons
+integer :: i
+
+   CountLeptons = 0
+   do i = 1,size(MY_IDUP)
+      if( IsALepton( MY_IDUP(i) ) ) CountLeptons=CountLeptons+1
+   enddo
+
+
+RETURN
 END FUNCTION
 
 
