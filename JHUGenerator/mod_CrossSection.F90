@@ -3101,6 +3101,12 @@ include 'csmaxvalue.f'
 !    IDUP(8)  -->  MomDK(:,4)  -->     v-spinor
 !    IDUP(9)  -->  MomDK(:,3)  -->  ubar-spinor
    call VVBranchings(MY_IDUP(4:9),ICOLUP(1:2,6:9))
+   if( RequestNLeptons.gt.0 ) then
+        if( CountLeptons(MY_IDUP(6:9))+NumLeptInEvent .lt. RequestNLeptons ) then 
+            EvalUnWeighted_withoutProduction = 0d0
+            return
+        endif
+   endif
 
    if( (RandomizeVVdecays.eqv..true.) ) then
    if( (MY_IDUP(6).ne.MY_IDUP(8)) .and. (IsAZDecay(DecayMode1)) .and. (IsAZDecay(DecayMode2)) ) then

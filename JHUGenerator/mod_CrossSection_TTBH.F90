@@ -176,8 +176,7 @@ EvalUnWeighted_TTBH = 0d0
 
 
 IF( GENEVT ) THEN   
-
-          
+      
       if( iPartons(1).eq.0 .and. iPartons(2).eq.0 ) then
       
           call EvalAmp_GG_TTBH(MomExt,LO_Res_GG_Unpol)

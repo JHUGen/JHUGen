@@ -1572,6 +1572,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
      NEvent=0
      do while ( .true. ) 
          NEvent=NEvent + 1
+         NumLeptInEvent = 0
          read(16,fmt=InputFmt0) EventNumPart,EventInfoLine!  read number of particle from the first line after <event> and other info
 !        read event lines
          do nline=1,EventNumPart
@@ -1588,6 +1589,9 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                   MomHiggs(1:4) = MomExt(1:4,nline)
                   pH2sq = dsqrt(abs(MomHiggs(1:4).dot.MomHiggs(1:4)))
                   iHiggs = nline
+            endif
+            if( IsALHELepton(LHE_IDUP(nline)) ) then
+                  NumLeptInEvent = NumLeptInEvent + 1
             endif
          enddo
          
