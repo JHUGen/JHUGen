@@ -30,14 +30,14 @@ EvalWeighted_TTBH = 0d0
 
    call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
    if (EHat.lt.2*M_Top+M_Reso) return
-   call EvalPhasespace_2to3M(EHat,M_Reso,yRnd(3:7),MomExt(1:4,1:5),PSWgt)! a(1)b(2)-->H(3)+tbar(4)+t(5)
+   call EvalPhasespace_2to3M(EHat,(/M_Reso,M_Top,M_Top/),yRnd(3:7),MomExt(1:4,1:5),PSWgt)! a(1)b(2)-->H(3)+tbar(4)+t(5)
    call boost2Lab(eta1,eta2,5,MomExt(1:4,1:5))
   
    if( TOPDECAYS.NE.0 ) then
       call EvalPhasespace_TopDecay(MomExt(1:4,4),yRnd(08:11),MomExt(1:4,06:08),PSWgt2)    ! ATop 
       call EvalPhasespace_TopDecay(MomExt(1:4,5),yRnd(12:15),MomExt(1:4,09:11),PSWgt3)    !  Top
       PSWgt = PSWgt * PSWgt2*PSWgt3
-   endif 
+   endif
 !    call EvalPhasespace_HDecay(MomExt(1:4,3),yRnd(16:17),MomExt(1:4,12:13),PSWgt4)
 !    PSWgt = PSWgt * PSWgt4 
    FluxFac = 1d0/(2d0*EHat**2)
@@ -148,7 +148,7 @@ EvalUnWeighted_TTBH = 0d0
    call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
    
    if (EHat.lt.2*M_Top+M_Reso) return
-   call EvalPhasespace_2to3M(EHat,M_Reso,yRnd(3:7),MomExt(1:4,1:5),PSWgt)! a(1)b(2)-->H(3)+tbar(4)+t(5)
+   call EvalPhasespace_2to3M(EHat,(/M_Reso,M_Top,M_Top/),yRnd(3:7),MomExt(1:4,1:5),PSWgt)! a(1)b(2)-->H(3)+tbar(4)+t(5)
    call boost2Lab(eta1,eta2,5,MomExt(1:4,1:5))
    
    if( TOPDECAYS.NE.0 ) then

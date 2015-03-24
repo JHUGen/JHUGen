@@ -3360,7 +3360,7 @@ SUBROUTINE EvalPhasespace_2to3M(EHat,Mass,xRndPS,Mom,PSWgt)
 use ModParameters
 implicit none
 real(8) :: EHat
-real(8) :: PSWgt,PSWgt2,PSWgt3,Mass
+real(8) :: PSWgt,PSWgt2,PSWgt3,Mass(1:3)
 real(8) :: xRndPS(1:5)
 real(8) :: Mom(1:4,1:5),TmpMom(1:4)
 ! real(8) :: MomDK(1:4,1:6)
@@ -3372,7 +3372,7 @@ real(8),parameter :: NPr=3, PiWgtPr = (2d0*Pi)**(4-NPr*3) * (4d0*Pi)**(NPr-1)
 
 
 !  generate PS: massless + massless --> massive(M) + massive(anti-top) + massive(top)
-  call genps(3,Ehat,xRndPS(1:5),(/Mass,m_Top,m_Top/),Mom(1:4,3:5),PSWgt)
+  call genps(3,Ehat,xRndPS(1:5),Mass,Mom(1:4,3:5),PSWgt)
   PSWgt = PSWgt*PiWgtPr
 
 !   call yeti3(Ehat,xRndPS(1:5),(/m_Top,m_Top,Mass/),Mom(1:4,3:5),PSWgt)
