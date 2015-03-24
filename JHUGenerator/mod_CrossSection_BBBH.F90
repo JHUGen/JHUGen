@@ -29,8 +29,8 @@ logical :: applyPSCut
 EvalWeighted_BBBH = 0d0
 
    call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
-   if (EHat.lt.2*M_Top+M_Reso) return
-   call EvalPhasespace_2to3M(EHat,M_Reso,yRnd(3:7),MomExt(1:4,1:5),PSWgt)! a(1)b(2)-->H(3)+tbar(4)+t(5)
+   if (EHat.lt.2*M_bot+M_Reso) return
+   call EvalPhasespace_2to3M(EHat,(/M_Reso,M_bot,M_bot/),yRnd(3:7),MomExt(1:4,1:5),PSWgt)! a(1)b(2)-->H(3)+tbar(4)+t(5)
    call boost2Lab(eta1,eta2,5,MomExt(1:4,1:5))
   
 !    call EvalPhasespace_HDecay(MomExt(1:4,3),yRnd(16:17),MomExt(1:4,12:13),PSWgt4)
@@ -53,7 +53,7 @@ EvalWeighted_BBBH = 0d0
 !    write(*,"(PE21.14,PE21.14,PE21.14,PE21.14)") MomExt(1:4,10)
 !    write(*,"(PE21.14,PE21.14,PE21.14,PE21.14)") MomExt(1:4,11)
 
-   Mu_Fact = 0.5d0*( 2d0*M_top + M_Reso )
+   Mu_Fact = 0.5d0*( 2d0*M_bot + M_Reso )
    call setPDFs(eta1,eta2,Mu_Fact,pdf)
    if( PChannel.eq.0 .or. PChannel.eq.2 ) then
       call EvalAmp_GG_TTBH(MomExt,LO_Res_GG_Unpol)
@@ -142,8 +142,8 @@ EvalUnWeighted_BBBH = 0d0
 
    call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
    
-   if (EHat.lt.2*M_Top+M_Reso) return
-   call EvalPhasespace_2to3M(EHat,M_Reso,yRnd(3:7),MomExt(1:4,1:5),PSWgt)! a(1)b(2)-->H(3)+tbar(4)+t(5)
+   if (EHat.lt.2*M_bot+M_Reso) return
+   call EvalPhasespace_2to3M(EHat,(/M_Reso,M_bot,M_bot/),yRnd(3:7),MomExt(1:4,1:5),PSWgt)! a(1)b(2)-->H(3)+tbar(4)+t(5)
    call boost2Lab(eta1,eta2,5,MomExt(1:4,1:5))
    
    MY_IDUP(6:11)=-9999
@@ -155,7 +155,7 @@ EvalUnWeighted_BBBH = 0d0
    call Kinematics_BBBH(MomExt,applyPSCut,NBin)
    if( applyPSCut .or. PSWgt.eq.zero ) return
 
-   Mu_Fact = 0.5d0*( 2d0*M_top + M_Reso )   
+   Mu_Fact = 0.5d0*( 2d0*M_bot + M_Reso )   
    call setPDFs(eta1,eta2,Mu_Fact,pdf)
 
 
