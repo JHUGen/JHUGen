@@ -392,7 +392,6 @@ ELSEIF( COLLIDER.EQ.0 ) THEN
 ENDIF
 
 
-
 ! rescale V branchings to preserve the correct branching proportions in partial decays
 if( (DecayMode1.eq.8 .and. DecayMode2.eq.9) .or.  & 
     (DecayMode1.eq.9 .and. DecayMode2.eq.8) ) then
@@ -580,6 +579,19 @@ include "vegas_common.f"
          VegasNc1_default =  500000
          VegasNc2_default =    1000
       endif
+      !- bbbar+H
+      if(Process.eq.90) then
+         TopDecays = 0
+         m_Top = m_Bot
+         
+         call InitProcess_TTBH()
+         NDim = 12
+         NDim = NDim + 2 ! sHat integration
+         VegasIt1_default = 5
+         VegasNc0_default =  100000
+         VegasNc1_default =  500000
+         VegasNc2_default =    1000
+      endif
 
       if( unweighted ) then
           NDim = NDim + 1  ! random number which decides if event is accepted
@@ -598,6 +610,7 @@ END SUBROUTINE
 SUBROUTINE StartVegas(VG_Result,VG_Error)
 use ModCrossSection
 use ModCrossSection_TTBH
+use ModCrossSection_BBBH
 use ModKinematics
 use ModParameters
 implicit none
@@ -655,6 +668,8 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
       call vegas(EvalWeighted_VHiggs,VG_Result,VG_Error,VG_Chi2)
     elseif (Process.eq.80) then
       call vegas(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
+    elseif (Process.eq.90) then
+      call vegas(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
     else
       call vegas(EvalWeighted,VG_Result,VG_Error,VG_Chi2)    ! usual call of vegas for weighted events
     endif
@@ -679,6 +694,8 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
       call vegas1(EvalWeighted_VHiggs,VG_Result,VG_Error,VG_Chi2)
     elseif (Process.eq.80) then
       call vegas1(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
+    elseif (Process.eq.90) then
+      call vegas1(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
     else
       call vegas1(EvalWeighted,VG_Result,VG_Error,VG_Chi2)    ! usual call of vegas for weighted events
     endif
@@ -890,6 +907,7 @@ END SUBROUTINE
 SUBROUTINE StartVegas_NEW(VG_Result,VG_Error)
 use ModCrossSection
 use ModCrossSection_TTBH
+use ModCrossSection_BBBH
 use ModKinematics
 use ModParameters
 implicit none
@@ -938,6 +956,7 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
     ncall= VegasNc1
     warmup = .true.
     if( Process.eq.80 ) call vegas(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
+    if( Process.eq.90 ) call vegas(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.60 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.61 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
 
@@ -953,6 +972,7 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
     itmx = 1
     ncall= VegasNc2
     if( Process.eq.80 ) call vegas1(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
+    if( Process.eq.90 ) call vegas1(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.60 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.61 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
 
@@ -974,6 +994,8 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
                 RES(:,:) = 0d0
                 if( Process.eq.80 ) then
                     dum = EvalUnWeighted_TTBH(yRnd,.false.,(/-99,-99/),RES)
+                elseif( Process.eq.90 ) then
+                    dum = EvalUnWeighted_BBBH(yRnd,.false.,(/-99,-99/),RES)
                 elseif( Process.eq.60 ) then
                     dum = EvalUnWeighted_HJJ(yRnd,.false.,(/-99,-99/),RES)
                 elseif( Process.eq.61 ) then
@@ -1044,6 +1066,8 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
               call random_number(yRnd)
               if( Process.eq.80 ) then
                   dum = EvalUnWeighted_TTBH(yRnd,.true.,(/i1,j1/),RES)
+              elseif( Process.eq.90 ) then
+                  dum = EvalUnWeighted_BBBH(yRnd,.true.,(/i1,j1/),RES)
               elseif( Process.eq.60 ) then
                   dum = EvalUnWeighted_HJJ(yRnd,.true.,(/i1,j1/),RES)
               elseif( Process.eq.61 ) then
@@ -1927,12 +1951,12 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                elseif( DecayMode1.eq.1 .and. LHE_IDUP(convertparent).eq.convertLHE(Z0_) ) then! convert Z decay products to quarks
                   if( LHE_IDUP(nline).gt.0 ) then
                          LHE_IDUP(nline) = convertLHE( ZQuaBranching(xRnd) )   
-                         LHE_ICOLUP(1:2,nline) = (/505,0/)
+                         LHE_ICOLUP(1:2,nline) = (/805,0/)
                          Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) ) /GeV
                          DecayParticles(i) = nline; i=i+1;
                   else
                          LHE_IDUP(nline) = convertLHE( -ZQuaBranching(xRnd) )    
-                         LHE_ICOLUP(1:2,nline) = (/0,505/)
+                         LHE_ICOLUP(1:2,nline) = (/0,805/)
                          Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) ) /GeV
                          DecayParticles(i) = nline; i=i+1;                      
                   endif
@@ -1940,12 +1964,12 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                elseif( DecayMode1.eq.5 .and. LHE_IDUP(convertparent).eq.convertLHE(Wp_) ) then! convert W+ decay products to quarks                  
                   if( LHE_IDUP(nline).gt.0 ) then
                          LHE_IDUP(nline) = convertLHE( WQuaUpBranching(xRnd) )   
-                         LHE_ICOLUP(1:2,nline) = (/505,0/)
+                         LHE_ICOLUP(1:2,nline) = (/805,0/)
                          Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) ) /GeV
                          DecayParticles(i) = nline; i=i+1;
                   else
                          LHE_IDUP(nline) = convertLHE( - SU2flip(WQuaUpBranching(xRnd)) )  
-                         LHE_ICOLUP(1:2,nline) = (/0,505/)
+                         LHE_ICOLUP(1:2,nline) = (/0,805/)
                          Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) ) /GeV
                          DecayParticles(i) = nline; i=i+1;
                   endif
@@ -1953,12 +1977,12 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                elseif( DecayMode1.eq.5 .and. LHE_IDUP(convertparent).eq.convertLHE(Wm_) ) then! convert W- decay products to quarks                  
                   if( LHE_IDUP(nline).gt.0 ) then
                          LHE_IDUP(nline) = convertLHE( Su2flip(WQuaUpBranching(xRnd)) )   
-                         LHE_ICOLUP(1:2,nline) = (/505,0/)
+                         LHE_ICOLUP(1:2,nline) = (/805,0/)
                          Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) ) /GeV
                          DecayParticles(i) = nline; i=i+1;
                   else
                          LHE_IDUP(nline) = convertLHE( -WQuaUpBranching(xRnd) )   
-                         LHE_ICOLUP(1:2,nline) = (/0,505/)
+                         LHE_ICOLUP(1:2,nline) = (/0,805/)
                          Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) ) /GeV
                          DecayParticles(i) = nline; i=i+1;
                   endif
@@ -1967,7 +1991,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                   if( LHE_IDUP(nline).gt.0 ) then
                          LHE_IDUP(nline) = convertLHE( ZAnyBranching(xRnd) )   
                          if( IsAQuark(convertLHEreverse(LHE_IDUP(nline))) ) then
-                             LHE_ICOLUP(1:2,nline) = (/505,0/)
+                             LHE_ICOLUP(1:2,nline) = (/805,0/)
                          else
                              LHE_ICOLUP(1:2,nline) = (/0,0/)
                          endif
@@ -1976,7 +2000,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                   else
                          LHE_IDUP(nline) = convertLHE( -ZAnyBranching(xRnd) )    
                          if( IsAQuark(convertLHEreverse(LHE_IDUP(nline))) ) then
-                             LHE_ICOLUP(1:2,nline) = (/0,505/)
+                             LHE_ICOLUP(1:2,nline) = (/0,805/)
                          else
                              LHE_ICOLUP(1:2,nline) = (/0,0/)
                          endif
@@ -1995,7 +2019,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                   if( LHE_IDUP(nline).gt.0 ) then
                          LHE_IDUP(nline) = convertLHE( WAnyBranching(xRnd) )   
                          if( IsAQuark(convertLHEreverse(LHE_IDUP(nline))) ) then
-                              LHE_ICOLUP(1:2,nline) = (/505,0/)
+                              LHE_ICOLUP(1:2,nline) = (/805,0/)
                          else
                               LHE_ICOLUP(1:2,nline) = (/0,0/)
                               LHE_IDUP(nline) = -LHE_IDUP(nline)! converts LepM to LepP
@@ -2007,7 +2031,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                   else
                          LHE_IDUP(nline) = convertLHE( - SU2flip(WAnyBranching(xRnd)) )  
                          if( IsAQuark(convertLHEreverse(LHE_IDUP(nline))) ) then
-                              LHE_ICOLUP(1:2,nline) = (/0,505/)
+                              LHE_ICOLUP(1:2,nline) = (/0,805/)
                          else
                               LHE_ICOLUP(1:2,nline) = (/0,0/)
                          endif                         
@@ -2019,7 +2043,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                   if( LHE_IDUP(nline).gt.0 ) then
                          LHE_IDUP(nline) = convertLHE( SU2flip(WAnyBranching(xRnd)) )   
                          if( IsAQuark(convertLHEreverse(LHE_IDUP(nline))) ) then
-                              LHE_ICOLUP(1:2,nline) = (/505,0/)
+                              LHE_ICOLUP(1:2,nline) = (/805,0/)
                          else
                               LHE_ICOLUP(1:2,nline) = (/0,0/)
                          endif                         
@@ -2030,7 +2054,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                   else
                          LHE_IDUP(nline) = convertLHE( -WAnyBranching(xRnd) )   
                          if( IsAQuark(convertLHEreverse(LHE_IDUP(nline))) ) then
-                              LHE_ICOLUP(1:2,nline) = (/0,505/)
+                              LHE_ICOLUP(1:2,nline) = (/0,805/)
                          else
                               LHE_ICOLUP(1:2,nline) = (/0,0/)
                               LHE_IDUP(nline) = -LHE_IDUP(nline)! converts -LepM to +LepM
@@ -2273,6 +2297,8 @@ implicit none
      call InitHisto_VHiggs()
   elseif (Process.eq.80) then
      call InitHisto_TTBH()
+  elseif (Process.eq.90) then
+     call InitHisto_BBBH()
   else
      call InitHisto_HZZ()
   endif
@@ -2504,6 +2530,44 @@ integer :: AllocStatus,NHisto
           endif
 
           Histo(1)%Info   = "pT_top"
+          Histo(1)%NBins  = 40
+          Histo(1)%BinSize= 10d0*GeV
+          Histo(1)%LowVal = 0d0
+          Histo(1)%SetScale= 1d0/GeV
+
+          Histo(2)%Info   = "pT_H"
+          Histo(2)%NBins  = 40
+          Histo(2)%BinSize= 10d0*GeV
+          Histo(2)%LowVal = 0d0
+          Histo(2)%SetScale= 1d0/GeV
+
+
+  do NHisto=1,NumHistograms
+      Histo(NHisto)%Value(:) = 0d0
+      Histo(NHisto)%Value2(:)= 0d0
+      Histo(NHisto)%Hits(:)  = 0
+  enddo
+
+RETURN
+END SUBROUTINE
+
+
+
+SUBROUTINE InitHisto_BBBH()
+use ModMisc
+use ModKinematics
+use ModParameters
+implicit none
+integer :: AllocStatus,NHisto
+
+          it_sav = 1
+          NumHistograms = 2
+          if( .not.allocated(Histo) ) then
+                allocate( Histo(1:NumHistograms), stat=AllocStatus  )
+                if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
+          endif
+
+          Histo(1)%Info   = "pT_bot"
           Histo(1)%NBins  = 40
           Histo(1)%BinSize= 10d0*GeV
           Histo(1)%LowVal = 0d0
@@ -2768,6 +2832,7 @@ character :: arg*(500)
     if( Process.eq.61) write(TheUnit,"(4X,A,F7.2,A,F6.3)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( Process.eq.50) write(TheUnit,"(4X,A,F7.2,A,F6.3)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( Process.eq.80) write(TheUnit,"(4X,A,F7.2,A,F6.3)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
+    if( Process.eq.90) write(TheUnit,"(4X,A,F7.2,A,F6.3)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( ReadLHEFile )    write(TheUnit,"(4X,A)") "           (This is ReadLHEFile mode. Resonance mass is read from LHE input file.)"
     if( ConvertLHEFile ) write(TheUnit,"(4X,A)") "           (This is ConvertLHEFile mode. Resonance mass is read from LHE input file.)"
     write(TheUnit,"(4X,A,I2,2X,A,I2)") "DecayMode1:",DecayMode1, "DecayMode2:",DecayMode2
@@ -2775,6 +2840,7 @@ character :: arg*(500)
     if( IsAWDecay(DecayMode1) .or. IsAWDecay(DecayMode2) ) write(TheUnit,"(4X,A,F6.3,A,F6.4)") "W-boson: mass=",M_W*100d0,", width=",Ga_W*100d0
     if( Process.eq.80 ) write(TheUnit,"(4X,A,F8.4,A,F6.4)") "Top quark mass=",m_top*100d0,", width=",Ga_top*100d0
     if( Process.eq.80 ) write(TheUnit,"(4X,A,I2)") "Top quark decay=",TOPDECAYS
+    if( Process.eq.90 ) write(TheUnit,"(4X,A,F8.4,A,F6.4)") "Bottom quark mass=",m_top*100d0
 
 
     if( .not. (ReadLHEFile .or. ConvertLHEFile) ) then
@@ -2995,7 +3061,7 @@ implicit none
         write(io_stdout,*) ""
         write(io_stdout,"(2X,A)") "Command line arguments:"
         write(io_stdout,"(4X,A)") "Collider:   1=LHC, 2=Tevatron, 0=e+e-"
-        write(io_stdout,"(4X,A)") "Process: 0=spin-0, 1=spin-1, 2=spin-2 resonance, 50=pp/ee->VH, 60=weakVBF, 61=pp->Hjj, 62=pp->Hj, 80=pp->ttbar+H"
+        write(io_stdout,"(4X,A)") "Process: 0=spin-0, 1=spin-1, 2=spin-2 resonance, 50=pp/ee->VH, 60=weakVBF, 61=pp->Hjj, 62=pp->Hj, 80=pp->ttbar+H, 90=pp->bbbar+H"
         write(io_stdout,"(4X,A)") "MReso:      resonance mass (default=125.60), format: yyy.xx"
         write(io_stdout,"(4X,A)") "DecayMode1: decay mode for vector boson 1 (Z/W+/gamma)"
         write(io_stdout,"(4X,A)") "DecayMode2: decay mode for vector boson 2 (Z/W-/gamma)"
