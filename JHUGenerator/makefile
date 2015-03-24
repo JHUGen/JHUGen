@@ -6,7 +6,7 @@ VegasDir = $(Here)/vegas
 
 # compiler options, Comp=ifort/gfort
 Opt  = Yes
-Comp = gfort
+Comp = ifort
 
 
 
@@ -42,12 +42,14 @@ Exec = ./JHUGen
 MainDep = mod_Kinematics.F90 \
           mod_CrossSection.F90 \
           mod_CrossSection_TTBH.F90 \
+          mod_CrossSection_BBBH.F90 \
           main.F90
 
 # main objects
 MainObj = $(ObjectDir)/mod_Kinematics.o \
           $(ObjectDir)/mod_CrossSection.o \
           $(ObjectDir)/mod_CrossSection_TTBH.o \
+          $(ObjectDir)/mod_CrossSection_BBBH.o \
           $(ObjectDir)/main.o
 
 

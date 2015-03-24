@@ -61,7 +61,7 @@ type(TreeProcess),save :: TheTreeAmps_GG_TTBH(1:2)
 type(TreeProcess),save :: TheTreeAmps_QQB_TTBH(1:1)
 
 
-
+complex(8) :: couplHTT_right_dyn,couplHTT_left_dyn
 
 
 
@@ -163,6 +163,10 @@ integer :: iTree,NumParticles
   
   TheTreeAmps_QQB_TTBH(1)%PartRef(1:5) = (/5,6,1,7,2/)! (/1,7,2,5,6/)
   call LinkTreeParticles(TheTreeAmps_QQB_TTBH(1),ExtParticles(1:7))
+
+  
+  couplHTT_right_dyn = m_top/vev/2d0 * ( kappa + (0d0,1d0)*kappa_tilde )
+  couplHTT_left_dyn  = m_top/vev/2d0 * ( kappa - (0d0,1d0)*kappa_tilde )
   
   
 RETURN

@@ -3,7 +3,7 @@ implicit none
 save
 ! 
 ! 
-character(len=6),parameter :: JHUGen_Version="v5.3.3"
+character(len=6),parameter :: JHUGen_Version="v5.3.4"
 ! 
 ! 
 integer, public :: Collider, PDFSet,PChannel,Process,DecayMode1,DecayMode2,TopDecays
@@ -50,12 +50,11 @@ real(8),parameter :: MPhotonCutoff = 4d0*GeV
 
 logical, public, parameter :: RandomizeVVdecays = .true. ! randomize DecayMode1 and DecayMode2 in H-->VV decays
 
-integer, public, parameter :: RequestNLeptons = 4       ! requested number of charged leptons in ReadLHE mode  (-1: no request)
-real(8), public, parameter :: M_Top   = 173d0     *GeV      ! 
+integer, public, parameter :: RequestNLeptons = -1           ! requested number of charged leptons in ReadLHE mode  (-1: no request)
+real(8), public            :: M_Top   = 173d0     *GeV      ! 
 real(8), public, parameter :: Ga_Top  = 1.33d0    *GeV      ! 
 real(8), public, parameter :: M_Z     = 91.1876d0 *GeV      ! Z boson mass (PDG-2011)
 real(8), public, parameter :: Ga_Z    = 2.4952d0  *GeV      ! Z boson width(PDG-2011)
-!real(8), public, parameter :: Ga_Z    = 2.5012d0  *GeV      
 real(8), public, parameter :: M_W     = 80.399d0  *GeV      ! W boson mass (PDG-2011)
 real(8), public, parameter :: Ga_W    = 2.085d0   *GeV      ! W boson width(PDG-2011)
 real(8), public            :: M_Reso  = 125.6d0   *GeV      ! X resonance mass (spin 0, spin 1, spin 2)     (carefule: no longer a parameter, can be overwritten by command line argument)
@@ -316,13 +315,10 @@ integer, public :: NumLeptInEvent=0
    real(8),    public, parameter :: Lambda_w4 = 10000d0*GeV
    real(8),    public, parameter :: Lambda_w5 = 10000d0*GeV
 
-!  couplings for ttbar+H
+!  couplings for ttbar+H and bbar+H
    complex(8),    public, parameter :: kappa       = (1d0,0d0)
    complex(8),    public, parameter :: kappa_tilde = (0d0,0d0) 
-   complex(8),    public, parameter :: couplHTT_right_dyn = m_top/vev/2d0 * ( kappa + (0d0,1d0)*kappa_tilde )
-   complex(8),    public, parameter :: couplHTT_left_dyn  = m_top/vev/2d0 * ( kappa - (0d0,1d0)*kappa_tilde )
-
-
+ 
 ! V-f-fbar couplings:
 !   g_R(f) = -e*sw/cw*Q(f)                 = e/2/sw/cw * a(b,c)R,
 !   g_L(f) = -e*sw/cw*Q(f) + e/sw/cw*T3(f) = e/2/sw/cw * a(b,c)L
