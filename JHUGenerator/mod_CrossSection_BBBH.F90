@@ -167,7 +167,7 @@ IF( GENEVT ) THEN
           call EvalAmp_GG_TTBH(MomExt,LO_Res_GG_Unpol)
           PDFFac1 = pdf(0,1)*pdf(0,2)
           EvalUnWeighted_BBBH = LO_Res_GG_Unpol * PDFFac1 * PreFac
-          MY_IDUP(1:5) = (/Glu_,Glu_,Hig_,ATop_,Top_/)
+          MY_IDUP(1:5) = (/Glu_,Glu_,Hig_,ABot_,Bot_/)
           ICOLUP(1:2,1:11) = 0
           
       else
@@ -175,7 +175,7 @@ IF( GENEVT ) THEN
           call EvalAmp_QQB_TTBH(MomExt,LO_Res_QQB_Unpol)
           PDFFac1 = pdf( LHA2M_pdf(iPartons(1)),1) * pdf( LHA2M_pdf(iPartons(2)),2)
           EvalUnWeighted_BBBH = LO_Res_QQB_Unpol * PDFFac1 * PreFac 
-          MY_IDUP(1:5) = (/ LHA2M_pdf(iPartons(1)),LHA2M_pdf(iPartons(2)),Hig_,ATop_,Top_/)
+          MY_IDUP(1:5) = (/ LHA2M_pdf(iPartons(1)),LHA2M_pdf(iPartons(2)),Hig_,ABot_,Bot_/)
           ICOLUP(1:2,1:11) = 0
 
       endif
