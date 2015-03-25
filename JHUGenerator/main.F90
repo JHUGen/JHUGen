@@ -29,7 +29,7 @@ logical,parameter :: useBetaVersion=.false.! this should be set to .false.
    if( .not.useBetaVersion .and.   ConvertLHEFile ) then
         call StartConvertLHE(VG_Result,VG_Error)
    elseif( .not.useBetaVersion .and. .not.ReadLHEFile ) then
-        if( Process.eq.80 .or. Process.eq.60 .or. Process.eq.61 ) then
+        if( Process.eq.80 .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.90 ) then
            call StartVegas_NEW(VG_Result,VG_Error)
         else
            call StartVegas(VG_Result,VG_Error)
