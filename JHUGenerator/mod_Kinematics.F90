@@ -793,7 +793,7 @@ use ModParameters
 implicit none
 real(8) :: Mom(1:4,1:11)
 real(8),optional :: EventWeight
-integer :: MY_IDUP(1:11),ICOLUP(1:2,1:11),LHE_IDUP(1:13),ISTUP(1:13),MOTHUP(1:2,1:13)
+integer :: MY_IDUP(1:11),ICOLUP(1:2,1:11),LHE_IDUP(1:5),ISTUP(1:5),MOTHUP(1:2,1:5)
 integer :: NUP,IDPRUP,i
 real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP,Lifetime,Spin,MomDummy(1:4,1:13)
 character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0)"
@@ -804,7 +804,7 @@ integer, parameter :: bbar=4,b=5,Hbos=3,inLeft=1,inRight=2
 ! The LHE numbering scheme can be found here: http://pdg.lbl.gov/mc_particle_id_contents.html and http://lhapdf.hepforge.org/manual#tth_sEcA
 
 
-do i=1,11
+do i=1,5
     LHE_IDUP(i) = convertLHE( MY_IDUP(i) )
 enddo
 
@@ -814,7 +814,7 @@ SCALUP=Mu_Fact * 100d0
 AQEDUP=alpha_QED
 AQCDUP=0.11d0
 
-ISTUP(1:13) = (/-1,-1,1,2,2,1,1,1,1,1,1,2,2/)
+ISTUP(1:5) = (/-1,-1,1,1,1/)
 
 
 MOTHUP(1:2,inLeft)  = (/0,0/)

@@ -1596,7 +1596,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
      NEvent=0
      do while ( .true. ) 
          NEvent=NEvent + 1
-         NumLeptInEvent = 0
+         LeptInEvent(:) = 0         
          read(16,fmt=InputFmt0) EventNumPart,EventInfoLine!  read number of particle from the first line after <event> and other info
 !        read event lines
          do nline=1,EventNumPart
@@ -1615,7 +1615,8 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                   iHiggs = nline
             endif
             if( IsALHELepton(LHE_IDUP(nline)) ) then
-                  NumLeptInEvent = NumLeptInEvent + 1
+                  LeptInEvent(0) = LeptInEvent(0) + 1
+                  LeptInEvent( LeptInEvent(0) ) = LHE_IDUP(nline)
             endif
          enddo
          
@@ -1623,10 +1624,10 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
           EHat = pH2sq
           do tries=1,5000000
               call random_number(yRnd)
-              dum = EvalUnWeighted_withoutProduction(yRnd,.true.,Ehat,RES,HiggsDK_Mom(1:4,6:9),HiggsDK_IDUP,HiggsDK_ICOLUP)
+              dum = EvalUnWeighted_withoutProduction(yRnd,.true.,Ehat,Res,HiggsDK_Mom(1:4,6:9),HiggsDK_IDUP,HiggsDK_ICOLUP)
               if( Res.ne.0d0 ) exit
           enddo
-          if( Res.ne.0d0 ) then ! decay event was accepted
+          if( Res.gt.0d0 ) then ! decay event was accepted
              call boost(HiggsDK_Mom(1:4,6),MomHiggs(1:4),pH2sq)
              call boost(HiggsDK_Mom(1:4,7),MomHiggs(1:4),pH2sq)
              call boost(HiggsDK_Mom(1:4,8),MomHiggs(1:4),pH2sq)
@@ -1648,7 +1649,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                   write(io_LogFile,*) NEvent," events accepted (",time_int-time_start, ") seconds"
              endif
 
-          else! decay event was not accepted after ncall evaluations, read next production event
+          elseif( Res.eq.0d0 ) then ! decay event was not accepted after ncall evaluations, read next production event
              print *, "Rejected event after ",tries-1," evaluations"
              AlertCounter = AlertCounter + 1 
           endif
@@ -1662,11 +1663,11 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
               read(16,fmt="(A160)",IOSTAT=stat,END=99) OtherLines(1:160)
               if(OtherLines(1:30).eq."</LesHouchesEvents>") then
                   goto 99
-              elseif( OtherLines(1:8).eq."</event>" .and. Res.ne.0d0 ) then
+              elseif( OtherLines(1:8).eq."</event>" .and. Res.gt.0d0 ) then
                   write(io_LHEOutFile,"(A)") "</event>"
               elseif( OtherLines(1:8).eq."<event>" ) then
                   exit
-              elseif( Res.ne.0d0 ) then !if there are "#" comments
+              elseif( Res.gt.0d0 ) then !if there are "#" comments
                   write(io_LHEOutFile,fmt="(A)") trim(OtherLines)
               elseif( tries.gt.10000000 ) then
                   write(io_LHEOutFile,"(A)") "</event>"
