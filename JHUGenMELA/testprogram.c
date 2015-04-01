@@ -267,7 +267,8 @@ int main(void){
  Ptth[10][3]= +(0.91848714288910793 );
  
  MReso = 125.60 / 100.0;
- __modttbh_MOD_initprocess_ttbh(&MReso);
+ double MTop = 173.00 / 100.0;
+ __modttbh_MOD_initprocess_ttbh(&MReso,&MTop);
 
  int TopDecays=0;
       __modttbh_MOD_evalamp_gg_ttbh(Ptth, TTBHcoupl, &TopDecays ,&MatElSq);
@@ -371,7 +372,7 @@ int main(void){
  nninitpdf_(&someParam);
 
  MReso = 125.60 / 100.0;
-//  __modttbh_MOD_initprocess_ttbh(&MReso);  // done above already
+//  __modttbh_MOD_initprocess_ttbh(&MReso,&MTop);  // done above already
  TopDecays=1;   // this parameter has to match the one in variables.F90; only for the purpose of this test
 
  
