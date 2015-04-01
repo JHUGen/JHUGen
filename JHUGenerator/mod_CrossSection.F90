@@ -3069,7 +3069,7 @@ use ModMisc
 use ifport
 #endif
 implicit none
-real(8) :: Res
+real(8) :: Res!  .ne.0: accepted event,  .eq.0: reject event,   .eq.-1: reject event and exit the loop over 'tries'
 real(8) :: EvalUnWeighted_withoutProduction,LO_Res_Unpol,yRnd(1:22),VgsWgt,LO_Res_Unpol1,LO_Res_Unpol2
 real(8) :: tau,x1,x2,sHatJacobi,PreFac
 integer :: NBin(1:NumHistograms),NHisto,i
@@ -3078,7 +3078,7 @@ real(8) :: MomExt(1:4,1:4),MomDK(1:4,1:4),MomExt_f(1:4,1:4),MomDK_f(1:4,1:4),Mom
 logical :: applyPSCut,genEvt
 real(8) :: CS_max,eta1,eta2
 real(8) :: oneovervolume, bound(1:11), sumtot,yz1,yz2,EZ_max,dr,MZ1,MZ2,ML1,ML2,ML3,ML4
-integer :: i1, ifound, i2, MY_IDUP(1:9), ICOLUP(1:2,1:9)
+integer :: i1, i2, MY_IDUP(1:9), ICOLUP(1:2,1:9),OSSFPair,LeptInEvent_tmp(0:8)
 real(8)::  ntRnd,ZMass(1:2),AcceptedEvent(1:4,1:4)
 real(8) :: offzchannel
 include 'vegas_common.f'
@@ -3101,13 +3101,7 @@ include 'csmaxvalue.f'
 !    IDUP(8)  -->  MomDK(:,4)  -->     v-spinor
 !    IDUP(9)  -->  MomDK(:,3)  -->  ubar-spinor
    call VVBranchings(MY_IDUP(4:9),ICOLUP(1:2,6:9))
-   if( RequestNLeptons.gt.0 ) then
-        if( CountLeptons(MY_IDUP(6:9))+NumLeptInEvent .lt. RequestNLeptons ) then 
-            EvalUnWeighted_withoutProduction = 0d0
-            return
-        endif
-   endif
-
+   
    if( (RandomizeVVdecays.eqv..true.) ) then
    if( (MY_IDUP(6).ne.MY_IDUP(8)) .and. (IsAZDecay(DecayMode1)) .and. (IsAZDecay(DecayMode2)) ) then
      if( (yrnd(16).le.0.5d0) ) then
@@ -3277,6 +3271,40 @@ include 'csmaxvalue.f'
 
 
 IF( GENEVT ) THEN
+
+      if( RequestNLeptons.gt.0 ) then! lepton filter
+            LeptInEvent_tmp(0:8) = LeptInEvent(0:8)
+            do i1=6,9
+                if( IsALepton(MY_IDUP(i1)) ) then
+                  LeptInEvent_tmp(0) = LeptInEvent_tmp(0)+1
+                  LeptInEvent_tmp( LeptInEvent_tmp(0) ) = ConvertLHE(MY_IDUP(i1))
+                endif
+            enddo
+!             print *, "total number of leptons", LeptInEvent_tmp(0),": ", LeptInEvent_tmp(1: LeptInEvent_tmp(0))
+            if( LeptInEvent_tmp(0) .lt. RequestNLeptons ) then
+!                 print *,"not enough leptons",LeptInEvent_tmp(0)
+                Res = -1d0
+                return
+            elseif( RequestOSSF ) then 
+                OSSFPair = 0
+                do i1=1,LeptInEvent_tmp(0)-1
+                    do i2=i1+1,LeptInEvent_tmp(0)
+                        if( LeptInEvent_tmp(i1)+LeptInEvent_tmp(i2).eq.0 ) then! found a l+ l- pair
+                          LeptInEvent_tmp(i2) = -999! remove from list
+                          OSSFPair = OSSFPair + 1
+                          exit
+                        endif 
+                    enddo
+                enddo
+!                 print *, "found ",OSSFPair," OSSF pairs"
+                if( OSSFPair.lt.2 ) then
+                    Res = -1d0
+                    return
+                endif    
+            endif
+      endif
+
+
 
       MY_IDUP(1:2)=(/Glu_,Glu_/)
       ICOLUP(1:2,1) = (/501,502/)
