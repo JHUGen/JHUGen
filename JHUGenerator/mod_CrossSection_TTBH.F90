@@ -150,15 +150,48 @@ EvalUnWeighted_TTBH = 0d0
    if (EHat.lt.2*M_Top+M_Reso) return
    call EvalPhasespace_2to3M(EHat,(/M_Reso,M_Top,M_Top/),yRnd(3:7),MomExt(1:4,1:5),PSWgt)! a(1)b(2)-->H(3)+tbar(4)+t(5)
    call boost2Lab(eta1,eta2,5,MomExt(1:4,1:5))
-   
+
+   ICOLUP(1:2,3) = (/000,000/)
+   ICOLUP(1:2,4) = (/000,502/)
+   ICOLUP(1:2,5) = (/501,000/)
    if( TOPDECAYS.NE.0 ) then
       call EvalPhasespace_TopDecay(MomExt(1:4,4),yRnd(08:11),MomExt(1:4,06:08),PSWgt2)    ! ATop 
       call EvalPhasespace_TopDecay(MomExt(1:4,5),yRnd(12:15),MomExt(1:4,09:11),PSWgt3)    !  Top
       PSWgt = PSWgt * PSWgt2*PSWgt3
-      if( TOPDECAYS.EQ.1 ) MY_IDUP(6:11)=(/ABot_,ElM_,ANuE_,Bot_,MuP_,NuM_/)
-      if( TOPDECAYS.EQ.2 ) MY_IDUP(6:11)=(/ABot_,Dn_,AUp_,Bot_,ADn_,Up_/)
-      if( TOPDECAYS.EQ.3 ) MY_IDUP(6:11)=(/ABot_,ElM_,ANuE_,Bot_,ADn_,Up_/)
-      if( TOPDECAYS.EQ.4 ) MY_IDUP(6:11)=(/ABot_,Dn_,AUp_,Bot_,MuP_,NuM_/)
+      if( TOPDECAYS.EQ.1 ) then
+          MY_IDUP(6:11)=(/ABot_,ElM_,ANuE_,Bot_,MuP_,NuM_/)
+          ICOLUP(1:2,6) = (/000,502/)
+          ICOLUP(1:2,7) = (/000,000/)
+          ICOLUP(1:2,8) = (/000,000/)
+          ICOLUP(1:2,9) = (/501,000/)
+          ICOLUP(1:2,10)= (/000,000/)
+          ICOLUP(1:2,11)= (/000,000/)             
+      elseif( TOPDECAYS.EQ.2 ) then
+          MY_IDUP(6:11)=(/ABot_,Dn_,AUp_,Bot_,ADn_,Up_/)
+          ICOLUP(1:2,6) = (/000,502/)
+          ICOLUP(1:2,7) = (/503,000/)
+          ICOLUP(1:2,8) = (/000,503/)
+          ICOLUP(1:2,9) = (/501,000/)
+          ICOLUP(1:2,10)= (/000,504/)
+          ICOLUP(1:2,11)= (/504,000/)   
+      elseif( TOPDECAYS.EQ.3 ) then
+          MY_IDUP(6:11)=(/ABot_,ElM_,ANuE_,Bot_,ADn_,Up_/)
+          ICOLUP(1:2,6) = (/000,502/)
+          ICOLUP(1:2,7) = (/000,000/)
+          ICOLUP(1:2,8) = (/000,000/)
+          ICOLUP(1:2,9) = (/501,000/)
+          ICOLUP(1:2,10)= (/000,504/)
+          ICOLUP(1:2,11)= (/504,000/)   
+      elseif( TOPDECAYS.EQ.4 ) then
+          MY_IDUP(6:11)=(/ABot_,Dn_,AUp_,Bot_,MuP_,NuM_/)
+          ICOLUP(1:2,6) = (/000,502/)
+          ICOLUP(1:2,7) = (/503,000/)
+          ICOLUP(1:2,8) = (/000,503/)
+          ICOLUP(1:2,9) = (/501,000/)
+          ICOLUP(1:2,10)= (/000,000/)
+          ICOLUP(1:2,11)= (/000,000/)
+      endif
+      
    else
       MY_IDUP(6:11)=-9999
    endif 
@@ -178,21 +211,25 @@ EvalUnWeighted_TTBH = 0d0
 IF( GENEVT ) THEN   
       
       if( iPartons(1).eq.0 .and. iPartons(2).eq.0 ) then
-      
           call EvalAmp_GG_TTBH(MomExt,LO_Res_GG_Unpol)
           PDFFac1 = pdf(0,1)*pdf(0,2)
           EvalUnWeighted_TTBH = LO_Res_GG_Unpol * PDFFac1 * PreFac
           MY_IDUP(1:5) = (/Glu_,Glu_,Hig_,ATop_,Top_/)
-          ICOLUP(1:2,1:11) = 0
+          ICOLUP(1:2,1) = (/501,510/)
+          ICOLUP(1:2,2) = (/510,502/)    
           
       else
-
           call EvalAmp_QQB_TTBH(MomExt,LO_Res_QQB_Unpol)
           PDFFac1 = pdf( LHA2M_pdf(iPartons(1)),1) * pdf( LHA2M_pdf(iPartons(2)),2)
           EvalUnWeighted_TTBH = LO_Res_QQB_Unpol * PDFFac1 * PreFac 
           MY_IDUP(1:5) = (/ LHA2M_pdf(iPartons(1)),LHA2M_pdf(iPartons(2)),Hig_,ATop_,Top_/)
-          ICOLUP(1:2,1:11) = 0
-
+          if( iPartons(1).gt.0 ) then
+             ICOLUP(1:2,1) = (/501,000/)
+             ICOLUP(1:2,2) = (/000,502/)          
+          else
+             ICOLUP(1:2,1) = (/000,502/)          
+             ICOLUP(1:2,2) = (/501,000/)
+          endif
       endif
       
       CS_max = CSmax(iPartons(1),iPartons(2))
