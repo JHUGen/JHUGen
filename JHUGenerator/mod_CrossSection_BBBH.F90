@@ -147,6 +147,10 @@ EvalUnWeighted_BBBH = 0d0
    call boost2Lab(eta1,eta2,5,MomExt(1:4,1:5))
    
    MY_IDUP(6:11)=-9999
+   ICOLUP(1:2,6:11) = 0
+   ICOLUP(1:2,3) = (/000,000/)
+   ICOLUP(1:2,4) = (/000,502/)
+   ICOLUP(1:2,5) = (/501,000/)   
 !    call EvalPhasespace_HDecay(MomExt(1:4,3),yRnd(16:17),MomExt(1:4,12:13),PSWgt4)
 !    PSWgt = PSWgt * PSWgt4 
    FluxFac = 1d0/(2d0*EHat**2)
@@ -163,21 +167,24 @@ EvalUnWeighted_BBBH = 0d0
 IF( GENEVT ) THEN   
       
       if( iPartons(1).eq.0 .and. iPartons(2).eq.0 ) then
-      
           call EvalAmp_GG_TTBH(MomExt,LO_Res_GG_Unpol)
           PDFFac1 = pdf(0,1)*pdf(0,2)
           EvalUnWeighted_BBBH = LO_Res_GG_Unpol * PDFFac1 * PreFac
           MY_IDUP(1:5) = (/Glu_,Glu_,Hig_,ABot_,Bot_/)
-          ICOLUP(1:2,1:11) = 0
-          
+          ICOLUP(1:2,1) = (/501,510/)
+          ICOLUP(1:2,2) = (/510,502/)            
       else
-
           call EvalAmp_QQB_TTBH(MomExt,LO_Res_QQB_Unpol)
           PDFFac1 = pdf( LHA2M_pdf(iPartons(1)),1) * pdf( LHA2M_pdf(iPartons(2)),2)
           EvalUnWeighted_BBBH = LO_Res_QQB_Unpol * PDFFac1 * PreFac 
           MY_IDUP(1:5) = (/ LHA2M_pdf(iPartons(1)),LHA2M_pdf(iPartons(2)),Hig_,ABot_,Bot_/)
-          ICOLUP(1:2,1:11) = 0
-
+          if( iPartons(1).gt.0 ) then
+             ICOLUP(1:2,1) = (/501,000/)
+             ICOLUP(1:2,2) = (/000,502/)          
+          else
+             ICOLUP(1:2,1) = (/000,502/)          
+             ICOLUP(1:2,2) = (/501,000/)
+          endif
       endif
       
       CS_max = CSmax(iPartons(1),iPartons(2))
