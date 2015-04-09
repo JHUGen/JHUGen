@@ -3101,6 +3101,7 @@ include 'csmaxvalue.f'
 !    IDUP(8)  -->  MomDK(:,4)  -->     v-spinor
 !    IDUP(9)  -->  MomDK(:,3)  -->  ubar-spinor
    call VVBranchings(MY_IDUP(4:9),ICOLUP(1:2,6:9))
+!    print *, MY_IDUP(4:9);pause
    
    if( (RandomizeVVdecays.eqv..true.) ) then
    if( (MY_IDUP(6).ne.MY_IDUP(8)) .and. (IsAZDecay(DecayMode1)) .and. (IsAZDecay(DecayMode2)) ) then
@@ -3274,7 +3275,7 @@ IF( GENEVT ) THEN
 
       if( RequestNLeptons.gt.0 ) then! lepton filter
             LeptInEvent_tmp(0:8) = LeptInEvent(0:8)
-            print *, ""
+!             print *, ""
             do i1=6,9
                 if( IsALepton(MY_IDUP(i1)) ) then
                   LeptInEvent_tmp(0) = LeptInEvent_tmp(0)+1
@@ -3304,7 +3305,7 @@ IF( GENEVT ) THEN
                     return
                 endif
             endif
-            print *, "accept event"
+!             print *, "accept event"
       endif
 
 
@@ -3351,7 +3352,7 @@ IF( GENEVT ) THEN
               AcceptedEvent(1:4,1:4) = MomDK_f(1:4,1:4)
          endif
          Res = 1d0
-          print *, "aj accept"
+!           print *, "aj accept"
 
       else
           RejeCounter = RejeCounter + 1
