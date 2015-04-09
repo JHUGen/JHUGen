@@ -1625,6 +1625,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
           do tries=1,5000000
               call random_number(yRnd)
               dum = EvalUnWeighted_withoutProduction(yRnd,.true.,Ehat,Res,HiggsDK_Mom(1:4,6:9),HiggsDK_IDUP,HiggsDK_ICOLUP)
+              print *, "xx2",res,tries
               if( Res.ne.0d0 ) exit
           enddo
           if( Res.gt.0d0 ) then ! decay event was accepted

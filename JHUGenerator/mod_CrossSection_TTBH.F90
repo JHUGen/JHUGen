@@ -136,9 +136,9 @@ implicit none
 real(8) :: yRnd(1:16),VgsWgt, EvalUnWeighted_TTBH
 real(8) :: pdf(-6:6,1:2),RES(-5:5,-5:5)
 real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi
-real(8) :: MomExt(1:4,1:13), PSWgt,PSWgt2,PSWgt3,CS_Max
+real(8) :: MomExt(1:4,1:13), PSWgt,PSWgt2,PSWgt3,CS_Max,DKRnd
 real(8) :: LO_Res_GG_Unpol,LO_Res_QQB_Unpol,PreFac,PDFFac1,PDFFac2
-integer :: NBin(1:NumHistograms),NHisto,iPartons(1:2)
+integer :: NBin(1:NumHistograms),NHisto,iPartons(1:2),DKFlavor
 integer :: MY_IDUP(1:11),ICOLUP(1:2,1:11),nparton
 logical :: applyPSCut,genEvt
 include 'csmaxvalue.f'  
@@ -158,38 +158,92 @@ EvalUnWeighted_TTBH = 0d0
       call EvalPhasespace_TopDecay(MomExt(1:4,4),yRnd(08:11),MomExt(1:4,06:08),PSWgt2)    ! ATop 
       call EvalPhasespace_TopDecay(MomExt(1:4,5),yRnd(12:15),MomExt(1:4,09:11),PSWgt3)    !  Top
       PSWgt = PSWgt * PSWgt2*PSWgt3
+
       if( TOPDECAYS.EQ.1 ) then
-          MY_IDUP(6:11)=(/ABot_,ElM_,ANuE_,Bot_,MuP_,NuM_/)
+          call random_number(DKRnd)! W-
+          DKFlavor = WLepBranching( DKRnd )!= ElM or MuM
+          MY_IDUP(6)= ABot_
+          MY_IDUP(7) = -abs(DKFlavor)     ! lepton(-)
+          MY_IDUP(8) = -abs(DKFlavor)-7   ! anti-neutrino
+      
+          call random_number(DKRnd)! W+
+          DKFlavor = WLepBranching( DKRnd )!= ElM or MuM
+          MY_IDUP(9)= Bot_
+          MY_IDUP(10) = +abs(DKFlavor)     ! lepton(+)
+          MY_IDUP(11) = +abs(DKFlavor)+7   ! neutrino    
+   
           ICOLUP(1:2,6) = (/000,502/)
           ICOLUP(1:2,7) = (/000,000/)
           ICOLUP(1:2,8) = (/000,000/)
           ICOLUP(1:2,9) = (/501,000/)
           ICOLUP(1:2,10)= (/000,000/)
           ICOLUP(1:2,11)= (/000,000/)             
+
       elseif( TOPDECAYS.EQ.2 ) then
-          MY_IDUP(6:11)=(/ABot_,Dn_,AUp_,Bot_,ADn_,Up_/)
+
+          call random_number(DKRnd)
+          DKFlavor = WQuaUpBranching( DKRnd )!= Up,Chm
+          MY_IDUP(6)= ABot_
+          MY_IDUP(7) = +abs(DKFlavor)+1  ! dn flavor
+          MY_IDUP(8) = -abs(DKFlavor)    ! anti-up flavor
+          
+          call random_number(DKRnd)
+          DKFlavor = WQuaUpBranching( DKRnd )!= Up,Chm
+          MY_IDUP(9)= Bot_          
+          MY_IDUP(10) = -abs(DKFlavor)-1  ! anti-dn flavor
+          MY_IDUP(11) = +abs(DKFlavor)    ! up flavor
+          
           ICOLUP(1:2,6) = (/000,502/)
           ICOLUP(1:2,7) = (/503,000/)
           ICOLUP(1:2,8) = (/000,503/)
           ICOLUP(1:2,9) = (/501,000/)
           ICOLUP(1:2,10)= (/000,504/)
           ICOLUP(1:2,11)= (/504,000/)   
+          
       elseif( TOPDECAYS.EQ.3 ) then
-          MY_IDUP(6:11)=(/ABot_,ElM_,ANuE_,Bot_,ADn_,Up_/)
+!           MY_IDUP(6:11)=(/ABot_,ElM_,ANuE_,Bot_,ADn_,Up_/)
+
+          call random_number(DKRnd)! W-
+          DKFlavor = WLepBranching( DKRnd )!= ElM or MuM
+          MY_IDUP(6)= ABot_
+          MY_IDUP(7) = -abs(DKFlavor)     ! lepton(-)
+          MY_IDUP(8) = -abs(DKFlavor)-7   ! anti-neutrino
+
+          call random_number(DKRnd)
+          DKFlavor = WQuaUpBranching( DKRnd )!= Up,Chm
+          MY_IDUP(9)= Bot_          
+          MY_IDUP(10) = -abs(DKFlavor)-1  ! anti-dn flavor
+          MY_IDUP(11) = +abs(DKFlavor)    ! up flavor
+          
           ICOLUP(1:2,6) = (/000,502/)
           ICOLUP(1:2,7) = (/000,000/)
           ICOLUP(1:2,8) = (/000,000/)
           ICOLUP(1:2,9) = (/501,000/)
           ICOLUP(1:2,10)= (/000,504/)
           ICOLUP(1:2,11)= (/504,000/)   
+          
       elseif( TOPDECAYS.EQ.4 ) then
-          MY_IDUP(6:11)=(/ABot_,Dn_,AUp_,Bot_,MuP_,NuM_/)
+!           MY_IDUP(6:11)=(/ABot_,Dn_,AUp_,Bot_,MuP_,NuM_/)
+
+          call random_number(DKRnd)
+          DKFlavor = WQuaUpBranching( DKRnd )!= Up,Chm
+          MY_IDUP(6)= ABot_
+          MY_IDUP(7) = +abs(DKFlavor)+1  ! dn flavor
+          MY_IDUP(8) = -abs(DKFlavor)    ! anti-up flavor
+
+          call random_number(DKRnd)! W+
+          DKFlavor = WLepBranching( DKRnd )!= ElM or MuM
+          MY_IDUP(9)= Bot_
+          MY_IDUP(10) = +abs(DKFlavor)     ! lepton(+)
+          MY_IDUP(11) = +abs(DKFlavor)+7   ! neutrino              
+
           ICOLUP(1:2,6) = (/000,502/)
           ICOLUP(1:2,7) = (/503,000/)
           ICOLUP(1:2,8) = (/000,503/)
           ICOLUP(1:2,9) = (/501,000/)
           ICOLUP(1:2,10)= (/000,000/)
           ICOLUP(1:2,11)= (/000,000/)
+          
       endif
       
    else

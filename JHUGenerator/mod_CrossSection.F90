@@ -3274,15 +3274,16 @@ IF( GENEVT ) THEN
 
       if( RequestNLeptons.gt.0 ) then! lepton filter
             LeptInEvent_tmp(0:8) = LeptInEvent(0:8)
+            print *, ""
             do i1=6,9
                 if( IsALepton(MY_IDUP(i1)) ) then
                   LeptInEvent_tmp(0) = LeptInEvent_tmp(0)+1
                   LeptInEvent_tmp( LeptInEvent_tmp(0) ) = ConvertLHE(MY_IDUP(i1))
                 endif
             enddo
-!             print *, "total number of leptons", LeptInEvent_tmp(0),": ", LeptInEvent_tmp(1: LeptInEvent_tmp(0))
+!             print *, "leptons in event: ",LeptInEvent_tmp(1: LeptInEvent_tmp(0))
             if( LeptInEvent_tmp(0) .lt. RequestNLeptons ) then
-!                 print *,"not enough leptons",LeptInEvent_tmp(0)
+!                 print *,"not enough leptons, reject!" !,LeptInEvent_tmp(1: LeptInEvent_tmp(0))
                 Res = -1d0
                 return
             elseif( RequestOSSF ) then 
@@ -3298,10 +3299,12 @@ IF( GENEVT ) THEN
                 enddo
 !                 print *, "found ",OSSFPair," OSSF pairs"
                 if( OSSFPair.lt.2 ) then
+!                     print *,"no OSSF pair, reject!" !,LeptInEvent_tmp(1: LeptInEvent_tmp(0))
                     Res = -1d0
                     return
-                endif    
+                endif
             endif
+            print *, "accept event"
       endif
 
 
@@ -3348,6 +3351,7 @@ IF( GENEVT ) THEN
               AcceptedEvent(1:4,1:4) = MomDK_f(1:4,1:4)
          endif
          Res = 1d0
+          print *, "aj accept"
 
       else
           RejeCounter = RejeCounter + 1
