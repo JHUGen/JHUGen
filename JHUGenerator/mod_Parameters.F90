@@ -3,7 +3,7 @@ implicit none
 save
 ! 
 ! 
-character(len=6),parameter :: JHUGen_Version="v5.4.6"
+character(len=6),parameter :: JHUGen_Version="v5.4.7"
 ! 
 ! 
 integer, public :: Collider, PDFSet,PChannel,Process,DecayMode1,DecayMode2,TopDecays
@@ -50,8 +50,8 @@ real(8),parameter :: MPhotonCutoff = 4d0*GeV
 
 logical, public, parameter :: RandomizeVVdecays = .true. ! randomize DecayMode1 and DecayMode2 in H-->VV decays
 
-integer, public, parameter :: RequestNLeptons = 4           ! requested number of charged leptons in ReadLHE mode  (-1: no request)
-logical, public, parameter :: RequestOSSF = .true.          ! requested 2 opposite-sign-same-flavor charged lepton pairs in ReadLHE mode
+integer, public, parameter :: RequestNLeptons = -1           ! requested number of charged leptons in ReadLHE mode  (-1: no request)
+logical, public, parameter :: RequestOSSF = .false.          ! requested 2 opposite-sign-same-flavor charged lepton pairs in ReadLHE mode
 real(8), public            :: M_Top   = 173d0     *GeV      ! 
 real(8), public, parameter :: Ga_Top  = 1.33d0    *GeV      ! 
 real(8), public, parameter :: M_Z     = 91.1876d0 *GeV      ! Z boson mass (PDG-2011)
