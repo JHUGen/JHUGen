@@ -1516,7 +1516,7 @@ character(len=160) :: FirstLines,EventInfoLine,OtherLines
 character(len=160) :: EventLine(1:maxpart)
 integer :: n,clock,i,stat,iHiggs
 integer, dimension(:), allocatable :: gfort_seed
-integer,parameter :: InputLHEFormat = 1  !  1=POWHEG, 2=JHUGen (old format), 3=JHUGen (new format), 4=MadGraph
+integer,parameter :: InputLHEFormat = 3  !  1=POWHEG, 2=JHUGen (old format), 3=JHUGen (new format), 4=MadGraph
 
 
 if(InputLHEFormat.eq.1) then
@@ -1625,7 +1625,6 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
           do tries=1,5000000
               call random_number(yRnd)
               dum = EvalUnWeighted_withoutProduction(yRnd,.true.,Ehat,Res,HiggsDK_Mom(1:4,6:9),HiggsDK_IDUP,HiggsDK_ICOLUP)
-              print *, "xx2",res,tries
               if( Res.ne.0d0 ) exit
           enddo
           if( Res.gt.0d0 ) then ! decay event was accepted
