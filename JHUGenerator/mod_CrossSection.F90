@@ -3273,46 +3273,6 @@ include 'csmaxvalue.f'
 
 IF( GENEVT ) THEN
 
-      if( RequestNLeptons.gt.0 ) then! lepton filter
-            LeptInEvent_tmp(0:8) = LeptInEvent(0:8)
-!             print *, ""
-            do i1=6,9
-                if( IsALepton(MY_IDUP(i1)) ) then
-                  LeptInEvent_tmp(0) = LeptInEvent_tmp(0)+1
-                  LeptInEvent_tmp( LeptInEvent_tmp(0) ) = ConvertLHE(MY_IDUP(i1))
-                endif
-            enddo
-!             print *, "leptons in event: ",LeptInEvent_tmp(1: LeptInEvent_tmp(0))
-            if( LeptInEvent_tmp(0) .lt. RequestNLeptons ) then
-!                 print *,"not enough leptons, reject!" !,LeptInEvent_tmp(1: LeptInEvent_tmp(0))
-                Res = -1d0
-                return
-            elseif( RequestOSSF ) then 
-                OSSFPair = 0
-                do i1=1,LeptInEvent_tmp(0)-1
-                    do i2=i1+1,LeptInEvent_tmp(0)
-                        if(      ( LeptInEvent_tmp(i1)+LeptInEvent_tmp(i2).eq.0                                                     )    &     ! found a l+ l- pair
-                            .OR. ( abs(LeptInEvent_tmp(i1)).eq.ConvertLHE(TaM_) .and. LeptInEvent_tmp(i1)*LeptInEvent_tmp(i2).lt.0  )    &     ! found l tau pair
-                            .OR. ( abs(LeptInEvent_tmp(i2)).eq.ConvertLHE(TaM_) .and. LeptInEvent_tmp(i1)*LeptInEvent_tmp(i2).lt.0  )    &     ! found l tau pair
-                        ) then
-                          LeptInEvent_tmp(i2) = -999! remove from list
-                          OSSFPair = OSSFPair + 1
-                          exit
-                        endif 
-                    enddo
-                enddo
-!                 print *, "found ",OSSFPair," OSSF pairs"
-                if( OSSFPair.lt.2 ) then
-!                     print *,"no OSSF pair, reject!" !,LeptInEvent_tmp(1: LeptInEvent_tmp(0))
-                    Res = -1d0
-                    return
-                endif
-            endif
-!             print *, "accept event"
-      endif
-
-
-
       MY_IDUP(1:2)=(/Glu_,Glu_/)
       ICOLUP(1:2,1) = (/501,502/)
       ICOLUP(1:2,2) = (/502,501/)
@@ -3345,6 +3305,51 @@ IF( GENEVT ) THEN
           Res = 0d0
 
       elseif( EvalUnWeighted_withoutProduction .gt. yRnd(14)*CS_max ) then
+      
+      
+      
+          if( RequestNLeptons.gt.0 ) then! lepton filter
+                LeptInEvent_tmp(0:8) = LeptInEvent(0:8)
+    !             print *, ""
+                do i1=6,9
+                    if( IsALepton(MY_IDUP(i1)) ) then
+                      LeptInEvent_tmp(0) = LeptInEvent_tmp(0)+1
+                      LeptInEvent_tmp( LeptInEvent_tmp(0) ) = ConvertLHE(MY_IDUP(i1))
+                    endif
+                enddo
+    !             print *, "leptons in event: ",LeptInEvent_tmp(1: LeptInEvent_tmp(0))
+                if( LeptInEvent_tmp(0) .lt. RequestNLeptons ) then
+    !                 print *,"not enough leptons, reject!" !,LeptInEvent_tmp(1: LeptInEvent_tmp(0))
+                    Res = -1d0
+                    return
+                elseif( RequestOSSF ) then 
+                    OSSFPair = 0
+                    do i1=1,LeptInEvent_tmp(0)-1
+                        do i2=i1+1,LeptInEvent_tmp(0)
+                            if(      ( LeptInEvent_tmp(i1)+LeptInEvent_tmp(i2).eq.0                                                     )    &     ! found a l+ l- pair
+                                .OR. ( abs(LeptInEvent_tmp(i1)).eq.ConvertLHE(TaM_) .and. LeptInEvent_tmp(i1)*LeptInEvent_tmp(i2).lt.0  )    &     ! found l tau pair
+                                .OR. ( abs(LeptInEvent_tmp(i2)).eq.ConvertLHE(TaM_) .and. LeptInEvent_tmp(i1)*LeptInEvent_tmp(i2).lt.0  )    &     ! found l tau pair
+                            ) then
+                              LeptInEvent_tmp(i2) = -999! remove from list
+                              OSSFPair = OSSFPair + 1
+                              exit
+                            endif 
+                        enddo
+                    enddo
+    !                 print *, "found ",OSSFPair," OSSF pairs"
+                    if( OSSFPair.lt.2 ) then
+    !                     print *,"no OSSF pair, reject!" !,LeptInEvent_tmp(1: LeptInEvent_tmp(0))
+                        Res = -1d0
+                        return
+                    endif
+                endif
+    !             print *, "accept event"
+          endif
+      
+      
+      
+      
+      
          do NHisto=1,NumHistograms
                call intoHisto(NHisto,NBin(NHisto),1d0)  ! CS_Max is the integration volume
          enddo
