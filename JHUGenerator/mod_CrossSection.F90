@@ -3291,7 +3291,10 @@ IF( GENEVT ) THEN
                 OSSFPair = 0
                 do i1=1,LeptInEvent_tmp(0)-1
                     do i2=i1+1,LeptInEvent_tmp(0)
-                        if( LeptInEvent_tmp(i1)+LeptInEvent_tmp(i2).eq.0 ) then! found a l+ l- pair
+                        if(      ( LeptInEvent_tmp(i1)+LeptInEvent_tmp(i2).eq.0                                                     )    &     ! found a l+ l- pair
+                            .OR. ( abs(LeptInEvent_tmp(i1)).eq.ConvertLHE(TaM_) .and. LeptInEvent_tmp(i1)*LeptInEvent_tmp(i2).lt.0  )    &     ! found l tau pair
+                            .OR. ( abs(LeptInEvent_tmp(i2)).eq.ConvertLHE(TaM_) .and. LeptInEvent_tmp(i1)*LeptInEvent_tmp(i2).lt.0  )    &     ! found l tau pair
+                        ) then
                           LeptInEvent_tmp(i2) = -999! remove from list
                           OSSFPair = OSSFPair + 1
                           exit

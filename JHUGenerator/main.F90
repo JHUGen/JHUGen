@@ -1516,7 +1516,7 @@ character(len=160) :: FirstLines,EventInfoLine,OtherLines
 character(len=160) :: EventLine(1:maxpart)
 integer :: n,clock,i,stat,iHiggs
 integer, dimension(:), allocatable :: gfort_seed
-integer,parameter :: InputLHEFormat = 3  !  1=POWHEG, 2=JHUGen (old format), 3=JHUGen (new format), 4=MadGraph
+integer,parameter :: InputLHEFormat = 1  !  1=POWHEG, 2=JHUGen (old format), 3=JHUGen (new format), 4=MadGraph
 
 
 if(InputLHEFormat.eq.1) then
