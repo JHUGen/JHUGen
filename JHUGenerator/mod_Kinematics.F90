@@ -934,13 +934,24 @@ ISTUP(5) = 1
 
 
 ! this is not correct: intermediate VV's need to be added
+! MOTHUP(1,1) = 0
+! MOTHUP(2,1) = 0
+! MOTHUP(1,2) = 0
+! MOTHUP(2,2) = 0
+! MOTHUP(1,3) = 1
+! MOTHUP(2,3) = 1
+! MOTHUP(1,4) = 2
+! MOTHUP(2,4) = 2
+! MOTHUP(1,5) = 1
+! MOTHUP(2,5) = 2
+
 MOTHUP(1,1) = 0
 MOTHUP(2,1) = 0
 MOTHUP(1,2) = 0
 MOTHUP(2,2) = 0
 MOTHUP(1,3) = 1
-MOTHUP(2,3) = 1
-MOTHUP(1,4) = 2
+MOTHUP(2,3) = 2
+MOTHUP(1,4) = 1
 MOTHUP(2,4) = 2
 MOTHUP(1,5) = 1
 MOTHUP(2,5) = 2
