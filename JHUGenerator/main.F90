@@ -43,7 +43,7 @@ logical,parameter :: useBetaVersion=.false.! this should be set to .false.
    call WriteHisto(VG_Result,VG_Error,time_end-time_start)
    call FinalizeOutput()
    call CloseFiles()
-   write(io_stdout,*) " Done"
+   write(io_stdout,*) "Done"
 
 END PROGRAM
 
@@ -1654,7 +1654,6 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
              AlertCounter = AlertCounter + 1 
           endif
 
-
 !        read optional lines
          FirstEvent = .true.
          tries = 0
@@ -1662,6 +1661,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
               tries = tries +1 
               read(16,fmt="(A160)",IOSTAT=stat,END=99) OtherLines(1:160)
               if(OtherLines(1:30).eq."</LesHouchesEvents>") then
+                  if( RequestNLeptons.gt.0 ) write(io_LHEOutFile,"(A,1F6.2,A)") "# Lepton filter efficiency:",dble(AccepCounter)/dble(NEvent)*100d0," %"
                   goto 99
               elseif( OtherLines(1:8).eq."</event>" .and. Res.gt.0d0 ) then
                   write(io_LHEOutFile,"(A)") "</event>"
@@ -1686,24 +1686,27 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
     write(io_stdout,*) ""
     write(io_stdout,*) "Evaluation Counter: ",EvalCounter
     write(io_stdout,*) "Acceptance Counter: ",AccepCounter
-    write(io_stdout,*) "Rejection  Counter: ",RejeCounter
-    write(io_stdout,*) " Alert  Counter: ",AlertCounter
+    write(io_stdout,*) "Rejection  Counter: ",RejeCounter    
+    write(io_stdout,*) "Alert  Counter: ",AlertCounter
     if( dble(AlertCounter)/dble(AccepCounter) .gt. 1d0*percent ) then
         write(io_stdout,*) "ALERT: The number of rejected events exceeds 1%."
         write(io_stdout,*) "       Increase CSMAX in main.F90 or VegasNc1."
     endif
-   write(io_stdout,*)  " event generation rate (events/sec)",dble(AccepCounter)/(time_end-time_start)
+   write(io_stdout,*)  "Event generation rate (events/sec)",dble(AccepCounter)/(time_end-time_start)
+   if( RequestNLeptons.gt.0 ) write(io_stdout,"(A,1F6.2,A)") " Lepton filter efficiency:",dble(AccepCounter)/dble(NEvent)*100d0," %"
 
+   
     write(io_LogFile,*) ""
     write(io_LogFile,*) "Evaluation Counter: ",EvalCounter
     write(io_LogFile,*) "Acceptance Counter: ",AccepCounter
     write(io_LogFile,*) "Rejection  Counter: ",RejeCounter
-    write(io_LogFile,*) " Alert  Counter: ",AlertCounter
+    write(io_LogFile,*) "Alert  Counter: ",AlertCounter
     if( dble(AlertCounter)/dble(AccepCounter) .gt. 1d0*percent ) then
         write(io_LogFile,*) "ALERT: The number of rejected events exceeds 1%."
         write(io_LogFile,*) "       Increase CSMAX in main.F90 or VegasNc1."
     endif
-   write(io_LogFile,*)  " event generation rate (events/sec)",dble(AccepCounter)/(time_end-time_start)
+   write(io_LogFile,*)  "Event generation rate (events/sec)",dble(AccepCounter)/(time_end-time_start)
+   if( RequestNLeptons.gt.0 ) write(io_LogFile,"(A,1F6.2,A)") " Lepton filter efficiency:",dble(AccepCounter)/dble(NEvent)*100d0," %"
 
 
 

@@ -3,7 +3,7 @@ implicit none
 save
 ! 
 ! 
-character(len=6),parameter :: JHUGen_Version="v5.4.8"
+character(len=6),parameter :: JHUGen_Version="v5.4.9"
 ! 
 ! 
 integer, public :: Collider, PDFSet,PChannel,Process,DecayMode1,DecayMode2,TopDecays
@@ -17,6 +17,7 @@ integer(8), public :: EvalCounter=0
 integer(8), public :: RejeCounter=0
 integer(8), public :: AccepCounter=0
 integer(8), public :: AlertCounter=0
+integer(8), public :: FilterCounter=0
 integer(8), public :: AccepCounter_part(-5:5,-5:5)=0
 real(8) :: time_start,time_end,time_int
 logical, public :: warmup

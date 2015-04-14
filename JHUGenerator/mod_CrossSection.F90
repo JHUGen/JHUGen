@@ -3308,7 +3308,7 @@ IF( GENEVT ) THEN
       
       
       
-          if( RequestNLeptons.gt.0 ) then! lepton filter
+         if( RequestNLeptons.gt.0 ) then! lepton filter
                 LeptInEvent_tmp(0:8) = LeptInEvent(0:8)
     !             print *, ""
                 do i1=6,9
@@ -3353,12 +3353,8 @@ IF( GENEVT ) THEN
                 endif
 !                 print *, "accept event"
 !                 pause
-          endif
-      
-      
-      
-      
-      
+         endif! lepton filter 
+         
          do NHisto=1,NumHistograms
                call intoHisto(NHisto,NBin(NHisto),1d0)  ! CS_Max is the integration volume
          enddo
@@ -3369,8 +3365,7 @@ IF( GENEVT ) THEN
               AcceptedEvent(1:4,1:4) = MomDK_f(1:4,1:4)
          endif
          Res = 1d0
-!           print *, "aj accept"
-
+         
       else
           RejeCounter = RejeCounter + 1
           Res = 0d0
