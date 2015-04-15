@@ -3,7 +3,7 @@ implicit none
 save
 ! 
 ! 
-character(len=6),parameter :: JHUGen_Version="v5.2.5"
+character(len=6),parameter :: JHUGen_Version="v5.4.9"
 ! 
 ! 
 integer, public :: Collider, PDFSet,PChannel,Process,DecayMode1,DecayMode2,TopDecays
@@ -17,6 +17,7 @@ integer(8), public :: EvalCounter=0
 integer(8), public :: RejeCounter=0
 integer(8), public :: AccepCounter=0
 integer(8), public :: AlertCounter=0
+integer(8), public :: FilterCounter=0
 integer(8), public :: AccepCounter_part(-5:5,-5:5)=0
 real(8) :: time_start,time_end,time_int
 logical, public :: warmup
@@ -50,11 +51,12 @@ real(8),parameter :: MPhotonCutoff = 4d0*GeV
 
 logical, public, parameter :: RandomizeVVdecays = .true. ! randomize DecayMode1 and DecayMode2 in H-->VV decays
 
-real(8), public, parameter :: M_Top   = 173d0     *GeV      ! 
+integer, public, parameter :: RequestNLeptons = -1           ! requested number of charged leptons in ReadLHE mode  (-1: no request)
+logical, public, parameter :: RequestOSSF = .false.          ! requested 2 opposite-sign-same-flavor charged lepton pairs in ReadLHE mode
+real(8), public            :: M_Top   = 173d0     *GeV      ! 
 real(8), public, parameter :: Ga_Top  = 1.33d0    *GeV      ! 
 real(8), public, parameter :: M_Z     = 91.1876d0 *GeV      ! Z boson mass (PDG-2011)
 real(8), public, parameter :: Ga_Z    = 2.4952d0  *GeV      ! Z boson width(PDG-2011)
-!real(8), public, parameter :: Ga_Z    = 2.5012d0  *GeV      
 real(8), public, parameter :: M_W     = 80.399d0  *GeV      ! W boson mass (PDG-2011)
 real(8), public, parameter :: Ga_W    = 2.085d0   *GeV      ! W boson width(PDG-2011)
 real(8), public            :: M_Reso  = 125.6d0   *GeV      ! X resonance mass (spin 0, spin 1, spin 2)     (carefule: no longer a parameter, can be overwritten by command line argument)
@@ -66,10 +68,10 @@ real(8), public, parameter :: Lambda  = 1000d0    *GeV      ! Lambda coupling en
 real(8), public, parameter :: m_el = 0.00051100d0  *GeV         ! electron mass
 real(8), public, parameter :: m_mu = 0.10566d0     *GeV         ! muon mass
 real(8), public, parameter :: m_tau = 1.7768d0     *GeV         ! tau mass
-real(8), public, parameter :: m_bot = 4.2000d0     *GeV         ! bottom quark mass
+real(8), public, parameter :: m_bot = 4.75000d0    *GeV         ! bottom quark mass
 
 real(8), public, parameter :: HiggsDecayLengthMM = 0d0      ! Higgs decay length in [mm]
-real(8), public, parameter :: Gf = 1.16639d-5/GeV**2        ! fermi constant
+real(8), public, parameter :: Gf = 1.16639d-5/GeV**2        ! Fermi constant
 real(8), public, parameter :: vev = 1.0d0/sqrt(Gf*sqrt(2.0d0))
 real(8), public, parameter :: gwsq = 4.0d0 * M_W**2/vev**2  ! weak constant squared
 real(8), public, parameter :: alpha_QED = 1d0/132.2319d0    ! el.magn. coupling
@@ -80,11 +82,11 @@ real(8), public            :: Mu_Fact                       ! pdf factorization 
 real(8), public, parameter :: LHC_Energy=13000d0  *GeV      ! LHC hadronic center of mass energy
 real(8), public, parameter :: TEV_Energy=1960d0  *GeV       ! Tevatron hadronic center of mass energy
 real(8), public, parameter :: ILC_Energy=250d0  *GeV        ! Linear collider center of mass energy
-real(8), public, parameter :: POL_A = 0d0                   !e+ polarization. 0: no polarization, 100: helicity = 1, -100: helicity = -1
-real(8), public, parameter :: POL_B = 0d0                   !e- polarization. 0: no polarization, 100: helicity = 1, -100: helicity = -1
-logical, public, parameter :: H_DK =.false.                 !default to false so H in V* > VH (Process = 50) does not decay
-!logical, public, parameter :: V_DK =.true.                  !default to true so V in V* > VH (Process = 50) decays
-real(8), public, parameter :: ptjetcut = 15d0*GeV           ! jet min pt
+real(8), public, parameter :: POL_A = 0d0                   ! e+ polarization. 0: no polarization, 100: helicity = 1, -100: helicity = -1
+real(8), public, parameter :: POL_B = 0d0                   ! e- polarization. 0: no polarization, 100: helicity = 1, -100: helicity = -1
+logical, public, parameter :: H_DK =.false.                 ! default to false so H in V* > VH (Process = 50) does not decay
+!logical, public, parameter :: V_DK =.true.                 ! default to true so V in V* > VH (Process = 50) decays
+real(8), public, parameter :: pTjetcut = 15d0*GeV           ! jet min pt
 real(8), public, parameter :: Rjet = 0.5d0                  ! jet deltaR, antikt algorithm 
 
 !----------------------------------------------------------------------------------------------------
@@ -154,6 +156,7 @@ integer, public :: Br_Z_dd_counter=0
 integer, public :: Br_W_ll_counter=0
 integer, public :: Br_W_ud_counter=0
 integer, public :: Br_counter(1:5,1:5)=0
+integer, public :: LeptInEvent(0:8) = 0
 
 !-- parameters that define on-shell spin 0 coupling to SM fields, see note
    logical, public, parameter :: generate_as = .false.
@@ -314,13 +317,10 @@ integer, public :: Br_counter(1:5,1:5)=0
    real(8),    public, parameter :: Lambda_w4 = 10000d0*GeV
    real(8),    public, parameter :: Lambda_w5 = 10000d0*GeV
 
-!  couplings for ttbar+H
+!  couplings for ttbar+H and bbar+H
    complex(8),    public, parameter :: kappa       = (1d0,0d0)
    complex(8),    public, parameter :: kappa_tilde = (0d0,0d0) 
-   complex(8),    public, parameter :: couplHTT_right_dyn = m_top/vev/2d0 * ( kappa + (0d0,1d0)*kappa_tilde )
-   complex(8),    public, parameter :: couplHTT_left_dyn  = m_top/vev/2d0 * ( kappa - (0d0,1d0)*kappa_tilde )
-
-
+ 
 ! V-f-fbar couplings:
 !   g_R(f) = -e*sw/cw*Q(f)                 = e/2/sw/cw * a(b,c)R,
 !   g_L(f) = -e*sw/cw*Q(f) + e/sw/cw*T3(f) = e/2/sw/cw * a(b,c)L
@@ -776,6 +776,35 @@ integer :: PartType
   endif
 
 END FUNCTION
+FUNCTION IsALHELepton(PartType)! note that lepton means charged lepton here
+implicit none
+logical :: IsALHELepton
+integer :: PartType
+
+
+  if( abs(PartType).eq.11 .or. abs(PartType).eq.13 .or. abs(PartType).eq.15 ) then
+     IsALHELepton = .true.
+  else
+     IsALHELepton=.false.
+  endif
+
+END FUNCTION
+
+
+
+FUNCTION IsALepton(PartType)! note that lepton means charged lepton here
+implicit none
+logical :: IsALepton
+integer :: PartType
+
+
+  if( abs(PartType).eq.ElP_ .or. abs(PartType).eq.MuP_ .or. abs(PartType).eq.TaP_ ) then
+     IsALepton = .true.
+  else
+     IsALepton=.false.
+  endif
+
+END FUNCTION
 
 
 
@@ -792,6 +821,21 @@ integer :: PartType
   endif
 
 
+END FUNCTION
+
+
+FUNCTION CountLeptons( MY_IDUP )
+implicit none
+integer :: MY_IDUP(:),CountLeptons
+integer :: i
+
+   CountLeptons = 0
+   do i = 1,size(MY_IDUP)
+      if( IsALepton( MY_IDUP(i) ) ) CountLeptons=CountLeptons+1
+   enddo
+
+
+RETURN
 END FUNCTION
 
 
