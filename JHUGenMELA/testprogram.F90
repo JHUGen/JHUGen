@@ -261,7 +261,7 @@ integer :: i, j
    TTBHcoupl(2) = (0d0,0d0)
 
    m_Reso=125.6d0 * GeV  
-   call InitProcess_TTBH(m_Reso)
+   call InitProcess_TTBH(m_Reso,m_top)
 
    TopDecays = 0
       call EvalAmp_GG_TTBH(p13(1:4,1:13),TTBHcoupl,TopDecays,MatElSq)
@@ -274,7 +274,7 @@ integer :: i, j
       print *, 'Matr.el. squared,gg->ttbH',MatElSq,MatElSq/161.41857569536978d0
       call EvalAmp_QQB_TTBH(p13(1:4,1:13),TTBHcoupl,TopDecays,MatElSq)
       print *, 'Matr.el. squared,qqb->ttbH',MatElSq,MatElSq/597.73846213084539d0
-  
+
   
 
   
@@ -302,8 +302,8 @@ integer :: i, j
 !    call InitProcess_TTBH(m_Reso)! done above already
 
    TopDecays = 1
-        call EvalXSec_PP_TTBH(p13(1:4,1:13),TTBHcoupl,TopDecays,2,MatElSq)
-        print *, 'Matr.el. squared,gg->ttbH',MatElSq ,MatElSq/( 1849.90671287913d0 + 2842.07693611093d0 ) * 1.14594184663D0
+   call EvalXSec_PP_TTBH(p13(1:4,1:13),TTBHcoupl,TopDecays,2,MatElSq)
+   print *, 'Matr.el. squared,gg->ttbH',MatElSq ,MatElSq/( 1849.90671287913d0 + 2842.07693611093d0 ) * 1.14594184663D0
    
    
   

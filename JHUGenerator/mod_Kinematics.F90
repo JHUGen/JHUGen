@@ -788,6 +788,106 @@ END SUBROUTINE
 
 
 
+SUBROUTINE WriteOutEvent_BBBH(Mom,MY_IDUP,ICOLUP,EventWeight)
+use ModParameters
+implicit none
+real(8) :: Mom(1:4,1:11)
+real(8),optional :: EventWeight
+integer :: MY_IDUP(1:11),ICOLUP(1:2,1:11),LHE_IDUP(1:5),ISTUP(1:5),MOTHUP(1:2,1:5)
+integer :: NUP,IDPRUP,i
+real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP,Lifetime,Spin,MomDummy(1:4,1:13)
+character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0)"
+integer, parameter :: bbar=4,b=5,Hbos=3,inLeft=1,inRight=2
+
+
+! For description of the LHE format see http://arxiv.org/abs/hep-ph/0109068 and http://arxiv.org/abs/hep-ph/0609017
+! The LHE numbering scheme can be found here: http://pdg.lbl.gov/mc_particle_id_contents.html and http://lhapdf.hepforge.org/manual#tth_sEcA
+
+
+do i=1,5
+    LHE_IDUP(i) = convertLHE( MY_IDUP(i) )
+enddo
+
+
+IDPRUP=100
+SCALUP=Mu_Fact * 100d0
+AQEDUP=alpha_QED
+AQCDUP=0.11d0
+
+ISTUP(1:5) = (/-1,-1,1,1,1/)
+
+
+MOTHUP(1:2,inLeft)  = (/0,0/)
+MOTHUP(1:2,inRight) = (/0,0/)
+MOTHUP(1:2,Hbos)    = (/1,2/)
+MOTHUP(1:2,bbar)    = (/1,2/)
+MOTHUP(1:2,b)       = (/1,2/)
+
+
+NUP = 5
+
+   
+if( present(EventWeight) ) then
+    XWGTUP=EventWeight
+else
+    XWGTUP=1.0d0
+endif
+
+Lifetime = 0.0d0
+Spin     = 0.1d0
+
+do i=1,11
+    MomDummy(1,i) = 100.0d0*Mom(1,i)
+    MomDummy(2,i) = 100.0d0*Mom(2,i)
+    MomDummy(3,i) = 100.0d0*Mom(3,i)
+    MomDummy(4,i) = 100.0d0*Mom(4,i)
+enddo
+
+
+
+write(io_LHEOutFile,"(A)") "<event>"
+write(io_LHEOutFile,"(I2,X,I3,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7)") NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
+! in order of appearance:
+! (*) number of particles in the event
+! (*) process ID (user defined)
+! (*) weighted or unweighted events: +1=unweighted, otherwise= see manual
+! (*) pdf factorization scale in GeV
+! (*) alpha_QED coupling for this event 
+! (*) alpha_s coupling for this event
+
+
+
+! parton_a
+i=1
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
+
+! parton_b
+i=2
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
+
+! H
+i=3
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),M_Reso*100d0,Lifetime,Spin
+
+! bb
+i=4
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),m_top*100d0,Lifetime,Spin
+
+! b
+i=5
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),m_top*100d0,Lifetime,Spin
+
+
+
+write(io_LHEOutFile,"(A)") "</event>"
+
+
+
+
+END SUBROUTINE
+
+
+
 
 
 
@@ -834,13 +934,24 @@ ISTUP(5) = 1
 
 
 ! this is not correct: intermediate VV's need to be added
+! MOTHUP(1,1) = 0
+! MOTHUP(2,1) = 0
+! MOTHUP(1,2) = 0
+! MOTHUP(2,2) = 0
+! MOTHUP(1,3) = 1
+! MOTHUP(2,3) = 1
+! MOTHUP(1,4) = 2
+! MOTHUP(2,4) = 2
+! MOTHUP(1,5) = 1
+! MOTHUP(2,5) = 2
+
 MOTHUP(1,1) = 0
 MOTHUP(2,1) = 0
 MOTHUP(1,2) = 0
 MOTHUP(2,2) = 0
 MOTHUP(1,3) = 1
-MOTHUP(2,3) = 1
-MOTHUP(1,4) = 2
+MOTHUP(2,3) = 2
+MOTHUP(1,4) = 1
 MOTHUP(2,4) = 2
 MOTHUP(1,5) = 1
 MOTHUP(2,5) = 2
@@ -1838,15 +1949,17 @@ implicit none
 real(8) :: Mom(1:4,1:11)
 logical :: applyPSCut
 integer :: NBin(:)
-real(8) :: pT_t,pT_H
+real(8) :: pT_t,pT_H,pT_tbar
 integer, parameter :: tbar=4,t=5,Hbos=3,inLeft=1,inRight=2,bbar=6, lepM=7,nubar=8,b=9,lepP=10,nu=11
 
 
     applyPSCut = .false.
 
     pT_t = get_PT(Mom(1:4,t))
+    pT_tbar = get_PT(Mom(1:4,tbar))
     pT_H = get_PT(Mom(1:4,Hbos))
     
+    if( m_Top.lt.10d0*GeV  .and. (pT_t.lt.pTjetcut .or. pT_tbar.lt.pTjetcut) ) applyPSCut=.true.
     
 !   binning
     NBin(1)  = WhichBin(1,pT_t)
@@ -1856,6 +1969,37 @@ integer, parameter :: tbar=4,t=5,Hbos=3,inLeft=1,inRight=2,bbar=6, lepM=7,nubar=
     
 RETURN
 END SUBROUTINE
+
+
+
+SUBROUTINE Kinematics_BBBH(Mom,applyPSCut,NBin)
+use ModParameters
+use ModMisc
+implicit none
+real(8) :: Mom(1:4,1:11)
+logical :: applyPSCut
+integer :: NBin(:)
+real(8) :: pT_b,pT_H,pT_bbar
+integer, parameter :: bbar=4,b=5,Hbos=3,inLeft=1,inRight=2
+
+
+    applyPSCut = .false.
+
+    pT_b = get_PT(Mom(1:4,b))
+    pT_bbar = get_PT(Mom(1:4,bbar))
+    pT_H = get_PT(Mom(1:4,Hbos))
+    
+    if( pT_b.lt.pTjetcut .or. pT_bbar.lt.pTjetcut ) applyPSCut=.true.
+    
+!   binning
+    NBin(1)  = WhichBin(1,pT_b)
+    NBin(2)  = WhichBin(2,pT_H)
+    
+    
+RETURN
+END SUBROUTINE
+
+
 
 
 
@@ -2346,8 +2490,8 @@ real(8) :: DKRnd
         DKFlavor = ZQuaBranching_flat( DKRnd )!= Up,Dn,Chm,Str,Bot
         MY_IDUP(6) =-DKFlavor
         MY_IDUP(7) =+DKFlavor
-        ICOLUP(1:2,6) = (/0,503/)
-        ICOLUP(1:2,7) = (/503,0/)
+        ICOLUP(1:2,6) = (/0,803/)
+        ICOLUP(1:2,7) = (/803,0/)
    elseif( DecayMode1.eq.2 ) then! Z1->2tau
         MY_IDUP(4) = Z0_
         MY_IDUP(6) = TaP_
@@ -2370,8 +2514,8 @@ real(8) :: DKRnd
         DKFlavor = WQuaUpBranching( DKRnd )!= Up,Chm
         MY_IDUP(6) = -abs(DKFlavor)-1  ! anti-dn flavor
         MY_IDUP(7) = +abs(DKFlavor)    ! up flavor
-        ICOLUP(1:2,6) = (/0,503/)
-        ICOLUP(1:2,7) = (/503,0/)
+        ICOLUP(1:2,6) = (/0,803/)
+        ICOLUP(1:2,7) = (/803,0/)
    elseif( DecayMode1.eq.6 ) then! W1(+)->taunu
         MY_IDUP(4) = Wp_
         MY_IDUP(6) = TaP_
@@ -2393,8 +2537,8 @@ real(8) :: DKRnd
         MY_IDUP(6) =-DKFlavor
         MY_IDUP(7) =+DKFlavor
         if(IsAQuark(DKFlavor)) then
-           ICOLUP(1:2,6) = (/0,503/)
-           ICOLUP(1:2,7) = (/503,0/)
+           ICOLUP(1:2,6) = (/0,803/)
+           ICOLUP(1:2,7) = (/803,0/)
         endif
    elseif( DecayMode1.eq.10 ) then! W1(+)->l+tau  +nu
         call random_number(DKRnd)
@@ -2409,8 +2553,8 @@ real(8) :: DKRnd
         if(IsAQuark(DKFlavor)) then
            MY_IDUP(6) = -abs(DKFlavor)-1  ! anti-dn flavor  
            MY_IDUP(7) = +abs(DKFlavor)    ! up flavor
-           ICOLUP(1:2,6) = (/0,503/)
-           ICOLUP(1:2,7) = (/503,0/)
+           ICOLUP(1:2,6) = (/0,803/)
+           ICOLUP(1:2,7) = (/803,0/)
         else
            MY_IDUP(6) = +abs(DKFlavor)     ! lepton(+)
            MY_IDUP(7) = +abs(DKFlavor)+7   ! neutrino
@@ -2430,8 +2574,8 @@ real(8) :: DKRnd
         DKFlavor = ZQuaBranching_flat( DKRnd )!= Up,Dn,Chm,Str,Bot
         MY_IDUP(8) =-DKFlavor
         MY_IDUP(9) =+DKFlavor
-        ICOLUP(1:2,8) = (/0,504/)
-        ICOLUP(1:2,9) = (/504,0/)
+        ICOLUP(1:2,8) = (/0,804/)
+        ICOLUP(1:2,9) = (/804,0/)
    elseif( DecayMode2.eq.2 ) then! Z2->2tau
         MY_IDUP(5) = Z0_
         MY_IDUP(8) = TaP_
@@ -2454,8 +2598,8 @@ real(8) :: DKRnd
         DKFlavor = WQuaUpBranching( DKRnd )!= Up,Chm
         MY_IDUP(8) = -abs(DKFlavor)    ! anti-up flavor
         MY_IDUP(9) = +abs(DKFlavor)+1  ! dn flavor
-        ICOLUP(1:2,8) = (/0,504/)
-        ICOLUP(1:2,9) = (/504,0/)
+        ICOLUP(1:2,8) = (/0,804/)
+        ICOLUP(1:2,9) = (/804,0/)
    elseif( DecayMode2.eq.6 ) then! W2(-)->taunu
         MY_IDUP(5) = Wm_
         MY_IDUP(8) = ANuT_
@@ -2477,8 +2621,8 @@ real(8) :: DKRnd
         MY_IDUP(8) =-DKFlavor
         MY_IDUP(9) =+DKFlavor
         if(IsAQuark(DKFlavor)) then
-           ICOLUP(1:2,8) = (/0,504/)
-           ICOLUP(1:2,9) = (/504,0/)
+           ICOLUP(1:2,8) = (/0,804/)
+           ICOLUP(1:2,9) = (/804,0/)
         endif
    elseif( DecayMode2.eq.10 ) then! W2(-)->l+tau + nu
         call random_number(DKRnd)
@@ -2493,8 +2637,8 @@ real(8) :: DKRnd
         if(IsAQuark(DKFlavor)) then
            MY_IDUP(8) = -abs(DKFlavor)    ! anti-up flavor
            MY_IDUP(9) = +abs(DKFlavor)+1  ! dn flavor
-           ICOLUP(1:2,8) = (/0,504/)
-           ICOLUP(1:2,9) = (/504,0/)
+           ICOLUP(1:2,8) = (/0,804/)
+           ICOLUP(1:2,9) = (/804,0/)
         else
            MY_IDUP(8) = -abs(DKFlavor)-7   ! anti-neutrino
            MY_IDUP(9) = -abs(DKFlavor)     ! lepton(-)
@@ -3227,7 +3371,7 @@ SUBROUTINE EvalPhasespace_2to3M(EHat,Mass,xRndPS,Mom,PSWgt)
 use ModParameters
 implicit none
 real(8) :: EHat
-real(8) :: PSWgt,PSWgt2,PSWgt3,Mass
+real(8) :: PSWgt,PSWgt2,PSWgt3,Mass(1:3)
 real(8) :: xRndPS(1:5)
 real(8) :: Mom(1:4,1:5),TmpMom(1:4)
 ! real(8) :: MomDK(1:4,1:6)
@@ -3239,7 +3383,7 @@ real(8),parameter :: NPr=3, PiWgtPr = (2d0*Pi)**(4-NPr*3) * (4d0*Pi)**(NPr-1)
 
 
 !  generate PS: massless + massless --> massive(M) + massive(anti-top) + massive(top)
-  call genps(3,Ehat,xRndPS(1:5),(/Mass,m_Top,m_Top/),Mom(1:4,3:5),PSWgt)
+  call genps(3,Ehat,xRndPS(1:5),Mass,Mom(1:4,3:5),PSWgt)
   PSWgt = PSWgt*PiWgtPr
 
 !   call yeti3(Ehat,xRndPS(1:5),(/m_Top,m_Top,Mass/),Mom(1:4,3:5),PSWgt)

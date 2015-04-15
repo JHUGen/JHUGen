@@ -52,7 +52,9 @@ end type
 
 INTERFACE OPERATOR (.Ndot.)
    module procedure FourVecDot
+   module procedure FourVecDotReal
 END INTERFACE OPERATOR (.Ndot.)
+
 
 
 real(8), parameter :: PropCut = 1.0d-8
@@ -70,9 +72,9 @@ type(TreeProcess),save :: TheTreeAmps_QQB_TTBH(1:1)
 
  
 
-SUBROUTINE InitProcess_TTBH(m_Reso)
+SUBROUTINE InitProcess_TTBH(m_Reso,m_Ferm)
 implicit none
-real(8) :: m_Reso
+real(8) :: m_Reso,m_Ferm
 integer :: NumQuarks,NumGluons,NumBoson
 integer :: NumTrees
 integer :: iTree,NumParticles
@@ -114,13 +116,13 @@ include "includeVars.F90"
   
   ExtParticles(1)%PartType = ATop_
   ExtParticles(1)%ExtRef   = 1
-  ExtParticles(1)%Mass = m_Top
+  ExtParticles(1)%Mass = m_Ferm
   ExtParticles(1)%Mass2= ExtParticles(1)%Mass**2
   ExtParticles(1)%Helicity = 0
 
   ExtParticles(2)%PartType = Top_
   ExtParticles(2)%ExtRef   = 2
-  ExtParticles(2)%Mass = m_Top
+  ExtParticles(2)%Mass = m_Ferm
   ExtParticles(2)%Mass2= ExtParticles(2)%Mass**2
   ExtParticles(2)%Helicity = 0
 
@@ -169,7 +171,9 @@ RETURN
 END SUBROUTINE
   
 
+      
 
+  
       
 SUBROUTINE EvalXSec_PP_TTBH(Mom,TTBHcoupl,TopDecays,SelectProcess,Res)
 implicit none
@@ -179,10 +183,12 @@ integer :: SelectProcess! 0=gg, 1=qqb, 2=all
 integer :: TopDecays! 0=stable, 1=di-leptonic
 real(8) :: eta1,eta2,Etot,Pztot,MatElSq_GG,MatElSq_QQB,MatElSq_QBQ
 real(8) :: x1,x2,PDFScale,Collider_Energy,E_CMS
-real(8) :: NNpdf(1:2,-6:7)
+real(8) :: NNpdf(1:2,-6:7),m_ferm
 include 'includeVars.F90'
       
 
+      m_ferm = ExtParticles(1)%Mass
+      
       Collider_Energy = -(Mom(1,1)+Mom(1,2))
       if( TopDecays.eq.0 ) then
           Etot = Mom(1,3)+Mom(1,4)+Mom(1,5)
@@ -194,7 +200,7 @@ include 'includeVars.F90'
       x1 = (Etot+Pztot * sign(1d0,Mom(4,2)) )/Collider_Energy
       x2 = (Etot-Pztot * sign(1d0,Mom(4,2)) )/Collider_Energy
       E_CMS = dsqrt(x1*x2)*Collider_Energy
-      PDFScale = 0.5d0*( 2d0*m_top + m_Higgs ) * 100d0
+      PDFScale = 0.5d0*( 2d0*m_ferm + m_Higgs ) * 100d0
 
       Mom(1:4,1) = x1 * Mom(1:4,1)
       Mom(1:4,2) = x2 * Mom(1:4,2)
@@ -238,7 +244,7 @@ END SUBROUTINE
 SUBROUTINE EvalAmp_GG_TTBH(Mom,TTBHcoupl,TopDecays,SqAmp)
 ! use ModTopDecay
 implicit none
-real(8) :: Mom(1:4,1:13),SqAmp
+real(8) :: Mom(1:4,1:13),SqAmp,m_ferm
 integer :: TopDecays! 0=stable, 1=di-leptonic
 complex(8) :: ResOffSh(1:4,1:2),Res(1:2,1:2),TTBHcoupl(1:2)
 complex(8) :: GluPol(1:4,1:2,1:2)
@@ -247,10 +253,10 @@ real(8),parameter :: c_aa=64.D0/3.D0, c_ab=-8.D0/3.D0
 include 'includeVars.F90'
 SqAmp = 0d0
 
-    
+     m_ferm = ExtParticles(1)%Mass    
 
-     couplHTT_right_dyn = m_top/vev/2d0 * ( TTBHcoupl(1) + (0d0,1d0)*TTBHcoupl(2) )
-     couplHTT_left_dyn  = m_top/vev/2d0 * ( TTBHcoupl(1) - (0d0,1d0)*TTBHcoupl(2) )
+     couplHTT_right_dyn = m_ferm/vev/2d0 * ( TTBHcoupl(1) + (0d0,1d0)*TTBHcoupl(2) )
+     couplHTT_left_dyn  = m_ferm/vev/2d0 * ( TTBHcoupl(1) - (0d0,1d0)*TTBHcoupl(2) )
      if( TOPDECAYS.EQ.0 ) then
         ExtParticles(1)%Mom(1:4) = Mom(1:4,4)
         ExtParticles(2)%Mom(1:4) = Mom(1:4,5)
@@ -278,8 +284,8 @@ SqAmp = 0d0
      do TopHel1=-1,nhel,2
      do TopHel2=-1,nhel,2
      if( TOPDECAYS.eq.0 ) then
-             call ubarSpi_Dirac(ExtParticles(2)%Mom(1:4),M_Top,TopHel1,ExtParticles(2)%Pol(1:4))
-             call    vSpi_Dirac(ExtParticles(1)%Mom(1:4),M_Top,TopHel2,ExtParticles(1)%Pol(1:4))    
+             call ubarSpi_Dirac(ExtParticles(2)%Mom(1:4),m_ferm,TopHel1,ExtParticles(2)%Pol(1:4))
+             call    vSpi_Dirac(ExtParticles(1)%Mom(1:4),m_ferm,TopHel2,ExtParticles(1)%Pol(1:4))    
      endif
      do hel4=1,2
      
@@ -302,14 +308,14 @@ SqAmp = 0d0
     enddo   
     enddo
     
-    SqAmp = SqAmp * SpinAvg * GluonColAvg**2 * (4d0*Pi*alphas)**2  !* (4d0*pi*alpha_QED) * (m_top/(2d0*sitW*M_W))**2
+    SqAmp = SqAmp * SpinAvg * GluonColAvg**2 * (4d0*Pi*alphas)**2  !* (4d0*pi*alpha_QED) * (m_ferm/(2d0*sitW*M_W))**2
 
 !     print *, "SqAmp",SqAmp
 !     pause
     
 RETURN
 END SUBROUTINE
-      
+
 
       
       
@@ -319,7 +325,7 @@ END SUBROUTINE
 SUBROUTINE EvalAmp_QQB_TTBH(Mom,TTBHcoupl,TopDecays,SqAmp)
 ! use ModTopDecay
 implicit none
-real(8) :: Mom(1:4,1:13),SqAmp
+real(8) :: Mom(1:4,1:13),SqAmp,m_ferm
 complex(8) :: ResOffSh(1:4),Res(1:2),TTBHcoupl(1:2)
 complex(8) :: QuaPol(1:4,1:2,1:2)
 integer :: hel4,TopHel1,TopHel2,nhel
@@ -328,8 +334,11 @@ real(8),parameter :: c_aa=8.0D0
 include 'includeVars.F90'
 SqAmp = 0d0
 
-     couplHTT_right_dyn = m_top/vev/2d0 * ( TTBHcoupl(1) + (0d0,1d0)*TTBHcoupl(2) )
-     couplHTT_left_dyn  = m_top/vev/2d0 * ( TTBHcoupl(1) - (0d0,1d0)*TTBHcoupl(2) )
+
+     m_ferm = ExtParticles(1)%Mass    
+
+     couplHTT_right_dyn = m_ferm/vev/2d0 * ( TTBHcoupl(1) + (0d0,1d0)*TTBHcoupl(2) )
+     couplHTT_left_dyn  = m_ferm/vev/2d0 * ( TTBHcoupl(1) - (0d0,1d0)*TTBHcoupl(2) )
 
      if( TOPDECAYS.EQ.0 ) then
         ExtParticles(1)%Mom(1:4) = Mom(1:4,4)
@@ -357,8 +366,8 @@ SqAmp = 0d0
      do TopHel1=-1,nhel,2
      do TopHel2=-1,nhel,2
      if( TOPDECAYS.eq.0 ) then
-             call ubarSpi_Dirac(ExtParticles(2)%Mom(1:4),M_Top,TopHel1,ExtParticles(2)%Pol(1:4))
-             call    vSpi_Dirac(ExtParticles(1)%Mom(1:4),M_Top,TopHel2,ExtParticles(1)%Pol(1:4))    
+             call ubarSpi_Dirac(ExtParticles(2)%Mom(1:4),m_ferm,TopHel1,ExtParticles(2)%Pol(1:4))
+             call    vSpi_Dirac(ExtParticles(1)%Mom(1:4),m_ferm,TopHel2,ExtParticles(1)%Pol(1:4))    
      endif
      do hel4=1,2
      
@@ -374,11 +383,111 @@ SqAmp = 0d0
     enddo    
     enddo   
     enddo
-    SqAmp = SqAmp * SpinAvg * QuarkColAvg**2 * (4d0*Pi*alphas)**2  !* (4d0*pi*alpha_QED) * (m_top/(2d0*sitW*M_W))**2
+    SqAmp = SqAmp * SpinAvg * QuarkColAvg**2 * (4d0*Pi*alphas)**2  !* (4d0*pi*alpha_QED) * (m_ferm/(2d0*sitW*M_W))**2
     
 RETURN
 END SUBROUTINE
       
+
+
+
+SUBROUTINE EvalXSec_PP_BBBH(Mom,BBBHcoupl,SelectProcess,Res)
+implicit none
+real(8) :: Mom(1:4,1:13),Res
+complex(8) :: BBBHcoupl(1:2)
+integer :: SelectProcess! 0=gg, 1=qqb, 2=all 
+integer,parameter :: TopDecays=0
+
+        
+        call EvalXSec_PP_TTBH(Mom,BBBHcoupl,TopDecays,SelectProcess,Res)
+
+RETURN
+END SUBROUTINE
+  
+
+
+      
+SUBROUTINE EvalAmp_GG_BBBH(Mom,BBBHcoupl,SqAmp)
+implicit none
+real(8) :: Mom(1:4,1:13),SqAmp
+complex(8) :: BBBHcoupl(1:2)
+integer,parameter :: TopDecays=0
+  
+
+  call EvalAmp_GG_TTBH(Mom,BBBHcoupl,TopDecays,SqAmp)
+  
+RETURN
+END SUBROUTINE
+  
+  
+  
+
+      
+SUBROUTINE EvalAmp_QQB_BBBH(Mom,BBBHcoupl,SqAmp)
+implicit none
+real(8) :: Mom(1:4,1:13),SqAmp
+complex(8) :: BBBHcoupl(1:2)
+integer,parameter :: TopDecays=0
+
+
+  call EvalAmp_QQB_TTBH(Mom,BBBHcoupl,TopDecays,SqAmp)
+
+RETURN
+END SUBROUTINE
+  
+        
+      
+      
+
+      
+! p1,p2: on-shell f fbar with off-shell p0=p1+p2 
+! p0hat, p1hat,p2hat: on-shell H f fbar 
+SUBROUTINE ProjectHffb(p1,p2,m0,p0hat,p1hat,p2hat)
+implicit none
+real(8) :: p1(1:4),p2(1:4),m0,p0hat(1:4),p1hat(1:4),p2hat(1:4)
+real(8) :: alpha,beta,p0(1:4),mfsq,p0sq
+
+  p0(1:4) = p1(1:4) + p2(1:4)
+  p0sq = p0(1:4).Ndot.p0(1:4)
+  mfsq = p1(1:4).Ndot.p1(1:4)
+
+  alpha = dsqrt(dabs( (m0**2-4d0*mfsq)/(p0sq-4d0*mfsq) ))
+  beta = m0**2/dsqrt(dabs(p0sq))
+
+  p1hat(1:4) = +0.5d0*alpha*( p1(1:4)-p2(1:4) ) + 0.5d0*beta*( p1(1:4)+p2(1:4) )
+  p2hat(1:4) = -0.5d0*alpha*( p1(1:4)-p2(1:4) ) + 0.5d0*beta*( p1(1:4)+p2(1:4) )
+  p0hat(1:4) = beta*p0(1:4)
+  
+  
+RETURN
+END SUBROUTINE
+
+
+      
+! p1,p2: off-shell t tbar
+! p1hat,p2hat: on-shell t tbar with m1, m2
+SUBROUTINE ProjectTTb(p1,p2,m1,m2,p1hat,p2hat)
+implicit none
+real(8) :: p1(1:4),p2(1:4),m1,m2,p1hat(1:4),p2hat(1:4)
+real(8) :: xi,eta,a,b,c,p1sq,p2sq,p1p2
+
+  p1sq = p1(1:4).Ndot.p1(1:4)
+  p2sq = p2(1:4).Ndot.p2(1:4)
+  p1p2 = p1(1:4).Ndot.p2(1:4)
+
+  a = ( p1sq*p2(1:4) - p2sq*p1(1:4) + p1p2*(p2(1:4)-p1(1:4)) ).Ndot.( p1sq*p2(1:4) - p2sq*p1(1:4) + p1p2*(p2(1:4)-p1(1:4)) )
+  b = ( p1sq+p2sq+2d0*p1p2+m2**2-m1**2 ) * ( p1p2**2 - p1sq*p2sq )
+  c = 0.25d0*( p1sq+p2sq+2d0*p1p2+m2**2-m1**2 )**2*p1sq - (p1sq+p1p2)**2*m2**2
+  eta = 1d0/2d0/a * ( -b - dsqrt( dabs(b**2 -4d0*a*c) ) )
+  xi = ( p1sq+p2sq+2d0*p1p2 + m2**2 - m1**2 - 2d0*eta*(p2sq+p1p2) )/2d0/( p1sq + p1p2 )
+
+  p2hat(1:4) = xi*p1(1:4) + eta*p2(1:4)
+  p1hat(1:4) = (1d0-xi)*p1(1:4) + (1d0-eta)*p2(1:4)
+
+
+RETURN
+END SUBROUTINE
+
 
       
       
@@ -4936,6 +5045,18 @@ integer :: mu
    enddo
 return
 END FUNCTION FourVecDot
+
+
+FUNCTION FourVecDotReal(p1,p2)
+implicit none
+real(8), intent(in) :: p1(1:4),p2(1:4)
+real(8)  :: FourVecDotReal
+
+   FourVecDotReal = p1(1)*p2(1)-p1(2)*p2(2)-p1(3)*p2(3)-p1(4)*p2(4)
+
+return
+END FUNCTION FourVecDotReal
+
 
 FUNCTION eval_TripVert(k1,k2,v1,v2)
 implicit none
