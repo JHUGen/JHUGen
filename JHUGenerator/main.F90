@@ -14,7 +14,7 @@ logical,parameter :: useBetaVersion=.false.! this should be set to .false.
 
 
    call GetCommandlineArgs()
-   call InitPDFs()
+   call InitPDFs()!  
    call InitHisto()
    call InitParameters()
    call InitProcess()
@@ -76,6 +76,8 @@ integer :: NumArgs,NArg,OffShell_XVV,iunwgt,CountArg,iinterf
    ConvertLHEFile=.false.
    ReadCSmax=.false.
    GenerateEvents=.false.
+   LHAPDFString = ""
+   LHAPDFMember = 0
    iinterf = -1
 
 ! !       DecayMode=0:  Z --> l+ l- (l=e,mu)
@@ -111,6 +113,12 @@ integer :: NumArgs,NArg,OffShell_XVV,iunwgt,CountArg,iinterf
         CountArg = CountArg + 1
     elseif( arg(1:7).eq."PDFSet=" ) then
         read(arg(8:10),*) PDFSet
+        CountArg = CountArg + 1
+    elseif( arg(1:7).eq."LHAPDF=" ) then
+        read(arg(8:107),"(A)") LHAPDFString
+        CountArg = CountArg + 1
+    elseif( arg(1:10).eq."LHAPDFMem=" ) then
+        read(arg(11:13),*) LHAPDFMember
         CountArg = CountArg + 1
     elseif( arg(1:6).eq."MReso=" ) then
         read(arg(7:12),*) M_Reso
@@ -205,6 +213,13 @@ integer :: NumArgs,NArg,OffShell_XVV,iunwgt,CountArg,iinterf
         OffShellV2=.false.
     endif
 
+#if useLHAPDF==1
+    if( LHAPDFString.eq."" ) then
+       print *, "Need to specify pdf file name in command line argument LHAPDF"
+       stop    
+    endif
+#endif    
+    
 !     if( ((OffShellV1).or.(OffShellV2).or.(OffShellReson)) ) then
 !         print *, "off shell Z/W's only allowed for spin 0,2 resonance"
 ! !         stop
@@ -363,15 +378,24 @@ use ModParameters
 implicit none
 character :: pdftable*(100)
 
-
-    call SetCtq6(4)  ! 4    CTEQ6L1  Leading Order           0.130**   215** 165    cteq6l1.tbl
-
-    if( PDFSet.eq.3 ) then
+#if useLHAPDF==1
+     call InitPDFset(trim(LHAPDFString))
+     call InitPDF(LHAPDFMember)  
+#else
+     if( PDFSet.eq.1 ) then
+        call SetCtq6(4)  ! 4    CTEQ6L1  Leading Order cteq6l1.tbl
+     elseif( PDFSet.eq.3 ) then
 !         pdftable(:)="./pdfs/NNPDF23_lo_as_0130.LHgrid"
         pdftable(:)="./pdfs/NNPDF30_lo_as_0130.LHgrid"
         call NNPDFDriver(pdftable)
         call NNinitPDF(0)
-    endif
+     endif
+#endif
+
+
+     
+     
+     
      
 return
 END SUBROUTINE
@@ -2851,7 +2875,11 @@ character :: arg*(500)
         write(TheUnit,"(4X,A)") ""
         write(TheUnit,"(4X,A,L,L,L)") "OffXVV: ",OffShellReson,OffShellV1,OffShellV2
         write(TheUnit,"(4X,A,I1)") "PChannel: ",PChannel
+#if useLHAPDF==1
+        write(TheUnit,"(4X,A,A,A,I3)") "LHAPDF set ",trim(LHAPDFString), ", member=",LHAPDFMember
+#else
         write(TheUnit,"(4X,A,I1)") "PDFSet: ",PDFSet
+#endif
         write(TheUnit,"(4X,A,L)") "Unweighted: ",Unweighted
     endif
     write(TheUnit,"(4X,A,L)") "Interference: ",includeInterference
@@ -3077,6 +3105,10 @@ implicit none
         write(io_stdout,"(4X,A)") "PChannel:   0=g+g, 1=q+qb, 2=both"
         write(io_stdout,"(4X,A)") "OffXVV:     off-shell option for resonance(X),or vector bosons(VV)"
         write(io_stdout,"(4X,A)") "PDFSet:     1=CTEQ6L1(default), 2=MSTW2008LO,  2xx=MSTW with eigenvector set xx=01..40), 3=NNPDF3.0LO"
+#if useLHAPDF==1
+        write(io_stdout,"(4X,A)") "LHAPDF:     name of the LHA PDF file, e.g. NNPDF30_lo_as_0130/NNPDF30_lo_as_0130.info"
+        write(io_stdout,"(4X,A)") "LHAPDFMem:  member PDF number, default=0 (best fit)"
+#endif        
         write(io_stdout,"(4X,A)") "VegasNc0:   number of evaluations for integrand scan"
         write(io_stdout,"(4X,A)") "VegasNc1:   number of evaluations for accept-reject sampling"
         write(io_stdout,"(4X,A)") "VegasNc2:   number of events for accept-reject sampling"
