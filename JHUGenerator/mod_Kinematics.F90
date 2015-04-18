@@ -194,6 +194,8 @@ if( (IsAZDecay(DecayMode1)).and.(IsAZDecay(DecayMode2)) .and. abs(LHE_IDUP(7)).e
      if( smallestInv.eq.3 .or. smallestInv.eq.4 ) then
         call swapi(MOTHUP(1,6),MOTHUP(1,8))
         call swapi(MOTHUP(2,6),MOTHUP(2,8))
+        call swapi(ICOLUP(1,6),ICOLUP(1,8))
+        call swapi(ICOLUP(2,6),ICOLUP(2,8))
         Z1FV(1:4) = MomDummy(1:4,3)+MomDummy(1:4,6)
         Z2FV(1:4) = MomDummy(1:4,5)+MomDummy(1:4,4)
      endif
@@ -436,6 +438,8 @@ character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE
         if( smallestInv.eq.3 .or. smallestInv.eq.4 ) then
             call swapi(HiggsDK_MOTHUP(1,6),HiggsDK_MOTHUP(1,8))
             call swapi(HiggsDK_MOTHUP(2,6),HiggsDK_MOTHUP(2,8))
+            call swapi(HiggsDK_ICOLUP(1,6),HiggsDK_ICOLUP(1,8))
+            call swapi(HiggsDK_ICOLUP(2,6),HiggsDK_ICOLUP(2,8))
             HiggsDK_Mom(1:4,1) = HiggsDK_Mom(1:4,3)+ HiggsDK_Mom(1:4,6)
             HiggsDK_Mom(1:4,2) = HiggsDK_Mom(1:4,4)+ HiggsDK_Mom(1:4,5)
         endif
