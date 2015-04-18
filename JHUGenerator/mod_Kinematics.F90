@@ -2931,9 +2931,42 @@ implicit none
 real(8) :: x1,x2,PDFScale,MuFac
 real(8) :: upv(1:2),dnv(1:2),usea(1:2),dsea(1:2),str(1:2),chm(1:2),bot(1:2),glu(1:2),phot(1:2),sbar(1:2),cbar(1:2),bbar(1:2)
 integer,parameter :: swPDF_u=1, swPDF_d=1, swPDF_c=1, swPDF_s=1, swPDF_b=1, swPDF_g=1
-real(8) :: pdf(-6:6,1:2),NNpdf(1:2,-6:7) 
+real(8) :: pdf(-6:6,1:2),NNpdf(1:2,-6:7)
 
         PDFScale=MuFac*100d0
+        
+#if useLHAPDF==1
+        call evolvePDF(x1,PDFScale,NNpdf(1,-6:6))
+        call evolvePDF(x2,PDFScale,NNpdf(2,-6:6))
+            NNpdf(1,-6:7) = NNpdf(1,-6:7)/x1
+            NNpdf(2,-6:7) = NNpdf(2,-6:7)/x2
+            
+            pdf(Up_,1)   = NNpdf(1,+1)         * swPDF_u
+            pdf(AUp_,1)  = NNpdf(1,-1)         * swPDF_u
+            pdf(Dn_,1)   = NNpdf(1,+2)         * swPDF_d
+            pdf(ADn_,1)  = NNpdf(1,-2)         * swPDF_d
+            pdf(Chm_,1)  = NNpdf(1,+3)         * swPDF_c
+            pdf(AChm_,1) = NNpdf(1,-3)         * swPDF_c
+            pdf(Str_,1)  = NNpdf(1,+4)         * swPDF_s
+            pdf(AStr_,1) = NNpdf(1,-4)         * swPDF_s
+            pdf(Bot_,1)  = NNpdf(1,+5)         * swPDF_b
+            pdf(ABot_,1) = NNpdf(1,-5)         * swPDF_b
+            pdf(0,1)     = NNpdf(1,+0)         * swPDF_g            
+            
+            pdf(Up_,2)   = NNpdf(2,+1)         * swPDF_u
+            pdf(AUp_,2)  = NNpdf(2,-1)         * swPDF_u
+            pdf(Dn_,2)   = NNpdf(2,+2)         * swPDF_d
+            pdf(ADn_,2)  = NNpdf(2,-2)         * swPDF_d
+            pdf(Chm_,2)  = NNpdf(2,+3)         * swPDF_c
+            pdf(AChm_,2) = NNpdf(2,-3)         * swPDF_c
+            pdf(Str_,2)  = NNpdf(2,+4)         * swPDF_s
+            pdf(AStr_,2) = NNpdf(2,-4)         * swPDF_s
+            pdf(Bot_,2)  = NNpdf(2,+5)         * swPDF_b
+            pdf(ABot_,2) = NNpdf(2,-5)         * swPDF_b
+            pdf(0,2)     = NNpdf(2,+0)         * swPDF_g            
+            RETURN
+            
+#else
         if( PDFSet.eq.1 ) then
             call cteq6(x1,PDFScale,upv(1),dnv(1),usea(1),dsea(1),str(1),chm(1),bot(1),glu(1))
             call cteq6(x2,PDFScale,upv(2),dnv(2),usea(2),dsea(2),str(2),chm(2),bot(2),glu(2))
@@ -3026,12 +3059,12 @@ real(8) :: pdf(-6:6,1:2),NNpdf(1:2,-6:7)
             pdf(ABot_,2) = NNpdf(2,-5)         * swPDF_b
             pdf(0,2)     = NNpdf(2,+0)         * swPDF_g            
             RETURN
-            
         else
             print *, "PDFSet",PDFSet,"not available!"
             stop
         endif
-
+#endif
+        
 IF( COLLIDER.EQ.1 ) THEN
 !       PROTON CONTENT
         pdf(Up_,1)   = (upv(1) + usea(1))  * swPDF_u

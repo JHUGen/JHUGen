@@ -1,12 +1,23 @@
 Here = $(PWD)
+Makefile=makefile
+# Makefile=
 ModuleDir = $(Here)/modules
 ObjectDir = $(Here)/objects
 PDFDir = $(Here)/pdfs
 VegasDir = $(Here)/vegas
 
-# compiler options, Comp=ifort/gfort
+# compiler options, Comp='ifort' or 'gfort'
 Opt  = Yes
 Comp = gfort
+
+# link pdfs via LHA library ('Yes' or 'No')
+UseLHAPDF=No
+
+# directory which contains libLHAPDF.a, libLHAPDF.la, libLHAPDF.so
+MyLHADir=/.../LHAPDF-6.1.5/lib/
+# remember to export 
+#          LD_LIBRARY_PATH=/.../LHAPDF-x.y.z/lib/:${LD_LIBRARY_PATH}
+#          LHAPDF_DATA_PATH=/.../LHAPDF-x.y.z/share/LHAPDF/:${LHAPDF_DATA_PATH}
 
 
 
@@ -16,7 +27,12 @@ ifeq ($(Comp),gfort)
  else
     OptOpts  = -O0
  endif
- fcomp = f95 $(OptOpts) -ffree-line-length-none -I$(VegasDir) -I$(ModuleDir) -J$(ModuleDir) -Dcompiler=2
+ ifeq ($(UseLHAPDF),Yes)
+    LHAPDFflags = -L$(MyLHADir) -lLHAPDF -DuseLHAPDF=1
+ else
+    LHAPDFflags = -DuseLHAPDF=0
+ endif 
+ fcomp = f95 $(OptOpts) -ffree-line-length-none -I$(VegasDir) -I$(ModuleDir) -J$(ModuleDir) $(LHAPDFflags) -Dcompiler=2 
 endif
 
 
@@ -26,7 +42,12 @@ ifeq ($(Comp),ifort)
  else
     OptOpts  = -O0 -implicitnone -zero -check bounds -check pointer -warn interfaces -ftrapuv  -diag-disable remark 
  endif
- fcomp = ifort -fpp $(OptOpts) -module $(ModuleDir) -I$(VegasDir) -Dcompiler=1
+ ifeq ($(UseLHAPDF),Yes)
+    LHAPDFflags = -L$(MyLHADir) -lLHAPDF -DuseLHAPDF=1
+ else
+    LHAPDFflags = -DuseLHAPDF=0
+ endif 
+ fcomp = ifort -fpp $(OptOpts) -module $(ModuleDir) -I$(VegasDir) -Dcompiler=1 $(LHAPDFflags)
 endif
 
 
@@ -113,29 +134,34 @@ MadGraphObj = $(ObjectDir)/gg_ttbh.o \
 
 JHUGenerator: $(PSGenObj) $(VegasObj) $(PDFObj) $(AmpObj) $(MainObj)
 	@echo " linking"
+ifeq ($(UseLHAPDF),Yes)
+	echo " interfaced with LHAPDF"
+else
+	echo " using internal PDF sets" 
+endif
 	@echo " executable file is "$(Exec) "compiled with "$(Comp)
 	@echo " "
 	$(fcomp) -o $(Exec) $(MainObj) $(AmpObj) $(PSGenObj) $(VegasObj) $(PDFObj)
 
 
 
-$(AmpObj): $(AmpDep) mod_Misc.F90 mod_Parameters.F90 makefile
+$(AmpObj): $(AmpDep) mod_Misc.F90 mod_Parameters.F90 $(Makefile)
 	@echo " compiling amplitude routines"
 	$(fcomp) -c $(AmpDep)
 	mv *.o $(ObjectDir)
 
 
-$(MainObj): $(MainDep) $(VegasDep) $(PDFDep) $(PSGenDep) mod_Parameters.F90 makefile
+$(MainObj): $(MainDep) $(VegasDep) $(PDFDep) $(PSGenDep) mod_Parameters.F90 $(Makefile)
 	@echo " compiling main routines"
 	$(fcomp) -c $(MainDep)
 	mv *.o $(ObjectDir)
 
-$(VegasObj): $(VegasDep) makefile
+$(VegasObj): $(VegasDep) $(Makefile)
 	@echo " compiling vegas"
 	$(fcomp) -c $(VegasDep)
 	mv *.o $(ObjectDir)
 
-$(PDFObj): $(PDFDep) makefile
+$(PDFObj): $(PDFDep) $(Makefile)
 	@echo " compiling pdfs"
 	$(fcomp) -c $(PDFDep)
 	mv *.o $(ObjectDir)
