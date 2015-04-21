@@ -541,17 +541,17 @@ IF( GENEVT ) THEN
           ICOLUP(1:2,2) = (/000,501/)
           ICOLUP(1:2,3) = (/502,000/)
           ICOLUP(1:2,4) = (/000,502/) 
-      elseif( MY_IDUP(1).gt.0 .and. MY_IDUP(2).lt.0 ) then! qq->qq
+      elseif( MY_IDUP(1).gt.0 .and. MY_IDUP(2).gt.0 ) then! qq->qq
           ICOLUP(1:2,1) = (/501,000/)
           ICOLUP(1:2,2) = (/502,000/)
           ICOLUP(1:2,3) = (/501,000/)
           ICOLUP(1:2,4) = (/502,000/) 
-      elseif( MY_IDUP(1).gt.0 .and. MY_IDUP(2).lt.0 ) then! qbq->qbq
+      elseif( MY_IDUP(1).lt.0 .and. MY_IDUP(2).gt.0 ) then! qbq->qbq
           ICOLUP(1:2,2) = (/501,000/)
           ICOLUP(1:2,1) = (/000,501/)
           ICOLUP(1:2,4) = (/502,000/)
           ICOLUP(1:2,3) = (/000,502/) 
-      elseif( MY_IDUP(1).gt.0 .and. MY_IDUP(2).lt.0 ) then! qbqb->qbqb
+      elseif( MY_IDUP(1).lt.0 .and. MY_IDUP(2).lt.0 ) then! qbqb->qbqb
           ICOLUP(1:2,1) = (/000,501/)
           ICOLUP(1:2,2) = (/000,502/)
           ICOLUP(1:2,3) = (/000,501/)
