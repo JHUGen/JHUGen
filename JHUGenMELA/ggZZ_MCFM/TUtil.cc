@@ -25,7 +25,7 @@ void SetEwkCouplingParameters(){
 // SETTINGS TO MATCH JHUGen ME/generator:
   ewinput_.Gf_inp=1.16639E-05;
   ewinput_.aemmz_inp=1./128.;
-  ewinput_.wmass_inp=80.398;
+  ewinput_.wmass_inp=80.399;
   ewinput_.zmass_inp=91.1876;
   ewinput_.xw_inp=0.23119;
 

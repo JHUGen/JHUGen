@@ -1,7 +1,7 @@
 real(8), parameter :: GeV=1d0   /100d0
 real(8), parameter :: M_Z     = 91.1876d0 *GeV      ! Z boson mass (PDG-2011)
 real(8), parameter :: Ga_Z    = 2.4952d0  *GeV      ! Z boson width(PDG-2011)
-real(8), parameter :: M_W     = 80.398d0  *GeV      ! W boson mass (PDG-2011)
+real(8), parameter :: M_W     = 80.399d0  *GeV      ! W boson mass (PDG-2011)
 real(8), parameter :: Ga_W    = 2.085d0   *GeV      ! W boson width(PDG-2011)
 real(8), parameter :: m_top   = 173.2d0  *GeV           ! top quark mass
 real(8), parameter :: Ga_Top  = 2.0d0  *GeV            ! top quark width

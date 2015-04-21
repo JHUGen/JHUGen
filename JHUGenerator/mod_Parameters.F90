@@ -57,7 +57,7 @@ real(8), public            :: M_Top   = 173.2d0     *GeV      !
 real(8), public, parameter :: Ga_Top  = 2.0d0    *GeV      ! 
 real(8), public, parameter :: M_Z     = 91.1876d0 *GeV      ! Z boson mass (PDG-2011)
 real(8), public, parameter :: Ga_Z    = 2.4952d0  *GeV      ! Z boson width(PDG-2011)
-real(8), public, parameter :: M_W     = 80.398d0  *GeV      ! W boson mass (PDG-2011)
+real(8), public, parameter :: M_W     = 80.399d0  *GeV      ! W boson mass (PDG-2011)
 real(8), public, parameter :: Ga_W    = 2.085d0   *GeV      ! W boson width(PDG-2011)
 real(8), public            :: M_Reso  = 125.6d0   *GeV      ! X resonance mass (spin 0, spin 1, spin 2)     (carefule: no longer a parameter, can be overwritten by command line argument)
 real(8), public, parameter :: Ga_Reso = 0.00415d0 *GeV      ! X resonance width
@@ -433,23 +433,23 @@ integer :: id1, id2, id1in, id2in
 id1 = abs(id1in)
 id2 = abs(id2in)
 if((id1.eq.convertLHE(Up_)  .and.  id2.eq.convertLHE(Dn_))  .or.  (id1.eq.convertLHE(Dn_)  .and.  id2.eq.convertLHE(Up_)))then
-  CKM= 0.97427d0 * dsqrt(scale_alpha_W_ud)
+  CKM= 0.97425d0 * dsqrt(scale_alpha_W_ud)
 elseif((id1.eq.convertLHE(Up_)  .and.  id2.eq.convertLHE(Str_))  .or.  (id1.eq.convertLHE(Str_)  .and.  id2.eq.convertLHE(Up_)))then
-  CKM= 0.22534d0
+  CKM= 0.2253d0
 elseif((id1.eq.convertLHE(Up_)  .and.  id2.eq.convertLHE(Bot_))  .or.  (id1.eq.convertLHE(Bot_)  .and.  id2.eq.convertLHE(Up_)))then
-  CKM= 0.00351d0
+  CKM= 0.00413d0
 elseif((id1.eq.convertLHE(Chm_)  .and.  id2.eq.convertLHE(Dn_))  .or.  (id1.eq.convertLHE(Dn_)  .and.  id2.eq.convertLHE(Chm_)))then
-  CKM= 0.22520d0
+  CKM= 0.225d0
 elseif((id1.eq.convertLHE(Chm_)  .and.  id2.eq.convertLHE(Str_))  .or.  (id1.eq.convertLHE(Str_)  .and.  id2.eq.convertLHE(Chm_)))then
-  CKM= 0.97344d0 * dsqrt(scale_alpha_W_cs)
+  CKM= 0.986d0 * dsqrt(scale_alpha_W_cs)
 elseif((id1.eq.convertLHE(Chm_)  .and.  id2.eq.convertLHE(Bot_))  .or.  (id1.eq.convertLHE(Bot_)  .and.  id2.eq.convertLHE(Chm_)))then
-  CKM= 0.0412d0
+  CKM= 0.0411d0
 !elseif((id1.eq.convertLHE(Top_)  .and.  id2.eq.convertLHE(Dn_))  .or.  (id1.eq.convertLHE(Dn_)  .and.  id2.eq.convertLHE(Top_)))then
-!  CKM= 0.22520d0
+!  CKM= 0.0084d0
 !elseif((id1.eq.convertLHE(Top_)  .and.  id2.eq.convertLHE(Str_))  .or.  (id1.eq.convertLHE(Str_)  .and.  id2.eq.convertLHE(Top_)))then
-!  CKM= 0.0404d0
+!  CKM= 0.0400d0
 !elseif((id1.eq.convertLHE(Top_)  .and.  id2.eq.convertLHE(Bot_))  .or.  (id1.eq.convertLHE(Bot_)  .and.  id2.eq.convertLHE(Top_)))then
-!  CKM= 0.999146
+!  CKM= 1.021
 elseif((abs(id1).eq.abs(convertLHE(NuT_))  .and.  abs(id2).eq.abs(convertLHE(TaP_)))  .or.  (abs(id1).eq.abs(convertLHE(TaP_))  .and.  abs(id2).eq.abs(convertLHE(NuT_))))then
   CKM= 1d0 * dsqrt(scale_alpha_W_tn)
 else
