@@ -88,6 +88,10 @@ extern "C" {
    double Gf_inp,aemmz_inp,xw_inp,wmass_inp,zmass_inp;
  } ewinput_;
 
+ extern struct{
+   int ewscheme;
+ } ewscheme_;
+
  extern struct {
    double gsq, as, ason2pi, ason4pi;
  } qcdcouple_;

@@ -35,7 +35,6 @@ module ModVHiggs
   !spin-0 couplings
   real(dp), parameter :: gFFS=1d0
   real(dp), parameter :: gFFP=0d0
-  real(dp), parameter :: b_Yukawa=4.18d0*GeV
 
   !----- notation for subroutines
   public :: EvalAmp_VHiggs
@@ -365,7 +364,7 @@ end subroutine EvalAmp_VHiggs
         MATRIXELEMENT0=MATRIXELEMENT0 *PROP1*PROP2*PROP3 &
         *(gFFS*FFS(id(8), MomExt(:,8), helicity(8), id(9), MomExt(:,9), helicity(9)) &
          +gFFP*FFP(id(8), MomExt(:,8), helicity(8), id(9), MomExt(:,9), helicity(9)))&
-        *(0d0,-1d0)*b_Yukawa/vev
+        *(0d0,-1d0)*m_bot/vev
       endif
 
       return
