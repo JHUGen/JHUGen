@@ -53,11 +53,11 @@ logical, public, parameter :: RandomizeVVdecays = .true. ! randomize DecayMode1 
 
 integer, public, parameter :: RequestNLeptons = -1           ! requested number of charged leptons in ReadLHE mode  (-1: no request)
 logical, public, parameter :: RequestOSSF = .false.          ! requested 2 opposite-sign-same-flavor charged lepton pairs in ReadLHE mode
-real(8), public            :: M_Top   = 173d0     *GeV      ! 
-real(8), public, parameter :: Ga_Top  = 1.33d0    *GeV      ! 
+real(8), public            :: M_Top   = 173.2d0     *GeV      ! 
+real(8), public, parameter :: Ga_Top  = 2.0d0    *GeV      ! 
 real(8), public, parameter :: M_Z     = 91.1876d0 *GeV      ! Z boson mass (PDG-2011)
 real(8), public, parameter :: Ga_Z    = 2.4952d0  *GeV      ! Z boson width(PDG-2011)
-real(8), public, parameter :: M_W     = 80.399d0  *GeV      ! W boson mass (PDG-2011)
+real(8), public, parameter :: M_W     = 80.398d0  *GeV      ! W boson mass (PDG-2011)
 real(8), public, parameter :: Ga_W    = 2.085d0   *GeV      ! W boson width(PDG-2011)
 real(8), public            :: M_Reso  = 125.6d0   *GeV      ! X resonance mass (spin 0, spin 1, spin 2)     (carefule: no longer a parameter, can be overwritten by command line argument)
 real(8), public, parameter :: Ga_Reso = 0.00415d0 *GeV      ! X resonance width
@@ -68,16 +68,15 @@ real(8), public, parameter :: Lambda  = 1000d0    *GeV      ! Lambda coupling en
 real(8), public, parameter :: m_el = 0.00051100d0  *GeV         ! electron mass
 real(8), public, parameter :: m_mu = 0.10566d0     *GeV         ! muon mass
 real(8), public, parameter :: m_tau = 1.7768d0     *GeV         ! tau mass
-real(8), public, parameter :: m_bot = 4.75000d0    *GeV         ! bottom quark mass
+real(8), public, parameter :: m_bot = 4.75d0    *GeV         ! bottom quark mass
 
 real(8), public, parameter :: HiggsDecayLengthMM = 0d0      ! Higgs decay length in [mm]
 real(8), public, parameter :: Gf = 1.16639d-5/GeV**2        ! Fermi constant
 real(8), public, parameter :: vev = 1.0d0/sqrt(Gf*sqrt(2.0d0))
 real(8), public, parameter :: gwsq = 4.0d0 * M_W**2/vev**2  ! weak constant squared
-real(8), public, parameter :: alpha_QED = 1d0/132.2319d0    ! el.magn. coupling
+real(8), public, parameter :: alpha_QED = 1d0/128d0    ! el.magn. coupling
 real(8), public, parameter :: alphas = 0.13229060d0         ! strong coupling
 real(8), public, parameter :: sitW = dsqrt(0.23119d0)       ! sin(Theta_Weinberg) (PDG-2008)
-!real(8), public, parameter :: sitW = dsqrt(0.222897209d0)      
 real(8), public            :: Mu_Fact                       ! pdf factorization scale (set to M_Reso in main.F90)
 real(8), public, parameter :: LHC_Energy=13000d0  *GeV      ! LHC hadronic center of mass energy
 real(8), public, parameter :: TEV_Energy=1960d0  *GeV       ! Tevatron hadronic center of mass energy
