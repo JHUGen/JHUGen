@@ -143,7 +143,7 @@ void testME() {
   // Create the instance of TEvtProb to calculate the differential cross-section
   TEvtProb Xcal2(4000);
   hzz4l_event_type hzz4l_event;
-  Xcal2.ResetMCFM_EWKParameters(1.16639E-05,7.81751E-03,79.956049884402844,91.1876);
+  Xcal2.ResetMCFM_EWKParameters(1.16639E-05, 1./128., 80.399, 91.1876, 0.23119, 3);
 
   // set four momenta
   vector<TLorentzVector> p;

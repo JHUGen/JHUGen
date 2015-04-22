@@ -53,8 +53,8 @@ logical, public, parameter :: RandomizeVVdecays = .true. ! randomize DecayMode1 
 
 integer, public, parameter :: RequestNLeptons = -1           ! requested number of charged leptons in ReadLHE mode  (-1: no request)
 logical, public, parameter :: RequestOSSF = .false.          ! requested 2 opposite-sign-same-flavor charged lepton pairs in ReadLHE mode
-real(8), public            :: M_Top   = 173d0     *GeV      ! 
-real(8), public, parameter :: Ga_Top  = 1.33d0    *GeV      ! 
+real(8), public            :: M_Top   = 173.2d0     *GeV      ! 
+real(8), public, parameter :: Ga_Top  = 2.0d0    *GeV      ! 
 real(8), public, parameter :: M_Z     = 91.1876d0 *GeV      ! Z boson mass (PDG-2011)
 real(8), public, parameter :: Ga_Z    = 2.4952d0  *GeV      ! Z boson width(PDG-2011)
 real(8), public, parameter :: M_W     = 80.399d0  *GeV      ! W boson mass (PDG-2011)
@@ -68,16 +68,15 @@ real(8), public, parameter :: Lambda  = 1000d0    *GeV      ! Lambda coupling en
 real(8), public, parameter :: m_el = 0.00051100d0  *GeV         ! electron mass
 real(8), public, parameter :: m_mu = 0.10566d0     *GeV         ! muon mass
 real(8), public, parameter :: m_tau = 1.7768d0     *GeV         ! tau mass
-real(8), public, parameter :: m_bot = 4.75000d0    *GeV         ! bottom quark mass
+real(8), public, parameter :: m_bot = 4.75d0    *GeV         ! bottom quark mass
 
 real(8), public, parameter :: HiggsDecayLengthMM = 0d0      ! Higgs decay length in [mm]
 real(8), public, parameter :: Gf = 1.16639d-5/GeV**2        ! Fermi constant
 real(8), public, parameter :: vev = 1.0d0/sqrt(Gf*sqrt(2.0d0))
 real(8), public, parameter :: gwsq = 4.0d0 * M_W**2/vev**2  ! weak constant squared
-real(8), public, parameter :: alpha_QED = 1d0/132.2319d0    ! el.magn. coupling
+real(8), public, parameter :: alpha_QED = 1d0/128d0    ! el.magn. coupling
 real(8), public, parameter :: alphas = 0.13229060d0         ! strong coupling
 real(8), public, parameter :: sitW = dsqrt(0.23119d0)       ! sin(Theta_Weinberg) (PDG-2008)
-!real(8), public, parameter :: sitW = dsqrt(0.222897209d0)      
 real(8), public            :: Mu_Fact                       ! pdf factorization scale (set to M_Reso in main.F90)
 real(8), public, parameter :: LHC_Energy=13000d0  *GeV      ! LHC hadronic center of mass energy
 real(8), public, parameter :: TEV_Energy=1960d0  *GeV       ! Tevatron hadronic center of mass energy
@@ -434,23 +433,23 @@ integer :: id1, id2, id1in, id2in
 id1 = abs(id1in)
 id2 = abs(id2in)
 if((id1.eq.convertLHE(Up_)  .and.  id2.eq.convertLHE(Dn_))  .or.  (id1.eq.convertLHE(Dn_)  .and.  id2.eq.convertLHE(Up_)))then
-  CKM= 0.97427d0 * dsqrt(scale_alpha_W_ud)
+  CKM= 0.97425d0 * dsqrt(scale_alpha_W_ud)
 elseif((id1.eq.convertLHE(Up_)  .and.  id2.eq.convertLHE(Str_))  .or.  (id1.eq.convertLHE(Str_)  .and.  id2.eq.convertLHE(Up_)))then
-  CKM= 0.22534d0
+  CKM= 0.2253d0
 elseif((id1.eq.convertLHE(Up_)  .and.  id2.eq.convertLHE(Bot_))  .or.  (id1.eq.convertLHE(Bot_)  .and.  id2.eq.convertLHE(Up_)))then
-  CKM= 0.00351d0
+  CKM= 0.00413d0
 elseif((id1.eq.convertLHE(Chm_)  .and.  id2.eq.convertLHE(Dn_))  .or.  (id1.eq.convertLHE(Dn_)  .and.  id2.eq.convertLHE(Chm_)))then
-  CKM= 0.22520d0
+  CKM= 0.225d0
 elseif((id1.eq.convertLHE(Chm_)  .and.  id2.eq.convertLHE(Str_))  .or.  (id1.eq.convertLHE(Str_)  .and.  id2.eq.convertLHE(Chm_)))then
-  CKM= 0.97344d0 * dsqrt(scale_alpha_W_cs)
+  CKM= 0.986d0 * dsqrt(scale_alpha_W_cs)
 elseif((id1.eq.convertLHE(Chm_)  .and.  id2.eq.convertLHE(Bot_))  .or.  (id1.eq.convertLHE(Bot_)  .and.  id2.eq.convertLHE(Chm_)))then
-  CKM= 0.0412d0
+  CKM= 0.0411d0
 !elseif((id1.eq.convertLHE(Top_)  .and.  id2.eq.convertLHE(Dn_))  .or.  (id1.eq.convertLHE(Dn_)  .and.  id2.eq.convertLHE(Top_)))then
-!  CKM= 0.22520d0
+!  CKM= 0.0084d0
 !elseif((id1.eq.convertLHE(Top_)  .and.  id2.eq.convertLHE(Str_))  .or.  (id1.eq.convertLHE(Str_)  .and.  id2.eq.convertLHE(Top_)))then
-!  CKM= 0.0404d0
+!  CKM= 0.0400d0
 !elseif((id1.eq.convertLHE(Top_)  .and.  id2.eq.convertLHE(Bot_))  .or.  (id1.eq.convertLHE(Bot_)  .and.  id2.eq.convertLHE(Top_)))then
-!  CKM= 0.999146
+!  CKM= 1.021
 elseif((abs(id1).eq.abs(convertLHE(NuT_))  .and.  abs(id2).eq.abs(convertLHE(TaP_)))  .or.  (abs(id1).eq.abs(convertLHE(TaP_))  .and.  abs(id2).eq.abs(convertLHE(NuT_))))then
   CKM= 1d0 * dsqrt(scale_alpha_W_tn)
 else

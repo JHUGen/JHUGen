@@ -35,7 +35,6 @@ module ModVHiggs
   !spin-0 couplings
   real(dp), parameter :: gFFS=1d0
   real(dp), parameter :: gFFP=0d0
-  real(dp), parameter :: b_Yukawa=4.18d0*GeV
 
   !----- notation for subroutines
   public :: EvalAmp_VHiggs
@@ -365,7 +364,7 @@ end subroutine EvalAmp_VHiggs
         MATRIXELEMENT0=MATRIXELEMENT0 *PROP1*PROP2*PROP3 &
         *(gFFS*FFS(id(8), MomExt(:,8), helicity(8), id(9), MomExt(:,9), helicity(9)) &
          +gFFP*FFP(id(8), MomExt(:,8), helicity(8), id(9), MomExt(:,9), helicity(9)))&
-        *(0d0,-1d0)*b_Yukawa/vev
+        *(0d0,-1d0)*m_bot/vev
       endif
 
       return
@@ -1367,23 +1366,23 @@ integer :: id1, id2, id1in, id2in
 id1 = abs(id1in)
 id2 = abs(id2in)
 if((id1.eq.2  .and.  id2.eq.1)  .or.  (id1.eq.1  .and.  id2.eq.2))then
-  CKM= 0.97427d0! * dsqrt(scale_alpha_W_ud)
+  CKM= 0.97425d0 * dsqrt(scale_alpha_W_ud)
 elseif((id1.eq.2  .and.  id2.eq.3)  .or.  (id1.eq.3  .and.  id2.eq.2))then
-  CKM= 0.22534d0
+  CKM= 0.2253d0
 elseif((id1.eq.2  .and.  id2.eq.1)  .or.  (id1.eq.1  .and.  id2.eq.2))then
-  CKM= 0.00351d0
+  CKM= 0.00413d0
 elseif((id1.eq.4  .and.  id2.eq.1)  .or.  (id1.eq.1  .and.  id2.eq.4))then
-  CKM= 0.22520d0
+  CKM= 0.225d0
 elseif((id1.eq.4  .and.  id2.eq.3)  .or.  (id1.eq.3  .and.  id2.eq.4))then
-  CKM= 0.97344d0! * dsqrt(scale_alpha_W_cs)
+  CKM= 0.986d0 * dsqrt(scale_alpha_W_cs)
 elseif((id1.eq.4  .and.  id2.eq.1)  .or.  (id1.eq.1  .and.  id2.eq.4))then
-  CKM= 0.0412d0
+  CKM= 0.0411d0
 !elseif((id1.eq.convertLHE(Top_)  .and.  id2.eq.convertLHE(Dn_))  .or.  (id1.eq.convertLHE(Dn_)  .and.  id2.eq.convertLHE(Top_)))then
-!  CKM= 0.22520d0
+!  CKM= 0.0084d0
 !elseif((id1.eq.convertLHE(Top_)  .and.  id2.eq.3)  .or.  (id1.eq.3  .and.  id2.eq.convertLHE(Top_)))then
-!  CKM= 0.0404d0
+!  CKM= 0.0400d0
 !elseif((id1.eq.convertLHE(Top_)  .and.  id2.eq.convertLHE(Bot_))  .or.  (id1.eq.convertLHE(Bot_)  .and.  id2.eq.convertLHE(Top_)))then
-!  CKM= 0.999146
+!  CKM= 1.021
 else
   CKM= 1d0! * dsqrt(scale_alpha_W_ln)
 endif
