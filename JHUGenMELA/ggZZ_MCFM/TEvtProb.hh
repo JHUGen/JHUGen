@@ -63,7 +63,7 @@ public:
   void SetMatrixElement(TVar::MatrixElement tmp){ _matrixElement = tmp; }
   void SetProduction(TVar::Production tmp){ _production = tmp; }
   void SetLeptonInterf(TVar::LeptonInterference tmp){ _leptonInterf = tmp; }
-  void ResetMCFM_EWKParameters(double ext_Gf, double ext_aemmz, double ext_mW, double ext_mZ);
+  void ResetMCFM_EWKParameters(double ext_Gf, double ext_aemmz, double ext_mW, double ext_mZ, double ext_xW, int ext_ewscheme=3);
 
   double XsecCalc(TVar::Process proc,
 		 TVar::Production production,

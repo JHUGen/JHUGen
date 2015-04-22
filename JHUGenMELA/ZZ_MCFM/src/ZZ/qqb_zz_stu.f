@@ -38,10 +38,10 @@ c     2 = t+u
       double complex Uncrossed(-nf:nf,-nf:nf,2,2,2)
 
       double precision FAC
-      integer j,k,polq,pol1,pol2,i4(2),i5(2),jkswitch(-nf:nf)
+      integer j,k,polq,pol1,pol2
       integer ii,nmax
-      data i4/4,5/,i5/5,4/,jkswitch/-1,-2,-1,-2,-1,0,1,2,1,2,1/
-      save i4,i5,jkswitch
+      integer,parameter::i4(2)=(/4,5/),i5(2)=(/5,4/),
+     & jkswitch(-nf:nf)=(/-1,-2,-1,-2,-1,0,1,2,1,2,1/)
 
       do j=1,2
       do k=1,2
@@ -244,13 +244,7 @@ c---    2nd pass --> fill msq
 c        write(6,*) 'With interf. plus q_qb 0 1 2 msq(j,k)=',msq(j,k)
 
       endif
-c         msq(j,k)=msq(j,k)-ave*abs(q_qb)**2
-c         if (pol1.eq.pol2) then
-c         msq(j,k)=msq(j,k)
-c     &   -2d0*ave*dble(dconjg(q_qb)*Uncrossed(j,k,polq,pol1,pol2))
-c     &   -ave*dble(dconjg(q_qb)*Uncrossed(j,k,polq,pol1,pol2))
-c         endif
-c      endif
+
 
 
       enddo
@@ -309,21 +303,6 @@ c---    2nd pass --> fill msq
      &              +ave*2d0*abs(qb_q)**2*oprat
         endif
       endif
-
-c      msq(j,k)=msq(j,k)+ave*abs(qb_q)**2
-
-c      !set-up interference terms
-c      if ((interference).and.(ii.eq.1)) then
-c         Uncrossed(j,k,polq,pol1,pol2)=qb_q
-c      elseif (ii.eq.2) then
-c         msq(j,k)=msq(j,k)-ave*abs(qb_q)**2
-c         if (pol1.eq.pol2) then
-c         msq(j,k)=msq(j,k)
-cc     &    -2d0*ave*dble(dconjg(qb_q)*Uncrossed(j,k,polq,pol1,pol2))
-c     &    -ave*dble(dconjg(qb_q)*Uncrossed(j,k,polq,pol1,pol2))
-c         endif
-c      endif
-
 
 
       enddo !end pol2 loop

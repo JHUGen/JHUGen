@@ -34,10 +34,10 @@ c----No statistical factor of 1/2 included.
       double complex Uncrossed(-nf:nf,-nf:nf,2,2,2)
 
       double precision FAC
-      integer j,k,polq,pol1,pol2,i4(2),i5(2),jkswitch(-nf:nf)
+      integer j,k,polq,pol1,pol2
       integer ii,nmax
-      data i4/4,5/,i5/5,4/,jkswitch/-1,-2,-1,-2,-1,0,1,2,1,2,1/
-      save i4,i5,jkswitch
+      integer,parameter::i4(2)=(/4,5/),i5(2)=(/5,4/),
+     & jkswitch(-nf:nf)=(/-1,-2,-1,-2,-1,0,1,2,1,2,1/)
 
 c     vsymfact=symmetry factor
       fac=-4D0*esq**2
@@ -46,7 +46,6 @@ c     vsymfact=symmetry factor
       v1(2)=r1
       v2(1)=l2
       v2(2)=r2
-
 C----setup factor to avoid summing over too many neutrinos
 C----if coupling enters twice    
       if (q1 .eq. 0d0) then   
@@ -196,6 +195,7 @@ c---    2nd pass --> fill msq
           else
             oprat=1d0
           endif
+
           msq(j,k)=msq(j,k)
      &              +ave*2d0*abs(Uncrossed(j,k,polq,pol1,pol2))**2*oprat
      &              +ave*2d0*abs(q_qb)**2*oprat
@@ -258,6 +258,8 @@ c---    2nd pass --> fill msq
      &              +ave*2d0*abs(qb_q)**2*oprat
         endif
       endif
+
+
 
       enddo !end pol2 loop
       enddo !end pol1 loop

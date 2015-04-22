@@ -40,15 +40,27 @@ TEvtProb::TEvtProb(double ebeam):EBEAM(ebeam){
 TEvtProb::~TEvtProb() {
 }
 
+/*
 void TEvtProb::ResetMCFM_EWKParameters(double ext_Gf, double ext_aemmz, double ext_mW, double ext_mZ){
-	ewinput_.Gf_inp = ext_Gf;
-	ewinput_.aemmz_inp = ext_aemmz;
-	ewinput_.wmass_inp = ext_mW;
-	ewinput_.zmass_inp = ext_mZ;
-	ewinput_.xw_inp = 1.-pow(ext_mW/ext_mZ,2);
-	coupling_();
+  ewinput_.Gf_inp = ext_Gf;
+  ewinput_.aemmz_inp = ext_aemmz;
+  ewinput_.wmass_inp = ext_mW;
+  ewinput_.zmass_inp = ext_mZ;
+  ewinput_.xw_inp = 1.-pow(ext_mW/ext_mZ,2);
+  coupling_();
 }
+*/
 
+void TEvtProb::ResetMCFM_EWKParameters(double ext_Gf, double ext_aemmz, double ext_mW, double ext_mZ, double ext_xW, int ext_ewscheme){
+  if (ext_ewscheme<-1 || ext_ewscheme>3) ext_ewscheme=3;
+  ewinput_.Gf_inp = ext_Gf;
+  ewinput_.aemmz_inp = ext_aemmz;
+  ewinput_.wmass_inp = ext_mW;
+  ewinput_.zmass_inp = ext_mZ;
+  ewinput_.xw_inp = ext_xW;
+  ewscheme_.ewscheme = ext_ewscheme;
+  coupling_();
+}
 
 //
 // Directly calculate the ZZ->4l differential cross-section 
@@ -664,7 +676,6 @@ double TEvtProb::XsecCalc_VX(TVar::Process proc, TVar::Production production, vh
     double W=sqrts*sqrts;
     
     //Weight calculation
-    double flux=1.;
     double msqjk=0;
     
 	if (
@@ -766,7 +777,7 @@ double TEvtProb::XsecCalc_VX(TVar::Process proc, TVar::Production production, vh
 							if (abs(outgoing2) == abs(outgoing1)) continue;
 							Vdecay_id[0] = outgoing1;
 							Vdecay_id[1] = outgoing2;
-							msqjk += (VHiggsMatEl(proc, production, pVH, pHdaughter, Vdecay_id, _hmass, _hwidth, Hvvcoupl, verbosity, EBEAM)) / 12.; // Average over quark flavors; CAUTION about 12: Depends on nf
+							msqjk += (VHiggsMatEl(proc, production, pVH, pHdaughter, Vdecay_id, _hmass, _hwidth, Hvvcoupl, verbosity, EBEAM)) / 12.; // Average over quark flavors; CAUTION about 12: Depends on nf, (nf+1)*(nf-1)/2 or nf**2/2
 						}
 					}
 					if (outgoing1 == -2 || outgoing1 == -4){ // u-bar or c-bar to d, b or s

@@ -16,22 +16,23 @@ source setup_matrixelement_sl6.sh # for sl6 machines
    1) Download MCFM 
    
    cd ../
-   wget http://mcfm.fnal.gov/MCFM-6.8.tar.gz
-   tar -xf MCFM-6.8.tar.gz
-   cd MCFM-6.8/
+   wget http://mcfm.fnal.gov/MCFM-7.0.tar.gz
+   tar -xf MCFM-7.0.tar.gz
+   cd MCFM-7.0/
 
    2) Modify makefile: replace the gfortran code tags to output library
 
-    FFLAGS 	= -fno-automatic -fno-f2c -O0 -fPIC -g -I$(INCPATH) -I$(TENSORREDDIR)/Include -Iobj
-    F90FLAGS = -fno-automatic -fno-f2c -O2 -fPIC -g -I$(INCPATH) -Iobj -Jobj
+   USEOMP = NO
+   FFLAGS 	= -fno-automatic -fno-f2c $(OMPFLAG) -O0 -fPIC -g -I$(INCPATH) -I$(TENSORREDDIR)/Include -I$(OBJNAME)
+   F90FLAGS = -fno-automatic -fno-f2c $(OMPFLAG) -O2 -fPIC -g -I$(INCPATH) -I$(OBJNAME) -J$(OBJNAME)
 
    3) Modify the makefile in QCDLoop/ql and QCDLoop/ff, adding the -fPIC in FFLAGS
 
       FFLAGS  = -g -fPIC
 
-   4) Copy contents of JHUGenMELA/ZZ_MCFM/src/ into MCFM-6.8/src/.
+   4) Copy contents of JHUGenMELA/ZZ_MCFM/src/ into MCFM-7.0/src/.
 
-   5) Add following lines in MCFM-6.8/makefile:
+   5) Add following lines in MCFM-7.0/makefile:
       Under "ZZFILES = \":
                            gg_ZZ_int_freenorm.o \
                            qqb_zz_stu.o \
@@ -41,9 +42,9 @@ source setup_matrixelement_sl6.sh # for sl6 machines
     ./Install
     make
     cd obj/
-    g++ -Wl,-soname,libmcfm_6p8.so -shared -o libmcfm_6p8.so *.o ../QCDLoop/ql/ql*.o ../QCDLoop/ql/a*.o ../QCDLoop/ff/*.o  
+    g++ -Wl,-soname,libmcfm_7p0.so -shared -o libmcfm_7p0.so *.o ../QCDLoop/ql/obj/ql*.o ../QCDLoop/ql/obj/a*.o ../QCDLoop/ff/obj/*.o  
 
-   7) Copy library libmcfm_6p8.so to the JHUGenMELA/ggZZ_MCFM/ area
+   7) Copy library libmcfm_7p0.so to the JHUGenMELA/ggZZ_MCFM/ area
           ---> Sample file compiled for SLC5/6 gcc 4.6.2+ is provided.
 
 
