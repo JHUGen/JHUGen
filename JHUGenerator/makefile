@@ -1,6 +1,5 @@
 Here = $(PWD)
 Makefile=makefile
-# Makefile=
 ModuleDir = $(Here)/modules
 ObjectDir = $(Here)/objects
 PDFDir = $(Here)/pdfs
@@ -14,7 +13,7 @@ Comp = gfort
 UseLHAPDF=No
 
 # directory which contains libLHAPDF.a, libLHAPDF.la, libLHAPDF.so
-MyLHADir=/.../LHAPDF-6.1.5/lib/
+MyLHADir=/home/schulze/lib/LHAPDF-6.1.5/lib/
 # remember to export 
 #          LD_LIBRARY_PATH=/.../LHAPDF-x.y.z/lib/:${LD_LIBRARY_PATH}
 #          LHAPDF_DATA_PATH=/.../LHAPDF-x.y.z/share/LHAPDF/:${LHAPDF_DATA_PATH}

@@ -3306,8 +3306,6 @@ IF( GENEVT ) THEN
 
       elseif( EvalUnWeighted_withoutProduction .gt. yRnd(14)*CS_max ) then
       
-      
-      
          if( RequestNLeptons.gt.0 ) then! lepton filter
                 LeptInEvent_tmp(0:8) = LeptInEvent(0:8)
     !             print *, ""

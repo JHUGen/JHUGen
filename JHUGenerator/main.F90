@@ -522,6 +522,30 @@ elseif( (DecayMode1.eq.6 .and. DecayMode2.eq.10) .or.  &
 endif
 
 
+
+if( LeptonFilterMode.eq.0 ) RequestNLeptons = 0
+
+if(  LeptonFilterMode.eq.2 .and. (  &
+        .not.( DecayMode1.eq.1 .and. DecayMode2.eq.1 ) &
+ .or.   .not.( DecayMode1.eq.1 .and. DecayMode2.eq.3 ) &
+ .or.   .not.( DecayMode1.eq.3 .and. DecayMode2.eq.3 ) &
+ .or.   .not.( DecayMode1.eq.3 .and. DecayMode2.eq.3 ) &
+ .or.   .not.( DecayMode1.eq.7 .and. DecayMode2.eq.7 ) &
+ .or.   .not.( DecayMode1.eq.1 .and. DecayMode2.eq.7 ) &
+ .or.   .not.( DecayMode1.eq.3 .and. DecayMode2.eq.7 ) &
+ .or.   .not.( DecayMode1.eq.4  ) &
+ .or.   .not.( DecayMode1.eq.5  ) &
+ .or.   .not.( DecayMode1.eq.6  ) &
+ .or.   .not.( DecayMode1.eq.10 ) &
+ .or.   .not.( DecayMode1.eq.11 ) &
+ .or.   .not.( DecayMode2.eq.4  ) &
+ .or.   .not.( DecayMode2.eq.5  ) &
+ .or.   .not.( DecayMode2.eq.6  ) &
+ .or.   .not.( DecayMode2.eq.10 ) &
+ .or.   .not.( DecayMode2.eq.11 ) )&
+  ) RequestNLeptons = 0 
+
+
 END SUBROUTINE
 
 
