@@ -56,7 +56,7 @@ use ModParameters
 use ModKinematics
 implicit none
 character :: arg*(500)
-integer :: NumArgs,NArg,OffShell_XVV,iunwgt,CountArg,iinterf
+integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
 
    Collider=1
    VegasIt1=-1
@@ -76,6 +76,8 @@ integer :: NumArgs,NArg,OffShell_XVV,iunwgt,CountArg,iinterf
    ConvertLHEFile=.false.
    ReadCSmax=.false.
    GenerateEvents=.false.
+   RequestNLeptons = -1
+   RequestOSSF=.true.
    LHAPDFString = ""
    LHAPDFMember = 0
    iinterf = -1
@@ -154,14 +156,25 @@ integer :: NumArgs,NArg,OffShell_XVV,iunwgt,CountArg,iinterf
     elseif( arg(1:7) .eq."OffXVV=" ) then
         read(arg(8:10),*) OffShell_XVV
         CountArg = CountArg + 1
-    elseif( arg(1:11) .eq."Unweighted=" ) then
-        read(arg(12:12),*) iunwgt
+    elseif( arg(1:12).eq."FilterNLept=" ) then
+        read(arg(13:13),*) RequestNLeptons
         CountArg = CountArg + 1
-        if( iunwgt.eq.0 ) then
+    elseif( arg(1:11) .eq."FilterOSSF=" ) then
+        read(arg(12:12),*) iargument
+        if( iargument.eq.1 ) then
+            RequestOSSF = .true.
+        else
+            RequestOSSF = .false.
+        endif        
+        CountArg = CountArg + 1
+    elseif( arg(1:11) .eq."Unweighted=" ) then
+        read(arg(12:12),*) iargument
+        if( iargument.eq.0 ) then
             Unweighted = .false.
         else
             Unweighted = .true.
         endif
+        CountArg = CountArg + 1
     elseif( arg(1:7) .eq."Interf=" ) then
         read(arg(8:8),*) iinterf
         CountArg = CountArg + 1
@@ -252,6 +265,7 @@ integer :: NumArgs,NArg,OffShell_XVV,iunwgt,CountArg,iinterf
        M_V = 0d0
        Ga_V= 0d0    
     endif
+
 
     if( ((DecayMode1.eq.0) .and. (DecayMode2.eq.0)) .or.  &
         ((DecayMode1.eq.2) .and. (DecayMode2.eq.2)) .or.  &
@@ -521,29 +535,6 @@ elseif( (DecayMode1.eq.6 .and. DecayMode2.eq.10) .or.  &
         scale_alpha_W_tn = scale_alpha_W_tn * 1d0
 endif
 
-
-
-if( LeptonFilterMode.eq.0 ) RequestNLeptons = 0
-
-if(  LeptonFilterMode.eq.2 .and. (  &
-        .not.( DecayMode1.eq.1 .and. DecayMode2.eq.1 ) &
- .or.   .not.( DecayMode1.eq.1 .and. DecayMode2.eq.3 ) &
- .or.   .not.( DecayMode1.eq.3 .and. DecayMode2.eq.3 ) &
- .or.   .not.( DecayMode1.eq.3 .and. DecayMode2.eq.3 ) &
- .or.   .not.( DecayMode1.eq.7 .and. DecayMode2.eq.7 ) &
- .or.   .not.( DecayMode1.eq.1 .and. DecayMode2.eq.7 ) &
- .or.   .not.( DecayMode1.eq.3 .and. DecayMode2.eq.7 ) &
- .or.   .not.( DecayMode1.eq.4  ) &
- .or.   .not.( DecayMode1.eq.5  ) &
- .or.   .not.( DecayMode1.eq.6  ) &
- .or.   .not.( DecayMode1.eq.10 ) &
- .or.   .not.( DecayMode1.eq.11 ) &
- .or.   .not.( DecayMode2.eq.4  ) &
- .or.   .not.( DecayMode2.eq.5  ) &
- .or.   .not.( DecayMode2.eq.6  ) &
- .or.   .not.( DecayMode2.eq.10 ) &
- .or.   .not.( DecayMode2.eq.11 ) )&
-  ) RequestNLeptons = 0 
 
 
 END SUBROUTINE
@@ -1620,7 +1611,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
      endif
      write(io_stdout,"(A)") ""
      write(io_LogFile,"(A)") ""
-
+     
 
 
       print *, " finding maximal weight with ",VegasNc0," points"
@@ -2893,7 +2884,8 @@ character :: arg*(500)
     if( Process.eq.80 ) write(TheUnit,"(4X,A,F8.4,A,F6.4)") "Top quark mass=",m_top*100d0,", width=",Ga_top*100d0
     if( Process.eq.80 ) write(TheUnit,"(4X,A,I2)") "Top quark decay=",TOPDECAYS
     if( Process.eq.90 ) write(TheUnit,"(4X,A,F8.4,A,F6.4)") "Bottom quark mass=",m_top*100d0
-
+    if( (ReadLHEFile) .and. (RequestNLeptons.gt.0) .and. (RequestOSSF) ) write(TheUnit,"(4X,A,I2,A)") "Lepton filter activated. Requesting ",RequestNLeptons," OSSF leptons."
+    if( (ReadLHEFile) .and. (RequestNLeptons.gt.0) .and. .not. (RequestOSSF)) write(TheUnit,"(4X,A,I2,A)") "Lepton filter activated. Requesting ",RequestNLeptons," leptons."
 
     if( .not. (ReadLHEFile .or. ConvertLHEFile) ) then
         write(TheUnit,"(4X,A)") ""

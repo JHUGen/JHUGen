@@ -6,8 +6,8 @@ PDFDir = $(Here)/pdfs
 VegasDir = $(Here)/vegas
 
 # compiler options, Comp='ifort' or 'gfort'
-Opt  = Yes
-Comp = gfort
+Opt  = No
+Comp = ifort
 
 # link pdfs via LHA library ('Yes' or 'No')
 UseLHAPDF=No
