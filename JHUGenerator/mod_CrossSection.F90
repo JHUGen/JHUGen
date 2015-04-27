@@ -410,7 +410,7 @@ integer :: MY_IDUP(1:5),ICOLUP(1:2,1:5),NBin(1:NumHistograms),NHisto
 real(8) :: LO_Res_Unpol, PreFac, CS_max, sumtot
 logical :: applyPSCut,genEVT,zz_fusion
 include 'csmaxvalue.f'
-   
+
    EvalUnWeighted_HJJ = 0d0
 
    call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
@@ -474,14 +474,12 @@ IF( GENEVT ) THEN
 
       ZZ_fusion=.false.
       if( MY_IDUP(1).eq.MY_IDUP(2) ) ZZ_fusion=.true.
-      if( any(MY_IDUP(1).eq.(/Up_,Chm_/))   .and. any(MY_IDUP(2).eq.(/ADn_,AStr_,ABot_/)) ) ZZ_fusion=.true.
-      if( any(MY_IDUP(1).eq.(/AUp_,AChm_/)) .and. any(MY_IDUP(2).eq.(/Dn_,Str_,Bot_/))    ) ZZ_fusion=.true.
-      if( any(MY_IDUP(2).eq.(/Up_,Chm_/))   .and. any(MY_IDUP(1).eq.(/ADn_,AStr_,ABot_/)) ) ZZ_fusion=.true.
-      if( any(MY_IDUP(2).eq.(/AUp_,AChm_/)) .and. any(MY_IDUP(1).eq.(/Dn_,Str_,Bot_/))    ) ZZ_fusion=.true.
+      if( any(MY_IDUP(1).eq.(/ Up_, Chm_,ADn_,AStr_,ABot_/)) .and. any(MY_IDUP(2).eq.(/ Up_, Chm_,ADn_,AStr_,ABot_/)) ) ZZ_fusion=.true.
+      if( any(MY_IDUP(1).eq.(/AUp_,AChm_, Dn_, Str_, Bot_/)) .and. any(MY_IDUP(2).eq.(/AUp_,AChm_, Dn_, Str_, Bot_/)) ) ZZ_fusion=.true.
 
       if( ZZ_Fusion ) then
           if( (MomExt(4,1)*MomExt(4,3).lt.0d0) .and. (MomExt(4,2)*MomExt(4,4).lt.0d0) ) then ! wrong configuration --> swap 3 and 4
-             MY_IDUP(3:4)= (/LHA2M_ID(iPartons(1)),LHA2M_ID(iPartons(2))/)
+             MY_IDUP(3:4)= (/LHA2M_ID(iPartons(2)),LHA2M_ID(iPartons(1))/)
              ICOLUP(1:2,4) = ICOLUP(1:2,1)
              ICOLUP(1:2,3) = ICOLUP(1:2,2)
           else! 
@@ -543,17 +541,17 @@ IF( GENEVT ) THEN
           ICOLUP(1:2,2) = (/000,501/)
           ICOLUP(1:2,3) = (/502,000/)
           ICOLUP(1:2,4) = (/000,502/) 
-      elseif( MY_IDUP(1).gt.0 .and. MY_IDUP(2).lt.0 ) then! qq->qq
+      elseif( MY_IDUP(1).gt.0 .and. MY_IDUP(2).gt.0 ) then! qq->qq
           ICOLUP(1:2,1) = (/501,000/)
           ICOLUP(1:2,2) = (/502,000/)
           ICOLUP(1:2,3) = (/501,000/)
           ICOLUP(1:2,4) = (/502,000/) 
-      elseif( MY_IDUP(1).gt.0 .and. MY_IDUP(2).lt.0 ) then! qbq->qbq
+      elseif( MY_IDUP(1).lt.0 .and. MY_IDUP(2).gt.0 ) then! qbq->qbq
           ICOLUP(1:2,2) = (/501,000/)
           ICOLUP(1:2,1) = (/000,501/)
           ICOLUP(1:2,4) = (/502,000/)
           ICOLUP(1:2,3) = (/000,502/) 
-      elseif( MY_IDUP(1).gt.0 .and. MY_IDUP(2).lt.0 ) then! qbqb->qbqb
+      elseif( MY_IDUP(1).lt.0 .and. MY_IDUP(2).lt.0 ) then! qbqb->qbqb
           ICOLUP(1:2,1) = (/000,501/)
           ICOLUP(1:2,2) = (/000,502/)
           ICOLUP(1:2,3) = (/000,501/)
