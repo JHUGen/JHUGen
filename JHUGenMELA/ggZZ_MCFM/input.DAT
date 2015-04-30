@@ -6,7 +6,7 @@
 .false.		[skipnt]
 .false.		[dswhisto]
 .false.         [creategrid]
-.true.		[writetop]
+.false.		[writetop]
 .false.		[writedat]
 .false.		[writegnu]
 .true.		[writeroot]
