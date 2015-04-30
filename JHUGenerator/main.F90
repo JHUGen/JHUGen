@@ -205,7 +205,7 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
    endif
 
     if (Process.eq.0) PChannel = 0   !only gluons
-    if (Process.eq.1) PChannel = 1   !only quarks
+    if (Process.eq.1 .or. Process.eq.50 .or. Process.eq.60) PChannel = 1   !only quarks
 
     if(OffShell_XVV.ge.100) then
         OffShell_XVV=OffShell_XVV-100
