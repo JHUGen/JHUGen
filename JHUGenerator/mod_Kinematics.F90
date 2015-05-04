@@ -194,6 +194,8 @@ if( (IsAZDecay(DecayMode1)).and.(IsAZDecay(DecayMode2)) .and. abs(LHE_IDUP(7)).e
      if( smallestInv.eq.3 .or. smallestInv.eq.4 ) then
         call swapi(MOTHUP(1,6),MOTHUP(1,8))
         call swapi(MOTHUP(2,6),MOTHUP(2,8))
+        call swapi(ICOLUP(1,6),ICOLUP(1,8))
+        call swapi(ICOLUP(2,6),ICOLUP(2,8))
         Z1FV(1:4) = MomDummy(1:4,3)+MomDummy(1:4,6)
         Z2FV(1:4) = MomDummy(1:4,5)+MomDummy(1:4,4)
      endif
@@ -436,6 +438,8 @@ character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE
         if( smallestInv.eq.3 .or. smallestInv.eq.4 ) then
             call swapi(HiggsDK_MOTHUP(1,6),HiggsDK_MOTHUP(1,8))
             call swapi(HiggsDK_MOTHUP(2,6),HiggsDK_MOTHUP(2,8))
+            call swapi(HiggsDK_ICOLUP(1,6),HiggsDK_ICOLUP(1,8))
+            call swapi(HiggsDK_ICOLUP(2,6),HiggsDK_ICOLUP(2,8))
             HiggsDK_Mom(1:4,1) = HiggsDK_Mom(1:4,3)+ HiggsDK_Mom(1:4,6)
             HiggsDK_Mom(1:4,2) = HiggsDK_Mom(1:4,4)+ HiggsDK_Mom(1:4,5)
         endif
@@ -1083,7 +1087,7 @@ if( .not. ReadLHEFile ) write(io_LHEOutFile,"(I2,X,I3,2X,1PE13.7,2X,1PE13.7,2X,1
 !    beam_id(2)=2212
 !endif
 helicity(3:5)=0d0
-!Spin = 1.0d0
+Spin = 0.1d0
 
 if(COLLIDER.eq.0)then
   ICOLUP=0
@@ -1114,27 +1118,27 @@ elseif((id(6).eq.convertLHE(AUp_)).or.(id(6).eq.convertLHE(ADn_)).or.(id(6).eq.c
 else
     ICOLUP(3:4,1:2)=0
 endif
-
+!!print *, helicity!!!!!!!!!!
 do i=1,2
-    write(io_LHEOutFile,fmt1) id(i), -1,0,0,ICOLUP(i,1),ICOLUP(i,2),MomDummy(2:4,i), MomDummy(1,i), 0.0d0, 0.0d0, helicity(i)
+    write(io_LHEOutFile,fmt1) id(i), -1,0,0,ICOLUP(i,1),ICOLUP(i,2),MomDummy(2:4,i), MomDummy(1,i), 0.0d0, 0.0d0, Spin
 enddo
 
-write(io_LHEOutFile,fmt1) id(4), 2,1,2,0,0,MomDummy(2:4,4), MomDummy(1,4), MassDummy(4), 0d0, helicity(4)
+write(io_LHEOutFile,fmt1) id(4), 2,1,2,0,0,MomDummy(2:4,4), MomDummy(1,4), MassDummy(4), 0d0, Spin
 
 if(H_DK.eqv..true.)then
-  write(io_LHEOutFile,fmt1) id(5), 2,1,2,0,0,MomDummy(2:4,5), MomDummy(1,5), MassDummy(5), HiggsDKLength, helicity(5)
+  write(io_LHEOutFile,fmt1) id(5), 2,1,2,0,0,MomDummy(2:4,5), MomDummy(1,5), MassDummy(5), HiggsDKLength, Spin
 else
-  write(io_LHEOutFile,fmt1) id(5), 1,1,2,0,0,MomDummy(2:4,5), MomDummy(1,5), MassDummy(5), HiggsDKLength, helicity(5)
+  write(io_LHEOutFile,fmt1) id(5), 1,1,2,0,0,MomDummy(2:4,5), MomDummy(1,5), MassDummy(5), HiggsDKLength, Spin
 endif
 
-write(io_LHEOutFile,fmt1) id(6), 1,3,3,ICOLUP(3,1),ICOLUP(3,2),MomDummy(2:4,6), MomDummy(1,6), MassDummy(6), 0.0d0, helicity(6)
+write(io_LHEOutFile,fmt1) id(6), 1,3,3,ICOLUP(3,1),ICOLUP(3,2),MomDummy(2:4,6), MomDummy(1,6), MassDummy(6), 0.0d0, Spin
 
-write(io_LHEOutFile,fmt1) id(7), 1,3,3,ICOLUP(4,1),ICOLUP(4,2),MomDummy(2:4,7), MomDummy(1,7), MassDummy(7), 0.0d0, helicity(7)
+write(io_LHEOutFile,fmt1) id(7), 1,3,3,ICOLUP(4,1),ICOLUP(4,2),MomDummy(2:4,7), MomDummy(1,7), MassDummy(7), 0.0d0, Spin
 
 if(H_DK.eqv..true.)then
-write(io_LHEOutFile,fmt1) id(8), 1,4,4,501,0,MomDummy(2:4,8), MomDummy(1,8), MassDummy(8), 0.0d0, helicity(8)
+write(io_LHEOutFile,fmt1) id(8), 1,4,4,501,0,MomDummy(2:4,8), MomDummy(1,8), MassDummy(8), 0.0d0, Spin
 
-write(io_LHEOutFile,fmt1) id(9), 1,4,4,0,501,MomDummy(2:4,9), MomDummy(1,9), MassDummy(9), 0.0d0, helicity(9)
+write(io_LHEOutFile,fmt1) id(9), 1,4,4,0,501,MomDummy(2:4,9), MomDummy(1,9), MassDummy(9), 0.0d0, Spin
 endif
 write(io_LHEOutFile,"(A)") "</event>"
 
@@ -2931,9 +2935,42 @@ implicit none
 real(8) :: x1,x2,PDFScale,MuFac
 real(8) :: upv(1:2),dnv(1:2),usea(1:2),dsea(1:2),str(1:2),chm(1:2),bot(1:2),glu(1:2),phot(1:2),sbar(1:2),cbar(1:2),bbar(1:2)
 integer,parameter :: swPDF_u=1, swPDF_d=1, swPDF_c=1, swPDF_s=1, swPDF_b=1, swPDF_g=1
-real(8) :: pdf(-6:6,1:2),NNpdf(1:2,-6:7) 
+real(8) :: pdf(-6:6,1:2),NNpdf(1:2,-6:7)
 
         PDFScale=MuFac*100d0
+        
+#if useLHAPDF==1
+        call evolvePDF(x1,PDFScale,NNpdf(1,-6:6))
+        call evolvePDF(x2,PDFScale,NNpdf(2,-6:6))
+            NNpdf(1,-6:7) = NNpdf(1,-6:7)/x1
+            NNpdf(2,-6:7) = NNpdf(2,-6:7)/x2
+            
+            pdf(Up_,1)   = NNpdf(1,+1)         * swPDF_u
+            pdf(AUp_,1)  = NNpdf(1,-1)         * swPDF_u
+            pdf(Dn_,1)   = NNpdf(1,+2)         * swPDF_d
+            pdf(ADn_,1)  = NNpdf(1,-2)         * swPDF_d
+            pdf(Chm_,1)  = NNpdf(1,+3)         * swPDF_c
+            pdf(AChm_,1) = NNpdf(1,-3)         * swPDF_c
+            pdf(Str_,1)  = NNpdf(1,+4)         * swPDF_s
+            pdf(AStr_,1) = NNpdf(1,-4)         * swPDF_s
+            pdf(Bot_,1)  = NNpdf(1,+5)         * swPDF_b
+            pdf(ABot_,1) = NNpdf(1,-5)         * swPDF_b
+            pdf(0,1)     = NNpdf(1,+0)         * swPDF_g            
+            
+            pdf(Up_,2)   = NNpdf(2,+1)         * swPDF_u
+            pdf(AUp_,2)  = NNpdf(2,-1)         * swPDF_u
+            pdf(Dn_,2)   = NNpdf(2,+2)         * swPDF_d
+            pdf(ADn_,2)  = NNpdf(2,-2)         * swPDF_d
+            pdf(Chm_,2)  = NNpdf(2,+3)         * swPDF_c
+            pdf(AChm_,2) = NNpdf(2,-3)         * swPDF_c
+            pdf(Str_,2)  = NNpdf(2,+4)         * swPDF_s
+            pdf(AStr_,2) = NNpdf(2,-4)         * swPDF_s
+            pdf(Bot_,2)  = NNpdf(2,+5)         * swPDF_b
+            pdf(ABot_,2) = NNpdf(2,-5)         * swPDF_b
+            pdf(0,2)     = NNpdf(2,+0)         * swPDF_g            
+            RETURN
+            
+#else
         if( PDFSet.eq.1 ) then
             call cteq6(x1,PDFScale,upv(1),dnv(1),usea(1),dsea(1),str(1),chm(1),bot(1),glu(1))
             call cteq6(x2,PDFScale,upv(2),dnv(2),usea(2),dsea(2),str(2),chm(2),bot(2),glu(2))
@@ -3026,12 +3063,12 @@ real(8) :: pdf(-6:6,1:2),NNpdf(1:2,-6:7)
             pdf(ABot_,2) = NNpdf(2,-5)         * swPDF_b
             pdf(0,2)     = NNpdf(2,+0)         * swPDF_g            
             RETURN
-            
         else
             print *, "PDFSet",PDFSet,"not available!"
             stop
         endif
-
+#endif
+        
 IF( COLLIDER.EQ.1 ) THEN
 !       PROTON CONTENT
         pdf(Up_,1)   = (upv(1) + usea(1))  * swPDF_u

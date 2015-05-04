@@ -72,7 +72,7 @@ The list of command line configurables and the default values are (also defined 
 \begin{verbatim}
     Collider:   1=LHC, 2=Tevatron, 0=e+e-
     Process:    0=spin-0, 1=spin-1, 2=spin-2 resonance, 50=pp/ee->VH,
-                60=weakVBF, 61=pp->Hjj, 62=pp->Hj, 80=ttH
+                60=weakVBF, 61=pp->Hjj, 62=pp->Hj, 80=ttH, 90=bbH
     MReso:      resonance mass (default=126.00), format: yyy.xx
     DecayMode1: decay mode for vector boson 1 (Z/W/gamma)
     DecayMode2: decay mode for vector boson 2 (Z/W/gamma)
@@ -105,8 +105,9 @@ A few more details on some particular parameters:
 \begin{itemize}
 \item {\verb|VegasNc0,1,2|}: For unweighted event generation \verb|VegasNc0| specifies the number of evaluations for the initial integrand scan.  The actual event generation is controlled by either \verb|VegasNc1| or \verb|VegasNc2|. \verb|VegasNc1| specifies the number of tries in the accept/reject phase and \verb|VegasNc2| is the number of generated events. When generating unweighted events in \verb|ReadLHE| mode, both \verb|VegasNc1| or \verb|VegasNc2| can be used to specify the number of generated events. For the generation of weighted events \verb|VegasNc1| specifies the number of evaluations for each of 5 iterations during the initial integrand scan. \verb|VegasNc2| gives the (approximate) number of generated weighted events.
 \item {\verb|OffXVV|}: The program does not work for $ZZ$ or $WW$ if you set them to be on-shell (\verb|OffXVV="000"|) and the mass of the $X$ resonance to be below the $m_{VV}$ threshold.  In general, the more off-shell the process, or the more "1" you have, the less efficient the \verb|VegasNc1| evaluations are.  Specifically, if you are interested then, in producing a resonance with mass below threshold $m_{VV}$ with a very narrow resonance, it is most efficient to generate with \verb|OffXVV="011"|
-\item \verb|PChannel|: This parameter is only meaningful in the spin-2 case.  For spin-0, production is possible only via the $gg$ process and for spin-1, production is only possible via the $q\bar{q}$ process.
-\item \verb|DecayMode2=7| note: Valid for spin-0 and spin-2, only OffXVV=000 or 100 are possible.
+\item \verb|PChannel|: This parameter is only meaningful in the spin-2 case and for $Hjj$, $Hj$, $ttH$, and $bbH$ production mechanisms.  For spin-0, production is possible only via the $gg$ process; for spin-1 and for the VBF and $VH$ processes, production is only possible via the $q\bar{q}$ process.
+\item \verb|DecayMode1,2=7|: Valid for spin-0 and spin-2.  Only OffXVV=000 or 100 are possible.
+\item In $VH$ production and \verb|ConvertLHE| mode, \verb|DecayMode1| is used for the decay of the $V$.  If it is a $Z$ decay mode, $ZH$ will be produced; if it is a $W$ decay mode, $WH$ will be produced.
 \end{itemize}
 
 \noindent
@@ -116,7 +117,7 @@ Then, as an example of running the generator, you could do:
 - gg production:
 \begin{verbatim}
 ./JHUGen Collider=1 Process=0 VegasNc2=100000 PChannel=0 OffXVV=011 DecayMode1=0 DecayMode2=0 \\
-		Unweighted=.true. DataFile=test1
+		Unweighted=1 DataFile=test1
 \end{verbatim}
 - ggH $\to$ Zgamma
 \begin{verbatim}
