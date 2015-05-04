@@ -3,7 +3,7 @@ implicit none
 save
 ! 
 ! 
-character(len=6),parameter :: JHUGen_Version="v5.4.9"
+character(len=6),parameter :: JHUGen_Version="v5.5.1"
 ! 
 ! 
 integer, public :: Collider, PDFSet,PChannel,Process,DecayMode1,DecayMode2,TopDecays
@@ -11,19 +11,21 @@ integer, public :: VegasIt1,VegasNc0,VegasNc1,VegasNc2
 real(8), public :: Collider_Energy
 integer, public :: VegasIt1_default,VegasNc0_default,VegasNc1_default,VegasNc2_default
 real(8), public :: VegasSeed
-integer, public :: NumHistograms
-logical, public :: unweighted,OffShellReson,OffShellV1,OffShellV2,ReadLHEFile,ConvertLHEFile,ReadCSmax,GenerateEvents
+integer, public :: NumHistograms,RequestNLeptons
+logical, public :: Unweighted,OffShellReson,OffShellV1,OffShellV2,ReadLHEFile,ConvertLHEFile
+logical, public :: ReadCSmax,GenerateEvents,RequestOSSF
 integer(8), public :: EvalCounter=0
 integer(8), public :: RejeCounter=0
 integer(8), public :: AccepCounter=0
 integer(8), public :: AlertCounter=0
-integer(8), public :: FilterCounter=0
 integer(8), public :: AccepCounter_part(-5:5,-5:5)=0
 real(8) :: time_start,time_end,time_int
 logical, public :: warmup
 character(len=100) :: DataFile
 character(len=100) :: LogFile
 character(len=500) :: LHEProdFile
+character(len=100) :: LHAPDFString
+integer, public :: LHAPDFMember
 logical, public :: includeInterference
 real(8), public :: M_V,Ga_V
 real(8), public, parameter :: GeV=1d0/100d0 ! we are using units of 100GeV, i.e. Lambda=10 is 1TeV 
@@ -51,8 +53,6 @@ real(8),parameter :: MPhotonCutoff = 4d0*GeV
 
 logical, public, parameter :: RandomizeVVdecays = .true. ! randomize DecayMode1 and DecayMode2 in H-->VV decays
 
-integer, public, parameter :: RequestNLeptons = -1           ! requested number of charged leptons in ReadLHE mode  (-1: no request)
-logical, public, parameter :: RequestOSSF = .false.          ! requested 2 opposite-sign-same-flavor charged lepton pairs in ReadLHE mode
 real(8), public            :: M_Top   = 173.2d0     *GeV      ! 
 real(8), public, parameter :: Ga_Top  = 2.0d0    *GeV      ! 
 real(8), public, parameter :: M_Z     = 91.1876d0 *GeV      ! Z boson mass (PDG-2011)
