@@ -26,9 +26,9 @@ source setup_matrixelement_sl6.sh # for sl6 machines
    FFLAGS 	= -fno-automatic -fno-f2c $(OMPFLAG) -O0 -fPIC -g -I$(INCPATH) -I$(TENSORREDDIR)/Include -I$(OBJNAME)
    F90FLAGS = -fno-automatic -fno-f2c $(OMPFLAG) -O2 -fPIC -g -I$(INCPATH) -I$(OBJNAME) -J$(OBJNAME)
 
-   3) Modify the makefile in QCDLoop/ql and QCDLoop/ff, adding the -fPIC in FFLAGS
+   3) Modify the makefiles in QCDLoop/ql/, QCDLoop/ff/, TensorStructure/ov/, TensorStructure/pv/, TensorStructure/recur/*/, adding the -fPIC in FFLAGS
 
-      FFLAGS  = -g -fPIC
+      Ex. FFLAGS  = -g -fPIC
 
    4) Copy contents of JHUGenMELA/ZZ_MCFM/src/ into MCFM-7.0/src/.
 
@@ -42,10 +42,12 @@ source setup_matrixelement_sl6.sh # for sl6 machines
     ./Install
     make
     cd obj/
-    g++ -Wl,-soname,libmcfm_7p0.so -shared -o libmcfm_7p0.so *.o ../QCDLoop/ql/obj/ql*.o ../QCDLoop/ql/obj/a*.o ../QCDLoop/ff/obj/*.o  
+    g++ -Wl,-soname,libmcfm_7p0.so -shared -o libmcfm_7p0.so *.o ../QCDLoop/ql/obj/ql*.o ../QCDLoop/ql/obj/a*.o ../QCDLoop/ff/obj/*.o ../TensorReduction/ov/*.a ../TensorReduction/pv/*.a ../TensorReduction/recur/*.a  
+
+    Note here that the order "../TensorReduction/ov/*.a ../TensorReduction/pv/*.a" matters.
 
    7) Copy library libmcfm_7p0.so to the JHUGenMELA/ggZZ_MCFM/ area
-          ---> Sample file compiled for SLC5/6 gcc 4.6.2+ is provided.
+          ---> Sample file compiled for SLC5/6 gcc 4.6.2+ is provided. Earlier gcc 4.3.4 needs to be compiled from scratch as described above.
 
 
 3. go back to JHUGenMELA/ggZZ_MCFM/ and compile the MELA code
@@ -57,4 +59,4 @@ make
 
 root -l -b -q testME.C+
 
-* The output is in "output.txt", which should be identical to the reference "output_ref.txt"
+* The output is in "output.txt", which should be identical to the reference "output_ref.txt" provided.
