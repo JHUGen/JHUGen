@@ -19,6 +19,7 @@ logical,parameter :: useBetaVersion=.false.! this should be set to .false.
    call InitParameters()
    call InitProcess()
    call InitVegas()
+   call InitRandomSeed(TheSeeds)
    call OpenFiles()
    call PrintLogo(io_stdout)
    call PrintLogo(io_LogFile)
@@ -196,13 +197,12 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
     endif
    enddo
 
-
     Mu_Fact = M_Reso! setting pdf scale to resonance mass
 
-   if( CountArg.ne.NumArgs ) then
+    if( CountArg.ne.NumArgs ) then
         print *, "unknown command line argument"
         stop
-   endif
+    endif
 
     if (Process.eq.0) PChannel = 0   !only gluons
     if (Process.eq.1 .or. Process.eq.50 .or. Process.eq.60) PChannel = 1   !only quarks
@@ -659,8 +659,8 @@ real(8) :: yRnd(1:22)
 real(8) :: dum, RES(-5:5,-5:5),VG2(-5:5,-5:5)
 integer :: i, i1, j1,PChannel_aux, PChannel_aux1,NHisto
 include 'csmaxvalue.f'
-integer :: n,clock,flav1,flav2,StatusPercent,LastStatusPercent=0
-integer, dimension(:), allocatable :: gfort_seed
+integer :: flav1,flav2,StatusPercent,LastStatusPercent=0
+integer, dimension(:), allocatable :: gen_seed
 
 
 if( VegasIt1.eq.-1 ) VegasIt1 = VegasIt1_default
@@ -682,10 +682,6 @@ if( VegasNc2.eq.-1 .and.  .not. (unweighted) ) VegasNc2 = VegasNc2_default
 
 if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !----------------------- weighted events
 
-
-
-    call InitRandomSeed(VegasSeed)
-    idum = int(VegasSeed)
 
     if( (GenerateEvents.eqv..true.) ) then
         itmx = 1
@@ -746,8 +742,6 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
     VG = zero
     VG2= zero
     csmax = zero
-
-    call InitRandomSeed(VegasSeed)
 
     if( .not. ReadCSmax ) then
         print *, " finding maximal weight with ",VegasNc0," evaluations"
@@ -821,8 +815,6 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
     RejeCounter = 0
     AlertCounter = 0
     AccepCounter_part = 0
-
-    call InitRandomSeed(VegasSeed)
 
     call cpu_time(time_start)
     warmup = .true.
@@ -956,7 +948,8 @@ real(8) :: yRnd(1:22)
 real(8) :: dum, RES(-5:5,-5:5),ResFrac(-5:5,-5:5),TotalXSec
 integer :: i, i1, j1,PChannel_aux, PChannel_aux1,NHisto,RequEvents(-5:+5,-5:+5)
 include 'csmaxvalue.f'
-integer :: n,flav1,flav2,StatusPercent
+integer :: flav1,flav2,StatusPercent
+integer :: VegasSeed
 
 
 if( VegasIt1.eq.-1 ) VegasIt1 = VegasIt1_default
@@ -978,9 +971,6 @@ if( VegasNc2.eq.-1 .and.  .not. (unweighted) ) VegasNc2 = VegasNc2_default
 
 if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !----------------------- weighted events
 
-
-    call InitRandomSeed(VegasSeed)
-    idum = int(VegasSeed)
 
     if( (GenerateEvents.eqv..true.) ) then
         itmx = 1
@@ -1023,8 +1013,6 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
 
     VG(:,:) = zero
     CSmax(:,:) = zero
-    call InitRandomSeed(VegasSeed)
-
 
     if( .not. ReadCSmax ) then
         print *, " finding maximal weight with ",VegasNc0," evaluations"
@@ -1044,11 +1032,11 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
                 PChannel = PChannel_aux
         enddo
         open(unit=io_CSmaxFile,file='CSmax.bin',form='unformatted',status='replace')
-        WRITE(io_CSmaxFile) CSMAX
+        WRITE(io_CSmaxFile) CSMAX,VG
         close(io_CSmaxFile)
     else
         open(unit=io_CSmaxFile,file='CSmax.bin',form='unformatted')
-        READ(io_CSmaxFile) CSMAX
+        READ(io_CSmaxFile) CSMAX,VG
         close(io_CSmaxFile)
     endif
    
@@ -1086,7 +1074,6 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
     AlertCounter = 0
     AccepCounter_part(:,:) = 0
 
-    call InitRandomSeed(VegasSeed)
     call cpu_time(time_start)
 
 
@@ -1100,8 +1087,8 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
           write(io_stdout,*) ""
           write(io_stdout,"(X,A,I8,A,I4,I4,A)",advance='no') "generating ",RequEvents(i1,j1)," events for channel",i1,j1,":  "
           flush(io_stdout)
+          
           do while( AccepCounter_part(i1,j1)  .lt. RequEvents(i1,j1) )
-
               call random_number(yRnd)
               if( Process.eq.80 ) then
                   dum = EvalUnWeighted_TTBH(yRnd,.true.,(/i1,j1/),RES)
@@ -1112,10 +1099,10 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
               elseif( Process.eq.61 ) then
                   dum = EvalUnWeighted_HJJ(yRnd,.true.,(/i1,j1/),RES)
               endif
-              
               StatusPercent = int(100d0*(AccepCounter_part(i1,j1))  /  dble(RequEvents(i1,j1))  )
               call PrintStatusBar( StatusPercent )
           enddo
+
     endif
     enddo
     enddo    
@@ -1166,8 +1153,8 @@ real(8) :: yRnd(1:22)
 real(8) :: dum, RES(-5:5,-5:5)
 integer :: i, i1, PChannel_aux, PChannel_aux1,n1,n2,n3,n4
 include 'csmaxvalue.f'
-integer :: n,clock
-integer, dimension(:), allocatable :: gfort_seed
+integer :: VegasSeed
+
 
 if( VegasIt1.eq.-1 ) VegasIt1 = VegasIt1_default
 if( VegasNc1.eq.-1 ) VegasNc1 = 5000
@@ -1226,8 +1213,6 @@ enddo
 !pause
    call ClearHisto()
    
-   call InitRandomSeed(VegasSeed)
-
    print *, " generating events"
    call cpu_time(time_start)
    do while( AccepCounter.lt.VegasNc1 )! generate a fixed number of VegasNc1 events
@@ -1260,266 +1245,265 @@ END SUBROUTINE
 
 
 
-SUBROUTINE StartReadLHE(VG_Result,VG_Error)
-use ModCrossSection
-use ModKinematics
-use ModParameters
-use ModMisc
-implicit none
-include 'csmaxvalue.f'
-integer,parameter :: maxpart=15!=max.partons; this parameter should match the one in WriteOutEvent of mod_Kinematics
-real(8) :: VG_Result,VG_Error,VG_Chi2
-real(8) :: yRnd(1:22),Res,dum,EMcheck(1:4)
-real(8) :: AcceptedEvent(1:4,1:maxpart),Ehat
-real(8) :: MomExt(1:4,1:maxpart),MomHiggs(1:4),MomParton(1:4,1:maxpart),Mass(1:maxpart),pH2sq
-integer :: tries, nParticle, MY_IDUP(1:7+maxpart), ICOLUP(1:2,1:7+maxpart),IntExt
-character(len=*),parameter :: POWHEG_Fmt0 = "(5X,I2,A160)"
-character(len=*),parameter :: POWHEG_Fmt1 = "(5X,I3,4X,I2,4X,I2,4X,I2,2X,I4,2X,I4,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9)"
-character(len=*),parameter :: JHUGen_Fmt0 = "(I2,A160)"
-character(len=*),parameter :: JHUGen_Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0)"
-character(len=*),parameter :: JHUGen_old_Fmt0 = "(2X,I2,A160)"
-character(len=*),parameter :: JHUGen_old_Fmt1 = "(I3,X,I2,X,I2,X,I2,X,I3,X,I3,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7)"
-character(len=*),parameter :: MadGra_Fmt0 = "(I2,A160)"
-character(len=*),parameter :: MadGra_Fmt1 = "(7X,I3,2X,I3,3X,I2,3X,I2,3X,I3,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1F3.0,X,1F3.0)"
-character(len=150) :: InputFmt0,InputFmt1
-logical :: FirstEvent,M_ResoSet
-integer :: nline,intDummy,Nevent
-integer :: LHE_IDUP(1:maxpart+3),   LHE_ICOLUP(1:2,1:maxpart+3),   LHE_MOTHUP(1:2,1:maxpart+3)
-integer :: LHE_IDUP_Part(1:maxpart),LHE_ICOLUP_Part(1:2,1:maxpart),LHE_MOTHUP_Part(1:2,1:maxpart+3)
-integer :: EventNumPart,nparton
-character(len=160) :: FirstLines,EventInfoLine,PDFLine
-character(len=160) :: EventLine(1:maxpart+3)
-integer :: n,clock,i,stat
-integer, dimension(:), allocatable :: gfort_seed
-integer,parameter :: InputLHEFormat = 1  !  1=POWHEG, 2=JHUGen (old format), 3=JHUGen (new format), 4=MadGraph
-
-
-if(InputLHEFormat.eq.1) then
-  InputFmt0 = trim(POWHEG_Fmt0)
-  InputFmt1 = trim(POWHEG_Fmt1)
-elseif(InputLHEFormat.eq.4) then
-  InputFmt0 = trim(MadGra_Fmt0)
-  InputFmt1 = trim(MadGra_Fmt1)
-elseif(InputLHEFormat.eq.2) then
-  InputFmt0 = trim(JHUGen_old_Fmt0)
-  InputFmt1 = trim(JHUGen_old_Fmt1)
-else
-  InputFmt0 = trim(JHUGen_Fmt0)
-  InputFmt1 = trim(JHUGen_Fmt1)
-endif
-
-
-
-if( VegasIt1.eq.-1 ) VegasIt1 = VegasIt1_default
-if( VegasNc0.eq.-1 ) VegasNc0 = VegasNc0_default
-if( VegasNc1.eq.-1 .and. VegasNc2.eq.-1 ) VegasNc1 = VegasNc1_default
-if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
-
-
-    call InitRandomSeed(VegasSeed)
-
-!    search for line with first event
-     FirstEvent = .false.
-     M_ResoSet=.false.
-     do while ( .not.FirstEvent )
-        read(16,fmt="(A160)",IOSTAT=stat,END=99) FirstLines
-        if( FirstLines(1:5).eq."hmass" ) then 
-               read(FirstLines(6:13),fmt="(F7.0)") M_Reso
-               M_Reso = M_Reso*GeV!  convert to units of 100GeV
-               M_ResoSet=.true.
-        endif
-        if( FirstLines(1:7).eq."<event>" ) then 
-               FirstEvent=.true.
-        else
-            if( importExternal_LHEinit ) then
-                if( FirstLines(1:17).eq."<LesHouchesEvents" .or. FirstLines(1:4).eq."<!--" ) then
-                else
-                  write(io_LHEOutFile,"(A)") trim(firstlines)
-                endif
-            endif
-        endif
-     enddo
-     if( .not. M_ResoSet ) then
-        write(io_stdout,"(2X,A,1F7.2)")  "ERROR: Higgs mass could not be read from LHE input file. Assuming default value",M_Reso*100d0
-        write(io_LogFile,"(2X,A,1F7.2)") "ERROR: Higgs mass could not be read from LHE input file. Assuming default value",M_Reso*100d0
-     else
-        write(io_stdout,"(2X,A,1F7.2,A)") "A Higgs mass of ",M_Reso*100d0," GeV was determined from the LHE input file."
-        write(io_LogFile,"(2X,A,1F7.2,A)") "A Higgs mass of ",M_Reso*100d0," GeV was determined from the LHE input file."
-     endif
-     write(io_stdout,"(A)") ""
-     write(io_LogFile,"(A)") ""
-
-
-
-      print *, " finding maximal weight with ",VegasNc0," points"
-      VG = zero
-      CSmax = zero
-      Ehat = M_Reso! fixing Ehat to M_Reso which should determine the max. of the integrand
-      do tries=1,VegasNc0
-          call random_number(yRnd)
-          dum = EvalUnWeighted_withoutProduction(yRnd,.false.,EHat,Res,AcceptedEvent,MY_IDUP(1:9),ICOLUP(1:2,1:9))
-      enddo
-      csmax(0,0)   = 1.5d0*csmax(0,0)    !  savety buffer
-
-
-
-
-
-     print *, " generating events"
-     EvalCounter = 0
-     AccepCounter = 0
-     RejeCounter = 0
-     AccepCounter_part = 0
-     call cpu_time(time_start)
-     NEvent=0
-     do while ( .true. ) 
-         NEvent=NEvent + 1
-         read(16,fmt=InputFmt0) EventNumPart,EventInfoLine!  read number of particle from the first line after <event> and other info
-!        read event lines
-         do nline=1,EventNumPart
-            read(16,fmt="(A160)") EventLine(nline)
-         enddo
-         if( EventNumPart.lt.3 .or. EventNumPart.gt.maxpart ) then
-            call Error("Number of particles in LHE input exceeds allowed limit",EventNumPart)
-         endif
-
- !       convert event lines into variables assuming that the Higgs resonance has ID 25
-         nparton = 0
-         do nline=1,EventNumPart
-            read(EventLine(nline),fmt=InputFmt1) LHE_IDUP(nline),IntExt,LHE_MOTHUP(1,nline),LHE_MOTHUP(2,nline),LHE_ICOLUP(1,nline),LHE_ICOLUP(2,nline),MomExt(2,nline),MomExt(3,nline),MomExt(4,nline),MomExt(1,nline),Mass(nline)
-            if( IntExt.ne.-1 .and. IntExt.ne.+1 ) cycle ! remove internal particles
-            MomExt(1:4,nline) = MomExt(1:4,nline)*GeV!  convert to units of 100GeV
-            Mass(nline) = Mass(nline)*GeV            !  convert to units of 100GeV
-            if( abs(LHE_IDUP(nline)).eq.25 ) then!   select the Higgs (ID=25, h0)
-                  MomHiggs(1:4) = MomExt(1:4,nline)
-                  pH2sq = dsqrt(abs(MomHiggs(1:4).dot.MomHiggs(1:4)))
-!             elseif( (abs(LHE_IDUP(nline)).eq.21) .or. (abs(LHE_IDUP(nline)).ge.1 .and. abs(LHE_IDUP(nline)).le.5) ) then!   select the gluons (ID=21) or quarks (ID=1,.,5)
-            else
-                  nparton = nparton + 1
-                  MomParton(1:4,nparton) = MomExt(1:4,nline)
-                  LHE_IDUP_Part(nparton) = LHE_IDUP(nline)
-                  LHE_ICOLUP_Part(1:2,nparton) = LHE_ICOLUP(1:2,nline)
-                  LHE_MOTHUP_Part(1:2,nparton) = LHE_MOTHUP(1:2,nline)
-!              else
-!                   call Error("Unknown particle in LHE input file",LHE_IDUP(nline))
-            endif
-         enddo
-!        read optional pdf line
-         read(16,fmt="(A160)",IOSTAT=stat,END=99) PDFLine(1:160)
-!          if( .not. PDFLine(1:4).eq."#pdf") then
-         if( .not. (PDFLine(1:4).eq."#pdf" .or. PDFLine(1:5).eq."#rwgt")) then         
-             PDFLine(:)=""
-             backspace(16)
-         endif
-
-
-! !        reject event if M_Reso and pH2sq deviate by more than 20 GeV 
-!          if( abs( M_Reso - pH2sq) .gt. 20d0*GeV ) then
-!               write(io_stdout,"(2X,A,2F10.4)")  "WARNING: Higgs mass and momentum squared deviate by more than 20 GeV!",pH2sq*100d0,M_Reso*100d0
-!               write(io_LogFile,"(2X,A,2F10.4)") "WARNING: Higgs mass and momentum squared deviate by more than 20 GeV!",pH2sq*100d0,M_Reso*100d0
-!               cycle
+! SUBROUTINE StartReadLHE(VG_Result,VG_Error)
+! use ModCrossSection
+! use ModKinematics
+! use ModParameters
+! use ModMisc
+! implicit none
+! include 'csmaxvalue.f'
+! integer,parameter :: maxpart=15!=max.partons; this parameter should match the one in WriteOutEvent of mod_Kinematics
+! real(8) :: VG_Result,VG_Error,VG_Chi2
+! real(8) :: yRnd(1:22),Res,dum,EMcheck(1:4)
+! real(8) :: AcceptedEvent(1:4,1:maxpart),Ehat
+! real(8) :: MomExt(1:4,1:maxpart),MomHiggs(1:4),MomParton(1:4,1:maxpart),Mass(1:maxpart),pH2sq
+! integer :: tries, nParticle, MY_IDUP(1:7+maxpart), ICOLUP(1:2,1:7+maxpart),IntExt
+! character(len=*),parameter :: POWHEG_Fmt0 = "(5X,I2,A160)"
+! character(len=*),parameter :: POWHEG_Fmt1 = "(5X,I3,4X,I2,4X,I2,4X,I2,2X,I4,2X,I4,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9)"
+! character(len=*),parameter :: JHUGen_Fmt0 = "(I2,A160)"
+! character(len=*),parameter :: JHUGen_Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0)"
+! character(len=*),parameter :: JHUGen_old_Fmt0 = "(2X,I2,A160)"
+! character(len=*),parameter :: JHUGen_old_Fmt1 = "(I3,X,I2,X,I2,X,I2,X,I3,X,I3,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7)"
+! character(len=*),parameter :: MadGra_Fmt0 = "(I2,A160)"
+! character(len=*),parameter :: MadGra_Fmt1 = "(7X,I3,2X,I3,3X,I2,3X,I2,3X,I3,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1F3.0,X,1F3.0)"
+! character(len=150) :: InputFmt0,InputFmt1
+! logical :: FirstEvent,M_ResoSet
+! integer :: nline,intDummy,Nevent
+! integer :: LHE_IDUP(1:maxpart+3),   LHE_ICOLUP(1:2,1:maxpart+3),   LHE_MOTHUP(1:2,1:maxpart+3)
+! integer :: LHE_IDUP_Part(1:maxpart),LHE_ICOLUP_Part(1:2,1:maxpart),LHE_MOTHUP_Part(1:2,1:maxpart+3)
+! integer :: EventNumPart,nparton
+! character(len=160) :: FirstLines,EventInfoLine,PDFLine
+! character(len=160) :: EventLine(1:maxpart+3)
+! integer :: VegasSeed,stat,n
+! integer,parameter :: InputLHEFormat = 1  !  1=POWHEG, 2=JHUGen (old format), 3=JHUGen (new format), 4=MadGraph
+! 
+! 
+! if(InputLHEFormat.eq.1) then
+!   InputFmt0 = trim(POWHEG_Fmt0)
+!   InputFmt1 = trim(POWHEG_Fmt1)
+! elseif(InputLHEFormat.eq.4) then
+!   InputFmt0 = trim(MadGra_Fmt0)
+!   InputFmt1 = trim(MadGra_Fmt1)
+! elseif(InputLHEFormat.eq.2) then
+!   InputFmt0 = trim(JHUGen_old_Fmt0)
+!   InputFmt1 = trim(JHUGen_old_Fmt1)
+! else
+!   InputFmt0 = trim(JHUGen_Fmt0)
+!   InputFmt1 = trim(JHUGen_Fmt1)
+! endif
+! 
+! 
+! 
+! if( VegasIt1.eq.-1 ) VegasIt1 = VegasIt1_default
+! if( VegasNc0.eq.-1 ) VegasNc0 = VegasNc0_default
+! if( VegasNc1.eq.-1 .and. VegasNc2.eq.-1 ) VegasNc1 = VegasNc1_default
+! if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
+! 
+! 
+!     call InitRandomSeed(TheSeed)
+! 
+! !    search for line with first event
+!      FirstEvent = .false.
+!      M_ResoSet=.false.
+!      do while ( .not.FirstEvent )
+!         read(16,fmt="(A160)",IOSTAT=stat,END=99) FirstLines
+!         if( FirstLines(1:5).eq."hmass" ) then 
+!                read(FirstLines(6:13),fmt="(F7.0)") M_Reso
+!                M_Reso = M_Reso*GeV!  convert to units of 100GeV
+!                M_ResoSet=.true.
+!         endif
+!         if( FirstLines(1:7).eq."<event>" ) then 
+!                FirstEvent=.true.
+!         else
+!             if( importExternal_LHEinit ) then
+!                 if( FirstLines(1:17).eq."<LesHouchesEvents" .or. FirstLines(1:4).eq."<!--" ) then
+!                 else
+!                   write(io_LHEOutFile,"(A)") trim(firstlines)
+!                 endif
+!             endif
+!         endif
+!      enddo
+!      if( .not. M_ResoSet ) then
+!         write(io_stdout,"(2X,A,1F7.2)")  "ERROR: Higgs mass could not be read from LHE input file. Assuming default value",M_Reso*100d0
+!         write(io_LogFile,"(2X,A,1F7.2)") "ERROR: Higgs mass could not be read from LHE input file. Assuming default value",M_Reso*100d0
+!      else
+!         write(io_stdout,"(2X,A,1F7.2,A)") "A Higgs mass of ",M_Reso*100d0," GeV was determined from the LHE input file."
+!         write(io_LogFile,"(2X,A,1F7.2,A)") "A Higgs mass of ",M_Reso*100d0," GeV was determined from the LHE input file."
+!      endif
+!      write(io_stdout,"(A)") ""
+!      write(io_LogFile,"(A)") ""
+! 
+! 
+! 
+!       print *, " finding maximal weight with ",VegasNc0," points"
+!       VG = zero
+!       CSmax = zero
+!       Ehat = M_Reso! fixing Ehat to M_Reso which should determine the max. of the integrand
+!       do tries=1,VegasNc0
+!           call random_number(yRnd)
+!           dum = EvalUnWeighted_withoutProduction(yRnd,.false.,EHat,Res,AcceptedEvent,MY_IDUP(1:9),ICOLUP(1:2,1:9))
+!       enddo
+!       csmax(0,0)   = 1.5d0*csmax(0,0)    !  savety buffer
+! 
+! 
+! 
+! 
+! 
+!      print *, " generating events"
+!      EvalCounter = 0
+!      AccepCounter = 0
+!      RejeCounter = 0
+!      AccepCounter_part = 0
+!      call cpu_time(time_start)
+!      NEvent=0
+!      do while ( .true. ) 
+!          NEvent=NEvent + 1
+!          read(16,fmt=InputFmt0) EventNumPart,EventInfoLine!  read number of particle from the first line after <event> and other info
+! !        read event lines
+!          do nline=1,EventNumPart
+!             read(16,fmt="(A160)") EventLine(nline)
+!          enddo
+!          if( EventNumPart.lt.3 .or. EventNumPart.gt.maxpart ) then
+!             call Error("Number of particles in LHE input exceeds allowed limit",EventNumPart)
 !          endif
-
-         EMcheck(1:4) = MomParton(1:4,1) + MomParton(1:4,2) - MomHiggs(1:4)
-         do n=3,nparton
-             EMcheck(1:4) = EMcheck(1:4) - MomParton(1:4,n)
-         enddo
-         if( any(abs(EMcheck(1:4)).gt.1d0*GeV) ) then
-              print *, EMcheck(1:4)
-              call Error("energy momentum violation while reading LHE production momenta.",nparton)
-         endif
-
-!         accept/reject sampling for H->VV decay contribution
-          EHat = pH2sq
-          do tries=1,5000000
-              call random_number(yRnd)
-              dum = EvalUnWeighted_withoutProduction(yRnd,.true.,Ehat,RES,AcceptedEvent,MY_IDUP(1:9),ICOLUP(1:2,1:9))
-              if( Res.ne.0d0 ) exit
-          enddo
-          if( Res.ne.0d0 ) then ! decay event was accepted
-             call boost(AcceptedEvent(1:4,1),MomHiggs(1:4),pH2sq)
-             call boost(AcceptedEvent(1:4,2),MomHiggs(1:4),pH2sq)
-             call boost(AcceptedEvent(1:4,3),MomHiggs(1:4),pH2sq)
-             call boost(AcceptedEvent(1:4,4),MomHiggs(1:4),pH2sq)
-
-             MY_IDUP(1) = convertLHEreverse(LHE_IDUP_Part(1))! overwrite inital ID with external ones
-             MY_IDUP(2) = convertLHEreverse(LHE_IDUP_Part(2))
-             ICOLUP(1:2,1:2) = LHE_ICOLUP_Part(1:2,1:2)!  overwrite inital colors with external ones
-             do n=3,nparton
-                MY_IDUP(7+n)= convertLHEreverse(LHE_IDUP_Part(n))
-                ICOLUP(1:2,7+n) = LHE_ICOLUP_Part(1:2,n)!  overwrite final colors with external ones
-             enddo
-             call WriteOutEvent((/MomParton(1:4,1),MomParton(1:4,2),AcceptedEvent(1:4,1),AcceptedEvent(1:4,2),AcceptedEvent(1:4,3),AcceptedEvent(1:4,4)/), &
-                                MY_IDUP(1:7+nparton),ICOLUP(1:2,1:7+nparton),MomFSPartons=MomParton(1:4,3:nparton),EventInfoLine=EventInfoLine,PDFLine=PDFLine,MOTHUP_Parton=LHE_MOTHUP_Part)
-             if( mod(AccepCounter,5000).eq.0 ) then
-                  call cpu_time(time_int)
-                  write(io_stdout,*)  NEvent," events accepted (",time_int-time_start, ") seconds"
-                  write(io_LogFile,*) NEvent," events accepted (",time_int-time_start, ") seconds"
-             endif
-          else! decay event was not accepted after ncall evaluations, read next production event
-             print *, "rejected event after ",tries-1," evaluations"
-             AlertCounter = AlertCounter + 1 
-          endif
-
-!        skip event lines 
-!          read(16,fmt="(A7)",IOSTAT=stat,END=99) FirstLines! skip <\event>
-! !          if( stat.lt.0 ) exit
-!          read(16,fmt="(A30)",IOSTAT=stat,END=99) FirstLines!   skip <event> or </LesHouchesEvents>
-!          if( FirstLines(1:30).eq."</LesHouchesEvents>" ) exit
-!          if( NEvent.eq. VegasNc1 ) exit
-
-
-!        read optional lines
-         FirstEvent = .true.
-         do while (.true.) 
-              read(16,fmt="(A160)",IOSTAT=stat,END=99) EventInfoLine(1:160)
-              if(EventInfoLine(1:30).eq."</LesHouchesEvents>") then
-                  goto 99
-              elseif( EventInfoLine(1:8).eq."<event>" ) then
-                  exit
-              else!if there are "#" comments
-                  if( FirstEvent ) then 
-                      backspace(io_LHEOutFile)! remove "</event>" from WriteOutEvent
-                      FirstEvent = .false.
-                  endif
-                  write(io_LHEOutFile,fmt="(A)") trim(EventInfoLine)
-              endif
-         enddo         
-
-         
-     enddo
-99   continue
-     call cpu_time(time_end)
-
-
-
-
-    write(io_stdout,*) ""
-    write(io_stdout,*) "Evaluation Counter: ",EvalCounter
-    write(io_stdout,*) "Acceptance Counter: ",AccepCounter
-    write(io_stdout,*) "Rejection  Counter: ",RejeCounter
-    write(io_stdout,*) " Alert  Counter: ",AlertCounter
-    if( dble(AlertCounter)/dble(AccepCounter) .gt. 1d0*percent ) then
-        write(io_stdout,*) "ALERT: The number of rejected events exceeds 1%."
-        write(io_stdout,*) "       Increase CSMAX in main.F90 or VegasNc1."
-    endif
-   write(io_stdout,*)  " event generation rate (events/sec)",dble(AccepCounter)/(time_end-time_start)
-
-    write(io_LogFile,*) ""
-    write(io_LogFile,*) "Evaluation Counter: ",EvalCounter
-    write(io_LogFile,*) "Acceptance Counter: ",AccepCounter
-    write(io_LogFile,*) "Rejection  Counter: ",RejeCounter
-    write(io_LogFile,*) " Alert  Counter: ",AlertCounter
-    if( dble(AlertCounter)/dble(AccepCounter) .gt. 1d0*percent ) then
-        write(io_LogFile,*) "ALERT: The number of rejected events exceeds 1%."
-        write(io_LogFile,*) "       Increase CSMAX in main.F90 or VegasNc1."
-    endif
-   write(io_LogFile,*)  " event generation rate (events/sec)",dble(AccepCounter)/(time_end-time_start)
-
-
-
-return
-END SUBROUTINE
+! 
+!  !       convert event lines into variables assuming that the Higgs resonance has ID 25
+!          nparton = 0
+!          do nline=1,EventNumPart
+!             read(EventLine(nline),fmt=InputFmt1) LHE_IDUP(nline),IntExt,LHE_MOTHUP(1,nline),LHE_MOTHUP(2,nline),LHE_ICOLUP(1,nline),LHE_ICOLUP(2,nline),MomExt(2,nline),MomExt(3,nline),MomExt(4,nline),MomExt(1,nline),Mass(nline)
+!             if( IntExt.ne.-1 .and. IntExt.ne.+1 ) cycle ! remove internal particles
+!             MomExt(1:4,nline) = MomExt(1:4,nline)*GeV!  convert to units of 100GeV
+!             Mass(nline) = Mass(nline)*GeV            !  convert to units of 100GeV
+!             if( abs(LHE_IDUP(nline)).eq.25 ) then!   select the Higgs (ID=25, h0)
+!                   MomHiggs(1:4) = MomExt(1:4,nline)
+!                   pH2sq = dsqrt(abs(MomHiggs(1:4).dot.MomHiggs(1:4)))
+! !             elseif( (abs(LHE_IDUP(nline)).eq.21) .or. (abs(LHE_IDUP(nline)).ge.1 .and. abs(LHE_IDUP(nline)).le.5) ) then!   select the gluons (ID=21) or quarks (ID=1,.,5)
+!             else
+!                   nparton = nparton + 1
+!                   MomParton(1:4,nparton) = MomExt(1:4,nline)
+!                   LHE_IDUP_Part(nparton) = LHE_IDUP(nline)
+!                   LHE_ICOLUP_Part(1:2,nparton) = LHE_ICOLUP(1:2,nline)
+!                   LHE_MOTHUP_Part(1:2,nparton) = LHE_MOTHUP(1:2,nline)
+! !              else
+! !                   call Error("Unknown particle in LHE input file",LHE_IDUP(nline))
+!             endif
+!          enddo
+! !        read optional pdf line
+!          read(16,fmt="(A160)",IOSTAT=stat,END=99) PDFLine(1:160)
+! !          if( .not. PDFLine(1:4).eq."#pdf") then
+!          if( .not. (PDFLine(1:4).eq."#pdf" .or. PDFLine(1:5).eq."#rwgt")) then         
+!              PDFLine(:)=""
+!              backspace(16)
+!          endif
+! 
+! 
+! ! !        reject event if M_Reso and pH2sq deviate by more than 20 GeV 
+! !          if( abs( M_Reso - pH2sq) .gt. 20d0*GeV ) then
+! !               write(io_stdout,"(2X,A,2F10.4)")  "WARNING: Higgs mass and momentum squared deviate by more than 20 GeV!",pH2sq*100d0,M_Reso*100d0
+! !               write(io_LogFile,"(2X,A,2F10.4)") "WARNING: Higgs mass and momentum squared deviate by more than 20 GeV!",pH2sq*100d0,M_Reso*100d0
+! !               cycle
+! !          endif
+! 
+!          EMcheck(1:4) = MomParton(1:4,1) + MomParton(1:4,2) - MomHiggs(1:4)
+!          do n=3,nparton
+!              EMcheck(1:4) = EMcheck(1:4) - MomParton(1:4,n)
+!          enddo
+!          if( any(abs(EMcheck(1:4)).gt.1d0*GeV) ) then
+!               print *, EMcheck(1:4)
+!               call Error("energy momentum violation while reading LHE production momenta.",nparton)
+!          endif
+! 
+! !         accept/reject sampling for H->VV decay contribution
+!           EHat = pH2sq
+!           do tries=1,5000000
+!               call random_number(yRnd)
+!               dum = EvalUnWeighted_withoutProduction(yRnd,.true.,Ehat,RES,AcceptedEvent,MY_IDUP(1:9),ICOLUP(1:2,1:9))
+!               if( Res.ne.0d0 ) exit
+!           enddo
+!           if( Res.ne.0d0 ) then ! decay event was accepted
+!              call boost(AcceptedEvent(1:4,1),MomHiggs(1:4),pH2sq)
+!              call boost(AcceptedEvent(1:4,2),MomHiggs(1:4),pH2sq)
+!              call boost(AcceptedEvent(1:4,3),MomHiggs(1:4),pH2sq)
+!              call boost(AcceptedEvent(1:4,4),MomHiggs(1:4),pH2sq)
+! 
+!              MY_IDUP(1) = convertLHEreverse(LHE_IDUP_Part(1))! overwrite inital ID with external ones
+!              MY_IDUP(2) = convertLHEreverse(LHE_IDUP_Part(2))
+!              ICOLUP(1:2,1:2) = LHE_ICOLUP_Part(1:2,1:2)!  overwrite inital colors with external ones
+!              do n=3,nparton
+!                 MY_IDUP(7+n)= convertLHEreverse(LHE_IDUP_Part(n))
+!                 ICOLUP(1:2,7+n) = LHE_ICOLUP_Part(1:2,n)!  overwrite final colors with external ones
+!              enddo
+!              call WriteOutEvent((/MomParton(1:4,1),MomParton(1:4,2),AcceptedEvent(1:4,1),AcceptedEvent(1:4,2),AcceptedEvent(1:4,3),AcceptedEvent(1:4,4)/), &
+!                                 MY_IDUP(1:7+nparton),ICOLUP(1:2,1:7+nparton),MomFSPartons=MomParton(1:4,3:nparton),EventInfoLine=EventInfoLine,PDFLine=PDFLine,MOTHUP_Parton=LHE_MOTHUP_Part)
+!              if( mod(AccepCounter,5000).eq.0 ) then
+!                   call cpu_time(time_int)
+!                   write(io_stdout,*)  NEvent," events accepted (",time_int-time_start, ") seconds"
+!                   write(io_LogFile,*) NEvent," events accepted (",time_int-time_start, ") seconds"
+!              endif
+!           else! decay event was not accepted after ncall evaluations, read next production event
+!              print *, "rejected event after ",tries-1," evaluations"
+!              AlertCounter = AlertCounter + 1 
+!           endif
+! 
+! !        skip event lines 
+! !          read(16,fmt="(A7)",IOSTAT=stat,END=99) FirstLines! skip <\event>
+! ! !          if( stat.lt.0 ) exit
+! !          read(16,fmt="(A30)",IOSTAT=stat,END=99) FirstLines!   skip <event> or </LesHouchesEvents>
+! !          if( FirstLines(1:30).eq."</LesHouchesEvents>" ) exit
+! !          if( NEvent.eq. VegasNc1 ) exit
+! 
+! 
+! !        read optional lines
+!          FirstEvent = .true.
+!          do while (.true.) 
+!               read(16,fmt="(A160)",IOSTAT=stat,END=99) EventInfoLine(1:160)
+!               if(EventInfoLine(1:30).eq."</LesHouchesEvents>") then
+!                   goto 99
+!               elseif( EventInfoLine(1:8).eq."<event>" ) then
+!                   exit
+!               else!if there are "#" comments
+!                   if( FirstEvent ) then 
+!                       backspace(io_LHEOutFile)! remove "</event>" from WriteOutEvent
+!                       FirstEvent = .false.
+!                   endif
+!                   write(io_LHEOutFile,fmt="(A)") trim(EventInfoLine)
+!               endif
+!          enddo         
+! 
+!          
+!      enddo
+! 99   continue
+!      call cpu_time(time_end)
+! 
+! 
+! 
+! 
+!     write(io_stdout,*) ""
+!     write(io_stdout,*) "Evaluation Counter: ",EvalCounter
+!     write(io_stdout,*) "Acceptance Counter: ",AccepCounter
+!     write(io_stdout,*) "Rejection  Counter: ",RejeCounter
+!     write(io_stdout,*) " Alert  Counter: ",AlertCounter
+!     if( dble(AlertCounter)/dble(AccepCounter) .gt. 1d0*percent ) then
+!         write(io_stdout,*) "ALERT: The number of rejected events exceeds 1%."
+!         write(io_stdout,*) "       Increase CSMAX in main.F90 or VegasNc1."
+!     endif
+!    write(io_stdout,*)  " event generation rate (events/sec)",dble(AccepCounter)/(time_end-time_start)
+! 
+!     write(io_LogFile,*) ""
+!     write(io_LogFile,*) "Evaluation Counter: ",EvalCounter
+!     write(io_LogFile,*) "Acceptance Counter: ",AccepCounter
+!     write(io_LogFile,*) "Rejection  Counter: ",RejeCounter
+!     write(io_LogFile,*) " Alert  Counter: ",AlertCounter
+!     if( dble(AlertCounter)/dble(AccepCounter) .gt. 1d0*percent ) then
+!         write(io_LogFile,*) "ALERT: The number of rejected events exceeds 1%."
+!         write(io_LogFile,*) "       Increase CSMAX in main.F90 or VegasNc1."
+!     endif
+!    write(io_LogFile,*)  " event generation rate (events/sec)",dble(AccepCounter)/(time_end-time_start)
+! 
+! 
+! 
+! return
+! END SUBROUTINE
 
 
 
@@ -1547,14 +1531,13 @@ character(len=*),parameter :: JHUGen_old_Fmt1 = "(I3,X,I2,X,I2,X,I2,X,I3,X,I3,X,
 character(len=*),parameter :: MadGra_Fmt0 = "(I2,A160)"
 character(len=*),parameter :: MadGra_Fmt1 = "(7X,I3,2X,I3,3X,I2,3X,I2,3X,I3,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1F3.0,X,1F3.0)"
 character(len=150) :: InputFmt0,InputFmt1
-logical :: FirstEvent,M_ResoSet
+logical :: FirstEvent,M_ResoSet,Ga_ResoSet
 integer :: nline,intDummy,Nevent
 integer :: LHE_IDUP(1:maxpart),LHE_ICOLUP(1:2,1:maxpart),LHE_MOTHUP(1:2,1:maxpart)
 integer :: EventNumPart
 character(len=160) :: FirstLines,EventInfoLine,OtherLines
 character(len=160) :: EventLine(1:maxpart)
-integer :: n,clock,i,stat,iHiggs
-integer, dimension(:), allocatable :: gfort_seed
+integer :: n,stat,iHiggs,VegasSeed
 integer,parameter :: InputLHEFormat = 1  !  1=POWHEG, 2=JHUGen (old format), 3=JHUGen (new format), 4=MadGraph
 
 
@@ -1579,17 +1562,21 @@ if( VegasNc0.eq.-1 ) VegasNc0 = VegasNc0_default
 if( VegasNc1.eq.-1 .and. VegasNc2.eq.-1 ) VegasNc1 = VegasNc1_default
 if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
 
-    call InitRandomSeed(VegasSeed)
-
 !    search for line with first event
      FirstEvent = .false.
      M_ResoSet=.false.
+     Ga_ResoSet=.false.
      do while ( .not.FirstEvent )
         read(16,fmt="(A160)",IOSTAT=stat,END=99) FirstLines
         if( FirstLines(1:5).eq."hmass" ) then 
-               read(FirstLines(6:13),fmt="(F7.0)") M_Reso
+               read(FirstLines(6:13),fmt="(F7.1)") M_Reso
                M_Reso = M_Reso*GeV!  convert to units of 100GeV
                M_ResoSet=.true.
+        endif
+        if( FirstLines(1:6).eq."hwidth" ) then 
+               read(FirstLines(7:17),fmt="(F9.3)") Ga_Reso
+               Ga_Reso = Ga_Reso*GeV!  convert to units of 100GeV
+               Ga_ResoSet=.true.
         endif
         if( FirstLines(1:7).eq."<event>" ) then 
                FirstEvent=.true.
@@ -1608,6 +1595,13 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
      else
         write(io_stdout,"(2X,A,1F7.2,A)") "A Higgs mass of ",M_Reso*100d0," GeV was determined from the LHE input file."
         write(io_LogFile,"(2X,A,1F7.2,A)") "A Higgs mass of ",M_Reso*100d0," GeV was determined from the LHE input file."
+     endif
+     if( .not. Ga_ResoSet ) then
+        write(io_stdout,"(2X,A,1F7.2)")  "ERROR: Higgs width could not be read from LHE input file. Assuming default value",Ga_Reso*100d0
+        write(io_LogFile,"(2X,A,1F7.2)") "ERROR: Higgs width could not be read from LHE input file. Assuming default value",Ga_Reso*100d0
+     else
+        write(io_stdout,"(2X,A,1F7.5,A)") "A Higgs width of ",Ga_Reso*100d0," GeV was determined from the LHE input file."
+        write(io_LogFile,"(2X,A,1F7.5,A)") "A Higgs width of ",Ga_Reso*100d0," GeV was determined from the LHE input file."
      endif
      write(io_stdout,"(A)") ""
      write(io_LogFile,"(A)") ""
@@ -1700,12 +1694,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
               tries = tries +1 
               read(16,fmt="(A160)",IOSTAT=stat,END=99) OtherLines(1:160)
               if(OtherLines(1:30).eq."</LesHouchesEvents>") then
-                  if( RequestNLeptons.gt.0 ) then
-                    write(io_LHEOutFile,"(A)") "<!-- Lepton filter information:"
-                    write(io_LHEOutFile,"(A,I8)") "     events processed:  ", NEvent
-                    write(io_LHEOutFile,"(A,I8)") "     events accepted:   ", AccepCounter
-                    write(io_LHEOutFile,"(A,1F6.2,A)") "     filter efficiency: ", dble(AccepCounter)/dble(NEvent)*100d0,"% -->"
-                  endif
+                  if( RequestNLeptons.gt.0 ) write(io_LHEOutFile,"(A,1F6.2,A)") "<!-- Lepton filter efficiency:",dble(AccepCounter)/dble(NEvent)*100d0," % -->"
                   goto 99
               elseif( OtherLines(1:8).eq."</event>" .and. Res.gt.0d0 ) then
                   write(io_LHEOutFile,"(A)") "</event>"
@@ -1790,8 +1779,8 @@ integer :: EventNumPart,nparton
 character(len=160) :: FirstLines
 character(len=120) :: EventInfoLine,PDFLine
 character(len=160) :: EventLine(1:maxpart+3)
-integer :: n,clock,i,stat,DecayParticles(1:2)
-integer, dimension(:), allocatable :: gfort_seed
+integer :: VegasSeed,i,stat,DecayParticles(1:2)
+integer, dimension(:), allocatable :: gen_seed
 integer,parameter :: InputLHEFormat = 1  !  1=POWHEG, 2=JHUGen (old format), 3=JHUGen (new format), 4=MadGraph
 
 
@@ -1815,9 +1804,6 @@ if( VegasIt1.eq.-1 ) VegasIt1 = VegasIt1_default
 if( VegasNc0.eq.-1 ) VegasNc0 = VegasNc0_default
 if( VegasNc1.eq.-1 .and. VegasNc2.eq.-1 ) VegasNc1 = VegasNc1_default
 if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
-
-
-    call InitRandomSeed(VegasSeed)
 
 
 !    search for line with first event
@@ -2571,7 +2557,7 @@ implicit none
 integer :: AllocStatus,NHisto
 
           it_sav = 1
-          NumHistograms = 2
+          NumHistograms = 3
           if( .not.allocated(Histo) ) then
                 allocate( Histo(1:NumHistograms), stat=AllocStatus  )
                 if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
@@ -2588,6 +2574,12 @@ integer :: AllocStatus,NHisto
           Histo(2)%BinSize= 10d0*GeV
           Histo(2)%LowVal = 0d0
           Histo(2)%SetScale= 1d0/GeV
+
+          Histo(3)%Info   = "D_0minus"
+          Histo(3)%NBins  = 50
+          Histo(3)%BinSize= 0.02
+          Histo(3)%LowVal = 0d0
+          Histo(3)%SetScale= 1d0
 
 
   do NHisto=1,NumHistograms
@@ -2788,6 +2780,9 @@ implicit none
         write(io_LHEOutFile ,'(A,A6,A)') 'Output from the JHUGenerator ',trim(JHUGen_Version),' described in arXiv:1001.3396 [hep-ph],arXiv:1208.4018 [hep-ph],arXiv:1309.4819 [hep-ph]'
 
         write(io_LHEOutFile ,'(A)') ''
+        write(io_LHEOutFile ,'(A,F5.1,A)') 'hmass   ',M_Reso*100d0,',     ! Higgs boson mass'
+        write(io_LHEOutFile ,'(A,F8.5,A)') 'hwidth ',Ga_Reso*100d0,',   ! Higgs boson width'
+        write(io_LHEOutFile ,'(A)') ''
 
         call WriteParameters(io_LHEOutFile)
 
@@ -2891,6 +2886,7 @@ character :: arg*(500)
     if( Process.eq.90 ) write(TheUnit,"(4X,A,F8.4,A,F6.4)") "Bottom quark mass=",m_top*100d0
     if( (ReadLHEFile) .and. (RequestNLeptons.gt.0) .and. (RequestOSSF) ) write(TheUnit,"(4X,A,I2,A)") "Lepton filter activated. Requesting ",RequestNLeptons," OSSF leptons."
     if( (ReadLHEFile) .and. (RequestNLeptons.gt.0) .and. .not. (RequestOSSF)) write(TheUnit,"(4X,A,I2,A)") "Lepton filter activated. Requesting ",RequestNLeptons," leptons."
+    write(TheUnit,"(4X,A,20I11)") "Random seeds: ",TheSeeds(1:TheSeeds(0))
 
     if( .not. (ReadLHEFile .or. ConvertLHEFile) ) then
         write(TheUnit,"(4X,A)") ""
@@ -3059,31 +3055,36 @@ END SUBROUTINE
 
 
 
-
-SUBROUTINE InitRandomSeed(TheSeed)
+! if seed_random=true:  "Seeds" returns the seeds chosen according to system clock
+! is seed_random=false: "Seeds" is used as input for initializing the random number generator
+SUBROUTINE InitRandomSeed(Seeds)
 use modParameters
+use modMisc
 implicit none
-integer, dimension(:), allocatable :: gfort_seed
-integer :: n,i,sclock
-real(8) :: TheSeed
+integer :: Seeds(0:20)
+integer, dimension(:), allocatable :: gen_seed
+integer :: n,i,sclock,SeedSize
+
 
     if (seed_random) then 
 #if compiler==1
         call random_seed()
 #elif compiler==2
         call random_seed(size=n)
-        allocate(gfort_seed(n))
+        allocate(gen_seed(n))
         call system_clock(count=sclock)
-        gfort_seed = sclock + 37 * (/ (i - 1, i = 1, n) /)
-        call random_seed(put = gfort_seed)
-        deallocate(gfort_seed)        
+        gen_seed = sclock + 37 * (/ (i - 1, i = 1, n) /)
+        call random_seed(put = gen_seed)
+        deallocate(gen_seed)
 #endif
-        call random_number(TheSeed)
-        TheSeed = - abs( TheSeed*10000d0 )
-    else
-        TheSeed = -19d0
+        call random_seed(size=SeedSize)
+        Seeds(0) = SeedSize
+        call random_seed(get=Seeds(1:SeedSize))
+    else        
+        call random_seed(size=n)
+        if( n.ne.Seeds(0) ) call Error("Number of input seeds does not match random_seed(size=n)",n)
+        call random_seed(put = Seeds(1:n))
     endif
-
 
 return
 END SUBROUTINE

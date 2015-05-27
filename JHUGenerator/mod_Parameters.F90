@@ -3,14 +3,13 @@ implicit none
 save
 ! 
 ! 
-character(len=6),parameter :: JHUGen_Version="v5.5.2"
+character(len=6),parameter :: JHUGen_Version="v5.5.4"
 ! 
 ! 
 integer, public :: Collider, PDFSet,PChannel,Process,DecayMode1,DecayMode2,TopDecays
 integer, public :: VegasIt1,VegasNc0,VegasNc1,VegasNc2
 real(8), public :: Collider_Energy
 integer, public :: VegasIt1_default,VegasNc0_default,VegasNc1_default,VegasNc2_default
-real(8), public :: VegasSeed
 integer, public :: NumHistograms,RequestNLeptons
 logical, public :: Unweighted,OffShellReson,OffShellV1,OffShellV2,ReadLHEFile,ConvertLHEFile
 logical, public :: ReadCSmax,GenerateEvents,RequestOSSF
@@ -38,6 +37,7 @@ real(8),public :: minCS=1d10,maxCS=0d0,avgCS=0d0
 
 
 logical, public, parameter :: seed_random = .true.
+integer, public :: TheSeeds(0:20) = (/12,1,2,3,4,5,6,7,8,9,10,11,12,0,0,0,0,0,0,0,0/)! only used if seed_random=.false., the first entry is the total number of seeds
 
 logical, public, parameter :: fix_channels_ratio = .false.
 
@@ -60,7 +60,7 @@ real(8), public, parameter :: Ga_Z    = 2.4952d0  *GeV      ! Z boson width(PDG-
 real(8), public, parameter :: M_W     = 80.399d0  *GeV      ! W boson mass (PDG-2011)
 real(8), public, parameter :: Ga_W    = 2.085d0   *GeV      ! W boson width(PDG-2011)
 real(8), public            :: M_Reso  = 125.6d0   *GeV      ! X resonance mass (spin 0, spin 1, spin 2)     (carefule: no longer a parameter, can be overwritten by command line argument)
-real(8), public, parameter :: Ga_Reso = 0.00415d0 *GeV      ! X resonance width
+real(8), public            :: Ga_Reso = 0.00415d0 *GeV      ! X resonance width
 real(8), public, parameter :: Lambda  = 1000d0    *GeV      ! Lambda coupling enters in two places
                                                             ! overal scale for x-section and in power suppressed
                                                             ! operators/formfactors (former r).
