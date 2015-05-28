@@ -644,7 +644,6 @@ END FUNCTION EvalUnWeighted_HJJ
 
 
 
-
 Function EvalWeighted_VHiggs(yRnd,VgsWgt)
  use ModKinematics
  use ModParameters
@@ -787,13 +786,25 @@ Function EvalWeighted_VHiggs(yRnd,VgsWgt)
     elseif(DecayMode1.eq.5)then
       id(3)=convertLHE(Wp_)
       id(4)=convertLHE(Wp_)
-      if(yRnd(5).lt.0.5d0)then
-      id(6)=convertLHE(Up_)
-      id(7)=convertLHE(Adn_)
-    else
-      id(6)=convertLHE(Chm_)
-      id(7)=convertLHE(AStr_)
-    endif
+      if(yRnd(5).lt.0.16666666666667d0)then
+        id(6)=convertLHE(Up_)
+        id(7)=convertLHE(Adn_)
+      elseif(yRnd(5).lt.0.33333333333333d0)then
+        id(6)=convertLHE(Chm_)
+        id(7)=convertLHE(AStr_)
+      elseif(yRnd(5).lt.0.5d0)then
+        id(6)=convertLHE(Up_)
+        id(7)=convertLHE(AStr_)
+      elseif(yRnd(5).lt.0.66666666666667d0)then
+        id(6)=convertLHE(Chm_)
+        id(7)=convertLHE(Adn_)
+      elseif(yRnd(5).lt.0.83333333333333d0)then
+        id(6)=convertLHE(Up_)
+        id(7)=convertLHE(Abot_)
+      else
+        id(6)=convertLHE(Chm_)
+        id(7)=convertLHE(Abot_)
+      endif
       helicity(6)=sign(1d0,-dble(id(6)))
       helicity(7)=-helicity(6)
 
@@ -1043,6 +1054,7 @@ elseif( IsAPhoton(DecayMode1) ) then
   print *, "invalid process"
   stop
 endif
+
 
 
    call Kinematics_VHiggs(MomExt,inv_mass,NBin,applyPSCut)
@@ -1306,13 +1318,25 @@ elseif (DecayMode1.eq.4) then
 elseif(DecayMode1.eq.5)then
   id(3)=convertLHE(Wp_)
   id(4)=convertLHE(Wp_)
-  if(yRnd(5).lt.0.5d0)then
-    id(6)=convertLHE(Up_)
-    id(7)=convertLHE(Adn_)
-  else
-    id(6)=convertLHE(Chm_)
-    id(7)=convertLHE(AStr_)
-  endif
+  if(yRnd(5).lt.0.16666666666667d0)then
+        id(6)=convertLHE(Up_)
+        id(7)=convertLHE(Adn_)
+      elseif(yRnd(5).lt.0.33333333333333d0)then
+        id(6)=convertLHE(Chm_)
+        id(7)=convertLHE(AStr_)
+      elseif(yRnd(5).lt.0.5d0)then
+        id(6)=convertLHE(Up_)
+        id(7)=convertLHE(AStr_)
+      elseif(yRnd(5).lt.0.66666666666667d0)then
+        id(6)=convertLHE(Chm_)
+        id(7)=convertLHE(Adn_)
+      elseif(yRnd(5).lt.0.83333333333333d0)then
+        id(6)=convertLHE(Up_)
+        id(7)=convertLHE(Abot_)
+      else
+        id(6)=convertLHE(Chm_)
+        id(7)=convertLHE(Abot_)
+      endif
   helicity(6)=sign(1d0,-dble(id(6)))
   helicity(7)=-helicity(6)
 
@@ -1405,21 +1429,33 @@ elseif(DecayMode1.eq.10)then
 elseif(DecayMode1.eq.11)then
   id(3)=convertLHE(Wp_)
   id(4)=convertLHE(Wp_)
-  if(yRnd(5).lt.1d0/9d0)then
+  if(yRnd(5).lt.1d0/21d0)then
     id(7)=convertLHE(ElP_)
     id(6)=convertLHE(NuE_)
-  elseif(yRnd(5).lt.(2d0/9d0))then
+  elseif(yRnd(5).lt.(2d0/21d0))then
     id(7)=convertLHE(MuP_)
     id(6)=convertLHE(NuM_)
-  elseif(yRnd(5).lt.(3d0/9d0))then
+  elseif(yRnd(5).lt.(3d0/21d0))then
     id(7)=convertLHE(TaP_)
     id(6)=convertLHE(NuT_)
-  elseif(yRnd(5).lt.(6d0/9d0))then
+  elseif(yRnd(5).lt.(6d0/21d0))then
     id(6)=convertLHE(Up_)
     id(7)=convertLHE(Adn_)
-  else
+  elseif(yRnd(5).lt.(9d0/21d0))then
     id(6)=convertLHE(Chm_)
     id(7)=convertLHE(AStr_)
+  elseif(yRnd(5).lt.(12d0/21d0))then
+    id(6)=convertLHE(Up_)
+    id(7)=convertLHE(AStr_)
+  elseif(yRnd(5).lt.(15d0/21d0))then
+    id(6)=convertLHE(Chm_)
+    id(7)=convertLHE(Adn_)
+  elseif(yRnd(5).lt.(18d0/21d0))then
+    id(6)=convertLHE(Up_)
+    id(7)=convertLHE(Abot_)
+  else
+    id(6)=convertLHE(Chm_)
+    id(7)=convertLHE(Abot_)
   endif
   helicity(6)=sign(1d0,-dble(id(6)))
   helicity(7)=-helicity(6)
@@ -1623,8 +1659,8 @@ endif
     do i=6,7
       inv_mass(i)=dsqrt(dabs(MomExt(1:4,i).dot.MomExt(1:4,i)))
     enddo
-
     call WriteOutEvent_VHiggs(id,helicity,MomExt,inv_mass,EventWeight=1d0)
+
   
   else
     RejeCounter = RejeCounter + 1
