@@ -1778,13 +1778,13 @@ END SUBROUTINE
 
 
 
-SUBROUTINE Kinematics_VHiggs(MomExt,inv_mass,NBin,applyPSCut)
+SUBROUTINE Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut)
 use ModMisc
 use ModParameters
 implicit none
 
 logical :: applyPSCut
-integer :: NumPart,NBin(:)
+integer :: NumPart,NBin(:),id(:)
 real(8) :: m_jj,y_j1,y_j2,dphi_jj, m_ll, pt_V, pt_H, m_Vstar, costheta1, costheta2, phistar1, phi
 double precision MomBoost(1:4), MomFerm(1:4), inv_mass(1:9), MomLeptX(1:4,1:4), ScatteringAxis(1:4), MomReso(1:4)
 double precision MomLeptPlane1(2:4), MomLeptPlane2(2:4), dummy(2:4), signPhi
@@ -1794,6 +1794,14 @@ double precision, intent(in) :: MomExt(1:4,1:9) !,beam_momentum(2,4),four_moment
      applyPSCut = .false.
      m_jj = inv_mass(5)
      m_ll = inv_mass(4)
+
+     if(inv_mass(4).le.getMass(convertLHEreverse(id(6)))+getMass(convertLHEreverse(id(7))))then
+      applyPSCut=.true.
+     endif
+     if(inv_mass(5).le.getMass(convertLHEreverse(id(8)))+getMass(convertLHEreverse(id(9))))then
+      applyPSCut=.true.
+     endif
+
      pt_V = get_PT(MomExt(1:4,6)+MomExt(1:4,7))
      pt_H = get_PT(MomExt(1:4,8)+MomExt(1:4,9))
      !inv_mass(4,5,6,7)

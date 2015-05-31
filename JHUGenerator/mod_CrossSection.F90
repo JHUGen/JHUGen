@@ -943,6 +943,9 @@ if( IsAZDecay(DecayMode1) ) then
       MomExt(4,2)=-MomExt(1,2)
 
       call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt)
+      call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut)
+      if( applyPSCut .or. PSWgt.eq.zero ) return
+
       call setPDFs(eta1,eta2,Mu_Fact,pdf)
       FluxFac = 1d0/(2d0*EHat**2)
       PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt *6d0 !2 for e and mu, 3 for colors of b
@@ -978,6 +981,8 @@ if( IsAZDecay(DecayMode1) ) then
       MomExt(4,2)=-MomExt(1,2)
 
       call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt)
+      call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut)
+      if( applyPSCut .or. PSWgt.eq.zero ) return
 
       FluxFac = 1d0/(2d0*ILC_Energy**2)
       PreFac = fbGeV2 * FluxFac * PSWgt *6d0 !2 for e and mu, 3 for colors of b
@@ -1015,6 +1020,9 @@ elseif( IsAWDecay(DecayMode1) ) then
       MomExt(4,2)=-MomExt(1,2)
 
       call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt)
+      call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut)
+      if( applyPSCut .or. PSWgt.eq.zero ) return
+
       call setPDFs(eta1,eta2,Mu_Fact,pdf)
       FluxFac = 1d0/(2d0*EHat**2)
       PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt *6d0 !2 for e and mu, 3 for colors of b
@@ -1055,9 +1063,6 @@ elseif( IsAPhoton(DecayMode1) ) then
   stop
 endif
 
-
-
-   call Kinematics_VHiggs(MomExt,inv_mass,NBin,applyPSCut)
 ! boost to the lab frame before writing .lhe
    
 !   do i=1,4
@@ -1077,12 +1082,6 @@ endif
    cyRnd(2)=yRnd(8)
 !   cyRnd(3)=yRnd(11)
 !   cyRnd(4)=yRnd(10)
-   if(inv_mass(4).le.getMass(convertLHEreverse(id(6)))+getMass(convertLHEreverse(id(7))))then
-     print *, "Warning, invalid kinematics, event rejected!"
-     EvalWeighted_VHiggs=0d0
-     LO_Res_Unpol=0d0
-     return
-   endif
    call EvalPhasespace_VDecay(MomExt(1:4,4),inv_mass(4),getMass(convertLHEreverse(id(6))),getMass(convertLHEreverse(id(7))),cyRnd(1:2),MomExt(1:4,6:7),PSWgt2)
 !   call EvalPhasespace_VDecay(MomExt(1:4,3),inv_mass(3),getMass(convertLHEreverse(id(6)))*1d2,getMass(convertLHEreverse(id(7)))*1d2,cyRnd(3:4),MomExt(1:4,6:7),PSWgt2)
 
@@ -1487,6 +1486,9 @@ if( IsAZDecay(DecayMode1) ) then
       MomExt(4,2)=-MomExt(1,2)
 
       call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt)
+      call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut)
+      if( applyPSCut .or. PSWgt.eq.zero ) return
+
       call setPDFs(eta1,eta2,Mu_Fact,pdf)
       FluxFac = 1d0/(2d0*EHat**2)
       PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt/3d0! *6d0 !2 for e and mu, 3 for colors of b
@@ -1508,6 +1510,9 @@ if( IsAZDecay(DecayMode1) ) then
       MomExt(4,2)=-MomExt(1,2)
 
       call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt)
+      call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut)
+      if( applyPSCut .or. PSWgt.eq.zero ) return
+
       FluxFac = 1d0/(2d0*ILC_Energy**2)
       PreFac = fbGeV2 * FluxFac * PSWgt
     endif
@@ -1530,6 +1535,9 @@ elseif( IsAWDecay(DecayMode1) ) then
       MomExt(4,2)=-MomExt(1,2)
 
       call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt)
+      call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut)
+      if( applyPSCut .or. PSWgt.eq.zero ) return
+
       call setPDFs(eta1,eta2,Mu_Fact,pdf)
       FluxFac = 1d0/(2d0*EHat**2)
       PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt/3d0! *6d0 !2 for e and mu, 3 for colors of qqb
@@ -1619,7 +1627,7 @@ endif
     Res = 0d0
   elseif( EvalUnWeighted_VHiggs .gt. yRnd(17)*CS_max ) then
 
-    call Kinematics_VHiggs(MomExt,inv_mass,NBin,applyPSCut)
+    call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut)
 
     do NHisto=1,NumHistograms
       call intoHisto(NHisto,NBin(NHisto),1d0)  ! CS_Max is the integration volume
@@ -1636,11 +1644,11 @@ endif
 !    enddo
     cyRnd(1)=yRnd(9)
     cyRnd(2)=yRnd(8)
-    if(inv_mass(4).le.getMass(convertLHEreverse(id(6)))+getMass(convertLHEreverse(id(7))))then
-      print *, "Warning, invalid kinematics, event rejected!"
-      RejeCounter = RejeCounter + 1
-      return
-    endif
+    !if(inv_mass(4).le.getMass(convertLHEreverse(id(6)))+getMass(convertLHEreverse(id(7))))then
+    !  print *, "Warning, invalid kinematics, event rejected!"
+    !  RejeCounter = RejeCounter + 1
+    !  return
+    !endif
     call EvalPhasespace_VDecay(MomExt(1:4,4),inv_mass(4),getMass(convertLHEreverse(id(6))),getMass(convertLHEreverse(id(7))),cyRnd(1:2),MomExt(1:4,6:7),PSWgt2)
     if(Collider.eq.1)then
       call boost2Lab(eta1,eta2,9,MomExt(1:4,1:9))
@@ -1659,6 +1667,7 @@ endif
     do i=6,7
       inv_mass(i)=dsqrt(dabs(MomExt(1:4,i).dot.MomExt(1:4,i)))
     enddo
+
     call WriteOutEvent_VHiggs(id,helicity,MomExt,inv_mass,EventWeight=1d0)
 
   
