@@ -2780,8 +2780,8 @@ implicit none
         write(io_LHEOutFile ,'(A,A6,A)') 'Output from the JHUGenerator ',trim(JHUGen_Version),' described in arXiv:1001.3396 [hep-ph],arXiv:1208.4018 [hep-ph],arXiv:1309.4819 [hep-ph]'
 
         write(io_LHEOutFile ,'(A)') ''
-        write(io_LHEOutFile ,'(A,F5.1,A)') 'hmass   ',M_Reso*100d0,',     ! Higgs boson mass'
-        write(io_LHEOutFile ,'(A,F8.5,A)') 'hwidth ',Ga_Reso*100d0,',   ! Higgs boson width'
+        write(io_LHEOutFile ,'(A,F5.1,A)') 'hmass   ',M_Reso*100d0,'     ! Higgs boson mass'
+        write(io_LHEOutFile ,'(A,F8.5,A)') 'hwidth ',Ga_Reso*100d0,'   ! Higgs boson width'
         write(io_LHEOutFile ,'(A)') ''
 
         call WriteParameters(io_LHEOutFile)
