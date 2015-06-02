@@ -1,7 +1,9 @@
-      subroutine qq_ZZqq(p,msq)
+      subroutine qq_ZZqq(p,msq,zzcoupl,wwcoupl,lambda_bsm,lambdaq,
+     . lambda)
       implicit none
 c--- Author: R.K. Ellis, October 2014
 c--- q(-p1)+q(-p2)->Z(p3,p4)+Z(p5,p6)+q(p7)+q(p8);
+      include 'spinzerohiggs_anomcoupl.f' !--F
       include 'constants.f'
       include 'cmplxmass.f'
       include 'ewcouple.f'
@@ -13,6 +15,8 @@ c--- q(-p1)+q(-p2)->Z(p3,p4)+Z(p5,p6)+q(p7)+q(p8);
       include 'anom_higgs.f'
       include 'first.f'
       include 'WWbits.f'
+      double complex zzcoupl(32),wwcoupl(32) !--F
+      double precision lambdaq,lambda_bsm,lambda(4)!--F
       integer nmax,jmax
       parameter(jmax=12,nmax=10)
       integer j,k,ll,
@@ -87,9 +91,172 @@ c     ,j3_4(4,2),j5_6(4,2),
       data zmass,zwidth/91.19d0,2.4952d0/
       data Gf,vevsq/1.16639d-5,246d0/
       data gw,xw,gwsq,esq/0.42464d0,0.23119d0,0.1d0,0.3133285d0/
-  
- 
 
+      lambdaBSM = lambda_BSM
+      lambda_Q = lambdaQ
+
+      lambda_z1 = lambda(1)
+      lambda_z2 = lambda(2)
+      lambda_z3 = lambda(3)
+      lambda_z4 = lambda(4)
+
+      !-- coupling 1-4 and lambdas are missing
+      ghz1 = zzcoupl(1) !-- check that these are correct according to Markus' definition
+      ghz2 = zzcoupl(2)
+      ghz3 = zzcoupl(3)
+      ghz4 = zzcoupl(4)
+
+      ghz1_prime = zzcoupl(5) !-- from here on taken from Markus
+      ghz1_prime2= zzcoupl(6) 
+      ghz1_prime3= zzcoupl(7) 
+      ghz1_prime4= zzcoupl(8)
+      ghz1_prime5= zzcoupl(9)
+      
+      ghz2_prime = zzcoupl(10) 
+      ghz2_prime2= zzcoupl(11)
+      ghz2_prime3= zzcoupl(12)
+      ghz2_prime4= zzcoupl(13)
+      ghz2_prime5= zzcoupl(14)
+      
+      ghz3_prime = zzcoupl(15)
+      ghz3_prime2= zzcoupl(16)
+      ghz3_prime3= zzcoupl(17)
+      ghz3_prime4= zzcoupl(18)
+      ghz3_prime5= zzcoupl(19)
+      
+      ghz4_prime = zzcoupl(20)
+      ghz4_prime2= zzcoupl(21)
+      ghz4_prime3= zzcoupl(22)
+      ghz4_prime4= zzcoupl(23)
+      ghz4_prime5= zzcoupl(24)
+      
+      ghz1_prime6= zzcoupl(25)
+      ghz1_prime7= zzcoupl(26)
+      
+      ghz2_prime6= zzcoupl(27)
+      ghz2_prime7= zzcoupl(28)
+      
+      ghz3_prime6= zzcoupl(29)
+      ghz3_prime7= zzcoupl(30)
+      
+      ghz4_prime6= zzcoupl(31)
+      ghz4_prime7= zzcoupl(32)
+      
+      ghz1_prime = zzcoupl(5) 
+      ghz1_prime2= zzcoupl(6) 
+      ghz1_prime3= zzcoupl(7) 
+      ghz1_prime4= zzcoupl(8)
+      ghz1_prime5= zzcoupl(9)
+      
+      ghz2_prime = zzcoupl(10) 
+      ghz2_prime2= zzcoupl(11)
+      ghz2_prime3= zzcoupl(12)
+      ghz2_prime4= zzcoupl(13)
+      ghz2_prime5= zzcoupl(14)
+      
+      ghz3_prime = zzcoupl(15)
+      ghz3_prime2= zzcoupl(16)
+      ghz3_prime3= zzcoupl(17)
+      ghz3_prime4= zzcoupl(18)
+      ghz3_prime5= zzcoupl(19)
+      
+      ghz4_prime = zzcoupl(20)
+      ghz4_prime2= zzcoupl(21)
+      ghz4_prime3= zzcoupl(22)
+      ghz4_prime4= zzcoupl(23)
+      ghz4_prime5= zzcoupl(24)
+      
+      ghz1_prime6= zzcoupl(25)
+      ghz1_prime7= zzcoupl(26)
+      
+      ghz2_prime6= zzcoupl(27)
+      ghz2_prime7= zzcoupl(28)
+      
+      ghz3_prime6= zzcoupl(29)
+      ghz3_prime7= zzcoupl(30)
+      
+      ghz4_prime6= zzcoupl(31)
+      ghz4_prime7= zzcoupl(32)
+
+
+      ghw1 = wwcoupl(1) !-- check that these are correct according to Markus' definition
+      ghw2 = wwcoupl(2)
+      ghw3 = wwcoupl(3)
+      ghw4 = wwcoupl(4)
+
+      ghw1_prime = wwcoupl(5) 
+      ghw1_prime2= wwcoupl(6) 
+      ghw1_prime3= wwcoupl(7) 
+      ghw1_prime4= wwcoupl(8)
+      ghw1_prime5= wwcoupl(9)
+      
+      ghw2_prime = wwcoupl(10) 
+      ghw2_prime2= wwcoupl(11)
+      ghw2_prime3= wwcoupl(12)
+      ghw2_prime4= wwcoupl(13)
+      ghw2_prime5= wwcoupl(14)
+      
+      ghw3_prime = wwcoupl(15)
+      ghw3_prime2= wwcoupl(16)
+      ghw3_prime3= wwcoupl(17)
+      ghw3_prime4= wwcoupl(18)
+      ghw3_prime5= wwcoupl(19)
+      
+      ghw4_prime = wwcoupl(20)
+      ghw4_prime2= wwcoupl(21)
+      ghw4_prime3= wwcoupl(22)
+      ghw4_prime4= wwcoupl(23)
+      ghw4_prime5= wwcoupl(24)
+      
+      ghw1_prime6= wwcoupl(25)
+      ghw1_prime7= wwcoupl(26)
+      
+      ghw2_prime6= wwcoupl(27)
+      ghw2_prime7= wwcoupl(28)
+      
+      ghw3_prime6= wwcoupl(29)
+      ghw3_prime7= wwcoupl(30)
+      
+      ghw4_prime6= wwcoupl(31)
+      ghw4_prime7= wwcoupl(32)
+      
+      ghw1_prime = wwcoupl(5) 
+      ghw1_prime2= wwcoupl(6) 
+      ghw1_prime3= wwcoupl(7) 
+      ghw1_prime4= wwcoupl(8)
+      ghw1_prime5= wwcoupl(9)
+      
+      ghw2_prime = wwcoupl(10) 
+      ghw2_prime2= wwcoupl(11)
+      ghw2_prime3= wwcoupl(12)
+      ghw2_prime4= wwcoupl(13)
+      ghw2_prime5= wwcoupl(14)
+      
+      ghw3_prime = wwcoupl(15)
+      ghw3_prime2= wwcoupl(16)
+      ghw3_prime3= wwcoupl(17)
+      ghw3_prime4= wwcoupl(18)
+      ghw3_prime5= wwcoupl(19)
+      
+      ghw4_prime = wwcoupl(20)
+      ghw4_prime2= wwcoupl(21)
+      ghw4_prime3= wwcoupl(22)
+      ghw4_prime4= wwcoupl(23)
+      ghw4_prime5= wwcoupl(24)
+      
+      ghw1_prime6= wwcoupl(25)
+      ghw1_prime7= wwcoupl(26)
+      
+      ghw2_prime6= wwcoupl(27)
+      ghw2_prime7= wwcoupl(28)
+      
+      ghw3_prime6= wwcoupl(29)
+      ghw3_prime7= wwcoupl(30)
+      
+      ghw4_prime6= wwcoupl(31)
+      ghw4_prime7= wwcoupl(32)
+      
+      
 !$omp threadprivate(doHO,doBO,mult)      
       msq(:,:)=0d0
 
