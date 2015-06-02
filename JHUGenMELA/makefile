@@ -11,7 +11,8 @@ endif
 ccomp = gcc
 
 
-MCFM_Dep = WBFZZ_MCFM/src/WBFZZ/qq_ZZqq.f \
+MCFM_Dep = WBFZZ_MCFM/src/WBFZZ/anomamp.f \
+	WBFZZ_MCFM/src/WBFZZ/qq_ZZqq.f \
            WBFZZ_MCFM/src/WBFZZ/setupzprops.f \
            WBFZZ_MCFM/src/WBFZZ/spinorcurr.f \
            WBFZZ_MCFM/src/WBFZZ/jzero.f \
@@ -25,7 +26,7 @@ MCFM_Dep = WBFZZ_MCFM/src/WBFZZ/qq_ZZqq.f \
 
 # MCFM_Obj = WBFZZ_MCFM/src/WBFZZ/*.o \
 #            WBFZZ_MCFM/src/Need/cdotpr.o
-MCFM_Obj = cdotpr.o jtwo3456.o jtwo.o jzero.o qq_ZZqq.o setupzprops.o spinorcurr.o WWZZ.o ZZHZZamp.o ZZSingleres.o jone.o
+MCFM_Obj = anomamp.o cdotpr.o jtwo3456.o jtwo.o jzero.o qq_ZZqq.o setupzprops.o spinorcurr.o WWZZ.o ZZHZZamp.o ZZSingleres.o jone.o
 
 
 

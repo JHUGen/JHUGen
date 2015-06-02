@@ -18,6 +18,7 @@
       integer h34,h56,i1,i2,i3,i4,i5,i6,i7,i8,
      & n1,n2,n3,n4,n5,n6,n7,n8
       double complex, save:: ZZ3456(2,2)
+      double complex anomzzamp,anomwwamp
 !$omp threadprivate(ZZ3456)
       t4(i1,i2,i3,i4)=     
      & +s(i1,i2)+s(i1,i3)+s(i1,i4)
@@ -169,7 +170,9 @@ c--- Make sure WWZA vertices included
 C----Higgs contribution
          WWZZamp(h34,h56)=WWZZamp(h34,h56)
      &    -2d0*sqzmass/cxw**2*ZZ3456(h34,h56)
-     &    *za(i7,i8)*zb(i2,i1)*za(i3,i5)*zb(i6,i4)
+!     &    *za(i7,i8)*zb(i2,i1)*za(i3,i5)*zb(i6,i4) !--F
+     &     *anomzzamp(i3,i4,i5,i6,s3456,s(i3,i4),s(i5,i6),za,zb) !--F
+     &     *anomwwamp(i7,i1,i8,i2,s3456,s(i7,i1),s(i8,i2),za,zb) !--F
      &    /(propWBF*prop3456)*Hbit
         enddo
       enddo

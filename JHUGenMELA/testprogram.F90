@@ -22,7 +22,7 @@ complex(8) :: Zqqcoupl(1:2),Zzzcoupl(1:2)
 complex(8) :: Gggcoupl(1:5),Gqqcoupl(1:2),Gzzcoupl(1:10)
 complex(8) :: TTBHcoupl(1:2)
 integer :: i, j
-
+real(8) :: lambdaBSM,lambda_z(4),lambda_w(4)
 
 
 ! input unit = GeV/100 such that 125GeV is 1.25 in the code
@@ -323,8 +323,17 @@ integer :: i, j
     p_MCFM(1:8,2)=p8(3,1:8) *100d0  ! y
     p_MCFM(1:8,3)=p8(4,1:8) *100d0  ! z
     
+
+    lambdaBSM = 100d0
+    Lambda_z(1) = 100d0
+    Lambda_z(2) = 100d0
+    Lambda_z(3) = 100d0
+    Lambda_z(4) = 100d0
+    HWWcoupl(:) = 0d0
+    HWWcoupl(1) = 1d0
+    HZZcoupl(1:32) = HWWcoupl(:)
     
-    call qq_ZZqq(p_MCFM,msq_MCFM)
+    call qq_ZZqq(p_MCFM,msq_MCFM,HZZcoupl(1:32),HWWcoupl,LambdaBSM,Lambda_Q,Lambda_z)
     
     print *, "MCFM:"
     print *, msq_MCFM(1,-1)
