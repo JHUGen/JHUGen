@@ -2496,7 +2496,6 @@ END FUNCTION
 
 
 
-
 SUBROUTINE VVBranchings(MY_IDUP,ICOLUP)
 use ModParameters
 implicit none
@@ -2541,13 +2540,15 @@ real(8) :: DKRnd
         MY_IDUP(4) = Wp_
         DKFlavor = WLepBranching( DKRnd )!= ElM or MuM
         MY_IDUP(6) = +abs(DKFlavor)     ! lepton(+)
-        MY_IDUP(7) = +abs(DKFlavor)+7   ! neutrino
+        MY_IDUP(7) = +abs(DKFlavor)+7   ! neutrino        
    elseif( DecayMode1.eq.5 ) then! W1(+)->2q
         call random_number(DKRnd)
         MY_IDUP(4) = Wp_
         DKFlavor = WQuaUpBranching( DKRnd )!= Up,Chm
-        MY_IDUP(6) = -abs(DKFlavor)-1  ! anti-dn flavor
-        MY_IDUP(7) = +abs(DKFlavor)    ! up flavor
+!         MY_IDUP(6) = -abs(DKFlavor)-1  ! anti-dn flavor
+!         MY_IDUP(7) = +abs(DKFlavor)    ! up flavor
+        MY_IDUP(7) = +abs(DKFlavor)           ! up flavor
+        MY_IDUP(6) = GetCKMPartner(MY_IDUP(7))! anti-dn flavor         
         ICOLUP(1:2,6) = (/0,803/)
         ICOLUP(1:2,7) = (/803,0/)
    elseif( DecayMode1.eq.6 ) then! W1(+)->taunu
@@ -2585,8 +2586,10 @@ real(8) :: DKRnd
         MY_IDUP(4) = Wp_
         DKFlavor = WAnyBranching_flat( DKRnd )
         if(IsAQuark(DKFlavor)) then
-           MY_IDUP(6) = -abs(DKFlavor)-1  ! anti-dn flavor  
-           MY_IDUP(7) = +abs(DKFlavor)    ! up flavor
+!            MY_IDUP(6) = -abs(DKFlavor)-1  ! anti-dn flavor  
+!            MY_IDUP(7) = +abs(DKFlavor)    ! up flavor
+           MY_IDUP(7) = +abs(DKFlavor)           ! up flavor
+           MY_IDUP(6) = GetCKMPartner(MY_IDUP(7))! anti-dn flavor  
            ICOLUP(1:2,6) = (/0,803/)
            ICOLUP(1:2,7) = (/803,0/)
         else
@@ -2630,8 +2633,10 @@ real(8) :: DKRnd
         call random_number(DKRnd)
         MY_IDUP(5) = Wm_
         DKFlavor = WQuaUpBranching( DKRnd )!= Up,Chm
-        MY_IDUP(8) = -abs(DKFlavor)    ! anti-up flavor
-        MY_IDUP(9) = +abs(DKFlavor)+1  ! dn flavor
+!         MY_IDUP(8) = -abs(DKFlavor)    ! anti-up flavor
+!         MY_IDUP(9) = +abs(DKFlavor)+1  ! dn flavor
+        MY_IDUP(8) = -abs(DKFlavor)           ! up flavor
+        MY_IDUP(9) = GetCKMPartner(MY_IDUP(8))! dn flavor
         ICOLUP(1:2,8) = (/0,804/)
         ICOLUP(1:2,9) = (/804,0/)
    elseif( DecayMode2.eq.6 ) then! W2(-)->taunu
@@ -2669,8 +2674,10 @@ real(8) :: DKRnd
         MY_IDUP(5) = Wm_
         DKFlavor = WAnyBranching_flat( DKRnd )
         if(IsAQuark(DKFlavor)) then
-           MY_IDUP(8) = -abs(DKFlavor)    ! anti-up flavor
-           MY_IDUP(9) = +abs(DKFlavor)+1  ! dn flavor
+!            MY_IDUP(8) = -abs(DKFlavor)    ! anti-up flavor
+!            MY_IDUP(9) = +abs(DKFlavor)+1  ! dn flavor
+           MY_IDUP(8) = -abs(DKFlavor)           ! up flavor
+           MY_IDUP(9) = GetCKMPartner(MY_IDUP(8))! dn flavor
            ICOLUP(1:2,8) = (/0,804/)
            ICOLUP(1:2,9) = (/804,0/)
         else
@@ -2682,6 +2689,66 @@ real(8) :: DKRnd
 
 RETURN
 END SUBROUTINE
+
+
+
+
+
+FUNCTION GetCKMPartner( Flavor )
+use modMisc
+use modParameters
+implicit none
+integer :: Flavor,GetCKMPartner
+real(8) :: FlavorRnd
+
+    call random_number(FlavorRnd)
+
+    
+    if( abs(Flavor).eq.abs(Up_) ) then
+        if( FlavorRnd.le.Vsq_ud ) then!  u-->d
+           GetCKMPartner = -sign(1,Flavor) * abs(Dn_)
+        elseif( FlavorRnd.gt.Vsq_ud .and. FlavorRnd.le.Vsq_ud+Vsq_us ) then!  u-->s
+           GetCKMPartner = -sign(1,Flavor) * abs(Str_)
+        else!  u-->b
+           GetCKMPartner = -sign(1,Flavor) * abs(Bot_)
+        endif
+                
+    elseif( abs(Flavor).eq.abs(Chm_) ) then
+        if( FlavorRnd.le.Vsq_cs ) then!  c-->s
+           GetCKMPartner = -sign(1,Flavor) * abs(Str_)
+        elseif( FlavorRnd.gt.Vsq_cs .and. FlavorRnd.le.Vsq_cs+Vsq_cd ) then!  c-->d
+           GetCKMPartner = -sign(1,Flavor) * abs(Dn_)
+        else!  c-->b
+           GetCKMPartner = -sign(1,Flavor) * abs(Bot_)
+        endif
+
+    elseif( abs(Flavor).eq.abs(Top_) ) then
+        if( FlavorRnd.le.Vsq_tb ) then!  t-->b
+           GetCKMPartner = -sign(1,Flavor) * abs(Bot_)
+        elseif( FlavorRnd.gt.Vsq_tb .and. FlavorRnd.le.Vsq_tb+Vsq_ts ) then!  t-->s
+           GetCKMPartner = -sign(1,Flavor) * abs(Str_)
+        else!  t-->u
+           GetCKMPartner = -sign(1,Flavor) * abs(Up_)
+        endif
+    
+    else
+    
+        call Error("Dn flavor conversion not yet implemented")
+!     elseif( abs(Flavor).eq.abs(Dn_) ) then
+!     elseif( abs(Flavor).eq.abs(Str_) ) then
+!     elseif( abs(Flavor).eq.abs(Bot_) ) then
+    
+    endif
+    
+    
+
+
+
+RETURN
+END FUNCTION
+
+
+
 
 
 

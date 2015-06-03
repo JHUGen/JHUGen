@@ -11,12 +11,30 @@ endif
 ccomp = gcc
 
 
+MCFM_Dep = WBFZZ_MCFM/src/WBFZZ/anomamp.f \
+	WBFZZ_MCFM/src/WBFZZ/qq_ZZqq.f \
+           WBFZZ_MCFM/src/WBFZZ/setupzprops.f \
+           WBFZZ_MCFM/src/WBFZZ/spinorcurr.f \
+           WBFZZ_MCFM/src/WBFZZ/jzero.f \
+           WBFZZ_MCFM/src/WBFZZ/jone.f \
+           WBFZZ_MCFM/src/WBFZZ/jtwo.f \
+           WBFZZ_MCFM/src/WBFZZ/jtwo3456.f \
+           WBFZZ_MCFM/src/WBFZZ/ZZSingleres.f \
+           WBFZZ_MCFM/src/WBFZZ/ZZHZZamp.f \
+           WBFZZ_MCFM/src/WBFZZ/WWZZ.f \
+           WBFZZ_MCFM/src/Need/cdotpr.f
+
+# MCFM_Obj = WBFZZ_MCFM/src/WBFZZ/*.o \
+#            WBFZZ_MCFM/src/Need/cdotpr.o
+MCFM_Obj = anomamp.o cdotpr.o jtwo3456.o jtwo.o jzero.o qq_ZZqq.o setupzprops.o spinorcurr.o WWZZ.o ZZHZZamp.o ZZSingleres.o jone.o
+
+
 
 Testprogram: mod_Higgs_MatEl.o mod_Zprime_MatEl.o mod_Graviton_MatEl.o mod_HiggsJ_MatEl.o mod_HiggsJJ_MatEl.o mod_VHiggs_MatEl.o mod_TTBH_MatEl.o NNPDFDriver.o testprogram.F90 \
-	checkWBF_SM.dat checkWBF_1-8.dat checkSBF_SM.dat checkSBF_1-4.dat checkHJ_SM.dat checkZH_SM.dat
+	checkWBF_SM.dat checkWBF_1-8.dat checkSBF_SM.dat checkSBF_1-4.dat checkHJ_SM.dat checkZH_SM.dat MCFMforVBF
 	@echo " "
 	@echo " compiling and linking testprogram.F90 with "$(Comp)
-	$(fcomp) -o testF testprogram.F90 -lm NNPDFDriver.o mod_Higgs_MatEl.o mod_Zprime_MatEl.o mod_Graviton_MatEl.o mod_HiggsJ_MatEl.o mod_HiggsJJ_MatEl.o mod_VHiggs_MatEl.o mod_TTBH_MatEl.o
+	$(fcomp) -o testF testprogram.F90 -lm NNPDFDriver.o mod_Higgs_MatEl.o mod_Zprime_MatEl.o mod_Graviton_MatEl.o mod_HiggsJ_MatEl.o mod_HiggsJJ_MatEl.o mod_VHiggs_MatEl.o mod_TTBH_MatEl.o $(MCFM_Obj)
 	@echo " "
 	@echo " compiling and linking testprogram.c with gcc"
 	$(ccomp) -o testC testprogram.c NNPDFDriver.o mod_Higgs_MatEl.o mod_Zprime_MatEl.o mod_Graviton_MatEl.o mod_TTBH_MatEl.o  -lm -lgfortran
@@ -66,7 +84,12 @@ mod_TTBH_MatEl.o: mod_TTBH_MatEl.F90 variables.F90
 	@echo " "
 	@echo " compiling mod_TTBH_MatEl.F90 with "$(Comp)
 	$(fcomp) -c mod_TTBH_MatEl.F90  
-		
+
+MCFMforVBF: $(MCFM_Dep)
+	@echo " "
+	@echo " compiling MCFM WBF files with "$(Comp)
+	$(fcomp) -c -I./WBFZZ_MCFM/src/Inc/ $(MCFM_Dep)
+
 clean:
 	@echo " deleting object files"
 	rm -f *.o *.mod
