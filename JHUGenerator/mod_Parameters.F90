@@ -91,15 +91,15 @@ real(8), public, parameter :: Rjet = 0.5d0                  ! jet deltaR, antikt
 !----------------------------------------------------------------------------------------------------
 
 ! CKM squared matrix entries 
-real(8), public, parameter :: Vsq_ud = 0.97425d0**2
-real(8), public, parameter :: Vsq_us = 0.2253d0**2
-real(8), public, parameter :: Vsq_cs = 0.9860d0**2
-real(8), public, parameter :: Vsq_cd = 0.2250d0**2
-real(8), public, parameter :: Vsq_tb = 0.999d0
-real(8), public, parameter :: Vsq_ts = 0.0001d0
-real(8), public, parameter :: Vsq_cb = 1d0 - Vsq_cs - Vsq_cd
-real(8), public, parameter :: Vsq_ub = 1d0 - Vsq_ud - Vsq_us
-real(8), public, parameter :: Vsq_tu = 1d0 - Vsq_tb - Vsq_ts
+real(8), public, parameter :: VCKM_ud = 0.97425d0
+real(8), public, parameter :: VCKM_us = 0.2253d0
+real(8), public, parameter :: VCKM_cs = 0.986d0
+real(8), public, parameter :: VCKM_cd = 0.225d0
+real(8), public, parameter :: VCKM_tb = 1.021d0
+real(8), public, parameter :: VCKM_ts = 0.0400d0
+real(8), public, parameter :: VCKM_cb = 0.0411d0
+real(8), public, parameter :: VCKM_ub = 0.00413d0
+real(8), public, parameter :: VCKM_td = 0.0084d0
 
 
 ! absolute branching fraction (taken from PDG-2014)
@@ -445,23 +445,23 @@ integer :: id1, id2, id1in, id2in
 id1 = abs(id1in)
 id2 = abs(id2in)
 if((id1.eq.convertLHE(Up_)  .and.  id2.eq.convertLHE(Dn_))  .or.  (id1.eq.convertLHE(Dn_)  .and.  id2.eq.convertLHE(Up_)))then
-  CKM= Vsq_ud * dsqrt(scale_alpha_W_ud)
+  CKM= VCKM_ud * dsqrt(scale_alpha_W_ud)
 elseif((id1.eq.convertLHE(Up_)  .and.  id2.eq.convertLHE(Str_))  .or.  (id1.eq.convertLHE(Str_)  .and.  id2.eq.convertLHE(Up_)))then
-  CKM= Vsq_us
+  CKM= VCKM_us
 elseif((id1.eq.convertLHE(Up_)  .and.  id2.eq.convertLHE(Bot_))  .or.  (id1.eq.convertLHE(Bot_)  .and.  id2.eq.convertLHE(Up_)))then
-  CKM= Vsq_ub
+  CKM= VCKM_ub
 elseif((id1.eq.convertLHE(Chm_)  .and.  id2.eq.convertLHE(Dn_))  .or.  (id1.eq.convertLHE(Dn_)  .and.  id2.eq.convertLHE(Chm_)))then
-  CKM= Vsq_cd
+  CKM= VCKM_cd
 elseif((id1.eq.convertLHE(Chm_)  .and.  id2.eq.convertLHE(Str_))  .or.  (id1.eq.convertLHE(Str_)  .and.  id2.eq.convertLHE(Chm_)))then
-  CKM= Vsq_cs * dsqrt(scale_alpha_W_cs)
+  CKM= VCKM_cs * dsqrt(scale_alpha_W_cs)
 elseif((id1.eq.convertLHE(Chm_)  .and.  id2.eq.convertLHE(Bot_))  .or.  (id1.eq.convertLHE(Bot_)  .and.  id2.eq.convertLHE(Chm_)))then
-  CKM= Vsq_cb
-!elseif((id1.eq.convertLHE(Top_)  .and.  id2.eq.convertLHE(Dn_))  .or.  (id1.eq.convertLHE(Dn_)  .and.  id2.eq.convertLHE(Top_)))then
-!  CKM= 0.0084d0
-!elseif((id1.eq.convertLHE(Top_)  .and.  id2.eq.convertLHE(Str_))  .or.  (id1.eq.convertLHE(Str_)  .and.  id2.eq.convertLHE(Top_)))then
-!  CKM= 0.0400d0
-!elseif((id1.eq.convertLHE(Top_)  .and.  id2.eq.convertLHE(Bot_))  .or.  (id1.eq.convertLHE(Bot_)  .and.  id2.eq.convertLHE(Top_)))then
-!  CKM= 1.021
+  CKM= VCKM_cb
+elseif((id1.eq.convertLHE(Top_)  .and.  id2.eq.convertLHE(Dn_))  .or.  (id1.eq.convertLHE(Dn_)  .and.  id2.eq.convertLHE(Top_)))then
+  CKM= VCKM_td
+elseif((id1.eq.convertLHE(Top_)  .and.  id2.eq.convertLHE(Str_))  .or.  (id1.eq.convertLHE(Str_)  .and.  id2.eq.convertLHE(Top_)))then
+  CKM= VCKM_ts
+elseif((id1.eq.convertLHE(Top_)  .and.  id2.eq.convertLHE(Bot_))  .or.  (id1.eq.convertLHE(Bot_)  .and.  id2.eq.convertLHE(Top_)))then
+  CKM= VCKM_tb
 elseif((abs(id1).eq.abs(convertLHE(NuT_))  .and.  abs(id2).eq.abs(convertLHE(TaP_)))  .or.  (abs(id1).eq.abs(convertLHE(TaP_))  .and.  abs(id2).eq.abs(convertLHE(NuT_))))then
   CKM= 1d0 * dsqrt(scale_alpha_W_tn)
 else

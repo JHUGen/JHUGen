@@ -1778,13 +1778,13 @@ END SUBROUTINE
 
 
 
-SUBROUTINE Kinematics_VHiggs(MomExt,inv_mass,NBin,applyPSCut)
+SUBROUTINE Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut)
 use ModMisc
 use ModParameters
 implicit none
 
 logical :: applyPSCut
-integer :: NumPart,NBin(:)
+integer :: NumPart,NBin(:),id(:)
 real(8) :: m_jj,y_j1,y_j2,dphi_jj, m_ll, pt_V, pt_H, m_Vstar, costheta1, costheta2, phistar1, phi
 double precision MomBoost(1:4), MomFerm(1:4), inv_mass(1:9), MomLeptX(1:4,1:4), ScatteringAxis(1:4), MomReso(1:4)
 double precision MomLeptPlane1(2:4), MomLeptPlane2(2:4), dummy(2:4), signPhi
@@ -1794,6 +1794,14 @@ double precision, intent(in) :: MomExt(1:4,1:9) !,beam_momentum(2,4),four_moment
      applyPSCut = .false.
      m_jj = inv_mass(5)
      m_ll = inv_mass(4)
+
+     if(inv_mass(4).le.getMass(convertLHEreverse(id(6)))+getMass(convertLHEreverse(id(7))))then
+      applyPSCut=.true.
+     endif
+     if(inv_mass(5).le.getMass(convertLHEreverse(id(8)))+getMass(convertLHEreverse(id(9))))then
+      applyPSCut=.true.
+     endif
+
      pt_V = get_PT(MomExt(1:4,6)+MomExt(1:4,7))
      pt_H = get_PT(MomExt(1:4,8)+MomExt(1:4,9))
      !inv_mass(4,5,6,7)
@@ -2691,36 +2699,41 @@ use modMisc
 use modParameters
 implicit none
 integer :: Flavor,GetCKMPartner
-real(8) :: FlavorRnd
+real(8) :: FlavorRnd,sumCKM,Vsq(1:3)
 
     call random_number(FlavorRnd)
 
+    Vsq(1) = (CKM( convertLHEreverse(abs(Flavor)), convertLHEreverse(abs(Dn_)) ))**2
+    Vsq(2) = (CKM( convertLHEreverse(abs(Flavor)), convertLHEreverse(abs(Str_)) ))**2
+    Vsq(3) = (CKM( convertLHEreverse(abs(Flavor)), convertLHEreverse(abs(Bot_)) ))**2
+    sumCKM = Vsq(1)+Vsq(2)+Vsq(3)
+    FlavorRnd = FlavorRnd*sumCKM
     
     if( abs(Flavor).eq.abs(Up_) ) then
-        if( FlavorRnd.le.Vsq_ud ) then!  u-->d
+        if( FlavorRnd.le.Vsq(1) ) then!  u-->d
            GetCKMPartner = -sign(1,Flavor) * abs(Dn_)
-        elseif( FlavorRnd.gt.Vsq_ud .and. FlavorRnd.le.Vsq_ud+Vsq_us ) then!  u-->s
+        elseif( FlavorRnd.le.Vsq(2) ) then!  u-->s
            GetCKMPartner = -sign(1,Flavor) * abs(Str_)
         else!  u-->b
            GetCKMPartner = -sign(1,Flavor) * abs(Bot_)
         endif
                 
     elseif( abs(Flavor).eq.abs(Chm_) ) then
-        if( FlavorRnd.le.Vsq_cs ) then!  c-->s
+        if( FlavorRnd.le.Vsq(2) ) then!  c-->s
            GetCKMPartner = -sign(1,Flavor) * abs(Str_)
-        elseif( FlavorRnd.gt.Vsq_cs .and. FlavorRnd.le.Vsq_cs+Vsq_cd ) then!  c-->d
+        elseif( FlavorRnd.le.Vsq(1) ) then!  c-->d
            GetCKMPartner = -sign(1,Flavor) * abs(Dn_)
         else!  c-->b
            GetCKMPartner = -sign(1,Flavor) * abs(Bot_)
         endif
 
     elseif( abs(Flavor).eq.abs(Top_) ) then
-        if( FlavorRnd.le.Vsq_tb ) then!  t-->b
+        if( FlavorRnd.le.Vsq(3) ) then!  t-->b
            GetCKMPartner = -sign(1,Flavor) * abs(Bot_)
-        elseif( FlavorRnd.gt.Vsq_tb .and. FlavorRnd.le.Vsq_tb+Vsq_ts ) then!  t-->s
+        elseif( FlavorRnd.le.Vsq(2) ) then!  t-->s
            GetCKMPartner = -sign(1,Flavor) * abs(Str_)
-        else!  t-->u
-           GetCKMPartner = -sign(1,Flavor) * abs(Up_)
+        else!  t-->d
+           GetCKMPartner = -sign(1,Flavor) * abs(Dn_)
         endif
     
     else
