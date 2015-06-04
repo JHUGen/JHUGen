@@ -1570,7 +1570,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
      do while ( .not.FirstEvent )
         read(16,fmt="(A160)",IOSTAT=stat,END=99) FirstLines
         if( FirstLines(1:5).eq."hmass" ) then 
-               read(FirstLines(6:13),*) M_Reso
+               read(FirstLines(6:16),*) M_Reso
                M_Reso = M_Reso*GeV!  convert to units of 100GeV
                M_ResoSet=.true.
         endif
@@ -1583,7 +1583,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
             write(io_LHEOutFile ,"(A)") ""
             write(io_LHEOutFile ,"(A)") "JHUGen Resonance parameters used for event generation:"
             write(io_LHEOutFile ,"(A,F6.1,A)") "hmass  ",M_Reso*100d0,"        ! Higgs boson mass"
-            write(io_LHEOutFile ,"(A,F8.5,A)") "hwidth",Ga_Reso*100d0,"      ! Higgs boson width"
+            write(io_LHEOutFile ,"(A,F10.5,A)") "hwidth",Ga_Reso*100d0,"      ! Higgs boson width"
             write(io_LHEOutFile ,"(A)") ""
         endif
         if( FirstLines(1:7).eq."<event>" ) then 
@@ -1608,8 +1608,8 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
         write(io_stdout,"(2X,A,1F7.2)")  "ERROR: Higgs width could not be read from LHE input file. Assuming default value",Ga_Reso*100d0
         write(io_LogFile,"(2X,A,1F7.2)") "ERROR: Higgs width could not be read from LHE input file. Assuming default value",Ga_Reso*100d0
      else
-        write(io_stdout,"(2X,A,1F7.5,A)") "A Higgs width of ",Ga_Reso*100d0," GeV was determined from the LHE input file."
-        write(io_LogFile,"(2X,A,1F7.5,A)") "A Higgs width of ",Ga_Reso*100d0," GeV was determined from the LHE input file."
+        write(io_stdout,"(2X,A,1F9.5,A)") "A Higgs width of ",Ga_Reso*100d0," GeV was determined from the LHE input file."
+        write(io_LogFile,"(2X,A,1F9.5,A)") "A Higgs width of ",Ga_Reso*100d0," GeV was determined from the LHE input file."
      endif
      write(io_stdout,"(A)") ""
      write(io_LogFile,"(A)") ""
@@ -1850,8 +1850,8 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
         write(io_stdout,"(2X,A,1F7.2)")  "ERROR: Higgs width could not be read from LHE input file. Assuming default value",Ga_Reso*100d0
         write(io_LogFile,"(2X,A,1F7.2)") "ERROR: Higgs width could not be read from LHE input file. Assuming default value",Ga_Reso*100d0
      else
-        write(io_stdout,"(2X,A,1F7.5,A)") "A Higgs width of ",Ga_Reso*100d0," GeV was determined from the LHE input file."
-        write(io_LogFile,"(2X,A,1F7.5,A)") "A Higgs width of ",Ga_Reso*100d0," GeV was determined from the LHE input file."
+        write(io_stdout,"(2X,A,1F9.5,A)") "A Higgs width of ",Ga_Reso*100d0," GeV was determined from the LHE input file."
+        write(io_LogFile,"(2X,A,1F9.5,A)") "A Higgs width of ",Ga_Reso*100d0," GeV was determined from the LHE input file."
      endif
      write(io_stdout,"(A)") ""
      write(io_LogFile,"(A)") ""
@@ -2897,8 +2897,8 @@ character :: arg*(500)
     if( Process.eq.50) write(TheUnit,"(4X,A,F7.2,A,F7.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( Process.eq.80) write(TheUnit,"(4X,A,F7.2,A,F7.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( Process.eq.90) write(TheUnit,"(4X,A,F7.2,A,F7.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
-    if( ReadLHEFile )    write(TheUnit,"(4X,A)") "           (This is ReadLHEFile mode. Resonance mass/width might be overwritten by LHE input parameters.)"
-    if( ConvertLHEFile ) write(TheUnit,"(4X,A)") "           (This is ConvertLHEFile mode. Resonance mass/width might be overwritten by LHE input parameters.)"
+    if( ReadLHEFile )    write(TheUnit,"(4X,A)") "           (This is ReadLHEFile mode. Resonance mass/width might be overwritten by LHE input parameters. See below.)"
+    if( ConvertLHEFile ) write(TheUnit,"(4X,A)") "           (This is ConvertLHEFile mode. Resonance mass/width might be overwritten by LHE input parameters. See below.)"
     write(TheUnit,"(4X,A,I2,2X,A,I2)") "DecayMode1:",DecayMode1, "DecayMode2:",DecayMode2
     if( IsAZDecay(DecayMode1) .or. IsAZDecay(DecayMode2) ) write(TheUnit,"(4X,A,F6.3,A,F6.4)") "Z-boson: mass=",M_Z*100d0,", width=",Ga_Z*100d0
     if( IsAWDecay(DecayMode1) .or. IsAWDecay(DecayMode2) ) write(TheUnit,"(4X,A,F6.3,A,F6.4)") "W-boson: mass=",M_W*100d0,", width=",Ga_W*100d0
