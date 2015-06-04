@@ -12,7 +12,7 @@ ccomp = gcc
 
 
 MCFM_Dep = WBFZZ_MCFM/src/WBFZZ/anomamp.f \
-	WBFZZ_MCFM/src/WBFZZ/qq_ZZqq.f \
+	   WBFZZ_MCFM/src/WBFZZ/qq_ZZqq.f \
            WBFZZ_MCFM/src/WBFZZ/setupzprops.f \
            WBFZZ_MCFM/src/WBFZZ/spinorcurr.f \
            WBFZZ_MCFM/src/WBFZZ/jzero.f \

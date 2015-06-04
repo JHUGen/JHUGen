@@ -139,8 +139,9 @@ real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi
 real(8) :: MomExt(1:4,1:13), PSWgt,PSWgt2,PSWgt3,CS_Max,DKRnd
 real(8) :: LO_Res_GG_Unpol,LO_Res_QQB_Unpol,PreFac,PDFFac1,PDFFac2
 integer :: NBin(1:NumHistograms),NHisto,iPartons(1:2),DKFlavor
-integer :: MY_IDUP(1:11),ICOLUP(1:2,1:11),nparton
+integer :: MY_IDUP(1:13),ICOLUP(1:2,1:13),nparton,DK_IDUP(1:6),DK_ICOLUP(1:2,3:6)
 logical :: applyPSCut,genEvt
+integer, parameter :: inLeft=1,inRight=2,Hbos=3,tbar=4,t=5,  bbar=6,Wm=7,lepM=8,nubar=9,  b=10,Wp=11,lepP=12,nu=13
 include 'csmaxvalue.f'  
 EvalUnWeighted_TTBH = 0d0
 
@@ -151,99 +152,160 @@ EvalUnWeighted_TTBH = 0d0
    call EvalPhasespace_2to3M(EHat,(/M_Reso,M_Top,M_Top/),yRnd(3:7),MomExt(1:4,1:5),PSWgt)! a(1)b(2)-->H(3)+tbar(4)+t(5)
    call boost2Lab(eta1,eta2,5,MomExt(1:4,1:5))
 
-   ICOLUP(1:2,3) = (/000,000/)
-   ICOLUP(1:2,4) = (/000,502/)
-   ICOLUP(1:2,5) = (/501,000/)
+   ICOLUP(1:2,Hbos) = (/000,000/)
+   ICOLUP(1:2,tbar) = (/000,502/)
+   ICOLUP(1:2,t)    = (/501,000/)
    if( TOPDECAYS.NE.0 ) then
-      call EvalPhasespace_TopDecay(MomExt(1:4,4),yRnd(08:11),MomExt(1:4,06:08),PSWgt2)    ! ATop 
-      call EvalPhasespace_TopDecay(MomExt(1:4,5),yRnd(12:15),MomExt(1:4,09:11),PSWgt3)    !  Top
+      call EvalPhasespace_TopDecay(MomExt(1:4,tbar),yRnd(08:11),MomExt(1:4,06:08),PSWgt2)    ! ATop 
+      MomExt(1:4,bbar) = MomExt(1:4,06)
+      MomExt(1:4,nubar)= MomExt(1:4,08)
+      MomExt(1:4,lepM) = MomExt(1:4,07)
+      MomExt(1:4,Wm)   = MomExt(1:4,lepM) + MomExt(1:4,nubar)
+
+      call EvalPhasespace_TopDecay(MomExt(1:4,t),yRnd(12:15),MomExt(1:4,10:12),PSWgt3)    !  Top
+      MomExt(1:4,b)   = MomExt(1:4,10)
+      MomExt(1:4,nu)  = MomExt(1:4,12)
+      MomExt(1:4,lepP)= MomExt(1:4,11)
+      MomExt(1:4,Wp)  = MomExt(1:4,lepP) + MomExt(1:4,nu)
       PSWgt = PSWgt * PSWgt2*PSWgt3
+ 
 
       if( TOPDECAYS.EQ.1 ) then
-          call random_number(DKRnd)! W-
-          DKFlavor = WLepBranching( DKRnd )!= ElM or MuM
-          MY_IDUP(6)= ABot_
-          MY_IDUP(7) = -abs(DKFlavor)     ! lepton(-)
-          MY_IDUP(8) = -abs(DKFlavor)-7   ! anti-neutrino
-      
-          call random_number(DKRnd)! W+
-          DKFlavor = WLepBranching( DKRnd )!= ElM or MuM
-          MY_IDUP(9)= Bot_
-          MY_IDUP(10) = +abs(DKFlavor)     ! lepton(+)
-          MY_IDUP(11) = +abs(DKFlavor)+7   ! neutrino    
-   
-          ICOLUP(1:2,6) = (/000,502/)
-          ICOLUP(1:2,7) = (/000,000/)
-          ICOLUP(1:2,8) = (/000,000/)
-          ICOLUP(1:2,9) = (/501,000/)
-          ICOLUP(1:2,10)= (/000,000/)
-          ICOLUP(1:2,11)= (/000,000/)             
+!           call random_number(DKRnd)! W-
+!           DKFlavor = WLepBranching( DKRnd )!= ElM or MuM
+!           MY_IDUP(bbar)= ABot_
+!           MY_IDUP(7) = -abs(DKFlavor)     ! lepton(-)
+!           MY_IDUP(8) = -abs(DKFlavor)-7   ! anti-neutrino      
+!           call random_number(DKRnd)! W+
+!           DKFlavor = WLepBranching( DKRnd )!= ElM or MuM
+!           MY_IDUP(b)= Bot_
+!           MY_IDUP(10) = +abs(DKFlavor)     ! lepton(+)
+!           MY_IDUP(11) = +abs(DKFlavor)+7   ! neutrino   
+!           ICOLUP(1:2,6) = (/000,502/)
+!           ICOLUP(1:2,7) = (/000,000/)
+!           ICOLUP(1:2,8) = (/000,000/)
+!           ICOLUP(1:2,9) = (/501,000/)
+!           ICOLUP(1:2,10)= (/000,000/)
+!           ICOLUP(1:2,11)= (/000,000/)             
+! print *, "old",      MY_IDUP(7:8)  ,  MY_IDUP(10:11)       
+! print *, "old",      ICOLUP(1:2,6:11)  
+
+          DecayMode1=4; DecayMode2=4;
+          call VVBranchings(DK_IDUP(1:6),DK_ICOLUP(1:2,3:6))
+          MY_IDUP(b)    = Bot_;        ICOLUP(1:2,b) = (/501,00/)
+          MY_IDUP(Wp)   = DK_IDUP(1);  ICOLUP(1:2,Wp)   = (/000,000/)
+          MY_IDUP(lepP) = DK_IDUP(3);  ICOLUP(1:2,lepP) = DK_ICOLUP(1:2,3)
+          MY_IDUP(nu)   = DK_IDUP(4);  ICOLUP(1:2,nu)   = DK_ICOLUP(1:2,4)  
+          MY_IDUP(bbar) = ABot_;       ICOLUP(1:2,bbar)    = (/000,502/)
+          MY_IDUP(Wm)   = DK_IDUP(2);  ICOLUP(1:2,Wm)   = (/000,000/)             
+          MY_IDUP(lepM) = DK_IDUP(6);  ICOLUP(1:2,lepM) = DK_ICOLUP(1:2,6)
+          MY_IDUP(nubar)= DK_IDUP(5);  ICOLUP(1:2,nubar)= DK_ICOLUP(1:2,5)  
+! print *, "new"  ,  MY_IDUP(lepM), MY_IDUP(nubar), MY_IDUP(lepP), MY_IDUP(nu)
+! print *, "new"  ,  ICOLUP(1:2,bbar), ICOLUP(1:2,lepM), ICOLUP(1:2,nubar), ICOLUP(1:2,b), ICOLUP(1:2,lepP), ICOLUP(1:2,nu)
+! pause
 
       elseif( TOPDECAYS.EQ.2 ) then
 
-          call random_number(DKRnd)
-          DKFlavor = WQuaUpBranching( DKRnd )!= Up,Chm
-          MY_IDUP(6)= ABot_
-          MY_IDUP(7) = +abs(DKFlavor)+1  ! dn flavor
-          MY_IDUP(8) = -abs(DKFlavor)    ! anti-up flavor
+!           call random_number(DKRnd)
+!           DKFlavor = WQuaUpBranching( DKRnd )!= Up,Chm
+!           MY_IDUP(bbar)= ABot_
+!           MY_IDUP(7) = +abs(DKFlavor)+1  ! dn flavor
+!           MY_IDUP(8) = -abs(DKFlavor)    ! anti-up flavor
+!           call random_number(DKRnd)
+!           DKFlavor = WQuaUpBranching( DKRnd )!= Up,Chm
+!           MY_IDUP(b)= Bot_          
+!           MY_IDUP(10) = -abs(DKFlavor)-1  ! anti-dn flavor
+!           MY_IDUP(11) = +abs(DKFlavor)    ! up flavor
+!           ICOLUP(1:2,6) = (/000,502/)
+!           ICOLUP(1:2,7) = (/503,000/)
+!           ICOLUP(1:2,8) = (/000,503/)
+!           ICOLUP(1:2,9) = (/501,000/)
+!           ICOLUP(1:2,10)= (/000,504/)
+!           ICOLUP(1:2,11)= (/504,000/)   
+
+          DecayMode1=5; DecayMode2=5;
+          call VVBranchings(DK_IDUP(1:6),DK_ICOLUP(1:2,3:6))
+          MY_IDUP(b)    = Bot_;        ICOLUP(1:2,b) = (/501,00/)
+          MY_IDUP(Wp)   = DK_IDUP(1);  ICOLUP(1:2,Wp)   = (/000,000/)
+          MY_IDUP(lepP) = DK_IDUP(3);  ICOLUP(1:2,lepP) = DK_ICOLUP(1:2,3)
+          MY_IDUP(nu)   = DK_IDUP(4);  ICOLUP(1:2,nu)   = DK_ICOLUP(1:2,4)  
+          MY_IDUP(bbar) = ABot_;       ICOLUP(1:2,bbar)    = (/000,502/)
+          MY_IDUP(Wm)   = DK_IDUP(2);  ICOLUP(1:2,Wm)   = (/000,000/)             
+          MY_IDUP(lepM) = DK_IDUP(6);  ICOLUP(1:2,lepM) = DK_ICOLUP(1:2,6)
+          MY_IDUP(nubar)= DK_IDUP(5);  ICOLUP(1:2,nubar)= DK_ICOLUP(1:2,5)  
           
-          call random_number(DKRnd)
-          DKFlavor = WQuaUpBranching( DKRnd )!= Up,Chm
-          MY_IDUP(9)= Bot_          
-          MY_IDUP(10) = -abs(DKFlavor)-1  ! anti-dn flavor
-          MY_IDUP(11) = +abs(DKFlavor)    ! up flavor
           
-          ICOLUP(1:2,6) = (/000,502/)
-          ICOLUP(1:2,7) = (/503,000/)
-          ICOLUP(1:2,8) = (/000,503/)
-          ICOLUP(1:2,9) = (/501,000/)
-          ICOLUP(1:2,10)= (/000,504/)
-          ICOLUP(1:2,11)= (/504,000/)   
           
       elseif( TOPDECAYS.EQ.3 ) then
 !           MY_IDUP(6:11)=(/ABot_,ElM_,ANuE_,Bot_,ADn_,Up_/)
+!           call random_number(DKRnd)! W-
+!           DKFlavor = WLepBranching( DKRnd )!= ElM or MuM
+!           MY_IDUP(bbar)= ABot_
+!           MY_IDUP(7) = -abs(DKFlavor)     ! lepton(-)
+!           MY_IDUP(8) = -abs(DKFlavor)-7   ! anti-neutrino
+!           call random_number(DKRnd)
+!           DKFlavor = WQuaUpBranching( DKRnd )!= Up,Chm
+!           MY_IDUP(b)= Bot_          
+!           MY_IDUP(10) = -abs(DKFlavor)-1  ! anti-dn flavor
+!           MY_IDUP(11) = +abs(DKFlavor)    ! up flavor
+!           ICOLUP(1:2,6) = (/000,502/)
+!           ICOLUP(1:2,7) = (/000,000/)
+!           ICOLUP(1:2,8) = (/000,000/)
+!           ICOLUP(1:2,9) = (/501,000/)
+!           ICOLUP(1:2,10)= (/000,504/)
+!           ICOLUP(1:2,11)= (/504,000/)   
+! print *, "old",      MY_IDUP(7:8)  ,  MY_IDUP(10:11)       
+! print *, "old",      ICOLUP(1:2,6:11)  
 
-          call random_number(DKRnd)! W-
-          DKFlavor = WLepBranching( DKRnd )!= ElM or MuM
-          MY_IDUP(6)= ABot_
-          MY_IDUP(7) = -abs(DKFlavor)     ! lepton(-)
-          MY_IDUP(8) = -abs(DKFlavor)-7   ! anti-neutrino
+          DecayMode1=5; DecayMode2=4;
+          call VVBranchings(DK_IDUP(1:6),DK_ICOLUP(1:2,3:6))
+          MY_IDUP(b)    = Bot_;        ICOLUP(1:2,b) = (/501,00/)
+          MY_IDUP(Wp)   = DK_IDUP(1);  ICOLUP(1:2,Wp)   = (/000,000/)
+          MY_IDUP(lepP) = DK_IDUP(3);  ICOLUP(1:2,lepP) = DK_ICOLUP(1:2,3)
+          MY_IDUP(nu)   = DK_IDUP(4);  ICOLUP(1:2,nu)   = DK_ICOLUP(1:2,4)  
+          MY_IDUP(bbar) = ABot_;       ICOLUP(1:2,bbar)    = (/000,502/)
+          MY_IDUP(Wm)   = DK_IDUP(2);  ICOLUP(1:2,Wm)   = (/000,000/)             
+          MY_IDUP(lepM) = DK_IDUP(6);  ICOLUP(1:2,lepM) = DK_ICOLUP(1:2,6)
+          MY_IDUP(nubar)= DK_IDUP(5);  ICOLUP(1:2,nubar)= DK_ICOLUP(1:2,5)  
+! print *, "new"  ,  MY_IDUP(lepM), MY_IDUP(nubar), MY_IDUP(lepP), MY_IDUP(nu)
+! print *, "new"  ,  ICOLUP(1:2,bbar), ICOLUP(1:2,lepM), ICOLUP(1:2,nubar), ICOLUP(1:2,b), ICOLUP(1:2,lepP), ICOLUP(1:2,nu)
+! pause
 
-          call random_number(DKRnd)
-          DKFlavor = WQuaUpBranching( DKRnd )!= Up,Chm
-          MY_IDUP(9)= Bot_          
-          MY_IDUP(10) = -abs(DKFlavor)-1  ! anti-dn flavor
-          MY_IDUP(11) = +abs(DKFlavor)    ! up flavor
           
-          ICOLUP(1:2,6) = (/000,502/)
-          ICOLUP(1:2,7) = (/000,000/)
-          ICOLUP(1:2,8) = (/000,000/)
-          ICOLUP(1:2,9) = (/501,000/)
-          ICOLUP(1:2,10)= (/000,504/)
-          ICOLUP(1:2,11)= (/504,000/)   
-          
+
       elseif( TOPDECAYS.EQ.4 ) then
 !           MY_IDUP(6:11)=(/ABot_,Dn_,AUp_,Bot_,MuP_,NuM_/)
 
-          call random_number(DKRnd)
-          DKFlavor = WQuaUpBranching( DKRnd )!= Up,Chm
-          MY_IDUP(6)= ABot_
-          MY_IDUP(7) = +abs(DKFlavor)+1  ! dn flavor
-          MY_IDUP(8) = -abs(DKFlavor)    ! anti-up flavor
+!           call random_number(DKRnd)
+!           DKFlavor = WQuaUpBranching( DKRnd )!= Up,Chm
+!           MY_IDUP(bbar)= ABot_
+!           MY_IDUP(7) = +abs(DKFlavor)+1  ! dn flavor
+!           MY_IDUP(8) = -abs(DKFlavor)    ! anti-up flavor
+! 
+!           call random_number(DKRnd)! W+
+!           DKFlavor = WLepBranching( DKRnd )!= ElM or MuM
+!           MY_IDUP(b)= Bot_
+!           MY_IDUP(10) = +abs(DKFlavor)     ! lepton(+)
+!           MY_IDUP(11) = +abs(DKFlavor)+7   ! neutrino              
+! 
+!           ICOLUP(1:2,6) = (/000,502/)
+!           ICOLUP(1:2,7) = (/503,000/)
+!           ICOLUP(1:2,8) = (/000,503/)
+!           ICOLUP(1:2,9) = (/501,000/)
+!           ICOLUP(1:2,10)= (/000,000/)
+!           ICOLUP(1:2,11)= (/000,000/)
 
-          call random_number(DKRnd)! W+
-          DKFlavor = WLepBranching( DKRnd )!= ElM or MuM
-          MY_IDUP(9)= Bot_
-          MY_IDUP(10) = +abs(DKFlavor)     ! lepton(+)
-          MY_IDUP(11) = +abs(DKFlavor)+7   ! neutrino              
+          DecayMode1=4; DecayMode2=5;
+          call VVBranchings(DK_IDUP(1:6),DK_ICOLUP(1:2,3:6))
+          MY_IDUP(b)    = Bot_;        ICOLUP(1:2,b) = (/501,00/)
+          MY_IDUP(Wp)   = DK_IDUP(1);  ICOLUP(1:2,Wp)   = (/000,000/)
+          MY_IDUP(lepP) = DK_IDUP(3);  ICOLUP(1:2,lepP) = DK_ICOLUP(1:2,3)
+          MY_IDUP(nu)   = DK_IDUP(4);  ICOLUP(1:2,nu)   = DK_ICOLUP(1:2,4)  
+          MY_IDUP(bbar) = ABot_;       ICOLUP(1:2,bbar)    = (/000,502/)
+          MY_IDUP(Wm)   = DK_IDUP(2);  ICOLUP(1:2,Wm)   = (/000,000/)             
+          MY_IDUP(lepM) = DK_IDUP(6);  ICOLUP(1:2,lepM) = DK_ICOLUP(1:2,6)
+          MY_IDUP(nubar)= DK_IDUP(5);  ICOLUP(1:2,nubar)= DK_ICOLUP(1:2,5)  
 
-          ICOLUP(1:2,6) = (/000,502/)
-          ICOLUP(1:2,7) = (/503,000/)
-          ICOLUP(1:2,8) = (/000,503/)
-          ICOLUP(1:2,9) = (/501,000/)
-          ICOLUP(1:2,10)= (/000,000/)
-          ICOLUP(1:2,11)= (/000,000/)
-          
       endif
       
    else
@@ -261,7 +323,6 @@ EvalUnWeighted_TTBH = 0d0
    call setPDFs(eta1,eta2,Mu_Fact,pdf)
 
 
-
 IF( GENEVT ) THEN   
       
       if( iPartons(1).eq.0 .and. iPartons(2).eq.0 ) then
@@ -271,7 +332,6 @@ IF( GENEVT ) THEN
           MY_IDUP(1:5) = (/Glu_,Glu_,Hig_,ATop_,Top_/)
           ICOLUP(1:2,1) = (/501,510/)
           ICOLUP(1:2,2) = (/510,502/)    
-          
       else
           call EvalAmp_QQB_TTBH(MomExt,LO_Res_QQB_Unpol)
           PDFFac1 = pdf( LHA2M_pdf(iPartons(1)),1) * pdf( LHA2M_pdf(iPartons(2)),2)
@@ -293,7 +353,7 @@ IF( GENEVT ) THEN
       elseif( EvalUnWeighted_TTBH .gt. yRnd(16)*CS_max ) then
          AccepCounter = AccepCounter + 1
          AccepCounter_part(iPartons(1),iPartons(2)) = AccepCounter_part(iPartons(1),iPartons(2))+1
-         call WriteOutEvent_TTBH(MomExt,MY_IDUP(1:11),ICOLUP(1:2,1:11))
+         call WriteOutEvent_TTBH(MomExt,MY_IDUP(1:13),ICOLUP(1:2,1:13))
          do NHisto=1,NumHistograms
                call intoHisto(NHisto,NBin(NHisto),1d0)
          enddo
@@ -304,7 +364,6 @@ IF( GENEVT ) THEN
 
 
 ELSE! NOT GENEVT
-
 
       
       if( PChannel.eq.0 .or. PChannel.eq.2 ) then
@@ -354,8 +413,8 @@ ELSE! NOT GENEVT
 ENDIF! GENEVT 
 
 
- RETURN
- END FUNCTION
+RETURN
+END FUNCTION
 
 
 

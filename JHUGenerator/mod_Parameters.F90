@@ -3,7 +3,7 @@ implicit none
 save
 ! 
 ! 
-character(len=6),parameter :: JHUGen_Version="v5.5.6"
+character(len=6),parameter :: JHUGen_Version="v5.5.7"
 ! 
 ! 
 integer, public :: Collider, PDFSet,PChannel,Process,DecayMode1,DecayMode2,TopDecays
@@ -37,7 +37,7 @@ real(8),public :: minCS=1d10,maxCS=0d0,avgCS=0d0
 
 
 logical, public, parameter :: seed_random = .true.
-integer, public :: TheSeeds(0:20) = (/12,1,2,3,4,5,6,7,8,9,10,11,12,0,0,0,0,0,0,0,0/)! only used if seed_random=.false., the first entry is the total number of seeds
+integer, public :: TheSeeds(0:20) = (/12,53253,223,3,4,5,6,7,8,9,10,11,12,0,0,0,0,0,0,0,0/)! only used if seed_random=.false., the first entry is the total number of seeds
 
 logical, public, parameter :: fix_channels_ratio = .false.
 
@@ -666,12 +666,16 @@ integer :: Part
       getMass = 0d0
   elseif( abs(Part).eq.abs(Bot_) ) then
       getMass = m_bot
+  elseif( abs(Part).eq.abs(Top_) ) then
+      getMass = m_top
   elseif( abs(Part).eq.abs(Z0_) ) then
       getMass = M_Z
   elseif( abs(Part).eq.abs(Wp_) ) then
       getMass = M_W
   elseif( abs(Part).eq.abs(Pho_) ) then
       getMass = 0d0
+  elseif( abs(Part).eq.abs(Hig_) ) then
+      getMass = M_Reso
   else
      print *, "Error in getMass",Part
      stop

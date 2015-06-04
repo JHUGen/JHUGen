@@ -14,7 +14,7 @@ SUBROUTINE TopDecay(Flavor,Mom,Spinor,TopHel)
 use ModMisc
 use ModParameters
 implicit none
-real(8) :: Mom(:,:)
+real(8) :: Mom(1:4,1:3)
 integer :: flavor
 integer,optional :: TopHel
 complex(8) :: Spinor(1:4)
@@ -26,8 +26,6 @@ real(8),parameter :: g2_weak = 4d0*dsqrt(2d0)*m_W**2*GF
 real(8),parameter :: Nc=3,NFlav=2
 
 
-
-    TopMom(1:4) = Mom(1:4,1)+Mom(1:4,2)+Mom(1:4,3)
 
 !     zeros(1:4) = dble(TopMom(1:4)) - Mom(1:4,1)-Mom(1:4,2)-Mom(1:4,3)
 !     if( any(abs(zeros(1:4)/dble(TopMom(1))).gt.1d-8) ) then
@@ -47,6 +45,8 @@ real(8),parameter :: Nc=3,NFlav=2
 !     endif
 
 
+
+    TopMom(1:4) = Mom(1:4,1)+Mom(1:4,2)+Mom(1:4,3)
     if( TOPDECAYS.eq.0 ) then
 !         if( Flavor.eq.Top_  ) call ubarSpi_Dirac(dcmplx(TopMom(1:4)),M_Top,TopHel,Spinor(1:4))
 !         if( Flavor.eq.ATop_ ) call    vSpi_Dirac(dcmplx(TopMom(1:4)),M_Top,TopHel,Spinor(1:4))

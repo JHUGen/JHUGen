@@ -1045,7 +1045,7 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
    VG(:,:) = VG(:,:)/dble(VegasNc0)
    TotalXSec = sum(  VG(:,:) )
    print *, ""    
-   write(io_stdout,*) "Total xsec",TotalXSec
+   write(io_stdout,"(1X,A,F8.3)") "Total xsec",TotalXSec
 
 
     RequEvents(:,:)=0
@@ -1058,7 +1058,7 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
    
     do i1=-5,5
     do j1=-5,5
-         if( VG(i1,j1).gt.1d-9 ) write(io_stdout,"(A,I4,I4,F8.3,I9)") "Fractional partonic xsec ", i1,j1,VG(i1,j1)/TotalXSec,RequEvents(i1,j1)
+         if( VG(i1,j1).gt.1d-9 ) write(io_stdout,"(1X,A,I4,I4,F8.3,I9)") "Fractional partonic xsec ", i1,j1,VG(i1,j1)/TotalXSec,RequEvents(i1,j1)
     enddo
     enddo
    
