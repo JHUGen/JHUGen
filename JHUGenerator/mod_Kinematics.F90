@@ -645,50 +645,52 @@ END SUBROUTINE
 SUBROUTINE WriteOutEvent_TTBH(Mom,MY_IDUP,ICOLUP,EventWeight)
 use ModParameters
 implicit none
-real(8) :: Mom(1:4,1:11)
+real(8) :: Mom(1:4,1:13)
 real(8),optional :: EventWeight
-integer :: MY_IDUP(1:11),ICOLUP(1:2,1:11),LHE_IDUP(1:13),ISTUP(1:13),MOTHUP(1:2,1:13)
+integer :: MY_IDUP(1:13),ICOLUP(1:2,1:13),LHE_IDUP(1:13),ISTUP(1:13),MOTHUP(1:2,1:13)
 integer :: NUP,IDPRUP,i
-real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP,Lifetime,Spin,MomDummy(1:4,1:13)
+real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP,Lifetime,Spin,MomDummy(1:4,1:13),TheMass
 character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0)"
-integer, parameter :: tbar=4,t=5,Hbos=3,inLeft=1,inRight=2,bbar=6, lepM=7,nubar=8,b=9,lepP=10,nu=11, Wm=12, Wp=13
+integer, parameter :: inLeft=1,inRight=2,Hbos=3,tbar=4,t=5,  bbar=6,Wm=7,lepM=8,nubar=9,  b=10,Wp=11,lepP=12,nu=13
 
 
 ! For description of the LHE format see http://arxiv.org/abs/hep-ph/0109068 and http://arxiv.org/abs/hep-ph/0609017
 ! The LHE numbering scheme can be found here: http://pdg.lbl.gov/mc_particle_id_contents.html and http://lhapdf.hepforge.org/manual#tth_sEcA
 
 
-do i=1,11
+do i=1,13
     LHE_IDUP(i) = convertLHE( MY_IDUP(i) )
 enddo
-LHE_IDUP(12) = convertLHE( Wm_ )
-LHE_IDUP(13) = convertLHE( Wp_ )
 
 IDPRUP=100
 SCALUP=Mu_Fact * 100d0
 AQEDUP=alpha_QED
 AQCDUP=0.11d0
 
-ISTUP(1:13) = (/-1,-1,1,2,2,1,1,1,1,1,1,2,2/)
 
 
-MOTHUP(1:2,inLeft)  = (/0,0/)
-MOTHUP(1:2,inRight) = (/0,0/)
-MOTHUP(1:2,Hbos)    = (/1,2/)
-MOTHUP(1:2,tbar)    = (/1,2/)
-MOTHUP(1:2,t)       = (/1,2/)
-MOTHUP(1:2,bbar)    = (/4,4/)
-MOTHUP(1:2,lepM)    = (/6,6/)
-MOTHUP(1:2,nubar)   = (/6,6/)
-MOTHUP(1:2,b)       = (/5,5/)
-MOTHUP(1:2,lepP)    = (/7,7/)
-MOTHUP(1:2,nu)      = (/7,7/)
-MOTHUP(1:2,Wm)      = (/4,4/)
-MOTHUP(1:2,Wp)      = (/5,5/)
+MOTHUP(1:2,inLeft) = (/0,0/);             ISTUP(inLeft) = -1
+MOTHUP(1:2,inRight)= (/0,0/);             ISTUP(inRight)= -1
+
+MOTHUP(1:2,Hbos)   = (/inLeft,inRight/);  ISTUP(Hbos)   = +1
+MOTHUP(1:2,tbar)   = (/inLeft,inRight/);  ISTUP(tbar)   = +2
+MOTHUP(1:2,t)      = (/inLeft,inRight/);  ISTUP(t)      = +2
+
+MOTHUP(1:2,bbar)   = (/tbar,tbar/);       ISTUP(bbar)   = +1
+MOTHUP(1:2,Wm)     = (/tbar,tbar/);       ISTUP(Wm)     = +2
+MOTHUP(1:2,lepM)   = (/Wm,Wm/);           ISTUP(lepM)   = +1
+MOTHUP(1:2,nubar)  = (/Wm,Wm/);           ISTUP(nubar)  = +1
+
+MOTHUP(1:2,b)      = (/t,t/);             ISTUP(b)      = +1
+MOTHUP(1:2,Wp)     = (/t,t/);             ISTUP(Wp)     = +2
+MOTHUP(1:2,lepP)   = (/Wp,Wp/);           ISTUP(lepP)   = +1
+MOTHUP(1:2,nu)     = (/Wp,Wp/);           ISTUP(nu)     = +1
 
 
 if( TopDecays.eq.0 ) then
    NUP = 5
+   ISTUP(tbar)   = +1
+   ISTUP(t)      = +1 
 else
    NUP=13
 endif
@@ -702,14 +704,13 @@ endif
 Lifetime = 0.0d0
 Spin     = 0.1d0
 
-do i=1,11
+do i=1,13
     MomDummy(1,i) = 100.0d0*Mom(1,i)
     MomDummy(2,i) = 100.0d0*Mom(2,i)
     MomDummy(3,i) = 100.0d0*Mom(3,i)
     MomDummy(4,i) = 100.0d0*Mom(4,i)
 enddo
-    MomDummy(1:4,Wm) = MomDummy(1:4,nubar)+ MomDummy(1:4,lepM)
-    MomDummy(1:4,Wp) = MomDummy(1:4,nu)   + MomDummy(1:4,lepP)
+
 
 
 
@@ -724,62 +725,67 @@ write(io_LHEOutFile,"(I2,X,I3,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7)") NUP
 ! (*) alpha_s coupling for this event
 
 
+do i=1,NUP
+     TheMass = GetMass( MY_IDUP(i) )
+     if( abs(MY_IDUP(i)).eq.Bot_ ) TheMass = 0.0d0  
+     write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),TheMass,Lifetime,Spin
+enddo
 
-! parton_a
-i=1
-write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
-
-! parton_b
-i=2
-write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
-
-! H
-i=3
-write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),M_Reso*100d0,Lifetime,Spin
-
-! tb
-i=4
-write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),m_top*100d0,Lifetime,Spin
-
-! t
-i=5
-write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),m_top*100d0,Lifetime,Spin
-
-
-if( TopDecays.ne.0 ) then
-
-    ! W-
-    i=12
-    write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), 0,0 ,MomDummy(2:4,i),MomDummy(1,i),M_W*100d0,Lifetime,Spin
-
-    ! W+
-    i=13
-    write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), 0,0 ,MomDummy(2:4,i),MomDummy(1,i),M_W*100d0,Lifetime,Spin
-
-    ! bb
-    i=6
-    write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
-
-    ! e-
-    i=7
-    write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
-
-    ! nub
-    i=8
-    write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
-
-    ! b
-    i=9
-    write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
-
-    ! e+
-    i=10
-    write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
-
-    ! nu
-    i=11
-    write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
-endif
+! ! parton_a
+! i=1
+! write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
+! 
+! ! parton_b
+! i=2
+! write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
+! 
+! ! H
+! i=3
+! write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),M_Reso*100d0,Lifetime,Spin
+! 
+! ! tb
+! i=4
+! write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),m_top*100d0,Lifetime,Spin
+! 
+! ! t
+! i=5
+! write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),m_top*100d0,Lifetime,Spin
+! 
+! 
+! if( TopDecays.ne.0 ) then
+! 
+!     ! W-
+!     i=12
+!     write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), 0,0 ,MomDummy(2:4,i),MomDummy(1,i),M_W*100d0,Lifetime,Spin
+! 
+!     ! W+
+!     i=13
+!     write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), 0,0 ,MomDummy(2:4,i),MomDummy(1,i),M_W*100d0,Lifetime,Spin
+! 
+!     ! bb
+!     i=6
+!     write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
+! 
+!     ! e-
+!     i=7
+!     write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
+! 
+!     ! nub
+!     i=8
+!     write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
+! 
+!     ! b
+!     i=9
+!     write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
+! 
+!     ! e+
+!     i=10
+!     write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
+! 
+!     ! nu
+!     i=11
+!     write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
+! endif
 
 
 write(io_LHEOutFile,"(A)") "</event>"
@@ -1959,11 +1965,11 @@ use ModParameters
 use ModMisc
 ! use modTTBH
 implicit none
-real(8) :: Mom(1:4,1:11),MomMELA(1:4,1:13)
+real(8) :: Mom(1:4,1:13),MomMELA(1:4,1:13)
 logical :: applyPSCut
 integer :: NBin(:)
 real(8) :: pT_t,pT_H,pT_tbar,MatElSq_H0,MatElSq_H1,D_0minus
-integer, parameter :: tbar=4,t=5,Hbos=3,inLeft=1,inRight=2,bbar=6, lepM=7,nubar=8,b=9,lepP=10,nu=11
+integer, parameter :: inLeft=1,inRight=2,Hbos=3,tbar=4,t=5,  bbar=6,Wm=7,lepM=8,nubar=9,  b=10,Wp=11,lepP=12,nu=13
 logical,save :: FirstTime=.true.
 
 
@@ -1984,7 +1990,7 @@ logical,save :: FirstTime=.true.
 !     endif
 !     MomMELA(1:4,1) = -(/         65d0,           0.0000000000000000d0, 0.0000000000000000d0,      65d0           /)
 !     MomMELA(1:4,2) = -(/         65d0,           0.0000000000000000d0, 0.0000000000000000d0,     -65d0           /)  
-!     MomMELA(1:4,3:11) = Mom(1:4,3:11)
+!     MomMELA(1:4,3:11) = Mom(1:4,3:11)  remap here because of new W bosons
 !     MomMELA(1:4,12:13) = 0d0
 !     
 !     call EvalXSec_PP_TTBH(MomMELA(1:4,1:13),(/(1d0,0d0),(0d0,0d0)/),TopDecays,2,MatElSq_H0)
@@ -2510,7 +2516,7 @@ real(8) :: DKRnd
 !    IDUP(9)  -->  MomDK(:,3)  -->  ubar-spinor
 
 
-
+   ICOLUP(:,:) = 0
    if( DecayMode1.eq.0 ) then! Z1->2l
         call random_number(DKRnd)
         MY_IDUP(4) = Z0_
