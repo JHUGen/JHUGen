@@ -2800,8 +2800,8 @@ implicit none
 
         if( .not. ReadLHEFile ) then
             write(io_LHEOutFile ,'(A)') ''
-            write(io_LHEOutFile ,'(A,F5.1,A)') 'hmass   ',M_Reso*100d0,',     ! Higgs boson mass'
-            write(io_LHEOutFile ,'(A,F8.5,A)') 'hwidth ',Ga_Reso*100d0,',   ! Higgs boson width'
+            write(io_LHEOutFile ,'(A,F5.1,A)') 'hmass   ',M_Reso*100d0,'     ! Higgs boson mass'
+            write(io_LHEOutFile ,'(A,F8.5,A)') 'hwidth ',Ga_Reso*100d0,'   ! Higgs boson width'
             write(io_LHEOutFile ,'(A)') ''
         endif
 
