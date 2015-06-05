@@ -55,6 +55,7 @@ END PROGRAM
 SUBROUTINE GetCommandlineArgs()
 use ModParameters
 use ModKinematics
+use ModMisc
 implicit none
 character :: arg*(500)
 integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
@@ -242,18 +243,35 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
        DecayMode2 = DecayMode1
     endif 
 
-    if(Process.eq.50)then
-      DecayMode2=DecayMode1
-      if(Collider.eq.2)then
-        print *, "Collider 2 not available for VH"
-        stop
-      endif
+    if( Process.eq.50 ) then
+        DecayMode2=DecayMode1
+        if( Collider.eq.2 ) then
+          print *, "Collider 2 not available for VH"
+          stop
+        endif
     endif
     if( (IsAZDecay(DecayMode1).eqv..false.) .and. (Collider.ne.1) ) then
       print *, "WH with Collider 1 only"
       stop
     endif
 
+    
+    if( (TopDecays.ne.0) .and. (Process.eq.80) ) then! TTBH
+       if( TopDecays.ne.1 ) call Error("TopDecays=2,3,4 are no longer supported. Use DecayMode1/2.")
+       if( .not. IsAWDecay(DecayMode1) ) call Error("Invalid DecayMode1 for top decays")
+       if( .not. IsAWDecay(DecayMode2) ) call Error("Invalid DecayMode2 for top decays")
+       if( DecayMode1.eq.4 .and. DecayMode2.eq.4 ) then
+          TopDecays = 1
+       elseif( DecayMode1.eq.5 .and. DecayMode2.eq.5 ) then
+          TopDecays = 2
+       elseif( DecayMode1.eq.5 .and. DecayMode2.eq.4 ) then 
+          TopDecays = 3
+       elseif( DecayMode1.eq.4 .and. DecayMode2.eq.6 ) then 
+          TopDecays = 4
+       else
+          call Error("Tau decay modes not yet supported in top decays")
+       endif
+    endif
 
     if( IsAZDecay(DecayMode1) ) then
        M_V = M_Z
@@ -3144,7 +3162,7 @@ implicit none
         write(io_stdout,"(4X,A)") "              4=W->lnu, 5=W->2q, 6=W->taunu,"
         write(io_stdout,"(4X,A)") "              7=gamma, 8=Z->2l+2tau,"
         write(io_stdout,"(4X,A)") "              9=Z->anything, 10=W->lnu+taunu, 11=W->anything"
-        write(io_stdout,"(4X,A)") "TopDK:      decay mode for tops in ttbar+H, 0=stable, 1=di-lept, 2=full hadr., 3,4=lepton+jets"
+        write(io_stdout,"(4X,A)") "TopDK:      decay mode for tops in ttbar+H, 0=stable, 1=decaying (use DecayMode1/2 = 4,5 for W+/W-"
         write(io_stdout,"(4X,A)") "PChannel:   0=g+g, 1=q+qb, 2=both"
         write(io_stdout,"(4X,A)") "OffXVV:     off-shell option for resonance(X),or vector bosons(VV)"
         write(io_stdout,"(4X,A)") "PDFSet:     1=CTEQ6L1(default), 2=MSTW2008LO,  2xx=MSTW with eigenvector set xx=01..40), 3=NNPDF3.0LO"

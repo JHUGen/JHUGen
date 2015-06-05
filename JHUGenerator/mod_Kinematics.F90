@@ -726,9 +726,10 @@ write(io_LHEOutFile,"(I2,X,I3,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7)") NUP
 
 
 do i=1,NUP
-     TheMass = GetMass( MY_IDUP(i) ) / GeV
-     if( abs(MY_IDUP(i)).eq.Bot_ ) TheMass = 0.0d0  
-     write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),TheMass,Lifetime,Spin
+     TheMass = GetMass( MY_IDUP(i) )
+!      if( abs(MY_IDUP(i)).eq.Bot_ ) TheMass = 0.0d0  
+     if( TheMass.le.m_bot .or. TheMass.le.4.2d0*GeV  ) TheMass = 0.0d0  
+     write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),TheMass*100d0,Lifetime,Spin
 enddo
 
 ! ! parton_a
