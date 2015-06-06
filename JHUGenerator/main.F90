@@ -260,17 +260,17 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
        if( TopDecays.ne.1 ) call Error("TopDecays=2,3,4 are no longer supported. Use DecayMode1/2.")
        if( .not. IsAWDecay(DecayMode1) ) call Error("Invalid DecayMode1 for top decays")
        if( .not. IsAWDecay(DecayMode2) ) call Error("Invalid DecayMode2 for top decays")
-       if( DecayMode1.eq.4 .and. DecayMode2.eq.4 ) then
+!        if( DecayMode1.eq.4 .and. DecayMode2.eq.4 ) then
           TopDecays = 1
-       elseif( DecayMode1.eq.5 .and. DecayMode2.eq.5 ) then
-          TopDecays = 2
-       elseif( DecayMode1.eq.5 .and. DecayMode2.eq.4 ) then 
-          TopDecays = 3
-       elseif( DecayMode1.eq.4 .and. DecayMode2.eq.6 ) then 
-          TopDecays = 4
-       else
-          call Error("Tau decay modes not yet supported in top decays")
-       endif
+!        elseif( DecayMode1.eq.5 .and. DecayMode2.eq.5 ) then
+!           TopDecays = 2
+!        elseif( DecayMode1.eq.5 .and. DecayMode2.eq.4 ) then 
+!           TopDecays = 3
+!        elseif( DecayMode1.eq.4 .and. DecayMode2.eq.6 ) then 
+!           TopDecays = 4
+!        else
+!           call Error("Tau decay modes not yet supported in top decays")
+!        endif
     endif
 
     if( IsAZDecay(DecayMode1) ) then
@@ -2921,7 +2921,7 @@ character :: arg*(500)
     if( IsAZDecay(DecayMode1) .or. IsAZDecay(DecayMode2) ) write(TheUnit,"(4X,A,F6.3,A,F6.4)") "Z-boson: mass=",M_Z*100d0,", width=",Ga_Z*100d0
     if( IsAWDecay(DecayMode1) .or. IsAWDecay(DecayMode2) ) write(TheUnit,"(4X,A,F6.3,A,F6.4)") "W-boson: mass=",M_W*100d0,", width=",Ga_W*100d0
     if( Process.eq.80 ) write(TheUnit,"(4X,A,F8.4,A,F6.4)") "Top quark mass=",m_top*100d0,", width=",Ga_top*100d0
-    if( Process.eq.80 ) write(TheUnit,"(4X,A,I2)") "Top quark decay=",TOPDECAYS
+!     if( Process.eq.80 ) write(TheUnit,"(4X,A,I2)") "Top quark decay=",TOPDECAYS
     if( Process.eq.90 ) write(TheUnit,"(4X,A,F8.4,A,F6.4)") "Bottom quark mass=",m_top*100d0
     if( (ReadLHEFile) .and. (RequestNLeptons.gt.0) .and. (RequestOSSF) ) write(TheUnit,"(4X,A,I2,A)") "Lepton filter activated. Requesting ",RequestNLeptons," OSSF leptons."
     if( (ReadLHEFile) .and. (RequestNLeptons.gt.0) .and. .not. (RequestOSSF)) write(TheUnit,"(4X,A,I2,A)") "Lepton filter activated. Requesting ",RequestNLeptons," leptons."

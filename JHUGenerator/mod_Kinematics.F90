@@ -711,7 +711,21 @@ do i=1,13
     MomDummy(4,i) = 100.0d0*Mom(4,i)
 enddo
 
+! introduce lepton masses for LHE output  
+call ShiftMass(Mom(1:4,LepP),Mom(1:4,Nu),    GetMass(MY_IDUP(LepP)),0d0,  MomDummy(1:4,LepP),MomDummy(1:4,Nu) )
+call ShiftMass(Mom(1:4,LepM),Mom(1:4,Nubar), GetMass(MY_IDUP(LepM)),0d0,  MomDummy(1:4,LepM),MomDummy(1:4,Nubar) )
+MomDummy(1:4,LepP) = MomDummy(1:4,LepP) *100d0 
+MomDummy(1:4,Nu)   = MomDummy(1:4,Nu)   *100d0
+MomDummy(1:4,LepM) = MomDummy(1:4,LepM) *100d0
+MomDummy(1:4,Nubar)= MomDummy(1:4,Nubar)*100d0
 
+! introduce b-quark mass for LHE output 
+call ShiftMass(Mom(1:4,b),   Mom(1:4,Wp),m_bot,M_W,  MomDummy(1:4,b),   MomDummy(1:4,Wp) )
+call ShiftMass(Mom(1:4,bbar),Mom(1:4,Wm),m_bot,M_W,  MomDummy(1:4,bbar),MomDummy(1:4,Wm) )
+MomDummy(1:4,b)   = MomDummy(1:4,b)   *100d0
+MomDummy(1:4,Wp)  = MomDummy(1:4,Wp)  *100d0
+MomDummy(1:4,bbar)= MomDummy(1:4,bbar)*100d0
+MomDummy(1:4,Wm)  = MomDummy(1:4,Wm)  *100d0
 
 
 write(io_LHEOutFile,"(A)") "<event>"
@@ -724,76 +738,19 @@ write(io_LHEOutFile,"(I2,X,I3,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7)") NUP
 ! (*) alpha_QED coupling for this event 
 ! (*) alpha_s coupling for this event
 
-
 do i=1,NUP
      TheMass = GetMass( MY_IDUP(i) )
 !      if( abs(MY_IDUP(i)).eq.Bot_ ) TheMass = 0.0d0  
-     if( TheMass.le.m_bot .or. TheMass.le.4.2d0*GeV  ) TheMass = 0.0d0  
+!      if( TheMass.le.m_bot .or. TheMass.le.4.2d0*GeV  ) TheMass = 0.0d0  
+     if( i.le.2  ) TheMass = 0.0d0  ! setting initial parton masses to zero
      write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),TheMass*100d0,Lifetime,Spin
 enddo
-
-! ! parton_a
-! i=1
-! write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
-! 
-! ! parton_b
-! i=2
-! write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
-! 
-! ! H
-! i=3
-! write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),M_Reso*100d0,Lifetime,Spin
-! 
-! ! tb
-! i=4
-! write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),m_top*100d0,Lifetime,Spin
-! 
-! ! t
-! i=5
-! write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),m_top*100d0,Lifetime,Spin
-! 
-! 
-! if( TopDecays.ne.0 ) then
-! 
-!     ! W-
-!     i=12
-!     write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), 0,0 ,MomDummy(2:4,i),MomDummy(1,i),M_W*100d0,Lifetime,Spin
-! 
-!     ! W+
-!     i=13
-!     write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), 0,0 ,MomDummy(2:4,i),MomDummy(1,i),M_W*100d0,Lifetime,Spin
-! 
-!     ! bb
-!     i=6
-!     write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
-! 
-!     ! e-
-!     i=7
-!     write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
-! 
-!     ! nub
-!     i=8
-!     write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
-! 
-!     ! b
-!     i=9
-!     write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
-! 
-!     ! e+
-!     i=10
-!     write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
-! 
-!     ! nu
-!     i=11
-!     write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
-! endif
 
 
 write(io_LHEOutFile,"(A)") "</event>"
 
 
-
-
+RETURN
 END SUBROUTINE
 
 

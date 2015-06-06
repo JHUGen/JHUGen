@@ -52,15 +52,16 @@ real(8),parameter :: Nc=3,NFlav=2
 !         if( Flavor.eq.ATop_ ) call    vSpi_Dirac(dcmplx(TopMom(1:4)),M_Top,TopHel,Spinor(1:4))
         Spinor(1:4) = 0d0
         RETURN
-    elseif( TOPDECAYS.eq.1 ) then
-        NWAFactor_Top = 1d0/dsqrt(2d0*Ga_Top*m_Top)
-    elseif( TOPDECAYS.eq.2 ) then
-        NWAFactor_Top = 1d0/dsqrt(2d0*Ga_Top*m_Top)    
-        NWAFactor_Top = NWAFactor_Top * dsqrt(dsqrt(Nc*NFlav)**2)
-    elseif( TOPDECAYS.eq.3 .or. TOPDECAYS.eq.4 ) then
-        NWAFactor_Top = 1d0/dsqrt(2d0*Ga_Top*m_Top)
-        NWAFactor_Top = NWAFactor_Top * dsqrt(dsqrt(Nc*NFlav))
     endif
+!     elseif( TOPDECAYS.eq.1 ) then
+    NWAFactor_Top = 1d0/dsqrt(2d0*Ga_Top*m_Top)
+!     elseif( TOPDECAYS.eq.2 ) then
+!         NWAFactor_Top = 1d0/dsqrt(2d0*Ga_Top*m_Top)    
+!         NWAFactor_Top = NWAFactor_Top * dsqrt(dsqrt(Nc*NFlav)**2)
+!     elseif( TOPDECAYS.eq.3 .or. TOPDECAYS.eq.4 ) then
+!         NWAFactor_Top = 1d0/dsqrt(2d0*Ga_Top*m_Top)
+!         NWAFactor_Top = NWAFactor_Top * dsqrt(dsqrt(Nc*NFlav))
+!     endif
 
 
     if( Flavor.eq.Top_ ) then ! Top quark decay
