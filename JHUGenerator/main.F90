@@ -264,9 +264,9 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
           TopDecays = 1
        elseif( DecayMode1.eq.5 .and. DecayMode2.eq.5 ) then
           TopDecays = 2
-       elseif( DecayMode1.eq.5 .and. DecayMode2.eq.4 ) then 
+       elseif( (DecayMode1.eq.5 .and. DecayMode2.eq.4) .or. (DecayMode1.eq.4 .and. DecayMode2.eq.5) ) then 
           TopDecays = 3
-       elseif( DecayMode1.eq.4 .and. DecayMode2.eq.6 ) then 
+       elseif( (DecayMode1.eq.4 .and. DecayMode2.eq.6) .or. (DecayMode1.eq.6 .and. DecayMode2.eq.4) ) then 
           TopDecays = 4
        else
           call Error("Tau decay modes not yet supported in top decays")

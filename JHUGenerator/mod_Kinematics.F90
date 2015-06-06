@@ -2719,7 +2719,7 @@ real(8) :: FlavorRnd,sumCKM,Vsq(1:3)
     if( abs(Flavor).eq.abs(Up_) ) then
         if( FlavorRnd.le.Vsq(1) ) then!  u-->d
            GetCKMPartner = -sign(1,Flavor) * abs(Dn_)
-        elseif( FlavorRnd.le.Vsq(2) ) then!  u-->s
+        elseif( FlavorRnd.le.(Vsq(2)+Vsq(1)) ) then!  u-->s
            GetCKMPartner = -sign(1,Flavor) * abs(Str_)
         else!  u-->b
            GetCKMPartner = -sign(1,Flavor) * abs(Bot_)
@@ -2728,7 +2728,7 @@ real(8) :: FlavorRnd,sumCKM,Vsq(1:3)
     elseif( abs(Flavor).eq.abs(Chm_) ) then
         if( FlavorRnd.le.Vsq(2) ) then!  c-->s
            GetCKMPartner = -sign(1,Flavor) * abs(Str_)
-        elseif( FlavorRnd.le.Vsq(1) ) then!  c-->d
+        elseif( FlavorRnd.le.(Vsq(1)+Vsq(2)) ) then!  c-->d
            GetCKMPartner = -sign(1,Flavor) * abs(Dn_)
         else!  c-->b
            GetCKMPartner = -sign(1,Flavor) * abs(Bot_)
@@ -2737,7 +2737,7 @@ real(8) :: FlavorRnd,sumCKM,Vsq(1:3)
     elseif( abs(Flavor).eq.abs(Top_) ) then
         if( FlavorRnd.le.Vsq(3) ) then!  t-->b
            GetCKMPartner = -sign(1,Flavor) * abs(Bot_)
-        elseif( FlavorRnd.le.Vsq(2) ) then!  t-->s
+        elseif( FlavorRnd.le.(Vsq(2)+Vsq(3)) ) then!  t-->s
            GetCKMPartner = -sign(1,Flavor) * abs(Str_)
         else!  t-->d
            GetCKMPartner = -sign(1,Flavor) * abs(Dn_)
