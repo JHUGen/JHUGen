@@ -141,6 +141,7 @@ real(8) :: LO_Res_GG_Unpol,LO_Res_QQB_Unpol,PreFac,PDFFac1,PDFFac2
 integer :: NBin(1:NumHistograms),NHisto,iPartons(1:2),DKFlavor
 integer :: MY_IDUP(1:13),ICOLUP(1:2,1:13),nparton,DK_IDUP(1:6),DK_ICOLUP(1:2,3:6)
 logical :: applyPSCut,genEvt
+logical, parameter :: randomize_LplusJ=.true.
 integer, parameter :: inLeft=1,inRight=2,Hbos=3,tbar=4,t=5,  bbar=6,Wm=7,lepM=8,nubar=9,  b=10,Wp=11,lepP=12,nu=13
 include 'csmaxvalue.f'  
 EvalUnWeighted_TTBH = 0d0
@@ -168,7 +169,12 @@ EvalUnWeighted_TTBH = 0d0
       MomExt(1:4,lepP)= MomExt(1:4,11)
       MomExt(1:4,Wp)  = MomExt(1:4,lepP) + MomExt(1:4,nu)
       PSWgt = PSWgt * PSWgt2*PSWgt3
- 
+    
+      if( randomize_LplusJ ) then 
+         call random_number(DKRnd)
+         if( DKRnd.lt.0.5d0 ) call swapi(DecayMode1,DecayMode2)
+      endif
+    
       call VVBranchings(DK_IDUP(1:6),DK_ICOLUP(1:2,3:6))
       MY_IDUP(b)    = Bot_;        ICOLUP(1:2,b) = (/501,00/)
       MY_IDUP(Wp)   = DK_IDUP(1);  ICOLUP(1:2,Wp)   = (/000,000/)
@@ -180,7 +186,7 @@ EvalUnWeighted_TTBH = 0d0
       MY_IDUP(nubar)= DK_IDUP(5);  ICOLUP(1:2,nubar)= DK_ICOLUP(1:2,5)  
    else
       MY_IDUP(6:11)=-9999
-   endif 
+   endif
 !    call EvalPhasespace_HDecay(MomExt(1:4,3),yRnd(16:17),MomExt(1:4,12:13),PSWgt4)
 !    PSWgt = PSWgt * PSWgt4 
    FluxFac = 1d0/(2d0*EHat**2)
