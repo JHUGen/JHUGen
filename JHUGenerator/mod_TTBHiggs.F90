@@ -184,17 +184,20 @@ complex(8) :: ResOffSh(1:4,1:2),Res(1:2,1:2)
 complex(8) :: GluPol(1:4,1:2,1:2)
 integer :: hel4,TopHel1,TopHel2,nhel
 real(8),parameter :: c_aa=64.D0/3.D0, c_ab=-8.D0/3.D0
+integer, parameter :: inLeft=1,inRight=2,Hbos=3,tbar=4,t=5,  bbar=6,Wm=7,lepM=8,nubar=9,  b=10,Wp=11,lepP=12,nu=13
 SqAmp = 0d0
 
 
-     ExtParticles(1)%Mom(1:4) = Mom(1:4,4)
-     ExtParticles(2)%Mom(1:4) = Mom(1:4,5)
-     ExtParticles(3)%Mom(1:4) =-Mom(1:4,1)
-     ExtParticles(4)%Mom(1:4) =-Mom(1:4,2)
-     ExtParticles(7)%Mom(1:4) = Mom(1:4,3)
+     ExtParticles(1)%Mom(1:4) = Mom(1:4,tbar)
+     ExtParticles(2)%Mom(1:4) = Mom(1:4,t)
+     ExtParticles(3)%Mom(1:4) =-Mom(1:4,inLeft)
+     ExtParticles(4)%Mom(1:4) =-Mom(1:4,inRight)
+     ExtParticles(7)%Mom(1:4) = Mom(1:4,Hbos)
 
-     call TopDecay(ATop_,Mom(1:4,6:8),ExtParticles(1)%Pol(1:4))
-     call TopDecay(Top_,Mom(1:4,9:11),ExtParticles(2)%Pol(1:4))
+     if( TOPDECAYS.ne.0 ) then
+        call TopDecay(ATop_,(/Mom(1:4,bbar),Mom(1:4,lepM),Mom(1:4,nubar)/),ExtParticles(1)%Pol(1:4))
+        call TopDecay(Top_,(/Mom(1:4,b),Mom(1:4,lepP),Mom(1:4,nu)/),ExtParticles(2)%Pol(1:4))
+     endif
      ExtParticles(7)%Pol(1:4) = 1d0
 !    call HDecay(ExtParticles(7),DK_LO,MomExt(1:4,12:13))
      GluPol(1:4,1,1) = pol_mless(ExtParticles(3)%Mom(1:4),+1,outgoing=.true.)
@@ -202,7 +205,7 @@ SqAmp = 0d0
      GluPol(1:4,2,1) = pol_mless(ExtParticles(4)%Mom(1:4),+1,outgoing=.true.)
      GluPol(1:4,2,2) = pol_mless(ExtParticles(4)%Mom(1:4),-1,outgoing=.true.)
 !      GluPol(1:4,1,1) = ExtParticles(3)%Mom(1:4);  GluPol(1:4,1,2) = ExtParticles(3)%Mom(1:4); print *, "checking gauge invariance"
-
+       
 
      nhel=-1
      if( TOPDECAYS.EQ.0 ) nhel=+1
@@ -235,8 +238,6 @@ SqAmp = 0d0
     
     SqAmp = SqAmp * SpinAvg * GluonColAvg**2 * (4d0*Pi*alphas)**2  !* (4d0*pi*alpha_QED) * (m_top/(2d0*sitW*M_W))**2
 
-!     print *, "SqAmp",SqAmp
-!     pause
     
 RETURN
 END SUBROUTINE
@@ -255,17 +256,19 @@ complex(8) :: ResOffSh(1:4),Res(1:2)
 complex(8) :: QuaPol(1:4,1:2,1:2)
 integer :: hel4,TopHel1,TopHel2,nhel
 real(8),parameter :: c_aa=8.0D0
+integer, parameter :: inLeft=1,inRight=2,Hbos=3,tbar=4,t=5,  bbar=6,Wm=7,lepM=8,nubar=9,  b=10,Wp=11,lepP=12,nu=13
 SqAmp = 0d0
 
+     ExtParticles(1)%Mom(1:4) = Mom(1:4,tbar)
+     ExtParticles(2)%Mom(1:4) = Mom(1:4,t)
+     ExtParticles(5)%Mom(1:4) =-Mom(1:4,inLeft)
+     ExtParticles(6)%Mom(1:4) =-Mom(1:4,inRight)
+     ExtParticles(7)%Mom(1:4) = Mom(1:4,Hbos)
 
-     ExtParticles(1)%Mom(1:4) = Mom(1:4,4)
-     ExtParticles(2)%Mom(1:4) = Mom(1:4,5)
-     ExtParticles(5)%Mom(1:4) =-Mom(1:4,1)
-     ExtParticles(6)%Mom(1:4) =-Mom(1:4,2)
-     ExtParticles(7)%Mom(1:4) = Mom(1:4,3)
-
-     call TopDecay(ATop_,Mom(1:4,6:8),ExtParticles(1)%Pol(1:4))
-     call TopDecay(Top_,Mom(1:4,9:11),ExtParticles(2)%Pol(1:4))
+     if( TOPDECAYS.ne.0 ) then
+        call TopDecay(ATop_,(/Mom(1:4,bbar),Mom(1:4,lepM),Mom(1:4,nubar)/),ExtParticles(1)%Pol(1:4))
+        call TopDecay(Top_,(/Mom(1:4,b),Mom(1:4,lepP),Mom(1:4,nu)/),ExtParticles(2)%Pol(1:4))
+     endif
      ExtParticles(7)%Pol(1:4) = 1d0
 !    call HDecay(ExtParticles(7),DK_LO,MomExt(1:4,12:13))
      call ubarSpi_Dirac(ExtParticles(6)%Mom(1:4),0d0,-1,QuaPol(1:4,1,1))
@@ -273,7 +276,8 @@ SqAmp = 0d0
      call    vSpi_Dirac(ExtParticles(5)%Mom(1:4),0d0,-1,QuaPol(1:4,2,1))    
      call    vSpi_Dirac(ExtParticles(5)%Mom(1:4),0d0,+1,QuaPol(1:4,2,2))    
        
-
+       
+       
      nhel=-1
      if( TOPDECAYS.EQ.0 ) nhel=+1
      do TopHel1=-1,nhel,2

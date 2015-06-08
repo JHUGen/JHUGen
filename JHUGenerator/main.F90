@@ -55,6 +55,7 @@ END PROGRAM
 SUBROUTINE GetCommandlineArgs()
 use ModParameters
 use ModKinematics
+use ModMisc
 implicit none
 character :: arg*(500)
 integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
@@ -242,18 +243,35 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
        DecayMode2 = DecayMode1
     endif 
 
-    if(Process.eq.50)then
-      DecayMode2=DecayMode1
-      if(Collider.eq.2)then
-        print *, "Collider 2 not available for VH"
-        stop
-      endif
+    if( Process.eq.50 ) then
+        DecayMode2=DecayMode1
+        if( Collider.eq.2 ) then
+          print *, "Collider 2 not available for VH"
+          stop
+        endif
     endif
     if( (IsAZDecay(DecayMode1).eqv..false.) .and. (Collider.ne.1) ) then
       print *, "WH with Collider 1 only"
       stop
     endif
 
+    
+    if( (TopDecays.ne.0) .and. (Process.eq.80) ) then! TTBH
+       if( TopDecays.ne.1 ) call Error("TopDecays=2,3,4 are no longer supported. Use DecayMode1/2.")
+       if( .not. IsAWDecay(DecayMode1) ) call Error("Invalid DecayMode1 for top decays")
+       if( .not. IsAWDecay(DecayMode2) ) call Error("Invalid DecayMode2 for top decays")
+!        if( DecayMode1.eq.4 .and. DecayMode2.eq.4 ) then
+          TopDecays = 1
+!        elseif( DecayMode1.eq.5 .and. DecayMode2.eq.5 ) then
+!           TopDecays = 2
+!        elseif( DecayMode1.eq.5 .and. DecayMode2.eq.4 ) then 
+!           TopDecays = 3
+!        elseif( DecayMode1.eq.4 .and. DecayMode2.eq.6 ) then 
+!           TopDecays = 4
+!        else
+!           call Error("Tau decay modes not yet supported in top decays")
+!        endif
+    endif
 
     if( IsAZDecay(DecayMode1) ) then
        M_V = M_Z
@@ -1045,7 +1063,7 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
    VG(:,:) = VG(:,:)/dble(VegasNc0)
    TotalXSec = sum(  VG(:,:) )
    print *, ""    
-   write(io_stdout,*) "Total xsec",TotalXSec
+   write(io_stdout,"(1X,A,F8.3)") "Total xsec",TotalXSec
 
 
     RequEvents(:,:)=0
@@ -1058,7 +1076,7 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
    
     do i1=-5,5
     do j1=-5,5
-         if( VG(i1,j1).gt.1d-9 ) write(io_stdout,"(A,I4,I4,F8.3,I9)") "Fractional partonic xsec ", i1,j1,VG(i1,j1)/TotalXSec,RequEvents(i1,j1)
+         if( VG(i1,j1).gt.1d-9 ) write(io_stdout,"(1X,A,I4,I4,F8.3,I9)") "Fractional partonic xsec ", i1,j1,VG(i1,j1)/TotalXSec,RequEvents(i1,j1)
     enddo
     enddo
    
@@ -1541,6 +1559,7 @@ integer :: n,stat,iHiggs,VegasSeed
 integer,parameter :: InputLHEFormat = 1  !  1=POWHEG, 2=JHUGen (old format), 3=JHUGen (new format), 4=MadGraph
 
 
+
 if(InputLHEFormat.eq.1) then
   InputFmt0 = trim(POWHEG_Fmt0)
   InputFmt1 = trim(POWHEG_Fmt1)
@@ -1569,14 +1588,21 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
      do while ( .not.FirstEvent )
         read(16,fmt="(A160)",IOSTAT=stat,END=99) FirstLines
         if( FirstLines(1:5).eq."hmass" ) then 
-               read(FirstLines(6:13),fmt="(F7.1)") M_Reso
+               read(FirstLines(6:16),*) M_Reso
                M_Reso = M_Reso*GeV!  convert to units of 100GeV
                M_ResoSet=.true.
         endif
         if( FirstLines(1:6).eq."hwidth" ) then 
-               read(FirstLines(7:17),fmt="(F9.3)") Ga_Reso
+               read(FirstLines(7:16),*) Ga_Reso
                Ga_Reso = Ga_Reso*GeV!  convert to units of 100GeV
                Ga_ResoSet=.true.
+        endif
+        if( FirstLines(1:3).eq."-->" ) then
+            write(io_LHEOutFile ,"(A)") ""
+            write(io_LHEOutFile ,"(A)") "JHUGen Resonance parameters used for event generation:"
+            write(io_LHEOutFile ,"(A,F6.1,A)") "hmass  ",M_Reso*100d0,"        ! Higgs boson mass"
+            write(io_LHEOutFile ,"(A,F10.5,A)") "hwidth",Ga_Reso*100d0,"      ! Higgs boson width"
+            write(io_LHEOutFile ,"(A)") ""
         endif
         if( FirstLines(1:7).eq."<event>" ) then 
                FirstEvent=.true.
@@ -1600,12 +1626,11 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
         write(io_stdout,"(2X,A,1F7.2)")  "ERROR: Higgs width could not be read from LHE input file. Assuming default value",Ga_Reso*100d0
         write(io_LogFile,"(2X,A,1F7.2)") "ERROR: Higgs width could not be read from LHE input file. Assuming default value",Ga_Reso*100d0
      else
-        write(io_stdout,"(2X,A,1F7.5,A)") "A Higgs width of ",Ga_Reso*100d0," GeV was determined from the LHE input file."
-        write(io_LogFile,"(2X,A,1F7.5,A)") "A Higgs width of ",Ga_Reso*100d0," GeV was determined from the LHE input file."
+        write(io_stdout,"(2X,A,1F9.5,A)") "A Higgs width of ",Ga_Reso*100d0," GeV was determined from the LHE input file."
+        write(io_LogFile,"(2X,A,1F9.5,A)") "A Higgs width of ",Ga_Reso*100d0," GeV was determined from the LHE input file."
      endif
      write(io_stdout,"(A)") ""
      write(io_LogFile,"(A)") ""
-     
 
 
       print *, " finding maximal weight with ",VegasNc0," points"
@@ -1771,7 +1796,7 @@ character(len=*),parameter :: JHUGen_old_Fmt1 = "(I3,X,I2,X,I2,X,I2,X,I3,X,I3,X,
 character(len=*),parameter :: MadGra_Fmt0 = "(I2,A120)"
 character(len=*),parameter :: MadGra_Fmt1 = "(7X,I3,2X,I3,3X,I2,3X,I2,3X,I3,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1F3.0,X,1F3.0)"
 character(len=150) :: InputFmt0,InputFmt1
-logical :: FirstEvent,M_ResoSet
+logical :: FirstEvent,M_ResoSet,Ga_ResoSet
 integer :: nline,intDummy,Nevent
 integer :: LHE_IDUP(1:maxpart+3),   LHE_ICOLUP(1:2,1:maxpart+3),   LHE_MOTHUP(1:2,1:maxpart+3)
 integer :: LHE_IDUP_Part(1:maxpart),LHE_ICOLUP_Part(1:2,1:maxpart),LHE_MOTHUP_Part(1:2,1:maxpart+3)
@@ -1812,10 +1837,15 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
      do while ( .not.FirstEvent )
         read(16,fmt="(A160)",IOSTAT=stat,END=99) FirstLines
         if( FirstLines(1:5).eq."hmass" ) then 
-               read(FirstLines(6:13),fmt="(F7.0)") M_Reso
+               read(FirstLines(6:13),fmt="(F7.1)") M_Reso
                M_Reso = M_Reso*GeV!  convert to units of 100GeV
                M_ResoSet=.true.
         endif
+        if( FirstLines(1:6).eq."hwidth" ) then 
+               read(FirstLines(7:17),fmt="(F9.3)") Ga_Reso
+               Ga_Reso = Ga_Reso*GeV!  convert to units of 100GeV
+               Ga_ResoSet=.true.
+        endif       
         if( FirstLines(1:7).eq."<event>" ) then 
                FirstEvent=.true.
         else
@@ -1833,6 +1863,13 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
      else
         write(io_stdout,"(2X,A,1F7.2,A)") "A Higgs mass of ",M_Reso*100d0," GeV was determined from the LHE input file."
         write(io_LogFile,"(2X,A,1F7.2,A)") "A Higgs mass of ",M_Reso*100d0," GeV was determined from the LHE input file."
+     endif
+     if( .not. Ga_ResoSet ) then
+        write(io_stdout,"(2X,A,1F7.2)")  "ERROR: Higgs width could not be read from LHE input file. Assuming default value",Ga_Reso*100d0
+        write(io_LogFile,"(2X,A,1F7.2)") "ERROR: Higgs width could not be read from LHE input file. Assuming default value",Ga_Reso*100d0
+     else
+        write(io_stdout,"(2X,A,1F9.5,A)") "A Higgs width of ",Ga_Reso*100d0," GeV was determined from the LHE input file."
+        write(io_LogFile,"(2X,A,1F9.5,A)") "A Higgs width of ",Ga_Reso*100d0," GeV was determined from the LHE input file."
      endif
      write(io_stdout,"(A)") ""
      write(io_LogFile,"(A)") ""
@@ -2779,10 +2816,12 @@ implicit none
         write(io_LHEOutFile ,'(A)') '<!--'
         write(io_LHEOutFile ,'(A,A6,A)') 'Output from the JHUGenerator ',trim(JHUGen_Version),' described in arXiv:1001.3396 [hep-ph],arXiv:1208.4018 [hep-ph],arXiv:1309.4819 [hep-ph]'
 
-        write(io_LHEOutFile ,'(A)') ''
-        write(io_LHEOutFile ,'(A,F5.1,A)') 'hmass   ',M_Reso*100d0,'     ! Higgs boson mass'
-        write(io_LHEOutFile ,'(A,F8.5,A)') 'hwidth ',Ga_Reso*100d0,'   ! Higgs boson width'
-        write(io_LHEOutFile ,'(A)') ''
+        if( .not. ReadLHEFile ) then
+            write(io_LHEOutFile ,'(A)') ''
+            write(io_LHEOutFile ,'(A,F5.1,A)') 'hmass   ',M_Reso*100d0,'     ! Higgs boson mass'
+            write(io_LHEOutFile ,'(A,F8.5,A)') 'hwidth ',Ga_Reso*100d0,'   ! Higgs boson width'
+            write(io_LHEOutFile ,'(A)') ''
+        endif
 
         call WriteParameters(io_LHEOutFile)
 
@@ -2868,21 +2907,21 @@ character :: arg*(500)
     if( Collider.eq.0 ) write(TheUnit,"(4X,A,1F8.2)") "Collider: e+ e-, sqrt(s)=",Collider_Energy*100d0
     if( Collider.eq.1 ) write(TheUnit,"(4X,A,1F8.2)") "Collider: P-P, sqrt(s)=",Collider_Energy*100d0
     if( Collider.eq.2 ) write(TheUnit,"(4X,A,1F8.2)") "Collider: P-Pbar, sqrt(s)=",Collider_Energy*100d0
-    if( Process.eq.0 ) write(TheUnit,"(4X,A,F7.2,A,F6.3)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
-    if( Process.eq.1 ) write(TheUnit,"(4X,A,F7.2,A,F6.3)") "Resonance: spin=1, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
-    if( Process.eq.2 ) write(TheUnit,"(4X,A,F7.2,A,F6.3)") "Resonance: spin=2, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
-    if( Process.eq.60) write(TheUnit,"(4X,A,F7.2,A,F6.3)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
-    if( Process.eq.61) write(TheUnit,"(4X,A,F7.2,A,F6.3)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
-    if( Process.eq.50) write(TheUnit,"(4X,A,F7.2,A,F6.3)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
-    if( Process.eq.80) write(TheUnit,"(4X,A,F7.2,A,F6.3)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
-    if( Process.eq.90) write(TheUnit,"(4X,A,F7.2,A,F6.3)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
-    if( ReadLHEFile )    write(TheUnit,"(4X,A)") "           (This is ReadLHEFile mode. Resonance mass is read from LHE input file.)"
-    if( ConvertLHEFile ) write(TheUnit,"(4X,A)") "           (This is ConvertLHEFile mode. Resonance mass is read from LHE input file.)"
+    if( Process.eq.0 ) write(TheUnit,"(4X,A,F7.2,A,F7.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
+    if( Process.eq.1 ) write(TheUnit,"(4X,A,F7.2,A,F7.5)") "Resonance: spin=1, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
+    if( Process.eq.2 ) write(TheUnit,"(4X,A,F7.2,A,F7.5)") "Resonance: spin=2, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
+    if( Process.eq.60) write(TheUnit,"(4X,A,F7.2,A,F7.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
+    if( Process.eq.61) write(TheUnit,"(4X,A,F7.2,A,F7.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
+    if( Process.eq.50) write(TheUnit,"(4X,A,F7.2,A,F7.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
+    if( Process.eq.80) write(TheUnit,"(4X,A,F7.2,A,F7.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
+    if( Process.eq.90) write(TheUnit,"(4X,A,F7.2,A,F7.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
+    if( ReadLHEFile )    write(TheUnit,"(4X,A)") "           (This is ReadLHEFile mode. Resonance mass/width might be overwritten by LHE input parameters. See below.)"
+    if( ConvertLHEFile ) write(TheUnit,"(4X,A)") "           (This is ConvertLHEFile mode. Resonance mass/width might be overwritten by LHE input parameters. See below.)"
     write(TheUnit,"(4X,A,I2,2X,A,I2)") "DecayMode1:",DecayMode1, "DecayMode2:",DecayMode2
     if( IsAZDecay(DecayMode1) .or. IsAZDecay(DecayMode2) ) write(TheUnit,"(4X,A,F6.3,A,F6.4)") "Z-boson: mass=",M_Z*100d0,", width=",Ga_Z*100d0
     if( IsAWDecay(DecayMode1) .or. IsAWDecay(DecayMode2) ) write(TheUnit,"(4X,A,F6.3,A,F6.4)") "W-boson: mass=",M_W*100d0,", width=",Ga_W*100d0
     if( Process.eq.80 ) write(TheUnit,"(4X,A,F8.4,A,F6.4)") "Top quark mass=",m_top*100d0,", width=",Ga_top*100d0
-    if( Process.eq.80 ) write(TheUnit,"(4X,A,I2)") "Top quark decay=",TOPDECAYS
+!     if( Process.eq.80 ) write(TheUnit,"(4X,A,I2)") "Top quark decay=",TOPDECAYS
     if( Process.eq.90 ) write(TheUnit,"(4X,A,F8.4,A,F6.4)") "Bottom quark mass=",m_top*100d0
     if( (ReadLHEFile) .and. (RequestNLeptons.gt.0) .and. (RequestOSSF) ) write(TheUnit,"(4X,A,I2,A)") "Lepton filter activated. Requesting ",RequestNLeptons," OSSF leptons."
     if( (ReadLHEFile) .and. (RequestNLeptons.gt.0) .and. .not. (RequestOSSF)) write(TheUnit,"(4X,A,I2,A)") "Lepton filter activated. Requesting ",RequestNLeptons," leptons."
@@ -3123,7 +3162,7 @@ implicit none
         write(io_stdout,"(4X,A)") "              4=W->lnu, 5=W->2q, 6=W->taunu,"
         write(io_stdout,"(4X,A)") "              7=gamma, 8=Z->2l+2tau,"
         write(io_stdout,"(4X,A)") "              9=Z->anything, 10=W->lnu+taunu, 11=W->anything"
-        write(io_stdout,"(4X,A)") "TopDK:      decay mode for tops in ttbar+H, 0=stable, 1=di-lept, 2=full hadr., 3,4=lepton+jets"
+        write(io_stdout,"(4X,A)") "TopDK:      decay mode for tops in ttbar+H, 0=stable, 1=decaying (use DecayMode1/2 = 4,5 for W+/W-"
         write(io_stdout,"(4X,A)") "PChannel:   0=g+g, 1=q+qb, 2=both"
         write(io_stdout,"(4X,A)") "OffXVV:     off-shell option for resonance(X),or vector bosons(VV)"
         write(io_stdout,"(4X,A)") "PDFSet:     1=CTEQ6L1(default), 2=MSTW2008LO,  2xx=MSTW with eigenvector set xx=01..40), 3=NNPDF3.0LO"
