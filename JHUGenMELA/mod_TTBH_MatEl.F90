@@ -5875,7 +5875,7 @@ integer :: TopDecays! 0=stable, 1=di-leptonic
 complex(8) :: Spinor(1:4)
 real(8) :: zeros(1:6),TopMom(1:4),NWAFactor_Top
 complex(8) :: Spi(1:4),BarSpi(1:4),BotSpi(1:4),WCurr(1:4)
-real(8),parameter :: Nc=3,NFlav=2
+real(8),parameter :: Nc=3
 real(8) :: NWAFactor_W
 complex(8) :: WProp
 real(8) :: g2_weak
@@ -5914,10 +5914,10 @@ include "includeVars.F90"
         NWAFactor_Top = 1d0/dsqrt(2d0*Ga_Top*m_Top)
     elseif( TOPDECAYS.eq.2 ) then
         NWAFactor_Top = 1d0/dsqrt(2d0*Ga_Top*m_Top)    
-        NWAFactor_Top = NWAFactor_Top * dsqrt(dsqrt(Nc*NFlav)**2)
+        NWAFactor_Top = NWAFactor_Top * dsqrt(dsqrt(Nc)**2)
     elseif( TOPDECAYS.eq.3 .or. TOPDECAYS.eq.4 ) then
         NWAFactor_Top = 1d0/dsqrt(2d0*Ga_Top*m_Top)
-        NWAFactor_Top = NWAFactor_Top * dsqrt(dsqrt(Nc*NFlav))
+        NWAFactor_Top = NWAFactor_Top * dsqrt(dsqrt(Nc))
     endif
 
 
