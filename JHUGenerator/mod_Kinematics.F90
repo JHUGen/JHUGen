@@ -658,9 +658,6 @@ integer, parameter :: inLeft=1,inRight=2,Hbos=3,tbar=4,t=5,  bbar=6,Wm=7,lepM=8,
 ! The LHE numbering scheme can be found here: http://pdg.lbl.gov/mc_particle_id_contents.html and http://lhapdf.hepforge.org/manual#tth_sEcA
 
 
-do i=1,13
-    LHE_IDUP(i) = convertLHE( MY_IDUP(i) )
-enddo
 
 IDPRUP=100
 SCALUP=Mu_Fact * 100d0
@@ -704,28 +701,33 @@ endif
 Lifetime = 0.0d0
 Spin     = 0.1d0
 
-do i=1,13
+
+do i=1,NUP
+    LHE_IDUP(i) = convertLHE( MY_IDUP(i) )
     MomDummy(1,i) = 100.0d0*Mom(1,i)
     MomDummy(2,i) = 100.0d0*Mom(2,i)
     MomDummy(3,i) = 100.0d0*Mom(3,i)
     MomDummy(4,i) = 100.0d0*Mom(4,i)
 enddo
 
-! introduce lepton masses for LHE output  
-call ShiftMass(Mom(1:4,LepP),Mom(1:4,Nu),    GetMass(MY_IDUP(LepP)),0d0,  MomDummy(1:4,LepP),MomDummy(1:4,Nu) )
-call ShiftMass(Mom(1:4,LepM),Mom(1:4,Nubar), GetMass(MY_IDUP(LepM)),0d0,  MomDummy(1:4,LepM),MomDummy(1:4,Nubar) )
-MomDummy(1:4,LepP) = MomDummy(1:4,LepP) *100d0 
-MomDummy(1:4,Nu)   = MomDummy(1:4,Nu)   *100d0
-MomDummy(1:4,LepM) = MomDummy(1:4,LepM) *100d0
-MomDummy(1:4,Nubar)= MomDummy(1:4,Nubar)*100d0
 
-! introduce b-quark mass for LHE output 
-call ShiftMass(Mom(1:4,b),   Mom(1:4,Wp),m_bot,M_W,  MomDummy(1:4,b),   MomDummy(1:4,Wp) )
-call ShiftMass(Mom(1:4,bbar),Mom(1:4,Wm),m_bot,M_W,  MomDummy(1:4,bbar),MomDummy(1:4,Wm) )
-MomDummy(1:4,b)   = MomDummy(1:4,b)   *100d0
-MomDummy(1:4,Wp)  = MomDummy(1:4,Wp)  *100d0
-MomDummy(1:4,bbar)= MomDummy(1:4,bbar)*100d0
-MomDummy(1:4,Wm)  = MomDummy(1:4,Wm)  *100d0
+if( TopDecays.ne.0 ) then
+      ! introduce lepton masses for LHE output  
+      call ShiftMass(Mom(1:4,LepP),Mom(1:4,Nu),    GetMass(MY_IDUP(LepP)),0d0,  MomDummy(1:4,LepP),MomDummy(1:4,Nu) )
+      call ShiftMass(Mom(1:4,LepM),Mom(1:4,Nubar), GetMass(MY_IDUP(LepM)),0d0,  MomDummy(1:4,LepM),MomDummy(1:4,Nubar) )
+      MomDummy(1:4,LepP) = MomDummy(1:4,LepP) *100d0 
+      MomDummy(1:4,Nu)   = MomDummy(1:4,Nu)   *100d0
+      MomDummy(1:4,LepM) = MomDummy(1:4,LepM) *100d0
+      MomDummy(1:4,Nubar)= MomDummy(1:4,Nubar)*100d0
+
+      ! introduce b-quark mass for LHE output 
+      call ShiftMass(Mom(1:4,b),   Mom(1:4,Wp),m_bot,M_W,  MomDummy(1:4,b),   MomDummy(1:4,Wp) )
+      call ShiftMass(Mom(1:4,bbar),Mom(1:4,Wm),m_bot,M_W,  MomDummy(1:4,bbar),MomDummy(1:4,Wm) )
+      MomDummy(1:4,b)   = MomDummy(1:4,b)   *100d0
+      MomDummy(1:4,Wp)  = MomDummy(1:4,Wp)  *100d0
+      MomDummy(1:4,bbar)= MomDummy(1:4,bbar)*100d0
+      MomDummy(1:4,Wm)  = MomDummy(1:4,Wm)  *100d0
+endif
 
 
 write(io_LHEOutFile,"(A)") "<event>"
