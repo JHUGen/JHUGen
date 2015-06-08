@@ -701,6 +701,13 @@ Lifetime = 0.0d0
 Spin     = 0.1d0
 
 
+do i=1,5
+    LHE_IDUP(i) = convertLHE( MY_IDUP(i) )
+    MomDummy(1,i) = 100.0d0*Mom(1,i)
+    MomDummy(2,i) = 100.0d0*Mom(2,i)
+    MomDummy(3,i) = 100.0d0*Mom(3,i)
+    MomDummy(4,i) = 100.0d0*Mom(4,i)
+enddo
 
 if( TopDecays.ne.0 ) then
       ! introduce b-quark mass for LHE output 
@@ -712,7 +719,7 @@ if( TopDecays.ne.0 ) then
       call ShiftMass(Mom(1:4,LepM),MomDummy(1:4,Wm)-MomDummy(1:4,LepM), GetMass(MY_IDUP(LepM)),0d0,  MomDummy(1:4,LepM),MomDummy(1:4,Nubar) )
 endif
 
-do i=1,NUP
+do i=6,NUP
     LHE_IDUP(i) = convertLHE( MY_IDUP(i) )
     MomDummy(1,i) = 100.0d0*MomDummy(1,i)
     MomDummy(2,i) = 100.0d0*MomDummy(2,i)
