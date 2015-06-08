@@ -697,9 +697,20 @@ if( present(EventWeight) ) then
 else
     XWGTUP=1.0d0
 endif
-
 Lifetime = 0.0d0
 Spin     = 0.1d0
+
+
+
+if( TopDecays.ne.0 ) then
+      ! introduce b-quark mass for LHE output 
+      call ShiftMass(Mom(1:4,b),   Mom(1:4,Wp),m_bot,M_W,  MomDummy(1:4,b),   MomDummy(1:4,Wp) )
+      call ShiftMass(Mom(1:4,bbar),Mom(1:4,Wm),m_bot,M_W,  MomDummy(1:4,bbar),MomDummy(1:4,Wm) )
+
+      ! introduce lepton/quark masses for LHE output  
+      call ShiftMass(Mom(1:4,LepP),MomDummy(1:4,Wp)-MomDummy(1:4,LepP), GetMass(MY_IDUP(LepP)),0d0,  MomDummy(1:4,LepP),MomDummy(1:4,Nu) )
+      call ShiftMass(Mom(1:4,LepM),MomDummy(1:4,Wm)-MomDummy(1:4,LepM), GetMass(MY_IDUP(LepM)),0d0,  MomDummy(1:4,LepM),MomDummy(1:4,Nubar) )
+endif
 
 
 do i=1,NUP
@@ -710,24 +721,6 @@ do i=1,NUP
     MomDummy(4,i) = 100.0d0*Mom(4,i)
 enddo
 
-
-if( TopDecays.ne.0 ) then
-      ! introduce lepton masses for LHE output  
-      call ShiftMass(Mom(1:4,LepP),Mom(1:4,Nu),    GetMass(MY_IDUP(LepP)),0d0,  MomDummy(1:4,LepP),MomDummy(1:4,Nu) )
-      call ShiftMass(Mom(1:4,LepM),Mom(1:4,Nubar), GetMass(MY_IDUP(LepM)),0d0,  MomDummy(1:4,LepM),MomDummy(1:4,Nubar) )
-      MomDummy(1:4,LepP) = MomDummy(1:4,LepP) *100d0 
-      MomDummy(1:4,Nu)   = MomDummy(1:4,Nu)   *100d0
-      MomDummy(1:4,LepM) = MomDummy(1:4,LepM) *100d0
-      MomDummy(1:4,Nubar)= MomDummy(1:4,Nubar)*100d0
-
-      ! introduce b-quark mass for LHE output 
-      call ShiftMass(Mom(1:4,b),   Mom(1:4,Wp),m_bot,M_W,  MomDummy(1:4,b),   MomDummy(1:4,Wp) )
-      call ShiftMass(Mom(1:4,bbar),Mom(1:4,Wm),m_bot,M_W,  MomDummy(1:4,bbar),MomDummy(1:4,Wm) )
-      MomDummy(1:4,b)   = MomDummy(1:4,b)   *100d0
-      MomDummy(1:4,Wp)  = MomDummy(1:4,Wp)  *100d0
-      MomDummy(1:4,bbar)= MomDummy(1:4,bbar)*100d0
-      MomDummy(1:4,Wm)  = MomDummy(1:4,Wm)  *100d0
-endif
 
 
 write(io_LHEOutFile,"(A)") "<event>"
@@ -742,8 +735,6 @@ write(io_LHEOutFile,"(I2,X,I3,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7)") NUP
 
 do i=1,NUP
      TheMass = GetMass( MY_IDUP(i) )
-!      if( abs(MY_IDUP(i)).eq.Bot_ ) TheMass = 0.0d0  
-!      if( TheMass.le.m_bot .or. TheMass.le.4.2d0*GeV  ) TheMass = 0.0d0  
      if( i.le.2  ) TheMass = 0.0d0  ! setting initial parton masses to zero
      write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),TheMass*100d0,Lifetime,Spin
 enddo
