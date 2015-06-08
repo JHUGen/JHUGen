@@ -169,6 +169,7 @@ c--- MARKUS: define q^2 dependent couplings
       aa2 = aa2 / wmass**2 !-- F
       aa3 = aa3 / wmass**2 !-- F
 
+     
       anomwwamp = s3456 * aa1 * za(i3,i5)*zb(i6,i4) + 
      & aa2 * 0.5d0 * (za(i3,i5)**2*zb(i5,i4)*zb(i6,i3) + 
      &  za(i3,i5)*za(i4,i5)*zb(i5,i4)*zb(i6,i4) + 

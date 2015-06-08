@@ -712,7 +712,6 @@ if( TopDecays.ne.0 ) then
       call ShiftMass(Mom(1:4,LepM),MomDummy(1:4,Wm)-MomDummy(1:4,LepM), GetMass(MY_IDUP(LepM)),0d0,  MomDummy(1:4,LepM),MomDummy(1:4,Nubar) )
 endif
 
-
 do i=1,NUP
     LHE_IDUP(i) = convertLHE( MY_IDUP(i) )
     MomDummy(1,i) = 100.0d0*Mom(1,i)
@@ -720,6 +719,7 @@ do i=1,NUP
     MomDummy(3,i) = 100.0d0*Mom(3,i)
     MomDummy(4,i) = 100.0d0*Mom(4,i)
 enddo
+
 
 
 
@@ -738,8 +738,6 @@ do i=1,NUP
      if( i.le.2  ) TheMass = 0.0d0  ! setting initial parton masses to zero
      write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),TheMass*100d0,Lifetime,Spin
 enddo
-
-
 write(io_LHEOutFile,"(A)") "</event>"
 
 
