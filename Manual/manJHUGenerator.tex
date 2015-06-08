@@ -24,21 +24,21 @@ Manual for the JHU generator
 \begin{center}
 \small
 For simulation of a single-produced resonance at hadron colliders \\
-(version v5.2.5, release date March 17, 2014) \\
+(version v5.6.2, release date June 8, 2015) \\
 \normalsize
 \end{center}
 
 \noindent
-The generator from \cite{Gao:2010qx,Bolognesi:2012,Anderson:2013} is a model-independent generator for studying spin and parity properties of new resonances.  
-Please cite \cite{Gao:2010qx,Bolognesi:2012,Anderson:2013} if using the "JHU generator".  
-The code can be downloaded from \cite{thesite}.  
-The generator outputs LHE files which can be passed to parton shower programs for hadronization.  
+The generator from \cite{Gao:2010qx,Bolognesi:2012,Anderson:2013} is a model-independent generator for studying spin and parity properties of new resonances.
+Please cite \cite{Gao:2010qx,Bolognesi:2012,Anderson:2013} if using the "JHU generator".
+The code can be downloaded from \cite{thesite}.
+The generator outputs LHE files which can be passed to parton shower programs for hadronization.
 Only relative values of cross sections are supposed to produce meaningful results, while absolute values are often subject to an arbitrary normalization.
 
-Additionally, the package includes code for computing the matrix elements standalone which can be used in a numerical matrix element analysis.  
-Please reference the above papers and refer to "MELA" when using the matrix element likelihood analysis technique. 
-The latter was also introduced in Ref.~\cite{Chatrchyan:2012ufa}. The matrix element package (MELA) also depends 
-on MCFM libraries for background parameterization which should be referenced~\cite{Campbell:2010ff} when used. 
+Additionally, the package includes code for computing the matrix elements standalone which can be used in a numerical matrix element analysis.
+Please reference the above papers and refer to "MELA" when using the matrix element likelihood analysis technique.
+The latter was also introduced in Ref.~\cite{Chatrchyan:2012ufa}. The matrix element package (MELA) also depends
+on MCFM libraries for background parameterization which should be referenced~\cite{Campbell:2010ff} when used.
 
 \vspace{0.5cm}
 \begin{center}
@@ -82,14 +82,14 @@ The list of command line configurables and the default values are (also defined 
                    9=Z->anything, 10=W->lnu+taunu, 11=W->anything
     PChannel:    0=g+g, 1=q+qb, 2=both
     OffXVV:      off-shell option for resonance(X),or vector bosons(VV)
-    PDFSet:      1=CTEQ6L1(2001),  2=MSTW(2008),  
+    PDFSet:      1=CTEQ6L1(2001),  2=MSTW(2008),
                                    2xx=MSTW with eigenvector set xx=01..40,
                                    3=NNPDF3.0LO
     VegasNc0:    number of evaluations for integrand scan
     VegasNc1:    number of evaluations for accept-reject sampling
     VegasNc2:    number of events for accept-reject sampling
     Unweighted:  0=weighted events, 1=unweighted events
-    Interf:      0=neglect interference for 4f final states, 
+    Interf:      0=neglect interference for 4f final states,
                  1=include interference
     DataFile:    LHE output file
     ReadLHE:     LHE input file from external file (only spin-0)
@@ -101,8 +101,9 @@ The list of command line configurables and the default values are (also defined 
     FilterOSSF:  For decay mode, reject events that don't have 2 pairs of
                  opposite-sign-same-flavor leptons.  Taus can stand in place of electrons
                  or muons of the same charge.
-\end{verbatim}   
-   
+    LHAPDF:      PDF set to use if interfaced with LHAPDF.  See below.
+\end{verbatim}
+
 \noindent
 A few more details on some particular parameters:
 
@@ -112,6 +113,7 @@ A few more details on some particular parameters:
 \item \verb|PChannel|: This parameter is only meaningful in the spin-2 case and for $Hjj$, $Hj$, $ttH$, and $bbH$ production mechanisms.  For spin-0, production is possible only via the $gg$ process; for spin-1 and for the VBF and $VH$ processes, production is only possible via the $q\bar{q}$ process.
 \item \verb|DecayMode1,2=7|: Valid for spin-0 and spin-2.  Only OffXVV=000 or 100 are possible.
 \item In $VH$ production and \verb|ConvertLHE| mode, \verb|DecayMode1| is used for the decay of the $V$.  If it is a $Z$ decay mode, $ZH$ will be produced; if it is a $W$ decay mode, $WH$ will be produced.
+\item In $ttH$ production, \verb|DecayMode1| and \verb|DecayMode2| are used to decay the $W$ bosons from the top decay.  Only $W$ decay modes are allowed.
 \end{itemize}
 
 \noindent
@@ -129,11 +131,21 @@ Then, as an example of running the generator, you could do:
 \end{verbatim}
 - VH (both $pp$ and $e^+e^-$ Collider options possible):
 \begin{verbatim}
-./JHUGen Collider=1 Process=50 Unweighted=1 VegasNc2=100000 OffXVV=011 DataFile=test2 
+./JHUGen Collider=1 Process=50 Unweighted=1 VegasNc2=100000 OffXVV=011 DataFile=test2
+\end{verbatim}
+- ZH with hadronic $Z$ decay (change \verb|DecayMode1| for other $Z$ decays; both $pp$ and $e^+e^-$ Collider options possible):
+\begin{verbatim}
+./JHUGen Collider=1 Process=50 DecayMode1=1 Unweighted=1 VegasNc2=100000 \\
+		OffXVV=011 DataFile=test2
+\end{verbatim}
+- WH with leptonic $W$ decay (change \verb|DecayMode1| for other $W$ decays; both $pp$ and $e^+e^-$ Collider options possible):
+\begin{verbatim}
+./JHUGen Collider=1 Process=50 DecayMode1=4 Unweighted=1 VegasNc2=100000 \\
+		OffXVV=011 DataFile=test2
 \end{verbatim}
 - VBF:
 \begin{verbatim}
-./JHUGen Collider=1 Process=60 Unweighted=1 VegasNc2=100000 OffXVV=011 DataFile=test2 
+./JHUGen Collider=1 Process=60 Unweighted=1 VegasNc2=100000 OffXVV=011 DataFile=test2
 \end{verbatim}
 - H+jj:
 \begin{verbatim}
@@ -143,11 +155,15 @@ Then, as an example of running the generator, you could do:
 \begin{verbatim}
 ./JHUGen Collider=1 Process=62 Unweighted=1 VegasNc2=100000 OffXVV=011 DataFile=test4
 \end{verbatim}
-- $pp \to t\bar{t}+H$:
+- $pp \to t\bar{t}+H$ with inclusive top decay (change \verb|DecayMode1,2| for specific $tt$ decays):
 \begin{verbatim}
-./JHUGen Collider=1 Process=80 TopDK=1 Unweighted=1 VegasNc2=100000 OffXVV=011 DataFile=test5
+./JHUGen Collider=1 Process=80 DecayMode1=11 DecayMode2=11 Unweighted=1 \\
+		VegasNc2=100000 OffXVV=011 DataFile=test5
 \end{verbatim}
-
+- $pp \to b\bar{b}+H$:
+\begin{verbatim}
+./JHUGen Collider=1 Process=90 Unweighted=1 VegasNc2=100000 OffXVV=011 DataFile=test6
+\end{verbatim}
 
 
 %\begin{center}
@@ -157,7 +173,7 @@ Then, as an example of running the generator, you could do:
 %\footnotesize
 %{\it N.B.}
 %There is a beta-version of the generator which has improved efficiency for the generation.  However, it is currently only available for gluon-gluon initiated processes.
-%It is by default turned off, but it can be accessed in the file \verb|main.F90|.  The beta version is currently still under validation. 
+%It is by default turned off, but it can be accessed in the file \verb|main.F90|.  The beta version is currently still under validation.
 %\begin{verbatim}
 %logical,parameter :: useBetaVersion=.false.
 %\end{verbatim}
@@ -175,12 +191,12 @@ may be generated by Pythia without loss of generality.
 \subsection{ Configuration in parameter file  }
 
 In the file \verb|mod_Parameters.F90|, one does all the configuration of the couplings of the resonance.
-After modifying this file, one needs to recompile. 
+After modifying this file, one needs to recompile.
 
 \subsubsection{ General parameters }
 
 \noindent
-Each generation run is different when this is \verb|.true.| 
+Each generation run is different when this is \verb|.true.|
 
 \begin{verbatim}
 seed_random = .true.
@@ -197,9 +213,9 @@ channels_ratio_fix = 0.25d0    ! desired ratio of
 
 
 \noindent
-For final states with a Z-boson decaying into $f\bar f$, intermediate off-shell photons can be included by switching 
+For final states with a Z-boson decaying into $f\bar f$, intermediate off-shell photons can be included by switching
 \begin{verbatim}
-logical, public, parameter :: includeGammaStar = .false. 
+logical, public, parameter :: includeGammaStar = .false.
 \end{verbatim}
 to the value \verb|.true.|. In such case, a lower cut on the photon invariant mass has to be placed in order to avoid the
 collinear singularity. This cutoff parameter is controlled by
@@ -208,7 +224,7 @@ real(8),parameter :: MPhotonCutoff = 4d0*GeV.
 \end{verbatim}
 
 \noindent
-For $VV$ decay, by default the $V$'s are randomized so that, for example, \verb|DecayMode1=5 DecayMode2=11| will produce all combinations that include at least one hadronic $W$ decay (rather of specifically hadronic decay of the $W^+$).  This can be switched off by changing
+For $VV$ decay (and similarly in $ttH$ production), by default the $V$'s are randomized so that, for example, \verb|DecayMode1=5 DecayMode2=11| will produce all combinations that include at least one hadronic $W$ decay (rather of specifically hadronic decay of the $W^+$).  This can be switched off by changing
 \begin{verbatim}
 logical, public, parameter :: RandomizeVV = .true.
 \end{verbatim}
@@ -223,7 +239,7 @@ Interf=0 or 1
 \noindent
 For the generation of weighted events (command line \verb|Unweighted=0|) an LHE output file is created if
 \begin{verbatim}
-logical, public, parameter :: writeWeightedLHE = .false. 
+logical, public, parameter :: writeWeightedLHE = .false.
 \end{verbatim}
 is set to \verb|.true.|.
 
@@ -262,7 +278,7 @@ real(8), public, parameter :: gwsq = 4.0d0 * M_W**2/vev**2  ! weak constant squa
 real(8), public, parameter :: alpha_QED = 1d0/132.2319d0    ! el.magn. coupling
 real(8), public, parameter :: alphas = 0.13229060d0         ! strong coupling
 real(8), public, parameter :: sitW = dsqrt(0.23119d0)       ! sin(Theta_Weinberg) (PDG-2008)
-real(8), public            :: Mu_Fact                       ! pdf factorization scale 
+real(8), public            :: Mu_Fact                       ! pdf factorization scale
                                                             ! (set to M_Reso in main.F90)
 real(8), public, parameter :: LHC_Energy=14000d0  *GeV      ! LHC hadronic center of mass energy
 real(8), public, parameter :: TEV_Energy=1960d0  *GeV       ! Tevatron hadronic center of mass
@@ -275,10 +291,10 @@ real(8), public, parameter :: POL_A = 0d0                   !e+ polarization. 0:
 real(8), public, parameter :: POL_B = 0d0                   !e- polarization. 0: no polarization,
                                                                               100: helicity = 1,
                                                                               -100: helicity = -1
-logical, public, parameter :: H_DK =.true.                  !default to false so H in 
+logical, public, parameter :: H_DK =.true.                  !default to false so H in
                                                              V > VH (Process = 50) does not decay
 real(8), public, parameter :: ptjetcut = 15d0*GeV           ! jet min pt
-real(8), public, parameter :: Rjet = 0.5d0                  ! jet deltaR, antikt algorithm 
+real(8), public, parameter :: Rjet = 0.5d0                  ! jet deltaR, antikt algorithm
 \end{verbatim}
 
 
@@ -315,17 +331,17 @@ These default values rescale the branchings to include the NLO QCD corrections (
 {\it N.B.  The parameters "ptjetcut" and "Rjet" only apply to Process=60,61.}
 
 \noindent
-The \verb|*hg*| parameters control the coupling of a spin-0 resonance to gluons in the production mechanism.  
-In practice, the production parameters are not having a large effect since angular corrections from the production mechanism are lost for spinless particles.  
-The \verb|*hz*| parameters control the decay into $Z$ and $W$ bosons.  
-One has the options to set the spin-0 couplings either from Eq.(9) or Eq.(11) from Ref.~\cite{Bolognesi:2012}.  
-To switch between the two, use the parameter \verb|generate_as|.  
+The \verb|*hg*| parameters control the coupling of a spin-0 resonance to gluons in the production mechanism.
+In practice, the production parameters are not having a large effect since angular corrections from the production mechanism are lost for spinless particles.
+The \verb|*hz*| parameters control the decay into $Z$ and $W$ bosons.
+One has the options to set the spin-0 couplings either from Eq.(9) or Eq.(11) from Ref.~\cite{Bolognesi:2012}.
+To switch between the two, use the parameter \verb|generate_as|.
 %For the parameters in Eq.(9) from Ref.~\cite{Bolognesi:2012}, we now allow for $q^2$ dependent form factors as described in Eq.(3) of~\cite{Anderson:2013} as:
 We now allow for $q^2$ dependent form factors as described in Ref.~\cite{Anderson:2013} and given in more detail in the equation below:
 \[
-g_i(q_1^2,q_2^2) = 
-g_i^{\rm SM} 
-+ g_i' \frac{\Lambda_i^4}{(\Lambda_i^2 + |q_1^2|)(\Lambda_i^2 + |q_2^2|)} 
+g_i(q_1^2,q_2^2) =
+g_i^{\rm SM}
++ g_i' \frac{\Lambda_i^4}{(\Lambda_i^2 + |q_1^2|)(\Lambda_i^2 + |q_2^2|)}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 \]
 \[
@@ -337,7 +353,7 @@ g_i^{\rm SM}
 + g_i^{\prime 7}  \frac{|q_1^2| \, |q_2^2|}{\Lambda_i^4}
 \]
 \noindent
-The user has the option to choose between these functional forms, 
+The user has the option to choose between these functional forms,
 where the term multiplying $g_i'$ corresponds to the full functional form and the $g_i''... g_i'''''' $ correspond to an expansion in $\Lambda^2$.
 All parameters can be modified in \verb|mod_Parameters.F90| by:
 \begin{verbatim}
@@ -359,7 +375,7 @@ All parameters can be modified in \verb|mod_Parameters.F90| by:
    complex(8), public, parameter :: ghz1 = (2.0d0,0d0)
    complex(8), public, parameter :: ghz2 = (0.0d0,0d0)
    complex(8), public, parameter :: ghz3 = (0.0d0,0d0)
-   complex(8), public, parameter :: ghz4 = (0.0d0,0d0)   ! pseudoscalar 
+   complex(8), public, parameter :: ghz4 = (0.0d0,0d0)   ! pseudoscalar
 
 !-- parameters that define q^2 dependent form factors
    complex(8), public, parameter :: ghz1_prime = (0.0d0,0d0)
@@ -397,11 +413,11 @@ All parameters can be modified in \verb|mod_Parameters.F90| by:
    real(8),    public, parameter :: Lambda_z1 = 10000d0*GeV
    real(8),    public, parameter :: Lambda_z2 = 10000d0*GeV
    real(8),    public, parameter :: Lambda_z3 = 10000d0*GeV
-   real(8),    public, parameter :: Lambda_z4 = 10000d0*GeV   
-   real(8),    public, parameter :: Lambda_Q  = 10000d0*GeV   
+   real(8),    public, parameter :: Lambda_z4 = 10000d0*GeV
+   real(8),    public, parameter :: Lambda_Q  = 10000d0*GeV
 \end{verbatim}
 
-If the switch \verb|includeGammaStar| is set to \verb|.true.| then intermediate off-shell photons are included for $Z$ boson final states. 
+If the switch \verb|includeGammaStar| is set to \verb|.true.| then intermediate off-shell photons are included for $Z$ boson final states.
 Their couplings to the spin-0 resonance are controlled by separate parameters,
 \begin{verbatim}
    complex(8), public, parameter :: ghzgs2  = (0.00d0,0d0)
@@ -423,7 +439,7 @@ is set by
    real(8),    public, parameter :: Lambda_z5 = 10000d0*GeV.
 \end{verbatim}
 
-In the weak vector boson fusion process we also allow for different $ZZH$ and $WWH$ couplings. 
+In the weak vector boson fusion process we also allow for different $ZZH$ and $WWH$ couplings.
 Per default, they are assumed to be equal, set by the {\tt ghzi} and {\tt ghzi\_primej} couplings.
 If any of the {\tt ghwi} or {\tt ghwi\_primej} couplings is different from zero,
 their value will be used instead for the $WWH$ interactions.
@@ -437,10 +453,10 @@ The parameters below represent the couplings given in Eq.~(16) from Ref.~\cite{B
 \begin{verbatim}
 !---parameters that define spin 1 coupling to SM fields, see note
    complex(8), public, parameter :: zprime_qq_left  = (1.0d0,0d0)   !  see note Eq. (4)
-   complex(8), public, parameter :: zprime_qq_right = (0.0d0,0d0) 
+   complex(8), public, parameter :: zprime_qq_right = (0.0d0,0d0)
    complex(8), public, parameter :: zprime_zz_v =  (1.0d0,0d0)!  =1 for JP=1-
    complex(8), public, parameter :: zprime_zz_a =  (0.0d0,0d0)!  =1 for JP=1+
-\end{verbatim}   
+\end{verbatim}
 
 \subsubsection{ Spin-2 parameters }
 
@@ -450,8 +466,8 @@ One has the options to set the spin-2 couplings either from Eq.(18) or Eq.(19) f
 
 \begin{verbatim}
   logical, public, parameter :: generate_bis = .true.
-  logical, public, parameter :: use_dynamic_MG = .true. ! .true. (=default), 
-													    ! the spin-2 resonance mass with MG^2=(p1+p2)^2, otherwise fixed at M_Reso^2. 
+  logical, public, parameter :: use_dynamic_MG = .true. ! .true. (=default),
+													    ! the spin-2 resonance mass with MG^2=(p1+p2)^2, otherwise fixed at M_Reso^2.
 
   complex(8), public, parameter :: a1 = (1.0d0,0d0)    ! g1  -- c.f. note
   complex(8), public, parameter :: a2 = (0.0d0,0d0)    ! g2
@@ -462,7 +478,7 @@ One has the options to set the spin-2 couplings either from Eq.(18) or Eq.(19) f
   complex(8), public, parameter :: graviton_qq_left  = (1.0d0,0d0)! graviton coupling to quarks
   complex(8), public, parameter :: graviton_qq_right = (1.0d0,0d0)
 
-  complex(8), public, parameter :: b1 = (1.0d0,0d0)  
+  complex(8), public, parameter :: b1 = (1.0d0,0d0)
   complex(8), public, parameter :: b2 = (0.0d0,0d0)
   complex(8), public, parameter :: b3 = (0.0d0,0d0)
   complex(8), public, parameter :: b4 = (0.0d0,0d0)
@@ -470,8 +486,8 @@ One has the options to set the spin-2 couplings either from Eq.(18) or Eq.(19) f
   complex(8), public, parameter :: b6 = (0.0d0,0d0)
   complex(8), public, parameter :: b7 = (0.0d0,0d0)
   complex(8), public, parameter :: b8 = (0.0d0,0d0)
-  complex(8), public, parameter :: b9 = (0.0d0,0d0)  
-  complex(8), public, parameter :: b10 =(0.0d0,0d0)  
+  complex(8), public, parameter :: b9 = (0.0d0,0d0)
+  complex(8), public, parameter :: b10 =(0.0d0,0d0)
 
 
   complex(8), public, parameter  :: c1 = (1.0d0,0d0)
@@ -480,14 +496,14 @@ One has the options to set the spin-2 couplings either from Eq.(18) or Eq.(19) f
   complex(8), public, parameter  :: c41= (0.0d0,0d0)
   complex(8), public, parameter  :: c42= (0.0d0,0d0)
   complex(8), public, parameter  :: c5 = (0.0d0,0d0)
-  complex(8), public, parameter  :: c6 = (0.0d0,0d0) 
-  complex(8), public, parameter  :: c7 = (0.0d0,0d0) 
+  complex(8), public, parameter  :: c6 = (0.0d0,0d0)
+  complex(8), public, parameter  :: c7 = (0.0d0,0d0)
 \end{verbatim}
 
 \section{ Examples }
 
 \noindent
-The below examples are not meant to be a complete set, but rather some interesting and relevant cases.  
+The below examples are not meant to be a complete set, but rather some interesting and relevant cases.
 In many cases, the example is not the only way to produce such a scenario.
 
 \subsection{ $J^P = 0^+_m$ resonance, $X \to ZZ~{\rm or}~WW$}
@@ -500,7 +516,7 @@ In many cases, the example is not the only way to produce such a scenario.
    complex(8), public, parameter :: ahg2 = (0.0d0,0d0)
    complex(8), public, parameter :: ahg3 = (0.0d0,0d0)  ! pseudoscalar
    complex(8), public, parameter :: ahz1 = (1.0d0,0d0)
-   complex(8), public, parameter :: ahz2 = (0.0d0,0d0)  
+   complex(8), public, parameter :: ahz2 = (0.0d0,0d0)
    complex(8), public, parameter :: ahz3 = (0.0d0,0d0)  ! pseudoscalar
 \end{verbatim}
 
@@ -514,15 +530,15 @@ In many cases, the example is not the only way to produce such a scenario.
    complex(8), public, parameter :: ahg2 = (0.0d0,0d0)
    complex(8), public, parameter :: ahg3 = (0.0d0,0d0)  ! pseudoscalar
    complex(8), public, parameter :: ahz1 = (0.0d0,0d0)
-   complex(8), public, parameter :: ahz2 = (0.0d0,0d0)  
+   complex(8), public, parameter :: ahz2 = (0.0d0,0d0)
    complex(8), public, parameter :: ahz3 = (1.0d0,0d0)  ! pseudoscalar
 \end{verbatim}
 
 \subsection{ $J^P = 0^+_m$ resonance, $X \to \gamma \gamma$}
 \label{sec:exC}
 
-In practice, the example $X \to \gamma \gamma$ from this section, Sec.~\ref{sec:exC} and the next Sec.~\ref{sec:exD} are 
-kinematically the same but are presented only to illustrate how one takes care of this final state.  
+In practice, the example $X \to \gamma \gamma$ from this section, Sec.~\ref{sec:exC} and the next Sec.~\ref{sec:exD} are
+kinematically the same but are presented only to illustrate how one takes care of this final state.
 
 \begin{verbatim}
    logical, public, parameter :: generate_as = .false.
@@ -532,7 +548,7 @@ kinematically the same but are presented only to illustrate how one takes care o
    complex(8), public, parameter :: ghg4 = (0.0d0,0d0)   ! pseudoscalar
    complex(8), public, parameter :: ghgsgs2 = (1.0d0,0d0)
    complex(8), public, parameter :: ghgsgs3 = (0.0d0,0d0)
-   complex(8), public, parameter :: ghgsgs4 = (0.0d0,0d0)   ! pseudoscalar 
+   complex(8), public, parameter :: ghgsgs4 = (0.0d0,0d0)   ! pseudoscalar
 \end{verbatim}
 
 \subsection{ $J^P = 0^-_m$ resonance, $X \to \gamma \gamma$}
@@ -546,7 +562,7 @@ kinematically the same but are presented only to illustrate how one takes care o
    complex(8), public, parameter :: ghg4 = (0.0d0,0d0)   ! pseudoscalar
    complex(8), public, parameter :: ghgsgs2 = (1.0d0,0d0)
    complex(8), public, parameter :: ghgsgs3 = (0.0d0,0d0)
-   complex(8), public, parameter :: ghgsgs4 = (0.0d0,0d0)   ! pseudoscalar 
+   complex(8), public, parameter :: ghgsgs4 = (0.0d0,0d0)   ! pseudoscalar
 \end{verbatim}
 
 \subsection{ $J^P = 2^+_m$ resonance, $X \to ZZ~{\rm or}~WW~{\rm or}~\gamma \gamma$}
@@ -560,7 +576,7 @@ kinematically the same but are presented only to illustrate how one takes care o
   complex(8), public, parameter :: a5 = (0.0d0,0d0)    ! pseudoscalar, g8
   complex(8), public, parameter :: graviton_qq_left  = (1.0d0,0d0)! graviton coupling to quarks
   complex(8), public, parameter :: graviton_qq_right = (1.0d0,0d0)
-  
+
   logical, public, parameter :: generate_bis = .true.
   logical, public, parameter :: use_dynamic_MG = .true.
 
@@ -573,13 +589,13 @@ kinematically the same but are presented only to illustrate how one takes care o
   complex(8), public, parameter :: b7 = (0.0d0,0d0)
   complex(8), public, parameter :: b8 = (0.0d0,0d0)
   complex(8), public, parameter :: b9 = (0.0d0,0d0)
-  complex(8), public, parameter :: b10 =(0.0d0,0d0) 
+  complex(8), public, parameter :: b10 =(0.0d0,0d0)
 
 \end{verbatim}
 
 \subsection{Cross-section calculation and fraction notation}
 
-For a vector boson coupling, we can represent the four independent parameters by two  fractions 
+For a vector boson coupling, we can represent the four independent parameters by two  fractions
 ($f_{g2}$ and $f_{g4}$) and two phases ($\phi_{g2}$ and $\phi_{g4}$), defined for the $HZZ$
 and $HWW$ couplings as follows (ignoring $g_3$)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -593,16 +609,33 @@ and $HWW$ couplings as follows (ignoring $g_3$)
 \end{eqnarray}
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-In order to obtain the cross-sections $\sigma_i$ corresponding to the $g^{}_{i}=1$ coupling, 
+In order to obtain the cross-sections $\sigma_i$ corresponding to the $g^{}_{i}=1$ coupling,
 generate large enough (e.g. VegasNc1=1000000, VegasNc2=50000000) number of weighted
 ({\tt Unweighted=0}) with the corresponding couplings setup ($g^{}_{i}=1$, $g^{}_{j\ne i}=0$).
+
+\subsection{LHAPDF}
+
+It is possible to interface to an LHAPDF setup instead of compiling with local PDF's.  To accomplish this:
+
+\begin{itemize}
+\item In the makefile:
+\begin{itemize}
+\item Make sure the compiler is ifort.  LHAPDF integration is currently not supported with gfortran.
+\item Set UseLHAPDF=Yes
+\item Set MyLHADir to a directory with your LHAPDF setup.  This can be in terms of environment variables; for example \verb|MyLHADir=${LHAPDF_DATA_PATH}/../../lib/|.
+\end{itemize}
+\item Ensure that \verb|$LHAPDF_DATA_PATH| and \verb|$LD_LIBRARY_PATH| are set (both when compiling and when running).
+\item Compile
+\item Run with the extra command line parameter \verb|LHAPDF| specifying your PDF set's \verb|.info| file.  For example: \verb|LHAPDF=NNPDF30_lo_as_0130/NNPDF30_lo_as_0130.info|
+\end{itemize}
+
 
 %%%%%%%%%%%
 \section{ JHU Generator Matrix Elements (JHUGenMELA)}
 
 \subsection{Native matrix elements}
 
-After extracting the code, you can go to the directory \verb|JHUGenMELA| to find code for computing matrix elements directly.  
+After extracting the code, you can go to the directory \verb|JHUGenMELA| to find code for computing matrix elements directly.
 To compile the code, simple do:
 \begin{verbatim}
 $ make
@@ -613,7 +646,7 @@ $ make
 \\
 \rm
 \noindent
-The usage of the package is straight-forward and an example is given in \verb|testprogram.c|.  
+The usage of the package is straight-forward and an example is given in \verb|testprogram.c|.
 There are 6 main modules allowing both specific production process and production-independent calculation:
 \begin{itemize}
 \item "modhiggs\_\_evalamp\_gg\_h\_vv": spin-0 matrix elements for $gg$ initiated processes
@@ -625,10 +658,10 @@ There are 6 main modules allowing both specific production process and productio
 
 \end{itemize}
 
-The inputs are the 4-vectors of the incoming patrons and outgoing particles in the CM frame of the object $X$.  
-In addition the mass and width of the resonance are required as well as the ID of the outgoing particles.  
+The inputs are the 4-vectors of the incoming patrons and outgoing particles in the CM frame of the object $X$.
+In addition the mass and width of the resonance are required as well as the ID of the outgoing particles.
 Finally the last set of inputs are the couplings themselves.  They are arrays for parameters for a given spin hypothesis
-which mirror the parameters configurable in \verb|mod_Parameters.F90|.  
+which mirror the parameters configurable in \verb|mod_Parameters.F90|.
 As an example, the arrays are initialized in \verb|testprogram.c|.
 % as:
 %\begin{verbatim}
@@ -648,6 +681,20 @@ Instructions for setting up the JHUGenMELA with MCFM are in the file \verb|JHUGe
 %%%%%%%%%%%
 
 \section{ Release notes }
+
+\noindent
+In going from \verb|v5.2.5| to \verb|v5.6.2|, the updates are as follows:
+
+\begin{itemize}
+\item Add \verb|Process=90| for $bbH$ production
+\item Add lepton filtering option
+\item Allow $W$ from $ttH$ to decay to any decay mode
+\item Allow $W$ to decay to off-diagonal elements of the CKM matrix
+\item Add support for LHAPDF linking
+\item Upgrade to MCFM 7
+\item Fixes for LHE printout in $VBF$, $Hjj$, and $VH$
+\item JHUGenMELA: add $bbH$ production process
+\end{itemize}
 
 \noindent
 In going from \verb|v4.8.1| to \verb|v5.2.5|, the updates are as follows:
@@ -692,7 +739,7 @@ In going from \verb|v4.3.2| to \verb|v4.5.2|, the updates are as follows:
 In going from \verb|v4.2.1| to \verb|v4.3.2|, the updates are as follows:
 
 \begin{itemize}
-\item update LHE file format and index of partons 
+\item update LHE file format and index of partons
 \item improve log printout
 \item update ReadLHE mode: $H\to Z\gamma$ output and more flexible input
 \item $VH$ production (replaces beta version)
@@ -807,7 +854,7 @@ We define configurations for certain models which are defined in Table~1 of~\cit
    complex(8), public, parameter :: ghz1 = (1.0d0,0d0)
    complex(8), public, parameter :: ghz2 = (0.0d0,0d0)
    complex(8), public, parameter :: ghz3 = (0.0d0,0d0)
-   complex(8), public, parameter :: ghz4 = (0.0d0,0d0)   ! pseudoscalar 
+   complex(8), public, parameter :: ghz4 = (0.0d0,0d0)   ! pseudoscalar
 \end{verbatim}
 \normalsize
 
@@ -832,7 +879,7 @@ We define configurations for certain models which are defined in Table~1 of~\cit
    complex(8), public, parameter :: ghz1 = (0.0d0,0d0)
    complex(8), public, parameter :: ghz2 = (1.0d0,0d0)
    complex(8), public, parameter :: ghz3 = (0.0d0,0d0)
-   complex(8), public, parameter :: ghz4 = (0.0d0,0d0)   ! pseudoscalar 
+   complex(8), public, parameter :: ghz4 = (0.0d0,0d0)   ! pseudoscalar
 \end{verbatim}
 \normalsize
 
@@ -857,7 +904,7 @@ We define configurations for certain models which are defined in Table~1 of~\cit
    complex(8), public, parameter :: ghz1 = (0.0d0,0d0)
    complex(8), public, parameter :: ghz2 = (0.0d0,0d0)
    complex(8), public, parameter :: ghz3 = (0.0d0,0d0)
-   complex(8), public, parameter :: ghz4 = (1.0d0,0d0)   ! pseudoscalar 
+   complex(8), public, parameter :: ghz4 = (1.0d0,0d0)   ! pseudoscalar
 \end{verbatim}
 \normalsize
 
@@ -1025,12 +1072,12 @@ S. Bolognesi, Y.Y. Gao, A. V. Gritsan, K. Melnikov, M. Schulze, N. V. Tran and A
 I. Anderson, S. Bolognesi, F. Caola, Y.Y. Gao, A. V. Gritsan, C. B. Martin, K. Melnikov, M. Schulze, N. V. Tran, A. Whitbeck, Y. Zhou, "Constraining anomalous HVV interactions at proton and lepton colliders". Phys. Rev. D {\bf 89}, 035007 (2014). arXiv:1309.4819 [hep-ph].
 \bibitem{thesite}
 See webpage: www.pha.jhu.edu/spin
-\bibitem{Chatrchyan:2012ufa} 
+\bibitem{Chatrchyan:2012ufa}
   S.~Chatrchyan {\it et al.}  [CMS Collaboration],
   ``Observation of a new boson at a mass of 125 GeV with the CMS experiment at the LHC,''
   Phys.\ Lett.\ B {\bf 716}, 30 (2012)
   [arXiv:1207.7235 [hep-ex]].
-\bibitem{Campbell:2010ff} 
+\bibitem{Campbell:2010ff}
   J.~M.~Campbell and R.~K.~Ellis,
   ``MCFM for the Tevatron and the LHC,''
   Nucl.\ Phys.\ Proc.\ Suppl.\  {\bf 205-206}, 10 (2010)
