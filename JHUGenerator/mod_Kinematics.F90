@@ -701,18 +701,7 @@ Lifetime = 0.0d0
 Spin     = 0.1d0
 
 
-
-if( TopDecays.ne.0 ) then
-      ! introduce b-quark mass for LHE output 
-      call ShiftMass(Mom(1:4,b),   Mom(1:4,Wp),m_bot,M_W,  MomDummy(1:4,b),   MomDummy(1:4,Wp) )
-      call ShiftMass(Mom(1:4,bbar),Mom(1:4,Wm),m_bot,M_W,  MomDummy(1:4,bbar),MomDummy(1:4,Wm) )
-
-      ! introduce lepton/quark masses for LHE output  
-      call ShiftMass(Mom(1:4,LepP),MomDummy(1:4,Wp)-MomDummy(1:4,LepP), GetMass(MY_IDUP(LepP)),0d0,  MomDummy(1:4,LepP),MomDummy(1:4,Nu) )
-      call ShiftMass(Mom(1:4,LepM),MomDummy(1:4,Wm)-MomDummy(1:4,LepM), GetMass(MY_IDUP(LepM)),0d0,  MomDummy(1:4,LepM),MomDummy(1:4,Nubar) )
-endif
-
-do i=1,NUP
+do i=1,5
     LHE_IDUP(i) = convertLHE( MY_IDUP(i) )
     MomDummy(1,i) = 100.0d0*Mom(1,i)
     MomDummy(2,i) = 100.0d0*Mom(2,i)
@@ -720,6 +709,23 @@ do i=1,NUP
     MomDummy(4,i) = 100.0d0*Mom(4,i)
 enddo
 
+if( TopDecays.ne.0 ) then
+      ! introduce b-quark mass for LHE output 
+      call ShiftMass(Mom(1:4,b),   Mom(1:4,Wp),m_bot,M_W,  MomDummy(1:4,b),   MomDummy(1:4,Wp) )
+      call ShiftMass(Mom(1:4,bbar),Mom(1:4,Wm),m_bot,M_W,  MomDummy(1:4,bbar),MomDummy(1:4,Wm) )
+
+      ! introduce lepton/quark masses for LHE output  
+      call ShiftMass(Mom(1:4,LepP),MomDummy(1:4,Wp)-Mom(1:4,LepP), GetMass(MY_IDUP(LepP)),0d0,  MomDummy(1:4,LepP),MomDummy(1:4,Nu) )
+      call ShiftMass(Mom(1:4,LepM),MomDummy(1:4,Wm)-Mom(1:4,LepM), GetMass(MY_IDUP(LepM)),0d0,  MomDummy(1:4,LepM),MomDummy(1:4,Nubar) )
+
+      do i=6,13
+          LHE_IDUP(i) = convertLHE( MY_IDUP(i) )
+          MomDummy(1,i) = 100.0d0*MomDummy(1,i)
+          MomDummy(2,i) = 100.0d0*MomDummy(2,i)
+          MomDummy(3,i) = 100.0d0*MomDummy(3,i)
+          MomDummy(4,i) = 100.0d0*MomDummy(4,i)
+      enddo
+endif
 
 
 
