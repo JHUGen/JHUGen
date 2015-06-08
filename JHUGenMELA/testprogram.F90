@@ -9,9 +9,9 @@ use modTTBH
 implicit none
 include './variables.F90'
 integer, parameter :: LHA2M_PDF(-6:6) = (/-5,-6,-3,-4,-1,-2,0 ,2,1,4,3,6,5/)
-real(8) :: helicity(9), mass(9,2)
+real(8) :: helicity(9), mass(9,2),msq_MCFM(-5:5,-5:5),p_MCFM(14,4)
 integer :: id(9), TopDecays
-real(8) :: p(4,6),p5(4,5),p4(4,4),p9(4,9),p13(4,13)
+real(8) :: p(4,6),p5(4,5),p4(4,4),p9(4,9),p8(4,8),p13(4,13)
 real(8) :: MatElSq,M_Reso,Ga_Reso,MatElSqPDF(-5:5,-5:5),check_vbf(-5:5,-5:5),check_sbf(-5:5,-5:5),check_hj(-5:5,-5:5),check_zh(-5:5,-5:5)
 integer :: MY_IDUP(6:9)
 ! real(8),  parameter :: GeV=1d0/100d0
@@ -22,7 +22,7 @@ complex(8) :: Zqqcoupl(1:2),Zzzcoupl(1:2)
 complex(8) :: Gggcoupl(1:5),Gqqcoupl(1:2),Gzzcoupl(1:10)
 complex(8) :: TTBHcoupl(1:2)
 integer :: i, j
-
+real(8) :: lambdaBSM,lambda_z(4),lambda_w(4)
 
 
 ! input unit = GeV/100 such that 125GeV is 1.25 in the code
@@ -306,6 +306,38 @@ integer :: i, j
    print *, 'Matr.el. squared,gg->ttbH',MatElSq ,MatElSq/( 1849.90671287913d0 + 2842.07693611093d0 ) * 1.14594184663D0
    
    
+
+
+
+    p8(1:4,1)=-(/   4.1980450031499998d0,        0.0000000000000000d0,        0.0000000000000000d0,        4.1980450031499998d0 /)
+    p8(1:4,2)=-(/   27.836467868400000d0,        0.0000000000000000d0,        0.0000000000000000d0,       -27.836467868400000d0 /)
+    p8(1:4,3)=+(/   3.8571535099599998d0,      -0.85263204716199992d0,       0.18796420827100002d0,        3.7570362319200004d0 /)
+    p8(1:4,4)=+(/   25.323655213100000d0,        1.4870426681000002d0,        1.0734899416599999d0,       -25.257154170600003d0/)
+    p8(1:4,5)=+(/  0.93253047945792955d0,       -6.8201413203919231d-002,    -0.48999386324721106d0,      -0.79048572176161769d0 /)
+    p8(1:4,6)=+(/   8.0173857331794371d-002,   -6.0571242164806610d-002,      2.9004810490239452d-002,    -4.3791471365831884d-002 /)
+    p8(1:4,7)=+(/   1.5158181532461399d0,      -0.18697831686662519d0,      -0.73614167277770559d0,       -1.3118071900735808d0/)
+    p8(1:4,8)=+(/  0.32518165844413610d0,      -0.31865964870464902d0,       -6.4323424395323042d-002,    7.7794566910300844d-003/)
+    
+    p_MCFM(1:8,4)=p8(1,1:8) *100d0  ! E
+    p_MCFM(1:8,1)=p8(2,1:8) *100d0  ! x
+    p_MCFM(1:8,2)=p8(3,1:8) *100d0  ! y
+    p_MCFM(1:8,3)=p8(4,1:8) *100d0  ! z
+    
+
+    lambdaBSM = 100d0
+    Lambda_z(1) = 100d0
+    Lambda_z(2) = 100d0
+    Lambda_z(3) = 100d0
+    Lambda_z(4) = 100d0
+    HWWcoupl(:) = 0d0
+    HWWcoupl(1) = 1d0
+    HZZcoupl(1:32) = HWWcoupl(:)
+    
+    call qq_ZZqq(p_MCFM,msq_MCFM,HZZcoupl(1:32),HWWcoupl,LambdaBSM,Lambda_Q,Lambda_z)
+    
+    print *, "MCFM:"
+    print *, msq_MCFM(1,-1)
+
   
 END PROGRAM
 

@@ -3,7 +3,7 @@ implicit none
 save
 ! 
 ! 
-character(len=6),parameter :: JHUGen_Version="v5.5.4"
+character(len=6),parameter :: JHUGen_Version="v5.6.2"
 ! 
 ! 
 integer, public :: Collider, PDFSet,PChannel,Process,DecayMode1,DecayMode2,TopDecays
@@ -37,7 +37,7 @@ real(8),public :: minCS=1d10,maxCS=0d0,avgCS=0d0
 
 
 logical, public, parameter :: seed_random = .true.
-integer, public :: TheSeeds(0:20) = (/12,1,2,3,4,5,6,7,8,9,10,11,12,0,0,0,0,0,0,0,0/)! only used if seed_random=.false., the first entry is the total number of seeds
+integer, public :: TheSeeds(0:20) = (/12,53253,223,3,4,5,6,7,8,9,10,11,12,0,0,0,0,0,0,0,0/)! only used if seed_random=.false., the first entry is the total number of seeds
 
 logical, public, parameter :: fix_channels_ratio = .false.
 
@@ -51,7 +51,7 @@ logical, public, parameter :: includeGammaStar = .false.
 
 real(8),parameter :: MPhotonCutoff = 4d0*GeV
 
-logical, public, parameter :: RandomizeVVdecays = .true. ! randomize DecayMode1 and DecayMode2 in H-->VV decays
+logical, public, parameter :: RandomizeVVdecays = .true. ! randomize DecayMode1 and DecayMode2 in H-->VV and TTBAR decays
 
 real(8), public            :: M_Top   = 173.2d0     *GeV      ! 
 real(8), public, parameter :: Ga_Top  = 2.0d0    *GeV      ! 
@@ -90,6 +90,18 @@ real(8), public, parameter :: Rjet = 0.5d0                  ! jet deltaR, antikt
 
 !----------------------------------------------------------------------------------------------------
 
+! CKM squared matrix entries 
+real(8), public, parameter :: VCKM_ud = 0.97425d0
+real(8), public, parameter :: VCKM_us = 0.2253d0
+real(8), public, parameter :: VCKM_cs = 0.986d0
+real(8), public, parameter :: VCKM_cd = 0.225d0
+real(8), public, parameter :: VCKM_tb = 1.021d0
+real(8), public, parameter :: VCKM_ts = 0.0400d0
+real(8), public, parameter :: VCKM_cb = 0.0411d0
+real(8), public, parameter :: VCKM_ub = 0.00413d0
+real(8), public, parameter :: VCKM_td = 0.0084d0
+
+
 ! absolute branching fraction (taken from PDG-2014)
 real(8), public, parameter :: Br_Z_ll   = 10.10d0*percent                             ! leptonic Z branching
 real(8), public, parameter :: Br_Z_hadr = 69.91d0*percent                             ! hadronic Z branching
@@ -103,7 +115,7 @@ real(8), public, parameter :: Br_W_ll   = 32.72d0*percent                       
 real(8), public, parameter :: Br_W_hadr = 100d0*percent - Br_W_ll                     ! hadronic W branching
 
 
-! derived branching fractions (assuming CKM=1)
+! derived branching fractions
 real(8), public, parameter :: Br_Z_ee   = 1d0/3d0*Br_Z_ll                             ! electron Z branching
 real(8), public, parameter :: Br_Z_mm   = 1d0/3d0*Br_Z_ll                             ! muon Z branching
 real(8), public, parameter :: Br_Z_tt   = 1d0/3d0*Br_Z_ll                             ! tau Z branching
@@ -433,23 +445,23 @@ integer :: id1, id2, id1in, id2in
 id1 = abs(id1in)
 id2 = abs(id2in)
 if((id1.eq.convertLHE(Up_)  .and.  id2.eq.convertLHE(Dn_))  .or.  (id1.eq.convertLHE(Dn_)  .and.  id2.eq.convertLHE(Up_)))then
-  CKM= 0.97425d0 * dsqrt(scale_alpha_W_ud)
+  CKM= VCKM_ud * dsqrt(scale_alpha_W_ud)
 elseif((id1.eq.convertLHE(Up_)  .and.  id2.eq.convertLHE(Str_))  .or.  (id1.eq.convertLHE(Str_)  .and.  id2.eq.convertLHE(Up_)))then
-  CKM= 0.2253d0
+  CKM= VCKM_us
 elseif((id1.eq.convertLHE(Up_)  .and.  id2.eq.convertLHE(Bot_))  .or.  (id1.eq.convertLHE(Bot_)  .and.  id2.eq.convertLHE(Up_)))then
-  CKM= 0.00413d0
+  CKM= VCKM_ub
 elseif((id1.eq.convertLHE(Chm_)  .and.  id2.eq.convertLHE(Dn_))  .or.  (id1.eq.convertLHE(Dn_)  .and.  id2.eq.convertLHE(Chm_)))then
-  CKM= 0.225d0
+  CKM= VCKM_cd
 elseif((id1.eq.convertLHE(Chm_)  .and.  id2.eq.convertLHE(Str_))  .or.  (id1.eq.convertLHE(Str_)  .and.  id2.eq.convertLHE(Chm_)))then
-  CKM= 0.986d0 * dsqrt(scale_alpha_W_cs)
+  CKM= VCKM_cs * dsqrt(scale_alpha_W_cs)
 elseif((id1.eq.convertLHE(Chm_)  .and.  id2.eq.convertLHE(Bot_))  .or.  (id1.eq.convertLHE(Bot_)  .and.  id2.eq.convertLHE(Chm_)))then
-  CKM= 0.0411d0
-!elseif((id1.eq.convertLHE(Top_)  .and.  id2.eq.convertLHE(Dn_))  .or.  (id1.eq.convertLHE(Dn_)  .and.  id2.eq.convertLHE(Top_)))then
-!  CKM= 0.0084d0
-!elseif((id1.eq.convertLHE(Top_)  .and.  id2.eq.convertLHE(Str_))  .or.  (id1.eq.convertLHE(Str_)  .and.  id2.eq.convertLHE(Top_)))then
-!  CKM= 0.0400d0
-!elseif((id1.eq.convertLHE(Top_)  .and.  id2.eq.convertLHE(Bot_))  .or.  (id1.eq.convertLHE(Bot_)  .and.  id2.eq.convertLHE(Top_)))then
-!  CKM= 1.021
+  CKM= VCKM_cb
+elseif((id1.eq.convertLHE(Top_)  .and.  id2.eq.convertLHE(Dn_))  .or.  (id1.eq.convertLHE(Dn_)  .and.  id2.eq.convertLHE(Top_)))then
+  CKM= VCKM_td
+elseif((id1.eq.convertLHE(Top_)  .and.  id2.eq.convertLHE(Str_))  .or.  (id1.eq.convertLHE(Str_)  .and.  id2.eq.convertLHE(Top_)))then
+  CKM= VCKM_ts
+elseif((id1.eq.convertLHE(Top_)  .and.  id2.eq.convertLHE(Bot_))  .or.  (id1.eq.convertLHE(Bot_)  .and.  id2.eq.convertLHE(Top_)))then
+  CKM= VCKM_tb
 elseif((abs(id1).eq.abs(convertLHE(NuT_))  .and.  abs(id2).eq.abs(convertLHE(TaP_)))  .or.  (abs(id1).eq.abs(convertLHE(TaP_))  .and.  abs(id2).eq.abs(convertLHE(NuT_))))then
   CKM= 1d0 * dsqrt(scale_alpha_W_tn)
 else
@@ -654,12 +666,16 @@ integer :: Part
       getMass = 0d0
   elseif( abs(Part).eq.abs(Bot_) ) then
       getMass = m_bot
+  elseif( abs(Part).eq.abs(Top_) ) then
+      getMass = m_top
   elseif( abs(Part).eq.abs(Z0_) ) then
       getMass = M_Z
   elseif( abs(Part).eq.abs(Wp_) ) then
       getMass = M_W
   elseif( abs(Part).eq.abs(Pho_) ) then
       getMass = 0d0
+  elseif( abs(Part).eq.abs(Hig_) ) then
+      getMass = M_Reso
   else
      print *, "Error in getMass",Part
      stop

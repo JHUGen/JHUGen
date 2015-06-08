@@ -645,50 +645,49 @@ END SUBROUTINE
 SUBROUTINE WriteOutEvent_TTBH(Mom,MY_IDUP,ICOLUP,EventWeight)
 use ModParameters
 implicit none
-real(8) :: Mom(1:4,1:11)
+real(8) :: Mom(1:4,1:13)
 real(8),optional :: EventWeight
-integer :: MY_IDUP(1:11),ICOLUP(1:2,1:11),LHE_IDUP(1:13),ISTUP(1:13),MOTHUP(1:2,1:13)
+integer :: MY_IDUP(1:13),ICOLUP(1:2,1:13),LHE_IDUP(1:13),ISTUP(1:13),MOTHUP(1:2,1:13)
 integer :: NUP,IDPRUP,i
-real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP,Lifetime,Spin,MomDummy(1:4,1:13)
+real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP,Lifetime,Spin,MomDummy(1:4,1:13),TheMass
 character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0)"
-integer, parameter :: tbar=4,t=5,Hbos=3,inLeft=1,inRight=2,bbar=6, lepM=7,nubar=8,b=9,lepP=10,nu=11, Wm=12, Wp=13
+integer, parameter :: inLeft=1,inRight=2,Hbos=3,tbar=4,t=5,  bbar=6,Wm=7,lepM=8,nubar=9,  b=10,Wp=11,lepP=12,nu=13
 
 
 ! For description of the LHE format see http://arxiv.org/abs/hep-ph/0109068 and http://arxiv.org/abs/hep-ph/0609017
 ! The LHE numbering scheme can be found here: http://pdg.lbl.gov/mc_particle_id_contents.html and http://lhapdf.hepforge.org/manual#tth_sEcA
 
 
-do i=1,11
-    LHE_IDUP(i) = convertLHE( MY_IDUP(i) )
-enddo
-LHE_IDUP(12) = convertLHE( Wm_ )
-LHE_IDUP(13) = convertLHE( Wp_ )
 
 IDPRUP=100
 SCALUP=Mu_Fact * 100d0
 AQEDUP=alpha_QED
 AQCDUP=0.11d0
 
-ISTUP(1:13) = (/-1,-1,1,2,2,1,1,1,1,1,1,2,2/)
 
 
-MOTHUP(1:2,inLeft)  = (/0,0/)
-MOTHUP(1:2,inRight) = (/0,0/)
-MOTHUP(1:2,Hbos)    = (/1,2/)
-MOTHUP(1:2,tbar)    = (/1,2/)
-MOTHUP(1:2,t)       = (/1,2/)
-MOTHUP(1:2,bbar)    = (/4,4/)
-MOTHUP(1:2,lepM)    = (/6,6/)
-MOTHUP(1:2,nubar)   = (/6,6/)
-MOTHUP(1:2,b)       = (/5,5/)
-MOTHUP(1:2,lepP)    = (/7,7/)
-MOTHUP(1:2,nu)      = (/7,7/)
-MOTHUP(1:2,Wm)      = (/4,4/)
-MOTHUP(1:2,Wp)      = (/5,5/)
+MOTHUP(1:2,inLeft) = (/0,0/);             ISTUP(inLeft) = -1
+MOTHUP(1:2,inRight)= (/0,0/);             ISTUP(inRight)= -1
+
+MOTHUP(1:2,Hbos)   = (/inLeft,inRight/);  ISTUP(Hbos)   = +1
+MOTHUP(1:2,tbar)   = (/inLeft,inRight/);  ISTUP(tbar)   = +2
+MOTHUP(1:2,t)      = (/inLeft,inRight/);  ISTUP(t)      = +2
+
+MOTHUP(1:2,bbar)   = (/tbar,tbar/);       ISTUP(bbar)   = +1
+MOTHUP(1:2,Wm)     = (/tbar,tbar/);       ISTUP(Wm)     = +2
+MOTHUP(1:2,lepM)   = (/Wm,Wm/);           ISTUP(lepM)   = +1
+MOTHUP(1:2,nubar)  = (/Wm,Wm/);           ISTUP(nubar)  = +1
+
+MOTHUP(1:2,b)      = (/t,t/);             ISTUP(b)      = +1
+MOTHUP(1:2,Wp)     = (/t,t/);             ISTUP(Wp)     = +2
+MOTHUP(1:2,lepP)   = (/Wp,Wp/);           ISTUP(lepP)   = +1
+MOTHUP(1:2,nu)     = (/Wp,Wp/);           ISTUP(nu)     = +1
 
 
 if( TopDecays.eq.0 ) then
    NUP = 5
+   ISTUP(tbar)   = +1
+   ISTUP(t)      = +1 
 else
    NUP=13
 endif
@@ -698,18 +697,29 @@ if( present(EventWeight) ) then
 else
     XWGTUP=1.0d0
 endif
-
 Lifetime = 0.0d0
 Spin     = 0.1d0
 
-do i=1,11
+
+
+if( TopDecays.ne.0 ) then
+      ! introduce b-quark mass for LHE output 
+      call ShiftMass(Mom(1:4,b),   Mom(1:4,Wp),m_bot,M_W,  MomDummy(1:4,b),   MomDummy(1:4,Wp) )
+      call ShiftMass(Mom(1:4,bbar),Mom(1:4,Wm),m_bot,M_W,  MomDummy(1:4,bbar),MomDummy(1:4,Wm) )
+
+      ! introduce lepton/quark masses for LHE output  
+      call ShiftMass(Mom(1:4,LepP),MomDummy(1:4,Wp)-MomDummy(1:4,LepP), GetMass(MY_IDUP(LepP)),0d0,  MomDummy(1:4,LepP),MomDummy(1:4,Nu) )
+      call ShiftMass(Mom(1:4,LepM),MomDummy(1:4,Wm)-MomDummy(1:4,LepM), GetMass(MY_IDUP(LepM)),0d0,  MomDummy(1:4,LepM),MomDummy(1:4,Nubar) )
+endif
+
+do i=1,NUP
+    LHE_IDUP(i) = convertLHE( MY_IDUP(i) )
     MomDummy(1,i) = 100.0d0*Mom(1,i)
     MomDummy(2,i) = 100.0d0*Mom(2,i)
     MomDummy(3,i) = 100.0d0*Mom(3,i)
     MomDummy(4,i) = 100.0d0*Mom(4,i)
 enddo
-    MomDummy(1:4,Wm) = MomDummy(1:4,nubar)+ MomDummy(1:4,lepM)
-    MomDummy(1:4,Wp) = MomDummy(1:4,nu)   + MomDummy(1:4,lepP)
+
 
 
 
@@ -723,70 +733,15 @@ write(io_LHEOutFile,"(I2,X,I3,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7)") NUP
 ! (*) alpha_QED coupling for this event 
 ! (*) alpha_s coupling for this event
 
-
-
-! parton_a
-i=1
-write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
-
-! parton_b
-i=2
-write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
-
-! H
-i=3
-write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),M_Reso*100d0,Lifetime,Spin
-
-! tb
-i=4
-write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),m_top*100d0,Lifetime,Spin
-
-! t
-i=5
-write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),m_top*100d0,Lifetime,Spin
-
-
-if( TopDecays.ne.0 ) then
-
-    ! W-
-    i=12
-    write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), 0,0 ,MomDummy(2:4,i),MomDummy(1,i),M_W*100d0,Lifetime,Spin
-
-    ! W+
-    i=13
-    write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), 0,0 ,MomDummy(2:4,i),MomDummy(1,i),M_W*100d0,Lifetime,Spin
-
-    ! bb
-    i=6
-    write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
-
-    ! e-
-    i=7
-    write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
-
-    ! nub
-    i=8
-    write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
-
-    ! b
-    i=9
-    write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
-
-    ! e+
-    i=10
-    write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
-
-    ! nu
-    i=11
-    write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
-endif
-
-
+do i=1,NUP
+     TheMass = GetMass( MY_IDUP(i) )
+     if( i.le.2  ) TheMass = 0.0d0  ! setting initial parton masses to zero
+     write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),TheMass*100d0,Lifetime,Spin
+enddo
 write(io_LHEOutFile,"(A)") "</event>"
 
 
-
-
+RETURN
 END SUBROUTINE
 
 
@@ -1959,11 +1914,11 @@ use ModParameters
 use ModMisc
 ! use modTTBH
 implicit none
-real(8) :: Mom(1:4,1:11),MomMELA(1:4,1:13)
+real(8) :: Mom(1:4,1:13),MomMELA(1:4,1:13)
 logical :: applyPSCut
 integer :: NBin(:)
 real(8) :: pT_t,pT_H,pT_tbar,MatElSq_H0,MatElSq_H1,D_0minus
-integer, parameter :: tbar=4,t=5,Hbos=3,inLeft=1,inRight=2,bbar=6, lepM=7,nubar=8,b=9,lepP=10,nu=11
+integer, parameter :: inLeft=1,inRight=2,Hbos=3,tbar=4,t=5,  bbar=6,Wm=7,lepM=8,nubar=9,  b=10,Wp=11,lepP=12,nu=13
 logical,save :: FirstTime=.true.
 
 
@@ -1984,7 +1939,7 @@ logical,save :: FirstTime=.true.
 !     endif
 !     MomMELA(1:4,1) = -(/         65d0,           0.0000000000000000d0, 0.0000000000000000d0,      65d0           /)
 !     MomMELA(1:4,2) = -(/         65d0,           0.0000000000000000d0, 0.0000000000000000d0,     -65d0           /)  
-!     MomMELA(1:4,3:11) = Mom(1:4,3:11)
+!     MomMELA(1:4,3:11) = Mom(1:4,3:11)  remap here because of new W bosons
 !     MomMELA(1:4,12:13) = 0d0
 !     
 !     call EvalXSec_PP_TTBH(MomMELA(1:4,1:13),(/(1d0,0d0),(0d0,0d0)/),TopDecays,2,MatElSq_H0)
@@ -2496,7 +2451,6 @@ END FUNCTION
 
 
 
-
 SUBROUTINE VVBranchings(MY_IDUP,ICOLUP)
 use ModParameters
 implicit none
@@ -2511,7 +2465,7 @@ real(8) :: DKRnd
 !    IDUP(9)  -->  MomDK(:,3)  -->  ubar-spinor
 
 
-
+   ICOLUP(:,:) = 0
    if( DecayMode1.eq.0 ) then! Z1->2l
         call random_number(DKRnd)
         MY_IDUP(4) = Z0_
@@ -2541,13 +2495,15 @@ real(8) :: DKRnd
         MY_IDUP(4) = Wp_
         DKFlavor = WLepBranching( DKRnd )!= ElM or MuM
         MY_IDUP(6) = +abs(DKFlavor)     ! lepton(+)
-        MY_IDUP(7) = +abs(DKFlavor)+7   ! neutrino
+        MY_IDUP(7) = +abs(DKFlavor)+7   ! neutrino        
    elseif( DecayMode1.eq.5 ) then! W1(+)->2q
         call random_number(DKRnd)
         MY_IDUP(4) = Wp_
         DKFlavor = WQuaUpBranching( DKRnd )!= Up,Chm
-        MY_IDUP(6) = -abs(DKFlavor)-1  ! anti-dn flavor
-        MY_IDUP(7) = +abs(DKFlavor)    ! up flavor
+!         MY_IDUP(6) = -abs(DKFlavor)-1  ! anti-dn flavor
+!         MY_IDUP(7) = +abs(DKFlavor)    ! up flavor
+        MY_IDUP(7) = +abs(DKFlavor)           ! up flavor
+        MY_IDUP(6) = GetCKMPartner(MY_IDUP(7))! anti-dn flavor         
         ICOLUP(1:2,6) = (/0,803/)
         ICOLUP(1:2,7) = (/803,0/)
    elseif( DecayMode1.eq.6 ) then! W1(+)->taunu
@@ -2585,8 +2541,10 @@ real(8) :: DKRnd
         MY_IDUP(4) = Wp_
         DKFlavor = WAnyBranching_flat( DKRnd )
         if(IsAQuark(DKFlavor)) then
-           MY_IDUP(6) = -abs(DKFlavor)-1  ! anti-dn flavor  
-           MY_IDUP(7) = +abs(DKFlavor)    ! up flavor
+!            MY_IDUP(6) = -abs(DKFlavor)-1  ! anti-dn flavor  
+!            MY_IDUP(7) = +abs(DKFlavor)    ! up flavor
+           MY_IDUP(7) = +abs(DKFlavor)           ! up flavor
+           MY_IDUP(6) = GetCKMPartner(MY_IDUP(7))! anti-dn flavor  
            ICOLUP(1:2,6) = (/0,803/)
            ICOLUP(1:2,7) = (/803,0/)
         else
@@ -2630,8 +2588,10 @@ real(8) :: DKRnd
         call random_number(DKRnd)
         MY_IDUP(5) = Wm_
         DKFlavor = WQuaUpBranching( DKRnd )!= Up,Chm
-        MY_IDUP(8) = -abs(DKFlavor)    ! anti-up flavor
-        MY_IDUP(9) = +abs(DKFlavor)+1  ! dn flavor
+!         MY_IDUP(8) = -abs(DKFlavor)    ! anti-up flavor
+!         MY_IDUP(9) = +abs(DKFlavor)+1  ! dn flavor
+        MY_IDUP(8) = -abs(DKFlavor)           ! up flavor
+        MY_IDUP(9) = GetCKMPartner(MY_IDUP(8))! dn flavor
         ICOLUP(1:2,8) = (/0,804/)
         ICOLUP(1:2,9) = (/804,0/)
    elseif( DecayMode2.eq.6 ) then! W2(-)->taunu
@@ -2669,8 +2629,10 @@ real(8) :: DKRnd
         MY_IDUP(5) = Wm_
         DKFlavor = WAnyBranching_flat( DKRnd )
         if(IsAQuark(DKFlavor)) then
-           MY_IDUP(8) = -abs(DKFlavor)    ! anti-up flavor
-           MY_IDUP(9) = +abs(DKFlavor)+1  ! dn flavor
+!            MY_IDUP(8) = -abs(DKFlavor)    ! anti-up flavor
+!            MY_IDUP(9) = +abs(DKFlavor)+1  ! dn flavor
+           MY_IDUP(8) = -abs(DKFlavor)           ! up flavor
+           MY_IDUP(9) = GetCKMPartner(MY_IDUP(8))! dn flavor
            ICOLUP(1:2,8) = (/0,804/)
            ICOLUP(1:2,9) = (/804,0/)
         else
@@ -2682,6 +2644,71 @@ real(8) :: DKRnd
 
 RETURN
 END SUBROUTINE
+
+
+
+
+
+FUNCTION GetCKMPartner( Flavor )
+use modMisc
+use modParameters
+implicit none
+integer :: Flavor,GetCKMPartner
+real(8) :: FlavorRnd,sumCKM,Vsq(1:3)
+
+    call random_number(FlavorRnd)
+
+    Vsq(1) = (CKM( convertLHEreverse(abs(Flavor)), convertLHEreverse(abs(Dn_)) ))**2
+    Vsq(2) = (CKM( convertLHEreverse(abs(Flavor)), convertLHEreverse(abs(Str_)) ))**2
+    Vsq(3) = (CKM( convertLHEreverse(abs(Flavor)), convertLHEreverse(abs(Bot_)) ))**2
+    sumCKM = Vsq(1)+Vsq(2)+Vsq(3)
+    FlavorRnd = FlavorRnd*sumCKM
+    
+    if( abs(Flavor).eq.abs(Up_) ) then
+        if( FlavorRnd.le.Vsq(1) ) then!  u-->d
+           GetCKMPartner = -sign(1,Flavor) * abs(Dn_)
+        elseif( FlavorRnd.le.(Vsq(2)+Vsq(1)) ) then!  u-->s
+           GetCKMPartner = -sign(1,Flavor) * abs(Str_)
+        else!  u-->b
+           GetCKMPartner = -sign(1,Flavor) * abs(Bot_)
+        endif
+                
+    elseif( abs(Flavor).eq.abs(Chm_) ) then
+        if( FlavorRnd.le.Vsq(2) ) then!  c-->s
+           GetCKMPartner = -sign(1,Flavor) * abs(Str_)
+        elseif( FlavorRnd.le.(Vsq(1)+Vsq(2)) ) then!  c-->d
+           GetCKMPartner = -sign(1,Flavor) * abs(Dn_)
+        else!  c-->b
+           GetCKMPartner = -sign(1,Flavor) * abs(Bot_)
+        endif
+
+    elseif( abs(Flavor).eq.abs(Top_) ) then
+        if( FlavorRnd.le.Vsq(3) ) then!  t-->b
+           GetCKMPartner = -sign(1,Flavor) * abs(Bot_)
+        elseif( FlavorRnd.le.(Vsq(2)+Vsq(3)) ) then!  t-->s
+           GetCKMPartner = -sign(1,Flavor) * abs(Str_)
+        else!  t-->d
+           GetCKMPartner = -sign(1,Flavor) * abs(Dn_)
+        endif
+    
+    else
+    
+        call Error("Dn flavor conversion not yet implemented")
+!     elseif( abs(Flavor).eq.abs(Dn_) ) then
+!     elseif( abs(Flavor).eq.abs(Str_) ) then
+!     elseif( abs(Flavor).eq.abs(Bot_) ) then
+    
+    endif
+    
+    
+
+
+
+RETURN
+END FUNCTION
+
+
+
 
 
 
