@@ -714,10 +714,10 @@ endif
 
 do i=1,NUP
     LHE_IDUP(i) = convertLHE( MY_IDUP(i) )
-    MomDummy(1,i) = 100.0d0*Mom(1,i)
-    MomDummy(2,i) = 100.0d0*Mom(2,i)
-    MomDummy(3,i) = 100.0d0*Mom(3,i)
-    MomDummy(4,i) = 100.0d0*Mom(4,i)
+    MomDummy(1,i) = 100.0d0*MomDummy(1,i)
+    MomDummy(2,i) = 100.0d0*MomDummy(2,i)
+    MomDummy(3,i) = 100.0d0*MomDummy(3,i)
+    MomDummy(4,i) = 100.0d0*MomDummy(4,i)
 enddo
 
 
