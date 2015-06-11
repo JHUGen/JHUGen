@@ -274,6 +274,82 @@ integer :: i,j,temp
 END SUBROUTINE
 
 
+      subroutine spinoru(N,p,za,zb,s)
+!---Calculate spinor products      
+!---taken from MCFM & modified by R. Rontsch, May 2015
+!---extended to deal with negative energies ie with all momenta outgoing                                                                
+!---Arbitrary conventions of Bern, Dixon, Kosower, Weinzierl,                                                                                  
+!---za(i,j)*zb(j,i)=s(i,j)                      
+      implicit none
+      real(8) :: p(:,:),two
+      integer, parameter :: mxpart=14
+      complex(8):: c23(N),f(N),rt(N),za(:,:),zb(:,:),czero,cone,ci
+      real(8)   :: s(:,:)
+      integer i,j,N
+      
+      if (size(p,1) .ne. N) then
+         call Error("spinorz: momentum mismatch")
+      endif
+      two=2d0
+      czero=dcmplx(0d0,0d0)
+      cone=dcmplx(1d0,0d0)
+      ci=dcmplx(0d0,1d0)
+      
+
+!---if one of the vectors happens to be zero this routine fails.                                                                                                                
+      do j=1,N
+         za(j,j)=czero
+         zb(j,j)=za(j,j)
+
+!-----positive energy case                                                                                                                                                      
+         if (p(j,4) .gt. 0d0) then
+            rt(j)=dsqrt(p(j,4)+p(j,1))
+            c23(j)=dcmplx(p(j,3),-p(j,2))
+            f(j)=cone
+         else
+!-----negative energy case                                                                                                                                                      
+            rt(j)=dsqrt(-p(j,4)-p(j,1))
+            c23(j)=dcmplx(-p(j,3),p(j,2))
+            f(j)=ci
+         endif
+      enddo
+      do i=2,N
+         do j=1,i-1
+         s(i,j)=two*(p(i,4)*p(j,4)-p(i,1)*p(j,1)-p(i,2)*p(j,2)-p(i,3)*p(j,3))
+         za(i,j)=f(i)*f(j)*(c23(i)*dcmplx(rt(j)/rt(i))-c23(j)*dcmplx(rt(i)/rt(j)))
+
+         if (abs(s(i,j)).lt.1d-5) then
+         zb(i,j)=-(f(i)*f(j))**2*dconjg(za(i,j))
+         else
+         zb(i,j)=-dcmplx(s(i,j))/za(i,j)
+         endif
+         za(j,i)=-za(i,j)
+         zb(j,i)=-zb(i,j)
+         s(j,i)=s(i,j)
+         enddo
+      enddo
+
+
+!      return
+    end subroutine spinoru
+
+    subroutine convert_to_MCFM(p)
+      implicit none
+! converts from (E,px,py,pz) to (px,py,pz,E)
+      real(8) :: p(4),tmp(4)
+
+      tmp(1)=p(1)
+      tmp(2)=p(2)
+      tmp(3)=p(3)
+      tmp(4)=p(4)
+
+      p(1)=tmp(2)
+      p(2)=tmp(3)
+      p(3)=tmp(4)
+      p(4)=tmp(1)
+    end subroutine convert_to_MCFM
+
+
 
 
 END MODULE
