@@ -1998,6 +1998,68 @@ END SUBROUTINE
 
 
 
+SUBROUTINE Kinematics_TH(Mom,applyPSCut,NBin)
+use ModParameters
+use ModMisc
+implicit none
+real(8) :: Mom(1:4,1:11),MomMELA(1:4,1:13)
+logical :: applyPSCut
+integer :: NBin(:)
+real(8) :: pT_Top,pT_Higgs,pT_j,eta_j,eta_top,eta_Higgs,y_Higgs,y_top,y_j,MatElSq_H0,MatElSq_H1,D_0minus
+integer, parameter :: t=4,Hbos=3,inLeft=1,inRight=2,ljet=5,bbar=6, lepP=8,nu=9
+logical,save :: FirstTime=.true.
+
+
+    applyPSCut = .false.
+
+
+       pT_Top  = get_PT(Mom(1:4,t))
+       pT_Higgs= get_PT(Mom(1:4,Hbos))
+       pT_j= get_PT(Mom(1:4,ljet))
+
+       y_top=get_eta(Mom(1:4,t))
+       y_Higgs=get_eta(Mom(1:4,Hbos))
+       y_j=get_eta(Mom(1:4,ljet))
+
+    
+    if( m_Top.lt.10d0*GeV  .and. (pT_top.lt.pTjetcut) ) applyPSCut=.true.
+    
+    
+!     if( FirstTime ) then
+! !       call NNPDFDriver("./pdfs/NNPDF30_lo_as_0130.LHgrid",33)
+! !       call NNinitPDF(0)
+!       call InitProcess_TTBH(m_Reso,m_top)
+!       FirstTime = .false.
+!     endif
+!     MomMELA(1:4,1) = -(/         65d0,           0.0000000000000000d0, 0.0000000000000000d0,      65d0           /)
+!     MomMELA(1:4,2) = -(/         65d0,           0.0000000000000000d0, 0.0000000000000000d0,     -65d0           /)  
+!     MomMELA(1:4,3:11) = Mom(1:4,3:11)
+!     MomMELA(1:4,12:13) = 0d0
+!     
+!     call EvalXSec_PP_TTBH(MomMELA(1:4,1:13),(/(1d0,0d0),(0d0,0d0)/),TopDecays,2,MatElSq_H0)
+!     call EvalXSec_PP_TTBH(MomMELA(1:4,1:13),(/(0d0,0d0),(1d0,0d0)/),TopDecays,2,MatElSq_H1)
+!     
+!     D_0minus = MatElSq_H0/(MatElSq_H0 + 2d0*MatElSq_H1 )
+
+
+    
+!   binning
+                                                                             
+       NBin(1) = WhichBin(1,pT_Top)
+       NBin(2) = WhichBin(2,y_Top)
+       NBin(3) = WhichBin(3,pT_j)
+       NBin(4) = WhichBin(4,y_j)
+       NBin(5) = WhichBin(5,pT_Higgs)
+       NBin(6) = WhichBin(6,y_Higgs)
+    
+    
+    
+RETURN
+END SUBROUTINE
+
+
+
+
 
 FUNCTION ZLepBranching(xRnd)
 use ModParameters
@@ -3505,6 +3567,48 @@ real(8),parameter :: NPr=3, PiWgtPr = (2d0*Pi)**(4-NPr*3) * (4d0*Pi)**(NPr-1)
 
 return
 END SUBROUTINE
+
+
+
+SUBROUTINE EvalPhasespace_2to3ArbMass(EHat,Mass,xRndPS,Mom,PSWgt)
+use ModParameters
+implicit none
+real(8) :: EHat
+real(8) :: PSWgt,PSWgt2,PSWgt3,Mass(1:3)
+real(8) :: xRndPS(1:5)
+real(8) :: Mom(1:4,1:5),TmpMom(1:4)
+! real(8) :: MomDK(1:4,1:6)                                                                                                              
+! integer :: NPart,i                                                                                                              
+! real(8) :: vel,parx,theta ! for checks                                                              
+integer :: Pcol1,Pcol2,Steps
+real(8) :: SingDepth,velo,parx
+real(8),parameter :: NPr=3, PiWgtPr = (2d0*Pi)**(4-NPr*3) * (4d0*Pi)**(NPr-1)
+
+
+  call genps(3,Ehat,xRndPS(1:5),Mass,Mom(1:4,3:5),PSWgt)
+  PSWgt = PSWgt*PiWgtPr
+
+!   call yeti3(Ehat,xRndPS(1:5),(/m_Top,m_Top,Mass/),Mom(1:4,3:5),PSWgt)         
+!   TmpMom(1:4) = Mom(1:4,3)                                                                                         
+!   Mom(1:4,3)  = Mom(1:4,5)                                                                                             
+!   Mom(1:4,5)  = TmpMom(1:4)                                                                                            
+
+!  particles on the beam axis:                                                                             
+                                    
+   Mom(1,1) =  EHat*0.5d0
+   Mom(2,1) =  0d0
+   Mom(3,1) =  0d0
+   Mom(4,1) = +EHat*0.5d0
+
+   Mom(1,2) =  EHat*0.5d0
+   Mom(2,2) =  0d0
+   Mom(3,2) =  0d0
+   Mom(4,2) = -EHat*0.5d0
+
+
+return
+END SUBROUTINE
+
 
 
 
