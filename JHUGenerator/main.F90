@@ -32,7 +32,7 @@ logical,parameter :: useBetaVersion=.false.! this should be set to .false.
    if( .not.useBetaVersion .and.   ConvertLHEFile ) then
         call StartConvertLHE(VG_Result,VG_Error)
    elseif( .not.useBetaVersion .and. .not.ReadLHEFile ) then
-        if( Process.eq.80 .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.90 ) then
+        if( Process.eq.80 .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.90 .or. Process .eq. 110 .or. Process .eq. 111 ) then
            call StartVegas_NEW(VG_Result,VG_Error)
         else
            call StartVegas(VG_Result,VG_Error)
@@ -146,7 +146,7 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
         read(arg(10:109),"(A)") DataFile
         CountArg = CountArg + 1
     elseif( arg(1:8).eq."Process=" ) then
-        read(arg(9:10),*) Process
+        read(arg(9:11),*) Process
         CountArg = CountArg + 1
     elseif( arg(1:11).eq."DecayMode1=" ) then
         read(arg(12:13),*) DecayMode1
@@ -651,6 +651,26 @@ include "vegas_common.f"
          VegasNc1_default =  500000
          VegasNc2_default =    1000
       endif
+     ! RR added -- t+H
+      if(Process.eq.110) then
+!         call InitProcess_TH()
+         NDim = 9
+         NDim = NDim + 2 ! sHat integration
+         VegasIt1_default = 5
+         VegasNc0_default =  500000
+         VegasNc1_default =  500000
+         VegasNc2_default =  500000
+      endif
+     ! RR added -- tb+H
+      if(Process.eq.111) then
+!         call InitProcess_TBH()
+         NDim = 9
+         NDim = NDim + 2 ! sHat integration
+         VegasIt1_default = 5
+         VegasNc0_default =  500000
+         VegasNc1_default =  500000
+         VegasNc2_default =  500000
+      endif
 
       if( unweighted ) then
           NDim = NDim + 1  ! random number which decides if event is accepted
@@ -670,6 +690,7 @@ SUBROUTINE StartVegas(VG_Result,VG_Error)
 use ModCrossSection
 use ModCrossSection_TTBH
 use ModCrossSection_BBBH
+use ModCrossSection_TH
 use ModKinematics
 use ModParameters
 implicit none
@@ -725,7 +746,11 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
       call vegas(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
     elseif (Process.eq.90) then
       call vegas(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
-    else
+    elseif (Process .eq. 110) then
+      call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
+   elseif (Process .eq. 111) then
+      call vegas(EvalWeighted_TBH,VG_Result,VG_Error,VG_Chi2)
+   else
       call vegas(EvalWeighted,VG_Result,VG_Error,VG_Chi2)    ! usual call of vegas for weighted events
     endif
 
@@ -751,6 +776,10 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
       call vegas1(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
     elseif (Process.eq.90) then
       call vegas1(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
+    elseif (Process.eq.110) then
+      call vegas1(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
+    elseif (Process.eq.111) then
+      call vegas1(EvalWeighted_TBH,VG_Result,VG_Error,VG_Chi2)
     else
       call vegas1(EvalWeighted,VG_Result,VG_Error,VG_Chi2)    ! usual call of vegas for weighted events
     endif
@@ -959,6 +988,7 @@ SUBROUTINE StartVegas_NEW(VG_Result,VG_Error)
 use ModCrossSection
 use ModCrossSection_TTBH
 use ModCrossSection_BBBH
+use ModCrossSection_TH
 use ModKinematics
 use ModParameters
 implicit none
@@ -1008,6 +1038,8 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
     if( Process.eq.90 ) call vegas(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.60 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.61 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
+    if( Process.eq.110 ) call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
+    if( Process.eq.111 ) call vegas(EvalWeighted_TBH,VG_Result,VG_Error,VG_Chi2)
 
 
     !DATA RUN
@@ -1024,7 +1056,8 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
     if( Process.eq.90 ) call vegas1(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.60 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.61 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
-
+    if( Process.eq.110 ) call vegas1(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
+    if( Process.eq.111 ) call vegas1(EvalWeighted_TBH,VG_Result,VG_Error,VG_Chi2)
 
 
 
@@ -1047,6 +1080,10 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
                     dum = EvalUnWeighted_HJJ(yRnd,.false.,(/-99,-99/),RES)
                 elseif( Process.eq.61 ) then
                     dum = EvalUnWeighted_HJJ(yRnd,.false.,(/-99,-99/),RES)
+!not_implemented_yet                if( Process.eq.110 ) then
+!not_implemented_yet                    dum = EvalUnWeighted_TH(yRnd,.false.,(/-99,-99/),RES)
+!not_implemented_yet                elseif( Process.eq.111 ) then
+!not_implemented_yet                    dum = EvalUnWeighted_TBH(yRnd,.false.,(/-99,-99/),RES)
                 endif
                 VG(:,:) = VG(:,:) + RES(:,:)
                 PChannel = PChannel_aux
@@ -1118,6 +1155,10 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
                   dum = EvalUnWeighted_HJJ(yRnd,.true.,(/i1,j1/),RES)
               elseif( Process.eq.61 ) then
                   dum = EvalUnWeighted_HJJ(yRnd,.true.,(/i1,j1/),RES)
+!not_implemented_yet              elseif( Process.eq.110 ) then
+!not_implemented_yet                  dum = EvalUnWeighted_TH(yRnd,.true.,(/i1,j1/),RES)
+!not_implemented_yet              elseif( Process.eq.111 ) then
+!not_implemented_yet                  dum = EvalUnWeighted_TBH(yRnd,.true.,(/i1,j1/),RES)
               endif
               StatusPercent = int(100d0*(AccepCounter_part(i1,j1))  /  dble(RequEvents(i1,j1))  )
               call PrintStatusBar( StatusPercent )
@@ -2634,6 +2675,8 @@ implicit none
      call InitHisto_TTBH()
   elseif (Process.eq.90) then
      call InitHisto_BBBH()
+  elseif (Process.eq.110 .or. Process .eq. 111) then
+     call InitHisto_TH()
   else
      call InitHisto_HZZ()
   endif
@@ -2930,6 +2973,69 @@ integer :: AllocStatus,NHisto
 RETURN
 END SUBROUTINE
 
+
+
+
+SUBROUTINE InitHisto_TH()
+use ModMisc
+use ModKinematics
+use ModParameters
+implicit none
+integer :: AllocStatus,NHisto
+
+          it_sav = 1
+          NumHistograms = 6
+          if( .not.allocated(Histo) ) then
+                allocate( Histo(1:NumHistograms), stat=AllocStatus  )
+                if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
+          endif
+
+          Histo(1)%Info   = "pT_top"
+          Histo(1)%NBins  = 50
+          Histo(1)%BinSize= 10d0*GeV
+          Histo(1)%LowVal = 0d0
+          Histo(1)%SetScale= 1d0/GeV
+
+          Histo(2)%Info   = "y(top)"
+          Histo(2)%NBins  = 60
+          Histo(2)%BinSize= 0.1d0
+          Histo(2)%LowVal = -3d0
+          Histo(2)%SetScale= 1d0
+
+          Histo(3)%Info   = "pT(jet)"
+          Histo(3)%NBins  = 50
+          Histo(3)%BinSize= 10d0*GeV
+          Histo(3)%LowVal =  0d0*GeV
+          Histo(3)%SetScale= 1d0/GeV
+
+          Histo(4)%Info   = "y(jet)"
+          Histo(4)%NBins  = 60
+          Histo(4)%BinSize= 0.2d0
+          Histo(4)%LowVal = -6d0
+          Histo(4)%SetScale= 1d0
+
+          Histo(5)%Info   = "pT(Higgs)"
+          Histo(5)%NBins  = 50
+          Histo(5)%BinSize= 10d0*GeV
+          Histo(5)%LowVal =  0d0*GeV
+          Histo(5)%SetScale= 1d0/GeV
+
+          Histo(6)%Info   = "y(Higgs)"
+          Histo(6)%NBins  = 100
+          Histo(6)%BinSize= 0.1d0
+          Histo(6)%LowVal = -5d0
+          Histo(6)%SetScale= 1d0
+
+
+
+  do NHisto=1,NumHistograms
+      Histo(NHisto)%Value(:) = 0d0
+      Histo(NHisto)%Value2(:)= 0d0
+      Histo(NHisto)%Hits(:)  = 0
+  enddo
+
+RETURN
+END SUBROUTINE
 
 SUBROUTINE InitHisto_HVBF()
 use ModMisc
