@@ -46,7 +46,6 @@ contains
    IsFac=SpinAvg*QuarkColAvg**2
 
    MuFac=(M_Top + M_Reso)/4d0
-   MuFac=75d0*GeV
    call setPDFs(eta1,eta2,MuFac,pdf)
 
 
@@ -211,8 +210,7 @@ contains
 
 !   ISFac = MomCrossing(MomExt)
    IsFac=SpinAvg*QuarkColAvg**2
-!   MuFac=(M_Top + M_Reso)/4d0
-   MuFac=75d0*GeV
+   MuFac=(M_Top + M_Reso)/4d0
    call setPDFs(eta1,eta2,MuFac,pdf)
 
 !couplings
