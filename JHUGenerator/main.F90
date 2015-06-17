@@ -1293,22 +1293,8 @@ END SUBROUTINE
 ! character(len=160) :: FirstLines,EventInfoLine,PDFLine
 ! character(len=160) :: EventLine(1:maxpart+3)
 ! integer :: VegasSeed,stat,n
-! integer,parameter :: InputLHEFormat = 1  !  1=POWHEG, 2=JHUGen (old format), 3=JHUGen (new format), 4=MadGraph
-! 
-! 
-! if(InputLHEFormat.eq.1) then
-!   InputFmt0 = trim(POWHEG_Fmt0)
-!   InputFmt1 = trim(POWHEG_Fmt1)
-! elseif(InputLHEFormat.eq.4) then
-!   InputFmt0 = trim(MadGra_Fmt0)
-!   InputFmt1 = trim(MadGra_Fmt1)
-! elseif(InputLHEFormat.eq.2) then
-!   InputFmt0 = trim(JHUGen_old_Fmt0)
-!   InputFmt1 = trim(JHUGen_old_Fmt1)
-! else
-!   InputFmt0 = trim(JHUGen_Fmt0)
-!   InputFmt1 = trim(JHUGen_Fmt1)
-! endif
+! integer,parameter :: DefaultInputLHEFormat = 1   !  1=POWHEG, 2=JHUGen (old format), 3=JHUGen (new format), 4=MadGraph
+! integer :: InputLHEFormat = 0
 ! 
 ! 
 ! 
@@ -1325,6 +1311,17 @@ END SUBROUTINE
 !      M_ResoSet=.false.
 !      do while ( .not.FirstEvent )
 !         read(16,fmt="(A160)",IOSTAT=stat,END=99) FirstLines
+!         if( InputLHEFormat.eq.0 ) then
+!             if ( FirstLines(21:30).eq."POWHEG-BOX" ) then
+!                 InputLHEFormat = 1
+!                 write (io_stdout,"(2X,A)")  "Input file detected as POWHEG"
+!                 write (io_LogFile,"(2X,A)") "Input file detected as POWHEG"
+!             elseif ( FirstLines(17:28).eq."JHUGenerator" ) then
+!                 InputLHEFormat = 3
+!                 write (io_stdout,"(2X,A)")  "Input file detected as JHUGen"
+!                 write (io_LogFile,"(2X,A)") "Input file detected as JHUGen"
+!             endif
+!         endif
 !         if( FirstLines(1:5).eq."hmass" ) then 
 !                read(FirstLines(6:13),fmt="(F7.0)") M_Reso
 !                M_Reso = M_Reso*GeV!  convert to units of 100GeV
@@ -1341,6 +1338,24 @@ END SUBROUTINE
 !             endif
 !         endif
 !      enddo
+!      if( InputLHEFormat.eq.0 ) then
+!          write(io_stdout,"(2X,A,I1)") "ERROR: Could not determine the LHE input file format.  Assuming default: ", DefaultInputLHEFormat
+!          write(io_LogFile,"(2X,A,I1)") "ERROR: Could not determine the LHE input file format.  Assuming default: ", DefaultInputLHEFormat
+!          InputLHEFormat = DefaultInputLHEFormat
+!      endif
+!      if(InputLHEFormat.eq.1) then
+!        InputFmt0 = trim(POWHEG_Fmt0)
+!        InputFmt1 = trim(POWHEG_Fmt1)
+!      elseif(InputLHEFormat.eq.4) then
+!        InputFmt0 = trim(MadGra_Fmt0)
+!        InputFmt1 = trim(MadGra_Fmt1)
+!      elseif(InputLHEFormat.eq.2) then
+!        InputFmt0 = trim(JHUGen_old_Fmt0)
+!        InputFmt1 = trim(JHUGen_old_Fmt1)
+!      else
+!        InputFmt0 = trim(JHUGen_Fmt0)
+!        InputFmt1 = trim(JHUGen_Fmt1)
+!      endif
 !      if( .not. M_ResoSet ) then
 !         write(io_stdout,"(2X,A,1F7.2)")  "ERROR: Higgs mass could not be read from LHE input file. Assuming default value",M_Reso*100d0
 !         write(io_LogFile,"(2X,A,1F7.2)") "ERROR: Higgs mass could not be read from LHE input file. Assuming default value",M_Reso*100d0
@@ -1556,23 +1571,9 @@ integer :: EventNumPart
 character(len=160) :: FirstLines,EventInfoLine,OtherLines
 character(len=160) :: EventLine(1:maxpart)
 integer :: n,stat,iHiggs,VegasSeed
-integer,parameter :: InputLHEFormat = 1  !  1=POWHEG, 2=JHUGen (old format), 3=JHUGen (new format), 4=MadGraph
+integer,parameter :: DefaultInputLHEFormat = 1   !  1=POWHEG, 2=JHUGen (old format), 3=JHUGen (new format), 4=MadGraph
+integer :: InputLHEFormat = 0
 
-
-
-if(InputLHEFormat.eq.1) then
-  InputFmt0 = trim(POWHEG_Fmt0)
-  InputFmt1 = trim(POWHEG_Fmt1)
-elseif(InputLHEFormat.eq.4) then
-  InputFmt0 = trim(MadGra_Fmt0)
-  InputFmt1 = trim(MadGra_Fmt1)
-elseif(InputLHEFormat.eq.2) then
-  InputFmt0 = trim(JHUGen_old_Fmt0)
-  InputFmt1 = trim(JHUGen_old_Fmt1)
-else
-  InputFmt0 = trim(JHUGen_Fmt0)
-  InputFmt1 = trim(JHUGen_Fmt1)
-endif
 
 
 
@@ -1587,6 +1588,17 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
      Ga_ResoSet=.false.
      do while ( .not.FirstEvent )
         read(16,fmt="(A160)",IOSTAT=stat,END=99) FirstLines
+        if( InputLHEFormat.eq.0 ) then
+            if ( FirstLines(21:30).eq."POWHEG-BOX" ) then
+                InputLHEFormat = 1
+                write (io_stdout,"(2X,A)")  "Input file detected as POWHEG"
+                write (io_LogFile,"(2X,A)") "Input file detected as POWHEG"
+            elseif ( FirstLines(17:28).eq."JHUGenerator" ) then
+                InputLHEFormat = 3
+                write (io_stdout,"(2X,A)")  "Input file detected as JHUGen"
+                write (io_LogFile,"(2X,A)") "Input file detected as JHUGen"
+            endif
+        endif
         if( FirstLines(1:5).eq."hmass" ) then 
                read(FirstLines(6:16),*) M_Reso
                M_Reso = M_Reso*GeV!  convert to units of 100GeV
@@ -1615,6 +1627,24 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
             endif
         endif
      enddo
+     if( InputLHEFormat.eq.0 ) then
+         write(io_stdout,"(2X,A,I1)") "ERROR: Could not determine the LHE input file format.  Assuming default: ", DefaultInputLHEFormat
+         write(io_LogFile,"(2X,A,I1)") "ERROR: Could not determine the LHE input file format.  Assuming default: ", DefaultInputLHEFormat
+         InputLHEFormat = DefaultInputLHEFormat
+     endif
+     if(InputLHEFormat.eq.1) then
+       InputFmt0 = trim(POWHEG_Fmt0)
+       InputFmt1 = trim(POWHEG_Fmt1)
+     elseif(InputLHEFormat.eq.4) then
+       InputFmt0 = trim(MadGra_Fmt0)
+       InputFmt1 = trim(MadGra_Fmt1)
+     elseif(InputLHEFormat.eq.2) then
+       InputFmt0 = trim(JHUGen_old_Fmt0)
+       InputFmt1 = trim(JHUGen_old_Fmt1)
+     else
+       InputFmt0 = trim(JHUGen_Fmt0)
+       InputFmt1 = trim(JHUGen_Fmt1)
+     endif
      if( .not. M_ResoSet ) then
         write(io_stdout,"(2X,A,1F7.2)")  "ERROR: Higgs mass could not be read from LHE input file. Assuming default value",M_Reso*100d0
         write(io_LogFile,"(2X,A,1F7.2)") "ERROR: Higgs mass could not be read from LHE input file. Assuming default value",M_Reso*100d0
@@ -1806,22 +1836,8 @@ character(len=120) :: EventInfoLine,PDFLine
 character(len=160) :: EventLine(1:maxpart+3)
 integer :: VegasSeed,i,stat,DecayParticles(1:2)
 integer, dimension(:), allocatable :: gen_seed
-integer,parameter :: InputLHEFormat = 1  !  1=POWHEG, 2=JHUGen (old format), 3=JHUGen (new format), 4=MadGraph
-
-
-if(InputLHEFormat.eq.1) then
-  InputFmt0 = trim(POWHEG_Fmt0)
-  InputFmt1 = trim(POWHEG_Fmt1)
-elseif(InputLHEFormat.eq.4) then
-  InputFmt0 = trim(MadGra_Fmt0)
-  InputFmt1 = trim(MadGra_Fmt1)
-elseif(InputLHEFormat.eq.2) then
-  InputFmt0 = trim(JHUGen_old_Fmt0)
-  InputFmt1 = trim(JHUGen_old_Fmt1)
-else
-  InputFmt0 = trim(JHUGen_Fmt0)
-  InputFmt1 = trim(JHUGen_Fmt1)
-endif
+integer,parameter :: DefaultInputLHEFormat = 1   !  1=POWHEG, 2=JHUGen (old format), 3=JHUGen (new format), 4=MadGraph
+integer :: InputLHEFormat = 0
 
 
 
@@ -1836,6 +1852,17 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
      M_ResoSet=.false.
      do while ( .not.FirstEvent )
         read(16,fmt="(A160)",IOSTAT=stat,END=99) FirstLines
+        if( InputLHEFormat.eq.0 ) then
+            if ( FirstLines(21:30).eq."POWHEG-BOX" ) then
+                InputLHEFormat = 1
+                write (io_stdout,"(2X,A)")  "Input file detected as POWHEG"
+                write (io_LogFile,"(2X,A)") "Input file detected as POWHEG"
+            elseif ( FirstLines(17:28).eq."JHUGenerator" ) then
+                InputLHEFormat = 3
+                write (io_stdout,"(2X,A)")  "Input file detected as JHUGen"
+                write (io_LogFile,"(2X,A)") "Input file detected as JHUGen"
+            endif
+        endif
         if( FirstLines(1:5).eq."hmass" ) then 
                read(FirstLines(6:13),fmt="(F7.1)") M_Reso
                M_Reso = M_Reso*GeV!  convert to units of 100GeV
@@ -1857,6 +1884,24 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
             endif
         endif
      enddo
+     if( InputLHEFormat.eq.0 ) then
+         write(io_stdout,"(2X,A,I1)") "ERROR: Could not determine the LHE input file format.  Assuming default: ", DefaultInputLHEFormat
+         write(io_LogFile,"(2X,A,I1)") "ERROR: Could not determine the LHE input file format.  Assuming default: ", DefaultInputLHEFormat
+         InputLHEFormat = DefaultInputLHEFormat
+     endif
+     if(InputLHEFormat.eq.1) then
+       InputFmt0 = trim(POWHEG_Fmt0)
+       InputFmt1 = trim(POWHEG_Fmt1)
+     elseif(InputLHEFormat.eq.4) then
+       InputFmt0 = trim(MadGra_Fmt0)
+       InputFmt1 = trim(MadGra_Fmt1)
+     elseif(InputLHEFormat.eq.2) then
+       InputFmt0 = trim(JHUGen_old_Fmt0)
+       InputFmt1 = trim(JHUGen_old_Fmt1)
+     else
+       InputFmt0 = trim(JHUGen_Fmt0)
+       InputFmt1 = trim(JHUGen_Fmt1)
+     endif
      if( .not. M_ResoSet ) then
         write(io_stdout,"(2X,A,1F7.2)")  "ERROR: Higgs mass could not be read from LHE input file. Assuming default value",M_Reso*100d0
         write(io_LogFile,"(2X,A,1F7.2)") "ERROR: Higgs mass could not be read from LHE input file. Assuming default value",M_Reso*100d0
@@ -2218,22 +2263,8 @@ END SUBROUTINE
 ! logical :: FirstEvent
 ! character(len=160) :: HeaderLines,EventInfoLine,OtherLines
 ! character(len=160) :: EventLine(1:maxpart)
-! integer,parameter :: InputLHEFormat = 1  !  1=POWHEG, 2=JHUGen (old format), 3=JHUGen (new format), 4=MadGraph
-! 
-! 
-! if(InputLHEFormat.eq.1) then
-!   InputFmt0 = trim(POWHEG_Fmt0)
-!   InputFmt1 = trim(POWHEG_Fmt1)
-! elseif(InputLHEFormat.eq.4) then
-!   InputFmt0 = trim(MadGra_Fmt0)
-!   InputFmt1 = trim(MadGra_Fmt1)
-! elseif(InputLHEFormat.eq.2) then
-!   InputFmt0 = trim(JHUGen_old_Fmt0)
-!   InputFmt1 = trim(JHUGen_old_Fmt1)
-! else
-!   InputFmt0 = trim(JHUGen_Fmt0)
-!   InputFmt1 = trim(JHUGen_Fmt1)
-! endif
+! integer,parameter :: DefaultInputLHEFormat = 1   !  1=POWHEG, 2=JHUGen (old format), 3=JHUGen (new format), 4=MadGraph
+! integer :: InputLHEFormat = 0
 ! 
 ! 
 !      open(unit=io_LHEOutFile,file=trim(DataFile)//'.lhe',form='formatted',access= 'sequential') ! in1 (part1)
@@ -2245,10 +2276,39 @@ END SUBROUTINE
 !      FirstEvent = .false.
 !      do while ( .not.FirstEvent )
 !         read(io_LHEOutFile,fmt="(A160)",IOSTAT=stat,END=99) HeaderLines
+!         if( InputLHEFormat.eq.0 ) then
+!             if ( HeaderLines(21:30).eq."POWHEG-BOX" ) then
+!                 InputLHEFormat = 1
+!                 write (io_stdout,"(2X,A)")  "Input file detected as POWHEG"
+!                 write (io_LogFile,"(2X,A)") "Input file detected as POWHEG"
+!             elseif ( HeaderLines(17:28).eq."JHUGenerator" ) then
+!                 InputLHEFormat = 3
+!                 write (io_stdout,"(2X,A)")  "Input file detected as JHUGen"
+!                 write (io_LogFile,"(2X,A)") "Input file detected as JHUGen"
+!             endif
+!         endif
 !         if( HeaderLines(1:7).eq."<event>" ) then 
 !                FirstEvent=.true.
 !         endif
 !      enddo
+!      if( InputLHEFormat.eq.0 ) then
+!          write(io_stdout,"(2X,A,I1)") "ERROR: Could not determine the LHE input file format.  Assuming default: ", DefaultInputLHEFormat
+!          write(io_LogFile,"(2X,A,I1)") "ERROR: Could not determine the LHE input file format.  Assuming default: ", DefaultInputLHEFormat
+!          InputLHEFormat = DefaultInputLHEFormat
+!      endif
+!      if(InputLHEFormat.eq.1) then
+!        InputFmt0 = trim(POWHEG_Fmt0)
+!        InputFmt1 = trim(POWHEG_Fmt1)
+!      elseif(InputLHEFormat.eq.4) then
+!        InputFmt0 = trim(MadGra_Fmt0)
+!        InputFmt1 = trim(MadGra_Fmt1)
+!      elseif(InputLHEFormat.eq.2) then
+!        InputFmt0 = trim(JHUGen_old_Fmt0)
+!        InputFmt1 = trim(JHUGen_old_Fmt1)
+!      else
+!        InputFmt0 = trim(JHUGen_Fmt0)
+!        InputFmt1 = trim(JHUGen_Fmt1)
+!      endif
 !      read(io_LHEOutFile,fmt=InputFmt0) EventNumPart,EventInfoLine!  read number of particle from the first line after <event> and other info
 !      do nline=1,EventNumPart!  read event lines
 !         read(io_LHEOutFile,fmt="(A160)") EventLine(nline)
