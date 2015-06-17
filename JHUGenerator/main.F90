@@ -1329,6 +1329,10 @@ END SUBROUTINE
 !                     write (io_stdout,"(2X,A)")  "Input file detected as JHUGen (pre-4.8)"
 !                     write (io_LogFile,"(2X,A)") "Input file detected as JHUGen (pre-4.8)"
 !                 endif
+!             elseif ( FirstLines(29:40).eq."Going Beyond" ) then                 !The actual MadGraph name is centered, so it moves
+!                 InputLHEFormat = 4                                              !between MadGraph 5 and Madgraph5_aMC@NLO
+!                 write (io_stdout,"(2X,A)")  "Input file detected as MadGraph"   !The motto is probably not going to change
+!                 write (io_LogFile,"(2X,A)") "Input file detected as MadGraph"
 !             endif
 !         endif
 !         if( FirstLines(1:5).eq."hmass" ) then 
@@ -1614,6 +1618,10 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                     write (io_stdout,"(2X,A)")  "Input file detected as JHUGen (pre-4.8)"
                     write (io_LogFile,"(2X,A)") "Input file detected as JHUGen (pre-4.8)"
                 endif
+            elseif ( FirstLines(29:40).eq."Going Beyond" ) then                 !The actual MadGraph name is centered, so it moves
+                InputLHEFormat = 4                                              !between MadGraph 5 and Madgraph5_aMC@NLO
+                write (io_stdout,"(2X,A)")  "Input file detected as MadGraph"   !The motto is probably not going to change
+                write (io_LogFile,"(2X,A)") "Input file detected as MadGraph"
             endif
         endif
         if( FirstLines(1:5).eq."hmass" ) then 
@@ -1887,6 +1895,10 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                     write (io_stdout,"(2X,A)")  "Input file detected as JHUGen (pre-4.8)"
                     write (io_LogFile,"(2X,A)") "Input file detected as JHUGen (pre-4.8)"
                 endif
+            elseif ( FirstLines(29:40).eq."Going Beyond" ) then                 !The actual MadGraph name is centered, so it moves
+                InputLHEFormat = 4                                              !between MadGraph 5 and Madgraph5_aMC@NLO
+                write (io_stdout,"(2X,A)")  "Input file detected as MadGraph"   !The motto is probably not going to change
+                write (io_LogFile,"(2X,A)") "Input file detected as MadGraph"
             endif
         endif
         if( FirstLines(1:5).eq."hmass" ) then 
@@ -2319,6 +2331,10 @@ END SUBROUTINE
 !                     write (io_stdout,"(2X,A)")  "Input file detected as JHUGen (pre-4.8)"
 !                     write (io_LogFile,"(2X,A)") "Input file detected as JHUGen (pre-4.8)"
 !                 endif
+!             elseif ( FirstLines(29:40).eq."Going Beyond" ) then                 !The actual MadGraph name is centered, so it moves
+!                 InputLHEFormat = 4                                              !between MadGraph 5 and Madgraph5_aMC@NLO
+!                 write (io_stdout,"(2X,A)")  "Input file detected as MadGraph"   !The motto is probably not going to change
+!                 write (io_LogFile,"(2X,A)") "Input file detected as MadGraph"
 !             endif
 !         endif
 !         if( HeaderLines(1:7).eq."<event>" ) then 
