@@ -2,7 +2,6 @@ MODULE ModCrossSection_TTBH
 IMPLICIT NONE
 
 integer, parameter,private :: LHA2M_pdf(-6:6) = (/-5,-6,-3,-4,-1,-2,0 ,2,1,4,3,6,5/)
-integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6,5/)
 
 
  CONTAINS
@@ -116,7 +115,6 @@ EvalWeighted_TTBH = 0d0
    EvalCounter = EvalCounter+1
 
 
-
 RETURN
 END FUNCTION 
 
@@ -161,19 +159,19 @@ EvalUnWeighted_TTBH = 0d0
       MomExt(1:4,nubar)= MomExt(1:4,08)
       MomExt(1:4,lepM) = MomExt(1:4,07)
       MomExt(1:4,Wm)   = MomExt(1:4,lepM) + MomExt(1:4,nubar)
-
+      
       call EvalPhasespace_TopDecay(MomExt(1:4,t),yRnd(12:15),MomExt(1:4,10:12),PSWgt3)    !  Top
       MomExt(1:4,b)   = MomExt(1:4,10)
       MomExt(1:4,nu)  = MomExt(1:4,12)
       MomExt(1:4,lepP)= MomExt(1:4,11)
       MomExt(1:4,Wp)  = MomExt(1:4,lepP) + MomExt(1:4,nu)
       PSWgt = PSWgt * PSWgt2*PSWgt3
-    
+      
       if( RandomizeVVdecays ) then 
          call random_number(DKRnd)
          if( DKRnd.lt.0.5d0 ) call swapi(DecayMode1,DecayMode2)
       endif
-    
+      
       call VVBranchings(DK_IDUP(1:6),DK_ICOLUP(1:2,3:6))
       MY_IDUP(b)    = Bot_;        ICOLUP(1:2,b) = (/501,00/)
       MY_IDUP(Wp)   = DK_IDUP(1);  ICOLUP(1:2,Wp)   = (/000,000/)
@@ -214,9 +212,9 @@ IF( GENEVT ) THEN
           MY_IDUP(1:5) = (/ LHA2M_pdf(iPartons(1)),LHA2M_pdf(iPartons(2)),Hig_,ATop_,Top_/)
           if( iPartons(1).gt.0 ) then
              ICOLUP(1:2,1) = (/501,000/)
-             ICOLUP(1:2,2) = (/000,502/)          
+             ICOLUP(1:2,2) = (/000,502/)
           else
-             ICOLUP(1:2,1) = (/000,502/)          
+             ICOLUP(1:2,1) = (/000,502/)
              ICOLUP(1:2,2) = (/501,000/)
           endif
       endif
