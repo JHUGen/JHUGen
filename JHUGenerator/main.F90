@@ -1295,6 +1295,7 @@ END SUBROUTINE
 ! integer :: VegasSeed,stat,n
 ! integer,parameter :: DefaultInputLHEFormat = 1   !  1=POWHEG, 2=JHUGen (old format), 3=JHUGen (new format), 4=MadGraph
 ! integer :: InputLHEFormat = 0
+! real :: InputJHUGenversion
 ! 
 ! 
 ! 
@@ -1317,9 +1318,17 @@ END SUBROUTINE
 !                 write (io_stdout,"(2X,A)")  "Input file detected as POWHEG"
 !                 write (io_LogFile,"(2X,A)") "Input file detected as POWHEG"
 !             elseif ( FirstLines(17:28).eq."JHUGenerator" ) then
-!                 InputLHEFormat = 3
-!                 write (io_stdout,"(2X,A)")  "Input file detected as JHUGen"
-!                 write (io_LogFile,"(2X,A)") "Input file detected as JHUGen"
+!                 read(FirstLines(31:33),*) InputJHUGenversion
+!                 if ( InputJHUGenversion.gt.4.799 ) then
+!                     InputLHEFormat = 3
+!                     write (io_stdout,"(2X,A)")  "Input file detected as JHUGen"
+!                     write (io_LogFile,"(2X,A)") "Input file detected as JHUGen"
+!                 else
+!                     !old JHUGen version
+!                     InputLHEFormat = 2
+!                     write (io_stdout,"(2X,A)")  "Input file detected as JHUGen (pre-4.8)"
+!                     write (io_LogFile,"(2X,A)") "Input file detected as JHUGen (pre-4.8)"
+!                 endif
 !             endif
 !         endif
 !         if( FirstLines(1:5).eq."hmass" ) then 
@@ -1573,7 +1582,7 @@ character(len=160) :: EventLine(1:maxpart)
 integer :: n,stat,iHiggs,VegasSeed
 integer,parameter :: DefaultInputLHEFormat = 1   !  1=POWHEG, 2=JHUGen (old format), 3=JHUGen (new format), 4=MadGraph
 integer :: InputLHEFormat = 0
-
+real :: InputJHUGenversion
 
 
 
@@ -1594,9 +1603,17 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                 write (io_stdout,"(2X,A)")  "Input file detected as POWHEG"
                 write (io_LogFile,"(2X,A)") "Input file detected as POWHEG"
             elseif ( FirstLines(17:28).eq."JHUGenerator" ) then
-                InputLHEFormat = 3
-                write (io_stdout,"(2X,A)")  "Input file detected as JHUGen"
-                write (io_LogFile,"(2X,A)") "Input file detected as JHUGen"
+                read(FirstLines(31:33),*) InputJHUGenversion
+                if ( InputJHUGenversion.gt.4.799 ) then
+                    InputLHEFormat = 3
+                    write (io_stdout,"(2X,A)")  "Input file detected as JHUGen"
+                    write (io_LogFile,"(2X,A)") "Input file detected as JHUGen"
+                else
+                    !old JHUGen version
+                    InputLHEFormat = 2
+                    write (io_stdout,"(2X,A)")  "Input file detected as JHUGen (pre-4.8)"
+                    write (io_LogFile,"(2X,A)") "Input file detected as JHUGen (pre-4.8)"
+                endif
             endif
         endif
         if( FirstLines(1:5).eq."hmass" ) then 
@@ -1838,6 +1855,7 @@ integer :: VegasSeed,i,stat,DecayParticles(1:2)
 integer, dimension(:), allocatable :: gen_seed
 integer,parameter :: DefaultInputLHEFormat = 1   !  1=POWHEG, 2=JHUGen (old format), 3=JHUGen (new format), 4=MadGraph
 integer :: InputLHEFormat = 0
+real :: InputJHUGenversion
 
 
 
@@ -1858,9 +1876,17 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                 write (io_stdout,"(2X,A)")  "Input file detected as POWHEG"
                 write (io_LogFile,"(2X,A)") "Input file detected as POWHEG"
             elseif ( FirstLines(17:28).eq."JHUGenerator" ) then
-                InputLHEFormat = 3
-                write (io_stdout,"(2X,A)")  "Input file detected as JHUGen"
-                write (io_LogFile,"(2X,A)") "Input file detected as JHUGen"
+                read(FirstLines(31:33),*) InputJHUGenversion
+                if ( InputJHUGenversion.gt.4.799 ) then
+                    InputLHEFormat = 3
+                    write (io_stdout,"(2X,A)")  "Input file detected as JHUGen"
+                    write (io_LogFile,"(2X,A)") "Input file detected as JHUGen"
+                else
+                    !old JHUGen version
+                    InputLHEFormat = 2
+                    write (io_stdout,"(2X,A)")  "Input file detected as JHUGen (pre-4.8)"
+                    write (io_LogFile,"(2X,A)") "Input file detected as JHUGen (pre-4.8)"
+                endif
             endif
         endif
         if( FirstLines(1:5).eq."hmass" ) then 
@@ -2282,9 +2308,17 @@ END SUBROUTINE
 !                 write (io_stdout,"(2X,A)")  "Input file detected as POWHEG"
 !                 write (io_LogFile,"(2X,A)") "Input file detected as POWHEG"
 !             elseif ( HeaderLines(17:28).eq."JHUGenerator" ) then
-!                 InputLHEFormat = 3
-!                 write (io_stdout,"(2X,A)")  "Input file detected as JHUGen"
-!                 write (io_LogFile,"(2X,A)") "Input file detected as JHUGen"
+!                 read(FirstLines(31:33),*) InputJHUGenversion
+!                 if ( InputJHUGenversion.gt.4.799 ) then
+!                     InputLHEFormat = 3
+!                     write (io_stdout,"(2X,A)")  "Input file detected as JHUGen"
+!                     write (io_LogFile,"(2X,A)") "Input file detected as JHUGen"
+!                 else
+!                     !old JHUGen version
+!                     InputLHEFormat = 2
+!                     write (io_stdout,"(2X,A)")  "Input file detected as JHUGen (pre-4.8)"
+!                     write (io_LogFile,"(2X,A)") "Input file detected as JHUGen (pre-4.8)"
+!                 endif
 !             endif
 !         endif
 !         if( HeaderLines(1:7).eq."<event>" ) then 
