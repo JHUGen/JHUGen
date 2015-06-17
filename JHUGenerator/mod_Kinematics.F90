@@ -1223,6 +1223,107 @@ SUBROUTINE EvalPhasespace_VBF(EHat,M_H,xRndPS,Mom,PSWgt)
 END SUBROUTINE
 
 
+
+SUBROUTINE EvalPhasespace_VBF_NEW(EHat,xRndPS,Mom,PSWgt)
+use modParameters
+use modMisc
+implicit none
+real(8) :: EHat,xRndPS(:),Mom(:,:),PSWgt
+real(8) :: s1,s2,y1,y2,phi1,phi2,Th1,Th2
+real(8) :: E1,cos_Th1,sin_Th1,sin_phi1,cos_phi1
+real(8) :: E2,cos_Th2,sin_Th2,sin_phi2,cos_phi2
+real(8) :: x1,x2,x3
+integer,parameter :: N2=3
+real(8),parameter :: PiWgt = (2d0*Pi)**(4-N2*3)
+
+! xRndPS(1:5) = (/ 0.9d0, 0.9d0, 0.5d0, 0.4d0, 0.78d0 /)
+
+
+!   s1   = EHat*0.5d0 * ( -1d0 + xRndPS(1) )
+!   s2   = EHat*0.5d0 * ( -1d0 + xRndPS(2) )
+  s1   = -EHat**2 * (1d0-M_Reso**2/EHat**2) * ( xRndPS(1) )
+  s2   = -EHat**2 * (1d0-M_Reso**2/EHat**2) * ( xRndPS(2) )
+  
+  y1   = -10d0 + xRndPS(3)*(20d0)
+  y2   = -10d0 + xRndPS(4)*(20d0) 
+  phi1 = 2d0*Pi * xRndPS(5)
+  
+  E1 = -s1/Ehat * dexp(y1) * dcosh(y1)
+  E2 = -s2/Ehat * dexp(-y2) * dcosh(-y2)
+   
+  Th1 = 2d0*datan( exp(-y1) )
+  Th2 = 2d0*datan( exp(+y2) )
+  
+  x1 = 2d0*E1*E2*dsin(phi1)*dsin(Th1)*dsin(Th2)
+  x2 = 2d0*E1*E2*dcos(phi1)*dsin(Th1)*dsin(Th2)
+  x3 = 2d0*E1*E2 - (E1+E2)*Ehat - M_Reso**2 + s1 + s2 - E2*Ehat*dcos(Th2) + E1*dcos(Th1)*(Ehat + 2*E2*dcos(Th2))
+ 
+if( x1**4 + x1**2*x2**2 - x1**2*x3**2 .lt. 0d0 ) then
+ PSWgt = 0d0
+ return
+endif
+ 
+ 
+!  print *, ""
+!  print *, "Ehat",Ehat*100d0
+!  print *, "E1",e1*100d0
+!  print *, "E2",e2*100d0
+!  print *, "-sqrt(s1)",-dsqrt(dabs(s1*100d0**2))
+!  print *, "-sqrt(s2)",-dsqrt(dabs(s2*100d0**2))
+!  print *, "y1",y1
+!  print *, "y2",y2
+!  
+!  print *, "Th1,cos(Th1)",Th1,dcos(th1)
+!  print *, "Th2,cos(Th2)",Th2,dcos(th2)
+!  print *, "phi1,cos(phi1)",phi1,dcos(phi1)
+!   
+!  print *, "x1",x1
+!  print *, "x2",x2
+!  print *, "x3",x3
+!  print *, x1**4 + x1**2*x2**2 - x1**2*x3**2
+!  print *, (x1**2 + x2**2)    
+!  
+!   phi2 = dATan2( (-x3 + (x2**2*x3)/(x1**2 + x2**2) + x2*dsqrt(-(x1**2*(-x1**2 - x2**2 + x3**2)))/(x1**2 + x2**2))/x1,   &
+!                  (-(x2*x3) - dsqrt(x1**4 + x1**2*x2**2 - x1**2*x3**2))/(x1**2 + x2**2)                                  &
+!                )
+!    print *, "sol1",phi2
+!    
+!    
+  phi2 = dATan2( (-x3 + (x2**2*x3)/(x1**2 + x2**2) - x2*dsqrt(-(x1**2*(-x1**2 - x2**2 + x3**2)))/(x1**2 + x2**2))/x1,   &
+                 (-(x2*x3) + dsqrt(x1**4 + x1**2*x2**2 - x1**2*x3**2))/(x1**2 + x2**2)                                  &
+               )
+!    print *, "sol2",phi2
+   
+!    print *, "chekcer",   -(x1*x3)/(x1**2+x2**2)  +  dsqrt((x1**2 * x3**2)/(x1**2+x2**2)**2/4d0 +(x2**2-x3**2)/(x1**2+x2**2) ) 
+!    print *, "chekcer",   -(x1*x3)/(x1**2+x2**2)  -  dsqrt((x1**2 * x3**2)/(x1**2+x2**2)**2/4d0 +(x2**2-x3**2)/(x1**2+x2**2) ) 
+!    print *, "chekcer",   (x1**2 * x3**2)/(x1**2+x2**2)**2/4d0 + (x2**2-x3**2)/(x1**2+x2**2)    
+!    pause
+ 
+  
+  sin_Th1 = dsin(Th1)
+  cos_Th1 = dcos(Th1)
+  sin_Th2 = dsin(Th2)
+  cos_Th2 = dcos(Th2)
+  sin_phi1= dsin(phi1)
+  cos_phi1= dcos(phi1)
+  sin_phi2= dsin(phi2)
+  cos_phi2= dcos(phi2)
+    
+  Mom(1:4,1) = EHat*0.5d0 *(/1d0,0d0,0d0,+1d0/)
+  Mom(1:4,2) = EHat*0.5d0 *(/1d0,0d0,0d0,-1d0/)
+  Mom(1:4,3) = E1 * (/ 1d0, sin_Th1*sin_phi1, sin_Th1*cos_phi1, cos_Th1 /)
+  Mom(1:4,4) = E2 * (/ 1d0, sin_Th2*sin_phi2, sin_Th2*cos_phi2, cos_Th2 /)
+  Mom(1:4,5) = Mom(1:4,1)+Mom(1:4,2) - Mom(1:4,3)- Mom(1:4,4)- Mom(1:4,5) 
+
+  PSWgt = 1d0/dcosh(y1)**2/dcosh(y2)**2 * PiWgt * (EHat**2 * (1d0-M_Reso**2/EHat**2))**2 * (20d0)**2 * 2d0*pi  & 
+          / dabs( x1*dcos(phi2) - x2*dsin(phi2) )
+  
+RETURN
+END SUBROUTINE
+
+
+
+
 SUBROUTINE EvalPhasespace_2to2(EHat,Masses,xRndPS,Mom,PSWgt)
 use ModMisc
 use ModParameters
@@ -1246,6 +1347,23 @@ real(8),parameter :: PiWgt2 = (2d0*Pi)**(4-N2*3) * (4d0*Pi)**(N2-1)
    Mom(2,2) =  0d0
    Mom(3,2) =  0d0
    Mom(4,2) = -EHat*0.5d0
+
+return
+END SUBROUTINE
+
+
+SUBROUTINE EvalPhasespace_2(EHat,Masses,xRndPS,Mom,PSWgt)
+use ModMisc
+use ModParameters
+implicit none
+real(8) :: EHat,Masses(1:2)
+real(8) :: PSWgt,PSWgt2,PSWgt3,PSWgt4,PSWgt5
+real(8) :: Mom(1:4,1:2),xRndPS(1:2)
+integer,parameter :: N2=2
+real(8),parameter :: PiWgt2 = (2d0*Pi)**(4-N2*3) * (4d0*Pi)**(N2-1)
+
+   call genps(2,Ehat,xRndPS(1:2),Masses,Mom(1:4,1:2),PSWgt)
+   PSWgt = PSWgt*PiWgt2
 
 return
 END SUBROUTINE
