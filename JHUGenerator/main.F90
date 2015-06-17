@@ -688,6 +688,7 @@ END SUBROUTINE
 
 SUBROUTINE StartVegas(VG_Result,VG_Error)
 use ModCrossSection
+use ModCrossSection_HJJ
 use ModCrossSection_TTBH
 use ModCrossSection_BBBH
 use ModCrossSection_TH
@@ -986,6 +987,7 @@ END SUBROUTINE
 
 SUBROUTINE StartVegas_NEW(VG_Result,VG_Error)
 use ModCrossSection
+use ModCrossSection_HJJ
 use ModCrossSection_TTBH
 use ModCrossSection_BBBH
 use ModCrossSection_TH

@@ -7,7 +7,7 @@ VegasDir = $(Here)/vegas
 
 # compiler options, Comp='ifort' or 'gfort'
 Opt  = Yes
-Comp = gfort
+Comp = ifort
 
 # link pdfs via LHA library ('Yes' or 'No')
 UseLHAPDF=No
@@ -61,6 +61,7 @@ Exec = ./JHUGen
 # main dependencies
 MainDep = mod_Kinematics.F90 \
           mod_CrossSection.F90 \
+          mod_CrossSection_HJJ.F90 \
           mod_CrossSection_TTBH.F90 \
           mod_CrossSection_BBBH.F90 \
           mod_CrossSection_TH.F90 \
@@ -69,6 +70,7 @@ MainDep = mod_Kinematics.F90 \
 # main objects
 MainObj = $(ObjectDir)/mod_Kinematics.o \
           $(ObjectDir)/mod_CrossSection.o \
+          $(ObjectDir)/mod_CrossSection_HJJ.o \
           $(ObjectDir)/mod_CrossSection_TTBH.o \
           $(ObjectDir)/mod_CrossSection_BBBH.o \
           $(ObjectDir)/mod_CrossSection_TH.o \
