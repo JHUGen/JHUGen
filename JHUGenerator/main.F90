@@ -258,7 +258,7 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
     endif
 
     
-    if( (TopDecays.ne.0) .and. (Process.eq.80) ) then! TTBH
+    if( (TopDecays.ne.0) .and. (Process.eq.80 .or. Process.eq.110 .or. Process.eq.111) ) then! TTBH and TH
        if( TopDecays.ne.1 ) call Error("TopDecays=2,3,4 are no longer supported. Use DecayMode1/2.")
        if( .not. IsAWDecay(DecayMode1) ) call Error("Invalid DecayMode1 for top decays")
        if( .not. IsAWDecay(DecayMode2) ) call Error("Invalid DecayMode2 for top decays")
@@ -653,7 +653,6 @@ include "vegas_common.f"
       endif
      ! RR added -- t+H
       if(Process.eq.110) then
-!         call InitProcess_TH()
          NDim = 9
          NDim = NDim + 2 ! sHat integration
          VegasIt1_default = 5
@@ -663,7 +662,6 @@ include "vegas_common.f"
       endif
      ! RR added -- tb+H
       if(Process.eq.111) then
-!         call InitProcess_TBH()
          NDim = 9
          NDim = NDim + 2 ! sHat integration
          VegasIt1_default = 5
@@ -678,8 +676,6 @@ include "vegas_common.f"
       NDim = NDim + 1  ! MC sampling for gg and qqb channel
 
 END SUBROUTINE
-
-
 
 
 
@@ -1078,10 +1074,10 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
                     dum = EvalUnWeighted_HJJ(yRnd,.false.,(/-99,-99/),RES)
                 elseif( Process.eq.61 ) then
                     dum = EvalUnWeighted_HJJ(yRnd,.false.,(/-99,-99/),RES)
-!not_implemented_yet                if( Process.eq.110 ) then
-!not_implemented_yet                    dum = EvalUnWeighted_TH(yRnd,.false.,(/-99,-99/),RES)
-!not_implemented_yet                elseif( Process.eq.111 ) then
-!not_implemented_yet                    dum = EvalUnWeighted_TBH(yRnd,.false.,(/-99,-99/),RES)
+                elseif( Process.eq.110 ) then
+                    dum = EvalUnWeighted_TH(yRnd,.false.,(/-99,-99/),RES)
+                elseif( Process.eq.111 ) then
+                    dum = EvalUnWeighted_TH(yRnd,.false.,(/-99,-99/),RES)
                 endif
                 VG(:,:) = VG(:,:) + RES(:,:)
                 PChannel = PChannel_aux
@@ -1153,10 +1149,10 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
                   dum = EvalUnWeighted_HJJ(yRnd,.true.,(/i1,j1/),RES)
               elseif( Process.eq.61 ) then
                   dum = EvalUnWeighted_HJJ(yRnd,.true.,(/i1,j1/),RES)
-!not_implemented_yet              elseif( Process.eq.110 ) then
-!not_implemented_yet                  dum = EvalUnWeighted_TH(yRnd,.true.,(/i1,j1/),RES)
-!not_implemented_yet              elseif( Process.eq.111 ) then
-!not_implemented_yet                  dum = EvalUnWeighted_TBH(yRnd,.true.,(/i1,j1/),RES)
+              elseif( Process.eq.110 ) then
+                  dum = EvalUnWeighted_TH(yRnd,.true.,(/i1,j1/),RES)
+              elseif( Process.eq.111 ) then
+                  dum = EvalUnWeighted_TH(yRnd,.true.,(/i1,j1/),RES)
               endif
               StatusPercent = int(100d0*(AccepCounter_part(i1,j1))  /  dble(RequEvents(i1,j1))  )
               call PrintStatusBar( StatusPercent )
@@ -3285,12 +3281,14 @@ character :: arg*(500)
     if( Process.eq.50) write(TheUnit,"(4X,A,F7.2,A,F7.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( Process.eq.80) write(TheUnit,"(4X,A,F7.2,A,F7.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( Process.eq.90) write(TheUnit,"(4X,A,F7.2,A,F7.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
+    if( Process.eq.110) write(TheUnit,"(4X,A,F7.2,A,F7.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
+    if( Process.eq.111) write(TheUnit,"(4X,A,F7.2,A,F7.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( ReadLHEFile )    write(TheUnit,"(4X,A)") "           (This is ReadLHEFile mode. Resonance mass/width might be overwritten by LHE input parameters. See below.)"
     if( ConvertLHEFile ) write(TheUnit,"(4X,A)") "           (This is ConvertLHEFile mode. Resonance mass/width might be overwritten by LHE input parameters. See below.)"
     write(TheUnit,"(4X,A,I2,2X,A,I2)") "DecayMode1:",DecayMode1, "DecayMode2:",DecayMode2
     if( IsAZDecay(DecayMode1) .or. IsAZDecay(DecayMode2) ) write(TheUnit,"(4X,A,F6.3,A,F6.4)") "Z-boson: mass=",M_Z*100d0,", width=",Ga_Z*100d0
     if( IsAWDecay(DecayMode1) .or. IsAWDecay(DecayMode2) ) write(TheUnit,"(4X,A,F6.3,A,F6.4)") "W-boson: mass=",M_W*100d0,", width=",Ga_W*100d0
-    if( Process.eq.80 ) write(TheUnit,"(4X,A,F8.4,A,F6.4)") "Top quark mass=",m_top*100d0,", width=",Ga_top*100d0
+    if( Process.eq.80 .or. Process.eq.110 .or. Process.eq.111 ) write(TheUnit,"(4X,A,F8.4,A,F6.4)") "Top quark mass=",m_top*100d0,", width=",Ga_top*100d0
 !     if( Process.eq.80 ) write(TheUnit,"(4X,A,I2)") "Top quark decay=",TOPDECAYS
     if( Process.eq.90 ) write(TheUnit,"(4X,A,F8.4,A,F6.4)") "Bottom quark mass=",m_top*100d0
     if( (ReadLHEFile) .and. (RequestNLeptons.gt.0) .and. (RequestOSSF) ) write(TheUnit,"(4X,A,I2,A)") "Lepton filter activated. Requesting ",RequestNLeptons," OSSF leptons."

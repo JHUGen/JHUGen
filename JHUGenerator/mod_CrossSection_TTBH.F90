@@ -171,14 +171,12 @@ EvalUnWeighted_TTBH = 0d0
          call random_number(DKRnd)
          if( DKRnd.lt.0.5d0 ) call swapi(DecayMode1,DecayMode2)
       endif
-    
       call VVBranchings(DK_IDUP(1:6),DK_ICOLUP(1:2,3:6),700)
-
       MY_IDUP(b)    = Bot_;        ICOLUP(1:2,b) = (/501,00/)
       MY_IDUP(Wp)   = DK_IDUP(1);  ICOLUP(1:2,Wp)   = (/000,000/)
       MY_IDUP(lepP) = DK_IDUP(3);  ICOLUP(1:2,lepP) = DK_ICOLUP(1:2,3)
       MY_IDUP(nu)   = DK_IDUP(4);  ICOLUP(1:2,nu)   = DK_ICOLUP(1:2,4)  
-      MY_IDUP(bbar) = ABot_;       ICOLUP(1:2,bbar)    = (/000,502/)
+      MY_IDUP(bbar) = ABot_;       ICOLUP(1:2,bbar) = (/000,502/)
       MY_IDUP(Wm)   = DK_IDUP(2);  ICOLUP(1:2,Wm)   = (/000,000/)             
       MY_IDUP(lepM) = DK_IDUP(6);  ICOLUP(1:2,lepM) = DK_ICOLUP(1:2,6)
       MY_IDUP(nubar)= DK_IDUP(5);  ICOLUP(1:2,nubar)= DK_ICOLUP(1:2,5)  
