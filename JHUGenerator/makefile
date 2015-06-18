@@ -87,7 +87,8 @@ AmpDep = mod_Misc.F90 \
           mod_HiggsJJ.F90 \
           mod_HiggsJ.F90 \
           mod_VHiggs.F90 \
-          mod_TTBHiggs.F90
+          mod_TTBHiggs.F90 \
+          mod_THiggs.F90
 
 
 # amplitude objects
@@ -100,7 +101,8 @@ AmpObj =  $(ObjectDir)/mod_Misc.o \
           $(ObjectDir)/mod_HiggsJJ.o \
           $(ObjectDir)/mod_HiggsJ.o \
           $(ObjectDir)/mod_VHiggs.o \
-          $(ObjectDir)/mod_TTBHiggs.o
+          $(ObjectDir)/mod_TTBHiggs.o \
+          $(ObjectDir)/mod_THiggs.o
 
 VegasDep = $(VegasDir)/vegas.f
 VegasObj = $(ObjectDir)/vegas.o

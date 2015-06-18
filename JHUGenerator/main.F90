@@ -747,10 +747,8 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
       call vegas(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
     elseif (Process.eq.90) then
       call vegas(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
-    elseif (Process .eq. 110) then
+    elseif (Process.eq.110 .or. Process.eq.111) then
       call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
-   elseif (Process .eq. 111) then
-      call vegas(EvalWeighted_TBH,VG_Result,VG_Error,VG_Chi2)
    else
       call vegas(EvalWeighted,VG_Result,VG_Error,VG_Chi2)    ! usual call of vegas for weighted events
     endif
@@ -777,10 +775,8 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
       call vegas1(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
     elseif (Process.eq.90) then
       call vegas1(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
-    elseif (Process.eq.110) then
+    elseif (Process.eq.110 .or. Process.eq.111) then
       call vegas1(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
-    elseif (Process.eq.111) then
-      call vegas1(EvalWeighted_TBH,VG_Result,VG_Error,VG_Chi2)
     else
       call vegas1(EvalWeighted,VG_Result,VG_Error,VG_Chi2)    ! usual call of vegas for weighted events
     endif
@@ -1040,8 +1036,8 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
     if( Process.eq.90 ) call vegas(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.60 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.61 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
-    if( Process.eq.110 ) call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
-    if( Process.eq.111 ) call vegas(EvalWeighted_TBH,VG_Result,VG_Error,VG_Chi2)
+    if( Process.eq.110) call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
+    if( Process.eq.111) call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
 
 
     !DATA RUN
@@ -1058,8 +1054,8 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
     if( Process.eq.90 ) call vegas1(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.60 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.61 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
-    if( Process.eq.110 ) call vegas1(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
-    if( Process.eq.111 ) call vegas1(EvalWeighted_TBH,VG_Result,VG_Error,VG_Chi2)
+    if( Process.eq.110) call vegas1(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
+    if( Process.eq.111) call vegas1(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
 
 
 
@@ -3528,7 +3524,8 @@ implicit none
         write(io_stdout,*) ""
         write(io_stdout,"(2X,A)") "Command line arguments:"
         write(io_stdout,"(4X,A)") "Collider:   1=LHC, 2=Tevatron, 0=e+e-"
-        write(io_stdout,"(4X,A)") "Process: 0=spin-0, 1=spin-1, 2=spin-2 resonance, 50=pp/ee->VH, 60=weakVBF, 61=pp->Hjj, 62=pp->Hj, 80=pp->ttbar+H, 90=pp->bbbar+H"
+        write(io_stdout,"(4X,A)") "Process: 0=spin-0, 1=spin-1, 2=spin-2 resonance, 50=pp/ee->VH, 60=weakVBF, 61=pp->Hjj, 62=pp->Hj"
+        write(io_stdout,"(4X,A)") "         80=pp->ttbar+H, 90=pp->bbbar+H, 110=pp->t+H, 111=pp->tbar+H"
         write(io_stdout,"(4X,A)") "MReso:      resonance mass (default=125.60), format: yyy.xx"
         write(io_stdout,"(4X,A)") "DecayMode1: decay mode for vector boson 1 (Z/W+/gamma)"
         write(io_stdout,"(4X,A)") "DecayMode2: decay mode for vector boson 2 (Z/W-/gamma)"
