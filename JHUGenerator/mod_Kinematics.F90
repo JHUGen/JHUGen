@@ -2120,7 +2120,7 @@ SUBROUTINE Kinematics_TH(Mom,applyPSCut,NBin)
 use ModParameters
 use ModMisc
 implicit none
-real(8) :: Mom(1:4,1:11),MomMELA(1:4,1:13)
+real(8) :: Mom(1:4,1:8),MomMELA(1:4,1:10)
 logical :: applyPSCut
 integer :: NBin(:)
 real(8) :: pT_Top,pT_Higgs,pT_j,eta_j,eta_top,eta_Higgs,y_Higgs,y_top,y_j,MatElSq_H0,MatElSq_H1,D_0minus
