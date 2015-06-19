@@ -1590,6 +1590,7 @@ integer,parameter :: DefaultInputLHEFormat = 1   !  1=POWHEG, 2=JHUGen (old form
 integer :: InputLHEFormat = 0
 real :: InputJHUGenversion
 logical :: WroteHeader = .false.
+logical :: WroteMassWidth = .false.
 
 
 
@@ -1631,14 +1632,22 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
         endif
         if ( FirstLines(1:4).eq."<!--" .and. .not.WroteHeader ) then
             call InitOutput()
+            if (InputLHEFormat .eq. 4) then
+                write(io_LHEOutFile, "(A)") "-->"
+            endif
+            WroteHeader = .true.
         endif
         if (FirstLines(1:6).eq."<init>" .and. .not.WroteHeader ) then
             call InitOutput()
-            write (io_LHEOutFile,"(A)") "-->"
             WroteHeader = .true.
         endif
         if( FirstLines(1:5).eq."hmass" ) then 
                read(FirstLines(6:16),*) M_Reso
+               M_Reso = M_Reso*GeV!  convert to units of 100GeV
+               M_ResoSet=.true.
+        endif
+        if( FirstLines(20:23).eq."# MH" ) then
+               read(FirstLines(7:18),*) M_Reso
                M_Reso = M_Reso*GeV!  convert to units of 100GeV
                M_ResoSet=.true.
         endif
@@ -1647,13 +1656,19 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                Ga_Reso = Ga_Reso*GeV!  convert to units of 100GeV
                Ga_ResoSet=.true.
         endif
-        if( FirstLines(1:3).eq."-->" .and. .not.WroteHeader) then
-            WroteHeader = .true.
+        if( .not.WroteMassWidth .and. (FirstLines(1:6).eq."<init>" .or. (FirstLines(1:3).eq."-->" .and. InputLHEFormat.ne.4))) then
             write(io_LHEOutFile ,"(A)") ""
+            if (InputLHEFormat .eq. 4) then
+                write(io_LHEOutFile, "(A)") "<!--"
+            endif
             write(io_LHEOutFile ,"(A)") "JHUGen Resonance parameters used for event generation:"
             write(io_LHEOutFile ,"(A,F6.1,A)") "hmass  ",M_Reso*100d0,"        ! Higgs boson mass"
             write(io_LHEOutFile ,"(A,F10.5,A)") "hwidth",Ga_Reso*100d0,"      ! Higgs boson width"
+            if (FirstLines(1:3).ne."-->") then
+                write(io_LHEOutFile, "(A)") "-->"
+            endif
             write(io_LHEOutFile ,"(A)") ""
+            WroteMassWidth = .true.
         endif
         if( FirstLines(1:7).eq."<event>" ) then 
                FirstEvent=.true.
