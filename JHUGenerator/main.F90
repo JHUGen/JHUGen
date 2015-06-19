@@ -25,7 +25,9 @@ logical,parameter :: useBetaVersion=.false.! this should be set to .false.
    call PrintLogo(io_LogFile)
    call WriteParameters(io_stdout)
    call WriteParameters(io_LogFile)
-   call InitOutput()
+   if ( .not. ReadLHEFile) then
+      call InitOutput()
+   endif
    write(io_stdout,*) " Running"
    if( .not.useBetaVersion .and.   ConvertLHEFile ) then
         call StartConvertLHE(VG_Result,VG_Error)
@@ -1587,6 +1589,7 @@ integer :: n,stat,iHiggs,VegasSeed
 integer,parameter :: DefaultInputLHEFormat = 1   !  1=POWHEG, 2=JHUGen (old format), 3=JHUGen (new format), 4=MadGraph
 integer :: InputLHEFormat = 0
 real :: InputJHUGenversion
+logical :: WroteHeader = .false.
 
 
 
@@ -1594,6 +1597,8 @@ if( VegasIt1.eq.-1 ) VegasIt1 = VegasIt1_default
 if( VegasNc0.eq.-1 ) VegasNc0 = VegasNc0_default
 if( VegasNc1.eq.-1 .and. VegasNc2.eq.-1 ) VegasNc1 = VegasNc1_default
 if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
+
+     write(io_LHEOutFile ,'(A)') '<LesHouchesEvents version="1.0">'
 
 !    search for line with first event
      FirstEvent = .false.
@@ -1624,6 +1629,14 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                 write (io_LogFile,"(2X,A)") "Input file detected as MadGraph"
             endif
         endif
+        if ( FirstLines(1:4).eq."<!--" .and. .not.WroteHeader ) then
+            call InitOutput()
+        endif
+        if (FirstLines(1:6).eq."<init>" .and. .not.WroteHeader ) then
+            call InitOutput()
+            write (io_LHEOutFile,"(A)") "-->"
+            WroteHeader = .true.
+        endif
         if( FirstLines(1:5).eq."hmass" ) then 
                read(FirstLines(6:16),*) M_Reso
                M_Reso = M_Reso*GeV!  convert to units of 100GeV
@@ -1634,7 +1647,8 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                Ga_Reso = Ga_Reso*GeV!  convert to units of 100GeV
                Ga_ResoSet=.true.
         endif
-        if( FirstLines(1:3).eq."-->" ) then
+        if( FirstLines(1:3).eq."-->" .and. .not.WroteHeader) then
+            WroteHeader = .true.
             write(io_LHEOutFile ,"(A)") ""
             write(io_LHEOutFile ,"(A)") "JHUGen Resonance parameters used for event generation:"
             write(io_LHEOutFile ,"(A,F6.1,A)") "hmass  ",M_Reso*100d0,"        ! Higgs boson mass"
@@ -2922,7 +2936,9 @@ use ModParameters
 implicit none
 
     if( (unweighted) .or. ( (.not.unweighted) .and. (writeWeightedLHE) )  ) then 
-        write(io_LHEOutFile ,'(A)') '<LesHouchesEvents version="1.0">'
+        if ( .not. ReadLHEFile ) then
+            write(io_LHEOutFile ,'(A)') '<LesHouchesEvents version="1.0">'
+        endif
         write(io_LHEOutFile ,'(A)') '<!--'
         write(io_LHEOutFile ,'(A,A6,A)') 'Output from the JHUGenerator ',trim(JHUGen_Version),' described in arXiv:1001.3396 [hep-ph],arXiv:1208.4018 [hep-ph],arXiv:1309.4819 [hep-ph]'
 
