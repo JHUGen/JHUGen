@@ -1678,7 +1678,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
         endif
         if( FirstLines(1:6).eq."<event" .or. FirstLines(3:8).eq."<event" ) then
                FirstEvent=.true.
-               BeginEventLine = FirstLines
+               BeginEventLine = trim(FirstLines)
         else
             if( importExternal_LHEinit ) then
                 if( FirstLines(1:17).eq."<LesHouchesEvents" .or. FirstLines(1:4).eq."<!--" ) then
@@ -2167,7 +2167,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
               elseif( (OtherLines(1:7).eq."</event" .or. OtherLines(3:9).eq."</event") .and. Res.gt.0d0 ) then
                   write(io_LHEOutFile,"(A)") trim(OtherLines)
               elseif( OtherLines(1:6).eq."<event" .or. OtherLines(3:8).eq."<event" ) then
-                  BeginEventLine = OtherLines
+                  BeginEventLine = trim(OtherLines)
                   exit
               elseif( Res.gt.0d0 ) then !if there are "#" comments
                   write(io_LHEOutFile,fmt="(A)") trim(OtherLines)
