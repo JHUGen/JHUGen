@@ -1596,6 +1596,7 @@ integer :: MomentumCharacters, LifetimeCharacters, LifetimeDigitsAfterDecimal, S
 logical :: LifetimeIsExponential, SpinIsExponential
 character(len=20) :: MomentumFormat
 character(len=40) :: FormatParts(11)
+character(len=100) :: BeginEventLine
 
 
 
@@ -1677,6 +1678,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
         endif
         if( FirstLines(1:6).eq."<event" .or. FirstLines(3:8).eq."<event" ) then
                FirstEvent=.true.
+               BeginEventLine = FirstLines
         else
             if( importExternal_LHEinit ) then
                 if( FirstLines(1:17).eq."<LesHouchesEvents" .or. FirstLines(1:4).eq."<!--" ) then
@@ -2140,7 +2142,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
              HiggsDK_IDUP(8) = convertLHE(HiggsDK_IDUP(8))
              HiggsDK_IDUP(9) = convertLHE(HiggsDK_IDUP(9))
              
-             call WriteOutEvent_NEW(EventNumPart,LHE_IDUP,LHE_IntExt,LHE_MOTHUP,LHE_ICOLUP,MomExt,HiggsDK_Mom,Mass,iHiggs,HiggsDK_IDUP,HiggsDK_ICOLUP,EventInfoLine)
+             call WriteOutEvent_NEW(EventNumPart,LHE_IDUP,LHE_IntExt,LHE_MOTHUP,LHE_ICOLUP,MomExt,HiggsDK_Mom,Mass,iHiggs,HiggsDK_IDUP,HiggsDK_ICOLUP,EventInfoLine,BeginEventLine=BeginEventLine)
 
              if( mod(AccepCounter,5000).eq.0 ) then
                   call cpu_time(time_int)
@@ -2163,8 +2165,9 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                   if( RequestNLeptons.gt.0 ) write(io_LHEOutFile,"(A,1F6.2,A)") "<!-- Lepton filter efficiency:",dble(AccepCounter)/dble(NEvent)*100d0," % -->"
                   goto 99
               elseif( (OtherLines(1:7).eq."</event" .or. OtherLines(3:9).eq."</event") .and. Res.gt.0d0 ) then
-                  write(io_LHEOutFile,"(A)") "</event>"
+                  write(io_LHEOutFile,"(A)") trim(OtherLines)
               elseif( OtherLines(1:6).eq."<event" .or. OtherLines(3:8).eq."<event" ) then
+                  BeginEventLine = OtherLines
                   exit
               elseif( Res.gt.0d0 ) then !if there are "#" comments
                   write(io_LHEOutFile,fmt="(A)") trim(OtherLines)

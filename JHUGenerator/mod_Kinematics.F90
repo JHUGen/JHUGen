@@ -349,7 +349,7 @@ END SUBROUTINE
 
 
 
-SUBROUTINE WriteOutEvent_NEW(NUP,IDUP,ISTUP,MOTHUP,ICOLUP,Mom,HiggsDK_Mom,Mass,iHiggs,HiggsDK_IDUP,HiggsDK_ICOLUP,EventInfoLine,EventWeight)
+SUBROUTINE WriteOutEvent_NEW(NUP,IDUP,ISTUP,MOTHUP,ICOLUP,Mom,HiggsDK_Mom,Mass,iHiggs,HiggsDK_IDUP,HiggsDK_ICOLUP,EventInfoLine,EventWeight,BeginEventLine)
 use ModParameters
 use modMisc
 implicit none
@@ -357,6 +357,7 @@ real(8) :: Mom(:,:),HiggsDK_Mom(:,:),Mass(:)
 ! real(8),optional :: MomFSPartons(:,:)
 real(8),optional :: EventWeight
 character(len=*) :: EventInfoLine
+character(len=*),optional :: BeginEventLine
 ! integer,optional :: MOTHUP_Parton(:,:)
 real(8) :: Spin, Lifetime, s34,s56,s36,s45,smallestInv
 integer :: IDUP(:),ISTUP(:),MOTHUP(:,:),ICOLUP(:,:)
@@ -444,9 +445,12 @@ character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE
             HiggsDK_Mom(1:4,2) = HiggsDK_Mom(1:4,4)+ HiggsDK_Mom(1:4,5)
         endif
     endif
-    
-    
-    write(io_LHEOutFile,"(A)") "<event>"
+
+    if (present(BeginEventLine)) then
+        write(io_LHEOutFile, "(A)") trim(BeginEventLine)
+    else
+        write(io_LHEOutFile,"(A)") "<event>"
+    endif
     if( ReadLHEFile .and. importExternal_LHEinit ) then
       write(io_LHEOutFile,"(I2,X,A)") NUP+NUP_NEW,trim(EventInfoLine)
     else
