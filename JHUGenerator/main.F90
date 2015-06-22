@@ -1591,7 +1591,11 @@ integer :: InputLHEFormat = 0
 real :: InputJHUGenversion
 logical :: WroteHeader = .false.
 logical :: WroteMassWidth = .false.
-integer :: i
+integer :: i, fieldwidth, spaces(1:13)
+integer :: MomentumCharacters, LifetimeCharacters, LifetimeDigitsAfterDecimal, SpinCharacters, SpinDigitsAfterDecimal
+logical :: LifetimeIsExponential, SpinIsExponential
+character(len=20) :: MomentumFormat
+character(len=40) :: FormatParts(11)
 
 
 
@@ -1702,7 +1706,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
      endif
 
      InputFmt0 = ""
-     !InputFmt1 = ""
+     InputFmt1 = ""
 
      if( .not. M_ResoSet ) then
         write(io_stdout,"(2X,A,1F7.2)")  "ERROR: Higgs mass could not be read from LHE input file. Assuming default value",M_Reso*100d0
@@ -1747,13 +1751,13 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
          if (InputFmt0.eq."") then
              read(16,"(A180)") OtherLines
              i = 1
-             do while (OtherLines(i+1:i+1) .eq. " ")
+             do while (OtherLines(i:i) .eq. " ")
                  i = i+1
              end do
              if (i.eq.1) then
                  InputFmt0 = "(I2,A160)"
              else
-                 write(InputFmt0, "(A,I2,A)") "(", i, "X,I2,A160)"
+                 write(InputFmt0, "(A,I2,A)") "(", i-1, "X,I2,A160)"
              endif
              read(OtherLines, InputFmt0) EventNumPart, EventInfoLine
          else
@@ -1767,6 +1771,320 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
             call Error("Number of particles in LHE input exceeds allowed limit",EventNumPart)
          endif
          do nline=1,EventNumPart
+            if (InputFmt1.eq."") then
+                !first find the number of spaces at the beginning
+                i = 1
+                spaces(1) = 0
+                do while (EventLine(nline)(i:i) .eq. " ")
+                    i = i+1
+                    spaces(1) = spaces(1)+1
+                end do
+                !now find the width of the id; assume it's right aligned.
+                fieldwidth = 0
+                do while (EventLine(nline)(i:i) .ne. " ")
+                    i = i+1
+                    fieldwidth = fieldwidth+1
+                end do
+                spaces(1) = spaces(1) + fieldwidth - 3
+
+                !number of spaces between the id and the status
+                spaces(2) = 0
+                do while (EventLine(nline)(i:i) .eq. " ")
+                    i = i+1
+                    spaces(2) = spaces(2)+1
+                end do
+                !width of the status (should be -1, so width 2, but just in case)
+                fieldwidth = 0
+                do while (EventLine(nline)(i:i) .ne. " ")
+                    i = i+1
+                    fieldwidth = fieldwidth+1
+                end do
+                spaces(2) = spaces(2) + fieldwidth - 2
+
+                !number of spaces between the status and the first mother
+                spaces(3) = 0
+                do while (EventLine(nline)(i:i) .eq. " ")
+                    i = i+1
+                    spaces(3) = spaces(3)+1
+                end do
+                fieldwidth = 0
+                do while (EventLine(nline)(i:i) .ne. " ")
+                    i = i+1
+                    fieldwidth = fieldwidth+1
+                end do
+                spaces(3) = spaces(3) + fieldwidth - 2
+
+                !number of spaces between the mothers
+                spaces(4) = 0
+                do while (EventLine(nline)(i:i) .eq. " ")
+                    i = i+1
+                    spaces(4) = spaces(4)+1
+                end do
+                fieldwidth = 0
+                do while (EventLine(nline)(i:i) .ne. " ")
+                    i = i+1
+                    fieldwidth = fieldwidth+1
+                end do
+                spaces(4) = spaces(4) + fieldwidth - 2
+
+                !number of spaces between the second mother and the color
+                spaces(5) = 0
+                do while (EventLine(nline)(i:i) .eq. " ")
+                    i = i+1
+                    spaces(5) = spaces(5)+1
+                end do
+                fieldwidth = 0
+                do while (EventLine(nline)(i:i) .ne. " ")
+                    i = i+1
+                    fieldwidth = fieldwidth+1
+                end do
+                spaces(5) = spaces(5) + fieldwidth - 3
+
+                !number of spaces between the color and the anticolor
+                spaces(6) = 0
+                do while (EventLine(nline)(i:i) .eq. " ")
+                    i = i+1
+                    spaces(6) = spaces(6)+1
+                end do
+                fieldwidth = 0
+                do while (EventLine(nline)(i:i) .ne. " ")
+                    i = i+1
+                    fieldwidth = fieldwidth+1
+                end do
+                spaces(6) = spaces(6) + fieldwidth - 3
+
+                !number of spaces between the anticolor and px
+                !From now on the alignment is simpler, every row will have the same width
+                !   except for possibly a - sign at the beginning
+                !Unfortunately now there's number formatting to worry about
+                !I will assume that the momentum components and the mass all have the same formatting
+                spaces(7) = 0
+                do while (EventLine(nline)(i:i) .eq. " ")
+                    i = i+1
+                    spaces(7) = spaces(7)+1
+                end do
+                if (EventLine(nline)(i:i) .eq. "-") then
+                    i = i+1
+                else
+                    spaces(7) = spaces(7)-1  !because the place where the - sign is supposed to go is not always a space
+                endif
+                !i is now on the first actual digit (not -) of px
+
+                !number of characters used for momentum
+                MomentumCharacters = 1           !we are already past the -
+                do while (EventLine(nline)(i:i) .ne. " ")
+                    i = i+1
+                    MomentumCharacters = MomentumCharacters+1
+                end do
+
+                !number of spaces between px and py
+                spaces(8) = 0
+                do while (EventLine(nline)(i:i) .eq. " ")
+                    i = i+1
+                    spaces(8) = spaces(8)+1
+                end do
+                i = i+1
+                if (EventLine(nline)(i:i) .ne. "-") then
+                    spaces(8) = spaces(8)-1  !because the place where the - sign is supposed to go is not always a space
+                endif
+                do while (EventLine(nline)(i:i) .ne. " ")
+                    i = i+1
+                enddo
+
+                !number of spaces between py and pz
+                spaces(9) = 0
+                do while (EventLine(nline)(i:i) .eq. " ")
+                    i = i+1
+                    spaces(9) = spaces(9)+1
+                end do
+                i = i+1
+                if (EventLine(nline)(i:i) .ne. "-") then
+                    spaces(9) = spaces(9)-1  !because the place where the - sign is supposed to go is not always a space
+                endif
+                do while (EventLine(nline)(i:i) .ne. " ")
+                    i = i+1
+                enddo
+
+                !number of spaces between pz and E
+                spaces(10) = 0
+                do while (EventLine(nline)(i:i) .eq. " ")
+                    i = i+1
+                    spaces(10) = spaces(10)+1
+                end do
+                i = i+1
+                if (EventLine(nline)(i:i) .ne. "-") then
+                    spaces(10) = spaces(10)-1  !because the place where the - sign is supposed to go is not always a space
+                endif
+                do while (EventLine(nline)(i:i) .ne. " ")
+                    i = i+1
+                enddo
+
+                !number of spaces between E and m
+                spaces(11) = 0
+                do while (EventLine(nline)(i:i) .eq. " ")
+                    i = i+1
+                    spaces(11) = spaces(11)+1
+                end do
+                i = i+1
+                if (EventLine(nline)(i:i) .ne. "-") then
+                    spaces(11) = spaces(11)-1  !because the place where the - sign is supposed to go is not always a space
+                endif
+                do while (EventLine(nline)(i:i) .ne. " ")
+                    i = i+1
+                enddo
+
+                !number of spaces between m and lifetime
+                !lifetime is nonnegative, so no - sign
+                !but some generators (JHUGen) write 0.00000000000E+00
+                !while some (old JHUGen, some versions of MadGraph) write 0.
+                spaces(12) = 0
+                do while (EventLine(nline)(i:i) .eq. " ")
+                    i = i+1
+                    spaces(12) = spaces(12)+1
+                end do
+
+                !lifetime formatting
+                LifetimeCharacters = 0
+                LifetimeDigitsAfterDecimal = -1
+                LifetimeIsExponential = .false.
+                do while (EventLine(nline)(i:i) .ne. " ")
+                    if ((LifetimeDigitsAfterDecimal .ge. 0 .and. .not.LifetimeIsExponential) &
+                            .or. EventLine(nline)(i:i) .eq. ".") then
+                        LifetimeDigitsAfterDecimal = LifetimeDigitsAfterDecimal+1
+                    endif
+                    if (EventLine(nline)(i:i) .eq. "E" .or. EventLine(nline)(i:i) .eq. "e") then
+                        LifetimeIsExponential = .true.
+                    endif
+                    i = i+1
+                    LifetimeCharacters = LifetimeCharacters+1
+                enddo
+
+                !number of spaces between lifetime and spin
+                !spin has all the complications of lifetime, plus it might be negative
+                spaces(13) = 0
+                do while (EventLine(nline)(i:i) .eq. " ")
+                    i = i+1
+                    spaces(13) = spaces(13)+1
+                end do
+                if (EventLine(nline)(i:i) .eq. "-") then
+                    i = i+1
+                else
+                    spaces(13) = spaces(13)-1  !because the place where the - sign is supposed to go is not always a space
+                endif
+                !i is now on the first digit of the spin
+
+                !spin formatting
+                SpinCharacters = 1             !we are already past the -
+                SpinDigitsAfterDecimal = -1
+                SpinIsExponential = .false.
+                do while (EventLine(nline)(i:i) .ne. " ")
+                    if (SpinDigitsAfterDecimal .ge. 0 .or. EventLine(nline)(i:i) .eq. ".") then
+                        SpinDigitsAfterDecimal = SpinDigitsAfterDecimal+1
+                    endif
+                    if (EventLine(nline)(i:i) .eq. "E" .or. EventLine(nline)(i:i) .eq. "e") then
+                        SpinIsExponential = .true.
+                    endif
+                    i = i+1
+                    SpinCharacters = SpinCharacters+1
+                enddo
+
+                !Ok, now we construct the format string
+                !Initial spaces and id
+                if (spaces(1).eq.0) then
+                    FormatParts(1) = "(I3,"
+                else
+                    write(FormatParts(1),"(A,I1,A)") "(", spaces(1), "X,I3,"
+                endif
+                !spaces and status
+                write(FormatParts(2),"(I1,A)") spaces(2), "X,I2,"
+                !spaces and mothers
+                write(FormatParts(3),"(I1,A,I1,A)") spaces(3), "X,I2,", spaces(4), "X,I2,"
+                !spaces and colors
+                write(FormatParts(4),"(I1,A,I1,A)") spaces(5), "X,I3,", spaces(6), "X,I3,"
+
+                !momentum format
+                if (MomentumCharacters .lt. 10) then
+                    write(MomentumFormat,"(A,I1,A,I1,A)") "1PE",MomentumCharacters,".",MomentumCharacters-7,","
+                elseif (MomentumCharacters .lt. 17) then
+                    write(MomentumFormat,"(A,I2,A,I1,A)") "1PE",MomentumCharacters,".",MomentumCharacters-7,","
+                else
+                    write(MomentumFormat,"(A,I2,A,I2,A)") "1PE",MomentumCharacters,".",MomentumCharacters-7,","
+                endif
+
+                !spaces and px
+                write(FormatParts(5),"(I1,A,A)") spaces(7), "X,", trim(MomentumFormat)
+                !spaces and py
+                write(FormatParts(6),"(I1,A,A)") spaces(8), "X,", trim(MomentumFormat)
+                !spaces and pz
+                write(FormatParts(7),"(I1,A,A)") spaces(9), "X,", trim(MomentumFormat)
+                !spaces and E
+                write(FormatParts(8),"(I1,A,A)") spaces(10), "X,", trim(MomentumFormat)
+                !spaces and m
+                write(FormatParts(9),"(I1,A,A)") spaces(11), "X,", trim(MomentumFormat)
+
+                !spaces and lifetime
+                if (LifetimeIsExponential) then
+                    if (LifetimeCharacters .lt. 10) then
+                        write(FormatParts(10),"(I1,A,I1,A,I1,A)") &
+                            spaces(12), "X,1PE",LifetimeCharacters,".",LifetimeDigitsAfterDecimal,","
+                    elseif (LifetimeDigitsAfterDecimal.lt.10) then
+                        write(FormatParts(10),"(I1,A,I2,A,I1,A)") &
+                            spaces(12), "X,1PE",LifetimeCharacters,".",LifetimeDigitsAfterDecimal,","
+                    else
+                        write(FormatParts(10),"(I1,A,I2,A,I2,A)") &
+                            spaces(12), "X,1PE",LifetimeCharacters,".",LifetimeDigitsAfterDecimal,","
+                    endif
+                else
+                    if (LifetimeCharacters .lt. 10) then
+                        write(FormatParts(10),"(I1,A,I1,A,I1,A)") &
+                            spaces(12), "X,1F",LifetimeCharacters,".",LifetimeDigitsAfterDecimal,","
+                    elseif (LifetimeDigitsAfterDecimal.lt.10) then
+                        write(FormatParts(10),"(I1,A,I2,A,I1,A)") &
+                            spaces(12), "X,1F",LifetimeCharacters,".",LifetimeDigitsAfterDecimal,","
+                    else
+                        write(FormatParts(10),"(I1,A,I2,A,I2,A)") &
+                            spaces(12), "X,1F",LifetimeCharacters,".",LifetimeDigitsAfterDecimal,","
+                    endif
+                endif
+
+                !spaces and spin
+                if (SpinIsExponential) then
+                    if (SpinCharacters .lt. 10) then
+                        write(FormatParts(11),"(I1,A,I1,A,I1,A)") &
+                            spaces(13), "X,1PE",SpinCharacters,".",SpinDigitsAfterDecimal,")"
+                    elseif (SpinDigitsAfterDecimal.lt.10) then
+                        write(FormatParts(11),"(I1,A,I2,A,I1,A)") &
+                            spaces(13), "X,1PE",SpinCharacters,".",SpinDigitsAfterDecimal,")"
+                    else
+                        write(FormatParts(11),"(I1,A,I2,A,I2,A)") &
+                            spaces(13), "X,1PE",SpinCharacters,".",SpinDigitsAfterDecimal,")"
+                    endif
+                else
+                    if (SpinCharacters .lt. 10) then
+                        write(FormatParts(11),"(I1,A,I1,A,I1,A)") &
+                            spaces(13), "X,1F",SpinCharacters,".",SpinDigitsAfterDecimal,")"
+                    elseif (SpinDigitsAfterDecimal.lt.10) then
+                        write(FormatParts(11),"(I1,A,I2,A,I1,A)") &
+                            spaces(13), "X,1F",SpinCharacters,".",SpinDigitsAfterDecimal,")"
+                    else
+                        write(FormatParts(11),"(I1,A,I2,A,I2,A)") &
+                            spaces(13), "X,1F",SpinCharacters,".",SpinDigitsAfterDecimal,")"
+                    endif
+                endif
+
+                InputFmt1 = (trim(FormatParts(1))  &
+                          // trim(FormatParts(2))  &
+                          // trim(FormatParts(3))  &
+                          // trim(FormatParts(4))  &
+                          // trim(FormatParts(5))  &
+                          // trim(FormatParts(6))  &
+                          // trim(FormatParts(7))  &
+                          // trim(FormatParts(8))  &
+                          // trim(FormatParts(9))  &
+                          // trim(FormatParts(10)) &
+                          // trim(FormatParts(11)))
+            endif
+
             read(EventLine(nline),fmt=InputFmt1) LHE_IDUP(nline),LHE_IntExt(nline),LHE_MOTHUP(1,nline),LHE_MOTHUP(2,nline),LHE_ICOLUP(1,nline),LHE_ICOLUP(2,nline),MomExt(2,nline),MomExt(3,nline),MomExt(4,nline),MomExt(1,nline),Mass(nline)
             MomExt(1:4,nline) = MomExt(1:4,nline)*GeV!  convert to units of 100GeV
             Mass(nline) = Mass(nline)*GeV            !  convert to units of 100GeV
