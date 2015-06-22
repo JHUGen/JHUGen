@@ -366,8 +366,11 @@ integer,parameter :: maxpart=30
 integer :: i,iHiggs
 integer :: NUP,NUP_NEW,IDPRUP
 real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP,HiggsDKLength
-character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0)"
-
+character(len=*),parameter :: Fmt0 = "I2,X,I3,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7"
+character(len=*),parameter :: Fmt0_read = "I2,X,A"
+character(len=*),parameter :: Fmt1 = "6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0"
+integer :: indent
+character(len=150) :: IndentedFmt0, IndentedFmt1
 
 
 !   For description of the LHE format see http://arxiv.org/abs/hep-ph/0109068 and http://arxiv.org/abs/hep-ph/0609017
@@ -447,14 +450,35 @@ character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE
     endif
 
     if (present(BeginEventLine)) then
-        write(io_LHEOutFile, "(A)") trim(BeginEventLine)
+        write(io_LHEOutFile, "(A)") BeginEventLine
+        indent = 0
+        do while (BeginEventLine(indent+1:indent+1).eq." ")
+            indent = indent+1
+        end do
     else
         write(io_LHEOutFile,"(A)") "<event>"
+        indent = 0
+    endif
+    print *,indent
+    if (indent.eq.0) then
+        if( ReadLHEFile .and. importExternal_LHEinit ) then
+            write(IndentedFmt0, "(A,A,A)") "(", Fmt0_read, ")"
+        else
+            write(IndentedFmt0, "(A,A,A)") "(", Fmt0, ")"
+        endif
+        write(IndentedFmt1, "(A,A,A)") "(", Fmt1, ")"
+    else
+        if( ReadLHEFile .and. importExternal_LHEinit ) then
+            write(IndentedFmt0, "(A,I1,A,A,A)") "(", indent, "X,", Fmt0_read, ")"
+        else
+            write(IndentedFmt0, "(A,I1,A,A,A)") "(", indent, "X,", Fmt0, ")"
+        endif
+        write(IndentedFmt1, "(A,I1,A,A,A)") "(", indent, "X,", Fmt1, ")"
     endif
     if( ReadLHEFile .and. importExternal_LHEinit ) then
-      write(io_LHEOutFile,"(I2,X,A)") NUP+NUP_NEW,trim(EventInfoLine)
+      write(io_LHEOutFile,IndentedFmt0) NUP+NUP_NEW,trim(EventInfoLine)
     else
-      write(io_LHEOutFile,"(I2,X,I3,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7)") NUP+NUP_NEW,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
+      write(io_LHEOutFile,IndentedFmt0) NUP+NUP_NEW,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
     !  in order of appearance:
     !  (*) number of particles in the event
     !  (*) process ID (user defined)
@@ -468,11 +492,11 @@ character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE
 !   write out existing particles
     do i = 1, NUP
         if( i.eq.iHiggs ) then 
-           write(io_LHEOutFile,fmt1) IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),  &
-                                     Mom(2:4,i)/GeV,Mom(1,i)/GeV, Mass(i)/GeV,HiggsDKLength, Spin           
+           write(io_LHEOutFile,IndentedFmt1) IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),  &
+                                             Mom(2:4,i)/GeV,Mom(1,i)/GeV, Mass(i)/GeV,HiggsDKLength, Spin           
         else
-           write(io_LHEOutFile,fmt1) IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),  &
-                                     Mom(2:4,i)/GeV,Mom(1,i)/GeV, Mass(i)/GeV,Lifetime, Spin   
+           write(io_LHEOutFile,IndentedFmt1) IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),  &
+                                             Mom(2:4,i)/GeV,Mom(1,i)/GeV, Mass(i)/GeV,Lifetime, Spin   
         endif                          
     enddo
     
@@ -481,8 +505,8 @@ character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE
     call swap_mom(HiggsDK_Mom(1:4,3),HiggsDK_Mom(1:4,4))! swap to account for flipped asignments
     call swap_mom(HiggsDK_Mom(1:4,5),HiggsDK_Mom(1:4,6))! swap to account for flipped asignments
     do i = 4,4 + (NUP_NEW-1)
-        write(io_LHEOutFile,fmt1) HiggsDK_IDUP(i),HiggsDK_ISTUP(i), HiggsDK_MOTHUP(1,i),HiggsDK_MOTHUP(2,i), HiggsDK_ICOLUP(1,i),HiggsDK_ICOLUP(2,i),  &
-                                  HiggsDK_Mom(2:4,i-3)/GeV,HiggsDK_Mom(1,i-3)/GeV, get_MInv(HiggsDK_Mom(1:4,i-3))/GeV, Lifetime, Spin   
+        write(io_LHEOutFile,IndentedFmt1) HiggsDK_IDUP(i),HiggsDK_ISTUP(i), HiggsDK_MOTHUP(1,i),HiggsDK_MOTHUP(2,i), HiggsDK_ICOLUP(1,i),HiggsDK_ICOLUP(2,i),  &
+                                          HiggsDK_Mom(2:4,i-3)/GeV,HiggsDK_Mom(1,i-3)/GeV, get_MInv(HiggsDK_Mom(1:4,i-3))/GeV, Lifetime, Spin   
     enddo
 
 RETURN
