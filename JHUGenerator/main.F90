@@ -1591,6 +1591,7 @@ integer :: InputLHEFormat = 0
 real :: InputJHUGenversion
 logical :: WroteHeader = .false.
 logical :: WroteMassWidth = .false.
+integer :: i
 
 
 
@@ -1699,6 +1700,10 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
        InputFmt0 = trim(JHUGen_Fmt0)
        InputFmt1 = trim(JHUGen_Fmt1)
      endif
+
+     InputFmt0 = ""
+     !InputFmt1 = ""
+
      if( .not. M_ResoSet ) then
         write(io_stdout,"(2X,A,1F7.2)")  "ERROR: Higgs mass could not be read from LHE input file. Assuming default value",M_Reso*100d0
         write(io_LogFile,"(2X,A,1F7.2)") "ERROR: Higgs mass could not be read from LHE input file. Assuming default value",M_Reso*100d0
@@ -1738,8 +1743,22 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
      NEvent=0
      do while ( .true. ) 
          NEvent=NEvent + 1
-         LeptInEvent(:) = 0         
-         read(16,fmt=InputFmt0) EventNumPart,EventInfoLine!  read number of particle from the first line after <event> and other info
+         LeptInEvent(:) = 0
+         if (InputFmt0.eq."") then
+             read(16,"(A180)") OtherLines
+             i = 1
+             do while (OtherLines(i+1:i+1) .eq. " ")
+                 i = i+1
+             end do
+             if (i.eq.1) then
+                 InputFmt0 = "(I2,A160)"
+             else
+                 write(InputFmt0, "(A,I2,A)") "(", i, "X,I2,A160)"
+             endif
+             read(OtherLines, InputFmt0) EventNumPart, EventInfoLine
+         else
+             read(16,fmt=InputFmt0) EventNumPart,EventInfoLine!  read number of particle from the first line after <event> and other info
+         endif
 !        read event lines
          do nline=1,EventNumPart
             read(16,fmt="(A160)") EventLine(nline)
