@@ -1342,7 +1342,7 @@ END SUBROUTINE
 !                M_Reso = M_Reso*GeV!  convert to units of 100GeV
 !                M_ResoSet=.true.
 !         endif
-!         if( FirstLines(1:7).eq."<event>" ) then 
+!         if( FirstLines(1:6).eq."<event" .or. FirstLines(3:8).eq."<event" ) then
 !                FirstEvent=.true.
 !         else
 !             if( importExternal_LHEinit ) then
@@ -1507,7 +1507,7 @@ END SUBROUTINE
 !               read(16,fmt="(A160)",IOSTAT=stat,END=99) EventInfoLine(1:160)
 !               if(EventInfoLine(1:30).eq."</LesHouchesEvents>") then
 !                   goto 99
-!               elseif( EventInfoLine(1:8).eq."<event>" ) then
+!               elseif( EventInfoLine(1:6).eq."<event" .or. EventInfoLine(3:8).eq."<event" ) then
 !                   exit
 !               else!if there are "#" comments
 !                   if( FirstEvent ) then 
@@ -1675,7 +1675,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
             write(io_LHEOutFile ,"(A)") ""
             WroteMassWidth = .true.
         endif
-        if( FirstLines(1:7).eq."<event>" ) then 
+        if( FirstLines(1:6).eq."<event" .or. FirstLines(3:8).eq."<event" ) then
                FirstEvent=.true.
         else
             if( importExternal_LHEinit ) then
@@ -1988,6 +1988,22 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                     SpinCharacters = SpinCharacters+1
                 enddo
 
+                !check that spaces(i) > 0
+                !the only way this can happen, consistent with the definition of lhe format,
+                ! is for a column not to leave extra space for a -
+                do i=1,13
+                    if (spaces(i).eq.0) then
+                        spaces(i) = 1
+                        if (i.eq.7) then   !we counted the nonexistant space for - in MomentumCharacters
+                            MomentumCharacters = MomentumCharacters-1
+                        endif
+                        if (i.eq.13) then  !same
+                            SpinCharacters = SpinCharacters-1
+                        endif
+                    endif
+                enddo
+
+
                 !Ok, now we construct the format string
                 !Initial spaces and id
                 if (spaces(1).eq.0) then
@@ -2072,6 +2088,10 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                     endif
                 endif
 
+                do i=1,11
+                    print *, FormatParts(i)
+                enddo
+
                 InputFmt1 = (trim(FormatParts(1))  &
                           // trim(FormatParts(2))  &
                           // trim(FormatParts(3))  &
@@ -2142,9 +2162,9 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
               if(OtherLines(1:30).eq."</LesHouchesEvents>") then
                   if( RequestNLeptons.gt.0 ) write(io_LHEOutFile,"(A,1F6.2,A)") "<!-- Lepton filter efficiency:",dble(AccepCounter)/dble(NEvent)*100d0," % -->"
                   goto 99
-              elseif( OtherLines(1:8).eq."</event>" .and. Res.gt.0d0 ) then
+              elseif( (OtherLines(1:7).eq."</event" .or. OtherLines(3:9).eq."</event") .and. Res.gt.0d0 ) then
                   write(io_LHEOutFile,"(A)") "</event>"
-              elseif( OtherLines(1:8).eq."<event>" ) then
+              elseif( OtherLines(1:6).eq."<event" .or. OtherLines(3:8).eq."<event" ) then
                   exit
               elseif( Res.gt.0d0 ) then !if there are "#" comments
                   write(io_LHEOutFile,fmt="(A)") trim(OtherLines)
@@ -2277,7 +2297,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                Ga_Reso = Ga_Reso*GeV!  convert to units of 100GeV
                Ga_ResoSet=.true.
         endif       
-        if( FirstLines(1:7).eq."<event>" ) then 
+        if( FirstLines(1:6).eq."<event" .or. FirstLines(3:8).eq."<event" ) then
                FirstEvent=.true.
         else
             if( importExternal_LHEinit ) then
@@ -2628,9 +2648,9 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
               read(16,fmt="(A120)",IOSTAT=stat,END=99) PDFLine(1:120)
               if(PDFLine(1:30).eq."</LesHouchesEvents>") then
                   goto 99
-              elseif( PDFLine(1:8).eq."</event>" ) then
+              elseif( PDFLine(1:7).eq."</event" .or. PDFLine(3:9).eq."</event" ) then
                   write(io_LHEOutFile,"(A)") "</event>"
-              elseif( PDFLine(1:8).eq."<event>" ) then
+              elseif( PDFLine(1:6).eq."<event" .or. PDFLine(3:8).eq."<event" ) then
                   exit
               else
                   write(io_LHEOutFile,fmt="(A)") trim(PDFLine)
@@ -2703,7 +2723,7 @@ END SUBROUTINE
 !                 write (io_LogFile,"(2X,A)") "Input file detected as MadGraph"
 !             endif
 !         endif
-!         if( HeaderLines(1:7).eq."<event>" ) then 
+!         if( HeaderLines(1:6).eq."<event" .or. HeaderLines(3:8).eq."<event" ) then
 !                FirstEvent=.true.
 !         endif
 !      enddo
@@ -2746,7 +2766,7 @@ END SUBROUTINE
 !      FirstEvent = .false.
 !      do while ( .not.FirstEvent )
 !         read(io_LHEOutFile2,fmt="(A160)",IOSTAT=stat,END=99) HeaderLines
-!         if( HeaderLines(1:7).eq."<event>" ) then 
+!         if( HeaderLines(1:6).eq."<event" .or. HeaderLines(3:8).eq."<event" ) then
 !                FirstEvent=.true.
 !         endif
 !      enddo
