@@ -459,7 +459,6 @@ character(len=150) :: IndentedFmt0, IndentedFmt1
         write(io_LHEOutFile,"(A)") "<event>"
         indent = 0
     endif
-    print *,indent
     if (indent.eq.0) then
         if( ReadLHEFile .and. importExternal_LHEinit ) then
             write(IndentedFmt0, "(A,A,A)") "(", Fmt0_read, ")"
