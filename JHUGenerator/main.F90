@@ -25,7 +25,7 @@ logical,parameter :: useBetaVersion=.false.! this should be set to .false.
    call PrintLogo(io_LogFile)
    call WriteParameters(io_stdout)
    call WriteParameters(io_LogFile)
-   if ( .not. ReadLHEFile) then
+   if ( .not. ReadLHEFile .and. .not. ConvertLHEFile ) then
       call InitOutput()
    endif
    write(io_stdout,*) " Running"
@@ -1586,11 +1586,7 @@ integer :: EventNumPart
 character(len=160) :: FirstLines,EventInfoLine,OtherLines
 character(len=160) :: EventLine(1:maxpart)
 integer :: n,stat,iHiggs,VegasSeed
-integer :: i, j, fieldwidth, spaces(1:13)
-integer :: MomentumCharacters, LifetimeCharacters, LifetimeDigitsAfterDecimal, SpinCharacters, SpinDigitsAfterDecimal
-logical :: LifetimeIsExponential, SpinIsExponential
-character(len=20) :: MomentumFormat
-character(len=40) :: FormatParts(11)
+integer :: i, j
 character(len=100) :: BeginEventLine
 
 
@@ -1883,7 +1879,7 @@ real(8) :: yRnd(1:22),Res,dum,EMcheck(1:4),xRnd
 real(8) :: AcceptedEvent(1:4,1:maxpart),Ehat,pH2sq
 real(8) :: MomExt(1:4,1:maxpart),MomShift(1:4,1:maxpart),MomHiggs(1:4),MomParton(1:4,1:maxpart),Mass(1:maxpart),Spin(1:maxpart),Lifetime(1:maxpart)
 integer :: tries, nParticle, MY_IDUP(1:7+maxpart), ICOLUP(1:2,1:7+maxpart),IntExt(1:7+maxpart),convertparent
-logical :: FirstEvent,M_ResoSet,Ga_ResoSet
+logical :: FirstEvent,M_ResoSet,Ga_ResoSet,WroteHeader,ClosedHeader,WroteMassWidth,InMadgraphMassBlock,InMadgraphDecayBlock
 integer :: nline,intDummy,Nevent
 integer :: LHE_IDUP(1:maxpart+3),   LHE_ICOLUP(1:2,1:maxpart+3),   LHE_MOTHUP(1:2,1:maxpart+3)
 integer :: LHE_IDUP_Part(1:maxpart),LHE_ICOLUP_Part(1:2,1:maxpart),LHE_MOTHUP_Part(1:2,1:maxpart+3)
@@ -1891,7 +1887,7 @@ integer :: EventNumPart,nparton
 character(len=160) :: FirstLines
 character(len=120) :: EventInfoLine,PDFLine
 character(len=160) :: EventLine(1:maxpart+3)
-integer :: VegasSeed,i,stat,DecayParticles(1:2)
+integer :: VegasSeed,i,j,stat,DecayParticles(1:2)
 integer, dimension(:), allocatable :: gen_seed
 integer,parameter :: DefaultInputLHEFormat = 1   !  1=POWHEG, 2=JHUGen (old format), 3=JHUGen (new format), 4=MadGraph
 character(len=*),parameter :: Fmt0 = "I2,X,A"
@@ -1907,28 +1903,109 @@ if( VegasNc0.eq.-1 ) VegasNc0 = VegasNc0_default
 if( VegasNc1.eq.-1 .and. VegasNc2.eq.-1 ) VegasNc1 = VegasNc1_default
 if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
 
+     write(io_LHEOutFile ,'(A)') '<LesHouchesEvents version="1.0">'
 
 !    search for line with first event
      FirstEvent = .false.
      M_ResoSet=.false.
+     Ga_ResoSet=.false.
+     WroteHeader=.false.
+     ClosedHeader=.false.
+     WroteMassWidth=.false.
+     InMadgraphMassBlock=.false.
      do while ( .not.FirstEvent )
         read(16,fmt="(A160)",IOSTAT=stat,END=99) FirstLines
-        if( FirstLines(1:5).eq."hmass" ) then 
-               read(FirstLines(6:13),fmt="(F7.1)") M_Reso
+        if ( FirstLines(1:4).eq."<!--" .and. .not.WroteHeader ) then
+            call InitOutput()
+            WroteHeader = .true.
+        endif
+        if (index(FirstLines,"<MG").ne.0 .and. .not.WroteHeader) then  !Sometimes MadGraph doesn't have a comment at the beginning
+            call InitOutput()                                          !In that case put the JHUGen header before the MadGraph
+            write(io_LHEOutFile, "(A)") "-->"                          ! proc card, etc.
+            WroteHeader = .true.                                       !and put the Higgs mass/width in a separate comment
+            ClosedHeader = .true.                                      !before <init>
+        endif
+        if (Index(FirstLines,"<init>").ne.0 .and. .not.WroteHeader ) then !If not now, when?
+            call InitOutput()
+            WroteHeader = .true.
+        endif
+
+        !Read the Higgs mass
+        !JHUGen or POWHEG
+        if( FirstLines(1:5).eq."hmass" ) then
+               read(FirstLines(6:16),*) M_Reso
                M_Reso = M_Reso*GeV!  convert to units of 100GeV
                M_ResoSet=.true.
         endif
-        if( FirstLines(1:6).eq."hwidth" ) then 
-               read(FirstLines(7:17),fmt="(F9.3)") Ga_Reso
+        !Madgraph
+        if ((Index(FirstLines,"BLOCK MASS").ne.0 .or. Index(FirstLines,"Block mass").ne.0 .or. &
+             Index(FirstLines,"Block Mass").ne.0 .or. Index(FirstLines,"block mass").ne.0)     &
+              .and. .not.M_ResoSet) then
+               InMadgraphMassBlock=.true.
+        elseif (Index(FirstLines,"BLOCK").ne.0 .or. Index(FirstLines,"Block").ne.0 .or. Index(FirstLines,"block").ne.0) then
+               InMadgraphMassBlock=.false.
+        endif
+        if (InMadgraphMassBlock) then
+               i = Index(FirstLines, " 25 ")
+               if (i.ne.0) then
+                   j = Index(FirstLines(i+4:len(FirstLines)), " ") + i+4 - 1
+                   if (j.eq.0) then
+                       j = len(FirstLines)
+                   endif
+                   read(FirstLines(i+4:j),*) M_Reso
+                   M_Reso = M_Reso*GeV
+                   M_ResoSet=.true.
+               endif
+        endif
+
+        !Read the Higgs width
+        !JHUGen or POWHEG
+        if( FirstLines(1:6).eq."hwidth" ) then
+               read(FirstLines(7:16),*) Ga_Reso
                Ga_Reso = Ga_Reso*GeV!  convert to units of 100GeV
                Ga_ResoSet=.true.
-        endif       
+        endif
+        !Madgraph
+        if (Index(FirstLines,"DECAY ").ne.0) then
+               i = Index(FirstLines, " 25 ")
+               if (i.ne.0) then
+                   j = Index(FirstLines(i+4:len(FirstLines)), " ") + i+4 - 1
+                   if (j.eq.0) then
+                       j = len(FirstLines)
+                   endif
+                   read(FirstLines(i+4:j),*) Ga_Reso
+                   Ga_Reso = Ga_Reso*GeV
+                   Ga_ResoSet=.true.
+               endif
+        endif
+
+        if( Index(FirstLines,"-->").ne.0 .and. .not.(M_ResoSet .and. Ga_ResoSet)) then
+            !In other words, if the mass and the width have not been found by the end of the comment
+            !This is possible in some MadGraph versions, where the mass and width are below, in the proc card
+            ! and the comment is just a fancy header.
+            !Give them more time to be found, and print them before <init>
+            ClosedHeader = .true.
+        elseif( .not.WroteMassWidth .and. (Index(FirstLines,"<init>").ne.0 .or. Index(FirstLines,"-->").ne.0) ) then
+            write(io_LHEOutFile ,"(A)") ""
+            if (ClosedHeader) then
+                write(io_LHEOutFile, "(A)") "<!--"
+            endif
+            write(io_LHEOutFile ,"(A)") "JHUGen Resonance parameters used for event generation:"
+            write(io_LHEOutFile ,"(A,F6.1,A)") "hmass  ",M_Reso*100d0,"        ! Higgs boson mass"
+            write(io_LHEOutFile ,"(A,F10.5,A)") "hwidth",Ga_Reso*100d0,"      ! Higgs boson width"
+            if (Index(FirstLines,"-->").eq.0) then
+                write(io_LHEOutFile, "(A)") "-->"
+            endif
+            write(io_LHEOutFile ,"(A)") ""
+            ClosedHeader = .true.
+            WroteMassWidth = .true.
+        endif
         if( Index(FirstLines, "<event").ne.0 ) then
-               BeginEventLine = FirstLines
                FirstEvent=.true.
+               BeginEventLine = trim(FirstLines)
         else
             if( importExternal_LHEinit ) then
-                if( FirstLines(1:17).eq."<LesHouchesEvents" .or. FirstLines(1:4).eq."<!--" ) then
+                if( Index(FirstLines,"<LesHouchesEvents").ne.0 .or. Index(FirstLines,"<!--").ne.0 ) then
                 else
                   write(io_LHEOutFile,"(A)") trim(firstlines)
                 endif
@@ -2928,13 +3005,13 @@ use ModParameters
 implicit none
 
     if( (unweighted) .or. ( (.not.unweighted) .and. (writeWeightedLHE) )  ) then 
-        if ( .not. ReadLHEFile ) then
+        if ( .not. ReadLHEFile .and. .not. ConvertLHEFile ) then
             write(io_LHEOutFile ,'(A)') '<LesHouchesEvents version="1.0">'
         endif
         write(io_LHEOutFile ,'(A)') '<!--'
         write(io_LHEOutFile ,'(A,A6,A)') 'Output from the JHUGenerator ',trim(JHUGen_Version),' described in arXiv:1001.3396 [hep-ph],arXiv:1208.4018 [hep-ph],arXiv:1309.4819 [hep-ph]'
 
-        if( .not. ReadLHEFile ) then
+        if( .not. ReadLHEFile .and. .not. ConvertLHEFile ) then
             write(io_LHEOutFile ,'(A)') ''
             write(io_LHEOutFile ,'(A,F5.1,A)') 'hmass   ',M_Reso*100d0,'     ! Higgs boson mass'
             write(io_LHEOutFile ,'(A,F8.5,A)') 'hwidth ',Ga_Reso*100d0,'   ! Higgs boson width'
