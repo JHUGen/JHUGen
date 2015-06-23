@@ -1749,7 +1749,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
          if (UseUnformattedRead) then
              read(EventLine(0),*) EventNumPart,EventInfoLine!  read number of particle from the first line after <event> and other info
          else
-             if (trim(InputFmt0).eq."") then
+             if (InputFmt0.eq."") then
                  InputFmt0 = FindInputFmt0(EventLine(0))
              endif
              read(EventLine(0),InputFmt0) EventNumPart, EventInfoLine
@@ -1765,7 +1765,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
             if (UseUnformattedRead) then
                 read(EventLine(nline),*) LHE_IDUP(nline),LHE_IntExt(nline),LHE_MOTHUP(1,nline),LHE_MOTHUP(2,nline),LHE_ICOLUP(1,nline),LHE_ICOLUP(2,nline),MomExt(2,nline),MomExt(3,nline),MomExt(4,nline),MomExt(1,nline),Mass(nline)
             else
-                if (trim(InputFmt0).eq."") then
+                if (InputFmt1.eq."") then
                     InputFmt1 = FindInputFmt1(EventLine(nline))
                 endif
                 read(EventLine(nline),InputFmt1) LHE_IDUP(nline),LHE_IntExt(nline),LHE_MOTHUP(1,nline),LHE_MOTHUP(2,nline),LHE_ICOLUP(1,nline),LHE_ICOLUP(2,nline),MomExt(2,nline),MomExt(3,nline),MomExt(4,nline),MomExt(1,nline),Mass(nline)
@@ -1900,13 +1900,12 @@ integer :: LHE_IDUP_Part(1:maxpart),LHE_ICOLUP_Part(1:2,1:maxpart),LHE_MOTHUP_Pa
 integer :: EventNumPart,nparton
 character(len=160) :: FirstLines
 character(len=120) :: EventInfoLine,PDFLine
-character(len=160) :: EventLine(1:maxpart+3)
+character(len=160) :: EventLine(0:maxpart+3)
 integer :: VegasSeed,i,j,stat,DecayParticles(1:2)
 integer, dimension(:), allocatable :: gen_seed
-integer,parameter :: DefaultInputLHEFormat = 1   !  1=POWHEG, 2=JHUGen (old format), 3=JHUGen (new format), 4=MadGraph
 character(len=*),parameter :: Fmt0 = "I2,X,A"
 character(len=*),parameter :: Fmt1 = "6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0"
-character(len=150) :: IndentedFmt0, IndentedFmt1
+character(len=150) :: IndentedFmt0, IndentedFmt1, InputFmt0, InputFmt1
 character(len=100) :: BeginEventLine
 integer :: indent
 
@@ -2043,13 +2042,24 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
      write(io_stdout,"(A)") ""
      write(io_LogFile,"(A)") ""
 
+     InputFmt0 = ""
+     InputFmt1 = ""
 
      print *, " converting events"
      call cpu_time(time_start)
      NEvent=0
      do while ( .true. ) 
          NEvent=NEvent + 1
-         read(16,*) EventNumPart,EventInfoLine!  read number of particle from the first line after <event> and other info
+         read(16,"(A)") EventLine(0)
+         if (UseUnformattedRead) then
+             read(EventLine(0),*) EventNumPart,EventInfoLine!  read number of particle from the first line after <event> and other info
+         else
+             if (InputFmt0.eq."") then
+                 InputFmt0 = FindInputFmt0(EventLine(0))
+             endif
+             read(EventLine(0),InputFmt0) EventNumPart, EventInfoLine
+         endif
+
 !        read event lines
          do nline=1,EventNumPart
             read(16,"(A)") EventLine(nline)
@@ -2061,7 +2071,14 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
  !       convert event lines into variables assuming that the Higgs resonance has ID 25
          nparton = 0
          do nline=1,EventNumPart
-            read(EventLine(nline),*) LHE_IDUP(nline),IntExt(nline),LHE_MOTHUP(1,nline),LHE_MOTHUP(2,nline),LHE_ICOLUP(1,nline),LHE_ICOLUP(2,nline),MomExt(2,nline),MomExt(3,nline),MomExt(4,nline),MomExt(1,nline),Mass(nline),Spin(nline),Lifetime(nline)
+            if (UseUnformattedRead) then
+                read(EventLine(nline),*) LHE_IDUP(nline),IntExt(nline),LHE_MOTHUP(1,nline),LHE_MOTHUP(2,nline),LHE_ICOLUP(1,nline),LHE_ICOLUP(2,nline),MomExt(2,nline),MomExt(3,nline),MomExt(4,nline),MomExt(1,nline),Mass(nline)
+            else
+                if (InputFmt1.eq."") then
+                    InputFmt1 = FindInputFmt1(EventLine(nline))
+                endif
+                read(EventLine(nline),InputFmt1) LHE_IDUP(nline),IntExt(nline),LHE_MOTHUP(1,nline),LHE_MOTHUP(2,nline),LHE_ICOLUP(1,nline),LHE_ICOLUP(2,nline),MomExt(2,nline),MomExt(3,nline),MomExt(4,nline),MomExt(1,nline),Mass(nline)
+            endif
             if( abs(LHE_IDUP(nline)).eq.25 ) then!   select the Higgs (ID=25, h0)
                   MomHiggs(1:4) = MomExt(1:4,nline)
                   pH2sq = dsqrt(abs(MomHiggs(1:4).dot.MomHiggs(1:4)))
