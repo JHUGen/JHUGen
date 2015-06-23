@@ -450,7 +450,7 @@ character(len=150) :: IndentedFmt0, IndentedFmt1
     endif
 
     if (present(BeginEventLine)) then
-        write(io_LHEOutFile, "(A)") BeginEventLine
+        write(io_LHEOutFile, "(A)") trim(BeginEventLine)
         indent = 0
         do while (BeginEventLine(indent+1:indent+1).eq." ")
             indent = indent+1
