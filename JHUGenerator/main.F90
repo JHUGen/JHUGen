@@ -1577,7 +1577,7 @@ character(len=*),parameter :: JHUGen_old_Fmt1 = "(I3,X,I2,X,I2,X,I2,X,I3,X,I3,X,
 character(len=*),parameter :: MadGra_Fmt0 = "(I2,A160)"
 character(len=*),parameter :: MadGra_Fmt1 = "(7X,I3,2X,I3,3X,I2,3X,I2,3X,I3,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1F3.0,X,1F3.0)"
 character(len=150) :: InputFmt0,InputFmt1
-logical :: FirstEvent,M_ResoSet,Ga_ResoSet,WroteHeader,ClosedHeader,WroteMassWidth,InMadgraphMassBlock,InMadgraphDecayBlock
+logical :: FirstEvent,M_ResoSet,Ga_ResoSet,WroteHeader,ClosedHeader,WroteMassWidth,InMadgraphMassBlock
 integer :: nline,intDummy,Nevent
 integer :: LHE_IDUP(1:maxpart),LHE_ICOLUP(1:2,1:maxpart),LHE_MOTHUP(1:2,1:maxpart)
 integer :: EventNumPart
@@ -1747,7 +1747,15 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
          LeptInEvent(:) = 0
          read(16,"(A)") EventLine(0)
          if (UseUnformattedRead) then
-             read(EventLine(0),*) EventNumPart,EventInfoLine!  read number of particle from the first line after <event> and other info
+             read(EventLine(0),*) EventNumPart !  read number of particle from the first line after <event>
+             i = 1                             !  trying to read the other stuff in one string would just give
+             do while(EventLine(0)(i:i).eq." ")!  the first field
+                 i=i+1
+             enddo
+             do while(EventLine(0)(i:i).ne." ")
+                 i=i+1
+             enddo
+             read(EventLine(0)(i:len(EventLine(0))),"(A)") EventInfoLine
          else
              if (InputFmt0.eq."") then
                  InputFmt0 = FindInputFmt0(EventLine(0))
@@ -1893,7 +1901,7 @@ real(8) :: yRnd(1:22),Res,dum,EMcheck(1:4),xRnd
 real(8) :: AcceptedEvent(1:4,1:maxpart),Ehat,pH2sq
 real(8) :: MomExt(1:4,1:maxpart),MomShift(1:4,1:maxpart),MomHiggs(1:4),MomParton(1:4,1:maxpart),Mass(1:maxpart),Spin(1:maxpart),Lifetime(1:maxpart)
 integer :: tries, nParticle, MY_IDUP(1:7+maxpart), ICOLUP(1:2,1:7+maxpart),IntExt(1:7+maxpart),convertparent
-logical :: FirstEvent,M_ResoSet,Ga_ResoSet,WroteHeader,ClosedHeader,WroteMassWidth,InMadgraphMassBlock,InMadgraphDecayBlock
+logical :: FirstEvent,M_ResoSet,Ga_ResoSet,WroteHeader,ClosedHeader,WroteMassWidth,InMadgraphMassBlock
 integer :: nline,intDummy,Nevent
 integer :: LHE_IDUP(1:maxpart+3),   LHE_ICOLUP(1:2,1:maxpart+3),   LHE_MOTHUP(1:2,1:maxpart+3)
 integer :: LHE_IDUP_Part(1:maxpart),LHE_ICOLUP_Part(1:2,1:maxpart),LHE_MOTHUP_Part(1:2,1:maxpart+3)
@@ -2052,7 +2060,15 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
          NEvent=NEvent + 1
          read(16,"(A)") EventLine(0)
          if (UseUnformattedRead) then
-             read(EventLine(0),*) EventNumPart,EventInfoLine!  read number of particle from the first line after <event> and other info
+             read(EventLine(0),*) EventNumPart !  read number of particle from the first line after <event>
+             i = 1                             !  trying to read the other stuff in one string would just give
+             do while(EventLine(0)(i:i).eq." ")!  the first field
+                 i=i+1
+             enddo
+             do while(EventLine(0)(i:i).ne." ")
+                 i=i+1
+             enddo
+             read(EventLine(0)(i:len(EventLine(0))),"(A)") EventInfoLine
          else
              if (InputFmt0.eq."") then
                  InputFmt0 = FindInputFmt0(EventLine(0))
