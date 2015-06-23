@@ -1579,7 +1579,7 @@ character(len=*),parameter :: JHUGen_old_Fmt1 = "(I3,X,I2,X,I2,X,I2,X,I3,X,I3,X,
 character(len=*),parameter :: MadGra_Fmt0 = "(I2,A160)"
 character(len=*),parameter :: MadGra_Fmt1 = "(7X,I3,2X,I3,3X,I2,3X,I2,3X,I3,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1F3.0,X,1F3.0)"
 character(len=150) :: InputFmt0,InputFmt1
-logical :: FirstEvent,M_ResoSet,Ga_ResoSet,WroteHeader,WroteMassWidth,InMadgraphMassBlock,InMadgraphDecayBlock
+logical :: FirstEvent,M_ResoSet,Ga_ResoSet,WroteHeader,ClosedHeader,WroteMassWidth,InMadgraphMassBlock,InMadgraphDecayBlock
 integer :: nline,intDummy,Nevent
 integer :: LHE_IDUP(1:maxpart),LHE_ICOLUP(1:2,1:maxpart),LHE_MOTHUP(1:2,1:maxpart)
 integer :: EventNumPart
@@ -1607,6 +1607,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
      M_ResoSet=.false.
      Ga_ResoSet=.false.
      WroteHeader=.false.
+     ClosedHeader=.false.
      WroteMassWidth=.false.
      InMadgraphMassBlock=.false.
      do while ( .not.FirstEvent )
@@ -1615,7 +1616,13 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
             call InitOutput()
             WroteHeader = .true.
         endif
-        if (Index(FirstLines,"<init>").ne.0 .and. .not.WroteHeader ) then
+        if (index(FirstLines,"<MG").ne.0 .and. .not.WroteHeader) then  !Sometimes MadGraph doesn't have a comment at the beginning
+            call InitOutput()                                          !In that case put the JHUGen header before the MadGraph
+            write(io_LHEOutFile, "(A)") "-->"                          ! proc card, etc.
+            WroteHeader = .true.                                       !and put the Higgs mass/width in a separate comment
+            ClosedHeader = .true.                                      !before <init>
+        endif
+        if (Index(FirstLines,"<init>").ne.0 .and. .not.WroteHeader ) then !If not now, when?
             call InitOutput()
             WroteHeader = .true.
         endif
@@ -1669,15 +1676,25 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                endif
         endif
 
-        if( .not.WroteMassWidth .and. (Index(FirstLines,"<init>").ne.0 .or. Index(FirstLines,"-->").ne.0)) then
+        if( Index(FirstLines,"-->").ne.0 .and. .not.(M_ResoSet .and. Ga_ResoSet)) then
+            !In other words, if the mass and the width have not been found by the end of the comment
+            !This is possible in some MadGraph versions, where the mass and width are below, in the proc card
+            ! and the comment is just a fancy header.
+            !Give them more time to be found, and print them before <init>
+            ClosedHeader = .true.
+        elseif( .not.WroteMassWidth .and. (Index(FirstLines,"<init>").ne.0 .or. Index(FirstLines,"-->").ne.0) ) then
             write(io_LHEOutFile ,"(A)") ""
+            if (ClosedHeader) then
+                write(io_LHEOutFile, "(A)") "<!--"
+            endif
             write(io_LHEOutFile ,"(A)") "JHUGen Resonance parameters used for event generation:"
             write(io_LHEOutFile ,"(A,F6.1,A)") "hmass  ",M_Reso*100d0,"        ! Higgs boson mass"
             write(io_LHEOutFile ,"(A,F10.5,A)") "hwidth",Ga_Reso*100d0,"      ! Higgs boson width"
-            if (FirstLines(1:3).ne."-->") then
+            if (Index(FirstLines,"-->").eq.0) then
                 write(io_LHEOutFile, "(A)") "-->"
             endif
             write(io_LHEOutFile ,"(A)") ""
+            ClosedHeader = .true.
             WroteMassWidth = .true.
         endif
         if( Index(FirstLines, "<event").ne.0 ) then
@@ -1685,7 +1702,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                BeginEventLine = trim(FirstLines)
         else
             if( importExternal_LHEinit ) then
-                if( FirstLines(1:17).eq."<LesHouchesEvents" .or. FirstLines(1:4).eq."<!--" ) then
+                if( Index(FirstLines,"<LesHouchesEvents").ne.0 .or. Index(FirstLines,"<!--").ne.0 ) then
                 else
                   write(io_LHEOutFile,"(A)") trim(firstlines)
                 endif
