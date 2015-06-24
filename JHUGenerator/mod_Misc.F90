@@ -291,7 +291,6 @@ endif
 return
 end function FindInputFmt0
 
-
 function FindInputFmt1(ParticleLine)
 implicit none
 character(len=*) :: ParticleLine
@@ -633,6 +632,29 @@ FindInputFmt1 = (trim(FormatParts(1))  &
               // trim(FormatParts(11)))
 return
 end function FindInputFmt1
+
+
+
+function Capitalize(InputString)
+implicit none
+character(len=150) :: InputString
+character(len=150) :: Capitalize
+character(len=26), parameter :: lower = "abcdefghijklmnopqrstuvwxyz"
+character(len=26), parameter :: upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+integer :: i, j
+
+Capitalize = ""
+
+do i=1,len(trim(InputString))
+    j = Index(lower,InputString(i:i))
+    if (j.ne.0) then
+        Capitalize(i:i) = upper(j:j)
+    else
+        Capitalize(i:i) = InputString(i:i)
+    endif
+enddo
+return
+end function Capitalize
 
 
 END MODULE
