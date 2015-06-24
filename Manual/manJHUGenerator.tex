@@ -76,7 +76,7 @@ The list of command line configurables and the default values are (also defined 
     MReso:       resonance mass (default=126.00), format: yyy.xx
     DecayMode1:  decay mode for vector boson 1 (Z/W/gamma)
     DecayMode2:  decay mode for vector boson 2 (Z/W/gamma)
-                   0=Z->2l,  1=Z->2q, 2=Z->2tau, 3=Z->3nu,
+                   0=Z->2l,  1=Z->2q, 2=Z->2tau, 3=Z->2nu,
                    4=W->lnu, 5=W->2q, 6=W->taunu,
                    7=gamma, 8=Z->2l+2tau,
                    9=Z->anything, 10=W->lnu+taunu, 11=W->anything
@@ -229,6 +229,13 @@ For $VV$ decay (and similarly in $ttH$ production), by default the $V$'s are ran
 logical, public, parameter :: RandomizeVV = .true.
 \end{verbatim}
 to \verb|.false.|.  In this case, \verb|DecayMode1| will refer specifically to the $W^+$ and \verb|DecayMode2| to the $W^-$.  For $ZZ$ decay, this parameter only determines whether the decays of first and second $Z$ written to the LHE file are randomized or not; in this case the only effect is the appearance of the output.
+
+\noindent
+When reading in LHE files, JHUGen determines the format by looking at the first lines of the first event.  If this determination fails for any reason (for example, if different events are written in inconsistent formats), try changing
+\begin{verbatim}
++logical, public, parameter :: UseUnformattedRead = .false.
+\end{verbatim}
+to \verb|.true.|.  However, this will noticeably slow down event generation in \verb|ReadLHE| mode.
 
 \noindent
 {\it Only for final states with 4 same flavor fermions }, one can include interference effects between the leptons.  The interference is controlled by the command line parameter:

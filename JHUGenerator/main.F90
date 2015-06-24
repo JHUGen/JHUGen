@@ -25,7 +25,9 @@ logical,parameter :: useBetaVersion=.false.! this should be set to .false.
    call PrintLogo(io_LogFile)
    call WriteParameters(io_stdout)
    call WriteParameters(io_LogFile)
-   call InitOutput()
+   if ( .not. ReadLHEFile .and. .not. ConvertLHEFile ) then
+      call InitOutput()
+   endif
    write(io_stdout,*) " Running"
    if( .not.useBetaVersion .and.   ConvertLHEFile ) then
         call StartConvertLHE(VG_Result,VG_Error)
@@ -1340,7 +1342,7 @@ END SUBROUTINE
 !                M_Reso = M_Reso*GeV!  convert to units of 100GeV
 !                M_ResoSet=.true.
 !         endif
-!         if( FirstLines(1:7).eq."<event>" ) then 
+!         if( Index(FirstLines, "<event").ne.0 ) then
 !                FirstEvent=.true.
 !         else
 !             if( importExternal_LHEinit ) then
@@ -1505,7 +1507,7 @@ END SUBROUTINE
 !               read(16,fmt="(A160)",IOSTAT=stat,END=99) EventInfoLine(1:160)
 !               if(EventInfoLine(1:30).eq."</LesHouchesEvents>") then
 !                   goto 99
-!               elseif( EventInfoLine(1:8).eq."<event>" ) then
+!               elseif( Index(EventInfoLine, "<event").ne.0 ) then
 !                   exit
 !               else!if there are "#" comments
 !                   if( FirstEvent ) then 
@@ -1553,8 +1555,6 @@ END SUBROUTINE
 
 
 
-
-
 SUBROUTINE StartReadLHE_NEW(VG_Result,VG_Error)
 use ModCrossSection
 use ModKinematics
@@ -1577,16 +1577,15 @@ character(len=*),parameter :: JHUGen_old_Fmt1 = "(I3,X,I2,X,I2,X,I2,X,I3,X,I3,X,
 character(len=*),parameter :: MadGra_Fmt0 = "(I2,A160)"
 character(len=*),parameter :: MadGra_Fmt1 = "(7X,I3,2X,I3,3X,I2,3X,I2,3X,I3,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1F3.0,X,1F3.0)"
 character(len=150) :: InputFmt0,InputFmt1
-logical :: FirstEvent,M_ResoSet,Ga_ResoSet
+logical :: FirstEvent,M_ResoSet,Ga_ResoSet,WroteHeader,ClosedHeader,WroteMassWidth,InMadgraphMassBlock
 integer :: nline,intDummy,Nevent
 integer :: LHE_IDUP(1:maxpart),LHE_ICOLUP(1:2,1:maxpart),LHE_MOTHUP(1:2,1:maxpart)
 integer :: EventNumPart
 character(len=160) :: FirstLines,EventInfoLine,OtherLines
-character(len=160) :: EventLine(1:maxpart)
+character(len=160) :: EventLine(0:maxpart)
 integer :: n,stat,iHiggs,VegasSeed
-integer,parameter :: DefaultInputLHEFormat = 1   !  1=POWHEG, 2=JHUGen (old format), 3=JHUGen (new format), 4=MadGraph
-integer :: InputLHEFormat = 0
-real :: InputJHUGenversion
+integer :: i, j
+character(len=100) :: BeginEventLine
 
 
 
@@ -1595,81 +1594,128 @@ if( VegasNc0.eq.-1 ) VegasNc0 = VegasNc0_default
 if( VegasNc1.eq.-1 .and. VegasNc2.eq.-1 ) VegasNc1 = VegasNc1_default
 if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
 
+     write(io_LHEOutFile ,'(A)') '<LesHouchesEvents version="1.0">'
+
 !    search for line with first event
      FirstEvent = .false.
      M_ResoSet=.false.
      Ga_ResoSet=.false.
+     WroteHeader=.false.
+     ClosedHeader=.false.
+     WroteMassWidth=.false.
+     InMadgraphMassBlock=.false.
      do while ( .not.FirstEvent )
         read(16,fmt="(A160)",IOSTAT=stat,END=99) FirstLines
-        if( InputLHEFormat.eq.0 ) then
-            if ( FirstLines(21:30).eq."POWHEG-BOX" ) then
-                InputLHEFormat = 1
-                write (io_stdout,"(2X,A)")  "Input file detected as POWHEG"
-                write (io_LogFile,"(2X,A)") "Input file detected as POWHEG"
-            elseif ( FirstLines(17:28).eq."JHUGenerator" ) then
-                read(FirstLines(31:33),*) InputJHUGenversion
-                if ( InputJHUGenversion.gt.4.799 ) then
-                    InputLHEFormat = 3
-                    write (io_stdout,"(2X,A)")  "Input file detected as JHUGen"
-                    write (io_LogFile,"(2X,A)") "Input file detected as JHUGen"
-                else
-                    !old JHUGen version
-                    InputLHEFormat = 2
-                    write (io_stdout,"(2X,A)")  "Input file detected as JHUGen (pre-4.8)"
-                    write (io_LogFile,"(2X,A)") "Input file detected as JHUGen (pre-4.8)"
-                endif
-            elseif ( FirstLines(29:40).eq."Going Beyond" ) then                 !The actual MadGraph name is centered, so it moves
-                InputLHEFormat = 4                                              !between MadGraph 5 and Madgraph5_aMC@NLO
-                write (io_stdout,"(2X,A)")  "Input file detected as MadGraph"   !The motto is probably not going to change
-                write (io_LogFile,"(2X,A)") "Input file detected as MadGraph"
-            endif
+        if ( FirstLines(1:4).eq."<!--" .and. .not.WroteHeader ) then
+            call InitOutput()
+            WroteHeader = .true.
         endif
+        if (index(FirstLines,"<MG").ne.0 .and. .not.WroteHeader) then  !Sometimes MadGraph doesn't have a comment at the beginning
+            call InitOutput()                                          !In that case put the JHUGen header before the MadGraph
+            write(io_LHEOutFile, "(A)") "-->"                          ! proc card, etc.
+            WroteHeader = .true.                                       !and put the Higgs mass/width in a separate comment
+            ClosedHeader = .true.                                      !before <init>
+        endif
+        if (Index(FirstLines,"<init>").ne.0 .and. .not.WroteHeader ) then !If not now, when?
+            call InitOutput()
+            WroteHeader = .true.
+        endif
+
+        !Read the Higgs mass
+        !JHUGen or POWHEG
         if( FirstLines(1:5).eq."hmass" ) then 
-               read(FirstLines(6:16),*) M_Reso
+               i = 6
+               do while(FirstLines(i:i).eq." ")
+                   i = i+1
+               enddo
+               do while(FirstLines(i:i).ne." ")
+                   i = i+1
+               enddo
+               read(FirstLines(6:i),*) M_Reso
                M_Reso = M_Reso*GeV!  convert to units of 100GeV
                M_ResoSet=.true.
         endif
-        if( FirstLines(1:6).eq."hwidth" ) then 
-               read(FirstLines(7:16),*) Ga_Reso
+        !Madgraph
+        if (Index(Capitalize(FirstLines),"BLOCK MASS").ne.0 .and. .not.M_ResoSet) then
+               InMadgraphMassBlock=.true.
+        elseif (Index(Capitalize(FirstLines),"BLOCK").ne.0) then
+               InMadgraphMassBlock=.false.
+        endif
+        if (InMadgraphMassBlock) then
+               i = Index(FirstLines, " 25 ")
+               if (i.ne.0) then
+                   j = Index(FirstLines(i+4:len(FirstLines)), " ") + i+4 - 1
+                   if (j.eq.0) then
+                       j = len(FirstLines)
+                   endif
+                   read(FirstLines(i+4:j),*) M_Reso
+                   M_Reso = M_Reso*GeV
+                   M_ResoSet=.true.
+               endif
+        endif
+
+        !Read the Higgs width
+        !JHUGen or POWHEG
+        if( FirstLines(1:6).eq."hwidth" ) then
+               i = 7
+               do while(FirstLines(i:i).eq." ")
+                   i = i+1
+               enddo
+               do while(FirstLines(i:i).ne." ")
+                   i = i+1
+               enddo
+               read(FirstLines(7:i),*) Ga_Reso
                Ga_Reso = Ga_Reso*GeV!  convert to units of 100GeV
                Ga_ResoSet=.true.
         endif
-        if( FirstLines(1:3).eq."-->" ) then
+        !Madgraph
+        if (Index(Capitalize(FirstLines),"DECAY ").ne.0) then
+               i = Index(FirstLines, " 25 ")
+               if (i.ne.0) then
+                   j = Index(FirstLines(i+4:len(FirstLines)), " ") + i+4 - 1
+                   if (j.eq.0) then
+                       j = len(FirstLines)
+                   endif
+                   read(FirstLines(i+4:j),*) Ga_Reso
+                   Ga_Reso = Ga_Reso*GeV
+                   Ga_ResoSet=.true.
+               endif
+        endif
+
+        if( Index(FirstLines,"-->").ne.0 .and. .not.(M_ResoSet .and. Ga_ResoSet)) then
+            !In other words, if the mass and the width have not been found by the end of the comment
+            !This is possible in some MadGraph versions, where the mass and width are below, in the proc card
+            ! and the comment is just a fancy header.
+            !Give them more time to be found, and print them before <init>
+            ClosedHeader = .true.
+        elseif( .not.WroteMassWidth .and. (Index(FirstLines,"<init>").ne.0 .or. Index(FirstLines,"-->").ne.0) ) then
             write(io_LHEOutFile ,"(A)") ""
+            if (ClosedHeader) then
+                write(io_LHEOutFile, "(A)") "<!--"
+            endif
             write(io_LHEOutFile ,"(A)") "JHUGen Resonance parameters used for event generation:"
             write(io_LHEOutFile ,"(A,F6.1,A)") "hmass  ",M_Reso*100d0,"        ! Higgs boson mass"
             write(io_LHEOutFile ,"(A,F10.5,A)") "hwidth",Ga_Reso*100d0,"      ! Higgs boson width"
+            if (Index(FirstLines,"-->").eq.0) then
+                write(io_LHEOutFile, "(A)") "-->"
+            endif
             write(io_LHEOutFile ,"(A)") ""
+            ClosedHeader = .true.
+            WroteMassWidth = .true.
         endif
-        if( FirstLines(1:7).eq."<event>" ) then 
+        if( Index(FirstLines, "<event").ne.0 ) then
                FirstEvent=.true.
+               BeginEventLine = trim(FirstLines)
         else
             if( importExternal_LHEinit ) then
-                if( FirstLines(1:17).eq."<LesHouchesEvents" .or. FirstLines(1:4).eq."<!--" ) then
+                if( Index(FirstLines,"<LesHouchesEvents").ne.0 .or. Index(FirstLines,"<!--").ne.0 ) then
                 else
                   write(io_LHEOutFile,"(A)") trim(firstlines)
                 endif
             endif
         endif
      enddo
-     if( InputLHEFormat.eq.0 ) then
-         write(io_stdout,"(2X,A,I1)") "ERROR: Could not determine the LHE input file format.  Assuming default: ", DefaultInputLHEFormat
-         write(io_LogFile,"(2X,A,I1)") "ERROR: Could not determine the LHE input file format.  Assuming default: ", DefaultInputLHEFormat
-         InputLHEFormat = DefaultInputLHEFormat
-     endif
-     if(InputLHEFormat.eq.1) then
-       InputFmt0 = trim(POWHEG_Fmt0)
-       InputFmt1 = trim(POWHEG_Fmt1)
-     elseif(InputLHEFormat.eq.4) then
-       InputFmt0 = trim(MadGra_Fmt0)
-       InputFmt1 = trim(MadGra_Fmt1)
-     elseif(InputLHEFormat.eq.2) then
-       InputFmt0 = trim(JHUGen_old_Fmt0)
-       InputFmt1 = trim(JHUGen_old_Fmt1)
-     else
-       InputFmt0 = trim(JHUGen_Fmt0)
-       InputFmt1 = trim(JHUGen_Fmt1)
-     endif
+
      if( .not. M_ResoSet ) then
         write(io_stdout,"(2X,A,1F7.2)")  "ERROR: Higgs mass could not be read from LHE input file. Assuming default value",M_Reso*100d0
         write(io_LogFile,"(2X,A,1F7.2)") "ERROR: Higgs mass could not be read from LHE input file. Assuming default value",M_Reso*100d0
@@ -1698,7 +1744,8 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
       enddo
       csmax(0,0)   = 1.5d0*csmax(0,0)    !  savety buffer
 
-
+     InputFmt0 = ""
+     InputFmt1 = ""
 
      print *, " generating events"
      EvalCounter = 0
@@ -1709,8 +1756,24 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
      NEvent=0
      do while ( .true. ) 
          NEvent=NEvent + 1
-         LeptInEvent(:) = 0         
-         read(16,fmt=InputFmt0) EventNumPart,EventInfoLine!  read number of particle from the first line after <event> and other info
+         LeptInEvent(:) = 0
+         read(16,"(A)") EventLine(0)
+         if (UseUnformattedRead) then
+             read(EventLine(0),*) EventNumPart !  read number of particle from the first line after <event>
+             i = 1                             !  trying to read the other stuff in one string would just give
+             do while(EventLine(0)(i:i).eq." ")!  the first field
+                 i=i+1
+             enddo
+             do while(EventLine(0)(i:i).ne." ")
+                 i=i+1
+             enddo
+             read(EventLine(0)(i:len(EventLine(0))),"(A)") EventInfoLine
+         else
+             if (InputFmt0.eq."") then
+                 InputFmt0 = FindInputFmt0(EventLine(0))
+             endif
+             read(EventLine(0),InputFmt0) EventNumPart, EventInfoLine
+         endif
 !        read event lines
          do nline=1,EventNumPart
             read(16,fmt="(A160)") EventLine(nline)
@@ -1719,7 +1782,14 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
             call Error("Number of particles in LHE input exceeds allowed limit",EventNumPart)
          endif
          do nline=1,EventNumPart
-            read(EventLine(nline),fmt=InputFmt1) LHE_IDUP(nline),LHE_IntExt(nline),LHE_MOTHUP(1,nline),LHE_MOTHUP(2,nline),LHE_ICOLUP(1,nline),LHE_ICOLUP(2,nline),MomExt(2,nline),MomExt(3,nline),MomExt(4,nline),MomExt(1,nline),Mass(nline)
+            if (UseUnformattedRead) then
+                read(EventLine(nline),*) LHE_IDUP(nline),LHE_IntExt(nline),LHE_MOTHUP(1,nline),LHE_MOTHUP(2,nline),LHE_ICOLUP(1,nline),LHE_ICOLUP(2,nline),MomExt(2,nline),MomExt(3,nline),MomExt(4,nline),MomExt(1,nline),Mass(nline)
+            else
+                if (InputFmt1.eq."") then
+                    InputFmt1 = FindInputFmt1(EventLine(nline))
+                endif
+                read(EventLine(nline),InputFmt1) LHE_IDUP(nline),LHE_IntExt(nline),LHE_MOTHUP(1,nline),LHE_MOTHUP(2,nline),LHE_ICOLUP(1,nline),LHE_ICOLUP(2,nline),MomExt(2,nline),MomExt(3,nline),MomExt(4,nline),MomExt(1,nline),Mass(nline)
+            endif
             MomExt(1:4,nline) = MomExt(1:4,nline)*GeV!  convert to units of 100GeV
             Mass(nline) = Mass(nline)*GeV            !  convert to units of 100GeV
             if( abs(LHE_IDUP(nline)).eq.25 ) then!   select the Higgs (ID=25, h0)
@@ -1754,7 +1824,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
              HiggsDK_IDUP(8) = convertLHE(HiggsDK_IDUP(8))
              HiggsDK_IDUP(9) = convertLHE(HiggsDK_IDUP(9))
              
-             call WriteOutEvent_NEW(EventNumPart,LHE_IDUP,LHE_IntExt,LHE_MOTHUP,LHE_ICOLUP,MomExt,HiggsDK_Mom,Mass,iHiggs,HiggsDK_IDUP,HiggsDK_ICOLUP,EventInfoLine)
+             call WriteOutEvent_NEW(EventNumPart,LHE_IDUP,LHE_IntExt,LHE_MOTHUP,LHE_ICOLUP,MomExt,HiggsDK_Mom,Mass,iHiggs,HiggsDK_IDUP,HiggsDK_ICOLUP,EventInfoLine,BeginEventLine=BeginEventLine)
 
              if( mod(AccepCounter,5000).eq.0 ) then
                   call cpu_time(time_int)
@@ -1776,9 +1846,10 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
               if(OtherLines(1:30).eq."</LesHouchesEvents>") then
                   if( RequestNLeptons.gt.0 ) write(io_LHEOutFile,"(A,1F6.2,A)") "<!-- Lepton filter efficiency:",dble(AccepCounter)/dble(NEvent)*100d0," % -->"
                   goto 99
-              elseif( OtherLines(1:8).eq."</event>" .and. Res.gt.0d0 ) then
-                  write(io_LHEOutFile,"(A)") "</event>"
-              elseif( OtherLines(1:8).eq."<event>" ) then
+              elseif( (Index(OtherLines(1:7),"</event").ne.0) .and. Res.gt.0d0 ) then
+                  write(io_LHEOutFile,"(A)") trim(OtherLines)
+              elseif( Index(OtherLines,"<event").ne.0 ) then
+                  BeginEventLine = trim(OtherLines)
                   exit
               elseif( Res.gt.0d0 ) then !if there are "#" comments
                   write(io_LHEOutFile,fmt="(A)") trim(OtherLines)
@@ -1842,28 +1913,21 @@ real(8) :: yRnd(1:22),Res,dum,EMcheck(1:4),xRnd
 real(8) :: AcceptedEvent(1:4,1:maxpart),Ehat,pH2sq
 real(8) :: MomExt(1:4,1:maxpart),MomShift(1:4,1:maxpart),MomHiggs(1:4),MomParton(1:4,1:maxpart),Mass(1:maxpart),Spin(1:maxpart),Lifetime(1:maxpart)
 integer :: tries, nParticle, MY_IDUP(1:7+maxpart), ICOLUP(1:2,1:7+maxpart),IntExt(1:7+maxpart),convertparent
-character(len=*),parameter :: POWHEG_Fmt0 = "(5X,I2,A160)"
-character(len=*),parameter :: POWHEG_Fmt1 = "(5X,I3,4X,I2,4X,I2,4X,I2,2X,I4,2X,I4,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9,1X,1PE12.5,1X,1PE10.3)"
-character(len=*),parameter :: JHUGen_Fmt0 = "(I2,A120)"
-character(len=*),parameter :: JHUGen_Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0)"
-character(len=*),parameter :: JHUGen_old_Fmt0 = "(2X,I2,A160)"
-character(len=*),parameter :: JHUGen_old_Fmt1 = "(I3,X,I2,X,I2,X,I2,X,I3,X,I3,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7)"
-character(len=*),parameter :: MadGra_Fmt0 = "(I2,A120)"
-character(len=*),parameter :: MadGra_Fmt1 = "(7X,I3,2X,I3,3X,I2,3X,I2,3X,I3,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1F3.0,X,1F3.0)"
-character(len=150) :: InputFmt0,InputFmt1
-logical :: FirstEvent,M_ResoSet,Ga_ResoSet
+logical :: FirstEvent,M_ResoSet,Ga_ResoSet,WroteHeader,ClosedHeader,WroteMassWidth,InMadgraphMassBlock
 integer :: nline,intDummy,Nevent
 integer :: LHE_IDUP(1:maxpart+3),   LHE_ICOLUP(1:2,1:maxpart+3),   LHE_MOTHUP(1:2,1:maxpart+3)
 integer :: LHE_IDUP_Part(1:maxpart),LHE_ICOLUP_Part(1:2,1:maxpart),LHE_MOTHUP_Part(1:2,1:maxpart+3)
 integer :: EventNumPart,nparton
 character(len=160) :: FirstLines
 character(len=120) :: EventInfoLine,PDFLine
-character(len=160) :: EventLine(1:maxpart+3)
-integer :: VegasSeed,i,stat,DecayParticles(1:2)
+character(len=160) :: EventLine(0:maxpart+3)
+integer :: VegasSeed,i,j,stat,DecayParticles(1:2)
 integer, dimension(:), allocatable :: gen_seed
-integer,parameter :: DefaultInputLHEFormat = 1   !  1=POWHEG, 2=JHUGen (old format), 3=JHUGen (new format), 4=MadGraph
-integer :: InputLHEFormat = 0
-real :: InputJHUGenversion
+character(len=*),parameter :: Fmt0 = "I2,X,A"
+character(len=*),parameter :: Fmt1 = "6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0"
+character(len=150) :: IndentedFmt0, IndentedFmt1, InputFmt0, InputFmt1
+character(len=100) :: BeginEventLine
+integer :: indent
 
 
 
@@ -1872,74 +1936,127 @@ if( VegasNc0.eq.-1 ) VegasNc0 = VegasNc0_default
 if( VegasNc1.eq.-1 .and. VegasNc2.eq.-1 ) VegasNc1 = VegasNc1_default
 if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
 
+     write(io_LHEOutFile ,'(A)') '<LesHouchesEvents version="1.0">'
 
 !    search for line with first event
      FirstEvent = .false.
      M_ResoSet=.false.
+     Ga_ResoSet=.false.
+     WroteHeader=.false.
+     ClosedHeader=.false.
+     WroteMassWidth=.false.
+     InMadgraphMassBlock=.false.
      do while ( .not.FirstEvent )
         read(16,fmt="(A160)",IOSTAT=stat,END=99) FirstLines
-        if( InputLHEFormat.eq.0 ) then
-            if ( FirstLines(21:30).eq."POWHEG-BOX" ) then
-                InputLHEFormat = 1
-                write (io_stdout,"(2X,A)")  "Input file detected as POWHEG"
-                write (io_LogFile,"(2X,A)") "Input file detected as POWHEG"
-            elseif ( FirstLines(17:28).eq."JHUGenerator" ) then
-                read(FirstLines(31:33),*) InputJHUGenversion
-                if ( InputJHUGenversion.gt.4.799 ) then
-                    InputLHEFormat = 3
-                    write (io_stdout,"(2X,A)")  "Input file detected as JHUGen"
-                    write (io_LogFile,"(2X,A)") "Input file detected as JHUGen"
-                else
-                    !old JHUGen version
-                    InputLHEFormat = 2
-                    write (io_stdout,"(2X,A)")  "Input file detected as JHUGen (pre-4.8)"
-                    write (io_LogFile,"(2X,A)") "Input file detected as JHUGen (pre-4.8)"
-                endif
-            elseif ( FirstLines(29:40).eq."Going Beyond" ) then                 !The actual MadGraph name is centered, so it moves
-                InputLHEFormat = 4                                              !between MadGraph 5 and Madgraph5_aMC@NLO
-                write (io_stdout,"(2X,A)")  "Input file detected as MadGraph"   !The motto is probably not going to change
-                write (io_LogFile,"(2X,A)") "Input file detected as MadGraph"
-            endif
+        if ( FirstLines(1:4).eq."<!--" .and. .not.WroteHeader ) then
+            call InitOutput()
+            WroteHeader = .true.
         endif
-        if( FirstLines(1:5).eq."hmass" ) then 
-               read(FirstLines(6:13),fmt="(F7.1)") M_Reso
+        if (index(FirstLines,"<MG").ne.0 .and. .not.WroteHeader) then  !Sometimes MadGraph doesn't have a comment at the beginning
+            call InitOutput()                                          !In that case put the JHUGen header before the MadGraph
+            write(io_LHEOutFile, "(A)") "-->"                          ! proc card, etc.
+            WroteHeader = .true.                                       !and put the Higgs mass/width in a separate comment
+            ClosedHeader = .true.                                      !before <init>
+        endif
+        if (Index(FirstLines,"<init>").ne.0 .and. .not.WroteHeader ) then !If not now, when?
+            call InitOutput()
+            WroteHeader = .true.
+        endif
+
+        !Read the Higgs mass
+        !JHUGen or POWHEG
+        if( FirstLines(1:5).eq."hmass" ) then
+               i = 6
+               do while(FirstLines(i:i).eq." ")
+                   i = i+1
+               enddo
+               do while(FirstLines(i:i).ne." ")
+                   i = i+1
+               enddo
+               read(FirstLines(6:i),*) M_Reso
                M_Reso = M_Reso*GeV!  convert to units of 100GeV
                M_ResoSet=.true.
         endif
-        if( FirstLines(1:6).eq."hwidth" ) then 
-               read(FirstLines(7:17),fmt="(F9.3)") Ga_Reso
+        !Madgraph
+        if (Index(Capitalize(FirstLines),"BLOCK MASS").ne.0 .and. .not.M_ResoSet) then
+               InMadgraphMassBlock=.true.
+        elseif (Index(Capitalize(FirstLines),"BLOCK").ne.0) then
+               InMadgraphMassBlock=.false.
+        endif
+        if (InMadgraphMassBlock) then
+               i = Index(FirstLines, " 25 ")
+               if (i.ne.0) then
+                   j = Index(FirstLines(i+4:len(FirstLines)), " ") + i+4 - 1
+                   if (j.eq.0) then
+                       j = len(FirstLines)
+                   endif
+                   read(FirstLines(i+4:j),*) M_Reso
+                   M_Reso = M_Reso*GeV
+                   M_ResoSet=.true.
+               endif
+        endif
+
+        !Read the Higgs width
+        !JHUGen or POWHEG
+        if( FirstLines(1:6).eq."hwidth" ) then
+               i = 7
+               do while(FirstLines(i:i).eq." ")
+                   i = i+1
+               enddo
+               do while(FirstLines(i:i).ne." ")
+                   i = i+1
+               enddo
+               read(FirstLines(7:i),*) Ga_Reso
                Ga_Reso = Ga_Reso*GeV!  convert to units of 100GeV
                Ga_ResoSet=.true.
-        endif       
-        if( FirstLines(1:7).eq."<event>" ) then 
+        endif
+        !Madgraph
+        if (Index(Capitalize(FirstLines),"DECAY ").ne.0) then
+               i = Index(FirstLines, " 25 ")
+               if (i.ne.0) then
+                   j = Index(FirstLines(i+4:len(FirstLines)), " ") + i+4 - 1
+                   if (j.eq.0) then
+                       j = len(FirstLines)
+                   endif
+                   read(FirstLines(i+4:j),*) Ga_Reso
+                   Ga_Reso = Ga_Reso*GeV
+                   Ga_ResoSet=.true.
+               endif
+        endif
+
+        if( Index(FirstLines,"-->").ne.0 .and. .not.(M_ResoSet .and. Ga_ResoSet)) then
+            !In other words, if the mass and the width have not been found by the end of the comment
+            !This is possible in some MadGraph versions, where the mass and width are below, in the proc card
+            ! and the comment is just a fancy header.
+            !Give them more time to be found, and print them before <init>
+            ClosedHeader = .true.
+        elseif( .not.WroteMassWidth .and. (Index(FirstLines,"<init>").ne.0 .or. Index(FirstLines,"-->").ne.0) ) then
+            write(io_LHEOutFile ,"(A)") ""
+            if (ClosedHeader) then
+                write(io_LHEOutFile, "(A)") "<!--"
+            endif
+            write(io_LHEOutFile ,"(A)") "JHUGen Resonance parameters used for event generation:"
+            write(io_LHEOutFile ,"(A,F6.1,A)") "hmass  ",M_Reso*100d0,"        ! Higgs boson mass"
+            write(io_LHEOutFile ,"(A,F10.5,A)") "hwidth",Ga_Reso*100d0,"      ! Higgs boson width"
+            if (Index(FirstLines,"-->").eq.0) then
+                write(io_LHEOutFile, "(A)") "-->"
+            endif
+            write(io_LHEOutFile ,"(A)") ""
+            ClosedHeader = .true.
+            WroteMassWidth = .true.
+        endif
+        if( Index(FirstLines, "<event").ne.0 ) then
                FirstEvent=.true.
+               BeginEventLine = trim(FirstLines)
         else
             if( importExternal_LHEinit ) then
-                if( FirstLines(1:17).eq."<LesHouchesEvents" .or. FirstLines(1:4).eq."<!--" ) then
+                if( Index(FirstLines,"<LesHouchesEvents").ne.0 .or. Index(FirstLines,"<!--").ne.0 ) then
                 else
                   write(io_LHEOutFile,"(A)") trim(firstlines)
                 endif
             endif
         endif
      enddo
-     if( InputLHEFormat.eq.0 ) then
-         write(io_stdout,"(2X,A,I1)") "ERROR: Could not determine the LHE input file format.  Assuming default: ", DefaultInputLHEFormat
-         write(io_LogFile,"(2X,A,I1)") "ERROR: Could not determine the LHE input file format.  Assuming default: ", DefaultInputLHEFormat
-         InputLHEFormat = DefaultInputLHEFormat
-     endif
-     if(InputLHEFormat.eq.1) then
-       InputFmt0 = trim(POWHEG_Fmt0)
-       InputFmt1 = trim(POWHEG_Fmt1)
-     elseif(InputLHEFormat.eq.4) then
-       InputFmt0 = trim(MadGra_Fmt0)
-       InputFmt1 = trim(MadGra_Fmt1)
-     elseif(InputLHEFormat.eq.2) then
-       InputFmt0 = trim(JHUGen_old_Fmt0)
-       InputFmt1 = trim(JHUGen_old_Fmt1)
-     else
-       InputFmt0 = trim(JHUGen_Fmt0)
-       InputFmt1 = trim(JHUGen_Fmt1)
-     endif
      if( .not. M_ResoSet ) then
         write(io_stdout,"(2X,A,1F7.2)")  "ERROR: Higgs mass could not be read from LHE input file. Assuming default value",M_Reso*100d0
         write(io_LogFile,"(2X,A,1F7.2)") "ERROR: Higgs mass could not be read from LHE input file. Assuming default value",M_Reso*100d0
@@ -1957,16 +2074,35 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
      write(io_stdout,"(A)") ""
      write(io_LogFile,"(A)") ""
 
+     InputFmt0 = ""
+     InputFmt1 = ""
 
      print *, " converting events"
      call cpu_time(time_start)
      NEvent=0
      do while ( .true. ) 
          NEvent=NEvent + 1
-         read(16,fmt=InputFmt0) EventNumPart,EventInfoLine!  read number of particle from the first line after <event> and other info
+         read(16,"(A)") EventLine(0)
+         if (UseUnformattedRead) then
+             read(EventLine(0),*) EventNumPart !  read number of particle from the first line after <event>
+             i = 1                             !  trying to read the other stuff in one string would just give
+             do while(EventLine(0)(i:i).eq." ")!  the first field
+                 i=i+1
+             enddo
+             do while(EventLine(0)(i:i).ne." ")
+                 i=i+1
+             enddo
+             read(EventLine(0)(i:len(EventLine(0))),"(A)") EventInfoLine
+         else
+             if (InputFmt0.eq."") then
+                 InputFmt0 = FindInputFmt0(EventLine(0))
+             endif
+             read(EventLine(0),InputFmt0) EventNumPart, EventInfoLine
+         endif
+
 !        read event lines
          do nline=1,EventNumPart
-            read(16,fmt="(A160)") EventLine(nline)
+            read(16,"(A)") EventLine(nline)
          enddo
          if( EventNumPart.lt.3 .or. EventNumPart.gt.maxpart ) then
             call Error("Number of particles in LHE input exceeds allowed limit",EventNumPart)
@@ -1975,7 +2111,14 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
  !       convert event lines into variables assuming that the Higgs resonance has ID 25
          nparton = 0
          do nline=1,EventNumPart
-            read(EventLine(nline),fmt=InputFmt1) LHE_IDUP(nline),IntExt(nline),LHE_MOTHUP(1,nline),LHE_MOTHUP(2,nline),LHE_ICOLUP(1,nline),LHE_ICOLUP(2,nline),MomExt(2,nline),MomExt(3,nline),MomExt(4,nline),MomExt(1,nline),Mass(nline),Spin(nline),Lifetime(nline)
+            if (UseUnformattedRead) then
+                read(EventLine(nline),*) LHE_IDUP(nline),IntExt(nline),LHE_MOTHUP(1,nline),LHE_MOTHUP(2,nline),LHE_ICOLUP(1,nline),LHE_ICOLUP(2,nline),MomExt(2,nline),MomExt(3,nline),MomExt(4,nline),MomExt(1,nline),Mass(nline)
+            else
+                if (InputFmt1.eq."") then
+                    InputFmt1 = FindInputFmt1(EventLine(nline))
+                endif
+                read(EventLine(nline),InputFmt1) LHE_IDUP(nline),IntExt(nline),LHE_MOTHUP(1,nline),LHE_MOTHUP(2,nline),LHE_ICOLUP(1,nline),LHE_ICOLUP(2,nline),MomExt(2,nline),MomExt(3,nline),MomExt(4,nline),MomExt(1,nline),Mass(nline)
+            endif
             if( abs(LHE_IDUP(nline)).eq.25 ) then!   select the Higgs (ID=25, h0)
                   MomHiggs(1:4) = MomExt(1:4,nline)
                   pH2sq = dsqrt(abs(MomHiggs(1:4).dot.MomHiggs(1:4)))
@@ -2235,10 +2378,21 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
 !          print *, MomShift(1:4,DecayParticles(2))
 !          pause
          
-         write(io_LHEOutFile,"(A)") "<event>"
-         write(io_LHEOutFile,fmt=InputFmt0) EventNumPart,EventInfoLine!  read number of particle from the first line after <event> and other info
+         write(io_LHEOutFile,"(A)") trim(BeginEventLine)
+         indent = 0
+         do while (BeginEventLine(indent+1:indent+1).eq." ")
+             indent = indent+1
+         enddo
+         if (indent.eq.0) then
+             write(IndentedFmt0, "(A,A,A)") "(", Fmt0, ")"
+             write(IndentedFmt1, "(A,A,A)") "(", Fmt1, ")"
+         else
+             write(IndentedFmt0, "(A,I1,A,A,A)") "(", indent, "X,", Fmt0, ")"
+             write(IndentedFmt1, "(A,I1,A,A,A)") "(", indent, "X,", Fmt1, ")"
+         endif
+         write(io_LHEOutFile,fmt=IndentedFmt0) EventNumPart,EventInfoLine!  read number of particle from the first line after <event> and other info
          do nline=1,EventNumPart
-            write(io_LHEOutFile,fmt=InputFmt1) LHE_IDUP(nline),IntExt(nline),LHE_MOTHUP(1,nline),LHE_MOTHUP(2,nline),LHE_ICOLUP(1,nline),LHE_ICOLUP(2,nline),MomShift(2,nline),MomShift(3,nline),MomShift(4,nline),MomShift(1,nline),Mass(nline),Spin(nline),Lifetime(nline)
+            write(io_LHEOutFile,fmt=IndentedFmt1) LHE_IDUP(nline),IntExt(nline),LHE_MOTHUP(1,nline),LHE_MOTHUP(2,nline),LHE_ICOLUP(1,nline),LHE_ICOLUP(2,nline),MomShift(2,nline),MomShift(3,nline),MomShift(4,nline),MomShift(1,nline),Mass(nline),Spin(nline),Lifetime(nline)
          enddo
          
 ! !        read optional lines
@@ -2262,9 +2416,9 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
               read(16,fmt="(A120)",IOSTAT=stat,END=99) PDFLine(1:120)
               if(PDFLine(1:30).eq."</LesHouchesEvents>") then
                   goto 99
-              elseif( PDFLine(1:8).eq."</event>" ) then
+              elseif( Index(PDFLine,"</event").ne.0 ) then
                   write(io_LHEOutFile,"(A)") "</event>"
-              elseif( PDFLine(1:8).eq."<event>" ) then
+              elseif( Index(PDFLine,"<event").ne.0 ) then
                   exit
               else
                   write(io_LHEOutFile,fmt="(A)") trim(PDFLine)
@@ -2337,7 +2491,7 @@ END SUBROUTINE
 !                 write (io_LogFile,"(2X,A)") "Input file detected as MadGraph"
 !             endif
 !         endif
-!         if( HeaderLines(1:7).eq."<event>" ) then 
+!         if( Index(HeaderLines(1:6),"<event").ne.0 ) then
 !                FirstEvent=.true.
 !         endif
 !      enddo
@@ -2380,7 +2534,7 @@ END SUBROUTINE
 !      FirstEvent = .false.
 !      do while ( .not.FirstEvent )
 !         read(io_LHEOutFile2,fmt="(A160)",IOSTAT=stat,END=99) HeaderLines
-!         if( HeaderLines(1:7).eq."<event>" ) then 
+!         if( Index(HeaderLines,"<event").ne.0 ) then
 !                FirstEvent=.true.
 !         endif
 !      enddo
@@ -2922,11 +3076,13 @@ use ModParameters
 implicit none
 
     if( (unweighted) .or. ( (.not.unweighted) .and. (writeWeightedLHE) )  ) then 
-        write(io_LHEOutFile ,'(A)') '<LesHouchesEvents version="1.0">'
+        if ( .not. ReadLHEFile .and. .not. ConvertLHEFile ) then
+            write(io_LHEOutFile ,'(A)') '<LesHouchesEvents version="1.0">'
+        endif
         write(io_LHEOutFile ,'(A)') '<!--'
         write(io_LHEOutFile ,'(A,A6,A)') 'Output from the JHUGenerator ',trim(JHUGen_Version),' described in arXiv:1001.3396 [hep-ph],arXiv:1208.4018 [hep-ph],arXiv:1309.4819 [hep-ph]'
 
-        if( .not. ReadLHEFile ) then
+        if( .not. ReadLHEFile .and. .not. ConvertLHEFile ) then
             write(io_LHEOutFile ,'(A)') ''
             write(io_LHEOutFile ,'(A,F5.1,A)') 'hmass   ',M_Reso*100d0,'     ! Higgs boson mass'
             write(io_LHEOutFile ,'(A,F8.5,A)') 'hwidth ',Ga_Reso*100d0,'   ! Higgs boson width'
