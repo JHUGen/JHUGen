@@ -2484,10 +2484,11 @@ END FUNCTION
 
 
 
-SUBROUTINE VVBranchings(MY_IDUP,ICOLUP)
+SUBROUTINE VVBranchings(MY_IDUP,ICOLUP,ColorBase)
 use ModParameters
 implicit none
-integer :: MY_IDUP(4:9),ICOLUP(1:2,6:9),DKFlavor
+integer :: MY_IDUP(4:9),ICOLUP(1:2,6:9),DKFlavor,ICOLUP_Base
+integer, optional ::ColorBase
 real(8) :: DKRnd
 
 !    particle associations:
@@ -2497,6 +2498,11 @@ real(8) :: DKRnd
 !    IDUP(8)  -->  MomDK(:,4)  -->     v-spinor
 !    IDUP(9)  -->  MomDK(:,3)  -->  ubar-spinor
 
+   if (present(ColorBase)) then
+       ICOLUP_BASE = ColorBase
+   else
+       ICOLUP_BASE = 800
+   endif
 
    ICOLUP(:,:) = 0
    if( DecayMode1.eq.0 ) then! Z1->2l
@@ -2511,8 +2517,8 @@ real(8) :: DKRnd
         DKFlavor = ZQuaBranching_flat( DKRnd )!= Up,Dn,Chm,Str,Bot
         MY_IDUP(6) =-DKFlavor
         MY_IDUP(7) =+DKFlavor
-        ICOLUP(1:2,6) = (/0,803/)
-        ICOLUP(1:2,7) = (/803,0/)
+        ICOLUP(1:2,6) = (/            0,ICOLUP_BASE+3/)
+        ICOLUP(1:2,7) = (/ICOLUP_BASE+3,            0/)
    elseif( DecayMode1.eq.2 ) then! Z1->2tau
         MY_IDUP(4) = Z0_
         MY_IDUP(6) = TaP_
@@ -2537,8 +2543,8 @@ real(8) :: DKRnd
 !         MY_IDUP(7) = +abs(DKFlavor)    ! up flavor
         MY_IDUP(7) = +abs(DKFlavor)           ! up flavor
         MY_IDUP(6) = GetCKMPartner(MY_IDUP(7))! anti-dn flavor         
-        ICOLUP(1:2,6) = (/0,803/)
-        ICOLUP(1:2,7) = (/803,0/)
+        ICOLUP(1:2,6) = (/            0,ICOLUP_BASE+3/)
+        ICOLUP(1:2,7) = (/ICOLUP_BASE+3,            0/)
    elseif( DecayMode1.eq.6 ) then! W1(+)->taunu
         MY_IDUP(4) = Wp_
         MY_IDUP(6) = TaP_
@@ -2560,8 +2566,8 @@ real(8) :: DKRnd
         MY_IDUP(6) =-DKFlavor
         MY_IDUP(7) =+DKFlavor
         if(IsAQuark(DKFlavor)) then
-           ICOLUP(1:2,6) = (/0,803/)
-           ICOLUP(1:2,7) = (/803,0/)
+           ICOLUP(1:2,6) = (/            0,ICOLUP_BASE+3/)
+           ICOLUP(1:2,7) = (/ICOLUP_BASE+3,            0/)
         endif
    elseif( DecayMode1.eq.10 ) then! W1(+)->l+tau  +nu
         call random_number(DKRnd)
@@ -2578,8 +2584,8 @@ real(8) :: DKRnd
 !            MY_IDUP(7) = +abs(DKFlavor)    ! up flavor
            MY_IDUP(7) = +abs(DKFlavor)           ! up flavor
            MY_IDUP(6) = GetCKMPartner(MY_IDUP(7))! anti-dn flavor  
-           ICOLUP(1:2,6) = (/0,803/)
-           ICOLUP(1:2,7) = (/803,0/)
+           ICOLUP(1:2,6) = (/            0,ICOLUP_BASE+3/)
+           ICOLUP(1:2,7) = (/ICOLUP_BASE+3,            0/)
         else
            MY_IDUP(6) = +abs(DKFlavor)     ! lepton(+)
            MY_IDUP(7) = +abs(DKFlavor)+7   ! neutrino
@@ -2599,8 +2605,8 @@ real(8) :: DKRnd
         DKFlavor = ZQuaBranching_flat( DKRnd )!= Up,Dn,Chm,Str,Bot
         MY_IDUP(8) =-DKFlavor
         MY_IDUP(9) =+DKFlavor
-        ICOLUP(1:2,8) = (/0,804/)
-        ICOLUP(1:2,9) = (/804,0/)
+        ICOLUP(1:2,8) = (/            0,ICOLUP_BASE+4/)
+        ICOLUP(1:2,9) = (/ICOLUP_BASE+4,            0/)
    elseif( DecayMode2.eq.2 ) then! Z2->2tau
         MY_IDUP(5) = Z0_
         MY_IDUP(8) = TaP_
@@ -2625,8 +2631,8 @@ real(8) :: DKRnd
 !         MY_IDUP(9) = +abs(DKFlavor)+1  ! dn flavor
         MY_IDUP(8) = -abs(DKFlavor)           ! up flavor
         MY_IDUP(9) = GetCKMPartner(MY_IDUP(8))! dn flavor
-        ICOLUP(1:2,8) = (/0,804/)
-        ICOLUP(1:2,9) = (/804,0/)
+        ICOLUP(1:2,8) = (/            0,ICOLUP_BASE+4/)
+        ICOLUP(1:2,9) = (/ICOLUP_BASE+4,            0/)
    elseif( DecayMode2.eq.6 ) then! W2(-)->taunu
         MY_IDUP(5) = Wm_
         MY_IDUP(8) = ANuT_
@@ -2648,8 +2654,8 @@ real(8) :: DKRnd
         MY_IDUP(8) =-DKFlavor
         MY_IDUP(9) =+DKFlavor
         if(IsAQuark(DKFlavor)) then
-           ICOLUP(1:2,8) = (/0,804/)
-           ICOLUP(1:2,9) = (/804,0/)
+           ICOLUP(1:2,8) = (/            0,ICOLUP_BASE+4/)
+           ICOLUP(1:2,9) = (/ICOLUP_BASE+4,            0/)
         endif
    elseif( DecayMode2.eq.10 ) then! W2(-)->l+tau + nu
         call random_number(DKRnd)
@@ -2666,8 +2672,8 @@ real(8) :: DKRnd
 !            MY_IDUP(9) = +abs(DKFlavor)+1  ! dn flavor
            MY_IDUP(8) = -abs(DKFlavor)           ! up flavor
            MY_IDUP(9) = GetCKMPartner(MY_IDUP(8))! dn flavor
-           ICOLUP(1:2,8) = (/0,804/)
-           ICOLUP(1:2,9) = (/804,0/)
+           ICOLUP(1:2,8) = (/            0,ICOLUP_BASE+4/)
+           ICOLUP(1:2,9) = (/ICOLUP_BASE+4,            0/)
         else
            MY_IDUP(8) = -abs(DKFlavor)-7   ! anti-neutrino
            MY_IDUP(9) = -abs(DKFlavor)     ! lepton(-)
