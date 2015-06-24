@@ -517,9 +517,10 @@ do while (ParticleLine(i:i) .ne. " ")
 enddo
 
 !check that spaces(i) > 0
+!(besides for spaces(1), before the id, which can be 0)
 !the only way this can happen, consistent with the definition of lhe format,
 ! is for a column not to leave extra space for a -
-do i=1,13
+do i=2,13
     if (spaces(i).eq.0) then
         spaces(i) = 1
         if (i.eq.7) then   !we counted the nonexistant space for - in MomentumCharacters
