@@ -1629,11 +1629,9 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                M_ResoSet=.true.
         endif
         !Madgraph
-        if ((Index(FirstLines,"BLOCK MASS").ne.0 .or. Index(FirstLines,"Block mass").ne.0 .or. &
-             Index(FirstLines,"Block Mass").ne.0 .or. Index(FirstLines,"block mass").ne.0)     &
-              .and. .not.M_ResoSet) then
+        if (Index(Capitalize(FirstLines),"BLOCK MASS").ne.0 .and. .not.M_ResoSet) then
                InMadgraphMassBlock=.true.
-        elseif (Index(FirstLines,"BLOCK").ne.0 .or. Index(FirstLines,"Block").ne.0 .or. Index(FirstLines,"block").ne.0) then
+        elseif (Index(Capitalize(FirstLines),"BLOCK").ne.0) then
                InMadgraphMassBlock=.false.
         endif
         if (InMadgraphMassBlock) then
@@ -1657,7 +1655,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                Ga_ResoSet=.true.
         endif
         !Madgraph
-        if (Index(FirstLines,"DECAY ").ne.0) then
+        if (Index(Capitalize(FirstLines),"DECAY ").ne.0) then
                i = Index(FirstLines, " 25 ")
                if (i.ne.0) then
                    j = Index(FirstLines(i+4:len(FirstLines)), " ") + i+4 - 1
@@ -1959,11 +1957,9 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                M_ResoSet=.true.
         endif
         !Madgraph
-        if ((Index(FirstLines,"BLOCK MASS").ne.0 .or. Index(FirstLines,"Block mass").ne.0 .or. &
-             Index(FirstLines,"Block Mass").ne.0 .or. Index(FirstLines,"block mass").ne.0)     &
-              .and. .not.M_ResoSet) then
+        if (Index(Capitalize(FirstLines),"BLOCK MASS").ne.0 .and. .not.M_ResoSet) then
                InMadgraphMassBlock=.true.
-        elseif (Index(FirstLines,"BLOCK").ne.0 .or. Index(FirstLines,"Block").ne.0 .or. Index(FirstLines,"block").ne.0) then
+        elseif (Index(Capitalize(FirstLines),"BLOCK").ne.0) then
                InMadgraphMassBlock=.false.
         endif
         if (InMadgraphMassBlock) then
@@ -1987,7 +1983,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                Ga_ResoSet=.true.
         endif
         !Madgraph
-        if (Index(FirstLines,"DECAY ").ne.0) then
+        if (Index(Capitalize(FirstLines),"DECAY ").ne.0) then
                i = Index(FirstLines, " 25 ")
                if (i.ne.0) then
                    j = Index(FirstLines(i+4:len(FirstLines)), " ") + i+4 - 1
