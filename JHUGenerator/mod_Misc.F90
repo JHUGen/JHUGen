@@ -615,9 +615,9 @@ else
     endif
 endif
 
-do i=1,11
-    print *, FormatParts(i)
-enddo
+!do i=1,11
+!    print *, FormatParts(i)
+!enddo
 
 FindInputFmt1 = (trim(FormatParts(1))  &
               // trim(FormatParts(2))  &
