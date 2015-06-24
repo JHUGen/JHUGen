@@ -1624,7 +1624,14 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
         !Read the Higgs mass
         !JHUGen or POWHEG
         if( FirstLines(1:5).eq."hmass" ) then 
-               read(FirstLines(6:16),*) M_Reso
+               i = 6
+               do while(FirstLines(i:i).eq." ")
+                   i = i+1
+               enddo
+               do while(FirstLines(i:i).ne." ")
+                   i = i+1
+               enddo
+               read(FirstLines(6:i),*) M_Reso
                M_Reso = M_Reso*GeV!  convert to units of 100GeV
                M_ResoSet=.true.
         endif
@@ -1650,7 +1657,14 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
         !Read the Higgs width
         !JHUGen or POWHEG
         if( FirstLines(1:6).eq."hwidth" ) then
-               read(FirstLines(7:16),*) Ga_Reso
+               i = 7
+               do while(FirstLines(i:i).eq." ")
+                   i = i+1
+               enddo
+               do while(FirstLines(i:i).ne." ")
+                   i = i+1
+               enddo
+               read(FirstLines(7:i),*) Ga_Reso
                Ga_Reso = Ga_Reso*GeV!  convert to units of 100GeV
                Ga_ResoSet=.true.
         endif
@@ -1952,7 +1966,14 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
         !Read the Higgs mass
         !JHUGen or POWHEG
         if( FirstLines(1:5).eq."hmass" ) then
-               read(FirstLines(6:16),*) M_Reso
+               i = 6
+               do while(FirstLines(i:i).eq." ")
+                   i = i+1
+               enddo
+               do while(FirstLines(i:i).ne." ")
+                   i = i+1
+               enddo
+               read(FirstLines(6:i),*) M_Reso
                M_Reso = M_Reso*GeV!  convert to units of 100GeV
                M_ResoSet=.true.
         endif
@@ -1978,7 +1999,14 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
         !Read the Higgs width
         !JHUGen or POWHEG
         if( FirstLines(1:6).eq."hwidth" ) then
-               read(FirstLines(7:16),*) Ga_Reso
+               i = 7
+               do while(FirstLines(i:i).eq." ")
+                   i = i+1
+               enddo
+               do while(FirstLines(i:i).ne." ")
+                   i = i+1
+               enddo
+               read(FirstLines(7:i),*) Ga_Reso
                Ga_Reso = Ga_Reso*GeV!  convert to units of 100GeV
                Ga_ResoSet=.true.
         endif
