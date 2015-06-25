@@ -3866,6 +3866,51 @@ END SUBROUTINE
 
 
 
+
+SUBROUTINE TTbar_OffShellProjection(MomIn,MomOut,Jacobian)
+use modParameters
+use modMisc
+implicit none
+real(8) :: MomIn(:,:),MomOut(:,:),MomTmp(1:4),Jacobian
+real(8) :: xRndWidth(1:5),BW_Mass(1:5),BW_Jacobi(1:5)
+integer, parameter :: inLeft=1,inRight=2,Hbos=3,tbar=4,t=5,  bbar=6,Wm=7,lepM=8,nubar=9,  b=10,Wp=11,lepP=12,nu=13
+
+
+    call random_number(xRndWidth)
+      
+    call SmearExternal(xRndWidth(1),m_Reso,Ga_Reso,m_Reso/4d0,m_Reso*4d0,BW_Mass(1),BW_Jacobi(1))
+    call SmearExternal(xRndWidth(2),m_top,Ga_Top,m_top/4d0,m_top*4d0,BW_Mass(2),BW_Jacobi(2))
+    call SmearExternal(xRndWidth(3),m_top,Ga_Top,m_top/4d0,m_top*4d0,BW_Mass(3),BW_Jacobi(3))
+    call SmearExternal(xRndWidth(4),m_W,Ga_W,m_W/4d0,m_W*4d0,BW_Mass(4),BW_Jacobi(4))
+    call SmearExternal(xRndWidth(5),m_W,Ga_W,m_W/4d0,m_W*4d0,BW_Mass(5),BW_Jacobi(5))
+    Jacobian = BW_Jacobi(1) * BW_Jacobi(2) * BW_Jacobi(3) * BW_Jacobi(4) * BW_Jacobi(5)    
+
+print *, "smeared mt",(BW_Mass(2:3)-m_top)*100d0
+print *, "smeared mw",(BW_Mass(4:5)-m_w)*100d0
+
+    call ShiftMass(MomIn(1:4,tbar),MomIn(1:4,t),BW_Mass(2),BW_Mass(3),MomOut(1:4,tbar),MomOut(1:4,t))
+    
+    MomTmp(1:4) = MomOut(1:4,t) - MomIn(1:4,Wp)
+    call ShiftMass(MomTmp,MomIn(1:4,Wp),m_Bot,BW_Mass(4),MomOut(1:4,b),MomOut(1:4,Wp))! project b and W+ on-shell
+    
+    MomTmp(1:4) = MomOut(1:4,tbar) - MomIn(1:4,Wm)
+    call ShiftMass(MomTmp,MomIn(1:4,Wm),m_Bot,BW_Mass(5),MomOut(1:4,bbar),MomOut(1:4,Wm))! project bbar and W- on-shell
+    
+    MomTmp(1:4) = MomOut(1:4,Wp) - MomIn(1:4,lepP)                                ! project W+ decay products on-shell
+    MomOut(1:4,nu)   = MomTmp(1:4) - (MomTmp(1:4).dot.MomTmp(1:4))/2d0/(MomTmp(1:4).dot.MomIn(1:4,lepP)) * MomIn(1:4,lepP)
+    MomOut(1:4,lepP) = (1d0 + (MomTmp(1:4).dot.MomTmp(1:4))/2d0/(MomTmp(1:4).dot.MomIn(1:4,lepP))) * MomIn(1:4,lepP)
+    
+    MomTmp(1:4) = MomOut(1:4,Wm) - MomIn(1:4,lepM)                                ! project W- decay products on-shell
+    MomOut(1:4,nubar) = MomTmp(1:4) - (MomTmp(1:4).dot.MomTmp(1:4))/2d0/(MomTmp(1:4).dot.MomIn(1:4,lepM)) * MomIn(1:4,lepM)
+    MomOut(1:4,lepM)  = (1d0 + (MomTmp(1:4).dot.MomTmp(1:4))/2d0/(MomTmp(1:4).dot.MomIn(1:4,lepM))) * MomIn(1:4,lepM)
+
+return
+END SUBROUTINE
+
+
+
+
+
 SUBROUTINE EvalPhasespace_2to3ArbMass(EHat,Mass,xRndPS,Mom,PSWgt)
 use ModParameters
 implicit none
