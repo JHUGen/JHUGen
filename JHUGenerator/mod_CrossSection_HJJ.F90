@@ -167,15 +167,11 @@ END FUNCTION
    EvalWeighted_HJJ = 0d0
 
    call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
-
    EvalCounter = EvalCounter+1
 
    if (EHat.lt.M_Reso) return
    if( Process.eq.60 ) call EvalPhaseSpace_VBF(EHat,M_Reso,yRnd(3:7),MomExt,PSWgt)
-   if( Process.eq.61 ) call EvalPhaseSpace_VBF(EHat,M_Reso,yRnd(3:7),MomExt,PSWgt) ! 0.52956881
-!    if( Process.eq.61 ) call EvalPhaseSpace_VBF_NEW(EHat,yRnd(3:7),MomExt,PSWgt)  ! 
-!    EvalWeighted_HJJ = PSWgt;  RETURN  ! CALCULATING PS VOLUME
-   
+   if( Process.eq.61 ) call EvalPhaseSpace_VBF(EHat,M_Reso,yRnd(3:7),MomExt,PSWgt)
    call boost2Lab(eta1,eta2,5,MomExt(1:4,1:5))
 
 
