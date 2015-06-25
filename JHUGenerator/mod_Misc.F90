@@ -329,24 +329,36 @@ END SUBROUTINE
          enddo
       enddo
 
-
-!      return
     end subroutine spinoru
 
-    subroutine convert_to_MCFM(p)
+    
+    
+    
+    
+    
+    subroutine convert_to_MCFM(p,pout)
       implicit none
 ! converts from (E,px,py,pz) to (px,py,pz,E)
-      real(8) :: p(4),tmp(4)
+      real(8) :: p(1:4),tmp(1:4)
+      real(8), optional :: pout(1:4)
 
-      tmp(1)=p(1)
-      tmp(2)=p(2)
-      tmp(3)=p(3)
-      tmp(4)=p(4)
+      if( present(pout) ) then
+          pout(1)=p(1)
+          pout(2)=p(2)
+          pout(3)=p(3)
+          pout(4)=p(4)          
+      else
+          tmp(1)=p(1)
+          tmp(2)=p(2)
+          tmp(3)=p(3)
+          tmp(4)=p(4)
 
-      p(1)=tmp(2)
-      p(2)=tmp(3)
-      p(3)=tmp(4)
-      p(4)=tmp(1)
+          p(1)=tmp(2)
+          p(2)=tmp(3)
+          p(3)=tmp(4)
+          p(4)=tmp(1)
+      endif  
+      
     end subroutine convert_to_MCFM
 
 
