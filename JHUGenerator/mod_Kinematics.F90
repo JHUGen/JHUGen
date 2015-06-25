@@ -2175,6 +2175,7 @@ real(8) :: Mom(1:4,1:13),MomMELA(1:4,1:13)
 logical :: applyPSCut
 integer :: NBin(:)
 real(8) :: pT_t,pT_H,pT_tbar,MatElSq_H0,MatElSq_H1,D_0minus
+real(8) :: mt,mtbar,mWp,mWm,pT_b,pT_l,pT_miss
 integer, parameter :: inLeft=1,inRight=2,Hbos=3,tbar=4,t=5,  bbar=6,Wm=7,lepM=8,nubar=9,  b=10,Wp=11,lepP=12,nu=13
 logical,save :: FirstTime=.true.
 
@@ -2184,9 +2185,16 @@ logical,save :: FirstTime=.true.
     pT_t = get_PT(Mom(1:4,t))
     pT_tbar = get_PT(Mom(1:4,tbar))
     pT_H = get_PT(Mom(1:4,Hbos))
+    pT_b = get_PT(Mom(1:4,b))
+    pT_l = get_PT(Mom(1:4,LepP))
+    pT_miss = get_PT(Mom(1:4,nu)+Mom(1:4,nubar))
+    mt = get_MInv(Mom(1:4,t))
+    mtbar = get_MInv(Mom(1:4,tbar))
+    mWp = get_MInv(Mom(1:4,Wp))
+    mWm = get_MInv(Mom(1:4,Wm))
     
     if( m_Top.lt.10d0*GeV  .and. (pT_t.lt.pTjetcut .or. pT_tbar.lt.pTjetcut) ) applyPSCut=.true.
-    
+
     
 !     if( FirstTime ) then
 ! !       call NNPDFDriver("./pdfs/NNPDF30_lo_as_0130.LHgrid",33)
@@ -2204,13 +2212,20 @@ logical,save :: FirstTime=.true.
 !     
 !     D_0minus = MatElSq_H0/(MatElSq_H0 + 2d0*MatElSq_H1 )
 
+    D_0minus=0d0
 
-    
 !   binning
     NBin(1)  = WhichBin(1,pT_t)
     NBin(2)  = WhichBin(2,pT_H)
-    NBin(3)  = WhichBin(3,D_0minus)
-    
+    NBin(3)  = WhichBin(3,mt)
+    NBin(4)  = WhichBin(4,mtbar)
+    NBin(5)  = WhichBin(5,mWp)
+    NBin(6)  = WhichBin(6,mWm)
+    NBin(7)  = WhichBin(7,pT_b)
+    NBin(8)  = WhichBin(8,pT_l)
+    NBin(9)  = WhichBin(9,pT_miss)
+    NBin(10) = WhichBin(10,D_0minus)
+
     
     
 RETURN
@@ -3911,15 +3926,14 @@ integer, parameter :: inLeft=1,inRight=2,Hbos=3,tbar=4,t=5,  bbar=6,Wm=7,lepM=8,
 
     call random_number(xRndWidth)
       
-    call SmearExternal(xRndWidth(1),m_Reso,Ga_Reso,m_Reso/4d0,m_Reso*4d0,BW_Mass(1),BW_Jacobi(1))
-    call SmearExternal(xRndWidth(2),m_top,Ga_Top,m_top/4d0,m_top*4d0,BW_Mass(2),BW_Jacobi(2))
-    call SmearExternal(xRndWidth(3),m_top,Ga_Top,m_top/4d0,m_top*4d0,BW_Mass(3),BW_Jacobi(3))
-    call SmearExternal(xRndWidth(4),m_W,Ga_W,m_W/4d0,m_W*4d0,BW_Mass(4),BW_Jacobi(4))
-    call SmearExternal(xRndWidth(5),m_W,Ga_W,m_W/4d0,m_W*4d0,BW_Mass(5),BW_Jacobi(5))
-    Jacobian = BW_Jacobi(1) * BW_Jacobi(2) * BW_Jacobi(3) * BW_Jacobi(4) * BW_Jacobi(5)    
+    call SmearExternal(xRndWidth(2),m_top,Ga_Top,m_top-4*Ga_Top,m_top+4*Ga_Top,BW_Mass(2),BW_Jacobi(2))
+    call SmearExternal(xRndWidth(3),m_top,Ga_Top,m_top-4*Ga_Top,m_top+4*Ga_Top,BW_Mass(3),BW_Jacobi(3))
+    call SmearExternal(xRndWidth(4),m_W,Ga_W,m_W-4d0*Ga_W,m_W+4d0*Ga_W,BW_Mass(4),BW_Jacobi(4))
+    call SmearExternal(xRndWidth(5),m_W,Ga_W,m_W-4d0*Ga_W,m_W+4d0*Ga_W,BW_Mass(5),BW_Jacobi(5))
+    Jacobian = BW_Jacobi(2) * BW_Jacobi(3) * BW_Jacobi(4) * BW_Jacobi(5)    
 
-print *, "smeared mt",(BW_Mass(2:3)-m_top)*100d0
-print *, "smeared mw",(BW_Mass(4:5)-m_w)*100d0
+! print *, "smeared mt",(BW_Mass(2:3)-m_top)*100d0
+! print *, "smeared mw",(BW_Mass(4:5)-m_w)*100d0
 
     call ShiftMass(MomIn(1:4,tbar),MomIn(1:4,t),BW_Mass(2),BW_Mass(3),MomOut(1:4,tbar),MomOut(1:4,t))
     
