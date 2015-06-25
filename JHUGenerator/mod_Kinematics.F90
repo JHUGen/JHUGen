@@ -519,7 +519,8 @@ END SUBROUTINE
 SUBROUTINE ShiftMass(p1,p2,m1,m2,p1hat,p2hat)
 use ModMisc
 implicit none
-real(8) :: p1(1:4),p2(1:4),m1,m2,p1hat(1:4),p2hat(1:4)
+real(8),intent(in) :: p1(1:4),p2(1:4)
+real(8) :: m1,m2,p1hat(1:4),p2hat(1:4)
 real(8) :: xi,eta,a,b,c,p1sq,p2sq,p1p2
 
   p1sq = p1(1:4).dot.p1(1:4)
@@ -3198,6 +3199,34 @@ END SUBROUTINE
 
 
 
+SUBROUTINE SmearExternal(xRnd,Mass,Width,MinEnergy,MaxEnergy,invMass,Jacobi)
+use ModParameters
+real(8) :: xRnd,Mass,Width,invMass,Jacobi,MinEnergy,MaxEnergy
+real(8) :: r,rmin,rmax,BW
+
+
+IF( Width.lt.(1d-6)*GeV ) THEN
+   invMass = Mass
+   Jacobi  = 1d0
+ELSE
+   rmin=1d0/(Width*Mass) * datan( (MinEnergy**2-Mass**2)/(Width*Mass)  )    
+   rmax=1d0/(Width*Mass) * datan( (MaxEnergy**2-Mass**2)/(Width*Mass)  )
+   r = xRnd*(rmax-rmin) + rmin
+   
+   invMass = dsqrt(dabs( Mass*Width * dtan( Mass*Width*r )  +  Mass**2 ))
+!    BW = (invMass**2 - Mass**2)**2 + Mass**2 * Width**2            ! Breit-Wiegner propagator 
+   BW = (Mass**2 * Width**2) * ( dtan( Mass*Width*r )**2 + 1d0 )    ! equivalent to above
+
+   Jacobi  = (rmax-rmin) * BW   /(2d0*Pi)                           ! this Jacobian has [GeV^2]; it becomes [GeV^-2] when hitting the sq. propagator 
+ENDIF                                                               ! factor 2*Pi comes from integr. measure
+
+
+return
+END SUBROUTINE
+
+
+
+
 SUBROUTINE PDFMapping(MapType,yRnd,eta1,eta2,Ehat,sHatJacobi)
 use ModParameters
 use ModMisc
@@ -3785,13 +3814,13 @@ END SUBROUTINE
 
 
 
-SUBROUTINE EvalPhasespace_2to3M(EHat,Mass,xRndPS,Mom,PSWgt)
+SUBROUTINE EvalPhasespace_2to3M(EHat,Mass,xRndPS,Mom,PSWgt,Width)
 use ModParameters
 implicit none
-real(8) :: EHat
-real(8) :: PSWgt,PSWgt2,PSWgt3,Mass(1:3)
-real(8) :: xRndPS(1:5)
-real(8) :: Mom(1:4,1:5),TmpMom(1:4)
+real(8) :: EHat,PSWgt,PSWgt2,PSWgt3,Mass(1:3)
+real(8), optional :: Width(1:3)
+real(8) :: xRndPS(1:5),xRndWidth(1:3),BW_Jacobi(1:3)
+real(8) :: Mom(1:4,1:5),TmpMom(1:4),BW_Mass(1:3)
 ! real(8) :: MomDK(1:4,1:6)
 ! integer :: NPart,i
 ! real(8) :: vel,parx,theta ! for checks
@@ -3799,10 +3828,24 @@ integer :: Pcol1,Pcol2,Steps
 real(8) :: SingDepth,velo,parx
 real(8),parameter :: NPr=3, PiWgtPr = (2d0*Pi)**(4-NPr*3) * (4d0*Pi)**(NPr-1)
 
+  if( present(Width) ) then
+      call random_number(xRndWidth)
+      
+      call SmearExternal(xRndWidth(1),Mass(1),Width(1),Mass(1)/4d0,Mass(1)*4d0,BW_Mass(1),BW_Jacobi(1))
+      call SmearExternal(xRndWidth(2),Mass(2),Width(2),Mass(2)/4d0,Mass(2)*4d0,BW_Mass(2),BW_Jacobi(2))
+      call SmearExternal(xRndWidth(3),Mass(3),Width(3),Mass(3)/4d0,Mass(3)*4d0,BW_Mass(3),BW_Jacobi(3))
+      
+      call genps(3,Ehat,xRndPS(1:5),BW_Mass,Mom(1:4,3:5),PSWgt)
+      PSWgt = PSWgt*PiWgtPr                             &
+              * BW_Jacobi(1)*BW_Jacobi(2)*BW_Jacobi(3)  &  ! maybe add factors for higgs  
+              * (2d0*Ga_Top*m_Top)**2                   &  ! remove narrow-width prefactor 
+              * (Ga_Top**2 * m_Top**2)**2                  ! and replace by on-shell propagator to restore correct scaling                   
+                   
+  else
+      call genps(3,Ehat,xRndPS(1:5),Mass,Mom(1:4,3:5),PSWgt)
+      PSWgt = PSWgt*PiWgtPr
+  endif
 
-!  generate PS: massless + massless --> massive(M) + massive(anti-top) + massive(top)
-  call genps(3,Ehat,xRndPS(1:5),Mass,Mom(1:4,3:5),PSWgt)
-  PSWgt = PSWgt*PiWgtPr
 
 !   call yeti3(Ehat,xRndPS(1:5),(/m_Top,m_Top,Mass/),Mom(1:4,3:5),PSWgt)
 !   TmpMom(1:4) = Mom(1:4,3)
@@ -3820,6 +3863,36 @@ real(8),parameter :: NPr=3, PiWgtPr = (2d0*Pi)**(4-NPr*3) * (4d0*Pi)**(NPr-1)
    Mom(3,2) =  0d0
    Mom(4,2) = -EHat*0.5d0
 
+
+return
+END SUBROUTINE
+
+
+
+
+SUBROUTINE TTbar_OnShellProjection(MomIn,MomOut)
+use modParameters
+use modMisc
+implicit none
+real(8) :: MomIn(:,:),MomOut(:,:),MomTmp(1:4)
+integer, parameter :: inLeft=1,inRight=2,Hbos=3,tbar=4,t=5,  bbar=6,Wm=7,lepM=8,nubar=9,  b=10,Wp=11,lepP=12,nu=13
+
+
+    call ShiftMass(MomIn(1:4,tbar),MomIn(1:4,t),m_top,m_top,MomOut(1:4,tbar),MomOut(1:4,t))! project top momenta on-shell
+    
+    MomTmp(1:4) = MomOut(1:4,t) - MomIn(1:4,Wp)
+    call ShiftMass(MomTmp,MomIn(1:4,Wp),m_Bot,m_W,MomOut(1:4,b),MomOut(1:4,Wp))! project b and W+ on-shell
+    
+    MomTmp(1:4) = MomOut(1:4,tbar) - MomIn(1:4,Wm)
+    call ShiftMass(MomTmp,MomIn(1:4,Wm),m_Bot,m_W,MomOut(1:4,bbar),MomOut(1:4,Wm))! project bbar and W- on-shell
+    
+    MomTmp(1:4) = MomOut(1:4,Wp) - MomIn(1:4,lepP)                                ! project W+ decay products on-shell
+    MomOut(1:4,nu)   = MomTmp(1:4) - (MomTmp(1:4).dot.MomTmp(1:4))/2d0/(MomTmp(1:4).dot.MomIn(1:4,lepP)) * MomIn(1:4,lepP)
+    MomOut(1:4,lepP) = (1d0 + (MomTmp(1:4).dot.MomTmp(1:4))/2d0/(MomTmp(1:4).dot.MomIn(1:4,lepP))) * MomIn(1:4,lepP)
+    
+    MomTmp(1:4) = MomOut(1:4,Wm) - MomIn(1:4,lepM)                                ! project W- decay products on-shell
+    MomOut(1:4,nubar) = MomTmp(1:4) - (MomTmp(1:4).dot.MomTmp(1:4))/2d0/(MomTmp(1:4).dot.MomIn(1:4,lepM)) * MomIn(1:4,lepM)
+    MomOut(1:4,lepM)  = (1d0 + (MomTmp(1:4).dot.MomTmp(1:4))/2d0/(MomTmp(1:4).dot.MomIn(1:4,lepM))) * MomIn(1:4,lepM)
 
 return
 END SUBROUTINE
