@@ -134,7 +134,7 @@ implicit none
 real(8) :: yRnd(1:16),VgsWgt, EvalUnWeighted_TTBH
 real(8) :: pdf(-6:6,1:2),RES(-5:5,-5:5)
 real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi,CS_Max,DKRnd
-real(8) :: MomExt(1:4,1:13),MomOnShell(1:4,1:13),PSWgt,PSWgt2,PSWgt3
+real(8) :: MomExt(1:4,1:13),MomOnShell(1:4,1:13),MomOffShell(1:4,1:13),PSWgt,PSWgt2,PSWgt3,PSWgt4
 real(8) :: LO_Res_GG_Unpol,LO_Res_QQB_Unpol,PreFac,PDFFac1,PDFFac2
 integer :: NBin(1:NumHistograms),NHisto,iPartons(1:2),DKFlavor
 integer :: MY_IDUP(1:13),ICOLUP(1:2,1:13),nparton,DK_IDUP(1:6),DK_ICOLUP(1:2,3:6)
@@ -170,47 +170,32 @@ EvalUnWeighted_TTBH = 0d0
 
       
 ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !       
-      call EvalPhasespace_2to3M(EHat,(/M_Reso,M_Top,M_Top/),yRnd(3:7),MomExt(1:4,1:5),PSWgt,(/Ga_Reso,Ga_Top,Ga_Top/))! a(1)b(2)-->H(3)+tbar(4)+t(5)
-      call boost2Lab(eta1,eta2,5,MomExt(1:4,1:5))
+call TTbar_OffShellProjection(MomExt,MomOffShell,PSWgt4)
+MomOffShell(1:4,1:3) = MomExt(1:4,1:3)
+! call TTbar_OnShellProjection(MomExt,MomOnShell)
 
-      call EvalPhasespace_TopDecay(MomExt(1:4,tbar),yRnd(08:11),MomExt(1:4,06:08),PSWgt2)    ! ATop 
-      MomExt(1:4,bbar) = MomExt(1:4,06)
-      MomExt(1:4,nubar)= MomExt(1:4,08)
-      MomExt(1:4,lepM) = MomExt(1:4,07)
-      MomExt(1:4,Wm)   = MomExt(1:4,lepM) + MomExt(1:4,nubar)
-      
-      call EvalPhasespace_TopDecay(MomExt(1:4,t),yRnd(12:15),MomExt(1:4,10:12),PSWgt3)    !  Top
-      MomExt(1:4,b)   = MomExt(1:4,10)
-      MomExt(1:4,nu)  = MomExt(1:4,12)
-      MomExt(1:4,lepP)= MomExt(1:4,11)
-      MomExt(1:4,Wp)  = MomExt(1:4,lepP) + MomExt(1:4,nu)
-      PSWgt = PSWgt * PSWgt2*PSWgt3
-
-MomOnShell(1:4,1:3) = MomExt(1:4,1:3)
-call TTbar_OnShellProjection(MomExt,MomOnShell)
-
-print *, get_MInv(MomExt(:,t))
-print *, get_MInv(MomExt(:,tbar))
-print *, get_MInv(MomExt(:,b))
-print *, get_MInv(MomExt(:,bbar))
-print *, get_MInv(MomExt(:,Wp))
-print *, get_MInv(MomExt(:,Wm))
-print *, get_MInv(MomExt(:,lepp))
-print *, get_MInv(MomExt(:,lepm))
-print *, get_MInv(MomExt(:,nu))
-print *, get_MInv(MomExt(:,nubar))
-print *, "----"
-print *, get_MInv(MomOnShell(:,t))
-print *, get_MInv(MomOnShell(:,tbar))
-print *, get_MInv(MomOnShell(:,b))
-print *, get_MInv(MomOnShell(:,bbar))
-print *, get_MInv(MomOnShell(:,Wp))
-print *, get_MInv(MomOnShell(:,Wm))
-print *, get_MInv(MomOnShell(:,lepp))
-print *, get_MInv(MomOnShell(:,lepm))
-print *, get_MInv(MomOnShell(:,nu))
-print *, get_MInv(MomOnShell(:,nubar))
-print *, "----"
+! print *, get_MInv(MomExt(:,t))
+! print *, get_MInv(MomExt(:,tbar))
+! print *, get_MInv(MomExt(:,b))
+! print *, get_MInv(MomExt(:,bbar))
+! print *, get_MInv(MomExt(:,Wp))
+! print *, get_MInv(MomExt(:,Wm))
+! print *, get_MInv(MomExt(:,lepp))
+! print *, get_MInv(MomExt(:,lepm))
+! print *, get_MInv(MomExt(:,nu))
+! print *, get_MInv(MomExt(:,nubar))
+! print *, "----"
+! print *, get_MInv(MomOnShell(:,t))
+! print *, get_MInv(MomOnShell(:,tbar))
+! print *, get_MInv(MomOnShell(:,b))
+! print *, get_MInv(MomOnShell(:,bbar))
+! print *, get_MInv(MomOnShell(:,Wp))
+! print *, get_MInv(MomOnShell(:,Wm))
+! print *, get_MInv(MomOnShell(:,lepp))
+! print *, get_MInv(MomOnShell(:,lepm))
+! print *, get_MInv(MomOnShell(:,nu))
+! print *, get_MInv(MomOnShell(:,nubar))
+! print *, "----"
 ! print *, MomExt(1:4,inLeft)+MomExt(1:4,inRight)-MomExt(1:4,lepp)-MomExt(1:4,lepm)-MomExt(1:4,nu)-MomExt(1:4,nubar)-MomExt(1:4,b)-MomExt(1:4,bbar)-MomExt(1:4,Hbos)
 ! print *, MomExt(1:4,inLeft)+MomExt(1:4,inRight)-MomExt(1:4,t)-MomExt(1:4,tbar)-MomExt(1:4,Hbos)
 ! print *, MomExt(1:4,t)- MomExt(1:4,Wp)- MomExt(1:4,b)
@@ -224,6 +209,24 @@ print *, "----"
 ! print *, MomOnShell(1:4,tbar)- MomOnShell(1:4,Wm)- MomOnShell(1:4,bbar)
 ! print *, MomOnShell(1:4,Wp)- MomOnShell(1:4,lepp)- MomOnShell(1:4,nu)
 ! print *, MomOnShell(1:4,Wm)- MomOnShell(1:4,lepm)- MomOnShell(1:4,nubar)
+
+
+! call TTbar_OnShellProjection(MomOffShell,MomOnShell)
+! print *, "xxx", (MomOffShell(:,1) - MomExt(:,1))*100d0
+! print *, "xxx", (MomOffShell(:,2) - MomExt(:,2))*100d0
+! print *, "xxx", (MomOffShell(:,3) - MomExt(:,3))*100d0
+! print *, "xxx", (MomOffShell(:,4) - MomExt(:,4))*100d0
+! print *, "xxx", (MomOffShell(:,5) - MomExt(:,5))*100d0
+print *, "xxx", (MomOffShell(:,6) - MomExt(:,6))*100d0
+! print *, "xxx", (MomOffShell(:,7) - MomExt(:,7))*100d0
+print *, "xxx", (MomOffShell(:,8) - MomExt(:,8))*100d0
+print *, "xxx", (MomOffShell(:,9) - MomExt(:,9))*100d0
+print *, "xxx", (MomOffShell(:,10) - MomExt(:,10))*100d0
+! print *, "xxx", (MomOffShell(:,11) - MomExt(:,11))*100d0
+print *, "xxx", (MomOffShell(:,12) - MomExt(:,12))*100d0
+print *, "xxx", (MomOffShell(:,13) - MomExt(:,13))*100d0
+
+
 pause
 ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! 
 

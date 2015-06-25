@@ -59,7 +59,8 @@ Exec = ./JHUGen
 
 
 # main dependencies
-MainDep = mod_Kinematics.F90 \
+MainDep = mod_Phasespace.F90 \
+          mod_Kinematics.F90 \
           mod_CrossSection.F90 \
           mod_CrossSection_HJJ.F90 \
           mod_CrossSection_TTBH.F90 \
@@ -68,7 +69,8 @@ MainDep = mod_Kinematics.F90 \
           main.F90
 
 # main objects
-MainObj = $(ObjectDir)/mod_Kinematics.o \
+MainObj = $(ObjectDir)/mod_Phasespace.o \
+          $(ObjectDir)/mod_Kinematics.o \
           $(ObjectDir)/mod_CrossSection.o \
           $(ObjectDir)/mod_CrossSection_HJJ.o \
           $(ObjectDir)/mod_CrossSection_TTBH.o \
