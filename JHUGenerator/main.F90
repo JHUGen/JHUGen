@@ -2631,29 +2631,71 @@ implicit none
 integer :: AllocStatus,NHisto
 
           it_sav = 1
-          NumHistograms = 3
+          NumHistograms = 10
           if( .not.allocated(Histo) ) then
                 allocate( Histo(1:NumHistograms), stat=AllocStatus  )
                 if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
           endif
 
           Histo(1)%Info   = "pT_top"
-          Histo(1)%NBins  = 40
+          Histo(1)%NBins  = 50
           Histo(1)%BinSize= 10d0*GeV
           Histo(1)%LowVal = 0d0
           Histo(1)%SetScale= 1d0/GeV
 
           Histo(2)%Info   = "pT_H"
-          Histo(2)%NBins  = 40
+          Histo(2)%NBins  = 50
           Histo(2)%BinSize= 10d0*GeV
           Histo(2)%LowVal = 0d0
           Histo(2)%SetScale= 1d0/GeV
 
-          Histo(3)%Info   = "D_0minus"
+          Histo(3)%Info   = "mt"
           Histo(3)%NBins  = 50
-          Histo(3)%BinSize= 0.02
-          Histo(3)%LowVal = 0d0
-          Histo(3)%SetScale= 1d0
+          Histo(3)%BinSize= 0.4d0*GeV
+          Histo(3)%LowVal = 160d0*GeV
+          Histo(3)%SetScale= 1d0/GeV
+
+          Histo(4)%Info   = "mtbar"
+          Histo(4)%NBins  = 50
+          Histo(4)%BinSize= 0.4d0*GeV
+          Histo(4)%LowVal = 160d0*GeV
+          Histo(4)%SetScale= 1d0/GeV
+
+          Histo(5)%Info   = "mWp"
+          Histo(5)%NBins  = 50
+          Histo(5)%BinSize= 0.4d0*GeV
+          Histo(5)%LowVal = 70d0*GeV
+          Histo(5)%SetScale= 1d0/GeV
+
+          Histo(6)%Info   = "mWm"
+          Histo(6)%NBins  = 50
+          Histo(6)%BinSize= 0.4d0*GeV
+          Histo(6)%LowVal = 70d0*GeV
+          Histo(6)%SetScale= 1d0/GeV
+
+          Histo(7)%Info   = "pT_b"
+          Histo(7)%NBins  = 50
+          Histo(7)%BinSize= 10d0*GeV
+          Histo(7)%LowVal = 0d0
+          Histo(7)%SetScale= 1d0/GeV
+
+          Histo(8)%Info   = "pT_l"
+          Histo(8)%NBins  = 50
+          Histo(8)%BinSize= 10d0*GeV
+          Histo(8)%LowVal = 0d0
+          Histo(8)%SetScale= 1d0/GeV
+          
+          Histo(9)%Info   = "pT_miss"
+          Histo(9)%NBins  = 50
+          Histo(9)%BinSize= 10d0*GeV
+          Histo(9)%LowVal = 0d0
+          Histo(9)%SetScale= 1d0/GeV
+          
+          Histo(10)%Info   = "D_0minus"
+          Histo(10)%NBins  = 50
+          Histo(10)%BinSize= 0.02
+          Histo(10)%LowVal = 0d0
+          Histo(10)%SetScale= 1d0
 
 
   do NHisto=1,NumHistograms
