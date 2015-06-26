@@ -672,6 +672,7 @@ END SUBROUTINE
 
 SUBROUTINE WriteOutEvent_TTBH(Mom,MY_IDUP,ICOLUP,EventWeight)
 use ModParameters
+use ModMisc
 implicit none
 real(8) :: Mom(1:4,1:13)
 real(8),optional :: EventWeight
@@ -739,12 +740,16 @@ enddo
 
 if( TopDecays.ne.0 ) then
       ! introduce b-quark mass for LHE output 
-      call ShiftMass(Mom(1:4,b),   Mom(1:4,Wp),m_bot,M_W,  MomDummy(1:4,b),   MomDummy(1:4,Wp) )
-      call ShiftMass(Mom(1:4,bbar),Mom(1:4,Wm),m_bot,M_W,  MomDummy(1:4,bbar),MomDummy(1:4,Wm) )
+!       call ShiftMass(Mom(1:4,b),   Mom(1:4,Wp),m_bot,M_W,  MomDummy(1:4,b),   MomDummy(1:4,Wp) )
+!       call ShiftMass(Mom(1:4,bbar),Mom(1:4,Wm),m_bot,M_W,  MomDummy(1:4,bbar),MomDummy(1:4,Wm) )
+      MomDummy(1:4,b)   = Mom(1:4,b)
+      MomDummy(1:4,bbar)= Mom(1:4,bbar)
+      MomDummy(1:4,Wp)  = Mom(1:4,Wp)
+      MomDummy(1:4,Wm)  = Mom(1:4,Wm)
 
       ! introduce lepton/quark masses for LHE output  
-      call ShiftMass(Mom(1:4,LepP),MomDummy(1:4,Wp)-Mom(1:4,LepP), GetMass(MY_IDUP(LepP)),0d0,  MomDummy(1:4,LepP),MomDummy(1:4,Nu) )
-      call ShiftMass(Mom(1:4,LepM),MomDummy(1:4,Wm)-Mom(1:4,LepM), GetMass(MY_IDUP(LepM)),0d0,  MomDummy(1:4,LepM),MomDummy(1:4,Nubar) )
+      call ShiftMass(Mom(1:4,LepP),Mom(1:4,Wp)-Mom(1:4,LepP), GetMass(MY_IDUP(LepP)),0d0,  MomDummy(1:4,LepP),MomDummy(1:4,Nu) )
+      call ShiftMass(Mom(1:4,LepM),Mom(1:4,Wm)-Mom(1:4,LepM), GetMass(MY_IDUP(LepM)),0d0,  MomDummy(1:4,LepM),MomDummy(1:4,Nubar) )
 
       do i=6,13
           LHE_IDUP(i) = convertLHE( MY_IDUP(i) )
@@ -754,7 +759,6 @@ if( TopDecays.ne.0 ) then
           MomDummy(4,i) = 100.0d0*MomDummy(4,i)
       enddo
 endif
-
 
 
 write(io_LHEOutFile,"(A)") "<event>"
@@ -768,9 +772,10 @@ write(io_LHEOutFile,"(I2,X,I3,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7)") NUP
 ! (*) alpha_s coupling for this event
 
 do i=1,NUP
-     TheMass = GetMass( MY_IDUP(i) )
+!      TheMass = GetMass( MY_IDUP(i) )*100d0
+     TheMass = get_Minv(MomDummy(:,i))
      if( i.le.2  ) TheMass = 0.0d0  ! setting initial parton masses to zero
-     write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),TheMass*100d0,Lifetime,Spin
+     write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),TheMass,Lifetime,Spin
 enddo
 write(io_LHEOutFile,"(A)") "</event>"
 
@@ -888,6 +893,7 @@ END SUBROUTINE
 
 SUBROUTINE WriteOutEvent_TH(Mom,MY_IDUP,ICOLUP,EventWeight)
 use ModParameters
+use ModMisc
 implicit none
 real(8) :: Mom(1:4,1:9)
 real(8),optional :: EventWeight
@@ -915,7 +921,7 @@ MOTHUP(1:2,inRight)= (/0,0/);             ISTUP(inRight)= -1
 
 MOTHUP(1:2,Hbos)   = (/t,t/);             ISTUP(Hbos)   = +1
 MOTHUP(1:2,t)      = (/inLeft,inRight/);  ISTUP(t)      = +2
-MOTHUP(1:2,qout)   = (/inLeft,inRight/);  ISTUP(t)      = +2
+MOTHUP(1:2,qout)   = (/inLeft,inRight/);  ISTUP(qout)   = +2
 
 MOTHUP(1:2,b)      = (/t,t/);             ISTUP(b)      = +1
 MOTHUP(1:2,W)      = (/t,t/);             ISTUP(W)      = +2
@@ -949,10 +955,12 @@ enddo
 
 if( TopDecays.ne.0 ) then
       ! introduce b-quark mass for LHE output 
-      call ShiftMass(Mom(1:4,b),   Mom(1:4,W),m_bot,M_W,  MomDummy(1:4,b),   MomDummy(1:4,W) )
+!       call ShiftMass(Mom(1:4,b),   Mom(1:4,W),m_bot,M_W,  MomDummy(1:4,b),   MomDummy(1:4,W) )
+      MomDummy(1:4,b) = Mom(1:4,b)
+      MomDummy(1:4,W) = Mom(1:4,W)
 
       ! introduce lepton/quark masses for LHE output  
-      call ShiftMass(Mom(1:4,Lep),MomDummy(1:4,W)-Mom(1:4,Lep), GetMass(MY_IDUP(Lep)),0d0,  MomDummy(1:4,Lep),MomDummy(1:4,Nu) )
+      call ShiftMass(Mom(1:4,Lep),Mom(1:4,W)-Mom(1:4,Lep), GetMass(MY_IDUP(Lep)),0d0,  MomDummy(1:4,Lep),MomDummy(1:4,Nu) )
 
       do i=6,9
           LHE_IDUP(i) = convertLHE( MY_IDUP(i) )
@@ -976,9 +984,10 @@ write(io_LHEOutFile,"(I2,X,I3,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7)") NUP
 ! (*) alpha_s coupling for this event
 
 do i=1,NUP
-     TheMass = GetMass( MY_IDUP(i) )
+!      TheMass = GetMass( MY_IDUP(i) )*100d0
+     TheMass = get_Minv(MomDummy(:,i))
      if( i.le.2  ) TheMass = 0.0d0  ! setting initial parton masses to zero
-     write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),TheMass*100d0,Lifetime,Spin
+     write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),TheMass,Lifetime,Spin
 enddo
 write(io_LHEOutFile,"(A)") "</event>"
 

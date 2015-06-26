@@ -179,14 +179,14 @@ IF( GENEVT ) THEN
 
           IF( PROCESS.EQ.110 ) THEN
               call EvalAmp_QB_TH(MomExt,LO_Res_Unpol)
-              ICOLUP(1:2,inLeft) = (/501,000/)  !  correct for b q initial states, needs to be flipped for q b initial states
-              ICOLUP(1:2,inRight)= (/502,000/)
+              ICOLUP(1:2,inLeft) = (/502,000/)  !  correct for b q initial states, needs to be flipped for q b initial states
+              ICOLUP(1:2,inRight)= (/501,000/)
           ELSEIF( PROCESS.EQ.111 ) THEN
               call EvalAmp_QbarBbar_TH(MomExt,LO_Res_Unpol)
               ICOLUP(1:2,inLeft) = (/000,501/)
               ICOLUP(1:2,inRight)= (/000,502/)
           ENDIF
-          MY_IDUP(1:5) = (/ LHA2M_pdf(iPartons(1)),LHA2M_pdf(iPartons(2)),Hig_,SU2flip(LHA2M_pdf(iPartons(1))),SU2flip(LHA2M_pdf(iPartons(2))) /)
+          MY_IDUP(1:5) = (/ LHA2M_pdf(iPartons(1)),LHA2M_pdf(iPartons(2)),Hig_,SU2flip(LHA2M_pdf(iPartons(2))),SU2flip(LHA2M_pdf(iPartons(1))) /)
 
           PDFFac1 = pdf( LHA2M_pdf(iPartons(1)),1) * pdf( LHA2M_pdf(iPartons(2)),2)
           EvalUnWeighted_TH = LO_Res_Unpol(LHA2M_pdf(iPartons(1)),LHA2M_pdf(iPartons(2))) * PDFFac1 * PreFac 
@@ -228,12 +228,12 @@ ELSE! NOT GENEVT
               do nparton = -5,5
                 PDFFac1 = pdf( LHA2M_pdf(nparton),1) * pdf(ABot_,2)
                 EvalUnWeighted_TH = LO_Res_Unpol(LHA2M_pdf(nparton),ABot_) * PreFac *PDFFac1
-                RES(nparton,5) = EvalUnWeighted_TH
+                RES(nparton,-5) = EvalUnWeighted_TH
                 if (EvalUnWeighted_TH.gt.csmax(nparton,-5)) CSmax(nparton,-5) = EvalUnWeighted_TH
 
                 PDFFac1 = pdf( LHA2M_pdf(nparton),2) * pdf(ABot_,1)
                 EvalUnWeighted_TH = LO_Res_Unpol(ABot_,LHA2M_pdf(nparton)) * PreFac *PDFFac1
-                RES(5,nparton) = EvalUnWeighted_TH
+                RES(-5,nparton) = EvalUnWeighted_TH
                 if (EvalUnWeighted_TH.gt.csmax(-5,nparton)) CSmax(-5,nparton) = EvalUnWeighted_TH
               enddo
           ENDIF
