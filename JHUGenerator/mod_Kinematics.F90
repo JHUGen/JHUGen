@@ -349,7 +349,7 @@ END SUBROUTINE
 
 
 
-SUBROUTINE WriteOutEvent_NEW(NUP,IDUP,ISTUP,MOTHUP,ICOLUP,Mom,HiggsDK_Mom,Mass,iHiggs,HiggsDK_IDUP,HiggsDK_ICOLUP,EventInfoLine,EventWeight)
+SUBROUTINE WriteOutEvent_NEW(NUP,IDUP,ISTUP,MOTHUP,ICOLUP,Mom,HiggsDK_Mom,Mass,iHiggs,HiggsDK_IDUP,HiggsDK_ICOLUP,EventInfoLine,EventWeight,BeginEventLine)
 use ModParameters
 use modMisc
 implicit none
@@ -357,6 +357,7 @@ real(8) :: Mom(:,:),HiggsDK_Mom(:,:),Mass(:)
 ! real(8),optional :: MomFSPartons(:,:)
 real(8),optional :: EventWeight
 character(len=*) :: EventInfoLine
+character(len=*),optional :: BeginEventLine
 ! integer,optional :: MOTHUP_Parton(:,:)
 real(8) :: Spin, Lifetime, s34,s56,s36,s45,smallestInv
 integer :: IDUP(:),ISTUP(:),MOTHUP(:,:),ICOLUP(:,:)
@@ -365,8 +366,11 @@ integer,parameter :: maxpart=30
 integer :: i,iHiggs
 integer :: NUP,NUP_NEW,IDPRUP
 real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP,HiggsDKLength
-character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0)"
-
+character(len=*),parameter :: Fmt0 = "I2,X,I3,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7"
+character(len=*),parameter :: Fmt0_read = "I2,X,A"
+character(len=*),parameter :: Fmt1 = "6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0"
+integer :: indent
+character(len=150) :: IndentedFmt0, IndentedFmt1
 
 
 !   For description of the LHE format see http://arxiv.org/abs/hep-ph/0109068 and http://arxiv.org/abs/hep-ph/0609017
@@ -444,13 +448,36 @@ character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE
             HiggsDK_Mom(1:4,2) = HiggsDK_Mom(1:4,4)+ HiggsDK_Mom(1:4,5)
         endif
     endif
-    
-    
-    write(io_LHEOutFile,"(A)") "<event>"
-    if( ReadLHEFile .and. importExternal_LHEinit ) then
-      write(io_LHEOutFile,"(I2,X,A)") NUP+NUP_NEW,trim(EventInfoLine)
+
+    if (present(BeginEventLine)) then
+        write(io_LHEOutFile, "(A)") trim(BeginEventLine)
+        indent = 0
+        do while (BeginEventLine(indent+1:indent+1).eq." ")
+            indent = indent+1
+        end do
     else
-      write(io_LHEOutFile,"(I2,X,I3,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7)") NUP+NUP_NEW,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
+        write(io_LHEOutFile,"(A)") "<event>"
+        indent = 0
+    endif
+    if (indent.eq.0) then
+        if( ReadLHEFile .and. importExternal_LHEinit ) then
+            write(IndentedFmt0, "(A,A,A)") "(", Fmt0_read, ")"
+        else
+            write(IndentedFmt0, "(A,A,A)") "(", Fmt0, ")"
+        endif
+        write(IndentedFmt1, "(A,A,A)") "(", Fmt1, ")"
+    else
+        if( ReadLHEFile .and. importExternal_LHEinit ) then
+            write(IndentedFmt0, "(A,I1,A,A,A)") "(", indent, "X,", Fmt0_read, ")"
+        else
+            write(IndentedFmt0, "(A,I1,A,A,A)") "(", indent, "X,", Fmt0, ")"
+        endif
+        write(IndentedFmt1, "(A,I1,A,A,A)") "(", indent, "X,", Fmt1, ")"
+    endif
+    if( ReadLHEFile .and. importExternal_LHEinit ) then
+      write(io_LHEOutFile,IndentedFmt0) NUP+NUP_NEW,trim(EventInfoLine)
+    else
+      write(io_LHEOutFile,IndentedFmt0) NUP+NUP_NEW,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
     !  in order of appearance:
     !  (*) number of particles in the event
     !  (*) process ID (user defined)
@@ -464,11 +491,11 @@ character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE
 !   write out existing particles
     do i = 1, NUP
         if( i.eq.iHiggs ) then 
-           write(io_LHEOutFile,fmt1) IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),  &
-                                     Mom(2:4,i)/GeV,Mom(1,i)/GeV, Mass(i)/GeV,HiggsDKLength, Spin           
+           write(io_LHEOutFile,IndentedFmt1) IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),  &
+                                             Mom(2:4,i)/GeV,Mom(1,i)/GeV, Mass(i)/GeV,HiggsDKLength, Spin           
         else
-           write(io_LHEOutFile,fmt1) IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),  &
-                                     Mom(2:4,i)/GeV,Mom(1,i)/GeV, Mass(i)/GeV,Lifetime, Spin   
+           write(io_LHEOutFile,IndentedFmt1) IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),  &
+                                             Mom(2:4,i)/GeV,Mom(1,i)/GeV, Mass(i)/GeV,Lifetime, Spin   
         endif                          
     enddo
     
@@ -477,8 +504,8 @@ character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE
     call swap_mom(HiggsDK_Mom(1:4,3),HiggsDK_Mom(1:4,4))! swap to account for flipped asignments
     call swap_mom(HiggsDK_Mom(1:4,5),HiggsDK_Mom(1:4,6))! swap to account for flipped asignments
     do i = 4,4 + (NUP_NEW-1)
-        write(io_LHEOutFile,fmt1) HiggsDK_IDUP(i),HiggsDK_ISTUP(i), HiggsDK_MOTHUP(1,i),HiggsDK_MOTHUP(2,i), HiggsDK_ICOLUP(1,i),HiggsDK_ICOLUP(2,i),  &
-                                  HiggsDK_Mom(2:4,i-3)/GeV,HiggsDK_Mom(1,i-3)/GeV, get_MInv(HiggsDK_Mom(1:4,i-3))/GeV, Lifetime, Spin   
+        write(io_LHEOutFile,IndentedFmt1) HiggsDK_IDUP(i),HiggsDK_ISTUP(i), HiggsDK_MOTHUP(1,i),HiggsDK_MOTHUP(2,i), HiggsDK_ICOLUP(1,i),HiggsDK_ICOLUP(2,i),  &
+                                          HiggsDK_Mom(2:4,i-3)/GeV,HiggsDK_Mom(1,i-3)/GeV, get_MInv(HiggsDK_Mom(1:4,i-3))/GeV, Lifetime, Spin   
     enddo
 
 RETURN
@@ -2457,10 +2484,11 @@ END FUNCTION
 
 
 
-SUBROUTINE VVBranchings(MY_IDUP,ICOLUP)
+SUBROUTINE VVBranchings(MY_IDUP,ICOLUP,ColorBase)
 use ModParameters
 implicit none
-integer :: MY_IDUP(4:9),ICOLUP(1:2,6:9),DKFlavor
+integer :: MY_IDUP(4:9),ICOLUP(1:2,6:9),DKFlavor,ICOLUP_Base
+integer, optional ::ColorBase
 real(8) :: DKRnd
 
 !    particle associations:
@@ -2470,6 +2498,11 @@ real(8) :: DKRnd
 !    IDUP(8)  -->  MomDK(:,4)  -->     v-spinor
 !    IDUP(9)  -->  MomDK(:,3)  -->  ubar-spinor
 
+   if (present(ColorBase)) then
+       ICOLUP_BASE = ColorBase
+   else
+       ICOLUP_BASE = 800
+   endif
 
    ICOLUP(:,:) = 0
    if( DecayMode1.eq.0 ) then! Z1->2l
@@ -2484,8 +2517,8 @@ real(8) :: DKRnd
         DKFlavor = ZQuaBranching_flat( DKRnd )!= Up,Dn,Chm,Str,Bot
         MY_IDUP(6) =-DKFlavor
         MY_IDUP(7) =+DKFlavor
-        ICOLUP(1:2,6) = (/0,803/)
-        ICOLUP(1:2,7) = (/803,0/)
+        ICOLUP(1:2,6) = (/            0,ICOLUP_BASE+3/)
+        ICOLUP(1:2,7) = (/ICOLUP_BASE+3,            0/)
    elseif( DecayMode1.eq.2 ) then! Z1->2tau
         MY_IDUP(4) = Z0_
         MY_IDUP(6) = TaP_
@@ -2510,8 +2543,8 @@ real(8) :: DKRnd
 !         MY_IDUP(7) = +abs(DKFlavor)    ! up flavor
         MY_IDUP(7) = +abs(DKFlavor)           ! up flavor
         MY_IDUP(6) = GetCKMPartner(MY_IDUP(7))! anti-dn flavor         
-        ICOLUP(1:2,6) = (/0,803/)
-        ICOLUP(1:2,7) = (/803,0/)
+        ICOLUP(1:2,6) = (/            0,ICOLUP_BASE+3/)
+        ICOLUP(1:2,7) = (/ICOLUP_BASE+3,            0/)
    elseif( DecayMode1.eq.6 ) then! W1(+)->taunu
         MY_IDUP(4) = Wp_
         MY_IDUP(6) = TaP_
@@ -2533,8 +2566,8 @@ real(8) :: DKRnd
         MY_IDUP(6) =-DKFlavor
         MY_IDUP(7) =+DKFlavor
         if(IsAQuark(DKFlavor)) then
-           ICOLUP(1:2,6) = (/0,803/)
-           ICOLUP(1:2,7) = (/803,0/)
+           ICOLUP(1:2,6) = (/            0,ICOLUP_BASE+3/)
+           ICOLUP(1:2,7) = (/ICOLUP_BASE+3,            0/)
         endif
    elseif( DecayMode1.eq.10 ) then! W1(+)->l+tau  +nu
         call random_number(DKRnd)
@@ -2551,8 +2584,8 @@ real(8) :: DKRnd
 !            MY_IDUP(7) = +abs(DKFlavor)    ! up flavor
            MY_IDUP(7) = +abs(DKFlavor)           ! up flavor
            MY_IDUP(6) = GetCKMPartner(MY_IDUP(7))! anti-dn flavor  
-           ICOLUP(1:2,6) = (/0,803/)
-           ICOLUP(1:2,7) = (/803,0/)
+           ICOLUP(1:2,6) = (/            0,ICOLUP_BASE+3/)
+           ICOLUP(1:2,7) = (/ICOLUP_BASE+3,            0/)
         else
            MY_IDUP(6) = +abs(DKFlavor)     ! lepton(+)
            MY_IDUP(7) = +abs(DKFlavor)+7   ! neutrino
@@ -2572,8 +2605,8 @@ real(8) :: DKRnd
         DKFlavor = ZQuaBranching_flat( DKRnd )!= Up,Dn,Chm,Str,Bot
         MY_IDUP(8) =-DKFlavor
         MY_IDUP(9) =+DKFlavor
-        ICOLUP(1:2,8) = (/0,804/)
-        ICOLUP(1:2,9) = (/804,0/)
+        ICOLUP(1:2,8) = (/            0,ICOLUP_BASE+4/)
+        ICOLUP(1:2,9) = (/ICOLUP_BASE+4,            0/)
    elseif( DecayMode2.eq.2 ) then! Z2->2tau
         MY_IDUP(5) = Z0_
         MY_IDUP(8) = TaP_
@@ -2598,8 +2631,8 @@ real(8) :: DKRnd
 !         MY_IDUP(9) = +abs(DKFlavor)+1  ! dn flavor
         MY_IDUP(8) = -abs(DKFlavor)           ! up flavor
         MY_IDUP(9) = GetCKMPartner(MY_IDUP(8))! dn flavor
-        ICOLUP(1:2,8) = (/0,804/)
-        ICOLUP(1:2,9) = (/804,0/)
+        ICOLUP(1:2,8) = (/            0,ICOLUP_BASE+4/)
+        ICOLUP(1:2,9) = (/ICOLUP_BASE+4,            0/)
    elseif( DecayMode2.eq.6 ) then! W2(-)->taunu
         MY_IDUP(5) = Wm_
         MY_IDUP(8) = ANuT_
@@ -2621,8 +2654,8 @@ real(8) :: DKRnd
         MY_IDUP(8) =-DKFlavor
         MY_IDUP(9) =+DKFlavor
         if(IsAQuark(DKFlavor)) then
-           ICOLUP(1:2,8) = (/0,804/)
-           ICOLUP(1:2,9) = (/804,0/)
+           ICOLUP(1:2,8) = (/            0,ICOLUP_BASE+4/)
+           ICOLUP(1:2,9) = (/ICOLUP_BASE+4,            0/)
         endif
    elseif( DecayMode2.eq.10 ) then! W2(-)->l+tau + nu
         call random_number(DKRnd)
@@ -2639,8 +2672,8 @@ real(8) :: DKRnd
 !            MY_IDUP(9) = +abs(DKFlavor)+1  ! dn flavor
            MY_IDUP(8) = -abs(DKFlavor)           ! up flavor
            MY_IDUP(9) = GetCKMPartner(MY_IDUP(8))! dn flavor
-           ICOLUP(1:2,8) = (/0,804/)
-           ICOLUP(1:2,9) = (/804,0/)
+           ICOLUP(1:2,8) = (/            0,ICOLUP_BASE+4/)
+           ICOLUP(1:2,9) = (/ICOLUP_BASE+4,            0/)
         else
            MY_IDUP(8) = -abs(DKFlavor)-7   ! anti-neutrino
            MY_IDUP(9) = -abs(DKFlavor)     ! lepton(-)
