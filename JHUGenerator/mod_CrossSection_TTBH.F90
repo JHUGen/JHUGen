@@ -174,7 +174,7 @@ EvalUnWeighted_TTBH = 0d0
          if( DKRnd.lt.0.5d0 ) call swapi(DecayMode1,DecayMode2)
       endif
     
-      call VVBranchings(DK_IDUP(1:6),DK_ICOLUP(1:2,3:6))
+      call VVBranchings(DK_IDUP(1:6),DK_ICOLUP(1:2,3:6),700)
       MY_IDUP(b)    = Bot_;        ICOLUP(1:2,b) = (/501,00/)
       MY_IDUP(Wp)   = DK_IDUP(1);  ICOLUP(1:2,Wp)   = (/000,000/)
       MY_IDUP(lepP) = DK_IDUP(3);  ICOLUP(1:2,lepP) = DK_ICOLUP(1:2,3)
