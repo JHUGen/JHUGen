@@ -3,7 +3,7 @@ implicit none
 save
 ! 
 ! 
-character(len=6),parameter :: JHUGen_Version="v6.1.4"
+character(len=6),parameter :: JHUGen_Version="v6.1.5"
 ! 
 ! 
 integer, public :: Collider, PDFSet,PChannel,Process,DecayMode1,DecayMode2,TopDecays

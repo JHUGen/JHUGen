@@ -52,11 +52,10 @@ integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9
 
       call Top_OffShellProjection(MomExt,MomOffShell,PSWgt3)  
       MomOffShell(1:4,1:3) = MomExt(1:4,1:3)            
-      PSWgt = PSWgt * PSWgt3
+!       PSWgt = PSWgt * PSWgt3       ! not using the Jacobian because the mat.el. don't have BW-propagators
    ENDIF
 
-   call Kinematics_TH(MomExt,applyPSCut,NBin)
-!    call Kinematics_TH(MomOffShell,applyPSCut,NBin)
+   call Kinematics_TH(MomOffShell,applyPSCut,NBin)
    if( applyPSCut ) then
       EvalWeighted_TH = 0d0
       return
@@ -142,7 +141,7 @@ EvalUnWeighted_TH = 0d0
       
       call Top_OffShellProjection(MomExt,MomOffShell,PSWgt3)  
       MomOffShell(1:4,1:3) = MomExt(1:4,1:3)            
-      PSWgt = PSWgt * PSWgt3 
+!       PSWgt = PSWgt * PSWgt3        ! not using the Jacobian because the mat.el. don't have BW-propagators
       
       call VVBranchings(DK_IDUP(1:6),DK_ICOLUP(1:2,3:6))
       if( PROCESS.EQ.110 ) then

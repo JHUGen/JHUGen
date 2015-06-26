@@ -49,7 +49,7 @@ EvalWeighted_TTBH = 0d0
 
       call TTbar_OffShellProjection(MomExt,MomOffShell,PSWgt4)
       MomOffShell(1:4,1:3) = MomExt(1:4,1:3)      
-      PSWgt = PSWgt * PSWgt4             
+!       PSWgt = PSWgt * PSWgt4       ! not using the Jacobian because the mat.el. don't have BW-propagators
    endif
 !    call EvalPhasespace_HDecay(MomExt(1:4,3),yRnd(16:17),MomExt(1:4,12:13),PSWgt4)
 !    PSWgt = PSWgt * PSWgt4 
@@ -57,6 +57,7 @@ EvalWeighted_TTBH = 0d0
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt
 
    call Kinematics_TTBH(MomOffShell,applyPSCut,NBin)
+!    call Kinematics_TTBH(MomExt,applyPSCut,NBin)
    if( applyPSCut .or. PSWgt.eq.zero ) return
 
 !    write(*,"(PE21.14,PE21.14,PE21.14,PE21.14)") MomExt(1:4,1)
@@ -183,7 +184,7 @@ EvalUnWeighted_TTBH = 0d0
       
       call TTbar_OffShellProjection(MomExt,MomOffShell,PSWgt4)
       MomOffShell(1:4,1:3) = MomExt(1:4,1:3)  
-      PSWgt = PSWgt * PSWgt4             
+!       PSWgt = PSWgt * PSWgt4       ! not using the Jacobian because the mat.el. don't have BW-propagators
 
       if( RandomizeVVdecays ) then 
          call random_number(DKRnd)
