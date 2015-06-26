@@ -3486,7 +3486,11 @@ real(8) :: VG_Result,VG_Error,RunTime
               it = 1
               Value  = Histo(NHisto)%Value(NBin)/BinSize / dble(EvalCounter)
               Integral = Integral + Histo(NHisto)%Value(NBin)
-              Error  = 1d0/dsqrt(dble(Hits))
+              if( Hits.gt.0 ) then
+                  Error  = 1d0/dsqrt(dble(Hits))
+              else
+                  Error = 0d0
+              endif
           else
               Value  = Histo(NHisto)%Value(NBin)/BinSize/it
               Integral = Integral + Histo(NHisto)%Value(NBin)/it
