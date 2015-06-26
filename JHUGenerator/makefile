@@ -31,7 +31,7 @@ ifeq ($(Comp),gfort)
  else
     LHAPDFflags = -DuseLHAPDF=0
  endif 
- fcomp = f95 $(OptOpts) -ffree-line-length-none -I$(VegasDir) -I$(ModuleDir) -J$(ModuleDir) $(LHAPDFflags) -Dcompiler=2 
+ fcomp = gfortran $(OptOpts) -ffree-line-length-none -I$(VegasDir) -I$(ModuleDir) -J$(ModuleDir) $(LHAPDFflags) -Dcompiler=2
 endif
 
 
