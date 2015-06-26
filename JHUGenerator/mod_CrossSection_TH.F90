@@ -19,8 +19,8 @@ use ModMisc
 use ModTHiggs
 implicit none
 real(8) :: EvalWeighted_TH,yRnd(1:11),VgsWgt
-real(8) :: Ehat,MH_Inv,eta1,eta2,ISFac,sHatJacobi,PreFac,FluxFac,PSWgt,PSWgt2,pdf(-6:6,1:2)
-real(8) :: MomExt(1:4,1:9),LO_Res_Unpol(-6:6,-6:6),MuFac
+real(8) :: Ehat,MH_Inv,eta1,eta2,ISFac,sHatJacobi,PreFac,FluxFac,PSWgt,PSWgt2,PSWgt3
+real(8) :: MomExt(1:4,1:9),MomOffShell(1:4,1:9),LO_Res_Unpol(-6:6,-6:6),MuFac,pdf(-6:6,1:2)
 integer :: NBin(1:NumHistograms),NHisto
 logical :: applyPSCut
 integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9
@@ -49,15 +49,20 @@ integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9
       MomExt(1:4,lep)= MomExt(1:4,7)
       MomExt(1:4,W)  = MomExt(1:4,lep) + MomExt(1:4,nu)
       PSWgt = PSWgt * PSWgt2
+
+      call Top_OffShellProjection(MomExt,MomOffShell,PSWgt3)  
+      MomOffShell(1:4,1:3) = MomExt(1:4,1:3)            
+      PSWgt = PSWgt * PSWgt3
    ENDIF
 
    call Kinematics_TH(MomExt,applyPSCut,NBin)
+!    call Kinematics_TH(MomOffShell,applyPSCut,NBin)
    if( applyPSCut ) then
       EvalWeighted_TH = 0d0
       return
    endif
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt
-
+   
    IF( PROCESS.EQ.110 ) THEN
       call EvalAmp_QB_TH(MomExt,LO_Res_Unpol)
       EvalWeighted_TH = &
@@ -110,8 +115,8 @@ implicit none
 real(8) :: yRnd(1:16),VgsWgt, EvalUnWeighted_TH
 real(8) :: pdf(-6:6,1:2),RES(-5:5,-5:5)
 real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi,MH_Inv,MuFac
-real(8) :: MomExt(1:4,1:9), PSWgt,PSWgt2,PSWgt3,CS_Max,DKRnd
-real(8) :: LO_Res_Unpol(-6:6,-6:6),PreFac,PDFFac1
+real(8) :: MomExt(1:4,1:9),MomOffShell(1:4,1:9),PSWgt,PSWgt2,PSWgt3
+real(8) :: LO_Res_Unpol(-6:6,-6:6),PreFac,PDFFac1,CS_Max,DKRnd
 integer :: NBin(1:NumHistograms),NHisto,iPartons(1:2),DKFlavor
 integer :: MY_IDUP(1:9),ICOLUP(1:2,1:9),nparton,DK_IDUP(1:6),DK_ICOLUP(1:2,3:6)
 logical :: applyPSCut,genEvt
@@ -134,6 +139,10 @@ EvalUnWeighted_TH = 0d0
       MomExt(1:4,lep)= MomExt(1:4,7)
       MomExt(1:4,W)  = MomExt(1:4,lep) + MomExt(1:4,nu)
       PSWgt = PSWgt * PSWgt2
+      
+      call Top_OffShellProjection(MomExt,MomOffShell,PSWgt3)  
+      MomOffShell(1:4,1:3) = MomExt(1:4,1:3)            
+      PSWgt = PSWgt * PSWgt3 
       
       call VVBranchings(DK_IDUP(1:6),DK_ICOLUP(1:2,3:6))
       if( PROCESS.EQ.110 ) then
@@ -159,7 +168,7 @@ EvalUnWeighted_TH = 0d0
    FluxFac = 1d0/(2d0*EHat**2)
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt
 
-   call Kinematics_TH(MomExt,applyPSCut,NBin)
+   call Kinematics_TH(MomOffShell,applyPSCut,NBin)
    if( applyPSCut .or. PSWgt.eq.zero ) return
 
    MuFac=(M_Top + M_Reso)/4d0
@@ -190,7 +199,7 @@ IF( GENEVT ) THEN
           elseif( EvalUnWeighted_TH .gt. yRnd(16)*CS_max ) then
             AccepCounter = AccepCounter + 1
             AccepCounter_part(iPartons(1),iPartons(2)) = AccepCounter_part(iPartons(1),iPartons(2))+1
-            call WriteOutEvent_TH(MomExt,MY_IDUP(1:9),ICOLUP(1:2,1:9))
+            call WriteOutEvent_TH(MomOffShell,MY_IDUP(1:9),ICOLUP(1:2,1:9))
             do NHisto=1,NumHistograms
                   call intoHisto(NHisto,NBin(NHisto),1d0)
             enddo

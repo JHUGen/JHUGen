@@ -49,6 +49,7 @@ EvalWeighted_TTBH = 0d0
 
       call TTbar_OffShellProjection(MomExt,MomOffShell,PSWgt4)
       MomOffShell(1:4,1:3) = MomExt(1:4,1:3)      
+      PSWgt = PSWgt * PSWgt4             
    endif
 !    call EvalPhasespace_HDecay(MomExt(1:4,3),yRnd(16:17),MomExt(1:4,12:13),PSWgt4)
 !    PSWgt = PSWgt * PSWgt4 
@@ -181,7 +182,8 @@ EvalUnWeighted_TTBH = 0d0
       PSWgt = PSWgt * PSWgt2*PSWgt3
       
       call TTbar_OffShellProjection(MomExt,MomOffShell,PSWgt4)
-      MomOffShell(1:4,1:3) = MomExt(1:4,1:3)
+      MomOffShell(1:4,1:3) = MomExt(1:4,1:3)  
+      PSWgt = PSWgt * PSWgt4             
 
       if( RandomizeVVdecays ) then 
          call random_number(DKRnd)

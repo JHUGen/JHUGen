@@ -2268,7 +2268,7 @@ SUBROUTINE Kinematics_TH(Mom,applyPSCut,NBin)
 use ModParameters
 use ModMisc
 implicit none
-real(8) :: Mom(1:4,1:8),MomMELA(1:4,1:10)
+real(8) :: Mom(1:4,1:9)
 logical :: applyPSCut
 integer :: NBin(:)
 real(8) :: pT_Top,pT_Higgs,pT_j,eta_j,eta_top,eta_Higgs,y_Higgs,y_top,y_j,MatElSq_H0,MatElSq_H1,D_0minus
@@ -2290,24 +2290,7 @@ logical,save :: FirstTime=.true.
     
     if( m_Top.lt.10d0*GeV  .and. (pT_top.lt.pTjetcut) ) applyPSCut=.true.
     
-    
-!     if( FirstTime ) then
-! !       call NNPDFDriver("./pdfs/NNPDF30_lo_as_0130.LHgrid",33)
-! !       call NNinitPDF(0)
-!       call InitProcess_TTBH(m_Reso,m_top)
-!       FirstTime = .false.
-!     endif
-!     MomMELA(1:4,1) = -(/         65d0,           0.0000000000000000d0, 0.0000000000000000d0,      65d0           /)
-!     MomMELA(1:4,2) = -(/         65d0,           0.0000000000000000d0, 0.0000000000000000d0,     -65d0           /)  
-!     MomMELA(1:4,3:11) = Mom(1:4,3:11)
-!     MomMELA(1:4,12:13) = 0d0
-!     
-!     call EvalXSec_PP_TTBH(MomMELA(1:4,1:13),(/(1d0,0d0),(0d0,0d0)/),TopDecays,2,MatElSq_H0)
-!     call EvalXSec_PP_TTBH(MomMELA(1:4,1:13),(/(0d0,0d0),(1d0,0d0)/),TopDecays,2,MatElSq_H1)
-!     
-!     D_0minus = MatElSq_H0/(MatElSq_H0 + 2d0*MatElSq_H1 )
-
-
+   
     
 !   binning
                                                                              
@@ -3957,42 +3940,35 @@ END SUBROUTINE
 
 
 
-! SUBROUTINE Top_OffShellProjection(MomIn,MomOut,Jacobian)
-! use modParameters
-! use modMisc
-! implicit none
-! real(8) :: MomIn(:,:),MomOut(:,:),MomTmp(1:4),Jacobian
-! real(8) :: xRndWidth(1:2),BW_Mass(1:2),BW_Jacobi(1:2)
-! integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9
-! 
-! 
-!     call random_number(xRndWidth)
-!     
-!     call SmearExternal(xRndWidth(1),m_top,Ga_Top,m_top-4*Ga_Top,m_top+4*Ga_Top,BW_Mass(1),BW_Jacobi(1))
-!     call SmearExternal(xRndWidth(2),m_W,Ga_W,m_W-4d0*Ga_W,m_W+4d0*Ga_W,BW_Mass(2),BW_Jacobi(2))
-!     Jacobian = BW_Jacobi(1) * BW_Jacobi(2)
-! 
-! ! print *, "smeared mt",(BW_Mass(2:3)-m_top)*100d0
-! ! print *, "smeared mw",(BW_Mass(4:5)-m_w)*100d0
-! 
-!     call ShiftMass(MomIn(1:4,tbar),MomIn(1:4,t),BW_Mass(2),BW_Mass(3),MomOut(1:4,tbar),MomOut(1:4,t))
-!     
-!     MomTmp(1:4) = MomOut(1:4,t) - MomIn(1:4,Wp)
-!     call ShiftMass(MomTmp,MomIn(1:4,Wp),m_Bot,BW_Mass(4),MomOut(1:4,b),MomOut(1:4,Wp))! project b and W+ on-shell
-!     
-!     MomTmp(1:4) = MomOut(1:4,tbar) - MomIn(1:4,Wm)
-!     call ShiftMass(MomTmp,MomIn(1:4,Wm),m_Bot,BW_Mass(5),MomOut(1:4,bbar),MomOut(1:4,Wm))! project bbar and W- on-shell
-!     
-!     MomTmp(1:4) = MomOut(1:4,Wp) - MomIn(1:4,lepP)                                ! project W+ decay products on-shell
-!     MomOut(1:4,nu)   = MomTmp(1:4) - (MomTmp(1:4).dot.MomTmp(1:4))/2d0/(MomTmp(1:4).dot.MomIn(1:4,lepP)) * MomIn(1:4,lepP)
-!     MomOut(1:4,lepP) = (1d0 + (MomTmp(1:4).dot.MomTmp(1:4))/2d0/(MomTmp(1:4).dot.MomIn(1:4,lepP))) * MomIn(1:4,lepP)
-!     
-!     MomTmp(1:4) = MomOut(1:4,Wm) - MomIn(1:4,lepM)                                ! project W- decay products on-shell
-!     MomOut(1:4,nubar) = MomTmp(1:4) - (MomTmp(1:4).dot.MomTmp(1:4))/2d0/(MomTmp(1:4).dot.MomIn(1:4,lepM)) * MomIn(1:4,lepM)
-!     MomOut(1:4,lepM)  = (1d0 + (MomTmp(1:4).dot.MomTmp(1:4))/2d0/(MomTmp(1:4).dot.MomIn(1:4,lepM))) * MomIn(1:4,lepM)
-! 
-! return
-! END SUBROUTINE
+SUBROUTINE Top_OffShellProjection(MomIn,MomOut,Jacobian)
+use modParameters
+use modMisc
+implicit none
+real(8) :: MomIn(:,:),MomOut(:,:),MomTmp(1:4),Jacobian
+real(8) :: xRndWidth(1:2),BW_Mass(1:2),BW_Jacobi(1:2)
+integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9
+
+
+    call random_number(xRndWidth)
+    
+    call SmearExternal(xRndWidth(1),m_top,Ga_Top,m_top-4*Ga_Top,m_top+4*Ga_Top,BW_Mass(1),BW_Jacobi(1))
+    call SmearExternal(xRndWidth(2),m_W,Ga_W,m_W-4d0*Ga_W,m_W+4d0*Ga_W,BW_Mass(2),BW_Jacobi(2))
+    Jacobian = BW_Jacobi(1) * BW_Jacobi(2)
+
+! print *, "smeared mt",BW_Mass(1)
+! print *, "smeared mw",BW_Mass(2)
+
+    call ShiftMass(MomIn(1:4,t),MomIn(1:4,qout),BW_Mass(1),0d0,MomOut(1:4,t),MomOut(1:4,qout))
+    
+    MomTmp(1:4) = MomOut(1:4,t) - MomIn(1:4,W)
+    call ShiftMass(MomTmp,MomIn(1:4,W),m_Bot,BW_Mass(2),MomOut(1:4,b),MomOut(1:4,W))! project b and W on-shell
+    
+    MomTmp(1:4) = MomOut(1:4,W) - MomIn(1:4,lep)                                ! project W decay products on-shell
+    MomOut(1:4,nu)   = MomTmp(1:4) - (MomTmp(1:4).dot.MomTmp(1:4))/2d0/(MomTmp(1:4).dot.MomIn(1:4,lep)) * MomIn(1:4,lep)
+    MomOut(1:4,lep) = (1d0 + (MomTmp(1:4).dot.MomTmp(1:4))/2d0/(MomTmp(1:4).dot.MomIn(1:4,lep))) * MomIn(1:4,lep)
+
+return
+END SUBROUTINE
 
 
 
