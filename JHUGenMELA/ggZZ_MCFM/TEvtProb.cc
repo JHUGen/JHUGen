@@ -62,6 +62,16 @@ void TEvtProb::ResetMCFM_EWKParameters(double ext_Gf, double ext_aemmz, double e
   coupling_();
 }
 
+// Set NNPDF driver path
+void TEvtProb::Set_LHAgrid(const char* path){
+  char path_nnpdf_c[200];
+  sprintf(path_nnpdf_c, "%s", path);
+  int pathLength = strlen(path_nnpdf_c);
+  nnpdfdriver_(path_nnpdf_c, &pathLength);
+  pathLength=0;
+  nninitpdf_(&pathLength);
+}
+
 //
 // Directly calculate the ZZ->4l differential cross-section 
 // WARNING: in development
@@ -798,22 +808,118 @@ double TEvtProb::XsecCalc_VX(TVar::Process proc, TVar::Production production, vh
 	return msqjk;
 }
 
+// Cross-section calculations for ttbar -> H
+double TEvtProb::XsecCalc_TTX(
+  TVar::Process proc, TVar::Production production, 
+  tth_event_type &tth_event,
+  int topDecay, int topProcess,
+  TVar::VerbosityLevel verbosity,
+  double selfDHvvcoupl[SIZE_TTH][2]
+  ){
+
+// Set Couplings at the TTH vertex
+  double Hvvcoupl[SIZE_TTH][2] ={ { 0 } };
+
+  //Initialize Process
+  SetProcess(proc);
+  SetProduction(production);
+
+  double msq=0;
+
+  TLorentzVector pCoM(0, 0, 0, 0);
+  const int nV = 7;
+  for(int vv=0;vv<nV;vv++) pCoM = pCoM + tth_event.p[vv];
+  double qX = pCoM.X();
+  double qY = pCoM.Y();
+  double qE = pCoM.E();
+  double qPt = (qX*qX+qY*qY);
+  if ((qPt)>0){
+    TVector3 boostV(-qX/qE, -qY/qE, 0); // Unit boost vector
+    for (int vv=0; vv<nV; vv++) tth_event.p[vv].Boost(boostV);
+  }
+
+  TLorentzVector p_tbar(0, 0, 0, 0);
+  TLorentzVector p_t(0, 0, 0, 0);
+  
+  bool unknownTopFlavor=false;
+  int indexTTBAR=0;
+  if (
+    (tth_event.PdgCode_tdecay[0][0]==0 || tth_event.PdgCode_tdecay[1][0]==0) ||
+    (tth_event.PdgCode_tdecay[0][0]>0 && tth_event.PdgCode_tdecay[1][0]>0) ||
+    (tth_event.PdgCode_tdecay[0][0]<0 && tth_event.PdgCode_tdecay[1][0]<0)
+    ) unknownTopFlavor=true;
+  else if (tth_event.PdgCode_tdecay[0][0]>0) indexTTBAR=1;
+
+  for (int vv=1; vv<4; vv++) p_tbar = p_tbar + tth_event.p[vv + 3*indexTTBAR];
+  for (int vv=1; vv<4; vv++) p_t = p_t + tth_event.p[vv + 3*(1-indexTTBAR)];
+
+  TLorentzVector pTTH[11];
+  pTTH[0].SetXYZT(0, 0, EBEAM, EBEAM);
+  pTTH[1].SetXYZT(0, 0, -EBEAM, EBEAM);
+  pTTH[2].SetXYZT(tth_event.p[0].X(), tth_event.p[0].Y(), tth_event.p[0].Z(), tth_event.p[0].T());
+  pTTH[3].SetXYZT(p_tbar.X(), p_tbar.Y(), p_tbar.Z(), p_tbar.T());
+  pTTH[4].SetXYZT(p_t.X(), p_t.Y(), p_t.Z(), p_t.T());
+  for (int vv=1; vv<4; vv++) pTTH[vv+4].SetXYZT(tth_event.p[vv + 3*indexTTBAR].X(), tth_event.p[vv + 3*indexTTBAR].Y(), tth_event.p[vv + 3*indexTTBAR].Z(), tth_event.p[vv + 3*indexTTBAR].T());
+  for (int vv=1; vv<4; vv++) pTTH[vv+7].SetXYZT(tth_event.p[vv + 3*(1-indexTTBAR)].X(), tth_event.p[vv + 3*(1-indexTTBAR)].Y(), tth_event.p[vv + 3*(1-indexTTBAR)].Z(), tth_event.p[vv + 3*(1-indexTTBAR)].T());
+
+
+  if (_matrixElement == TVar::JHUGen){
+    // By default set the Spin 0 couplings for SM case
+    Hvvcoupl[0][0]=1.0;  Hvvcoupl[0][1]=0.0;   // first/second number is the real/imaginary part
+    for (int i = 1; i<SIZE_TTH; i++){ for (int com=0; com<2; com++) Hvvcoupl[i][com] = 0; }
+
+    // 0-
+    if (proc == TVar::H0minus) {
+      Hvvcoupl[0][0] = 0.0;
+      Hvvcoupl[1][0] = 1.0;
+    }
+
+    if (proc == TVar::SelfDefine_spin0){
+      for (int i=0; i<SIZE_TTH; i++){
+        for (int j=0; j<2; j++){
+          Hvvcoupl[i][j] = selfDHvvcoupl[i][j];
+        }
+      }
+    }
+
+    double topMass = 173.2;
+    double topWidth = 2.;
+    if (production == TVar::bbH){
+      topMass = 4.75;
+      topWidth = 0;
+    }
+    msq = TTHiggsMatEl(production, pTTH, _hmass, _hwidth, topMass, topWidth, Hvvcoupl, topDecay, topProcess, verbosity);
+    if (unknownTopFlavor){
+//      cout << "Unknown top flavor" << endl;
+      pTTH[4].SetXYZT(p_tbar.X(), p_tbar.Y(), p_tbar.Z(), p_tbar.T());
+      pTTH[3].SetXYZT(p_t.X(), p_t.Y(), p_t.Z(), p_t.T());
+      for (int vv=1; vv<4; vv++) pTTH[vv+7].SetXYZT(tth_event.p[vv + 3*indexTTBAR].X(), tth_event.p[vv + 3*indexTTBAR].Y(), tth_event.p[vv + 3*indexTTBAR].Z(), tth_event.p[vv + 3*indexTTBAR].T());
+      for (int vv=1; vv<4; vv++) pTTH[vv+4].SetXYZT(tth_event.p[vv + 3*(1-indexTTBAR)].X(), tth_event.p[vv + 3*(1-indexTTBAR)].Y(), tth_event.p[vv + 3*(1-indexTTBAR)].Z(), tth_event.p[vv + 3*(1-indexTTBAR)].T());
+      msq += TTHiggsMatEl(production, pTTH, _hmass, _hwidth, topMass, topWidth, Hvvcoupl, topDecay, topProcess, verbosity);
+      msq *= 0.5;
+    }
+  }
+
+  return msq;
+}
+
+
 
 // this appears to be some kind of 
 // way of setting MCFM parameters through
 // an interface defined in TMCFM.hh
 void TEvtProb::SetHiggsMass(double mass, float wHiggs){
 	if (wHiggs < 0){
-		masses_mcfm_.hwidth=4.15e-3;
-		_hwidth = 4.15e-3;
+		masses_mcfm_.hwidth=4.07e-3;
+		_hwidth = 4.07e-3;
 	}
 	else{
 		masses_mcfm_.hwidth = wHiggs;
     	_hwidth = wHiggs; 
 	}
 	if (mass < 0){
-		masses_mcfm_.hmass=125.6;
-		_hmass = 4.15e-3;
+		masses_mcfm_.hmass=125.;
+		_hmass = 125.;
 	}
 	else{
 		masses_mcfm_.hmass=mass;
