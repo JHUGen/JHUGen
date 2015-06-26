@@ -20,9 +20,11 @@ use ModTHiggs
 implicit none
 real(8) :: EvalWeighted_TH,yRnd(1:11),VgsWgt
 real(8) :: Ehat,MH_Inv,eta1,eta2,ISFac,sHatJacobi,PreFac,FluxFac,PSWgt,PSWgt2,pdf(-6:6,1:2)
-real(8) :: MomExt(1:4,1:8),LO_Res_Unpol(-6:6,-6:6),MuFac
+real(8) :: MomExt(1:4,1:9),LO_Res_Unpol(-6:6,-6:6),MuFac
 integer :: NBin(1:NumHistograms),NHisto
 logical :: applyPSCut
+integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9
+
 
     
    EvalWeighted_TH = 0d0   
@@ -42,6 +44,10 @@ logical :: applyPSCut
    
    IF( TOPDECAYS.NE.0 ) THEN
       call EvalPhasespace_TopDecay(MomExt(1:4,4),yRnd(8:11),MomExt(1:4,6:8),PSWgt2)
+      MomExt(1:4,b)  = MomExt(1:4,6)
+      MomExt(1:4,nu) = MomExt(1:4,8)
+      MomExt(1:4,lep)= MomExt(1:4,7)
+      MomExt(1:4,W)  = MomExt(1:4,lep) + MomExt(1:4,nu)
       PSWgt = PSWgt * PSWgt2
    ENDIF
 
@@ -123,6 +129,10 @@ EvalUnWeighted_TH = 0d0
 
    if( TOPDECAYS.NE.0 ) then
       call EvalPhasespace_TopDecay(MomExt(1:4,4),yRnd(8:11),MomExt(1:4,6:8),PSWgt2)
+      MomExt(1:4,b)  = MomExt(1:4,6)
+      MomExt(1:4,nu) = MomExt(1:4,8)
+      MomExt(1:4,lep)= MomExt(1:4,7)
+      MomExt(1:4,W)  = MomExt(1:4,lep) + MomExt(1:4,nu)
       PSWgt = PSWgt * PSWgt2
       
       call VVBranchings(DK_IDUP(1:6),DK_ICOLUP(1:2,3:6))

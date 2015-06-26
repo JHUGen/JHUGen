@@ -15,35 +15,36 @@ SUBROUTINE EvalAmp_QB_TH(MomExt,LO_Res_Unpol)
 use ModMisc
 use modParameters
 implicit none
-real(8) :: MomExt(1:4,1:8),MomExtFlat(1:7,1:4),p4Dp5,p4Dp7,LO_Res_UnPol(-6:6,-6:6),s(10,10),p2Dp3,MomExtFlatDK(1:10,1:4)
+real(8) :: MomExt(1:4,1:9),MomExtFlat(1:7,1:4),p4Dp5,p4Dp7,LO_Res_UnPol(-6:6,-6:6),s(10,10),p2Dp3,MomExtFlatDK(1:10,1:4)
 complex(8) :: za(10,10),zb(10,10),LOAmp(-6:6,-6:6,1:2),decay_amp(1:2)
 real(8) :: s12,s13,s1e4,s1k4,s15,s23,s2e4,s2k4,s25,s3e4,s3k4,s35,se45,sk45,se4k4,ColFac
 integer :: j
+integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9
 
 
 
 ! setup momenta for spinor helicity products -- undecayed tops
-      p4Dp5=MomExt(1,5)*MomExt(1,4)-MomExt(2,5)*MomExt(2,4)-MomExt(3,5)*MomExt(3,4)-MomExt(4,5)*MomExt(4,4)
-      p4Dp7=MomExt(1,7)*MomExt(1,4)-MomExt(2,7)*MomExt(2,4)-MomExt(3,7)*MomExt(3,4)-MomExt(4,7)*MomExt(4,4)
-      p2Dp3=MomExt(1,2)*MomExt(1,3)-MomExt(2,2)*MomExt(2,3)-MomExt(3,2)*MomExt(3,3)-MomExt(4,2)*MomExt(4,3)
-      MomExtFlat(1,1:4)=MomExt(1:4,1)
-      MomExtFlat(2,1:4)=MomExt(1:4,2)
-      MomExtFlat(3,1:4)=m_Reso**2/2d0/p2Dp3*MomExt(1:4,2)
-      MomExtFlat(4,1:4)=MomExt(1:4,3)-MomExtFlat(3,1:4)
-      MomExtFlat(5,1:4)=m_Top**2*MomExt(1:4,5)/2d0/p4Dp5
-      MomExtFlat(6,1:4)=MomExt(1:4,4)-MomExtFlat(5,1:4)
-      MomExtFlat(7,1:4)=MomExt(1:4,5)
+      p4Dp5=MomExt(1,qout)*MomExt(1,t)-MomExt(2,qout)*MomExt(2,t)-MomExt(3,qout)*MomExt(3,t)-MomExt(4,qout)*MomExt(4,t)
+      p4Dp7=MomExt(1,lep)*MomExt(1,t)-MomExt(2,lep)*MomExt(2,t)-MomExt(3,lep)*MomExt(3,t)-MomExt(4,lep)*MomExt(4,t)
+      p2Dp3=MomExt(1,inRight)*MomExt(1,Hbos)-MomExt(2,inRight)*MomExt(2,Hbos)-MomExt(3,inRight)*MomExt(3,Hbos)-MomExt(4,inRight)*MomExt(4,Hbos)
+      MomExtFlat(1,1:4)=MomExt(1:4,inLeft)
+      MomExtFlat(2,1:4)=MomExt(1:4,inRight)
+      MomExtFlat(3,1:4)=m_Reso**2/2d0/p2Dp3*MomExt(1:4,inRight)
+      MomExtFlat(4,1:4)=MomExt(1:4,Hbos)-MomExtFlat(3,1:4)
+      MomExtFlat(5,1:4)=m_Top**2*MomExt(1:4,qout)/2d0/p4Dp5
+      MomExtFlat(6,1:4)=MomExt(1:4,t)-MomExtFlat(5,1:4)
+      MomExtFlat(7,1:4)=MomExt(1:4,qout)
 
     ! use different flattened momenta for top decays
       IF (TOPDECAYS .NE. 0) THEN 
          MomExtFlatDK(1:7,1:4)=MomExtFlat(1:7,1:4)
          ! overwrite flattened top momenta         
-         MomExtFlatDK(5,1:4)=m_Top**2*MomExt(1:4,7)/2d0/p4Dp7
-         MomExtFlatDK(6,1:4)=MomExt(1:4,4)-MomExtFlatDK(5,1:4)
+         MomExtFlatDK(5,1:4)=m_Top**2*MomExt(1:4,lep)/2d0/p4Dp7
+         MomExtFlatDK(6,1:4)=MomExt(1:4,t)-MomExtFlatDK(5,1:4)
          ! top decay products 
-         MomExtFlatDK(8,1:4)=MomExt(1:4,6)
-         MomExtFlatDK(9,1:4)=MomExt(1:4,7)
-         MomExtFlatDK(10,1:4)=MomExt(1:4,8)
+         MomExtFlatDK(8,1:4)=MomExt(1:4,b)
+         MomExtFlatDK(9,1:4)=MomExt(1:4,lep)
+         MomExtFlatDK(10,1:4)=MomExt(1:4,nu)
       ENDIF
       
 
@@ -102,35 +103,36 @@ SUBROUTINE EvalAmp_QbarBbar_TH(MomExt,LO_Res_Unpol)
 use ModMisc
 use modParameters
 implicit none
-real(8) :: MomExt(1:4,1:8),MomExtFlat(1:7,1:4),p4Dp5,p4Dp7,LO_Res_UnPol(-6:6,-6:6),s(10,10),p2Dp3,MomExtFlatDK(1:10,1:4)
+real(8) :: MomExt(1:4,1:9),MomExtFlat(1:7,1:4),p4Dp5,p4Dp7,LO_Res_UnPol(-6:6,-6:6),s(10,10),p2Dp3,MomExtFlatDK(1:10,1:4)
 complex(8) :: za(10,10),zb(10,10),LOAmp(-6:6,-6:6,1:2),decay_amp(1:2)
 real(8) :: s12,s13,s1e4,s1k4,s15,s23,s2e4,s2k4,s25,s3e4,s3k4,s35,se45,sk45,se4k4,ColFac
 integer :: j
+integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9
 
 
 
 ! setup momenta for spinor helicity products                                                                                                                                 
-   p4Dp5=MomExt(1,5)*MomExt(1,4)-MomExt(2,5)*MomExt(2,4)-MomExt(3,5)*MomExt(3,4)-MomExt(4,5)*MomExt(4,4)
-   p4Dp7=MomExt(1,7)*MomExt(1,4)-MomExt(2,7)*MomExt(2,4)-MomExt(3,7)*MomExt(3,4)-MomExt(4,7)*MomExt(4,4)
-   p2Dp3=MomExt(1,2)*MomExt(1,3)-MomExt(2,2)*MomExt(2,3)-MomExt(3,2)*MomExt(3,3)-MomExt(4,2)*MomExt(4,3)
-   MomExtFlat(1,1:4)=MomExt(1:4,1)
-   MomExtFlat(2,1:4)=MomExt(1:4,2)
-   MomExtFlat(3,1:4)=m_Reso**2/2d0/p2Dp3*MomExt(1:4,2)
-   MomExtFlat(4,1:4)=MomExt(1:4,3)-MomExtFlat(3,1:4)
-   MomExtFlat(5,1:4)=m_Top**2*MomExt(1:4,5)/2d0/p4Dp5
-   MomExtFlat(6,1:4)=MomExt(1:4,4)-MomExtFlat(5,1:4)
-   MomExtFlat(7,1:4)=MomExt(1:4,5)
+   p4Dp5=MomExt(1,qout)*MomExt(1,t)-MomExt(2,qout)*MomExt(2,t)-MomExt(3,qout)*MomExt(3,t)-MomExt(4,qout)*MomExt(4,t)
+   p4Dp7=MomExt(1,lep)*MomExt(1,t)-MomExt(2,lep)*MomExt(2,t)-MomExt(3,lep)*MomExt(3,t)-MomExt(4,lep)*MomExt(4,t)
+   p2Dp3=MomExt(1,inRight)*MomExt(1,Hbos)-MomExt(2,inRight)*MomExt(2,Hbos)-MomExt(3,inRight)*MomExt(3,Hbos)-MomExt(4,inRight)*MomExt(4,Hbos)
+   MomExtFlat(1,1:4)=MomExt(1:4,inLeft)
+   MomExtFlat(2,1:4)=MomExt(1:4,inRight)
+   MomExtFlat(3,1:4)=m_Reso**2/2d0/p2Dp3*MomExt(1:4,inRight)
+   MomExtFlat(4,1:4)=MomExt(1:4,Hbos)-MomExtFlat(3,1:4)
+   MomExtFlat(5,1:4)=m_Top**2*MomExt(1:4,qout)/2d0/p4Dp5
+   MomExtFlat(6,1:4)=MomExt(1:4,t)-MomExtFlat(5,1:4)
+   MomExtFlat(7,1:4)=MomExt(1:4,qout)
 
     ! use different flattened momenta for anti-top decays
       IF (TOPDECAYS .NE. 0) THEN 
          MomExtFlatDK(1:7,1:4)=MomExtFlat(1:7,1:4)
          ! overwrite flattened top momenta         
-         MomExtFlatDK(5,1:4)=m_Top**2*MomExt(1:4,7)/2d0/p4Dp7
-         MomExtFlatDK(6,1:4)=MomExt(1:4,4)-MomExtFlatDK(5,1:4)
+         MomExtFlatDK(5,1:4)=m_Top**2*MomExt(1:4,lep)/2d0/p4Dp7
+         MomExtFlatDK(6,1:4)=MomExt(1:4,t)-MomExtFlatDK(5,1:4)
          ! top decay products 
-         MomExtFlatDK(8,1:4)=MomExt(1:4,6)
-         MomExtFlatDK(9,1:4)=MomExt(1:4,7)
-         MomExtFlatDK(10,1:4)=MomExt(1:4,8)
+         MomExtFlatDK(8,1:4)=MomExt(1:4,b)
+         MomExtFlatDK(9,1:4)=MomExt(1:4,lep)
+         MomExtFlatDK(10,1:4)=MomExt(1:4,nu)
 
       ENDIF
 
