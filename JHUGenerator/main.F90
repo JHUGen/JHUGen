@@ -1844,7 +1844,12 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
               tries = tries +1 
               read(16,fmt="(A160)",IOSTAT=stat,END=99) OtherLines(1:160)
               if(OtherLines(1:30).eq."</LesHouchesEvents>") then
-                  if( RequestNLeptons.gt.0 ) write(io_LHEOutFile,"(A,1F6.2,A)") "<!-- Lepton filter efficiency:",dble(AccepCounter)/dble(NEvent)*100d0," % -->"
+                  if( RequestNLeptons.gt.0 ) then
+                    write(io_LHEOutFile,"(A)") "<!-- Lepton filter information:"
+                    write(io_LHEOutFile,"(A,I8)") "     events processed:  ", NEvent
+                    write(io_LHEOutFile,"(A,I8)") "     events accepted:   ", AccepCounter
+                    write(io_LHEOutFile,"(A,1F6.2,A)") "     filter efficiency: ", dble(AccepCounter)/dble(NEvent)*100d0,"% -->"
+                  endif
                   goto 99
               elseif( (Index(OtherLines(1:7),"</event").ne.0) .and. Res.gt.0d0 ) then
                   write(io_LHEOutFile,"(A)") trim(OtherLines)
