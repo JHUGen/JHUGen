@@ -272,8 +272,8 @@ c--- and the following lines set up the appropriate masses and sin^2(theta_w)
        ! MARKUS: choosing ZZ final state
        l1=le
        l2=le
-       r1=le
-       r2=le
+       r1=re
+       r2=re
        
 c       cxw=dcmplx(xw,0d0) ! DEBUG: Madgraph comparison
        write(6,*)
@@ -944,6 +944,7 @@ c--- qbar-q extra pieces
       endif
 
       enddo
+
 
       return
 
