@@ -19,7 +19,7 @@ use ifport
 #endif
 implicit none
 integer,parameter :: mxpart=14 ! this has to match the MCFM parameter
-real(8) :: yRnd(1:15),VgsWgt, EvalWeighted_HJJ_fulldecay
+real(8) :: yRnd(1:16),VgsWgt, EvalWeighted_HJJ_fulldecay
 real(8) :: pdf(-6:6,1:2),me2(-5:5,-5:5)
 real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi
 real(8) :: MomExt(1:4,1:11),PSWgt,PSWgt2,PSWgt3,MInvH,MInvZ1,MInvZ2
@@ -39,9 +39,9 @@ logical :: applyPSCut
    call boost2Lab(eta1,eta2,5,MomExt(1:4,1:5))
    
 
-    yz1 = yRnd(10)
-    yz2 = yRnd(11)
-    offzchannel = yRnd(15) 
+    yz1 = yRnd(14)
+    yz2 = yRnd(15)
+    offzchannel = yRnd(16) 
     
          if(MInvH.gt.2d0*M_V) then
               EZ_max = EHat
@@ -82,7 +82,7 @@ logical :: applyPSCut
       return
     endif
     
-    call EvalPhaseSpace_2(MInvH,(/MInvZ1,MInvZ2/),yRnd(3:4),MomExt(1:4,6:7),PSWgt)
+    call EvalPhaseSpace_2(MInvH,(/MInvZ1,MInvZ2/),yRnd(8:9),MomExt(1:4,6:7),PSWgt)
     ML1 = 0d0
     ML2 = 0d0
     ML3 = 0d0
@@ -90,15 +90,16 @@ logical :: applyPSCut
     call boost(MomExt(1:4,6),MomExt(1:4,5),MInvH)
     call boost(MomExt(1:4,7),MomExt(1:4,5),MInvH)
     
-    call EvalPhasespace_VDecay(MomExt(1:4,6),MInvZ1,ML1,ML2,yRnd(5:6),MomExt(1:4,8:9),PSWgt2)
-    call EvalPhasespace_VDecay(MomExt(1:4,7),MInvZ2,ML3,ML4,yRnd(7:8),MomExt(1:4,10:11),PSWgt3)
+    call EvalPhasespace_VDecay(MomExt(1:4,6),MInvZ1,ML1,ML2,yRnd(10:11),MomExt(1:4,8:9),PSWgt2)
+    call EvalPhasespace_VDecay(MomExt(1:4,7),MInvZ2,ML3,ML4,yRnd(12:13),MomExt(1:4,10:11),PSWgt3)
     PSWgt = PSWgt * PSWgt2*PSWgt3
 
 !      if( (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then! introduce this momentum flip to allow proper mapping of integrand with Z-poles at MInvZ2=(p2+p3)^2 and MInvZ2=(p1+p4)^2
 !          if( yrnd(16).gt.0.5d0 ) call swapmom( MomExt(1:4,8),MomExt(1:4,10) )
 !      endif
    
-    !    call Kinematics_HVBF(5,MomExt,applyPSCut,NBin)
+nbin(:) = 1   
+!    call Kinematics_HVBF(5,MomExt,applyPSCut,NBin)
 !    if( applyPSCut .or. PSWgt.eq.zero ) return
    
    call setPDFs(eta1,eta2,Mu_Fact,pdf)
@@ -112,14 +113,22 @@ logical :: applyPSCut
    call convert_to_MCFM(+MomExt(1:4,11),p_MCFM(6,1:4))
    call convert_to_MCFM(+MomExt(1:4,3), p_MCFM(7,1:4))
    call convert_to_MCFM(+MomExt(1:4,4), p_MCFM(8,1:4))
-!    call qq_ZZqq(p_MCFM,msq_MCFM,HZZcoupl,HWWcoupl,Lambda,Lambda_Q,Lambda_z1)!  q(-p1)+q(-p2)->Z(p3,p4)+Z(p5,p6)+q(p7)+q(p8)
+   HZZcoupl(:) = 0d0
+   HZZcoupl(1) = 1d0
+   HWWcoupl(:) = HZZcoupl(:)
+   call qq_ZZqq(p_MCFM,msq_MCFM,HZZcoupl,HWWcoupl,Lambda,Lambda_Q,Lambda_z1)!  q(-p1)+q(-p2)->Z(p3,p4)+Z(p5,p6)+q(p7)+q(p8)
+   
    
    LO_Res_Unpol = 0d0
    do i = -5,5
       do j = -5,5
-         LO_Res_Unpol = LO_Res_Unpol + me2(i,j)*pdf(LHA2M_pdf(i),1)*pdf(LHA2M_pdf(j),2)
+         LO_Res_Unpol = LO_Res_Unpol + msq_MCFM(i,j)*pdf(LHA2M_pdf(i),1)*pdf(LHA2M_pdf(j),2)!  check correct me pdf assignments
+print *, i,j,msq_MCFM(i,j)
       enddo
    enddo
+pause
+
+
 
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt 
    EvalWeighted_HJJ_fulldecay = LO_Res_Unpol * PreFac

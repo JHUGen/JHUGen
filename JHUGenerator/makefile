@@ -2,12 +2,14 @@ Here = $(PWD)
 Makefile=makefile
 ModuleDir = $(Here)/modules
 ObjectDir = $(Here)/objects
+JHUGenMELADir = ../JHUGenMELA
+MCFMDir = $(JHUGenMELADir)
 PDFDir = $(Here)/pdfs
 VegasDir = $(Here)/vegas
 
 # compiler options, Comp='ifort' or 'gfort'
 Opt  = Yes
-Comp = ifort
+Comp = gfort
 
 # link pdfs via LHA library ('Yes' or 'No')
 UseLHAPDF=No
@@ -122,6 +124,21 @@ PSGenDep = genps.c \
 PSGenObj = $(ObjectDir)/genps.o \
            $(ObjectDir)/boost.o
 
+JHUGenMELA = 
+
+MCFM_Obj = $(MCFMDir)/anomamp.o \
+           $(MCFMDir)/cdotpr.o \
+           $(MCFMDir)/jtwo3456.o \
+           $(MCFMDir)/jtwo.o \
+           $(MCFMDir)/jzero.o \
+           $(MCFMDir)/qq_ZZqq.o \
+           $(MCFMDir)/setupzprops.o \
+           $(MCFMDir)/spinorcurr.o \
+           $(MCFMDir)/WWZZ.o \
+           $(MCFMDir)/ZZHZZamp.o \
+           $(MCFMDir)/ZZSingleres.o \
+           $(MCFMDir)/jone.o
+
 
 # MadGraphDep = h_emepemep.f \
 #               h_emepemep_noint.f \
@@ -148,7 +165,7 @@ else
 endif
 	@echo " executable file is "$(Exec) "compiled with "$(Comp)
 	@echo " "
-	$(fcomp) -o $(Exec) $(MainObj) $(AmpObj) $(PSGenObj) $(VegasObj) $(PDFObj)
+	$(fcomp) -o $(Exec) $(MainObj) $(AmpObj) $(PSGenObj) $(VegasObj) $(PDFObj) $(MCFM_Obj)
 
 
 
