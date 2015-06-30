@@ -2,6 +2,8 @@ Here = $(PWD)
 Makefile=makefile
 ModuleDir = $(Here)/modules
 ObjectDir = $(Here)/objects
+JHUGenMELADir = ../JHUGenMELA
+MCFMDir = $(JHUGenMELADir)
 PDFDir = $(Here)/pdfs
 VegasDir = $(Here)/vegas
 
@@ -31,7 +33,7 @@ ifeq ($(Comp),gfort)
  else
     LHAPDFflags = -DuseLHAPDF=0
  endif 
- fcomp = f95 $(OptOpts) -ffree-line-length-none -I$(VegasDir) -I$(ModuleDir) -J$(ModuleDir) $(LHAPDFflags) -Dcompiler=2 
+ fcomp = gfortran $(OptOpts) -ffree-line-length-none -I$(VegasDir) -I$(ModuleDir) -J$(ModuleDir) $(LHAPDFflags) -Dcompiler=2
 endif
 
 
@@ -59,17 +61,23 @@ Exec = ./JHUGen
 
 
 # main dependencies
-MainDep = mod_Kinematics.F90 \
+MainDep = mod_Phasespace.F90 \
+          mod_Kinematics.F90 \
           mod_CrossSection.F90 \
+          mod_CrossSection_HJJ.F90 \
           mod_CrossSection_TTBH.F90 \
           mod_CrossSection_BBBH.F90 \
+          mod_CrossSection_TH.F90 \
           main.F90
 
 # main objects
-MainObj = $(ObjectDir)/mod_Kinematics.o \
+MainObj = $(ObjectDir)/mod_Phasespace.o \
+          $(ObjectDir)/mod_Kinematics.o \
           $(ObjectDir)/mod_CrossSection.o \
+          $(ObjectDir)/mod_CrossSection_HJJ.o \
           $(ObjectDir)/mod_CrossSection_TTBH.o \
           $(ObjectDir)/mod_CrossSection_BBBH.o \
+          $(ObjectDir)/mod_CrossSection_TH.o \
           $(ObjectDir)/main.o
 
 
@@ -83,7 +91,8 @@ AmpDep = mod_Misc.F90 \
           mod_HiggsJJ.F90 \
           mod_HiggsJ.F90 \
           mod_VHiggs.F90 \
-          mod_TTBHiggs.F90
+          mod_TTBHiggs.F90 \
+          mod_THiggs.F90
 
 
 # amplitude objects
@@ -96,7 +105,8 @@ AmpObj =  $(ObjectDir)/mod_Misc.o \
           $(ObjectDir)/mod_HiggsJJ.o \
           $(ObjectDir)/mod_HiggsJ.o \
           $(ObjectDir)/mod_VHiggs.o \
-          $(ObjectDir)/mod_TTBHiggs.o
+          $(ObjectDir)/mod_TTBHiggs.o \
+          $(ObjectDir)/mod_THiggs.o
 
 VegasDep = $(VegasDir)/vegas.f
 VegasObj = $(ObjectDir)/vegas.o
@@ -113,6 +123,21 @@ PSGenDep = genps.c \
            boost.c
 PSGenObj = $(ObjectDir)/genps.o \
            $(ObjectDir)/boost.o
+
+JHUGenMELA = 
+
+MCFM_Obj = $(MCFMDir)/anomamp.o \
+           $(MCFMDir)/cdotpr.o \
+           $(MCFMDir)/jtwo3456.o \
+           $(MCFMDir)/jtwo.o \
+           $(MCFMDir)/jzero.o \
+           $(MCFMDir)/qq_ZZqq.o \
+           $(MCFMDir)/setupzprops.o \
+           $(MCFMDir)/spinorcurr.o \
+           $(MCFMDir)/WWZZ.o \
+           $(MCFMDir)/ZZHZZamp.o \
+           $(MCFMDir)/ZZSingleres.o \
+           $(MCFMDir)/jone.o
 
 
 # MadGraphDep = h_emepemep.f \
@@ -140,7 +165,8 @@ else
 endif
 	@echo " executable file is "$(Exec) "compiled with "$(Comp)
 	@echo " "
-	$(fcomp) -o $(Exec) $(MainObj) $(AmpObj) $(PSGenObj) $(VegasObj) $(PDFObj)
+	$(fcomp) -o $(Exec) $(MainObj) $(AmpObj) $(PSGenObj) $(VegasObj) $(PDFObj) 
+# $(MCFM_Obj)
 
 
 
