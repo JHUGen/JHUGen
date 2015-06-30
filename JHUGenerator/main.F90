@@ -32,7 +32,7 @@ logical,parameter :: useBetaVersion=.false.! this should be set to .false.
    if( .not.useBetaVersion .and.   ConvertLHEFile ) then
         call StartConvertLHE(VG_Result,VG_Error)
    elseif( .not.useBetaVersion .and. .not.ReadLHEFile ) then
-        if( Process.eq.80 .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.90 .or. Process .eq. 110 .or. Process .eq. 111 ) then
+        if( Process.eq.80 .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.66 .or. Process.eq.90 .or. Process .eq. 110 .or. Process .eq. 111 ) then
            call StartVegas_NEW(VG_Result,VG_Error)
         else
            call StartVegas(VG_Result,VG_Error)
@@ -208,7 +208,7 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
     endif
 
     if (Process.eq.0) PChannel = 0   !only gluons
-    if (Process.eq.1 .or. Process.eq.50 .or. Process.eq.60) PChannel = 1   !only quarks
+    if (Process.eq.1 .or. Process.eq.50 .or. Process.eq.60 .or. Process.eq.66) PChannel = 1   !only quarks
 
     if(OffShell_XVV.ge.100) then
         OffShell_XVV=OffShell_XVV-100
@@ -596,13 +596,25 @@ include "vegas_common.f"
       if(Process.eq.60) then
          NDim = 5
          NDim = NDim + 2 ! sHat integration
-ndim=ndim+9
          
          VegasIt1_default = 5
          VegasNc0_default = 10000000
          VegasNc1_default = 500000
          VegasNc2_default = 10000
       endif
+      !- HVBF with decays
+      if(Process.eq.66) then
+         NDim = 5
+         NDim = NDim + 2 ! sHat integration
+         NDim = NDim + 8
+         NDim = NDim + 1
+         
+         VegasIt1_default = 5
+         VegasNc0_default = 10000000
+         VegasNc1_default = 500000
+         VegasNc2_default = 10000
+      endif
+
       !- Hjj, gluon fusion
       if(Process.eq.61) then
          NDim = 5
@@ -1033,8 +1045,8 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
     if( Process.eq.80 ) call vegas(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.90 ) call vegas(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
     
-!     if( Process.eq.60 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
- if( Process.eq.60 ) call vegas(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
+    if( Process.eq.60 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
+    if( Process.eq.66 ) call vegas(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
     
     if( Process.eq.61 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.110) call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
@@ -1054,6 +1066,7 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
     if( Process.eq.80 ) call vegas1(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.90 ) call vegas1(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.60 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
+    if( Process.eq.66 ) call vegas1(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.61 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.110) call vegas1(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.111) call vegas1(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
@@ -1077,6 +1090,8 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
                     dum = EvalUnWeighted_BBBH(yRnd,.false.,(/-99,-99/),RES)
                 elseif( Process.eq.60 ) then
                     dum = EvalUnWeighted_HJJ(yRnd,.false.,(/-99,-99/),RES)
+                elseif( Process.eq.66 ) then
+                    dum = EvalUnWeighted_HJJ_fulldecay(yRnd,.false.,(/-99,-99/),RES)
                 elseif( Process.eq.61 ) then
                     dum = EvalUnWeighted_HJJ(yRnd,.false.,(/-99,-99/),RES)
                 elseif( Process.eq.110 ) then
@@ -1152,6 +1167,8 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
                   dum = EvalUnWeighted_BBBH(yRnd,.true.,(/i1,j1/),RES)
               elseif( Process.eq.60 ) then
                   dum = EvalUnWeighted_HJJ(yRnd,.true.,(/i1,j1/),RES)
+              elseif( Process.eq.66 ) then
+                  dum = EvalUnWeighted_HJJ_fulldecay(yRnd,.true.,(/i1,j1/),RES)
               elseif( Process.eq.61 ) then
                   dum = EvalUnWeighted_HJJ(yRnd,.true.,(/i1,j1/),RES)
               elseif( Process.eq.110 ) then
@@ -2664,7 +2681,7 @@ SUBROUTINE InitHisto()
 use modParameters
 implicit none
 
-  if( Process.eq.60 .or. Process.eq.61 ) then
+  if( Process.eq.60 .or. Process.eq.61 .or. Process.eq.66 ) then
      call InitHisto_HVBF()
   elseif( Process.eq.62) then
      call InitHisto_HJ()
@@ -3086,7 +3103,7 @@ implicit none
 integer :: AllocStatus,NHisto
 
           it_sav = 1
-          NumHistograms = 2
+          NumHistograms = 5
           if( .not.allocated(Histo) ) then
                 allocate( Histo(1:NumHistograms), stat=AllocStatus  )
                 if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
@@ -3104,17 +3121,25 @@ integer :: AllocStatus,NHisto
           Histo(2)%LowVal = 0d0
           Histo(2)%SetScale= 1d0
 
-!           Histo(3)%Info   = "log(MEsq)"
-!           Histo(3)%NBins  = 11
-!           Histo(3)%BinSize= 1d0
-!           Histo(3)%LowVal = -10d0
-!           Histo(3)%SetScale= 1d0
-! 
-!           Histo(4)%Info   = "log(MEsq*pdf)"
-!           Histo(4)%NBins  = 11
-!           Histo(4)%BinSize= 1d0
-!           Histo(4)%LowVal = -10d0
-!           Histo(4)%SetScale= 1d0
+          Histo(3)%Info   = "pT(H)"
+          Histo(3)%NBins  = 50
+          Histo(3)%BinSize= 10d0*GeV
+          Histo(3)%LowVal = 0d0
+          Histo(3)%SetScale= 1d0/GeV
+
+          Histo(4)%Info   = "pT(j1)"
+          Histo(4)%NBins  = 50
+          Histo(4)%BinSize= 10d0*GeV
+          Histo(4)%LowVal = 0d0
+          Histo(4)%SetScale= 1d0/GeV
+
+          Histo(5)%Info   = "dy(j1,j2)"
+          Histo(5)%NBins  = 50
+          Histo(5)%BinSize= 0.2d0
+          Histo(5)%LowVal = -5d0
+          Histo(5)%SetScale= 1d0
+
+
 
   do NHisto=1,NumHistograms
       Histo(NHisto)%Value(:) = 0d0
@@ -3325,6 +3350,7 @@ character :: arg*(500)
     if( Process.eq.2 ) write(TheUnit,"(4X,A,F7.2,A,F7.5)") "Resonance: spin=2, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( Process.eq.60) write(TheUnit,"(4X,A,F7.2,A,F7.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( Process.eq.61) write(TheUnit,"(4X,A,F7.2,A,F7.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
+    if( Process.eq.66) write(TheUnit,"(4X,A,F7.2,A,F7.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( Process.eq.50) write(TheUnit,"(4X,A,F7.2,A,F7.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( Process.eq.80) write(TheUnit,"(4X,A,F7.2,A,F7.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( Process.eq.90) write(TheUnit,"(4X,A,F7.2,A,F7.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
@@ -3359,7 +3385,7 @@ character :: arg*(500)
     if( .not. seed_random ) write(TheUnit,"(4X,A)") "NOTE: seed_random==FALSE (switched off)"
 
     write(TheUnit,"(4X,A)") ""
-    if( Process.eq.0 .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.62.or. Process.eq.50 ) then
+    if( Process.eq.0 .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.62 .or. Process.eq.66 .or. Process.eq.50 ) then
         write(TheUnit,"(4X,A)") "spin-0-VV couplings: "
         write(TheUnit,"(6X,A,L)") "generate_as=",generate_as
         if( generate_as ) then 
@@ -3573,7 +3599,8 @@ implicit none
         write(io_stdout,*) ""
         write(io_stdout,"(2X,A)") "Command line arguments:"
         write(io_stdout,"(4X,A)") "Collider:   1=LHC, 2=Tevatron, 0=e+e-"
-        write(io_stdout,"(4X,A)") "Process: 0=spin-0, 1=spin-1, 2=spin-2 resonance, 50=pp/ee->VH, 60=weakVBF, 61=pp->Hjj, 62=pp->Hj"
+        write(io_stdout,"(4X,A)") "Process: 0=spin-0, 1=spin-1, 2=spin-2 resonance"
+        write(io_stdout,"(4X,A)") "         50=pp/ee->VH, 60/66=weakVBF (without/with decay+SM bkg), 61=pp->Hjj, 62=pp->Hj"
         write(io_stdout,"(4X,A)") "         80=pp->ttbar+H, 90=pp->bbbar+H, 110=pp->t+H, 111=pp->tbar+H"
         write(io_stdout,"(4X,A)") "MReso:      resonance mass (default=125.60), format: yyy.xx"
         write(io_stdout,"(4X,A)") "DecayMode1: decay mode for vector boson 1 (Z/W+/gamma)"

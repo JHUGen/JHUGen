@@ -19,20 +19,26 @@ use ifport
 #endif
 implicit none
 integer,parameter :: mxpart=14 ! this has to match the MCFM parameter
-real(8) :: yRnd(1:16),VgsWgt, EvalWeighted_HJJ_fulldecay
+real(8) :: yRnd(1:17),VgsWgt, EvalWeighted_HJJ_fulldecay
 real(8) :: pdf(-6:6,1:2),me2(-5:5,-5:5)
 real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi
-real(8) :: MomExt(1:4,1:11),PSWgt,PSWgt2,PSWgt3,MInvH,MInvZ1,MInvZ2
+real(8) :: MomExt(1:4,1:11),PSWgt,PSWgt1,PSWgt2,PSWgt3,MInvH,MInvZ1,MInvZ2
 real(8) :: yz1,yz2,offzchannel,EZ_max,dr,ML1,ML2,ML3,ML4
 real(8) :: p_MCFM(mxpart,1:4),msq_MCFM(-5:5,-5:5),HZZcoupl(1:32),HWWcoupl(1:32)
 integer :: i,j,MY_IDUP(1:5),ICOLUP(1:2,1:5),NBin(1:NumHistograms),NHisto
-real(8) :: LO_Res_Unpol, PreFac
+real(8) :: LO_Res_Unpol, PreFac,BWJacobi
 logical :: applyPSCut
+integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, Higgs=5, V1=6, V2=7, Lep1P=8, Lep1M=9, Lep2P=10, Lep2M=11
    
    EvalWeighted_HJJ_fulldecay = 0d0
    
    call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)   
    MInvH = M_Reso
+
+       BWJacobi = 1d0
+!      call SmearExternal(yRnd(17),M_Reso,Ga_Reso,M_Reso/4d0,M_Reso*4d0,MInvH,BWJacobi)
+       
+
    
    if (EHat.lt.MInvH) return
    call EvalPhaseSpace_VBF(EHat,MInvH,yRnd(3:7),MomExt(1:4,1:5),PSWgt)
@@ -42,7 +48,10 @@ logical :: applyPSCut
     yz1 = yRnd(14)
     yz2 = yRnd(15)
     offzchannel = yRnd(16) 
-    
+! yz1=0.2d0
+! yz2=0.5d0
+! offzchannel=0.8d0
+
          if(MInvH.gt.2d0*M_V) then
               EZ_max = EHat
               dr = datan((EZ_max**2-M_V**2)/(Ga_V*M_V)) + datan(M_V/Ga_V)
@@ -52,7 +61,7 @@ logical :: applyPSCut
               EZ_max = EHat - MInvZ1*0.99999d0
               dr = datan((EZ_max**2-M_V**2)/(Ga_V*M_V)) + datan(M_V/Ga_V)
               MInvZ2 = dsqrt( M_V*Ga_V * dtan(dr*yz2-datan(M_V/Ga_V)) + M_V**2 )
-              sHatJacobi = sHatJacobi*dr/(Ga_V*M_V)*( (MInvZ2**2 - M_V**2)**2 + M_V**2*Ga_V**2 )
+              sHatJacobi = sHatJacobi*dr/(Ga_V*M_V)  *  ( (MInvZ2**2 - M_V**2)**2 + M_V**2*Ga_V**2 )
 
           elseif(MInvH.lt.2d0*M_V) then
               if (offzchannel.le.0.5d0) then
@@ -61,28 +70,26 @@ logical :: applyPSCut
                   MInvZ1 = dsqrt( M_V*Ga_V * dtan(dr*yz1-datan(M_V/Ga_V)) + M_V**2 )
                   MInvZ2 = abs(EHat - MInvZ1*0.999999999999999d0)*dsqrt(dabs(dble(yz2)))
                   sHatJacobi = sHatJacobi * dr/(Ga_V*M_V) * 1d0/(  &
-                  1d0/((MInvZ1**2 - M_V**2)**2 + M_V**2*Ga_V**2 )     &
-                  + 1d0/((MInvZ2**2 - M_V**2)**2 + M_V**2*Ga_V**2 ) )
+                  1d0/((MInvZ1**2 - M_V**2)**2 + M_V**2*Ga_V**2 )   )
                   sHatJacobi = sHatJacobi *(EHat - MInvZ1*0.99999d0)**2
               elseif(offzchannel.gt.0.5d0) then
                   EZ_max = EHat
                   dr = datan((EZ_max**2-M_V**2)/(Ga_V*M_V)) + datan(M_V/Ga_V)
                   MInvZ2 = dsqrt( M_V*Ga_V * dtan(dr*yz2-datan(M_V/Ga_V)) + M_V**2 )
                   MInvZ1 = abs(EHat - MInvZ2*0.999999999999999d0)*dsqrt(dabs(dble(yz1)))
-                  sHatJacobi = sHatJacobi * dr/(Ga_V*M_V) * 1d0/( &
-                  1d0/((MInvZ1**2 - M_V**2)**2 + M_V**2*Ga_V**2 )    &
+                  sHatJacobi = sHatJacobi * dr/(Ga_V*M_V) * 1d0/(  &
                   + 1d0/((MInvZ2**2 - M_V**2)**2 + M_V**2*Ga_V**2 ) )
                   sHatJacobi = sHatJacobi *(EHat - MInvZ2*0.99999d0)**2
               endif
         endif
 
-    if( MInvZ1+MInvZ2.gt.EHat ) then
+    if( MInvZ1+MInvZ2.gt.MInvH ) then
       EvalWeighted_HJJ_fulldecay = 0d0
       RejeCounter = RejeCounter + 1
       return
     endif
     
-    call EvalPhaseSpace_2(MInvH,(/MInvZ1,MInvZ2/),yRnd(8:9),MomExt(1:4,6:7),PSWgt)
+    call EvalPhaseSpace_2(MInvH,(/MInvZ1,MInvZ2/),yRnd(8:9),MomExt(1:4,6:7),PSWgt1)
     ML1 = 0d0
     ML2 = 0d0
     ML3 = 0d0
@@ -90,47 +97,66 @@ logical :: applyPSCut
     call boost(MomExt(1:4,6),MomExt(1:4,5),MInvH)
     call boost(MomExt(1:4,7),MomExt(1:4,5),MInvH)
     
+    
     call EvalPhasespace_VDecay(MomExt(1:4,6),MInvZ1,ML1,ML2,yRnd(10:11),MomExt(1:4,8:9),PSWgt2)
     call EvalPhasespace_VDecay(MomExt(1:4,7),MInvZ2,ML3,ML4,yRnd(12:13),MomExt(1:4,10:11),PSWgt3)
-    PSWgt = PSWgt * PSWgt2*PSWgt3
+    PSWgt = PSWgt * PSWgt1*PSWgt2*PSWgt3 * BWJacobi
 
 !      if( (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then! introduce this momentum flip to allow proper mapping of integrand with Z-poles at MInvZ2=(p2+p3)^2 and MInvZ2=(p1+p4)^2
 !          if( yrnd(16).gt.0.5d0 ) call swapmom( MomExt(1:4,8),MomExt(1:4,10) )
 !      endif
-   
-nbin(:) = 1   
-!    call Kinematics_HVBF(5,MomExt,applyPSCut,NBin)
-!    if( applyPSCut .or. PSWgt.eq.zero ) return
+
+   call Kinematics_HVBF_fulldecay(MomExt,applyPSCut,NBin)
+   if( applyPSCut .or. PSWgt.eq.zero ) return
    
    call setPDFs(eta1,eta2,Mu_Fact,pdf)
    FluxFac = 1d0/(2d0*EHat**2)
    
-   call convert_to_MCFM(-MomExt(1:4,1), p_MCFM(1,1:4))
-   call convert_to_MCFM(-MomExt(1:4,2), p_MCFM(2,1:4))
-   call convert_to_MCFM(+MomExt(1:4,8), p_MCFM(3,1:4))! check f fbar assignment
-   call convert_to_MCFM(+MomExt(1:4,9), p_MCFM(4,1:4))
-   call convert_to_MCFM(+MomExt(1:4,10),p_MCFM(5,1:4))
-   call convert_to_MCFM(+MomExt(1:4,11),p_MCFM(6,1:4))
-   call convert_to_MCFM(+MomExt(1:4,3), p_MCFM(7,1:4))
-   call convert_to_MCFM(+MomExt(1:4,4), p_MCFM(8,1:4))
+
+
+   call convert_to_MCFM(-MomExt(1:4,inTop), p_MCFM(1,1:4))
+   call convert_to_MCFM(-MomExt(1:4,inBot), p_MCFM(2,1:4))
+   call convert_to_MCFM(+MomExt(1:4,Lep1P), p_MCFM(3,1:4))! check f fbar assignment
+   call convert_to_MCFM(+MomExt(1:4,Lep1M), p_MCFM(4,1:4))
+   call convert_to_MCFM(+MomExt(1:4,Lep2P), p_MCFM(5,1:4))
+   call convert_to_MCFM(+MomExt(1:4,Lep2M), p_MCFM(6,1:4))
+   call convert_to_MCFM(+MomExt(1:4,outTop),p_MCFM(7,1:4))
+   call convert_to_MCFM(+MomExt(1:4,outBot),p_MCFM(8,1:4))
    HZZcoupl(:) = 0d0
-   HZZcoupl(1) = 1d0
+   HZZcoupl(1) = 0d0
    HWWcoupl(:) = HZZcoupl(:)
-   call qq_ZZqq(p_MCFM,msq_MCFM,HZZcoupl,HWWcoupl,Lambda,Lambda_Q,Lambda_z1)!  q(-p1)+q(-p2)->Z(p3,p4)+Z(p5,p6)+q(p7)+q(p8)
-   
+
+!    print *, (MomExt(1:4,1)).dot.(MomExt(1:4,1))
+!    print *, (MomExt(1:4,2)).dot.(MomExt(1:4,2))
+!    print *, (MomExt(1:4,8)).dot.(MomExt(1:4,8))
+!    print *, (MomExt(1:4,9)).dot.(MomExt(1:4,9))
+!    print *, (MomExt(1:4,10)).dot.(MomExt(1:4,10))
+!    print *, (MomExt(1:4,11)).dot.(MomExt(1:4,11))
+!    print *, (MomExt(1:4,3)).dot.(MomExt(1:4,3))
+!    print *, (MomExt(1:4,4)).dot.(MomExt(1:4,4))
+!    print *, "---"
+!    print *, p_MCFM(1,1:4)+p_MCFM(2,1:4)  +p_MCFM(3,1:4)+p_MCFM(4,1:4)  +p_MCFM(5,1:4)+p_MCFM(6,1:4)  +p_MCFM(7,1:4)+p_MCFM(8,1:4)
+!    print *, p_MCFM(1,4)**2-p_MCFM(1,1)**2-p_MCFM(1,2)**2-p_MCFM(1,3)**2
+!    print *, p_MCFM(2,4)**2-p_MCFM(2,1)**2-p_MCFM(2,2)**2-p_MCFM(2,3)**2
+!    print *, p_MCFM(3,4)**2-p_MCFM(3,1)**2-p_MCFM(3,2)**2-p_MCFM(3,3)**2
+!    print *, p_MCFM(4,4)**2-p_MCFM(4,1)**2-p_MCFM(4,2)**2-p_MCFM(4,3)**2
+!    print *, p_MCFM(5,4)**2-p_MCFM(5,1)**2-p_MCFM(5,2)**2-p_MCFM(5,3)**2
+!    print *, p_MCFM(6,4)**2-p_MCFM(6,1)**2-p_MCFM(6,2)**2-p_MCFM(6,3)**2
+!    print *, p_MCFM(7,4)**2-p_MCFM(7,1)**2-p_MCFM(7,2)**2-p_MCFM(7,3)**2
+!    print *, p_MCFM(8,4)**2-p_MCFM(8,1)**2-p_MCFM(8,2)**2-p_MCFM(8,3)**2
+!    pause
+
+!   call qq_ZZqq(p_MCFM,msq_MCFM,HZZcoupl,HWWcoupl,Lambda,Lambda_Q,Lambda_z1)!  q(-p1)+q(-p2)->Z(p3,p4)+Z(p5,p6)+q(p7)+q(p8)
    
    LO_Res_Unpol = 0d0
    do i = -5,5
       do j = -5,5
-         LO_Res_Unpol = LO_Res_Unpol + msq_MCFM(i,j)*pdf(LHA2M_pdf(i),1)*pdf(LHA2M_pdf(j),2)!  check correct me pdf assignments
-print *, i,j,msq_MCFM(i,j)
+         LO_Res_Unpol = LO_Res_Unpol + msq_MCFM(i,j)*pdf(LHA2M_pdf(i),1)*pdf(LHA2M_pdf(j),2)
       enddo
    enddo
-pause
 
 
-
-   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt 
+   PreFac = fbGeV2 * FluxFac * PSWgt * sHatJacobi
    EvalWeighted_HJJ_fulldecay = LO_Res_Unpol * PreFac
 
    AccepCounter=AccepCounter+1
@@ -151,8 +177,35 @@ END FUNCTION
 
 
 
+
+ FUNCTION EvalUnWeighted_HJJ_fulldecay(yRnd,genEvt,iPartons,RES)
+ use ModKinematics
+ use ModParameters
+ use ModHiggsjj
+ use ModMisc
+#if compiler==1
+ use ifport
+#endif
+implicit none
+real(8) :: yRnd(:),VgsWgt, EvalUnWeighted_HJJ_fulldecay,RES(-5:5,-5:5)
+real(8) :: pdf(-6:6,1:2)
+real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi
+real(8) :: MomExt(1:4,1:5), PSWgt
+real(8) :: me2(-5:5,-5:5)
+integer :: i,j,k,iPartons(1:2)
+integer :: MY_IDUP(1:5),ICOLUP(1:2,1:5),NBin(1:NumHistograms),NHisto
+real(8) :: LO_Res_Unpol, PreFac, CS_max, sumtot
+logical :: applyPSCut,genEvt,zz_fusion
+include 'csmaxvalue.f'
+
+ EvalUnWeighted_HJJ_fulldecay = 0d0
  
- 
+RETURN
+END FUNCTION
+
+
+
+
  
 
 
@@ -167,7 +220,7 @@ END FUNCTION
    real(8) :: yRnd(1:7),VgsWgt, EvalWeighted_HJJ
    real(8) :: pdf(-6:6,1:2)
    real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi
-   real(8) :: MomExt(1:4,1:5), PSWgt,MomDK(1:4,1:4)
+   real(8) :: MomExt(1:4,1:5), PSWgt
    real(8) :: me2(-5:5,-5:5)
    integer :: i,j,MY_IDUP(1:5),ICOLUP(1:2,1:5),NBin(1:NumHistograms),NHisto
    real(8) :: LO_Res_Unpol, PreFac
@@ -184,7 +237,7 @@ END FUNCTION
    call boost2Lab(eta1,eta2,5,MomExt(1:4,1:5))
 
 
-   if( Process.eq.60 ) call Kinematics_HVBF(5,MomExt,MomDK,applyPSCut,NBin)
+   if( Process.eq.60 ) call Kinematics_HVBF(5,MomExt,applyPSCut,NBin)
    if( Process.eq.61 ) call Kinematics_HJJ(5,MomExt,applyPSCut,NBin)
    if( applyPSCut .or. PSWgt.eq.zero ) return
    
@@ -255,7 +308,7 @@ implicit none
 real(8) :: yRnd(:),VgsWgt, EvalUnWeighted_HJJ,RES(-5:5,-5:5)
 real(8) :: pdf(-6:6,1:2)
 real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi
-real(8) :: MomExt(1:4,1:5), PSWgt,MomDK(1:4,1:4)
+real(8) :: MomExt(1:4,1:5), PSWgt
 real(8) :: me2(-5:5,-5:5)
 integer :: i,j,k,iPartons(1:2)
 integer :: MY_IDUP(1:5),ICOLUP(1:2,1:5),NBin(1:NumHistograms),NHisto
@@ -274,7 +327,7 @@ include 'csmaxvalue.f'
    call boost2Lab(eta1,eta2,5,MomExt(1:4,1:5))
 
 
-   if( Process.eq.60 ) call Kinematics_HVBF(5,MomExt,MomDK,applyPSCut,NBin)
+   if( Process.eq.60 ) call Kinematics_HVBF(5,MomExt,applyPSCut,NBin)
    if( Process.eq.61 ) call Kinematics_HJJ(5,MomExt,applyPSCut,NBin)
    if( applyPSCut .or. PSWgt.eq.zero ) return
    

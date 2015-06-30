@@ -1452,6 +1452,7 @@ real(8),parameter :: PiWgt2 = (2d0*Pi)**(4-N2*3) * (4d0*Pi)**(N2-1)
    call genps(2,Ehat,xRndPS(1:2),Masses,Mom(1:4,3:4),PSWgt)
    PSWgt = PSWgt*PiWgt2
 
+
 !  particles on the beam axis:
    Mom(1,1) =  EHat*0.5d0
    Mom(2,1) =  0d0
@@ -1843,28 +1844,40 @@ END SUBROUTINE
 
 
 
-SUBROUTINE Kinematics_HVBF(NumPart,MomExt,MomDK,applyPSCut,NBin)
+SUBROUTINE Kinematics_HVBF(NumPart,MomExt,applyPSCut,NBin)
 use ModMisc
 use ModParameters
 implicit none
-real(8) :: MomExt(:,:),MomDK(:,:), mZ1, mZ2, MReso
+real(8) :: MomExt(:,:), mZ1, mZ2, MReso
 real(8) :: MomLepP(1:4),MomLepM(1:4),MomBoost(1:4),BeamAxis(1:4),ScatteringAxis(1:4),dummy(1:4)
 real(8) :: MomLept(1:4,1:4),MomLeptX(1:4,1:4),MomLeptPlane1(2:4),MomLeptPlane2(2:4),MomBeamScatterPlane(2:4)
 logical :: applyPSCut
 integer :: NumPart,NBin(:)
-real(8) :: m_jj,y_j1,y_j2,dphi_jj
+real(8) :: m_jj,y_j1,y_j2,dphi_jj,dy_j1j2,pT_jl,pT_j1,pT_j2,pT_H
+integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, Higgs=5
 
 
        applyPSCut = .false.
  
-       m_jj = get_MInv( MomExt(1:4,3)+MomExt(1:4,4) )
-       y_j1 = get_eta(MomExt(1:4,3))
-       y_j2 = get_eta(MomExt(1:4,4))
+       m_jj = get_MInv( MomExt(1:4,outTop)+MomExt(1:4,outBot) )
+       y_j1 = get_eta(MomExt(1:4,outTop))
+       y_j2 = get_eta(MomExt(1:4,outBot))
+       pT_H = get_PT(MomExt(1:4,Higgs))
+       pT_j1= get_PT(MomExt(1:4,outTop))
+       pT_j2= get_PT(MomExt(1:4,outBot))
+       pT_jl = max(pT_j1,pT_j2)
+       dy_j1j2 = y_j1 - y_j2
 
 !        if( abs(y_j1).lt.1d0 .or. abs(y_j2).lt.1d0 .or. y_j1*y_j2.gt.0d0 ) then
 !           applyPSCut=.true.
 !           return
 !        endif
+
+       if(  pT_j1.lt.15d0*GeV .or. pT_j2.lt.15d0*GeV )  then
+          applyPSCut=.true.
+          return
+       endif
+
 
        dphi_jj = abs( Get_PHI(MomExt(1:4,3)) - Get_PHI(MomExt(1:4,4)) )
        if( dphi_jj.gt.Pi ) dphi_jj=2d0*Pi-dphi_jj
@@ -1874,11 +1887,70 @@ real(8) :: m_jj,y_j1,y_j2,dphi_jj
        NBin(:) = 1
        NBin(1)  = WhichBin(1,m_jj)
        NBin(2)  = WhichBin(2,dphi_jj)
+       NBin(3)  = WhichBin(3,pT_H)
+       NBin(4)  = WhichBin(4,pT_jl)
+       NBin(5)  = WhichBin(5,dy_j1j2)
 
 
 RETURN
 END SUBROUTINE
 
+
+
+
+
+SUBROUTINE Kinematics_HVBF_fulldecay(MomExt,applyPSCut,NBin)
+use ModMisc
+use ModParameters
+implicit none
+real(8) :: MomExt(:,:), mZ1, mZ2, MReso
+real(8) :: MomLepP(1:4),MomLepM(1:4),MomBoost(1:4),BeamAxis(1:4),ScatteringAxis(1:4),dummy(1:4)
+real(8) :: MomLept(1:4,1:4),MomLeptX(1:4,1:4),MomLeptPlane1(2:4),MomLeptPlane2(2:4),MomBeamScatterPlane(2:4)
+logical :: applyPSCut
+integer :: NBin(:)
+real(8) :: m_jj,y_j1,y_j2,dphi_jj,dy_j1j2,pT_jl,pT_j1,pT_j2,pT_H
+integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, Higgs=5, V1=6, V2=7, Lep1P=8, Lep1M=9, Lep2P=10, Lep2M=11
+
+
+       applyPSCut = .false.
+ 
+       m_jj = get_MInv( MomExt(1:4,outTop)+MomExt(1:4,outBot) )
+       y_j1 = get_eta(MomExt(1:4,outTop))
+       y_j2 = get_eta(MomExt(1:4,outBot))
+       pT_H = get_PT(MomExt(1:4,Higgs))
+       pT_j1= get_PT(MomExt(1:4,outTop))
+       pT_j2= get_PT(MomExt(1:4,outBot))
+       pT_jl = max(pT_j1,pT_j2)
+       dy_j1j2 = y_j1 - y_j2
+
+
+
+!        if( abs(y_j1).lt.1d0 .or. abs(y_j2).lt.1d0 .or. y_j1*y_j2.gt.0d0 ) then
+!           applyPSCut=.true.
+!           return
+!        endif
+
+
+       if(  pT_j1.lt.15d0*GeV .or. pT_j2.lt.15d0*GeV )  then
+          applyPSCut=.true.
+          return
+       endif
+
+       dphi_jj = abs( Get_PHI(MomExt(1:4,3)) - Get_PHI(MomExt(1:4,4)) )
+       if( dphi_jj.gt.Pi ) dphi_jj=2d0*Pi-dphi_jj
+
+
+ !     binning
+       NBin(:) = 1
+       NBin(1)  = WhichBin(1,m_jj)
+       NBin(2)  = WhichBin(2,dphi_jj)
+       NBin(3)  = WhichBin(3,pT_H)
+       NBin(4)  = WhichBin(4,pT_jl)
+       NBin(5)  = WhichBin(5,dy_j1j2)
+
+
+RETURN
+END SUBROUTINE
 
 
 
