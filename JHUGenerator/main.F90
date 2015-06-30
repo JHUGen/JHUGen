@@ -3350,17 +3350,17 @@ character :: arg*(500)
     if( Collider.eq.0 ) write(TheUnit,"(4X,A,1F8.2)") "Collider: e+ e-, sqrt(s)=",Collider_Energy*100d0
     if( Collider.eq.1 ) write(TheUnit,"(4X,A,1F8.2)") "Collider: P-P, sqrt(s)=",Collider_Energy*100d0
     if( Collider.eq.2 ) write(TheUnit,"(4X,A,1F8.2)") "Collider: P-Pbar, sqrt(s)=",Collider_Energy*100d0
-    if( Process.eq.0 ) write(TheUnit,"(4X,A,F7.2,A,F7.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
-    if( Process.eq.1 ) write(TheUnit,"(4X,A,F7.2,A,F7.5)") "Resonance: spin=1, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
-    if( Process.eq.2 ) write(TheUnit,"(4X,A,F7.2,A,F7.5)") "Resonance: spin=2, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
-    if( Process.eq.60) write(TheUnit,"(4X,A,F7.2,A,F7.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
-    if( Process.eq.61) write(TheUnit,"(4X,A,F7.2,A,F7.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
-    if( Process.eq.66) write(TheUnit,"(4X,A,F7.2,A,F7.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
-    if( Process.eq.50) write(TheUnit,"(4X,A,F7.2,A,F7.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
-    if( Process.eq.80) write(TheUnit,"(4X,A,F7.2,A,F7.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
-    if( Process.eq.90) write(TheUnit,"(4X,A,F7.2,A,F7.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
-    if( Process.eq.110) write(TheUnit,"(4X,A,F7.2,A,F7.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
-    if( Process.eq.111) write(TheUnit,"(4X,A,F7.2,A,F7.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
+    if( Process.eq.0 ) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
+    if( Process.eq.1 ) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=1, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
+    if( Process.eq.2 ) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=2, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
+    if( Process.eq.60) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
+    if( Process.eq.61) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
+    if( Process.eq.66) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
+    if( Process.eq.50) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
+    if( Process.eq.80) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
+    if( Process.eq.90) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
+    if( Process.eq.110) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
+    if( Process.eq.111) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( ReadLHEFile )    write(TheUnit,"(4X,A)") "           (This is ReadLHEFile mode. Resonance mass/width might be overwritten by LHE input parameters. See below.)"
     if( ConvertLHEFile ) write(TheUnit,"(4X,A)") "           (This is ConvertLHEFile mode. Resonance mass/width might be overwritten by LHE input parameters. See below.)"
     write(TheUnit,"(4X,A,I2,2X,A,I2)") "DecayMode1:",DecayMode1, "DecayMode2:",DecayMode2
