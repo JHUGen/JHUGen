@@ -86,9 +86,9 @@ c     ,j3_4(4,2),j5_6(4,2),
       data Q(+5)/-0.333333333333333d0/
       data tau/1d0,-1d0,1d0,-1d0,1d0,0d0,-1d0,1d0,-1d0,1d0,-1d0/
       data mt,twidth/173.2d0,2.5d0/
-      data hmass,hwidth/125d0,0.00415d0/
-      data wmass,wwidth/80.39d0,2.085d0/
-      data zmass,zwidth/91.19d0,2.4952d0/
+      data hmass,hwidth/250d0,0.00415d0/
+      data wmass,wwidth/80.399d0,2.085d0/
+      data zmass,zwidth/91.1876d0,2.4952d0/
       data Gf,vevsq/1.16639d-5,246d0/
       data gw,xw,gwsq,esq/0.42464d0,0.23119d0,0.1d0,0.3133285d0/
 
@@ -272,8 +272,8 @@ c--- and the following lines set up the appropriate masses and sin^2(theta_w)
        ! MARKUS: choosing ZZ final state
        l1=le
        l2=le
-       r1=le
-       r2=le
+       r1=re
+       r2=re
        
 c       cxw=dcmplx(xw,0d0) ! DEBUG: Madgraph comparison
        write(6,*)
@@ -287,7 +287,8 @@ c       cxw=dcmplx(xw,0d0) ! DEBUG: Madgraph comparison
        write(6,*)
        doHO=.false.
        doBO=.false.
-                 runstring(4:5)="HO"
+!        runstring(4:5)="what-nonsense-this-is"
+       runstring(4:5)="HO"
        if     (runstring(4:5) .eq. 'HO') then
          doHO=.true.
        write(6,*) '>>>>>>>>>>>>>> Higgs contribution only <<<<<<<<<<<<<'
@@ -305,7 +306,10 @@ c--- rescaling factor for Higgs amplitudes, if anomalous Higgs width
        endif
        first=.false.
        call flush(6)
-      endif
+      endif! first
+
+
+
 
       if (doHO) then
         Hbit=mult*cone
@@ -320,7 +324,6 @@ c--- rescaling factor for Higgs amplitudes, if anomalous Higgs width
 
 C---setup spinors and spinorvector products
       call spinorcurr(8,p,za,zb,zab,zba)
-
       do j=1,jmax
       temp(:,:)=0d0
       tempw(:,:)=0d0
@@ -376,11 +379,12 @@ C-----Singly resonant production in VBF style diagrams
      & ZZ8341,WWp8341,WWm8341)
       call ZZSingleres(j1(j),j2(j),5,6,3,4,j8(j),j7(j),za,zb,
      & ZZ8561,WWp8561,WWm8561)
+     
       endif
       
       
       
-C----ZZ->ZZ scattering with the exchange of a H
+! C----ZZ->ZZ scattering with the exchange of a H
       call ZZHZZamp(j1(j),j2(j),3,4,5,6,j7(j),j8(j),
      & za,zb,ZZHamp71_82)
       call ZZHZZamp(j1(j),j2(j),3,4,5,6,j8(j),j7(j),
@@ -390,6 +394,8 @@ C----Four boson vertex + WW->Higgs diagram
      & za,zb,WWZZ71_82amp,srWWZZ71_82amp) 
       call WWZZ(j1(j),j2(j),3,4,5,6,j8(j),j7(j),
      & za,zb,WWZZ81_72amp,srWWZZ81_72amp) 
+
+ 
 
 C-----setup for (uqbq_uqbq) (2,5)->(2,5)
       do h1=1,2
@@ -401,8 +407,8 @@ C-----setup for (uqbq_uqbq) (2,5)->(2,5)
      & +cdotpr(j7_34_1(:,2,h1,h3),j8_56_2(:,1,h2,h5))*gmZ7341(2,1,h1,h2)
      & +cdotpr(jl7_34_1(:,2,h1,h3),jl8_56_2(:,1,h2,h5))*ll7341(h3,h5)
      & +cdotpr(j7_34_1(:,2,h1,h3),jl8_56_2(:,1,h2,h5))*gmZl8562(2,h1,h5)
-     & +cdotpr(jl7_34_1(:,2,h1,h3),j8_56_2(:,1,h2,h5))*gmZl7341(1,h2,h3)
-     
+     & +cdotpr(jl7_34_1(:,2,h1,h3),j8_56_2(:,1,h2,h5))*gmZl7341(1,h2,h3) 
+         
       amp(uqbq_uqbq,h1,h2,h3,h5)=amp(uqbq_uqbq,h1,h2,h3,h5)
      & +cdotpr(j7_56_1(:,2,h1,h5),j8_34_2(:,1,h2,h3))*gmZ7561(2,1,h1,h2)
      & +cdotpr(jl7_56_1(:,2,h1,h5),jl8_34_2(:,1,h2,h3))*ll7561(h3,h5)
@@ -420,14 +426,21 @@ C-----setup for (uqbq_uqbq) (2,5)->(2,5)
       amp(uqbq_uqbq,h1,h2,h3,h5)=Bbit*amp(uqbq_uqbq,h1,h2,h3,h5)
      & +Hbit*ZZHamp71_82(2,1,h1,h2,h3,h5)
 
+
       temp(2,5)=temp(2,5)+esq**6*spinavge
      &   *dble(amp(uqbq_uqbq,h1,h2,h3,h5)
      & *dconjg(amp(uqbq_uqbq,h1,h2,h3,h5)))
+
+
+
       enddo
       enddo
       enddo
       enddo
       temp(4,5)=temp(2,5)
+
+
+
 C--------------------------------------------------------------------------
 C-----setup for (uqcq_uqcq) (2,4)->(2,4)
       do h1=1,2
@@ -803,6 +816,8 @@ C-----------------ampb
       enddo
       temp(3,3)=temp(1,1)
       temp(5,5)=temp(1,1)
+      
+      
  100  continue
 
       if (j.eq.1) then

@@ -2,7 +2,6 @@ MODULE ModCrossSection_TTBH
 IMPLICIT NONE
 
 integer, parameter,private :: LHA2M_pdf(-6:6) = (/-5,-6,-3,-4,-1,-2,0 ,2,1,4,3,6,5/)
-integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6,5/)
 
 
  CONTAINS
@@ -22,10 +21,11 @@ implicit none
 real(8) :: yRnd(1:15),VgsWgt, EvalWeighted_TTBH
 real(8) :: pdf(-6:6,1:2)
 real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi, PDFFac1,PDFFac2
-real(8) :: MomExt(1:4,1:13), PSWgt,PSWgt2,PSWgt3
+real(8) :: MomExt(1:4,1:13),MomOffShell(1:4,1:13),PSWgt,PSWgt2,PSWgt3,PSWgt4
 real(8) :: LO_Res_GG_Unpol,LO_Res_QQB_Unpol, PreFac, MG_MOM(0:3,1:5),MadGraph_tree
 integer :: NBin(1:NumHistograms),NHisto
 logical :: applyPSCut
+integer, parameter :: inLeft=1,inRight=2,Hbos=3,tbar=4,t=5,  bbar=6,Wm=7,lepM=8,nubar=9,  b=10,Wp=11,lepP=12,nu=13
 EvalWeighted_TTBH = 0d0
 
    call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
@@ -34,16 +34,30 @@ EvalWeighted_TTBH = 0d0
    call boost2Lab(eta1,eta2,5,MomExt(1:4,1:5))
   
    if( TOPDECAYS.NE.0 ) then
-      call EvalPhasespace_TopDecay(MomExt(1:4,4),yRnd(08:11),MomExt(1:4,06:08),PSWgt2)    ! ATop 
-      call EvalPhasespace_TopDecay(MomExt(1:4,5),yRnd(12:15),MomExt(1:4,09:11),PSWgt3)    !  Top
+      call EvalPhasespace_TopDecay(MomExt(1:4,tbar),yRnd(08:11),MomExt(1:4,06:08),PSWgt2)    ! ATop 
+      MomExt(1:4,bbar) = MomExt(1:4,06)
+      MomExt(1:4,nubar)= MomExt(1:4,08)
+      MomExt(1:4,lepM) = MomExt(1:4,07)
+      MomExt(1:4,Wm)   = MomExt(1:4,lepM) + MomExt(1:4,nubar)
+      
+      call EvalPhasespace_TopDecay(MomExt(1:4,t),yRnd(12:15),MomExt(1:4,10:12),PSWgt3)    !  Top
+      MomExt(1:4,b)   = MomExt(1:4,10)
+      MomExt(1:4,nu)  = MomExt(1:4,12)
+      MomExt(1:4,lepP)= MomExt(1:4,11)
+      MomExt(1:4,Wp)  = MomExt(1:4,lepP) + MomExt(1:4,nu)
       PSWgt = PSWgt * PSWgt2*PSWgt3
+
+      call TTbar_OffShellProjection(MomExt,MomOffShell,PSWgt4)
+      MomOffShell(1:4,1:3) = MomExt(1:4,1:3)      
+!       PSWgt = PSWgt * PSWgt4       ! not using the Jacobian because the mat.el. don't have BW-propagators
    endif
 !    call EvalPhasespace_HDecay(MomExt(1:4,3),yRnd(16:17),MomExt(1:4,12:13),PSWgt4)
 !    PSWgt = PSWgt * PSWgt4 
    FluxFac = 1d0/(2d0*EHat**2)
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt
 
-   call Kinematics_TTBH(MomExt,applyPSCut,NBin)
+   call Kinematics_TTBH(MomOffShell,applyPSCut,NBin)
+!    call Kinematics_TTBH(MomExt,applyPSCut,NBin)
    if( applyPSCut .or. PSWgt.eq.zero ) return
 
 !    write(*,"(PE21.14,PE21.14,PE21.14,PE21.14)") MomExt(1:4,1)
@@ -116,7 +130,6 @@ EvalWeighted_TTBH = 0d0
    EvalCounter = EvalCounter+1
 
 
-
 RETURN
 END FUNCTION 
 
@@ -135,8 +148,8 @@ use ifport
 implicit none
 real(8) :: yRnd(1:16),VgsWgt, EvalUnWeighted_TTBH
 real(8) :: pdf(-6:6,1:2),RES(-5:5,-5:5)
-real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi
-real(8) :: MomExt(1:4,1:13), PSWgt,PSWgt2,PSWgt3,CS_Max,DKRnd
+real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi,CS_Max,DKRnd
+real(8) :: MomExt(1:4,1:13),MomOffShell(1:4,1:13),PSWgt,PSWgt2,PSWgt3,PSWgt4
 real(8) :: LO_Res_GG_Unpol,LO_Res_QQB_Unpol,PreFac,PDFFac1,PDFFac2
 integer :: NBin(1:NumHistograms),NHisto,iPartons(1:2),DKFlavor
 integer :: MY_IDUP(1:13),ICOLUP(1:2,1:13),nparton,DK_IDUP(1:6),DK_ICOLUP(1:2,3:6)
@@ -161,25 +174,28 @@ EvalUnWeighted_TTBH = 0d0
       MomExt(1:4,nubar)= MomExt(1:4,08)
       MomExt(1:4,lepM) = MomExt(1:4,07)
       MomExt(1:4,Wm)   = MomExt(1:4,lepM) + MomExt(1:4,nubar)
-
+      
       call EvalPhasespace_TopDecay(MomExt(1:4,t),yRnd(12:15),MomExt(1:4,10:12),PSWgt3)    !  Top
       MomExt(1:4,b)   = MomExt(1:4,10)
       MomExt(1:4,nu)  = MomExt(1:4,12)
       MomExt(1:4,lepP)= MomExt(1:4,11)
       MomExt(1:4,Wp)  = MomExt(1:4,lepP) + MomExt(1:4,nu)
       PSWgt = PSWgt * PSWgt2*PSWgt3
-    
+      
+      call TTbar_OffShellProjection(MomExt,MomOffShell,PSWgt4)
+      MomOffShell(1:4,1:3) = MomExt(1:4,1:3)  
+!       PSWgt = PSWgt * PSWgt4       ! not using the Jacobian because the mat.el. don't have BW-propagators
+
       if( RandomizeVVdecays ) then 
          call random_number(DKRnd)
          if( DKRnd.lt.0.5d0 ) call swapi(DecayMode1,DecayMode2)
       endif
-    
       call VVBranchings(DK_IDUP(1:6),DK_ICOLUP(1:2,3:6),700)
       MY_IDUP(b)    = Bot_;        ICOLUP(1:2,b) = (/501,00/)
       MY_IDUP(Wp)   = DK_IDUP(1);  ICOLUP(1:2,Wp)   = (/000,000/)
       MY_IDUP(lepP) = DK_IDUP(3);  ICOLUP(1:2,lepP) = DK_ICOLUP(1:2,3)
       MY_IDUP(nu)   = DK_IDUP(4);  ICOLUP(1:2,nu)   = DK_ICOLUP(1:2,4)  
-      MY_IDUP(bbar) = ABot_;       ICOLUP(1:2,bbar)    = (/000,502/)
+      MY_IDUP(bbar) = ABot_;       ICOLUP(1:2,bbar) = (/000,502/)
       MY_IDUP(Wm)   = DK_IDUP(2);  ICOLUP(1:2,Wm)   = (/000,000/)             
       MY_IDUP(lepM) = DK_IDUP(6);  ICOLUP(1:2,lepM) = DK_ICOLUP(1:2,6)
       MY_IDUP(nubar)= DK_IDUP(5);  ICOLUP(1:2,nubar)= DK_ICOLUP(1:2,5)  
@@ -191,13 +207,13 @@ EvalUnWeighted_TTBH = 0d0
    FluxFac = 1d0/(2d0*EHat**2)
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt
 
-   call Kinematics_TTBH(MomExt,applyPSCut,NBin)
+   call Kinematics_TTBH(MomOffShell,applyPSCut,NBin)
    if( applyPSCut .or. PSWgt.eq.zero ) return
 
    Mu_Fact = 0.5d0*( 2d0*M_top + M_Reso )   
    call setPDFs(eta1,eta2,Mu_Fact,pdf)
 
-
+   
 IF( GENEVT ) THEN   
       
       if( iPartons(1).eq.0 .and. iPartons(2).eq.0 ) then
@@ -214,9 +230,9 @@ IF( GENEVT ) THEN
           MY_IDUP(1:5) = (/ LHA2M_pdf(iPartons(1)),LHA2M_pdf(iPartons(2)),Hig_,ATop_,Top_/)
           if( iPartons(1).gt.0 ) then
              ICOLUP(1:2,1) = (/501,000/)
-             ICOLUP(1:2,2) = (/000,502/)          
+             ICOLUP(1:2,2) = (/000,502/)
           else
-             ICOLUP(1:2,1) = (/000,502/)          
+             ICOLUP(1:2,1) = (/000,502/)
              ICOLUP(1:2,2) = (/501,000/)
           endif
       endif
@@ -228,14 +244,13 @@ IF( GENEVT ) THEN
       elseif( EvalUnWeighted_TTBH .gt. yRnd(16)*CS_max ) then
          AccepCounter = AccepCounter + 1
          AccepCounter_part(iPartons(1),iPartons(2)) = AccepCounter_part(iPartons(1),iPartons(2))+1
-         call WriteOutEvent_TTBH(MomExt,MY_IDUP(1:13),ICOLUP(1:2,1:13))
+         call WriteOutEvent_TTBH(MomOffShell,MY_IDUP(1:13),ICOLUP(1:2,1:13))
          do NHisto=1,NumHistograms
                call intoHisto(NHisto,NBin(NHisto),1d0)
          enddo
       endif
       EvalCounter = EvalCounter + 1 
       
-
 
 
 ELSE! NOT GENEVT
