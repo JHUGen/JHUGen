@@ -25,6 +25,10 @@
 #include "TModHiggsJMatEl.hh"
 // VH
 #include "TModVHiggsMatEl.hh"
+// ttH
+#include "TModTTBHMatEl.hh"
+// NNPDF Driver for JHUGen
+#include "TNNPDFDriver.hh"
 
 
 using namespace std;
@@ -40,6 +44,7 @@ double JHUGenMatEl(TVar::Process process, TVar::Production production, mcfm_even
 		   double Gqqcoupl[SIZE_GQQ][2], double Gggcoupl[SIZE_GGG][2], double Gvvcoupl[SIZE_GVV][2]);
 double HJJMatEl(TVar::Process process,TVar::Production production, const TLorentzVector p[5], double Hggcoupl[SIZE_HGG][2], double Hvvcoupl[SIZE_HVV_VBF][2], double Hwwcoupl[SIZE_HWW_VBF][2], TVar::VerbosityLevel verb, double EBEAM);
 double VHiggsMatEl(TVar::Process process, TVar::Production production, TLorentzVector p[5], TLorentzVector pHdaughter[4], int Vdecay_id[6], double MReso, double GaReso, double Hvvcoupl[SIZE_HVV_VBF][2], TVar::VerbosityLevel verbosity, double EBEAM);
-double SumMEPDF(const TLorentzVector p0, const TLorentzVector p1, double flavor_msq[nmsq][nmsq],  TVar::VerbosityLevel verbosity, double EBEAM);
+double TTHiggsMatEl(TVar::Production production, const TLorentzVector p[11], double MReso, double GaReso, double MFerm, double GaFerm, double Hvvcoupl[SIZE_TTH][2], int topDecay, int topProcess, TVar::VerbosityLevel verbosity);
+double SumMEPDF(const TLorentzVector p0, const TLorentzVector p1, double flavor_msq[nmsq][nmsq], TVar::VerbosityLevel verbosity, double EBEAM);
 
 #endif

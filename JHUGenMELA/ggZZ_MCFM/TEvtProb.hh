@@ -11,6 +11,7 @@
 // Yanyan Gao
 //-----------------------------------------------------------------------------
 #include <sstream>
+#include <cstdio>
 #include <string>
 
 #include <iostream>
@@ -64,6 +65,7 @@ public:
   void SetProduction(TVar::Production tmp){ _production = tmp; }
   void SetLeptonInterf(TVar::LeptonInterference tmp){ _leptonInterf = tmp; }
   void ResetMCFM_EWKParameters(double ext_Gf, double ext_aemmz, double ext_mW, double ext_mZ, double ext_xW, int ext_ewscheme=3);
+  void Set_LHAgrid(const char* path);
 
   double XsecCalc(TVar::Process proc,
 		 TVar::Production production,
@@ -89,6 +91,13 @@ public:
   double XsecCalc_VX(TVar::Process proc, TVar::Production production, vh_event_type &vh_event,
 			TVar::VerbosityLevel verbosity,
 			double selfDHvvcoupl[SIZE_HVV_VBF][2]);
+
+  double XsecCalc_TTX(
+    TVar::Process proc, TVar::Production production,
+    tth_event_type &tth_event,
+    int topDecay, int topProcess,
+    TVar::VerbosityLevel verbosity,
+    double selfDHvvcoupl[SIZE_TTH][2]);
 
   // this appears to be some kind of 
   // way of setting MCFM parameters through

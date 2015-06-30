@@ -1751,7 +1751,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                 write(io_LHEOutFile, "(A)") "<!--"
             endif
             write(io_LHEOutFile ,"(A)") "JHUGen Resonance parameters used for event generation:"
-            write(io_LHEOutFile ,"(A,F6.1,A)") "hmass  ",M_Reso*100d0,"        ! Higgs boson mass"
+            write(io_LHEOutFile ,"(A,F6.1,A)") "hmass  ",M_Reso*100d0,"         ! Higgs boson mass"
             write(io_LHEOutFile ,"(A,F10.5,A)") "hwidth",Ga_Reso*100d0,"      ! Higgs boson width"
             if (Index(FirstLines,"-->").eq.0) then
                 write(io_LHEOutFile, "(A)") "-->"
@@ -1781,11 +1781,11 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
         write(io_LogFile,"(2X,A,1F7.2,A)") "A Higgs mass of ",M_Reso*100d0," GeV was determined from the LHE input file."
      endif
      if( .not. Ga_ResoSet ) then
-        write(io_stdout,"(2X,A,1F7.2)")  "ERROR: Higgs width could not be read from LHE input file. Assuming default value",Ga_Reso*100d0
-        write(io_LogFile,"(2X,A,1F7.2)") "ERROR: Higgs width could not be read from LHE input file. Assuming default value",Ga_Reso*100d0
+        write(io_stdout,"(2X,A,1F10.5)")  "ERROR: Higgs width could not be read from LHE input file. Assuming default value",Ga_Reso*100d0
+        write(io_LogFile,"(2X,A,1F10.5)") "ERROR: Higgs width could not be read from LHE input file. Assuming default value",Ga_Reso*100d0
      else
-        write(io_stdout,"(2X,A,1F9.5,A)") "A Higgs width of ",Ga_Reso*100d0," GeV was determined from the LHE input file."
-        write(io_LogFile,"(2X,A,1F9.5,A)") "A Higgs width of ",Ga_Reso*100d0," GeV was determined from the LHE input file."
+        write(io_stdout,"(2X,A,1F10.5,A)") "A Higgs width of ",Ga_Reso*100d0," GeV was determined from the LHE input file."
+        write(io_LogFile,"(2X,A,1F10.5,A)") "A Higgs width of ",Ga_Reso*100d0," GeV was determined from the LHE input file."
      endif
      write(io_stdout,"(A)") ""
      write(io_LogFile,"(A)") ""
@@ -1901,7 +1901,12 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
               tries = tries +1 
               read(16,fmt="(A160)",IOSTAT=stat,END=99) OtherLines(1:160)
               if(OtherLines(1:30).eq."</LesHouchesEvents>") then
-                  if( RequestNLeptons.gt.0 ) write(io_LHEOutFile,"(A,1F6.2,A)") "<!-- Lepton filter efficiency:",dble(AccepCounter)/dble(NEvent)*100d0," % -->"
+                  if( RequestNLeptons.gt.0 ) then
+                    write(io_LHEOutFile,"(A)") "<!-- Lepton filter information:"
+                    write(io_LHEOutFile,"(A,I8)") "     events processed:  ", NEvent
+                    write(io_LHEOutFile,"(A,I8)") "     events accepted:   ", AccepCounter
+                    write(io_LHEOutFile,"(A,1F6.2,A)") "     filter efficiency: ", dble(AccepCounter)/dble(NEvent)*100d0,"% -->"
+                  endif
                   goto 99
               elseif( (Index(OtherLines(1:7),"</event").ne.0) .and. Res.gt.0d0 ) then
                   write(io_LHEOutFile,"(A)") trim(OtherLines)
@@ -2093,7 +2098,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                 write(io_LHEOutFile, "(A)") "<!--"
             endif
             write(io_LHEOutFile ,"(A)") "JHUGen Resonance parameters used for event generation:"
-            write(io_LHEOutFile ,"(A,F6.1,A)") "hmass  ",M_Reso*100d0,"        ! Higgs boson mass"
+            write(io_LHEOutFile ,"(A,F6.1,A)") "hmass  ",M_Reso*100d0,"         ! Higgs boson mass"
             write(io_LHEOutFile ,"(A,F10.5,A)") "hwidth",Ga_Reso*100d0,"      ! Higgs boson width"
             if (Index(FirstLines,"-->").eq.0) then
                 write(io_LHEOutFile, "(A)") "-->"
@@ -2122,11 +2127,11 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
         write(io_LogFile,"(2X,A,1F7.2,A)") "A Higgs mass of ",M_Reso*100d0," GeV was determined from the LHE input file."
      endif
      if( .not. Ga_ResoSet ) then
-        write(io_stdout,"(2X,A,1F7.2)")  "ERROR: Higgs width could not be read from LHE input file. Assuming default value",Ga_Reso*100d0
-        write(io_LogFile,"(2X,A,1F7.2)") "ERROR: Higgs width could not be read from LHE input file. Assuming default value",Ga_Reso*100d0
+        write(io_stdout,"(2X,A,1F10.5)")  "ERROR: Higgs width could not be read from LHE input file. Assuming default value",Ga_Reso*100d0
+        write(io_LogFile,"(2X,A,1F10.5)") "ERROR: Higgs width could not be read from LHE input file. Assuming default value",Ga_Reso*100d0
      else
-        write(io_stdout,"(2X,A,1F9.5,A)") "A Higgs width of ",Ga_Reso*100d0," GeV was determined from the LHE input file."
-        write(io_LogFile,"(2X,A,1F9.5,A)") "A Higgs width of ",Ga_Reso*100d0," GeV was determined from the LHE input file."
+        write(io_stdout,"(2X,A,1F10.5,A)") "A Higgs width of ",Ga_Reso*100d0," GeV was determined from the LHE input file."
+        write(io_LogFile,"(2X,A,1F10.5,A)") "A Higgs width of ",Ga_Reso*100d0," GeV was determined from the LHE input file."
      endif
      write(io_stdout,"(A)") ""
      write(io_LogFile,"(A)") ""
@@ -3256,8 +3261,8 @@ implicit none
 
         if( .not. ReadLHEFile .and. .not. ConvertLHEFile ) then
             write(io_LHEOutFile ,'(A)') ''
-            write(io_LHEOutFile ,'(A,F5.1,A)') 'hmass   ',M_Reso*100d0,'     ! Higgs boson mass'
-            write(io_LHEOutFile ,'(A,F8.5,A)') 'hwidth ',Ga_Reso*100d0,'   ! Higgs boson width'
+            write(io_LHEOutFile ,'(A,F5.1,A)') 'hmass   ',M_Reso*100d0,'       ! Higgs boson mass'
+            write(io_LHEOutFile ,'(A,F10.5,A)') 'hwidth ',Ga_Reso*100d0,'   ! Higgs boson width'
             write(io_LHEOutFile ,'(A)') ''
         endif
 
