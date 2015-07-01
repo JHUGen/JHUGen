@@ -114,14 +114,14 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, Higgs=5, V1=6, V2=7, 
    
 
 
-   call convert_to_MCFM(-MomExt(1:4,inTop), p_MCFM(1,1:4))
-   call convert_to_MCFM(-MomExt(1:4,inBot), p_MCFM(2,1:4))
-   call convert_to_MCFM(+MomExt(1:4,Lep1P), p_MCFM(3,1:4))! check f fbar assignment
-   call convert_to_MCFM(+MomExt(1:4,Lep1M), p_MCFM(4,1:4))
-   call convert_to_MCFM(+MomExt(1:4,Lep2P), p_MCFM(5,1:4))
-   call convert_to_MCFM(+MomExt(1:4,Lep2M), p_MCFM(6,1:4))
-   call convert_to_MCFM(+MomExt(1:4,outTop),p_MCFM(7,1:4))
-   call convert_to_MCFM(+MomExt(1:4,outBot),p_MCFM(8,1:4))
+   call convert_to_MCFM(-MomExt(1:4,inTop)*100d0, p_MCFM(1,1:4))
+   call convert_to_MCFM(-MomExt(1:4,inBot)*100d0, p_MCFM(2,1:4))
+   call convert_to_MCFM(+MomExt(1:4,Lep1P)*100d0, p_MCFM(3,1:4))! check f fbar assignment
+   call convert_to_MCFM(+MomExt(1:4,Lep1M)*100d0, p_MCFM(4,1:4))
+   call convert_to_MCFM(+MomExt(1:4,Lep2P)*100d0, p_MCFM(5,1:4))
+   call convert_to_MCFM(+MomExt(1:4,Lep2M)*100d0, p_MCFM(6,1:4))
+   call convert_to_MCFM(+MomExt(1:4,outTop)*100d0,p_MCFM(7,1:4))
+   call convert_to_MCFM(+MomExt(1:4,outBot)*100d0,p_MCFM(8,1:4))
    HZZcoupl(:) = 0d0
    HZZcoupl(1) = 0d0
    HWWcoupl(:) = HZZcoupl(:)

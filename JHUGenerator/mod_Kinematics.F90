@@ -921,7 +921,7 @@ MOTHUP(1:2,inRight)= (/0,0/);             ISTUP(inRight)= -1
 
 MOTHUP(1:2,Hbos)   = (/t,t/);             ISTUP(Hbos)   = +1
 MOTHUP(1:2,t)      = (/inLeft,inRight/);  ISTUP(t)      = +2
-MOTHUP(1:2,qout)   = (/inLeft,inRight/);  ISTUP(qout)   = +2
+MOTHUP(1:2,qout)   = (/inLeft,inRight/);  ISTUP(qout)   = +1
 
 MOTHUP(1:2,b)      = (/t,t/);             ISTUP(b)      = +1
 MOTHUP(1:2,W)      = (/t,t/);             ISTUP(W)      = +2
