@@ -53,9 +53,11 @@ integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9
       call Top_OffShellProjection(MomExt,MomOffShell,PSWgt3)  
       MomOffShell(1:4,1:3) = MomExt(1:4,1:3)            
 !       PSWgt = PSWgt * PSWgt3       ! not using the Jacobian because the mat.el. don't have BW-propagators
+      call Kinematics_TH(MomOffShell,applyPSCut,NBin)
+   ELSE
+      call Kinematics_TH(MomExt,applyPSCut,NBin)
    ENDIF
-
-   call Kinematics_TH(MomOffShell,applyPSCut,NBin)
+   
    if( applyPSCut ) then
       EvalWeighted_TH = 0d0
       return
@@ -148,18 +150,18 @@ EvalUnWeighted_TH = 0d0
           ICOLUP(1:2,Hbos) = (/000,000/)
           ICOLUP(1:2,t)    = (/501,000/)
           ICOLUP(1:2,qout) = (/502,000/)
-          MY_IDUP(b)    = Bot_;       ICOLUP(1:2,b)   = (/501,00/)
-          MY_IDUP(W)   = DK_IDUP(1);  ICOLUP(1:2,W)   = (/000,000/)
-          MY_IDUP(lep) = DK_IDUP(3);  ICOLUP(1:2,lep) = DK_ICOLUP(1:2,3)
-          MY_IDUP(nu)   = DK_IDUP(4); ICOLUP(1:2,nu)  = DK_ICOLUP(1:2,4)  
+          MY_IDUP(b)   = Bot_;       ICOLUP(1:2,b)   = (/501,00/)
+          MY_IDUP(W)   = DK_IDUP(1); ICOLUP(1:2,W)   = (/000,000/)
+          MY_IDUP(lep) = DK_IDUP(3); ICOLUP(1:2,lep) = DK_ICOLUP(1:2,3)
+          MY_IDUP(nu)  = DK_IDUP(4); ICOLUP(1:2,nu)  = DK_ICOLUP(1:2,4)  
       elseif( PROCESS.EQ.111 ) then
           ICOLUP(1:2,Hbos) = (/000,000/)
           ICOLUP(1:2,t)    = (/000,501/)
           ICOLUP(1:2,qout) = (/000,502/)
-          MY_IDUP(b) = ABot_;        ICOLUP(1:2,b)  = (/000,501/)
+          MY_IDUP(b)   = ABot_;      ICOLUP(1:2,b)  = (/000,501/)
           MY_IDUP(W)   = DK_IDUP(2); ICOLUP(1:2,W)  = (/000,000/)             
           MY_IDUP(lep) = DK_IDUP(6); ICOLUP(1:2,lep)= DK_ICOLUP(1:2,6)
-          MY_IDUP(nu)= DK_IDUP(5);   ICOLUP(1:2,nu) = DK_ICOLUP(1:2,5)  
+          MY_IDUP(nu)  = DK_IDUP(5); ICOLUP(1:2,nu) = DK_ICOLUP(1:2,5)  
       endif
    else
       MY_IDUP(6:9)=-9999
@@ -179,15 +181,19 @@ IF( GENEVT ) THEN
 
           IF( PROCESS.EQ.110 ) THEN
               call EvalAmp_QB_TH(MomExt,LO_Res_Unpol)
-              ICOLUP(1:2,inLeft) = (/502,000/)  !  correct for b q initial states, needs to be flipped for q b initial states
-              ICOLUP(1:2,inRight)= (/501,000/)
+              ICOLUP(1:2,inLeft) = ICOLUP(1:2,qout)
+              ICOLUP(1:2,inRight)= ICOLUP(1:2,t)                      
           ELSEIF( PROCESS.EQ.111 ) THEN
               call EvalAmp_QbarBbar_TH(MomExt,LO_Res_Unpol)
               ICOLUP(1:2,inLeft) = (/000,501/)
               ICOLUP(1:2,inRight)= (/000,502/)
           ENDIF
           MY_IDUP(1:5) = (/ LHA2M_pdf(iPartons(1)),LHA2M_pdf(iPartons(2)),Hig_,SU2flip(LHA2M_pdf(iPartons(2))),SU2flip(LHA2M_pdf(iPartons(1))) /)
+          if( iPartons(1).eq.5 ) then
+              call swapi( MY_IDUP(1),MY_IDUP(2) )
+          endif
 
+          
           PDFFac1 = pdf( LHA2M_pdf(iPartons(1)),1) * pdf( LHA2M_pdf(iPartons(2)),2)
           EvalUnWeighted_TH = LO_Res_Unpol(LHA2M_pdf(iPartons(1)),LHA2M_pdf(iPartons(2))) * PDFFac1 * PreFac 
       
