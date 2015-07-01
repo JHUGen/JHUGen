@@ -133,7 +133,7 @@ EvalUnWeighted_TH = 0d0
    call EvalPhaseSpace_2to3ArbMass(EHat,(/MH_Inv,M_Top,0d0/),yRnd(3:7),MomExt(1:4,1:5),PSWgt)!  inLeft, inRight, Higgs, Top, Quark
    call boost2Lab(eta1,eta2,5,MomExt(1:4,1:5))
 
-   if( TOPDECAYS.NE.0 ) then
+   IF( TOPDECAYS.NE.0 ) THEN
       call EvalPhasespace_TopDecay(MomExt(1:4,4),yRnd(8:11),MomExt(1:4,6:8),PSWgt2)
       MomExt(1:4,b)  = MomExt(1:4,6)
       MomExt(1:4,nu) = MomExt(1:4,8)
@@ -150,6 +150,8 @@ EvalUnWeighted_TH = 0d0
           ICOLUP(1:2,Hbos) = (/000,000/)
           ICOLUP(1:2,t)    = (/501,000/)
           ICOLUP(1:2,qout) = (/502,000/)
+          ICOLUP(1:2,inLeft) = ICOLUP(1:2,qout)
+          ICOLUP(1:2,inRight)= ICOLUP(1:2,t) 
           MY_IDUP(b)   = Bot_;       ICOLUP(1:2,b)   = (/501,00/)
           MY_IDUP(W)   = DK_IDUP(1); ICOLUP(1:2,W)   = (/000,000/)
           MY_IDUP(lep) = DK_IDUP(3); ICOLUP(1:2,lep) = DK_ICOLUP(1:2,3)
@@ -158,14 +160,33 @@ EvalUnWeighted_TH = 0d0
           ICOLUP(1:2,Hbos) = (/000,000/)
           ICOLUP(1:2,t)    = (/000,501/)
           ICOLUP(1:2,qout) = (/000,502/)
+          ICOLUP(1:2,inLeft) = ICOLUP(1:2,qout)
+          ICOLUP(1:2,inRight)= ICOLUP(1:2,t) 
           MY_IDUP(b)   = ABot_;      ICOLUP(1:2,b)  = (/000,501/)
           MY_IDUP(W)   = DK_IDUP(2); ICOLUP(1:2,W)  = (/000,000/)             
           MY_IDUP(lep) = DK_IDUP(6); ICOLUP(1:2,lep)= DK_ICOLUP(1:2,6)
           MY_IDUP(nu)  = DK_IDUP(5); ICOLUP(1:2,nu) = DK_ICOLUP(1:2,5)  
       endif
-   else
+
+   ELSE
+
+      MomOffShell(1:4,1:5) = MomExt(1:4,1:5)
+      if( PROCESS.EQ.110 ) then
+          ICOLUP(1:2,Hbos) = (/000,000/)
+          ICOLUP(1:2,t)    = (/501,000/)
+          ICOLUP(1:2,qout) = (/502,000/)
+          ICOLUP(1:2,inLeft) = ICOLUP(1:2,qout)
+          ICOLUP(1:2,inRight)= ICOLUP(1:2,t) 
+      elseif( PROCESS.EQ.111 ) then
+          ICOLUP(1:2,Hbos) = (/000,000/)
+          ICOLUP(1:2,t)    = (/000,501/)
+          ICOLUP(1:2,qout) = (/000,502/)
+          ICOLUP(1:2,inLeft) = ICOLUP(1:2,qout)
+          ICOLUP(1:2,inRight)= ICOLUP(1:2,t) 
+      endif
       MY_IDUP(6:9)=-9999
-   endif
+   ENDIF
+
    FluxFac = 1d0/(2d0*EHat**2)
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt
 
@@ -180,15 +201,11 @@ IF( GENEVT ) THEN
 
           IF( PROCESS.EQ.110 ) THEN
               call EvalAmp_QB_TH(MomExt,LO_Res_Unpol)
-              ICOLUP(1:2,inLeft) = ICOLUP(1:2,qout)
-              ICOLUP(1:2,inRight)= ICOLUP(1:2,t)
           ELSEIF( PROCESS.EQ.111 ) THEN
               call EvalAmp_QbarBbar_TH(MomExt,LO_Res_Unpol)
-              ICOLUP(1:2,inLeft) = ICOLUP(1:2,t)
-              ICOLUP(1:2,inRight)= ICOLUP(1:2,qout) 
           ENDIF
           MY_IDUP(1:5) = (/ LHA2M_pdf(iPartons(1)),LHA2M_pdf(iPartons(2)),Hig_,SU2flip(LHA2M_pdf(iPartons(2))),SU2flip(LHA2M_pdf(iPartons(1))) /)
-          if( iPartons(1).eq.5 ) then
+          if( abs(iPartons(1)).eq.5 ) then
               call swapi( MY_IDUP(4),MY_IDUP(5) )
               call swapi( ICOLUP(1,inLeft),ICOLUP(1,inRight) )
               call swapi( ICOLUP(2,inLeft),ICOLUP(2,inRight) )
