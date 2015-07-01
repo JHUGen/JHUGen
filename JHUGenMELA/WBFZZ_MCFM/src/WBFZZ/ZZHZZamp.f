@@ -103,21 +103,21 @@ C---setup propagators
 C---s-channel
       ZZHamp(jdu1,jdu2,h17,h28,h34,h56)=
      & +fac*ZZ3456(h34,h56)*ZZ1728(jdu1,jdu2,h17,h28)
-     & *za(i7,i8)*zb(i2,i1)*za(i3,i5)*zb(i6,i4) !--F
-!      & *anomzzamp(i3,i4,i5,i6,s3456,s(i3,i4),s(i5,i6),za,zb) !--F
-!      & *anomzzamp(i7,i1,i8,i2,s3456,s(i7,i1),s(i8,i2),za,zb) !--F
+!      & *za(i7,i8)*zb(i2,i1)*za(i3,i5)*zb(i6,i4) !--F
+     & *anomzzamp(i3,i4,i5,i6,s3456,s(i3,i4),s(i5,i6),za,zb) !--F
+     & *anomzzamp(i7,i1,i8,i2,s3456,s(i7,i1),s(i8,i2),za,zb) !--F
      & /(propWBF*prop3456)
 C---t-channel
      & +fac*ZZ1734(jdu1,h17,h34)*ZZ2856(jdu2,h28,h56)
-     & *za(i7,i3)*zb(i4,i1)*za(i8,i5)*zb(i6,i2) !--F
-!      & *anomzzamp(i3,i4,i7,i1,s1734,s(i3,i4),s(i7,i1),za,zb) !--F
-!      & *anomzzamp(i5,i6,i8,i2,s1734,s(i5,i6),s(i8,i2),za,zb) !--F
+!      & *za(i7,i3)*zb(i4,i1)*za(i8,i5)*zb(i6,i2) !--F
+     & *anomzzamp(i3,i4,i7,i1,s1734,s(i3,i4),s(i7,i1),za,zb) !--F
+     & *anomzzamp(i5,i6,i8,i2,s1734,s(i5,i6),s(i8,i2),za,zb) !--F
      & /(propWBF*prop1734)
 C---u-channel
      & +fac*ZZ2856(jdu1,h17,h56)*ZZ1734(jdu2,h28,h34)
-     & *za(i7,i5)*zb(i6,i1)*za(i8,i3)*zb(i4,i2) !--F
-!      & *anomzzamp(i5,i6,i7,i1,s1756,s(i5,i6),s(i7,i1),za,zb) !--F
-!      & *anomzzamp(i3,i4,i8,i2,s1756,s(i3,i4),s(i8,i2),za,zb) !--F
+!      & *za(i7,i5)*zb(i6,i1)*za(i8,i3)*zb(i4,i2) !--F
+     & *anomzzamp(i5,i6,i7,i1,s1756,s(i5,i6),s(i7,i1),za,zb) !--F
+     & *anomzzamp(i3,i4,i8,i2,s1756,s(i3,i4),s(i8,i2),za,zb) !--F
      & /(propWBF*prop1756)
       enddo
       enddo

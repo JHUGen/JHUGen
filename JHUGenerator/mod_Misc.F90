@@ -734,20 +734,20 @@ subroutine spinoru(N,p,za,zb,s)
       real(8), optional :: pout(1:4)
 
       if( present(pout) ) then
-          pout(1)=p(2)  *100d0
-          pout(2)=p(3)  *100d0
-          pout(3)=p(4)  *100d0
-          pout(4)=p(1)  *100d0  
+          pout(1)=p(2)  
+          pout(2)=p(3)  
+          pout(3)=p(4) 
+          pout(4)=p(1)  
       else
           tmp(1)=p(1)
           tmp(2)=p(2)
           tmp(3)=p(3)
           tmp(4)=p(4)
 
-          p(1)=tmp(2)  *100d0
-          p(2)=tmp(3)  *100d0
-          p(3)=tmp(4)  *100d0
-          p(4)=tmp(1)  *100d0
+          p(1)=tmp(2)  
+          p(2)=tmp(3) 
+          p(3)=tmp(4)  
+          p(4)=tmp(1)  
       endif  
       
     end subroutine convert_to_MCFM
