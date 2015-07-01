@@ -38,7 +38,7 @@ integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9
     ! use different flattened momenta for top decays
       IF (TOPDECAYS .NE. 0) THEN 
          MomExtFlatDK(1:7,1:4)=MomExtFlat(1:7,1:4)
-         ! overwrite flattened top momenta         
+!          ! overwrite flattened top momenta         
          MomExtFlatDK(5,1:4)=m_Top**2*MomExt(1:4,lep)/2d0/p4Dp7
          MomExtFlatDK(6,1:4)=MomExt(1:4,t)-MomExtFlatDK(5,1:4)
          ! top decay products 
@@ -46,7 +46,7 @@ integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9
          MomExtFlatDK(9,1:4)=MomExt(1:4,lep)
          MomExtFlatDK(10,1:4)=MomExt(1:4,nu)
       ENDIF
-      
+
 
 ! Get spinor products
       za=0d0

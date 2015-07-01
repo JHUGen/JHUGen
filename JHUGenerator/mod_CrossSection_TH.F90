@@ -44,7 +44,7 @@ integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9
    
    IF( TOPDECAYS.NE.0 ) THEN
       call EvalPhasespace_TopDecay(MomExt(1:4,4),yRnd(8:11),MomExt(1:4,6:8),PSWgt2)
-      MomExt(1:4,b)  = MomExt(1:4,6)
+!       MomExt(1:4,b)  = MomExt(1:4,6)
       MomExt(1:4,nu) = MomExt(1:4,8)
       MomExt(1:4,lep)= MomExt(1:4,7)
       MomExt(1:4,W)  = MomExt(1:4,lep) + MomExt(1:4,nu)
@@ -178,19 +178,20 @@ EvalUnWeighted_TH = 0d0
 
 IF( GENEVT ) THEN   
 
-
           IF( PROCESS.EQ.110 ) THEN
               call EvalAmp_QB_TH(MomExt,LO_Res_Unpol)
               ICOLUP(1:2,inLeft) = ICOLUP(1:2,qout)
-              ICOLUP(1:2,inRight)= ICOLUP(1:2,t)                      
+              ICOLUP(1:2,inRight)= ICOLUP(1:2,t)
           ELSEIF( PROCESS.EQ.111 ) THEN
               call EvalAmp_QbarBbar_TH(MomExt,LO_Res_Unpol)
-              ICOLUP(1:2,inLeft) = (/000,501/)
-              ICOLUP(1:2,inRight)= (/000,502/)
+              ICOLUP(1:2,inLeft) = ICOLUP(1:2,t)
+              ICOLUP(1:2,inRight)= ICOLUP(1:2,qout) 
           ENDIF
           MY_IDUP(1:5) = (/ LHA2M_pdf(iPartons(1)),LHA2M_pdf(iPartons(2)),Hig_,SU2flip(LHA2M_pdf(iPartons(2))),SU2flip(LHA2M_pdf(iPartons(1))) /)
           if( iPartons(1).eq.5 ) then
-              call swapi( MY_IDUP(1),MY_IDUP(2) )
+              call swapi( MY_IDUP(4),MY_IDUP(5) )
+              call swapi( ICOLUP(1,inLeft),ICOLUP(1,inRight) )
+              call swapi( ICOLUP(2,inLeft),ICOLUP(2,inRight) )
           endif
 
           
