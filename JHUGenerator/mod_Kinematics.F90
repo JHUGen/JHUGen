@@ -3910,9 +3910,9 @@ real(8),parameter :: NPr=3, PiWgtPr = (2d0*Pi)**(4-NPr*3) * (4d0*Pi)**(NPr-1)
   if( present(Width) ) then
       call random_number(xRndWidth)
       
-      call SmearExternal(xRndWidth(1),Mass(1),Width(1),Mass(1)/4d0,Mass(1)*4d0,BW_Mass(1),BW_Jacobi(1))
-      call SmearExternal(xRndWidth(2),Mass(2),Width(2),Mass(2)/4d0,Mass(2)*4d0,BW_Mass(2),BW_Jacobi(2))
-      call SmearExternal(xRndWidth(3),Mass(3),Width(3),Mass(3)/4d0,Mass(3)*4d0,BW_Mass(3),BW_Jacobi(3))
+      call SmearExternal(xRndWidth(1),Mass(1),Width(1),Mass(1)-6d0*Width(1),Mass(1)+6d0*Width(1),BW_Mass(1),BW_Jacobi(1))
+      call SmearExternal(xRndWidth(2),Mass(2),Width(2),Mass(2)-6d0*Width(2),Mass(2)+6d0*Width(2),BW_Mass(2),BW_Jacobi(2))
+      call SmearExternal(xRndWidth(3),Mass(3),Width(3),Mass(3)-6d0*Width(3),Mass(3)+6d0*Width(3),BW_Mass(3),BW_Jacobi(3))
       
       call genps(3,Ehat,xRndPS(1:5),BW_Mass,Mom(1:4,3:5),PSWgt)
       PSWgt = PSWgt*PiWgtPr                             &
@@ -3990,10 +3990,10 @@ integer, parameter :: inLeft=1,inRight=2,Hbos=3,tbar=4,t=5,  bbar=6,Wm=7,lepM=8,
 
     call random_number(xRndWidth)
       
-    call SmearExternal(xRndWidth(2),m_top,Ga_Top,m_top-4*Ga_Top,m_top+4*Ga_Top,BW_Mass(2),BW_Jacobi(2))
-    call SmearExternal(xRndWidth(3),m_top,Ga_Top,m_top-4*Ga_Top,m_top+4*Ga_Top,BW_Mass(3),BW_Jacobi(3))
-    call SmearExternal(xRndWidth(4),m_W,Ga_W,m_W-4d0*Ga_W,m_W+4d0*Ga_W,BW_Mass(4),BW_Jacobi(4))
-    call SmearExternal(xRndWidth(5),m_W,Ga_W,m_W-4d0*Ga_W,m_W+4d0*Ga_W,BW_Mass(5),BW_Jacobi(5))
+    call SmearExternal(xRndWidth(2),m_top,Ga_Top,m_top-6d0*Ga_Top,m_top+6d0*Ga_Top,BW_Mass(2),BW_Jacobi(2))
+    call SmearExternal(xRndWidth(3),m_top,Ga_Top,m_top-6d0*Ga_Top,m_top+6d0*Ga_Top,BW_Mass(3),BW_Jacobi(3))
+    call SmearExternal(xRndWidth(4),m_W,Ga_W,m_W-6d0*Ga_W,m_W+6d0*Ga_W,BW_Mass(4),BW_Jacobi(4))
+    call SmearExternal(xRndWidth(5),m_W,Ga_W,m_W-6d0*Ga_W,m_W+6d0*Ga_W,BW_Mass(5),BW_Jacobi(5))
     Jacobian = BW_Jacobi(2) * BW_Jacobi(3) * BW_Jacobi(4) * BW_Jacobi(5)    
 
 ! print *, "smeared mt",(BW_Mass(2:3)-m_top)*100d0
@@ -4032,8 +4032,8 @@ integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9
 
     call random_number(xRndWidth)
     
-    call SmearExternal(xRndWidth(1),m_top,Ga_Top,m_top-4*Ga_Top,m_top+4*Ga_Top,BW_Mass(1),BW_Jacobi(1))
-    call SmearExternal(xRndWidth(2),m_W,Ga_W,m_W-4d0*Ga_W,m_W+4d0*Ga_W,BW_Mass(2),BW_Jacobi(2))
+    call SmearExternal(xRndWidth(1),m_top,Ga_Top,m_top-6*Ga_Top,m_top+6*Ga_Top,BW_Mass(1),BW_Jacobi(1))
+    call SmearExternal(xRndWidth(2),m_W,Ga_W,m_W-6d0*Ga_W,m_W+6d0*Ga_W,BW_Mass(2),BW_Jacobi(2))
     Jacobian = BW_Jacobi(1) * BW_Jacobi(2)
 
 ! print *, "smeared mt",BW_Mass(1)
