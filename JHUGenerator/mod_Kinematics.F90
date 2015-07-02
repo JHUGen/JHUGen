@@ -2065,6 +2065,7 @@ applyPSCut = .false.
  !     binning
        NBin(1)  = WhichBin(1,m_jj)
        NBin(2)  = WhichBin(2,dphi_jj)
+       NBin(3:5) = 1
 
 RETURN
 END SUBROUTINE
