@@ -61,7 +61,7 @@ C---setup propagators
       prop28=dcmplx(s(n2,n8))-czmass2
       prop34=dcmplx(s(n3,n4))-czmass2
       prop56=dcmplx(s(n5,n6))-czmass2
-      prop3456=dcmplx(s3456-hmass**2,htheta(s3456)*hmass*hwidth)
+      prop3456=dcmplx(s3456-hmass**2,htheta(s3456)*hmass*hwidth)    
       prop1734=dcmplx(s1734-hmass**2,htheta(s1734)*hmass*hwidth)
       prop1756=dcmplx(s1756-hmass**2,htheta(s1756)*hmass*hwidth)
       propWBF=prop17*prop28*prop34*prop56
@@ -100,24 +100,29 @@ C---setup propagators
          endif
       do jdu1=1,2
       do jdu2=1,2
+      
+! ! !      & za(p1,p2)*zb(p7,p8)*MH2*cPRRR - za(p1,p8)*zb(p2,p7)*MH2*cPRRL - &
+! ! !      & za(p2,p7)*zb(p1,p8)*MH2*cPRLR + za(p7,p8)*zb(p1,p2)*MH2*cPRLL
+      
+      
 C---s-channel
       ZZHamp(jdu1,jdu2,h17,h28,h34,h56)=
      & +fac*ZZ3456(h34,h56)*ZZ1728(jdu1,jdu2,h17,h28)
-!      & *za(i7,i8)*zb(i2,i1)*za(i3,i5)*zb(i6,i4) !--F
-     & *anomzzamp(i3,i4,i5,i6,s3456,s(i3,i4),s(i5,i6),za,zb) !--F
-     & *anomzzamp(i7,i1,i8,i2,s3456,s(i7,i1),s(i8,i2),za,zb) !--F
+     & *za(i7,i8)*zb(i2,i1)*za(i3,i5)*zb(i6,i4) !--F
+!      & *anomzzamp(i3,i4,i5,i6,s3456,s(i3,i4),s(i5,i6),za,zb) !--F               =DK
+!      & *anomzzamp(i7,i1,i8,i2,s3456,s(i7,i1),s(i8,i2),za,zb) !--F               =PR(3,4,5,6) =    za(i3,i5)*zb(i6,i4)
      & /(propWBF*prop3456)
 C---t-channel
      & +fac*ZZ1734(jdu1,h17,h34)*ZZ2856(jdu2,h28,h56)
-!      & *za(i7,i3)*zb(i4,i1)*za(i8,i5)*zb(i6,i2) !--F
-     & *anomzzamp(i3,i4,i7,i1,s1734,s(i3,i4),s(i7,i1),za,zb) !--F
-     & *anomzzamp(i5,i6,i8,i2,s1734,s(i5,i6),s(i8,i2),za,zb) !--F
+     & *za(i7,i3)*zb(i4,i1)*za(i8,i5)*zb(i6,i2) !--F
+!      & *anomzzamp(i3,i4,i7,i1,s1734,s(i3,i4),s(i7,i1),za,zb) !--F
+!      & *anomzzamp(i5,i6,i8,i2,s1734,s(i5,i6),s(i8,i2),za,zb) !--F
      & /(propWBF*prop1734)
 C---u-channel
      & +fac*ZZ2856(jdu1,h17,h56)*ZZ1734(jdu2,h28,h34)
-!      & *za(i7,i5)*zb(i6,i1)*za(i8,i3)*zb(i4,i2) !--F
-     & *anomzzamp(i5,i6,i7,i1,s1756,s(i5,i6),s(i7,i1),za,zb) !--F
-     & *anomzzamp(i3,i4,i8,i2,s1756,s(i3,i4),s(i8,i2),za,zb) !--F
+     & *za(i7,i5)*zb(i6,i1)*za(i8,i3)*zb(i4,i2) !--F
+!      & *anomzzamp(i5,i6,i7,i1,s1756,s(i5,i6),s(i7,i1),za,zb) !--F
+!      & *anomzzamp(i3,i4,i8,i2,s1756,s(i3,i4),s(i8,i2),za,zb) !--F
      & /(propWBF*prop1756)
       enddo
       enddo

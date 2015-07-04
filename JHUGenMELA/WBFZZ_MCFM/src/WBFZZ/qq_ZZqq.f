@@ -86,7 +86,7 @@ c     ,j3_4(4,2),j5_6(4,2),
       data Q(+5)/-0.333333333333333d0/
       data tau/1d0,-1d0,1d0,-1d0,1d0,0d0,-1d0,1d0,-1d0,1d0,-1d0/
       data mt,twidth/173.2d0,2.5d0/
-      data hmass,hwidth/250d0,0.00415d0/
+      data hmass,hwidth/125d0,0.00415d0/
       data wmass,wwidth/80.399d0,2.085d0/
       data zmass,zwidth/91.1876d0,2.4952d0/
       data Gf,vevsq/1.16639d-5,246d0/
@@ -288,7 +288,7 @@ c       cxw=dcmplx(xw,0d0) ! DEBUG: Madgraph comparison
        doHO=.false.
        doBO=.false.
 !        runstring(4:5)="what-nonsense-this-is"
-       runstring(4:5)="HO"
+       runstring(4:5)="XX"
        if     (runstring(4:5) .eq. 'HO') then
          doHO=.true.
        write(6,*) '>>>>>>>>>>>>>> Higgs contribution only <<<<<<<<<<<<<'
@@ -307,9 +307,6 @@ c--- rescaling factor for Higgs amplitudes, if anomalous Higgs width
        first=.false.
        call flush(6)
       endif! first
-
-
-
 
       if (doHO) then
         Hbit=mult*cone
@@ -382,7 +379,10 @@ C-----Singly resonant production in VBF style diagrams
      
       endif
       
-      
+      ZZHamp71_82 = czip
+      ZZHamp81_72 = czip
+      WWZZ71_82amp= czip
+      WWZZ81_72amp= czip
       
 ! C----ZZ->ZZ scattering with the exchange of a H
       call ZZHZZamp(j1(j),j2(j),3,4,5,6,j7(j),j8(j),
