@@ -37,9 +37,7 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, Higgs=5, V1=6, V2=7, 
 
        BWJacobi = 1d0
 !      call SmearExternal(yRnd(17),M_Reso,Ga_Reso,M_Reso/4d0,M_Reso*4d0,MInvH,BWJacobi)
-       
-
-   
+         
    if (EHat.lt.MInvH) return
    call EvalPhaseSpace_VBF(EHat,MInvH,yRnd(3:7),MomExt(1:4,1:5),PSWgt)
    call boost2Lab(eta1,eta2,5,MomExt(1:4,1:5))
@@ -100,7 +98,7 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, Higgs=5, V1=6, V2=7, 
     
     call EvalPhasespace_VDecay(MomExt(1:4,6),MInvZ1,ML1,ML2,yRnd(10:11),MomExt(1:4,8:9),PSWgt2)
     call EvalPhasespace_VDecay(MomExt(1:4,7),MInvZ2,ML3,ML4,yRnd(12:13),MomExt(1:4,10:11),PSWgt3)
-    PSWgt = PSWgt * PSWgt1*PSWgt2*PSWgt3 * BWJacobi
+    PSWgt = PSWgt * PSWgt1   *PSWgt2*PSWgt3 * BWJacobi
 
 !      if( (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then! introduce this momentum flip to allow proper mapping of integrand with Z-poles at MInvZ2=(p2+p3)^2 and MInvZ2=(p1+p4)^2
 !          if( yrnd(16).gt.0.5d0 ) call swapmom( MomExt(1:4,8),MomExt(1:4,10) )
@@ -146,7 +144,9 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, Higgs=5, V1=6, V2=7, 
 !    print *, p_MCFM(8,4)**2-p_MCFM(8,1)**2-p_MCFM(8,2)**2-p_MCFM(8,3)**2
 !    pause
 
-!   call qq_ZZqq(p_MCFM,msq_MCFM,HZZcoupl,HWWcoupl,Lambda,Lambda_Q,Lambda_z1)!  q(-p1)+q(-p2)->Z(p3,p4)+Z(p5,p6)+q(p7)+q(p8)
+
+  msq_MCFM(:,:) = 0d0
+  call qq_ZZqq(p_MCFM,msq_MCFM,HZZcoupl,HWWcoupl,Lambda,Lambda_Q,Lambda_z1)!  q(-p1)+q(-p2)->Z(p3,p4)+Z(p5,p6)+q(p7)+q(p8)
    
    LO_Res_Unpol = 0d0
    do i = -5,5
@@ -247,6 +247,7 @@ END FUNCTION
 
    if (process.eq.60) then
       call EvalAmp_WBFH_UnSymm_SA(MomExt,(/ghz1,ghz2,ghz3,ghz4/),(/ghw1,ghw2,ghw3,ghw4/),me2)
+      
       MY_IDUP(1:5)  = (/Up_,Up_,Up_,Up_,Hig_/)
       ICOLUP(1:2,1) = (/501,000/)
       ICOLUP(1:2,2) = (/502,000/)
@@ -360,6 +361,7 @@ IF( GENEVT ) THEN
 !       enddo
 !    enddo
 ! 1313 continue
+
 
 
    if( Process.eq.60 ) then
