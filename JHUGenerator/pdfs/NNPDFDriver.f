@@ -1,20 +1,20 @@
-***
-*
-* NNPDF Fortran Driver
-*
-* Stefano Carrazza for the NNPDF Collaboration
-* email: stefano.carrazza@mi.infn.it
-*
-* February 2013
-*
-* Usage:
-*
-*  NNPDFDriver("gridname.LHgrid");
-*
-*  NNinitPDF(0); // select replica [0,Mem]
-*
-*  NNevolvePDF(x,Q,pdf); // -> returns double array (-6,7)
-*     
+!!!
+!
+! NNPDF Fortran Driver
+!
+! Stefano Carrazza for the NNPDF Collaboration
+! email: stefano.carrazza@mi.infn.it
+!
+! February 2013
+!
+! Usage:
+!
+!  NNPDFDriver("gridname.LHgrid");
+!
+!  NNinitPDF(0); // select replica [0,Mem]
+!
+!  NNevolvePDF(x,Q,pdf); // -> returns double array (-6,7)
+!     
       subroutine NNPDFDriver(gridfilename)
       implicit none
       
@@ -25,18 +25,18 @@
       double precision pdfgrid(0:100,14,100,50)
       logical hasphoton
       common /nnpdf/nfl,nx,nq2,mem,rep,hasphoton,alphas,xgrid,logxgrid,
-     1     q2grid,logq2grid,pdfgrid
+     &     q2grid,logq2grid,pdfgrid
 
       character*100 gridfilename
-*
+
       nfl = 13
       nx = 100
       nq2 = 50
       mem = 1
       rep = 0
       alphas = 0
-*
-*     Logo
+
+!     Logo
       write(6,*) " ****************************************"
       write(6,*) ""
       write(6,*) "      NNPDFDriver version 1.0.3"
@@ -58,7 +58,7 @@
       double precision pdfgrid(0:100,14,100,50)
       logical hasphoton
       common /nnpdf/nfl,nx,nq2,mem,rep,hasphoton,alphas,xgrid,logxgrid,
-     1     q2grid,logq2grid,pdfgrid
+     &     q2grid,logq2grid,pdfgrid
 
       if (irep.gt.mem.or.irep.lt.0d0) then
          write(6,*) "Error: replica out of range [0,",mem,"]"
@@ -74,7 +74,7 @@
       integer i,ix,iq,fl,imem
       character*100 gridfilename
       character*100 line
-*
+
       integer nfl,nx,nq2,mem,rep
       double precision alphas
       double precision xgrid(100),logxgrid(100)
@@ -82,11 +82,11 @@
       double precision pdfgrid(0:100,14,100,50)
       logical hasphoton
       common /nnpdf/nfl,nx,nq2,mem,rep,hasphoton,alphas,xgrid,logxgrid,
-     1     q2grid,logq2grid,pdfgrid
-*
+     &     q2grid,logq2grid,pdfgrid
+
       open (20, FILE=gridfilename, STATUS='OLD')
       
-*     Read header
+!     Read header
       do i=1,1000
          read(20,*) line
          if (line(1:14).eq.'Parameterlist:') then
@@ -95,7 +95,7 @@
          endif
       enddo
 
-*     Select driver
+!     Select driver
       do i=1,1000
          read(20,*) line
          if (line(1:13).eq.'NNPDF20intqed') then
@@ -110,20 +110,20 @@
             exit
          endif
       enddo
-*
+
       read(20,*) nx
       do ix=1,nx
          read(20,*) xgrid(ix)
          logxgrid(ix) = dlog(xgrid(ix))
       enddo
-*
+
       read(20,*) nq2
       read(20,*) line
       do iq=1,nq2
          read(20,*) q2grid(iq)
          logq2grid(iq) = dlog(q2grid(iq))
       enddo
-*            
+
       read(20,*) line      
       do imem=0,mem
          do ix=1,nx
@@ -161,11 +161,11 @@
       double precision pdfgrid(0:100,14,100,50)
       logical hasphoton
       common /nnpdf/nfl,nx,nq2,mem,rep,hasphoton,alphas,xgrid,logxgrid,
-     1     q2grid,logq2grid,pdfgrid
+     &     q2grid,logq2grid,pdfgrid
       
 
       Q2 = Q*Q
-*     check bounds
+!     check bounds
       if (x.lt.xmingrid.or.x.lt.xgrid(1).or.x.gt.xgrid(nx)) then
          write(6,*) "Parton interpolation: x out of range -- freezed"
          if (x.lt.xgrid(1)) x = xgrid(1)
@@ -202,13 +202,13 @@
       if ((maxq-minq).gt.1) go to 20
       iq2 = minq
 
-*     Assign grid for interpolation. M, N -> order of polyN interpolation      
+!     Assign grid for interpolation. M, N -> order of polyN interpolation      
       do I=1,M
          if(IX.ge.M/2.and.IX.le.(NX-M/2)) IX1A(I) = IX - M/2 + I
          if(IX.lt.M/2) IX1A(I) = I
          if(IX.gt.(NX-M/2)) IX1A(I) = (NX - M) + I
          
-*     Check grids
+!     Check grids
          if(IX1A(I).le.0.or.IX1A(I).gt.NX) then
             write(6,*) "Error in grids! "
             write(6,*) "I, IXIA(I) = ",I, IX1A(I)
@@ -220,7 +220,7 @@
          if(IQ2.ge.N/2.and.IQ2.le.(NQ2-N/2)) IX2A(J) = IQ2 - N/2 + J
          if(IQ2.lt.N/2) IX2A(J) = J
          if(IQ2.gt.(NQ2-N/2)) IX2A(J) = (NQ2 - N) + J
-*     Check grids
+!     Check grids
          if(IX2A(J).le.0.or.IX2A(J).gt.NQ2) then
             write(6,*) "Error in grids! "
             write(6,*) "J, IXIA(J) = ",J,IX2A(J)
@@ -228,8 +228,8 @@
          endif
       enddo
             
-*     Define points where to evaluate interpolation
-*     Choose between linear or logarithmic (x,Q2) interpolation
+!     Define points where to evaluate interpolation
+!     Choose between linear or logarithmic (x,Q2) interpolation
 
       IF(X.LT.XCH)THEN
          X1=dlog(X)          
@@ -238,7 +238,7 @@
       ENDIF
       X2=dlog(Q2)
 
-*     initialize output vector
+!     initialize output vector
       do i=-6,7 
          xpdf(i) = 0
       enddo
@@ -247,7 +247,7 @@
       if (nfl.eq.14) fmax=7
 
       DO IPDF = -6,fmax,1                 
-*     Choose between linear or logarithmic (x,Q2) interpolation        
+!     Choose between linear or logarithmic (x,Q2) interpolation        
          DO I=1,M
             IF(X.LT.XCH)THEN
                X1A(I)= logxgrid(IX1A(I))
@@ -269,7 +269,7 @@
 
       subroutine lh_polin2(x1a,x2a,ya,m,n,x1,x2,y,dy) 
       implicit none 
-!                                                                       
+
       integer m,n,nmax,mmax 
       integer j,k 
       parameter(nmax=1e3,mmax=1e3) 
@@ -284,13 +284,13 @@
          call lh_polint(x2a,yntmp,n,x2,ymtmp(j),dy) 
       enddo 
       call lh_polint(x1a,ymtmp,m,x1,y,dy) 
-!                                                                       
+
       return 
       END                                           
 
       subroutine lh_polint(xa,ya,n,x,y,dy) 
       implicit none 
-!                                                                       
+
       integer n,NMAX 
 !     Largest anticipated value of n                                    
       parameter(nmax=1e3) 
