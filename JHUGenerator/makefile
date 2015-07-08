@@ -9,7 +9,7 @@ VegasDir = $(Here)/vegas
 
 # compiler options, Comp='ifort' or 'gfort'
 Opt  = Yes
-Comp = gfort
+Comp = ifort
 
 # link pdfs via LHA library ('Yes' or 'No')
 UseLHAPDF=No
@@ -26,7 +26,7 @@ ifeq ($(Comp),gfort)
  ifeq ($(Opt),Yes)
     OptOpts  = -O3
  else
-    OptOpts  = -O0
+    OptOpts  = -O0 -fcheck=all
  endif
  ifeq ($(UseLHAPDF),Yes)
     LHAPDFflags = -L$(MyLHADir) -lLHAPDF -DuseLHAPDF=1

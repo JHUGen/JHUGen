@@ -1740,6 +1740,80 @@ END FUNCTION
 
 
 
+ FUNCTION EvalWeighted_tautau(yRnd,VgsWgt)
+ use ModKinematics 
+ use ModParameters
+ use ModGraviton
+ use ModHiggs
+ use ModZprime
+ use ModMisc
+#if compiler==1
+ use ifport
+#endif
+ implicit none
+ real(8) :: EvalWeighted_tautau,LO_Res_Unpol,yRnd(1:22),VgsWgt
+ real(8) :: eta1,eta2,tau,x1,x2,sHatJacobi,PreFac,FluxFac,PDFFac,PDFFac1,PDFFac2
+ real(8) :: pdf(-6:6,1:2)
+ integer :: NBin(1:NumHistograms),NHisto,i,MY_IDUP(1:9), ICOLUP(1:2,1:9)
+ real(8) :: EHat,PSWgt,PSWgt2,PSWgt3
+ logical :: applyPSCut
+ real(8) :: pHiggs(1:4),Mom(1:4,1:12)
+
+
+ 
+    EvalWeighted_tautau = 0d0
+    if( OffShellReson ) then
+      call PDFMapping(10,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
+    else
+!       call PDFMapping(11,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
+      call PDFMapping(12,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
+    endif
+    EvalCounter = EvalCounter+1
+  
+    MY_IDUP(1:2) = (/ElP_,MuM_/)
+    pHiggs(2:4) = (/110d0, -60d0,95d0  /)
+    pHiggs(1) = dsqrt( M_Reso**2 + pHiggs(2)**2+ pHiggs(3)**2+ pHiggs(4)**2 )
+    call EvalPhasespace_tautau(yRnd(1:12),pHiggs,MY_IDUP,Mom,PSWgt)
+
+    
+    call Kinematics_Htautau(Mom,applyPSCut,NBin)
+    if( applyPSCut ) then
+      EvalWeighted_tautau = 0d0
+      return
+    endif
+
+    
+   call setPDFs(eta1,eta2,Mu_Fact,pdf)
+   FluxFac = 1d0/(2d0*EHat**2)
+
+   PDFFac = pdf(0,1) * pdf(0,2)
+
+!       call matrix element here
+      LO_Res_Unpol = 1d0
+      
+      
+      LO_Res_Unpol = LO_Res_Unpol * SpinAvg * GluonColAvg**2
+      PreFac = 2d0 * fbGeV2 * FluxFac * sHatJacobi * PSWgt * PDFFac * SymmFac
+      if( abs(MY_IDUP(6)).ge.1 .and. abs(MY_IDUP(6)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
+      if( abs(MY_IDUP(8)).ge.1 .and. abs(MY_IDUP(8)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
+      EvalWeighted_tautau = LO_Res_Unpol * PreFac
+
+
+      do NHisto=1,NumHistograms
+          call intoHisto(NHisto,NBin(NHisto),EvalWeighted_tautau*VgsWgt)
+      enddo
+
+      
+
+RETURN
+END FUNCTION
+
+
+
+
+
+
+
 
 
 FUNCTION EvalUnWeighted(yRnd,genEvt,RES)
@@ -2752,7 +2826,7 @@ END FUNCTION
 
 
 
-FUNCTION EvalUnWeighted_withoutProduction(yRnd,genEvt,Ehat,Res,AcceptedEvent,MY_IDUP,ICOLUP)
+FUNCTION EvalUnWeighted_DecayToVV(yRnd,genEvt,Ehat,Res,AcceptedEvent,MY_IDUP,ICOLUP)
 use ModKinematics
 use ModParameters
 use ModHiggs
@@ -2764,7 +2838,7 @@ use ifport
 #endif
 implicit none
 real(8) :: Res!  .ne.0: accepted event,  .eq.0: reject event,   .eq.-1: reject event and exit the loop over 'tries'
-real(8) :: EvalUnWeighted_withoutProduction,LO_Res_Unpol,yRnd(1:22),VgsWgt,LO_Res_Unpol1,LO_Res_Unpol2
+real(8) :: EvalUnWeighted_DecayToVV,LO_Res_Unpol,yRnd(1:22),VgsWgt,LO_Res_Unpol1,LO_Res_Unpol2
 real(8) :: tau,x1,x2,sHatJacobi,PreFac
 integer :: NBin(1:NumHistograms),NHisto,i
 real(8) :: EHat,PSWgt,PSWgt2,PSWgt3
@@ -2781,7 +2855,7 @@ include 'csmaxvalue.f'
 
    oneovervolume = one
    ICOLUP(1:2,1:9) = 0
-   EvalUnWeighted_withoutProduction = 0d0
+   EvalUnWeighted_DecayToVV = 0d0
    Res = 0d0
    EvalCounter = EvalCounter+1
 
@@ -2904,7 +2978,7 @@ include 'csmaxvalue.f'
 
 
     if( MZ1+MZ2.gt.EHat ) then
-      EvalUnWeighted_withoutProduction = 0d0
+      EvalUnWeighted_DecayToVV = 0d0
       RejeCounter = RejeCounter + 1
       return
     endif
@@ -2919,7 +2993,7 @@ include 'csmaxvalue.f'
       ML3 = getMass(MY_IDUP(9))
       ML4 = getMass(MY_IDUP(8))
       if( (MZ1.lt.ML1+ML2) .or. (MZ2.lt.ML3+ML4) ) then
-          EvalUnWeighted_withoutProduction = 0d0
+          EvalUnWeighted_DecayToVV = 0d0
           RejeCounter = RejeCounter + 1
           return
       endif
@@ -2942,7 +3016,7 @@ include 'csmaxvalue.f'
         ML2 = getMass(MY_IDUP(6))
         ML3=0d0; ML4=0d0
         if( (MZ1.lt.ML1+ML2) ) then
-            EvalUnWeighted_withoutProduction = 0d0
+            EvalUnWeighted_DecayToVV = 0d0
             return
         endif
         call EvalPhasespace_VDecay(MomExt(1:4,3),MZ1,ML1,ML2,yRnd(5:6),MomDK(1:4,1:2),PSWgt2)
@@ -2959,7 +3033,7 @@ include 'csmaxvalue.f'
         call Kinematics(4,MomExt_f,MomDK_f,applyPSCut,NBin)
     endif
     if( applyPSCut ) then
-      EvalUnWeighted_withoutProduction = 0d0
+      EvalUnWeighted_DecayToVV = 0d0
       return
     endif
 
@@ -2988,17 +3062,17 @@ IF( GENEVT ) THEN
       PreFac = 2d0 * fbGeV2 * sHatJacobi * PSWgt * SymmFac
 !       if( abs(MY_IDUP(6)).ge.1 .and. abs(MY_IDUP(6)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
 !       if( abs(MY_IDUP(8)).ge.1 .and. abs(MY_IDUP(8)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
-      EvalUnWeighted_withoutProduction = LO_Res_Unpol * PreFac
+      EvalUnWeighted_DecayToVV = LO_Res_Unpol * PreFac
 
       CS_max = csmax(0,0)
 
-      if( EvalUnWeighted_withoutProduction .gt. CS_max) then
-          write(io_stdout,"(2X,A,1PE13.6,1PE13.6)")  "CS_max is too small.",EvalUnWeighted_withoutProduction, CS_max
-          write(io_LogFile,"(2X,A,1PE13.6,1PE13.6)") "CS_max is too small.",EvalUnWeighted_withoutProduction, CS_max
+      if( EvalUnWeighted_DecayToVV .gt. CS_max) then
+          write(io_stdout,"(2X,A,1PE13.6,1PE13.6)")  "CS_max is too small.",EvalUnWeighted_DecayToVV, CS_max
+          write(io_LogFile,"(2X,A,1PE13.6,1PE13.6)") "CS_max is too small.",EvalUnWeighted_DecayToVV, CS_max
           AlertCounter = AlertCounter + 1
           Res = 0d0
 
-      elseif( EvalUnWeighted_withoutProduction .gt. yRnd(14)*CS_max ) then
+      elseif( EvalUnWeighted_DecayToVV .gt. yRnd(14)*CS_max ) then
       
          if( RequestNLeptons.gt.0 ) then! lepton filter
                 LeptInEvent_tmp(0:8) = LeptInEvent(0:8)
@@ -3086,12 +3160,12 @@ ELSE! NOT GENEVT
      PreFac = 2d0 * fbGeV2 * sHatJacobi * PSWgt * SymmFac
 !       if( abs(MY_IDUP(6)).ge.1 .and. abs(MY_IDUP(6)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
 !       if( abs(MY_IDUP(8)).ge.1 .and. abs(MY_IDUP(8)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
-      EvalUnWeighted_withoutProduction = LO_Res_Unpol * PreFac
-      Res = EvalUnWeighted_withoutProduction
+      EvalUnWeighted_DecayToVV = LO_Res_Unpol * PreFac
+      Res = EvalUnWeighted_DecayToVV
 
 
-      if (EvalUnWeighted_withoutProduction.gt.csmax(0,0)) then
-          csmax(0,0) = EvalUnWeighted_withoutProduction
+      if (EvalUnWeighted_DecayToVV.gt.csmax(0,0)) then
+          csmax(0,0) = EvalUnWeighted_DecayToVV
       endif
 
 
@@ -3100,6 +3174,49 @@ ENDIF! genEvt
 
 RETURN
 END FUNCTION
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+FUNCTION EvalUnWeighted_DecayToTT(yRnd)
+use ModKinematics
+use ModParameters
+use ModMisc
+#if compiler==1
+use ifport
+#endif
+implicit none
+real(8) :: EvalUnWeighted_DecayToTT
+real(8) :: yRnd(1:12),pHiggs(1:4),Mom(1:4,1:10),Jac
+integer :: MY_IDUP(1:2)
+EvalUnWeighted_DecayToTT = 0d0
+
+
+  
+  MY_IDUP(1:2) = (/ElP_,MuM_/)
+  pHiggs(2:4) = (/110d0, -60d0,95d0  /)
+  pHiggs(1) = dsqrt( M_Reso**2 + pHiggs(2)**2+ pHiggs(3)**2+ pHiggs(4)**2 )
+  call EvalPhasespace_tautau(yRnd(1:12),pHiggs,MY_IDUP,Mom,Jac)
+
+
+
+RETURN
+END FUNCTION
+
+
 
 
 

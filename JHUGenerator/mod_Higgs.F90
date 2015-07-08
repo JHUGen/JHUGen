@@ -11,7 +11,9 @@
 
 
 !----- notation for subroutines
-      public :: EvalAmp_gg_H_VV,EvalAmp_H_VV
+      public :: EvalAmp_gg_H_VV
+      public :: EvalAmp_H_VV
+      public :: EvalAmp_H_TT
 
       CONTAINS
 
@@ -1365,6 +1367,30 @@
 
 
 
+   
+   
+   
+   
+   
+
+      ! Higgs decay to tau^+ tau^-   or    top anti-top 
+      SUBROUTINE EvalAmp_H_TT(p,res)
+      use ModMisc
+      implicit none
+      real(dp), intent(out) ::  res
+      real(dp), intent(in) :: p(1:4,1:6)
+      res = 0d0
+
+
+      RETURN
+      END SUBROUTINE
+
+
+   
+   
+   
+   
+   
 
 
 

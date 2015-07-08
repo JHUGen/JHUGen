@@ -24,7 +24,8 @@ real(8) :: pdf(-6:6,1:2),me2(-5:5,-5:5)
 real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi
 real(8) :: MomExt(1:4,1:11),PSWgt,PSWgt1,PSWgt2,PSWgt3,MInvH,MInvZ1,MInvZ2
 real(8) :: yz1,yz2,offzchannel,EZ_max,dr,ML1,ML2,ML3,ML4
-real(8) :: p_MCFM(mxpart,1:4),msq_MCFM(-5:5,-5:5),HZZcoupl(1:32),HWWcoupl(1:32)
+real(8) :: p_MCFM(mxpart,1:4),msq_MCFM(-5:5,-5:5)
+complex(8) :: HZZcoupl(1:32),HWWcoupl(1:32)
 integer :: i,j,MY_IDUP(1:5),ICOLUP(1:2,1:5),NBin(1:NumHistograms),NHisto
 real(8) :: LO_Res_Unpol, PreFac,BWJacobi
 logical :: applyPSCut
@@ -37,6 +38,10 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, Higgs=5, V1=6, V2=7, 
 
        BWJacobi = 1d0
 !      call SmearExternal(yRnd(17),M_Reso,Ga_Reso,M_Reso/4d0,M_Reso*4d0,MInvH,BWJacobi)
+         
+         
+         yrnd(1)=0.1231d0
+         yrnd(2)=0.9712d0
          
    if (EHat.lt.MInvH) return
    call EvalPhaseSpace_VBF(EHat,MInvH,yRnd(3:7),MomExt(1:4,1:5),PSWgt)
@@ -120,8 +125,8 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, Higgs=5, V1=6, V2=7, 
    call convert_to_MCFM(+MomExt(1:4,Lep2M)*100d0, p_MCFM(6,1:4))
    call convert_to_MCFM(+MomExt(1:4,outTop)*100d0,p_MCFM(7,1:4))
    call convert_to_MCFM(+MomExt(1:4,outBot)*100d0,p_MCFM(8,1:4))
-   HZZcoupl(:) = 0d0
-   HZZcoupl(1) = 0d0
+   HZZcoupl(:) = (0d0,0d0)
+   HZZcoupl(1) = (1d0,0d0)
    HWWcoupl(:) = HZZcoupl(:)
 
 !    print *, (MomExt(1:4,1)).dot.(MomExt(1:4,1))
@@ -146,7 +151,7 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, Higgs=5, V1=6, V2=7, 
 
 
   msq_MCFM(:,:) = 0d0
-  call qq_ZZqq(p_MCFM,msq_MCFM,HZZcoupl,HWWcoupl,Lambda,Lambda_Q,Lambda_z1)!  q(-p1)+q(-p2)->Z(p3,p4)+Z(p5,p6)+q(p7)+q(p8)
+  call qq_ZZqq(p_MCFM,msq_MCFM,HZZcoupl,HWWcoupl,Lambda,Lambda_Q,(/Lambda_z1,Lambda_z2,Lambda_z3,Lambda_z4/))!  q(-p1)+q(-p2)->Z(p3,p4)+Z(p5,p6)+q(p7)+q(p8)
    
    LO_Res_Unpol = 0d0
    do i = -5,5

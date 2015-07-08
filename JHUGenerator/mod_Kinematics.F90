@@ -1924,12 +1924,15 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, Higgs=5, V1=6, V2=7, 
        dy_j1j2 = y_j1 - y_j2
 
 
+!        if( m_jj.lt.200d0*GeV ) then
+!           applyPSCut=.true.
+!           return
+!        endif
 
 !        if( abs(y_j1).lt.1d0 .or. abs(y_j2).lt.1d0 .or. y_j1*y_j2.gt.0d0 ) then
 !           applyPSCut=.true.
 !           return
 !        endif
-
 
        if(  pT_j1.lt.15d0*GeV .or. pT_j2.lt.15d0*GeV )  then
           applyPSCut=.true.
@@ -2387,6 +2390,40 @@ logical,save :: FirstTime=.true.
     
 RETURN
 END SUBROUTINE
+
+
+
+
+
+SUBROUTINE Kinematics_Htautau(Mom,applyPSCut,NBin)
+use ModParameters
+use ModMisc
+implicit none
+real(8) :: Mom(:,:)
+logical :: applyPSCut
+integer :: NBin(:)
+integer, parameter :: inLeft=1, inRight=2, tauP=3, tauM=4, Wp=5, Wm=6, nu1=7, nubar1=8, lepP=9, lepM=10, nu2=11, nubar2=12
+real(8) :: m_tauP,m_tauM,m_Wp,m_Wm
+
+
+    applyPSCut = .false.
+    
+    m_tauP = get_MInv(Mom(1:4,tauP))
+    m_tauM = get_MInv(Mom(1:4,tauM))
+    m_Wp   = get_MInv(Mom(1:4,Wp))
+    m_Wm   = get_MInv(Mom(1:4,Wm))
+   
+    
+!      binning
+       NBin(1) = WhichBin(1,m_tauP)
+       NBin(2) = WhichBin(2,m_tauM)
+       NBin(3) = WhichBin(3,m_Wp)
+       NBin(4) = WhichBin(4,m_Wm)
+    
+    
+RETURN
+END SUBROUTINE
+
 
 
 
@@ -4124,6 +4161,61 @@ real(8),parameter :: N4=4, PiWgt4 = (2d0*Pi)**(4-N4*3) * (4d0*Pi)**(N4-1)
 RETURN
 END SUBROUTINE
 
+
+
+SUBROUTINE EvalPhasespace_tautau(xRnd,pHiggs,MY_IDUP,Mom,Jac)
+use ModParameters
+use ModPhasespace
+use ModMisc
+implicit none
+real(8) :: xRnd(:), pHiggs(:), Mom(:,:)
+integer :: MY_IDUP(1:2)
+real(8) :: Jac,Jac1,Jac2,Jac3,Jac4,Jac5,Jac6,Jac7,Jac8,Jac9
+real(8) :: Minvsq_tau1,Minvsq_tau2,Minvsq_Wp,Minvsq_Wm,mLepP,mLepM
+real(8),parameter :: m_neu = 0d0, ga_tau =4d-13*GeV
+integer, parameter :: inLeft=1, inRight=2, tauP=3, tauM=4, Wp=5, Wm=6, nu1=7, nubar1=8, lepP=9, lepM=10, nu2=11, nubar2=12
+   
+   
+   mLepP = getMass(MY_IDUP(1))
+   mLepM = getMass(MY_IDUP(2))
+   
+   Jac1 = s_channel_propagator( m_tau**2,ga_tau, m_tau**2,m_tau**2, xRnd(1),Minvsq_tau1 )
+   Jac2 = s_channel_propagator( m_tau**2,ga_tau, m_tau**2,m_tau**2, xRnd(1),Minvsq_tau2 )
+   Jac3 = s_channel_decay( pHiggs,Minvsq_tau1,Minvsq_tau2,xRnd(1:2),Mom(:,tauP),Mom(:,tauM) )
+   
+   Jac4 = s_channel_propagator( M_W**2,Ga_W, 0d0,Minvsq_tau1, xRnd(3),Minvsq_Wp )
+   Jac5 = s_channel_decay( Mom(:,tauP),Minvsq_Wp,m_neu, xRnd(4:5),Mom(:,Wp),Mom(:,nu1) )   
+   Jac6 = s_channel_decay( Mom(:,Wp),mLepP**2,m_neu, xRnd(6:7),Mom(:,LepP),Mom(:,nu2) )   
+   
+   Jac7 = s_channel_propagator( M_W**2,Ga_W, 0d0,Minvsq_tau2, xRnd(8),Minvsq_Wm )
+   Jac8 = s_channel_decay( Mom(:,tauM),Minvsq_Wm,m_neu,xRnd(9:10),Mom(:,Wm),Mom(:,nubar1) )
+   Jac9 = s_channel_decay( Mom(:,Wm),mLepM**2,m_neu,xRnd(11:12),Mom(:,LepM),Mom(:,nubar2) )      
+   
+   Jac = Jac1*Jac2*Jac3*Jac4*Jac5*Jac6*Jac7*Jac8*Jac9
+   
+!    print *, "masses checker",dsqrt(Minvsq_Wp),dsqrt(Minvsq_Wm),mLepP,mLepM
+!    print *, "OS checker",dsqrt(pHiggs.dot.pHiggs )
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,tauP).dot.Mom(1:4,tauP) ))
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,tauM).dot.Mom(1:4,tauM) ))
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,Wp).dot.Mom(1:4,Wp) ))
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,Wm).dot.Mom(1:4,Wm) ))
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,nu1).dot.Mom(1:4,nu1) ))
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,nu2).dot.Mom(1:4,nu2) ))
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,nubar1).dot.Mom(1:4,nubar1) ))
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,nubar2).dot.Mom(1:4,nubar2) ))
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,lepP).dot.Mom(1:4,lepP) ))
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,lepM).dot.Mom(1:4,lepM) ))
+!    print *, "----------"
+!    print *, "Mom.cons. ",pHiggs(1:4)-Mom(1:4,tauP)-Mom(1:4,tauM)
+!    print *, "Mom.cons. ",Mom(1:4,tauP) - Mom(1:4,nu1)-Mom(1:4,Wp)
+!    print *, "Mom.cons. ",Mom(1:4,tauM) - Mom(1:4,nubar1)-Mom(1:4,Wm)
+!    print *, "Mom.cons. ",Mom(1:4,Wp) - Mom(1:4,nu2)-Mom(1:4,lepP)
+!    print *, "Mom.cons. ",Mom(1:4,Wm) - Mom(1:4,nubar2)-Mom(1:4,lepM)   
+!    pause
+   
+
+RETURN
+END SUBROUTINE
 
 
 
