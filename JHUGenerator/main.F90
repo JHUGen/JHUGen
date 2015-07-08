@@ -98,6 +98,8 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
 ! !       DecayMode=9:  Z --> anything
 ! !       DecayMode=10: W --> l nu_l (l=e,mu,tau)
 ! !       DecayMode=11: W --> anything
+! !       DecayMode=20: tau --> 2nu + l (e,mu)
+! !       DecayMode=30: top --> b el nu
 
    DataFile="./data/output"
 
@@ -761,6 +763,9 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
       call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
    else
       call vegas(EvalWeighted,VG_Result,VG_Error,VG_Chi2)    ! usual call of vegas for weighted events
+!       call vegas(EvalWeighted_tautau,VG_Result,VG_Error,VG_Chi2)    ! usual call of vegas for weighted events
+      
+      
     endif
 
     !DATA RUN
@@ -789,6 +794,7 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
       call vegas1(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
     else
       call vegas1(EvalWeighted,VG_Result,VG_Error,VG_Chi2)    ! usual call of vegas for weighted events
+!       call vegas1(EvalWeighted_tautau,VG_Result,VG_Error,VG_Chi2)    ! usual call of vegas for weighted events
     endif
 
 
@@ -1448,7 +1454,7 @@ END SUBROUTINE
 !       Ehat = M_Reso! fixing Ehat to M_Reso which should determine the max. of the integrand
 !       do tries=1,VegasNc0
 !           call random_number(yRnd)
-!           dum = EvalUnWeighted_withoutProduction(yRnd,.false.,EHat,Res,AcceptedEvent,MY_IDUP(1:9),ICOLUP(1:2,1:9))
+!           dum = EvalUnWeighted_DecayToVV(yRnd,.false.,EHat,Res,AcceptedEvent,MY_IDUP(1:9),ICOLUP(1:2,1:9))
 !       enddo
 !       csmax(0,0)   = 1.5d0*csmax(0,0)    !  savety buffer
 ! 
@@ -1524,7 +1530,7 @@ END SUBROUTINE
 !           EHat = pH2sq
 !           do tries=1,5000000
 !               call random_number(yRnd)
-!               dum = EvalUnWeighted_withoutProduction(yRnd,.true.,Ehat,RES,AcceptedEvent,MY_IDUP(1:9),ICOLUP(1:2,1:9))
+!               dum = EvalUnWeighted_DecayToVV(yRnd,.true.,Ehat,RES,AcceptedEvent,MY_IDUP(1:9),ICOLUP(1:2,1:9))
 !               if( Res.ne.0d0 ) exit
 !           enddo
 !           if( Res.ne.0d0 ) then ! decay event was accepted
@@ -1663,6 +1669,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
      ClosedHeader=.false.
      WroteMassWidth=.false.
      InMadgraphMassBlock=.false.
+
      do while ( .not.FirstEvent )
         read(16,fmt="(A160)",IOSTAT=stat,END=99) FirstLines
         if ( FirstLines(1:4).eq."<!--" .and. .not.WroteHeader ) then
@@ -1775,6 +1782,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
         endif
      enddo
 
+     
      if( .not. M_ResoSet ) then
         write(io_stdout,"(2X,A,1F7.2)")  "ERROR: Higgs mass could not be read from LHE input file. Assuming default value",M_Reso*100d0
         write(io_LogFile,"(2X,A,1F7.2)") "ERROR: Higgs mass could not be read from LHE input file. Assuming default value",M_Reso*100d0
@@ -1799,7 +1807,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
       Ehat = M_Reso! fixing Ehat to M_Reso which should determine the max. of the integrand
       do tries=1,VegasNc0
           call random_number(yRnd)
-          dum = EvalUnWeighted_withoutProduction(yRnd,.false.,EHat,Res,HiggsDK_Mom(1:4,6:9),HiggsDK_IDUP,HiggsDK_ICOLUP)
+          dum = EvalUnWeighted_DecayToVV(yRnd,.false.,EHat,Res,HiggsDK_Mom(1:4,6:9),HiggsDK_IDUP,HiggsDK_ICOLUP)
       enddo
       csmax(0,0)   = 1.5d0*csmax(0,0)    !  savety buffer
 
@@ -1866,7 +1874,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
           EHat = pH2sq
           do tries=1,5000000
               call random_number(yRnd)
-              dum = EvalUnWeighted_withoutProduction(yRnd,.true.,Ehat,Res,HiggsDK_Mom(1:4,6:9),HiggsDK_IDUP,HiggsDK_ICOLUP)
+              dum = EvalUnWeighted_DecayToVV(yRnd,.true.,Ehat,Res,HiggsDK_Mom(1:4,6:9),HiggsDK_IDUP,HiggsDK_ICOLUP)
               if( Res.ne.0d0 ) exit
           enddo
           if( Res.gt.0d0 ) then ! decay event was accepted
@@ -2688,6 +2696,7 @@ SUBROUTINE InitHisto()
 use modParameters
 implicit none
 
+
   if( Process.eq.60 .or. Process.eq.61 .or. Process.eq.66 ) then
      call InitHisto_HVBF()
   elseif( Process.eq.62) then
@@ -2702,6 +2711,8 @@ implicit none
      call InitHisto_TH()
   else
      call InitHisto_HZZ()
+!      call InitHisto_Htautau()
+!      call InitHisto_Htoptop()
   endif
 
 RETURN
@@ -3101,6 +3112,124 @@ integer :: AllocStatus,NHisto
 
 RETURN
 END SUBROUTINE
+
+
+
+
+
+
+SUBROUTINE InitHisto_Htautau()
+use ModMisc
+use ModKinematics
+use ModParameters
+implicit none
+integer :: AllocStatus,NHisto
+
+
+          it_sav = 1
+          NumHistograms = 4
+          if( .not.allocated(Histo) ) then
+                allocate( Histo(1:NumHistograms), stat=AllocStatus  )
+                if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
+          endif
+
+          Histo(1)%Info   = "m_tauP"
+          Histo(1)%NBins  = 50
+          Histo(1)%BinSize= 0.05d0*GeV
+          Histo(1)%LowVal = 0d0*GeV
+          Histo(1)%SetScale= 1d0/GeV
+
+
+          Histo(2)%Info   = "m_tauM"
+          Histo(2)%NBins  = 50
+          Histo(2)%BinSize= 0.05d0*GeV
+          Histo(2)%LowVal = 0d0*GeV
+          Histo(2)%SetScale= 1d0/GeV
+
+          
+          Histo(3)%Info   = "m_Wp"
+          Histo(3)%NBins  = 50
+          Histo(3)%BinSize= 0.05d0*GeV
+          Histo(3)%LowVal = 0d0*GeV
+          Histo(3)%SetScale= 1d0/GeV
+          
+            
+          Histo(4)%Info   = "m_Wm"
+          Histo(4)%NBins  = 50
+          Histo(4)%BinSize= 0.05d0*GeV
+          Histo(4)%LowVal = 0d0*GeV
+          Histo(4)%SetScale= 1d0/GeV
+          
+
+          do NHisto=1,NumHistograms
+              Histo(NHisto)%Value(:) = 0d0
+              Histo(NHisto)%Value2(:)= 0d0
+              Histo(NHisto)%Hits(:)  = 0
+          enddo
+
+RETURN
+END SUBROUTINE
+
+
+
+
+
+SUBROUTINE InitHisto_Htoptop()
+use ModMisc
+use ModKinematics
+use ModParameters
+implicit none
+integer :: AllocStatus,NHisto
+
+
+          it_sav = 1
+          NumHistograms = 4
+          if( .not.allocated(Histo) ) then
+                allocate( Histo(1:NumHistograms), stat=AllocStatus  )
+                if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
+          endif
+
+          Histo(1)%Info   = "m_top"
+          Histo(1)%NBins  = 50
+          Histo(1)%BinSize= 0.25d0*GeV
+          Histo(1)%LowVal = 166d0*GeV
+          Histo(1)%SetScale= 1d0/GeV
+
+
+          Histo(2)%Info   = "m_topbar"
+          Histo(2)%NBins  = 50
+          Histo(2)%BinSize= 0.25d0*GeV
+          Histo(2)%LowVal = 166d0*GeV
+          Histo(2)%SetScale= 1d0/GeV
+          
+          
+          Histo(3)%Info   = "m_Wp"
+          Histo(3)%NBins  = 50
+          Histo(3)%BinSize= 0.2d0*GeV
+          Histo(3)%LowVal = 75d0*GeV
+          Histo(3)%SetScale= 1d0/GeV
+          
+          
+          Histo(4)%Info   = "m_Wm"
+          Histo(4)%NBins  = 50
+          Histo(4)%BinSize= 0.2d0*GeV
+          Histo(4)%LowVal = 75d0*GeV
+          Histo(4)%SetScale= 1d0/GeV
+          
+          
+          do NHisto=1,NumHistograms
+              Histo(NHisto)%Value(:) = 0d0
+              Histo(NHisto)%Value2(:)= 0d0
+              Histo(NHisto)%Hits(:)  = 0
+          enddo
+
+RETURN
+END SUBROUTINE
+
+
+
+
+
 
 SUBROUTINE InitHisto_HVBF()
 use ModMisc
@@ -3617,6 +3746,8 @@ implicit none
         write(io_stdout,"(4X,A)") "              4=W->lnu, 5=W->2q, 6=W->taunu,"
         write(io_stdout,"(4X,A)") "              7=gamma, 8=Z->2l+2tau,"
         write(io_stdout,"(4X,A)") "              9=Z->anything, 10=W->lnu+taunu, 11=W->anything"
+        write(io_stdout,"(4X,A)") "              20=tau->2nu+l"
+        write(io_stdout,"(4X,A)") "              30=top->b+l+nu"
         write(io_stdout,"(4X,A)") "TopDK:      decay mode for tops in ttbar+H, 0=stable, 1=decaying (use DecayMode1/2 = 4,5 for W+/W-"
         write(io_stdout,"(4X,A)") "PChannel:   0=g+g, 1=q+qb, 2=both"
         write(io_stdout,"(4X,A)") "OffXVV:     off-shell option for resonance(X),or vector bosons(VV)"

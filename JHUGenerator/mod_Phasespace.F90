@@ -1,4 +1,4 @@
-MODULE PHASESPACE 
+MODULE ModPhasespace 
 !    NOTE: (1) global factors of pi are excluded, i.e. multiply by (2*pi)^(4-3*N) for N-particle phase space
 !          (2) no external dependencies 
 
@@ -6,6 +6,10 @@ MODULE PHASESPACE
   public :: Propagator_S_channel
   public :: DecayPS_S_channel
   public :: DecayPS_T_channel
+
+  public :: s_channel_propagator
+  public :: s_channel_decay
+
   
   private :: remap_s_channel_propagator
   private :: generate_s_channel_phasespace
@@ -62,7 +66,91 @@ MODULE PHASESPACE
 
 
 
-CONTAINS
+  
+  
+ CONTAINS
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+ 
+ 
+  FUNCTION s_channel_propagator(PropMass_sq,Width,sMin,sMax,xRnd,InvMass_sq,PropPower) 
+  implicit none
+  real(8) :: s_channel_propagator
+  real(8) :: PropMass_sq,Width,sMin,sMax,xRnd,InvMass_sq,Power
+  real(8), optional :: PropPower
+
+      if( present(PropPower) ) then
+         Power = PropPower
+      else
+         Power = 2d0
+      endif
+
+      if( Width.lt.1d-15 ) then
+           InvMass_sq = h(xRnd, PropMass_sq, Power, sMin, sMax)
+           s_channel_propagator = g_s(InvMass_sq, PropMass_sq, Power, sMin, sMax)
+      else
+           if( dabs(sMin + sMax -2d0*PropMass_sq).lt.1d-10 ) then! this is the narrow-width mapping (i.e. no integration)
+              InvMass_sq = PropMass_sq
+              s_channel_propagator = pi/(dsqrt(PropMass_sq)*Width)
+           else ! this is the normal s-channel mapping  
+              if( sMax.gt.PropMass_sq-Width**2 ) then
+                  InvMass_sq = h_BreitWigner(xRnd, PropMass_sq, Width, Power, sMin, sMax)
+                  s_channel_propagator = g_s_BreitWigner(InvMass_sq, PropMass_sq, Width, Power, sMin, sMax)
+              else
+                  InvMass_sq = sMin + (sMax-sMin) * xRnd
+                  s_channel_propagator = sMax-sMin
+              endif
+           endif
+      endif
+
+  RETURN
+  END FUNCTION
+
+
+!    Jac3 = s_channel_decay( pHiggs,minv_tau1,minv_tau2,xRnd(1:2),Mom(:,tauP),Mom(:,tauM) )
+
+
+! s-channel phase space
+  FUNCTION s_channel_decay( p0,Mass1_sq,Mass2_sq,xRnd,Mom1,Mom2  ) 
+  implicit none
+  real(8) :: s_channel_decay
+  real(8) :: p0(1:4),Mass1_sq,Mass2_sq,xRnd(1:2),Mom1(1:4),Mom2(1:4)
+  real(8) :: E1,p1z,phi,theta,Jac,Mandelstam_S
+
+        phi   = 2d0*pi * xRnd(1)
+        theta = 1d0*pi * xRnd(2)
+        Mandelstam_S = p0(1)**2 - p0(2)**2 - p0(3)**2 - p0(4)**2 
+
+        E1 = ( Mandelstam_S + Mass1_sq - Mass2_sq )/2d0/dsqrt(Mandelstam_S)
+        p1z= sqrt_lambda(Mandelstam_S,Mass1_sq,Mass2_sq)/2d0/dsqrt(Mandelstam_S)
+        Mom1(1:4) = (/ E1,0d0,0d0,p1z /)
+!         call rotate3D_phi_theta(phi,theta,Mom1)
+        
+        Mom2(1)   = dsqrt(Mandelstam_S) - Mom1(1)
+        Mom2(2:4) = - Mom1(2:4)
+        call boost_from_CMS_to_RefMom(Mom1,p0)
+        call boost_from_CMS_to_RefMom(Mom2,p0)
+
+! print *, "in",        Mass1_sq,Mass2_sq
+! print *,"out", mom1(1)**2-mom1(2)**2-mom1(3)**2-mom1(4)**2
+! print *,"out", mom2(1)**2-mom2(2)**2-mom2(3)**2-mom2(4)**2
+! pause        
+        s_channel_decay = 1d0/g_d(Mandelstam_S, Mass1_sq,Mass2_sq)  *  dSin(pi*xRnd(2))
+
+  RETURN
+  END FUNCTION
+ 
+
+ 
+ 
+ !--------- private section ------------
+ 
 
 
 
@@ -77,8 +165,13 @@ CONTAINS
            InvMass_sq = h(this%RandomVar, this%PropMass_sq, this%Power, this%InvMinMax_sq(1), this%InvMinMax_sq(2))
            Jac = g_s(InvMass_sq, this%PropMass_sq, this%Power, this%InvMinMax_sq(1), this%InvMinMax_sq(2))
       else
-           InvMass_sq = h_BreitWigner(this%RandomVar, this%PropMass_sq, this%Width, this%Power, this%InvMinMax_sq(1), this%InvMinMax_sq(2))
-           Jac = g_s_BreitWigner(InvMass_sq, this%PropMass_sq, this%Width, this%Power, this%InvMinMax_sq(1), this%InvMinMax_sq(2))
+           if( dabs(this%InvMinMax_sq(1) + this%InvMinMax_sq(2) -2d0*this%PropMass_sq).lt.1d-10 ) then! this is the narrow-width mapping (i.e. no integration)
+              InvMass_sq = this%PropMass_sq
+              Jac = pi/(dsqrt(this%PropMass_sq)*this%Width)
+           else ! this is the normal s-channel mapping     
+              InvMass_sq = h_BreitWigner(this%RandomVar, this%PropMass_sq, this%Width, this%Power, this%InvMinMax_sq(1), this%InvMinMax_sq(2))
+              Jac = g_s_BreitWigner(InvMass_sq, this%PropMass_sq, this%Width, this%Power, this%InvMinMax_sq(1), this%InvMinMax_sq(2))
+           endif
       endif
 
   RETURN
