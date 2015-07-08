@@ -61,8 +61,7 @@ Exec = ./JHUGen
 
 
 # main dependencies
-MainDep = mod_Phasespace.F90 \
-          mod_Kinematics.F90 \
+MainDep = mod_Kinematics.F90 \
           mod_CrossSection.F90 \
           mod_CrossSection_HJJ.F90 \
           mod_CrossSection_TTBH.F90 \
@@ -71,8 +70,7 @@ MainDep = mod_Phasespace.F90 \
           main.F90
 
 # main objects
-MainObj = $(ObjectDir)/mod_Phasespace.o \
-          $(ObjectDir)/mod_Kinematics.o \
+MainObj = $(ObjectDir)/mod_Kinematics.o \
           $(ObjectDir)/mod_CrossSection.o \
           $(ObjectDir)/mod_CrossSection_HJJ.o \
           $(ObjectDir)/mod_CrossSection_TTBH.o \
@@ -121,6 +119,7 @@ PDFObj   = $(ObjectDir)/Cteq61Pdf.o \
 
 PSGenDep = genps.c \
            boost.c
+
 PSGenObj = $(ObjectDir)/genps.o \
            $(ObjectDir)/boost.o
 
@@ -210,6 +209,7 @@ clean:
 	rm -f modules/*.mod
 	rm -f modules/*.f90
 	rm -f *.mod
+	rm -f *.o
 	rm -f $(Exec)
 
 # supresses command calls
