@@ -6,7 +6,7 @@ save
 character(len=6),parameter :: JHUGen_Version="v6.4.0"
 ! 
 ! 
-integer, public :: Collider, PDFSet,PChannel,Process,DecayMode1,DecayMode2,TopDecays
+integer, public :: Collider, PDFSet,PChannel,Process,DecayMode1,DecayMode2,TopDecays,TauDecays,BotDecays
 integer, public :: VegasIt1,VegasNc0,VegasNc1,VegasNc2
 real(8), public :: Collider_Energy
 integer, public :: VegasIt1_default,VegasNc0_default,VegasNc1_default,VegasNc2_default

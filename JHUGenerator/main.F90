@@ -72,6 +72,7 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
    DecayMode1=0  ! Z/W+
    DecayMode2=0  ! Z/W-
    TopDecays=1
+   TauDecays=1
    Process = 0   ! select 0, 1 or 2 to represent the spin of the resonance
    Unweighted =.true.
    OffShell_XVV=011! 000: X,V1,V2 on-shell; 010: X,V2 on-shell, V1 off-shell; and so on
@@ -98,9 +99,6 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
 ! !       DecayMode=9:  Z --> anything
 ! !       DecayMode=10: W --> l nu_l (l=e,mu,tau)
 ! !       DecayMode=11: W --> anything
-! !       DecayMode=20: tau --> 2nu + l (e,mu)
-! !       DecayMode=30: top --> b el nu
-
    DataFile="./data/output"
 
 
@@ -158,6 +156,12 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
         CountArg = CountArg + 1
     elseif( arg(1:6).eq."TopDK=" ) then
         read(arg(7:7),*) TopDecays
+        CountArg = CountArg + 1
+    elseif( arg(1:6).eq."TauDK=" ) then
+        read(arg(7:7),*) TauDecays
+        CountArg = CountArg + 1
+    elseif( arg(1:6).eq."BotDK=" ) then
+        read(arg(7:7),*) BotDecays
         CountArg = CountArg + 1
     elseif( arg(1:7) .eq."OffXVV=" ) then
         read(arg(8:10),*) OffShell_XVV
@@ -762,8 +766,8 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
     elseif (Process.eq.110 .or. Process.eq.111) then
       call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
    else
-      call vegas(EvalWeighted,VG_Result,VG_Error,VG_Chi2)    ! usual call of vegas for weighted events
-!       call vegas(EvalWeighted_tautau,VG_Result,VG_Error,VG_Chi2)    ! usual call of vegas for weighted events
+!       call vegas(EvalWeighted,VG_Result,VG_Error,VG_Chi2)    ! usual call of vegas for weighted events
+      call vegas(EvalWeighted_tautau,VG_Result,VG_Error,VG_Chi2)    ! usual call of vegas for weighted events
       
       
     endif
@@ -793,8 +797,8 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
     elseif (Process.eq.110 .or. Process.eq.111) then
       call vegas1(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
     else
-      call vegas1(EvalWeighted,VG_Result,VG_Error,VG_Chi2)    ! usual call of vegas for weighted events
-!       call vegas1(EvalWeighted_tautau,VG_Result,VG_Error,VG_Chi2)    ! usual call of vegas for weighted events
+!       call vegas1(EvalWeighted,VG_Result,VG_Error,VG_Chi2)    ! usual call of vegas for weighted events
+      call vegas1(EvalWeighted_tautau,VG_Result,VG_Error,VG_Chi2)    ! usual call of vegas for weighted events
     endif
 
 
@@ -3746,9 +3750,12 @@ implicit none
         write(io_stdout,"(4X,A)") "              4=W->lnu, 5=W->2q, 6=W->taunu,"
         write(io_stdout,"(4X,A)") "              7=gamma, 8=Z->2l+2tau,"
         write(io_stdout,"(4X,A)") "              9=Z->anything, 10=W->lnu+taunu, 11=W->anything"
-        write(io_stdout,"(4X,A)") "              20=tau->2nu+l"
-        write(io_stdout,"(4X,A)") "              30=top->b+l+nu"
-        write(io_stdout,"(4X,A)") "TopDK:      decay mode for tops in ttbar+H, 0=stable, 1=decaying (use DecayMode1/2 = 4,5 for W+/W-"
+        write(io_stdout,"(4X,A)") "              20=tau->nu + W(select with TauDK)"
+        write(io_stdout,"(4X,A)") "              30=top->b bbar"
+        write(io_stdout,"(4X,A)") "              40=top->b + W(select with TopDK)"
+        write(io_stdout,"(4X,A)") "TopDK:      decay mode for tops in ttbar+H or H->ttbar, 0=stable, 1=decaying (use DecayMode1/2 = 4,5 for W+/W-"
+        write(io_stdout,"(4X,A)") "TauDK:      decay mode for taus in H->tautau, 0=stable, 1=decaying (use DecayMode1/2 = 4,5 for W+/W-"
+        write(io_stdout,"(4X,A)") "BotDK:      decay mode for bottom quarks in H->bbar, 0=deactivated, 1=activated"
         write(io_stdout,"(4X,A)") "PChannel:   0=g+g, 1=q+qb, 2=both"
         write(io_stdout,"(4X,A)") "OffXVV:     off-shell option for resonance(X),or vector bosons(VV)"
         write(io_stdout,"(4X,A)") "PDFSet:     1=CTEQ6L1(default), 2=MSTW2008LO,  2xx=MSTW with eigenvector set xx=01..40), 3=NNPDF3.0LO"

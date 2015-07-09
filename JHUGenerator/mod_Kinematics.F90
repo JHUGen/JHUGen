@@ -4170,30 +4170,26 @@ use ModMisc
 implicit none
 real(8) :: xRnd(:), pHiggs(:), Mom(:,:)
 integer :: MY_IDUP(1:2)
-real(8) :: Jac,Jac1,Jac2,Jac3,Jac4,Jac5,Jac6,Jac7,Jac8,Jac9
-real(8) :: Minvsq_tau1,Minvsq_tau2,Minvsq_Wp,Minvsq_Wm,mLepP,mLepM
-real(8),parameter :: m_neu = 0d0, ga_tau =4d-13*GeV
+real(8) :: Jac,Jac1,Jac2,Jac3,Jac4,Jac5
+real(8) :: Minvsq_tau1,Minvsq_tau2,Minvsq_Wp,Minvsq_Wm,m_LepP,m_LepM
+real(8),parameter :: m_nu = 0d0, ga_tau =4d-13*GeV
 integer, parameter :: inLeft=1, inRight=2, tauP=3, tauM=4, Wp=5, Wm=6, nu1=7, nubar1=8, lepP=9, lepM=10, nu2=11, nubar2=12
    
    
-   mLepP = getMass(MY_IDUP(1))
-   mLepM = getMass(MY_IDUP(2))
+   m_LepP = getMass(MY_IDUP(1))
+   m_LepM = getMass(MY_IDUP(2))
    
-   Jac1 = s_channel_propagator( m_tau**2,ga_tau, m_tau**2,m_tau**2, xRnd(1),Minvsq_tau1 )
-   Jac2 = s_channel_propagator( m_tau**2,ga_tau, m_tau**2,m_tau**2, xRnd(1),Minvsq_tau2 )
-   Jac3 = s_channel_decay( pHiggs,Minvsq_tau1,Minvsq_tau2,xRnd(1:2),Mom(:,tauP),Mom(:,tauM) )
    
-   Jac4 = s_channel_propagator( M_W**2,Ga_W, 0d0,Minvsq_tau1, xRnd(3),Minvsq_Wp )
-   Jac5 = s_channel_decay( Mom(:,tauP),Minvsq_Wp,m_neu, xRnd(4:5),Mom(:,Wp),Mom(:,nu1) )   
-   Jac6 = s_channel_decay( Mom(:,Wp),mLepP**2,m_neu, xRnd(6:7),Mom(:,LepP),Mom(:,nu2) )   
+   Jac1 = s_channel_prop_decay(pHiggs,(/m_tau,ga_tau,m_tau,m_tau/),(/m_tau,ga_tau,m_tau,m_tau/),xRnd(1:2),Mom(:,tauP),Mom(:,tauM)) 
+
+   Jac2 = s_channel_prop_decay(Mom(:,tauP),(/m_W,ga_W,0d0,get_MInv(Mom(:,tauP))/),(/m_nu,0d0,0d0,0d0/),xRnd(3:5),Mom(:,Wp),Mom(:,nu1)) 
+   Jac3 = s_channel_prop_decay(Mom(:,tauM),(/m_W,ga_W,0d0,get_MInv(Mom(:,tauM))/),(/m_nu,0d0,0d0,0d0/),xRnd(6:8),Mom(:,Wm),Mom(:,nubar1)) 
+
+   Jac4 = s_channel_prop_decay(Mom(:,Wp),(/m_LepP,0d0,0d0,0d0/),(/m_nu,0d0,0d0,0d0/),xRnd( 9:10),Mom(:,LepP),Mom(:,nu2)) 
+   Jac5 = s_channel_prop_decay(Mom(:,Wm),(/m_LepM,0d0,0d0,0d0/),(/m_nu,0d0,0d0,0d0/),xRnd(11:12),Mom(:,LepM),Mom(:,nubar2)) 
    
-   Jac7 = s_channel_propagator( M_W**2,Ga_W, 0d0,Minvsq_tau2, xRnd(8),Minvsq_Wm )
-   Jac8 = s_channel_decay( Mom(:,tauM),Minvsq_Wm,m_neu,xRnd(9:10),Mom(:,Wm),Mom(:,nubar1) )
-   Jac9 = s_channel_decay( Mom(:,Wm),mLepM**2,m_neu,xRnd(11:12),Mom(:,LepM),Mom(:,nubar2) )      
+   Jac = Jac1*Jac2*Jac3*Jac4*Jac5 * PSNorm6
    
-   Jac = Jac1*Jac2*Jac3*Jac4*Jac5*Jac6*Jac7*Jac8*Jac9
-   
-!    print *, "masses checker",dsqrt(Minvsq_Wp),dsqrt(Minvsq_Wm),mLepP,mLepM
 !    print *, "OS checker",dsqrt(pHiggs.dot.pHiggs )
 !    print *, "OS checker", dsqrt( dabs(Mom(1:4,tauP).dot.Mom(1:4,tauP) ))
 !    print *, "OS checker", dsqrt( dabs(Mom(1:4,tauM).dot.Mom(1:4,tauM) ))

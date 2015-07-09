@@ -6,6 +6,8 @@ fcomp = ifort -fpp -O2 -vec-report0 -Dcompiler=1
 endif
 ifeq ($(Comp),gfort)
 fcomp = f95 -O3 -ffree-line-length-none -Dcompiler=2
+# fcomp = f95 -O0 -ffree-line-length-none -Dcompiler=2 -fcheck=all
+
 endif
 
 ccomp = gcc
@@ -87,8 +89,11 @@ mod_TTBH_MatEl.o: mod_TTBH_MatEl.F90 variables.F90
 
 MCFMforVBF: $(MCFM_Dep)
 	@echo " "
-	@echo " compiling MCFM WBF files with "$(Comp)
-	$(fcomp) -c -I./WBFZZ_MCFM/src/Inc/ $(MCFM_Dep)
+# 	@echo " compiling MCFM WBF files with "$(Comp)
+# 	$(fcomp) -c -I./WBFZZ_MCFM/src/Inc/ $(MCFM_Dep)
+	@echo " compiling MCFM WBF files with ifort!"
+# 	ifort  -O0 -implicitnone -zero -check bounds -check pointer -warn interfaces -ftrapuv  -diag-disable remark  -c -I./WBFZZ_MCFM/src/Inc/ $(MCFM_Dep)
+	ifort  -O2  -c -I./WBFZZ_MCFM/src/Inc/ $(MCFM_Dep)
 
 clean:
 	@echo " deleting object files"

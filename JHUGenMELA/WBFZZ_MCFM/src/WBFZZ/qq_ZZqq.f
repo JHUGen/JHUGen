@@ -99,9 +99,9 @@ c     ,j3_4(4,2),j5_6(4,2),
       lambda_z2 = lambda(2)
       lambda_z3 = lambda(3)
       lambda_z4 = lambda(4)
-
+      
       !-- coupling 1-4 and lambdas are missing
-      ghz1 = zzcoupl(1) !-- check that these are correct according to Markus' definition
+      ghz1 = zzcoupl(1) !-- if this is set to 1d0 then it's the SM value
       ghz2 = zzcoupl(2)
       ghz3 = zzcoupl(3)
       ghz4 = zzcoupl(4)
@@ -179,7 +179,7 @@ c     ,j3_4(4,2),j5_6(4,2),
       ghz4_prime7= zzcoupl(32)
 
 
-      ghw1 = wwcoupl(1) !-- check that these are correct according to Markus' definition
+      ghw1 = wwcoupl(1) !-- if this is set to 1d0 then it's the SM value
       ghw2 = wwcoupl(2)
       ghw3 = wwcoupl(3)
       ghw4 = wwcoupl(4)
@@ -288,7 +288,7 @@ c       cxw=dcmplx(xw,0d0) ! DEBUG: Madgraph comparison
        doHO=.false.
        doBO=.false.
 !        runstring(4:5)="what-nonsense-this-is"
-       runstring(4:5)="XX"
+       runstring(4:5)="HO"
        if     (runstring(4:5) .eq. 'HO') then
          doHO=.true.
        write(6,*) '>>>>>>>>>>>>>> Higgs contribution only <<<<<<<<<<<<<'
@@ -322,6 +322,7 @@ c--- rescaling factor for Higgs amplitudes, if anomalous Higgs width
 C---setup spinors and spinorvector products
       call spinorcurr(8,p,za,zb,zab,zba)
       do j=1,jmax
+!       do j=1,1
       temp(:,:)=0d0
       tempw(:,:)=0d0
       amp(:,:,:,:,:)=czip
@@ -387,15 +388,14 @@ C-----Singly resonant production in VBF style diagrams
 ! C----ZZ->ZZ scattering with the exchange of a H
       call ZZHZZamp(j1(j),j2(j),3,4,5,6,j7(j),j8(j),
      & za,zb,ZZHamp71_82)
-      call ZZHZZamp(j1(j),j2(j),3,4,5,6,j8(j),j7(j),
-     & za,zb,ZZHamp81_72)
+!       call ZZHZZamp(j1(j),j2(j),3,4,5,6,j8(j),j7(j),
+!      & za,zb,ZZHamp81_72)
 C----Four boson vertex + WW->Higgs diagram 
-      call WWZZ(j1(j),j2(j),3,4,5,6,j7(j),j8(j),
-     & za,zb,WWZZ71_82amp,srWWZZ71_82amp) 
-      call WWZZ(j1(j),j2(j),3,4,5,6,j8(j),j7(j),
-     & za,zb,WWZZ81_72amp,srWWZZ81_72amp) 
+!       call WWZZ(j1(j),j2(j),3,4,5,6,j7(j),j8(j),
+!      & za,zb,WWZZ71_82amp,srWWZZ71_82amp) 
+!       call WWZZ(j1(j),j2(j),3,4,5,6,j8(j),j7(j),
+!      & za,zb,WWZZ81_72amp,srWWZZ81_72amp) 
 
- 
 
 C-----setup for (uqbq_uqbq) (2,5)->(2,5)
       do h1=1,2
