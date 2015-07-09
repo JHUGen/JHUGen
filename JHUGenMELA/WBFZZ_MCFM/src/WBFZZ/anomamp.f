@@ -73,6 +73,7 @@ c--- MARKUS: define q^2 dependent couplings
       aa3 =-2d0*ghz4_dyn
 
 
+
       aa1 = aa1 / zmass**2 !-- F
       aa2 = aa2 / zmass**2 !-- F
       aa3 = aa3 / zmass**2 !-- F

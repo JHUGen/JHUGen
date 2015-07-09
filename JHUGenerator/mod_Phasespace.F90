@@ -62,8 +62,16 @@ MODULE ModPhasespace
   end type
 
 
-  real(8),private, parameter :: pi = 3.1415926535897932384626433d0
+  real(8), private, parameter :: pi = 3.1415926535897932384626433d0
 
+  real(8), public, parameter :: PSNorm2 =  (2*pi)**(4-3*2)
+  real(8), public, parameter :: PSNorm3 =  (2*pi)**(4-3*3)
+  real(8), public, parameter :: PSNorm4 =  (2*pi)**(4-3*4)
+  real(8), public, parameter :: PSNorm5 =  (2*pi)**(4-3*5)
+  real(8), public, parameter :: PSNorm6 =  (2*pi)**(4-3*6)
+  real(8), public, parameter :: PSNorm7 =  (2*pi)**(4-3*7)
+  real(8), public, parameter :: PSNorm8 =  (2*pi)**(4-3*8)
+  real(8), public, parameter :: PSNorm9 =  (2*pi)**(4-3*9)
 
 
   
@@ -73,11 +81,55 @@ MODULE ModPhasespace
  
  
  
+  ! if partx(1)=partx(3)=partx(4) (i.e. sqrt(smin)=sqrt(smax)=mass) then we assume a stable internal particle with narrow-width jacobian
+  ! if 0=partx(3)=partx(4) (i.e. sqrt(smin)=sqrt(smax)=0) then we assume a stable external particle
+  FUNCTION s_channel_prop_decay(p0,part1,part2,xRnd,Mom1,Mom2,PropPower) 
+  implicit none
+  real(8) :: s_channel_prop_decay
+  real(8) :: p0(:),xRnd(:),Mom1(1:4),Mom2(1:4),Jac1,Jac2,Jac3,Minvsq_1,Minvsq_2,Power
+  real(8) :: part1(1:4),part2(1:4) ! 1=mass, 2=width, 3=sqrt(smin), 4=sqrt(smax)
+  real(8),optional :: PropPower
+  integer :: iRnd
+  
+      if( present(PropPower) ) then
+         Power = PropPower
+      else
+         Power = 2d0
+      endif
+      iRnd = 1
+
+      if( part1(3).eq.0d0 .and. part1(4).eq.0d0 ) then
+          Minvsq_1 = part1(1)**2
+          Jac1 = 1d0
+      elseif( part1(1).eq.part1(3) .and. part1(1).eq.part1(4) ) then
+          Minvsq_1 = part1(1)**2
+          Jac1 = pi/(part1(1)*part1(2))
+      else
+          Jac1 = s_channel_propagator( part1(1)**2,part1(2), part1(3)**2,part1(4)**2, xRnd(iRnd),Minvsq_1,Power )
+          iRnd = iRnd+1
+      endif
+      
+
+      if( part2(3).eq.0d0 .and. part2(4).eq.0d0 ) then
+          Minvsq_2 = part2(1)**2
+          Jac2 = 1d0
+      elseif( part2(1).eq.part2(3) .and. part2(1).eq.part2(4) ) then
+          Minvsq_2 = part2(1)**2
+          Jac2 = pi/(part2(1)*part2(2))          
+      else
+          Jac2 = s_channel_propagator( part2(1)**2,part2(2), part2(3)**2,part2(4)**2, xRnd(iRnd),Minvsq_2,Power )
+          iRnd = iRnd+1          
+      endif
+      
+      
+      Jac3 = s_channel_decay( p0,Minvsq_1,Minvsq_2,xRnd(iRnd:iRnd+1),Mom1,Mom2 )       
+      s_channel_prop_decay = Jac1*Jac2*Jac3
  
- 
- 
+  RETURN
+  END FUNCTION
 
  
+
  
   FUNCTION s_channel_propagator(PropMass_sq,Width,sMin,sMax,xRnd,InvMass_sq,PropPower) 
   implicit none
@@ -95,10 +147,10 @@ MODULE ModPhasespace
            InvMass_sq = h(xRnd, PropMass_sq, Power, sMin, sMax)
            s_channel_propagator = g_s(InvMass_sq, PropMass_sq, Power, sMin, sMax)
       else
-           if( dabs(sMin + sMax -2d0*PropMass_sq).lt.1d-10 ) then! this is the narrow-width mapping (i.e. no integration)
-              InvMass_sq = PropMass_sq
-              s_channel_propagator = pi/(dsqrt(PropMass_sq)*Width)
-           else ! this is the normal s-channel mapping  
+!            if( dabs(sMin + sMax -2d0*PropMass_sq).lt.1d-10 ) then! this is the narrow-width mapping (i.e. no integration)
+!               InvMass_sq = PropMass_sq
+!               s_channel_propagator = pi/(dsqrt(PropMass_sq)*Width)
+!            else ! this is the normal s-channel mapping  
               if( sMax.gt.PropMass_sq-Width**2 ) then
                   InvMass_sq = h_BreitWigner(xRnd, PropMass_sq, Width, Power, sMin, sMax)
                   s_channel_propagator = g_s_BreitWigner(InvMass_sq, PropMass_sq, Width, Power, sMin, sMax)
@@ -106,15 +158,17 @@ MODULE ModPhasespace
                   InvMass_sq = sMin + (sMax-sMin) * xRnd
                   s_channel_propagator = sMax-sMin
               endif
-           endif
+!            endif
       endif
 
   RETURN
   END FUNCTION
 
 
-!    Jac3 = s_channel_decay( pHiggs,minv_tau1,minv_tau2,xRnd(1:2),Mom(:,tauP),Mom(:,tauM) )
 
+  
+  
+  
 
 ! s-channel phase space
   FUNCTION s_channel_decay( p0,Mass1_sq,Mass2_sq,xRnd,Mom1,Mom2  ) 
