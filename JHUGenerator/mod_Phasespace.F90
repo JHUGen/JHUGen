@@ -5,10 +5,13 @@ MODULE ModPhasespace
 !          (2) no external dependencies 
 
 
-  public :: s_channel_propagator
-  public :: s_channel_decay
   public :: s_channel_prop_decay
   public :: t_channel_prop_decay
+  
+  public :: s_channel_propagator
+  public :: s_channel_decay
+  public :: get_minmax_s
+  public :: get_minmax_t
 
   
   private :: rotate3D_phi_theta
@@ -19,12 +22,12 @@ MODULE ModPhasespace
   private :: g_d
   private :: g_p
   private :: h
-  public  :: h_l
+  private :: h_l
   private :: h_BreitWigner 
-  private :: k_s
-  private :: k_t
+  public  :: k_s
+  public  :: k_t
   public  :: k_l
-  private :: k_BreitWigner 
+  public  :: k_BreitWigner 
 
 
 
@@ -143,12 +146,11 @@ MODULE ModPhasespace
  
  
 ! t-channel phase space
-  FUNCTION t_channel_prop_decay(pa,pb,part0,part1,part2,xRnd,Mom1,Mom2,PropPower) 
+  FUNCTION t_channel_prop_decay(pa,pb,PropMass_sq,Mass1_sq,Mass2_sq,xRnd,Mom1,Mom2,PropPower) 
   implicit none
   real(8) :: t_channel_prop_decay
   real(8) :: pa(1:4),pb(1:4),p0(1:4),xRnd(:),Mom1(1:4),Mom2(1:4)
-  real(8) :: part0(1:4),part1(1:4),part2(1:4) ! 1=mass, 2=width, 3=(smin), 4=(smax)  
-  real(8) :: phi,Theta_hat,CosTheta,p0_sq,Mandelstam_S,Mandelstam_T,pa_sq,pb_sq,Eab,E1,p1z,T_Min_sq,T_Max_sq
+  real(8) :: phi,Theta_hat,CosTheta,p0_sq,Mandelstam_S,Mandelstam_T,pa_sq,pb_sq,Eab,E1,p1z,T_MinMax_sq(1:2)
   real(8) :: Mass1_sq,Mass2_sq,PropMass_sq,phi_hat,CosTheta_hat,pa_hat(1:4),p_boost(1:4),Power
   real(8),optional :: PropPower
   integer :: iRnd
@@ -160,19 +162,14 @@ MODULE ModPhasespace
        endif
        iRnd = 1
        
-       Mass1_sq = part1(1)**2
-       Mass2_sq = part2(1)**2
-       PropMass_sq = part0(1)**2
-       T_Min_sq = part0(3)
-       T_Max_sq = part0(4)
-    
        p0(1:4) = pa(1:4) + pb(1:4)
        pa_sq = pa(1)**2 - pa(2)**2 - pa(3)**2 - pa(4)**2
        pb_sq = pb(1)**2 - pb(2)**2 - pb(3)**2 - pb(4)**2
        Mandelstam_S = p0(1)*p0(1) -p0(2)*p0(2) -p0(3)*p0(3) -p0(4)*p0(4)
-!        Mandelstam_T = -h(xRnd(2), -PropMass_sq, Power, -T_Min_sq, -T_Max_sq)
-!        t_channel_prop_decay = 1d0/g_p( Mandelstam_S, pa_sq, pb_sq, Mandelstam_T, PropMass_sq, power, T_Min_sq, T_Max_sq)
-       t_channel_prop_decay = k_t(xRnd(2),Mandelstam_S, pa_sq, pb_sq, PropMass_sq, Power, T_Min_sq, T_Max_sq,Mandelstam_T)
+       call get_minmax_t(Mandelstam_S,pa_sq,pb_sq,Mass1_sq,Mass2_sq,T_MinMax_sq)       
+!        Mandelstam_T = -h(xRnd(2), -PropMass_sq, Power, -T_MinMax_sq(1), -T_MinMax_sq(2))
+!        t_channel_prop_decay = 1d0/g_p( Mandelstam_S, pa_sq, pb_sq, Mandelstam_T, PropMass_sq, power, T_MinMax_sq(1), T_MinMax_sq(2))
+       t_channel_prop_decay = k_t(xRnd(2),Mandelstam_S, pa_sq, pb_sq, PropMass_sq, Power, T_MinMax_sq(1), T_MinMax_sq(2),Mandelstam_T)
        
        E1 = ( Mandelstam_S + Mass1_sq - Mass2_sq )/2d0/dsqrt(Mandelstam_S)
        p1z= sqrt_lambda(Mandelstam_S,Mass1_sq,Mass2_sq)/2d0/dsqrt(Mandelstam_S)
@@ -556,6 +553,30 @@ pause
   END FUNCTION
 
 
+  
+  SUBROUTINE get_minmax_s(shat,mass1_sq,mass2_sq,sothers_min,minmax)
+  implicit none
+  real(8) :: shat,mass1_sq,mass2_sq,sothers_min,minmax(1:2)
+     
+     minmax(1) = (dsqrt(mass1_sq) + dsqrt(mass2_sq))**2   ! =min
+     minmax(2) = (dsqrt(shat) - dsqrt(sothers_min))**2        ! =max
+  
+  RETURN
+  END SUBROUTINE
+  
+
+  
+  SUBROUTINE get_minmax_t(sab,pa_sq,pb_sq,ka_sq,kb_sq,minmax)
+  implicit none
+  real(8) :: sab,pa_sq,pb_sq,ka_sq,kb_sq,minmax(1:2),tmp
+     
+     tmp = ka_sq + pa_sq - (sab+ka_sq-kb_sq)*(sab+pa_sq-pb_sq)/(2d0*sab)
+     minmax(1) = tmp - sqrt_lambda(sab,ka_sq,kb_sq)*sqrt_lambda(sab,pa_sq,pb_sq)/(2d0*sab)  ! =min
+     minmax(2) = tmp + sqrt_lambda(sab,ka_sq,kb_sq)*sqrt_lambda(sab,pa_sq,pb_sq)/(2d0*sab)  ! =max
+  
+  RETURN
+  END SUBROUTINE
+  
   
   
   

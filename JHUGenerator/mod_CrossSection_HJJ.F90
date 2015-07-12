@@ -240,7 +240,7 @@ END FUNCTION
    if( Process.eq.60 ) call EvalPhaseSpace_VBF(EHat,M_Reso,yRnd(3:7),MomExt,PSWgt)
 !    if( Process.eq.61 ) call EvalPhaseSpace_VBF(EHat,M_Reso,yRnd(3:7),MomExt,PSWgt)
    
-! call EvalPhasespace_VBF_NEW2(yRnd(3:7),EHat,MomExt,PSWgt)
+call EvalPhasespace_VBF_NEW2(yRnd(3:7),EHat,MomExt,PSWgt)
 ! EvalWeighted_HJJ = PSWgt
 ! RETURN
    

@@ -4234,22 +4234,31 @@ use ModPhasespace
 use ModMisc
 implicit none
 real(8) :: xRnd(:), Energy, Mom(:,:)
-real(8) :: Jac,Jac1,Jac2,Jac3,Mom35(1:4),s35,s24
+real(8) :: Jac,Jac1,Jac2,Jac3,Mom35(1:4),s35,minmax(1:2)
 integer, parameter :: inLeft=1, inRight=2, qup=3, qdn=4, Higgs=5
 
-   Mom(1:4,inLeft)  = 0.5d0*Energy * (/+1d0,0d0,0d0,+1d0/)
-   Mom(1:4,inRight) = 0.5d0*Energy * (/+1d0,0d0,0d0,-1d0/)
+
+   Mom(1:4,1) = 0.5d0*Energy * (/+1d0,0d0,0d0,+1d0/)
+   Mom(1:4,2) = 0.5d0*Energy * (/+1d0,0d0,0d0,-1d0/)
   
 !  int d(s35)  
-   Jac3 = k_l(xRnd(5),M_Reso**2,Energy**2,s35)
+   Jac1 = k_l(xRnd(1),M_Reso**2,Energy**2,s35)
+!    call get_minmax_s(Energy**2,0d0,M_Reso**2,0d0,minmax)
+!    Jac3 = k_l(xRnd(5),minmax(1),minmax(2),s35)
+
 
 !  1+2 --> (35)+4
-   Jac1 = t_channel_prop_decay(Mom(1:4,1),Mom(1:4,2),(/M_W,Ga_W,s35-Energy**2,0d0/),(/dsqrt(s35),0d0,0d0,0d0/),(/0d0,0d0,0d0,0d0/),xRnd(1:2),Mom35(1:4),Mom(1:4,4)) 
-
+   Jac2 = t_channel_prop_decay(Mom(1:4,1),Mom(1:4,2),M_W**2,s35,0d0,xRnd(2:3),Mom35(1:4),Mom(1:4,4)) 
+   
 !  1+(24) --> 3+5
-   s24 = -2d0*((Mom(1:4,2)).dot.(Mom(1:4,4)))
-   Jac2 = t_channel_prop_decay(Mom(1:4,1),Mom(1:4,2)-Mom(1:4,4),(/M_W,Ga_W,-(s35-M_Reso**2)*(s35-s24)/s35,0d0/),(/0d0,0d0,0d0,0d0/),(/M_Reso,0d0,0d0,0d0/),xRnd(3:4),Mom(1:4,3),Mom(1:4,5)) 
+   Jac3 = t_channel_prop_decay(Mom(1:4,1),Mom(1:4,2)-Mom(1:4,4),M_W**2,0d0,M_Reso**2,xRnd(4:5),Mom(1:4,3),Mom(1:4,5)) 
+   
+!  combine   
+   Jac = Jac1*Jac2*Jac3 * PSNorm3
 
+
+   
+   
    
 !    print *, "OS checker", dsqrt( dabs(Mom(1:4,3).dot.Mom(1:4,3) ))
 !    print *, "OS checker", dsqrt( dabs(Mom(1:4,4).dot.Mom(1:4,4) ))
@@ -4258,7 +4267,7 @@ integer, parameter :: inLeft=1, inRight=2, qup=3, qdn=4, Higgs=5
 !    print *, "Mom.cons. ",Mom(1:4,1)+Mom(1:4,2)-Mom(1:4,3)-Mom(1:4,4)-Mom(1:4,5)
 !    pause
    
-   Jac = Jac1*Jac2*Jac3 * PSNorm3
+   
    
 RETURN
 END SUBROUTINE
