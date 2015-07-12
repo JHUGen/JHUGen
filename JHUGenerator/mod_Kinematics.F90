@@ -1924,17 +1924,24 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, Higgs=5, V1=6, V2=7, 
        dy_j1j2 = y_j1 - y_j2
 
 
-!        if( m_jj.lt.200d0*GeV ) then
-!           applyPSCut=.true.
-!           return
-!        endif
+!      VERY loose VBF cuts
+     
+       if( m_jj.lt.400d0*GeV ) then
+          applyPSCut=.true.
+          return
+       endif
 
-!        if( abs(y_j1).lt.1d0 .or. abs(y_j2).lt.1d0 .or. y_j1*y_j2.gt.0d0 ) then
-!           applyPSCut=.true.
-!           return
-!        endif
+       if( abs(y_j1).gt.5d0 .or. abs(y_j2).gt.5d0 ) then
+          applyPSCut=.true.
+          return
+       endif
 
-       if(  pT_j1.lt.15d0*GeV .or. pT_j2.lt.15d0*GeV )  then
+       if( abs(y_j1-y_j2).lt.2.0d0 .or. y_j1*y_j2.gt.0d0 ) then
+          applyPSCut=.true.
+          return
+       endif
+
+       if(  pT_j1.lt.20d0*GeV .or. pT_j2.lt.20d0*GeV )  then
           applyPSCut=.true.
           return
        endif
@@ -4170,7 +4177,7 @@ use ModMisc
 implicit none
 real(8) :: xRnd(:), pHiggs(:), Mom(:,:)
 integer :: MY_IDUP(1:2)
-real(8) :: Jac,Jac1,Jac2,Jac3,Jac4,Jac5
+real(8) :: Jac,Jac1,Jac2,Jac3,Jac4,Jac5,Jac6,Jac7,Jac8,Jac9
 real(8) :: Minvsq_tau1,Minvsq_tau2,Minvsq_Wp,Minvsq_Wm,m_LepP,m_LepM
 real(8),parameter :: m_nu = 0d0, ga_tau =4d-13*GeV
 integer, parameter :: inLeft=1, inRight=2, tauP=3, tauM=4, Wp=5, Wm=6, nu1=7, nubar1=8, lepP=9, lepM=10, nu2=11, nubar2=12
@@ -4178,17 +4185,23 @@ integer, parameter :: inLeft=1, inRight=2, tauP=3, tauM=4, Wp=5, Wm=6, nu1=7, nu
    
    m_LepP = getMass(MY_IDUP(1))
    m_LepM = getMass(MY_IDUP(2))
+
    
    
+!  H-->tau tau (NWA)
    Jac1 = s_channel_prop_decay(pHiggs,(/m_tau,ga_tau,m_tau,m_tau/),(/m_tau,ga_tau,m_tau,m_tau/),xRnd(1:2),Mom(:,tauP),Mom(:,tauM)) 
 
+!  tau-->W nu (BW)
    Jac2 = s_channel_prop_decay(Mom(:,tauP),(/m_W,ga_W,0d0,get_MInv(Mom(:,tauP))/),(/m_nu,0d0,0d0,0d0/),xRnd(3:5),Mom(:,Wp),Mom(:,nu1)) 
    Jac3 = s_channel_prop_decay(Mom(:,tauM),(/m_W,ga_W,0d0,get_MInv(Mom(:,tauM))/),(/m_nu,0d0,0d0,0d0/),xRnd(6:8),Mom(:,Wm),Mom(:,nubar1)) 
 
+!  W-->l nu (ONS)
    Jac4 = s_channel_prop_decay(Mom(:,Wp),(/m_LepP,0d0,0d0,0d0/),(/m_nu,0d0,0d0,0d0/),xRnd( 9:10),Mom(:,LepP),Mom(:,nu2)) 
    Jac5 = s_channel_prop_decay(Mom(:,Wm),(/m_LepM,0d0,0d0,0d0/),(/m_nu,0d0,0d0,0d0/),xRnd(11:12),Mom(:,LepM),Mom(:,nubar2)) 
    
-   Jac = Jac1*Jac2*Jac3*Jac4*Jac5 * PSNorm6
+   Jac = Jac1*Jac2*Jac4*Jac3*Jac5 * PSNorm6
+   
+   
    
 !    print *, "OS checker",dsqrt(pHiggs.dot.pHiggs )
 !    print *, "OS checker", dsqrt( dabs(Mom(1:4,tauP).dot.Mom(1:4,tauP) ))
@@ -4212,6 +4225,45 @@ integer, parameter :: inLeft=1, inRight=2, tauP=3, tauM=4, Wp=5, Wm=6, nu1=7, nu
 
 RETURN
 END SUBROUTINE
+
+
+
+SUBROUTINE EvalPhasespace_VBF_NEW2(xRnd,Energy,Mom,Jac)
+use ModParameters
+use ModPhasespace
+use ModMisc
+implicit none
+real(8) :: xRnd(:), Energy, Mom(:,:)
+real(8) :: Jac,Jac1,Jac2,Jac3,Mom35(1:4),s35,s24
+integer, parameter :: inLeft=1, inRight=2, qup=3, qdn=4, Higgs=5
+
+   Mom(1:4,inLeft)  = 0.5d0*Energy * (/+1d0,0d0,0d0,+1d0/)
+   Mom(1:4,inRight) = 0.5d0*Energy * (/+1d0,0d0,0d0,-1d0/)
+  
+!  int d(s35)  
+   Jac3 = k_l(xRnd(5),M_Reso**2,Energy**2,s35)
+
+!  1+2 --> (35)+4
+   Jac1 = t_channel_prop_decay(Mom(1:4,1),Mom(1:4,2),(/M_W,Ga_W,s35-Energy**2,0d0/),(/dsqrt(s35),0d0,0d0,0d0/),(/0d0,0d0,0d0,0d0/),xRnd(1:2),Mom35(1:4),Mom(1:4,4)) 
+
+!  1+(24) --> 3+5
+   s24 = -2d0*((Mom(1:4,2)).dot.(Mom(1:4,4)))
+   Jac2 = t_channel_prop_decay(Mom(1:4,1),Mom(1:4,2)-Mom(1:4,4),(/M_W,Ga_W,-(s35-M_Reso**2)*(s35-s24)/s35,0d0/),(/0d0,0d0,0d0,0d0/),(/M_Reso,0d0,0d0,0d0/),xRnd(3:4),Mom(1:4,3),Mom(1:4,5)) 
+
+   
+   print *, "OS checker", dsqrt( dabs(Mom(1:4,3).dot.Mom(1:4,3) ))
+   print *, "OS checker", dsqrt( dabs(Mom(1:4,4).dot.Mom(1:4,4) ))
+   print *, "OS checker", dsqrt( dabs(Mom(1:4,5).dot.Mom(1:4,5) ))
+   print *, "----------"
+   print *, "Mom.cons. ",Mom(1:4,1)+Mom(1:4,2)-Mom(1:4,3)-Mom(1:4,4)-Mom(1:4,5)
+   pause
+   
+   Jac = Jac1*Jac2*Jac3 * PSNorm3
+   
+RETURN
+END SUBROUTINE
+
+
 
 
 

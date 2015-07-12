@@ -39,10 +39,10 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, Higgs=5, V1=6, V2=7, 
        BWJacobi = 1d0
 !      call SmearExternal(yRnd(17),M_Reso,Ga_Reso,M_Reso/4d0,M_Reso*4d0,MInvH,BWJacobi)
          
-         
-         yrnd(1)=0.1231d0
-         yrnd(2)=0.9712d0
-         
+
+!          yrnd(1)=0.1231d0
+!          yrnd(2)=0.9712d0
+
    if (EHat.lt.MInvH) return
    call EvalPhaseSpace_VBF(EHat,MInvH,yRnd(3:7),MomExt(1:4,1:5),PSWgt)
    call boost2Lab(eta1,eta2,5,MomExt(1:4,1:5))
@@ -151,7 +151,7 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, Higgs=5, V1=6, V2=7, 
 
 
   msq_MCFM(:,:) = 0d0
-  call qq_ZZqq(p_MCFM,msq_MCFM,HZZcoupl,HWWcoupl,Lambda,Lambda_Q,(/Lambda_z1,Lambda_z2,Lambda_z3,Lambda_z4/))!  q(-p1)+q(-p2)->Z(p3,p4)+Z(p5,p6)+q(p7)+q(p8)
+  call qq_ZZqq(p_MCFM,msq_MCFM,HZZcoupl,HWWcoupl,Lambda*100d0,Lambda_Q*100d0,(/Lambda_z1,Lambda_z2,Lambda_z3,Lambda_z4/)*100d0)!  q(-p1)+q(-p2)->Z(p3,p4)+Z(p5,p6)+q(p7)+q(p8)
    
    LO_Res_Unpol = 0d0
    do i = -5,5
@@ -237,8 +237,13 @@ END FUNCTION
    EvalCounter = EvalCounter+1
 
    if (EHat.lt.M_Reso) return
-   if( Process.eq.60 ) call EvalPhaseSpace_VBF(EHat,M_Reso,yRnd(3:7),MomExt,PSWgt)
-   if( Process.eq.61 ) call EvalPhaseSpace_VBF(EHat,M_Reso,yRnd(3:7),MomExt,PSWgt)
+!    if( Process.eq.60 ) call EvalPhaseSpace_VBF(EHat,M_Reso,yRnd(3:7),MomExt,PSWgt)
+!    if( Process.eq.61 ) call EvalPhaseSpace_VBF(EHat,M_Reso,yRnd(3:7),MomExt,PSWgt)
+   
+call EvalPhasespace_VBF_NEW2(yRnd(3:7),EHat,MomExt,PSWgt)
+EvalWeighted_HJJ = PSWgt
+RETURN
+   
    call boost2Lab(eta1,eta2,5,MomExt(1:4,1:5))
 
 

@@ -1798,7 +1798,6 @@ END FUNCTION
       if( abs(MY_IDUP(8)).ge.1 .and. abs(MY_IDUP(8)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
       EvalWeighted_tautau = LO_Res_Unpol * PreFac
 
-
       do NHisto=1,NumHistograms
           call intoHisto(NHisto,NBin(NHisto),EvalWeighted_tautau*VgsWgt)
       enddo
