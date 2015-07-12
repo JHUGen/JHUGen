@@ -237,12 +237,12 @@ END FUNCTION
    EvalCounter = EvalCounter+1
 
    if (EHat.lt.M_Reso) return
-!    if( Process.eq.60 ) call EvalPhaseSpace_VBF(EHat,M_Reso,yRnd(3:7),MomExt,PSWgt)
+   if( Process.eq.60 ) call EvalPhaseSpace_VBF(EHat,M_Reso,yRnd(3:7),MomExt,PSWgt)
 !    if( Process.eq.61 ) call EvalPhaseSpace_VBF(EHat,M_Reso,yRnd(3:7),MomExt,PSWgt)
    
-call EvalPhasespace_VBF_NEW2(yRnd(3:7),EHat,MomExt,PSWgt)
-EvalWeighted_HJJ = PSWgt
-RETURN
+! call EvalPhasespace_VBF_NEW2(yRnd(3:7),EHat,MomExt,PSWgt)
+! EvalWeighted_HJJ = PSWgt
+! RETURN
    
    call boost2Lab(eta1,eta2,5,MomExt(1:4,1:5))
 

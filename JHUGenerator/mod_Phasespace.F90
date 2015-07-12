@@ -148,7 +148,7 @@ MODULE ModPhasespace
   real(8) :: t_channel_prop_decay
   real(8) :: pa(1:4),pb(1:4),p0(1:4),xRnd(:),Mom1(1:4),Mom2(1:4)
   real(8) :: part0(1:4),part1(1:4),part2(1:4) ! 1=mass, 2=width, 3=(smin), 4=(smax)  
-  real(8) :: phi,CosTheta,p0_sq,Mandelstam_S,Mandelstam_T,pa_sq,pb_sq,Eab,E1,p1z,T_Min_sq,T_Max_sq
+  real(8) :: phi,Theta_hat,CosTheta,p0_sq,Mandelstam_S,Mandelstam_T,pa_sq,pb_sq,Eab,E1,p1z,T_Min_sq,T_Max_sq
   real(8) :: Mass1_sq,Mass2_sq,PropMass_sq,phi_hat,CosTheta_hat,pa_hat(1:4),p_boost(1:4),Power
   real(8),optional :: PropPower
   integer :: iRnd
@@ -190,8 +190,9 @@ MODULE ModPhasespace
        
        pa_hat(1:4) = pa(1:4)
        p_boost(1:4) = (/ pa(1)+pb(1), -(pa(2:4)+pb(2:4)) /)       
-       call boost_from_CMS_to_RefMom(pa_hat,p_boost)
+       call boost_from_CMS_to_RefMom(p_boost,pa_hat)
        CosTheta_hat = pa_hat(4)/dsqrt( pa_hat(2)**2+pa_hat(3)**2+pa_hat(4)**2 )
+       Theta_hat = dacos(CosTheta_hat)       
        phi_hat = datan( pa_hat(3)/(pa_hat(2)+1d-15) )
        if( pa_hat(2).lt.0d0 ) phi_hat = phi_hat + pi
 
@@ -205,17 +206,16 @@ MODULE ModPhasespace
 ! print *, "R * pa_star=",pa_hat
 ! 
 ! p_boost(1:4) = (/ pa(1)+pb(1), -(pa(2:4)+pb(2:4)) /)
-! call boost_from_CMS_to_RefMom(pa(:),p_boost)
+! call boost_from_CMS_to_RefMom(p_boost,pa(:))
 ! print *, "B * pa=",pa
 ! print *,""
 ! !checks
        
-       
-       call rotate3D_phi_theta(-phi_hat,dacos(CosTheta_hat),Mom1(:))
-       call rotate3D_phi_theta(-phi_hat,dacos(CosTheta_hat),Mom2(:))
+       call rotate3D_phi_theta(-phi_hat,Theta_hat,Mom1(:),Mom2(:))
+!        call rotate3D_phi_theta(-phi_hat,Theta_hat,Mom2(:))
        p_boost(1:4) = pa(1:4)+pb(1:4)
-       call boost_from_CMS_to_RefMom(Mom1(:),p_boost)
-       call boost_from_CMS_to_RefMom(Mom2(:),p_boost)
+       call boost_from_CMS_to_RefMom(p_boost,Mom1(:),Mom2(:))
+!        call boost_from_CMS_to_RefMom(p_boost,Mom2(:))
        
 
   RETURN
@@ -291,8 +291,8 @@ pause
         
         Mom2(1)   = dsqrt(Mandelstam_S) - Mom1(1)
         Mom2(2:4) = - Mom1(2:4)
-        call boost_from_CMS_to_RefMom(Mom1,p0)
-        call boost_from_CMS_to_RefMom(Mom2,p0)
+        call boost_from_CMS_to_RefMom(p0,Mom1,Mom2)
+!         call boost_from_CMS_to_RefMom(p0,Mom2)
  
         s_channel_decay = 1d0/g_d(Mandelstam_S, Mass1_sq,Mass2_sq)  *  dSin(pi*xRnd(2))
 
@@ -306,41 +306,59 @@ pause
 
 ! ----- transformations ---------
 
-  SUBROUTINE rotate3D_phi_theta(phi,theta,mom)
+  SUBROUTINE rotate3D_phi_theta(phi,theta,mom,mom2)
   implicit none
-  real(8) :: phi,theta,mom(1:4),mom_tmp(2:4)
-  real(8) :: cos_phi,sin_phi,cos_theta,sin_theta
+  real(8) :: phi,theta,mom(1:4)
+  real(8), optional :: Mom2(1:4)
+  real(8) :: cos_phi,sin_phi,cos_theta,sin_theta,mom_tmp(2:4),mom_tmp2(2:4)
   
-      mom_tmp(2:4) = mom(2:4)
       
       cos_phi = dCos(phi)
       sin_phi = dSin(phi)
       cos_theta = dCos(theta)
       sin_theta = dSin(theta)
-      
+
+      mom_tmp(2:4) = mom(2:4)      
       mom(2) = mom_tmp(2) * cos_phi * cos_theta + mom_tmp(3) * sin_phi + mom_tmp(4) * cos_phi * sin_theta
       mom(3) = mom_tmp(3) * cos_phi - mom_tmp(2) * cos_theta * sin_phi - mom_tmp(4) * sin_phi * sin_theta
       mom(4) = mom_tmp(4) * cos_theta - mom_tmp(2) * sin_theta
-    
+      
+      if( present(mom2) ) then
+         mom_tmp2(2:4) = mom2(2:4)
+         mom2(2) = mom_tmp2(2) * cos_phi * cos_theta + mom_tmp2(3) * sin_phi + mom_tmp2(4) * cos_phi * sin_theta
+         mom2(3) = mom_tmp2(3) * cos_phi - mom_tmp2(2) * cos_theta * sin_phi - mom_tmp2(4) * sin_phi * sin_theta
+         mom2(4) = mom_tmp2(4) * cos_theta - mom_tmp2(2) * sin_theta
+      endif
+      
   RETURN
   END SUBROUTINE
 
 
   
 ! careful, this is the inverse of Kallweit's boost
-  SUBROUTINE boost_from_CMS_to_RefMom(BoostMom,RefMom)
+  SUBROUTINE boost_from_CMS_to_RefMom(RefMom,BoostMom,BoostMom2)
   implicit none
   real(8) :: BoostMom(1:4),RefMom(1:4)
+  real(8), optional :: BoostMom2(1:4)
   real(8) :: EuklidSP,spacialFact,refMass
 
       refMass = dsqrt( RefMom(1)**2 - RefMom(2)**2 - RefMom(3)**2 - RefMom(4)**2 )
+
       EuklidSP = refMom(2)*boostMom(2) + refMom(3)*boostMom(3) + refMom(4)*boostMom(4)
       spacialFact = (EuklidSP/(refMom(1) + refMass) + boostMom(1))/refMass
-     
       boostMom(1) = (refMom(1)*boostMom(1) + EuklidSP)/refMass
       boostMom(2) = boostMom(2) + refMom(2)*spacialFact
       boostMom(3) = boostMom(3) + refMom(3)*spacialFact
       boostMom(4) = boostMom(4) + refMom(4)*spacialFact  
+ 
+      if( present(BoostMom2) ) then
+          EuklidSP = refMom(2)*boostMom2(2) + refMom(3)*boostMom2(3) + refMom(4)*boostMom2(4)
+          spacialFact = (EuklidSP/(refMom(1) + refMass) + boostMom2(1))/refMass
+          boostMom2(1) = (refMom(1)*boostMom2(1) + EuklidSP)/refMass
+          boostMom2(2) = boostMom2(2) + refMom(2)*spacialFact
+          boostMom2(3) = boostMom2(3) + refMom(3)*spacialFact
+          boostMom2(4) = boostMom2(4) + refMom(4)*spacialFact        
+      endif
  
   RETURN
   END SUBROUTINE
