@@ -4251,12 +4251,12 @@ integer, parameter :: inLeft=1, inRight=2, qup=3, qdn=4, Higgs=5
    Jac2 = t_channel_prop_decay(Mom(1:4,1),Mom(1:4,2)-Mom(1:4,4),(/M_W,Ga_W,-(s35-M_Reso**2)*(s35-s24)/s35,0d0/),(/0d0,0d0,0d0,0d0/),(/M_Reso,0d0,0d0,0d0/),xRnd(3:4),Mom(1:4,3),Mom(1:4,5)) 
 
    
-   print *, "OS checker", dsqrt( dabs(Mom(1:4,3).dot.Mom(1:4,3) ))
-   print *, "OS checker", dsqrt( dabs(Mom(1:4,4).dot.Mom(1:4,4) ))
-   print *, "OS checker", dsqrt( dabs(Mom(1:4,5).dot.Mom(1:4,5) ))
-   print *, "----------"
-   print *, "Mom.cons. ",Mom(1:4,1)+Mom(1:4,2)-Mom(1:4,3)-Mom(1:4,4)-Mom(1:4,5)
-   pause
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,3).dot.Mom(1:4,3) ))
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,4).dot.Mom(1:4,4) ))
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,5).dot.Mom(1:4,5) ))
+!    print *, "----------"
+!    print *, "Mom.cons. ",Mom(1:4,1)+Mom(1:4,2)-Mom(1:4,3)-Mom(1:4,4)-Mom(1:4,5)
+!    pause
    
    Jac = Jac1*Jac2*Jac3 * PSNorm3
    
