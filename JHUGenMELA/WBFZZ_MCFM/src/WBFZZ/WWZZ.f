@@ -165,12 +165,10 @@ c--- Make sure WWZA vertices included
      &    *ggWW(h34,h56)/(propw17*propw28)*Bbit
 
 
-
-
 C----Higgs contribution
          WWZZamp(h34,h56)=WWZZamp(h34,h56)
      &    -2d0*sqzmass/cxw**2*ZZ3456(h34,h56)
-!     &    *za(i7,i8)*zb(i2,i1)*za(i3,i5)*zb(i6,i4) !--F
+!      &    *za(i7,i8)*zb(i2,i1)*za(i3,i5)*zb(i6,i4) !--F
      &     *anomzzamp(i3,i4,i5,i6,s3456,s(i3,i4),s(i5,i6),za,zb) !--F
      &     *anomwwamp(i7,i1,i8,i2,s3456,s(i7,i1),s(i8,i2),za,zb) !--F
      &    /(propWBF*prop3456)*Hbit

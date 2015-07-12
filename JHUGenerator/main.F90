@@ -32,7 +32,7 @@ logical,parameter :: useBetaVersion=.false.! this should be set to .false.
    if( .not.useBetaVersion .and.   ConvertLHEFile ) then
         call StartConvertLHE(VG_Result,VG_Error)
    elseif( .not.useBetaVersion .and. .not.ReadLHEFile ) then
-        if( Process.eq.80 .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.90 ) then
+        if( Process.eq.80 .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.66 .or. Process.eq.90 .or. Process .eq. 110 .or. Process .eq. 111 ) then
            call StartVegas_NEW(VG_Result,VG_Error)
         else
            call StartVegas(VG_Result,VG_Error)
@@ -146,7 +146,7 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
         read(arg(10:109),"(A)") DataFile
         CountArg = CountArg + 1
     elseif( arg(1:8).eq."Process=" ) then
-        read(arg(9:10),*) Process
+        read(arg(9:11),*) Process
         CountArg = CountArg + 1
     elseif( arg(1:11).eq."DecayMode1=" ) then
         read(arg(12:13),*) DecayMode1
@@ -208,7 +208,7 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
     endif
 
     if (Process.eq.0) PChannel = 0   !only gluons
-    if (Process.eq.1 .or. Process.eq.50 .or. Process.eq.60) PChannel = 1   !only quarks
+    if (Process.eq.1 .or. Process.eq.50 .or. Process.eq.60 .or. Process.eq.66) PChannel = 1   !only quarks
 
     if(OffShell_XVV.ge.100) then
         OffShell_XVV=OffShell_XVV-100
@@ -258,7 +258,7 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
     endif
 
     
-    if( (TopDecays.ne.0) .and. (Process.eq.80) ) then! TTBH
+    if( (TopDecays.ne.0) .and. (Process.eq.80 .or. Process.eq.110 .or. Process.eq.111) ) then! TTBH and TH
        if( TopDecays.ne.1 ) call Error("TopDecays=2,3,4 are no longer supported. Use DecayMode1/2.")
        if( .not. IsAWDecay(DecayMode1) ) call Error("Invalid DecayMode1 for top decays")
        if( .not. IsAWDecay(DecayMode2) ) call Error("Invalid DecayMode2 for top decays")
@@ -596,11 +596,25 @@ include "vegas_common.f"
       if(Process.eq.60) then
          NDim = 5
          NDim = NDim + 2 ! sHat integration
+         
          VegasIt1_default = 5
          VegasNc0_default = 10000000
          VegasNc1_default = 500000
          VegasNc2_default = 10000
       endif
+      !- HVBF with decays
+      if(Process.eq.66) then
+         NDim = 5
+         NDim = NDim + 2 ! sHat integration
+         NDim = NDim + 8
+         NDim = NDim + 1
+         
+         VegasIt1_default = 5
+         VegasNc0_default = 10000000
+         VegasNc1_default = 500000
+         VegasNc2_default = 10000
+      endif
+
       !- Hjj, gluon fusion
       if(Process.eq.61) then
          NDim = 5
@@ -651,6 +665,24 @@ include "vegas_common.f"
          VegasNc1_default =  500000
          VegasNc2_default =    1000
       endif
+     ! RR added -- t+H
+      if(Process.eq.110) then
+         NDim = 9
+         NDim = NDim + 2 ! sHat integration
+         VegasIt1_default = 5
+         VegasNc0_default =  500000
+         VegasNc1_default =  500000
+         VegasNc2_default =  500000
+      endif
+     ! RR added -- tb+H
+      if(Process.eq.111) then
+         NDim = 9
+         NDim = NDim + 2 ! sHat integration
+         VegasIt1_default = 5
+         VegasNc0_default =  500000
+         VegasNc1_default =  500000
+         VegasNc2_default =  500000
+      endif
 
       if( unweighted ) then
           NDim = NDim + 1  ! random number which decides if event is accepted
@@ -664,12 +696,12 @@ END SUBROUTINE
 
 
 
-
-
 SUBROUTINE StartVegas(VG_Result,VG_Error)
 use ModCrossSection
+use ModCrossSection_HJJ
 use ModCrossSection_TTBH
 use ModCrossSection_BBBH
+use ModCrossSection_TH
 use ModKinematics
 use ModParameters
 implicit none
@@ -725,7 +757,9 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
       call vegas(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
     elseif (Process.eq.90) then
       call vegas(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
-    else
+    elseif (Process.eq.110 .or. Process.eq.111) then
+      call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
+   else
       call vegas(EvalWeighted,VG_Result,VG_Error,VG_Chi2)    ! usual call of vegas for weighted events
     endif
 
@@ -751,6 +785,8 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
       call vegas1(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
     elseif (Process.eq.90) then
       call vegas1(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
+    elseif (Process.eq.110 .or. Process.eq.111) then
+      call vegas1(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
     else
       call vegas1(EvalWeighted,VG_Result,VG_Error,VG_Chi2)    ! usual call of vegas for weighted events
     endif
@@ -957,8 +993,10 @@ END SUBROUTINE
 
 SUBROUTINE StartVegas_NEW(VG_Result,VG_Error)
 use ModCrossSection
+use ModCrossSection_HJJ
 use ModCrossSection_TTBH
 use ModCrossSection_BBBH
+use ModCrossSection_TH
 use ModKinematics
 use ModParameters
 implicit none
@@ -1006,8 +1044,13 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
     warmup = .true.
     if( Process.eq.80 ) call vegas(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.90 ) call vegas(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
+    
     if( Process.eq.60 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
+    if( Process.eq.66 ) call vegas(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.61 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
+
+    if( Process.eq.110) call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
+    if( Process.eq.111) call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
 
 
     !DATA RUN
@@ -1022,9 +1065,13 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
     ncall= VegasNc2
     if( Process.eq.80 ) call vegas1(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.90 ) call vegas1(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
+
     if( Process.eq.60 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
+    if( Process.eq.66 ) call vegas1(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.61 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
 
+    if( Process.eq.110) call vegas1(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
+    if( Process.eq.111) call vegas1(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
 
 
 
@@ -1045,8 +1092,14 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
                     dum = EvalUnWeighted_BBBH(yRnd,.false.,(/-99,-99/),RES)
                 elseif( Process.eq.60 ) then
                     dum = EvalUnWeighted_HJJ(yRnd,.false.,(/-99,-99/),RES)
+                elseif( Process.eq.66 ) then
+                    dum = EvalUnWeighted_HJJ_fulldecay(yRnd,.false.,(/-99,-99/),RES)
                 elseif( Process.eq.61 ) then
                     dum = EvalUnWeighted_HJJ(yRnd,.false.,(/-99,-99/),RES)
+                elseif( Process.eq.110 ) then
+                    dum = EvalUnWeighted_TH(yRnd,.false.,(/-99,-99/),RES)
+                elseif( Process.eq.111 ) then
+                    dum = EvalUnWeighted_TH(yRnd,.false.,(/-99,-99/),RES)
                 endif
                 VG(:,:) = VG(:,:) + RES(:,:)
                 PChannel = PChannel_aux
@@ -1065,7 +1118,7 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
    VG(:,:) = VG(:,:)/dble(VegasNc0)
    TotalXSec = sum(  VG(:,:) )
    print *, ""    
-   write(io_stdout,"(1X,A,F8.3)") "Total xsec",TotalXSec
+   write(io_stdout,"(1X,A,F10.3)") "Total xsec: ",TotalXSec
 
 
     RequEvents(:,:)=0
@@ -1116,8 +1169,14 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
                   dum = EvalUnWeighted_BBBH(yRnd,.true.,(/i1,j1/),RES)
               elseif( Process.eq.60 ) then
                   dum = EvalUnWeighted_HJJ(yRnd,.true.,(/i1,j1/),RES)
+              elseif( Process.eq.66 ) then
+                  dum = EvalUnWeighted_HJJ_fulldecay(yRnd,.true.,(/i1,j1/),RES)
               elseif( Process.eq.61 ) then
                   dum = EvalUnWeighted_HJJ(yRnd,.true.,(/i1,j1/),RES)
+              elseif( Process.eq.110 ) then
+                  dum = EvalUnWeighted_TH(yRnd,.true.,(/i1,j1/),RES)
+              elseif( Process.eq.111 ) then
+                  dum = EvalUnWeighted_TH(yRnd,.true.,(/i1,j1/),RES)
               endif
               StatusPercent = int(100d0*(AccepCounter_part(i1,j1))  /  dble(RequEvents(i1,j1))  )
               call PrintStatusBar( StatusPercent )
@@ -1694,7 +1753,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                 write(io_LHEOutFile, "(A)") "<!--"
             endif
             write(io_LHEOutFile ,"(A)") "JHUGen Resonance parameters used for event generation:"
-            write(io_LHEOutFile ,"(A,F6.1,A)") "hmass  ",M_Reso*100d0,"        ! Higgs boson mass"
+            write(io_LHEOutFile ,"(A,F6.1,A)") "hmass  ",M_Reso*100d0,"         ! Higgs boson mass"
             write(io_LHEOutFile ,"(A,F10.5,A)") "hwidth",Ga_Reso*100d0,"      ! Higgs boson width"
             if (Index(FirstLines,"-->").eq.0) then
                 write(io_LHEOutFile, "(A)") "-->"
@@ -1724,11 +1783,11 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
         write(io_LogFile,"(2X,A,1F7.2,A)") "A Higgs mass of ",M_Reso*100d0," GeV was determined from the LHE input file."
      endif
      if( .not. Ga_ResoSet ) then
-        write(io_stdout,"(2X,A,1F7.2)")  "ERROR: Higgs width could not be read from LHE input file. Assuming default value",Ga_Reso*100d0
-        write(io_LogFile,"(2X,A,1F7.2)") "ERROR: Higgs width could not be read from LHE input file. Assuming default value",Ga_Reso*100d0
+        write(io_stdout,"(2X,A,1F10.5)")  "ERROR: Higgs width could not be read from LHE input file. Assuming default value",Ga_Reso*100d0
+        write(io_LogFile,"(2X,A,1F10.5)") "ERROR: Higgs width could not be read from LHE input file. Assuming default value",Ga_Reso*100d0
      else
-        write(io_stdout,"(2X,A,1F9.5,A)") "A Higgs width of ",Ga_Reso*100d0," GeV was determined from the LHE input file."
-        write(io_LogFile,"(2X,A,1F9.5,A)") "A Higgs width of ",Ga_Reso*100d0," GeV was determined from the LHE input file."
+        write(io_stdout,"(2X,A,1F10.5,A)") "A Higgs width of ",Ga_Reso*100d0," GeV was determined from the LHE input file."
+        write(io_LogFile,"(2X,A,1F10.5,A)") "A Higgs width of ",Ga_Reso*100d0," GeV was determined from the LHE input file."
      endif
      write(io_stdout,"(A)") ""
      write(io_LogFile,"(A)") ""
@@ -1844,7 +1903,12 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
               tries = tries +1 
               read(16,fmt="(A160)",IOSTAT=stat,END=99) OtherLines(1:160)
               if(OtherLines(1:30).eq."</LesHouchesEvents>") then
-                  if( RequestNLeptons.gt.0 ) write(io_LHEOutFile,"(A,1F6.2,A)") "<!-- Lepton filter efficiency:",dble(AccepCounter)/dble(NEvent)*100d0," % -->"
+                  if( RequestNLeptons.gt.0 ) then
+                    write(io_LHEOutFile,"(A)") "<!-- Lepton filter information:"
+                    write(io_LHEOutFile,"(A,I8)") "     events processed:  ", NEvent
+                    write(io_LHEOutFile,"(A,I8)") "     events accepted:   ", AccepCounter
+                    write(io_LHEOutFile,"(A,1F6.2,A)") "     filter efficiency: ", dble(AccepCounter)/dble(NEvent)*100d0,"% -->"
+                  endif
                   goto 99
               elseif( (Index(OtherLines(1:7),"</event").ne.0) .and. Res.gt.0d0 ) then
                   write(io_LHEOutFile,"(A)") trim(OtherLines)
@@ -2036,7 +2100,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                 write(io_LHEOutFile, "(A)") "<!--"
             endif
             write(io_LHEOutFile ,"(A)") "JHUGen Resonance parameters used for event generation:"
-            write(io_LHEOutFile ,"(A,F6.1,A)") "hmass  ",M_Reso*100d0,"        ! Higgs boson mass"
+            write(io_LHEOutFile ,"(A,F6.1,A)") "hmass  ",M_Reso*100d0,"         ! Higgs boson mass"
             write(io_LHEOutFile ,"(A,F10.5,A)") "hwidth",Ga_Reso*100d0,"      ! Higgs boson width"
             if (Index(FirstLines,"-->").eq.0) then
                 write(io_LHEOutFile, "(A)") "-->"
@@ -2065,11 +2129,11 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
         write(io_LogFile,"(2X,A,1F7.2,A)") "A Higgs mass of ",M_Reso*100d0," GeV was determined from the LHE input file."
      endif
      if( .not. Ga_ResoSet ) then
-        write(io_stdout,"(2X,A,1F7.2)")  "ERROR: Higgs width could not be read from LHE input file. Assuming default value",Ga_Reso*100d0
-        write(io_LogFile,"(2X,A,1F7.2)") "ERROR: Higgs width could not be read from LHE input file. Assuming default value",Ga_Reso*100d0
+        write(io_stdout,"(2X,A,1F10.5)")  "ERROR: Higgs width could not be read from LHE input file. Assuming default value",Ga_Reso*100d0
+        write(io_LogFile,"(2X,A,1F10.5)") "ERROR: Higgs width could not be read from LHE input file. Assuming default value",Ga_Reso*100d0
      else
-        write(io_stdout,"(2X,A,1F9.5,A)") "A Higgs width of ",Ga_Reso*100d0," GeV was determined from the LHE input file."
-        write(io_LogFile,"(2X,A,1F9.5,A)") "A Higgs width of ",Ga_Reso*100d0," GeV was determined from the LHE input file."
+        write(io_stdout,"(2X,A,1F10.5,A)") "A Higgs width of ",Ga_Reso*100d0," GeV was determined from the LHE input file."
+        write(io_LogFile,"(2X,A,1F10.5,A)") "A Higgs width of ",Ga_Reso*100d0," GeV was determined from the LHE input file."
      endif
      write(io_stdout,"(A)") ""
      write(io_LogFile,"(A)") ""
@@ -2624,7 +2688,7 @@ SUBROUTINE InitHisto()
 use modParameters
 implicit none
 
-  if( Process.eq.60 .or. Process.eq.61 ) then
+  if( Process.eq.60 .or. Process.eq.61 .or. Process.eq.66 ) then
      call InitHisto_HVBF()
   elseif( Process.eq.62) then
      call InitHisto_HJ()
@@ -2634,6 +2698,8 @@ implicit none
      call InitHisto_TTBH()
   elseif (Process.eq.90) then
      call InitHisto_BBBH()
+  elseif (Process.eq.110 .or. Process .eq. 111) then
+     call InitHisto_TH()
   else
      call InitHisto_HZZ()
   endif
@@ -2858,29 +2924,71 @@ implicit none
 integer :: AllocStatus,NHisto
 
           it_sav = 1
-          NumHistograms = 3
+          NumHistograms = 10
           if( .not.allocated(Histo) ) then
                 allocate( Histo(1:NumHistograms), stat=AllocStatus  )
                 if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
           endif
 
           Histo(1)%Info   = "pT_top"
-          Histo(1)%NBins  = 40
+          Histo(1)%NBins  = 50
           Histo(1)%BinSize= 10d0*GeV
           Histo(1)%LowVal = 0d0
           Histo(1)%SetScale= 1d0/GeV
 
           Histo(2)%Info   = "pT_H"
-          Histo(2)%NBins  = 40
+          Histo(2)%NBins  = 50
           Histo(2)%BinSize= 10d0*GeV
           Histo(2)%LowVal = 0d0
           Histo(2)%SetScale= 1d0/GeV
 
-          Histo(3)%Info   = "D_0minus"
+          Histo(3)%Info   = "mt"
           Histo(3)%NBins  = 50
-          Histo(3)%BinSize= 0.02
-          Histo(3)%LowVal = 0d0
-          Histo(3)%SetScale= 1d0
+          Histo(3)%BinSize= 0.4d0*GeV
+          Histo(3)%LowVal = 160d0*GeV
+          Histo(3)%SetScale= 1d0/GeV
+
+          Histo(4)%Info   = "mtbar"
+          Histo(4)%NBins  = 50
+          Histo(4)%BinSize= 0.4d0*GeV
+          Histo(4)%LowVal = 160d0*GeV
+          Histo(4)%SetScale= 1d0/GeV
+
+          Histo(5)%Info   = "mWp"
+          Histo(5)%NBins  = 50
+          Histo(5)%BinSize= 0.4d0*GeV
+          Histo(5)%LowVal = 70d0*GeV
+          Histo(5)%SetScale= 1d0/GeV
+
+          Histo(6)%Info   = "mWm"
+          Histo(6)%NBins  = 50
+          Histo(6)%BinSize= 0.4d0*GeV
+          Histo(6)%LowVal = 70d0*GeV
+          Histo(6)%SetScale= 1d0/GeV
+
+          Histo(7)%Info   = "pT_b"
+          Histo(7)%NBins  = 50
+          Histo(7)%BinSize= 10d0*GeV
+          Histo(7)%LowVal = 0d0
+          Histo(7)%SetScale= 1d0/GeV
+
+          Histo(8)%Info   = "pT_l"
+          Histo(8)%NBins  = 50
+          Histo(8)%BinSize= 10d0*GeV
+          Histo(8)%LowVal = 0d0
+          Histo(8)%SetScale= 1d0/GeV
+          
+          Histo(9)%Info   = "pT_miss"
+          Histo(9)%NBins  = 50
+          Histo(9)%BinSize= 10d0*GeV
+          Histo(9)%LowVal = 0d0
+          Histo(9)%SetScale= 1d0/GeV
+          
+          Histo(10)%Info   = "D_0minus"
+          Histo(10)%NBins  = 50
+          Histo(10)%BinSize= 0.02
+          Histo(10)%LowVal = 0d0
+          Histo(10)%SetScale= 1d0
 
 
   do NHisto=1,NumHistograms
@@ -2931,6 +3039,69 @@ RETURN
 END SUBROUTINE
 
 
+
+
+SUBROUTINE InitHisto_TH()
+use ModMisc
+use ModKinematics
+use ModParameters
+implicit none
+integer :: AllocStatus,NHisto
+
+          it_sav = 1
+          NumHistograms = 6
+          if( .not.allocated(Histo) ) then
+                allocate( Histo(1:NumHistograms), stat=AllocStatus  )
+                if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
+          endif
+
+          Histo(1)%Info   = "pT_top"
+          Histo(1)%NBins  = 50
+          Histo(1)%BinSize= 10d0*GeV
+          Histo(1)%LowVal = 0d0
+          Histo(1)%SetScale= 1d0/GeV
+
+          Histo(2)%Info   = "y(top)"
+          Histo(2)%NBins  = 60
+          Histo(2)%BinSize= 0.1d0
+          Histo(2)%LowVal = -3d0
+          Histo(2)%SetScale= 1d0
+
+          Histo(3)%Info   = "pT(jet)"
+          Histo(3)%NBins  = 50
+          Histo(3)%BinSize= 10d0*GeV
+          Histo(3)%LowVal =  0d0*GeV
+          Histo(3)%SetScale= 1d0/GeV
+
+          Histo(4)%Info   = "y(jet)"
+          Histo(4)%NBins  = 60
+          Histo(4)%BinSize= 0.2d0
+          Histo(4)%LowVal = -6d0
+          Histo(4)%SetScale= 1d0
+
+          Histo(5)%Info   = "pT(Higgs)"
+          Histo(5)%NBins  = 50
+          Histo(5)%BinSize= 10d0*GeV
+          Histo(5)%LowVal =  0d0*GeV
+          Histo(5)%SetScale= 1d0/GeV
+
+          Histo(6)%Info   = "y(Higgs)"
+          Histo(6)%NBins  = 100
+          Histo(6)%BinSize= 0.1d0
+          Histo(6)%LowVal = -5d0
+          Histo(6)%SetScale= 1d0
+
+
+
+  do NHisto=1,NumHistograms
+      Histo(NHisto)%Value(:) = 0d0
+      Histo(NHisto)%Value2(:)= 0d0
+      Histo(NHisto)%Hits(:)  = 0
+  enddo
+
+RETURN
+END SUBROUTINE
+
 SUBROUTINE InitHisto_HVBF()
 use ModMisc
 use ModKinematics
@@ -2939,7 +3110,7 @@ implicit none
 integer :: AllocStatus,NHisto
 
           it_sav = 1
-          NumHistograms = 2
+          NumHistograms = 5
           if( .not.allocated(Histo) ) then
                 allocate( Histo(1:NumHistograms), stat=AllocStatus  )
                 if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
@@ -2957,17 +3128,25 @@ integer :: AllocStatus,NHisto
           Histo(2)%LowVal = 0d0
           Histo(2)%SetScale= 1d0
 
-!           Histo(3)%Info   = "log(MEsq)"
-!           Histo(3)%NBins  = 11
-!           Histo(3)%BinSize= 1d0
-!           Histo(3)%LowVal = -10d0
-!           Histo(3)%SetScale= 1d0
-! 
-!           Histo(4)%Info   = "log(MEsq*pdf)"
-!           Histo(4)%NBins  = 11
-!           Histo(4)%BinSize= 1d0
-!           Histo(4)%LowVal = -10d0
-!           Histo(4)%SetScale= 1d0
+          Histo(3)%Info   = "pT(H)"
+          Histo(3)%NBins  = 50
+          Histo(3)%BinSize= 10d0*GeV
+          Histo(3)%LowVal = 0d0
+          Histo(3)%SetScale= 1d0/GeV
+
+          Histo(4)%Info   = "pT(j1)"
+          Histo(4)%NBins  = 50
+          Histo(4)%BinSize= 10d0*GeV
+          Histo(4)%LowVal = 0d0
+          Histo(4)%SetScale= 1d0/GeV
+
+          Histo(5)%Info   = "dy(j1,j2)"
+          Histo(5)%NBins  = 50
+          Histo(5)%BinSize= 0.2d0
+          Histo(5)%LowVal = -5d0
+          Histo(5)%SetScale= 1d0
+
+
 
   do NHisto=1,NumHistograms
       Histo(NHisto)%Value(:) = 0d0
@@ -3084,8 +3263,8 @@ implicit none
 
         if( .not. ReadLHEFile .and. .not. ConvertLHEFile ) then
             write(io_LHEOutFile ,'(A)') ''
-            write(io_LHEOutFile ,'(A,F5.1,A)') 'hmass   ',M_Reso*100d0,'     ! Higgs boson mass'
-            write(io_LHEOutFile ,'(A,F8.5,A)') 'hwidth ',Ga_Reso*100d0,'   ! Higgs boson width'
+            write(io_LHEOutFile ,'(A,F5.1,A)') 'hmass   ',M_Reso*100d0,'       ! Higgs boson mass'
+            write(io_LHEOutFile ,'(A,F10.5,A)') 'hwidth ',Ga_Reso*100d0,'   ! Higgs boson width'
             write(io_LHEOutFile ,'(A)') ''
         endif
 
@@ -3173,21 +3352,24 @@ character :: arg*(500)
     if( Collider.eq.0 ) write(TheUnit,"(4X,A,1F8.2)") "Collider: e+ e-, sqrt(s)=",Collider_Energy*100d0
     if( Collider.eq.1 ) write(TheUnit,"(4X,A,1F8.2)") "Collider: P-P, sqrt(s)=",Collider_Energy*100d0
     if( Collider.eq.2 ) write(TheUnit,"(4X,A,1F8.2)") "Collider: P-Pbar, sqrt(s)=",Collider_Energy*100d0
-    if( Process.eq.0 ) write(TheUnit,"(4X,A,F7.2,A,F7.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
-    if( Process.eq.1 ) write(TheUnit,"(4X,A,F7.2,A,F7.5)") "Resonance: spin=1, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
-    if( Process.eq.2 ) write(TheUnit,"(4X,A,F7.2,A,F7.5)") "Resonance: spin=2, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
-    if( Process.eq.60) write(TheUnit,"(4X,A,F7.2,A,F7.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
-    if( Process.eq.61) write(TheUnit,"(4X,A,F7.2,A,F7.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
-    if( Process.eq.50) write(TheUnit,"(4X,A,F7.2,A,F7.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
-    if( Process.eq.80) write(TheUnit,"(4X,A,F7.2,A,F7.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
-    if( Process.eq.90) write(TheUnit,"(4X,A,F7.2,A,F7.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
+    if( Process.eq.0 ) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
+    if( Process.eq.1 ) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=1, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
+    if( Process.eq.2 ) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=2, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
+    if( Process.eq.60) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
+    if( Process.eq.61) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
+    if( Process.eq.66) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
+    if( Process.eq.50) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
+    if( Process.eq.80) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
+    if( Process.eq.90) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
+    if( Process.eq.110) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
+    if( Process.eq.111) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( ReadLHEFile )    write(TheUnit,"(4X,A)") "           (This is ReadLHEFile mode. Resonance mass/width might be overwritten by LHE input parameters. See below.)"
     if( ConvertLHEFile ) write(TheUnit,"(4X,A)") "           (This is ConvertLHEFile mode. Resonance mass/width might be overwritten by LHE input parameters. See below.)"
     write(TheUnit,"(4X,A,I2,2X,A,I2)") "DecayMode1:",DecayMode1, "DecayMode2:",DecayMode2
     if( IsAZDecay(DecayMode1) .or. IsAZDecay(DecayMode2) ) write(TheUnit,"(4X,A,F6.3,A,F6.4)") "Z-boson: mass=",M_Z*100d0,", width=",Ga_Z*100d0
     if( IsAWDecay(DecayMode1) .or. IsAWDecay(DecayMode2) ) write(TheUnit,"(4X,A,F6.3,A,F6.4)") "W-boson: mass=",M_W*100d0,", width=",Ga_W*100d0
-    if( Process.eq.80 ) write(TheUnit,"(4X,A,F8.4,A,F6.4)") "Top quark mass=",m_top*100d0,", width=",Ga_top*100d0
-!     if( Process.eq.80 ) write(TheUnit,"(4X,A,I2)") "Top quark decay=",TOPDECAYS
+    if( Process.eq.80 .or. Process.eq.110 .or. Process.eq.111 ) write(TheUnit,"(4X,A,F8.4,A,F6.4)") "Top quark mass=",m_top*100d0,", width=",Ga_top*100d0
+    if( Process.eq.80 .or. Process.eq.110 .or. Process.eq.111 ) write(TheUnit,"(4X,A,I2)") "Top quark decay=",TOPDECAYS
     if( Process.eq.90 ) write(TheUnit,"(4X,A,F8.4,A,F6.4)") "Bottom quark mass=",m_top*100d0
     if( (ReadLHEFile) .and. (RequestNLeptons.gt.0) .and. (RequestOSSF) ) write(TheUnit,"(4X,A,I2,A)") "Lepton filter activated. Requesting ",RequestNLeptons," OSSF leptons."
     if( (ReadLHEFile) .and. (RequestNLeptons.gt.0) .and. .not. (RequestOSSF)) write(TheUnit,"(4X,A,I2,A)") "Lepton filter activated. Requesting ",RequestNLeptons," leptons."
@@ -3210,7 +3392,7 @@ character :: arg*(500)
     if( .not. seed_random ) write(TheUnit,"(4X,A)") "NOTE: seed_random==FALSE (switched off)"
 
     write(TheUnit,"(4X,A)") ""
-    if( Process.eq.0 .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.62.or. Process.eq.50 ) then
+    if( Process.eq.0 .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.62 .or. Process.eq.66 .or. Process.eq.50 ) then
         write(TheUnit,"(4X,A)") "spin-0-VV couplings: "
         write(TheUnit,"(6X,A,L)") "generate_as=",generate_as
         if( generate_as ) then 
@@ -3342,7 +3524,11 @@ real(8) :: VG_Result,VG_Error,RunTime
               it = 1
               Value  = Histo(NHisto)%Value(NBin)/BinSize / dble(EvalCounter)
               Integral = Integral + Histo(NHisto)%Value(NBin)
-              Error  = 1d0/dsqrt(dble(Hits))
+              if( Hits.gt.0 ) then
+                  Error  = 1d0/dsqrt(dble(Hits))
+              else
+                  Error = 0d0
+              endif
           else
               Value  = Histo(NHisto)%Value(NBin)/BinSize/it
               Integral = Integral + Histo(NHisto)%Value(NBin)/it
@@ -3420,7 +3606,10 @@ implicit none
         write(io_stdout,*) ""
         write(io_stdout,"(2X,A)") "Command line arguments:"
         write(io_stdout,"(4X,A)") "Collider:   1=LHC, 2=Tevatron, 0=e+e-"
-        write(io_stdout,"(4X,A)") "Process: 0=spin-0, 1=spin-1, 2=spin-2 resonance, 50=pp/ee->VH, 60=weakVBF, 61=pp->Hjj, 62=pp->Hj, 80=pp->ttbar+H, 90=pp->bbbar+H"
+        write(io_stdout,"(4X,A)") "Process: 0=spin-0, 1=spin-1, 2=spin-2 resonance"
+        write(io_stdout,"(4X,A)") "         50=pp/ee->VH, 60=weakVBF, 61=pp->Hjj, 62=pp->Hj"
+!         write(io_stdout,"(4X,A)") "         50=pp/ee->VH, 60/66=weakVBF (without/with decay+SM bkg), 61=pp->Hjj, 62=pp->Hj"
+        write(io_stdout,"(4X,A)") "         80=pp->ttbar+H, 90=pp->bbbar+H, 110=pp->t+H, 111=pp->tbar+H"
         write(io_stdout,"(4X,A)") "MReso:      resonance mass (default=125.60), format: yyy.xx"
         write(io_stdout,"(4X,A)") "DecayMode1: decay mode for vector boson 1 (Z/W+/gamma)"
         write(io_stdout,"(4X,A)") "DecayMode2: decay mode for vector boson 2 (Z/W-/gamma)"
