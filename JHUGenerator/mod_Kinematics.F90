@@ -3427,6 +3427,10 @@ real(8) :: upv(1:2),dnv(1:2),usea(1:2),dsea(1:2),str(1:2),chm(1:2),bot(1:2),glu(
 integer,parameter :: swPDF_u=1, swPDF_d=1, swPDF_c=1, swPDF_s=1, swPDF_b=1, swPDF_g=1
 real(8) :: pdf(-6:6,1:2),NNpdf(1:2,-6:7)
 
+!set top components zero
+        pdf(-5,1:2) = 0d0
+        pdf( 5,1:2) = 0d0
+
         PDFScale=MuFac*100d0
         
 #if useLHAPDF==1
