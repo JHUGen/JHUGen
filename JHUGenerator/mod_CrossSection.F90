@@ -705,6 +705,7 @@ elseif( IsAWDecay(DecayMode1) ) then
         endif
           LO_Res_Unpol = me2/3d0*pdf(i,1)*pdf(j,2) * PreFac
           EvalWeighted_VHiggs = EvalWeighted_VHiggs+LO_Res_Unpol
+          !print *, i,j,pdf(i,1),pdf(j,2),"!"
           !lheweight(i,j)=LO_Res_Unpol
       enddo
       enddo
