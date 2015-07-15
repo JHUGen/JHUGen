@@ -4228,35 +4228,55 @@ END SUBROUTINE
 
 
 
-SUBROUTINE EvalPhasespace_VBF_NEW2(xRnd,Energy,Mom,Jac)
+SUBROUTINE EvalPhasespace_VBF_NEW2(xchannel,xRnd,Energy,Mom,Jac)
 use ModParameters
 use ModPhasespace
 use ModMisc
 implicit none
-real(8) :: xRnd(:), Energy, Mom(:,:)
-real(8) :: Jac,Jac1,Jac2,Jac3,Mom35(1:4),s35,minmax(1:2)
+real(8) :: xchannel,xRnd(:), Energy, Mom(:,:)
+integer :: iChannel
+real(8) :: Jac,Jac1,Jac2,Jac3,Mom_ij_Dummy(1:4),s35,s45,minmax(1:2)
+integer, parameter :: NumChannels=4
 integer, parameter :: inLeft=1, inRight=2, qup=3, qdn=4, Higgs=5
 
 
    Mom(1:4,1) = 0.5d0*Energy * (/+1d0,0d0,0d0,+1d0/)
    Mom(1:4,2) = 0.5d0*Energy * (/+1d0,0d0,0d0,-1d0/)
-  
-!  int d(s35)  
-   Jac1 = k_l(xRnd(1),M_Reso**2,Energy**2,s35)
-!    call get_minmax_s(Energy**2,0d0,M_Reso**2,0d0,minmax)
-!    Jac3 = k_l(xRnd(5),minmax(1),minmax(2),s35)
 
+   iChannel = int(xchannel * NumChannels)+1
 
-!  1+2 --> (35)+4
-   Jac2 = t_channel_prop_decay(Mom(1:4,1),Mom(1:4,2),M_W**2,s35,0d0,xRnd(2:3),Mom35(1:4),Mom(1:4,4)) 
+IF( iChannel.EQ.1 ) THEN   
    
-!  1+(24) --> 3+5
-   Jac3 = t_channel_prop_decay(Mom(1:4,1),Mom(1:4,2)-Mom(1:4,4),M_W**2,0d0,M_Reso**2,xRnd(4:5),Mom(1:4,3),Mom(1:4,5)) 
+   Jac1 = k_l(xRnd(1),M_Reso**2,Energy**2,s35)                                                                           !  int d(s35)  
+!  equival.: call get_minmax_s(Energy**2,0d0,M_Reso**2,0d0,minmax); Jac1 = k_l(xRnd(5),minmax(1),minmax(2),s35)
+   Jac2 = t_channel_prop_decay(Mom(1:4,1),Mom(1:4,2),M_W**2,s35,0d0,xRnd(2:3),Mom_ij_Dummy(1:4),Mom(1:4,4))              !  1+2 --> (35)+4
+   Jac3 = t_channel_prop_decay(Mom(1:4,1),Mom(1:4,2)-Mom(1:4,4),M_W**2,0d0,M_Reso**2,xRnd(4:5),Mom(1:4,3),Mom(1:4,5))    !  1+(24) --> 3+5
+   Jac = Jac1*Jac2*Jac3 * PSNorm3                                                                                        !  combine   
    
-!  combine   
-   Jac = Jac1*Jac2*Jac3 * PSNorm3
+ELSEIF( iChannel.EQ.2 ) THEN   
 
+   Jac1 = k_l(xRnd(1),M_Reso**2,Energy**2,s35)                                                                           !  int d(s35)  
+   Jac2 = t_channel_prop_decay(Mom(1:4,1),Mom(1:4,2),M_Z**2,s35,0d0,xRnd(2:3),Mom_ij_Dummy(1:4),Mom(1:4,4))              !  1+2 --> (35)+4 
+   Jac3 = t_channel_prop_decay(Mom(1:4,1),Mom(1:4,2)-Mom(1:4,4),M_Z**2,0d0,M_Reso**2,xRnd(4:5),Mom(1:4,3),Mom(1:4,5))    !  1+(24) --> 3+5
+   Jac  = Jac1*Jac2*Jac3 * PSNorm3                                                                                       !  combine  
+   
+ELSEIF( iChannel.EQ.3 ) THEN   
 
+   Jac1 = k_l(xRnd(1),M_Reso**2,Energy**2,s45)                                                                           !  int d(s45)  
+   Jac2 = t_channel_prop_decay(Mom(1:4,1),Mom(1:4,2),M_W**2,s45,0d0,xRnd(2:3),Mom_ij_Dummy(1:4),Mom(1:4,3))              !  1+2 --> (45)+3 
+   Jac3 = t_channel_prop_decay(Mom(1:4,1),Mom(1:4,2)-Mom(1:4,3),M_W**2,0d0,M_Reso**2,xRnd(4:5),Mom(1:4,4),Mom(1:4,5))    !  1+(23) --> 4+5
+   Jac  = Jac1*Jac2*Jac3 * PSNorm3                                                                                       !  combine  
+   
+ELSEIF( iChannel.EQ.4 ) THEN   
+
+   Jac1 = k_l(xRnd(1),M_Reso**2,Energy**2,s45)                                                                           !  int d(s45)  
+   Jac2 = t_channel_prop_decay(Mom(1:4,1),Mom(1:4,2),M_Z**2,s45,0d0,xRnd(2:3),Mom_ij_Dummy(1:4),Mom(1:4,3))              !  1+2 --> (45)+3 
+   Jac3 = t_channel_prop_decay(Mom(1:4,1),Mom(1:4,2)-Mom(1:4,3),M_Z**2,0d0,M_Reso**2,xRnd(4:5),Mom(1:4,4),Mom(1:4,5))    !  1+(23) --> 4+5
+   Jac  = Jac1*Jac2*Jac3 * PSNorm3                                                                                       !  combine  
+   
+ELSE
+   call Error("PS channel not available in EvalPhasespace_VBF_NEW2",ichannel)
+ENDIF 
    
    
    
@@ -4271,6 +4291,126 @@ integer, parameter :: inLeft=1, inRight=2, qup=3, qdn=4, Higgs=5
    
 RETURN
 END SUBROUTINE
+
+
+
+
+
+SUBROUTINE EvalPhasespace_VBF_H4f(xchannel,xRnd,Energy,Mom,Jac)
+use ModParameters
+use ModPhasespace
+use ModMisc
+implicit none
+real(8) :: xchannel,xRnd(:), Energy, Mom(:,:)
+integer :: iChannel
+real(8) :: Jac,Jac1,Jac2,Jac3,Jac4,Jac5,Jac6,Jac7,Jac8,Jac9
+real(8) :: s35,s45,s67,s89,s1011,Mom_Dummy(1:4)
+integer, parameter :: NumChannels=4
+integer, parameter :: inLeft=1, inRight=2, qup=3, qdn=4, Higgs=5
+
+
+   Mom(1:4,1) = 0.5d0*Energy * (/+1d0,0d0,0d0,+1d0/)
+   Mom(1:4,2) = 0.5d0*Energy * (/+1d0,0d0,0d0,-1d0/)
+
+   iChannel = int(xchannel * NumChannels)+1
+
+IF( iChannel.EQ.1 ) THEN   
+
+!  masses
+   Jac1 = s_channel_propagator(M_Reso**2,Ga_Reso,0d0,Energy**2,xRnd(1),s67)                                                       !  int d(s67)    = Higgs
+   Jac2 = k_l(xRnd(2),s67,Energy**2,s35)                                                                                          !  int d(s35)     
+   Jac3 = s_channel_propagator(M_Z**2,Ga_Z,0d0,s67,xRnd(3),s89)                                                                   !  int d(s89)    = Z1
+   Jac4 = s_channel_propagator(M_Z**2,Ga_Z,0d0,(dsqrt(s67)-dsqrt(s89))**2,xRnd(4),s1011)                                          !  int d(s10,11) = Z2
+     
+!  splittings
+   Jac5 = t_channel_prop_decay(Mom(1:4,1),Mom(1:4,2),M_W**2,s35,0d0,xRnd(5:6),Mom_Dummy(1:4),Mom(1:4,4))                          !  1+2 --> (35)+4
+   Jac6 = t_channel_prop_decay(Mom(1:4,1),Mom(:,2)-Mom(1:4,4),M_W**2,0d0,s67,xRnd(7:8),Mom(:,3),Mom(:,5))                         !  1+(24) --> 3+5
+   Jac7 = s_channel_decay(Mom(1:4,5),s89,s1011,xRnd(9:10),Mom(:,6),Mom(:,7))                                                      !  5 --> 6+7       
+   Jac8 = s_channel_decay(Mom(1:4,6),0d0,0d0,xRnd(11:12),Mom(:,8),Mom(:,9))                                                       !  6 --> 8+9       
+   Jac9 = s_channel_decay(Mom(1:4,7),0d0,0d0,xRnd(13:14),Mom(:,10),Mom(:,11))                                                     !  7 --> 10+11      
+   
+   Jac = Jac1*Jac2*Jac3*Jac4*Jac5*Jac6*Jac7*Jac8*Jac9 * PSNorm3                                                                   !  combine   
+      
+ELSEIF( iChannel.EQ.2 ) THEN   
+
+!  masses
+   Jac1 = s_channel_propagator(M_Reso**2,Ga_Reso,0d0,Energy**2,xRnd(1),s67)                                                       !  int d(s67)    = Higgs
+   Jac2 = k_l(xRnd(2),s67,Energy**2,s35)                                                                                          !  int d(s35)     
+   Jac3 = s_channel_propagator(M_Z**2,Ga_Z,0d0,s67,xRnd(3),s89)                                                                   !  int d(s89)    = Z1
+   Jac4 = s_channel_propagator(M_Z**2,Ga_Z,0d0,(dsqrt(s67)-dsqrt(s89))**2,xRnd(4),s1011)                                          !  int d(s10,11) = Z2
+     
+!  splittings
+   Jac5 = t_channel_prop_decay(Mom(1:4,1),Mom(1:4,2),M_Z**2,s35,0d0,xRnd(5:6),Mom_Dummy(1:4),Mom(1:4,4))                          !  1+2 --> (35)+4
+   Jac6 = t_channel_prop_decay(Mom(1:4,1),Mom(:,2)-Mom(1:4,4),M_Z**2,0d0,s67,xRnd(7:8),Mom(:,3),Mom(:,5))                         !  1+(24) --> 3+5
+   Jac7 = s_channel_decay(Mom(1:4,5),s89,s1011,xRnd(9:10),Mom(:,6),Mom(:,7))                                                      !  5 --> 6+7       
+   Jac8 = s_channel_decay(Mom(1:4,6),0d0,0d0,xRnd(11:12),Mom(:,8),Mom(:,9))                                                       !  6 --> 8+9       
+   Jac9 = s_channel_decay(Mom(1:4,7),0d0,0d0,xRnd(13:14),Mom(:,10),Mom(:,11))                                                     !  7 --> 10+11      
+   
+   Jac = Jac1*Jac2*Jac3*Jac4*Jac5*Jac6*Jac7*Jac8*Jac9 * PSNorm3                                                                   !  combine   
+
+ELSEIF( iChannel.EQ.3 ) THEN   
+
+!  masses
+   Jac1 = s_channel_propagator(M_Reso**2,Ga_Reso,0d0,Energy**2,xRnd(1),s67)                                                       !  int d(s67)    = Higgs
+   Jac2 = k_l(xRnd(2),s67,Energy**2,s45)                                                                                          !  int d(s45)     
+   Jac3 = s_channel_propagator(M_Z**2,Ga_Z,0d0,s67,xRnd(3),s89)                                                                   !  int d(s89)    = Z1
+   Jac4 = s_channel_propagator(M_Z**2,Ga_Z,0d0,(dsqrt(s67)-dsqrt(s89))**2,xRnd(4),s1011)                                          !  int d(s10,11) = Z2
+     
+!  splittings
+   Jac5 = t_channel_prop_decay(Mom(1:4,1),Mom(1:4,2),M_W**2,s45,0d0,xRnd(5:6),Mom_Dummy(1:4),Mom(1:4,3))                          !  1+2 --> (45)+3
+   Jac6 = t_channel_prop_decay(Mom(1:4,1),Mom(:,2)-Mom(1:4,3),M_W**2,0d0,s67,xRnd(7:8),Mom(:,4),Mom(:,5))                         !  1+(23) --> 4+5
+   Jac7 = s_channel_decay(Mom(1:4,5),s89,s1011,xRnd(9:10),Mom(:,6),Mom(:,7))                                                      !  5 --> 6+7       
+   Jac8 = s_channel_decay(Mom(1:4,6),0d0,0d0,xRnd(11:12),Mom(:,8),Mom(:,9))                                                       !  6 --> 8+9       
+   Jac9 = s_channel_decay(Mom(1:4,7),0d0,0d0,xRnd(13:14),Mom(:,10),Mom(:,11))                                                     !  7 --> 10+11      
+   
+   Jac = Jac1*Jac2*Jac3*Jac4*Jac5*Jac6*Jac7*Jac8*Jac9 * PSNorm3                                                                   !  combine   
+
+
+ELSEIF( iChannel.EQ.4 ) THEN   
+
+!  masses
+   Jac1 = s_channel_propagator(M_Reso**2,Ga_Reso,0d0,Energy**2,xRnd(1),s67)                                                       !  int d(s67)    = Higgs
+   Jac2 = k_l(xRnd(2),s67,Energy**2,s45)                                                                                          !  int d(s45)     
+   Jac3 = s_channel_propagator(M_Z**2,Ga_Z,0d0,s67,xRnd(3),s89)                                                                   !  int d(s89)    = Z1
+   Jac4 = s_channel_propagator(M_Z**2,Ga_Z,0d0,(dsqrt(s67)-dsqrt(s89))**2,xRnd(4),s1011)                                          !  int d(s10,11) = Z2
+     
+!  splittings
+   Jac5 = t_channel_prop_decay(Mom(1:4,1),Mom(1:4,2),M_Z**2,s45,0d0,xRnd(5:6),Mom_Dummy(1:4),Mom(1:4,3))                          !  1+2 --> (45)+3
+   Jac6 = t_channel_prop_decay(Mom(1:4,1),Mom(:,2)-Mom(1:4,3),M_Z**2,0d0,s67,xRnd(7:8),Mom(:,4),Mom(:,5))                         !  1+(23) --> 4+5
+   Jac7 = s_channel_decay(Mom(1:4,5),s89,s1011,xRnd(9:10),Mom(:,6),Mom(:,7))                                                      !  5 --> 6+7       
+   Jac8 = s_channel_decay(Mom(1:4,6),0d0,0d0,xRnd(11:12),Mom(:,8),Mom(:,9))                                                       !  6 --> 8+9       
+   Jac9 = s_channel_decay(Mom(1:4,7),0d0,0d0,xRnd(13:14),Mom(:,10),Mom(:,11))                                                     !  7 --> 10+11      
+   
+   Jac = Jac1*Jac2*Jac3*Jac4*Jac5*Jac6*Jac7*Jac8*Jac9 * PSNorm3                                                                   !  combine   
+
+ELSE
+   call Error("PS channel not available in EvalPhasespace_VBF_NEW2",ichannel)
+ENDIF 
+   
+   
+   
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,3).dot.Mom(1:4,3) ))
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,4).dot.Mom(1:4,4) ))
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,8).dot.Mom(1:4,8) ))
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,9).dot.Mom(1:4,9) ))
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,10).dot.Mom(1:4,10) ))
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,11).dot.Mom(1:4,11) ))
+!    print *, "----------"
+!    print *, "Mom.cons. ",Mom(1:4,1)+Mom(1:4,2)-Mom(1:4,3)-Mom(1:4,4)-Mom(1:4,8)-Mom(1:4,9)-Mom(1:4,10)-Mom(1:4,11)
+!    print *, "Mom.cons. ",Mom(1:4,5)-Mom(1:4,6)-Mom(1:4,7)
+!    print *, "Mom.cons. ",Mom(1:4,6)-Mom(1:4,8)-Mom(1:4,9)
+!    print *, "Mom.cons. ",Mom(1:4,7)-Mom(1:4,10)-Mom(1:4,11)
+!    print *, "----------"
+!    print *, "Inv.mass  ",get_MInv(Mom(1:4,5))*100d0
+!    print *, "Inv.mass  ",get_MInv(Mom(1:4,6))*100d0
+!    print *, "Inv.mass  ",get_MInv(Mom(1:4,7))*100d0
+!    pause
+   
+   
+   
+RETURN
+END SUBROUTINE
+
 
 
 

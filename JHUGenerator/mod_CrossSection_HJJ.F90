@@ -109,6 +109,9 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, Higgs=5, V1=6, V2=7, 
 !          if( yrnd(16).gt.0.5d0 ) call swapmom( MomExt(1:4,8),MomExt(1:4,10) )
 !      endif
 
+call EvalPhasespace_VBF_H4f(yRnd(15),yRnd(1:14),EHat,MomExt(1:4,1:11),PSWgt)
+
+
    call Kinematics_HVBF_fulldecay(MomExt,applyPSCut,NBin)
    if( applyPSCut .or. PSWgt.eq.zero ) return
    
@@ -222,7 +225,7 @@ END FUNCTION
  use ifport
 #endif
    implicit none
-   real(8) :: yRnd(1:7),VgsWgt, EvalWeighted_HJJ
+   real(8) :: yRnd(1:8),VgsWgt, EvalWeighted_HJJ
    real(8) :: pdf(-6:6,1:2)
    real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi
    real(8) :: MomExt(1:4,1:5), PSWgt
@@ -237,12 +240,10 @@ END FUNCTION
    EvalCounter = EvalCounter+1
 
    if (EHat.lt.M_Reso) return
-   if( Process.eq.60 ) call EvalPhaseSpace_VBF(EHat,M_Reso,yRnd(3:7),MomExt,PSWgt)
+!    if( Process.eq.60 ) call EvalPhaseSpace_VBF(EHat,M_Reso,yRnd(3:7),MomExt,PSWgt)
 !    if( Process.eq.61 ) call EvalPhaseSpace_VBF(EHat,M_Reso,yRnd(3:7),MomExt,PSWgt)
    
-call EvalPhasespace_VBF_NEW2(yRnd(3:7),EHat,MomExt,PSWgt)
-! EvalWeighted_HJJ = PSWgt
-! RETURN
+call EvalPhasespace_VBF_NEW2(yrnd(8),yRnd(3:7),EHat,MomExt,PSWgt)
    
    call boost2Lab(eta1,eta2,5,MomExt(1:4,1:5))
 
