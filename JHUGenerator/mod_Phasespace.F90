@@ -1,19 +1,25 @@
 MODULE ModPhasespace 
 !    This implementation closely follows the notation in Stefan Kallweit's Master Thesis
 !
-!    NOTE: (1) global factors of pi are excluded, i.e. multiply by (2*pi)^(4-3*N) for N-particle phase space
-!          (2) no external dependencies 
+!    NOTE: (1) global factors of pi are excluded, i.e. multiply by (2*pi)^(4-3*N) for N-particle phase space (see PSNormi below)
+!          (2) no external dependencies required
+
 
 
   public :: s_channel_prop_decay
   public :: t_channel_prop_decay
-  
   public :: s_channel_propagator
   public :: s_channel_decay
+
+  public  :: k_s
+  public  :: k_t
+  public  :: k_l
+  public  :: k_BreitWigner 
+
   public :: get_minmax_s
   public :: get_minmax_t
 
-  
+    
   private :: rotate3D_phi_theta
   private :: boost_from_CMS_to_RefMom
   private :: sqrt_lambda
@@ -24,10 +30,6 @@ MODULE ModPhasespace
   private :: h
   private :: h_l
   private :: h_BreitWigner 
-  public  :: k_s
-  public  :: k_t
-  public  :: k_l
-  public  :: k_BreitWigner 
 
 
 
@@ -111,25 +113,25 @@ MODULE ModPhasespace
       endif
       iRnd = 1
 
-      if( part1(3).eq.0d0 .and. part1(4).eq.0d0 ) then
+      if( part1(3).eq.0d0 .and. part1(4).eq.0d0 ) then! on-shell decay
           Minvsq_1 = part1(1)**2
           Jac1 = 1d0
-      elseif( part1(1).eq.part1(3) .and. part1(1).eq.part1(4) ) then
+      elseif( part1(1).eq.part1(3) .and. part1(1).eq.part1(4) ) then! narrow-width decay
           Minvsq_1 = part1(1)**2
           Jac1 = pi/(part1(1)*part1(2))
-      else
+      else! propagator
           Jac1 = s_channel_propagator( part1(1)**2,part1(2), part1(3)**2,part1(4)**2, xRnd(iRnd),Minvsq_1,Power )
           iRnd = iRnd+1
       endif
       
 
-      if( part2(3).eq.0d0 .and. part2(4).eq.0d0 ) then
+      if( part2(3).eq.0d0 .and. part2(4).eq.0d0 ) then! on-shell decay
           Minvsq_2 = part2(1)**2
           Jac2 = 1d0
-      elseif( part2(1).eq.part2(3) .and. part2(1).eq.part2(4) ) then
+      elseif( part2(1).eq.part2(3) .and. part2(1).eq.part2(4) ) then! narrow-width decay
           Minvsq_2 = part2(1)**2
           Jac2 = pi/(part2(1)*part2(2))
-      else
+      else! propagator
           Jac2 = s_channel_propagator( part2(1)**2,part2(2), part2(3)**2,part2(4)**2, xRnd(iRnd),Minvsq_2,Power )
           iRnd = iRnd+1          
       endif
@@ -559,7 +561,7 @@ pause
   real(8) :: shat,mass1_sq,mass2_sq,sothers_min,minmax(1:2)
      
      minmax(1) = (dsqrt(mass1_sq) + dsqrt(mass2_sq))**2   ! =min
-     minmax(2) = (dsqrt(shat) - dsqrt(sothers_min))**2        ! =max
+     minmax(2) = (dsqrt(shat) - dsqrt(sothers_min))**2    ! =max
   
   RETURN
   END SUBROUTINE
