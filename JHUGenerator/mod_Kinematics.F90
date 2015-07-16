@@ -3428,8 +3428,8 @@ integer,parameter :: swPDF_u=1, swPDF_d=1, swPDF_c=1, swPDF_s=1, swPDF_b=1, swPD
 real(8) :: pdf(-6:6,1:2),NNpdf(1:2,-6:7)
 
 !set top components zero
-        pdf(-5,1:2) = 0d0
-        pdf( 5,1:2) = 0d0
+        pdf( Top_,1:2) = 0d0
+        pdf(ATop_,1:2) = 0d0
 
         PDFScale=MuFac*100d0
         
