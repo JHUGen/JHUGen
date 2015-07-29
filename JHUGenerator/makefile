@@ -41,7 +41,7 @@ ifeq ($(Comp),ifort)
  ifeq ($(Opt),Yes)
     OptOpts  = -O2 -vec-report0 -diag-disable remark
  else
-    OptOpts  = -O0 -implicitnone -zero -check bounds -check pointer -warn interfaces -ftrapuv  -diag-disable remark 
+    OptOpts  = -O0 -implicitnone -zero -check bounds -check pointer -warn interfaces -ftrapuv  -diag-disable remark -debug extended -g -traceback -fpe0 -check uninit
  endif
  ifeq ($(UseLHAPDF),Yes)
     LHAPDFflags = -L$(MyLHADir) -lLHAPDF -DuseLHAPDF=1

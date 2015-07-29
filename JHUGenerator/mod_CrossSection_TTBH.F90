@@ -20,15 +20,17 @@ use ifport
 implicit none
 real(8) :: yRnd(1:15),VgsWgt, EvalWeighted_TTBH
 real(8) :: pdf(-6:6,1:2)
-real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi, PDFFac1,PDFFac2
+real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi, PDFFac1,PDFFac2,xRnd
 real(8) :: MomExt(1:4,1:13),MomOffShell(1:4,1:13),PSWgt,PSWgt2,PSWgt3,PSWgt4
 real(8) :: LO_Res_GG_Unpol,LO_Res_QQB_Unpol, PreFac, MG_MOM(0:3,1:5),MadGraph_tree
 integer :: NBin(1:NumHistograms),NHisto
+integer :: MY_IDUP(1:13),ICOLUP(1:2,1:13),DK_IDUP(1:6),DK_ICOLUP(1:2,3:6)
 logical :: applyPSCut
 integer, parameter :: inLeft=1,inRight=2,Hbos=3,tbar=4,t=5,  bbar=6,Wm=7,lepM=8,nubar=9,  b=10,Wp=11,lepP=12,nu=13
+include 'csmaxvalue.f'  
 EvalWeighted_TTBH = 0d0
 
-   call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
+   call PDFMapping(2,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
    if (EHat.lt.2*M_Top+M_Reso) return
    call EvalPhasespace_2to3M(EHat,(/M_Reso,M_Top,M_Top/),yRnd(3:7),MomExt(1:4,1:5),PSWgt)! a(1)b(2)-->H(3)+tbar(4)+t(5)
    call boost2Lab(eta1,eta2,5,MomExt(1:4,1:5))
@@ -118,6 +120,51 @@ EvalWeighted_TTBH = 0d0
 !       print *, "MG/ME ratio: ", MadGraph_tree/(dble(LO_Res_QQB_Unpol)/(100d0)**2)
 !       pause
 
+if( unweighted ) then 
+  if( warmup ) then
+    
+     if (  EvalWeighted_TTBH*VgsWgt  .gt. CSmax(0,0)  )  CSmax(0,0) = EvalWeighted_TTBH*VgsWgt
+      AccepCounter=AccepCounter+1
+      if( writeWeightedLHE ) then 
+            call Error("WriteLHE not yet supported for ttb+H")
+    !        call WriteOutEvent_HVBF((/MomExt(1:4,1),MomExt(1:4,2),MomExt(1:4,3),MomExt(1:4,4),MomExt(1:4,5)/),MY_IDUP(1:5),ICOLUP(1:2,1:5),EventWeight=EvalWeighted_TTBH*VgsWgt)
+      endif
+ 
+     
+  else  
+          ICOLUP(:,:) = 000
+          ICOLUP(1:2,1) = (/501,510/)
+          ICOLUP(1:2,2) = (/510,502/)   
+          ICOLUP(1:2,tbar) = (/000,502/)
+          ICOLUP(1:2,t)    = (/501,000/)
+          call VVBranchings(DK_IDUP(1:6),DK_ICOLUP(1:2,3:6),700)
+          MY_IDUP(b)    = Bot_;        ICOLUP(1:2,b) = (/501,00/)
+          MY_IDUP(Wp)   = DK_IDUP(1);  ICOLUP(1:2,Wp)   = (/000,000/)
+          MY_IDUP(lepP) = DK_IDUP(3);  ICOLUP(1:2,lepP) = DK_ICOLUP(1:2,3)
+          MY_IDUP(nu)   = DK_IDUP(4);  ICOLUP(1:2,nu)   = DK_ICOLUP(1:2,4)  
+          MY_IDUP(bbar) = ABot_;       ICOLUP(1:2,bbar) = (/000,502/)
+          MY_IDUP(Wm)   = DK_IDUP(2);  ICOLUP(1:2,Wm)   = (/000,000/)             
+          MY_IDUP(lepM) = DK_IDUP(6);  ICOLUP(1:2,lepM) = DK_ICOLUP(1:2,6)
+          MY_IDUP(nubar)= DK_IDUP(5);  ICOLUP(1:2,nubar)= DK_ICOLUP(1:2,5)  
+          
+          
+          
+      call random_number(xRnd) 
+      if( EvalWeighted_TTBH*VgsWgt .gt. CSmax(0,0)) then
+         write(io_LogFile,"(2X,A,1PE13.6,1PE13.6)") "CSmax(0,0) is too small.",EvalWeighted_TTBH*VgsWgt, CSmax(0,0)
+         AlertCounter = AlertCounter + 1
+      elseif( EvalWeighted_TTBH*VgsWgt .gt. xRnd*CSmax(0,0) ) then
+         AccepCounter = AccepCounter + 1
+         call WriteOutEvent_TTBH(MomOffShell,MY_IDUP(1:13),ICOLUP(1:2,1:13))
+         do NHisto=1,NumHistograms
+               call intoHisto(NHisto,NBin(NHisto),1d0)
+         enddo
+      endif
+  
+  
+  endif
+  
+else
 
    AccepCounter=AccepCounter+1
    if( writeWeightedLHE ) then 
@@ -128,8 +175,9 @@ EvalWeighted_TTBH = 0d0
        call intoHisto(NHisto,NBin(NHisto),EvalWeighted_TTBH*VgsWgt)
    enddo
    EvalCounter = EvalCounter+1
-
-
+endif
+   
+   
 RETURN
 END FUNCTION 
 
