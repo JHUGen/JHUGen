@@ -76,7 +76,7 @@ real(8), public, parameter :: HiggsDecayLengthMM = 0d0      ! Higgs decay length
 real(8), public, parameter :: Gf = 1.16639d-5/GeV**2        ! Fermi constant
 real(8), public, parameter :: vev = 1.0d0/sqrt(Gf*sqrt(2.0d0))
 real(8), public, parameter :: gwsq = 4.0d0 * M_W**2/vev**2  ! weak constant squared
-real(8), public, parameter :: alpha_QED = 1d0/128d0    ! el.magn. coupling
+real(8), public, parameter :: alpha_QED = 1d0/128d0         ! el.magn. coupling
 real(8), public, parameter :: alphas = 0.13229060d0         ! strong coupling
 real(8), public, parameter :: sitW = dsqrt(0.23119d0)       ! sin(Theta_Weinberg) (PDG-2008)
 real(8), public            :: Mu_Fact                       ! pdf factorization scale (set to M_Reso in main.F90)
@@ -89,6 +89,9 @@ logical, public, parameter :: H_DK =.false.                 ! default to false s
 !logical, public, parameter :: V_DK =.true.                 ! default to true so V in V* > VH (Process = 50) decays
 real(8), public, parameter :: pTjetcut = 15d0*GeV           ! jet min pt
 real(8), public, parameter :: Rjet = 0.5d0                  ! jet deltaR, antikt algorithm 
+real(8), public, parameter :: VBF_4ml_minmax(1:2) = (/ -1d0,-1d0 /)*GeV  ! min and max for m_4l in off-shell VBF production;   default is (-1,-1): m_4l ~ Higgs resonance (on-shell)
+! real(8), public, parameter :: VBF_4ml_minmax(1:2) = (/ 300d0,600d0 /)*GeV  ! min and max for m_4l in off-shell VBF production, default is (-1,-1): m_4l ~ Higgs resonance (on-shell)
+
 
 !----------------------------------------------------------------------------------------------------
 
@@ -431,7 +434,6 @@ integer,parameter :: io_LHEOutFile3=20
 
 integer, public :: DebugCounter(0:10) = 0
 real(8), public :: debugvar(0:10) = 0d0
-
 
 
 

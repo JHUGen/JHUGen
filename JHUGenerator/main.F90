@@ -47,6 +47,7 @@ logical,parameter :: useBetaVersion=.false.! this should be set to .false.
    call FinalizeOutput()
    call CloseFiles()
    write(io_stdout,*) "Done"
+   
 
 END PROGRAM
 
@@ -602,7 +603,7 @@ include "vegas_common.f"
       if(Process.eq.60) then
          NDim = 5
          NDim = NDim + 2 ! sHat integration
-         
+        
          VegasIt1_default = 5
          VegasNc0_default = 10000000
          VegasNc1_default = 500000
@@ -614,7 +615,7 @@ include "vegas_common.f"
          NDim = NDim + 2 ! sHat integration
          NDim = NDim + 8
          NDim = NDim + 1
-         
+
          VegasIt1_default = 5
          VegasNc0_default = 10000000
          VegasNc1_default = 500000
@@ -1047,9 +1048,9 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
         return
     endif
 
-
     ! WARM-UP RUN
     itmx = VegasIt1
+! itmx=3    
     ncall= VegasNc1
     warmup = .true.
     if( Process.eq.80 ) call vegas(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
@@ -1062,7 +1063,6 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
     if( Process.eq.110) call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.111) call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
 
-
     !DATA RUN
     call ClearHisto()   
     warmup = .false.
@@ -1072,6 +1072,7 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
     AlertCounter=0
     avgcs = 0d0
     itmx = 1
+! itmx=5    
     ncall= VegasNc2
     if( Process.eq.80 ) call vegas1(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.90 ) call vegas1(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
@@ -1088,6 +1089,39 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
 
 elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
 
+
+
+!  call ClearHisto()   
+!  csmax(:,:)=0d0
+!  warmup = .true.
+! 
+!  
+! itmx = 5
+! ncall= VegasNc0
+! if( Process.eq.80 ) call vegas(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
+! print *, "csmax",csmax(0,0)
+! 
+! 
+! 
+!  csmax(:,:)=0d0
+!  itmx = 1
+! if( Process.eq.80 ) call vegas1(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
+! print *, "csmax",csmax(0,0)
+! call ClearHisto()   
+! 
+! 
+!  itmx = 1
+!  warmup = .false.
+! ncall= VegasNc2
+! if( Process.eq.80 ) call vegas1(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
+! if( Process.eq.80 ) call vegas1(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
+! if( Process.eq.80 ) call vegas1(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
+! 
+! return
+
+
+
+!-------------------old stuff -------------------
     VG(:,:) = zero
     CSmax(:,:) = zero
 
@@ -1130,7 +1164,6 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
    print *, ""    
    write(io_stdout,"(1X,A,F10.3)") "Total xsec: ",TotalXSec
 
-
     RequEvents(:,:)=0
     do i1=-5,5
     do j1=-5,5
@@ -1165,7 +1198,6 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
     if(RequEvents(i1,j1).ne.0) then
           if( (PChannel.eq.0) .and. (abs(i1)+abs(j1).ne.0) ) cycle
           if( (PChannel.eq.1) .and. i1*j1.eq.0 ) cycle
-          
           write(io_stdout,*) ""
           write(io_stdout,*) ""
           write(io_stdout,"(X,A,I8,A,I4,I4,A)",advance='no') "generating ",RequEvents(i1,j1)," events for channel",i1,j1,":  "
@@ -1195,7 +1227,7 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
     endif
     enddo
     enddo    
-
+    
     
     
     call cpu_time(time_end)
@@ -1209,14 +1241,14 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
     enddo
     enddo
     print *, " Alert  Counter: ",AlertCounter
-    print *, " gg/qqb ratio = ", dble(AccepCounter_part(0,0))/dble(sum(AccepCounter_part(:,:))-AccepCounter_part(0,0))
-    if( dble(AlertCounter)/dble(AccepCounter) .gt. 1d0*percent ) then
+    print *, " gg/qqb ratio = ", dble(AccepCounter_part(0,0))/dble(sum(AccepCounter_part(:,:))-AccepCounter_part(0,0)+1d-10)
+    if( dble(AlertCounter)/dble(AccepCounter+1d-10) .gt. 1d0*percent ) then
         write(io_LogFile,*) "ALERT: The number of rejected events with too small CSMAX exceeds 1%."
         write(io_LogFile,*) "       Increase CSMAX in main.F90."
         write(io_stdout, *) "ALERT: The number of rejected events with too small CSMAX exceeds 1%."
         write(io_stdout, *) "       Increase CSMAX in main.F90."
     endif
-    write(io_stdout,*)  " event generation rate (events/sec)",dble(AccepCounter)/(time_end-time_start)
+    write(io_stdout,*)  " event generation rate (events/sec)",dble(AccepCounter)/(time_end-time_start+1d-10)
 
                      
   endif! unweighted
@@ -3243,7 +3275,7 @@ implicit none
 integer :: AllocStatus,NHisto
 
           it_sav = 1
-          NumHistograms = 5
+          NumHistograms = 7
           if( .not.allocated(Histo) ) then
                 allocate( Histo(1:NumHistograms), stat=AllocStatus  )
                 if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
@@ -3278,6 +3310,18 @@ integer :: AllocStatus,NHisto
           Histo(5)%BinSize= 0.2d0
           Histo(5)%LowVal = -5d0
           Histo(5)%SetScale= 1d0
+          
+          Histo(6)%Info   = "m_4l"
+          Histo(6)%NBins  = 50
+          Histo(6)%BinSize= 10d0*GeV
+          Histo(6)%LowVal = 120d0*GeV
+          Histo(6)%SetScale= 1d0/GeV
+
+          Histo(7)%Info   = "weights"
+          Histo(7)%NBins  = 50
+          Histo(7)%BinSize= 0.25d0
+          Histo(7)%LowVal = -18d0
+          Histo(7)%SetScale= 1d0
 
 
 

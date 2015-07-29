@@ -294,7 +294,7 @@ pause
 !         call boost_from_CMS_to_RefMom(p0,Mom2)
  
         s_channel_decay = 1d0/g_d(Mandelstam_S, Mass1_sq,Mass2_sq)  *  dSin(pi*xRnd(2))
-
+        
   RETURN
   END FUNCTION
  
@@ -522,7 +522,7 @@ pause
         endif
 
         k_t =  -pi/2d0/sqrt_lambda(sab,pa_sq,pb_sq)/g_s(-InvMass_sq,-m_sq,nu,-smin,-smax)
-                
+        
   RETURN
   END FUNCTION
 
@@ -534,6 +534,11 @@ pause
   
          InvMass_sq = RandomVar*smax + (1d0-RandomVar)*smin
          k_l = (smax - smin) ! = 1/g_l(...)
+
+         if( k_l.lt.0d0 ) then! if smax < smin then return zero
+             k_l = 0d0
+             InvMass_sq = 0d0
+         endif
 
   RETURN
   END FUNCTION
@@ -550,7 +555,7 @@ pause
         InvMass_sq = dsqrt(m_sq)*gamma * dtan(y1 + (y2-y1)*RandomVar) + m_sq
 
         k_BreitWigner = (y2-y1)*( (InvMass_sq-m_sq)**2 + m_sq*gamma**2 )/(m*gamma)!  = 1/g_s_BreitWigner(...)
-                
+                               
   RETURN
   END FUNCTION
 

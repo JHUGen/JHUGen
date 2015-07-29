@@ -163,8 +163,8 @@ contains
     complex(dp) :: za(4,4), zb(4,4)
     real(dp), parameter :: Lu = aL_QUp**2, Ru = aR_QUp**2
     real(dp), parameter :: Ld = aL_QDn**2, Rd = aR_QDn**2
-    real(dp), parameter :: couplz = gwsq * xw/twosc**2
-    real(dp), parameter :: couplw = gwsq/two
+    real(dp), parameter :: couplz = gwsq * xw/twosc**2         *M_Z/sitW/dsqrt(1d0-sitW**2)! MARKUS ADDED HVV COUPLINGS: CHECK!!
+    real(dp), parameter :: couplw = gwsq/two                   *M_W/sitW
     real(dp) :: restmp
     integer :: i, j, j1, j2, iflip, pdfindex(2)
 
@@ -236,6 +236,7 @@ contains
     res(pdfAStr_,pdfAStr_) = restmp
     res(pdfABot_,pdfABot_) = restmp * tagbot
 
+    ! NEED TO ADJSUT J1,J2 in W AMPS HERE
     !-- W/Z interference
     j1 = 1
     j2 = 2
@@ -392,9 +393,11 @@ contains
        !-- non-symmetric qq processes
        amp_z = A0_VV_4f(3,j1,4,j2,vvcoupl,za,zb,sprod,m_z,ga_z)      
        if( all(cdabs(wwcoupl(:)).lt.1d-15) ) then
-          amp_w = A0_VV_4f(3,j2,4,j1,vvcoupl,za,zb,sprod,m_w,ga_w)
+!           amp_w = A0_VV_4f(3,j2,4,j1,vvcoupl,za,zb,sprod,m_w,ga_w)
+          amp_w = A0_VV_4f(3,j1,4,j2,vvcoupl,za,zb,sprod,m_w,ga_w)! MARKUS
        else
-          amp_w = A0_VV_4f(3,j2,4,j1,wwcoupl,za,zb,sprod,m_w,ga_w,useWWcoupl=.true.)
+!           amp_w = A0_VV_4f(3,j2,4,j1,wwcoupl,za,zb,sprod,m_w,ga_w,useWWcoupl=.true.)
+          amp_w = A0_VV_4f(3,j1,4,j2,wwcoupl,za,zb,sprod,m_w,ga_w,useWWcoupl=.true.)! MARKUS
        endif
 
        !--uc -> uc
@@ -410,14 +413,14 @@ contains
        restmp = ((abs(amp_z(-1,-1))**2) * Lu * Ld + &
             (abs(amp_z(-1,+1))**2) * Lu * Rd + &
             (abs(amp_z(+1,-1))**2) * Ru * Ld + &
-            (abs(amp_z(+1,+1))**2) * Ru * Rd) * couplz**2 * SpinAvg * tag1
+            (abs(amp_z(+1,+1))**2) * Ru * Rd) * couplz**2 * SpinAvg * tag1  *1d0
 
        pdfindex = flip(iflip,pdfUp_,pdfBot_)
        res(pdfindex(1),pdfindex(2)) = restmp * tagbot
        pdfindex = flip(iflip,pdfChm_,pdfBot_)
        res(pdfindex(1),pdfindex(2)) = restmp * tagbot
        
-       restmp = restmp + abs(amp_w(-1,-1))**2 * couplw**2 * SpinAvg * tag2
+       restmp = restmp + abs(amp_w(-1,-1))**2 * couplw**2 * SpinAvg * tag2  *1d0
 
        pdfindex = flip(iflip,pdfUp_,pdfStr_)
        res(pdfindex(1),pdfindex(2)) = restmp
