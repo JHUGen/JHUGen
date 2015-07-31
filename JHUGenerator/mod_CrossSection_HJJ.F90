@@ -29,25 +29,19 @@ integer :: i,j,MY_IDUP(1:10),ICOLUP(1:2,1:10),NBin(1:NumHistograms),NHisto
 real(8) :: LO_Res_Unpol, PreFac
 logical :: applyPSCut
 integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, Lep1M=8, Lep2P=9, Lep2M=10
-   
-   EvalWeighted_HJJ_fulldecay = 0d0
+EvalWeighted_HJJ_fulldecay = 0d0
    
 
    call PDFMapping(2,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)   
-
-   
-if( ehat.lt.m_reso+2*pTjetcut ) return ! 30GeV = pTcut on fwd jets
-! if( ehat.lt.300d0*GeV+30d0*GeV ) return ! 30GeV = pTcut on fwd jets
-
+   if( Ehat.lt.m_reso+2*pTjetcut ) return ! 30GeV = pTcut on fwd jets
 
    call EvalPhasespace_VBF_H4f(yRnd(17),yRnd(3:16),EHat,MomExt(1:4,1:10),PSWgt)
    call boost2Lab(eta1,eta2,10,MomExt(1:4,1:10))
-   PSWgt = PSWgt * (100d0)**8
+   PSWgt = PSWgt * (100d0)**8  ! adjust PSWgt for GeV units of MCFM mat.el.
 
 
    call Kinematics_HVBF_fulldecay(MomExt,applyPSCut,NBin)
    if( applyPSCut .or. PSWgt.lt.1d-12 ) return
-   
    call setPDFs(eta1,eta2,Mu_Fact,pdf)
    FluxFac = 1d0/(2d0*EHat**2)
 
@@ -68,14 +62,18 @@ if( ehat.lt.m_reso+2*pTjetcut ) return ! 30GeV = pTcut on fwd jets
    call convert_to_MCFM(+MomExt(1:4,outTop)*100d0,p_MCFM(7,1:4))
    call convert_to_MCFM(+MomExt(1:4,outBot)*100d0,p_MCFM(8,1:4))
 
-!    HZZcoupl(:) = (2d0,1d0)
-!    HWWcoupl(:) = (-3d0,0.3d0)
-
-   HZZcoupl(1) = (1d0,0d0)
-   HWWcoupl(:) = HZZcoupl(:)
-
+   HZZcoupl(1) = ghz1
+   HZZcoupl(2) = ghz2
+   HZZcoupl(3) = ghz3
+   HZZcoupl(4) = ghz4
+   HZZcoupl(5:) = (0d0,0d0)
    
-   
+   HWWcoupl(1) = ghw1
+   HWWcoupl(2) = ghw2
+   HWWcoupl(3) = ghw3
+   HWWcoupl(4) = ghw4
+   HWWcoupl(5:) = (0d0,0d0)
+      
 !    print *, (MomExt(1:4,1)).dot.(MomExt(1:4,1))
 !    print *, (MomExt(1:4,2)).dot.(MomExt(1:4,2))
 !    print *, (MomExt(1:4,3)).dot.(MomExt(1:4,3))
@@ -108,8 +106,6 @@ if( ehat.lt.m_reso+2*pTjetcut ) return ! 30GeV = pTcut on fwd jets
 !   print *, "old ",me2(i,j)
 !   print *, "rat", msq_MCFM(i,j)/me2(i,j)
 !   pause
-  
-
   
   
   LO_Res_Unpol = 0d0

@@ -3,7 +3,7 @@ implicit none
 save
 ! 
 ! 
-character(len=6),parameter :: JHUGen_Version="v6.4.1"
+character(len=6),parameter :: JHUGen_Version="v6.5.0"
 ! 
 ! 
 integer, public :: Collider, PDFSet,PChannel,Process,DecayMode1,DecayMode2,TopDecays,TauDecays,BotDecays
@@ -17,7 +17,9 @@ integer(8), public :: EvalCounter=0
 integer(8), public :: RejeCounter=0
 integer(8), public :: AccepCounter=0
 integer(8), public :: AlertCounter=0
-integer(8), public :: AccepCounter_part(-5:5,-5:5)=0
+integer(8), public :: AccepCounter_part(-6:6,-6:6)=0,RequEvents(-6:+6,-6:+6)
+real(8), public :: CrossSecMax(-6:+6,-6:+6),CrossSec(-6:+6,-6:+6)
+integer, public :: iPart_sel, jPart_sel
 real(8) :: time_start,time_end,time_int
 logical, public :: warmup
 character(len=100) :: DataFile
@@ -45,7 +47,7 @@ real(8), public, parameter :: channels_ratio_fix = 0.25d0    ! desired ratio of 
 
 logical, public, parameter :: importExternal_LHEinit = .true.
 
-logical, public, parameter :: writeWeightedLHE = .false. 
+logical, public, parameter :: writeWeightedLHE = .true. 
 
 logical, public, parameter :: includeGammaStar = .false. 
 
@@ -88,7 +90,7 @@ real(8), public, parameter :: POL_B = 0d0                   ! e- polarization. 0
 logical, public, parameter :: H_DK =.false.                 ! default to false so H in V* > VH (Process = 50) does not decay
 !logical, public, parameter :: V_DK =.true.                 ! default to true so V in V* > VH (Process = 50) decays
 real(8), public, parameter :: pTjetcut = 15d0*GeV           ! jet min pt
-real(8), public, parameter :: Rjet = 0.5d0                  ! jet deltaR, antikt algorithm 
+real(8), public, parameter :: Rjet = 0.5d0                  ! jet deltaR, anti-kt algorithm 
 real(8), public, parameter :: VBF_4ml_minmax(1:2) = (/ -1d0,-1d0 /)*GeV  ! min and max for m_4l in off-shell VBF production;   default is (-1,-1): m_4l ~ Higgs resonance (on-shell)
 ! real(8), public, parameter :: VBF_4ml_minmax(1:2) = (/ 300d0,600d0 /)*GeV  ! min and max for m_4l in off-shell VBF production, default is (-1,-1): m_4l ~ Higgs resonance (on-shell)
 
@@ -187,6 +189,7 @@ integer, public :: LeptInEvent(0:8) = 0
    complex(8), public, parameter :: ghg2 = (1.0d0,0d0)
    complex(8), public, parameter :: ghg3 = (0.0d0,0d0)
    complex(8), public, parameter :: ghg4 = (0.0d0,0d0)   ! pseudoscalar
+   
    complex(8), public, parameter :: ghz1 = (2.0d0,0d0)   ! SM=2
    complex(8), public, parameter :: ghz2 = (0.0d0,0d0)
    complex(8), public, parameter :: ghz3 = (0.0d0,0d0)
@@ -431,6 +434,7 @@ integer,parameter :: io_LogFile=17
 integer,parameter :: io_CSmaxFile=18
 integer,parameter :: io_LHEOutFile2=19
 integer,parameter :: io_LHEOutFile3=20
+
 
 integer, public :: DebugCounter(0:10) = 0
 real(8), public :: debugvar(0:10) = 0d0
