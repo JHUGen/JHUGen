@@ -166,7 +166,7 @@ c--- read-in grid if necessary
  7       xi(nd,j)=one
          ndo=nd
 c
- 8       if(nprn.ge.0) then
+ 8       if(nprn.gt.0) then
             write(6,200)ndim,calls,it,itmx,acc
      1   ,mds,nd,(xl(j),xu(j),j=1,ndim)
          endif

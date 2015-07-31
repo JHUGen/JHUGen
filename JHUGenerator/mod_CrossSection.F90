@@ -2265,7 +2265,7 @@ IF( GENEVT ) THEN
 ! if( (MY_IDUP(6)).eq.(MY_IDUP(8)) ) debugcounter(1)=debugcounter(1)+1
 
          AccepCounter = AccepCounter + 1
-         AccepCounter_part = AccepCounter_part  + parton
+         AccepCounter_part(-5:+5,-5:5) = AccepCounter_part(-5:+5,-5:5)  + parton(-5:+5,-5:5)
          call BranchingCounter(MY_IDUP(6:9))
          if( (OffShellV1).or.(OffShellV2).or.(IsAPhoton(DecayMode2)) ) then
               call WriteOutEvent((/MomExt(1:4,1),MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(1:9),ICOLUP(1:2,1:9))
@@ -2803,7 +2803,7 @@ include 'csmaxvalue.f'
                call intoHisto(NHisto,NBin(NHisto),1d0)  ! CS_Max is the integration volume
          enddo
          AccepCounter = AccepCounter + 1
-         AccepCounter_part = AccepCounter_part  + parton
+         AccepCounter_part(-5:+5,-5:5) = AccepCounter_part(-5:+5,-5:5)  + parton(-5:+5,-5:5)
          if( (OffShellV1).or.(OffShellV2).or.(IsAPhoton(DecayMode1)) ) then
               call WriteOutEvent((/MomExt(1:4,1),MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(1:9),ICOLUP(1:2,1:9))
           else
