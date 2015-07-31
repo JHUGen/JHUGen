@@ -133,18 +133,18 @@ C---s-channel  MCFM original+anomalous
 
 
 
-! C---t-channel MCFM original+anomalous
-!      & +fac*ZZ1734(jdu1,h17,h34)*ZZ2856(jdu2,h28,h56)
-! !      & *za(i7,i3)*zb(i4,i1)*za(i8,i5)*zb(i6,i2) !-- removed from MCFM
-!      & *anomzzamp(i3,i4,i7,i1,s1734,s(i3,i4),s(i7,i1),za,zb) !--added by Fabrizio (anomal. DK)
-!      & *anomzzamp(i5,i6,i8,i2,s1734,s(i5,i6),s(i8,i2),za,zb) !--added by Fabrizio (anomal. PR)
-!      & /(propWBF*prop1734)
-! C---u-channel MCFM original+anomalous
-!      & +fac*ZZ2856(jdu1,h17,h56)*ZZ1734(jdu2,h28,h34)
-! !      & *za(i7,i5)*zb(i6,i1)*za(i8,i3)*zb(i4,i2) !-- removed from MCFM
-!      & *anomzzamp(i5,i6,i7,i1,s1756,s(i5,i6),s(i7,i1),za,zb) !--added by Fabrizio (anomal. DK)
-!      & *anomzzamp(i3,i4,i8,i2,s1756,s(i3,i4),s(i8,i2),za,zb) !--added by Fabrizio (anomal. PR)
-!      & /(propWBF*prop1756)
+C---t-channel MCFM original+anomalous
+     & +fac*ZZ1734(jdu1,h17,h34)*ZZ2856(jdu2,h28,h56)
+!      & *za(i7,i3)*zb(i4,i1)*za(i8,i5)*zb(i6,i2) !-- removed from MCFM
+     & *anomzzamp(i3,i4,i7,i1,s1734,s(i3,i4),s(i7,i1),za,zb) !--added by Fabrizio (anomal. DK)
+     & *anomzzamp(i5,i6,i8,i2,s1734,s(i5,i6),s(i8,i2),za,zb) !--added by Fabrizio (anomal. PR)
+     & /(propWBF*prop1734)
+C---u-channel MCFM original+anomalous
+     & +fac*ZZ2856(jdu1,h17,h56)*ZZ1734(jdu2,h28,h34)
+!      & *za(i7,i5)*zb(i6,i1)*za(i8,i3)*zb(i4,i2) !-- removed from MCFM
+     & *anomzzamp(i5,i6,i7,i1,s1756,s(i5,i6),s(i7,i1),za,zb) !--added by Fabrizio (anomal. DK)
+     & *anomzzamp(i3,i4,i8,i2,s1756,s(i3,i4),s(i8,i2),za,zb) !--added by Fabrizio (anomal. PR)
+     & /(propWBF*prop1756)
 
          
       enddo
