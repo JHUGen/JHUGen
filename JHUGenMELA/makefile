@@ -36,7 +36,7 @@ Testprogram: mod_Higgs_MatEl.o mod_Zprime_MatEl.o mod_Graviton_MatEl.o mod_Higgs
 	checkWBF_SM.dat checkWBF_1-8.dat checkSBF_SM.dat checkSBF_1-4.dat checkHJ_SM.dat checkZH_SM.dat MCFMforVBF
 	@echo " "
 	@echo " compiling and linking testprogram.F90 with "$(Comp)
-	$(fcomp) -o testF testprogram.F90 -lm NNPDFDriver.o mod_Higgs_MatEl.o mod_Zprime_MatEl.o mod_Graviton_MatEl.o mod_HiggsJ_MatEl.o mod_HiggsJJ_MatEl.o mod_VHiggs_MatEl.o mod_TH_MatEl.o $(MCFM_Obj)
+	$(fcomp) -o testF testprogram.F90 -lm NNPDFDriver.o mod_Higgs_MatEl.o mod_Zprime_MatEl.o mod_Graviton_MatEl.o mod_HiggsJ_MatEl.o mod_HiggsJJ_MatEl.o mod_VHiggs_MatEl.o mod_TTBH_MatEl.o mod_TH_MatEl.o $(MCFM_Obj)
 	@echo " "
 	@echo " compiling and linking testprogram.c with gcc"
 	$(ccomp) -o testC testprogram.c NNPDFDriver.o mod_Higgs_MatEl.o mod_Zprime_MatEl.o mod_Graviton_MatEl.o mod_TTBH_MatEl.o mod_TH_MatEl.o  -lm -lgfortran
@@ -94,11 +94,12 @@ mod_TH_MatEl.o: mod_TH_MatEl.F90 variables.F90
 
 MCFMforVBF: $(MCFM_Dep)
 	@echo " "
-# 	@echo " compiling MCFM WBF files with "$(Comp)
-# 	$(fcomp) -c -I./WBFZZ_MCFM/src/Inc/ $(MCFM_Dep)
-	@echo " compiling MCFM WBF files with ifort!"
-# 	ifort  -O0 -implicitnone -zero -check bounds -check pointer -warn interfaces -ftrapuv  -diag-disable remark -debug extended -g -traceback -fpe0 -check uninit  -c -I./WBFZZ_MCFM/src/Inc/ $(MCFM_Dep)
-	ifort  -O2  -c -I./WBFZZ_MCFM/src/Inc/ $(MCFM_Dep)
+	@echo " compiling MCFM WBF files with "$(Comp)
+	$(fcomp) -c -I./WBFZZ_MCFM/src/Inc/ $(MCFM_Dep)
+# 
+# 	@echo " compiling MCFM WBF files with ifort!"
+# # 	ifort  -O0 -implicitnone -zero -check bounds -check pointer -warn interfaces -ftrapuv  -diag-disable remark -debug extended -g -traceback -fpe0 -check uninit  -c -I./WBFZZ_MCFM/src/Inc/ $(MCFM_Dep)
+# 	ifort  -O2  -c -I./WBFZZ_MCFM/src/Inc/ $(MCFM_Dep)
 
 clean:
 	@echo " deleting object files"

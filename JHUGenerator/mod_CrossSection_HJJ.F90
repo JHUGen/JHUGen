@@ -96,7 +96,7 @@ EvalWeighted_HJJ_fulldecay = 0d0
   
   
   msq_MCFM(:,:) = 0d0
-  call qq_ZZqq(p_MCFM,msq_MCFM,HZZcoupl,HWWcoupl,Lambda*100d0,Lambda_Q*100d0,(/Lambda_z1,Lambda_z2,Lambda_z3,Lambda_z4/)*100d0)!  q(-p1)+q(-p2)->Z(p3,p4)+Z(p5,p6)+q(p7)+q(p8)
+!   call qq_ZZqq(p_MCFM,msq_MCFM,HZZcoupl,HWWcoupl,Lambda*100d0,Lambda_Q*100d0,(/Lambda_z1,Lambda_z2,Lambda_z3,Lambda_z4/)*100d0)!  q(-p1)+q(-p2)->Z(p3,p4)+Z(p5,p6)+q(p7)+q(p8)
 !   msq_MCFM=msq_MCFM/(9.495632068338d-2)**3   !/ (1.11379452919968d0)
 !   print *, "new ",msq_MCFM(i,j)
 
@@ -213,7 +213,7 @@ EvalUnWeighted_HJJ_fulldecay = 0d0
 IF( GENEVT ) THEN   
       
       if( iPartons(1).eq.+1 .and. iPartons(2).eq.+1 ) then
-          call qq_ZZqq(p_MCFM,msq_MCFM,HZZcoupl,HWWcoupl,Lambda*100d0,Lambda_Q*100d0,(/Lambda_z1,Lambda_z2,Lambda_z3,Lambda_z4/)*100d0)!  q(-p1)+q(-p2)->Z(p3,p4)+Z(p5,p6)+q(p7)+q(p8)
+!           call qq_ZZqq(p_MCFM,msq_MCFM,HZZcoupl,HWWcoupl,Lambda*100d0,Lambda_Q*100d0,(/Lambda_z1,Lambda_z2,Lambda_z3,Lambda_z4/)*100d0)!  q(-p1)+q(-p2)->Z(p3,p4)+Z(p5,p6)+q(p7)+q(p8)
           LO_Res_Unpol = 0d0
           do i = -5,5
               do j = -5,5
@@ -245,7 +245,7 @@ IF( GENEVT ) THEN
 ELSE! NOT GENEVT
 
 
-   call qq_ZZqq(p_MCFM,msq_MCFM,HZZcoupl,HWWcoupl,Lambda*100d0,Lambda_Q*100d0,(/Lambda_z1,Lambda_z2,Lambda_z3,Lambda_z4/)*100d0)!  q(-p1)+q(-p2)->Z(p3,p4)+Z(p5,p6)+q(p7)+q(p8)
+!    call qq_ZZqq(p_MCFM,msq_MCFM,HZZcoupl,HWWcoupl,Lambda*100d0,Lambda_Q*100d0,(/Lambda_z1,Lambda_z2,Lambda_z3,Lambda_z4/)*100d0)!  q(-p1)+q(-p2)->Z(p3,p4)+Z(p5,p6)+q(p7)+q(p8)
    LO_Res_Unpol = 0d0
    do i = -5,5
       do j = -5,5

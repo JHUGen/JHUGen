@@ -47,7 +47,7 @@ real(8), public, parameter :: channels_ratio_fix = 0.25d0    ! desired ratio of 
 
 logical, public, parameter :: importExternal_LHEinit = .true.
 
-logical, public, parameter :: writeWeightedLHE = .true. 
+logical, public, parameter :: writeWeightedLHE = .false. 
 
 logical, public, parameter :: includeGammaStar = .false. 
 
