@@ -7,11 +7,11 @@ IMPLICIT NONE
 
  private
 
- real(8), public, parameter :: GeV=1d0/100d0 ! we are using units of 100GeV, i.e. Lambda=10 is 1TeV 
- real(8), public, parameter :: Gf = 1.16639d-5/GeV**2        ! Fermi constant
- real(8), public, parameter :: vev = 1.0d0/sqrt(Gf*sqrt(2.0d0))
+ real(8), parameter :: GeV=1d0/100d0 ! we are using units of 100GeV, i.e. Lambda=10 is 1TeV 
+ real(8), parameter :: Gf = 1.16639d-5/GeV**2        ! Fermi constant
+ real(8), parameter :: vev = 1.0d0/sqrt(Gf*sqrt(2.0d0))
  
- real(8), public, parameter :: M_Reso=125d0*GeV
+ real(8), parameter :: M_Reso=125d0*GeV
 
  CONTAINS 
 
@@ -20,7 +20,7 @@ IMPLICIT NONE
       
 SUBROUTINE EvalXSec_PP_TH(Mom,TTBHcoupl,TopDecays,Res)
 implicit none
-real(8) :: Mom(1:4,1:13),Res
+real(8) :: Mom(1:4,1:9),Res
 complex(8) :: TTBHcoupl(1:2)
 integer :: TopDecays! 0=stable, 1=di-leptonic
 real(8) :: eta1,eta2,Etot,Pztot,MatElSq_GG,MatElSq_QQB,MatElSq_QBQ
@@ -42,7 +42,7 @@ include 'includeVars.F90'
       x1 = (Etot+Pztot * sign(1d0,Mom(4,inRight)) )/Collider_Energy
       x2 = (Etot-Pztot * sign(1d0,Mom(4,inRight)) )/Collider_Energy
       E_CMS = dsqrt(x1*x2)*Collider_Energy
-      PDFScale = 0.5d0*( m_Top + m_Reso ) * 100d0
+      PDFScale = 0.25d0*( m_Top + m_Reso ) * 100d0
 
       Mom(1:4,inLeft)  = x1 * Mom(1:4,inLeft)
       Mom(1:4,inRight) = x2 * Mom(1:4,inRight)
@@ -51,10 +51,10 @@ include 'includeVars.F90'
       call NNevolvePDF(x1,PDFScale,NNpdf(1,-6:7))
       call NNevolvePDF(x2,PDFScale,NNpdf(2,-6:7))
       Res = &
-            + LO_Res_Unpol(Up_,Bot_)   * ( NNpdf(Up_,1) *NNpdf(Bot_,2)  +  NNpdf(Chm_,1) *NNpdf(Bot_,2) )   &
-            + LO_Res_Unpol(Bot_,Up_)   * ( NNpdf(Bot_,1)*NNpdf(Up_,2)   +  NNpdf(Bot_,1) *NNpdf(Chm_,2) )   &
-            + LO_Res_Unpol(ADn_,Bot_)  * ( NNpdf(ADn_,1)*NNpdf(Bot_,2)  +  NNpdf(AStr_,1)*NNpdf(Bot_,2) )   &
-            + LO_Res_Unpol(Bot_,ADn_)  * ( NNpdf(Bot_,1)*NNpdf(ADn_,2)  +  NNpdf(Bot_,1) *NNpdf(AStr_,2))
+            + LO_Res_Unpol(Up_,Bot_)   * ( NNpdf(1,+2)*NNpdf(2,+5)  +  NNpdf(1,+4)*NNpdf(2,+5) )   &
+            + LO_Res_Unpol(Bot_,Up_)   * ( NNpdf(1,+5)*NNpdf(2,+2)  +  NNpdf(1,+5)*NNpdf(2,+4) )   &
+            + LO_Res_Unpol(ADn_,Bot_)  * ( NNpdf(1,-1)*NNpdf(2,+5)  +  NNpdf(1,-3)*NNpdf(2,+5) )   &
+            + LO_Res_Unpol(Bot_,ADn_)  * ( NNpdf(1,+5)*NNpdf(2,-1)  +  NNpdf(1,+5)*NNpdf(2,-3))
       Res = Res/x1/x2/(2d0*E_CMS**2)
 
 !     restore incoming momenta (in all-outgoing convention)
@@ -92,11 +92,11 @@ include 'includeVars.F90'
       x1 = (Etot+Pztot * sign(1d0,Mom(4,inRight)) )/Collider_Energy
       x2 = (Etot-Pztot * sign(1d0,Mom(4,inRight)) )/Collider_Energy
       E_CMS = dsqrt(x1*x2)*Collider_Energy
-      PDFScale = 0.5d0*( m_Top + m_Reso ) * 100d0
+      PDFScale = 0.25d0*( m_Top + m_Reso ) * 100d0
 
       Mom(1:4,inLeft)  = x1 * Mom(1:4,inLeft)
       Mom(1:4,inRight) = x2 * Mom(1:4,inRight)
-      call EvalAmp_QbarBbar_TH(Mom,TTBHcoupl,TopDecays,LO_Res_Unpol)
+      call EvalAmp_QbarBbar_TbarH(Mom,TTBHcoupl,TopDecays,LO_Res_Unpol)
       
       call NNevolvePDF(x1,PDFScale,NNpdf(1,-6:7))
       call NNevolvePDF(x2,PDFScale,NNpdf(2,-6:7))
@@ -121,7 +121,7 @@ END SUBROUTINE
  
  
  
- 
+! MARKUS: changed MomExt(1:4, inLeft/inRight) to all outgoing
 SUBROUTINE EvalAmp_QB_TH(MomExt,TTBHcoupl,TopDecays,LO_Res_Unpol)
 implicit none
 integer :: TopDecays! 0=stable, 1=di-leptonic
@@ -137,10 +137,10 @@ include 'includeVars.F90'
 ! setup momenta for spinor helicity products -- undecayed tops
       p4Dp5=MomExt(1,qout)*MomExt(1,t)-MomExt(2,qout)*MomExt(2,t)-MomExt(3,qout)*MomExt(3,t)-MomExt(4,qout)*MomExt(4,t)
       p4Dp7=MomExt(1,lep)*MomExt(1,t)-MomExt(2,lep)*MomExt(2,t)-MomExt(3,lep)*MomExt(3,t)-MomExt(4,lep)*MomExt(4,t)
-      p2Dp3=MomExt(1,inRight)*MomExt(1,Hbos)-MomExt(2,inRight)*MomExt(2,Hbos)-MomExt(3,inRight)*MomExt(3,Hbos)-MomExt(4,inRight)*MomExt(4,Hbos)
-      MomExtFlat(1,1:4)=MomExt(1:4,inLeft)
-      MomExtFlat(2,1:4)=MomExt(1:4,inRight)
-      MomExtFlat(3,1:4)=m_Reso**2/2d0/p2Dp3*MomExt(1:4,inRight)
+      p2Dp3=-MomExt(1,inRight)*MomExt(1,Hbos)+MomExt(2,inRight)*MomExt(2,Hbos)+MomExt(3,inRight)*MomExt(3,Hbos)+MomExt(4,inRight)*MomExt(4,Hbos)
+      MomExtFlat(1,1:4)=-MomExt(1:4,inLeft)
+      MomExtFlat(2,1:4)=-MomExt(1:4,inRight)
+      MomExtFlat(3,1:4)=-m_Reso**2/2d0/p2Dp3*MomExt(1:4,inRight)
       MomExtFlat(4,1:4)=MomExt(1:4,Hbos)-MomExtFlat(3,1:4)
       MomExtFlat(5,1:4)=m_Top**2*MomExt(1:4,qout)/2d0/p4Dp5
       MomExtFlat(6,1:4)=MomExt(1:4,t)-MomExtFlat(5,1:4)
@@ -209,7 +209,7 @@ END SUBROUTINE
    
    
    
-
+! MARKUS: changed MomExt(1:4, inLeft/inRight) to all outgoing
 SUBROUTINE EvalAmp_QbarBbar_TbarH(MomExt,TTBHcoupl,TopDecays,LO_Res_Unpol)
 implicit none
 integer :: TopDecays! 0=stable, 1=di-leptonic
@@ -225,10 +225,10 @@ include 'includeVars.F90'
 ! setup momenta for spinor helicity products                                                                                                                                 
    p4Dp5=MomExt(1,qout)*MomExt(1,t)-MomExt(2,qout)*MomExt(2,t)-MomExt(3,qout)*MomExt(3,t)-MomExt(4,qout)*MomExt(4,t)
    p4Dp7=MomExt(1,lep)*MomExt(1,t)-MomExt(2,lep)*MomExt(2,t)-MomExt(3,lep)*MomExt(3,t)-MomExt(4,lep)*MomExt(4,t)
-   p2Dp3=MomExt(1,inRight)*MomExt(1,Hbos)-MomExt(2,inRight)*MomExt(2,Hbos)-MomExt(3,inRight)*MomExt(3,Hbos)-MomExt(4,inRight)*MomExt(4,Hbos)
-   MomExtFlat(1,1:4)=MomExt(1:4,inLeft)
-   MomExtFlat(2,1:4)=MomExt(1:4,inRight)
-   MomExtFlat(3,1:4)=m_Reso**2/2d0/p2Dp3*MomExt(1:4,inRight)
+   p2Dp3=-MomExt(1,inRight)*MomExt(1,Hbos)+MomExt(2,inRight)*MomExt(2,Hbos)+MomExt(3,inRight)*MomExt(3,Hbos)+MomExt(4,inRight)*MomExt(4,Hbos)
+   MomExtFlat(1,1:4)=-MomExt(1:4,inLeft)
+   MomExtFlat(2,1:4)=-MomExt(1:4,inRight)
+   MomExtFlat(3,1:4)=-m_Reso**2/2d0/p2Dp3*MomExt(1:4,inRight)
    MomExtFlat(4,1:4)=MomExt(1:4,Hbos)-MomExtFlat(3,1:4)
    MomExtFlat(5,1:4)=m_Top**2*MomExt(1:4,qout)/2d0/p4Dp5
    MomExtFlat(6,1:4)=MomExt(1:4,t)-MomExtFlat(5,1:4)
@@ -453,6 +453,96 @@ END SUBROUTINE
    
 
  
- 
+
+
+    SUBROUTINE convert_to_MCFM(p,pout)
+      implicit none
+! converts from (E,px,py,pz) to (px,py,pz,E)
+      real(8) :: p(1:4),tmp(1:4)
+      real(8), optional :: pout(1:4)
+
+      if( present(pout) ) then
+          pout(1)=p(2)  
+          pout(2)=p(3)  
+          pout(3)=p(4) 
+          pout(4)=p(1)  
+      else
+          tmp(1)=p(1)
+          tmp(2)=p(2)
+          tmp(3)=p(3)
+          tmp(4)=p(4)
+
+          p(1)=tmp(2)  
+          p(2)=tmp(3) 
+          p(3)=tmp(4)  
+          p(4)=tmp(1)  
+      endif  
+      
+    END SUBROUTINE
+
+
+
+
+subroutine spinoru(N,p,za,zb,s)
+!---Calculate spinor products      
+!---taken from MCFM & modified by R. Rontsch, May 2015
+!---extended to deal with negative energies ie with all momenta outgoing                                                                
+!---Arbitrary conventions of Bern, Dixon, Kosower, Weinzierl,                                                                                  
+!---za(i,j)*zb(j,i)=s(i,j)                      
+      implicit none
+      real(8) :: p(:,:),two
+      integer, parameter :: mxpart=14
+      complex(8):: c23(N),f(N),rt(N),za(:,:),zb(:,:),czero,cone,ci
+      real(8)   :: s(:,:)
+      integer i,j,N
+      
+      if (size(p,1) .ne. N) then
+         print *, "spinorz: momentum mismatch"
+         stop
+      endif
+      two=2d0
+      czero=dcmplx(0d0,0d0)
+      cone=dcmplx(1d0,0d0)
+      ci=dcmplx(0d0,1d0)
+      
+
+!---if one of the vectors happens to be zero this routine fails.                                                                                                                
+      do j=1,N
+         za(j,j)=czero
+         zb(j,j)=za(j,j)
+
+!-----positive energy case                                                                                                                                                      
+         if (p(j,4) .gt. 0d0) then
+            rt(j)=dsqrt(p(j,4)+p(j,1))
+            c23(j)=dcmplx(p(j,3),-p(j,2))
+            f(j)=cone
+         else
+!-----negative energy case                                                                                                                                                      
+            rt(j)=dsqrt(-p(j,4)-p(j,1))
+            c23(j)=dcmplx(-p(j,3),p(j,2))
+            f(j)=ci
+         endif
+      enddo
+      do i=2,N
+         do j=1,i-1
+         s(i,j)=two*(p(i,4)*p(j,4)-p(i,1)*p(j,1)-p(i,2)*p(j,2)-p(i,3)*p(j,3))
+         za(i,j)=f(i)*f(j)*(c23(i)*dcmplx(rt(j)/rt(i))-c23(j)*dcmplx(rt(i)/rt(j)))
+
+         if (abs(s(i,j)).lt.1d-5) then
+         zb(i,j)=-(f(i)*f(j))**2*dconjg(za(i,j))
+         else
+         zb(i,j)=-dcmplx(s(i,j))/za(i,j)
+         endif
+         za(j,i)=-za(i,j)
+         zb(j,i)=-zb(i,j)
+         s(j,i)=s(i,j)
+         enddo
+      enddo
+
+    end subroutine spinoru
+
+    
+    
+    
 END MODULE
 

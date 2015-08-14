@@ -58,6 +58,8 @@ integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9
       call Kinematics_TH(MomExt,applyPSCut,NBin)
    ENDIF
    
+
+   
    if( applyPSCut ) then
       EvalWeighted_TH = 0d0
       return
@@ -81,6 +83,17 @@ integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9
    ENDIF
    EvalWeighted_TH = EvalWeighted_TH * PreFac
 
+! call printMom(MomExt(1:4,1:9))
+! print *, eta1,eta2,FluxFac
+! print *, "MEM", LO_Res_Unpol(Up_,Bot_),FluxFac*LO_Res_Unpol(Up_,Bot_)   * ( pdf(Up_,1) *pdf(Bot_,2)  +  pdf(Chm_,1) *pdf(Bot_,2) ) 
+! print *, "MEM", LO_Res_Unpol(Bot_,Up_),FluxFac* LO_Res_Unpol(Bot_,Up_)   * ( pdf(Bot_,1)*pdf(Up_,2)   +  pdf(Bot_,1) *pdf(Chm_,2) ) 
+! print *, "MEM",LO_Res_Unpol(ADn_,Bot_),FluxFac*LO_Res_Unpol(ADn_,Bot_)  * ( pdf(ADn_,1)*pdf(Bot_,2)  +  pdf(AStr_,1)*pdf(Bot_,2) ) 
+! print *, "MEM",LO_Res_Unpol(Bot_,ADn_),FluxFac*LO_Res_Unpol(Bot_,ADn_)  * ( pdf(Bot_,1)*pdf(ADn_,2)  +  pdf(Bot_,1) *pdf(AStr_,2))
+! print *, "MEM",LO_Res_Unpol(Dn_,ABot_),FluxFac* LO_Res_Unpol(Dn_,ABot_)  * ( pdf(Dn_,1)*pdf(ABot_,2)  + pdf(Str_,1)*pdf(ABot_,2) )  
+! print *, "MEM",LO_Res_Unpol(ABot_,Dn_),FluxFac*LO_Res_Unpol(ABot_,Dn_)  * ( pdf(ABot_,1)*pdf(Dn_,2)  + pdf(ABot_,1)*pdf(Str_,2) ) 
+! print *, "MEM", LO_Res_Unpol(AUp_,ABot_),FluxFac* LO_Res_Unpol(AUp_,ABot_) * ( pdf(AUp_,1)*pdf(ABot_,2) + pdf(AChm_,1)*pdf(ABot_,2))    
+! print *, "MEM", LO_Res_Unpol(ABot_,AUp_),FluxFac*LO_Res_Unpol(ABot_,AUp_) * ( pdf(ABot_,1)*pdf(AUp_,2) + pdf(ABot_,1)*pdf(AChm_,2))
+! pause
 
    if( writeWeightedLHE ) then 
         call Error("WriteLHE not yet supported for t+H")
@@ -268,12 +281,6 @@ ENDIF! GENEVT
 
 RETURN
 END FUNCTION
-
-
-
-
-
-
 
 
 

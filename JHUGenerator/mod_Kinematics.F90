@@ -3567,31 +3567,31 @@ real(8) :: pdf(-6:6,1:2),NNpdf(1:2,-6:7)
         PDFScale=MuFac*100d0
         
 #if useLHAPDF==1
-        call evolvePDF(x1,PDFScale,NNpdf(1,-6:6))
-        call evolvePDF(x2,PDFScale,NNpdf(2,-6:6))
+        call evolvePDF(x1,PDFScale,NNpdf(1,-6:7))
+        call evolvePDF(x2,PDFScale,NNpdf(2,-6:7))
             NNpdf(1,-6:7) = NNpdf(1,-6:7)/x1
             NNpdf(2,-6:7) = NNpdf(2,-6:7)/x2
             
-            pdf(Up_,1)   = NNpdf(1,+1)         * swPDF_u
-            pdf(AUp_,1)  = NNpdf(1,-1)         * swPDF_u
-            pdf(Dn_,1)   = NNpdf(1,+2)         * swPDF_d
-            pdf(ADn_,1)  = NNpdf(1,-2)         * swPDF_d
-            pdf(Chm_,1)  = NNpdf(1,+3)         * swPDF_c
-            pdf(AChm_,1) = NNpdf(1,-3)         * swPDF_c
-            pdf(Str_,1)  = NNpdf(1,+4)         * swPDF_s
-            pdf(AStr_,1) = NNpdf(1,-4)         * swPDF_s
+            pdf(Up_,1)   = NNpdf(1,+2)         * swPDF_u
+            pdf(AUp_,1)  = NNpdf(1,-2)         * swPDF_u
+            pdf(Dn_,1)   = NNpdf(1,+1)         * swPDF_d
+            pdf(ADn_,1)  = NNpdf(1,-1)         * swPDF_d
+            pdf(Chm_,1)  = NNpdf(1,+4)         * swPDF_c
+            pdf(AChm_,1) = NNpdf(1,-4)         * swPDF_c
+            pdf(Str_,1)  = NNpdf(1,+3)         * swPDF_s
+            pdf(AStr_,1) = NNpdf(1,-3)         * swPDF_s
             pdf(Bot_,1)  = NNpdf(1,+5)         * swPDF_b
             pdf(ABot_,1) = NNpdf(1,-5)         * swPDF_b
             pdf(0,1)     = NNpdf(1,+0)         * swPDF_g            
             
-            pdf(Up_,2)   = NNpdf(2,+1)         * swPDF_u
-            pdf(AUp_,2)  = NNpdf(2,-1)         * swPDF_u
-            pdf(Dn_,2)   = NNpdf(2,+2)         * swPDF_d
-            pdf(ADn_,2)  = NNpdf(2,-2)         * swPDF_d
-            pdf(Chm_,2)  = NNpdf(2,+3)         * swPDF_c
-            pdf(AChm_,2) = NNpdf(2,-3)         * swPDF_c
-            pdf(Str_,2)  = NNpdf(2,+4)         * swPDF_s
-            pdf(AStr_,2) = NNpdf(2,-4)         * swPDF_s
+            pdf(Up_,2)   = NNpdf(2,+2)         * swPDF_u
+            pdf(AUp_,2)  = NNpdf(2,-2)         * swPDF_u
+            pdf(Dn_,2)   = NNpdf(2,+1)         * swPDF_d
+            pdf(ADn_,2)  = NNpdf(2,-1)         * swPDF_d
+            pdf(Chm_,2)  = NNpdf(2,+4)         * swPDF_c
+            pdf(AChm_,2) = NNpdf(2,-4)         * swPDF_c
+            pdf(Str_,2)  = NNpdf(2,+3)         * swPDF_s
+            pdf(AStr_,2) = NNpdf(2,-3)         * swPDF_s
             pdf(Bot_,2)  = NNpdf(2,+5)         * swPDF_b
             pdf(ABot_,2) = NNpdf(2,-5)         * swPDF_b
             pdf(0,2)     = NNpdf(2,+0)         * swPDF_g            
@@ -3666,26 +3666,26 @@ real(8) :: pdf(-6:6,1:2),NNpdf(1:2,-6:7)
             NNpdf(2,-6:7) = NNpdf(2,-6:7)/x2
             
     !       PROTON CONTENT
-            pdf(Up_,1)   = NNpdf(1,+1)         * swPDF_u
-            pdf(AUp_,1)  = NNpdf(1,-1)         * swPDF_u
-            pdf(Dn_,1)   = NNpdf(1,+2)         * swPDF_d
-            pdf(ADn_,1)  = NNpdf(1,-2)         * swPDF_d
-            pdf(Chm_,1)  = NNpdf(1,+3)         * swPDF_c
-            pdf(AChm_,1) = NNpdf(1,-3)         * swPDF_c
-            pdf(Str_,1)  = NNpdf(1,+4)         * swPDF_s
-            pdf(AStr_,1) = NNpdf(1,-4)         * swPDF_s
+            pdf(Up_,1)   = NNpdf(1,+2)         * swPDF_u
+            pdf(AUp_,1)  = NNpdf(1,-2)         * swPDF_u
+            pdf(Dn_,1)   = NNpdf(1,+1)         * swPDF_d
+            pdf(ADn_,1)  = NNpdf(1,-1)         * swPDF_d
+            pdf(Chm_,1)  = NNpdf(1,+4)         * swPDF_c
+            pdf(AChm_,1) = NNpdf(1,-4)         * swPDF_c
+            pdf(Str_,1)  = NNpdf(1,+3)         * swPDF_s
+            pdf(AStr_,1) = NNpdf(1,-3)         * swPDF_s
             pdf(Bot_,1)  = NNpdf(1,+5)         * swPDF_b
             pdf(ABot_,1) = NNpdf(1,-5)         * swPDF_b
             pdf(0,1)     = NNpdf(1,+0)         * swPDF_g            
             
-            pdf(Up_,2)   = NNpdf(2,+1)         * swPDF_u
-            pdf(AUp_,2)  = NNpdf(2,-1)         * swPDF_u
-            pdf(Dn_,2)   = NNpdf(2,+2)         * swPDF_d
-            pdf(ADn_,2)  = NNpdf(2,-2)         * swPDF_d
-            pdf(Chm_,2)  = NNpdf(2,+3)         * swPDF_c
-            pdf(AChm_,2) = NNpdf(2,-3)         * swPDF_c
-            pdf(Str_,2)  = NNpdf(2,+4)         * swPDF_s
-            pdf(AStr_,2) = NNpdf(2,-4)         * swPDF_s
+            pdf(Up_,2)   = NNpdf(2,+2)         * swPDF_u
+            pdf(AUp_,2)  = NNpdf(2,-2)         * swPDF_u
+            pdf(Dn_,2)   = NNpdf(2,+1)         * swPDF_d
+            pdf(ADn_,2)  = NNpdf(2,-1)         * swPDF_d
+            pdf(Chm_,2)  = NNpdf(2,+4)         * swPDF_c
+            pdf(AChm_,2) = NNpdf(2,-4)         * swPDF_c
+            pdf(Str_,2)  = NNpdf(2,+3)         * swPDF_s
+            pdf(AStr_,2) = NNpdf(2,-3)         * swPDF_s
             pdf(Bot_,2)  = NNpdf(2,+5)         * swPDF_b
             pdf(ABot_,2) = NNpdf(2,-5)         * swPDF_b
             pdf(0,2)     = NNpdf(2,+0)         * swPDF_g            

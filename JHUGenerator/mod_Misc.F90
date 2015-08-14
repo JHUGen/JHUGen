@@ -224,11 +224,23 @@ integer i, j, jmax, itemp
 !     print *, iy(:)
 !     stop
 
-return
+RETURN
 END SUBROUTINE
 
 
 
+
+SUBROUTINE printMom(Mom)
+implicit none
+real(8) :: Mom(:,:)
+integer :: n
+
+    do n=1,size(Mom,2)
+      write (*,"(A,I2,A,1F20.16,A,1F20.16,A,1F20.16,A,1F20.16,A)") "Mom(1:4,",n,")= (/",Mom(1,n),"d0,",Mom(2,n),"d0,",Mom(3,n),"d0,",Mom(4,n),"d0   /)"
+    enddo
+
+RETURN
+END SUBROUTINE
 
 
 
@@ -754,6 +766,7 @@ subroutine spinoru(N,p,za,zb,s)
 
 
     
+
 
 END MODULE
 
