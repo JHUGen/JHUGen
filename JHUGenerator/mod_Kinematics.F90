@@ -2525,7 +2525,7 @@ implicit none
 real(8) :: Mom(:,:)
 logical :: applyPSCut
 integer :: NBin(:)
-integer, parameter :: inLeft=1, inRight=2, tauP=3, tauM=4, Wp=5, Wm=6, nu1=7, nubar1=8, lepP=9, lepM=10, nu2=11, nubar2=12
+integer, parameter :: inLeft=1, inRight=2, tauP=3, tauM=4, Wp=5, Wm=6, nu=7, nubar_tau=8, lepP=9, lepM=10, nu_tau=11, nubar=12
 real(8) :: m_tauP,m_tauM,m_Wp,m_Wm
 
 
@@ -3343,25 +3343,25 @@ END FUNCTION
 
 
 
-FUNCTION WhichXBin(NHisto,XValue)
-use ModParameters
-implicit none
-integer :: WhichXBin,NHisto
-real(8) :: XValue
-integer :: i
-include "vegas_common.f"
-
-    whichxbin = int( xValue*NPart )!  uniform distribution
-
-
-!    do i=1,50!                         distribution according to vegas grid
-!       if( XValue .lt. xi(i,NHisto) ) then
-!           WhichXBin=i
-!           return
-!       endif
-!    enddo
-RETURN
-END FUNCTION
+! FUNCTION WhichXBin(NHisto,XValue)
+! use ModParameters
+! implicit none
+! integer :: WhichXBin,NHisto
+! real(8) :: XValue
+! integer :: i
+! include "vegas_common.f"
+! 
+!     whichxbin = int( xValue*NPart )!  uniform distribution
+! 
+! 
+! !    do i=1,50!                         distribution according to vegas grid
+! !       if( XValue .lt. xi(i,NHisto) ) then
+! !           WhichXBin=i
+! !           return
+! !       endif
+! !    enddo
+! RETURN
+! END FUNCTION
 
 
 
@@ -4296,7 +4296,7 @@ integer :: MY_IDUP(1:2)
 real(8) :: Jac,Jac1,Jac2,Jac3,Jac4,Jac5,Jac6,Jac7,Jac8,Jac9
 real(8) :: Minvsq_tau1,Minvsq_tau2,Minvsq_Wp,Minvsq_Wm,m_LepP,m_LepM
 real(8),parameter :: m_nu = 0d0, ga_tau =4d-13*GeV
-integer, parameter :: inLeft=1, inRight=2, tauP=3, tauM=4, Wp=5, Wm=6, nu1=7, nubar1=8, lepP=9, lepM=10, nu2=11, nubar2=12
+integer, parameter :: inLeft=1, inRight=2, tauP=3, tauM=4, Wp=5, Wm=6,   nu=7, nubar_tau=8, lepP=9,   lepM=10, nu_tau=11, nubar=12
    
    
    m_LepP = getMass(MY_IDUP(1))
@@ -4308,12 +4308,12 @@ integer, parameter :: inLeft=1, inRight=2, tauP=3, tauM=4, Wp=5, Wm=6, nu1=7, nu
    Jac1 = s_channel_prop_decay(pHiggs,(/m_tau,ga_tau,m_tau,m_tau/),(/m_tau,ga_tau,m_tau,m_tau/),xRnd(1:2),Mom(:,tauP),Mom(:,tauM)) 
 
 !  tau-->W nu (BW)
-   Jac2 = s_channel_prop_decay(Mom(:,tauP),(/m_W,ga_W,0d0,get_MInv(Mom(:,tauP))/),(/m_nu,0d0,0d0,0d0/),xRnd(3:5),Mom(:,Wp),Mom(:,nu1)) 
-   Jac3 = s_channel_prop_decay(Mom(:,tauM),(/m_W,ga_W,0d0,get_MInv(Mom(:,tauM))/),(/m_nu,0d0,0d0,0d0/),xRnd(6:8),Mom(:,Wm),Mom(:,nubar1)) 
+   Jac2 = s_channel_prop_decay(Mom(:,tauP),(/m_W,ga_W,0d0,get_MInv(Mom(:,tauP))/),(/m_nu,0d0,0d0,0d0/),xRnd(3:5),Mom(:,Wp),Mom(:,nu)) 
+   Jac3 = s_channel_prop_decay(Mom(:,tauM),(/m_W,ga_W,0d0,get_MInv(Mom(:,tauM))/),(/m_nu,0d0,0d0,0d0/),xRnd(6:8),Mom(:,Wm),Mom(:,nubar_tau)) 
 
 !  W-->l nu (ONS)
-   Jac4 = s_channel_prop_decay(Mom(:,Wp),(/m_LepP,0d0,0d0,0d0/),(/m_nu,0d0,0d0,0d0/),xRnd( 9:10),Mom(:,LepP),Mom(:,nu2)) 
-   Jac5 = s_channel_prop_decay(Mom(:,Wm),(/m_LepM,0d0,0d0,0d0/),(/m_nu,0d0,0d0,0d0/),xRnd(11:12),Mom(:,LepM),Mom(:,nubar2)) 
+   Jac4 = s_channel_prop_decay(Mom(:,Wp),(/m_LepP,0d0,0d0,0d0/),(/m_nu,0d0,0d0,0d0/),xRnd( 9:10),Mom(:,LepP),Mom(:,nu_tau)) 
+   Jac5 = s_channel_prop_decay(Mom(:,Wm),(/m_LepM,0d0,0d0,0d0/),(/m_nu,0d0,0d0,0d0/),xRnd(11:12),Mom(:,LepM),Mom(:,nubar)) 
    
    Jac = Jac1*Jac2*Jac4*Jac3*Jac5 * PSNorm6
    
@@ -4324,18 +4324,18 @@ integer, parameter :: inLeft=1, inRight=2, tauP=3, tauM=4, Wp=5, Wm=6, nu1=7, nu
 !    print *, "OS checker", dsqrt( dabs(Mom(1:4,tauM).dot.Mom(1:4,tauM) ))
 !    print *, "OS checker", dsqrt( dabs(Mom(1:4,Wp).dot.Mom(1:4,Wp) ))
 !    print *, "OS checker", dsqrt( dabs(Mom(1:4,Wm).dot.Mom(1:4,Wm) ))
-!    print *, "OS checker", dsqrt( dabs(Mom(1:4,nu1).dot.Mom(1:4,nu1) ))
-!    print *, "OS checker", dsqrt( dabs(Mom(1:4,nu2).dot.Mom(1:4,nu2) ))
-!    print *, "OS checker", dsqrt( dabs(Mom(1:4,nubar1).dot.Mom(1:4,nubar1) ))
-!    print *, "OS checker", dsqrt( dabs(Mom(1:4,nubar2).dot.Mom(1:4,nubar2) ))
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,nu).dot.Mom(1:4,nu) ))
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,nu_tau).dot.Mom(1:4,nu_tau) ))
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,nubar_tau).dot.Mom(1:4,nubar_tau) ))
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,nubar).dot.Mom(1:4,nubar) ))
 !    print *, "OS checker", dsqrt( dabs(Mom(1:4,lepP).dot.Mom(1:4,lepP) ))
 !    print *, "OS checker", dsqrt( dabs(Mom(1:4,lepM).dot.Mom(1:4,lepM) ))
 !    print *, "----------"
 !    print *, "Mom.cons. ",pHiggs(1:4)-Mom(1:4,tauP)-Mom(1:4,tauM)
-!    print *, "Mom.cons. ",Mom(1:4,tauP) - Mom(1:4,nu1)-Mom(1:4,Wp)
-!    print *, "Mom.cons. ",Mom(1:4,tauM) - Mom(1:4,nubar1)-Mom(1:4,Wm)
-!    print *, "Mom.cons. ",Mom(1:4,Wp) - Mom(1:4,nu2)-Mom(1:4,lepP)
-!    print *, "Mom.cons. ",Mom(1:4,Wm) - Mom(1:4,nubar2)-Mom(1:4,lepM)   
+!    print *, "Mom.cons. ",Mom(1:4,tauP) - Mom(1:4,nu)-Mom(1:4,Wp)
+!    print *, "Mom.cons. ",Mom(1:4,tauM) - Mom(1:4,nubar_tau)-Mom(1:4,Wm)
+!    print *, "Mom.cons. ",Mom(1:4,Wp) - Mom(1:4,nu_tau)-Mom(1:4,lepP)
+!    print *, "Mom.cons. ",Mom(1:4,Wm) - Mom(1:4,nubar)-Mom(1:4,lepM)   
 !    pause
    
 
