@@ -245,7 +245,6 @@ print *, "check old",InvMass_sq,s_channel_propagator
            s_channel_propagator = k_s(xRnd, PropMass_sq, Power, sMin, sMax,InvMass_sq)
 print *, "check new",InvMass_sq,s_channel_propagator
 pause
-                      
       else
            if( dabs(sMin + sMax -2d0*PropMass_sq).lt.1d-10 .and.PropMass_sq.gt.1d-14 ) then! this is the narrow-width mapping (i.e. no integration)
               InvMass_sq = PropMass_sq

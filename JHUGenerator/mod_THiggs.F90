@@ -77,6 +77,7 @@ integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9
       ELSE
          call tdecay(5,6,8,9,10,za,zb,decay_amp)
       ENDIF
+            
       call ubhtdamp(1,2,3,4,5,6,7,za,zb,s,decay_amp,LOAmp(Up_,Bot_,1:2))
       call ubhtdamp(2,1,3,4,5,6,7,za,zb,s,decay_amp,LOAmp(Bot_,Up_,1:2))        
       call ubhtdamp(7,2,3,4,5,6,1,za,zb,s,decay_amp,LOAmp(ADn_,Bot_,1:2))
@@ -314,8 +315,7 @@ END SUBROUTINE
        WProp = (0d0,-1d0)*NWAFactor_W
    
        dkamp = dkamp * WProp * NWAFactor_Top * g2_weak
-   
-   
+     
      END SUBROUTINE
    
     

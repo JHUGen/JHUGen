@@ -3,7 +3,7 @@ implicit none
 save
 ! 
 ! 
-character(len=6),parameter :: JHUGen_Version="v6.5.0"
+character(len=6),parameter :: JHUGen_Version="v6.5.1"
 ! 
 ! 
 integer, public :: Collider, PDFSet,PChannel,Process,DecayMode1,DecayMode2,TopDecays,TauDecays,BotDecays
@@ -57,8 +57,8 @@ logical, public, parameter :: RandomizeVVdecays = .true. ! randomize DecayMode1 
 
 logical, public, parameter :: UseUnformattedRead = .false.  !Set this to true if the regular reading fails for whatever reason
 
-real(8), public            :: M_Top   = 173.2d0     *GeV      ! 
-real(8), public, parameter :: Ga_Top  = 2.0d0    *GeV      ! 
+real(8), public            :: M_Top   = 173.2d0   *GeV      ! top quark mass
+real(8), public, parameter :: Ga_Top  = 2.0d0     *GeV      ! top quark width
 real(8), public, parameter :: M_Z     = 91.1876d0 *GeV      ! Z boson mass (PDG-2011)
 real(8), public, parameter :: Ga_Z    = 2.4952d0  *GeV      ! Z boson width(PDG-2011)
 real(8), public, parameter :: M_W     = 80.399d0  *GeV      ! W boson mass (PDG-2011)
@@ -693,6 +693,81 @@ integer :: Part
 
 END FUNCTION
 
+FUNCTION getParticle(Part)
+implicit none
+character(len=3) :: getParticle
+integer :: Part
+
+
+  if( Part.eq.Glu_ ) then
+      getParticle = "glu"
+  elseif( Part.eq.0 ) then
+      getParticle = "glu"
+  elseif( Part.eq.ElM_ ) then
+      getParticle = "el-"
+  elseif( Part.eq.ElP_ ) then
+      getParticle = "el+"
+  elseif( Part.eq.MuM_ ) then
+      getParticle = "mu-"
+  elseif( Part.eq.MuP_ ) then
+      getParticle = "mu+"
+  elseif( Part.eq.TaM_ ) then
+      getParticle = "ta-"
+  elseif( Part.eq.TaP_ ) then
+      getParticle = "t+-"
+  elseif( Part.eq.NuE_ ) then
+      getParticle = "nuE"
+  elseif( Part.eq.ANuE_ ) then
+      getParticle = "AnE"
+  elseif( Part.eq.NuM_ ) then
+      getParticle = "nuM"
+  elseif( Part.eq.ANuM_ ) then
+      getParticle = "AnM"
+  elseif( Part.eq.NuT_ ) then
+      getParticle = "nuT"
+  elseif( Part.eq.ANuT_ ) then
+      getParticle = "AnT"
+  elseif( Part.eq.Up_ ) then
+      getParticle = "up "
+  elseif( Part.eq.AUp_ ) then
+      getParticle = "Aup"
+  elseif( Part.eq.Dn_ ) then
+      getParticle = "dn "
+  elseif( Part.eq.ADn_ ) then
+      getParticle = "Adn"
+  elseif( Part.eq.Chm_ ) then
+      getParticle = "chm"
+  elseif( Part.eq.AChm_ ) then
+      getParticle = "Achm"
+  elseif( Part.eq.Str_ ) then
+      getParticle = "str"
+  elseif( Part.eq.AStr_ ) then
+      getParticle = "Astr"
+  elseif( Part.eq.Bot_ ) then
+      getParticle = "bot"
+  elseif( Part.eq.ABot_ ) then
+      getParticle = "Abot"
+  elseif( Part.eq.Top_ ) then
+      getParticle = "top"
+  elseif( Part.eq.ATop_ ) then
+      getParticle = "Atop"
+  elseif( Part.eq.Z0_ ) then
+      getParticle = "Z0 "
+  elseif( Part.eq.Wp_ ) then
+      getParticle = "W+ "
+  elseif( Part.eq.Wm_ ) then
+      getParticle = "W- "
+  elseif( Part.eq.Pho_ ) then
+      getParticle = "pho"
+  elseif( Part.eq.Hig_ ) then
+      getParticle = "Hig"
+  else
+     print *, "Error in getParticle",Part
+     stop
+  endif
+
+
+END FUNCTION
 
 
 
