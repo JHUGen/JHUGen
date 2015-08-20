@@ -3,10 +3,10 @@ implicit none
 save
 ! 
 ! 
-character(len=6),parameter :: JHUGen_Version="v6.5.1"
+character(len=6),parameter :: JHUGen_Version="v6.6.0"
 ! 
 ! 
-integer, public :: Collider, PDFSet,PChannel,Process,DecayMode1,DecayMode2,TopDecays,TauDecays,BotDecays
+integer, public :: Collider, PDFSet,PChannel,Process,DecayMode1,DecayMode2,TopDecays,TauDecays
 integer, public :: VegasIt1,VegasNc0,VegasNc1,VegasNc2
 real(8), public :: Collider_Energy
 integer, public :: VegasIt1_default,VegasNc0_default,VegasNc1_default,VegasNc2_default
@@ -31,10 +31,10 @@ logical, public :: includeInterference
 real(8), public :: M_V,Ga_V
 real(8), public, parameter :: GeV=1d0/100d0 ! we are using units of 100GeV, i.e. Lambda=10 is 1TeV 
 real(8), public, parameter :: percent=1d0/100d0
-real(8),public :: GlobalMax=-1d99
-real(8),public :: GlobalMin=+1d99
-integer,parameter :: NPart=200
-real(8),public :: PartitionMax(0:NPart,0:NPart)=-1d99
+! real(8),public :: GlobalMax=-1d99
+! real(8),public :: GlobalMin=+1d99
+! integer,parameter :: NPart=200
+! real(8),public :: PartitionMax(0:NPart,0:NPart)=-1d99
 real(8),public :: minCS=1d10,maxCS=0d0,avgCS=0d0
 
 

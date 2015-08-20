@@ -13,7 +13,7 @@
 !----- notation for subroutines
       public :: EvalAmp_gg_H_VV
       public :: EvalAmp_H_VV
-      public :: EvalAmp_H_TT
+      public :: EvalAmp_H_FF, EvalAmp_H_TT_decay
 
       CONTAINS
 
@@ -1367,22 +1367,81 @@
 
 
 
+
+
+
    
    
    
+! Higgs decay to tau^+ tau^-   or    top anti-top                  
+! Decay amplitude H --> tau^-(p1) + tau^+(p2)
+! or              H --> tbar(p1)  + top(p2)
+! with tau/top controlled by value of mass_F
+! Since this is an isotropic scalar decay, just provide a matrix element SQUARED
+! R.Rontsch July 2015
+   SUBROUTINE EvalAmp_H_FF(pin,mass_F,res)
+   use ModMisc
+   use ModParameters
+   implicit none
+   real(dp), intent(out) ::  res
+   real(dp), intent(in) :: pin(1:4,1:2),mass_F
+   real(dp)             :: s12
 
-      ! Higgs decay to tau^+ tau^-   or    top anti-top 
-      SUBROUTINE EvalAmp_H_TT(p,res)
-      use ModMisc
-      implicit none
-      real(dp), intent(out) ::  res
-      real(dp), intent(in) :: p(1:4,1:6)
-      res = 0d0
+      s12=2d0*(pin(1,1)*pin(1,2)-pin(2,1)*pin(2,2)-pin(3,1)*pin(3,2)-pin(4,1)*pin(4,2)) + 2d0*mass_F**2
+      res =   2d0*s12*(kappa_tilde**2 + kappa**2) - 8d0*mass_F**2*kappa**2
+
+      res=res*mass_F**2/vev**2                    
+      
+   RETURN
+   END SUBROUTINE
 
 
-      RETURN
-      END SUBROUTINE
 
+
+
+
+! Decay amplitude H --> tau^-(-->l^-(p1)+nubar(p2)+nutau(p3))  +  tau^+(-->nu(p4)+l^+(p5)+nutaubar(p6))
+! or H --> tbar^-(-->l^-(p1)+nubar(p2)+bbar(p3))+top(-->nu(p4)+l^+(p5)+b(p6))
+! Note: 1. Value of m allows to change between H->tau^+tau^- and H->ttbar
+!       2. Full kinematics of decaying particles -- no NWA.
+!       3. Final state b quark is massless.
+!       4. At present, no width in the tau/top propagator
+! R. Rontsch July 2015
+   SUBROUTINE EvalAmp_H_TT_decay(pin,mass_F,res)
+   use ModMisc
+   use ModParameters
+   implicit none
+   real(dp), intent(out) ::  res
+   real(dp), intent(in) :: pin(1:4,1:6),mass_F
+   integer              :: j
+   real(dp)             :: p(1:4,1:6),s12,s45,s123,s456,KL,KR,s(6,6)
+   complex(dp)          :: za(6,6),zb(6,6),amp
+
+      p=pin
+      do j=1,6
+          call convert_to_MCFM(pin(1:4,j),p(1:4,j))  
+      enddo       
+      call spinoru(6,p,za,zb,s)
+  
+      s12=s(1,2)
+      s45=s(4,5)
+      s123=s(1,2)+s(1,3)+s(2,3)
+      s456=s(4,5)+s(4,6)+s(5,6)     
+
+      KL=-mass_F/vev*( kappa -(0d0,1d0)*kappa_tilde )
+      KR=-mass_F/vev*( kappa +(0d0,1d0)*kappa_tilde )
+
+      amp =  + KR * ( za(1,3)*za(1,4)*zb(1,2)*zb(5,6)- za(1,3)*za(3,4)*zb(2,3)*zb(5,6)) &
+             + KL * (- za(1,3)*za(4,5)*zb(2,5)*zb(5,6)- za(1,3)*za(4,6)*zb(2,6)*zb(5,6))
+
+! overall factors and propagators
+      amp=amp/(s123-mass_F**2)/(s456-mass_F**2)/(s12-m_w**2+ci*m_w*Ga_W)/(s45-m_w**2+ci*m_w*Ga_W)
+      amp=amp*16d0*ci*mass_F*gwsq**2
+      
+      res = cdabs(amp)
+
+   RETURN
+   END SUBROUTINE
 
    
    
