@@ -1370,8 +1370,6 @@
    
    
    
-   
-   
 
       ! Higgs decay to tau^+ tau^-   or    top anti-top 
       SUBROUTINE EvalAmp_H_TT(p,res)

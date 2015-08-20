@@ -3210,7 +3210,141 @@ EvalUnWeighted_DecayToTT = 0d0
   pHiggs(1) = dsqrt( M_Reso**2 + pHiggs(2)**2+ pHiggs(3)**2+ pHiggs(4)**2 )
   call EvalPhasespace_tautau(yRnd(1:12),pHiggs,MY_IDUP,Mom,Jac)
 
-
+!   call Kinematics_Htautau()
+  
+! IF( GENEVT ) THEN
+! 
+!       MY_IDUP(1:2)=(/Glu_,Glu_/)
+!       ICOLUP(1:2,1) = (/501,502/)
+!       ICOLUP(1:2,2) = (/502,501/)
+! 
+!       if (Process.eq.0) then
+!             if( ML1.gt.1d-6 .or. ML2.gt.1d-6 .or. ML3.gt.1d-6 .or. ML4.gt.1d-6 ) then
+!                call EvalPhasespace_VDecay(MomExt(1:4,3),MZ1,0d0,0d0,yRnd(5:6),MomDK_massless(1:4,1:2),PSWgt2)
+!                call EvalPhasespace_VDecay(MomExt(1:4,4),MZ2,0d0,0d0,yRnd(7:8),MomDK_massless(1:4,3:4),PSWgt3)
+!                if( (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then
+!                   if( yrnd(16).gt.0.5d0 ) call swapmom( MomDK_massless(1:4,1),MomDK_massless(1:4,3) )
+!                endif
+!                call EvalAmp_H_VV( (/-MomExt(1:4,1)-MomExt(1:4,2),(/0d0,0d0,0d0,0d0/),MomDK_massless(1:4,1),MomDK_massless(1:4,2),MomDK_massless(1:4,3),MomDK_massless(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol)
+!             else
+!                call EvalAmp_H_VV( (/-MomExt(1:4,1)-MomExt(1:4,2),(/0d0,0d0,0d0,0d0/),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol)
+!             endif
+!       endif
+! 
+! 
+!       PreFac = 2d0 * fbGeV2 * sHatJacobi * PSWgt * SymmFac
+! !       if( abs(MY_IDUP(6)).ge.1 .and. abs(MY_IDUP(6)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
+! !       if( abs(MY_IDUP(8)).ge.1 .and. abs(MY_IDUP(8)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
+!       EvalUnWeighted_DecayToVV = LO_Res_Unpol * PreFac
+! 
+!       CS_max = csmax(0,0)
+! 
+!       if( EvalUnWeighted_DecayToVV .gt. CS_max) then
+!           write(io_stdout,"(2X,A,1PE13.6,1PE13.6)")  "CS_max is too small.",EvalUnWeighted_DecayToVV, CS_max
+!           write(io_LogFile,"(2X,A,1PE13.6,1PE13.6)") "CS_max is too small.",EvalUnWeighted_DecayToVV, CS_max
+!           AlertCounter = AlertCounter + 1
+!           Res = 0d0
+! 
+!       elseif( EvalUnWeighted_DecayToVV .gt. yRnd(14)*CS_max ) then
+!       
+!          if( RequestNLeptons.gt.0 ) then! lepton filter
+!                 LeptInEvent_tmp(0:8) = LeptInEvent(0:8)
+!     !             print *, ""
+!                 do i1=6,9
+!                     if( IsALepton(MY_IDUP(i1)) ) then
+!                       LeptInEvent_tmp(0) = LeptInEvent_tmp(0)+1
+!                       LeptInEvent_tmp( LeptInEvent_tmp(0) ) = ConvertLHE(MY_IDUP(i1))
+!                     endif
+!                 enddo
+! ! print *, "leptons in event: ",LeptInEvent_tmp(1: LeptInEvent_tmp(0))
+!                 ordered_Lept(1:8) = (/1,2,3,4,5,6,7,8/)! order leptons for tau decay associations
+!                 call BubleSort(LeptInEvent_tmp(0),dabs(dble(LeptInEvent_tmp(1:LeptInEvent_tmp(0)))), ordered_Lept(1:LeptInEvent_tmp(0)))
+! ! do i1=1,LeptInEvent_tmp(0)
+! !   print *, "new order:",LeptInEvent_tmp( ordered_Lept(i1) )
+! ! enddo
+! ! pause                
+!                 if( LeptInEvent_tmp(0) .lt. RequestNLeptons ) then
+!     !                 print *,"not enough leptons, reject!" !,LeptInEvent_tmp(1: LeptInEvent_tmp(0))
+!                     Res = -1d0
+!                     return
+!                 elseif( RequestOSSF ) then 
+!                     OSSFPair = 0
+! !                     do i1=1,LeptInEvent_tmp(0)-1
+! !                         do i2=i1+1,LeptInEvent_tmp(0)
+!                     do i1=LeptInEvent_tmp(0),2,-1
+!                         do i2=i1-1,1,-1
+!                             if(      ( LeptInEvent_tmp(i1)+LeptInEvent_tmp(i2).eq.0                                                     )    &     ! found a l+ l- pair
+!                                 .OR. ( abs(LeptInEvent_tmp(i1)).eq.ConvertLHE(TaM_) .and. LeptInEvent_tmp(i1)*LeptInEvent_tmp(i2).lt.0  )    &     ! found l tau pair
+!                                 .OR. ( abs(LeptInEvent_tmp(i2)).eq.ConvertLHE(TaM_) .and. LeptInEvent_tmp(i1)*LeptInEvent_tmp(i2).lt.0  )    &     ! found l tau pair
+!                             ) then
+!                               LeptInEvent_tmp(i2) = -999! remove from list
+!                               OSSFPair = OSSFPair + 1
+!                               exit
+!                             endif 
+!                         enddo
+!                     enddo
+! !                     print *, "found ",OSSFPair," OSSF pairs"
+!                     if( OSSFPair.lt.2 ) then
+! !                         print *,"no OSSF pair, reject!" !,LeptInEvent_tmp(1: LeptInEvent_tmp(0))
+!                         Res = -1d0
+!                         return
+!                     endif
+!                 endif
+! !                 print *, "accept event"
+! !                 pause
+!          endif! lepton filter 
+!          
+!          do NHisto=1,NumHistograms
+!                call intoHisto(NHisto,NBin(NHisto),1d0)  ! CS_Max is the integration volume
+!          enddo
+!          AccepCounter = AccepCounter + 1
+!          if( (OffShellV1).or.(OffShellV2).or.(IsAPhoton(DecayMode1)) ) then
+!               AcceptedEvent(1:4,1:4) = MomDK(1:4,1:4)
+!           else
+!               AcceptedEvent(1:4,1:4) = MomDK_f(1:4,1:4)
+!          endif
+!          Res = 1d0
+!          
+!       else
+!           RejeCounter = RejeCounter + 1
+!           Res = 0d0
+!       endif
+! 
+! 
+! ELSE! NOT GENEVT
+! 
+! 
+!       if (Process.eq.0) then
+!          MomExt(1:4,1) = (/M_Reso,0d0,0d0,0d0/)
+!          MomExt(1:4,2) = (/0d0,0d0,0d0,0d0/)
+! 
+!          if( ML1.gt.1d-6 .or. ML2.gt.1d-6 .or. ML3.gt.1d-6 .or. ML4.gt.1d-6 ) then
+!                call EvalPhasespace_VDecay(MomExt(1:4,3),MZ1,0d0,0d0,yRnd(5:6),MomDK_massless(1:4,1:2),PSWgt2)
+!                call EvalPhasespace_VDecay(MomExt(1:4,4),MZ2,0d0,0d0,yRnd(7:8),MomDK_massless(1:4,3:4),PSWgt3)
+!                if( (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then
+!                   if( yrnd(16).gt.0.5d0 ) call swapmom( MomDK_massless(1:4,1),MomDK_massless(1:4,3) )
+!                endif
+!                call EvalAmp_H_VV( (/-MomExt(1:4,1)-MomExt(1:4,2),(/0d0,0d0,0d0,0d0/),MomDK_massless(1:4,1),MomDK_massless(1:4,2),MomDK_massless(1:4,3),MomDK_massless(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol)
+!          else
+!                call EvalAmp_H_VV( (/-MomExt(1:4,1)-MomExt(1:4,2),(/0d0,0d0,0d0,0d0/),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol)
+!          endif
+!       endif
+! 
+!      PreFac = 2d0 * fbGeV2 * sHatJacobi * PSWgt * SymmFac
+! !       if( abs(MY_IDUP(6)).ge.1 .and. abs(MY_IDUP(6)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
+! !       if( abs(MY_IDUP(8)).ge.1 .and. abs(MY_IDUP(8)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
+!       EvalUnWeighted_DecayToVV = LO_Res_Unpol * PreFac
+!       Res = EvalUnWeighted_DecayToVV
+! 
+! 
+!       if (EvalUnWeighted_DecayToVV.gt.csmax(0,0)) then
+!           csmax(0,0) = EvalUnWeighted_DecayToVV
+!       endif
+! 
+! 
+! ENDIF! genEvt
+  
+  
 
 RETURN
 END FUNCTION

@@ -23,7 +23,7 @@ real(8) :: pdf(-6:6,1:2)
 real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi, PDFFac1,PDFFac2,xRnd
 real(8) :: MomExt(1:4,1:13),MomOffShell(1:4,1:13),PSWgt,PSWgt2,PSWgt3,PSWgt4
 real(8) :: LO_Res_Unpol,LO_Res_GG_Unpol,LO_Res_QQB_Unpol,PreFac  !, MG_MOM(0:3,1:5),MadGraph_tree
-integer :: NBin(1:NumHistograms),NHisto,iPart,iPartChannel
+integer :: NBin(1:NumHistograms),NHisto,iPart,iPartChannel,PartChannelAvg
 integer :: MY_IDUP(1:13),ICOLUP(1:2,1:13),DK_IDUP(1:6),DK_ICOLUP(1:2,3:6)
 logical :: applyPSCut
 integer, parameter :: NumPartonicChannels=6
@@ -31,8 +31,16 @@ integer, parameter :: inLeft=1,inRight=2,Hbos=3,tbar=4,t=5,  bbar=6,Wm=7,lepM=8,
 EvalWeighted_TTBH = 0d0
 
 
-
    iPartChannel = int(yRnd(1) * NumPartonicChannels)
+   if( PChannel.eq.0 ) then
+      iPartChannel = 0
+      PartChannelAvg = 1
+   elseif( PChannel.eq.1 ) then
+      iPartChannel = int(yRnd(1) * (NumPartonicChannels-1d0))+1
+      PartChannelAvg = NumPartonicChannels - 1
+   else
+      PartChannelAvg = NumPartonicChannels
+   endif
    if( iPartChannel.eq.0 ) then
       iPart_sel = 0
       jPart_sel = 0
@@ -89,10 +97,9 @@ EvalWeighted_TTBH = 0d0
 
 
    call Kinematics_TTBH(MomOffShell,applyPSCut,NBin)
-!    call Kinematics_TTBH(MomExt,applyPSCut,NBin)
    if( applyPSCut .or. PSWgt.eq.zero ) return
    FluxFac = 1d0/(2d0*EHat**2)
-   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt
+   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * PartChannelAvg
    Mu_Fact = 0.5d0*( 2d0*M_top + M_Reso )
    call setPDFs(eta1,eta2,Mu_Fact,pdf)
    
@@ -105,7 +112,8 @@ EvalWeighted_TTBH = 0d0
       call EvalAmp_QQB_TTBH(MomExt,LO_Res_Unpol) 
       PDFFac1 = pdf(iPart_sel,1)*pdf(jPart_sel,2) + pdf(iPart_sel,2)*pdf(jPart_sel,1)
    endif
-   EvalWeighted_TTBH = LO_Res_Unpol * PDFFac1 * PreFac * NumPartonicChannels
+   EvalWeighted_TTBH = LO_Res_Unpol * PDFFac1 * PreFac
+   
    
    
    

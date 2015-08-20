@@ -83,6 +83,7 @@ integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9
    ENDIF
    EvalWeighted_TH = EvalWeighted_TH * PreFac
 
+
 ! call printMom(MomExt(1:4,1:9))
 ! print *, eta1,eta2,FluxFac
 ! print *, "MEM", LO_Res_Unpol(Up_,Bot_),FluxFac*LO_Res_Unpol(Up_,Bot_)   * ( pdf(Up_,1) *pdf(Bot_,2)  +  pdf(Chm_,1) *pdf(Bot_,2) ) 

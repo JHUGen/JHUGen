@@ -54,9 +54,9 @@ include 'includeVars.F90'
             + LO_Res_Unpol(Up_,Bot_)   * ( NNpdf(1,+2)*NNpdf(2,+5)  +  NNpdf(1,+4)*NNpdf(2,+5) )   &
             + LO_Res_Unpol(Bot_,Up_)   * ( NNpdf(1,+5)*NNpdf(2,+2)  +  NNpdf(1,+5)*NNpdf(2,+4) )   &
             + LO_Res_Unpol(ADn_,Bot_)  * ( NNpdf(1,-1)*NNpdf(2,+5)  +  NNpdf(1,-3)*NNpdf(2,+5) )   &
-            + LO_Res_Unpol(Bot_,ADn_)  * ( NNpdf(1,+5)*NNpdf(2,-1)  +  NNpdf(1,+5)*NNpdf(2,-3))
+            + LO_Res_Unpol(Bot_,ADn_)  * ( NNpdf(1,+5)*NNpdf(2,-1)  +  NNpdf(1,+5)*NNpdf(2,-3) )
       Res = Res/x1/x2/(2d0*E_CMS**2)
-
+            
 !     restore incoming momenta (in all-outgoing convention)
       Mom(1,1:2) = -0.5d0*Collider_Energy
       Mom(4,1)   = -0.5d0*Collider_Energy * sign(1d0,Mom(4,2))
@@ -188,6 +188,7 @@ include 'includeVars.F90'
       ELSE
          call tdecay(5,6,8,9,10,za,zb,decay_amp)
       ENDIF
+            
       call ubhtdamp(1,2,3,4,5,6,7,za,zb,s,decay_amp,TTBHcoupl,LOAmp(Up_,Bot_,1:2))
       call ubhtdamp(2,1,3,4,5,6,7,za,zb,s,decay_amp,TTBHcoupl,LOAmp(Bot_,Up_,1:2))        
       call ubhtdamp(7,2,3,4,5,6,1,za,zb,s,decay_amp,TTBHcoupl,LOAmp(ADn_,Bot_,1:2))
@@ -423,8 +424,7 @@ END SUBROUTINE
        NWAFactor_W   = 1d0/dsqrt(2d0*Ga_W*m_W)
        WProp = (0d0,-1d0)*NWAFactor_W
    
-       dkamp = dkamp * WProp * NWAFactor_Top * (4d0*dsqrt(2d0)*m_W**2*GF)
-   
+       dkamp = dkamp * WProp * NWAFactor_Top * (4d0*dsqrt(2d0)*m_W**2*GF)        
    
      END SUBROUTINE
    

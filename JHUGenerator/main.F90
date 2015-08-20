@@ -608,6 +608,7 @@ include "vegas_common.f"
          VegasNc0_default = 10000000
          VegasNc1_default = 500000
          VegasNc2_default = 10000
+         if( unweighted ) NDim = NDim + 1  ! random number which decides if event is accepted
       endif
       !- HVBF with decays
       if(Process.eq.66) then
@@ -615,7 +616,8 @@ include "vegas_common.f"
          NDim = NDim + 2 ! sHat integration
          NDim = NDim + 8
          NDim = NDim + 1
-
+         if( unweighted ) NDim = NDim + 1  ! random number which decides if event is accepted
+         
          VegasIt1_default = 5
          VegasNc0_default = 10000000
          VegasNc1_default = 500000
@@ -626,6 +628,8 @@ include "vegas_common.f"
       if(Process.eq.61) then
          NDim = 5
          NDim = NDim + 2 ! sHat integration
+         if( unweighted ) NDim = NDim + 1  ! random number which decides if event is accepted
+         
          VegasIt1_default = 5
          VegasNc0_default = 10000000
          VegasNc1_default = 500000
@@ -635,6 +639,8 @@ include "vegas_common.f"
       if(Process.eq.62) then
          NDim = 5+1 !1 for color flow ramdomization in gg > Hg
          NDim = NDim + 2 ! sHat integration
+         if( unweighted ) NDim = NDim + 1  ! random number which decides if event is accepted
+         
          VegasIt1_default = 5
          VegasNc0_default = 10000000
          VegasNc1_default = 500000
@@ -644,6 +650,8 @@ include "vegas_common.f"
       if(Process.eq.50) then
          NDim = 17
          NDim = NDim + 2 ! sHat integration
+         if( unweighted ) NDim = NDim + 1  ! random number which decides if event is accepted
+         
          VegasIt1_default = 5
          VegasNc0_default = 10000000
          VegasNc1_default = 500000
@@ -652,9 +660,11 @@ include "vegas_common.f"
       !- ttbar+H
       if(Process.eq.80) then
          call InitProcess_TTBH()
-         NDim = 12
+         NDim = 5                                  ! phase space
+         if( TopDecays.ne.0 ) NDim = Ndim + 8      ! phase space
          NDim = NDim + 2 ! sHat integration
-         NDim = NDim + 1 ! partonic channel sampling
+         NDim = NDim + 1  ! MC sampling for gg and qqb channel
+         
          VegasIt1_default = 5
          VegasNc0_default =  100000
          VegasNc1_default =  500000
@@ -668,6 +678,8 @@ include "vegas_common.f"
          call InitProcess_TTBH()
          NDim = 12
          NDim = NDim + 2 ! sHat integration
+         if( unweighted ) NDim = NDim + 1  ! random number which decides if event is accepted
+         
          VegasIt1_default = 5
          VegasNc0_default =  100000
          VegasNc1_default =  500000
@@ -677,6 +689,8 @@ include "vegas_common.f"
       if(Process.eq.110) then
          NDim = 9
          NDim = NDim + 2 ! sHat integration
+         if( unweighted ) NDim = NDim + 1  ! random number which decides if event is accepted
+         
          VegasIt1_default = 5
          VegasNc0_default =  500000
          VegasNc1_default =  500000
@@ -686,16 +700,14 @@ include "vegas_common.f"
       if(Process.eq.111) then
          NDim = 9
          NDim = NDim + 2 ! sHat integration
+         if( unweighted ) NDim = NDim + 1  ! random number which decides if event is accepted
+         
          VegasIt1_default = 5
          VegasNc0_default =  500000
          VegasNc1_default =  500000
          VegasNc2_default =  500000
       endif
 
-      if( unweighted ) then
-          NDim = NDim + 1  ! random number which decides if event is accepted
-      endif
-      NDim = NDim + 1  ! MC sampling for gg and qqb channel
 
 END SUBROUTINE
 
@@ -1073,7 +1085,7 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
     AccepCounter=0
     AlertCounter=0
     avgcs = 0d0
-    itmx = 1
+    itmx = 2
     ncall= VegasNc2
     if( Process.eq.80 ) call vegas1(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.90 ) call vegas1(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
@@ -1100,9 +1112,9 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
     ncall= VegasNc0
     if( Process.eq.80 ) call vegas(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
 !     if( Process.eq.90 ) call vegas(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
-!     if( Process.eq.60 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
+    if( Process.eq.60 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
 !     if( Process.eq.66 ) call vegas(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
-!     if( Process.eq.61 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
+    if( Process.eq.61 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
 !     if( Process.eq.110) call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
 !     if( Process.eq.111) call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)    
 
@@ -1141,24 +1153,25 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
     CrossSecMax(:,:) = 1.0d0 * CrossSecMax(:,:)    !  adjustment factor
     
     call cpu_time(time_start)    
-    do while( StatusPercent.lt.100d0  ) 
+    do while( StatusPercent.lt.100d0  )
     
         if( Process.eq.80 ) call vegas1(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
     !     if( Process.eq.90 ) call vegas1(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
-    !     if( Process.eq.60 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
+        if( Process.eq.60 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
     !     if( Process.eq.66 ) call vegas1(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
-    !     if( Process.eq.61 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
+        if( Process.eq.61 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
     !     if( Process.eq.110) call vegas1(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
     !     if( Process.eq.111) call vegas1(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)      
-        print *, ""
+        call system('clear')
         do i1=-6,6
         do j1=-6,6
-            if( CrossSec(i1,j1).gt.1d-9 ) write(io_stdout,"(1X,A,I4,I4,2X,I7,2X,I7,2X,F8.3,1X,A)") "Generated events ", i1,j1,(AccepCounter_part(i1,j1)),(RequEvents(i1,j1)),dble(AccepCounter_part(i1,j1))/dble(RequEvents(i1,j1))*100d0,"%"
+            if( CrossSec(i1,j1).gt.1d-9 ) then 
+!                write(io_stdout,"(1X,A,I4,I4,2X,I7,2X,I7,2X,F8.3,1X,A)") "Generated events ", i1,j1,(AccepCounter_part(i1,j1)),(RequEvents(i1,j1)),dble(AccepCounter_part(i1,j1))/dble(RequEvents(i1,j1))*100d0,"%"
+               call PrintStatusBar2(int(dble(AccepCounter_part(i1,j1))/dble(RequEvents(i1,j1))*100),"channel "//getParticle(i1)//" "//getParticle(j1)//" ")
+            endif   
         enddo
         enddo  
-        StatusPercent = int(100d0*dble(sum(AccepCounter_part(:,:)))/dble(sum(RequEvents(:,:)))  )
-!         call PrintStatusBar( StatusPercent )        
-    
+        StatusPercent = int(100d0*dble(sum(AccepCounter_part(:,:)))/dble(sum(RequEvents(:,:)))  )   
     enddo
     call cpu_time(time_end)
     write(io_stdout,*)  " event generation rate (events/sec)",dble(sum(AccepCounter_part(:,:)))/(time_end-time_start+1d-10)
@@ -3144,7 +3157,7 @@ implicit none
 integer :: AllocStatus,NHisto
 
           it_sav = 1
-          NumHistograms = 6
+          NumHistograms = 7
           if( .not.allocated(Histo) ) then
                 allocate( Histo(1:NumHistograms), stat=AllocStatus  )
                 if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
@@ -3185,6 +3198,12 @@ integer :: AllocStatus,NHisto
           Histo(6)%BinSize= 0.1d0
           Histo(6)%LowVal = -5d0
           Histo(6)%SetScale= 1d0
+
+          Histo(7)%Info   = "D_0minus"
+          Histo(7)%NBins  = 50
+          Histo(7)%BinSize= 0.02
+          Histo(7)%LowVal = 0d0
+          Histo(7)%SetScale= 1d0
 
 
 
@@ -3821,6 +3840,67 @@ integer,save :: LastPercent=0
 return
 END SUBROUTINE
 
+
+SUBROUTINE PrintStatusBar2(StatusPercent,ThePreface)
+implicit none
+integer :: StatusPercent
+character(len=*):: ThePreface
+
+
+      if( StatusPercent.lt.4d0*1   ) then
+          write(*,"(2X,A,A,I3,A)") trim(ThePreface)," |------------------------| (",StatusPercent,"%)"
+      elseif( StatusPercent.lt.4d0*2   ) then
+          write(*,"(2X,A,A,I3,A)") trim(ThePreface)," |*-----------------------| (",StatusPercent,"%)"
+      elseif( StatusPercent.lt.4d0*3 ) then
+          write(*,"(2X,A,A,I3,A)") trim(ThePreface)," |-*----------------------| (",StatusPercent,"%)"
+      elseif( StatusPercent.lt.4d0*4 ) then
+          write(*,"(2X,A,A,I3,A)") trim(ThePreface)," |--*---------------------| (",StatusPercent,"%)"
+      elseif( StatusPercent.lt.4d0*5 ) then
+          write(*,"(2X,A,A,I3,A)") trim(ThePreface)," |---*--------------------| (",StatusPercent,"%)"
+      elseif( StatusPercent.lt.4d0*6 ) then
+          write(*,"(2X,A,A,I3,A)") trim(ThePreface)," |----*-------------------| (",StatusPercent,"%)"
+      elseif( StatusPercent.lt.4d0*7 ) then
+          write(*,"(2X,A,A,I3,A)") trim(ThePreface)," |-----*------------------| (",StatusPercent,"%)"
+      elseif( StatusPercent.lt.4d0*8 ) then
+          write(*,"(2X,A,A,I3,A)") trim(ThePreface)," |------*-----------------| (",StatusPercent,"%)"
+      elseif( StatusPercent.lt.4d0*9 ) then
+          write(*,"(2X,A,A,I3,A)") trim(ThePreface)," |-------*----------------| (",StatusPercent,"%)"
+      elseif( StatusPercent.lt.4d0*10) then
+          write(*,"(2X,A,A,I3,A)") trim(ThePreface)," |--------*---------------| (",StatusPercent,"%)"
+      elseif( StatusPercent.lt.4d0*11) then
+          write(*,"(2X,A,A,I3,A)") trim(ThePreface)," |---------*--------------| (",StatusPercent,"%)"
+      elseif( StatusPercent.lt.4d0*12) then
+          write(*,"(2X,A,A,I3,A)") trim(ThePreface)," |----------*-------------| (",StatusPercent,"%)"
+      elseif( StatusPercent.lt.4d0*13) then
+          write(*,"(2X,A,A,I3,A)") trim(ThePreface)," |-----------*------------| (",StatusPercent,"%)"
+      elseif( StatusPercent.lt.4d0*14) then
+          write(*,"(2X,A,A,I3,A)") trim(ThePreface)," |------------*-----------| (",StatusPercent,"%)"
+      elseif( StatusPercent.lt.4d0*15) then
+          write(*,"(2X,A,A,I3,A)") trim(ThePreface)," |-------------*----------| (",StatusPercent,"%)"
+      elseif( StatusPercent.lt.4d0*16) then
+          write(*,"(2X,A,A,I3,A)") trim(ThePreface)," |--------------*---------| (",StatusPercent,"%)"
+      elseif( StatusPercent.lt.4d0*17) then
+          write(*,"(2X,A,A,I3,A)") trim(ThePreface)," |---------------*--------| (",StatusPercent,"%)"
+      elseif( StatusPercent.lt.4d0*18) then
+          write(*,"(2X,A,A,I3,A)") trim(ThePreface)," |----------------*-------| (",StatusPercent,"%)"
+      elseif( StatusPercent.lt.4d0*19) then
+          write(*,"(2X,A,A,I3,A)") trim(ThePreface)," |-----------------*------| (",StatusPercent,"%)"
+      elseif( StatusPercent.lt.4d0*20) then
+          write(*,"(2X,A,A,I3,A)") trim(ThePreface)," |------------------*-----| (",StatusPercent,"%)"
+      elseif( StatusPercent.lt.4d0*21) then
+          write(*,"(2X,A,A,I3,A)") trim(ThePreface)," |-------------------*----| (",StatusPercent,"%)"
+      elseif( StatusPercent.lt.4d0*22) then
+          write(*,"(2X,A,A,I3,A)") trim(ThePreface)," |--------------------*---| (",StatusPercent,"%)"
+      elseif( StatusPercent.lt.4d0*23) then
+          write(*,"(2X,A,A,I3,A)") trim(ThePreface)," |---------------------*--| (",StatusPercent,"%)"
+      elseif( StatusPercent.lt.4d0*24) then
+          write(*,"(2X,A,A,I3,A)") trim(ThePreface)," |----------------------*-| (",StatusPercent,"%)"
+      else
+          write(*,"(2X,A,A,I3,A)") trim(ThePreface)," |-----------------------*| (",StatusPercent,"%)"
+      endif
+   
+return
+END SUBROUTINE
 
 
 

@@ -2452,8 +2452,9 @@ END SUBROUTINE
 SUBROUTINE Kinematics_TH(Mom,applyPSCut,NBin)
 use ModParameters
 use ModMisc
+use ModTH
 implicit none
-real(8) :: Mom(1:4,1:9)
+real(8) :: Mom(1:4,1:9),MomMELA(1:4,1:9)
 logical :: applyPSCut
 integer :: NBin(:)
 real(8) :: pT_Top,pT_Higgs,pT_j,eta_j,eta_top,eta_Higgs,y_Higgs,y_top,y_j,MatElSq_H0,MatElSq_H1,D_0minus
@@ -2476,6 +2477,27 @@ logical,save :: FirstTime=.true.
     if( m_Top.lt.10d0*GeV  .and. (pT_top.lt.pTjetcut) ) applyPSCut=.true.
     
    
+   
+
+!     if( FirstTime ) then
+! !       call NNPDFDriver("./pdfs/NNPDF30_lo_as_0130.LHgrid",33)
+! !       call NNinitPDF(0)
+!       call InitProcess_TTBH(m_Reso,m_top)
+!       FirstTime = .false.
+!     endif
+    MomMELA(1:4,1) = -(/         65d0,           0.0000000000000000d0, 0.0000000000000000d0,      65d0           /)
+    MomMELA(1:4,2) = -(/         65d0,           0.0000000000000000d0, 0.0000000000000000d0,     -65d0           /)  
+    MomMELA(1:4,3:9) = Mom(1:4,3:9)
+    
+    call EvalXSec_PP_TH(MomMELA,(/(1d0,0d0),(0d0,0d0)/),TopDecays,MatElSq_H0)
+    call EvalXSec_PP_TH(MomMELA,(/(0d0,0d0),(1d0,0d0)/),TopDecays,MatElSq_H1)
+    
+    MatElSq_H0 = MatElSq_H0 !/40d0
+    MatElSq_H1 = MatElSq_H1 !/147d0
+        
+    D_0minus = MatElSq_H0/(MatElSq_H0 + 1d0*MatElSq_H1 )
+   
+   
     
 !   binning
                                                                              
@@ -2485,6 +2507,7 @@ logical,save :: FirstTime=.true.
        NBin(4) = WhichBin(4,y_j)
        NBin(5) = WhichBin(5,pT_Higgs)
        NBin(6) = WhichBin(6,y_Higgs)
+       NBin(7) = WhichBin(7,D_0minus)
     
     
     
