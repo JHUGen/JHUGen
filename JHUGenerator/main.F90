@@ -1331,7 +1331,7 @@ include 'csmaxvalue.f'
 integer,parameter :: maxpart=30!=max.part particles in LHE file; this parameter should match the one in WriteOutEvent of mod_Kinematics
 real(8) :: VG_Result,VG_Error,VG_Chi2
 real(8) :: yRnd(1:22),Res,dum,EMcheck(1:4)
-real(8) :: HiggsDK_Mom(1:4,4:11),Ehat
+real(8) :: HiggsDK_Mom(1:4,4:13),Ehat
 real(8) :: MomExt(1:4,1:maxpart),MomHiggs(1:4),Mass(1:maxpart),pH2sq
 integer :: tries, nParticle,  ICOLUP(1:2,1:7+maxpart),LHE_IntExt(1:7+maxpart),HiggsDK_IDUP(1:13),HiggsDK_ICOLUP(1:2,1:13)
 character(len=*),parameter :: POWHEG_Fmt0 = "(5X,I2,A160)"
@@ -1514,7 +1514,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
      else
          do tries=1,VegasNc0
              call random_number(yRnd)
-             dum = EvalUnWeighted_DecayToTauTau(yRnd,.false.,EHat,Res,HiggsDK_Mom(1:4,6:11),HiggsDK_IDUP(1:13),HiggsDK_ICOLUP(1:2,1:13))
+             dum = EvalUnWeighted_DecayToTauTau(yRnd,.false.,EHat,Res,HiggsDK_Mom(1:4,4:13),HiggsDK_IDUP(1:13),HiggsDK_ICOLUP(1:2,1:13))
          enddo      
      endif
      csmax(0,0)   = 1.5d0*csmax(0,0)    !  savety buffer
@@ -1589,7 +1589,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
           else
                 do tries=1,5000000
                     call random_number(yRnd)
-                    dum =  EvalUnWeighted_DecayToTauTau(yRnd,.true.,EHat,Res,HiggsDK_Mom(1:4,6:11),HiggsDK_IDUP(1:13),HiggsDK_ICOLUP(1:2,1:13))
+                    dum =  EvalUnWeighted_DecayToTauTau(yRnd,.true.,EHat,Res,HiggsDK_Mom(1:4,1:13),HiggsDK_IDUP(1:13),HiggsDK_ICOLUP(1:2,1:13))
                     if( Res.ne.0d0 ) exit
                 enddo
           endif          
@@ -1611,14 +1611,16 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                 HiggsDK_IDUP(9) = convertLHE(HiggsDK_IDUP(9))
                 call WriteOutEvent_NEW(EventNumPart,LHE_IDUP,LHE_IntExt,LHE_MOTHUP,LHE_ICOLUP,MomExt,HiggsDK_Mom(1:4,4:9),Mass,iHiggs,HiggsDK_IDUP(1:9),HiggsDK_ICOLUP(1:2,1:9),EventInfoLine,BeginEventLine=BeginEventLine)
              else
+                call boost(HiggsDK_Mom(1:4,4),MomHiggs(1:4),pH2sq)
+                call boost(HiggsDK_Mom(1:4,5),MomHiggs(1:4),pH2sq)
                 call boost(HiggsDK_Mom(1:4,6),MomHiggs(1:4),pH2sq)
                 call boost(HiggsDK_Mom(1:4,7),MomHiggs(1:4),pH2sq)
                 call boost(HiggsDK_Mom(1:4,8),MomHiggs(1:4),pH2sq)
                 call boost(HiggsDK_Mom(1:4,9),MomHiggs(1:4),pH2sq)
                 call boost(HiggsDK_Mom(1:4,10),MomHiggs(1:4),pH2sq)
                 call boost(HiggsDK_Mom(1:4,11),MomHiggs(1:4),pH2sq)
-                HiggsDK_Mom(1:4,4) = HiggsDK_Mom(1:4,6) + HiggsDK_Mom(1:4,7) + HiggsDK_Mom(1:4,9)
-                HiggsDK_Mom(1:4,5) = HiggsDK_Mom(1:4,9) + HiggsDK_Mom(1:4,10)+ HiggsDK_Mom(1:4,11)
+                call boost(HiggsDK_Mom(1:4,12),MomHiggs(1:4),pH2sq)
+                call boost(HiggsDK_Mom(1:4,13),MomHiggs(1:4),pH2sq)
                 HiggsDK_IDUP(4) = convertLHE(HiggsDK_IDUP(4))
                 HiggsDK_IDUP(5) = convertLHE(HiggsDK_IDUP(5))
                 HiggsDK_IDUP(6) = convertLHE(HiggsDK_IDUP(6))
@@ -1627,7 +1629,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                 HiggsDK_IDUP(9) = convertLHE(HiggsDK_IDUP(9))
                 HiggsDK_IDUP(10)= convertLHE(HiggsDK_IDUP(10))
                 HiggsDK_IDUP(11)= convertLHE(HiggsDK_IDUP(11))
-                call WriteOutEvent_HFF(EventNumPart,LHE_IDUP,LHE_IntExt,LHE_MOTHUP,LHE_ICOLUP,MomExt,HiggsDK_Mom(1:4,4:11),Mass,iHiggs,HiggsDK_IDUP(1:11),HiggsDK_ICOLUP(1:2,1:11),EventInfoLine,BeginEventLine=BeginEventLine)
+                call WriteOutEvent_HFF(EventNumPart,LHE_IDUP,LHE_IntExt,LHE_MOTHUP,LHE_ICOLUP,MomExt,HiggsDK_Mom(1:4,1:13),Mass,iHiggs,HiggsDK_IDUP(1:13),HiggsDK_ICOLUP(1:2,1:13),EventInfoLine,BeginEventLine=BeginEventLine)
              endif
 
              if( mod(AccepCounter,5000).eq.0 ) then

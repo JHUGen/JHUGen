@@ -2806,7 +2806,8 @@ EvalUnWeighted_DecayToTauTau = 0d0
   MY_IDUP(1:2) = (/ElP_,MuM_/)
   pHiggs(1:4) = (/Ehat,0d0,0d0,0d0/)
   if( TauDecays.eq.0 ) then
-     call EvalPhasespace_2to2(pHiggs(1),(/m_tau,m_tau/),yRnd(1:2),(/Mom(1:4,1),Mom(1:4,2),Mom(1:4,tauP),Mom(1:4,tauM)/),PSWgt)
+     call genps(2,Ehat,yRnd(1:2),(/m_tau,m_tau/),Mom(1:4,tauP:tauM),PSWgt)
+     PSWgt = PSWgt/(2d0*Pi)**2/(4d0*Pi)
   else
      call EvalPhasespace_tautau(yRnd(1:12),pHiggs,MY_IDUP,Mom(1:4,tauP:nubar),PSWgt)
   endif
@@ -2818,10 +2819,10 @@ EvalUnWeighted_DecayToTauTau = 0d0
   PreFac = fbGeV2 * PSWgt
   
 
-  ICOLUP(1:2,tauP+1) = (/000,000/)
-  ICOLUP(1:2,tauM+1) = (/000,000/)
-  MY_IDUP(tauP+1) = TaP_;
-  MY_IDUP(tauM+1) = TaM_;
+  ICOLUP(1:2,tauP) = (/000,000/)
+  ICOLUP(1:2,tauM) = (/000,000/)
+  MY_IDUP(tauP) = TaP_;
+  MY_IDUP(tauM) = TaM_;
   if( RandomizeVVdecays ) then 
      call random_number(DKRnd)
      if( DKRnd.lt.0.5d0 ) call swapi(DecayMode1,DecayMode2)
@@ -2865,12 +2866,16 @@ IF( GENEVT ) THEN
             AcceptedEvent(1:4,2) = Mom(1:4,tauM)
             AcceptedEvent(1:4,3:6) = 0d0
          else
-            AcceptedEvent(1:4,1) = Mom(1:4,nu)
-            AcceptedEvent(1:4,2) = Mom(1:4,nubar_tau)
-            AcceptedEvent(1:4,3) = Mom(1:4,lepP)
-            AcceptedEvent(1:4,4) = Mom(1:4,lepM)
-            AcceptedEvent(1:4,5) = Mom(1:4,nu_tau)
-            AcceptedEvent(1:4,6) = Mom(1:4,nubar)
+            AcceptedEvent(1:4,1) = Mom(1:4,tauP)
+            AcceptedEvent(1:4,2) = Mom(1:4,tauM)
+            AcceptedEvent(1:4,3) = Mom(1:4,Wp)
+            AcceptedEvent(1:4,4) = Mom(1:4,Wm)
+            AcceptedEvent(1:4,5) = Mom(1:4,nu)
+            AcceptedEvent(1:4,6) = Mom(1:4,nubar_tau)
+            AcceptedEvent(1:4,7) = Mom(1:4,lepP)
+            AcceptedEvent(1:4,8) = Mom(1:4,lepM)
+            AcceptedEvent(1:4,9) = Mom(1:4,nu_tau)
+            AcceptedEvent(1:4,10)= Mom(1:4,nubar)
          endif
          Res = 1d0
       else
@@ -2894,6 +2899,7 @@ ELSE! NOT GENEVT
       if( EvalUnWeighted_DecayToTauTau.gt.csmax(0,0) ) then
           csmax(0,0) = EvalUnWeighted_DecayToTauTau
       endif
+
 
 
 ENDIF! GENEVT

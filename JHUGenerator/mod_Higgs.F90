@@ -1414,12 +1414,12 @@
    real(dp), intent(out) ::  res
    real(dp), intent(in) :: pin(1:4,1:6),mass_F
    integer              :: j
-   real(dp)             :: p(1:4,1:6),s12,s45,s123,s456,KL,KR,s(6,6)
+   real(dp)             :: p(1:6,1:4),s12,s45,s123,s456,KL,KR,s(6,6)
    complex(dp)          :: za(6,6),zb(6,6),amp
 
-      p=pin
+!       p=pin
       do j=1,6
-          call convert_to_MCFM(pin(1:4,j),p(1:4,j))  
+          call convert_to_MCFM(pin(1:4,j),p(j,1:4))  
       enddo       
       call spinoru(6,p,za,zb,s)
   
