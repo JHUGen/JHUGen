@@ -2793,10 +2793,10 @@ use ifport
 #endif
 implicit none
 real(8) :: EvalUnWeighted_DecayToTauTau,Ehat,Res,AcceptedEvent(:,:),DKRnd
-real(8) :: yRnd(:),Mom(1:4,1:12),pHiggs(1:4),PSWgt,PreFac,LO_Res_Unpol,CS_max
+real(8) :: yRnd(:),Mom(1:4,1:13),pHiggs(1:4),PSWgt,PreFac,LO_Res_Unpol,CS_max
 integer :: MY_IDUP(:),ICOLUP(:,:),NBin(1:NumHistograms),NHisto=1,DK_IDUP(1:6),DK_ICOLUP(1:2,3:6)
 logical :: applyPSCut,genEvt
-integer, parameter :: inLeft=1, inRight=2, tauP=3, tauM=4, Wp=5, Wm=6,   nu=7, nubar_tau=8, lepP=9,   lepM=10, nu_tau=11, nubar=12
+integer, parameter :: inLeft=1, inRight=2, Hig=3, tauP=4, tauM=5, Wp=6, Wm=7,   nu=8, nubar_tau=9, lepP=10,   lepM=11, nu_tau=12, nubar=13
 include 'vegas_common.f'
 include 'csmaxvalue.f'
 EvalUnWeighted_DecayToTauTau = 0d0
@@ -2805,7 +2805,11 @@ EvalUnWeighted_DecayToTauTau = 0d0
   
   MY_IDUP(1:2) = (/ElP_,MuM_/)
   pHiggs(1:4) = (/Ehat,0d0,0d0,0d0/)
-  call EvalPhasespace_tautau(yRnd(1:12),pHiggs,MY_IDUP,Mom,PSWgt)
+  if( TauDecays.eq.0 ) then
+     call EvalPhasespace_2to2(pHiggs(1),(/m_tau,m_tau/),yRnd(1:2),(/Mom(1:4,1),Mom(1:4,2),Mom(1:4,tauP),Mom(1:4,tauM)/),PSWgt)
+  else
+     call EvalPhasespace_tautau(yRnd(1:12),pHiggs,MY_IDUP,Mom(1:4,tauP:nubar),PSWgt)
+  endif
   call Kinematics_Htautau(Mom,applyPSCut,NBin)
   if( applyPSCut ) then
       EvalUnWeighted_DecayToTauTau = 0d0
@@ -2814,8 +2818,10 @@ EvalUnWeighted_DecayToTauTau = 0d0
   PreFac = fbGeV2 * PSWgt
   
 
-  ICOLUP(1:2,tauP) = (/000,000/)
-  ICOLUP(1:2,tauM) = (/000,000/)
+  ICOLUP(1:2,tauP+1) = (/000,000/)
+  ICOLUP(1:2,tauM+1) = (/000,000/)
+  MY_IDUP(tauP+1) = TaP_;
+  MY_IDUP(tauM+1) = TaM_;
   if( RandomizeVVdecays ) then 
      call random_number(DKRnd)
      if( DKRnd.lt.0.5d0 ) call swapi(DecayMode1,DecayMode2)
@@ -2825,24 +2831,23 @@ EvalUnWeighted_DecayToTauTau = 0d0
   MY_IDUP(Wp)       = DK_IDUP(1);  ICOLUP(1:2,Wp)       = (/000,000/)
   MY_IDUP(lepP)     = DK_IDUP(3);  ICOLUP(1:2,lepP)     = DK_ICOLUP(1:2,3)
   MY_IDUP(nu)       = DK_IDUP(4);  ICOLUP(1:2,nu)       = DK_ICOLUP(1:2,4)  
-  MY_IDUP(nubar_tau)= ABot_;       ICOLUP(1:2,nubar_tau)= (/000,000/)
+  MY_IDUP(nubar_tau)= ANuT_;       ICOLUP(1:2,nubar_tau)= (/000,000/)
   MY_IDUP(Wm)       = DK_IDUP(2);  ICOLUP(1:2,Wm)       = (/000,000/)             
   MY_IDUP(lepM)     = DK_IDUP(6);  ICOLUP(1:2,lepM)     = DK_ICOLUP(1:2,6)
   MY_IDUP(nubar)    = DK_IDUP(5);  ICOLUP(1:2,nubar)    = DK_ICOLUP(1:2,5)  
 
 
-
-
 IF( GENEVT ) THEN
 
       if( TauDecays.eq.0 ) then
-         call EvalAmp_H_FF(Mom(1:4,3:4),m_tau,LO_Res_Unpol)
+         call EvalAmp_H_FF(Mom(1:4,tauP:tauM),m_tau,LO_Res_Unpol)
       else
          call EvalAmp_H_TT_decay((/Mom(1:4,lepM),Mom(1:4,nubar),Mom(1:4,nu_tau),Mom(1:4,nu),Mom(1:4,lepP),Mom(1:4,nubar_tau)/),m_tau,LO_Res_Unpol)
       endif
       EvalUnWeighted_DecayToTauTau = LO_Res_Unpol * PreFac
 
       CS_max = csmax(0,0)
+      
       if( EvalUnWeighted_DecayToTauTau .gt. CS_max) then
           write(io_stdout,"(2X,A,1PE13.6,1PE13.6)")  "CS_max is too small.",EvalUnWeighted_DecayToTauTau, CS_max
           write(io_LogFile,"(2X,A,1PE13.6,1PE13.6)") "CS_max is too small.",EvalUnWeighted_DecayToTauTau, CS_max
@@ -2854,22 +2859,32 @@ IF( GENEVT ) THEN
                call intoHisto(NHisto,NBin(NHisto),1d0)  ! CS_Max is the integration volume
          enddo
          AccepCounter = AccepCounter + 1
-         AcceptedEvent(1:4,1:4) = Mom(1:4,1:4)
-         AcceptedEvent(1:4,5:12) = 0d0
-         if( TauDecays.gt.0 ) AcceptedEvent(1:4,5:12) = Mom(1:4,5:12)
+         if( TauDecays.eq.0 ) then
+! integer, parameter :: inLeft=1, inRight=2, tauP=3, tauM=4, Wp=5, Wm=6,   nu=7, nubar_tau=8, lepP=9,   lepM=10, nu_tau=11, nubar=12
+            AcceptedEvent(1:4,1) = Mom(1:4,tauP)
+            AcceptedEvent(1:4,2) = Mom(1:4,tauM)
+            AcceptedEvent(1:4,3:6) = 0d0
+         else
+            AcceptedEvent(1:4,1) = Mom(1:4,nu)
+            AcceptedEvent(1:4,2) = Mom(1:4,nubar_tau)
+            AcceptedEvent(1:4,3) = Mom(1:4,lepP)
+            AcceptedEvent(1:4,4) = Mom(1:4,lepM)
+            AcceptedEvent(1:4,5) = Mom(1:4,nu_tau)
+            AcceptedEvent(1:4,6) = Mom(1:4,nubar)
+         endif
          Res = 1d0
-         
       else
           RejeCounter = RejeCounter + 1
           Res = 0d0
       endif
+      EvalCounter = EvalCounter + 1
 
 
 ELSE! NOT GENEVT
 
 
       if( TauDecays.eq.0 ) then
-         call EvalAmp_H_FF(Mom(1:4,3:4),m_tau,LO_Res_Unpol)
+         call EvalAmp_H_FF(Mom(1:4,tauP:tauM),m_tau,LO_Res_Unpol)
       else
          call EvalAmp_H_TT_decay((/Mom(1:4,lepM),Mom(1:4,nubar),Mom(1:4,nu_tau),Mom(1:4,nu),Mom(1:4,lepP),Mom(1:4,nubar_tau)/),m_tau,LO_Res_Unpol)
       endif

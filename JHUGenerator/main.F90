@@ -158,7 +158,6 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
     elseif( arg(1:6).eq."TauDK=" ) then
         read(arg(7:7),*) TauDecays
         CountArg = CountArg + 1
-        CountArg = CountArg + 1
     elseif( arg(1:7) .eq."OffXVV=" ) then
         read(arg(8:10),*) OffShell_XVV
         CountArg = CountArg + 1
@@ -1332,9 +1331,9 @@ include 'csmaxvalue.f'
 integer,parameter :: maxpart=30!=max.part particles in LHE file; this parameter should match the one in WriteOutEvent of mod_Kinematics
 real(8) :: VG_Result,VG_Error,VG_Chi2
 real(8) :: yRnd(1:22),Res,dum,EMcheck(1:4)
-real(8) :: HiggsDK_Mom(1:4,4:9),Ehat
+real(8) :: HiggsDK_Mom(1:4,4:11),Ehat
 real(8) :: MomExt(1:4,1:maxpart),MomHiggs(1:4),Mass(1:maxpart),pH2sq
-integer :: tries, nParticle, HiggsDK_IDUP(1:9), ICOLUP(1:2,1:7+maxpart),LHE_IntExt(1:7+maxpart),HiggsDK_ICOLUP(1:2,1:9)
+integer :: tries, nParticle,  ICOLUP(1:2,1:7+maxpart),LHE_IntExt(1:7+maxpart),HiggsDK_IDUP(1:13),HiggsDK_ICOLUP(1:2,1:13)
 character(len=*),parameter :: POWHEG_Fmt0 = "(5X,I2,A160)"
 character(len=*),parameter :: POWHEG_Fmt1 = "(5X,I3,4X,I2,4X,I2,4X,I2,2X,I4,2X,I4,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9)"
 character(len=*),parameter :: JHUGen_Fmt0 = "(I2,A160)"
@@ -1507,8 +1506,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
      VG = zero
      CSmax = zero
      Ehat = M_Reso! fixing Ehat to M_Reso which should determine the max. of the integrand
-     
-     if( TauDecays.ge.0 ) then
+     if( TauDecays.lt.0 ) then
          do tries=1,VegasNc0
              call random_number(yRnd)
              dum = EvalUnWeighted_DecayToVV(yRnd,.false.,EHat,Res,HiggsDK_Mom(1:4,6:9),HiggsDK_IDUP(1:9),HiggsDK_ICOLUP)
@@ -1516,7 +1514,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
      else
          do tries=1,VegasNc0
              call random_number(yRnd)
-             dum = EvalUnWeighted_DecayToTauTau(yRnd,.false.,EHat,Res,HiggsDK_Mom(1:4,4:9),HiggsDK_IDUP(1:8),HiggsDK_ICOLUP(1:2,1:8))
+             dum = EvalUnWeighted_DecayToTauTau(yRnd,.false.,EHat,Res,HiggsDK_Mom(1:4,6:11),HiggsDK_IDUP(1:13),HiggsDK_ICOLUP(1:2,1:13))
          enddo      
      endif
      csmax(0,0)   = 1.5d0*csmax(0,0)    !  savety buffer
@@ -1582,36 +1580,55 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
          
 !         accept/reject sampling for H->VV decay contribution
           EHat = pH2sq
-          if( TauDecays.ge.0 ) then
+          if( TauDecays.lt.0 ) then
                 do tries=1,5000000
                     call random_number(yRnd)
-                    dum = EvalUnWeighted_DecayToVV(yRnd,.true.,Ehat,Res,HiggsDK_Mom(1:4,6:9),HiggsDK_IDUP,HiggsDK_ICOLUP)
+                    dum = EvalUnWeighted_DecayToVV(yRnd,.true.,Ehat,Res,HiggsDK_Mom(1:4,6:9),HiggsDK_IDUP(1:9),HiggsDK_ICOLUP(1:2,1:9))
                     if( Res.ne.0d0 ) exit
                 enddo
           else
                 do tries=1,5000000
                     call random_number(yRnd)
-                    dum =  EvalUnWeighted_DecayToTauTau(yRnd,.false.,EHat,Res,HiggsDK_Mom(1:4,4:9),HiggsDK_IDUP(1:8),HiggsDK_ICOLUP(1:2,1:8))
+                    dum =  EvalUnWeighted_DecayToTauTau(yRnd,.true.,EHat,Res,HiggsDK_Mom(1:4,6:11),HiggsDK_IDUP(1:13),HiggsDK_ICOLUP(1:2,1:13))
                     if( Res.ne.0d0 ) exit
                 enddo
-          endif
-          
+          endif          
 
           if( Res.gt.0d0 ) then ! decay event was accepted
-             call boost(HiggsDK_Mom(1:4,6),MomHiggs(1:4),pH2sq)
-             call boost(HiggsDK_Mom(1:4,7),MomHiggs(1:4),pH2sq)
-             call boost(HiggsDK_Mom(1:4,8),MomHiggs(1:4),pH2sq)
-             call boost(HiggsDK_Mom(1:4,9),MomHiggs(1:4),pH2sq)
-             HiggsDK_Mom(1:4,4) = HiggsDK_Mom(1:4,6) + HiggsDK_Mom(1:4,7)
-             HiggsDK_Mom(1:4,5) = HiggsDK_Mom(1:4,8) + HiggsDK_Mom(1:4,9)
-             HiggsDK_IDUP(4) = convertLHE(HiggsDK_IDUP(4))
-             HiggsDK_IDUP(5) = convertLHE(HiggsDK_IDUP(5))
-             HiggsDK_IDUP(6) = convertLHE(HiggsDK_IDUP(6))
-             HiggsDK_IDUP(7) = convertLHE(HiggsDK_IDUP(7))
-             HiggsDK_IDUP(8) = convertLHE(HiggsDK_IDUP(8))
-             HiggsDK_IDUP(9) = convertLHE(HiggsDK_IDUP(9))
-             
-             call WriteOutEvent_NEW(EventNumPart,LHE_IDUP,LHE_IntExt,LHE_MOTHUP,LHE_ICOLUP,MomExt,HiggsDK_Mom,Mass,iHiggs,HiggsDK_IDUP,HiggsDK_ICOLUP,EventInfoLine,BeginEventLine=BeginEventLine)
+          
+             if( TauDecays.lt.0 ) then
+                call boost(HiggsDK_Mom(1:4,6),MomHiggs(1:4),pH2sq)
+                call boost(HiggsDK_Mom(1:4,7),MomHiggs(1:4),pH2sq)
+                call boost(HiggsDK_Mom(1:4,8),MomHiggs(1:4),pH2sq)
+                call boost(HiggsDK_Mom(1:4,9),MomHiggs(1:4),pH2sq)
+                HiggsDK_Mom(1:4,4) = HiggsDK_Mom(1:4,6) + HiggsDK_Mom(1:4,7)
+                HiggsDK_Mom(1:4,5) = HiggsDK_Mom(1:4,8) + HiggsDK_Mom(1:4,9)
+                HiggsDK_IDUP(4) = convertLHE(HiggsDK_IDUP(4))
+                HiggsDK_IDUP(5) = convertLHE(HiggsDK_IDUP(5))
+                HiggsDK_IDUP(6) = convertLHE(HiggsDK_IDUP(6))
+                HiggsDK_IDUP(7) = convertLHE(HiggsDK_IDUP(7))
+                HiggsDK_IDUP(8) = convertLHE(HiggsDK_IDUP(8))
+                HiggsDK_IDUP(9) = convertLHE(HiggsDK_IDUP(9))
+                call WriteOutEvent_NEW(EventNumPart,LHE_IDUP,LHE_IntExt,LHE_MOTHUP,LHE_ICOLUP,MomExt,HiggsDK_Mom(1:4,4:9),Mass,iHiggs,HiggsDK_IDUP(1:9),HiggsDK_ICOLUP(1:2,1:9),EventInfoLine,BeginEventLine=BeginEventLine)
+             else
+                call boost(HiggsDK_Mom(1:4,6),MomHiggs(1:4),pH2sq)
+                call boost(HiggsDK_Mom(1:4,7),MomHiggs(1:4),pH2sq)
+                call boost(HiggsDK_Mom(1:4,8),MomHiggs(1:4),pH2sq)
+                call boost(HiggsDK_Mom(1:4,9),MomHiggs(1:4),pH2sq)
+                call boost(HiggsDK_Mom(1:4,10),MomHiggs(1:4),pH2sq)
+                call boost(HiggsDK_Mom(1:4,11),MomHiggs(1:4),pH2sq)
+                HiggsDK_Mom(1:4,4) = HiggsDK_Mom(1:4,6) + HiggsDK_Mom(1:4,7) + HiggsDK_Mom(1:4,9)
+                HiggsDK_Mom(1:4,5) = HiggsDK_Mom(1:4,9) + HiggsDK_Mom(1:4,10)+ HiggsDK_Mom(1:4,11)
+                HiggsDK_IDUP(4) = convertLHE(HiggsDK_IDUP(4))
+                HiggsDK_IDUP(5) = convertLHE(HiggsDK_IDUP(5))
+                HiggsDK_IDUP(6) = convertLHE(HiggsDK_IDUP(6))
+                HiggsDK_IDUP(7) = convertLHE(HiggsDK_IDUP(7))
+                HiggsDK_IDUP(8) = convertLHE(HiggsDK_IDUP(8))
+                HiggsDK_IDUP(9) = convertLHE(HiggsDK_IDUP(9))
+                HiggsDK_IDUP(10)= convertLHE(HiggsDK_IDUP(10))
+                HiggsDK_IDUP(11)= convertLHE(HiggsDK_IDUP(11))
+                call WriteOutEvent_HFF(EventNumPart,LHE_IDUP,LHE_IntExt,LHE_MOTHUP,LHE_ICOLUP,MomExt,HiggsDK_Mom(1:4,4:11),Mass,iHiggs,HiggsDK_IDUP(1:11),HiggsDK_ICOLUP(1:2,1:11),EventInfoLine,BeginEventLine=BeginEventLine)
+             endif
 
              if( mod(AccepCounter,5000).eq.0 ) then
                   call cpu_time(time_int)

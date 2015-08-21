@@ -514,6 +514,148 @@ END SUBROUTINE
 
 
 
+SUBROUTINE WriteOutEvent_HFF(NUP,IDUP,ISTUP,MOTHUP,ICOLUP,Mom,HiggsDK_Mom,Mass,iHiggs,HiggsDK_IDUP,HiggsDK_ICOLUP,EventInfoLine,EventWeight,BeginEventLine)
+use ModParameters
+use modMisc
+implicit none
+real(8) :: Mom(:,:),HiggsDK_Mom(:,:),Mass(:)
+real(8),optional :: EventWeight
+character(len=*) :: EventInfoLine
+character(len=*),optional :: BeginEventLine
+real(8) :: Spin, Lifetime, s34,s56,s36,s45,smallestInv
+integer :: IDUP(:),ISTUP(:),MOTHUP(:,:),ICOLUP(:,:)
+integer :: HiggsDK_IDUP(:),HiggsDK_ICOLUP(:,:),HiggsDK_ISTUP(4:13),HiggsDK_MOTHUP(1:2,4:13)
+integer,parameter :: maxpart=30
+integer :: i,iHiggs
+integer :: NUP,NUP_NEW,IDPRUP
+real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP,HiggsDKLength
+character(len=*),parameter :: Fmt0 = "I2,X,I3,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7"
+character(len=*),parameter :: Fmt0_read = "I2,X,A"
+character(len=*),parameter :: Fmt1 = "6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0"
+integer :: indent
+character(len=150) :: IndentedFmt0, IndentedFmt1
+
+
+!   For description of the LHE format see http://arxiv.org/abs/hep-ph/0109068 and http://arxiv.org/abs/hep-ph/0609017
+!   The LHE numbering scheme can be found here: http://pdg.lbl.gov/mc_particle_id_contents.html and http://lhapdf.hepforge.org/manual#tth_sEcA
+
+
+!     assignments:
+!     HiggsDK_Mom(1:4,1) --> HiggsDK_IDUP(4)! V1
+!     HiggsDK_Mom(1:4,2) --> HiggsDK_IDUP(5)! V2
+!     HiggsDK_Mom(1:4,3) --> HiggsDK_IDUP(7)! l- 
+!     HiggsDK_Mom(1:4,4) --> HiggsDK_IDUP(6)! l+
+!     HiggsDK_Mom(1:4,5) --> HiggsDK_IDUP(9)! l-
+!     HiggsDK_Mom(1:4,6) --> HiggsDK_IDUP(8)! l+
+
+    
+    ! NUP changes for gamma gamma final state
+    if( TauDecays.eq.0 ) then
+        NUP_NEW = 2
+    else
+        NUP_NEW = 10
+    endif
+
+
+    IDPRUP=100
+    if( present(EventWeight) ) then
+        XWGTUP=EventWeight
+    else
+        XWGTUP=1.0d0
+    endif
+    SCALUP=Mu_Fact * 100d0
+    AQEDUP=alpha_QED
+    AQCDUP=0.11d0
+    ISTUP(iHiggs) = 2
+    if ( TauDecays.eq.0 ) then
+        HiggsDK_ISTUP(4:5) = (/1,1/)
+        HiggsDK_MOTHUP(1:2,4) = (/iHiggs,iHiggs/)
+        HiggsDK_MOTHUP(1:2,5) = (/iHiggs,iHiggs/)
+        HiggsDK_MOTHUP(1:2,6:11) = 0
+    else    
+        HiggsDK_ISTUP(4:13) = (/2,2,2,2,1,1,1,1,1,1/)
+        HiggsDK_MOTHUP(1:2,4) = (/iHiggs,iHiggs/)
+        HiggsDK_MOTHUP(1:2,5) = (/iHiggs,iHiggs/)
+        HiggsDK_MOTHUP(1:2,6) = (/1,1/) + NUP
+        HiggsDK_MOTHUP(1:2,9) = (/1,1/) + NUP
+        HiggsDK_MOTHUP(1:2,7) = (/2,2/) + NUP
+        HiggsDK_MOTHUP(1:2,12)= (/2,2/) + NUP
+        HiggsDK_MOTHUP(1:2,8) = (/5,5/) + NUP
+        HiggsDK_MOTHUP(1:2,10)= (/5,5/) + NUP
+        HiggsDK_MOTHUP(1:2,11)= (/6,6/) + NUP
+        HiggsDK_MOTHUP(1:2,13)= (/6,6/) + NUP
+    endif
+
+    Lifetime = 0.0d0
+    Spin = 0.1d0
+    call getHiggsDecayLength(HiggsDKLength)
+
+
+    if (present(BeginEventLine)) then
+        write(io_LHEOutFile, "(A)") trim(BeginEventLine)
+        indent = 0
+        do while (BeginEventLine(indent+1:indent+1).eq." ")
+            indent = indent+1
+        end do
+    else
+        write(io_LHEOutFile,"(A)") "<event>"
+        indent = 0
+    endif
+    if (indent.eq.0) then
+        if( ReadLHEFile .and. importExternal_LHEinit ) then
+            write(IndentedFmt0, "(A,A,A)") "(", Fmt0_read, ")"
+        else
+            write(IndentedFmt0, "(A,A,A)") "(", Fmt0, ")"
+        endif
+        write(IndentedFmt1, "(A,A,A)") "(", Fmt1, ")"
+    else
+        if( ReadLHEFile .and. importExternal_LHEinit ) then
+            write(IndentedFmt0, "(A,I1,A,A,A)") "(", indent, "X,", Fmt0_read, ")"
+        else
+            write(IndentedFmt0, "(A,I1,A,A,A)") "(", indent, "X,", Fmt0, ")"
+        endif
+        write(IndentedFmt1, "(A,I1,A,A,A)") "(", indent, "X,", Fmt1, ")"
+    endif
+    if( ReadLHEFile .and. importExternal_LHEinit ) then
+      write(io_LHEOutFile,IndentedFmt0) NUP+NUP_NEW,trim(EventInfoLine)
+    else
+      write(io_LHEOutFile,IndentedFmt0) NUP+NUP_NEW,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
+    !  in order of appearance:
+    !  (*) number of particles in the event
+    !  (*) process ID (user defined)
+    !  (*) weighted or unweighted events: +1=unweighted, otherwise= see manual
+    !  (*) pdf factorization scale in GeV
+    !  (*) alpha_QED coupling for this event
+    !  (*) alpha_s coupling for this event
+    endif
+
+    
+!   write out existing particles
+    do i = 1, NUP
+        if( i.eq.iHiggs ) then 
+           write(io_LHEOutFile,IndentedFmt1) IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),  &
+                                             Mom(2:4,i)/GeV,Mom(1,i)/GeV, Mass(i)/GeV,HiggsDKLength, Spin           
+        else
+           write(io_LHEOutFile,IndentedFmt1) IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),  &
+                                             Mom(2:4,i)/GeV,Mom(1,i)/GeV, Mass(i)/GeV,Lifetime, Spin   
+        endif                          
+    enddo
+    
+    
+!   write new intermediate particles and Higgs decay products
+!     call swap_mom(HiggsDK_Mom(1:4,3),HiggsDK_Mom(1:4,4))! swap to account for flipped asignments
+!     call swap_mom(HiggsDK_Mom(1:4,5),HiggsDK_Mom(1:4,6))! swap to account for flipped asignments
+    do i = 4,4 + (NUP_NEW-1)
+        write(io_LHEOutFile,IndentedFmt1) HiggsDK_IDUP(i),HiggsDK_ISTUP(i), HiggsDK_MOTHUP(1,i),HiggsDK_MOTHUP(2,i), HiggsDK_ICOLUP(1,i),HiggsDK_ICOLUP(2,i),  &
+                                          HiggsDK_Mom(2:4,i-3)/GeV,HiggsDK_Mom(1,i-3)/GeV, get_MInv(HiggsDK_Mom(1:4,i-3))/GeV, Lifetime, Spin   
+    enddo
+
+RETURN
+END SUBROUTINE
+
+
+
+
 
 
 SUBROUTINE ShiftMass(p1,p2,m1,m2,p1hat,p2hat)
@@ -2525,8 +2667,8 @@ implicit none
 real(8) :: Mom(:,:)
 logical :: applyPSCut
 integer :: NBin(:)
-integer, parameter :: inLeft=1, inRight=2, tauP=3, tauM=4, Wp=5, Wm=6, nu=7, nubar_tau=8, lepP=9, lepM=10, nu_tau=11, nubar=12
 real(8) :: m_tauP,m_tauM,m_Wp,m_Wm
+integer, parameter :: inLeft=1, inRight=2, Hig=3, tauP=4, tauM=5, Wp=6, Wm=7,   nu=8, nubar_tau=9, lepP=10,   lepM=11, nu_tau=12, nubar=13
 
 
     applyPSCut = .false.
@@ -2538,11 +2680,11 @@ real(8) :: m_tauP,m_tauM,m_Wp,m_Wm
    
     
 !      binning
-       NBin(1) = WhichBin(1,m_tauP)
-       NBin(2) = WhichBin(2,m_tauM)
-       NBin(3) = WhichBin(3,m_Wp)
-       NBin(4) = WhichBin(4,m_Wm)
-    
+!        NBin(1) = WhichBin(1,m_tauP)
+!        NBin(2) = WhichBin(2,m_tauM)
+!        NBin(3) = WhichBin(3,m_Wp)
+!        NBin(4) = WhichBin(4,m_Wm)
+    NBin(:)=1
     
 RETURN
 END SUBROUTINE
@@ -4296,13 +4438,12 @@ integer :: MY_IDUP(1:2)
 real(8) :: Jac,Jac1,Jac2,Jac3,Jac4,Jac5,Jac6,Jac7,Jac8,Jac9
 real(8) :: Minvsq_tau1,Minvsq_tau2,Minvsq_Wp,Minvsq_Wm,m_LepP,m_LepM
 real(8),parameter :: m_nu = 0d0, ga_tau =4d-13*GeV
-integer, parameter :: inLeft=1, inRight=2, tauP=3, tauM=4, Wp=5, Wm=6,   nu=7, nubar_tau=8, lepP=9,   lepM=10, nu_tau=11, nubar=12
-   
+integer, parameter :: inLeft=1, inRight=2, Hig=3, tauP=4, tauM=5, Wp=6, Wm=7,   nu=8, nubar_tau=9, lepP=10,   lepM=11, nu_tau=12, nubar=13
+
    
    m_LepP = getMass(MY_IDUP(1))
    m_LepM = getMass(MY_IDUP(2))
 
-   
    
 !  H-->tau tau (NWA)
    Jac1 = s_channel_prop_decay(pHiggs,(/m_tau,ga_tau,m_tau,m_tau/),(/m_tau,ga_tau,m_tau,m_tau/),xRnd(1:2),Mom(:,tauP),Mom(:,tauM)) 
