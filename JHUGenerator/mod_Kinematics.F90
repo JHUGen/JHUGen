@@ -534,21 +534,13 @@ character(len=*),parameter :: Fmt0_read = "I2,X,A"
 character(len=*),parameter :: Fmt1 = "6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0"
 integer :: indent
 character(len=150) :: IndentedFmt0, IndentedFmt1
+integer, parameter :: inLeft=1, inRight=2, Hig=3, tauP=4, tauM=5, Wp=6, Wm=7,   nu=8, nubar_tau=9, lepP=10,   lepM=11, nu_tau=12, nubar=13
 
 
 !   For description of the LHE format see http://arxiv.org/abs/hep-ph/0109068 and http://arxiv.org/abs/hep-ph/0609017
 !   The LHE numbering scheme can be found here: http://pdg.lbl.gov/mc_particle_id_contents.html and http://lhapdf.hepforge.org/manual#tth_sEcA
 
 
-!     assignments:
-!     HiggsDK_Mom(1:4,1) --> HiggsDK_IDUP(4)! V1
-!     HiggsDK_Mom(1:4,2) --> HiggsDK_IDUP(5)! V2
-!     HiggsDK_Mom(1:4,3) --> HiggsDK_IDUP(7)! l- 
-!     HiggsDK_Mom(1:4,4) --> HiggsDK_IDUP(6)! l+
-!     HiggsDK_Mom(1:4,5) --> HiggsDK_IDUP(9)! l-
-!     HiggsDK_Mom(1:4,6) --> HiggsDK_IDUP(8)! l+
-
-    
     ! NUP changes for gamma gamma final state
     if( TauDecays.eq.0 ) then
         NUP_NEW = 2
@@ -574,16 +566,16 @@ character(len=150) :: IndentedFmt0, IndentedFmt1
         HiggsDK_MOTHUP(1:2,6:11) = 0
     else    
         HiggsDK_ISTUP(4:13) = (/2,2,2,2,1,1,1,1,1,1/)
-        HiggsDK_MOTHUP(1:2,4) = (/iHiggs,iHiggs/)
-        HiggsDK_MOTHUP(1:2,5) = (/iHiggs,iHiggs/)
-        HiggsDK_MOTHUP(1:2,6) = (/1,1/) + NUP
-        HiggsDK_MOTHUP(1:2,9) = (/1,1/) + NUP
-        HiggsDK_MOTHUP(1:2,7) = (/2,2/) + NUP
-        HiggsDK_MOTHUP(1:2,12)= (/2,2/) + NUP
-        HiggsDK_MOTHUP(1:2,8) = (/5,5/) + NUP
-        HiggsDK_MOTHUP(1:2,10)= (/5,5/) + NUP
-        HiggsDK_MOTHUP(1:2,11)= (/6,6/) + NUP
-        HiggsDK_MOTHUP(1:2,13)= (/6,6/) + NUP
+        HiggsDK_MOTHUP(1:2,tauP)     = (/iHiggs,iHiggs/)
+        HiggsDK_MOTHUP(1:2,tauM)     = (/iHiggs,iHiggs/)
+        HiggsDK_MOTHUP(1:2,Wp)       = (/1,7/) + NUP
+        HiggsDK_MOTHUP(1:2,nubar_tau)= (/1,3/) + NUP
+        HiggsDK_MOTHUP(1:2,Wm)       = (/2,8/) + NUP
+        HiggsDK_MOTHUP(1:2,nu_tau)   = (/2,4/) + NUP
+        HiggsDK_MOTHUP(1:2,nu)       = (/3,3/) + NUP
+        HiggsDK_MOTHUP(1:2,lepP)     = (/3,3/) + NUP
+        HiggsDK_MOTHUP(1:2,lepM)     = (/4,4/) + NUP
+        HiggsDK_MOTHUP(1:2,nubar)    = (/4,4/) + NUP
     endif
 
     Lifetime = 0.0d0
@@ -640,7 +632,6 @@ character(len=150) :: IndentedFmt0, IndentedFmt1
                                              Mom(2:4,i)/GeV,Mom(1,i)/GeV, Mass(i)/GeV,Lifetime, Spin   
         endif                          
     enddo
-    
     
 !   write new intermediate particles and Higgs decay products
 !     call swap_mom(HiggsDK_Mom(1:4,3),HiggsDK_Mom(1:4,4))! swap to account for flipped asignments
@@ -4452,7 +4443,7 @@ integer, parameter :: inLeft=1, inRight=2, Hig=3, tauP=4, tauM=5, Wp=6, Wm=7,   
    Jac2 = s_channel_prop_decay(Mom(:,tauP),(/m_W,ga_W,0d0,get_MInv(Mom(:,tauP))/),(/m_nu,0d0,0d0,0d0/),xRnd(3:5),Mom(:,Wp),Mom(:,nu)) 
    Jac3 = s_channel_prop_decay(Mom(:,tauM),(/m_W,ga_W,0d0,get_MInv(Mom(:,tauM))/),(/m_nu,0d0,0d0,0d0/),xRnd(6:8),Mom(:,Wm),Mom(:,nubar_tau)) 
 
-!  W-->l nu (ONS)
+!  W-->l nu (ONSH)
    Jac4 = s_channel_prop_decay(Mom(:,Wp),(/m_LepP,0d0,0d0,0d0/),(/m_nu,0d0,0d0,0d0/),xRnd( 9:10),Mom(:,LepP),Mom(:,nu_tau)) 
    Jac5 = s_channel_prop_decay(Mom(:,Wm),(/m_LepM,0d0,0d0,0d0/),(/m_nu,0d0,0d0,0d0/),xRnd(11:12),Mom(:,LepM),Mom(:,nubar)) 
    

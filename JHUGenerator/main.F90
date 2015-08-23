@@ -69,7 +69,7 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
    PChannel=2
    DecayMode1=0  ! Z/W+
    DecayMode2=0  ! Z/W-
-   TopDecays=1
+   TopDecays=-1
    TauDecays=-1
    Process = 0   ! select 0, 1 or 2 to represent the spin of the resonance
    Unweighted =.true.
@@ -259,22 +259,14 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
     endif
 
     
-    if( (TopDecays.ne.0) .and. (Process.eq.80 .or. Process.eq.110 .or. Process.eq.111) ) then! TTBH and TH
-       if( TopDecays.ne.1 ) call Error("TopDecays=2,3,4 are no longer supported. Use DecayMode1/2.")
-       if( .not. IsAWDecay(DecayMode1) ) call Error("Invalid DecayMode1 for top decays")
-       if( .not. IsAWDecay(DecayMode2) ) call Error("Invalid DecayMode2 for top decays")
-!        if( DecayMode1.eq.4 .and. DecayMode2.eq.4 ) then
-          TopDecays = 1
-!        elseif( DecayMode1.eq.5 .and. DecayMode2.eq.5 ) then
-!           TopDecays = 2
-!        elseif( DecayMode1.eq.5 .and. DecayMode2.eq.4 ) then 
-!           TopDecays = 3
-!        elseif( DecayMode1.eq.4 .and. DecayMode2.eq.6 ) then 
-!           TopDecays = 4
-!        else
-!           call Error("Tau decay modes not yet supported in top decays")
-!        endif
-    endif
+    if( (TopDecays.ne.0 .and. TopDecays.ne.1) .and. (Process.eq.80 .or. Process.eq.110 .or. Process.eq.111) ) call Error("Specify TopDK=0,1")
+    if( (TopDecays.eq.1) .and. .not. IsAWDecay(DecayMode1) ) call Error("Invalid DecayMode1 for top decays")
+    if( (TopDecays.eq.1) .and. .not. IsAWDecay(DecayMode2) ) call Error("Invalid DecayMode2 for top decays")
+
+    if( (TauDecays.ne.0 .and. TauDecays.ne.1) .and. (Process.eq.80 .or. Process.eq.110 .or. Process.eq.111) ) call Error("Specify TauDK=0,1")
+    if( (TauDecays.eq.1) .and. .not. IsAWDecay(DecayMode1) ) call Error("Invalid DecayMode1 for tau decays")
+    if( (TauDecays.eq.1) .and. .not. IsAWDecay(DecayMode2) ) call Error("Invalid DecayMode2 for tau decays")
+
 
     if( IsAZDecay(DecayMode1) ) then
        M_V = M_Z
@@ -1583,7 +1575,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
           if( TauDecays.lt.0 ) then
                 do tries=1,5000000
                     call random_number(yRnd)
-                    dum = EvalUnWeighted_DecayToVV(yRnd,.true.,Ehat,Res,HiggsDK_Mom(1:4,6:9),HiggsDK_IDUP(1:9),HiggsDK_ICOLUP(1:2,1:9))
+                    dum = EvalUnWeighted_DecayToVV(yRnd,.true.,EHat,Res,HiggsDK_Mom(1:4,6:9),HiggsDK_IDUP(1:9),HiggsDK_ICOLUP(1:2,1:9))
                     if( Res.ne.0d0 ) exit
                 enddo
           else

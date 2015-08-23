@@ -2801,32 +2801,16 @@ include 'vegas_common.f'
 include 'csmaxvalue.f'
 EvalUnWeighted_DecayToTauTau = 0d0
 
-
-  
-  MY_IDUP(1:2) = (/ElP_,MuM_/)
-  pHiggs(1:4) = (/Ehat,0d0,0d0,0d0/)
-  if( TauDecays.eq.0 ) then
-     call genps(2,Ehat,yRnd(1:2),(/m_tau,m_tau/),Mom(1:4,tauP:tauM),PSWgt)
-     PSWgt = PSWgt/(2d0*Pi)**2/(4d0*Pi)
-  else
-     call EvalPhasespace_tautau(yRnd(1:12),pHiggs,MY_IDUP,Mom(1:4,tauP:nubar),PSWgt)
-  endif
-  call Kinematics_Htautau(Mom,applyPSCut,NBin)
-  if( applyPSCut ) then
-      EvalUnWeighted_DecayToTauTau = 0d0
-      return
-  endif
-  PreFac = fbGeV2 * PSWgt
   
 
   ICOLUP(1:2,tauP) = (/000,000/)
   ICOLUP(1:2,tauM) = (/000,000/)
   MY_IDUP(tauP) = TaP_;
   MY_IDUP(tauM) = TaM_;
-  if( RandomizeVVdecays ) then 
-     call random_number(DKRnd)
-     if( DKRnd.lt.0.5d0 ) call swapi(DecayMode1,DecayMode2)
-  endif
+!   if( RandomizeVVdecays ) then 
+!      call random_number(DKRnd)
+!      if( DKRnd.lt.0.5d0 ) call swapi(DecayMode1,DecayMode2)
+!   endif
   call VVBranchings(DK_IDUP(1:6),DK_ICOLUP(1:2,3:6),700)
   MY_IDUP(nu_tau)   = NuT_;        ICOLUP(1:2,nu_tau)   = (/000,000/)
   MY_IDUP(Wp)       = DK_IDUP(1);  ICOLUP(1:2,Wp)       = (/000,000/)
@@ -2837,6 +2821,19 @@ EvalUnWeighted_DecayToTauTau = 0d0
   MY_IDUP(lepM)     = DK_IDUP(6);  ICOLUP(1:2,lepM)     = DK_ICOLUP(1:2,6)
   MY_IDUP(nubar)    = DK_IDUP(5);  ICOLUP(1:2,nubar)    = DK_ICOLUP(1:2,5)  
 
+  pHiggs(1:4) = (/Ehat,0d0,0d0,0d0/)
+  if( TauDecays.eq.0 ) then
+     call genps(2,Ehat,yRnd(1:2),(/m_tau,m_tau/),Mom(1:4,tauP:tauM),PSWgt)
+     PSWgt = PSWgt/(2d0*Pi)**2/(4d0*Pi)
+  else
+     call EvalPhasespace_tautau(yRnd(1:12),pHiggs,(/DK_IDUP(3),DK_IDUP(6)/),Mom,PSWgt)
+  endif
+  call Kinematics_Htautau(Mom,applyPSCut,NBin)
+  if( applyPSCut ) then
+      EvalUnWeighted_DecayToTauTau = 0d0
+      return
+  endif
+  PreFac = fbGeV2 * PSWgt
 
 IF( GENEVT ) THEN
 
@@ -2846,7 +2843,6 @@ IF( GENEVT ) THEN
          call EvalAmp_H_TT_decay((/Mom(1:4,lepM),Mom(1:4,nubar),Mom(1:4,nu_tau),Mom(1:4,nu),Mom(1:4,lepP),Mom(1:4,nubar_tau)/),m_tau,LO_Res_Unpol)
       endif
       EvalUnWeighted_DecayToTauTau = LO_Res_Unpol * PreFac
-
       CS_max = csmax(0,0)
       
       if( EvalUnWeighted_DecayToTauTau .gt. CS_max) then
@@ -2854,29 +2850,12 @@ IF( GENEVT ) THEN
           write(io_LogFile,"(2X,A,1PE13.6,1PE13.6)") "CS_max is too small.",EvalUnWeighted_DecayToTauTau, CS_max
           AlertCounter = AlertCounter + 1
           Res = 0d0
-
       elseif( EvalUnWeighted_DecayToTauTau .gt. yRnd(14)*CS_max ) then
          do NHisto=1,NumHistograms
                call intoHisto(NHisto,NBin(NHisto),1d0)  ! CS_Max is the integration volume
          enddo
          AccepCounter = AccepCounter + 1
-         if( TauDecays.eq.0 ) then
-! integer, parameter :: inLeft=1, inRight=2, tauP=3, tauM=4, Wp=5, Wm=6,   nu=7, nubar_tau=8, lepP=9,   lepM=10, nu_tau=11, nubar=12
-            AcceptedEvent(1:4,1) = Mom(1:4,tauP)
-            AcceptedEvent(1:4,2) = Mom(1:4,tauM)
-            AcceptedEvent(1:4,3:6) = 0d0
-         else
-            AcceptedEvent(1:4,1) = Mom(1:4,tauP)
-            AcceptedEvent(1:4,2) = Mom(1:4,tauM)
-            AcceptedEvent(1:4,3) = Mom(1:4,Wp)
-            AcceptedEvent(1:4,4) = Mom(1:4,Wm)
-            AcceptedEvent(1:4,5) = Mom(1:4,nu)
-            AcceptedEvent(1:4,6) = Mom(1:4,nubar_tau)
-            AcceptedEvent(1:4,7) = Mom(1:4,lepP)
-            AcceptedEvent(1:4,8) = Mom(1:4,lepM)
-            AcceptedEvent(1:4,9) = Mom(1:4,nu_tau)
-            AcceptedEvent(1:4,10)= Mom(1:4,nubar)
-         endif
+         AcceptedEvent(:,:)=Mom(:,:)
          Res = 1d0
       else
           RejeCounter = RejeCounter + 1
