@@ -4437,17 +4437,11 @@ integer, parameter :: inLeft=1, inRight=2, Hig=3, tauP=4, tauM=5, Wp=6, Wm=7,   
 
    
 !  H-->tau tau (NWA)
-!    Jac1 = s_channel_prop_decay(pHiggs,(/m_tau,ga_tau,m_tau,m_tau/),(/m_tau,ga_tau,m_tau,m_tau/),xRnd(1:2),Mom(:,tauP),Mom(:,tauM)) 
    Jac1 = s_channel_prop_decay(pHiggs,(/m_tau,ga_tau,m_tau,m_tau/),(/m_tau,ga_tau,m_tau,m_tau/),xRnd(1:2),Mom(:,tauP),Mom(:,tauM)) 
 
-print *, "minv",get_MInv(Mom(:,tauP))
-print *, "minv",get_MInv(Mom(:,tauM))
-
-! print prop. here
-
 !  tau-->W nu (BW)
-   Jac2 = s_channel_prop_decay(Mom(:,tauP),(/m_W,ga_W,0d0,m_tau/),(/m_nu,0d0,0d0,0d0/),xRnd(3:5),Mom(:,Wp),Mom(:,nu_tau)) 
-   Jac3 = s_channel_prop_decay(Mom(:,tauM),(/m_W,ga_W,0d0,m_tau/),(/m_nu,0d0,0d0,0d0/),xRnd(6:8),Mom(:,Wm),Mom(:,nubar_tau)) 
+   Jac2 = s_channel_prop_decay(Mom(:,tauP),(/m_W,ga_W,0d0,m_tau/),(/m_nu,0d0,0d0,0d0/),xRnd(3:5),Mom(:,Wp),Mom(:,nubar_tau)) 
+   Jac3 = s_channel_prop_decay(Mom(:,tauM),(/m_W,ga_W,0d0,m_tau/),(/m_nu,0d0,0d0,0d0/),xRnd(6:8),Mom(:,Wm),Mom(:,nu_tau)) 
 
 !  W-->l nu (ONSH)
    Jac4 = s_channel_prop_decay(Mom(:,Wp),(/m_LepP,0d0,0d0,0d0/),(/m_nu,0d0,0d0,0d0/),xRnd( 9:10),Mom(:,LepP),Mom(:,nu)) 
@@ -4455,6 +4449,8 @@ print *, "minv",get_MInv(Mom(:,tauM))
    
    Jac = Jac1*Jac2*Jac4*Jac3*Jac5 * PSNorm6
    
+! print *, "minv",get_MInv(Mom(:,tauP)),get_MInv(Mom(1:4,lepP)+Mom(1:4,nubar_tau)+Mom(1:4,nu))
+! print *, "minv",get_MInv(Mom(:,tauM)),get_MInv(Mom(1:4,lepM)+Mom(1:4,nubar)+Mom(1:4,nu_tau))
    
    
 !    print *, "OS checker",dsqrt(pHiggs.dot.pHiggs )
@@ -4470,9 +4466,9 @@ print *, "minv",get_MInv(Mom(:,tauM))
 !    print *, "OS checker", dsqrt( dabs(Mom(1:4,lepM).dot.Mom(1:4,lepM) ))
 !    print *, "----------"
 !    print *, "Mom.cons. ",pHiggs(1:4)-Mom(1:4,tauP)-Mom(1:4,tauM)
-!    print *, "Mom.cons. ",Mom(1:4,tauP) - Mom(1:4,nu)-Mom(1:4,Wp)
-!    print *, "Mom.cons. ",Mom(1:4,tauM) - Mom(1:4,nubar_tau)-Mom(1:4,Wm)
-!    print *, "Mom.cons. ",Mom(1:4,Wp) - Mom(1:4,nu_tau)-Mom(1:4,lepP)
+!    print *, "Mom.cons. ",Mom(1:4,tauP) - Mom(1:4,nubar_tau)-Mom(1:4,Wp)
+!    print *, "Mom.cons. ",Mom(1:4,tauM) - Mom(1:4,nu_tau)-Mom(1:4,Wm)
+!    print *, "Mom.cons. ",Mom(1:4,Wp) - Mom(1:4,nu)-Mom(1:4,lepP)
 !    print *, "Mom.cons. ",Mom(1:4,Wm) - Mom(1:4,nubar)-Mom(1:4,lepM)   
 !    pause
    
