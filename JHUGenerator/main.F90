@@ -1613,6 +1613,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                 call boost(HiggsDK_Mom(1:4,11),MomHiggs(1:4),pH2sq)
                 call boost(HiggsDK_Mom(1:4,12),MomHiggs(1:4),pH2sq)
                 call boost(HiggsDK_Mom(1:4,13),MomHiggs(1:4),pH2sq)
+
                 HiggsDK_IDUP(4) = convertLHE(HiggsDK_IDUP(4))
                 HiggsDK_IDUP(5) = convertLHE(HiggsDK_IDUP(5))
                 HiggsDK_IDUP(6) = convertLHE(HiggsDK_IDUP(6))
@@ -1621,6 +1622,8 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                 HiggsDK_IDUP(9) = convertLHE(HiggsDK_IDUP(9))
                 HiggsDK_IDUP(10)= convertLHE(HiggsDK_IDUP(10))
                 HiggsDK_IDUP(11)= convertLHE(HiggsDK_IDUP(11))
+                HiggsDK_IDUP(12)= convertLHE(HiggsDK_IDUP(12))
+                HiggsDK_IDUP(13)= convertLHE(HiggsDK_IDUP(13))
                 call WriteOutEvent_HFF(EventNumPart,LHE_IDUP,LHE_IntExt,LHE_MOTHUP,LHE_ICOLUP,MomExt,HiggsDK_Mom(1:4,1:13),Mass,iHiggs,HiggsDK_IDUP(1:13),HiggsDK_ICOLUP(1:2,1:13),EventInfoLine,BeginEventLine=BeginEventLine)
              endif
 
