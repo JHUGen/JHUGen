@@ -133,12 +133,15 @@ MODULE ModPhasespace
           Jac2 = pi/(part2(1)*part2(2))
       else! propagator
           Jac2 = s_channel_propagator( part2(1)**2,part2(2), part2(3)**2,part2(4)**2, xRnd(iRnd),Minvsq_2,Power )
-          iRnd = iRnd+1          
+          iRnd = iRnd+1           
       endif
       
       
       Jac3 = s_channel_decay( p0,Minvsq_1,Minvsq_2,xRnd(iRnd:iRnd+1),Mom1,Mom2 )       
       s_channel_prop_decay = Jac1*Jac2*Jac3
+
+          print *, "jac1,2",jac1,jac2
+
  
   RETURN
   END FUNCTION
@@ -426,6 +429,7 @@ pause
   real(8) :: g_d,sab,m1_sq,m2_sq
   
         g_d = 2d0*sab/sqrt_lambda(sab,m1_sq,m2_sq)/pi 
+        
     
   RETURN
   END FUNCTION
