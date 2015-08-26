@@ -94,7 +94,7 @@ MODULE ModPhasespace
  
  
  
- 
+  ! note: this generates phase space for particle p0 decaying into part1 and part2 where we (possibly) integrate over inv. masses of part1 and part2
   ! note: if partx(1)=partx(3)=partx(4) (i.e. sqrt(smin)=sqrt(smax)=mass) then we assume a stable internal particle with narrow-width jacobian
   ! note: if 0=partx(3)=partx(4) (i.e. sqrt(smin)=sqrt(smax)=0) then we assume a stable external particle
   ! note: the number of xRnd's has to be chosen correctly
@@ -140,7 +140,7 @@ MODULE ModPhasespace
       Jac3 = s_channel_decay( p0,Minvsq_1,Minvsq_2,xRnd(iRnd:iRnd+1),Mom1,Mom2 )       
       s_channel_prop_decay = Jac1*Jac2*Jac3
 
-          print *, "jac1,2",jac1,jac2
+!           print *, "jac1,2",jac1,jac2
 
  
   RETURN
