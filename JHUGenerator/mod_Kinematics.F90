@@ -2611,24 +2611,24 @@ logical,save :: FirstTime=.true.
     
    
    
-
-!     if( FirstTime ) then
-! !       call NNPDFDriver("./pdfs/NNPDF30_lo_as_0130.LHgrid",33)
-! !       call NNinitPDF(0)
-!       call InitProcess_TTBH(m_Reso,m_top)
-!       FirstTime = .false.
-!     endif
-    MomMELA(1:4,1) = -(/         65d0,           0.0000000000000000d0, 0.0000000000000000d0,      65d0           /)
-    MomMELA(1:4,2) = -(/         65d0,           0.0000000000000000d0, 0.0000000000000000d0,     -65d0           /)  
-    MomMELA(1:4,3:9) = Mom(1:4,3:9)
-    
-    call EvalXSec_PP_TH(MomMELA,(/(1d0,0d0),(0d0,0d0)/),TopDecays,MatElSq_H0)
-    call EvalXSec_PP_TH(MomMELA,(/(0d0,0d0),(1d0,0d0)/),TopDecays,MatElSq_H1)
-    
-    MatElSq_H0 = MatElSq_H0 !/40d0
-    MatElSq_H1 = MatElSq_H1 !/147d0
+D_0minus = 0d0
+! !     if( FirstTime ) then
+! ! !       call NNPDFDriver("./pdfs/NNPDF30_lo_as_0130.LHgrid",33)
+! ! !       call NNinitPDF(0)
+! !       call InitProcess_TTBH(m_Reso,m_top)
+! !       FirstTime = .false.
+! !     endif
+!     MomMELA(1:4,1) = -(/         65d0,           0.0000000000000000d0, 0.0000000000000000d0,      65d0           /)
+!     MomMELA(1:4,2) = -(/         65d0,           0.0000000000000000d0, 0.0000000000000000d0,     -65d0           /)  
+!     MomMELA(1:4,3:9) = Mom(1:4,3:9)
+!     
+!     call EvalXSec_PP_TH(MomMELA,(/(1d0,0d0),(0d0,0d0)/),TopDecays,MatElSq_H0)
+!     call EvalXSec_PP_TH(MomMELA,(/(0d0,0d0),(1d0,0d0)/),TopDecays,MatElSq_H1)
+!     
+!     MatElSq_H0 = MatElSq_H0 !/40d0
+!     MatElSq_H1 = MatElSq_H1 !/147d0
         
-    D_0minus = MatElSq_H0/(MatElSq_H0 + 1d0*MatElSq_H1 )
+!     D_0minus = MatElSq_H0/(MatElSq_H0 + 1d0*MatElSq_H1 )
    
    
     
@@ -4428,23 +4428,29 @@ real(8) :: xRnd(:), pHiggs(:), Mom(:,:)
 integer :: MY_IDUP(1:2)
 real(8) :: Jac,Jac1,Jac2,Jac3,Jac4,Jac5,Jac6,Jac7,Jac8,Jac9
 real(8) :: Minvsq_tau1,Minvsq_tau2,Minvsq_Wp,Minvsq_Wm,m_LepP,m_LepM
-real(8),parameter :: m_nu = 0d0, ga_tau =4d-13*GeV
+real(8),parameter :: m_nu = 0d0
 integer, parameter :: inLeft=1, inRight=2, Hig=3, tauP=4, tauM=5, Wp=6, Wm=7,   nu=8, nubar_tau=9, lepP=10,   lepM=11, nu_tau=12, nubar=13
 
    
-   m_LepP = getMass(MY_IDUP(1))
-   m_LepM = getMass(MY_IDUP(2))
+   m_LepP = getMass(MY_IDUP(1)) *000d0
+   m_LepM = getMass(MY_IDUP(2)) *000d0
 
    
 !  H-->tau tau (NWA)
+!    Jac1 = s_channel_prop_decay(pHiggs,(/m_tau,ga_tau,m_tau,m_tau/),(/m_tau,ga_tau,m_tau,m_tau/),xRnd(1:2),Mom(:,tauP),Mom(:,tauM)) 
    Jac1 = s_channel_prop_decay(pHiggs,(/m_tau,ga_tau,m_tau,m_tau/),(/m_tau,ga_tau,m_tau,m_tau/),xRnd(1:2),Mom(:,tauP),Mom(:,tauM)) 
 
+print *, "minv",get_MInv(Mom(:,tauP))
+print *, "minv",get_MInv(Mom(:,tauM))
+
+! print prop. here
+
 !  tau-->W nu (BW)
-   Jac2 = s_channel_prop_decay(Mom(:,tauP),(/m_W,ga_W,0d0,get_MInv(Mom(:,tauP))/),(/m_nu,0d0,0d0,0d0/),xRnd(3:5),Mom(:,Wp),Mom(:,nu)) 
-   Jac3 = s_channel_prop_decay(Mom(:,tauM),(/m_W,ga_W,0d0,get_MInv(Mom(:,tauM))/),(/m_nu,0d0,0d0,0d0/),xRnd(6:8),Mom(:,Wm),Mom(:,nubar_tau)) 
+   Jac2 = s_channel_prop_decay(Mom(:,tauP),(/m_W,ga_W,0d0,m_tau/),(/m_nu,0d0,0d0,0d0/),xRnd(3:5),Mom(:,Wp),Mom(:,nu_tau)) 
+   Jac3 = s_channel_prop_decay(Mom(:,tauM),(/m_W,ga_W,0d0,m_tau/),(/m_nu,0d0,0d0,0d0/),xRnd(6:8),Mom(:,Wm),Mom(:,nubar_tau)) 
 
 !  W-->l nu (ONSH)
-   Jac4 = s_channel_prop_decay(Mom(:,Wp),(/m_LepP,0d0,0d0,0d0/),(/m_nu,0d0,0d0,0d0/),xRnd( 9:10),Mom(:,LepP),Mom(:,nu_tau)) 
+   Jac4 = s_channel_prop_decay(Mom(:,Wp),(/m_LepP,0d0,0d0,0d0/),(/m_nu,0d0,0d0,0d0/),xRnd( 9:10),Mom(:,LepP),Mom(:,nu)) 
    Jac5 = s_channel_prop_decay(Mom(:,Wm),(/m_LepM,0d0,0d0,0d0/),(/m_nu,0d0,0d0,0d0/),xRnd(11:12),Mom(:,LepM),Mom(:,nubar)) 
    
    Jac = Jac1*Jac2*Jac4*Jac3*Jac5 * PSNorm6
