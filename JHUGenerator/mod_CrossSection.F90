@@ -2855,7 +2855,13 @@ IF( GENEVT ) THEN
                call intoHisto(NHisto,NBin(NHisto),1d0)  ! CS_Max is the integration volume
          enddo
          AccepCounter = AccepCounter + 1
-         AcceptedEvent(:,:)=Mom(:,:)
+
+         AcceptedEvent(:,:) = Mom(:,:)
+         if( TauDecays.ne.0 ) then
+             call ShiftMass(Mom(1:4,LepP),Mom(1:4,Wp)-Mom(1:4,LepP), GetMass(MY_IDUP(LepP)),0d0,  AcceptedEvent(1:4,LepP),AcceptedEvent(1:4,Nu) )
+             call ShiftMass(Mom(1:4,LepM),Mom(1:4,Wm)-Mom(1:4,LepM), GetMass(MY_IDUP(LepM)),0d0,  AcceptedEvent(1:4,LepM),AcceptedEvent(1:4,Nubar) )
+         endif
+
          Res = 1d0
       else
           RejeCounter = RejeCounter + 1

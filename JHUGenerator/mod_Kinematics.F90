@@ -633,9 +633,8 @@ integer, parameter :: inLeft=1, inRight=2, Hig=3, tauP=4, tauM=5, Wp=6, Wm=7,   
         endif                          
     enddo
     
+
 !   write new intermediate particles and Higgs decay products
-!     call swap_mom(HiggsDK_Mom(1:4,3),HiggsDK_Mom(1:4,4))! swap to account for flipped asignments
-!     call swap_mom(HiggsDK_Mom(1:4,5),HiggsDK_Mom(1:4,6))! swap to account for flipped asignments
     do i = 4,4 + (NUP_NEW-1)
         write(io_LHEOutFile,IndentedFmt1) HiggsDK_IDUP(i),HiggsDK_ISTUP(i), HiggsDK_MOTHUP(1,i),HiggsDK_MOTHUP(2,i), HiggsDK_ICOLUP(1,i),HiggsDK_ICOLUP(2,i),  &
                                           HiggsDK_Mom(2:4,i)/GeV,HiggsDK_Mom(1,i)/GeV, get_MInv(HiggsDK_Mom(1:4,i))/GeV, Lifetime, Spin   
@@ -4427,14 +4426,12 @@ implicit none
 real(8) :: xRnd(:), pHiggs(:), Mom(:,:)
 integer :: MY_IDUP(1:2)
 real(8) :: Jac,Jac1,Jac2,Jac3,Jac4,Jac5,Jac6,Jac7,Jac8,Jac9
-real(8) :: Minvsq_tau1,Minvsq_tau2,Minvsq_Wp,Minvsq_Wm,m_LepP,m_LepM
-real(8),parameter :: m_nu = 0d0
+real(8) :: Minvsq_tau1,Minvsq_tau2,Minvsq_Wp,Minvsq_Wm
+real(8),parameter :: m_nu = 0d0, m_lep=0d0
 integer, parameter :: inLeft=1, inRight=2, Hig=3, tauP=4, tauM=5, Wp=6, Wm=7,   nu=8, nubar_tau=9, lepP=10,   lepM=11, nu_tau=12, nubar=13
 
+  
    
-   m_LepP = getMass(MY_IDUP(1)) *000d0
-   m_LepM = getMass(MY_IDUP(2)) *000d0
-
    
 !  H-->tau tau (NWA)
    Jac1 = s_channel_prop_decay(pHiggs,(/m_tau,ga_tau,m_tau,m_tau/),(/m_tau,ga_tau,m_tau,m_tau/),xRnd(1:2),Mom(:,tauP),Mom(:,tauM)) 
@@ -4444,13 +4441,10 @@ integer, parameter :: inLeft=1, inRight=2, Hig=3, tauP=4, tauM=5, Wp=6, Wm=7,   
    Jac3 = s_channel_prop_decay(Mom(:,tauM),(/m_W,ga_W,0d0,m_tau/),(/m_nu,0d0,0d0,0d0/),xRnd(6:8),Mom(:,Wm),Mom(:,nu_tau)) 
 
 !  W-->l nu (ONSH)
-   Jac4 = s_channel_prop_decay(Mom(:,Wp),(/m_LepP,0d0,0d0,0d0/),(/m_nu,0d0,0d0,0d0/),xRnd( 9:10),Mom(:,LepP),Mom(:,nu)) 
-   Jac5 = s_channel_prop_decay(Mom(:,Wm),(/m_LepM,0d0,0d0,0d0/),(/m_nu,0d0,0d0,0d0/),xRnd(11:12),Mom(:,LepM),Mom(:,nubar)) 
+   Jac4 = s_channel_prop_decay(Mom(:,Wp),(/m_Lep,0d0,0d0,0d0/),(/m_nu,0d0,0d0,0d0/),xRnd( 9:10),Mom(:,LepP),Mom(:,nu)) 
+   Jac5 = s_channel_prop_decay(Mom(:,Wm),(/m_Lep,0d0,0d0,0d0/),(/m_nu,0d0,0d0,0d0/),xRnd(11:12),Mom(:,LepM),Mom(:,nubar)) 
    
    Jac = Jac1*Jac2*Jac4*Jac3*Jac5 * PSNorm6
-   
-! print *, "minv",get_MInv(Mom(:,tauP)),get_MInv(Mom(1:4,lepP)+Mom(1:4,nubar_tau)+Mom(1:4,nu))
-! print *, "minv",get_MInv(Mom(:,tauM)),get_MInv(Mom(1:4,lepM)+Mom(1:4,nubar)+Mom(1:4,nu_tau))
    
    
 !    print *, "OS checker",dsqrt(pHiggs.dot.pHiggs )

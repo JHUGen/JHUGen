@@ -428,7 +428,7 @@ pause
   implicit none
   real(8) :: g_d,sab,m1_sq,m2_sq
   
-        g_d = 2d0*sab/sqrt_lambda(sab,m1_sq,m2_sq)/pi 
+        g_d = 2d0*sab/(sqrt_lambda(sab,m1_sq,m2_sq)+1d-16)/pi
         
     
   RETURN
