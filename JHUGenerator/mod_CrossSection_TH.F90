@@ -21,6 +21,7 @@ implicit none
 real(8) :: EvalWeighted_TH,yRnd(1:11),VgsWgt
 real(8) :: Ehat,MH_Inv,eta1,eta2,ISFac,sHatJacobi,PreFac,FluxFac,PSWgt,PSWgt2,PSWgt3
 real(8) :: MomExt(1:4,1:9),MomOffShell(1:4,1:9),LO_Res_Unpol(-6:6,-6:6),MuFac,pdf(-6:6,1:2)
+real(8) :: MG_MOM(0:3,1:5),MadGraph_tree(1)
 integer :: NBin(1:NumHistograms),NHisto
 logical :: applyPSCut
 integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9
@@ -66,20 +67,30 @@ integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9
    endif
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt
    
-   IF( PROCESS.EQ.110 ) THEN
+   IF( PROCESS.EQ.110 ) THEN        ! t-channel production of t H
       call EvalAmp_QB_TH(MomExt,LO_Res_Unpol)
       EvalWeighted_TH = &
                       + LO_Res_Unpol(Up_,Bot_)   * ( pdf(Up_,1) *pdf(Bot_,2)  +  pdf(Chm_,1) *pdf(Bot_,2) )   &
                       + LO_Res_Unpol(Bot_,Up_)   * ( pdf(Bot_,1)*pdf(Up_,2)   +  pdf(Bot_,1) *pdf(Chm_,2) )   &
                       + LO_Res_Unpol(ADn_,Bot_)  * ( pdf(ADn_,1)*pdf(Bot_,2)  +  pdf(AStr_,1)*pdf(Bot_,2) )   &
                       + LO_Res_Unpol(Bot_,ADn_)  * ( pdf(Bot_,1)*pdf(ADn_,2)  +  pdf(Bot_,1) *pdf(AStr_,2))
-   ELSEIF( PROCESS.EQ.111 ) THEN
+   ELSEIF( PROCESS.EQ.111 ) THEN      ! t-channel production of tbar H
       call EvalAmp_QbarBbar_TH(MomExt,LO_Res_Unpol)
       EvalWeighted_TH = &
                       + LO_Res_Unpol(Dn_,ABot_)  * ( pdf(Dn_,1)*pdf(ABot_,2)  + pdf(Str_,1)*pdf(ABot_,2) )    &
                       + LO_Res_Unpol(ABot_,Dn_)  * ( pdf(ABot_,1)*pdf(Dn_,2)  + pdf(ABot_,1)*pdf(Str_,2) )    &
                       + LO_Res_Unpol(AUp_,ABot_) * ( pdf(AUp_,1)*pdf(ABot_,2) + pdf(AChm_,1)*pdf(ABot_,2))    &
                       + LO_Res_Unpol(ABot_,AUp_) * ( pdf(ABot_,1)*pdf(AUp_,2) + pdf(ABot_,1)*pdf(AChm_,2))
+   ELSEIF (PROCESS .EQ. 112) THEN      ! s-channel production of t H
+      call EvalAmp_QQB_THBBAR(MomExt,LO_Res_Unpol)
+      EvalWeighted_TH = &
+           + LO_Res_Unpol(Up_,ADn_)  * ( pdf(Up_,1)*pdf(ADn_,2)  + pdf(Chm_,1)*pdf(AStr_,2) )    &
+           + LO_Res_Unpol(ADn_,Up_)  * ( pdf(ADn_,1)*pdf(Up_,2)  + pdf(AStr_,1)*pdf(Chm_,2) )    
+   ELSEIF (PROCESS .EQ. 113) THEN      ! s-channel production of tbar H
+      call EvalAmp_QQB_TBARHB(MomExt,LO_Res_Unpol)
+      EvalWeighted_TH = &
+           + LO_Res_Unpol(Dn_,AUp_)  * ( pdf(Dn_,1)*pdf(AUp_,2)  + pdf(Str_,1)*pdf(AChm_,2) )    &
+           + LO_Res_Unpol(AUp_,Dn_)  * ( pdf(AUp_,1)*pdf(Dn_,2)  + pdf(AChm_,1)*pdf(Str_,2) )                 
    ENDIF
    EvalWeighted_TH = EvalWeighted_TH * PreFac
 
@@ -96,6 +107,54 @@ integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9
 ! print *, "MEM", LO_Res_Unpol(ABot_,AUp_),FluxFac*LO_Res_Unpol(ABot_,AUp_) * ( pdf(ABot_,1)*pdf(AUp_,2) + pdf(ABot_,1)*pdf(AChm_,2))
 ! pause
 
+!!! MadGraph check
+!!
+!!   MG_MOM(0:3,1) = MomExt(1:4,1)*100d0
+!!   MG_MOM(0:3,2) = MomExt(1:4,2)*100d0
+!!   MG_MOM(0:3,3) = MomExt(1:4,3)*100d0
+!!   MG_MOM(0:3,4) = MomExt(1:4,4)*100d0
+!!   MG_MOM(0:3,5) = MomExt(1:4,5)*100d0
+!!
+!!   
+!!   call coupsm(0)
+!!   print *, "My parameters:"
+!!   print *, "mtop",M_Top
+!!   print *, "mW",M_W
+!!   print *, "vev",vev
+!!   print *, "gw",dsqrt(gwsq)
+!!
+!!
+!!   if (Process .eq. 110) then
+!!
+!!      call SUB_HTD(MG_MOM,MadGraph_Tree)
+!!      print *, "My tree ub -> Htd",LO_Res_UnPol(Up_,Bot_)/gwsq**2*vev**2 * 0.6414935883355840d0**4 / 250.618249228543d0**2
+!!      print *, "MadGraph tree ub -> Htd",MadGraph_Tree
+!!      print *, "MG/ME ratio",MadGraph_tree/(LO_Res_UnPol(Up_,Bot_)/gwsq**2*vev**2 * 0.6414935883355840d0**4 / 250.618249228543d0**2)
+!!
+!!   elseif (Process .eq. 111) then
+!!
+!!      call SDBBAR_HTBARU(MG_MOM,MadGraph_Tree)
+!!      print *, "My tree d bbar -> H tbar u",LO_Res_UnPol(Dn_,ABot_)/gwsq**2*vev**2 * 0.6414935883355840d0**4 / 250.618249228543d0**2
+!!      print *, "MadGraph tree d bbar -> H tbar u",MadGraph_Tree
+!!      print *, "MG/ME ratio",MadGraph_tree/(LO_Res_UnPol(Dn_,ABot_)/gwsq**2*vev**2 * 0.6414935883355840d0**4 / 250.618249228543d0**2)
+!!
+!!   elseif (Process .eq. 112) then
+!!
+!!      call SUDBAR_HTBBAR(MG_MOM,MadGraph_Tree)
+!!      print *, "My tree u dbar -> H t bbar",LO_Res_UnPol(Up_,ADn_)/gwsq**2*vev**2 * 0.6414935883355840d0**4 / 250.618249228543d0**2
+!!      print *, "MadGraph tree u dbar -> H t bbar",MadGraph_Tree
+!!      print *, "MG/ME ratio",MadGraph_tree/(LO_Res_UnPol(Up_,ADn_)/gwsq**2*vev**2 * 0.6414935883355840d0**4 / 250.618249228543d0**2)
+!!
+!!   elseif (Process .eq. 113) then
+!!
+!!      call SDUBAR_HTBARB(MG_MOM,MadGraph_Tree)
+!!      print *, "My tree d ubar -> H t b",LO_Res_UnPol(Dn_,AUp_)/gwsq**2*vev**2 * 0.6414935883355840d0**4 / 250.618249228543d0**2
+!!      print *, "MadGraph tree d ubar -> H tbar b",MadGraph_Tree
+!!      print *, "MG/ME ratio",MadGraph_tree/(LO_Res_UnPol(Dn_,AUp_)/gwsq**2*vev**2 * 0.6414935883355840d0**4 / 250.618249228543d0**2)
+!!
+!!   endif
+!!
+!!   pause
    if( writeWeightedLHE ) then 
         call Error("WriteLHE not yet supported for t+H")
    endif
@@ -180,6 +239,28 @@ EvalUnWeighted_TH = 0d0
           MY_IDUP(W)   = DK_IDUP(2); ICOLUP(1:2,W)  = (/000,000/)             
           MY_IDUP(lep) = DK_IDUP(6); ICOLUP(1:2,lep)= DK_ICOLUP(1:2,6)
           MY_IDUP(nu)  = DK_IDUP(5); ICOLUP(1:2,nu) = DK_ICOLUP(1:2,5)  
+! Markus, please check this! ------------ for u dbar -> H t bbar
+      elseif( PROCESS.EQ.112 ) then
+          ICOLUP(1:2,Hbos) = (/000,000/)
+          ICOLUP(1:2,t)    = (/501,000/)
+          ICOLUP(1:2,qout) = (/000,502/)
+          ICOLUP(1:2,inLeft) = ICOLUP(1:2,qout)
+          ICOLUP(1:2,inRight)= ICOLUP(1:2,t) 
+          MY_IDUP(b)   = ABot_;       ICOLUP(1:2,b)   = (/000,501/)
+          MY_IDUP(W)   = DK_IDUP(1); ICOLUP(1:2,W)   = (/000,000/)
+          MY_IDUP(lep) = DK_IDUP(3); ICOLUP(1:2,lep) = DK_ICOLUP(1:2,3)
+          MY_IDUP(nu)  = DK_IDUP(4); ICOLUP(1:2,nu)  = DK_ICOLUP(1:2,4)  
+! Markus, please check this! ------------ for d ubar -> H tbar b
+      elseif( PROCESS.EQ.113 ) then   
+          ICOLUP(1:2,Hbos) = (/000,000/)
+          ICOLUP(1:2,t)    = (/000,501/)
+          ICOLUP(1:2,qout) = (/502,000/)
+          ICOLUP(1:2,inLeft) = ICOLUP(1:2,qout)
+          ICOLUP(1:2,inRight)= ICOLUP(1:2,t) 
+          MY_IDUP(b)   = ABot_;      ICOLUP(1:2,b)  = (/501,000/)
+          MY_IDUP(W)   = DK_IDUP(2); ICOLUP(1:2,W)  = (/000,000/)             
+          MY_IDUP(lep) = DK_IDUP(6); ICOLUP(1:2,lep)= DK_ICOLUP(1:2,6)
+          MY_IDUP(nu)  = DK_IDUP(5); ICOLUP(1:2,nu) = DK_ICOLUP(1:2,5)  
       endif
 
    ELSE
@@ -195,6 +276,19 @@ EvalUnWeighted_TH = 0d0
           ICOLUP(1:2,Hbos) = (/000,000/)
           ICOLUP(1:2,t)    = (/000,501/)
           ICOLUP(1:2,qout) = (/000,502/)
+          ICOLUP(1:2,inLeft) = ICOLUP(1:2,qout)
+          ICOLUP(1:2,inRight)= ICOLUP(1:2,t) 
+! Markus, please check this: 
+      elseif( PROCESS.EQ.112 ) then
+          ICOLUP(1:2,Hbos) = (/000,000/)
+          ICOLUP(1:2,t)    = (/501,000/)
+          ICOLUP(1:2,qout) = (/000,502/)
+          ICOLUP(1:2,inLeft) = ICOLUP(1:2,qout)
+          ICOLUP(1:2,inRight)= ICOLUP(1:2,t) 
+      elseif( PROCESS.EQ.113 ) then
+          ICOLUP(1:2,Hbos) = (/000,000/)
+          ICOLUP(1:2,t)    = (/000,501/)
+          ICOLUP(1:2,qout) = (/502,000/)
           ICOLUP(1:2,inLeft) = ICOLUP(1:2,qout)
           ICOLUP(1:2,inRight)= ICOLUP(1:2,t) 
       endif
@@ -213,12 +307,17 @@ EvalUnWeighted_TH = 0d0
 
 IF( GENEVT ) THEN   
 
-          IF( PROCESS.EQ.110 ) THEN
-              call EvalAmp_QB_TH(MomExt,LO_Res_Unpol)
-          ELSEIF( PROCESS.EQ.111 ) THEN
-              call EvalAmp_QbarBbar_TH(MomExt,LO_Res_Unpol)
-          ENDIF
-          MY_IDUP(1:5) = (/ LHA2M_pdf(iPartons(1)),LHA2M_pdf(iPartons(2)),Hig_,SU2flip(LHA2M_pdf(iPartons(2))),SU2flip(LHA2M_pdf(iPartons(1))) /)
+   IF( PROCESS.EQ.110 ) THEN
+      call EvalAmp_QB_TH(MomExt,LO_Res_Unpol)
+   ELSEIF( PROCESS.EQ.111 ) THEN
+      call EvalAmp_QbarBbar_TH(MomExt,LO_Res_Unpol)
+! Markus, this seems reasonable, right?
+   ELSEIF (PROCESS .EQ. 112) THEN      
+      call EvalAmp_QQB_THBBAR(MomExt,LO_Res_Unpol)
+   ELSEIF (PROCESS .EQ. 113) THEN      
+      call EvalAmp_QQB_TBARHB(MomExt,LO_Res_Unpol)
+   ENDIF
+   MY_IDUP(1:5) = (/ LHA2M_pdf(iPartons(1)),LHA2M_pdf(iPartons(2)),Hig_,SU2flip(LHA2M_pdf(iPartons(2))),SU2flip(LHA2M_pdf(iPartons(1))) /)
           if( abs(iPartons(1)).eq.5 ) then
               call swapi( MY_IDUP(4),MY_IDUP(5) )
               call swapi( ICOLUP(1,inLeft),ICOLUP(1,inRight) )
@@ -273,6 +372,33 @@ ELSE! NOT GENEVT
                 EvalUnWeighted_TH = LO_Res_Unpol(ABot_,LHA2M_pdf(nparton)) * PreFac *PDFFac1
                 RES(-5,nparton) = EvalUnWeighted_TH
                 if (EvalUnWeighted_TH.gt.csmax(-5,nparton)) CSmax(-5,nparton) = EvalUnWeighted_TH
+             enddo
+! Markus, please check this -- 
+          ELSEIF (PROCESS .EQ. 112) THEN      ! s-channel production of t H
+             call EvalAmp_QQB_THBBAR(MomExt,LO_Res_Unpol)
+              do nparton = -5,5   ! LHE conventions
+                PDFFac1 = pdf( LHA2M_pdf(nparton),1) * pdf(Bot_,2)
+                EvalUnWeighted_TH = LO_Res_Unpol(LHA2M_pdf(nparton),Bot_) * PreFac *PDFFac1
+                RES(nparton,+5) = EvalUnWeighted_TH
+                if (EvalUnWeighted_TH.gt.csmax(nparton,+5)) CSmax(nparton,+5) = EvalUnWeighted_TH
+
+                PDFFac1 = pdf( LHA2M_pdf(nparton),2) * pdf(Bot_,1)
+                EvalUnWeighted_TH = LO_Res_Unpol(Bot_,LHA2M_pdf(nparton)) * PreFac *PDFFac1
+                RES(+5,nparton) = EvalUnWeighted_TH
+                if (EvalUnWeighted_TH.gt.csmax(+5,nparton)) CSmax(+5,nparton) = EvalUnWeighted_TH
+              enddo
+           ELSEIF( PROCESS.EQ.113 ) THEN      ! t-channel production of tbar H
+              call EvalAmp_QbarBbar_TH(MomExt,LO_Res_Unpol)
+              do nparton = -5,5   ! LHE conventions
+                 PDFFac1 = pdf( LHA2M_pdf(nparton),1) * pdf(Bot_,2)
+                 EvalUnWeighted_TH = LO_Res_Unpol(LHA2M_pdf(nparton),Bot_) * PreFac *PDFFac1
+                 RES(nparton,+5) = EvalUnWeighted_TH
+                 if (EvalUnWeighted_TH.gt.csmax(nparton,+5)) CSmax(nparton,+5) = EvalUnWeighted_TH
+                 
+                 PDFFac1 = pdf( LHA2M_pdf(nparton),2) * pdf(Bot_,1)
+                 EvalUnWeighted_TH = LO_Res_Unpol(Bot_,LHA2M_pdf(nparton)) * PreFac *PDFFac1
+                 RES(+5,nparton) = EvalUnWeighted_TH
+                 if (EvalUnWeighted_TH.gt.csmax(+5,nparton)) CSmax(+5,nparton) = EvalUnWeighted_TH
               enddo
           ENDIF
 
