@@ -2584,7 +2584,7 @@ END SUBROUTINE
 SUBROUTINE Kinematics_TH(Mom,applyPSCut,NBin)
 use ModParameters
 use ModMisc
-use ModTH
+! use ModTH
 implicit none
 real(8) :: Mom(1:4,1:9),MomMELA(1:4,1:9)
 logical :: applyPSCut
