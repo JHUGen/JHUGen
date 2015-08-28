@@ -1436,14 +1436,7 @@
 
 ! overall factors and propagators
       amp=amp/(s123-mass_F**2+ci*m_tau*ga_tau)/(s456-mass_F**2+ci*m_tau*ga_tau)/(s12-m_w**2+ci*m_w*Ga_W)/(s45-m_w**2+ci*m_w*Ga_W)
-      amp=amp*16d0*ci*mass_F*gwsq**2
-      
-!       print *, "prop1sq tau-",cdabs(s123-mass_F**2+ci*m_tau*ga_tau)
-!       print *, "prop2sq tau +",cdabs(s456-mass_F**2+ci*m_tau*ga_tau)
-!       print *, "prop3sq w-",cdabs(s12-m_w**2+ci*m_w*Ga_W)
-!       print *, "prop4sq w+",cdabs(s45-m_w**2+ci*m_w*Ga_W)
-!       pause
-      
+      amp=amp*16d0*ci*mass_F*gwsq**2   
       res = cdabs(amp)
 
    RETURN
