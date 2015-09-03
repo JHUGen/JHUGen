@@ -34,7 +34,8 @@ real(8) :: VG_Result,VG_Error
 !         call StartReadLHE(VG_Result,VG_Error)
         call StartReadLHE_NEW(VG_Result,VG_Error)
    else
-        if( Process.eq.80 .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.66 .or. Process.eq.90 .or. Process .eq. 110 .or. Process .eq. 111 ) then
+        if( Process.eq.80 .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.66 .or. Process.eq.90 .or. &
+            Process.eq.110 .or. Process.eq.111 .or. Process.eq.112 .or. Process.eq.113 ) then
            call StartVegas_NEW(VG_Result,VG_Error)
         else
            call StartVegas(VG_Result,VG_Error)
@@ -1108,211 +1109,223 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
 
 elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
 
-! !-------------------new stuff -------------------
-    write(io_stdout,"(1X,A)")  "Scanning the integrand"
-    CrossSecMax(:,:) = 0d0
-    CrossSec(:,:) = 0d0
-    warmup = .true.
-    
-    itmx = 5
-    ncall= VegasNc0
-    if( Process.eq.80 ) call vegas(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
-!     if( Process.eq.90 ) call vegas(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
-    if( Process.eq.60 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
-!     if( Process.eq.66 ) call vegas(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
-    if( Process.eq.61 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
-!     if( Process.eq.110) call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
-!     if( Process.eq.111) call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)    
-
-    CrossSec(:,:) = CrossSec(:,:)/dble(itmx)    
-    write(io_stdout,"(A)")  ""
-    write(io_stdout,"(1X,A,F10.3,A,F10.3,A)") "Total xsec: ",VG_Result, " +/-",VG_Error, " fb"
-
-    RequEvents(:,:)=0
-    do i1=-6,6
-    do j1=-6,6
-        RequEvents(i1,j1) = RequEvents(i1,j1) + int( CrossSec(i1,j1)/VG_Result * VegasNc2 )
-    enddo
-    enddo
-    do i1=-6,6
-    do j1=-6,6
-        if( CrossSec(i1,j1).gt.1d-9 ) write(io_stdout,"(1X,A,I4,I4,F8.3,I9)") "Fractional partonic xsec ", i1,j1,CrossSec(i1,j1)/VG_Result,RequEvents(i1,j1)
-    enddo
-    enddo
-    write(io_stdout,"(1X,A,F8.3,I9)") "Sum        partonic xsec    x   x",sum(CrossSec(:,:))/VG_Result,sum(RequEvents(:,:))
-
-      
-
-      
-    write(io_stdout,"(A)")  ""
-    write(io_stdout,"(1X,A)")  "Event generation"
-    call ClearHisto()   
-    warmup = .false.
-    itmx = 1
-    nprn = 0  
-    EvalCounter = 0
-    RejeCounter = 0
-    AlertCounter = 0
-    AccepCounter_part(:,:) = 0 
-    StatusPercent = 0d0
-    
-    CrossSecMax(:,:) = 1.0d0 * CrossSecMax(:,:)    !  adjustment factor
-    
-    call cpu_time(time_start)    
-    do while( StatusPercent.lt.100d0  )
-    
-        if( Process.eq.80 ) call vegas1(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
-    !     if( Process.eq.90 ) call vegas1(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
-        if( Process.eq.60 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
-    !     if( Process.eq.66 ) call vegas1(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
-        if( Process.eq.61 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
-    !     if( Process.eq.110) call vegas1(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
-    !     if( Process.eq.111) call vegas1(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)      
-        call system('clear')
-        do i1=-6,6
-        do j1=-6,6
-            if( CrossSec(i1,j1).gt.1d-9 ) then 
-!                write(io_stdout,"(1X,A,I4,I4,2X,I7,2X,I7,2X,F8.3,1X,A)") "Generated events ", i1,j1,(AccepCounter_part(i1,j1)),(RequEvents(i1,j1)),dble(AccepCounter_part(i1,j1))/dble(RequEvents(i1,j1))*100d0,"%"
-               call PrintStatusBar2(int(dble(AccepCounter_part(i1,j1))/dble(RequEvents(i1,j1))*100),"channel "//getParticle(i1)//" "//getParticle(j1)//" ")
-            endif   
-        enddo
-        enddo  
-        StatusPercent = int(100d0*dble(sum(AccepCounter_part(:,:)))/dble(sum(RequEvents(:,:)))  )   
-    enddo
-    call cpu_time(time_end)
-    write(io_stdout,*)  " event generation rate (events/sec)",dble(sum(AccepCounter_part(:,:)))/(time_end-time_start+1d-10)
+! ! !-------------------new stuff -------------------
+!     write(io_stdout,"(1X,A)")  "Scanning the integrand"
+!     CrossSecMax(:,:) = 0d0
+!     CrossSec(:,:) = 0d0
+!     warmup = .true.
+!     
+!     itmx = 5
+!     ncall= VegasNc0
+!     if( Process.eq.80 ) call vegas(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
+! !     if( Process.eq.90 ) call vegas(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
+!     if( Process.eq.60 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
+! !     if( Process.eq.66 ) call vegas(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
+!     if( Process.eq.61 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
+! !     if( Process.eq.110) call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
+! !     if( Process.eq.111) call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)    
+! !     if( Process.eq.112) call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)    
+! !     if( Process.eq.113) call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)    
+! 
+!     CrossSec(:,:) = CrossSec(:,:)/dble(itmx)    
+!     write(io_stdout,"(A)")  ""
+!     write(io_stdout,"(1X,A,F10.3,A,F10.3,A)") "Total xsec: ",VG_Result, " +/-",VG_Error, " fb"
+! 
+!     RequEvents(:,:)=0
+!     do i1=-6,6
+!     do j1=-6,6
+!         RequEvents(i1,j1) = RequEvents(i1,j1) + int( CrossSec(i1,j1)/VG_Result * VegasNc2 )
+!     enddo
+!     enddo
+!     do i1=-6,6
+!     do j1=-6,6
+!         if( CrossSec(i1,j1).gt.1d-9 ) write(io_stdout,"(1X,A,I4,I4,F8.3,I9)") "Fractional partonic xsec ", i1,j1,CrossSec(i1,j1)/VG_Result,RequEvents(i1,j1)
+!     enddo
+!     enddo
+!     write(io_stdout,"(1X,A,F8.3,I9)") "Sum        partonic xsec    x   x",sum(CrossSec(:,:))/VG_Result,sum(RequEvents(:,:))
+! 
+!       
+! 
+!       
+!     write(io_stdout,"(A)")  ""
+!     write(io_stdout,"(1X,A)")  "Event generation"
+!     call ClearHisto()   
+!     warmup = .false.
+!     itmx = 1
+!     nprn = 0  
+!     EvalCounter = 0
+!     RejeCounter = 0
+!     AlertCounter = 0
+!     AccepCounter_part(:,:) = 0 
+!     StatusPercent = 0d0
+!     
+!     CrossSecMax(:,:) = 1.0d0 * CrossSecMax(:,:)    !  adjustment factor
+! 
+!     call cpu_time(time_start)    
+!     do while( StatusPercent.lt.100d0  )
+!     
+!         if( Process.eq.80 ) call vegas1(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
+!     !     if( Process.eq.90 ) call vegas1(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
+!         if( Process.eq.60 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
+!     !     if( Process.eq.66 ) call vegas1(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
+!         if( Process.eq.61 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
+! !         if( Process.eq.110) call vegas1(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
+! !         if( Process.eq.111) call vegas1(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)      
+! !         if( Process.eq.112) call vegas1(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)      
+! !         if( Process.eq.113) call vegas1(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)      
+!         call system('clear')
+!         do i1=-6,6
+!         do j1=-6,6
+!             if( CrossSec(i1,j1).gt.1d-9 ) then 
+! !                write(io_stdout,"(1X,A,I4,I4,2X,I7,2X,I7,2X,F8.3,1X,A)") "Generated events ", i1,j1,(AccepCounter_part(i1,j1)),(RequEvents(i1,j1)),dble(AccepCounter_part(i1,j1))/dble(RequEvents(i1,j1))*100d0,"%"
+!                call PrintStatusBar2(int(dble(AccepCounter_part(i1,j1))/dble(RequEvents(i1,j1))*100),"channel "//getParticle(i1)//" "//getParticle(j1)//" ")
+!             endif   
+!         enddo
+!         enddo  
+!         StatusPercent = int(100d0*dble(sum(AccepCounter_part(:,:)))/dble(sum(RequEvents(:,:)))  )   
+!     enddo
+!     call cpu_time(time_end)
+!     write(io_stdout,*)  " event generation rate (events/sec)",dble(sum(AccepCounter_part(:,:)))/(time_end-time_start+1d-10)
     
     
     
 
 ! !-------------------old stuff -------------------
-!     VG(:,:) = zero
-!     CSmax(:,:) = zero
-! 
-!     if( .not. ReadCSmax ) then
-!         print *, " finding maximal weight with ",VegasNc0," evaluations"
-!         do i=1,VegasNc0
-!                 call random_number(yRnd)
-!                 RES(:,:) = 0d0
-!                 if( Process.eq.80 ) then
-!                     dum = EvalUnWeighted_TTBH(yRnd,.false.,(/-99,-99/),RES)
-!                 elseif( Process.eq.90 ) then
-!                     dum = EvalUnWeighted_BBBH(yRnd,.false.,(/-99,-99/),RES)
-!                 elseif( Process.eq.60 ) then
-!                     dum = EvalUnWeighted_HJJ(yRnd,.false.,(/-99,-99/),RES)
-!                 elseif( Process.eq.66 ) then
-!                     dum = EvalUnWeighted_HJJ_fulldecay(yRnd,.false.,(/-99,-99/),RES)
-!                 elseif( Process.eq.61 ) then
-!                     dum = EvalUnWeighted_HJJ(yRnd,.false.,(/-99,-99/),RES)
-!                 elseif( Process.eq.110 ) then
-!                     dum = EvalUnWeighted_TH(yRnd,.false.,(/-99,-99/),RES)
-!                 elseif( Process.eq.111 ) then
-!                     dum = EvalUnWeighted_TH(yRnd,.false.,(/-99,-99/),RES)
-!                 endif
-!                 VG(:,:) = VG(:,:) + RES(:,:)
-!                 PChannel = PChannel_aux
-!         enddo
-!         open(unit=io_CSmaxFile,file='CSmax.bin',form='unformatted',status='replace')
-!         WRITE(io_CSmaxFile) CSMAX,VG
-!         close(io_CSmaxFile)
-!     else
-!         open(unit=io_CSmaxFile,file='CSmax.bin',form='unformatted')
-!         READ(io_CSmaxFile) CSMAX,VG
-!         close(io_CSmaxFile)
-!     endif
-!    
-!    CSmax(:,:)   = 1.5d0 * CSmax(:,:)    !  adjustment factor
-! 
-!    VG(:,:) = VG(:,:)/dble(VegasNc0)
-!    TotalXSec = sum(  VG(:,:) )
-!    print *, ""    
-!    write(io_stdout,"(1X,A,F10.3)") "Total xsec: ",TotalXSec
-! 
-!     RequEvents(:,:)=0
-!     do i1=-5,5
-!     do j1=-5,5
-!          RequEvents(i1,j1) = RequEvents(i1,j1) + int( VG(i1,j1)/TotalXSec * VegasNc2 )
-!     enddo
-!     enddo
-!     
-!    
-!     do i1=-5,5
-!     do j1=-5,5
-!          if( VG(i1,j1).gt.1d-9 ) write(io_stdout,"(1X,A,I4,I4,F8.3,I9)") "Fractional partonic xsec ", i1,j1,VG(i1,j1)/TotalXSec,RequEvents(i1,j1)
-!     enddo
-!     enddo
-!    
-! 
-! 
-! 
-! 
-! !------------------------------- set counts to zero for actual evaluation
-! 
-!     EvalCounter = 0
-!     AccepCounter = 0
-!     RejeCounter = 0
-!     AlertCounter = 0
-!     AccepCounter_part(:,:) = 0
-! 
-!     call cpu_time(time_start)
-! 
-! 
-!     do i1=-5,5!! idea: instead of these 2 do-loop introduce randomized loop
-!     do j1=-5,5
-!     if(RequEvents(i1,j1).ne.0) then
-!           if( (PChannel.eq.0) .and. (abs(i1)+abs(j1).ne.0) ) cycle
-!           if( (PChannel.eq.1) .and. i1*j1.eq.0 ) cycle
-!           write(io_stdout,*) ""
-!           write(io_stdout,*) ""
-!           write(io_stdout,"(X,A,I8,A,I4,I4,A)",advance='no') "generating ",RequEvents(i1,j1)," events for channel",i1,j1,":  "
-!           flush(io_stdout)
-!           
-!           do while( AccepCounter_part(i1,j1)  .lt. RequEvents(i1,j1) )
-!               call random_number(yRnd)
-!               if( Process.eq.80 ) then
-!                   dum = EvalUnWeighted_TTBH(yRnd,.true.,(/i1,j1/),RES)
-!               elseif( Process.eq.90 ) then
-!                   dum = EvalUnWeighted_BBBH(yRnd,.true.,(/i1,j1/),RES)
-!               elseif( Process.eq.60 ) then
-!                   dum = EvalUnWeighted_HJJ(yRnd,.true.,(/i1,j1/),RES)
-!               elseif( Process.eq.66 ) then
-!                   dum = EvalUnWeighted_HJJ_fulldecay(yRnd,.true.,(/i1,j1/),RES)
-!               elseif( Process.eq.61 ) then
-!                   dum = EvalUnWeighted_HJJ(yRnd,.true.,(/i1,j1/),RES)
-!               elseif( Process.eq.110 ) then
-!                   dum = EvalUnWeighted_TH(yRnd,.true.,(/i1,j1/),RES)
-!               elseif( Process.eq.111 ) then
-!                   dum = EvalUnWeighted_TH(yRnd,.true.,(/i1,j1/),RES)
-!               endif
-!               StatusPercent = int(100d0*(AccepCounter_part(i1,j1))  /  dble(RequEvents(i1,j1))  )
-!               call PrintStatusBar( StatusPercent )
-!           enddo
-! 
-!     endif
-!     enddo
-!     enddo    
-!     
-!     
-!     
-!     call cpu_time(time_end)
-!     print *, ""
-!     print *, ""
-!     print *, " Evaluation Counter: ",EvalCounter
-!     print *, " Acceptance Counter: ",AccepCounter
-!     do i1=-5,+5
-!     do j1=-5,+5
-!       if( AccepCounter_part(i1,j1).ne.0 ) print *, " Acceptance  Counter_part: ", i1,j1, AccepCounter_part(i1,j1)
-!     enddo
-!     enddo
-!     print *, " Alert  Counter: ",AlertCounter
-!     print *, " gg/qqb ratio = ", dble(AccepCounter_part(0,0))/dble(sum(AccepCounter_part(:,:))-AccepCounter_part(0,0)+1d-10)
-!     if( dble(AlertCounter)/dble(AccepCounter+1d-10) .gt. 1d0*percent ) then
-!         write(io_LogFile,*) "ALERT: The number of rejected events with too small CSMAX exceeds 1%."
-!         write(io_LogFile,*) "       Increase CSMAX in main.F90."
-!         write(io_stdout, *) "ALERT: The number of rejected events with too small CSMAX exceeds 1%."
-!         write(io_stdout, *) "       Increase CSMAX in main.F90."
-!     endif
-!     write(io_stdout,*)  " event generation rate (events/sec)",dble(AccepCounter)/(time_end-time_start+1d-10)
+    VG(:,:) = zero
+    CSmax(:,:) = zero
+
+    if( .not. ReadCSmax ) then
+        print *, " finding maximal weight with ",VegasNc0," evaluations"
+        do i=1,VegasNc0
+                call random_number(yRnd)
+                RES(:,:) = 0d0
+                if( Process.eq.80 ) then
+                    dum = EvalUnWeighted_TTBH(yRnd,.false.,(/-99,-99/),RES)
+                elseif( Process.eq.90 ) then
+                    dum = EvalUnWeighted_BBBH(yRnd,.false.,(/-99,-99/),RES)
+                elseif( Process.eq.60 ) then
+                    dum = EvalUnWeighted_HJJ(yRnd,.false.,(/-99,-99/),RES)
+                elseif( Process.eq.66 ) then
+                    dum = EvalUnWeighted_HJJ_fulldecay(yRnd,.false.,(/-99,-99/),RES)
+                elseif( Process.eq.61 ) then
+                    dum = EvalUnWeighted_HJJ(yRnd,.false.,(/-99,-99/),RES)
+                elseif( Process.eq.110 ) then
+                    dum = EvalUnWeighted_TH(yRnd,.false.,(/-99,-99/),RES)
+                elseif( Process.eq.111 ) then
+                    dum = EvalUnWeighted_TH(yRnd,.false.,(/-99,-99/),RES)
+                elseif( Process.eq.112 ) then
+                    dum = EvalUnWeighted_TH(yRnd,.false.,(/-99,-99/),RES)
+                elseif( Process.eq.113 ) then
+                    dum = EvalUnWeighted_TH(yRnd,.false.,(/-99,-99/),RES)
+                endif
+                VG(:,:) = VG(:,:) + RES(:,:)
+                PChannel = PChannel_aux
+        enddo
+        open(unit=io_CSmaxFile,file='CSmax.bin',form='unformatted',status='replace')
+        WRITE(io_CSmaxFile) CSMAX,VG
+        close(io_CSmaxFile)
+    else
+        open(unit=io_CSmaxFile,file='CSmax.bin',form='unformatted')
+        READ(io_CSmaxFile) CSMAX,VG
+        close(io_CSmaxFile)
+    endif
+   
+   CSmax(:,:)   = 1.5d0 * CSmax(:,:)    !  adjustment factor
+
+   VG(:,:) = VG(:,:)/dble(VegasNc0)
+   TotalXSec = sum(  VG(:,:) )
+   print *, ""    
+   write(io_stdout,"(1X,A,F10.3)") "Total xsec: ",TotalXSec
+
+    RequEvents(:,:)=0
+    do i1=-5,5
+    do j1=-5,5
+         RequEvents(i1,j1) = RequEvents(i1,j1) + int( VG(i1,j1)/TotalXSec * VegasNc2 )
+    enddo
+    enddo
+    
+   
+    do i1=-5,5
+    do j1=-5,5
+         if( VG(i1,j1).gt.1d-9 ) write(io_stdout,"(1X,A,I4,I4,F8.3,I9)") "Fractional partonic xsec ", i1,j1,VG(i1,j1)/TotalXSec,RequEvents(i1,j1)
+    enddo
+    enddo
+   
+
+
+
+
+!------------------------------- set counts to zero for actual evaluation
+
+    EvalCounter = 0
+    AccepCounter = 0
+    RejeCounter = 0
+    AlertCounter = 0
+    AccepCounter_part(:,:) = 0
+
+    call cpu_time(time_start)
+
+
+    do i1=-5,5!! idea: instead of these 2 do-loop introduce randomized loop
+    do j1=-5,5
+    if(RequEvents(i1,j1).ne.0) then
+          if( (PChannel.eq.0) .and. (abs(i1)+abs(j1).ne.0) ) cycle
+          if( (PChannel.eq.1) .and. i1*j1.eq.0 ) cycle
+          write(io_stdout,*) ""
+          write(io_stdout,*) ""
+          write(io_stdout,"(X,A,I8,A,I4,I4,A)",advance='no') "generating ",RequEvents(i1,j1)," events for channel",i1,j1,":  "
+          flush(io_stdout)
+          
+          do while( AccepCounter_part(i1,j1)  .lt. RequEvents(i1,j1) )
+              call random_number(yRnd)
+              if( Process.eq.80 ) then
+                  dum = EvalUnWeighted_TTBH(yRnd,.true.,(/i1,j1/),RES)
+              elseif( Process.eq.90 ) then
+                  dum = EvalUnWeighted_BBBH(yRnd,.true.,(/i1,j1/),RES)
+              elseif( Process.eq.60 ) then
+                  dum = EvalUnWeighted_HJJ(yRnd,.true.,(/i1,j1/),RES)
+              elseif( Process.eq.66 ) then
+                  dum = EvalUnWeighted_HJJ_fulldecay(yRnd,.true.,(/i1,j1/),RES)
+              elseif( Process.eq.61 ) then
+                  dum = EvalUnWeighted_HJJ(yRnd,.true.,(/i1,j1/),RES)
+              elseif( Process.eq.110 ) then
+                  dum = EvalUnWeighted_TH(yRnd,.true.,(/i1,j1/),RES)
+              elseif( Process.eq.111 ) then
+                  dum = EvalUnWeighted_TH(yRnd,.true.,(/i1,j1/),RES)
+              elseif( Process.eq.112 ) then
+                  dum = EvalUnWeighted_TH(yRnd,.true.,(/i1,j1/),RES)
+              elseif( Process.eq.113 ) then
+                  dum = EvalUnWeighted_TH(yRnd,.true.,(/i1,j1/),RES)
+              endif
+              StatusPercent = int(100d0*(AccepCounter_part(i1,j1))  /  dble(RequEvents(i1,j1))  )
+              call PrintStatusBar( StatusPercent )
+          enddo
+
+    endif
+    enddo
+    enddo    
+    
+    
+    
+    call cpu_time(time_end)
+    print *, ""
+    print *, ""
+    print *, " Evaluation Counter: ",EvalCounter
+    print *, " Acceptance Counter: ",AccepCounter
+    do i1=-5,+5
+    do j1=-5,+5
+      if( AccepCounter_part(i1,j1).ne.0 ) print *, " Acceptance  Counter_part: ", i1,j1, AccepCounter_part(i1,j1)
+    enddo
+    enddo
+    print *, " Alert  Counter: ",AlertCounter
+    print *, " gg/qqb ratio = ", dble(AccepCounter_part(0,0))/dble(sum(AccepCounter_part(:,:))-AccepCounter_part(0,0)+1d-10)
+    if( dble(AlertCounter)/dble(AccepCounter+1d-10) .gt. 1d0*percent ) then
+        write(io_LogFile,*) "ALERT: The number of rejected events with too small CSMAX exceeds 1%."
+        write(io_LogFile,*) "       Increase CSMAX in main.F90."
+        write(io_stdout, *) "ALERT: The number of rejected events with too small CSMAX exceeds 1%."
+        write(io_stdout, *) "       Increase CSMAX in main.F90."
+    endif
+    write(io_stdout,*)  " event generation rate (events/sec)",dble(AccepCounter)/(time_end-time_start+1d-10)
 
                      
                      
