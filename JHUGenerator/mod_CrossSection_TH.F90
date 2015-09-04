@@ -323,7 +323,6 @@ IF( GENEVT ) THEN
                   call swapi( ICOLUP(1,inLeft),ICOLUP(1,inRight) )
                   call swapi( ICOLUP(2,inLeft),ICOLUP(2,inRight) )
               endif              
-        ! Markus, this seems reasonable, right?
           ELSEIF (PROCESS .EQ. 112) THEN      
               call EvalAmp_QQB_THBBAR(MomExt,LO_Res_Unpol)
           ELSEIF (PROCESS .EQ. 113) THEN      
@@ -378,7 +377,6 @@ ELSE! NOT GENEVT
                 RES(-5,nparton) = EvalUnWeighted_TH
                 if (EvalUnWeighted_TH.gt.csmax(-5,nparton)) CSmax(-5,nparton) = EvalUnWeighted_TH
              enddo
-! Markus, please check this -- 
           ELSEIF (PROCESS .EQ. 112) THEN      ! s-channel production of t H
                call EvalAmp_QQB_THBBAR(MomExt,LO_Res_Unpol)
                RES(2,-1) = LO_Res_Unpol(Up_,ADn_)   * pdf(Up_,1)*pdf(ADn_,2)   * PreFac
@@ -391,33 +389,18 @@ ELSE! NOT GENEVT
                if (RES(-1,2).gt.csmax(-1,2)) CSmax(-1,2) = RES(-1,2)
                if (RES(-3,4).gt.csmax(-3,4)) CSmax(-3,4) = RES(-3,4)
 
-           ELSEIF( PROCESS.EQ.113 ) THEN      ! t-channel production of tbar H
-              call EvalAmp_QbarBbar_TH(MomExt,LO_Res_Unpol)
-              do nparton = -5,5   ! LHE conventions
-                 PDFFac1 = pdf( LHA2M_pdf(nparton),1) * pdf(Bot_,2)
-                 EvalUnWeighted_TH = LO_Res_Unpol(LHA2M_pdf(nparton),Bot_) * PreFac *PDFFac1
-                 RES(nparton,+5) = EvalUnWeighted_TH
-                 if (EvalUnWeighted_TH.gt.csmax(nparton,+5)) CSmax(nparton,+5) = EvalUnWeighted_TH
-                 
-                 PDFFac1 = pdf( LHA2M_pdf(nparton),2) * pdf(Bot_,1)
-                 EvalUnWeighted_TH = LO_Res_Unpol(Bot_,LHA2M_pdf(nparton)) * PreFac *PDFFac1
-                 RES(+5,nparton) = EvalUnWeighted_TH
-                 if (EvalUnWeighted_TH.gt.csmax(+5,nparton)) CSmax(+5,nparton) = EvalUnWeighted_TH
-              enddo
+          ELSEIF( PROCESS.EQ.113 ) THEN      ! t-channel production of tbar H
+              call EvalAmp_QQB_TBARHB(MomExt,LO_Res_Unpol)
+               RES(-2,1) = LO_Res_Unpol(AUp_,Dn_)   * pdf(AUp_,1)*pdf(Dn_,2)   * PreFac
+               RES(-4,3) = LO_Res_Unpol(AChm_,Str_) * pdf(AChm_,1)*pdf(Str_,2) * PreFac
+               RES(1,-2) = LO_Res_Unpol(Dn_,AUp_)   * pdf(AUp_,2)*pdf(Dn_,1)   * PreFac
+               RES(3,-4) = LO_Res_Unpol(Str_,AChm_) * pdf(AChm_,2)*pdf(Str_,1) * PreFac
+                
+               if (RES(-2,1).gt.csmax(-2,1)) CSmax(-2,1) = RES(-2,1)
+               if (RES(-4,3).gt.csmax(-4,3)) CSmax(-4,3) = RES(-4,3)
+               if (RES(1,-2).gt.csmax(1,-2)) CSmax(1,-2) = RES(1,-2)
+               if (RES(3,-4).gt.csmax(3,-4)) CSmax(3,-4) = RES(3,-4)
           ENDIF
-!    ELSEIF (PROCESS .EQ. 112) THEN      ! s-channel production of t H
-!       call EvalAmp_QQB_THBBAR(MomExt,LO_Res_Unpol)
-!       EvalWeighted_TH = &
-!            + LO_Res_Unpol(Up_,ADn_)  * ( pdf(Up_,1)*pdf(ADn_,2)  + pdf(Chm_,1)*pdf(AStr_,2) )    &
-!            + LO_Res_Unpol(ADn_,Up_)  * ( pdf(ADn_,1)*pdf(Up_,2)  + pdf(AStr_,1)*pdf(Chm_,2) )    
-!    ELSEIF (PROCESS .EQ. 113) THEN      ! s-channel production of tbar H
-!       call EvalAmp_QQB_TBARHB(MomExt,LO_Res_Unpol)
-!       EvalWeighted_TH = &
-!            + LO_Res_Unpol(Dn_,AUp_)  * ( pdf(Dn_,1)*pdf(AUp_,2)  + pdf(Str_,1)*pdf(AChm_,2) )    &
-!            + LO_Res_Unpol(AUp_,Dn_)  * ( pdf(AUp_,1)*pdf(Dn_,2)  + pdf(AChm_,1)*pdf(Str_,2) )                 
-!    ENDIF
-
-
 ENDIF! GENEVT 
 
 
