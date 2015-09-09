@@ -62,13 +62,13 @@ EvalWeighted_HJJ_fulldecay = 0d0
    call convert_to_MCFM(+MomExt(1:4,outTop)*100d0,p_MCFM(7,1:4))
    call convert_to_MCFM(+MomExt(1:4,outBot)*100d0,p_MCFM(8,1:4))
 
-   HZZcoupl(1) = ghz1
+   HZZcoupl(1) = 1d0  !ghz1
    HZZcoupl(2) = ghz2
    HZZcoupl(3) = ghz3
    HZZcoupl(4) = ghz4
    HZZcoupl(5:) = (0d0,0d0)
    
-   HWWcoupl(1) = ghw1
+   HWWcoupl(1) = 1d0! HZZcoupl(1)!  ghw1  ! this is actually wrong
    HWWcoupl(2) = ghw2
    HWWcoupl(3) = ghw3
    HWWcoupl(4) = ghw4
@@ -83,7 +83,7 @@ EvalWeighted_HJJ_fulldecay = 0d0
 !    print *, (MomExt(1:4,9)).dot.(MomExt(1:4,9))
 !    print *, (MomExt(1:4,10)).dot.(MomExt(1:4,10))
 !    print *, "---"
-!    print *, p_MCFM(1,1:4)+p_MCFM(2,1:4)  +p_MCFM(3,1:4)+p_MCFM(4,1:4)  +p_MCFM(5,1:4)+p_MCFM(6,1:4)  +p_MCFM(7,1:4)+p_MCFM(8,1:4)
+!    print *, p_MCFM(1,1:4)+p_MCFM(2,1:4)  +p_MCFM(3,1:4)+p_MCFM(4,1:4)  +p_MCFM(5,1:4)+p_MCFM(6,1:4)  +p_MCFM(7,1:4) +p_MCFM(8,1:4)
 !    print *, p_MCFM(1,4)**2-p_MCFM(1,1)**2-p_MCFM(1,2)**2-p_MCFM(1,3)**2
 !    print *, p_MCFM(2,4)**2-p_MCFM(2,1)**2-p_MCFM(2,2)**2-p_MCFM(2,3)**2
 !    print *, p_MCFM(3,4)**2-p_MCFM(3,1)**2-p_MCFM(3,2)**2-p_MCFM(3,3)**2
@@ -94,18 +94,21 @@ EvalWeighted_HJJ_fulldecay = 0d0
 !    print *, p_MCFM(8,4)**2-p_MCFM(8,1)**2-p_MCFM(8,2)**2-p_MCFM(8,3)**2
 !    pause
   
-  
+
+! 1.982278980884535E-005  zz
+! 3.186871063969136E-005  ww
+
+  i=1; j=2;
   msq_MCFM(:,:) = 0d0
 !   call qq_ZZqq(p_MCFM,msq_MCFM,HZZcoupl,HWWcoupl,Lambda*100d0,Lambda_Q*100d0,(/Lambda_z1,Lambda_z2,Lambda_z3,Lambda_z4/)*100d0)!  q(-p1)+q(-p2)->Z(p3,p4)+Z(p5,p6)+q(p7)+q(p8)
-!   msq_MCFM=msq_MCFM/(9.495632068338d-2)**3   !/ (1.11379452919968d0)
-!   print *, "new ",msq_MCFM(i,j)
+  msq_MCFM=msq_MCFM/(9.495632068338d-2)**3   !/ (1.11379452919968d0)
+  print *, "new ",msq_MCFM(j,i)
 
-
-!   call EvalAmp_WBFH_UnSymm_SA(MomExt(1:4,1:5),(/ghz1,ghz2,ghz3,ghz4/),(/ghw1,ghw2,ghw3,ghw4/),me2)
-! !   msq_MCFM(:,:) = me2(:,:)
-!   print *, "old ",me2(i,j)
-!   print *, "rat", msq_MCFM(i,j)/me2(i,j)
-!   pause
+  call EvalAmp_WBFH_UnSymm_SA(MomExt(1:4,1:5),HZZcoupl(1:4),HWWcoupl(1:4),me2)
+!   msq_MCFM(:,:) = me2(:,:)
+  print *, "old ",me2(i,j)
+  print *, "rat", msq_MCFM(j,i)/me2(i,j)
+  pause
   
   
   LO_Res_Unpol = 0d0
