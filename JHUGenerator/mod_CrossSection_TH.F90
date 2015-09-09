@@ -322,8 +322,10 @@ IF( GENEVT ) THEN
                   call swapi( ICOLUP(2,inLeft),ICOLUP(2,inRight) )
               endif              
           ELSEIF (PROCESS .EQ. 112) THEN      
+              MY_IDUP(1:5) = (/ LHA2M_pdf(iPartons(1)),LHA2M_pdf(iPartons(2)),Hig_,Top_,ABot_ /)
               call EvalAmp_QQB_THBBAR(MomExt,LO_Res_Unpol)
           ELSEIF (PROCESS .EQ. 113) THEN      
+              MY_IDUP(1:5) = (/ LHA2M_pdf(iPartons(1)),LHA2M_pdf(iPartons(2)),Hig_,ATop_,Bot_ /)
               call EvalAmp_QQB_TBARHB(MomExt,LO_Res_Unpol)
           ENDIF
           
