@@ -252,12 +252,12 @@ contains
        restmp = ((abs(amp_z(-1,-1))**2) * Ld * Lu + &
             (abs(amp_z(-1,+1))**2) * Ld * Ru + &
             (abs(amp_z(+1,-1))**2) * Rd * Lu + &
-            (abs(amp_z(+1,+1))**2) * Rd * Ru) * couplz**2 * xn**2
+            (abs(amp_z(+1,+1))**2) * Rd * Ru) * couplz**2 * xn**2  *00
 
        restmp = restmp + abs(amp_w(-1,-1))**2 * couplw**2 * xn**2
 
        restmp = restmp + two * real(amp_z(-1,-1)*conjg(amp_w(-1,-1)),kind=dp) * &
-            aL_QUp * aL_QDn * couplz * couplw * xn
+            aL_QUp * aL_QDn * couplz * couplw * xn   *00000000d0 !MARKUS: switching off the interference
 
        restmp = restmp * aveqq
 

@@ -223,8 +223,8 @@ EvalUnWeighted_TH = 0d0
           ICOLUP(1:2,Hbos) = (/000,000/)
           ICOLUP(1:2,t)    = (/501,000/)
           ICOLUP(1:2,qout) = (/502,000/)
-          ICOLUP(1:2,inLeft) = ICOLUP(1:2,qout)
-          ICOLUP(1:2,inRight)= ICOLUP(1:2,t) 
+          ICOLUP(1:2,inLeft) = (/000,502/)
+          ICOLUP(1:2,inRight)= (/000,501/)
           MY_IDUP(b)   = Bot_;       ICOLUP(1:2,b)   = (/501,00/)
           MY_IDUP(W)   = DK_IDUP(1); ICOLUP(1:2,W)   = (/000,000/)
           MY_IDUP(lep) = DK_IDUP(3); ICOLUP(1:2,lep) = DK_ICOLUP(1:2,3)
@@ -233,31 +233,29 @@ EvalUnWeighted_TH = 0d0
           ICOLUP(1:2,Hbos) = (/000,000/)
           ICOLUP(1:2,t)    = (/000,501/)
           ICOLUP(1:2,qout) = (/000,502/)
-          ICOLUP(1:2,inLeft) = ICOLUP(1:2,qout)
-          ICOLUP(1:2,inRight)= ICOLUP(1:2,t) 
+          ICOLUP(1:2,inLeft) = (/502,000/)
+          ICOLUP(1:2,inRight)= (/501,000/)
           MY_IDUP(b)   = ABot_;      ICOLUP(1:2,b)  = (/000,501/)
           MY_IDUP(W)   = DK_IDUP(2); ICOLUP(1:2,W)  = (/000,000/)             
           MY_IDUP(lep) = DK_IDUP(6); ICOLUP(1:2,lep)= DK_ICOLUP(1:2,6)
           MY_IDUP(nu)  = DK_IDUP(5); ICOLUP(1:2,nu) = DK_ICOLUP(1:2,5)  
-! Markus, please check this! ------------ for u dbar -> H t bbar
       elseif( PROCESS.EQ.112 ) then
           ICOLUP(1:2,Hbos) = (/000,000/)
-          ICOLUP(1:2,t)    = (/501,000/)
+          ICOLUP(1:2,t)    = (/502,000/)
           ICOLUP(1:2,qout) = (/000,502/)
-          ICOLUP(1:2,inLeft) = ICOLUP(1:2,qout)
-          ICOLUP(1:2,inRight)= ICOLUP(1:2,t) 
-          MY_IDUP(b)   = ABot_;       ICOLUP(1:2,b)   = (/000,501/)
+          ICOLUP(1:2,inLeft) = (/501,000/)
+          ICOLUP(1:2,inRight)= (/000,501/)
+          MY_IDUP(b)   = ABot_;       ICOLUP(1:2,b)   = (/502,00/)
           MY_IDUP(W)   = DK_IDUP(1); ICOLUP(1:2,W)   = (/000,000/)
           MY_IDUP(lep) = DK_IDUP(3); ICOLUP(1:2,lep) = DK_ICOLUP(1:2,3)
           MY_IDUP(nu)  = DK_IDUP(4); ICOLUP(1:2,nu)  = DK_ICOLUP(1:2,4)  
-! Markus, please check this! ------------ for d ubar -> H tbar b
       elseif( PROCESS.EQ.113 ) then   
           ICOLUP(1:2,Hbos) = (/000,000/)
-          ICOLUP(1:2,t)    = (/000,501/)
+          ICOLUP(1:2,t)    = (/000,502/)
           ICOLUP(1:2,qout) = (/502,000/)
-          ICOLUP(1:2,inLeft) = ICOLUP(1:2,qout)
-          ICOLUP(1:2,inRight)= ICOLUP(1:2,t) 
-          MY_IDUP(b)   = ABot_;      ICOLUP(1:2,b)  = (/501,000/)
+          ICOLUP(1:2,inLeft) = (/501,000/)
+          ICOLUP(1:2,inRight)= (/000,501/)
+          MY_IDUP(b)   = ABot_;      ICOLUP(1:2,b)  = (/000,502/)
           MY_IDUP(W)   = DK_IDUP(2); ICOLUP(1:2,W)  = (/000,000/)             
           MY_IDUP(lep) = DK_IDUP(6); ICOLUP(1:2,lep)= DK_ICOLUP(1:2,6)
           MY_IDUP(nu)  = DK_IDUP(5); ICOLUP(1:2,nu) = DK_ICOLUP(1:2,5)  
@@ -266,33 +264,33 @@ EvalUnWeighted_TH = 0d0
    ELSE
 
       MomOffShell(1:4,1:5) = MomExt(1:4,1:5)
-      if( PROCESS.EQ.110 ) then
-          ICOLUP(1:2,Hbos) = (/000,000/)
-          ICOLUP(1:2,t)    = (/501,000/)
-          ICOLUP(1:2,qout) = (/502,000/)
-          ICOLUP(1:2,inLeft) = ICOLUP(1:2,qout)
-          ICOLUP(1:2,inRight)= ICOLUP(1:2,t) 
-      elseif( PROCESS.EQ.111 ) then
-          ICOLUP(1:2,Hbos) = (/000,000/)
-          ICOLUP(1:2,t)    = (/000,501/)
-          ICOLUP(1:2,qout) = (/000,502/)
-          ICOLUP(1:2,inLeft) = ICOLUP(1:2,qout)
-          ICOLUP(1:2,inRight)= ICOLUP(1:2,t) 
-! Markus, please check this: 
-      elseif( PROCESS.EQ.112 ) then
-          ICOLUP(1:2,Hbos) = (/000,000/)
-          ICOLUP(1:2,t)    = (/501,000/)
-          ICOLUP(1:2,qout) = (/000,502/)
-          ICOLUP(1:2,inLeft) = ICOLUP(1:2,qout)
-          ICOLUP(1:2,inRight)= ICOLUP(1:2,t) 
-      elseif( PROCESS.EQ.113 ) then
-          ICOLUP(1:2,Hbos) = (/000,000/)
-          ICOLUP(1:2,t)    = (/000,501/)
-          ICOLUP(1:2,qout) = (/502,000/)
-          ICOLUP(1:2,inLeft) = ICOLUP(1:2,qout)
-          ICOLUP(1:2,inRight)= ICOLUP(1:2,t) 
-      endif
-      MY_IDUP(6:9)=-9999
+!       if( PROCESS.EQ.110 ) then
+!           ICOLUP(1:2,Hbos) = (/000,000/)
+!           ICOLUP(1:2,t)    = (/501,000/)
+!           ICOLUP(1:2,qout) = (/502,000/)
+!           ICOLUP(1:2,inLeft) = ICOLUP(1:2,qout)
+!           ICOLUP(1:2,inRight)= ICOLUP(1:2,t) 
+!       elseif( PROCESS.EQ.111 ) then
+!           ICOLUP(1:2,Hbos) = (/000,000/)
+!           ICOLUP(1:2,t)    = (/000,501/)
+!           ICOLUP(1:2,qout) = (/000,502/)
+!           ICOLUP(1:2,inLeft) = ICOLUP(1:2,qout)
+!           ICOLUP(1:2,inRight)= ICOLUP(1:2,t) 
+! ! Markus, please check this: 
+!       elseif( PROCESS.EQ.112 ) then
+!           ICOLUP(1:2,Hbos) = (/000,000/)
+!           ICOLUP(1:2,t)    = (/501,000/)
+!           ICOLUP(1:2,qout) = (/000,502/)
+!           ICOLUP(1:2,inLeft) = ICOLUP(1:2,qout)
+!           ICOLUP(1:2,inRight)= ICOLUP(1:2,t) 
+!       elseif( PROCESS.EQ.113 ) then
+!           ICOLUP(1:2,Hbos) = (/000,000/)
+!           ICOLUP(1:2,t)    = (/000,501/)
+!           ICOLUP(1:2,qout) = (/502,000/)
+!           ICOLUP(1:2,inLeft) = ICOLUP(1:2,qout)
+!           ICOLUP(1:2,inRight)= ICOLUP(1:2,t) 
+!       endif
+!       MY_IDUP(6:9)=-9999
    ENDIF
 
    FluxFac = 1d0/(2d0*EHat**2)

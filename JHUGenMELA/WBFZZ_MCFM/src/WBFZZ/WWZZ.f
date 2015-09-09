@@ -175,20 +175,21 @@ c--- Make sure WWZA vertices included
 
 
 ! !      MARKUS: removed decay     
-!          WWZZamp(h34,h56)=WWZZamp(h34,h56)
-!      & -2d0*sqzmass/cxw**2*ZZ3456(h34,h56)
-!      & *za(i7,i8)*zb(i2,i1)
-!      & /(propw17*propw28)/4d0/ZZ3456(h34,h56)
+         WWZZamp(h34,h56)=WWZZamp(h34,h56)
+     & -2d0*sqzmass/cxw**2  *ZZ3456(h34,h56)
+     & *za(i7,i8)*zb(i2,i1)
+     & /(propw17*propw28)/4d0/ZZ3456(h34,h56)
 !      & /zmass*cxw**2/sqrt(cxw)**3d0*sqrt(1d0-cxw) !-- only  MCFM PR
+     & /zmass*cxw*sqrt(1d0-cxw) !-- only  MCFM PR
 
           
 !       MCFM original + anomalous
-         WWZZamp(h34,h56)=WWZZamp(h34,h56)
-     & -2d0*sqzmass/cxw**2*ZZ3456(h34,h56)
-!      &    *za(i7,i8)*zb(i2,i1)*za(i3,i5)*zb(i6,i4) !--  removed from MCFM
-     &     *anomzzamp(i3,i4,i5,i6,s3456,s(i3,i4),s(i5,i6),za,zb) !--added by Fabrizio 
-     &     *anomwwamp(i7,i1,i8,i2,s3456,s(i7,i1),s(i8,i2),za,zb) !--added by Fabrizio 
-     &    /(propWBF*prop3456)*Hbit
+!          WWZZamp(h34,h56)=WWZZamp(h34,h56)
+!      & -2d0*sqzmass/cxw**2*ZZ3456(h34,h56)
+! !      &    *za(i7,i8)*zb(i2,i1)*za(i3,i5)*zb(i6,i4) !--  removed from MCFM
+!      &     *anomzzamp(i3,i4,i5,i6,s3456,s(i3,i4),s(i5,i6),za,zb) !--added by Fabrizio 
+!      &     *anomwwamp(i7,i1,i8,i2,s3456,s(i7,i1),s(i8,i2),za,zb) !--added by Fabrizio 
+!      &    /(propWBF*prop3456)*Hbit
           
         enddo
       enddo

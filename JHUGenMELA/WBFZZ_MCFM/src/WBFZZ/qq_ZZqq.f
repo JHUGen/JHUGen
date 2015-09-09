@@ -289,7 +289,7 @@ c       cxw=dcmplx(xw,0d0) ! DEBUG: Madgraph comparison
        doHO=.false.
        doBO=.false.
 !        runstring(4:5)="what-nonsense-this-is"
-       runstring(4:5)="XX"
+       runstring(4:5)="HO"
        if     (runstring(4:5) .eq. 'HO') then
          doHO=.true.
        write(6,*) '>>>>>>>>>>>>>> Higgs contribution only <<<<<<<<<<<<<'

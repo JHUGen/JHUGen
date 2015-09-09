@@ -1356,7 +1356,7 @@ include 'csmaxvalue.f'
 integer,parameter :: maxpart=30!=max.part particles in LHE file; this parameter should match the one in WriteOutEvent of mod_Kinematics
 real(8) :: VG_Result,VG_Error,VG_Chi2
 real(8) :: yRnd(1:22),Res,dum,EMcheck(1:4)
-real(8) :: HiggsDK_Mom(1:4,4:13),Ehat
+real(8) :: HiggsDK_Mom(1:4,1:13),Ehat
 real(8) :: MomExt(1:4,1:maxpart),MomHiggs(1:4),Mass(1:maxpart),pH2sq
 integer :: tries, nParticle,  ICOLUP(1:2,1:7+maxpart),LHE_IntExt(1:7+maxpart),HiggsDK_IDUP(1:13),HiggsDK_ICOLUP(1:2,1:13)
 character(len=*),parameter :: POWHEG_Fmt0 = "(5X,I2,A160)"
