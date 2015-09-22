@@ -290,34 +290,39 @@ END FUNCTION
    real(8) :: MomExt(1:4,1:5), PSWgt
    real(8) :: me2(-5:5,-5:5)
    integer :: i,j,MY_IDUP(1:5),ICOLUP(1:2,1:5),NBin(1:NumHistograms),NHisto
+   integer :: iPartChannel,PartChannelAvg,NumPartonicChannels
    real(8) :: LO_Res_Unpol, PreFac
    logical :: applyPSCut
-   
+   integer, parameter :: ij_neg_offset=6, ij_max=+5
+   integer, parameter :: ij_num=ij_max+ij_neg_offset
    EvalWeighted_HJJ = 0d0
-
+   
+   if( Process.eq.60 ) NumPartonicChannels = 100! NumPartonicChannels=100 for WBF   (-5,..,-1,+1,..,+5)^2
+   iPartChannel = int(yRnd(8) * (NumPartonicChannels))! this runs from 0..99
+   
+   PartChannelAvg = NumPartonicChannels
+   iPart_sel = iPartChannel/ij_num + 1 -ij_neg_offset
+   jPart_sel = (iPartChannel+1) - (iPart_sel-1+ij_neg_offset)*ij_num - ij_neg_offset
+   if( (unweighted) .and. (.not. warmup) .and. (AccepCounter_part(iPart_sel,jPart_sel) .ge. RequEvents(iPart_sel,jPart_Sel))  ) return
+   
+   
+   
    call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
-   EvalCounter = EvalCounter+1
-
    if (EHat.lt.M_Reso) return
    if( Process.eq.60 ) call EvalPhaseSpace_VBF(EHat,M_Reso,yRnd(3:7),MomExt,PSWgt)
    if( Process.eq.61 ) call EvalPhaseSpace_VBF(EHat,M_Reso,yRnd(3:7),MomExt,PSWgt)
-   
 ! call EvalPhasespace_VBF_NEW2(yrnd(8),yRnd(3:7),EHat,MomExt,PSWgt)
 ! call EvalPhasespace_VBF_H4f(yrnd(17),yRnd(3:16),EHat,MomExt(:,:),PSWgt)
-   
-   
-   
    call boost2Lab(eta1,eta2,5,MomExt(1:4,1:5))
-
 
    if( Process.eq.60 ) call Kinematics_HVBF(5,MomExt,applyPSCut,NBin)
    if( Process.eq.61 ) call Kinematics_HJJ(5,MomExt,applyPSCut,NBin)
    if( applyPSCut .or. PSWgt.eq.zero ) return
+   EvalCounter = EvalCounter+1
    
 
    call setPDFs(eta1,eta2,Mu_Fact,pdf)
    FluxFac = 1d0/(2d0*EHat**2)
-
    if (process.eq.60) then
       call EvalAmp_WBFH_UnSymm_SA(MomExt,(/ghz1,ghz2,ghz3,ghz4/),(/ghw1,ghw2,ghw3,ghw4/),me2)
       
@@ -339,16 +344,39 @@ END FUNCTION
    endif
    
    LO_Res_Unpol = 0d0
-   do i = -5,5
-      do j = -5,5
-         LO_Res_Unpol = LO_Res_Unpol + me2(i,j)*pdf(LHA2M_pdf(i),1)*pdf(LHA2M_pdf(j),2)
-      enddo
-   enddo
-
-   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt 
+!    do i = -5,5
+!       do j = -5,5
+         LO_Res_Unpol = LO_Res_Unpol + me2(iPart_sel,jPart_sel)*pdf(LHA2M_pdf(iPart_sel),1)*pdf(LHA2M_pdf(jPart_sel),2)
+!       enddo
+!    enddo
+   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt  * PartChannelAvg
    EvalWeighted_HJJ = LO_Res_Unpol * PreFac
+   
+!    LO_Res_Unpol = 0d0
+!    do i = -5,5
+!       do j = -5,5
+!          LO_Res_Unpol = LO_Res_Unpol + me2(i,j)*pdf(LHA2M_pdf(i),1)*pdf(LHA2M_pdf(j),2)
+!       enddo
+!    enddo
+!    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt
+!    EvalWeighted_HJJ = LO_Res_Unpol * PreFac
+   
+
+   
+   
+if( unweighted ) then 
+
+  if( warmup ) then
+      CrossSec(iPart_sel,jPart_sel) = CrossSec(iPart_sel,jPart_sel) + EvalWeighted_HJJ*VgsWgt
+      CrossSecMax(iPart_sel,jPart_sel) = max(CrossSecMax(iPart_sel,jPart_sel),EvalWeighted_HJJ*VgsWgt)
+  else
+  
+  endif
 
 
+else! unweighted
+   
+   
    AccepCounter=AccepCounter+1
    if( writeWeightedLHE ) then 
        call WriteOutEvent_HVBF((/MomExt(1:4,1),MomExt(1:4,2),MomExt(1:4,3),MomExt(1:4,4),MomExt(1:4,5)/),MY_IDUP(1:5),ICOLUP(1:2,1:5),EventWeight=EvalWeighted_HJJ*VgsWgt)
@@ -357,7 +385,7 @@ END FUNCTION
        call intoHisto(NHisto,NBin(NHisto),EvalWeighted_HJJ*VgsWgt)
    enddo
 
-
+endif
 
 
  RETURN
