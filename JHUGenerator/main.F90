@@ -591,12 +591,13 @@ include "vegas_common.f"
          NDim = NDim + 2 ! sHat integration
          
 NDim = NDim + 1 ! for pdf sampling
+! NDim = NDim + 1 ! for PS sampling
         
          VegasIt1_default = 5
          VegasNc0_default = 10000000
          VegasNc1_default = 500000
          VegasNc2_default = 10000
-         if( unweighted ) NDim = NDim + 1  ! random number which decides if event is accepted
+!          if( unweighted ) NDim = NDim + 1  ! random number which decides if event is accepted
       endif
       !- HVBF with decays
       if(Process.eq.66) then
@@ -1036,7 +1037,7 @@ integer :: i, i1, j1,PChannel_aux, PChannel_aux1,NHisto
 include 'csmaxvalue.f'
 integer :: flav1,flav2,StatusPercent
 integer :: VegasSeed
-logical, parameter :: UseBetaVersion=.false.
+logical, parameter :: UseBetaVersion=.true.
 
 
 if( VegasIt1.eq.-1 ) VegasIt1 = VegasIt1_default
@@ -1121,7 +1122,7 @@ if( UseBetaVersion ) then
     
     itmx = 5
     ncall= VegasNc0
-    if( Process.eq.80 ) call vegas(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
+!     if( Process.eq.80 ) call vegas(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2) ! adjust to LHE format
 !     if( Process.eq.90 ) call vegas(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.60 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
 !     if( Process.eq.66 ) call vegas(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
@@ -1136,20 +1137,19 @@ if( UseBetaVersion ) then
     write(io_stdout,"(1X,A,F10.3,A,F10.3,A)") "Total xsec: ",VG_Result, " +/-",VG_Error, " fb"
 
     RequEvents(:,:)=0
-    do i1=-6,6
-    do j1=-6,6
+    do i1=-5,5
+    do j1=-5,5
         RequEvents(i1,j1) = RequEvents(i1,j1) + int( CrossSec(i1,j1)/VG_Result * VegasNc2 )
     enddo
     enddo
-    do i1=-6,6
-    do j1=-6,6
-        if( CrossSec(i1,j1).gt.1d-9 ) write(io_stdout,"(1X,A,I4,I4,F8.3,I9)") "Fractional partonic xsec ", i1,j1,CrossSec(i1,j1)/VG_Result,RequEvents(i1,j1)
+    do i1=-5,5
+    do j1=-5,5
+        if( CrossSec(i1,j1).gt.1d-9 ) write(io_stdout,"(1X,A,3X,F8.3,I9)") "Fractional partonic xsec "//getLHEParticle(i1)//" "//getLHEParticle(j1)//" ",CrossSec(i1,j1)/VG_Result,RequEvents(i1,j1)
     enddo
     enddo
-    write(io_stdout,"(1X,A,F8.3,I9)") "Sum        partonic xsec    x   x",sum(CrossSec(:,:))/VG_Result,sum(RequEvents(:,:))
+    write(io_stdout,"(1X,A,F8.3,I9)") "Sum        partonic xsec   x   x    ",sum(CrossSec(:,:))/VG_Result,sum(RequEvents(:,:))
 
       
-
       
     write(io_stdout,"(A)")  ""
     write(io_stdout,"(1X,A)")  "Event generation"
@@ -1165,10 +1165,12 @@ if( UseBetaVersion ) then
     
     CrossSecMax(:,:) = 1.0d0 * CrossSecMax(:,:)    !  adjustment factor
 
+
+    ncall= 500000
     call cpu_time(time_start)    
     do while( StatusPercent.lt.100d0  )
     
-        if( Process.eq.80 ) call vegas1(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
+!         if( Process.eq.80 ) call vegas1(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)! adjust to LHE format
     !     if( Process.eq.90 ) call vegas1(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
         if( Process.eq.60 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
     !     if( Process.eq.66 ) call vegas1(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
@@ -1178,11 +1180,11 @@ if( UseBetaVersion ) then
 !         if( Process.eq.112) call vegas1(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)      
 !         if( Process.eq.113) call vegas1(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)      
         call system('clear')
-        do i1=-6,6
-        do j1=-6,6
-            if( CrossSec(i1,j1).gt.1d-9 ) then 
+        do i1=-5,5
+        do j1=-5,5
+            if( RequEvents(i1,j1).gt.0 ) then 
 !                write(io_stdout,"(1X,A,I4,I4,2X,I7,2X,I7,2X,F8.3,1X,A)") "Generated events ", i1,j1,(AccepCounter_part(i1,j1)),(RequEvents(i1,j1)),dble(AccepCounter_part(i1,j1))/dble(RequEvents(i1,j1))*100d0,"%"
-               call PrintStatusBar2(int(dble(AccepCounter_part(i1,j1))/dble(RequEvents(i1,j1))*100),"channel "//getParticle(i1)//" "//getParticle(j1)//" ")
+               call PrintStatusBar2(int(dble(AccepCounter_part(i1,j1))/(dble(RequEvents(i1,j1)))*100),"channel "//getLHEParticle(i1)//" "//getLHEParticle(j1)//" ")
             endif   
         enddo
         enddo  
@@ -1192,7 +1194,12 @@ if( UseBetaVersion ) then
     write(io_stdout,*)  " event generation rate (events/sec)",dble(sum(AccepCounter_part(:,:)))/(time_end-time_start+1d-10)
 
     
+
+
 else! beta version
+
+
+
 
 !-------------------old stuff -------------------
     VG(:,:) = zero
@@ -3402,57 +3409,56 @@ implicit none
 integer :: StatusPercent
 character(len=*):: ThePreface
 
-
       if( StatusPercent.lt.4d0*1   ) then
-          write(*,"(2X,A,A,I3,A)") trim(ThePreface)," |------------------------| (",StatusPercent,"%)"
+          write(*,"(2X,A,A,I4,A)") trim(ThePreface)," |------------------------| (",StatusPercent,"%)"
       elseif( StatusPercent.lt.4d0*2   ) then
-          write(*,"(2X,A,A,I3,A)") trim(ThePreface)," |*-----------------------| (",StatusPercent,"%)"
+          write(*,"(2X,A,A,I4,A)") trim(ThePreface)," |*-----------------------| (",StatusPercent,"%)"
       elseif( StatusPercent.lt.4d0*3 ) then
-          write(*,"(2X,A,A,I3,A)") trim(ThePreface)," |-*----------------------| (",StatusPercent,"%)"
+          write(*,"(2X,A,A,I4,A)") trim(ThePreface)," |-*----------------------| (",StatusPercent,"%)"
       elseif( StatusPercent.lt.4d0*4 ) then
-          write(*,"(2X,A,A,I3,A)") trim(ThePreface)," |--*---------------------| (",StatusPercent,"%)"
+          write(*,"(2X,A,A,I4,A)") trim(ThePreface)," |--*---------------------| (",StatusPercent,"%)"
       elseif( StatusPercent.lt.4d0*5 ) then
-          write(*,"(2X,A,A,I3,A)") trim(ThePreface)," |---*--------------------| (",StatusPercent,"%)"
+          write(*,"(2X,A,A,I4,A)") trim(ThePreface)," |---*--------------------| (",StatusPercent,"%)"
       elseif( StatusPercent.lt.4d0*6 ) then
-          write(*,"(2X,A,A,I3,A)") trim(ThePreface)," |----*-------------------| (",StatusPercent,"%)"
+          write(*,"(2X,A,A,I4,A)") trim(ThePreface)," |----*-------------------| (",StatusPercent,"%)"
       elseif( StatusPercent.lt.4d0*7 ) then
-          write(*,"(2X,A,A,I3,A)") trim(ThePreface)," |-----*------------------| (",StatusPercent,"%)"
+          write(*,"(2X,A,A,I4,A)") trim(ThePreface)," |-----*------------------| (",StatusPercent,"%)"
       elseif( StatusPercent.lt.4d0*8 ) then
-          write(*,"(2X,A,A,I3,A)") trim(ThePreface)," |------*-----------------| (",StatusPercent,"%)"
+          write(*,"(2X,A,A,I4,A)") trim(ThePreface)," |------*-----------------| (",StatusPercent,"%)"
       elseif( StatusPercent.lt.4d0*9 ) then
-          write(*,"(2X,A,A,I3,A)") trim(ThePreface)," |-------*----------------| (",StatusPercent,"%)"
+          write(*,"(2X,A,A,I4,A)") trim(ThePreface)," |-------*----------------| (",StatusPercent,"%)"
       elseif( StatusPercent.lt.4d0*10) then
-          write(*,"(2X,A,A,I3,A)") trim(ThePreface)," |--------*---------------| (",StatusPercent,"%)"
+          write(*,"(2X,A,A,I4,A)") trim(ThePreface)," |--------*---------------| (",StatusPercent,"%)"
       elseif( StatusPercent.lt.4d0*11) then
-          write(*,"(2X,A,A,I3,A)") trim(ThePreface)," |---------*--------------| (",StatusPercent,"%)"
+          write(*,"(2X,A,A,I4,A)") trim(ThePreface)," |---------*--------------| (",StatusPercent,"%)"
       elseif( StatusPercent.lt.4d0*12) then
-          write(*,"(2X,A,A,I3,A)") trim(ThePreface)," |----------*-------------| (",StatusPercent,"%)"
+          write(*,"(2X,A,A,I4,A)") trim(ThePreface)," |----------*-------------| (",StatusPercent,"%)"
       elseif( StatusPercent.lt.4d0*13) then
-          write(*,"(2X,A,A,I3,A)") trim(ThePreface)," |-----------*------------| (",StatusPercent,"%)"
+          write(*,"(2X,A,A,I4,A)") trim(ThePreface)," |-----------*------------| (",StatusPercent,"%)"
       elseif( StatusPercent.lt.4d0*14) then
-          write(*,"(2X,A,A,I3,A)") trim(ThePreface)," |------------*-----------| (",StatusPercent,"%)"
+          write(*,"(2X,A,A,I4,A)") trim(ThePreface)," |------------*-----------| (",StatusPercent,"%)"
       elseif( StatusPercent.lt.4d0*15) then
-          write(*,"(2X,A,A,I3,A)") trim(ThePreface)," |-------------*----------| (",StatusPercent,"%)"
+          write(*,"(2X,A,A,I4,A)") trim(ThePreface)," |-------------*----------| (",StatusPercent,"%)"
       elseif( StatusPercent.lt.4d0*16) then
-          write(*,"(2X,A,A,I3,A)") trim(ThePreface)," |--------------*---------| (",StatusPercent,"%)"
+          write(*,"(2X,A,A,I4,A)") trim(ThePreface)," |--------------*---------| (",StatusPercent,"%)"
       elseif( StatusPercent.lt.4d0*17) then
-          write(*,"(2X,A,A,I3,A)") trim(ThePreface)," |---------------*--------| (",StatusPercent,"%)"
+          write(*,"(2X,A,A,I4,A)") trim(ThePreface)," |---------------*--------| (",StatusPercent,"%)"
       elseif( StatusPercent.lt.4d0*18) then
-          write(*,"(2X,A,A,I3,A)") trim(ThePreface)," |----------------*-------| (",StatusPercent,"%)"
+          write(*,"(2X,A,A,I4,A)") trim(ThePreface)," |----------------*-------| (",StatusPercent,"%)"
       elseif( StatusPercent.lt.4d0*19) then
-          write(*,"(2X,A,A,I3,A)") trim(ThePreface)," |-----------------*------| (",StatusPercent,"%)"
+          write(*,"(2X,A,A,I4,A)") trim(ThePreface)," |-----------------*------| (",StatusPercent,"%)"
       elseif( StatusPercent.lt.4d0*20) then
-          write(*,"(2X,A,A,I3,A)") trim(ThePreface)," |------------------*-----| (",StatusPercent,"%)"
+          write(*,"(2X,A,A,I4,A)") trim(ThePreface)," |------------------*-----| (",StatusPercent,"%)"
       elseif( StatusPercent.lt.4d0*21) then
-          write(*,"(2X,A,A,I3,A)") trim(ThePreface)," |-------------------*----| (",StatusPercent,"%)"
+          write(*,"(2X,A,A,I4,A)") trim(ThePreface)," |-------------------*----| (",StatusPercent,"%)"
       elseif( StatusPercent.lt.4d0*22) then
-          write(*,"(2X,A,A,I3,A)") trim(ThePreface)," |--------------------*---| (",StatusPercent,"%)"
+          write(*,"(2X,A,A,I4,A)") trim(ThePreface)," |--------------------*---| (",StatusPercent,"%)"
       elseif( StatusPercent.lt.4d0*23) then
-          write(*,"(2X,A,A,I3,A)") trim(ThePreface)," |---------------------*--| (",StatusPercent,"%)"
+          write(*,"(2X,A,A,I4,A)") trim(ThePreface)," |---------------------*--| (",StatusPercent,"%)"
       elseif( StatusPercent.lt.4d0*24) then
-          write(*,"(2X,A,A,I3,A)") trim(ThePreface)," |----------------------*-| (",StatusPercent,"%)"
+          write(*,"(2X,A,A,I4,A)") trim(ThePreface)," |----------------------*-| (",StatusPercent,"%)"
       else
-          write(*,"(2X,A,A,I3,A)") trim(ThePreface)," |-----------------------*| (",StatusPercent,"%)"
+          write(*,"(2X,A,A,I4,A)") trim(ThePreface)," |-----------------------*| (",StatusPercent,"%)"
       endif
    
 return

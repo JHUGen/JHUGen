@@ -275,7 +275,7 @@ END FUNCTION
 
  
 
-
+ ! since the me2(:,:) array is defined from -5..+5, the iPart_sel,jPart_sel have to follow the LHE numbering convention
  FUNCTION EvalWeighted_HJJ(yRnd,VgsWgt)
  use ModKinematics
  use ModParameters
@@ -291,27 +291,28 @@ END FUNCTION
    real(8) :: me2(-5:5,-5:5)
    integer :: i,j,MY_IDUP(1:5),ICOLUP(1:2,1:5),NBin(1:NumHistograms),NHisto
    integer :: iPartChannel,PartChannelAvg,NumPartonicChannels
-   real(8) :: LO_Res_Unpol, PreFac
-   logical :: applyPSCut
+   real(8) :: LO_Res_Unpol, PreFac,xRnd
+   logical :: applyPSCut,ZZ_Fusion
    integer, parameter :: ij_neg_offset=6, ij_max=+5
    integer, parameter :: ij_num=ij_max+ij_neg_offset
    EvalWeighted_HJJ = 0d0
    
-   if( Process.eq.60 ) NumPartonicChannels = 100! NumPartonicChannels=100 for WBF   (-5,..,-1,+1,..,+5)^2
-   iPartChannel = int(yRnd(8) * (NumPartonicChannels))! this runs from 0..99
+ 
+   if( Process.eq.60 ) NumPartonicChannels = 121 !=ij_num**2=121 for WBF   (-5,..,-1,0,+1,..,+5)^2
+   iPartChannel = int(yRnd(8) * (NumPartonicChannels))! this runs from 0..120
    
    PartChannelAvg = NumPartonicChannels
    iPart_sel = iPartChannel/ij_num + 1 -ij_neg_offset
-   jPart_sel = (iPartChannel+1) - (iPart_sel-1+ij_neg_offset)*ij_num - ij_neg_offset
+   jPart_sel = (iPartChannel+1) - (iPart_sel-1+ij_neg_offset)*ij_num - ij_neg_offset  
+   if( jPart_sel.gt.iPart_sel ) return
    if( (unweighted) .and. (.not. warmup) .and. (AccepCounter_part(iPart_sel,jPart_sel) .ge. RequEvents(iPart_sel,jPart_Sel))  ) return
    
-   
-   
+      
    call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
    if (EHat.lt.M_Reso) return
    if( Process.eq.60 ) call EvalPhaseSpace_VBF(EHat,M_Reso,yRnd(3:7),MomExt,PSWgt)
    if( Process.eq.61 ) call EvalPhaseSpace_VBF(EHat,M_Reso,yRnd(3:7),MomExt,PSWgt)
-! call EvalPhasespace_VBF_NEW2(yrnd(8),yRnd(3:7),EHat,MomExt,PSWgt)
+! call EvalPhasespace_VBF_NEW2(yrnd(9),yRnd(3:7),EHat,MomExt,PSWgt)
 ! call EvalPhasespace_VBF_H4f(yrnd(17),yRnd(3:16),EHat,MomExt(:,:),PSWgt)
    call boost2Lab(eta1,eta2,5,MomExt(1:4,1:5))
 
@@ -324,8 +325,12 @@ END FUNCTION
    call setPDFs(eta1,eta2,Mu_Fact,pdf)
    FluxFac = 1d0/(2d0*EHat**2)
    if (process.eq.60) then
-      call EvalAmp_WBFH_UnSymm_SA(MomExt,(/ghz1,ghz2,ghz3,ghz4/),(/ghw1,ghw2,ghw3,ghw4/),me2)
-      
+!       call EvalAmp_WBFH_UnSymm_SA(MomExt,(/ghz1,ghz2,ghz3,ghz4/),(/ghw1,ghw2,ghw3,ghw4/),me2)
+
+      me2(:,:) = 0d0
+      call EvalAmp_WBFH_UnSymm_SA_Select( MomExt,(/ghz1,ghz2,ghz3,ghz4/),(/ghw1,ghw2,ghw3,ghw4/),iPart_sel,jPart_sel,me2)     
+      call EvalAmp_WBFH_UnSymm_SA_Select( MomExt,(/ghz1,ghz2,ghz3,ghz4/),(/ghw1,ghw2,ghw3,ghw4/),jPart_sel,iPart_sel,me2)     
+
       MY_IDUP(1:5)  = (/Up_,Up_,Up_,Up_,Hig_/)
       ICOLUP(1:2,1) = (/501,000/)
       ICOLUP(1:2,2) = (/502,000/)
@@ -343,38 +348,88 @@ END FUNCTION
       ICOLUP(1:2,5) = (/000,000/)
    endif
    
-   LO_Res_Unpol = 0d0
-!    do i = -5,5
-!       do j = -5,5
-         LO_Res_Unpol = LO_Res_Unpol + me2(iPart_sel,jPart_sel)*pdf(LHA2M_pdf(iPart_sel),1)*pdf(LHA2M_pdf(jPart_sel),2)
-!       enddo
-!    enddo
+
+                                               LO_Res_Unpol = me2(iPart_sel,jPart_sel) * pdf(LHA2M_pdf(iPart_sel),1)*pdf(LHA2M_pdf(jPart_sel),2)
+   if( iPart_sel.ne.jPart_sel ) LO_Res_Unpol = LO_Res_Unpol + me2(jPart_sel,iPart_sel) * pdf(LHA2M_pdf(jPart_sel),1)*pdf(LHA2M_pdf(iPart_sel),2)
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt  * PartChannelAvg
    EvalWeighted_HJJ = LO_Res_Unpol * PreFac
    
-!    LO_Res_Unpol = 0d0
-!    do i = -5,5
-!       do j = -5,5
-!          LO_Res_Unpol = LO_Res_Unpol + me2(i,j)*pdf(LHA2M_pdf(i),1)*pdf(LHA2M_pdf(j),2)
-!       enddo
-!    enddo
-!    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt
-!    EvalWeighted_HJJ = LO_Res_Unpol * PreFac
-   
-
-   
+  
    
 if( unweighted ) then 
 
   if( warmup ) then
+
       CrossSec(iPart_sel,jPart_sel) = CrossSec(iPart_sel,jPart_sel) + EvalWeighted_HJJ*VgsWgt
       CrossSecMax(iPart_sel,jPart_sel) = max(CrossSecMax(iPart_sel,jPart_sel),EvalWeighted_HJJ*VgsWgt)
-  else
-  
-  endif
+
+  else! not warmup
+
+      MY_IDUP(1:2)= (/LHA2M_ID(iPart_sel),LHA2M_ID(jPart_sel)/)
+      if( MY_IDUP(1).gt.0 ) then ! quark
+          ICOLUP(1:2,1) = (/501,000/)
+      else! anti-quark
+          ICOLUP(1:2,1) = (/000,501/)
+      endif
+      if( MY_IDUP(2).gt.0 ) then! quark
+          ICOLUP(1:2,2) = (/502,000/)
+      else! anti-quark
+          ICOLUP(1:2,2) = (/000,502/)
+      endif
+
+      ZZ_fusion=.false.
+      if( MY_IDUP(1).eq.MY_IDUP(2) ) ZZ_fusion=.true.
+      if( any(MY_IDUP(1).eq.(/ Up_, Chm_,ADn_,AStr_,ABot_/)) .and. any(MY_IDUP(2).eq.(/ Up_, Chm_,ADn_,AStr_,ABot_/)) ) ZZ_fusion=.true.
+      if( any(MY_IDUP(1).eq.(/AUp_,AChm_, Dn_, Str_, Bot_/)) .and. any(MY_IDUP(2).eq.(/AUp_,AChm_, Dn_, Str_, Bot_/)) ) ZZ_fusion=.true.
+
+      if( ZZ_Fusion ) then
+          if( (MomExt(4,1)*MomExt(4,3).lt.0d0) .and. (MomExt(4,2)*MomExt(4,4).lt.0d0) ) then ! wrong configuration --> swap 3 and 4
+             MY_IDUP(3:4)= (/LHA2M_ID(jPart_sel),LHA2M_ID(iPart_sel)/)
+             ICOLUP(1:2,4) = ICOLUP(1:2,1)
+             ICOLUP(1:2,3) = ICOLUP(1:2,2)
+          else! 
+             MY_IDUP(3:4)= (/LHA2M_ID(iPart_sel),LHA2M_ID(jPart_sel)/)
+             ICOLUP(1:2,3) = ICOLUP(1:2,1)
+             ICOLUP(1:2,4) = ICOLUP(1:2,2)
+          endif
+      else! WW fusion
+          if( (MomExt(4,1)*MomExt(4,3).lt.0d0) .and. (MomExt(4,2)*MomExt(4,4).lt.0d0) ) then ! wrong configuration --> swap 3 and 4
+             MY_IDUP(3:4)= (/SU2flip(LHA2M_ID(jPart_sel)),SU2flip(LHA2M_ID(iPart_sel))/)
+             if( abs(MY_IDUP(3)).eq.Top_ ) MY_IDUP(3) = sign(1,MY_IDUP(3))*Chm_
+             if( abs(MY_IDUP(4)).eq.Top_ ) MY_IDUP(4) = sign(1,MY_IDUP(4))*Chm_ 
+             ICOLUP(1:2,4) = ICOLUP(1:2,1)
+             ICOLUP(1:2,3) = ICOLUP(1:2,2)
+          else
+             MY_IDUP(3:4)= (/SU2flip(LHA2M_ID(iPart_sel)),SU2flip(LHA2M_ID(jPart_sel))/)
+             if( abs(MY_IDUP(3)).eq.Top_ ) MY_IDUP(3) = sign(1,MY_IDUP(3))*Chm_
+             if( abs(MY_IDUP(4)).eq.Top_ ) MY_IDUP(4) = sign(1,MY_IDUP(4))*Chm_ 
+             ICOLUP(1:2,3) = ICOLUP(1:2,1)
+             ICOLUP(1:2,4) = ICOLUP(1:2,2)
+          endif         
+      endif
+      MY_IDUP(5)  = Hig_
+      ICOLUP(1:2,5) = (/000,000/)
+
+      
+      call random_number(xRnd) 
+      if( EvalWeighted_HJJ*VgsWgt.gt.CrossSecMax(iPart_sel,jPart_sel) ) then
+          write(io_LogFile,"(2X,A,1PE13.6,1PE13.6)") "CrossSecMax is too small.",EvalWeighted_HJJ*VgsWgt, CrossSecMax(iPart_sel,jPart_sel)
+  !          write(io_stdout, "(2X,A,1PE13.6,1PE13.6)") "CrossSecMax is too small.",EvalWeighted_HJJ*VgsWgt, CrossSecMax(iPart_sel,jPart_sel)
+          AlertCounter = AlertCounter + 1
+      elseif( EvalWeighted_HJJ*VgsWgt .gt. xRnd*CrossSecMax(iPart_sel,jPart_sel) ) then
+          AccepCounter = AccepCounter + 1
+          AccepCounter_part(iPart_sel,jPart_sel) = AccepCounter_part(iPart_sel,jPart_sel) + 1
+          call WriteOutEvent_HVBF((/MomExt(1:4,1),MomExt(1:4,2),MomExt(1:4,3),MomExt(1:4,4),MomExt(1:4,5)/),MY_IDUP(1:5),ICOLUP(1:2,1:5),EventWeight=EvalWeighted_HJJ*VgsWgt)
+          do NHisto=1,NumHistograms
+                call intoHisto(NHisto,NBin(NHisto),1d0)
+          enddo
+      endif
+       
+  endif! warmup
 
 
-else! unweighted
+
+else! weighted
    
    
    AccepCounter=AccepCounter+1

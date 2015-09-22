@@ -694,6 +694,10 @@ integer :: Part
 
 END FUNCTION
 
+
+
+
+
 FUNCTION getParticle(Part)
 implicit none
 character(len=3) :: getParticle
@@ -729,11 +733,11 @@ integer :: Part
   elseif( Part.eq.ANuT_ ) then
       getParticle = "AnT"
   elseif( Part.eq.Up_ ) then
-      getParticle = "up "
+      getParticle = " up"
   elseif( Part.eq.AUp_ ) then
       getParticle = "Aup"
   elseif( Part.eq.Dn_ ) then
-      getParticle = "dn "
+      getParticle = " dn"
   elseif( Part.eq.ADn_ ) then
       getParticle = "Adn"
   elseif( Part.eq.Chm_ ) then
@@ -753,11 +757,11 @@ integer :: Part
   elseif( Part.eq.ATop_ ) then
       getParticle = "Atop"
   elseif( Part.eq.Z0_ ) then
-      getParticle = "Z0 "
+      getParticle = " Z0"
   elseif( Part.eq.Wp_ ) then
-      getParticle = "W+ "
+      getParticle = " W+"
   elseif( Part.eq.Wm_ ) then
-      getParticle = "W- "
+      getParticle = " W-"
   elseif( Part.eq.Pho_ ) then
       getParticle = "pho"
   elseif( Part.eq.Hig_ ) then
@@ -767,6 +771,23 @@ integer :: Part
      stop
   endif
 
+
+END FUNCTION
+
+
+
+
+
+
+
+FUNCTION getLHEParticle(PartLHE)
+implicit none
+character(len=3) :: getLHEParticle
+integer :: PartLHE,Part
+
+
+  Part = convertLHEreverse(PartLHE)
+  getLHEParticle = getParticle(Part)
 
 END FUNCTION
 
