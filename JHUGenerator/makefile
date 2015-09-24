@@ -9,13 +9,13 @@ VegasDir = $(Here)/vegas
 
 # compiler options, Comp='ifort' or 'gfort'
 Opt  = Yes
-Comp = gfort
+Comp = ifort
 
 # link pdfs via LHA library ('Yes' or 'No')
 UseLHAPDF=No
 
 # directory which contains libLHAPDF.a, libLHAPDF.la, libLHAPDF.so
-MyLHADir=/home/schulze/lib/LHAPDF-6.1.5/lib/
+MyLHADir=/afs/cern.ch/user/m/maschulz/lib/LHAPDF-6.1.5/lib/
 # remember to export 
 #          LD_LIBRARY_PATH=/.../LHAPDF-x.y.z/lib/:${LD_LIBRARY_PATH}
 #          LHAPDF_DATA_PATH=/.../LHAPDF-x.y.z/share/LHAPDF/:${LHAPDF_DATA_PATH}
@@ -26,7 +26,7 @@ ifeq ($(Comp),gfort)
  ifeq ($(Opt),Yes)
     OptOpts  = -O3
  else
-    OptOpts  = -O0
+    OptOpts  = -O0 -fcheck=all
  endif
  ifeq ($(UseLHAPDF),Yes)
     LHAPDFflags = -L$(MyLHADir) -lLHAPDF -DuseLHAPDF=1
@@ -41,7 +41,7 @@ ifeq ($(Comp),ifort)
  ifeq ($(Opt),Yes)
     OptOpts  = -O2 -vec-report0 -diag-disable remark
  else
-    OptOpts  = -O0 -implicitnone -zero -check bounds -check pointer -warn interfaces -ftrapuv  -diag-disable remark 
+    OptOpts  = -O0 -implicitnone -check bounds -check pointer -warn interfaces -ftrapuv  -diag-disable remark -debug extended -g -traceback -fpe0 -check uninit
  endif
  ifeq ($(UseLHAPDF),Yes)
     LHAPDFflags = -L$(MyLHADir) -lLHAPDF -DuseLHAPDF=1
@@ -61,7 +61,8 @@ Exec = ./JHUGen
 
 
 # main dependencies
-MainDep = mod_Kinematics.F90 \
+MainDep = mod_Phasespace.F90 \
+          mod_Kinematics.F90 \
           mod_CrossSection.F90 \
           mod_CrossSection_HJJ.F90 \
           mod_CrossSection_TTBH.F90 \
@@ -70,7 +71,8 @@ MainDep = mod_Kinematics.F90 \
           main.F90
 
 # main objects
-MainObj = $(ObjectDir)/mod_Kinematics.o \
+MainObj = $(ObjectDir)/mod_Phasespace.o \
+          $(ObjectDir)/mod_Kinematics.o \
           $(ObjectDir)/mod_CrossSection.o \
           $(ObjectDir)/mod_CrossSection_HJJ.o \
           $(ObjectDir)/mod_CrossSection_TTBH.o \
@@ -119,7 +121,6 @@ PDFObj   = $(ObjectDir)/Cteq61Pdf.o \
 
 PSGenDep = genps.c \
            boost.c
-
 PSGenObj = $(ObjectDir)/genps.o \
            $(ObjectDir)/boost.o
 
@@ -165,7 +166,7 @@ endif
 	@echo " executable file is "$(Exec) "compiled with "$(Comp)
 	@echo " "
 	$(fcomp) -o $(Exec) $(MainObj) $(AmpObj) $(PSGenObj) $(VegasObj) $(PDFObj) 
-# $(MCFM_Obj)
+#  $(MCFM_Obj) 
 
 
 
@@ -209,7 +210,6 @@ clean:
 	rm -f modules/*.mod
 	rm -f modules/*.f90
 	rm -f *.mod
-	rm -f *.o
 	rm -f $(Exec)
 
 # supresses command calls

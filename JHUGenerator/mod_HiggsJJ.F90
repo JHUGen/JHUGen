@@ -3,7 +3,7 @@ module modHiggsJJ
   implicit none
   private
 
-  public :: EvalAmp_WBFH_UnSymm_SA
+  public :: EvalAmp_WBFH_UnSymm_SA,EvalAmp_WBFH_UnSymm_SA_Select
   public :: EvalAmp_SBFH_UnSymm_SA
 
   !-- general definitions, to be merged with Markus final structure
@@ -153,6 +153,12 @@ contains
   end subroutine EvalAmp_SBFH_UnSymm_SA
 
 
+
+
+
+
+
+
   subroutine EvalAmp_WBFH_UnSymm_SA(p,vvcoupl,wwcoupl,res)
     real(dp), intent(in) :: p(4,5)
     complex(dp), intent(in) :: vvcoupl(4),wwcoupl(4)! wwcoupl is only used (for H->WW) if it includes non-zero values
@@ -163,8 +169,8 @@ contains
     complex(dp) :: za(4,4), zb(4,4)
     real(dp), parameter :: Lu = aL_QUp**2, Ru = aR_QUp**2
     real(dp), parameter :: Ld = aL_QDn**2, Rd = aR_QDn**2
-    real(dp), parameter :: couplz = gwsq * xw/twosc**2
-    real(dp), parameter :: couplw = gwsq/two
+    real(dp), parameter :: couplz = gwsq * xw/twosc**2         !*M_Z/sitW/dsqrt(1d0-sitW**2)! MARKUS ADDED HVV COUPLINGS: CHECK!!
+    real(dp), parameter :: couplw = gwsq/two                   !*M_W/sitW
     real(dp) :: restmp
     integer :: i, j, j1, j2, iflip, pdfindex(2)
 
@@ -236,6 +242,7 @@ contains
     res(pdfAStr_,pdfAStr_) = restmp
     res(pdfABot_,pdfABot_) = restmp * tagbot
 
+    ! NEED TO ADJSUT J1,J2 in W AMPS HERE
     !-- W/Z interference
     j1 = 1
     j2 = 2
@@ -251,12 +258,12 @@ contains
        restmp = ((abs(amp_z(-1,-1))**2) * Ld * Lu + &
             (abs(amp_z(-1,+1))**2) * Ld * Ru + &
             (abs(amp_z(+1,-1))**2) * Rd * Lu + &
-            (abs(amp_z(+1,+1))**2) * Rd * Ru) * couplz**2 * xn**2
+            (abs(amp_z(+1,+1))**2) * Rd * Ru) * couplz**2 * xn**2  !*00  !MARKUS
 
        restmp = restmp + abs(amp_w(-1,-1))**2 * couplw**2 * xn**2
 
        restmp = restmp + two * real(amp_z(-1,-1)*conjg(amp_w(-1,-1)),kind=dp) * &
-            aL_QUp * aL_QDn * couplz * couplw * xn
+            aL_QUp * aL_QDn * couplz * couplw * xn  ! *00000000d0 !MARKUS: switching off the interference
 
        restmp = restmp * aveqq
 
@@ -393,8 +400,10 @@ contains
        amp_z = A0_VV_4f(3,j1,4,j2,vvcoupl,za,zb,sprod,m_z,ga_z)      
        if( all(cdabs(wwcoupl(:)).lt.1d-15) ) then
           amp_w = A0_VV_4f(3,j2,4,j1,vvcoupl,za,zb,sprod,m_w,ga_w)
+!           amp_w = A0_VV_4f(3,j1,4,j2,vvcoupl,za,zb,sprod,m_w,ga_w)! MARKUS
        else
           amp_w = A0_VV_4f(3,j2,4,j1,wwcoupl,za,zb,sprod,m_w,ga_w,useWWcoupl=.true.)
+!           amp_w = A0_VV_4f(3,j1,4,j2,wwcoupl,za,zb,sprod,m_w,ga_w,useWWcoupl=.true.)! MARKUS
        endif
 
        !--uc -> uc
@@ -410,14 +419,14 @@ contains
        restmp = ((abs(amp_z(-1,-1))**2) * Lu * Ld + &
             (abs(amp_z(-1,+1))**2) * Lu * Rd + &
             (abs(amp_z(+1,-1))**2) * Ru * Ld + &
-            (abs(amp_z(+1,+1))**2) * Ru * Rd) * couplz**2 * SpinAvg * tag1
+            (abs(amp_z(+1,+1))**2) * Ru * Rd) * couplz**2 * SpinAvg * tag1  *1d0
 
        pdfindex = flip(iflip,pdfUp_,pdfBot_)
        res(pdfindex(1),pdfindex(2)) = restmp * tagbot
        pdfindex = flip(iflip,pdfChm_,pdfBot_)
        res(pdfindex(1),pdfindex(2)) = restmp * tagbot
        
-       restmp = restmp + abs(amp_w(-1,-1))**2 * couplw**2 * SpinAvg * tag2
+       restmp = restmp + abs(amp_w(-1,-1))**2 * couplw**2 * SpinAvg * tag2  *1d0
 
        pdfindex = flip(iflip,pdfUp_,pdfStr_)
        res(pdfindex(1),pdfindex(2)) = restmp
@@ -493,6 +502,1054 @@ contains
     return
 
   end subroutine EvalAmp_WBFH_UnSymm_SA
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  SUBROUTINE EvalAmp_WBFH_UnSymm_SA_Select(p,vvcoupl,wwcoupl,iSel,jSel,res)
+  implicit none
+    real(dp), intent(in) :: p(4,5)
+    complex(dp), intent(in) :: vvcoupl(4),wwcoupl(4)! wwcoupl is only used (for H->WW) if it includes non-zero values
+    real(dp), intent(out) :: res(-5:5,-5:5)
+    integer, intent(in) :: iSel,jSel
+    complex(dp) :: amp_z(-1:1,-1:1), amp_z_b(-1:1,-1:1)
+    complex(dp) :: amp_w(-1:1,-1:1)
+    real(dp) :: sprod(4,4)
+    complex(dp) :: za(4,4), zb(4,4)
+    real(dp), parameter :: Lu = aL_QUp**2, Ru = aR_QUp**2
+    real(dp), parameter :: Ld = aL_QDn**2, Rd = aR_QDn**2
+    real(dp), parameter :: couplz = gwsq * xw/twosc**2        
+    real(dp), parameter :: couplw = gwsq/two                  
+    real(dp) :: restmp
+    integer :: i, j, j1, j2, iflip, pdfindex(2)
+
+    call spinoru(4,(/-p(:,1),-p(:,2),p(:,3),p(:,4)/),za,zb,sprod)
+
+
+
+    !-- qq->qq, up
+if( (iSel.eq.pdfUp_ .and. jSel.eq.pdfUp_) .or. (iSel.eq.pdfChm_ .and. jSel.eq.pdfChm_) ) then
+    amp_z = A0_VV_4f(4,1,3,2,vvcoupl,za,zb,sprod,m_z,ga_z)
+    amp_z_b = -A0_VV_4f(3,1,4,2,vvcoupl,za,zb,sprod,m_z,ga_z)
+    
+    restmp = ((abs(amp_z(-1,-1))**2+abs(amp_z_b(-1,-1))**2) * Lu**2 + &
+         (abs(amp_z(-1,+1))**2+abs(amp_z_b(-1,+1))**2) * Lu * Ru + &
+         (abs(amp_z(+1,-1))**2+abs(amp_z_b(+1,-1))**2) * Lu * Ru + &
+         (abs(amp_z(+1,+1))**2+abs(amp_z_b(+1,+1))**2) * Ru**2) * xn**2
+
+    restmp = restmp + (two * real(amp_z(-1,-1)*conjg(amp_z_b(-1,-1)),kind=dp) * Lu**2 + &
+            two * real(amp_z(+1,+1)*conjg(amp_z_b(+1,+1)),kind=dp) * Ru**2) * xn
+
+    restmp = restmp * SymmFac * aveqq * couplz**2
+
+    res(pdfUp_,pdfUp_) = restmp
+    res(pdfChm_,pdfChm_) = restmp
+return
+endif
+
+
+
+
+
+
+
+
+
+    !-- qq->qq, down
+if( (iSel.eq.pdfDn_ .and. jSel.eq.pdfDn_) .or. (iSel.eq.pdfStr_ .and. jSel.eq.pdfStr_) .or. (iSel.eq.pdfBot_ .and. jSel.eq.pdfBot_) ) then
+    amp_z = A0_VV_4f(4,1,3,2,vvcoupl,za,zb,sprod,m_z,ga_z)
+    amp_z_b = -A0_VV_4f(3,1,4,2,vvcoupl,za,zb,sprod,m_z,ga_z)
+    restmp = ((abs(amp_z(-1,-1))**2+abs(amp_z_b(-1,-1))**2) * Ld**2 + &
+         (abs(amp_z(-1,+1))**2+abs(amp_z_b(-1,+1))**2) * Ld * Rd + &
+         (abs(amp_z(+1,-1))**2+abs(amp_z_b(+1,-1))**2) * Ld * Rd + &
+         (abs(amp_z(+1,+1))**2+abs(amp_z_b(+1,+1))**2) * Rd**2) * xn**2
+
+    restmp = restmp + (two * real(amp_z(-1,-1)*conjg(amp_z_b(-1,-1)),kind=dp) * Ld**2 + &
+            two * real(amp_z(+1,+1)*conjg(amp_z_b(+1,+1)),kind=dp) * Rd**2) * xn
+
+    restmp = restmp * SymmFac * aveqq * couplz**2
+
+    res(pdfDn_,pdfDn_) = restmp
+    res(pdfStr_,pdfStr_) = restmp
+    res(pdfBot_,pdfBot_) = restmp * tagbot
+return
+endif
+
+
+
+
+
+
+
+
+
+    !-- qbqb->qbqb, aup
+if( (iSel.eq.pdfAUp_ .and. jSel.eq.pdfAUp_) .or. (iSel.eq.pdfAChm_ .and. jSel.eq.pdfAChm_) ) then
+    amp_z = A0_VV_4f(1,4,2,3,vvcoupl,za,zb,sprod,m_z,ga_z)
+    amp_z_b = -A0_VV_4f(1,3,2,4,vvcoupl,za,zb,sprod,m_z,ga_z)
+
+    restmp = ((abs(amp_z(-1,-1))**2+abs(amp_z_b(-1,-1))**2) * Lu**2 + &
+         (abs(amp_z(-1,+1))**2+abs(amp_z_b(-1,+1))**2) * Lu * Ru + &
+         (abs(amp_z(+1,-1))**2+abs(amp_z_b(+1,-1))**2) * Lu * Ru + &
+         (abs(amp_z(+1,+1))**2+abs(amp_z_b(+1,+1))**2) * Ru**2) * xn**2
+
+    restmp = restmp + (two * real(amp_z(-1,-1)*conjg(amp_z_b(-1,-1)),kind=dp) * Lu**2 + &
+            two * real(amp_z(+1,+1)*conjg(amp_z_b(+1,+1)),kind=dp) * Ru**2) * xn
+
+    restmp = restmp * SymmFac * aveqq * couplz**2
+
+    res(pdfAUp_,pdfAUp_) = restmp
+    res(pdfAChm_,pdfAChm_) = restmp
+return
+endif
+
+
+
+
+
+
+
+    !-- qbqb->qbqb, adn
+if( (iSel.eq.pdfADn_ .and. jSel.eq.pdfADn_) .or. (iSel.eq.pdfAStr_ .and. jSel.eq.pdfAStr_) .or. (iSel.eq.pdfABot_ .and. jSel.eq.pdfABot_) ) then
+    amp_z = A0_VV_4f(1,4,2,3,vvcoupl,za,zb,sprod,m_z,ga_z)
+    amp_z_b = -A0_VV_4f(1,3,2,4,vvcoupl,za,zb,sprod,m_z,ga_z)
+    restmp = ((abs(amp_z(-1,-1))**2+abs(amp_z_b(-1,-1))**2) * Ld**2 + &
+         (abs(amp_z(-1,+1))**2+abs(amp_z_b(-1,+1))**2) * Ld * Rd + &
+         (abs(amp_z(+1,-1))**2+abs(amp_z_b(+1,-1))**2) * Ld * Rd + &
+         (abs(amp_z(+1,+1))**2+abs(amp_z_b(+1,+1))**2) * Rd**2) * xn**2
+
+    restmp = restmp + (two * real(amp_z(-1,-1)*conjg(amp_z_b(-1,-1)),kind=dp) * Ld**2 + &
+            two * real(amp_z(+1,+1)*conjg(amp_z_b(+1,+1)),kind=dp) * Rd**2) * xn
+
+    restmp = restmp * SymmFac * aveqq * couplz**2
+
+    res(pdfADn_,pdfADn_) = restmp
+    res(pdfAStr_,pdfAStr_) = restmp
+    res(pdfABot_,pdfABot_) = restmp * tagbot
+return
+endif
+
+
+
+
+
+
+    ! NEED TO ADJSUT J1,J2 in W AMPS HERE
+    !-- W/Z interference
+    j1 = 1
+    j2 = 2
+    iflip = 1
+
+       !-- ud -> ud
+if( (iSel.eq.pdfUp_ .and. jSel.eq.pdfDn_) .or. (iSel.eq.pdfChm_ .and. jSel.eq.pdfStr_) ) then
+       amp_z = A0_VV_4f(4,j2,3,j1,vvcoupl,za,zb,sprod,m_z,ga_z)
+       if( all(cdabs(wwcoupl(:)).lt.1d-15) ) then
+          amp_w = -A0_VV_4f(4,j1,3,j2,vvcoupl,za,zb,sprod,m_w,ga_w)
+       else
+          amp_w = -A0_VV_4f(4,j1,3,j2,wwcoupl,za,zb,sprod,m_w,ga_w,useWWcoupl=.true.)
+       endif
+
+       restmp = ((abs(amp_z(-1,-1))**2) * Ld * Lu + &
+            (abs(amp_z(-1,+1))**2) * Ld * Ru + &
+            (abs(amp_z(+1,-1))**2) * Rd * Lu + &
+            (abs(amp_z(+1,+1))**2) * Rd * Ru) * couplz**2 * xn**2 
+
+       restmp = restmp + abs(amp_w(-1,-1))**2 * couplw**2 * xn**2
+
+       restmp = restmp + two * real(amp_z(-1,-1)*conjg(amp_w(-1,-1)),kind=dp) * &
+            aL_QUp * aL_QDn * couplz * couplw * xn
+
+       restmp = restmp * aveqq
+
+       pdfindex = flip(iflip,pdfUp_,pdfDn_)
+       res(pdfindex(1),pdfindex(2)) = restmp
+
+       pdfindex = flip(iflip,pdfChm_,pdfStr_)
+       res(pdfindex(1),pdfindex(2)) = restmp
+return
+endif
+
+
+
+
+
+
+       !-- ubdb -> ubdb
+if( (iSel.eq.pdfAUp_ .and. jSel.eq.pdfADn_) .or. (iSel.eq.pdfAChm_ .and. jSel.eq.pdfAStr_) ) then
+       amp_z = A0_VV_4f(j2,4,j1,3,vvcoupl,za,zb,sprod,m_z,ga_z)
+       if( all(cdabs(wwcoupl(:)).lt.1d-15) ) then
+          amp_w = -A0_VV_4f(j1,4,j2,3,vvcoupl,za,zb,sprod,m_w,ga_w)
+       else
+          amp_w = -A0_VV_4f(j1,4,j2,3,wwcoupl,za,zb,sprod,m_w,ga_w,useWWcoupl=.true.)
+       endif
+
+       restmp = ((abs(amp_z(-1,-1))**2) * Ld * Lu + &
+            (abs(amp_z(-1,+1))**2) * Ld * Ru + &
+            (abs(amp_z(+1,-1))**2) * Rd * Lu + &
+            (abs(amp_z(+1,+1))**2) * Rd * Ru) * couplz**2 * xn**2
+
+       restmp = restmp + abs(amp_w(-1,-1))**2 * couplw**2 * xn**2
+
+       restmp = restmp + two * real(amp_z(-1,-1)*conjg(amp_w(-1,-1)),kind=dp) * &
+            aL_QUp * aL_QDn * couplz * couplw * xn
+
+       restmp = restmp * aveqq
+
+       pdfindex = flip(iflip,pdfAUp_,pdfADn_)
+       res(pdfindex(1),pdfindex(2)) = restmp
+       pdfindex = flip(iflip,pdfAChm_,pdfAStr_)
+       res(pdfindex(1),pdfindex(2)) = restmp
+return
+endif
+
+
+
+
+
+
+
+
+    ! NEED TO ADJSUT J1,J2 in W AMPS HERE
+    !-- W/Z interference
+    j1 = 2
+    j2 = 1
+    iflip = 2
+
+       !-- ud -> ud
+if( (iSel.eq.pdfDn_ .and. jSel.eq.pdfUp_) .or. (iSel.eq.pdfStr_ .and. jSel.eq.pdfChm_) ) then
+       amp_z = A0_VV_4f(4,j2,3,j1,vvcoupl,za,zb,sprod,m_z,ga_z)
+       if( all(cdabs(wwcoupl(:)).lt.1d-15) ) then
+          amp_w = -A0_VV_4f(4,j1,3,j2,vvcoupl,za,zb,sprod,m_w,ga_w)
+       else
+          amp_w = -A0_VV_4f(4,j1,3,j2,wwcoupl,za,zb,sprod,m_w,ga_w,useWWcoupl=.true.)
+       endif
+
+       restmp = ((abs(amp_z(-1,-1))**2) * Ld * Lu + &
+            (abs(amp_z(-1,+1))**2) * Ld * Ru + &
+            (abs(amp_z(+1,-1))**2) * Rd * Lu + &
+            (abs(amp_z(+1,+1))**2) * Rd * Ru) * couplz**2 * xn**2 
+
+       restmp = restmp + abs(amp_w(-1,-1))**2 * couplw**2 * xn**2
+
+       restmp = restmp + two * real(amp_z(-1,-1)*conjg(amp_w(-1,-1)),kind=dp) * &
+            aL_QUp * aL_QDn * couplz * couplw * xn
+
+       restmp = restmp * aveqq
+
+       pdfindex = flip(iflip,pdfUp_,pdfDn_)
+       res(pdfindex(1),pdfindex(2)) = restmp
+
+       pdfindex = flip(iflip,pdfChm_,pdfStr_)
+       res(pdfindex(1),pdfindex(2)) = restmp
+return
+endif
+
+
+
+
+
+
+       !-- ubdb -> ubdb
+if( (iSel.eq.pdfADn_ .and. jSel.eq.pdfAUp_) .or. (iSel.eq.pdfAStr_ .and. jSel.eq.pdfAChm_) ) then
+       amp_z = A0_VV_4f(j2,4,j1,3,vvcoupl,za,zb,sprod,m_z,ga_z)
+       if( all(cdabs(wwcoupl(:)).lt.1d-15) ) then
+          amp_w = -A0_VV_4f(j1,4,j2,3,vvcoupl,za,zb,sprod,m_w,ga_w)
+       else
+          amp_w = -A0_VV_4f(j1,4,j2,3,wwcoupl,za,zb,sprod,m_w,ga_w,useWWcoupl=.true.)
+       endif
+
+       restmp = ((abs(amp_z(-1,-1))**2) * Ld * Lu + &
+            (abs(amp_z(-1,+1))**2) * Ld * Ru + &
+            (abs(amp_z(+1,-1))**2) * Rd * Lu + &
+            (abs(amp_z(+1,+1))**2) * Rd * Ru) * couplz**2 * xn**2
+
+       restmp = restmp + abs(amp_w(-1,-1))**2 * couplw**2 * xn**2
+
+       restmp = restmp + two * real(amp_z(-1,-1)*conjg(amp_w(-1,-1)),kind=dp) * &
+            aL_QUp * aL_QDn * couplz * couplw * xn
+
+       restmp = restmp * aveqq
+
+       pdfindex = flip(iflip,pdfAUp_,pdfADn_)
+       res(pdfindex(1),pdfindex(2)) = restmp
+
+       pdfindex = flip(iflip,pdfAChm_,pdfAStr_)
+       res(pdfindex(1),pdfindex(2)) = restmp
+return
+endif
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    !-- non-interfering diagrams below
+    j1 = 1
+    j2 = 2
+    iflip = 1
+
+       !-- qqb processes
+
+       !--uub -> uub // ddb
+if( (iSel.eq.pdfUp_ .and. jSel.eq.pdfAUp_) .or. (iSel.eq.pdfChm_ .and. jSel.eq.pdfAChm_) .or. (iSel.eq.pdfUp_ .and. jSel.eq.pdfAChm_) .or. (iSel.eq.pdfChm_ .and. jSel.eq.pdfAUp_) ) then
+       amp_z = A0_VV_4f(3,j1,j2,4,vvcoupl,za,zb,sprod,m_z,ga_z)
+       if( all(cdabs(wwcoupl(:)).lt.1d-15) ) then
+          amp_w = A0_VV_4f(3,j1,j2,4,vvcoupl,za,zb,sprod,m_w,ga_w)
+       else
+          amp_w = A0_VV_4f(3,j1,j2,4,wwcoupl,za,zb,sprod,m_w,ga_w,useWWcoupl=.true.)
+       endif
+       restmp = ((abs(amp_z(-1,-1))**2) * Lu * Lu + &
+            (abs(amp_z(-1,+1))**2) * Lu * Ru + &
+            (abs(amp_z(+1,-1))**2) * Ru * Lu + &
+            (abs(amp_z(+1,+1))**2) * Ru * Ru) * couplz**2 * SpinAvg * tag1
+       restmp = restmp + abs(amp_w(-1,-1))**2 * couplw**2 * SpinAvg * tag2
+
+       pdfindex = flip(iflip,pdfUp_,pdfAUp_)
+       res(pdfindex(1),pdfindex(2)) = restmp
+
+       pdfindex = flip(iflip,pdfChm_,pdfAChm_)
+       res(pdfindex(1),pdfindex(2)) = restmp
+
+       pdfindex = flip(iflip,pdfUp_,pdfAChm_)
+       res(pdfindex(1),pdfindex(2)) = restmp
+
+       pdfindex = flip(iflip,pdfChm_,pdfAUp_)
+       res(pdfindex(1),pdfindex(2)) = restmp
+       
+return
+endif
+
+
+
+
+
+
+
+
+       !--udb -> udb
+if( (iSel.eq.pdfUp_ .and. jSel.eq.pdfADn_) .or. (iSel.eq.pdfChm_ .and. jSel.eq.pdfAStr_) .or. (iSel.eq.pdfUp_ .and. jSel.eq.pdfAStr_) .or. &
+    (iSel.eq.pdfChm_ .and. jSel.eq.pdfADn_) .or. (iSel.eq.pdfUp_ .and. jSel.eq.pdfABot_) .or. (iSel.eq.pdfChm_ .and. jSel.eq.pdfABot_) ) then
+       amp_z = A0_VV_4f(3,j1,j2,4,vvcoupl,za,zb,sprod,m_z,ga_z)
+       restmp = ((abs(amp_z(-1,-1))**2) * Lu * Ld + &
+            (abs(amp_z(-1,+1))**2) * Lu * Rd + &
+            (abs(amp_z(+1,-1))**2) * Ru * Ld + &
+            (abs(amp_z(+1,+1))**2) * Ru * Rd) * couplz**2 * SpinAvg
+      
+       pdfindex = flip(iflip,pdfUp_,pdfADn_)
+       res(pdfindex(1),pdfindex(2)) = restmp
+
+       pdfindex = flip(iflip,pdfChm_,pdfAStr_)
+       res(pdfindex(1),pdfindex(2)) = restmp
+
+       pdfindex = flip(iflip,pdfUp_,pdfAStr_)
+       res(pdfindex(1),pdfindex(2)) = restmp
+
+       pdfindex = flip(iflip,pdfChm_,pdfADn_)
+       res(pdfindex(1),pdfindex(2)) = restmp
+
+       pdfindex = flip(iflip,pdfUp_,pdfABot_)
+       res(pdfindex(1),pdfindex(2)) = restmp * tagbot
+
+       pdfindex = flip(iflip,pdfChm_,pdfABot_)
+       res(pdfindex(1),pdfindex(2)) = restmp * tagbot
+
+return
+endif
+
+
+
+
+
+
+
+
+
+       !--dub -> dub
+if( (iSel.eq.pdfDn_ .and. jSel.eq.pdfAUp_) .or. (iSel.eq.pdfStr_ .and. jSel.eq.pdfAChm_)  .or. (iSel.eq.pdfDn_ .and. jSel.eq.pdfAChm_)  .or. &
+    (iSel.eq.pdfStr_ .and. jSel.eq.pdfAUp_)  .or. (iSel.eq.pdfBot_ .and. jSel.eq.pdfAUp_)  .or. (iSel.eq.pdfBot_ .and. jSel.eq.pdfAChm_) ) then
+       amp_z = A0_VV_4f(3,j1,j2,4,vvcoupl,za,zb,sprod,m_z,ga_z)
+       restmp = ((abs(amp_z(-1,-1))**2) * Ld * Lu + &
+            (abs(amp_z(-1,+1))**2) * Ld * Ru + &
+            (abs(amp_z(+1,-1))**2) * Rd * Lu + &
+            (abs(amp_z(+1,+1))**2) * Rd * Ru) * couplz**2 * SpinAvg
+
+       pdfindex = flip(iflip,pdfDn_,pdfAUp_)
+       res(pdfindex(1),pdfindex(2)) = restmp
+
+       pdfindex = flip(iflip,pdfStr_,pdfAChm_)
+       res(pdfindex(1),pdfindex(2)) = restmp
+
+       pdfindex = flip(iflip,pdfDn_,pdfAChm_)
+       res(pdfindex(1),pdfindex(2)) = restmp
+
+       pdfindex = flip(iflip,pdfStr_,pdfAUp_)
+       res(pdfindex(1),pdfindex(2)) = restmp
+
+       pdfindex = flip(iflip,pdfBot_,pdfAUp_)
+       res(pdfindex(1),pdfindex(2)) = restmp * tagbot
+
+       pdfindex = flip(iflip,pdfBot_,pdfAChm_)
+       res(pdfindex(1),pdfindex(2)) = restmp * tagbot
+return
+endif
+
+
+
+
+
+
+
+       !--ddb -> uub/ddb
+if( (iSel.eq.pdfBot_ .and. jSel.eq.pdfABot_) .or. (iSel.eq.pdfDn_ .and. jSel.eq.pdfABot_) .or. (iSel.eq.pdfStr_ .and. jSel.eq.pdfABot_) .or.&
+    (iSel.eq.pdfBot_ .and. jSel.eq.pdfADn_) .or. (iSel.eq.pdfBot_ .and. jSel.eq.pdfAStr_) ) then
+       amp_z = A0_VV_4f(3,j1,j2,4,vvcoupl,za,zb,sprod,m_z,ga_z)
+
+       restmp = ((abs(amp_z(-1,-1))**2) * Ld * Ld + &
+            (abs(amp_z(-1,+1))**2) * Ld * Rd + &
+            (abs(amp_z(+1,-1))**2) * Rd * Ld + &
+            (abs(amp_z(+1,+1))**2) * Rd * Rd) * couplz**2 * SpinAvg * tag1
+
+       pdfindex = flip(iflip,pdfBot_,pdfABot_)
+       res(pdfindex(1),pdfindex(2)) = restmp * tagbot
+
+       pdfindex = flip(iflip,pdfDn_,pdfABot_)
+       res(pdfindex(1),pdfindex(2)) = restmp * tagbot
+
+       pdfindex = flip(iflip,pdfStr_,pdfABot_)
+       res(pdfindex(1),pdfindex(2)) = restmp * tagbot
+
+       pdfindex = flip(iflip,pdfBot_,pdfADn_)
+       res(pdfindex(1),pdfindex(2)) = restmp * tagbot
+
+       pdfindex = flip(iflip,pdfBot_,pdfAStr_)
+       res(pdfindex(1),pdfindex(2)) = restmp * tagbot
+return
+endif
+
+
+
+
+if( (iSel.eq.pdfDn_ .and. jSel.eq.pdfADn_) .or. (iSel.eq.pdfStr_ .and. jSel.eq.pdfAStr_)  .or. (iSel.eq.pdfDn_ .and. jSel.eq.pdfAStr_)  .or. (iSel.eq.pdfStr_ .and. jSel.eq.pdfADn_) ) then
+       amp_z = A0_VV_4f(3,j1,j2,4,vvcoupl,za,zb,sprod,m_z,ga_z)
+       if( all(cdabs(wwcoupl(:)).lt.1d-15) ) then
+          amp_w = A0_VV_4f(3,j1,j2,4,vvcoupl,za,zb,sprod,m_w,ga_w)
+       else
+          amp_w = A0_VV_4f(3,j1,j2,4,wwcoupl,za,zb,sprod,m_w,ga_w,useWWcoupl=.true.)
+       endif
+
+       restmp = ((abs(amp_z(-1,-1))**2) * Ld * Ld + &
+            (abs(amp_z(-1,+1))**2) * Ld * Rd + &
+            (abs(amp_z(+1,-1))**2) * Rd * Ld + &
+            (abs(amp_z(+1,+1))**2) * Rd * Rd) * couplz**2 * SpinAvg * tag1
+       restmp = restmp + abs(amp_w(-1,-1))**2 * couplw**2 * SpinAvg * tag2
+
+       pdfindex = flip(iflip,pdfDn_,pdfADn_)
+       res(pdfindex(1),pdfindex(2)) = restmp
+
+       pdfindex = flip(iflip,pdfStr_,pdfAStr_)
+       res(pdfindex(1),pdfindex(2)) = restmp
+
+       pdfindex = flip(iflip,pdfDn_,pdfAStr_)
+       res(pdfindex(1),pdfindex(2)) = restmp
+
+       pdfindex = flip(iflip,pdfStr_,pdfADn_)
+       res(pdfindex(1),pdfindex(2)) = restmp
+return
+endif
+
+
+
+
+if( (iSel.eq.pdfUp_ .and. jSel.eq.pdfChm_)  ) then
+
+       !-- non-symmetric qq processes
+       amp_z = A0_VV_4f(3,j1,4,j2,vvcoupl,za,zb,sprod,m_z,ga_z)      
+       !--uc -> uc
+       restmp = ((abs(amp_z(-1,-1))**2) * Lu * Lu + &
+            (abs(amp_z(-1,+1))**2) * Lu * Ru + &
+            (abs(amp_z(+1,-1))**2) * Ru * Lu + &
+            (abs(amp_z(+1,+1))**2) * Ru * Ru) * couplz**2 * SpinAvg
+
+       pdfindex = flip(iflip,pdfUp_,pdfChm_)
+       res(pdfindex(1),pdfindex(2)) = restmp
+return
+endif
+
+
+
+
+
+
+
+       !--us -> us/cd
+if( (iSel.eq.pdfUp_ .and. jSel.eq.pdfBot_) .or. (iSel.eq.pdfChm_ .and. jSel.eq.pdfBot_) ) then
+
+       amp_z = A0_VV_4f(3,j1,4,j2,vvcoupl,za,zb,sprod,m_z,ga_z)      
+       restmp = ((abs(amp_z(-1,-1))**2) * Lu * Ld + &
+            (abs(amp_z(-1,+1))**2) * Lu * Rd + &
+            (abs(amp_z(+1,-1))**2) * Ru * Ld + &
+            (abs(amp_z(+1,+1))**2) * Ru * Rd) * couplz**2 * SpinAvg * tag1
+
+       pdfindex = flip(iflip,pdfUp_,pdfBot_)
+       res(pdfindex(1),pdfindex(2)) = restmp * tagbot
+
+       pdfindex = flip(iflip,pdfChm_,pdfBot_)
+       res(pdfindex(1),pdfindex(2)) = restmp * tagbot
+       
+return
+endif
+
+
+
+
+
+if( (iSel.eq.pdfUp_ .and. jSel.eq.pdfStr_) .or. (iSel.eq.pdfChm_ .and. jSel.eq.pdfDn_) ) then
+
+       amp_z = A0_VV_4f(3,j1,4,j2,vvcoupl,za,zb,sprod,m_z,ga_z)      
+       if( all(cdabs(wwcoupl(:)).lt.1d-15) ) then
+          amp_w = A0_VV_4f(3,j2,4,j1,vvcoupl,za,zb,sprod,m_w,ga_w)
+!           amp_w = A0_VV_4f(3,j1,4,j2,vvcoupl,za,zb,sprod,m_w,ga_w)! MARKUS
+       else
+          amp_w = A0_VV_4f(3,j2,4,j1,wwcoupl,za,zb,sprod,m_w,ga_w,useWWcoupl=.true.)
+!           amp_w = A0_VV_4f(3,j1,4,j2,wwcoupl,za,zb,sprod,m_w,ga_w,useWWcoupl=.true.)! MARKUS
+       endif
+
+       restmp = ((abs(amp_z(-1,-1))**2) * Lu * Ld + &
+            (abs(amp_z(-1,+1))**2) * Lu * Rd + &
+            (abs(amp_z(+1,-1))**2) * Ru * Ld + &
+            (abs(amp_z(+1,+1))**2) * Ru * Rd) * couplz**2 * SpinAvg * tag1
+       restmp = restmp + abs(amp_w(-1,-1))**2 * couplw**2 * SpinAvg * tag2
+
+       pdfindex = flip(iflip,pdfUp_,pdfStr_)
+       res(pdfindex(1),pdfindex(2)) = restmp
+
+       pdfindex = flip(iflip,pdfChm_,pdfDn_)
+       res(pdfindex(1),pdfindex(2)) = restmp
+return
+endif
+
+
+
+
+
+
+
+       !--ds -> ds
+if( (iSel.eq.pdfDn_ .and. jSel.eq.pdfStr_) .or. (iSel.eq.pdfDn_ .and. jSel.eq.pdfBot_) .or. (iSel.eq.pdfStr_ .and. jSel.eq.pdfBot_) ) then
+
+       amp_z = A0_VV_4f(3,j1,4,j2,vvcoupl,za,zb,sprod,m_z,ga_z)      
+       restmp = ((abs(amp_z(-1,-1))**2) * Ld * Ld + &
+            (abs(amp_z(-1,+1))**2) * Ld * Rd + &
+            (abs(amp_z(+1,-1))**2) * Rd * Ld + &
+            (abs(amp_z(+1,+1))**2) * Rd * Rd) * couplz**2 * SpinAvg
+
+       pdfindex = flip(iflip,pdfDn_,pdfStr_)
+       res(pdfindex(1),pdfindex(2)) = restmp
+
+       pdfindex = flip(iflip,pdfDn_,pdfBot_)
+       res(pdfindex(1),pdfindex(2)) = restmp * tagbot
+
+       pdfindex = flip(iflip,pdfStr_,pdfBot_)
+       res(pdfindex(1),pdfindex(2)) = restmp * tagbot
+return
+endif
+
+
+
+
+
+
+       !-- qbqb processes
+if( (iSel.eq.pdfAUp_ .and. jSel.eq.pdfAChm_) ) then
+       amp_z = A0_VV_4f(j1,3,j2,4,vvcoupl,za,zb,sprod,m_z,ga_z)
+
+
+       !--ubcb -> ubcb
+       restmp = ((abs(amp_z(-1,-1))**2) * Lu * Lu + &
+            (abs(amp_z(-1,+1))**2) * Lu * Ru + &
+            (abs(amp_z(+1,-1))**2) * Ru * Lu + &
+            (abs(amp_z(+1,+1))**2) * Ru * Ru) * couplz**2 * SpinAvg
+
+       pdfindex = flip(iflip,pdfAUp_,pdfAChm_)
+       res(pdfindex(1),pdfindex(2)) = restmp
+return
+endif
+
+
+
+
+
+
+       !--ubsb -> ubsb//cbdb
+if( (iSel.eq.pdfAUp_ .and. jSel.eq.pdfABot_) .or. (iSel.eq.pdfAChm_ .and. jSel.eq.pdfABot_) ) then
+       amp_z = A0_VV_4f(j1,3,j2,4,vvcoupl,za,zb,sprod,m_z,ga_z)
+
+       restmp = ((abs(amp_z(-1,-1))**2) * Lu * Ld + &
+            (abs(amp_z(-1,+1))**2) * Lu * Rd + &
+            (abs(amp_z(+1,-1))**2) * Ru * Ld + &
+            (abs(amp_z(+1,+1))**2) * Ru * Rd) * couplz**2 * SpinAvg * tag1
+
+       pdfindex = flip(iflip,pdfAUp_,pdfABot_)
+       res(pdfindex(1),pdfindex(2)) = restmp * tagbot
+
+       pdfindex = flip(iflip,pdfAChm_,pdfABot_)
+       res(pdfindex(1),pdfindex(2)) = restmp * tagbot
+
+return
+endif
+
+
+
+if( (iSel.eq.pdfAUp_ .and. jSel.eq.pdfAStr_) .or. (iSel.eq.pdfAChm_ .and. jSel.eq.pdfADn_) ) then
+       amp_z = A0_VV_4f(j1,3,j2,4,vvcoupl,za,zb,sprod,m_z,ga_z)
+       if( all(cdabs(wwcoupl(:)).lt.1d-15) ) then
+          amp_w = A0_VV_4f(j1,4,j2,3,vvcoupl,za,zb,sprod,m_w,ga_w)
+       else
+          amp_w = A0_VV_4f(j1,4,j2,3,wwcoupl,za,zb,sprod,m_w,ga_w,useWWcoupl=.true.)
+       endif
+
+       restmp = ((abs(amp_z(-1,-1))**2) * Lu * Ld + &
+            (abs(amp_z(-1,+1))**2) * Lu * Rd + &
+            (abs(amp_z(+1,-1))**2) * Ru * Ld + &
+            (abs(amp_z(+1,+1))**2) * Ru * Rd) * couplz**2 * SpinAvg * tag1
+       restmp = restmp + abs(amp_w(-1,-1))**2 * couplw**2 * SpinAvg * tag2
+
+       pdfindex = flip(iflip,pdfAUp_,pdfAStr_)
+       res(pdfindex(1),pdfindex(2)) = restmp
+
+       pdfindex = flip(iflip,pdfAChm_,pdfADn_)
+       res(pdfindex(1),pdfindex(2)) = restmp
+return
+endif
+
+
+
+
+
+
+
+       !--dbsb -> dbsb
+if( (iSel.eq.pdfADn_ .and. jSel.eq.pdfAStr_) .or. (iSel.eq.pdfADn_ .and. jSel.eq.pdfABot_) .or. (iSel.eq.pdfAStr_ .and. jSel.eq.pdfABot_) ) then
+
+       amp_z = A0_VV_4f(j1,3,j2,4,vvcoupl,za,zb,sprod,m_z,ga_z)
+       restmp = ((abs(amp_z(-1,-1))**2) * Ld * Ld + &
+            (abs(amp_z(-1,+1))**2) * Ld * Rd + &
+            (abs(amp_z(+1,-1))**2) * Rd * Ld + &
+            (abs(amp_z(+1,+1))**2) * Rd * Rd) * couplz**2 * SpinAvg
+
+       pdfindex = flip(iflip,pdfADn_,pdfAStr_)
+       res(pdfindex(1),pdfindex(2)) = restmp
+
+       pdfindex = flip(iflip,pdfADn_,pdfABot_)
+       res(pdfindex(1),pdfindex(2)) = restmp * tagbot
+
+       pdfindex = flip(iflip,pdfAStr_,pdfABot_)
+       res(pdfindex(1),pdfindex(2)) = restmp * tagbot
+return
+endif
+
+
+
+
+
+
+
+
+!-------------
+
+       j1 = 2
+       j2 = 1
+       iflip = 2
+       !-- qqb processes
+
+       !--uub -> uub // ddb
+if( (jSel.eq.pdfUp_ .and. iSel.eq.pdfAUp_) .or. (jSel.eq.pdfChm_ .and. iSel.eq.pdfAChm_) .or. (jSel.eq.pdfUp_ .and. iSel.eq.pdfAChm_) .or. (jSel.eq.pdfChm_ .and. iSel.eq.pdfAUp_) ) then
+       amp_z = A0_VV_4f(3,j1,j2,4,vvcoupl,za,zb,sprod,m_z,ga_z)
+       if( all(cdabs(wwcoupl(:)).lt.1d-15) ) then
+          amp_w = A0_VV_4f(3,j1,j2,4,vvcoupl,za,zb,sprod,m_w,ga_w)
+       else
+          amp_w = A0_VV_4f(3,j1,j2,4,wwcoupl,za,zb,sprod,m_w,ga_w,useWWcoupl=.true.)
+       endif
+       restmp = ((abs(amp_z(-1,-1))**2) * Lu * Lu + &
+            (abs(amp_z(-1,+1))**2) * Lu * Ru + &
+            (abs(amp_z(+1,-1))**2) * Ru * Lu + &
+            (abs(amp_z(+1,+1))**2) * Ru * Ru) * couplz**2 * SpinAvg * tag1
+       restmp = restmp + abs(amp_w(-1,-1))**2 * couplw**2 * SpinAvg * tag2
+
+       pdfindex = flip(iflip,pdfUp_,pdfAUp_)
+       res(pdfindex(1),pdfindex(2)) = restmp
+
+       pdfindex = flip(iflip,pdfChm_,pdfAChm_)
+       res(pdfindex(1),pdfindex(2)) = restmp
+
+       pdfindex = flip(iflip,pdfUp_,pdfAChm_)
+       res(pdfindex(1),pdfindex(2)) = restmp
+
+       pdfindex = flip(iflip,pdfChm_,pdfAUp_)
+       res(pdfindex(1),pdfindex(2)) = restmp
+       
+return
+endif
+
+
+
+
+
+
+
+
+       !--udb -> udb
+if( (jSel.eq.pdfUp_ .and. iSel.eq.pdfADn_) .or. (jSel.eq.pdfChm_ .and. iSel.eq.pdfAStr_) .or. (jSel.eq.pdfUp_ .and. iSel.eq.pdfAStr_) .or. &
+    (jSel.eq.pdfChm_ .and. iSel.eq.pdfADn_) .or. (jSel.eq.pdfUp_ .and. iSel.eq.pdfABot_) .or. (jSel.eq.pdfChm_ .and. iSel.eq.pdfABot_) ) then
+       amp_z = A0_VV_4f(3,j1,j2,4,vvcoupl,za,zb,sprod,m_z,ga_z)
+       restmp = ((abs(amp_z(-1,-1))**2) * Lu * Ld + &
+            (abs(amp_z(-1,+1))**2) * Lu * Rd + &
+            (abs(amp_z(+1,-1))**2) * Ru * Ld + &
+            (abs(amp_z(+1,+1))**2) * Ru * Rd) * couplz**2 * SpinAvg
+      
+       pdfindex = flip(iflip,pdfUp_,pdfADn_)
+       res(pdfindex(1),pdfindex(2)) = restmp
+
+       pdfindex = flip(iflip,pdfChm_,pdfAStr_)
+       res(pdfindex(1),pdfindex(2)) = restmp
+
+       pdfindex = flip(iflip,pdfUp_,pdfAStr_)
+       res(pdfindex(1),pdfindex(2)) = restmp
+
+       pdfindex = flip(iflip,pdfChm_,pdfADn_)
+       res(pdfindex(1),pdfindex(2)) = restmp
+
+       pdfindex = flip(iflip,pdfUp_,pdfABot_)
+       res(pdfindex(1),pdfindex(2)) = restmp * tagbot
+
+       pdfindex = flip(iflip,pdfChm_,pdfABot_)
+       res(pdfindex(1),pdfindex(2)) = restmp * tagbot
+
+return
+endif
+
+
+
+
+
+
+
+
+
+       !--dub -> dub
+if( (jSel.eq.pdfDn_ .and. iSel.eq.pdfAUp_) .or. (jSel.eq.pdfStr_ .and. iSel.eq.pdfAChm_)  .or. (jSel.eq.pdfDn_ .and. iSel.eq.pdfAChm_)  .or. &
+    (jSel.eq.pdfStr_ .and. iSel.eq.pdfAUp_)  .or. (jSel.eq.pdfBot_ .and. iSel.eq.pdfAUp_)  .or. (jSel.eq.pdfBot_ .and. iSel.eq.pdfAChm_) ) then
+       amp_z = A0_VV_4f(3,j1,j2,4,vvcoupl,za,zb,sprod,m_z,ga_z)
+       restmp = ((abs(amp_z(-1,-1))**2) * Ld * Lu + &
+            (abs(amp_z(-1,+1))**2) * Ld * Ru + &
+            (abs(amp_z(+1,-1))**2) * Rd * Lu + &
+            (abs(amp_z(+1,+1))**2) * Rd * Ru) * couplz**2 * SpinAvg
+
+       pdfindex = flip(iflip,pdfDn_,pdfAUp_)
+       res(pdfindex(1),pdfindex(2)) = restmp
+
+       pdfindex = flip(iflip,pdfStr_,pdfAChm_)
+       res(pdfindex(1),pdfindex(2)) = restmp
+
+       pdfindex = flip(iflip,pdfDn_,pdfAChm_)
+       res(pdfindex(1),pdfindex(2)) = restmp
+
+       pdfindex = flip(iflip,pdfStr_,pdfAUp_)
+       res(pdfindex(1),pdfindex(2)) = restmp
+
+       pdfindex = flip(iflip,pdfBot_,pdfAUp_)
+       res(pdfindex(1),pdfindex(2)) = restmp * tagbot
+
+       pdfindex = flip(iflip,pdfBot_,pdfAChm_)
+       res(pdfindex(1),pdfindex(2)) = restmp * tagbot
+return
+endif
+
+
+
+
+
+
+
+       !--ddb -> uub/ddb
+if( (jSel.eq.pdfBot_ .and. iSel.eq.pdfABot_) .or. (jSel.eq.pdfDn_ .and. iSel.eq.pdfABot_) .or. (jSel.eq.pdfStr_ .and. iSel.eq.pdfABot_) .or.&
+    (jSel.eq.pdfBot_ .and. iSel.eq.pdfADn_) .or. (jSel.eq.pdfBot_ .and. iSel.eq.pdfAStr_) ) then
+       amp_z = A0_VV_4f(3,j1,j2,4,vvcoupl,za,zb,sprod,m_z,ga_z)
+
+       restmp = ((abs(amp_z(-1,-1))**2) * Ld * Ld + &
+            (abs(amp_z(-1,+1))**2) * Ld * Rd + &
+            (abs(amp_z(+1,-1))**2) * Rd * Ld + &
+            (abs(amp_z(+1,+1))**2) * Rd * Rd) * couplz**2 * SpinAvg * tag1
+
+       pdfindex = flip(iflip,pdfBot_,pdfABot_)
+       res(pdfindex(1),pdfindex(2)) = restmp * tagbot
+
+       pdfindex = flip(iflip,pdfDn_,pdfABot_)
+       res(pdfindex(1),pdfindex(2)) = restmp * tagbot
+
+       pdfindex = flip(iflip,pdfStr_,pdfABot_)
+       res(pdfindex(1),pdfindex(2)) = restmp * tagbot
+
+       pdfindex = flip(iflip,pdfBot_,pdfADn_)
+       res(pdfindex(1),pdfindex(2)) = restmp * tagbot
+
+       pdfindex = flip(iflip,pdfBot_,pdfAStr_)
+       res(pdfindex(1),pdfindex(2)) = restmp * tagbot
+return
+endif
+
+
+
+
+if( (jSel.eq.pdfDn_ .and. iSel.eq.pdfADn_) .or. (jSel.eq.pdfStr_ .and. iSel.eq.pdfAStr_)  .or. (jSel.eq.pdfDn_ .and. iSel.eq.pdfAStr_)  .or. (jSel.eq.pdfStr_ .and. iSel.eq.pdfADn_) ) then
+       amp_z = A0_VV_4f(3,j1,j2,4,vvcoupl,za,zb,sprod,m_z,ga_z)
+       if( all(cdabs(wwcoupl(:)).lt.1d-15) ) then
+          amp_w = A0_VV_4f(3,j1,j2,4,vvcoupl,za,zb,sprod,m_w,ga_w)
+       else
+          amp_w = A0_VV_4f(3,j1,j2,4,wwcoupl,za,zb,sprod,m_w,ga_w,useWWcoupl=.true.)
+       endif
+
+       restmp = ((abs(amp_z(-1,-1))**2) * Ld * Ld + &
+            (abs(amp_z(-1,+1))**2) * Ld * Rd + &
+            (abs(amp_z(+1,-1))**2) * Rd * Ld + &
+            (abs(amp_z(+1,+1))**2) * Rd * Rd) * couplz**2 * SpinAvg * tag1
+       restmp = restmp + abs(amp_w(-1,-1))**2 * couplw**2 * SpinAvg * tag2
+
+       pdfindex = flip(iflip,pdfDn_,pdfADn_)
+       res(pdfindex(1),pdfindex(2)) = restmp
+
+       pdfindex = flip(iflip,pdfStr_,pdfAStr_)
+       res(pdfindex(1),pdfindex(2)) = restmp
+
+       pdfindex = flip(iflip,pdfDn_,pdfAStr_)
+       res(pdfindex(1),pdfindex(2)) = restmp
+
+       pdfindex = flip(iflip,pdfStr_,pdfADn_)
+       res(pdfindex(1),pdfindex(2)) = restmp
+return
+endif
+
+
+
+
+if( (jSel.eq.pdfUp_ .and. iSel.eq.pdfChm_) ) then
+
+       !-- non-symmetric qq processes
+       amp_z = A0_VV_4f(3,j1,4,j2,vvcoupl,za,zb,sprod,m_z,ga_z)      
+       !--uc -> uc
+       restmp = ((abs(amp_z(-1,-1))**2) * Lu * Lu + &
+            (abs(amp_z(-1,+1))**2) * Lu * Ru + &
+            (abs(amp_z(+1,-1))**2) * Ru * Lu + &
+            (abs(amp_z(+1,+1))**2) * Ru * Ru) * couplz**2 * SpinAvg
+
+       pdfindex = flip(iflip,pdfUp_,pdfChm_)
+       res(pdfindex(1),pdfindex(2)) = restmp
+return
+endif
+
+
+
+
+
+
+       !--us -> us/cd
+if( (jSel.eq.pdfUp_ .and. iSel.eq.pdfBot_) .or. (jSel.eq.pdfChm_ .and. iSel.eq.pdfBot_) ) then
+
+       amp_z = A0_VV_4f(3,j1,4,j2,vvcoupl,za,zb,sprod,m_z,ga_z)      
+       restmp = ((abs(amp_z(-1,-1))**2) * Lu * Ld + &
+            (abs(amp_z(-1,+1))**2) * Lu * Rd + &
+            (abs(amp_z(+1,-1))**2) * Ru * Ld + &
+            (abs(amp_z(+1,+1))**2) * Ru * Rd) * couplz**2 * SpinAvg * tag1
+
+       pdfindex = flip(iflip,pdfUp_,pdfBot_)
+       res(pdfindex(1),pdfindex(2)) = restmp * tagbot
+
+       pdfindex = flip(iflip,pdfChm_,pdfBot_)
+       res(pdfindex(1),pdfindex(2)) = restmp * tagbot
+       
+return
+endif
+
+
+
+
+
+if( (jSel.eq.pdfUp_ .and. iSel.eq.pdfStr_) .or. (jSel.eq.pdfChm_ .and. iSel.eq.pdfDn_) ) then
+
+       amp_z = A0_VV_4f(3,j1,4,j2,vvcoupl,za,zb,sprod,m_z,ga_z)      
+       if( all(cdabs(wwcoupl(:)).lt.1d-15) ) then
+          amp_w = A0_VV_4f(3,j2,4,j1,vvcoupl,za,zb,sprod,m_w,ga_w)
+!           amp_w = A0_VV_4f(3,j1,4,j2,vvcoupl,za,zb,sprod,m_w,ga_w)! MARKUS
+       else
+          amp_w = A0_VV_4f(3,j2,4,j1,wwcoupl,za,zb,sprod,m_w,ga_w,useWWcoupl=.true.)
+!           amp_w = A0_VV_4f(3,j1,4,j2,wwcoupl,za,zb,sprod,m_w,ga_w,useWWcoupl=.true.)! MARKUS
+       endif
+
+       restmp = ((abs(amp_z(-1,-1))**2) * Lu * Ld + &
+            (abs(amp_z(-1,+1))**2) * Lu * Rd + &
+            (abs(amp_z(+1,-1))**2) * Ru * Ld + &
+            (abs(amp_z(+1,+1))**2) * Ru * Rd) * couplz**2 * SpinAvg * tag1
+       restmp = restmp + abs(amp_w(-1,-1))**2 * couplw**2 * SpinAvg * tag2
+
+       pdfindex = flip(iflip,pdfUp_,pdfStr_)
+       res(pdfindex(1),pdfindex(2)) = restmp
+
+       pdfindex = flip(iflip,pdfChm_,pdfDn_)
+       res(pdfindex(1),pdfindex(2)) = restmp
+return
+endif
+
+
+
+
+
+
+
+       !--ds -> ds
+if( (jSel.eq.pdfDn_ .and. iSel.eq.pdfStr_) .or. (jSel.eq.pdfDn_ .and. iSel.eq.pdfBot_) .or. (jSel.eq.pdfStr_ .and. iSel.eq.pdfBot_) ) then
+
+       amp_z = A0_VV_4f(3,j1,4,j2,vvcoupl,za,zb,sprod,m_z,ga_z)      
+       restmp = ((abs(amp_z(-1,-1))**2) * Ld * Ld + &
+            (abs(amp_z(-1,+1))**2) * Ld * Rd + &
+            (abs(amp_z(+1,-1))**2) * Rd * Ld + &
+            (abs(amp_z(+1,+1))**2) * Rd * Rd) * couplz**2 * SpinAvg
+
+       pdfindex = flip(iflip,pdfDn_,pdfStr_)
+       res(pdfindex(1),pdfindex(2)) = restmp
+
+       pdfindex = flip(iflip,pdfDn_,pdfBot_)
+       res(pdfindex(1),pdfindex(2)) = restmp * tagbot
+
+       pdfindex = flip(iflip,pdfStr_,pdfBot_)
+       res(pdfindex(1),pdfindex(2)) = restmp * tagbot
+return
+endif
+
+
+
+
+
+
+       !-- qbqb processes
+if( (jSel.eq.pdfAUp_ .and. iSel.eq.pdfAChm_) ) then
+       amp_z = A0_VV_4f(j1,3,j2,4,vvcoupl,za,zb,sprod,m_z,ga_z)
+
+
+       !--ubcb -> ubcb
+       restmp = ((abs(amp_z(-1,-1))**2) * Lu * Lu + &
+            (abs(amp_z(-1,+1))**2) * Lu * Ru + &
+            (abs(amp_z(+1,-1))**2) * Ru * Lu + &
+            (abs(amp_z(+1,+1))**2) * Ru * Ru) * couplz**2 * SpinAvg
+
+       pdfindex = flip(iflip,pdfAUp_,pdfAChm_)
+       res(pdfindex(1),pdfindex(2)) = restmp
+return
+endif
+
+
+
+
+
+
+       !--ubsb -> ubsb//cbdb
+if( (jSel.eq.pdfAUp_ .and. iSel.eq.pdfABot_) .or. (jSel.eq.pdfAChm_ .and. iSel.eq.pdfABot_) ) then
+       amp_z = A0_VV_4f(j1,3,j2,4,vvcoupl,za,zb,sprod,m_z,ga_z)
+
+       restmp = ((abs(amp_z(-1,-1))**2) * Lu * Ld + &
+            (abs(amp_z(-1,+1))**2) * Lu * Rd + &
+            (abs(amp_z(+1,-1))**2) * Ru * Ld + &
+            (abs(amp_z(+1,+1))**2) * Ru * Rd) * couplz**2 * SpinAvg * tag1
+
+       pdfindex = flip(iflip,pdfAUp_,pdfABot_)
+       res(pdfindex(1),pdfindex(2)) = restmp * tagbot
+
+       pdfindex = flip(iflip,pdfAChm_,pdfABot_)
+       res(pdfindex(1),pdfindex(2)) = restmp * tagbot
+
+return
+endif
+
+
+
+if( (jSel.eq.pdfAUp_ .and. iSel.eq.pdfAStr_) .or. (jSel.eq.pdfAChm_ .and. iSel.eq.pdfADn_) ) then
+       amp_z = A0_VV_4f(j1,3,j2,4,vvcoupl,za,zb,sprod,m_z,ga_z)
+       if( all(cdabs(wwcoupl(:)).lt.1d-15) ) then
+          amp_w = A0_VV_4f(j1,4,j2,3,vvcoupl,za,zb,sprod,m_w,ga_w)
+       else
+          amp_w = A0_VV_4f(j1,4,j2,3,wwcoupl,za,zb,sprod,m_w,ga_w,useWWcoupl=.true.)
+       endif
+
+       restmp = ((abs(amp_z(-1,-1))**2) * Lu * Ld + &
+            (abs(amp_z(-1,+1))**2) * Lu * Rd + &
+            (abs(amp_z(+1,-1))**2) * Ru * Ld + &
+            (abs(amp_z(+1,+1))**2) * Ru * Rd) * couplz**2 * SpinAvg * tag1
+       restmp = restmp + abs(amp_w(-1,-1))**2 * couplw**2 * SpinAvg * tag2
+
+       pdfindex = flip(iflip,pdfAUp_,pdfAStr_)
+       res(pdfindex(1),pdfindex(2)) = restmp
+
+       pdfindex = flip(iflip,pdfAChm_,pdfADn_)
+       res(pdfindex(1),pdfindex(2)) = restmp
+return
+endif
+
+
+
+
+
+
+
+       !--dbsb -> dbsb
+if( (jSel.eq.pdfADn_ .and. iSel.eq.pdfAStr_) .or. (jSel.eq.pdfADn_ .and. iSel.eq.pdfABot_) .or. (jSel.eq.pdfAStr_ .and. iSel.eq.pdfABot_) ) then
+
+       amp_z = A0_VV_4f(j1,3,j2,4,vvcoupl,za,zb,sprod,m_z,ga_z)
+       restmp = ((abs(amp_z(-1,-1))**2) * Ld * Ld + &
+            (abs(amp_z(-1,+1))**2) * Ld * Rd + &
+            (abs(amp_z(+1,-1))**2) * Rd * Ld + &
+            (abs(amp_z(+1,+1))**2) * Rd * Rd) * couplz**2 * SpinAvg
+
+       pdfindex = flip(iflip,pdfADn_,pdfAStr_)
+       res(pdfindex(1),pdfindex(2)) = restmp
+
+       pdfindex = flip(iflip,pdfADn_,pdfABot_)
+       res(pdfindex(1),pdfindex(2)) = restmp * tagbot
+
+       pdfindex = flip(iflip,pdfAStr_,pdfABot_)
+       res(pdfindex(1),pdfindex(2)) = restmp * tagbot
+return
+endif
+
+
+
+  RETURN
+  END SUBROUTINE 
+
+
+
+
+
+
+
 
   function flip(i,a1,a2)
     integer :: flip(2)
