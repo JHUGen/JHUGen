@@ -6,13 +6,14 @@ use modHiggsJ
 use modHiggsJJ
 use modVHiggs
 use modTTBH
+use modTH
 implicit none
 include './variables.F90'
 integer, parameter :: LHA2M_PDF(-6:6) = (/-5,-6,-3,-4,-1,-2,0 ,2,1,4,3,6,5/)
 real(8) :: helicity(9), mass(9,2),msq_MCFM(-5:5,-5:5),p_MCFM(14,4)
 integer :: id(9), TopDecays
 real(8) :: p(4,6),p5(4,5),p4(4,4),p9(4,9),p8(4,8),p13(4,13)
-real(8) :: MatElSq,M_Reso,Ga_Reso,MatElSqPDF(-5:5,-5:5),check_vbf(-5:5,-5:5),check_sbf(-5:5,-5:5),check_hj(-5:5,-5:5),check_zh(-5:5,-5:5)
+real(8) :: MatElSq,M_Reso,Ga_Reso,MatElSqPDF(-5:5,-5:5),check_vbf(-5:5,-5:5),check_sbf(-5:5,-5:5),check_hj(-5:5,-5:5),check_zh(-5:5,-5:5),LO_Res_Unpol(-6:6,-6:6)
 integer :: MY_IDUP(6:9)
 ! real(8),  parameter :: GeV=1d0/100d0
 real(8),  parameter :: LHCEnergy=8000d0 * GeV
@@ -23,6 +24,39 @@ complex(8) :: Gggcoupl(1:5),Gqqcoupl(1:2),Gzzcoupl(1:10)
 complex(8) :: TTBHcoupl(1:2)
 integer :: i, j
 real(8) :: lambdaBSM,lambda_z(4),lambda_w(4)
+integer,  target :: Up_  = 1
+integer,  target :: Dn_  = 2
+integer,  target :: Chm_ = 3
+integer,  target :: Str_ = 4
+integer,  target :: Top_ = 5
+integer,  target :: Bot_ = 6
+integer,  target :: ElP_ = 7
+integer,  target :: MuP_ = 8
+integer,  target :: TaP_ = 9
+integer,  target :: Glu_ = 10
+integer,  target :: Pho_ = 11
+integer,  target :: Z0_  = 12
+integer,  target :: Wp_  = 13
+integer,  target :: NuE_ = 14
+integer,  target :: NuM_ = 15
+integer,  target :: NuT_ = 16
+integer,  target :: Hig_ = 25
+
+integer,  target :: AUp_  = -1
+integer,  target :: ADn_  = -2
+integer,  target :: AChm_ = -3
+integer,  target :: AStr_ = -4
+integer,  target :: ATop_ = -5
+integer,  target :: ABot_ = -6
+integer,  target :: ElM_  = -7
+integer,  target :: MuM_  = -8
+integer,  target :: TaM_  = -9
+integer,  target :: Wm_   = -13
+integer,  target :: ANuE_ = -14
+integer,  target :: ANuM_ = -15
+integer,  target :: ANuT_ = -16
+
+
 
 
 ! input unit = GeV/100 such that 125GeV is 1.25 in the code
@@ -277,6 +311,7 @@ real(8) :: lambdaBSM,lambda_z(4),lambda_w(4)
 
   
 
+
   
   
   
@@ -306,6 +341,65 @@ real(8) :: lambdaBSM,lambda_z(4),lambda_w(4)
    print *, 'Matr.el. squared,gg->ttbH',MatElSq ,MatElSq/( 1849.90671287913d0 + 2842.07693611093d0 ) * 1.14594184663D0
    
    
+
+
+
+
+      print *, ""
+
+      TopDecays = 0
+      p13(1:4, 1)= -(/  9.7874342193510468d0,  0.0000000000000000d0,  0.0000000000000000d0,  9.7874342193510468d0   /)
+      p13(1:4, 2)= -(/  9.2977851537577170d0,  0.0000000000000000d0,  0.0000000000000000d0, -9.2977851537577170d0   /)
+      p13(1:4, 3)= (/  8.6778443628345983d0, -6.4821540094930068d0,  3.4577764095902768d0, -4.4461156624715583d0   /)
+      p13(1:4, 4)= (/  2.2106067055897123d0,  0.0991617911895264d0,  0.2290221720430701d0,  1.3508048677284821d0   /)
+      p13(1:4, 5)= (/  8.1967683046844542d0,  6.3829922183034800d0, -3.6867985816333464d0,  3.5849598603364061d0   /)
+
+      TTBHcoupl(1) = (1d0,0d0)
+      TTBHcoupl(2) = (0d0,0d0)
+
+      call EvalAmp_QB_TH(p13(1:4,1:9),TTBHcoupl,TopDecays,LO_Res_Unpol)
+      print *, 'Matr.el. squared,qb->qtH',LO_Res_Unpol(Up_,Bot_),LO_Res_Unpol(Up_,Bot_)/1.049507609593066d-003
+      print *, 'Matr.el. squared,qb->qtH',LO_Res_Unpol(Bot_,Up_),LO_Res_Unpol(Bot_,Up_)/1.280488548899522d-003
+      print *, 'Matr.el. squared,qb->qtH',LO_Res_Unpol(ADn_,Bot_),LO_Res_Unpol(ADn_,Bot_)/2.081443944891091d-004
+      print *, 'Matr.el. squared,qb->qtH',LO_Res_Unpol(Bot_,ADn_),LO_Res_Unpol(Bot_,ADn_)/7.220195562015913d-004 
+
+
+
+      TopDecays = 1
+      p13(1:4, 1)= -(/  9.8417970033143032d0,  0.0000000000000000d0,  0.0000000000000000d0,  9.8417970033143032d0   /)
+      p13(1:4, 2)= -(/  6.3123031317004434d0,  0.0000000000000000d0,  0.0000000000000000d0, -6.3123031317004434d0   /)
+      p13(1:4, 3)= (/  5.9766360090616208d0, -1.8511659245935128d0,  4.9632444771012443d0, -2.4692239600651549d0   /)
+      p13(1:4, 4)= (/  3.0344443548727673d0, -1.8455807404734683d0, -1.0803193014072070d0,  1.2785814327682274d0   /)
+      p13(1:4, 5)= (/  7.1430197710803602d0,  3.6967466650669811d0, -3.8829251756940377d0,  4.7201363989107881d0   /)
+      p13(1:4, 6)= (/  0.6996106119904022d0, -0.5105695682736915d0,  0.3638334071184443d0,  0.3104818452453953d0   /)
+      p13(1:4, 7)= (/  2.3348337428823651d0, -1.3350111721997768d0, -1.4441527085256514d0,  0.9680995875228320d0   /)
+      p13(1:4, 8)= (/  0.5776965244852138d0, -0.1433307123133740d0, -0.5589332893276414d0,  0.0279849851066435d0   /)
+      p13(1:4, 9)= (/  1.7571372183971512d0, -1.1916804598864028d0, -0.8852194191980098d0,  0.9401146024161884d0   /)
+
+      call EvalAmp_QB_TH(p13(1:4,1:9),TTBHcoupl,TopDecays,LO_Res_Unpol)
+      print *, 'Matr.el. squared,qb->qtH',LO_Res_Unpol(Up_,Bot_),LO_Res_Unpol(Up_,Bot_)/0.284758712972994d0
+      print *, 'Matr.el. squared,qb->qtH',LO_Res_Unpol(Bot_,Up_),LO_Res_Unpol(Bot_,Up_)/2.563212477812484d-002
+      print *, 'Matr.el. squared,qb->qtH',LO_Res_Unpol(ADn_,Bot_),LO_Res_Unpol(ADn_,Bot_)/0.108606428211673d0
+      print *, 'Matr.el. squared,qb->qtH',LO_Res_Unpol(Bot_,ADn_),LO_Res_Unpol(Bot_,ADn_)/1.046682368912733d-002
+
+
+
+
+
+      p13(1:4,1) = -(/         65d0,           0.0000000000000000d0, 0.0000000000000000d0,      65d0           /)
+      p13(1:4,2) = -(/         65d0,           0.0000000000000000d0, 0.0000000000000000d0,     -65d0           /)
+      p13(1:4, 3)= (/  2.9874912525118145d0,  1.8997099515936877d0,  1.2153648472485448d0, -1.5088387494106308d0   /)
+      p13(1:4, 4)= (/  1.7949401873990432d0, -0.1775843756226277d0, -0.3279788942841994d0,  0.2878887124896471d0   /)
+      p13(1:4, 5)= (/  2.4336840717496426d0, -1.7221255759710599d0, -0.8873859529643454d0,  1.4729724478603887d0   /)
+      p13(1:4, 6)= (/  0.5434663913025691d0,  0.2852653137486568d0,  0.4625619417027513d0,  0.0039836334542818d0   /)
+      p13(1:4, 7)= (/  1.2514737960964741d0, -0.4628496893712846d0, -0.7905408359869507d0,  0.2839050790353653d0   /)
+      p13(1:4, 8)= (/  0.5301510637154445d0, -0.5155386531213912d0, -0.1053847880936881d0,  0.0646072281935035d0   /)
+      p13(1:4, 9)= (/  0.7213227323810296d0,  0.0526889637501066d0, -0.6851560478932626d0,  0.2192978508418619d0   /)
+
+      call EvalXSec_PP_TH(p13(1:4,1:9),TTBHcoupl,TopDecays,MatElSq)
+      print *, 'Matr.el. squared,PP->qtH',MatElSq,MatElSq/0.154800780966d0
+
+
 
 
 
