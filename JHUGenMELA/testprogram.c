@@ -431,9 +431,13 @@ int main(void){
  Pth[8][2] = (-0.6851560478932626);
  Pth[8][3] = (0.2192978508418619); 
  
- 
+
+     MReso = 125.0/100.0;  
+      __modth_MOD_initprocess_th(&MReso);
+
       TopDecays=1;        
-      __modth_MOD_evalxsec_pp_th(Pth, TTBHcoupl, &TopDecays, &MatElSq);
+      int Channel = 1;
+      __modth_MOD_evalxsec_pp_th(Pth, TTBHcoupl, &TopDecays, &Channel, &MatElSq);
       printf("\n ");
       printf("Matr.el. squared (PP->qth): %20.17e \n ",MatElSq);
       printf("result should be (PP->qth): %20.17e \n ",0.154800780966);
