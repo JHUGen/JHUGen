@@ -11,7 +11,7 @@ implicit none
 include './variables.F90'
 integer, parameter :: LHA2M_PDF(-6:6) = (/-5,-6,-3,-4,-1,-2,0 ,2,1,4,3,6,5/)
 real(8) :: helicity(9), mass(9,2),msq_MCFM(-5:5,-5:5),p_MCFM(14,4)
-integer :: id(9), TopDecays
+integer :: id(9), TopDecays, Channel
 real(8) :: p(4,6),p5(4,5),p4(4,4),p9(4,9),p8(4,8),p13(4,13)
 real(8) :: MatElSq,M_Reso,Ga_Reso,MatElSqPDF(-5:5,-5:5),check_vbf(-5:5,-5:5),check_sbf(-5:5,-5:5),check_hj(-5:5,-5:5),check_zh(-5:5,-5:5),LO_Res_Unpol(-6:6,-6:6)
 integer :: MY_IDUP(6:9)
@@ -357,6 +357,8 @@ integer,  target :: ANuT_ = -16
       TTBHcoupl(1) = (1d0,0d0)
       TTBHcoupl(2) = (0d0,0d0)
 
+      M_Reso  = 125d0 * GeV
+      call InitProcess_TH(m_Reso)
       call EvalAmp_QB_TH(p13(1:4,1:9),TTBHcoupl,TopDecays,LO_Res_Unpol)
       print *, 'Matr.el. squared,qb->qtH',LO_Res_Unpol(Up_,Bot_),LO_Res_Unpol(Up_,Bot_)/1.049507609593066d-003
       print *, 'Matr.el. squared,qb->qtH',LO_Res_Unpol(Bot_,Up_),LO_Res_Unpol(Bot_,Up_)/1.280488548899522d-003
@@ -376,6 +378,9 @@ integer,  target :: ANuT_ = -16
       p13(1:4, 8)= (/  0.5776965244852138d0, -0.1433307123133740d0, -0.5589332893276414d0,  0.0279849851066435d0   /)
       p13(1:4, 9)= (/  1.7571372183971512d0, -1.1916804598864028d0, -0.8852194191980098d0,  0.9401146024161884d0   /)
 
+
+      M_Reso  = 125d0 * GeV
+      call InitProcess_TH(m_Reso)
       call EvalAmp_QB_TH(p13(1:4,1:9),TTBHcoupl,TopDecays,LO_Res_Unpol)
       print *, 'Matr.el. squared,qb->qtH',LO_Res_Unpol(Up_,Bot_),LO_Res_Unpol(Up_,Bot_)/0.284758712972994d0
       print *, 'Matr.el. squared,qb->qtH',LO_Res_Unpol(Bot_,Up_),LO_Res_Unpol(Bot_,Up_)/2.563212477812484d-002
@@ -396,7 +401,10 @@ integer,  target :: ANuT_ = -16
       p13(1:4, 8)= (/  0.5301510637154445d0, -0.5155386531213912d0, -0.1053847880936881d0,  0.0646072281935035d0   /)
       p13(1:4, 9)= (/  0.7213227323810296d0,  0.0526889637501066d0, -0.6851560478932626d0,  0.2192978508418619d0   /)
 
-      call EvalXSec_PP_TH(p13(1:4,1:9),TTBHcoupl,TopDecays,MatElSq)
+      Channel=1!   1=t-channel, 2=s-channel, 0=all
+      M_Reso  = 125d0 * GeV
+      call InitProcess_TH(m_Reso)
+      call EvalXSec_PP_TH(p13(1:4,1:9),TTBHcoupl,TopDecays,Channel,MatElSq)
       print *, 'Matr.el. squared,PP->qtH',MatElSq,MatElSq/0.154800780966d0
 
 
