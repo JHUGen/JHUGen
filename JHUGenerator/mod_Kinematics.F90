@@ -1873,7 +1873,7 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, Higgs=5
 !           return
 !        endif
 
-       if(  pT_j1.lt.15d0*GeV .or. pT_j2.lt.15d0*GeV )  then
+       if(  pT_j1.lt.ptjetcut .or. pT_j2.lt.ptjetcut )  then
           applyPSCut=.true.
           return
        endif
@@ -1931,7 +1931,7 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, Higgs=5, V1=6, V2=7, 
 !        endif
 
 
-       if(  pT_j1.lt.15d0*GeV .or. pT_j2.lt.15d0*GeV )  then
+       if(  pT_j1.lt.ptjetcut .or. pT_j2.lt.ptjetcut )  then
           applyPSCut=.true.
           return
        endif
