@@ -3,7 +3,8 @@ use ModParameters
 implicit none
 
 
-public :: EvalAmp_QB_TH, EvalAmp_QbarBbar_TH,EvalAmp_QQB_THBBAR,EvalAmp_QQB_TBARHB
+public :: EvalAmp_QB_TH, EvalAmp_QbarBbar_TH     ! t-channel
+public :: EvalAmp_QQB_THBBAR,EvalAmp_QQB_TBARHB  ! s-channel
 private
 
  CONTAINS 
@@ -466,6 +467,9 @@ END SUBROUTINE
         amp(2)=(ampw(2)+ampt(2))*mdecay(2)
         
       END SUBROUTINE 
+      
+      
+      
       subroutine udbar_htbbaramp(p1,p2,e3,k3,k4,e4,p5,za,zb,s,mdecay,amp)
 ! amplitude for production u(p1)+dbar(p2)->H(p3)+t(p4)+bbar(p5)
 ! allowing for scalar & pseudoscalar couplings of Higgs to top

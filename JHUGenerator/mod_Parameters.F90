@@ -3,7 +3,7 @@ implicit none
 save
 ! 
 ! 
-character(len=6),parameter :: JHUGen_Version="v6.6.2"
+character(len=6),parameter :: JHUGen_Version="v6.6.3"
 ! 
 ! 
 integer, public :: Collider, PDFSet,PChannel,Process,DecayMode1,DecayMode2,TopDecays,TauDecays
@@ -488,7 +488,9 @@ implicit none
 integer :: convertLHEreverse
 integer :: Part
 
-  if(     Part.eq.1 ) then
+  if(     Part.eq.0 ) then      ! 0=Glu_ is not the official LHE convention
+      convertLHEreverse = Glu_
+  elseif(     Part.eq.1 ) then
       convertLHEreverse = Dn_
   elseif( Part.eq.2 ) then
       convertLHEreverse = Up_

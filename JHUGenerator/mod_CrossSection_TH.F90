@@ -245,7 +245,7 @@ EvalUnWeighted_TH = 0d0
           ICOLUP(1:2,qout) = (/000,502/)
           ICOLUP(1:2,inLeft) = (/501,000/)
           ICOLUP(1:2,inRight)= (/000,501/)
-          MY_IDUP(b)   = ABot_;       ICOLUP(1:2,b)   = (/502,00/)
+          MY_IDUP(b)   = Bot_;       ICOLUP(1:2,b)   = (/502,00/)
           MY_IDUP(W)   = DK_IDUP(1); ICOLUP(1:2,W)   = (/000,000/)
           MY_IDUP(lep) = DK_IDUP(3); ICOLUP(1:2,lep) = DK_ICOLUP(1:2,3)
           MY_IDUP(nu)  = DK_IDUP(4); ICOLUP(1:2,nu)  = DK_ICOLUP(1:2,4)  
