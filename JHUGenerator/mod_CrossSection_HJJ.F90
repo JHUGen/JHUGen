@@ -280,6 +280,7 @@ END FUNCTION
  use ModKinematics
  use ModParameters
  use ModHiggsjj
+ use ModMisc
 #if compiler==1
  use ifport
 #endif
@@ -299,6 +300,7 @@ END FUNCTION
    
  
    if( Process.eq.60 ) NumPartonicChannels = 121 !=ij_num**2=121 for WBF   (-5,..,-1,0,+1,..,+5)^2
+   if( Process.eq.61 ) NumPartonicChannels = 121 !=ij_num**2=121 for WBF   (-5,..,-1,0,+1,..,+5)^2
    iPartChannel = int(yRnd(8) * (NumPartonicChannels))! this runs from 0..120
    
    PartChannelAvg = NumPartonicChannels
@@ -365,6 +367,9 @@ if( unweighted ) then
 
   else! not warmup
 
+
+   if( Process.eq.60 ) then
+
       MY_IDUP(1:2)= (/LHA2M_ID(iPart_sel),LHA2M_ID(jPart_sel)/)
       if( MY_IDUP(1).gt.0 ) then ! quark
           ICOLUP(1:2,1) = (/501,000/)
@@ -409,6 +414,65 @@ if( unweighted ) then
       endif
       MY_IDUP(5)  = Hig_
       ICOLUP(1:2,5) = (/000,000/)
+
+   elseif( Process.eq.61 ) then
+
+      MY_IDUP(1:5)  = (/LHA2M_ID(iPart_sel),LHA2M_ID(jPart_sel),LHA2M_ID(iPart_sel),LHA2M_ID(jPart_sel),Hig_/)
+
+      if( MY_IDUP(1).eq.Glu_ .and. MY_IDUP(2).eq.Glu_ ) then! gg->gg
+          ICOLUP(1:2,1) = (/501,502/)
+          ICOLUP(1:2,2) = (/503,501/)
+          ICOLUP(1:2,3) = (/504,502/)
+          ICOLUP(1:2,4) = (/503,504/)
+      elseif( MY_IDUP(1).ne.Glu_ .and. MY_IDUP(1).gt.0 .and. MY_IDUP(2).eq.Glu_ ) then! qg->qg
+          ICOLUP(1:2,1) = (/501,000/)
+          ICOLUP(1:2,2) = (/502,501/)
+          ICOLUP(1:2,3) = (/503,000/)
+          ICOLUP(1:2,4) = (/502,503/)   
+      elseif( MY_IDUP(1).ne.Glu_ .and. MY_IDUP(1).lt.0 .and. MY_IDUP(2).eq.Glu_ ) then! qbg->qbg
+          ICOLUP(1:2,1) = (/000,501/)
+          ICOLUP(1:2,2) = (/501,502/)
+          ICOLUP(1:2,3) = (/000,503/)
+          ICOLUP(1:2,4) = (/503,502/)
+      elseif( MY_IDUP(1).eq.Glu_ .and. MY_IDUP(2).ne.Glu_ .and. MY_IDUP(2).gt.0 ) then! gq->gq
+          ICOLUP(1:2,2) = (/501,000/)
+          ICOLUP(1:2,1) = (/502,501/)
+          ICOLUP(1:2,4) = (/503,000/)
+          ICOLUP(1:2,3) = (/502,503/)   
+      elseif( MY_IDUP(1).eq.Glu_ .and. MY_IDUP(2).ne.Glu_ .and. MY_IDUP(2).lt.0 ) then! gqb->gqb
+          ICOLUP(1:2,2) = (/000,501/)
+          ICOLUP(1:2,1) = (/501,502/)
+          ICOLUP(1:2,4) = (/000,503/)
+          ICOLUP(1:2,3) = (/503,502/)
+      elseif( MY_IDUP(1).gt.0 .and. MY_IDUP(2).lt.0 ) then! qqb->qqb
+          ICOLUP(1:2,1) = (/501,000/)
+          ICOLUP(1:2,2) = (/000,501/)
+          ICOLUP(1:2,3) = (/502,000/)
+          ICOLUP(1:2,4) = (/000,502/) 
+      elseif( MY_IDUP(1).gt.0 .and. MY_IDUP(2).gt.0 ) then! qq->qq
+          ICOLUP(1:2,1) = (/501,000/)
+          ICOLUP(1:2,2) = (/502,000/)
+          ICOLUP(1:2,3) = (/501,000/)
+          ICOLUP(1:2,4) = (/502,000/) 
+      elseif( MY_IDUP(1).lt.0 .and. MY_IDUP(2).gt.0 ) then! qbq->qbq
+          ICOLUP(1:2,2) = (/501,000/)
+          ICOLUP(1:2,1) = (/000,501/)
+          ICOLUP(1:2,4) = (/502,000/)
+          ICOLUP(1:2,3) = (/000,502/) 
+      elseif( MY_IDUP(1).lt.0 .and. MY_IDUP(2).lt.0 ) then! qbqb->qbqb
+          ICOLUP(1:2,1) = (/000,501/)
+          ICOLUP(1:2,2) = (/000,502/)
+          ICOLUP(1:2,3) = (/000,501/)
+          ICOLUP(1:2,4) = (/000,502/)
+      endif
+      if( (MomExt(4,1)*MomExt(4,3).lt.0d0) .and. (MomExt(4,2)*MomExt(4,4).lt.0d0) ) then
+        call swapi(MY_IDUP(3),MY_IDUP(4))
+        call swapi(ICOLUP(1,3),ICOLUP(1,4))
+        call swapi(ICOLUP(2,3),ICOLUP(2,4))
+      endif
+
+      ICOLUP(1:2,5) = (/000,000/) 
+   endif
 
       
       call random_number(xRnd) 

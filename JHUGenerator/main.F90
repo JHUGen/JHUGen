@@ -141,7 +141,7 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
         read(arg(10:11),*) PChannel
         CountArg = CountArg + 1
     elseif( arg(1:9).eq."DataFile=" ) then
-        read(arg(10:109),"(A)") DataFile
+        read(arg(10:500),"(A)") DataFile
         CountArg = CountArg + 1
     elseif( arg(1:8).eq."Process=" ) then
         read(arg(9:11),*) Process
@@ -617,7 +617,8 @@ NDim = NDim + 1 ! for pdf sampling
       if(Process.eq.61) then
          NDim = 5
          NDim = NDim + 2 ! sHat integration
-         if( unweighted ) NDim = NDim + 1  ! random number which decides if event is accepted
+NDim = NDim + 1 ! for pdf sampling       
+!          if( unweighted ) NDim = NDim + 1  ! random number which decides if event is accepted
          
          VegasIt1_default = 5
          VegasNc0_default = 10000000
@@ -950,8 +951,6 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
     endif
     print *, ""
 
-    call cpu_time(time_end)
-
 
     print *, " Evaluation Counter: ",EvalCounter
     print *, " Acceptance Counter: ",AccepCounter
@@ -1006,6 +1005,8 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
                
    
   endif! unweighted
+
+  call cpu_time(time_end)
   
   
 
@@ -1039,6 +1040,8 @@ integer :: flav1,flav2,StatusPercent
 integer :: VegasSeed
 logical, parameter :: UseBetaVersion=.true.
 
+VG_Result = -13d0
+VG_Error  = -13d0
 
 if( VegasIt1.eq.-1 ) VegasIt1 = VegasIt1_default
 if( VegasNc0.eq.-1 ) VegasNc0 = VegasNc0_default
@@ -1051,6 +1054,7 @@ if( VegasNc2.eq.-1 .and.  .not. (unweighted) ) VegasNc2 = VegasNc2_default
 
 
 
+   call cpu_time(time_start)    
    warmup = .false.
    itmx = VegasIt1
    ncall= VegasNc1
@@ -1116,40 +1120,52 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
 if( UseBetaVersion ) then 
 ! !-------------------new stuff -------------------
     write(io_stdout,"(1X,A)")  "Scanning the integrand"
-    CrossSecMax(:,:) = 0d0
-    CrossSec(:,:) = 0d0
     warmup = .true.
-    
     itmx = 5
     ncall= VegasNc0
+    if( Process.eq.60 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
+    if( Process.eq.61 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
+    
+    
+    CrossSecMax(:,:) = 0d0
+    CrossSec(:,:) = 0d0
+    
+    itmx = 3
 !     if( Process.eq.80 ) call vegas(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2) ! adjust to LHE format
 !     if( Process.eq.90 ) call vegas(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
-    if( Process.eq.60 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
+    if( Process.eq.60 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
 !     if( Process.eq.66 ) call vegas(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
-    if( Process.eq.61 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
+    if( Process.eq.61 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
 !     if( Process.eq.110) call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
 !     if( Process.eq.111) call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)    
 !     if( Process.eq.112) call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)    
 !     if( Process.eq.113) call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)    
 
+
+
+
+
+
+
+
     CrossSec(:,:) = CrossSec(:,:)/dble(itmx)    
     write(io_stdout,"(A)")  ""
-    write(io_stdout,"(1X,A,F10.3,A,F10.3,A)") "Total xsec: ",VG_Result, " +/-",VG_Error, " fb"
+    write(io_stdout,"(1X,A,F10.3,A,F10.3,A,F10.3)") "Total xsec: ",VG_Result, " +/-",VG_Error, " fb    vs.",sum(CrossSec(:,:))
 
     RequEvents(:,:)=0
     do i1=-5,5
     do j1=-5,5
-        RequEvents(i1,j1) = RequEvents(i1,j1) + int( CrossSec(i1,j1)/VG_Result * VegasNc2 )
+        RequEvents(i1,j1) = RequEvents(i1,j1) + nint( CrossSec(i1,j1)/VG_Result * VegasNc2 )
     enddo
     enddo
     do i1=-5,5
     do j1=-5,5
-        if( CrossSec(i1,j1).gt.1d-9 ) write(io_stdout,"(1X,A,3X,F8.3,I9)") "Fractional partonic xsec "//getLHEParticle(i1)//" "//getLHEParticle(j1)//" ",CrossSec(i1,j1)/VG_Result,RequEvents(i1,j1)
+        if( RequEvents(i1,j1).gt.0 ) write(io_stdout,"(1X,A,3X,F8.3,I9)") "Fractional partonic xsec "//getLHEParticle(i1)//" "//getLHEParticle(j1)//" ",CrossSec(i1,j1)/VG_Result,RequEvents(i1,j1)
     enddo
     enddo
     write(io_stdout,"(1X,A,F8.3,I9)") "Sum        partonic xsec   x   x    ",sum(CrossSec(:,:))/VG_Result,sum(RequEvents(:,:))
 
-      
+! pause      
       
     write(io_stdout,"(A)")  ""
     write(io_stdout,"(1X,A)")  "Event generation"
@@ -1166,8 +1182,7 @@ if( UseBetaVersion ) then
     CrossSecMax(:,:) = 1.0d0 * CrossSecMax(:,:)    !  adjustment factor
 
 
-    ncall= 500000
-    call cpu_time(time_start)    
+!     ncall= 1000000
     do while( StatusPercent.lt.100d0  )
     
 !         if( Process.eq.80 ) call vegas1(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)! adjust to LHE format
@@ -1190,7 +1205,7 @@ if( UseBetaVersion ) then
         enddo  
         StatusPercent = int(100d0*dble(sum(AccepCounter_part(:,:)))/dble(sum(RequEvents(:,:)))  )   
     enddo
-    call cpu_time(time_end)
+    call cpu_time(time_end)  
     write(io_stdout,*)  " event generation rate (events/sec)",dble(sum(AccepCounter_part(:,:)))/(time_end-time_start+1d-10)
 
     
@@ -1337,12 +1352,10 @@ else! beta version
 
     
 endif! beta version
-                     
-                     
-                     
-                     
+                                         
   endif! unweighted
   
+
   
 
 

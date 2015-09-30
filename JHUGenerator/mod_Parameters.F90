@@ -3,7 +3,7 @@ implicit none
 save
 ! 
 ! 
-character(len=6),parameter :: JHUGen_Version="v6.6.2"
+character(len=6),parameter :: JHUGen_Version="v6.6.3"
 ! 
 ! 
 integer, public :: Collider, PDFSet,PChannel,Process,DecayMode1,DecayMode2,TopDecays,TauDecays
@@ -22,7 +22,7 @@ real(8), public :: CrossSecMax(-6:+6,-6:+6),CrossSec(-6:+6,-6:+6)
 integer, public :: iPart_sel, jPart_sel
 real(8) :: time_start,time_end,time_int
 logical, public :: warmup
-character(len=100) :: DataFile
+character(len=500) :: DataFile
 character(len=100) :: LogFile
 character(len=500) :: LHEProdFile
 character(len=100) :: LHAPDFString
@@ -439,7 +439,7 @@ integer,parameter :: io_LHEOutFile3=20
 
 integer, public :: DebugCounter(0:10) = 0
 real(8), public :: debugvar(0:10) = 0d0
-
+integer, public :: ijPartons(1:2)=0
 
 
 
@@ -488,7 +488,9 @@ implicit none
 integer :: convertLHEreverse
 integer :: Part
 
-  if(     Part.eq.1 ) then
+  if(     Part.eq.0 ) then      ! 0=Glu_ is not the official LHE convention
+      convertLHEreverse = Glu_
+  elseif(     Part.eq.1 ) then
       convertLHEreverse = Dn_
   elseif( Part.eq.2 ) then
       convertLHEreverse = Up_

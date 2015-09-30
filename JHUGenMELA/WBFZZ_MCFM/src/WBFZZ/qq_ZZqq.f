@@ -392,7 +392,7 @@ C-----Singly resonant production in VBF style diagrams
       call ZZHZZamp(j1(j),j2(j),3,4,5,6,j8(j),j7(j),
      & za,zb,ZZHamp81_72)
       
-      
+     
 C----Four boson vertex + WW->Higgs diagram 
       call WWZZ(j1(j),j2(j),3,4,5,6,j7(j),j8(j),
      & za,zb,WWZZ71_82amp,srWWZZ71_82amp) 
