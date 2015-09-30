@@ -22,7 +22,7 @@ real(8), public :: CrossSecMax(-6:+6,-6:+6),CrossSec(-6:+6,-6:+6)
 integer, public :: iPart_sel, jPart_sel
 real(8) :: time_start,time_end,time_int
 logical, public :: warmup
-character(len=100) :: DataFile
+character(len=500) :: DataFile
 character(len=100) :: LogFile
 character(len=500) :: LHEProdFile
 character(len=100) :: LHAPDFString
@@ -439,7 +439,7 @@ integer,parameter :: io_LHEOutFile3=20
 
 integer, public :: DebugCounter(0:10) = 0
 real(8), public :: debugvar(0:10) = 0d0
-
+integer, public :: ijPartons(1:2)=0
 
 
 
