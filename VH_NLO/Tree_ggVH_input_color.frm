@@ -1,0 +1,14 @@
+Global [1,Col] = SUNF(Glu1, Glu2, GluInt5)*SUNT(GluInt5, ColInt5, ColInt5);
+Global [2,Col] = SUNF(Glu1, Glu2, GluInt5)*SUNT(GluInt5, ColInt5, ColInt5);
+Global [3,Col] = SUNT(Glu1, ColInt6, ColInt5)*SUNT(Glu2, ColInt5, ColInt6);
+Global [4,Col] = SUNT(Glu1, ColInt5, ColInt6)*SUNT(Glu2, ColInt6, ColInt5);
+Global [5,Col] = SUNT(Glu1, ColInt6, ColInt5)*SUNT(Glu2, ColInt5, ColInt6);
+Global [6,Col] = SUNT(Glu1, ColInt5, ColInt6)*SUNT(Glu2, ColInt6, ColInt5);
+Global [7,Col] = SUNT(Glu1, ColInt6, ColInt5)*SUNT(Glu2, ColInt5, ColInt6);
+Global [8,Col] = SUNT(Glu1, ColInt5, ColInt6)*SUNT(Glu2, ColInt6, ColInt5);
+Global [9,Col] = SUNT(Glu1, ColInt6, ColInt5)*SUNT(Glu2, ColInt5, ColInt6);
+Global [10,Col] = SUNT(Glu1, ColInt5, ColInt6)*SUNT(Glu2, ColInt6, ColInt5);
+Global [11,Col] = SUNT(Glu1, ColInt6, ColInt5)*SUNT(Glu2, ColInt5, ColInt6);
+Global [12,Col] = SUNT(Glu1, ColInt5, ColInt6)*SUNT(Glu2, ColInt6, ColInt5);
+Global [13,Col] = SUNF(Glu1, Glu2, GluInt5)*SUNT(GluInt5, ColInt5, ColInt5);
+Global [14,Col] = SUNF(Glu1, Glu2, GluInt5)*SUNT(GluInt5, ColInt5, ColInt5);
