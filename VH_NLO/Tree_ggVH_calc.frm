@@ -149,7 +149,7 @@ endargument;
 ***#call insertMandelstam2to2();
 
 
-id e_(Lor1?,Lor2?,Lor3?,Lor4?) = LeviCiv(Lor1,Lor2,Lor3,Lor4)   *000;
+id e_(Lor1?,Lor2?,Lor3?,Lor4?) = LeviCiv(Lor1,Lor2,Lor3,Lor4);
 
 
 

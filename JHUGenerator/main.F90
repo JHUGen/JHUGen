@@ -141,7 +141,7 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
         read(arg(10:11),*) PChannel
         CountArg = CountArg + 1
     elseif( arg(1:9).eq."DataFile=" ) then
-        read(arg(10:109),"(A)") DataFile
+        read(arg(10:500),"(A)") DataFile
         CountArg = CountArg + 1
     elseif( arg(1:8).eq."Process=" ) then
         read(arg(9:11),*) Process
@@ -1165,7 +1165,7 @@ if( UseBetaVersion ) then
     enddo
     write(io_stdout,"(1X,A,F8.3,I9)") "Sum        partonic xsec   x   x    ",sum(CrossSec(:,:))/VG_Result,sum(RequEvents(:,:))
 
-pause      
+! pause      
       
     write(io_stdout,"(A)")  ""
     write(io_stdout,"(1X,A)")  "Event generation"
