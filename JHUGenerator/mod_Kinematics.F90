@@ -2089,7 +2089,7 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, Higgs=5
 !           return
 !        endif
 
-       if(  pT_j1.lt.ptjetcut .or. pT_j2.lt.ptjetcut )  then
+       if(  pT_j1.lt.pTjetcut .or. pT_j2.lt.pTjetcut )  then
           applyPSCut=.true.
           return
        endif
@@ -2106,6 +2106,7 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, Higgs=5
        NBin(3)  = WhichBin(3,pT_H)
        NBin(4)  = WhichBin(4,pT_jl)
        NBin(5)  = WhichBin(5,dy_j1j2)
+       NBin(6:7)= 1
 
 
 RETURN
@@ -2301,7 +2302,7 @@ applyPSCut = .false.
  !     binning
        NBin(1)  = WhichBin(1,m_jj)
        NBin(2)  = WhichBin(2,dphi_jj)
-       NBin(3:5) = 1
+       NBin(3:7) = 1
 
 RETURN
 END SUBROUTINE

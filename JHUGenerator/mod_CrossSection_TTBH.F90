@@ -23,7 +23,7 @@ real(8) :: pdf(-6:6,1:2)
 real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi, PDFFac1,PDFFac2,xRnd
 real(8) :: MomExt(1:4,1:13),MomOffShell(1:4,1:13),PSWgt,PSWgt2,PSWgt3,PSWgt4
 real(8) :: LO_Res_Unpol,LO_Res_GG_Unpol,LO_Res_QQB_Unpol,PreFac  !, MG_MOM(0:3,1:5),MadGraph_tree
-integer :: NBin(1:NumHistograms),NHisto,iPart,iPartChannel,PartChannelAvg
+integer :: NBin(1:NumHistograms),NHisto,iPartChannel,PartChannelAvg
 integer :: MY_IDUP(1:13),ICOLUP(1:2,1:13),DK_IDUP(1:6),DK_ICOLUP(1:2,3:6)
 logical :: applyPSCut
 integer, parameter :: NumPartonicChannels=6
