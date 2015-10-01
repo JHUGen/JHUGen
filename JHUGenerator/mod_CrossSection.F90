@@ -816,6 +816,11 @@ endif
       stop
     endif
 
+    if( IsNaN(EvalWeighted_VHiggs) ) then
+        EvalWeighted_VHiggs = 0d0
+        return
+    endif
+
     if(EvalWeighted_VHiggs.ne.0d0)then
       call WriteOutEvent_VHiggs(id,helicity,MomExt,inv_mass,EventWeight=EvalWeighted_VHiggs*VgsWgt)
     endif
@@ -1270,7 +1275,7 @@ elseif( IsAPhoton(DecayMode1) ) then
   stop
 endif
 
-   
+
   CS_max = csmax(ifound,jfound)
   if( EvalUnWeighted_VHiggs.gt. CS_max) then
     write(io_stdout,"(2X,A,1PE13.6,1PE13.6)")  "CS_max is too small.",EvalUnWeighted_VHiggs, CS_max
