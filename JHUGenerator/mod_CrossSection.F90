@@ -596,6 +596,9 @@ if( IsAZDecay(DecayMode1) ) then
       call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt)
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut)
       if( applyPSCut .or. PSWgt.eq.zero ) return
+      if(H_DK.eqv..false.) then
+        if(dabs(inv_mass(5)-M_Reso).gt.6d0*Ga_Reso) return
+      endif
 
       call setPDFs(eta1,eta2,Mu_Fact,pdf)
       FluxFac = 1d0/(2d0*EHat**2)
@@ -634,6 +637,9 @@ if( IsAZDecay(DecayMode1) ) then
       call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt)
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut)
       if( applyPSCut .or. PSWgt.eq.zero ) return
+      if(H_DK.eqv..false.) then
+        if(dabs(inv_mass(5)-M_Reso).gt.6d0*Ga_Reso) return
+      endif
 
       FluxFac = 1d0/(2d0*ILC_Energy**2)
       PreFac = fbGeV2 * FluxFac * PSWgt *6d0 !2 for e and mu, 3 for colors of b
@@ -673,6 +679,9 @@ elseif( IsAWDecay(DecayMode1) ) then
       call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt)
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut)
       if( applyPSCut .or. PSWgt.eq.zero ) return
+      if(H_DK.eqv..false.) then
+        if(dabs(inv_mass(5)-M_Reso).gt.6d0*Ga_Reso) return
+      endif
 
       call setPDFs(eta1,eta2,Mu_Fact,pdf)
       FluxFac = 1d0/(2d0*EHat**2)
@@ -1145,6 +1154,9 @@ if( IsAZDecay(DecayMode1) ) then
       call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt)
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut)
       if( applyPSCut .or. PSWgt.eq.zero ) return
+      if(H_DK.eqv..false.) then
+        if(dabs(inv_mass(5)-M_Reso).gt.6d0*Ga_Reso) return
+      endif
 
       call setPDFs(eta1,eta2,Mu_Fact,pdf)
       FluxFac = 1d0/(2d0*EHat**2)
@@ -1169,6 +1181,9 @@ if( IsAZDecay(DecayMode1) ) then
       call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt)
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut)
       if( applyPSCut .or. PSWgt.eq.zero ) return
+      if(H_DK.eqv..false.) then
+        if(dabs(inv_mass(5)-M_Reso).gt.6d0*Ga_Reso) return
+      endif
 
       FluxFac = 1d0/(2d0*ILC_Energy**2)
       PreFac = fbGeV2 * FluxFac * PSWgt
@@ -1194,6 +1209,9 @@ elseif( IsAWDecay(DecayMode1) ) then
       call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt)
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut)
       if( applyPSCut .or. PSWgt.eq.zero ) return
+      if(H_DK.eqv..false.) then
+        if(dabs(inv_mass(5)-M_Reso).gt.6d0*Ga_Reso) return
+      endif
 
       call setPDFs(eta1,eta2,Mu_Fact,pdf)
       FluxFac = 1d0/(2d0*EHat**2)
