@@ -597,7 +597,7 @@ if( IsAZDecay(DecayMode1) ) then
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut)
       if( applyPSCut .or. PSWgt.eq.zero ) return
       if(H_DK.eqv..false.) then
-        if(dabs(inv_mass(5)-M_Reso).gt.6d0*Ga_Reso) return
+        if(dabs(inv_mass(5)-M_Reso).gt.10d0*Ga_Reso) return
       endif
 
       call setPDFs(eta1,eta2,Mu_Fact,pdf)
@@ -638,7 +638,7 @@ if( IsAZDecay(DecayMode1) ) then
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut)
       if( applyPSCut .or. PSWgt.eq.zero ) return
       if(H_DK.eqv..false.) then
-        if(dabs(inv_mass(5)-M_Reso).gt.6d0*Ga_Reso) return
+        if(dabs(inv_mass(5)-M_Reso).gt.10d0*Ga_Reso) return
       endif
 
       FluxFac = 1d0/(2d0*ILC_Energy**2)
@@ -680,7 +680,7 @@ elseif( IsAWDecay(DecayMode1) ) then
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut)
       if( applyPSCut .or. PSWgt.eq.zero ) return
       if(H_DK.eqv..false.) then
-        if(dabs(inv_mass(5)-M_Reso).gt.6d0*Ga_Reso) return
+        if(dabs(inv_mass(5)-M_Reso).gt.10d0*Ga_Reso) return
       endif
 
       call setPDFs(eta1,eta2,Mu_Fact,pdf)
@@ -1155,7 +1155,7 @@ if( IsAZDecay(DecayMode1) ) then
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut)
       if( applyPSCut .or. PSWgt.eq.zero ) return
       if(H_DK.eqv..false.) then
-        if(dabs(inv_mass(5)-M_Reso).gt.6d0*Ga_Reso) return
+        if(dabs(inv_mass(5)-M_Reso).gt.10d0*Ga_Reso) return
       endif
 
       call setPDFs(eta1,eta2,Mu_Fact,pdf)
@@ -1182,7 +1182,7 @@ if( IsAZDecay(DecayMode1) ) then
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut)
       if( applyPSCut .or. PSWgt.eq.zero ) return
       if(H_DK.eqv..false.) then
-        if(dabs(inv_mass(5)-M_Reso).gt.6d0*Ga_Reso) return
+        if(dabs(inv_mass(5)-M_Reso).gt.10d0*Ga_Reso) return
       endif
 
       FluxFac = 1d0/(2d0*ILC_Energy**2)
@@ -1210,7 +1210,7 @@ elseif( IsAWDecay(DecayMode1) ) then
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut)
       if( applyPSCut .or. PSWgt.eq.zero ) return
       if(H_DK.eqv..false.) then
-        if(dabs(inv_mass(5)-M_Reso).gt.6d0*Ga_Reso) return
+        if(dabs(inv_mass(5)-M_Reso).gt.10d0*Ga_Reso) return
       endif
 
       call setPDFs(eta1,eta2,Mu_Fact,pdf)
