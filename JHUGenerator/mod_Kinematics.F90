@@ -2106,6 +2106,7 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, Higgs=5
        NBin(3)  = WhichBin(3,pT_H)
        NBin(4)  = WhichBin(4,pT_jl)
        NBin(5)  = WhichBin(5,dy_j1j2)
+       NBin(6:7)= 1
 
 
 RETURN
@@ -2313,6 +2314,7 @@ applyPSCut = .false.
        NBin(4)  = WhichBin(4,y_j1)
        NBin(5)  = WhichBin(5,y_j2)
        NBin(6)  = WhichBin(6,dy_j1j2)
+
 
        
 RETURN
