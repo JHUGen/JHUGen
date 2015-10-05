@@ -1165,7 +1165,7 @@ if( UseBetaVersion ) then
     enddo
     write(io_stdout,"(1X,A,F8.3,I9)") "Sum        partonic xsec   x   x    ",sum(CrossSec(:,:))/VG_Result,sum(RequEvents(:,:))
 
-pause      
+! pause      
       
     write(io_stdout,"(A)")  ""
     write(io_stdout,"(1X,A)")  "Event generation"
@@ -1182,7 +1182,7 @@ pause
     CrossSecMax(:,:) = 1.0d0 * CrossSecMax(:,:)    !  adjustment factor
 
 
-!     ncall= 1000000
+!     ncall= 500000 !1000000
     do while( StatusPercent.lt.100d0  )
     
 !         if( Process.eq.80 ) call vegas1(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)! adjust to LHE format
@@ -1394,7 +1394,7 @@ character(len=150) :: InputFmt0,InputFmt1
 logical :: FirstEvent,M_ResoSet,Ga_ResoSet,WroteHeader,ClosedHeader,WroteMassWidth,InMadgraphMassBlock
 integer :: nline,intDummy,Nevent
 integer :: LHE_IDUP(1:maxpart),LHE_ICOLUP(1:2,1:maxpart),LHE_MOTHUP(1:2,1:maxpart)
-integer :: EventNumPart
+integer :: EventNumPart,NBin(1:NumHistograms)
 character(len=160) :: FirstLines,EventInfoLine,OtherLines
 character(len=160) :: EventLine(0:maxpart)
 integer :: n,stat,iHiggs,VegasSeed
@@ -1644,7 +1644,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
 
           if( Res.gt.0d0 ) then ! decay event was accepted
           
-             if( TauDecays.lt.0 ) then
+             if( TauDecays.lt.0 ) then!  H->VV->4f
                 call boost(HiggsDK_Mom(1:4,6),MomHiggs(1:4),pH2sq)
                 call boost(HiggsDK_Mom(1:4,7),MomHiggs(1:4),pH2sq)
                 call boost(HiggsDK_Mom(1:4,8),MomHiggs(1:4),pH2sq)
@@ -1658,7 +1658,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                 HiggsDK_IDUP(8) = convertLHE(HiggsDK_IDUP(8))
                 HiggsDK_IDUP(9) = convertLHE(HiggsDK_IDUP(9))
                 call WriteOutEvent_NEW(EventNumPart,LHE_IDUP,LHE_IntExt,LHE_MOTHUP,LHE_ICOLUP,MomExt,HiggsDK_Mom(1:4,4:9),Mass,iHiggs,HiggsDK_IDUP(1:9),HiggsDK_ICOLUP(1:2,1:9),EventInfoLine,BeginEventLine=BeginEventLine)
-             else
+             else! H->tautau
                 call boost(HiggsDK_Mom(1:4,4),MomHiggs(1:4),pH2sq)
                 call boost(HiggsDK_Mom(1:4,5),MomHiggs(1:4),pH2sq)
                 call boost(HiggsDK_Mom(1:4,6),MomHiggs(1:4),pH2sq)
@@ -2368,8 +2368,11 @@ use modParameters
 implicit none
 
 
-  if( Process.eq.60 .or. Process.eq.61 .or. Process.eq.66 ) then
+
+  if( Process.eq.60 .or. Process.eq.66 ) then
      call InitHisto_HVBF()
+  elseif( Process.eq.61) then
+     call InitHisto_HJJ()
   elseif( Process.eq.62) then
      call InitHisto_HJ()
   elseif (Process.eq.50) then
@@ -2381,8 +2384,13 @@ implicit none
   elseif (Process.eq.110 .or. Process .eq. 111 .or. Process.eq.112 .or. Process .eq. 113) then
      call InitHisto_TH()
   else
-     call InitHisto_HZZ()
-!      call InitHisto_Htautau()
+  
+     if( TauDecays.eq.0 .or. TauDecays.eq.1 ) then
+         call InitHisto_Htautau()
+     else
+         call InitHisto_HZZ()
+     endif
+     
 !      call InitHisto_Htoptop()
   endif
 
@@ -2564,7 +2572,6 @@ END SUBROUTINE
 
 
 
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 SUBROUTINE InitHisto_HJ()
 use ModMisc
 use ModKinematics
@@ -2591,6 +2598,70 @@ integer :: AllocStatus,NHisto
       Histo(NHisto)%Value2(:)= 0d0
       Histo(NHisto)%Hits(:)  = 0
   enddo
+
+RETURN
+END SUBROUTINE
+
+
+
+
+SUBROUTINE InitHisto_HJJ()
+use ModMisc
+use ModKinematics
+use ModParameters
+implicit none
+integer :: AllocStatus,NHisto
+
+          it_sav = 1
+          NumHistograms = 6
+          if( .not.allocated(Histo) ) then
+                allocate( Histo(1:NumHistograms), stat=AllocStatus  )
+                if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
+          endif
+
+          Histo(1)%Info   = "m_jj"
+          Histo(1)%NBins  = 40
+          Histo(1)%BinSize= 50d0*GeV
+          Histo(1)%LowVal = 0d0
+          Histo(1)%SetScale= 1d0/GeV
+
+          Histo(2)%Info   = "dphi_jj"
+          Histo(2)%NBins  = 25
+          Histo(2)%BinSize= 0.125d0
+          Histo(2)%LowVal = 0d0
+          Histo(2)%SetScale= 1d0
+
+          Histo(3)%Info   = "pT(H)"
+          Histo(3)%NBins  = 50
+          Histo(3)%BinSize= 10d0*GeV
+          Histo(3)%LowVal = 0d0
+          Histo(3)%SetScale= 1d0/GeV
+
+          Histo(4)%Info   = "y(j1)"
+          Histo(4)%NBins  = 50
+          Histo(4)%BinSize= 0.2d0
+          Histo(4)%LowVal = -5d0
+          Histo(4)%SetScale= 1d0
+
+          Histo(5)%Info   = "y(j2)"
+          Histo(5)%NBins  = 50
+          Histo(5)%BinSize= 0.2d0
+          Histo(5)%LowVal = -5d0
+          Histo(5)%SetScale= 1d0
+          
+          Histo(6)%Info   = "dy(y1-j2)"
+          Histo(6)%NBins  = 50
+          Histo(6)%BinSize= 0.2d0
+          Histo(6)%LowVal = -5d0
+          Histo(6)%SetScale= 1d0
+
+
+  do NHisto=1,NumHistograms
+      Histo(NHisto)%Value(:) = 0d0
+      Histo(NHisto)%Value2(:)= 0d0
+      Histo(NHisto)%Hits(:)  = 0
+  enddo
+
 
 RETURN
 END SUBROUTINE
@@ -2804,7 +2875,7 @@ integer :: AllocStatus,NHisto
 
 
           it_sav = 1
-          NumHistograms = 4
+          NumHistograms = 6
           if( .not.allocated(Histo) ) then
                 allocate( Histo(1:NumHistograms), stat=AllocStatus  )
                 if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
@@ -2816,27 +2887,36 @@ integer :: AllocStatus,NHisto
           Histo(1)%LowVal = 0d0*GeV
           Histo(1)%SetScale= 1d0/GeV
 
-
           Histo(2)%Info   = "m_tauM"
           Histo(2)%NBins  = 50
           Histo(2)%BinSize= 0.05d0*GeV
           Histo(2)%LowVal = 0d0*GeV
           Histo(2)%SetScale= 1d0/GeV
 
-          
           Histo(3)%Info   = "m_Wp"
           Histo(3)%NBins  = 50
           Histo(3)%BinSize= 0.05d0*GeV
           Histo(3)%LowVal = 0d0*GeV
           Histo(3)%SetScale= 1d0/GeV
           
-            
           Histo(4)%Info   = "m_Wm"
           Histo(4)%NBins  = 50
           Histo(4)%BinSize= 0.05d0*GeV
           Histo(4)%LowVal = 0d0*GeV
           Histo(4)%SetScale= 1d0/GeV
-          
+            
+          Histo(5)%Info   = "y_tau+"
+          Histo(5)%NBins  = 40
+          Histo(5)%BinSize= 0.25d0
+          Histo(5)%LowVal = -5d0
+          Histo(5)%SetScale= 1d0
+            
+          Histo(6)%Info   = "y_tau-"
+          Histo(6)%NBins  = 40
+          Histo(6)%BinSize= 0.25d0
+          Histo(6)%LowVal = -5d0
+          Histo(6)%SetScale= 1d0
+            
 
           do NHisto=1,NumHistograms
               Histo(NHisto)%Value(:) = 0d0
