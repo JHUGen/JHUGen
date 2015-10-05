@@ -288,7 +288,7 @@ pause
         E1 = ( Mandelstam_S + Mass1_sq - Mass2_sq )/2d0/dsqrt(Mandelstam_S)
         p1z= sqrt_lambda(Mandelstam_S,Mass1_sq,Mass2_sq)/2d0/dsqrt(Mandelstam_S)
         Mom1(1:4) = (/ E1,0d0,0d0,p1z /)
-!         call rotate3D_phi_theta(phi,theta,Mom1)
+        call rotate3D_phi_theta(phi,theta,Mom1)
         
         Mom2(1)   = dsqrt(Mandelstam_S) - Mom1(1)
         Mom2(2:4) = - Mom1(2:4)
