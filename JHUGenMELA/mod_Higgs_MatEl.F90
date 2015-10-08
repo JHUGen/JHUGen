@@ -1,7 +1,7 @@
       MODULE modHiggs
       implicit none
 
-      public :: EvalAmp_gg_H_VV,EvalAmp_H_VV
+      public :: EvalAmp_gg_H_VV,EvalAmp_H_VV,EvalAmp_H_FF
       private
       integer, parameter  :: dp = selected_real_kind(15)
       real(dp), private, parameter :: tol = 0.00000010_dp
@@ -1308,12 +1308,160 @@
 
 
 
+!          subroutine EvalAmp_H_VV(p,M_Reso,Ga_Reso,ggcoupl,vvcoupl,MY_IDUP,res)
+
+   
+   
+! Higgs decay to Fbar(e+) F(e-)
+   SUBROUTINE EvalAmp_H_FF(pin,mass_F,Ga_F,TTBHcoupl,FDecay,res)
+   implicit none
+   real(8), intent(out):: res
+   integer, intent(in) :: FDecay! 0=stable, 1=decay f-->f'+W(F+F')
+   complex(8), intent(in):: TTBHcoupl(1:2)
+   real(8), intent(in) :: pin(:,:),mass_F,Ga_F
+   integer             :: j
+   real(8)             :: s12,s45,s123,s456,KL,KR,s(6,6)
+   real(dp)             :: p(1:6,1:4)
+   complex(dp)          :: za(6,6),zb(6,6),amp
+   include 'includeVars.F90'
+
+
+      if( FDecay.eq.0 ) then 
+      
+          do j=1,6
+              call convert_to_MCFM(pin(1:4,j),p(j,1:4))  
+          enddo       
+          call spinoru(6,p,za,zb,s)
+      
+          s12=s(1,2)
+          s45=s(4,5)
+          s123=s(1,2)+s(1,3)+s(2,3)
+          s456=s(4,5)+s(4,6)+s(5,6)     
+
+          KL = -mass_F/vev*( TTBHcoupl(1) -(0d0,1d0)*TTBHcoupl(2) )
+          KR = -mass_F/vev*( TTBHcoupl(1) +(0d0,1d0)*TTBHcoupl(2) )
+
+          amp = + KR * ( za(1,3)*za(1,4)*zb(1,2)*zb(5,6)- za(1,3)*za(3,4)*zb(2,3)*zb(5,6)) &
+                + KL * (- za(1,3)*za(4,5)*zb(2,5)*zb(5,6)- za(1,3)*za(4,6)*zb(2,6)*zb(5,6))
+
+          ! overall factors and propagators
+          amp=amp/(s123-mass_F**2+ci*mass_F*Ga_F)/(s456-mass_F**2+ci*mass_F*Ga_F)/(s12-m_w**2+ci*m_w*Ga_W)/(s45-m_w**2+ci*m_w*Ga_W)
+          amp=amp*16d0*ci*mass_F*gwsq**2   
+          res = cdabs(amp)
+          
+      else! stable
+          s12=2d0*(pin(1,1)*pin(1,2)-pin(2,1)*pin(2,2)-pin(3,1)*pin(3,2)-pin(4,1)*pin(4,2)) + 2d0*mass_F**2
+          res =   2d0*s12*(TTBHcoupl(2)**2 + TTBHcoupl(1)**2) - 8d0*mass_F**2*TTBHcoupl(1)**2
+          res=res*mass_F**2/vev**2
+
+      endif
+      
+   RETURN
+   END SUBROUTINE
 
 
 
+   
+   
+   
+   
+   
+   
+   
+
+
+subroutine spinoru(N,p,za,zb,s)
+!---Calculate spinor products      
+!---taken from MCFM & modified by R. Rontsch, May 2015
+!---extended to deal with negative energies ie with all momenta outgoing                                                                
+!---Arbitrary conventions of Bern, Dixon, Kosower, Weinzierl,                                                                                  
+!---za(i,j)*zb(j,i)=s(i,j)                      
+      implicit none
+      real(8) :: p(:,:),two
+      integer, parameter :: mxpart=14
+      complex(8):: c23(N),f(N),rt(N),za(:,:),zb(:,:),czero,cone,ci
+      real(8)   :: s(:,:)
+      integer i,j,N
+      
+      if (size(p,1) .ne. N) then
+         print *, "spinorz: momentum mismatch"
+         stop
+      endif
+      two=2d0
+      czero=dcmplx(0d0,0d0)
+      cone=dcmplx(1d0,0d0)
+      ci=dcmplx(0d0,1d0)
+      
+
+!---if one of the vectors happens to be zero this routine fails.                                                                                                                
+      do j=1,N
+         za(j,j)=czero
+         zb(j,j)=za(j,j)
+
+!-----positive energy case                                                                                                                                                      
+         if (p(j,4) .gt. 0d0) then
+            rt(j)=dsqrt(p(j,4)+p(j,1))
+            c23(j)=dcmplx(p(j,3),-p(j,2))
+            f(j)=cone
+         else
+!-----negative energy case                                                                                                                                                      
+            rt(j)=dsqrt(-p(j,4)-p(j,1))
+            c23(j)=dcmplx(-p(j,3),p(j,2))
+            f(j)=ci
+         endif
+      enddo
+      do i=2,N
+         do j=1,i-1
+         s(i,j)=two*(p(i,4)*p(j,4)-p(i,1)*p(j,1)-p(i,2)*p(j,2)-p(i,3)*p(j,3))
+         za(i,j)=f(i)*f(j)*(c23(i)*dcmplx(rt(j)/rt(i))-c23(j)*dcmplx(rt(i)/rt(j)))
+
+         if (abs(s(i,j)).lt.1d-5) then
+         zb(i,j)=-(f(i)*f(j))**2*dconjg(za(i,j))
+         else
+         zb(i,j)=-dcmplx(s(i,j))/za(i,j)
+         endif
+         za(j,i)=-za(i,j)
+         zb(j,i)=-zb(i,j)
+         s(j,i)=s(i,j)
+         enddo
+      enddo
+
+    end subroutine spinoru
+
+    
+    
+    
+    
+    
+    subroutine convert_to_MCFM(p,pout)
+      implicit none
+! converts from (E,px,py,pz) to (px,py,pz,E)
+      real(8) :: p(1:4),tmp(1:4)
+      real(8), optional :: pout(1:4)
+
+      if( present(pout) ) then
+          pout(1)=p(2)  
+          pout(2)=p(3)  
+          pout(3)=p(4) 
+          pout(4)=p(1)  
+      else
+          tmp(1)=p(1)
+          tmp(2)=p(2)
+          tmp(3)=p(3)
+          tmp(4)=p(4)
+
+          p(1)=tmp(2)  
+          p(2)=tmp(3) 
+          p(3)=tmp(4)  
+          p(4)=tmp(1)  
+      endif  
+      
+    end subroutine convert_to_MCFM
 
 
 
+   
+   
 
 
    double complex function et1(e1,e2,e3,e4)
