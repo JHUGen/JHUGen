@@ -1307,9 +1307,6 @@
 
 
 
-
-!          subroutine EvalAmp_H_VV(p,M_Reso,Ga_Reso,ggcoupl,vvcoupl,MY_IDUP,res)
-
    
    
 ! Higgs decay to Fbar(e+) F(e-)
@@ -1318,7 +1315,7 @@
    real(8), intent(out):: res
    integer, intent(in) :: FDecay! 0=stable, 1=decay f-->f'+W(F+F')
    complex(8), intent(in):: TTBHcoupl(1:2)
-   real(8), intent(in) :: pin(:,:),mass_F,Ga_F
+   real(8), intent(in) :: pin(1:4,1:6),mass_F,Ga_F
    integer             :: j
    real(8)             :: s12,s45,s123,s456,KL,KR,s(6,6)
    real(dp)             :: p(1:6,1:4)
@@ -1326,7 +1323,7 @@
    include 'includeVars.F90'
 
 
-      if( FDecay.eq.0 ) then 
+      if( FDecay.eq.1 ) then 
       
           do j=1,6
               call convert_to_MCFM(pin(1:4,j),p(j,1:4))  
