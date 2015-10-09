@@ -302,11 +302,11 @@ END FUNCTION
    if( Process.eq.60 ) NumPartonicChannels = 121 !=ij_num**2=121 for WBF   (-5,..,-1,0,+1,..,+5)^2
    if( Process.eq.61 ) NumPartonicChannels = 121 !=ij_num**2=121 for WBF   (-5,..,-1,0,+1,..,+5)^2
    iPartChannel = int(yRnd(8) * (NumPartonicChannels))! this runs from 0..120
-   
+     
    PartChannelAvg = NumPartonicChannels
    iPart_sel = iPartChannel/ij_num + 1 -ij_neg_offset
    jPart_sel = (iPartChannel+1) - (iPart_sel-1+ij_neg_offset)*ij_num - ij_neg_offset  
-   if( jPart_sel.gt.iPart_sel ) return
+!    if( jPart_sel.gt.iPart_sel ) return !  sort by i>j
    if( (unweighted) .and. (.not. warmup) .and. (AccepCounter_part(iPart_sel,jPart_sel) .ge. RequEvents(iPart_sel,jPart_Sel))  ) return
    
       
@@ -323,7 +323,7 @@ END FUNCTION
    if( applyPSCut .or. PSWgt.eq.zero ) return
    EvalCounter = EvalCounter+1
    
-
+   
    call setPDFs(eta1,eta2,Mu_Fact,pdf)
    FluxFac = 1d0/(2d0*EHat**2)
    if (process.eq.60) then
@@ -331,7 +331,7 @@ END FUNCTION
 
       me2(:,:) = 0d0
       call EvalAmp_WBFH_UnSymm_SA_Select( MomExt,(/ghz1,ghz2,ghz3,ghz4/),(/ghw1,ghw2,ghw3,ghw4/),iPart_sel,jPart_sel,me2)     
-      call EvalAmp_WBFH_UnSymm_SA_Select( MomExt,(/ghz1,ghz2,ghz3,ghz4/),(/ghw1,ghw2,ghw3,ghw4/),jPart_sel,iPart_sel,me2)     
+!       call EvalAmp_WBFH_UnSymm_SA_Select( MomExt,(/ghz1,ghz2,ghz3,ghz4/),(/ghw1,ghw2,ghw3,ghw4/),jPart_sel,iPart_sel,me2)     
 
       MY_IDUP(1:5)  = (/Up_,Up_,Up_,Up_,Hig_/)
       ICOLUP(1:2,1) = (/501,000/)
@@ -339,6 +339,7 @@ END FUNCTION
       ICOLUP(1:2,3) = (/501,000/)
       ICOLUP(1:2,4) = (/502,000/)
       ICOLUP(1:2,5) = (/000,000/)
+      
    elseif (process.eq.61) then
       call EvalAmp_SBFH_UnSymm_SA(MomExt,(/ghg2,ghg3,ghg4/),me2)
       me2 = me2 * (2d0/3d0*alphas**2)**2 
@@ -352,7 +353,7 @@ END FUNCTION
    
 
                                                LO_Res_Unpol = me2(iPart_sel,jPart_sel) * pdf(LHA2M_pdf(iPart_sel),1)*pdf(LHA2M_pdf(jPart_sel),2)
-   if( iPart_sel.ne.jPart_sel ) LO_Res_Unpol = LO_Res_Unpol + me2(jPart_sel,iPart_sel) * pdf(LHA2M_pdf(jPart_sel),1)*pdf(LHA2M_pdf(iPart_sel),2)
+!    if( iPart_sel.ne.jPart_sel ) LO_Res_Unpol = LO_Res_Unpol + me2(jPart_sel,iPart_sel) * pdf(LHA2M_pdf(jPart_sel),1)*pdf(LHA2M_pdf(iPart_sel),2)
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt  * PartChannelAvg
    EvalWeighted_HJJ = LO_Res_Unpol * PreFac
    

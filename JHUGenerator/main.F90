@@ -786,10 +786,8 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
     elseif (Process.eq.110 .or. Process.eq.111 .or. Process.eq.112 .or. Process.eq.113)  then
       call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
    else
-!       call vegas(EvalWeighted,VG_Result,VG_Error,VG_Chi2)    ! usual call of vegas for weighted events
-      call vegas(EvalWeighted_tautau,VG_Result,VG_Error,VG_Chi2)    ! usual call of vegas for weighted events
-      
-      
+      call vegas(EvalWeighted,VG_Result,VG_Error,VG_Chi2)    ! usual call of vegas for weighted events
+!       call vegas(EvalWeighted_tautau,VG_Result,VG_Error,VG_Chi2)    ! usual call of vegas for weighted events
     endif
 
     !DATA RUN
@@ -817,8 +815,8 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
     elseif (Process.eq.110 .or. Process.eq.111 .or. Process.eq.112 .or. Process.eq.113) then
       call vegas1(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
     else
-!       call vegas1(EvalWeighted,VG_Result,VG_Error,VG_Chi2)    ! usual call of vegas for weighted events
-      call vegas1(EvalWeighted_tautau,VG_Result,VG_Error,VG_Chi2)    ! usual call of vegas for weighted events
+      call vegas1(EvalWeighted,VG_Result,VG_Error,VG_Chi2)    ! usual call of vegas for weighted events
+!       call vegas1(EvalWeighted_tautau,VG_Result,VG_Error,VG_Chi2)    ! usual call of vegas for weighted events
     endif
 
 
@@ -1182,7 +1180,7 @@ if( UseBetaVersion ) then
     CrossSecMax(:,:) = 1.0d0 * CrossSecMax(:,:)    !  adjustment factor
 
 
-!     ncall= 500000 !1000000
+!     ncall= !500000 !1000000   ?????????
     do while( StatusPercent.lt.100d0  )
     
 !         if( Process.eq.80 ) call vegas1(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)! adjust to LHE format
@@ -1195,6 +1193,7 @@ if( UseBetaVersion ) then
 !         if( Process.eq.112) call vegas1(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)      
 !         if( Process.eq.113) call vegas1(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)      
         call system('clear')
+        write(io_stdout,"")
         do i1=-5,5
         do j1=-5,5
             if( RequEvents(i1,j1).gt.0 ) then 
@@ -1394,7 +1393,7 @@ character(len=150) :: InputFmt0,InputFmt1
 logical :: FirstEvent,M_ResoSet,Ga_ResoSet,WroteHeader,ClosedHeader,WroteMassWidth,InMadgraphMassBlock
 integer :: nline,intDummy,Nevent
 integer :: LHE_IDUP(1:maxpart),LHE_ICOLUP(1:2,1:maxpart),LHE_MOTHUP(1:2,1:maxpart)
-integer :: EventNumPart,NBin(1:NumHistograms)
+integer :: EventNumPart
 character(len=160) :: FirstLines,EventInfoLine,OtherLines
 character(len=160) :: EventLine(0:maxpart)
 integer :: n,stat,iHiggs,VegasSeed
@@ -3031,18 +3030,30 @@ integer :: AllocStatus,NHisto
           Histo(5)%BinSize= 0.2d0
           Histo(5)%LowVal = -5d0
           Histo(5)%SetScale= 1d0
-          
-          Histo(6)%Info   = "m_4l"
-          Histo(6)%NBins  = 50
-          Histo(6)%BinSize= 10d0*GeV
-          Histo(6)%LowVal = 120d0*GeV
-          Histo(6)%SetScale= 1d0/GeV
 
-          Histo(7)%Info   = "weights"
+          Histo(6)%Info   = "y(j1)"
+          Histo(6)%NBins  = 50
+          Histo(6)%BinSize= 0.2d0
+          Histo(6)%LowVal = -5d0
+          Histo(6)%SetScale= 1d0
+
+          Histo(7)%Info   = "y(j2)"
           Histo(7)%NBins  = 50
-          Histo(7)%BinSize= 0.25d0
-          Histo(7)%LowVal = -18d0
+          Histo(7)%BinSize= 0.2d0
+          Histo(7)%LowVal = -5d0
           Histo(7)%SetScale= 1d0
+          
+!           Histo(6)%Info   = "m_4l"
+!           Histo(6)%NBins  = 50
+!           Histo(6)%BinSize= 10d0*GeV
+!           Histo(6)%LowVal = 120d0*GeV
+!           Histo(6)%SetScale= 1d0/GeV
+! 
+!           Histo(7)%Info   = "weights"
+!           Histo(7)%NBins  = 50
+!           Histo(7)%BinSize= 0.25d0
+!           Histo(7)%LowVal = -18d0
+!           Histo(7)%SetScale= 1d0
 
 
 
