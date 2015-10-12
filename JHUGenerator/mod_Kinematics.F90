@@ -569,9 +569,9 @@ integer, parameter :: inLeft=1, inRight=2, Hig=3, tauP=4, tauM=5, Wp=6, Wm=7,   
         HiggsDK_MOTHUP(1:2,tauP)     = (/iHiggs,iHiggs/)
         HiggsDK_MOTHUP(1:2,tauM)     = (/iHiggs,iHiggs/)
         HiggsDK_MOTHUP(1:2,Wp)       = (/1,1/) + NUP
-        HiggsDK_MOTHUP(1:2,nubar_tau)= (/1,3/) + NUP
+        HiggsDK_MOTHUP(1:2,nubar_tau)= (/1,1/) + NUP
         HiggsDK_MOTHUP(1:2,Wm)       = (/2,2/) + NUP
-        HiggsDK_MOTHUP(1:2,nu_tau)   = (/2,4/) + NUP
+        HiggsDK_MOTHUP(1:2,nu_tau)   = (/2,2/) + NUP
         HiggsDK_MOTHUP(1:2,nu)       = (/3,3/) + NUP
         HiggsDK_MOTHUP(1:2,lepP)     = (/3,3/) + NUP
         HiggsDK_MOTHUP(1:2,lepM)     = (/4,4/) + NUP
@@ -4539,6 +4539,7 @@ ELSEIF( iChannel.EQ.4 ) THEN
    Jac  = Jac1*Jac2*Jac3 * PSNorm3                                                                                       !  combine  
    
 ELSE
+print *, xchannel , NumChannels
    call Error("PS channel not available in EvalPhasespace_VBF_NEW2",ichannel)
 ENDIF 
    
