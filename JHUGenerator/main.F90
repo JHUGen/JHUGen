@@ -83,7 +83,7 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
    RequestNLeptons = -1
    RequestOS=-1
    RequestOSSF=-1
-   CountTauAsAny = .false.
+   CountTauAsAny = .true.
    LHAPDFString = ""
    LHAPDFMember = 0
    iinterf = -1
