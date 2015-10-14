@@ -3397,17 +3397,37 @@ character :: arg*(500)
     if( Process.eq.90 ) write(TheUnit,"(4X,A,F8.4,A,F6.4)") "Bottom quark mass=",m_top*100d0
     if( (ReadLHEFile) .and. (RequestNLeptons.gt.0) ) then
         if ( RequestOS .le. 0 ) then
-            write(TheUnit,"(4X,A,I2,A)") "Lepton filter activated. Requesting ",RequestNLeptons," leptons."
+            if ( RequestNLeptons .eq. 1 ) then
+                write(TheUnit,"(4X,A,I2,A)") "Lepton filter activated. Requesting ",RequestNLeptons," lepton."
+            else
+                write(TheUnit,"(4X,A,I2,A)") "Lepton filter activated. Requesting ",RequestNLeptons," leptons."
+            endif
         elseif ( RequestOSSF .le. 0 ) then
             if ( RequestOS*2 .eq. RequestNLeptons ) then
-                write(TheUnit,"(4X,A,I2,A)") "Lepton filter activated. Requesting ",RequestNLeptons," leptons in OS pairs."
+                if ( RequestOS .eq. 1 ) then
+                    write(TheUnit,"(4X,A,I2,A)") "Lepton filter activated. Requesting ",RequestNLeptons," leptons in an OS pair."
+                else
+                    write(TheUnit,"(4X,A,I2,A)") "Lepton filter activated. Requesting ",RequestNLeptons," leptons in OS pairs."
+                endif
             else
-                write(TheUnit,"(4X,A,I2,A,I2,A)") "Lepton filter activated. Requesting ",RequestNLeptons," leptons including ", RequestOS, " OS pairs."
+                if ( RequestOS .eq. 1 ) then
+                    write(TheUnit,"(4X,A,I2,A,I2,A)") "Lepton filter activated. Requesting ",RequestNLeptons," leptons including ", RequestOS, " OS pair."
+                else
+                    write(TheUnit,"(4X,A,I2,A,I2,A)") "Lepton filter activated. Requesting ",RequestNLeptons," leptons including ", RequestOS, " OS pairs."
+                endif
             endif
         elseif ( RequestOSSF*2 .eq. RequestNLeptons ) then
-            write(TheUnit,"(4X,A,I2,A)") "Lepton filter activated. Requesting ",RequestNLeptons," leptons in OSSF pairs."
+            if ( RequestOSSF .eq. 1 ) then
+                write(TheUnit,"(4X,A,I2,A)") "Lepton filter activated. Requesting ",RequestNLeptons," leptons in an OSSF pair."
+            else
+                write(TheUnit,"(4X,A,I2,A)") "Lepton filter activated. Requesting ",RequestNLeptons," leptons in OSSF pairs."
+            endif
         elseif ( RequestOSSF .eq. RequestOS ) then
-            write(TheUnit,"(4X,A,I2,A,I2,A)") "Lepton filter activated. Requesting ",RequestNLeptons," leptons including ", RequestOSSF, " OSSF pairs."
+            if ( RequestOSSF .eq. 1 ) then
+                write(TheUnit,"(4X,A,I2,A,I2,A)") "Lepton filter activated. Requesting ",RequestNLeptons," leptons including ", RequestOSSF, " OSSF pair."
+            else
+                write(TheUnit,"(4X,A,I2,A,I2,A)") "Lepton filter activated. Requesting ",RequestNLeptons," leptons including ", RequestOSSF, " OSSF pairs."
+            endif
         elseif ( RequestOS*2 .eq. RequestNLeptons ) then
             write(TheUnit,"(4X,A,I2,A,I2,A)") "Lepton filter activated. Requesting ",RequestNLeptons," leptons in OS pairs, ", RequestOSSF, " of the pairs OSSF."
         else ! this will never happen
