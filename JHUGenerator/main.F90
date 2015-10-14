@@ -3434,6 +3434,9 @@ character :: arg*(500)
             write(TheUnit,"(4X,A,I2,A,I2,A,I2,A)") "Lepton filter activated. Requesting ",RequestNLeptons," leptons including ", RequestOS, " OS pairs, ", RequestOSSF, " of them OSSF."
         endif
     endif
+    if( CountTauAsAny .and. RequestOSSF.gt.0 ) then
+        write(TheUnit,"(8X,A)") "(counting tau in place of e or mu of the same sign, if necessary)"
+    endif
     write(TheUnit,"(4X,A,20I11)") "Random seeds: ",TheSeeds(1:TheSeeds(0))
 
     if( .not. (ReadLHEFile .or. ConvertLHEFile) ) then
