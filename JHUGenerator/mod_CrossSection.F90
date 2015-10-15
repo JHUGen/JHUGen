@@ -3053,10 +3053,10 @@ IF( GENEVT ) THEN
                     do i1=LeptInEvent_tmp(0),2,-1
                         do i2=i1-1,1,-1
                             if(      ( LeptInEvent_tmp(i1)+LeptInEvent_tmp(i2).eq.0                                                     )    &     ! found a l+ l- pair
-                                .OR. ( CountTauAsAny .AND. ( &
+                                .OR. ( CountTauAsAny .AND. LeptInEvent_tmp(i1).ne.-999 .AND. LeptInEvent_tmp(i2).ne.-999 .AND. ( &
                                             ( abs(LeptInEvent_tmp(i1)).eq.ConvertLHE(TaM_) .and. LeptInEvent_tmp(i1)*LeptInEvent_tmp(i2).lt.0  )    &     ! found l tau pair
-                                .OR. ( abs(LeptInEvent_tmp(i2)).eq.ConvertLHE(TaM_) .and. LeptInEvent_tmp(i1)*LeptInEvent_tmp(i2).lt.0  )    &     ! found l tau pair
-                                     )                     ) &
+                                       .OR. ( abs(LeptInEvent_tmp(i2)).eq.ConvertLHE(TaM_) .and. LeptInEvent_tmp(i1)*LeptInEvent_tmp(i2).lt.0  )    &     ! found l tau pair
+                                     )                                                                                         ) &
                             ) then
                               LeptInEvent_tmp(i1) = -999! remove from list
                               LeptInEvent_tmp(i2) = -999! remove from list
