@@ -2838,9 +2838,10 @@ EvalUnWeighted_DecayToTauTau = 0d0
 IF( GENEVT ) THEN
 
       if( TauDecays.eq.0 ) then
+      call printMom(Mom(1:4,tauP:tauM))
          call EvalAmp_H_FF(Mom(1:4,tauP:tauM),m_tau,LO_Res_Unpol)
       else
-         call EvalAmp_H_TT_decay((/Mom(1:4,lepM),Mom(1:4,nubar),Mom(1:4,nu_tau),Mom(1:4,nu),Mom(1:4,lepP),Mom(1:4,nubar_tau)/),m_tau,LO_Res_Unpol)
+         call EvalAmp_H_TT_decay((/Mom(1:4,lepM),Mom(1:4,nubar),Mom(1:4,nu_tau),Mom(1:4,nu),Mom(1:4,lepP),Mom(1:4,nubar_tau)/),m_tau,ga_tau,LO_Res_Unpol)
       endif
       EvalUnWeighted_DecayToTauTau = LO_Res_Unpol * PreFac
       CS_max = csmax(0,0)
@@ -2876,7 +2877,7 @@ ELSE! NOT GENEVT
       if( TauDecays.eq.0 ) then
          call EvalAmp_H_FF(Mom(1:4,tauP:tauM),m_tau,LO_Res_Unpol)
       else
-         call EvalAmp_H_TT_decay((/Mom(1:4,lepM),Mom(1:4,nubar),Mom(1:4,nu_tau),Mom(1:4,nu),Mom(1:4,lepP),Mom(1:4,nubar_tau)/),m_tau,LO_Res_Unpol)
+         call EvalAmp_H_TT_decay((/Mom(1:4,lepM),Mom(1:4,nubar),Mom(1:4,nu_tau),Mom(1:4,nu),Mom(1:4,lepP),Mom(1:4,nubar_tau)/),m_tau,ga_tau,LO_Res_Unpol)
       endif
       EvalUnWeighted_DecayToTauTau = LO_Res_Unpol * PreFac
       Res = EvalUnWeighted_DecayToTauTau

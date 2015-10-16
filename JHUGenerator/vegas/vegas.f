@@ -78,6 +78,7 @@ c
 !          include 'gridinfo.f'
          include 'maxwt.f'
          parameter(mprod=50*mxdim)
+         integer jj
          dimension d(50,mxdim),di(50,mxdim),xin(50),r(50),
      1   dx(mxdim),dt(mxdim),x(mxdim),kg(mxdim),ia(mxdim)
          data ndmx/50/,alph/1.5d0/,one/1d0/,mds/1/
@@ -187,6 +188,7 @@ c
          f2b=fb
          k=0
  12      k=k+1
+c        MARKUS: main loop starts here
          wgt=xjac
          do 15 j=1,ndim
          call random_number(xrandom)
@@ -203,6 +205,9 @@ c
 c
 c         write(6,FMT='(a20,2F20.16)') 'xo,xnd in dvegas: ',xo,xnd
          f=fxn(x,wgt)
+         if( stopvegas ) then
+           return
+         endif
          f=f*wgt         
          if( abs(f).gt.wtmax ) wtmax=f
          if( abs(f).lt.wtmin ) wtmin=f

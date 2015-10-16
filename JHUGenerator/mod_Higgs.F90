@@ -1389,7 +1389,6 @@
 
       s12=2d0*(pin(1,1)*pin(1,2)-pin(2,1)*pin(2,2)-pin(3,1)*pin(3,2)-pin(4,1)*pin(4,2)) + 2d0*mass_F**2
       res =   2d0*s12*(kappa_tilde**2 + kappa**2) - 8d0*mass_F**2*kappa**2
-
       res=res*mass_F**2/vev**2                    
       
    RETURN
@@ -1407,12 +1406,12 @@
 !       3. Final state b quark is massless.
 !       4. At present, no width in the tau/top propagator
 ! R. Rontsch July 2015
-   SUBROUTINE EvalAmp_H_TT_decay(pin,mass_F,res)
+   SUBROUTINE EvalAmp_H_TT_decay(pin,mass_F,ga_F,res) 
    use ModMisc
    use ModParameters
    implicit none
    real(dp), intent(out) ::  res
-   real(dp), intent(in) :: pin(1:4,1:6),mass_F
+   real(dp), intent(in) :: pin(1:4,1:6),mass_F,ga_F
    integer              :: j
    real(dp)             :: p(1:6,1:4),s12,s45,s123,s456,KL,KR,s(6,6)
    complex(dp)          :: za(6,6),zb(6,6),amp
@@ -1435,8 +1434,8 @@
              + KL * (- za(1,3)*za(4,5)*zb(2,5)*zb(5,6)- za(1,3)*za(4,6)*zb(2,6)*zb(5,6))
 
 ! overall factors and propagators
-      amp=amp/(s123-mass_F**2+ci*m_tau*ga_tau)/(s456-mass_F**2+ci*m_tau*ga_tau)/(s12-m_w**2+ci*m_w*Ga_W)/(s45-m_w**2+ci*m_w*Ga_W)
-      amp=amp*16d0*ci*mass_F*gwsq**2   
+      amp=amp/(s123-mass_F**2+ci*mass_F*ga_F)/(s456-mass_F**2+ci*mass_F*ga_F)/(s12-m_w**2+ci*m_w*Ga_W)/(s45-m_w**2+ci*m_w*Ga_W)
+      amp=amp*16d0*ci*mass_F*gwsq**2
       res = cdabs(amp)
 
    RETURN
