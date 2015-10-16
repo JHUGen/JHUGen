@@ -70,38 +70,41 @@ There are two ways to configure the program, from the command line and in the fi
 The list of command line configurables and the default values are (also defined in the \verb|README|):
 
 \begin{verbatim}
-    Collider:    1=LHC, 2=Tevatron, 0=e+e-
-    Process:     0=spin-0, 1=spin-1, 2=spin-2 resonance, 50=pp/ee->VH,
-                 60=weakVBF, 61=pp->Hjj, 62=pp->Hj, 80=ttH, 90=bbH
-    MReso:       resonance mass (default=126.00), format: yyy.xx
-    DecayMode1:  decay mode for vector boson 1 (Z/W/gamma)
-    DecayMode2:  decay mode for vector boson 2 (Z/W/gamma)
-                   0=Z->2l,  1=Z->2q, 2=Z->2tau, 3=Z->2nu,
-                   4=W->lnu, 5=W->2q, 6=W->taunu,
-                   7=gamma, 8=Z->2l+2tau,
-                   9=Z->anything, 10=W->lnu+taunu, 11=W->anything
-    PChannel:    0=g+g, 1=q+qb, 2=both
-    OffXVV:      off-shell option for resonance(X),or vector bosons(VV)
-    PDFSet:      1=CTEQ6L1(2001),  2=MSTW(2008),
-                                   2xx=MSTW with eigenvector set xx=01..40,
-                                   3=NNPDF3.0LO
-    VegasNc0:    number of evaluations for integrand scan
-    VegasNc1:    number of evaluations for accept-reject sampling
-    VegasNc2:    number of events for accept-reject sampling
-    Unweighted:  0=weighted events, 1=unweighted events
-    Interf:      0=neglect interference for 4f final states,
-                 1=include interference
-    DataFile:    LHE output file
-    ReadLHE:     LHE input file from external file (only spin-0)
-    ConvertLHE:  Convert decay of the V from VH production.
-                 Use DecayMode1 to specify the decay.
-                 (should be a Z or W mode, depending on the input file)
-    TopDK:       For Process=80, 0=leave top quarks as stable, 1=decay top quarks
-    FilterNLept: For decay mode, reject events that have less than FilterNLept leptons
-    FilterOSSF:  For decay mode, reject events that don't have 2 pairs of
-                 opposite-sign-same-flavor leptons.  Taus can stand in place of electrons
-                 or muons of the same charge.
-    LHAPDF:      PDF set to use if interfaced with LHAPDF.  See below.
+    Collider:        1=LHC, 2=Tevatron, 0=e+e-
+    Process:         0=spin-0, 1=spin-1, 2=spin-2 resonance, 50=pp/ee->VH,
+                     60=weakVBF, 61=pp->Hjj, 62=pp->Hj, 80=ttH, 90=bbH
+    MReso:           resonance mass (default=126.00), format: yyy.xx
+    DecayMode1:      decay mode for vector boson 1 (Z/W/gamma)
+    DecayMode2:      decay mode for vector boson 2 (Z/W/gamma)
+                       0=Z->2l,  1=Z->2q, 2=Z->2tau, 3=Z->2nu,
+                       4=W->lnu, 5=W->2q, 6=W->taunu,
+                       7=gamma, 8=Z->2l+2tau,
+                       9=Z->anything, 10=W->lnu+taunu, 11=W->anything
+    PChannel:        0=g+g, 1=q+qb, 2=both
+    OffXVV:          off-shell option for resonance(X),or vector bosons(VV)
+    PDFSet:          1=CTEQ6L1(2001),  2=MSTW(2008),
+                                       2xx=MSTW with eigenvector set xx=01..40,
+                                       3=NNPDF3.0LO
+    VegasNc0:        number of evaluations for integrand scan
+    VegasNc1:        number of evaluations for accept-reject sampling
+    VegasNc2:        number of events for accept-reject sampling
+    Unweighted:      0=weighted events, 1=unweighted events
+    Interf:          0=neglect interference for 4f final states,
+                     1=include interference
+    DataFile:        LHE output file
+    ReadLHE:         LHE input file from external file (only spin-0)
+    ConvertLHE:      Convert decay of the V from VH production.
+                     Use DecayMode1 to specify the decay.
+                     (should be a Z or W mode, depending on the input file)
+    TopDK:           For Process=80, 0=leave top quarks as stable, 1=decay top quarks
+    FilterNLept:     For decay mode, reject events that have less than FilterNLept leptons
+    FilterOSPairs:   For decay mode, reject events that have less than FilterOSPairs pairs of
+                       sign leptons of any flavor.
+    FilterOSSFPairs: For decay mode, reject events that have less than FilterOSSFPairs pairs of
+                       opposite-sign-same-flavor leptons.
+    CountTauAsAny:   For FilterOSSFPairs, taus can stand in place of electrons or muons
+                       of the same charge.
+    LHAPDF:          PDF set to use if interfaced with LHAPDF.  See below.
 \end{verbatim}
 
 \noindent
