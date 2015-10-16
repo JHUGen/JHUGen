@@ -183,8 +183,7 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
         read(arg(12:12),*) iargument
         write(*,*), "The filtering syntax has changed to become more general.  Please see the manual for more details."
         if( iargument.eq.1 ) then
-            write(*,*), "Setting FilterNLept=4, FilterOSSFPairs=2"
-            RequestNLeptons = 4
+            write(*,*), "Setting FilterOSSFPairs=2"
             RequestOSSF = 2
         endif        
         CountArg = CountArg + 1
