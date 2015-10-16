@@ -390,6 +390,7 @@ include "vegas_common.f"
   nprn = 1
   readin=.false.
   writeout=.false.
+  stopvegas=.false.
 
 return
 END SUBROUTINE
@@ -591,7 +592,7 @@ include "vegas_common.f"
          NDim = NDim + 2 ! sHat integration
          
 NDim = NDim + 1 ! for pdf sampling
-! NDim = NDim + 1 ! for PS sampling
+NDim = NDim + 1 ! for PS sampling
         
          VegasIt1_default = 5
          VegasNc0_default = 10000000
@@ -618,6 +619,8 @@ NDim = NDim + 1 ! for pdf sampling
          NDim = 5
          NDim = NDim + 2 ! sHat integration
 NDim = NDim + 1 ! for pdf sampling       
+NDim = NDim + 1 ! for PS sampling
+
 !          if( unweighted ) NDim = NDim + 1  ! random number which decides if event is accepted
          
          VegasIt1_default = 5
@@ -1121,14 +1124,27 @@ if( UseBetaVersion ) then
     warmup = .true.
     itmx = 5
     ncall= VegasNc0
-    if( Process.eq.60 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
-    if( Process.eq.61 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
+    outgridfile="vegas.grid"  
+    ingridfile=trim(outgridfile)
+    
+        
+    if( ReadCSmax ) then
+        readin=.true.
+        writeout=.false.
+        itmx = 3
+    else
+        readin=.false.
+        writeout=.true.
+        if( Process.eq.60 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
+        if( Process.eq.61 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
+        itmx = 3
+    endif
+    
     
     
     CrossSecMax(:,:) = 0d0
     CrossSec(:,:) = 0d0
     
-    itmx = 3
 !     if( Process.eq.80 ) call vegas(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2) ! adjust to LHE format
 !     if( Process.eq.90 ) call vegas(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.60 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
@@ -1163,14 +1179,13 @@ if( UseBetaVersion ) then
     enddo
     write(io_stdout,"(1X,A,F8.3,I9)") "Sum        partonic xsec   x   x    ",sum(CrossSec(:,:))/VG_Result,sum(RequEvents(:,:))
 
-! pause      
       
     write(io_stdout,"(A)")  ""
     write(io_stdout,"(1X,A)")  "Event generation"
     call ClearHisto()   
     warmup = .false.
     itmx = 1
-    nprn = 0  
+!     nprn = 0  
     EvalCounter = 0
     RejeCounter = 0
     AlertCounter = 0
@@ -1179,10 +1194,11 @@ if( UseBetaVersion ) then
     
     CrossSecMax(:,:) = 1.0d0 * CrossSecMax(:,:)    !  adjustment factor
 
-
-!     ncall= !500000 !1000000   ?????????
-    do while( StatusPercent.lt.100d0  )
-    
+! try running with itmx=5,
+! try with adating grid instead of while loop   -> is the grid changing with each while-loop???
+!     ncall=1000000  this cannot be different from Ncall from csmax scan because then the VgsWgt is different !!!
+    itmx=200000
+!     do while( StatusPercent.lt.100d0  )
 !         if( Process.eq.80 ) call vegas1(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)! adjust to LHE format
     !     if( Process.eq.90 ) call vegas1(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
         if( Process.eq.60 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
@@ -1193,7 +1209,7 @@ if( UseBetaVersion ) then
 !         if( Process.eq.112) call vegas1(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)      
 !         if( Process.eq.113) call vegas1(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)      
         call system('clear')
-        write(io_stdout,"")
+        write(io_stdout,' ')
         do i1=-5,5
         do j1=-5,5
             if( RequEvents(i1,j1).gt.0 ) then 
@@ -1203,8 +1219,16 @@ if( UseBetaVersion ) then
         enddo
         enddo  
         StatusPercent = int(100d0*dble(sum(AccepCounter_part(:,:)))/dble(sum(RequEvents(:,:)))  )   
-    enddo
+!     enddo
     call cpu_time(time_end)  
+    
+    print *, " Alert  Counter: ",AlertCounter
+    if( dble(AlertCounter)/dble(AccepCounter+1d-10) .gt. 1d0*percent ) then
+        write(io_LogFile,*) "ALERT: The number of rejected events with too small CSMAX exceeds 1%."
+        write(io_LogFile,*) "       Increase CSMAX in main.F90."
+        write(io_stdout, *) "ALERT: The number of rejected events with too small CSMAX exceeds 1%."
+        write(io_stdout, *) "       Increase CSMAX in main.F90."
+    endif
     write(io_stdout,*)  " event generation rate (events/sec)",dble(sum(AccepCounter_part(:,:)))/(time_end-time_start+1d-10)
 
     

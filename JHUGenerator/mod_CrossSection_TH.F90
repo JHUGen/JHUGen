@@ -301,6 +301,7 @@ EvalUnWeighted_TH = 0d0
 
    MuFac=(M_Top + M_Reso)/4d0
    call setPDFs(eta1,eta2,Mu_Fact,pdf)
+   LO_Res_Unpol = 0d0
 
 
 IF( GENEVT ) THEN   
