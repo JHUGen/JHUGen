@@ -20,7 +20,7 @@ integer(8), public :: AlertCounter=0
 integer(8), public :: AccepCounter_part(-5:5,-5:5)=0
 real(8) :: time_start,time_end,time_int
 logical, public :: warmup
-character(len=100) :: DataFile
+character(len=500) :: DataFile
 character(len=100) :: LogFile
 character(len=500) :: LHEProdFile
 character(len=100) :: LHAPDFString
