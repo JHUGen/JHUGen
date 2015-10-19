@@ -296,26 +296,31 @@ END FUNCTION
    logical :: applyPSCut,ZZ_Fusion
    integer, parameter :: ij_neg_offset=6, ij_max=+5
    integer, parameter :: ij_num=ij_max+ij_neg_offset
+   include 'vegas_common.f'   
    EvalWeighted_HJJ = 0d0
    
  
    if( Process.eq.60 ) NumPartonicChannels = 121 !=ij_num**2=121 for WBF   (-5,..,-1,0,+1,..,+5)^2
-   if( Process.eq.61 ) NumPartonicChannels = 121 !=ij_num**2=121 for WBF   (-5,..,-1,0,+1,..,+5)^2
+   if( Process.eq.61 ) NumPartonicChannels = 121 !=ij_num**2=121 for HJJ   (-5,..,-1,0,+1,..,+5)^2
    iPartChannel = int(yRnd(8) * (NumPartonicChannels))! this runs from 0..120
-   
+     
+if( unweighted .and. .not.warmup .and.  sum(AccepCounter_part(:,:)) .eq. sum(RequEvents(:,:)) ) then 
+   stopvegas=.true.
+endif
+     
    PartChannelAvg = NumPartonicChannels
    iPart_sel = iPartChannel/ij_num + 1 -ij_neg_offset
    jPart_sel = (iPartChannel+1) - (iPart_sel-1+ij_neg_offset)*ij_num - ij_neg_offset  
-   if( jPart_sel.gt.iPart_sel ) return
+   if( jPart_sel.gt.iPart_sel ) return !  sort by i>j
    if( (unweighted) .and. (.not. warmup) .and. (AccepCounter_part(iPart_sel,jPart_sel) .ge. RequEvents(iPart_sel,jPart_Sel))  ) return
    
       
    call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
    if (EHat.lt.M_Reso) return
-   if( Process.eq.60 ) call EvalPhaseSpace_VBF(EHat,M_Reso,yRnd(3:7),MomExt,PSWgt)
-   if( Process.eq.61 ) call EvalPhaseSpace_VBF(EHat,M_Reso,yRnd(3:7),MomExt,PSWgt)
-! call EvalPhasespace_VBF_NEW2(yrnd(9),yRnd(3:7),EHat,MomExt,PSWgt)
-! call EvalPhasespace_VBF_H4f(yrnd(17),yRnd(3:16),EHat,MomExt(:,:),PSWgt)
+!    if( Process.eq.60 ) call EvalPhaseSpace_VBF(EHat,M_Reso,yRnd(3:7),MomExt,PSWgt)
+   if( Process.eq.60 ) call EvalPhasespace_VBF_NEW2(yRnd(9),yRnd(3:7),EHat,MomExt,PSWgt)
+!    if( Process.eq.61 ) call EvalPhaseSpace_VBF(EHat,M_Reso,yRnd(3:7),MomExt,PSWgt)
+   if( Process.eq.61 ) call EvalPhasespace_VBF_NEW2(yRnd(9),yRnd(3:7),EHat,MomExt,PSWgt)
    call boost2Lab(eta1,eta2,5,MomExt(1:4,1:5))
 
    if( Process.eq.60 ) call Kinematics_HVBF(5,MomExt,applyPSCut,NBin)
@@ -323,7 +328,7 @@ END FUNCTION
    if( applyPSCut .or. PSWgt.eq.zero ) return
    EvalCounter = EvalCounter+1
    
-
+   
    call setPDFs(eta1,eta2,Mu_Fact,pdf)
    FluxFac = 1d0/(2d0*EHat**2)
    if (process.eq.60) then
@@ -339,6 +344,7 @@ END FUNCTION
       ICOLUP(1:2,3) = (/501,000/)
       ICOLUP(1:2,4) = (/502,000/)
       ICOLUP(1:2,5) = (/000,000/)
+      
    elseif (process.eq.61) then
       call EvalAmp_SBFH_UnSymm_SA(MomExt,(/ghg2,ghg3,ghg4/),me2)
       me2 = me2 * (2d0/3d0*alphas**2)**2 
@@ -478,7 +484,7 @@ if( unweighted ) then
       call random_number(xRnd) 
       if( EvalWeighted_HJJ*VgsWgt.gt.CrossSecMax(iPart_sel,jPart_sel) ) then
           write(io_LogFile,"(2X,A,1PE13.6,1PE13.6)") "CrossSecMax is too small.",EvalWeighted_HJJ*VgsWgt, CrossSecMax(iPart_sel,jPart_sel)
-  !          write(io_stdout, "(2X,A,1PE13.6,1PE13.6)") "CrossSecMax is too small.",EvalWeighted_HJJ*VgsWgt, CrossSecMax(iPart_sel,jPart_sel)
+          write(io_stdout, "(2X,A,1PE13.6,1PE13.6,1PE13.6)") "CrossSecMax is too small.",EvalWeighted_HJJ*VgsWgt, CrossSecMax(iPart_sel,jPart_sel),EvalWeighted_HJJ*VgsWgt/CrossSecMax(iPart_sel,jPart_sel)
           AlertCounter = AlertCounter + 1
       elseif( EvalWeighted_HJJ*VgsWgt .gt. xRnd*CrossSecMax(iPart_sel,jPart_sel) ) then
           AccepCounter = AccepCounter + 1
@@ -490,7 +496,6 @@ if( unweighted ) then
       endif
        
   endif! warmup
-
 
 
 else! weighted

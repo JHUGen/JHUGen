@@ -10,8 +10,8 @@ use modTH
 implicit none
 include './variables.F90'
 integer, parameter :: LHA2M_PDF(-6:6) = (/-5,-6,-3,-4,-1,-2,0 ,2,1,4,3,6,5/)
-real(8) :: helicity(9), mass(9,2),msq_MCFM(-5:5,-5:5),p_MCFM(14,4)
-integer :: id(9), TopDecays, Channel
+real(8) :: helicity(9), mass(9,2),msq_MCFM(-5:5,-5:5),p_MCFM(14,4),Ga_F,Mass_F
+integer :: id(9), TopDecays, Channel,FDecay
 real(8) :: p(4,6),p5(4,5),p4(4,4),p9(4,9),p8(4,8),p13(4,13)
 real(8) :: MatElSq,M_Reso,Ga_Reso,MatElSqPDF(-5:5,-5:5),check_vbf(-5:5,-5:5),check_sbf(-5:5,-5:5),check_hj(-5:5,-5:5),check_zh(-5:5,-5:5),LO_Res_Unpol(-6:6,-6:6)
 integer :: MY_IDUP(6:9)
@@ -261,7 +261,7 @@ integer,  target :: ANuT_ = -16
   mass(5,2)=Ga_Reso
   Hzzcoupl(1:4) = (/ (2d0,0d0), (0d0,0d0), (0d0,0d0), (0d0,0d0) /)
   include './checkZH_SM.dat'
-  do i = -6,6
+  do i = -5,5
     j = -i
     !id(1:2) = (/LHA2M_PDF(i),LHA2M_PDF(j)/)
     id(1:2) = (/i,j/)
@@ -332,7 +332,7 @@ integer,  target :: ANuT_ = -16
    TTBHcoupl(1) = (1d0,0d0)
    TTBHcoupl(2) = (0d0,0d0)
 
-   call NNPDFDriver("./pdfs/NNPDF30_lo_as_0130.LHgrid",33)
+   call NNPDFDriver("./pdfs/NNPDF30_lo_as_0130.LHgrid",32)
    call NNinitPDF(0)
 !    call InitProcess_TTBH(m_Reso)! done above already
 
@@ -408,9 +408,50 @@ integer,  target :: ANuT_ = -16
       print *, 'Matr.el. squared,PP->qtH',MatElSq,MatElSq/0.154800780966d0
 
 
+      
+      
+      
+      
+      
+      
+      p(1:4,1)= (/  0.6250000000010161d0, -0.6056761969204049d0, -0.0054925049983839d0, -0.1530864953225722d0   /)
+      p(1:4,2)= (/  0.6250000000010161d0,  0.6056761969204049d0,  0.0054925049983839d0,  0.1530864953225722d0   /)
+      FDecay=0!   0= stable, 1=decayed
+      TTBHcoupl(1) = (1d0,0d0)
+      TTBHcoupl(2) = (0d0,0d0)
+            
+      mass_F = m_tau
+      Ga_F = Ga_Tau
+      call EvalAmp_H_FF(p(1:4,1:6),mass_F,Ga_F,TTBHcoupl,FDecay,MatElSq)
+      print *, 'Matr.el. squared,H->tautau',MatElSq,MatElSq/(1.626053239296826d-004)
 
 
 
+
+      p(1:4,1)= (/  0.5550197379512286d0, -0.2102963013914331d0, -0.0239796671928995d0, -0.5130763595195669d0   /)
+      p(1:4,2)= (/  0.0166004007668986d0, -0.0075603185841941d0,  0.0008541786501176d0, -0.0147541610185337d0   /)
+      p(1:4,3)= (/  0.0533798612831287d0, -0.0237961371790174d0, -0.0021940039571579d0, -0.0477319577704437d0   /)
+      p(1:4,4)= (/  0.5683752405984198d0,  0.2153564111970493d0,  0.0217324025842142d0,  0.5255470796794106d0   /)
+      p(1:4,5)= (/  0.0389643243756764d0,  0.0182679061301883d0,  0.0027072853373549d0,  0.0343099517017105d0   /)
+      p(1:4,6)= (/  0.0176604350271595d0,  0.0080284398274069d0,  0.0008798045783706d0,  0.0157054469274231d0   /)
+      FDecay=1!   0= stable, 1=decayed
+      TTBHcoupl(1) = (1d0,0d0)
+      TTBHcoupl(2) = (0d0,0d0)
+      mass_F = m_tau
+      Ga_F = Ga_Tau
+      call EvalAmp_H_FF(p(1:4,1:6),mass_F,Ga_F,TTBHcoupl,FDecay,MatElSq)
+      print *, 'Matr.el. squared,H->tautau',MatElSq,MatElSq/(1.518044263918771d+021)
+      
+      
+
+      
+      
+      
+      
+      
+      
+      
+      
     p8(1:4,1)=-(/   4.1980450031499998d0,        0.0000000000000000d0,        0.0000000000000000d0,        4.1980450031499998d0 /)
     p8(1:4,2)=-(/   27.836467868400000d0,        0.0000000000000000d0,        0.0000000000000000d0,       -27.836467868400000d0 /)
     p8(1:4,3)=+(/   3.8571535099599998d0,      -0.85263204716199992d0,       0.18796420827100002d0,        3.7570362319200004d0 /)
@@ -440,6 +481,10 @@ integer,  target :: ANuT_ = -16
     print *, "MCFM:"
     print *, msq_MCFM(1,-1)
 
+  
+  
+  
+  
   
 END PROGRAM
 

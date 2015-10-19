@@ -413,6 +413,7 @@ include "vegas_common.f"
   nprn = 1
   readin=.false.
   writeout=.false.
+  stopvegas=.false.
 
 return
 END SUBROUTINE
@@ -614,7 +615,7 @@ include "vegas_common.f"
          NDim = NDim + 2 ! sHat integration
          
 NDim = NDim + 1 ! for pdf sampling
-! NDim = NDim + 1 ! for PS sampling
+NDim = NDim + 1 ! for PS sampling
         
          VegasIt1_default = 5
          VegasNc0_default = 10000000
@@ -641,6 +642,8 @@ NDim = NDim + 1 ! for pdf sampling
          NDim = 5
          NDim = NDim + 2 ! sHat integration
 NDim = NDim + 1 ! for pdf sampling       
+NDim = NDim + 1 ! for PS sampling
+
 !          if( unweighted ) NDim = NDim + 1  ! random number which decides if event is accepted
          
          VegasIt1_default = 5
@@ -809,10 +812,8 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
     elseif (Process.eq.110 .or. Process.eq.111 .or. Process.eq.112 .or. Process.eq.113)  then
       call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
    else
-!       call vegas(EvalWeighted,VG_Result,VG_Error,VG_Chi2)    ! usual call of vegas for weighted events
-      call vegas(EvalWeighted_tautau,VG_Result,VG_Error,VG_Chi2)    ! usual call of vegas for weighted events
-      
-      
+      call vegas(EvalWeighted,VG_Result,VG_Error,VG_Chi2)    ! usual call of vegas for weighted events
+!       call vegas(EvalWeighted_tautau,VG_Result,VG_Error,VG_Chi2)    ! usual call of vegas for weighted events
     endif
 
     !DATA RUN
@@ -840,8 +841,8 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
     elseif (Process.eq.110 .or. Process.eq.111 .or. Process.eq.112 .or. Process.eq.113) then
       call vegas1(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
     else
-!       call vegas1(EvalWeighted,VG_Result,VG_Error,VG_Chi2)    ! usual call of vegas for weighted events
-      call vegas1(EvalWeighted_tautau,VG_Result,VG_Error,VG_Chi2)    ! usual call of vegas for weighted events
+      call vegas1(EvalWeighted,VG_Result,VG_Error,VG_Chi2)    ! usual call of vegas for weighted events
+!       call vegas1(EvalWeighted_tautau,VG_Result,VG_Error,VG_Chi2)    ! usual call of vegas for weighted events
     endif
 
 
@@ -1146,14 +1147,27 @@ if( UseBetaVersion ) then
     warmup = .true.
     itmx = 5
     ncall= VegasNc0
-    if( Process.eq.60 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
-    if( Process.eq.61 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
+    outgridfile="vegas.grid"  
+    ingridfile=trim(outgridfile)
+    
+        
+    if( ReadCSmax ) then
+        readin=.true.
+        writeout=.false.
+        itmx = 3
+    else
+        readin=.false.
+        writeout=.true.
+        if( Process.eq.60 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
+        if( Process.eq.61 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
+        itmx = 3
+    endif
+    
     
     
     CrossSecMax(:,:) = 0d0
     CrossSec(:,:) = 0d0
     
-    itmx = 3
 !     if( Process.eq.80 ) call vegas(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2) ! adjust to LHE format
 !     if( Process.eq.90 ) call vegas(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.60 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
@@ -1188,14 +1202,13 @@ if( UseBetaVersion ) then
     enddo
     write(io_stdout,"(1X,A,F8.3,I9)") "Sum        partonic xsec   x   x    ",sum(CrossSec(:,:))/VG_Result,sum(RequEvents(:,:))
 
-! pause      
       
     write(io_stdout,"(A)")  ""
     write(io_stdout,"(1X,A)")  "Event generation"
     call ClearHisto()   
     warmup = .false.
     itmx = 1
-    nprn = 0  
+!     nprn = 0  
     EvalCounter = 0
     RejeCounter = 0
     AlertCounter = 0
@@ -1204,10 +1217,11 @@ if( UseBetaVersion ) then
     
     CrossSecMax(:,:) = 1.0d0 * CrossSecMax(:,:)    !  adjustment factor
 
-
-!     ncall= 1000000
-    do while( StatusPercent.lt.100d0  )
-    
+! try running with itmx=5,
+! try with adating grid instead of while loop   -> is the grid changing with each while-loop???
+!     ncall=1000000  this cannot be different from Ncall from csmax scan because then the VgsWgt is different !!!
+    itmx=200000
+!     do while( StatusPercent.lt.100d0  )
 !         if( Process.eq.80 ) call vegas1(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)! adjust to LHE format
     !     if( Process.eq.90 ) call vegas1(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
         if( Process.eq.60 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
@@ -1218,6 +1232,7 @@ if( UseBetaVersion ) then
 !         if( Process.eq.112) call vegas1(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)      
 !         if( Process.eq.113) call vegas1(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)      
         call system('clear')
+        write(io_stdout,' ')
         do i1=-5,5
         do j1=-5,5
             if( RequEvents(i1,j1).gt.0 ) then 
@@ -1227,8 +1242,16 @@ if( UseBetaVersion ) then
         enddo
         enddo  
         StatusPercent = int(100d0*dble(sum(AccepCounter_part(:,:)))/dble(sum(RequEvents(:,:)))  )   
-    enddo
+!     enddo
     call cpu_time(time_end)  
+    
+    print *, " Alert  Counter: ",AlertCounter
+    if( dble(AlertCounter)/dble(AccepCounter+1d-10) .gt. 1d0*percent ) then
+        write(io_LogFile,*) "ALERT: The number of rejected events with too small CSMAX exceeds 1%."
+        write(io_LogFile,*) "       Increase CSMAX in main.F90."
+        write(io_stdout, *) "ALERT: The number of rejected events with too small CSMAX exceeds 1%."
+        write(io_stdout, *) "       Increase CSMAX in main.F90."
+    endif
     write(io_stdout,*)  " event generation rate (events/sec)",dble(sum(AccepCounter_part(:,:)))/(time_end-time_start+1d-10)
 
     
@@ -1667,7 +1690,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
 
           if( Res.gt.0d0 ) then ! decay event was accepted
           
-             if( TauDecays.lt.0 ) then
+             if( TauDecays.lt.0 ) then!  H->VV->4f
                 call boost(HiggsDK_Mom(1:4,6),MomHiggs(1:4),pH2sq)
                 call boost(HiggsDK_Mom(1:4,7),MomHiggs(1:4),pH2sq)
                 call boost(HiggsDK_Mom(1:4,8),MomHiggs(1:4),pH2sq)
@@ -1681,7 +1704,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                 HiggsDK_IDUP(8) = convertLHE(HiggsDK_IDUP(8))
                 HiggsDK_IDUP(9) = convertLHE(HiggsDK_IDUP(9))
                 call WriteOutEvent_NEW(EventNumPart,LHE_IDUP,LHE_IntExt,LHE_MOTHUP,LHE_ICOLUP,MomExt,HiggsDK_Mom(1:4,4:9),Mass,iHiggs,HiggsDK_IDUP(1:9),HiggsDK_ICOLUP(1:2,1:9),EventInfoLine,BeginEventLine=BeginEventLine)
-             else
+             else! H->tautau
                 call boost(HiggsDK_Mom(1:4,4),MomHiggs(1:4),pH2sq)
                 call boost(HiggsDK_Mom(1:4,5),MomHiggs(1:4),pH2sq)
                 call boost(HiggsDK_Mom(1:4,6),MomHiggs(1:4),pH2sq)
@@ -2391,8 +2414,11 @@ use modParameters
 implicit none
 
 
-  if( Process.eq.60 .or. Process.eq.61 .or. Process.eq.66 ) then
+
+  if( Process.eq.60 .or. Process.eq.66 ) then
      call InitHisto_HVBF()
+  elseif( Process.eq.61) then
+     call InitHisto_HJJ()
   elseif( Process.eq.62) then
      call InitHisto_HJ()
   elseif (Process.eq.50) then
@@ -2404,8 +2430,13 @@ implicit none
   elseif (Process.eq.110 .or. Process .eq. 111 .or. Process.eq.112 .or. Process .eq. 113) then
      call InitHisto_TH()
   else
-     call InitHisto_HZZ()
-!      call InitHisto_Htautau()
+  
+     if( TauDecays.eq.0 .or. TauDecays.eq.1 ) then
+         call InitHisto_Htautau()
+     else
+         call InitHisto_HZZ()
+     endif
+     
 !      call InitHisto_Htoptop()
   endif
 
@@ -2587,7 +2618,6 @@ END SUBROUTINE
 
 
 
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 SUBROUTINE InitHisto_HJ()
 use ModMisc
 use ModKinematics
@@ -2614,6 +2644,70 @@ integer :: AllocStatus,NHisto
       Histo(NHisto)%Value2(:)= 0d0
       Histo(NHisto)%Hits(:)  = 0
   enddo
+
+RETURN
+END SUBROUTINE
+
+
+
+
+SUBROUTINE InitHisto_HJJ()
+use ModMisc
+use ModKinematics
+use ModParameters
+implicit none
+integer :: AllocStatus,NHisto
+
+          it_sav = 1
+          NumHistograms = 6
+          if( .not.allocated(Histo) ) then
+                allocate( Histo(1:NumHistograms), stat=AllocStatus  )
+                if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
+          endif
+
+          Histo(1)%Info   = "m_jj"
+          Histo(1)%NBins  = 40
+          Histo(1)%BinSize= 50d0*GeV
+          Histo(1)%LowVal = 0d0
+          Histo(1)%SetScale= 1d0/GeV
+
+          Histo(2)%Info   = "dphi_jj"
+          Histo(2)%NBins  = 25
+          Histo(2)%BinSize= 0.125d0
+          Histo(2)%LowVal = 0d0
+          Histo(2)%SetScale= 1d0
+
+          Histo(3)%Info   = "pT(H)"
+          Histo(3)%NBins  = 50
+          Histo(3)%BinSize= 10d0*GeV
+          Histo(3)%LowVal = 0d0
+          Histo(3)%SetScale= 1d0/GeV
+
+          Histo(4)%Info   = "y(j1)"
+          Histo(4)%NBins  = 50
+          Histo(4)%BinSize= 0.2d0
+          Histo(4)%LowVal = -5d0
+          Histo(4)%SetScale= 1d0
+
+          Histo(5)%Info   = "y(j2)"
+          Histo(5)%NBins  = 50
+          Histo(5)%BinSize= 0.2d0
+          Histo(5)%LowVal = -5d0
+          Histo(5)%SetScale= 1d0
+          
+          Histo(6)%Info   = "dy(y1-j2)"
+          Histo(6)%NBins  = 50
+          Histo(6)%BinSize= 0.2d0
+          Histo(6)%LowVal = -5d0
+          Histo(6)%SetScale= 1d0
+
+
+  do NHisto=1,NumHistograms
+      Histo(NHisto)%Value(:) = 0d0
+      Histo(NHisto)%Value2(:)= 0d0
+      Histo(NHisto)%Hits(:)  = 0
+  enddo
+
 
 RETURN
 END SUBROUTINE
@@ -2827,7 +2921,7 @@ integer :: AllocStatus,NHisto
 
 
           it_sav = 1
-          NumHistograms = 4
+          NumHistograms = 6
           if( .not.allocated(Histo) ) then
                 allocate( Histo(1:NumHistograms), stat=AllocStatus  )
                 if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
@@ -2839,27 +2933,36 @@ integer :: AllocStatus,NHisto
           Histo(1)%LowVal = 0d0*GeV
           Histo(1)%SetScale= 1d0/GeV
 
-
           Histo(2)%Info   = "m_tauM"
           Histo(2)%NBins  = 50
           Histo(2)%BinSize= 0.05d0*GeV
           Histo(2)%LowVal = 0d0*GeV
           Histo(2)%SetScale= 1d0/GeV
 
-          
           Histo(3)%Info   = "m_Wp"
           Histo(3)%NBins  = 50
           Histo(3)%BinSize= 0.05d0*GeV
           Histo(3)%LowVal = 0d0*GeV
           Histo(3)%SetScale= 1d0/GeV
           
-            
           Histo(4)%Info   = "m_Wm"
           Histo(4)%NBins  = 50
           Histo(4)%BinSize= 0.05d0*GeV
           Histo(4)%LowVal = 0d0*GeV
           Histo(4)%SetScale= 1d0/GeV
-          
+            
+          Histo(5)%Info   = "y_tau+"
+          Histo(5)%NBins  = 40
+          Histo(5)%BinSize= 0.25d0
+          Histo(5)%LowVal = -5d0
+          Histo(5)%SetScale= 1d0
+            
+          Histo(6)%Info   = "y_tau-"
+          Histo(6)%NBins  = 40
+          Histo(6)%BinSize= 0.25d0
+          Histo(6)%LowVal = -5d0
+          Histo(6)%SetScale= 1d0
+            
 
           do NHisto=1,NumHistograms
               Histo(NHisto)%Value(:) = 0d0
@@ -2974,18 +3077,30 @@ integer :: AllocStatus,NHisto
           Histo(5)%BinSize= 0.2d0
           Histo(5)%LowVal = -5d0
           Histo(5)%SetScale= 1d0
-          
-          Histo(6)%Info   = "m_4l"
-          Histo(6)%NBins  = 50
-          Histo(6)%BinSize= 10d0*GeV
-          Histo(6)%LowVal = 120d0*GeV
-          Histo(6)%SetScale= 1d0/GeV
 
-          Histo(7)%Info   = "weights"
+          Histo(6)%Info   = "y(j1)"
+          Histo(6)%NBins  = 50
+          Histo(6)%BinSize= 0.2d0
+          Histo(6)%LowVal = -5d0
+          Histo(6)%SetScale= 1d0
+
+          Histo(7)%Info   = "y(j2)"
           Histo(7)%NBins  = 50
-          Histo(7)%BinSize= 0.25d0
-          Histo(7)%LowVal = -18d0
+          Histo(7)%BinSize= 0.2d0
+          Histo(7)%LowVal = -5d0
           Histo(7)%SetScale= 1d0
+          
+!           Histo(6)%Info   = "m_4l"
+!           Histo(6)%NBins  = 50
+!           Histo(6)%BinSize= 10d0*GeV
+!           Histo(6)%LowVal = 120d0*GeV
+!           Histo(6)%SetScale= 1d0/GeV
+! 
+!           Histo(7)%Info   = "weights"
+!           Histo(7)%NBins  = 50
+!           Histo(7)%BinSize= 0.25d0
+!           Histo(7)%LowVal = -18d0
+!           Histo(7)%SetScale= 1d0
 
 
 

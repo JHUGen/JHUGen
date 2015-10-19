@@ -15,8 +15,8 @@ type :: Particle
    integer  :: Helicity
    real(8)  :: Mass
    real(8)  :: Mass2
-   complex(8) :: Mom(1:8)
-   complex(8) :: Pol(1:16)
+   complex(8) :: Mom(1:4)
+   complex(8) :: Pol(1:4)
 end type
 
 type :: PtrToParticle
