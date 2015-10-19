@@ -6,7 +6,8 @@ real(8), parameter :: Ga_W    = 2.085d0   *GeV      ! W boson width(PDG-2011)
 real(8), parameter :: m_top   = 173.2d0  *GeV           ! top quark mass
 real(8), parameter :: Ga_Top  = 2.0d0  *GeV            ! top quark width
 real(8), parameter :: m_bot   = 4.75d0  *GeV          ! bottom quark mass
-real(8), parameter :: m_tau = 1.7768d0  *GeV           ! tau lepton mass
+real(8), parameter :: m_tau   = 1.7768d0  *GeV           ! tau lepton mass
+real(8), parameter :: Ga_tau  = 4d-13    *GeV           ! tau lepton mass
 real(8), parameter :: Lambda  = 1000d0    *GeV      ! Lambda coupling enters in two places
                                                             ! overal scale for x-section and in power suppressed
                                                             ! operators/formfactors (former r).

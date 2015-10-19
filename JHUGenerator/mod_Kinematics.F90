@@ -568,10 +568,10 @@ integer, parameter :: inLeft=1, inRight=2, Hig=3, tauP=4, tauM=5, Wp=6, Wm=7,   
         HiggsDK_ISTUP(4:13) = (/2,2,2,2,1,1,1,1,1,1/)
         HiggsDK_MOTHUP(1:2,tauP)     = (/iHiggs,iHiggs/)
         HiggsDK_MOTHUP(1:2,tauM)     = (/iHiggs,iHiggs/)
-        HiggsDK_MOTHUP(1:2,Wp)       = (/1,7/) + NUP
-        HiggsDK_MOTHUP(1:2,nubar_tau)= (/1,3/) + NUP
-        HiggsDK_MOTHUP(1:2,Wm)       = (/2,8/) + NUP
-        HiggsDK_MOTHUP(1:2,nu_tau)   = (/2,4/) + NUP
+        HiggsDK_MOTHUP(1:2,Wp)       = (/1,1/) + NUP
+        HiggsDK_MOTHUP(1:2,nubar_tau)= (/1,1/) + NUP
+        HiggsDK_MOTHUP(1:2,Wm)       = (/2,2/) + NUP
+        HiggsDK_MOTHUP(1:2,nu_tau)   = (/2,2/) + NUP
         HiggsDK_MOTHUP(1:2,nu)       = (/3,3/) + NUP
         HiggsDK_MOTHUP(1:2,lepP)     = (/3,3/) + NUP
         HiggsDK_MOTHUP(1:2,lepM)     = (/4,4/) + NUP
@@ -2106,7 +2106,8 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, Higgs=5
        NBin(3)  = WhichBin(3,pT_H)
        NBin(4)  = WhichBin(4,pT_jl)
        NBin(5)  = WhichBin(5,dy_j1j2)
-       NBin(6:7)= 1
+       NBin(6)  = WhichBin(6,y_j1)
+       NBin(7)  = WhichBin(7,y_j2)
 
 
 RETURN
@@ -2260,8 +2261,8 @@ real(8) :: MomLept(1:4,1:4),MomLeptX(1:4,1:4),MomLeptPlane1(2:4),MomLeptPlane2(2
 logical :: applyPSCut
 integer :: NumPart,NBin(:),NumHadr,JetList(1:2),NJEt,PartList(1:2)
 real(8) :: pT_lepM,pT_lepP,y_lepM,y_lepP,MomFerm(1:4),MomZ2(1:4),MomReso(1:4),CosTheta1,Phi,Phi1,signPhi,signPhi1
-real(8) :: CosPhi_LepPZ,InvM_Lep,CosPhi_LepPlanes,CosThetaZ,CosThetaStar
-real(8) :: pT_3, pT_4,MomHadr(1:4,1:2),MomJet(1:4,1:2),pT_j1,pT_j2,m_jj,dphi_jj
+real(8) :: CosPhi_LepPZ,InvM_Lep,CosPhi_LepPlanes,CosThetaZ,CosThetaStar,y_j1,y_j2,dy_j1j2
+real(8) :: pT_3, pT_4,MomHadr(1:4,1:2),MomJet(1:4,1:2),pT_j1,pT_j2,m_jj,dphi_jj,pT_H
 
 
 
@@ -2286,24 +2287,37 @@ applyPSCut = .false.
     pT_j1 = get_PT(momjet(1:4,1))
     pT_j2 = get_PT(momjet(1:4,2))
 
+
     if( pT_j1.lt.ptjetcut .or. pT_j2.lt.ptjetcut ) then
       applyPSCut=.true.
       return
     endif
+    
+    pT_H = get_PT(MomExt(1:4,5))
+    
+    y_j1 = get_ETA(momjet(1:4,1))
+    y_j2 = get_ETA(momjet(1:4,2))
 
+   dy_j1j2 = y_j1 - y_j2
 
-
-       m_jj = get_MInv( MomJet(1:4,1)+MomJet(1:4,2) )
-
-       dphi_jj = abs( Get_PHI(MomJet(1:4,1)) - Get_PHI(MomJet(1:4,2)) )
-       if( dphi_jj.gt.Pi ) dphi_jj=2d0*Pi-dphi_jj
+  
+    m_jj = get_MInv( MomJet(1:4,1)+MomJet(1:4,2) )
+  
+    dphi_jj = abs( Get_PHI(MomJet(1:4,1)) - Get_PHI(MomJet(1:4,2)) )
+    if( dphi_jj.gt.Pi ) dphi_jj=2d0*Pi-dphi_jj
 
 
  !     binning
+       NBin(:) = 1
        NBin(1)  = WhichBin(1,m_jj)
        NBin(2)  = WhichBin(2,dphi_jj)
-       NBin(3:7) = 1
+       NBin(3)  = WhichBin(3,pT_H)
+       NBin(4)  = WhichBin(4,y_j1)
+       NBin(5)  = WhichBin(5,y_j2)
+       NBin(6)  = WhichBin(6,dy_j1j2)
 
+
+       
 RETURN
 END SUBROUTINE
 
@@ -2658,7 +2672,7 @@ implicit none
 real(8) :: Mom(:,:)
 logical :: applyPSCut
 integer :: NBin(:)
-real(8) :: m_tauP,m_tauM,m_Wp,m_Wm
+real(8) :: m_tauP,m_tauM,m_Wp,m_Wm,y_tauM,y_tauP
 integer, parameter :: inLeft=1, inRight=2, Hig=3, tauP=4, tauM=5, Wp=6, Wm=7,   nu=8, nubar_tau=9, lepP=10,   lepM=11, nu_tau=12, nubar=13
 
 
@@ -2668,14 +2682,19 @@ integer, parameter :: inLeft=1, inRight=2, Hig=3, tauP=4, tauM=5, Wp=6, Wm=7,   
     m_tauM = get_MInv(Mom(1:4,tauM))
     m_Wp   = get_MInv(Mom(1:4,Wp))
     m_Wm   = get_MInv(Mom(1:4,Wm))
-   
+    y_tauP = get_ETA(Mom(1:4,tauP))  
+    y_tauM = get_ETA(Mom(1:4,tauM))  
     
-!      binning
-!        NBin(1) = WhichBin(1,m_tauP)
-!        NBin(2) = WhichBin(2,m_tauM)
-!        NBin(3) = WhichBin(3,m_Wp)
-!        NBin(4) = WhichBin(4,m_Wm)
+    
+    
+!   binning
     NBin(:)=1
+    NBin(1) = WhichBin(1,m_tauP)
+    NBin(2) = WhichBin(2,m_tauM)
+    NBin(3) = WhichBin(3,m_Wp)
+    NBin(4) = WhichBin(4,m_Wm)
+    NBin(5) = WhichBin(5,y_tauP)
+    NBin(6) = WhichBin(6,y_tauM)
     
 RETURN
 END SUBROUTINE
@@ -4522,6 +4541,7 @@ ELSEIF( iChannel.EQ.4 ) THEN
    Jac  = Jac1*Jac2*Jac3 * PSNorm3                                                                                       !  combine  
    
 ELSE
+print *, xchannel , NumChannels
    call Error("PS channel not available in EvalPhasespace_VBF_NEW2",ichannel)
 ENDIF 
    

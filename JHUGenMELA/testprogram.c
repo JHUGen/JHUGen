@@ -11,6 +11,7 @@ int main(void){
   double P[6][4];
   double Ptth[13][4];
   double Pth[9][4];
+  double PHtt[6][4];
   double MatElSq;
   int MYIDUP[4];
   double Hggcoupl[3][2];
@@ -360,14 +361,14 @@ int main(void){
  Ptth[10][1]= +(  1.47308581101401e-01 );
  Ptth[10][2]= +(-5.49785829570067e-01 );
  Ptth[10][3]= +(5.82526785337429 );
- 
- int someParam=33;
+
+ int someParam=32;
  nnpdfdriver_("./pdfs/NNPDF30_lo_as_0130.LHgrid",&someParam);
  someParam=0;
  nninitpdf_(&someParam);
 
  MReso = 125.60 / 100.0;
-//  __modttbh_MOD_initprocess_ttbh(&MReso,&MTop);  // done above already
+ __modttbh_MOD_initprocess_ttbh(&MReso,&MTop);  // done above already
  TopDecays=1;  
 
  
@@ -442,8 +443,72 @@ int main(void){
       printf("Matr.el. squared (PP->qth): %20.17e \n ",MatElSq);
       printf("result should be (PP->qth): %20.17e \n ",0.154800780966);
       printf("ratio: %20.17e \n ",MatElSq/(0.154800780966));
-       
       
+      
+
+      
+      
+      
+      PHtt[0][0] = 0.6250000000010161;
+      PHtt[0][1] =-0.6056761969204049;
+      PHtt[0][2] =-0.0054925049983839;
+      PHtt[0][3] =-0.1530864953225722;
+
+      PHtt[1][0] = 0.6250000000010161;
+      PHtt[1][1] = 0.6056761969204049;
+      PHtt[1][2] = 0.0054925049983839;
+      PHtt[1][3] = 0.1530864953225722;     
+
+     
+      int FDecay=0;
+      double mtau= 0.017768;
+      double gatau= 4e-15;
+      __modhiggs_MOD_evalamp_h_ff(PHtt,&mtau,&gatau, TTBHcoupl, &FDecay, &MatElSq);
+      printf("\n ");
+      printf("Matr.el. squared (H->tau): %20.17e \n ",MatElSq);
+      printf("result should be (H->tau): %20.17e \n ",1.626053239296826e-004);
+      printf("ratio: %20.17e \n ",MatElSq/(1.626053239296826e-004));
+       
+
+   
+      
+      PHtt[0][0] = 0.5550197379512286;
+      PHtt[0][1] =-0.2102963013914331 ;
+      PHtt[0][2] =-0.0239796671928995;
+      PHtt[0][3] = -0.5130763595195669 ;
+      PHtt[1][0] = 0.0166004007668986;
+      PHtt[1][1] =-0.0075603185841941 ;
+      PHtt[1][2] = 0.0008541786501176;
+      PHtt[1][3] = -0.0147541610185337;
+      PHtt[2][0] = 0.0533798612831287;
+      PHtt[2][1] =-0.0237961371790174 ;
+      PHtt[2][2] =-0.0021940039571579 ;
+      PHtt[2][3] =  -0.0477319577704437;
+      PHtt[3][0] = 0.5683752405984198;
+      PHtt[3][1] = 0.2153564111970493;
+      PHtt[3][2] =0.0217324025842142 ;
+      PHtt[3][3] = 0.5255470796794106;
+      PHtt[4][0] = 0.0389643243756764;
+      PHtt[4][1] = 0.0182679061301883;
+      PHtt[4][2] = 0.0027072853373549;
+      PHtt[4][3] =0.0343099517017105 ;
+      PHtt[5][0] = 0.0176604350271595;
+      PHtt[5][1] = 0.0080284398274069;
+      PHtt[5][2] = 0.0008798045783706;
+      PHtt[5][3] = 0.0157054469274231;
+   
+
+     
+      FDecay=1;
+      __modhiggs_MOD_evalamp_h_ff(PHtt,&mtau,&gatau, TTBHcoupl, &FDecay, &MatElSq);
+      printf("\n ");
+      printf("Matr.el. squared (H->tau): %20.17e \n ",MatElSq);
+      printf("result should be (H->tau): %20.17e \n ",1.518044263918771e+021);
+      printf("ratio: %20.17e \n ",MatElSq/(1.518044263918771e+021));
+       
+            
+       
+
       
 return 0;
 };

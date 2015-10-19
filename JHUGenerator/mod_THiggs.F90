@@ -89,8 +89,13 @@ integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9
 
       LO_Res_Unpol(Up_,Bot_)  = cdabs(LOAmp(Up_,Bot_,1))**2  + cdabs(LOAmp(Up_,Bot_,2))**2
       LO_Res_Unpol(Bot_,Up_)  = cdabs(LOAmp(Bot_,Up_,1))**2  + cdabs(LOAmp(Bot_,Up_,2))**2
+      LO_Res_Unpol(Chm_,Bot_) = LO_Res_Unpol(Up_,Bot_)
+      LO_Res_Unpol(Bot_,Chm_) = LO_Res_Unpol(Bot_,Up_)
+
       LO_Res_Unpol(ADn_,Bot_) = cdabs(LOAmp(ADn_,Bot_,1))**2 + cdabs(LOAmp(ADn_,Bot_,2))**2
       LO_Res_Unpol(Bot_,ADn_) = cdabs(LOAmp(Bot_,ADn_,1))**2 + cdabs(LOAmp(Bot_,ADn_,2))**2
+      LO_Res_Unpol(AStr_,Bot_)= LO_Res_Unpol(ADn_,Bot_)
+      LO_Res_Unpol(Bot_,AStr_)= LO_Res_Unpol(Bot_,ADn_)
       
       ColFac=9d0   
       LO_Res_Unpol(:,:) = LO_Res_Unpol(:,:) * ColFac * SpinAvg * QuarkColAvg**2
@@ -180,8 +185,13 @@ integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9
 
       LO_Res_Unpol(Dn_,ABot_)  = cdabs(LOAmp(Dn_,ABot_,1))**2  + cdabs(LOAmp(Dn_,ABot_,2))**2
       LO_Res_Unpol(ABot_,Dn_)  = cdabs(LOAmp(ABot_,Dn_,1))**2  + cdabs(LOAmp(ABot_,Dn_,2))**2
+      LO_Res_Unpol(Str_,ABot_) = LO_Res_Unpol(Dn_,ABot_)
+      LO_Res_Unpol(ABot_,Str_) = LO_Res_Unpol(ABot_,Dn_)
+      
       LO_Res_Unpol(AUp_,ABot_) = cdabs(LOAmp(AUp_,ABot_,1))**2 + cdabs(LOAmp(AUp_,ABot_,2))**2
       LO_Res_Unpol(ABot_,AUp_) = cdabs(LOAmp(ABot_,AUp_,1))**2 + cdabs(LOAmp(ABot_,AUp_,2))**2
+      LO_Res_Unpol(AChm_,ABot_)= LO_Res_Unpol(AUp_,ABot_)
+      LO_Res_Unpol(ABot_,AChm_)= LO_Res_Unpol(ABot_,AUp_)
       
       ColFac=9d0   
       LO_Res_Unpol(:,:) = LO_Res_Unpol(:,:) * ColFac * SpinAvg * QuarkColAvg**2
