@@ -80,7 +80,9 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
    ReadCSmax=.false.
    GenerateEvents=.false.
    RequestNLeptons = -1
-   RequestOSSF=.true.
+   RequestOS=-1
+   RequestOSSF=-1
+   CountTauAsAny = .true.
    LHAPDFString = ""
    LHAPDFMember = 0
    iinterf = -1
@@ -164,12 +166,26 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
     elseif( arg(1:12).eq."FilterNLept=" ) then
         read(arg(13:13),*) RequestNLeptons
         CountArg = CountArg + 1
+    elseif( arg(1:14) .eq."FilterOSPairs=" ) then
+        read(arg(15:15),*) RequestOS
+        CountArg = CountArg + 1
+    elseif( arg(1:16) .eq."FilterOSSFPairs=" ) then
+        read(arg(17:17),*) RequestOSSF
+        CountArg = CountArg + 1
+    elseif( arg(1:14) .eq."CountTauAsAny=" ) then
+        read(arg(15:15),*) iargument
+        if( iargument.eq.1 ) then
+            CountTauAsAny = .true.
+        else
+            CountTauAsAny = .false.
+        endif
+        CountArg = CountArg + 1
     elseif( arg(1:11) .eq."FilterOSSF=" ) then
         read(arg(12:12),*) iargument
+        write(*,*), "The filtering syntax has changed to become more general.  Please see the manual for more details."
         if( iargument.eq.1 ) then
-            RequestOSSF = .true.
-        else
-            RequestOSSF = .false.
+            write(*,*), "Setting FilterOSSFPairs=2"
+            RequestOSSF = 2
         endif        
         CountArg = CountArg + 1
     elseif( arg(1:11) .eq."Unweighted=" ) then
@@ -369,6 +385,13 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
     if( ReadLHEFile .and. .not. Unweighted ) then
         print *, "ReadLHE option is only allowed for generating unweighted events"
         stop
+    endif
+
+    if( RequestOS.lt.RequestOSSF ) then
+        RequestOS = RequestOSSF
+    endif
+    if( RequestNLeptons .lt. 2*RequestOS ) then
+        RequestNLeptons = 2*RequestOS
     endif
 
 return
@@ -3191,8 +3214,48 @@ character :: arg*(500)
     if( Process.eq.80 .or. Process.eq.110 .or. Process.eq.111 .or.Process.eq.112 .or. Process.eq.113 ) write(TheUnit,"(4X,A,F8.4,A,F6.4)") "Top quark mass=",m_top*100d0,", width=",Ga_top*100d0
     if( Process.eq.80 .or. Process.eq.110 .or. Process.eq.111 .or. Process.eq.112 .or. Process.eq.113) write(TheUnit,"(4X,A,I2)") "Top quark decay=",TOPDECAYS
     if( Process.eq.90 ) write(TheUnit,"(4X,A,F8.4,A,F6.4)") "Bottom quark mass=",m_top*100d0
-    if( (ReadLHEFile) .and. (RequestNLeptons.gt.0) .and. (RequestOSSF) ) write(TheUnit,"(4X,A,I2,A)") "Lepton filter activated. Requesting ",RequestNLeptons," OSSF leptons."
-    if( (ReadLHEFile) .and. (RequestNLeptons.gt.0) .and. .not. (RequestOSSF)) write(TheUnit,"(4X,A,I2,A)") "Lepton filter activated. Requesting ",RequestNLeptons," leptons."
+    if( (ReadLHEFile) .and. (RequestNLeptons.gt.0) ) then
+        if ( RequestOS .le. 0 ) then
+            if ( RequestNLeptons .eq. 1 ) then
+                write(TheUnit,"(4X,A,I2,A)") "Lepton filter activated. Requesting ",RequestNLeptons," lepton."
+            else
+                write(TheUnit,"(4X,A,I2,A)") "Lepton filter activated. Requesting ",RequestNLeptons," leptons."
+            endif
+        elseif ( RequestOSSF .le. 0 ) then
+            if ( RequestOS*2 .eq. RequestNLeptons ) then
+                if ( RequestOS .eq. 1 ) then
+                    write(TheUnit,"(4X,A,I2,A)") "Lepton filter activated. Requesting ",RequestNLeptons," leptons in an OS pair."
+                else
+                    write(TheUnit,"(4X,A,I2,A)") "Lepton filter activated. Requesting ",RequestNLeptons," leptons in OS pairs."
+                endif
+            else
+                if ( RequestOS .eq. 1 ) then
+                    write(TheUnit,"(4X,A,I2,A,I2,A)") "Lepton filter activated. Requesting ",RequestNLeptons," leptons including ", RequestOS, " OS pair."
+                else
+                    write(TheUnit,"(4X,A,I2,A,I2,A)") "Lepton filter activated. Requesting ",RequestNLeptons," leptons including ", RequestOS, " OS pairs."
+                endif
+            endif
+        elseif ( RequestOSSF*2 .eq. RequestNLeptons ) then
+            if ( RequestOSSF .eq. 1 ) then
+                write(TheUnit,"(4X,A,I2,A)") "Lepton filter activated. Requesting ",RequestNLeptons," leptons in an OSSF pair."
+            else
+                write(TheUnit,"(4X,A,I2,A)") "Lepton filter activated. Requesting ",RequestNLeptons," leptons in OSSF pairs."
+            endif
+        elseif ( RequestOSSF .eq. RequestOS ) then
+            if ( RequestOSSF .eq. 1 ) then
+                write(TheUnit,"(4X,A,I2,A,I2,A)") "Lepton filter activated. Requesting ",RequestNLeptons," leptons including ", RequestOSSF, " OSSF pair."
+            else
+                write(TheUnit,"(4X,A,I2,A,I2,A)") "Lepton filter activated. Requesting ",RequestNLeptons," leptons including ", RequestOSSF, " OSSF pairs."
+            endif
+        elseif ( RequestOS*2 .eq. RequestNLeptons ) then
+            write(TheUnit,"(4X,A,I2,A,I2,A)") "Lepton filter activated. Requesting ",RequestNLeptons," leptons in OS pairs, ", RequestOSSF, " of the pairs OSSF."
+        else ! this will never happen
+            write(TheUnit,"(4X,A,I2,A,I2,A,I2,A)") "Lepton filter activated. Requesting ",RequestNLeptons," leptons including ", RequestOS, " OS pairs, ", RequestOSSF, " of them OSSF."
+        endif
+    endif
+    if( CountTauAsAny .and. RequestOSSF.gt.0 ) then
+        write(TheUnit,"(8X,A)") "(counting tau in place of e or mu of the same sign, if necessary)"
+    endif
     write(TheUnit,"(4X,A,20I11)") "Random seeds: ",TheSeeds(1:TheSeeds(0))
 
     if( .not. (ReadLHEFile .or. ConvertLHEFile) ) then

@@ -596,6 +596,9 @@ if( IsAZDecay(DecayMode1) ) then
       call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt)
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut)
       if( applyPSCut .or. PSWgt.eq.zero ) return
+      if(H_DK.eqv..false.) then
+        if(dabs(inv_mass(5)-M_Reso).gt.10d0*Ga_Reso) return
+      endif
 
       call setPDFs(eta1,eta2,Mu_Fact,pdf)
       FluxFac = 1d0/(2d0*EHat**2)
@@ -634,6 +637,9 @@ if( IsAZDecay(DecayMode1) ) then
       call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt)
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut)
       if( applyPSCut .or. PSWgt.eq.zero ) return
+      if(H_DK.eqv..false.) then
+        if(dabs(inv_mass(5)-M_Reso).gt.10d0*Ga_Reso) return
+      endif
 
       FluxFac = 1d0/(2d0*ILC_Energy**2)
       PreFac = fbGeV2 * FluxFac * PSWgt *6d0 !2 for e and mu, 3 for colors of b
@@ -673,6 +679,9 @@ elseif( IsAWDecay(DecayMode1) ) then
       call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt)
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut)
       if( applyPSCut .or. PSWgt.eq.zero ) return
+      if(H_DK.eqv..false.) then
+        if(dabs(inv_mass(5)-M_Reso).gt.10d0*Ga_Reso) return
+      endif
 
       call setPDFs(eta1,eta2,Mu_Fact,pdf)
       FluxFac = 1d0/(2d0*EHat**2)
@@ -814,6 +823,11 @@ endif
     elseif( IsAPhoton(DecayMode1) ) then
       print *, "invalid final states"
       stop
+    endif
+
+    if( IsNaN(EvalWeighted_VHiggs) ) then
+        EvalWeighted_VHiggs = 0d0
+        return
     endif
 
     if(EvalWeighted_VHiggs.ne.0d0)then
@@ -1140,6 +1154,9 @@ if( IsAZDecay(DecayMode1) ) then
       call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt)
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut)
       if( applyPSCut .or. PSWgt.eq.zero ) return
+      if(H_DK.eqv..false.) then
+        if(dabs(inv_mass(5)-M_Reso).gt.10d0*Ga_Reso) return
+      endif
 
       call setPDFs(eta1,eta2,Mu_Fact,pdf)
       FluxFac = 1d0/(2d0*EHat**2)
@@ -1164,6 +1181,9 @@ if( IsAZDecay(DecayMode1) ) then
       call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt)
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut)
       if( applyPSCut .or. PSWgt.eq.zero ) return
+      if(H_DK.eqv..false.) then
+        if(dabs(inv_mass(5)-M_Reso).gt.10d0*Ga_Reso) return
+      endif
 
       FluxFac = 1d0/(2d0*ILC_Energy**2)
       PreFac = fbGeV2 * FluxFac * PSWgt
@@ -1189,6 +1209,9 @@ elseif( IsAWDecay(DecayMode1) ) then
       call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt)
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut)
       if( applyPSCut .or. PSWgt.eq.zero ) return
+      if(H_DK.eqv..false.) then
+        if(dabs(inv_mass(5)-M_Reso).gt.10d0*Ga_Reso) return
+      endif
 
       call setPDFs(eta1,eta2,Mu_Fact,pdf)
       FluxFac = 1d0/(2d0*EHat**2)
@@ -1270,7 +1293,7 @@ elseif( IsAPhoton(DecayMode1) ) then
   stop
 endif
 
-   
+
   CS_max = csmax(ifound,jfound)
   if( EvalUnWeighted_VHiggs.gt. CS_max) then
     write(io_stdout,"(2X,A,1PE13.6,1PE13.6)")  "CS_max is too small.",EvalUnWeighted_VHiggs, CS_max
@@ -2439,7 +2462,7 @@ real(8) :: MomExt(1:4,1:4),MomDK(1:4,1:4),MomExt_f(1:4,1:4),MomDK_f(1:4,1:4),Mom
 logical :: applyPSCut,genEvt
 real(8) :: CS_max,eta1,eta2
 real(8) :: oneovervolume, bound(1:11), sumtot,yz1,yz2,EZ_max,dr,MZ1,MZ2,ML1,ML2,ML3,ML4
-integer :: i1, i2, MY_IDUP(1:9), ICOLUP(1:2,1:9),OSSFPair,LeptInEvent_tmp(0:8),ordered_Lept(1:8)
+integer :: i1, i2, MY_IDUP(1:9), ICOLUP(1:2,1:9),OSPair,OSSFPair,LeptInEvent_tmp(0:8),ordered_Lept(1:8)
 real(8)::  ntRnd,ZMass(1:2),AcceptedEvent(1:4,1:4)
 real(8) :: offzchannel
 include 'vegas_common.f'
@@ -2687,24 +2710,48 @@ IF( GENEVT ) THEN
     !                 print *,"not enough leptons, reject!" !,LeptInEvent_tmp(1: LeptInEvent_tmp(0))
                     Res = -1d0
                     return
-                elseif( RequestOSSF ) then 
+                endif
+                if( RequestOS.gt.0 ) then
+                    OSPair = 0
                     OSSFPair = 0
 !                     do i1=1,LeptInEvent_tmp(0)-1
 !                         do i2=i1+1,LeptInEvent_tmp(0)
                     do i1=LeptInEvent_tmp(0),2,-1
                         do i2=i1-1,1,-1
                             if(      ( LeptInEvent_tmp(i1)+LeptInEvent_tmp(i2).eq.0                                                     )    &     ! found a l+ l- pair
-                                .OR. ( abs(LeptInEvent_tmp(i1)).eq.ConvertLHE(TaM_) .and. LeptInEvent_tmp(i1)*LeptInEvent_tmp(i2).lt.0  )    &     ! found l tau pair
-                                .OR. ( abs(LeptInEvent_tmp(i2)).eq.ConvertLHE(TaM_) .and. LeptInEvent_tmp(i1)*LeptInEvent_tmp(i2).lt.0  )    &     ! found l tau pair
+                                .OR. ( CountTauAsAny .AND. LeptInEvent_tmp(i1).ne.-999 .AND. LeptInEvent_tmp(i2).ne.-999 .AND. ( &
+                                            ( abs(LeptInEvent_tmp(i1)).eq.ConvertLHE(TaM_) .and. LeptInEvent_tmp(i1)*LeptInEvent_tmp(i2).lt.0  )    &     ! found l tau pair
+                                       .OR. ( abs(LeptInEvent_tmp(i2)).eq.ConvertLHE(TaM_) .and. LeptInEvent_tmp(i1)*LeptInEvent_tmp(i2).lt.0  )    &     ! found l tau pair
+                                     )                                                                                         ) &
                             ) then
+                              LeptInEvent_tmp(i1) = -999! remove from list
                               LeptInEvent_tmp(i2) = -999! remove from list
+                              OSPair = OSPair + 1
                               OSSFPair = OSSFPair + 1
+                              exit
+                            endif
+                        enddo
+                    enddo
+                    do i1=LeptInEvent_tmp(0),2,-1
+                        do i2=i1-1,1,-1
+                            if(      ( LeptInEvent_tmp(i1)*LeptInEvent_tmp(i2).lt.0 )    &     ! found a l+ l'- pair
+                               .and. ( (LeptInEvent_tmp(i1).ne.-999) .and. (LeptInEvent_tmp(i2).ne.-999) ) &
+                            ) then
+                              LeptInEvent_tmp(i1) = -999! remove from list
+                              LeptInEvent_tmp(i2) = -999! remove from list
+                              OSPair = OSPair + 1
                               exit
                             endif 
                         enddo
                     enddo
+!                     print *, "found ",OSPair," OS pairs"
 !                     print *, "found ",OSSFPair," OSSF pairs"
-                    if( OSSFPair.lt.2 ) then
+                    if( OSPair.lt.RequestOS ) then
+!                         print *,"no OS pair, reject!" !,LeptInEvent_tmp(1: LeptInEvent_tmp(0))
+                        Res = -1d0
+                        return
+                    endif
+                    if( OSSFPair.lt.RequestOSSF ) then
 !                         print *,"no OSSF pair, reject!" !,LeptInEvent_tmp(1: LeptInEvent_tmp(0))
                         Res = -1d0
                         return

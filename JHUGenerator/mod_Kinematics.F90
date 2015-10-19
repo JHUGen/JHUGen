@@ -4048,6 +4048,7 @@ implicit none
       real(8), parameter :: Pi = 3.14159265358979323846d0
       real(8), parameter :: Twopi = 2d0 * Pi
       real(8) :: MomExt(1:4,1:9)
+      real(8) :: MomDummy(1:4)
       !double precision four_momentum(7,4)
       real(8), intent(out) :: PSWgt,inv_mass(9)
 ! 1=E, 2,3,4=p_x,y,z
@@ -4100,9 +4101,10 @@ implicit none
 !z component
       beta = MomExt(4,3)/MomExt(1,3)
       gamma = 1d0/dsqrt((1d0+beta)*(1d0-beta))
-      MomExt(4,4)=(MomExt(4,4)+MomExt(1,4)*beta) *gamma
+      MomDummy(1:4)=MomExt(1:4,4)
+      MomExt(4,4)=(MomDummy(4)+MomDummy(1)*beta) *gamma
 !energy 
-      MomExt(1,4)=(MomExt(1,4)+MomExt(4,4)*beta) *gamma
+      MomExt(1,4)=(MomDummy(1)+MomDummy(4)*beta) *gamma
 !555555555555555555
       MomExt(1:4,5) = MomExt(1:4,3) - MomExt(1:4,4)
 
