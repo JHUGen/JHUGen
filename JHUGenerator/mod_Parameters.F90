@@ -3,7 +3,7 @@ implicit none
 save
 ! 
 ! 
-character(len=6),parameter :: JHUGen_Version="v6.3.0"
+character(len=6),parameter :: JHUGen_Version="v6.3.1"
 ! 
 ! 
 integer, public :: Collider, PDFSet,PChannel,Process,DecayMode1,DecayMode2,TopDecays
@@ -450,15 +450,15 @@ id2 = abs(id2in)
 if((id1.eq.convertLHE(Up_)  .and.  id2.eq.convertLHE(Dn_))  .or.  (id1.eq.convertLHE(Dn_)  .and.  id2.eq.convertLHE(Up_)))then
   CKM= VCKM_ud * dsqrt(scale_alpha_W_ud)
 elseif((id1.eq.convertLHE(Up_)  .and.  id2.eq.convertLHE(Str_))  .or.  (id1.eq.convertLHE(Str_)  .and.  id2.eq.convertLHE(Up_)))then
-  CKM= VCKM_us
+  CKM= VCKM_us * dsqrt(scale_alpha_W_ud)
 elseif((id1.eq.convertLHE(Up_)  .and.  id2.eq.convertLHE(Bot_))  .or.  (id1.eq.convertLHE(Bot_)  .and.  id2.eq.convertLHE(Up_)))then
-  CKM= VCKM_ub
+  CKM= VCKM_ub * dsqrt(scale_alpha_W_ud)
 elseif((id1.eq.convertLHE(Chm_)  .and.  id2.eq.convertLHE(Dn_))  .or.  (id1.eq.convertLHE(Dn_)  .and.  id2.eq.convertLHE(Chm_)))then
-  CKM= VCKM_cd
+  CKM= VCKM_cd * dsqrt(scale_alpha_W_cs)
 elseif((id1.eq.convertLHE(Chm_)  .and.  id2.eq.convertLHE(Str_))  .or.  (id1.eq.convertLHE(Str_)  .and.  id2.eq.convertLHE(Chm_)))then
   CKM= VCKM_cs * dsqrt(scale_alpha_W_cs)
 elseif((id1.eq.convertLHE(Chm_)  .and.  id2.eq.convertLHE(Bot_))  .or.  (id1.eq.convertLHE(Bot_)  .and.  id2.eq.convertLHE(Chm_)))then
-  CKM= VCKM_cb
+  CKM= VCKM_cb * dsqrt(scale_alpha_W_cs)
 elseif((id1.eq.convertLHE(Top_)  .and.  id2.eq.convertLHE(Dn_))  .or.  (id1.eq.convertLHE(Dn_)  .and.  id2.eq.convertLHE(Top_)))then
   CKM= VCKM_td
 elseif((id1.eq.convertLHE(Top_)  .and.  id2.eq.convertLHE(Str_))  .or.  (id1.eq.convertLHE(Str_)  .and.  id2.eq.convertLHE(Top_)))then
