@@ -3378,10 +3378,14 @@ real(8) :: FlavorRnd,sumCKM,Vsq(1:3)
     Vsq(1) = (CKM( convertLHEreverse(abs(Flavor)), convertLHEreverse(abs(Dn_)) ))**2
     Vsq(2) = (CKM( convertLHEreverse(abs(Flavor)), convertLHEreverse(abs(Str_)) ))**2
     Vsq(3) = (CKM( convertLHEreverse(abs(Flavor)), convertLHEreverse(abs(Bot_)) ))**2
-    sumCKM = Vsq(1)+Vsq(2)+Vsq(3)
-    FlavorRnd = FlavorRnd*sumCKM
     
-    if( abs(Flavor).eq.abs(Up_) ) then
+    if( abs(Flavor).eq.abs(Up_) ) then   
+
+        Vsq(:) = Vsq(:)/scale_alpha_W_ud
+        sumCKM = Vsq(1)+Vsq(2)+Vsq(3)
+        FlavorRnd = FlavorRnd*sumCKM
+        print *, "checker",sumCKM;pause
+
         if( FlavorRnd.le.Vsq(1) ) then!  u-->d
            GetCKMPartner = -sign(1,Flavor) * abs(Dn_)
         elseif( FlavorRnd.le.(Vsq(2)+Vsq(1)) ) then!  u-->s
@@ -3389,10 +3393,15 @@ real(8) :: FlavorRnd,sumCKM,Vsq(1:3)
         else!  u-->b
            GetCKMPartner = -sign(1,Flavor) * abs(Bot_)
         endif
-                
+                                
     elseif( abs(Flavor).eq.abs(Chm_) ) then
+    
+        Vsq(:) = Vsq(:)/scale_alpha_W_cs
+        sumCKM = Vsq(1)+Vsq(2)+Vsq(3)
+        FlavorRnd = FlavorRnd*sumCKM    
+    
         if( FlavorRnd.le.Vsq(2) ) then!  c-->s
-           GetCKMPartner = -sign(1,Flavor) * abs(Str_)
+           GetCKMPartner = -sign(1,Flavor) * abs(Str_)     
         elseif( FlavorRnd.le.(Vsq(1)+Vsq(2)) ) then!  c-->d
            GetCKMPartner = -sign(1,Flavor) * abs(Dn_)
         else!  c-->b
@@ -3400,6 +3409,10 @@ real(8) :: FlavorRnd,sumCKM,Vsq(1:3)
         endif
 
     elseif( abs(Flavor).eq.abs(Top_) ) then
+
+        sumCKM = Vsq(1)+Vsq(2)+Vsq(3)
+        FlavorRnd = FlavorRnd*sumCKM    
+        
         if( FlavorRnd.le.Vsq(3) ) then!  t-->b
            GetCKMPartner = -sign(1,Flavor) * abs(Bot_)
         elseif( FlavorRnd.le.(Vsq(2)+Vsq(3)) ) then!  t-->s
@@ -4542,8 +4555,12 @@ ELSE
 print *, xchannel , NumChannels
    call Error("PS channel not available in EvalPhasespace_VBF_NEW2",ichannel)
 ENDIF 
-   
-   
+      
+      
+      if( IsNaN(Jac) ) then! THIS SHOULD BE REMOVED AFTER DEBUGGING
+         Jac = 0d0
+         print *, "ERROR in EvalPhasespace_VBF_NEW2, NaN Jac",xchannel,xRnd
+      endif
    
 !    print *, "OS checker", dsqrt( dabs(Mom(1:4,3).dot.Mom(1:4,3) ))
 !    print *, "OS checker", dsqrt( dabs(Mom(1:4,4).dot.Mom(1:4,4) ))
