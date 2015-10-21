@@ -12,8 +12,12 @@ endargument;
 id SUND(Glu1,Glu2) = ICol(1);
 
 
-id IZ(3,+1) = IZ(3,0) - IZ(3,-1);
-id IZ(4,+1) = IZ(4,0) - IZ(4,-1);
+id IZ(3,+1) = IZ(3,9) - IZ(3,-1);
+id IZ(4,+1) = IZ(4,9) - IZ(4,-1);
+
+**id IZ(3,-1) = -IZ(3,8) + IZ(3,+1);
+**id IZ(4,-1) = -IZ(4,8) + IZ(4,+1);
+
 
 .sort
 
@@ -94,7 +98,7 @@ id LoopMom(0)=1;
 
 
 * insert tensor decomposition ( scalar integrals must be identified first )
-#include  /afs/cern.ch/user/m/maschulz/lib/FeynArtsToForm/LorDec.frm
+#include  /home/schulze/lib/FeynArtsToForm/LorDec.frm
 
 
 
@@ -160,14 +164,61 @@ id p1.cep3 = SME(4);
 id p2.cep3 = SME(5);
 id p3.ep1 = SME(6);
 id p3.ep2 = SME(7);
+id LeviCiv(p1,p2,ep1,ep2)   = SME(8);
+id LeviCiv(p2,ep1,ep2,cep3) = SME(9);
+id LeviCiv(p1,ep1,ep2,cep3) = SME(10);
+id LeviCiv(p1,p2,p3,cep3)   = SME(11);
+id LeviCiv(p1,p2,p3,ep1)    = SME(12);
+id LeviCiv(p1,p2,p3,ep2)    = SME(13);
+id LeviCiv(p2,p3,ep1,ep2)   = SME(14);
+id LeviCiv(p1,p3,ep1,ep2)   = SME(15);
+id LeviCiv(p1,p2,ep2,cep3)  = SME(16);
+id LeviCiv(p2,p3,ep2,cep3)  = SME(17);
+id LeviCiv(p1,p3,ep2,cep3)  = SME(18);
+id LeviCiv(p1,p2,ep1,cep3)  = SME(19);
+id LeviCiv(p2,p3,ep1,cep3)  = SME(20);
+id LeviCiv(p1,p3,ep1,cep3)  = SME(21);
+id LeviCiv(p3,ep1,ep2,cep3) = SME(22);
 
-id SME(1)*SME(4) = SME(10);
-id SME(1)*SME(5) = SME(11);
-id SME(2)*SME(7) = SME(12);
-id SME(3)*SME(6) = SME(13);
-id SME(4)*SME(6)*SME(7) = SME(14);
-id SME(5)*SME(6)*SME(7) = SME(15);
 
+* this does not involve LeviCiv's  (it seems that they are zero if added up in mama)
+id SME(1)*SME(4) = SME(40);
+id SME(1)*SME(5) = SME(41);
+id SME(2)*SME(7) = SME(42);
+id SME(3)*SME(6) = SME(43);
+id SME(4)*SME(6)*SME(7) = SME(44);
+id SME(5)*SME(6)*SME(7) = SME(45);
+
+
+* yes, this can be set to zero because the final result only depends on LeviCiv's
+**id SME(40)=0;
+**id SME(41)=0;
+**id SME(42)=0;
+**id SME(43)=0;
+**id SME(44)=0;
+**id SME(45)=0;
+
+
+
+* this involves LeviCiv's
+id SME(4)*SME(8) = SME(50);
+id SME(5)*SME(8) = SME(51);
+id SME(1)*SME(11) = SME(52);
+id SME(3)*SME(12) = SME(53);
+id SME(2)*SME(13) = SME(54);
+id SME(4)*SME(14) = SME(55);
+id SME(4)*SME(15) = SME(56);
+id SME(5)*SME(14) = SME(57);
+id SME(5)*SME(15) = SME(58);
+id SME(6)*SME(16) = SME(59);
+id SME(6)*SME(17) = SME(60);
+id SME(6)*SME(18) = SME(61);
+id SME(7)*SME(19) = SME(62);
+id SME(7)*SME(20) = SME(63);
+id SME(7)*SME(21) = SME(64);
+
+
+id ICol(1)*EL^2*GS^2*SW^(-1)*Pi^2 = PreFac;
 
 
 

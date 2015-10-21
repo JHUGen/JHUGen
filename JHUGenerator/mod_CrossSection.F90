@@ -2206,42 +2206,6 @@ IF( GENEVT ) THEN
                call intoHisto(NHisto,NBin(NHisto),1d0)  ! CS_Max is the integration volume
          enddo
 
-!       this is for z decays
-!        debugcounter(0)=debugcounter(0)+1
-!        if( abs(MY_IDUP(6)).eq.ElP_ .and. abs(MY_IDUP(7)).eq.ElP_  ) debugcounter(1)=debugcounter(1)+1
-!        if( abs(MY_IDUP(6)).eq.NuE_ .and. abs(MY_IDUP(7)).eq.ANuE_ ) debugcounter(2)=debugcounter(2)+1
-!        if( IsAQuark(MY_IDUP(6)) .and.  IsAQuark(MY_IDUP(6)) )       debugcounter(3)=debugcounter(3)+1
-
-!   if( abs(MY_IDUP(6)).eq.ElP_ .and. abs(MY_IDUP(7)).eq.ElP_ .and. abs(MY_IDUP(8)).eq.ElP_ .and. abs(MY_IDUP(9)).eq.ElP_ ) call intoHisto(12,1,1d0)
-!   if( abs(MY_IDUP(6)).eq.MuP_ .and. abs(MY_IDUP(7)).eq.MuP_ .and. abs(MY_IDUP(8)).eq.MuP_ .and. abs(MY_IDUP(9)).eq.MuP_ ) call intoHisto(13,1,1d0)
-!   if( abs(MY_IDUP(6)).eq.taP_ .and. abs(MY_IDUP(7)).eq.taP_ .and. abs(MY_IDUP(8)).eq.taP_ .and. abs(MY_IDUP(9)).eq.taP_ ) call intoHisto(14,1,1d0)
-! 
-!   if( abs(MY_IDUP(6)).eq.ElP_ .and. abs(MY_IDUP(7)).eq.ElP_ .and. abs(MY_IDUP(8)).eq.muP_ .and. abs(MY_IDUP(9)).eq.muP_ ) call intoHisto(15,1,1d0)
-!   if( abs(MY_IDUP(6)).eq.muP_ .and. abs(MY_IDUP(7)).eq.muP_ .and. abs(MY_IDUP(8)).eq.ElP_ .and. abs(MY_IDUP(9)).eq.ElP_ ) call intoHisto(15,1,1d0)
-! 
-!   if( abs(MY_IDUP(6)).eq.ElP_ .and. abs(MY_IDUP(7)).eq.ElP_ .and. abs(MY_IDUP(8)).eq.taP_ .and. abs(MY_IDUP(9)).eq.taP_ ) call intoHisto(16,1,1d0)
-!   if( abs(MY_IDUP(6)).eq.taP_ .and. abs(MY_IDUP(7)).eq.taP_ .and. abs(MY_IDUP(8)).eq.ElP_ .and. abs(MY_IDUP(9)).eq.ElP_ ) call intoHisto(16,1,1d0)
-! 
-!   if( abs(MY_IDUP(6)).eq.taP_ .and. abs(MY_IDUP(7)).eq.taP_ .and. abs(MY_IDUP(8)).eq.MuP_ .and. abs(MY_IDUP(9)).eq.MuP_ ) call intoHisto(17,1,1d0)
-!   if( abs(MY_IDUP(6)).eq.MuP_ .and. abs(MY_IDUP(7)).eq.MuP_ .and. abs(MY_IDUP(8)).eq.taP_ .and. abs(MY_IDUP(9)).eq.taP_ ) call intoHisto(17,1,1d0)
-!       this is for w decays
-!       if( abs(MY_IDUP(6)).eq.ElP_ .and. abs(MY_IDUP(9)).eq.ElP_ ) call intoHisto(12,1,1d0)
-!       if( abs(MY_IDUP(6)).eq.MuP_ .and. abs(MY_IDUP(9)).eq.MuP_ ) call intoHisto(13,1,1d0)
-!       if( abs(MY_IDUP(6)).eq.taP_ .and. abs(MY_IDUP(9)).eq.taP_ ) call intoHisto(14,1,1d0)
-! 
-!       if( abs(MY_IDUP(6)).eq.ElP_.and. abs(MY_IDUP(9)).eq.muP_) call intoHisto(15,1,1d0)
-!       if( abs(MY_IDUP(6)).eq.muP_.and. abs(MY_IDUP(9)).eq.ElP_) call intoHisto(15,1,1d0)
-
-!         call intoHisto(18,NBin(18),1d0)
-
-
-! debugcounter(0)=debugcounter(0)+1
-! if(  abs(MY_IDUP(6)).ge.7 .and.  abs(MY_IDUP(6)).le.16  ) debugcounter(1)=debugcounter(1)+1
-! if(  abs(MY_IDUP(8)).ge.7 .and.  abs(MY_IDUP(8)).le.16  ) debugcounter(2)=debugcounter(2)+1
-! if(  (abs(MY_IDUP(8)).ge.7 .and.  abs(MY_IDUP(8)).le.16) .and.  (abs(MY_IDUP(6)).ge.7 .and.  abs(MY_IDUP(6)).le.16)  ) debugcounter(3)=debugcounter(3)+1
-
-! if( (MY_IDUP(6)).eq.(MY_IDUP(8)) ) debugcounter(1)=debugcounter(1)+1
-
          AccepCounter = AccepCounter + 1
          AccepCounter_part(-5:+5,-5:5) = AccepCounter_part(-5:+5,-5:5)  + parton(-5:+5,-5:5)
          call BranchingCounter(MY_IDUP(6:9))
@@ -2418,7 +2382,7 @@ END FUNCTION
 
 
 
-FUNCTION EvalUnWeighted_DecayToVV(yRnd,genEvt,Ehat,Res,AcceptedEvent,MY_IDUP,ICOLUP)
+FUNCTION EvalUnWeighted_DecayToVV(yRnd,genEvt,EHat,Res,AcceptedEvent,MY_IDUP,ICOLUP)
 use ModKinematics
 use ModParameters
 use ModHiggs
