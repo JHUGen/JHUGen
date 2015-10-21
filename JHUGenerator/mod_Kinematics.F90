@@ -3792,9 +3792,11 @@ implicit none
 !        jacobian5 = jacobian5 * inv_mass(3)
 !      else
 !if using Breit-Wigner distribution
+!
         inv_mass(4) = dsqrt(bw_sq(yRnd(12),mass(4,1), mass(4,2), inv_mass(3)**2, jacobian4))
         inv_mass(5) = dsqrt(bw_sq(yRnd(13),mass(5,1), mass(5,2), (inv_mass(3)-inv_mass(4))**2, jacobian5))
 !      endif
+
 
 !444444444444
 !energy of 4 in the CM frame of 3
@@ -4144,15 +4146,15 @@ END SUBROUTINE
 function bw_sq(x, m, ga, smax, jacobian)
 implicit none
 real(8) :: bw_sq
-real(8), intent(in) :: m, ga, smax
-real(8) :: xmin, xmax, x
+real(8), intent(in) :: m, ga, smax,x
+real(8) :: xmin, xmax,xprime
 real(8), intent(out) :: jacobian
 
 xmin=-datan(m/ga)/m/ga
 xmax=-datan((-smax+m**2)/ga/m)/ga/m
-x=x*(xmax-xmin)+xmin
-bw_sq=m**2+dtan(x*ga*m)*ga*m
-jacobian=(ga*m)**2 * (1d0+dtan(ga*m*x)**2) * (xmax-xmin)
+xprime=x*(xmax-xmin)+xmin
+bw_sq=m**2+dtan(xprime*ga*m)*ga*m
+jacobian=(ga*m)**2 * (1d0+dtan(ga*m*xprime)**2) * (xmax-xmin)
 
 return
 end function bw_sq
