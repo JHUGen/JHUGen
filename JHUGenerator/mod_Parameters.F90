@@ -103,10 +103,10 @@ real(8), public, parameter :: VBF_4ml_minmax(1:2) = (/ -1d0,-1d0 /)*GeV  ! min a
 real(8), public, parameter :: VCKM_ud = 0.97425d0
 real(8), public, parameter :: VCKM_us = 0.2253d0
 real(8), public, parameter :: VCKM_cs = 0.986d0
-real(8), public, parameter :: VCKM_cd = 0.15d0
+real(8), public, parameter :: VCKM_cd = 0.225d0
 real(8), public, parameter :: VCKM_tb = 1.021d0
 real(8), public, parameter :: VCKM_ts = 0.0400d0
-real(8), public, parameter :: VCKM_cb = 0.07282d0
+real(8), public, parameter :: VCKM_cb = 0.0411d0
 real(8), public, parameter :: VCKM_ub = 0.00413d0
 real(8), public, parameter :: VCKM_td = 0.0084d0
 
