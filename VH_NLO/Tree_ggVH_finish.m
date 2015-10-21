@@ -1,7 +1,9 @@
-InitPath = "/afs/cern.ch/user/m/maschulz/lib/MathLib/";
-FeynArtsPath = "/afs/cern.ch/user/m/maschulz/lib/FeynArts-3.5/";
-FeynArtsToFormPath = "/afs/cern.ch/user/m/maschulz/lib/FeynArtsToForm/";
-ProjectPath = "/afs/cern.ch/user/m/maschulz/1git_JHUGen/VH_NLO/";
+(* ::Package:: *)
+
+InitPath = "/home/schulze/lib/MathLib/";
+FeynArtsPath = "/home/schulze/lib/FeynArts-3.5/";
+FeynArtsToFormPath = "/home/schulze/lib/FeynArtsToForm/";
+ProjectPath = "/home/schulze/projects/JHUGenerator/JHUGen-origin/VH_NLO/";
 
 Get[ InitPath<>"StandardInit.m" ];
 Get[ InitPath<>"SIOrder.m" ];

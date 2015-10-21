@@ -3384,7 +3384,6 @@ real(8) :: FlavorRnd,sumCKM,Vsq(1:3)
         Vsq(:) = Vsq(:)/scale_alpha_W_ud
         sumCKM = Vsq(1)+Vsq(2)+Vsq(3)
         FlavorRnd = FlavorRnd*sumCKM
-        print *, "checker",sumCKM;pause
 
         if( FlavorRnd.le.Vsq(1) ) then!  u-->d
            GetCKMPartner = -sign(1,Flavor) * abs(Dn_)
@@ -3393,13 +3392,13 @@ real(8) :: FlavorRnd,sumCKM,Vsq(1:3)
         else!  u-->b
            GetCKMPartner = -sign(1,Flavor) * abs(Bot_)
         endif
-                                
+        
     elseif( abs(Flavor).eq.abs(Chm_) ) then
     
         Vsq(:) = Vsq(:)/scale_alpha_W_cs
         sumCKM = Vsq(1)+Vsq(2)+Vsq(3)
         FlavorRnd = FlavorRnd*sumCKM    
-    
+
         if( FlavorRnd.le.Vsq(2) ) then!  c-->s
            GetCKMPartner = -sign(1,Flavor) * abs(Str_)     
         elseif( FlavorRnd.le.(Vsq(1)+Vsq(2)) ) then!  c-->d

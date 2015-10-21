@@ -943,13 +943,11 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
               endif
         enddo
 
-
-
-
     else
         print *, "ERROR: VegasNc1 and VegasNc2 must not be set at the same time"
         stop
     endif
+    call cpu_time(time_end)
     print *, ""
 
 
@@ -982,13 +980,14 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
                                           dble(Br_counter(3,1))+dble(Br_counter(3,2)))/dble(AccepCounter)
           write(*,"(A,5F16.3)") "2l2q: ",(dble(Br_counter(1,5))+dble(Br_counter(2,5))+dble(Br_counter(3,5))+  &
                                           dble(Br_counter(5,1))+dble(Br_counter(5,2))+dble(Br_counter(5,3)) )/dble(AccepCounter)
-            
+          
           write(*,"(A,5F16.3)") "4l/2q2l: ",(dble(Br_counter(1,2))+dble(Br_counter(1,3))+ dble(Br_counter(1,1))+dble(Br_counter(2,2))+dble(Br_counter(3,3)) &
                                         + dble(Br_counter(2,1))+dble(Br_counter(2,3))+   &
                                           dble(Br_counter(3,1))+dble(Br_counter(3,2)))/  &
                                           (dble(Br_counter(1,5))+dble(Br_counter(2,5))+dble(Br_counter(3,5))+  &
                                           dble(Br_counter(5,1))+dble(Br_counter(5,2))+dble(Br_counter(5,3)) )
-                                          
+                                                           
+                                                           
       !     print *, alpha_QED/12d0*M_Z * (   (aR_lep+aL_lep)**2 + (aR_lep-aL_lep)**2        &
       !                                      +(aR_lep+aL_lep)**2 + (aR_lep-aL_lep)**2        &
       !                                      +(aR_lep+aL_lep)**2 + (aR_lep-aL_lep)**2        &
@@ -1006,11 +1005,7 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
                
    
   endif! unweighted
-
-  call cpu_time(time_end)
-  
-  
-
+ 
 
 return
 END SUBROUTINE
@@ -1033,7 +1028,7 @@ use ModParameters
 implicit none
 include "vegas_common.f"
 real(8) :: VG_Result,VG_Error,VG_Chi2
-real(8) :: yRnd(1:22)
+real(8) :: yRnd(1:22),calls1,calls2,calls_rescale
 real(8) :: dum, RES(-5:5,-5:5),ResFrac(-5:5,-5:5),TotalXSec
 integer :: i, i1, j1,PChannel_aux, PChannel_aux1,NHisto
 include 'csmaxvalue.f'
@@ -1126,12 +1121,11 @@ if( UseBetaVersion ) then
     ncall= VegasNc0
     outgridfile="vegas.grid"  
     ingridfile=trim(outgridfile)
-    
         
     if( ReadCSmax ) then
         readin=.true.
         writeout=.false.
-        itmx = 3
+        itmx = 3 
     else
         readin=.false.
         writeout=.true.
@@ -1139,12 +1133,11 @@ if( UseBetaVersion ) then
         if( Process.eq.61 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
         itmx = 3
     endif
-    
-    
+      
     
     CrossSecMax(:,:) = 0d0
     CrossSec(:,:) = 0d0
-    
+        
 !     if( Process.eq.80 ) call vegas(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2) ! adjust to LHE format
 !     if( Process.eq.90 ) call vegas(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.60 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
@@ -1156,12 +1149,7 @@ if( UseBetaVersion ) then
 !     if( Process.eq.113) call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)    
 
 
-
-
-
-
-
-
+    call vegas_get_calls(calls1)
     CrossSec(:,:) = CrossSec(:,:)/dble(itmx)    
     write(io_stdout,"(A)")  ""
     write(io_stdout,"(1X,A,F10.3,A,F10.3,A,F10.3)") "Total xsec: ",VG_Result, " +/-",VG_Error, " fb    vs.",sum(CrossSec(:,:))
@@ -1193,11 +1181,17 @@ if( UseBetaVersion ) then
     StatusPercent = 0d0
     
     CrossSecMax(:,:) = 1.0d0 * CrossSecMax(:,:)    !  adjustment factor
-
+    call cpu_time(time_start)    
+    
 ! try running with itmx=5,
 ! try with adating grid instead of while loop   -> is the grid changing with each while-loop???
-!     ncall=1000000  this cannot be different from Ncall from csmax scan because then the VgsWgt is different !!!
     itmx=200000
+    ncall= 1000000       !1000000  this cannot be different from Ncall from csmax scan because then the VgsWgt is different !!!
+    call vegas_get_calls(calls2)
+    calls_rescale = calls1/calls2
+    CrossSecMax(:,:) = CrossSecMax(:,:) * calls_rescale    
+
+    
 !     do while( StatusPercent.lt.100d0  )
 !         if( Process.eq.80 ) call vegas1(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)! adjust to LHE format
     !     if( Process.eq.90 ) call vegas1(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
@@ -1209,7 +1203,7 @@ if( UseBetaVersion ) then
 !         if( Process.eq.112) call vegas1(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)      
 !         if( Process.eq.113) call vegas1(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)      
         call system('clear')
-        write(io_stdout,' ')
+        write(io_stdout,*) ""
         do i1=-5,5
         do j1=-5,5
             if( RequEvents(i1,j1).gt.0 ) then 
@@ -1576,7 +1570,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
      print *, " finding maximal weight with ",VegasNc0," points"
      VG = zero
      CSmax = zero
-     Ehat = M_Reso! fixing Ehat to M_Reso which should determine the max. of the integrand
+     EHat = M_Reso! fixing Ehat to M_Reso which should determine the max. of the integrand
      if( TauDecays.lt.0 ) then
          do tries=1,VegasNc0
              call random_number(yRnd)
