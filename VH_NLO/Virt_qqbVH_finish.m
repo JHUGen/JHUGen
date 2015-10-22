@@ -1,7 +1,7 @@
-InitPath = "/afs/cern.ch/user/m/maschulz/lib/MathLib/";
-FeynArtsPath = "/afs/cern.ch/user/m/maschulz/lib/FeynArts-3.5/";
-FeynArtsToFormPath = "/afs/cern.ch/user/m/maschulz/lib/FeynArtsToForm/";
-ProjectPath = "/afs/cern.ch/user/m/maschulz/1git_JHUGen/VH_NLO/";
+InitPath = $HomeDirectory<>"/lib/MathLib/";
+FeynArtsPath = $HomeDirectory<>"/lib/FeynArts-3.5/";
+FeynArtsToFormPath = $HomeDirectory<>"/lib/FeynArtsToForm/";
+ProjectPath = $HomeDirectory<>"/1git_JHUGen/VH_NLO/";
 
 Get[ InitPath<>"StandardInit.m" ];
 Get[ InitPath<>"SIOrder.m" ];
