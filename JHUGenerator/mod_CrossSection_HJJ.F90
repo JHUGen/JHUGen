@@ -298,8 +298,8 @@ END FUNCTION
    integer, parameter :: ij_num=ij_max+ij_neg_offset
    include 'vegas_common.f'   
    EvalWeighted_HJJ = 0d0
-   
 
+   
    if( Process.eq.60 ) NumPartonicChannels = 121 !=ij_num**2=121 for WBF   (-5,..,-1,0,+1,..,+5)^2
    if( Process.eq.61 ) NumPartonicChannels = 121 !=ij_num**2=121 for HJJ   (-5,..,-1,0,+1,..,+5)^2
    iPartChannel = int(yRnd(8) * (NumPartonicChannels))! this runs from 0..120
@@ -367,9 +367,7 @@ endif
    if( iPart_sel.ne.jPart_sel ) LO_Res_Unpol = LO_Res_Unpol + me2(jPart_sel,iPart_sel) * pdf(LHA2M_pdf(jPart_sel),1)*pdf(LHA2M_pdf(iPart_sel),2)
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt  * PartChannelAvg
    EvalWeighted_HJJ = LO_Res_Unpol * PreFac
-   
-  
-   
+      
 if( unweighted ) then 
 
   if( warmup ) then
@@ -516,6 +514,7 @@ else! weighted
    enddo
 
 endif
+
 
 
  RETURN
