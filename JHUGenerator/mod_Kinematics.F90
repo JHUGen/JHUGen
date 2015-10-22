@@ -3392,7 +3392,7 @@ real(8) :: FlavorRnd,sumCKM,Vsq(1:3)
         else!  u-->b
            GetCKMPartner = -sign(1,Flavor) * abs(Bot_)
         endif
-                                
+
     elseif( abs(Flavor).eq.abs(Chm_) ) then
     
         Vsq(:) = Vsq(:)/scale_alpha_W_cs
@@ -4558,8 +4558,12 @@ ELSE
 print *, xchannel , NumChannels
    call Error("PS channel not available in EvalPhasespace_VBF_NEW2",ichannel)
 ENDIF 
-   
-   
+      
+      
+      if( IsNaN(Jac) ) then! THIS SHOULD BE REMOVED AFTER DEBUGGING
+         Jac = 0d0
+         print *, "ERROR in EvalPhasespace_VBF_NEW2, NaN Jac",xchannel,xRnd
+      endif
    
 !    print *, "OS checker", dsqrt( dabs(Mom(1:4,3).dot.Mom(1:4,3) ))
 !    print *, "OS checker", dsqrt( dabs(Mom(1:4,4).dot.Mom(1:4,4) ))

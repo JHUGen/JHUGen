@@ -1,4 +1,4 @@
-#define WorkPath "/afs/cern.ch/user/m/maschulz/1git_JHUGen/VH_NLO/"
+#define WorkPath "/home/schulze/projects/JHUGenerator/JHUGen-origin/VH_NLO/"
 #define setP1P1 "0"
 #define setP2P2 "0"
 #define setP3P3 "MZ^2"
@@ -10,7 +10,7 @@
 
 
 
-#include /afs/cern.ch/user/m/maschulz/lib/FeynArtsToForm/header2.frm
+#include /home/schulze/lib/FeynArtsToForm/header2.frm
 
 
 #include `WorkPath'Tree_ggVH_input.frm
@@ -42,7 +42,7 @@ id SumOver(?args) = 1;
 
 Format Mathematica;
 Print;
-Bracket SME,IZ,ICol,EL,GS,SW,MW,Pi;
+Bracket PreFac,SME,IZ,ICol,EL,GS,SW,MW,Pi;
 .sort;
 
 
