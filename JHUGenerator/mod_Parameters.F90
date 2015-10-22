@@ -39,7 +39,7 @@ real(8),public :: minCS=1d10,maxCS=0d0,avgCS=0d0
 
 
 logical, public, parameter :: seed_random = .true.
-integer, public :: TheSeeds(0:20) = (/12,53253,223,3,4,5,6,7,8,9,10,11,12,0,0,0,0,0,0,0,0/)! only used if seed_random=.false., the first entry is the total number of seeds
+integer, public :: TheSeeds(0:20) = (/2,700470849,470115596,3,4,5,6,7,8,9,10,11,12,0,0,0,0,0,0,0,0/)! only used if seed_random=.false., the first entry is the total number of seeds
 
 logical, public, parameter :: fix_channels_ratio = .false.
 
@@ -100,15 +100,15 @@ real(8), public, parameter :: VBF_4ml_minmax(1:2) = (/ -1d0,-1d0 /)*GeV  ! min a
 
 
 ! CKM squared matrix entries 
-real(8), public, parameter :: VCKM_ud = 0.97425d0
-real(8), public, parameter :: VCKM_us = 0.2253d0
-real(8), public, parameter :: VCKM_cs = 0.986d0
-real(8), public, parameter :: VCKM_cd = 0.225d0
-real(8), public, parameter :: VCKM_tb = 1.021d0
-real(8), public, parameter :: VCKM_ts = 0.0400d0
-real(8), public, parameter :: VCKM_cb = 0.0411d0
-real(8), public, parameter :: VCKM_ub = 0.00413d0
-real(8), public, parameter :: VCKM_td = 0.0084d0
+real(8), public, parameter :: VCKM_ud = 0.97426d0
+real(8), public, parameter :: VCKM_us = 0.22529d0
+real(8), public, parameter :: VCKM_cs = 0.97341d0
+real(8), public, parameter :: VCKM_cd =-0.22518d0
+real(8), public, parameter :: VCKM_tb = 0.999119d0
+real(8), public, parameter :: VCKM_ts =-0.04092d0
+real(8), public, parameter :: VCKM_cb = dsqrt(1d0-VCKM_cd**2-VCKM_cs**2)
+real(8), public, parameter :: VCKM_ub = dsqrt(1d0-VCKM_ud**2-VCKM_us**2)
+real(8), public, parameter :: VCKM_td = dsqrt(1d0-VCKM_tb**2-VCKM_ts**2)
 
 
 
@@ -189,7 +189,7 @@ integer, public :: LeptInEvent(0:8) = 0
    complex(8), public, parameter :: ahz3 = (0.0d0,0d0)  ! pseudoscalar
 
 !-- parameters that define off-shell spin 0 coupling to SM fields, see note
-   complex(8), public, parameter :: ghg2 = (1.0d0,0d0)
+   complex(8), public, parameter :: ghg2 = (0.99906100d-01,0d0)
    complex(8), public, parameter :: ghg3 = (0.0d0,0d0)
    complex(8), public, parameter :: ghg4 = (0.0d0,0d0)   ! pseudoscalar
    
