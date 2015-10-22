@@ -1549,8 +1549,8 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                 write(io_LHEOutFile, "(A)") "<!--"
             endif
             write(io_LHEOutFile ,"(A)") "JHUGen Resonance parameters used for event generation:"
-            write(io_LHEOutFile ,"(A,F6.1,A)") "hmass  ",M_Reso*100d0,"         ! Higgs boson mass"
-            write(io_LHEOutFile ,"(A,F10.5,A)") "hwidth",Ga_Reso*100d0,"      ! Higgs boson width"
+            write(io_LHEOutFile ,"(A,F8.1,A)") "hmass  ",M_Reso*100d0,"       ! Higgs boson mass"
+            write(io_LHEOutFile ,"(A,F10.5,A)") "hwidth   ",Ga_Reso*100d0,"   ! Higgs boson width"
             if (Index(FirstLines,"-->").eq.0) then
                 write(io_LHEOutFile, "(A)") "-->"
             endif
@@ -1938,8 +1938,8 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                 write(io_LHEOutFile, "(A)") "<!--"
             endif
             write(io_LHEOutFile ,"(A)") "JHUGen Resonance parameters used for event generation:"
-            write(io_LHEOutFile ,"(A,F6.1,A)") "hmass  ",M_Reso*100d0,"         ! Higgs boson mass"
-            write(io_LHEOutFile ,"(A,F10.5,A)") "hwidth",Ga_Reso*100d0,"      ! Higgs boson width"
+            write(io_LHEOutFile ,"(A,F8.1,A)") "hmass  ",M_Reso*100d0,"       ! Higgs boson mass"
+            write(io_LHEOutFile ,"(A,F10.5,A)") "hwidth   ",Ga_Reso*100d0,"   ! Higgs boson width"
             if (Index(FirstLines,"-->").eq.0) then
                 write(io_LHEOutFile, "(A)") "-->"
             endif
@@ -3213,8 +3213,8 @@ implicit none
 
         if( .not. ReadLHEFile .and. .not. ConvertLHEFile ) then
             write(io_LHEOutFile ,'(A)') ''
-            write(io_LHEOutFile ,'(A,F5.1,A)') 'hmass   ',M_Reso*100d0,'       ! Higgs boson mass'
-            write(io_LHEOutFile ,'(A,F10.5,A)') 'hwidth ',Ga_Reso*100d0,'   ! Higgs boson width'
+            write(io_LHEOutFile ,'(A,F8.1,A)') 'hmass   ',M_Reso*100d0,'       ! Higgs boson mass'
+            write(io_LHEOutFile ,'(A,F10.5,A)') 'hwidth    ',Ga_Reso*100d0,'   ! Higgs boson width'
             write(io_LHEOutFile ,'(A)') ''
         endif
 
