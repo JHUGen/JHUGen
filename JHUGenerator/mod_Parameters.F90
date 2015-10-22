@@ -99,9 +99,9 @@ real(8), public, parameter :: VCKM_cs = 0.97341d0
 real(8), public, parameter :: VCKM_cd =-0.22518d0
 real(8), public, parameter :: VCKM_tb = 0.999119d0
 real(8), public, parameter :: VCKM_ts =-0.04092d0
-real(8), public, parameter :: VCKM_cb = 0.0417d0
-real(8), public, parameter :: VCKM_ub = 0.00363d0
-real(8), public, parameter :: VCKM_td = 0.0088d0
+real(8), public, parameter :: VCKM_cb = dsqrt(1d0-VCKM_cd**2-VCKM_cs**2)
+real(8), public, parameter :: VCKM_ub = dsqrt(1d0-VCKM_ud**2-VCKM_us**2)
+real(8), public, parameter :: VCKM_td = dsqrt(1d0-VCKM_tb**2-VCKM_ts**2)
 
 
 ! absolute branching fraction (taken from PDG-2014)
