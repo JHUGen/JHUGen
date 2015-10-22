@@ -86,7 +86,7 @@ id LoopMom(0)=1;
 
 
 * insert tensor decomposition ( scalar integrals must be identified first )
-#include  /afs/cern.ch/user/m/maschulz/lib/FeynArtsToForm/LorDec.frm
+#include  /home/schulze/lib/FeynArtsToForm/LorDec.frm
 
 
 
