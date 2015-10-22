@@ -3,7 +3,7 @@ implicit none
 save
 ! 
 ! 
-character(len=6),parameter :: JHUGen_Version="v6.6.4"
+character(len=6),parameter :: JHUGen_Version="v6.6.5"
 ! 
 ! 
 integer, public :: Collider, PDFSet,PChannel,Process,DecayMode1,DecayMode2,TopDecays,TauDecays
@@ -53,7 +53,7 @@ logical, public, parameter :: includeGammaStar = .false.
 
 real(8),parameter :: MPhotonCutoff = 4d0*GeV
 
-logical, public, parameter :: RandomizeVVdecays = .true. ! randomize DecayMode1 and DecayMode2 in H-->VV and TTBAR decays
+logical, public, parameter :: RandomizeVVdecays = .false. ! randomize DecayMode1 and DecayMode2 in H-->VV and TTBAR decays
 
 logical, public, parameter :: UseUnformattedRead = .false.  !Set this to true if the regular reading fails for whatever reason
 
@@ -98,6 +98,7 @@ real(8), public, parameter :: VBF_4ml_minmax(1:2) = (/ -1d0,-1d0 /)*GeV  ! min a
 
 !----------------------------------------------------------------------------------------------------
 
+
 ! CKM squared matrix entries 
 real(8), public, parameter :: VCKM_ud = 0.97425d0
 real(8), public, parameter :: VCKM_us = 0.2253d0
@@ -108,6 +109,7 @@ real(8), public, parameter :: VCKM_ts = 0.0400d0
 real(8), public, parameter :: VCKM_cb = 0.0411d0
 real(8), public, parameter :: VCKM_ub = 0.00413d0
 real(8), public, parameter :: VCKM_td = 0.0084d0
+
 
 
 ! absolute branching fraction (taken from PDG-2014)

@@ -181,7 +181,7 @@ MODULE ModPhasespace
        Mom1(1:4) = (/ E1,0d0,0d0,p1z /)
 
        phi   = 2d0*pi * xRnd(1)
-       CosTheta = 1d0/sqrt_lambda(Mandelstam_S,Mass1_sq,Mass2_sq)/sqrt_lambda(Mandelstam_S,pa_sq,pb_sq)    &
+       CosTheta = 1d0/(sqrt_lambda(Mandelstam_S,Mass1_sq,Mass2_sq)+1d-15)/(sqrt_lambda(Mandelstam_S,pa_sq,pb_sq)+1d-15)    &
                 * ( (Mandelstam_S+Mass1_sq-Mass2_sq)*(Mandelstam_S+pa_sq-pb_sq) + 2d0*Mandelstam_S*(Mandelstam_T-Mass1_sq-pa_sq) )       
        call rotate3D_phi_theta(phi,dacos(CosTheta),Mom1(:))
        
@@ -388,9 +388,9 @@ pause
   real(8) :: g_s,s,m_sq,nu,smin,smax
   
         if( nu.ne.1d0 ) then
-          g_s =  (1d0-nu)/( (smax-m_sq)**(1d0-nu) - (smin-m_sq)**(1d0-nu) )/( s - m_sq )**nu
+          g_s =  (1d0-nu)/( (smax-m_sq)**(1d0-nu) - (smin-m_sq)**(1d0-nu) +1d-15)/( s - m_sq )**nu
         else
-          g_s = 1d0/( dlog(smax-m_sq) - dlog(smin-m_sq) )/( s - m_sq )
+          g_s = 1d0/( dlog(smax-m_sq) - dlog(smin-m_sq) + 1d-15)/( s - m_sq )
         endif
     
   RETURN
@@ -524,8 +524,9 @@ pause
            InvMass_sq = - ( dexp( RandomVar*dlog(-smax+m_sq) - (1d0-RandomVar)*dlog(-smin+m_sq)  )  -  m_sq )
         endif
 
-        k_t =  -pi/2d0/sqrt_lambda(sab,pa_sq,pb_sq)/g_s(-InvMass_sq,-m_sq,nu,-smin,-smax)
         
+        k_t =  -pi/2d0/sqrt_lambda(sab,pa_sq,pb_sq)/g_s(-InvMass_sq,-m_sq,nu,-smin,-smax)
+                
   RETURN
   END FUNCTION
 
