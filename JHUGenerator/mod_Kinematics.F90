@@ -3378,10 +3378,13 @@ real(8) :: FlavorRnd,sumCKM,Vsq(1:3)
     Vsq(1) = (CKM( convertLHEreverse(abs(Flavor)), convertLHEreverse(abs(Dn_)) ))**2
     Vsq(2) = (CKM( convertLHEreverse(abs(Flavor)), convertLHEreverse(abs(Str_)) ))**2
     Vsq(3) = (CKM( convertLHEreverse(abs(Flavor)), convertLHEreverse(abs(Bot_)) ))**2
-    sumCKM = Vsq(1)+Vsq(2)+Vsq(3)
-    FlavorRnd = FlavorRnd*sumCKM
     
-    if( abs(Flavor).eq.abs(Up_) ) then
+    if( abs(Flavor).eq.abs(Up_) ) then   
+
+        Vsq(:) = Vsq(:)/scale_alpha_W_ud
+        sumCKM = Vsq(1)+Vsq(2)+Vsq(3)
+        FlavorRnd = FlavorRnd*sumCKM
+
         if( FlavorRnd.le.Vsq(1) ) then!  u-->d
            GetCKMPartner = -sign(1,Flavor) * abs(Dn_)
         elseif( FlavorRnd.le.(Vsq(2)+Vsq(1)) ) then!  u-->s
@@ -3389,10 +3392,15 @@ real(8) :: FlavorRnd,sumCKM,Vsq(1:3)
         else!  u-->b
            GetCKMPartner = -sign(1,Flavor) * abs(Bot_)
         endif
-                
+                                
     elseif( abs(Flavor).eq.abs(Chm_) ) then
+    
+        Vsq(:) = Vsq(:)/scale_alpha_W_cs
+        sumCKM = Vsq(1)+Vsq(2)+Vsq(3)
+        FlavorRnd = FlavorRnd*sumCKM    
+
         if( FlavorRnd.le.Vsq(2) ) then!  c-->s
-           GetCKMPartner = -sign(1,Flavor) * abs(Str_)
+           GetCKMPartner = -sign(1,Flavor) * abs(Str_)     
         elseif( FlavorRnd.le.(Vsq(1)+Vsq(2)) ) then!  c-->d
            GetCKMPartner = -sign(1,Flavor) * abs(Dn_)
         else!  c-->b
@@ -3400,6 +3408,10 @@ real(8) :: FlavorRnd,sumCKM,Vsq(1:3)
         endif
 
     elseif( abs(Flavor).eq.abs(Top_) ) then
+
+        sumCKM = Vsq(1)+Vsq(2)+Vsq(3)
+        FlavorRnd = FlavorRnd*sumCKM    
+        
         if( FlavorRnd.le.Vsq(3) ) then!  t-->b
            GetCKMPartner = -sign(1,Flavor) * abs(Bot_)
         elseif( FlavorRnd.le.(Vsq(2)+Vsq(3)) ) then!  t-->s
@@ -3423,7 +3435,6 @@ real(8) :: FlavorRnd,sumCKM,Vsq(1:3)
 
 RETURN
 END FUNCTION
-
 
 
 
@@ -3740,6 +3751,7 @@ integer,parameter :: swPDF_u=1, swPDF_d=1, swPDF_c=1, swPDF_s=1, swPDF_b=1, swPD
 real(8) :: pdf(-6:6,1:2),NNpdf(1:2,-6:7)
 
         PDFScale=MuFac*100d0
+        pdf(:,:) = 0d0
         
 #if useLHAPDF==1
         call evolvePDF(x1,PDFScale,NNpdf(1,-6:7))
@@ -4094,9 +4106,11 @@ implicit none
 !        jacobian5 = jacobian5 * inv_mass(3)
 !      else
 !if using Breit-Wigner distribution
+!
         inv_mass(4) = dsqrt(bw_sq(yRnd(12),mass(4,1), mass(4,2), inv_mass(3)**2, jacobian4))
         inv_mass(5) = dsqrt(bw_sq(yRnd(13),mass(5,1), mass(5,2), (inv_mass(3)-inv_mass(4))**2, jacobian5))
 !      endif
+
 
 !444444444444
 !energy of 4 in the CM frame of 3
@@ -4716,15 +4730,15 @@ END SUBROUTINE
 function bw_sq(x, m, ga, smax, jacobian)
 implicit none
 real(8) :: bw_sq
-real(8), intent(in) :: m, ga, smax
-real(8) :: xmin, xmax, x
+real(8), intent(in) :: m, ga, smax,x
+real(8) :: xmin, xmax,xprime
 real(8), intent(out) :: jacobian
 
 xmin=-datan(m/ga)/m/ga
 xmax=-datan((-smax+m**2)/ga/m)/ga/m
-x=x*(xmax-xmin)+xmin
-bw_sq=m**2+dtan(x*ga*m)*ga*m
-jacobian=(ga*m)**2 * (1d0+dtan(ga*m*x)**2) * (xmax-xmin)
+xprime=x*(xmax-xmin)+xmin
+bw_sq=m**2+dtan(xprime*ga*m)*ga*m
+jacobian=(ga*m)**2 * (1d0+dtan(ga*m*xprime)**2) * (xmax-xmin)
 
 return
 end function bw_sq
