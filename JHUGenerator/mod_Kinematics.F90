@@ -3437,6 +3437,7 @@ integer,parameter :: swPDF_u=1, swPDF_d=1, swPDF_c=1, swPDF_s=1, swPDF_b=1, swPD
 real(8) :: pdf(-6:6,1:2),NNpdf(1:2,-6:7)
 
         PDFScale=MuFac*100d0
+        pdf(:,:) = 0d0
         
 #if useLHAPDF==1
         call evolvePDF(x1,PDFScale,NNpdf(1,-6:7))
