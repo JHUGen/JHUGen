@@ -537,7 +537,6 @@ contains
     call spinoru(4,(/-p(:,1),-p(:,2),p(:,3),p(:,4)/),za,zb,sprod)
 
 
-
     !-- qq->qq, up
 if( (iSel.eq.pdfUp_ .and. jSel.eq.pdfUp_) .or. (iSel.eq.pdfChm_ .and. jSel.eq.pdfChm_) ) then
     amp_z = A0_VV_4f(4,1,3,2,vvcoupl,za,zb,sprod,m_z,ga_z)
@@ -570,6 +569,7 @@ endif
 if( (iSel.eq.pdfDn_ .and. jSel.eq.pdfDn_) .or. (iSel.eq.pdfStr_ .and. jSel.eq.pdfStr_) .or. (iSel.eq.pdfBot_ .and. jSel.eq.pdfBot_) ) then
     amp_z = A0_VV_4f(4,1,3,2,vvcoupl,za,zb,sprod,m_z,ga_z)
     amp_z_b = -A0_VV_4f(3,1,4,2,vvcoupl,za,zb,sprod,m_z,ga_z)
+        
     restmp = ((abs(amp_z(-1,-1))**2+abs(amp_z_b(-1,-1))**2) * Ld**2 + &
          (abs(amp_z(-1,+1))**2+abs(amp_z_b(-1,+1))**2) * Ld * Rd + &
          (abs(amp_z(+1,-1))**2+abs(amp_z_b(+1,-1))**2) * Ld * Rd + &
@@ -956,7 +956,7 @@ if( (iSel.eq.pdfDn_ .and. jSel.eq.pdfADn_) .or. (iSel.eq.pdfStr_ .and. jSel.eq.p
        else
           amp_w = A0_VV_4f(3,j1,j2,4,wwcoupl,za,zb,sprod,m_w,ga_w,useWWcoupl=.true.)
        endif
-
+       
        restmp = ((abs(amp_z(-1,-1))**2) * Ld * Ld + &
             (abs(amp_z(-1,+1))**2) * Ld * Rd + &
             (abs(amp_z(+1,-1))**2) * Rd * Ld + &
@@ -1672,7 +1672,7 @@ endif
     struc1 = two * (a1 * mhsq - ci * a3 * q1q2)
     struc2 = a2 + ci * a3
     struc3 = two * ci * a3
-
+    
     A0_VV_4f(-1,-1) = za(j1,j3)*zb(j4,j2) * struc1 + &
          zab2(j1,j3,j4,j2)*zab2(j3,j1,j2,j4) * struc2 + &
          za(j1,j2)*za(j3,j4)*zb(j4,j2)**2 * struc3
@@ -2030,12 +2030,12 @@ endif
 
        !-----positive energy case
        if (p(1,j) .gt. zero) then
-          rt(j)=sqrt(p(2,j)+p(1,j))
+          rt(j)=sqrt(abs(p(2,j)+p(1,j)))
           c23(j)=cmplx(p(4,j),-p(3,j),kind=dp)
           f(j)=(one,zero)
        else
        !-----negative energy case
-          rt(j)=sqrt(-p(1,j)-p(2,j))
+          rt(j)=sqrt(abs(-p(1,j)-p(2,j)))
           c23(j)=cmplx(-p(4,j),p(3,j),kind=dp)
           f(j)=ci
        endif
@@ -2045,13 +2045,12 @@ endif
   
      do j=1,i-1
           s(i,j)=two*scr(p(:,i),p(:,j))
-          za(i,j)=f(i)*f(j) &
-               *(c23(i)*cmplx(rt(j)/rt(i),kind=dp)-c23(j)*cmplx(rt(i)/rt(j),kind=dp))
+          za(i,j)=f(i)*f(j)  * ( c23(i)*cmplx(rt(j)/(rt(i)+1d-16),kind=dp)-c23(j)*cmplx(rt(i)/(rt(j)+1d-16),kind=dp) )
           
           if (abs(s(i,j)).lt.1d-5) then
              zb(i,j)=-(f(i)*f(j))**2*conjg(za(i,j))
           else
-             zb(i,j)=-cmplx(s(i,j),kind=dp)/za(i,j)
+             zb(i,j)=-cmplx(s(i,j),kind=dp)/(za(i,j)+1d-16)
           endif
           
           za(j,i)=-za(i,j)
