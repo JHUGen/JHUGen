@@ -2084,10 +2084,10 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, Higgs=5
        pT_jl = max(pT_j1,pT_j2)
        dy_j1j2 = y_j1 - y_j2
 
-       if( abs(y_j1).lt.1d0 .or. abs(y_j2).lt.1d0 .or. y_j1*y_j2.gt.0d0 ) then
-          applyPSCut=.true.
-          return
-       endif
+!        if( abs(y_j1).lt.1d0 .or. abs(y_j2).lt.1d0 .or. y_j1*y_j2.gt.0d0 ) then
+!           applyPSCut=.true.
+!           return
+!        endif
 
        if(  pT_j1.lt.pTjetcut .or. pT_j2.lt.pTjetcut )  then
           applyPSCut=.true.
