@@ -305,6 +305,18 @@ Function EvalWeighted_VHiggs(yRnd,VgsWgt)
  use ifport
 #endif
     implicit none
+! yrnd(1:2): helicity of parton 1:2
+! yrnd(3): helicities of parton 6,7
+! yrnd(4): helicities of parton 8,9
+! yrnd(5): flavor in Z/W decay mode
+! yrnd(6:7): cos(theta_4) and phi_4 in the CM frame of Z*(3)
+! yrnd(8:9): cos(theta_6) and phi_6 in the CM frame of decay product of Z(4)
+! yrnd(10:11): cos(theta_8) and phi_8 in the CM frame of decay product of H(5)
+! yRnd(12): inv_mass(4)
+! yRnd(13): inv_mass(5)
+! yrnd(14:15): PDF mapping
+! yrnd(16): partonic channel in unweighted events
+! yRnd(17): accept or reject in unweighted events    
     real(8) :: yRnd(1:20),VgsWgt, EvalWeighted_VHiggs
     real(8) :: pdf(-6:6,1:2)
     real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi
