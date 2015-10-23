@@ -280,8 +280,8 @@ contains
       dMATRIXELEMENT=(0d0,0d0)
       do lambda1=1,3
       do lambda2=1,3  
-      dMATRIXELEMENT=current1(1)*dconjg(POL1(lambda1, 1)) -current1(2)*dconjg(POL1(lambda1, 2)) -current1(3)*dconjg(POL1(lambda1, 3))-current1(4)*dconjg(POL1(lambda1, 4))
-      dMATRIXELEMENT=dMATRIXELEMENT *(current2(1)*POL2(lambda2, 1) -current2(2)*POL2(lambda2, 2) -current2(3)*POL2(lambda2, 3) -current2(4)*POL2(lambda2, 4))
+      dMATRIXELEMENT=current1(1)*POL1(lambda1, 1) -current1(2)*POL1(lambda1, 2) -current1(3)*POL1(lambda1, 3)-current1(4)*POL1(lambda1, 4)
+      dMATRIXELEMENT=dMATRIXELEMENT *(current2(1)*dconjg(POL2(lambda2, 1)) -current2(2)*dconjg(POL2(lambda2, 2)) -current2(3)*dconjg(POL2(lambda2, 3)) -current2(4)*dconjg(POL2(lambda2, 4)))
       PVVX0P=(0d0,0d0)
       do mu3=1,4
       do mu4=1,4
