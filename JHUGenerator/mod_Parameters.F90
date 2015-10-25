@@ -189,7 +189,7 @@ integer, public :: LeptInEvent(0:8) = 0
    complex(8), public, parameter :: ahz3 = (0.0d0,0d0)  ! pseudoscalar
 
 !-- parameters that define off-shell spin 0 coupling to SM fields, see note
-   complex(8), public, parameter :: ghg2 = (0.99906100d-01,0d0)
+   complex(8), public, parameter :: ghg2 = (1.0d0,0d0)
    complex(8), public, parameter :: ghg3 = (0.0d0,0d0)
    complex(8), public, parameter :: ghg4 = (0.0d0,0d0)   ! pseudoscalar
    
