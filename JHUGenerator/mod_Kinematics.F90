@@ -4107,8 +4107,9 @@ implicit none
 !      else
 !if using Breit-Wigner distribution
 !
-        inv_mass(4) = dsqrt(bw_sq(yRnd(12),mass(4,1), mass(4,2), inv_mass(3)**2, jacobian4))
-        inv_mass(5) = dsqrt(bw_sq(yRnd(13),mass(5,1), mass(5,2), (inv_mass(3)-inv_mass(4))**2, jacobian5))
+        inv_mass(4) = dsqrt(dabs(bw_sq(yRnd(12),mass(4,1), mass(4,2), inv_mass(3)**2, jacobian4)))
+        inv_mass(5) = dsqrt(dabs(bw_sq(yRnd(13),mass(5,1), mass(5,2), (inv_mass(3)-inv_mass(4))**2, jacobian5)))
+!print *, bw_sq(yRnd(13),mass(5,1), mass(5,2), (inv_mass(3)-inv_mass(4))**2, jacobian5), inv_mass(4:5)
 !      endif
 
 

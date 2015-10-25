@@ -305,6 +305,18 @@ Function EvalWeighted_VHiggs(yRnd,VgsWgt)
  use ifport
 #endif
     implicit none
+! yrnd(1:2): helicity of parton 1:2
+! yrnd(3): helicities of parton 6,7
+! yrnd(4): helicities of parton 8,9
+! yrnd(5): flavor in Z/W decay mode
+! yrnd(6:7): cos(theta_4) and phi_4 in the CM frame of Z*(3)
+! yrnd(8:9): cos(theta_6) and phi_6 in the CM frame of decay product of Z(4)
+! yrnd(10:11): cos(theta_8) and phi_8 in the CM frame of decay product of H(5)
+! yRnd(12): inv_mass(4)
+! yRnd(13): inv_mass(5)
+! yrnd(14:15): PDF mapping
+! yrnd(16): partonic channel in unweighted events
+! yRnd(17): accept or reject in unweighted events    
     real(8) :: yRnd(1:20),VgsWgt, EvalWeighted_VHiggs
     real(8) :: pdf(-6:6,1:2)
     real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi
@@ -319,6 +331,8 @@ Function EvalWeighted_VHiggs(yRnd,VgsWgt)
     !double precision beam_momentum(2,4), four_momentum(7,4),inv_mass(7),mass(7,2)
     real(8) :: helicity(9)!, beam_h(2) !helicities
     integer id(9), id2(9)!, beam_id(2)
+
+!yrnd(1:20)=(/0.70081154024295889d0,       0.36652768365385663d0,        3.4015114427896315d-002,  0.12011275833880684d0,       0.27630110527729695d0,       0.39126881153768606d0,       0.51098461273436080d0,       0.93976094696594392d0,       0.75740719244663901d0,       0.63188392158202700d0,        7.7191020216007322d-002,  0.99999999970117104d0,       0.64254210890693042d0,        6.4323827671500966d-002,  0.65341322658978906d0,       0.72709843817452313d0,        4.7717851574683431d-002,  0.86837190555567156d0,       0.70578200706054295d0,       0.53128914246883485d0/)
 
     EvalWeighted_VHiggs=0d0
     EvalCounter = EvalCounter+1
@@ -677,6 +691,7 @@ elseif( IsAWDecay(DecayMode1) ) then
       MomExt(4,2)=-MomExt(1,2)
 
       call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt)
+      !print *, PSWgt, "PSWgt"
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut)
       if( applyPSCut .or. PSWgt.eq.zero ) return
       if(H_DK.eqv..false.) then
@@ -714,10 +729,15 @@ elseif( IsAWDecay(DecayMode1) ) then
         endif
           LO_Res_Unpol = me2/3d0*pdf(i,1)*pdf(j,2) * PreFac
           EvalWeighted_VHiggs = EvalWeighted_VHiggs+LO_Res_Unpol
-          !print *, i,j,pdf(i,1),pdf(j,2),"!"
+          !print *, i,j,pdf(i,1),pdf(j,2)
+          !print *, me2,"me2"
           !lheweight(i,j)=LO_Res_Unpol
       enddo
       enddo
+
+!print *,PreFac,"PreFac"
+!print *, PSWgt, "PSWgt"
+
 
 elseif( IsAPhoton(DecayMode1) ) then
   print *, "invalid process"
@@ -840,7 +860,10 @@ endif
     call intoHisto(NHisto,NBin(NHisto),EvalWeighted_VHiggs*VgsWgt)
    enddo
 
-
+!if(IsNaN(EvalWeighted_VHiggs).eqv. .true.)then
+!  print *, yRnd
+!  pause
+!endif
 
 
    RETURN
