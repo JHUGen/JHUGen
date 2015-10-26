@@ -100,12 +100,12 @@ real(8), public, parameter :: VBF_4ml_minmax(1:2) = (/ -1d0,-1d0 /)*GeV  ! min a
 
 
 ! CKM squared matrix entries 
-real(8), public, parameter :: VCKM_ud = 0.97426d0
-real(8), public, parameter :: VCKM_us = 0.22529d0
-real(8), public, parameter :: VCKM_cs = 0.97341d0
-real(8), public, parameter :: VCKM_cd =-0.22518d0
-real(8), public, parameter :: VCKM_tb = 0.999119d0
-real(8), public, parameter :: VCKM_ts =-0.04092d0
+real(8), public, parameter :: VCKM_ud = 0.974285d0
+real(8), public, parameter :: VCKM_us = 0.225290d0
+real(8), public, parameter :: VCKM_cs = 0.9734244d0
+real(8), public, parameter :: VCKM_cd =-0.225182d0
+real(8), public, parameter :: VCKM_tb = 0.99912367d0
+real(8), public, parameter :: VCKM_ts =-0.040920069d0
 real(8), public, parameter :: VCKM_cb = dsqrt(1d0-VCKM_cd**2-VCKM_cs**2)
 real(8), public, parameter :: VCKM_ub = dsqrt(1d0-VCKM_ud**2-VCKM_us**2)
 real(8), public, parameter :: VCKM_td = dsqrt(1d0-VCKM_tb**2-VCKM_ts**2)
