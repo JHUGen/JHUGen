@@ -1662,7 +1662,8 @@ character(len=150) :: InputFmt0,InputFmt1
 logical :: FirstEvent,M_ResoSet,Ga_ResoSet,WroteHeader,ClosedHeader,WroteMassWidth,InMadgraphMassBlock
 integer :: nline,intDummy,Nevent
 integer :: LHE_IDUP(1:maxpart),LHE_ICOLUP(1:2,1:maxpart),LHE_MOTHUP(1:2,1:maxpart)
-integer :: EventNumPart
+integer :: EventNumPart, EventProcessId
+real(8) :: WeightScaleAqedAqcd(1:4)
 character(len=160) :: FirstLines,EventInfoLine,OtherLines
 character(len=160) :: EventLine(0:maxpart)
 integer :: n,stat,iHiggs,VegasSeed
@@ -1841,20 +1842,12 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
          LeptInEvent(:) = 0
          read(16,"(A)") EventLine(0)
          if (UseUnformattedRead) then
-             read(EventLine(0),*) EventNumPart !  read number of particle from the first line after <event>
-             i = 1                             !  trying to read the other stuff in one string would just give
-             do while(EventLine(0)(i:i).eq." ")!  the first field
-                 i=i+1
-             enddo
-             do while(EventLine(0)(i:i).ne." ")
-                 i=i+1
-             enddo
-             read(EventLine(0)(i:len(EventLine(0))),"(A)") EventInfoLine
+             read(EventLine(0),*) EventNumPart, EventProcessId, WeightScaleAqedAqcd
          else
              if (InputFmt0.eq."") then
                  InputFmt0 = FindInputFmt0(EventLine(0))
              endif
-             read(EventLine(0),InputFmt0) EventNumPart, EventInfoLine
+             read(EventLine(0),InputFmt0) EventNumPart, EventProcessId, WeightScaleAqedAqcd
          endif
 !        read event lines
          do nline=1,EventNumPart
@@ -1905,8 +1898,12 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
              HiggsDK_IDUP(7) = convertLHE(HiggsDK_IDUP(7))
              HiggsDK_IDUP(8) = convertLHE(HiggsDK_IDUP(8))
              HiggsDK_IDUP(9) = convertLHE(HiggsDK_IDUP(9))
-             
-             call WriteOutEvent_NEW(EventNumPart,LHE_IDUP,LHE_IntExt,LHE_MOTHUP,LHE_ICOLUP,MomExt,HiggsDK_Mom,Mass,iHiggs,HiggsDK_IDUP,HiggsDK_ICOLUP,EventInfoLine,BeginEventLine=BeginEventLine)
+
+             if (UseUnformattedRead) then
+                 call WriteOutEvent_NEW(EventNumPart,LHE_IDUP,LHE_IntExt,LHE_MOTHUP,LHE_ICOLUP,MomExt,HiggsDK_Mom,Mass,iHiggs,HiggsDK_IDUP,HiggsDK_ICOLUP,EventProcessId,EventWeight=WeightScaleAqedAqcd(1),EventScaleAqedAqcd=WeightScaleAqedAqcd(2:4),BeginEventLine=BeginEventLine)
+             else
+                 call WriteOutEvent_NEW(EventNumPart,LHE_IDUP,LHE_IntExt,LHE_MOTHUP,LHE_ICOLUP,MomExt,HiggsDK_Mom,Mass,iHiggs,HiggsDK_IDUP,HiggsDK_ICOLUP,EventProcessId,EventWeight=WeightScaleAqedAqcd(1),EventScaleAqedAqcd=WeightScaleAqedAqcd(2:4),BeginEventLine=BeginEventLine,InputFmt0=InputFmt0)
+             endif
 
              if( mod(AccepCounter,5000).eq.0 ) then
                   call cpu_time(time_int)
