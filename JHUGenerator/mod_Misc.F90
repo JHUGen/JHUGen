@@ -278,16 +278,92 @@ function FindInputFmt0(EventInfoLine)
 implicit none
 character(len=*) :: EventInfoLine
 character(len=150) FindInputFmt0
-integer :: i
+integer :: i, j, fieldwidth, spaces(1:6)
+integer :: ProcessIdCharacters, WeightScaleAqedAqcdCharacters(1:4), WeightScaleAqedAqcdAfterDecimal(1:4)
+character(len=40) :: FormatParts(1:6)
+
+!find the nubmer of spaces at the beginning
+spaces(1) = 0
 i = 1
-do while (EventInfoLine(i+1:i+1) .eq. " ")
+do while (EventInfoLine(i:i) .eq. " ")
     i = i+1
+    spaces(1) = spaces(1)+1
 end do
-if (i.eq.1) then
-    FindInputFmt0 = "(I2,A160)"
+!now find the width of the number of particles, assume it's right aligned with a max of 2 digits
+fieldwidth = 0
+do while (EventInfoLine(i:i) .ne. " ")
+    i = i+1
+    fieldwidth = fieldwidth+1
+end do
+spaces(1) = spaces(1) + fieldwidth - 2
+
+!spaces and process id.
+!"The process ID’s are not intended to be generic" [arXiv:0109068]
+!I will assume that however many digits they are, they're right aligned
+
+ProcessIdCharacters = -1  !so that it's 0 after the first space
+spaces(2) = 1             !this is not increased, it's exactly 1
+do while (EventInfoLine(i:i) .eq. " ")
+    i = i+1
+    ProcessIdCharacters = ProcessIdCharacters+1
+end do
+do while (EventInfoLine(i:i) .ne. " ")
+    i = i+1
+    ProcessIdCharacters = ProcessIdCharacters+1
+end do
+
+!the rest of the fields (scale, alpha_QED, alpha_QCD) are decimals
+do j=1,4
+    spaces(j+2) = 0
+    do while (EventInfoLine(i:i) .eq. " ")
+        i = i+1
+        spaces(j+2) = spaces(j+2)+1
+    end do
+    if (EventInfoLine(i:i) .eq. "-") then
+        i = i+1
+        WeightScaleAqedAqcdCharacters(j) = 1  !we are already past the -
+    else if (spaces(j+2).eq.1) then
+        WeightScaleAqedAqcdCharacters(j) = 0
+    else
+        spaces(j+2) = spaces(j+2)-1           !because the place where the - sign is supposed to go is not always a space
+        WeightScaleAqedAqcdCharacters(j) = 1  !we are already past the -
+    endif
+    do while (EventInfoLine(i:i) .ne. " ")
+        i = i+1
+        WeightScaleAqedAqcdCharacters(j) = WeightScaleAqedAqcdCharacters(j)+1
+    end do
+    WeightScaleAqedAqcdAfterDecimal(j) = WeightScaleAqedAqcdCharacters(j)-7
+end do
+
+!now we construct the format string
+if (spaces(1).eq.0) then
+    FormatParts(1) = "(I2,"
 else
-    write(FindInputFmt0, "(A,I2,A)") "(", i, "X,I2,A160)"
+    write(FormatParts(1), "(A,I1,A)") "(", spaces(1), "X,I2,"
 endif
+if (ProcessIdCharacters.lt.10) then
+    write(FormatParts(2), "(I1,A,I1,A)") spaces(2), "X,I", ProcessIdCharacters !the comma is at the beginning of the next part
+else
+    write(FormatParts(2), "(I1,A,I2)") spaces(2), "X,I", ProcessIdCharacters !the comma is at the beginning of the next part
+endif
+do j=1,4
+    if (WeightScaleAqedAqcdCharacters(j).lt.10) then
+        write(FormatParts(j+2), "(A,I1,A,I1,A,I1)") ",", spaces(j+2), "X,1PE", WeightScaleAqedAqcdCharacters(j), ".", WeightScaleAqedAqcdAfterDecimal(j)
+    elseif (WeightScaleAqedAqcdCharacters(j).lt.17) then
+        write(FormatParts(j+2), "(A,I1,A,I2,A,I1)") ",", spaces(j+2), "X,1PE", WeightScaleAqedAqcdCharacters(j), ".", WeightScaleAqedAqcdAfterDecimal(j)
+    else
+        write(FormatParts(j+2), "(A,I1,A,I2,A,I2)") ",", spaces(j+2), "X,1PE", WeightScaleAqedAqcdCharacters(j), ".", WeightScaleAqedAqcdAfterDecimal(j)
+    endif
+end do
+
+FindInputFmt0 = (trim(FormatParts(1))  &
+              // trim(FormatParts(2))  &
+              // trim(FormatParts(3))  &
+              // trim(FormatParts(4))  &
+              // trim(FormatParts(5))  &
+              // trim(FormatParts(6))  &
+              // ")")
+
 return
 end function FindInputFmt0
 
@@ -397,7 +473,7 @@ do j=7,11   !px, py, pz, E, m
     else
         spaces(j) = spaces(j)-1  !because the place where the - sign is supposed to go is not always a space
     endif
-    !i is now on the first actual digit (not -) of px
+    !i is now on the first actual digit (not -) of the component
 
     !number of characters used for the component
     MomentumCharacters(j-6) = 1           !we are already past the -
