@@ -1025,14 +1025,15 @@ use ModCrossSection_BBBH
 use ModCrossSection_TH
 use ModKinematics
 use ModParameters
+use modHiggsJJ
 implicit none
 include "vegas_common.f"
 real(8) :: VG_Result,VG_Error,VG_Chi2
 real(8) :: yRnd(1:22),calls1,calls2,calls_rescale
 real(8) :: dum, RES(-5:5,-5:5),ResFrac(-5:5,-5:5),TotalXSec
-integer :: i, i1, j1,PChannel_aux, PChannel_aux1,NHisto
+integer :: i, i1, j1,PChannel_aux, PChannel_aux1,NHisto,ijSel(1:121,1:3)
 include 'csmaxvalue.f'
-integer :: flav1,flav2,StatusPercent
+integer :: flav1,flav2,StatusPercent,MissingEvents,MaxEvts,imax
 integer :: VegasSeed
 logical, parameter :: UseBetaVersion=.true.
 
@@ -1160,14 +1161,52 @@ if( UseBetaVersion ) then
         RequEvents(i1,j1) = RequEvents(i1,j1) + nint( CrossSec(i1,j1)/VG_Result * VegasNc2 )
     enddo
     enddo
-    do i1=-5,5
-    do j1=-5,5
-        if( RequEvents(i1,j1).gt.0 ) write(io_stdout,"(1X,A,3X,F8.3,I9)") "Fractional partonic xsec "//getLHEParticle(i1)//" "//getLHEParticle(j1)//" ",CrossSec(i1,j1)/VG_Result,RequEvents(i1,j1)
-    enddo
+
+
+
+    if( Process.eq.60 ) then
+       call get_VBFchannelHash(ijSel)
+    else
+       call get_GENchannelHash(ijSel)
+    endif
+    do i=1,121
+         i1 = ijSel(i,1)
+         j1 = ijSel(i,2)
+         if( RequEvents(i1,j1).gt.0 .and. ijSel(i,3).eq.1 ) write(io_stdout,"(1X,I3,A,I3,I3,A,3X,F8.3,I9)") i," Fractional partonic xsec ",i1,j1," "//getLHEParticle(i1)//" "//getLHEParticle(j1)//" ",CrossSec(i1,j1)/VG_Result,RequEvents(i1,j1) 
     enddo
     write(io_stdout,"(1X,A,F8.3,I9)") "Sum        partonic xsec   x   x    ",sum(CrossSec(:,:))/VG_Result,sum(RequEvents(:,:))
-
+  
+  
+  
+  
+!   add some events that got lost due to rounding errors
+!   distribute them according to the partonic cross section fractions and finally add the last pieces to the largest partonic contribution
+    MissingEvents = VegasNc2 - sum(RequEvents(:,:))
+    if( MissingEvents.ne.0 ) then
+!         print *, "MISSING EVENTS",MissingEvents
+        MaxEvts = -10000
+        do i=1,121
+            i1 = ijSel(i,1)
+            j1 = ijSel(i,2)
+            RequEvents(i1,j1) = RequEvents(i1,j1) + nint( CrossSec(i1,j1)/VG_Result * MissingEvents )
+            if( RequEvents(i1,j1).gt.MaxEvts ) then
+              MaxEvts = RequEvents(i1,j1)
+              imax=i
+            endif
+!             print *, "adding",i1,j1,nint( CrossSec(i1,j1)/VG_Result * MissingEvents )
+        enddo       
+        MissingEvents = VegasNc2 - sum(RequEvents(:,:))
+!         print *, "MISSING EVENTS",MissingEvents
+        i1 = ijSel(imax,1)
+        j1 = ijSel(imax,2)
+        RequEvents(i1,j1) = RequEvents(i1,j1) + MissingEvents
+        write(*,"(A,I4)") "Adjusting number of events. New event count=",sum(RequEvents(:,:))
+    endif
+    pause
+    
       
+      
+    
     write(io_stdout,"(A)")  ""
     write(io_stdout,"(1X,A)")  "Event generation"
     call ClearHisto()   
@@ -1183,10 +1222,9 @@ if( UseBetaVersion ) then
     CrossSecMax(:,:) = 1.0d0 * CrossSecMax(:,:)    !  adjustment factor
     call cpu_time(time_start)    
     
-! try running with itmx=5,
-! try with adating grid instead of while loop   -> is the grid changing with each while-loop???
+
     itmx=200000
-    ncall= 1000000       !1000000  this cannot be different from Ncall from csmax scan because then the VgsWgt is different !!!
+    ncall= 1000000
     call vegas_get_calls(calls2)
     calls_rescale = calls1/calls2
     CrossSecMax(:,:) = CrossSecMax(:,:) * calls_rescale    
@@ -3256,6 +3294,12 @@ implicit none
         write(io_LogFile,'(12X,A,F6.3,A,F6.3,A)') 'Br_Z_dd_counter  ',dble(Br_Z_dd_counter)/AccepCounter *100d0," %    +/-",dsqrt(dble(Br_Z_dd_counter))/AccepCounter *100d0," %"
         write(io_LogFile,'(12X,A,F6.3,A,F6.3,A)') 'Br_W_ll_counter  ',dble(Br_W_ll_counter)/AccepCounter *100d0," %    +/-",dsqrt(dble(Br_W_ll_counter))/AccepCounter *100d0," %"
         write(io_LogFile,'(12X,A,F6.3,A,F6.3,A)') 'Br_W_ud_counter  ',dble(Br_W_ud_counter)/AccepCounter *100d0," %    +/-",dsqrt(dble(Br_W_ud_counter))/AccepCounter *100d0," %"
+    endif
+    
+    if( any(DebugCounter.ne.0) ) then
+       
+       print *, "DebugCounter(:)=",DebugCounter(:)
+    
     endif
   
 END SUBROUTINE

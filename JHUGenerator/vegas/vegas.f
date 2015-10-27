@@ -62,6 +62,8 @@ c        initialises  cumulative  variables but not grid
 c
          entry vegas2(fxn,avgi,sd,chi2a)
 c        no initialisation
+         jj=0
+
          nd=ndmx
          ng=1
          if(mds.eq.0)go to 2
@@ -338,7 +340,7 @@ c
      1   dx(mxdim),dt(mxdim),x(mxdim),kg(mxdim),ia(mxdim)
          data ndmx/50/,alph/1.5d0/,one/1d0/,mds/1/
 !          data idum/-113123/
-
+         
          nd=ndmx
          ng=1
          if(mds.eq.0)go to 2
