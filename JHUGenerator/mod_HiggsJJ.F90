@@ -396,7 +396,7 @@ module modHiggsJJ
     real(dp), parameter :: Ld = aL_QDn**2, Rd = aR_QDn**2
     real(dp), parameter :: couplz = gwsq * xw/twosc**2         !*M_Z/sitW/dsqrt(1d0-sitW**2)! MARKUS ADDED HVV COUPLINGS: CHECK!!
     real(dp), parameter :: couplw = gwsq/two                   !*M_W/sitW
-    real(dp) :: restmp=0d0,restmp2=0d0
+    real(dp) :: restmp=0d0
     integer :: i, j, j1, j2, iflip, pdfindex(2)
 
     res = zero
@@ -752,7 +752,7 @@ module modHiggsJJ
     integer, intent(in) :: iSel,jSel
     complex(dp) :: amp_z(-1:1,-1:1), amp_z_b(-1:1,-1:1)
     complex(dp) :: amp_w(-1:1,-1:1)
-    real(dp) :: sprod(4,4),zzfus_rnd
+    real(dp) :: sprod(4,4)
     complex(dp) :: za(4,4), zb(4,4)
     real(dp), parameter :: Lu = aL_QUp**2, Ru = aR_QUp**2
     real(dp), parameter :: Ld = aL_QDn**2, Rd = aR_QDn**2
