@@ -53,7 +53,7 @@ logical, public, parameter :: includeGammaStar = .false.
 
 real(8),parameter :: MPhotonCutoff = 4d0*GeV
 
-logical, public, parameter :: RandomizeVVdecays = .false. ! randomize DecayMode1 and DecayMode2 in H-->VV and TTBAR decays
+logical, public, parameter :: RandomizeVVdecays = .true. ! randomize DecayMode1 and DecayMode2 in H-->VV and TTBAR decays
 
 logical, public, parameter :: UseUnformattedRead = .false.  !Set this to true if the regular reading fails for whatever reason
 

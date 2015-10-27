@@ -1,4 +1,4 @@
-#define WorkPath "/afs/cern.ch/user/m/maschulz/1git_JHUGen/VH_NLO/"
+#define WorkPath "/home/schulze/1git_JHUGen/VH_NLO/"
 #define setP1P1 "0"
 #define setP2P2 "0"
 #define setP3P3 "MZ^2"
@@ -7,11 +7,17 @@
 #define setDSTm4 "0"
 #define InterfereDiags1 "1,1"
 #define InterfereDiags2 "1,1"
+#include /home/schulze/lib/FeynArtsToForm/header2.frm
 
 
-#include /afs/cern.ch/user/m/maschulz/lib/FeynArtsToForm/header2.frm
+** original FeynArt output
+*#include `WorkPath'Tree_qqbVH_input.frm
 
-#include `WorkPath'Tree_qqbVH_input.frm
+** my modified anomalous version
+
+#include `WorkPath'Tree_qqbVH_BSM_input.frm
+
+
 
 * up quark masses
 id MU=0;
@@ -31,9 +37,16 @@ id DID(Col1?)=1;
 
 Format Mathematica;
 Print;
-Bracket IZ,SME;
+Bracket a1HVV,a2HVV,a3HVV,vev;
 .sort;
 
+
+#write <`WorkPath'Tree_qqbVH_output.dat> "NumAmps = `NumAmps';\n";
+#write <`WorkPath'Tree_qqbVH_output.dat> "AmpList = \"  `AmpList'\";\n";
+
+#do TheAmp = `AmpList'
+  #write <`WorkPath'Tree_qqbVH_output.dat> "M`TheAmp' = (%E);\n ", `TheAmp';
+#enddo
 
 
 
