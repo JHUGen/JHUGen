@@ -1035,27 +1035,38 @@ integer :: i, i1, j1,PChannel_aux, PChannel_aux1,NHisto,ijSel(1:121,1:3)
 include 'csmaxvalue.f'
 integer :: flav1,flav2,StatusPercent,MissingEvents,MaxEvts,imax
 integer :: VegasSeed
+character :: ProcessStr*(3)
 logical, parameter :: UseBetaVersion=.true.
 
-VG_Result = -13d0
-VG_Error  = -13d0
+    VG_Result = -13d0
+    VG_Error  = -13d0
 
-if( VegasIt1.eq.-1 ) VegasIt1 = VegasIt1_default
-if( VegasNc0.eq.-1 ) VegasNc0 = VegasNc0_default
-if( VegasNc1.eq.-1 .and. VegasNc2.eq.-1 .and.  (unweighted) ) then 
-      VegasNc1 = VegasNc1_default
-      VegasNc2 = VegasNc2_default
-endif
-if( VegasNc1.eq.-1 .and.  .not. (unweighted) ) VegasNc1 = VegasNc1_default
-if( VegasNc2.eq.-1 .and.  .not. (unweighted) ) VegasNc2 = VegasNc2_default
+    if( VegasIt1.eq.-1 ) VegasIt1 = VegasIt1_default
+    if( VegasNc0.eq.-1 ) VegasNc0 = VegasNc0_default
+    if( VegasNc1.eq.-1 .and. VegasNc2.eq.-1 .and.  (unweighted) ) then 
+          VegasNc1 = VegasNc1_default
+          VegasNc2 = VegasNc2_default
+    endif
+    if( VegasNc1.eq.-1 .and.  .not. (unweighted) ) VegasNc1 = VegasNc1_default
+    if( VegasNc2.eq.-1 .and.  .not. (unweighted) ) VegasNc2 = VegasNc2_default
 
 
 
-   call cpu_time(time_start)    
-   warmup = .false.
-   itmx = VegasIt1
-   ncall= VegasNc1
-   PChannel_aux = PChannel
+    if(Process.lt.10) then
+      write(ProcessStr,"(I1)") Process
+      ProcessStr="0"//trim(ProcessStr)
+    elseif(Process.lt.100) then
+      write(ProcessStr,"(I2)") Process
+    else
+      write(ProcessStr,"(I3)") Process
+    endif
+
+
+    call cpu_time(time_start)    
+    warmup = .false.
+    itmx = VegasIt1
+    ncall= VegasNc1
+    PChannel_aux = PChannel
 
    
    
@@ -1120,9 +1131,9 @@ if( UseBetaVersion ) then
     warmup = .true.
     itmx = 5
     ncall= VegasNc0
-    outgridfile="vegas.grid"  
+    outgridfile="vegas_"//trim(ProcessStr)//".grid"  
     ingridfile=trim(outgridfile)
-        
+    
     if( ReadCSmax ) then
         readin=.true.
         writeout=.false.
@@ -1153,7 +1164,7 @@ if( UseBetaVersion ) then
     call vegas_get_calls(calls1)
     CrossSec(:,:) = CrossSec(:,:)/dble(itmx)    
     write(io_stdout,"(A)")  ""
-    write(io_stdout,"(1X,A,F10.3,A,F10.3,A,F10.3)") "Total xsec: ",VG_Result, " +/-",VG_Error, " fb    vs.",sum(CrossSec(:,:))
+    write(io_stdout,"(2X,A,F10.3,A,F10.3,A,F10.3)") "Total xsec: ",VG_Result, " +/-",VG_Error, " fb    vs.",sum(CrossSec(:,:))
 
     RequEvents(:,:)=0
     do i1=-5,5
@@ -1174,7 +1185,7 @@ if( UseBetaVersion ) then
          j1 = ijSel(i,2)
          if( RequEvents(i1,j1).gt.0 .and. ijSel(i,3).eq.1 ) write(io_stdout,"(1X,I3,A,I3,I3,A,3X,F8.3,I9)") i," Fractional partonic xsec ",i1,j1," "//getLHEParticle(i1)//" "//getLHEParticle(j1)//" ",CrossSec(i1,j1)/VG_Result,RequEvents(i1,j1) 
     enddo
-    write(io_stdout,"(1X,A,F8.3,I9)") "Sum        partonic xsec   x   x    ",sum(CrossSec(:,:))/VG_Result,sum(RequEvents(:,:))
+    write(io_stdout,"(2X,A,F8.3,I9)") "Sum        partonic xsec   x   x    ",sum(CrossSec(:,:))/VG_Result,sum(RequEvents(:,:))
   
   
   
@@ -1200,9 +1211,8 @@ if( UseBetaVersion ) then
         i1 = ijSel(imax,1)
         j1 = ijSel(imax,2)
         RequEvents(i1,j1) = RequEvents(i1,j1) + MissingEvents
-        write(*,"(A,I4)") "Adjusting number of events. New event count=",sum(RequEvents(:,:))
+        write(*,"(2X,A,I4)") "Adjusting number of events. New event count=",sum(RequEvents(:,:))
     endif
-    pause
     
       
       
