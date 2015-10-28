@@ -183,11 +183,12 @@ MODULE ModPhasespace
        phi   = 2d0*pi * xRnd(1)
        CosTheta = 1d0/(sqrt_lambda(Mandelstam_S,Mass1_sq,Mass2_sq)+1d-15)/(sqrt_lambda(Mandelstam_S,pa_sq,pb_sq)+1d-15)    &
                 * ( (Mandelstam_S+Mass1_sq-Mass2_sq)*(Mandelstam_S+pa_sq-pb_sq) + 2d0*Mandelstam_S*(Mandelstam_T-Mass1_sq-pa_sq) )       
+       if( CosTheta.gt.+1d0 ) CosTheta=+1d0
+       if( CosTheta.lt.-1d0 ) CosTheta=-1d0
        call rotate3D_phi_theta(phi,dacos(CosTheta),Mom1(:))
-       
+      
        Eab = Mandelstam_S/dsqrt(Mandelstam_S)
        Mom2(1:4) = (/Eab,0d0,0d0,0d0/) - Mom1(1:4)
-
 
        
        pa_hat(1:4) = pa(1:4)
@@ -319,6 +320,7 @@ pause
       cos_theta = dCos(theta)
       sin_theta = dSin(theta)
 
+
       mom_tmp(2:4) = mom(2:4)      
       mom(2) = mom_tmp(2) * cos_phi * cos_theta + mom_tmp(3) * sin_phi + mom_tmp(4) * cos_phi * sin_theta
       mom(3) = mom_tmp(3) * cos_phi - mom_tmp(2) * cos_theta * sin_phi - mom_tmp(4) * sin_phi * sin_theta
@@ -376,7 +378,7 @@ pause
   implicit none
   real(8) :: sqrt_lambda,x,y,z
   
-        sqrt_lambda = dsqrt(x**2 + y**2 + z**2 - 2d0*x*y - 2d0*x*z - 2d0*y*z)
+        sqrt_lambda = dsqrt(dabs(x**2 + y**2 + z**2 - 2d0*x*y - 2d0*x*z - 2d0*y*z))
 
   RETURN
   END FUNCTION
@@ -526,7 +528,7 @@ pause
 
         
         k_t =  -pi/2d0/sqrt_lambda(sab,pa_sq,pb_sq)/g_s(-InvMass_sq,-m_sq,nu,-smin,-smax)
-                
+                                
   RETURN
   END FUNCTION
 

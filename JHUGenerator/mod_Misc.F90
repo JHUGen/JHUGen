@@ -95,7 +95,7 @@ FUNCTION Get_ETA(Mom)
 implicit none
 real(8) ::Mom(1:4),Get_ETA
 
-   Get_ETA = 0.5d0*dlog( (Mom(1)+Mom(4))/(Mom(1)-Mom(4)) )
+   Get_ETA = 0.5d0*dlog( dabs((Mom(1)+Mom(4)+1d-16)/(Mom(1)-Mom(4) +1d-16) ))
 
 RETURN
 END FUNCTION
@@ -127,7 +127,7 @@ FUNCTION Get_CosTheta(Mom)! = Mom.nz/abs(Mom)
 implicit none
 real(8) ::Mom(1:4), Get_CosTheta
 
-    Get_CosTheta = Mom(4)/dsqrt( Mom(2)**2+Mom(3)**2+Mom(4)**2 )
+    Get_CosTheta = Mom(4)/dsqrt( Mom(2)**2+Mom(3)**2+Mom(4)**2 +1d-16)
 
 RETURN
 END FUNCTION

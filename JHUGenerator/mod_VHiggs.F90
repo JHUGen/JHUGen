@@ -52,19 +52,73 @@ contains
 
 
 
+!       complex(8) FUNCTION MATRIXELEMENT1(MomExt,inv_mass,mass,helicity,id)
+!       implicit none
+!       
+!       ! 12 --> 34 --> Z3-->56 + H4-->78
+! 
+! ! -+
+!       HelAmp =
+!      &  + IZfs(1)*VVHg3 * (  - za(p2,p6)*za(p6,p7)*zb(p1,p7)*zb(p5,p6)&
+!      &     - za(p2,p6)*za(p6,p8)*zb(p1,p8)*zb(p5,p6) - za(p2,p7)*za(p5,&
+!      &    p6)*zb(p1,p5)*zb(p5,p7) - za(p2,p8)*za(p5,p6)*zb(p1,p5)*zb(p5&
+!      &    ,p8) )
+!       HelAmp = HelAmp + IZfs(1)*VVHg2 * ( za(p2,p7)*za(p6,p7)*zb(p1,p7)&
+!      &    *zb(p5,p7) + za(p2,p7)*za(p6,p8)*zb(p1,p7)*zb(p5,p8) + za(p2,&
+!      &    p8)*za(p6,p7)*zb(p1,p8)*zb(p5,p7) + za(p2,p8)*za(p6,p8)*zb(p1&
+!      &    ,p8)*zb(p5,p8) )
+!       HelAmp = HelAmp + IZfs(1)*VVHg1 * (  - 2.*za(p2,p6)*zb(p1,p5) )
+! 
+! ! +-
+!       HelAmp =
+!      &  + IZfs(-1)*VVHg3 * (  - za(p1,p5)*za(p5,p7)*zb(p2,p5)*zb(p6,p7)&
+!      &     + za(p1,p5)*za(p5,p7)*zb(p2,p6)*zb(p5,p7) - za(p1,p5)*za(p5,&
+!      &    p8)*zb(p2,p5)*zb(p6,p8) + za(p1,p5)*za(p5,p8)*zb(p2,p6)*zb(p5&
+!      &    ,p8) + za(p1,p7)*za(p5,p6)*zb(p2,p6)*zb(p6,p7) + za(p1,p8)*&
+!      &    za(p5,p6)*zb(p2,p6)*zb(p6,p8) )
+!       HelAmp = HelAmp + IZfs(-1)*VVHg2 * ( za(p1,p7)*za(p5,p7)*zb(p2,p7&
+!      &    )*zb(p6,p7) + za(p1,p7)*za(p5,p8)*zb(p2,p7)*zb(p6,p8) + za(p1&
+!      &    ,p8)*za(p5,p7)*zb(p2,p8)*zb(p6,p7) + za(p1,p8)*za(p5,p8)*zb(&
+!      &    p2,p8)*zb(p6,p8) )
+!       HelAmp = HelAmp + IZfs(-1)*VVHg1 * (  - 2.*za(p1,p5)*zb(p2,p6) )
+! 
+! ! ++
+!       HelAmp =
+!      &  + IZfs(1)*VVHg3 * (  - za(p1,p6)*za(p6,p7)*zb(p2,p7)*zb(p5,p6)&
+!      &     - za(p1,p6)*za(p6,p8)*zb(p2,p8)*zb(p5,p6) - za(p1,p7)*za(p5,&
+!      &    p6)*zb(p2,p5)*zb(p5,p7) - za(p1,p8)*za(p5,p6)*zb(p2,p5)*zb(p5&
+!      &    ,p8) )
+!       HelAmp = HelAmp + IZfs(1)*VVHg2 * ( za(p1,p7)*za(p6,p7)*zb(p2,p7)&
+!      &    *zb(p5,p7) + za(p1,p7)*za(p6,p8)*zb(p2,p7)*zb(p5,p8) + za(p1,&
+!      &    p8)*za(p6,p7)*zb(p2,p8)*zb(p5,p7) + za(p1,p8)*za(p6,p8)*zb(p2&
+!      &    ,p8)*zb(p5,p8) )
+!       HelAmp = HelAmp + IZfs(1)*VVHg1 * (  - 2.*za(p1,p6)*zb(p2,p5) )
+! 
+! ! --
+!       HelAmp =
+!      &  + IZfs(-1)*VVHg3 * ( za(p2,p5)*za(p5,p7)*zb(p1,p7)*zb(p5,p6) + &
+!      &    za(p2,p5)*za(p5,p8)*zb(p1,p8)*zb(p5,p6) + za(p2,p7)*za(p5,p6)&
+!      &    *zb(p1,p6)*zb(p6,p7) + za(p2,p8)*za(p5,p6)*zb(p1,p6)*zb(p6,p8&
+!      &    ) )
+!       HelAmp = HelAmp + IZfs(-1)*VVHg2 * ( za(p2,p7)*za(p5,p7)*zb(p1,p7&
+!      &    )*zb(p6,p7) + za(p2,p7)*za(p5,p8)*zb(p1,p7)*zb(p6,p8) + za(p2&
+!      &    ,p8)*za(p5,p7)*zb(p1,p8)*zb(p6,p7) + za(p2,p8)*za(p5,p8)*zb(&
+!      &    p1,p8)*zb(p6,p8) )
+!       HelAmp = HelAmp + IZfs(-1)*VVHg1 * (  - 2.*za(p2,p5)*zb(p1,p6) )
+!   
+!   
+!   
+! 
+!       END FUNCTION
 
-
-
-
+      
 !MATRIXELEMENT0.F
 !VERSION 20130710
 
 !
 
       complex(8) function MATRIXELEMENT0(MomExt,inv_mass,mass,helicity,id)
-
       implicit none
-
       complex(8) dMATRIXELEMENT
       real(8), intent(in) :: MomExt(1:4,1:9) !,four_momentum(7,4)
       real(8), intent(in) :: inv_mass(9)
@@ -218,8 +272,8 @@ contains
 
       call POLARIZATION(MomExt(:,3), POL1)
       call POLARIZATION(MomExt(:,4), POL2)
-   
-
+      
+      
 !ZZX vertex
       q3_q3 = inv_mass(3)**2
       q4_q4 = inv_mass(4)**2
