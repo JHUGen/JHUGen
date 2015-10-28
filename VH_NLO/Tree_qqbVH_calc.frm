@@ -49,7 +49,7 @@ endrepeat;
 
 
 * move Chir to the left
-#call moveChirL();
+#call moveChirR();
 
 
 #call simplify();
@@ -64,9 +64,14 @@ endargument;
 id MW = CW*MZ;
 id 1/MW = 1/CW/MZ;
 
-id ASpi(1,p2,0)*Chir(1,+1)*Ga(1,cep3)*Spi(1,p1,0) = SME(1,+1);
-id ASpi(1,p2,0)*Chir(1,-1)*Ga(1,cep3)*Spi(1,p1,0) = SME(1,-1);
+id ASpi(1,p2,0)*Ga(1,cep3)*Chir(1,+1)*Spi(1,p1,0) = SME(1,+1);
+id ASpi(1,p2,0)*Ga(1,cep3)*Chir(1,-1)*Spi(1,p1,0) = SME(1,-1);
 
+id ASpi(1,p2,0)*Ga(1,p3)*Chir(1,+1)*Spi(1,p1,0)*p4.cep3 = SME(2,+1);
+id ASpi(1,p2,0)*Ga(1,p3)*Chir(1,-1)*Spi(1,p1,0)*p4.cep3 = SME(2,-1);
+
+id ASpi(1,p2,0)*Ga(1,Lor2)*Chir(1,+1)*Spi(1,p1,0)*LeviCiv(p3,p4,cep3,Lor2) = SME(3,+1);
+id ASpi(1,p2,0)*Ga(1,Lor2)*Chir(1,-1)*Spi(1,p1,0)*LeviCiv(p3,p4,cep3,Lor2) = SME(3,-1);
 
 
 

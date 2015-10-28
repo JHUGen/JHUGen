@@ -3,8 +3,8 @@
 #define setP2P2 "0"
 #define setP3P3 "MZ^2"
 #define setP4P4 "MH^2"
-#define setDST   "4"
-#define setDSTm4 "0"
+#define setDST   "DST"
+#define setDSTm4 "DSTm4"
 #define InterfereDiags1 "1,1"
 #define InterfereDiags2 "1,1"
 

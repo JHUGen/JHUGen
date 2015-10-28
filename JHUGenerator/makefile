@@ -12,7 +12,7 @@ Opt  = Yes
 Comp = ifort
 
 # link pdfs via LHA library ('Yes' or 'No')
-UseLHAPDF=Yes
+UseLHAPDF=No
 
 # directory which contains libLHAPDF.a, libLHAPDF.la, libLHAPDF.so
 # MyLHADir=/afs/cern.ch/user/m/maschulz/lib/LHAPDF-6.1.5/lib/

@@ -4524,6 +4524,7 @@ integer, parameter :: inLeft=1, inRight=2, qup=3, qdn=4, Higgs=5
    Mom(1:4,1) = 0.5d0*Energy * (/+1d0,0d0,0d0,+1d0/)
    Mom(1:4,2) = 0.5d0*Energy * (/+1d0,0d0,0d0,-1d0/)
 
+  
    iChannel = int(xchannel * NumChannels)+1
 
 IF( iChannel.EQ.1 ) THEN   
@@ -4556,16 +4557,18 @@ ELSEIF( iChannel.EQ.4 ) THEN
    Jac  = Jac1*Jac2*Jac3 * PSNorm3                                                                                       !  combine  
    
 ELSE
-print *, xchannel , NumChannels
+   print *, xchannel , NumChannels
    call Error("PS channel not available in EvalPhasespace_VBF_NEW2",ichannel)
 ENDIF 
       
       
       if( IsNaN(Jac) ) then! THIS SHOULD BE REMOVED AFTER DEBUGGING
          Jac = 0d0
-         print *, "ERROR in EvalPhasespace_VBF_NEW2, NaN Jac",xchannel,xRnd
+         print *, "ERROR in EvalPhasespace_VBF_NEW2, NaN Jac",Energy,xchannel,xRnd
+         print *, "ERROR in Channel",ichannel
       endif
-   
+
+      
 !    print *, "OS checker", dsqrt( dabs(Mom(1:4,3).dot.Mom(1:4,3) ))
 !    print *, "OS checker", dsqrt( dabs(Mom(1:4,4).dot.Mom(1:4,4) ))
 !    print *, "OS checker", dsqrt( dabs(Mom(1:4,5).dot.Mom(1:4,5) ))
