@@ -4,7 +4,7 @@ module modHiggsJJ
   private
 
   public :: EvalAmp_WBFH_UnSymm_SA,EvalAmp_WBFH_UnSymm_SA_Select
-  public :: EvalAmp_SBFH_UnSymm_SA
+  public :: EvalAmp_SBFH_UnSymm_SA,EvalAmp_SBFH_UnSymm_SA_Select
   public :: get_VBFchannelHash,get_GENchannelHash
 
   !-- general definitions, to be merged with Markus final structure
@@ -376,6 +376,119 @@ module modHiggsJJ
     return
 
   end subroutine EvalAmp_SBFH_UnSymm_SA
+
+
+
+
+
+
+  !-- SM: |g2| = alphas/(six*pi)
+  !-- g3 not supported yet
+  subroutine EvalAmp_SBFH_UnSymm_SA_Select(p,ggcoupl,iSel,jSel,flav_tag,res)
+    real(dp), intent(in) :: p(4,5)
+    integer, intent(in) :: iSel,jSel,flav_tag
+    complex(dp), intent(in) :: ggcoupl(2:4)
+    real(dp), intent(out) :: res(-5:5,-5:5)
+    real(dp) :: sprod(4,4)
+    complex(dp) :: za(4,4), zb(4,4)
+    real(dp) :: restmp, restmpid
+    integer :: i, j
+
+    res = zero
+
+    call spinoru(4,(/-p(:,1),-p(:,2),p(:,3),p(:,4)/),za,zb,sprod)
+
+    !-- gg -> gg
+    call me2_ggggh(ggcoupl,1,2,3,4,za,zb,sprod,restmp)
+    restmp = restmp * avegg * SymmFac
+    res(0,0) = res(0,0) + restmp
+
+    !-- gg -> qqb
+    call me2_qbqggh(ggcoupl,4,3,1,2,za,zb,sprod,restmp)
+    restmp = restmp * avegg
+    res(0,0) = res(0,0) + restmp * nf
+
+    !-- gq -> gq
+    call me2_qbqggh(ggcoupl,2,4,1,3,za,zb,sprod,restmp)
+    restmp = restmp * aveqg
+    do i = 1,5
+       res(0,i) = res(0,i) + restmp
+       res(0,-i) = res(0,-i) + restmp
+    enddo
+    call me2_qbqggh(ggcoupl,1,4,2,3,za,zb,sprod,restmp)
+    restmp = restmp * aveqg
+    do i = 1,5
+       res(i,0) = res(i,0) + restmp
+       res(-i,0) = res(-i,0) + restmp
+    enddo
+
+    !-- qqb -> gg
+    call me2_qbqggh(ggcoupl,1,2,3,4,za,zb,sprod,restmp)
+    restmp = restmp * aveqq * SymmFac
+    do i = 1,5
+       res(i,-i) = res(i,-i) + restmp
+       res(-i,i) = res(-i,i) + restmp
+    enddo
+
+    !-- qqb -> qqb
+    call me2_qbqQBQ(ggcoupl,1,2,4,3,za,zb,sprod,restmp,restmpid)
+    restmp = restmpid * aveqq
+    do i = 1,5
+       res(i,-i) =res(i,-i) + restmp
+    enddo
+    call me2_qbqQBQ(ggcoupl,2,1,4,3,za,zb,sprod,restmp,restmpid)
+    restmp = restmpid * aveqq
+    do i = 1,5
+       res(-i,i) =res(-i,i) + restmp
+    enddo
+
+    !-- qqb -> rrb
+    call me2_qbqQBQ(ggcoupl,1,2,4,3,za,zb,sprod,restmp,restmpid)
+    restmp = restmp * aveqq
+    do i = 1,5
+       res(i,-i) =res(i,-i) + restmp * (nf-1.0_dp)
+       res(-i,i) = res(-i,i) + restmp * (nf-1.0_dp)
+    enddo
+
+    !-- qrb -> qrb
+    call me2_qbqQBQ(ggcoupl,1,3,4,2,za,zb,sprod,restmp,restmpid)
+    restmp = restmp * aveqq
+    do i = 1,5
+       do j = 1,5
+          if (i.ne.j) res(i,-j) = res(i,-j) + restmp
+       enddo
+    enddo
+    call me2_qbqQBQ(ggcoupl,2,3,4,1,za,zb,sprod,restmp,restmpid)
+    restmp = restmp * aveqq
+    do i = 1,5
+       do j = 1,5
+          if (i.ne.j) res(-j,i) = res(-j,i) + restmp
+       enddo
+    enddo
+
+    !-- qq -> qq
+    call me2_qbqQBQ(ggcoupl,1,3,2,4,za,zb,sprod,restmp,restmpid)
+    restmp = restmpid * aveqq * SymmFac
+    do i = 1,5
+       res(i,i) = res(i,i) + restmp
+       res(-i,-i) = res(-i,-i) + restmp
+    enddo
+
+    !-- qr -> qr
+    call me2_qbqQBQ(ggcoupl,1,3,2,4,za,zb,sprod,restmp,restmpid)
+    restmp = restmp * aveqq
+    do i = 1,5
+       do j = 1,5
+          if (i.ne.j) then
+             res(i,j) = res(i,j) + restmp
+             res(-i,-j) = res(-i,-j) + restmp
+          endif
+       enddo
+    enddo
+
+    return
+
+  end subroutine
 
 
 

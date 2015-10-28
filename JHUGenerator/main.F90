@@ -1211,7 +1211,7 @@ if( UseBetaVersion ) then
         i1 = ijSel(imax,1)
         j1 = ijSel(imax,2)
         RequEvents(i1,j1) = RequEvents(i1,j1) + MissingEvents
-        write(*,"(2X,A,I4)") "Adjusting number of events. New event count=",sum(RequEvents(:,:))
+        write(*,"(2X,A,I9)") "Adjusting number of events. New event count=",sum(RequEvents(:,:))
     endif
     
       
