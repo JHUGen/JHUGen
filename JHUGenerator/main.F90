@@ -1178,8 +1178,17 @@ if( UseBetaVersion ) then
     if( Process.eq.60 ) then
        call get_VBFchannelHash(ijSel)
     else
-       call get_GENchannelHash(ijSel)
+!        call get_GENchannelHash(ijSel)
+       call get_HJJchannelHash(ijSel)
     endif
+! do i=1,121
+!          i1 = ijSel(i,1)
+!          j1 = ijSel(i,2)
+!          if( j1.gt.i1 ) cycle
+!          write(io_stdout,"(1X,I3,A,I3,I3,A,3X,F8.3,I9)") i," Fractional partonic xsec ",i1,j1," "//getLHEParticle(i1)//" "//getLHEParticle(j1)//" ",CrossSec(i1,j1)/VG_Result,RequEvents(i1,j1) 
+! enddo
+! pause
+    
     do i=1,121
          i1 = ijSel(i,1)
          j1 = ijSel(i,2)

@@ -684,10 +684,10 @@ subroutine spinoru(N,p,za,zb,s)
 !---Arbitrary conventions of Bern, Dixon, Kosower, Weinzierl,                                                                                  
 !---za(i,j)*zb(j,i)=s(i,j)                      
       implicit none
-      real(8) :: p(:,:),two
+      real(8) :: p(1:4,1:N),two
       integer, parameter :: mxpart=14
-      complex(8):: c23(N),f(N),rt(N),za(:,:),zb(:,:),czero,cone,ci
-      real(8)   :: s(:,:)
+      complex(8):: c23(N),f(N),rt(N),za(1:N,1:N),zb(1:N,1:N),czero,cone,ci
+      real(8)   :: s(1:N,1:N)
       integer i,j,N
       
       if (size(p,1) .ne. N) then
