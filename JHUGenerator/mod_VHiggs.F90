@@ -30,7 +30,7 @@ contains
 
 
   subroutine EvalAmp_VHiggs(id,helicity,MomExt,inv_mass,mass,me2)
-      real(8), intent(in) :: MomExt(1:4,1:9) !beam_momentum(2,4),4_momentum(7,4)
+      real(8), intent(in) :: MomExt(1:4,1:9) !beam_momentum(2,4),four_momentum(7,4)
       !real(8) :: MomExt(1:4,1:9)
       real(8), intent(in) :: inv_mass(9)
       !real(8) :: inv_mass(9)
@@ -201,7 +201,7 @@ contains
       complex(8) function MATRIXELEMENT0(MomExt,inv_mass,mass,helicity,id)
       implicit none
       complex(8) dMATRIXELEMENT
-      real(8), intent(in) :: MomExt(1:4,1:9) !,4_momentum(7,4)
+      real(8), intent(in) :: MomExt(1:4,1:9) !,four_momentum(7,4)
       real(8), intent(in) :: inv_mass(9)
       real(8), intent(in) ::  mass(9,2)
       !real(8), intent(in) ::  beam_momentum(2,4)
@@ -1241,9 +1241,9 @@ contains
 !INV_LORENTZ.F
 !VERSION 20130602
 !
-!A subroutine that performs a general inverse boost to a 4 vector
-!(vector) based on another 4 vector (boost). The primed and
-!unprimed frames have their axes in parallel to 1 another.
+!A subroutine that performs a general inverse boost to a four vector
+!(vector) based on another four vector (boost). The primed and
+!unprimed frames have their axes in parallel to one another.
 !Rotation is not performed by this subroutine.
 
       subroutine INV_LORENTZ(vector, boost)
@@ -1272,7 +1272,7 @@ contains
 
       do i=2,4
       do j=2,4
-        lambda(i,j) = (gamma-1d0)*beta(i)*beta(j)/beta_sq + KR1CKER_DELTA(i,j)
+        lambda(i,j) = (gamma-1d0)*beta(i)*beta(j)/beta_sq + KRONECKER_DELTA(i,j)
       enddo
       enddo
 
@@ -1310,20 +1310,20 @@ contains
 
 
 
-!KR1CKER_DELTA.F
+!KRONECKER_DELTA.F
 
-!KR1CKER_DELTA(i,j)
+!KRONECKER_DELTA(i,j)
 !A function that returns 1 if i=j, and 0 otherwise.
-      real(8) function KR1CKER_DELTA(i,j)
+      real(8) function KRONECKER_DELTA(i,j)
       integer i,j
       if(i.eq.j)then
-        KR1CKER_DELTA = 1d0
+        KRONECKER_DELTA = 1d0
       else
-        KR1CKER_DELTA = 0d0
+        KRONECKER_DELTA = 0d0
       endif
 
       return
-      end function KR1CKER_DELTA
+      end function KRONECKER_DELTA
 
 
 
