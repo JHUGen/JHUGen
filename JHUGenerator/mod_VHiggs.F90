@@ -30,7 +30,7 @@ contains
 
 
   subroutine EvalAmp_VHiggs(id,helicity,MomExt,inv_mass,mass,me2)
-      real(8), intent(in) :: MomExt(1:4,1:9) !beam_momentum(2,4),four_momentum(7,4)
+      real(8), intent(in) :: MomExt(1:4,1:9) !beam_momentum(2,4),4_momentum(7,4)
       !real(8) :: MomExt(1:4,1:9)
       real(8), intent(in) :: inv_mass(9)
       !real(8) :: inv_mass(9)
@@ -52,75 +52,156 @@ contains
 
 
 
-!       complex(8) FUNCTION MATRIXELEMENT1(MomExt,inv_mass,mass,helicity,id)
-!       implicit none
-!       
-!       ! 12 --> 34 --> Z3-->56 + H4-->78
-! 
-! ! -+
-!       HelAmp =
-!      &  + IZfs(1)*VVHg3 * (  - za(p2,p6)*za(p6,p7)*zb(p1,p7)*zb(p5,p6)&
-!      &     - za(p2,p6)*za(p6,p8)*zb(p1,p8)*zb(p5,p6) - za(p2,p7)*za(p5,&
-!      &    p6)*zb(p1,p5)*zb(p5,p7) - za(p2,p8)*za(p5,p6)*zb(p1,p5)*zb(p5&
-!      &    ,p8) )
-!       HelAmp = HelAmp + IZfs(1)*VVHg2 * ( za(p2,p7)*za(p6,p7)*zb(p1,p7)&
-!      &    *zb(p5,p7) + za(p2,p7)*za(p6,p8)*zb(p1,p7)*zb(p5,p8) + za(p2,&
-!      &    p8)*za(p6,p7)*zb(p1,p8)*zb(p5,p7) + za(p2,p8)*za(p6,p8)*zb(p1&
-!      &    ,p8)*zb(p5,p8) )
-!       HelAmp = HelAmp + IZfs(1)*VVHg1 * (  - 2.*za(p2,p6)*zb(p1,p5) )
-! 
-! ! +-
-!       HelAmp =
-!      &  + IZfs(-1)*VVHg3 * (  - za(p1,p5)*za(p5,p7)*zb(p2,p5)*zb(p6,p7)&
-!      &     + za(p1,p5)*za(p5,p7)*zb(p2,p6)*zb(p5,p7) - za(p1,p5)*za(p5,&
-!      &    p8)*zb(p2,p5)*zb(p6,p8) + za(p1,p5)*za(p5,p8)*zb(p2,p6)*zb(p5&
-!      &    ,p8) + za(p1,p7)*za(p5,p6)*zb(p2,p6)*zb(p6,p7) + za(p1,p8)*&
-!      &    za(p5,p6)*zb(p2,p6)*zb(p6,p8) )
-!       HelAmp = HelAmp + IZfs(-1)*VVHg2 * ( za(p1,p7)*za(p5,p7)*zb(p2,p7&
-!      &    )*zb(p6,p7) + za(p1,p7)*za(p5,p8)*zb(p2,p7)*zb(p6,p8) + za(p1&
-!      &    ,p8)*za(p5,p7)*zb(p2,p8)*zb(p6,p7) + za(p1,p8)*za(p5,p8)*zb(&
-!      &    p2,p8)*zb(p6,p8) )
-!       HelAmp = HelAmp + IZfs(-1)*VVHg1 * (  - 2.*za(p1,p5)*zb(p2,p6) )
-! 
-! ! ++
-!       HelAmp =
-!      &  + IZfs(1)*VVHg3 * (  - za(p1,p6)*za(p6,p7)*zb(p2,p7)*zb(p5,p6)&
-!      &     - za(p1,p6)*za(p6,p8)*zb(p2,p8)*zb(p5,p6) - za(p1,p7)*za(p5,&
-!      &    p6)*zb(p2,p5)*zb(p5,p7) - za(p1,p8)*za(p5,p6)*zb(p2,p5)*zb(p5&
-!      &    ,p8) )
-!       HelAmp = HelAmp + IZfs(1)*VVHg2 * ( za(p1,p7)*za(p6,p7)*zb(p2,p7)&
-!      &    *zb(p5,p7) + za(p1,p7)*za(p6,p8)*zb(p2,p7)*zb(p5,p8) + za(p1,&
-!      &    p8)*za(p6,p7)*zb(p2,p8)*zb(p5,p7) + za(p1,p8)*za(p6,p8)*zb(p2&
-!      &    ,p8)*zb(p5,p8) )
-!       HelAmp = HelAmp + IZfs(1)*VVHg1 * (  - 2.*za(p1,p6)*zb(p2,p5) )
-! 
-! ! --
-!       HelAmp =
-!      &  + IZfs(-1)*VVHg3 * ( za(p2,p5)*za(p5,p7)*zb(p1,p7)*zb(p5,p6) + &
-!      &    za(p2,p5)*za(p5,p8)*zb(p1,p8)*zb(p5,p6) + za(p2,p7)*za(p5,p6)&
-!      &    *zb(p1,p6)*zb(p6,p7) + za(p2,p8)*za(p5,p6)*zb(p1,p6)*zb(p6,p8&
-!      &    ) )
-!       HelAmp = HelAmp + IZfs(-1)*VVHg2 * ( za(p2,p7)*za(p5,p7)*zb(p1,p7&
-!      &    )*zb(p6,p7) + za(p2,p7)*za(p5,p8)*zb(p1,p7)*zb(p6,p8) + za(p2&
-!      &    ,p8)*za(p5,p7)*zb(p1,p8)*zb(p6,p7) + za(p2,p8)*za(p5,p8)*zb(&
-!      &    p1,p8)*zb(p6,p8) )
-!       HelAmp = HelAmp + IZfs(-1)*VVHg1 * (  - 2.*za(p2,p5)*zb(p1,p6) )
-!   
-!   
-!   
-! 
-!       END FUNCTION
+      SUBROUTINE MATRIXELEMENT1(p,UnPolSqAmp)
+      use ModParameters
+      use ModMisc
+      implicit none
+      complex(8) :: SME(1:3,-1:+1,-1:+1),HelAmp
+      real(8) :: sprod(8,8),p(1:4,1:8),IZis(-1:+1),IZfs(-1:+1),UnpolSqAmp
+      real(8) :: PreFac
+      complex(8) :: za(8,8), zb(8,8),a1HVV,a2HVV,a3HVV
+      integer :: ishel,fshel
+      
+      
+      call spinoru(8,(/-p(1:4,1),-p(1:4,2),p(1:4,5)+p(1:4,6),p(1:4,7)+p(1:4,8),p(1:4,5),p(1:4,6),p(1:4,7),p(1:4,8)/),za,zb,sprod)
 
+      
+      ! 12 --> 34 --> Z3-->56 + H4-->78
+
+      SME(1,+1,+1) = + IZfs(1) * (  - 2d0*za(1,6)*zb(2,3) )
+
+      SME(2,+1,+1) =  + IZfs(1) * ( za(1,3)*za(6,7)*zb(2,3)*zb(&
+     &    3,7) + za(1,3)*za(6,7)*zb(2,3)*zb(&
+     &    3,8) + za(1,3)*za(6,7)*zb(2,6)*zb(&
+     &    3,7) + za(1,3)*za(6,7)*zb(2,6)*zb(&
+     &    3,8) + za(1,3)*za(6,8)*zb(2,3)*zb(&
+     &    3,7) + za(1,3)*za(6,8)*zb(2,3)*zb(&
+     &    3,8) + za(1,3)*za(6,8)*zb(2,6)*zb(&
+     &    3,7) + za(1,3)*za(6,8)*zb(2,6)*zb(&
+     &    3,8) + za(1,6)*za(6,7)*zb(2,3)*zb(&
+     &    3,7) + za(1,6)*za(6,7)*zb(2,3)*zb(&
+     &    3,8) + za(1,6)*za(6,7)*zb(2,6)*zb(3&
+     &    ,7) + za(1,6)*za(6,7)*zb(2,6)*zb(3,&
+     &    8) + za(1,6)*za(6,8)*zb(2,3)*zb(3,&
+     &    7) + za(1,6)*za(6,8)*zb(2,3)*zb(3,&
+     &    8) + za(1,6)*za(6,8)*zb(2,6)*zb(3,7&
+     &    ) )
+      SME(2,+1,+1) =  SME(2,+1,+1) + IZfs(1) * ( za(1,6)*za(6,&
+     &    8)*zb(2,6)*zb(3,8) )
+
+      SME(3,+1,+1) =  + IZfs(1) * (  - za(1,6)*za(6,7)*zb(2,7)*zb(&
+     &    3,6) - za(1,6)*za(6,8)*zb(2,8)*zb(3&
+     &    ,6) - za(1,7)*za(3,6)*zb(2,3)*zb(3,&
+     &    7) - za(1,8)*za(3,6)*zb(2,3)*zb(3,&
+     &    8) )
+
+      SME(1,+1,-1) =  + IZfs(-1) * (  - 2d0*za(1,3)*zb(2,6) )
+
+      SME(2,+1,-1) = + IZfs(-1) * ( za(1,3)*za(3,7)*zb(2,3)*zb(&
+     &    6,7) + za(1,3)*za(3,7)*zb(2,3)*zb(&
+     &    6,8) + za(1,3)*za(3,7)*zb(2,6)*zb(6&
+     &    ,7) + za(1,3)*za(3,7)*zb(2,6)*zb(6,&
+     &    8) + za(1,3)*za(3,8)*zb(2,3)*zb(6,&
+     &    7) + za(1,3)*za(3,8)*zb(2,3)*zb(6,&
+     &    8) + za(1,3)*za(3,8)*zb(2,6)*zb(6,&
+     &    7) + za(1,3)*za(3,8)*zb(2,6)*zb(6,&
+     &    8) + za(1,6)*za(3,7)*zb(2,3)*zb(6,&
+     &    7) + za(1,6)*za(3,7)*zb(2,3)*zb(6,&
+     &    8) + za(1,6)*za(3,7)*zb(2,6)*zb(6,7&
+     &    ) + za(1,6)*za(3,7)*zb(2,6)*zb(6,8) + &
+     &    za(1,6)*za(3,8)*zb(2,3)*zb(6,7) + za(&
+     &    1,6)*za(3,8)*zb(2,3)*zb(6,8) + za(1&
+     &    ,6)*za(3,8)*zb(2,6)*zb(6,7) + za(1,6)&
+     &    *za(3,8)*zb(2,6)*zb(6,8) )
+
+      SME(3,+1,-1) =  + IZfs(-1) * (  - za(1,3)*za(3,7)*zb(2,3)*&
+     &    zb(6,7) + za(1,3)*za(3,7)*zb(2,6)*zb(&
+     &    3,7) - za(1,3)*za(3,8)*zb(2,3)*&
+     &    zb(6,8) + za(1,3)*za(3,8)*zb(2,6)*zb(&
+     &    3,8) - za(1,3)*za(6,7)*zb(2,6)*zb(6&
+     &    ,7) - za(1,3)*za(6,8)*zb(2,6)*zb(6,&
+     &    8) + za(1,6)*za(3,7)*zb(2,6)*zb(6,7&
+     &    ) + za(1,6)*za(3,8)*zb(2,6)*zb(6,8) )
+
+      SME(1,-1,+1) =  + IZfs(1) * (  - 2d0*za(2,6)*zb(1,3) )
+
+      SME(2,-1,+1) =  + IZfs(1) * ( za(2,3)*za(6,7)*zb(1,3)*zb(&
+     &    3,7) + za(2,3)*za(6,7)*zb(1,3)*zb(&
+     &    3,8) + za(2,3)*za(6,7)*zb(1,6)*zb(&
+     &    3,7) + za(2,3)*za(6,7)*zb(1,6)*zb(&
+     &    3,8) + za(2,3)*za(6,8)*zb(1,3)*zb(&
+     &    3,7) + za(2,3)*za(6,8)*zb(1,3)*zb(&
+     &    3,8) + za(2,3)*za(6,8)*zb(1,6)*zb(&
+     &    3,7) + za(2,3)*za(6,8)*zb(1,6)*zb(&
+     &    3,8) + za(2,6)*za(6,7)*zb(1,3)*zb(&
+     &    3,7) + za(2,6)*za(6,7)*zb(1,3)*zb(&
+     &    3,8) + za(2,6)*za(6,7)*zb(1,6)*zb(3&
+     &    ,7) + za(2,6)*za(6,7)*zb(1,6)*zb(3,&
+     &    8) + za(2,6)*za(6,8)*zb(1,3)*zb(3,&
+     &    7) + za(2,6)*za(6,8)*zb(1,3)*zb(3,&
+     &    8) + za(2,6)*za(6,8)*zb(1,6)*zb(3,7&
+     &    ) )
+      SME(2,-1,+1) =  SME(2,-1,+1) + IZfs(1) * ( za(2,6)*za(6,&
+     &    8)*zb(1,6)*zb(3,8) )
+
+      SME(3,-1,+1) =  + IZfs(1) * (  - za(2,6)*za(6,7)*zb(1,7)*zb(&
+     &    3,6) - za(2,6)*za(6,8)*zb(1,8)*zb(3&
+     &    ,6) - za(2,7)*za(3,6)*zb(1,3)*zb(3,&
+     &    7) - za(2,8)*za(3,6)*zb(1,3)*zb(3,&
+     &    8) )
+
+      SME(1,-1,-1) =  + IZfs(-1) * (  - 2d0*za(2,3)*zb(1,6) )
+
+      SME(2,-1,-1) =  + IZfs(-1) * ( za(2,3)*za(3,7)*zb(1,3)*zb(&
+     &    6,7) + za(2,3)*za(3,7)*zb(1,3)*zb(&
+     &    6,8) + za(2,3)*za(3,7)*zb(1,6)*zb(6&
+     &    ,7) + za(2,3)*za(3,7)*zb(1,6)*zb(6,&
+     &    8) + za(2,3)*za(3,8)*zb(1,3)*zb(6,&
+     &    7) + za(2,3)*za(3,8)*zb(1,3)*zb(6,&
+     &    8) + za(2,3)*za(3,8)*zb(1,6)*zb(6,&
+     &    7) + za(2,3)*za(3,8)*zb(1,6)*zb(6,&
+     &    8) + za(2,6)*za(3,7)*zb(1,3)*zb(6,&
+     &    7) + za(2,6)*za(3,7)*zb(1,3)*zb(6,&
+     &    8) + za(2,6)*za(3,7)*zb(1,6)*zb(6,7&
+     &    ) + za(2,6)*za(3,7)*zb(1,6)*zb(6,8) + &
+     &    za(2,6)*za(3,8)*zb(1,3)*zb(6,7) + za(&
+     &    2,6)*za(3,8)*zb(1,3)*zb(6,8) + za(2&
+     &    ,6)*za(3,8)*zb(1,6)*zb(6,7) + za(2,6)&
+     &    *za(3,8)*zb(1,6)*zb(6,8) )
+
+      SME(3,-1,-1) =   + IZfs(-1) * ( za(2,3)*za(3,7)*zb(1,7)*zb(&
+     &    3,6) + za(2,3)*za(3,8)*zb(1,8)*zb(&
+     &    3,6) + za(2,7)*za(3,6)*zb(1,6)*zb(6,&
+     &    7) + za(2,8)*za(3,6)*zb(1,6)*zb(6,8&
+     &    ) )
+
+
+     PreFac = dsqrt(4d0*Pi*alpha_QED)*1d0/(M_Reso**2 + 2*sprod(3,4))/vev
+
+     do ishel=-1,+1,2
+     do fshel=-1,+1,2
+          HelAmp =  a3HVV * (  - IZis(ishel)*SME(3,ishel,fshel)  )          &
+                  + a2HVV * (  - IZis(ishel)*SME(2,ishel,fshel)  )          &
+                  + a1HVV * (  + IZis(ishel)*SME(1,ishel,fshel)  )*M_V**2
+          HelAmp = HelAmp * PreFac
+          UnPolSqAmp = UnPolSqAmp + HelAmp*dconjg(HelAmp)
+          
+      enddo
+      enddo
+
+      RETURN
+      END SUBROUTINE
+
+      
+      
+      
       
 !MATRIXELEMENT0.F
 !VERSION 20130710
-
-!
-
       complex(8) function MATRIXELEMENT0(MomExt,inv_mass,mass,helicity,id)
       implicit none
       complex(8) dMATRIXELEMENT
-      real(8), intent(in) :: MomExt(1:4,1:9) !,four_momentum(7,4)
+      real(8), intent(in) :: MomExt(1:4,1:9) !,4_momentum(7,4)
       real(8), intent(in) :: inv_mass(9)
       real(8), intent(in) ::  mass(9,2)
       !real(8), intent(in) ::  beam_momentum(2,4)
@@ -392,10 +473,10 @@ contains
       subroutine ANGLES(sincos, vector)
       implicit none
 !     real(8) Pi
-      real(8) Twopi, Fourpi, epsilon
+      real(8) twopi, fourpi, epsilon
 !     parameter( Pi = 3.14159265358979323846d0 )
-      parameter( Twopi = 2d0 * Pi )
-      parameter( Fourpi = 4d0 * Pi )
+      parameter( twopi = 2d0 * Pi )
+      parameter( fourpi = 4d0 * Pi )
       parameter( epsilon = 1d-13 ) !a small quantity slightly above machine precision
       real(8) sincos(4), vector(4), abs3p, phi
 !sincos(1)=cos(theta)
@@ -420,17 +501,17 @@ contains
         phi=0d0
       else
         if(dabs(vector(2)).lt.epsilon)then
-           phi=(TwoPi/2d0)/2d0 * dsign(1d0,vector(3))
+           phi=(twopi/2d0)/2d0 * dsign(1d0,vector(3))
         else
            phi=datan(vector(3)/vector(2))
         endif
       endif
-!shift phi so that 0 < phi < 2Pi
+!shift phi so that 0 < phi < twopi
       if(vector(2).lt.0d0)then
             phi=phi+Pi
       endif
       if(phi.lt.0d0)then
-            phi=phi+Twopi
+            phi=phi+twopi
       endif
 !     print *,phi
       sincos(3)=dcos(phi)
@@ -470,10 +551,10 @@ contains
 
       implicit none
 !     real(8) Pi
-      real(8) Twopi, Fourpi, epsilon
+      real(8) twopi, fourpi, epsilon
 !     parameter( Pi = 3.14159265358979323846d0 )
-      parameter( Twopi = 2d0 * Pi )
-      parameter( Fourpi = 4d0 * Pi )
+      parameter( twopi = 2d0 * Pi )
+      parameter( fourpi = 4d0 * Pi )
       parameter( epsilon = 1d-13 ) !a small quantity slightly above machine precision
 
       complex(8) p1(4), p2(4)
@@ -568,10 +649,10 @@ contains
 
       implicit none
 !     real(8) Pi
-      real(8) Twopi, Fourpi, epsilon
+      real(8) twopi, fourpi, epsilon
 !     parameter( Pi = 3.14159265358979323846d0 )
-      parameter( Twopi = 2d0 * Pi )
-      parameter( Fourpi = 4d0 * Pi )
+      parameter( twopi = 2d0 * Pi )
+      parameter( fourpi = 4d0 * Pi )
       parameter( epsilon = 1d-13 ) !a small quantity slightly above machine precision
       complex(8) epep(4,4),emem(4,4),epe0(4,4),eme0(4,4),e0e0(4,4)
       complex(8) epem(4,4),e0ep(4,4),e0em(4,4),emep(4,4)
@@ -686,10 +767,10 @@ contains
 
       implicit none
 !     real(8) Pi
-      real(8) Twopi, Fourpi, epsilon
+      real(8) twopi, fourpi, epsilon
 !     parameter( Pi = 3.14159265358979323846d0 )
-      parameter( Twopi = 2d0 * Pi )
-      parameter( Fourpi = 4d0 * Pi )
+      parameter( twopi = 2d0 * Pi )
+      parameter( fourpi = 4d0 * Pi )
       parameter( epsilon = 1d-13 ) !a small quantity slightly above machine precision
       complex(8) epep(4,4),emem(4,4),epe0(4,4),eme0(4,4),e0e0(4,4)
       complex(8) epem(4,4),e0ep(4,4),e0em(4,4),emep(4,4)
@@ -788,7 +869,7 @@ contains
 !COVARIANT_VECTOR.F
 !VERSION 20130703
 
-!returns the component of the COVARIANT vector for given 4-vector
+!returns the comp1nt of the COVARIANT vector for given 4-vector
 !and Lorentz index.
 
       complex(8) function COVARIANT_VECTOR(p,mu)
@@ -1160,9 +1241,9 @@ contains
 !INV_LORENTZ.F
 !VERSION 20130602
 !
-!A subroutine that performs a general inverse boost to a four vector
-!(vector) based on another four vector (boost). The primed and
-!unprimed frames have their axes in parallel to one another.
+!A subroutine that performs a general inverse boost to a 4 vector
+!(vector) based on another 4 vector (boost). The primed and
+!unprimed frames have their axes in parallel to 1 another.
 !Rotation is not performed by this subroutine.
 
       subroutine INV_LORENTZ(vector, boost)
@@ -1191,7 +1272,7 @@ contains
 
       do i=2,4
       do j=2,4
-        lambda(i,j) = (gamma-1d0)*beta(i)*beta(j)/beta_sq + KRONECKER_DELTA(i,j)
+        lambda(i,j) = (gamma-1d0)*beta(i)*beta(j)/beta_sq + KR1CKER_DELTA(i,j)
       enddo
       enddo
 
@@ -1229,20 +1310,20 @@ contains
 
 
 
-!KRONECKER_DELTA.F
+!KR1CKER_DELTA.F
 
-!KRONECKER_DELTA(i,j)
+!KR1CKER_DELTA(i,j)
 !A function that returns 1 if i=j, and 0 otherwise.
-      real(8) function KRONECKER_DELTA(i,j)
+      real(8) function KR1CKER_DELTA(i,j)
       integer i,j
       if(i.eq.j)then
-        KRONECKER_DELTA = 1d0
+        KR1CKER_DELTA = 1d0
       else
-        KRONECKER_DELTA = 0d0
+        KR1CKER_DELTA = 0d0
       endif
 
       return
-      end function KRONECKER_DELTA
+      end function KR1CKER_DELTA
 
 
 

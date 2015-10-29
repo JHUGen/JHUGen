@@ -5,7 +5,7 @@ module modHiggsJJ
 
   public :: EvalAmp_WBFH_UnSymm_SA,EvalAmp_WBFH_UnSymm_SA_Select
   public :: EvalAmp_SBFH_UnSymm_SA,EvalAmp_SBFH_UnSymm_SA_Select
-  public :: get_VBFchannelHash,get_GENchannelHash
+  public :: get_VBFchannelHash,get_HJJchannelHash,get_GENchannelHash
 
   !-- general definitions, to be merged with Markus final structure
   integer, parameter  :: dp = selected_real_kind(15)
@@ -134,6 +134,92 @@ module modHiggsJJ
   
   
 
+  subroutine get_HJJchannelHash(ijSel)
+  implicit none
+  integer, intent(out) :: ijSel(1:121,1:3)
+  
+      ijSel(  1,1:3) = (/ 0, 0, 1/)
+      ijSel(  2,1:3) = (/ 0, 0, 2/)
+      ijSel(  3,1:3) = (/ 2, 0, 1/)
+      ijSel(  4,1:3) = (/ 1, 0, 1/)
+      ijSel(  5,1:3) = (/ 0,-1, 1/)
+      ijSel(  6,1:3) = (/ 0,-2, 1/)
+      ijSel(  7,1:3) = (/ 3, 0, 1/)
+      ijSel(  8,1:3) = (/ 0,-3, 1/)
+      ijSel(  9,1:3) = (/ 4, 0, 1/)
+      ijSel( 10,1:3) = (/ 0,-4, 1/)
+      ijSel( 11,1:3) = (/ 5, 0, 1/)
+      ijSel( 12,1:3) = (/ 0,-5, 1/)
+      ijSel( 13,1:3) = (/ 2, 2, 1/)
+      ijSel( 14,1:3) = (/ 2, 1, 1/)
+      ijSel( 15,1:3) = (/ 2,-2, 1/)
+      ijSel( 16,1:3) = (/ 2,-2, 2/)
+      ijSel( 17,1:3) = (/ 2,-2, 3/)
+      ijSel( 18,1:3) = (/ 1,-1, 1/)
+      ijSel( 19,1:3) = (/ 1,-1, 2/)
+      ijSel( 20,1:3) = (/ 1,-1, 3/)
+      ijSel( 21,1:3) = (/ 2,-1, 1/)
+      ijSel( 22,1:3) = (/ 1, 1, 1/)
+      ijSel( 23,1:3) = (/ 3, 2, 1/)
+      ijSel( 24,1:3) = (/ 2,-3, 1/)
+      ijSel( 25,1:3) = (/ 4, 2, 1/)
+      ijSel( 26,1:3) = (/ 1,-2, 1/)
+      ijSel( 27,1:3) = (/ 2,-4, 1/)
+      ijSel( 28,1:3) = (/ 1,-3, 1/)
+      ijSel( 29,1:3) = (/ 2,-5, 1/)
+      ijSel( 30,1:3) = (/ 3, 1, 1/)
+      ijSel( 31,1:3) = (/ 5, 2, 1/)
+      ijSel( 32,1:3) = (/ 4, 1, 1/)
+      ijSel( 33,1:3) = (/ 1,-4, 1/)
+      ijSel( 34,1:3) = (/ 5, 1, 1/)
+      ijSel( 35,1:3) = (/ 1,-5, 1/)
+      ijSel( 36,1:3) = (/-1,-2, 1/)
+      ijSel( 37,1:3) = (/ 3,-1, 1/)
+      ijSel( 38,1:3) = (/ 3,-3, 1/)
+      ijSel( 39,1:3) = (/ 3,-3, 2/)
+      ijSel( 40,1:3) = (/ 3,-3, 3/)
+      ijSel( 41,1:3) = (/-2,-3, 1/)
+      ijSel( 42,1:3) = (/-1,-3, 1/)
+      ijSel( 43,1:3) = (/ 3,-2, 1/)
+      ijSel( 44,1:3) = (/-1,-1, 1/)
+      ijSel( 45,1:3) = (/ 4,-1, 1/)
+      ijSel( 46,1:3) = (/-2,-2, 1/)
+      ijSel( 47,1:3) = (/-1,-4, 1/)
+      ijSel( 48,1:3) = (/ 4,-2, 1/)
+      ijSel( 49,1:3) = (/-2,-4, 1/)
+      ijSel( 50,1:3) = (/ 5,-1, 1/)
+      ijSel( 51,1:3) = (/-1,-5, 1/)
+      ijSel( 52,1:3) = (/ 4,-4, 1/)
+      ijSel( 53,1:3) = (/ 4,-4, 2/)
+      ijSel( 54,1:3) = (/ 4,-4, 3/)
+      ijSel( 55,1:3) = (/ 4,-3, 1/)
+      ijSel( 56,1:3) = (/ 4, 3, 1/)
+      ijSel( 57,1:3) = (/ 3,-4, 1/)
+      ijSel( 58,1:3) = (/-2,-5, 1/)
+      ijSel( 59,1:3) = (/-3,-4, 1/)
+      ijSel( 60,1:3) = (/ 5,-2, 1/)
+      ijSel( 61,1:3) = (/ 3, 3, 1/)
+      ijSel( 62,1:3) = (/-3,-3, 1/)
+      ijSel( 63,1:3) = (/ 5, 3, 1/)
+      ijSel( 64,1:3) = (/ 3,-5, 1/)
+      ijSel( 65,1:3) = (/ 5,-3, 1/)
+      ijSel( 66,1:3) = (/-3,-5, 1/)
+      ijSel( 67,1:3) = (/ 5, 4, 1/)
+      ijSel( 68,1:3) = (/ 5,-4, 1/)
+      ijSel( 69,1:3) = (/-4,-5, 1/)
+      ijSel( 70,1:3) = (/ 4,-5, 1/)
+      ijSel( 71,1:3) = (/ 5,-5, 1/)
+      ijSel( 72,1:3) = (/ 5,-5, 2/)
+      ijSel( 73,1:3) = (/ 5,-5, 3/)
+      ijSel( 74,1:3) = (/-4,-4, 1/)
+      ijSel( 75,1:3) = (/ 4, 4, 1/)
+      ijSel( 76,1:3) = (/-5,-5, 1/)
+      ijSel( 77,1:3) = (/ 5, 5, 1/)
+      
+      ijSel( 78:,:) = 0 
+  
+  return
+  end subroutine
   
   
   
@@ -398,95 +484,124 @@ module modHiggsJJ
 
     call spinoru(4,(/-p(:,1),-p(:,2),p(:,3),p(:,4)/),za,zb,sprod)
 
+    
     !-- gg -> gg
-    call me2_ggggh(ggcoupl,1,2,3,4,za,zb,sprod,restmp)
-    restmp = restmp * avegg * SymmFac
-    res(0,0) = res(0,0) + restmp
+    if( iSel.eq.pdfGlu_ .and. jSel.eq.pdfGlu_ .and. flav_tag.eq.1 ) then
+        call me2_ggggh(ggcoupl,1,2,3,4,za,zb,sprod,restmp)
+        restmp = restmp * avegg * SymmFac
+        res(iSel,jSel) = restmp
+        return
+    endif
+
 
     !-- gg -> qqb
-    call me2_qbqggh(ggcoupl,4,3,1,2,za,zb,sprod,restmp)
-    restmp = restmp * avegg
-    res(0,0) = res(0,0) + restmp * nf
+    if( iSel.eq.pdfGlu_ .and. jSel.eq.pdfGlu_ .and. flav_tag.eq.2 ) then
+        call me2_qbqggh(ggcoupl,4,3,1,2,za,zb,sprod,restmp)
+        restmp = restmp * avegg
+        res(iSel,jSel) = restmp * nf   
+        return     
+    endif
+
+
 
     !-- gq -> gq
-    call me2_qbqggh(ggcoupl,2,4,1,3,za,zb,sprod,restmp)
-    restmp = restmp * aveqg
-    do i = 1,5
-       res(0,i) = res(0,i) + restmp
-       res(0,-i) = res(0,-i) + restmp
-    enddo
-    call me2_qbqggh(ggcoupl,1,4,2,3,za,zb,sprod,restmp)
-    restmp = restmp * aveqg
-    do i = 1,5
-       res(i,0) = res(i,0) + restmp
-       res(-i,0) = res(-i,0) + restmp
-    enddo
+    if( iSel.eq.pdfGlu_ .and. jSel.ne.0 ) then    
+        call me2_qbqggh(ggcoupl,2,4,1,3,za,zb,sprod,restmp)
+        restmp = restmp * aveqg
+        res(iSel,jSel) = restmp
+        return        
+    endif
+    
+    if( jSel.eq.pdfGlu_ .and. iSel.ne.0 ) then    
+        call me2_qbqggh(ggcoupl,1,4,2,3,za,zb,sprod,restmp)
+        restmp = restmp * aveqg
+        res(iSel,jSel) = restmp  
+        return      
+    endif
 
+    
+    
     !-- qqb -> gg
-    call me2_qbqggh(ggcoupl,1,2,3,4,za,zb,sprod,restmp)
-    restmp = restmp * aveqq * SymmFac
-    do i = 1,5
-       res(i,-i) = res(i,-i) + restmp
-       res(-i,i) = res(-i,i) + restmp
-    enddo
+    if( iSel.ne.0 .and. jSel.eq.-iSel .and. flav_tag.eq.1 ) then    
+        call me2_qbqggh(ggcoupl,1,2,3,4,za,zb,sprod,restmp)
+        restmp = restmp * aveqq * SymmFac
+        res(iSel,jSel) = restmp  
+        return      
+    endif
+       
 
     !-- qqb -> qqb
-    call me2_qbqQBQ(ggcoupl,1,2,4,3,za,zb,sprod,restmp,restmpid)
-    restmp = restmpid * aveqq
-    do i = 1,5
-       res(i,-i) =res(i,-i) + restmp
-    enddo
-    call me2_qbqQBQ(ggcoupl,2,1,4,3,za,zb,sprod,restmp,restmpid)
-    restmp = restmpid * aveqq
-    do i = 1,5
-       res(-i,i) =res(-i,i) + restmp
-    enddo
+    if( iSel.gt.0 .and. jSel.eq.-iSel .and. flav_tag.eq.2 ) then    
+        call me2_qbqQBQ(ggcoupl,1,2,4,3,za,zb,sprod,restmp,restmpid)
+        restmp = restmpid * aveqq
+        res(iSel,jSel) = restmp   
+        return     
+    endif
+    
+    if( iSel.lt.0 .and. jSel.eq.-iSel .and. flav_tag.eq.2 ) then    
+        call me2_qbqQBQ(ggcoupl,2,1,4,3,za,zb,sprod,restmp,restmpid)
+        restmp = restmpid * aveqq
+        res(iSel,jSel) = restmp     
+        return   
+    endif    
+    
 
     !-- qqb -> rrb
-    call me2_qbqQBQ(ggcoupl,1,2,4,3,za,zb,sprod,restmp,restmpid)
-    restmp = restmp * aveqq
-    do i = 1,5
-       res(i,-i) =res(i,-i) + restmp * (nf-1.0_dp)
-       res(-i,i) = res(-i,i) + restmp * (nf-1.0_dp)
-    enddo
-
+    if( iSel.ne.0 .and. jSel.eq.-iSel .and. flav_tag.eq.3 ) then    
+        call me2_qbqQBQ(ggcoupl,1,2,4,3,za,zb,sprod,restmp,restmpid)
+        restmp = restmp * aveqq
+        res(iSel,jSel) = restmp     * (nf-1.0_dp)   
+        return 
+    endif
+    
+    
+    
     !-- qrb -> qrb
-    call me2_qbqQBQ(ggcoupl,1,3,4,2,za,zb,sprod,restmp,restmpid)
-    restmp = restmp * aveqq
-    do i = 1,5
-       do j = 1,5
-          if (i.ne.j) res(i,-j) = res(i,-j) + restmp
-       enddo
-    enddo
-    call me2_qbqQBQ(ggcoupl,2,3,4,1,za,zb,sprod,restmp,restmpid)
-    restmp = restmp * aveqq
-    do i = 1,5
-       do j = 1,5
-          if (i.ne.j) res(-j,i) = res(-j,i) + restmp
-       enddo
-    enddo
+    if( iSel.gt.0 .and. jSel.lt.0 .and. iSel.ne.jSel ) then    
+        call me2_qbqQBQ(ggcoupl,1,3,4,2,za,zb,sprod,restmp,restmpid)
+        restmp = restmp * aveqq
+        res(iSel,jSel) = restmp
+        return
+    endif     
 
+    if( iSel.lt.0 .and. jSel.gt.0 .and. iSel.ne.jSel ) then    
+        call me2_qbqQBQ(ggcoupl,2,3,4,1,za,zb,sprod,restmp,restmpid)
+        restmp = restmp * aveqq
+        res(iSel,jSel) = restmp
+        return
+    endif      
+    
+    
+    
+    
     !-- qq -> qq
-    call me2_qbqQBQ(ggcoupl,1,3,2,4,za,zb,sprod,restmp,restmpid)
-    restmp = restmpid * aveqq * SymmFac
-    do i = 1,5
-       res(i,i) = res(i,i) + restmp
-       res(-i,-i) = res(-i,-i) + restmp
-    enddo
+    if( iSel.ne.0 .and. iSel.eq.jSel ) then    
+        call me2_qbqQBQ(ggcoupl,1,3,2,4,za,zb,sprod,restmp,restmpid)
+        restmp = restmpid * aveqq * SymmFac
+        res(iSel,jSel) = restmp
+        return
+    endif
+    
 
+    
     !-- qr -> qr
-    call me2_qbqQBQ(ggcoupl,1,3,2,4,za,zb,sprod,restmp,restmpid)
-    restmp = restmp * aveqq
-    do i = 1,5
-       do j = 1,5
-          if (i.ne.j) then
-             res(i,j) = res(i,j) + restmp
-             res(-i,-j) = res(-i,-j) + restmp
-          endif
-       enddo
-    enddo
+    if( iSel.gt.0 .and. jSel.gt.0 .and. iSel.ne.jSel ) then    
+        call me2_qbqQBQ(ggcoupl,1,3,2,4,za,zb,sprod,restmp,restmpid)
+        restmp = restmp * aveqq
+        res(iSel,jSel) = restmp
+        return
+    endif
+    
+    if( iSel.lt.0 .and. jSel.lt.0 .and. iSel.ne.jSel ) then    
+        call me2_qbqQBQ(ggcoupl,1,3,2,4,za,zb,sprod,restmp,restmpid)
+        restmp = restmp * aveqq
+        res(iSel,jSel) = restmp
+        return
+    endif
+    
+    
 
-    return
+  return
 
   end subroutine
 
