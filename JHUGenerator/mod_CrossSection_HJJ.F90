@@ -291,7 +291,7 @@ END FUNCTION
    real(8) :: MomExt(1:4,1:5), PSWgt
    real(8) :: me2(-5:5,-5:5)
    integer :: i,j,MY_IDUP(1:5),ICOLUP(1:2,1:5),NBin(1:NumHistograms),NHisto
-   integer :: iPartChannel,PartChannelAvg,NumPartonicChannels,ijSel(1:121,1:3)
+   integer :: iPartChannel,PartChannelAvg,NumPartonicChannels,ijSel(1:121,1:3),flavor_tag
    real(8) :: LO_Res_Unpol, PreFac,xRnd,partonic_flip
    logical :: applyPSCut,ZZ_Fusion
    integer, parameter :: ij_neg_offset=6, ij_max=+5
@@ -309,19 +309,16 @@ END FUNCTION
       ZZ_Fusion = .false.      
       if( ijSel(iPartChannel,3).eq.1 ) ZZ_Fusion = .true.   
    elseif( Process.eq.61 ) then
-      NumPartonicChannels = 121
-      iPartChannel = int(yRnd(8) * (NumPartonicChannels)) ! this runs from 0..121
-      iPart_sel = iPartChannel/ij_num + 1 -ij_neg_offset
-      jPart_sel = (iPartChannel+1) - (iPart_sel-1+ij_neg_offset)*ij_num - ij_neg_offset        
-      if( jPart_sel.gt.iPart_sel ) return !  sort by i>j   
+      NumPartonicChannels = 77
+      iPartChannel = int(yRnd(8) * (NumPartonicChannels)) +1 ! this runs from 1..77
+      call get_HJJchannelHash(ijSel)      
+      iPart_sel = ijSel(iPartChannel,1)
+      jPart_sel = ijSel(iPartChannel,2)   
+      flavor_tag= ijSel(iPartChannel,3)      
    endif   
    PartChannelAvg = NumPartonicChannels
 
-   
-! iPart_sel = 1
-! jPart_sel = 1
-
-
+  
    if( unweighted .and. .not.warmup .and.  sum(AccepCounter_part(:,:)) .eq. sum(RequEvents(:,:)) ) then 
       stopvegas=.true.
    endif
@@ -351,7 +348,8 @@ END FUNCTION
    if( Process.eq.60 ) then
       call EvalAmp_WBFH_UnSymm_SA_Select( MomExt,(/ghz1,ghz2,ghz3,ghz4/),(/ghw1,ghw2,ghw3,ghw4/),iPart_sel,jPart_sel,zz_fusion,me2)                 
    elseif( Process.eq.61 ) then
-      call EvalAmp_SBFH_UnSymm_SA(MomExt,(/ghg2,ghg3,ghg4/),me2)
+!       call EvalAmp_SBFH_UnSymm_SA(MomExt,(/ghg2,ghg3,ghg4/),me2)
+      call EvalAmp_SBFH_UnSymm_SA_Select(MomExt,(/ghg2,ghg3,ghg4/),iPart_sel,jPart_sel,flavor_tag,me2)
       me2 = me2 * (2d0/3d0*alphas**2)**2 
    endif
    
@@ -422,12 +420,29 @@ if( unweighted ) then
 
    elseif( Process.eq.61 ) then
 
-      MY_IDUP(1:5)  = (/LHA2M_ID(iPart_sel),LHA2M_ID(jPart_sel),LHA2M_ID(iPart_sel),LHA2M_ID(jPart_sel),Hig_/)
+      MY_IDUP(1:5) = (/LHA2M_ID(iPart_sel),LHA2M_ID(jPart_sel),LHA2M_ID(iPart_sel),LHA2M_ID(jPart_sel),Hig_/)! flavor default is out3=in1 out4=in2
       if( MY_IDUP(1).eq.Glu_ .and. MY_IDUP(2).eq.Glu_ ) then! gg->gg
           ICOLUP(1:2,1) = (/501,502/)
-          ICOLUP(1:2,2) = (/503,501/)
-          ICOLUP(1:2,3) = (/504,502/)
-          ICOLUP(1:2,4) = (/503,504/)
+          ICOLUP(1:2,2) = (/503,501/)      
+          if( flavor_tag.eq.2 ) then
+             call random_number(xRnd)
+             ICOLUP(1:2,3) = (/000,502/)
+             ICOLUP(1:2,4) = (/503,000/)             
+             if( xRnd.lt.1d0/5d0 ) then
+                MY_IDUP(3:4) = (/Up_,AUp_/)
+             elseif( xRnd.lt.2d0/5d0 ) then
+                MY_IDUP(3:4) = (/Dn_,ADn_/)
+             elseif( xRnd.lt.3d0/5d0 ) then
+                MY_IDUP(3:4) = (/Chm_,AChm_/)
+             elseif( xRnd.lt.4d0/5d0 ) then
+                MY_IDUP(3:4) = (/Str_,AStr_/)
+             elseif( xRnd.lt.5d0/5d0 ) then
+                MY_IDUP(3:4) = (/Bot_,ABot_/)
+             endif
+          else
+             ICOLUP(1:2,3) = (/504,502/)
+             ICOLUP(1:2,4) = (/503,504/)      
+          endif
       elseif( MY_IDUP(1).ne.Glu_ .and. MY_IDUP(1).gt.0 .and. MY_IDUP(2).eq.Glu_ ) then! qg->qg
           ICOLUP(1:2,1) = (/501,000/)
           ICOLUP(1:2,2) = (/502,501/)
@@ -450,9 +465,28 @@ if( unweighted ) then
           ICOLUP(1:2,3) = (/503,502/)
       elseif( MY_IDUP(1).gt.0 .and. MY_IDUP(2).lt.0 ) then! qqb->qqb
           ICOLUP(1:2,1) = (/501,000/)
-          ICOLUP(1:2,2) = (/000,501/)
-          ICOLUP(1:2,3) = (/502,000/)
-          ICOLUP(1:2,4) = (/000,502/) 
+          ICOLUP(1:2,2) = (/000,502/)
+          ICOLUP(1:2,3) = (/000,501/)            
+          ICOLUP(1:2,4) = (/502,000/)  
+          if( flavor_tag.eq.1 ) then! qqb->gg
+             MY_IDUP(3:4) = (/Glu_,Glu_/)
+          elseif( flavor_tag.eq.3 ) then! qqb->q' qbar'
+             do while (.true.) ! infinite loop, sorry bad programming...
+                call random_number(xRnd)
+                if( xRnd.lt.1d0/5d0 ) then
+                    MY_IDUP(3:4) = (/Up_,AUp_/)
+                elseif( xRnd.lt.2d0/5d0 ) then
+                    MY_IDUP(3:4) = (/Dn_,ADn_/)
+                elseif( xRnd.lt.3d0/5d0 ) then
+                    MY_IDUP(3:4) = (/Chm_,AChm_/)
+                elseif( xRnd.lt.4d0/5d0 ) then
+                    MY_IDUP(3:4) = (/Str_,AStr_/)
+                elseif( xRnd.lt.5d0/5d0 ) then
+                    MY_IDUP(3:4) = (/Bot_,ABot_/)
+                endif
+                if( abs(MY_IDUP(3)).ne.abs(MY_IDUP(1)) ) exit
+             enddo
+          endif
       elseif( MY_IDUP(1).gt.0 .and. MY_IDUP(2).gt.0 ) then! qq->qq
           ICOLUP(1:2,1) = (/501,000/)
           ICOLUP(1:2,2) = (/502,000/)
