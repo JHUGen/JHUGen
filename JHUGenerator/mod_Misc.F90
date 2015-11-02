@@ -95,7 +95,7 @@ FUNCTION Get_ETA(Mom)
 implicit none
 real(8) ::Mom(1:4),Get_ETA
 
-   Get_ETA = 0.5d0*dlog( dabs((Mom(1)+Mom(4)+1d-16)/(Mom(1)-Mom(4) +1d-16) ))
+   Get_ETA = 0.5d0*dlog( (Mom(1)+Mom(4))/(Mom(1)-Mom(4)) )
 
 RETURN
 END FUNCTION
@@ -127,7 +127,7 @@ FUNCTION Get_CosTheta(Mom)! = Mom.nz/abs(Mom)
 implicit none
 real(8) ::Mom(1:4), Get_CosTheta
 
-    Get_CosTheta = Mom(4)/dsqrt( Mom(2)**2+Mom(3)**2+Mom(4)**2 +1d-16)
+    Get_CosTheta = Mom(4)/dsqrt( Mom(2)**2+Mom(3)**2+Mom(4)**2 )
 
 RETURN
 END FUNCTION
@@ -224,22 +224,11 @@ integer i, j, jmax, itemp
 !     print *, iy(:)
 !     stop
 
-RETURN
+return
 END SUBROUTINE
 
 
 
-SUBROUTINE printMom(Mom)
-implicit none
-real(8) :: Mom(:,:)
-integer :: n
-
-    do n=1,size(Mom,2)
-      write (*,"(A,I2,A,1F20.16,A,1F20.16,A,1F20.16,A,1F20.16,A)") "Mom(1:4,",n,")= (/",Mom(1,n),"d0,",Mom(2,n),"d0,",Mom(3,n),"d0,",Mom(4,n),"d0   /)"
-    enddo
-
-RETURN
-END SUBROUTINE
 
 
 
@@ -683,14 +672,14 @@ subroutine spinoru(N,p,za,zb,s)
 !---Arbitrary conventions of Bern, Dixon, Kosower, Weinzierl,                                                                                  
 !---za(i,j)*zb(j,i)=s(i,j)                      
       implicit none
-      real(8) :: p(1:N,1:4),two
+      real(8) :: p(:,:),two
       integer, parameter :: mxpart=14
-      complex(8):: c23(N),f(N),rt(N),za(1:N,1:N),zb(1:N,1:N),czero,cone,ci
-      real(8)   :: s(1:N,1:N)
+      complex(8):: c23(N),f(N),rt(N),za(:,:),zb(:,:),czero,cone,ci
+      real(8)   :: s(:,:)
       integer i,j,N
       
       if (size(p,1) .ne. N) then
-         call Error("spinorz: momentum mismatch",size(p,1))
+         call Error("spinorz: momentum mismatch")
       endif
       two=2d0
       czero=dcmplx(0d0,0d0)

@@ -15,8 +15,8 @@ type :: Particle
    integer  :: Helicity
    real(8)  :: Mass
    real(8)  :: Mass2
-   complex(8) :: Mom(1:4)
-   complex(8) :: Pol(1:4)
+   complex(8) :: Mom(1:8)
+   complex(8) :: Pol(1:16)
 end type
 
 type :: PtrToParticle
@@ -5198,21 +5198,6 @@ END SUBROUTINE
         end function
 
 
-
-      function SpiVL(sp,v)   ! SpiVL=sp.(v_mu*gamma^mu) =spb2(4,4,...)
-      implicit none
-      double complex :: sp(:),v(:)
-      double complex :: SpiVL(size(sp))
-
-            SpiVL(1) = sp(1)*v(1) + sp(4)*(v(2) + (0d0,1d0)*v(3)) + sp(3)*v(4)
-            SpiVL(2) = sp(2)*v(1) + sp(3)*(v(2) - (0d0,1d0)*v(3)) - sp(4)*v(4)
-            SpiVL(3) =-sp(3)*v(1) - sp(2)*(v(2) + (0d0,1d0)*v(3)) - sp(1)*v(4)
-            SpiVL(4) =-sp(4)*v(1) - sp(1)*(v(2) - (0d0,1d0)*v(3)) + sp(2)*v(4)
-        
-      return
-      end function
-
-
         function spb2_(sp,v)
         implicit none
         double complex, intent(in) :: sp(:),v(:)
@@ -5464,49 +5449,48 @@ END SUBROUTINE
 
 
       
-!       function vbqq(Dv,sp1,sp2)
-!       implicit none
-!       complex(8), intent(in) :: sp1(:), sp2(:)
-!       integer, intent(in) ::  Dv
-!       integer :: i
-!       complex(8) :: vbqq(Dv)
-!       complex(8) :: rr, va(Dv),sp1a(size(sp1))
-!       real(8), parameter :: sqrt2 = 1.4142135623730950488016887242096980786d0
-! 
-!           va=(0d0,0d0)
-!           vbqq=(0d0,0d0)
-! 
-!           do i=1,Dv
-!              if (i.eq.1) then
-!                va(1)=(1d0,0d0)
-!              else
-!                va(i)=(-1d0,0d0)
-!              endif
-!              sp1a=spb2_(sp1,va)
-! 
-!              rr=(0d0,-1d0)/sqrt2*psp1_(sp1a,sp2)
-!              if (i.eq.1) then
-!                   vbqq = vbqq + rr*va
-!               else
-!                   vbqq = vbqq - rr*va
-!              endif
-!              va(i)=(0d0,0d0)
-!           enddo
-! 
-!       end function vbqq
-
-
-
-
-
-      function vbqq(Dummy,sp1,sp2)! this is my own simpler 4-dim version
+      function vbqq(Dv,sp1,sp2)
       implicit none
-      complex(8), intent(in) :: sp1(1:4), sp2(1:4)
-      integer :: i,Dummy
-      complex(8) :: vbqq(4)
+      complex(8), intent(in) :: sp1(:), sp2(:)
+      integer, intent(in) ::  Dv
+      integer :: i
+      complex(8) :: vbqq(Dv)
+      complex(8) :: rr, va(Dv),sp1a(size(sp1))
+      real(8), parameter :: sqrt2 = 1.4142135623730950488016887242096980786d0
+
+          va=(0d0,0d0)
+          vbqq=(0d0,0d0)
+
+          do i=1,Dv
+             if (i.eq.1) then
+               va(1)=(1d0,0d0)
+             else
+               va(i)=(-1d0,0d0)
+             endif
+             sp1a=spb2_(sp1,va)
+
+             rr=(0d0,-1d0)/sqrt2*psp1_(sp1a,sp2)
+             if (i.eq.1) then
+                  vbqq = vbqq + rr*va
+              else
+                  vbqq = vbqq - rr*va
+             endif
+             va(i)=(0d0,0d0)
+          enddo
+
+      end function vbqq
+
+
+
+
+
+      function vbqq2(sp1,sp2)! this is my own simpler 4-dim version,   without -i/sqrt(2) norm!!
+      implicit none
+      complex(8), intent(in) :: sp1(:), sp2(:)
+      integer :: i
+      complex(8) :: vbqq2(4)
       complex(8) :: sp1a(4)
       real(8) :: va(1:4,1:4)
-      real(8), parameter :: sqrt2 = 1.4142135623730950488016887242096980786d0
 
          va(1,1:4)=(/+1d0,0d0,0d0,0d0/)      
          va(2,1:4)=(/0d0,-1d0,0d0,0d0/)      
@@ -5514,12 +5498,11 @@ END SUBROUTINE
          va(4,1:4)=(/0d0,0d0,0d0,-1d0/)
 
           do i=1,4
-             sp1a=SpiVL(sp1,dcmplx(va(i,1:4)))
-             vbqq(i) = (sp1a(1)*sp2(1)+sp1a(2)*sp2(2)+sp1a(3)*sp2(3)+sp1a(4)*sp2(4)) * (0d0,-1d0)/sqrt2
+             sp1a=spb2_(sp1,dcmplx(va(i,1:4)))
+             vbqq2(i) = psp1_(sp1a,sp2)
           enddo
-          
 
-      end function vbqq
+      end function vbqq2
 
 
 
