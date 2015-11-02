@@ -229,7 +229,6 @@ END SUBROUTINE
 
 
 
-
 SUBROUTINE printMom(Mom)
 implicit none
 real(8) :: Mom(:,:)
@@ -766,7 +765,6 @@ subroutine spinoru(N,p,za,zb,s)
 
 
     
-
 
 END MODULE
 

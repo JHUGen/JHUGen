@@ -644,10 +644,6 @@ RETURN
 END SUBROUTINE
 
 
-
-
-
-
 SUBROUTINE ShiftMass(p1,p2,m1,m2,p1hat,p2hat)
 use ModMisc
 implicit none
@@ -795,10 +791,6 @@ write(io_LHEOutFile,"(A)") "</event>"
 
 
 END SUBROUTINE
-
-
-
-
 
 
 SUBROUTINE WriteOutEvent_HJJ_fulldecay(Mom,MY_IDUP,ICOLUP,EventWeight)
@@ -2287,7 +2279,6 @@ applyPSCut = .false.
     pT_j1 = get_PT(momjet(1:4,1))
     pT_j2 = get_PT(momjet(1:4,2))
 
-
     if( pT_j1.lt.ptjetcut .or. pT_j2.lt.ptjetcut ) then
       applyPSCut=.true.
       return
@@ -2299,6 +2290,7 @@ applyPSCut = .false.
     y_j2 = get_ETA(momjet(1:4,2))
 
    dy_j1j2 = y_j1 - y_j2
+
 
   
     m_jj = get_MInv( MomJet(1:4,1)+MomJet(1:4,2) )
@@ -2315,7 +2307,6 @@ applyPSCut = .false.
        NBin(4)  = WhichBin(4,y_j1)
        NBin(5)  = WhichBin(5,y_j2)
        NBin(6)  = WhichBin(6,dy_j1j2)
-
 
        
 RETURN
@@ -2423,10 +2414,10 @@ double precision, intent(in) :: MomExt(1:4,1:9) !,beam_momentum(2,4),four_moment
 
 !     orthogonal vectors defined as p(fermion) x p(antifermion)
       MomLeptPlane1(2:4) = (MomLeptX(2:4,1)).cross.(MomLeptX(2:4,2))! orthogonal vector to lepton plane
-      MomLeptPlane1(2:4) = MomLeptPlane1(2:4)/dsqrt( MomLeptPlane1(2)**2+MomLeptPlane1(3)**2+MomLeptPlane1(4)**2 )! normalize
+      MomLeptPlane1(2:4) = MomLeptPlane1(2:4)/dsqrt(dabs(MomLeptPlane1(2)**2+MomLeptPlane1(3)**2+MomLeptPlane1(4)**2 +1d-15) )! normalize
       
       MomLeptPlane2(2:4) = (MomLeptX(2:4,3)).cross.(MomLeptX(2:4,4))! orthogonal vector to lepton plane
-      MomLeptPlane2(2:4) = MomLeptPlane2(2:4)/dsqrt( MomLeptPlane2(2)**2+MomLeptPlane2(3)**2+MomLeptPlane2(4)**2 )! normalize
+      MomLeptPlane2(2:4) = MomLeptPlane2(2:4)/dsqrt(dabs(MomLeptPlane2(2)**2+MomLeptPlane2(3)**2+MomLeptPlane2(4)**2 +1d-15 ))! normalize
 
 !     get the sign
       dummy(2:4) = (MomLeptPlane1(2:4)).cross.(MomLeptPlane2(2:4))
@@ -2558,6 +2549,7 @@ logical,save :: FirstTime=.true.
     NBin(8)  = WhichBin(8,pT_l)
     NBin(9)  = WhichBin(9,pT_miss)
     NBin(10) = WhichBin(10,D_0minus)
+
     
     
 RETURN
@@ -2698,12 +2690,6 @@ integer, parameter :: inLeft=1, inRight=2, Hig=3, tauP=4, tauM=5, Wp=6, Wm=7,   
     
 RETURN
 END SUBROUTINE
-
-
-
-
-
-
 FUNCTION ZLepBranching(xRnd)
 use ModParameters
 implicit none
@@ -3392,7 +3378,7 @@ real(8) :: FlavorRnd,sumCKM,Vsq(1:3)
         else!  u-->b
            GetCKMPartner = -sign(1,Flavor) * abs(Bot_)
         endif
-
+        
     elseif( abs(Flavor).eq.abs(Chm_) ) then
     
         Vsq(:) = Vsq(:)/scale_alpha_W_cs
@@ -3740,8 +3726,6 @@ END SUBROUTINE
 
 
 
-
-
 SUBROUTINE setPDFs(x1,x2,MuFac,pdf)
 use ModParameters
 implicit none
@@ -3941,6 +3925,7 @@ ENDIF
 
 RETURN
 END SUBROUTINE
+
 
 
 
@@ -4452,9 +4437,6 @@ real(8),parameter :: N4=4, PiWgt4 = (2d0*Pi)**(4-N4*3) * (4d0*Pi)**(N4-1)
 
 RETURN
 END SUBROUTINE
-
-
-
 SUBROUTINE EvalPhasespace_tautau(xRnd,pHiggs,MY_IDUP,Mom,Jac)
 use ModParameters
 use ModPhasespace
@@ -4727,8 +4709,6 @@ ENDIF
    
 RETURN
 END SUBROUTINE
-
-
 
 
 
