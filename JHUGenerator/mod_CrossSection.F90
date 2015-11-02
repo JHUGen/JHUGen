@@ -332,8 +332,6 @@ Function EvalWeighted_VHiggs(yRnd,VgsWgt)
     real(8) :: helicity(9)!, beam_h(2) !helicities
     integer id(9), id2(9)!, beam_id(2)
 
-!yrnd(1:20)=(/0.70081154024295889d0,       0.36652768365385663d0,        3.4015114427896315d-002,  0.12011275833880684d0,       0.27630110527729695d0,       0.39126881153768606d0,       0.51098461273436080d0,       0.93976094696594392d0,       0.75740719244663901d0,       0.63188392158202700d0,        7.7191020216007322d-002,  0.99999999970117104d0,       0.64254210890693042d0,        6.4323827671500966d-002,  0.65341322658978906d0,       0.72709843817452313d0,        4.7717851574683431d-002,  0.86837190555567156d0,       0.70578200706054295d0,       0.53128914246883485d0/)
-
     EvalWeighted_VHiggs=0d0
     EvalCounter = EvalCounter+1
 
@@ -691,7 +689,6 @@ elseif( IsAWDecay(DecayMode1) ) then
       MomExt(4,2)=-MomExt(1,2)
 
       call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt)
-      !print *, PSWgt, "PSWgt"
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut)
       if( applyPSCut .or. PSWgt.eq.zero ) return
       if(H_DK.eqv..false.) then
@@ -729,14 +726,9 @@ elseif( IsAWDecay(DecayMode1) ) then
         endif
           LO_Res_Unpol = me2/3d0*pdf(i,1)*pdf(j,2) * PreFac
           EvalWeighted_VHiggs = EvalWeighted_VHiggs+LO_Res_Unpol
-          !print *, i,j,pdf(i,1),pdf(j,2)
-          !print *, me2,"me2"
           !lheweight(i,j)=LO_Res_Unpol
       enddo
       enddo
-
-!print *,PreFac,"PreFac"
-!print *, PSWgt, "PSWgt"
 
 
 elseif( IsAPhoton(DecayMode1) ) then
@@ -859,11 +851,6 @@ endif
    do NHisto = 1,NumHistograms
     call intoHisto(NHisto,NBin(NHisto),EvalWeighted_VHiggs*VgsWgt)
    enddo
-
-!if(IsNaN(EvalWeighted_VHiggs).eqv. .true.)then
-!  print *, yRnd
-!  pause
-!endif
 
 
    RETURN
@@ -1317,6 +1304,7 @@ elseif( IsAPhoton(DecayMode1) ) then
 endif
 
 
+   
   CS_max = csmax(ifound,jfound)
   if( EvalUnWeighted_VHiggs.gt. CS_max) then
     write(io_stdout,"(2X,A,1PE13.6,1PE13.6)")  "CS_max is too small.",EvalUnWeighted_VHiggs, CS_max
@@ -1744,16 +1732,6 @@ ENDIF! GENEVT
 
 
       call intoHisto(18,NBin(18),EvalWeighted*VgsWgt)
-
-
-!       xBin(1) = WhichXBin(1,yrnd(1))
-!       xBin(2) = WhichXBin(2,yrnd(2))
-! !      xBin(3) = WhichXBin(3,yrnd(10))
-! !      xBin(4) = WhichXBin(4,yrnd(11))
-!       if( EvalWeighted .gt. globalMax ) globalMax = EvalWeighted
-!       if( EvalWeighted .lt. globalMin ) globalMin = EvalWeighted
-!       if( EvalWeighted .gt. PartitionMax(xBin(1),xBin(2)) ) PartitionMax(xBin(1),xBin(2)) = EvalWeighted
-! !       if( EvalWeighted .gt. PartitionMax(xBin(1),xBin(2),xBin(3),xBin(4)) ) PartitionMax(xBin(1),xBin(2),xBin(3),xBin(4)) = EvalWeighted
 
 
 RETURN
@@ -2429,6 +2407,10 @@ END FUNCTION
 
 
 
+
+
+
+
 FUNCTION EvalUnWeighted_DecayToVV(yRnd,genEvt,EHat,Res,AcceptedEvent,MY_IDUP,ICOLUP)
 use ModKinematics
 use ModParameters
@@ -2803,21 +2785,6 @@ RETURN
 END FUNCTION
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 FUNCTION EvalUnWeighted_DecayToTauTau(yRnd,genEvt,Ehat,Res,AcceptedEvent,MY_IDUP,ICOLUP)
 use ModKinematics
 use ModParameters
@@ -2929,8 +2896,6 @@ ENDIF! GENEVT
 
 RETURN
 END FUNCTION
-
-
 
 
 
