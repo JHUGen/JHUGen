@@ -86,12 +86,11 @@ c     ,j3_4(4,2),j5_6(4,2),
       data Q(+5)/-0.333333333333333d0/
       data tau/1d0,-1d0,1d0,-1d0,1d0,0d0,-1d0,1d0,-1d0,1d0,-1d0/
       data mt,twidth/173.2d0,2.5d0/
-      data hmass,hwidth/125d0,0.00415d0/
+      data hmass,hwidth/250d0,0.00415d0/
       data wmass,wwidth/80.399d0,2.085d0/
       data zmass,zwidth/91.1876d0,2.4952d0/
-      data Gf,vevsq/1.16639d-5,246.218458101816d0/
-      data gw,xw/0.653070453124d0,0.23119d0/
-      data gwsq,esq/0.426501016743344d0,9.495632068338d-2/
+      data Gf,vevsq/1.16639d-5,246d0/
+      data gw,xw,gwsq,esq/0.42464d0,0.23119d0,0.1d0,0.3133285d0/
 
       lambdaBSM = lambda_BSM
       lambda_Q = lambdaQ
@@ -102,7 +101,7 @@ c     ,j3_4(4,2),j5_6(4,2),
       lambda_z4 = lambda(4)
 
       !-- coupling 1-4 and lambdas are missing
-      ghz1 = zzcoupl(1) !-- if this is set to 1d0 then it's the SM value
+      ghz1 = zzcoupl(1) !-- check that these are correct according to Markus' definition
       ghz2 = zzcoupl(2)
       ghz3 = zzcoupl(3)
       ghz4 = zzcoupl(4)
@@ -180,7 +179,7 @@ c     ,j3_4(4,2),j5_6(4,2),
       ghz4_prime7= zzcoupl(32)
 
 
-      ghw1 = wwcoupl(1) !-- if this is set to 1d0 then it's the SM value
+      ghw1 = wwcoupl(1) !-- check that these are correct according to Markus' definition
       ghw2 = wwcoupl(2)
       ghw3 = wwcoupl(3)
       ghw4 = wwcoupl(4)
@@ -269,7 +268,7 @@ c--- and the following lines set up the appropriate masses and sin^2(theta_w)
        czmass2=dcmplx(zmass**2,-zmass*zwidth)
        cxw=cone-cwmass2/czmass2
        call couplz(xw)
-
+       
        ! MARKUS: choosing ZZ final state
        l1=le
        l2=le
@@ -309,6 +308,9 @@ c--- rescaling factor for Higgs amplitudes, if anomalous Higgs width
        call flush(6)
       endif! first
 
+
+
+
       if (doHO) then
         Hbit=mult*cone
         Bbit=czip
@@ -322,7 +324,7 @@ c--- rescaling factor for Higgs amplitudes, if anomalous Higgs width
 
 C---setup spinors and spinorvector products
       call spinorcurr(8,p,za,zb,zab,zba)
-      do j=1,12
+      do j=1,jmax
       temp(:,:)=0d0
       tempw(:,:)=0d0
       amp(:,:,:,:,:)=czip
@@ -377,32 +379,24 @@ C-----Singly resonant production in VBF style diagrams
      & ZZ8341,WWp8341,WWm8341)
       call ZZSingleres(j1(j),j2(j),5,6,3,4,j8(j),j7(j),za,zb,
      & ZZ8561,WWp8561,WWm8561)
-      
+     
       endif
       
-      ZZHamp71_82 = czip
-      ZZHamp81_72 = czip
-      WWZZ71_82amp= czip
-      WWZZ81_72amp= czip
+      
       
 ! C----ZZ->ZZ scattering with the exchange of a H
       call ZZHZZamp(j1(j),j2(j),3,4,5,6,j7(j),j8(j),
      & za,zb,ZZHamp71_82)
-      
       call ZZHZZamp(j1(j),j2(j),3,4,5,6,j8(j),j7(j),
      & za,zb,ZZHamp81_72)
-      
-     
 C----Four boson vertex + WW->Higgs diagram 
       call WWZZ(j1(j),j2(j),3,4,5,6,j7(j),j8(j),
      & za,zb,WWZZ71_82amp,srWWZZ71_82amp) 
-     
       call WWZZ(j1(j),j2(j),3,4,5,6,j8(j),j7(j),
      & za,zb,WWZZ81_72amp,srWWZZ81_72amp) 
 
-     
-     
-     
+ 
+
 C-----setup for (uqbq_uqbq) (2,5)->(2,5)
       do h1=1,2
       do h2=1,2
@@ -444,7 +438,8 @@ C-----setup for (uqbq_uqbq) (2,5)->(2,5)
       enddo
       enddo
       temp(4,5)=temp(2,5)
-      
+
+
 
 C--------------------------------------------------------------------------
 C-----setup for (uqcq_uqcq) (2,4)->(2,4)
@@ -535,7 +530,7 @@ C-----setup for uqsq_dqcq W diagrams (2,3)->(1,4)
       enddo     
       enddo     
       enddo     
-      enddo
+      enddo     
       temp(2,3)=temp(2,5)
 
 C-----setup for dqcq_uqsq (1,4)-->(2,3)
@@ -963,11 +958,8 @@ c--- qbar-q extra pieces
   
       endif
 
+      enddo
 
-      enddo! MARKUS: this is the end of the j=1..jmax loop
-
-      
-      
       return
 
    77 format(' *      W-mass^2     (',f11.5,',',f11.5,')      *')
@@ -995,7 +987,7 @@ c---xw=sin^2 theta_w
       enddo
 
       le=(-1d0-two*(-1d0)*xw)/sin2w
-      re=(    -two*(-1d0)*xw)/sin2w
+      re=(-two*(-1d0)*xw)/sin2w
 
       ln=(+1d0-two*(+0d0)*xw)/sin2w
       rn=0d0
