@@ -21,7 +21,6 @@ implicit none
 real(8) :: EvalWeighted_TH,yRnd(1:11),VgsWgt
 real(8) :: Ehat,MH_Inv,eta1,eta2,ISFac,sHatJacobi,PreFac,FluxFac,PSWgt,PSWgt2,PSWgt3
 real(8) :: MomExt(1:4,1:9),MomOffShell(1:4,1:9),LO_Res_Unpol(-6:6,-6:6),MuFac,pdf(-6:6,1:2)
-real(8) :: MG_MOM(0:3,1:5),MadGraph_tree(1)
 integer :: NBin(1:NumHistograms),NHisto
 logical :: applyPSCut
 integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9
@@ -59,7 +58,6 @@ integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9
       call Kinematics_TH(MomExt,applyPSCut,NBin)
    ENDIF
    
-
    
    if( applyPSCut ) then
       EvalWeighted_TH = 0d0
@@ -95,66 +93,6 @@ integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9
    EvalWeighted_TH = EvalWeighted_TH * PreFac
 
 
-! call printMom(MomExt(1:4,1:9))
-! print *, eta1,eta2,FluxFac
-! print *, "MEM", LO_Res_Unpol(Up_,Bot_),FluxFac*LO_Res_Unpol(Up_,Bot_)   * ( pdf(Up_,1) *pdf(Bot_,2)  +  pdf(Chm_,1) *pdf(Bot_,2) ) 
-! print *, "MEM", LO_Res_Unpol(Bot_,Up_),FluxFac* LO_Res_Unpol(Bot_,Up_)   * ( pdf(Bot_,1)*pdf(Up_,2)   +  pdf(Bot_,1) *pdf(Chm_,2) ) 
-! print *, "MEM",LO_Res_Unpol(ADn_,Bot_),FluxFac*LO_Res_Unpol(ADn_,Bot_)  * ( pdf(ADn_,1)*pdf(Bot_,2)  +  pdf(AStr_,1)*pdf(Bot_,2) ) 
-! print *, "MEM",LO_Res_Unpol(Bot_,ADn_),FluxFac*LO_Res_Unpol(Bot_,ADn_)  * ( pdf(Bot_,1)*pdf(ADn_,2)  +  pdf(Bot_,1) *pdf(AStr_,2))
-! print *, "MEM",LO_Res_Unpol(Dn_,ABot_),FluxFac* LO_Res_Unpol(Dn_,ABot_)  * ( pdf(Dn_,1)*pdf(ABot_,2)  + pdf(Str_,1)*pdf(ABot_,2) )  
-! print *, "MEM",LO_Res_Unpol(ABot_,Dn_),FluxFac*LO_Res_Unpol(ABot_,Dn_)  * ( pdf(ABot_,1)*pdf(Dn_,2)  + pdf(ABot_,1)*pdf(Str_,2) ) 
-! print *, "MEM", LO_Res_Unpol(AUp_,ABot_),FluxFac* LO_Res_Unpol(AUp_,ABot_) * ( pdf(AUp_,1)*pdf(ABot_,2) + pdf(AChm_,1)*pdf(ABot_,2))    
-! print *, "MEM", LO_Res_Unpol(ABot_,AUp_),FluxFac*LO_Res_Unpol(ABot_,AUp_) * ( pdf(ABot_,1)*pdf(AUp_,2) + pdf(ABot_,1)*pdf(AChm_,2))
-! pause
-
-!!! MadGraph check
-!!
-!!   MG_MOM(0:3,1) = MomExt(1:4,1)*100d0
-!!   MG_MOM(0:3,2) = MomExt(1:4,2)*100d0
-!!   MG_MOM(0:3,3) = MomExt(1:4,3)*100d0
-!!   MG_MOM(0:3,4) = MomExt(1:4,4)*100d0
-!!   MG_MOM(0:3,5) = MomExt(1:4,5)*100d0
-!!
-!!   
-!!   call coupsm(0)
-!!   print *, "My parameters:"
-!!   print *, "mtop",M_Top
-!!   print *, "mW",M_W
-!!   print *, "vev",vev
-!!   print *, "gw",dsqrt(gwsq)
-!!
-!!
-!!   if (Process .eq. 110) then
-!!
-!!      call SUB_HTD(MG_MOM,MadGraph_Tree)
-!!      print *, "My tree ub -> Htd",LO_Res_UnPol(Up_,Bot_)/gwsq**2*vev**2 * 0.6414935883355840d0**4 / 250.618249228543d0**2
-!!      print *, "MadGraph tree ub -> Htd",MadGraph_Tree
-!!      print *, "MG/ME ratio",MadGraph_tree/(LO_Res_UnPol(Up_,Bot_)/gwsq**2*vev**2 * 0.6414935883355840d0**4 / 250.618249228543d0**2)
-!!
-!!   elseif (Process .eq. 111) then
-!!
-!!      call SDBBAR_HTBARU(MG_MOM,MadGraph_Tree)
-!!      print *, "My tree d bbar -> H tbar u",LO_Res_UnPol(Dn_,ABot_)/gwsq**2*vev**2 * 0.6414935883355840d0**4 / 250.618249228543d0**2
-!!      print *, "MadGraph tree d bbar -> H tbar u",MadGraph_Tree
-!!      print *, "MG/ME ratio",MadGraph_tree/(LO_Res_UnPol(Dn_,ABot_)/gwsq**2*vev**2 * 0.6414935883355840d0**4 / 250.618249228543d0**2)
-!!
-!!   elseif (Process .eq. 112) then
-!!
-!!      call SUDBAR_HTBBAR(MG_MOM,MadGraph_Tree)
-!!      print *, "My tree u dbar -> H t bbar",LO_Res_UnPol(Up_,ADn_)/gwsq**2*vev**2 * 0.6414935883355840d0**4 / 250.618249228543d0**2
-!!      print *, "MadGraph tree u dbar -> H t bbar",MadGraph_Tree
-!!      print *, "MG/ME ratio",MadGraph_tree/(LO_Res_UnPol(Up_,ADn_)/gwsq**2*vev**2 * 0.6414935883355840d0**4 / 250.618249228543d0**2)
-!!
-!!   elseif (Process .eq. 113) then
-!!
-!!      call SDUBAR_HTBARB(MG_MOM,MadGraph_Tree)
-!!      print *, "My tree d ubar -> H t b",LO_Res_UnPol(Dn_,AUp_)/gwsq**2*vev**2 * 0.6414935883355840d0**4 / 250.618249228543d0**2
-!!      print *, "MadGraph tree d ubar -> H tbar b",MadGraph_Tree
-!!      print *, "MG/ME ratio",MadGraph_tree/(LO_Res_UnPol(Dn_,AUp_)/gwsq**2*vev**2 * 0.6414935883355840d0**4 / 250.618249228543d0**2)
-!!
-!!   endif
-!!
-!!   pause
    if( writeWeightedLHE ) then 
         call Error("WriteLHE not yet supported for t+H")
    endif
@@ -329,6 +267,8 @@ IF( GENEVT ) THEN
               MY_IDUP(1:5) = (/ LHA2M_pdf(iPartons(1)),LHA2M_pdf(iPartons(2)),Hig_,ATop_,Bot_ /)
               call EvalAmp_QQB_TBARHB(MomExt,LO_Res_Unpol)
           ENDIF
+
+
           
           PDFFac1 = pdf( LHA2M_pdf(iPartons(1)),1) * pdf( LHA2M_pdf(iPartons(2)),2)
           EvalUnWeighted_TH = LO_Res_Unpol(LHA2M_pdf(iPartons(1)),LHA2M_pdf(iPartons(2))) * PDFFac1 * PreFac 
@@ -402,11 +342,19 @@ ELSE! NOT GENEVT
                if (RES(1,-2).gt.csmax(1,-2)) CSmax(1,-2) = RES(1,-2)
                if (RES(3,-4).gt.csmax(3,-4)) CSmax(3,-4) = RES(3,-4)
           ENDIF
+
+
 ENDIF! GENEVT 
 
 
 RETURN
 END FUNCTION
+
+
+
+
+
+
 
 
 
