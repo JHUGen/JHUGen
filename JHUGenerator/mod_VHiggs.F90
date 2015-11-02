@@ -52,152 +52,19 @@ contains
 
 
 
-      SUBROUTINE MATRIXELEMENT1(p,FermFlav,UnPolSqAmp)
-      use ModParameters
-      use ModMisc
-      implicit none
-      complex(8) :: SME(1:3,-1:+1,-1:+1),HelAmp
-      real(8) :: p(1:4,1:9),UnpolSqAmp,PreFac,IZis(-1:+1)
-      real(8) :: qsq_V1,qsq_V2,qsq_V1V2,qsq_H
-      complex(8) ghz1_dyn,ghz2_dyn,ghz3_dyn,ghz4_dyn      
-      complex(8) :: a1HVV,a2HVV,a3HVV,Prop
-      integer :: ishel,fshel,FermFlav(1:6)! 12:IS, 34:ZDK, 56:HDK
-      real(8),parameter :: CF=4d0/3d0
-      
-          ! q1 qbar2 --> 3 --> 45 --> Z4-->f6 fbar7 + H5-->89      
-          call getSME(p,FermFlav,SME)
-          if( H_DK ) call Error("Higgs decay not implemented")
-
-          Prop = (0d0,1d0)/(((p(1:4,4)+p(1:4,5)).dot.(p(1:4,4)+p(1:4,5))) -M_V**2 + (0d0,1d0)*M_V*Ga_V )
-          PreFac = 4d0*Pi*alpha_QED/4d0/sitW**2/(1d0-sitW**2)      ! gets squared below
-
-          ! initial state couplings
-          if( IsAWDecay(DecayMode1) ) then
-              IZis(+1) = bR   *CKM(FermFlav(1),FermFlav(2))
-              IZis(-1) = bL   *CKM(FermFlav(1),FermFlav(2))
-          elseif( IsAZDecay(DecayMode1) .and. (abs(FermFlav(1)).eq.2 .or. abs(FermFlav(1)).eq.4) ) then
-              IZis(+1) = aR_QUp
-              IZis(-1) = aL_QUp
-          elseif( IsAZDecay(DecayMode1) .and. (abs(FermFlav(1)).eq.1 .or. abs(FermFlav(1)).eq.3 .or. abs(FermFlav(1)).eq.5) ) then
-              IZis(+1) = aR_QDn
-              IZis(-1) = aL_QDn
-          endif
 
 
-          ! anomalous HVV couplings
-          qsq_V1  =  p(1:4,3).dot.p(1:4,3)
-          qsq_V2  =  p(1:4,4).dot.p(1:4,4)
-          qsq_V1V2=-(p(1:4,3).dot.p(1:4,4))
-          qsq_H   =  p(1:4,5).dot.p(1:4,5)
-          ghz1_dyn = ghz1   +   ghz1_prime * Lambda_z1**4/( Lambda_z1**2 + abs(qsq_V1) )/( Lambda_z1**2 + abs(qsq_V2))  &
-                            +   ghz1_prime2* ( abs(qsq_V1)+abs(qsq_V2) )/Lambda_z1**2                                   &
-                            +   ghz1_prime3* ( abs(qsq_V1)-abs(qsq_V2) )/Lambda_z1**2                                   &
-                            +   ghz1_prime4* qsq_H / Lambda_z1**2                                                       &
-                            +   ghz1_prime5* ( abs(qsq_V1)**2+abs(qsq_V2)**2 )/Lambda_z1**4                             &
-                            +   ghz1_prime6* ( abs(qsq_V1)**2-abs(qsq_V2)**2 )/Lambda_z1**4                             &
-                            +   ghz1_prime7* ( abs(qsq_V1)*abs(qsq_V2) )/Lambda_z1**4
-          ghz2_dyn = ghz2   +   ghz2_prime * Lambda_z2**4/( Lambda_z2**2 + abs(qsq_V1) )/( Lambda_z2**2 + abs(qsq_V2))  &
-                            +   ghz2_prime2* ( abs(qsq_V1)+abs(qsq_V2) )/Lambda_z2**2                                   &
-                            +   ghz2_prime3* ( abs(qsq_V1)-abs(qsq_V2) )/Lambda_z2**2                                   &
-                            +   ghz2_prime4* qsq_H / Lambda_z2**2                                                       &
-                            +   ghz2_prime5* ( abs(qsq_V1)**2+abs(qsq_V2)**2 )/Lambda_z2**4                             &
-                            +   ghz2_prime6* ( abs(qsq_V1)**2-abs(qsq_V2)**2 )/Lambda_z2**4                             &
-                            +   ghz2_prime7* ( abs(qsq_V1)*abs(qsq_V2) )/Lambda_z4**4
-          ghz3_dyn = ghz3   +   ghz3_prime * Lambda_z3**4/( Lambda_z3**2 + abs(qsq_V1) )/( Lambda_z3**2 + abs(qsq_V2))  &
-                            +   ghz3_prime2* ( abs(qsq_V1)+abs(qsq_V2) )/Lambda_z3**2                                   &
-                            +   ghz3_prime3* ( abs(qsq_V1)-abs(qsq_V2) )/Lambda_z3**2                                   &
-                            +   ghz3_prime4* qsq_H / Lambda_z3**2                                                       &
-                            +   ghz3_prime5* ( abs(qsq_V1)**2+abs(qsq_V2)**2 )/Lambda_z3**4                             &
-                            +   ghz3_prime6* ( abs(qsq_V1)**2-abs(qsq_V2)**2 )/Lambda_z3**4                             &
-                            +   ghz3_prime7* ( abs(qsq_V1)*abs(qsq_V2) )/Lambda_z3**4
-          ghz4_dyn = ghz4   +   ghz4_prime * Lambda_z4**4/( Lambda_z4**2 + abs(qsq_V1) )/( Lambda_z4**2 + abs(qsq_V2))  &
-                            +   ghz4_prime2* ( abs(qsq_V1)+abs(qsq_V2) )/Lambda_z4**2                                   &
-                            +   ghz4_prime3* ( abs(qsq_V1)-abs(qsq_V2) )/Lambda_z4**2                                   &
-                            +   ghz4_prime4* qsq_H / Lambda_z4**2                                                       &
-                            +   ghz4_prime5* ( abs(qsq_V1)**2+abs(qsq_V2)**2 )/Lambda_z4**4                             &
-                            +   ghz4_prime6* ( abs(qsq_V1)**2-abs(qsq_V2)**2 )/Lambda_z4**4                             &
-                            +   ghz4_prime7* ( abs(qsq_V1)*abs(qsq_V2) )/Lambda_z4**4
 
-          a1HVV = ghz1_dyn*M_V**2 + qsq_V1V2*( 2d0*ghz2_dyn + ghz3_dyn*qsq_V1V2/Lambda )
-          a2HVV =-2d0*ghz2_dyn - ghz3_dyn*qsq_V1V2/Lambda
-          a3HVV =-2d0*ghz4_dyn 
-          
-          UnPolSqAmp = 0d0
-          do ishel=-1,+1,2
-          do fshel=-1,+1,2
-                HelAmp =  a3HVV * (  - IZis(ishel)*SME(3,ishel,fshel)  )          &
-                        + a2HVV * (  - IZis(ishel)*SME(2,ishel,fshel)  )          &
-                        + a1HVV * (  + IZis(ishel)*SME(1,ishel,fshel)  )
-                HelAmp = HelAmp * PreFac/vev * Prop
-                UnPolSqAmp = UnPolSqAmp + dreal( HelAmp*dconjg(HelAmp) )
-          enddo
-          enddo
-          UnPolSqAmp = UnPolSqAmp * CF
-          
-      RETURN
-END SUBROUTINE
 
-      
-
-      
-      SUBROUTINE getSME(p,FermFlav,SME)
-      use ModParameters
-      use ModMisc
-      implicit none
-      complex(8) :: SME(1:3,-1:+1,-1:+1)
-      real(8) :: sprod(9,9),p(1:4,1:9),IZfs(-1:+1)
-      complex(8) :: za(9,9), zb(9,9),Prop
-      integer :: FermFlav(1:6)
-      
-          call spinoru2(9,(/-p(1:4,1),-p(1:4,2),-p(1:4,1)-p(1:4,2),p(1:4,6)+p(1:4,7),p(1:4,8)+p(1:4,9),p(1:4,6),p(1:4,7),p(1:4,8),p(1:4,9)/),za,zb,sprod)
-          
-          
-          ! Z-final state couplings
-          if( IsAWDecay(DecayMode1) ) then
-              IZfs(+1) = bR   *CKM(FermFlav(3),FermFlav(4))
-              IZfs(-1) = bL   *CKM(FermFlav(3),FermFlav(4))
-          elseif( abs(FermFlav(3)).eq.11 .or. abs(FermFlav(3)).eq.13 .or. abs(FermFlav(3)).eq.15) then
-               IZfs(-1)=aL_lep    * dsqrt(scale_alpha_Z_ll)
-               IZfs(+1)=aR_lep    * dsqrt(scale_alpha_Z_ll)
-          elseif( abs(FermFlav(3)).eq.12 .or. abs(FermFlav(3)).eq.14 .or. abs(FermFlav(3)).eq.16 ) then
-               IZfs(-1)=aL_neu    * dsqrt(scale_alpha_Z_nn)
-               IZfs(+1)=aR_neu    * dsqrt(scale_alpha_Z_nn)
-          elseif( abs(FermFlav(3)).eq.2 .or. abs(FermFlav(3)).eq.4 ) then
-               IZfs(-1)=aL_QUp    * dsqrt(scale_alpha_Z_uu) 
-               IZfs(+1)=aR_QUp    * dsqrt(scale_alpha_Z_uu) 
-          elseif( abs(FermFlav(3)).eq.1 .or. abs(FermFlav(3)).eq.3 .or. abs(FermFlav(3)).eq.5 ) then
-               IZfs(-1)=aL_QDn    * dsqrt(scale_alpha_Z_dd) 
-               IZfs(+1)=aR_QDn    * dsqrt(scale_alpha_Z_dd) 
-          else
-               call Error("Wrong flavor in getSME",FermFlav(3))
-          endif
-
-          SME(1,+1,+1) =  -2*IZfs(1)*za(1,7)*zb(2,6)
-          SME(2,+1,+1) =  IZfs(1)*(za(1,6)*zb(2,6) + za(1,7)*zb(2,7))*(za(7,8)*zb(6,8) + za(7,9)*zb(6,9))
-          SME(3,+1,+1) = cI*IZfs(1)*(za(1,7)*(za(7,8)*zb(2,8) + za(7,9)*zb(2,9))*zb(6,7) + za(6,7)*zb(2,6)*(za(1,8)*zb(6,8) + za(1,9)*zb(6,9)))
-          SME(1,+1,-1) =  -2*IZfs(-1)*za(1,6)*zb(2,7)
-          SME(2,+1,-1) =  IZfs(-1)*(za(1,6)*zb(2,6) + za(1,7)*zb(2,7))*(za(6,8)*zb(7,8) + za(6,9)*zb(7,9))
-          SME(3,+1,-1) = cI*IZfs(-1)*(-(za(1,7)*zb(2,7)*(za(6,8)*zb(7,8) + za(6,9)*zb(7,9))) + za(1,6)*(za(6,8)*(-(zb(2,7)*zb(6,8)) + zb(2,6)*zb(7,8)) + zb(2,7)*(za(7,8)*zb(7,8) + za(7,9)*zb(7,9)) + za(6,9)*(-(zb(2,7)*zb(6,9)) + zb(2,6)*zb(7,9))))
-          SME(1,-1,+1) = -2*IZfs(1)*za(2,7)*zb(1,6)
-          SME(2,-1,+1) = IZfs(1)*(za(2,6)*zb(1,6) + za(2,7)*zb(1,7))*(za(7,8)*zb(6,8) + za(7,9)*zb(6,9))
-          SME(3,-1,+1) = cI*IZfs(1)*(za(2,7)*(za(7,8)*zb(1,8) + za(7,9)*zb(1,9))*zb(6,7) + za(6,7)*zb(1,6)*(za(2,8)*zb(6,8) + za(2,9)*zb(6,9)))
-          SME(1,-1,-1) = -2*IZfs(-1)*za(2,6)*zb(1,7)
-          SME(2,-1,-1) =  IZfs(-1)*(za(2,6)*zb(1,6) + za(2,7)*zb(1,7))*(za(6,8)*zb(7,8) + za(6,9)*zb(7,9))
-          SME(3,-1,-1) =   -(cI*IZfs(-1)*(za(2,6)*(za(6,8)*zb(1,8) + za(6,9)*zb(1,9))*zb(6,7) + za(6,7)*zb(1,7)*(za(2,8)*zb(7,8) + za(2,9)*zb(7,9))))      
-          
-          Prop = (0d0,1d0)/(2*(p(1:4,6).dot.p(1:4,7)) - M_V**2 + (0d0,1d0)*M_V*Ga_V )         
-          SME(:,:,:) = SME(:,:,:) * Prop
-
-     RETURN
-     END SUBROUTINE
-      
-      
-      
-      
 !MATRIXELEMENT0.F
 !VERSION 20130710
+
+!
+
       complex(8) function MATRIXELEMENT0(MomExt,inv_mass,mass,helicity,id)
+
       implicit none
+
       complex(8) dMATRIXELEMENT
       real(8), intent(in) :: MomExt(1:4,1:9) !,four_momentum(7,4)
       real(8), intent(in) :: inv_mass(9)
@@ -230,7 +97,6 @@ END SUBROUTINE
       PROP2 = PROPAGATOR(inv_mass(4),mass(4,1),mass(4,2))
       PROP3 = PROPAGATOR(inv_mass(5),mass(5,1),mass(5,2))
 
-      
       if(id(1).gt.0)then
         call FFV(id(2), MomExt(:,2), helicity(2), id(1), MomExt(:,1), helicity(1), Vcurrent1)
         if((id(1)+id(2)).eq.0)then
@@ -258,13 +124,11 @@ END SUBROUTINE
 !WH
       if((id(1)+id(2)).ne.0)then
         if((id(1)*helicity(1)).le.0d0)then
-          current1=(Vcurrent1-Acurrent1)/2d0*gFFW  !*CKM(id(1),id(2))
+          current1=Vcurrent1*gFFW*CKM(id(1),id(2))
         else
           current1=0d0
         endif
-        if((id(7)*helicity(7)).le.0d0)then        
-          current2=(Vcurrent2-Acurrent2)/2d0*gFFW    !*CKM(id(6),id(7))
-        endif
+        current2=Vcurrent2*gFFW*CKM(id(6),id(7))
 
 !ZH
       else if((abs(id(1)).eq.11).or.(abs(id(1)).eq.13))then
@@ -1778,65 +1642,6 @@ END SUBROUTINE
 
 
 
-  !-- generic functions below
-  function scr(p1,p2) 
-    real(8), intent(in) :: p1(4), p2(4)
-    real(8) :: scr
-    scr = p1(1)*p2(1)-p1(2)*p2(2)-p1(3)*p2(3)-p1(4)*p2(4)
-  end function scr
-
-  !- MCFM spinors in non-MCFM momentum convention
-  subroutine spinoru2(n,p,za,zb,s)
-    implicit none
-    integer, intent(in) :: n
-    real(8), intent(in) :: p(4,n)
-    complex(8), intent(out) :: za(n,n), zb(n,n)
-    real(8), intent(out) :: s(n,n)
-    integer :: i,j
-    complex(8) :: c23(n), f(n)
-    real(8) :: rt(n)
-      
-    !---if one of the vectors happens to be zero this routine fails.
-    do j=1,N
-       za(j,j)=czero
-       zb(j,j)=za(j,j)
-
-       !-----positive energy case
-       if (p(1,j) .gt. zero) then
-          rt(j)=sqrt(abs(p(2,j)+p(1,j)))
-          c23(j)=dcmplx(p(4,j),-p(3,j))
-          f(j)=(one,zero)
-       else
-       !-----negative energy case
-          rt(j)=sqrt(abs(-p(1,j)-p(2,j)))
-          c23(j)=dcmplx(-p(4,j),p(3,j))
-          f(j)=ci
-       endif
-    enddo
-
-    do i=2,N
-  
-     do j=1,i-1
-          s(i,j)=two*scr(p(:,i),p(:,j))
-          za(i,j)=f(i)*f(j)  * ( c23(i)*dcmplx(rt(j)/(rt(i)+1d-16))-c23(j)*dcmplx(rt(i)/(rt(j)+1d-16)) )
-          
-          if (abs(s(i,j)).lt.1d-5) then
-             zb(i,j)=-(f(i)*f(j))**2*conjg(za(i,j))
-          else
-             zb(i,j)=-dcmplx(s(i,j))/(za(i,j)+1d-16)
-          endif
-          
-          za(j,i)=-za(i,j)
-          zb(j,i)=-zb(i,j)
-          s(j,i)=s(i,j)
-          
-       enddo
-
-    enddo
-
-    return
-    
-  end subroutine spinoru2
 
 
 
