@@ -9,13 +9,12 @@ VegasDir = $(Here)/vegas
 
 # compiler options, Comp='ifort' or 'gfort'
 Opt  = Yes
-Comp = ifort
+Comp = gfort
 
 # link pdfs via LHA library ('Yes' or 'No')
 UseLHAPDF=No
 
 # directory which contains libLHAPDF.a, libLHAPDF.la, libLHAPDF.so
-# MyLHADir=/afs/cern.ch/user/m/maschulz/lib/LHAPDF-6.1.5/lib/
 MyLHADir=/home/schulze/lib/LHAPDF-6.1.5/lib/
 # remember to export 
 #          LD_LIBRARY_PATH=/.../LHAPDF-x.y.z/lib/:${LD_LIBRARY_PATH}
@@ -122,6 +121,7 @@ PDFObj   = $(ObjectDir)/Cteq61Pdf.o \
 
 PSGenDep = genps.c \
            boost.c
+
 PSGenObj = $(ObjectDir)/genps.o \
            $(ObjectDir)/boost.o
 
@@ -167,7 +167,7 @@ endif
 	@echo " executable file is "$(Exec) "compiled with "$(Comp)
 	@echo " "
 	$(fcomp) -o $(Exec) $(MainObj) $(AmpObj) $(PSGenObj) $(VegasObj) $(PDFObj) 
-#  $(MCFM_Obj) 
+# $(MCFM_Obj)
 
 
 
@@ -211,6 +211,7 @@ clean:
 	rm -f modules/*.mod
 	rm -f modules/*.f90
 	rm -f *.mod
+	rm -f *.o
 	rm -f $(Exec)
 
 # supresses command calls
