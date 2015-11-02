@@ -30,7 +30,6 @@ real(8) :: VG_Result,VG_Error
    if( ConvertLHEFile ) then
         call StartConvertLHE(VG_Result,VG_Error)
    elseif( ReadLHEFile ) then
-!         call StartReadLHE(VG_Result,VG_Error)
         call StartReadLHE_NEW(VG_Result,VG_Error)
    else
         if( Process.eq.80 .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.66 .or. Process.eq.90 .or. &
@@ -282,7 +281,6 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
 !     if( (TauDecays.ne.0 .and. TauDecays.ne.1) .and. (Process.eq.80 .or. Process.eq.110 .or. Process.eq.111) ) call Error("Specify TauDK=0,1")
 !     if( (TauDecays.eq.1) .and. .not. IsAWDecay(DecayMode1) ) call Error("Invalid DecayMode1 for tau decays")
 !     if( (TauDecays.eq.1) .and. .not. IsAWDecay(DecayMode2) ) call Error("Invalid DecayMode2 for tau decays")
-
 
     if( IsAZDecay(DecayMode1) ) then
        M_V = M_Z
@@ -611,17 +609,14 @@ include "vegas_common.f"
 
       !- HVBF
       if(Process.eq.60) then
-         NDim = 5
+         NDim = 5        ! for phase space
          NDim = NDim + 2 ! sHat integration
-         
-NDim = NDim + 1 ! for pdf sampling
-NDim = NDim + 1 ! for PS sampling
-        
+         NDim = NDim + 1 ! for pdf sampling
+         NDim = NDim + 1 ! for PS sampling 
          VegasIt1_default = 5
          VegasNc0_default = 10000000
          VegasNc1_default = 500000
          VegasNc2_default = 10000
-!          if( unweighted ) NDim = NDim + 1  ! random number which decides if event is accepted
       endif
       !- HVBF with decays
       if(Process.eq.66) then
@@ -639,13 +634,10 @@ NDim = NDim + 1 ! for PS sampling
 
       !- Hjj, gluon fusion
       if(Process.eq.61) then
-         NDim = 5
+         NDim = 5        ! phase space
          NDim = NDim + 2 ! sHat integration
-NDim = NDim + 1 ! for pdf sampling       
-NDim = NDim + 1 ! for PS sampling
-
-!          if( unweighted ) NDim = NDim + 1  ! random number which decides if event is accepted
-         
+         NDim = NDim + 1 ! for pdf sampling       
+         NDim = NDim + 1 ! for PS sampling
          VegasIt1_default = 5
          VegasNc0_default = 10000000
          VegasNc1_default = 500000
@@ -721,6 +713,7 @@ NDim = NDim + 1 ! for PS sampling
          VegasNc1_default =  500000
          VegasNc2_default =  500000
       endif
+
      ! RR added -- t+H s-schannel
       if(Process.eq.112) then
          NDim = 9
@@ -739,7 +732,6 @@ NDim = NDim + 1 ! for PS sampling
          VegasNc1_default =  500000
          VegasNc2_default =  500000
       endif
-
 
 END SUBROUTINE
 
@@ -966,12 +958,16 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
               endif
         enddo
 
+
+
+
     else
         print *, "ERROR: VegasNc1 and VegasNc2 must not be set at the same time"
         stop
     endif
     call cpu_time(time_end)
     print *, ""
+
 
 
     print *, " Evaluation Counter: ",EvalCounter
@@ -1003,14 +999,13 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
                                           dble(Br_counter(3,1))+dble(Br_counter(3,2)))/dble(AccepCounter)
           write(*,"(A,5F16.3)") "2l2q: ",(dble(Br_counter(1,5))+dble(Br_counter(2,5))+dble(Br_counter(3,5))+  &
                                           dble(Br_counter(5,1))+dble(Br_counter(5,2))+dble(Br_counter(5,3)) )/dble(AccepCounter)
-          
+            
           write(*,"(A,5F16.3)") "4l/2q2l: ",(dble(Br_counter(1,2))+dble(Br_counter(1,3))+ dble(Br_counter(1,1))+dble(Br_counter(2,2))+dble(Br_counter(3,3)) &
                                         + dble(Br_counter(2,1))+dble(Br_counter(2,3))+   &
                                           dble(Br_counter(3,1))+dble(Br_counter(3,2)))/  &
                                           (dble(Br_counter(1,5))+dble(Br_counter(2,5))+dble(Br_counter(3,5))+  &
                                           dble(Br_counter(5,1))+dble(Br_counter(5,2))+dble(Br_counter(5,3)) )
-                                                           
-                                                           
+                                          
       !     print *, alpha_QED/12d0*M_Z * (   (aR_lep+aL_lep)**2 + (aR_lep-aL_lep)**2        &
       !                                      +(aR_lep+aL_lep)**2 + (aR_lep-aL_lep)**2        &
       !                                      +(aR_lep+aL_lep)**2 + (aR_lep-aL_lep)**2        &
@@ -1028,7 +1023,9 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
                
    
   endif! unweighted
- 
+  
+  
+
 
 return
 END SUBROUTINE
@@ -1059,7 +1056,7 @@ include 'csmaxvalue.f'
 integer :: flav1,flav2,StatusPercent,MissingEvents,MaxEvts,imax
 integer :: VegasSeed
 character :: ProcessStr*(3)
-logical, parameter :: UseBetaVersion=.true.
+logical :: UseBetaVersion=.false.
 
     VG_Result = -13d0
     VG_Error  = -13d0
@@ -1104,6 +1101,7 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
         return
     endif
 
+
     ! WARM-UP RUN
     itmx = VegasIt1
     ncall= VegasNc1
@@ -1117,6 +1115,7 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
 
     if( Process.eq.110) call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.111) call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
+
     if( Process.eq.112) call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.113) call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
 
@@ -1146,6 +1145,9 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
 
 
 elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
+
+if( Process.eq.60 ) UseBetaVersion=.true.
+if( Process.eq.61 ) UseBetaVersion=.true.
 
 
 if( UseBetaVersion ) then 
@@ -1360,6 +1362,7 @@ else! beta version
    print *, ""    
    write(io_stdout,"(1X,A,F10.3)") "Total xsec: ",TotalXSec
 
+
     RequEvents(:,:)=0
     do i1=-5,5
     do j1=-5,5
@@ -1374,6 +1377,9 @@ else! beta version
     enddo
     enddo
    
+
+
+
 
 !------------------------------- set counts to zero for actual evaluation
 
@@ -1391,6 +1397,7 @@ else! beta version
     if(RequEvents(i1,j1).ne.0) then
           if( (PChannel.eq.0) .and. (abs(i1)+abs(j1).ne.0) ) cycle
           if( (PChannel.eq.1) .and. i1*j1.eq.0 ) cycle
+          
           write(io_stdout,*) ""
           write(io_stdout,*) ""
           write(io_stdout,"(X,A,I8,A,I4,I4,A)",advance='no') "generating ",RequEvents(i1,j1)," events for channel",i1,j1,":  "
@@ -1424,6 +1431,7 @@ else! beta version
     endif
     enddo
     enddo    
+
     
     
     
@@ -1452,7 +1460,6 @@ endif! beta version
                                          
   endif! unweighted
   
-
   
 
 
@@ -1515,7 +1522,6 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
      ClosedHeader=.false.
      WroteMassWidth=.false.
      InMadgraphMassBlock=.false.
-
      do while ( .not.FirstEvent )
         read(16,fmt="(A160)",IOSTAT=stat,END=99) FirstLines
         if ( FirstLines(1:4).eq."<!--" .and. .not.WroteHeader ) then
@@ -1738,7 +1744,6 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                     if( Res.ne.0d0 ) exit
                 enddo
           endif          
-
           if( Res.gt.0d0 ) then ! decay event was accepted
           
              if( TauDecays.lt.0 ) then!  H->VV->4f
@@ -2464,8 +2469,6 @@ SUBROUTINE InitHisto()
 use modParameters
 implicit none
 
-
-
   if( Process.eq.60 .or. Process.eq.66 ) then
      call InitHisto_HVBF()
   elseif( Process.eq.61) then
@@ -2669,6 +2672,7 @@ END SUBROUTINE
 
 
 
+
 SUBROUTINE InitHisto_HJ()
 use ModMisc
 use ModKinematics
@@ -2762,10 +2766,6 @@ integer :: AllocStatus,NHisto
 
 RETURN
 END SUBROUTINE
-
-
-
-
 SUBROUTINE InitHisto_TTBH()
 use ModMisc
 use ModKinematics
@@ -2940,7 +2940,6 @@ integer :: AllocStatus,NHisto
           Histo(6)%BinSize= 0.1d0
           Histo(6)%LowVal = -5d0
           Histo(6)%SetScale= 1d0
-
           Histo(7)%Info   = "D_0minus"
           Histo(7)%NBins  = 50
           Histo(7)%BinSize= 0.02
@@ -2957,11 +2956,6 @@ integer :: AllocStatus,NHisto
 
 RETURN
 END SUBROUTINE
-
-
-
-
-
 
 SUBROUTINE InitHisto_Htautau()
 use ModMisc
@@ -3079,12 +3073,6 @@ integer :: AllocStatus,NHisto
 
 RETURN
 END SUBROUTINE
-
-
-
-
-
-
 SUBROUTINE InitHisto_HVBF()
 use ModMisc
 use ModKinematics
@@ -3128,7 +3116,6 @@ integer :: AllocStatus,NHisto
           Histo(5)%BinSize= 0.2d0
           Histo(5)%LowVal = -5d0
           Histo(5)%SetScale= 1d0
-
           Histo(6)%Info   = "y(j1)"
           Histo(6)%NBins  = 50
           Histo(6)%BinSize= 0.2d0
@@ -3711,7 +3698,6 @@ character(len=*):: ThePreface
    
 return
 END SUBROUTINE
-
 
 
 SUBROUTINE PrintCommandLineArgs()
