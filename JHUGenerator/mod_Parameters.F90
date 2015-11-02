@@ -73,7 +73,7 @@ real(8), public, parameter :: m_el = 0.00051100d0  *GeV         ! electron mass
 real(8), public, parameter :: m_mu = 0.10566d0     *GeV         ! muon mass
 real(8), public, parameter :: m_tau = 1.7768d0     *GeV         ! tau mass
 real(8), public, parameter :: m_bot = 4.75d0       *GeV         ! bottom quark mass
-real(8), public, parameter :: Ga_tau =2.267d-12        *GeV         ! tau width
+real(8), public, parameter :: Ga_tau =2.267d-12    *GeV         ! tau width
 
 real(8), public, parameter :: HiggsDecayLengthMM = 0d0      ! Higgs decay length in [mm]
 real(8), public, parameter :: Gf = 1.16639d-5/GeV**2        ! Fermi constant
@@ -95,9 +95,7 @@ real(8), public, parameter :: Rjet = 0.5d0                  ! jet deltaR, anti-k
 real(8), public, parameter :: VBF_4ml_minmax(1:2) = (/ -1d0,-1d0 /)*GeV  ! min and max for m_4l in off-shell VBF production;   default is (-1,-1): m_4l ~ Higgs resonance (on-shell)
 ! real(8), public, parameter :: VBF_4ml_minmax(1:2) = (/ 300d0,600d0 /)*GeV  ! min and max for m_4l in off-shell VBF production, default is (-1,-1): m_4l ~ Higgs resonance (on-shell)
 
-
 !----------------------------------------------------------------------------------------------------
-
 
 ! CKM squared matrix entries 
 real(8), public, parameter :: VCKM_ud = 0.974285d0
@@ -109,7 +107,6 @@ real(8), public, parameter :: VCKM_ts =-0.040920069d0
 real(8), public, parameter :: VCKM_cb = dsqrt(1d0-VCKM_cd**2-VCKM_cs**2)
 real(8), public, parameter :: VCKM_ub = dsqrt(1d0-VCKM_ud**2-VCKM_us**2)
 real(8), public, parameter :: VCKM_td = dsqrt(1d0-VCKM_tb**2-VCKM_ts**2)
-
 
 
 ! absolute branching fraction (taken from PDG-2014)
@@ -438,9 +435,10 @@ integer,parameter :: io_CSmaxFile=18
 integer,parameter :: io_LHEOutFile2=19
 integer,parameter :: io_LHEOutFile3=20
 
-
 integer, public :: DebugCounter(0:10) = 0
 real(8), public :: debugvar(0:10) = 0d0
+
+
 integer, public :: ijPartons(1:2)=0
 
 
@@ -697,10 +695,6 @@ integer :: Part
 
 
 END FUNCTION
-
-
-
-
 
 FUNCTION getParticle(Part)
 implicit none

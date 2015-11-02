@@ -91,7 +91,6 @@ integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9
       LO_Res_Unpol(Bot_,Up_)  = cdabs(LOAmp(Bot_,Up_,1))**2  + cdabs(LOAmp(Bot_,Up_,2))**2
       LO_Res_Unpol(Chm_,Bot_) = LO_Res_Unpol(Up_,Bot_)
       LO_Res_Unpol(Bot_,Chm_) = LO_Res_Unpol(Bot_,Up_)
-
       LO_Res_Unpol(ADn_,Bot_) = cdabs(LOAmp(ADn_,Bot_,1))**2 + cdabs(LOAmp(ADn_,Bot_,2))**2
       LO_Res_Unpol(Bot_,ADn_) = cdabs(LOAmp(Bot_,ADn_,1))**2 + cdabs(LOAmp(Bot_,ADn_,2))**2
       LO_Res_Unpol(AStr_,Bot_)= LO_Res_Unpol(ADn_,Bot_)

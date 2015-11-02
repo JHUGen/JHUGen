@@ -63,7 +63,6 @@ c
          entry vegas2(fxn,avgi,sd,chi2a)
 c        no initialisation
          jj=0
-
          nd=ndmx
          ng=1
          if(mds.eq.0)go to 2
