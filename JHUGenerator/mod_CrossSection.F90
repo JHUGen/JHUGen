@@ -332,7 +332,6 @@ Function EvalWeighted_VHiggs(yRnd,VgsWgt)
     real(8) :: helicity(9)!, beam_h(2) !helicities
     integer id(9), id2(9)!, beam_id(2)
 
-!yrnd(1:20)=(/0.70081154024295889d0,       0.36652768365385663d0,        3.4015114427896315d-002,  0.12011275833880684d0,       0.27630110527729695d0,       0.39126881153768606d0,       0.51098461273436080d0,       0.93976094696594392d0,       0.75740719244663901d0,       0.63188392158202700d0,        7.7191020216007322d-002,  0.99999999970117104d0,       0.64254210890693042d0,        6.4323827671500966d-002,  0.65341322658978906d0,       0.72709843817452313d0,        4.7717851574683431d-002,  0.86837190555567156d0,       0.70578200706054295d0,       0.53128914246883485d0/)
 
     EvalWeighted_VHiggs=0d0
     EvalCounter = EvalCounter+1
@@ -382,76 +381,75 @@ Function EvalWeighted_VHiggs(yRnd,VgsWgt)
         endif
         helicity(7)=-helicity(6)
 
-    if(DecayMode1.eq.0)then
-      id(3)=convertLHE(Z0_)
-      id(4)=convertLHE(Z0_)
-      if(yRnd(5).lt.0.5d0)then
-        id(6)=convertLHE(MuM_)
-        id(7)=-id(6)
-      else
-        id(6)=convertLHE(ElM_)
-        id(7)=-id(6)
-      endif
+if(DecayMode1.eq.0)then
+  id(3)=convertLHE(Z0_)
+  id(4)=convertLHE(Z0_)
+  if(yRnd(5).lt.0.5d0)then
+id(6)=convertLHE(MuM_)
+  else
+id(6)=convertLHE(ElM_)
+endif
+id(7)=-id(6)
 
-    elseif(DecayMode1.eq.1)then
-      id(3)=convertLHE(Z0_)
-      id(4)=convertLHE(Z0_)
-      if(yRnd(5).lt.Brhadr_Z_uu)then
-        id(6)=convertLHE(Up_)
-        id(7)=-id(6)
-      elseif(yRnd(5).lt.(Brhadr_Z_uu+Brhadr_Z_cc))then
-        id(6)=convertLHE(Chm_)
-        id(7)=-id(6)
-      elseif(yRnd(5).lt.(Brhadr_Z_uu+Brhadr_Z_cc+Brhadr_Z_dd))then
-        id(6)=convertLHE(Dn_)
-        id(7)=-id(6)
-      elseif(yRnd(5).lt.(Brhadr_Z_uu+Brhadr_Z_cc+Brhadr_Z_dd+Brhadr_Z_ss))then
-        id(6)=convertLHE(Str_)
-        id(7)=-id(6)
-      else
-        id(6)=convertLHE(Bot_)
-        id(7)=-id(6)  
-      endif
+!elseif(DecayMode1.eq.1)then
+!  id(3)=convertLHE(Z0_)
+!  id(4)=convertLHE(Z0_)
+!  id(6)=convertLHE(ZQuaBranching_flat(yRnd(5)))
+!  id(7)=-id(6)
 
-    elseif(DecayMode1.eq.2)then
-      id(3)=convertLHE(Z0_)
-      id(4)=convertLHE(Z0_)
-      id(6)=convertLHE(TaM_)
-      id(7)=-id(6)  
+elseif(DecayMode1.eq.1)then
+  id(3)=convertLHE(Z0_)
+  id(4)=convertLHE(Z0_)
+  if(yRnd(5).lt.0.2d0)then
+    id(6)=convertLHE(Up_)
+  elseif(yRnd(5).lt.0.4d0)then
+    id(6)=convertLHE(Chm_)
+  elseif(yRnd(5).lt.0.6d0)then
+    id(6)=convertLHE(Dn_)
+  elseif(yRnd(5).lt.0.8d0)then
+    id(6)=convertLHE(Str_)
+  else
+    id(6)=convertLHE(Bot_)
+  endif
+  id(7)=-id(6)
 
-    elseif(DecayMode1.eq.3)then
-      id(3)=convertLHE(Z0_)
-      id(4)=convertLHE(Z0_)
-      if(yRnd(5).lt.0.33333333333333333333d0)then
-        id(6)=convertLHE(NuE_)
-        id(7)=-id(6)
-      elseif(yRnd(5).lt.0.66666666666666666667d0)then
-        id(6)=convertLHE(NuM_)
-        id(7)=-id(6)
-      else
-        id(6)=convertLHE(NuT_)
-        id(7)=-id(6)
-      endif
-    helicity(6)=sign(1d0,-dble(id(6)))
-    helicity(7)=-helicity(6)
+elseif(DecayMode1.eq.2)then
+  id(3)=convertLHE(Z0_)
+  id(4)=convertLHE(Z0_)
+  id(6)=convertLHE(TaM_)
+  id(7)=-id(6)  
 
-    elseif (DecayMode1.eq.4) then
-      id(3)=convertLHE(Wp_)
-      id(4)=convertLHE(Wp_)
-      if(yRnd(5).lt.0.5d0)then
-        id(7)=convertLHE(ElP_)
-        id(6)=convertLHE(NuE_)
-      else
-        id(7)=convertLHE(MuP_)
-        id(6)=convertLHE(NuM_)
-      endif
-      helicity(6)=sign(1d0,-dble(id(6)))
-      helicity(7)=-helicity(6)
+elseif(DecayMode1.eq.3)then
+  id(3)=convertLHE(Z0_)
+  id(4)=convertLHE(Z0_)
+  if(yRnd(5).lt.0.33333333333333333333d0)then
+    id(6)=convertLHE(NuE_)
+  elseif(yRnd(5).lt.0.66666666666666666667d0)then
+    id(6)=convertLHE(NuM_)
+  else
+    id(6)=convertLHE(NuT_)
+  endif
+  id(7)=-id(6)
+  helicity(6)=sign(1d0,-dble(id(6)))
+  helicity(7)=-helicity(6)
 
-    elseif(DecayMode1.eq.5)then
-      id(3)=convertLHE(Wp_)
-      id(4)=convertLHE(Wp_)
-      if(yRnd(5).lt.0.16666666666667d0)then
+elseif (DecayMode1.eq.4) then
+  id(3)=convertLHE(Wp_)
+  id(4)=convertLHE(Wp_)
+  if(yRnd(5).lt.0.5d0)then
+    id(7)=convertLHE(ElP_)
+    id(6)=convertLHE(NuE_)
+  else
+    id(7)=convertLHE(MuP_)
+    id(6)=convertLHE(NuM_)
+  endif
+  helicity(6)=sign(1d0,-dble(id(6)))
+  helicity(7)=-helicity(6)
+
+elseif(DecayMode1.eq.5)then
+  id(3)=convertLHE(Wp_)
+  id(4)=convertLHE(Wp_)
+  if(yRnd(5).lt.0.16666666666667d0)then
         id(6)=convertLHE(Up_)
         id(7)=convertLHE(Adn_)
       elseif(yRnd(5).lt.0.33333333333333d0)then
@@ -470,122 +468,122 @@ Function EvalWeighted_VHiggs(yRnd,VgsWgt)
         id(6)=convertLHE(Chm_)
         id(7)=convertLHE(Abot_)
       endif
-      helicity(6)=sign(1d0,-dble(id(6)))
-      helicity(7)=-helicity(6)
+  helicity(6)=sign(1d0,-dble(id(6)))
+  helicity(7)=-helicity(6)
 
-    elseif(DecayMode1.eq.6)then
-      id(3)=convertLHE(Wp_)
-      id(4)=convertLHE(Wp_)
-      id(7)=convertLHE(TaP_)
-      id(6)=convertLHE(NuT_)
-      helicity(6)=sign(1d0,-dble(id(6)))
-      helicity(7)=-helicity(6)
+elseif(DecayMode1.eq.6)then
+  id(3)=convertLHE(Wp_)
+  id(4)=convertLHE(Wp_)
+  id(7)=convertLHE(TaP_)
+  id(6)=convertLHE(NuT_)
+  helicity(6)=sign(1d0,-dble(id(6)))
+  helicity(7)=-helicity(6)
 
-    elseif(DecayMode1.eq.7)then
-      print *, "invalid final states for V > VH"
-      stop
+elseif(DecayMode1.eq.7)then
+  print *, "invalid final states for V > VH"
+  stop
 
-    elseif(DecayMode1.eq.8)then
-      id(3)=convertLHE(Z0_)
-      id(4)=convertLHE(Z0_)
-      if(yRnd(5).lt.0.33333333333333333333d0)then
-        id(6)=convertLHE(ElM_)
-        id(7)=-id(6)
-      elseif(yRnd(5).lt.0.66666666666666666667d0)then
-        id(6)=convertLHE(MuM_)
-        id(7)=-id(6)
-      else
-        id(6)=convertLHE(TaM_)
-        id(7)=-id(6)
-      endif
+elseif(DecayMode1.eq.8)then
+  id(3)=convertLHE(Z0_)
+  id(4)=convertLHE(Z0_)
+  if(yRnd(5).lt.0.33333333333333333333d0)then
+    id(6)=convertLHE(ElM_)
+  elseif(yRnd(5).lt.0.66666666666666666667d0)then
+    id(6)=convertLHE(MuM_)
+  else
+    id(6)=convertLHE(TaM_)
+  endif
+  id(7)=-id(6)
 
-    elseif(DecayMode1.eq.9)then
-      id(3)=convertLHE(Z0_)
-      id(4)=convertLHE(Z0_)
-      if(yRnd(5).lt.Br_Z_uu)then
-        id(6)=convertLHE(Up_)
-        id(7)=-id(6)
-      elseif(yRnd(5).lt.(Br_Z_uu+Br_Z_cc))then
-        id(6)=convertLHE(Chm_)
-        id(7)=-id(6)
-      elseif(yRnd(5).lt.(Br_Z_uu+Br_Z_cc+Br_Z_dd))then
-        id(6)=convertLHE(Dn_)
-        id(7)=-id(6)
-      elseif(yRnd(5).lt.(Br_Z_uu+Br_Z_cc+Br_Z_dd+Br_Z_ss))then
-        id(6)=convertLHE(Str_)
-        id(7)=-id(6)
-      elseif(yRnd(5).lt.(Br_Z_uu+Br_Z_cc+Br_Z_dd+Br_Z_ss+Br_Z_bb))then
-        id(6)=convertLHE(Bot_)
-        id(7)=-id(6)
-      elseif(yRnd(5).lt.(Br_Z_uu+Br_Z_cc+Br_Z_dd+Br_Z_ss+Br_Z_bb+Br_Z_ee))then
-        id(6)=convertLHE(ElM_)
-        id(7)=-id(6)
-      elseif(yRnd(5).lt.(Br_Z_uu+Br_Z_cc+Br_Z_dd+Br_Z_ss+Br_Z_bb+Br_Z_ee+Br_Z_mm))then
-        id(6)=convertLHE(MuM_)
-        id(7)=-id(6)
-      elseif(yRnd(5).lt.(Br_Z_uu+Br_Z_cc+Br_Z_dd+Br_Z_ss+Br_Z_bb+Br_Z_ee+Br_Z_mm+Br_Z_tt))then
-        id(6)=convertLHE(TaM_)
-        id(7)=-id(6)
-      elseif(yRnd(5).lt.(Br_Z_uu+Br_Z_cc+Br_Z_dd+Br_Z_ss+Br_Z_bb+Br_Z_ee+Br_Z_mm+Br_Z_tt+Br_Z_nn))then
-        id(6)=convertLHE(NuE_)
-        id(7)=-id(6)
-        helicity(6)=sign(1d0,-dble(id(4)))
-        helicity(7)=-helicity(6)
-      elseif(yRnd(5).lt.(Br_Z_uu+Br_Z_cc+Br_Z_dd+Br_Z_ss+Br_Z_bb+Br_Z_ee+Br_Z_mm+Br_Z_tt+Br_Z_nn+Br_Z_nn))then
-        id(6)=convertLHE(NuM_)
-        id(7)=-id(6)
-        helicity(6)=sign(1d0,-dble(id(6)))
-        helicity(7)=-helicity(6)
-      else
-        id(6)=convertLHE(NuT_)
-        id(7)=-id(6)
-        helicity(6)=sign(1d0,-dble(id(6)))
-        helicity(7)=-helicity(6)
-      endif
+elseif(DecayMode1.eq.9)then
+  id(3)=convertLHE(Z0_)
+  id(4)=convertLHE(Z0_)
+  if(yRnd(5).lt.6d0/39d0)then
+    id(6)=convertLHE(Up_)
+  elseif(yRnd(5).lt.(12d0/39d0))then
+    id(6)=convertLHE(Chm_)
+  elseif(yRnd(5).lt.(18d0/39d0))then
+    id(6)=convertLHE(Dn_)
+  elseif(yRnd(5).lt.(24d0/39d0))then
+    id(6)=convertLHE(Str_)
+  elseif(yRnd(5).lt.(30d0/39d0))then
+    id(6)=convertLHE(Bot_)
+  elseif(yRnd(5).lt.(32d0/39d0))then
+    id(6)=convertLHE(ElM_)
+  elseif(yRnd(5).lt.(34d0/39d0))then
+    id(6)=convertLHE(MuM_)
+  elseif(yRnd(5).lt.(36d0/39d0))then
+    id(6)=convertLHE(TaM_)
+  elseif(yRnd(5).lt.(37d0/39d0))then
+    id(6)=convertLHE(NuE_)
+    helicity(6)=sign(1d0,-dble(id(6)))
+    helicity(7)=-helicity(6)
+  elseif(yRnd(5).lt.(38d0/39d0))then
+    id(6)=convertLHE(NuM_)
+    helicity(6)=sign(1d0,-dble(id(6)))
+    helicity(7)=-helicity(6)
+  else
+    id(6)=convertLHE(NuT_)
+    helicity(6)=sign(1d0,-dble(id(6)))
+    helicity(7)=-helicity(6)
+  endif
+  id(7)=-id(6)
 
-      elseif(DecayMode1.eq.10)then
-        id(3)=convertLHE(Wp_)
-        id(4)=convertLHE(Wp_)
-        if(yRnd(5).lt.0.33333333333333333333d0)then
-          id(7)=convertLHE(ElP_)
-          id(6)=convertLHE(NuE_)
-        elseif(yRnd(5).lt.0.66666666666666666667d0)then
-          id(7)=convertLHE(MuP_)
-          id(6)=convertLHE(NuM_)
-        else
-          id(7)=convertLHE(TaP_)
-          id(6)=convertLHE(NuT_)
-        endif
-        helicity(6)=sign(1d0,-dble(id(6)))
-        helicity(7)=-helicity(6)
+elseif(DecayMode1.eq.10)then
+  id(3)=convertLHE(Wp_)
+  id(4)=convertLHE(Wp_)
+  if(yRnd(5).lt.0.33333333333333333333d0)then
+    id(7)=convertLHE(ElP_)
+    id(6)=convertLHE(NuE_)
+  elseif(yRnd(5).lt.0.66666666666666666667d0)then
+    id(7)=convertLHE(MuP_)
+    id(6)=convertLHE(NuM_)
+  else
+    id(7)=convertLHE(TaP_)
+    id(6)=convertLHE(NuT_)
+  endif
+  helicity(6)=sign(1d0,-dble(id(6)))
+  helicity(7)=-helicity(6)
 
-      elseif(DecayMode1.eq.11)then
-        id(3)=convertLHE(Wp_)
-        id(4)=convertLHE(Wp_)
-        if(yRnd(5).lt.Br_W_en)then
-          id(7)=convertLHE(ElP_)
-          id(6)=convertLHE(NuE_)
-        elseif(yRnd(5).lt.(Br_W_en+Br_W_mn))then
-          id(7)=convertLHE(MuP_)
-          id(6)=convertLHE(NuM_)
-        elseif(yRnd(5).lt.(Br_W_en+Br_W_mn+Br_W_tn))then
-          id(7)=convertLHE(TaP_)
-          id(6)=convertLHE(NuT_)
-        elseif(yRnd(5).lt.(Br_W_en+Br_W_mn+Br_W_tn+Br_W_ud))then
-          id(6)=convertLHE(Up_)
-          id(7)=convertLHE(Adn_)
-        else
-          id(6)=convertLHE(Chm_)
-          id(7)=convertLHE(AStr_)
-        endif
-        helicity(6)=sign(1d0,-dble(id(6)))
-        helicity(7)=-helicity(6)
+elseif(DecayMode1.eq.11)then
+  id(3)=convertLHE(Wp_)
+  id(4)=convertLHE(Wp_)
+  if(yRnd(5).lt.1d0/21d0)then
+    id(7)=convertLHE(ElP_)
+    id(6)=convertLHE(NuE_)
+  elseif(yRnd(5).lt.(2d0/21d0))then
+    id(7)=convertLHE(MuP_)
+    id(6)=convertLHE(NuM_)
+  elseif(yRnd(5).lt.(3d0/21d0))then
+    id(7)=convertLHE(TaP_)
+    id(6)=convertLHE(NuT_)
+  elseif(yRnd(5).lt.(6d0/21d0))then
+    id(6)=convertLHE(Up_)
+    id(7)=convertLHE(Adn_)
+  elseif(yRnd(5).lt.(9d0/21d0))then
+    id(6)=convertLHE(Chm_)
+    id(7)=convertLHE(AStr_)
+  elseif(yRnd(5).lt.(12d0/21d0))then
+    id(6)=convertLHE(Up_)
+    id(7)=convertLHE(AStr_)
+  elseif(yRnd(5).lt.(15d0/21d0))then
+    id(6)=convertLHE(Chm_)
+    id(7)=convertLHE(Adn_)
+  elseif(yRnd(5).lt.(18d0/21d0))then
+    id(6)=convertLHE(Up_)
+    id(7)=convertLHE(Abot_)
+  else
+    id(6)=convertLHE(Chm_)
+    id(7)=convertLHE(Abot_)
+  endif
+  helicity(6)=sign(1d0,-dble(id(6)))
+  helicity(7)=-helicity(6)
 
-      else
-        print *, "invalid final states"
-        stop
+else
+  print *, "invalid final states"
+  stop
 
-      endif
+endif
 
 
 if( IsAZDecay(DecayMode1) ) then
@@ -956,16 +954,31 @@ if(DecayMode1.eq.0)then
   id(4)=convertLHE(Z0_)
   if(yRnd(5).lt.0.5d0)then
 id(6)=convertLHE(MuM_)
-id(7)=-id(6)
   else
 id(6)=convertLHE(ElM_)
-id(7)=-id(6)
 endif
+id(7)=-id(6)
+
+!elseif(DecayMode1.eq.1)then
+!  id(3)=convertLHE(Z0_)
+!  id(4)=convertLHE(Z0_)
+!  id(6)=convertLHE(ZQuaBranching_flat(yRnd(5)))
+!  id(7)=-id(6)
 
 elseif(DecayMode1.eq.1)then
   id(3)=convertLHE(Z0_)
   id(4)=convertLHE(Z0_)
-  id(6)=convertLHE(ZQuaBranching_flat(yRnd(5)))
+  if(yRnd(5).lt.0.2d0)then
+    id(6)=convertLHE(Up_)
+  elseif(yRnd(5).lt.0.4d0)then
+    id(6)=convertLHE(Chm_)
+  elseif(yRnd(5).lt.0.6d0)then
+    id(6)=convertLHE(Dn_)
+  elseif(yRnd(5).lt.0.8d0)then
+    id(6)=convertLHE(Str_)
+  else
+    id(6)=convertLHE(Bot_)
+  endif
   id(7)=-id(6)
 
 elseif(DecayMode1.eq.2)then
@@ -979,14 +992,12 @@ elseif(DecayMode1.eq.3)then
   id(4)=convertLHE(Z0_)
   if(yRnd(5).lt.0.33333333333333333333d0)then
     id(6)=convertLHE(NuE_)
-    id(7)=-id(6)
   elseif(yRnd(5).lt.0.66666666666666666667d0)then
     id(6)=convertLHE(NuM_)
-    id(7)=-id(6)
   else
     id(6)=convertLHE(NuT_)
-    id(7)=-id(6)
   endif
+  id(7)=-id(6)
   helicity(6)=sign(1d0,-dble(id(6)))
   helicity(7)=-helicity(6)
 
@@ -1045,58 +1056,46 @@ elseif(DecayMode1.eq.8)then
   id(4)=convertLHE(Z0_)
   if(yRnd(5).lt.0.33333333333333333333d0)then
     id(6)=convertLHE(ElM_)
-    id(7)=-id(6)
   elseif(yRnd(5).lt.0.66666666666666666667d0)then
     id(6)=convertLHE(MuM_)
-    id(7)=-id(6)
   else
     id(6)=convertLHE(TaM_)
-    id(7)=-id(6)
   endif
+  id(7)=-id(6)
 
 elseif(DecayMode1.eq.9)then
   id(3)=convertLHE(Z0_)
   id(4)=convertLHE(Z0_)
   if(yRnd(5).lt.6d0/39d0)then
     id(6)=convertLHE(Up_)
-    id(7)=-id(6)
   elseif(yRnd(5).lt.(12d0/39d0))then
     id(6)=convertLHE(Chm_)
-    id(7)=-id(6)
   elseif(yRnd(5).lt.(18d0/39d0))then
     id(6)=convertLHE(Dn_)
-    id(7)=-id(6)
   elseif(yRnd(5).lt.(24d0/39d0))then
     id(6)=convertLHE(Str_)
-    id(7)=-id(6)
   elseif(yRnd(5).lt.(30d0/39d0))then
     id(6)=convertLHE(Bot_)
-    id(7)=-id(6)
   elseif(yRnd(5).lt.(32d0/39d0))then
     id(6)=convertLHE(ElM_)
-    id(7)=-id(6)
   elseif(yRnd(5).lt.(34d0/39d0))then
     id(6)=convertLHE(MuM_)
-    id(7)=-id(6)
   elseif(yRnd(5).lt.(36d0/39d0))then
     id(6)=convertLHE(TaM_)
-    id(7)=-id(6)
   elseif(yRnd(5).lt.(37d0/39d0))then
     id(6)=convertLHE(NuE_)
-    id(7)=-id(6)
     helicity(6)=sign(1d0,-dble(id(6)))
     helicity(7)=-helicity(6)
   elseif(yRnd(5).lt.(38d0/39d0))then
     id(6)=convertLHE(NuM_)
-    id(7)=-id(6)
     helicity(6)=sign(1d0,-dble(id(6)))
     helicity(7)=-helicity(6)
   else
     id(6)=convertLHE(NuT_)
-    id(7)=-id(6)
     helicity(6)=sign(1d0,-dble(id(6)))
     helicity(7)=-helicity(6)
   endif
+  id(7)=-id(6)
 
 elseif(DecayMode1.eq.10)then
   id(3)=convertLHE(Wp_)

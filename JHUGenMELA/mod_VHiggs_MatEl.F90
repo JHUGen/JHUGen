@@ -173,36 +173,40 @@ end subroutine EvalAmp_VHiggs
 
       if(id(1).gt.0)then
         call FFV(id(2), MomExt(:,2), helicity(2), id(1), MomExt(:,1), helicity(1), Vcurrent1)
-        if((id(1)+id(2)).eq.0)then
+!        if((id(1)+id(2)).eq.0)then
           call FFA(id(2), MomExt(:,2), helicity(2), id(1), MomExt(:,1), helicity(1), Acurrent1)
-        endif
+!        endif
       else
         call FFV(id(1), MomExt(:,1), helicity(1), id(2), MomExt(:,2), helicity(2), Vcurrent1)
-        if((id(1)+id(2)).eq.0)then
+!        if((id(1)+id(2)).eq.0)then
           call FFA(id(1), MomExt(:,1), helicity(1), id(2), MomExt(:,2), helicity(2), Acurrent1)
-        endif
+!        endif
       endif
 
       if(id(6).gt.0)then
         call FFV(id(6), MomExt(:,6), helicity(6), id(7), MomExt(:,7), helicity(7), Vcurrent2)
-        if((id(6)+id(7)).eq.0)then
+!        if((id(6)+id(7)).eq.0)then
           call FFA(id(6), MomExt(:,6), helicity(6), id(7), MomExt(:,7), helicity(7), Acurrent2)
-        endif
+!        endif
       else
         call FFV(id(7), MomExt(:,7), helicity(7), id(6), MomExt(:,6), helicity(6), Vcurrent2)
-        if((id(6)+id(7)).eq.0)then
+!        if((id(6)+id(7)).eq.0)then
           call FFA(id(7), MomExt(:,7), helicity(7), id(6), MomExt(:,6), helicity(6), Acurrent2)
-        endif
+!        endif
       endif
 
 !WH
       if((id(1)+id(2)).ne.0)then
         if((id(1)*helicity(1)).le.0d0)then
-          current1=Vcurrent1*gFFW*CKM(abs(id(1)),abs(id(2)))
+          current1=(Vcurrent1-Acurrent1)/2d0*gFFW*CKM(id(1),id(2))
         else
           current1=0d0
         endif
-        current2=Vcurrent2*gFFW*CKM(abs(id(6)),abs(id(7)))
+        if((id(6)*helicity(6)).le.0d0)then
+          current2=(Vcurrent2-Acurrent2)/2d0*gFFW*CKM(id(6),id(7))
+        else
+          current2=0d0
+        endif
 
 !ZH
       else if((abs(id(1)).eq.11).or.(abs(id(1)).eq.13))then

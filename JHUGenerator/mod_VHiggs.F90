@@ -97,38 +97,53 @@ contains
       PROP2 = PROPAGATOR(inv_mass(4),mass(4,1),mass(4,2))
       PROP3 = PROPAGATOR(inv_mass(5),mass(5,1),mass(5,2))
 
+      Vcurrent1 = (0d0,0d0)
+      Acurrent1 = (0d0,0d0)
+      Vcurrent2 = (0d0,0d0)
+      Acurrent2 = (0d0,0d0)
+
       if(id(1).gt.0)then
         call FFV(id(2), MomExt(:,2), helicity(2), id(1), MomExt(:,1), helicity(1), Vcurrent1)
-        if((id(1)+id(2)).eq.0)then
+!        if((id(1)+id(2)).eq.0)then
           call FFA(id(2), MomExt(:,2), helicity(2), id(1), MomExt(:,1), helicity(1), Acurrent1)
-        endif
+!        endif
       else
         call FFV(id(1), MomExt(:,1), helicity(1), id(2), MomExt(:,2), helicity(2), Vcurrent1)
-        if((id(1)+id(2)).eq.0)then
+!        if((id(1)+id(2)).eq.0)then
           call FFA(id(1), MomExt(:,1), helicity(1), id(2), MomExt(:,2), helicity(2), Acurrent1)
-        endif
+!        endif
       endif
 
       if(id(6).gt.0)then
         call FFV(id(6), MomExt(:,6), helicity(6), id(7), MomExt(:,7), helicity(7), Vcurrent2)
-        if((id(6)+id(7)).eq.0)then
+!        if((id(6)+id(7)).eq.0)then
           call FFA(id(6), MomExt(:,6), helicity(6), id(7), MomExt(:,7), helicity(7), Acurrent2)
-        endif
+!        endif
       else
         call FFV(id(7), MomExt(:,7), helicity(7), id(6), MomExt(:,6), helicity(6), Vcurrent2)
-        if((id(6)+id(7)).eq.0)then
+!        if((id(6)+id(7)).eq.0)then
           call FFA(id(7), MomExt(:,7), helicity(7), id(6), MomExt(:,6), helicity(6), Acurrent2)
-        endif
+!        endif
       endif
+
+!        print *, Vcurrent1
+!        Print *, Acurrent1
+!        print *, Vcurrent2
+!        Print *, Acurrent2
+!        print *, "----"
 
 !WH
       if((id(1)+id(2)).ne.0)then
         if((id(1)*helicity(1)).le.0d0)then
-          current1=Vcurrent1*gFFW*CKM(id(1),id(2))
+          current1=(Vcurrent1-Acurrent1)/2d0*gFFW*CKM(id(1),id(2))
         else
           current1=0d0
         endif
-        current2=Vcurrent2*gFFW*CKM(id(6),id(7))
+        if((id(6)*helicity(6)).le.0d0)then
+          current2=(Vcurrent2-Acurrent2)/2d0*gFFW*CKM(id(6),id(7))
+        else
+          current2=0d0
+        endif
 
 !ZH
       else if((abs(id(1)).eq.11).or.(abs(id(1)).eq.13))then
@@ -850,6 +865,8 @@ contains
       complex(8) Acurrent(4)
       integer mu
 
+      Acurrent = (0d0,0d0)
+
       if( ( dble(pdg_code1) *h1* dble(pdg_code2) *h2 ).lt.0d0)then
         do mu=1,4
           Acurrent(mu)=0d0
@@ -939,6 +956,8 @@ contains
       integer pdg_code1, pdg_code2
       real(8) sqrt_pp1Dpp2
 
+      FFS = (0d0,0d0)
+
       if( ( dble(pdg_code1) *h1* dble(pdg_code2) *h2 ).gt.0d0)then
         FFS=0d0
 
@@ -995,6 +1014,8 @@ contains
       real(8) sqrt_pp1Dpp2, sqrt_pp1Xpp2
       complex(8) Vcurrent(4)
       integer mu
+
+      Vcurrent = (0d0,0d0)
 
       if( ( dble(pdg_code1) *h1* dble(pdg_code2) *h2 ).lt.0d0)then
         do mu=1,4
