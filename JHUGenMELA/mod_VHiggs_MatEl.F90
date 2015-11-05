@@ -507,7 +507,7 @@ end subroutine EvalAmp_VHiggs
 
       integer i,j,k,l
 
-      ANTISYMMETRIC=-dble((i-j)*(i-k)*(i-l)*(j-k)*(j-l)*(k-l))/12d0
+      ANTISYMMETRIC=dble((i-j)*(i-k)*(i-l)*(j-k)*(j-l)*(k-l))/12d0
 
       return
       END function ANTISYMMETRIC
