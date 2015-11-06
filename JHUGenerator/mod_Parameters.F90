@@ -3,10 +3,10 @@ implicit none
 save
 ! 
 ! 
-character(len=6),parameter :: JHUGen_Version="v6.3.2"
+character(len=6),parameter :: JHUGen_Version="v6.6.8"
 ! 
 ! 
-integer, public :: Collider, PDFSet,PChannel,Process,DecayMode1,DecayMode2,TopDecays
+integer, public :: Collider, PDFSet,PChannel,Process,DecayMode1,DecayMode2,TopDecays,TauDecays
 integer, public :: VegasIt1,VegasNc0,VegasNc1,VegasNc2
 real(8), public :: Collider_Energy
 integer, public :: VegasIt1_default,VegasNc0_default,VegasNc1_default,VegasNc2_default
@@ -17,7 +17,9 @@ integer(8), public :: EvalCounter=0
 integer(8), public :: RejeCounter=0
 integer(8), public :: AccepCounter=0
 integer(8), public :: AlertCounter=0
-integer(8), public :: AccepCounter_part(-5:5,-5:5)=0
+integer(8), public :: AccepCounter_part(-6:6,-6:6)=0,RequEvents(-6:+6,-6:+6)
+real(8), public :: CrossSecMax(-6:+6,-6:+6),CrossSec(-6:+6,-6:+6)
+integer, public :: iPart_sel, jPart_sel
 real(8) :: time_start,time_end,time_int
 logical, public :: warmup
 character(len=500) :: DataFile
@@ -29,10 +31,10 @@ logical, public :: includeInterference
 real(8), public :: M_V,Ga_V
 real(8), public, parameter :: GeV=1d0/100d0 ! we are using units of 100GeV, i.e. Lambda=10 is 1TeV 
 real(8), public, parameter :: percent=1d0/100d0
-real(8),public :: GlobalMax=-1d99
-real(8),public :: GlobalMin=+1d99
-integer,parameter :: NPart=200
-real(8),public :: PartitionMax(0:NPart,0:NPart)=-1d99
+! real(8),public :: GlobalMax=-1d99
+! real(8),public :: GlobalMin=+1d99
+! integer,parameter :: NPart=200
+! real(8),public :: PartitionMax(0:NPart,0:NPart)=-1d99
 real(8),public :: minCS=1d10,maxCS=0d0,avgCS=0d0
 
 
@@ -55,8 +57,8 @@ logical, public, parameter :: RandomizeVVdecays = .true. ! randomize DecayMode1 
 
 logical, public, parameter :: UseUnformattedRead = .false.  !Set this to true if the regular reading fails for whatever reason
 
-real(8), public            :: M_Top   = 173.2d0     *GeV      ! 
-real(8), public, parameter :: Ga_Top  = 2.0d0    *GeV      ! 
+real(8), public            :: M_Top   = 173.2d0   *GeV      ! top quark mass
+real(8), public, parameter :: Ga_Top  = 2.0d0     *GeV      ! top quark width
 real(8), public, parameter :: M_Z     = 91.1876d0 *GeV      ! Z boson mass (PDG-2011)
 real(8), public, parameter :: Ga_Z    = 2.4952d0  *GeV      ! Z boson width(PDG-2011)
 real(8), public, parameter :: M_W     = 80.399d0  *GeV      ! W boson mass (PDG-2011)
@@ -70,13 +72,14 @@ real(8), public, parameter :: Lambda  = 1000d0    *GeV      ! Lambda coupling en
 real(8), public, parameter :: m_el = 0.00051100d0  *GeV         ! electron mass
 real(8), public, parameter :: m_mu = 0.10566d0     *GeV         ! muon mass
 real(8), public, parameter :: m_tau = 1.7768d0     *GeV         ! tau mass
-real(8), public, parameter :: m_bot = 4.75d0    *GeV         ! bottom quark mass
+real(8), public, parameter :: m_bot = 4.75d0       *GeV         ! bottom quark mass
+real(8), public, parameter :: Ga_tau =2.267d-12    *GeV         ! tau width
 
 real(8), public, parameter :: HiggsDecayLengthMM = 0d0      ! Higgs decay length in [mm]
 real(8), public, parameter :: Gf = 1.16639d-5/GeV**2        ! Fermi constant
 real(8), public, parameter :: vev = 1.0d0/sqrt(Gf*sqrt(2.0d0))
 real(8), public, parameter :: gwsq = 4.0d0 * M_W**2/vev**2  ! weak constant squared
-real(8), public, parameter :: alpha_QED = 1d0/128d0    ! el.magn. coupling
+real(8), public, parameter :: alpha_QED = 1d0/128d0         ! el.magn. coupling
 real(8), public, parameter :: alphas = 0.13229060d0         ! strong coupling
 real(8), public, parameter :: sitW = dsqrt(0.23119d0)       ! sin(Theta_Weinberg) (PDG-2008)
 real(8), public            :: Mu_Fact                       ! pdf factorization scale (set to M_Reso in main.F90)
@@ -88,7 +91,9 @@ real(8), public, parameter :: POL_B = 0d0                   ! e- polarization. 0
 logical, public, parameter :: H_DK =.false.                 ! default to false so H in V* > VH (Process = 50) does not decay
 !logical, public, parameter :: V_DK =.true.                 ! default to true so V in V* > VH (Process = 50) decays
 real(8), public, parameter :: pTjetcut = 15d0*GeV           ! jet min pt
-real(8), public, parameter :: Rjet = 0.5d0                  ! jet deltaR, antikt algorithm 
+real(8), public, parameter :: Rjet = 0.5d0                  ! jet deltaR, anti-kt algorithm 
+real(8), public, parameter :: VBF_4ml_minmax(1:2) = (/ -1d0,-1d0 /)*GeV  ! min and max for m_4l in off-shell VBF production;   default is (-1,-1): m_4l ~ Higgs resonance (on-shell)
+! real(8), public, parameter :: VBF_4ml_minmax(1:2) = (/ 300d0,600d0 /)*GeV  ! min and max for m_4l in off-shell VBF production, default is (-1,-1): m_4l ~ Higgs resonance (on-shell)
 
 !----------------------------------------------------------------------------------------------------
 
@@ -184,6 +189,7 @@ integer, public :: LeptInEvent(0:8) = 0
    complex(8), public, parameter :: ghg2 = (1.0d0,0d0)
    complex(8), public, parameter :: ghg3 = (0.0d0,0d0)
    complex(8), public, parameter :: ghg4 = (0.0d0,0d0)   ! pseudoscalar
+   
    complex(8), public, parameter :: ghz1 = (2.0d0,0d0)   ! SM=2
    complex(8), public, parameter :: ghz2 = (0.0d0,0d0)
    complex(8), public, parameter :: ghz3 = (0.0d0,0d0)
@@ -433,6 +439,7 @@ integer, public :: DebugCounter(0:10) = 0
 real(8), public :: debugvar(0:10) = 0d0
 
 
+integer, public :: ijPartons(1:2)=0
 
 
 
@@ -481,7 +488,9 @@ implicit none
 integer :: convertLHEreverse
 integer :: Part
 
-  if(     Part.eq.1 ) then
+  if(     Part.eq.0 ) then      ! 0=Glu_ is not the official LHE convention
+      convertLHEreverse = Glu_
+  elseif(     Part.eq.1 ) then
       convertLHEreverse = Dn_
   elseif( Part.eq.2 ) then
       convertLHEreverse = Up_
@@ -687,6 +696,98 @@ integer :: Part
 
 END FUNCTION
 
+FUNCTION getParticle(Part)
+implicit none
+character(len=3) :: getParticle
+integer :: Part
+
+
+  if( Part.eq.Glu_ ) then
+      getParticle = "glu"
+  elseif( Part.eq.0 ) then
+      getParticle = "glu"
+  elseif( Part.eq.ElM_ ) then
+      getParticle = "el-"
+  elseif( Part.eq.ElP_ ) then
+      getParticle = "el+"
+  elseif( Part.eq.MuM_ ) then
+      getParticle = "mu-"
+  elseif( Part.eq.MuP_ ) then
+      getParticle = "mu+"
+  elseif( Part.eq.TaM_ ) then
+      getParticle = "ta-"
+  elseif( Part.eq.TaP_ ) then
+      getParticle = "t+-"
+  elseif( Part.eq.NuE_ ) then
+      getParticle = "nuE"
+  elseif( Part.eq.ANuE_ ) then
+      getParticle = "AnE"
+  elseif( Part.eq.NuM_ ) then
+      getParticle = "nuM"
+  elseif( Part.eq.ANuM_ ) then
+      getParticle = "AnM"
+  elseif( Part.eq.NuT_ ) then
+      getParticle = "nuT"
+  elseif( Part.eq.ANuT_ ) then
+      getParticle = "AnT"
+  elseif( Part.eq.Up_ ) then
+      getParticle = " up"
+  elseif( Part.eq.AUp_ ) then
+      getParticle = "Aup"
+  elseif( Part.eq.Dn_ ) then
+      getParticle = " dn"
+  elseif( Part.eq.ADn_ ) then
+      getParticle = "Adn"
+  elseif( Part.eq.Chm_ ) then
+      getParticle = "chm"
+  elseif( Part.eq.AChm_ ) then
+      getParticle = "Achm"
+  elseif( Part.eq.Str_ ) then
+      getParticle = "str"
+  elseif( Part.eq.AStr_ ) then
+      getParticle = "Astr"
+  elseif( Part.eq.Bot_ ) then
+      getParticle = "bot"
+  elseif( Part.eq.ABot_ ) then
+      getParticle = "Abot"
+  elseif( Part.eq.Top_ ) then
+      getParticle = "top"
+  elseif( Part.eq.ATop_ ) then
+      getParticle = "Atop"
+  elseif( Part.eq.Z0_ ) then
+      getParticle = " Z0"
+  elseif( Part.eq.Wp_ ) then
+      getParticle = " W+"
+  elseif( Part.eq.Wm_ ) then
+      getParticle = " W-"
+  elseif( Part.eq.Pho_ ) then
+      getParticle = "pho"
+  elseif( Part.eq.Hig_ ) then
+      getParticle = "Hig"
+  else
+     print *, "Error in getParticle",Part
+     stop
+  endif
+
+
+END FUNCTION
+
+
+
+
+
+
+
+FUNCTION getLHEParticle(PartLHE)
+implicit none
+character(len=3) :: getLHEParticle
+integer :: PartLHE,Part
+
+
+  Part = convertLHEreverse(PartLHE)
+  getLHEParticle = getParticle(Part)
+
+END FUNCTION
 
 
 

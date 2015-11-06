@@ -10,52 +10,10 @@
      2   xu/mxdim*1d0/
 
          data XI/mprod*1d0/
-         data wtmax/0d0/
+         data wtmin/+1d14/
+         data wtmax/-1d14/
          end
 
-
-         subroutine novegas(fxn,avgi,sd,chi2a)
-         implicit none
-         include 'vegas_common.f'
-         double precision fxn,avgi,sd,chi2a
-         double precision x(mxdim),wgt
-         external fxn
-
-              x( 1) =0.29
-              x( 2) =0.12
-              x( 3) =0.89
-              x( 4) =0.91
-              x( 5) =0.21
-              x( 6) =0.11
-              x( 7) =0.04
-              x( 8) =0.53
-              x( 9) =0.65
-              x(10) =0.78
-              x(11) =0.11
-              x(12) =0.04
-              x(13) =0.65
-              x(14) =0.53
-              x(15) =0.29
-              x(16) =0.89
-              x(17) =0.91
-              x(18) =0.65
-              x(19) =0.78
-              x(20) =0.15
-              x(21) =0.11
-              x(22) = 0.53
-              x(23) =0.04
-              x(24) =0.65
-              x(25) =0.53
-              x(26) =0.29
-              x(27) =0.89
-              x(28) =0.91
-              x(29) =0.65
-              x(30) =0.78
-
-              avgi = fxn(x,wgt)
-              avgi = wgt*avgi
-         return
-         end subroutine
 
 
 
@@ -77,6 +35,7 @@ c
 !          include 'gridinfo.f'
          include 'maxwt.f'
          parameter(mprod=50*mxdim)
+         integer jj
          dimension d(50,mxdim),di(50,mxdim),xin(50),r(50),
      1   dx(mxdim),dt(mxdim),x(mxdim),kg(mxdim),ia(mxdim)
          data ndmx/50/,alph/1.5d0/,one/1d0/,mds/1/
@@ -103,6 +62,7 @@ c        initialises  cumulative  variables but not grid
 c
          entry vegas2(fxn,avgi,sd,chi2a)
 c        no initialisation
+         jj=0
          nd=ndmx
          ng=1
          if(mds.eq.0)go to 2
@@ -165,7 +125,7 @@ c--- read-in grid if necessary
  7       xi(nd,j)=one
          ndo=nd
 c
- 8       if(nprn.ge.0) then
+ 8       if(nprn.gt.0) then
             write(6,200)ndim,calls,it,itmx,acc
      1   ,mds,nd,(xl(j),xu(j),j=1,ndim)
          endif
@@ -186,6 +146,7 @@ c
          f2b=fb
          k=0
  12      k=k+1
+c        MARKUS: main loop starts here
          wgt=xjac
          do 15 j=1,ndim
          call random_number(xrandom)
@@ -200,9 +161,14 @@ c
  14      x(j)=xl(j)+rc*dx(j)
  15      wgt=wgt*xo*xnd
 c
-         f=wgt
 c         write(6,FMT='(a20,2F20.16)') 'xo,xnd in dvegas: ',xo,xnd
-         f=f*fxn(x,wgt)
+         f=fxn(x,wgt)
+         if( stopvegas ) then
+           return
+         endif
+         f=f*wgt         
+         if( abs(f).gt.wtmax ) wtmax=f
+         if( abs(f).lt.wtmin ) wtmin=f
          f2=f*f
          fb=fb+f
          f2b=f2b+f2
@@ -246,10 +212,13 @@ c
         if(nprn.eq.0)go to 21
         tsi=dsqrt(tsi)
 c        write(6,201)it,ti,tsi,avgi,sd,chi2a
-        write(6,201)it,ti,avgi,tsi,sd,wtmax,chi2a
+        write(6,201)it,ti,avgi,tsi,sd,wtmin,wtmax,chi2a
+        wtmin=1d14
+        wtmax=-1d14
         !write(15,201)it,ti,avgi,tsi,sd,wtmax,chi2a
         call flush(6)
         !call flush(15)
+        
         if(nprn.ge.0)go to 21
         do 20 j=1,ndim
  20     write(6,202) j,(xi(i,j),di(i,j),d(i,j),i=1,nd)
@@ -319,13 +288,13 @@ c 201    format(///' Integration by vegas' / ' iteration no.',i3,
 c     1  ':  integral=',g14.8/21x,'std dev =',g14.8 /
 c     2  ' accumulated results:   integral=',g14.8/
 c     3  24x,'std dev =',g14.8 / 24x,'chi**2 per it''n =',g10.4)
- 201    format(/'#************ Integration by Vegas (iteration ',i3,
-     .   ') **************' / '#',63x,'*'/,
+ 201    format(/'#********** Integration by Vegas (iteration ',i7,
+     .   ') ************' / '#',63x,'*'/,
      .   '#  integral  = ',g14.8,2x,
      .   ' accum. integral = ',g14.8,'*'/,
      .   '#  std. dev. = ',g14.8,2x,
      .   ' accum. std. dev = ',g14.8,'*'/,
-     .   '#   max. wt. = ',g14.6,35x,'*'/,'#',63x,'*'/,
+     .   '#   min/max. wt. = ',g14.6,6x,g14.6,11x,'*'/,'#',63x,'*'/,
      .   '#*************   chi**2/iteration = ',
      .   g10.4,'   ****************' /)
  202    format(1X,' data for axis',i2,/,' ',6x,'x',7x,'  delt i ',
@@ -355,7 +324,43 @@ c
         return
         end
 
+        
+!        MARKUS compute number of calls per iteration
+!                
+         subroutine vegas_get_calls(calls)
+         implicit double precision (a-h,o-z)
+         implicit integer (i-n)
+         include 'vegas_common.f'
+!          include 'gridinfo.f'
+         include 'maxwt.f'
+         parameter(mprod=50*mxdim)
+         integer jj
+         dimension d(50,mxdim),di(50,mxdim),xin(50),r(50),
+     1   dx(mxdim),dt(mxdim),x(mxdim),kg(mxdim),ia(mxdim)
+         data ndmx/50/,alph/1.5d0/,one/1d0/,mds/1/
+!          data idum/-113123/
+         
+         nd=ndmx
+         ng=1
+         if(mds.eq.0)go to 2
+         ng=int((dble(ncall)/2d0)**(1d0/dble(ndim)))
+         mds=1
+         if((2*ng-ndmx).lt.0)go to 2
+         mds=-1
+         npg=ng/ndmx+1
+         nd=ng/npg
+         ng=npg*nd
+ 2       k=ng**ndim
+         npg=ncall/k
+         if(npg.lt.2)npg=2
+         calls=dble(npg*k)
+        
+         return
+         end
 
+         
+         
+         
 
 
 ! ! C  (C) Copr. 1986-92 Numerical Recipes Software ]2w.1,r1..
