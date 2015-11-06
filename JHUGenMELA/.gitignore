@@ -1,2 +1,7 @@
 *.o
 *.mod
+testC
+testF
+#for cygwin
+testC.exe
+testF.exe
