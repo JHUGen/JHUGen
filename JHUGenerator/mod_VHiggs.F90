@@ -287,7 +287,7 @@ END SUBROUTINE
         else
           current1=(0.5d0*T3lL - QlL*sitW**2) *Vcurrent1 -(0.5d0*T3lL)*Acurrent1
         endif
-        current1=current1*gFFZ
+        current1=current1*gFFZ*dsqrt(scale_alpha_Z_ll)
 
 !u u~ Z vertex for incoming states
       else if((abs(id(1)).eq.2).or.(abs(id(1)).eq.4))then
@@ -296,7 +296,7 @@ END SUBROUTINE
         else
           current1=(0.5d0*T3uL - QuL*sitW**2) *Vcurrent1 -(0.5d0*T3uL)*Acurrent1
         endif
-        current1=current1*gFFZ
+        current1=current1*gFFZ*dsqrt(scale_alpha_Z_uu)
 !d d~ Z vertex for incoming states
       else if((abs(id(1)).eq.1).or.(abs(id(1)).eq.3).or.(abs(id(1)).eq.5))then
         if((id(1)*helicity(1)).gt.0d0)then
@@ -304,8 +304,7 @@ END SUBROUTINE
         else
           current1=(0.5d0*T3dL - QdL*sitW**2) *Vcurrent1 -(0.5d0*T3dL)*Acurrent1
         endif
-        current1=current1*gFFZ
-
+        current1=current1*gFFZ*dsqrt(scale_alpha_Z_dd)
       else
       current1=0d0
       print *, "invalid incoming state"
