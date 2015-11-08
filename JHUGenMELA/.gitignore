@@ -1,5 +1,6 @@
 *.o
 *.mod
+*.log
 testC
 testF
 #for cygwin

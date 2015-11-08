@@ -24,7 +24,7 @@ Manual for the JHU generator
 \begin{center}
 \small
 For simulation of a single-produced resonance at hadron colliders \\
-(version v6.2.8, release date September 17, 2015) \\
+(version v6.7.0, release date Oct. 6, 2015) \\
 \normalsize
 \end{center}
 
@@ -73,7 +73,7 @@ The list of command line configurables and the default values are (also defined 
     Collider:        1=LHC, 2=Tevatron, 0=e+e-
     Process:         0=spin-0, 1=spin-1, 2=spin-2 resonance, 50=pp/ee->VH,
                      60=weakVBF, 61=pp->Hjj, 62=pp->Hj, 80=ttH, 90=bbH
-    MReso:           resonance mass (default=126.00), format: yyy.xx
+    MReso:           resonance mass (default=125.00), format: yyy.xx
     DecayMode1:      decay mode for vector boson 1 (Z/W/gamma)
     DecayMode2:      decay mode for vector boson 2 (Z/W/gamma)
                        0=Z->2l,  1=Z->2q, 2=Z->2tau, 3=Z->2nu,
@@ -260,17 +260,17 @@ The remaining parameters are more-or-less self-explanatory:
 real(8), public, parameter :: GeV=1d0/100d0
 real(8), public, parameter :: percent=1d0/100d0
 real(8), public :: M_V,Ga_V
-real(8), public, parameter :: M_Top   = 173d0     *GeV      !
-real(8), public, parameter :: Ga_Top  = 1.33d0    *GeV     !
+real(8), public, parameter :: M_Top   = 173.2d0     *GeV      !
+real(8), public, parameter :: Ga_Top  = 2d0    *GeV     !
 real(8), public, parameter :: M_Z     = 91.1876d0 *GeV      ! Z boson mass (PDG-2011)
 real(8), public, parameter :: Ga_Z    = 2.4952d0  *GeV      ! Z boson width(PDG-2011)
 real(8), public, parameter :: M_W     = 80.399d0  *GeV      ! W boson mass (PDG-2011)
 real(8), public, parameter :: Ga_W    = 2.085d0   *GeV      ! W boson width(PDG-2011)
-real(8), public            :: M_Reso  = 125.6d0   *GeV      ! X resonance mass (spin 0, spin 1,
+real(8), public            :: M_Reso  = 125d0   *GeV      ! X resonance mass (spin 0, spin 1,
                                                             !  spin 2) (careful: no longer a
                                                             !  parameter, can be overwritten by
                                                             !  command line argument)
-real(8), public, parameter :: Ga_Reso = 0.00415d0 *GeV      ! X resonance width
+real(8), public, parameter :: Ga_Reso = 0.00407d0 *GeV      ! X resonance width
 real(8), public, parameter :: Lambda  = 1000d0    *GeV      ! Lambda coupling enters in two
                                                             !  places: overall scale for
                                                             !  x-section and in power suppressed
@@ -279,7 +279,7 @@ real(8), public, parameter :: Lambda  = 1000d0    *GeV      ! Lambda coupling en
 real(8), public, parameter :: m_el = 0.00051100d0  *GeV     ! electron mass
 real(8), public, parameter :: m_mu = 0.10566d0  *GeV        ! muon mass
 real(8), public, parameter :: m_tau = 1.7768d0  *GeV        ! tau mass
-real(8), public, parameter :: m_bot = 4.2000d0     *GeV     ! bottom quark mass
+real(8), public, parameter :: m_bot = 4.75d0     *GeV     ! bottom quark mass
 
 
 real(8), public, parameter :: Gf = 1.16639d-5/GeV**2        ! fermi constant
@@ -290,7 +290,7 @@ real(8), public, parameter :: alphas = 0.13229060d0         ! strong coupling
 real(8), public, parameter :: sitW = dsqrt(0.23119d0)       ! sin(Theta_Weinberg) (PDG-2008)
 real(8), public            :: Mu_Fact                       ! pdf factorization scale
                                                             ! (set to M_Reso in main.F90)
-real(8), public, parameter :: LHC_Energy=14000d0  *GeV      ! LHC hadronic center of mass energy
+real(8), public, parameter :: LHC_Energy=13000d0  *GeV      ! LHC hadronic center of mass energy
 real(8), public, parameter :: TEV_Energy=1960d0  *GeV       ! Tevatron hadronic center of mass
                                                             !  energy
 real(8), public, parameter :: ILC_Energy=250d0  *GeV        ! Linear collider center of mass
@@ -301,7 +301,7 @@ real(8), public, parameter :: POL_A = 0d0                   !e+ polarization. 0:
 real(8), public, parameter :: POL_B = 0d0                   !e- polarization. 0: no polarization,
                                                                               100: helicity = 1,
                                                                               -100: helicity = -1
-logical, public, parameter :: H_DK =.true.                  !default to false so H in
+logical, public, parameter :: H_DK =.false.                  !default to false so H in
                                                              V > VH (Process = 50) does not decay
 real(8), public, parameter :: ptjetcut = 15d0*GeV           ! jet min pt
 real(8), public, parameter :: Rjet = 0.5d0                  ! jet deltaR, antikt algorithm

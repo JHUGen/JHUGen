@@ -3,7 +3,7 @@ implicit none
 save
 ! 
 ! 
-character(len=6),parameter :: JHUGen_Version="v6.6.8"
+character(len=6),parameter :: JHUGen_Version="v6.7.0"
 ! 
 ! 
 integer, public :: Collider, PDFSet,PChannel,Process,DecayMode1,DecayMode2,TopDecays,TauDecays
@@ -69,10 +69,10 @@ real(8), public, parameter :: Lambda  = 1000d0    *GeV      ! Lambda coupling en
                                                             ! overal scale for x-section and in power suppressed
                                                             ! operators/formfactors (former r).
 
+real(8), public, parameter :: m_bot = 4.75d0       *GeV         ! bottom quark mass
 real(8), public, parameter :: m_el = 0.00051100d0  *GeV         ! electron mass
 real(8), public, parameter :: m_mu = 0.10566d0     *GeV         ! muon mass
 real(8), public, parameter :: m_tau = 1.7768d0     *GeV         ! tau mass
-real(8), public, parameter :: m_bot = 4.75d0       *GeV         ! bottom quark mass
 real(8), public, parameter :: Ga_tau =2.267d-12    *GeV         ! tau width
 
 real(8), public, parameter :: HiggsDecayLengthMM = 0d0      ! Higgs decay length in [mm]
