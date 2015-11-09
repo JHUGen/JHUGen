@@ -3,6 +3,6 @@ JHUGen
 JHUGen.exe
 CSmax.bin
 data
-vegas.grid
+vegas_*.grid
 NNPDF30_lo_as_0130.LHgrid
 *.log
