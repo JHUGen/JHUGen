@@ -421,6 +421,7 @@ if( unweighted ) then
    elseif( Process.eq.61 ) then
 
       MY_IDUP(1:5) = (/LHA2M_ID(iPart_sel),LHA2M_ID(jPart_sel),LHA2M_ID(iPart_sel),LHA2M_ID(jPart_sel),Hig_/)! flavor default is out3=in1 out4=in2
+      
       if( MY_IDUP(1).eq.Glu_ .and. MY_IDUP(2).eq.Glu_ ) then! gg->gg
           ICOLUP(1:2,1) = (/501,502/)
           ICOLUP(1:2,2) = (/503,501/)      
@@ -468,9 +469,9 @@ if( unweighted ) then
           ICOLUP(1:2,2) = (/000,502/)
           ICOLUP(1:2,3) = (/000,501/)            
           ICOLUP(1:2,4) = (/502,000/)  
-          if( flavor_tag.eq.1 ) then! qqb->gg
+          if( MY_IDUP(1).eq.-MY_IDUP(2) .and. flavor_tag.eq.1 ) then! qqb->gg
              MY_IDUP(3:4) = (/Glu_,Glu_/)
-          elseif( flavor_tag.eq.3 ) then! qqb->q' qbar'
+          elseif( MY_IDUP(1).eq.-MY_IDUP(2) .and. flavor_tag.eq.3 ) then! qqb->q' qbar'
              do while (.true.) ! infinite loop, sorry bad programming...
                 call random_number(xRnd)
                 if( xRnd.lt.1d0/5d0 ) then
@@ -511,7 +512,6 @@ if( unweighted ) then
 
       ICOLUP(1:2,5) = (/000,000/) 
    endif
-
       
       call random_number(xRnd) 
       if( jPart_Sel.gt.iPart_sel ) call swapi(iPart_sel,jPart_sel)
