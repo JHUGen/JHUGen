@@ -471,7 +471,15 @@ if( unweighted ) then
           ICOLUP(1:2,4) = (/502,000/)  
           if( MY_IDUP(1).eq.-MY_IDUP(2) .and. flavor_tag.eq.1 ) then! qqb->gg
              MY_IDUP(3:4) = (/Glu_,Glu_/)
+             ICOLUP(1:2,1) = (/501,000/)
+             ICOLUP(1:2,2) = (/000,501/)
+             ICOLUP(1:2,3) = (/502,503/)            
+             ICOLUP(1:2,4) = (/503,502/)               
           elseif( MY_IDUP(1).eq.-MY_IDUP(2) .and. flavor_tag.eq.3 ) then! qqb->q' qbar'
+             ICOLUP(1:2,1) = (/501,000/)
+             ICOLUP(1:2,2) = (/000,501/)
+             ICOLUP(1:2,3) = (/502,000/)            
+             ICOLUP(1:2,4) = (/000,502/)  
              do while (.true.) ! infinite loop, sorry bad programming...
                 call random_number(xRnd)
                 if( xRnd.lt.1d0/5d0 ) then
