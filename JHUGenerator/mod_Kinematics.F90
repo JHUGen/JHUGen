@@ -1311,10 +1311,6 @@ if( .not. ReadLHEFile ) write(io_LHEOutFile,"(I2,X,I3,2X,1PE13.7,2X,1PE13.7,2X,1
 ! (*) alpha_s coupling for this event
 
 
-if( abs(LHE_IDUP(1))+abs(LHE_IDUP(2))-abs(LHE_IDUP(3))-abs(LHE_IDUP(4)).ne.0 ) then
-print *, "io",LHE_IDUP(1:4)
-pause
-endif
 
 ! parton_a
 i=1
