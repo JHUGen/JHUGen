@@ -400,15 +400,20 @@ if( unweighted ) then
           endif
       else! WW fusion
           if( (MomExt(4,1)*MomExt(4,3).lt.0d0) .and. (MomExt(4,2)*MomExt(4,4).lt.0d0) ) then ! wrong configuration --> swap 3 and 4
-             MY_IDUP(3:4)= (/SU2flip(LHA2M_ID(jPart_sel)),SU2flip(LHA2M_ID(iPart_sel))/)
-             if( abs(MY_IDUP(3)).eq.Top_ ) MY_IDUP(3) = sign(1,MY_IDUP(3))*Chm_
-             if( abs(MY_IDUP(4)).eq.Top_ ) MY_IDUP(4) = sign(1,MY_IDUP(4))*Chm_ 
+!              MY_IDUP(3:4)= (/SU2flip(LHA2M_ID(jPart_sel)),SU2flip(LHA2M_ID(iPart_sel))/)
+             MY_IDUP(3) = -GetCKMPartner( LHA2M_ID(jPart_sel) )
+             MY_IDUP(4) = -GetCKMPartner( LHA2M_ID(iPart_sel) )
+             
+             if( abs(MY_IDUP(3)).eq.Top_ ) return !MY_IDUP(3) = sign(1,MY_IDUP(3))*Chm_
+             if( abs(MY_IDUP(4)).eq.Top_ ) return !MY_IDUP(4) = sign(1,MY_IDUP(4))*Chm_ 
              ICOLUP(1:2,4) = ICOLUP(1:2,1)
              ICOLUP(1:2,3) = ICOLUP(1:2,2)
           else
-             MY_IDUP(3:4)= (/SU2flip(LHA2M_ID(iPart_sel)),SU2flip(LHA2M_ID(jPart_sel))/)
-             if( abs(MY_IDUP(3)).eq.Top_ ) MY_IDUP(3) = sign(1,MY_IDUP(3))*Chm_
-             if( abs(MY_IDUP(4)).eq.Top_ ) MY_IDUP(4) = sign(1,MY_IDUP(4))*Chm_ 
+!              MY_IDUP(3:4)= (/SU2flip(LHA2M_ID(iPart_sel)),SU2flip(LHA2M_ID(jPart_sel))/)
+             MY_IDUP(3) = -GetCKMPartner( LHA2M_ID(iPart_sel) )
+             MY_IDUP(4) = -GetCKMPartner( LHA2M_ID(jPart_sel) )
+             if( abs(MY_IDUP(3)).eq.Top_ ) return !MY_IDUP(3) = sign(1,MY_IDUP(3))*Chm_
+             if( abs(MY_IDUP(4)).eq.Top_ ) return !MY_IDUP(4) = sign(1,MY_IDUP(4))*Chm_ 
              ICOLUP(1:2,3) = ICOLUP(1:2,1)
              ICOLUP(1:2,4) = ICOLUP(1:2,2)
           endif         
@@ -478,8 +483,8 @@ if( unweighted ) then
           elseif( MY_IDUP(1).eq.-MY_IDUP(2) .and. flavor_tag.eq.3 ) then! qqb->q' qbar'
              ICOLUP(1:2,1) = (/501,000/)
              ICOLUP(1:2,2) = (/000,501/)
-             ICOLUP(1:2,3) = (/502,000/)            
-             ICOLUP(1:2,4) = (/000,502/)  
+             ICOLUP(1:2,3) = (/502,000/)
+             ICOLUP(1:2,4) = (/000,502/)
              do while (.true.) ! infinite loop, sorry bad programming...
                 call random_number(xRnd)
                 if( xRnd.lt.1d0/5d0 ) then

@@ -784,11 +784,6 @@ write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(
 write(io_LHEOutFile,"(A)") "</event>"
 
 
-! if( dabs(MomDummy(2,1)+MomDummy(2,2)+MomDummy(2,3)+MomDummy(2,4)+MomDummy(2,5)).gt. 1d-10 ) then
-!     print *, "checker",MomDummy(2,1)+MomDummy(2,2)+MomDummy(2,3)+MomDummy(2,4)+MomDummy(2,5)
-!     pause
-! endif
-
 
 END SUBROUTINE
 
@@ -1316,6 +1311,10 @@ if( .not. ReadLHEFile ) write(io_LHEOutFile,"(I2,X,I3,2X,1PE13.7,2X,1PE13.7,2X,1
 ! (*) alpha_s coupling for this event
 
 
+if( abs(LHE_IDUP(1))+abs(LHE_IDUP(2))-abs(LHE_IDUP(3))-abs(LHE_IDUP(4)).ne.0 ) then
+print *, "io",LHE_IDUP(1:4)
+pause
+endif
 
 ! parton_a
 i=1
@@ -3361,13 +3360,13 @@ real(8) :: FlavorRnd,sumCKM,Vsq(1:3)
 
     call random_number(FlavorRnd)
 
-    Vsq(1) = (CKM( convertLHEreverse(abs(Flavor)), convertLHEreverse(abs(Dn_)) ))**2
-    Vsq(2) = (CKM( convertLHEreverse(abs(Flavor)), convertLHEreverse(abs(Str_)) ))**2
-    Vsq(3) = (CKM( convertLHEreverse(abs(Flavor)), convertLHEreverse(abs(Bot_)) ))**2
     
     if( abs(Flavor).eq.abs(Up_) ) then   
-
+        Vsq(1) = (CKM( convertLHEreverse(abs(Flavor)), convertLHEreverse(abs(Dn_)) ))**2
+        Vsq(2) = (CKM( convertLHEreverse(abs(Flavor)), convertLHEreverse(abs(Str_)) ))**2
+        Vsq(3) = (CKM( convertLHEreverse(abs(Flavor)), convertLHEreverse(abs(Bot_)) ))**2
         Vsq(:) = Vsq(:)/scale_alpha_W_ud
+
         sumCKM = Vsq(1)+Vsq(2)+Vsq(3)
         FlavorRnd = FlavorRnd*sumCKM
 
@@ -3380,8 +3379,11 @@ real(8) :: FlavorRnd,sumCKM,Vsq(1:3)
         endif
         
     elseif( abs(Flavor).eq.abs(Chm_) ) then
-    
+        Vsq(1) = (CKM( convertLHEreverse(abs(Flavor)), convertLHEreverse(abs(Dn_)) ))**2
+        Vsq(2) = (CKM( convertLHEreverse(abs(Flavor)), convertLHEreverse(abs(Str_)) ))**2
+        Vsq(3) = (CKM( convertLHEreverse(abs(Flavor)), convertLHEreverse(abs(Bot_)) ))**2    
         Vsq(:) = Vsq(:)/scale_alpha_W_cs
+        
         sumCKM = Vsq(1)+Vsq(2)+Vsq(3)
         FlavorRnd = FlavorRnd*sumCKM    
 
@@ -3394,6 +3396,9 @@ real(8) :: FlavorRnd,sumCKM,Vsq(1:3)
         endif
 
     elseif( abs(Flavor).eq.abs(Top_) ) then
+        Vsq(1) = (CKM( convertLHEreverse(abs(Flavor)), convertLHEreverse(abs(Dn_)) ))**2
+        Vsq(2) = (CKM( convertLHEreverse(abs(Flavor)), convertLHEreverse(abs(Str_)) ))**2
+        Vsq(3) = (CKM( convertLHEreverse(abs(Flavor)), convertLHEreverse(abs(Bot_)) ))**2
 
         sumCKM = Vsq(1)+Vsq(2)+Vsq(3)
         FlavorRnd = FlavorRnd*sumCKM    
@@ -3404,6 +3409,57 @@ real(8) :: FlavorRnd,sumCKM,Vsq(1:3)
            GetCKMPartner = -sign(1,Flavor) * abs(Str_)
         else!  t-->d
            GetCKMPartner = -sign(1,Flavor) * abs(Dn_)
+        endif
+
+
+    elseif( abs(Flavor).eq.abs(Dn_) ) then   
+        Vsq(1) = (CKM( convertLHEreverse(abs(Flavor)), convertLHEreverse(abs(Up_)) ))**2
+        Vsq(2) = (CKM( convertLHEreverse(abs(Flavor)), convertLHEreverse(abs(Chm_)) ))**2
+        Vsq(3) = (CKM( convertLHEreverse(abs(Flavor)), convertLHEreverse(abs(Top_)) ))**2
+        Vsq(:) = Vsq(:)/scale_alpha_W_ud
+
+        sumCKM = Vsq(1)+Vsq(2)+Vsq(3)
+        FlavorRnd = FlavorRnd*sumCKM
+
+        if( FlavorRnd.le.Vsq(1) ) then!  d-->u
+           GetCKMPartner = -sign(1,Flavor) * abs(Up_)
+        elseif( FlavorRnd.le.(Vsq(2)+Vsq(1)) ) then!  d-->c
+           GetCKMPartner = -sign(1,Flavor) * abs(Chm_)
+        else!  d-->t
+           GetCKMPartner = -sign(1,Flavor) * abs(Top_)
+        endif
+        
+    elseif( abs(Flavor).eq.abs(Str_) ) then
+        Vsq(1) = (CKM( convertLHEreverse(abs(Flavor)), convertLHEreverse(abs(Up_)) ))**2
+        Vsq(2) = (CKM( convertLHEreverse(abs(Flavor)), convertLHEreverse(abs(Chm_)) ))**2
+        Vsq(3) = (CKM( convertLHEreverse(abs(Flavor)), convertLHEreverse(abs(Top_)) ))**2    
+        Vsq(:) = Vsq(:)/scale_alpha_W_cs
+        
+        sumCKM = Vsq(1)+Vsq(2)+Vsq(3)
+        FlavorRnd = FlavorRnd*sumCKM    
+
+        if( FlavorRnd.le.Vsq(2) ) then!  s-->c
+           GetCKMPartner = -sign(1,Flavor) * abs(Chm_)     
+        elseif( FlavorRnd.le.(Vsq(1)+Vsq(2)) ) then!  s-->u
+           GetCKMPartner = -sign(1,Flavor) * abs(Up_)
+        else!  s-->t
+           GetCKMPartner = -sign(1,Flavor) * abs(Top_)
+        endif
+
+    elseif( abs(Flavor).eq.abs(Bot_) ) then
+        Vsq(1) = (CKM( convertLHEreverse(abs(Flavor)), convertLHEreverse(abs(Up_)) ))**2
+        Vsq(2) = (CKM( convertLHEreverse(abs(Flavor)), convertLHEreverse(abs(Chm_)) ))**2
+        Vsq(3) = (CKM( convertLHEreverse(abs(Flavor)), convertLHEreverse(abs(Top_)) ))**2
+
+        sumCKM = Vsq(1)+Vsq(2)+Vsq(3)
+        FlavorRnd = FlavorRnd*sumCKM    
+        
+        if( FlavorRnd.le.Vsq(3) ) then!  b-->t
+           GetCKMPartner = -sign(1,Flavor) * abs(Top_)
+        elseif( FlavorRnd.le.(Vsq(2)+Vsq(3)) ) then!  b-->c
+           GetCKMPartner = -sign(1,Flavor) * abs(Chm_)
+        else!  b -->u
+           GetCKMPartner = -sign(1,Flavor) * abs(Up_)
         endif
     
     else
