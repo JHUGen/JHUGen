@@ -266,7 +266,7 @@ write(io_LHEOutFile,"(A)") "<event>"
 if( ReadLHEFile .and. importExternal_LHEinit .and. present(EventInfoLine) ) then
    write(io_LHEOutFile,"(I2,X,A)") NUP,trim(EventInfoLine)
 else
-   write(io_LHEOutFile,"(I2,X,I3,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7)") NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
+   write(io_LHEOutFile,"(I2,X,I3,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7)") NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
 !  in order of appearance:
 !  (*) number of particles in the event
 !  (*) process ID (user defined)
@@ -366,7 +366,7 @@ integer,parameter :: maxpart=30
 integer :: i,iHiggs
 integer :: NUP,NUP_NEW,IDPRUP
 real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP,HiggsDKLength
-character(len=*),parameter :: Fmt0 = "I2,X,I3,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7"
+character(len=*),parameter :: Fmt0 = "I2,X,I3,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7"
 character(len=*),parameter :: Fmt0_read = "I2,X,A"
 character(len=*),parameter :: Fmt1 = "6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0"
 integer :: indent
@@ -529,7 +529,7 @@ integer,parameter :: maxpart=30
 integer :: i,iHiggs
 integer :: NUP,NUP_NEW,IDPRUP
 real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP,HiggsDKLength
-character(len=*),parameter :: Fmt0 = "I2,X,I3,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7"
+character(len=*),parameter :: Fmt0 = "I2,X,I3,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7"
 character(len=*),parameter :: Fmt0_read = "I2,X,A"
 character(len=*),parameter :: Fmt1 = "6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0"
 integer :: indent
@@ -753,7 +753,7 @@ XMass = M_Reso* 100d0
 
 
 write(io_LHEOutFile,"(A)") "<event>"
-if( .not. ReadLHEFile ) write(io_LHEOutFile,"(I2,X,I3,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7)") NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
+if( .not. ReadLHEFile ) write(io_LHEOutFile,"(I2,X,I3,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7)") NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
 ! in order of appearance:
 ! (*) number of particles in the event
 ! (*) process ID (user defined)
@@ -847,7 +847,7 @@ enddo
 
 
 write(io_LHEOutFile,"(A)") "<event>"
-write(io_LHEOutFile,"(I2,X,I3,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7)") NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
+write(io_LHEOutFile,"(I2,X,I3,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7)") NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
 ! in order of appearance:
 ! (*) number of particles in the event
 ! (*) process ID (user defined)
@@ -965,7 +965,7 @@ endif
 
 
 write(io_LHEOutFile,"(A)") "<event>"
-write(io_LHEOutFile,"(I2,X,I3,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7)") NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
+write(io_LHEOutFile,"(I2,X,I3,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7)") NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
 ! in order of appearance:
 ! (*) number of particles in the event
 ! (*) process ID (user defined)
@@ -1048,7 +1048,7 @@ enddo
 
 
 write(io_LHEOutFile,"(A)") "<event>"
-write(io_LHEOutFile,"(I2,X,I3,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7)") NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
+write(io_LHEOutFile,"(I2,X,I3,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7)") NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
 ! in order of appearance:
 ! (*) number of particles in the event
 ! (*) process ID (user defined)
@@ -1177,7 +1177,7 @@ endif
 
 
 write(io_LHEOutFile,"(A)") "<event>"
-write(io_LHEOutFile,"(I2,X,I3,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7)") NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
+write(io_LHEOutFile,"(I2,X,I3,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7)") NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
 ! in order of appearance:
 ! (*) number of particles in the event
 ! (*) process ID (user defined)
@@ -1301,7 +1301,7 @@ XMass = M_Reso* 100d0
 
 
 write(io_LHEOutFile,"(A)") "<event>"
-if( .not. ReadLHEFile ) write(io_LHEOutFile,"(I2,X,I3,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7)") NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
+if( .not. ReadLHEFile ) write(io_LHEOutFile,"(I2,X,I3,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7)") NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
 ! in order of appearance:
 ! (*) number of particles in the event
 ! (*) process ID (user defined)
@@ -1385,7 +1385,7 @@ endif
     XWGTUP=EventWeight
 
 write(io_LHEOutFile,"(A)") "<event>"
-if( .not. ReadLHEFile ) write(io_LHEOutFile,"(I2,X,I3,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7)") NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
+if( .not. ReadLHEFile ) write(io_LHEOutFile,"(I2,X,I3,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7)") NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
 
 
 !if((COLLIDER.ne.0) .and. (unweighted.eqv..false.))then
