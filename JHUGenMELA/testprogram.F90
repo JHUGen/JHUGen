@@ -440,13 +440,23 @@ integer,  target :: ANuT_ = -16
       mass_F = m_tau
       Ga_F = Ga_Tau
       call EvalAmp_H_FF(p(1:4,1:6),mass_F,Ga_F,TTBHcoupl,FDecay,MatElSq)
-      print *, 'Matr.el. squared,H->tautau',MatElSq,MatElSq/(1.518044263918771d+021)
+      print *, 'Matr.el. squared,H->tautau->6l',MatElSq,MatElSq/(1.518044263918771d+021)
       
       
 
       
-      
-      
+      ! this is a special call to H_FF where we only enter the tau_nu and W momenta, the W decay product phasespace is integrated over
+      FDecay=1!   0= stable, 1=decayed
+      TTBHcoupl(1) = (1d0,0d0)
+      TTBHcoupl(2) = (0d0,0d0)
+      mass_F = m_tau
+      Ga_F = Ga_Tau
+      call EvalAmp_H_FF2((/p(1:4,3),p(1:4,1)+p(1:4,2),p(1:4,4)+p(1:4,5),p(1:4,6)/),mass_F,Ga_F,TTBHcoupl,MatElSq)
+      print *, 'Matr.el. squared,H->tautau->WWnunu',MatElSq 
+       
+ 
+ 
+ 
       
       
       
