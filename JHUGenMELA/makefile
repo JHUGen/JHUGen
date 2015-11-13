@@ -32,22 +32,27 @@ MCFM_Obj = anomamp.o cdotpr.o jtwo3456.o jtwo.o jzero.o qq_ZZqq.o setupzprops.o 
 
 
 
-Testprogram: mod_Higgs_MatEl.o mod_Zprime_MatEl.o mod_Graviton_MatEl.o mod_HiggsJ_MatEl.o mod_HiggsJJ_MatEl.o mod_VHiggs_MatEl.o mod_TTBH_MatEl.o mod_TH_MatEl.o NNPDFDriver.o testprogram.F90 \
+Testprogram: mod_Higgs_MatEl.o mod_Zprime_MatEl.o mod_Graviton_MatEl.o mod_HiggsJ_MatEl.o mod_HiggsJJ_MatEl.o mod_VHiggs_MatEl.o mod_TTBH_MatEl.o mod_TH_MatEl.o vegas.o NNPDFDriver.o testprogram.F90 \
 	checkWBF_SM.dat checkWBF_1-8.dat checkSBF_SM.dat checkSBF_1-4.dat checkHJ_SM.dat checkZH_SM.dat MCFMforVBF
 	@echo " "
 	@echo " compiling and linking testprogram.F90 with "$(Comp)
-	$(fcomp) -o testF testprogram.F90 -lm NNPDFDriver.o mod_Higgs_MatEl.o mod_Zprime_MatEl.o mod_Graviton_MatEl.o mod_HiggsJ_MatEl.o mod_HiggsJJ_MatEl.o mod_VHiggs_MatEl.o mod_TTBH_MatEl.o mod_TH_MatEl.o $(MCFM_Obj)
+	$(fcomp) -o testF testprogram.F90 -lm vegas.o NNPDFDriver.o mod_Higgs_MatEl.o mod_Zprime_MatEl.o mod_Graviton_MatEl.o mod_HiggsJ_MatEl.o mod_HiggsJJ_MatEl.o mod_VHiggs_MatEl.o mod_TTBH_MatEl.o mod_TH_MatEl.o $(MCFM_Obj)
 	@echo " "
 	@echo " compiling and linking testprogram.c with gcc"
-	$(ccomp) -o testC testprogram.c NNPDFDriver.o mod_Higgs_MatEl.o mod_Zprime_MatEl.o mod_Graviton_MatEl.o mod_TTBH_MatEl.o mod_TH_MatEl.o  -lm -lgfortran
+	$(ccomp) -o testC testprogram.c NNPDFDriver.o vegas.o mod_Higgs_MatEl.o mod_Zprime_MatEl.o mod_Graviton_MatEl.o mod_TTBH_MatEl.o mod_TH_MatEl.o -lm -lgfortran
 	@echo " "
-
 
 
 NNPDFDriver.o: ./pdfs/NNPDFDriver.f
 	@echo " "
 	@echo " compiling NNPDFDriver.f with "$(Comp)
 	$(fcomp) -c ./pdfs/NNPDFDriver.f
+	
+	
+vegas.o: ./vegas.f
+	@echo " "
+	@echo " compiling vegas.f with "$(Comp)
+	$(fcomp) -c ./vegas.f
 
 
 mod_Higgs_MatEl.o: mod_Higgs_MatEl.F90 includeVars.F90 variables.F90
