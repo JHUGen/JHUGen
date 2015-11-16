@@ -1359,11 +1359,12 @@
 !----------------------
 
 ! Higgs decay to Fbar(e+) F(e-) with stable W's
-   SUBROUTINE EvalAmp_H_FF2(pin_in,mass_F_in,Ga_F_in,TTBHcoupl_in,res)
+   SUBROUTINE EvalAmp_H_FF2(pin_in,mass_F_in,Ga_F_in,TTBHcoupl_in,res,NIntPoint)
    implicit none
    complex(8) :: TTBHcoupl(1:2),TTBHcoupl_in(1:2)
    real(8) :: pin(1:4,1:4),mass_F,Ga_F,pin_in(1:4,1:4),mass_F_in,Ga_F_in !  1:nu_t, 2:W, 3:W, 4:nu_t
    real(8) :: VG_Result,VG_Error,VG_Chi2,res
+   integer, optional :: NIntPoint
    common/integrand/mass_F,Ga_F,pin,TTBHcoupl
    include "vegas_common.f"   
    include 'includeVars.F90'
@@ -1379,7 +1380,11 @@
       nprn = 0
       ndim = 4
       itmx=3
-      ncall=100000
+      if( present(NIntPoint) ) then
+          ncall=NIntPoint
+      else
+          ncall=50000
+      endif
       readin=.false.
       writeout=.false.
       stopvegas=.false.
