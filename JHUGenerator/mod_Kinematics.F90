@@ -1335,7 +1335,6 @@ write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(
 
 write(io_LHEOutFile,"(A)") "</event>"
 
-
 ! if( dabs(MomDummy(2,1)+MomDummy(2,2)+MomDummy(2,3)+MomDummy(2,4)+MomDummy(2,5)).gt. 1d-10 ) then
 !     print *, "checker",MomDummy(2,1)+MomDummy(2,2)+MomDummy(2,3)+MomDummy(2,4)+MomDummy(2,5)
 !     pause
@@ -3817,7 +3816,10 @@ real(8) :: pdf(-6:6,1:2),NNpdf(1:2,-6:7)
             pdf(AStr_,2) = NNpdf(2,-3)         * swPDF_s
             pdf(Bot_,2)  = NNpdf(2,+5)         * swPDF_b
             pdf(ABot_,2) = NNpdf(2,-5)         * swPDF_b
-            pdf(0,2)     = NNpdf(2,+0)         * swPDF_g            
+            pdf(0,2)     = NNpdf(2,+0)         * swPDF_g
+            
+            pdf(:,:) = dabs(pdf(:,:))
+            
             RETURN
             
 #else
@@ -3912,6 +3914,8 @@ real(8) :: pdf(-6:6,1:2),NNpdf(1:2,-6:7)
             pdf(Bot_,2)  = NNpdf(2,+5)         * swPDF_b
             pdf(ABot_,2) = NNpdf(2,-5)         * swPDF_b
             pdf(0,2)     = NNpdf(2,+0)         * swPDF_g            
+
+            pdf(:,:) = dabs(pdf(:,:))            
             RETURN
         else
             print *, "PDFSet",PDFSet,"not available!"
@@ -3974,6 +3978,9 @@ ELSEIF( COLLIDER.EQ.2 ) THEN
         pdf(0,2)     = glu(2)              * swPDF_g
 
 ENDIF
+
+pdf(:,:) = dabs(pdf(:,:))
+
 
 RETURN
 END SUBROUTINE
