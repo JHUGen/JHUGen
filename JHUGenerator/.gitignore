@@ -1,0 +1,8 @@
+JHUGen
+#for cygwin
+JHUGen.exe
+CSmax.bin
+data
+vegas_*.grid
+NNPDF30_lo_as_0130.LHgrid
+*.log

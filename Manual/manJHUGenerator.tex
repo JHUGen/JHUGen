@@ -24,7 +24,7 @@ Manual for the JHU generator
 \begin{center}
 \small
 For simulation of a single-produced resonance at hadron colliders \\
-(version v5.6.3, release date June 8, 2015) \\
+(version v6.7.0, release date Nov. 6, 2015) \\
 \normalsize
 \end{center}
 
@@ -70,38 +70,41 @@ There are two ways to configure the program, from the command line and in the fi
 The list of command line configurables and the default values are (also defined in the \verb|README|):
 
 \begin{verbatim}
-    Collider:    1=LHC, 2=Tevatron, 0=e+e-
-    Process:     0=spin-0, 1=spin-1, 2=spin-2 resonance, 50=pp/ee->VH,
-                 60=weakVBF, 61=pp->Hjj, 62=pp->Hj, 80=ttH, 90=bbH
-    MReso:       resonance mass (default=126.00), format: yyy.xx
-    DecayMode1:  decay mode for vector boson 1 (Z/W/gamma)
-    DecayMode2:  decay mode for vector boson 2 (Z/W/gamma)
-                   0=Z->2l,  1=Z->2q, 2=Z->2tau, 3=Z->2nu,
-                   4=W->lnu, 5=W->2q, 6=W->taunu,
-                   7=gamma, 8=Z->2l+2tau,
-                   9=Z->anything, 10=W->lnu+taunu, 11=W->anything
-    PChannel:    0=g+g, 1=q+qb, 2=both
-    OffXVV:      off-shell option for resonance(X),or vector bosons(VV)
-    PDFSet:      1=CTEQ6L1(2001),  2=MSTW(2008),
-                                   2xx=MSTW with eigenvector set xx=01..40,
-                                   3=NNPDF3.0LO
-    VegasNc0:    number of evaluations for integrand scan
-    VegasNc1:    number of evaluations for accept-reject sampling
-    VegasNc2:    number of events for accept-reject sampling
-    Unweighted:  0=weighted events, 1=unweighted events
-    Interf:      0=neglect interference for 4f final states,
-                 1=include interference
-    DataFile:    LHE output file
-    ReadLHE:     LHE input file from external file (only spin-0)
-    ConvertLHE:  Convert decay of the V from VH production.
-                 Use DecayMode1 to specify the decay.
-                 (should be a Z or W mode, depending on the input file)
-    TopDK:       For Process=80, 0=leave top quarks as stable, 1=decay top quarks
-    FilterNLept: For decay mode, reject events that have less than FilterNLept leptons
-    FilterOSSF:  For decay mode, reject events that don't have 2 pairs of
-                 opposite-sign-same-flavor leptons.  Taus can stand in place of electrons
-                 or muons of the same charge.
-    LHAPDF:      PDF set to use if interfaced with LHAPDF.  See below.
+    Collider:        1=LHC, 2=Tevatron, 0=e+e-
+    Process:         0=spin-0, 1=spin-1, 2=spin-2 resonance, 50=pp/ee->VH,
+                     60=weakVBF, 61=pp->Hjj, 62=pp->Hj, 80=ttH, 90=bbH
+    MReso:           resonance mass (default=125.00), format: yyy.xx
+    DecayMode1:      decay mode for vector boson 1 (Z/W/gamma)
+    DecayMode2:      decay mode for vector boson 2 (Z/W/gamma)
+                       0=Z->2l,  1=Z->2q, 2=Z->2tau, 3=Z->2nu,
+                       4=W->lnu, 5=W->2q, 6=W->taunu,
+                       7=gamma, 8=Z->2l+2tau,
+                       9=Z->anything, 10=W->lnu+taunu, 11=W->anything
+    PChannel:        0=g+g, 1=q+qb, 2=both
+    OffXVV:          off-shell option for resonance(X),or vector bosons(VV)
+    PDFSet:          1=CTEQ6L1(2001),  2=MSTW(2008),
+                                       2xx=MSTW with eigenvector set xx=01..40,
+                                       3=NNPDF3.0LO
+    VegasNc0:        number of evaluations for integrand scan
+    VegasNc1:        number of evaluations for accept-reject sampling
+    VegasNc2:        number of events for accept-reject sampling
+    Unweighted:      0=weighted events, 1=unweighted events
+    Interf:          0=neglect interference for 4f final states,
+                     1=include interference
+    DataFile:        LHE output file
+    ReadLHE:         LHE input file from external file (only spin-0)
+    ConvertLHE:      Convert decay of the V from VH production.
+                     Use DecayMode1 to specify the decay.
+                     (should be a Z or W mode, depending on the input file)
+    TopDK:           For Process=80, 0=leave top quarks as stable, 1=decay top quarks
+    FilterNLept:     For decay mode, reject events that have less than FilterNLept leptons
+    FilterOSPairs:   For decay mode, reject events that have less than FilterOSPairs pairs of
+                       sign leptons of any flavor.
+    FilterOSSFPairs: For decay mode, reject events that have less than FilterOSSFPairs pairs of
+                       opposite-sign-same-flavor leptons.
+    CountTauAsAny:   For FilterOSSFPairs, taus can stand in place of electrons or muons
+                       of the same charge.
+    LHAPDF:          PDF set to use if interfaced with LHAPDF.  See below.
 \end{verbatim}
 
 \noindent
@@ -257,17 +260,17 @@ The remaining parameters are more-or-less self-explanatory:
 real(8), public, parameter :: GeV=1d0/100d0
 real(8), public, parameter :: percent=1d0/100d0
 real(8), public :: M_V,Ga_V
-real(8), public, parameter :: M_Top   = 173d0     *GeV      !
-real(8), public, parameter :: Ga_Top  = 1.33d0    *GeV     !
+real(8), public, parameter :: M_Top   = 173.2d0     *GeV      !
+real(8), public, parameter :: Ga_Top  = 2d0    *GeV     !
 real(8), public, parameter :: M_Z     = 91.1876d0 *GeV      ! Z boson mass (PDG-2011)
 real(8), public, parameter :: Ga_Z    = 2.4952d0  *GeV      ! Z boson width(PDG-2011)
 real(8), public, parameter :: M_W     = 80.399d0  *GeV      ! W boson mass (PDG-2011)
 real(8), public, parameter :: Ga_W    = 2.085d0   *GeV      ! W boson width(PDG-2011)
-real(8), public            :: M_Reso  = 125.6d0   *GeV      ! X resonance mass (spin 0, spin 1,
+real(8), public            :: M_Reso  = 125d0   *GeV      ! X resonance mass (spin 0, spin 1,
                                                             !  spin 2) (careful: no longer a
                                                             !  parameter, can be overwritten by
                                                             !  command line argument)
-real(8), public, parameter :: Ga_Reso = 0.00415d0 *GeV      ! X resonance width
+real(8), public, parameter :: Ga_Reso = 0.00407d0 *GeV      ! X resonance width
 real(8), public, parameter :: Lambda  = 1000d0    *GeV      ! Lambda coupling enters in two
                                                             !  places: overall scale for
                                                             !  x-section and in power suppressed
@@ -276,7 +279,7 @@ real(8), public, parameter :: Lambda  = 1000d0    *GeV      ! Lambda coupling en
 real(8), public, parameter :: m_el = 0.00051100d0  *GeV     ! electron mass
 real(8), public, parameter :: m_mu = 0.10566d0  *GeV        ! muon mass
 real(8), public, parameter :: m_tau = 1.7768d0  *GeV        ! tau mass
-real(8), public, parameter :: m_bot = 4.2000d0     *GeV     ! bottom quark mass
+real(8), public, parameter :: m_bot = 4.75d0     *GeV     ! bottom quark mass
 
 
 real(8), public, parameter :: Gf = 1.16639d-5/GeV**2        ! fermi constant
@@ -287,7 +290,7 @@ real(8), public, parameter :: alphas = 0.13229060d0         ! strong coupling
 real(8), public, parameter :: sitW = dsqrt(0.23119d0)       ! sin(Theta_Weinberg) (PDG-2008)
 real(8), public            :: Mu_Fact                       ! pdf factorization scale
                                                             ! (set to M_Reso in main.F90)
-real(8), public, parameter :: LHC_Energy=14000d0  *GeV      ! LHC hadronic center of mass energy
+real(8), public, parameter :: LHC_Energy=13000d0  *GeV      ! LHC hadronic center of mass energy
 real(8), public, parameter :: TEV_Energy=1960d0  *GeV       ! Tevatron hadronic center of mass
                                                             !  energy
 real(8), public, parameter :: ILC_Energy=250d0  *GeV        ! Linear collider center of mass
@@ -298,7 +301,7 @@ real(8), public, parameter :: POL_A = 0d0                   !e+ polarization. 0:
 real(8), public, parameter :: POL_B = 0d0                   !e- polarization. 0: no polarization,
                                                                               100: helicity = 1,
                                                                               -100: helicity = -1
-logical, public, parameter :: H_DK =.true.                  !default to false so H in
+logical, public, parameter :: H_DK =.false.                  !default to false so H in
                                                              V > VH (Process = 50) does not decay
 real(8), public, parameter :: ptjetcut = 15d0*GeV           ! jet min pt
 real(8), public, parameter :: Rjet = 0.5d0                  ! jet deltaR, antikt algorithm
@@ -690,6 +693,23 @@ Instructions for setting up the JHUGenMELA with MCFM are in the file \verb|JHUGe
 \section{ Release notes }
 
 \noindent
+In going from \verb|v6.2.8| to \verb|v6.7.0|, the updates are as follows:
+
+\begin{itemize}
+\item Much faster event generation for VBF and $Hjj$ with deterministic jet flavor assignment
+\item cleanup of the $VH$ code and CKM matrix
+\item More flexible lepton filter
+\end{itemize}
+
+\noindent
+In going from \verb|v5.6.3| to \verb|v6.2.8|, the updates are as follows:
+
+\begin{itemize}
+\item Flexible LHE reading process for compatibility with more generators
+\item Small bugfixes
+\end{itemize}
+
+\noindent
 In going from \verb|v5.2.5| to \verb|v5.6.3|, the updates are as follows:
 
 \begin{itemize}
@@ -698,9 +718,7 @@ In going from \verb|v5.2.5| to \verb|v5.6.3|, the updates are as follows:
 \item Allow $W$ from $ttH$ to decay to any decay mode
 \item Allow $W$ to decay to off-diagonal elements of the CKM matrix
 \item Add support for LHAPDF linking
-\item Upgrade to MCFM 7
 \item Fixes for LHE printout in $VBF$, $Hjj$, and $VH$
-\item JHUGenMELA: add $bbH$ production process
 \end{itemize}
 
 \noindent
@@ -714,7 +732,6 @@ In going from \verb|v4.8.1| to \verb|v5.2.5|, the updates are as follows:
 \item Fixes for smoother reading of LHE files: mother assignment and invariant mass for all intermediate particles
 \item Add \verb|ConvertLHE| option for converting VH decay to any DecayMode
 \item In \verb|ReadLHE| and \verb|ConvertLHE|, preserve comments and optional tags from the input LHE
-\item JHUGenMELA: add $ttH$ production process (both with and without top decay)
 \end{itemize}
 
 \noindent
