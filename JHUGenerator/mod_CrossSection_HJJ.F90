@@ -530,7 +530,7 @@ END FUNCTION
 
    else! weighted
 
-      if( VegasWeighted_HJJ.ne.0d0 )
+      if( VegasWeighted_HJJ.ne.0d0 ) then
         AccepCounter=AccepCounter+1
         if( writeWeightedLHE ) then 
           call WriteOutEvent_HVBF((/MomExt(1:4,1),MomExt(1:4,2),MomExt(1:4,3),MomExt(1:4,4),MomExt(1:4,5)/),MY_IDUP(1:5),ICOLUP(1:2,1:5),EventWeight=VegasWeighted_HJJ)
