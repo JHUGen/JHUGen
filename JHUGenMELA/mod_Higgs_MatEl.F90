@@ -1,7 +1,7 @@
       MODULE modHiggs
       implicit none
 
-      public :: EvalAmp_gg_H_VV,EvalAmp_H_VV
+      public :: EvalAmp_gg_H_VV,EvalAmp_H_VV,EvalAmp_H_FF,EvalAmp_H_FF2
       private
       integer, parameter  :: dp = selected_real_kind(15)
       real(dp), private, parameter :: tol = 0.00000010_dp
@@ -1305,15 +1305,320 @@
       END SUBROUTINE HZZampl
 
 
+   
+   
+! Higgs decay to Fbar(e+) F(e-)
+   SUBROUTINE EvalAmp_H_FF(pin,mass_F,Ga_F,TTBHcoupl,FDecay,res)
+   implicit none
+   real(8), intent(out):: res
+   integer, intent(in) :: FDecay! 0=stable, 1=decay f-->f'+W(F+F')
+   complex(8), intent(in):: TTBHcoupl(1:2)
+   real(8), intent(in) :: pin(1:4,1:6),mass_F,Ga_F
+   integer             :: j
+   real(8)             :: s12,s45,s123,s456,KL,KR,s(6,6)
+   real(dp)             :: p(1:6,1:4)
+   complex(dp)          :: za(6,6),zb(6,6),amp
+   include 'includeVars.F90'
+
+
+      if( FDecay.eq.1 ) then 
+      
+          do j=1,6
+              call convert_to_MCFM(pin(1:4,j),p(j,1:4))  
+          enddo       
+          call spinoru(6,p,za,zb,s)
+      
+          s12=s(1,2)
+          s45=s(4,5)
+          s123=s(1,2)+s(1,3)+s(2,3)
+          s456=s(4,5)+s(4,6)+s(5,6)     
+
+          KL = -mass_F/vev*( TTBHcoupl(1) -(0d0,1d0)*TTBHcoupl(2) )
+          KR = -mass_F/vev*( TTBHcoupl(1) +(0d0,1d0)*TTBHcoupl(2) )
+
+          amp = + KR * ( za(1,3)*za(1,4)*zb(1,2)*zb(5,6)- za(1,3)*za(3,4)*zb(2,3)*zb(5,6)) &
+                + KL * (- za(1,3)*za(4,5)*zb(2,5)*zb(5,6)- za(1,3)*za(4,6)*zb(2,6)*zb(5,6))
+
+          ! overall factors and propagators
+          amp=amp/(s123-mass_F**2+ci*mass_F*Ga_F)/(s456-mass_F**2+ci*mass_F*Ga_F)/(s12-m_w**2+ci*m_w*Ga_W)/(s45-m_w**2+ci*m_w*Ga_W)
+          amp=amp*16d0*ci*mass_F*gwsq**2   
+          res = cdabs(amp)
+          
+      else! stable
+          s12=2d0*(pin(1,1)*pin(1,2)-pin(2,1)*pin(2,2)-pin(3,1)*pin(3,2)-pin(4,1)*pin(4,2)) + 2d0*mass_F**2
+          res =   2d0*s12*(TTBHcoupl(2)**2 + TTBHcoupl(1)**2) - 8d0*mass_F**2*TTBHcoupl(1)**2
+          res=res*mass_F**2/vev**2
+
+      endif
+      
+   RETURN
+   END SUBROUTINE
 
 
 
+!----------------------
+
+! Higgs decay to Fbar(e+) F(e-) with stable W's
+   SUBROUTINE EvalAmp_H_FF2(pin_in,mass_F_in,Ga_F_in,TTBHcoupl_in,res,NIntPoint)
+   implicit none
+   complex(8) :: TTBHcoupl(1:2),TTBHcoupl_in(1:2)
+   real(8) :: pin(1:4,1:4),mass_F,Ga_F,pin_in(1:4,1:4),mass_F_in,Ga_F_in !  1:nu_t, 2:W, 3:W, 4:nu_t
+   real(8) :: VG_Result,VG_Error,VG_Chi2,res
+   integer, optional :: NIntPoint
+   common/integrand/mass_F,Ga_F,pin,TTBHcoupl
+   include "vegas_common.f"   
+   include 'includeVars.F90'
+      
+      mass_F = mass_F_in
+      Ga_F = Ga_F_in
+      pin(:,:) = pin_in(:,:)
+      TTBHcoupl(:) = TTBHcoupl_in(:)
+
+      xl(1:mxdim) = 0d0
+      xu(1:mxdim) = 1d0
+      acc = -1d0
+      nprn = 0
+      ndim = 4
+      itmx=3
+      if( present(NIntPoint) ) then
+          ncall=NIntPoint
+      else
+          ncall=50000
+      endif
+      readin=.false.
+      writeout=.false.
+      stopvegas=.false.
+      
+      call vegas(EvalAmp_H_FF_integrW,res,VG_Error,VG_Chi2)
+      
+   RETURN
+   END SUBROUTINE
 
 
 
+   
+   FUNCTION EvalAmp_H_FF_integrW(yRnd,VgsWgt)
+   implicit none
+   complex(8) :: TTBHcoupl(1:2)
+   real(8)  :: pin(1:4,1:4),mass_F,Ga_F   
+   common/integrand/mass_F,Ga_F,pin,TTBHcoupl
+   real(dp) :: pnew(1:4,1:6),Jac1,Jac2,EvalAmp_H_FF_integrW,yRnd(1:4),VgsWgt
+
+   
+          EvalAmp_H_FF_integrW = 0d0
+          Jac1 = s_channel_decay( pin(1:4,2),0d0,0d0,yRnd(1:2),pnew(1:4,1),pnew(1:4,2) ) 
+          Jac2 = s_channel_decay( pin(1:4,3),0d0,0d0,yRnd(3:4),pnew(1:4,4),pnew(1:4,5) ) 
+          pnew(1:4,3) = pin(1:4,1)! nu_t
+          pnew(1:4,6) = pin(1:4,4)! nu_t
+          call EvalAmp_H_FF(pnew,mass_F,Ga_F,TTBHcoupl,1,EvalAmp_H_FF_integrW)
+          EvalAmp_H_FF_integrW = EvalAmp_H_FF_integrW * Jac1 * Jac2 
+ 
+   RETURN
+   END FUNCTION
+  
+  
+  
+! s-channel phase space
+  FUNCTION s_channel_decay( p0,Mass1_sq,Mass2_sq,xRnd,Mom1,Mom2  ) 
+  implicit none
+  real(8) :: s_channel_decay
+  real(8) :: p0(1:4),Mass1_sq,Mass2_sq,xRnd(1:2),Mom1(1:4),Mom2(1:4)
+  real(8) :: E1,p1z,phi,theta,Jac,Mandelstam_S
+  real(8), parameter :: pi = 3.1415926535897932384626433d0
+
+        phi   = 2d0*pi * xRnd(1)
+        theta = 1d0*pi * xRnd(2)
+        Mandelstam_S = p0(1)**2 - p0(2)**2 - p0(3)**2 - p0(4)**2 
+
+        E1 = ( Mandelstam_S + Mass1_sq - Mass2_sq )/2d0/dsqrt(Mandelstam_S)
+        p1z= sqrt_lambda(Mandelstam_S,Mass1_sq,Mass2_sq)/2d0/dsqrt(Mandelstam_S)
+        Mom1(1:4) = (/ E1,0d0,0d0,p1z /)
+        call rotate3D_phi_theta(phi,theta,Mom1)
+        
+        Mom2(1)   = dsqrt(Mandelstam_S) - Mom1(1)
+        Mom2(2:4) = - Mom1(2:4)
+        call boost_from_CMS_to_RefMom(p0,Mom1,Mom2)
+!         call boost_from_CMS_to_RefMom(p0,Mom2)
+ 
+        s_channel_decay = 1d0/g_d(Mandelstam_S, Mass1_sq,Mass2_sq)  *  dSin(pi*xRnd(2))
+        
+  RETURN
+  END FUNCTION
+ 
+ 
+  FUNCTION sqrt_lambda(x,y,z)
+  implicit none
+  real(8) :: sqrt_lambda,x,y,z
+  
+        sqrt_lambda = dsqrt(dabs(x**2 + y**2 + z**2 - 2d0*x*y - 2d0*x*z - 2d0*y*z))
+
+  RETURN
+  END FUNCTION
+
+
+  SUBROUTINE rotate3D_phi_theta(phi,theta,mom,mom2)
+  implicit none
+  real(8) :: phi,theta,mom(1:4)
+  real(8), optional :: Mom2(1:4)
+  real(8) :: cos_phi,sin_phi,cos_theta,sin_theta,mom_tmp(2:4),mom_tmp2(2:4)
+  
+      
+      cos_phi = dCos(phi)
+      sin_phi = dSin(phi)
+      cos_theta = dCos(theta)
+      sin_theta = dSin(theta)
+
+
+      mom_tmp(2:4) = mom(2:4)      
+      mom(2) = mom_tmp(2) * cos_phi * cos_theta + mom_tmp(3) * sin_phi + mom_tmp(4) * cos_phi * sin_theta
+      mom(3) = mom_tmp(3) * cos_phi - mom_tmp(2) * cos_theta * sin_phi - mom_tmp(4) * sin_phi * sin_theta
+      mom(4) = mom_tmp(4) * cos_theta - mom_tmp(2) * sin_theta
+      
+      if( present(mom2) ) then
+         mom_tmp2(2:4) = mom2(2:4)
+         mom2(2) = mom_tmp2(2) * cos_phi * cos_theta + mom_tmp2(3) * sin_phi + mom_tmp2(4) * cos_phi * sin_theta
+         mom2(3) = mom_tmp2(3) * cos_phi - mom_tmp2(2) * cos_theta * sin_phi - mom_tmp2(4) * sin_phi * sin_theta
+         mom2(4) = mom_tmp2(4) * cos_theta - mom_tmp2(2) * sin_theta
+      endif
+      
+  RETURN
+  END SUBROUTINE
+
+  SUBROUTINE boost_from_CMS_to_RefMom(RefMom,BoostMom,BoostMom2)
+  implicit none
+  real(8) :: BoostMom(1:4),RefMom(1:4)
+  real(8), optional :: BoostMom2(1:4)
+  real(8) :: EuklidSP,spacialFact,refMass
+
+      refMass = dsqrt( RefMom(1)**2 - RefMom(2)**2 - RefMom(3)**2 - RefMom(4)**2 )
+
+      EuklidSP = refMom(2)*boostMom(2) + refMom(3)*boostMom(3) + refMom(4)*boostMom(4)
+      spacialFact = (EuklidSP/(refMom(1) + refMass) + boostMom(1))/refMass
+      boostMom(1) = (refMom(1)*boostMom(1) + EuklidSP)/refMass
+      boostMom(2) = boostMom(2) + refMom(2)*spacialFact
+      boostMom(3) = boostMom(3) + refMom(3)*spacialFact
+      boostMom(4) = boostMom(4) + refMom(4)*spacialFact  
+ 
+      if( present(BoostMom2) ) then
+          EuklidSP = refMom(2)*boostMom2(2) + refMom(3)*boostMom2(3) + refMom(4)*boostMom2(4)
+          spacialFact = (EuklidSP/(refMom(1) + refMass) + boostMom2(1))/refMass
+          boostMom2(1) = (refMom(1)*boostMom2(1) + EuklidSP)/refMass
+          boostMom2(2) = boostMom2(2) + refMom(2)*spacialFact
+          boostMom2(3) = boostMom2(3) + refMom(3)*spacialFact
+          boostMom2(4) = boostMom2(4) + refMom(4)*spacialFact        
+      endif
+ 
+  RETURN
+  END SUBROUTINE
+
+ 
+  FUNCTION g_d(sab,m1_sq,m2_sq)! inverse Jacobian for 1-->2 phase space
+  implicit none
+  real(8) :: g_d,sab,m1_sq,m2_sq
+  real(8), parameter :: pi = 3.1415926535897932384626433d0
+
+        g_d = 2d0*sab/(sqrt_lambda(sab,m1_sq,m2_sq)+1d-16)/pi
+        
+    
+  RETURN
+  END FUNCTION
+
+! -------------------------   
+   
+
+
+subroutine spinoru(N,p,za,zb,s)
+!---Calculate spinor products      
+!---taken from MCFM & modified by R. Rontsch, May 2015
+!---extended to deal with negative energies ie with all momenta outgoing                                                                
+!---Arbitrary conventions of Bern, Dixon, Kosower, Weinzierl,                                                                                  
+!---za(i,j)*zb(j,i)=s(i,j)                      
+      implicit none
+      real(8) :: p(:,:),two
+      integer, parameter :: mxpart=14
+      complex(8):: c23(N),f(N),rt(N),za(:,:),zb(:,:),czero,cone,ci
+      real(8)   :: s(:,:)
+      integer i,j,N
+      
+      if (size(p,1) .ne. N) then
+         print *, "spinorz: momentum mismatch"
+         stop
+      endif
+      two=2d0
+      czero=dcmplx(0d0,0d0)
+      cone=dcmplx(1d0,0d0)
+      ci=dcmplx(0d0,1d0)
+      
+
+!---if one of the vectors happens to be zero this routine fails.                                                                                                                
+      do j=1,N
+         za(j,j)=czero
+         zb(j,j)=za(j,j)
+
+!-----positive energy case                                                                                                                                                      
+         if (p(j,4) .gt. 0d0) then
+            rt(j)=dsqrt(p(j,4)+p(j,1))
+            c23(j)=dcmplx(p(j,3),-p(j,2))
+            f(j)=cone
+         else
+!-----negative energy case                                                                                                                                                      
+            rt(j)=dsqrt(-p(j,4)-p(j,1))
+            c23(j)=dcmplx(-p(j,3),p(j,2))
+            f(j)=ci
+         endif
+      enddo
+      do i=2,N
+         do j=1,i-1
+         s(i,j)=two*(p(i,4)*p(j,4)-p(i,1)*p(j,1)-p(i,2)*p(j,2)-p(i,3)*p(j,3))
+         za(i,j)=f(i)*f(j)*(c23(i)*dcmplx(rt(j)/rt(i))-c23(j)*dcmplx(rt(i)/rt(j)))
+
+         if (abs(s(i,j)).lt.1d-5) then
+         zb(i,j)=-(f(i)*f(j))**2*dconjg(za(i,j))
+         else
+         zb(i,j)=-dcmplx(s(i,j))/za(i,j)
+         endif
+         za(j,i)=-za(i,j)
+         zb(j,i)=-zb(i,j)
+         s(j,i)=s(i,j)
+         enddo
+      enddo
+
+    end subroutine spinoru
+
+    
+    
+    
+    
+    
+    subroutine convert_to_MCFM(p,pout)
+      implicit none
+! converts from (E,px,py,pz) to (px,py,pz,E)
+      real(8) :: p(1:4),tmp(1:4)
+      real(8), optional :: pout(1:4)
+
+      if( present(pout) ) then
+          pout(1)=p(2)  
+          pout(2)=p(3)  
+          pout(3)=p(4) 
+          pout(4)=p(1)  
+      else
+          tmp(1)=p(1)
+          tmp(2)=p(2)
+          tmp(3)=p(3)
+          tmp(4)=p(4)
+
+          p(1)=tmp(2)  
+          p(2)=tmp(3) 
+          p(3)=tmp(4)  
+          p(4)=tmp(1)  
+      endif  
+      
+    end subroutine convert_to_MCFM
 
 
 
+   
+   
 
 
    double complex function et1(e1,e2,e3,e4)

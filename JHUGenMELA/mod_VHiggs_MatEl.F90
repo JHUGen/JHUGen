@@ -173,36 +173,40 @@ end subroutine EvalAmp_VHiggs
 
       if(id(1).gt.0)then
         call FFV(id(2), MomExt(:,2), helicity(2), id(1), MomExt(:,1), helicity(1), Vcurrent1)
-        if((id(1)+id(2)).eq.0)then
+!        if((id(1)+id(2)).eq.0)then
           call FFA(id(2), MomExt(:,2), helicity(2), id(1), MomExt(:,1), helicity(1), Acurrent1)
-        endif
+!        endif
       else
         call FFV(id(1), MomExt(:,1), helicity(1), id(2), MomExt(:,2), helicity(2), Vcurrent1)
-        if((id(1)+id(2)).eq.0)then
+!        if((id(1)+id(2)).eq.0)then
           call FFA(id(1), MomExt(:,1), helicity(1), id(2), MomExt(:,2), helicity(2), Acurrent1)
-        endif
+!        endif
       endif
 
       if(id(6).gt.0)then
         call FFV(id(6), MomExt(:,6), helicity(6), id(7), MomExt(:,7), helicity(7), Vcurrent2)
-        if((id(6)+id(7)).eq.0)then
+!        if((id(6)+id(7)).eq.0)then
           call FFA(id(6), MomExt(:,6), helicity(6), id(7), MomExt(:,7), helicity(7), Acurrent2)
-        endif
+!        endif
       else
         call FFV(id(7), MomExt(:,7), helicity(7), id(6), MomExt(:,6), helicity(6), Vcurrent2)
-        if((id(6)+id(7)).eq.0)then
+!        if((id(6)+id(7)).eq.0)then
           call FFA(id(7), MomExt(:,7), helicity(7), id(6), MomExt(:,6), helicity(6), Acurrent2)
-        endif
+!        endif
       endif
 
 !WH
       if((id(1)+id(2)).ne.0)then
         if((id(1)*helicity(1)).le.0d0)then
-          current1=Vcurrent1*gFFW*CKM(abs(id(1)),abs(id(2)))
+          current1=(Vcurrent1-Acurrent1)/2d0*gFFW*CKM(id(1),id(2))
         else
           current1=0d0
         endif
-        current2=Vcurrent2*gFFW*CKM(abs(id(6)),abs(id(7)))
+        if((id(6)*helicity(6)).le.0d0)then
+          current2=(Vcurrent2-Acurrent2)/2d0*gFFW*CKM(id(6),id(7))
+        else
+          current2=0d0
+        endif
 
 !ZH
       else if((abs(id(1)).eq.11).or.(abs(id(1)).eq.13))then
@@ -213,7 +217,7 @@ end subroutine EvalAmp_VHiggs
         else
           current1=(0.5d0*T3lL - QlL*sitW**2) *Vcurrent1 -(0.5d0*T3lL)*Acurrent1
         endif
-        current1=current1*gFFZ
+        current1=current1*gFFZ*dsqrt(scale_alpha_Z_ll)
 
 !u u~ Z vertex for incoming states
       else if((abs(id(1)).eq.2).or.(abs(id(1)).eq.4))then
@@ -222,7 +226,7 @@ end subroutine EvalAmp_VHiggs
         else
           current1=(0.5d0*T3uL - QuL*sitW**2) *Vcurrent1 -(0.5d0*T3uL)*Acurrent1
         endif
-        current1=current1*gFFZ
+        current1=current1*gFFZ*dsqrt(scale_alpha_Z_uu)
 !d d~ Z vertex for incoming states
       else if((abs(id(1)).eq.1).or.(abs(id(1)).eq.3).or.(abs(id(1)).eq.5))then
         if((id(1)*helicity(1)).gt.0d0)then
@@ -230,7 +234,7 @@ end subroutine EvalAmp_VHiggs
         else
           current1=(0.5d0*T3dL - QdL*sitW**2) *Vcurrent1 -(0.5d0*T3dL)*Acurrent1
         endif
-        current1=current1*gFFZ
+        current1=current1*gFFZ*dsqrt(scale_alpha_Z_dd)
 
       else
       current1=0d0
@@ -345,8 +349,8 @@ end subroutine EvalAmp_VHiggs
       dMATRIXELEMENT=(0d0,0d0)
       do lambda1=1,3
       do lambda2=1,3  
-      dMATRIXELEMENT=current1(1)*dconjg(POL1(lambda1, 1)) -current1(2)*dconjg(POL1(lambda1, 2)) -current1(3)*dconjg(POL1(lambda1, 3))-current1(4)*dconjg(POL1(lambda1, 4))
-      dMATRIXELEMENT=dMATRIXELEMENT *(current2(1)*POL2(lambda2, 1) -current2(2)*POL2(lambda2, 2) -current2(3)*POL2(lambda2, 3) -current2(4)*POL2(lambda2, 4))
+      dMATRIXELEMENT=current1(1)*POL1(lambda1, 1) -current1(2)*POL1(lambda1, 2) -current1(3)*POL1(lambda1, 3)-current1(4)*POL1(lambda1, 4)
+      dMATRIXELEMENT=dMATRIXELEMENT *(current2(1)*dconjg(POL2(lambda2, 1)) -current2(2)*dconjg(POL2(lambda2, 2)) -current2(3)*dconjg(POL2(lambda2, 3)) -current2(4)*dconjg(POL2(lambda2, 4)))
       PVVX0P=(0d0,0d0)
       do mu3=1,4
       do mu4=1,4
@@ -503,7 +507,7 @@ end subroutine EvalAmp_VHiggs
 
       integer i,j,k,l
 
-      ANTISYMMETRIC=-dble((i-j)*(i-k)*(i-l)*(j-k)*(j-l)*(k-l))/12d0
+      ANTISYMMETRIC=dble((i-j)*(i-k)*(i-l)*(j-k)*(j-l)*(k-l))/12d0
 
       return
       END function ANTISYMMETRIC
