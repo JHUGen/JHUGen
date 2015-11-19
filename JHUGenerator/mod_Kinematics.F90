@@ -2075,7 +2075,7 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, Higgs=5
 !           return
 !        endif
 
-       if(  pT_j1.lt.pTjetcut .or. pT_j2.lt.pTjetcut )  then
+       if(  pT_j1.lt.pTjetcut .or. pT_j2.lt.pTjetcut .or. m_jj.lt.mJJcut)  then
           applyPSCut=.true.
           return
        endif
@@ -2154,7 +2154,7 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
           return
        endif
 
-       if(  pT_j1.lt.pTjetcut .or. pT_j2.lt.pTjetcut )  then
+       if(  pT_j1.lt.pTjetcut .or. pT_j2.lt.pTjetcut .or. m_jj.lt.mJJcut )  then
           applyPSCut=.true.
           return
        endif
@@ -2273,11 +2273,6 @@ applyPSCut = .false.
     pT_j1 = get_PT(momjet(1:4,1))
     pT_j2 = get_PT(momjet(1:4,2))
 
-    if( pT_j1.lt.ptjetcut .or. pT_j2.lt.ptjetcut ) then
-      applyPSCut=.true.
-      return
-    endif
-    
     pT_H = get_PT(MomExt(1:4,5))
     
     y_j1 = get_ETA(momjet(1:4,1))
@@ -2289,6 +2284,11 @@ applyPSCut = .false.
   
     m_jj = get_MInv( MomJet(1:4,1)+MomJet(1:4,2) )
   
+    if( pT_j1.lt.ptjetcut .or. pT_j2.lt.ptjetcut .or. m_jj.lt.mJJcut) then
+      applyPSCut=.true.
+      return
+    endif
+
     dphi_jj = abs( Get_PHI(MomJet(1:4,1)) - Get_PHI(MomJet(1:4,2)) )
     if( dphi_jj.gt.Pi ) dphi_jj=2d0*Pi-dphi_jj
 
@@ -2493,7 +2493,7 @@ real(8) :: Mom(1:4,1:13),MomMELA(1:4,1:13)
 logical :: applyPSCut
 integer :: NBin(:)
 real(8) :: pT_t,pT_H,pT_tbar,MatElSq_H0,MatElSq_H1,D_0minus
-real(8) :: mt,mtbar,mWp,mWm,pT_b,pT_l,pT_miss
+real(8) :: mt,mtbar,mttbar,mWp,mWm,pT_b,pT_l,pT_miss
 integer, parameter :: inLeft=1,inRight=2,Hbos=3,tbar=4,t=5,  bbar=6,Wm=7,lepM=8,nubar=9,  b=10,Wp=11,lepP=12,nu=13
 logical,save :: FirstTime=.true.
 
@@ -2508,10 +2508,11 @@ logical,save :: FirstTime=.true.
     pT_miss = get_PT(Mom(1:4,nu)+Mom(1:4,nubar))
     mt = get_MInv(Mom(1:4,t))
     mtbar = get_MInv(Mom(1:4,tbar))
+    mttbar = get_MInv(Mom(1:4,t)+Mom(1:4,tbar))
     mWp = get_MInv(Mom(1:4,Wp))
     mWm = get_MInv(Mom(1:4,Wm))
     
-    if( m_Top.lt.10d0*GeV  .and. (pT_t.lt.pTjetcut .or. pT_tbar.lt.pTjetcut) ) applyPSCut=.true.
+    if( m_Top.lt.10d0*GeV  .and. (pT_t.lt.pTjetcut .or. pT_tbar.lt.pTjetcut .or. mttbar.lt.mJJcut) ) applyPSCut=.true.
 
     
 !     if( FirstTime ) then
@@ -2558,7 +2559,7 @@ implicit none
 real(8) :: Mom(1:4,1:11)
 logical :: applyPSCut
 integer :: NBin(:)
-real(8) :: pT_b,pT_H,pT_bbar
+real(8) :: pT_b,pT_H,pT_bbar,mbbbar
 integer, parameter :: bbar=4,b=5,Hbos=3,inLeft=1,inRight=2
 
 
@@ -2567,8 +2568,9 @@ integer, parameter :: bbar=4,b=5,Hbos=3,inLeft=1,inRight=2
     pT_b = get_PT(Mom(1:4,b))
     pT_bbar = get_PT(Mom(1:4,bbar))
     pT_H = get_PT(Mom(1:4,Hbos))
+    mbbbar = get_MInv(Mom(1:4,b)+Mom(1:4,bbar))
     
-    if( pT_b.lt.pTjetcut .or. pT_bbar.lt.pTjetcut ) applyPSCut=.true.
+    if( pT_b.lt.pTjetcut .or. pT_bbar.lt.pTjetcut .or. mbbbar.lt.mJJcut) applyPSCut=.true.
     
 !   binning
     NBin(1)  = WhichBin(1,pT_b)
