@@ -92,7 +92,7 @@ logical, public, parameter :: H_DK =.false.                 ! default to false s
 !logical, public, parameter :: V_DK =.true.                 ! default to true so V in V* > VH (Process = 50) decays
 real(8), public, parameter :: pTjetcut = 15d0*GeV           ! jet min pt
 real(8), public, parameter :: Rjet = 0.5d0                  ! jet deltaR, anti-kt algorithm
-real(8), public, parameter :: mJJcut = 0d0                  ! minimum mJJ for VBF, HJJ, bbH
+real(8), public, parameter :: mJJcut = 0d0*GeV              ! minimum mJJ for VBF, HJJ, bbH
 real(8), public, parameter :: VBF_4ml_minmax(1:2) = (/ -1d0,-1d0 /)*GeV  ! min and max for m_4l in off-shell VBF production;   default is (-1,-1): m_4l ~ Higgs resonance (on-shell)
 ! real(8), public, parameter :: VBF_4ml_minmax(1:2) = (/ 300d0,600d0 /)*GeV  ! min and max for m_4l in off-shell VBF production, default is (-1,-1): m_4l ~ Higgs resonance (on-shell)
 
