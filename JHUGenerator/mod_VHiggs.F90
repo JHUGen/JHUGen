@@ -370,6 +370,14 @@ END SUBROUTINE
 !ZZX vertex
       q3_q3 = inv_mass(3)**2
       q4_q4 = inv_mass(4)**2
+
+!Ulascan requests
+      if(id(3).eq.convertLHE(Wp_))then
+        q3_q3 = inv_mass(4)**2
+        q4_q4 = inv_mass(3)**2
+      endif
+!end Ulascan requests
+
       ghz1_dyn = ghz1   +   ghz1_prime * Lambda_z1**4/( Lambda_z1**2 + abs(q3_q3) )/( Lambda_z1**2 + abs(q4_q4))  &
                         +   ghz1_prime2* ( abs(q3_q3)+abs(q4_q4) )/Lambda_z1**2                                   &
                         +   ghz1_prime3* ( abs(q3_q3)-abs(q4_q4) )/Lambda_z1**2                                   &
