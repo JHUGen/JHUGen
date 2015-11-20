@@ -50,21 +50,31 @@ void SetEwkCouplingParameters(){
 }
 
 
-void SetAlphaS (double Q, int mynloop, int mynflav, string mypartons){
-	if(Q<=1 || mynloop<=0 || mypartons.compare("Default")==0){
-		if(Q<0) cout << "Invalid QCD scale for alpha_s, setting to mH/2..." << endl;
-		Q = (masses_mcfm_.hmass)*0.5;
-		mynloop = 1;
-	};
+void SetAlphaS(double Q_ren, double Q_fac, double multiplier_ren, double multiplier_fac, int mynloop, int mynflav, string mypartons){
+  if (multiplier_ren<=0 || multiplier_fac<=0){
+    cout << "Invalid scale multipliers" << endl;
+    return;
+  }
+  if (Q_ren<=1 || Q_fac<=1 || mynloop<=0 || mypartons.compare("Default")==0){
+    if (Q_ren<0) cout << "Invalid QCD scale for alpha_s, setting to mH/2..." << endl;
+    if (Q_fac<0) cout << "Invalid factorization scale, setting to mH/2..." << endl;
+    Q_ren = (masses_mcfm_.hmass)*0.5;
+    Q_fac = Q_ren;
+    mynloop = 1;
+	}
 	if(mypartons.compare("Default")!=0 && mypartons.compare("cteq6_l")!=0 && mypartons.compare("cteq6l1")!=0){
 		cout << "Only default :: cteq6l1 or cteq6_l are supported. Modify mela.cc symlinks, put the pdf table into data/Pdfdata and retry. Setting to Default..." << endl;
 		mypartons = "Default";
-	};
+	}
+
+  Q_ren *= multiplier_ren;
+  Q_fac *= multiplier_fac;
 
 	bool nflav_is_same = (nflav_.nflav == mynflav);
-	scale_.scale = Q;
-	scale_.musq = Q*Q;
-	nlooprun_.nlooprun = mynloop;
+  scale_.scale = Q_ren;
+  scale_.musq = Q_ren*Q_ren;
+  facscale_.facscale = Q_fac;
+  nlooprun_.nlooprun = mynloop;
 
 // From pdfwrapper_linux.f:
 	if(mypartons.compare("cteq6_l")==0) couple_.amz = 0.118;
@@ -81,7 +91,7 @@ void SetAlphaS (double Q, int mynloop, int mynflav, string mypartons){
 	}
 	else{
 		qcdcouple_.as = alphas_(&(scale_.scale),&(couple_.amz),&(nlooprun_.nlooprun));
-	};
+	}
 
 	qcdcouple_.gsq = 4.0*TMath::Pi()*qcdcouple_.as;
 	qcdcouple_.ason2pi = qcdcouple_.as/(2.0*TMath::Pi());
@@ -91,7 +101,7 @@ void SetAlphaS (double Q, int mynloop, int mynflav, string mypartons){
 /*
 	if(verbosity >= TVar::DEBUG){
 		cout << "My pdf is: " << pdlabel_.pdlabel << endl;
-		cout << "My Q: " << Q << " | My alpha_s: " << qcdcouple_.as << " at order " << nlooprun_.nlooprun << " with a(m_Z): " << couple_.amz << '\t'
+		cout << "My Q_ren: " << Q_ren << " | My alpha_s: " << qcdcouple_.as << " at order " << nlooprun_.nlooprun << " with a(m_Z): " << couple_.amz << '\t'
 			<< "Nflav: " << nflav_.nflav << endl;
 */
 }
@@ -484,11 +494,12 @@ double SumMatrixElementPDF(TVar::Process process, TVar::Production production, T
   for(int iq=2;iq<5;iq++) invariantP[0] -= pow(invariantP[iq],2.0);
   invariantP[0] = sqrt(fabs(invariantP[0]));
 
-  double defaultScale = scale_.scale;
+  double defaultRenScale = scale_.scale;
+  double defaultFacScale = facscale_.facscale;
   int defaultNloop = nlooprun_.nlooprun;
   int defaultNflav = nflav_.nflav;
   string defaultPdflabel = pdlabel_.pdlabel;
-  SetAlphaS( invariantP[0]*0.5 , 1 , 5 , "cteq6_l"); // Set AlphaS(|Q|/2, mynloop, mynflav, mypartonPDF) for MCFM ME-related calculations
+  SetAlphaS(invariantP[0], invariantP[0], 0.5, 0.5, 1, 5, "cteq6_l"); // Set AlphaS(|Q|/2, mynloop, mynflav, mypartonPDF) for MCFM ME-related calculations
 
   //calculate invariant masses between partons/final state particles
   for(int jdx=0;jdx< NPart ;jdx++){
@@ -583,7 +594,7 @@ double SumMatrixElementPDF(TVar::Process process, TVar::Production production, T
     *flux=0;
   }
 
-  SetAlphaS( defaultScale , defaultNloop , defaultNflav , defaultPdflabel); // Protection for other probabilities
+  SetAlphaS(defaultRenScale, defaultFacScale, 0.5, 0.5, defaultNloop, defaultNflav, defaultPdflabel); // Protection for other probabilities
   return msqjk;
 }
 

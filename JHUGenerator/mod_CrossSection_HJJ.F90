@@ -286,6 +286,7 @@ END FUNCTION
 #endif
    implicit none
    real(8) :: yRnd(1:9),VgsWgt, EvalWeighted_HJJ
+   real(8) :: VegasWeighted_HJJ
    real(8) :: pdf(-6:6,1:2)
    real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi
    real(8) :: MomExt(1:4,1:5), PSWgt
@@ -297,9 +298,10 @@ END FUNCTION
    integer, parameter :: ij_neg_offset=6, ij_max=+5
    integer, parameter :: ij_num=ij_max+ij_neg_offset
    include 'vegas_common.f'   
-   EvalWeighted_HJJ = 0d0
 
-   
+   EvalWeighted_HJJ = 0d0
+   VegasWeighted_HJJ = 0d0
+
    if( Process.eq.60 ) then!  assuming everywhere that i>j  (apart from the LHE writeout)
       NumPartonicChannels = 70 
       iPartChannel = int(yRnd(8) * (NumPartonicChannels)) +1 ! this runs from 1..70   
@@ -345,38 +347,10 @@ END FUNCTION
    if( partonic_flip.gt.0.5d0 ) call swapi(iPart_sel,jPart_sel)
    if( iPart_sel.ne.jPart_sel ) PreFac = PreFac*2d0
 
-   if( Process.eq.60 ) then
-      call EvalAmp_WBFH_UnSymm_SA_Select( MomExt,(/ghz1,ghz2,ghz3,ghz4/),(/ghw1,ghw2,ghw3,ghw4/),iPart_sel,jPart_sel,zz_fusion,me2)                 
-   elseif( Process.eq.61 ) then
-!       call EvalAmp_SBFH_UnSymm_SA(MomExt,(/ghg2,ghg3,ghg4/),me2)
-      call EvalAmp_SBFH_UnSymm_SA_Select(MomExt,(/ghg2,ghg3,ghg4/),iPart_sel,jPart_sel,flavor_tag,me2)
-      me2 = me2 * (2d0/3d0*alphas**2)**2 
-   endif
-   
-   LO_Res_Unpol = me2(iPart_sel,jPart_sel) * pdf(LHA2M_pdf(iPart_sel),1)*pdf(LHA2M_pdf(jPart_sel),2)    
-!    LO_Res_Unpol = me2(iPart_sel,jPart_sel) * pdf(LHA2M_pdf(iPart_sel),1)*pdf(LHA2M_pdf(jPart_sel),2) 
-!    if( iPart_sel.ne.jPart_sel ) LO_Res_Unpol = LO_Res_Unpol + me2(jPart_sel,iPart_sel) * pdf(LHA2M_pdf(jPart_sel),1)*pdf(LHA2M_pdf(iPart_sel),2) 
-
-   EvalWeighted_HJJ = LO_Res_Unpol * PreFac
-      
-if( unweighted ) then 
-
-  if( warmup ) then
-
-      if( iPart_sel.gt.jPart_sel ) then
-          CrossSec(iPart_sel,jPart_sel) = CrossSec(iPart_sel,jPart_sel) + EvalWeighted_HJJ*VgsWgt
-          CrossSecMax(iPart_sel,jPart_sel) = max(CrossSecMax(iPart_sel,jPart_sel),EvalWeighted_HJJ*VgsWgt)
-      else! only fill CrossSec arrays with 1st index > 2nd indexs
-          CrossSec(jPart_sel,iPart_sel) = CrossSec(jPart_sel,iPart_sel) + EvalWeighted_HJJ*VgsWgt
-          CrossSecMax(jPart_sel,iPart_sel) = max(CrossSecMax(jPart_sel,iPart_sel),EvalWeighted_HJJ*VgsWgt)
-      endif
-
-
-  else! not warmup
 
    if( Process.eq.60 ) then
-
       MY_IDUP(1:2)= (/LHA2M_ID(iPart_sel),LHA2M_ID(jPart_sel)/)
+
       if( MY_IDUP(1).gt.0 ) then ! quark
           ICOLUP(1:2,1) = (/501,000/)
       else! anti-quark
@@ -400,7 +374,6 @@ if( unweighted ) then
           endif
       else! WW fusion
           if( (MomExt(4,1)*MomExt(4,3).lt.0d0) .and. (MomExt(4,2)*MomExt(4,4).lt.0d0) ) then ! wrong configuration --> swap 3 and 4
-!              MY_IDUP(3:4)= (/SU2flip(LHA2M_ID(jPart_sel)),SU2flip(LHA2M_ID(iPart_sel))/)
              MY_IDUP(3) = -GetCKMPartner( LHA2M_ID(jPart_sel) )
              MY_IDUP(4) = -GetCKMPartner( LHA2M_ID(iPart_sel) )
              
@@ -409,7 +382,6 @@ if( unweighted ) then
              ICOLUP(1:2,4) = ICOLUP(1:2,1)
              ICOLUP(1:2,3) = ICOLUP(1:2,2)
           else
-!              MY_IDUP(3:4)= (/SU2flip(LHA2M_ID(iPart_sel)),SU2flip(LHA2M_ID(jPart_sel))/)
              MY_IDUP(3) = -GetCKMPartner( LHA2M_ID(iPart_sel) )
              MY_IDUP(4) = -GetCKMPartner( LHA2M_ID(jPart_sel) )
              if( abs(MY_IDUP(3)).eq.Top_ ) return !MY_IDUP(3) = sign(1,MY_IDUP(3))*Chm_
@@ -421,10 +393,8 @@ if( unweighted ) then
       MY_IDUP(5)  = Hig_
       ICOLUP(1:2,5) = (/000,000/)
 
-
-
+      call EvalAmp_WBFH_UnSymm_SA_Select( MomExt,(/ghz1,ghz2,ghz3,ghz4/),(/ghw1,ghw2,ghw3,ghw4/),iPart_sel,jPart_sel,zz_fusion,me2)                 
    elseif( Process.eq.61 ) then
-
       MY_IDUP(1:5) = (/LHA2M_ID(iPart_sel),LHA2M_ID(jPart_sel),LHA2M_ID(iPart_sel),LHA2M_ID(jPart_sel),Hig_/)! flavor default is out3=in1 out4=in2
       
       if( MY_IDUP(1).eq.Glu_ .and. MY_IDUP(2).eq.Glu_ ) then! gg->?
@@ -522,59 +492,58 @@ if( unweighted ) then
         call swapi(ICOLUP(1,3),ICOLUP(1,4))
         call swapi(ICOLUP(2,3),ICOLUP(2,4))
       endif
-
       ICOLUP(1:2,5) = (/000,000/) 
+
+      call EvalAmp_SBFH_UnSymm_SA_Select(MomExt,(/ghg2,ghg3,ghg4/),iPart_sel,jPart_sel,flavor_tag,me2)
+      me2 = me2 * (2d0/3d0*alphas**2)**2 
    endif
-      
-      call random_number(xRnd) 
-      if( jPart_Sel.gt.iPart_sel ) call swapi(iPart_sel,jPart_sel)
-      if( EvalWeighted_HJJ*VgsWgt.gt.CrossSecMax(iPart_sel,jPart_sel) ) then
-          write(io_LogFile,"(2X,A,1PE13.6,1PE13.6)") "CrossSecMax is too small.",EvalWeighted_HJJ*VgsWgt, CrossSecMax(iPart_sel,jPart_sel)
-          write(io_stdout, "(2X,A,1PE13.6,1PE13.6,1PE13.6,I3,I3)") "CrossSecMax is too small.",EvalWeighted_HJJ*VgsWgt, CrossSecMax(iPart_sel,jPart_sel),EvalWeighted_HJJ*VgsWgt/CrossSecMax(iPart_sel,jPart_sel),iPart_sel,jPart_sel
-          AlertCounter = AlertCounter + 1
-      elseif( EvalWeighted_HJJ*VgsWgt .gt. xRnd*CrossSecMax(iPart_sel,jPart_sel) ) then
-          AccepCounter = AccepCounter + 1
-          AccepCounter_part(iPart_sel,jPart_sel) = AccepCounter_part(iPart_sel,jPart_sel) + 1
-          call WriteOutEvent_HVBF((/MomExt(1:4,1),MomExt(1:4,2),MomExt(1:4,3),MomExt(1:4,4),MomExt(1:4,5)/),MY_IDUP(1:5),ICOLUP(1:2,1:5),EventWeight=EvalWeighted_HJJ*VgsWgt)
-          do NHisto=1,NumHistograms
-                call intoHisto(NHisto,NBin(NHisto),1d0)
-          enddo
-      endif
-       
-  endif! warmup
 
+   LO_Res_Unpol = me2(iPart_sel,jPart_sel) * pdf(LHA2M_pdf(iPart_sel),1)*pdf(LHA2M_pdf(jPart_sel),2)    
+   EvalWeighted_HJJ = LO_Res_Unpol * PreFac
+   VegasWeighted_HJJ = EvalWeighted_HJJ*VgsWgt
 
-else! weighted
-   
-   
-   AccepCounter=AccepCounter+1
-   if( writeWeightedLHE ) then 
-       if( Process.eq.60 ) then
-            MY_IDUP(1:5)  = (/Up_,Up_,Up_,Up_,Hig_/)
-            ICOLUP(1:2,1) = (/501,000/)
-            ICOLUP(1:2,2) = (/502,000/)
-            ICOLUP(1:2,3) = (/501,000/)
-            ICOLUP(1:2,4) = (/502,000/)
-            ICOLUP(1:2,5) = (/000,000/)         
-       elseif( Process.eq.61 ) then
-            MY_IDUP(1:5)  = (/Up_,Up_,Up_,Up_,Hig_/)
-            ICOLUP(1:2,1) = (/501,000/)
-            ICOLUP(1:2,2) = (/502,000/)
-            ICOLUP(1:2,3) = (/501,000/)
-            ICOLUP(1:2,4) = (/502,000/)
-            ICOLUP(1:2,5) = (/000,000/)
+   if( jPart_Sel.gt.iPart_sel ) call swapi(iPart_sel,jPart_sel) ! iPar,jPart are no longer used in parton id determination or ME calculations
+   if( unweighted ) then 
+
+     if( warmup ) then
+
+       CrossSec(iPart_sel,jPart_sel) = CrossSec(iPart_sel,jPart_sel) + VegasWeighted_HJJ
+       CrossSecMax(iPart_sel,jPart_sel) = max(CrossSecMax(iPart_sel,jPart_sel),VegasWeighted_HJJ)
+
+     else! not warmup
+
+       call random_number(xRnd)
+       if( VegasWeighted_HJJ.gt.CrossSecMax(iPart_sel,jPart_sel) ) then
+         write(io_LogFile,"(2X,A,1PE13.6,1PE13.6)") "CrossSecMax is too small.",VegasWeighted_HJJ, CrossSecMax(iPart_sel,jPart_sel)
+         write(io_stdout, "(2X,A,1PE13.6,1PE13.6,1PE13.6,I3,I3)") "CrossSecMax is too small.",VegasWeighted_HJJ, CrossSecMax(iPart_sel,jPart_sel),VegasWeighted_HJJ/CrossSecMax(iPart_sel,jPart_sel),iPart_sel,jPart_sel
+         AlertCounter = AlertCounter + 1
+       elseif( VegasWeighted_HJJ .gt. xRnd*CrossSecMax(iPart_sel,jPart_sel) ) then
+         AccepCounter = AccepCounter + 1
+         AccepCounter_part(iPart_sel,jPart_sel) = AccepCounter_part(iPart_sel,jPart_sel) + 1
+         call WriteOutEvent_HVBF((/MomExt(1:4,1),MomExt(1:4,2),MomExt(1:4,3),MomExt(1:4,4),MomExt(1:4,5)/),MY_IDUP(1:5),ICOLUP(1:2,1:5),EventWeight=1d0)
+         do NHisto=1,NumHistograms
+           call intoHisto(NHisto,NBin(NHisto),1d0)
+         enddo
        endif
-       call WriteOutEvent_HVBF((/MomExt(1:4,1),MomExt(1:4,2),MomExt(1:4,3),MomExt(1:4,4),MomExt(1:4,5)/),MY_IDUP(1:5),ICOLUP(1:2,1:5),EventWeight=EvalWeighted_HJJ*VgsWgt)
-   endif
-   do NHisto=1,NumHistograms
-       call intoHisto(NHisto,NBin(NHisto),EvalWeighted_HJJ*VgsWgt)
-   enddo
 
-endif
+     endif! warmup
 
+   else! weighted
 
+      if( VegasWeighted_HJJ.ne.0d0 ) then
+        AccepCounter=AccepCounter+1
+        if( writeWeightedLHE ) then 
+          call WriteOutEvent_HVBF((/MomExt(1:4,1),MomExt(1:4,2),MomExt(1:4,3),MomExt(1:4,4),MomExt(1:4,5)/),MY_IDUP(1:5),ICOLUP(1:2,1:5),EventWeight=VegasWeighted_HJJ)
+        endif
+        do NHisto=1,NumHistograms
+          call intoHisto(NHisto,NBin(NHisto),VegasWeighted_HJJ)
+        enddo
+      endif
 
- RETURN
+   endif! unweighted
+
+   RETURN
+
  END FUNCTION EvalWeighted_HJJ
 
 
