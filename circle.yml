@@ -1,0 +1,87 @@
+machine:
+  #https://circleci.com/docs/environment, at the bottom
+  pre:
+    - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.6 10
+    - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.6 10
+    - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.9 20
+    - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.9 20
+  environment:
+    #environment variables can only be set in this section so . bin/thisroot.sh doesn't work
+    PATH: "$(echo /home/ubuntu/root/bin:/home/ubuntu/CMSJHU_AnalysisMacros/JHUSpinWidthPaper_2015/LHEAnalyzer:$PATH | sed s/:$//)"
+    LD_LIBRARY_PATH: "$(echo /home/ubuntu/root/lib:$LD_LIBRARY_PATH | sed s/:$//)"
+    SHLIB_PATH: "$(echo /home/ubuntu/root/lib:$SHLIB_PATH | sed s/:$//)"
+    LIBPATH: "$(echo /home/ubuntu/root/lib:$LIBPATH | sed s/:$//)"
+    PYTHONPATH: "$(echo /home/ubuntu/root/lib:$PYTHONPATH | sed s/:$//)"
+    MANPATH: "$(echo /home/ubuntu/JHUGen/JHUGenerator/root/man:$MANPATH | sed s/:$//)"
+
+general:
+  build_dir: JHUGenerator
+
+dependencies:
+   override:
+     - if ! [ -d ~/root ]; then cd && wget https://root.cern.ch/download/root_v6.04.08.Linux-ubuntu14-x86_64-gcc4.8.tar.gz && tar -xvzf root_v6.04.08.Linux-ubuntu14-x86_64-gcc4.8.tar.gz; fi
+     - cd ~ && if ! [ -d CMSJHU_AnalysisMacros ]; then git clone -b noMELA git@github.com:hroskes/CMSJHU_AnalysisMacros; fi && cd CMSJHU_AnalysisMacros/JHUSpinWidthPaper_2015/LHEAnalyzer && git pull && make all
+     - if ! [ -d ~/checklhe ]; then cd ~ && git clone -b lite git@github.com:hroskes/checklhe; else cd ~/checklhe && git pull; fi
+   cache_directories:
+     - ~/root
+     - ~/CMSJHU_AnalysisMacros
+     - ~/checklhe
+
+test:
+
+  pre:
+    - mkdir -p $CIRCLE_ARTIFACTS/{ggH,VBF,HJJ,other}/{SM,PS}
+    - make
+
+  override:
+    #here we want to generate as many production modes as possible and get the widest range of events to check for syntax issues
+    #the actual checking (checklhe) is done in post
+    #later is more specific generation with different hypotheses to get plots (which of course have to be checked manually)
+
+    #Should move VH in the other section once we set up the plotting code
+    - ./JHUGen Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/other/WH  DecayMode1=11
+    - ./JHUGen Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/other/ZH  DecayMode1=9
+    - ./JHUGen Process=62 VegasNc0=100000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/other/HJ
+    - ./JHUGen Process=80 VegasNc0=100000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/other/ttH DecayMode1=11 DecayMode2=11 TopDK=1
+    #bbH is really slow...
+    #- ./JHUGen Process=90 VegasNc0=100000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/other/bbH
+
+
+
+
+    #generate with 0 interference and make plots
+    - ./JHUGen VegasNc0=100000 VegasNc2=10000 Interf=0 DataFile=$CIRCLE_ARTIFACTS/ggH/SM
+    - analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/ggH/ outfile=SM.root indir=$CIRCLE_ARTIFACTS/ggH/ computeVBFProdAngles=1 computeVHProdAngles=1 SM.lhe
+
+    - ./JHUGen Process=60 VegasNc0=100000 VegasNc2=10000 Interf=0 DataFile=$CIRCLE_ARTIFACTS/VBF/SM
+    - ./JHUGen DecayMode1=8 DecayMode2=8 Interf=0 ReadLHE=$CIRCLE_ARTIFACTS/VBF/SM.lhe DataFile=$CIRCLE_ARTIFACTS/VBF/SM_decayed
+    - analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/VBF/ outfile=SM.root indir=$CIRCLE_ARTIFACTS/VBF/ computeVBFProdAngles=1 computeVHProdAngles=1 SM_decayed.lhe
+    - ./JHUGen Process=61 VegasNc0=100000 VegasNc2=10000 Interf=0 DataFile=$CIRCLE_ARTIFACTS/HJJ/SM
+    - ./JHUGen DecayMode1=8 DecayMode2=8 Interf=0 ReadLHE=$CIRCLE_ARTIFACTS/HJJ/SM.lhe DataFile=$CIRCLE_ARTIFACTS/HJJ/SM_decayed
+    - analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/HJJ/ outfile=SM.root indir=$CIRCLE_ARTIFACTS/HJJ/ computeVBFProdAngles=1 computeVHProdAngles=1 SM_decayed.lhe
+
+    #pseudoscalar
+    - sed -i -r -e "s/( ghz1 = \()[^,]*/\10d0/" -e "s/( ghz4 = \()[^,]*/\11d0/" mod_Parameters.F90
+    - sed -i -r -e "s/( ghg2 = \()[^,]*/\10d0/" -e "s/( ghg4 = \()[^,]*/\11d0/" mod_Parameters.F90
+    - make
+    - ./JHUGen VegasNc0=100000 VegasNc2=10000 Interf=0 DataFile=$CIRCLE_ARTIFACTS/ggH/PS
+    - analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/ggH/ outfile=PS.root indir=$CIRCLE_ARTIFACTS/ggH/ computeVBFProdAngles=1 computeVHProdAngles=1 PS.lhe
+
+    - ./JHUGen Process=60 VegasNc0=100000 VegasNc2=10000 Interf=0 DataFile=$CIRCLE_ARTIFACTS/VBF/PS
+    - ./JHUGen DecayMode1=8 DecayMode2=8 Interf=0 ReadLHE=$CIRCLE_ARTIFACTS/VBF/PS.lhe DataFile=$CIRCLE_ARTIFACTS/VBF/PS_decayed
+    - analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/VBF/ outfile=PS.root indir=$CIRCLE_ARTIFACTS/VBF/ computeVBFProdAngles=1 computeVHProdAngles=1 PS_decayed.lhe
+    - ./JHUGen Process=61 VegasNc0=100000 VegasNc2=10000 Interf=0 DataFile=$CIRCLE_ARTIFACTS/HJJ/PS
+    - ./JHUGen DecayMode1=8 DecayMode2=8 Interf=0 ReadLHE=$CIRCLE_ARTIFACTS/HJJ/PS.lhe DataFile=$CIRCLE_ARTIFACTS/HJJ/PS_decayed
+    - analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/HJJ/ outfile=PS.root indir=$CIRCLE_ARTIFACTS/HJJ/ computeVBFProdAngles=1 computeVHProdAngles=1 PS_decayed.lhe
+
+
+  post:
+    - python ~/checklhe/checklhe.py $(find $CIRCLE_ARTIFACTS -name *.lhe) | tee checklheoutput.txt
+    #if there are any errors this command will exit 1 and so the test will fail
+    - "! grep -q '!' checklheoutput.txt"    #all the error messages end with !
+
+    #ggH analytical fits
+    - cd ~/CMSJHU_AnalysisMacros/ZZ4lanalyticalfits && echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$CIRCLE_ARTIFACTS/ggH/SM.root", "$CIRCLE_ARTIFACTS/ggH/SM/", 1, 0, 0)' | root -b
+    - cd ~/CMSJHU_AnalysisMacros/ZZ4lanalyticalfits && echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$CIRCLE_ARTIFACTS/ggH/PS.root", "$CIRCLE_ARTIFACTS/ggH/PS/", 0, 1, 0)' | root -b
+    #VBF plots
+    - cd ~/CMSJHU_AnalysisMacros/MCProductionValidation && root -b -q VBFplots.C+
