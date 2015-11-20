@@ -53,10 +53,10 @@ test:
     - ./JHUGen VegasNc0=100000 VegasNc2=10000 Interf=0 DataFile=$CIRCLE_ARTIFACTS/ggH/SM
     - analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/ggH/ outfile=SM.root indir=$CIRCLE_ARTIFACTS/ggH/ computeVBFProdAngles=1 computeVHProdAngles=1 SM.lhe
 
-    - ./JHUGen Process=60 VegasNc0=100000 VegasNc2=10000 Interf=0 DataFile=$CIRCLE_ARTIFACTS/VBF/SM
+    - ./JHUGen Process=60 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$CIRCLE_ARTIFACTS/VBF/SM
     - ./JHUGen DecayMode1=8 DecayMode2=8 Interf=0 ReadLHE=$CIRCLE_ARTIFACTS/VBF/SM.lhe DataFile=$CIRCLE_ARTIFACTS/VBF/SM_decayed
     - analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/VBF/ outfile=SM.root indir=$CIRCLE_ARTIFACTS/VBF/ computeVBFProdAngles=1 computeVHProdAngles=1 SM_decayed.lhe
-    - ./JHUGen Process=61 VegasNc0=100000 VegasNc2=10000 Interf=0 DataFile=$CIRCLE_ARTIFACTS/HJJ/SM
+    - ./JHUGen Process=61 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$CIRCLE_ARTIFACTS/HJJ/SM
     - ./JHUGen DecayMode1=8 DecayMode2=8 Interf=0 ReadLHE=$CIRCLE_ARTIFACTS/HJJ/SM.lhe DataFile=$CIRCLE_ARTIFACTS/HJJ/SM_decayed
     - analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/HJJ/ outfile=SM.root indir=$CIRCLE_ARTIFACTS/HJJ/ computeVBFProdAngles=1 computeVHProdAngles=1 SM_decayed.lhe
 
@@ -67,10 +67,10 @@ test:
     - ./JHUGen VegasNc0=100000 VegasNc2=10000 Interf=0 DataFile=$CIRCLE_ARTIFACTS/ggH/PS
     - analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/ggH/ outfile=PS.root indir=$CIRCLE_ARTIFACTS/ggH/ computeVBFProdAngles=1 computeVHProdAngles=1 PS.lhe
 
-    - ./JHUGen Process=60 VegasNc0=100000 VegasNc2=10000 Interf=0 DataFile=$CIRCLE_ARTIFACTS/VBF/PS
+    - ./JHUGen Process=60 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$CIRCLE_ARTIFACTS/VBF/PS
     - ./JHUGen DecayMode1=8 DecayMode2=8 Interf=0 ReadLHE=$CIRCLE_ARTIFACTS/VBF/PS.lhe DataFile=$CIRCLE_ARTIFACTS/VBF/PS_decayed
     - analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/VBF/ outfile=PS.root indir=$CIRCLE_ARTIFACTS/VBF/ computeVBFProdAngles=1 computeVHProdAngles=1 PS_decayed.lhe
-    - ./JHUGen Process=61 VegasNc0=100000 VegasNc2=10000 Interf=0 DataFile=$CIRCLE_ARTIFACTS/HJJ/PS
+    - ./JHUGen Process=61 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$CIRCLE_ARTIFACTS/HJJ/PS
     - ./JHUGen DecayMode1=8 DecayMode2=8 Interf=0 ReadLHE=$CIRCLE_ARTIFACTS/HJJ/PS.lhe DataFile=$CIRCLE_ARTIFACTS/HJJ/PS_decayed
     - analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/HJJ/ outfile=PS.root indir=$CIRCLE_ARTIFACTS/HJJ/ computeVBFProdAngles=1 computeVHProdAngles=1 PS_decayed.lhe
 
