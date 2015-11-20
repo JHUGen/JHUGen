@@ -427,13 +427,13 @@ if( unweighted ) then
 
       MY_IDUP(1:5) = (/LHA2M_ID(iPart_sel),LHA2M_ID(jPart_sel),LHA2M_ID(iPart_sel),LHA2M_ID(jPart_sel),Hig_/)! flavor default is out3=in1 out4=in2
       
-      if( MY_IDUP(1).eq.Glu_ .and. MY_IDUP(2).eq.Glu_ ) then! gg->gg
+      if( MY_IDUP(1).eq.Glu_ .and. MY_IDUP(2).eq.Glu_ ) then! gg->?
           ICOLUP(1:2,1) = (/501,502/)
           ICOLUP(1:2,2) = (/503,501/)      
-          if( flavor_tag.eq.2 ) then
+          if( flavor_tag.eq.2 ) then! gg->qqb
              call random_number(xRnd)
-             ICOLUP(1:2,3) = (/000,502/)
-             ICOLUP(1:2,4) = (/503,000/)             
+             ICOLUP(1:2,3) = (/503,000/)
+             ICOLUP(1:2,4) = (/000,502/)
              if( xRnd.lt.1d0/5d0 ) then
                 MY_IDUP(3:4) = (/Up_,AUp_/)
              elseif( xRnd.lt.2d0/5d0 ) then
@@ -445,7 +445,7 @@ if( unweighted ) then
              elseif( xRnd.lt.5d0/5d0 ) then
                 MY_IDUP(3:4) = (/Bot_,ABot_/)
              endif
-          else
+          else! gg->gg
              ICOLUP(1:2,3) = (/504,502/)
              ICOLUP(1:2,4) = (/503,504/)      
           endif
@@ -472,8 +472,8 @@ if( unweighted ) then
       elseif( MY_IDUP(1).gt.0 .and. MY_IDUP(2).lt.0 ) then! qqb->qqb
           ICOLUP(1:2,1) = (/501,000/)
           ICOLUP(1:2,2) = (/000,502/)
-          ICOLUP(1:2,3) = (/000,501/)            
-          ICOLUP(1:2,4) = (/502,000/)  
+          ICOLUP(1:2,3) = (/501,000/)            
+          ICOLUP(1:2,4) = (/000,502/)  
           if( MY_IDUP(1).eq.-MY_IDUP(2) .and. flavor_tag.eq.1 ) then! qqb->gg
              MY_IDUP(3:4) = (/Glu_,Glu_/)
              ICOLUP(1:2,1) = (/501,000/)
