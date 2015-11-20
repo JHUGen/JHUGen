@@ -35,7 +35,7 @@ using namespace std;
 TString DbnEventLepSelName(int i);
 void My_choose(TVar::Process process, TVar::Production production, TVar::LeptonInterference leptonInterf, int flavor);
 void SetEwkCouplingParameters();
-void SetAlphaS(double Q, int mynloop, int mynflav, string mypartons);
+void SetAlphaS(double Q_ren, double Q_fac, double multiplier_ren, double multiplier_fac, int mynloop, int mynflav, string mypartons);
 void SetMCFMHiggsDecayCouplings(bool useBSM, double Hvvcoupl[SIZE_HVV][2]);
 bool My_smalls(double s[][mxpart], int npart);
 double SumMatrixElementPDF(TVar::Process procees, TVar::Production production,TVar::MatrixElement myME,mcfm_event_type* mcfm_event,double flavor_msq[][11],double* flux,double EBEAM, double coupling[SIZE_HVV_FREENORM]);

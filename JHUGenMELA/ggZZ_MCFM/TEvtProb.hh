@@ -102,7 +102,14 @@ public:
   // this appears to be some kind of 
   // way of setting MCFM parameters through
   // an interface defined in TMCFM.hh
-  void SetHiggsMass(double mass=125.6, float wHiggs=-1);
+  void SetHiggsMass(double mass=125, float wHiggs=-1);
+
+  void SetRenFacScaleMode(std::string renormalizationMode, std::string factorizationMode, double ren_scale_factor, double fac_scale_factor);
+
+private:
+  event_scales_type event_scales;
+
+
   ClassDef(TEvtProb,0);
 };
 
