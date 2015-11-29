@@ -263,6 +263,11 @@
               s = scr(p(:,l3)+p(:,l4),p(:,l3)+p(:,l4))
               propZ2 = s/dcmplx(s - M_V**2,M_V*Ga_V)
 
+             if( convertLHE(MY_IDUP(6))+convertLHE(MY_IDUP(7)).lt.0 ) then! this assigns the W+/W- to the first/second set of inputs; important for q^2-dependent form factors. Everything else is symmetric any ways.
+                  call swap_cmom(sp(3,1:4),sp(4,1:4))
+                  call swap_mom(pin(3,1:4),pin(4,1:4))
+              endif
+
          elseif( VVMode.eq.ZgMode ) then
 !        Zgamma DECAYS
               if( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_)  ) then
@@ -600,7 +605,6 @@
       MZ3=dsqrt(dabs(q3_q3))
       MZ4=dsqrt(dabs(q4_q4))
 
-
 !---- data that defines couplings
       ghg2_dyn = ghg2
       ghg3_dyn = ghg3
@@ -734,9 +738,9 @@
       real(dp), intent(out) ::  res
       real(dp), intent(in) :: p(4,6)
       integer, intent(in) :: MY_IDUP(6:9)
-      complex(dp) :: A_VV(1:8)
+      complex(dp) :: A_VV(1:8),VVHg1,VVHg2,VVHg3
       integer :: i3,i4,VVMode
-      real(dp) :: gZ_sq
+      real(dp) :: gZ_sq,s
       real(dp) :: prefactor, Lambda_inv
       real(dp), parameter :: symmFact=1d0/2d0
 
@@ -804,7 +808,7 @@
                           call calcHelAmp2((/5,4,3,6/),gsZMode,MY_IDUP,p(1:4,1:6),i3,i4,A_VV(6))
                           call calcHelAmp2((/5,4,3,6/),gsgsMode,MY_IDUP,p(1:4,1:6),i3,i4,A_VV(8))
                       endif
-                      A_VV(2) = -A_VV(2) ! minus from Fermi statistics
+                      A_VV(2) = -A_VV(2)! minus from Fermi statistics
                       A_VV(4) = -A_VV(4)
                       A_VV(6) = -A_VV(6)
                       A_VV(8) = -A_VV(8)
@@ -846,6 +850,10 @@
           if(  (VVMode.eq.ZZMode) .and. (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) res = res * symmFact
 
 
+          
+
+
+          
       RETURN
       END SUBROUTINE
 
@@ -867,6 +875,7 @@
          l3=ordering(3)
          l4=ordering(4)
          pin(1,:) = p(:,1)
+        
 
 
 !        ij helicicites: -1 == left, 1 == right
@@ -960,6 +969,11 @@
               s = scr(p(:,l3)+p(:,l4),p(:,l3)+p(:,l4))
               propZ2 = s/dcmplx(s - M_V**2,M_V*Ga_V)
 
+             if( convertLHE(MY_IDUP(6))+convertLHE(MY_IDUP(7)).lt.0 ) then! this assigns the W+/W- to the first/second set of inputs; important for q^2-dependent form factors. Everything else is symmetric any ways.
+                  call swap_cmom(sp(3,1:4),sp(4,1:4))
+                  call swap_mom(pin(3,1:4),pin(4,1:4))
+              endif
+         
          elseif( VVMode.eq.ZgMode ) then
 !        Zgamma DECAYS
               if( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_) ) then
@@ -1206,6 +1220,7 @@
 
 
          call HZZampl(VVMode,pin,sp,A(1))
+
          if (i3.eq.1) then
             A(1) = aL1 * A(1)
          elseif(i3.eq.2) then
@@ -1217,6 +1232,7 @@
             A(1) = aR2 * A(1)
          endif
          A(1) = A(1) * propZ1*propZ2
+                
 
      end subroutine
 
@@ -2021,6 +2037,10 @@
 
 
 
+           
+           
+           
+           
 END MODULE
 
 

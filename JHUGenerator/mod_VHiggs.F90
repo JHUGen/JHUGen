@@ -407,9 +407,9 @@ END SUBROUTINE
                         +   ghz4_prime6* ( abs(q3_q3)**2-abs(q4_q4)**2 )/Lambda_z4**4                             &
                         +   ghz4_prime7* ( abs(q3_q3)*abs(q4_q4) )/Lambda_z4**4
 
-      gVVS1 = ghz1_dyn*(mass(3,1)**2) + qq * ( 2d0*ghz2_dyn + ghz3_dyn*qq/Lambda )
-      gVVS2 = -( 2d0*ghz2_dyn + ghz3_dyn*qq/Lambda )
-      gVVP = -2d0*ghz4_dyn
+      gVVS1 = ghz1_dyn*(mass(3,1)**2) + qq * ( 2d0*ghz2_dyn + ghz3_dyn*qq/Lambda**2 )
+      gVVS2 = -( 2d0*ghz2_dyn + ghz3_dyn*qq/Lambda**2 )
+      gVVP = -2d0*ghz4_dyn   * (-1d0)! MARKUS: fix sign here to be conform with other processes
 
       VVX0 = 0d0
       if(gVVS1.ne.0d0)then

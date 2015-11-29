@@ -61,6 +61,7 @@ integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9
          MomExtFlat(2,1:4)=-MomExtFlat(2,1:4)
 
          call spinoru(7,MomExtFlat,za,zb,s)
+         
       ELSE
          do j=1,10
             call convert_to_MCFM(MomExtFlatDK(j,1:4))
@@ -86,8 +87,14 @@ integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9
 
       ! coupling factors in decay incl in tdecay function
       LOAmp(:,:,:) = LOAmp(:,:,:) * 2d0*gwsq/vev*ci
-
       LO_Res_Unpol(Up_,Bot_)  = cdabs(LOAmp(Up_,Bot_,1))**2  + cdabs(LOAmp(Up_,Bot_,2))**2
+      
+! print *, "raoul",LO_Res_Unpol(Up_,Bot_)
+! call myAmp((/MomExt(1:4,4),-MomExt(1:4,1),MomExt(1:4,5),-MomExt(1:4,2)/),ghz1,ghz2,ghz3,kappa,kappa_tilde,LO_Res_Unpol(Chm_,Bot_))
+! print *, "marku",LO_Res_Unpol(Chm_,Bot_)
+! print *, "ratio",LO_Res_Unpol(Up_,Bot_)/LO_Res_Unpol(Chm_,Bot_)
+! pause
+      
       LO_Res_Unpol(Bot_,Up_)  = cdabs(LOAmp(Bot_,Up_,1))**2  + cdabs(LOAmp(Bot_,Up_,2))**2
       LO_Res_Unpol(Chm_,Bot_) = LO_Res_Unpol(Up_,Bot_)
       LO_Res_Unpol(Bot_,Chm_) = LO_Res_Unpol(Bot_,Up_)
@@ -394,11 +401,11 @@ END SUBROUTINE
         s15=s(p1,p5)
         mw=M_W
         mt=m_Top
-
+        
 ! there is a factor of -2 relative to ttbH
         KL=-mt/vev*(kappa-(0d0,1d0)*kappa_tilde)
         KR=-mt/vev*(kappa+(0d0,1d0)*kappa_tilde)        
-        
+                
         ampw(1) = 1/( - mw**2 + s24)/( - mw**2 + s15)*za(p5,e4)*zb(p1,&
      & p2)*mw**2 + 1d0/2d0/( - mw**2 + s24)/( - mw**2 + s15)/(zb(k4,e4)&
      & )*za(p5,e3)*zb(p2,k4)*zb(e3,p1)*mt**2 + 1d0/2d0/( - mw**2 + s24)&
@@ -632,6 +639,99 @@ END SUBROUTINE
      END SUBROUTINE 
    
 
+
+     SUBROUTINE myAmp(p,VVHg1,VVHg2,VVHg3,TTHg1,TTHg2,res)
+     implicit none
+     real(8) :: p(1:4,1:4),s12,s34,s234,IV1,IV2,sprod(1:4,1:4),res
+     complex(8) :: VVHg1,VVHg2,VVHg3,TTHg1,TTHg2
+     complex(8) :: HelAmp(1:2),Props1,Props2
+     complex(8) :: za(1:4,1:4),zb(1:4,1:4)
+     complex(8),parameter :: cI=(0d0,1d0)
+     
+        call my_spinoru(4,(/p(1:4,1),p(1:4,2),p(1:4,3),p(1:4,4)/),za,zb,sprod)
+     
+        s12 = m_Top**2 + sprod(1,2)
+        s34 = sprod(3,4)
+        Props1 =  cI/(s12-M_W**2+cI*M_W*Ga_W) * cI/(s34-M_W**2+cI*M_W*Ga_W)           ! all propagator denominators for the HVV diagram
+        s234 = sprod(2,3)+sprod(2,4)+sprod(3,4)
+        Props2 =  cI/(s234-M_Top**2+cI*M_Top*Ga_Top) * cI/(s34-M_W**2+cI*M_W*Ga_W)    ! all propagator denominators for the Yukawa diagram
+     
+        IV1 = 1d0/dsqrt(2d0)/sitW
+        IV2 = 1d0/dsqrt(2d0)/sitW
+     
+        HelAmp(1) =  2*Props2*(TTHg1 - cI*TTHg2)*IV1*IV2*zb(2,4)*(za(2,3)*zb(2,1) - za(3,4)*zb(4,1)) +      &
+       (m_top*Props1*IV1*IV2*(za(2,3)*zb(2,4) + za(3,1)*zb(4,1))*(VVHg2*za(3,1)**2*zb(2,1)*zb(3,1)**2 + VVHg2*za(2,3)*zb(2,1)*zb(2,3)*(-2*m_top**2 + za(3,1)*zb(3,1)) +       &
+            za(3,4)*(M_W**2*(VVHg2 - cI*VVHg3)*zb(2,4)*zb(3,1) - m_top**2*VVHg2*zb(2,1)*zb(3,4)) +       &
+            za(3,1)*zb(2,1)*zb(3,1)*(-VVHg1 - 2*m_top**2*VVHg2 + M_W**2*VVHg2 + 2*VVHg2*za(2,1)*zb(2,1) + VVHg2*za(2,4)*zb(2,4) +       &
+               VVHg2*za(4,1)*zb(4,1))))/(M_W**2*za(3,1)*zb(3,1))    
+
+         HelAmp(2) =   (-2*m_top*Props2*IV1*IV2*zb(2,4)*((-TTHg1 + cI*TTHg2)*za(2,3)*zb(2,3) + (TTHg1 + cI*TTHg2)*za(3,1)*zb(3,1) +       &
+            (-TTHg1 + cI*TTHg2)*za(3,4)*zb(3,4)))/zb(3,1) +       &
+            (Props1*IV1*IV2*(m_top**2*VVHg2*za(2,3)**2*zb(2,3)**2*zb(2,4)*(-2*m_top**2 + za(3,1)*zb(3,1)) +       &
+            za(2,3)*(zb(2,4)*(za(3,1)*zb(3,1)*(m_top**2*zb(2,3)*(-VVHg1 - 2*m_top**2*VVHg2 + M_W**2*VVHg2 + 2*VVHg2*za(2,1)*zb(2,1) + VVHg2*za(2,4)*zb(2,4)) +       &
+                     VVHg2*((m_top - M_W)*(m_top + M_W)*za(3,1)*zb(2,3) - M_W**2*za(4,1)*zb(2,4))*zb(3,1)) - m_top**4*VVHg2*za(3,4)*zb(2,3)*zb(3,4)) +       &
+               m_top**2*VVHg2*za(3,1)*zb(2,3)*(za(4,1)*zb(2,4)*zb(3,1) + zb(2,3)*(-2*m_top**2 + za(3,1)*zb(3,1)))*zb(4,1)) +       &
+            za(3,1)*(M_W**2*zb(2,4)*zb(3,1)*(2*VVHg1*za(3,1)*zb(3,1) + cI*VVHg3*za(3,1)**2*zb(3,1)**2 +       &
+                  cI*VVHg3*za(3,4)*(-(za(2,1)*zb(2,4)*zb(3,1)) + m_top**2*zb(3,4))) -       &
+               (za(3,1)*zb(3,1)*(m_top**2*zb(2,3)*(VVHg1 + 2*m_top**2*VVHg2 - M_W**2*VVHg2 - 2*VVHg2*za(2,1)*zb(2,1) - VVHg2*za(2,4)*zb(2,4)) +       &
+                     ((-(m_top**2*VVHg2) + M_W**2*(VVHg2 + cI*VVHg3))*za(3,1)*zb(2,3) + M_W**2*VVHg2*za(4,1)*zb(2,4))*zb(3,1)) +       &
+                  m_top**4*VVHg2*za(3,4)*zb(2,3)*zb(3,4))*zb(4,1) + m_top**2*VVHg2*za(3,1)*za(4,1)*zb(2,3)*zb(3,1)*zb(4,1)**2)))/(M_W**2*za(3,1)*zb(3,1)**2)
+     
+          Res =  HelAmp(1)*dconjg(HelAmp(1)) + HelAmp(2)*dconjg(HelAmp(2)) 
+     
+     END SUBROUTINE 
+
+  subroutine my_spinoru(n,p,za,zb,s)
+    implicit none
+    integer, intent(in) :: n
+    real(8), intent(in) :: p(4,n)
+    complex(8), intent(out) :: za(n,n), zb(n,n)
+    real(8), intent(out) :: s(n,n)
+    integer :: i,j
+    complex(8) :: c23(n), f(n)
+    real(8) :: rt(n)
+      
+    !---if one of the vectors happens to be zero this routine fails.
+    do j=1,N
+       za(j,j)=czero
+       zb(j,j)=za(j,j)
+
+       !-----positive energy case
+       if (p(1,j) .gt. zero) then
+          rt(j)=dsqrt(dabs(p(2,j)+p(1,j)))
+          c23(j)=dcmplx(p(4,j),-p(3,j))
+          f(j)=(one,zero)
+       else
+       !-----negative energy case
+          rt(j)=dsqrt(dabs(-p(1,j)-p(2,j)))
+          c23(j)=dcmplx(-p(4,j),p(3,j))
+          f(j)=ci
+       endif
+    enddo
+
+    do i=2,N
+  
+     do j=1,i-1
+          s(i,j)=two*(p(1,i)*p(1,j)-p(2,i)*p(2,j)-p(3,i)*p(3,j)-p(4,i)*p(4,j))
+          za(i,j)=f(i)*f(j)  * ( c23(i)*dcmplx(rt(j)/(rt(i)+1d-16))-c23(j)*dcmplx(rt(i)/(rt(j)+1d-16)) )
+          
+          if (dabs(s(i,j)).lt.1d-5) then
+             zb(i,j)=-(f(i)*f(j))**2*dconjg(za(i,j))
+          else
+             zb(i,j)=-dcmplx(s(i,j))/(za(i,j)+1d-16)
+          endif
+          
+          za(j,i)=-za(i,j)
+          zb(j,i)=-zb(i,j)
+          s(j,i)=s(i,j)
+          
+       enddo
+
+    enddo
+
+    return
+    
+  end subroutine 
 
 
 END MODULE 

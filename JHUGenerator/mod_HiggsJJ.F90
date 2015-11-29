@@ -125,8 +125,9 @@ module modHiggsJJ
       ijSel( 68,1:3) = (/ 4, 4, zz/)
       ijSel( 69,1:3) = (/-4,-4, zz/)
       ijSel( 70,1:3) = (/-5,-5, zz/)
+      ijSel( 71,1:3) = (/ 5, 5, zz/)
       
-      ijSel( 71:,:)  = 0
+      ijSel( 72:,:)  = 0
       
 
   return
@@ -462,9 +463,14 @@ module modHiggsJJ
     return
 
   end subroutine EvalAmp_SBFH_UnSymm_SA
+  
+  
+  
+  
+  
   !-- SM: |g2| = alphas/(six*pi)
   !-- g3 not supported yet
-  subroutine EvalAmp_SBFH_UnSymm_SA_Select(p,ggcoupl,iSel,jSel,flav_tag,res)
+  subroutine EvalAmp_SBFH_UnSymm_SA_Select(p,ggcoupl,iSel,jSel,flav_tag,iflip,res)
     real(dp), intent(in) :: p(4,5)
     integer, intent(in) :: iSel,jSel,flav_tag
     complex(dp), intent(in) :: ggcoupl(2:4)
@@ -472,13 +478,13 @@ module modHiggsJJ
     real(dp) :: sprod(4,4)
     complex(dp) :: za(4,4), zb(4,4)
     real(dp) :: restmp, restmpid
-    integer :: i, j
+    integer :: i, j,iflip
 
     res = zero
 
     call spinoru(4,(/-p(:,1),-p(:,2),p(:,3),p(:,4)/),za,zb,sprod)
+    iflip = 1
 
-    
     !-- gg -> gg
     if( iSel.eq.pdfGlu_ .and. jSel.eq.pdfGlu_ .and. flav_tag.eq.1 ) then
         call me2_ggggh(ggcoupl,1,2,3,4,za,zb,sprod,restmp)
@@ -506,7 +512,8 @@ module modHiggsJJ
         return        
     endif
     
-    if( jSel.eq.pdfGlu_ .and. iSel.ne.0 ) then    
+    if( jSel.eq.pdfGlu_ .and. iSel.ne.0 ) then 
+        iflip = 2
         call me2_qbqggh(ggcoupl,1,4,2,3,za,zb,sprod,restmp)
         restmp = restmp * aveqg
         res(iSel,jSel) = restmp  
@@ -533,6 +540,7 @@ module modHiggsJJ
     endif
     
     if( iSel.lt.0 .and. jSel.eq.-iSel .and. flav_tag.eq.2 ) then    
+        iflip = 2
         call me2_qbqQBQ(ggcoupl,2,1,4,3,za,zb,sprod,restmp,restmpid)
         restmp = restmpid * aveqq
         res(iSel,jSel) = restmp     
@@ -559,6 +567,7 @@ module modHiggsJJ
     endif     
 
     if( iSel.lt.0 .and. jSel.gt.0 .and. iSel.ne.jSel ) then    
+        iflip = 2
         call me2_qbqQBQ(ggcoupl,2,3,4,1,za,zb,sprod,restmp,restmpid)
         restmp = restmp * aveqq
         res(iSel,jSel) = restmp
@@ -941,7 +950,10 @@ module modHiggsJJ
 
   end subroutine EvalAmp_WBFH_UnSymm_SA
 
-  SUBROUTINE EvalAmp_WBFH_UnSymm_SA_Select(p,vvcoupl,wwcoupl,iSel,jSel,zz_fusion,res)
+
+
+
+  SUBROUTINE EvalAmp_WBFH_UnSymm_SA_Select(p,vvcoupl,wwcoupl,iSel,jSel,zz_fusion,iflip,res)
   implicit none
     real(dp), intent(in) :: p(4,5)
     complex(dp), intent(in) :: vvcoupl(4),wwcoupl(4)! wwcoupl is only used (for H->WW) if it includes non-zero values
@@ -960,10 +972,7 @@ module modHiggsJJ
     integer :: i, j, j1, j2, iflip, pdfindex(2)
 
     call spinoru(4,(/-p(:,1),-p(:,2),p(:,3),p(:,4)/),za,zb,sprod)
-    
-    
-    
-    
+    iflip = 1
     
     
     !-- qq->qq, up
@@ -1109,7 +1118,7 @@ if( (iSel.eq.pdfUp_ .and. jSel.eq.pdfDn_) .or. (iSel.eq.pdfChm_ .and. jSel.eq.pd
        else
           restmp = abs(amp_w(-1,-1))**2 * couplw**2 * xn**2
           restmp = restmp + two * real(amp_z(-1,-1)*conjg(amp_w(-1,-1)),kind=dp) * &
-                   aL_QUp * aL_QDn * couplz * couplw * xn          
+                   aL_QUp * aL_QDn * couplz * couplw * xn
        endif
        restmp = restmp * aveqq
 
@@ -1399,8 +1408,6 @@ return
 endif
 
 
-
-! MARKUS: why is bot abot not here????
 
 if( (iSel.eq.pdfDn_ .and. jSel.eq.pdfADn_) .or. (iSel.eq.pdfStr_ .and. jSel.eq.pdfAStr_)  .or. (iSel.eq.pdfDn_ .and. jSel.eq.pdfAStr_)  .or. (iSel.eq.pdfStr_ .and. jSel.eq.pdfADn_) ) then
        if( zz_fusion ) then
