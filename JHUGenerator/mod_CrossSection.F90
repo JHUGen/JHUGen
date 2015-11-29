@@ -1886,7 +1886,7 @@ include 'csmaxvalue.f'
      endif
   elseif( (IsAWDecay(DecayMode1)) .and. (IsAWDecay(DecayMode2)) ) then
      if( (yrnd(16).le.0.5d0) ) then
-      MY_IDUP(4) = ChargeFlip(MY_IDUP(4))
+     MY_IDUP(4) = ChargeFlip(MY_IDUP(4))
       MY_IDUP(5) = ChargeFlip(MY_IDUP(5))
       MY_IDUP(6) = ChargeFlip(MY_IDUP(6))
       MY_IDUP(7) = ChargeFlip(MY_IDUP(7))

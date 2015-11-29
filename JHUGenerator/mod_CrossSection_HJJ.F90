@@ -291,7 +291,7 @@ END FUNCTION
    real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi
    real(8) :: MomExt(1:4,1:5), PSWgt
    real(8) :: me2(-5:5,-5:5)
-   integer :: i,j,MY_IDUP(1:5),ICOLUP(1:2,1:5),NBin(1:NumHistograms),NHisto
+   integer :: i,j,MY_IDUP(1:5),ICOLUP(1:2,1:5),NBin(1:NumHistograms),NHisto,iflip
    integer :: iPartChannel,PartChannelAvg,NumPartonicChannels,ijSel(1:121,1:3),flavor_tag
    real(8) :: LO_Res_Unpol, PreFac,xRnd,partonic_flip
    logical :: applyPSCut,ZZ_Fusion
@@ -303,8 +303,8 @@ END FUNCTION
    VegasWeighted_HJJ = 0d0
 
    if( Process.eq.60 ) then!  assuming everywhere that i>j  (apart from the LHE writeout)
-      NumPartonicChannels = 70 
-      iPartChannel = int(yRnd(8) * (NumPartonicChannels)) +1 ! this runs from 1..70   
+      NumPartonicChannels = 71
+      iPartChannel = int(yRnd(8) * (NumPartonicChannels)) +1 ! this runs from 1..71
       call get_VBFchannelHash(ijSel)
       iPart_sel = ijSel(iPartChannel,1)
       jPart_sel = ijSel(iPartChannel,2)
@@ -324,7 +324,7 @@ END FUNCTION
    if( unweighted .and. .not.warmup .and.  sum(AccepCounter_part(:,:)) .eq. sum(RequEvents(:,:)) ) then 
       stopvegas=.true.
    endif
-     
+   
    if( (unweighted) .and. (.not. warmup) .and. (AccepCounter_part(iPart_sel,jPart_sel) .ge. RequEvents(iPart_sel,jPart_Sel))  ) return
    
    call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
@@ -362,8 +362,21 @@ END FUNCTION
           ICOLUP(1:2,2) = (/000,502/)
       endif
 
+
+      call EvalAmp_WBFH_UnSymm_SA_Select( MomExt,(/ghz1,ghz2,ghz3,ghz4/),(/ghw1,ghw2,ghw3,ghw4/),iPart_sel,jPart_sel,zz_fusion,iflip,me2)
+      
       if( ZZ_Fusion ) then
-          if( (MomExt(4,1)*MomExt(4,3).lt.0d0) .and. (MomExt(4,2)*MomExt(4,4).lt.0d0) ) then ! wrong configuration --> swap 3 and 4
+!           if( (MomExt(4,1)*MomExt(4,3).lt.0d0) .and. (MomExt(4,2)*MomExt(4,4).lt.0d0) ) then ! wrong configuration --> swap 3 and 4
+!              MY_IDUP(3:4)= (/LHA2M_ID(jPart_sel),LHA2M_ID(iPart_sel)/)
+!              ICOLUP(1:2,4) = ICOLUP(1:2,1)
+!              ICOLUP(1:2,3) = ICOLUP(1:2,2)
+!           else! 
+!              MY_IDUP(3:4)= (/LHA2M_ID(iPart_sel),LHA2M_ID(jPart_sel)/)
+!              ICOLUP(1:2,3) = ICOLUP(1:2,1)
+!              ICOLUP(1:2,4) = ICOLUP(1:2,2)
+!           endif
+          
+          if( iflip.eq.2 ) then ! wrong configuration --> swap 3 and 4
              MY_IDUP(3:4)= (/LHA2M_ID(jPart_sel),LHA2M_ID(iPart_sel)/)
              ICOLUP(1:2,4) = ICOLUP(1:2,1)
              ICOLUP(1:2,3) = ICOLUP(1:2,2)
@@ -372,8 +385,27 @@ END FUNCTION
              ICOLUP(1:2,3) = ICOLUP(1:2,1)
              ICOLUP(1:2,4) = ICOLUP(1:2,2)
           endif
+          
+          
       else! WW fusion
-          if( (MomExt(4,1)*MomExt(4,3).lt.0d0) .and. (MomExt(4,2)*MomExt(4,4).lt.0d0) ) then ! wrong configuration --> swap 3 and 4
+!           if( (MomExt(4,1)*MomExt(4,3).lt.0d0) .and. (MomExt(4,2)*MomExt(4,4).lt.0d0) ) then ! wrong configuration --> swap 3 and 4
+!              MY_IDUP(3) = -GetCKMPartner( LHA2M_ID(jPart_sel) )
+!              MY_IDUP(4) = -GetCKMPartner( LHA2M_ID(iPart_sel) )
+!              
+!              if( abs(MY_IDUP(3)).eq.Top_ ) return !MY_IDUP(3) = sign(1,MY_IDUP(3))*Chm_
+!              if( abs(MY_IDUP(4)).eq.Top_ ) return !MY_IDUP(4) = sign(1,MY_IDUP(4))*Chm_ 
+!              ICOLUP(1:2,4) = ICOLUP(1:2,1)
+!              ICOLUP(1:2,3) = ICOLUP(1:2,2)
+!           else
+!              MY_IDUP(3) = -GetCKMPartner( LHA2M_ID(iPart_sel) )
+!              MY_IDUP(4) = -GetCKMPartner( LHA2M_ID(jPart_sel) )
+!              if( abs(MY_IDUP(3)).eq.Top_ ) return !MY_IDUP(3) = sign(1,MY_IDUP(3))*Chm_
+!              if( abs(MY_IDUP(4)).eq.Top_ ) return !MY_IDUP(4) = sign(1,MY_IDUP(4))*Chm_ 
+!              ICOLUP(1:2,3) = ICOLUP(1:2,1)
+!              ICOLUP(1:2,4) = ICOLUP(1:2,2)
+!           endif         
+
+          if( iflip.eq.1 ) then ! wrong configuration --> swap 3 and 4  (opposite to zz case)
              MY_IDUP(3) = -GetCKMPartner( LHA2M_ID(jPart_sel) )
              MY_IDUP(4) = -GetCKMPartner( LHA2M_ID(iPart_sel) )
              
@@ -388,13 +420,18 @@ END FUNCTION
              if( abs(MY_IDUP(4)).eq.Top_ ) return !MY_IDUP(4) = sign(1,MY_IDUP(4))*Chm_ 
              ICOLUP(1:2,3) = ICOLUP(1:2,1)
              ICOLUP(1:2,4) = ICOLUP(1:2,2)
-          endif         
+          endif        
+
       endif
       MY_IDUP(5)  = Hig_
       ICOLUP(1:2,5) = (/000,000/)
-
-      call EvalAmp_WBFH_UnSymm_SA_Select( MomExt,(/ghz1,ghz2,ghz3,ghz4/),(/ghw1,ghw2,ghw3,ghw4/),iPart_sel,jPart_sel,zz_fusion,me2)                 
+      
+      
    elseif( Process.eq.61 ) then
+   
+      call EvalAmp_SBFH_UnSymm_SA_Select(MomExt,(/ghg2,ghg3,ghg4/),iPart_sel,jPart_sel,flavor_tag,iflip,me2)
+      me2 = me2 * (2d0/3d0*alphas**2)**2    
+   
       MY_IDUP(1:5) = (/LHA2M_ID(iPart_sel),LHA2M_ID(jPart_sel),LHA2M_ID(iPart_sel),LHA2M_ID(jPart_sel),Hig_/)! flavor default is out3=in1 out4=in2
       
       if( MY_IDUP(1).eq.Glu_ .and. MY_IDUP(2).eq.Glu_ ) then! gg->?
@@ -487,15 +524,13 @@ END FUNCTION
           ICOLUP(1:2,3) = (/000,501/)
           ICOLUP(1:2,4) = (/000,502/)
       endif
-      if( (MomExt(4,1)*MomExt(4,3).lt.0d0) .and. (MomExt(4,2)*MomExt(4,4).lt.0d0) ) then
+      if( iflip.eq.2 ) then
         call swapi(MY_IDUP(3),MY_IDUP(4))
         call swapi(ICOLUP(1,3),ICOLUP(1,4))
         call swapi(ICOLUP(2,3),ICOLUP(2,4))
       endif
       ICOLUP(1:2,5) = (/000,000/) 
 
-      call EvalAmp_SBFH_UnSymm_SA_Select(MomExt,(/ghg2,ghg3,ghg4/),iPart_sel,jPart_sel,flavor_tag,me2)
-      me2 = me2 * (2d0/3d0*alphas**2)**2 
    endif
 
    LO_Res_Unpol = me2(iPart_sel,jPart_sel) * pdf(LHA2M_pdf(iPart_sel),1)*pdf(LHA2M_pdf(jPart_sel),2)    
