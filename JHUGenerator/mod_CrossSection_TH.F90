@@ -182,9 +182,21 @@ EvalUnWeighted_TH = 0d0
       elseif( PROCESS.EQ.111 ) then
           ICOLUP(1:2,Hbos) = (/000,000/)
           ICOLUP(1:2,t)    = (/000,501/)
-          ICOLUP(1:2,qout) = (/000,502/)
-          ICOLUP(1:2,inLeft) = (/502,000/)
-          ICOLUP(1:2,inRight)= (/501,000/)
+          if( iPartons(inLeft)*iPartons(inRight).gt.0 ) then
+              ICOLUP(1:2,qout) = (/000,502/)
+          else
+              ICOLUP(1:2,qout) = (/502,000/)
+          endif
+          if( iPartons(inLeft).gt.0 ) then
+              ICOLUP(1:2,inLeft) = (/502,000/)
+          else
+              ICOLUP(1:2,inLeft) = (/000,502/)
+          endif
+          if( iPartons(inRight).gt.0 ) then
+              ICOLUP(1:2,inRight)= (/501,000/)
+          else
+              ICOLUP(1:2,inRight)= (/000,501/)
+          endif
           MY_IDUP(b)   = ABot_;      ICOLUP(1:2,b)  = (/000,501/)
           MY_IDUP(W)   = DK_IDUP(2); ICOLUP(1:2,W)  = (/000,000/)             
           MY_IDUP(lep) = DK_IDUP(6); ICOLUP(1:2,lep)= DK_ICOLUP(1:2,6)
@@ -193,8 +205,16 @@ EvalUnWeighted_TH = 0d0
           ICOLUP(1:2,Hbos) = (/000,000/)
           ICOLUP(1:2,t)    = (/502,000/)
           ICOLUP(1:2,qout) = (/000,502/)
-          ICOLUP(1:2,inLeft) = (/501,000/)
-          ICOLUP(1:2,inRight)= (/000,501/)
+          if( iPartons(inLeft).gt.0 ) then
+              ICOLUP(1:2,inLeft) = (/501,000/)
+          else
+              ICOLUP(1:2,inLeft) = (/000,501/)
+          endif
+          if( iPartons(inRight).gt.0 ) then
+              ICOLUP(1:2,inRight)= (/501,000/)
+          else
+              ICOLUP(1:2,inRight)= (/000,501/)
+          endif
           MY_IDUP(b)   = Bot_;       ICOLUP(1:2,b)   = (/502,00/)
           MY_IDUP(W)   = DK_IDUP(1); ICOLUP(1:2,W)   = (/000,000/)
           MY_IDUP(lep) = DK_IDUP(3); ICOLUP(1:2,lep) = DK_ICOLUP(1:2,3)
@@ -203,8 +223,16 @@ EvalUnWeighted_TH = 0d0
           ICOLUP(1:2,Hbos) = (/000,000/)
           ICOLUP(1:2,t)    = (/000,502/)
           ICOLUP(1:2,qout) = (/502,000/)
-          ICOLUP(1:2,inLeft) = (/501,000/)
-          ICOLUP(1:2,inRight)= (/000,501/)
+          if( iPartons(inLeft).gt.0 ) then
+              ICOLUP(1:2,inLeft) = (/501,000/)
+          else
+              ICOLUP(1:2,inLeft) = (/000,501/)
+          endif
+          if( iPartons(inRight).gt.0 ) then
+              ICOLUP(1:2,inRight)= (/501,000/)
+          else
+              ICOLUP(1:2,inRight)= (/000,501/)
+          endif
           MY_IDUP(b)   = ABot_;      ICOLUP(1:2,b)  = (/000,502/)
           MY_IDUP(W)   = DK_IDUP(2); ICOLUP(1:2,W)  = (/000,000/)             
           MY_IDUP(lep) = DK_IDUP(6); ICOLUP(1:2,lep)= DK_ICOLUP(1:2,6)
@@ -274,8 +302,13 @@ IF( GENEVT ) THEN
               MY_IDUP(1:5) = (/ LHA2M_pdf(iPartons(1)),LHA2M_pdf(iPartons(2)),Hig_,SU2flip(LHA2M_pdf(iPartons(2))),SU2flip(LHA2M_pdf(iPartons(1))) /)
               if( abs(iPartons(1)).eq.5 ) then
                   call swapi( MY_IDUP(4),MY_IDUP(5) )
-                  call swapi( ICOLUP(1,inLeft),ICOLUP(1,inRight) )
-                  call swapi( ICOLUP(2,inLeft),ICOLUP(2,inRight) )
+                  if( iPartons(1)*iPartons(2).gt.0 ) then
+                      call swapi( ICOLUP(1,inLeft),ICOLUP(1,inRight) )
+                      call swapi( ICOLUP(2,inLeft),ICOLUP(2,inRight) )
+                  else
+                      call swapi( ICOLUP(1,inLeft),ICOLUP(2,inRight) )
+                      call swapi( ICOLUP(2,inLeft),ICOLUP(1,inRight) )
+                  endif
               endif              
           ELSEIF (PROCESS .EQ. 112) THEN      
               MY_IDUP(1:5) = (/ LHA2M_pdf(iPartons(1)),LHA2M_pdf(iPartons(2)),Hig_,Top_,ABot_ /)
