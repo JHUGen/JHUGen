@@ -48,13 +48,16 @@ test:
     - ./JHUGen PDFSet=3 Process=80 VegasNc0=100000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/other/ttH DecayMode1=11 DecayMode2=11 TopDK=1
     #only generate 100 of bbH and various tqH, they're slow
     - ./JHUGen PDFSet=3 Process=90  VegasNc0=100000 VegasNc2=100 DataFile=$CIRCLE_ARTIFACTS/other/bbH
-    - ./JHUGen PDFSet=3 Process=110 VegasNc0=100000 VegasNc2=100 DataFile=$CIRCLE_ARTIFACTS/other/tH_t
-    - ./JHUGen PDFSet=3 Process=111 VegasNc0=100000 VegasNc2=100 DataFile=$CIRCLE_ARTIFACTS/other/tbarH_t
-    - ./JHUGen PDFSet=3 Process=112 VegasNc0=100000 VegasNc2=100 DataFile=$CIRCLE_ARTIFACTS/other/tH_s
-    - ./JHUGen PDFSet=3 Process=113 VegasNc0=100000 VegasNc2=100 DataFile=$CIRCLE_ARTIFACTS/other/tbarH_s
-
-
-
+    - ./JHUGen PDFSet=3 Process=110 VegasNc0=100000 VegasNc2=100 DataFile=$CIRCLE_ARTIFACTS/other/tH_t    DecayMode1=11 TopDK=1
+    - ./JHUGen PDFSet=3 Process=111 VegasNc0=100000 VegasNc2=100 DataFile=$CIRCLE_ARTIFACTS/other/tbarH_t DecayMode1=11 TopDK=1
+    - ./JHUGen PDFSet=3 Process=112 VegasNc0=100000 VegasNc2=100 DataFile=$CIRCLE_ARTIFACTS/other/tH_s    DecayMode1=11 TopDK=1
+    - ./JHUGen PDFSet=3 Process=113 VegasNc0=100000 VegasNc2=100 DataFile=$CIRCLE_ARTIFACTS/other/tbarH_s DecayMode1=11 TopDK=1
+    #Decays for t(t)H which have complicated quarks, to check colors
+    - ./JHUGen PDFSet=3 DecayMode1=1 DecayMode2=1 Interf=0 ReadLHE=$CIRCLE_ARTIFACTS/other/ttH.lhe DataFile=$CIRCLE_ARTIFACTS/other/ttH_decayed
+    - ./JHUGen PDFSet=3 DecayMode1=5 DecayMode2=5 Interf=0 ReadLHE=$CIRCLE_ARTIFACTS/other/tH_t.lhe DataFile=$CIRCLE_ARTIFACTS/other/tH_t_decayed
+    - ./JHUGen PDFSet=3 DecayMode1=1 DecayMode2=1 Interf=0 ReadLHE=$CIRCLE_ARTIFACTS/other/tbarH_t.lhe DataFile=$CIRCLE_ARTIFACTS/other/tbarH_t_decayed
+    - ./JHUGen PDFSet=3 DecayMode1=5 DecayMode2=5 Interf=0 ReadLHE=$CIRCLE_ARTIFACTS/other/tH_s.lhe DataFile=$CIRCLE_ARTIFACTS/other/tH_s_decayed
+    - ./JHUGen PDFSet=3 DecayMode1=1 DecayMode2=1 Interf=0 ReadLHE=$CIRCLE_ARTIFACTS/other/tbarH_s.lhe DataFile=$CIRCLE_ARTIFACTS/other/tH_s_decayed
 
     #generate with 0 interference and make plots
     - ./JHUGen PDFSet=3 VegasNc0=100000 VegasNc2=10000 Interf=0 DataFile=$CIRCLE_ARTIFACTS/ggH/SM

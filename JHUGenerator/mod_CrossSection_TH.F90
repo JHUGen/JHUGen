@@ -156,7 +156,7 @@ EvalUnWeighted_TH = 0d0
       MomOffShell(1:4,1:3) = MomExt(1:4,1:3)            
 !       PSWgt = PSWgt * PSWgt3        ! not using the Jacobian because the mat.el. don't have BW-propagators
       
-      call VVBranchings(DK_IDUP(1:6),DK_ICOLUP(1:2,3:6))
+      call VVBranchings(DK_IDUP(1:6),DK_ICOLUP(1:2,3:6),700)
       if( PROCESS.EQ.110 ) then
           ICOLUP(1:2,Hbos) = (/000,000/)
           ICOLUP(1:2,t)    = (/501,000/)
