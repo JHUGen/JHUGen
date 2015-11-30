@@ -267,7 +267,7 @@ integer,optional :: ErrNum
    else
       print *, "ERROR: ",Message
    endif
-   stop
+   stop 1
 END SUBROUTINE
 
 

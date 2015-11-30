@@ -272,9 +272,9 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
       print *, "WH with Collider 1 only"
       stop
     endif
-
+    if( Process.ge.110 .and. Process.le.113 ) DecayMode2 = DecayMode1
     
-    if( (TopDecays.ne.0 .and. TopDecays.ne.1) .and. (Process.eq.80 .or. Process.eq.110 .or. Process.eq.111) ) call Error("Specify TopDK=0,1")
+    if( (TopDecays.ne.0 .and. TopDecays.ne.1) .and. (Process.eq.80 .or. (Process.ge.110 .and. Process.le.113)) ) call Error("Specify TopDK=0,1")
     if( (TopDecays.eq.1) .and. .not. IsAWDecay(DecayMode1) ) call Error("Invalid DecayMode1 for top decays")
     if( (TopDecays.eq.1) .and. .not. IsAWDecay(DecayMode2) ) call Error("Invalid DecayMode2 for top decays")
 
