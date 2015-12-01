@@ -494,7 +494,7 @@ real(8) :: lambda_v120(1:3)
 logical :: forceZZcoupl
 logical :: computeQsqCompundCoupl
 
-	forceZZcoupl = (.not.present(tryWWcoupl) .or. .not.distinguish_HWWcouplings .or. .not.tryWWcoupl)
+	forceZZcoupl = (.not.present(tryWWcoupl) .or. .not.distinguish_HWWcouplings .or. .not.tryWWcoupl .or. index.gt.4)
 	computeQsqCompundCoupl = .false.
 	sWplus_signed=0d0
 	sWminus_signed=0d0
@@ -521,6 +521,34 @@ logical :: computeQsqCompundCoupl
 		elseif(index.eq.4) then
 			vvcoupl = (/ ghz4, ghz4_prime, ghz4_prime2, ghz4_prime3, ghz4_prime4, ghz4_prime5, ghz4_prime6, ghz4_prime7 /)
 			lambda_v = Lambda_z4
+			lambda_v120 = (/ Lambda_z41, Lambda_z42, Lambda_z40 /)
+		elseif(index.eq.5) then ! Zgs 1
+			if(sWW.gt.0d0) vvcoupl(3) = ghzgs1_prime2 * M_Z**2/sWW**2
+			lambda_v = Lambda_zgs1
+			lambda_v120 = (/ Lambda_z11, Lambda_z12, Lambda_z10 /)
+		elseif(index.eq.6) then ! Zgs 2-4
+			vvcoupl(1) = ghzgs2
+			lambda_v = 1d0 ! Not present
+			lambda_v120 = (/ Lambda_z21, Lambda_z22, Lambda_z20 /)
+		elseif(index.eq.7) then
+			vvcoupl(1) = ghzgs3
+			lambda_v = 1d0 ! Not present
+			lambda_v120 = (/ Lambda_z31, Lambda_z32, Lambda_z30 /)
+		elseif(index.eq.8) then
+			vvcoupl(1) = ghzgs4
+			lambda_v = 1d0 ! Not present
+			lambda_v120 = (/ Lambda_z41, Lambda_z42, Lambda_z40 /)
+		elseif(index.eq.9) then ! gsgs 2-4
+			vvcoupl(1) = ghgsgs2
+			lambda_v = 1d0 ! Not present
+			lambda_v120 = (/ Lambda_z21, Lambda_z22, Lambda_z20 /)
+		elseif(index.eq.10) then
+			vvcoupl(1) = ghgsgs3
+			lambda_v = 1d0 ! Not present
+			lambda_v120 = (/ Lambda_z31, Lambda_z32, Lambda_z30 /)
+		elseif(index.eq.11) then
+			vvcoupl(1) = ghgsgs4
+			lambda_v = 1d0 ! Not present
 			lambda_v120 = (/ Lambda_z41, Lambda_z42, Lambda_z40 /)
 		endif
 	else
