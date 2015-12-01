@@ -90,10 +90,10 @@ contains
           qsq_V1V2=-(p(1:4,3).dot.p(1:4,4))
           qsq_H   =  p(1:4,5).dot.p(1:4,5)
 
-          ghz1_dyn = HVVSpinZeroDynamicCoupling(1,q3_q3,q4_q4,inv_mass(5)**2)
-          ghz2_dyn = HVVSpinZeroDynamicCoupling(2,q3_q3,q4_q4,inv_mass(5)**2)
-          ghz3_dyn = HVVSpinZeroDynamicCoupling(3,q3_q3,q4_q4,inv_mass(5)**2)
-          ghz4_dyn = HVVSpinZeroDynamicCoupling(4,q3_q3,q4_q4,inv_mass(5)**2)
+          ghz1_dyn = HVVSpinZeroDynamicCoupling(1,qsq_V1,qsq_V2,qsq_H)
+          ghz2_dyn = HVVSpinZeroDynamicCoupling(2,qsq_V1,qsq_V2,qsq_H)
+          ghz3_dyn = HVVSpinZeroDynamicCoupling(3,qsq_V1,qsq_V2,qsq_H)
+          ghz4_dyn = HVVSpinZeroDynamicCoupling(4,qsq_V1,qsq_V2,qsq_H)
 
           a1HVV = ghz1_dyn*M_V**2 + qsq_V1V2*( 2d0*ghz2_dyn + ghz3_dyn*qsq_V1V2/Lambda )
           a2HVV =-2d0*ghz2_dyn - ghz3_dyn*qsq_V1V2/Lambda

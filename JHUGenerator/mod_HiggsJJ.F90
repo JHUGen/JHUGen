@@ -2050,7 +2050,7 @@ endif
 	   enddo
     else
        do vv_it=1,4
-          vvcoupl_prime(vv_it) = HVVSpinZeroDynamicCoupling(vv_it,sprod(j1,j2),sprod(j3,j4),mhsq,useWWcoupl)
+          vvcoupl_prime(vv_it) = HVVSpinZeroDynamicCoupling(vv_it,sprod(j1,j2),sprod(j3,j4),mhsq,tryWWcoupl=useWWcoupl)
 	   enddo
     endif
 
