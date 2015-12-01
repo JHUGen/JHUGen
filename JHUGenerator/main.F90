@@ -3373,6 +3373,15 @@ character :: arg*(500)
     if( Process.eq.80 .or. Process.eq.110 .or. Process.eq.111 .or.Process.eq.112 .or. Process.eq.113 ) write(TheUnit,"(4X,A,F8.4,A,F6.4)") "Top quark mass=",m_top*100d0,", width=",Ga_top*100d0
     if( Process.eq.80 .or. Process.eq.110 .or. Process.eq.111 .or. Process.eq.112 .or. Process.eq.113) write(TheUnit,"(4X,A,I2)") "Top quark decay=",TOPDECAYS
     if( Process.eq.90 ) write(TheUnit,"(4X,A,F8.4,A,F6.4)") "Bottom quark mass=",m_top*100d0
+    if( Process.eq.60 .or. Process.eq.61 .or. Process.eq.62 .or. Process.eq.90 .or. &
+       ((Process.eq.80 .or. (Process.ge.110 .and. Process.le.113)) .and. m_Top.lt.10d0*GeV) ) then
+        write(TheUnit,"(4X,A)") "Jet cuts:"
+        write(TheUnit,"(12X,A,F8.2,A)") "pT >= ", pTjetcut/GeV, " GeV"
+        if( Process.eq.60 .or. Process.eq.61 .or. Process.eq.80 .or. Process.eq.90) then
+            write(TheUnit,"(8X,A,F8.2)") "DeltaR >= ", Rjet
+            write(TheUnit,"(11X,A,F8.2,A)") "mJJ >= ", mJJcut, " GeV"
+        endif
+    endif
     if( (ReadLHEFile) .and. (RequestNLeptons.gt.0) ) then
         if ( RequestOS .le. 0 ) then
             if ( RequestNLeptons .eq. 1 ) then
