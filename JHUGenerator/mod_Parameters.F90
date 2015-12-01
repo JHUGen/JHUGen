@@ -237,13 +237,31 @@ integer, public :: LeptInEvent(0:8) = 0
    complex(8), public, parameter :: ghz4_prime6= (0.0d0,0d0)
    complex(8), public, parameter :: ghz4_prime7= (0.0d0,0d0)
    complex(8), public, parameter :: ghzgs1_prime2= (0.0d0,0d0)
-   
+
    real(8),    public, parameter :: Lambda_z1 = 10000d0*GeV
    real(8),    public, parameter :: Lambda_z2 = 10000d0*GeV
    real(8),    public, parameter :: Lambda_z3 = 10000d0*GeV
    real(8),    public, parameter :: Lambda_z4 = 10000d0*GeV
-   real(8),    public, parameter :: Lambda_z5 = 10000d0*GeV
+   real(8),    public, parameter :: Lambda_zgs1 = 10000d0*GeV
    real(8),    public, parameter :: Lambda_Q  = 10000d0*GeV
+
+   integer,    public, parameter :: cq1sq = 0d0 ! Sign of q1,2,12**2 for the following Lambda's, set to 1 or -1 to get q**2-dependence from these form factor Lambdas
+   integer,    public, parameter :: cq2sq = 0d0
+   integer,    public, parameter :: cq12sq = 0d0
+   ! These Lambdas all have numerical value of 1d0
+   real(8),    public, parameter :: Lambda_z11 = 100d0*GeV ! For Z1
+   real(8),    public, parameter :: Lambda_z21 = 100d0*GeV
+   real(8),    public, parameter :: Lambda_z31 = 100d0*GeV
+   real(8),    public, parameter :: Lambda_z41 = 100d0*GeV
+   real(8),    public, parameter :: Lambda_z12 = 100d0*GeV ! For Z2
+   real(8),    public, parameter :: Lambda_z22 = 100d0*GeV
+   real(8),    public, parameter :: Lambda_z32 = 100d0*GeV
+   real(8),    public, parameter :: Lambda_z42 = 100d0*GeV
+   real(8),    public, parameter :: Lambda_z10 = 100d0*GeV ! For the Higgs
+   real(8),    public, parameter :: Lambda_z20 = 100d0*GeV
+   real(8),    public, parameter :: Lambda_z30 = 100d0*GeV
+   real(8),    public, parameter :: Lambda_z40 = 100d0*GeV
+
 
 
 !---parameters that define spin 1 coupling to SM fields, see note
@@ -292,7 +310,8 @@ integer, public :: LeptInEvent(0:8) = 0
 
 
 !-- extra couplings for weak boson fusion when WW-spin-0 couplings are required to be different from ZZ-spin-0
-!-- note: if all couplings below are set to zero, WW-spin-0 and ZZ-spin-0 couplings are assumed to be equal
+!-- note: ZZ-spin-0 couplings are used in processes other than VBF
+   logical, public, parameter :: distinguish_HWWcouplings=.false.
    complex(8), public, parameter :: ghw1 = (0.0d0,0d0)
    complex(8), public, parameter :: ghw2 = (0.0d0,0d0)
    complex(8), public, parameter :: ghw3 = (0.0d0,0d0)
@@ -335,7 +354,20 @@ integer, public :: LeptInEvent(0:8) = 0
    real(8),    public, parameter :: Lambda_w2 = 10000d0*GeV
    real(8),    public, parameter :: Lambda_w3 = 10000d0*GeV
    real(8),    public, parameter :: Lambda_w4 = 10000d0*GeV
-   real(8),    public, parameter :: Lambda_w5 = 10000d0*GeV
+   !real(8),    public, parameter :: Lambda_w5 = 10000d0*GeV ! Not used
+
+   real(8),    public, parameter :: Lambda_w11 = 100d0*GeV ! For W+
+   real(8),    public, parameter :: Lambda_w21 = 100d0*GeV
+   real(8),    public, parameter :: Lambda_w31 = 100d0*GeV
+   real(8),    public, parameter :: Lambda_w41 = 100d0*GeV
+   real(8),    public, parameter :: Lambda_w12 = 100d0*GeV ! For W-
+   real(8),    public, parameter :: Lambda_w22 = 100d0*GeV
+   real(8),    public, parameter :: Lambda_w32 = 100d0*GeV
+   real(8),    public, parameter :: Lambda_w42 = 100d0*GeV
+   real(8),    public, parameter :: Lambda_w10 = 100d0*GeV ! For the Higgs
+   real(8),    public, parameter :: Lambda_w20 = 100d0*GeV
+   real(8),    public, parameter :: Lambda_w30 = 100d0*GeV
+   real(8),    public, parameter :: Lambda_w40 = 100d0*GeV
 
 !  couplings for ttbar+H and bbar+H
    complex(8),    public, parameter :: kappa       = (1d0,0d0)
@@ -445,6 +477,74 @@ integer, public :: ijPartons(1:2)=0
 
 
 CONTAINS
+
+
+function HVVSpinZeroDynamicCoupling (index,sWplus,sWminus,sWW,useWWcoupl)
+integer, intent(in) :: index
+real(8), intent(in) :: sWplus, sWminus, sWW
+logical,optional :: useWWcoupl
+complex(8) :: HVVSpinZeroDynamicCoupling
+complex(8) :: vvcoupl(8)
+real(8) :: lambda_v
+real(8) : lambda_v120(3)
+
+	vvcoupl(:)=czero
+	HVVSpinZeroDynamicCoupling=czero
+	if( .not.present(useWWcoupl) .or. .not.distinguish_HWWcouplings ) then
+		if(index.eq.1) then
+			vvcoupl = (/ ghz1, ghz1_prime, ghz1_prime2, ghz1_prime3, ghz1_prime4, ghz1_prime5, ghz1_prime6, ghz1_prime7 /)
+			lambda_v = Lambda_z1
+			lambda_v120 = (/ Lambda_z11, Lambda_z12, Lambda_z10 /)
+		elseif(index.eq.2) then
+			vvcoupl = (/ ghz2, ghz2_prime, ghz2_prime2, ghz2_prime3, ghz2_prime4, ghz2_prime5, ghz2_prime6, ghz2_prime7 /)
+			lambda_v = Lambda_z2
+			lambda_v120 = (/ Lambda_z21, Lambda_z22, Lambda_z20 /)
+		elseif(index.eq.3) then
+			vvcoupl = (/ ghz3, ghz3_prime, ghz3_prime2, ghz3_prime3, ghz3_prime4, ghz3_prime5, ghz3_prime6, ghz3_prime7 /)
+			lambda_v = Lambda_z3
+			lambda_v120 = (/ Lambda_z31, Lambda_z32, Lambda_z30 /)
+		elseif(index.eq.4) then
+			vvcoupl = (/ ghz4, ghz4_prime, ghz4_prime2, ghz4_prime3, ghz4_prime4, ghz4_prime5, ghz4_prime6, ghz4_prime7 /)
+			lambda_v = Lambda_z4
+			lambda_v120 = (/ Lambda_z41, Lambda_z42, Lambda_z40 /)
+		endif
+	else
+		if(index.eq.1) then
+			vvcoupl = (/ ghw, ghw_prime, ghw_prime2, ghw_prime3, ghw_prime4, ghw_prime5, ghw_prime6, ghw_prime7 /)
+			lambda_v = Lambda_w1
+			lambda_v120 = (/ Lambda_w11, Lambda_w12, Lambda_w10 /)
+		elseif(index.eq.2) then
+			vvcoupl = (/ ghz2, ghz2_prime, ghz2_prime2, ghz2_prime3, ghz2_prime4, ghz2_prime5, ghz2_prime6, ghz2_prime7 /)
+			lambda_v = Lambda_w2
+			lambda_v120 = (/ Lambda_w21, Lambda_w22, Lambda_w20 /)
+		elseif(index.eq.3) then
+			vvcoupl = (/ ghz3, ghz3_prime, ghz3_prime2, ghz3_prime3, ghz3_prime4, ghz3_prime5, ghz3_prime6, ghz3_prime7 /)
+			lambda_v = Lambda_w3
+			lambda_v120 = (/ Lambda_w31, Lambda_w32, Lambda_w30 /)
+		elseif(index.eq.4) then
+			vvcoupl = (/ ghz4, ghz4_prime, ghz4_prime2, ghz4_prime3, ghz4_prime4, ghz4_prime5, ghz4_prime6, ghz4_prime7 /)
+			lambda_v = Lambda_w4
+			lambda_v120 = (/ Lambda_w41, Lambda_w42, Lambda_w40 /)
+		endif
+	endif
+
+	if(vvcoupl(2).ne.czero) HVVSpinZeroDynamicCoupling = HVVSpinZeroDynamicCoupling + vvcoupl(2) * lambda_v**4/(lambda_v**2 + abs(sWplus))/(lambda_v**2 + abs(sWminus))
+	if(vvcoupl(3).ne.czero) HVVSpinZeroDynamicCoupling = HVVSpinZeroDynamicCoupling + vvcoupl(3) * ( sWplus + sWminus )/lambda_v**2
+	if(vvcoupl(4).ne.czero) HVVSpinZeroDynamicCoupling = HVVSpinZeroDynamicCoupling + vvcoupl(4) * ( sWplus - sWminus )/lambda_v**2
+	if(vvcoupl(5).ne.czero) HVVSpinZeroDynamicCoupling = HVVSpinZeroDynamicCoupling + vvcoupl(5) * ( sWW )/Lambda_Q**2
+	if(vvcoupl(6).ne.czero) HVVSpinZeroDynamicCoupling = HVVSpinZeroDynamicCoupling + vvcoupl(6) * ( sWplus**2 + sWminus**2 )/lambda_v**4
+	if(vvcoupl(7).ne.czero) HVVSpinZeroDynamicCoupling = HVVSpinZeroDynamicCoupling + vvcoupl(7) * ( sWplus**2 - sWminus**2 )/lambda_v**4
+	if(vvcoupl(8).ne.czero) HVVSpinZeroDynamicCoupling = HVVSpinZeroDynamicCoupling + vvcoupl(8) * ( sWplus    * sWminus    )/lambda_v**4
+
+	if(index.eq.1) then
+		if(cq1sq.ne.0 .or. cq2sq.ne.0 .or. cq12sq.ne.0) HVVSpinZeroDynamicCoupling = HVVSpinZeroDynamicCoupling * (lambda_v120(1)*lambda_v120(2)*lambda_v120(3))**2 / ( (lambda_v120(1)**2 + dble(sign(1,cq1sq))*sWplus)*(lambda_v120(2)**2 + dble(sign(1,cq2sq))*sWminus)(lambda_v120(3)**2 + dble(sign(1,cq12sq))*sWW) )
+		if(vvcoupl(1).ne.czero) HVVSpinZeroDynamicCoupling = HVVSpinZeroDynamicCoupling + vvcoupl(1)
+	else
+		if(vvcoupl(1).ne.czero) HVVSpinZeroDynamicCoupling = HVVSpinZeroDynamicCoupling + vvcoupl(1)
+		if(cq1sq.ne.0 .or. cq2sq.ne.0 .or. cq12sq.ne.0) HVVSpinZeroDynamicCoupling = HVVSpinZeroDynamicCoupling * (lambda_v120(1)*lambda_v120(2)*lambda_v120(3))**2 / ( (lambda_v120(1)**2 + dble(sign(1,cq1sq))*sWplus)*(lambda_v120(2)**2 + dble(sign(1,cq2sq))*sWminus)(lambda_v120(3)**2 + dble(sign(1,cq12sq))*sWW) )
+	endif
+
+end function
 
 
 

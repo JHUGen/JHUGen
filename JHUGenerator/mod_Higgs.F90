@@ -609,38 +609,11 @@
       ghg2_dyn = ghg2
       ghg3_dyn = ghg3
       ghg4_dyn = ghg4
-      ghz1_dyn = ghz1   +   ghz1_prime * Lambda_z1**4/( Lambda_z1**2 + abs(q3_q3) )/( Lambda_z1**2 + abs(q4_q4))  &
-                        +   ghz1_prime2* ( abs(q3_q3)+abs(q4_q4) )/Lambda_z1**2                                   &
-                        +   ghz1_prime3* ( abs(q3_q3)-abs(q4_q4) )/Lambda_z1**2                                   &
-                        +   ghz1_prime4* (          MG**2        )/Lambda_Q**2                                    &
-                        +   ghz1_prime5* ( abs(q3_q3)**2+abs(q4_q4)**2 )/Lambda_z1**4                             &
-                        +   ghz1_prime6* ( abs(q3_q3)**2-abs(q4_q4)**2 )/Lambda_z1**4                             &
-                        +   ghz1_prime7* ( abs(q3_q3)*abs(q4_q4) )      /Lambda_z1**4
 
-      ghz2_dyn = ghz2   +   ghz2_prime * Lambda_z2**4/( Lambda_z2**2 + abs(q3_q3) )/( Lambda_z2**2 + abs(q4_q4))  &
-                        +   ghz2_prime2* ( abs(q3_q3)+abs(q4_q4) )/Lambda_z2**2                                   &
-                        +   ghz2_prime3* ( abs(q3_q3)-abs(q4_q4) )/Lambda_z2**2                                   &
-                        +   ghz2_prime4* (          MG**2        )/Lambda_Q**2                                    &
-                        +   ghz2_prime5* ( abs(q3_q3)**2+abs(q4_q4)**2 )/Lambda_z2**4                             &
-                        +   ghz2_prime6* ( abs(q3_q3)**2-abs(q4_q4)**2 )/Lambda_z2**4                             &
-                        +   ghz2_prime7* ( abs(q3_q3)*abs(q4_q4) )      /Lambda_z2**4
-
-      ghz3_dyn = ghz3   +   ghz3_prime * Lambda_z3**4/( Lambda_z3**2 + abs(q3_q3) )/( Lambda_z3**2 + abs(q4_q4))  &
-                        +   ghz3_prime2* ( abs(q3_q3)+abs(q4_q4) )/Lambda_z3**2                                   &
-                        +   ghz3_prime3* ( abs(q3_q3)-abs(q4_q4) )/Lambda_z3**2                                   &
-                        +   ghz3_prime4* (          MG**2        )/Lambda_Q**2                                    &
-                        +   ghz3_prime5* ( abs(q3_q3)**2+abs(q4_q4)**2 )/Lambda_z3**4                             &
-                        +   ghz3_prime6* ( abs(q3_q3)**2-abs(q4_q4)**2 )/Lambda_z3**4                             &
-                        +   ghz3_prime7* ( abs(q3_q3)*abs(q4_q4) )      /Lambda_z3**4
-
-      ghz4_dyn = ghz4   +   ghz4_prime * Lambda_z4**4/( Lambda_z4**2 + abs(q3_q3) )/( Lambda_z4**2 + abs(q4_q4))  &
-                        +   ghz4_prime2* ( abs(q3_q3)+abs(q4_q4) )/Lambda_z4**2                                   &
-                        +   ghz4_prime3* ( abs(q3_q3)-abs(q4_q4) )/Lambda_z4**2                                   &
-                        +   ghz4_prime4* (          MG**2        )/Lambda_Q**2                                    &
-                        +   ghz4_prime5* ( abs(q3_q3)**2+abs(q4_q4)**2 )/Lambda_z4**4                             &
-                        +   ghz4_prime6* ( abs(q3_q3)**2-abs(q4_q4)**2 )/Lambda_z4**4                             &
-                        +   ghz4_prime7* ( abs(q3_q3)*abs(q4_q4) )      /Lambda_z4**4
-
+      ghz1_dyn = HVVSpinZeroDynamicCoupling(1,q3_q3,q4_q4,MG**2)
+      ghz2_dyn = HVVSpinZeroDynamicCoupling(2,q3_q3,q4_q4,MG**2)
+      ghz3_dyn = HVVSpinZeroDynamicCoupling(3,q3_q3,q4_q4,MG**2)
+      ghz4_dyn = HVVSpinZeroDynamicCoupling(4,q3_q3,q4_q4,MG**2)
 
       ghzgs2_dyn = ghzgs2
       ghzgs3_dyn = ghzgs3
@@ -702,9 +675,9 @@
            + ghzgs2_dyn*(MG**2-MZ3**2-MZ4**2)/MG**2 &  
            + ghzgs3_dyn/Lambda**2*(MG**2-MZ3**2-MZ4**2)*(MG**2-MZ4**2-MZ3**2)/4d0/MG**2
            if( (VVMode.eq.gsZMode) ) then
-           yyy1 = yyy1 + ghzgs1_prime2/Lambda_z5**2 *MZ3**2 *M_Z**2/MG**2!   MZ3=q^2_gamma
+           yyy1 = yyy1 + ghzgs1_prime2/Lambda_zgs1**2 *MZ3**2 *M_Z**2/MG**2!   MZ3=q^2_gamma
       else
-           yyy1 = yyy1 + ghzgs1_prime2/Lambda_z5**2 *MZ4**2 *M_Z**2/MG**2!   MZ4=q^2_gamma
+           yyy1 = yyy1 + ghzgs1_prime2/Lambda_zgs1**2 *MZ4**2 *M_Z**2/MG**2!   MZ4=q^2_gamma
       endif
       yyy2 = -2d0*ghzgs2_dyn-ghzgs3_dyn/2d0/Lambda**2*(MG**2-MZ3**2-MZ4**2)
       yyy3 = -2d0*ghzgs4_dyn
@@ -1288,37 +1261,10 @@
 
 
 !---- data that defines couplings
-      ghz1_dyn = ghz1   +   ghz1_prime * Lambda_z1**4/( Lambda_z1**2 + abs(q3_q3) )/( Lambda_z1**2 + abs(q4_q4))  &
-                        +   ghz1_prime2* ( abs(q3_q3)+abs(q4_q4) )/Lambda_z1**2                                   &
-                        +   ghz1_prime3* ( abs(q3_q3)-abs(q4_q4) )/Lambda_z1**2                                   &
-                        +   ghz1_prime4* (          MG**2        )/Lambda_Q**2                                    &
-                        +   ghz1_prime5* ( abs(q3_q3)**2+abs(q4_q4)**2 )/Lambda_z1**4                             &
-                        +   ghz1_prime6* ( abs(q3_q3)**2-abs(q4_q4)**2 )/Lambda_z1**4                             &
-                        +   ghz1_prime7* ( abs(q3_q3)*abs(q4_q4) )      /Lambda_z1**4
-
-      ghz2_dyn = ghz2   +   ghz2_prime * Lambda_z2**4/( Lambda_z2**2 + abs(q3_q3) )/( Lambda_z2**2 + abs(q4_q4))  &
-                        +   ghz2_prime2* ( abs(q3_q3)+abs(q4_q4) )/Lambda_z2**2                                   &
-                        +   ghz2_prime3* ( abs(q3_q3)-abs(q4_q4) )/Lambda_z2**2                                   &
-                        +   ghz2_prime4* (          MG**2        )/Lambda_Q**2                                    &
-                        +   ghz2_prime5* ( abs(q3_q3)**2+abs(q4_q4)**2 )/Lambda_z2**4                             &
-                        +   ghz2_prime6* ( abs(q3_q3)**2-abs(q4_q4)**2 )/Lambda_z2**4                             &
-                        +   ghz2_prime7* ( abs(q3_q3)*abs(q4_q4) )      /Lambda_z2**4
-
-      ghz3_dyn = ghz3   +   ghz3_prime * Lambda_z3**4/( Lambda_z3**2 + abs(q3_q3) )/( Lambda_z3**2 + abs(q4_q4))  &
-                        +   ghz3_prime2* ( abs(q3_q3)+abs(q4_q4) )/Lambda_z3**2                                   &
-                        +   ghz3_prime3* ( abs(q3_q3)-abs(q4_q4) )/Lambda_z3**2                                   &
-                        +   ghz3_prime4* (          MG**2        )/Lambda_Q**2                                    &
-                        +   ghz3_prime5* ( abs(q3_q3)**2+abs(q4_q4)**2 )/Lambda_z3**4                             &
-                        +   ghz3_prime6* ( abs(q3_q3)**2-abs(q4_q4)**2 )/Lambda_z3**4                             &
-                        +   ghz3_prime7* ( abs(q3_q3)*abs(q4_q4) )      /Lambda_z3**4
-
-      ghz4_dyn = ghz4   +   ghz4_prime * Lambda_z4**4/( Lambda_z4**2 + abs(q3_q3) )/( Lambda_z4**2 + abs(q4_q4))  &
-                        +   ghz4_prime2* ( abs(q3_q3)+abs(q4_q4) )/Lambda_z4**2                                   &
-                        +   ghz4_prime3* ( abs(q3_q3)-abs(q4_q4) )/Lambda_z4**2                                   &
-                        +   ghz4_prime4* (          MG**2        )/Lambda_Q**2                                    &
-                        +   ghz4_prime5* ( abs(q3_q3)**2+abs(q4_q4)**2 )/Lambda_z4**4                             &
-                        +   ghz4_prime6* ( abs(q3_q3)**2-abs(q4_q4)**2 )/Lambda_z4**4                             &
-                        +   ghz4_prime7* ( abs(q3_q3)*abs(q4_q4) )      /Lambda_z4**4
+      ghz1_dyn = HVVSpinZeroDynamicCoupling(1,q3_q3,q4_q4,MG**2)
+      ghz2_dyn = HVVSpinZeroDynamicCoupling(2,q3_q3,q4_q4,MG**2)
+      ghz3_dyn = HVVSpinZeroDynamicCoupling(3,q3_q3,q4_q4,MG**2)
+      ghz4_dyn = HVVSpinZeroDynamicCoupling(4,q3_q3,q4_q4,MG**2)
 
       ghzgs2_dyn = ghzgs2
       ghzgs3_dyn = ghzgs3
@@ -1365,9 +1311,9 @@
                 + ghzgs2_dyn*(MG**2-MZ3**2-MZ4**2)/MG**2 &
                 + ghzgs3_dyn/Lambda**2*(MG**2-MZ3**2-MZ4**2)*(MG**2-MZ4**2-MZ3**2)/4d0/MG**2
             if( (VVMode.eq.gsZMode) ) then
-                yyy1 = yyy1 + ghzgs1_prime2/Lambda_z5**2*MZ3**2*M_Z**2/MG**2
+                yyy1 = yyy1 + ghzgs1_prime2/Lambda_zgs1**2*MZ3**2*M_Z**2/MG**2
             else
-                yyy1 = yyy1 + ghzgs1_prime2/Lambda_z5**2*MZ4**2*M_Z**2/MG**2
+                yyy1 = yyy1 + ghzgs1_prime2/Lambda_zgs1**2*MZ4**2*M_Z**2/MG**2
             endif
             yyy2 = (-2d0*ghzgs2_dyn-ghzgs3_dyn/2d0/Lambda**2*(MG**2-MZ3**2-MZ4**2) )
             yyy3 = -2d0*ghzgs4_dyn
