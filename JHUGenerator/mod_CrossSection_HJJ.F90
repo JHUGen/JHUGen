@@ -508,16 +508,43 @@ END FUNCTION
                 if( abs(MY_IDUP(3)).ne.abs(MY_IDUP(1)) ) exit
              enddo
           endif
-      elseif( MY_IDUP(1).gt.0 .and. MY_IDUP(2).gt.0 ) then! qq->qq
-          ICOLUP(1:2,1) = (/501,000/)
-          ICOLUP(1:2,2) = (/502,000/)
-          ICOLUP(1:2,3) = (/501,000/)
-          ICOLUP(1:2,4) = (/502,000/) 
       elseif( MY_IDUP(1).lt.0 .and. MY_IDUP(2).gt.0 ) then! qbq->qbq
           ICOLUP(1:2,2) = (/501,000/)
           ICOLUP(1:2,1) = (/000,501/)
           ICOLUP(1:2,4) = (/502,000/)
           ICOLUP(1:2,3) = (/000,502/) 
+          if( MY_IDUP(1).eq.-MY_IDUP(2) .and. flavor_tag.eq.1 ) then! qbq->gg
+             MY_IDUP(3:4) = (/Glu_,Glu_/)
+             ICOLUP(1:2,2) = (/501,000/)
+             ICOLUP(1:2,1) = (/000,501/)
+             ICOLUP(1:2,4) = (/502,503/)            
+             ICOLUP(1:2,3) = (/503,502/)               
+          elseif( MY_IDUP(1).eq.-MY_IDUP(2) .and. flavor_tag.eq.3 ) then! qbq->qbar'q'
+             ICOLUP(1:2,2) = (/501,000/)
+             ICOLUP(1:2,1) = (/000,501/)
+             ICOLUP(1:2,4) = (/502,000/)
+             ICOLUP(1:2,3) = (/000,502/)
+             do while (.true.) ! infinite loop, sorry bad programming...
+                call random_number(xRnd)
+                if( xRnd.lt.1d0/5d0 ) then
+                    MY_IDUP(3:4) = (/AUp_,Up_/)
+                elseif( xRnd.lt.2d0/5d0 ) then
+                    MY_IDUP(3:4) = (/ADn_,Dn_/)
+                elseif( xRnd.lt.3d0/5d0 ) then
+                    MY_IDUP(3:4) = (/AChm_,Chm_/)
+                elseif( xRnd.lt.4d0/5d0 ) then
+                    MY_IDUP(3:4) = (/AStr_,Str_/)
+                elseif( xRnd.lt.5d0/5d0 ) then
+                    MY_IDUP(3:4) = (/ABot_,Bot_/)
+                endif
+                if( abs(MY_IDUP(3)).ne.abs(MY_IDUP(1)) ) exit
+             enddo
+          endif
+      elseif( MY_IDUP(1).gt.0 .and. MY_IDUP(2).gt.0 ) then! qq->qq
+          ICOLUP(1:2,1) = (/501,000/)
+          ICOLUP(1:2,2) = (/502,000/)
+          ICOLUP(1:2,3) = (/501,000/)
+          ICOLUP(1:2,4) = (/502,000/) 
       elseif( MY_IDUP(1).lt.0 .and. MY_IDUP(2).lt.0 ) then! qbqb->qbqb
           ICOLUP(1:2,1) = (/000,501/)
           ICOLUP(1:2,2) = (/000,502/)
