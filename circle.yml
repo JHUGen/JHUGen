@@ -30,7 +30,7 @@ dependencies:
 test:
 
   pre:
-    - mkdir -p $CIRCLE_ARTIFACTS/{ggH,VBF,HJJ,other}/{SM,PS,fa30.5,fa30.5i}
+    - mkdir -p $CIRCLE_ARTIFACTS/{ggH,VBF,HJJ,other}/{SM,PS,fa30.5,fa30.5i,a2}
     - make
 
   override:
@@ -85,6 +85,15 @@ test:
     - if [ -f ~/mixtures ]; then ./JHUGen VegasNc0=100000 VegasNc2=10000 Interf=0 DataFile=$CIRCLE_ARTIFACTS/ggH/fa30.5i; fi
     - if [ -f ~/mixtures ]; then analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/ggH/ outfile=fa30.5i.root indir=$CIRCLE_ARTIFACTS/ggH/ computeVBFProdAngles=1 computeVHProdAngles=1 fa30.5i.lhe; fi
 
+    #a2
+    - sed -i -r -e "s/( ghz1 = \()[^,]*/\10d0/" -e "s/( ghz2 = \()[^,]*/\11d0/" -e "s/( ghz4 = \()[^,]*/\10d0/" mod_Parameters.F90
+    - make
+    - ./JHUGen VegasNc0=100000 VegasNc2=10000 Interf=0 DataFile=$CIRCLE_ARTIFACTS/ggH/a2
+    - analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/ggH/ outfile=a2.root indir=$CIRCLE_ARTIFACTS/ggH/ computeVBFProdAngles=1 computeVHProdAngles=1 a2.lhe
+    - ./JHUGen Process=60 VegasNc0=1000000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/VBF/a2
+    - ./JHUGen DecayMode1=8 DecayMode2=8 Interf=0 ReadLHE=$CIRCLE_ARTIFACTS/VBF/a2.lhe DataFile=$CIRCLE_ARTIFACTS/VBF/a2_decayed
+    - analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/VBF/ outfile=a2.root indir=$CIRCLE_ARTIFACTS/VBF/ computeVBFProdAngles=1 computeVHProdAngles=1 a2_decayed.lhe
+
 
   post:
     - python ~/checklhe/checklhe.py $(find $CIRCLE_ARTIFACTS -name *.lhe) | tee checklheoutput.txt
@@ -92,8 +101,9 @@ test:
     - "! grep -q '!' checklheoutput.txt"    #all the error messages end with !
 
     #ggH analytical fits
-    - cd ~/CMSJHU_AnalysisMacros/ZZ4lanalyticalfits && echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$CIRCLE_ARTIFACTS/ggH/SM.root", "$CIRCLE_ARTIFACTS/ggH/SM/", 1, 0, 0)' | root -b
-    - cd ~/CMSJHU_AnalysisMacros/ZZ4lanalyticalfits && echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$CIRCLE_ARTIFACTS/ggH/PS.root", "$CIRCLE_ARTIFACTS/ggH/PS/", 0, 1, 0)' | root -b
+    - cd ~/CMSJHU_AnalysisMacros/ZZ4lanalyticalfits && echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$CIRCLE_ARTIFACTS/ggH/SM.root", "$CIRCLE_ARTIFACTS/ggH/SM/", 1, 0, 0, 0, 0)' | root -b
+    - cd ~/CMSJHU_AnalysisMacros/ZZ4lanalyticalfits && echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$CIRCLE_ARTIFACTS/ggH/PS.root", "$CIRCLE_ARTIFACTS/ggH/PS/", 0, 0, 0, 1, 0)' | root -b
+    - cd ~/CMSJHU_AnalysisMacros/ZZ4lanalyticalfits && echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$CIRCLE_ARTIFACTS/ggH/a2.root", "$CIRCLE_ARTIFACTS/ggH/a2/", 0, 1, 0, 0, 0)' | root -b
     - if [ -f ~/mixtures ]; then cd ~/CMSJHU_AnalysisMacros/ZZ4lanalyticalfits && echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$CIRCLE_ARTIFACTS/ggH/fa30.5.root", "$CIRCLE_ARTIFACTS/ggH/fa30.5/", 1, 2.55052, 0)' | root -b; fi
     - if [ -f ~/mixtures ]; then cd ~/CMSJHU_AnalysisMacros/ZZ4lanalyticalfits && echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$CIRCLE_ARTIFACTS/ggH/fa30.5i.root", "$CIRCLE_ARTIFACTS/ggH/fa30.5i/", 1, 0, 2.55052)' | root -b; fi
     #VBF plots
