@@ -104,7 +104,7 @@ EvalWeighted_HJJ_fulldecay = 0d0
   msq_MCFM=msq_MCFM/(9.495632068338d-2)**3   !/ (1.11379452919968d0)
   print *, "new ",msq_MCFM(j,i)
 
-  call EvalAmp_WBFH_UnSymm_SA(MomExt(1:4,1:5),HZZcoupl(1:4),HWWcoupl(1:4),me2)
+  call EvalAmp_WBFH_UnSymm_SA(MomExt(1:4,1:5),me2)
 !   msq_MCFM(:,:) = me2(:,:)
   print *, "old ",me2(i,j)
   print *, "rat", msq_MCFM(j,i)/me2(i,j)
@@ -363,7 +363,7 @@ END FUNCTION
       endif
 
 
-      call EvalAmp_WBFH_UnSymm_SA_Select( MomExt,(/ghz1,ghz2,ghz3,ghz4/),(/ghw1,ghw2,ghw3,ghw4/),iPart_sel,jPart_sel,zz_fusion,iflip,me2)
+      call EvalAmp_WBFH_UnSymm_SA_Select( MomExt,iPart_sel,jPart_sel,zz_fusion,iflip,me2)
       
       if( ZZ_Fusion ) then
 !           if( (MomExt(4,1)*MomExt(4,3).lt.0d0) .and. (MomExt(4,2)*MomExt(4,4).lt.0d0) ) then ! wrong configuration --> swap 3 and 4
@@ -508,16 +508,43 @@ END FUNCTION
                 if( abs(MY_IDUP(3)).ne.abs(MY_IDUP(1)) ) exit
              enddo
           endif
-      elseif( MY_IDUP(1).gt.0 .and. MY_IDUP(2).gt.0 ) then! qq->qq
-          ICOLUP(1:2,1) = (/501,000/)
-          ICOLUP(1:2,2) = (/502,000/)
-          ICOLUP(1:2,3) = (/501,000/)
-          ICOLUP(1:2,4) = (/502,000/) 
       elseif( MY_IDUP(1).lt.0 .and. MY_IDUP(2).gt.0 ) then! qbq->qbq
           ICOLUP(1:2,2) = (/501,000/)
           ICOLUP(1:2,1) = (/000,501/)
           ICOLUP(1:2,4) = (/502,000/)
           ICOLUP(1:2,3) = (/000,502/) 
+          if( MY_IDUP(1).eq.-MY_IDUP(2) .and. flavor_tag.eq.1 ) then! qbq->gg
+             MY_IDUP(3:4) = (/Glu_,Glu_/)
+             ICOLUP(1:2,2) = (/501,000/)
+             ICOLUP(1:2,1) = (/000,501/)
+             ICOLUP(1:2,4) = (/502,503/)            
+             ICOLUP(1:2,3) = (/503,502/)               
+          elseif( MY_IDUP(1).eq.-MY_IDUP(2) .and. flavor_tag.eq.3 ) then! qbq->qbar'q'
+             ICOLUP(1:2,2) = (/501,000/)
+             ICOLUP(1:2,1) = (/000,501/)
+             ICOLUP(1:2,4) = (/502,000/)
+             ICOLUP(1:2,3) = (/000,502/)
+             do while (.true.) ! infinite loop, sorry bad programming...
+                call random_number(xRnd)
+                if( xRnd.lt.1d0/5d0 ) then
+                    MY_IDUP(3:4) = (/AUp_,Up_/)
+                elseif( xRnd.lt.2d0/5d0 ) then
+                    MY_IDUP(3:4) = (/ADn_,Dn_/)
+                elseif( xRnd.lt.3d0/5d0 ) then
+                    MY_IDUP(3:4) = (/AChm_,Chm_/)
+                elseif( xRnd.lt.4d0/5d0 ) then
+                    MY_IDUP(3:4) = (/AStr_,Str_/)
+                elseif( xRnd.lt.5d0/5d0 ) then
+                    MY_IDUP(3:4) = (/ABot_,Bot_/)
+                endif
+                if( abs(MY_IDUP(3)).ne.abs(MY_IDUP(1)) ) exit
+             enddo
+          endif
+      elseif( MY_IDUP(1).gt.0 .and. MY_IDUP(2).gt.0 ) then! qq->qq
+          ICOLUP(1:2,1) = (/501,000/)
+          ICOLUP(1:2,2) = (/502,000/)
+          ICOLUP(1:2,3) = (/501,000/)
+          ICOLUP(1:2,4) = (/502,000/) 
       elseif( MY_IDUP(1).lt.0 .and. MY_IDUP(2).lt.0 ) then! qbqb->qbqb
           ICOLUP(1:2,1) = (/000,501/)
           ICOLUP(1:2,2) = (/000,502/)
@@ -656,7 +683,7 @@ IF( GENEVT ) THEN
 
 
    if( Process.eq.60 ) then
-      call EvalAmp_WBFH_UnSymm_SA(MomExt,(/ghz1,ghz2,ghz3,ghz4/),(/ghw1,ghw2,ghw3,ghw4/),me2)
+      call EvalAmp_WBFH_UnSymm_SA(MomExt,me2)
 
       MY_IDUP(1:2)= (/LHA2M_ID(iPartons(1)),LHA2M_ID(iPartons(2))/)
       if( MY_IDUP(1).gt.0 ) then ! quark
@@ -801,7 +828,7 @@ ELSE! NOT GENEVT
 
 
    if( Process.eq.60 ) then
-      call EvalAmp_WBFH_UnSymm_SA(MomExt,(/ghz1,ghz2,ghz3,ghz4/),(/ghw1,ghw2,ghw3,ghw4/),me2)
+      call EvalAmp_WBFH_UnSymm_SA(MomExt,me2)
    elseif( Process.eq.61 ) then
       call EvalAmp_SBFH_UnSymm_SA(MomExt,(/ghg2,ghg3,ghg4/),me2)
       me2 = me2 * (2d0/3d0*alphas**2)**2
