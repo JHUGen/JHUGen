@@ -1122,7 +1122,7 @@ AQCDUP=0.11d0
 MOTHUP(1:2,inLeft) = (/0,0/);             ISTUP(inLeft) = -1
 MOTHUP(1:2,inRight)= (/0,0/);             ISTUP(inRight)= -1
 
-MOTHUP(1:2,Hbos)   = (/t,t/);             ISTUP(Hbos)   = +1
+MOTHUP(1:2,Hbos)   = (/inLeft,inRight/);  ISTUP(Hbos)   = +1
 MOTHUP(1:2,t)      = (/inLeft,inRight/);  ISTUP(t)      = +2
 MOTHUP(1:2,qout)   = (/inLeft,inRight/);  ISTUP(qout)   = +1
 
