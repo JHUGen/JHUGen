@@ -1417,7 +1417,8 @@
       do j=1,6
           call convert_to_MCFM(pin(1:4,j),p(j,1:4))  
       enddo       
-      call spinoru(6,p,za,zb,s)
+!       call spinoru(6,p,za,zb,s)
+      call spinoru(p,za,zb,s)
   
       s12=s(1,2)
       s45=s(4,5)

@@ -424,8 +424,8 @@ include 'includeVars.F90'
 
       LO_Res_Unpol(Up_,ADn_)  = cdabs(LOAmp(Up_,ADn_,1))**2  + cdabs(LOAmp(Up_,ADn_,2))**2
       LO_Res_Unpol(ADn_,Up_)  = cdabs(LOAmp(ADn_,Up_,1))**2  + cdabs(LOAmp(ADn_,Up_,2))**2
-      LO_Res_Unpol(Chm_,AStr_)  = LO_Res_Unpol(Up_,ADn_) 
-      LO_Res_Unpol(AStr_,Chm_)  = LO_Res_Unpol(ADn_,Up_) 
+      LO_Res_Unpol(Chm_,AStr_)= LO_Res_Unpol(Up_,ADn_) 
+      LO_Res_Unpol(AStr_,Chm_)= LO_Res_Unpol(ADn_,Up_) 
            
       ColFac=9d0   
       LO_Res_Unpol(:,:) = LO_Res_Unpol(:,:) * ColFac * SpinAvg * QuarkColAvg**2
@@ -505,7 +505,6 @@ include 'includeVars.F90'
          decay_amp(2)=dcmplx(1d0,0d0)
       ELSE
          call atdecay(5,6,8,9,10,za,zb,decay_amp)
-         
       ENDIF
       call ubard_Htbarbamp(1,2,3,4,5,6,7,za,zb,s,decay_amp,TTBHcoupl,LOAmp(AUp_,Dn_,1:2))
       call ubard_Htbarbamp(2,1,3,4,5,6,7,za,zb,s,decay_amp,TTBHcoupl,LOAmp(Dn_,AUp_,1:2))

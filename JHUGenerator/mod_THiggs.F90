@@ -60,7 +60,8 @@ integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9
          MomExtFlat(1,1:4)=-MomExtFlat(1,1:4)
          MomExtFlat(2,1:4)=-MomExtFlat(2,1:4)
 
-         call spinoru(7,MomExtFlat,za,zb,s)
+!          call spinoru(7,MomExtFlat,za,zb,s)
+         call spinoru(MomExtFlat,za,zb,s)
          
       ELSE
          do j=1,10
@@ -69,7 +70,8 @@ integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9
          MomExtFlatDK(1,1:4)=-MomExtFlatDK(1,1:4)
          MomExtFlatDK(2,1:4)=-MomExtFlatDK(2,1:4)
 
-         call spinoru(10,MomExtFlatDK,za,zb,s)
+!          call spinoru(10,MomExtFlatDK,za,zb,s)
+         call spinoru(MomExtFlatDK,za,zb,s)
       ENDIF
 
       LOAmp(:,:,:)=(0d0,0d0)
@@ -88,14 +90,16 @@ integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9
       ! coupling factors in decay incl in tdecay function
       LOAmp(:,:,:) = LOAmp(:,:,:) * 2d0*gwsq/vev*ci
       LO_Res_Unpol(Up_,Bot_)  = cdabs(LOAmp(Up_,Bot_,1))**2  + cdabs(LOAmp(Up_,Bot_,2))**2
-      
-! print *, "raoul",LO_Res_Unpol(Up_,Bot_)
-! call myAmp((/MomExt(1:4,4),-MomExt(1:4,1),MomExt(1:4,5),-MomExt(1:4,2)/),ghz1,ghz2,ghz3,kappa,kappa_tilde,LO_Res_Unpol(Chm_,Bot_))
-! print *, "marku",LO_Res_Unpol(Chm_,Bot_)
-! print *, "ratio",LO_Res_Unpol(Up_,Bot_)/LO_Res_Unpol(Chm_,Bot_)
-! pause
-      
       LO_Res_Unpol(Bot_,Up_)  = cdabs(LOAmp(Bot_,Up_,1))**2  + cdabs(LOAmp(Bot_,Up_,2))**2
+      
+      
+! call myAmp((/MomExt(1:4,t),-MomExt(1:4,inLeft),MomExt(1:4,qout),-MomExt(1:4,inRight)/),M_W**2/vev*(2d0,0d0)*000d0, -2d0/vev*(1d0,0d0), -2d0/vev*(1d0,0d0)*000d0,  &
+!                                                                                        (1d0,0d0)*(-m_top/vev)*00d0,(0d0,0d0)*(-m_top/vev),LO_Res_Unpol(Bot_,Chm_))
+! print *, "marku",LO_Res_Unpol(Bot_,Chm_)
+! print *, "ratio",LO_Res_Unpol(Bot_,Up_)/LO_Res_Unpol(Bot_,Chm_)
+! pause
+            
+      
       LO_Res_Unpol(Chm_,Bot_) = LO_Res_Unpol(Up_,Bot_)
       LO_Res_Unpol(Bot_,Chm_) = LO_Res_Unpol(Bot_,Up_)
       LO_Res_Unpol(ADn_,Bot_) = cdabs(LOAmp(ADn_,Bot_,1))**2 + cdabs(LOAmp(ADn_,Bot_,2))**2
@@ -162,7 +166,8 @@ integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9
          MomExtFlat(1,1:4)=-MomExtFlat(1,1:4)
          MomExtFlat(2,1:4)=-MomExtFlat(2,1:4)
 
-         call spinoru(7,MomExtFlat,za,zb,s)
+!          call spinoru(7,MomExtFlat,za,zb,s)
+         call spinoru(MomExtFlat,za,zb,s)
       ELSE
          do j=1,10
             call convert_to_MCFM(MomExtFlatDK(j,1:4))
@@ -170,7 +175,8 @@ integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9
          MomExtFlatDK(1,1:4)=-MomExtFlatDK(1,1:4)
          MomExtFlatDK(2,1:4)=-MomExtFlatDK(2,1:4)
 
-         call spinoru(10,MomExtFlatDK,za,zb,s)
+!          call spinoru(10,MomExtFlatDK,za,zb,s)
+         call spinoru(MomExtFlatDK,za,zb,s)
       ENDIF
 
       LOAmp=(0d0,0d0)
@@ -256,7 +262,8 @@ integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, bout=5, bdk=6,W=7,lep=8,nu=
          MomExtFlat(1,1:4)=-MomExtFlat(1,1:4)
          MomExtFlat(2,1:4)=-MomExtFlat(2,1:4)
 
-         call spinoru(7,MomExtFlat,za,zb,s)
+!          call spinoru(7,MomExtFlat,za,zb,s)
+         call spinoru(MomExtFlat,za,zb,s)
       ELSE
          do j=1,10
             call convert_to_MCFM(MomExtFlatDK(j,1:4))
@@ -264,7 +271,8 @@ integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, bout=5, bdk=6,W=7,lep=8,nu=
          MomExtFlatDK(1,1:4)=-MomExtFlatDK(1,1:4)
          MomExtFlatDK(2,1:4)=-MomExtFlatDK(2,1:4)
 
-         call spinoru(10,MomExtFlatDK,za,zb,s)
+!          call spinoru(10,MomExtFlatDK,za,zb,s)
+         call spinoru(MomExtFlatDK,za,zb,s)
       ENDIF
 
       LOAmp(:,:,:)=(0d0,0d0)
@@ -342,7 +350,8 @@ integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, bout=5, bdk=6,W=7,lep=8,nu=
          MomExtFlat(1,1:4)=-MomExtFlat(1,1:4)
          MomExtFlat(2,1:4)=-MomExtFlat(2,1:4)
 
-         call spinoru(7,MomExtFlat,za,zb,s)
+!          call spinoru(7,MomExtFlat,za,zb,s)
+         call spinoru(MomExtFlat,za,zb,s)
       ELSE
          do j=1,10
             call convert_to_MCFM(MomExtFlatDK(j,1:4))
@@ -350,7 +359,8 @@ integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, bout=5, bdk=6,W=7,lep=8,nu=
          MomExtFlatDK(1,1:4)=-MomExtFlatDK(1,1:4)
          MomExtFlatDK(2,1:4)=-MomExtFlatDK(2,1:4)
 
-         call spinoru(10,MomExtFlatDK,za,zb,s)
+!          call spinoru(10,MomExtFlatDK,za,zb,s)
+         call spinoru(MomExtFlatDK,za,zb,s)
       ENDIF
 
       LOAmp=(0d0,0d0)
@@ -381,59 +391,126 @@ END SUBROUTINE
    
       
       
-   
-   
-   
-      SUBROUTINE ubhtdamp(p1,p2,e3,k3,k4,e4,p5,za,zb,s,mdecay,amp)
-! amplitude for production u(p1)+b(p2)->H(p3)+t(p4)+d(p5)
-! allowing for scalar & pseudoscalar couplings of Higgs to top
-! modification of amplitude in MCFM and hep-ph:/1302.3856
+
+      subroutine ubhtdamp(p1,p2,e3,k3,k4,e4,p5,za,zb,s,mdecay,amp)
         use ModParameters
         implicit none
         integer    :: p1,p2,p3,e3,k3,e4,p5,k4
         complex(8) :: za(:,:),zb(:,:),mdecay(1:2)
-        real(8)    :: s(:,:),KL,KR
-        complex(8) :: amp(2),ampw(2),ampt(2)
-        real(8)    :: s24,s34,s15,mt,mw
-
-        s24=s(p2,k4)+s(p2,e4)+s(e4,k4)
-        s34=s(p1,p2)+s(p1,p5)+s(p2,p5)
+        real(8)    :: s(:,:)
+        complex(8) :: amp(2),ampw(2),ampt(2),om1,om2,om3,KL,KR
+        real(8)    :: s12,s13,s14,s15,s23,s24,s25,s34,s35,s45,s125,mt,mw
+    
+        s12=s(p1,p2)
+        s13=s(p1,e3)+s(p1,k3)+s(e3,k3)
+        s14=s(p1,k4)+s(p1,e4)+s(e4,k4)
         s15=s(p1,p5)
+        s23=s(p2,e3)+s(p2,k3)+s(e3,k3)
+        s24=s(p2,k4)+s(p2,e4)+s(e4,k4)
+        s25=s(p2,p5)
+        s45=s(p5,k4)+s(p5,e4)+s(e4,k4)
+        s34=s(p1,p2)+s(p1,p5)+s(p2,p5)
+        s35=s(e3,p5)+s(k3,p5)+s(e3,k3)
+        s125=s(p1,p2)+s(p1,p5)+s(p2,p5)
         mw=M_W
         mt=m_Top
         
-! there is a factor of -2 relative to ttbH
-        KL=-mt/vev*(kappa-(0d0,1d0)*kappa_tilde)
-        KR=-mt/vev*(kappa+(0d0,1d0)*kappa_tilde)        
-                
-        ampw(1) = 1/( - mw**2 + s24)/( - mw**2 + s15)*za(p5,e4)*zb(p1,&
-     & p2)*mw**2 + 1d0/2d0/( - mw**2 + s24)/( - mw**2 + s15)/(zb(k4,e4)&
-     & )*za(p5,e3)*zb(p2,k4)*zb(e3,p1)*mt**2 + 1d0/2d0/( - mw**2 + s24)&
-     & /( - mw**2 + s15)/(zb(k4,e4))*za(p5,k3)*zb(p2,k4)*zb(k3,p1)*&
-     & mt**2
+        KL=-mt/vev*(kappa-(0d0,1d0)*kappa_tilde) !   *0000000000000d0
+        KR=-mt/vev*(kappa+(0d0,1d0)*kappa_tilde) !   *0000000000000d0
         
-        ampw(2) = 1d0/2d0/( - mw**2 + s24)/( - mw**2 + s15)*za(p5,e3)*&
-     & zb(p2,e4)*zb(e3,p1)*mt + 1d0/2d0/( - mw**2 + s24)/( - mw**2 + &
-     & s15)*za(p5,k3)*zb(p2,e4)*zb(k3,p1)*mt + 1/( - mw**2 + s24)/( - &
-     & mw**2 + s15)/(za(k4,e4))*za(p5,k4)*zb(p1,p2)*mw**2*mt
+!         om1 = 0d0
+!         om2 = 1d0
+!         om3 = 0d0
         
-        ampt(1) =  - 1d0/2d0/( - mt**2 + s34)/( - mw**2 + s15)*za(p5,e4&
-     & )*zb(p1,p2)*mt*vev*KR - 1d0/2d0/( - mt**2 + s34)/( - mw**2 + s15&
-     & )/(zb(k4,e4))*za(p5,p1)*zb(p1,p2)*zb(p1,k4)*mt*vev*KL - 1d0/2d0&
-     & /( - mt**2 + s34)/( - mw**2 + s15)/(zb(k4,e4))*za(p5,p2)*zb(p1,&
-     & p2)*zb(p2,k4)*mt*vev*KL
         
-        ampt(2) =  - 1d0/2d0/( - mt**2 + s34)/( - mw**2 + s15)*za(p5,p1&
-     & )*zb(p1,p2)*zb(p1,e4)*vev*KL - 1d0/2d0/( - mt**2 + s34)/( - &
-     & mw**2 + s15)*za(p5,p2)*zb(p1,p2)*zb(p2,e4)*vev*KL - 1d0/2d0/( - &
-     & mt**2 + s34)/( - mw**2 + s15)/(za(k4,e4))*za(p5,k4)*zb(p1,p2)*&
-     & mt**2*vev*KR
+        ampw(1) =  + om3 * (  - 1d0/2d0*za(p5,p2)*za(e4,p1)*zb(p1,p2)*&
+     &    zb(p2,p1)*ci - 1d0/2d0*za(p5,p2)*za(e4,p5)*zb(p2,p1)*zb(p5,p2&
+     &    )*ci + za(p5,k4)*za(e4,p1)*zb(p1,p2)*zb(p1,k4)*ci + 1d0/2d0*&
+     &    za(p5,k4)*za(e4,p1)*zb(p1,p2)*zb(k4,p1)*ci + za(p5,k4)*za(e4,&
+     &    p5)*zb(p1,p2)*zb(p5,k4)*ci + 1d0/2d0*za(p5,k4)*za(e4,p5)*zb(&
+     &    p5,p2)*zb(k4,p1)*ci + za(p5,e4)*za(e4,p1)*zb(p1,p2)*zb(p1,e4)&
+     &    *ci + 1d0/2d0*za(p5,e4)*za(e4,p1)*zb(p1,p2)*zb(e4,p1)*ci + &
+     &    za(p5,e4)*za(e4,p5)*zb(p1,p2)*zb(p5,e4)*ci + 1d0/2d0*za(p5,e4&
+     &    )*za(e4,p5)*zb(p5,p2)*zb(e4,p1)*ci + za(p5,e4)*zb(p1,p2)*&
+     &    mt**2*ci - 1d0/2d0*za(p5,e4)*zb(p1,p2)*s12*ci - 1d0/2d0*za(p5&
+     &    ,e4)*zb(p1,p2)*s14*ci - 1d0/2d0*za(p5,e4)*zb(p1,p2)*s45*ci - &
+     &    1d0/2d0*za(p5,e4)*zb(p1,p2)*s25*ci )
+      ampw(1) = ampw(1) + om2 * (  - 1d0/2d0*za(p5,e3)*za(e4,e3)*zb(e3,&
+     &    p1)*zb(e3,p2) - 1d0/2d0*za(p5,e3)*za(e4,k3)*zb(e3,p1)*zb(k3,&
+     &    p2) - 1d0/2d0*za(p5,k3)*za(e4,e3)*zb(e3,p2)*zb(k3,p1) - 1d0/2d0&
+      &    *za(p5,k3)*za(e4,k3)*zb(k3,p1)*zb(k3,p2) - 1d0/2d0/(zb(k4,e4&
+     &    ))*za(p5,e3)*zb(p2,k4)*zb(e3,p1)*mw**(-2)*mt**4 + 1d0/2d0/(&
+     &    zb(k4,e4))*za(p5,e3)*zb(p2,k4)*zb(e3,p1)*s24*mw**(-2)*mt**2&
+     &     + 1d0/4d0/(zb(k4,e4))*za(p5,e3)*zb(p2,k4)*zb(e3,p1)*s12*&
+     &    mw**(-2)*mt**2 + 1d0/4d0/(zb(k4,e4))*za(p5,e3)*zb(p2,k4)*zb(&
+     &    e3,p1)*s14*mw**(-2)*mt**2 + 1d0/4d0/(zb(k4,e4))*za(p5,e3)*zb(&
+     &    p2,k4)*zb(e3,p1)*s45*mw**(-2)*mt**2 + 1d0/4d0/(zb(k4,e4))*za(&
+     &    p5,e3)*zb(p2,k4)*zb(e3,p1)*s25*mw**(-2)*mt**2 - 1d0/2d0/(zb(&
+     &    k4,e4))*za(p5,k3)*zb(p2,k4)*zb(k3,p1)*mw**(-2)*mt**4 + 1d0/2d0&
+     &    /(zb(k4,e4))*za(p5,k3)*zb(p2,k4)*zb(k3,p1)*s24*mw**(-2)*mt**2&
+     &     + 1d0/4d0/(zb(k4,e4))*za(p5,k3)*zb(p2,k4)*zb(k3,p1)*s12*&
+     &    mw**(-2)*mt**2 + 1d0/4d0/(zb(k4,e4))*za(p5,k3)*zb(p2,k4)*zb(&
+     &    k3,p1)*s14*mw**(-2)*mt**2 )
+      ampw(1) = ampw(1) + om2 * ( 1d0/4d0/(zb(k4,e4))*za(p5,k3)*zb(p2,&
+     &    k4)*zb(k3,p1)*s45*mw**(-2)*mt**2 + 1d0/4d0/(zb(k4,e4))*za(p5,&
+     &    k3)*zb(p2,k4)*zb(k3,p1)*s25*mw**(-2)*mt**2 )
+      ampw(1) = ampw(1) + om1 * ( za(p5,e4)*zb(p1,p2)*mw**2 - 1d0/2d0/(&
+     &    zb(k4,e4))*za(p5,p2)*zb(p2,p1)*zb(p2,k4)*mt**2 - 1d0/2d0/(zb(&
+     &    k4,e4))*za(p5,k4)*zb(p2,k4)*zb(k4,p1)*mt**2 - 1d0/2d0/(zb(k4,&
+     &    e4))*za(p5,e4)*zb(p2,k4)*zb(e4,p1)*mt**2 )
+        
+        ampw(2) =  + om3 * (  - 1d0/2d0/(za(k4,e4))*za(p5,p2)*za(k4,p1)&
+     &    *zb(p1,p2)*zb(p2,p1)*mt*ci - 1d0/2d0/(za(k4,e4))*za(p5,p2)*&
+     &    za(k4,p5)*zb(p2,p1)*zb(p5,p2)*mt*ci - 1d0/2d0/(za(k4,e4))*za(&
+     &    p5,k4)*za(k4,p1)*zb(p1,p2)*zb(k4,p1)*mt*ci - 1/(za(k4,e4))*&
+     &    za(p5,k4)*za(k4,p5)*zb(p1,p2)*zb(k4,p5)*mt*ci + 1d0/2d0/(za(&
+     &    k4,e4))*za(p5,k4)*za(k4,p5)*zb(p5,p2)*zb(k4,p1)*mt*ci + 1/(&
+     &    za(k4,e4))*za(p5,k4)*zb(p1,p2)*mt**3*ci - 1d0/2d0/(za(k4,e4))&
+     &    *za(p5,k4)*zb(p1,p2)*s12*mt*ci - 1d0/2d0/(za(k4,e4))*za(p5,k4&
+     &    )*zb(p1,p2)*s14*mt*ci - 1d0/2d0/(za(k4,e4))*za(p5,k4)*zb(p1,&
+     &    p2)*s45*mt*ci - 1d0/2d0/(za(k4,e4))*za(p5,k4)*zb(p1,p2)*s25*&
+     &    mt*ci - 1d0/2d0/(za(k4,e4))*za(p5,e4)*za(k4,p1)*zb(p1,p2)*zb(&
+     &    e4,p1)*mt*ci - 1/(za(k4,e4))*za(p5,e4)*za(k4,p5)*zb(p1,p2)*&
+     &    zb(e4,p5)*mt*ci + 1d0/2d0/(za(k4,e4))*za(p5,e4)*za(k4,p5)*zb(&
+     &    p5,p2)*zb(e4,p1)*mt*ci )
+      ampw(2) = ampw(2) + om2 * (  - 1d0/2d0*za(p5,e3)*zb(p2,e4)*zb(e3,&
+     &    p1)*mw**(-2)*mt**3 + 1d0/2d0*za(p5,e3)*zb(p2,e4)*zb(e3,p1)*&
+     &    s24*mw**(-2)*mt + 1d0/4d0*za(p5,e3)*zb(p2,e4)*zb(e3,p1)*s12*&
+     &    mw**(-2)*mt + 1d0/4d0*za(p5,e3)*zb(p2,e4)*zb(e3,p1)*s14*&
+     &    mw**(-2)*mt + 1d0/4d0*za(p5,e3)*zb(p2,e4)*zb(e3,p1)*s45*&
+     &    mw**(-2)*mt + 1d0/4d0*za(p5,e3)*zb(p2,e4)*zb(e3,p1)*s25*&
+     &    mw**(-2)*mt - 1d0/2d0*za(p5,k3)*zb(p2,e4)*zb(k3,p1)*mw**(-2)*&
+     &    mt**3 + 1d0/2d0*za(p5,k3)*zb(p2,e4)*zb(k3,p1)*s24*mw**(-2)*mt&
+     &     + 1d0/4d0*za(p5,k3)*zb(p2,e4)*zb(k3,p1)*s12*mw**(-2)*mt + 1d0&
+      &   /4d0*za(p5,k3)*zb(p2,e4)*zb(k3,p1)*s14*mw**(-2)*mt + 1d0/4d0*&
+     &    za(p5,k3)*zb(p2,e4)*zb(k3,p1)*s45*mw**(-2)*mt + 1d0/4d0*za(p5&
+     &    ,k3)*zb(p2,e4)*zb(k3,p1)*s25*mw**(-2)*mt - 1d0/2d0/(za(k4,e4)&
+     &    )*za(p5,e3)*za(k4,e3)*zb(e3,p1)*zb(e3,p2)*mt - 1d0/2d0/(za(k4&
+     &    ,e4))*za(p5,e3)*za(k4,k3)*zb(e3,p1)*zb(k3,p2)*mt - 1d0/2d0/(&
+     &    za(k4,e4))*za(p5,k3)*za(k4,e3)*zb(e3,p2)*zb(k3,p1)*mt - 1d0/2d0&
+      &    /(za(k4,e4))*za(p5,k3)*za(k4,k3)*zb(k3,p1)*zb(k3,p2)*mt )
+      ampw(2) = ampw(2) + om1 * (  - 1d0/2d0*za(p5,p2)*zb(p2,p1)*zb(p2,&
+     &    e4)*mt - 1d0/2d0*za(p5,k4)*zb(p2,e4)*zb(k4,p1)*mt - 1d0/2d0*&
+     &    za(p5,e4)*zb(p2,e4)*zb(e4,p1)*mt + 1/(za(k4,e4))*za(p5,k4)*&
+     &    zb(p1,p2)*mw**2*mt )
+        
+        ampt(1) =  - 1d0/2d0*za(p5,e4)*zb(p1,p2)*mt*vev*KR - 1d0/2d0/(&
+     &    zb(k4,e4))*za(p5,p1)*zb(p1,p2)*zb(p1,k4)*mt*vev*KL + 1d0/2d0&
+     &    /(zb(k4,e4))*za(p5,p2)*zb(p2,p1)*zb(p2,k4)*mt*vev*KL
+        
+        ampt(2) =  - 1d0/2d0*za(p5,p1)*zb(p1,p2)*zb(p1,e4)*vev*KL + 1d0/&
+     &    2d0*za(p5,p2)*zb(p2,p1)*zb(p2,e4)*vev*KL - 1d0/2d0/(za(k4,e4)&
+     &    )*za(p5,k4)*zb(p1,p2)*mt**2*vev*KR
+        
+! -- include propagators
+        ampt = ampt / (s125-mt**2+cI*M_Top*Ga_Top)/(s15-mw**2+cI*M_W*Ga_W)
+        ampw = ampw / (s24-mw**2+cI*M_W*Ga_W)/(s15-mw**2+cI*M_W*Ga_W)
         
         amp(1)=(ampw(1)+ampt(1))*mdecay(1)
         amp(2)=(ampw(2)+ampt(2))*mdecay(2)
-        
-      END SUBROUTINE
-        
+      end subroutine ubhtdamp   
+   
+   
     
       SUBROUTINE dbbarhtbaruamp(p1,p2,e3,k3,k4,e4,p5,za,zb,s,mdecay,amp)
 ! amplitude for production d(p1)+bbar(p2)->H(p3)+tbar(p4)+u(p5)
@@ -443,8 +520,8 @@ END SUBROUTINE
         implicit none
         integer    :: p1,p2,p3,e3,k3,e4,p5,k4
         complex(8) :: za(:,:),zb(:,:),mdecay(1:2)
-        real(8)    :: s(:,:),KL,KR
-        complex(8) :: amp(2),ampw(2),ampt(2)
+        real(8)    :: s(:,:)
+        complex(8) :: amp(2),ampw(2),ampt(2),KL,KR
         real(8)    :: s24,s34,s15,mt,mw
     
         s24=s(p2,k4)+s(p2,e4)+s(e4,k4)
@@ -493,8 +570,8 @@ END SUBROUTINE
         implicit none
         integer    :: p1,p2,p3,e3,k3,e4,p5,k4
         complex(8) :: za(:,:),zb(:,:),mdecay(1:2)
-        real(8)    :: s(:,:),KL,KR
-        complex(8) :: amp(2),ampw(2),ampt(2)
+        real(8)    :: s(:,:)
+        complex(8) :: amp(2),ampw(2),ampt(2),KL,KR
         real(8)    :: s12,s34,s45,mt,mw
     
         s45=s(k4,p5)+s(e4,p5)+s(e4,k4)
@@ -544,8 +621,8 @@ END SUBROUTINE
         implicit none
         integer    :: p1,p2,p3,e3,k3,e4,p5,k4
         complex(8) :: za(:,:),zb(:,:),mdecay(1:2)
-        real(8)    :: s(:,:),KL,KR
-        complex(8) :: amp(2),ampw(2),ampt(2)
+        real(8)    :: s(:,:)
+        complex(8) :: amp(2),ampw(2),ampt(2),KL,KR
         real(8)    :: s45,s34,s12,mt,mw
     
         s45=s(k4,p5)+s(e4,p5)+s(e4,k4)
@@ -576,7 +653,7 @@ END SUBROUTINE
      & mw**2 + s12)*za(p1,p5)*za(e4,p5)*zb(p5,p2)*vev*KR - 1d0/2d0/( - &
      & mt**2 + s34)/( - mw**2 + s12)/(zb(k4,e4))*za(p1,p5)*zb(p2,k4)*&
      & mt**2*vev*KL
-        
+                
         ampt(2) =  - 1d0/2d0/( - mt**2 + s34)/( - mw**2 + s12)*za(p1,p5&
      & )*zb(p2,e4)*mt*vev*KL - 1d0/2d0/( - mt**2 + s34)/( - mw**2 + s12&
      & )/(za(k4,e4))*za(p1,p5)*za(k4,p1)*zb(p1,p2)*mt*vev*KR - 1d0/2d0&
@@ -640,25 +717,30 @@ END SUBROUTINE
    
 
 
-     SUBROUTINE myAmp(p,VVHg1,VVHg2,VVHg3,TTHg1,TTHg2,res)
+     SUBROUTINE myAmp(p,VVHg1,VVHg2,VVHg3,TTHg1,TTHg2,res)! 1:t_out 2:b_out 3:q_out 4:qbar_out
      implicit none
-     real(8) :: p(1:4,1:4),s12,s34,s234,IV1,IV2,sprod(1:4,1:4),res
+     real(8) :: p(1:4,1:4),pt_light(1:4),res
+     real(8) :: s12,s34,s234,IV1,IV2,sprod(1:4,1:4)
      complex(8) :: VVHg1,VVHg2,VVHg3,TTHg1,TTHg2
      complex(8) :: HelAmp(1:2),Props1,Props2
      complex(8) :: za(1:4,1:4),zb(1:4,1:4)
      complex(8),parameter :: cI=(0d0,1d0)
      
-        call my_spinoru(4,(/p(1:4,1),p(1:4,2),p(1:4,3),p(1:4,4)/),za,zb,sprod)
-     
+        pt_light(1:4) = p(1:4,1) - m_top**2/(2d0*(p(1,3)*p(1,1)-p(2,3)*p(2,1)-p(3,3)*p(3,1)-p(4,3)*p(4,1)))*p(1:4,3)
+        call my_spinoru(4,(/pt_light(1:4),p(1:4,2),p(1:4,3),p(1:4,4)/),za,zb,sprod)   
+        sprod(1,2) = 2d0*(p(1,2)*p(1,1)-p(2,2)*p(2,1)-p(3,2)*p(3,1)-p(4,2)*p(4,1))!  overwriting sprod(1,2) because 1=not top momentum above
+        
         s12 = m_Top**2 + sprod(1,2)
         s34 = sprod(3,4)
         Props1 =  cI/(s12-M_W**2+cI*M_W*Ga_W) * cI/(s34-M_W**2+cI*M_W*Ga_W)           ! all propagator denominators for the HVV diagram
         s234 = sprod(2,3)+sprod(2,4)+sprod(3,4)
         Props2 =  cI/(s234-M_Top**2+cI*M_Top*Ga_Top) * cI/(s34-M_W**2+cI*M_W*Ga_W)    ! all propagator denominators for the Yukawa diagram
-     
-        IV1 = 1d0/dsqrt(2d0)/sitW
-        IV2 = 1d0/dsqrt(2d0)/sitW
-     
+        
+        IV1 = dsqrt(gwsq)/dsqrt(2d0)
+        IV2 = dsqrt(gwsq)/dsqrt(2d0)
+        
+        ! assuming tbar*( TTHg1 + i*TTHg2*gamma^5 )*t
+        ! 
         HelAmp(1) =  2*Props2*(TTHg1 - cI*TTHg2)*IV1*IV2*zb(2,4)*(za(2,3)*zb(2,1) - za(3,4)*zb(4,1)) +      &
        (m_top*Props1*IV1*IV2*(za(2,3)*zb(2,4) + za(3,1)*zb(4,1))*(VVHg2*za(3,1)**2*zb(2,1)*zb(3,1)**2 + VVHg2*za(2,3)*zb(2,1)*zb(2,3)*(-2*m_top**2 + za(3,1)*zb(3,1)) +       &
             za(3,4)*(M_W**2*(VVHg2 - cI*VVHg3)*zb(2,4)*zb(3,1) - m_top**2*VVHg2*zb(2,1)*zb(3,4)) +       &

@@ -298,6 +298,18 @@ integer :: i,j,temp
 END SUBROUTINE
 
 
+
+SUBROUTINE swapr(i,j)
+implicit none
+real(8) :: i,j,temp
+
+    temp=j
+    j=i
+    i=temp
+
+END SUBROUTINE
+
+
 function FindInputFmt0(EventInfoLine)
 implicit none
 character(len=*) :: EventInfoLine
@@ -689,22 +701,23 @@ end function Capitalize
 
 
 
-subroutine spinoru(N,p,za,zb,s)
+subroutine spinoru(p,za,zb,s)
 !---Calculate spinor products      
 !---taken from MCFM & modified by R. Rontsch, May 2015
 !---extended to deal with negative energies ie with all momenta outgoing                                                                
 !---Arbitrary conventions of Bern, Dixon, Kosower, Weinzierl,                                                                                  
 !---za(i,j)*zb(j,i)=s(i,j)                      
       implicit none
-      real(8) :: p(1:N,1:4),two
+      real(8) :: p(:,:),two
       integer, parameter :: mxpart=14
-      complex(8):: c23(N),f(N),rt(N),za(1:N,1:N),zb(1:N,1:N),czero,cone,ci
-      real(8)   :: s(1:N,1:N)
+      complex(8):: c23(mxpart),f(mxpart),rt(mxpart),za(:,:),zb(:,:),czero,cone,ci
+      real(8)   :: s(:,:)
       integer i,j,N
       
-      if (size(p,1) .ne. N) then
-         call Error("spinorz: momentum mismatch",size(p,1))
-      endif
+      N = size(p,1)
+!       if (size(p,1) .ne. N) then
+!          call Error("spinorz: momentum mismatch",size(p,1))
+!       endif
       two=2d0
       czero=dcmplx(0d0,0d0)
       cone=dcmplx(1d0,0d0)
