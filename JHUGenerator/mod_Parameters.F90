@@ -494,7 +494,11 @@ real(8) :: lambda_v120(1:3)
 logical :: forceZZcoupl
 logical :: computeQsqCompundCoupl
 
-	forceZZcoupl = (.not.present(tryWWcoupl) .or. .not.distinguish_HWWcouplings .or. .not.tryWWcoupl .or. index.gt.4)
+	if(present(tryWWcoupl)) then
+		forceZZcoupl = (.not.tryWWcoupl .or. .not.distinguish_HWWcouplings .or. index.gt.4)
+	else
+		forceZZcoupl = (.not.distinguish_HWWcouplings .or. index.gt.4)
+	endif
 	computeQsqCompundCoupl = .false.
 	sWplus_signed=0d0
 	sWminus_signed=0d0
