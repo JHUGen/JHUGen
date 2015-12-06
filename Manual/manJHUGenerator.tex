@@ -24,7 +24,7 @@ Manual for the JHU generator
 \begin{center}
 \small
 For simulation of a single-produced resonance at hadron colliders \\
-(version v6.7.0, release date Nov. 6, 2015) \\
+(version v6.7.2, release date Dec. 7, 2015) \\
 \normalsize
 \end{center}
 
@@ -205,7 +205,7 @@ seed_random = .true.
 
 \begin{itemize}
 \item
-\verb|seed_random| is false, the seeds are set through
+If \verb|seed_random| is false, the seeds are set through
 \begin{verbatim}
 integer, public :: TheSeeds(0:20)
 \end{verbatim}
@@ -265,7 +265,7 @@ real(8), public, parameter :: pTjetcut = 15d0*GeV           ! jet min pt
 real(8), public, parameter :: Rjet = 0.3d0                  ! jet deltaR, antikt algorithm
 real(8), public, parameter :: mJJcut = 0d0*GeV              ! minimum mJJ for VBF, HJJ, bbH
 \end{verbatim}
-All three cuts are used in processes 60, 61, 90, and also 80 if \verb|m_Top| is set to be light ($<10 \text{GeV}$).  \verb|pTjetcut| is also used in process 62 ($H+j$).
+All three cuts are used in processes 60 (VBF), 61 ($H+jj$), 90 ($bbH$), and also 80 ($ttH$) if \verb|m_Top| is set to be light ($<10 \text{GeV}$).  \verb|pTjetcut| is also used in process 62 ($H+j$).
 
 \item Constants, more or less self-explanatory, including the masses of particles and width of Standard Model particles and the generated resonance, CKM matrix elements, $Z$ and $W$ branching fractions and scale factors for NLO QCD corrections ($1+\alpha_s/\pi$), and collider energies.  They are documented in comments in \verb|mod_Parameters.F90|.
 
@@ -372,7 +372,7 @@ Their couplings to the spin-0 resonance are controlled by separate parameters,
    complex(8), public, parameter :: ghgsgs4 = (0.00d0,0d0)
 \end{verbatim}
 where the first three correspond to $Z\gamma^*$ couplings and the latter three corresponds to $\gamma^* \gamma^*$ interactions.
-These two sets of parameters also controll the coupling strength in final states with on-shell photons, i.e. $Z\gamma$ and $\gamma\gamma$.
+These two sets of parameters also control the coupling strength in final states with on-shell photons, i.e. $Z\gamma$ and $\gamma\gamma$.
 The anomalous coupling involving the off-shell photon momentum (in $\gamma^* Z$ interactions)
 \[
 g_1' \frac{ q^2_\gamma }{ \Lambda_2^{Z\gamma} } m_Z^2 \epsilon^*_1 \epsilon^*_2
