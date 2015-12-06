@@ -64,7 +64,6 @@ logical, public, parameter :: importExternal_LHEinit = .true.
 logical, public, parameter :: writeWeightedLHE = .false. 
 
 logical, public, parameter :: includeGammaStar = .false. 
-
 real(8),parameter :: MPhotonCutoff = 4d0*GeV
 
 logical, public, parameter :: RandomizeVVdecays = .true.    ! randomize DecayMode1 and DecayMode2 in H-->VV and TTBAR decays
@@ -72,6 +71,7 @@ logical, public, parameter :: RandomizeVVdecays = .true.    ! randomize DecayMod
 logical, public, parameter :: UseUnformattedRead = .false.  !Set this to true if the regular reading fails for whatever reason
 
 logical, public, parameter :: H_DK =.false.                 ! default to false so H in V* > VH (Process = 50) does not decay
+!logical, public, parameter :: V_DK =.true.                 ! default to true so V in V* > VH (Process = 50) decays
 !=====================================================
 
 
