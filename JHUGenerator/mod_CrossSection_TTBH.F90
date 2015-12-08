@@ -23,13 +23,14 @@ real(8) :: pdf(-6:6,1:2)
 real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi, PDFFac1,PDFFac2,xRnd
 real(8) :: MomExt(1:4,1:13),MomOffShell(1:4,1:13),PSWgt,PSWgt2,PSWgt3,PSWgt4
 real(8) :: LO_Res_Unpol,LO_Res_GG_Unpol,LO_Res_QQB_Unpol,PreFac  !, MG_MOM(0:3,1:5),MadGraph_tree
+real(8) :: WdecayKfactor
 integer :: NBin(1:NumHistograms),NHisto,iPartChannel,PartChannelAvg
 integer :: MY_IDUP(1:13),ICOLUP(1:2,1:13),DK_IDUP(1:6),DK_ICOLUP(1:2,3:6)
 logical :: applyPSCut
 integer, parameter :: NumPartonicChannels=6
 integer, parameter :: inLeft=1,inRight=2,Hbos=3,tbar=4,t=5,  bbar=6,Wm=7,lepM=8,nubar=9,  b=10,Wp=11,lepP=12,nu=13
 EvalWeighted_TTBH = 0d0
-
+WdecayKfactor = 1d0
 
    iPartChannel = int(yRnd(1) * NumPartonicChannels)
    if( PChannel.eq.0 ) then
@@ -74,6 +75,7 @@ EvalWeighted_TTBH = 0d0
    call EvalPhasespace_2to3M(EHat,(/M_Reso,M_Top,M_Top/),yRnd(4:8),MomExt(1:4,1:5),PSWgt)! a(1)b(2)-->H(3)+tbar(4)+t(5)
    call boost2Lab(eta1,eta2,5,MomExt(1:4,1:5))
   
+   call VVBranchings(DK_IDUP(1:6),DK_ICOLUP(1:2,3:6),700) ! Do not assign MY_IDUP yet
    if( TOPDECAYS.NE.0 ) then
       call EvalPhasespace_TopDecay(MomExt(1:4,tbar),yRnd(09:12),MomExt(1:4,06:08),PSWgt2)    ! ATop 
       MomExt(1:4,bbar) = MomExt(1:4,06)
@@ -91,6 +93,8 @@ EvalWeighted_TTBH = 0d0
       call TTbar_OffShellProjection(MomExt,MomOffShell,PSWgt4)
       MomOffShell(1:4,1:3) = MomExt(1:4,1:3)      
 !       PSWgt = PSWgt * PSWgt4       ! not using the Jacobian because the mat.el. don't have BW-propagators
+
+      WdecayKfactor = (ScaleFactor( convertLHE(DK_IDUP(3)),convertLHE(DK_IDUP(4)) ))*(ScaleFactor( convertLHE(DK_IDUP(5)),convertLHE(DK_IDUP(6)) ))
    endif
 !    call EvalPhasespace_HDecay(MomExt(1:4,3),yRnd(17:18),MomExt(1:4,12:13),PSWgt5)
 !    PSWgt = PSWgt * PSWgt5 
@@ -99,7 +103,7 @@ EvalWeighted_TTBH = 0d0
    call Kinematics_TTBH(MomOffShell,applyPSCut,NBin)
    if( applyPSCut .or. PSWgt.eq.zero ) return
    FluxFac = 1d0/(2d0*EHat**2)
-   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * PartChannelAvg
+   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * PartChannelAvg * WdecayKfactor
    Mu_Fact = 0.5d0*( 2d0*M_top + M_Reso )
    call setPDFs(eta1,eta2,Mu_Fact,pdf)
    
@@ -177,7 +181,6 @@ if( unweighted ) then
      ICOLUP(1:2,2) = (/510,502/)   
      ICOLUP(1:2,tbar) = (/000,502/)
      ICOLUP(1:2,t)    = (/501,000/)
-     call VVBranchings(DK_IDUP(1:6),DK_ICOLUP(1:2,3:6),700)
      MY_IDUP(b)    = Bot_;        ICOLUP(1:2,b) = (/501,00/)
      MY_IDUP(Wp)   = DK_IDUP(1);  ICOLUP(1:2,Wp)   = (/000,000/)
      MY_IDUP(lepP) = DK_IDUP(3);  ICOLUP(1:2,lepP) = DK_ICOLUP(1:2,3)
@@ -239,13 +242,14 @@ real(8) :: pdf(-6:6,1:2),RES(-5:5,-5:5)
 real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi,CS_Max,DKRnd
 real(8) :: MomExt(1:4,1:13),MomOffShell(1:4,1:13),PSWgt,PSWgt2,PSWgt3,PSWgt4
 real(8) :: LO_Res_GG_Unpol,LO_Res_QQB_Unpol,PreFac,PDFFac1,PDFFac2
+real(8) :: WdecayKfactor
 integer :: NBin(1:NumHistograms),NHisto,iPartons(1:2),DKFlavor
 integer :: MY_IDUP(1:13),ICOLUP(1:2,1:13),nparton,DK_IDUP(1:6),DK_ICOLUP(1:2,3:6)
 logical :: applyPSCut,genEvt
 integer, parameter :: inLeft=1,inRight=2,Hbos=3,tbar=4,t=5,  bbar=6,Wm=7,lepM=8,nubar=9,  b=10,Wp=11,lepP=12,nu=13
 include 'csmaxvalue.f'  
 EvalUnWeighted_TTBH = 0d0
-
+WdecayKfactor = 1d0
 
    call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
    
@@ -286,14 +290,16 @@ EvalUnWeighted_TTBH = 0d0
       MY_IDUP(bbar) = ABot_;       ICOLUP(1:2,bbar) = (/000,502/)
       MY_IDUP(Wm)   = DK_IDUP(2);  ICOLUP(1:2,Wm)   = (/000,000/)             
       MY_IDUP(lepM) = DK_IDUP(6);  ICOLUP(1:2,lepM) = DK_ICOLUP(1:2,6)
-      MY_IDUP(nubar)= DK_IDUP(5);  ICOLUP(1:2,nubar)= DK_ICOLUP(1:2,5)  
+      MY_IDUP(nubar)= DK_IDUP(5);  ICOLUP(1:2,nubar)= DK_ICOLUP(1:2,5)
+
+      WdecayKfactor = (ScaleFactor( convertLHE(DK_IDUP(3)),convertLHE(DK_IDUP(4)) ))*(ScaleFactor( convertLHE(DK_IDUP(5)),convertLHE(DK_IDUP(6)) ))
    else
       MY_IDUP(6:11)=-9999
    endif
 !    call EvalPhasespace_HDecay(MomExt(1:4,3),yRnd(16:17),MomExt(1:4,12:13),PSWgt4)
 !    PSWgt = PSWgt * PSWgt4 
    FluxFac = 1d0/(2d0*EHat**2)
-   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt
+   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * WdecayKfactor
 
    call Kinematics_TTBH(MomOffShell,applyPSCut,NBin)
    if( applyPSCut .or. PSWgt.eq.zero ) return
