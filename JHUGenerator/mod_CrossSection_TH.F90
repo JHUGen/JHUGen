@@ -146,6 +146,72 @@ WdecayKfactor = 1d0
    call EvalPhaseSpace_2to3ArbMass(EHat,(/MH_Inv,M_Top,0d0/),yRnd(3:7),MomExt(1:4,1:5),PSWgt)!  inLeft, inRight, Higgs, Top, Quark
    call boost2Lab(eta1,eta2,5,MomExt(1:4,1:5))
 
+   if( PROCESS.EQ.110 ) then
+      ICOLUP(1:2,Hbos) = (/000,000/)
+      ICOLUP(1:2,t)    = (/501,000/)
+      if( iPartons(inLeft)*iPartons(inRight).gt.0 ) then
+          ICOLUP(1:2,qout) = (/502,000/)
+      else
+          ICOLUP(1:2,qout) = (/000,502/)
+      endif
+      if( iPartons(inLeft).gt.0 ) then
+          ICOLUP(1:2,inLeft) = (/502,000/)
+      else
+          ICOLUP(1:2,inLeft) = (/000,502/)
+      endif
+      if( iPartons(inRight).gt.0 ) then
+          ICOLUP(1:2,inRight)= (/501,000/)
+      else
+          ICOLUP(1:2,inRight)= (/000,501/)
+      endif
+   elseif( PROCESS.EQ.111 ) then
+      ICOLUP(1:2,Hbos) = (/000,000/)
+      ICOLUP(1:2,t)    = (/000,501/)
+      if( iPartons(inLeft)*iPartons(inRight).gt.0 ) then
+          ICOLUP(1:2,qout) = (/000,502/)
+      else
+          ICOLUP(1:2,qout) = (/502,000/)
+      endif
+      if( iPartons(inLeft).gt.0 ) then
+          ICOLUP(1:2,inLeft) = (/502,000/)
+      else
+          ICOLUP(1:2,inLeft) = (/000,502/)
+      endif
+      if( iPartons(inRight).gt.0 ) then
+          ICOLUP(1:2,inRight)= (/501,000/)
+      else
+          ICOLUP(1:2,inRight)= (/000,501/)
+      endif
+   elseif( PROCESS.EQ.112 ) then
+      ICOLUP(1:2,Hbos) = (/000,000/)
+      ICOLUP(1:2,t)    = (/502,000/)
+      ICOLUP(1:2,qout) = (/000,502/)
+      if( iPartons(inLeft).gt.0 ) then
+          ICOLUP(1:2,inLeft) = (/501,000/)
+      else
+          ICOLUP(1:2,inLeft) = (/000,501/)
+      endif
+      if( iPartons(inRight).gt.0 ) then
+          ICOLUP(1:2,inRight)= (/501,000/)
+      else
+          ICOLUP(1:2,inRight)= (/000,501/)
+      endif
+   elseif( PROCESS.EQ.113 ) then
+      ICOLUP(1:2,Hbos) = (/000,000/)
+      ICOLUP(1:2,t)    = (/000,502/)
+      ICOLUP(1:2,qout) = (/502,000/)
+      if( iPartons(inLeft).gt.0 ) then
+          ICOLUP(1:2,inLeft) = (/501,000/)
+      else
+          ICOLUP(1:2,inLeft) = (/000,501/)
+      endif
+      if( iPartons(inRight).gt.0 ) then
+          ICOLUP(1:2,inRight)= (/501,000/)
+      else
+          ICOLUP(1:2,inRight)= (/000,501/)
+      endif
+   endif
+
    IF( TOPDECAYS.NE.0 ) THEN
       call EvalPhasespace_TopDecay(MomExt(1:4,4),yRnd(8:11),MomExt(1:4,6:8),PSWgt2)
       MomExt(1:4,b)  = MomExt(1:4,6)
@@ -160,23 +226,6 @@ WdecayKfactor = 1d0
       
       call VVBranchings(DK_IDUP(1:6),DK_ICOLUP(1:2,3:6),700)
       if( PROCESS.EQ.110 ) then
-          ICOLUP(1:2,Hbos) = (/000,000/)
-          ICOLUP(1:2,t)    = (/501,000/)
-          if( iPartons(inLeft)*iPartons(inRight).gt.0 ) then
-              ICOLUP(1:2,qout) = (/502,000/)
-          else
-              ICOLUP(1:2,qout) = (/000,502/)
-          endif
-          if( iPartons(inLeft).gt.0 ) then
-              ICOLUP(1:2,inLeft) = (/502,000/)
-          else
-              ICOLUP(1:2,inLeft) = (/000,502/)
-          endif
-          if( iPartons(inRight).gt.0 ) then
-              ICOLUP(1:2,inRight)= (/501,000/)
-          else
-              ICOLUP(1:2,inRight)= (/000,501/)
-          endif
           MY_IDUP(b)   = Bot_;       ICOLUP(1:2,b)   = (/501,000/)
           MY_IDUP(W)   = DK_IDUP(1); ICOLUP(1:2,W)   = (/000,000/)
           MY_IDUP(lep) = DK_IDUP(3); ICOLUP(1:2,lep) = DK_ICOLUP(1:2,3)
@@ -184,23 +233,6 @@ WdecayKfactor = 1d0
 
           WdecayKfactor = ScaleFactor( convertLHE(DK_IDUP(3)),convertLHE(DK_IDUP(4)) )
       elseif( PROCESS.EQ.111 ) then
-          ICOLUP(1:2,Hbos) = (/000,000/)
-          ICOLUP(1:2,t)    = (/000,501/)
-          if( iPartons(inLeft)*iPartons(inRight).gt.0 ) then
-              ICOLUP(1:2,qout) = (/000,502/)
-          else
-              ICOLUP(1:2,qout) = (/502,000/)
-          endif
-          if( iPartons(inLeft).gt.0 ) then
-              ICOLUP(1:2,inLeft) = (/502,000/)
-          else
-              ICOLUP(1:2,inLeft) = (/000,502/)
-          endif
-          if( iPartons(inRight).gt.0 ) then
-              ICOLUP(1:2,inRight)= (/501,000/)
-          else
-              ICOLUP(1:2,inRight)= (/000,501/)
-          endif
           MY_IDUP(b)   = ABot_;      ICOLUP(1:2,b)  = (/000,501/)
           MY_IDUP(W)   = DK_IDUP(2); ICOLUP(1:2,W)  = (/000,000/)             
           MY_IDUP(lep) = DK_IDUP(6); ICOLUP(1:2,lep)= DK_ICOLUP(1:2,6)
@@ -208,19 +240,6 @@ WdecayKfactor = 1d0
 
           WdecayKfactor = ScaleFactor( convertLHE(DK_IDUP(5)),convertLHE(DK_IDUP(6)) )
       elseif( PROCESS.EQ.112 ) then
-          ICOLUP(1:2,Hbos) = (/000,000/)
-          ICOLUP(1:2,t)    = (/502,000/)
-          ICOLUP(1:2,qout) = (/000,502/)
-          if( iPartons(inLeft).gt.0 ) then
-              ICOLUP(1:2,inLeft) = (/501,000/)
-          else
-              ICOLUP(1:2,inLeft) = (/000,501/)
-          endif
-          if( iPartons(inRight).gt.0 ) then
-              ICOLUP(1:2,inRight)= (/501,000/)
-          else
-              ICOLUP(1:2,inRight)= (/000,501/)
-          endif
           MY_IDUP(b)   = Bot_;       ICOLUP(1:2,b)   = (/502,00/)
           MY_IDUP(W)   = DK_IDUP(1); ICOLUP(1:2,W)   = (/000,000/)
           MY_IDUP(lep) = DK_IDUP(3); ICOLUP(1:2,lep) = DK_ICOLUP(1:2,3)
@@ -228,19 +247,6 @@ WdecayKfactor = 1d0
 
           WdecayKfactor = ScaleFactor( convertLHE(DK_IDUP(3)),convertLHE(DK_IDUP(4)) )
       elseif( PROCESS.EQ.113 ) then   
-          ICOLUP(1:2,Hbos) = (/000,000/)
-          ICOLUP(1:2,t)    = (/000,502/)
-          ICOLUP(1:2,qout) = (/502,000/)
-          if( iPartons(inLeft).gt.0 ) then
-              ICOLUP(1:2,inLeft) = (/501,000/)
-          else
-              ICOLUP(1:2,inLeft) = (/000,501/)
-          endif
-          if( iPartons(inRight).gt.0 ) then
-              ICOLUP(1:2,inRight)= (/501,000/)
-          else
-              ICOLUP(1:2,inRight)= (/000,501/)
-          endif
           MY_IDUP(b)   = ABot_;      ICOLUP(1:2,b)  = (/000,502/)
           MY_IDUP(W)   = DK_IDUP(2); ICOLUP(1:2,W)  = (/000,000/)             
           MY_IDUP(lep) = DK_IDUP(6); ICOLUP(1:2,lep)= DK_ICOLUP(1:2,6)
@@ -252,33 +258,7 @@ WdecayKfactor = 1d0
    ELSE
 
       MomOffShell(1:4,1:5) = MomExt(1:4,1:5)
-!       if( PROCESS.EQ.110 ) then
-!           ICOLUP(1:2,Hbos) = (/000,000/)
-!           ICOLUP(1:2,t)    = (/501,000/)
-!           ICOLUP(1:2,qout) = (/502,000/)
-!           ICOLUP(1:2,inLeft) = ICOLUP(1:2,qout)
-!           ICOLUP(1:2,inRight)= ICOLUP(1:2,t) 
-!       elseif( PROCESS.EQ.111 ) then
-!           ICOLUP(1:2,Hbos) = (/000,000/)
-!           ICOLUP(1:2,t)    = (/000,501/)
-!           ICOLUP(1:2,qout) = (/000,502/)
-!           ICOLUP(1:2,inLeft) = ICOLUP(1:2,qout)
-!           ICOLUP(1:2,inRight)= ICOLUP(1:2,t) 
-! ! Markus, please check this: 
-!       elseif( PROCESS.EQ.112 ) then
-!           ICOLUP(1:2,Hbos) = (/000,000/)
-!           ICOLUP(1:2,t)    = (/501,000/)
-!           ICOLUP(1:2,qout) = (/000,502/)
-!           ICOLUP(1:2,inLeft) = ICOLUP(1:2,qout)
-!           ICOLUP(1:2,inRight)= ICOLUP(1:2,t) 
-!       elseif( PROCESS.EQ.113 ) then
-!           ICOLUP(1:2,Hbos) = (/000,000/)
-!           ICOLUP(1:2,t)    = (/000,501/)
-!           ICOLUP(1:2,qout) = (/502,000/)
-!           ICOLUP(1:2,inLeft) = ICOLUP(1:2,qout)
-!           ICOLUP(1:2,inRight)= ICOLUP(1:2,t) 
-!       endif
-!       MY_IDUP(6:9)=-9999
+
    ENDIF
 
    FluxFac = 1d0/(2d0*EHat**2)

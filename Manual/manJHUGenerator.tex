@@ -1,7 +1,7 @@
 %
 %
 \documentclass[aps,superscriptaddress,nofootinbib]{revtex4}
-% \documentclass[12pt]{article}
+%\documentclass[12pt]{article}
 \usepackage{graphicx}
 \usepackage{epsfig}
 \usepackage{float}
@@ -24,7 +24,7 @@ Manual for the JHU generator
 \begin{center}
 \small
 For simulation of a single-produced resonance at hadron colliders \\
-(version v6.7.0, release date Nov. 6, 2015) \\
+(version v6.7.5, release date Dec. 10, 2015) \\
 \normalsize
 \end{center}
 
@@ -113,61 +113,56 @@ A few more details on some particular parameters:
 \begin{itemize}
 \item {\verb|VegasNc0,1,2|}: For unweighted event generation \verb|VegasNc0| specifies the number of evaluations for the initial integrand scan.  The actual event generation is controlled by either \verb|VegasNc1| or \verb|VegasNc2|. \verb|VegasNc1| specifies the number of tries in the accept/reject phase and \verb|VegasNc2| is the number of generated events. When generating unweighted events in \verb|ReadLHE| mode, both \verb|VegasNc1| or \verb|VegasNc2| can be used to specify the number of generated events. For the generation of weighted events \verb|VegasNc1| specifies the number of evaluations for each of 5 iterations during the initial integrand scan. \verb|VegasNc2| gives the (approximate) number of generated weighted events.
 \item {\verb|OffXVV|}: The program does not work for $ZZ$ or $WW$ if you set them to be on-shell (\verb|OffXVV="000"|) and the mass of the $X$ resonance to be below the $m_{VV}$ threshold.  In general, the more off-shell the process, or the more "1" you have, the less efficient the \verb|VegasNc1| evaluations are.  Specifically, if you are interested then, in producing a resonance with mass below threshold $m_{VV}$ with a very narrow resonance, it is most efficient to generate with \verb|OffXVV="011"|
-\item \verb|PChannel|: This parameter is only meaningful in the spin-2 case and for $Hjj$, $Hj$, $ttH$, and $bbH$ production mechanisms.  For spin-0, production is possible only via the $gg$ process; for spin-1 and for the VBF and $VH$ processes, production is only possible via the $q\bar{q}$ process.
+\item \verb|PChannel|: This parameter is only meaningful in the spin-2 case and for the $ttH$ and $bbH$ production mechanisms.  For spin-0, production is possible only via the $gg$ process; for spin-1 and for the VBF and $VH$ processes, production is only possible via the $q\bar{q}$ process.  For $H+jj$ and $H+j$, all four parton channels $gg$, $q\bar{q}$, $qg$, and $\bar{q}g$ are included.
 \item \verb|DecayMode1,2=7|: Valid for spin-0 and spin-2.  Only OffXVV=000 or 100 are possible.
 \item In $VH$ production and \verb|ConvertLHE| mode, \verb|DecayMode1| is used for the decay of the $V$.  If it is a $Z$ decay mode, $ZH$ will be produced; if it is a $W$ decay mode, $WH$ will be produced.
 \item In $ttH$ production, \verb|DecayMode1| and \verb|DecayMode2| are used to decay the $W$ bosons from the top decay.  Only $W$ decay modes are allowed.
+\item \verb|Interf|: For final states with 4 same flavor fermions, this parameter controls whether or not to include interference effects.
 \end{itemize}
 
-\noindent
-Then, as an example of running the generator, you could do:
-
-\noindent
-- gg production:
+Examples of running the generator:
+\begin{itemize}
+\item $gg$ production:
 \begin{verbatim}
-./JHUGen Collider=1 Process=0 VegasNc2=100000 PChannel=0 OffXVV=011 DecayMode1=0 DecayMode2=0 \\
-		Unweighted=1 DataFile=test1
+./JHUGen Collider=1 Process=0 VegasNc2=100000 PChannel=0 OffXVV=011 DecayMode1=0 \\
+		DecayMode2=0 Unweighted=1 DataFile=test1
 \end{verbatim}
-- ggH $\to$ Zgamma
+\item $ggH \to Z\gamma$
 \begin{verbatim}
 ./JHUGen DecayMode1=0 DecayMode2=7 OffXVV=010
 \end{verbatim}
-- VH (both $pp$ and $e^+e^-$ Collider options possible):
-\begin{verbatim}
-./JHUGen Collider=1 Process=50 Unweighted=1 VegasNc2=100000 OffXVV=011 DataFile=test2
-\end{verbatim}
-- ZH with hadronic $Z$ decay (change \verb|DecayMode1| for other $Z$ decays; both $pp$ and $e^+e^-$ Collider options possible):
+\item $ZH$ with hadronic $Z$ decay (change \verb|DecayMode1| for other $Z$ decays; both $pp$ and $e^+e^-$ Collider options possible):
 \begin{verbatim}
 ./JHUGen Collider=1 Process=50 DecayMode1=1 Unweighted=1 VegasNc2=100000 \\
 		OffXVV=011 DataFile=test2
 \end{verbatim}
-- WH with leptonic $W$ decay (change \verb|DecayMode1| for other $W$ decays; both $pp$ and $e^+e^-$ Collider options possible):
+\item $WH$ with leptonic $W$ decay (change \verb|DecayMode1| for other $W$ decays):
 \begin{verbatim}
 ./JHUGen Collider=1 Process=50 DecayMode1=4 Unweighted=1 VegasNc2=100000 \\
 		OffXVV=011 DataFile=test2
 \end{verbatim}
-- VBF:
+\item VBF:
 \begin{verbatim}
 ./JHUGen Collider=1 Process=60 Unweighted=1 VegasNc2=100000 OffXVV=011 DataFile=test2
 \end{verbatim}
-- H+jj:
+\item $H+jj$:
 \begin{verbatim}
 ./JHUGen Collider=1 Process=61 Unweighted=1 VegasNc2=100000 OffXVV=011 DataFile=test3
 \end{verbatim}
-- H+j:
+\item $H+j$:
 \begin{verbatim}
 ./JHUGen Collider=1 Process=62 Unweighted=1 VegasNc2=100000 OffXVV=011 DataFile=test4
 \end{verbatim}
-- $pp \to t\bar{t}+H$ with inclusive top decay (change \verb|DecayMode1,2| for specific $tt$ decays):
+\item $pp \to t\bar{t}+H$ with inclusive top decay (change \verb|DecayMode1,2| for specific $tt$ decays):
 \begin{verbatim}
 ./JHUGen Collider=1 Process=80 DecayMode1=11 DecayMode2=11 Unweighted=1 \\
 		VegasNc2=100000 OffXVV=011 DataFile=test5
 \end{verbatim}
-- $pp \to b\bar{b}+H$:
+\item $pp \to b\bar{b}+H$:
 \begin{verbatim}
 ./JHUGen Collider=1 Process=90 Unweighted=1 VegasNc2=100000 OffXVV=011 DataFile=test6
 \end{verbatim}
-
+\end{itemize}
 
 %\begin{center}
 %\line(1,0){250}
@@ -198,151 +193,90 @@ After modifying this file, one needs to recompile.
 
 \subsubsection{ General parameters }
 
-\noindent
+\begin{itemize}
+\item Switches:
+\begin{itemize}
+\item
 Each generation run is different when this is \verb|.true.|
 
 \begin{verbatim}
 seed_random = .true.
 \end{verbatim}
 
-\noindent
+\begin{itemize}
+\item
+If \verb|seed_random| is false, the seeds are set through
+\begin{verbatim}
+integer, public :: TheSeeds(0:20)
+\end{verbatim}
+\end{itemize}
+
+\item
 In the case when \verb|PChannel=2| for a spin-2 resonance, the user can define an approximate ratio of the production of gg and $q\bar{q}$ production.
 
 \begin{verbatim}
 fix_channels_ratio = .true.
-channels_ratio_fix = 0.25d0    ! desired ratio of
-                               ! N_qq/(N_qq+N_gg)
+channels_ratio_fix = 0.25d0    ! desired ratio of N_qq/(N_qq+N_gg)
 \end{verbatim}
 
 
-\noindent
+\item
 For final states with a Z-boson decaying into $f\bar f$, intermediate off-shell photons can be included by switching
 \begin{verbatim}
 logical, public, parameter :: includeGammaStar = .false.
 \end{verbatim}
-to the value \verb|.true.|. In such case, a lower cut on the photon invariant mass has to be placed in order to avoid the
-collinear singularity. This cutoff parameter is controlled by
+to the value \verb|.true.|.
+\begin{itemize}
+\item
+In such case, a lower cut on the photon invariant mass has to be placed in order to avoid the collinear singularity. This cutoff parameter is controlled by
 \begin{verbatim}
 real(8),parameter :: MPhotonCutoff = 4d0*GeV.
 \end{verbatim}
+\end{itemize}
 
-\noindent
+\item
 For $VV$ decay (and similarly in $ttH$ production), by default the $V$'s are randomized so that, for example, \verb|DecayMode1=5 DecayMode2=11| will produce all combinations that include at least one hadronic $W$ decay (rather of specifically hadronic decay of the $W^+$).  This can be switched off by changing
 \begin{verbatim}
 logical, public, parameter :: RandomizeVV = .true.
 \end{verbatim}
 to \verb|.false.|.  In this case, \verb|DecayMode1| will refer specifically to the $W^+$ and \verb|DecayMode2| to the $W^-$.  For $ZZ$ decay, this parameter only determines whether the decays of first and second $Z$ written to the LHE file are randomized or not; in this case the only effect is the appearance of the output.
 
-\noindent
+\item
 When reading in LHE files, JHUGen determines the format by looking at the first lines of the first event.  If this determination fails for any reason (for example, if different events are written in inconsistent formats), try changing
 \begin{verbatim}
 +logical, public, parameter :: UseUnformattedRead = .false.
 \end{verbatim}
 to \verb|.true.|.  However, this will noticeably slow down event generation in \verb|ReadLHE| mode.
 
-\noindent
-{\it Only for final states with 4 same flavor fermions }, one can include interference effects between the leptons.  The interference is controlled by the command line parameter:
-\begin{verbatim}
-Interf=0 or 1
-\end{verbatim}
 
-\noindent
+
+\item
 For the generation of weighted events (command line \verb|Unweighted=0|) an LHE output file is created if
 \begin{verbatim}
 logical, public, parameter :: writeWeightedLHE = .false.
 \end{verbatim}
 is set to \verb|.true.|.
+\end{itemize}
 
-
-The remaining parameters are more-or-less self-explanatory:
+\item
+Jet cuts:
 \begin{verbatim}
-! we are using units of 100GeV, i.e. Lambda=10 is 1TeV
-real(8), public, parameter :: GeV=1d0/100d0
-real(8), public, parameter :: percent=1d0/100d0
-real(8), public :: M_V,Ga_V
-real(8), public, parameter :: M_Top   = 173.2d0     *GeV      !
-real(8), public, parameter :: Ga_Top  = 2d0    *GeV     !
-real(8), public, parameter :: M_Z     = 91.1876d0 *GeV      ! Z boson mass (PDG-2011)
-real(8), public, parameter :: Ga_Z    = 2.4952d0  *GeV      ! Z boson width(PDG-2011)
-real(8), public, parameter :: M_W     = 80.399d0  *GeV      ! W boson mass (PDG-2011)
-real(8), public, parameter :: Ga_W    = 2.085d0   *GeV      ! W boson width(PDG-2011)
-real(8), public            :: M_Reso  = 125d0   *GeV      ! X resonance mass (spin 0, spin 1,
-                                                            !  spin 2) (careful: no longer a
-                                                            !  parameter, can be overwritten by
-                                                            !  command line argument)
-real(8), public, parameter :: Ga_Reso = 0.00407d0 *GeV      ! X resonance width
-real(8), public, parameter :: Lambda  = 1000d0    *GeV      ! Lambda coupling enters in two
-                                                            !  places: overall scale for
-                                                            !  x-section and in power suppressed
-                                                            !  operators/formfactors (former r).
-
-real(8), public, parameter :: m_el = 0.00051100d0  *GeV     ! electron mass
-real(8), public, parameter :: m_mu = 0.10566d0  *GeV        ! muon mass
-real(8), public, parameter :: m_tau = 1.7768d0  *GeV        ! tau mass
-real(8), public, parameter :: m_bot = 4.75d0     *GeV     ! bottom quark mass
-
-
-real(8), public, parameter :: Gf = 1.16639d-5/GeV**2        ! fermi constant
-real(8), public, parameter :: vev = 1.0d0/sqrt(Gf*sqrt(2.0d0))
-real(8), public, parameter :: gwsq = 4.0d0 * M_W**2/vev**2  ! weak constant squared
-real(8), public, parameter :: alpha_QED = 1d0/132.2319d0    ! el.magn. coupling
-real(8), public, parameter :: alphas = 0.13229060d0         ! strong coupling
-real(8), public, parameter :: sitW = dsqrt(0.23119d0)       ! sin(Theta_Weinberg) (PDG-2008)
-real(8), public            :: Mu_Fact                       ! pdf factorization scale
-                                                            ! (set to M_Reso in main.F90)
-real(8), public, parameter :: LHC_Energy=13000d0  *GeV      ! LHC hadronic center of mass energy
-real(8), public, parameter :: TEV_Energy=1960d0  *GeV       ! Tevatron hadronic center of mass
-                                                            !  energy
-real(8), public, parameter :: ILC_Energy=250d0  *GeV        ! Linear collider center of mass
-                                                            !  energy
-real(8), public, parameter :: POL_A = 0d0                   !e+ polarization. 0: no polarization,
-                                                            !                 100: helicity = 1,
-                                                            !                -100: helicity = -1
-real(8), public, parameter :: POL_B = 0d0                   !e- polarization. 0: no polarization,
-                                                                              100: helicity = 1,
-                                                                              -100: helicity = -1
-logical, public, parameter :: H_DK =.false.                  !default to false so H in
-                                                             V > VH (Process = 50) does not decay
-real(8), public, parameter :: ptjetcut = 15d0*GeV           ! jet min pt
-real(8), public, parameter :: Rjet = 0.5d0                  ! jet deltaR, antikt algorithm
+real(8), public, parameter :: pTjetcut = 15d0*GeV           ! jet min pt
+real(8), public, parameter :: Rjet = 0.3d0                  ! jet deltaR, antikt algorithm
+real(8), public, parameter :: mJJcut = 0d0*GeV              ! minimum mJJ for VBF, HJJ, bbH
 \end{verbatim}
+All three cuts are used in processes 60 (VBF), 61 ($H+jj$), 90 ($bbH$), and also 80 ($ttH$) if \verb|m_Top| is set to be light ($<10 \text{GeV}$).  \verb|pTjetcut| is also used in process 62 ($H+j$).
 
+\item Constants, more or less self-explanatory, including the masses of particles and width of Standard Model particles and the generated resonance, CKM matrix elements, $Z$ and $W$ branching fractions and scale factors for NLO QCD corrections ($1+\alpha_s/\pi$), and collider energies.  They are documented in comments in \verb|mod_Parameters.F90|.
 
-\noindent
-The branching fractions of $Z$ and $W$ bosons depend on the above input parameter and can slightly vary from the given PDG measurements.
-Those branchings can be rescaled with the parameters below.
-\begin{verbatim}
-real(8), public, parameter :: scale_alpha_Z_uu = 1.037560d0 ! scaling factor of alpha
-                                                           ! (~partial width) for Z > u u~, c c~
-real(8), public, parameter :: scale_alpha_Z_dd = 1.037560d0 ! scaling factor of alpha
-                                                           ! (~partial width) for
-                                                           ! Z > d d~, s s~, b b~
-real(8), public, parameter :: scale_alpha_Z_ll = 1d0       ! scaling factor of alpha
-                                                           ! (~partial width) for Z > l+ l-
-                                                           ! (l=e, mu)
-real(8), public, parameter :: scale_alpha_Z_tt = 1d0       ! scaling factor of alpha
-                                                           ! (~partial width) for Z > tau+ tau-
-real(8), public, parameter :: scale_alpha_Z_nn = 1d0       ! scaling factor of alpha
-                                                           ! (~partial width) for Z > nu nu~
-real(8), public, parameter :: scale_alpha_W_ud = 1.038200d0  ! scaling factor of alpha
-                                                             ! (~partial width) for W > u d
-real(8), public, parameter :: scale_alpha_W_cs = 1.038200d0  ! scaling factor of alpha
-                                                             ! (~partial width) for W > c s
-real(8), public, parameter :: scale_alpha_W_ln = 1d0       ! scaling factor of alpha
-                                                           ! (~partial width) for W > l nu
-real(8), public, parameter :: scale_alpha_W_tn = 1d0       ! scaling factor of alpha
-                                                           ! (~partial width) for W > tau nu
-\end{verbatim}
-These default values rescale the branchings to include the NLO QCD corrections ($1+\alpha_s/\pi$).
+\item Resonance couplings to SM fields, described in detail in the next few sections
+\end{itemize}
 
 \subsubsection{ Spin-0 parameters }
 
 \noindent
-{\it N.B.  The parameters "ptjetcut" and "Rjet" only apply to Process=60,61.}
-
-\noindent
 The \verb|*hg*| parameters control the coupling of a spin-0 resonance to gluons in the production mechanism.
-In practice, the production parameters are not having a large effect since angular corrections from the production mechanism are lost for spinless particles.
+In practice, the production parameters do not have a large effect since angular corrections from the production mechanism are lost for spinless particles.
 The \verb|*hz*| parameters control the decay into $Z$ and $W$ bosons.
 One has the options to set the spin-0 couplings either from Eq.(9) or Eq.(11) from Ref.~\cite{Bolognesi:2012}.
 To switch between the two, use the parameter \verb|generate_as|.
@@ -438,7 +372,7 @@ Their couplings to the spin-0 resonance are controlled by separate parameters,
    complex(8), public, parameter :: ghgsgs4 = (0.00d0,0d0)
 \end{verbatim}
 where the first three correspond to $Z\gamma^*$ couplings and the latter three corresponds to $\gamma^* \gamma^*$ interactions.
-These two sets of parameters also controll the coupling strength in final states with on-shell photons, i.e. $Z\gamma$ and $\gamma\gamma$.
+These two sets of parameters also control the coupling strength in final states with on-shell photons, i.e. $Z\gamma$ and $\gamma\gamma$.
 The anomalous coupling involving the off-shell photon momentum (in $\gamma^* Z$ interactions)
 \[
 g_1' \frac{ q^2_\gamma }{ \Lambda_2^{Z\gamma} } m_Z^2 \epsilon^*_1 \epsilon^*_2
@@ -630,7 +564,6 @@ It is possible to interface to an LHAPDF setup instead of compiling with local P
 \begin{itemize}
 \item In the makefile:
 \begin{itemize}
-\item Make sure the compiler is ifort.  LHAPDF integration is currently not supported with gfortran.
 \item Set UseLHAPDF=Yes
 \item Set MyLHADir to a directory with your LHAPDF setup.  This can be in terms of environment variables; for example \verb|MyLHADir=${LHAPDF_DATA_PATH}/../../lib/|.
 \end{itemize}
@@ -646,16 +579,10 @@ It is possible to interface to an LHAPDF setup instead of compiling with local P
 \subsection{Native matrix elements}
 
 After extracting the code, you can go to the directory \verb|JHUGenMELA| to find code for computing matrix elements directly.
-To compile the code, simple do:
-\begin{verbatim}
-$ make
-\end{verbatim}
+To compile the code, simply run \texttt{make}.
 
-\noindent
-\bf Please take note: The setup is configured for \verb|gfort + gcc version 4.1.2 20080704 (Red Hat 4.1.2-50)| and it is highly dependent on the compiler version.  Please configure for your own setup accordingly.  {\rm (Using \verb|'nm'| command will help decipher the module names you will need)}\\
-\\
-\rm
-\noindent
+\textbf{Please take note: The setup is configured for \texttt{gfort + gcc version 4.1.2 20080704 (Red Hat 4.1.2-50)} and it is highly dependent on the compiler version.  Please configure for your own setup accordingly.}  (Using the \verb|nm| command will help decipher the module names you will need)
+
 The usage of the package is straight-forward and an example is given in \verb|testprogram.c|.
 There are 6 main modules allowing both specific production process and production-independent calculation:
 \begin{itemize}
@@ -693,7 +620,7 @@ Instructions for setting up the JHUGenMELA with MCFM are in the file \verb|JHUGe
 \section{ Release notes }
 
 \noindent
-In going from \verb|v6.2.8| to \verb|v6.7.0|, the updates are as follows:
+In going from \verb|v6.2.8| to \verb|v6.7.5|, the updates are as follows:
 
 \begin{itemize}
 \item Much faster event generation for VBF and $Hjj$ with deterministic jet flavor assignment

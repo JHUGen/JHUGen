@@ -6,6 +6,8 @@ save
 character(len=6),parameter :: JHUGen_Version="v6.7.5"
 ! 
 ! 
+!=====================================================
+!internal
 integer, public :: Collider, PDFSet,PChannel,Process,DecayMode1,DecayMode2,TopDecays,TauDecays
 integer, public :: VegasIt1,VegasNc0,VegasNc1,VegasNc2
 real(8), public :: Collider_Energy
@@ -36,44 +38,72 @@ real(8), public, parameter :: percent=1d0/100d0
 ! integer,parameter :: NPart=200
 ! real(8),public :: PartitionMax(0:NPart,0:NPart)=-1d99
 real(8),public :: minCS=1d10,maxCS=0d0,avgCS=0d0
+integer, public :: Br_Z_ll_counter=0
+integer, public :: Br_Z_inv_counter=0
+integer, public :: Br_Z_uu_counter=0
+integer, public :: Br_Z_dd_counter=0
+integer, public :: Br_W_ll_counter=0
+integer, public :: Br_W_ud_counter=0
+integer, public :: Br_counter(1:5,1:5)=0
+integer, public :: LeptInEvent(0:8) = 0
+!=====================================================
 
 
+
+!=====================================================
+!switches
 logical, public, parameter :: seed_random = .true.
 integer, public :: TheSeeds(0:20) = (/2,700470849,470115596,3,4,5,6,7,8,9,10,11,12,0,0,0,0,0,0,0,0/)! only used if seed_random=.false., the first entry is the total number of seeds
 
 logical, public, parameter :: fix_channels_ratio = .false.
 
-real(8), public, parameter :: channels_ratio_fix = 0.25d0    ! desired ratio of  N_qq/(N_qq+N_gg)
+real(8), public, parameter :: channels_ratio_fix = 0.25d0   ! desired ratio of  N_qq/(N_qq+N_gg)
 
 logical, public, parameter :: importExternal_LHEinit = .true.
 
 logical, public, parameter :: writeWeightedLHE = .false. 
 
 logical, public, parameter :: includeGammaStar = .false. 
-
 real(8),parameter :: MPhotonCutoff = 4d0*GeV
 
-logical, public, parameter :: RandomizeVVdecays = .true. ! randomize DecayMode1 and DecayMode2 in H-->VV and TTBAR decays
+logical, public, parameter :: RandomizeVVdecays = .true.    ! randomize DecayMode1 and DecayMode2 in H-->VV and TTBAR decays
 
 logical, public, parameter :: UseUnformattedRead = .false.  !Set this to true if the regular reading fails for whatever reason
 
+logical, public, parameter :: H_DK =.false.                 ! default to false so H in V* > VH (Process = 50) does not decay
+!logical, public, parameter :: V_DK =.true.                 ! default to true so V in V* > VH (Process = 50) decays
+!=====================================================
+
+
+!=====================================================
+!cuts
+real(8), public, parameter :: pTjetcut = 15d0*GeV           ! jet min pt
+real(8), public, parameter :: Rjet = 0.3d0                  ! jet deltaR, anti-kt algorithm
+real(8), public, parameter :: mJJcut = 0d0*GeV              ! minimum mJJ for VBF, HJJ, bbH
+real(8), public, parameter :: VBF_4ml_minmax(1:2) = (/ -1d0,-1d0 /)*GeV  ! min and max for m_4l in off-shell VBF production;   default is (-1,-1): m_4l ~ Higgs resonance (on-shell)
+! real(8), public, parameter :: VBF_4ml_minmax(1:2) = (/ 300d0,600d0 /)*GeV  ! min and max for m_4l in off-shell VBF production, default is (-1,-1): m_4l ~ Higgs resonance (on-shell)
+!=====================================================
+
+
+!=====================================================
+!constants
 real(8), public            :: M_Top   = 173.2d0   *GeV      ! top quark mass
 real(8), public, parameter :: Ga_Top  = 2.0d0     *GeV      ! top quark width
 real(8), public, parameter :: M_Z     = 91.1876d0 *GeV      ! Z boson mass (PDG-2011)
 real(8), public, parameter :: Ga_Z    = 2.4952d0  *GeV      ! Z boson width(PDG-2011)
 real(8), public, parameter :: M_W     = 80.399d0  *GeV      ! W boson mass (PDG-2011)
 real(8), public, parameter :: Ga_W    = 2.085d0   *GeV      ! W boson width(PDG-2011)
-real(8), public            :: M_Reso  = 125.0d0   *GeV      ! X resonance mass (spin 0, spin 1, spin 2)     (carefule: no longer a parameter, can be overwritten by command line argument)
+real(8), public            :: M_Reso  = 125.0d0   *GeV      ! X resonance mass (spin 0, spin 1, spin 2)     (can be overwritten by command line argument)
 real(8), public            :: Ga_Reso = 0.00407d0 *GeV      ! X resonance width
 real(8), public, parameter :: Lambda  = 1000d0    *GeV      ! Lambda coupling enters in two places
                                                             ! overal scale for x-section and in power suppressed
                                                             ! operators/formfactors (former r).
 
-real(8), public, parameter :: m_bot = 4.75d0       *GeV         ! bottom quark mass
-real(8), public, parameter :: m_el = 0.00051100d0  *GeV         ! electron mass
-real(8), public, parameter :: m_mu = 0.10566d0     *GeV         ! muon mass
-real(8), public, parameter :: m_tau = 1.7768d0     *GeV         ! tau mass
-real(8), public, parameter :: Ga_tau =2.267d-12    *GeV         ! tau width
+real(8), public, parameter :: m_bot = 4.75d0       *GeV     ! bottom quark mass
+real(8), public, parameter :: m_el = 0.00051100d0  *GeV     ! electron mass
+real(8), public, parameter :: m_mu = 0.10566d0     *GeV     ! muon mass
+real(8), public, parameter :: m_tau = 1.7768d0     *GeV     ! tau mass
+real(8), public, parameter :: Ga_tau =2.267d-12    *GeV     ! tau width
 
 real(8), public, parameter :: HiggsDecayLengthMM = 0d0      ! Higgs decay length in [mm]
 real(8), public, parameter :: Gf = 1.16639d-5/GeV**2        ! Fermi constant
@@ -88,15 +118,6 @@ real(8), public, parameter :: TEV_Energy=1960d0  *GeV       ! Tevatron hadronic 
 real(8), public, parameter :: ILC_Energy=250d0  *GeV        ! Linear collider center of mass energy
 real(8), public, parameter :: POL_A = 0d0                   ! e+ polarization. 0: no polarization, 100: helicity = 1, -100: helicity = -1
 real(8), public, parameter :: POL_B = 0d0                   ! e- polarization. 0: no polarization, 100: helicity = 1, -100: helicity = -1
-logical, public, parameter :: H_DK =.false.                 ! default to false so H in V* > VH (Process = 50) does not decay
-!logical, public, parameter :: V_DK =.true.                 ! default to true so V in V* > VH (Process = 50) decays
-real(8), public, parameter :: pTjetcut = 15d0*GeV           ! jet min pt
-real(8), public, parameter :: Rjet = 0.3d0                  ! jet deltaR, anti-kt algorithm
-real(8), public, parameter :: mJJcut = 0d0*GeV              ! minimum mJJ for VBF, HJJ, bbH
-real(8), public, parameter :: VBF_4ml_minmax(1:2) = (/ -1d0,-1d0 /)*GeV  ! min and max for m_4l in off-shell VBF production;   default is (-1,-1): m_4l ~ Higgs resonance (on-shell)
-! real(8), public, parameter :: VBF_4ml_minmax(1:2) = (/ 300d0,600d0 /)*GeV  ! min and max for m_4l in off-shell VBF production, default is (-1,-1): m_4l ~ Higgs resonance (on-shell)
-
-!----------------------------------------------------------------------------------------------------
 
 ! CKM squared matrix entries 
 real(8), public, parameter :: VCKM_ud = 0.974285d0
@@ -152,13 +173,13 @@ real(8), public, parameter :: Brhadr_W_cs = Br_W_cs/Br_W_hadr                   
 
 real(8), public :: scale_alpha_Z_uu = 1.037560d0 ! scaling factor of alpha (~partial width) for Z > u u~, c c~
 real(8), public :: scale_alpha_Z_dd = 1.037560d0 ! scaling factor of alpha (~partial width) for Z > d d~, s s~, b b~
-real(8), public :: scale_alpha_Z_ll = 1d0 ! scaling factor of alpha (~partial width) for Z > l+ l-  (l=e,mu)
-real(8), public :: scale_alpha_Z_tt = 1d0 ! scaling factor of alpha (~partial width) for Z > tau+ tau-
-real(8), public :: scale_alpha_Z_nn = 1d0 ! scaling factor of alpha (~partial width) for Z > nu nu~
+real(8), public :: scale_alpha_Z_ll = 1d0        ! scaling factor of alpha (~partial width) for Z > l+ l-  (l=e,mu)
+real(8), public :: scale_alpha_Z_tt = 1d0        ! scaling factor of alpha (~partial width) for Z > tau+ tau-
+real(8), public :: scale_alpha_Z_nn = 1d0        ! scaling factor of alpha (~partial width) for Z > nu nu~
 real(8), public :: scale_alpha_W_ud = 1.038200d0 ! scaling factor of alpha (~partial width) for W > u d
 real(8), public :: scale_alpha_W_cs = 1.038200d0 ! scaling factor of alpha (~partial width) for W > c s
-real(8), public :: scale_alpha_W_ln = 1d0 ! scaling factor of alpha (~partial width) for W > l nu (l=e,mu)
-real(8), public :: scale_alpha_W_tn = 1d0 ! scaling factor of alpha (~partial width) for W > tau nu
+real(8), public :: scale_alpha_W_ln = 1d0        ! scaling factor of alpha (~partial width) for W > l nu (l=e,mu)
+real(8), public :: scale_alpha_W_tn = 1d0        ! scaling factor of alpha (~partial width) for W > tau nu
 ! real(8), public, parameter :: scale_alpha_Z_ll = (1d0-(Br_Z_uu+Br_Z_cc)*scale_alpha_Z_uu-(Br_Z_dd+Br_Z_ss+Br_Z_bb)*scale_alpha_Z_dd)/(3d0*Br_Z_nn+3d0*Br_Z_ee) ! scaling factor of alpha (~partial width) for Z > l+ l- which restores the total width
 ! real(8), public, parameter :: scale_alpha_Z_nn = scale_alpha_Z_ll ! scaling factor of alpha (~partial width) for Z > nu nu~ which restores total width
 ! real(8), public, parameter :: scale_alpha_W_ln = (1d0-Br_W_ud*scale_alpha_W_ud-Br_W_cs*scale_alpha_W_cs)/(3d0*Br_W_en) ! scaling factor of alpha (~partial width) for W > l nu
@@ -168,14 +189,11 @@ real(8), public :: scale_alpha_W_tn = 1d0 ! scaling factor of alpha (~partial wi
 !
 ! sum rule with scaling factors
 ! 1 = 3*(Br_Z_nn*scale_alpha_Z_nn) + 3*(Br_Z_ee*scale_alpha_Z_ll) + 2*(Br_Z_uu*scale_alpha_Z_uu) + 3*(Br_Z_dd*scale_alpha_Z_dd)
-integer, public :: Br_Z_ll_counter=0
-integer, public :: Br_Z_inv_counter=0
-integer, public :: Br_Z_uu_counter=0
-integer, public :: Br_Z_dd_counter=0
-integer, public :: Br_W_ll_counter=0
-integer, public :: Br_W_ud_counter=0
-integer, public :: Br_counter(1:5,1:5)=0
-integer, public :: LeptInEvent(0:8) = 0
+!=====================================================
+
+
+!=====================================================
+!resonance couplings
 
 !-- parameters that define on-shell spin 0 coupling to SM fields, see note
    logical, public, parameter :: generate_as = .false.
@@ -284,7 +302,7 @@ integer, public :: LeptInEvent(0:8) = 0
   logical, public, parameter :: generate_bis = .true.
   logical, public, parameter :: use_dynamic_MG = .true.
 
-  complex(8), public, parameter :: b1 = (0.0d0,0d0)    !  all b' below are g's in the draft
+  complex(8), public, parameter :: b1 = (0.0d0,0d0)  !  all b' below are g's in the draft
   complex(8), public, parameter :: b2 = (1.0d0,0d0)
   complex(8), public, parameter :: b3 = (0.0d0,0d0)
   complex(8), public, parameter :: b4 = (0.0d0,0d0)
@@ -302,8 +320,8 @@ integer, public :: LeptInEvent(0:8) = 0
   complex(8), public, parameter  :: c41= (0.0d0,0d0)
   complex(8), public, parameter  :: c42= (0.0d0,0d0)
   complex(8), public, parameter  :: c5 = (0.0d0,0d0)
-  complex(8), public, parameter  :: c6 = (0.0d0,0d0)  ! this coupling does not contribute to gamma+gamma final states
-  complex(8), public, parameter  :: c7 = (0.0d0,0d0)  ! this coupling does not contribute to gamma+gamma final states
+  complex(8), public, parameter  :: c6 = (0.0d0,0d0) ! this coupling does not contribute to gamma+gamma final states
+  complex(8), public, parameter  :: c7 = (0.0d0,0d0) ! this coupling does not contribute to gamma+gamma final states
 
 
 
@@ -375,7 +393,11 @@ integer, public :: LeptInEvent(0:8) = 0
 !  couplings for ttbar+H and bbar+H
    complex(8),    public, parameter :: kappa       = (1d0,0d0)
    complex(8),    public, parameter :: kappa_tilde = (0d0,0d0) 
- 
+!=====================================================
+
+!=====================================================
+!internal
+
 ! V-f-fbar couplings:
 !   g_R(f) = -e*sw/cw*Q(f)                 = e/2/sw/cw * a(b,c)R,
 !   g_L(f) = -e*sw/cw*Q(f) + e/sw/cw*T3(f) = e/2/sw/cw * a(b,c)L
@@ -391,7 +413,6 @@ integer, public :: LeptInEvent(0:8) = 0
 !   cR = -2*sw*cw*Q(f)
 !   cL = -2*sw*cw*Q(f)
 ! for V = photon*
-!
 !
 real(8), public, parameter :: aR_lep =-2d0*sitW**2*(-1d0)
 real(8), public, parameter :: aL_lep =-2d0*sitW**2*(-1d0)-1d0
@@ -477,7 +498,7 @@ real(8), public :: debugvar(0:10) = 0d0
 
 integer, public :: ijPartons(1:2)=0
 
-
+!=====================================================
 
 CONTAINS
 
