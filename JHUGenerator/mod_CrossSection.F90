@@ -208,12 +208,12 @@ IF( GENEVT ) THEN
           ICOLUP(1:2,2) = (/000,501/)
           ICOLUP(1:2,4) = (/000,502/)
           MY_IDUP(4) = MY_IDUP(2)  
-      elseif( MY_IDUP(1).gt.0 .and. MY_IDUP(1).ne.Glu_ .and. MY_IDUP(2).lt.0 ) then! qqb->qqb
+      elseif( MY_IDUP(1).gt.0 .and. MY_IDUP(1).ne.Glu_ .and. MY_IDUP(2).lt.0 ) then! qqb->Hg
           ICOLUP(1:2,1) = (/502,000/)
           ICOLUP(1:2,2) = (/000,501/)
           ICOLUP(1:2,4) = (/502,501/)
           MY_IDUP(4) = Glu_
-      elseif( MY_IDUP(1).lt.0 .and. MY_IDUP(2).gt.0 .and. MY_IDUP(2).ne.Glu_ ) then! qbq->qbq
+      elseif( MY_IDUP(1).lt.0 .and. MY_IDUP(2).gt.0 .and. MY_IDUP(2).ne.Glu_ ) then! qbq->Hg
           ICOLUP(1:2,1) = (/000,501/)
           ICOLUP(1:2,2) = (/502,000/)
           ICOLUP(1:2,4) = (/502,501/)
