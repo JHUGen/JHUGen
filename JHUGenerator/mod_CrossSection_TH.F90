@@ -129,12 +129,14 @@ real(8) :: pdf(-6:6,1:2),RES(-5:5,-5:5)
 real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi,MH_Inv,MuFac
 real(8) :: MomExt(1:4,1:9),MomOffShell(1:4,1:9),PSWgt,PSWgt2,PSWgt3
 real(8) :: LO_Res_Unpol(-6:6,-6:6),PreFac,PDFFac1,CS_Max,DKRnd
+real(8) :: WdecayKfactor
 integer :: NBin(1:NumHistograms),NHisto,iPartons(1:2),DKFlavor
 integer :: MY_IDUP(1:9),ICOLUP(1:2,1:9),nparton,DK_IDUP(1:6),DK_ICOLUP(1:2,3:6)
 logical :: applyPSCut,genEvt
 integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9
 include 'csmaxvalue.f'  
 EvalUnWeighted_TH = 0d0
+WdecayKfactor = 1d0
 
 
    call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
@@ -178,7 +180,9 @@ EvalUnWeighted_TH = 0d0
           MY_IDUP(b)   = Bot_;       ICOLUP(1:2,b)   = (/501,000/)
           MY_IDUP(W)   = DK_IDUP(1); ICOLUP(1:2,W)   = (/000,000/)
           MY_IDUP(lep) = DK_IDUP(3); ICOLUP(1:2,lep) = DK_ICOLUP(1:2,3)
-          MY_IDUP(nu)  = DK_IDUP(4); ICOLUP(1:2,nu)  = DK_ICOLUP(1:2,4)  
+          MY_IDUP(nu)  = DK_IDUP(4); ICOLUP(1:2,nu)  = DK_ICOLUP(1:2,4)
+
+          WdecayKfactor = ScaleFactor( convertLHE(DK_IDUP(3)),convertLHE(DK_IDUP(4)) )
       elseif( PROCESS.EQ.111 ) then
           ICOLUP(1:2,Hbos) = (/000,000/)
           ICOLUP(1:2,t)    = (/000,501/)
@@ -201,6 +205,8 @@ EvalUnWeighted_TH = 0d0
           MY_IDUP(W)   = DK_IDUP(2); ICOLUP(1:2,W)  = (/000,000/)             
           MY_IDUP(lep) = DK_IDUP(6); ICOLUP(1:2,lep)= DK_ICOLUP(1:2,6)
           MY_IDUP(nu)  = DK_IDUP(5); ICOLUP(1:2,nu) = DK_ICOLUP(1:2,5)  
+
+          WdecayKfactor = ScaleFactor( convertLHE(DK_IDUP(5)),convertLHE(DK_IDUP(6)) )
       elseif( PROCESS.EQ.112 ) then
           ICOLUP(1:2,Hbos) = (/000,000/)
           ICOLUP(1:2,t)    = (/502,000/)
@@ -219,6 +225,8 @@ EvalUnWeighted_TH = 0d0
           MY_IDUP(W)   = DK_IDUP(1); ICOLUP(1:2,W)   = (/000,000/)
           MY_IDUP(lep) = DK_IDUP(3); ICOLUP(1:2,lep) = DK_ICOLUP(1:2,3)
           MY_IDUP(nu)  = DK_IDUP(4); ICOLUP(1:2,nu)  = DK_ICOLUP(1:2,4)  
+
+          WdecayKfactor = ScaleFactor( convertLHE(DK_IDUP(3)),convertLHE(DK_IDUP(4)) )
       elseif( PROCESS.EQ.113 ) then   
           ICOLUP(1:2,Hbos) = (/000,000/)
           ICOLUP(1:2,t)    = (/000,502/)
@@ -237,6 +245,8 @@ EvalUnWeighted_TH = 0d0
           MY_IDUP(W)   = DK_IDUP(2); ICOLUP(1:2,W)  = (/000,000/)             
           MY_IDUP(lep) = DK_IDUP(6); ICOLUP(1:2,lep)= DK_ICOLUP(1:2,6)
           MY_IDUP(nu)  = DK_IDUP(5); ICOLUP(1:2,nu) = DK_ICOLUP(1:2,5)  
+
+          WdecayKfactor = ScaleFactor( convertLHE(DK_IDUP(5)),convertLHE(DK_IDUP(6)) )
       endif
 
    ELSE
@@ -272,7 +282,7 @@ EvalUnWeighted_TH = 0d0
    ENDIF
 
    FluxFac = 1d0/(2d0*EHat**2)
-   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt
+   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * WdecayKfactor
 
    call Kinematics_TH(MomOffShell,applyPSCut,NBin)
    if( applyPSCut .or. PSWgt.eq.zero ) return
