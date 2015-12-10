@@ -1231,8 +1231,8 @@ if( (iSel.eq.pdfUp_ .and. jSel.eq.pdfAUp_) .or. (iSel.eq.pdfChm_ .and. jSel.eq.p
                 (abs(amp_z(-1,+1))**2) * Lu * Ru + &
                 (abs(amp_z(+1,-1))**2) * Ru * Lu + &
                 (abs(amp_z(+1,+1))**2) * Ru * Ru) * couplz**2 * SpinAvg * tag1
-       else            
-          amp_w = A0_VV_4f(3,j1,j2,4,za,zb,sprod,m_w,ga_w,useWWcoupl=.true.,Wpm_flip=.true.)
+       else
+          amp_w = A0_VV_4f(4,j1,j2,3,za,zb,sprod,m_w,ga_w,useWWcoupl=.true.,Wpm_flip=.true.)
           restmp = abs(amp_w(-1,-1))**2 * couplw**2 * SpinAvg * tag2
        endif
 
@@ -1376,7 +1376,7 @@ if( (iSel.eq.pdfDn_ .and. jSel.eq.pdfADn_) .or. (iSel.eq.pdfStr_ .and. jSel.eq.p
                 (abs(amp_z(+1,-1))**2) * Rd * Ld + &
                 (abs(amp_z(+1,+1))**2) * Rd * Rd) * couplz**2 * SpinAvg * tag1
        else
-          amp_w = A0_VV_4f(3,j1,j2,4,za,zb,sprod,m_w,ga_w,useWWcoupl=.true.,Wpm_flip=.false.)
+          amp_w = A0_VV_4f(4,j1,j2,3,za,zb,sprod,m_w,ga_w,useWWcoupl=.true.,Wpm_flip=.false.)
           restmp = abs(amp_w(-1,-1))**2 * couplw**2 * SpinAvg * tag2
        endif
 
@@ -1623,7 +1623,7 @@ if( (jSel.eq.pdfUp_ .and. iSel.eq.pdfAUp_) .or. (jSel.eq.pdfChm_ .and. iSel.eq.p
                 (abs(amp_z(+1,-1))**2) * Ru * Lu + &
                 (abs(amp_z(+1,+1))**2) * Ru * Ru) * couplz**2 * SpinAvg * tag1
        else
-            amp_w = A0_VV_4f(3,j1,j2,4,za,zb,sprod,m_w,ga_w,useWWcoupl=.true.,Wpm_flip=.true.)
+            amp_w = A0_VV_4f(4,j1,j2,3,za,zb,sprod,m_w,ga_w,useWWcoupl=.true.,Wpm_flip=.true.)
             restmp= abs(amp_w(-1,-1))**2 * couplw**2 * SpinAvg * tag2
        endif       
 
@@ -1769,7 +1769,7 @@ if( (jSel.eq.pdfDn_ .and. iSel.eq.pdfADn_) .or. (jSel.eq.pdfStr_ .and. iSel.eq.p
                 (abs(amp_z(+1,-1))**2) * Rd * Ld + &
                 (abs(amp_z(+1,+1))**2) * Rd * Rd) * couplz**2 * SpinAvg * tag1
        else
-          amp_w = A0_VV_4f(3,j1,j2,4,za,zb,sprod,m_w,ga_w,useWWcoupl=.true.,Wpm_flip=.false.)
+          amp_w = A0_VV_4f(4,j1,j2,3,za,zb,sprod,m_w,ga_w,useWWcoupl=.true.,Wpm_flip=.false.)
           restmp= abs(amp_w(-1,-1))**2 * couplw**2 * SpinAvg * tag2
        endif
        

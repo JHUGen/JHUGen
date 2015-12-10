@@ -3,7 +3,7 @@ implicit none
 save
 ! 
 ! 
-character(len=6),parameter :: JHUGen_Version="v6.7.4"
+character(len=6),parameter :: JHUGen_Version="v6.7.5"
 ! 
 ! 
 integer, public :: Collider, PDFSet,PChannel,Process,DecayMode1,DecayMode2,TopDecays,TauDecays
@@ -632,6 +632,59 @@ endif
 
 END FUNCTION
 
+
+FUNCTION ScaleFactor(id1in,id2in)
+implicit none
+real(8) :: ScaleFactor
+integer :: id1, id2, id1in, id2in
+id1 = abs(id1in)
+id2 = abs(id2in)
+
+! W->qq
+if((id1.eq.convertLHE(Up_)  .and.  id2.eq.convertLHE(Dn_))  .or.  (id1.eq.convertLHE(Dn_)  .and.  id2.eq.convertLHE(Up_)))then
+  ScaleFactor = scale_alpha_W_ud
+elseif((id1.eq.convertLHE(Up_)  .and.  id2.eq.convertLHE(Str_))  .or.  (id1.eq.convertLHE(Str_)  .and.  id2.eq.convertLHE(Up_)))then
+  ScaleFactor = scale_alpha_W_ud
+elseif((id1.eq.convertLHE(Up_)  .and.  id2.eq.convertLHE(Bot_))  .or.  (id1.eq.convertLHE(Bot_)  .and.  id2.eq.convertLHE(Up_)))then
+  ScaleFactor = scale_alpha_W_ud
+elseif((id1.eq.convertLHE(Chm_)  .and.  id2.eq.convertLHE(Dn_))  .or.  (id1.eq.convertLHE(Dn_)  .and.  id2.eq.convertLHE(Chm_)))then
+  ScaleFactor = scale_alpha_W_cs
+elseif((id1.eq.convertLHE(Chm_)  .and.  id2.eq.convertLHE(Str_))  .or.  (id1.eq.convertLHE(Str_)  .and.  id2.eq.convertLHE(Chm_)))then
+  ScaleFactor = scale_alpha_W_cs
+elseif((id1.eq.convertLHE(Chm_)  .and.  id2.eq.convertLHE(Bot_))  .or.  (id1.eq.convertLHE(Bot_)  .and.  id2.eq.convertLHE(Chm_)))then
+  ScaleFactor = scale_alpha_W_cs
+! W-> td
+elseif((id1.eq.convertLHE(Top_)  .and.  id2.eq.convertLHE(Dn_))  .or.  (id1.eq.convertLHE(Dn_)  .and.  id2.eq.convertLHE(Top_)))then
+  ScaleFactor = 1d0
+elseif((id1.eq.convertLHE(Top_)  .and.  id2.eq.convertLHE(Str_))  .or.  (id1.eq.convertLHE(Str_)  .and.  id2.eq.convertLHE(Top_)))then
+  ScaleFactor = 1d0
+elseif((id1.eq.convertLHE(Top_)  .and.  id2.eq.convertLHE(Bot_))  .or.  (id1.eq.convertLHE(Bot_)  .and.  id2.eq.convertLHE(Top_)))then
+  ScaleFactor = 1d0
+! W->lnu
+elseif((abs(id1).eq.abs(convertLHE(NuT_))  .and.  abs(id2).eq.abs(convertLHE(TaP_)))  .or.  (abs(id1).eq.abs(convertLHE(TaP_))  .and.  abs(id2).eq.abs(convertLHE(NuT_))))then
+  ScaleFactor = scale_alpha_W_tn
+elseif((abs(id1).eq.abs(convertLHE(NuM_))  .and.  abs(id2).eq.abs(convertLHE(MuP_)))  .or.  (abs(id1).eq.abs(convertLHE(MuP_))  .and.  abs(id2).eq.abs(convertLHE(NuM_))))then
+  ScaleFactor = scale_alpha_W_ln
+elseif((abs(id1).eq.abs(convertLHE(NuE_))  .and.  abs(id2).eq.abs(convertLHE(ElP_)))  .or.  (abs(id1).eq.abs(convertLHE(ElP_))  .and.  abs(id2).eq.abs(convertLHE(NuE_))))then
+  ScaleFactor = scale_alpha_W_ln
+! Z->qq
+elseif((id1.eq.convertLHE(Up_)  .and.  id2.eq.convertLHE(Up_))  .or.  (id1.eq.convertLHE(Chm_)  .and.  id2.eq.convertLHE(Chm_)))then
+  ScaleFactor = scale_alpha_Z_uu
+elseif((id1.eq.convertLHE(Dn_)  .and.  id2.eq.convertLHE(Dn_))  .or.  (id1.eq.convertLHE(Str_)  .and.  id2.eq.convertLHE(Str_))  .or.  (id1.eq.convertLHE(Bot_)  .and.  id2.eq.convertLHE(Bot_)))then
+  ScaleFactor = scale_alpha_Z_dd
+! Z-> ll, nunu
+elseif(id1.eq.convertLHE(TaP_)  .and.  id2.eq.convertLHE(TaP_))then
+  ScaleFactor = scale_alpha_Z_tt
+elseif((id1.eq.convertLHE(MuP_)  .and.  id2.eq.convertLHE(MuP_))  .or.  (id1.eq.convertLHE(ElP_)  .and.  id2.eq.convertLHE(ElP_)))then
+  ScaleFactor = scale_alpha_Z_ll
+elseif((id1.eq.convertLHE(NuT_)  .and.  id2.eq.convertLHE(NuT_))  .or.  (id1.eq.convertLHE(NuM_)  .and.  id2.eq.convertLHE(NuM_))  .or.  (id1.eq.convertLHE(NuE_)  .and.  id2.eq.convertLHE(NuE_)))then
+  ScaleFactor = scale_alpha_Z_nn
+! Everything else
+else
+  ScaleFactor = 1d0
+endif
+
+END FUNCTION
 
 
 
