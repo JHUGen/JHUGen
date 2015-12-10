@@ -4840,9 +4840,11 @@ type(PtrToParticle) :: Particles(:)
 integer :: i1,i2,j
 
    SumMom(1:Dv)= (0d0,0d0)
-   do j=i1,i2
-      SumMom(1:Dv) = SumMom(1:Dv) + Particles(j)%Mom(1:Dv)
-   enddo
+   if (i2.ge.i1) then
+      do j=i1,i2
+         SumMom(1:Dv) = SumMom(1:Dv) + Particles(j)%Mom(1:Dv)
+      enddo
+   endif
 END FUNCTION
 
 
