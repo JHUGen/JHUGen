@@ -3358,7 +3358,7 @@ real(8) :: FlavorRnd,sumCKM,Vsq(1:3)
     call random_number(FlavorRnd)
 
     
-    if( abs(Flavor).eq.abs(Up_) ) then   
+    if( abs(Flavor).eq.abs(Up_) ) then
         Vsq(1) = (CKM( convertLHEreverse(abs(Flavor)), convertLHEreverse(abs(Dn_)) ))**2
         Vsq(2) = (CKM( convertLHEreverse(abs(Flavor)), convertLHEreverse(abs(Str_)) ))**2
         Vsq(3) = (CKM( convertLHEreverse(abs(Flavor)), convertLHEreverse(abs(Bot_)) ))**2
@@ -3409,7 +3409,7 @@ real(8) :: FlavorRnd,sumCKM,Vsq(1:3)
         endif
 
 
-    elseif( abs(Flavor).eq.abs(Dn_) ) then   
+    elseif( abs(Flavor).eq.abs(Dn_) ) then
         Vsq(1) = (CKM( convertLHEreverse(abs(Flavor)), convertLHEreverse(abs(Up_)) ))**2
         Vsq(2) = (CKM( convertLHEreverse(abs(Flavor)), convertLHEreverse(abs(Chm_)) ))**2
         Vsq(3) = (CKM( convertLHEreverse(abs(Flavor)), convertLHEreverse(abs(Top_)) ))**2
@@ -3460,23 +3460,86 @@ real(8) :: FlavorRnd,sumCKM,Vsq(1:3)
         endif
     
     else
-    
         call Error("Dn flavor conversion not yet implemented")
-!     elseif( abs(Flavor).eq.abs(Dn_) ) then
-!     elseif( abs(Flavor).eq.abs(Str_) ) then
-!     elseif( abs(Flavor).eq.abs(Bot_) ) then
-    
     endif
-    
-    
-
-
 
 RETURN
 END FUNCTION
 
 
+FUNCTION GetCKMPartner_flat( Flavor )
+use modMisc
+use modParameters
+implicit none
+integer :: Flavor,GetCKMPartner_flat
+real(8) :: FlavorRnd,sumCKM,Vsq(1:3)
 
+    call random_number(FlavorRnd)
+    Vsq(:) = 1d0
+    sumCKM = Vsq(1)+Vsq(2)+Vsq(3)
+    FlavorRnd = FlavorRnd*sumCKM
+    
+    if( abs(Flavor).eq.abs(Up_) ) then
+        if( FlavorRnd.le.Vsq(1) ) then!  u-->d
+           GetCKMPartner_flat = -sign(1,Flavor) * abs(Dn_)
+        elseif( FlavorRnd.le.(Vsq(2)+Vsq(1)) ) then!  u-->s
+           GetCKMPartner_flat = -sign(1,Flavor) * abs(Str_)
+        else!  u-->b
+           GetCKMPartner_flat = -sign(1,Flavor) * abs(Bot_)
+        endif
+        
+    elseif( abs(Flavor).eq.abs(Chm_) ) then
+        if( FlavorRnd.le.Vsq(2) ) then!  c-->s
+           GetCKMPartner_flat = -sign(1,Flavor) * abs(Str_)     
+        elseif( FlavorRnd.le.(Vsq(1)+Vsq(2)) ) then!  c-->d
+           GetCKMPartner_flat = -sign(1,Flavor) * abs(Dn_)
+        else!  c-->b
+           GetCKMPartner_flat = -sign(1,Flavor) * abs(Bot_)
+        endif
+
+    elseif( abs(Flavor).eq.abs(Top_) ) then
+        if( FlavorRnd.le.Vsq(3) ) then!  t-->b
+           GetCKMPartner_flat = -sign(1,Flavor) * abs(Bot_)
+        elseif( FlavorRnd.le.(Vsq(2)+Vsq(3)) ) then!  t-->s
+           GetCKMPartner_flat = -sign(1,Flavor) * abs(Str_)
+        else!  t-->d
+           GetCKMPartner_flat = -sign(1,Flavor) * abs(Dn_)
+        endif
+
+
+    elseif( abs(Flavor).eq.abs(Dn_) ) then
+        if( FlavorRnd.le.Vsq(1) ) then!  d-->u
+           GetCKMPartner_flat = -sign(1,Flavor) * abs(Up_)
+        elseif( FlavorRnd.le.(Vsq(2)+Vsq(1)) ) then!  d-->c
+           GetCKMPartner_flat = -sign(1,Flavor) * abs(Chm_)
+        else!  d-->t
+           GetCKMPartner_flat = -sign(1,Flavor) * abs(Top_)
+        endif
+        
+    elseif( abs(Flavor).eq.abs(Str_) ) then
+        if( FlavorRnd.le.Vsq(2) ) then!  s-->c
+           GetCKMPartner_flat = -sign(1,Flavor) * abs(Chm_)     
+        elseif( FlavorRnd.le.(Vsq(1)+Vsq(2)) ) then!  s-->u
+           GetCKMPartner_flat = -sign(1,Flavor) * abs(Up_)
+        else!  s-->t
+           GetCKMPartner_flat = -sign(1,Flavor) * abs(Top_)
+        endif
+
+    elseif( abs(Flavor).eq.abs(Bot_) ) then
+        if( FlavorRnd.le.Vsq(3) ) then!  b-->t
+           GetCKMPartner_flat = -sign(1,Flavor) * abs(Top_)
+        elseif( FlavorRnd.le.(Vsq(2)+Vsq(3)) ) then!  b-->c
+           GetCKMPartner_flat = -sign(1,Flavor) * abs(Chm_)
+        else!  b -->u
+           GetCKMPartner_flat = -sign(1,Flavor) * abs(Up_)
+        endif
+    
+    else
+        call Error("Dn flavor conversion not yet implemented")
+    endif
+
+RETURN
+END FUNCTION
 
 
 
@@ -4624,6 +4687,142 @@ ENDIF
 RETURN
 END SUBROUTINE
 
+
+
+SUBROUTINE EvalPhasespace_VBF_deterministic(xchannel,xRnd,Energy,iSel,jSel,rSel,sSel,Mom,Jac) ! TESTING PURPOSES
+use ModParameters
+use ModPhasespace
+use ModMisc
+implicit none
+integer, intent(in) :: iSel,jSel,rSel,sSel
+real(8) :: xchannel, xRnd(:), Energy, Mom(:,:)
+integer :: jz1, jz2, jw1, jw2 ! incoming partons
+integer :: kz1, kz2, kw1, kw2 ! outgoing partons
+logical :: ZZ_fusion,WW_fusion
+real(8) :: Jac,Jac1,Jac2,Jac3,Mom_ij_Dummy(1:4),s35,s45
+
+   Mom(1:4,1) = 0.5d0*Energy * (/+1d0,0d0,0d0,+1d0/)
+   Mom(1:4,2) = 0.5d0*Energy * (/+1d0,0d0,0d0,-1d0/)
+
+	ZZ_fusion=.false.
+	WW_fusion=.false.
+
+	jz1 = 1
+	jz2 = 2
+	jw1 = jz1
+	jw2 = jz2
+
+	if( &
+	(iSel.eq.rSel .and. jSel.eq.sSel) &
+	.or. &
+	(iSel.eq.sSel .and. jSel.eq.rSel) &
+	) then
+	   ZZ_fusion=.true.
+	   if( iSel.eq.sSel .and. jSel.eq.rSel ) then
+	      kz1 = 4
+	      kz2 = 3
+	   else
+	      kz1 = 3
+		  kz2 = 4
+	   endif
+	endif
+
+	if( &
+	( (sign(iSel,rSel).eq.iSel .and. sign(jSel,sSel).eq.jSel) .and. (abs(iSel-rSel).eq.1 .or. abs(iSel-rSel).eq.3 .or. abs(iSel-rSel).eq.5) .and. (abs(jSel-sSel).eq.1 .or. abs(jSel-sSel).eq.3 .or. abs(jSel-sSel).eq.5) ) &
+	.or. &
+	( (sign(iSel,sSel).eq.iSel .and. sign(jSel,rSel).eq.jSel) .and. (abs(iSel-sSel).eq.1 .or. abs(iSel-sSel).eq.3 .or. abs(iSel-sSel).eq.5) .and. (abs(jSel-rSel).eq.1 .or. abs(jSel-rSel).eq.3 .or. abs(jSel-rSel).eq.5) ) &
+	) then
+	   WW_fusion=.true.
+	   ! W_is W_jr fusion
+	   if( (sign(iSel,sSel).eq.iSel .and. sign(jSel,rSel).eq.jSel) .and. (abs(iSel-sSel).eq.1 .or. abs(iSel-sSel).eq.3 .or. abs(iSel-sSel).eq.5) .and. (abs(jSel-rSel).eq.1 .or. abs(jSel-rSel).eq.3 .or. abs(jSel-rSel).eq.5) ) then
+	      kw1 = 4
+	      kw2 = 3
+	   else	! W_ir W_js fusion
+	      kw1 = 3
+	      kw2 = 4	      
+	   endif
+	endif
+
+   if(WW_fusion .and. .not.ZZ_fusion) then
+      if(xchannel .lt. 0.5) then
+         Jac1 = k_l(xRnd(1),M_Reso**2,Energy**2,s35)                                                                                   !  int d(s35)  
+         Jac2 = t_channel_prop_decay(Mom(1:4,jw1),Mom(1:4,jw2),M_W**2,s35,0d0,xRnd(2:3),Mom_ij_Dummy(1:4),Mom(1:4,kw2))                !  1+2 --> (35)+4
+         Jac3 = t_channel_prop_decay(Mom(1:4,jw1),Mom(1:4,jw2)-Mom(1:4,kw2),M_W**2,0d0,M_Reso**2,xRnd(4:5),Mom(1:4,kw1),Mom(1:4,5))    !  1+(24) --> 3+5
+         Jac = Jac1*Jac2*Jac3 * PSNorm3                                                                                                !  combine   
+      else
+         Jac1 = k_l(xRnd(1),M_Reso**2,Energy**2,s45)                                                                                   !  int d(s45)  
+         Jac2 = t_channel_prop_decay(Mom(1:4,jw1),Mom(1:4,jw2),M_W**2,0d0,s45,xRnd(2:3),Mom(1:4,kw1),Mom_ij_Dummy(1:4))                !  1+2 --> 3+(45) 
+         Jac3 = t_channel_prop_decay(Mom(1:4,jw1)-Mom(1:4,kw1),Mom(1:4,jw2),M_W**2,0d0,M_Reso**2,xRnd(4:5),Mom(1:4,kw2),Mom(1:4,5))    !  (13)+2 --> 4+5
+         Jac = Jac1*Jac2*Jac3 * PSNorm3                                                                                                !  combine   
+      endif
+   elseif(ZZ_fusion .and. .not.WW_fusion) then
+      if(iSel .eq.jSel) then
+         if(xchannel .lt. 0.25) then
+            Jac1 = k_l(xRnd(1),M_Reso**2,Energy**2,s35)                                                                                   !  int d(s35)  
+            Jac2 = t_channel_prop_decay(Mom(1:4,jz1),Mom(1:4,jz2),M_Z**2,s35,0d0,xRnd(2:3),Mom_ij_Dummy(1:4),Mom(1:4,kz2))                !  1+2 --> (35)+4
+            Jac3 = t_channel_prop_decay(Mom(1:4,jz1),Mom(1:4,jz2)-Mom(1:4,kz2),M_Z**2,0d0,M_Reso**2,xRnd(4:5),Mom(1:4,kz1),Mom(1:4,5))    !  1+(24) --> 3+5
+            Jac = Jac1*Jac2*Jac3 * PSNorm3                                                                                                !  combine   
+         elseif(xchannel .lt. 0.5) then
+            Jac1 = k_l(xRnd(1),M_Reso**2,Energy**2,s45)                                                                                   !  int d(s45)  
+            Jac2 = t_channel_prop_decay(Mom(1:4,jz1),Mom(1:4,jz2),M_Z**2,0d0,s45,xRnd(2:3),Mom(1:4,kz1),Mom_ij_Dummy(1:4))                !  1+2 --> 3+(45) 
+            Jac3 = t_channel_prop_decay(Mom(1:4,jz1)-Mom(1:4,kz1),Mom(1:4,jz2),M_Z**2,0d0,M_Reso**2,xRnd(4:5),Mom(1:4,kz2),Mom(1:4,5))    !  (13)+2 --> 4+5
+            Jac = Jac1*Jac2*Jac3 * PSNorm3                                                                                                !  combine   
+         elseif(xchannel .lt. 0.75) then
+            Jac1 = k_l(xRnd(1),M_Reso**2,Energy**2,s35)                                                                                   !  int d(s35)  
+            Jac2 = t_channel_prop_decay(Mom(1:4,jz2),Mom(1:4,jz1),M_Z**2,s35,0d0,xRnd(2:3),Mom_ij_Dummy(1:4),Mom(1:4,kz2))                !  2+1 --> (35)+4
+            Jac3 = t_channel_prop_decay(Mom(1:4,jz2),Mom(1:4,jz1)-Mom(1:4,kz2),M_Z**2,0d0,M_Reso**2,xRnd(4:5),Mom(1:4,kz1),Mom(1:4,5))    !  2+(14) --> 3+5
+            Jac = Jac1*Jac2*Jac3 * PSNorm3                                                                                                !  combine   
+         else
+            Jac1 = k_l(xRnd(1),M_Reso**2,Energy**2,s45)                                                                                   !  int d(s45)  
+            Jac2 = t_channel_prop_decay(Mom(1:4,jz2),Mom(1:4,jz1),M_Z**2,0d0,s45,xRnd(2:3),Mom(1:4,kz1),Mom_ij_Dummy(1:4))                !  2+1 --> 3+(45) 
+            Jac3 = t_channel_prop_decay(Mom(1:4,jz2)-Mom(1:4,kz1),Mom(1:4,jz1),M_Z**2,0d0,M_Reso**2,xRnd(4:5),Mom(1:4,kz2),Mom(1:4,5))    !  (23)+1 --> 4+5
+            Jac = Jac1*Jac2*Jac3 * PSNorm3                                                                                                !  combine   
+         endif
+	  else
+         if(xchannel .lt. 0.5) then
+            Jac1 = k_l(xRnd(1),M_Reso**2,Energy**2,s35)                                                                                   !  int d(s35)  
+            Jac2 = t_channel_prop_decay(Mom(1:4,jz1),Mom(1:4,jz2),M_Z**2,s35,0d0,xRnd(2:3),Mom_ij_Dummy(1:4),Mom(1:4,kz2))                !  1+2 --> (35)+4
+            Jac3 = t_channel_prop_decay(Mom(1:4,jz1),Mom(1:4,jz2)-Mom(1:4,kz2),M_Z**2,0d0,M_Reso**2,xRnd(4:5),Mom(1:4,kz1),Mom(1:4,5))    !  1+(24) --> 3+5
+            Jac = Jac1*Jac2*Jac3 * PSNorm3                                                                                                !  combine   
+         else
+            Jac1 = k_l(xRnd(1),M_Reso**2,Energy**2,s45)                                                                                   !  int d(s45)  
+            Jac2 = t_channel_prop_decay(Mom(1:4,jz1),Mom(1:4,jz2),M_Z**2,0d0,s45,xRnd(2:3),Mom(1:4,kz1),Mom_ij_Dummy(1:4))                !  1+2 --> 3+(45) 
+            Jac3 = t_channel_prop_decay(Mom(1:4,jz1)-Mom(1:4,kz1),Mom(1:4,jz2),M_Z**2,0d0,M_Reso**2,xRnd(4:5),Mom(1:4,kz2),Mom(1:4,5))    !  (13)+2 --> 4+5
+            Jac = Jac1*Jac2*Jac3 * PSNorm3                                                                                                !  combine   
+         endif
+	  endif
+   elseif(ZZ_fusion .and. WW_fusion) then
+      if(xchannel .lt. 0.25) then
+         Jac1 = k_l(xRnd(1),M_Reso**2,Energy**2,s35)                                                                                   !  int d(s35)  
+         Jac2 = t_channel_prop_decay(Mom(1:4,jz1),Mom(1:4,jz2),M_Z**2,s35,0d0,xRnd(2:3),Mom_ij_Dummy(1:4),Mom(1:4,kz2))                !  1+2 --> (35)+4
+         Jac3 = t_channel_prop_decay(Mom(1:4,jz1),Mom(1:4,jz2)-Mom(1:4,kz2),M_Z**2,0d0,M_Reso**2,xRnd(4:5),Mom(1:4,kz1),Mom(1:4,5))    !  1+(24) --> 3+5
+         Jac = Jac1*Jac2*Jac3 * PSNorm3                                                                                                !  combine   
+      elseif(xchannel .lt. 0.5) then
+         Jac1 = k_l(xRnd(1),M_Reso**2,Energy**2,s45)                                                                                   !  int d(s45)  
+         Jac2 = t_channel_prop_decay(Mom(1:4,jz1),Mom(1:4,jz2),M_Z**2,0d0,s45,xRnd(2:3),Mom(1:4,kz1),Mom_ij_Dummy(1:4))                !  1+2 --> 3+(45) 
+         Jac3 = t_channel_prop_decay(Mom(1:4,jz1)-Mom(1:4,kz1),Mom(1:4,jz2),M_Z**2,0d0,M_Reso**2,xRnd(4:5),Mom(1:4,kz2),Mom(1:4,5))    !  (13)+2 --> 4+5
+         Jac = Jac1*Jac2*Jac3 * PSNorm3                                                                                                !  combine   
+      elseif(xchannel .lt. 0.75) then
+         Jac1 = k_l(xRnd(1),M_Reso**2,Energy**2,s35)                                                                                   !  int d(s35)  
+         Jac2 = t_channel_prop_decay(Mom(1:4,jw1),Mom(1:4,jw2),M_W**2,s35,0d0,xRnd(2:3),Mom_ij_Dummy(1:4),Mom(1:4,kw2))                !  1+2 --> (35)+4
+         Jac3 = t_channel_prop_decay(Mom(1:4,jw1),Mom(1:4,jw2)-Mom(1:4,kw2),M_W**2,0d0,M_Reso**2,xRnd(4:5),Mom(1:4,kw1),Mom(1:4,5))    !  1+(24) --> 3+5
+         Jac = Jac1*Jac2*Jac3 * PSNorm3                                                                                                !  combine   
+      else
+         Jac1 = k_l(xRnd(1),M_Reso**2,Energy**2,s45)                                                                                   !  int d(s45)  
+         Jac2 = t_channel_prop_decay(Mom(1:4,jw1),Mom(1:4,jw2),M_W**2,0d0,s45,xRnd(2:3),Mom(1:4,kw1),Mom_ij_Dummy(1:4))                !  1+2 --> 3+(45) 
+         Jac3 = t_channel_prop_decay(Mom(1:4,jw1)-Mom(1:4,kw1),Mom(1:4,jw2),M_W**2,0d0,M_Reso**2,xRnd(4:5),Mom(1:4,kw2),Mom(1:4,5))    !  (13)+2 --> 4+5
+         Jac = Jac1*Jac2*Jac3 * PSNorm3                                                                                                !  combine   
+      endif
+
+   endif
+
+      if( IsNaN(Jac) ) then! THIS SHOULD BE REMOVED AFTER DEBUGGING
+         Jac = 0d0
+         print *, "ERROR in EvalPhasespace_VBF_deterministic, NaN Jac",Energy,xchannel,xRnd
+      endif
+   
+RETURN
+END SUBROUTINE
 
 
 
