@@ -72,7 +72,9 @@ The list of command line configurables and the default values are (also defined 
 \begin{verbatim}
     Collider:        1=LHC, 2=Tevatron, 0=e+e-
     Process:         0=spin-0, 1=spin-1, 2=spin-2 resonance, 50=pp/ee->VH,
-                     60=weakVBF, 61=pp->Hjj, 62=pp->Hj, 80=ttH, 90=bbH
+                     60=weakVBF, 61=pp->Hjj, 62=pp->Hj, 80=ttH, 90=bbH,
+                     110=t+H t channel, 111=tbar+H t channel,
+                     112=t+H s channel, 113=tbar+H s channel
     MReso:           resonance mass (default=125.00), format: yyy.xx
     DecayMode1:      decay mode for vector boson 1 (Z/W/gamma)
     DecayMode2:      decay mode for vector boson 2 (Z/W/gamma)
@@ -96,7 +98,7 @@ The list of command line configurables and the default values are (also defined 
     ConvertLHE:      Convert decay of the V from VH production.
                      Use DecayMode1 to specify the decay.
                      (should be a Z or W mode, depending on the input file)
-    TopDK:           For Process=80, 0=leave top quarks as stable, 1=decay top quarks
+    TopDK:           For ttH or t+H, 0=leave top quarks as stable, 1=decay top quarks
     FilterNLept:     For decay mode, reject events that have less than FilterNLept leptons
     FilterOSPairs:   For decay mode, reject events that have less than FilterOSPairs pairs of
                        sign leptons of any flavor.
@@ -117,6 +119,7 @@ A few more details on some particular parameters:
 \item \verb|DecayMode1,2=7|: Valid for spin-0 and spin-2.  Only OffXVV=000 or 100 are possible.
 \item In $VH$ production and \verb|ConvertLHE| mode, \verb|DecayMode1| is used for the decay of the $V$.  If it is a $Z$ decay mode, $ZH$ will be produced; if it is a $W$ decay mode, $WH$ will be produced.
 \item In $ttH$ production, \verb|DecayMode1| and \verb|DecayMode2| are used to decay the $W$ bosons from the top decay.  Only $W$ decay modes are allowed.
+\item In $t+H$ production, \verb|DecayMode1| is used to decay the W boson from the top decay.
 \item \verb|Interf|: For final states with 4 same flavor fermions, this parameter controls whether or not to include interference effects.
 \end{itemize}
 
@@ -125,42 +128,47 @@ Examples of running the generator:
 \item $gg$ production:
 \begin{verbatim}
 ./JHUGen Collider=1 Process=0 VegasNc2=100000 PChannel=0 OffXVV=011 DecayMode1=0 \\
-		DecayMode2=0 Unweighted=1 DataFile=test1
+		DecayMode2=0 Unweighted=1 DataFile=ggHZZ4l
 \end{verbatim}
 \item $ggH \to Z\gamma$
 \begin{verbatim}
-./JHUGen DecayMode1=0 DecayMode2=7 OffXVV=010
+./JHUGen DecayMode1=0 DecayMode2=7 OffXVV=010 DataFile=ggHgammaZ2l
 \end{verbatim}
 \item $ZH$ with hadronic $Z$ decay (change \verb|DecayMode1| for other $Z$ decays; both $pp$ and $e^+e^-$ Collider options possible):
 \begin{verbatim}
 ./JHUGen Collider=1 Process=50 DecayMode1=1 Unweighted=1 VegasNc2=100000 \\
-		OffXVV=011 DataFile=test2
+		OffXVV=011 DataFile=ZH
 \end{verbatim}
 \item $WH$ with leptonic $W$ decay (change \verb|DecayMode1| for other $W$ decays):
 \begin{verbatim}
 ./JHUGen Collider=1 Process=50 DecayMode1=4 Unweighted=1 VegasNc2=100000 \\
-		OffXVV=011 DataFile=test2
+		OffXVV=011 DataFile=WH
 \end{verbatim}
 \item VBF:
 \begin{verbatim}
-./JHUGen Collider=1 Process=60 Unweighted=1 VegasNc2=100000 OffXVV=011 DataFile=test2
+./JHUGen Collider=1 Process=60 Unweighted=1 VegasNc2=100000 OffXVV=011 DataFile=VBF
 \end{verbatim}
 \item $H+jj$:
 \begin{verbatim}
-./JHUGen Collider=1 Process=61 Unweighted=1 VegasNc2=100000 OffXVV=011 DataFile=test3
+./JHUGen Collider=1 Process=61 Unweighted=1 VegasNc2=100000 OffXVV=011 DataFile=Hjj
 \end{verbatim}
 \item $H+j$:
 \begin{verbatim}
-./JHUGen Collider=1 Process=62 Unweighted=1 VegasNc2=100000 OffXVV=011 DataFile=test4
+./JHUGen Collider=1 Process=62 Unweighted=1 VegasNc2=100000 OffXVV=011 DataFile=Hj
 \end{verbatim}
 \item $pp \to t\bar{t}+H$ with inclusive top decay (change \verb|DecayMode1,2| for specific $tt$ decays):
 \begin{verbatim}
 ./JHUGen Collider=1 Process=80 DecayMode1=11 DecayMode2=11 Unweighted=1 \\
-		VegasNc2=100000 OffXVV=011 DataFile=test5
+		VegasNc2=100000 OffXVV=011 DataFile=ttH
 \end{verbatim}
 \item $pp \to b\bar{b}+H$:
 \begin{verbatim}
-./JHUGen Collider=1 Process=90 Unweighted=1 VegasNc2=100000 OffXVV=011 DataFile=test6
+./JHUGen Collider=1 Process=90 Unweighted=1 VegasNc2=100000 OffXVV=011 DataFile=bbH
+\end{verbatim}
+\item $pp \to t+H$, $t$ channel with inclusive top decay (change \verb|DecayMode1| for specific $t$ decays; similar syntax for processes 111--113):
+\begin{verbatim}
+./JHUGen Collider=1 Process=110 DecayMode1=11 Unweighted=1 \\
+		VegasNc2=100000 OffXVV=011 DataFile=tH_s
 \end{verbatim}
 \end{itemize}
 
@@ -181,7 +189,7 @@ Examples of running the generator:
 %\end{center}
 
 \noindent
-For generating Higgs decay in VBF, H+J(J), VH, or ttbH production
+For generating Higgs decay in VBF, $H+j(j)$, $VH$, $ttbH$, or $tH$ production
 modes by the JHU generator or NLO gluon fusion with another generator (e.g. POWHEG), use JHU generator in \verb|ReadLHE|
 mode and specify the decay mode of interest (ZZ, WW, gam gam, Z gam), while the SM fermionic decays
 may be generated by Pythia without loss of generality.
@@ -265,7 +273,7 @@ real(8), public, parameter :: pTjetcut = 15d0*GeV           ! jet min pt
 real(8), public, parameter :: Rjet = 0.3d0                  ! jet deltaR, antikt algorithm
 real(8), public, parameter :: mJJcut = 0d0*GeV              ! minimum mJJ for VBF, HJJ, bbH
 \end{verbatim}
-All three cuts are used in processes 60 (VBF), 61 ($H+jj$), 90 ($bbH$), and also 80 ($ttH$) if \verb|m_Top| is set to be light ($<10 \text{GeV}$).  \verb|pTjetcut| is also used in process 62 ($H+j$).
+All three cuts are used in processes 60 (VBF), 61 ($H+jj$), 90 ($bbH$), and also 80 ($ttH$) if \verb|m_Top| is set to be light ($<10 \text{GeV}$).  \verb|pTjetcut| is also used in process 62 ($H+j$) and processes 110--113 ($t/\bar{t}+H$).
 
 \item Constants, more or less self-explanatory, including the masses of particles and width of Standard Model particles and the generated resonance, CKM matrix elements, $Z$ and $W$ branching fractions and scale factors for NLO QCD corrections ($1+\alpha_s/\pi$), and collider energies.  They are documented in comments in \verb|mod_Parameters.F90|.
 
@@ -644,6 +652,7 @@ In going from \verb|v6.2.8| to \verb|v6.7.6|, the updates are as follows:
 \begin{itemize}
 \item Faster event generation for VBF and $Hjj$ with deterministic jet flavor assignment
 \item Clean up of the $VH$ code and CKM matrix
+\item Add \verb|Processes=110-113| for $t/\bar{t}+H$ production
 \item More flexible lepton filter
 \end{itemize}
 
