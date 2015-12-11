@@ -112,6 +112,13 @@ test:
     - ./JHUGen PDFSet=3 VegasNc0=100000 DecayMode1=8 DecayMode2=8 Interf=0 ReadLHE=$CIRCLE_ARTIFACTS/VBF/a2.lhe DataFile=$CIRCLE_ARTIFACTS/VBF/a2_decayed
     - analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/VBF/ outfile=a2.root indir=$CIRCLE_ARTIFACTS/VBF/ computeVBFProdAngles=1 computeVHProdAngles=1 a2_decayed.lhe
 
+    #make sure MELA compiles and runs
+    - cd ../JHUGenMELA && make
+    - cd ../JHUGenMELA/pdfs && ./downloadNNPDF.sh
+    - cd ../JHUGenMELA && ./testC.exe
+    - cd ../JHUGenMELA && ./testF.exe
+    #should check that all the "should be" ME's are correct...
+
 
   post:
     - python ~/checklhe/checklhe.py $(find $CIRCLE_ARTIFACTS -name *.lhe) | tee checklheoutput.txt

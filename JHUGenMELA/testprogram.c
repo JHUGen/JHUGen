@@ -368,7 +368,7 @@ int main(void){
  nninitpdf_(&someParam);
 
  MReso = 125.60 / 100.0;
- __modttbh_MOD_initprocess_ttbh(&MReso,&MTop);  // done above already
+ //__modttbh_MOD_initprocess_ttbh(&MReso,&MTop);  // done above already
  TopDecays=1;  
 
  
