@@ -24,7 +24,7 @@ Manual for the JHU generator
 \begin{center}
 \small
 For simulation of a single-produced resonance at hadron colliders \\
-(version v6.7.5, release date Dec. 10, 2015) \\
+(version v6.7.6, release date Dec. 10, 2015) \\
 \normalsize
 \end{center}
 
@@ -349,15 +349,32 @@ All parameters can be modified in \verb|mod_Parameters.F90| by:
    complex(8), public, parameter :: ghz4_prime2= (0.0d0,0d0)
    complex(8), public, parameter :: ghz4_prime3= (0.0d0,0d0)
    complex(8), public, parameter :: ghz4_prime4= (0.0d0,0d0)
-   complex(8), public, parameter :: ghz3_prime5= (0.0d0,0d0)
-   complex(8), public, parameter :: ghz3_prime6= (0.0d0,0d0)
-   complex(8), public, parameter :: ghz3_prime7= (0.0d0,0d0)
+   complex(8), public, parameter :: ghz4_prime5= (0.0d0,0d0)
+   complex(8), public, parameter :: ghz4_prime6= (0.0d0,0d0)
+   complex(8), public, parameter :: ghz4_prime7= (0.0d0,0d0)
 
    real(8),    public, parameter :: Lambda_z1 = 10000d0*GeV
    real(8),    public, parameter :: Lambda_z2 = 10000d0*GeV
    real(8),    public, parameter :: Lambda_z3 = 10000d0*GeV
    real(8),    public, parameter :: Lambda_z4 = 10000d0*GeV
    real(8),    public, parameter :: Lambda_Q  = 10000d0*GeV
+   
+   integer,    public, parameter :: cz_q1sq = 0d0 ! Sign of q1,2,12**2 for the following Lambda's
+   integer,    public, parameter :: cz_q2sq = 0d0
+   integer,    public, parameter :: cz_q12sq = 0d0
+   
+   real(8),    public, parameter :: Lambda_z11 = 100d0*GeV ! For Z1
+   real(8),    public, parameter :: Lambda_z21 = 100d0*GeV
+   real(8),    public, parameter :: Lambda_z31 = 100d0*GeV
+   real(8),    public, parameter :: Lambda_z41 = 100d0*GeV
+   real(8),    public, parameter :: Lambda_z12 = 100d0*GeV ! For Z2
+   real(8),    public, parameter :: Lambda_z22 = 100d0*GeV
+   real(8),    public, parameter :: Lambda_z32 = 100d0*GeV
+   real(8),    public, parameter :: Lambda_z42 = 100d0*GeV
+   real(8),    public, parameter :: Lambda_z10 = 100d0*GeV ! For the Higgs
+   real(8),    public, parameter :: Lambda_z20 = 100d0*GeV
+   real(8),    public, parameter :: Lambda_z30 = 100d0*GeV
+   real(8),    public, parameter :: Lambda_z40 = 100d0*GeV         
 \end{verbatim}
 
 If the switch \verb|includeGammaStar| is set to \verb|.true.| then intermediate off-shell photons are included for $Z$ boson final states.
@@ -379,13 +396,16 @@ g_1' \frac{ q^2_\gamma }{ \Lambda_2^{Z\gamma} } m_Z^2 \epsilon^*_1 \epsilon^*_2
 is set by
 \begin{verbatim}
    complex(8), public, parameter :: ghzgs1_prime2= (0.0d0,0d0)
-   real(8),    public, parameter :: Lambda_z5 = 10000d0*GeV.
+   real(8),    public, parameter :: Lambda_zgs1 = 10000d0*GeV.
 \end{verbatim}
 
-In the weak vector boson fusion process we also allow for different $ZZH$ and $WWH$ couplings.
-Per default, they are assumed to be equal, set by the {\tt ghzi} and {\tt ghzi\_primej} couplings.
-If any of the {\tt ghwi} or {\tt ghwi\_primej} couplings is different from zero,
-their value will be used instead for the $WWH$ interactions.
+In the weak vector boson fusion process (VBF) we also allow for different $ZZH$ and $WWH$ couplings.
+Per default, they are assumed to be equal, set by 
+\begin{verbatim}
+   logical, public, parameter :: distinguish_HWWcouplings=.false.
+\end{verbatim}
+If this value is set to \verb|.true.|, their value will be used instead for the $WWH$ interactions. Each \verb|Lambda_z|
+and \verb|cz_q1sq| parameter has a \verb|Lambda_w| and \verb|cw_q1sq| counterpart.
 
 
 
@@ -619,11 +639,11 @@ Instructions for setting up the JHUGenMELA with MCFM are in the file \verb|JHUGe
 \section{ Release notes }
 
 \noindent
-In going from \verb|v6.2.8| to \verb|v6.7.5|, the updates are as follows:
+In going from \verb|v6.2.8| to \verb|v6.7.6|, the updates are as follows:
 
 \begin{itemize}
-\item Much faster event generation for VBF and $Hjj$ with deterministic jet flavor assignment
-\item cleanup of the $VH$ code and CKM matrix
+\item Faster event generation for VBF and $Hjj$ with deterministic jet flavor assignment
+\item Clean up of the $VH$ code and CKM matrix
 \item More flexible lepton filter
 \end{itemize}
 
