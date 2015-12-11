@@ -245,7 +245,7 @@ END SUBROUTINE
 !WH
       if((id(1)+id(2)).ne.0)then
         if((id(1)*helicity(1)).le.0d0)then
-          current1=(Vcurrent1-Acurrent1)/2d0*gFFW*CKM(id(1),id(2))
+          current1=(Vcurrent1-Acurrent1)/2d0*gFFW*CKM(id(1),id(2))/dsqrt(ScaleFactor(id(1),id(2)))
         else
           current1=0d0
         endif
@@ -264,7 +264,7 @@ END SUBROUTINE
         else
           current1=(0.5d0*T3lL - QlL*sitW**2) *Vcurrent1 -(0.5d0*T3lL)*Acurrent1
         endif
-        current1=current1*gFFZ*dsqrt(scale_alpha_Z_ll)
+        current1=current1*gFFZ
 
 !u u~ Z vertex for incoming states
       else if((abs(id(1)).eq.2).or.(abs(id(1)).eq.4))then
@@ -273,7 +273,7 @@ END SUBROUTINE
         else
           current1=(0.5d0*T3uL - QuL*sitW**2) *Vcurrent1 -(0.5d0*T3uL)*Acurrent1
         endif
-        current1=current1*gFFZ*dsqrt(scale_alpha_Z_uu)
+        current1=current1*gFFZ
 !d d~ Z vertex for incoming states
       else if((abs(id(1)).eq.1).or.(abs(id(1)).eq.3).or.(abs(id(1)).eq.5))then
         if((id(1)*helicity(1)).gt.0d0)then
@@ -281,7 +281,7 @@ END SUBROUTINE
         else
           current1=(0.5d0*T3dL - QdL*sitW**2) *Vcurrent1 -(0.5d0*T3dL)*Acurrent1
         endif
-        current1=current1*gFFZ*dsqrt(scale_alpha_Z_dd)
+        current1=current1*gFFZ
       else
       current1=0d0
       print *, "invalid incoming state"
