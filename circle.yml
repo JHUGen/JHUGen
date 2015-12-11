@@ -3,7 +3,6 @@ machine:
   pre:
     - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.6 10
     - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.6 10
-    - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.9 20
     - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.9 20
   environment:
     #environment variables can only be set in this section so . bin/thisroot.sh doesn't work
@@ -23,6 +22,9 @@ dependencies:
      - cd ~ && if ! [ -d CMSJHU_AnalysisMacros ]; then git clone -b noMELA git@github.com:hroskes/CMSJHU_AnalysisMacros; fi && cd CMSJHU_AnalysisMacros/JHUSpinWidthPaper_2015/LHEAnalyzer && git pull && make all
      - if ! [ -d ~/checklhe ]; then cd ~ && git clone -b lite git@github.com:hroskes/checklhe; else cd ~/checklhe && git pull; fi
      - cd pdfs && ./downloadNNPDF.sh
+     - cd pdfs && ./downloadNNPDF.sh:
+         pwd:
+           ../JHUGenMELA
    cache_directories:
      - ~/root
      - ~/CMSJHU_AnalysisMacros
@@ -36,6 +38,9 @@ test:
     - sed -i -r -e "s/(pTjetcut = )[0-9.d]*/\10d0/" -e "s/(Rjet = )[0-9.d]*/\10d0/" mod_Parameters.F90
     - git diff > ~/VBFvsHJJ.diff
     - git checkout -- mod_Parameters.F90
+    - make:
+         pwd:
+           ../JHUGenMELA
   override:
     #here we want to generate as many production modes as possible and get the widest range of events to check for syntax issues
     #the actual checking (checklhe) is done in post
@@ -113,10 +118,12 @@ test:
     - analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/VBF/ outfile=a2.root indir=$CIRCLE_ARTIFACTS/VBF/ computeVBFProdAngles=1 computeVHProdAngles=1 a2_decayed.lhe
 
     #make sure MELA compiles and runs
-    #- cd ../JHUGenMELA && make
-    #- cd ../JHUGenMELA/pdfs && ./downloadNNPDF.sh
-    #- cd ../JHUGenMELA && ./testC
-    #- cd ../JHUGenMELA && ./testF
+    - ./testC:
+        pwd:
+          ../JHUGenMELA
+    - ./testF:
+        pwd:
+          ../JHUGenMELA
     #should check that all the "should be" ME's are correct...
 
 
