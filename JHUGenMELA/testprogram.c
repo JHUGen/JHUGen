@@ -435,10 +435,16 @@ int main(void){
 
      MReso = 125.0/100.0;  
       __modth_MOD_initprocess_th(&MReso);
+      
+      Hvvcoupl[0][0]=2.0;  Hvvcoupl[0][1]=0.0;    // ghz1
+      Hvvcoupl[1][0]=0.0;  Hvvcoupl[1][1]=0.0;    // ghz2
+      Hvvcoupl[2][0]=0.0;  Hvvcoupl[2][1]=0.0;    // ghz3
+      Hvvcoupl[3][0]=0.0;  Hvvcoupl[3][1]=0.0;    // ghz4
 
+      
       TopDecays=1;        
       int Channel = 1;
-      __modth_MOD_evalxsec_pp_th(Pth, TTBHcoupl, &TopDecays, &Channel, &MatElSq);
+      __modth_MOD_evalxsec_pp_th(Pth, TTBHcoupl,Hvvcoupl, &TopDecays, &Channel, &MatElSq);
       printf("\n ");
       printf("Matr.el. squared (PP->qth): %20.17e \n ",MatElSq);
       printf("result should be (PP->qth): %20.17e \n ",0.154800780966);

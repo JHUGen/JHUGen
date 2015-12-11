@@ -356,10 +356,11 @@ integer,  target :: ANuT_ = -16
 
       TTBHcoupl(1) = (1d0,0d0)
       TTBHcoupl(2) = (0d0,0d0)
+      Hwwcoupl(1:4) = (/ (2d0,0d0), (0d0,0d0), (0d0,0d0), (0d0,0d0) /)
 
       M_Reso  = 125d0 * GeV
       call InitProcess_TH(m_Reso)
-      call EvalAmp_QB_TH(p13(1:4,1:9),TTBHcoupl,TopDecays,LO_Res_Unpol)
+      call EvalAmp_QB_TH(p13(1:4,1:9),TTBHcoupl,Hwwcoupl,TopDecays,LO_Res_Unpol)
       print *, 'Matr.el. squared,qb->qtH',LO_Res_Unpol(Up_,Bot_),LO_Res_Unpol(Up_,Bot_)/1.049507609593066d-003
       print *, 'Matr.el. squared,qb->qtH',LO_Res_Unpol(Bot_,Up_),LO_Res_Unpol(Bot_,Up_)/1.280488548899522d-003
       print *, 'Matr.el. squared,qb->qtH',LO_Res_Unpol(ADn_,Bot_),LO_Res_Unpol(ADn_,Bot_)/2.081443944891091d-004
@@ -381,7 +382,7 @@ integer,  target :: ANuT_ = -16
 
       M_Reso  = 125d0 * GeV
       call InitProcess_TH(m_Reso)
-      call EvalAmp_QB_TH(p13(1:4,1:9),TTBHcoupl,TopDecays,LO_Res_Unpol)
+      call EvalAmp_QB_TH(p13(1:4,1:9),TTBHcoupl,Hwwcoupl,TopDecays,LO_Res_Unpol)
       print *, 'Matr.el. squared,qb->qtH',LO_Res_Unpol(Up_,Bot_),LO_Res_Unpol(Up_,Bot_)/0.284758712972994d0
       print *, 'Matr.el. squared,qb->qtH',LO_Res_Unpol(Bot_,Up_),LO_Res_Unpol(Bot_,Up_)/2.563212477812484d-002
       print *, 'Matr.el. squared,qb->qtH',LO_Res_Unpol(ADn_,Bot_),LO_Res_Unpol(ADn_,Bot_)/0.108606428211673d0
@@ -404,7 +405,7 @@ integer,  target :: ANuT_ = -16
       Channel=1!   1=t-channel, 2=s-channel, 0=all
       M_Reso  = 125d0 * GeV
       call InitProcess_TH(m_Reso)
-      call EvalXSec_PP_TH(p13(1:4,1:9),TTBHcoupl,TopDecays,Channel,MatElSq)
+      call EvalXSec_PP_TH(p13(1:4,1:9),TTBHcoupl,Hwwcoupl,TopDecays,Channel,MatElSq)
       print *, 'Matr.el. squared,PP->qtH',MatElSq,MatElSq/0.154800780966d0
 
 
