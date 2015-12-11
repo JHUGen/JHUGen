@@ -1315,9 +1315,9 @@
    complex(8), intent(in):: TTBHcoupl(1:2)
    real(8), intent(in) :: pin(1:4,1:6),mass_F,Ga_F
    integer             :: j
-   real(8)             :: s12,s45,s123,s456,KL,KR,s(6,6)
+   real(8)             :: s12,s45,s123,s456,s(6,6)
    real(dp)             :: p(1:6,1:4)
-   complex(dp)          :: za(6,6),zb(6,6),amp
+   complex(dp)          :: za(6,6),zb(6,6),amp,KL,KR
    include 'includeVars.F90'
 
 
