@@ -1326,7 +1326,7 @@
           do j=1,6
               call convert_to_MCFM(pin(1:4,j),p(j,1:4))  
           enddo       
-          call spinoru(6,p,za,zb,s)
+          call spinoru(p,za,zb,s)
       
           s12=s(1,2)
           s45=s(4,5)
@@ -1527,7 +1527,7 @@
    
 
 
-subroutine spinoru(N,p,za,zb,s)
+subroutine spinoru(p,za,zb,s)
 !---Calculate spinor products      
 !---taken from MCFM & modified by R. Rontsch, May 2015
 !---extended to deal with negative energies ie with all momenta outgoing                                                                
@@ -1536,14 +1536,11 @@ subroutine spinoru(N,p,za,zb,s)
       implicit none
       real(8) :: p(:,:),two
       integer, parameter :: mxpart=14
-      complex(8):: c23(N),f(N),rt(N),za(:,:),zb(:,:),czero,cone,ci
+      complex(8):: c23(mxpart),f(mxpart),rt(mxpart),za(:,:),zb(:,:),czero,cone,ci
       real(8)   :: s(:,:)
       integer i,j,N
       
-      if (size(p,1) .ne. N) then
-         print *, "spinorz: momentum mismatch"
-         stop
-      endif
+      N=size(p,1)
       two=2d0
       czero=dcmplx(0d0,0d0)
       cone=dcmplx(1d0,0d0)
