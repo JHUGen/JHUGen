@@ -207,7 +207,7 @@ include 'includeVars.F90'
          MomExtFlat(1,1:4)=-MomExtFlat(1,1:4)
          MomExtFlat(2,1:4)=-MomExtFlat(2,1:4)
 
-         call spinoru(7,MomExtFlat,za,zb,s)
+         call spinoru(MomExtFlat,za,zb,s)
       ELSE
          do j=1,10
             call convert_to_MCFM(MomExtFlatDK(j,1:4))
@@ -215,7 +215,7 @@ include 'includeVars.F90'
          MomExtFlatDK(1,1:4)=-MomExtFlatDK(1,1:4)
          MomExtFlatDK(2,1:4)=-MomExtFlatDK(2,1:4)
 
-         call spinoru(10,MomExtFlatDK,za,zb,s)
+         call spinoru(MomExtFlatDK,za,zb,s)
       ENDIF
 
       LOAmp(:,:,:)=(0d0,0d0)
@@ -303,7 +303,7 @@ include 'includeVars.F90'
          MomExtFlat(1,1:4)=-MomExtFlat(1,1:4)
          MomExtFlat(2,1:4)=-MomExtFlat(2,1:4)
 
-         call spinoru(7,MomExtFlat,za,zb,s)
+         call spinoru(MomExtFlat,za,zb,s)
       ELSE
          do j=1,10
             call convert_to_MCFM(MomExtFlatDK(j,1:4))
@@ -311,7 +311,7 @@ include 'includeVars.F90'
          MomExtFlatDK(1,1:4)=-MomExtFlatDK(1,1:4)
          MomExtFlatDK(2,1:4)=-MomExtFlatDK(2,1:4)
 
-         call spinoru(10,MomExtFlatDK,za,zb,s)
+         call spinoru(MomExtFlatDK,za,zb,s)
       ENDIF
 
       LOAmp=(0d0,0d0)
@@ -399,7 +399,7 @@ include 'includeVars.F90'
          MomExtFlat(1,1:4)=-MomExtFlat(1,1:4)
          MomExtFlat(2,1:4)=-MomExtFlat(2,1:4)
 
-         call spinoru(7,MomExtFlat,za,zb,s)
+         call spinoru(MomExtFlat,za,zb,s)
       ELSE
          do j=1,10
             call convert_to_MCFM(MomExtFlatDK(j,1:4))
@@ -407,7 +407,7 @@ include 'includeVars.F90'
          MomExtFlatDK(1,1:4)=-MomExtFlatDK(1,1:4)
          MomExtFlatDK(2,1:4)=-MomExtFlatDK(2,1:4)
 
-         call spinoru(10,MomExtFlatDK,za,zb,s)
+         call spinoru(MomExtFlatDK,za,zb,s)
       ENDIF
 
       LOAmp(:,:,:)=(0d0,0d0)
@@ -488,7 +488,7 @@ include 'includeVars.F90'
          MomExtFlat(1,1:4)=-MomExtFlat(1,1:4)
          MomExtFlat(2,1:4)=-MomExtFlat(2,1:4)
 
-         call spinoru(7,MomExtFlat,za,zb,s)
+         call spinoru(MomExtFlat,za,zb,s)
       ELSE
          do j=1,10
             call convert_to_MCFM(MomExtFlatDK(j,1:4))
@@ -496,7 +496,7 @@ include 'includeVars.F90'
          MomExtFlatDK(1,1:4)=-MomExtFlatDK(1,1:4)
          MomExtFlatDK(2,1:4)=-MomExtFlatDK(2,1:4)
 
-         call spinoru(10,MomExtFlatDK,za,zb,s)
+         call spinoru(MomExtFlatDK,za,zb,s)
       ENDIF
 
       LOAmp=(0d0,0d0)
@@ -827,7 +827,7 @@ END SUBROUTINE
 
 
 
-subroutine spinoru(N,p,za,zb,s)
+subroutine spinoru(p,za,zb,s)
 !---Calculate spinor products      
 !---taken from MCFM & modified by R. Rontsch, May 2015
 !---extended to deal with negative energies ie with all momenta outgoing                                                                
@@ -836,14 +836,12 @@ subroutine spinoru(N,p,za,zb,s)
       implicit none
       real(8) :: p(:,:),two
       integer, parameter :: mxpart=14
-      complex(8):: c23(N),f(N),rt(N),za(:,:),zb(:,:),czero,cone,ci
+      complex(8):: c23(mxpart),f(mxpart),rt(mxpart),za(:,:),zb(:,:),czero,cone,ci
       real(8)   :: s(:,:)
       integer i,j,N
       
-      if (size(p,1) .ne. N) then
-         print *, "spinorz: momentum mismatch"
-         stop
-      endif
+      N=size(p,1)
+
       two=2d0
       czero=dcmplx(0d0,0d0)
       cone=dcmplx(1d0,0d0)
