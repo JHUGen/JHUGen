@@ -418,9 +418,9 @@ END SUBROUTINE
         KL=-mt/vev*(kappa-(0d0,1d0)*kappa_tilde) !   *0000000000000d0
         KR=-mt/vev*(kappa+(0d0,1d0)*kappa_tilde) !   *0000000000000d0
         
-!         om1 = 0d0
-!         om2 = 1d0
-!         om3 = 0d0
+         om1 = 1d0
+         om2 = 0d0
+         om3 = 0d0
         
         
         ampw(1) =  + om3 * (  - 1d0/2d0*za(p5,p2)*za(e4,p1)*zb(p1,p2)*&
