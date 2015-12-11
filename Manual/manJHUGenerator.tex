@@ -6,7 +6,7 @@
 \usepackage{epsfig}
 \usepackage{float}
 % % \usepackage{cprotect}
-%\usepackage{amsmath}
+\usepackage{amsmath}
 
 % \textwidth18cm
 % \addtolength{\oddsidemargin}{-2cm}
@@ -281,22 +281,21 @@ The \verb|*hz*| parameters control the decay into $Z$ and $W$ bosons.
 One has the options to set the spin-0 couplings either from Eq.(9) or Eq.(11) from Ref.~\cite{Bolognesi:2012}.
 To switch between the two, use the parameter \verb|generate_as|.
 %For the parameters in Eq.(9) from Ref.~\cite{Bolognesi:2012}, we now allow for $q^2$ dependent form factors as described in Eq.(3) of~\cite{Anderson:2013} as:
-We now allow for $q^2$ dependent form factors as described in Ref.~\cite{Anderson:2013} and given in more detail in the equation below:
-\[
-g_i(q_1^2,q_2^2) =
-g_i^{\rm SM}
-+ g_i' \frac{\Lambda_i^4}{(\Lambda_i^2 + |q_1^2|)(\Lambda_i^2 + |q_2^2|)}
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-\]
-\[
-+ g_i^{\prime 2}  \frac{(|q_1^2|+|q_2^2|)}{\Lambda_i^2}
-+ g_i^{\prime 3}  \frac{(|q_1^2|-|q_2^2|)}{\Lambda_i^2}
-+ g_i^{\prime 4}  \frac{|(q_1+q_2)^2|}{\Lambda_Q^2}
-+ g_i^{\prime 5}  \frac{(|q_1^2|^2+|q_2^2|^2)}{\Lambda_i^4}
-+ g_i^{\prime 6}  \frac{(|q_1^2|^2-|q_2^2|^2)}{\Lambda_i^4}
-+ g_i^{\prime 7}  \frac{|q_1^2| \, |q_2^2|}{\Lambda_i^4}
-\]
+We allow for $q^2$ dependent form factors similar to those described in Ref.~\cite{Anderson:2013}:
+\begin{eqnarray*}
+g^\Lambda_i(q_1,q_2) &=& 
+g_i' \frac{\Lambda_i^4}{(\Lambda_i^2 + |q_1^2|)(\Lambda_i^2 + |q_2^2|)} \\
+&+& g_i^{\prime 2}  \frac{(q_1^2+q_2^2)}{\Lambda_i^2} 
++ g_i^{\prime 3}  \frac{(q_1^2-q_2^2)}{\Lambda_i^2} 
++ g_i^{\prime 4}  \frac{(q_1+q_2)^2}{\Lambda_Q^2} \\
+&+& g_i^{\prime 5}  \frac{((q_1^2)^2+(q_2^2)^2)}{\Lambda_i^4}  
++ g_i^{\prime 6}  \frac{((q_1^2)^2-(q_2^2)^2)}{\Lambda_i^4}
++ g_i^{\prime 7}  \frac{q_1^2 \, q_2^2}{\Lambda_i^4} \\
+g_i(q_1,q_2) &=& g_i \delta_{i1} + (g^\Lambda_i (q_1,q_2) + g_i (1- \delta_{i1}))
+\frac{\Lambda^2_{i1}\,\Lambda^2_{i2}\,\Lambda^2_{i3}}
+{(\Lambda^2_{i1}+c_{i1}|q_1|^2)\,(\Lambda^2_{i2}+c_{i2}|q_2|^2)\,(\Lambda^2_{i3}+c_{i3}|q_1+q_2|^2)}
 \noindent
+\end{eqnarray*}
 The user has the option to choose between these functional forms,
 where the term multiplying $g_i'$ corresponds to the full functional form and the $g_i''... g_i'''''' $ correspond to an expansion in $\Lambda^2$.
 All parameters can be modified in \verb|mod_Parameters.F90| by:

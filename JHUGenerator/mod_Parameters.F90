@@ -471,6 +471,19 @@ integer, public, target :: ANuE_ = -14
 integer, public, target :: ANuM_ = -15
 integer, public, target :: ANuT_ = -16
 
+integer, public, parameter :: pdfGlu_ = 0
+integer, public, parameter :: pdfDn_ = 1
+integer, public, parameter :: pdfUp_ = 2
+integer, public, parameter :: pdfStr_ = 3
+integer, public, parameter :: pdfChm_ = 4
+integer, public, parameter :: pdfBot_ = 5
+integer, public, parameter :: pdfTop_ = 6 ! Dummy
+integer, public, parameter :: pdfADn_ = -1
+integer, public, parameter :: pdfAUp_ = -2
+integer, public, parameter :: pdfAStr_ = -3
+integer, public, parameter :: pdfAChm_ = -4
+integer, public, parameter :: pdfABot_ = -5
+integer, public, parameter :: pdfATop_ = -6 ! Dummy
 
 real(8), public, parameter :: pi =3.141592653589793238462643383279502884197d0
 real(8), public, parameter :: sqrt2 = 1.4142135623730950488016887242096980786d0
@@ -716,7 +729,7 @@ integer :: Part
 
   if(     Part.eq.0 ) then      ! 0=Glu_ is not the official LHE convention
       convertLHEreverse = Glu_
-  elseif(     Part.eq.1 ) then
+  elseif( Part.eq.1 ) then
       convertLHEreverse = Dn_
   elseif( Part.eq.2 ) then
       convertLHEreverse = Up_
@@ -870,6 +883,80 @@ integer :: Part
 END FUNCTION
 
 
+FUNCTION convertToPartIndex(Part)
+implicit none
+integer :: convertToPartIndex
+integer :: Part
+
+
+  if( Part.eq.Glu_ ) then
+      convertToPartIndex = pdfGlu_
+  elseif( Part.eq.Up_  ) then
+      convertToPartIndex = pdfUp_
+  elseif( Part.eq.AUp_ ) then
+      convertToPartIndex = pdfAUp_
+  elseif( Part.eq.Dn_  ) then
+      convertToPartIndex = pdfDn_
+  elseif( Part.eq.ADn_ ) then
+      convertToPartIndex = pdfADn_
+  elseif( Part.eq.Chm_ ) then
+      convertToPartIndex = pdfChm_
+  elseif( Part.eq.AChm_) then
+      convertToPartIndex = pdfAChm_
+  elseif( Part.eq.Str_ ) then
+      convertToPartIndex = pdfStr_
+  elseif( Part.eq.AStr_) then
+      convertToPartIndex = pdfAStr_
+  elseif( Part.eq.Bot_ ) then
+      convertToPartIndex = pdfBot_
+  elseif( Part.eq.ABot_) then
+      convertToPartIndex = pdfABot_
+  else
+      print *, "Unsuccessful conversion to a parton ME array index from ",Part
+      stop
+  endif
+
+END FUNCTION
+
+
+FUNCTION convertFromPartIndex(Part)
+implicit none
+integer :: convertFromPartIndex
+integer :: Part
+
+
+  if( Part.eq.pdfGlu_ ) then
+      convertFromPartIndex = Glu_
+  elseif( Part.eq.pdfUp_  ) then
+      convertFromPartIndex = Up_
+  elseif( Part.eq.pdfAUp_ ) then
+      convertFromPartIndex = AUp_
+  elseif( Part.eq.pdfDn_  ) then
+      convertFromPartIndex = Dn_
+  elseif( Part.eq.pdfADn_ ) then
+      convertFromPartIndex = ADn_
+  elseif( Part.eq.pdfChm_ ) then
+      convertFromPartIndex = Chm_
+  elseif( Part.eq.pdfAChm_) then
+      convertFromPartIndex = AChm_
+  elseif( Part.eq.pdfStr_ ) then
+      convertFromPartIndex = Str_
+  elseif( Part.eq.pdfAStr_) then
+      convertFromPartIndex = AStr_
+  elseif( Part.eq.pdfBot_ ) then
+      convertFromPartIndex = Bot_
+  elseif( Part.eq.pdfABot_) then
+      convertFromPartIndex = ABot_
+  elseif( Part.eq.pdfTop_ ) then
+      convertFromPartIndex = Top_
+  elseif( Part.eq.pdfATop_) then
+      convertFromPartIndex = ATop_
+  else
+      print *, "Unsuccessful conversion to a parton id from the ME array index ",Part
+      stop
+  endif
+
+END FUNCTION
 
 
 

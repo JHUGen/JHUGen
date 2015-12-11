@@ -1,10 +1,11 @@
 module modHiggsJJ
   use modParameters
+  use ModMisc
   implicit none
   private
 
-  public :: EvalAmp_WBFH_UnSymm_SA,EvalAmp_WBFH_UnSymm_SA_Select
-  public :: EvalAmp_SBFH_UnSymm_SA,EvalAmp_SBFH_UnSymm_SA_Select
+  public :: EvalAmp_WBFH_UnSymm_SA,EvalAmp_WBFH_UnSymm_SA_Select,EvalAmp_WBFH_UnSymm_SA_Select_test
+  public :: EvalAmp_SBFH_UnSymm_SA,EvalAmp_SBFH_UnSymm_SA_Select,EvalAmp_SBFH_UnSymm_SA_Select_test
   public :: get_VBFchannelHash,get_HJJchannelHash,get_GENchannelHash
 
   !-- general definitions, to be merged with Markus final structure
@@ -14,18 +15,6 @@ module modHiggsJJ
   real(dp), parameter :: xw = sitW**2
   real(dp), parameter :: twosc = sqrt(4.0_dp*xw*(1.0_dp-xw))
   real(dp), parameter :: gs = sqrt(alphas*4.0_dp*pi)
-
-  integer :: pdfGlu_ = 0
-  integer :: pdfDn_ = 1
-  integer :: pdfUp_ = 2
-  integer :: pdfStr_ = 3
-  integer :: pdfChm_ = 4
-  integer :: pdfBot_ = 5
-  integer :: pdfADn_ = -1
-  integer :: pdfAUp_ = -2
-  integer :: pdfAStr_ = -3
-  integer :: pdfAChm_ = -4
-  integer :: pdfABot_ = -5
 
   real(dp), parameter :: tag1 = 1.0_dp
   real(dp), parameter :: tag2 = 1.0_dp
@@ -370,7 +359,7 @@ module modHiggsJJ
 
     res = zero
 
-    call spinoru(4,(/-p(:,1),-p(:,2),p(:,3),p(:,4)/),za,zb,sprod)
+    call spinoru2(4,(/-p(:,1),-p(:,2),p(:,3),p(:,4)/),za,zb,sprod)
 
     !-- gg -> gg
     call me2_ggggh(ggcoupl,1,2,3,4,za,zb,sprod,restmp)
@@ -482,7 +471,7 @@ module modHiggsJJ
 
     res = zero
 
-    call spinoru(4,(/-p(:,1),-p(:,2),p(:,3),p(:,4)/),za,zb,sprod)
+    call spinoru2(4,(/-p(:,1),-p(:,2),p(:,3),p(:,4)/),za,zb,sprod)
     iflip = 1
 
     !-- gg -> gg
@@ -609,6 +598,251 @@ module modHiggsJJ
   end subroutine
 
 
+    subroutine EvalAmp_SBFH_UnSymm_SA_Select_test(p,ggcoupl,iSel,jSel,rSel,sSel,res)
+    real(dp), intent(in) :: p(4,5)
+    integer, intent(in) :: iSel,jSel,rSel,sSel!,flavor_tag ! flavor_tag for TEST
+    complex(dp), intent(in) :: ggcoupl(2:4)
+    real(dp), intent(out) :: res(-5:5,-5:5)
+    real(dp) :: sprod(4,4)
+    complex(dp) :: za(4,4), zb(4,4)
+    real(dp) :: restmp, restmpid
+    integer :: i, j
+	integer :: j1,j2,k1,k2
+	logical :: isGGGG,isQQGG,isQQQQ,isQQQQ_idQ
+
+	if( (abs(iSel).eq.pdfTop_ .or. abs(jSel).eq.pdfTop_) .or. (abs(rSel).eq.pdfTop_ .or. abs(sSel).eq.pdfTop_) ) return
+	restmp=0.0_dp
+	restmpid=0.0_dp
+	res(:,:)=0.0_dp
+	isGGGG=.false.
+	isQQGG=.false.
+	isQQQQ=.false.
+	isQQQQ_idQ=.false.
+	j1 = 0
+	j2 = 0
+	k1 = 0
+	k2 = 0
+
+	!print *, "Begin EvalAmp_SBFH_UnSymm_SA_Select_test"
+	!print *, "iSel: ",iSel,", jSel: ",jSel," rSel: ",rSel," sSel: ",sSel
+
+	if(iSel.eq.pdfGlu_) then ! 1==g
+	   if(jSel.eq.pdfGlu_) then ! gg
+	      if(rSel.eq.pdfGlu_ .and. sSel .eq. pdfGlu_) then ! gg->gg
+			 isGGGG=.true.
+		     j1=1
+	         j2=2
+			 k1=3
+			 k2=4
+
+	      elseif(sSel.eq.(-rSel)) then ! gg->qqb/qbq
+			 isQQGG=.true.
+		     if(rSel.gt.0) then ! gg->qqb
+		        j1=4
+			    j2=3
+		     else ! gg->qbq
+		        j1=3
+			    j2=4
+			 endif
+		     k1=1
+	         k2=2
+		  endif
+
+	   elseif(abs(jSel).eq.pdfUp_ .or. abs(jSel).eq.pdfChm_ .or. abs(jSel).eq.pdfDn_ .or. abs(jSel).eq.pdfStr_ .or. abs(jSel).eq.pdfBot_) then ! gq/gqb
+		  isQQGG=.true.
+	      k1=1
+	      if(jSel.gt.0) then ! gq
+		     j1=2
+		     if(rSel.eq.iSel .and. sSel.eq.jSel) then ! gq->gq
+		        k2=3
+				j2=4
+			 elseif(sSel.eq.iSel .and. rSel.eq.jSel) then ! gq->qg
+			    j2=3
+				k2=4
+			 endif
+	      else ! gqb
+			 j2=2
+		     if(rSel.eq.iSel .and. sSel.eq.jSel) then ! gqb->gqb
+		        k2=3
+				j1=4
+			 elseif(sSel.eq.iSel .and. rSel.eq.jSel) then ! gqb->qbg
+			    j1=3
+				k1=4
+			 endif
+	      endif
+	   endif
+	elseif(abs(iSel).eq.pdfUp_ .or. abs(iSel).eq.pdfChm_ .or. abs(iSel).eq.pdfDn_ .or. abs(iSel).eq.pdfStr_ .or. abs(iSel).eq.pdfBot_) then ! q/qb?->?
+	   if(jSel.eq.pdfGlu_) then ! qg->?
+	      isQQGG=.true.
+	      k1=2
+	      if(iSel.gt.0) then
+		     j1=1
+		     if(rSel.eq.iSel .and. sSel.eq.jSel) then ! qg->qg
+		        k2=4
+				j2=3
+			 elseif(sSel.eq.iSel .and. rSel.eq.jSel) then ! qg->gq
+			    j2=4
+				k2=3
+			 endif
+	      else ! qbg
+		     j2=1
+		     if(rSel.eq.iSel .and. sSel.eq.jSel) then ! qbg->qbg
+		        k2=4
+				j1=3
+			 elseif(sSel.eq.iSel .and. rSel.eq.jSel) then ! qbg->gqb
+			    j1=4
+				k1=3
+			 endif
+	      endif
+
+	   elseif(abs(jSel).eq.pdfUp_ .or. abs(jSel).eq.pdfChm_ .or. abs(jSel).eq.pdfDn_ .or. abs(jSel).eq.pdfStr_ .or. abs(jSel).eq.pdfBot_) then ! qq/qqb/qbq/qbqb->?
+	      if(iSel.gt.0) then ! qq'/qqb'->?
+		     j1=1
+	      else ! qbq'/qbqb'->?
+		     j2=1
+	      endif
+
+		  if(jSel.eq.(-iSel)) then ! qqb/qbq->?
+	         if(jSel.gt.0) then ! qbq->?
+		        j1=2
+	         else ! qqb->?
+			    j2=2
+	         endif
+
+	         if(rSel.eq.pdfGlu_ .and. sSel .eq. pdfGlu_) then ! qqb/qbq->gg
+	            isQQGG=.true.
+	            k1=3
+	            k2=4
+	         elseif(sSel.eq.(-rSel)) then ! qqb->q'qb'/qb'q'
+	            isQQQQ=.true.
+	            if(rSel.gt.0) then ! ->q'qb'
+	               if(rSel .eq. iSel .or. rSel.eq.jSel) isQQQQ_idQ=.true.
+		           k1=4
+			       k2=3
+		        else ! ->qb'q'
+	               if(rSel .eq. iSel .or. rSel.eq.jSel) isQQQQ_idQ=.true.
+		           k1=3
+			       k2=4
+	            endif
+	         endif
+
+		  elseif(jSel.eq.iSel) then ! qq/qbqb->?
+	         isQQQQ=.true.
+	         if(jSel.gt.0) then ! qq
+		        k1=2
+	         else ! qbqb
+			    k2=2
+	         endif
+	         if(rSel.gt.0 .and. rSel.eq.sSel .and. rSel.eq.iSel) then ! qq->qq
+			    isQQQQ_idQ=.true.
+		        j2=3
+				k2=4
+	         elseif(rSel.lt.0 .and. rSel.eq.sSel .and. rSel.eq.iSel) then ! qbqb->qbqb
+			    isQQQQ_idQ=.true.
+			    j1=3
+				k1=4
+	         endif
+
+		  elseif(jSel.eq.sign(jSel,iSel)) then ! qq'/qbqb'->?
+	         isQQQQ=.true.
+	         if(jSel.gt.0) then ! qq'
+		        k1=2 ! j1=1
+	         else ! qbqb'
+			    k2=2 ! j2=1
+	         endif
+	         if(rSel.gt.0 .and. rSel.ne.sSel .and. rSel.eq.sign(rSel,sSel) .and. rSel.eq.iSel) then ! ->qq'
+		        j2=3
+				k2=4
+	         elseif(rSel.lt.0 .and. rSel.ne.sSel .and. rSel.eq.sign(rSel,sSel) .and. rSel.eq.iSel) then ! ->qbqb'
+			    j1=3
+				k1=4
+	         elseif(rSel.gt.0 .and. rSel.ne.sSel .and. rSel.eq.sign(rSel,sSel) .and. rSel.eq.jSel) then ! ->q'q
+		        j2=4
+				k2=3
+	         elseif(rSel.lt.0 .and. rSel.ne.sSel .and. rSel.eq.sign(rSel,sSel) .and. rSel.eq.jSel) then ! ->qb'qb
+			    j1=4
+				k1=3
+	         endif
+
+		  elseif(jSel.eq.(-sign(jSel,iSel))) then ! qqb'/qbq'->?
+	         isQQQQ=.true.
+	         if(jSel.gt.0) then ! qbq'
+		        k1=2 ! j2=1
+	         else ! qqb'
+			    k2=2 ! j1=1
+	         endif
+	         if(rSel.gt.0 .and. rSel.ne.sSel .and. rSel.ne.sign(rSel,sSel) .and. rSel.eq.iSel) then ! qqb'->qqb'
+		        j2=3
+				k1=4
+	         elseif(rSel.lt.0 .and. rSel.ne.sSel .and. rSel.ne.sign(rSel,sSel) .and. rSel.eq.iSel) then ! qbq'->qbq'
+			    j1=3
+				k2=4
+	         elseif(rSel.lt.0 .and. rSel.ne.sSel .and. rSel.ne.sign(rSel,sSel) .and. rSel.eq.jSel) then ! qqb'->qb'q
+		        j2=4
+				k1=3
+	         elseif(rSel.gt.0 .and. rSel.ne.sSel .and. rSel.ne.sign(rSel,sSel) .and. rSel.eq.jSel) then ! qbq'->q'qb
+			    j1=4
+				k2=3
+	         endif
+	      endif
+
+	   endif
+	endif
+
+!	if(j1.eq.0 .and. j2.eq.0 .and. k1.eq.0 .and. k2.eq.0) then
+!	   print *,"Could not recognize the incoming flavors!"
+!	   print *,"iSel: ",iSel,", jSel: ",jSel," rSel: ",rSel," sSel: ",sSel
+!	   print *,"j1: ",j1,", j2: ",j2," k1: ",k1," k2: ",k2
+!		if(isGGGG) then
+!			print *,"is gggg"
+!		endif
+!		if(isQQGG) then
+!			print *,"is qbqgg"
+!		endif
+!		if(isQQQQ) then
+!			print *,"is qbqQBQ"
+!		endif
+!		if(isQQQQ_idQ) then
+!			print *,"is qbqQBQ id"
+!		endif
+!	   isGGGG=.false.
+!	   isQQGG=.false.
+!	   isQQQQ=.false.
+!	   isQQQQ_idQ=.false.
+!	   return
+!	endif
+
+    call spinoru2(4,(/-p(:,1),-p(:,2),p(:,3),p(:,4)/),za,zb,sprod)
+
+	if(isGGGG) then
+	   call me2_ggggh(ggcoupl,j1,j2,k1,k2,za,zb,sprod,restmp)
+	   restmp = restmp * avegg * SymmFac
+	elseif(isQQQQ) then
+        call me2_qbqQBQ(ggcoupl,j1,j2,k1,k2,za,zb,sprod,restmp,restmpid)
+        if(isQQQQ_idQ) then
+		   restmp = restmpid * aveqq
+		   if(iSel.eq.jSel) restmp = restmp * SymmFac
+        else
+		   restmp = restmp * aveqq
+		   if(iSel .eq. (-jSel) .and. rSel .eq. (-sSel) .and. abs(iSel) .ne. abs(rSel)) restmp = restmp * (nf-1.0_dp)
+		endif
+	elseif(isQQGG) then
+	    call me2_qbqggh(ggcoupl,j1,j2,k1,k2,za,zb,sprod,restmp)
+	    if( iSel.eq.pdfGlu_ .and. jSel.eq.pdfGlu_) then
+	       restmp = restmp * avegg * nf
+	    elseif( iSel.ne.pdfGlu_ .and. jSel.ne.pdfGlu_) then
+	       restmp = restmp * aveqq * SymmFac
+	    else
+	       restmp = restmp * aveqg
+		endif
+	endif
+
+	res(iSel,jSel) = restmp
+	return
+  end subroutine
+
+
+
   subroutine EvalAmp_WBFH_UnSymm_SA(p,res)
     real(dp), intent(in) :: p(4,5)
     real(dp), intent(out) :: res(-5:5,-5:5)
@@ -625,7 +859,7 @@ module modHiggsJJ
 
     res = zero
 
-    call spinoru(4,(/-p(:,1),-p(:,2),p(:,3),p(:,4)/),za,zb,sprod)
+    call spinoru2(4,(/-p(:,1),-p(:,2),p(:,3),p(:,4)/),za,zb,sprod)
 
     !-- qq->qq, up
     amp_z = A0_VV_4f(4,1,3,2,za,zb,sprod,m_z,ga_z)
@@ -950,7 +1184,7 @@ module modHiggsJJ
     real(dp) :: restmp
     integer :: i, j, j1, j2, iflip, pdfindex(2)
 
-    call spinoru(4,(/-p(:,1),-p(:,2),p(:,3),p(:,4)/),za,zb,sprod)
+    call spinoru2(4,(/-p(:,1),-p(:,2),p(:,3),p(:,4)/),za,zb,sprod)
     iflip = 1
     
     
@@ -1988,7 +2222,202 @@ if( (jSel.eq.pdfADn_ .and. iSel.eq.pdfAStr_) .or. (jSel.eq.pdfADn_ .and. iSel.eq
 return
 endif
 
+  RETURN
+  END SUBROUTINE 
 
+
+
+  SUBROUTINE EvalAmp_WBFH_UnSymm_SA_Select_test(p,iSel,jSel,rSel,sSel,res)
+  implicit none
+    real(dp), intent(in) :: p(4,5)
+    real(dp), intent(out) :: res(-5:5,-5:5)
+    integer, intent(in) :: iSel,jSel,rSel,sSel
+    complex(dp) :: amp_z(-1:1,-1:1), amp_z_b(-1:1,-1:1)
+    complex(dp) :: amp_w(-1:1,-1:1)
+    real(dp) :: sprod(4,4)
+    complex(dp) :: za(4,4), zb(4,4)
+    real(dp), parameter :: couplz = gwsq * xw/twosc**2        
+    real(dp), parameter :: couplw = gwsq/two                  
+    real(dp) :: restmp
+	real(dp) :: cli, clj, cri, crj, sr_cli, sr_clj, sr_cri, sr_crj
+	real(dp) :: ckm_wfactor
+    real(dp) :: kfactor_z,kfactor_w
+    integer :: i, j, jz1, jz2, jw1, jw2, iflip, pdfindex(2)
+	integer :: kz1, kz2, kw1, kw2
+	logical :: ZZ_fusion,WW_fusion
+
+	if( (abs(iSel).eq.pdfTop_ .or. abs(jSel).eq.pdfTop_) .or. (abs(rSel).eq.pdfTop_ .or. abs(sSel).eq.pdfTop_) ) return
+
+	!print *, "Begin EvalAmp_WBFH_UnSymm_SA_Select_test"
+	!print *, "iSel: ",iSel,", jSel: ",jSel," rSel: ",rSel," sSel: ",sSel
+
+	res(:,:)=0.0_dp
+
+	ZZ_fusion=.false.
+	WW_fusion=.false.
+
+	ckm_wfactor=1.0_dp
+	kfactor_z=1.0_dp
+	kfactor_w=1.0_dp
+	cli=0.0_dp
+	clj=0.0_dp
+	cri=0.0_dp
+	crj=0.0_dp
+	sr_cli=0.0_dp
+	sr_clj=0.0_dp
+	sr_cri=0.0_dp
+	sr_crj=0.0_dp
+	restmp=0.0_dp
+
+	jz1 = 1
+	jz2 = 2
+	jw1 = jz1
+	jw2 = jz2
+	iflip = 1
+
+	if( &
+	(iSel.eq.rSel .and. jSel.eq.sSel) &
+	.or. &
+	(iSel.eq.sSel .and. jSel.eq.rSel) &
+	) then
+	   ZZ_fusion=.true.
+	   if( iSel.eq.sSel .and. jSel.eq.rSel ) then
+	      kz1 = 4
+	      kz2 = 3
+		  kfactor_z = 1.0_dp ! dsqrt(ScaleFactor(iSel,sSel)*ScaleFactor(jSel,rSel))
+		  !print *, "EvalAmp_WBFH_UnSymm_SA_Select_test: isZZ and is-jr"
+	   else
+	      kz1 = 3
+		  kz2 = 4
+		  kfactor_z = 1.0_dp ! dsqrt(ScaleFactor(iSel,rSel)*ScaleFactor(jSel,sSel))
+		  !print *, "EvalAmp_WBFH_UnSymm_SA_Select_test: isZZ and ir-js"
+	   endif
+	endif
+
+	if( &
+	( (sign(iSel,rSel).eq.iSel .and. sign(jSel,sSel).eq.jSel) .and. (abs(iSel-rSel).eq.1 .or. abs(iSel-rSel).eq.3 .or. abs(iSel-rSel).eq.5) .and. (abs(jSel-sSel).eq.1 .or. abs(jSel-sSel).eq.3 .or. abs(jSel-sSel).eq.5) ) &
+	.or. &
+	( (sign(iSel,sSel).eq.iSel .and. sign(jSel,rSel).eq.jSel) .and. (abs(iSel-sSel).eq.1 .or. abs(iSel-sSel).eq.3 .or. abs(iSel-sSel).eq.5) .and. (abs(jSel-rSel).eq.1 .or. abs(jSel-rSel).eq.3 .or. abs(jSel-rSel).eq.5) ) &
+	) then
+	   WW_fusion=.true.
+	   ! W_is W_jr fusion
+	   if( (sign(iSel,sSel).eq.iSel .and. sign(jSel,rSel).eq.jSel) .and. (abs(iSel-sSel).eq.1 .or. abs(iSel-sSel).eq.3 .or. abs(iSel-sSel).eq.5) .and. (abs(jSel-rSel).eq.1 .or. abs(jSel-rSel).eq.3 .or. abs(jSel-rSel).eq.5) ) then
+	      kw1 = 4
+	      kw2 = 3
+  		  kfactor_w = 1.0_dp ! dsqrt(ScaleFactor(iSel,sSel)*ScaleFactor(jSel,rSel))
+
+	      !if(ZZ_fusion) then ! Special treatment for WW+ZZ interference, not included through phasespace
+	         ckm_wfactor = CKM(iSel,sSel)*CKM(jSel,rSel)/dsqrt(ScaleFactor(iSel,sSel)*ScaleFactor(jSel,rSel))
+			 !print *, "iSel, sSel: ",iSel," ",sSel, "; jSel, rSel: ",jSel," ",rSel, ", ckm: ",ckm_wfactor
+	      !endif
+		  !print *, "EvalAmp_WBFH_UnSymm_SA_Select_test: isWW and is-jr"
+	   else	! W_ir W_js fusion
+	      kw1 = 3
+	      kw2 = 4	      
+		  kfactor_w = 1.0_dp ! dsqrt(ScaleFactor(iSel,rSel)*ScaleFactor(jSel,sSel))
+
+		  ckm_wfactor = CKM(iSel,rSel)*CKM(jSel,sSel)/dsqrt(ScaleFactor(iSel,rSel)*ScaleFactor(jSel,sSel))
+		  !print *, "iSel, rSel: ",iSel," ",rSel, "; jSel, sSel: ",jSel," ",sSel, ", ckm: ",ckm_wfactor
+		  !print *, "EvalAmp_WBFH_UnSymm_SA_Select_test: isWW and ir-js"
+	   endif
+	endif
+
+
+	if( .not.(ZZ_fusion .or. WW_fusion) ) return
+	if(iSel.lt.0) then
+	  if(ZZ_fusion) call swapi(jz1,kz1)
+	  if(WW_fusion) call swapi(jw1,kw1)
+	endif
+	if(jSel.lt.0) then
+	  if(ZZ_fusion) call swapi(jz2,kz2)
+	  if(WW_fusion) call swapi(jw2,kw2)
+	endif
+
+	if(ZZ_fusion) then
+		if (abs(iSel).eq.pdfUp_ .or. abs(iSel).eq.pdfChm_) then ! u-current couplings
+			sr_cli = aL_QUp
+			sr_cri = aR_QUp
+		else ! d-current couplings
+			sr_cli = aL_QDn
+			sr_cri = aR_QDn
+		endif
+		cli = sr_cli**2
+		cri = sr_cri**2
+		if (abs(jSel).eq.pdfUp_ .or. abs(jSel).eq.pdfChm_) then ! u-current couplings
+			sr_clj = aL_QUp
+			sr_crj = aR_QUp
+		else ! d-current couplings
+			sr_clj = aL_QDn
+			sr_crj = aR_QDn
+		endif
+		clj = sr_clj**2
+		crj = sr_crj**2
+	endif
+
+	if(WW_fusion) then
+		if (iSel.eq.pdfUp_ .or. iSel.eq.pdfChm_ .or. iSel.eq.pdfADn_ .or. iSel.eq.pdfAStr_ .or. iSel.eq.pdfABot_) then ! W+ should be passed as the second set of partons
+			call swapi(jw1,jw2)
+			call swapi(kw1,kw2)
+			if(ZZ_fusion) then ! If also ZZ fusion, swap it as well
+				call swapi(jz1,jz2)
+				call swapi(kz1,kz2)
+
+				call swapr(cli,clj)
+				call swapr(cri,crj)
+				call swapr(sr_cli,sr_clj)
+				call swapr(sr_cri,sr_crj)
+			endif
+		endif
+	endif
+
+    call spinoru2(4,(/-p(:,1),-p(:,2),p(:,3),p(:,4)/),za,zb,sprod)
+
+	!if(ZZ_fusion) print *, "jz1: ",jz1,", jz2: ",jz2," kz1: ",kz1," kz2: ",kz2
+	!if(WW_fusion) print *, "jw1: ",jw1,", jw2: ",jw2," kw1: ",kw1," kw2: ",kw2
+
+	!ckm_wfactor = 1.0_dp ! TEST!!!
+	if(ZZ_fusion) then
+		amp_z = A0_VV_4f(kz1,jz1,kz2,jz2,za,zb,sprod,m_z,ga_z)
+
+		restmp = restmp + &
+				((abs(amp_z(-1,-1))**2) * cli * clj + &
+				(abs(amp_z(-1,+1))**2) * cli * crj + &
+				(abs(amp_z(+1,-1))**2) * cri * clj + &
+				(abs(amp_z(+1,+1))**2) * cri * crj) * xn**2
+
+		if(iSel.eq.jSel) then
+			amp_z_b = -A0_VV_4f(kz2,jz1,kz1,jz2,za,zb,sprod,m_z,ga_z)
+			restmp = restmp + &
+					((abs(amp_z_b(-1,-1))**2) * cli * clj + &
+					(abs(amp_z_b(-1,+1))**2) * cli * crj + &
+					(abs(amp_z_b(+1,-1))**2) * cri * clj + &
+					(abs(amp_z_b(+1,+1))**2) * cri * crj) * xn**2
+			restmp = restmp + &
+					(two * real(amp_z(-1,-1)*conjg(amp_z_b(-1,-1)),kind=dp) * cli * clj + &
+		            two * real(amp_z(+1,+1)*conjg(amp_z_b(+1,+1)),kind=dp) * cri * crj) * xn
+
+			restmp = restmp * SymmFac
+		endif
+		restmp = restmp * couplz**2 * kfactor_z**2
+	endif
+    
+	if(WW_fusion) then
+		amp_w = -A0_VV_4f(kw1,jw1,kw2,jw2,za,zb,sprod,m_w,ga_w,useWWcoupl=.true.)
+		restmp = restmp + abs(amp_w(-1,-1))**2 * couplw**2 * xn**2 * kfactor_w**2 * abs(ckm_wfactor)**2
+		if(ZZ_fusion) restmp = restmp + two * real(amp_w(-1,-1)*ckm_wfactor*conjg(amp_z(-1,-1)),kind=dp) * cli * clj * couplz * couplw * xn * kfactor_z * kfactor_w
+	endif
+
+	restmp = restmp * aveqq
+	if(abs(iSel).eq.pdfBot_ .or. abs(jSel).eq.pdfBot_) restmp = restmp * tagbot
+	res(iSel,jSel) = restmp
+	
+	if(restmp.eq.0.0_dp) then
+		print *, "restmp = 0. Relevant indices:"
+		print *, "iSel: ",iSel,", jSel: ",jSel," rSel: ",rSel," sSel: ",sSel
+		if(ZZ_fusion) print *, "jz1: ",jz1,", jz2: ",jz2," kz1: ",kz1," kz2: ",kz2
+		if(WW_fusion) print *, "jw1: ",jw1,", jw2: ",jw2," kw1: ",kw1," kw2: ",kw2
+	endif
+	!print *, "End EvalAmp_WBFH_UnSymm_SA_Select_test: ",restmp
 
   RETURN
   END SUBROUTINE 
@@ -1997,15 +2426,6 @@ endif
 
 
 
-
-
-
-
-  
-  
-  
-  
-  
   function flip(i,a1,a2)
     integer :: flip(2)
     integer :: i, a1, a2
@@ -2411,7 +2831,7 @@ endif
   end function scr
 
   !- MCFM spinors
-  subroutine spinoru(n,p,za,zb,s)
+  subroutine spinoru2(n,p,za,zb,s)
     implicit none
     integer, intent(in) :: n
     real(dp), intent(in) :: p(4,n)
@@ -2461,7 +2881,7 @@ endif
 
     return
     
-  end subroutine spinoru
+  end subroutine spinoru2
 
 
 end module modHiggsJJ

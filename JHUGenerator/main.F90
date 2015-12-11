@@ -613,7 +613,7 @@ include "vegas_common.f"
          NDim = NDim + 2 ! sHat integration
          NDim = NDim + 1 ! for pdf sampling
          NDim = NDim + 1 ! for PS sampling 
-         VegasIt1_default = 5
+         VegasIt1_default = 15
          VegasNc0_default = 10000000
          VegasNc1_default = 500000
          VegasNc2_default = 10000
@@ -638,7 +638,7 @@ include "vegas_common.f"
          NDim = NDim + 2 ! sHat integration
          NDim = NDim + 1 ! for pdf sampling       
          NDim = NDim + 1 ! for PS sampling
-         VegasIt1_default = 5
+         VegasIt1_default = 15
          VegasNc0_default = 10000000
          VegasNc1_default = 500000
          VegasNc2_default = 10000
