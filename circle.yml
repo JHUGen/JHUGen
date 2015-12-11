@@ -113,10 +113,10 @@ test:
     - analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/VBF/ outfile=a2.root indir=$CIRCLE_ARTIFACTS/VBF/ computeVBFProdAngles=1 computeVHProdAngles=1 a2_decayed.lhe
 
     #make sure MELA compiles and runs
-    - cd ../JHUGenMELA && make
-    - cd ../JHUGenMELA/pdfs && ./downloadNNPDF.sh
-    - cd ../JHUGenMELA && ./testC.exe
-    - cd ../JHUGenMELA && ./testF.exe
+    #- cd ../JHUGenMELA && make
+    #- cd ../JHUGenMELA/pdfs && ./downloadNNPDF.sh
+    #- cd ../JHUGenMELA && ./testC
+    #- cd ../JHUGenMELA && ./testF
     #should check that all the "should be" ME's are correct...
 
 
