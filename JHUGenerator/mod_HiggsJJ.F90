@@ -2456,8 +2456,23 @@ endif
     complex(dp) :: iprop12, iprop34
     complex(dp) :: vvcoupl_prime(4)
     integer :: vv_it
+    integer :: i,j,k,l
 
     zab2(j1,j2,j3,j4) = za(j1,j2)*zb(j2,j4) + za(j1,j3)*zb(j3,j4)
+    !The previous line works, and assigns the whole zab2 correctly.
+    !I have no idea how it works.
+    !If you don't believe me, please uncomment the following lines:
+    !do i=1,4
+    ! do j=1,4
+    !  do k=1,4
+    !   do l=1,4
+    !    print *,i,j,k,l,zab2(i,j,k,l),za(i,j)*zb(j,l) + za(i,k)*zb(k,l)
+    !   enddo
+    !  enddo
+    ! enddo
+    !enddo
+    !print *,j1,j2,j3,j4
+    !pause
 
     A0_VV_4f = czero
 
