@@ -1888,7 +1888,7 @@ character(len=120) :: PDFLine
 character(len=160) :: EventLine(0:maxpart+3)
 integer :: VegasSeed,i,j,stat,DecayParticles(1:2)
 integer, dimension(:), allocatable :: gen_seed
-character(len=*),parameter :: DefaultFmt0 = "I2,X,I3,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7,2X,1PE13.7"
+character(len=*),parameter :: DefaultFmt0 = "I2,X,I3,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7"
 character(len=*),parameter :: Fmt1 = "6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0"
 character(len=150) :: IndentedFmt0, IndentedFmt1, InputFmt0, InputFmt1
 character(len=100) :: BeginEventLine
