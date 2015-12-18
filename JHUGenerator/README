@@ -28,8 +28,10 @@ command line parameters:
                   x=8:  Z --> l+ l- (l=e,mu,tau)
                   x=9:  Z --> anything
                   x=10: W --> l nu_l (l=e,mu,tau)
-                  x=11: W --> anyting                
-   TopDK         decay mode for tops in ttbar+H, 0=stable, 1=di-lept, 2=full hadr., 3,4=lepton+jets  
+                  x=11: W --> anyting       
+   TopDK         decay mode for tops in ttbar+H, 0=stable, 1=decaying (use DecayMode1/2 = 4,5 for W+/W-
+   TauDK         decay mode for taus in H-->tautau, 0=stable, 1=decaying (use DecayMode1/2 = 4,5 for W+/W-
+   BotDK         decay mode for bottom quarks in H->bbar, 0=deactivated, 1=activated
    DataFile=x    (name of the output file), default value: "output"
    MReso=yyy.xx  (resonance mass, default=125.60)
    OffXVV=xyz    (only applies to Higgs production, x,y,z can be 1 or 0 indicating real off-shellness for Higgs, Z/W boson 1/2, resp.), default 011
