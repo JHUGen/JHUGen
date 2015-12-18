@@ -155,7 +155,6 @@ complex(8), parameter :: cone = 1.0d0
 complex(8), parameter :: ci=(0.0d0,1.0d0)
 complex(8), parameter :: ne=(0.0d0,1.0d0)
 
-
 real(8) :: M_V,Ga_V
 real(8), parameter :: tol = 0.0000001d0
 

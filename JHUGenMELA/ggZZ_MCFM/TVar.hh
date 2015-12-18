@@ -242,6 +242,10 @@ struct event_type{
   TLorentzVector p1,p2,ep,em,nu,nb;
   double PSWeight;
 };
+struct event_scales_type{
+  std::string renormalizationMode, factorizationMode;
+  double ren_scale_factor, fac_scale_factor;
+};
 struct anomcoup{
   double delg1_z, delg1_g, lambda_g, lambda_z, delk_g, delk_z_,tevscale;
 };

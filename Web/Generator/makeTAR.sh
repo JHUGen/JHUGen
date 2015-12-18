@@ -5,9 +5,11 @@ INDIR="../../"
 
 cd $INDIR/JHUGenerator
 make || ( echo "compiling JHUGen failed!"; exit 1 )
+make clean
 cd - > /dev/null
 cd $INDIR/JHUGenMELA
 make || ( echo "compiling JHUGenMELA failed!"; exit 1 )
+make clean
 cd - > /dev/null
 
 

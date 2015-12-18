@@ -95,7 +95,7 @@ FUNCTION Get_ETA(Mom)
 implicit none
 real(8) ::Mom(1:4),Get_ETA
 
-   Get_ETA = 0.5d0*dlog( (Mom(1)+Mom(4))/(Mom(1)-Mom(4)) )
+   Get_ETA = 0.5d0*dlog( dabs((Mom(1)+Mom(4)+1d-16)/(Mom(1)-Mom(4) +1d-16) ))
 
 RETURN
 END FUNCTION
@@ -127,7 +127,7 @@ FUNCTION Get_CosTheta(Mom)! = Mom.nz/abs(Mom)
 implicit none
 real(8) ::Mom(1:4), Get_CosTheta
 
-    Get_CosTheta = Mom(4)/dsqrt( Mom(2)**2+Mom(3)**2+Mom(4)**2 )
+    Get_CosTheta = Mom(4)/dsqrt( Mom(2)**2+Mom(3)**2+Mom(4)**2 +1d-16)
 
 RETURN
 END FUNCTION
@@ -163,6 +163,19 @@ real(8) :: Mom1(1:4),Mom2(1:4),tmp(1:4)
 
 RETURN
 END SUBROUTINE
+
+
+SUBROUTINE swap_cmom(Mom1,Mom2)
+implicit none
+complex(8) :: Mom1(1:4),Mom2(1:4),tmp(1:4)
+
+    tmp(1:4) = Mom2(1:4)
+    Mom2(1:4) = Mom1(1:4)
+    Mom1(1:4) = tmp(1:4)
+
+RETURN
+END SUBROUTINE
+
 
 SUBROUTINE pT_order(N,Mom)
 implicit none
@@ -224,11 +237,22 @@ integer i, j, jmax, itemp
 !     print *, iy(:)
 !     stop
 
-return
+RETURN
 END SUBROUTINE
 
 
 
+SUBROUTINE printMom(Mom)
+implicit none
+real(8) :: Mom(:,:)
+integer :: n
+
+    do n=1,size(Mom,2)
+      write (*,"(A,I2,A,1F20.16,A,1F20.16,A,1F20.16,A,1F20.16,A)") "Mom(1:4,",n,")= (/",Mom(1,n),"d0,",Mom(2,n),"d0,",Mom(3,n),"d0,",Mom(4,n),"d0   /)"
+    enddo
+
+RETURN
+END SUBROUTINE
 
 
 
@@ -243,7 +267,7 @@ integer,optional :: ErrNum
    else
       print *, "ERROR: ",Message
    endif
-   stop
+   stop 1
 END SUBROUTINE
 
 
@@ -266,6 +290,18 @@ END FUNCTION
 SUBROUTINE swapi(i,j)
 implicit none
 integer :: i,j,temp
+
+    temp=j
+    j=i
+    i=temp
+
+END SUBROUTINE
+
+
+
+SUBROUTINE swapr(i,j)
+implicit none
+real(8) :: i,j,temp
 
     temp=j
     j=i
@@ -676,7 +712,7 @@ end function Capitalize
 
 
 
-subroutine spinoru(N,p,za,zb,s)
+subroutine spinoru(p,za,zb,s)
 !---Calculate spinor products      
 !---taken from MCFM & modified by R. Rontsch, May 2015
 !---extended to deal with negative energies ie with all momenta outgoing                                                                
@@ -685,13 +721,14 @@ subroutine spinoru(N,p,za,zb,s)
       implicit none
       real(8) :: p(:,:),two
       integer, parameter :: mxpart=14
-      complex(8):: c23(N),f(N),rt(N),za(:,:),zb(:,:),czero,cone,ci
+      complex(8):: c23(mxpart),f(mxpart),rt(mxpart),za(:,:),zb(:,:),czero,cone,ci
       real(8)   :: s(:,:)
       integer i,j,N
       
-      if (size(p,1) .ne. N) then
-         call Error("spinorz: momentum mismatch")
-      endif
+      N = size(p,1)
+!       if (size(p,1) .ne. N) then
+!          call Error("spinorz: momentum mismatch",size(p,1))
+!       endif
       two=2d0
       czero=dcmplx(0d0,0d0)
       cone=dcmplx(1d0,0d0)

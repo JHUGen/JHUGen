@@ -70,7 +70,7 @@
       subroutine readPDFSet(gridfilename,lenfilename)
       implicit none
       integer i,ix,iq,fl,imem,lenfilename
-      character(len=lenfilename) gridfilename
+      character(len=100) gridfilename
       character(len=100) line
 *
       integer nfl,nx,nq2,mem,rep
