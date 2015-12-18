@@ -2814,7 +2814,7 @@ EvalUnWeighted_DecayToTauTau = 0d0
 !      call random_number(DKRnd)
 !      if( DKRnd.lt.0.5d0 ) call swapi(DecayMode1,DecayMode2)
 !   endif
-  call VVBranchings(DK_IDUP(1:6),DK_ICOLUP(1:2,3:6),700)
+  call VVBranchings(DK_IDUP(1:6),DK_ICOLUP(1:2,3:6),800)
   MY_IDUP(nu_tau)   = NuT_;        ICOLUP(1:2,nu_tau)   = (/000,000/)
   MY_IDUP(Wp)       = DK_IDUP(1);  ICOLUP(1:2,Wp)       = (/000,000/)
   MY_IDUP(lepP)     = DK_IDUP(3);  ICOLUP(1:2,lepP)     = DK_ICOLUP(1:2,3)
