@@ -323,7 +323,7 @@ end subroutine EvalAmp_VHiggs
 
       gVVS1 = ghz1_dyn*(mass(3,1)**2) + qq * ( 2d0*ghz2_dyn + ghz3_dyn*qq/Lambda )
       gVVS2 = -( 2d0*ghz2_dyn + ghz3_dyn*qq/Lambda )
-      gVVP = -2d0*ghz4_dyn*(-1d0)
+      gVVP = -2d0*ghz4_dyn
       
       VVX0 = 0d0
       if(gVVS1.ne.0d0)then
@@ -354,7 +354,7 @@ end subroutine EvalAmp_VHiggs
       PVVX0P=(0d0,0d0)
       do mu3=1,4
       do mu4=1,4
-      PVVX0P=PVVX0P +POL1(lambda1,mu3)*VVX0(mu3,mu4)*dconjg(POL2(lambda2,mu4))
+      PVVX0P=PVVX0P +dconjg(POL1(lambda1,mu3))*VVX0(mu3,mu4)*POL2(lambda2,mu4)
       enddo !mu4
       enddo !mu3
       dMATRIXELEMENT=dMATRIXELEMENT*PVVX0P
@@ -1124,9 +1124,9 @@ end subroutine EvalAmp_VHiggs
 
 !lambda = +1
       POL(1,1)= 0d0
-      POL(1,2)= (-sincos(3)*sincos(1)+(0d0,1d0)*sincos(4))/dsqrt(2d0)
-      POL(1,3)= (-sincos(4)*sincos(1)-(0d0,1d0)*sincos(3))/dsqrt(2d0)
-      POL(1,4)= sincos(2)/dsqrt(2d0)
+      POL(1,2)= (sincos(3)*sincos(1)-(0d0,1d0)*sincos(4))/dsqrt(2d0)
+      POL(1,3)= (sincos(4)*sincos(1)+(0d0,1d0)*sincos(3))/dsqrt(2d0)
+      POL(1,4)= -sincos(2)/dsqrt(2d0)
 !lambda = -1
       POL(2,1)= 0d0
       POL(2,2)= ( sincos(3)*sincos(1)+(0d0,1d0)*sincos(4))/dsqrt(2d0)
