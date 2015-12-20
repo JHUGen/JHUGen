@@ -349,15 +349,17 @@ END SUBROUTINE
 
 
 
-SUBROUTINE WriteOutEvent_NEW(NUP,IDUP,ISTUP,MOTHUP,ICOLUP,Mom,HiggsDK_Mom,Mass,iHiggs,HiggsDK_IDUP,HiggsDK_ICOLUP,EventInfoLine,EventWeight,BeginEventLine)
+SUBROUTINE WriteOutEvent_NEW(NUP,IDUP,ISTUP,MOTHUP,ICOLUP,Mom,HiggsDK_Mom,Mass,iHiggs,HiggsDK_IDUP,HiggsDK_ICOLUP,EventProcessId,EventWeight,EventScaleAqedAqcd,BeginEventLine,InputFmt0)
 use ModParameters
 use modMisc
 implicit none
 real(8) :: Mom(:,:),HiggsDK_Mom(:,:),Mass(:)
 ! real(8),optional :: MomFSPartons(:,:)
+integer,optional :: EventProcessId
 real(8),optional :: EventWeight
-character(len=*) :: EventInfoLine
+real(8),optional :: EventScaleAqedAqcd(1:3)
 character(len=*),optional :: BeginEventLine
+character(len=*),optional :: InputFmt0
 ! integer,optional :: MOTHUP_Parton(:,:)
 real(8) :: Spin, Lifetime, s34,s56,s36,s45,smallestInv
 integer :: IDUP(:),ISTUP(:),MOTHUP(:,:),ICOLUP(:,:)
@@ -366,8 +368,7 @@ integer,parameter :: maxpart=30
 integer :: i,iHiggs
 integer :: NUP,NUP_NEW,IDPRUP
 real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP,HiggsDKLength
-character(len=*),parameter :: Fmt0 = "I2,X,I3,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7"
-character(len=*),parameter :: Fmt0_read = "I2,X,A"
+character(len=*),parameter :: DefaultFmt0 = "I2,X,I3,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7"
 character(len=*),parameter :: Fmt1 = "6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0"
 integer :: indent
 character(len=150) :: IndentedFmt0, IndentedFmt1
@@ -395,16 +396,25 @@ character(len=150) :: IndentedFmt0, IndentedFmt1
         NUP_NEW = 6
     endif
 
-
-    IDPRUP=100
+    if( present(EventProcessId) .and. importExternal_LHEinit) then
+        IDPRUP=EventProcessId
+    else
+        IDPRUP=100
+    endif
     if( present(EventWeight) ) then
         XWGTUP=EventWeight
     else
         XWGTUP=1.0d0
     endif
-    SCALUP=Mu_Fact * 100d0
-    AQEDUP=alpha_QED
-    AQCDUP=0.11d0
+    if( present(EventScaleAqedAqcd)  .and. importExternal_LHEinit) then
+        SCALUP=EventScaleAqedAqcd(1)
+        AQEDUP=EventScaleAqedAqcd(2)
+        AQCDUP=EventScaleAqedAqcd(3)
+    else
+        SCALUP=Mu_Fact * 100d0
+        AQEDUP=alpha_QED
+        AQCDUP=0.11d0
+    endif
     ISTUP(iHiggs) = 2
     if ( IsAPhoton(DecayMode1) .and. IsAPhoton(DecayMode2) ) then! photon+photon FS
         HiggsDK_ISTUP(4:9) = (/1,1,0,0,0,0/)
@@ -459,25 +469,21 @@ character(len=150) :: IndentedFmt0, IndentedFmt1
         write(io_LHEOutFile,"(A)") "<event>"
         indent = 0
     endif
-    if (indent.eq.0) then
-        if( ReadLHEFile .and. importExternal_LHEinit ) then
-            write(IndentedFmt0, "(A,A,A)") "(", Fmt0_read, ")"
+    if (present(InputFmt0)) then
+        IndentedFmt0=InputFmt0
+    else
+        if (indent.eq.0) then
+            write(IndentedFmt0, "(A,A,A)") "(", DefaultFmt0, ")"
         else
-            write(IndentedFmt0, "(A,A,A)") "(", Fmt0, ")"
+            write(IndentedFmt0, "(A,I1,A,A,A)") "(", indent, "X,", DefaultFmt0, ")"
         endif
+    endif
+    if (indent.eq.0) then
         write(IndentedFmt1, "(A,A,A)") "(", Fmt1, ")"
     else
-        if( ReadLHEFile .and. importExternal_LHEinit ) then
-            write(IndentedFmt0, "(A,I1,A,A,A)") "(", indent, "X,", Fmt0_read, ")"
-        else
-            write(IndentedFmt0, "(A,I1,A,A,A)") "(", indent, "X,", Fmt0, ")"
-        endif
         write(IndentedFmt1, "(A,I1,A,A,A)") "(", indent, "X,", Fmt1, ")"
     endif
-    if( ReadLHEFile .and. importExternal_LHEinit ) then
-      write(io_LHEOutFile,IndentedFmt0) NUP+NUP_NEW,trim(EventInfoLine)
-    else
-      write(io_LHEOutFile,IndentedFmt0) NUP+NUP_NEW,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
+    write(io_LHEOutFile,IndentedFmt0) NUP+NUP_NEW,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
     !  in order of appearance:
     !  (*) number of particles in the event
     !  (*) process ID (user defined)
@@ -485,7 +491,6 @@ character(len=150) :: IndentedFmt0, IndentedFmt1
     !  (*) pdf factorization scale in GeV
     !  (*) alpha_QED coupling for this event
     !  (*) alpha_s coupling for this event
-    endif
 
     
 !   write out existing particles
@@ -514,14 +519,16 @@ END SUBROUTINE
 
 
 
-SUBROUTINE WriteOutEvent_HFF(NUP,IDUP,ISTUP,MOTHUP,ICOLUP,Mom,HiggsDK_Mom,Mass,iHiggs,HiggsDK_IDUP,HiggsDK_ICOLUP,EventInfoLine,EventWeight,BeginEventLine)
+SUBROUTINE WriteOutEvent_HFF(NUP,IDUP,ISTUP,MOTHUP,ICOLUP,Mom,HiggsDK_Mom,Mass,iHiggs,HiggsDK_IDUP,HiggsDK_ICOLUP,EventProcessId,EventWeight,EventScaleAqedAqcd,BeginEventLine,InputFmt0)
 use ModParameters
 use modMisc
 implicit none
 real(8) :: Mom(:,:),HiggsDK_Mom(:,:),Mass(:)
+integer,optional :: EventProcessId
 real(8),optional :: EventWeight
-character(len=*) :: EventInfoLine
+real(8),optional :: EventScaleAqedAqcd(1:3)
 character(len=*),optional :: BeginEventLine
+character(len=*),optional :: InputFmt0
 real(8) :: Spin, Lifetime, s34,s56,s36,s45,smallestInv
 integer :: IDUP(:),ISTUP(:),MOTHUP(:,:),ICOLUP(:,:)
 integer :: HiggsDK_IDUP(:),HiggsDK_ICOLUP(:,:),HiggsDK_ISTUP(4:13),HiggsDK_MOTHUP(1:2,4:13)
@@ -529,8 +536,7 @@ integer,parameter :: maxpart=30
 integer :: i,iHiggs
 integer :: NUP,NUP_NEW,IDPRUP
 real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP,HiggsDKLength
-character(len=*),parameter :: Fmt0 = "I2,X,I3,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7"
-character(len=*),parameter :: Fmt0_read = "I2,X,A"
+character(len=*),parameter :: DefaultFmt0 = "I2,X,I3,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7"
 character(len=*),parameter :: Fmt1 = "6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0"
 integer :: indent
 character(len=150) :: IndentedFmt0, IndentedFmt1
@@ -549,15 +555,25 @@ integer, parameter :: inLeft=1, inRight=2, Hig=3, tauP=4, tauM=5, Wp=6, Wm=7,   
     endif
 
 
-    IDPRUP=100
+    if( present(EventProcessId) .and. importExternal_LHEinit) then
+        IDPRUP=EventProcessId
+    else
+        IDPRUP=100
+    endif
     if( present(EventWeight) ) then
         XWGTUP=EventWeight
     else
         XWGTUP=1.0d0
     endif
-    SCALUP=Mu_Fact * 100d0
-    AQEDUP=alpha_QED
-    AQCDUP=0.11d0
+    if( present(EventScaleAqedAqcd)  .and. importExternal_LHEinit) then
+        SCALUP=EventScaleAqedAqcd(1)
+        AQEDUP=EventScaleAqedAqcd(2)
+        AQCDUP=EventScaleAqedAqcd(3)
+    else
+        SCALUP=Mu_Fact * 100d0
+        AQEDUP=alpha_QED
+        AQCDUP=0.11d0
+    endif
     ISTUP(iHiggs) = 2
     if ( TauDecays.eq.0 ) then
         HiggsDK_ISTUP(4:5) = (/1,1/)
@@ -593,25 +609,21 @@ integer, parameter :: inLeft=1, inRight=2, Hig=3, tauP=4, tauM=5, Wp=6, Wm=7,   
         write(io_LHEOutFile,"(A)") "<event>"
         indent = 0
     endif
-    if (indent.eq.0) then
-        if( ReadLHEFile .and. importExternal_LHEinit ) then
-            write(IndentedFmt0, "(A,A,A)") "(", Fmt0_read, ")"
+    if (present(InputFmt0)) then
+        IndentedFmt0=InputFmt0
+    else
+        if (indent.eq.0) then
+            write(IndentedFmt0, "(A,A,A)") "(", DefaultFmt0, ")"
         else
-            write(IndentedFmt0, "(A,A,A)") "(", Fmt0, ")"
+            write(IndentedFmt0, "(A,I1,A,A,A)") "(", indent, "X,", DefaultFmt0, ")"
         endif
+    endif
+    if (indent.eq.0) then
         write(IndentedFmt1, "(A,A,A)") "(", Fmt1, ")"
     else
-        if( ReadLHEFile .and. importExternal_LHEinit ) then
-            write(IndentedFmt0, "(A,I1,A,A,A)") "(", indent, "X,", Fmt0_read, ")"
-        else
-            write(IndentedFmt0, "(A,I1,A,A,A)") "(", indent, "X,", Fmt0, ")"
-        endif
         write(IndentedFmt1, "(A,I1,A,A,A)") "(", indent, "X,", Fmt1, ")"
     endif
-    if( ReadLHEFile .and. importExternal_LHEinit ) then
-      write(io_LHEOutFile,IndentedFmt0) NUP+NUP_NEW,trim(EventInfoLine)
-    else
-      write(io_LHEOutFile,IndentedFmt0) NUP+NUP_NEW,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
+    write(io_LHEOutFile,IndentedFmt0) NUP+NUP_NEW,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
     !  in order of appearance:
     !  (*) number of particles in the event
     !  (*) process ID (user defined)
@@ -619,7 +631,6 @@ integer, parameter :: inLeft=1, inRight=2, Hig=3, tauP=4, tauM=5, Wp=6, Wm=7,   
     !  (*) pdf factorization scale in GeV
     !  (*) alpha_QED coupling for this event
     !  (*) alpha_s coupling for this event
-    endif
 
     
 !   write out existing particles

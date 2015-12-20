@@ -278,9 +278,8 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
     if( (TopDecays.eq.1) .and. .not. IsAWDecay(DecayMode1) ) call Error("Invalid DecayMode1 for top decays")
     if( (TopDecays.eq.1) .and. .not. IsAWDecay(DecayMode2) ) call Error("Invalid DecayMode2 for top decays")
 
-!     if( (TauDecays.ne.0 .and. TauDecays.ne.1) .and. (Process.eq.80 .or. Process.eq.110 .or. Process.eq.111) ) call Error("Specify TauDK=0,1")
-!     if( (TauDecays.eq.1) .and. .not. IsAWDecay(DecayMode1) ) call Error("Invalid DecayMode1 for tau decays")
-!     if( (TauDecays.eq.1) .and. .not. IsAWDecay(DecayMode2) ) call Error("Invalid DecayMode2 for tau decays")
+    if( (TauDecays.eq.1) .and. .not. IsAWDecay(DecayMode1) ) call Error("Invalid DecayMode1 for tau decays")
+    if( (TauDecays.eq.1) .and. .not. IsAWDecay(DecayMode2) ) call Error("Invalid DecayMode2 for tau decays")
 
     if( IsAZDecay(DecayMode1) ) then
        M_V = M_Z
@@ -1498,7 +1497,8 @@ character(len=150) :: InputFmt0,InputFmt1
 logical :: FirstEvent,M_ResoSet,Ga_ResoSet,WroteHeader,ClosedHeader,WroteMassWidth,InMadgraphMassBlock
 integer :: nline,intDummy,Nevent
 integer :: LHE_IDUP(1:maxpart),LHE_ICOLUP(1:2,1:maxpart),LHE_MOTHUP(1:2,1:maxpart)
-integer :: EventNumPart
+integer :: EventNumPart, EventProcessId
+real(8) :: WeightScaleAqedAqcd(1:4)
 character(len=160) :: FirstLines,EventInfoLine,OtherLines
 character(len=160) :: EventLine(0:maxpart)
 integer :: n,stat,iHiggs,VegasSeed
@@ -1685,20 +1685,12 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
          LeptInEvent(:) = 0
          read(16,"(A)") EventLine(0)
          if (UseUnformattedRead) then
-             read(EventLine(0),*) EventNumPart !  read number of particle from the first line after <event>
-             i = 1                             !  trying to read the other stuff in one string would just give
-             do while(EventLine(0)(i:i).eq." ")!  the first field
-                 i=i+1
-             enddo
-             do while(EventLine(0)(i:i).ne." ")
-                 i=i+1
-             enddo
-             read(EventLine(0)(i:len(EventLine(0))),"(A)") EventInfoLine
+             read(EventLine(0),*) EventNumPart, EventProcessId, WeightScaleAqedAqcd
          else
              if (InputFmt0.eq."") then
                  InputFmt0 = FindInputFmt0(EventLine(0))
              endif
-             read(EventLine(0),InputFmt0) EventNumPart, EventInfoLine
+             read(EventLine(0),InputFmt0) EventNumPart, EventProcessId, WeightScaleAqedAqcd
          endif
 !        read event lines
          do nline=1,EventNumPart
@@ -1759,7 +1751,11 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                 HiggsDK_IDUP(7) = convertLHE(HiggsDK_IDUP(7))
                 HiggsDK_IDUP(8) = convertLHE(HiggsDK_IDUP(8))
                 HiggsDK_IDUP(9) = convertLHE(HiggsDK_IDUP(9))
-                call WriteOutEvent_NEW(EventNumPart,LHE_IDUP,LHE_IntExt,LHE_MOTHUP,LHE_ICOLUP,MomExt,HiggsDK_Mom(1:4,4:9),Mass,iHiggs,HiggsDK_IDUP(1:9),HiggsDK_ICOLUP(1:2,1:9),EventInfoLine,BeginEventLine=BeginEventLine)
+                if (UseUnformattedRead) then
+                    call WriteOutEvent_NEW(EventNumPart,LHE_IDUP,LHE_IntExt,LHE_MOTHUP,LHE_ICOLUP,MomExt,HiggsDK_Mom(1:4,4:9),Mass,iHiggs,HiggsDK_IDUP,HiggsDK_ICOLUP,EventProcessId,EventWeight=WeightScaleAqedAqcd(1),EventScaleAqedAqcd=WeightScaleAqedAqcd(2:4),BeginEventLine=BeginEventLine)
+                else
+                    call WriteOutEvent_NEW(EventNumPart,LHE_IDUP,LHE_IntExt,LHE_MOTHUP,LHE_ICOLUP,MomExt,HiggsDK_Mom(1:4,4:9),Mass,iHiggs,HiggsDK_IDUP,HiggsDK_ICOLUP,EventProcessId,EventWeight=WeightScaleAqedAqcd(1),EventScaleAqedAqcd=WeightScaleAqedAqcd(2:4),BeginEventLine=BeginEventLine,InputFmt0=InputFmt0)
+                endif
              else! H->tautau
                 call boost(HiggsDK_Mom(1:4,4),MomHiggs(1:4),pH2sq)
                 call boost(HiggsDK_Mom(1:4,5),MomHiggs(1:4),pH2sq)
@@ -1782,7 +1778,11 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                 HiggsDK_IDUP(11)= convertLHE(HiggsDK_IDUP(11))
                 HiggsDK_IDUP(12)= convertLHE(HiggsDK_IDUP(12))
                 HiggsDK_IDUP(13)= convertLHE(HiggsDK_IDUP(13))
-                call WriteOutEvent_HFF(EventNumPart,LHE_IDUP,LHE_IntExt,LHE_MOTHUP,LHE_ICOLUP,MomExt,HiggsDK_Mom(1:4,1:13),Mass,iHiggs,HiggsDK_IDUP(1:13),HiggsDK_ICOLUP(1:2,1:13),EventInfoLine,BeginEventLine=BeginEventLine)
+                if (UseUnformattedRead) then
+                    call WriteOutEvent_HFF(EventNumPart,LHE_IDUP,LHE_IntExt,LHE_MOTHUP,LHE_ICOLUP,MomExt,HiggsDK_Mom(1:4,1:13),Mass,iHiggs,HiggsDK_IDUP(1:13),HiggsDK_ICOLUP(1:2,1:13),EventProcessId,EventWeight=WeightScaleAqedAqcd(1),EventScaleAqedAqcd=WeightScaleAqedAqcd(2:4),BeginEventLine=BeginEventLine)
+                else
+                    call WriteOutEvent_HFF(EventNumPart,LHE_IDUP,LHE_IntExt,LHE_MOTHUP,LHE_ICOLUP,MomExt,HiggsDK_Mom(1:4,1:13),Mass,iHiggs,HiggsDK_IDUP(1:13),HiggsDK_ICOLUP(1:2,1:13),EventProcessId,EventWeight=WeightScaleAqedAqcd(1),EventScaleAqedAqcd=WeightScaleAqedAqcd(2:4),BeginEventLine=BeginEventLine,InputFmt0=InputFmt0)
+                endif
              endif
 
              if( mod(AccepCounter,5000).eq.0 ) then
@@ -1881,13 +1881,14 @@ logical :: FirstEvent,M_ResoSet,Ga_ResoSet,WroteHeader,ClosedHeader,WroteMassWid
 integer :: nline,intDummy,Nevent
 integer :: LHE_IDUP(1:maxpart+3),   LHE_ICOLUP(1:2,1:maxpart+3),   LHE_MOTHUP(1:2,1:maxpart+3)
 integer :: LHE_IDUP_Part(1:maxpart),LHE_ICOLUP_Part(1:2,1:maxpart),LHE_MOTHUP_Part(1:2,1:maxpart+3)
-integer :: EventNumPart,nparton
+integer :: EventNumPart,nparton,EventProcessId
+real(8) :: WeightScaleAqedAqcd(1:4)
 character(len=160) :: FirstLines
-character(len=120) :: EventInfoLine,PDFLine
+character(len=120) :: PDFLine
 character(len=160) :: EventLine(0:maxpart+3)
 integer :: VegasSeed,i,j,stat,DecayParticles(1:2)
 integer, dimension(:), allocatable :: gen_seed
-character(len=*),parameter :: Fmt0 = "I2,X,A"
+character(len=*),parameter :: DefaultFmt0 = "I2,X,I3,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7"
 character(len=*),parameter :: Fmt1 = "6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0"
 character(len=150) :: IndentedFmt0, IndentedFmt1, InputFmt0, InputFmt1
 character(len=100) :: BeginEventLine
@@ -2048,20 +2049,12 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
          NEvent=NEvent + 1
          read(16,"(A)") EventLine(0)
          if (UseUnformattedRead) then
-             read(EventLine(0),*) EventNumPart !  read number of particle from the first line after <event>
-             i = 1                             !  trying to read the other stuff in one string would just give
-             do while(EventLine(0)(i:i).eq." ")!  the first field
-                 i=i+1
-             enddo
-             do while(EventLine(0)(i:i).ne." ")
-                 i=i+1
-             enddo
-             read(EventLine(0)(i:len(EventLine(0))),"(A)") EventInfoLine
+             read(EventLine(0),*) EventNumPart, EventProcessId, WeightScaleAqedAqcd
          else
              if (InputFmt0.eq."") then
                  InputFmt0 = FindInputFmt0(EventLine(0))
              endif
-             read(EventLine(0),InputFmt0) EventNumPart, EventInfoLine
+             read(EventLine(0),InputFmt0) EventNumPart, EventProcessId, WeightScaleAqedAqcd
          endif
 
 !        read event lines
@@ -2347,14 +2340,21 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
          do while (BeginEventLine(indent+1:indent+1).eq." ")
              indent = indent+1
          enddo
+         if (.not.UseUnformattedRead) then
+             IndentedFmt0=InputFmt0
+         else
+             if (indent.eq.0) then
+                 write(IndentedFmt0, "(A,A,A)") "(", DefaultFmt0, ")"
+             else
+                 write(IndentedFmt0, "(A,I1,A,A,A)") "(", indent, "X,", DefaultFmt0, ")"
+             endif
+         endif
          if (indent.eq.0) then
-             write(IndentedFmt0, "(A,A,A)") "(", Fmt0, ")"
              write(IndentedFmt1, "(A,A,A)") "(", Fmt1, ")"
          else
-             write(IndentedFmt0, "(A,I1,A,A,A)") "(", indent, "X,", Fmt0, ")"
              write(IndentedFmt1, "(A,I1,A,A,A)") "(", indent, "X,", Fmt1, ")"
          endif
-         write(io_LHEOutFile,fmt=IndentedFmt0) EventNumPart,EventInfoLine!  read number of particle from the first line after <event> and other info
+         write(io_LHEOutFile,fmt=IndentedFmt0) EventNumPart,EventProcessId,WeightScaleAqedAqcd!  read number of particle from the first line after <event> and other info
          do nline=1,EventNumPart
             write(io_LHEOutFile,fmt=IndentedFmt1) LHE_IDUP(nline),IntExt(nline),LHE_MOTHUP(1,nline),LHE_MOTHUP(2,nline),LHE_ICOLUP(1,nline),LHE_ICOLUP(2,nline),MomShift(2,nline),MomShift(3,nline),MomShift(4,nline),MomShift(1,nline),Mass(nline),Spin(nline),Lifetime(nline)
          enddo
@@ -3368,7 +3368,11 @@ character :: arg*(500)
     if( Process.eq.113) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( ReadLHEFile )    write(TheUnit,"(4X,A)") "           (This is ReadLHEFile mode. Resonance mass/width might be overwritten by LHE input parameters. See below.)"
     if( ConvertLHEFile ) write(TheUnit,"(4X,A)") "           (This is ConvertLHEFile mode. Resonance mass/width might be overwritten by LHE input parameters. See below.)"
-    if( Process.le.2 .or. Process.eq.50 .or. Process.eq.60 .or. Process.eq.66 .or. ((TopDecays.eq.1).and.Process.eq.80) .or. (Process.ge.110 .and. Process.le.113) .or. ReadLHEFile .or. ConvertLHEFile ) then
+    if( &
+         (.not.ReadLHEFile .and. (Process.le.2 .or. Process.eq.50 .or. Process.eq.60 .or. Process.eq.66 .or. ((TopDecays.eq.1).and.Process.eq.80) .or. (Process.ge.110 .and. Process.le.113))) &
+    .or. (ReadLHEFile .and. TauDecays.ne.0) &
+    .or. ConvertLHEFile ) &
+    then
         if( .not.ReadLHEFile .and. (ConvertLHEFile .or. Process.eq.50 .or. (Process.ge.110 .and. Process.le.113)) ) then
             write(TheUnit,"(4X,A,I2,2X,A,I2)") "DecayMode1:",DecayMode1
         else if( ReadLHEFile .or. Process.le.2 .or. Process .eq. 80 ) then
