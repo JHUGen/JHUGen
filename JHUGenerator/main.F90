@@ -293,21 +293,12 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
     endif
 
 
-    if( ((DecayMode1.eq.0) .and. (DecayMode2.eq.0)) .or.  &
-        ((DecayMode1.eq.2) .and. (DecayMode2.eq.2)) .or.  &
-        ((DecayMode1.eq.8) .and. (DecayMode2.eq.8)) .or.  &
-        ((DecayMode1.eq.9) .and. (DecayMode2.eq.9)) .or.  &
-        ((DecayMode1.eq.0) .and. (DecayMode2.eq.8)) .or.  &
-        ((DecayMode1.eq.0) .and. (DecayMode2.eq.9)) .or.  &
-        ((DecayMode1.eq.2) .and. (DecayMode2.eq.8)) .or.  &
-        ((DecayMode1.eq.2) .and. (DecayMode2.eq.9)) .or.  &
-        ((DecayMode1.eq.8) .and. (DecayMode2.eq.9)) .or.  &
-        ((DecayMode2.eq.0) .and. (DecayMode1.eq.0)) .or.  &
-        ((DecayMode2.eq.0) .and. (DecayMode1.eq.8)) .or.  &
-        ((DecayMode2.eq.0) .and. (DecayMode1.eq.9)) .or.  &
-        ((DecayMode2.eq.2) .and. (DecayMode1.eq.8)) .or.  &
-        ((DecayMode2.eq.2) .and. (DecayMode1.eq.9)) .or.  &
-        ((DecayMode2.eq.8) .and. (DecayMode1.eq.9))       ) then !  allow interference
+    if( (DecayMode1.eq.DecayMode2 .and. IsAZDecay(DecayMode1)) .or.  &
+        (DecayMode1.eq.9) .or. (DecayMode2.eq.9)               .or.  &
+        (DecayMode1.eq.8  .and. DecayMode2.eq.0)               .or.  &
+        (DecayMode1.eq.8  .and. DecayMode2.eq.2)               .or.  &
+        (DecayMode1.eq.0  .and. DecayMode2.eq.8)               .or.  &
+        (DecayMode1.eq.2  .and. DecayMode2.eq.8)               ) then !  allow interference
             if( iinterf.eq.-1 ) then!  set default interference switch
                 if( M_Reso.gt.2d0*M_Z ) then
                     includeInterference = .false.
