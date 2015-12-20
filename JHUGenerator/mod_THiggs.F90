@@ -22,8 +22,6 @@ real(8) :: s12,s13,s1e4,s1k4,s15,s23,s2e4,s2k4,s25,s3e4,s3k4,s35,se45,sk45,se4k4
 integer :: j
 integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9
 
-
-
 ! setup momenta for spinor helicity products -- undecayed tops
       p4Dp5=MomExt(1,qout)*MomExt(1,t)-MomExt(2,qout)*MomExt(2,t)-MomExt(3,qout)*MomExt(3,t)-MomExt(4,qout)*MomExt(4,t)
       p4Dp7=MomExt(1,lep)*MomExt(1,t)-MomExt(2,lep)*MomExt(2,t)-MomExt(3,lep)*MomExt(3,t)-MomExt(4,lep)*MomExt(4,t)
@@ -126,8 +124,6 @@ real(8) :: s12,s13,s1e4,s1k4,s15,s23,s2e4,s2k4,s25,s3e4,s3k4,s35,se45,sk45,se4k4
 integer :: j
 integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9
 
-
-
 ! setup momenta for spinor helicity products                                                                                                                                 
    p4Dp5=MomExt(1,qout)*MomExt(1,t)-MomExt(2,qout)*MomExt(2,t)-MomExt(3,qout)*MomExt(3,t)-MomExt(4,qout)*MomExt(4,t)
    p4Dp7=MomExt(1,lep)*MomExt(1,t)-MomExt(2,lep)*MomExt(2,t)-MomExt(3,lep)*MomExt(3,t)-MomExt(4,lep)*MomExt(4,t)
@@ -224,7 +220,6 @@ real(8) :: s12,s13,s1e4,s1k4,s15,s23,s2e4,s2k4,s25,s3e4,s3k4,s35,se45,sk45,se4k4
 integer :: j
 integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, bout=5, bdk=6,W=7,lep=8,nu=9
 
-
 ! setup momenta for spinor helicity products -- undecayed tops
       p4Dp5=MomExt(1,bout)*MomExt(1,t)-MomExt(2,bout)*MomExt(2,t)-MomExt(3,bout)*MomExt(3,t)-MomExt(4,bout)*MomExt(4,t)
       p4Dp7=MomExt(1,lep)*MomExt(1,t)-MomExt(2,lep)*MomExt(2,t)-MomExt(3,lep)*MomExt(3,t)-MomExt(4,lep)*MomExt(4,t)
@@ -309,7 +304,6 @@ complex(8) :: za(10,10),zb(10,10),LOAmp(-6:6,-6:6,1:2),decay_amp(1:2)
 real(8) :: s12,s13,s1e4,s1k4,s15,s23,s2e4,s2k4,s25,s3e4,s3k4,s35,se45,sk45,se4k4,ColFac
 integer :: j
 integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, bout=5, bdk=6,W=7,lep=8,nu=9
-
 
 
 ! setup momenta for spinor helicity products                                                                                                                                 
@@ -418,93 +412,114 @@ END SUBROUTINE
         KL=-mt/vev*(kappa-(0d0,1d0)*kappa_tilde) !   *0000000000000d0
         KR=-mt/vev*(kappa+(0d0,1d0)*kappa_tilde) !   *0000000000000d0
         
+! these should be defined globally...
          om1 = 1d0
          om2 = 0d0
          om3 = 0d0
+
+        ampw(1) =  + mw**(-2)*om2 * ( 1d0/2d0*za(p5,p2)*za(e4,k4)*zb(p2&
+     &    ,p1)*zb(k4,p2)*s24 + 1d0/4d0*za(p5,p2)*za(e4,k4)*zb(p2,p1)*&
+     &    zb(k4,p2)*s12 + 1d0/4d0*za(p5,p2)*za(e4,k4)*zb(p2,p1)*zb(k4,&
+     &    p2)*s14 + 1d0/4d0*za(p5,p2)*za(e4,k4)*zb(p2,p1)*zb(k4,p2)*s45&
+     &     + 1d0/4d0*za(p5,p2)*za(e4,k4)*zb(p2,p1)*zb(k4,p2)*s25 + 1d0/&
+     &    2d0*za(p5,k4)*za(e4,k4)*zb(k4,p1)*zb(k4,p2)*s24 + 1d0/4d0*za(&
+     &    p5,k4)*za(e4,k4)*zb(k4,p1)*zb(k4,p2)*s12 + 1d0/4d0*za(p5,k4)*&
+     &    za(e4,k4)*zb(k4,p1)*zb(k4,p2)*s14 + 1d0/4d0*za(p5,k4)*za(e4,&
+     &    k4)*zb(k4,p1)*zb(k4,p2)*s45 + 1d0/4d0*za(p5,k4)*za(e4,k4)*zb(&
+     &    k4,p1)*zb(k4,p2)*s25 + 1d0/2d0*za(p5,e4)*za(e4,k4)*zb(k4,p2)*&
+     &    zb(e4,p1)*s24 + 1d0/4d0*za(p5,e4)*za(e4,k4)*zb(k4,p2)*zb(e4,&
+     &    p1)*s12 + 1d0/4d0*za(p5,e4)*za(e4,k4)*zb(k4,p2)*zb(e4,p1)*s14&
+     &     + 1d0/4d0*za(p5,e4)*za(e4,k4)*zb(k4,p2)*zb(e4,p1)*s45 + 1d0/&
+     &    4d0*za(p5,e4)*za(e4,k4)*zb(k4,p2)*zb(e4,p1)*s25 )
+      ampw(1) = ampw(1) + mw**(-2)*mt**2*om2 * (  - 1d0/2d0*za(p5,p2)*&
+     &    za(e4,k4)*zb(p2,p1)*zb(k4,p2) - 1d0/2d0*za(p5,k4)*za(e4,k4)*&
+     &    zb(k4,p1)*zb(k4,p2) - 1d0/2d0*za(p5,e4)*za(e4,k4)*zb(k4,p2)*&
+     &    zb(e4,p1) )
+      ampw(1) = ampw(1) + om3 * ( 1d0/2d0*za(p5,p2)*za(e4,p1)*zb(p1,p2)&
+     &    *zb(p2,p1)*ci + 1d0/2d0*za(p5,p2)*za(e4,p5)*zb(p2,p1)*zb(p5,&
+     &    p2)*ci - za(p5,k4)*za(e4,p1)*zb(p1,p2)*zb(p1,k4)*ci - 1d0/2d0&
+     &    *za(p5,k4)*za(e4,p1)*zb(p1,p2)*zb(k4,p1)*ci - za(p5,k4)*za(e4&
+     &    ,p5)*zb(p1,p2)*zb(p5,k4)*ci - 1d0/2d0*za(p5,k4)*za(e4,p5)*zb(&
+     &    p5,p2)*zb(k4,p1)*ci - za(p5,e4)*za(e4,p1)*zb(p1,p2)*zb(p1,e4)&
+     &    *ci - 1d0/2d0*za(p5,e4)*za(e4,p1)*zb(p1,p2)*zb(e4,p1)*ci - &
+     &    za(p5,e4)*za(e4,p5)*zb(p1,p2)*zb(p5,e4)*ci - 1d0/2d0*za(p5,e4&
+     &    )*za(e4,p5)*zb(p5,p2)*zb(e4,p1)*ci + 1d0/2d0*za(p5,e4)*zb(p1,&
+     &    p2)*s12*ci + 1d0/2d0*za(p5,e4)*zb(p1,p2)*s14*ci + 1d0/2d0*za(&
+     &    p5,e4)*zb(p1,p2)*s45*ci + 1d0/2d0*za(p5,e4)*zb(p1,p2)*s25*ci&
+     &     )
+      ampw(1) = ampw(1) + om2 * (  - 1d0/2d0*za(p5,p2)*za(e4,p1)*zb(p1,&
+     &    p2)*zb(p2,p1) - 1d0/2d0*za(p5,p2)*za(e4,p5)*zb(p2,p1)*zb(p5,&
+     &    p2) - 1d0/2d0*za(p5,p2)*za(e4,k4)*zb(p2,p1)*zb(k4,p2) - 1d0/2d0&
+      &    *za(p5,k4)*za(e4,p1)*zb(p1,p2)*zb(k4,p1) - 1d0/2d0*za(p5,k4)&
+     &    *za(e4,p5)*zb(p5,p2)*zb(k4,p1) - 1d0/2d0*za(p5,k4)*za(e4,k4)*&
+     &    zb(k4,p1)*zb(k4,p2) - 1d0/2d0*za(p5,e4)*za(e4,p1)*zb(p1,p2)*&
+     &    zb(e4,p1) - 1d0/2d0*za(p5,e4)*za(e4,p5)*zb(p5,p2)*zb(e4,p1)&
+     &     - 1d0/2d0*za(p5,e4)*za(e4,k4)*zb(k4,p2)*zb(e4,p1) )
+      ampw(1) = ampw(1) + om1 * ( 1d0/2d0*za(p5,p2)*za(e4,k4)*zb(p2,p1)&
+     &    *zb(k4,p2) + 1d0/2d0*za(p5,k4)*za(e4,k4)*zb(k4,p1)*zb(k4,p2)&
+     &     + 1d0/2d0*za(p5,e4)*za(e4,k4)*zb(k4,p2)*zb(e4,p1) )
+      ampw(1) = ampw(1) + mt**2*om3 * (  - za(p5,e4)*zb(p1,p2)*ci )
+      ampw(1) = ampw(1) + mw**2*om1 * ( za(p5,e4)*zb(p1,p2) )
         
+        ampw(2) =  + mw**(-2)*mt*om2 * (  - 1d0/2d0*za(p5,p2)*zb(p2,p1)&
+     &    *zb(p2,e4)*s24 - 1d0/4d0*za(p5,p2)*zb(p2,p1)*zb(p2,e4)*s12 - &
+     &    1d0/4d0*za(p5,p2)*zb(p2,p1)*zb(p2,e4)*s14 - 1d0/4d0*za(p5,p2)&
+     &    *zb(p2,p1)*zb(p2,e4)*s45 - 1d0/4d0*za(p5,p2)*zb(p2,p1)*zb(p2,&
+     &    e4)*s25 - 1d0/2d0*za(p5,k4)*zb(p2,e4)*zb(k4,p1)*s24 - 1d0/4d0&
+     &    *za(p5,k4)*zb(p2,e4)*zb(k4,p1)*s12 - 1d0/4d0*za(p5,k4)*zb(p2,&
+     &    e4)*zb(k4,p1)*s14 - 1d0/4d0*za(p5,k4)*zb(p2,e4)*zb(k4,p1)*s45&
+     &     - 1d0/4d0*za(p5,k4)*zb(p2,e4)*zb(k4,p1)*s25 - 1d0/2d0*za(p5,&
+     &    e4)*zb(p2,e4)*zb(e4,p1)*s24 - 1d0/4d0*za(p5,e4)*zb(p2,e4)*zb(&
+     &    e4,p1)*s12 - 1d0/4d0*za(p5,e4)*zb(p2,e4)*zb(e4,p1)*s14 - 1d0/&
+     &    4d0*za(p5,e4)*zb(p2,e4)*zb(e4,p1)*s45 - 1d0/4d0*za(p5,e4)*zb(&
+     &    p2,e4)*zb(e4,p1)*s25 )
+      ampw(2) = ampw(2) + mw**(-2)*mt**3*om2 * ( 1d0/2d0*za(p5,p2)*zb(&
+     &    p2,p1)*zb(p2,e4) + 1d0/2d0*za(p5,k4)*zb(p2,e4)*zb(k4,p1) + 1d0&
+      &   /2d0*za(p5,e4)*zb(p2,e4)*zb(e4,p1) )
+      ampw(2) = ampw(2) + mt*om3 * ( 1d0/2d0/(za(k4,e4))*za(p5,p2)*za(&
+     &    k4,p1)*zb(p1,p2)*zb(p2,p1)*ci + 1d0/2d0/(za(k4,e4))*za(p5,p2)&
+     &    *za(k4,p5)*zb(p2,p1)*zb(p5,p2)*ci + 1d0/2d0/(za(k4,e4))*za(p5&
+     &    ,k4)*za(k4,p1)*zb(p1,p2)*zb(k4,p1)*ci + 1/(za(k4,e4))*za(p5,&
+     &    k4)*za(k4,p5)*zb(p1,p2)*zb(k4,p5)*ci - 1d0/2d0/(za(k4,e4))*&
+     &    za(p5,k4)*za(k4,p5)*zb(p5,p2)*zb(k4,p1)*ci + 1d0/2d0/(za(k4,&
+     &    e4))*za(p5,k4)*zb(p1,p2)*s12*ci + 1d0/2d0/(za(k4,e4))*za(p5,&
+     &    k4)*zb(p1,p2)*s14*ci + 1d0/2d0/(za(k4,e4))*za(p5,k4)*zb(p1,p2&
+     &    )*s45*ci + 1d0/2d0/(za(k4,e4))*za(p5,k4)*zb(p1,p2)*s25*ci + 1d0&
+      &    /2d0/(za(k4,e4))*za(p5,e4)*za(k4,p1)*zb(p1,p2)*zb(e4,p1)*ci&
+     &     + 1/(za(k4,e4))*za(p5,e4)*za(k4,p5)*zb(p1,p2)*zb(e4,p5)*ci&
+     &     - 1d0/2d0/(za(k4,e4))*za(p5,e4)*za(k4,p5)*zb(p5,p2)*zb(e4,p1&
+     &    )*ci )
+      ampw(2) = ampw(2) + mt*om2 * ( 1d0/2d0*za(p5,p2)*zb(p2,p1)*zb(p2,&
+     &    e4) + 1d0/2d0*za(p5,k4)*zb(p2,e4)*zb(k4,p1) + 1d0/2d0*za(p5,&
+     &    e4)*zb(p2,e4)*zb(e4,p1) - 1d0/2d0/(za(k4,e4))*za(p5,p2)*za(k4&
+     &    ,p1)*zb(p1,p2)*zb(p2,p1) - 1d0/2d0/(za(k4,e4))*za(p5,p2)*za(&
+     &    k4,p5)*zb(p2,p1)*zb(p5,p2) - 1d0/2d0/(za(k4,e4))*za(p5,k4)*&
+     &    za(k4,p1)*zb(p1,p2)*zb(k4,p1) - 1d0/2d0/(za(k4,e4))*za(p5,k4)&
+     &    *za(k4,p5)*zb(p5,p2)*zb(k4,p1) - 1d0/2d0/(za(k4,e4))*za(p5,e4&
+     &    )*za(k4,p1)*zb(p1,p2)*zb(e4,p1) - 1d0/2d0/(za(k4,e4))*za(p5,&
+     &    e4)*za(k4,p5)*zb(p5,p2)*zb(e4,p1) )
+      ampw(2) = ampw(2) + mt*om1 * (  - 1d0/2d0*za(p5,p2)*zb(p2,p1)*zb(&
+     &    p2,e4) - 1d0/2d0*za(p5,k4)*zb(p2,e4)*zb(k4,p1) - 1d0/2d0*za(&
+     &    p5,e4)*zb(p2,e4)*zb(e4,p1) )
+      ampw(2) = ampw(2) + mt**3*om3 * (  - 1/(za(k4,e4))*za(p5,k4)*zb(&
+     &    p1,p2)*ci )
+      ampw(2) = ampw(2) + mw**2*mt*om1 * ( 1/(za(k4,e4))*za(p5,k4)*zb(&
+     &    p1,p2) )
         
-        ampw(1) =  + om3 * (  - 1d0/2d0*za(p5,p2)*za(e4,p1)*zb(p1,p2)*&
-     &    zb(p2,p1)*ci - 1d0/2d0*za(p5,p2)*za(e4,p5)*zb(p2,p1)*zb(p5,p2&
-     &    )*ci + za(p5,k4)*za(e4,p1)*zb(p1,p2)*zb(p1,k4)*ci + 1d0/2d0*&
-     &    za(p5,k4)*za(e4,p1)*zb(p1,p2)*zb(k4,p1)*ci + za(p5,k4)*za(e4,&
-     &    p5)*zb(p1,p2)*zb(p5,k4)*ci + 1d0/2d0*za(p5,k4)*za(e4,p5)*zb(&
-     &    p5,p2)*zb(k4,p1)*ci + za(p5,e4)*za(e4,p1)*zb(p1,p2)*zb(p1,e4)&
-     &    *ci + 1d0/2d0*za(p5,e4)*za(e4,p1)*zb(p1,p2)*zb(e4,p1)*ci + &
-     &    za(p5,e4)*za(e4,p5)*zb(p1,p2)*zb(p5,e4)*ci + 1d0/2d0*za(p5,e4&
-     &    )*za(e4,p5)*zb(p5,p2)*zb(e4,p1)*ci + za(p5,e4)*zb(p1,p2)*&
-     &    mt**2*ci - 1d0/2d0*za(p5,e4)*zb(p1,p2)*s12*ci - 1d0/2d0*za(p5&
-     &    ,e4)*zb(p1,p2)*s14*ci - 1d0/2d0*za(p5,e4)*zb(p1,p2)*s45*ci - &
-     &    1d0/2d0*za(p5,e4)*zb(p1,p2)*s25*ci )
-      ampw(1) = ampw(1) + om2 * (  - 1d0/2d0*za(p5,e3)*za(e4,e3)*zb(e3,&
-     &    p1)*zb(e3,p2) - 1d0/2d0*za(p5,e3)*za(e4,k3)*zb(e3,p1)*zb(k3,&
-     &    p2) - 1d0/2d0*za(p5,k3)*za(e4,e3)*zb(e3,p2)*zb(k3,p1) - 1d0/2d0&
-      &    *za(p5,k3)*za(e4,k3)*zb(k3,p1)*zb(k3,p2) - 1d0/2d0/(zb(k4,e4&
-     &    ))*za(p5,e3)*zb(p2,k4)*zb(e3,p1)*mw**(-2)*mt**4 + 1d0/2d0/(&
-     &    zb(k4,e4))*za(p5,e3)*zb(p2,k4)*zb(e3,p1)*s24*mw**(-2)*mt**2&
-     &     + 1d0/4d0/(zb(k4,e4))*za(p5,e3)*zb(p2,k4)*zb(e3,p1)*s12*&
-     &    mw**(-2)*mt**2 + 1d0/4d0/(zb(k4,e4))*za(p5,e3)*zb(p2,k4)*zb(&
-     &    e3,p1)*s14*mw**(-2)*mt**2 + 1d0/4d0/(zb(k4,e4))*za(p5,e3)*zb(&
-     &    p2,k4)*zb(e3,p1)*s45*mw**(-2)*mt**2 + 1d0/4d0/(zb(k4,e4))*za(&
-     &    p5,e3)*zb(p2,k4)*zb(e3,p1)*s25*mw**(-2)*mt**2 - 1d0/2d0/(zb(&
-     &    k4,e4))*za(p5,k3)*zb(p2,k4)*zb(k3,p1)*mw**(-2)*mt**4 + 1d0/2d0&
-     &    /(zb(k4,e4))*za(p5,k3)*zb(p2,k4)*zb(k3,p1)*s24*mw**(-2)*mt**2&
-     &     + 1d0/4d0/(zb(k4,e4))*za(p5,k3)*zb(p2,k4)*zb(k3,p1)*s12*&
-     &    mw**(-2)*mt**2 + 1d0/4d0/(zb(k4,e4))*za(p5,k3)*zb(p2,k4)*zb(&
-     &    k3,p1)*s14*mw**(-2)*mt**2 )
-      ampw(1) = ampw(1) + om2 * ( 1d0/4d0/(zb(k4,e4))*za(p5,k3)*zb(p2,&
-     &    k4)*zb(k3,p1)*s45*mw**(-2)*mt**2 + 1d0/4d0/(zb(k4,e4))*za(p5,&
-     &    k3)*zb(p2,k4)*zb(k3,p1)*s25*mw**(-2)*mt**2 )
-      ampw(1) = ampw(1) + om1 * ( za(p5,e4)*zb(p1,p2)*mw**2 - 1d0/2d0/(&
-     &    zb(k4,e4))*za(p5,p2)*zb(p2,p1)*zb(p2,k4)*mt**2 - 1d0/2d0/(zb(&
-     &    k4,e4))*za(p5,k4)*zb(p2,k4)*zb(k4,p1)*mt**2 - 1d0/2d0/(zb(k4,&
-     &    e4))*za(p5,e4)*zb(p2,k4)*zb(e4,p1)*mt**2 )
+        ampt(1) =  + mt * (  - 1d0/2d0*za(p5,e4)*zb(p1,p2)*vev*KR - 1d0/&
+     &    2d0/(zb(k4,e4))*za(p5,p1)*zb(p1,p2)*zb(p1,k4)*vev*KL + 1d0/2d0&
+     &    /(zb(k4,e4))*za(p5,p2)*zb(p2,p1)*zb(p2,k4)*vev*KL )
         
-        ampw(2) =  + om3 * (  - 1d0/2d0/(za(k4,e4))*za(p5,p2)*za(k4,p1)&
-     &    *zb(p1,p2)*zb(p2,p1)*mt*ci - 1d0/2d0/(za(k4,e4))*za(p5,p2)*&
-     &    za(k4,p5)*zb(p2,p1)*zb(p5,p2)*mt*ci - 1d0/2d0/(za(k4,e4))*za(&
-     &    p5,k4)*za(k4,p1)*zb(p1,p2)*zb(k4,p1)*mt*ci - 1/(za(k4,e4))*&
-     &    za(p5,k4)*za(k4,p5)*zb(p1,p2)*zb(k4,p5)*mt*ci + 1d0/2d0/(za(&
-     &    k4,e4))*za(p5,k4)*za(k4,p5)*zb(p5,p2)*zb(k4,p1)*mt*ci + 1/(&
-     &    za(k4,e4))*za(p5,k4)*zb(p1,p2)*mt**3*ci - 1d0/2d0/(za(k4,e4))&
-     &    *za(p5,k4)*zb(p1,p2)*s12*mt*ci - 1d0/2d0/(za(k4,e4))*za(p5,k4&
-     &    )*zb(p1,p2)*s14*mt*ci - 1d0/2d0/(za(k4,e4))*za(p5,k4)*zb(p1,&
-     &    p2)*s45*mt*ci - 1d0/2d0/(za(k4,e4))*za(p5,k4)*zb(p1,p2)*s25*&
-     &    mt*ci - 1d0/2d0/(za(k4,e4))*za(p5,e4)*za(k4,p1)*zb(p1,p2)*zb(&
-     &    e4,p1)*mt*ci - 1/(za(k4,e4))*za(p5,e4)*za(k4,p5)*zb(p1,p2)*&
-     &    zb(e4,p5)*mt*ci + 1d0/2d0/(za(k4,e4))*za(p5,e4)*za(k4,p5)*zb(&
-     &    p5,p2)*zb(e4,p1)*mt*ci )
-      ampw(2) = ampw(2) + om2 * (  - 1d0/2d0*za(p5,e3)*zb(p2,e4)*zb(e3,&
-     &    p1)*mw**(-2)*mt**3 + 1d0/2d0*za(p5,e3)*zb(p2,e4)*zb(e3,p1)*&
-     &    s24*mw**(-2)*mt + 1d0/4d0*za(p5,e3)*zb(p2,e4)*zb(e3,p1)*s12*&
-     &    mw**(-2)*mt + 1d0/4d0*za(p5,e3)*zb(p2,e4)*zb(e3,p1)*s14*&
-     &    mw**(-2)*mt + 1d0/4d0*za(p5,e3)*zb(p2,e4)*zb(e3,p1)*s45*&
-     &    mw**(-2)*mt + 1d0/4d0*za(p5,e3)*zb(p2,e4)*zb(e3,p1)*s25*&
-     &    mw**(-2)*mt - 1d0/2d0*za(p5,k3)*zb(p2,e4)*zb(k3,p1)*mw**(-2)*&
-     &    mt**3 + 1d0/2d0*za(p5,k3)*zb(p2,e4)*zb(k3,p1)*s24*mw**(-2)*mt&
-     &     + 1d0/4d0*za(p5,k3)*zb(p2,e4)*zb(k3,p1)*s12*mw**(-2)*mt + 1d0&
-      &   /4d0*za(p5,k3)*zb(p2,e4)*zb(k3,p1)*s14*mw**(-2)*mt + 1d0/4d0*&
-     &    za(p5,k3)*zb(p2,e4)*zb(k3,p1)*s45*mw**(-2)*mt + 1d0/4d0*za(p5&
-     &    ,k3)*zb(p2,e4)*zb(k3,p1)*s25*mw**(-2)*mt - 1d0/2d0/(za(k4,e4)&
-     &    )*za(p5,e3)*za(k4,e3)*zb(e3,p1)*zb(e3,p2)*mt - 1d0/2d0/(za(k4&
-     &    ,e4))*za(p5,e3)*za(k4,k3)*zb(e3,p1)*zb(k3,p2)*mt - 1d0/2d0/(&
-     &    za(k4,e4))*za(p5,k3)*za(k4,e3)*zb(e3,p2)*zb(k3,p1)*mt - 1d0/2d0&
-      &    /(za(k4,e4))*za(p5,k3)*za(k4,k3)*zb(k3,p1)*zb(k3,p2)*mt )
-      ampw(2) = ampw(2) + om1 * (  - 1d0/2d0*za(p5,p2)*zb(p2,p1)*zb(p2,&
-     &    e4)*mt - 1d0/2d0*za(p5,k4)*zb(p2,e4)*zb(k4,p1)*mt - 1d0/2d0*&
-     &    za(p5,e4)*zb(p2,e4)*zb(e4,p1)*mt + 1/(za(k4,e4))*za(p5,k4)*&
-     &    zb(p1,p2)*mw**2*mt )
-        
-        ampt(1) =  - 1d0/2d0*za(p5,e4)*zb(p1,p2)*mt*vev*KR - 1d0/2d0/(&
-     &    zb(k4,e4))*za(p5,p1)*zb(p1,p2)*zb(p1,k4)*mt*vev*KL + 1d0/2d0&
-     &    /(zb(k4,e4))*za(p5,p2)*zb(p2,p1)*zb(p2,k4)*mt*vev*KL
-        
-        ampt(2) =  - 1d0/2d0*za(p5,p1)*zb(p1,p2)*zb(p1,e4)*vev*KL + 1d0/&
-     &    2d0*za(p5,p2)*zb(p2,p1)*zb(p2,e4)*vev*KL - 1d0/2d0/(za(k4,e4)&
-     &    )*za(p5,k4)*zb(p1,p2)*mt**2*vev*KR
-        
+        ampt(2) =  + mt**2 * (  - 1d0/2d0/(za(k4,e4))*za(p5,k4)*zb(p1,&
+     &    p2)*vev*KR )
+        ampt(2) = ampt(2) - 1d0/2d0*za(p5,p1)*zb(p1,p2)*zb(p1,e4)*vev*KL&
+     &     + 1d0/2d0*za(p5,p2)*zb(p2,p1)*zb(p2,e4)*vev*KL
+
+
 ! -- include propagators
         ampt = ampt / (s125-mt**2+cI*M_Top*Ga_Top)/(s15-mw**2+cI*M_W*Ga_W)
         ampw = ampw / (s24-mw**2+cI*M_W*Ga_W)/(s15-mw**2+cI*M_W*Ga_W)
+
         
         amp(1)=(ampw(1)+ampt(1))*mdecay(1)
         amp(2)=(ampw(2)+ampt(2))*mdecay(2)
@@ -521,41 +536,135 @@ END SUBROUTINE
         integer    :: p1,p2,p3,e3,k3,e4,p5,k4
         complex(8) :: za(:,:),zb(:,:),mdecay(1:2)
         real(8)    :: s(:,:)
-        complex(8) :: amp(2),ampw(2),ampt(2),KL,KR
-        real(8)    :: s24,s34,s15,mt,mw
+        complex(8) :: amp(2),ampw(2),ampt(2),KL,KR,om1,om2,om3
+        real(8)    :: s12,s14,s15,s24,s25,s45,s125,mt,mw
     
-        s24=s(p2,k4)+s(p2,e4)+s(e4,k4)
-        s34=s(p1,p2)+s(p1,p5)+s(p2,p5)
+        s12=s(p1,p2)
+        s14=s(p1,k4)+s(p1,e4)+s(e4,k4)
         s15=s(p1,p5)
+        s24=s(p2,k4)+s(p2,e4)+s(e4,k4)
+        s25=s(p2,p5)
+        s45=s(p5,k4)+s(p5,e4)+s(e4,k4)
+        s125=s(p1,p2)+s(p1,p5)+s(p2,p5)
+
         mw=M_W
         mt=m_Top
 ! there is a factor of -2 relative to ttbH
         KL=-mt/vev*(kappa-(0d0,1d0)*kappa_tilde)
         KR=-mt/vev*(kappa+(0d0,1d0)*kappa_tilde)
+! these should be declared globally somewhere
+        om1=1d0
+        om2=0d0
+        om3=0d0
         
-        ampw(1) = 1d0/2d0/( - mw**2 + s24)/( - mw**2 + s15)*za(p2,e4)*&
-     & za(p5,e3)*zb(e3,p1)*mt + 1d0/2d0/( - mw**2 + s24)/( - mw**2 + &
-     & s15)*za(p2,e4)*za(p5,k3)*zb(k3,p1)*mt - 1/( - mw**2 + s24)/( - &
-     & mw**2 + s15)/(zb(k4,e4))*za(p2,p5)*zb(p1,k4)*mw**2*mt
+        ampw(1) =  + mw**(-2)*mt*om2 * (  - 1d0/2d0*za(p2,e4)*za(p5,p2)&
+     &    *zb(p2,p1)*s24 - 1d0/4d0*za(p2,e4)*za(p5,p2)*zb(p2,p1)*s12 - &
+     &    1d0/4d0*za(p2,e4)*za(p5,p2)*zb(p2,p1)*s14 - 1d0/4d0*za(p2,e4)&
+     &    *za(p5,p2)*zb(p2,p1)*s45 - 1d0/4d0*za(p2,e4)*za(p5,p2)*zb(p2,&
+     &    p1)*s25 - 1d0/2d0*za(p2,e4)*za(p5,k4)*zb(k4,p1)*s24 - 1d0/4d0&
+     &    *za(p2,e4)*za(p5,k4)*zb(k4,p1)*s12 - 1d0/4d0*za(p2,e4)*za(p5,&
+     &    k4)*zb(k4,p1)*s14 - 1d0/4d0*za(p2,e4)*za(p5,k4)*zb(k4,p1)*s45&
+     &     - 1d0/4d0*za(p2,e4)*za(p5,k4)*zb(k4,p1)*s25 - 1d0/2d0*za(p2,&
+     &    e4)*za(p5,e4)*zb(e4,p1)*s24 - 1d0/4d0*za(p2,e4)*za(p5,e4)*zb(&
+     &    e4,p1)*s12 - 1d0/4d0*za(p2,e4)*za(p5,e4)*zb(e4,p1)*s14 - 1d0/&
+     &    4d0*za(p2,e4)*za(p5,e4)*zb(e4,p1)*s45 - 1d0/4d0*za(p2,e4)*za(&
+     &    p5,e4)*zb(e4,p1)*s25 )
+      ampw(1) = ampw(1) + mw**(-2)*mt**3*om2 * ( 1d0/2d0*za(p2,e4)*za(&
+     &    p5,p2)*zb(p2,p1) + 1d0/2d0*za(p2,e4)*za(p5,k4)*zb(k4,p1) + 1d0&
+      &   /2d0*za(p2,e4)*za(p5,e4)*zb(e4,p1) )
+      ampw(1) = ampw(1) + mt*om3 * (  - 1d0/2d0/(zb(k4,e4))*za(p2,p1)*&
+     &    za(p5,p2)*zb(p1,k4)*zb(p2,p1)*ci + 1d0/2d0/(zb(k4,e4))*za(p2,&
+     &    p1)*za(p5,k4)*zb(p1,k4)*zb(k4,p1)*ci - 1/(zb(k4,e4))*za(p2,p1&
+     &    )*za(p5,e4)*zb(p1,k4)*zb(p1,e4)*ci - 1d0/2d0/(zb(k4,e4))*za(&
+     &    p2,p1)*za(p5,e4)*zb(p1,k4)*zb(e4,p1)*ci - 1d0/2d0/(zb(k4,e4))&
+     &    *za(p2,p5)*za(p5,p2)*zb(p2,p1)*zb(p5,k4)*ci + 1d0/2d0/(zb(k4,&
+     &    e4))*za(p2,p5)*za(p5,k4)*zb(p5,k4)*zb(k4,p1)*ci - 1/(zb(k4,e4&
+     &    ))*za(p2,p5)*za(p5,e4)*zb(p1,k4)*zb(p5,e4)*ci - 1d0/2d0/(zb(&
+     &    k4,e4))*za(p2,p5)*za(p5,e4)*zb(p5,k4)*zb(e4,p1)*ci + 1d0/2d0&
+     &    /(zb(k4,e4))*za(p2,p5)*zb(p1,k4)*s12*ci - 1d0/2d0/(zb(k4,e4))&
+     &    *za(p2,p5)*zb(p1,k4)*s14*ci - 1d0/2d0/(zb(k4,e4))*za(p2,p5)*&
+     &    zb(p1,k4)*s45*ci + 1d0/2d0/(zb(k4,e4))*za(p2,p5)*zb(p1,k4)*&
+     &    s25*ci )
+      ampw(1) = ampw(1) + mt*om2 * (  - 1d0/2d0/(zb(k4,e4))*za(p2,p1)*&
+     &    za(p5,p2)*zb(p1,k4)*zb(p2,p1) - 1d0/2d0/(zb(k4,e4))*za(p2,p1)&
+     &    *za(p5,k4)*zb(p1,k4)*zb(k4,p1) - 1d0/2d0/(zb(k4,e4))*za(p2,p1&
+     &    )*za(p5,e4)*zb(p1,k4)*zb(e4,p1) - 1d0/2d0/(zb(k4,e4))*za(p2,&
+     &    p2)*za(p5,p2)*zb(p2,p1)*zb(p2,k4) - 1d0/2d0/(zb(k4,e4))*za(p2&
+     &    ,p2)*za(p5,k4)*zb(p2,k4)*zb(k4,p1) - 1d0/2d0/(zb(k4,e4))*za(&
+     &    p2,p2)*za(p5,e4)*zb(p2,k4)*zb(e4,p1) - 1d0/2d0/(zb(k4,e4))*&
+     &    za(p2,p5)*za(p5,p2)*zb(p2,p1)*zb(p5,k4) - 1d0/2d0/(zb(k4,e4))&
+     &    *za(p2,p5)*za(p5,k4)*zb(p5,k4)*zb(k4,p1) - 1d0/2d0/(zb(k4,e4)&
+     &    )*za(p2,p5)*za(p5,e4)*zb(p5,k4)*zb(e4,p1) - 1d0/2d0/(zb(k4,e4&
+     &    ))*za(p2,e4)*za(p5,p2)*zb(p2,p1)*zb(e4,k4) - 1d0/2d0/(zb(k4,&
+     &    e4))*za(p2,e4)*za(p5,k4)*zb(k4,p1)*zb(e4,k4) - 1d0/2d0/(zb(k4&
+     &    ,e4))*za(p2,e4)*za(p5,e4)*zb(e4,p1)*zb(e4,k4) )
+      ampw(1) = ampw(1) + mt*om1 * (  - 1d0/2d0*za(p2,e4)*za(p5,p2)*zb(&
+     &    p2,p1) - 1d0/2d0*za(p2,e4)*za(p5,k4)*zb(k4,p1) - 1d0/2d0*za(&
+     &    p2,e4)*za(p5,e4)*zb(e4,p1) )
+      ampw(1) = ampw(1) + mt**3*om3 * ( 1/(zb(k4,e4))*za(p2,p5)*zb(p1,&
+     &    k4)*ci )
+      ampw(1) = ampw(1) + mw**2*mt*om1 * (  - 1/(zb(k4,e4))*za(p2,p5)*&
+     &    zb(p1,k4) )
         
-        ampw(2) =  - 1/( - mw**2 + s24)/( - mw**2 + s15)*za(p2,p5)*zb(&
-     & p1,e4)*mw**2 + 1d0/2d0/( - mw**2 + s24)/( - mw**2 + s15)/(za(k4,&
-     & e4))*za(p2,k4)*za(p5,e3)*zb(e3,p1)*mt**2 + 1d0/2d0/( - mw**2 + &
-     & s24)/( - mw**2 + s15)/(za(k4,e4))*za(p2,k4)*za(p5,k3)*zb(k3,p1)*&
-     & mt**2
+        ampw(2) =  + mw**(-2)*om2 * ( 1d0/2d0*za(p2,k4)*za(p5,p2)*zb(p2&
+     &    ,p1)*zb(k4,e4)*s24 + 1d0/4d0*za(p2,k4)*za(p5,p2)*zb(p2,p1)*&
+     &    zb(k4,e4)*s12 + 1d0/4d0*za(p2,k4)*za(p5,p2)*zb(p2,p1)*zb(k4,&
+     &    e4)*s14 + 1d0/4d0*za(p2,k4)*za(p5,p2)*zb(p2,p1)*zb(k4,e4)*s45&
+     &     + 1d0/4d0*za(p2,k4)*za(p5,p2)*zb(p2,p1)*zb(k4,e4)*s25 + 1d0/&
+     &    2d0*za(p2,k4)*za(p5,k4)*zb(k4,p1)*zb(k4,e4)*s24 + 1d0/4d0*za(&
+     &    p2,k4)*za(p5,k4)*zb(k4,p1)*zb(k4,e4)*s12 + 1d0/4d0*za(p2,k4)*&
+     &    za(p5,k4)*zb(k4,p1)*zb(k4,e4)*s14 + 1d0/4d0*za(p2,k4)*za(p5,&
+     &    k4)*zb(k4,p1)*zb(k4,e4)*s45 + 1d0/4d0*za(p2,k4)*za(p5,k4)*zb(&
+     &    k4,p1)*zb(k4,e4)*s25 + 1d0/2d0*za(p2,k4)*za(p5,e4)*zb(k4,e4)*&
+     &    zb(e4,p1)*s24 + 1d0/4d0*za(p2,k4)*za(p5,e4)*zb(k4,e4)*zb(e4,&
+     &    p1)*s12 + 1d0/4d0*za(p2,k4)*za(p5,e4)*zb(k4,e4)*zb(e4,p1)*s14&
+     &     + 1d0/4d0*za(p2,k4)*za(p5,e4)*zb(k4,e4)*zb(e4,p1)*s45 + 1d0/&
+     &    4d0*za(p2,k4)*za(p5,e4)*zb(k4,e4)*zb(e4,p1)*s25 )
+      ampw(2) = ampw(2) + mw**(-2)*mt**2*om2 * (  - 1d0/2d0*za(p2,k4)*&
+     &    za(p5,p2)*zb(p2,p1)*zb(k4,e4) - 1d0/2d0*za(p2,k4)*za(p5,k4)*&
+     &    zb(k4,p1)*zb(k4,e4) - 1d0/2d0*za(p2,k4)*za(p5,e4)*zb(k4,e4)*&
+     &    zb(e4,p1) )
+      ampw(2) = ampw(2) + om3 * (  - 1d0/2d0*za(p2,p1)*za(p5,p2)*zb(p1,&
+     &    e4)*zb(p2,p1)*ci - za(p2,p1)*za(p5,k4)*zb(p1,k4)*zb(p1,e4)*ci&
+     &     - 1d0/2d0*za(p2,p1)*za(p5,k4)*zb(p1,e4)*zb(k4,p1)*ci + 1d0/2d0&
+      &    *za(p2,p1)*za(p5,e4)*zb(p1,e4)*zb(e4,p1)*ci - 1d0/2d0*za(p2,&
+     &    p5)*za(p5,p2)*zb(p2,p1)*zb(p5,e4)*ci - za(p2,p5)*za(p5,k4)*&
+     &    zb(p1,e4)*zb(p5,k4)*ci - 1d0/2d0*za(p2,p5)*za(p5,k4)*zb(p5,e4&
+     &    )*zb(k4,p1)*ci + 1d0/2d0*za(p2,p5)*za(p5,e4)*zb(p5,e4)*zb(e4,&
+     &    p1)*ci + 1d0/2d0*za(p2,p5)*zb(p1,e4)*s12*ci - 1d0/2d0*za(p2,&
+     &    p5)*zb(p1,e4)*s14*ci - 1d0/2d0*za(p2,p5)*zb(p1,e4)*s45*ci + 1d0&
+      &    /2d0*za(p2,p5)*zb(p1,e4)*s25*ci )
+      ampw(2) = ampw(2) + om2 * (  - 1d0/2d0*za(p2,p1)*za(p5,p2)*zb(p1,&
+     &    e4)*zb(p2,p1) - 1d0/2d0*za(p2,p1)*za(p5,k4)*zb(p1,e4)*zb(k4,&
+     &    p1) - 1d0/2d0*za(p2,p1)*za(p5,e4)*zb(p1,e4)*zb(e4,p1) - 1d0/2d0&
+      &    *za(p2,p2)*za(p5,p2)*zb(p2,p1)*zb(p2,e4) - 1d0/2d0*za(p2,p2)&
+     &    *za(p5,k4)*zb(p2,e4)*zb(k4,p1) - 1d0/2d0*za(p2,p2)*za(p5,e4)*&
+     &    zb(p2,e4)*zb(e4,p1) - 1d0/2d0*za(p2,p5)*za(p5,p2)*zb(p2,p1)*&
+     &    zb(p5,e4) - 1d0/2d0*za(p2,p5)*za(p5,k4)*zb(p5,e4)*zb(k4,p1)&
+     &     - 1d0/2d0*za(p2,p5)*za(p5,e4)*zb(p5,e4)*zb(e4,p1) - 1d0/2d0*&
+     &    za(p2,k4)*za(p5,p2)*zb(p2,p1)*zb(k4,e4) - 1d0/2d0*za(p2,k4)*&
+     &    za(p5,k4)*zb(k4,p1)*zb(k4,e4) - 1d0/2d0*za(p2,k4)*za(p5,e4)*&
+     &    zb(k4,e4)*zb(e4,p1) )
+      ampw(2) = ampw(2) + om1 * ( 1d0/2d0*za(p2,k4)*za(p5,p2)*zb(p2,p1)&
+     &    *zb(k4,e4) + 1d0/2d0*za(p2,k4)*za(p5,k4)*zb(k4,p1)*zb(k4,e4)&
+     &     + 1d0/2d0*za(p2,k4)*za(p5,e4)*zb(k4,e4)*zb(e4,p1) )
+      ampw(2) = ampw(2) + mt**2*om3 * ( za(p2,p5)*zb(p1,e4)*ci )
+      ampw(2) = ampw(2) + mw**2*om1 * (  - za(p2,p5)*zb(p1,e4) )
         
-        ampt(1) = 1d0/2d0/( - mt**2 + s34)/( - mw**2 + s15)*za(p2,p5)*&
-     & za(e4,p2)*zb(p2,p1)*vev*KR + 1d0/2d0/( - mt**2 + s34)/( - mw**2&
-     &  + s15)*za(p2,p5)*za(e4,p5)*zb(p5,p1)*vev*KR + 1d0/2d0/( - mt**2&
-     &  + s34)/( - mw**2 + s15)/(zb(k4,e4))*za(p2,p5)*zb(p1,k4)*mt**2*&
-     & vev*KL
+        ampt(1) =  + mt**2 * ( 1d0/2d0/(zb(k4,e4))*za(p2,p5)*zb(p1,k4)*&
+     &    vev*KL )
+      ampt(1) = ampt(1) + 1d0/2d0*za(p2,p5)*za(e4,p5)*zb(p5,p1)*vev*KR&
+     &     + 1d0/2d0*za(p2,e4)*za(p5,p2)*zb(p2,p1)*vev*KR
         
-        ampt(2) = 1d0/2d0/( - mt**2 + s34)/( - mw**2 + s15)*za(p2,p5)*&
-     & zb(p1,e4)*mt*vev*KL + 1d0/2d0/( - mt**2 + s34)/( - mw**2 + s15)&
-     & /(za(k4,e4))*za(p2,p5)*za(k4,p2)*zb(p2,p1)*mt*vev*KR + 1d0/2d0/(&
-     &  - mt**2 + s34)/( - mw**2 + s15)/(za(k4,e4))*za(p2,p5)*za(k4,p5)&
-     & *zb(p5,p1)*mt*vev*KR
+        ampt(2) =  + mt * ( 1d0/2d0*za(p2,p5)*zb(p1,e4)*vev*KL + 1d0/2d0&
+     &    /(za(k4,e4))*za(p2,p5)*za(k4,p5)*zb(p5,p1)*vev*KR + 1d0/2d0/(&
+     &    za(k4,e4))*za(p2,k4)*za(p5,p2)*zb(p2,p1)*vev*KR )
         
+
+! -- include propagators
+        ampt = ampt / (s125-mt**2+cI*M_Top*Ga_Top)/(s15-mw**2+cI*M_W*Ga_W)
+        ampw = ampw / (s24-mw**2+cI*M_W*Ga_W)/(s15-mw**2+cI*M_W*Ga_W)
+
         amp(1)=(ampw(1)+ampt(1))*mdecay(1)
         amp(2)=(ampw(2)+ampt(2))*mdecay(2)
         
@@ -571,43 +680,131 @@ END SUBROUTINE
         integer    :: p1,p2,p3,e3,k3,e4,p5,k4
         complex(8) :: za(:,:),zb(:,:),mdecay(1:2)
         real(8)    :: s(:,:)
-        complex(8) :: amp(2),ampw(2),ampt(2),KL,KR
-        real(8)    :: s12,s34,s45,mt,mw
+        complex(8) :: amp(2),ampw(2),ampt(2),KL,KR,om1,om2,om3
+        real(8)    :: s12,s14,s15,s24,s25,s45,s125,mt,mw
     
-        s45=s(k4,p5)+s(e4,p5)+s(e4,k4)
-        s34=s(p1,p2)+s(p1,p5)+s(p2,p5)
         s12=s(p1,p2)
+        s14=s(p1,k4)+s(p1,e4)+s(e4,k4)
+        s15=s(p1,p5)
+        s24=s(p2,k4)+s(p2,e4)+s(e4,k4)
+        s25=s(p2,p5)
+        s45=s(p5,k4)+s(p5,e4)+s(e4,k4)
+        s125=s(p1,p2)+s(p1,p5)+s(p2,p5)
         mw=M_W
         mt=m_Top
         
 ! there is a factor of -2 relative to ttbH
         KL=-mt/vev*(kappa-(0d0,1d0)*kappa_tilde)
         KR=-mt/vev*(kappa+(0d0,1d0)*kappa_tilde)
+! these should be declared globally somewhere
+        om1=1d0
+        om2=0d0
+        om3=0d0
 
+        ampw(1) =  + mw**(-2)*mt**2*om2 * (  - 1d0/4d0/(zb(k4,e4))*za(&
+     &    p2,p5)*zb(p5,p1)*zb(p5,k4)*s24 - 1d0/4d0/(zb(k4,e4))*za(p2,p5&
+     &    )*zb(p5,p1)*zb(p5,k4)*s15 - 1d0/4d0/(zb(k4,e4))*za(p2,p5)*zb(&
+     &    p5,p1)*zb(p5,k4)*s14 - 1d0/2d0/(zb(k4,e4))*za(p2,p5)*zb(p5,p1&
+     &    )*zb(p5,k4)*s45 - 1d0/4d0/(zb(k4,e4))*za(p2,p5)*zb(p5,p1)*zb(&
+     &    p5,k4)*s25 - 1d0/4d0/(zb(k4,e4))*za(p2,k4)*zb(p5,k4)*zb(k4,p1&
+     &    )*s24 - 1d0/4d0/(zb(k4,e4))*za(p2,k4)*zb(p5,k4)*zb(k4,p1)*s15&
+     &     - 1d0/4d0/(zb(k4,e4))*za(p2,k4)*zb(p5,k4)*zb(k4,p1)*s14 - 1d0&
+      &   /2d0/(zb(k4,e4))*za(p2,k4)*zb(p5,k4)*zb(k4,p1)*s45 - 1d0/4d0&
+     &    /(zb(k4,e4))*za(p2,k4)*zb(p5,k4)*zb(k4,p1)*s25 - 1d0/4d0/(zb(&
+     &    k4,e4))*za(p2,e4)*zb(p5,k4)*zb(e4,p1)*s24 - 1d0/4d0/(zb(k4,e4&
+     &    ))*za(p2,e4)*zb(p5,k4)*zb(e4,p1)*s15 - 1d0/4d0/(zb(k4,e4))*&
+     &    za(p2,e4)*zb(p5,k4)*zb(e4,p1)*s14 - 1d0/2d0/(zb(k4,e4))*za(p2&
+     &    ,e4)*zb(p5,k4)*zb(e4,p1)*s45 - 1d0/4d0/(zb(k4,e4))*za(p2,e4)*&
+     &    zb(p5,k4)*zb(e4,p1)*s25 )
+      ampw(1) = ampw(1) + mw**(-2)*mt**4*om2 * ( 1d0/2d0/(zb(k4,e4))*&
+     &    za(p2,p5)*zb(p5,p1)*zb(p5,k4) + 1d0/2d0/(zb(k4,e4))*za(p2,k4)&
+     &    *zb(p5,k4)*zb(k4,p1) + 1d0/2d0/(zb(k4,e4))*za(p2,e4)*zb(p5,k4&
+     &    )*zb(e4,p1) )
+      ampw(1) = ampw(1) + om3 * ( za(p2,p1)*za(p5,e4)*zb(p1,p5)**2*ci&
+     &     + za(p2,p1)*za(k4,e4)*zb(p1,p5)*zb(p1,k4)*ci - 1d0/2d0*za(p2&
+     &    ,p5)*za(e4,p1)*zb(p1,p5)*zb(p5,p1)*ci - 1d0/2d0*za(p2,p5)*za(&
+     &    e4,p2)*zb(p2,p5)*zb(p5,p1)*ci - 1d0/2d0*za(p2,k4)*za(e4,p1)*&
+     &    zb(p1,p5)*zb(k4,p1)*ci - 1d0/2d0*za(p2,k4)*za(e4,p2)*zb(p2,p5&
+     &    )*zb(k4,p1)*ci - 1d0/2d0*za(p2,e4)*za(e4,p1)*zb(p1,p5)*zb(e4,&
+     &    p1)*ci - 1d0/2d0*za(p2,e4)*za(e4,p2)*zb(p2,p5)*zb(e4,p1)*ci&
+     &     - 1d0/2d0*za(p2,e4)*zb(p1,p5)*s24*ci - 1d0/2d0*za(p2,e4)*zb(&
+     &    p1,p5)*s15*ci - 1d0/2d0*za(p2,e4)*zb(p1,p5)*s14*ci - 1d0/2d0*&
+     &    za(p2,e4)*zb(p1,p5)*s25*ci )
+      ampw(1) = ampw(1) + om2 * (  - 1d0/2d0*za(p2,p5)*za(e4,p1)*zb(p1,&
+     &    p5)*zb(p5,p1) - 1d0/2d0*za(p2,p5)*za(e4,p2)*zb(p2,p5)*zb(p5,&
+     &    p1) - 1d0/2d0*za(p2,p5)*za(e4,k4)*zb(p5,p1)*zb(k4,p5) - 1d0/2d0&
+      &    *za(p2,k4)*za(e4,p1)*zb(p1,p5)*zb(k4,p1) - 1d0/2d0*za(p2,k4)&
+     &    *za(e4,p2)*zb(p2,p5)*zb(k4,p1) - 1d0/2d0*za(p2,k4)*za(e4,k4)*&
+     &    zb(k4,p1)*zb(k4,p5) - 1d0/2d0*za(p2,e4)*za(e4,p1)*zb(p1,p5)*&
+     &    zb(e4,p1) - 1d0/2d0*za(p2,e4)*za(e4,p2)*zb(p2,p5)*zb(e4,p1)&
+     &     - 1d0/2d0*za(p2,e4)*za(e4,k4)*zb(k4,p5)*zb(e4,p1) )
+      ampw(1) = ampw(1) + mt**2*om3 * ( za(p2,e4)*zb(p1,p5)*ci )
+      ampw(1) = ampw(1) + mt**2*om1 * (  - 1d0/2d0/(zb(k4,e4))*za(p2,p5&
+     &    )*zb(p5,p1)*zb(p5,k4) - 1d0/2d0/(zb(k4,e4))*za(p2,k4)*zb(p5,&
+     &    k4)*zb(k4,p1) - 1d0/2d0/(zb(k4,e4))*za(p2,e4)*zb(p5,k4)*zb(e4&
+     &    ,p1) )
+      ampw(1) = ampw(1) + mw**2*om1 * ( za(p2,e4)*zb(p1,p5) )
         
-        ampw(1) = 1/( - mw**2 + s45)/( - mw**2 + s12)*za(p2,e4)*zb(p1,&
-     & p5)*mw**2 + 1d0/2d0/( - mw**2 + s45)/( - mw**2 + s12)/(zb(k4,e4)&
-     & )*za(p2,e3)*zb(p5,k4)*zb(e3,p1)*mt**2 + 1d0/2d0/( - mw**2 + s45)&
-     & /( - mw**2 + s12)/(zb(k4,e4))*za(p2,k3)*zb(p5,k4)*zb(k3,p1)*&
-     & mt**2
+        ampw(2) =  + mw**(-2)*mt*om2 * (  - 1d0/4d0*za(p2,p5)*zb(p5,p1)&
+     &    *zb(p5,e4)*s24 - 1d0/4d0*za(p2,p5)*zb(p5,p1)*zb(p5,e4)*s15 - &
+     &    1d0/4d0*za(p2,p5)*zb(p5,p1)*zb(p5,e4)*s14 - 1d0/2d0*za(p2,p5)&
+     &    *zb(p5,p1)*zb(p5,e4)*s45 - 1d0/4d0*za(p2,p5)*zb(p5,p1)*zb(p5,&
+     &    e4)*s25 - 1d0/4d0*za(p2,k4)*zb(p5,e4)*zb(k4,p1)*s24 - 1d0/4d0&
+     &    *za(p2,k4)*zb(p5,e4)*zb(k4,p1)*s15 - 1d0/4d0*za(p2,k4)*zb(p5,&
+     &    e4)*zb(k4,p1)*s14 - 1d0/2d0*za(p2,k4)*zb(p5,e4)*zb(k4,p1)*s45&
+     &     - 1d0/4d0*za(p2,k4)*zb(p5,e4)*zb(k4,p1)*s25 - 1d0/4d0*za(p2,&
+     &    e4)*zb(p5,e4)*zb(e4,p1)*s24 - 1d0/4d0*za(p2,e4)*zb(p5,e4)*zb(&
+     &    e4,p1)*s15 - 1d0/4d0*za(p2,e4)*zb(p5,e4)*zb(e4,p1)*s14 - 1d0/&
+     &    2d0*za(p2,e4)*zb(p5,e4)*zb(e4,p1)*s45 - 1d0/4d0*za(p2,e4)*zb(&
+     &    p5,e4)*zb(e4,p1)*s25 )
+      ampw(2) = ampw(2) + mw**(-2)*mt**3*om2 * ( 1d0/2d0*za(p2,p5)*zb(&
+     &    p5,p1)*zb(p5,e4) + 1d0/2d0*za(p2,k4)*zb(p5,e4)*zb(k4,p1) + 1d0&
+      &   /2d0*za(p2,e4)*zb(p5,e4)*zb(e4,p1) )
+      ampw(2) = ampw(2) + mt*om3 * (  - za(p2,p1)*zb(p1,p5)*zb(p1,e4)*&
+     &    ci + 1/(za(k4,e4))*za(p2,p1)*za(p5,k4)*zb(p1,p5)**2*ci - 1d0/&
+     &    2d0/(za(k4,e4))*za(p2,p5)*za(k4,p1)*zb(p1,p5)*zb(p5,p1)*ci - &
+     &    1d0/2d0/(za(k4,e4))*za(p2,p5)*za(k4,p2)*zb(p2,p5)*zb(p5,p1)*&
+     &    ci - 1d0/2d0/(za(k4,e4))*za(p2,k4)*za(k4,p1)*zb(p1,p5)*zb(k4,&
+     &    p1)*ci - 1d0/2d0/(za(k4,e4))*za(p2,k4)*za(k4,p2)*zb(p2,p5)*&
+     &    zb(k4,p1)*ci - 1d0/2d0/(za(k4,e4))*za(p2,k4)*zb(p1,p5)*s24*ci&
+     &     - 1d0/2d0/(za(k4,e4))*za(p2,k4)*zb(p1,p5)*s15*ci - 1d0/2d0/(&
+     &    za(k4,e4))*za(p2,k4)*zb(p1,p5)*s14*ci - 1d0/2d0/(za(k4,e4))*&
+     &    za(p2,k4)*zb(p1,p5)*s25*ci - 1d0/2d0/(za(k4,e4))*za(p2,e4)*&
+     &    za(k4,p1)*zb(p1,p5)*zb(e4,p1)*ci - 1d0/2d0/(za(k4,e4))*za(p2,&
+     &    e4)*za(k4,p2)*zb(p2,p5)*zb(e4,p1)*ci )
+      ampw(2) = ampw(2) + mt*om2 * (  - 1d0/2d0/(za(k4,e4))*za(p2,p5)*&
+     &    za(k4,p1)*zb(p1,p5)*zb(p5,p1) - 1d0/2d0/(za(k4,e4))*za(p2,p5)&
+     &    *za(k4,p2)*zb(p2,p5)*zb(p5,p1) - 1d0/2d0/(za(k4,e4))*za(p2,p5&
+     &    )*za(k4,e4)*zb(p5,p1)*zb(e4,p5) - 1d0/2d0/(za(k4,e4))*za(p2,&
+     &    k4)*za(k4,p1)*zb(p1,p5)*zb(k4,p1) - 1d0/2d0/(za(k4,e4))*za(p2&
+     &    ,k4)*za(k4,p2)*zb(p2,p5)*zb(k4,p1) - 1d0/2d0/(za(k4,e4))*za(&
+     &    p2,k4)*za(k4,e4)*zb(k4,p1)*zb(e4,p5) - 1d0/2d0/(za(k4,e4))*&
+     &    za(p2,e4)*za(k4,p1)*zb(p1,p5)*zb(e4,p1) - 1d0/2d0/(za(k4,e4))&
+     &    *za(p2,e4)*za(k4,p2)*zb(p2,p5)*zb(e4,p1) - 1d0/2d0/(za(k4,e4)&
+     &    )*za(p2,e4)*za(k4,e4)*zb(e4,p1)*zb(e4,p5) )
+      ampw(2) = ampw(2) + mt*om1 * (  - 1d0/2d0*za(p2,p5)*zb(p5,p1)*zb(&
+     &    p5,e4) - 1d0/2d0*za(p2,k4)*zb(p5,e4)*zb(k4,p1) - 1d0/2d0*za(&
+     &    p2,e4)*zb(p5,e4)*zb(e4,p1) )
+      ampw(2) = ampw(2) + mt**3*om3 * ( 1/(za(k4,e4))*za(p2,k4)*zb(p1,&
+     &    p5)*ci )
+      ampw(2) = ampw(2) + mw**2*mt*om1 * ( 1/(za(k4,e4))*za(p2,k4)*zb(&
+     &    p1,p5) )
         
-        ampw(2) = 1d0/2d0/( - mw**2 + s45)/( - mw**2 + s12)*za(p2,e3)*&
-     & zb(p5,e4)*zb(e3,p1)*mt + 1d0/2d0/( - mw**2 + s45)/( - mw**2 + &
-     & s12)*za(p2,k3)*zb(p5,e4)*zb(k3,p1)*mt + 1/( - mw**2 + s45)/( - &
-     & mw**2 + s12)/(za(k4,e4))*za(p2,k4)*zb(p1,p5)*mw**2*mt
+        ampt(1) =  + mt * (  - 1d0/2d0*za(p2,e4)*zb(p1,p5)*vev*KR - 1d0/&
+     &    2d0*za(p2,e4)*zb(p1,p5)*vev*KL - 1d0/2d0/(zb(k4,e4))*za(p2,p1&
+     &    )*zb(p1,p5)*zb(p1,k4)*vev*KL - 1d0/2d0/(zb(k4,e4))*za(p2,p5)*&
+     &    zb(p1,p5)*zb(p5,k4)*vev*KL - 1d0/2d0/(zb(k4,e4))*za(p2,e4)*&
+     &    zb(p1,p5)*zb(e4,k4)*vev*KL )
         
-        ampt(1) =  - 1d0/2d0/( - mt**2 + s34)/( - mw**2 + s12)*za(p2,e4&
-     & )*zb(p1,p5)*mt*vev*KR - 1d0/2d0/( - mt**2 + s34)/( - mw**2 + s12&
-     & )/(zb(k4,e4))*za(p2,p1)*zb(p1,p5)*zb(p1,k4)*mt*vev*KL - 1d0/2d0&
-     & /( - mt**2 + s34)/( - mw**2 + s12)/(zb(k4,e4))*za(p2,p5)*zb(p1,&
-     & p5)*zb(p5,k4)*mt*vev*KL
+        ampt(2) =  + mt**2 * (  - 1d0/2d0/(za(k4,e4))*za(p2,k4)*zb(p1,&
+     &    p5)*vev*KR )
+      ampt(2) = ampt(2) - 1d0/2d0*za(p2,p1)*zb(p1,p5)*zb(p1,e4)*vev*KL&
+     &     - 1d0/2d0*za(p2,p5)*zb(p1,p5)*zb(p5,e4)*vev*KL
         
-        ampt(2) =  - 1d0/2d0/( - mt**2 + s34)/( - mw**2 + s12)*za(p2,p1&
-     & )*zb(p1,p5)*zb(p1,e4)*vev*KL - 1d0/2d0/( - mt**2 + s34)/( - &
-     & mw**2 + s12)*za(p2,p5)*zb(p1,p5)*zb(p5,e4)*vev*KL - 1d0/2d0/( - &
-     & mt**2 + s34)/( - mw**2 + s12)/(za(k4,e4))*za(p2,k4)*zb(p1,p5)*&
-     & mt**2*vev*KR
-        
+! -- include propagators
+        ampt = ampt / (s125-mt**2+ci*M_Top*Ga_Top)/(s12-mw**2+ci*M_W*Ga_W)
+        ampw = ampw / (s45-mw**2+ci*M_W*Ga_W)/(s12-mw**2+ci*M_W*Ga_W)
+
         amp(1)=(ampw(1)+ampt(1))*mdecay(1)
         amp(2)=(ampw(2)+ampt(2))*mdecay(2)
         
@@ -622,43 +819,130 @@ END SUBROUTINE
         integer    :: p1,p2,p3,e3,k3,e4,p5,k4
         complex(8) :: za(:,:),zb(:,:),mdecay(1:2)
         real(8)    :: s(:,:)
-        complex(8) :: amp(2),ampw(2),ampt(2),KL,KR
-        real(8)    :: s45,s34,s12,mt,mw
+        complex(8) :: amp(2),ampw(2),ampt(2),KL,KR,om1,om2,om3
+        real(8)    :: s12,s14,s15,s24,s25,s45,s125,mt,mw
     
-        s45=s(k4,p5)+s(e4,p5)+s(e4,k4)
-        s34=s(p1,p2)+s(p1,p5)+s(p2,p5)
         s12=s(p1,p2)
-
+        s14=s(p1,k4)+s(p1,e4)+s(e4,k4)
+        s15=s(p1,p5)
+        s24=s(p2,k4)+s(p2,e4)+s(e4,k4)
+        s25=s(p2,p5)
+        s45=s(p5,k4)+s(p5,e4)+s(e4,k4)
+        s125=s(p1,p2)+s(p1,p5)+s(p2,p5)
         mw=M_W
         mt=m_Top
         
 ! there is a factor of -2 relative to ttbH
         KL=-mt/vev*(kappa-(0d0,1d0)*kappa_tilde)
         KR=-mt/vev*(kappa+(0d0,1d0)*kappa_tilde)
+! these should be declared globally somewhere
+        om1=1d0
+        om2=0d0
+        om3=0d0
 
-       
-        ampw(1) = 1d0/2d0/( - mw**2 + s45)/( - mw**2 + s12)*za(p1,e3)*&
-     & za(p5,e4)*zb(e3,p2)*mt + 1d0/2d0/( - mw**2 + s45)/( - mw**2 + &
-     & s12)*za(p1,k3)*za(p5,e4)*zb(k3,p2)*mt + 1/( - mw**2 + s45)/( - &
-     & mw**2 + s12)/(zb(k4,e4))*za(p1,p5)*zb(p2,k4)*mw**2*mt
+        ampw(1) =  + mw**(-2)*mt*om2 * (  - 1d0/4d0*za(p1,p5)*za(p5,e4)&
+     &    *zb(p5,p2)*s24 - 1d0/4d0*za(p1,p5)*za(p5,e4)*zb(p5,p2)*s15 - &
+     &    1d0/4d0*za(p1,p5)*za(p5,e4)*zb(p5,p2)*s14 - 1d0/2d0*za(p1,p5)&
+     &    *za(p5,e4)*zb(p5,p2)*s45 - 1d0/4d0*za(p1,p5)*za(p5,e4)*zb(p5,&
+     &    p2)*s25 - 1d0/4d0*za(p1,k4)*za(p5,e4)*zb(k4,p2)*s24 - 1d0/4d0&
+     &    *za(p1,k4)*za(p5,e4)*zb(k4,p2)*s15 - 1d0/4d0*za(p1,k4)*za(p5,&
+     &    e4)*zb(k4,p2)*s14 - 1d0/2d0*za(p1,k4)*za(p5,e4)*zb(k4,p2)*s45&
+     &     - 1d0/4d0*za(p1,k4)*za(p5,e4)*zb(k4,p2)*s25 - 1d0/4d0*za(p1,&
+     &    e4)*za(p5,e4)*zb(e4,p2)*s24 - 1d0/4d0*za(p1,e4)*za(p5,e4)*zb(&
+     &    e4,p2)*s15 - 1d0/4d0*za(p1,e4)*za(p5,e4)*zb(e4,p2)*s14 - 1d0/&
+     &    2d0*za(p1,e4)*za(p5,e4)*zb(e4,p2)*s45 - 1d0/4d0*za(p1,e4)*za(&
+     &    p5,e4)*zb(e4,p2)*s25 )
+      ampw(1) = ampw(1) + mw**(-2)*mt**3*om2 * ( 1d0/2d0*za(p1,p5)*za(&
+     &    p5,e4)*zb(p5,p2) + 1d0/2d0*za(p1,k4)*za(p5,e4)*zb(k4,p2) + 1d0&
+      &   /2d0*za(p1,e4)*za(p5,e4)*zb(e4,p2) )
+      ampw(1) = ampw(1) + mt*om3 * (  - 1/(zb(k4,e4))*za(p1,p2)*za(p5,&
+     &    k4)*zb(p2,k4)**2*ci - 1/(zb(k4,e4))*za(p1,p2)*za(p5,e4)*zb(p2&
+     &    ,k4)*zb(p2,e4)*ci - 1d0/2d0/(zb(k4,e4))*za(p1,p5)*za(p5,p1)*&
+     &    zb(p1,k4)*zb(p5,p2)*ci - 1d0/2d0/(zb(k4,e4))*za(p1,p5)*za(p5,&
+     &    p2)*zb(p2,k4)*zb(p5,p2)*ci - 1d0/2d0/(zb(k4,e4))*za(p1,p5)*&
+     &    zb(p2,k4)*s24*ci - 1d0/2d0/(zb(k4,e4))*za(p1,p5)*zb(p2,k4)*&
+     &    s15*ci - 1d0/2d0/(zb(k4,e4))*za(p1,p5)*zb(p2,k4)*s14*ci - 1d0/&
+     &    2d0/(zb(k4,e4))*za(p1,p5)*zb(p2,k4)*s25*ci - 1d0/2d0/(zb(k4,&
+     &    e4))*za(p1,k4)*za(p5,p1)*zb(p1,k4)*zb(k4,p2)*ci - 1d0/2d0/(&
+     &    zb(k4,e4))*za(p1,k4)*za(p5,p2)*zb(p2,k4)*zb(k4,p2)*ci - 1d0/2d0&
+      &    /(zb(k4,e4))*za(p1,e4)*za(p5,p1)*zb(p1,k4)*zb(e4,p2)*ci - 1d0&
+      &   /2d0/(zb(k4,e4))*za(p1,e4)*za(p5,p2)*zb(p2,k4)*zb(e4,p2)*ci )
+      ampw(1) = ampw(1) + mt*om2 * (  - 1d0/2d0/(zb(k4,e4))*za(p1,p5)*&
+     &    za(p5,p1)*zb(p1,k4)*zb(p5,p2) - 1d0/2d0/(zb(k4,e4))*za(p1,p5)&
+     &    *za(p5,p2)*zb(p2,k4)*zb(p5,p2) - 1d0/2d0/(zb(k4,e4))*za(p1,p5&
+     &    )*za(p5,e4)*zb(p5,p2)*zb(e4,k4) - 1d0/2d0/(zb(k4,e4))*za(p1,&
+     &    k4)*za(p5,p1)*zb(p1,k4)*zb(k4,p2) - 1d0/2d0/(zb(k4,e4))*za(p1&
+     &    ,k4)*za(p5,p2)*zb(p2,k4)*zb(k4,p2) - 1d0/2d0/(zb(k4,e4))*za(&
+     &    p1,k4)*za(p5,e4)*zb(k4,p2)*zb(e4,k4) - 1d0/2d0/(zb(k4,e4))*&
+     &    za(p1,e4)*za(p5,p1)*zb(p1,k4)*zb(e4,p2) - 1d0/2d0/(zb(k4,e4))&
+     &    *za(p1,e4)*za(p5,p2)*zb(p2,k4)*zb(e4,p2) - 1d0/2d0/(zb(k4,e4)&
+     &    )*za(p1,e4)*za(p5,e4)*zb(e4,p2)*zb(e4,k4) )
+      ampw(1) = ampw(1) + mt*om1 * (  - 1d0/2d0*za(p1,p5)*za(p5,e4)*zb(&
+     &    p5,p2) - 1d0/2d0*za(p1,k4)*za(p5,e4)*zb(k4,p2) - 1d0/2d0*za(&
+     &    p1,e4)*za(p5,e4)*zb(e4,p2) )
+      ampw(1) = ampw(1) + mt**3*om3 * ( 1/(zb(k4,e4))*za(p1,p5)*zb(p2,&
+     &    k4)*ci )
+      ampw(1) = ampw(1) + mw**2*mt*om1 * ( 1/(zb(k4,e4))*za(p1,p5)*zb(&
+     &    p2,k4) )
         
-        ampw(2) = 1/( - mw**2 + s45)/( - mw**2 + s12)*za(p1,p5)*zb(p2,&
-     & e4)*mw**2 + 1d0/2d0/( - mw**2 + s45)/( - mw**2 + s12)/(za(k4,e4)&
-     & )*za(p1,e3)*za(p5,k4)*zb(e3,p2)*mt**2 + 1d0/2d0/( - mw**2 + s45)&
-     & /( - mw**2 + s12)/(za(k4,e4))*za(p1,k3)*za(p5,k4)*zb(k3,p2)*&
-     & mt**2
+        ampw(2) =  + mw**(-2)*mt**2*om2 * (  - 1d0/4d0/(za(k4,e4))*za(&
+     &    p1,p5)*za(p5,k4)*zb(p5,p2)*s24 - 1d0/4d0/(za(k4,e4))*za(p1,p5&
+     &    )*za(p5,k4)*zb(p5,p2)*s15 - 1d0/4d0/(za(k4,e4))*za(p1,p5)*za(&
+     &    p5,k4)*zb(p5,p2)*s14 - 1d0/2d0/(za(k4,e4))*za(p1,p5)*za(p5,k4&
+     &    )*zb(p5,p2)*s45 - 1d0/4d0/(za(k4,e4))*za(p1,p5)*za(p5,k4)*zb(&
+     &    p5,p2)*s25 - 1d0/4d0/(za(k4,e4))*za(p1,k4)*za(p5,k4)*zb(k4,p2&
+     &    )*s24 - 1d0/4d0/(za(k4,e4))*za(p1,k4)*za(p5,k4)*zb(k4,p2)*s15&
+     &     - 1d0/4d0/(za(k4,e4))*za(p1,k4)*za(p5,k4)*zb(k4,p2)*s14 - 1d0&
+      &   /2d0/(za(k4,e4))*za(p1,k4)*za(p5,k4)*zb(k4,p2)*s45 - 1d0/4d0&
+     &    /(za(k4,e4))*za(p1,k4)*za(p5,k4)*zb(k4,p2)*s25 - 1d0/4d0/(za(&
+     &    k4,e4))*za(p1,e4)*za(p5,k4)*zb(e4,p2)*s24 - 1d0/4d0/(za(k4,e4&
+     &    ))*za(p1,e4)*za(p5,k4)*zb(e4,p2)*s15 - 1d0/4d0/(za(k4,e4))*&
+     &    za(p1,e4)*za(p5,k4)*zb(e4,p2)*s14 - 1d0/2d0/(za(k4,e4))*za(p1&
+     &    ,e4)*za(p5,k4)*zb(e4,p2)*s45 - 1d0/4d0/(za(k4,e4))*za(p1,e4)*&
+     &    za(p5,k4)*zb(e4,p2)*s25 )
+      ampw(2) = ampw(2) + mw**(-2)*mt**4*om2 * ( 1d0/2d0/(za(k4,e4))*&
+     &    za(p1,p5)*za(p5,k4)*zb(p5,p2) + 1d0/2d0/(za(k4,e4))*za(p1,k4)&
+     &    *za(p5,k4)*zb(k4,p2) + 1d0/2d0/(za(k4,e4))*za(p1,e4)*za(p5,k4&
+     &    )*zb(e4,p2) )
+      ampw(2) = ampw(2) + om3 * (  - za(p1,p2)*za(p5,k4)*zb(p2,k4)*zb(&
+     &    p2,e4)*ci - za(p1,p2)*za(p5,e4)*zb(p2,e4)**2*ci - 1d0/2d0*za(&
+     &    p1,p5)*za(p5,p1)*zb(p1,e4)*zb(p5,p2)*ci - 1d0/2d0*za(p1,p5)*&
+     &    za(p5,p2)*zb(p2,e4)*zb(p5,p2)*ci - 1d0/2d0*za(p1,p5)*zb(p2,e4&
+     &    )*s24*ci - 1d0/2d0*za(p1,p5)*zb(p2,e4)*s15*ci - 1d0/2d0*za(p1&
+     &    ,p5)*zb(p2,e4)*s14*ci - 1d0/2d0*za(p1,p5)*zb(p2,e4)*s25*ci - &
+     &    1d0/2d0*za(p1,k4)*za(p5,p1)*zb(p1,e4)*zb(k4,p2)*ci - 1d0/2d0*&
+     &    za(p1,k4)*za(p5,p2)*zb(p2,e4)*zb(k4,p2)*ci - 1d0/2d0*za(p1,e4&
+     &    )*za(p5,p1)*zb(p1,e4)*zb(e4,p2)*ci - 1d0/2d0*za(p1,e4)*za(p5,&
+     &    p2)*zb(p2,e4)*zb(e4,p2)*ci )
+      ampw(2) = ampw(2) + om2 * (  - 1d0/2d0*za(p1,p5)*za(p5,p1)*zb(p1,&
+     &    e4)*zb(p5,p2) - 1d0/2d0*za(p1,p5)*za(p5,p2)*zb(p2,e4)*zb(p5,&
+     &    p2) - 1d0/2d0*za(p1,p5)*za(p5,k4)*zb(p5,p2)*zb(k4,e4) - 1d0/2d0&
+      &    *za(p1,k4)*za(p5,p1)*zb(p1,e4)*zb(k4,p2) - 1d0/2d0*za(p1,k4)&
+     &    *za(p5,p2)*zb(p2,e4)*zb(k4,p2) - 1d0/2d0*za(p1,k4)*za(p5,k4)*&
+     &    zb(k4,p2)*zb(k4,e4) - 1d0/2d0*za(p1,e4)*za(p5,p1)*zb(p1,e4)*&
+     &    zb(e4,p2) - 1d0/2d0*za(p1,e4)*za(p5,p2)*zb(p2,e4)*zb(e4,p2)&
+     &     - 1d0/2d0*za(p1,e4)*za(p5,k4)*zb(k4,e4)*zb(e4,p2) )
+      ampw(2) = ampw(2) + mt**2*om3 * ( za(p1,p5)*zb(p2,e4)*ci )
+      ampw(2) = ampw(2) + mt**2*om1 * (  - 1d0/2d0/(za(k4,e4))*za(p1,p5&
+     &    )*za(p5,k4)*zb(p5,p2) - 1d0/2d0/(za(k4,e4))*za(p1,k4)*za(p5,&
+     &    k4)*zb(k4,p2) - 1d0/2d0/(za(k4,e4))*za(p1,e4)*za(p5,k4)*zb(e4&
+     &    ,p2) )
+      ampw(2) = ampw(2) + mw**2*om1 * ( za(p1,p5)*zb(p2,e4) )
         
-        ampt(1) =  - 1d0/2d0/( - mt**2 + s34)/( - mw**2 + s12)*za(p1,p5&
-     & )*za(e4,p1)*zb(p1,p2)*vev*KR - 1d0/2d0/( - mt**2 + s34)/( - &
-     & mw**2 + s12)*za(p1,p5)*za(e4,p5)*zb(p5,p2)*vev*KR - 1d0/2d0/( - &
-     & mt**2 + s34)/( - mw**2 + s12)/(zb(k4,e4))*za(p1,p5)*zb(p2,k4)*&
-     & mt**2*vev*KL
-                
-        ampt(2) =  - 1d0/2d0/( - mt**2 + s34)/( - mw**2 + s12)*za(p1,p5&
-     & )*zb(p2,e4)*mt*vev*KL - 1d0/2d0/( - mt**2 + s34)/( - mw**2 + s12&
-     & )/(za(k4,e4))*za(p1,p5)*za(k4,p1)*zb(p1,p2)*mt*vev*KR - 1d0/2d0&
-     & /( - mt**2 + s34)/( - mw**2 + s12)/(za(k4,e4))*za(p1,p5)*za(k4,&
-     & p5)*zb(p5,p2)*mt*vev*KR                
+        ampt(1) =  + mt**2 * (  - 1d0/2d0/(zb(k4,e4))*za(p1,p5)*zb(p2,&
+     &    k4)*vev*KL )
+      ampt(1) = ampt(1) - 1d0/2d0*za(p1,p5)*za(e4,p1)*zb(p1,p2)*vev*KR&
+     &     - 1d0/2d0*za(p1,p5)*za(e4,p5)*zb(p5,p2)*vev*KR
+        
+        ampt(2) =  + mt * (  - 1d0/2d0*za(p1,p5)*zb(p2,e4)*vev*KR - 1d0/&
+     &    2d0*za(p1,p5)*zb(p2,e4)*vev*KL - 1d0/2d0/(za(k4,e4))*za(p1,p5&
+     &    )*za(k4,p1)*zb(p1,p2)*vev*KR - 1d0/2d0/(za(k4,e4))*za(p1,p5)*&
+     &    za(k4,p5)*zb(p5,p2)*vev*KR - 1d0/2d0/(za(k4,e4))*za(p1,p5)*&
+     &    za(k4,e4)*zb(e4,p2)*vev*KR )
+        
+! -- include propagators
+        ampt = ampt / (s125-mt**2+ci*M_Top*Ga_Top)/(s12-mw**2+ci*M_W*Ga_W)
+        ampw = ampw / (s45-mw**2+ci*M_W*Ga_W)/(s12-mw**2+ci*M_W*Ga_W)
 
         amp(1)=(ampw(1)+ampt(1))*mdecay(1)
         amp(2)=(ampw(2)+ampt(2))*mdecay(2)
