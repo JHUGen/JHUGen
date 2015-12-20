@@ -20,7 +20,7 @@ use ModTHiggs
 implicit none
 real(8) :: EvalWeighted_TH,yRnd(1:11),VgsWgt
 real(8) :: Ehat,MH_Inv,eta1,eta2,ISFac,sHatJacobi,PreFac,FluxFac,PSWgt,PSWgt2,PSWgt3
-real(8) :: MomExt(1:4,1:9),MomOffShell(1:4,1:9),LO_Res_Unpol(-6:6,-6:6),MuFac,pdf(-6:6,1:2)
+real(8) :: MomExt(1:4,1:9),MomOffShell(1:4,1:9),LO_Res_Unpol(-6:6,-6:6),pdf(-6:6,1:2)
 integer :: NBin(1:NumHistograms),NHisto
 logical :: applyPSCut
 integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9
@@ -39,8 +39,8 @@ integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9
    FluxFac = 1d0/(2d0*EHat**2)
    call EvalPhaseSpace_2to3ArbMass(EHat,(/MH_Inv,M_Top,0d0/),yRnd(3:7),MomExt(1:4,1:5),PSWgt)
    call boost2Lab(eta1,eta2,5,MomExt(1:4,1:5))
-   MuFac=(M_Top + M_Reso)/4d0
-   call setPDFs(eta1,eta2,MuFac,pdf)
+   Mu_Fact=(M_Top + M_Reso)/4d0
+   call setPDFs(eta1,eta2,Mu_Fact,pdf)
    
    IF( TOPDECAYS.NE.0 ) THEN
       call EvalPhasespace_TopDecay(MomExt(1:4,4),yRnd(8:11),MomExt(1:4,6:8),PSWgt2)
@@ -126,7 +126,7 @@ use ModMisc
 implicit none
 real(8) :: yRnd(1:16),VgsWgt, EvalUnWeighted_TH
 real(8) :: pdf(-6:6,1:2),RES(-5:5,-5:5)
-real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi,MH_Inv,MuFac
+real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi,MH_Inv
 real(8) :: MomExt(1:4,1:9),MomOffShell(1:4,1:9),PSWgt,PSWgt2,PSWgt3
 real(8) :: LO_Res_Unpol(-6:6,-6:6),PreFac,PDFFac1,CS_Max,DKRnd
 real(8) :: WdecayKfactor
@@ -267,7 +267,7 @@ WdecayKfactor = 1d0
    call Kinematics_TH(MomOffShell,applyPSCut,NBin)
    if( applyPSCut .or. PSWgt.eq.zero ) return
 
-   MuFac=(M_Top + M_Reso)/4d0
+   Mu_Fact=(M_Top + M_Reso)/4d0
    call setPDFs(eta1,eta2,Mu_Fact,pdf)
    LO_Res_Unpol = 0d0
 
