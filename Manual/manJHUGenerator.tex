@@ -24,7 +24,7 @@ Manual for the JHU generator
 \begin{center}
 \small
 For simulation of a single-produced resonance at hadron colliders \\
-(version v6.7.7, release date Dec. 11, 2015) \\
+(version v6.7.8, release date Dec. 21, 2015) \\
 \normalsize
 \end{center}
 
@@ -647,12 +647,15 @@ Instructions for setting up the JHUGenMELA with MCFM are in the file \verb|JHUGe
 \section{ Release notes }
 
 \noindent
-In going from \verb|v6.2.8| to \verb|v6.7.7|, the updates are as follows:
+In going from \verb|v6.2.8| to \verb|v6.7.8|, the updates are as follows:
 
 \begin{itemize}
-\item Faster event generation for VBF and $Hjj$ with deterministic jet flavor assignment
-\item Clean up of the $VH$ code and CKM matrix
-\item Add \verb|Processes=110-113| for $t/\bar{t}+H$ production
+\item Added running factorization scale ($$\mu_F=m_{H*}/2$) in spin-0,1,2 decays
+\item Enabled identical 4$nu$ and 4$q$ final state interference in $ZZ$ decay
+\item Faster VBF and $Hjj$ event generation with deterministic jet flavor assignment
+\item $VH$ code clean-up
+\item Update of the CKM matrix and of hadronic $W$ decay
+\item New processes \verb|110-113| for $t/\bar{t}+H$ production
 \item More flexible lepton filter
 \end{itemize}
 
@@ -693,12 +696,12 @@ In going from \verb|v4.8.1| to \verb|v5.2.5|, the updates are as follows:
 In going from \verb|v4.5.2| to \verb|v4.8.1|, the updates are as follows:
 
 \begin{itemize}
-\item more flexibility for $q^2$-dependent form factors
-\item separate couplings for ZZH and WWH in weak boson fusion
-\item add new process: $pp\to H$+jet (Process=62)
-\item extended LHE output format to allow for more digits
+\item More flexibility for $q^2$-dependent form factors
+\item Separate couplings for ZZH and WWH in weak boson fusion
+\item Add new process: $pp\to H$+jet (Process=62)
+\item Extended LHE output format to allow for more digits
 \item MCFM plug-in for anomalous couplings in off-shell Higgs boson production in gg->ZZ
-\item synchronize JHUGenMELA with MCFM library v6.8
+\item Synchronize JHUGenMELA with MCFM library v6.8
 \item JHUGenMELA: extended MCFM ggHZZ matrix elements by anomalous couplings
 \item JHUGenMELA: add matrix elements for H+jet and V+H
 \end{itemize}
@@ -708,23 +711,23 @@ In going from \verb|v4.5.2| to \verb|v4.8.1|, the updates are as follows:
 In going from \verb|v4.3.2| to \verb|v4.5.2|, the updates are as follows:
 
 \begin{itemize}
-\item add an option of intermediate photons for the modes with Z-bosons
-\item more flexibility for $q^2$-dependent form factors
-\item option of hadronic branching rescaling (NLO QCD corrections) for inclusive decays
-\item synchronize JHUGenMELA with the generator and with MCFM library v6.7
+\item Add an option of intermediate photons for the modes with Z-bosons
+\item More flexibility for $q^2$-dependent form factors
+\item Option of hadronic branching rescaling (NLO QCD corrections) for inclusive decays
+\item Synchronize JHUGenMELA with the generator and with MCFM library v6.7
 \end{itemize}
 
 \noindent
 In going from \verb|v4.2.1| to \verb|v4.3.2|, the updates are as follows:
 
 \begin{itemize}
-\item update LHE file format and index of partons
-\item improve log printout
-\item update ReadLHE mode: $H\to Z\gamma$ output and more flexible input
+\item Update LHE file format and index of partons
+\item Improve log printout
+\item Update ReadLHE mode: $H\to Z\gamma$ output and more flexible input
 \item $VH$ production (replaces beta version)
-\item more flexibility for $q^2$-dependent form factors
-\item tune $q^2$-dependence of couplings for some of the spin-$2_h$ models
-\item synchronize JHUGenMELA with the generator
+\item More flexibility for $q^2$-dependent form factors
+\item Tune $q^2$-dependence of couplings for some of the spin-$2_h$ models
+\item Synchronize JHUGenMELA with the generator
 \end{itemize}
 
 \noindent
