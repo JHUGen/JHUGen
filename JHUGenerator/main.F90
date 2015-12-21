@@ -216,7 +216,7 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
     endif
    enddo
 
-    Mu_Fact = M_Reso! setting pdf scale to resonance mass
+    Mu_Fact = M_Reso! setting pdf scale to resonance mass by default, later changed as necessary in the EvalWeighted/EvalUnweighted subroutines
 
     if( CountArg.ne.NumArgs ) then
         print *, "unknown command line argument"

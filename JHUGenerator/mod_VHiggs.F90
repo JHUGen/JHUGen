@@ -95,8 +95,8 @@ contains
           ghz3_dyn = HVVSpinZeroDynamicCoupling(3,qsq_V1,qsq_V2,qsq_H)
           ghz4_dyn = HVVSpinZeroDynamicCoupling(4,qsq_V1,qsq_V2,qsq_H)
 
-          a1HVV = ghz1_dyn*M_V**2 + qsq_V1V2*( 2d0*ghz2_dyn + ghz3_dyn*qsq_V1V2/Lambda )
-          a2HVV =-2d0*ghz2_dyn - ghz3_dyn*qsq_V1V2/Lambda
+          a1HVV = ghz1_dyn*M_V**2 + qsq_V1V2*( 2d0*ghz2_dyn + ghz3_dyn*qsq_V1V2/Lambda**2 )
+          a2HVV =-2d0*ghz2_dyn - ghz3_dyn*qsq_V1V2/Lambda**2
           a3HVV =-2d0*ghz4_dyn 
           
           UnPolSqAmp = 0d0
@@ -359,7 +359,7 @@ END SUBROUTINE
 
       gVVS1 = ghz1_dyn*(mass(3,1)**2) + qq * ( 2d0*ghz2_dyn + ghz3_dyn*qq/Lambda**2 )
       gVVS2 = -( 2d0*ghz2_dyn + ghz3_dyn*qq/Lambda**2 )
-      gVVP = -2d0*ghz4_dyn   * (-1d0)! MARKUS: fix sign here to be conform with other processes
+      gVVP = -2d0*ghz4_dyn
 
       VVX0 = 0d0
       if(gVVS1.ne.0d0)then
@@ -390,7 +390,7 @@ END SUBROUTINE
       PVVX0P=(0d0,0d0)
       do mu3=1,4
       do mu4=1,4
-      PVVX0P=PVVX0P +POL1(lambda1,mu3)*VVX0(mu3,mu4)*dconjg(POL2(lambda2,mu4))
+      PVVX0P=PVVX0P +dconjg(POL1(lambda1,mu3))*VVX0(mu3,mu4)*POL2(lambda2,mu4)
       enddo !mu4
       enddo !mu3
       dMATRIXELEMENT=dMATRIXELEMENT*PVVX0P
@@ -1413,9 +1413,9 @@ END SUBROUTINE
 
 !lambda = +1
       POL(1,1)= 0d0
-      POL(1,2)= (-sincos(3)*sincos(1)+(0d0,1d0)*sincos(4))/dsqrt(2d0)
-      POL(1,3)= (-sincos(4)*sincos(1)-(0d0,1d0)*sincos(3))/dsqrt(2d0)
-      POL(1,4)= sincos(2)/dsqrt(2d0)
+      POL(1,2)= (sincos(3)*sincos(1)-(0d0,1d0)*sincos(4))/dsqrt(2d0)
+      POL(1,3)= (sincos(4)*sincos(1)+(0d0,1d0)*sincos(3))/dsqrt(2d0)
+      POL(1,4)= -sincos(2)/dsqrt(2d0)
 !lambda = -1
       POL(2,1)= 0d0
       POL(2,2)= ( sincos(3)*sincos(1)+(0d0,1d0)*sincos(4))/dsqrt(2d0)
