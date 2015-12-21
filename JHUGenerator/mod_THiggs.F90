@@ -418,9 +418,9 @@ END SUBROUTINE
         KL=-mt/vev*(kappa-(0d0,1d0)*kappa_tilde) !   *0000000000000d0
         KR=-mt/vev*(kappa+(0d0,1d0)*kappa_tilde) !   *0000000000000d0
         
-!         om1 = 0d0
-!         om2 = 1d0
-!         om3 = 0d0
+         om1 = ghz1/2d0
+         om2 = 0d0
+         om3 = 0d0
         
         
         ampw(1) =  + om3 * (  - 1d0/2d0*za(p5,p2)*za(e4,p1)*zb(p1,p2)*&
@@ -556,8 +556,8 @@ END SUBROUTINE
      &  - mt**2 + s34)/( - mw**2 + s15)/(za(k4,e4))*za(p2,p5)*za(k4,p5)&
      & *zb(p5,p1)*mt*vev*KR
         
-        amp(1)=(ampw(1)+ampt(1))*mdecay(1)
-        amp(2)=(ampw(2)+ampt(2))*mdecay(2)
+        amp(1)=(ampw(1)*(ghz1/2d0)  +ampt(1))*mdecay(1)
+        amp(2)=(ampw(2)*(ghz1/2d0)  +ampt(2))*mdecay(2)
         
       END SUBROUTINE 
       
@@ -608,8 +608,8 @@ END SUBROUTINE
      & mt**2 + s34)/( - mw**2 + s12)/(za(k4,e4))*za(p2,k4)*zb(p1,p5)*&
      & mt**2*vev*KR
         
-        amp(1)=(ampw(1)+ampt(1))*mdecay(1)
-        amp(2)=(ampw(2)+ampt(2))*mdecay(2)
+        amp(1)=(ampw(1)*(ghz1/2d0)  +ampt(1))*mdecay(1)
+        amp(2)=(ampw(2)*(ghz1/2d0)  +ampt(2))*mdecay(2)
         
       end subroutine udbar_htbbaramp
         
@@ -660,8 +660,8 @@ END SUBROUTINE
      & /( - mt**2 + s34)/( - mw**2 + s12)/(za(k4,e4))*za(p1,p5)*za(k4,&
      & p5)*zb(p5,p2)*mt*vev*KR                
 
-        amp(1)=(ampw(1)+ampt(1))*mdecay(1)
-        amp(2)=(ampw(2)+ampt(2))*mdecay(2)
+        amp(1)=(ampw(1)*(ghz1/2d0)  +ampt(1))*mdecay(1)
+        amp(2)=(ampw(2)*(ghz1/2d0)  +ampt(2))*mdecay(2)
         
       end subroutine ubard_Htbarbamp
     

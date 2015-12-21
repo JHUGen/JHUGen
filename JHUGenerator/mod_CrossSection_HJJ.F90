@@ -512,13 +512,13 @@ END FUNCTION
           ICOLUP(1:2,2) = (/501,000/)
           ICOLUP(1:2,1) = (/000,501/)
           ICOLUP(1:2,4) = (/502,000/)
-          ICOLUP(1:2,3) = (/000,502/) 
+          ICOLUP(1:2,3) = (/000,502/)
           if( MY_IDUP(1).eq.-MY_IDUP(2) .and. flavor_tag.eq.1 ) then! qbq->gg
              MY_IDUP(3:4) = (/Glu_,Glu_/)
              ICOLUP(1:2,2) = (/501,000/)
              ICOLUP(1:2,1) = (/000,501/)
-             ICOLUP(1:2,4) = (/502,503/)            
-             ICOLUP(1:2,3) = (/503,502/)               
+             ICOLUP(1:2,4) = (/502,503/)
+             ICOLUP(1:2,3) = (/503,502/)
           elseif( MY_IDUP(1).eq.-MY_IDUP(2) .and. flavor_tag.eq.3 ) then! qbq->qbar'q'
              ICOLUP(1:2,2) = (/501,000/)
              ICOLUP(1:2,1) = (/000,501/)
@@ -544,7 +544,7 @@ END FUNCTION
           ICOLUP(1:2,1) = (/501,000/)
           ICOLUP(1:2,2) = (/502,000/)
           ICOLUP(1:2,3) = (/501,000/)
-          ICOLUP(1:2,4) = (/502,000/) 
+          ICOLUP(1:2,4) = (/502,000/)
       elseif( MY_IDUP(1).lt.0 .and. MY_IDUP(2).lt.0 ) then! qbqb->qbqb
           ICOLUP(1:2,1) = (/000,501/)
           ICOLUP(1:2,2) = (/000,502/)
@@ -556,7 +556,7 @@ END FUNCTION
         call swapi(ICOLUP(1,3),ICOLUP(1,4))
         call swapi(ICOLUP(2,3),ICOLUP(2,4))
       endif
-      ICOLUP(1:2,5) = (/000,000/) 
+      ICOLUP(1:2,5) = (/000,000/)
 
    endif
 

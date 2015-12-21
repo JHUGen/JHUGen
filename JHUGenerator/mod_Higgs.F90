@@ -1410,8 +1410,8 @@
    real(dp), intent(out) ::  res
    real(dp), intent(in) :: pin(1:4,1:6),mass_F,ga_F
    integer              :: j
-   real(dp)             :: p(1:6,1:4),s12,s45,s123,s456,KL,KR,s(6,6)
-   complex(dp)          :: za(6,6),zb(6,6),amp
+   real(dp)             :: p(1:6,1:4),s12,s45,s123,s456,s(6,6)
+   complex(dp)          :: za(6,6),zb(6,6),amp,KL,KR
 
 !       p=pin
       do j=1,6

@@ -3,7 +3,6 @@ machine:
   pre:
     - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.6 10
     - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.6 10
-    - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.9 20
     - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.9 20
   environment:
     #environment variables can only be set in this section so . bin/thisroot.sh doesn't work
@@ -23,6 +22,9 @@ dependencies:
      - cd ~ && if ! [ -d CMSJHU_AnalysisMacros ]; then git clone -b noMELA git@github.com:hroskes/CMSJHU_AnalysisMacros; fi && cd CMSJHU_AnalysisMacros/JHUSpinWidthPaper_2015/LHEAnalyzer && git pull && make all
      - if ! [ -d ~/checklhe ]; then cd ~ && git clone -b lite git@github.com:hroskes/checklhe; else cd ~/checklhe && git pull; fi
      - cd pdfs && ./downloadNNPDF.sh
+     - cd pdfs && ./downloadNNPDF.sh:
+         pwd:
+           ../JHUGenMELA
    cache_directories:
      - ~/root
      - ~/CMSJHU_AnalysisMacros
@@ -36,6 +38,9 @@ test:
     - sed -i -r -e "s/(pTjetcut = )[0-9.d]*/\10d0/" -e "s/(Rjet = )[0-9.d]*/\10d0/" mod_Parameters.F90
     - git diff > ~/VBFvsHJJ.diff
     - git checkout -- mod_Parameters.F90
+    - make:
+         pwd:
+           ../JHUGenMELA
   override:
     #here we want to generate as many production modes as possible and get the widest range of events to check for syntax issues
     #the actual checking (checklhe) is done in post
@@ -45,8 +50,8 @@ test:
     - ./JHUGen PDFSet=3 Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/other/WH  DecayMode1=11
     - ./JHUGen PDFSet=3 Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/other/ZH  DecayMode1=9
     - ./JHUGen PDFSet=3 Process=62 VegasNc0=100000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/other/HJ
-    - ./JHUGen PDFSet=3 Process=80 VegasNc0=100000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/other/ttH DecayMode1=11 DecayMode2=11 TopDK=1
-    #only generate 100 of bbH and various tqH, they're slow
+    #only generate a few of ttH, bbH, and various tqH, they're slow
+    - ./JHUGen PDFSet=3 Process=80  VegasNc0=100000 VegasNc2=100 DataFile=$CIRCLE_ARTIFACTS/other/ttH DecayMode1=11 DecayMode2=11 TopDK=1
     - ./JHUGen PDFSet=3 Process=90  VegasNc0=100000 VegasNc2=10  DataFile=$CIRCLE_ARTIFACTS/other/gg_bbH PChannel=0
     - ./JHUGen PDFSet=3 Process=90  VegasNc0=100000 VegasNc2=10  DataFile=$CIRCLE_ARTIFACTS/other/qq_bbH PChannel=1
     - ./JHUGen PDFSet=3 Process=110 VegasNc0=100000 VegasNc2=100 DataFile=$CIRCLE_ARTIFACTS/other/tH_t    DecayMode1=11 TopDK=1
@@ -54,11 +59,11 @@ test:
     - ./JHUGen PDFSet=3 Process=112 VegasNc0=100000 VegasNc2=100 DataFile=$CIRCLE_ARTIFACTS/other/tH_s    DecayMode1=11 TopDK=1
     - ./JHUGen PDFSet=3 Process=113 VegasNc0=100000 VegasNc2=100 DataFile=$CIRCLE_ARTIFACTS/other/tbarH_s DecayMode1=11 TopDK=1
     #Decays for t(t)H which have complicated quarks, to check colors
-    - ./JHUGen PDFSet=3 VegasNc0=100000 DecayMode1=1 DecayMode2=1 Interf=0 ReadLHE=$CIRCLE_ARTIFACTS/other/ttH.lhe DataFile=$CIRCLE_ARTIFACTS/other/ttH_decayed
-    - ./JHUGen PDFSet=3 VegasNc0=100000 DecayMode1=5 DecayMode2=5 Interf=0 ReadLHE=$CIRCLE_ARTIFACTS/other/tH_t.lhe DataFile=$CIRCLE_ARTIFACTS/other/tH_t_decayed
-    - ./JHUGen PDFSet=3 VegasNc0=100000 DecayMode1=1 DecayMode2=1 Interf=0 ReadLHE=$CIRCLE_ARTIFACTS/other/tbarH_t.lhe DataFile=$CIRCLE_ARTIFACTS/other/tbarH_t_decayed
-    - ./JHUGen PDFSet=3 VegasNc0=100000 DecayMode1=5 DecayMode2=5 Interf=0 ReadLHE=$CIRCLE_ARTIFACTS/other/tH_s.lhe DataFile=$CIRCLE_ARTIFACTS/other/tH_s_decayed
-    - ./JHUGen PDFSet=3 VegasNc0=100000 DecayMode1=1 DecayMode2=1 Interf=0 ReadLHE=$CIRCLE_ARTIFACTS/other/tbarH_s.lhe DataFile=$CIRCLE_ARTIFACTS/other/tH_s_decayed
+    - ./JHUGen PDFSet=3 VegasNc0=100000         DecayMode1=1 DecayMode2=1 Interf=0 ReadLHE=$CIRCLE_ARTIFACTS/other/ttH.lhe DataFile=$CIRCLE_ARTIFACTS/other/ttH_ZZ
+    - ./JHUGen PDFSet=3 VegasNc0=100000 TauDK=1 DecayMode1=5 DecayMode2=5 Interf=0 ReadLHE=$CIRCLE_ARTIFACTS/other/ttH.lhe DataFile=$CIRCLE_ARTIFACTS/other/ttH_tautau
+    - ./JHUGen PDFSet=3 VegasNc0=100000         DecayMode1=5 DecayMode2=5 Interf=0 ReadLHE=$CIRCLE_ARTIFACTS/other/tH_t.lhe DataFile=$CIRCLE_ARTIFACTS/other/tH_t_decayed
+    - ./JHUGen PDFSet=3 VegasNc0=100000         DecayMode1=1 DecayMode2=1 Interf=0 ReadLHE=$CIRCLE_ARTIFACTS/other/tbarH_t.lhe DataFile=$CIRCLE_ARTIFACTS/other/tbarH_t_decayed
+    - ./JHUGen PDFSet=3 VegasNc0=100000 TauDK=1 DecayMode1=5 DecayMode2=5 Interf=0 ReadLHE=$CIRCLE_ARTIFACTS/other/tH_s.lhe DataFile=$CIRCLE_ARTIFACTS/other/tH_s_decayed
 
     #generate with 0 interference and make plots
     - ./JHUGen PDFSet=3 VegasNc0=100000 VegasNc2=10000 Interf=0 DataFile=$CIRCLE_ARTIFACTS/ggH/SM
@@ -111,6 +116,15 @@ test:
     - git apply --reverse ~/VBFvsHJJ.diff && make
     - ./JHUGen PDFSet=3 VegasNc0=100000 DecayMode1=8 DecayMode2=8 Interf=0 ReadLHE=$CIRCLE_ARTIFACTS/VBF/a2.lhe DataFile=$CIRCLE_ARTIFACTS/VBF/a2_decayed
     - analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/VBF/ outfile=a2.root indir=$CIRCLE_ARTIFACTS/VBF/ computeVBFProdAngles=1 computeVHProdAngles=1 a2_decayed.lhe
+
+    #make sure MELA compiles and runs
+    - ./testC:
+        pwd:
+          ../JHUGenMELA
+    - ./testF:
+        pwd:
+          ../JHUGenMELA
+    #should check that all the "should be" ME's are correct...
 
 
   post:
