@@ -314,16 +314,92 @@ function FindInputFmt0(EventInfoLine)
 implicit none
 character(len=*) :: EventInfoLine
 character(len=150) FindInputFmt0
-integer :: i
+integer :: i, j, fieldwidth, spaces(1:6)
+integer :: ProcessIdCharacters, WeightScaleAqedAqcdCharacters(1:4), WeightScaleAqedAqcdAfterDecimal(1:4)
+character(len=40) :: FormatParts(1:6)
+
+!find the nubmer of spaces at the beginning
+spaces(1) = 0
 i = 1
-do while (EventInfoLine(i+1:i+1) .eq. " ")
+do while (EventInfoLine(i:i) .eq. " ")
     i = i+1
+    spaces(1) = spaces(1)+1
 end do
-if (i.eq.1) then
-    FindInputFmt0 = "(I2,A160)"
+!now find the width of the number of particles, assume it's right aligned with a max of 2 digits
+fieldwidth = 0
+do while (EventInfoLine(i:i) .ne. " ")
+    i = i+1
+    fieldwidth = fieldwidth+1
+end do
+spaces(1) = spaces(1) + fieldwidth - 2
+
+!spaces and process id.
+!"The process ID’s are not intended to be generic" [arXiv:0109068]
+!I will assume that however many digits they are, they're right aligned
+
+ProcessIdCharacters = -1  !so that it's 0 after the first space
+spaces(2) = 1             !this is not increased, it's exactly 1
+do while (EventInfoLine(i:i) .eq. " ")
+    i = i+1
+    ProcessIdCharacters = ProcessIdCharacters+1
+end do
+do while (EventInfoLine(i:i) .ne. " ")
+    i = i+1
+    ProcessIdCharacters = ProcessIdCharacters+1
+end do
+
+!the rest of the fields (scale, alpha_QED, alpha_QCD) are decimals
+do j=1,4
+    spaces(j+2) = 0
+    do while (EventInfoLine(i:i) .eq. " ")
+        i = i+1
+        spaces(j+2) = spaces(j+2)+1
+    end do
+    if (EventInfoLine(i:i) .eq. "-") then
+        i = i+1
+        WeightScaleAqedAqcdCharacters(j) = 1  !we are already past the -
+    else if (spaces(j+2).eq.1) then
+        WeightScaleAqedAqcdCharacters(j) = 0
+    else
+        spaces(j+2) = spaces(j+2)-1           !because the place where the - sign is supposed to go is not always a space
+        WeightScaleAqedAqcdCharacters(j) = 1  !we are already past the -
+    endif
+    do while (EventInfoLine(i:i) .ne. " ")
+        i = i+1
+        WeightScaleAqedAqcdCharacters(j) = WeightScaleAqedAqcdCharacters(j)+1
+    end do
+    WeightScaleAqedAqcdAfterDecimal(j) = WeightScaleAqedAqcdCharacters(j)-7
+end do
+
+!now we construct the format string
+if (spaces(1).eq.0) then
+    FormatParts(1) = "(I2,"
 else
-    write(FindInputFmt0, "(A,I2,A)") "(", i, "X,I2,A160)"
+    write(FormatParts(1), "(A,I1,A)") "(", spaces(1), "X,I2,"
 endif
+if (ProcessIdCharacters.lt.10) then
+    write(FormatParts(2), "(I1,A,I1,A)") spaces(2), "X,I", ProcessIdCharacters !the comma is at the beginning of the next part
+else
+    write(FormatParts(2), "(I1,A,I2)") spaces(2), "X,I", ProcessIdCharacters !the comma is at the beginning of the next part
+endif
+do j=1,4
+    if (WeightScaleAqedAqcdCharacters(j).lt.10) then
+        write(FormatParts(j+2), "(A,I1,A,I1,A,I1)") ",", spaces(j+2), "X,1PE", WeightScaleAqedAqcdCharacters(j), ".", WeightScaleAqedAqcdAfterDecimal(j)
+    elseif (WeightScaleAqedAqcdCharacters(j).lt.17) then
+        write(FormatParts(j+2), "(A,I1,A,I2,A,I1)") ",", spaces(j+2), "X,1PE", WeightScaleAqedAqcdCharacters(j), ".", WeightScaleAqedAqcdAfterDecimal(j)
+    else
+        write(FormatParts(j+2), "(A,I1,A,I2,A,I2)") ",", spaces(j+2), "X,1PE", WeightScaleAqedAqcdCharacters(j), ".", WeightScaleAqedAqcdAfterDecimal(j)
+    endif
+end do
+
+FindInputFmt0 = (trim(FormatParts(1))  &
+              // trim(FormatParts(2))  &
+              // trim(FormatParts(3))  &
+              // trim(FormatParts(4))  &
+              // trim(FormatParts(5))  &
+              // trim(FormatParts(6))  &
+              // ")")
+
 return
 end function FindInputFmt0
 
@@ -332,11 +408,10 @@ end function FindInputFmt0
 function FindInputFmt1(ParticleLine)
 implicit none
 character(len=*) :: ParticleLine
-integer :: i, fieldwidth, spaces(1:13)
+integer :: i, j, fieldwidth, spaces(1:13)
 character(len=150) :: FindInputFmt1
-integer :: MomentumCharacters, LifetimeCharacters, LifetimeDigitsAfterDecimal, SpinCharacters, SpinDigitsAfterDecimal
+integer :: MomentumCharacters(1:5), LifetimeCharacters, LifetimeDigitsAfterDecimal, SpinCharacters, SpinDigitsAfterDecimal
 logical :: LifetimeIsExponential, SpinIsExponential
-character(len=20) :: MomentumFormat
 character(len=40) :: FormatParts(11)
 !first find the number of spaces at the beginning
 i = 1
@@ -419,84 +494,29 @@ do while (ParticleLine(i:i) .ne. " ")
 end do
 spaces(6) = spaces(6) + fieldwidth - 3
 
-!number of spaces between the anticolor and px
 !From now on the alignment is simpler, every row will have the same width
 !   except for possibly a - sign at the beginning
 !Unfortunately now there's number formatting to worry about
-!I will assume that the momentum components and the mass all have the same formatting
-spaces(7) = 0
-do while (ParticleLine(i:i) .eq. " ")
-    i = i+1
-    spaces(7) = spaces(7)+1
-end do
-if (ParticleLine(i:i) .eq. "-") then
-    i = i+1
-else
-    spaces(7) = spaces(7)-1  !because the place where the - sign is supposed to go is not always a space
-endif
-!i is now on the first actual digit (not -) of px
+do j=7,11   !px, py, pz, E, m
+    !spaces before the momentum component
+    spaces(j) = 0
+    do while (ParticleLine(i:i) .eq. " ")
+        i = i+1
+        spaces(j) = spaces(j)+1
+    end do
+    if (ParticleLine(i:i) .eq. "-") then
+        i = i+1
+    else
+        spaces(j) = spaces(j)-1  !because the place where the - sign is supposed to go is not always a space
+    endif
+    !i is now on the first actual digit (not -) of the component
 
-!number of characters used for momentum
-MomentumCharacters = 1           !we are already past the -
-do while (ParticleLine(i:i) .ne. " ")
-    i = i+1
-    MomentumCharacters = MomentumCharacters+1
-end do
-
-!number of spaces between px and py
-spaces(8) = 0
-do while (ParticleLine(i:i) .eq. " ")
-    i = i+1
-    spaces(8) = spaces(8)+1
-end do
-i = i+1
-if (ParticleLine(i:i) .ne. "-") then
-    spaces(8) = spaces(8)-1  !because the place where the - sign is supposed to go is not always a space
-endif
-do while (ParticleLine(i:i) .ne. " ")
-    i = i+1
-enddo
-
-!number of spaces between py and pz
-spaces(9) = 0
-do while (ParticleLine(i:i) .eq. " ")
-    i = i+1
-    spaces(9) = spaces(9)+1
-end do
-i = i+1
-if (ParticleLine(i:i) .ne. "-") then
-    spaces(9) = spaces(9)-1  !because the place where the - sign is supposed to go is not always a space
-endif
-do while (ParticleLine(i:i) .ne. " ")
-    i = i+1
-enddo
-
-!number of spaces between pz and E
-spaces(10) = 0
-do while (ParticleLine(i:i) .eq. " ")
-    i = i+1
-    spaces(10) = spaces(10)+1
-end do
-i = i+1
-if (ParticleLine(i:i) .ne. "-") then
-    spaces(10) = spaces(10)-1  !because the place where the - sign is supposed to go is not always a space
-endif
-do while (ParticleLine(i:i) .ne. " ")
-    i = i+1
-enddo
-
-!number of spaces between E and m
-spaces(11) = 0
-do while (ParticleLine(i:i) .eq. " ")
-    i = i+1
-    spaces(11) = spaces(11)+1
-end do
-i = i+1
-if (ParticleLine(i:i) .ne. "-") then
-    spaces(11) = spaces(11)-1  !because the place where the - sign is supposed to go is not always a space
-endif
-do while (ParticleLine(i:i) .ne. " ")
-    i = i+1
+    !number of characters used for the component
+    MomentumCharacters(j-6) = 1           !we are already past the -
+    do while (ParticleLine(i:i) .ne. " ")
+        i = i+1
+        MomentumCharacters(j-6) = MomentumCharacters(j-6)+1
+    end do
 enddo
 
 !number of spaces between m and lifetime
@@ -561,8 +581,8 @@ enddo
 do i=2,13
     if (spaces(i).eq.0) then
         spaces(i) = 1
-        if (i.eq.7) then   !we counted the nonexistant space for - in MomentumCharacters
-            MomentumCharacters = MomentumCharacters-1
+        if (i.ge.7 .and. i.le.11) then   !we counted the nonexistant space for - in MomentumCharacters(i-6)
+            MomentumCharacters(i-6) = MomentumCharacters(i-6)-1
         endif
         if (i.eq.13) then  !same
             SpinCharacters = SpinCharacters-1
@@ -584,25 +604,16 @@ write(FormatParts(3),"(I1,A,I1,A)") spaces(3), "X,I2,", spaces(4), "X,I2,"
 !spaces and colors
 write(FormatParts(4),"(I1,A,I1,A)") spaces(5), "X,I3,", spaces(6), "X,I3,"
 
-!momentum format
-if (MomentumCharacters .lt. 10) then
-    write(MomentumFormat,"(A,I1,A,I1,A)") "1PE",MomentumCharacters,".",MomentumCharacters-7,","
-elseif (MomentumCharacters .lt. 17) then
-    write(MomentumFormat,"(A,I2,A,I1,A)") "1PE",MomentumCharacters,".",MomentumCharacters-7,","
-else
-    write(MomentumFormat,"(A,I2,A,I2,A)") "1PE",MomentumCharacters,".",MomentumCharacters-7,","
-endif
-
-!spaces and px
-write(FormatParts(5),"(I1,A,A)") spaces(7), "X,", trim(MomentumFormat)
-!spaces and py
-write(FormatParts(6),"(I1,A,A)") spaces(8), "X,", trim(MomentumFormat)
-!spaces and pz
-write(FormatParts(7),"(I1,A,A)") spaces(9), "X,", trim(MomentumFormat)
-!spaces and E
-write(FormatParts(8),"(I1,A,A)") spaces(10), "X,", trim(MomentumFormat)
-!spaces and m
-write(FormatParts(9),"(I1,A,A)") spaces(11), "X,", trim(MomentumFormat)
+do i=5,9
+    !spaces and momentum components (and mass)
+    if (MomentumCharacters(i-4) .lt. 10) then
+        write(FormatParts(i),"(I1,A,I1,A,I1,A)") spaces(i+2), "X,1PE", MomentumCharacters(i-4), ".", MomentumCharacters(i-4)-7, ","
+    elseif (MomentumCharacters(i-4) .lt. 17) then
+        write(FormatParts(i),"(I1,A,I2,A,I1,A)") spaces(i+2), "X,1PE", MomentumCharacters(i-4), ".", MomentumCharacters(i-4)-7, ","
+    else
+        write(FormatParts(i),"(I1,A,I2,A,I2,A)") spaces(i+2), "X,1PE", MomentumCharacters(i-4), ".", MomentumCharacters(i-4)-7, ","
+    endif
+enddo
 
 !spaces and lifetime
 if (LifetimeIsExponential) then
