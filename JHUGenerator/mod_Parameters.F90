@@ -3,7 +3,7 @@ implicit none
 save
 ! 
 ! 
-character(len=6),parameter :: JHUGen_Version="v6.7.8"
+character(len=6),parameter :: JHUGen_Version="v6.8.0"
 ! 
 ! 
 !=====================================================
@@ -66,6 +66,7 @@ logical, public, parameter :: writeWeightedLHE = .false.
 logical, public, parameter :: includeGammaStar = .false. 
 real(8),parameter :: MPhotonCutoff = 4d0*GeV
 
+logical, public, parameter :: UseComplexPoleScheme = .false. 
 logical, public, parameter :: RandomizeVVdecays = .true.    ! randomize DecayMode1 and DecayMode2 in H-->VV and TTBAR decays
 
 logical, public, parameter :: UseUnformattedRead = .false.  !Set this to true if the regular reading fails for whatever reason
