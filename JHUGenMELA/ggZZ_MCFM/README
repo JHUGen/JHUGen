@@ -1,17 +1,10 @@
 #========================================================
 # Instruction for using the JHUGenMELA/ggZZ_MCFM
 # NOTE the instructions need lxplus at cern
-# contact Yanyan Gao (Yanyan.Gao@cern.ch)
+# contact Yanyan Gao (Yanyan.Gao@cern.SPAMNOT.ch) or Ulascan Sarica (ulascan.sarica@cern.SPAMNOT.ch)
 #========================================================
 
-1. set up the enviorment in JHUGenMELA/ggZZ_MCFM/
-
-* choose sl5 or sl6 by doing one of the following
-
-source setup_matrixelement_sl5.sh # for sl5 machines
-source setup_matrixelement_sl6.sh # for sl6 machines
-
-2. Make the MCFM library outside of the JHUGenMELA/ggZZ_MCFM
+1. Make the MCFM library libmcfm_7p0.so (a copy that works for a good range of software releases in slc6 and slc5 is provided) outside of the JHUGenMELA/ggZZ_MCFM
 
    1) Download MCFM 
    
@@ -37,7 +30,7 @@ source setup_matrixelement_sl6.sh # for sl6 machines
                            gg_ZZ_int_freenorm.o \
                            qqb_zz_stu.o \
 
-   6) Compile the package and export the libarry
+   6) Compile the package and export the library
    
     ./Install
     make
@@ -50,13 +43,13 @@ source setup_matrixelement_sl6.sh # for sl6 machines
           ---> Sample file compiled for SLC5/6 gcc 4.6.2+ is provided. Earlier gcc 4.3.4 needs to be compiled from scratch as described above.
 
 
-3. go back to JHUGenMELA/ggZZ_MCFM/ and compile the MELA code
+2. go back to JHUGenMELA/ggZZ_MCFM/ and compile the MELA code
 
 make clean   # absolutely needed
 make
 
-4. run test script based on one event
+3. run test script based on one event
 
-root -l -b -q testME.C+
+root -l -b -q loadMELA.C testME.C+
 
 * The output is in "output.txt", which should be identical to the reference "output_ref.txt" provided.
