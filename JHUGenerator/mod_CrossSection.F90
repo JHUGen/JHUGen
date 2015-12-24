@@ -1663,7 +1663,7 @@ ENDIF! GENEVT
       LO_Res_Unpol = LO_Res_Unpol * SpinAvg * GluonColAvg**2
       PreFac = 2d0 * fbGeV2 * FluxFac * sHatJacobi * PSWgt * PDFFac * SymmFac
       if( abs(MY_IDUP(6)).ge.1 .and. abs(MY_IDUP(6)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
-      if( abs(MY_IDUP(8)).ge.1 .and. abs(MY_IDUP(8)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
+      if( abs(MY_IDUP(8)).ge.1 .and. abs(MY_IDUP(8)).le.6 ) PreFac = PreFac * 3d0 ! =Nc     
       EvalWeighted = LO_Res_Unpol * PreFac
 
 ! EvalWeighted = PreFac  ! for PS output   (only run 1 iteration without vegas adaptation)
@@ -1718,6 +1718,8 @@ ENDIF! GENEVT
       EvalWeighted = LO_Res_Unpol * PreFac
    endif
 
+   if( UseComplexPoleScheme ) EvalWeighted = EvalWeighted * ReweightToCPS( Get_MInv( MomExt(1:4,3)+MomExt(1:4,4) ) )
+!    print *, ReweightToCPS( Get_MInv( MomExt(1:4,3)+MomExt(1:4,4) ) );pause
 
    if( writeWeightedLHE .and. (.not. warmup) ) then
       if( (OffShellV1).or.(OffShellV2).or.(IsAPhoton(DecayMode2))   ) then
@@ -1933,7 +1935,7 @@ include 'csmaxvalue.f'
                 sHatJacobi = sHatJacobi * dr/(Ga_V*M_V) * 1d0/(  &
                 1d0/((MZ1**2 - M_V**2)**2 + M_V**2*Ga_V**2 )     &
                 + 1d0/((MZ2**2 - M_V**2)**2 + M_V**2*Ga_V**2 ) )
-                sHatJacobi = sHatJacobi *(EHat - MZ1*0.999)**2
+                sHatJacobi = sHatJacobi *(EHat - MZ1*0.999d0)**2
             elseif(offzchannel.gt.0.5d0) then
                 EZ_max = EHat
                 dr = datan((EZ_max**2-M_V**2)/(Ga_V*M_V)) + datan(M_V/Ga_V)
@@ -1942,14 +1944,14 @@ include 'csmaxvalue.f'
                 sHatJacobi = sHatJacobi * dr/(Ga_V*M_V) * 1d0/( &
                 1d0/((MZ1**2 - M_V**2)**2 + M_V**2*Ga_V**2 )    &
                 + 1d0/((MZ2**2 - M_V**2)**2 + M_V**2*Ga_V**2 ) )
-                sHatJacobi = sHatJacobi *(EHat - MZ2*0.999)**2
+                sHatJacobi = sHatJacobi *(EHat - MZ2*0.999d0)**2
             endif
        endif
 
   elseif((OffShellV1.eqv..false.).and.(OffShellV2.eqv..true.)) then
         MZ1 = getMass(MY_IDUP(4))
         if(M_Reso.gt.2d0*M_V) then
-            EZ_max = EHat - MZ1*0.99
+            EZ_max = EHat - MZ1*0.99d0
             dr = datan((EZ_max**2-M_V**2)/(Ga_V*M_V)) + datan(M_V/Ga_V)
             MZ2 = dsqrt( M_V*Ga_V * dtan(dr*yz2-datan(M_V/Ga_V)) + M_V**2 )
             sHatJacobi = sHatJacobi*dr/(Ga_V*M_V)*( (MZ2**2 - M_V**2)**2 + M_V**2*Ga_V**2 )
@@ -1961,13 +1963,13 @@ include 'csmaxvalue.f'
   elseif((OffShellV1.eqv..true.).and.(OffShellV2.eqv..false.)) then
         MZ2 = getMass(MY_IDUP(5))
         if(M_Reso.gt.2d0*M_V) then
-            EZ_max = EHat - MZ2*0.99
+            EZ_max = EHat - MZ2*0.99d0
             dr = datan((EZ_max**2-M_V**2)/(Ga_V*M_V)) + datan(M_V/Ga_V)
             MZ1 = dsqrt( M_V*Ga_V * dtan(dr*yz1-datan(M_V/Ga_V)) + M_V**2 )
             sHatJacobi = sHatJacobi*dr/(Ga_V*M_V)*( (MZ1**2 - M_V**2)**2 + M_V**2*Ga_V**2 )
          else
             MZ1 = abs(EHat - MZ2*0.999999999999999d0)*dsqrt(abs(dble(yz2)))
-            sHatJacobi = sHatJacobi *(EHat - MZ2*0.999)**2
+            sHatJacobi = sHatJacobi *(EHat - MZ2*0.999d0)**2
   endif
 
   elseif((OffShellV1.eqv..false.).and.(OffShellV2.eqv..false.)) then
