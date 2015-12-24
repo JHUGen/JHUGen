@@ -2567,8 +2567,9 @@ integer :: AllocStatus,NHisto
 
           Histo(11)%Info   = "MG resonance invariant mass"
           Histo(11)%NBins  = 200
-          Histo(11)%BinSize= 10d0*GeV
-          Histo(11)%LowVal = 0d0*GeV
+          Histo(11)%BinSize= 1d0*GeV
+          Histo(11)%LowVal = 50d0*GeV
+!           Histo(11)%LowVal = 650*GeV !50d0*GeV
           Histo(11)%SetScale= 1d0/GeV
 
           Histo(12)%Info   = "mLep12 invariant mass"

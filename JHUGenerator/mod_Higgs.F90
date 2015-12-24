@@ -33,7 +33,6 @@
       real(dp) :: prefactor, Lambda_inv,res2
       real(dp), parameter :: symmFact=1d0/2d0
 
-
          if( IsAZDecay(DecayMode1) .and. IsAZDecay(DecayMode2) ) then
              VVMode = ZZMode
          elseif( IsAWDecay(DecayMode1) .and. IsAWDecay(DecayMode2) ) then 
@@ -161,6 +160,7 @@
          l4=ordering(4)
 
          s  = 2d0 * scr(p(:,1),p(:,2))
+         
          propG = one/dcmplx(s - M_Reso**2,M_Reso*Ga_Reso)
 
 
