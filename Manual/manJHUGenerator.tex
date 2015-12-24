@@ -650,35 +650,21 @@ Instructions for setting up the JHUGenMELA with MCFM are in the file \verb|JHUGe
 \item \verb|void ResetMCFM_EWKParameters(double ext_Gf, double ext_aemmz, double ext_mW, double ext_mZ, double ext_xW, int ext_ewscheme=3)|: Reset the MCFM EWK scheme and its parameters. See MCFM manual for the details on the EWK scheme.
 \item \verb|void Set_LHAgrid(const char* path)|: One-time call to setup the PDF path in case NNPDF 3.0 is used.
 
-\item \verb|double XsecCalc(TVar::Process proc,
-TVar::Production production,
-const hzz4l_event_type \&hzz4l_event,
-TVar::VerbosityLevel verbosity,
-double couplingvals[SIZE_HVV_FREENORM],
-double selfDHvvcoupl[SIZE_HVV][2],
-double selfDZqqcoupl[SIZE_ZQQ][2],
-double selfDZvvcoupl[SIZE_ZVV][2],
-double selfDGqqcoupl[SIZE_GQQ][2],
-double selfDGggcoupl[SIZE_GGG][2],
-double selfDGvvcoupl[SIZE_GVV][2])|: Calls to the decay MEs are handled through this function. Depending on the type of process, the self-defined coupling arrays may be ignored.
+\item \verb|double XsecCalc(TVar::Process proc, TVar::Production production, const hzz4l_event_type &hzz4l_event, TVar::VerbosityLevel verbosity, double couplingvals[SIZE_HVV_FREENORM], double selfDHvvcoupl[SIZE_HVV][2], double selfDZqqcoupl[SIZE_ZQQ][2], double selfDZvvcoupl[SIZE_ZVV][2], double selfDGqqcoupl[SIZE_GQQ][2], double selfDGggcoupl[SIZE_GGG][2], double selfDGvvcoupl[SIZE_GVV][2])|: Calls to the decay MEs are handled through this function. Depending on the type of process, the self-defined coupling arrays may be ignored.
 
-\item \verb|double XsecCalcXJJ(TVar::Process proc, TVar::Production production, TLorentzVector p4[3],
-TVar::VerbosityLevel verbosity,
-double selfDHggcoupl[SIZE_HGG][2],
-double selfDHvvcoupl[SIZE_HVV_VBF][2],
-double selfDHwwcoupl[SIZE_HWW_VBF][2])|: Calls to VBF, and $Hjj$ MEs are handled from this function. Depending on the production mode or the process, these arrays may be ignored.
+\item \verb|double XsecCalcXJJ(TVar::Process proc, TVar::Production production, TLorentzVector p4[3], TVar::VerbosityLevel verbosity, double selfDHggcoupl[SIZE_HGG][2], double selfDHvvcoupl[SIZE_HVV_VBF][2], double selfDHwwcoupl[SIZE_HWW_VBF][2])|: Calls to VBF, and $Hjj$ MEs are handled from this function. Depending on the production mode or the process, these arrays may be ignored.
 
 \item \verb|double XsecCalcXJ(TVar::Process proc, TVar::Production production, TLorentzVector p4[2],TVar::VerbosityLevel verbosity)|: Call to the JHUGen $Hj$ ME is handled through tis routine.
 
-\item \verb|double XsecCalc_VX(TVar::Process proc, TVar::Production production, vh_event_type \&vh_event,TVar::VerbosityLevel verbosity,double selfDHvvcoupl[SIZE_HVV_VBF][2])|: Call to the JHUGen $VH$ ME is handled from this routine.
+\item \verb|double XsecCalc_VX(TVar::Process proc, TVar::Production production, vh_event_type &vh_event,TVar::VerbosityLevel verbosity,double selfDHvvcoupl[SIZE_HVV_VBF][2])|: Call to the JHUGen $VH$ ME is handled from this routine.
 
-\item \verb|double XsecCalc_TTX(TVar::Process proc, TVar::Production production,tth_event_type \&tth_event,int topDecay,int topProcess,TVar::VerbosityLevel verbosity,double selfDHvvcoupl[SIZE_TTH][2])|: Call to te $t\bar{t}H$ ME is handled through this routine.
+\item \verb|double XsecCalc_TTX(TVar::Process proc, TVar::Production production,tth_event_type &tth_event,int topDecay,int topProcess,TVar::VerbosityLevel verbosity,double selfDHvvcoupl[SIZE_TTH][2])|: Call to te $t\bar{t}H$ ME is handled through this routine.
 
 \item \verb|void SetHiggsMass(double mass=125, float wHiggs=-1)|: This routine changes the Higgs mass and width used in the MCFM calculations.
 
-See the beginning declarations in \verb|TVar.hh| for the list of enumerated variables, and \verb|testME.C| for example calls (eg. array filling, assignment of momenta, and passing te arguments to these routines).
-
 \end{itemize}
+
+See the beginning declarations in \verb|TVar.hh| for the list of enumerated variables, and \verb|testME.C| for example calls (eg. array filling, assignment of momenta, and passing te arguments to these routines).
 
 %%%%%%%%%%%
 
