@@ -217,6 +217,7 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
    enddo
 
     Mu_Fact = M_Reso! setting pdf scale to resonance mass by default, later changed as necessary in the EvalWeighted/EvalUnweighted subroutines
+	Mu_Ren = M_Reso! setting renorm. scale to resonance mass by default, later changed as necessary in the EvalWeighted/EvalUnweighted subroutines
 
     if( CountArg.ne.NumArgs ) then
         print *, "unknown command line argument"
@@ -408,33 +409,104 @@ END SUBROUTINE
 
 
 
+SUBROUTINE InitPDFNonConstVals()
+use ModParameters
+implicit none
+   nloops_pdf = 1
+   bmass_pdf = m_bot
+   cmass_pdf = m_charm
+   zmass_pdf = M_Z
+   Mu_Fact = M_Reso
+   Mu_Ren = M_Reso
+   alphas = 0.13229060d0
+   alphas_mz = alphas
+   alphas_mb = alphas
+   alphas_mc = alphas
+   gs = sqrt(alphas*4.0_dp*pi)
+return
+END SUBROUTINE
+
+SUBROUTINE InitPDFConstVals()
+use ModParameters
+use ModKinematics
+implicit none
+   real(dp) :: T
+   INTEGER, PARAMETER :: NF5=5
+   INTEGER, PARAMETER :: NF4=4
+
+   ! One-time checks
+      IF (alphas_mz .LE. 0d0) THEN 
+         WRITE(6,*) 'alphas_mz .le. 0:',alphas_mz
+         WRITE(6,*) 'continuing with alphas_mz=0.118'
+         alphas_mz=0.118d0
+      ENDIF
+      IF (cmass_pdf .LE. 0.3d0*GeV) THEN 
+         WRITE(6,*) 'cmass_pdf .le. 0.3GeV:',cmass_pdf
+         WRITE(6,*) 'continuing with cmass_pdf=1.5GeV'
+         cmass_pdf = 1.5d0*GeV
+      ENDIF
+      IF (bmass_pdf .LE. 0d0) THEN 
+         WRITE(6,*) 'bmass_pdf .le. 0:',bmass_pdf
+         WRITE(6,*) 'continuing with bmass_pdf=5.0GeV'
+         bmass_pdf = 5d0*GeV
+      ENDIF
+      IF (nloops_pdf.lt.1) THEN
+         WRITE(6,*) 'Unimplemented nloops_pdf .lt. 1:',nloops_pdf
+         stop
+      ENDIF
+
+      ! Establish value of coupling at b- and c-mass and save
+      T=2D0*DLOG(bmass_pdf/zmass_pdf)
+      CALL NEWTONPDF(T,alphas_mz,alphas_mb,NF5)
+      T=2D0*DLOG(cmass_pdf/bmass_pdf)
+      CALL NEWTONPDF(T,alphas_mb,alphas_mc,NF4)
+
+return
+END SUBROUTINE
 
 
 
 
 SUBROUTINE InitPDFs()
+#if useLHAPDF==1
 use ModParameters
+implicit none
+
+     call InitPDFNonConstVals()
+     call InitPDFset(trim(LHAPDFString))
+     call InitPDF(LHAPDFMember)
+     alphas_mz=alphasPDF(zmass_pdf)
+#else
+use ModParameters
+use ModKinematics
 implicit none
 character :: pdftable*(100)
 
-#if useLHAPDF==1
-     call InitPDFset(trim(LHAPDFString))
-     call InitPDF(LHAPDFMember)  
-#else
+     call InitPDFNonConstVals()
      if( PDFSet.eq.1 ) then
         call SetCtq6(4)  ! 4    CTEQ6L1  Leading Order cteq6l1.tbl
+        alphas_mz=0.130d0
+        nloops_pdf=1
+        cmass_pdf=1.3d0*GeV
+        bmass_pdf=4.5d0*GeV
      elseif( PDFSet.eq.3 ) then
 !         pdftable(:)="./pdfs/NNPDF23_lo_as_0130.LHgrid"
         pdftable(:)="./pdfs/NNPDF30_lo_as_0130.LHgrid"
         call NNPDFDriver(pdftable)
         call NNinitPDF(0)
+        alphas_mz=0.130d0
+        nloops_pdf=1
+		zmass_pdf=91.199996948242188d0*GeV
+        cmass_pdf=1.274999976158142d0*GeV
+        bmass_pdf=4.179999828338623d0*GeV
+     elseif( (PDFSet.eq.2) .or. (PDFSet.ge.201 .and. PDFSet.le.240) ) then
+        alphas_mz=0.13939d0
+        nloops_pdf=1
+        cmass_pdf=1.40d0*GeV
+        bmass_pdf=4.75d0*GeV
      endif
+	 call InitPDFConstVals()
 #endif
-
-
-     
-     
-     
      
 return
 END SUBROUTINE

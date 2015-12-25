@@ -1629,6 +1629,7 @@ ENDIF! GENEVT
     endif
 
    Mu_Fact = Get_MInv( MomExt(1:4,3)+MomExt(1:4,4) )*0.5d0
+   Mu_Ren = Mu_Fact
    call setPDFs(eta1,eta2,pdf)
    FluxFac = 1d0/(2d0*EHat**2)
 
@@ -2040,6 +2041,7 @@ include 'csmaxvalue.f'
     endif
 
    Mu_Fact = Get_MInv( MomExt(1:4,3)+MomExt(1:4,4) )*0.5d0
+   Mu_Ren = Mu_Fact
    call setPDFs(eta1,eta2,pdf)
    FluxFac = 1d0/(2d0*EHat**2)
 
