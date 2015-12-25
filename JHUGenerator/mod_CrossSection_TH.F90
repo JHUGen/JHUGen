@@ -40,7 +40,7 @@ integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9
    call EvalPhaseSpace_2to3ArbMass(EHat,(/MH_Inv,M_Top,0d0/),yRnd(3:7),MomExt(1:4,1:5),PSWgt)
    call boost2Lab(eta1,eta2,5,MomExt(1:4,1:5))
    Mu_Fact=(M_Top + M_Reso)/4d0
-   call setPDFs(eta1,eta2,Mu_Fact,pdf)
+   call setPDFs(eta1,eta2,pdf)
    
    IF( TOPDECAYS.NE.0 ) THEN
       call EvalPhasespace_TopDecay(MomExt(1:4,4),yRnd(8:11),MomExt(1:4,6:8),PSWgt2)
@@ -268,7 +268,7 @@ WdecayKfactor = 1d0
    if( applyPSCut .or. PSWgt.eq.zero ) return
 
    Mu_Fact=(M_Top + M_Reso)/4d0
-   call setPDFs(eta1,eta2,Mu_Fact,pdf)
+   call setPDFs(eta1,eta2,pdf)
    LO_Res_Unpol = 0d0
 
 

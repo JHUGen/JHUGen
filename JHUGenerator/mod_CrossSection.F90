@@ -40,7 +40,7 @@ Function EvalWeighted_HJ(yRnd,VgsWgt)
     call Kinematics_HJ(4,MomExt,applyPSCut,NBin)
     if( applyPSCut .or. PSWgt.eq.zero ) return
 
-    call setPDFs(eta1,eta2,Mu_Fact,pdf)
+    call setPDFs(eta1,eta2,pdf)
 
     call EvalAmp_HJ(MomExt,me2)
 
@@ -133,7 +133,7 @@ include 'csmaxvalue.f'
     if( applyPSCut .or. PSWgt.eq.zero ) return
    
 
-   call setPDFs(eta1,eta2,Mu_Fact,pdf)
+   call setPDFs(eta1,eta2,pdf)
    FluxFac = 1d0/(2d0*EHat**2)
    EvalCounter = EvalCounter+1
 
@@ -612,7 +612,7 @@ if( IsAZDecay(DecayMode1) ) then
         if(dabs(inv_mass(5)-M_Reso).gt.10d0*Ga_Reso) return
       endif
 
-      call setPDFs(eta1,eta2,Mu_Fact,pdf)
+      call setPDFs(eta1,eta2,pdf)
       FluxFac = 1d0/(2d0*EHat**2)
       PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt *6d0 !2 for e and mu, 3 for colors of b
       LO_Res_Unpol=0d0
@@ -695,7 +695,7 @@ elseif( IsAWDecay(DecayMode1) ) then
         if(dabs(inv_mass(5)-M_Reso).gt.10d0*Ga_Reso) return
       endif
 
-      call setPDFs(eta1,eta2,Mu_Fact,pdf)
+      call setPDFs(eta1,eta2,pdf)
       FluxFac = 1d0/(2d0*EHat**2)
       PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt *6d0 !2 for e and mu, 3 for colors of b
       LO_Res_Unpol=0d0
@@ -1169,7 +1169,7 @@ if( IsAZDecay(DecayMode1) ) then
         if(dabs(inv_mass(5)-M_Reso).gt.10d0*Ga_Reso) return
       endif
 
-      call setPDFs(eta1,eta2,Mu_Fact,pdf)
+      call setPDFs(eta1,eta2,pdf)
       FluxFac = 1d0/(2d0*EHat**2)
       PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt/3d0! *6d0 !2 for e and mu, 3 for colors of b
 
@@ -1224,7 +1224,7 @@ elseif( IsAWDecay(DecayMode1) ) then
         if(dabs(inv_mass(5)-M_Reso).gt.10d0*Ga_Reso) return
       endif
 
-      call setPDFs(eta1,eta2,Mu_Fact,pdf)
+      call setPDFs(eta1,eta2,pdf)
       FluxFac = 1d0/(2d0*EHat**2)
       PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt/3d0! *6d0 !2 for e and mu, 3 for colors of qqb
 
@@ -1629,7 +1629,7 @@ ENDIF! GENEVT
     endif
 
    Mu_Fact = Get_MInv( MomExt(1:4,3)+MomExt(1:4,4) )*0.5d0
-   call setPDFs(eta1,eta2,Mu_Fact,pdf)
+   call setPDFs(eta1,eta2,pdf)
    FluxFac = 1d0/(2d0*EHat**2)
 
    if (PChannel.eq.0.or.PChannel.eq.2) then
@@ -1790,7 +1790,7 @@ END FUNCTION
     endif
 
 
-   call setPDFs(eta1,eta2,Mu_Fact,pdf)
+   call setPDFs(eta1,eta2,pdf)
    FluxFac = 1d0/(2d0*EHat**2)
 
    PDFFac = pdf(0,1) * pdf(0,2)
@@ -2040,7 +2040,7 @@ include 'csmaxvalue.f'
     endif
 
    Mu_Fact = Get_MInv( MomExt(1:4,3)+MomExt(1:4,4) )*0.5d0
-   call setPDFs(eta1,eta2,Mu_Fact,pdf)
+   call setPDFs(eta1,eta2,pdf)
    FluxFac = 1d0/(2d0*EHat**2)
 
 

@@ -105,7 +105,7 @@ WdecayKfactor = 1d0
    FluxFac = 1d0/(2d0*EHat**2)
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * PartChannelAvg * WdecayKfactor
    Mu_Fact = 0.5d0*( 2d0*M_top + M_Reso )
-   call setPDFs(eta1,eta2,Mu_Fact,pdf)
+   call setPDFs(eta1,eta2,pdf)
    
    
    
@@ -305,7 +305,7 @@ WdecayKfactor = 1d0
    if( applyPSCut .or. PSWgt.eq.zero ) return
 
    Mu_Fact = 0.5d0*( 2d0*M_top + M_Reso )   
-   call setPDFs(eta1,eta2,Mu_Fact,pdf)
+   call setPDFs(eta1,eta2,pdf)
 
    
 IF( GENEVT ) THEN   
