@@ -2,7 +2,6 @@
       use ModParameters
       implicit none
       private
-      integer, parameter  :: dp = selected_real_kind(15)
       real(dp), private, parameter :: tol = 0.00000010_dp
 
 
