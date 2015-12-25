@@ -5113,186 +5113,133 @@ END SUBROUTINE
 
 
 ! QCD scale from MCFM
-FUNCTION EVALALPHAS(Q,AMZ,NLOOP)
-#if useLHAPDF==1
-c--- this is simply a wrapper to the LHAPDF implementation of the
-c--- running coupling, in the style of the native MCFM routine
-c--- Note that the inputs AMZ and NLOOP are not used
-   IMPLICIT NONE
-   REAL(DP) :: EVALALPHAS
-   REAL(DP), intent(in) :: Q,AMZ
-   INTEGER, intent(in) :: NLOOP
-   DOUBLE PRECISION alphasPDF
-   INTEGER NLOOP
-	  EVALALPHAS = 0d0
-      EVALALPHAS=alphasPDF(Q)
-#else
-c     Evaluation of strong coupling constant alpha_S
-c     Author: R.K. Ellis
-c     q -- scale at which alpha_s is to be evaluated
-c     amz -- value of alpha_s at the mass of the Z-boson
-c     nloop -- the number of loops (1,2, or 3) at which beta 
-c     function is evaluated to determine running.
-c     the values of the cmass and the bmass should be set
-c     in common block qmass.
+subroutine EVALALPHAS()
    use ModParameters
    IMPLICIT NONE
-   REAL(DP) :: EVALALPHAS
-   REAL(DP), intent(in) :: Q,AMZ
-   INTEGER, intent(in) :: NLOOP
-   REAL(DP) :: T,AMZ0,AMB,AMC,BMASS,CMASS,AS_OUT
-   INTEGER :: NLOOP0
+#if useLHAPDF==1
+!--- this is simply a wrapper to the LHAPDF implementation of the
+!--- running coupling, in the style of the native MCFM routine
+!--- Note that the inputs AMZ and NLOOP are not used
+   DOUBLE PRECISION alphasPDF
+   REAL(DP) :: Q
+      Q = Mu_Ren/GeV
+      alphas=alphasPDF(Q)
+#else
+!     Evaluation of strong coupling constant alpha_S
+!     Author: R.K. Ellis
+!     q -- scale at which alpha_s is to be evaluated
+!     amz -- value of alpha_s at the mass of the Z-boson
+!     nloop -- the number of loops (1,2, or 3) at which beta 
+!     function is evaluated to determine running.
+!     the values of the cmass and the bmass should be set
+!     in common block qmass.
+   REAL(DP) :: T
    INTEGER, PARAMETER :: NF5=5
    INTEGER, PARAMETER :: NF4=4
    INTEGER, PARAMETER :: NF3=3
    
-      AMZ0=0d0
-      NLOOP0=0
-      CMASS = m_charm
-      bMASS = m_bot
-	  EVALALPHAS = 0d0
-
       ! Set masses
-      IF (Q .LE. 0D0) THEN 
+      IF (Mu_Ren .LE. 0d0) THEN 
          WRITE(6,*) 'q .le. 0 in alphas'
-         WRITE(6,*) 'q = ',Q
+         WRITE(6,*) 'q = ',Mu_Ren
          stop
       ENDIF
-      IF (AMZ .LE. 0D0) THEN 
-         WRITE(6,*) 'amz .le. 0 in alphas',AMZ
-         WRITE(6,*) 'continuing with amz=0.118'
-         AMZ=0.118D0
-      ENDIF
-      IF (CMASS .LE. 0.3D0) THEN 
-         WRITE(6,*) 'cmass .le. 0.3GeV in alphas',CMASS
-         WRITE(6,*) 'continuing with cmass=1.5GeV'
-         CMASS = 1.5D0
-      ENDIF
-      IF (BMASS .LE. 0D0) THEN 
-         WRITE(6,*) 'bmass .le. 0 in alphas',BMASS
-         WRITE(6,*) 'continuing with bmass=5.0GeV'
-         BMASS = 5D0
-      ENDIF
 
-c--- 3-flavour running only
-      if     (cmass .gt. 999d0) then
-         T=2D0*DLOG(Q/M_Z)
-         CALL NEWTON1(T,AMZ,AS_OUT,NLOOP,NF3)
-         EVALALPHAS=AS_OUT
+!--- 3-flavour running only
+      if     (cmass_pdf .gt. 999d0*GeV) then
+         T=2D0*DLOG(Mu_Ren/zmass_pdf)
+         CALL NEWTONPDF(T,alphas_mz,alphas,NF3)
          RETURN
-c--- 4-flavour running only
-      elseif (bmass .gt. 999d0) then
-         T=2D0*DLOG(Q/M_Z)
-         CALL NEWTON1(T,AMZ,AS_OUT,NLOOP,NF4)
-         EVALALPHAS=AS_OUT
+!--- 4-flavour running only
+      elseif (bmass_pdf .gt. 999d0*GeV) then
+         T=2D0*DLOG(Mu_Ren/zmass_pdf)
+         CALL NEWTONPDF(T,alphas_mz,alphas,NF4)
          RETURN
       endif
-c--- establish value of coupling at b- and c-mass and save
-      IF ((AMZ .NE. AMZ0) .OR. (NLOOP .NE. NLOOP0)) THEN
-         AMZ0=AMZ
-         NLOOP0=NLOOP
-         T=2D0*DLOG(BMASS/M_Z)
-         CALL NEWTON1(T,AMZ,AMB,NLOOP,NF5)
-         T=2D0*DLOG(CMASS/BMASS)
-         CALL NEWTON1(T,AMB,AMC,NLOOP,NF4)
-      ENDIF
-c--- evaluate strong coupling at scale q
-      IF (Q  .LT. BMASS) THEN
-         IF (Q  .LT. CMASS) THEN
-            T=2D0*DLOG(Q/CMASS)
-            CALL NEWTON1(T,AMC,AS_OUT,NLOOP,NF3)
+!--- evaluate strong coupling at scale q
+      IF (Mu_Ren .LT. bmass_pdf) THEN
+         IF (Mu_Ren .LT. cmass_pdf) THEN
+            T=2D0*DLOG(Mu_Ren/cmass_pdf)
+            CALL NEWTONPDF(T,alphas_mc,alphas,NF3)
          ELSE
-            T=2D0*DLOG(Q/BMASS)
-            CALL NEWTON1(T,AMB,AS_OUT,NLOOP,NF4)
+            T=2D0*DLOG(Mu_Ren/bmass_pdf)
+            CALL NEWTONPDF(T,alphas_mb,alphas,NF4)
          ENDIF
       ELSE
-         T=2D0*DLOG(Q/M_Z)
-         CALL NEWTON1(T,AMZ,AS_OUT,NLOOP,NF5)
+         T=2D0*DLOG(Mu_Ren/zmass_pdf)
+         CALL NEWTONPDF(T,alphas_mz,alphas,NF5)
       ENDIF
-      EVALALPHAS = AS_OUT
 #endif
+      gs = sqrt(alphas*4.0_dp*pi)
    RETURN
-END FUNCTION EVALALPHAS
+end subroutine EVALALPHAS
 
+function F2_PDF(AS,NF)
+use ModParameters
+implicit none
+real(dp), intent(in) :: AS
+integer, intent(in) :: NF
+real(dp) :: F2_PDF
+      F2_PDF=1D0/AS+C1_PDF(NF)*LOG((C1_PDF(NF)*AS)/(1D0+C1_PDF(NF)*AS))
+end function F2_PDF
 
-SUBROUTINE NEWTON1(T,A_IN,A_OUT,NLOOP,NF)
-C     Author: R.K. Ellis
-c---  calculate a_out using nloop beta-function evolution 
-c---  with nf flavours, given starting value as-in
-c---  given as_in and logarithmic separation between 
-c---  input scale and output scale t.
-c---  Evolution is performed using Newton's method,
-c---  with a precision given by tolerance.
+function F3_PDF(AS,NF)
+use ModParameters
+implicit none
+real(dp), intent(in) :: AS
+integer, intent(in) :: NF
+real(dp) :: F3_PDF
+      F3_PDF=1D0/AS+0.5D0*C1_PDF(NF) &
+       *LOG((C2_PDF(NF)*AS**2)/(1D0+C1_PDF(NF)*AS+C2_PDF(NF)*AS**2)) &
+       -(C1_PDF(NF)**2-2D0*C2_PDF(NF))/DELC_PDF(NF) &
+       *ATAN((2D0*C2_PDF(NF)*AS+C1_PDF(NF))/DELC_PDF(NF))
+end function F3_PDF
+
+SUBROUTINE NEWTONPDF(T,A_IN,A_OUT,NF)
+!     Author: R.K. Ellis
+!---  calculate a_out using nloop beta-function evolution 
+!---  with nf flavours, given starting value as-in
+!---  given as_in and logarithmic separation between 
+!---  input scale and output scale t.
+!---  Evolution is performed using Newton's method,
+!---  with a precision given by tolerance.
    use ModParameters
    IMPLICIT NONE
-   INTEGER :: NLOOP,NF
-   REAL(DP) :: T,A_IN,A_OUT,AS,F2,F3,F,FP,DELTA
-   REAL(DP) B0(0:6),C1(0:6),C2(0:6),DEL(0:6)
+   REAL(DP),INTENT(IN) :: T,A_IN
+   INTEGER, INTENT(IN) :: NF
+   REAL(DP),INTENT(OUT) :: A_OUT
+   REAL(DP) :: AS,F,FP,DELC_PDFTA
    REAL(DP), PARAMETER :: TOLERANCE=5D-4
 
-C---     B0=(11.-2.*NF/3.)/4./PI
-   B0 =(/
-     &   0.8753521870054244D0,0.822300539308126D0,0.7692488916108274D0,
-     &   0.716197243913529D0,0.6631455962162306D0,0.6100939485189321D0,
-     &   0.5570423008216338D0/)
-C---     C1=(102.D0-38.D0/3.D0*NF)/4.D0/PI/(11.D0-2.D0/3.D0*NF)
-   C1 =(/
-     &   0.7379001906987874D0,0.6879600765907734D0,0.631131670881654D0,
-     &   0.5658842421045168D0,0.4901972247230377D0,0.4013472477969535D0,
-     &   0.2955734657420913D0/)
-C---     C2=(2857.D0/2.D0-5033*NF/18.D0+325*NF**2/54)
-C---     /16.D0/PI**2/(11.D0-2.D0/3.D0*NF)
-   C2 =(/
-     &   0.8223710842788609D0,0.7077616059424726D0,0.5852293127502415D0,
-     &   0.4530135791786467D0,0.3087903795366415D0,0.1494273313710745D0,
-     &  -0.02940123632478559D0/)
-C---     DEL=SQRT(4*C2-C1**2)  (DEL(6) imaginary, set equal to zero
-   DEL =(/
-     &   1.656800424215946D0,1.535499057891964D0,1.393768296744871D0,
-     &   1.221404659092302D0,0.9974307991136014D0,0.660779624511916D0,
-     &   0D0/)
-   F = 0D0
-   FP= 1d0
-
-      IF ((NF .lt. 0) .or. (NF .gt. 6)
-     & .or. ((NF.eq.6) .and. (NLOOP.gt.2))
-     & .or. (NLOOP.lt.1)) then
-          write(6,*) 'unimplemented value of NF/NLOOP in newton1'
-          write(6,*) 'NF,NLOOP=',NF,NLOOP
+      IF ((NF .lt. 0) .or. (NF .gt. 6) .or. ((NF.eq.6) .and. (nloops_pdf.gt.2)) ) then
+          write(6,*) 'unimplemented value of NF/nloops_pdf in newton1'
+          write(6,*) 'NF,nloops_pdf=',NF,nloops_pdf
           STOP
       ENDIF
 
-      F2(AS)=1D0/AS+C1(NF)*LOG((C1(NF)*AS)/(1D0+C1(NF)*AS))
-      F3(AS)=1D0/AS+0.5D0*C1(NF)
-     & *LOG((C2(NF)*AS**2)/(1D0+C1(NF)*AS+C2(NF)*AS**2))
-     & -(C1(NF)**2-2D0*C2(NF))/DEL(NF)
-     & *ATAN((2D0*C2(NF)*AS+C1(NF))/DEL(NF))
-
-      A_OUT=A_IN/(1D0+A_IN*B0(NF)*T)
-      IF (NLOOP .EQ. 1) RETURN
-      A_OUT=A_IN/(1D0+B0(NF)*A_IN*T+C1(NF)*A_IN*LOG(1D0+A_IN*B0(NF)*T))
-      IF (A_OUT .LT. 0D0) AS=0.3D0
+      F = 0D0
+      FP= 1d0
+      A_OUT=A_IN/(1D0+A_IN*B0_PDF(NF)*T)
+      IF (nloops_pdf .EQ. 1) RETURN
+      A_OUT=A_IN/(1D0+B0_PDF(NF)*A_IN*T+C1_PDF(NF)*A_IN*LOG(1D0+A_IN*B0_PDF(NF)*T))
+      IF (A_OUT .LT. 0D0) A_OUT=0.3D0
  30   AS=A_OUT
 
-      IF (NLOOP .EQ. 2) THEN
-         F=B0(NF)*T+F2(A_IN)-F2(AS)
-         FP=1D0/(AS**2*(1D0+C1(NF)*AS))
-      ELSEIF (NLOOP .EQ. 3) THEN
-         F=B0(NF)*T+F3(A_IN)-F3(AS)
-         FP=1D0/(AS**2*(1D0+C1(NF)*AS+C2(NF)*AS**2))
+      IF (nloops_pdf .EQ. 2) THEN
+         F=B0_PDF(NF)*T+F2_PDF(A_IN,NF)-F2_PDF(AS,NF)
+         FP=1D0/(AS**2*(1D0+C1_PDF(NF)*AS))
+      ELSEIF (nloops_pdf .EQ. 3) THEN
+         F=B0_PDF(NF)*T+F3_PDF(A_IN,NF)-F3_PDF(AS,NF)
+         FP=1D0/(AS**2*(1D0+C1_PDF(NF)*AS+C2_PDF(NF)*AS**2))
       ELSE
-         WRITE(6,*) 'Unimplemented value of NLOOP in newton1'
+         WRITE(6,*) 'Unimplemented value of nloops_pdf in newton1'
          stop
       ENDIF
       A_OUT=AS-F/FP
-      DELTA=ABS(F/FP/AS)
-      IF (DELTA .GT. TOLERANCE) GO TO 30
+      DELC_PDFTA=ABS(F/FP/AS)
+      IF (DELC_PDFTA .GT. TOLERANCE) GO TO 30
    RETURN
-END SUBROUTINE NEWTON1
-
-
-
-
+END SUBROUTINE NEWTONPDF
 
 
 
