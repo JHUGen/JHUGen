@@ -3,11 +3,12 @@ implicit none
 save
 ! 
 ! 
-character(len=6),parameter :: JHUGen_Version="v6.8.0"
+character(len=6),parameter :: JHUGen_Version="v6.8.1"
 ! 
 ! 
 !=====================================================
 !internal
+integer, public, parameter  :: dp = selected_real_kind(15)
 integer, public :: Collider, PDFSet,PChannel,Process,DecayMode1,DecayMode2,TopDecays,TauDecays
 integer, public :: VegasIt1,VegasNc0,VegasNc1,VegasNc2
 real(8), public :: Collider_Energy
@@ -267,7 +268,7 @@ real(8), public :: scale_alpha_W_tn = 1d0        ! scaling factor of alpha (~par
    integer,    public, parameter :: cz_q1sq = 0d0 ! Sign of q1,2,12**2 for the following Lambda's, set to 1 or -1 to get q**2-dependence from these form factor Lambdas
    integer,    public, parameter :: cz_q2sq = 0d0
    integer,    public, parameter :: cz_q12sq = 0d0
-   ! These Lambdas all have numerical value of 1d0
+   ! These Lambdas all have a numerical value of 1d0
    real(8),    public, parameter :: Lambda_z11 = 100d0*GeV ! For Z1
    real(8),    public, parameter :: Lambda_z21 = 100d0*GeV
    real(8),    public, parameter :: Lambda_z31 = 100d0*GeV
@@ -405,11 +406,10 @@ real(8), public :: scale_alpha_W_tn = 1d0        ! scaling factor of alpha (~par
 ! with
 !   aR(f) = -2*sw**2*Q(f),
 !   aL(f) = -2*sw**2*Q(f) + 2*T3(f).
-! for V = Z-boson
-! and
+! for V = Z-boson,
 !   bR = 0
 !   bL = dsqrt(2)*cw
-! for V = W-boson
+! for V = W-boson,
 ! and
 !   cR = -2*sw*cw*Q(f)
 !   cL = -2*sw*cw*Q(f)
@@ -486,9 +486,9 @@ integer, public, parameter :: pdfAChm_ = -4
 integer, public, parameter :: pdfABot_ = -5
 integer, public, parameter :: pdfATop_ = -6 ! Dummy
 
-real(8), public, parameter :: pi =3.141592653589793238462643383279502884197d0
-real(8), public, parameter :: sqrt2 = 1.4142135623730950488016887242096980786d0
-real(8), public, parameter :: pisq = pi**2
+real(dp), public, parameter :: pi =3.141592653589793238462643383279502884197_dp
+real(dp), public, parameter :: sqrt2 = 1.4142135623730950488016887242096980786_dp
+real(dp), public, parameter :: pisq = pi**2
 real(8), public, parameter :: one = 1.0d0, mone = -1.0d0
 real(8), public, parameter :: half  = 0.5d0,two = 2.0d0
 real(8), public, parameter :: zero  = 0.0d0

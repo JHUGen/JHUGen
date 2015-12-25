@@ -2,7 +2,6 @@
       use ModParameters
       implicit none
       private
-      integer, parameter  :: dp = selected_real_kind(15)
       real(dp), private, parameter :: tol = 0.00000010_dp
       integer, private, parameter :: ZZMode=00,ZgsMode=01,gsZMode=02,gsgsMode=03
       integer, private, parameter :: WWMode=10

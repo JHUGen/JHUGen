@@ -9,8 +9,6 @@ module modHiggsJJ
   public :: get_VBFchannelHash,get_HJJchannelHash,get_GENchannelHash
 
   !-- general definitions, to be merged with Markus final structure
-  integer, parameter  :: dp = selected_real_kind(15)
-
   real(dp), parameter :: nf = 5.0_dp
   real(dp), parameter :: xw = sitW**2
   real(dp), parameter :: twosc = sqrt(4.0_dp*xw*(1.0_dp-xw))
