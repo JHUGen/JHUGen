@@ -426,6 +426,7 @@ implicit none
 return
 END SUBROUTINE
 
+#if useLHAPDF==1
 SUBROUTINE InitPDFConstVals()
 use ModParameters
 use ModKinematics
@@ -463,7 +464,7 @@ implicit none
 
 return
 END SUBROUTINE
-
+#endif
 
 
 
@@ -471,6 +472,7 @@ SUBROUTINE InitPDFs()
 #if useLHAPDF==1
 use ModParameters
 implicit none
+DOUBLE PRECISION alphasPDF
 
      call InitPDFNonConstVals()
      call InitPDFset(trim(LHAPDFString))
