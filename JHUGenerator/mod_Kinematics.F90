@@ -5124,6 +5124,9 @@ subroutine EVALALPHAS()
    REAL(DP) :: Q
       Q = Mu_Ren/GeV
       alphas=alphasPDF(Q)
+      gs = sqrt(alphas*4.0_dp*pi)
+   RETURN
+end subroutine EVALALPHAS
 #else
 !     Evaluation of strong coupling constant alpha_S
 !     Author: R.K. Ellis
@@ -5169,7 +5172,7 @@ subroutine EVALALPHAS()
          T=2D0*DLOG(Mu_Ren/zmass_pdf)
          CALL NEWTONPDF(T,alphas_mz,alphas,NF5)
       ENDIF
-#endif
+
       gs = sqrt(alphas*4.0_dp*pi)
    RETURN
 end subroutine EVALALPHAS
@@ -5208,7 +5211,7 @@ SUBROUTINE NEWTONPDF(T,A_IN,A_OUT,NF)
    REAL(DP),INTENT(IN) :: T,A_IN
    INTEGER, INTENT(IN) :: NF
    REAL(DP),INTENT(OUT) :: A_OUT
-   REAL(DP) :: AS,F,FP,DELC_PDFTA
+   REAL(DP) :: AS,F,FP,DELTAAS
    REAL(DP), PARAMETER :: TOLERANCE=5D-4
 
       IF ((NF .lt. 0) .or. (NF .gt. 6) .or. ((NF.eq.6) .and. (nloops_pdf.gt.2)) ) then
@@ -5236,11 +5239,11 @@ SUBROUTINE NEWTONPDF(T,A_IN,A_OUT,NF)
          stop
       ENDIF
       A_OUT=AS-F/FP
-      DELC_PDFTA=ABS(F/FP/AS)
-      IF (DELC_PDFTA .GT. TOLERANCE) GO TO 30
+      DELTAAS=ABS(F/FP/AS)
+      IF (DELTAAS .GT. TOLERANCE) GO TO 30
    RETURN
 END SUBROUTINE NEWTONPDF
-
+#endif
 
 
 
