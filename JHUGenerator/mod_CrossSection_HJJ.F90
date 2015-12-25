@@ -42,7 +42,7 @@ EvalWeighted_HJJ_fulldecay = 0d0
 
    call Kinematics_HVBF_fulldecay(MomExt,applyPSCut,NBin)
    if( applyPSCut .or. PSWgt.lt.1d-12 ) return
-   call setPDFs(eta1,eta2,Mu_Fact,pdf)
+   call setPDFs(eta1,eta2,pdf)
    FluxFac = 1d0/(2d0*EHat**2)
 
 
@@ -183,7 +183,7 @@ EvalUnWeighted_HJJ_fulldecay = 0d0
    call Kinematics_HVBF_fulldecay(MomExt,applyPSCut,NBin)
    if( applyPSCut .or. PSWgt.lt.1d-12 ) return
    
-   call setPDFs(eta1,eta2,Mu_Fact,pdf)
+   call setPDFs(eta1,eta2,pdf)
    FluxFac = 1d0/(2d0*EHat**2)   
    
 
@@ -339,7 +339,7 @@ END FUNCTION
    EvalCounter = EvalCounter+1
    
    
-   call setPDFs(eta1,eta2,Mu_Fact,pdf)
+   call setPDFs(eta1,eta2,pdf)
    FluxFac = 1d0/(2d0*EHat**2)
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt  * PartChannelAvg
 
@@ -651,7 +651,7 @@ include 'csmaxvalue.f'
    if( applyPSCut .or. PSWgt.eq.zero ) return
    
 
-   call setPDFs(eta1,eta2,Mu_Fact,pdf)
+   call setPDFs(eta1,eta2,pdf)
    FluxFac = 1d0/(2d0*EHat**2)
    EvalCounter = EvalCounter+1
 
