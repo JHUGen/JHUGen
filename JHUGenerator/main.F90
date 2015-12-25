@@ -426,7 +426,7 @@ implicit none
 return
 END SUBROUTINE
 
-#if useLHAPDF==1
+#if useLHAPDF==0
 SUBROUTINE InitPDFConstVals()
 use ModParameters
 use ModKinematics
