@@ -4869,7 +4869,108 @@ end function bw_sq
 
 
 
+subroutine SetMuRenFact(p,id) ! p in JHU-GeV, id in JHUGen conventions
+use ModParameters
+use ModMisc
+implicit none
+real(dp), intent(in) :: p(4,6)
+integer, intent(in) :: id(6)
+real(8) :: polemass(4:6)
+real(8) :: pHstar(4),pJJHstar(4),pJHstar(4),pJJ(4),pJ(4)
+integer idx,ip
 
+   pHstar(:) = 0d0
+   pJJ(:) = 0d0
+   polemass(4) = M_Reso
+
+   do idx=1,6
+      if(idx.le.4) then
+         do ip=1,4
+            pHstar(ip) = pHstar(ip) + p(ip,idx)
+         enddo
+      else
+         polemass(idx) = getMass(id(idx))
+         do ip=1,4
+            pJJ(ip) = pJJ(ip) + p(ip,idx)
+         enddo
+      endif
+   enddo
+
+   pJJHstar = pJJ + pHstar
+   if(polemass(5).ge.polemass(6)) then
+      pJ(:)=p(:,5)
+   else
+      pJ(:)=p(:,6)
+      call swapr(polemass(5),polemass(6)) ! will use polemass(5) as the greater mass below
+   endif
+   pJHstar = pJ + pHstar
+
+   ! Determine the appropriate factorization scale for the chosen scheme from pole and invariant masses
+   if(FacScheme .eq. kRenFacScheme_mhstar) then
+      Mu_Fact = Get_MInv(pHstar(1:4))
+
+   elseif(FacScheme .eq. -kRenFacScheme_mhstar) then
+      Mu_Fact = polemass(4)
+
+   elseif(FacScheme .eq. kRenFacScheme_mjjhstar) then
+      Mu_Fact = Get_MInv(pJJHstar(1:4))
+   elseif(FacScheme .eq. kRenFacScheme_mjj_mhstar) then
+      Mu_Fact = Get_MInv(pJJ(1:4))+Get_MInv(pHstar(1:4))
+   elseif((FacScheme .eq. -kRenFacScheme_mjjhstar) .or. (FacScheme .eq. -kRenFacScheme_mjj_mhstar)) then
+      Mu_Fact = polemass(4)+polemass(5)+polemass(6)
+   elseif(FacScheme .eq. kRenFacScheme_mjj) then
+      Mu_Fact = Get_MInv(pJJ(1:4))
+   elseif(FacScheme .eq. -kRenFacScheme_mjj) then
+      Mu_Fact = polemass(5)+polemass(6)
+
+   elseif(FacScheme .eq. kRenFacScheme_mjhstar) then
+      Mu_Fact = Get_MInv(pJHstar(1:4))
+   elseif(FacScheme .eq. kRenFacScheme_mj_mhstar) then
+      Mu_Fact = Get_MInv(pJ(1:4))+Get_MInv(pHstar(1:4))
+   elseif((FacScheme .eq. -kRenFacScheme_mjhstar) .or. (FacScheme .eq. -kRenFacScheme_mj_mhstar)) then
+      Mu_Fact = polemass(4)+polemass(5)
+   elseif(FacScheme .eq. kRenFacScheme_mj) then
+      Mu_Fact = Get_MInv(pJ(1:4))
+   elseif(FacScheme .eq. -kRenFacScheme_mj) then
+      Mu_Fact = polemass(5)
+   endif
+
+   ! Do the same for the renormalization scale
+   if(RenScheme .eq. kRenFacScheme_mhstar) then
+      Mu_Ren = Get_MInv(pHstar(1:4))
+
+   elseif(RenScheme .eq. -kRenFacScheme_mhstar) then
+      Mu_Ren = polemass(4)
+
+   elseif(RenScheme .eq. kRenFacScheme_mjjhstar) then
+      Mu_Ren = Get_MInv(pJJHstar(1:4))
+   elseif(RenScheme .eq. kRenFacScheme_mjj_mhstar) then
+      Mu_Ren = Get_MInv(pJJ(1:4))+Get_MInv(pHstar(1:4))
+   elseif((RenScheme .eq. -kRenFacScheme_mjjhstar) .or. (RenScheme .eq. -kRenFacScheme_mjj_mhstar)) then
+      Mu_Ren = polemass(4)+polemass(5)+polemass(6)
+   elseif(RenScheme .eq. kRenFacScheme_mjj) then
+      Mu_Ren = Get_MInv(pJJ(1:4))
+   elseif(RenScheme .eq. -kRenFacScheme_mjj) then
+      Mu_Ren = polemass(5)+polemass(6)
+
+   elseif(RenScheme .eq. kRenFacScheme_mjhstar) then
+      Mu_Ren = Get_MInv(pJHstar(1:4))
+   elseif(RenScheme .eq. kRenFacScheme_mj_mhstar) then
+      Mu_Ren = Get_MInv(pJ(1:4))+Get_MInv(pHstar(1:4))
+   elseif((RenScheme .eq. -kRenFacScheme_mjhstar) .or. (RenScheme .eq. -kRenFacScheme_mj_mhstar)) then
+      Mu_Ren = polemass(4)+polemass(5)
+   elseif(RenScheme .eq. kRenFacScheme_mj) then
+      Mu_Ren = Get_MInv(pJ(1:4))
+   elseif(RenScheme .eq. -kRenFacScheme_mj) then
+      Mu_Ren = polemass(5)
+   endif
+
+   ! Never ever allow the scales to go negative
+   Mu_Fact = abs(Mu_Fact) * MuFacMultiplier
+   Mu_Ren = abs(Mu_Ren) * MuRenMultiplier
+
+return
+end subroutine SetMuRenFact
 
 
 
@@ -5113,48 +5214,45 @@ END SUBROUTINE
 
 
 ! QCD scale from MCFM
-subroutine EVALALPHAS()
+! Implementation into JHUGen by Ulascan Sarica, Dec. 2015
+subroutine EvalAlphaS()
    use ModParameters
    IMPLICIT NONE
 #if useLHAPDF==1
-!--- this is simply a wrapper to the LHAPDF implementation of the
-!--- running coupling, in the style of the native MCFM routine
-!--- Note that the inputs AMZ and NLOOP are not used
+!--- This is simply a wrapper to the LHAPDF implementation of the running coupling alphas, in the style of the native MCFM routine
    DOUBLE PRECISION alphasPDF
    REAL(DP) :: Q
       Q = Mu_Ren/GeV
       alphas=alphasPDF(Q)
-      gs = sqrt(alphas*4.0_dp*pi)
+
+      ! Calculate the derived couplings
+      call ComputeQCDVariables()
    RETURN
-end subroutine EVALALPHAS
+end subroutine EvalAlphaS
 #else
-!     Evaluation of strong coupling constant alpha_S
+!     Evaluation of strong coupling constant alphas
 !     Author: R.K. Ellis
-!     q -- scale at which alpha_s is to be evaluated
-!     amz -- value of alpha_s at the mass of the Z-boson
-!     nloop -- the number of loops (1,2, or 3) at which beta 
-!     function is evaluated to determine running.
-!     the values of the cmass and the bmass should be set
-!     in common block qmass.
+!     q -- Scale at which alpha_s is to be evaluated
+!     alphas_mz -- ModParameters value of alpha_s at the mass of the Z-boson
+!     nloops_pdf -- ModParameters value of the number of loops (1,2, or 3) at which the beta function is evaluated to determine running.
+!     The values of the cmass and the bmass are set in main.F90.
    REAL(DP) :: T
    INTEGER, PARAMETER :: NF5=5
    INTEGER, PARAMETER :: NF4=4
    INTEGER, PARAMETER :: NF3=3
    
-      ! Set masses
       IF (Mu_Ren .LE. 0d0) THEN 
-         WRITE(6,*) 'q .le. 0 in alphas'
-         WRITE(6,*) 'q = ',Mu_Ren
+         WRITE(6,*) 'ModKinematics::EvalAlphaS: Mu_Ren .le. 0, Mu_Ren (GeV) = ',(Mu_Ren*GeV)
          stop
       ENDIF
 
 !--- 3-flavour running only
-      if     (cmass_pdf .gt. 999d0*GeV) then
+      if     (cmass_pdf .ge. 999d0*GeV) then
          T=2D0*DLOG(Mu_Ren/zmass_pdf)
          CALL NEWTONPDF(T,alphas_mz,alphas,NF3)
          RETURN
 !--- 4-flavour running only
-      elseif (bmass_pdf .gt. 999d0*GeV) then
+      elseif (bmass_pdf .ge. 999d0*GeV) then
          T=2D0*DLOG(Mu_Ren/zmass_pdf)
          CALL NEWTONPDF(T,alphas_mz,alphas,NF4)
          RETURN
@@ -5173,9 +5271,10 @@ end subroutine EVALALPHAS
          CALL NEWTONPDF(T,alphas_mz,alphas,NF5)
       ENDIF
 
-      gs = sqrt(alphas*4.0_dp*pi)
+      ! Calculate the derived couplings
+      call ComputeQCDVariables()
    RETURN
-end subroutine EVALALPHAS
+end subroutine EvalAlphaS
 
 function F2_PDF(AS,NF)
 use ModParameters
@@ -5183,7 +5282,7 @@ implicit none
 real(dp), intent(in) :: AS
 integer, intent(in) :: NF
 real(dp) :: F2_PDF
-      F2_PDF=1D0/AS+C1_PDF(NF)*LOG((C1_PDF(NF)*AS)/(1D0+C1_PDF(NF)*AS))
+   F2_PDF=1D0/AS+C1_PDF(NF)*LOG((C1_PDF(NF)*AS)/(1D0+C1_PDF(NF)*AS))
 end function F2_PDF
 
 function F3_PDF(AS,NF)
@@ -5192,10 +5291,10 @@ implicit none
 real(dp), intent(in) :: AS
 integer, intent(in) :: NF
 real(dp) :: F3_PDF
-      F3_PDF=1D0/AS+0.5D0*C1_PDF(NF) &
-       *LOG((C2_PDF(NF)*AS**2)/(1D0+C1_PDF(NF)*AS+C2_PDF(NF)*AS**2)) &
-       -(C1_PDF(NF)**2-2D0*C2_PDF(NF))/DELC_PDF(NF) &
-       *ATAN((2D0*C2_PDF(NF)*AS+C1_PDF(NF))/DELC_PDF(NF))
+   F3_PDF=1D0/AS+0.5D0*C1_PDF(NF) &
+         *LOG((C2_PDF(NF)*AS**2)/(1D0+C1_PDF(NF)*AS+C2_PDF(NF)*AS**2)) &
+         -(C1_PDF(NF)**2-2D0*C2_PDF(NF))/DELC_PDF(NF) &
+         *ATAN((2D0*C2_PDF(NF)*AS+C1_PDF(NF))/DELC_PDF(NF))
 end function F3_PDF
 
 SUBROUTINE NEWTONPDF(T,A_IN,A_OUT,NF)
@@ -5206,6 +5305,7 @@ SUBROUTINE NEWTONPDF(T,A_IN,A_OUT,NF)
 !---  input scale and output scale t.
 !---  Evolution is performed using Newton's method,
 !---  with a precision given by tolerance.
+!---  Broken by Ulascan Sarica to be implemented into JHUGen
    use ModParameters
    IMPLICIT NONE
    REAL(DP),INTENT(IN) :: T,A_IN
@@ -5215,8 +5315,7 @@ SUBROUTINE NEWTONPDF(T,A_IN,A_OUT,NF)
    REAL(DP), PARAMETER :: TOLERANCE=5D-4
 
       IF ((NF .lt. 0) .or. (NF .gt. 6) .or. ((NF.eq.6) .and. (nloops_pdf.gt.2)) ) then
-          write(6,*) 'unimplemented value of NF/nloops_pdf in newton1'
-          write(6,*) 'NF,nloops_pdf=',NF,nloops_pdf
+          write(6,*) 'ModKinematics::newtonpdf: Unimplemented value of NF,nloops_pdf=',NF,nloops_pdf
           STOP
       ENDIF
 
@@ -5235,7 +5334,7 @@ SUBROUTINE NEWTONPDF(T,A_IN,A_OUT,NF)
          F=B0_PDF(NF)*T+F3_PDF(A_IN,NF)-F3_PDF(AS,NF)
          FP=1D0/(AS**2*(1D0+C1_PDF(NF)*AS+C2_PDF(NF)*AS**2))
       ELSE
-         WRITE(6,*) 'Unimplemented value of nloops_pdf in newton1'
+         WRITE(6,*) 'ModKinematics::newtonpdf: Unimplemented value of nloops_pdf = ',nloops_pdf
          stop
       ENDIF
       A_OUT=AS-F/FP

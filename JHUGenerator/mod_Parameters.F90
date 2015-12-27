@@ -12,10 +12,21 @@ integer, public, parameter  :: dp = selected_real_kind(15)
 integer, public :: Collider, PDFSet,PChannel,Process,DecayMode1,DecayMode2,TopDecays,TauDecays
 integer, public :: VegasIt1,VegasNc0,VegasNc1,VegasNc2
 real(8), public :: Collider_Energy
+integer, public :: FacScheme,RenScheme
+real(8), public :: MuFacMultiplier,MuRenMultiplier
 integer, public :: VegasIt1_default,VegasNc0_default,VegasNc1_default,VegasNc2_default
 integer, public :: NumHistograms,RequestNLeptons,RequestOS,RequestOSSF
 logical, public :: Unweighted,OffShellReson,OffShellV1,OffShellV2,ReadLHEFile,ConvertLHEFile
 logical, public :: ReadCSmax,GenerateEvents,CountTauAsAny,HasLeptonFilter
+integer, public, parameter :: kRenFacScheme_default=0
+integer, public, parameter :: kRenFacScheme_mhstar=1
+integer, public, parameter :: kRenFacScheme_mjjhstar=2
+integer, public, parameter :: kRenFacScheme_mjj_mhstar=3
+integer, public, parameter :: kRenFacScheme_mjj=4
+integer, public, parameter :: kRenFacScheme_mjhstar=5
+integer, public, parameter :: kRenFacScheme_mj_mhstar=6
+integer, public, parameter :: kRenFacScheme_mj=7
+integer, public, parameter :: nRenFacSchemes=8
 integer(8), public :: EvalCounter=0
 integer(8), public :: RejeCounter=0
 integer(8), public :: AccepCounter=0
@@ -127,10 +138,10 @@ real(8), public            :: cmass_pdf            ! c mass used in pdf toward t
 real(8), public            :: zmass_pdf            ! Z mass used in pdf toward the QCD scale, reset later in main per PDF if needed
 real(8), public            :: Mu_Fact              ! pdf factorization scale (set to M_Reso in main.F90)
 real(8), public            :: Mu_Ren               ! QCD renormalization (alpha_s) scale (set to M_Reso in main.F90)
-real(8), public            :: alphas               ! strong coupling per event, set to some reasonable value
-real(8), public            :: alphas_mz            ! strong coupling at M_Z, reset later in main per PDF
-real(8), public            :: alphas_mb            ! strong coupling at m_bot, reset later only once in main per PDF
-real(8), public            :: alphas_mc            ! strong coupling at m_charm, reset later only once in main per PDF
+real(dp), public           :: alphas              ! strong coupling per event, set to some reasonable value
+real(dp), public           :: alphas_mz           ! strong coupling at M_Z, reset later in main per PDF
+real(dp), public           :: alphas_mb           ! strong coupling at m_bot, reset later only once in main per PDF
+real(dp), public           :: alphas_mc           ! strong coupling at m_charm, reset later only once in main per PDF
 real(dp), public           :: gs                   ! = sqrt(alphas*4.0_dp*pi)
 
 !---     B0_PDF=(11.-2.*NF/3.)/4./PI
@@ -494,6 +505,9 @@ integer, public, target :: Wm_   = -13
 integer, public, target :: ANuE_ = -14
 integer, public, target :: ANuM_ = -15
 integer, public, target :: ANuT_ = -16
+
+integer, public, parameter :: Not_a_particle_  = -9000
+real(8), public, parameter :: Mom_Not_a_particle(1:4) = (/0d0,0d0,0d0,0d0/)
 
 integer, public, parameter :: pdfGlu_ = 0
 integer, public, parameter :: pdfDn_ = 1
@@ -897,8 +911,10 @@ integer :: Part
       convertLHE =32
   elseif( Part.eq.Gra_) then
       convertLHE =39
+  elseif( Part.eq.Not_a_particle_) then
+      convertLHE = Part
   elseif( Part.lt.-9000) then
-      convertLHE =Part
+      convertLHE = Part
   else
       print *, "LHE format not implemented for ",Part
       stop
@@ -1010,7 +1026,7 @@ integer :: Part
   elseif( abs(Part).eq.abs(Dn_) ) then
       getMass = 0d0
   elseif( abs(Part).eq.abs(Chm_) ) then
-      getMass = 0d0
+      getMass = m_charm
   elseif( abs(Part).eq.abs(Str_) ) then
       getMass = 0d0
   elseif( abs(Part).eq.abs(Bot_) ) then
@@ -1025,6 +1041,8 @@ integer :: Part
       getMass = 0d0
   elseif( abs(Part).eq.abs(Hig_) ) then
       getMass = M_Reso
+  elseif( Part.eq.Not_a_particle_) then
+      getMass = 0d0
   else
      print *, "Error in getMass",Part
      stop
@@ -1353,6 +1371,12 @@ integer :: Part
 
 END FUNCTION
 
+
+
+subroutine ComputeQCDVariables()
+implicit none
+   gs = sqrt(alphas*4.0_dp*pi)
+end subroutine ComputeQCDVariables
 
 
 
