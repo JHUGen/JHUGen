@@ -53,7 +53,7 @@ EvalWeighted_BBBH = 0d0
 !    write(*,"(PE21.14,PE21.14,PE21.14,PE21.14)") MomExt(1:4,10)
 !    write(*,"(PE21.14,PE21.14,PE21.14,PE21.14)") MomExt(1:4,11)
 
-   Mu_Fact = 0.5d0*( 2d0*M_bot + M_Reso )
+   call SetRunningScales( (/ MomExt(1:4,3),MomExt(1:4,4),MomExt(1:4,5) /) , (/ Not_a_particle_,ABot_,Bot_,Not_a_particle_ /) )
    call setPDFs(eta1,eta2,pdf)
    if( PChannel.eq.0 .or. PChannel.eq.2 ) then
       call EvalAmp_GG_TTBH(MomExt,LO_Res_GG_Unpol)
@@ -159,7 +159,7 @@ EvalUnWeighted_BBBH = 0d0
    call Kinematics_BBBH(MomExt,applyPSCut,NBin)
    if( applyPSCut .or. PSWgt.eq.zero ) return
 
-   Mu_Fact = 0.5d0*( 2d0*M_bot + M_Reso )   
+   call SetRunningScales( (/ MomExt(1:4,3),MomExt(1:4,4),MomExt(1:4,5) /) , (/ Not_a_particle_,ABot_,Bot_,Not_a_particle_ /) )
    call setPDFs(eta1,eta2,pdf)
 
 

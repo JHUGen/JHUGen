@@ -54,7 +54,9 @@ END PROGRAM
 ! !       Below, J stands for the particles immediately associated to the Higgs (e.g. ttH, VH, VBF, tqH)
 ! !       Scheme=+-kRenFacScheme_mjjhstar: Scale ~ m_JJHstar (or m_JJVV in bkg.); + for running, - for fixed
 ! !       Scheme=+-kRenFacScheme_mjj_mhstar: Scale ~ m_JJ + m_Hstar (or m_JJ+m_VV in bkg.); + for running, - for fixed
+! !       Scheme=+-kRenFacScheme_mj_mj_mhstar: Scale ~ m_J + m_J + m_Hstar (or m_J+m_J+m_VV in bkg.); + for running, - for fixed
 ! !       Scheme=+-kRenFacScheme_mjj: Scale ~ m_JJ; + for running, - for fixed
+! !       Scheme=+-kRenFacScheme_mj_mj: Scale ~ m_J + m_J; + for running, - for fixed
 ! !       Below, J stands for either the top in JJ associated production (e.g. tqH), or the single jet (Hj)
 ! !       Scheme=+-kRenFacScheme_mjhstar: Scale ~ m_JHstar (or m_JVV in bkg.); + for running, - for fixed
 ! !       Scheme=+-kRenFacScheme_mj_mhstar: Scale ~ m_J + m_Hstar (or m_J+m_VV in bkg.); + for running, - for fixed
@@ -72,6 +74,7 @@ subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to t
             Process.eq.50 .or.  &
             Process.eq.60 .or.  &
             Process.eq.61 .or.  &
+            Process.eq.62 .or.  &
             Process.eq.66 .or.  &
             Process.eq.80 .or.  &
             Process.eq.90 .or.  &
@@ -82,7 +85,7 @@ subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to t
          )                      &
       ) call Error("main::InitProcessScaleSchemes: Renormalization and factorization schemes are not implemented for process",Process)
 
-      if(FacScheme.eq.0) then
+      if(FacScheme.eq.kRenFacScheme_default) then
          if( &
          Process.eq. 0 .or. & !- ggH spin-0
          Process.eq. 1 .or. & !- ggH spin-1
@@ -92,7 +95,6 @@ subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to t
             MuFacMultiplier = 0.5d0
          elseif( &
          Process.eq.60 .or. & !- HVBF without decays
-         Process.eq.66 .or. & !- HVBF with decays
          Process.eq.61 .or. & !- Hjj, gluon fusion
          Process.eq.62 .or. & !- Hj, gluon fusion
          Process.eq.50 & !- VHiggs
@@ -100,10 +102,15 @@ subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to t
             FacScheme = -kRenFacScheme_mhstar
             MuFacMultiplier = 1d0
          elseif( &
+         Process.eq.66      & !- HVBF with decays
+         ) then
+            FacScheme = +kRenFacScheme_mhstar
+            MuFacMultiplier = 1d0
+         elseif( &
          Process.eq.80 .or. & !- ttbar+H
          Process.eq.90      & !- bbbar+H
          ) then
-            FacScheme = -kRenFacScheme_mjj_mhstar
+            FacScheme = -kRenFacScheme_mj_mj_mhstar
             MuFacMultiplier = 0.5d0
          elseif( &
          Process.eq.110 .or. & !- t+H
@@ -115,7 +122,8 @@ subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to t
             MuFacMultiplier = 0.25d0
          endif
       endif
-      if(RenScheme.eq.0) then
+
+      if(RenScheme.eq.kRenFacScheme_default) then
          if( &
          Process.eq. 0 .or. & !- ggH spin-0
          Process.eq. 1 .or. & !- ggH spin-1
@@ -125,7 +133,6 @@ subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to t
             MuRenMultiplier = 0.5d0
          elseif( &
          Process.eq.60 .or. & !- HVBF without decays
-         Process.eq.66 .or. & !- HVBF with decays
          Process.eq.61 .or. & !- Hjj, gluon fusion
          Process.eq.62 .or. & !- Hj, gluon fusion
          Process.eq.50 & !- VHiggs
@@ -133,10 +140,15 @@ subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to t
             RenScheme = -kRenFacScheme_mhstar
             MuRenMultiplier = 1d0
          elseif( &
+         Process.eq.66     & !- HVBF with decays
+         ) then
+            RenScheme = +kRenFacScheme_mhstar
+            MuRenMultiplier = 1d0
+         elseif( &
          Process.eq.80 .or. & !- ttbar+H
          Process.eq.90      & !- bbbar+H
          ) then
-            RenScheme = -kRenFacScheme_mjj_mhstar
+            RenScheme = -kRenFacScheme_mj_mj_mhstar
             MuRenMultiplier = 0.5d0
          elseif( &
          Process.eq.110 .or. & !- t+H
@@ -162,7 +174,19 @@ subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to t
             (abs(FacScheme).eq.kRenFacScheme_mjhstar) .or. (abs(FacScheme).eq.kRenFacScheme_mj_mhstar) .or. (abs(FacScheme).eq.kRenFacScheme_mj) .or. &
             (abs(RenScheme).eq.kRenFacScheme_mjhstar) .or. (abs(RenScheme).eq.kRenFacScheme_mj_mhstar) .or. (abs(RenScheme).eq.kRenFacScheme_mj)      &
          )                     &
-      ) call Error("ttH, bbH, VBF and VH processes cannot distinguish the outgoing partons. Choose a different renormalization or factorization scheme.")
+      ) call Error("ttH, bbH, HJJ, VBF and VH processes cannot distinguish the outgoing partons. Choose a different renormalization or factorization scheme.")
+
+      if( &
+         (                     &
+            Process.eq.50 .or. &
+            Process.eq.60 .or. &
+            Process.eq.61 .or. &
+            Process.eq.66      &
+         ) .and. (             &
+            (abs(FacScheme).eq.kRenFacScheme_mj_mj_mhstar) .or. (abs(FacScheme).eq.kRenFacScheme_mj_mj) .or. &
+            (abs(RenScheme).eq.kRenFacScheme_mj_mj_mhstar) .or. (abs(RenScheme).eq.kRenFacScheme_mj_mj)      &
+         )                     &
+      ) call Error("HJJ, VBF and VH processes outgoing partons are mostly massless, and alpha_S at a scale ~0 GeV is very unstable. Choose a different renormalization or factorization scheme (e.g. kRenFacScheme_mhstar).")
 
       ! H+1j Me
       if( &
@@ -171,8 +195,8 @@ subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to t
          ) .and. (             &
             (FacScheme.eq.-kRenFacScheme_mjhstar) .or. (FacScheme.eq.-kRenFacScheme_mj_mhstar) .or. (abs(FacScheme).eq.kRenFacScheme_mj) .or. &
             (RenScheme.eq.-kRenFacScheme_mjhstar) .or. (RenScheme.eq.-kRenFacScheme_mj_mhstar) .or. (abs(RenScheme).eq.kRenFacScheme_mj) .or. &
-            (abs(FacScheme).eq.kRenFacScheme_mjjhstar) .or. (abs(FacScheme).eq.kRenFacScheme_mjj_mhstar) .or. (abs(FacScheme).eq.kRenFacScheme_mjj) .or. &
-            (abs(RenScheme).eq.kRenFacScheme_mjjhstar) .or. (abs(RenScheme).eq.kRenFacScheme_mjj_mhstar) .or. (abs(RenScheme).eq.kRenFacScheme_mjj)      &
+            (abs(FacScheme).eq.kRenFacScheme_mjjhstar) .or. (abs(FacScheme).eq.kRenFacScheme_mjj_mhstar) .or. (abs(FacScheme).eq.kRenFacScheme_mjj) .or. (abs(FacScheme).eq.kRenFacScheme_mj_mj_mhstar) .or. (abs(FacScheme).eq.kRenFacScheme_mj_mj) .or. &
+            (abs(RenScheme).eq.kRenFacScheme_mjjhstar) .or. (abs(RenScheme).eq.kRenFacScheme_mjj_mhstar) .or. (abs(RenScheme).eq.kRenFacScheme_mjj) .or. (abs(RenScheme).eq.kRenFacScheme_mj_mj_mhstar) .or. (abs(RenScheme).eq.kRenFacScheme_mj_mj)      &
          )                     &
       ) call Error("Invalid scheme for the HJ gluon fusion process. Choose a different renormalization or factorization scheme.")
 
@@ -243,8 +267,8 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
 
    MuFacMultiplier = 1d0
    MuRenMultiplier = 1d0
-   FacScheme = 0
-   RenScheme = 0
+   FacScheme = kRenFacScheme_default
+   RenScheme = kRenFacScheme_default
 
    DataFile="./data/output"
 

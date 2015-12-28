@@ -22,11 +22,13 @@ integer, public, parameter :: kRenFacScheme_default=0
 integer, public, parameter :: kRenFacScheme_mhstar=1
 integer, public, parameter :: kRenFacScheme_mjjhstar=2
 integer, public, parameter :: kRenFacScheme_mjj_mhstar=3
-integer, public, parameter :: kRenFacScheme_mjj=4
-integer, public, parameter :: kRenFacScheme_mjhstar=5
-integer, public, parameter :: kRenFacScheme_mj_mhstar=6
-integer, public, parameter :: kRenFacScheme_mj=7
-integer, public, parameter :: nRenFacSchemes=8
+integer, public, parameter :: kRenFacScheme_mj_mj_mhstar=4
+integer, public, parameter :: kRenFacScheme_mjj=5
+integer, public, parameter :: kRenFacScheme_mj_mj=6
+integer, public, parameter :: kRenFacScheme_mjhstar=7
+integer, public, parameter :: kRenFacScheme_mj_mhstar=8
+integer, public, parameter :: kRenFacScheme_mj=9
+integer, public, parameter :: nRenFacSchemes=10
 integer(8), public :: EvalCounter=0
 integer(8), public :: RejeCounter=0
 integer(8), public :: AccepCounter=0
@@ -138,10 +140,10 @@ real(8), public            :: cmass_pdf            ! c mass used in pdf toward t
 real(8), public            :: zmass_pdf            ! Z mass used in pdf toward the QCD scale, reset later in main per PDF if needed
 real(8), public            :: Mu_Fact              ! pdf factorization scale (set to M_Reso in main.F90)
 real(8), public            :: Mu_Ren               ! QCD renormalization (alpha_s) scale (set to M_Reso in main.F90)
-real(dp), public           :: alphas              ! strong coupling per event, set to some reasonable value
-real(dp), public           :: alphas_mz           ! strong coupling at M_Z, reset later in main per PDF
-real(dp), public           :: alphas_mb           ! strong coupling at m_bot, reset later only once in main per PDF
-real(dp), public           :: alphas_mc           ! strong coupling at m_charm, reset later only once in main per PDF
+real(dp), public           :: alphas               ! strong coupling per event, set to some reasonable value
+real(dp), public           :: alphas_mz            ! strong coupling at M_Z, reset later in main per PDF
+real(dp), public           :: alphas_mb            ! strong coupling at m_bot, reset later only once in main per PDF
+real(dp), public           :: alphas_mc            ! strong coupling at m_charm, reset later only once in main per PDF
 real(dp), public           :: gs                   ! = sqrt(alphas*4.0_dp*pi)
 
 !---     B0_PDF=(11.-2.*NF/3.)/4./PI
