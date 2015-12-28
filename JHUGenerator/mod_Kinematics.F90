@@ -4869,22 +4869,22 @@ end function bw_sq
 
 
 
-subroutine SetMuRenFact(p,id) ! p in JHU-GeV, id in JHUGen conventions
+subroutine SetRunningScales(p,id) ! p in JHU-GeV, id in JHUGen conventions
 use ModParameters
 use ModMisc
 implicit none
-real(dp), intent(in) :: p(4,6)
-integer, intent(in) :: id(6)
-real(8) :: polemass(4:6)
-real(8) :: pHstar(4),pJJHstar(4),pJHstar(4),pJJ(4),pJ(4)
+real(dp), intent(in) :: p(1:4,4:6) ! No need to run the second index from 3 to 7: pH, pJ1, pJ2
+integer, intent(in) :: id(4:7) ! id_JJH/id_JJVV, id_J1, id_J2, id_JJ (if applicable)  
+real(8) :: polemass(3:7) ! mJJH, mH, mJ1, mJ2, mJJ (if applicable)
+real(8) :: pJJHstar(4),pHstar(4),pJ(4,2),pJJ(4),pJHstar(4)
 integer idx,ip
 
    pHstar(:) = 0d0
    pJJ(:) = 0d0
+   polemass(3) = getMass(id(4)) ! Pole mass of the JJH system
    polemass(4) = M_Reso
-
-   do idx=1,6
-      if(idx.le.4) then
+   do idx=4,6
+      if(idx.eq.4) then
          do ip=1,4
             pHstar(ip) = pHstar(ip) + p(ip,idx)
          enddo
@@ -4895,15 +4895,18 @@ integer idx,ip
          enddo
       endif
    enddo
+   polemass(7) = getMass(id(7)) ! Pole mass of the JJ system
 
    pJJHstar = pJJ + pHstar
-   if(polemass(5).ge.polemass(6)) then
-      pJ(:)=p(:,5)
+   if(polemass(5).lt.polemass(6)) then
+      pJ(:,1)=p(:,5)
+      pJ(:,2)=p(:,6)
    else
-      pJ(:)=p(:,6)
+      pJ(:,1)=p(:,6)
+      pJ(:,2)=p(:,5)
       call swapr(polemass(5),polemass(6)) ! will use polemass(5) as the greater mass below
    endif
-   pJHstar = pJ + pHstar
+   pJHstar(1:4) = pJ(1:4,1) + pHstar(1:4)
 
    ! Determine the appropriate factorization scale for the chosen scheme from pole and invariant masses
    if(FacScheme .eq. kRenFacScheme_mhstar) then
@@ -4914,23 +4917,35 @@ integer idx,ip
 
    elseif(FacScheme .eq. kRenFacScheme_mjjhstar) then
       Mu_Fact = Get_MInv(pJJHstar(1:4))
+   elseif(FacScheme .eq. -kRenFacScheme_mjjhstar) then
+      Mu_Fact = polemass(3)
+
    elseif(FacScheme .eq. kRenFacScheme_mjj_mhstar) then
       Mu_Fact = Get_MInv(pJJ(1:4))+Get_MInv(pHstar(1:4))
-   elseif((FacScheme .eq. -kRenFacScheme_mjjhstar) .or. (FacScheme .eq. -kRenFacScheme_mjj_mhstar)) then
+   elseif(FacScheme .eq. -kRenFacScheme_mjj_mhstar) then
+      Mu_Fact = polemass(4)+polemass(7)
+   elseif(FacScheme .eq. kRenFacScheme_mj_mj_mhstar) then
+      Mu_Fact = Get_MInv(pJ(1:4,1))+Get_MInv(pJ(1:4,2))+Get_MInv(pHstar(1:4))
+   elseif(FacScheme .eq. -kRenFacScheme_mj_mj_mhstar) then
       Mu_Fact = polemass(4)+polemass(5)+polemass(6)
+
    elseif(FacScheme .eq. kRenFacScheme_mjj) then
       Mu_Fact = Get_MInv(pJJ(1:4))
    elseif(FacScheme .eq. -kRenFacScheme_mjj) then
+      Mu_Fact = polemass(7)
+   elseif(FacScheme .eq. kRenFacScheme_mj_mj) then
+      Mu_Fact = Get_MInv(pJJ(1:4))
+   elseif(FacScheme .eq. -kRenFacScheme_mj_mj) then
       Mu_Fact = polemass(5)+polemass(6)
 
    elseif(FacScheme .eq. kRenFacScheme_mjhstar) then
       Mu_Fact = Get_MInv(pJHstar(1:4))
    elseif(FacScheme .eq. kRenFacScheme_mj_mhstar) then
-      Mu_Fact = Get_MInv(pJ(1:4))+Get_MInv(pHstar(1:4))
+      Mu_Fact = Get_MInv(pJ(1:4,1))+Get_MInv(pHstar(1:4))
    elseif((FacScheme .eq. -kRenFacScheme_mjhstar) .or. (FacScheme .eq. -kRenFacScheme_mj_mhstar)) then
       Mu_Fact = polemass(4)+polemass(5)
    elseif(FacScheme .eq. kRenFacScheme_mj) then
-      Mu_Fact = Get_MInv(pJ(1:4))
+      Mu_Fact = Get_MInv(pJ(1:4,1))
    elseif(FacScheme .eq. -kRenFacScheme_mj) then
       Mu_Fact = polemass(5)
    endif
@@ -4944,23 +4959,35 @@ integer idx,ip
 
    elseif(RenScheme .eq. kRenFacScheme_mjjhstar) then
       Mu_Ren = Get_MInv(pJJHstar(1:4))
+   elseif(RenScheme .eq. -kRenFacScheme_mjjhstar) then
+      Mu_Ren = polemass(3)
+
    elseif(RenScheme .eq. kRenFacScheme_mjj_mhstar) then
       Mu_Ren = Get_MInv(pJJ(1:4))+Get_MInv(pHstar(1:4))
-   elseif((RenScheme .eq. -kRenFacScheme_mjjhstar) .or. (RenScheme .eq. -kRenFacScheme_mjj_mhstar)) then
+   elseif(RenScheme .eq. -kRenFacScheme_mjj_mhstar) then
+      Mu_Ren = polemass(4)+polemass(7)
+   elseif(RenScheme .eq. kRenFacScheme_mj_mj_mhstar) then
+      Mu_Ren = Get_MInv(pJ(1:4,1))+Get_MInv(pJ(1:4,2))+Get_MInv(pHstar(1:4))
+   elseif(RenScheme .eq. -kRenFacScheme_mj_mj_mhstar) then
       Mu_Ren = polemass(4)+polemass(5)+polemass(6)
+
    elseif(RenScheme .eq. kRenFacScheme_mjj) then
       Mu_Ren = Get_MInv(pJJ(1:4))
    elseif(RenScheme .eq. -kRenFacScheme_mjj) then
+      Mu_Ren = polemass(7)
+   elseif(RenScheme .eq. kRenFacScheme_mj_mj) then
+      Mu_Ren = Get_MInv(pJJ(1:4))
+   elseif(RenScheme .eq. -kRenFacScheme_mj_mj) then
       Mu_Ren = polemass(5)+polemass(6)
 
    elseif(RenScheme .eq. kRenFacScheme_mjhstar) then
       Mu_Ren = Get_MInv(pJHstar(1:4))
    elseif(RenScheme .eq. kRenFacScheme_mj_mhstar) then
-      Mu_Ren = Get_MInv(pJ(1:4))+Get_MInv(pHstar(1:4))
+      Mu_Ren = Get_MInv(pJ(1:4,1))+Get_MInv(pHstar(1:4))
    elseif((RenScheme .eq. -kRenFacScheme_mjhstar) .or. (RenScheme .eq. -kRenFacScheme_mj_mhstar)) then
       Mu_Ren = polemass(4)+polemass(5)
    elseif(RenScheme .eq. kRenFacScheme_mj) then
-      Mu_Ren = Get_MInv(pJ(1:4))
+      Mu_Ren = Get_MInv(pJ(1:4,1))
    elseif(RenScheme .eq. -kRenFacScheme_mj) then
       Mu_Ren = polemass(5)
    endif
@@ -4970,7 +4997,7 @@ integer idx,ip
    Mu_Ren = abs(Mu_Ren) * MuRenMultiplier
 
 return
-end subroutine SetMuRenFact
+end subroutine SetRunningScales
 
 
 

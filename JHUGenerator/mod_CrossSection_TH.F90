@@ -39,7 +39,8 @@ integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9
    FluxFac = 1d0/(2d0*EHat**2)
    call EvalPhaseSpace_2to3ArbMass(EHat,(/MH_Inv,M_Top,0d0/),yRnd(3:7),MomExt(1:4,1:5),PSWgt)
    call boost2Lab(eta1,eta2,5,MomExt(1:4,1:5))
-   Mu_Fact=(M_Top + M_Reso)/4d0
+
+   call SetRunningScales( (/ MomExt(1:4,Hbos),MomExt(1:4,t),MomExt(1:4,qout) /) , (/ Not_a_particle_,Top_,Glu_,Not_a_particle_ /) ) ! Glu_? Why not!
    call setPDFs(eta1,eta2,pdf)
    
    IF( TOPDECAYS.NE.0 ) THEN
@@ -267,7 +268,7 @@ WdecayKfactor = 1d0
    call Kinematics_TH(MomOffShell,applyPSCut,NBin)
    if( applyPSCut .or. PSWgt.eq.zero ) return
 
-   Mu_Fact=(M_Top + M_Reso)/4d0
+   call SetRunningScales( (/ MomExt(1:4,Hbos),MomExt(1:4,t),MomExt(1:4,qout) /) , (/ Not_a_particle_,Top_,Glu_,Not_a_particle_ /) ) ! Glu_? Why not!
    call setPDFs(eta1,eta2,pdf)
    LO_Res_Unpol = 0d0
 

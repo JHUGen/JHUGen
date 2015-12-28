@@ -104,7 +104,7 @@ WdecayKfactor = 1d0
    if( applyPSCut .or. PSWgt.eq.zero ) return
    FluxFac = 1d0/(2d0*EHat**2)
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * PartChannelAvg * WdecayKfactor
-   Mu_Fact = 0.5d0*( 2d0*M_top + M_Reso )
+   call SetRunningScales( (/ MomExt(1:4,Hbos),MomExt(1:4,tbar),MomExt(1:4,t) /) , (/ Not_a_particle_,ATop_,Top_,Not_a_particle_ /) )
    call setPDFs(eta1,eta2,pdf)
    
    
@@ -304,7 +304,7 @@ WdecayKfactor = 1d0
    call Kinematics_TTBH(MomOffShell,applyPSCut,NBin)
    if( applyPSCut .or. PSWgt.eq.zero ) return
 
-   Mu_Fact = 0.5d0*( 2d0*M_top + M_Reso )   
+   call SetRunningScales( (/ MomExt(1:4,Hbos),MomExt(1:4,tbar),MomExt(1:4,t) /) , (/ Not_a_particle_,ATop_,Top_,Not_a_particle_ /) )
    call setPDFs(eta1,eta2,pdf)
 
    
