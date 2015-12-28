@@ -332,10 +332,10 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
         read(arg(11:13),*) RenScheme
         CountArg = CountArg + 1
     elseif( arg(1:16).eq."MuFacMultiplier=" ) then
-        read(arg(16:23),*) MuFacMultiplier
+        read(arg(17:24),*) MuFacMultiplier
         CountArg = CountArg + 1
     elseif( arg(1:16).eq."MuRenMultiplier=" ) then
-        read(arg(16:23),*) MuRenMultiplier
+        read(arg(17:24),*) MuRenMultiplier
         CountArg = CountArg + 1
     elseif( arg(1:6).eq."TopDK=" ) then
         read(arg(7:7),*) TopDecays
