@@ -1623,6 +1623,7 @@ ENDIF! GENEVT
     endif
 
    call SetRunningScales( (/ (MomExt(1:4,3)+MomExt(1:4,4)),Mom_Not_a_particle(1:4),Mom_Not_a_particle(1:4) /) , (/ Not_a_particle_,Not_a_particle_,Not_a_particle_,Not_a_particle_ /) )
+   call EvalAlphaS()
    call setPDFs(eta1,eta2,pdf)
    FluxFac = 1d0/(2d0*EHat**2)
 
@@ -1785,6 +1786,7 @@ END FUNCTION
 
 
    call SetRunningScales( (/ pHiggs(1:4),Mom_Not_a_particle(1:4),Mom_Not_a_particle(1:4) /) , (/ Not_a_particle_,Not_a_particle_,Not_a_particle_,Not_a_particle_ /) )
+   call EvalAlphaS()
    call setPDFs(eta1,eta2,pdf)
    FluxFac = 1d0/(2d0*EHat**2)
 
@@ -2035,6 +2037,7 @@ include 'csmaxvalue.f'
     endif
 
    call SetRunningScales( (/ (MomExt(1:4,3)+MomExt(1:4,4)),Mom_Not_a_particle(1:4),Mom_Not_a_particle(1:4) /) , (/ Not_a_particle_,Not_a_particle_,Not_a_particle_,Not_a_particle_ /) )
+   call EvalAlphaS()
    call setPDFs(eta1,eta2,pdf)
    FluxFac = 1d0/(2d0*EHat**2)
 
@@ -2624,6 +2627,7 @@ include 'csmaxvalue.f'
 
 
     call SetRunningScales( (/ (MomExt(1:4,3)+MomExt(1:4,4)),Mom_Not_a_particle(1:4),Mom_Not_a_particle(1:4) /) , (/ Not_a_particle_,Not_a_particle_,Not_a_particle_,Not_a_particle_ /) ) ! Call anyway
+    call EvalAlphaS()
 
 IF( GENEVT ) THEN
 
@@ -2839,6 +2843,7 @@ EvalUnWeighted_DecayToTauTau = 0d0
   PreFac = fbGeV2 * PSWgt
 
   call SetRunningScales( (/ pHiggs(1:4),Mom_Not_a_particle(1:4),Mom_Not_a_particle(1:4) /) , (/ Not_a_particle_,Not_a_particle_,Not_a_particle_,Not_a_particle_ /) ) ! Call anyway
+  call EvalAlphaS()
 
 IF( GENEVT ) THEN
 

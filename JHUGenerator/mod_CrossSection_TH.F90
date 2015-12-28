@@ -41,6 +41,7 @@ integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9
    call boost2Lab(eta1,eta2,5,MomExt(1:4,1:5))
 
    call SetRunningScales( (/ MomExt(1:4,Hbos),MomExt(1:4,t),MomExt(1:4,qout) /) , (/ Not_a_particle_,Top_,Glu_,Not_a_particle_ /) ) ! Glu_? Why not!
+   call EvalAlphaS()
    call setPDFs(eta1,eta2,pdf)
    
    IF( TOPDECAYS.NE.0 ) THEN
@@ -269,6 +270,7 @@ WdecayKfactor = 1d0
    if( applyPSCut .or. PSWgt.eq.zero ) return
 
    call SetRunningScales( (/ MomExt(1:4,Hbos),MomExt(1:4,t),MomExt(1:4,qout) /) , (/ Not_a_particle_,Top_,Glu_,Not_a_particle_ /) ) ! Glu_? Why not!
+   call EvalAlphaS()
    call setPDFs(eta1,eta2,pdf)
    LO_Res_Unpol = 0d0
 

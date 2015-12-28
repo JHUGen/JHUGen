@@ -347,6 +347,7 @@ END FUNCTION
 
    ! Outgoing ids~incoming ids up to swapping and flavor changes, and main.F90 protexts from errors due to swapping (ie. massive mJ_mJ-fixed scenario)
    call SetRunningScales( (/ MomExt(1:4,5),MomExt(1:4,3),MomExt(1:4,4) /) , (/ Not_a_particle_,LHA2M_ID(iPart_sel),LHA2M_ID(jPart_sel),Not_a_particle_ /) )
+   if ( Process.eq.61 ) call EvalAlphaS()
    call setPDFs(eta1,eta2,pdf)
 
    if( Process.eq.60 ) then
@@ -627,6 +628,7 @@ include 'csmaxvalue.f'
 
    ! Outgoing ids~incoming ids up to swapping and flavor changes, and main.F90 protexts from errors due to swapping (ie. massive mJ_mJ-fixed scenario)
    call SetRunningScales( (/ MomExt(1:4,5),MomExt(1:4,3),MomExt(1:4,4) /) , (/ Not_a_particle_,LHA2M_ID(iPartons(1)),LHA2M_ID(iPartons(2)),Not_a_particle_ /) )
+   if ( Process.eq.61 ) call EvalAlphaS()
    call setPDFs(eta1,eta2,pdf)
    FluxFac = 1d0/(2d0*EHat**2)
    EvalCounter = EvalCounter+1
