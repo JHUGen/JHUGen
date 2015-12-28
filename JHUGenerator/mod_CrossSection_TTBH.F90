@@ -105,6 +105,7 @@ WdecayKfactor = 1d0
    FluxFac = 1d0/(2d0*EHat**2)
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * PartChannelAvg * WdecayKfactor
    call SetRunningScales( (/ MomExt(1:4,Hbos),MomExt(1:4,tbar),MomExt(1:4,t) /) , (/ Not_a_particle_,ATop_,Top_,Not_a_particle_ /) )
+   call EvalAlphaS()
    call setPDFs(eta1,eta2,pdf)
    
    
@@ -305,6 +306,7 @@ WdecayKfactor = 1d0
    if( applyPSCut .or. PSWgt.eq.zero ) return
 
    call SetRunningScales( (/ MomExt(1:4,Hbos),MomExt(1:4,tbar),MomExt(1:4,t) /) , (/ Not_a_particle_,ATop_,Top_,Not_a_particle_ /) )
+   call EvalAlphaS()
    call setPDFs(eta1,eta2,pdf)
 
    
