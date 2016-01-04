@@ -65,7 +65,7 @@ endif
 
 
 
-IDPRUP=100
+IDPRUP=Process
 if( present(EventWeight) ) then
     XWGTUP=EventWeight
 else
@@ -399,7 +399,7 @@ character(len=150) :: IndentedFmt0, IndentedFmt1
     if( present(EventProcessId) .and. importExternal_LHEinit) then
         IDPRUP=EventProcessId
     else
-        IDPRUP=100
+        IDPRUP=Process
     endif
     if( present(EventWeight) ) then
         XWGTUP=EventWeight
@@ -558,7 +558,7 @@ integer, parameter :: inLeft=1, inRight=2, Hig=3, tauP=4, tauM=5, Wp=6, Wm=7,   
     if( present(EventProcessId) .and. importExternal_LHEinit) then
         IDPRUP=EventProcessId
     else
-        IDPRUP=100
+        IDPRUP=Process
     endif
     if( present(EventWeight) ) then
         XWGTUP=EventWeight
@@ -710,7 +710,7 @@ do i=1,4
 enddo
 
 
-IDPRUP=100
+IDPRUP=Process
 SCALUP=Mu_Fact * 100d0
 AQEDUP=alpha_QED
 AQCDUP=0.11d0
@@ -816,7 +816,7 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
 ! For description of the LHE format see http://arxiv.org/abs/hep-ph/0109068 and http://arxiv.org/abs/hep-ph/0609017
 ! The LHE numbering scheme can be found here: http://pdg.lbl.gov/mc_particle_id_contents.html and http://lhapdf.hepforge.org/manual#tth_sEcA
 
-IDPRUP=100
+IDPRUP=Process
 SCALUP=Mu_Fact * 100d0
 AQEDUP=alpha_QED
 AQCDUP=0.11d0
@@ -902,7 +902,7 @@ integer, parameter :: inLeft=1,inRight=2,Hbos=3,tbar=4,t=5,  bbar=6,Wm=7,lepM=8,
 
 
 
-IDPRUP=100
+IDPRUP=Process
 SCALUP=Mu_Fact * 100d0
 AQEDUP=alpha_QED
 AQCDUP=0.11d0
@@ -1022,7 +1022,7 @@ do i=1,5
 enddo
 
 
-IDPRUP=100
+IDPRUP=Process
 SCALUP=Mu_Fact * 100d0
 AQEDUP=alpha_QED
 AQCDUP=0.11d0
@@ -1123,7 +1123,7 @@ integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9
 
 
 
-IDPRUP=100
+IDPRUP=Process
 SCALUP=Mu_Fact * 100d0
 AQEDUP=alpha_QED
 AQCDUP=0.11d0
@@ -1242,7 +1242,7 @@ do i=1,5
 enddo
 
 
-IDPRUP=100
+IDPRUP=Process
 SCALUP=Mu_Fact * 100d0
 AQEDUP=alpha_QED
 AQCDUP=0.11d0
@@ -1378,7 +1378,7 @@ character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE
 MomDummy = MomExt*1d2
 MassDummy = inv_mass*1d2
 
-IDPRUP=100
+IDPRUP=Process
 SCALUP=Mu_Fact * 100d0
 AQEDUP=alpha_QED
 AQCDUP=0.11d0
