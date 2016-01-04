@@ -3302,7 +3302,7 @@ C        (MODE = 1: Algorithm M;    MODE = 2: Algorithm R)
        print 1,qm
     1  format(/' error detected by HTO_rrunm ',/
      #         ' current value of quark mass  = ',e20.5)
-*       STOP
+*       STOP    !  MARKUS NOTE: Removed this stop. Hence, the program keeps running even if there are errors!
       ENDIF
       IF(f < 0.d0) then
        HTO_rrunm= x1
