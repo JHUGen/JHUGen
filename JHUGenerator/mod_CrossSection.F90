@@ -1713,7 +1713,7 @@ ENDIF! GENEVT
       EvalWeighted = LO_Res_Unpol * PreFac
    endif
 
-   if( UseComplexPoleScheme ) EvalWeighted = EvalWeighted * ReweightToCPS( Get_MInv( MomExt(1:4,3)+MomExt(1:4,4) ) )
+   if( RescaleHiggsWidth.ne.0 ) EvalWeighted = EvalWeighted * ReweightBWPropagator( Get_MInv( MomExt(1:4,3)+MomExt(1:4,4) ) )
 !    print *, ReweightToCPS( Get_MInv( MomExt(1:4,3)+MomExt(1:4,4) ) );pause
 
    if( writeWeightedLHE .and. (.not. warmup) ) then
