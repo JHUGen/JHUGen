@@ -1495,6 +1495,7 @@ ENDIF! GENEVT
 !    IDUP(7)  -->  MomDK(:,1)  -->  ubar-spinor
 !    IDUP(8)  -->  MomDK(:,4)  -->     v-spinor
 !    IDUP(9)  -->  MomDK(:,3)  -->  ubar-spinor
+    ICOLUP(1:2,1:9) = 0
     call VVBranchings(MY_IDUP(4:9),ICOLUP(1:2,6:9))
     MY_IDUP(1:3) = 0
     yz1 = yRnd(10)
@@ -1717,6 +1718,12 @@ ENDIF! GENEVT
 !    print *, ReweightToCPS( Get_MInv( MomExt(1:4,3)+MomExt(1:4,4) ) );pause
 
    if( writeWeightedLHE .and. (.not. warmup) ) then
+      if (PChannel.eq.0) then
+         My_IDUP(1) = Glu_
+         My_IDUP(2) = Glu_
+         ICOLUP(1:2,1) = (/501,502/)
+         ICOLUP(1:2,2) = (/502,501/)
+      endif
       if( (OffShellV1).or.(OffShellV2).or.(IsAPhoton(DecayMode2))   ) then
             call WriteOutEvent((/MomExt(1:4,1),MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(1:9),ICOLUP(1:2,1:9),EventWeight=EvalWeighted*VgsWgt)
       else

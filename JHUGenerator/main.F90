@@ -24,8 +24,8 @@ real(8) :: VG_Result,VG_Error
    call PrintLogo(io_LogFile)
    call WriteParameters(io_stdout)
    call WriteParameters(io_LogFile)
-   if ( .not. ReadLHEFile .and. .not. ConvertLHEFile ) then
-      call InitOutput()
+   if ( .not. ReadLHEFile .and. .not. ConvertLHEFile .and. .not.((Process.eq.60 .or. Process.eq.61) .and. unweighted) ) then
+      call InitOutput(-1d0, -1d0)   !for VBF/HJJ the cross section is calculated, so use that in the <init> block
    endif
    write(io_stdout,*) " Running"
    if( ConvertLHEFile ) then
@@ -1470,6 +1470,7 @@ if( UseBetaVersion ) then
     CrossSec(:,:) = CrossSec(:,:)/dble(itmx)    
     write(io_stdout,"(A)")  ""
     write(io_stdout,"(2X,A,F10.3,A,F10.3,A,F10.3)") "Total xsec: ",VG_Result, " +/-",VG_Error, " fb    vs.",sum(CrossSec(:,:))
+    call InitOutput(VG_Result, VG_Error)
 
     RequEvents(:,:)=0
     do i1=-5,5
@@ -1806,17 +1807,17 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
      do while ( .not.FirstEvent )
         read(16,fmt="(A160)",IOSTAT=stat,END=99) FirstLines
         if ( FirstLines(1:4).eq."<!--" .and. .not.WroteHeader ) then
-            call InitOutput()
+            call InitOutput(-1d0, -1d0)
             WroteHeader = .true.
         endif
         if (index(FirstLines,"<MG").ne.0 .and. .not.WroteHeader) then  !Sometimes MadGraph doesn't have a comment at the beginning
-            call InitOutput()                                          !In that case put the JHUGen header before the MadGraph
+            call InitOutput(-1d0, -1d0)                                !In that case put the JHUGen header before the MadGraph
             write(io_LHEOutFile, "(A)") "-->"                          ! proc card, etc.
             WroteHeader = .true.                                       !and put the Higgs mass/width in a separate comment
             ClosedHeader = .true.                                      !before <init>
         endif
         if (Index(FirstLines,"<init>").ne.0 .and. .not.WroteHeader ) then !If not now, when?
-            call InitOutput()
+            call InitOutput(-1d0, -1d0)
             WroteHeader = .true.
         endif
 
@@ -2195,17 +2196,17 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
      do while ( .not.FirstEvent )
         read(16,fmt="(A160)",IOSTAT=stat,END=99) FirstLines
         if ( FirstLines(1:4).eq."<!--" .and. .not.WroteHeader ) then
-            call InitOutput()
+            call InitOutput(-1d0, -1d0)
             WroteHeader = .true.
         endif
         if (index(FirstLines,"<MG").ne.0 .and. .not.WroteHeader) then  !Sometimes MadGraph doesn't have a comment at the beginning
-            call InitOutput()                                          !In that case put the JHUGen header before the MadGraph
+            call InitOutput(-1d0, -1d0)                                !In that case put the JHUGen header before the MadGraph
             write(io_LHEOutFile, "(A)") "-->"                          ! proc card, etc.
             WroteHeader = .true.                                       !and put the Higgs mass/width in a separate comment
             ClosedHeader = .true.                                      !before <init>
         endif
         if (Index(FirstLines,"<init>").ne.0 .and. .not.WroteHeader ) then !If not now, when?
-            call InitOutput()
+            call InitOutput(-1d0, -1d0)
             WroteHeader = .true.
         endif
 
@@ -3526,9 +3527,11 @@ END SUBROUTINE
 
 
 
-SUBROUTINE InitOutput
+SUBROUTINE InitOutput(CrossSection, CrossSectionError)
 use ModParameters
 implicit none
+
+real(8) :: CrossSection, CrossSectionError
 
     if( (unweighted) .or. ( (.not.unweighted) .and. (writeWeightedLHE) )  ) then 
         if ( .not. ReadLHEFile .and. .not. ConvertLHEFile ) then
@@ -3571,8 +3574,7 @@ implicit none
 ! (*) pdf code of LHAGLUE for colliding particles (10042=CTEQ6Ll, MSTW2008=21000,21041-21080)    
 ! (*) weighting strategy (3=unweighted events, 4=weighted events,  otherwise=see LHE manuals)
 ! (*) number of process types to be accepted (default=1, otherwise=see manual)
-! 
-            write(io_LHEOutFile ,'(A)') '0.43538820803E-02  0.72559367904E-05  1.00000000000E-00 100'
+            write(io_LHEOutFile ,'(1PE14.7,1PE14.7,1PE14.7,I3)') CrossSection, CrossSectionError, 1.00000000000E-00, Process
 ! in order of appearance: 
 ! (*) total cross section in pb
 ! (*) stat. error in the total cross section in pb
