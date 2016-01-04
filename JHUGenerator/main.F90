@@ -3574,7 +3574,7 @@ real(8) :: CrossSection, CrossSectionError
 ! (*) pdf code of LHAGLUE for colliding particles (10042=CTEQ6Ll, MSTW2008=21000,21041-21080)    
 ! (*) weighting strategy (3=unweighted events, 4=weighted events,  otherwise=see LHE manuals)
 ! (*) number of process types to be accepted (default=1, otherwise=see manual)
-            write(io_LHEOutFile ,'(1PE14.7,1PE14.7,1PE14.7,I3)') CrossSection, CrossSectionError, 1.00000000000E-00, Process
+            write(io_LHEOutFile ,'(1PE14.7,1X,1PE14.7,1X,1PE14.7,1X,I3)') CrossSection, CrossSectionError, 1.00000000000E-00, Process
 ! in order of appearance: 
 ! (*) total cross section in pb
 ! (*) stat. error in the total cross section in pb
