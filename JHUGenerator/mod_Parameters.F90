@@ -66,8 +66,7 @@ logical, public, parameter :: writeWeightedLHE = .false.
 logical, public, parameter :: includeGammaStar = .false. 
 real(8),parameter :: MPhotonCutoff = 4d0*GeV
 
-! logical, public, parameter :: UseComplexPoleScheme = .false. 
-integer, public, parameter :: RescaleHiggsWidth = 0    ! 0=fixed BW-width, 1=runing BW-width, 2=Passarino's CPS
+integer, public  :: WidthScheme    ! 0=fixed BW-width, 1=runing BW-width, 2=Passarino's CPS
 logical, public, parameter :: RandomizeVVdecays = .true.    ! randomize DecayMode1 and DecayMode2 in H-->VV and TTBAR decays
 
 logical, public, parameter :: UseUnformattedRead = .false.  !Set this to true if the regular reading fails for whatever reason
