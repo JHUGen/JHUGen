@@ -74,7 +74,7 @@ endif
 
 SCALUP=Mu_Fact * 100d0
 AQEDUP=alpha_QED
-AQCDUP=0.11d0
+AQCDUP=alphas
 
 ISTUP(1) = -1
 ISTUP(2) = -1
@@ -413,7 +413,7 @@ character(len=150) :: IndentedFmt0, IndentedFmt1
     else
         SCALUP=Mu_Fact * 100d0
         AQEDUP=alpha_QED
-        AQCDUP=0.11d0
+        AQCDUP=alphas
     endif
     ISTUP(iHiggs) = 2
     if ( IsAPhoton(DecayMode1) .and. IsAPhoton(DecayMode2) ) then! photon+photon FS
@@ -572,7 +572,7 @@ integer, parameter :: inLeft=1, inRight=2, Hig=3, tauP=4, tauM=5, Wp=6, Wm=7,   
     else
         SCALUP=Mu_Fact * 100d0
         AQEDUP=alpha_QED
-        AQCDUP=0.11d0
+        AQCDUP=alphas
     endif
     ISTUP(iHiggs) = 2
     if ( TauDecays.eq.0 ) then
@@ -713,7 +713,7 @@ enddo
 IDPRUP=Process
 SCALUP=Mu_Fact * 100d0
 AQEDUP=alpha_QED
-AQCDUP=0.11d0
+AQCDUP=alphas
 
 ISTUP(1) = -1
 ISTUP(2) = -1
@@ -819,7 +819,7 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
 IDPRUP=Process
 SCALUP=Mu_Fact * 100d0
 AQEDUP=alpha_QED
-AQCDUP=0.11d0
+AQCDUP=alphas
 
 
 MOTHUP(1:2,inTop) = (/0,0/);          ISTUP(inTop) = -1
@@ -905,7 +905,7 @@ integer, parameter :: inLeft=1,inRight=2,Hbos=3,tbar=4,t=5,  bbar=6,Wm=7,lepM=8,
 IDPRUP=Process
 SCALUP=Mu_Fact * 100d0
 AQEDUP=alpha_QED
-AQCDUP=0.11d0
+AQCDUP=alphas
 
 
 
@@ -1025,7 +1025,7 @@ enddo
 IDPRUP=Process
 SCALUP=Mu_Fact * 100d0
 AQEDUP=alpha_QED
-AQCDUP=0.11d0
+AQCDUP=alphas
 
 ISTUP(1:5) = (/-1,-1,1,1,1/)
 
@@ -1126,7 +1126,7 @@ integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9
 IDPRUP=Process
 SCALUP=Mu_Fact * 100d0
 AQEDUP=alpha_QED
-AQCDUP=0.11d0
+AQCDUP=alphas
 
 
 
@@ -1245,7 +1245,7 @@ enddo
 IDPRUP=Process
 SCALUP=Mu_Fact * 100d0
 AQEDUP=alpha_QED
-AQCDUP=0.11d0
+AQCDUP=alphas
 
 ISTUP(1) = -1
 ISTUP(2) = -1
@@ -1381,7 +1381,7 @@ MassDummy = inv_mass*1d2
 IDPRUP=Process
 SCALUP=Mu_Fact * 100d0
 AQEDUP=alpha_QED
-AQCDUP=0.11d0
+AQCDUP=alphas
 
 call getHiggsDecayLength(HiggsDKLength)
 
