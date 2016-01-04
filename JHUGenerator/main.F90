@@ -1741,7 +1741,8 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
           endif          
           if( Res.gt.0d0 ) then ! decay event was accepted
           
-             WeightScaleAqedAqcd(1) = WeightScaleAqedAqcd(1) *  DecayWeight
+             !   multiply input weight with Higgs decay weight (assuming that H-propagator is already taken care of in input LHE's
+             WeightScaleAqedAqcd(1) = WeightScaleAqedAqcd(1) *  DecayWeight/csmax(0,0)!    normalize to max. weight
           
              if( TauDecays.lt.0 ) then!  H->VV->4f
                 call boost(HiggsDK_Mom(1:4,6),MomHiggs(1:4),pH2sq)
