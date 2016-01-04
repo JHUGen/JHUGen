@@ -31,6 +31,13 @@
       real(dp) :: gZ_sq
       real(dp) :: prefactor, Lambda_inv,res2
       real(dp), parameter :: symmFact=1d0/2d0
+      real(dp) :: intcolfac
+
+         if(IsAQuark(MY_IDUP(6)) .and. IsAQuark(MY_IDUP(8))) then
+            intcolfac=1_dp/3_dp
+         else
+            intcolfac=1_dp
+         endif
 
          if( IsAZDecay(DecayMode1) .and. IsAZDecay(DecayMode2) ) then
              VVMode = ZZMode
@@ -57,6 +64,7 @@
          else
               prefactor = 0d0
          endif
+         prefactor = prefactor * (alphas/(3_dp*pi*vev))**2
 
 
 
@@ -102,10 +110,10 @@
                   res = res + (A_VV(1)+A_VV(3)+A_VV(5)+A_VV(7))*dconjg(A_VV(1)+A_VV(3)+A_VV(5)+A_VV(7))!   interfere the 3456 pieces
                   res = res + (A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8))*dconjg(A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8))!   interfere the 5436 pieces
                   if( (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) .and. (i3.eq.i4) ) then! interfere the 3456 with 5436 pieces
-                      res = res + 2d0*dreal(  A_VV(1)*dconjg( A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8) )  )
-                      res = res + 2d0*dreal(  A_VV(3)*dconjg( A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8) )  )
-                      res = res + 2d0*dreal(  A_VV(5)*dconjg( A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8) )  )
-                      res = res + 2d0*dreal(  A_VV(7)*dconjg( A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8) )  )
+                      res = res + 2d0*intcolfac*dreal(  A_VV(1)*dconjg( A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8) )  )
+                      res = res + 2d0*intcolfac*dreal(  A_VV(3)*dconjg( A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8) )  )
+                      res = res + 2d0*intcolfac*dreal(  A_VV(5)*dconjg( A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8) )  )
+                      res = res + 2d0*intcolfac*dreal(  A_VV(7)*dconjg( A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8) )  )
                   endif
           enddo;  enddo;  enddo;  enddo
 
@@ -733,7 +741,13 @@
       real(dp) :: gZ_sq,s
       real(dp) :: prefactor, Lambda_inv
       real(dp), parameter :: symmFact=1d0/2d0
+      real(dp) :: intcolfac
 
+         if(IsAQuark(MY_IDUP(6)) .and. IsAQuark(MY_IDUP(8))) then
+            intcolfac=1_dp/3_dp
+         else
+            intcolfac=1_dp
+         endif
 
 
          if( IsAZDecay(DecayMode1) .and. IsAZDecay(DecayMode2) ) then
@@ -807,10 +821,10 @@
                   res = res + (A_VV(1)+A_VV(3)+A_VV(5)+A_VV(7))*dconjg(A_VV(1)+A_VV(3)+A_VV(5)+A_VV(7))!   interfere the 3456 pieces
                   res = res + (A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8))*dconjg(A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8))!   interfere the 5436 pieces
                   if( (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) .and. (i3.eq.i4) ) then! interfere the 3456 with 5436 pieces
-                      res = res + 2d0*dreal(  A_VV(1)*dconjg( A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8) )  )
-                      res = res + 2d0*dreal(  A_VV(3)*dconjg( A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8) )  )
-                      res = res + 2d0*dreal(  A_VV(5)*dconjg( A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8) )  )
-                      res = res + 2d0*dreal(  A_VV(7)*dconjg( A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8) )  )
+                      res = res + 2d0*intcolfac*dreal(  A_VV(1)*dconjg( A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8) )  )
+                      res = res + 2d0*intcolfac*dreal(  A_VV(3)*dconjg( A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8) )  )
+                      res = res + 2d0*intcolfac*dreal(  A_VV(5)*dconjg( A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8) )  )
+                      res = res + 2d0*intcolfac*dreal(  A_VV(7)*dconjg( A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8) )  )
                   endif
           enddo;  enddo
 
