@@ -5271,40 +5271,62 @@ end subroutine EvalAlphaS
 !     nloops_pdf -- ModParameters value of the number of loops (1,2, or 3) at which the beta function is evaluated to determine running.
 !     The values of the cmass and the bmass are set in main.F90.
    REAL(DP) :: T
+   INTEGER, PARAMETER :: NF6=6
    INTEGER, PARAMETER :: NF5=5
    INTEGER, PARAMETER :: NF4=4
    INTEGER, PARAMETER :: NF3=3
+   INTEGER, PARAMETER :: NF2=2
+   INTEGER, PARAMETER :: NF1=1
    
       IF (Mu_Ren .LE. 0d0) THEN 
          WRITE(6,*) 'ModKinematics::EvalAlphaS: Mu_Ren .le. 0, Mu_Ren (GeV) = ',(Mu_Ren*GeV)
          stop
       ENDIF
-
-!--- 3-flavour running only
-      if     (cmass_pdf .ge. 999d0*GeV) then
-         T=2D0*DLOG(Mu_Ren/zmass_pdf)
-         CALL NEWTONPDF(T,alphas_mz,alphas,NF3)
-         RETURN
-!--- 4-flavour running only
-      elseif (bmass_pdf .ge. 999d0*GeV) then
-         T=2D0*DLOG(Mu_Ren/zmass_pdf)
-         CALL NEWTONPDF(T,alphas_mz,alphas,NF4)
-         RETURN
-      endif
-!--- evaluate strong coupling at scale q
-      IF (Mu_Ren .LT. bmass_pdf) THEN
-         IF (Mu_Ren .LT. cmass_pdf) THEN
-            T=2D0*DLOG(Mu_Ren/cmass_pdf)
-            CALL NEWTONPDF(T,alphas_mc,alphas,NF3)
-         ELSE
-            T=2D0*DLOG(Mu_Ren/bmass_pdf)
-            CALL NEWTONPDF(T,alphas_mb,alphas,NF4)
-         ENDIF
-      ELSE
-         T=2D0*DLOG(Mu_Ren/zmass_pdf)
-         CALL NEWTONPDF(T,alphas_mz,alphas,NF5)
+      IF (nQflavors_pdf .GE. NF6 .OR. nQflavors_pdf.EQ.NF2 .OR. nQflavors_pdf.EQ.NF1) THEN 
+         WRITE(6,*) 'ModKinematics::EvalAlphaS: nQflavors_pdf invalid, nQflavors_pdf = ',nQflavors_pdf
+         stop
       ENDIF
 
+      if(nQflavors_pdf .EQ. NF5) then
+         T=2D0*DLOG(Mu_Ren/zmass_pdf)
+         CALL NEWTONPDF(T,alphas_mz,alphas,NF5)
+         GO TO 105
+      elseif(nQflavors_pdf .EQ. NF4) then
+         T=2D0*DLOG(Mu_Ren/bmass_pdf)
+         CALL NEWTONPDF(T,alphas_mb,alphas,NF4)
+         GO TO 105
+      elseif(nQflavors_pdf .EQ. NF3) then
+         T=2D0*DLOG(Mu_Ren/cmass_pdf)
+         CALL NEWTONPDF(T,alphas_mc,alphas,NF3)
+         GO TO 105
+      elseif(nQflavors_pdf .LT. 0) then
+!--- 3-flavour running only
+         if     (cmass_pdf .ge. 999d0*GeV) then
+            T=2D0*DLOG(Mu_Ren/zmass_pdf)
+            CALL NEWTONPDF(T,alphas_mz,alphas,NF3)
+            GO TO 105
+!--- 4-flavour running only
+         elseif (bmass_pdf .ge. 999d0*GeV) then
+            T=2D0*DLOG(Mu_Ren/zmass_pdf)
+            CALL NEWTONPDF(T,alphas_mz,alphas,NF4)
+            GO TO 105
+         endif
+!--- evaluate strong coupling at scale q
+         if (Mu_Ren .lt. bmass_pdf) then
+            if (Mu_Ren .lt. cmass_pdf) then
+               T=2D0*DLOG(Mu_Ren/cmass_pdf)
+               CALL NEWTONPDF(T,alphas_mc,alphas,NF3)
+            else
+               T=2D0*DLOG(Mu_Ren/bmass_pdf)
+               CALL NEWTONPDF(T,alphas_mb,alphas,NF4)
+            endif
+         else
+            T=2D0*DLOG(Mu_Ren/zmass_pdf)
+            CALL NEWTONPDF(T,alphas_mz,alphas,NF5)
+         endif
+      ENDIF
+
+105   continue
       ! Calculate the derived couplings
       call ComputeQCDVariables()
    RETURN
