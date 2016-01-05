@@ -4063,24 +4063,32 @@ END SUBROUTINE
 
 
 
-FUNCTION ReweightToCPS(shat)! shat is the resonance inv. mass squared
+FUNCTION ReweightBWPropagator(shat)! shat is the resonance inv. mass squared
 use modParameters
 implicit none
-real(8) :: ReweightToCPS,shat
-real(8) :: BreitWigner,BreitWigner_CPS,Ga_shat,muH,gaH
+real(8) :: ReweightBWPropagator,shat
+real(8) :: BreitWigner,BreitWigner_Run,Ga_shat,muH,gaH
 
 
-    BreitWigner = M_Reso*Ga_Reso/( (shat-M_Reso**2)**2 + (M_Reso*Ga_Reso)**2 )
-
+    ReweightBWPropagator = 1d0
     
-    muH = dsqrt( M_Reso**2/(1d0+(Ga_Reso/M_Reso)**2) )
-    gaH = muH/M_Reso*Ga_Reso
-    call CALL_HTO(dsqrt(dabs(shat))*100d0,m_top*100d0,Ga_shat)
-    Ga_shat = Ga_shat/100d0
-    
-    BreitWigner_CPS = dsqrt(dabs(shat)) * Ga_shat /( (shat-muH**2)**2 + (muH*gaH) )
+    if( WidthScheme.eq.1) then! running width
+        BreitWigner = M_Reso*Ga_Reso/( (shat-M_Reso**2)**2 + (M_Reso*Ga_Reso)**2 )
+        BreitWigner_Run =  shat*Ga_Reso/M_Reso/( (shat-M_Reso**2)**2 + (shat*Ga_Reso/M_Reso)**2 )
+       
+    elseif( WidthScheme.eq.2) then! Passarino'S CPS
+        BreitWigner = M_Reso*Ga_Reso/( (shat-M_Reso**2)**2 + (M_Reso*Ga_Reso)**2 )
 
-    ReweightToCPS = BreitWigner_CPS/BreitWigner
+        muH = dsqrt( M_Reso**2/(1d0+(Ga_Reso/M_Reso)**2) )
+        gaH = muH/M_Reso*Ga_Reso
+        call CALL_HTO(dsqrt(dabs(shat))*100d0,m_top*100d0,Ga_shat)
+        Ga_shat = Ga_shat/100d0
+        
+        BreitWigner_Run = dsqrt(dabs(shat)) * Ga_shat /( (shat-muH**2)**2 + (muH*gaH) )
+    endif
+
+    ReweightBWPropagator = BreitWigner_Run/BreitWigner
+    
 
 RETURN
 END FUNCTION

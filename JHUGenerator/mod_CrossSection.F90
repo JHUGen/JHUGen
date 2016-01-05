@@ -1719,7 +1719,7 @@ ENDIF! GENEVT
       EvalWeighted = LO_Res_Unpol * PreFac
    endif
 
-   if( UseComplexPoleScheme ) EvalWeighted = EvalWeighted * ReweightToCPS( Get_MInv( MomExt(1:4,3)+MomExt(1:4,4) ) )
+   if( WidthScheme.ne.0 ) EvalWeighted = EvalWeighted * ReweightBWPropagator( Get_MInv( MomExt(1:4,3)+MomExt(1:4,4) ) )
 !    print *, ReweightToCPS( Get_MInv( MomExt(1:4,3)+MomExt(1:4,4) ) );pause
 
    if( writeWeightedLHE .and. (.not. warmup) ) then
@@ -2231,6 +2231,7 @@ IF( GENEVT ) THEN
 
    PreFac = 2d0 * fbGeV2 * FluxFac * sHatJacobi * PSWgt * SymmFac
    EvalUnWeighted = LO_Res_Unpol * PreFac
+   if( WidthScheme.ne.0 ) EvalUnWeighted = EvalUnWeighted * ReweightBWPropagator( Get_MInv( MomExt(1:4,3)+MomExt(1:4,4) ) )   
 
       if( EvalUnWeighted.gt. CS_max) then
           write(io_stdout,"(2X,A,1PE13.6,1PE13.6)")  "CS_max is too small.",EvalUnWeighted, CS_max
@@ -2321,6 +2322,7 @@ ELSE! NOT GENEVT
 
       PreFac = 2d0 * fbGeV2 * FluxFac * sHatJacobi * PSWgt * PDFFac * SymmFac
       EvalUnWeighted = LO_Res_Unpol * PreFac
+      if( WidthScheme.ne.0 ) EvalUnWeighted = EvalUnWeighted * ReweightBWPropagator( Get_MInv( MomExt(1:4,3)+MomExt(1:4,4) ) )      
       RES(0,0) = EvalUnWeighted
 
       if (EvalUnWeighted.gt.csmax(0,0)) then
@@ -2660,7 +2662,7 @@ IF( GENEVT ) THEN
 !       if( abs(MY_IDUP(6)).ge.1 .and. abs(MY_IDUP(6)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
 !       if( abs(MY_IDUP(8)).ge.1 .and. abs(MY_IDUP(8)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
       EvalUnWeighted_DecayToVV = LO_Res_Unpol * PreFac
-
+      
       CS_max = csmax(0,0)
 
       if( EvalUnWeighted_DecayToVV .gt. CS_max) then
