@@ -13,7 +13,7 @@ integer, public :: VegasIt1,VegasNc0,VegasNc1,VegasNc2
 real(8), public :: Collider_Energy
 integer, public :: VegasIt1_default,VegasNc0_default,VegasNc1_default,VegasNc2_default
 integer, public :: NumHistograms,RequestNLeptons,RequestOS,RequestOSSF
-logical, public :: Unweighted,OffShellReson,OffShellV1,OffShellV2,ReadLHEFile,ConvertLHEFile
+logical, public :: Unweighted,OffShellReson,OffShellV1,OffShellV2,ReadLHEFile,ConvertLHEFile,CalcPMZZ
 logical, public :: ReadCSmax,GenerateEvents,CountTauAsAny,HasLeptonFilter
 integer(8), public :: EvalCounter=0
 integer(8), public :: RejeCounter=0
