@@ -3,7 +3,7 @@ implicit none
 save
 ! 
 ! 
-character(len=6),parameter :: JHUGen_Version="v6.8.1"
+character(len=6),parameter :: JHUGen_Version="v6.8.3"
 ! 
 ! 
 !=====================================================
@@ -134,27 +134,17 @@ real(8), public, parameter :: POL_A = 0d0                   ! e+ polarization. 0
 real(8), public, parameter :: POL_B = 0d0                   ! e- polarization. 0: no polarization, 100: helicity = 1, -100: helicity = -1
 
 ! PDF and QCD scale variables, set in main::InitPDFNonConstVals if not a parameter
-integer, public, parameter :: nQflavors_pdf = 5    ! Number of flavors enforced to the PDF, set to -1 for activating step functions in EvalAlphaS()
-integer, public            :: nloops_pdf           ! alpha_s order
-real(8), public            :: bmass_pdf            ! b mass used in pdf toward the QCD scale, reset later in main per PDF
-real(8), public            :: cmass_pdf            ! c mass used in pdf toward the QCD scale, reset later in main per PDF
+integer, public, parameter :: nQflavors_pdf = 5    ! Number of flavors enforced to the PDF, used in ModKinematics::EvalAlphaS()
+integer, public, parameter :: nloops_pdf = 1       ! alpha_s order
 real(8), public            :: zmass_pdf            ! Z mass used in pdf toward the QCD scale, reset later in main per PDF if needed
 real(8), public            :: Mu_Fact              ! pdf factorization scale (set to M_Reso in main.F90)
 real(8), public            :: Mu_Ren               ! QCD renormalization (alpha_s) scale (set to M_Reso in main.F90)
 real(dp), public           :: alphas               ! strong coupling per event, set to some reasonable value
 real(dp), public           :: alphas_mz            ! strong coupling at M_Z, reset later in main per PDF
-real(dp), public           :: alphas_mb            ! strong coupling at m_bot, reset later only once in main per PDF
-real(dp), public           :: alphas_mc            ! strong coupling at m_charm, reset later only once in main per PDF
 real(dp), public           :: gs                   ! = sqrt(alphas*4.0_dp*pi)
 
 !---     B0_PDF=(11.-2.*NF/3.)/4./PI
 real(dp), public, parameter :: B0_PDF(0:6) = (/ 0.8753521870054244D0,0.822300539308126D0,0.7692488916108274D0,0.716197243913529D0,0.6631455962162306D0,0.6100939485189321D0,0.5570423008216338D0 /)
-!---     C1_PDF=(102.D0-38.D0/3.D0*NF)/4.D0/PI/(11.D0-2.D0/3.D0*NF)
-real(dp), public, parameter :: C1_PDF(0:6) = (/ 0.7379001906987874D0,0.6879600765907734D0,0.631131670881654D0,0.5658842421045168D0,0.4901972247230377D0,0.4013472477969535D0,0.2955734657420913D0 /)
-!---     C2_PDF=(2857.D0/2.D0-5033*NF/18.D0+325*NF**2/54) / 16.D0/PI**2/(11.D0-2.D0/3.D0*NF)
-real(dp), public, parameter :: C2_PDF(0:6) = (/ 0.8223710842788609D0,0.7077616059424726D0,0.5852293127502415D0,0.4530135791786467D0,0.3087903795366415D0,0.1494273313710745D0,-0.02940123632478559D0 /)
-!---     DELC_PDF=SQRT(4*C2_PDF-C1_PDF**2)  (DELC_PDF(6) imaginary, set equal to zero
-real(dp), public, parameter :: DELC_PDF(0:6) = (/ 1.656800424215946D0,1.535499057891964D0,1.393768296744871D0,1.221404659092302D0,0.9974307991136014D0,0.660779624511916D0,0D0 /)
 
 
 

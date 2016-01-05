@@ -603,13 +603,12 @@ SUBROUTINE InitPDFValues()
    use ModKinematics
    implicit none
 
-#if useLHAPDF==1
-   ! Dummy initialization
-   alphas_mb = alphas_mz
-   alphas_mc = alphas_mz
-#else
-   ! Not-so-dummy initialization
-   call InitPDFConstVals()
+#if useLHAPDF==0
+   IF (alphas_mz .LE. 0d0) THEN 
+      WRITE(6,*) 'alphas_mz .le. 0:',alphas_mz
+      WRITE(6,*) 'continuing with alphas_mz=0.118'
+      alphas_mz=0.118d0
+   ENDIF
 #endif
 
    Mu_Fact = M_Reso ! Set pdf scale to resonance mass by default, later changed as necessary in the EvalWeighted/EvalUnweighted subroutines
@@ -617,55 +616,6 @@ SUBROUTINE InitPDFValues()
    call EvalAlphaS() ! Set alphas at default Mu_Ren. Notice ModParameters::ComputeQCDVariables is automatically called!
    return
 END SUBROUTINE
-
-#if useLHAPDF==0
-SUBROUTINE InitPDFConstVals() ! A safe way to initialize alphas_mb and alphas_mc instead of calling EvalAlphaS blindly
-   use ModParameters
-   use ModKinematics
-   implicit none
-   real(dp) :: T
-   INTEGER, PARAMETER :: NF5=5
-   INTEGER, PARAMETER :: NF4=4
-
-   ! One-time checks
-      IF (alphas_mz .LE. 0d0) THEN 
-         WRITE(6,*) 'alphas_mz .le. 0:',alphas_mz
-         WRITE(6,*) 'continuing with alphas_mz=0.118'
-         alphas_mz=0.118d0
-      ENDIF
-      IF (cmass_pdf .LE. 0.3d0*GeV) THEN 
-         WRITE(6,*) 'cmass_pdf .le. 0.3 GeV:',cmass_pdf
-         WRITE(6,*) 'Continuing with cmass_pdf=m_charm or 1.5 GeV, whichever is greater than 0.3 GeV first!'
-         if(m_charm .gt. 0.3d0*GeV) then
-            cmass_pdf = m_charm
-         else
-            cmass_pdf = 1.5d0*GeV
-         endif
-      ENDIF
-      IF (bmass_pdf .LE. 0d0) THEN 
-         WRITE(6,*) 'bmass_pdf .le. 0 GeV:',bmass_pdf
-         WRITE(6,*) 'Continuing with bmass_pdf=m_bot or 4.75 GeV, whichever is greater than 0 GeV first!'
-         if(m_bot .gt. 0d0) then
-            bmass_pdf = m_bot
-         else
-            bmass_pdf = 4.75d0*GeV
-         endif
-      ENDIF
-      IF (nloops_pdf.lt.1) THEN
-         WRITE(6,*) 'Unimplemented nloops_pdf .lt. 1:',nloops_pdf
-         stop
-      ENDIF
-
-      ! Establish value of coupling at b- and c-mass and save
-      T=2D0*DLOG(bmass_pdf/zmass_pdf)
-      CALL NEWTONPDF(T,alphas_mz,alphas_mb,NF5)
-      T=2D0*DLOG(cmass_pdf/bmass_pdf)
-      CALL NEWTONPDF(T,alphas_mb,alphas_mc,NF4)
-
-   return
-END SUBROUTINE
-#endif
-
 
 
 SUBROUTINE InitPDFs()
@@ -681,10 +631,8 @@ SUBROUTINE InitPDFs()
 
      alphas_mz=alphasPDF(zmass_pdf)
      ! Dummy initialization, just in case. These values are not used.
-     nloops_pdf = 1
+     !nloops_pdf = 1
      zmass_pdf = M_Z
-     cmass_pdf = m_charm
-     bmass_pdf = m_bot
 
 #else
 
@@ -699,32 +647,24 @@ SUBROUTINE InitPDFs()
         call SetCtq6(4)  ! 4    CTEQ6L1  Leading Order cteq6l1.tbl
 
         alphas_mz=0.130d0
-        nloops_pdf=1
-        cmass_pdf=1.3d0*GeV
-        bmass_pdf=4.5d0*GeV
+        !nloops_pdf=1
      elseif( PDFSet.eq.3 ) then  ! NNPDF 3.0 LO with a_s=0.13
         pdftable(:)="./pdfs/NNPDF30_lo_as_0130.LHgrid"
         call NNPDFDriver(pdftable)
         call NNinitPDF(0)
 
         alphas_mz=0.130d0
-        nloops_pdf=1
+        !nloops_pdf=1
         zmass_pdf=91.199996948242188d0*GeV
-        cmass_pdf=1.274999976158142d0*GeV
-        bmass_pdf=4.179999828338623d0*GeV
      elseif( (PDFSet.eq.2) .or. (PDFSet.ge.201 .and. PDFSet.le.240) ) then ! MSTW2008 and variations
         alphas_mz=0.13939d0
-        nloops_pdf=1
-        cmass_pdf=1.40d0*GeV
-        bmass_pdf=4.75d0*GeV
+        !nloops_pdf=1
      else ! Everything else
         write(6,*),"main.F90::InitPDFs: PDFSet",PDFSet,"QCD parameters are unknown. Please double-check! Stopping JHUGen..."
         stop
         ! Could also have used these instead of the stop statement, but why introduce arbitrary number?
         !alphas_mz = 0.13229060d0
         !nloops_pdf = 1
-        !cmass_pdf = m_charm
-        !bmass_pdf = m_bot
      endif
 
 #endif
