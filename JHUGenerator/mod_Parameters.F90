@@ -133,7 +133,8 @@ real(8), public, parameter :: ILC_Energy=250d0  *GeV        ! Linear collider ce
 real(8), public, parameter :: POL_A = 0d0                   ! e+ polarization. 0: no polarization, 100: helicity = 1, -100: helicity = -1
 real(8), public, parameter :: POL_B = 0d0                   ! e- polarization. 0: no polarization, 100: helicity = 1, -100: helicity = -1
 
-! PDF and QCD scale variables, set in main::InitPDFNonConstVals
+! PDF and QCD scale variables, set in main::InitPDFNonConstVals if not a parameter
+integer, public, parameter :: nQflavors_pdf = 5    ! Number of flavors enforced to the PDF, set to -1 for activating step functions in EvalAlphaS()
 integer, public            :: nloops_pdf           ! alpha_s order
 real(8), public            :: bmass_pdf            ! b mass used in pdf toward the QCD scale, reset later in main per PDF
 real(8), public            :: cmass_pdf            ! c mass used in pdf toward the QCD scale, reset later in main per PDF
