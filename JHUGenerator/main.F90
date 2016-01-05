@@ -1661,9 +1661,11 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
      write(io_stdout,"(A)") ""
      write(io_LogFile,"(A)") ""
 
-     if( TauDecays.lt.0 ) then
+     if( TauDecays.lt.0 .and. ReweightDecay ) then
         print *, " finding P_H4l(m_Reso) with ",1000000," points" 
         DecayWidth0 = GetMZZProbability(EHat,1000000)
+     else
+        DecayWidth0 = 1
      endif
 
      print *, " finding maximal weight for mZZ=mReso with ",VegasNc0," points"
@@ -1741,7 +1743,11 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
           DecayWeight = 0d0
           if( TauDecays.lt.0 ) then
           
-                DecayWidth = GetMZZProbability(EHat,PMZZcalls)!  could also be used to determine csmax for this particular event to improve efficiency (-->future work)
+                if( ReweightDecay ) then
+                    DecayWidth = GetMZZProbability(EHat,PMZZcalls)!  could also be used to determine csmax for this particular event to improve efficiency (-->future work)
+                else
+                    DecayWidth = 1
+                endif
                 WeightScaleAqedAqcd(1) = WeightScaleAqedAqcd(1) *   DecayWidth/DecayWidth0
                 
                 do tries=1,5000000
@@ -1757,9 +1763,12 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                 enddo
           endif          
           
-          if( Res.eq.0d0 ) WeightScaleAqedAqcd(1) = 0d0! events that were not accepted after 50 Mio. tries are assigned weight zero
+          if( Res.eq.0d0 .and. PrintRejectedEventsWeightZero ) then
+              WeightScaleAqedAqcd(1) = 0d0! events that were not accepted after 50 Mio. tries are assigned weight zero
+              Res = 1d0
+          endif
           
-!           if( Res.gt.0d0 ) then ! decay event was accepted
+          if( Res.gt.0d0 ) then ! decay event was accepted
              if( TauDecays.lt.0 ) then!  H->VV->4f
                 call boost(HiggsDK_Mom(1:4,6),MomHiggs(1:4),pH2sq)
                 call boost(HiggsDK_Mom(1:4,7),MomHiggs(1:4),pH2sq)
@@ -1813,10 +1822,10 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                   write(io_LogFile,*) NEvent," events accepted (",time_int-time_start, ") seconds"
              endif
 
-!           elseif( Res.eq.0d0 ) then ! decay event was not accepted after ncall evaluations, read next production event
-!              print *, "Rejected event after ",tries-1," evaluations"
-!              AlertCounter = AlertCounter + 1 
-!           endif
+          elseif( Res.eq.0d0 ) then ! decay event was not accepted after ncall evaluations, read next production event
+             print *, "Rejected event after ",tries-1," evaluations"
+             AlertCounter = AlertCounter + 1 
+          endif
 
 
 
@@ -2442,7 +2451,7 @@ real(8),parameter :: ScanRange=120d0*GeV
   do nscan=-nmax,+nmax,1
      
      EHat = M_Reso+ScanRange*nscan/dble(nmax)
-     DecayWidth = GetMZZProbability(EHat)
+     DecayWidth = GetMZZProbability(EHat,Ncalls)
      write(*,"(1F10.5,1PE16.9)") EHat*100d0,DecayWidth/DecayWidth0
      
   enddo
