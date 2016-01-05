@@ -31,6 +31,8 @@ real(8) :: VG_Result,VG_Error
         call StartConvertLHE(VG_Result,VG_Error)
    elseif( ReadLHEFile ) then
         call StartReadLHE_NEW(VG_Result,VG_Error)
+   elseif( CalcPMZZ ) then
+        call GetMZZdistribution()
    else
         if( Process.eq.80 .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.66 .or. Process.eq.90 .or. &
             Process.eq.110 .or. Process.eq.111 .or. Process.eq.112 .or. Process.eq.113 ) then
@@ -78,6 +80,7 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf,i
    ReadLHEFile=.false.
    ConvertLHEFile=.false.
    ReadCSmax=.false.
+   CalcPMZZ = .false.
    GenerateEvents=.false.
    RequestNLeptons = -1
    RequestOS=-1
@@ -212,6 +215,9 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf,i
         CountArg = CountArg + 1
     elseif( arg(1:9) .eq."ReadCSmax" ) then
         ReadCSmax=.true.
+        CountArg = CountArg + 1
+    elseif( arg(1:9) .eq."CalcPMZZ" ) then
+        CalcPMZZ=.true.
         CountArg = CountArg + 1
     elseif( arg(1:9) .eq."GenEvents" ) then
         GenerateEvents=.true.
@@ -1483,8 +1489,8 @@ implicit none
 include 'csmaxvalue.f'
 integer,parameter :: maxpart=30!=max.part particles in LHE file; this parameter should match the one in WriteOutEvent of mod_Kinematics
 real(8) :: VG_Result,VG_Error,VG_Chi2
-real(8) :: yRnd(1:22),Res,dum,EMcheck(1:4),DecayWeight
-real(8) :: HiggsDK_Mom(1:4,1:13),Ehat
+real(8) :: yRnd(1:22),Res,EMcheck(1:4),DecayWeight,DecayWidth,DecayWidth0
+real(8) :: HiggsDK_Mom(1:4,1:13),Ehat,GetMZZProbability
 real(8) :: MomExt(1:4,1:maxpart),MomHiggs(1:4),Mass(1:maxpart),pH2sq
 integer :: tries, nParticle,  ICOLUP(1:2,1:7+maxpart),LHE_IntExt(1:7+maxpart),HiggsDK_IDUP(1:13),HiggsDK_ICOLUP(1:2,1:13)
 character(len=*),parameter :: POWHEG_Fmt0 = "(5X,I2,A160)"
@@ -1506,7 +1512,7 @@ character(len=160) :: EventLine(0:maxpart)
 integer :: n,stat,iHiggs,VegasSeed
 integer :: i, j
 character(len=100) :: BeginEventLine
-
+integer,parameter :: PMZZcalls = 200000
 
 
 if( VegasIt1.eq.-1 ) VegasIt1 = VegasIt1_default
@@ -1654,20 +1660,25 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
      write(io_stdout,"(A)") ""
      write(io_LogFile,"(A)") ""
 
+     if( TauDecays.lt.0 ) then
+        print *, " finding P_H4l(m_Reso) with ",1000000," points" 
+        DecayWidth0 = GetMZZProbability(EHat,1000000)
+     endif
 
-     print *, " finding maximal weight with ",VegasNc0," points"
+     print *, " finding maximal weight for mZZ=mReso with ",VegasNc0," points"
      VG = zero
      CSmax = zero
      EHat = M_Reso! fixing Ehat to M_Reso which should determine the max. of the integrand
      if( TauDecays.lt.0 ) then
          do tries=1,VegasNc0
              call random_number(yRnd)
-             dum = EvalUnWeighted_DecayToVV(yRnd,.false.,EHat,Res,HiggsDK_Mom(1:4,6:9),HiggsDK_IDUP(1:9),HiggsDK_ICOLUP)
+             DecayWeight = EvalUnWeighted_DecayToVV(yRnd,.false.,EHat,Res,HiggsDK_Mom(1:4,6:9),HiggsDK_IDUP(1:9),HiggsDK_ICOLUP)
          enddo
+
      else
          do tries=1,VegasNc0
              call random_number(yRnd)
-             dum = EvalUnWeighted_DecayToTauTau(yRnd,.false.,EHat,Res,HiggsDK_Mom(1:4,4:13),HiggsDK_IDUP(1:13),HiggsDK_ICOLUP(1:2,1:13))
+             DecayWeight = EvalUnWeighted_DecayToTauTau(yRnd,.false.,EHat,Res,HiggsDK_Mom(1:4,4:13),HiggsDK_IDUP(1:13),HiggsDK_ICOLUP(1:2,1:13))
          enddo      
      endif
      csmax(0,0)   = 1.5d0*csmax(0,0)    !  savety buffer
@@ -1722,11 +1733,16 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                   LeptInEvent( LeptInEvent(0) ) = LHE_IDUP(nline)
             endif
          enddo
+            
          
 !         accept/reject sampling for H->VV decay contribution
           EHat = pH2sq
           DecayWeight = 0d0
           if( TauDecays.lt.0 ) then
+          
+                DecayWidth = GetMZZProbability(EHat,PMZZcalls)!  could also be used to determine csmax for this particular event to improve efficiency (-->future work)
+                WeightScaleAqedAqcd(1) = WeightScaleAqedAqcd(1) *   DecayWidth/DecayWidth0
+                
                 do tries=1,5000000
                     call random_number(yRnd)
                     DecayWeight = EvalUnWeighted_DecayToVV(yRnd,.true.,EHat,Res,HiggsDK_Mom(1:4,6:9),HiggsDK_IDUP(1:9),HiggsDK_ICOLUP(1:2,1:9))
@@ -1739,11 +1755,10 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                     if( Res.ne.0d0 ) exit
                 enddo
           endif          
-          if( Res.gt.0d0 ) then ! decay event was accepted
           
-             !   multiply input weight with Higgs decay weight (assuming that H-propagator is already taken care of in input LHE's
-             WeightScaleAqedAqcd(1) = WeightScaleAqedAqcd(1) *  DecayWeight/csmax(0,0)!    normalize to max. weight
+          if( Res.eq.0d0 ) WeightScaleAqedAqcd(1) = 0d0! events that were not accepted after 50 Mio. tries are assigned weight zero
           
+!           if( Res.gt.0d0 ) then ! decay event was accepted
              if( TauDecays.lt.0 ) then!  H->VV->4f
                 call boost(HiggsDK_Mom(1:4,6),MomHiggs(1:4),pH2sq)
                 call boost(HiggsDK_Mom(1:4,7),MomHiggs(1:4),pH2sq)
@@ -1797,10 +1812,13 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                   write(io_LogFile,*) NEvent," events accepted (",time_int-time_start, ") seconds"
              endif
 
-          elseif( Res.eq.0d0 ) then ! decay event was not accepted after ncall evaluations, read next production event
-             print *, "Rejected event after ",tries-1," evaluations"
-             AlertCounter = AlertCounter + 1 
-          endif
+!           elseif( Res.eq.0d0 ) then ! decay event was not accepted after ncall evaluations, read next production event
+!              print *, "Rejected event after ",tries-1," evaluations"
+!              AlertCounter = AlertCounter + 1 
+!           endif
+
+
+
 
 !        read optional lines
          FirstEvent = .true.
@@ -2399,8 +2417,66 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
 99   continue
      call cpu_time(time_end)
 
-return
+RETURN
 END SUBROUTINE
+
+
+
+
+
+SUBROUTINE GetMZZdistribution()
+use ModCrossSection
+use ModParameters
+implicit none
+real(8) :: DecayWeight,DecayWidth,DecayWidth0
+real(8) :: Ehat,GetMZZProbability
+integer :: nscan
+integer,parameter :: nmax=20, Ncalls=200000
+real(8),parameter :: ScanRange=120d0*GeV
+
+
+
+  DecayWidth0 = GetMZZProbability(M_Reso,Ncalls)
+  
+  do nscan=-nmax,+nmax,1
+     
+     EHat = M_Reso+ScanRange*nscan/dble(nmax)
+     DecayWidth = GetMZZProbability(EHat)
+     write(*,"(1F10.5,1PE16.9)") EHat*100d0,DecayWidth/DecayWidth0
+     
+  enddo
+
+RETURN
+END SUBROUTINE
+
+
+
+
+
+
+FUNCTION GetMZZProbability(EHat,Ncalls)
+use ModCrossSection
+use ModParameters
+implicit none
+real(8) :: DecayWeight,yRnd(1:22),Res,GetMZZProbability
+real(8) :: HiggsDK_Mom(1:4,1:13),Ehat
+integer :: HiggsDK_IDUP(1:13),HiggsDK_ICOLUP(1:2,1:13)
+integer :: evals,Ncalls
+integer,parameter :: nmax=20
+real(8),parameter :: ScanRange=120d0*GeV
+
+
+     GetMZZProbability = 0d0     
+     do evals=1,Ncalls
+         call random_number(yRnd)
+         DecayWeight = EvalUnWeighted_DecayToVV(yRnd,.false.,EHat,Res,HiggsDK_Mom(1:4,6:9),HiggsDK_IDUP(1:9),HiggsDK_ICOLUP)
+         GetMZZProbability = GetMZZProbability + DecayWeight
+     enddo
+     GetMZZProbability = GetMZZProbability/dble(evals)
+    
+
+RETURN
+END FUNCTION
 
 
 
