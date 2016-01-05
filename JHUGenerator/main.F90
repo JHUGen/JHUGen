@@ -24,7 +24,7 @@ real(8) :: VG_Result,VG_Error
    call WriteParameters(io_stdout)
    call WriteParameters(io_LogFile)
    if ( .not. ReadLHEFile .and. .not. ConvertLHEFile .and. .not.((Process.eq.60 .or. Process.eq.61) .and. unweighted) ) then
-      call InitOutput(-1d0, -1d0)   !for VBF/HJJ the cross section is calculated, so use that in the <init> block
+      call InitOutput(1d0, 1d14)   !for VBF/HJJ the cross section is calculated, so use that in the <init> block
    endif
    write(io_stdout,*) " Running"
    if( ConvertLHEFile ) then
@@ -1524,17 +1524,17 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
      do while ( .not.FirstEvent )
         read(16,fmt="(A160)",IOSTAT=stat,END=99) FirstLines
         if ( FirstLines(1:4).eq."<!--" .and. .not.WroteHeader ) then
-            call InitOutput(-1d0, -1d0)
+            call InitOutput(1d0, 1d14)
             WroteHeader = .true.
         endif
         if (index(FirstLines,"<MG").ne.0 .and. .not.WroteHeader) then  !Sometimes MadGraph doesn't have a comment at the beginning
-            call InitOutput(-1d0, -1d0)                                !In that case put the JHUGen header before the MadGraph
+            call InitOutput(1d0, 1d14)                                 !In that case put the JHUGen header before the MadGraph
             write(io_LHEOutFile, "(A)") "-->"                          ! proc card, etc.
             WroteHeader = .true.                                       !and put the Higgs mass/width in a separate comment
             ClosedHeader = .true.                                      !before <init>
         endif
         if (Index(FirstLines,"<init>").ne.0 .and. .not.WroteHeader ) then !If not now, when?
-            call InitOutput(-1d0, -1d0)
+            call InitOutput(1d0, 1d14)
             WroteHeader = .true.
         endif
 
@@ -1913,17 +1913,17 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
      do while ( .not.FirstEvent )
         read(16,fmt="(A160)",IOSTAT=stat,END=99) FirstLines
         if ( FirstLines(1:4).eq."<!--" .and. .not.WroteHeader ) then
-            call InitOutput(-1d0, -1d0)
+            call InitOutput(1d0, 1d14)
             WroteHeader = .true.
         endif
         if (index(FirstLines,"<MG").ne.0 .and. .not.WroteHeader) then  !Sometimes MadGraph doesn't have a comment at the beginning
-            call InitOutput(-1d0, -1d0)                                !In that case put the JHUGen header before the MadGraph
+            call InitOutput(1d0, 1d14)                                 !In that case put the JHUGen header before the MadGraph
             write(io_LHEOutFile, "(A)") "-->"                          ! proc card, etc.
             WroteHeader = .true.                                       !and put the Higgs mass/width in a separate comment
             ClosedHeader = .true.                                      !before <init>
         endif
         if (Index(FirstLines,"<init>").ne.0 .and. .not.WroteHeader ) then !If not now, when?
-            call InitOutput(-1d0, -1d0)
+            call InitOutput(1d0, 1d14)
             WroteHeader = .true.
         endif
 
