@@ -701,7 +701,7 @@
     else   
       xxx1 = ghg2+ghg3/4d0/Lambda**2*MG**2
       xxx3 = -2d0*ghg4
-      yyy1 = ghzgs1_dyn                             &
+      yyy1 = ghzgs1_dyn*M_V**2/MG**2                &
            + ghzgs2_dyn*(MG**2-MZ3**2-MZ4**2)/MG**2 &  
            + ghzgs3_dyn/Lambda**2*(MG**2-MZ3**2-MZ4**2)*(MG**2-MZ4**2-MZ3**2)/4d0/MG**2
       yyy2 = -2d0*ghzgs2_dyn-ghzgs3_dyn/2d0/Lambda**2*(MG**2-MZ3**2-MZ4**2)
@@ -1363,7 +1363,7 @@
             yyy2 = -2*ahz1*MG**2/(MG**2-MZ3**2)
             yyy3 = ahz3
           else
-            yyy1 = ghzgs1_dyn                            &
+            yyy1 = ghzgs1_dyn*M_V**2/MG**2               &
                 + ghzgs2_dyn*(MG**2-MZ3**2-MZ4**2)/MG**2 &
                 + ghzgs3_dyn/Lambda**2*(MG**2-MZ3**2-MZ4**2)*(MG**2-MZ4**2-MZ3**2)/4d0/MG**2
             yyy2 = (-2d0*ghzgs2_dyn-ghzgs3_dyn/2d0/Lambda**2*(MG**2-MZ3**2-MZ4**2) )

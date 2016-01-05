@@ -5258,19 +5258,13 @@ subroutine EvalAlphaS()
    REAL(DP) :: Q
       Q = Mu_Ren/GeV
       alphas=alphasPDF(Q)
-
-      ! Calculate the derived couplings
-      call ComputeQCDVariables()
-   RETURN
-end subroutine EvalAlphaS
 #else
 !     Evaluation of strong coupling constant alphas
-!     Author: R.K. Ellis
+!     Original Author: R.K. Ellis
 !     q -- Scale at which alpha_s is to be evaluated
 !     alphas_mz -- ModParameters value of alpha_s at the mass of the Z-boson
 !     nloops_pdf -- ModParameters value of the number of loops (1,2, or 3) at which the beta function is evaluated to determine running.
-!     The values of the cmass and the bmass are set in main.F90.
-   REAL(DP) :: T
+!     If you somehow need a more complete implementation, check everything at or before commit 28472c5bfee128dde458fd4929b4d3ece9519ab8
    INTEGER, PARAMETER :: NF6=6
    INTEGER, PARAMETER :: NF5=5
    INTEGER, PARAMETER :: NF4=4
@@ -5282,123 +5276,23 @@ end subroutine EvalAlphaS
          WRITE(6,*) 'ModKinematics::EvalAlphaS: Mu_Ren .le. 0, Mu_Ren (GeV) = ',(Mu_Ren*GeV)
          stop
       ENDIF
-      IF (nQflavors_pdf .GE. NF6 .OR. nQflavors_pdf.EQ.NF2 .OR. nQflavors_pdf.EQ.NF1) THEN 
+      IF (nQflavors_pdf .NE. NF5) THEN 
          WRITE(6,*) 'ModKinematics::EvalAlphaS: nQflavors_pdf invalid, nQflavors_pdf = ',nQflavors_pdf
+         WRITE(6,*) 'ModKinematics::EvalAlphaS: Check 28472c5bfee128dde458fd4929b4d3ece9519ab8'
+         stop
+      ENDIF
+      IF (nloops_pdf .NE. 1) THEN 
+         WRITE(6,*) 'ModKinematics::EvalAlphaS: nloops_pdf invalid, nloops_pdf = ',nloops_pdf
+         WRITE(6,*) 'ModKinematics::EvalAlphaS: Check 28472c5bfee128dde458fd4929b4d3ece9519ab8'
          stop
       ENDIF
 
-      if(nQflavors_pdf .EQ. NF5) then
-         T=2D0*DLOG(Mu_Ren/zmass_pdf)
-         CALL NEWTONPDF(T,alphas_mz,alphas,NF5)
-         GO TO 105
-      elseif(nQflavors_pdf .EQ. NF4) then
-         T=2D0*DLOG(Mu_Ren/bmass_pdf)
-         CALL NEWTONPDF(T,alphas_mb,alphas,NF4)
-         GO TO 105
-      elseif(nQflavors_pdf .EQ. NF3) then
-         T=2D0*DLOG(Mu_Ren/cmass_pdf)
-         CALL NEWTONPDF(T,alphas_mc,alphas,NF3)
-         GO TO 105
-      elseif(nQflavors_pdf .LT. 0) then
-!--- 3-flavour running only
-         if     (cmass_pdf .ge. 999d0*GeV) then
-            T=2D0*DLOG(Mu_Ren/zmass_pdf)
-            CALL NEWTONPDF(T,alphas_mz,alphas,NF3)
-            GO TO 105
-!--- 4-flavour running only
-         elseif (bmass_pdf .ge. 999d0*GeV) then
-            T=2D0*DLOG(Mu_Ren/zmass_pdf)
-            CALL NEWTONPDF(T,alphas_mz,alphas,NF4)
-            GO TO 105
-         endif
-!--- evaluate strong coupling at scale q
-         if (Mu_Ren .lt. bmass_pdf) then
-            if (Mu_Ren .lt. cmass_pdf) then
-               T=2D0*DLOG(Mu_Ren/cmass_pdf)
-               CALL NEWTONPDF(T,alphas_mc,alphas,NF3)
-            else
-               T=2D0*DLOG(Mu_Ren/bmass_pdf)
-               CALL NEWTONPDF(T,alphas_mb,alphas,NF4)
-            endif
-         else
-            T=2D0*DLOG(Mu_Ren/zmass_pdf)
-            CALL NEWTONPDF(T,alphas_mz,alphas,NF5)
-         endif
-      ENDIF
-
-105   continue
+      alphas=alphas_mz/(1_dp+alphas_mz*B0_PDF(NF5)*2_dp*log((Mu_Ren/zmass_pdf)))
+#endif
       ! Calculate the derived couplings
       call ComputeQCDVariables()
    RETURN
 end subroutine EvalAlphaS
-
-function F2_PDF(AS,NF)
-use ModParameters
-implicit none
-real(dp), intent(in) :: AS
-integer, intent(in) :: NF
-real(dp) :: F2_PDF
-   F2_PDF=1D0/AS+C1_PDF(NF)*LOG((C1_PDF(NF)*AS)/(1D0+C1_PDF(NF)*AS))
-end function F2_PDF
-
-function F3_PDF(AS,NF)
-use ModParameters
-implicit none
-real(dp), intent(in) :: AS
-integer, intent(in) :: NF
-real(dp) :: F3_PDF
-   F3_PDF=1D0/AS+0.5D0*C1_PDF(NF) &
-         *LOG((C2_PDF(NF)*AS**2)/(1D0+C1_PDF(NF)*AS+C2_PDF(NF)*AS**2)) &
-         -(C1_PDF(NF)**2-2D0*C2_PDF(NF))/DELC_PDF(NF) &
-         *ATAN((2D0*C2_PDF(NF)*AS+C1_PDF(NF))/DELC_PDF(NF))
-end function F3_PDF
-
-SUBROUTINE NEWTONPDF(T,A_IN,A_OUT,NF)
-!     Author: R.K. Ellis
-!---  calculate a_out using nloop beta-function evolution 
-!---  with nf flavours, given starting value as-in
-!---  given as_in and logarithmic separation between 
-!---  input scale and output scale t.
-!---  Evolution is performed using Newton's method,
-!---  with a precision given by tolerance.
-!---  Broken by Ulascan Sarica to be implemented into JHUGen
-   use ModParameters
-   IMPLICIT NONE
-   REAL(DP),INTENT(IN) :: T,A_IN
-   INTEGER, INTENT(IN) :: NF
-   REAL(DP),INTENT(OUT) :: A_OUT
-   REAL(DP) :: AS,F,FP,DELTAAS
-   REAL(DP), PARAMETER :: TOLERANCE=5D-4
-
-      IF ((NF .lt. 0) .or. (NF .gt. 6) .or. ((NF.eq.6) .and. (nloops_pdf.gt.2)) ) then
-          write(6,*) 'ModKinematics::newtonpdf: Unimplemented value of NF,nloops_pdf=',NF,nloops_pdf
-          STOP
-      ENDIF
-
-      F = 0D0
-      FP= 1d0
-      A_OUT=A_IN/(1D0+A_IN*B0_PDF(NF)*T)
-      IF (nloops_pdf .EQ. 1) RETURN
-      A_OUT=A_IN/(1D0+B0_PDF(NF)*A_IN*T+C1_PDF(NF)*A_IN*LOG(1D0+A_IN*B0_PDF(NF)*T))
-      IF (A_OUT .LT. 0D0) A_OUT=0.3D0
- 30   AS=A_OUT
-
-      IF (nloops_pdf .EQ. 2) THEN
-         F=B0_PDF(NF)*T+F2_PDF(A_IN,NF)-F2_PDF(AS,NF)
-         FP=1D0/(AS**2*(1D0+C1_PDF(NF)*AS))
-      ELSEIF (nloops_pdf .EQ. 3) THEN
-         F=B0_PDF(NF)*T+F3_PDF(A_IN,NF)-F3_PDF(AS,NF)
-         FP=1D0/(AS**2*(1D0+C1_PDF(NF)*AS+C2_PDF(NF)*AS**2))
-      ELSE
-         WRITE(6,*) 'ModKinematics::newtonpdf: Unimplemented value of nloops_pdf = ',nloops_pdf
-         stop
-      ENDIF
-      A_OUT=AS-F/FP
-      DELTAAS=ABS(F/FP/AS)
-      IF (DELTAAS .GT. TOLERANCE) GO TO 30
-   RETURN
-END SUBROUTINE NEWTONPDF
-#endif
 
 
 
