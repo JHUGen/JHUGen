@@ -74,7 +74,7 @@ endif
 
 SCALUP=Mu_Fact * 100d0
 AQEDUP=alpha_QED
-AQCDUP=0.11d0
+AQCDUP=alphas
 
 ISTUP(1) = -1
 ISTUP(2) = -1
@@ -413,7 +413,7 @@ character(len=150) :: IndentedFmt0, IndentedFmt1
     else
         SCALUP=Mu_Fact * 100d0
         AQEDUP=alpha_QED
-        AQCDUP=0.11d0
+        AQCDUP=alphas
     endif
     ISTUP(iHiggs) = 2
     if ( IsAPhoton(DecayMode1) .and. IsAPhoton(DecayMode2) ) then! photon+photon FS
@@ -572,7 +572,7 @@ integer, parameter :: inLeft=1, inRight=2, Hig=3, tauP=4, tauM=5, Wp=6, Wm=7,   
     else
         SCALUP=Mu_Fact * 100d0
         AQEDUP=alpha_QED
-        AQCDUP=0.11d0
+        AQCDUP=alphas
     endif
     ISTUP(iHiggs) = 2
     if ( TauDecays.eq.0 ) then
@@ -713,7 +713,7 @@ enddo
 IDPRUP=Process
 SCALUP=Mu_Fact * 100d0
 AQEDUP=alpha_QED
-AQCDUP=0.11d0
+AQCDUP=alphas
 
 ISTUP(1) = -1
 ISTUP(2) = -1
@@ -819,7 +819,7 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
 IDPRUP=Process
 SCALUP=Mu_Fact * 100d0
 AQEDUP=alpha_QED
-AQCDUP=0.11d0
+AQCDUP=alphas
 
 
 MOTHUP(1:2,inTop) = (/0,0/);          ISTUP(inTop) = -1
@@ -905,7 +905,7 @@ integer, parameter :: inLeft=1,inRight=2,Hbos=3,tbar=4,t=5,  bbar=6,Wm=7,lepM=8,
 IDPRUP=Process
 SCALUP=Mu_Fact * 100d0
 AQEDUP=alpha_QED
-AQCDUP=0.11d0
+AQCDUP=alphas
 
 
 
@@ -1025,7 +1025,7 @@ enddo
 IDPRUP=Process
 SCALUP=Mu_Fact * 100d0
 AQEDUP=alpha_QED
-AQCDUP=0.11d0
+AQCDUP=alphas
 
 ISTUP(1:5) = (/-1,-1,1,1,1/)
 
@@ -1126,7 +1126,7 @@ integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9
 IDPRUP=Process
 SCALUP=Mu_Fact * 100d0
 AQEDUP=alpha_QED
-AQCDUP=0.11d0
+AQCDUP=alphas
 
 
 
@@ -1245,7 +1245,7 @@ enddo
 IDPRUP=Process
 SCALUP=Mu_Fact * 100d0
 AQEDUP=alpha_QED
-AQCDUP=0.11d0
+AQCDUP=alphas
 
 ISTUP(1) = -1
 ISTUP(2) = -1
@@ -1381,7 +1381,7 @@ MassDummy = inv_mass*1d2
 IDPRUP=Process
 SCALUP=Mu_Fact * 100d0
 AQEDUP=alpha_QED
-AQCDUP=0.11d0
+AQCDUP=alphas
 
 call getHiggsDecayLength(HiggsDKLength)
 
@@ -3851,218 +3851,6 @@ END SUBROUTINE
 
 
 
-
-
-SUBROUTINE setPDFs(x1,x2,MuFac,pdf)
-use ModParameters
-implicit none
-real(8) :: x1,x2,PDFScale,MuFac
-real(8) :: upv(1:2),dnv(1:2),usea(1:2),dsea(1:2),str(1:2),chm(1:2),bot(1:2),glu(1:2),phot(1:2),sbar(1:2),cbar(1:2),bbar(1:2)
-integer,parameter :: swPDF_u=1, swPDF_d=1, swPDF_c=1, swPDF_s=1, swPDF_b=1, swPDF_g=1
-real(8) :: pdf(-6:6,1:2),NNpdf(1:2,-6:7)
-
-        PDFScale=MuFac*100d0
-        pdf(:,:) = 0d0
-        
-#if useLHAPDF==1
-        call evolvePDF(x1,PDFScale,NNpdf(1,-6:7))
-        call evolvePDF(x2,PDFScale,NNpdf(2,-6:7))
-            NNpdf(1,-6:7) = NNpdf(1,-6:7)/x1
-            NNpdf(2,-6:7) = NNpdf(2,-6:7)/x2
-            
-            pdf(Up_,1)   = NNpdf(1,+2)         * swPDF_u
-            pdf(AUp_,1)  = NNpdf(1,-2)         * swPDF_u
-            pdf(Dn_,1)   = NNpdf(1,+1)         * swPDF_d
-            pdf(ADn_,1)  = NNpdf(1,-1)         * swPDF_d
-            pdf(Chm_,1)  = NNpdf(1,+4)         * swPDF_c
-            pdf(AChm_,1) = NNpdf(1,-4)         * swPDF_c
-            pdf(Str_,1)  = NNpdf(1,+3)         * swPDF_s
-            pdf(AStr_,1) = NNpdf(1,-3)         * swPDF_s
-            pdf(Bot_,1)  = NNpdf(1,+5)         * swPDF_b
-            pdf(ABot_,1) = NNpdf(1,-5)         * swPDF_b
-            pdf(0,1)     = NNpdf(1,+0)         * swPDF_g            
-            
-            pdf(Up_,2)   = NNpdf(2,+2)         * swPDF_u
-            pdf(AUp_,2)  = NNpdf(2,-2)         * swPDF_u
-            pdf(Dn_,2)   = NNpdf(2,+1)         * swPDF_d
-            pdf(ADn_,2)  = NNpdf(2,-1)         * swPDF_d
-            pdf(Chm_,2)  = NNpdf(2,+4)         * swPDF_c
-            pdf(AChm_,2) = NNpdf(2,-4)         * swPDF_c
-            pdf(Str_,2)  = NNpdf(2,+3)         * swPDF_s
-            pdf(AStr_,2) = NNpdf(2,-3)         * swPDF_s
-            pdf(Bot_,2)  = NNpdf(2,+5)         * swPDF_b
-            pdf(ABot_,2) = NNpdf(2,-5)         * swPDF_b
-            pdf(0,2)     = NNpdf(2,+0)         * swPDF_g
-            
-            pdf(:,:) = dabs(pdf(:,:))
-            
-            RETURN
-            
-#else
-        if( PDFSet.eq.1 ) then
-            call cteq6(x1,PDFScale,upv(1),dnv(1),usea(1),dsea(1),str(1),chm(1),bot(1),glu(1))
-            call cteq6(x2,PDFScale,upv(2),dnv(2),usea(2),dsea(2),str(2),chm(2),bot(2),glu(2))
-        elseif( PDFSet.eq.2 ) then
-            call GetAllPDFs("pdfs/mstw2008lo",0,x1,PDFScale,upv(1),dnv(1),usea(1),dsea(1),str(1),sbar(1),chm(1),cbar(1),bot(1),bbar(1),glu(1),phot(1))
-            str(1)= (str(1)+sbar(1))/2d0
-            chm(1)= (chm(1)+cbar(1))/2d0
-            bot(1)= (bot(1)+bbar(1))/2d0
-            upv(1)=upv(1)/x1
-            dnv(1)=dnv(1)/x1
-            usea(1)=usea(1)/x1
-            dsea(1)=dsea(1)/x1
-            str(1)=str(1)/x1
-            chm(1)=chm(1)/x1
-            bot(1)=bot(1)/x1
-            glu(1)=glu(1)/x1
-            phot(1)=phot(1)/x1
-
-            call GetAllPDFs("pdfs/mstw2008lo",0,x2,PDFScale,upv(2),dnv(2),usea(2),dsea(2),str(2),sbar(2),chm(2),cbar(2),bot(2),bbar(2),glu(2),phot(2))
-            str(2)= (str(2)+sbar(2))/2d0
-            chm(2)= (chm(2)+cbar(2))/2d0
-            bot(2)= (bot(2)+bbar(2))/2d0
-            upv(2)=upv(2)/x2
-            dnv(2)=dnv(2)/x2
-            usea(2)=usea(2)/x2
-            dsea(2)=dsea(2)/x2
-            str(2)=str(2)/x2
-            chm(2)=chm(2)/x2
-            bot(2)=bot(2)/x2
-            glu(2)=glu(2)/x2
-            phot(2)=phot(2)/x2
-
-        elseif( PDFSet.ge.201 .and. PDFSet.le.240) then
-            call GetAllPDFs("pdfs/mstw2008lo.90cl",PDFSet-200,x1,PDFScale,upv(1),dnv(1),usea(1),dsea(1),str(1),sbar(1),chm(1),cbar(1),bot(1),bbar(1),glu(1),phot(1))
-            str(1)= (str(1)+sbar(1))/2d0
-            chm(1)= (chm(1)+cbar(1))/2d0
-            bot(1)= (bot(1)+bbar(1))/2d0
-            upv(1)=upv(1)/x1
-            dnv(1)=dnv(1)/x1
-            usea(1)=usea(1)/x1
-            dsea(1)=dsea(1)/x1
-            str(1)=str(1)/x1
-            chm(1)=chm(1)/x1
-            bot(1)=bot(1)/x1
-            glu(1)=glu(1)/x1
-            phot(1)=phot(1)/x1
-
-            call GetAllPDFs("pdfs/mstw2008lo.90cl",PDFSet-200,x2,PDFScale,upv(2),dnv(2),usea(2),dsea(2),str(2),sbar(2),chm(2),cbar(2),bot(2),bbar(2),glu(2),phot(2))
-            str(2)= (str(2)+sbar(2))/2d0
-            chm(2)= (chm(2)+cbar(2))/2d0
-            bot(2)= (bot(2)+bbar(2))/2d0
-            upv(2)=upv(2)/x2
-            dnv(2)=dnv(2)/x2
-            usea(2)=usea(2)/x2
-            dsea(2)=dsea(2)/x2
-            str(2)=str(2)/x2
-            chm(2)=chm(2)/x2
-            bot(2)=bot(2)/x2
-            glu(2)=glu(2)/x2
-            phot(2)=phot(2)/x2
-        elseif( PDFSet.eq.3 ) then
-
-            call NNevolvePDF(x1,PDFScale,NNpdf(1,-6:7))
-            call NNevolvePDF(x2,PDFScale,NNpdf(2,-6:7))
-            NNpdf(1,-6:7) = NNpdf(1,-6:7)/x1
-            NNpdf(2,-6:7) = NNpdf(2,-6:7)/x2
-            
-    !       PROTON CONTENT
-            pdf(Up_,1)   = NNpdf(1,+2)         * swPDF_u
-            pdf(AUp_,1)  = NNpdf(1,-2)         * swPDF_u
-            pdf(Dn_,1)   = NNpdf(1,+1)         * swPDF_d
-            pdf(ADn_,1)  = NNpdf(1,-1)         * swPDF_d
-            pdf(Chm_,1)  = NNpdf(1,+4)         * swPDF_c
-            pdf(AChm_,1) = NNpdf(1,-4)         * swPDF_c
-            pdf(Str_,1)  = NNpdf(1,+3)         * swPDF_s
-            pdf(AStr_,1) = NNpdf(1,-3)         * swPDF_s
-            pdf(Bot_,1)  = NNpdf(1,+5)         * swPDF_b
-            pdf(ABot_,1) = NNpdf(1,-5)         * swPDF_b
-            pdf(0,1)     = NNpdf(1,+0)         * swPDF_g            
-            
-            pdf(Up_,2)   = NNpdf(2,+2)         * swPDF_u
-            pdf(AUp_,2)  = NNpdf(2,-2)         * swPDF_u
-            pdf(Dn_,2)   = NNpdf(2,+1)         * swPDF_d
-            pdf(ADn_,2)  = NNpdf(2,-1)         * swPDF_d
-            pdf(Chm_,2)  = NNpdf(2,+4)         * swPDF_c
-            pdf(AChm_,2) = NNpdf(2,-4)         * swPDF_c
-            pdf(Str_,2)  = NNpdf(2,+3)         * swPDF_s
-            pdf(AStr_,2) = NNpdf(2,-3)         * swPDF_s
-            pdf(Bot_,2)  = NNpdf(2,+5)         * swPDF_b
-            pdf(ABot_,2) = NNpdf(2,-5)         * swPDF_b
-            pdf(0,2)     = NNpdf(2,+0)         * swPDF_g            
-
-            pdf(:,:) = dabs(pdf(:,:))            
-            RETURN
-        else
-            print *, "PDFSet",PDFSet,"not available!"
-            stop
-        endif
-#endif
-        
-IF( COLLIDER.EQ.1 ) THEN
-!       PROTON CONTENT
-        pdf(Up_,1)   = (upv(1) + usea(1))  * swPDF_u
-        pdf(AUp_,1)  = usea(1)             * swPDF_u
-        pdf(Dn_,1)   = (dnv(1) + dsea(1))  * swPDF_d
-        pdf(ADn_,1)  = dsea(1)             * swPDF_d
-        pdf(Chm_,1)  = chm(1)              * swPDF_c
-        pdf(AChm_,1) = chm(1)              * swPDF_c
-        pdf(Str_,1)  = str(1)              * swPDF_s
-        pdf(AStr_,1) = str(1)              * swPDF_s
-        pdf(Bot_,1)  = bot(1)              * swPDF_b
-        pdf(ABot_,1) = bot(1)              * swPDF_b
-        pdf(0,1)     = glu(1)              * swPDF_g
-
-!       PROTON CONTENT
-        pdf(Up_,2)   = (upv(2) + usea(2))  * swPDF_u
-        pdf(AUp_,2)  = usea(2)             * swPDF_u
-        pdf(Dn_,2)   = (dnv(2) + dsea(2))  * swPDF_d
-        pdf(ADn_,2)  = dsea(2)             * swPDF_d
-        pdf(Chm_,2)  = chm(2)              * swPDF_c
-        pdf(AChm_,2) = chm(2)              * swPDF_c
-        pdf(Str_,2)  = str(2)              * swPDF_s
-        pdf(AStr_,2) = str(2)              * swPDF_s
-        pdf(Bot_,2)  = bot(2)              * swPDF_b
-        pdf(ABot_,2) = bot(2)              * swPDF_b
-        pdf(0,2)     = glu(2)              * swPDF_g
-
-ELSEIF( COLLIDER.EQ.2 ) THEN
-!       PROTON CONTENT
-        pdf(Up_,1)   = (upv(1) + usea(1))  * swPDF_u
-        pdf(AUp_,1)  = usea(1)             * swPDF_u
-        pdf(Dn_,1)   = (dnv(1) + dsea(1))  * swPDF_d
-        pdf(ADn_,1)  = dsea(1)             * swPDF_d
-        pdf(Chm_,1)  = chm(1)              * swPDF_c
-        pdf(AChm_,1) = chm(1)              * swPDF_c
-        pdf(Str_,1)  = str(1)              * swPDF_s
-        pdf(AStr_,1) = str(1)              * swPDF_s
-        pdf(Bot_,1)  = bot(1)              * swPDF_b
-        pdf(ABot_,1) = bot(1)              * swPDF_b
-        pdf(0,1)     = glu(1)              * swPDF_g
-
-!       ANTI-PROTON CONTENT
-        pdf(Up_,2)   = usea(2)             * swPDF_u
-        pdf(AUp_,2)  = (upv(2)+usea(2))    * swPDF_u
-        pdf(Dn_,2)   = dsea(2)             * swPDF_d
-        pdf(ADn_,2)  = (dnv(2) + dsea(2))  * swPDF_d
-        pdf(Chm_,2)  = chm(2)              * swPDF_c
-        pdf(AChm_,2) = chm(2)              * swPDF_c
-        pdf(Str_,2)  = str(2)              * swPDF_s
-        pdf(AStr_,2) = str(2)              * swPDF_s
-        pdf(Bot_,2)  = bot(2)              * swPDF_b
-        pdf(ABot_,2) = bot(2)              * swPDF_b
-        pdf(0,2)     = glu(2)              * swPDF_g
-
-ENDIF
-
-pdf(:,:) = dabs(pdf(:,:))
-
-
-RETURN
-END SUBROUTINE
-
-
-
 FUNCTION ReweightBWPropagator(shat)! shat is the resonance inv. mass squared
 use modParameters
 implicit none
@@ -4093,30 +3881,6 @@ real(8) :: BreitWigner,BreitWigner_Run,Ga_shat,muH,gaH
 RETURN
 END FUNCTION
 
-
-
-SUBROUTINE CTEQ6(X,SCALE,UPV,DNV,USEA,DSEA,STR,CHM,BOT,GLU)
-implicit none
-double precision X,SCALE,UPV,DNV,USEA,DSEA,STR,CHM,BOT,GLU
-double precision Q,xsave,qsave,Ctq6Pdf,D,U
-
-         Q=SCALE
-         xsave=X
-         qsave=Q
-         U =         Ctq6Pdf(1,X,Q)
-         D =         Ctq6Pdf(2,X,Q)
-         USEA =      Ctq6Pdf(-1,X,Q)
-         DSEA =      Ctq6Pdf(-2,X,Q)
-         STR =       Ctq6Pdf(3,X,Q)
-         CHM =       Ctq6Pdf(4,X,Q)
-         BOT =       Ctq6Pdf(5,X,Q)
-         GLU  =      Ctq6Pdf(0,X,Q)
-         UPV=U-USEA
-         DNV=D-DSEA
-         X=xsave
-         Q=qsave
-RETURN
-END SUBROUTINE
 
 
 RECURSIVE SUBROUTINE JetAlgo_kt(Rsep_jet,PartonList,MomParton,NJet,JetList,MomJet)  ! initial call must have NJet=0 and MomJet(1:4,:) = MomPartons(1:4,:)
@@ -5014,8 +4778,6 @@ END SUBROUTINE
 
 
 
-
-
 ! Breit-Wigner mass^2
 function bw_sq(x, m, ga, smax, jacobian)
 implicit none
@@ -5111,6 +4873,427 @@ end function bw_sq
       return
       end function KRONECKER_DELTA
 
+
+
+
+
+subroutine SetRunningScales(p,id) ! p in JHU-GeV, id in JHUGen conventions
+use ModParameters
+use ModMisc
+implicit none
+real(dp), intent(in) :: p(1:4,4:6) ! No need to run the second index from 3 to 7: pH, pJ1, pJ2
+integer, intent(in) :: id(4:7) ! id_JJH/id_JJVV, id_J1, id_J2, id_JJ (if applicable)  
+real(8) :: polemass(3:7) ! mJJH, mH, mJ1, mJ2, mJJ (if applicable)
+real(8) :: pJJHstar(4),pHstar(4),pJ(4,2),pJJ(4),pJHstar(4)
+integer idx,ip
+
+   pHstar(:) = 0d0
+   pJJ(:) = 0d0
+   polemass(3) = getMass(id(4)) ! Pole mass of the JJH system
+   polemass(4) = M_Reso
+   do idx=4,6
+      if(idx.eq.4) then
+         do ip=1,4
+            pHstar(ip) = pHstar(ip) + p(ip,idx)
+         enddo
+      else
+         polemass(idx) = getMass(id(idx))
+         do ip=1,4
+            pJJ(ip) = pJJ(ip) + p(ip,idx)
+         enddo
+      endif
+   enddo
+   polemass(7) = getMass(id(7)) ! Pole mass of the JJ system
+
+   pJJHstar = pJJ + pHstar
+   if(polemass(5).lt.polemass(6)) then
+      pJ(:,1)=p(:,5)
+      pJ(:,2)=p(:,6)
+   else
+      pJ(:,1)=p(:,6)
+      pJ(:,2)=p(:,5)
+      call swapr(polemass(5),polemass(6)) ! will use polemass(5) as the greater mass below
+   endif
+   pJHstar(1:4) = pJ(1:4,1) + pHstar(1:4)
+
+   ! Determine the appropriate factorization scale for the chosen scheme from pole and invariant masses
+   if(FacScheme .eq. kRenFacScheme_mhstar) then
+      Mu_Fact = Get_MInv(pHstar(1:4))
+
+   elseif(FacScheme .eq. -kRenFacScheme_mhstar) then
+      Mu_Fact = polemass(4)
+
+   elseif(FacScheme .eq. kRenFacScheme_mjjhstar) then
+      Mu_Fact = Get_MInv(pJJHstar(1:4))
+   elseif(FacScheme .eq. -kRenFacScheme_mjjhstar) then
+      Mu_Fact = polemass(3)
+
+   elseif(FacScheme .eq. kRenFacScheme_mjj_mhstar) then
+      Mu_Fact = Get_MInv(pJJ(1:4))+Get_MInv(pHstar(1:4))
+   elseif(FacScheme .eq. -kRenFacScheme_mjj_mhstar) then
+      Mu_Fact = polemass(4)+polemass(7)
+   elseif(FacScheme .eq. kRenFacScheme_mj_mj_mhstar) then
+      Mu_Fact = Get_MInv(pJ(1:4,1))+Get_MInv(pJ(1:4,2))+Get_MInv(pHstar(1:4))
+   elseif(FacScheme .eq. -kRenFacScheme_mj_mj_mhstar) then
+      Mu_Fact = polemass(4)+polemass(5)+polemass(6)
+
+   elseif(FacScheme .eq. kRenFacScheme_mjj) then
+      Mu_Fact = Get_MInv(pJJ(1:4))
+   elseif(FacScheme .eq. -kRenFacScheme_mjj) then
+      Mu_Fact = polemass(7)
+   elseif(FacScheme .eq. kRenFacScheme_mj_mj) then
+      Mu_Fact = Get_MInv(pJJ(1:4))
+   elseif(FacScheme .eq. -kRenFacScheme_mj_mj) then
+      Mu_Fact = polemass(5)+polemass(6)
+
+   elseif(FacScheme .eq. kRenFacScheme_mjhstar) then
+      Mu_Fact = Get_MInv(pJHstar(1:4))
+   elseif(FacScheme .eq. kRenFacScheme_mj_mhstar) then
+      Mu_Fact = Get_MInv(pJ(1:4,1))+Get_MInv(pHstar(1:4))
+   elseif((FacScheme .eq. -kRenFacScheme_mjhstar) .or. (FacScheme .eq. -kRenFacScheme_mj_mhstar)) then
+      Mu_Fact = polemass(4)+polemass(5)
+   elseif(FacScheme .eq. kRenFacScheme_mj) then
+      Mu_Fact = Get_MInv(pJ(1:4,1))
+   elseif(FacScheme .eq. -kRenFacScheme_mj) then
+      Mu_Fact = polemass(5)
+   endif
+
+   ! Do the same for the renormalization scale
+   if(RenScheme .eq. kRenFacScheme_mhstar) then
+      Mu_Ren = Get_MInv(pHstar(1:4))
+
+   elseif(RenScheme .eq. -kRenFacScheme_mhstar) then
+      Mu_Ren = polemass(4)
+
+   elseif(RenScheme .eq. kRenFacScheme_mjjhstar) then
+      Mu_Ren = Get_MInv(pJJHstar(1:4))
+   elseif(RenScheme .eq. -kRenFacScheme_mjjhstar) then
+      Mu_Ren = polemass(3)
+
+   elseif(RenScheme .eq. kRenFacScheme_mjj_mhstar) then
+      Mu_Ren = Get_MInv(pJJ(1:4))+Get_MInv(pHstar(1:4))
+   elseif(RenScheme .eq. -kRenFacScheme_mjj_mhstar) then
+      Mu_Ren = polemass(4)+polemass(7)
+   elseif(RenScheme .eq. kRenFacScheme_mj_mj_mhstar) then
+      Mu_Ren = Get_MInv(pJ(1:4,1))+Get_MInv(pJ(1:4,2))+Get_MInv(pHstar(1:4))
+   elseif(RenScheme .eq. -kRenFacScheme_mj_mj_mhstar) then
+      Mu_Ren = polemass(4)+polemass(5)+polemass(6)
+
+   elseif(RenScheme .eq. kRenFacScheme_mjj) then
+      Mu_Ren = Get_MInv(pJJ(1:4))
+   elseif(RenScheme .eq. -kRenFacScheme_mjj) then
+      Mu_Ren = polemass(7)
+   elseif(RenScheme .eq. kRenFacScheme_mj_mj) then
+      Mu_Ren = Get_MInv(pJJ(1:4))
+   elseif(RenScheme .eq. -kRenFacScheme_mj_mj) then
+      Mu_Ren = polemass(5)+polemass(6)
+
+   elseif(RenScheme .eq. kRenFacScheme_mjhstar) then
+      Mu_Ren = Get_MInv(pJHstar(1:4))
+   elseif(RenScheme .eq. kRenFacScheme_mj_mhstar) then
+      Mu_Ren = Get_MInv(pJ(1:4,1))+Get_MInv(pHstar(1:4))
+   elseif((RenScheme .eq. -kRenFacScheme_mjhstar) .or. (RenScheme .eq. -kRenFacScheme_mj_mhstar)) then
+      Mu_Ren = polemass(4)+polemass(5)
+   elseif(RenScheme .eq. kRenFacScheme_mj) then
+      Mu_Ren = Get_MInv(pJ(1:4,1))
+   elseif(RenScheme .eq. -kRenFacScheme_mj) then
+      Mu_Ren = polemass(5)
+   endif
+
+   ! Never ever allow the scales to go negative
+   Mu_Fact = abs(Mu_Fact) * MuFacMultiplier
+   Mu_Ren = abs(Mu_Ren) * MuRenMultiplier
+
+return
+end subroutine SetRunningScales
+
+
+
+
+SUBROUTINE setPDFs(x1,x2,pdf)
+use ModParameters
+implicit none
+real(8) :: x1,x2,PDFScale
+real(8) :: upv(1:2),dnv(1:2),usea(1:2),dsea(1:2),str(1:2),chm(1:2),bot(1:2),glu(1:2),phot(1:2),sbar(1:2),cbar(1:2),bbar(1:2)
+integer,parameter :: swPDF_u=1, swPDF_d=1, swPDF_c=1, swPDF_s=1, swPDF_b=1, swPDF_g=1
+real(8) :: pdf(-6:6,1:2),NNpdf(1:2,-6:7)
+
+        PDFScale=Mu_Fact*100d0
+        pdf(:,:) = 0d0
+        
+#if useLHAPDF==1
+        call evolvePDF(x1,PDFScale,NNpdf(1,-6:7))
+        call evolvePDF(x2,PDFScale,NNpdf(2,-6:7))
+            NNpdf(1,-6:7) = NNpdf(1,-6:7)/x1
+            NNpdf(2,-6:7) = NNpdf(2,-6:7)/x2
+            
+            pdf(Up_,1)   = NNpdf(1,+2)         * swPDF_u
+            pdf(AUp_,1)  = NNpdf(1,-2)         * swPDF_u
+            pdf(Dn_,1)   = NNpdf(1,+1)         * swPDF_d
+            pdf(ADn_,1)  = NNpdf(1,-1)         * swPDF_d
+            pdf(Chm_,1)  = NNpdf(1,+4)         * swPDF_c
+            pdf(AChm_,1) = NNpdf(1,-4)         * swPDF_c
+            pdf(Str_,1)  = NNpdf(1,+3)         * swPDF_s
+            pdf(AStr_,1) = NNpdf(1,-3)         * swPDF_s
+            pdf(Bot_,1)  = NNpdf(1,+5)         * swPDF_b
+            pdf(ABot_,1) = NNpdf(1,-5)         * swPDF_b
+            pdf(0,1)     = NNpdf(1,+0)         * swPDF_g            
+            
+            pdf(Up_,2)   = NNpdf(2,+2)         * swPDF_u
+            pdf(AUp_,2)  = NNpdf(2,-2)         * swPDF_u
+            pdf(Dn_,2)   = NNpdf(2,+1)         * swPDF_d
+            pdf(ADn_,2)  = NNpdf(2,-1)         * swPDF_d
+            pdf(Chm_,2)  = NNpdf(2,+4)         * swPDF_c
+            pdf(AChm_,2) = NNpdf(2,-4)         * swPDF_c
+            pdf(Str_,2)  = NNpdf(2,+3)         * swPDF_s
+            pdf(AStr_,2) = NNpdf(2,-3)         * swPDF_s
+            pdf(Bot_,2)  = NNpdf(2,+5)         * swPDF_b
+            pdf(ABot_,2) = NNpdf(2,-5)         * swPDF_b
+            pdf(0,2)     = NNpdf(2,+0)         * swPDF_g
+            
+            pdf(:,:) = dabs(pdf(:,:))
+            
+            RETURN
+            
+#else
+        if( PDFSet.eq.1 ) then
+            call cteq6(x1,PDFScale,upv(1),dnv(1),usea(1),dsea(1),str(1),chm(1),bot(1),glu(1))
+            call cteq6(x2,PDFScale,upv(2),dnv(2),usea(2),dsea(2),str(2),chm(2),bot(2),glu(2))
+        elseif( PDFSet.eq.2 ) then
+            call GetAllPDFs("pdfs/mstw2008lo",0,x1,PDFScale,upv(1),dnv(1),usea(1),dsea(1),str(1),sbar(1),chm(1),cbar(1),bot(1),bbar(1),glu(1),phot(1))
+            str(1)= (str(1)+sbar(1))/2d0
+            chm(1)= (chm(1)+cbar(1))/2d0
+            bot(1)= (bot(1)+bbar(1))/2d0
+            upv(1)=upv(1)/x1
+            dnv(1)=dnv(1)/x1
+            usea(1)=usea(1)/x1
+            dsea(1)=dsea(1)/x1
+            str(1)=str(1)/x1
+            chm(1)=chm(1)/x1
+            bot(1)=bot(1)/x1
+            glu(1)=glu(1)/x1
+            phot(1)=phot(1)/x1
+
+            call GetAllPDFs("pdfs/mstw2008lo",0,x2,PDFScale,upv(2),dnv(2),usea(2),dsea(2),str(2),sbar(2),chm(2),cbar(2),bot(2),bbar(2),glu(2),phot(2))
+            str(2)= (str(2)+sbar(2))/2d0
+            chm(2)= (chm(2)+cbar(2))/2d0
+            bot(2)= (bot(2)+bbar(2))/2d0
+            upv(2)=upv(2)/x2
+            dnv(2)=dnv(2)/x2
+            usea(2)=usea(2)/x2
+            dsea(2)=dsea(2)/x2
+            str(2)=str(2)/x2
+            chm(2)=chm(2)/x2
+            bot(2)=bot(2)/x2
+            glu(2)=glu(2)/x2
+            phot(2)=phot(2)/x2
+
+        elseif( PDFSet.ge.201 .and. PDFSet.le.240) then
+            call GetAllPDFs("pdfs/mstw2008lo.90cl",PDFSet-200,x1,PDFScale,upv(1),dnv(1),usea(1),dsea(1),str(1),sbar(1),chm(1),cbar(1),bot(1),bbar(1),glu(1),phot(1))
+            str(1)= (str(1)+sbar(1))/2d0
+            chm(1)= (chm(1)+cbar(1))/2d0
+            bot(1)= (bot(1)+bbar(1))/2d0
+            upv(1)=upv(1)/x1
+            dnv(1)=dnv(1)/x1
+            usea(1)=usea(1)/x1
+            dsea(1)=dsea(1)/x1
+            str(1)=str(1)/x1
+            chm(1)=chm(1)/x1
+            bot(1)=bot(1)/x1
+            glu(1)=glu(1)/x1
+            phot(1)=phot(1)/x1
+
+            call GetAllPDFs("pdfs/mstw2008lo.90cl",PDFSet-200,x2,PDFScale,upv(2),dnv(2),usea(2),dsea(2),str(2),sbar(2),chm(2),cbar(2),bot(2),bbar(2),glu(2),phot(2))
+            str(2)= (str(2)+sbar(2))/2d0
+            chm(2)= (chm(2)+cbar(2))/2d0
+            bot(2)= (bot(2)+bbar(2))/2d0
+            upv(2)=upv(2)/x2
+            dnv(2)=dnv(2)/x2
+            usea(2)=usea(2)/x2
+            dsea(2)=dsea(2)/x2
+            str(2)=str(2)/x2
+            chm(2)=chm(2)/x2
+            bot(2)=bot(2)/x2
+            glu(2)=glu(2)/x2
+            phot(2)=phot(2)/x2
+        elseif( PDFSet.eq.3 ) then
+
+            call NNevolvePDF(x1,PDFScale,NNpdf(1,-6:7))
+            call NNevolvePDF(x2,PDFScale,NNpdf(2,-6:7))
+            NNpdf(1,-6:7) = NNpdf(1,-6:7)/x1
+            NNpdf(2,-6:7) = NNpdf(2,-6:7)/x2
+            
+    !       PROTON CONTENT
+            pdf(Up_,1)   = NNpdf(1,+2)         * swPDF_u
+            pdf(AUp_,1)  = NNpdf(1,-2)         * swPDF_u
+            pdf(Dn_,1)   = NNpdf(1,+1)         * swPDF_d
+            pdf(ADn_,1)  = NNpdf(1,-1)         * swPDF_d
+            pdf(Chm_,1)  = NNpdf(1,+4)         * swPDF_c
+            pdf(AChm_,1) = NNpdf(1,-4)         * swPDF_c
+            pdf(Str_,1)  = NNpdf(1,+3)         * swPDF_s
+            pdf(AStr_,1) = NNpdf(1,-3)         * swPDF_s
+            pdf(Bot_,1)  = NNpdf(1,+5)         * swPDF_b
+            pdf(ABot_,1) = NNpdf(1,-5)         * swPDF_b
+            pdf(0,1)     = NNpdf(1,+0)         * swPDF_g            
+            
+            pdf(Up_,2)   = NNpdf(2,+2)         * swPDF_u
+            pdf(AUp_,2)  = NNpdf(2,-2)         * swPDF_u
+            pdf(Dn_,2)   = NNpdf(2,+1)         * swPDF_d
+            pdf(ADn_,2)  = NNpdf(2,-1)         * swPDF_d
+            pdf(Chm_,2)  = NNpdf(2,+4)         * swPDF_c
+            pdf(AChm_,2) = NNpdf(2,-4)         * swPDF_c
+            pdf(Str_,2)  = NNpdf(2,+3)         * swPDF_s
+            pdf(AStr_,2) = NNpdf(2,-3)         * swPDF_s
+            pdf(Bot_,2)  = NNpdf(2,+5)         * swPDF_b
+            pdf(ABot_,2) = NNpdf(2,-5)         * swPDF_b
+            pdf(0,2)     = NNpdf(2,+0)         * swPDF_g            
+
+            pdf(:,:) = dabs(pdf(:,:))            
+            RETURN
+        else
+            print *, "PDFSet",PDFSet,"not available!"
+            stop
+        endif
+#endif
+        
+IF( COLLIDER.EQ.1 ) THEN
+!       PROTON CONTENT
+        pdf(Up_,1)   = (upv(1) + usea(1))  * swPDF_u
+        pdf(AUp_,1)  = usea(1)             * swPDF_u
+        pdf(Dn_,1)   = (dnv(1) + dsea(1))  * swPDF_d
+        pdf(ADn_,1)  = dsea(1)             * swPDF_d
+        pdf(Chm_,1)  = chm(1)              * swPDF_c
+        pdf(AChm_,1) = chm(1)              * swPDF_c
+        pdf(Str_,1)  = str(1)              * swPDF_s
+        pdf(AStr_,1) = str(1)              * swPDF_s
+        pdf(Bot_,1)  = bot(1)              * swPDF_b
+        pdf(ABot_,1) = bot(1)              * swPDF_b
+        pdf(0,1)     = glu(1)              * swPDF_g
+
+!       PROTON CONTENT
+        pdf(Up_,2)   = (upv(2) + usea(2))  * swPDF_u
+        pdf(AUp_,2)  = usea(2)             * swPDF_u
+        pdf(Dn_,2)   = (dnv(2) + dsea(2))  * swPDF_d
+        pdf(ADn_,2)  = dsea(2)             * swPDF_d
+        pdf(Chm_,2)  = chm(2)              * swPDF_c
+        pdf(AChm_,2) = chm(2)              * swPDF_c
+        pdf(Str_,2)  = str(2)              * swPDF_s
+        pdf(AStr_,2) = str(2)              * swPDF_s
+        pdf(Bot_,2)  = bot(2)              * swPDF_b
+        pdf(ABot_,2) = bot(2)              * swPDF_b
+        pdf(0,2)     = glu(2)              * swPDF_g
+
+ELSEIF( COLLIDER.EQ.2 ) THEN
+!       PROTON CONTENT
+        pdf(Up_,1)   = (upv(1) + usea(1))  * swPDF_u
+        pdf(AUp_,1)  = usea(1)             * swPDF_u
+        pdf(Dn_,1)   = (dnv(1) + dsea(1))  * swPDF_d
+        pdf(ADn_,1)  = dsea(1)             * swPDF_d
+        pdf(Chm_,1)  = chm(1)              * swPDF_c
+        pdf(AChm_,1) = chm(1)              * swPDF_c
+        pdf(Str_,1)  = str(1)              * swPDF_s
+        pdf(AStr_,1) = str(1)              * swPDF_s
+        pdf(Bot_,1)  = bot(1)              * swPDF_b
+        pdf(ABot_,1) = bot(1)              * swPDF_b
+        pdf(0,1)     = glu(1)              * swPDF_g
+
+!       ANTI-PROTON CONTENT
+        pdf(Up_,2)   = usea(2)             * swPDF_u
+        pdf(AUp_,2)  = (upv(2)+usea(2))    * swPDF_u
+        pdf(Dn_,2)   = dsea(2)             * swPDF_d
+        pdf(ADn_,2)  = (dnv(2) + dsea(2))  * swPDF_d
+        pdf(Chm_,2)  = chm(2)              * swPDF_c
+        pdf(AChm_,2) = chm(2)              * swPDF_c
+        pdf(Str_,2)  = str(2)              * swPDF_s
+        pdf(AStr_,2) = str(2)              * swPDF_s
+        pdf(Bot_,2)  = bot(2)              * swPDF_b
+        pdf(ABot_,2) = bot(2)              * swPDF_b
+        pdf(0,2)     = glu(2)              * swPDF_g
+
+ENDIF
+
+pdf(:,:) = dabs(pdf(:,:))
+
+
+RETURN
+END SUBROUTINE
+
+
+
+
+SUBROUTINE CTEQ6(X,SCALE,UPV,DNV,USEA,DSEA,STR,CHM,BOT,GLU)
+implicit none
+double precision X,SCALE,UPV,DNV,USEA,DSEA,STR,CHM,BOT,GLU
+double precision Q,xsave,qsave,Ctq6Pdf,D,U
+
+         Q=SCALE
+         xsave=X
+         qsave=Q
+         U =         Ctq6Pdf(1,X,Q)
+         D =         Ctq6Pdf(2,X,Q)
+         USEA =      Ctq6Pdf(-1,X,Q)
+         DSEA =      Ctq6Pdf(-2,X,Q)
+         STR =       Ctq6Pdf(3,X,Q)
+         CHM =       Ctq6Pdf(4,X,Q)
+         BOT =       Ctq6Pdf(5,X,Q)
+         GLU  =      Ctq6Pdf(0,X,Q)
+         UPV=U-USEA
+         DNV=D-DSEA
+         X=xsave
+         Q=qsave
+RETURN
+END SUBROUTINE
+
+
+
+
+
+! QCD scale from MCFM
+! Implementation into JHUGen by Ulascan Sarica, Dec. 2015
+subroutine EvalAlphaS()
+   use ModParameters
+   IMPLICIT NONE
+#if useLHAPDF==1
+!--- This is simply a wrapper to the LHAPDF implementation of the running coupling alphas, in the style of the native MCFM routine
+   DOUBLE PRECISION alphasPDF
+   REAL(DP) :: Q
+      Q = Mu_Ren/GeV
+      alphas=alphasPDF(Q)
+#else
+!     Evaluation of strong coupling constant alphas
+!     Original Author: R.K. Ellis
+!     q -- Scale at which alpha_s is to be evaluated
+!     alphas_mz -- ModParameters value of alpha_s at the mass of the Z-boson
+!     nloops_pdf -- ModParameters value of the number of loops (1,2, or 3) at which the beta function is evaluated to determine running.
+!     If you somehow need a more complete implementation, check everything at or before commit 28472c5bfee128dde458fd4929b4d3ece9519ab8
+   INTEGER, PARAMETER :: NF6=6
+   INTEGER, PARAMETER :: NF5=5
+   INTEGER, PARAMETER :: NF4=4
+   INTEGER, PARAMETER :: NF3=3
+   INTEGER, PARAMETER :: NF2=2
+   INTEGER, PARAMETER :: NF1=1
+   
+      IF (Mu_Ren .LE. 0d0) THEN 
+         WRITE(6,*) 'ModKinematics::EvalAlphaS: Mu_Ren .le. 0, Mu_Ren (GeV) = ',(Mu_Ren*GeV)
+         stop
+      ENDIF
+      IF (nQflavors_pdf .NE. NF5) THEN 
+         WRITE(6,*) 'ModKinematics::EvalAlphaS: nQflavors_pdf invalid, nQflavors_pdf = ',nQflavors_pdf
+         WRITE(6,*) 'ModKinematics::EvalAlphaS: Check 28472c5bfee128dde458fd4929b4d3ece9519ab8'
+         stop
+      ENDIF
+      IF (nloops_pdf .NE. 1) THEN 
+         WRITE(6,*) 'ModKinematics::EvalAlphaS: nloops_pdf invalid, nloops_pdf = ',nloops_pdf
+         WRITE(6,*) 'ModKinematics::EvalAlphaS: Check 28472c5bfee128dde458fd4929b4d3ece9519ab8'
+         stop
+      ENDIF
+
+      alphas=alphas_mz/(1_dp+alphas_mz*B0_PDF(NF5)*2_dp*log((Mu_Ren/zmass_pdf)))
+#endif
+      ! Calculate the derived couplings
+      call ComputeQCDVariables()
+   RETURN
+end subroutine EvalAlphaS
 
 
 

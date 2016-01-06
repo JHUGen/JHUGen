@@ -12,6 +12,7 @@ implicit none
 real(8) :: VG_Result,VG_Error
 
    call GetCommandlineArgs()
+   call InitProcessScaleSchemes()
    call InitPDFs()!  
    call InitHisto()
    call InitParameters()
@@ -50,6 +51,170 @@ real(8) :: VG_Result,VG_Error
 END PROGRAM
 
 
+! !       Scheme=kRenFacScheme_default: Defaults of each process with Mu_Fact==Mu_Ren
+! !       Scheme=+-kRenFacScheme_mhstar: Scale ~ m_Hstar (or m_VV in bkg.); + for running, - for fixed
+! !       Below, J stands for the particles immediately associated to the Higgs (e.g. ttH, VH, VBF, tqH)
+! !       Scheme=+-kRenFacScheme_mjjhstar: Scale ~ m_JJHstar (or m_JJVV in bkg.); + for running, - for fixed
+! !       Scheme=+-kRenFacScheme_mjj_mhstar: Scale ~ m_JJ + m_Hstar (or m_JJ+m_VV in bkg.); + for running, - for fixed
+! !       Scheme=+-kRenFacScheme_mj_mj_mhstar: Scale ~ m_J + m_J + m_Hstar (or m_J+m_J+m_VV in bkg.); + for running, - for fixed
+! !       Scheme=+-kRenFacScheme_mjj: Scale ~ m_JJ; + for running, - for fixed
+! !       Scheme=+-kRenFacScheme_mj_mj: Scale ~ m_J + m_J; + for running, - for fixed
+! !       Below, J stands for either the top in JJ associated production (e.g. tqH), or the single jet (Hj)
+! !       Scheme=+-kRenFacScheme_mjhstar: Scale ~ m_JHstar (or m_JVV in bkg.); + for running, - for fixed
+! !       Scheme=+-kRenFacScheme_mj_mhstar: Scale ~ m_J + m_Hstar (or m_J+m_VV in bkg.); + for running, - for fixed
+! !       Scheme=+-kRenFacScheme_mj: Scale ~ m_J for the heavy jet (ie. t or b); + for running, - for fixed
+subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to the appropriate numbers
+   use ModParameters
+   use ModMisc
+   implicit none
+
+      if( .not.                 &
+         (                      &
+            Process.eq. 0 .or.  &
+            Process.eq. 1 .or.  &
+            Process.eq. 2 .or.  &
+            Process.eq.50 .or.  &
+            Process.eq.60 .or.  &
+            Process.eq.61 .or.  &
+            Process.eq.62 .or.  &
+            Process.eq.66 .or.  &
+            Process.eq.80 .or.  &
+            Process.eq.90 .or.  &
+            Process.eq.110 .or. &
+            Process.eq.111 .or. &
+            Process.eq.112 .or. &
+            Process.eq.113      &
+         )                      &
+      ) call Error("main::InitProcessScaleSchemes: Renormalization and factorization schemes are not implemented for process",Process)
+
+      if(FacScheme.eq.kRenFacScheme_default) then
+         if( &
+         Process.eq. 0 .or. & !- ggH spin-0
+         Process.eq. 1 .or. & !- ggH spin-1
+         Process.eq. 2      & !- ggH spin-2
+         ) then
+            FacScheme = +kRenFacScheme_mhstar
+            MuFacMultiplier = 0.5d0
+         elseif( &
+         Process.eq.60 .or. & !- HVBF without decays
+         Process.eq.61 .or. & !- Hjj, gluon fusion
+         Process.eq.62 .or. & !- Hj, gluon fusion
+         Process.eq.50 & !- VHiggs
+         ) then
+            FacScheme = -kRenFacScheme_mhstar
+            MuFacMultiplier = 1d0
+         elseif( &
+         Process.eq.66      & !- HVBF with decays
+         ) then
+            FacScheme = +kRenFacScheme_mhstar
+            MuFacMultiplier = 1d0
+         elseif( &
+         Process.eq.80 .or. & !- ttbar+H
+         Process.eq.90      & !- bbbar+H
+         ) then
+            FacScheme = -kRenFacScheme_mj_mj_mhstar
+            MuFacMultiplier = 0.5d0
+         elseif( &
+         Process.eq.110 .or. & !- t+H
+         Process.eq.111 .or. & !- tb+H
+         Process.eq.112 .or. & !- t+H s-channel
+         Process.eq.113      & !- tb+H s-channel
+         ) then
+            FacScheme = -kRenFacScheme_mj_mhstar
+            MuFacMultiplier = 0.25d0
+         endif
+      endif
+
+      if(RenScheme.eq.kRenFacScheme_default) then
+         if( &
+         Process.eq. 0 .or. & !- ggH spin-0
+         Process.eq. 1 .or. & !- ggH spin-1
+         Process.eq. 2      & !- ggH spin-2
+         ) then
+            RenScheme = +kRenFacScheme_mhstar
+            MuRenMultiplier = 0.5d0
+         elseif( &
+         Process.eq.60 .or. & !- HVBF without decays
+         Process.eq.61 .or. & !- Hjj, gluon fusion
+         Process.eq.62 .or. & !- Hj, gluon fusion
+         Process.eq.50 & !- VHiggs
+         ) then
+            RenScheme = -kRenFacScheme_mhstar
+            MuRenMultiplier = 1d0
+         elseif( &
+         Process.eq.66     & !- HVBF with decays
+         ) then
+            RenScheme = +kRenFacScheme_mhstar
+            MuRenMultiplier = 1d0
+         elseif( &
+         Process.eq.80 .or. & !- ttbar+H
+         Process.eq.90      & !- bbbar+H
+         ) then
+            RenScheme = -kRenFacScheme_mj_mj_mhstar
+            MuRenMultiplier = 0.5d0
+         elseif( &
+         Process.eq.110 .or. & !- t+H
+         Process.eq.111 .or. & !- tb+H
+         Process.eq.112 .or. & !- t+H s-channel
+         Process.eq.113      & !- tb+H s-channel
+         ) then
+            RenScheme = -kRenFacScheme_mj_mhstar
+            MuRenMultiplier = 0.25d0
+         endif
+      endif
+
+      ! H+2j MEs
+      if( &
+         (                     &
+            Process.eq.50 .or. &
+            Process.eq.60 .or. &
+            Process.eq.61 .or. &
+            Process.eq.66 .or. &
+            Process.eq.80 .or. &
+            Process.eq.90      &
+         ) .and. (             &
+            (abs(FacScheme).eq.kRenFacScheme_mjhstar) .or. (abs(FacScheme).eq.kRenFacScheme_mj_mhstar) .or. (abs(FacScheme).eq.kRenFacScheme_mj) .or. &
+            (abs(RenScheme).eq.kRenFacScheme_mjhstar) .or. (abs(RenScheme).eq.kRenFacScheme_mj_mhstar) .or. (abs(RenScheme).eq.kRenFacScheme_mj)      &
+         )                     &
+      ) call Error("ttH, bbH, HJJ, VBF and VH processes cannot distinguish the outgoing partons. Choose a different renormalization or factorization scheme.")
+
+      if( &
+         (                     &
+            Process.eq.50 .or. &
+            Process.eq.60 .or. &
+            Process.eq.61 .or. &
+            Process.eq.66      &
+         ) .and. (             &
+            (abs(FacScheme).eq.kRenFacScheme_mj_mj_mhstar) .or. (abs(FacScheme).eq.kRenFacScheme_mj_mj) .or. &
+            (abs(RenScheme).eq.kRenFacScheme_mj_mj_mhstar) .or. (abs(RenScheme).eq.kRenFacScheme_mj_mj)      &
+         )                     &
+      ) call Error("HJJ, VBF and VH processes outgoing partons are mostly massless, and alpha_S at a scale ~0 GeV is very unstable. Choose a different renormalization or factorization scheme (e.g. kRenFacScheme_mhstar).")
+
+      ! H+1j Me
+      if( &
+         (                     &
+            Process.eq.62      &
+         ) .and. (             &
+            (FacScheme.eq.-kRenFacScheme_mjhstar) .or. (FacScheme.eq.-kRenFacScheme_mj_mhstar) .or. (abs(FacScheme).eq.kRenFacScheme_mj) .or. &
+            (RenScheme.eq.-kRenFacScheme_mjhstar) .or. (RenScheme.eq.-kRenFacScheme_mj_mhstar) .or. (abs(RenScheme).eq.kRenFacScheme_mj) .or. &
+            (abs(FacScheme).eq.kRenFacScheme_mjjhstar) .or. (abs(FacScheme).eq.kRenFacScheme_mjj_mhstar) .or. (abs(FacScheme).eq.kRenFacScheme_mjj) .or. (abs(FacScheme).eq.kRenFacScheme_mj_mj_mhstar) .or. (abs(FacScheme).eq.kRenFacScheme_mj_mj) .or. &
+            (abs(RenScheme).eq.kRenFacScheme_mjjhstar) .or. (abs(RenScheme).eq.kRenFacScheme_mjj_mhstar) .or. (abs(RenScheme).eq.kRenFacScheme_mjj) .or. (abs(RenScheme).eq.kRenFacScheme_mj_mj_mhstar) .or. (abs(RenScheme).eq.kRenFacScheme_mj_mj)      &
+         )                     &
+      ) call Error("Invalid scheme for the HJ gluon fusion process. Choose a different renormalization or factorization scheme.")
+
+      ! H+0j Me
+      if( &
+         (                     &
+            Process.eq. 0 .or. & !- ggH spin-0
+            Process.eq. 1 .or. & !- ggH spin-1
+            Process.eq. 2      & !- ggH spin-2
+         ) .and. (             &
+            (abs(FacScheme).ne.kRenFacScheme_mhstar) .or. (abs(RenScheme).ne.kRenFacScheme_mhstar)      &
+         )                     &
+      ) call Error("Invalid scheme for the H+0J processes. Choose a different renormalization or factorization scheme.")
+
+   return
+end subroutine
 
 
 
@@ -68,8 +233,22 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf,i
    VegasNc1=-1
    VegasNc2=-1
    PChannel=2
+
    DecayMode1=0  ! Z/W+
    DecayMode2=0  ! Z/W-
+! !       DecayMode=0:  Z --> l+ l- (l=e,mu)
+! !       DecayMode=1:  Z --> q qbar (q=u,d,c,s,b)
+! !       DecayMode=2:  Z --> tau+ tau-
+! !       DecayMode=3:  Z --> nu nubar (nu=nu_e,nu_mu,nu_tau)
+! !       DecayMode=4:  W --> l nu_l (l=e,mu)
+! !       DecayMode=5:  W --> q qbar' (q=u,c, qbar'=d,s)
+! !       DecayMode=6:  W --> tau nu_tau
+! !       DecayMode=7:  photon
+! !       DecayMode=8:  Z --> l+ l- (l=e,mu,tau)
+! !       DecayMode=9:  Z --> anything
+! !       DecayMode=10: W --> l nu_l (l=e,mu,tau)
+! !       DecayMode=11: W --> anything
+
    WidthScheme=0
    TopDecays=-1
    TauDecays=-1
@@ -90,18 +269,11 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf,i
    LHAPDFMember = 0
    iinterf = -1
 
-! !       DecayMode=0:  Z --> l+ l- (l=e,mu)
-! !       DecayMode=1:  Z --> q qbar (q=u,d,c,s,b)
-! !       DecayMode=2:  Z --> tau+ tau-
-! !       DecayMode=3:  Z --> nu nubar (nu=nu_e,nu_mu,nu_tau)
-! !       DecayMode=4:  W --> l nu_l (l=e,mu)
-! !       DecayMode=5:  W --> q qbar' (q=u,c, qbar'=d,s)
-! !       DecayMode=6:  W --> tau nu_tau
-! !       DecayMode=7:  photon
-! !       DecayMode=8:  Z --> l+ l- (l=e,mu,tau)
-! !       DecayMode=9:  Z --> anything
-! !       DecayMode=10: W --> l nu_l (l=e,mu,tau)
-! !       DecayMode=11: W --> anything
+   MuFacMultiplier = 1d0
+   MuRenMultiplier = 1d0
+   FacScheme = kRenFacScheme_default
+   RenScheme = kRenFacScheme_default
+
    DataFile="./data/output"
 
 
@@ -156,6 +328,18 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf,i
         CountArg = CountArg + 1
     elseif( arg(1:11).eq."DecayMode2=" ) then
         read(arg(12:13),*) DecayMode2
+        CountArg = CountArg + 1
+    elseif( arg(1:10).eq."FacScheme=" ) then
+        read(arg(11:13),*) FacScheme
+        CountArg = CountArg + 1
+    elseif( arg(1:10).eq."RenScheme=" ) then
+        read(arg(11:13),*) RenScheme
+        CountArg = CountArg + 1
+    elseif( arg(1:16).eq."MuFacMultiplier=" ) then
+        read(arg(17:24),*) MuFacMultiplier
+        CountArg = CountArg + 1
+    elseif( arg(1:16).eq."MuRenMultiplier=" ) then
+        read(arg(17:24),*) MuRenMultiplier
         CountArg = CountArg + 1
     elseif( arg(1:6).eq."TopDK=" ) then
         read(arg(7:7),*) TopDecays
@@ -226,10 +410,8 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf,i
     endif
    enddo
 
-    Mu_Fact = M_Reso! setting pdf scale to resonance mass by default, later changed as necessary in the EvalWeighted/EvalUnweighted subroutines
-
     if( CountArg.ne.NumArgs ) then
-        print *, "unknown command line argument"
+        print *, "Unknown command line argument"
         stop
     endif
 
@@ -271,17 +453,14 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf,i
        DecayMode2 = DecayMode1
     endif 
 
+    if((abs(FacScheme) .ge. nRenFacSchemes) .or. (abs(RenScheme) .ge. nRenFacSchemes) .or. (MuFacMultiplier.le.0d0) .or. (MuRenMultiplier.le.0d0)) call Error("The renormalization or factorization scheme is invalid, or the scale multiplier to either is not positive.")
+
     if( Process.eq.50 ) then
         DecayMode2=DecayMode1
-        if( Collider.eq.2 ) then
-          print *, "Collider 2 not available for VH"
-          stop
-        endif
+        if( Collider.eq.2 ) call Error("Collider 2 not available for VH")
+        if( (IsAZDecay(DecayMode1).eqv..false.) .and. (Collider.ne.1) ) call Error("WH with Collider 1 only")
     endif
-    if( (IsAZDecay(DecayMode1).eqv..false.) .and. (Collider.ne.1) ) then
-      print *, "WH with Collider 1 only"
-      stop
-    endif
+
     if( Process.ge.110 .and. Process.le.113 ) DecayMode2 = DecayMode1
     
     if( (TopDecays.ne.0 .and. TopDecays.ne.1) .and. (Process.eq.80 .or. (Process.ge.110 .and. Process.le.113)) ) call Error("Specify TopDK=0,1")
@@ -425,35 +604,79 @@ END SUBROUTINE
 
 
 
+SUBROUTINE InitPDFValues()
+   use ModParameters
+   use ModKinematics
+   implicit none
 
+#if useLHAPDF==0
+   IF (alphas_mz .LE. 0d0) THEN 
+      WRITE(6,*) 'alphas_mz .le. 0:',alphas_mz
+      WRITE(6,*) 'continuing with alphas_mz=0.118'
+      alphas_mz=0.118d0
+   ENDIF
+#endif
 
+   Mu_Fact = M_Reso ! Set pdf scale to resonance mass by default, later changed as necessary in the EvalWeighted/EvalUnweighted subroutines
+	Mu_Ren = M_Reso ! Set renorm. scale to resonance mass by default, later changed as necessary in the EvalWeighted/EvalUnweighted subroutines
+   call EvalAlphaS() ! Set alphas at default Mu_Ren. Notice ModParameters::ComputeQCDVariables is automatically called!
+   return
+END SUBROUTINE
 
 
 SUBROUTINE InitPDFs()
-use ModParameters
-implicit none
-character :: pdftable*(100)
 
 #if useLHAPDF==1
-     call InitPDFset(trim(LHAPDFString))
-     call InitPDF(LHAPDFMember)  
+
+   use ModParameters
+   implicit none
+   DOUBLE PRECISION alphasPDF
+
+     call InitPDFset(trim(LHAPDFString)) ! Let LHAPDF handle everything
+     call InitPDF(LHAPDFMember)
+
+     alphas_mz=alphasPDF(zmass_pdf)
+     ! Dummy initialization, just in case. These values are not used.
+     !nloops_pdf = 1
+     zmass_pdf = M_Z
+
 #else
-     if( PDFSet.eq.1 ) then
+
+   use ModParameters
+   use ModKinematics
+   implicit none
+   character :: pdftable*(100)
+
+     zmass_pdf = M_Z ! Take zmass_pdf=M_Z in pdfs that do not specify this value
+
+     if( PDFSet.eq.1 ) then ! CTEQ6L1
         call SetCtq6(4)  ! 4    CTEQ6L1  Leading Order cteq6l1.tbl
-     elseif( PDFSet.eq.3 ) then
-!         pdftable(:)="./pdfs/NNPDF23_lo_as_0130.LHgrid"
+
+        alphas_mz=0.130d0
+        !nloops_pdf=1
+     elseif( PDFSet.eq.3 ) then  ! NNPDF 3.0 LO with a_s=0.13
         pdftable(:)="./pdfs/NNPDF30_lo_as_0130.LHgrid"
         call NNPDFDriver(pdftable)
         call NNinitPDF(0)
+
+        alphas_mz=0.130d0
+        !nloops_pdf=1
+        zmass_pdf=91.199996948242188d0*GeV
+     elseif( (PDFSet.eq.2) .or. (PDFSet.ge.201 .and. PDFSet.le.240) ) then ! MSTW2008 and variations
+        alphas_mz=0.13939d0
+        !nloops_pdf=1
+     else ! Everything else
+        write(6,*),"main.F90::InitPDFs: PDFSet",PDFSet,"QCD parameters are unknown. Please double-check! Stopping JHUGen..."
+        stop
+        ! Could also have used these instead of the stop statement, but why introduce arbitrary number?
+        !alphas_mz = 0.13229060d0
+        !nloops_pdf = 1
      endif
+
 #endif
 
-
-     
-     
-     
-     
-return
+     call InitPDFValues() ! Call this only once
+   return
 END SUBROUTINE
 
 

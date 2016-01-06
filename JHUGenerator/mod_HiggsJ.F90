@@ -6,10 +6,6 @@ module ModHiggsJ
   public :: EvalAmp_HJ
 
 !-- general definitions, to be merged with Markus final structure
-  integer, parameter  :: dp = selected_real_kind(15)
-  
-  real(dp), parameter :: gs = sqrt(alphas*4.0_dp*pi)
-
   real(dp), parameter :: xn = 3.0_dp
   real(dp), parameter :: Ca = 3.0_dp
   real(dp), parameter :: Cf = 4.0_dp/3.0_dp

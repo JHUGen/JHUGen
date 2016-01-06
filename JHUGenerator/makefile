@@ -196,7 +196,7 @@ $(PDFObj): $(PDFDep) $(Makefile)
 	mv *.o $(ObjectDir)
 
 $(CPSObj): $(CPSDep) $(Makefile)
-	@echo " compiling spin-0 propagator in complex-pole scheme"
+	@echo " compiling complex-pole scheme for the spin-0 propagator"
 	$(fcomp) -c $(CPSDep)
 	mv *.o $(ObjectDir)
 

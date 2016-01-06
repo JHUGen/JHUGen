@@ -42,7 +42,7 @@ EvalWeighted_HJJ_fulldecay = 0d0
 
    call Kinematics_HVBF_fulldecay(MomExt,applyPSCut,NBin)
    if( applyPSCut .or. PSWgt.lt.1d-12 ) return
-   call setPDFs(eta1,eta2,Mu_Fact,pdf)
+   call setPDFs(eta1,eta2,pdf)
    FluxFac = 1d0/(2d0*EHat**2)
 
 
@@ -183,7 +183,8 @@ EvalUnWeighted_HJJ_fulldecay = 0d0
    call Kinematics_HVBF_fulldecay(MomExt,applyPSCut,NBin)
    if( applyPSCut .or. PSWgt.lt.1d-12 ) return
    
-   call setPDFs(eta1,eta2,Mu_Fact,pdf)
+   call SetRunningScales( (/ (MomExt(1:4,Lep1P)+MomExt(1:4,Lep1M)+MomExt(1:4,Lep2P)+MomExt(1:4,Lep2M)),MomExt(1:4,outTop),MomExt(1:4,outBot) /) , (/ Not_a_particle_,Up_,AUp_,Not_a_particle_ /) ) ! Implement like this for now, has to change with deterministic flavors!
+   call setPDFs(eta1,eta2,pdf)
    FluxFac = 1d0/(2d0*EHat**2)   
    
 
@@ -216,7 +217,7 @@ EvalUnWeighted_HJJ_fulldecay = 0d0
 IF( GENEVT ) THEN   
       
       if( iPartons(1).eq.+1 .and. iPartons(2).eq.+1 ) then
-!           call qq_ZZqq(p_MCFM,msq_MCFM,HZZcoupl,HWWcoupl,Lambda*100d0,Lambda_Q*100d0,(/Lambda_z1,Lambda_z2,Lambda_z3,Lambda_z4/)*100d0)!  q(-p1)+q(-p2)->Z(p3,p4)+Z(p5,p6)+q(p7)+q(p8)
+!          call qq_ZZqq(p_MCFM,msq_MCFM,HZZcoupl,HWWcoupl,Lambda*100d0,Lambda_Q*100d0,(/Lambda_z1,Lambda_z2,Lambda_z3,Lambda_z4/)*100d0)!  q(-p1)+q(-p2)->Z(p3,p4)+Z(p5,p6)+q(p7)+q(p8)
           LO_Res_Unpol = 0d0
           do i = -5,5
               do j = -5,5
@@ -337,16 +338,17 @@ END FUNCTION
    if( Process.eq.61 ) call Kinematics_HJJ(5,MomExt,applyPSCut,NBin)
    if( applyPSCut .or. PSWgt.eq.zero ) return
    EvalCounter = EvalCounter+1
-   
-   
-   call setPDFs(eta1,eta2,Mu_Fact,pdf)
+
    FluxFac = 1d0/(2d0*EHat**2)
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt  * PartChannelAvg
-
    call random_number(partonic_flip)
    if( partonic_flip.gt.0.5d0 ) call swapi(iPart_sel,jPart_sel)
    if( iPart_sel.ne.jPart_sel ) PreFac = PreFac*2d0
 
+   ! Outgoing ids~incoming ids up to swapping and flavor changes, and main.F90 protexts from errors due to swapping (ie. massive mJ_mJ-fixed scenario)
+   call SetRunningScales( (/ MomExt(1:4,5),MomExt(1:4,3),MomExt(1:4,4) /) , (/ Not_a_particle_,LHA2M_ID(iPart_sel),LHA2M_ID(jPart_sel),Not_a_particle_ /) )
+   if ( Process.eq.61 ) call EvalAlphaS()
+   call setPDFs(eta1,eta2,pdf)
 
    if( Process.eq.60 ) then
       MY_IDUP(1:2)= (/LHA2M_ID(iPart_sel),LHA2M_ID(jPart_sel)/)
@@ -362,20 +364,10 @@ END FUNCTION
           ICOLUP(1:2,2) = (/000,502/)
       endif
 
-
       call EvalAmp_WBFH_UnSymm_SA_Select( MomExt,iPart_sel,jPart_sel,zz_fusion,iflip,me2)
       
       if( ZZ_Fusion ) then
-!           if( (MomExt(4,1)*MomExt(4,3).lt.0d0) .and. (MomExt(4,2)*MomExt(4,4).lt.0d0) ) then ! wrong configuration --> swap 3 and 4
-!              MY_IDUP(3:4)= (/LHA2M_ID(jPart_sel),LHA2M_ID(iPart_sel)/)
-!              ICOLUP(1:2,4) = ICOLUP(1:2,1)
-!              ICOLUP(1:2,3) = ICOLUP(1:2,2)
-!           else! 
-!              MY_IDUP(3:4)= (/LHA2M_ID(iPart_sel),LHA2M_ID(jPart_sel)/)
-!              ICOLUP(1:2,3) = ICOLUP(1:2,1)
-!              ICOLUP(1:2,4) = ICOLUP(1:2,2)
-!           endif
-          
+
           if( iflip.eq.2 ) then ! wrong configuration --> swap 3 and 4
              MY_IDUP(3:4)= (/LHA2M_ID(jPart_sel),LHA2M_ID(iPart_sel)/)
              ICOLUP(1:2,4) = ICOLUP(1:2,1)
@@ -385,25 +377,8 @@ END FUNCTION
              ICOLUP(1:2,3) = ICOLUP(1:2,1)
              ICOLUP(1:2,4) = ICOLUP(1:2,2)
           endif
-          
-          
+
       else! WW fusion
-!           if( (MomExt(4,1)*MomExt(4,3).lt.0d0) .and. (MomExt(4,2)*MomExt(4,4).lt.0d0) ) then ! wrong configuration --> swap 3 and 4
-!              MY_IDUP(3) = -GetCKMPartner( LHA2M_ID(jPart_sel) )
-!              MY_IDUP(4) = -GetCKMPartner( LHA2M_ID(iPart_sel) )
-!              
-!              if( abs(MY_IDUP(3)).eq.Top_ ) return !MY_IDUP(3) = sign(1,MY_IDUP(3))*Chm_
-!              if( abs(MY_IDUP(4)).eq.Top_ ) return !MY_IDUP(4) = sign(1,MY_IDUP(4))*Chm_ 
-!              ICOLUP(1:2,4) = ICOLUP(1:2,1)
-!              ICOLUP(1:2,3) = ICOLUP(1:2,2)
-!           else
-!              MY_IDUP(3) = -GetCKMPartner( LHA2M_ID(iPart_sel) )
-!              MY_IDUP(4) = -GetCKMPartner( LHA2M_ID(jPart_sel) )
-!              if( abs(MY_IDUP(3)).eq.Top_ ) return !MY_IDUP(3) = sign(1,MY_IDUP(3))*Chm_
-!              if( abs(MY_IDUP(4)).eq.Top_ ) return !MY_IDUP(4) = sign(1,MY_IDUP(4))*Chm_ 
-!              ICOLUP(1:2,3) = ICOLUP(1:2,1)
-!              ICOLUP(1:2,4) = ICOLUP(1:2,2)
-!           endif         
 
           if( iflip.eq.1 ) then ! wrong configuration --> swap 3 and 4  (opposite to zz case)
              MY_IDUP(3) = -GetCKMPartner( LHA2M_ID(jPart_sel) )
@@ -651,7 +626,10 @@ include 'csmaxvalue.f'
    if( applyPSCut .or. PSWgt.eq.zero ) return
    
 
-   call setPDFs(eta1,eta2,Mu_Fact,pdf)
+   ! Outgoing ids~incoming ids up to swapping and flavor changes, and main.F90 protexts from errors due to swapping (ie. massive mJ_mJ-fixed scenario)
+   call SetRunningScales( (/ MomExt(1:4,5),MomExt(1:4,3),MomExt(1:4,4) /) , (/ Not_a_particle_,LHA2M_ID(iPartons(1)),LHA2M_ID(iPartons(2)),Not_a_particle_ /) )
+   if ( Process.eq.61 ) call EvalAlphaS()
+   call setPDFs(eta1,eta2,pdf)
    FluxFac = 1d0/(2d0*EHat**2)
    EvalCounter = EvalCounter+1
 
