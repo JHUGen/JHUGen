@@ -1724,7 +1724,25 @@ character(len=100), intent(out) :: BeginEventLine
         read(16,fmt="(A160)",IOSTAT=stat,END=98) FirstLines
 
         !Read the Higgs mass
-        !JHUGen or POWHEG
+        !JHUGen
+        i = Index(FirstLines, "Resonance: spin=")
+        if ( i .ne. 0) then
+            do while (FirstLines(i:i+4) .ne. "mass=")
+                i = i+1
+            enddo
+            i = i+5 !after the =
+            do while (FirstLines(i:i).eq." ")
+                i = i+1
+            enddo
+            j = i
+            do while (FirstLines(j:j).ne." ")
+                j = j+1
+            enddo
+            read(FirstLines(i:j),*) M_Reso
+            M_Reso = M_Reso*GeV
+            M_ResoSet=.true.
+        endif
+        !POWHEG
         if( FirstLines(1:5).eq."hmass" ) then 
                i = 6
                do while(FirstLines(i:i).eq." ")
@@ -1757,7 +1775,25 @@ character(len=100), intent(out) :: BeginEventLine
         endif
 
         !Read the Higgs width
-        !JHUGen or POWHEG
+        !JHUGen
+        i = Index(FirstLines, "Resonance: spin=")
+        if ( i .ne. 0) then
+            do while (FirstLines(i:i+5) .ne. "width=")
+                i = i+1
+            enddo
+            i = i+6 !after the =
+            do while (FirstLines(i:i).eq." ")
+                i = i+1
+            enddo
+            j = i
+            do while (FirstLines(j:j).ne." ")
+                j = j+1
+            enddo
+            read(FirstLines(i:j),*) Ga_Reso
+            Ga_Reso = Ga_Reso*GeV
+            Ga_ResoSet=.true.
+        endif
+        !POWHEG
         if( FirstLines(1:6).eq."hwidth" ) then
                i = 7
                do while(FirstLines(i:i).eq." ")
@@ -3417,13 +3453,6 @@ real(8) :: CrossSection, CrossSectionError
         endif
         write(io_LHEOutFile ,'(A)') '<!--'
         write(io_LHEOutFile ,'(A,A6,A)') 'Output from the JHUGenerator ',trim(JHUGen_Version),' described in arXiv:1001.3396 [hep-ph],arXiv:1208.4018 [hep-ph],arXiv:1309.4819 [hep-ph]'
-
-        if( .not. ReadLHEFile .and. .not. ConvertLHEFile ) then
-            write(io_LHEOutFile ,'(A)') ''
-            write(io_LHEOutFile ,'(A,F8.1,A)') 'hmass   ',M_Reso*100d0,'       ! Higgs boson mass'
-            write(io_LHEOutFile ,'(A,F10.5,A)') 'hwidth    ',Ga_Reso*100d0,'   ! Higgs boson width'
-            write(io_LHEOutFile ,'(A)') ''
-        endif
 
         call WriteParameters(io_LHEOutFile)
 
