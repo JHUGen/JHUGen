@@ -3873,8 +3873,9 @@ real(8) :: BreitWigner,BreitWigner_Run,Ga_shat,muH,gaH
         Ga_shat = Ga_shat/100d0
         
         BreitWigner_Run = dsqrt(dabs(shat)) * Ga_shat /( (shat-muH**2)**2 + (muH*gaH) )
-        ReweightBWPropagator = BreitWigner_Run/BreitWigner        
     endif
+
+    ReweightBWPropagator = BreitWigner_Run/BreitWigner
     
 
 RETURN

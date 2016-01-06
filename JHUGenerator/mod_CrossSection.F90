@@ -2663,8 +2663,6 @@ IF( GENEVT ) THEN
 !       if( abs(MY_IDUP(8)).ge.1 .and. abs(MY_IDUP(8)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
       EvalUnWeighted_DecayToVV = LO_Res_Unpol * PreFac
       
-      print *, "EvalUnWeighted_DecayToVV",EvalUnWeighted_DecayToVV
-
       CS_max = csmax(0,0)
 
       if( EvalUnWeighted_DecayToVV .gt. CS_max) then
