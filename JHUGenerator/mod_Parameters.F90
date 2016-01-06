@@ -46,6 +46,8 @@ integer, public :: Br_W_ll_counter=0
 integer, public :: Br_W_ud_counter=0
 integer, public :: Br_counter(1:5,1:5)=0
 integer, public :: LeptInEvent(0:8) = 0
+logical, public, parameter :: ReweightDecay = .false.
+logical, public, parameter :: PrintRejectedEventsWeightZero = .false.
 !=====================================================
 
 

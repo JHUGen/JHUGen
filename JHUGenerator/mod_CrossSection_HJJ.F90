@@ -100,7 +100,7 @@ EvalWeighted_HJJ_fulldecay = 0d0
 
   i=1; j=-1;
   msq_MCFM(:,:) = 0d0
-  call qq_ZZqq(p_MCFM,msq_MCFM,HZZcoupl,HWWcoupl,Lambda*100d0,Lambda_Q*100d0,(/Lambda_z1,Lambda_z2,Lambda_z3,Lambda_z4/)*100d0)!  q(-p1)+q(-p2)->Z(p3,p4)+Z(p5,p6)+q(p7)+q(p8)
+  !call qq_ZZqq(p_MCFM,msq_MCFM,HZZcoupl,HWWcoupl,Lambda*100d0,Lambda_Q*100d0,(/Lambda_z1,Lambda_z2,Lambda_z3,Lambda_z4/)*100d0)!  q(-p1)+q(-p2)->Z(p3,p4)+Z(p5,p6)+q(p7)+q(p8)
   msq_MCFM(:,:) = msq_MCFM(:,:)/(9.495632068338d-2)**3! removing esq^3
   print *, "new ",msq_MCFM(j,i)
 
