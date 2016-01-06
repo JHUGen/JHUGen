@@ -1721,21 +1721,7 @@ character(len=100), intent(out) :: BeginEventLine
      WroteMassWidth=.false.
      InMadgraphMassBlock=.false.
      do while ( .not.FirstEvent )
-        read(16,fmt="(A160)",IOSTAT=stat,END=99) FirstLines
-        if ( FirstLines(1:4).eq."<!--" .and. .not.WroteHeader ) then
-            call InitOutput(1d0, 1d14)
-            WroteHeader = .true.
-        endif
-        if (index(FirstLines,"<MG").ne.0 .and. .not.WroteHeader) then  !Sometimes MadGraph doesn't have a comment at the beginning
-            call InitOutput(1d0, 1d14)                                 !In that case put the JHUGen header before the MadGraph
-            write(io_LHEOutFile, "(A)") "-->"                          ! proc card, etc.
-            WroteHeader = .true.                                       !and put the Higgs mass/width in a separate comment
-            ClosedHeader = .true.                                      !before <init>
-        endif
-        if (Index(FirstLines,"<init>").ne.0 .and. .not.WroteHeader ) then !If not now, when?
-            call InitOutput(1d0, 1d14)
-            WroteHeader = .true.
-        endif
+        read(16,fmt="(A160)",IOSTAT=stat,END=98) FirstLines
 
         !Read the Higgs mass
         !JHUGen or POWHEG
@@ -1798,39 +1784,10 @@ character(len=100), intent(out) :: BeginEventLine
                endif
         endif
 
-        if( Index(FirstLines,"-->").ne.0 .and. .not.(M_ResoSet .and. Ga_ResoSet)) then
-            !In other words, if the mass and the width have not been found by the end of the comment
-            !This is possible in some MadGraph versions, where the mass and width are below, in the proc card
-            ! and the comment is just a fancy header.
-            !Give them more time to be found, and print them before <init>
-            ClosedHeader = .true.
-        elseif( .not.WroteMassWidth .and. (Index(FirstLines,"<init>").ne.0 .or. Index(FirstLines,"-->").ne.0) ) then
-            write(io_LHEOutFile ,"(A)") ""
-            if (ClosedHeader) then
-                write(io_LHEOutFile, "(A)") "<!--"
-            endif
-            write(io_LHEOutFile ,"(A)") "JHUGen Resonance parameters used for event generation:"
-            write(io_LHEOutFile ,"(A,F8.1,A)") "hmass  ",M_Reso*100d0,"       ! Higgs boson mass"
-            write(io_LHEOutFile ,"(A,F10.5,A)") "hwidth   ",Ga_Reso*100d0,"   ! Higgs boson width"
-            if (Index(FirstLines,"-->").eq.0) then
-                write(io_LHEOutFile, "(A)") "-->"
-            endif
-            write(io_LHEOutFile ,"(A)") ""
-            ClosedHeader = .true.
-            WroteMassWidth = .true.
-        endif
-        if( Index(FirstLines, "<event").ne.0 ) then
-               FirstEvent=.true.
-               BeginEventLine = trim(FirstLines)
-        else
-            if( importExternal_LHEinit ) then
-                if( Index(FirstLines,"<LesHouchesEvents").ne.0 .or. Index(FirstLines,"<!--").ne.0 ) then
-                else
-                  write(io_LHEOutFile,"(A)") trim(firstlines)
-                endif
-            endif
-        endif
+        if( Index(FirstLines, "<event").ne.0 ) FirstEvent=.true.
      enddo
+98   continue
+
      if( .not. M_ResoSet ) then
         write(io_stdout,"(2X,A,1F7.2)")  "ERROR: Higgs mass could not be read from LHE input file. Assuming default value",M_Reso*100d0
         write(io_LogFile,"(2X,A,1F7.2)") "ERROR: Higgs mass could not be read from LHE input file. Assuming default value",M_Reso*100d0
@@ -1848,7 +1805,40 @@ character(len=100), intent(out) :: BeginEventLine
      write(io_stdout,"(A)") ""
      write(io_LogFile,"(A)") ""
 
-99   continue
+     call ReopenInFile()
+
+     FirstEvent = .false.
+     do while ( .not.FirstEvent )
+        read(16,fmt="(A160)",IOSTAT=stat,END=99) FirstLines
+        if ( FirstLines(1:4).eq."<!--" .and. .not.WroteHeader ) then
+            call InitOutput(1d0, 1d14)
+            WroteHeader = .true.
+        endif
+        if (index(FirstLines,"<MG").ne.0 .and. .not.WroteHeader) then  !Sometimes MadGraph doesn't have a comment at the beginning
+            call InitOutput(1d0, 1d14)                                 !In that case put the JHUGen header before the MadGraph
+            write(io_LHEOutFile, "(A)") "-->"                          ! proc card, etc.
+            WroteHeader = .true.                                       !and put the Higgs mass/width in a separate comment
+            ClosedHeader = .true.                                      !before <init>
+        endif
+        if (Index(FirstLines,"<init>").ne.0 .and. .not.WroteHeader ) then !If not now, when?
+            call InitOutput(1d0, 1d14)
+            WroteHeader = .true.
+        endif
+
+        if( Index(FirstLines, "<event").ne.0 ) then
+               FirstEvent=.true.
+               BeginEventLine = trim(FirstLines)
+        else
+            if( importExternal_LHEinit ) then
+                if( Index(FirstLines,"<LesHouchesEvents").ne.0 .or. Index(FirstLines,"<!--").ne.0 ) then
+                else
+                  write(io_LHEOutFile,"(A)") trim(firstlines)
+                endif
+            endif
+        endif
+
+    enddo
+99  continue
 
 return
 END SUBROUTINE
