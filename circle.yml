@@ -34,6 +34,7 @@ test:
 
   pre:
     - mkdir -p $CIRCLE_ARTIFACTS/{ggH,VBF,HJJ,other}/{SM,PS,fa30.5,fa30.5i,a2}
+    - sed -i -r -e "s/(Comp *= *)ifort/\1gfort/" makefile
     - make
     - sed -i -r -e "s/(pTjetcut = )[0-9.d]*/\10d0/" -e "s/(Rjet = )[0-9.d]*/\10d0/" mod_Parameters.F90
     - git diff > ~/VBFvsHJJ.diff
