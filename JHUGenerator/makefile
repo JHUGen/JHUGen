@@ -140,6 +140,9 @@ MCFM_Obj = $(MCFMDir)/anomamp.o \
            $(MCFMDir)/ZZSingleres.o \
            $(MCFMDir)/jone.o
 
+CPSDep = ./CPS/CALLING_cpHTO.f
+
+CPSObj = $(ObjectDir)/CALLING_cpHTO.o 
 
 # MadGraphDep = h_emepemep.f \
 #               h_emepemep_noint.f \
@@ -157,7 +160,7 @@ MadGraphObj = $(ObjectDir)/gg_ttbh.o \
 
 
 
-JHUGenerator: $(PSGenObj) $(VegasObj) $(PDFObj) $(AmpObj) $(MainObj)
+JHUGenerator: $(CPSObj) $(PSGenObj) $(VegasObj) $(PDFObj) $(AmpObj) $(MainObj)
 	@echo " linking"
 ifeq ($(UseLHAPDF),Yes)
 	echo " interfaced with LHAPDF"
@@ -166,7 +169,7 @@ else
 endif
 	@echo " executable file is "$(Exec) "compiled with "$(Comp)
 	@echo " "
-	$(fcomp) -o $(Exec) $(MainObj) $(AmpObj) $(PSGenObj) $(VegasObj) $(PDFObj) 
+	$(fcomp) -o $(Exec) $(MainObj) $(AmpObj) $(PSGenObj) $(VegasObj) $(PDFObj) $(CPSObj)
 # $(MCFM_Obj)
 
 
@@ -192,6 +195,12 @@ $(PDFObj): $(PDFDep) $(Makefile)
 	$(fcomp) -c $(PDFDep)
 	mv *.o $(ObjectDir)
 
+$(CPSObj): $(CPSDep) $(Makefile)
+	@echo " compiling complex-pole scheme for the spin-0 propagator"
+	$(fcomp) -c $(CPSDep)
+	mv *.o $(ObjectDir)
+
+	
 $(PSGenObj): $(PSGenDep)
 	@echo " compiling phase space generator"
 	$(ccomp) -c $(PSGenDep)

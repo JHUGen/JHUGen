@@ -2,7 +2,6 @@
       use ModParameters
       implicit none
       private
-      integer, parameter  :: dp = selected_real_kind(15)
       real(dp), private, parameter :: tol = 0.00000010_dp
 
 
@@ -28,6 +27,13 @@
       real(dp) :: gZ_sq
       real(dp) :: prefactor, Lambda_inv
       real(dp), parameter :: symmFact=1d0/2d0
+      real(dp) :: intcolfac
+
+      if(IsAQuark(MY_IDUP(6)) .and. IsAQuark(MY_IDUP(8))) then
+         intcolfac=1_dp/3_dp
+      else
+         intcolfac=1_dp
+      endif
 
       gZ_sq = 4.0_dp*pi*alpha_QED/4.0_dp/(one-sitW**2)/sitW**2
 
@@ -155,7 +161,7 @@ do i4 = 1,2
 
          if( (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then
              sum = sum + symmFact * (cdabs( A(1)*dconjg(A(1)) ) +  cdabs( A(2)*dconjg(A(2)) ))
-             if( i3.eq.i4 ) sum = sum + symmFact * 2d0*dreal(A(1)*dconjg(A(2)))  
+             if( i3.eq.i4 ) sum = sum + symmFact * 2d0*intcolfac*dreal(A(1)*dconjg(A(2)))  
          else
              sum = sum + cdabs( A(1)*dconjg(A(1)) )
          endif
@@ -256,7 +262,13 @@ enddo
       real(dp) :: gZ_sq
       real(dp) :: prefactor, Lambda_inv
       real(dp), parameter :: symmFact=1d0/2d0
+      real(dp) :: intcolfac
 
+      if(IsAQuark(MY_IDUP(6)) .and. IsAQuark(MY_IDUP(8))) then
+         intcolfac=1_dp/3_dp
+      else
+         intcolfac=1_dp
+      endif
 
 !---- electroweak couplings
 !       aL = -one + two*sitW**2
@@ -393,7 +405,7 @@ do i4 = 1,2
 
          if( (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then
              sum = sum + symmFact * (cdabs( A(1)*dconjg(A(1)) ) + cdabs( A(2)*dconjg(A(2)) ))
-             if( i3.eq.i4 ) sum = sum + symmFact * 2d0*dreal(A(1)*dconjg(A(2)))  
+             if( i3.eq.i4 ) sum = sum + symmFact * 2d0*intcolfac*dreal(A(1)*dconjg(A(2)))  
          else
              sum = sum + cdabs( A(1)*dconjg(A(1)) )
          endif
@@ -1362,6 +1374,7 @@ enddo
       real(dp) :: gZ_sq
       real(dp) :: prefactor, Lambda_inv
 
+
 !---- electroweak couplings
 
       aL = -one + two*sitW**2
@@ -1455,7 +1468,6 @@ enddo
       real(dp) :: aL,aR
       real(dp) :: gZ_sq
       real(dp) :: prefactor, Lambda_inv
-
 
 !---- electroweak couplings
       aL = -one + two*sitW**2

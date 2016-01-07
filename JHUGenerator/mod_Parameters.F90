@@ -3,18 +3,34 @@ implicit none
 save
 ! 
 ! 
-character(len=6),parameter :: JHUGen_Version="v6.7.7"
+character(len=6),parameter :: JHUGen_Version="v6.8.4"
 ! 
 ! 
 !=====================================================
 !internal
+integer, public, parameter  :: dp = selected_real_kind(15)
 integer, public :: Collider, PDFSet,PChannel,Process,DecayMode1,DecayMode2,TopDecays,TauDecays
 integer, public :: VegasIt1,VegasNc0,VegasNc1,VegasNc2
 real(8), public :: Collider_Energy
+integer, public :: FacScheme,RenScheme
+real(8), public :: MuFacMultiplier,MuRenMultiplier
 integer, public :: VegasIt1_default,VegasNc0_default,VegasNc1_default,VegasNc2_default
 integer, public :: NumHistograms,RequestNLeptons,RequestOS,RequestOSSF
-logical, public :: Unweighted,OffShellReson,OffShellV1,OffShellV2,ReadLHEFile,ConvertLHEFile
-logical, public :: ReadCSmax,GenerateEvents,CountTauAsAny,HasLeptonFilter
+logical, public :: Unweighted,OffShellReson,OffShellV1,OffShellV2,ReadLHEFile,ConvertLHEFile,CalcPMZZ
+logical, public :: ReadCSmax,GenerateEvents,CountTauAsAny,HasLeptonFilter, FoundHiggsMass, FoundHiggsWidth
+integer, public :: WriteFailedEvents
+logical, public :: FilesOpened = .false.
+integer, public, parameter :: kRenFacScheme_default=0
+integer, public, parameter :: kRenFacScheme_mhstar=1
+integer, public, parameter :: kRenFacScheme_mjjhstar=2
+integer, public, parameter :: kRenFacScheme_mjj_mhstar=3
+integer, public, parameter :: kRenFacScheme_mj_mj_mhstar=4
+integer, public, parameter :: kRenFacScheme_mjj=5
+integer, public, parameter :: kRenFacScheme_mj_mj=6
+integer, public, parameter :: kRenFacScheme_mjhstar=7
+integer, public, parameter :: kRenFacScheme_mj_mhstar=8
+integer, public, parameter :: kRenFacScheme_mj=9
+integer, public, parameter :: nRenFacSchemes=10
 integer(8), public :: EvalCounter=0
 integer(8), public :: RejeCounter=0
 integer(8), public :: AccepCounter=0
@@ -46,6 +62,7 @@ integer, public :: Br_W_ll_counter=0
 integer, public :: Br_W_ud_counter=0
 integer, public :: Br_counter(1:5,1:5)=0
 integer, public :: LeptInEvent(0:8) = 0
+logical, public, parameter :: ReweightDecay = .false.
 !=====================================================
 
 
@@ -66,6 +83,7 @@ logical, public, parameter :: writeWeightedLHE = .false.
 logical, public, parameter :: includeGammaStar = .false. 
 real(8),parameter :: MPhotonCutoff = 4d0*GeV
 
+integer, public  :: WidthScheme    ! 0=fixed BW-width, 1=runing BW-width, 2=Passarino's CPS
 logical, public, parameter :: RandomizeVVdecays = .true.    ! randomize DecayMode1 and DecayMode2 in H-->VV and TTBAR decays
 
 logical, public, parameter :: UseUnformattedRead = .false.  !Set this to true if the regular reading fails for whatever reason
@@ -100,6 +118,7 @@ real(8), public, parameter :: Lambda  = 1000d0    *GeV      ! Lambda coupling en
                                                             ! operators/formfactors (former r).
 
 real(8), public, parameter :: m_bot = 4.75d0       *GeV     ! bottom quark mass
+real(8), public, parameter :: m_charm = 1.275d0    *GeV     ! charm quark mass
 real(8), public, parameter :: m_el = 0.00051100d0  *GeV     ! electron mass
 real(8), public, parameter :: m_mu = 0.10566d0     *GeV     ! muon mass
 real(8), public, parameter :: m_tau = 1.7768d0     *GeV     ! tau mass
@@ -110,14 +129,27 @@ real(8), public, parameter :: Gf = 1.16639d-5/GeV**2        ! Fermi constant
 real(8), public, parameter :: vev = 1.0d0/sqrt(Gf*sqrt(2.0d0))
 real(8), public, parameter :: gwsq = 4.0d0 * M_W**2/vev**2  ! weak constant squared
 real(8), public, parameter :: alpha_QED = 1d0/128d0         ! el.magn. coupling
-real(8), public, parameter :: alphas = 0.13229060d0         ! strong coupling
 real(8), public, parameter :: sitW = dsqrt(0.23119d0)       ! sin(Theta_Weinberg) (PDG-2008)
-real(8), public            :: Mu_Fact                       ! pdf factorization scale (set to M_Reso in main.F90)
 real(8), public, parameter :: LHC_Energy=13000d0  *GeV      ! LHC hadronic center of mass energy
 real(8), public, parameter :: TEV_Energy=1960d0  *GeV       ! Tevatron hadronic center of mass energy
 real(8), public, parameter :: ILC_Energy=250d0  *GeV        ! Linear collider center of mass energy
 real(8), public, parameter :: POL_A = 0d0                   ! e+ polarization. 0: no polarization, 100: helicity = 1, -100: helicity = -1
 real(8), public, parameter :: POL_B = 0d0                   ! e- polarization. 0: no polarization, 100: helicity = 1, -100: helicity = -1
+
+! PDF and QCD scale variables, set in main::InitPDFNonConstVals if not a parameter
+integer, public, parameter :: nQflavors_pdf = 5    ! Number of flavors enforced to the PDF, used in ModKinematics::EvalAlphaS()
+integer, public, parameter :: nloops_pdf = 1       ! alpha_s order
+real(8), public            :: zmass_pdf            ! Z mass used in pdf toward the QCD scale, reset later in main per PDF if needed
+real(8), public            :: Mu_Fact              ! pdf factorization scale (set to M_Reso in main.F90)
+real(8), public            :: Mu_Ren               ! QCD renormalization (alpha_s) scale (set to M_Reso in main.F90)
+real(dp), public           :: alphas               ! strong coupling per event, set to some reasonable value
+real(dp), public           :: alphas_mz            ! strong coupling at M_Z, reset later in main per PDF
+real(dp), public           :: gs                   ! = sqrt(alphas*4.0_dp*pi)
+
+!---     B0_PDF=(11.-2.*NF/3.)/4./PI
+real(dp), public, parameter :: B0_PDF(0:6) = (/ 0.8753521870054244D0,0.822300539308126D0,0.7692488916108274D0,0.716197243913529D0,0.6631455962162306D0,0.6100939485189321D0,0.5570423008216338D0 /)
+
+
 
 ! CKM squared matrix entries 
 real(8), public, parameter :: VCKM_ud = 0.974285d0
@@ -266,7 +298,7 @@ real(8), public :: scale_alpha_W_tn = 1d0        ! scaling factor of alpha (~par
    integer,    public, parameter :: cz_q1sq = 0d0 ! Sign of q1,2,12**2 for the following Lambda's, set to 1 or -1 to get q**2-dependence from these form factor Lambdas
    integer,    public, parameter :: cz_q2sq = 0d0
    integer,    public, parameter :: cz_q12sq = 0d0
-   ! These Lambdas all have numerical value of 1d0
+   ! These Lambdas all have a numerical value of 1d0
    real(8),    public, parameter :: Lambda_z11 = 100d0*GeV ! For Z1
    real(8),    public, parameter :: Lambda_z21 = 100d0*GeV
    real(8),    public, parameter :: Lambda_z31 = 100d0*GeV
@@ -404,11 +436,10 @@ real(8), public :: scale_alpha_W_tn = 1d0        ! scaling factor of alpha (~par
 ! with
 !   aR(f) = -2*sw**2*Q(f),
 !   aL(f) = -2*sw**2*Q(f) + 2*T3(f).
-! for V = Z-boson
-! and
+! for V = Z-boson,
 !   bR = 0
 !   bL = dsqrt(2)*cw
-! for V = W-boson
+! for V = W-boson,
 ! and
 !   cR = -2*sw*cw*Q(f)
 !   cL = -2*sw*cw*Q(f)
@@ -471,6 +502,9 @@ integer, public, target :: ANuE_ = -14
 integer, public, target :: ANuM_ = -15
 integer, public, target :: ANuT_ = -16
 
+integer, public, parameter :: Not_a_particle_  = -9000
+real(8), public, parameter :: Mom_Not_a_particle(1:4) = (/0d0,0d0,0d0,0d0/)
+
 integer, public, parameter :: pdfGlu_ = 0
 integer, public, parameter :: pdfDn_ = 1
 integer, public, parameter :: pdfUp_ = 2
@@ -485,9 +519,9 @@ integer, public, parameter :: pdfAChm_ = -4
 integer, public, parameter :: pdfABot_ = -5
 integer, public, parameter :: pdfATop_ = -6 ! Dummy
 
-real(8), public, parameter :: pi =3.141592653589793238462643383279502884197d0
-real(8), public, parameter :: sqrt2 = 1.4142135623730950488016887242096980786d0
-real(8), public, parameter :: pisq = pi**2
+real(dp), public, parameter :: pi =3.141592653589793238462643383279502884197_dp
+real(dp), public, parameter :: sqrt2 = 1.4142135623730950488016887242096980786_dp
+real(dp), public, parameter :: pisq = pi**2
 real(8), public, parameter :: one = 1.0d0, mone = -1.0d0
 real(8), public, parameter :: half  = 0.5d0,two = 2.0d0
 real(8), public, parameter :: zero  = 0.0d0
@@ -873,8 +907,10 @@ integer :: Part
       convertLHE =32
   elseif( Part.eq.Gra_) then
       convertLHE =39
+  elseif( Part.eq.Not_a_particle_) then
+      convertLHE = Part
   elseif( Part.lt.-9000) then
-      convertLHE =Part
+      convertLHE = Part
   else
       print *, "LHE format not implemented for ",Part
       stop
@@ -986,7 +1022,7 @@ integer :: Part
   elseif( abs(Part).eq.abs(Dn_) ) then
       getMass = 0d0
   elseif( abs(Part).eq.abs(Chm_) ) then
-      getMass = 0d0
+      getMass = m_charm
   elseif( abs(Part).eq.abs(Str_) ) then
       getMass = 0d0
   elseif( abs(Part).eq.abs(Bot_) ) then
@@ -1001,6 +1037,8 @@ integer :: Part
       getMass = 0d0
   elseif( abs(Part).eq.abs(Hig_) ) then
       getMass = M_Reso
+  elseif( Part.eq.Not_a_particle_) then
+      getMass = 0d0
   else
      print *, "Error in getMass",Part
      stop
@@ -1329,6 +1367,12 @@ integer :: Part
 
 END FUNCTION
 
+
+
+subroutine ComputeQCDVariables()
+implicit none
+   gs = sqrt(alphas*4.0_dp*pi)
+end subroutine ComputeQCDVariables
 
 
 

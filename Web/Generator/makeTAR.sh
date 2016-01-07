@@ -19,4 +19,11 @@ if [ ! $VERSION ]; then
     VERSION=$(grep JHUGen_Version ../../JHUGenerator/mod_Parameters.F90 | grep JHUGen_Version | sed -r 's/.*"(.*)".*/\1/')
 fi
 
-tar -czvf "JHUGenerator."$VERSION".tar.gz" $INDIR"/JHUGenerator" $INDIR"/JHUGenMELA" $INDIR"/AnalyticMELA"
+pushd $INDIR"/Manual/"
+# Do this three times
+pdflatex manJHUGenerator.tex
+pdflatex manJHUGenerator.tex
+pdflatex manJHUGenerator.tex
+popd
+cp $INDIR"/Manual/manJHUGenerator.pdf" "../manJHUGenerator."$VERSION".pdf"
+tar -czvf "JHUGenerator."$VERSION".tar.gz" $INDIR"/JHUGenerator" $INDIR"/JHUGenMELA" $INDIR"/AnalyticMELA" "../manJHUGenerator."$VERSION".pdf"

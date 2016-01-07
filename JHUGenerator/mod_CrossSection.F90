@@ -40,16 +40,16 @@ Function EvalWeighted_HJ(yRnd,VgsWgt)
     call Kinematics_HJ(4,MomExt,applyPSCut,NBin)
     if( applyPSCut .or. PSWgt.eq.zero ) return
 
-    call setPDFs(eta1,eta2,Mu_Fact,pdf)
-
-    call EvalAmp_HJ(MomExt,me2)
-
-      
-    MY_IDUP(1:4)  = (/Glu_,Glu_,Hig_,Glu_/)!weighted events, dominated by gg>Hg
+    MY_IDUP(1:4)  = (/Glu_,Glu_,Hig_,Glu_/) ! weighted events, dominated by gg>Hg
     ICOLUP(1:2,1) = (/502,501/)!weighted events, dominated by gg>Hg
     ICOLUP(1:2,2) = (/503,502/)!weighted events, dominated by gg>Hg
     ICOLUP(1:2,3) = (/000,000/)!weighted events, dominated by gg>Hg
     ICOLUP(1:2,4) = (/503,501/)!weighted events, dominated by gg>Hg
+
+    call SetRunningScales( (/ MomExt(1:4,3),MomExt(1:4,4),Mom_Not_a_particle(1:4) /) , (/ Not_a_particle_,MY_IDUP(4),Not_a_particle_,Not_a_particle_ /) )
+    call EvalAlphaS()
+    call setPDFs(eta1,eta2,pdf)
+    call EvalAmp_HJ(MomExt,me2)
 
     LO_Res_Unpol = 0d0
     do i = -5,5
@@ -129,64 +129,50 @@ include 'csmaxvalue.f'
    Masses(2) = zero
    call EvalPhasespace_2to2(EHat,Masses,yRnd(3:4),MomExt,PSWgt)
    call boost2Lab(eta1,eta2,4,MomExt(1:4,1:4))
-    call Kinematics_HJ(4,MomExt,applyPSCut,NBin)
-    if( applyPSCut .or. PSWgt.eq.zero ) return
-   
+   call Kinematics_HJ(4,MomExt,applyPSCut,NBin)
+   if( applyPSCut .or. PSWgt.eq.zero ) return
 
-   call setPDFs(eta1,eta2,Mu_Fact,pdf)
    FluxFac = 1d0/(2d0*EHat**2)
    EvalCounter = EvalCounter+1
 
 
-
 IF( GENEVT ) THEN
 
-   sumtot = 0d0
-   do i = -5,5
-      do j = -5,5
-         sumtot = sumtot + csmax(i,j)
+      sumtot = 0d0
+      do i = -5,5
+         do j = -5,5
+            sumtot = sumtot + csmax(i,j)
+         enddo
       enddo
-   enddo
-!print *,csmax(0,0), csmax(0,1)
-   k=0; bound(0)=0d0
-   do i = -5,5
-      do j = -5,5
-         k=k+1
-         bound(k) = bound(k-1) + csmax(i,j)/sumtot
-         if( yRnd(8).gt.bound(k-1) .and. yRnd(8).lt.bound(k)  ) then
-            ifound=i; jfound=j;
-            goto 1313
-         endif
+      !print *,csmax(0,0), csmax(0,1)
+      k=0; bound(0)=0d0
+      do i = -5,5
+         do j = -5,5
+            k=k+1
+            bound(k) = bound(k-1) + csmax(i,j)/sumtot
+            if( yRnd(8).gt.bound(k-1) .and. yRnd(8).lt.bound(k)  ) then
+               ifound=i; jfound=j;
+               goto 1313
+            endif
+         enddo
       enddo
-   enddo
-1313 continue
-!print *,ifound, jfound
-   call EvalAmp_HJ(MomExt,me2)
+ 1313 continue
+      !print *,ifound, jfound
 
-      MY_IDUP(1:2)= (/LHA2M_ID(ifound),LHA2M_ID(jfound)/)
-!      if( MY_IDUP(1).gt.0 ) then ! quark
-!          ICOLUP(1:2,1) = (/501,000/)
-!      else! anti-quark
-!          ICOLUP(1:2,1) = (/000,501/)
-!      endif
-!      if( MY_IDUP(2).gt.0 ) then! quark
-!          ICOLUP(1:2,2) = (/502,000/)
-!      else! anti-quark
-!          ICOLUP(1:2,2) = (/000,502/)
-!      endif
 
+      MY_IDUP(1:3) = (/LHA2M_ID(ifound),LHA2M_ID(jfound),Hig_/)
       ICOLUP(1:2,3) = (/000,000/)! H
 ! color assignments may need correction/randomization
       if( MY_IDUP(1).eq.Glu_ .and. MY_IDUP(2).eq.Glu_ ) then! gg->Hg
-        if(yRnd(10).gt.0.5d0)then
-          ICOLUP(1:2,1) = (/502,501/)
-          ICOLUP(1:2,2) = (/503,502/)
-          ICOLUP(1:2,4) = (/503,501/)
-        else
-          ICOLUP(1:2,1) = (/501,502/)
-          ICOLUP(1:2,2) = (/502,503/)
-          ICOLUP(1:2,4) = (/501,503/)
-        endif
+          if(yRnd(10).gt.0.5d0)then
+            ICOLUP(1:2,1) = (/502,501/)
+            ICOLUP(1:2,2) = (/503,502/)
+            ICOLUP(1:2,4) = (/503,501/)
+          else
+            ICOLUP(1:2,1) = (/501,502/)
+            ICOLUP(1:2,2) = (/502,503/)
+            ICOLUP(1:2,4) = (/501,503/)
+          endif
           MY_IDUP(4) = Glu_
       elseif( MY_IDUP(1).ne.Glu_ .and. MY_IDUP(1).gt.0 .and. MY_IDUP(2).eq.Glu_ ) then! qg->Hq
           ICOLUP(1:2,1) = (/502,000/)
@@ -220,18 +206,21 @@ IF( GENEVT ) THEN
           MY_IDUP(4) = Glu_
       endif
 
-   MY_IDUP(1:3)  = (/LHA2M_ID(ifound),LHA2M_ID(jfound),Hig_/)
+      call SetRunningScales( (/ MomExt(1:4,3),MomExt(1:4,4),Mom_Not_a_particle(1:4) /) , (/ Not_a_particle_,Glu_,Not_a_particle_,Not_a_particle_ /) ) ! Here, pass Glu_ since all partons are treated as massless
+      call EvalAlphaS()
+      call setPDFs(eta1,eta2,pdf)
+      call EvalAmp_HJ(MomExt,me2)
 
-   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt 
+      PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt 
 
-   LO_Res_Unpol =  me2(ifound,jfound) * pdf(LHA2M_pdf(ifound),1)*pdf(LHA2M_pdf(jfound),2)
-   EvalUnWeighted_HJ = LO_Res_Unpol * PreFac
+      LO_Res_Unpol =  me2(ifound,jfound) * pdf(LHA2M_pdf(ifound),1)*pdf(LHA2M_pdf(jfound),2)
+      EvalUnWeighted_HJ = LO_Res_Unpol * PreFac
 
-   if( ifound.eq.0 .and. jfound.eq.0 ) then
-       CS_max = csmax(ifound,jfound) * adj_par 
-   else
-       CS_max = csmax(ifound,jfound)   
-   endif
+      if( ifound.eq.0 .and. jfound.eq.0 ) then
+          CS_max = csmax(ifound,jfound) * adj_par 
+      else
+          CS_max = csmax(ifound,jfound)   
+      endif
 
       if( EvalUnWeighted_HJ.gt. CS_max) then
           write(io_stdout,"(2X,A,1PE13.6,1PE13.6)")  "CS_max is too small.",EvalUnWeighted_HJ, CS_max
@@ -253,9 +242,10 @@ IF( GENEVT ) THEN
 ELSE! NOT GENEVT
 
 
+   call SetRunningScales( (/ MomExt(1:4,3),MomExt(1:4,4),Mom_Not_a_particle(1:4) /) , (/ Not_a_particle_,Glu_,Not_a_particle_,Not_a_particle_ /) )
+   call EvalAlphaS()
+   call setPDFs(eta1,eta2,pdf)
    call EvalAmp_HJ(MomExt,me2)
-!   print *, me2(0,0), me2(0,1),"!!"
-
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt 
 
 
@@ -612,7 +602,8 @@ if( IsAZDecay(DecayMode1) ) then
         if(dabs(inv_mass(5)-M_Reso).gt.10d0*Ga_Reso) return
       endif
 
-      call setPDFs(eta1,eta2,Mu_Fact,pdf)
+      call SetRunningScales( (/ MomExt(1:4,5),MomExt(1:4,6),MomExt(1:4,7) /) , (/ convertLHEreverse(id(3)),convertLHEreverse(id(6)),convertLHEreverse(id(7)),convertLHEreverse(id(4)) /) )
+      call setPDFs(eta1,eta2,pdf)
       FluxFac = 1d0/(2d0*EHat**2)
       PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt *6d0 !2 for e and mu, 3 for colors of b
       LO_Res_Unpol=0d0
@@ -695,7 +686,8 @@ elseif( IsAWDecay(DecayMode1) ) then
         if(dabs(inv_mass(5)-M_Reso).gt.10d0*Ga_Reso) return
       endif
 
-      call setPDFs(eta1,eta2,Mu_Fact,pdf)
+      call SetRunningScales( (/ MomExt(1:4,5),MomExt(1:4,6),MomExt(1:4,7) /) , (/ convertLHEreverse(id(3)),convertLHEreverse(id(6)),convertLHEreverse(id(7)),convertLHEreverse(id(4)) /) )
+      call setPDFs(eta1,eta2,pdf)
       FluxFac = 1d0/(2d0*EHat**2)
       PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt *6d0 !2 for e and mu, 3 for colors of b
       LO_Res_Unpol=0d0
@@ -1169,7 +1161,8 @@ if( IsAZDecay(DecayMode1) ) then
         if(dabs(inv_mass(5)-M_Reso).gt.10d0*Ga_Reso) return
       endif
 
-      call setPDFs(eta1,eta2,Mu_Fact,pdf)
+      call SetRunningScales( (/ MomExt(1:4,5),MomExt(1:4,6),MomExt(1:4,7) /) , (/ convertLHEreverse(id(3)),convertLHEreverse(id(6)),convertLHEreverse(id(7)),convertLHEreverse(id(4)) /) )
+      call setPDFs(eta1,eta2,pdf)
       FluxFac = 1d0/(2d0*EHat**2)
       PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt/3d0! *6d0 !2 for e and mu, 3 for colors of b
 
@@ -1224,7 +1217,8 @@ elseif( IsAWDecay(DecayMode1) ) then
         if(dabs(inv_mass(5)-M_Reso).gt.10d0*Ga_Reso) return
       endif
 
-      call setPDFs(eta1,eta2,Mu_Fact,pdf)
+      call SetRunningScales( (/ MomExt(1:4,5),MomExt(1:4,6),MomExt(1:4,7) /) , (/ convertLHEreverse(id(3)),convertLHEreverse(id(6)),convertLHEreverse(id(7)),convertLHEreverse(id(4)) /) )
+      call setPDFs(eta1,eta2,pdf)
       FluxFac = 1d0/(2d0*EHat**2)
       PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt/3d0! *6d0 !2 for e and mu, 3 for colors of qqb
 
@@ -1501,6 +1495,7 @@ ENDIF! GENEVT
 !    IDUP(7)  -->  MomDK(:,1)  -->  ubar-spinor
 !    IDUP(8)  -->  MomDK(:,4)  -->     v-spinor
 !    IDUP(9)  -->  MomDK(:,3)  -->  ubar-spinor
+    ICOLUP(1:2,1:9) = 0
     call VVBranchings(MY_IDUP(4:9),ICOLUP(1:2,6:9))
     MY_IDUP(1:3) = 0
     yz1 = yRnd(10)
@@ -1628,7 +1623,9 @@ ENDIF! GENEVT
       return
     endif
 
-   call setPDFs(eta1,eta2,Mu_Fact,pdf)
+   call SetRunningScales( (/ (MomExt(1:4,3)+MomExt(1:4,4)),Mom_Not_a_particle(1:4),Mom_Not_a_particle(1:4) /) , (/ Not_a_particle_,Not_a_particle_,Not_a_particle_,Not_a_particle_ /) )
+   call EvalAlphaS()
+   call setPDFs(eta1,eta2,pdf)
    FluxFac = 1d0/(2d0*EHat**2)
 
    if (PChannel.eq.0.or.PChannel.eq.2) then
@@ -1662,7 +1659,7 @@ ENDIF! GENEVT
       LO_Res_Unpol = LO_Res_Unpol * SpinAvg * GluonColAvg**2
       PreFac = 2d0 * fbGeV2 * FluxFac * sHatJacobi * PSWgt * PDFFac * SymmFac
       if( abs(MY_IDUP(6)).ge.1 .and. abs(MY_IDUP(6)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
-      if( abs(MY_IDUP(8)).ge.1 .and. abs(MY_IDUP(8)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
+      if( abs(MY_IDUP(8)).ge.1 .and. abs(MY_IDUP(8)).le.6 ) PreFac = PreFac * 3d0 ! =Nc     
       EvalWeighted = LO_Res_Unpol * PreFac
 
 ! EvalWeighted = PreFac  ! for PS output   (only run 1 iteration without vegas adaptation)
@@ -1717,8 +1714,16 @@ ENDIF! GENEVT
       EvalWeighted = LO_Res_Unpol * PreFac
    endif
 
+   if( WidthScheme.ne.0 ) EvalWeighted = EvalWeighted * ReweightBWPropagator( Get_MInv( MomExt(1:4,3)+MomExt(1:4,4) ) )
+!    print *, ReweightToCPS( Get_MInv( MomExt(1:4,3)+MomExt(1:4,4) ) );pause
 
    if( writeWeightedLHE .and. (.not. warmup) ) then
+      if (PChannel.eq.0) then
+         My_IDUP(1) = Glu_
+         My_IDUP(2) = Glu_
+         ICOLUP(1:2,1) = (/501,502/)
+         ICOLUP(1:2,2) = (/502,501/)
+      endif
       if( (OffShellV1).or.(OffShellV2).or.(IsAPhoton(DecayMode2))   ) then
             call WriteOutEvent((/MomExt(1:4,1),MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(1:9),ICOLUP(1:2,1:9),EventWeight=EvalWeighted*VgsWgt)
       else
@@ -1775,7 +1780,7 @@ END FUNCTION
     EvalCounter = EvalCounter+1
   
     MY_IDUP(1:2) = (/ElP_,MuM_/)
-    pHiggs(2:4) = (/110d0, -60d0,95d0  /)
+    pHiggs(2:4) = (/110d0, -60d0,95d0  /) ! What is this?
     pHiggs(1) = dsqrt( M_Reso**2 + pHiggs(2)**2+ pHiggs(3)**2+ pHiggs(4)**2 )
     call EvalPhasespace_tautau(yRnd(1:12),pHiggs,MY_IDUP,Mom,PSWgt)
 
@@ -1787,7 +1792,9 @@ END FUNCTION
     endif
 
 
-   call setPDFs(eta1,eta2,Mu_Fact,pdf)
+   call SetRunningScales( (/ pHiggs(1:4),Mom_Not_a_particle(1:4),Mom_Not_a_particle(1:4) /) , (/ Not_a_particle_,Not_a_particle_,Not_a_particle_,Not_a_particle_ /) )
+   call EvalAlphaS()
+   call setPDFs(eta1,eta2,pdf)
    FluxFac = 1d0/(2d0*EHat**2)
 
    PDFFac = pdf(0,1) * pdf(0,2)
@@ -1932,7 +1939,7 @@ include 'csmaxvalue.f'
                 sHatJacobi = sHatJacobi * dr/(Ga_V*M_V) * 1d0/(  &
                 1d0/((MZ1**2 - M_V**2)**2 + M_V**2*Ga_V**2 )     &
                 + 1d0/((MZ2**2 - M_V**2)**2 + M_V**2*Ga_V**2 ) )
-                sHatJacobi = sHatJacobi *(EHat - MZ1*0.999)**2
+                sHatJacobi = sHatJacobi *(EHat - MZ1*0.999d0)**2
             elseif(offzchannel.gt.0.5d0) then
                 EZ_max = EHat
                 dr = datan((EZ_max**2-M_V**2)/(Ga_V*M_V)) + datan(M_V/Ga_V)
@@ -1941,14 +1948,14 @@ include 'csmaxvalue.f'
                 sHatJacobi = sHatJacobi * dr/(Ga_V*M_V) * 1d0/( &
                 1d0/((MZ1**2 - M_V**2)**2 + M_V**2*Ga_V**2 )    &
                 + 1d0/((MZ2**2 - M_V**2)**2 + M_V**2*Ga_V**2 ) )
-                sHatJacobi = sHatJacobi *(EHat - MZ2*0.999)**2
+                sHatJacobi = sHatJacobi *(EHat - MZ2*0.999d0)**2
             endif
        endif
 
   elseif((OffShellV1.eqv..false.).and.(OffShellV2.eqv..true.)) then
         MZ1 = getMass(MY_IDUP(4))
         if(M_Reso.gt.2d0*M_V) then
-            EZ_max = EHat - MZ1*0.99
+            EZ_max = EHat - MZ1*0.99d0
             dr = datan((EZ_max**2-M_V**2)/(Ga_V*M_V)) + datan(M_V/Ga_V)
             MZ2 = dsqrt( M_V*Ga_V * dtan(dr*yz2-datan(M_V/Ga_V)) + M_V**2 )
             sHatJacobi = sHatJacobi*dr/(Ga_V*M_V)*( (MZ2**2 - M_V**2)**2 + M_V**2*Ga_V**2 )
@@ -1960,13 +1967,13 @@ include 'csmaxvalue.f'
   elseif((OffShellV1.eqv..true.).and.(OffShellV2.eqv..false.)) then
         MZ2 = getMass(MY_IDUP(5))
         if(M_Reso.gt.2d0*M_V) then
-            EZ_max = EHat - MZ2*0.99
+            EZ_max = EHat - MZ2*0.99d0
             dr = datan((EZ_max**2-M_V**2)/(Ga_V*M_V)) + datan(M_V/Ga_V)
             MZ1 = dsqrt( M_V*Ga_V * dtan(dr*yz1-datan(M_V/Ga_V)) + M_V**2 )
             sHatJacobi = sHatJacobi*dr/(Ga_V*M_V)*( (MZ1**2 - M_V**2)**2 + M_V**2*Ga_V**2 )
          else
             MZ1 = abs(EHat - MZ2*0.999999999999999d0)*dsqrt(abs(dble(yz2)))
-            sHatJacobi = sHatJacobi *(EHat - MZ2*0.999)**2
+            sHatJacobi = sHatJacobi *(EHat - MZ2*0.999d0)**2
   endif
 
   elseif((OffShellV1.eqv..false.).and.(OffShellV2.eqv..false.)) then
@@ -2036,7 +2043,9 @@ include 'csmaxvalue.f'
       return
     endif
 
-   call setPDFs(eta1,eta2,Mu_Fact,pdf)
+   call SetRunningScales( (/ (MomExt(1:4,3)+MomExt(1:4,4)),Mom_Not_a_particle(1:4),Mom_Not_a_particle(1:4) /) , (/ Not_a_particle_,Not_a_particle_,Not_a_particle_,Not_a_particle_ /) )
+   call EvalAlphaS()
+   call setPDFs(eta1,eta2,pdf)
    FluxFac = 1d0/(2d0*EHat**2)
 
 
@@ -2220,6 +2229,7 @@ IF( GENEVT ) THEN
 
    PreFac = 2d0 * fbGeV2 * FluxFac * sHatJacobi * PSWgt * SymmFac
    EvalUnWeighted = LO_Res_Unpol * PreFac
+   if( WidthScheme.ne.0 ) EvalUnWeighted = EvalUnWeighted * ReweightBWPropagator( Get_MInv( MomExt(1:4,3)+MomExt(1:4,4) ) )   
 
       if( EvalUnWeighted.gt. CS_max) then
           write(io_stdout,"(2X,A,1PE13.6,1PE13.6)")  "CS_max is too small.",EvalUnWeighted, CS_max
@@ -2310,6 +2320,7 @@ ELSE! NOT GENEVT
 
       PreFac = 2d0 * fbGeV2 * FluxFac * sHatJacobi * PSWgt * PDFFac * SymmFac
       EvalUnWeighted = LO_Res_Unpol * PreFac
+      if( WidthScheme.ne.0 ) EvalUnWeighted = EvalUnWeighted * ReweightBWPropagator( Get_MInv( MomExt(1:4,3)+MomExt(1:4,4) ) )      
       RES(0,0) = EvalUnWeighted
 
       if (EvalUnWeighted.gt.csmax(0,0)) then
@@ -2624,12 +2635,20 @@ include 'csmaxvalue.f'
     endif
 
 
+    call SetRunningScales( (/ (MomExt(1:4,3)+MomExt(1:4,4)),Mom_Not_a_particle(1:4),Mom_Not_a_particle(1:4) /) , (/ Not_a_particle_,Not_a_particle_,Not_a_particle_,Not_a_particle_ /) ) ! Call anyway
+    call EvalAlphaS()
 
 IF( GENEVT ) THEN
 
       MY_IDUP(1:2)=(/Glu_,Glu_/)
       ICOLUP(1:2,1) = (/501,502/)
       ICOLUP(1:2,2) = (/502,501/)
+
+      if( (OffShellV1).or.(OffShellV2).or.(IsAPhoton(DecayMode1)) ) then
+           AcceptedEvent(1:4,1:4) = MomDK(1:4,1:4)
+      else
+           AcceptedEvent(1:4,1:4) = MomDK_f(1:4,1:4)
+      endif
 
       if (Process.eq.0) then
             if( ML1.gt.1d-6 .or. ML2.gt.1d-6 .or. ML3.gt.1d-6 .or. ML4.gt.1d-6 ) then
@@ -2649,7 +2668,7 @@ IF( GENEVT ) THEN
 !       if( abs(MY_IDUP(6)).ge.1 .and. abs(MY_IDUP(6)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
 !       if( abs(MY_IDUP(8)).ge.1 .and. abs(MY_IDUP(8)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
       EvalUnWeighted_DecayToVV = LO_Res_Unpol * PreFac
-
+      
       CS_max = csmax(0,0)
 
       if( EvalUnWeighted_DecayToVV .gt. CS_max) then
@@ -2735,11 +2754,6 @@ IF( GENEVT ) THEN
                call intoHisto(NHisto,NBin(NHisto),1d0)  ! CS_Max is the integration volume
          enddo
          AccepCounter = AccepCounter + 1
-         if( (OffShellV1).or.(OffShellV2).or.(IsAPhoton(DecayMode1)) ) then
-              AcceptedEvent(1:4,1:4) = MomDK(1:4,1:4)
-          else
-              AcceptedEvent(1:4,1:4) = MomDK_f(1:4,1:4)
-         endif
          Res = 1d0
          
       else
@@ -2814,7 +2828,7 @@ EvalUnWeighted_DecayToTauTau = 0d0
 !      call random_number(DKRnd)
 !      if( DKRnd.lt.0.5d0 ) call swapi(DecayMode1,DecayMode2)
 !   endif
-  call VVBranchings(DK_IDUP(1:6),DK_ICOLUP(1:2,3:6),700)
+  call VVBranchings(DK_IDUP(1:6),DK_ICOLUP(1:2,3:6),800)
   MY_IDUP(nu_tau)   = NuT_;        ICOLUP(1:2,nu_tau)   = (/000,000/)
   MY_IDUP(Wp)       = DK_IDUP(1);  ICOLUP(1:2,Wp)       = (/000,000/)
   MY_IDUP(lepP)     = DK_IDUP(3);  ICOLUP(1:2,lepP)     = DK_ICOLUP(1:2,3)
@@ -2838,6 +2852,9 @@ EvalUnWeighted_DecayToTauTau = 0d0
   endif
   PreFac = fbGeV2 * PSWgt
 
+  call SetRunningScales( (/ pHiggs(1:4),Mom_Not_a_particle(1:4),Mom_Not_a_particle(1:4) /) , (/ Not_a_particle_,Not_a_particle_,Not_a_particle_,Not_a_particle_ /) ) ! Call anyway
+  call EvalAlphaS()
+
 IF( GENEVT ) THEN
 
       if( TauDecays.eq.0 ) then
@@ -2848,6 +2865,12 @@ IF( GENEVT ) THEN
       endif
       EvalUnWeighted_DecayToTauTau = LO_Res_Unpol * PreFac
       CS_max = csmax(0,0)
+
+      AcceptedEvent(:,:) = Mom(:,:)
+      if( TauDecays.ne.0 ) then
+          call ShiftMass(Mom(1:4,LepP),Mom(1:4,Wp)-Mom(1:4,LepP), GetMass(MY_IDUP(LepP)),0d0,  AcceptedEvent(1:4,LepP),AcceptedEvent(1:4,Nu) )
+          call ShiftMass(Mom(1:4,LepM),Mom(1:4,Wm)-Mom(1:4,LepM), GetMass(MY_IDUP(LepM)),0d0,  AcceptedEvent(1:4,LepM),AcceptedEvent(1:4,Nubar) )
+      endif
       
       if( EvalUnWeighted_DecayToTauTau .gt. CS_max) then
           write(io_stdout,"(2X,A,1PE13.6,1PE13.6)")  "CS_max is too small.",EvalUnWeighted_DecayToTauTau, CS_max
@@ -2859,12 +2882,6 @@ IF( GENEVT ) THEN
                call intoHisto(NHisto,NBin(NHisto),1d0)  ! CS_Max is the integration volume
          enddo
          AccepCounter = AccepCounter + 1
-
-         AcceptedEvent(:,:) = Mom(:,:)
-         if( TauDecays.ne.0 ) then
-             call ShiftMass(Mom(1:4,LepP),Mom(1:4,Wp)-Mom(1:4,LepP), GetMass(MY_IDUP(LepP)),0d0,  AcceptedEvent(1:4,LepP),AcceptedEvent(1:4,Nu) )
-             call ShiftMass(Mom(1:4,LepM),Mom(1:4,Wm)-Mom(1:4,LepM), GetMass(MY_IDUP(LepM)),0d0,  AcceptedEvent(1:4,LepM),AcceptedEvent(1:4,Nubar) )
-         endif
 
          Res = 1d0
       else

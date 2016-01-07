@@ -12,6 +12,7 @@ implicit none
 real(8) :: VG_Result,VG_Error
 
    call GetCommandlineArgs()
+   call InitProcessScaleSchemes()
    call InitPDFs()!  
    call InitHisto()
    call InitParameters()
@@ -23,14 +24,16 @@ real(8) :: VG_Result,VG_Error
    call PrintLogo(io_LogFile)
    call WriteParameters(io_stdout)
    call WriteParameters(io_LogFile)
-   if ( .not. ReadLHEFile .and. .not. ConvertLHEFile ) then
-      call InitOutput()
+   if ( .not. ReadLHEFile .and. .not. ConvertLHEFile .and. .not.((Process.eq.60 .or. Process.eq.61) .and. unweighted) ) then
+      call InitOutput(1d0, 1d14)   !for VBF/HJJ the cross section is calculated, so use that in the <init> block
    endif
    write(io_stdout,*) " Running"
    if( ConvertLHEFile ) then
         call StartConvertLHE(VG_Result,VG_Error)
    elseif( ReadLHEFile ) then
         call StartReadLHE_NEW(VG_Result,VG_Error)
+   elseif( CalcPMZZ ) then
+        call GetMZZdistribution()
    else
         if( Process.eq.80 .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.66 .or. Process.eq.90 .or. &
             Process.eq.110 .or. Process.eq.111 .or. Process.eq.112 .or. Process.eq.113 ) then
@@ -48,6 +51,170 @@ real(8) :: VG_Result,VG_Error
 END PROGRAM
 
 
+! !       Scheme=kRenFacScheme_default: Defaults of each process with Mu_Fact==Mu_Ren
+! !       Scheme=+-kRenFacScheme_mhstar: Scale ~ m_Hstar (or m_VV in bkg.); + for running, - for fixed
+! !       Below, J stands for the particles immediately associated to the Higgs (e.g. ttH, VH, VBF, tqH)
+! !       Scheme=+-kRenFacScheme_mjjhstar: Scale ~ m_JJHstar (or m_JJVV in bkg.); + for running, - for fixed
+! !       Scheme=+-kRenFacScheme_mjj_mhstar: Scale ~ m_JJ + m_Hstar (or m_JJ+m_VV in bkg.); + for running, - for fixed
+! !       Scheme=+-kRenFacScheme_mj_mj_mhstar: Scale ~ m_J + m_J + m_Hstar (or m_J+m_J+m_VV in bkg.); + for running, - for fixed
+! !       Scheme=+-kRenFacScheme_mjj: Scale ~ m_JJ; + for running, - for fixed
+! !       Scheme=+-kRenFacScheme_mj_mj: Scale ~ m_J + m_J; + for running, - for fixed
+! !       Below, J stands for either the top in JJ associated production (e.g. tqH), or the single jet (Hj)
+! !       Scheme=+-kRenFacScheme_mjhstar: Scale ~ m_JHstar (or m_JVV in bkg.); + for running, - for fixed
+! !       Scheme=+-kRenFacScheme_mj_mhstar: Scale ~ m_J + m_Hstar (or m_J+m_VV in bkg.); + for running, - for fixed
+! !       Scheme=+-kRenFacScheme_mj: Scale ~ m_J for the heavy jet (ie. t or b); + for running, - for fixed
+subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to the appropriate numbers
+   use ModParameters
+   use ModMisc
+   implicit none
+
+      if( .not.                 &
+         (                      &
+            Process.eq. 0 .or.  &
+            Process.eq. 1 .or.  &
+            Process.eq. 2 .or.  &
+            Process.eq.50 .or.  &
+            Process.eq.60 .or.  &
+            Process.eq.61 .or.  &
+            Process.eq.62 .or.  &
+            Process.eq.66 .or.  &
+            Process.eq.80 .or.  &
+            Process.eq.90 .or.  &
+            Process.eq.110 .or. &
+            Process.eq.111 .or. &
+            Process.eq.112 .or. &
+            Process.eq.113      &
+         )                      &
+      ) call Error("main::InitProcessScaleSchemes: Renormalization and factorization schemes are not implemented for process",Process)
+
+      if(FacScheme.eq.kRenFacScheme_default) then
+         if( &
+         Process.eq. 0 .or. & !- ggH spin-0
+         Process.eq. 1 .or. & !- ggH spin-1
+         Process.eq. 2      & !- ggH spin-2
+         ) then
+            FacScheme = +kRenFacScheme_mhstar
+            MuFacMultiplier = 0.5d0
+         elseif( &
+         Process.eq.60 .or. & !- HVBF without decays
+         Process.eq.61 .or. & !- Hjj, gluon fusion
+         Process.eq.62 .or. & !- Hj, gluon fusion
+         Process.eq.50 & !- VHiggs
+         ) then
+            FacScheme = -kRenFacScheme_mhstar
+            MuFacMultiplier = 1d0
+         elseif( &
+         Process.eq.66      & !- HVBF with decays
+         ) then
+            FacScheme = +kRenFacScheme_mhstar
+            MuFacMultiplier = 1d0
+         elseif( &
+         Process.eq.80 .or. & !- ttbar+H
+         Process.eq.90      & !- bbbar+H
+         ) then
+            FacScheme = -kRenFacScheme_mj_mj_mhstar
+            MuFacMultiplier = 0.5d0
+         elseif( &
+         Process.eq.110 .or. & !- t+H
+         Process.eq.111 .or. & !- tb+H
+         Process.eq.112 .or. & !- t+H s-channel
+         Process.eq.113      & !- tb+H s-channel
+         ) then
+            FacScheme = -kRenFacScheme_mj_mhstar
+            MuFacMultiplier = 0.25d0
+         endif
+      endif
+
+      if(RenScheme.eq.kRenFacScheme_default) then
+         if( &
+         Process.eq. 0 .or. & !- ggH spin-0
+         Process.eq. 1 .or. & !- ggH spin-1
+         Process.eq. 2      & !- ggH spin-2
+         ) then
+            RenScheme = +kRenFacScheme_mhstar
+            MuRenMultiplier = 0.5d0
+         elseif( &
+         Process.eq.60 .or. & !- HVBF without decays
+         Process.eq.61 .or. & !- Hjj, gluon fusion
+         Process.eq.62 .or. & !- Hj, gluon fusion
+         Process.eq.50 & !- VHiggs
+         ) then
+            RenScheme = -kRenFacScheme_mhstar
+            MuRenMultiplier = 1d0
+         elseif( &
+         Process.eq.66     & !- HVBF with decays
+         ) then
+            RenScheme = +kRenFacScheme_mhstar
+            MuRenMultiplier = 1d0
+         elseif( &
+         Process.eq.80 .or. & !- ttbar+H
+         Process.eq.90      & !- bbbar+H
+         ) then
+            RenScheme = -kRenFacScheme_mj_mj_mhstar
+            MuRenMultiplier = 0.5d0
+         elseif( &
+         Process.eq.110 .or. & !- t+H
+         Process.eq.111 .or. & !- tb+H
+         Process.eq.112 .or. & !- t+H s-channel
+         Process.eq.113      & !- tb+H s-channel
+         ) then
+            RenScheme = -kRenFacScheme_mj_mhstar
+            MuRenMultiplier = 0.25d0
+         endif
+      endif
+
+      ! H+2j MEs
+      if( &
+         (                     &
+            Process.eq.50 .or. &
+            Process.eq.60 .or. &
+            Process.eq.61 .or. &
+            Process.eq.66 .or. &
+            Process.eq.80 .or. &
+            Process.eq.90      &
+         ) .and. (             &
+            (abs(FacScheme).eq.kRenFacScheme_mjhstar) .or. (abs(FacScheme).eq.kRenFacScheme_mj_mhstar) .or. (abs(FacScheme).eq.kRenFacScheme_mj) .or. &
+            (abs(RenScheme).eq.kRenFacScheme_mjhstar) .or. (abs(RenScheme).eq.kRenFacScheme_mj_mhstar) .or. (abs(RenScheme).eq.kRenFacScheme_mj)      &
+         )                     &
+      ) call Error("ttH, bbH, HJJ, VBF and VH processes cannot distinguish the outgoing partons. Choose a different renormalization or factorization scheme.")
+
+      if( &
+         (                     &
+            Process.eq.50 .or. &
+            Process.eq.60 .or. &
+            Process.eq.61 .or. &
+            Process.eq.66      &
+         ) .and. (             &
+            (abs(FacScheme).eq.kRenFacScheme_mj_mj_mhstar) .or. (abs(FacScheme).eq.kRenFacScheme_mj_mj) .or. &
+            (abs(RenScheme).eq.kRenFacScheme_mj_mj_mhstar) .or. (abs(RenScheme).eq.kRenFacScheme_mj_mj)      &
+         )                     &
+      ) call Error("HJJ, VBF and VH processes outgoing partons are mostly massless, and alpha_S at a scale ~0 GeV is very unstable. Choose a different renormalization or factorization scheme (e.g. kRenFacScheme_mhstar).")
+
+      ! H+1j Me
+      if( &
+         (                     &
+            Process.eq.62      &
+         ) .and. (             &
+            (FacScheme.eq.-kRenFacScheme_mjhstar) .or. (FacScheme.eq.-kRenFacScheme_mj_mhstar) .or. (abs(FacScheme).eq.kRenFacScheme_mj) .or. &
+            (RenScheme.eq.-kRenFacScheme_mjhstar) .or. (RenScheme.eq.-kRenFacScheme_mj_mhstar) .or. (abs(RenScheme).eq.kRenFacScheme_mj) .or. &
+            (abs(FacScheme).eq.kRenFacScheme_mjjhstar) .or. (abs(FacScheme).eq.kRenFacScheme_mjj_mhstar) .or. (abs(FacScheme).eq.kRenFacScheme_mjj) .or. (abs(FacScheme).eq.kRenFacScheme_mj_mj_mhstar) .or. (abs(FacScheme).eq.kRenFacScheme_mj_mj) .or. &
+            (abs(RenScheme).eq.kRenFacScheme_mjjhstar) .or. (abs(RenScheme).eq.kRenFacScheme_mjj_mhstar) .or. (abs(RenScheme).eq.kRenFacScheme_mjj) .or. (abs(RenScheme).eq.kRenFacScheme_mj_mj_mhstar) .or. (abs(RenScheme).eq.kRenFacScheme_mj_mj)      &
+         )                     &
+      ) call Error("Invalid scheme for the HJ gluon fusion process. Choose a different renormalization or factorization scheme.")
+
+      ! H+0j Me
+      if( &
+         (                     &
+            Process.eq. 0 .or. & !- ggH spin-0
+            Process.eq. 1 .or. & !- ggH spin-1
+            Process.eq. 2      & !- ggH spin-2
+         ) .and. (             &
+            (abs(FacScheme).ne.kRenFacScheme_mhstar) .or. (abs(RenScheme).ne.kRenFacScheme_mhstar)      &
+         )                     &
+      ) call Error("Invalid scheme for the H+0J processes. Choose a different renormalization or factorization scheme.")
+
+   return
+end subroutine
 
 
 
@@ -66,26 +233,9 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
    VegasNc1=-1
    VegasNc2=-1
    PChannel=2
+
    DecayMode1=0  ! Z/W+
    DecayMode2=0  ! Z/W-
-   TopDecays=-1
-   TauDecays=-1
-   Process = 0   ! select 0, 1 or 2 to represent the spin of the resonance
-   Unweighted =.true.
-   OffShell_XVV=011! 000: X,V1,V2 on-shell; 010: X,V2 on-shell, V1 off-shell; and so on
-   LHEProdFile=""
-   ReadLHEFile=.false.
-   ConvertLHEFile=.false.
-   ReadCSmax=.false.
-   GenerateEvents=.false.
-   RequestNLeptons = -1
-   RequestOS=-1
-   RequestOSSF=-1
-   CountTauAsAny = .true.
-   LHAPDFString = ""
-   LHAPDFMember = 0
-   iinterf = -1
-
 ! !       DecayMode=0:  Z --> l+ l- (l=e,mu)
 ! !       DecayMode=1:  Z --> q qbar (q=u,d,c,s,b)
 ! !       DecayMode=2:  Z --> tau+ tau-
@@ -98,6 +248,33 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
 ! !       DecayMode=9:  Z --> anything
 ! !       DecayMode=10: W --> l nu_l (l=e,mu,tau)
 ! !       DecayMode=11: W --> anything
+
+   WidthScheme=0
+   TopDecays=-1
+   TauDecays=-1
+   Process = 0   ! select 0, 1 or 2 to represent the spin of the resonance
+   Unweighted =.true.
+   OffShell_XVV=011! 000: X,V1,V2 on-shell; 010: X,V2 on-shell, V1 off-shell; and so on
+   LHEProdFile=""
+   ReadLHEFile=.false.
+   ConvertLHEFile=.false.
+   ReadCSmax=.false.
+   CalcPMZZ = .false.
+   GenerateEvents=.false.
+   RequestNLeptons = -1
+   RequestOS=-1
+   RequestOSSF=-1
+   CountTauAsAny = .true.
+   LHAPDFString = ""
+   LHAPDFMember = 0
+   iinterf = -1
+   WriteFailedEvents=0
+
+   MuFacMultiplier = 1d0
+   MuRenMultiplier = 1d0
+   FacScheme = kRenFacScheme_default
+   RenScheme = kRenFacScheme_default
+
    DataFile="./data/output"
 
 
@@ -153,11 +330,26 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
     elseif( arg(1:11).eq."DecayMode2=" ) then
         read(arg(12:13),*) DecayMode2
         CountArg = CountArg + 1
+    elseif( arg(1:10).eq."FacScheme=" ) then
+        read(arg(11:13),*) FacScheme
+        CountArg = CountArg + 1
+    elseif( arg(1:10).eq."RenScheme=" ) then
+        read(arg(11:13),*) RenScheme
+        CountArg = CountArg + 1
+    elseif( arg(1:16).eq."MuFacMultiplier=" ) then
+        read(arg(17:24),*) MuFacMultiplier
+        CountArg = CountArg + 1
+    elseif( arg(1:16).eq."MuRenMultiplier=" ) then
+        read(arg(17:24),*) MuRenMultiplier
+        CountArg = CountArg + 1
     elseif( arg(1:6).eq."TopDK=" ) then
         read(arg(7:7),*) TopDecays
         CountArg = CountArg + 1
     elseif( arg(1:6).eq."TauDK=" ) then
         read(arg(7:7),*) TauDecays
+        CountArg = CountArg + 1
+    elseif( arg(1:12).eq."WidthScheme=" ) then
+        read(arg(13:13),*) WidthScheme
         CountArg = CountArg + 1
     elseif( arg(1:7) .eq."OffXVV=" ) then
         read(arg(8:10),*) OffShell_XVV
@@ -209,18 +401,21 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
     elseif( arg(1:9) .eq."ReadCSmax" ) then
         ReadCSmax=.true.
         CountArg = CountArg + 1
+    elseif( arg(1:9) .eq."CalcPMZZ" ) then
+        CalcPMZZ=.true.
+        CountArg = CountArg + 1
     elseif( arg(1:9) .eq."GenEvents" ) then
         GenerateEvents=.true.
         Unweighted=.false.
         CountArg = CountArg + 1
+    elseif( arg(1:18) .eq."WriteFailedEvents=" ) then
+        read(arg(19:19),*) WriteFailedEvents
+        CountArg = CountArg + 1
     endif
    enddo
 
-    Mu_Fact = M_Reso! setting pdf scale to resonance mass
-
     if( CountArg.ne.NumArgs ) then
-        print *, "unknown command line argument"
-        stop
+        call Error("Unknown command line argument")
     endif
 
     if (Process.eq.0) PChannel = 0   !only gluons
@@ -261,26 +456,22 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
        DecayMode2 = DecayMode1
     endif 
 
+    if((abs(FacScheme) .ge. nRenFacSchemes) .or. (abs(RenScheme) .ge. nRenFacSchemes) .or. (MuFacMultiplier.le.0d0) .or. (MuRenMultiplier.le.0d0)) call Error("The renormalization or factorization scheme is invalid, or the scale multiplier to either is not positive.")
+
     if( Process.eq.50 ) then
         DecayMode2=DecayMode1
-        if( Collider.eq.2 ) then
-          print *, "Collider 2 not available for VH"
-          stop
-        endif
+        if( Collider.eq.2 ) call Error("Collider 2 not available for VH")
+        if( (IsAZDecay(DecayMode1).eqv..false.) .and. (Collider.ne.1) ) call Error("WH with Collider 1 only")
     endif
-    if( (IsAZDecay(DecayMode1).eqv..false.) .and. (Collider.ne.1) ) then
-      print *, "WH with Collider 1 only"
-      stop
-    endif
+
     if( Process.ge.110 .and. Process.le.113 ) DecayMode2 = DecayMode1
     
     if( (TopDecays.ne.0 .and. TopDecays.ne.1) .and. (Process.eq.80 .or. (Process.ge.110 .and. Process.le.113)) ) call Error("Specify TopDK=0,1")
     if( (TopDecays.eq.1) .and. .not. IsAWDecay(DecayMode1) ) call Error("Invalid DecayMode1 for top decays")
     if( (TopDecays.eq.1) .and. .not. IsAWDecay(DecayMode2) ) call Error("Invalid DecayMode2 for top decays")
 
-!     if( (TauDecays.ne.0 .and. TauDecays.ne.1) .and. (Process.eq.80 .or. Process.eq.110 .or. Process.eq.111) ) call Error("Specify TauDK=0,1")
-!     if( (TauDecays.eq.1) .and. .not. IsAWDecay(DecayMode1) ) call Error("Invalid DecayMode1 for tau decays")
-!     if( (TauDecays.eq.1) .and. .not. IsAWDecay(DecayMode2) ) call Error("Invalid DecayMode2 for tau decays")
+    if( (TauDecays.eq.1) .and. .not. IsAWDecay(DecayMode1) ) call Error("Invalid DecayMode1 for tau decays")
+    if( (TauDecays.eq.1) .and. .not. IsAWDecay(DecayMode2) ) call Error("Invalid DecayMode2 for tau decays")
 
     if( IsAZDecay(DecayMode1) ) then
        M_V = M_Z
@@ -293,22 +484,17 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
        Ga_V= 0d0    
     endif
 
+    if (ReadLHEFile .or. ConvertLHEFile) then
+       call OpenFiles()
+       call ReadMassWidth()
+    endif
 
-    if( ((DecayMode1.eq.0) .and. (DecayMode2.eq.0)) .or.  &
-        ((DecayMode1.eq.2) .and. (DecayMode2.eq.2)) .or.  &
-        ((DecayMode1.eq.8) .and. (DecayMode2.eq.8)) .or.  &
-        ((DecayMode1.eq.9) .and. (DecayMode2.eq.9)) .or.  &
-        ((DecayMode1.eq.0) .and. (DecayMode2.eq.8)) .or.  &
-        ((DecayMode1.eq.0) .and. (DecayMode2.eq.9)) .or.  &
-        ((DecayMode1.eq.2) .and. (DecayMode2.eq.8)) .or.  &
-        ((DecayMode1.eq.2) .and. (DecayMode2.eq.9)) .or.  &
-        ((DecayMode1.eq.8) .and. (DecayMode2.eq.9)) .or.  &
-        ((DecayMode2.eq.0) .and. (DecayMode1.eq.0)) .or.  &
-        ((DecayMode2.eq.0) .and. (DecayMode1.eq.8)) .or.  &
-        ((DecayMode2.eq.0) .and. (DecayMode1.eq.9)) .or.  &
-        ((DecayMode2.eq.2) .and. (DecayMode1.eq.8)) .or.  &
-        ((DecayMode2.eq.2) .and. (DecayMode1.eq.9)) .or.  &
-        ((DecayMode2.eq.8) .and. (DecayMode1.eq.9))       ) then !  allow interference
+    if( (DecayMode1.eq.DecayMode2 .and. IsAZDecay(DecayMode1)) .or.  &
+        (DecayMode1.eq.9) .or. (DecayMode2.eq.9)               .or.  &
+        (DecayMode1.eq.8  .and. DecayMode2.eq.0)               .or.  &
+        (DecayMode1.eq.8  .and. DecayMode2.eq.2)               .or.  &
+        (DecayMode1.eq.0  .and. DecayMode2.eq.8)               .or.  &
+        (DecayMode1.eq.2  .and. DecayMode2.eq.8)               ) then !  allow interference
             if( iinterf.eq.-1 ) then!  set default interference switch
                 if( M_Reso.gt.2d0*M_Z ) then
                     includeInterference = .false.
@@ -392,6 +578,10 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
         RequestNLeptons = 2*RequestOS
     endif
 
+    if( WriteFailedEvents.lt.0 .or. WriteFailedEvents.gt.2 ) then
+        call Error("WriteFailedEvents can only be 0, 1, or 2.  Please see the manual.")
+    endif
+
 return
 END SUBROUTINE
 
@@ -418,35 +608,79 @@ END SUBROUTINE
 
 
 
+SUBROUTINE InitPDFValues()
+   use ModParameters
+   use ModKinematics
+   implicit none
 
+#if useLHAPDF==0
+   IF (alphas_mz .LE. 0d0) THEN 
+      WRITE(6,*) 'alphas_mz .le. 0:',alphas_mz
+      WRITE(6,*) 'continuing with alphas_mz=0.118'
+      alphas_mz=0.118d0
+   ENDIF
+#endif
 
+   Mu_Fact = M_Reso ! Set pdf scale to resonance mass by default, later changed as necessary in the EvalWeighted/EvalUnweighted subroutines
+	Mu_Ren = M_Reso ! Set renorm. scale to resonance mass by default, later changed as necessary in the EvalWeighted/EvalUnweighted subroutines
+   call EvalAlphaS() ! Set alphas at default Mu_Ren. Notice ModParameters::ComputeQCDVariables is automatically called!
+   return
+END SUBROUTINE
 
 
 SUBROUTINE InitPDFs()
-use ModParameters
-implicit none
-character :: pdftable*(100)
 
 #if useLHAPDF==1
-     call InitPDFset(trim(LHAPDFString))
-     call InitPDF(LHAPDFMember)  
+
+   use ModParameters
+   implicit none
+   DOUBLE PRECISION alphasPDF
+
+     call InitPDFset(trim(LHAPDFString)) ! Let LHAPDF handle everything
+     call InitPDF(LHAPDFMember)
+
+     alphas_mz=alphasPDF(zmass_pdf)
+     ! Dummy initialization, just in case. These values are not used.
+     !nloops_pdf = 1
+     zmass_pdf = M_Z
+
 #else
-     if( PDFSet.eq.1 ) then
+
+   use ModParameters
+   use ModKinematics
+   implicit none
+   character :: pdftable*(100)
+
+     zmass_pdf = M_Z ! Take zmass_pdf=M_Z in pdfs that do not specify this value
+
+     if( PDFSet.eq.1 ) then ! CTEQ6L1
         call SetCtq6(4)  ! 4    CTEQ6L1  Leading Order cteq6l1.tbl
-     elseif( PDFSet.eq.3 ) then
-!         pdftable(:)="./pdfs/NNPDF23_lo_as_0130.LHgrid"
+
+        alphas_mz=0.130d0
+        !nloops_pdf=1
+     elseif( PDFSet.eq.3 ) then  ! NNPDF 3.0 LO with a_s=0.13
         pdftable(:)="./pdfs/NNPDF30_lo_as_0130.LHgrid"
         call NNPDFDriver(pdftable)
         call NNinitPDF(0)
+
+        alphas_mz=0.130d0
+        !nloops_pdf=1
+        zmass_pdf=91.199996948242188d0*GeV
+     elseif( (PDFSet.eq.2) .or. (PDFSet.ge.201 .and. PDFSet.le.240) ) then ! MSTW2008 and variations
+        alphas_mz=0.13939d0
+        !nloops_pdf=1
+     else ! Everything else
+        write(6,*),"main.F90::InitPDFs: PDFSet",PDFSet,"QCD parameters are unknown. Please double-check! Stopping JHUGen..."
+        stop
+        ! Could also have used these instead of the stop statement, but why introduce arbitrary number?
+        !alphas_mz = 0.13229060d0
+        !nloops_pdf = 1
      endif
+
 #endif
 
-
-     
-     
-     
-     
-return
+     call InitPDFValues() ! Call this only once
+   return
 END SUBROUTINE
 
 
@@ -1190,6 +1424,7 @@ if( UseBetaVersion ) then
     CrossSec(:,:) = CrossSec(:,:)/dble(itmx)    
     write(io_stdout,"(A)")  ""
     write(io_stdout,"(2X,A,F10.3,A,F10.3,A,F10.3)") "Total xsec: ",VG_Result, " +/-",VG_Error, " fb    vs.",sum(CrossSec(:,:))
+    call InitOutput(VG_Result, VG_Error)
 
     RequEvents(:,:)=0
     do i1=-5,5
@@ -1469,78 +1704,42 @@ END SUBROUTINE
 
 
 
-
-
-
-
-SUBROUTINE StartReadLHE_NEW(VG_Result,VG_Error)
-use ModCrossSection
-use ModKinematics
+SUBROUTINE ReadMassWidth()
 use ModParameters
 use ModMisc
 implicit none
-include 'csmaxvalue.f'
-integer,parameter :: maxpart=30!=max.part particles in LHE file; this parameter should match the one in WriteOutEvent of mod_Kinematics
-real(8) :: VG_Result,VG_Error,VG_Chi2
-real(8) :: yRnd(1:22),Res,dum,EMcheck(1:4)
-real(8) :: HiggsDK_Mom(1:4,1:13),Ehat
-real(8) :: MomExt(1:4,1:maxpart),MomHiggs(1:4),Mass(1:maxpart),pH2sq
-integer :: tries, nParticle,  ICOLUP(1:2,1:7+maxpart),LHE_IntExt(1:7+maxpart),HiggsDK_IDUP(1:13),HiggsDK_ICOLUP(1:2,1:13)
-character(len=*),parameter :: POWHEG_Fmt0 = "(5X,I2,A160)"
-character(len=*),parameter :: POWHEG_Fmt1 = "(5X,I3,4X,I2,4X,I2,4X,I2,2X,I4,2X,I4,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9,1X,1PE16.9)"
-character(len=*),parameter :: JHUGen_Fmt0 = "(I2,A160)"
-character(len=*),parameter :: JHUGen_Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0)"
-character(len=*),parameter :: JHUGen_old_Fmt0 = "(2X,I2,A160)"
-character(len=*),parameter :: JHUGen_old_Fmt1 = "(I3,X,I2,X,I2,X,I2,X,I3,X,I3,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7)"
-character(len=*),parameter :: MadGra_Fmt0 = "(I2,A160)"
-character(len=*),parameter :: MadGra_Fmt1 = "(7X,I3,2X,I3,3X,I2,3X,I2,3X,I3,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1F3.0,X,1F3.0)"
-character(len=150) :: InputFmt0,InputFmt1
-logical :: FirstEvent,M_ResoSet,Ga_ResoSet,WroteHeader,ClosedHeader,WroteMassWidth,InMadgraphMassBlock
-integer :: nline,intDummy,Nevent
-integer :: LHE_IDUP(1:maxpart),LHE_ICOLUP(1:2,1:maxpart),LHE_MOTHUP(1:2,1:maxpart)
-integer :: EventNumPart
-character(len=160) :: FirstLines,EventInfoLine,OtherLines
-character(len=160) :: EventLine(0:maxpart)
-integer :: n,stat,iHiggs,VegasSeed
-integer :: i, j
-character(len=100) :: BeginEventLine
-
-
-
-if( VegasIt1.eq.-1 ) VegasIt1 = VegasIt1_default
-if( VegasNc0.eq.-1 ) VegasNc0 = VegasNc0_default
-if( VegasNc1.eq.-1 .and. VegasNc2.eq.-1 ) VegasNc1 = VegasNc1_default
-if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
-
-     write(io_LHEOutFile ,'(A)') '<LesHouchesEvents version="1.0">'
+logical :: FirstEvent,InMadgraphMassBlock
+character(len=160) :: FirstLines
+integer :: i, j, stat
 
 !    search for line with first event
      FirstEvent = .false.
-     M_ResoSet=.false.
-     Ga_ResoSet=.false.
-     WroteHeader=.false.
-     ClosedHeader=.false.
-     WroteMassWidth=.false.
+     FoundHiggsMass=.false.
+     FoundHiggsWidth=.false.
      InMadgraphMassBlock=.false.
      do while ( .not.FirstEvent )
         read(16,fmt="(A160)",IOSTAT=stat,END=99) FirstLines
-        if ( FirstLines(1:4).eq."<!--" .and. .not.WroteHeader ) then
-            call InitOutput()
-            WroteHeader = .true.
-        endif
-        if (index(FirstLines,"<MG").ne.0 .and. .not.WroteHeader) then  !Sometimes MadGraph doesn't have a comment at the beginning
-            call InitOutput()                                          !In that case put the JHUGen header before the MadGraph
-            write(io_LHEOutFile, "(A)") "-->"                          ! proc card, etc.
-            WroteHeader = .true.                                       !and put the Higgs mass/width in a separate comment
-            ClosedHeader = .true.                                      !before <init>
-        endif
-        if (Index(FirstLines,"<init>").ne.0 .and. .not.WroteHeader ) then !If not now, when?
-            call InitOutput()
-            WroteHeader = .true.
-        endif
 
         !Read the Higgs mass
-        !JHUGen or POWHEG
+        !JHUGen
+        i = Index(FirstLines, "Resonance: spin=")
+        if ( i .ne. 0) then
+            do while (FirstLines(i:i+4) .ne. "mass=")
+                i = i+1
+            enddo
+            i = i+5 !after the =
+            do while (FirstLines(i:i).eq." ")
+                i = i+1
+            enddo
+            j = i
+            do while (FirstLines(j:j).ne." ")
+                j = j+1
+            enddo
+            read(FirstLines(i:j),*) M_Reso
+            M_Reso = M_Reso*GeV
+            FoundHiggsMass=.true.
+        endif
+        !POWHEG
         if( FirstLines(1:5).eq."hmass" ) then 
                i = 6
                do while(FirstLines(i:i).eq." ")
@@ -1551,10 +1750,10 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                enddo
                read(FirstLines(6:i),*) M_Reso
                M_Reso = M_Reso*GeV!  convert to units of 100GeV
-               M_ResoSet=.true.
+               FoundHiggsMass=.true.
         endif
         !Madgraph
-        if (Index(Capitalize(FirstLines),"BLOCK MASS").ne.0 .and. .not.M_ResoSet) then
+        if (Index(Capitalize(FirstLines),"BLOCK MASS").ne.0 .and. .not.FoundHiggsMass) then
                InMadgraphMassBlock=.true.
         elseif (Index(Capitalize(FirstLines),"BLOCK").ne.0) then
                InMadgraphMassBlock=.false.
@@ -1568,12 +1767,30 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                    endif
                    read(FirstLines(i+4:j),*) M_Reso
                    M_Reso = M_Reso*GeV
-                   M_ResoSet=.true.
+                   FoundHiggsMass=.true.
                endif
         endif
 
         !Read the Higgs width
-        !JHUGen or POWHEG
+        !JHUGen
+        i = Index(FirstLines, "Resonance: spin=")
+        if ( i .ne. 0) then
+            do while (FirstLines(i:i+5) .ne. "width=")
+                i = i+1
+            enddo
+            i = i+6 !after the =
+            do while (FirstLines(i:i).eq." ")
+                i = i+1
+            enddo
+            j = i
+            do while (FirstLines(j:j).ne." ")
+                j = j+1
+            enddo
+            read(FirstLines(i:j),*) Ga_Reso
+            Ga_Reso = Ga_Reso*GeV
+            FoundHiggsWidth=.true.
+        endif
+        !POWHEG
         if( FirstLines(1:6).eq."hwidth" ) then
                i = 7
                do while(FirstLines(i:i).eq." ")
@@ -1584,7 +1801,7 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                enddo
                read(FirstLines(7:i),*) Ga_Reso
                Ga_Reso = Ga_Reso*GeV!  convert to units of 100GeV
-               Ga_ResoSet=.true.
+               FoundHiggsWidth=.true.
         endif
         !Madgraph
         if (Index(Capitalize(FirstLines),"DECAY ").ne.0) then
@@ -1596,34 +1813,50 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                    endif
                    read(FirstLines(i+4:j),*) Ga_Reso
                    Ga_Reso = Ga_Reso*GeV
-                   Ga_ResoSet=.true.
+                   FoundHiggsWidth=.true.
                endif
         endif
 
-        if( Index(FirstLines,"-->").ne.0 .and. .not.(M_ResoSet .and. Ga_ResoSet)) then
-            !In other words, if the mass and the width have not been found by the end of the comment
-            !This is possible in some MadGraph versions, where the mass and width are below, in the proc card
-            ! and the comment is just a fancy header.
-            !Give them more time to be found, and print them before <init>
-            ClosedHeader = .true.
-        elseif( .not.WroteMassWidth .and. (Index(FirstLines,"<init>").ne.0 .or. Index(FirstLines,"-->").ne.0) ) then
-            write(io_LHEOutFile ,"(A)") ""
-            if (ClosedHeader) then
-                write(io_LHEOutFile, "(A)") "<!--"
-            endif
-            write(io_LHEOutFile ,"(A)") "JHUGen Resonance parameters used for event generation:"
-            write(io_LHEOutFile ,"(A,F8.1,A)") "hmass  ",M_Reso*100d0,"       ! Higgs boson mass"
-            write(io_LHEOutFile ,"(A,F10.5,A)") "hwidth   ",Ga_Reso*100d0,"   ! Higgs boson width"
-            if (Index(FirstLines,"-->").eq.0) then
-                write(io_LHEOutFile, "(A)") "-->"
-            endif
-            write(io_LHEOutFile ,"(A)") ""
-            ClosedHeader = .true.
-            WroteMassWidth = .true.
+        if( Index(FirstLines, "<event").ne.0 ) FirstEvent=.true.
+     enddo
+99   continue
+
+     call ReopenInFile()
+
+return
+END SUBROUTINE
+
+SUBROUTINE InitReadLHE(BeginEventLine)
+use ModParameters
+use ModMisc
+implicit none
+logical :: FirstEvent, WroteHeader
+character(len=160) :: FirstLines
+integer :: stat
+character(len=100), intent(out) :: BeginEventLine
+
+     write(io_LHEOutFile ,'(A)') '<LesHouchesEvents version="1.0">'
+     FirstEvent = .false.
+     WroteHeader = .false.
+     do while ( .not.FirstEvent )
+        read(16,fmt="(A160)",IOSTAT=stat,END=99) FirstLines
+        if ( FirstLines(1:4).eq."<!--" .and. .not.WroteHeader ) then
+            call InitOutput(1d0, 1d14)
+            WroteHeader = .true.
         endif
+        if (index(FirstLines,"<MG").ne.0 .and. .not.WroteHeader) then  !Sometimes MadGraph doesn't have a comment at the beginning
+            call InitOutput(1d0, 1d14)                                 !In that case put the JHUGen header before the MadGraph
+            write(io_LHEOutFile, "(A)") "-->"                          ! proc card, etc.
+            WroteHeader = .true.                                       !and put the Higgs mass/width in a separate comment
+        endif
+        if (Index(FirstLines,"<init>").ne.0 .and. .not.WroteHeader ) then !If not now, when?
+            call InitOutput(1d0, 1d14)
+            WroteHeader = .true.
+        endif
+
         if( Index(FirstLines, "<event").ne.0 ) then
-               FirstEvent=.true.
-               BeginEventLine = trim(FirstLines)
+            FirstEvent=.true.
+            BeginEventLine = trim(FirstLines)
         else
             if( importExternal_LHEinit ) then
                 if( Index(FirstLines,"<LesHouchesEvents").ne.0 .or. Index(FirstLines,"<!--").ne.0 ) then
@@ -1632,40 +1865,87 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                 endif
             endif
         endif
-     enddo
 
-     
-     if( .not. M_ResoSet ) then
-        write(io_stdout,"(2X,A,1F7.2)")  "ERROR: Higgs mass could not be read from LHE input file. Assuming default value",M_Reso*100d0
-        write(io_LogFile,"(2X,A,1F7.2)") "ERROR: Higgs mass could not be read from LHE input file. Assuming default value",M_Reso*100d0
+    enddo
+
+    if( .not. FoundHiggsMass ) then
+       write(io_stdout,"(2X,A,1F7.2)")  "ERROR: Higgs mass could not be read from LHE input file. Assuming default value",M_Reso*100d0
+       write(io_LogFile,"(2X,A,1F7.2)") "ERROR: Higgs mass could not be read from LHE input file. Assuming default value",M_Reso*100d0
+    else
+       write(io_stdout,"(2X,A,1F7.2,A)") "A Higgs mass of ",M_Reso*100d0," GeV was determined from the LHE input file."
+       write(io_LogFile,"(2X,A,1F7.2,A)") "A Higgs mass of ",M_Reso*100d0," GeV was determined from the LHE input file."
+    endif
+    if( .not. FoundHiggsWidth ) then
+       write(io_stdout,"(2X,A,1F10.5)")  "ERROR: Higgs width could not be read from LHE input file. Assuming default value",Ga_Reso*100d0
+       write(io_LogFile,"(2X,A,1F10.5)") "ERROR: Higgs width could not be read from LHE input file. Assuming default value",Ga_Reso*100d0
+    else
+       write(io_stdout,"(2X,A,1F10.5,A)") "A Higgs width of ",Ga_Reso*100d0," GeV was determined from the LHE input file."
+       write(io_LogFile,"(2X,A,1F10.5,A)") "A Higgs width of ",Ga_Reso*100d0," GeV was determined from the LHE input file."
+    endif
+    write(io_stdout,"(A)") ""
+    write(io_LogFile,"(A)") ""
+
+99  continue
+
+return
+END SUBROUTINE
+
+
+SUBROUTINE StartReadLHE_NEW(VG_Result,VG_Error)
+use ModCrossSection
+use ModKinematics
+use ModParameters
+use ModMisc
+implicit none
+include 'csmaxvalue.f'
+integer,parameter :: maxpart=30!=max.part particles in LHE file; this parameter should match the one in WriteOutEvent of mod_Kinematics
+real(8) :: VG_Result,VG_Error,VG_Chi2
+real(8) :: yRnd(1:22),Res,EMcheck(1:4),DecayWeight,DecayWidth,DecayWidth0
+real(8) :: HiggsDK_Mom(1:4,1:13),Ehat,GetMZZProbability
+real(8) :: MomExt(1:4,1:maxpart),MomHiggs(1:4),Mass(1:maxpart),pH2sq
+integer :: tries, nParticle,  ICOLUP(1:2,1:7+maxpart),LHE_IntExt(1:7+maxpart),HiggsDK_IDUP(1:13),HiggsDK_ICOLUP(1:2,1:13)
+character(len=150) :: InputFmt0,InputFmt1
+integer :: nline,intDummy,Nevent
+integer :: LHE_IDUP(1:maxpart),LHE_ICOLUP(1:2,1:maxpart),LHE_MOTHUP(1:2,1:maxpart)
+integer :: EventNumPart, EventProcessId
+real(8) :: WeightScaleAqedAqcd(1:4)
+character(len=160) :: OtherLines
+character(len=160) :: EventLine(0:maxpart)
+integer :: n,stat,iHiggs,VegasSeed,AccepLastPrinted
+character(len=100) :: BeginEventLine
+integer,parameter :: PMZZcalls = 200000
+logical :: Empty
+
+
+if( VegasIt1.eq.-1 ) VegasIt1 = VegasIt1_default
+if( VegasNc0.eq.-1 ) VegasNc0 = VegasNc0_default
+if( VegasNc1.eq.-1 .and. VegasNc2.eq.-1 ) VegasNc1 = VegasNc1_default
+if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
+AccepLastPrinted = 0
+
+call InitReadLHE(BeginEventLine)
+
+     if( TauDecays.lt.0 .and. ReweightDecay ) then
+        print *, " finding P_H4l(m_Reso) with ",1000000," points" 
+        DecayWidth0 = GetMZZProbability(m_Reso,1000000)
      else
-        write(io_stdout,"(2X,A,1F7.2,A)") "A Higgs mass of ",M_Reso*100d0," GeV was determined from the LHE input file."
-        write(io_LogFile,"(2X,A,1F7.2,A)") "A Higgs mass of ",M_Reso*100d0," GeV was determined from the LHE input file."
+        DecayWidth0 = 1
      endif
-     if( .not. Ga_ResoSet ) then
-        write(io_stdout,"(2X,A,1F10.5)")  "ERROR: Higgs width could not be read from LHE input file. Assuming default value",Ga_Reso*100d0
-        write(io_LogFile,"(2X,A,1F10.5)") "ERROR: Higgs width could not be read from LHE input file. Assuming default value",Ga_Reso*100d0
-     else
-        write(io_stdout,"(2X,A,1F10.5,A)") "A Higgs width of ",Ga_Reso*100d0," GeV was determined from the LHE input file."
-        write(io_LogFile,"(2X,A,1F10.5,A)") "A Higgs width of ",Ga_Reso*100d0," GeV was determined from the LHE input file."
-     endif
-     write(io_stdout,"(A)") ""
-     write(io_LogFile,"(A)") ""
 
-
-     print *, " finding maximal weight with ",VegasNc0," points"
+     print *, " finding maximal weight for mZZ=mReso with ",VegasNc0," points"
      VG = zero
      CSmax = zero
      EHat = M_Reso! fixing Ehat to M_Reso which should determine the max. of the integrand
      if( TauDecays.lt.0 ) then
          do tries=1,VegasNc0
              call random_number(yRnd)
-             dum = EvalUnWeighted_DecayToVV(yRnd,.false.,EHat,Res,HiggsDK_Mom(1:4,6:9),HiggsDK_IDUP(1:9),HiggsDK_ICOLUP)
+             DecayWeight = EvalUnWeighted_DecayToVV(yRnd,.false.,EHat,Res,HiggsDK_Mom(1:4,6:9),HiggsDK_IDUP(1:9),HiggsDK_ICOLUP)
          enddo
+
      else
          do tries=1,VegasNc0
              call random_number(yRnd)
-             dum = EvalUnWeighted_DecayToTauTau(yRnd,.false.,EHat,Res,HiggsDK_Mom(1:4,4:13),HiggsDK_IDUP(1:13),HiggsDK_ICOLUP(1:2,1:13))
+             DecayWeight = EvalUnWeighted_DecayToTauTau(yRnd,.false.,EHat,Res,HiggsDK_Mom(1:4,4:13),HiggsDK_IDUP(1:13),HiggsDK_ICOLUP(1:2,1:13))
          enddo      
      endif
      csmax(0,0)   = 1.5d0*csmax(0,0)    !  savety buffer
@@ -1685,20 +1965,12 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
          LeptInEvent(:) = 0
          read(16,"(A)") EventLine(0)
          if (UseUnformattedRead) then
-             read(EventLine(0),*) EventNumPart !  read number of particle from the first line after <event>
-             i = 1                             !  trying to read the other stuff in one string would just give
-             do while(EventLine(0)(i:i).eq." ")!  the first field
-                 i=i+1
-             enddo
-             do while(EventLine(0)(i:i).ne." ")
-                 i=i+1
-             enddo
-             read(EventLine(0)(i:len(EventLine(0))),"(A)") EventInfoLine
+             read(EventLine(0),*) EventNumPart, EventProcessId, WeightScaleAqedAqcd
          else
              if (InputFmt0.eq."") then
                  InputFmt0 = FindInputFmt0(EventLine(0))
              endif
-             read(EventLine(0),InputFmt0) EventNumPart, EventInfoLine
+             read(EventLine(0),InputFmt0) EventNumPart, EventProcessId, WeightScaleAqedAqcd
          endif
 !        read event lines
          do nline=1,EventNumPart
@@ -1728,24 +2000,46 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                   LeptInEvent( LeptInEvent(0) ) = LHE_IDUP(nline)
             endif
          enddo
+            
          
 !         accept/reject sampling for H->VV decay contribution
           EHat = pH2sq
+          DecayWeight = 0d0
           if( TauDecays.lt.0 ) then
+          
+                if( ReweightDecay ) then
+                    DecayWidth = GetMZZProbability(EHat,PMZZcalls)!  could also be used to determine csmax for this particular event to improve efficiency (-->future work)
+                else
+                    DecayWidth = 1
+                endif
+                WeightScaleAqedAqcd(1) = WeightScaleAqedAqcd(1) *   DecayWidth/DecayWidth0
+                
                 do tries=1,5000000
                     call random_number(yRnd)
-                    dum = EvalUnWeighted_DecayToVV(yRnd,.true.,EHat,Res,HiggsDK_Mom(1:4,6:9),HiggsDK_IDUP(1:9),HiggsDK_ICOLUP(1:2,1:9))
+                    DecayWeight = EvalUnWeighted_DecayToVV(yRnd,.true.,EHat,Res,HiggsDK_Mom(1:4,6:9),HiggsDK_IDUP(1:9),HiggsDK_ICOLUP(1:2,1:9))
                     if( Res.ne.0d0 ) exit
                 enddo
           else
                 do tries=1,5000000
                     call random_number(yRnd)
-                    dum =  EvalUnWeighted_DecayToTauTau(yRnd,.true.,EHat,Res,HiggsDK_Mom(1:4,1:13),HiggsDK_IDUP(1:13),HiggsDK_ICOLUP(1:2,1:13))
+                    DecayWeight =  EvalUnWeighted_DecayToTauTau(yRnd,.true.,EHat,Res,HiggsDK_Mom(1:4,1:13),HiggsDK_IDUP(1:13),HiggsDK_ICOLUP(1:2,1:13))
                     if( Res.ne.0d0 ) exit
                 enddo
-          endif          
-          if( Res.gt.0d0 ) then ! decay event was accepted
+          endif
+
+          Empty = .false.
+          if( Res.le.0 .and. WriteFailedEvents.ne.0 ) then
+              if( WriteFailedEvents.eq.1 ) then
+                  WeightScaleAqedAqcd(1) = 0d0! events that were not accepted after 50 Mio. tries are assigned weight zero
+                  Res = 1d0
+              elseif( WriteFailedEvents.eq.2 ) then
+                  WeightScaleAqedAqcd(1) = 0d0
+                  Res = 1d0
+                  Empty = .true.
+              endif
+          endif
           
+          if( Res.gt.0d0 ) then ! decay event was accepted
              if( TauDecays.lt.0 ) then!  H->VV->4f
                 call boost(HiggsDK_Mom(1:4,6),MomHiggs(1:4),pH2sq)
                 call boost(HiggsDK_Mom(1:4,7),MomHiggs(1:4),pH2sq)
@@ -1759,7 +2053,11 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                 HiggsDK_IDUP(7) = convertLHE(HiggsDK_IDUP(7))
                 HiggsDK_IDUP(8) = convertLHE(HiggsDK_IDUP(8))
                 HiggsDK_IDUP(9) = convertLHE(HiggsDK_IDUP(9))
-                call WriteOutEvent_NEW(EventNumPart,LHE_IDUP,LHE_IntExt,LHE_MOTHUP,LHE_ICOLUP,MomExt,HiggsDK_Mom(1:4,4:9),Mass,iHiggs,HiggsDK_IDUP(1:9),HiggsDK_ICOLUP(1:2,1:9),EventInfoLine,BeginEventLine=BeginEventLine)
+                if (UseUnformattedRead) then
+                    call WriteOutEvent_NEW(EventNumPart,LHE_IDUP,LHE_IntExt,LHE_MOTHUP,LHE_ICOLUP,MomExt,HiggsDK_Mom(1:4,4:9),Mass,iHiggs,HiggsDK_IDUP,HiggsDK_ICOLUP,EventProcessId,EventWeight=WeightScaleAqedAqcd(1),EventScaleAqedAqcd=WeightScaleAqedAqcd(2:4),BeginEventLine=BeginEventLine,Empty=Empty)
+                else
+                    call WriteOutEvent_NEW(EventNumPart,LHE_IDUP,LHE_IntExt,LHE_MOTHUP,LHE_ICOLUP,MomExt,HiggsDK_Mom(1:4,4:9),Mass,iHiggs,HiggsDK_IDUP,HiggsDK_ICOLUP,EventProcessId,EventWeight=WeightScaleAqedAqcd(1),EventScaleAqedAqcd=WeightScaleAqedAqcd(2:4),BeginEventLine=BeginEventLine,InputFmt0=InputFmt0,Empty=Empty)
+                endif
              else! H->tautau
                 call boost(HiggsDK_Mom(1:4,4),MomHiggs(1:4),pH2sq)
                 call boost(HiggsDK_Mom(1:4,5),MomHiggs(1:4),pH2sq)
@@ -1782,13 +2080,18 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
                 HiggsDK_IDUP(11)= convertLHE(HiggsDK_IDUP(11))
                 HiggsDK_IDUP(12)= convertLHE(HiggsDK_IDUP(12))
                 HiggsDK_IDUP(13)= convertLHE(HiggsDK_IDUP(13))
-                call WriteOutEvent_HFF(EventNumPart,LHE_IDUP,LHE_IntExt,LHE_MOTHUP,LHE_ICOLUP,MomExt,HiggsDK_Mom(1:4,1:13),Mass,iHiggs,HiggsDK_IDUP(1:13),HiggsDK_ICOLUP(1:2,1:13),EventInfoLine,BeginEventLine=BeginEventLine)
+                if (UseUnformattedRead) then
+                    call WriteOutEvent_HFF(EventNumPart,LHE_IDUP,LHE_IntExt,LHE_MOTHUP,LHE_ICOLUP,MomExt,HiggsDK_Mom(1:4,1:13),Mass,iHiggs,HiggsDK_IDUP(1:13),HiggsDK_ICOLUP(1:2,1:13),EventProcessId,EventWeight=WeightScaleAqedAqcd(1),EventScaleAqedAqcd=WeightScaleAqedAqcd(2:4),BeginEventLine=BeginEventLine,Empty=Empty)
+                else
+                    call WriteOutEvent_HFF(EventNumPart,LHE_IDUP,LHE_IntExt,LHE_MOTHUP,LHE_ICOLUP,MomExt,HiggsDK_Mom(1:4,1:13),Mass,iHiggs,HiggsDK_IDUP(1:13),HiggsDK_ICOLUP(1:2,1:13),EventProcessId,EventWeight=WeightScaleAqedAqcd(1),EventScaleAqedAqcd=WeightScaleAqedAqcd(2:4),BeginEventLine=BeginEventLine,InputFmt0=InputFmt0,Empty=Empty)
+                endif
              endif
 
-             if( mod(AccepCounter,5000).eq.0 ) then
+             if( mod(NEvent,5000).eq.0 .and. AccepCounter.ne.AccepLastPrinted) then
                   call cpu_time(time_int)
-                  write(io_stdout,*)  NEvent," events accepted (",time_int-time_start, ") seconds"
-                  write(io_LogFile,*) NEvent," events accepted (",time_int-time_start, ") seconds"
+                  write(io_stdout,*)  NEvent," events processed (",time_int-time_start, ") seconds"
+                  write(io_LogFile,*) NEvent," events processed (",time_int-time_start, ") seconds"
+                  AccepLastPrinted = AccepCounter
              endif
 
           elseif( Res.eq.0d0 ) then ! decay event was not accepted after ncall evaluations, read next production event
@@ -1796,8 +2099,10 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
              AlertCounter = AlertCounter + 1 
           endif
 
+
+
+
 !        read optional lines
-         FirstEvent = .true.
          tries = 0
          do while (.true.) 
               tries = tries +1 
@@ -1875,19 +2180,18 @@ integer,parameter :: maxpart=15!=max.partons; this parameter should match the on
 real(8) :: VG_Result,VG_Error,VG_Chi2
 real(8) :: yRnd(1:22),Res,dum,EMcheck(1:4),xRnd
 real(8) :: AcceptedEvent(1:4,1:maxpart),Ehat,pH2sq
-real(8) :: MomExt(1:4,1:maxpart),MomShift(1:4,1:maxpart),MomHiggs(1:4),MomParton(1:4,1:maxpart),Mass(1:maxpart),Spin(1:maxpart),Lifetime(1:maxpart)
+real(8) :: MomExt(1:4,1:maxpart),MomShift(1:4,1:maxpart),MomHiggs(1:4),MomParton(1:4,1:maxpart),Mass(1:maxpart),Lifetime(1:maxpart),Spin(1:maxpart)
 integer :: tries, nParticle, MY_IDUP(1:7+maxpart), ICOLUP(1:2,1:7+maxpart),IntExt(1:7+maxpart),convertparent
-logical :: FirstEvent,M_ResoSet,Ga_ResoSet,WroteHeader,ClosedHeader,WroteMassWidth,InMadgraphMassBlock
 integer :: nline,intDummy,Nevent
 integer :: LHE_IDUP(1:maxpart+3),   LHE_ICOLUP(1:2,1:maxpart+3),   LHE_MOTHUP(1:2,1:maxpart+3)
 integer :: LHE_IDUP_Part(1:maxpart),LHE_ICOLUP_Part(1:2,1:maxpart),LHE_MOTHUP_Part(1:2,1:maxpart+3)
-integer :: EventNumPart,nparton
-character(len=160) :: FirstLines
-character(len=120) :: EventInfoLine,PDFLine
+integer :: EventNumPart,nparton,EventProcessId
+real(8) :: WeightScaleAqedAqcd(1:4)
+character(len=120) :: PDFLine
 character(len=160) :: EventLine(0:maxpart+3)
-integer :: VegasSeed,i,j,stat,DecayParticles(1:2)
+integer :: VegasSeed,i,stat,DecayParticles(1:2)
 integer, dimension(:), allocatable :: gen_seed
-character(len=*),parameter :: Fmt0 = "I2,X,A"
+character(len=*),parameter :: DefaultFmt0 = "I2,X,I3,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7"
 character(len=*),parameter :: Fmt1 = "6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0"
 character(len=150) :: IndentedFmt0, IndentedFmt1, InputFmt0, InputFmt1
 character(len=100) :: BeginEventLine
@@ -1900,143 +2204,10 @@ if( VegasNc0.eq.-1 ) VegasNc0 = VegasNc0_default
 if( VegasNc1.eq.-1 .and. VegasNc2.eq.-1 ) VegasNc1 = VegasNc1_default
 if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
 
-     write(io_LHEOutFile ,'(A)') '<LesHouchesEvents version="1.0">'
+Lifetime(1:maxpart) = 0d0
+Spin(1:maxpart) = 0d0
 
-!    search for line with first event
-     FirstEvent = .false.
-     M_ResoSet=.false.
-     Ga_ResoSet=.false.
-     WroteHeader=.false.
-     ClosedHeader=.false.
-     WroteMassWidth=.false.
-     InMadgraphMassBlock=.false.
-     do while ( .not.FirstEvent )
-        read(16,fmt="(A160)",IOSTAT=stat,END=99) FirstLines
-        if ( FirstLines(1:4).eq."<!--" .and. .not.WroteHeader ) then
-            call InitOutput()
-            WroteHeader = .true.
-        endif
-        if (index(FirstLines,"<MG").ne.0 .and. .not.WroteHeader) then  !Sometimes MadGraph doesn't have a comment at the beginning
-            call InitOutput()                                          !In that case put the JHUGen header before the MadGraph
-            write(io_LHEOutFile, "(A)") "-->"                          ! proc card, etc.
-            WroteHeader = .true.                                       !and put the Higgs mass/width in a separate comment
-            ClosedHeader = .true.                                      !before <init>
-        endif
-        if (Index(FirstLines,"<init>").ne.0 .and. .not.WroteHeader ) then !If not now, when?
-            call InitOutput()
-            WroteHeader = .true.
-        endif
-
-        !Read the Higgs mass
-        !JHUGen or POWHEG
-        if( FirstLines(1:5).eq."hmass" ) then
-               i = 6
-               do while(FirstLines(i:i).eq." ")
-                   i = i+1
-               enddo
-               do while(FirstLines(i:i).ne." ")
-                   i = i+1
-               enddo
-               read(FirstLines(6:i),*) M_Reso
-               M_Reso = M_Reso*GeV!  convert to units of 100GeV
-               M_ResoSet=.true.
-        endif
-        !Madgraph
-        if (Index(Capitalize(FirstLines),"BLOCK MASS").ne.0 .and. .not.M_ResoSet) then
-               InMadgraphMassBlock=.true.
-        elseif (Index(Capitalize(FirstLines),"BLOCK").ne.0) then
-               InMadgraphMassBlock=.false.
-        endif
-        if (InMadgraphMassBlock) then
-               i = Index(FirstLines, " 25 ")
-               if (i.ne.0) then
-                   j = Index(FirstLines(i+4:len(FirstLines)), " ") + i+4 - 1
-                   if (j.eq.0) then
-                       j = len(FirstLines)
-                   endif
-                   read(FirstLines(i+4:j),*) M_Reso
-                   M_Reso = M_Reso*GeV
-                   M_ResoSet=.true.
-               endif
-        endif
-
-        !Read the Higgs width
-        !JHUGen or POWHEG
-        if( FirstLines(1:6).eq."hwidth" ) then
-               i = 7
-               do while(FirstLines(i:i).eq." ")
-                   i = i+1
-               enddo
-               do while(FirstLines(i:i).ne." ")
-                   i = i+1
-               enddo
-               read(FirstLines(7:i),*) Ga_Reso
-               Ga_Reso = Ga_Reso*GeV!  convert to units of 100GeV
-               Ga_ResoSet=.true.
-        endif
-        !Madgraph
-        if (Index(Capitalize(FirstLines),"DECAY ").ne.0) then
-               i = Index(FirstLines, " 25 ")
-               if (i.ne.0) then
-                   j = Index(FirstLines(i+4:len(FirstLines)), " ") + i+4 - 1
-                   if (j.eq.0) then
-                       j = len(FirstLines)
-                   endif
-                   read(FirstLines(i+4:j),*) Ga_Reso
-                   Ga_Reso = Ga_Reso*GeV
-                   Ga_ResoSet=.true.
-               endif
-        endif
-
-        if( Index(FirstLines,"-->").ne.0 .and. .not.(M_ResoSet .and. Ga_ResoSet)) then
-            !In other words, if the mass and the width have not been found by the end of the comment
-            !This is possible in some MadGraph versions, where the mass and width are below, in the proc card
-            ! and the comment is just a fancy header.
-            !Give them more time to be found, and print them before <init>
-            ClosedHeader = .true.
-        elseif( .not.WroteMassWidth .and. (Index(FirstLines,"<init>").ne.0 .or. Index(FirstLines,"-->").ne.0) ) then
-            write(io_LHEOutFile ,"(A)") ""
-            if (ClosedHeader) then
-                write(io_LHEOutFile, "(A)") "<!--"
-            endif
-            write(io_LHEOutFile ,"(A)") "JHUGen Resonance parameters used for event generation:"
-            write(io_LHEOutFile ,"(A,F8.1,A)") "hmass  ",M_Reso*100d0,"       ! Higgs boson mass"
-            write(io_LHEOutFile ,"(A,F10.5,A)") "hwidth   ",Ga_Reso*100d0,"   ! Higgs boson width"
-            if (Index(FirstLines,"-->").eq.0) then
-                write(io_LHEOutFile, "(A)") "-->"
-            endif
-            write(io_LHEOutFile ,"(A)") ""
-            ClosedHeader = .true.
-            WroteMassWidth = .true.
-        endif
-        if( Index(FirstLines, "<event").ne.0 ) then
-               FirstEvent=.true.
-               BeginEventLine = trim(FirstLines)
-        else
-            if( importExternal_LHEinit ) then
-                if( Index(FirstLines,"<LesHouchesEvents").ne.0 .or. Index(FirstLines,"<!--").ne.0 ) then
-                else
-                  write(io_LHEOutFile,"(A)") trim(firstlines)
-                endif
-            endif
-        endif
-     enddo
-     if( .not. M_ResoSet ) then
-        write(io_stdout,"(2X,A,1F7.2)")  "ERROR: Higgs mass could not be read from LHE input file. Assuming default value",M_Reso*100d0
-        write(io_LogFile,"(2X,A,1F7.2)") "ERROR: Higgs mass could not be read from LHE input file. Assuming default value",M_Reso*100d0
-     else
-        write(io_stdout,"(2X,A,1F7.2,A)") "A Higgs mass of ",M_Reso*100d0," GeV was determined from the LHE input file."
-        write(io_LogFile,"(2X,A,1F7.2,A)") "A Higgs mass of ",M_Reso*100d0," GeV was determined from the LHE input file."
-     endif
-     if( .not. Ga_ResoSet ) then
-        write(io_stdout,"(2X,A,1F10.5)")  "ERROR: Higgs width could not be read from LHE input file. Assuming default value",Ga_Reso*100d0
-        write(io_LogFile,"(2X,A,1F10.5)") "ERROR: Higgs width could not be read from LHE input file. Assuming default value",Ga_Reso*100d0
-     else
-        write(io_stdout,"(2X,A,1F10.5,A)") "A Higgs width of ",Ga_Reso*100d0," GeV was determined from the LHE input file."
-        write(io_LogFile,"(2X,A,1F10.5,A)") "A Higgs width of ",Ga_Reso*100d0," GeV was determined from the LHE input file."
-     endif
-     write(io_stdout,"(A)") ""
-     write(io_LogFile,"(A)") ""
+call InitReadLHE(BeginEventLine)
 
      InputFmt0 = ""
      InputFmt1 = ""
@@ -2048,20 +2219,12 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
          NEvent=NEvent + 1
          read(16,"(A)") EventLine(0)
          if (UseUnformattedRead) then
-             read(EventLine(0),*) EventNumPart !  read number of particle from the first line after <event>
-             i = 1                             !  trying to read the other stuff in one string would just give
-             do while(EventLine(0)(i:i).eq." ")!  the first field
-                 i=i+1
-             enddo
-             do while(EventLine(0)(i:i).ne." ")
-                 i=i+1
-             enddo
-             read(EventLine(0)(i:len(EventLine(0))),"(A)") EventInfoLine
+             read(EventLine(0),*) EventNumPart, EventProcessId, WeightScaleAqedAqcd
          else
              if (InputFmt0.eq."") then
                  InputFmt0 = FindInputFmt0(EventLine(0))
              endif
-             read(EventLine(0),InputFmt0) EventNumPart, EventInfoLine
+             read(EventLine(0),InputFmt0) EventNumPart, EventProcessId, WeightScaleAqedAqcd
          endif
 
 !        read event lines
@@ -2076,24 +2239,16 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
          nparton = 0
          do nline=1,EventNumPart
             if (UseUnformattedRead) then
-                read(EventLine(nline),*) LHE_IDUP(nline),IntExt(nline),LHE_MOTHUP(1,nline),LHE_MOTHUP(2,nline),LHE_ICOLUP(1,nline),LHE_ICOLUP(2,nline),MomExt(2,nline),MomExt(3,nline),MomExt(4,nline),MomExt(1,nline),Mass(nline)
+                read(EventLine(nline),*) LHE_IDUP(nline),IntExt(nline),LHE_MOTHUP(1,nline),LHE_MOTHUP(2,nline),LHE_ICOLUP(1,nline),LHE_ICOLUP(2,nline),MomExt(2,nline),MomExt(3,nline),MomExt(4,nline),MomExt(1,nline),Mass(nline),Lifetime(nline),Spin(nline)
             else
                 if (InputFmt1.eq."") then
                     InputFmt1 = FindInputFmt1(EventLine(nline))
                 endif
-                read(EventLine(nline),InputFmt1) LHE_IDUP(nline),IntExt(nline),LHE_MOTHUP(1,nline),LHE_MOTHUP(2,nline),LHE_ICOLUP(1,nline),LHE_ICOLUP(2,nline),MomExt(2,nline),MomExt(3,nline),MomExt(4,nline),MomExt(1,nline),Mass(nline)
+                read(EventLine(nline),InputFmt1) LHE_IDUP(nline),IntExt(nline),LHE_MOTHUP(1,nline),LHE_MOTHUP(2,nline),LHE_ICOLUP(1,nline),LHE_ICOLUP(2,nline),MomExt(2,nline),MomExt(3,nline),MomExt(4,nline),MomExt(1,nline),Mass(nline),Lifetime(nline),Spin(nline)
             endif
-            if( abs(LHE_IDUP(nline)).eq.25 ) then!   select the Higgs (ID=25, h0)
-                  MomHiggs(1:4) = MomExt(1:4,nline)
-                  pH2sq = dsqrt(abs(MomHiggs(1:4).dot.MomHiggs(1:4)))
-            else
-                  nparton = nparton + 1
-                  MomParton(1:4,nparton) = MomExt(1:4,nline)
-                  LHE_IDUP_Part(nparton) = LHE_IDUP(nline)
-                  LHE_ICOLUP_Part(1:2,nparton) = LHE_ICOLUP(1:2,nline)
-                  LHE_MOTHUP_Part(1:2,nparton) = LHE_MOTHUP(1:2,nline)
-            endif
-            
+            Spin(1:maxpart) = 0d0  !discard spin information
+                                   !would not make sense if converting from a generator that has spin
+
             if( IntExt(nline).eq.2 .and. (LHE_IDUP(nline).eq.convertLHE(Z0_) .or. LHE_IDUP(nline).eq.convertLHE(Wp_) .or. LHE_IDUP(nline).eq.convertLHE(Wm_)) ) then
                convertparent = nline
             endif 
@@ -2347,34 +2502,25 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
          do while (BeginEventLine(indent+1:indent+1).eq." ")
              indent = indent+1
          enddo
+         if (.not.UseUnformattedRead) then
+             IndentedFmt0=InputFmt0
+         else
+             if (indent.eq.0) then
+                 write(IndentedFmt0, "(A,A,A)") "(", DefaultFmt0, ")"
+             else
+                 write(IndentedFmt0, "(A,I1,A,A,A)") "(", indent, "X,", DefaultFmt0, ")"
+             endif
+         endif
          if (indent.eq.0) then
-             write(IndentedFmt0, "(A,A,A)") "(", Fmt0, ")"
              write(IndentedFmt1, "(A,A,A)") "(", Fmt1, ")"
          else
-             write(IndentedFmt0, "(A,I1,A,A,A)") "(", indent, "X,", Fmt0, ")"
              write(IndentedFmt1, "(A,I1,A,A,A)") "(", indent, "X,", Fmt1, ")"
          endif
-         write(io_LHEOutFile,fmt=IndentedFmt0) EventNumPart,EventInfoLine!  read number of particle from the first line after <event> and other info
+         write(io_LHEOutFile,fmt=IndentedFmt0) EventNumPart,EventProcessId,WeightScaleAqedAqcd!  read number of particle from the first line after <event> and other info
          do nline=1,EventNumPart
-            write(io_LHEOutFile,fmt=IndentedFmt1) LHE_IDUP(nline),IntExt(nline),LHE_MOTHUP(1,nline),LHE_MOTHUP(2,nline),LHE_ICOLUP(1,nline),LHE_ICOLUP(2,nline),MomShift(2,nline),MomShift(3,nline),MomShift(4,nline),MomShift(1,nline),Mass(nline),Spin(nline),Lifetime(nline)
+            write(io_LHEOutFile,fmt=IndentedFmt1) LHE_IDUP(nline),IntExt(nline),LHE_MOTHUP(1,nline),LHE_MOTHUP(2,nline),LHE_ICOLUP(1,nline),LHE_ICOLUP(2,nline),MomShift(2,nline),MomShift(3,nline),MomShift(4,nline),MomShift(1,nline),Mass(nline),Lifetime(nline),Spin(nline)
          enddo
          
-! !        read optional lines
-!          read(16,fmt="(A160)",IOSTAT=stat,END=99) PDFLine(1:160)
-!          if( PDFLine(1:1).ne."#" ) then
-!              PDFLine(:)=""
-!              backspace(16)
-!          else
-!              write(io_LHEOutFile,fmt="(A)") trim(PDFLine)
-!          endif
-!          write(io_LHEOutFile,"(A)") "</event>"         
-!          
-! !        skip event lines 
-!          read(16,fmt="(A7)",IOSTAT=stat,END=99) FirstLines! skip <\event>
-!          read(16,fmt="(A30)",IOSTAT=stat,END=99) FirstLines!   skip <event> or </LesHouchesEvents>
-!          if( FirstLines(1:30).eq."</LesHouchesEvents>" ) exit
-
-
 !        read optional lines
          do while (.true.) 
               read(16,fmt="(A120)",IOSTAT=stat,END=99) PDFLine(1:120)
@@ -2393,8 +2539,66 @@ if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
 99   continue
      call cpu_time(time_end)
 
-return
+RETURN
 END SUBROUTINE
+
+
+
+
+
+SUBROUTINE GetMZZdistribution()
+use ModCrossSection
+use ModParameters
+implicit none
+real(8) :: DecayWeight,DecayWidth,DecayWidth0
+real(8) :: Ehat,GetMZZProbability
+integer :: nscan
+integer,parameter :: nmax=20, Ncalls=200000
+real(8),parameter :: ScanRange=120d0*GeV
+
+
+
+  DecayWidth0 = GetMZZProbability(M_Reso,Ncalls)
+  
+  do nscan=-nmax,+nmax,1
+     
+     EHat = M_Reso+ScanRange*nscan/dble(nmax)
+     DecayWidth = GetMZZProbability(EHat,Ncalls)
+     write(*,"(1F10.5,1PE16.9)") EHat*100d0,DecayWidth/DecayWidth0
+     
+  enddo
+
+RETURN
+END SUBROUTINE
+
+
+
+
+
+
+FUNCTION GetMZZProbability(EHat,Ncalls)
+use ModCrossSection
+use ModParameters
+implicit none
+real(8) :: DecayWeight,yRnd(1:22),Res,GetMZZProbability
+real(8) :: HiggsDK_Mom(1:4,1:13),Ehat
+integer :: HiggsDK_IDUP(1:13),HiggsDK_ICOLUP(1:2,1:13)
+integer :: evals,Ncalls
+integer,parameter :: nmax=20
+real(8),parameter :: ScanRange=120d0*GeV
+
+
+     GetMZZProbability = 0d0     
+     do evals=1,Ncalls
+         call random_number(yRnd)
+         DecayWeight = EvalUnWeighted_DecayToVV(yRnd,.false.,EHat,Res,HiggsDK_Mom(1:4,6:9),HiggsDK_IDUP(1:9),HiggsDK_ICOLUP)
+         GetMZZProbability = GetMZZProbability + DecayWeight
+     enddo
+     GetMZZProbability = GetMZZProbability/dble(evals)
+    
+
+RETURN
+END FUNCTION
 
 
 
@@ -2403,31 +2607,50 @@ END SUBROUTINE
 SUBROUTINE OpenFiles()
 use ModParameters
 implicit none
-logical :: dirresult
+integer :: i
+
+   if( .not.FilesOpened ) then
+       FilesOpened = .true.
+       call system('mkdir -p ./data')! -p is suppressing error messages if directory already exists
+
+       i = len(trim(DataFile))
+       if( DataFile(i-3:i).eq.".lhe" ) then
+           !print *, DataFile
+           DataFile = DataFile(1:i-4)
+           !print *, DataFile
+       endif
+
+       print *, ""
+       if( unweighted ) then
+          open(unit=io_LHEOutFile,file=trim(DataFile)//'.lhe',form='formatted',access= 'sequential',status='replace')        ! LHE event file
+          open(unit=io_HistoFile, file=trim(DataFile)//'.dat',form='formatted',access= 'sequential',status='replace')        ! histogram file
+       else
+          if( (writeWeightedLHE) .or. (GenerateEvents) ) open(unit=io_LHEOutFile,file=trim(DataFile)//'.lhe',form='formatted',access= 'sequential',status='replace')        ! LHE event file
+          open(unit=io_HistoFile,file=trim(DataFile)//'.dat',form='formatted',access= 'sequential',status='replace')         ! histogram file
+       endif
+       open(unit=io_LogFile,file=trim(DataFile)//'.log',form='formatted',access= 'sequential',status='replace')              ! log file
 
 
-   call system('mkdir -p ./data')! -p is suppressing error messages if directory already exists
-
-   print *, ""
-   if( unweighted ) then
-      open(unit=io_LHEOutFile,file=trim(DataFile)//'.lhe',form='formatted',access= 'sequential',status='replace')        ! LHE event file
-      open(unit=io_HistoFile, file=trim(DataFile)//'.dat',form='formatted',access= 'sequential',status='replace')        ! histogram file
-   else
-      if( (writeWeightedLHE) .or. (GenerateEvents) ) open(unit=io_LHEOutFile,file=trim(DataFile)//'.lhe',form='formatted',access= 'sequential',status='replace')        ! LHE event file
-      open(unit=io_HistoFile,file=trim(DataFile)//'.dat',form='formatted',access= 'sequential',status='replace')         ! histogram file
+       if( ReadLHEFile .or. ConvertLHEFile ) then 
+          open(unit=io_LHEInFile,file=trim(LHEProdFile),form='formatted',access= 'sequential',status='old')                  ! LHE input file      
+       endif
    endif
-   open(unit=io_LogFile,file=trim(DataFile)//'.log',form='formatted',access= 'sequential',status='replace')              ! log file
 
-
-   if( ReadLHEFile .or. ConvertLHEFile ) then 
-      open(unit=io_LHEInFile,file=trim(LHEProdFile),form='formatted',access= 'sequential',status='old')                  ! LHE input file      
-   endif
-
-   
 return
 END SUBROUTINE
 
 
+SUBROUTINE ReopenInFile()
+use ModParameters
+implicit none
+
+    if ( ReadLHEFile .or. ConvertLHEFile ) then
+        close(io_LHEInFile)
+        open(unit=io_LHEInFile,file=trim(LHEProdFile),form='formatted',access= 'sequential',status='old')
+    endif
+
+return
+END SUBROUTINE
 
 
 SUBROUTINE CloseFiles()
@@ -2436,7 +2659,7 @@ implicit none
 
    close(io_LHEOutFile)
    close(io_HistoFile)
-   if( ReadLHEFile ) close(io_LHEInFile)
+   if( ReadLHEFile .or. ConvertLHEFile ) close(io_LHEInFile)
    close(io_LogFile)
 
  
@@ -2576,8 +2799,9 @@ integer :: AllocStatus,NHisto
 
           Histo(11)%Info   = "MG resonance invariant mass"
           Histo(11)%NBins  = 200
-          Histo(11)%BinSize= 10d0*GeV
-          Histo(11)%LowVal = 0d0*GeV
+          Histo(11)%BinSize= 1d0*GeV
+          Histo(11)%LowVal = 50d0*GeV
+!           Histo(11)%LowVal = 650*GeV !50d0*GeV
           Histo(11)%SetScale= 1d0/GeV
 
           Histo(12)%Info   = "mLep12 invariant mass"
@@ -3244,9 +3468,11 @@ END SUBROUTINE
 
 
 
-SUBROUTINE InitOutput
+SUBROUTINE InitOutput(CrossSection, CrossSectionError)
 use ModParameters
 implicit none
+
+real(8) :: CrossSection, CrossSectionError
 
     if( (unweighted) .or. ( (.not.unweighted) .and. (writeWeightedLHE) )  ) then 
         if ( .not. ReadLHEFile .and. .not. ConvertLHEFile ) then
@@ -3254,13 +3480,6 @@ implicit none
         endif
         write(io_LHEOutFile ,'(A)') '<!--'
         write(io_LHEOutFile ,'(A,A6,A)') 'Output from the JHUGenerator ',trim(JHUGen_Version),' described in arXiv:1001.3396 [hep-ph],arXiv:1208.4018 [hep-ph],arXiv:1309.4819 [hep-ph]'
-
-        if( .not. ReadLHEFile .and. .not. ConvertLHEFile ) then
-            write(io_LHEOutFile ,'(A)') ''
-            write(io_LHEOutFile ,'(A,F8.1,A)') 'hmass   ',M_Reso*100d0,'       ! Higgs boson mass'
-            write(io_LHEOutFile ,'(A,F10.5,A)') 'hwidth    ',Ga_Reso*100d0,'   ! Higgs boson width'
-            write(io_LHEOutFile ,'(A)') ''
-        endif
 
         call WriteParameters(io_LHEOutFile)
 
@@ -3289,8 +3508,7 @@ implicit none
 ! (*) pdf code of LHAGLUE for colliding particles (10042=CTEQ6Ll, MSTW2008=21000,21041-21080)    
 ! (*) weighting strategy (3=unweighted events, 4=weighted events,  otherwise=see LHE manuals)
 ! (*) number of process types to be accepted (default=1, otherwise=see manual)
-! 
-            write(io_LHEOutFile ,'(A)') '0.43538820803E-02  0.72559367904E-05  1.00000000000E-00 100'
+            write(io_LHEOutFile ,'(1PE14.7,1X,1PE14.7,1X,1PE14.7,1X,I3)') CrossSection, CrossSectionError, 1.00000000000E-00, Process
 ! in order of appearance: 
 ! (*) total cross section in pb
 ! (*) stat. error in the total cross section in pb
@@ -3366,9 +3584,13 @@ character :: arg*(500)
     if( Process.eq.111) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( Process.eq.112) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( Process.eq.113) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
-    if( ReadLHEFile )    write(TheUnit,"(4X,A)") "           (This is ReadLHEFile mode. Resonance mass/width might be overwritten by LHE input parameters. See below.)"
-    if( ConvertLHEFile ) write(TheUnit,"(4X,A)") "           (This is ConvertLHEFile mode. Resonance mass/width might be overwritten by LHE input parameters. See below.)"
-    if( Process.le.2 .or. Process.eq.50 .or. Process.eq.60 .or. Process.eq.66 .or. ((TopDecays.eq.1).and.Process.eq.80) .or. (Process.ge.110 .and. Process.le.113) .or. ReadLHEFile .or. ConvertLHEFile ) then
+    if( ReadLHEFile )    write(TheUnit,"(4X,A)") "           (This is ReadLHEFile mode. Resonance mass/width are read from LHE input parameters.)"
+    if( ConvertLHEFile ) write(TheUnit,"(4X,A)") "           (This is ConvertLHEFile mode. Resonance mass/width are read from LHE input parameters.)"
+    if( &
+         (.not.ReadLHEFile .and. (Process.le.2 .or. Process.eq.50 .or. Process.eq.60 .or. Process.eq.66 .or. ((TopDecays.eq.1).and.Process.eq.80) .or. (Process.ge.110 .and. Process.le.113))) &
+    .or. (ReadLHEFile .and. TauDecays.ne.0) &
+    .or. ConvertLHEFile ) &
+    then
         if( .not.ReadLHEFile .and. (ConvertLHEFile .or. Process.eq.50 .or. (Process.ge.110 .and. Process.le.113)) ) then
             write(TheUnit,"(4X,A,I2,2X,A,I2)") "DecayMode1:",DecayMode1
         else if( ReadLHEFile .or. Process.le.2 .or. Process .eq. 80 ) then
@@ -3436,6 +3658,7 @@ character :: arg*(500)
     if( .not. (ReadLHEFile .or. ConvertLHEFile) ) then
         write(TheUnit,"(4X,A)") ""
         if( Process.le.2 ) write(TheUnit,"(4X,A,L,L,L)") "OffXVV: ",OffShellReson,OffShellV1,OffShellV2
+        write(TheUnit,"(4X,A,I3)") "WidthScheme: ",WidthScheme
         if( Process.le.2 .or. Process.eq.80 .or. Process.eq.90 ) write(TheUnit,"(4X,A,I1)") "PChannel: ",PChannel
 #if useLHAPDF==1
         write(TheUnit,"(4X,A,A,A,I3)") "LHAPDF set ",trim(LHAPDFString), ", member=",LHAPDFMember
@@ -3743,6 +3966,7 @@ implicit none
         write(io_stdout,"(4X,A)") "BotDK:      decay mode for bottom quarks in H->bbar, 0=deactivated, 1=activated"
         write(io_stdout,"(4X,A)") "PChannel:   0=g+g, 1=q+qb, 2=both"
         write(io_stdout,"(4X,A)") "OffXVV:     off-shell option for resonance(X),or vector bosons(VV)"
+        write(io_stdout,"(4X,A)") "WidthScheme:0=fixed width, 1=running width, 2=complex pole scheme"
         write(io_stdout,"(4X,A)") "PDFSet:     1=CTEQ6L1(default), 2=MSTW2008LO,  2xx=MSTW with eigenvector set xx=01..40), 3=NNPDF3.0LO"
 #if useLHAPDF==1
         write(io_stdout,"(4X,A)") "LHAPDF:     name of the LHA PDF file, e.g. NNPDF30_lo_as_0130/NNPDF30_lo_as_0130.info"
