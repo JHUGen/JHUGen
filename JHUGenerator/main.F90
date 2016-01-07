@@ -268,7 +268,7 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
    LHAPDFString = ""
    LHAPDFMember = 0
    iinterf = -1
-   WriteRejectedEvents=.false.
+   WriteRejectedEvents=0
 
    MuFacMultiplier = 1d0
    MuRenMultiplier = 1d0
@@ -408,8 +408,8 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
         GenerateEvents=.true.
         Unweighted=.false.
         CountArg = CountArg + 1
-    elseif( arg(1:20) .eq."WriteRejectedEvents" ) then
-        WriteRejectedEvents=.true.
+    elseif( arg(1:20) .eq."WriteRejectedEvents=" ) then
+        read(arg(21:21),*) WriteRejectedEvents
         CountArg = CountArg + 1
     endif
    enddo
@@ -576,6 +576,10 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
     endif
     if( RequestNLeptons .lt. 2*RequestOS ) then
         RequestNLeptons = 2*RequestOS
+    endif
+
+    if( WriteRejectedEvents.lt.0 .or. WriteRejectedEvents.gt.2 ) then
+        call Error("WriteRejectedEvents can only be 0, 1, or 2.  Please see the manual.")
     endif
 
 return
@@ -1910,6 +1914,7 @@ character(len=160) :: EventLine(0:maxpart)
 integer :: n,stat,iHiggs,VegasSeed,AccepLastPrinted
 character(len=100) :: BeginEventLine
 integer,parameter :: PMZZcalls = 200000
+logical :: Empty
 
 
 if( VegasIt1.eq.-1 ) VegasIt1 = VegasIt1_default
@@ -2020,14 +2025,21 @@ call InitReadLHE(BeginEventLine)
                     DecayWeight =  EvalUnWeighted_DecayToTauTau(yRnd,.true.,EHat,Res,HiggsDK_Mom(1:4,1:13),HiggsDK_IDUP(1:13),HiggsDK_ICOLUP(1:2,1:13))
                     if( Res.ne.0d0 ) exit
                 enddo
-          endif          
-          
-          if( Res.le.0d0 .and. WriteRejectedEvents ) then
-              WeightScaleAqedAqcd(1) = 0d0! events that were not accepted after 50 Mio. tries are assigned weight zero
-              Res = 1d0
+          endif
+
+          Empty = .false.
+          if( Res.le.0 .and. WriteRejectedEvents.ne.0 ) then
+              if( WriteRejectedEvents.eq.1 ) then
+                  WeightScaleAqedAqcd(1) = 0d0! events that were not accepted after 50 Mio. tries are assigned weight zero
+                  Res = 1d0
+              elseif( WriteRejectedEvents.eq.2 ) then
+                  WeightScaleAqedAqcd(1) = 0d0
+                  Res = 1d0
+                  Empty = .true.
+              endif
           endif
           
-          if( Res.gt.0.5d0 ) then ! decay event was accepted
+          if( Res.gt.0d0 ) then ! decay event was accepted
              if( TauDecays.lt.0 ) then!  H->VV->4f
                 call boost(HiggsDK_Mom(1:4,6),MomHiggs(1:4),pH2sq)
                 call boost(HiggsDK_Mom(1:4,7),MomHiggs(1:4),pH2sq)
@@ -2042,9 +2054,9 @@ call InitReadLHE(BeginEventLine)
                 HiggsDK_IDUP(8) = convertLHE(HiggsDK_IDUP(8))
                 HiggsDK_IDUP(9) = convertLHE(HiggsDK_IDUP(9))
                 if (UseUnformattedRead) then
-                    call WriteOutEvent_NEW(EventNumPart,LHE_IDUP,LHE_IntExt,LHE_MOTHUP,LHE_ICOLUP,MomExt,HiggsDK_Mom(1:4,4:9),Mass,iHiggs,HiggsDK_IDUP,HiggsDK_ICOLUP,EventProcessId,EventWeight=WeightScaleAqedAqcd(1),EventScaleAqedAqcd=WeightScaleAqedAqcd(2:4),BeginEventLine=BeginEventLine)
+                    call WriteOutEvent_NEW(EventNumPart,LHE_IDUP,LHE_IntExt,LHE_MOTHUP,LHE_ICOLUP,MomExt,HiggsDK_Mom(1:4,4:9),Mass,iHiggs,HiggsDK_IDUP,HiggsDK_ICOLUP,EventProcessId,EventWeight=WeightScaleAqedAqcd(1),EventScaleAqedAqcd=WeightScaleAqedAqcd(2:4),BeginEventLine=BeginEventLine,Empty=Empty)
                 else
-                    call WriteOutEvent_NEW(EventNumPart,LHE_IDUP,LHE_IntExt,LHE_MOTHUP,LHE_ICOLUP,MomExt,HiggsDK_Mom(1:4,4:9),Mass,iHiggs,HiggsDK_IDUP,HiggsDK_ICOLUP,EventProcessId,EventWeight=WeightScaleAqedAqcd(1),EventScaleAqedAqcd=WeightScaleAqedAqcd(2:4),BeginEventLine=BeginEventLine,InputFmt0=InputFmt0)
+                    call WriteOutEvent_NEW(EventNumPart,LHE_IDUP,LHE_IntExt,LHE_MOTHUP,LHE_ICOLUP,MomExt,HiggsDK_Mom(1:4,4:9),Mass,iHiggs,HiggsDK_IDUP,HiggsDK_ICOLUP,EventProcessId,EventWeight=WeightScaleAqedAqcd(1),EventScaleAqedAqcd=WeightScaleAqedAqcd(2:4),BeginEventLine=BeginEventLine,InputFmt0=InputFmt0,Empty=Empty)
                 endif
              else! H->tautau
                 call boost(HiggsDK_Mom(1:4,4),MomHiggs(1:4),pH2sq)
@@ -2069,9 +2081,9 @@ call InitReadLHE(BeginEventLine)
                 HiggsDK_IDUP(12)= convertLHE(HiggsDK_IDUP(12))
                 HiggsDK_IDUP(13)= convertLHE(HiggsDK_IDUP(13))
                 if (UseUnformattedRead) then
-                    call WriteOutEvent_HFF(EventNumPart,LHE_IDUP,LHE_IntExt,LHE_MOTHUP,LHE_ICOLUP,MomExt,HiggsDK_Mom(1:4,1:13),Mass,iHiggs,HiggsDK_IDUP(1:13),HiggsDK_ICOLUP(1:2,1:13),EventProcessId,EventWeight=WeightScaleAqedAqcd(1),EventScaleAqedAqcd=WeightScaleAqedAqcd(2:4),BeginEventLine=BeginEventLine)
+                    call WriteOutEvent_HFF(EventNumPart,LHE_IDUP,LHE_IntExt,LHE_MOTHUP,LHE_ICOLUP,MomExt,HiggsDK_Mom(1:4,1:13),Mass,iHiggs,HiggsDK_IDUP(1:13),HiggsDK_ICOLUP(1:2,1:13),EventProcessId,EventWeight=WeightScaleAqedAqcd(1),EventScaleAqedAqcd=WeightScaleAqedAqcd(2:4),BeginEventLine=BeginEventLine,Empty=Empty)
                 else
-                    call WriteOutEvent_HFF(EventNumPart,LHE_IDUP,LHE_IntExt,LHE_MOTHUP,LHE_ICOLUP,MomExt,HiggsDK_Mom(1:4,1:13),Mass,iHiggs,HiggsDK_IDUP(1:13),HiggsDK_ICOLUP(1:2,1:13),EventProcessId,EventWeight=WeightScaleAqedAqcd(1),EventScaleAqedAqcd=WeightScaleAqedAqcd(2:4),BeginEventLine=BeginEventLine,InputFmt0=InputFmt0)
+                    call WriteOutEvent_HFF(EventNumPart,LHE_IDUP,LHE_IntExt,LHE_MOTHUP,LHE_ICOLUP,MomExt,HiggsDK_Mom(1:4,1:13),Mass,iHiggs,HiggsDK_IDUP(1:13),HiggsDK_ICOLUP(1:2,1:13),EventProcessId,EventWeight=WeightScaleAqedAqcd(1),EventScaleAqedAqcd=WeightScaleAqedAqcd(2:4),BeginEventLine=BeginEventLine,InputFmt0=InputFmt0,Empty=Empty)
                 endif
              endif
 
