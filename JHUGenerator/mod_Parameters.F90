@@ -17,7 +17,8 @@ real(8), public :: MuFacMultiplier,MuRenMultiplier
 integer, public :: VegasIt1_default,VegasNc0_default,VegasNc1_default,VegasNc2_default
 integer, public :: NumHistograms,RequestNLeptons,RequestOS,RequestOSSF
 logical, public :: Unweighted,OffShellReson,OffShellV1,OffShellV2,ReadLHEFile,ConvertLHEFile,CalcPMZZ
-logical, public :: ReadCSmax,GenerateEvents,CountTauAsAny,HasLeptonFilter
+logical, public :: ReadCSmax,GenerateEvents,CountTauAsAny,HasLeptonFilter, FoundHiggsMass, FoundHiggsWidth
+logical, public :: FilesOpened = .false.
 integer, public, parameter :: kRenFacScheme_default=0
 integer, public, parameter :: kRenFacScheme_mhstar=1
 integer, public, parameter :: kRenFacScheme_mjjhstar=2
