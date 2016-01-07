@@ -411,8 +411,7 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
    enddo
 
     if( CountArg.ne.NumArgs ) then
-        print *, "Unknown command line argument"
-        stop
+        call Error("Unknown command line argument")
     endif
 
     if (Process.eq.0) PChannel = 0   !only gluons
