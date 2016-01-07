@@ -268,6 +268,7 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
    LHAPDFString = ""
    LHAPDFMember = 0
    iinterf = -1
+   WriteRejectedEvents=.false.
 
    MuFacMultiplier = 1d0
    MuRenMultiplier = 1d0
@@ -406,6 +407,9 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
     elseif( arg(1:9) .eq."GenEvents" ) then
         GenerateEvents=.true.
         Unweighted=.false.
+        CountArg = CountArg + 1
+    elseif( arg(1:20) .eq."WriteRejectedEvents" ) then
+        WriteRejectedEvents=.true.
         CountArg = CountArg + 1
     endif
    enddo
@@ -1903,7 +1907,7 @@ integer :: EventNumPart, EventProcessId
 real(8) :: WeightScaleAqedAqcd(1:4)
 character(len=160) :: OtherLines
 character(len=160) :: EventLine(0:maxpart)
-integer :: n,stat,iHiggs,VegasSeed
+integer :: n,stat,iHiggs,VegasSeed,AccepLastPrinted
 character(len=100) :: BeginEventLine
 integer,parameter :: PMZZcalls = 200000
 
@@ -1912,12 +1916,13 @@ if( VegasIt1.eq.-1 ) VegasIt1 = VegasIt1_default
 if( VegasNc0.eq.-1 ) VegasNc0 = VegasNc0_default
 if( VegasNc1.eq.-1 .and. VegasNc2.eq.-1 ) VegasNc1 = VegasNc1_default
 if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
+AccepLastPrinted = 0
 
 call InitReadLHE(BeginEventLine)
 
      if( TauDecays.lt.0 .and. ReweightDecay ) then
         print *, " finding P_H4l(m_Reso) with ",1000000," points" 
-        DecayWidth0 = GetMZZProbability(EHat,1000000)
+        DecayWidth0 = GetMZZProbability(m_Reso,1000000)
      else
         DecayWidth0 = 1
      endif
@@ -2017,12 +2022,12 @@ call InitReadLHE(BeginEventLine)
                 enddo
           endif          
           
-          if( Res.eq.0d0 .and. PrintRejectedEventsWeightZero ) then
+          if( Res.le.0d0 .and. WriteRejectedEvents ) then
               WeightScaleAqedAqcd(1) = 0d0! events that were not accepted after 50 Mio. tries are assigned weight zero
               Res = 1d0
           endif
           
-          if( Res.gt.0d0 ) then ! decay event was accepted
+          if( Res.gt.0.5d0 ) then ! decay event was accepted
              if( TauDecays.lt.0 ) then!  H->VV->4f
                 call boost(HiggsDK_Mom(1:4,6),MomHiggs(1:4),pH2sq)
                 call boost(HiggsDK_Mom(1:4,7),MomHiggs(1:4),pH2sq)
@@ -2070,10 +2075,11 @@ call InitReadLHE(BeginEventLine)
                 endif
              endif
 
-             if( mod(AccepCounter,5000).eq.0 ) then
+             if( mod(NEvent,5000).eq.0 .and. AccepCounter.ne.AccepLastPrinted) then
                   call cpu_time(time_int)
-                  write(io_stdout,*)  NEvent," events accepted (",time_int-time_start, ") seconds"
-                  write(io_LogFile,*) NEvent," events accepted (",time_int-time_start, ") seconds"
+                  write(io_stdout,*)  NEvent," events processed (",time_int-time_start, ") seconds"
+                  write(io_LogFile,*) NEvent," events processed (",time_int-time_start, ") seconds"
+                  AccepLastPrinted = AccepCounter
              endif
 
           elseif( Res.eq.0d0 ) then ! decay event was not accepted after ncall evaluations, read next production event

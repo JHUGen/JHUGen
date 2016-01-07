@@ -18,6 +18,7 @@ integer, public :: VegasIt1_default,VegasNc0_default,VegasNc1_default,VegasNc2_d
 integer, public :: NumHistograms,RequestNLeptons,RequestOS,RequestOSSF
 logical, public :: Unweighted,OffShellReson,OffShellV1,OffShellV2,ReadLHEFile,ConvertLHEFile,CalcPMZZ
 logical, public :: ReadCSmax,GenerateEvents,CountTauAsAny,HasLeptonFilter, FoundHiggsMass, FoundHiggsWidth
+logical, public :: WriteRejectedEvents
 logical, public :: FilesOpened = .false.
 integer, public, parameter :: kRenFacScheme_default=0
 integer, public, parameter :: kRenFacScheme_mhstar=1
@@ -62,7 +63,6 @@ integer, public :: Br_W_ud_counter=0
 integer, public :: Br_counter(1:5,1:5)=0
 integer, public :: LeptInEvent(0:8) = 0
 logical, public, parameter :: ReweightDecay = .false.
-logical, public, parameter :: PrintRejectedEventsWeightZero = .false.
 !=====================================================
 
 
