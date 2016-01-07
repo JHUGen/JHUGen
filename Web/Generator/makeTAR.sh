@@ -20,6 +20,9 @@ if [ ! $VERSION ]; then
 fi
 
 pushd $INDIR"/Manual/"
+# Do this three times
+pdflatex manJHUGenerator.tex
+pdflatex manJHUGenerator.tex
 pdflatex manJHUGenerator.tex
 popd
 cp $INDIR"/Manual/manJHUGenerator.pdf" "../manJHUGenerator."$VERSION".pdf"
