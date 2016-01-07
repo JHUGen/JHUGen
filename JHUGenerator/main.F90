@@ -224,7 +224,7 @@ use ModKinematics
 use ModMisc
 implicit none
 character :: arg*(500)
-integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf,i
+integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
 
    Collider=1
    VegasIt1=-1
@@ -573,13 +573,6 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf,i
     endif
     if( RequestNLeptons .lt. 2*RequestOS ) then
         RequestNLeptons = 2*RequestOS
-    endif
-
-    i = len(trim(DataFile))
-    if( DataFile(i-3:i).eq.".lhe" ) then
-        !print *, DataFile
-        DataFile = DataFile(1:i-4)
-        !print *, DataFile
     endif
 
 return
@@ -2597,10 +2590,18 @@ END FUNCTION
 SUBROUTINE OpenFiles()
 use ModParameters
 implicit none
+integer :: i
 
    if( .not.FilesOpened ) then
        FilesOpened = .true.
        call system('mkdir -p ./data')! -p is suppressing error messages if directory already exists
+
+       i = len(trim(DataFile))
+       if( DataFile(i-3:i).eq.".lhe" ) then
+           !print *, DataFile
+           DataFile = DataFile(1:i-4)
+           !print *, DataFile
+       endif
 
        print *, ""
        if( unweighted ) then
