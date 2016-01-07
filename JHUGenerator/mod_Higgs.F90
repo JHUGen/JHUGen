@@ -2,7 +2,6 @@
       use ModParameters
       implicit none
       private
-      integer, parameter  :: dp = selected_real_kind(15)
       real(dp), private, parameter :: tol = 0.00000010_dp
       integer, private, parameter :: ZZMode=00,ZgsMode=01,gsZMode=02,gsgsMode=03
       integer, private, parameter :: WWMode=10
@@ -32,7 +31,13 @@
       real(dp) :: gZ_sq
       real(dp) :: prefactor, Lambda_inv,res2
       real(dp), parameter :: symmFact=1d0/2d0
+      real(dp) :: intcolfac
 
+         if(IsAQuark(MY_IDUP(6)) .and. IsAQuark(MY_IDUP(8))) then
+            intcolfac=1_dp/3_dp
+         else
+            intcolfac=1_dp
+         endif
 
          if( IsAZDecay(DecayMode1) .and. IsAZDecay(DecayMode2) ) then
              VVMode = ZZMode
@@ -59,6 +64,7 @@
          else
               prefactor = 0d0
          endif
+         prefactor = prefactor * (alphas/(3_dp*pi*vev))**2
 
 
 
@@ -104,10 +110,10 @@
                   res = res + (A_VV(1)+A_VV(3)+A_VV(5)+A_VV(7))*dconjg(A_VV(1)+A_VV(3)+A_VV(5)+A_VV(7))!   interfere the 3456 pieces
                   res = res + (A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8))*dconjg(A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8))!   interfere the 5436 pieces
                   if( (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) .and. (i3.eq.i4) ) then! interfere the 3456 with 5436 pieces
-                      res = res + 2d0*dreal(  A_VV(1)*dconjg( A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8) )  )
-                      res = res + 2d0*dreal(  A_VV(3)*dconjg( A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8) )  )
-                      res = res + 2d0*dreal(  A_VV(5)*dconjg( A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8) )  )
-                      res = res + 2d0*dreal(  A_VV(7)*dconjg( A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8) )  )
+                      res = res + 2d0*intcolfac*dreal(  A_VV(1)*dconjg( A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8) )  )
+                      res = res + 2d0*intcolfac*dreal(  A_VV(3)*dconjg( A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8) )  )
+                      res = res + 2d0*intcolfac*dreal(  A_VV(5)*dconjg( A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8) )  )
+                      res = res + 2d0*intcolfac*dreal(  A_VV(7)*dconjg( A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8) )  )
                   endif
           enddo;  enddo;  enddo;  enddo
 
@@ -161,6 +167,7 @@
          l4=ordering(4)
 
          s  = 2d0 * scr(p(:,1),p(:,2))
+         
          propG = one/dcmplx(s - M_Reso**2,M_Reso*Ga_Reso)
 
 
@@ -694,7 +701,7 @@
     else   
       xxx1 = ghg2+ghg3/4d0/Lambda**2*MG**2
       xxx3 = -2d0*ghg4
-      yyy1 = ghzgs1_dyn                             &
+      yyy1 = ghzgs1_dyn*M_V**2/MG**2                &
            + ghzgs2_dyn*(MG**2-MZ3**2-MZ4**2)/MG**2 &  
            + ghzgs3_dyn/Lambda**2*(MG**2-MZ3**2-MZ4**2)*(MG**2-MZ4**2-MZ3**2)/4d0/MG**2
       yyy2 = -2d0*ghzgs2_dyn-ghzgs3_dyn/2d0/Lambda**2*(MG**2-MZ3**2-MZ4**2)
@@ -734,7 +741,13 @@
       real(dp) :: gZ_sq,s
       real(dp) :: prefactor, Lambda_inv
       real(dp), parameter :: symmFact=1d0/2d0
+      real(dp) :: intcolfac
 
+         if(IsAQuark(MY_IDUP(6)) .and. IsAQuark(MY_IDUP(8))) then
+            intcolfac=1_dp/3_dp
+         else
+            intcolfac=1_dp
+         endif
 
 
          if( IsAZDecay(DecayMode1) .and. IsAZDecay(DecayMode2) ) then
@@ -808,10 +821,10 @@
                   res = res + (A_VV(1)+A_VV(3)+A_VV(5)+A_VV(7))*dconjg(A_VV(1)+A_VV(3)+A_VV(5)+A_VV(7))!   interfere the 3456 pieces
                   res = res + (A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8))*dconjg(A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8))!   interfere the 5436 pieces
                   if( (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) .and. (i3.eq.i4) ) then! interfere the 3456 with 5436 pieces
-                      res = res + 2d0*dreal(  A_VV(1)*dconjg( A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8) )  )
-                      res = res + 2d0*dreal(  A_VV(3)*dconjg( A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8) )  )
-                      res = res + 2d0*dreal(  A_VV(5)*dconjg( A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8) )  )
-                      res = res + 2d0*dreal(  A_VV(7)*dconjg( A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8) )  )
+                      res = res + 2d0*intcolfac*dreal(  A_VV(1)*dconjg( A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8) )  )
+                      res = res + 2d0*intcolfac*dreal(  A_VV(3)*dconjg( A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8) )  )
+                      res = res + 2d0*intcolfac*dreal(  A_VV(5)*dconjg( A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8) )  )
+                      res = res + 2d0*intcolfac*dreal(  A_VV(7)*dconjg( A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8) )  )
                   endif
           enddo;  enddo
 
@@ -1350,7 +1363,7 @@
             yyy2 = -2*ahz1*MG**2/(MG**2-MZ3**2)
             yyy3 = ahz3
           else
-            yyy1 = ghzgs1_dyn                            &
+            yyy1 = ghzgs1_dyn*M_V**2/MG**2               &
                 + ghzgs2_dyn*(MG**2-MZ3**2-MZ4**2)/MG**2 &
                 + ghzgs3_dyn/Lambda**2*(MG**2-MZ3**2-MZ4**2)*(MG**2-MZ4**2-MZ3**2)/4d0/MG**2
             yyy2 = (-2d0*ghzgs2_dyn-ghzgs3_dyn/2d0/Lambda**2*(MG**2-MZ3**2-MZ4**2) )

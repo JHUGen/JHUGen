@@ -93,12 +93,14 @@ integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9
       LO_Res_Unpol(Bot_,Up_)  = cdabs(LOAmp(Bot_,Up_,1))**2  + cdabs(LOAmp(Bot_,Up_,2))**2
       
       
-! call myAmp((/MomExt(1:4,t),-MomExt(1:4,inLeft),MomExt(1:4,qout),-MomExt(1:4,inRight)/),M_W**2/vev*(2d0,0d0)*000d0, -2d0/vev*(1d0,0d0), -2d0/vev*(1d0,0d0)*000d0,  &
-!                                                                                        (1d0,0d0)*(-m_top/vev)*00d0,(0d0,0d0)*(-m_top/vev),LO_Res_Unpol(Bot_,Chm_))
+! print *, "coupl",ghz1,ghz2,ghz3,kappa,kappa_tilde      
+! call myAmp((/MomExt(1:4,t),-MomExt(1:4,inLeft),MomExt(1:4,qout),-MomExt(1:4,inRight)/),   M_W**2/vev*ghz1,    +2d0/vev*ghz2,    +2d0/vev*ghz3,  &
+!                                                                                           kappa*(-m_top/vev),   kappa_tilde*(-m_top/vev)    ,LO_Res_Unpol(Bot_,Chm_))
 ! print *, "marku",LO_Res_Unpol(Bot_,Chm_)
+! print *, "raoul",LO_Res_Unpol(Bot_,Up_)
 ! print *, "ratio",LO_Res_Unpol(Bot_,Up_)/LO_Res_Unpol(Bot_,Chm_)
 ! pause
-            
+      
       
       LO_Res_Unpol(Chm_,Bot_) = LO_Res_Unpol(Up_,Bot_)
       LO_Res_Unpol(Bot_,Chm_) = LO_Res_Unpol(Bot_,Up_)
@@ -391,7 +393,7 @@ END SUBROUTINE
    
       
       
-
+!     normalization in FORM +2*i_/vev*(om1*mw^2*d_(ro,si)+om2*p3(si)*p3(ro)+om3*e_(ro,si,al,be)*p24(al)*p15(be));
       subroutine ubhtdamp(p1,p2,e3,k3,k4,e4,p5,za,zb,s,mdecay,amp)
         use ModParameters
         implicit none
@@ -415,12 +417,12 @@ END SUBROUTINE
         mw=M_W
         mt=m_Top
         
-        KL=-mt/vev*(kappa-(0d0,1d0)*kappa_tilde) !   *0000000000000d0
-        KR=-mt/vev*(kappa+(0d0,1d0)*kappa_tilde) !   *0000000000000d0
+        KL=-mt/vev*(kappa-(0d0,1d0)*kappa_tilde)
+        KR=-mt/vev*(kappa+(0d0,1d0)*kappa_tilde)
         
-         om1 = ghz1/2d0
-         om2 = 0d0
-         om3 = 0d0
+         om1 = ghz1/2d0  ! this should be proper a1,a2,a3
+         om2 = ghz2
+         om3 = ghz3     * (-1d0) ! correct buggy minus sign in Raoul's code
         
         
         ampw(1) =  + om3 * (  - 1d0/2d0*za(p5,p2)*za(e4,p1)*zb(p1,p2)*&
@@ -740,24 +742,20 @@ END SUBROUTINE
         IV2 = dsqrt(gwsq)/dsqrt(2d0)
         
         ! assuming tbar*( TTHg1 + i*TTHg2*gamma^5 )*t
-        ! 
-        HelAmp(1) =  2*Props2*(TTHg1 - cI*TTHg2)*IV1*IV2*zb(2,4)*(za(2,3)*zb(2,1) - za(3,4)*zb(4,1)) +      &
-       (m_top*Props1*IV1*IV2*(za(2,3)*zb(2,4) + za(3,1)*zb(4,1))*(VVHg2*za(3,1)**2*zb(2,1)*zb(3,1)**2 + VVHg2*za(2,3)*zb(2,1)*zb(2,3)*(-2*m_top**2 + za(3,1)*zb(3,1)) +       &
-            za(3,4)*(M_W**2*(VVHg2 - cI*VVHg3)*zb(2,4)*zb(3,1) - m_top**2*VVHg2*zb(2,1)*zb(3,4)) +       &
-            za(3,1)*zb(2,1)*zb(3,1)*(-VVHg1 - 2*m_top**2*VVHg2 + M_W**2*VVHg2 + 2*VVHg2*za(2,1)*zb(2,1) + VVHg2*za(2,4)*zb(2,4) +       &
-               VVHg2*za(4,1)*zb(4,1))))/(M_W**2*za(3,1)*zb(3,1))    
+        HelAmp(1) =  (IV1*IV2*(-(m_top**3*Props1*VVHg2*zb(2,1)*(2*za(2,3)*zb(2,3) + 2*za(3,1)*zb(3,1) + za(3,4)*zb(3,4))*(za(2,3)*zb(2,4) + za(3,1)*zb(4,1))) +   &
+           4*M_W**2*Props2*(TTHg1 - cI*TTHg2)*za(3,1)*zb(2,4)*zb(3,1)*(za(2,3)*zb(2,1) - za(3,4)*zb(4,1)) +   &
+           m_top*Props1*zb(3,1)*(za(2,3)*zb(2,4) + za(3,1)*zb(4,1))*   &
+            (-2*VVHg1*za(3,1)*zb(2,1) + 2*M_W**2*(VVHg2*za(3,1)*zb(2,1) + (VVHg2 - cI*VVHg3)*za(3,4)*zb(2,4)) +    &
+              VVHg2*za(3,1)*zb(2,1)*(2*za(2,1)*zb(2,1) + za(2,3)*zb(2,3) + za(2,4)*zb(2,4) + za(3,1)*zb(3,1) + za(4,1)*zb(4,1)))))/(2*M_W**2*za(3,1)*zb(3,1))
 
-         HelAmp(2) =   (-2*m_top*Props2*IV1*IV2*zb(2,4)*((-TTHg1 + cI*TTHg2)*za(2,3)*zb(2,3) + (TTHg1 + cI*TTHg2)*za(3,1)*zb(3,1) +       &
-            (-TTHg1 + cI*TTHg2)*za(3,4)*zb(3,4)))/zb(3,1) +       &
-            (Props1*IV1*IV2*(m_top**2*VVHg2*za(2,3)**2*zb(2,3)**2*zb(2,4)*(-2*m_top**2 + za(3,1)*zb(3,1)) +       &
-            za(2,3)*(zb(2,4)*(za(3,1)*zb(3,1)*(m_top**2*zb(2,3)*(-VVHg1 - 2*m_top**2*VVHg2 + M_W**2*VVHg2 + 2*VVHg2*za(2,1)*zb(2,1) + VVHg2*za(2,4)*zb(2,4)) +       &
-                     VVHg2*((m_top - M_W)*(m_top + M_W)*za(3,1)*zb(2,3) - M_W**2*za(4,1)*zb(2,4))*zb(3,1)) - m_top**4*VVHg2*za(3,4)*zb(2,3)*zb(3,4)) +       &
-               m_top**2*VVHg2*za(3,1)*zb(2,3)*(za(4,1)*zb(2,4)*zb(3,1) + zb(2,3)*(-2*m_top**2 + za(3,1)*zb(3,1)))*zb(4,1)) +       &
-            za(3,1)*(M_W**2*zb(2,4)*zb(3,1)*(2*VVHg1*za(3,1)*zb(3,1) + cI*VVHg3*za(3,1)**2*zb(3,1)**2 +       &
-                  cI*VVHg3*za(3,4)*(-(za(2,1)*zb(2,4)*zb(3,1)) + m_top**2*zb(3,4))) -       &
-               (za(3,1)*zb(3,1)*(m_top**2*zb(2,3)*(VVHg1 + 2*m_top**2*VVHg2 - M_W**2*VVHg2 - 2*VVHg2*za(2,1)*zb(2,1) - VVHg2*za(2,4)*zb(2,4)) +       &
-                     ((-(m_top**2*VVHg2) + M_W**2*(VVHg2 + cI*VVHg3))*za(3,1)*zb(2,3) + M_W**2*VVHg2*za(4,1)*zb(2,4))*zb(3,1)) +       &
-                  m_top**4*VVHg2*za(3,4)*zb(2,3)*zb(3,4))*zb(4,1) + m_top**2*VVHg2*za(3,1)*za(4,1)*zb(2,3)*zb(3,1)*zb(4,1)**2)))/(M_W**2*za(3,1)*zb(3,1)**2)
+         HelAmp(2) =  (IV1*IV2*(-4*m_top*M_W**2*Props2*za(3,1)*zb(2,4)*zb(3,1)*   &
+            (-(TTHg1*za(2,3)*zb(2,3)) + cI*TTHg2*za(2,3)*zb(2,3) + TTHg1*za(3,1)*zb(3,1) + cI*TTHg2*za(3,1)*zb(3,1) + (-TTHg1 + cI*TTHg2)*za(3,4)*zb(3,4)) -    &
+           m_top**4*Props1*VVHg2*zb(2,3)*(2*za(2,3)*zb(2,3) + 2*za(3,1)*zb(3,1) + za(3,4)*zb(3,4))*(za(2,3)*zb(2,4) + za(3,1)*zb(4,1)) +     &
+           m_top**2*Props1*za(3,1)*zb(3,1)*(-2*VVHg1*zb(2,3)*(za(2,3)*zb(2,4) + za(3,1)*zb(4,1)) +     &
+              VVHg2*zb(2,3)*(za(2,3)*zb(2,4) + za(3,1)*zb(4,1))*(2*za(2,1)*zb(2,1) + za(2,3)*zb(2,3) + za(2,4)*zb(2,4) + za(3,1)*zb(3,1) + za(4,1)*zb(4,1)) +   & 
+              2*M_W**2*(cI*VVHg3*za(3,4)*zb(2,4)*zb(3,4) + VVHg2*zb(2,3)*(za(2,3)*zb(2,4) + za(3,1)*zb(4,1)))) -   & 
+           2*M_W**2*Props1*za(3,1)*zb(3,1)**2*(-2*VVHg1*za(3,1)*zb(2,4) + VVHg2*(za(3,1)*zb(2,3) + za(4,1)*zb(2,4))*(za(2,3)*zb(2,4) + za(3,1)*zb(4,1)) +   & 
+              cI*VVHg3*(za(2,1)*za(3,4)*zb(2,4)**2 + za(3,1)**2*(-(zb(2,4)*zb(3,1)) + zb(2,3)*zb(4,1))))))/(2*M_W**2*za(3,1)*zb(3,1)**2)
      
           Res =  HelAmp(1)*dconjg(HelAmp(1)) + HelAmp(2)*dconjg(HelAmp(2)) 
      
