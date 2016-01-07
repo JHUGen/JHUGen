@@ -268,6 +268,7 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
    LHAPDFString = ""
    LHAPDFMember = 0
    iinterf = -1
+   WriteFailedEvents=0
 
    MuFacMultiplier = 1d0
    MuRenMultiplier = 1d0
@@ -406,6 +407,9 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
     elseif( arg(1:9) .eq."GenEvents" ) then
         GenerateEvents=.true.
         Unweighted=.false.
+        CountArg = CountArg + 1
+    elseif( arg(1:18) .eq."WriteFailedEvents=" ) then
+        read(arg(19:19),*) WriteFailedEvents
         CountArg = CountArg + 1
     endif
    enddo
@@ -572,6 +576,10 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
     endif
     if( RequestNLeptons .lt. 2*RequestOS ) then
         RequestNLeptons = 2*RequestOS
+    endif
+
+    if( WriteFailedEvents.lt.0 .or. WriteFailedEvents.gt.2 ) then
+        call Error("WriteFailedEvents can only be 0, 1, or 2.  Please see the manual.")
     endif
 
 return
@@ -1903,21 +1911,23 @@ integer :: EventNumPart, EventProcessId
 real(8) :: WeightScaleAqedAqcd(1:4)
 character(len=160) :: OtherLines
 character(len=160) :: EventLine(0:maxpart)
-integer :: n,stat,iHiggs,VegasSeed
+integer :: n,stat,iHiggs,VegasSeed,AccepLastPrinted
 character(len=100) :: BeginEventLine
 integer,parameter :: PMZZcalls = 200000
+logical :: Empty
 
 
 if( VegasIt1.eq.-1 ) VegasIt1 = VegasIt1_default
 if( VegasNc0.eq.-1 ) VegasNc0 = VegasNc0_default
 if( VegasNc1.eq.-1 .and. VegasNc2.eq.-1 ) VegasNc1 = VegasNc1_default
 if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
+AccepLastPrinted = 0
 
 call InitReadLHE(BeginEventLine)
 
      if( TauDecays.lt.0 .and. ReweightDecay ) then
         print *, " finding P_H4l(m_Reso) with ",1000000," points" 
-        DecayWidth0 = GetMZZProbability(EHat,1000000)
+        DecayWidth0 = GetMZZProbability(m_Reso,1000000)
      else
         DecayWidth0 = 1
      endif
@@ -2015,11 +2025,18 @@ call InitReadLHE(BeginEventLine)
                     DecayWeight =  EvalUnWeighted_DecayToTauTau(yRnd,.true.,EHat,Res,HiggsDK_Mom(1:4,1:13),HiggsDK_IDUP(1:13),HiggsDK_ICOLUP(1:2,1:13))
                     if( Res.ne.0d0 ) exit
                 enddo
-          endif          
-          
-          if( Res.eq.0d0 .and. PrintRejectedEventsWeightZero ) then
-              WeightScaleAqedAqcd(1) = 0d0! events that were not accepted after 50 Mio. tries are assigned weight zero
-              Res = 1d0
+          endif
+
+          Empty = .false.
+          if( Res.le.0 .and. WriteFailedEvents.ne.0 ) then
+              if( WriteFailedEvents.eq.1 ) then
+                  WeightScaleAqedAqcd(1) = 0d0! events that were not accepted after 50 Mio. tries are assigned weight zero
+                  Res = 1d0
+              elseif( WriteFailedEvents.eq.2 ) then
+                  WeightScaleAqedAqcd(1) = 0d0
+                  Res = 1d0
+                  Empty = .true.
+              endif
           endif
           
           if( Res.gt.0d0 ) then ! decay event was accepted
@@ -2037,9 +2054,9 @@ call InitReadLHE(BeginEventLine)
                 HiggsDK_IDUP(8) = convertLHE(HiggsDK_IDUP(8))
                 HiggsDK_IDUP(9) = convertLHE(HiggsDK_IDUP(9))
                 if (UseUnformattedRead) then
-                    call WriteOutEvent_NEW(EventNumPart,LHE_IDUP,LHE_IntExt,LHE_MOTHUP,LHE_ICOLUP,MomExt,HiggsDK_Mom(1:4,4:9),Mass,iHiggs,HiggsDK_IDUP,HiggsDK_ICOLUP,EventProcessId,EventWeight=WeightScaleAqedAqcd(1),EventScaleAqedAqcd=WeightScaleAqedAqcd(2:4),BeginEventLine=BeginEventLine)
+                    call WriteOutEvent_NEW(EventNumPart,LHE_IDUP,LHE_IntExt,LHE_MOTHUP,LHE_ICOLUP,MomExt,HiggsDK_Mom(1:4,4:9),Mass,iHiggs,HiggsDK_IDUP,HiggsDK_ICOLUP,EventProcessId,EventWeight=WeightScaleAqedAqcd(1),EventScaleAqedAqcd=WeightScaleAqedAqcd(2:4),BeginEventLine=BeginEventLine,Empty=Empty)
                 else
-                    call WriteOutEvent_NEW(EventNumPart,LHE_IDUP,LHE_IntExt,LHE_MOTHUP,LHE_ICOLUP,MomExt,HiggsDK_Mom(1:4,4:9),Mass,iHiggs,HiggsDK_IDUP,HiggsDK_ICOLUP,EventProcessId,EventWeight=WeightScaleAqedAqcd(1),EventScaleAqedAqcd=WeightScaleAqedAqcd(2:4),BeginEventLine=BeginEventLine,InputFmt0=InputFmt0)
+                    call WriteOutEvent_NEW(EventNumPart,LHE_IDUP,LHE_IntExt,LHE_MOTHUP,LHE_ICOLUP,MomExt,HiggsDK_Mom(1:4,4:9),Mass,iHiggs,HiggsDK_IDUP,HiggsDK_ICOLUP,EventProcessId,EventWeight=WeightScaleAqedAqcd(1),EventScaleAqedAqcd=WeightScaleAqedAqcd(2:4),BeginEventLine=BeginEventLine,InputFmt0=InputFmt0,Empty=Empty)
                 endif
              else! H->tautau
                 call boost(HiggsDK_Mom(1:4,4),MomHiggs(1:4),pH2sq)
@@ -2064,16 +2081,17 @@ call InitReadLHE(BeginEventLine)
                 HiggsDK_IDUP(12)= convertLHE(HiggsDK_IDUP(12))
                 HiggsDK_IDUP(13)= convertLHE(HiggsDK_IDUP(13))
                 if (UseUnformattedRead) then
-                    call WriteOutEvent_HFF(EventNumPart,LHE_IDUP,LHE_IntExt,LHE_MOTHUP,LHE_ICOLUP,MomExt,HiggsDK_Mom(1:4,1:13),Mass,iHiggs,HiggsDK_IDUP(1:13),HiggsDK_ICOLUP(1:2,1:13),EventProcessId,EventWeight=WeightScaleAqedAqcd(1),EventScaleAqedAqcd=WeightScaleAqedAqcd(2:4),BeginEventLine=BeginEventLine)
+                    call WriteOutEvent_HFF(EventNumPart,LHE_IDUP,LHE_IntExt,LHE_MOTHUP,LHE_ICOLUP,MomExt,HiggsDK_Mom(1:4,1:13),Mass,iHiggs,HiggsDK_IDUP(1:13),HiggsDK_ICOLUP(1:2,1:13),EventProcessId,EventWeight=WeightScaleAqedAqcd(1),EventScaleAqedAqcd=WeightScaleAqedAqcd(2:4),BeginEventLine=BeginEventLine,Empty=Empty)
                 else
-                    call WriteOutEvent_HFF(EventNumPart,LHE_IDUP,LHE_IntExt,LHE_MOTHUP,LHE_ICOLUP,MomExt,HiggsDK_Mom(1:4,1:13),Mass,iHiggs,HiggsDK_IDUP(1:13),HiggsDK_ICOLUP(1:2,1:13),EventProcessId,EventWeight=WeightScaleAqedAqcd(1),EventScaleAqedAqcd=WeightScaleAqedAqcd(2:4),BeginEventLine=BeginEventLine,InputFmt0=InputFmt0)
+                    call WriteOutEvent_HFF(EventNumPart,LHE_IDUP,LHE_IntExt,LHE_MOTHUP,LHE_ICOLUP,MomExt,HiggsDK_Mom(1:4,1:13),Mass,iHiggs,HiggsDK_IDUP(1:13),HiggsDK_ICOLUP(1:2,1:13),EventProcessId,EventWeight=WeightScaleAqedAqcd(1),EventScaleAqedAqcd=WeightScaleAqedAqcd(2:4),BeginEventLine=BeginEventLine,InputFmt0=InputFmt0,Empty=Empty)
                 endif
              endif
 
-             if( mod(AccepCounter,5000).eq.0 ) then
+             if( mod(NEvent,5000).eq.0 .and. AccepCounter.ne.AccepLastPrinted) then
                   call cpu_time(time_int)
-                  write(io_stdout,*)  NEvent," events accepted (",time_int-time_start, ") seconds"
-                  write(io_LogFile,*) NEvent," events accepted (",time_int-time_start, ") seconds"
+                  write(io_stdout,*)  NEvent," events processed (",time_int-time_start, ") seconds"
+                  write(io_LogFile,*) NEvent," events processed (",time_int-time_start, ") seconds"
+                  AccepLastPrinted = AccepCounter
              endif
 
           elseif( Res.eq.0d0 ) then ! decay event was not accepted after ncall evaluations, read next production event

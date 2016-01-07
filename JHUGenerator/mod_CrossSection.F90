@@ -2644,6 +2644,12 @@ IF( GENEVT ) THEN
       ICOLUP(1:2,1) = (/501,502/)
       ICOLUP(1:2,2) = (/502,501/)
 
+      if( (OffShellV1).or.(OffShellV2).or.(IsAPhoton(DecayMode1)) ) then
+           AcceptedEvent(1:4,1:4) = MomDK(1:4,1:4)
+      else
+           AcceptedEvent(1:4,1:4) = MomDK_f(1:4,1:4)
+      endif
+
       if (Process.eq.0) then
             if( ML1.gt.1d-6 .or. ML2.gt.1d-6 .or. ML3.gt.1d-6 .or. ML4.gt.1d-6 ) then
                call EvalPhasespace_VDecay(MomExt(1:4,3),MZ1,0d0,0d0,yRnd(5:6),MomDK_massless(1:4,1:2),PSWgt2)
@@ -2748,11 +2754,6 @@ IF( GENEVT ) THEN
                call intoHisto(NHisto,NBin(NHisto),1d0)  ! CS_Max is the integration volume
          enddo
          AccepCounter = AccepCounter + 1
-         if( (OffShellV1).or.(OffShellV2).or.(IsAPhoton(DecayMode1)) ) then
-              AcceptedEvent(1:4,1:4) = MomDK(1:4,1:4)
-          else
-              AcceptedEvent(1:4,1:4) = MomDK_f(1:4,1:4)
-         endif
          Res = 1d0
          
       else
@@ -2864,6 +2865,12 @@ IF( GENEVT ) THEN
       endif
       EvalUnWeighted_DecayToTauTau = LO_Res_Unpol * PreFac
       CS_max = csmax(0,0)
+
+      AcceptedEvent(:,:) = Mom(:,:)
+      if( TauDecays.ne.0 ) then
+          call ShiftMass(Mom(1:4,LepP),Mom(1:4,Wp)-Mom(1:4,LepP), GetMass(MY_IDUP(LepP)),0d0,  AcceptedEvent(1:4,LepP),AcceptedEvent(1:4,Nu) )
+          call ShiftMass(Mom(1:4,LepM),Mom(1:4,Wm)-Mom(1:4,LepM), GetMass(MY_IDUP(LepM)),0d0,  AcceptedEvent(1:4,LepM),AcceptedEvent(1:4,Nubar) )
+      endif
       
       if( EvalUnWeighted_DecayToTauTau .gt. CS_max) then
           write(io_stdout,"(2X,A,1PE13.6,1PE13.6)")  "CS_max is too small.",EvalUnWeighted_DecayToTauTau, CS_max
@@ -2875,12 +2882,6 @@ IF( GENEVT ) THEN
                call intoHisto(NHisto,NBin(NHisto),1d0)  ! CS_Max is the integration volume
          enddo
          AccepCounter = AccepCounter + 1
-
-         AcceptedEvent(:,:) = Mom(:,:)
-         if( TauDecays.ne.0 ) then
-             call ShiftMass(Mom(1:4,LepP),Mom(1:4,Wp)-Mom(1:4,LepP), GetMass(MY_IDUP(LepP)),0d0,  AcceptedEvent(1:4,LepP),AcceptedEvent(1:4,Nu) )
-             call ShiftMass(Mom(1:4,LepM),Mom(1:4,Wm)-Mom(1:4,LepM), GetMass(MY_IDUP(LepM)),0d0,  AcceptedEvent(1:4,LepM),AcceptedEvent(1:4,Nubar) )
-         endif
 
          Res = 1d0
       else
