@@ -268,7 +268,7 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
    LHAPDFString = ""
    LHAPDFMember = 0
    iinterf = -1
-   WriteRejectedEvents=0
+   WriteFailedEvents=0
 
    MuFacMultiplier = 1d0
    MuRenMultiplier = 1d0
@@ -408,8 +408,8 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
         GenerateEvents=.true.
         Unweighted=.false.
         CountArg = CountArg + 1
-    elseif( arg(1:20) .eq."WriteRejectedEvents=" ) then
-        read(arg(21:21),*) WriteRejectedEvents
+    elseif( arg(1:18) .eq."WriteFailedEvents=" ) then
+        read(arg(19:19),*) WriteFailedEvents
         CountArg = CountArg + 1
     endif
    enddo
@@ -578,8 +578,8 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
         RequestNLeptons = 2*RequestOS
     endif
 
-    if( WriteRejectedEvents.lt.0 .or. WriteRejectedEvents.gt.2 ) then
-        call Error("WriteRejectedEvents can only be 0, 1, or 2.  Please see the manual.")
+    if( WriteFailedEvents.lt.0 .or. WriteFailedEvents.gt.2 ) then
+        call Error("WriteFailedEvents can only be 0, 1, or 2.  Please see the manual.")
     endif
 
 return
@@ -2028,11 +2028,11 @@ call InitReadLHE(BeginEventLine)
           endif
 
           Empty = .false.
-          if( Res.le.0 .and. WriteRejectedEvents.ne.0 ) then
-              if( WriteRejectedEvents.eq.1 ) then
+          if( Res.le.0 .and. WriteFailedEvents.ne.0 ) then
+              if( WriteFailedEvents.eq.1 ) then
                   WeightScaleAqedAqcd(1) = 0d0! events that were not accepted after 50 Mio. tries are assigned weight zero
                   Res = 1d0
-              elseif( WriteRejectedEvents.eq.2 ) then
+              elseif( WriteFailedEvents.eq.2 ) then
                   WeightScaleAqedAqcd(1) = 0d0
                   Res = 1d0
                   Empty = .true.
