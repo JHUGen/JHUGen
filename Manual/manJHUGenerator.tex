@@ -12,6 +12,8 @@
 % \addtolength{\oddsidemargin}{-2cm}
 % \addtolength{\evensidemargin}{-2cm}
 
+\newcommand{\eg}{e.g.~}
+
 \begin{document}
 
 \vspace{0.6cm}
@@ -24,7 +26,7 @@ Manual for the JHU generator
 \begin{center}
 \small
 For simulation of a single-produced resonance at hadron colliders \\
-(version v6.8.3, release date Jan. 06, 2016, manual date Jan. 05, 2016) \\
+(version v6.8.3, release date Jan. 06, 2016, manual date Jan. 06, 2016) \\
 \normalsize
 \end{center}
 
@@ -106,7 +108,13 @@ The list of command line configurables and the default values are (also defined 
                        opposite-sign-same-flavor leptons.
     CountTauAsAny:   For FilterOSSFPairs, taus can stand in place of electrons or muons
                        of the same charge.
-    LHAPDF:          PDF set to use if interfaced with LHAPDF.  See below.
+    LHAPDF:          PDF set to use if interfaced with LHAPDF. See below.
+    FacScheme:       PDF factorization scale scheme
+    MuFacMultiplier: Multiplier for the factorization scale chosen by FacScheme
+    RenScheme:       QCD renormalization scale scheme
+    MuRenMultiplier: Multiplier for the renormalization scale chosen by RenScheme
+    WidthScheme:     Higgs width scheme: 0 for fixed width (default), 1 for running width,
+                       and 2 for the CPS
 \end{verbatim}
 
 \noindent
@@ -121,6 +129,20 @@ A few more details on some particular parameters:
 \item In $ttH$ production, \verb|DecayMode1| and \verb|DecayMode2| are used to decay the $W$ bosons from the top decay.  Only $W$ decay modes are allowed.
 \item In $t+H$ production, \verb|DecayMode1| is used to decay the W boson from the top decay.
 \item \verb|Interf|: For final states with 4 same flavor fermions, this parameter controls whether or not to include interference effects.
+\item \verb|FacScheme|, \verb|MuFacMultiplier|, and \verb|RenScheme|, \verb|MuRenMultiplier|: There are currently 10 different schemes, which set the basis of the scale up to the scale multiplier. A postive integer uses running scales per event whereas a negative one uses a fixed scale, and \verb|MuFacMultiplier| and \verb|MuRenMultiplier| determine the scale multipliers for the factorization and renormalization scales, respectively:
+     \begin{itemize}
+     \item $\pm0$: $\mu_{F,\,R}$ are set to the default values of each process. The command line values of \verb|MuFacMultiplier| and \verb|MuRenMultiplier| are disregarded.
+     \item $\pm1$: $\mu_{F,\,R} \propto \sqrt{q^2_H}$ if the scheme number is positive, or $\mu_{F,\,R} \propto m_H$ if the scheme number is negative. $+1$ is the default value for \verb|Process| 0, 1 and 2 with scale multiplier $0.5$, and  $-1$ is the default value for \verb|Process| 50, 60, 61 and 62 with scale multiplier $1$.
+     \item $\pm2$: If the scheme number is positive, $\mu_{F,\,R} \propto \sqrt{q^2_{JJH}}$, where $J$ refers to a particle (partons or leptons) immediately associated in the Higgs production. If the scheme number is negative and the Higgs and the associated partons originate from a common particle (\eg $V^{*}$ in $VH$), $\mu_{F,\,R} \propto m_{JJH}$.
+     \item $\pm3$: If the scheme number is positive, $\mu_{F,\,R} \propto \sqrt{q^2_{JJ}}+\sqrt{q^2_{H}}$. If the scheme number is negative and the associated particles originate from a common particle without the Higgs (\eg $V$ in $VH$), $\mu_{F,\,R} \propto m_{JJ}+m_{H}$.
+     \item $\pm4$: If the scheme number is positive, $\mu_{F,\,R} \propto \sqrt{q^2_{J1}}+\sqrt{q^2_{J2}}+\sqrt{q^2_{H}}$, where $J_{1,\,2}$ are the associated particles. If the scheme number is negative and the matrix element treats the associated particles as massive (\eg $t$ and $\bar{t}$ in $t\bar{t}H$), $\mu_{F,\,R} \propto m_{J1}+m_{J2}+m_{H}$.  $-4$ is the default value for \verb|Process| 80 and 90 with scale multiplier $0.5$.
+     \item $\pm5$: If the scheme number is positive, $\mu_{F,\,R} \propto \sqrt{q^2_{JJ}}$. If the scheme number is negative and the associated particles originate from a common particle without the Higgs (\eg $V$ in $VH$), $\mu_{F,\,R} \propto m_{JJ}$.
+     \item $\pm6$: If the scheme number is positive, $\mu_{F,\,R} \propto \sqrt{q^2_{J1}}+\sqrt{q^2_{J2}}$, where $J_{1,\,2}$ are the associated particles. If the scheme number is negative and the matrix element treats the associated particles as massive (\eg $t$ and $\bar{t}$ in $t\bar{t}H$), $\mu_{F,\,R} \propto m_{J1}+m_{J2}$.
+     \item $\pm7$: If the scheme number is positive, $\mu_{F,\,R} \propto \sqrt{q^2_{JH}}$, where $J$ is the more massive associated particle by its pole mass. If the scheme number is negative and the matrix element treats an associated particle as massive (\eg $t$ in $t+H$), $\mu_{F,\,R} \propto m_{J}+m_{H}$ for the most massive associated particle.
+     \item $\pm8$: If the scheme number is positive, $\mu_{F,\,R} \propto \sqrt{q^2_{J}}+\sqrt{q^2_{H}}$, where $J$ is the more massive associated particle. If the scheme number is negative and the matrix element treats an associated particle as massive (\eg $t$ in $t+H$), $\mu_{F,\,R} \propto m_{J}+m_{H}$ for the most massive associated particle (same as option -7).  $-8$ is the default value for \verb|Process| 110, 111, 112 and 113. with scale multiplier $0.25$.
+     \item $\pm9$: If the scheme number is positive, $\mu_{F,\,R} \propto \sqrt{q^2_{J}}$, where $J$ is the more massive associated particle. If the scheme number is negative and the matrix element treats an associated particle as massive (\eg $t$ in $t+H$), $\mu_{F,\,R} \propto m_{J}$.
+     \end{itemize}
+\item \verb|WidthScheme|: This option controls the width scheme in JHUGen. The options are 0 for fixed width, 1 for running width, and 2 for the complex pole scheme~\cite{Passarino:2010qk,Goria:2011wa}. 0 is the default option.
 \end{itemize}
 
 Examples of running the generator:
@@ -603,44 +625,12 @@ It is possible to interface to an LHAPDF setup instead of compiling with local P
 %%%%%%%%%%%
 \section{ JHU Generator Matrix Elements (JHUGenMELA)}
 
-\subsection{Native matrix elements}
-
 After extracting the code, you can go to the directory \verb|JHUGenMELA| to find code for computing matrix elements directly.
 To compile the code, simply run \texttt{make}.
 
 \textbf{Please take note: The setup is configured for \texttt{gfort + gcc version 4.1.2 20080704 (Red Hat 4.1.2-50)} and it is highly dependent on the compiler version.  Please configure for your own setup accordingly.}  (Using the \verb|nm| command will help decipher the module names you will need)
 
-The usage of the package is straight-forward and an example is given in \verb|testprogram.c|.
-There are 6 main modules allowing both specific production process and production-independent calculation:
-\begin{itemize}
-\item "modhiggs\_\_evalamp\_gg\_h\_vv": spin-0 matrix elements for $gg$ initiated processes
-\item "modzprime\_\_evalamp\_qqb\_zprime\_vv": spin-1 matrix elements for $q\bar{q}$ initiated processes
-\item "modgraviton\_\_evalamp\_gg\_g\_vv:" spin-2 matrix elements for $gg$ initiated processes
-\item "modgraviton\_\_evalamp\_qqb\_g\_vv": spin-2 matrix elements for $q\bar{q}$ initiated processes
-\item "modzprime\_\_evalamp\_zprime\_vv": spin-1 matrix elements production-independent
-\item "modgraviton\_\_evalamp\_g\_vv": spin-2 matrix elements production-independent
-
-\end{itemize}
-
-The inputs are the 4-vectors of the incoming patrons and outgoing particles in the CM frame of the object $X$.
-In addition the mass and width of the resonance are required as well as the ID of the outgoing particles.
-Finally the last set of inputs are the couplings themselves.  They are arrays for parameters for a given spin hypothesis
-which mirror the parameters configurable in \verb|mod_Parameters.F90|.
-As an example, the arrays are initialized in \verb|testprogram.c|.
-% as:
-%\begin{verbatim}
-%  Hggcoupl[3][2];
-%  Hvvcoupl[4][2];
-%  Zqqcoupl[2][2];
-%  Zvvcoupl[2][2];
-%  Gqqcoupl[2][2];
-%  Gggcoupl[5][2];
-%  Gvvcoupl[10][2];
-%\end{verbatim}
-
-\subsection{Interface with MCFM}
-
-Instructions for setting up the JHUGenMELA with MCFM are in the file \verb|JHUGenMELA/ggZZ_MCFM/README|. The interface also covers the native matrix elements aforementioned through the wrapper class \verb|TEvtProb|. The class currently includes the following calls:
+Instructions for setting up the JHUGenMELA with MCFM are in the file \verb|JHUGenMELA/ggZZ_MCFM/README|. This \verb|C++| interface also covers the native matrix elements aforementioned through the wrapper class \verb|TEvtProb|. The class currently includes the following calls:
 \begin{itemize}
 \item \verb|TEvtProb|: Constructor with argument $\sqrt{s}$ in units of GeV.
 \item \verb|SetProcess|: Set the process to be used in te calculation of the ME
@@ -652,21 +642,48 @@ Instructions for setting up the JHUGenMELA with MCFM are in the file \verb|JHUGe
 
 \item \verb|Set_LHAgrid|: One-time call to setup the PDF path in case NNPDF 3.0 is used.
 
-\item \verb|XsecCalc|: Calls to the decay MEs are handled through this function. Depending on the type of process, the self-defined coupling arrays may be ignored.
+\item \verb|XsecCalc|: Calls to the decay MEs are handled through this function. Depending on the type of process, the self-defined coupling arrays may be ignored. Uses the following interfaced fortran subroutines:
+\begin{itemize}
+\item "modhiggs\_\_evalamp\_gg\_h\_vv": Spin-0 matrix elements for $gg$ initiated processes
+\item "modzprime\_\_evalamp\_qqb\_zprime\_vv": Spin-1 matrix elements for $q\bar{q}$ initiated processes
+\item "modzprime\_\_evalamp\_zprime\_vv": Spin-1 matrix elements production-independent
+\item "modgraviton\_\_evalamp\_qqb\_g\_vv": Spin-2 matrix elements for $q\bar{q}$ initiated processes
+\item "modgraviton\_\_evalamp\_gg\_g\_vv:" Spin-2 matrix elements for $gg$ initiated processes
+\item "modgraviton\_\_evalamp\_g\_vv": Spin-2 matrix elements production-independent
+\end{itemize}
 
 \item \verb|XsecCalcXJJ|: Calls to VBF, and $Hjj$ MEs are handled from this function. Depending on the production mode or the process, these arrays may be ignored.
+\begin{itemize}
+\item "modhiggsjj\_\_evalamp\_wbfh": Spin-0 matrix element for on-shell $VBF$ production
+\item "modhiggsjj\_\_evalamp\_sbfh": Spin-0 matrix element for on-shell $H+JJ$ QCD production
+\end{itemize}
 
 \item \verb|XsecCalcXJ|: Call to the JHUGen $Hj$ ME is handled through tis routine.
+\begin{itemize}
+\item "modhiggsj\_\_evalamp\_hj": Spin-0 matrix element for on-shell $H+J$ QCD production
+\end{itemize}
 
 \item \verb|XsecCalc_VX|: Call to the JHUGen $VH$ ME is handled from this routine.
+\begin{itemize}
+\item "modvhiggs\_\_evalamp\_vhiggs": Spin-0 matrix element for on-shell $VH$ production
+\end{itemize}
 
 \item \verb|XsecCalc_TTX|: Call to te $t\bar{t}H$ ME is handled through this routine.
+\begin{itemize}
+\item "modttbhiggs\_\_evalxsec\_pp\_ttbh": Spin-0 matrix element for on-shell $t\bar{t}H$ production
+\item "modttbhiggs\_\_evalxsec\_pp\_bbbh": Spin-0 matrix element for on-shell $b\bar{b}H$ production
+\end{itemize}
 
 \item \verb|SetHiggsMass|: This routine changes the Higgs mass and width used in the MCFM calculations.
 
 \end{itemize}
 
-See the beginning declarations in \verb|TVar.hh| for the list of enumerated variables, and \verb|testME.C| for example calls (eg. array filling, assignment of momenta, and passing te arguments to these routines).
+The inputs are usually the 4-vectors of the incoming patrons and outgoing particles in the CM frame of the object $X$.
+In addition the mass and width of the resonance are required as well as the ID of the outgoing particles.
+Finally the last set of inputs are the couplings themselves.  They are arrays for parameters for a given spin hypothesis
+which mirror the parameters configurable in \verb|mod_Parameters.F90|.
+Exemplary array initialization can be found in \verb|testprogram.c| for the native matrix elements or \verb|testME.C| for the interface with MCFM.
+For the interface, you can also see the beginning declarations in \verb|TVar.hh| for the list of enumerated variables, and \verb|testME.C| for example calls (eg. array filling, assignment of momenta, and passing te arguments to these routines).
 
 %%%%%%%%%%%
 
@@ -678,7 +695,7 @@ In going from \verb|v6.7.8| to \verb|v6.8.3|, the updates are as follows:
 \begin{itemize}
 \item Added running renormalization scale and generalized the running scales
 \item Added more options for the Higgs mass shape
-\item Improved LHE writing process
+\item Improved LHE reading and writing
 \end{itemize}
 
 \noindent
@@ -1100,7 +1117,17 @@ See webpage: www.pha.jhu.edu/spin
   Nucl.\ Phys.\ Proc.\ Suppl.\  {\bf 205-206}, 10 (2010)
   [arXiv:1007.3492 [hep-ph]].
   See also http://mcfm.fnal.gov
-%
+\bibitem{Goria:2011wa}
+  S.~Goria, G.~Passarino and D.~Rosco,
+  ``The Higgs-boson lineshape,''
+  Nucl.\ Phys.\ B  {\bf 864} (2012)
+  [arXiv:1112.5517 [hep-ph]].
+\bibitem{Passarino:2010qk}
+  G.~Passarino, C.~Sturm and S.~Uccirati, 
+  ``Higgs pseudo-observables, second riemann sheet and all that,''
+  Nucl.\ Phys.\ B {\bf 834} (2010)
+  [arXiv:1001.3360 [hep-ph]].
+
 \end{thebibliography}
 
 \end{document}
