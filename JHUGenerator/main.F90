@@ -1845,7 +1845,6 @@ character(len=100), intent(out) :: BeginEventLine
             WroteHeader = .true.
         endif
         if (index(FirstLines,"<MG").ne.0 .and. .not.WroteHeader) then  !Sometimes MadGraph doesn't have a comment at the beginning
-            print *, "MG"
             call InitOutput(1d0, 1d14)                                 !In that case put the JHUGen header before the MadGraph
             write(io_LHEOutFile, "(A)") "-->"                          ! proc card, etc.
             WroteHeader = .true.                                       !and put the Higgs mass/width in a separate comment
@@ -2196,6 +2195,9 @@ if( VegasNc1.eq.-1 .and. VegasNc2.eq.-1 ) VegasNc1 = VegasNc1_default
 if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
 
 call InitReadLHE(BeginEventLine)
+
+     InputFmt0 = ""
+     InputFmt1 = ""
 
      print *, " converting events"
      call cpu_time(time_start)
