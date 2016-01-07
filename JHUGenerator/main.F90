@@ -2170,7 +2170,7 @@ integer,parameter :: maxpart=15!=max.partons; this parameter should match the on
 real(8) :: VG_Result,VG_Error,VG_Chi2
 real(8) :: yRnd(1:22),Res,dum,EMcheck(1:4),xRnd
 real(8) :: AcceptedEvent(1:4,1:maxpart),Ehat,pH2sq
-real(8) :: MomExt(1:4,1:maxpart),MomShift(1:4,1:maxpart),MomHiggs(1:4),MomParton(1:4,1:maxpart),Mass(1:maxpart),Spin(1:maxpart),Lifetime(1:maxpart)
+real(8) :: MomExt(1:4,1:maxpart),MomShift(1:4,1:maxpart),MomHiggs(1:4),MomParton(1:4,1:maxpart),Mass(1:maxpart),Lifetime(1:maxpart),Spin(1:maxpart)
 integer :: tries, nParticle, MY_IDUP(1:7+maxpart), ICOLUP(1:2,1:7+maxpart),IntExt(1:7+maxpart),convertparent
 integer :: nline,intDummy,Nevent
 integer :: LHE_IDUP(1:maxpart+3),   LHE_ICOLUP(1:2,1:maxpart+3),   LHE_MOTHUP(1:2,1:maxpart+3)
@@ -2193,6 +2193,9 @@ if( VegasIt1.eq.-1 ) VegasIt1 = VegasIt1_default
 if( VegasNc0.eq.-1 ) VegasNc0 = VegasNc0_default
 if( VegasNc1.eq.-1 .and. VegasNc2.eq.-1 ) VegasNc1 = VegasNc1_default
 if( VegasNc1.eq.-1 .and. .not.VegasNc2.eq.-1 ) VegasNc1 = VegasNc2
+
+Lifetime(1:maxpart) = 0d0
+Spin(1:maxpart) = 0d0
 
 call InitReadLHE(BeginEventLine)
 
@@ -2226,24 +2229,16 @@ call InitReadLHE(BeginEventLine)
          nparton = 0
          do nline=1,EventNumPart
             if (UseUnformattedRead) then
-                read(EventLine(nline),*) LHE_IDUP(nline),IntExt(nline),LHE_MOTHUP(1,nline),LHE_MOTHUP(2,nline),LHE_ICOLUP(1,nline),LHE_ICOLUP(2,nline),MomExt(2,nline),MomExt(3,nline),MomExt(4,nline),MomExt(1,nline),Mass(nline)
+                read(EventLine(nline),*) LHE_IDUP(nline),IntExt(nline),LHE_MOTHUP(1,nline),LHE_MOTHUP(2,nline),LHE_ICOLUP(1,nline),LHE_ICOLUP(2,nline),MomExt(2,nline),MomExt(3,nline),MomExt(4,nline),MomExt(1,nline),Mass(nline),Lifetime(nline),Spin(nline)
             else
                 if (InputFmt1.eq."") then
                     InputFmt1 = FindInputFmt1(EventLine(nline))
                 endif
-                read(EventLine(nline),InputFmt1) LHE_IDUP(nline),IntExt(nline),LHE_MOTHUP(1,nline),LHE_MOTHUP(2,nline),LHE_ICOLUP(1,nline),LHE_ICOLUP(2,nline),MomExt(2,nline),MomExt(3,nline),MomExt(4,nline),MomExt(1,nline),Mass(nline)
+                read(EventLine(nline),InputFmt1) LHE_IDUP(nline),IntExt(nline),LHE_MOTHUP(1,nline),LHE_MOTHUP(2,nline),LHE_ICOLUP(1,nline),LHE_ICOLUP(2,nline),MomExt(2,nline),MomExt(3,nline),MomExt(4,nline),MomExt(1,nline),Mass(nline),Lifetime(nline),Spin(nline)
             endif
-            if( abs(LHE_IDUP(nline)).eq.25 ) then!   select the Higgs (ID=25, h0)
-                  MomHiggs(1:4) = MomExt(1:4,nline)
-                  pH2sq = dsqrt(abs(MomHiggs(1:4).dot.MomHiggs(1:4)))
-            else
-                  nparton = nparton + 1
-                  MomParton(1:4,nparton) = MomExt(1:4,nline)
-                  LHE_IDUP_Part(nparton) = LHE_IDUP(nline)
-                  LHE_ICOLUP_Part(1:2,nparton) = LHE_ICOLUP(1:2,nline)
-                  LHE_MOTHUP_Part(1:2,nparton) = LHE_MOTHUP(1:2,nline)
-            endif
-            
+            Spin(1:maxpart) = 0d0  !discard spin information
+                                   !would not make sense if converting from a generator that has spin
+
             if( IntExt(nline).eq.2 .and. (LHE_IDUP(nline).eq.convertLHE(Z0_) .or. LHE_IDUP(nline).eq.convertLHE(Wp_) .or. LHE_IDUP(nline).eq.convertLHE(Wm_)) ) then
                convertparent = nline
             endif 
@@ -2513,7 +2508,7 @@ call InitReadLHE(BeginEventLine)
          endif
          write(io_LHEOutFile,fmt=IndentedFmt0) EventNumPart,EventProcessId,WeightScaleAqedAqcd!  read number of particle from the first line after <event> and other info
          do nline=1,EventNumPart
-            write(io_LHEOutFile,fmt=IndentedFmt1) LHE_IDUP(nline),IntExt(nline),LHE_MOTHUP(1,nline),LHE_MOTHUP(2,nline),LHE_ICOLUP(1,nline),LHE_ICOLUP(2,nline),MomShift(2,nline),MomShift(3,nline),MomShift(4,nline),MomShift(1,nline),Mass(nline),Spin(nline),Lifetime(nline)
+            write(io_LHEOutFile,fmt=IndentedFmt1) LHE_IDUP(nline),IntExt(nline),LHE_MOTHUP(1,nline),LHE_MOTHUP(2,nline),LHE_ICOLUP(1,nline),LHE_ICOLUP(2,nline),MomShift(2,nline),MomShift(3,nline),MomShift(4,nline),MomShift(1,nline),Mass(nline),Lifetime(nline),Spin(nline)
          enddo
          
 !        read optional lines
