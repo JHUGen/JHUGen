@@ -18,7 +18,7 @@ integer, public :: VegasIt1_default,VegasNc0_default,VegasNc1_default,VegasNc2_d
 integer, public :: NumHistograms,RequestNLeptons,RequestOS,RequestOSSF
 logical, public :: Unweighted,OffShellReson,OffShellV1,OffShellV2,ReadLHEFile,ConvertLHEFile,CalcPMZZ
 logical, public :: ReadCSmax,GenerateEvents,CountTauAsAny,HasLeptonFilter, FoundHiggsMass, FoundHiggsWidth
-logical, public :: WriteRejectedEvents
+integer, public :: WriteRejectedEvents
 logical, public :: FilesOpened = .false.
 integer, public, parameter :: kRenFacScheme_default=0
 integer, public, parameter :: kRenFacScheme_mhstar=1
