@@ -3567,7 +3567,7 @@ character :: arg*(500)
     if( Process.eq.112) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( Process.eq.113) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( ReadLHEFile )    write(TheUnit,"(4X,A)") "           (This is ReadLHEFile mode. Resonance mass/width are read from LHE input parameters.)"
-    if( ConvertLHEFile ) write(TheUnit,"(4X,A)") "           (This is ConvertLHEFile mode. Resonance mass/width are read from LHE input parameters. See below.)"
+    if( ConvertLHEFile ) write(TheUnit,"(4X,A)") "           (This is ConvertLHEFile mode. Resonance mass/width are read from LHE input parameters.)"
     if( &
          (.not.ReadLHEFile .and. (Process.le.2 .or. Process.eq.50 .or. Process.eq.60 .or. Process.eq.66 .or. ((TopDecays.eq.1).and.Process.eq.80) .or. (Process.ge.110 .and. Process.le.113))) &
     .or. (ReadLHEFile .and. TauDecays.ne.0) &
