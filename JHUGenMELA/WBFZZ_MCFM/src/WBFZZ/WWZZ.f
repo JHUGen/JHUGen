@@ -102,6 +102,13 @@ C---setting up couplings dependent on whether we are doing 34-line or 56-line
       prop3456=dcmplx(s3456-hmass**2,hmass*hwidth)
       propWBF=propw17*propw28*prop34*prop56
 
+!       print *,""
+!       print *, "ww prop17",1d0/cdabs(propw17)**2
+!       print *, "ww prop28",1d0/cdabs(propw28)**2
+!       print *, "ww prop34",1d0/cdabs(prop34)**2
+!       print *, "ww prop56",1d0/cdabs(prop56)**2
+!       print *, "ww prop3456",1d0/cdabs(propz3456)**2
+      
 C----setup couplings and propagators
 c      ggWW(1,1)=dcmplx(q1**2/(s34*s56))+dcmplx(rxw*l1**2)/prop34/prop56
 c      ggWW(1,2)=dcmplx(q1**2/(s34*s56))+dcmplx(rxw*l1*r1)/prop34/prop56
@@ -165,13 +172,29 @@ c--- Make sure WWZA vertices included
      &    *ggWW(h34,h56)/(propw17*propw28)*Bbit
 
 
+
+
+
+
+! !      MARKUS: removed decay     
+!          WWZZamp(h34,h56)=WWZZamp(h34,h56)
+!      & -2d0*sqzmass/cxw**2                   !   <----  where is the factor 2.0 coming from::  ZZH amplitudes also have a global factor 2 in ZZ1728 (for no good reason)
+!      & *za(i7,i8)*zb(i2,i1)
+!      & /(propw17*propw28)
+!      & /zmass*sqrt(cxw)*sqrt(1d0-cxw) !-- only  MCFM PR
+
+
+
+
 C----Higgs contribution
-         WWZZamp(h34,h56)=WWZZamp(h34,h56)
+        WWZZamp(h34,h56)=WWZZamp(h34,h56)
      &    -2d0*sqzmass/cxw**2*ZZ3456(h34,h56)
-!      &    *za(i7,i8)*zb(i2,i1)*za(i3,i5)*zb(i6,i4) !--F
-     &     *anomzzamp(i3,i4,i5,i6,s3456,s(i3,i4),s(i5,i6),za,zb) !--F
-     &     *anomwwamp(i7,i1,i8,i2,s3456,s(i7,i1),s(i8,i2),za,zb) !--F
+     &    *za(i7,i8)*zb(i2,i1)*za(i3,i5)*zb(i6,i4) !--F
+!      &     *anomzzamp(i3,i4,i5,i6,s3456,s(i3,i4),s(i5,i6),za,zb) !--F
+!      &     *anomwwamp(i7,i1,i8,i2,s3456,s(i7,i1),s(i8,i2),za,zb) !--F
      &    /(propWBF*prop3456)*Hbit
+
+
         enddo
       enddo
 

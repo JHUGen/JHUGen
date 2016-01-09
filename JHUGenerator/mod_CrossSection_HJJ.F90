@@ -32,10 +32,18 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
 EvalWeighted_HJJ_fulldecay = 0d0
    
 
-   call PDFMapping(2,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)   
-   if( Ehat.lt.m_reso+2*pTjetcut ) return ! 30GeV = pTcut on fwd jets
+   call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)   
+!    if( Ehat.lt.m_reso+2*pTjetcut ) return ! 30GeV = pTcut on fwd jets  ! this should probably be removed when background is present
 
-   call EvalPhasespace_VBF_H4f(yRnd(17),yRnd(3:16),EHat,MomExt(1:4,1:10),PSWgt)
+
+   call EvalPhasespace_VBF_H4f(yRnd(3),yRnd(4:17),EHat,MomExt(1:4,1:10),PSWgt)
+!       call genps(6,EHat,yRnd(3:16),(/0d0,0d0,0d0,0d0,0d0,0d0/),MomExt(1:4,3:10),PSWgt)
+!       PSWgt = PSWgt * (2d0*Pi)**(4-(6)*3) * (4d0*Pi)**((6)-1)
+
+
+!    call EvalPhasespace_VBF_NEW2(yRnd(17),yRnd(3:7),EHat,MomExt(1:4,1:10),PSWgt)! stable Higgs
+!       call genps(3,EHat,yRnd(3:7),(/0d0,0d0,M_Reso/),MomExt(1:4,3:5),PSWgt)
+!       PSWgt = PSWgt * (2d0*Pi)**(4-(3)*3) * (4d0*Pi)**((3)-1)
    call boost2Lab(eta1,eta2,10,MomExt(1:4,1:10))
    PSWgt = PSWgt * (100d0)**8  ! adjust PSWgt for GeV units of MCFM mat.el.
 
@@ -95,25 +103,23 @@ EvalWeighted_HJJ_fulldecay = 0d0
 !    pause
   
 
-! 1.982278980884535E-005  zz
-! 3.186871063969136E-005  ww
 
-  i=1; j=-1;
+!   i=+2; j=+2;
   msq_MCFM(:,:) = 0d0
-  !call qq_ZZqq(p_MCFM,msq_MCFM,HZZcoupl,HWWcoupl,Lambda*100d0,Lambda_Q*100d0,(/Lambda_z1,Lambda_z2,Lambda_z3,Lambda_z4/)*100d0)!  q(-p1)+q(-p2)->Z(p3,p4)+Z(p5,p6)+q(p7)+q(p8)
-  msq_MCFM(:,:) = msq_MCFM(:,:)/(9.495632068338d-2)**3! removing esq^3
-  print *, "new ",msq_MCFM(j,i)
-
-  call EvalAmp_WBFH_UnSymm_SA(MomExt(1:4,1:5),me2)
-!   msq_MCFM(:,:) = me2(:,:)
-  print *, "old ",me2(i,j)
-  print *, "rat", msq_MCFM(j,i)/me2(i,j)
-  pause
+  call qq_ZZqq(p_MCFM,msq_MCFM,HZZcoupl,HWWcoupl,Lambda*100d0,Lambda_Q*100d0,(/Lambda_z1,Lambda_z2,Lambda_z3,Lambda_z4/)*100d0)!  q(-p1)+q(-p2)->Z(p3,p4)+Z(p5,p6)+q(p7)+q(p8)
+!   print *, "new ",msq_MCFM(j,i)
+!   call EvalAmp_WBFH_UnSymm_SA(MomExt(1:4,1:5),me2)
+! !   msq_MCFM(:,:) = me2(:,:)
+!   print *, "old ",me2(i,j)
+!   print *, "rat", msq_MCFM(j,i)/me2(i,j)
+!   pause
   
   
   LO_Res_Unpol = 0d0
    do i =  -5,5
       do j = -5,5
+!    do i =  +2,+2,1
+!       do j = +2,+2,1
          LO_Res_Unpol = LO_Res_Unpol + msq_MCFM(i,j)*pdf(LHA2M_pdf(i),1)*pdf(LHA2M_pdf(j),2)
       enddo
    enddo
@@ -132,7 +138,7 @@ EvalWeighted_HJJ_fulldecay = 0d0
 
    
    
-   NBin(7) = WhichBin(7, dlog10( EvalWeighted_HJJ_fulldecay*VgsWgt )  )
+!    NBin(7) = WhichBin(7, dlog10( EvalWeighted_HJJ_fulldecay*VgsWgt )  )
    do NHisto=1,NumHistograms
        call intoHisto(NHisto,NBin(NHisto),EvalWeighted_HJJ_fulldecay*VgsWgt)
    enddo

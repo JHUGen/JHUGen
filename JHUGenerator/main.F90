@@ -858,6 +858,7 @@ include "vegas_common.f"
          NDim = NDim + 2 ! sHat integration
          NDim = NDim + 8
          NDim = NDim + 1
+         NDim = NDim + 1
          if( unweighted ) NDim = NDim + 1  ! random number which decides if event is accepted
          
          VegasIt1_default = 5
@@ -3305,7 +3306,7 @@ implicit none
 integer :: AllocStatus,NHisto
 
           it_sav = 1
-          NumHistograms = 7
+          NumHistograms = 8
           if( .not.allocated(Histo) ) then
                 allocate( Histo(1:NumHistograms), stat=AllocStatus  )
                 if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
@@ -3340,6 +3341,7 @@ integer :: AllocStatus,NHisto
           Histo(5)%BinSize= 0.2d0
           Histo(5)%LowVal = -5d0
           Histo(5)%SetScale= 1d0
+          
           Histo(6)%Info   = "y(j1)"
           Histo(6)%NBins  = 50
           Histo(6)%BinSize= 0.2d0
@@ -3352,11 +3354,11 @@ integer :: AllocStatus,NHisto
           Histo(7)%LowVal = -5d0
           Histo(7)%SetScale= 1d0
           
-!           Histo(6)%Info   = "m_4l"
-!           Histo(6)%NBins  = 50
-!           Histo(6)%BinSize= 10d0*GeV
-!           Histo(6)%LowVal = 120d0*GeV
-!           Histo(6)%SetScale= 1d0/GeV
+          Histo(8)%Info   = "m_4l"
+          Histo(8)%NBins  = 50
+          Histo(8)%BinSize= 10d0*GeV
+          Histo(8)%LowVal = 120d0*GeV
+          Histo(8)%SetScale= 1d0/GeV
 ! 
 !           Histo(7)%Info   = "weights"
 !           Histo(7)%NBins  = 50
