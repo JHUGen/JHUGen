@@ -2087,7 +2087,7 @@ real(8) :: MomLepP(1:4),MomLepM(1:4),MomBoost(1:4),BeamAxis(1:4),ScatteringAxis(
 real(8) :: MomLept(1:4,1:4),MomLeptX(1:4,1:4),MomLeptPlane1(2:4),MomLeptPlane2(2:4),MomBeamScatterPlane(2:4)
 logical :: applyPSCut
 integer :: NumPart,NBin(:)
-real(8) :: m_jj,y_j1,y_j2,dphi_jj,dy_j1j2,pT_jl,pT_j1,pT_j2,pT_H
+real(8) :: m_jj,y_j1,y_j2,dphi_jj,dy_j1j2,pT_jl,pT_j1,pT_j2,pT_H,m_4l
 integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, Higgs=5
 
 
@@ -2101,6 +2101,7 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, Higgs=5
        pT_j2= get_PT(MomExt(1:4,outBot))
        pT_jl = max(pT_j1,pT_j2)
        dy_j1j2 = y_j1 - y_j2
+       m_4l = get_MInv(MomExt(1:4,Higgs))
 
 !        if( abs(y_j1).lt.1d0 .or. abs(y_j2).lt.1d0 .or. y_j1*y_j2.gt.0d0 ) then
 !           applyPSCut=.true.
@@ -2126,6 +2127,7 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, Higgs=5
        NBin(5)  = WhichBin(5,dy_j1j2)
        NBin(6)  = WhichBin(6,y_j1)
        NBin(7)  = WhichBin(7,y_j2)
+       NBin(8)  = WhichBin(8,m_4l)
 
 
 RETURN
@@ -2145,6 +2147,7 @@ real(8) :: MomLept(1:4,1:4),MomLeptX(1:4,1:4),MomLeptPlane1(2:4),MomLeptPlane2(2
 logical :: applyPSCut
 integer :: NBin(:)
 real(8) :: m_jj,y_j1,y_j2,dphi_jj,dy_j1j2,pT_jl,pT_j1,pT_j2,pT_H,m_4l
+real(8) :: pT_l1,pT_l2,pT_l3,pT_l4,y_l1,y_l2,y_l3,y_l4
 integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, Lep1M=8, Lep2P=9, Lep2M=10
 
 
@@ -2157,39 +2160,74 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
        pT_H = get_PT(MomExt(1:4,V1)+MomExt(1:4,V2))
        pT_j1= get_PT(MomExt(1:4,outTop))
        pT_j2= get_PT(MomExt(1:4,outBot))
+       pT_l1= get_PT(MomExt(1:4,Lep1P))
+       pT_l2= get_PT(MomExt(1:4,Lep1M))
+       pT_l3= get_PT(MomExt(1:4,Lep2P))
+       pT_l4= get_PT(MomExt(1:4,Lep2M))
+       y_l1= get_eta(MomExt(1:4,Lep1P))
+       y_l2= get_eta(MomExt(1:4,Lep1M))
+       y_l3= get_eta(MomExt(1:4,Lep2P))
+       y_l4= get_eta(MomExt(1:4,Lep2M))
        pT_jl = max(pT_j1,pT_j2)
        dy_j1j2 = y_j1 - y_j2
+       
+       mZ1 = get_MInv(MomExt(1:4,Lep1P)+MomExt(1:4,Lep1M))
+       mZ2 = get_MInv(MomExt(1:4,Lep2P)+MomExt(1:4,Lep2M))
 
 
-!      VERY loose VBF cuts
-       if( m_jj.lt.400d0*GeV ) then
+       if( mZ1.lt.2.5d0*GeV ) then
           applyPSCut=.true.
           return
        endif
+       if( mZ2.lt.2.5d0*GeV ) then
+          applyPSCut=.true.
+          return
+       endif
+       if( m_4l.lt.70d0*GeV ) then
+          applyPSCut=.true.
+          return
+       endif
+       
+       if( pT_l1.lt.3d0*GeV .or. pT_l2.lt.3d0*GeV .or. pT_l3.lt.3d0*GeV .or. pT_l4.lt.3d0*GeV ) then
+          applyPSCut=.true.
+          return
+       endif
+       
+       if( dabs(y_l1).gt.2.7d0 .or. dabs(y_l2).gt.2.7d0 .or. dabs(y_l3).gt.2.7d0 .or. dabs(y_l4).gt.2.7d0 ) then
+          applyPSCut=.true.
+          return
+       endif
+       
 
+!      VERY loose VBF cuts
+!        if( m_jj.lt.400d0*GeV ) then
+!           applyPSCut=.true.
+!           return
+!        endif
 !        if( dabs(m_4l-m_reso).gt.20d0*GeV ) then
 !           applyPSCut=.true.
 !           return
 !        endif
-!        if( dabs(m_4l).lt.300d0*GeV ) then
+
+       if( dabs(m_4l).lt.70d0*GeV ) then
+          applyPSCut=.true.
+          return
+       endif
+
+!        if( abs(y_j1).gt.5d0 .or. abs(y_j2).gt.5d0 ) then
+!           applyPSCut=.true.
+!           return
+!        endif
+! 
+!        if( abs(y_j1-y_j2).lt.2.0d0 .or. y_j1*y_j2.gt.0d0 ) then
 !           applyPSCut=.true.
 !           return
 !        endif
 
-       if( abs(y_j1).gt.5d0 .or. abs(y_j2).gt.5d0 ) then
-          applyPSCut=.true.
-          return
-       endif
-
-       if( abs(y_j1-y_j2).lt.2.0d0 .or. y_j1*y_j2.gt.0d0 ) then
-          applyPSCut=.true.
-          return
-       endif
-
-       if(  pT_j1.lt.pTjetcut .or. pT_j2.lt.pTjetcut .or. m_jj.lt.mJJcut )  then
-          applyPSCut=.true.
-          return
-       endif
+!        if(  pT_j1.lt.pTjetcut .or. pT_j2.lt.pTjetcut .or. m_jj.lt.mJJcut )  then
+!           applyPSCut=.true.
+!           return
+!        endif
 
        dphi_jj = abs( Get_PHI(MomExt(1:4,3)) - Get_PHI(MomExt(1:4,4)) )
        if( dphi_jj.gt.Pi ) dphi_jj=2d0*Pi-dphi_jj
@@ -2202,7 +2240,9 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
        NBin(3)  = WhichBin(3,pT_H)
        NBin(4)  = WhichBin(4,pT_jl)
        NBin(5)  = WhichBin(5,dy_j1j2)
-       NBin(6)  = WhichBin(6,m_4l)
+       NBin(6)  = WhichBin(6,y_j1)
+       NBin(7)  = WhichBin(7,y_j2)
+       NBin(8)  = WhichBin(8,m_4l)
 
 
 RETURN
@@ -3770,30 +3810,32 @@ use ModMisc
 implicit none
 integer :: MapType
 real(8) :: yRnd(1:2),eta1,eta2,EHat,sHatJacobi,tau,nPotMap,z,sbar,fmax
-real(8) :: etamin, Ymax, Y, Ymin
+real(8) :: etamin, Ymax, Y, Ymin, MThresh
+
+  MThresh = M_Reso
 
   if( MapType.eq.1 ) then!  no mapping
       eta1 = yRnd(1)
       eta2 = yRnd(2)
       sHatJacobi = 1d0
   elseif( MapType.eq.2 ) then!  exponential mapping
-      tau = (2d0*m_Top/Collider_Energy)**2
+      tau = (MThresh/Collider_Energy)**2
       eta1 = tau**yRnd(1)
       eta2 = tau**( (1d0-yRnd(1))*yRnd(2) )
       sHatJacobi = dlog(tau)**2*(1d0-yRnd(1))*eta1*eta2
   elseif( MapType.eq.3 ) then!  linear mapping
-      tau = (2d0*m_Top/Collider_Energy)**2
+      tau = (MThresh/Collider_Energy)**2
       eta1 = (1d0-tau)*yRnd(1) + tau
       eta2 = ((1d0-tau)*yRnd(1))/((1d0-tau)*yRnd(1)+tau)*yRnd(2) + tau/((1d0-tau)*yRnd(1)+tau)
       sHatJacobi = (1d0-tau)*((1d0-tau)*yRnd(1))/((1d0-tau)*yRnd(1)+tau)
   elseif( MapType.eq.4 ) then!  MCFM mapping
-      tau = dexp(dlog(((2d0*m_Top/Collider_Energy)**2))*yRnd(1))
+      tau = dexp(dlog(((MThresh/Collider_Energy)**2))*yRnd(1))
       eta1 = dsqrt(tau)*dexp(0.5d0*dlog(tau)*(1d0-2d0*yRnd(2)))
       eta2 = dsqrt(tau)/dexp(0.5d0*dlog(tau)*(1d0-2d0*yRnd(2)))
-      sHatJacobi = dlog(((2d0*m_Top/Collider_Energy)**2))*tau*dlog(tau)
+      sHatJacobi = dlog(((MThresh/Collider_Energy)**2))*tau*dlog(tau)
   elseif( MapType.eq.5 ) then!  nPotMap mapping
 !       nPotMap = 0.5d0
-!       tau = (2d0*m_Top/Collider_Energy)**2
+!       tau = (MThresh/Collider_Energy)**2
 !       yRnd(1) = yRnd(1)**nPotMap
 !       yRnd(2) = yRnd(2)**nPotMap
 !       eta1 = (1d0-tau) * yRnd(1) + tau
@@ -3821,6 +3863,7 @@ real(8) :: etamin, Ymax, Y, Ymin
      eta2 = M_Reso/Collider_Energy*exp(-Y)
      fmax = 0.5d0*pi/M_Reso**3/Ga_Reso*2d0*Ymax
      sHatJacobi = fmax*(M_Reso**2*Ga_Reso**2 )
+     
   elseif( MapType.eq.13 ) then!  Breit-Wigner mapping with M = M_Z + M_h
       fmax = 1d0/(M_Reso+M_Z)/Ga_Z * ( datan((Collider_Energy**2-(M_Reso+M_Z)**2)/(M_Reso+M_Z)/Ga_Z) - datan(-(M_Reso+M_Z)/Ga_Z) )
       sbar = (M_Reso+M_Z)*Ga_Z * dtan(fmax*yRnd(1)*(M_Reso+M_Z)*Ga_Z - datan((M_Reso+M_Z)/Ga_Z) ) + (M_Reso+M_Z)**2
@@ -3828,6 +3871,7 @@ real(8) :: etamin, Ymax, Y, Ymin
       eta1 = z + (1d0-z)*yRnd(2)
       eta2 = z/eta1
       sHatJacobi = fmax/Collider_Energy**2 * (1d0-z)/eta1  * ( (sbar - (M_Reso+M_Z)**2)**2 + (M_Reso+M_Z)**2*Ga_Z**2 )
+      
   elseif( MapType.eq.14 ) then! Z-Higgs associate production   
       etamin = (M_Reso+M_Z-2d0*Ga_Z)/Collider_Energy
       z = 1d0/(1d0-etamin)
@@ -3839,6 +3883,7 @@ real(8) :: etamin, Ymax, Y, Ymin
       eta1 = (z-1d0)/(z-yRnd(1))*dexp(Y)
       eta2 = (z-1d0)/(z-yRnd(1))*dexp(-Y)
       sHatJacobi = 2d0*(z-1d0)**2/(z-yRnd(1))**3*(Ymax-Ymin)
+      
   elseif( MapType.eq.15 ) then! W-Higgs associate production   
       etamin = (M_Reso+M_W-2d0*Ga_W)/Collider_Energy
       z = 1d0/(1d0-etamin)
@@ -3850,6 +3895,7 @@ real(8) :: etamin, Ymax, Y, Ymin
       eta1 = (z-1d0)/(z-yRnd(1))*dexp(Y)
       eta2 = (z-1d0)/(z-yRnd(1))*dexp(-Y)
       sHatJacobi = 2d0*(z-1d0)**2/(z-yRnd(1))**3*(Ymax-Ymin)
+      
   elseif( MapType.eq.16 ) then! H+j   
       etamin = (M_Reso-3d0*Ga_Reso)/Collider_Energy
       z = 1d0/(1d0-etamin)
@@ -4663,6 +4709,7 @@ real(8) :: xchannel,xRnd(:), Energy, Mom(:,:)
 integer :: iChannel
 real(8) :: Jac,Jac1,Jac2,Jac3,Jac4,Jac5,Jac6,Jac7,Jac8,Jac9
 real(8) :: s3H,s4H,s56,s78,s910,Mom_Dummy(1:4),xRndOffShellZ
+real(8), parameter :: RescaleWidth=10d0
 integer, parameter :: NumChannels=4
 integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, Lep1M=8, Lep2P=9, Lep2M=10
 
@@ -4679,7 +4726,7 @@ IF( iChannel.EQ.1 ) THEN! 34 + WW-->H-->ZZ
 
 !  masses
    if( VBF_4ml_minmax(1).lt.0d0 ) then
-      Jac1 = s_channel_propagator(M_Reso**2,Ga_Reso,0d0,Energy**2,xRnd(1),s56)                                                    !  int d(s56)    = Higgs resonance
+      Jac1 = s_channel_propagator(M_Reso**2,RescaleWidth*Ga_Reso,0d0,Energy**2,xRnd(1),s56)                                                    !  int d(s56)    = Higgs resonance
    else
       Jac1 = k_l(xRnd(1),VBF_4ml_minmax(1)**2,min(Energy**2,VBF_4ml_minmax(2)**2),s56)                                            !  int d(s56)    = linear mapping
    endif
@@ -4694,11 +4741,12 @@ IF( iChannel.EQ.1 ) THEN! 34 + WW-->H-->ZZ
    Jac8 = s_channel_decay(Mom(:,5),0d0,0d0,xRnd(11:12),Mom(:,7),Mom(:,8))                                                         !  5 --> 7+8       
    Jac9 = s_channel_decay(Mom(:,6),0d0,0d0,xRnd(13:14),Mom(:,9),Mom(:,10))                                                        !  6 --> 9+10      
       
+      
 ELSEIF( iChannel.EQ.3 ) THEN! 34 + ZZ-->H-->ZZ
 
 !  masses
    if( VBF_4ml_minmax(1).lt.0d0 ) then
-      Jac1 = s_channel_propagator(M_Reso**2,Ga_Reso,0d0,Energy**2,xRnd(1),s56)                                                    !  int d(s56)    = Higgs resonance
+      Jac1 = s_channel_propagator(M_Reso**2,RescaleWidth*Ga_Reso,0d0,Energy**2,xRnd(1),s56)                                                    !  int d(s56)    = Higgs resonance
    else
       Jac1 = k_l(xRnd(1),VBF_4ml_minmax(1)**2,min(Energy**2,VBF_4ml_minmax(2)**2),s56)                                            !  int d(s56)    = linear mapping
    endif    
@@ -4718,7 +4766,7 @@ ELSEIF( iChannel.EQ.2 ) THEN! 43 + WW-->H-->ZZ
 
 !  masses
    if( VBF_4ml_minmax(1).lt.0d0 ) then
-      Jac1 = s_channel_propagator(M_Reso**2,Ga_Reso,0d0,Energy**2,xRnd(1),s56)                                                    !  int d(s56)    = Higgs resonance
+      Jac1 = s_channel_propagator(M_Reso**2,RescaleWidth*Ga_Reso,0d0,Energy**2,xRnd(1),s56)                                                    !  int d(s56)    = Higgs resonance
    else
       Jac1 = k_l(xRnd(1),VBF_4ml_minmax(1)**2,min(Energy**2,VBF_4ml_minmax(2)**2),s56)                                            !  int d(s56)    = linear mapping
    endif
@@ -4738,7 +4786,7 @@ ELSEIF( iChannel.EQ.4 ) THEN! 43 + ZZ-->H-->ZZ
 
 !  masses
    if( VBF_4ml_minmax(1).lt.0d0 ) then
-      Jac1 = s_channel_propagator(M_Reso**2,Ga_Reso,0d0,Energy**2,xRnd(1),s56)                                                    !  int d(s56)    = Higgs resonance
+      Jac1 = s_channel_propagator(M_Reso**2,RescaleWidth*Ga_Reso,0d0,Energy**2,xRnd(1),s56)                                                    !  int d(s56)    = Higgs resonance
    else
       Jac1 = k_l(xRnd(1),VBF_4ml_minmax(1)**2,min(Energy**2,VBF_4ml_minmax(2)**2),s56)                                            !  int d(s56)    = linear mapping
    endif  
