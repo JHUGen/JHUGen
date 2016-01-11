@@ -9,7 +9,7 @@ VegasDir = $(Here)/vegas
 
 # compiler options, Comp='ifort' or 'gfort'
 Opt  = Yes
-Comp = ifort
+Comp = gfort
 
 # link pdfs via LHA library ('Yes' or 'No')
 UseLHAPDF=No
@@ -169,7 +169,8 @@ else
 endif
 	@echo " executable file is "$(Exec) "compiled with "$(Comp)
 	@echo " "
-	$(fcomp) -o $(Exec) $(MainObj) $(AmpObj) $(PSGenObj) $(VegasObj) $(PDFObj) $(CPSObj) $(MCFM_Obj)
+	$(fcomp) -o $(Exec) $(MainObj) $(AmpObj) $(PSGenObj) $(VegasObj) $(PDFObj) $(CPSObj)
+# $(MCFM_Obj)
 
 
 

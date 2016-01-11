@@ -86,7 +86,7 @@ c     ,j3_4(4,2),j5_6(4,2),
       data Q(+5)/-0.333333333333333d0/
       data tau/1d0,-1d0,1d0,-1d0,1d0,0d0,-1d0,1d0,-1d0,1d0,-1d0/
       data mt,twidth/173.2d0,2.5d0/
-      data hmass,hwidth/125d0,4.07d-3/
+      data hmass,hwidth/250d0,0.00415d0/
       data wmass,wwidth/80.399d0,2.085d0/
       data zmass,zwidth/91.1876d0,2.4952d0/
       data Gf,vevsq/1.16639d-5,246d0/
@@ -287,11 +287,8 @@ c       cxw=dcmplx(xw,0d0) ! DEBUG: Madgraph comparison
        write(6,*)
        doHO=.false.
        doBO=.false.
-       
-       runstring(4:5)="what-nonsense-this-is"
-!        runstring(4:5)="HO"
-       
-       
+!        runstring(4:5)="what-nonsense-this-is"
+       runstring(4:5)="HO"
        if     (runstring(4:5) .eq. 'HO') then
          doHO=.true.
        write(6,*) '>>>>>>>>>>>>>> Higgs contribution only <<<<<<<<<<<<<'
@@ -328,7 +325,6 @@ c--- rescaling factor for Higgs amplitudes, if anomalous Higgs width
 C---setup spinors and spinorvector products
       call spinorcurr(8,p,za,zb,zab,zba)
       do j=1,jmax
-!       do j=2,2; print *, "cut loop over qq-->Hqq",j
       temp(:,:)=0d0
       tempw(:,:)=0d0
       amp(:,:,:,:,:)=czip
@@ -654,20 +650,20 @@ C-----setup for dquq_dquq W diagrams (1,2)-->(1,2)
      & -srWWZZ81_72amp(h3,h5) ! note minus sign instead of exchanging 1<->7,2<->8
       endif
       
-      ampa(dquq_dquq,h1,h2,h3,h5)=Bbit*ampa(dquq_dquq,h1,h2,h3,h5)         !  MARKUS: WW-->H
+      ampa(dquq_dquq,h1,h2,h3,h5)=Bbit*ampa(dquq_dquq,h1,h2,h3,h5)
      & +WWZZ81_72amp(h3,h5)
       endif
 
 C--Fill Z exchange diagrams
-      ampb(dquq_dquq,h1,h2,h3,h5)=amp(dqcq_dqcq,h1,h2,h3,h5)                ! MARKUS:  ZZ-->H
+      ampb(dquq_dquq,h1,h2,h3,h5)=amp(dqcq_dqcq,h1,h2,h3,h5)
        
-      temp(1,2)=temp(1,2)+esq**6*spinavge           ! MARKUS:  WW-->H
+      temp(1,2)=temp(1,2)+esq**6*spinavge
      &   *dble(ampa(dquq_dquq,h1,h2,h3,h5)
      & *dconjg(ampa(dquq_dquq,h1,h2,h3,h5)))
-      temp(1,2)=temp(1,2)+esq**6*spinavge           ! MARKUS:  ZZ-->H
+      temp(1,2)=temp(1,2)+esq**6*spinavge
      &   *dble(ampb(dquq_dquq,h1,h2,h3,h5)
      & *dconjg(ampb(dquq_dquq,h1,h2,h3,h5)))
-      temp(1,2)=temp(1,2)-2d0/xn*esq**6*spinavge    ! MARKUS:  interf. term 
+      temp(1,2)=temp(1,2)-2d0/xn*esq**6*spinavge
      &   *dble(ampa(dquq_dquq,h1,h2,h3,h5)
      & *dconjg(ampb(dquq_dquq,h1,h2,h3,h5)))
       enddo
@@ -962,13 +958,8 @@ c--- qbar-q extra pieces
   
       endif
 
-      enddo! MARKUS: this is the end of the j=1..jmax loop
+      enddo
 
-      
-      
-      
-      
-      
       return
 
    77 format(' *      W-mass^2     (',f11.5,',',f11.5,')      *')
