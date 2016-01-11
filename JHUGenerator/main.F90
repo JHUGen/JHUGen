@@ -223,8 +223,13 @@ use ModParameters
 use ModKinematics
 use ModMisc
 implicit none
-character :: arg*(500)
+character :: arg*(500), argmatch*(30)
 integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
+real(8) :: Reghz1, Reghz2, Reghz4, Reghz1_prime2
+real(8) :: Imghz1, Imghz2, Imghz4, Imghz1_prime2
+real(8) :: Rea1, Rea2, Reb1, Reb2, Reb5
+real(8) :: Ima1, Ima2, Imb1, Imb2, Imb5
+logical :: SetAnomalousSpin0, Setg1, SetAnomalousSpin2, Seta2, Setb2
 
    Collider=1
    VegasIt1=-1
@@ -274,6 +279,30 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
    MuRenMultiplier = 1d0
    FacScheme = kRenFacScheme_default
    RenScheme = kRenFacScheme_default
+
+   SetAnomalousSpin0=.false.
+   Setg1=.false.
+   SetAnomalousSpin2=.false.
+   Seta2=.false.
+   Setb2=.false.
+   Reghz1 = 0
+   Reghz2 = 0
+   Reghz4 = 0
+   Reghz1_prime2 = 0
+   Imghz1 = 0
+   Imghz2 = 0
+   Imghz4 = 0
+   Imghz1_prime2 = 0
+   Rea1 = 0
+   Rea2 = 0
+   Reb1 = 0
+   Reb2 = 0
+   Reb5 = 0
+   Ima1 = 0
+   Ima2 = 0
+   Imb1 = 0
+   Imb2 = 0
+   Imb5 = 0
 
    DataFile="./data/output"
 
@@ -415,6 +444,83 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
     elseif( arg(1:18) .eq."WriteFailedEvents=" ) then
         read(arg(19:19),*) WriteFailedEvents
         CountArg = CountArg + 1
+    !anomalous couplings - only the most common ones for now
+    elseif( arg(1:7).eq."Reghz1=" ) then
+        read(arg(8:500),*) Reghz1
+        CountArg = CountArg + 1
+        Setg1=.true.
+        SetAnomalousSpin0=.true.
+    elseif( arg(1:7).eq."Reghz2=" ) then
+        read(arg(8:500),*) Reghz2
+        CountArg = CountArg + 1
+        SetAnomalousSpin0=.true.
+    elseif( arg(1:7).eq."Reghz4=" ) then
+        read(arg(8:500),*) Reghz4
+        CountArg = CountArg + 1
+        SetAnomalousSpin0=.true.
+    elseif( arg(1:14).eq."Reghz1_prime2=" ) then
+        read(arg(15:500),*) Reghz1_prime2
+        CountArg = CountArg + 1
+        SetAnomalousSpin0=.true.
+    elseif( arg(1:7).eq."Imghz1=" ) then
+        read(arg(8:500),*) Imghz1
+        CountArg = CountArg + 1
+        SetAnomalousSpin0=.true.
+    elseif( arg(1:7).eq."Imghz2=" ) then
+        read(arg(8:500),*) Imghz2
+        CountArg = CountArg + 1
+        SetAnomalousSpin0=.true.
+    elseif( arg(1:7).eq."Imghz4=" ) then
+        read(arg(8:500),*) Imghz4
+        CountArg = CountArg + 1
+        SetAnomalousSpin0=.true.
+    elseif( arg(1:14).eq."Imghz1_prime2=" ) then
+        read(arg(15:500),*) Imghz1_prime2
+        CountArg = CountArg + 1
+        SetAnomalousSpin0=.true.
+    !spin 2
+    elseif( arg(1:5).eq."Rea1=" ) then
+        read(arg(6:500),*) Rea1
+        CountArg = CountArg + 1
+        SetAnomalousSpin2=.true.
+    elseif( arg(1:5).eq."Rea2=" ) then
+        read(arg(6:500),*) Rea2
+        CountArg = CountArg + 1
+        Seta2=.true.
+        SetAnomalousSpin2=.true.
+    elseif( arg(1:5).eq."Reb1=" ) then
+        read(arg(6:500),*) Reb1
+        CountArg = CountArg + 1
+        SetAnomalousSpin2=.true.
+    elseif( arg(1:5).eq."Reb2=" ) then
+        read(arg(6:500),*) Reb2
+        CountArg = CountArg + 1
+        Setb2=.true.
+        SetAnomalousSpin2=.true.
+    elseif( arg(1:5).eq."Reb5=" ) then
+        read(arg(6:500),*) Reb5
+        CountArg = CountArg + 1
+        SetAnomalousSpin2=.true.
+    elseif( arg(1:5).eq."Ima1=" ) then
+        read(arg(6:500),*) Ima1
+        CountArg = CountArg + 1
+        SetAnomalousSpin2=.true.
+    elseif( arg(1:5).eq."Ima2=" ) then
+        read(arg(6:500),*) Ima2
+        CountArg = CountArg + 1
+        SetAnomalousSpin2=.true.
+    elseif( arg(1:5).eq."Imb1=" ) then
+        read(arg(6:500),*) Imb1
+        CountArg = CountArg + 1
+        SetAnomalousSpin2=.true.
+    elseif( arg(1:5).eq."Imb2=" ) then
+        read(arg(6:500),*) Imb2
+        CountArg = CountArg + 1
+        SetAnomalousSpin2=.true.
+    elseif( arg(1:5).eq."Imb5=" ) then
+        read(arg(6:500),*) Imb5
+        CountArg = CountArg + 1
+        SetAnomalousSpin2=.true.
     endif
    enddo
 
@@ -584,6 +690,26 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
 
     if( WriteFailedEvents.lt.0 .or. WriteFailedEvents.gt.2 ) then
         call Error("WriteFailedEvents can only be 0, 1, or 2.  Please see the manual.")
+    endif
+
+    if( SetAnomalousSpin0 ) then
+        if( .not.Setg1 ) then
+            call Error("If you set an anomalous spin 0 coupling, you need to explicitly set ghz1 as well")
+        endif
+        ghz1 = cmplx(Reghz1, Imghz1)
+        ghz2 = cmplx(Reghz2, Imghz2)
+        ghz4 = cmplx(Reghz4, Imghz4)
+        ghz1_prime2 = cmplx(Reghz1_prime2, Imghz1_prime2)
+    endif
+    if( SetAnomalousSpin2 ) then
+        if( .not.(Seta2.and.Setb2) ) then
+            call Error("If you set an anomalous spin 2 coupling, you need to explicitly set a2 and b2 as well")
+        endif
+        a1 = cmplx(Rea1, Ima1)
+        a2 = cmplx(Rea2, Ima2)
+        b1 = cmplx(Reb1, Imb1)
+        b2 = cmplx(Reb2, Imb2)
+        b5 = cmplx(Reb5, Imb5)
     endif
 
 return
