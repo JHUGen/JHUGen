@@ -1368,6 +1368,16 @@ integer :: Part
 END FUNCTION
 
 
+FUNCTION daimag(z)
+implicit none
+complex(8) :: z
+real(8) :: daimag
+complex(8), parameter :: i = (0d0,1d0)
+
+    daimag = dreal(z/i)
+
+END FUNCTION
+
 
 subroutine ComputeQCDVariables()
 implicit none
@@ -1375,9 +1385,106 @@ implicit none
 end subroutine ComputeQCDVariables
 
 
+subroutine ReadCommandLineArgument_logical(argument, argumentname, success, dest_logical)
+implicit none
+character(len=*) :: argument, argumentname
+logical :: dest_logical
+logical :: success
+integer :: length
+
+    length=len(trim(argumentname))
+
+    if( trim(argument).eq.trim(argumentname) ) then
+        dest_logical=.true.
+        success=.true.
+    elseif( argument(1:length+1) .eq. trim(argumentname)//"=" ) then
+        read(argument(length+2:len(argument)), *) dest_logical
+        success=.true.
+    endif
+
+end subroutine ReadCommandLineArgument_logical
+
+
+subroutine ReadCommandLineArgument_integer(argument, argumentname, success, dest_integer)
+implicit none
+character(len=*) :: argument, argumentname
+integer :: dest_integer
+logical :: success
+integer :: length
+
+    length=len(trim(argumentname))
+
+    if( argument(1:length+1) .eq. trim(argumentname)//"=" ) then
+        read(argument(length+2:len(argument)), *) dest_integer
+        success=.true.
+    endif
+
+end subroutine ReadCommandLineArgument_integer
+
+
+subroutine ReadCommandLineArgument_real8(argument, argumentname, success, dest_real8)
+implicit none
+character(len=*) :: argument, argumentname
+real(8) :: dest_real8
+logical :: success
+integer :: length
+
+    length=len(trim(argumentname))
+
+    if( argument(1:length+1) .eq. trim(argumentname)//"=" ) then
+        read(argument(length+2:len(argument)), *) dest_real8
+        success=.true.
+    endif
+
+end subroutine ReadCommandLineArgument_real8
+
+
+subroutine ReadCommandLineArgument_complex8(argument, argumentname, success, dest_complex8)
+implicit none
+character(len=*) :: argument, argumentname
+complex(8) :: dest_complex8
+real(8) :: re, im
+logical :: success
+integer :: length
+
+    length=len(trim(argumentname))
+
+    if( argument(1:length+1) .eq. trim(argumentname)//"=" ) then
+        read(argument(length+2:len(argument)), *) re, im
+        dest_complex8 = dcmplx(re, im)
+        success=.true.
+    elseif( argument(1:length+3) .eq. "Re"//trim(argumentname)//"=" ) then
+        read(argument(length+4:len(argument)), *) re
+        dest_complex8 = dcmplx(re, daimag(dest_complex8))
+        success=.true.
+    elseif( argument(1:length+3) .eq. "Im"//trim(argumentname)//"=" ) then
+        read(argument(length+4:len(argument)), *) im
+        dest_complex8 = dcmplx(dreal(dest_complex8), im)
+        success=.true.
+    endif
+
+end subroutine ReadCommandLineArgument_complex8
+
+
+subroutine ReadCommandLineArgument_string(argument, argumentname, success, dest_string)
+implicit none
+character(len=*) :: argument, argumentname
+character(len=*) :: dest_string
+logical :: success
+integer :: length
+
+    length=len(trim(argumentname))
+
+    if( argument(1:length+1) .eq. trim(argumentname)//"=" ) then
+        if( len(dest_string).lt.len(trim(argument))-(length+1) ) then
+            print "(A,A,A,I4,A)", "Argument ", argument, " is too long!  Maximum allowed length is ", len(dest_string), " characters."
+            stop 1
+        endif
+        dest_string = argument(length+2:len(argument))
+        success=.true.
+    endif
+
+end subroutine ReadCommandLineArgument_string
 
 
 END MODULE
-
-
-
