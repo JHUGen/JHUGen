@@ -306,6 +306,10 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
         read(arg(7:12),*) M_Reso
         M_Reso = M_Reso*GeV
         CountArg = CountArg + 1
+    elseif( arg(1:7).eq."GaReso=" ) then
+        read(arg(8:13),*) Ga_Reso
+        Ga_Reso = Ga_Reso*GeV
+        CountArg = CountArg + 1
     elseif( arg(1:9).eq."VegasNc0=" ) then
         read(arg(10:17),*) VegasNc0
         CountArg = CountArg + 1
