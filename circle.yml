@@ -36,9 +36,6 @@ test:
     - mkdir -p $CIRCLE_ARTIFACTS/{ggH,VBF,HJJ,other}/{SM,PS,fa30.5,fa30.5i,a2}
     - sed -i -r -e "s/(Comp *= *)ifort/\1gfort/" makefile
     - make
-    - sed -i -r -e "s/(pTjetcut = )[0-9.d]*/\10d0/" -e "s/(Rjet = )[0-9.d]*/\10d0/" mod_Parameters.F90
-    - git diff > ~/VBFvsHJJ.diff
-    - git checkout -- mod_Parameters.F90
     - make:
          pwd:
            ../JHUGenMELA
@@ -74,9 +71,7 @@ test:
     - ./JHUGen PDFSet=3 VegasNc0=100000 VegasNc2=10000 Interf=0 DataFile=$CIRCLE_ARTIFACTS/ggH/SM
     - analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/ggH/ outfile=SM.root indir=$CIRCLE_ARTIFACTS/ggH/ computeVBFProdAngles=1 computeVHProdAngles=1 SM.lhe
 
-    - git apply ~/VBFvsHJJ.diff && make
-    - ./JHUGen PDFSet=3 Process=60 VegasNc0=10000000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/VBF/SM
-    - git apply --reverse ~/VBFvsHJJ.diff && make
+    - ./JHUGen PDFSet=3 Process=60 VegasNc0=10000000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/VBF/SM pTjetcut=0 deltaRcut=0
     - ./JHUGen PDFSet=3 VegasNc0=100000 DecayMode1=8 DecayMode2=8 Interf=0 ReadLHE=$CIRCLE_ARTIFACTS/VBF/SM.lhe DataFile=$CIRCLE_ARTIFACTS/VBF/SM_decayed
     - analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/VBF/ outfile=SM.root indir=$CIRCLE_ARTIFACTS/VBF/ computeVBFProdAngles=1 computeVHProdAngles=1 SM_decayed.lhe
     - ./JHUGen PDFSet=3 Process=61 VegasNc0=10000000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/HJJ/SM
@@ -87,9 +82,7 @@ test:
     - ./JHUGen PDFSet=3 VegasNc0=100000 VegasNc2=10000 Interf=0 DataFile=$CIRCLE_ARTIFACTS/ggH/PS Reghz1=0 Reghz4=1
     - analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/ggH/ outfile=PS.root indir=$CIRCLE_ARTIFACTS/ggH/ computeVBFProdAngles=1 computeVHProdAngles=1 PS.lhe
 
-    - git apply ~/VBFvsHJJ.diff && make
-    - ./JHUGen PDFSet=3 Process=60 VegasNc0=10000000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/VBF/PS Reghz1=0 Reghz4=1
-    - git apply --reverse ~/VBFvsHJJ.diff && make
+    - ./JHUGen PDFSet=3 Process=60 VegasNc0=10000000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/VBF/PS Reghz1=0 Reghz4=1  pTjetcut=0 deltaRcut=0
     - ./JHUGen PDFSet=3 VegasNc0=100000 DecayMode1=8 DecayMode2=8 Interf=0 ReadLHE=$CIRCLE_ARTIFACTS/VBF/PS.lhe DataFile=$CIRCLE_ARTIFACTS/VBF/PS_decayed Reghz1=0 Reghz4=1
     - analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/VBF/ outfile=PS.root indir=$CIRCLE_ARTIFACTS/VBF/ computeVBFProdAngles=1 computeVHProdAngles=1 PS_decayed.lhe
 
@@ -105,9 +98,7 @@ test:
     - ./JHUGen PDFSet=3 VegasNc0=100000 VegasNc2=10000 Interf=0 DataFile=$CIRCLE_ARTIFACTS/ggH/a2 Reghz1=0 Reghz2=1
     - analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/ggH/ outfile=a2.root indir=$CIRCLE_ARTIFACTS/ggH/ computeVBFProdAngles=1 computeVHProdAngles=1 a2.lhe
 
-    - git apply ~/VBFvsHJJ.diff && make
-    - ./JHUGen PDFSet=3 Process=60 VegasNc0=10000000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/VBF/a2 Reghz1=0 Reghz2=1
-    - git apply --reverse ~/VBFvsHJJ.diff && make
+    - ./JHUGen PDFSet=3 Process=60 VegasNc0=10000000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/VBF/a2 Reghz1=0 Reghz2=1 pTjetcut=0 deltaRcut=0
     - ./JHUGen PDFSet=3 VegasNc0=100000 DecayMode1=8 DecayMode2=8 Interf=0 ReadLHE=$CIRCLE_ARTIFACTS/VBF/a2.lhe DataFile=$CIRCLE_ARTIFACTS/VBF/a2_decayed Reghz1=0 Reghz2=1
     - analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/VBF/ outfile=a2.root indir=$CIRCLE_ARTIFACTS/VBF/ computeVBFProdAngles=1 computeVHProdAngles=1 a2_decayed.lhe
 
