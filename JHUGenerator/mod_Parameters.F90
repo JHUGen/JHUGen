@@ -241,10 +241,10 @@ real(8), public :: scale_alpha_W_tn = 1d0        ! scaling factor of alpha (~par
    complex(8), public, parameter :: ghg3 = (0.0d0,0d0)
    complex(8), public, parameter :: ghg4 = (0.0d0,0d0)   ! pseudoscalar
    
-   complex(8), public, parameter :: ghz1 = (2.0d0,0d0)   ! SM=2
-   complex(8), public, parameter :: ghz2 = (0.0d0,0d0)
+   complex(8), public            :: ghz1 = (2.0d0,0d0)   ! SM=2
+   complex(8), public            :: ghz2 = (0.0d0,0d0)
    complex(8), public, parameter :: ghz3 = (0.0d0,0d0)
-   complex(8), public, parameter :: ghz4 = (0.0d0,0d0)   ! pseudoscalar 
+   complex(8), public            :: ghz4 = (0.0d0,0d0)   ! pseudoscalar 
 
    complex(8), public, parameter :: ghzgs2  = (0.00d0,0d0)
    complex(8), public, parameter :: ghzgs3  = (0.00d0,0d0)
@@ -256,7 +256,7 @@ real(8), public :: scale_alpha_W_tn = 1d0        ! scaling factor of alpha (~par
 
 !-- parameters that define q^2 dependent form factors
    complex(8), public, parameter :: ghz1_prime = (0.0d0,0d0)
-   complex(8), public, parameter :: ghz1_prime2= (0.0d0,0d0)
+   complex(8), public            :: ghz1_prime2= (0.0d0,0d0)
    complex(8), public, parameter :: ghz1_prime3= (0.0d0,0d0)
    complex(8), public, parameter :: ghz1_prime4= (0.0d0,0d0)
    complex(8), public, parameter :: ghz1_prime5= (0.0d0,0d0)
@@ -322,8 +322,8 @@ real(8), public :: scale_alpha_W_tn = 1d0        ! scaling factor of alpha (~par
 
 !-- parameters that define spin 2 coupling to SM fields, see note
 ! minimal coupling corresponds to a1 = b1 = b5 = 1 everything else 0
-  complex(8), public, parameter :: a1 = (0.0d0,0d0)    ! g1  -- c.f. draft
-  complex(8), public, parameter :: a2 = (1.0d0,0d0)    ! g2
+  complex(8), public            :: a1 = (0.0d0,0d0)    ! g1  -- c.f. draft
+  complex(8), public            :: a2 = (1.0d0,0d0)    ! g2
   complex(8), public, parameter :: a3 = (0.0d0,0d0)    ! g3
   complex(8), public, parameter :: a4 = (0.0d0,0d0)    ! g4
   complex(8), public, parameter :: a5 = (0.0d0,0d0)    ! pseudoscalar, g8
@@ -334,11 +334,11 @@ real(8), public :: scale_alpha_W_tn = 1d0        ! scaling factor of alpha (~par
   logical, public, parameter :: generate_bis = .true.
   logical, public, parameter :: use_dynamic_MG = .true.
 
-  complex(8), public, parameter :: b1 = (0.0d0,0d0)  !  all b' below are g's in the draft
-  complex(8), public, parameter :: b2 = (1.0d0,0d0)
+  complex(8), public            :: b1 = (0.0d0,0d0)  !  all b' below are g's in the draft
+  complex(8), public            :: b2 = (1.0d0,0d0)
   complex(8), public, parameter :: b3 = (0.0d0,0d0)
   complex(8), public, parameter :: b4 = (0.0d0,0d0)
-  complex(8), public, parameter :: b5 = (0.0d0,0d0)
+  complex(8), public            :: b5 = (0.0d0,0d0)
   complex(8), public, parameter :: b6 = (0.0d0,0d0)
   complex(8), public, parameter :: b7 = (0.0d0,0d0)
   complex(8), public, parameter :: b8 = (0.0d0,0d0)
