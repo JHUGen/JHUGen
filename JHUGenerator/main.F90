@@ -444,6 +444,7 @@ logical :: SetAnomalousSpin0, Setg1, SetAnomalousSpin2, Seta2, Setb2
     elseif( arg(1:18) .eq."WriteFailedEvents=" ) then
         read(arg(19:19),*) WriteFailedEvents
         CountArg = CountArg + 1
+
     !anomalous couplings - only the most common ones for now
     elseif( arg(1:7).eq."Reghz1=" ) then
         read(arg(8:500),*) Reghz1
@@ -521,6 +522,27 @@ logical :: SetAnomalousSpin0, Setg1, SetAnomalousSpin2, Seta2, Setb2
         read(arg(6:500),*) Imb5
         CountArg = CountArg + 1
         SetAnomalousSpin2=.true.
+
+    !jet cuts
+    elseif( arg(1:9).eq."pTjetcut=" ) then
+        read(arg(10:500),*) pTjetcut
+        pTjetcut = pTjetcut*GeV
+        CountArg = CountArg+1
+    elseif( arg(1:10).eq."deltaRcut=" ) then
+        read(arg(11:500),*) Rjet
+        CountArg = CountArg+1
+    elseif( arg(1:7).eq."mJJcut=" ) then
+        read(arg(8:500),*) mJJcut
+        mJJcut = mJJcut*GeV
+        CountArg = CountArg+1
+    elseif( arg(1:12).eq."VBF_m4l_min=" ) then
+        read(arg(13:500),*) VBF_4ml_minmax(1)
+        VBF_4ml_minmax(1) = VBF_4ml_minmax(1)*GeV
+        CountArg = CountArg+1
+    elseif( arg(1:12).eq."VBF_m4l_max=" ) then
+        read(arg(13:500),*) VBF_4ml_minmax(2)
+        VBF_4ml_minmax(2) = VBF_4ml_minmax(2)*GeV
+        CountArg = CountArg+1
     endif
    enddo
 
@@ -3740,7 +3762,7 @@ character :: arg*(500)
         write(TheUnit,"(12X,A,F8.2,A)") "pT >= ", pTjetcut/GeV, " GeV"
         if( Process.eq.60 .or. Process.eq.61 .or. Process.eq.80 .or. Process.eq.90) then
             write(TheUnit,"(8X,A,F8.2)") "DeltaR >= ", Rjet
-            write(TheUnit,"(11X,A,F8.2,A)") "mJJ >= ", mJJcut, " GeV"
+            write(TheUnit,"(11X,A,F8.2,A)") "mJJ >= ", mJJcut/GeV, " GeV"
         endif
     endif
     if( (ReadLHEFile) .and. (RequestNLeptons.gt.0) ) then
