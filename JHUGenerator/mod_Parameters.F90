@@ -94,7 +94,7 @@ logical, public, parameter :: H_DK =.false.                 ! default to false s
 
 
 !=====================================================
-!cuts
+!cuts - should be set on the command line
 real(8), public :: pTjetcut = 15d0*GeV                        ! jet min pt
 real(8), public :: Rjet = 0.3d0                               ! jet deltaR, anti-kt algorithm
 real(8), public :: mJJcut = 0d0*GeV                           ! minimum mJJ for VBF, HJJ, bbH
