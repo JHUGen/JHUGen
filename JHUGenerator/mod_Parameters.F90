@@ -547,6 +547,13 @@ integer, public :: ijPartons(1:2)=0
 
 !=====================================================
 
+
+interface ReadCommandLineArgument
+    module procedure ReadCommandLineArgument_logical, ReadCommandLineArgument_integer, ReadCommandLineArgument_real8,&
+                     ReadCommandLineArgument_complex8, ReadCommandLineArgument_string
+end interface
+
+
 CONTAINS
 
 
@@ -1385,64 +1392,64 @@ implicit none
 end subroutine ComputeQCDVariables
 
 
-subroutine ReadCommandLineArgument_logical(argument, argumentname, success, dest_logical)
+subroutine ReadCommandLineArgument_logical(argument, argumentname, success, dest)
 implicit none
 character(len=*) :: argument, argumentname
-logical :: dest_logical
+logical :: dest
 logical :: success
 integer :: length
 
     length=len(trim(argumentname))
 
     if( trim(argument).eq.trim(argumentname) ) then
-        dest_logical=.true.
+        dest=.true.
         success=.true.
     elseif( argument(1:length+1) .eq. trim(argumentname)//"=" ) then
-        read(argument(length+2:len(argument)), *) dest_logical
+        read(argument(length+2:len(argument)), *) dest
         success=.true.
     endif
 
 end subroutine ReadCommandLineArgument_logical
 
 
-subroutine ReadCommandLineArgument_integer(argument, argumentname, success, dest_integer)
+subroutine ReadCommandLineArgument_integer(argument, argumentname, success, dest)
 implicit none
 character(len=*) :: argument, argumentname
-integer :: dest_integer
+integer :: dest
 logical :: success
 integer :: length
 
     length=len(trim(argumentname))
 
     if( argument(1:length+1) .eq. trim(argumentname)//"=" ) then
-        read(argument(length+2:len(argument)), *) dest_integer
+        read(argument(length+2:len(argument)), *) dest
         success=.true.
     endif
 
 end subroutine ReadCommandLineArgument_integer
 
 
-subroutine ReadCommandLineArgument_real8(argument, argumentname, success, dest_real8)
+subroutine ReadCommandLineArgument_real8(argument, argumentname, success, dest)
 implicit none
 character(len=*) :: argument, argumentname
-real(8) :: dest_real8
+real(8) :: dest
 logical :: success
 integer :: length
 
     length=len(trim(argumentname))
 
     if( argument(1:length+1) .eq. trim(argumentname)//"=" ) then
-        read(argument(length+2:len(argument)), *) dest_real8
+        read(argument(length+2:len(argument)), *) dest
         success=.true.
     endif
 
 end subroutine ReadCommandLineArgument_real8
 
 
-subroutine ReadCommandLineArgument_complex8(argument, argumentname, success, dest_complex8)
+subroutine ReadCommandLineArgument_complex8(argument, argumentname, success, dest)
 implicit none
 character(len=*) :: argument, argumentname
-complex(8) :: dest_complex8
+complex(8) :: dest
 real(8) :: re, im
 logical :: success
 integer :: length
@@ -1451,36 +1458,36 @@ integer :: length
 
     if( argument(1:length+1) .eq. trim(argumentname)//"=" ) then
         read(argument(length+2:len(argument)), *) re, im
-        dest_complex8 = dcmplx(re, im)
+        dest = dcmplx(re, im)
         success=.true.
     elseif( argument(1:length+3) .eq. "Re"//trim(argumentname)//"=" ) then
         read(argument(length+4:len(argument)), *) re
-        dest_complex8 = dcmplx(re, daimag(dest_complex8))
+        dest = dcmplx(re, daimag(dest))
         success=.true.
     elseif( argument(1:length+3) .eq. "Im"//trim(argumentname)//"=" ) then
         read(argument(length+4:len(argument)), *) im
-        dest_complex8 = dcmplx(dreal(dest_complex8), im)
+        dest = dcmplx(dreal(dest), im)
         success=.true.
     endif
 
 end subroutine ReadCommandLineArgument_complex8
 
 
-subroutine ReadCommandLineArgument_string(argument, argumentname, success, dest_string)
+subroutine ReadCommandLineArgument_string(argument, argumentname, success, dest)
 implicit none
 character(len=*) :: argument, argumentname
-character(len=*) :: dest_string
+character(len=*) :: dest
 logical :: success
 integer :: length
 
     length=len(trim(argumentname))
 
     if( argument(1:length+1) .eq. trim(argumentname)//"=" ) then
-        if( len(dest_string).lt.len(trim(argument))-(length+1) ) then
-            print "(A,A,A,I4,A)", "Argument ", argument, " is too long!  Maximum allowed length is ", len(dest_string), " characters."
+        if( len(dest).lt.len(trim(argument))-(length+1) ) then
+            print "(A,A,A,I4,A)", "Argument ", argument, " is too long!  Maximum allowed length is ", len(dest), " characters."
             stop 1
         endif
-        dest_string = argument(length+2:len(argument))
+        dest = argument(length+2:len(argument))
         success=.true.
     endif
 
