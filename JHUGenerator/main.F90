@@ -224,8 +224,8 @@ use ModKinematics
 use ModMisc
 implicit none
 character :: arg*(500), argmatch*(30)
-integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
-logical :: help, success, tmpsuccess, SetAnomalousSpin0, Setg1, SetAnomalousSpin2, Seta2, Setb2
+integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg
+logical :: help, success, tmpsuccess, SetAnomalousSpin0, Setg1, SetAnomalousSpin2, Seta2, Setb2, interfSet
 
    help = .false.
 
@@ -270,7 +270,7 @@ logical :: help, success, tmpsuccess, SetAnomalousSpin0, Setg1, SetAnomalousSpin
    CountTauAsAny = .true.
    LHAPDFString = ""
    LHAPDFMember = 0
-   iinterf = -1
+   interfSet = .false.
    WriteFailedEvents=0
 
    MuFacMultiplier = 1d0
@@ -337,7 +337,10 @@ logical :: help, success, tmpsuccess, SetAnomalousSpin0, Setg1, SetAnomalousSpin
     call ReadCommandLineArgument(arg, "FilterOSSFPairs", success, RequestOSSF)
     call ReadCommandLineArgument(arg, "CountTauAsAny", success, CountTauAsAny)
     call ReadCommandLineArgument(arg, "Unweighted", success, Unweighted)
-    call ReadCommandLineArgument(arg, "Interf", success, iinterf)
+    call ReadCommandLineArgument(arg, "Interf", tmpsuccess, includeInterference)
+    interfSet = interfSet.or.tmpsuccess
+    success = success.or.tmpsuccess
+    tmpsuccess = .false.
     call ReadCommandLineArgument(arg, "ReadLHE", tmpsuccess, LHEProdFile)
     ReadLHEFile = ReadLHEFile.or.tmpsuccess
     success = success.or.tmpsuccess
@@ -483,16 +486,12 @@ logical :: help, success, tmpsuccess, SetAnomalousSpin0, Setg1, SetAnomalousSpin
         (DecayMode1.eq.8  .and. DecayMode2.eq.2)               .or.  &
         (DecayMode1.eq.0  .and. DecayMode2.eq.8)               .or.  &
         (DecayMode1.eq.2  .and. DecayMode2.eq.8)               ) then !  allow interference
-            if( iinterf.eq.-1 ) then!  set default interference switch
+            if( .not.interfSet ) then!  set default interference switch
                 if( M_Reso.gt.2d0*M_Z ) then
                     includeInterference = .false.
                 else
                     includeInterference = .true.
                 endif
-            elseif( iinterf.eq.0 ) then! overwrite default and use user selection
-                includeInterference = .false.
-            else
-                includeInterference = .true.
             endif
     else
         includeInterference = .false.   ! no interference if decay mode does not allow 4 same flavor leptons
