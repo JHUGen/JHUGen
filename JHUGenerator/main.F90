@@ -313,9 +313,11 @@ logical :: help, success, tmpsuccess, SetAnomalousSpin0, Setg1, SetAnomalousSpin
     call ReadCommandLineArgument(arg, "MReso", tmpsuccess, M_Reso)
     if( tmpsuccess ) M_Reso = M_Reso*GeV
     success = success.or.tmpsuccess
+    tmpsuccess = .false.
     call ReadCommandLineArgument(arg, "GaReso", tmpsuccess, Ga_Reso)
     if( tmpsuccess ) Ga_Reso = Ga_Reso*GeV
     success = success.or.tmpsuccess
+    tmpsuccess = .false.
     call ReadCommandLineArgument(arg, "VegasNc0", success, VegasNc0)
     call ReadCommandLineArgument(arg, "VegasNc1", success, VegasNc1)
     call ReadCommandLineArgument(arg, "VegasNc2", success, VegasNc2)
