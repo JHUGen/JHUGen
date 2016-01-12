@@ -3,7 +3,7 @@ implicit none
 save
 ! 
 ! 
-character(len=6),parameter :: JHUGen_Version="v6.8.4"
+character(len=6),parameter :: JHUGen_Version="v6.8.5"
 ! 
 ! 
 !=====================================================
