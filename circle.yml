@@ -54,7 +54,7 @@ test:
     - ./JHUGen PDFSet=3 Process=90  VegasNc0=100000 VegasNc2=10  DataFile=$CIRCLE_ARTIFACTS/other/gg_bbH PChannel=0
     - ./JHUGen PDFSet=3 Process=90  VegasNc0=100000 VegasNc2=10  DataFile=$CIRCLE_ARTIFACTS/other/qq_bbH PChannel=1
     - ./JHUGen PDFSet=3 Process=110 VegasNc0=100000 VegasNc2=100 DataFile=$CIRCLE_ARTIFACTS/other/tH_t    DecayMode1=11 TopDK=1
-    - ./JHUGen PDFSet=3 Process=111 VegasNc0=100000 VegasNc2=100 DataFile=$CIRCLE_ARTIFACTS/other/tbarH_t DecayMode1=11 TopDK=1 MReso=750
+    - ./JHUGen PDFSet=3 Process=111 VegasNc0=100000 VegasNc2=100 DataFile=$CIRCLE_ARTIFACTS/other/tbarH_t DecayMode1=11 TopDK=1 MReso=750 GaReso=247
     - ./JHUGen PDFSet=3 Process=112 VegasNc0=100000 VegasNc2=100 DataFile=$CIRCLE_ARTIFACTS/other/tH_s    DecayMode1=11 TopDK=1
     - ./JHUGen PDFSet=3 Process=113 VegasNc0=100000 VegasNc2=100 DataFile=$CIRCLE_ARTIFACTS/other/tbarH_s DecayMode1=11 TopDK=1
     #Decays for t(t)H which have complicated quarks, to check colors
