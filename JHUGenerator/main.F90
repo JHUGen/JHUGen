@@ -225,11 +225,9 @@ use ModMisc
 implicit none
 character :: arg*(500), argmatch*(30)
 integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
-real(8) :: Reghz1, Reghz2, Reghz4, Reghz1_prime2
-real(8) :: Imghz1, Imghz2, Imghz4, Imghz1_prime2
-real(8) :: Rea1, Rea2, Reb1, Reb2, Reb5
-real(8) :: Ima1, Ima2, Imb1, Imb2, Imb5
-logical :: SetAnomalousSpin0, Setg1, SetAnomalousSpin2, Seta2, Setb2
+logical :: help, success, tmpsuccess, SetAnomalousSpin0, Setg1, SetAnomalousSpin2, Seta2, Setb2
+
+   help = .false.
 
    Collider=1
    VegasIt1=-1
@@ -285,24 +283,6 @@ logical :: SetAnomalousSpin0, Setg1, SetAnomalousSpin2, Seta2, Setb2
    SetAnomalousSpin2=.false.
    Seta2=.false.
    Setb2=.false.
-   Reghz1 = 0
-   Reghz2 = 0
-   Reghz4 = 0
-   Reghz1_prime2 = 0
-   Imghz1 = 0
-   Imghz2 = 0
-   Imghz4 = 0
-   Imghz1_prime2 = 0
-   Rea1 = 0
-   Rea2 = 0
-   Reb1 = 0
-   Reb2 = 0
-   Reb5 = 0
-   Ima1 = 0
-   Ima2 = 0
-   Imb1 = 0
-   Imb2 = 0
-   Imb5 = 0
 
    DataFile="./data/output"
 
@@ -316,239 +296,110 @@ logical :: SetAnomalousSpin0, Setg1, SetAnomalousSpin2, Seta2, Setb2
    CountArg = 0
    do NArg=1,NumArgs
     call GetArg(NArg,arg)
-    if( arg(1:4).eq."help" .or. arg(1:4).eq."Help" .or. arg(1:4).eq."HELP") then
+    success = .false.
+    tmpsuccess = .false.
+    call ReadCommandLineArgument(arg, "help", success, help)
+    if( help ) then
         call PrintCommandLineArgs()
-        stop
-    elseif( arg(1:9).eq."Collider=" ) then
-        read(arg(10:10),*) Collider
-        CountArg = CountArg + 1
-    elseif( arg(1:7).eq."PDFSet=" ) then
-        read(arg(8:10),*) PDFSet
-        CountArg = CountArg + 1
-    elseif( arg(1:7).eq."LHAPDF=" ) then
-        read(arg(8:107),"(A)") LHAPDFString
-        CountArg = CountArg + 1
-    elseif( arg(1:10).eq."LHAPDFMem=" ) then
-        read(arg(11:13),*) LHAPDFMember
-        CountArg = CountArg + 1
-    elseif( arg(1:6).eq."MReso=" ) then
-        read(arg(7:12),*) M_Reso
-        M_Reso = M_Reso*GeV
-        CountArg = CountArg + 1
-    elseif( arg(1:7).eq."GaReso=" ) then
-        read(arg(8:13),*) Ga_Reso
-        Ga_Reso = Ga_Reso*GeV
-        CountArg = CountArg + 1
-    elseif( arg(1:9).eq."VegasNc0=" ) then
-        read(arg(10:17),*) VegasNc0
-        CountArg = CountArg + 1
-    elseif( arg(1:9).eq."VegasNc1=" ) then
-        read(arg(10:17),*) VegasNc1
-        CountArg = CountArg + 1
-    elseif( arg(1:9).eq."VegasNc2=" ) then
-        read(arg(10:17),*) VegasNc2
-        CountArg = CountArg + 1
-    elseif( arg(1:9).eq."PChannel=" ) then
-        read(arg(10:11),*) PChannel
-        CountArg = CountArg + 1
-    elseif( arg(1:9).eq."DataFile=" ) then
-        read(arg(10:500),"(A)") DataFile
-        CountArg = CountArg + 1
-    elseif( arg(1:8).eq."Process=" ) then
-        read(arg(9:11),*) Process
-        CountArg = CountArg + 1
-    elseif( arg(1:11).eq."DecayMode1=" ) then
-        read(arg(12:13),*) DecayMode1
-        CountArg = CountArg + 1
-    elseif( arg(1:11).eq."DecayMode2=" ) then
-        read(arg(12:13),*) DecayMode2
-        CountArg = CountArg + 1
-    elseif( arg(1:10).eq."FacScheme=" ) then
-        read(arg(11:13),*) FacScheme
-        CountArg = CountArg + 1
-    elseif( arg(1:10).eq."RenScheme=" ) then
-        read(arg(11:13),*) RenScheme
-        CountArg = CountArg + 1
-    elseif( arg(1:16).eq."MuFacMultiplier=" ) then
-        read(arg(17:24),*) MuFacMultiplier
-        CountArg = CountArg + 1
-    elseif( arg(1:16).eq."MuRenMultiplier=" ) then
-        read(arg(17:24),*) MuRenMultiplier
-        CountArg = CountArg + 1
-    elseif( arg(1:6).eq."TopDK=" ) then
-        read(arg(7:7),*) TopDecays
-        CountArg = CountArg + 1
-    elseif( arg(1:6).eq."TauDK=" ) then
-        read(arg(7:7),*) TauDecays
-        CountArg = CountArg + 1
-    elseif( arg(1:12).eq."WidthScheme=" ) then
-        read(arg(13:13),*) WidthScheme
-        CountArg = CountArg + 1
-    elseif( arg(1:7) .eq."OffXVV=" ) then
-        read(arg(8:10),*) OffShell_XVV
-        CountArg = CountArg + 1
-    elseif( arg(1:12).eq."FilterNLept=" ) then
-        read(arg(13:13),*) RequestNLeptons
-        CountArg = CountArg + 1
-    elseif( arg(1:14) .eq."FilterOSPairs=" ) then
-        read(arg(15:15),*) RequestOS
-        CountArg = CountArg + 1
-    elseif( arg(1:16) .eq."FilterOSSFPairs=" ) then
-        read(arg(17:17),*) RequestOSSF
-        CountArg = CountArg + 1
-    elseif( arg(1:14) .eq."CountTauAsAny=" ) then
-        read(arg(15:15),*) iargument
-        if( iargument.eq.1 ) then
-            CountTauAsAny = .true.
-        else
-            CountTauAsAny = .false.
-        endif
-        CountArg = CountArg + 1
-    elseif( arg(1:11) .eq."FilterOSSF=" ) then
-        read(arg(12:12),*) iargument
-        write(*,*), "The filtering syntax has changed to become more general.  Please see the manual for more details."
-        if( iargument.eq.1 ) then
-            write(*,*), "Setting FilterOSSFPairs=2"
-            RequestOSSF = 2
-        endif        
-        CountArg = CountArg + 1
-    elseif( arg(1:11) .eq."Unweighted=" ) then
-        read(arg(12:12),*) iargument
-        if( iargument.eq.0 ) then
-            Unweighted = .false.
-        else
-            Unweighted = .true.
-        endif
-        CountArg = CountArg + 1
-    elseif( arg(1:7) .eq."Interf=" ) then
-        read(arg(8:8),*) iinterf
-        CountArg = CountArg + 1
-    elseif( arg(1:8) .eq."ReadLHE=" ) then
-        read(arg(9:500),"(A)") LHEProdFile
-        ReadLHEFile=.true.
-        CountArg = CountArg + 1
-    elseif( arg(1:11) .eq."ConvertLHE=" ) then
-        read(arg(12:500),"(A)") LHEProdFile
-        ConvertLHEFile=.true.
-        CountArg = CountArg + 1
-    elseif( arg(1:9) .eq."ReadCSmax" ) then
-        ReadCSmax=.true.
-        CountArg = CountArg + 1
-    elseif( arg(1:9) .eq."CalcPMZZ" ) then
-        CalcPMZZ=.true.
-        CountArg = CountArg + 1
-    elseif( arg(1:9) .eq."GenEvents" ) then
-        GenerateEvents=.true.
-        Unweighted=.false.
-        CountArg = CountArg + 1
-    elseif( arg(1:18) .eq."WriteFailedEvents=" ) then
-        read(arg(19:19),*) WriteFailedEvents
-        CountArg = CountArg + 1
+        stop 1
+    endif
+    !ReadCommandLineArgument is overloaded, it puts the value into the last argument
+    ! by detecting the type.  It also sets success to .true. if the argument name (before =)
+    ! is correct.
+    call ReadCommandLineArgument(arg, "Collider", success, Collider)
+    call ReadCommandLineArgument(arg, "PDFSet", success, PDFSet)
+    call ReadCommandLineArgument(arg, "LHAPDF", success, LHAPDFString)
+    call ReadCommandLineArgument(arg, "LHAPDFMem", success, LHAPDFMember)
+    call ReadCommandLineArgument(arg, "MReso", success, M_Reso)
+    call ReadCommandLineArgument(arg, "GaReso", success, Ga_Reso)
+    call ReadCommandLineArgument(arg, "VegasNc0", success, VegasNc0)
+    call ReadCommandLineArgument(arg, "VegasNc1", success, VegasNc1)
+    call ReadCommandLineArgument(arg, "VegasNc2", success, VegasNc2)
+    call ReadCommandLineArgument(arg, "PChannel", success, PChannel)
+    call ReadCommandLineArgument(arg, "DataFile", success, DataFile)
+    call ReadCommandLineArgument(arg, "Process", success, Process)
+    call ReadCommandLineArgument(arg, "DecayMode1", success, DecayMode1)
+    call ReadCommandLineArgument(arg, "DecayMode2", success, DecayMode2)
+    call ReadCommandLineArgument(arg, "FacScheme", success, FacScheme)
+    call ReadCommandLineArgument(arg, "RenScheme", success, RenScheme)
+    call ReadCommandLineArgument(arg, "MuFacMultiplier", success, MuFacMultiplier)
+    call ReadCommandLineArgument(arg, "MuRenMultiplier", success, MuRenMultiplier)
+    call ReadCommandLineArgument(arg, "TopDK", success, TopDecays)
+    call ReadCommandLineArgument(arg, "TauDK", success, TauDecays)
+    call ReadCommandLineArgument(arg, "WidthScheme", success, WidthScheme)
+    call ReadCommandLineArgument(arg, "OffXVV", success, OffShell_XVV)
+    call ReadCommandLineArgument(arg, "FilterNLept", success, RequestNLeptons)
+    call ReadCommandLineArgument(arg, "FilterOSPairs", success, RequestOS)
+    call ReadCommandLineArgument(arg, "FilterOSSFPairs", success, RequestOSSF)
+    call ReadCommandLineArgument(arg, "CountTauAsAny", success, CountTauAsAny)
+    call ReadCommandLineArgument(arg, "Unweighted", success, Unweighted)
+    call ReadCommandLineArgument(arg, "Interf", success, iinterf)
+    call ReadCommandLineArgument(arg, "ReadLHE", tmpsuccess, LHEProdFile)
+    ReadLHEFile = ReadLHEFile.or.tmpsuccess
+    success = success.or.tmpsuccess
+    tmpsuccess = .false.
+    call ReadCommandLineArgument(arg, "ConvertLHE", tmpsuccess, LHEProdFile)
+    ConvertLHEFile = ConvertLHEFile.or.tmpsuccess
+    success = success.or.tmpsuccess
+    tmpsuccess = .false.
+    call ReadCommandLineArgument(arg, "ReadCSmax", success, ReadCSmax)
+    call ReadCommandLineArgument(arg, "GenEvents", tmpsuccess, GenerateEvents)
+    if( tmpsuccess ) Unweighted = .false.
+    success = success.or.tmpsuccess
+    tmpsuccess = .false.
+    call ReadCommandLineArgument(arg, "WriteFailedEvents", success, WriteFailedEvents)
 
     !anomalous couplings - only the most common ones for now
-    elseif( arg(1:7).eq."Reghz1=" ) then
-        read(arg(8:500),*) Reghz1
-        CountArg = CountArg + 1
-        Setg1=.true.
-        SetAnomalousSpin0=.true.
-    elseif( arg(1:7).eq."Reghz2=" ) then
-        read(arg(8:500),*) Reghz2
-        CountArg = CountArg + 1
-        SetAnomalousSpin0=.true.
-    elseif( arg(1:7).eq."Reghz4=" ) then
-        read(arg(8:500),*) Reghz4
-        CountArg = CountArg + 1
-        SetAnomalousSpin0=.true.
-    elseif( arg(1:14).eq."Reghz1_prime2=" ) then
-        read(arg(15:500),*) Reghz1_prime2
-        CountArg = CountArg + 1
-        SetAnomalousSpin0=.true.
-    elseif( arg(1:7).eq."Imghz1=" ) then
-        read(arg(8:500),*) Imghz1
-        CountArg = CountArg + 1
-        SetAnomalousSpin0=.true.
-    elseif( arg(1:7).eq."Imghz2=" ) then
-        read(arg(8:500),*) Imghz2
-        CountArg = CountArg + 1
-        SetAnomalousSpin0=.true.
-    elseif( arg(1:7).eq."Imghz4=" ) then
-        read(arg(8:500),*) Imghz4
-        CountArg = CountArg + 1
-        SetAnomalousSpin0=.true.
-    elseif( arg(1:14).eq."Imghz1_prime2=" ) then
-        read(arg(15:500),*) Imghz1_prime2
-        CountArg = CountArg + 1
-        SetAnomalousSpin0=.true.
+    call ReadCommandLineArgument(arg, "ghz1", tmpsuccess, ghz1)
+    Setg1 = Setg1.or.tmpsuccess
+    success = success.or.tmpsuccess
+    tmpsuccess = .false.
+    call ReadCommandLineArgument(arg, "ghz2", tmpsuccess, ghz2)
+    call ReadCommandLineArgument(arg, "ghz4", tmpsuccess, ghz4)
+    call ReadCommandLineArgument(arg, "ghz1_prime2", tmpsuccess, ghz1_prime2)
+    SetAnomalousSpin0 = SetAnomalousSpin0.or.tmpsuccess.or.Setg1
+    success = success.or.tmpsuccess
+    tmpsuccess = .false.
+
     !spin 2
-    elseif( arg(1:5).eq."Rea1=" ) then
-        read(arg(6:500),*) Rea1
-        CountArg = CountArg + 1
-        SetAnomalousSpin2=.true.
-    elseif( arg(1:5).eq."Rea2=" ) then
-        read(arg(6:500),*) Rea2
-        CountArg = CountArg + 1
-        Seta2=.true.
-        SetAnomalousSpin2=.true.
-    elseif( arg(1:5).eq."Reb1=" ) then
-        read(arg(6:500),*) Reb1
-        CountArg = CountArg + 1
-        SetAnomalousSpin2=.true.
-    elseif( arg(1:5).eq."Reb2=" ) then
-        read(arg(6:500),*) Reb2
-        CountArg = CountArg + 1
-        Setb2=.true.
-        SetAnomalousSpin2=.true.
-    elseif( arg(1:5).eq."Reb5=" ) then
-        read(arg(6:500),*) Reb5
-        CountArg = CountArg + 1
-        SetAnomalousSpin2=.true.
-    elseif( arg(1:5).eq."Ima1=" ) then
-        read(arg(6:500),*) Ima1
-        CountArg = CountArg + 1
-        SetAnomalousSpin2=.true.
-    elseif( arg(1:5).eq."Ima2=" ) then
-        read(arg(6:500),*) Ima2
-        CountArg = CountArg + 1
-        SetAnomalousSpin2=.true.
-    elseif( arg(1:5).eq."Imb1=" ) then
-        read(arg(6:500),*) Imb1
-        CountArg = CountArg + 1
-        SetAnomalousSpin2=.true.
-    elseif( arg(1:5).eq."Imb2=" ) then
-        read(arg(6:500),*) Imb2
-        CountArg = CountArg + 1
-        SetAnomalousSpin2=.true.
-    elseif( arg(1:5).eq."Imb5=" ) then
-        read(arg(6:500),*) Imb5
-        CountArg = CountArg + 1
-        SetAnomalousSpin2=.true.
+    call ReadCommandLineArgument(arg, "a2", tmpsuccess, a2)
+    Seta2 = Seta2.or.tmpsuccess
+    success = success.or.tmpsuccess
+    tmpsuccess = .false.
+    call ReadCommandLineArgument(arg, "b2", tmpsuccess, b2)
+    Setb2 = Setb2.or.tmpsuccess
+    success = success.or.tmpsuccess
+    tmpsuccess = .false.
+    call ReadCommandLineArgument(arg, "a1", tmpsuccess, a1)
+    call ReadCommandLineArgument(arg, "b1", tmpsuccess, b1)
+    call ReadCommandLineArgument(arg, "b5", tmpsuccess, b5)
+    SetAnomalousSpin2 = SetAnomalousSpin2.or.tmpsuccess.or.Seta2.or.Setb2
+    success = success.or.tmpsuccess
+    tmpsuccess = .false.
 
     !jet cuts
-    elseif( arg(1:9).eq."pTjetcut=" ) then
-        read(arg(10:500),*) pTjetcut
-        pTjetcut = pTjetcut*GeV
-        CountArg = CountArg+1
-    elseif( arg(1:10).eq."deltaRcut=" ) then
-        read(arg(11:500),*) Rjet
-        CountArg = CountArg+1
-    elseif( arg(1:7).eq."mJJcut=" ) then
-        read(arg(8:500),*) mJJcut
-        mJJcut = mJJcut*GeV
-        CountArg = CountArg+1
-    elseif( arg(1:12).eq."VBF_m4l_min=" ) then
-        read(arg(13:500),*) VBF_4ml_minmax(1)
-        VBF_4ml_minmax(1) = VBF_4ml_minmax(1)*GeV
-        CountArg = CountArg+1
-    elseif( arg(1:12).eq."VBF_m4l_max=" ) then
-        read(arg(13:500),*) VBF_4ml_minmax(2)
-        VBF_4ml_minmax(2) = VBF_4ml_minmax(2)*GeV
-        CountArg = CountArg+1
+    call ReadCommandLineArgument(arg, "pTjetcut", tmpsuccess, pTjetcut)
+    if( tmpsuccess ) pTjetcut = pTjetcut*GeV
+    success = success.or.tmpsuccess
+    tmpsuccess = .false.
+    call ReadCommandLineArgument(arg, "deltaRcut", success, Rjet)
+    call ReadCommandLineArgument(arg, "mJJcut", tmpsuccess, mJJcut)
+    if( tmpsuccess ) mJJcut = mJJcut*GeV
+    success = success.or.tmpsuccess
+    tmpsuccess = .false.
+    call ReadCommandLineArgument(arg, "VBF_m4l_min", tmpsuccess, VBF_4ml_minmax(1))
+    if( tmpsuccess ) VBF_4ml_minmax(1) = VBF_4ml_minmax(1)*GeV
+    success = success.or.tmpsuccess
+    tmpsuccess = .false.
+    call ReadCommandLineArgument(arg, "VBF_m4l_max", tmpsuccess, VBF_4ml_minmax(2))
+    if( tmpsuccess ) VBF_4ml_minmax(2) = VBF_4ml_minmax(2)*GeV
+    success = success.or.tmpsuccess
+    tmpsuccess = .false.
+
+    if( .not.success ) then
+        call Error("Unknown command line argument: " // trim(arg))
     endif
    enddo
-
-    if( CountArg.ne.NumArgs ) then
-        call Error("Unknown command line argument")
-    endif
 
     if (Process.eq.0) PChannel = 0   !only gluons
     if (Process.eq.1 .or. Process.eq.50 .or. Process.eq.60 .or. Process.eq.66) PChannel = 1   !only quarks
@@ -714,24 +565,11 @@ logical :: SetAnomalousSpin0, Setg1, SetAnomalousSpin2, Seta2, Setb2
         call Error("WriteFailedEvents can only be 0, 1, or 2.  Please see the manual.")
     endif
 
-    if( SetAnomalousSpin0 ) then
-        if( .not.Setg1 ) then
-            call Error("If you set an anomalous spin 0 coupling, you need to explicitly set ghz1 as well")
-        endif
-        ghz1 = cmplx(Reghz1, Imghz1)
-        ghz2 = cmplx(Reghz2, Imghz2)
-        ghz4 = cmplx(Reghz4, Imghz4)
-        ghz1_prime2 = cmplx(Reghz1_prime2, Imghz1_prime2)
+    if( SetAnomalousSpin0.and. .not.Setg1 ) then
+        call Error("If you set an anomalous spin 0 coupling, you need to explicitly set ghz1 as well")
     endif
-    if( SetAnomalousSpin2 ) then
-        if( .not.(Seta2.and.Setb2) ) then
-            call Error("If you set an anomalous spin 2 coupling, you need to explicitly set a2 and b2 as well")
-        endif
-        a1 = cmplx(Rea1, Ima1)
-        a2 = cmplx(Rea2, Ima2)
-        b1 = cmplx(Reb1, Imb1)
-        b2 = cmplx(Reb2, Imb2)
-        b5 = cmplx(Reb5, Imb5)
+    if( SetAnomalousSpin2 .and. .not.(Seta2.and.Setb2) ) then
+        call Error("If you set an anomalous spin 2 coupling, you need to explicitly set a2 and b2 as well")
     endif
 
 return
