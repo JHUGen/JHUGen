@@ -1398,15 +1398,26 @@ character(len=*) :: argument, argumentname
 logical :: dest
 logical :: success
 integer :: length
+integer :: temp_int
+character(len=*), parameter :: numbers = "0123456789"
 
     length=len(trim(argumentname))
 
     if( trim(argument).eq.trim(argumentname) ) then
         dest=.true.
         success=.true.
-    elseif( argument(1:length+1) .eq. trim(argumentname)//"=" ) then
-        read(argument(length+2:len(argument)), *) dest
+    elseif( trim(argument).eq."No"//trim(argumentname) ) then
+        dest=.false.
         success=.true.
+    elseif( argument(1:length+1) .eq. trim(argumentname)//"=" ) then
+        if( Index(numbers, argument(length+2:length+2)) .ne. 0 ) then
+            read(argument(length+2:len(argument)), *) temp_int
+            dest = (temp_int.ne.0)
+            success=.true.
+        else
+            read(argument(length+2:len(argument)), *) dest
+            success=.true.
+        endif
     endif
 
 end subroutine ReadCommandLineArgument_logical
