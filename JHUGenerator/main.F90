@@ -310,8 +310,12 @@ logical :: help, success, tmpsuccess, SetAnomalousSpin0, Setg1, SetAnomalousSpin
     call ReadCommandLineArgument(arg, "PDFSet", success, PDFSet)
     call ReadCommandLineArgument(arg, "LHAPDF", success, LHAPDFString)
     call ReadCommandLineArgument(arg, "LHAPDFMem", success, LHAPDFMember)
-    call ReadCommandLineArgument(arg, "MReso", success, M_Reso)
-    call ReadCommandLineArgument(arg, "GaReso", success, Ga_Reso)
+    call ReadCommandLineArgument(arg, "MReso", tmpsuccess, M_Reso)
+    if( tmpsuccess ) M_Reso = M_Reso*GeV
+    success = success.or.tmpsuccess
+    call ReadCommandLineArgument(arg, "GaReso", tmpsuccess, Ga_Reso)
+    if( tmpsuccess ) Ga_Reso = Ga_Reso*GeV
+    success = success.or.tmpsuccess
     call ReadCommandLineArgument(arg, "VegasNc0", success, VegasNc0)
     call ReadCommandLineArgument(arg, "VegasNc1", success, VegasNc1)
     call ReadCommandLineArgument(arg, "VegasNc2", success, VegasNc2)
@@ -347,6 +351,7 @@ logical :: help, success, tmpsuccess, SetAnomalousSpin0, Setg1, SetAnomalousSpin
     if( tmpsuccess ) Unweighted = .false.
     success = success.or.tmpsuccess
     tmpsuccess = .false.
+    call ReadCommandLineArgument(arg, "CalcPMZZ", success, CalcPMZZ)
     call ReadCommandLineArgument(arg, "WriteFailedEvents", success, WriteFailedEvents)
 
     !anomalous couplings - only the most common ones for now
