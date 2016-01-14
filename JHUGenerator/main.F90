@@ -225,7 +225,7 @@ use ModMisc
 implicit none
 character :: arg*(500), argmatch*(30)
 integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg
-logical :: help, success, tmpsuccess, SetAnomalousSpin0, Setg1, SetAnomalousSpin2, Seta2, Setb2, interfSet
+logical :: help, success, tmpsuccess, SetAnomalousSpin0, Setg1, SetAnomalousSpin0ggH, Setghg2, SetAnomalousSpin2, Seta2, Setb2, interfSet
 
    help = .false.
 
@@ -280,6 +280,8 @@ logical :: help, success, tmpsuccess, SetAnomalousSpin0, Setg1, SetAnomalousSpin
 
    SetAnomalousSpin0=.false.
    Setg1=.false.
+   SetAnomalousSpin0ggH=.false.
+   Setghg2=.false.
    SetAnomalousSpin2=.false.
    Seta2=.false.
    Setb2=.false.
@@ -368,6 +370,16 @@ logical :: help, success, tmpsuccess, SetAnomalousSpin0, Setg1, SetAnomalousSpin
     call ReadCommandLineArgument(arg, "ghz4", tmpsuccess, ghz4)
     call ReadCommandLineArgument(arg, "ghz1_prime2", tmpsuccess, ghz1_prime2)
     SetAnomalousSpin0 = SetAnomalousSpin0.or.tmpsuccess.or.Setg1
+    success = success.or.tmpsuccess
+    tmpsuccess = .false.
+
+    !spin 0 gg couplings
+    call ReadCommandLineArgument(arg, "ghg2", tmpsuccess, ghg2)
+    Setghg2 = Setghg2.or.tmpsuccess
+    success = success.or.tmpsuccess
+    tmpsuccess = .false.
+    call ReadCommandLineArgument(arg, "ghg4", tmpsuccess, ghg4)
+    SetAnomalousSpin0ggH = SetAnomalousSpin0ggH.or.tmpsuccess.or.Setghg2
     success = success.or.tmpsuccess
     tmpsuccess = .false.
 
@@ -573,6 +585,9 @@ logical :: help, success, tmpsuccess, SetAnomalousSpin0, Setg1, SetAnomalousSpin
 
     if( SetAnomalousSpin0.and. .not.Setg1 ) then
         call Error("If you set an anomalous spin 0 coupling, you need to explicitly set ghz1 as well")
+    endif
+    if( SetAnomalousSpin0ggH.and. .not.Setghg2 ) then
+        call Error("If you set an anomalous spin 0 gg coupling, you need to explicitly set ghg2 as well")
     endif
     if( SetAnomalousSpin2 .and. .not.(Seta2.and.Setb2) ) then
         call Error("If you set an anomalous spin 2 coupling, you need to explicitly set a2 and b2 as well")
