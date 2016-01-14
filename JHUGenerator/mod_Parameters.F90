@@ -3,7 +3,7 @@ implicit none
 save
 ! 
 ! 
-character(len=6),parameter :: JHUGen_Version="v6.8.4"
+character(len=6),parameter :: JHUGen_Version="v6.8.5"
 ! 
 ! 
 !=====================================================
@@ -94,12 +94,12 @@ logical, public, parameter :: H_DK =.false.                 ! default to false s
 
 
 !=====================================================
-!cuts
-real(8), public, parameter :: pTjetcut = 15d0*GeV           ! jet min pt
-real(8), public, parameter :: Rjet = 0.3d0                  ! jet deltaR, anti-kt algorithm
-real(8), public, parameter :: mJJcut = 0d0*GeV              ! minimum mJJ for VBF, HJJ, bbH
-real(8), public, parameter :: VBF_4ml_minmax(1:2) = (/ -1d0,-1d0 /)*GeV  ! min and max for m_4l in off-shell VBF production;   default is (-1,-1): m_4l ~ Higgs resonance (on-shell)
-! real(8), public, parameter :: VBF_4ml_minmax(1:2) = (/ 300d0,600d0 /)*GeV  ! min and max for m_4l in off-shell VBF production, default is (-1,-1): m_4l ~ Higgs resonance (on-shell)
+!cuts - should be set on the command line
+real(8), public :: pTjetcut = 15d0*GeV                        ! jet min pt
+real(8), public :: Rjet = 0.3d0                               ! jet deltaR, anti-kt algorithm
+real(8), public :: mJJcut = 0d0*GeV                           ! minimum mJJ for VBF, HJJ, bbH
+real(8), public :: VBF_4ml_minmax(1:2) = (/ -1d0,-1d0 /)*GeV  ! min and max for m_4l in off-shell VBF production;   default is (-1,-1): m_4l ~ Higgs resonance (on-shell)
+! real(8), public :: VBF_4ml_minmax(1:2) = (/ 300d0,600d0 /)*GeV  ! min and max for m_4l in off-shell VBF production, default is (-1,-1): m_4l ~ Higgs resonance (on-shell)
 !=====================================================
 
 
@@ -237,14 +237,14 @@ real(8), public :: scale_alpha_W_tn = 1d0        ! scaling factor of alpha (~par
    complex(8), public, parameter :: ahz3 = (0.0d0,0d0)  ! pseudoscalar
 
 !-- parameters that define off-shell spin 0 coupling to SM fields, see note
-   complex(8), public, parameter :: ghg2 = (1.0d0,0d0)
+   complex(8), public            :: ghg2 = (1.0d0,0d0)
    complex(8), public, parameter :: ghg3 = (0.0d0,0d0)
-   complex(8), public, parameter :: ghg4 = (0.0d0,0d0)   ! pseudoscalar
+   complex(8), public            :: ghg4 = (0.0d0,0d0)   ! pseudoscalar
    
-   complex(8), public, parameter :: ghz1 = (2.0d0,0d0)   ! SM=2
-   complex(8), public, parameter :: ghz2 = (0.0d0,0d0)
+   complex(8), public            :: ghz1 = (2.0d0,0d0)   ! SM=2
+   complex(8), public            :: ghz2 = (0.0d0,0d0)
    complex(8), public, parameter :: ghz3 = (0.0d0,0d0)
-   complex(8), public, parameter :: ghz4 = (0.0d0,0d0)   ! pseudoscalar 
+   complex(8), public            :: ghz4 = (0.0d0,0d0)   ! pseudoscalar 
 
    complex(8), public, parameter :: ghzgs2  = (0.00d0,0d0)
    complex(8), public, parameter :: ghzgs3  = (0.00d0,0d0)
@@ -256,7 +256,7 @@ real(8), public :: scale_alpha_W_tn = 1d0        ! scaling factor of alpha (~par
 
 !-- parameters that define q^2 dependent form factors
    complex(8), public, parameter :: ghz1_prime = (0.0d0,0d0)
-   complex(8), public, parameter :: ghz1_prime2= (0.0d0,0d0)
+   complex(8), public            :: ghz1_prime2= (0.0d0,0d0)
    complex(8), public, parameter :: ghz1_prime3= (0.0d0,0d0)
    complex(8), public, parameter :: ghz1_prime4= (0.0d0,0d0)
    complex(8), public, parameter :: ghz1_prime5= (0.0d0,0d0)
@@ -322,8 +322,8 @@ real(8), public :: scale_alpha_W_tn = 1d0        ! scaling factor of alpha (~par
 
 !-- parameters that define spin 2 coupling to SM fields, see note
 ! minimal coupling corresponds to a1 = b1 = b5 = 1 everything else 0
-  complex(8), public, parameter :: a1 = (0.0d0,0d0)    ! g1  -- c.f. draft
-  complex(8), public, parameter :: a2 = (1.0d0,0d0)    ! g2
+  complex(8), public            :: a1 = (0.0d0,0d0)    ! g1  -- c.f. draft
+  complex(8), public            :: a2 = (1.0d0,0d0)    ! g2
   complex(8), public, parameter :: a3 = (0.0d0,0d0)    ! g3
   complex(8), public, parameter :: a4 = (0.0d0,0d0)    ! g4
   complex(8), public, parameter :: a5 = (0.0d0,0d0)    ! pseudoscalar, g8
@@ -334,11 +334,11 @@ real(8), public :: scale_alpha_W_tn = 1d0        ! scaling factor of alpha (~par
   logical, public, parameter :: generate_bis = .true.
   logical, public, parameter :: use_dynamic_MG = .true.
 
-  complex(8), public, parameter :: b1 = (0.0d0,0d0)  !  all b' below are g's in the draft
-  complex(8), public, parameter :: b2 = (1.0d0,0d0)
+  complex(8), public            :: b1 = (0.0d0,0d0)  !  all b' below are g's in the draft
+  complex(8), public            :: b2 = (1.0d0,0d0)
   complex(8), public, parameter :: b3 = (0.0d0,0d0)
   complex(8), public, parameter :: b4 = (0.0d0,0d0)
-  complex(8), public, parameter :: b5 = (0.0d0,0d0)
+  complex(8), public            :: b5 = (0.0d0,0d0)
   complex(8), public, parameter :: b6 = (0.0d0,0d0)
   complex(8), public, parameter :: b7 = (0.0d0,0d0)
   complex(8), public, parameter :: b8 = (0.0d0,0d0)
@@ -546,6 +546,13 @@ real(8), public :: debugvar(0:10) = 0d0
 integer, public :: ijPartons(1:2)=0
 
 !=====================================================
+
+
+interface ReadCommandLineArgument
+    module procedure ReadCommandLineArgument_logical, ReadCommandLineArgument_integer, ReadCommandLineArgument_real8,&
+                     ReadCommandLineArgument_complex8, ReadCommandLineArgument_string
+end interface
+
 
 CONTAINS
 
@@ -1368,6 +1375,16 @@ integer :: Part
 END FUNCTION
 
 
+FUNCTION daimag(z)
+implicit none
+complex(8) :: z
+real(8) :: daimag
+complex(8), parameter :: i = (0d0,1d0)
+
+    daimag = dreal(z/i)
+
+END FUNCTION
+
 
 subroutine ComputeQCDVariables()
 implicit none
@@ -1375,9 +1392,117 @@ implicit none
 end subroutine ComputeQCDVariables
 
 
+subroutine ReadCommandLineArgument_logical(argument, argumentname, success, dest)
+implicit none
+character(len=*) :: argument, argumentname
+logical :: dest
+logical :: success
+integer :: length
+integer :: temp_int
+character(len=*), parameter :: numbers = "0123456789"
+
+    length=len(trim(argumentname))
+
+    if( trim(argument).eq.trim(argumentname) ) then
+        dest=.true.
+        success=.true.
+    elseif( trim(argument).eq."No"//trim(argumentname) ) then
+        dest=.false.
+        success=.true.
+    elseif( argument(1:length+1) .eq. trim(argumentname)//"=" ) then
+        if( Index(numbers, argument(length+2:length+2)) .ne. 0 ) then
+            read(argument(length+2:len(argument)), *) temp_int
+            dest = (temp_int.ne.0)
+            success=.true.
+        else
+            read(argument(length+2:len(argument)), *) dest
+            success=.true.
+        endif
+    endif
+
+end subroutine ReadCommandLineArgument_logical
+
+
+subroutine ReadCommandLineArgument_integer(argument, argumentname, success, dest)
+implicit none
+character(len=*) :: argument, argumentname
+integer :: dest
+logical :: success
+integer :: length
+
+    length=len(trim(argumentname))
+
+    if( argument(1:length+1) .eq. trim(argumentname)//"=" ) then
+        read(argument(length+2:len(argument)), *) dest
+        success=.true.
+    endif
+
+end subroutine ReadCommandLineArgument_integer
+
+
+subroutine ReadCommandLineArgument_real8(argument, argumentname, success, dest)
+implicit none
+character(len=*) :: argument, argumentname
+real(8) :: dest
+logical :: success
+integer :: length
+
+    length=len(trim(argumentname))
+
+    if( argument(1:length+1) .eq. trim(argumentname)//"=" ) then
+        read(argument(length+2:len(argument)), *) dest
+        success=.true.
+    endif
+
+end subroutine ReadCommandLineArgument_real8
+
+
+subroutine ReadCommandLineArgument_complex8(argument, argumentname, success, dest)
+implicit none
+character(len=*) :: argument, argumentname
+complex(8) :: dest
+real(8) :: re, im
+logical :: success
+integer :: length
+
+    length=len(trim(argumentname))
+
+    if( argument(1:length+1) .eq. trim(argumentname)//"=" ) then
+        read(argument(length+2:len(argument)), *) re, im
+        dest = dcmplx(re, im)
+        success=.true.
+    elseif( argument(1:length+3) .eq. "Re"//trim(argumentname)//"=" ) then
+        read(argument(length+4:len(argument)), *) re
+        dest = dcmplx(re, daimag(dest))
+        success=.true.
+    elseif( argument(1:length+3) .eq. "Im"//trim(argumentname)//"=" ) then
+        read(argument(length+4:len(argument)), *) im
+        dest = dcmplx(dreal(dest), im)
+        success=.true.
+    endif
+
+end subroutine ReadCommandLineArgument_complex8
+
+
+subroutine ReadCommandLineArgument_string(argument, argumentname, success, dest)
+implicit none
+character(len=*) :: argument, argumentname
+character(len=*) :: dest
+logical :: success
+integer :: length
+
+    length=len(trim(argumentname))
+
+    if( argument(1:length+1) .eq. trim(argumentname)//"=" ) then
+        if( len(dest).lt.len(trim(argument))-(length+1) ) then
+            print "(A,A,A,I4,A)", "Argument ", argument, " is too long!  Maximum allowed length is ", len(dest), " characters."
+            stop 1
+        endif
+        dest = argument(length+2:len(argument))
+        success=.true.
+    endif
+
+end subroutine ReadCommandLineArgument_string
 
 
 END MODULE
-
-
-

@@ -223,8 +223,11 @@ use ModParameters
 use ModKinematics
 use ModMisc
 implicit none
-character :: arg*(500)
-integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
+character :: arg*(500), argmatch*(30)
+integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg
+logical :: help, success, tmpsuccess, SetAnomalousSpin0, Setg1, SetAnomalousSpin0ggH, Setghg2, SetAnomalousSpin2, Seta2, Setb2, interfSet
+
+   help = .false.
 
    Collider=1
    VegasIt1=-1
@@ -267,13 +270,21 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
    CountTauAsAny = .true.
    LHAPDFString = ""
    LHAPDFMember = 0
-   iinterf = -1
+   interfSet = .false.
    WriteFailedEvents=0
 
    MuFacMultiplier = 1d0
    MuRenMultiplier = 1d0
    FacScheme = kRenFacScheme_default
    RenScheme = kRenFacScheme_default
+
+   SetAnomalousSpin0=.false.
+   Setg1=.false.
+   SetAnomalousSpin0ggH=.false.
+   Setghg2=.false.
+   SetAnomalousSpin2=.false.
+   Seta2=.false.
+   Setb2=.false.
 
    DataFile="./data/output"
 
@@ -287,140 +298,130 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
    CountArg = 0
    do NArg=1,NumArgs
     call GetArg(NArg,arg)
-    if( arg(1:4).eq."help" .or. arg(1:4).eq."Help" .or. arg(1:4).eq."HELP") then
+    success = .false.
+    tmpsuccess = .false.
+    call ReadCommandLineArgument(arg, "help", success, help)
+    if( help ) then
         call PrintCommandLineArgs()
-        stop
-    elseif( arg(1:9).eq."Collider=" ) then
-        read(arg(10:10),*) Collider
-        CountArg = CountArg + 1
-    elseif( arg(1:7).eq."PDFSet=" ) then
-        read(arg(8:10),*) PDFSet
-        CountArg = CountArg + 1
-    elseif( arg(1:7).eq."LHAPDF=" ) then
-        read(arg(8:107),"(A)") LHAPDFString
-        CountArg = CountArg + 1
-    elseif( arg(1:10).eq."LHAPDFMem=" ) then
-        read(arg(11:13),*) LHAPDFMember
-        CountArg = CountArg + 1
-    elseif( arg(1:6).eq."MReso=" ) then
-        read(arg(7:12),*) M_Reso
-        M_Reso = M_Reso*GeV
-        CountArg = CountArg + 1
-    elseif( arg(1:7).eq."GaReso=" ) then
-        read(arg(8:13),*) Ga_Reso
-        Ga_Reso = Ga_Reso*GeV
-        CountArg = CountArg + 1
-    elseif( arg(1:9).eq."VegasNc0=" ) then
-        read(arg(10:17),*) VegasNc0
-        CountArg = CountArg + 1
-    elseif( arg(1:9).eq."VegasNc1=" ) then
-        read(arg(10:17),*) VegasNc1
-        CountArg = CountArg + 1
-    elseif( arg(1:9).eq."VegasNc2=" ) then
-        read(arg(10:17),*) VegasNc2
-        CountArg = CountArg + 1
-    elseif( arg(1:9).eq."PChannel=" ) then
-        read(arg(10:11),*) PChannel
-        CountArg = CountArg + 1
-    elseif( arg(1:9).eq."DataFile=" ) then
-        read(arg(10:500),"(A)") DataFile
-        CountArg = CountArg + 1
-    elseif( arg(1:8).eq."Process=" ) then
-        read(arg(9:11),*) Process
-        CountArg = CountArg + 1
-    elseif( arg(1:11).eq."DecayMode1=" ) then
-        read(arg(12:13),*) DecayMode1
-        CountArg = CountArg + 1
-    elseif( arg(1:11).eq."DecayMode2=" ) then
-        read(arg(12:13),*) DecayMode2
-        CountArg = CountArg + 1
-    elseif( arg(1:10).eq."FacScheme=" ) then
-        read(arg(11:13),*) FacScheme
-        CountArg = CountArg + 1
-    elseif( arg(1:10).eq."RenScheme=" ) then
-        read(arg(11:13),*) RenScheme
-        CountArg = CountArg + 1
-    elseif( arg(1:16).eq."MuFacMultiplier=" ) then
-        read(arg(17:24),*) MuFacMultiplier
-        CountArg = CountArg + 1
-    elseif( arg(1:16).eq."MuRenMultiplier=" ) then
-        read(arg(17:24),*) MuRenMultiplier
-        CountArg = CountArg + 1
-    elseif( arg(1:6).eq."TopDK=" ) then
-        read(arg(7:7),*) TopDecays
-        CountArg = CountArg + 1
-    elseif( arg(1:6).eq."TauDK=" ) then
-        read(arg(7:7),*) TauDecays
-        CountArg = CountArg + 1
-    elseif( arg(1:12).eq."WidthScheme=" ) then
-        read(arg(13:13),*) WidthScheme
-        CountArg = CountArg + 1
-    elseif( arg(1:7) .eq."OffXVV=" ) then
-        read(arg(8:10),*) OffShell_XVV
-        CountArg = CountArg + 1
-    elseif( arg(1:12).eq."FilterNLept=" ) then
-        read(arg(13:13),*) RequestNLeptons
-        CountArg = CountArg + 1
-    elseif( arg(1:14) .eq."FilterOSPairs=" ) then
-        read(arg(15:15),*) RequestOS
-        CountArg = CountArg + 1
-    elseif( arg(1:16) .eq."FilterOSSFPairs=" ) then
-        read(arg(17:17),*) RequestOSSF
-        CountArg = CountArg + 1
-    elseif( arg(1:14) .eq."CountTauAsAny=" ) then
-        read(arg(15:15),*) iargument
-        if( iargument.eq.1 ) then
-            CountTauAsAny = .true.
-        else
-            CountTauAsAny = .false.
-        endif
-        CountArg = CountArg + 1
-    elseif( arg(1:11) .eq."FilterOSSF=" ) then
-        read(arg(12:12),*) iargument
-        write(*,*), "The filtering syntax has changed to become more general.  Please see the manual for more details."
-        if( iargument.eq.1 ) then
-            write(*,*), "Setting FilterOSSFPairs=2"
-            RequestOSSF = 2
-        endif        
-        CountArg = CountArg + 1
-    elseif( arg(1:11) .eq."Unweighted=" ) then
-        read(arg(12:12),*) iargument
-        if( iargument.eq.0 ) then
-            Unweighted = .false.
-        else
-            Unweighted = .true.
-        endif
-        CountArg = CountArg + 1
-    elseif( arg(1:7) .eq."Interf=" ) then
-        read(arg(8:8),*) iinterf
-        CountArg = CountArg + 1
-    elseif( arg(1:8) .eq."ReadLHE=" ) then
-        read(arg(9:500),"(A)") LHEProdFile
-        ReadLHEFile=.true.
-        CountArg = CountArg + 1
-    elseif( arg(1:11) .eq."ConvertLHE=" ) then
-        read(arg(12:500),"(A)") LHEProdFile
-        ConvertLHEFile=.true.
-        CountArg = CountArg + 1
-    elseif( arg(1:9) .eq."ReadCSmax" ) then
-        ReadCSmax=.true.
-        CountArg = CountArg + 1
-    elseif( arg(1:9) .eq."CalcPMZZ" ) then
-        CalcPMZZ=.true.
-        CountArg = CountArg + 1
-    elseif( arg(1:9) .eq."GenEvents" ) then
-        GenerateEvents=.true.
-        Unweighted=.false.
-        CountArg = CountArg + 1
-    elseif( arg(1:18) .eq."WriteFailedEvents=" ) then
-        read(arg(19:19),*) WriteFailedEvents
-        CountArg = CountArg + 1
+        stop 1
+    endif
+    !ReadCommandLineArgument is overloaded, it puts the value into the last argument
+    ! by detecting the type.  It also sets success to .true. if the argument name (before =)
+    ! is correct.
+    call ReadCommandLineArgument(arg, "Collider", success, Collider)
+    call ReadCommandLineArgument(arg, "PDFSet", success, PDFSet)
+    call ReadCommandLineArgument(arg, "LHAPDF", success, LHAPDFString)
+    call ReadCommandLineArgument(arg, "LHAPDFMem", success, LHAPDFMember)
+    call ReadCommandLineArgument(arg, "MReso", tmpsuccess, M_Reso)
+    if( tmpsuccess ) M_Reso = M_Reso*GeV
+    success = success.or.tmpsuccess
+    tmpsuccess = .false.
+    call ReadCommandLineArgument(arg, "GaReso", tmpsuccess, Ga_Reso)
+    if( tmpsuccess ) Ga_Reso = Ga_Reso*GeV
+    success = success.or.tmpsuccess
+    tmpsuccess = .false.
+    call ReadCommandLineArgument(arg, "VegasNc0", success, VegasNc0)
+    call ReadCommandLineArgument(arg, "VegasNc1", success, VegasNc1)
+    call ReadCommandLineArgument(arg, "VegasNc2", success, VegasNc2)
+    call ReadCommandLineArgument(arg, "PChannel", success, PChannel)
+    call ReadCommandLineArgument(arg, "DataFile", success, DataFile)
+    call ReadCommandLineArgument(arg, "Process", success, Process)
+    call ReadCommandLineArgument(arg, "DecayMode1", success, DecayMode1)
+    call ReadCommandLineArgument(arg, "DecayMode2", success, DecayMode2)
+    call ReadCommandLineArgument(arg, "FacScheme", success, FacScheme)
+    call ReadCommandLineArgument(arg, "RenScheme", success, RenScheme)
+    call ReadCommandLineArgument(arg, "MuFacMultiplier", success, MuFacMultiplier)
+    call ReadCommandLineArgument(arg, "MuRenMultiplier", success, MuRenMultiplier)
+    call ReadCommandLineArgument(arg, "TopDK", success, TopDecays)
+    call ReadCommandLineArgument(arg, "TauDK", success, TauDecays)
+    call ReadCommandLineArgument(arg, "WidthScheme", success, WidthScheme)
+    call ReadCommandLineArgument(arg, "OffXVV", success, OffShell_XVV)
+    call ReadCommandLineArgument(arg, "FilterNLept", success, RequestNLeptons)
+    call ReadCommandLineArgument(arg, "FilterOSPairs", success, RequestOS)
+    call ReadCommandLineArgument(arg, "FilterOSSFPairs", success, RequestOSSF)
+    call ReadCommandLineArgument(arg, "CountTauAsAny", success, CountTauAsAny)
+    call ReadCommandLineArgument(arg, "Unweighted", success, Unweighted)
+    call ReadCommandLineArgument(arg, "Interf", tmpsuccess, includeInterference)
+    interfSet = interfSet.or.tmpsuccess
+    success = success.or.tmpsuccess
+    tmpsuccess = .false.
+    call ReadCommandLineArgument(arg, "ReadLHE", tmpsuccess, LHEProdFile)
+    ReadLHEFile = ReadLHEFile.or.tmpsuccess
+    success = success.or.tmpsuccess
+    tmpsuccess = .false.
+    call ReadCommandLineArgument(arg, "ConvertLHE", tmpsuccess, LHEProdFile)
+    ConvertLHEFile = ConvertLHEFile.or.tmpsuccess
+    success = success.or.tmpsuccess
+    tmpsuccess = .false.
+    call ReadCommandLineArgument(arg, "ReadCSmax", success, ReadCSmax)
+    call ReadCommandLineArgument(arg, "GenEvents", tmpsuccess, GenerateEvents)
+    if( tmpsuccess ) Unweighted = .false.
+    success = success.or.tmpsuccess
+    tmpsuccess = .false.
+    call ReadCommandLineArgument(arg, "CalcPMZZ", success, CalcPMZZ)
+    call ReadCommandLineArgument(arg, "WriteFailedEvents", success, WriteFailedEvents)
+
+    !anomalous couplings - only the most common ones for now
+    call ReadCommandLineArgument(arg, "ghz1", tmpsuccess, ghz1)
+    Setg1 = Setg1.or.tmpsuccess
+    success = success.or.tmpsuccess
+    tmpsuccess = .false.
+    call ReadCommandLineArgument(arg, "ghz2", tmpsuccess, ghz2)
+    call ReadCommandLineArgument(arg, "ghz4", tmpsuccess, ghz4)
+    call ReadCommandLineArgument(arg, "ghz1_prime2", tmpsuccess, ghz1_prime2)
+    SetAnomalousSpin0 = SetAnomalousSpin0.or.tmpsuccess.or.Setg1
+    success = success.or.tmpsuccess
+    tmpsuccess = .false.
+
+    !spin 0 gg couplings
+    call ReadCommandLineArgument(arg, "ghg2", tmpsuccess, ghg2)
+    Setghg2 = Setghg2.or.tmpsuccess
+    success = success.or.tmpsuccess
+    tmpsuccess = .false.
+    call ReadCommandLineArgument(arg, "ghg4", tmpsuccess, ghg4)
+    SetAnomalousSpin0ggH = SetAnomalousSpin0ggH.or.tmpsuccess.or.Setghg2
+    success = success.or.tmpsuccess
+    tmpsuccess = .false.
+
+    !spin 2
+    call ReadCommandLineArgument(arg, "a2", tmpsuccess, a2)
+    Seta2 = Seta2.or.tmpsuccess
+    success = success.or.tmpsuccess
+    tmpsuccess = .false.
+    call ReadCommandLineArgument(arg, "b2", tmpsuccess, b2)
+    Setb2 = Setb2.or.tmpsuccess
+    success = success.or.tmpsuccess
+    tmpsuccess = .false.
+    call ReadCommandLineArgument(arg, "a1", tmpsuccess, a1)
+    call ReadCommandLineArgument(arg, "b1", tmpsuccess, b1)
+    call ReadCommandLineArgument(arg, "b5", tmpsuccess, b5)
+    SetAnomalousSpin2 = SetAnomalousSpin2.or.tmpsuccess.or.Seta2.or.Setb2
+    success = success.or.tmpsuccess
+    tmpsuccess = .false.
+
+    !jet cuts
+    call ReadCommandLineArgument(arg, "pTjetcut", tmpsuccess, pTjetcut)
+    if( tmpsuccess ) pTjetcut = pTjetcut*GeV
+    success = success.or.tmpsuccess
+    tmpsuccess = .false.
+    call ReadCommandLineArgument(arg, "deltaRcut", success, Rjet)
+    call ReadCommandLineArgument(arg, "mJJcut", tmpsuccess, mJJcut)
+    if( tmpsuccess ) mJJcut = mJJcut*GeV
+    success = success.or.tmpsuccess
+    tmpsuccess = .false.
+    call ReadCommandLineArgument(arg, "VBF_m4l_min", tmpsuccess, VBF_4ml_minmax(1))
+    if( tmpsuccess ) VBF_4ml_minmax(1) = VBF_4ml_minmax(1)*GeV
+    success = success.or.tmpsuccess
+    tmpsuccess = .false.
+    call ReadCommandLineArgument(arg, "VBF_m4l_max", tmpsuccess, VBF_4ml_minmax(2))
+    if( tmpsuccess ) VBF_4ml_minmax(2) = VBF_4ml_minmax(2)*GeV
+    success = success.or.tmpsuccess
+    tmpsuccess = .false.
+
+    if( .not.success ) then
+        call Error("Unknown command line argument: " // trim(arg))
     endif
    enddo
-
-    if( CountArg.ne.NumArgs ) then
-        call Error("Unknown command line argument")
-    endif
 
     if (Process.eq.0) PChannel = 0   !only gluons
     if (Process.eq.1 .or. Process.eq.50 .or. Process.eq.60 .or. Process.eq.66) PChannel = 1   !only quarks
@@ -499,16 +500,12 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
         (DecayMode1.eq.8  .and. DecayMode2.eq.2)               .or.  &
         (DecayMode1.eq.0  .and. DecayMode2.eq.8)               .or.  &
         (DecayMode1.eq.2  .and. DecayMode2.eq.8)               ) then !  allow interference
-            if( iinterf.eq.-1 ) then!  set default interference switch
+            if( .not.interfSet ) then!  set default interference switch
                 if( M_Reso.gt.2d0*M_Z ) then
                     includeInterference = .false.
                 else
                     includeInterference = .true.
                 endif
-            elseif( iinterf.eq.0 ) then! overwrite default and use user selection
-                includeInterference = .false.
-            else
-                includeInterference = .true.
             endif
     else
         includeInterference = .false.   ! no interference if decay mode does not allow 4 same flavor leptons
@@ -584,6 +581,16 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
 
     if( WriteFailedEvents.lt.0 .or. WriteFailedEvents.gt.2 ) then
         call Error("WriteFailedEvents can only be 0, 1, or 2.  Please see the manual.")
+    endif
+
+    if( SetAnomalousSpin0.and. .not.Setg1 ) then
+        call Error("If you set an anomalous spin 0 coupling, you need to explicitly set ghz1 as well")
+    endif
+    if( SetAnomalousSpin0ggH.and. .not.Setghg2 ) then
+        call Error("If you set an anomalous spin 0 gg coupling, you need to explicitly set ghg2 as well")
+    endif
+    if( SetAnomalousSpin2 .and. .not.(Seta2.and.Setb2) ) then
+        call Error("If you set an anomalous spin 2 coupling, you need to explicitly set a2 and b2 as well")
     endif
 
 return
@@ -3612,7 +3619,7 @@ character :: arg*(500)
         write(TheUnit,"(12X,A,F8.2,A)") "pT >= ", pTjetcut/GeV, " GeV"
         if( Process.eq.60 .or. Process.eq.61 .or. Process.eq.80 .or. Process.eq.90) then
             write(TheUnit,"(8X,A,F8.2)") "DeltaR >= ", Rjet
-            write(TheUnit,"(11X,A,F8.2,A)") "mJJ >= ", mJJcut, " GeV"
+            write(TheUnit,"(11X,A,F8.2,A)") "mJJ >= ", mJJcut/GeV, " GeV"
         endif
     endif
     if( (ReadLHEFile) .and. (RequestNLeptons.gt.0) ) then
