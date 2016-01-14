@@ -237,9 +237,9 @@ real(8), public :: scale_alpha_W_tn = 1d0        ! scaling factor of alpha (~par
    complex(8), public, parameter :: ahz3 = (0.0d0,0d0)  ! pseudoscalar
 
 !-- parameters that define off-shell spin 0 coupling to SM fields, see note
-   complex(8), public, parameter :: ghg2 = (1.0d0,0d0)
+   complex(8), public            :: ghg2 = (1.0d0,0d0)
    complex(8), public, parameter :: ghg3 = (0.0d0,0d0)
-   complex(8), public, parameter :: ghg4 = (0.0d0,0d0)   ! pseudoscalar
+   complex(8), public            :: ghg4 = (0.0d0,0d0)   ! pseudoscalar
    
    complex(8), public            :: ghz1 = (2.0d0,0d0)   ! SM=2
    complex(8), public            :: ghz2 = (0.0d0,0d0)

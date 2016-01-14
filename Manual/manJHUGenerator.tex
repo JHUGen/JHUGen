@@ -122,7 +122,8 @@ The list of command line configurables and the default values are (also defined 
     deltaRcut:         Minimum deltaR for jets (default: 0.3)
     mJJcut:            Minimum dijet mass in GeV (default: 0)
     ghz1, ghz2, ghz4,
-          ghz1_prime2: Spin 0 anomalous couplings
+          ghz1_prime2: Spin 0 ZZ anomalous couplings
+    ghg2, ghg4:        Spin 0 gg anomalous couplings
     a1,a2,b1,b2,b5:    Spin 2 anomalous couplings
 \end{verbatim}
 
@@ -154,11 +155,18 @@ A few more details on some particular parameters:
 \item \verb|WidthScheme|: This option controls the width scheme in JHUGen. The options are 0 for fixed width, 1 for running width, and 2 for the complex pole scheme~\cite{Passarino:2010qk,Goria:2011wa}. 0 is the default option.
 \item \verb|WriteFailedEvents|: In \verb|ReadLHE| mode, events that fail in decay or that fail the lepton filter are by default not written to the LHE file.  If this option is set to 1, they are written, but their weight is set to 0.  If it is set to 2, they are written with a weight of zero and with no particles in the event.  This option is useful if the same number of events are required to be in the input and the output.
 \item \verb|pTjetcut|, \verb|deltaRcut|, \verb|mJJcut| All three cuts are used in processes 60 (VBF), 61 ($H+jj$), 90 ($bbH$), and also 80 ($ttH$) if \verb|m_Top| is set to be light ($<10 \text{GeV}$).  In addition, \verb|pTjetcut| is used in process 62 ($H+j$) and also processes 110--113 ($t/\bar{t}+H$) if \verb|m_Top| is light.
-\item Anomalous couplings: the most commonly used anomalous couplings can be set on the command line.  These are \verb|ghz1|, \verb|ghz2|, \verb|ghz4|, and \verb|ghz1_prime2| for spin 0, and \verb|a1|, \verb|a2|, \verb|b1|, \verb|b2|, and \verb|b5| for spin 2.  If any anomalous couplings are set, the default couplings (\verb|ghz1| for spin 0, \verb|a2| and \verb|b2| for spin 2) must also be explicitly turned off by setting them to 0 or explicitly turned on by setting them to nonzero values.  The couplings can be set in two ways:
+\item Anomalous couplings: the most commonly used anomalous couplings can be set on the command line.  These are:
+\begin{itemize}
+\item \verb|ghz1|, \verb|ghz2|, \verb|ghz4|, and \verb|ghz1_prime2| for spin 0 $ZZ$ couplings
+\item \verb|ghg2| and \verb|ghg4| for spin 0 $gg$ couplings
+\item \verb|a1|, \verb|a2|, \verb|b1|, \verb|b2|, and \verb|b5| for spin 2.
+\end{itemize}
+The couplings can be set either as:
 \begin{itemize}
 \item \verb|ghz4=1,0|, specifying the real and imaginary parts together
 \item \verb|Reghz4=1 Imghz4=0|, specifying the real and imaginary parts separately.
 \end{itemize}
+If any anomalous couplings are set, the default couplings (\verb|ghz1| for spin 0 $ZZ$, \verb|ghg2| for spin 0 $gg$, \verb|a2| and \verb|b2| for spin 2) must also be explicitly turned off by setting them to 0 or explicitly turned on by setting them to nonzero values.
 \end{itemize}
 
 Examples of running the generator:
