@@ -1,7 +1,7 @@
 Comp = gfort
 
 ifeq ($(Comp),ifort)
-fcomp = ifort -fpp -O2 -vec-report0 -Dcompiler=1
+fcomp = ifort -fpp -O2 -vec-report0 -Dcompiler=1 -lifcore
 # fcomp = ifort -fpp -O0 -vec-report0 -Dcompiler=1
 endif
 ifeq ($(Comp),gfort)
@@ -10,7 +10,19 @@ fcomp = f95 -O3 -ffree-line-length-none -Dcompiler=2
 
 endif
 
+ifeq ($(Comp),gfort)
 ccomp = gcc
+endif
+ifeq ($(Comp),ifort)
+ccomp = icc
+endif
+
+ifeq ($(Comp),gfort)
+clib =  -lm -lgfortran
+endif
+ifeq ($(Comp),ifort)
+clib =  -lm -lirc
+endif
 
 
 MCFM_Dep = WBFZZ_MCFM/src/WBFZZ/anomamp.f \
@@ -39,7 +51,7 @@ Testprogram: mod_Higgs_MatEl.o mod_Zprime_MatEl.o mod_Graviton_MatEl.o mod_Higgs
 	$(fcomp) -o testF testprogram.F90 -lm vegas.o NNPDFDriver.o mod_Higgs_MatEl.o mod_Zprime_MatEl.o mod_Graviton_MatEl.o mod_HiggsJ_MatEl.o mod_HiggsJJ_MatEl.o mod_VHiggs_MatEl.o mod_TTBH_MatEl.o mod_TH_MatEl.o $(MCFM_Obj)
 	@echo " "
 	@echo " compiling and linking testprogram.c with gcc"
-	$(ccomp) -o testC testprogram.c NNPDFDriver.o vegas.o mod_Higgs_MatEl.o mod_Zprime_MatEl.o mod_Graviton_MatEl.o mod_TTBH_MatEl.o mod_TH_MatEl.o -lm -lgfortran
+	$(ccomp) -o testC testprogram.c NNPDFDriver.o vegas.o mod_Higgs_MatEl.o mod_Zprime_MatEl.o mod_Graviton_MatEl.o mod_TTBH_MatEl.o mod_TH_MatEl.o $(clib)
 	@echo " "
 
 
@@ -105,7 +117,6 @@ MCFMforVBF: $(MCFM_Dep)
 	@echo " compiling MCFM WBF files with ifort to link with JHUGenerator"
 	@echo " compiling with ifort causes error messages in the testprograms"
 #	ifort  -O0 -implicitnone -zero -check bounds -check pointer -warn interfaces -ftrapuv  -diag-disable remark -debug extended -g -traceback -fpe0 -check uninit  -c -I./WBFZZ_MCFM/src/Inc/ $(MCFM_Dep)
-	ifort  -O2 -c -I./WBFZZ_MCFM/src/Inc/ $(MCFM_Dep)
 	ifort  -O2 -c -I./WBFZZ_MCFM/src/Inc/ $(MCFM_Dep)
 
 clean:
