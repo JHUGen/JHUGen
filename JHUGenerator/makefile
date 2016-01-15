@@ -68,6 +68,7 @@ MainDep = mod_Phasespace.F90 \
           mod_CrossSection_TTBH.F90 \
           mod_CrossSection_BBBH.F90 \
           mod_CrossSection_TH.F90 \
+          mod_YRdata.F90 \
           main.F90
 
 # main objects
