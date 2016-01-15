@@ -225,7 +225,7 @@ use ModMisc
 implicit none
 character :: arg*(500), argmatch*(30)
 integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg
-logical :: help, success, tmpsuccess, SetAnomalousSpin0, Setg1, SetAnomalousSpin0ggH, Setghg2, SetAnomalousSpin2, Seta2, Setb2, interfSet
+logical :: help, success, SetLastArgument, SetAnomalousSpin0, Setg1, SetAnomalousSpin0ggH, Setghg2, SetAnomalousSpin2, Seta2, Setb2, interfSet
 
    help = .false.
 
@@ -299,7 +299,6 @@ logical :: help, success, tmpsuccess, SetAnomalousSpin0, Setg1, SetAnomalousSpin
    do NArg=1,NumArgs
     call GetArg(NArg,arg)
     success = .false.
-    tmpsuccess = .false.
     call ReadCommandLineArgument(arg, "help", success, help)
     if( help ) then
         call PrintCommandLineArgs()
@@ -312,14 +311,10 @@ logical :: help, success, tmpsuccess, SetAnomalousSpin0, Setg1, SetAnomalousSpin
     call ReadCommandLineArgument(arg, "PDFSet", success, PDFSet)
     call ReadCommandLineArgument(arg, "LHAPDF", success, LHAPDFString)
     call ReadCommandLineArgument(arg, "LHAPDFMem", success, LHAPDFMember)
-    call ReadCommandLineArgument(arg, "MReso", tmpsuccess, M_Reso)
-    if( tmpsuccess ) M_Reso = M_Reso*GeV
-    success = success.or.tmpsuccess
-    tmpsuccess = .false.
-    call ReadCommandLineArgument(arg, "GaReso", tmpsuccess, Ga_Reso)
-    if( tmpsuccess ) Ga_Reso = Ga_Reso*GeV
-    success = success.or.tmpsuccess
-    tmpsuccess = .false.
+    call ReadCommandLineArgument(arg, "MReso", success, M_Reso, SetLastArgument)
+    if( SetLastArgument ) M_Reso = M_Reso*GeV
+    call ReadCommandLineArgument(arg, "GaReso", success, Ga_Reso, SetLastArgument)
+    if( SetLastArgument ) Ga_Reso = Ga_Reso*GeV
     call ReadCommandLineArgument(arg, "VegasNc0", success, VegasNc0)
     call ReadCommandLineArgument(arg, "VegasNc1", success, VegasNc1)
     call ReadCommandLineArgument(arg, "VegasNc2", success, VegasNc2)
@@ -341,82 +336,45 @@ logical :: help, success, tmpsuccess, SetAnomalousSpin0, Setg1, SetAnomalousSpin
     call ReadCommandLineArgument(arg, "FilterOSSFPairs", success, RequestOSSF)
     call ReadCommandLineArgument(arg, "CountTauAsAny", success, CountTauAsAny)
     call ReadCommandLineArgument(arg, "Unweighted", success, Unweighted)
-    call ReadCommandLineArgument(arg, "Interf", tmpsuccess, includeInterference)
-    interfSet = interfSet.or.tmpsuccess
-    success = success.or.tmpsuccess
-    tmpsuccess = .false.
-    call ReadCommandLineArgument(arg, "ReadLHE", tmpsuccess, LHEProdFile)
-    ReadLHEFile = ReadLHEFile.or.tmpsuccess
-    success = success.or.tmpsuccess
-    tmpsuccess = .false.
-    call ReadCommandLineArgument(arg, "ConvertLHE", tmpsuccess, LHEProdFile)
-    ConvertLHEFile = ConvertLHEFile.or.tmpsuccess
-    success = success.or.tmpsuccess
-    tmpsuccess = .false.
+    call ReadCommandLineArgument(arg, "Interf", success, includeInterference, success2=interfSet)
+    call ReadCommandLineArgument(arg, "ReadLHE", success, LHEProdFile, success2=ReadLHEFile)
+    call ReadCommandLineArgument(arg, "ConvertLHE", success, LHEProdFile, success2=ConvertLHEFile)
     call ReadCommandLineArgument(arg, "ReadCSmax", success, ReadCSmax)
-    call ReadCommandLineArgument(arg, "GenEvents", tmpsuccess, GenerateEvents)
-    if( tmpsuccess ) Unweighted = .false.
-    success = success.or.tmpsuccess
-    tmpsuccess = .false.
+    call ReadCommandLineArgument(arg, "GenEvents", success, GenerateEvents, SetLastArgument)
+    if( SetLastArgument ) Unweighted = .false.
     call ReadCommandLineArgument(arg, "CalcPMZZ", success, CalcPMZZ)
     call ReadCommandLineArgument(arg, "WriteFailedEvents", success, WriteFailedEvents)
 
     !anomalous couplings - only the most common ones for now
-    call ReadCommandLineArgument(arg, "ghz1", tmpsuccess, ghz1)
-    Setg1 = Setg1.or.tmpsuccess
-    success = success.or.tmpsuccess
-    tmpsuccess = .false.
-    call ReadCommandLineArgument(arg, "ghz2", tmpsuccess, ghz2)
-    call ReadCommandLineArgument(arg, "ghz4", tmpsuccess, ghz4)
-    call ReadCommandLineArgument(arg, "ghz1_prime2", tmpsuccess, ghz1_prime2)
-    SetAnomalousSpin0 = SetAnomalousSpin0.or.tmpsuccess.or.Setg1
-    success = success.or.tmpsuccess
-    tmpsuccess = .false.
+    !If any anomalous couplings are set, the default ones have to be set explicitly to keep them on or turn them off
+    !e.g. just setting ghz4=0.2982,0 is ambiguous if you mean to leave g1 on (so fa3=0.5)
+    !                                                      or to turn it off (fa3=1 with a weird prefactor)
+    call ReadCommandLineArgument(arg, "ghz1",        success, ghz1,        success2=SetAnomalousSpin0, success2Re=Setg1)
+    call ReadCommandLineArgument(arg, "ghz2",        success, ghz2,        success2=SetAnomalousSpin0)
+    call ReadCommandLineArgument(arg, "ghz4",        success, ghz4,        success2=SetAnomalousSpin0)
+    call ReadCommandLineArgument(arg, "ghz1_prime2", success, ghz1_prime2, success2=SetAnomalousSpin0)
 
     !spin 0 gg couplings
-    call ReadCommandLineArgument(arg, "ghg2", tmpsuccess, ghg2)
-    Setghg2 = Setghg2.or.tmpsuccess
-    success = success.or.tmpsuccess
-    tmpsuccess = .false.
-    call ReadCommandLineArgument(arg, "ghg4", tmpsuccess, ghg4)
-    SetAnomalousSpin0ggH = SetAnomalousSpin0ggH.or.tmpsuccess.or.Setghg2
-    success = success.or.tmpsuccess
-    tmpsuccess = .false.
+    call ReadCommandLineArgument(arg, "ghg2", success, ghg2, success2=SetAnomalousSpin0ggH, success2Re=Setghg2)
+    call ReadCommandLineArgument(arg, "ghg4", success, ghg4, success2=SetAnomalousSpin0ggH)
 
     !spin 2
-    call ReadCommandLineArgument(arg, "a2", tmpsuccess, a2)
-    Seta2 = Seta2.or.tmpsuccess
-    success = success.or.tmpsuccess
-    tmpsuccess = .false.
-    call ReadCommandLineArgument(arg, "b2", tmpsuccess, b2)
-    Setb2 = Setb2.or.tmpsuccess
-    success = success.or.tmpsuccess
-    tmpsuccess = .false.
-    call ReadCommandLineArgument(arg, "a1", tmpsuccess, a1)
-    call ReadCommandLineArgument(arg, "b1", tmpsuccess, b1)
-    call ReadCommandLineArgument(arg, "b5", tmpsuccess, b5)
-    SetAnomalousSpin2 = SetAnomalousSpin2.or.tmpsuccess.or.Seta2.or.Setb2
-    success = success.or.tmpsuccess
-    tmpsuccess = .false.
+    call ReadCommandLineArgument(arg, "a2", success, a2, success2=SetAnomalousSpin2, success2Re=Seta2)
+    call ReadCommandLineArgument(arg, "b2", success, b2, success2=SetAnomalousSpin2, success2Re=Setb2)
+    call ReadCommandLineArgument(arg, "a1", success, a1, success2=SetAnomalousSpin2)
+    call ReadCommandLineArgument(arg, "b1", success, b1, success2=SetAnomalousSpin2)
+    call ReadCommandLineArgument(arg, "b5", success, b5, success2=SetAnomalousSpin2)
 
     !jet cuts
-    call ReadCommandLineArgument(arg, "pTjetcut", tmpsuccess, pTjetcut)
-    if( tmpsuccess ) pTjetcut = pTjetcut*GeV
-    success = success.or.tmpsuccess
-    tmpsuccess = .false.
+    call ReadCommandLineArgument(arg, "pTjetcut", success, pTjetcut, SetLastArgument)
+    if( SetLastArgument ) pTjetcut = pTjetcut*GeV
     call ReadCommandLineArgument(arg, "deltaRcut", success, Rjet)
-    call ReadCommandLineArgument(arg, "mJJcut", tmpsuccess, mJJcut)
-    if( tmpsuccess ) mJJcut = mJJcut*GeV
-    success = success.or.tmpsuccess
-    tmpsuccess = .false.
-    call ReadCommandLineArgument(arg, "VBF_m4l_min", tmpsuccess, VBF_4ml_minmax(1))
-    if( tmpsuccess ) VBF_4ml_minmax(1) = VBF_4ml_minmax(1)*GeV
-    success = success.or.tmpsuccess
-    tmpsuccess = .false.
-    call ReadCommandLineArgument(arg, "VBF_m4l_max", tmpsuccess, VBF_4ml_minmax(2))
-    if( tmpsuccess ) VBF_4ml_minmax(2) = VBF_4ml_minmax(2)*GeV
-    success = success.or.tmpsuccess
-    tmpsuccess = .false.
+    call ReadCommandLineArgument(arg, "mJJcut", success, mJJcut, SetLastArgument)
+    if( SetLastArgument ) mJJcut = mJJcut*GeV
+    call ReadCommandLineArgument(arg, "VBF_m4l_min", success, VBF_4ml_minmax(1), SetLastArgument)
+    if( SetLastArgument ) VBF_4ml_minmax(1) = VBF_4ml_minmax(1)*GeV
+    call ReadCommandLineArgument(arg, "VBF_m4l_max", success, VBF_4ml_minmax(2), SetLastArgument)
+    if( SetLastArgument ) VBF_4ml_minmax(2) = VBF_4ml_minmax(2)*GeV
 
     if( .not.success ) then
         call Error("Unknown command line argument: " // trim(arg))

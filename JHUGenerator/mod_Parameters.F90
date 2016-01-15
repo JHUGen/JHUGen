@@ -1375,95 +1375,116 @@ integer :: Part
 END FUNCTION
 
 
-FUNCTION daimag(z)
-implicit none
-complex(8) :: z
-real(8) :: daimag
-complex(8), parameter :: i = (0d0,1d0)
-
-    daimag = dreal(z/i)
-
-END FUNCTION
-
-
 subroutine ComputeQCDVariables()
 implicit none
    gs = sqrt(alphas*4.0_dp*pi)
 end subroutine ComputeQCDVariables
 
 
-subroutine ReadCommandLineArgument_logical(argument, argumentname, success, dest)
+
+!ReadCommandLineArgument is overloaded.  Pass the type needed as "dest"
+!success is set to true if the argument passed matches argumentname, otherwise it's left alone
+!same for success2 (optional, can be used for other things, see main.F90)
+!success2Re and success2Im (optional, for complex overload only) are set if the respective parts are set
+!SetLastArgument (optional) is set to true if the argument matches, otherwise it's set to false
+!for examples of all of them see main.F90
+
+subroutine ReadCommandLineArgument_logical(argument, argumentname, success, dest, SetLastArgument, success2)
 implicit none
 character(len=*) :: argument, argumentname
-logical :: dest
-logical :: success
+logical, intent(inout) :: dest
+logical, intent(inout) :: success
 integer :: length
+logical, optional, intent(inout) :: SetLastArgument, success2
 integer :: temp_int
 character(len=*), parameter :: numbers = "0123456789"
+
+    if (present(SetLastArgument)) SetLastArgument=.false.
 
     length=len(trim(argumentname))
 
     if( trim(argument).eq.trim(argumentname) ) then
         dest=.true.
         success=.true.
+        if (present(SetLastArgument)) SetLastArgument=.true.
+        if (present(success2)) success2=.true.
     elseif( trim(argument).eq."No"//trim(argumentname) ) then
         dest=.false.
         success=.true.
+        if (present(SetLastArgument)) SetLastArgument=.true.
+        if (present(success2)) success2=.true.
     elseif( argument(1:length+1) .eq. trim(argumentname)//"=" ) then
         if( Index(numbers, argument(length+2:length+2)) .ne. 0 ) then
             read(argument(length+2:len(argument)), *) temp_int
             dest = (temp_int.ne.0)
             success=.true.
+            if (present(SetLastArgument)) SetLastArgument=.true.
+            if (present(success2)) success2=.true.
         else
             read(argument(length+2:len(argument)), *) dest
             success=.true.
+            if (present(SetLastArgument)) SetLastArgument=.true.
+            if (present(success2)) success2=.true.
         endif
     endif
 
 end subroutine ReadCommandLineArgument_logical
 
 
-subroutine ReadCommandLineArgument_integer(argument, argumentname, success, dest)
+subroutine ReadCommandLineArgument_integer(argument, argumentname, success, dest, SetLastArgument, success2)
 implicit none
 character(len=*) :: argument, argumentname
-integer :: dest
-logical :: success
+integer, intent(inout) :: dest
+logical, intent(inout) :: success
+logical, optional, intent(inout) :: SetLastArgument, success2
 integer :: length
+
+    if (present(SetLastArgument)) SetLastArgument=.false.
 
     length=len(trim(argumentname))
 
     if( argument(1:length+1) .eq. trim(argumentname)//"=" ) then
         read(argument(length+2:len(argument)), *) dest
         success=.true.
+        if (present(SetLastArgument)) SetLastArgument=.true.
+        if (present(success2)) success2=.true.
     endif
 
 end subroutine ReadCommandLineArgument_integer
 
 
-subroutine ReadCommandLineArgument_real8(argument, argumentname, success, dest)
+subroutine ReadCommandLineArgument_real8(argument, argumentname, success, dest, SetLastArgument, success2)
 implicit none
 character(len=*) :: argument, argumentname
-real(8) :: dest
-logical :: success
+real(8), intent(inout) :: dest
+logical, intent(inout) :: success
+logical, optional, intent(inout) :: SetLastArgument, success2
 integer :: length
+
+    if (present(SetLastArgument)) SetLastArgument=.false.
 
     length=len(trim(argumentname))
 
     if( argument(1:length+1) .eq. trim(argumentname)//"=" ) then
         read(argument(length+2:len(argument)), *) dest
         success=.true.
+        if (present(SetLastArgument)) SetLastArgument=.true.
+        if (present(success2)) success2=.true.
     endif
 
 end subroutine ReadCommandLineArgument_real8
 
 
-subroutine ReadCommandLineArgument_complex8(argument, argumentname, success, dest)
+subroutine ReadCommandLineArgument_complex8(argument, argumentname, success, dest, SetLastArgument, success2, success2Re, success2Im)
 implicit none
 character(len=*) :: argument, argumentname
-complex(8) :: dest
+complex(8), intent(inout) :: dest
 real(8) :: re, im
-logical :: success
+logical, intent(inout) :: success
+logical, optional, intent(inout) :: SetLastArgument, success2, success2Re, success2Im
 integer :: length
+
+    if (present(SetLastArgument)) SetLastArgument=.false.
 
     length=len(trim(argumentname))
 
@@ -1471,25 +1492,38 @@ integer :: length
         read(argument(length+2:len(argument)), *) re, im
         dest = dcmplx(re, im)
         success=.true.
+        if (present(SetLastArgument)) SetLastArgument=.true.
+        if (present(success2)) success2=.true.
+        if (present(success2Re)) success2Re=.true.
+        if (present(success2Im)) success2Im=.true.
     elseif( argument(1:length+3) .eq. "Re"//trim(argumentname)//"=" ) then
         read(argument(length+4:len(argument)), *) re
-        dest = dcmplx(re, daimag(dest))
+        dest = dcmplx(re, dimag(dest))
         success=.true.
+        if (present(SetLastArgument)) SetLastArgument=.true.
+        if (present(success2)) success2=.true.
+        if (present(success2Re)) success2Re=.true.
     elseif( argument(1:length+3) .eq. "Im"//trim(argumentname)//"=" ) then
         read(argument(length+4:len(argument)), *) im
         dest = dcmplx(dreal(dest), im)
         success=.true.
+        if (present(SetLastArgument)) SetLastArgument=.true.
+        if (present(success2)) success2=.true.
+        if (present(success2Im)) success2Im=.true.
     endif
 
 end subroutine ReadCommandLineArgument_complex8
 
 
-subroutine ReadCommandLineArgument_string(argument, argumentname, success, dest)
+subroutine ReadCommandLineArgument_string(argument, argumentname, success, dest, SetLastArgument, success2)
 implicit none
 character(len=*) :: argument, argumentname
-character(len=*) :: dest
-logical :: success
+character(len=*), intent(inout) :: dest
+logical, intent(inout) :: success
+logical, optional, intent(inout) :: SetLastArgument, success2
 integer :: length
+
+    if (present(SetLastArgument)) SetLastArgument=.false.
 
     length=len(trim(argumentname))
 
@@ -1500,6 +1534,8 @@ integer :: length
         endif
         dest = argument(length+2:len(argument))
         success=.true.
+        if (present(SetLastArgument)) SetLastArgument=.true.
+        if (present(success2)) success2=.true.
     endif
 
 end subroutine ReadCommandLineArgument_string
