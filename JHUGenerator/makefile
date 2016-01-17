@@ -79,6 +79,7 @@ MainObj = $(ObjectDir)/mod_Phasespace.o \
           $(ObjectDir)/mod_CrossSection_TTBH.o \
           $(ObjectDir)/mod_CrossSection_BBBH.o \
           $(ObjectDir)/mod_CrossSection_TH.o \
+          $(ObjectDir)/mod_YRdata.o \
           $(ObjectDir)/main.o
 
 

@@ -2739,7 +2739,9 @@ END SUBROUTINE
 
 FUNCTION GetMZZProbability(EHat,Ncalls)
 use ModCrossSection
+use ModMisc
 use ModParameters
+use ModYRdata
 implicit none
 real(8) :: DecayWeight,yRnd(1:22),Res,GetMZZProbability
 real(8) :: HiggsDK_Mom(1:4,1:13),Ehat
@@ -2749,14 +2751,20 @@ integer,parameter :: nmax=20
 real(8),parameter :: ScanRange=120d0*GeV
 
 
-     GetMZZProbability = 0d0     
-     do evals=1,Ncalls
-         call random_number(yRnd)
-         DecayWeight = EvalUnWeighted_DecayToVV(yRnd,.false.,EHat,Res,HiggsDK_Mom(1:4,6:9),HiggsDK_IDUP(1:9),HiggsDK_ICOLUP)
-         GetMZZProbability = GetMZZProbability + DecayWeight
-     enddo
-     GetMZZProbability = GetMZZProbability/dble(evals)
-    
+     if( WidthScheme.eq.1 ) then
+         GetMZZProbability = 0d0
+         do evals=1,Ncalls
+             call random_number(yRnd)
+             DecayWeight = EvalUnWeighted_DecayToVV(yRnd,.false.,EHat,Res,HiggsDK_Mom(1:4,6:9),HiggsDK_IDUP(1:9),HiggsDK_ICOLUP)
+             GetMZZProbability = GetMZZProbability + DecayWeight
+         enddo
+         GetMZZProbability = GetMZZProbability/dble(evals)
+     elseif( WidthScheme.eq.3 ) then
+         call YR_GetBranchingFraction(EHat, GetMZZProbability)
+     else
+         call Error("Invalid WidthScheme!")
+     endif
+
 
 RETURN
 END FUNCTION
