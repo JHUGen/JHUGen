@@ -2760,7 +2760,7 @@ real(8),parameter :: ScanRange=120d0*GeV
          enddo
          GetMZZProbability = GetMZZProbability/dble(evals)
      elseif( WidthScheme.eq.3 ) then
-         call YR_GetBranchingFraction(EHat, GetMZZProbability)
+         call YR_GetBranchingFraction(EHat/GeV, GetMZZProbability)
      else
          call Error("Invalid WidthScheme!")
      endif
