@@ -1299,6 +1299,330 @@ real, public, parameter :: YR_BRgammagamma(YR_nMassPoints) = (/    &
     4.39E-07     &
 /)
 
+real, public, parameter :: YR_BRZgamma(YR_nMassPoints) = (/    &
+    0.00E+00,    &
+    0.00E+00,    &
+    0.00E+00,    &
+    0.00E+00,    &
+    0.00E+00,    &
+    0.00E+00,    &
+    0.00E+00,    &
+    0.00E+00,    &
+    0.00E+00,    &
+    0.00E+00,    &
+    0.00E+00,    &
+    0.00E+00,    &
+    5.09E-08,    &
+    5.17E-07,    &
+    1.85E-06,    &
+    4.48E-06,    &
+    8.78E-06,    &
+    1.51E-05,    &
+    2.38E-05,    &
+    3.51E-05,    &
+    4.93E-05,    &
+    6.67E-05,    &
+    8.74E-05,    &
+    1.12E-04,    &
+    1.40E-04,    &
+    1.71E-04,    &
+    2.07E-04,    &
+    2.47E-04,    &
+    2.91E-04,    &
+    3.39E-04,    &
+    3.91E-04,    &
+    4.19E-04,    &
+    4.47E-04,    &
+    4.77E-04,    &
+    5.07E-04,    &
+    5.39E-04,    &
+    5.71E-04,    &
+    6.04E-04,    &
+    6.39E-04,    &
+    6.74E-04,    &
+    7.10E-04,    &
+    7.46E-04,    &
+    7.84E-04,    &
+    8.22E-04,    &
+    8.61E-04,    &
+    9.00E-04,    &
+    9.41E-04,    &
+    9.81E-04,    &
+    1.02E-03,    &
+    1.06E-03,    &
+    1.11E-03,    &
+    1.12E-03,    &
+    1.12E-03,    &
+    1.13E-03,    &
+    1.14E-03,    &
+    1.15E-03,    &
+    1.16E-03,    &
+    1.17E-03,    &
+    1.18E-03,    &
+    1.18E-03,    &
+    1.19E-03,    &
+    1.20E-03,    &
+    1.21E-03,    &
+    1.22E-03,    &
+    1.23E-03,    &
+    1.24E-03,    &
+    1.24E-03,    &
+    1.25E-03,    &
+    1.26E-03,    &
+    1.27E-03,    &
+    1.28E-03,    &
+    1.29E-03,    &
+    1.30E-03,    &
+    1.30E-03,    &
+    1.31E-03,    &
+    1.32E-03,    &
+    1.33E-03,    &
+    1.34E-03,    &
+    1.35E-03,    &
+    1.36E-03,    &
+    1.36E-03,    &
+    1.37E-03,    &
+    1.38E-03,    &
+    1.39E-03,    &
+    1.40E-03,    &
+    1.41E-03,    &
+    1.42E-03,    &
+    1.43E-03,    &
+    1.44E-03,    &
+    1.44E-03,    &
+    1.45E-03,    &
+    1.46E-03,    &
+    1.47E-03,    &
+    1.48E-03,    &
+    1.49E-03,    &
+    1.50E-03,    &
+    1.50E-03,    &
+    1.51E-03,    &
+    1.52E-03,    &
+    1.53E-03,    &
+    1.54E-03,    &
+    1.55E-03,    &
+    1.56E-03,    &
+    1.56E-03,    &
+    1.57E-03,    &
+    1.58E-03,    &
+    1.59E-03,    &
+    1.60E-03,    &
+    1.61E-03,    &
+    1.62E-03,    &
+    1.62E-03,    &
+    1.63E-03,    &
+    1.64E-03,    &
+    1.65E-03,    &
+    1.66E-03,    &
+    1.67E-03,    &
+    1.68E-03,    &
+    1.68E-03,    &
+    1.69E-03,    &
+    1.70E-03,    &
+    1.71E-03,    &
+    1.72E-03,    &
+    1.73E-03,    &
+    1.73E-03,    &
+    1.74E-03,    &
+    1.75E-03,    &
+    1.76E-03,    &
+    1.77E-03,    &
+    1.77E-03,    &
+    1.78E-03,    &
+    1.79E-03,    &
+    1.80E-03,    &
+    1.81E-03,    &
+    1.81E-03,    &
+    1.82E-03,    &
+    1.83E-03,    &
+    1.84E-03,    &
+    1.85E-03,    &
+    1.85E-03,    &
+    1.86E-03,    &
+    1.87E-03,    &
+    1.88E-03,    &
+    1.89E-03,    &
+    1.89E-03,    &
+    1.90E-03,    &
+    1.91E-03,    &
+    1.92E-03,    &
+    1.92E-03,    &
+    1.93E-03,    &
+    1.94E-03,    &
+    1.95E-03,    &
+    1.98E-03,    &
+    2.02E-03,    &
+    2.05E-03,    &
+    2.09E-03,    &
+    2.12E-03,    &
+    2.15E-03,    &
+    2.18E-03,    &
+    2.21E-03,    &
+    2.24E-03,    &
+    2.27E-03,    &
+    2.29E-03,    &
+    2.32E-03,    &
+    2.34E-03,    &
+    2.36E-03,    &
+    2.38E-03,    &
+    2.40E-03,    &
+    2.41E-03,    &
+    2.43E-03,    &
+    2.44E-03,    &
+    2.45E-03,    &
+    2.46E-03,    &
+    2.47E-03,    &
+    2.48E-03,    &
+    2.48E-03,    &
+    2.49E-03,    &
+    2.49E-03,    &
+    2.49E-03,    &
+    2.49E-03,    &
+    2.48E-03,    &
+    2.48E-03,    &
+    2.47E-03,    &
+    2.46E-03,    &
+    2.45E-03,    &
+    2.43E-03,    &
+    2.42E-03,    &
+    2.40E-03,    &
+    2.38E-03,    &
+    2.36E-03,    &
+    2.33E-03,    &
+    2.31E-03,    &
+    2.18E-03,    &
+    2.01E-03,    &
+    1.79E-03,    &
+    1.50E-03,    &
+    1.15E-03,    &
+    8.41E-04,    &
+    6.06E-04,    &
+    5.45E-04,    &
+    5.00E-04,    &
+    4.39E-04,    &
+    4.00E-04,    &
+    3.71E-04,    &
+    3.48E-04,    &
+    3.38E-04,    &
+    3.29E-04,    &
+    3.12E-04,    &
+    2.96E-04,    &
+    2.76E-04,    &
+    2.54E-04,    &
+    2.44E-04,    &
+    2.36E-04,    &
+    2.22E-04,    &
+    2.11E-04,    &
+    2.02E-04,    &
+    1.94E-04,    &
+    1.91E-04,    &
+    1.87E-04,    &
+    1.81E-04,    &
+    1.75E-04,    &
+    1.70E-04,    &
+    1.65E-04,    &
+    1.61E-04,    &
+    1.56E-04,    &
+    1.52E-04,    &
+    1.48E-04,    &
+    1.45E-04,    &
+    1.41E-04,    &
+    1.38E-04,    &
+    1.34E-04,    &
+    1.31E-04,    &
+    1.28E-04,    &
+    1.25E-04,    &
+    1.22E-04,    &
+    1.19E-04,    &
+    1.17E-04,    &
+    1.14E-04,    &
+    1.11E-04,    &
+    1.09E-04,    &
+    1.07E-04,    &
+    1.04E-04,    &
+    1.02E-04,    &
+    9.96E-05,    &
+    9.75E-05,    &
+    9.54E-05,    &
+    9.33E-05,    &
+    9.13E-05,    &
+    8.94E-05,    &
+    8.75E-05,    &
+    8.57E-05,    &
+    8.39E-05,    &
+    8.21E-05,    &
+    8.05E-05,    &
+    7.88E-05,    &
+    7.72E-05,    &
+    7.56E-05,    &
+    7.41E-05,    &
+    7.26E-05,    &
+    7.12E-05,    &
+    6.98E-05,    &
+    6.84E-05,    &
+    6.71E-05,    &
+    6.57E-05,    &
+    6.45E-05,    &
+    6.32E-05,    &
+    6.20E-05,    &
+    6.08E-05,    &
+    5.97E-05,    &
+    5.86E-05,    &
+    5.75E-05,    &
+    5.48E-05,    &
+    5.24E-05,    &
+    5.00E-05,    &
+    4.78E-05,    &
+    4.58E-05,    &
+    4.38E-05,    &
+    4.21E-05,    &
+    4.03E-05,    &
+    3.88E-05,    &
+    3.65E-05,    &
+    3.17E-05,    &
+    2.76E-05,    &
+    2.42E-05,    &
+    2.14E-05,    &
+    1.90E-05,    &
+    1.53E-05,    &
+    1.26E-05,    &
+    1.15E-05,    &
+    1.05E-05,    &
+    8.88E-06,    &
+    7.59E-06,    &
+    6.54E-06,    &
+    5.67E-06,    &
+    5.30E-06,    &
+    4.96E-06,    &
+    4.35E-06,    &
+    3.84E-06,    &
+    3.40E-06,    &
+    3.03E-06,    &
+    2.86E-06,    &
+    2.70E-06,    &
+    2.42E-06,    &
+    2.18E-06,    &
+    1.96E-06,    &
+    1.77E-06,    &
+    1.69E-06,    &
+    1.61E-06,    &
+    1.46E-06,    &
+    1.33E-06,    &
+    1.22E-06,    &
+    1.12E-06,    &
+    1.07E-06,    &
+    1.02E-06,    &
+    9.44E-07,    &
+    8.72E-07,    &
+    8.07E-07,    &
+    7.49E-07,    &
+    7.22E-07,    &
+    6.97E-07,    &
+    6.50E-07,    &
+    6.08E-07     &
+/)
+
 real, public, parameter :: YR_BRtautau(YR_nMassPoints) = (/    &
     8.27E-02,    &
     8.27E-02,    &
@@ -1622,5 +1946,222 @@ real, public, parameter :: YR_BRtautau(YR_nMassPoints) = (/    &
     3.38E-06,    &
     3.20E-06     &
 /)
+
+contains
+
+
+!========================================================================
+!borrowed from Passarino's file, some internal variable names or comments
+!might not be correct in this context
+!========================================================================
+
+      SUBROUTINE YR_GetBranchingFraction(mass,BranchingRatio)
+      use ModParameters
+
+      IMPLICIT NONE
+
+      INTEGER i,top,gdim
+      REAL(8) u,value,BranchingRatio,mass
+      REAL(8), dimension(YR_nMassPoints) :: bc,cc,dc
+
+! u value of M_H at which the spline is to be evaluated
+
+      gdim= YR_nMassPoints
+
+      CALL HTO_FMMsplineSingleHt(bc,cc,dc,top,gdim)
+
+      u= mass
+      CALL HTO_Seval3SingleHt(u,bc,cc,dc,top,gdim,value)
+
+      BranchingRatio= value
+
+      RETURN
+
+!-----------------------------------------------------------------------
+
+      CONTAINS
+
+      SUBROUTINE HTO_FMMsplineSingleHt(b,c,d,top,gdim)
+
+!---------------------------------------------------------------------------
+
+      INTEGER k,n,i,top,gdim,l
+
+      REAL(8), dimension(gdim) :: xc,yc
+      REAL(8), dimension(gdim) :: x,y
+
+      REAL(8), DIMENSION(gdim) :: b
+! linear coeff
+
+      REAL(8), DIMENSION(gdim) :: c
+! quadratic coeff.
+
+      REAL(8), DIMENSION(gdim) :: d
+! cubic coeff.
+
+      REAL(8) :: t
+      REAL(8),PARAMETER:: ZERO=0.0, TWO=2.0, THREE=3.0
+
+! The grid
+
+
+      xc = YR_HiggsMass
+      if( TauDecays.ge.0 ) then
+          yc = YR_BRtautau
+      elseif( IsAZDecay(DecayMode1).and.IsAZDecay(DecayMode2) ) then
+          yc = YR_BRZZ
+      elseif( IsAWDecay(DecayMode1).and.IsAWDecay(DecayMode2) ) then
+          yc = YR_BRWW
+      elseif( (IsAZDecay(DecayMode1).and.IsAPhoton(DecayMode2)) .or. &
+              (IsAPhoton(DecayMode1).and.IsAZDecay(DecayMode2)) ) then
+          yc = YR_BRZgamma
+      elseif( (IsAPhoton(DecayMode1).and.IsAPhoton(DecayMode2)) ) then
+          yc = YR_BRgammagamma
+      endif
+
+
+
+      n= gdim
+      FORALL(l=1:gdim)
+       x(l)= xc(l)
+       y(l)= yc(l)
+      ENDFORALL
+
+!.....Set up tridiagonal system.........................................
+!     b=diagonal, d=offdiagonal, c=right-hand side
+
+      d(1)= x(2)-x(1)
+      c(2)= (y(2)-y(1))/d(1)
+      DO k= 2,n-1
+       d(k)= x(k+1)-x(k)
+       b(k)= TWO*(d(k-1)+d(k))
+       c(k+1)= (y(k+1)-y(k))/d(k)
+       c(k)= c(k+1)-c(k)
+      END DO
+
+!.....End conditions.  third derivatives at x(1) and x(n) obtained
+!     from divided differences.......................................
+
+      b(1)= -d(1)
+      b(n)= -d(n-1)
+      c(1)= ZERO
+      c(n)= ZERO
+      IF (n > 3) THEN
+       c(1)= c(3)/(x(4)-x(2))-c(2)/(x(3)-x(1))
+       c(n)= c(n-1)/(x(n)-x(n-2))-c(n-2)/(x(n-1)-x(n-3))
+       c(1)= c(1)*d(1)*d(1)/(x(4)-x(1))
+       c(n)= -c(n)*d(n-1)*d(n-1)/(x(n)-x(n-3))
+      END IF
+
+      DO k=2,n    ! forward elimination
+       t= d(k-1)/b(k-1)
+       b(k)= b(k)-t*d(k-1)
+       c(k)= c(k)-t*c(k-1)
+      END DO
+
+      c(n)= c(n)/b(n)
+
+! back substitution ( makes c the sigma of text)
+
+      DO k=n-1,1,-1
+       c(k)= (c(k)-d(k)*c(k+1))/b(k)
+      END DO
+
+!.....Compute polynomial coefficients...................................
+
+      b(n)= (y(n)-y(n-1))/d(n-1)+d(n-1)*(c(n-1)+c(n)+c(n))
+      DO k=1,n-1
+       b(k)= (y(k+1)-y(k))/d(k)-d(k)*(c(k+1)+c(k)+c(k))
+       d(k)= (c(k+1)-c(k))/d(k)
+       c(k)= THREE*c(k)
+      END DO
+      c(n)= THREE*c(n)
+      d(n)= d(n-1)
+
+      RETURN
+
+      END SUBROUTINE HTO_FMMsplineSingleHt
+
+!------------------------------------------------------------------------
+
+      SUBROUTINE HTO_Seval3SingleHt(u,b,c,d,top,gdim,f,fp,fpp,fppp)
+
+! ---------------------------------------------------------------------------
+
+      REAL(8),INTENT(IN) :: u
+! abscissa at which the spline is to be evaluated
+
+      INTEGER j,k,n,l,top,gdim
+
+      REAL(8), dimension(gdim) :: xc,yc
+      REAL(8), dimension(gdim) :: x,y
+      REAL(8), DIMENSION(gdim) :: b,c,d
+! linear,quadratic,cubic coeff
+
+      REAL(8),INTENT(OUT),OPTIONAL:: f,fp,fpp,fppp
+! function, 1st,2nd,3rd deriv
+
+      INTEGER, SAVE :: i=1
+      REAL(8)    :: dx
+      REAL(8),PARAMETER:: TWO=2.0, THREE=3.0, SIX=6.0
+
+! The grid
+
+      xc = YR_HiggsMass
+      if( TauDecays.ge.0 ) then
+          yc = YR_BRtautau
+      elseif( IsAZDecay(DecayMode1).and.IsAZDecay(DecayMode2) ) then
+          yc = YR_BRZZ
+      elseif( IsAWDecay(DecayMode1).and.IsAWDecay(DecayMode2) ) then
+          yc = YR_BRWW
+      elseif( (IsAZDecay(DecayMode1).and.IsAPhoton(DecayMode2)) .or. &
+              (IsAPhoton(DecayMode1).and.IsAZDecay(DecayMode2)) ) then
+          yc = YR_BRZgamma
+      elseif( (IsAPhoton(DecayMode1).and.IsAPhoton(DecayMode2)) ) then
+          yc = YR_BRgammagamma
+      endif
+
+      n= gdim
+      FORALL(l=1:gdim)
+       x(l)= xc(l)
+       y(l)= yc(l)
+      ENDFORALL
+
+!.....First check if u is in the same interval found on the
+!     last call to Seval.............................................
+
+      IF (  (i<1) .OR. (i >= n) ) i=1
+      IF ( (u < x(i))  .OR.  (u >= x(i+1)) ) THEN
+       i=1
+
+! binary search
+
+       j= n+1
+       DO
+        k= (i+j)/2
+        IF (u < x(k)) THEN
+         j= k
+        ELSE
+         i= k
+        ENDIF
+        IF (j <= i+1) EXIT
+       ENDDO
+      ENDIF
+
+      dx= u-x(i)
+
+! evaluate the spline
+
+      IF (Present(f))    f= y(i)+dx*(b(i)+dx*(c(i)+dx*d(i)))
+      IF (Present(fp))   fp= b(i)+dx*(TWO*c(i) + dx*THREE*d(i))
+      IF (Present(fpp))  fpp= TWO*c(i) + dx*SIX*d(i)
+      IF (Present(fppp)) fppp= SIX*d(i)
+
+      RETURN
+
+      END SUBROUTINE HTO_Seval3SingleHt
+
+      END SUBROUTINE YR_GetBranchingFraction
+
 
 end module
