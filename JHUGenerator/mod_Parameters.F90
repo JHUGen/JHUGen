@@ -237,56 +237,57 @@ real(8), public :: scale_alpha_W_tn = 1d0        ! scaling factor of alpha (~par
    complex(8), public, parameter :: ahz3 = (0.0d0,0d0)  ! pseudoscalar
 
 !-- parameters that define off-shell spin 0 coupling to SM fields, see note
-   complex(8), public            :: ghg2 = (1.0d0,0d0)
-   complex(8), public, parameter :: ghg3 = (0.0d0,0d0)
-   complex(8), public            :: ghg4 = (0.0d0,0d0)   ! pseudoscalar
+   complex(8), public :: ghg2 = (1.0d0,0d0)
+   complex(8), public :: ghg3 = (0.0d0,0d0)
+   complex(8), public :: ghg4 = (0.0d0,0d0)   ! pseudoscalar
    
-   complex(8), public            :: ghz1 = (2.0d0,0d0)   ! SM=2
-   complex(8), public            :: ghz2 = (0.0d0,0d0)
-   complex(8), public, parameter :: ghz3 = (0.0d0,0d0)
-   complex(8), public            :: ghz4 = (0.0d0,0d0)   ! pseudoscalar 
+   complex(8), public :: ghz1 = (2.0d0,0d0)   ! SM=2
+   complex(8), public :: ghz2 = (0.0d0,0d0)
+   complex(8), public :: ghz3 = (0.0d0,0d0)
+   complex(8), public :: ghz4 = (0.0d0,0d0)   ! pseudoscalar 
 
-   complex(8), public, parameter :: ghzgs2  = (0.00d0,0d0)
-   complex(8), public, parameter :: ghzgs3  = (0.00d0,0d0)
-   complex(8), public, parameter :: ghzgs4  = (0.00d0,0d0)
-   complex(8), public, parameter :: ghgsgs2 = (0.00d0,0d0)
-   complex(8), public, parameter :: ghgsgs3 = (0.00d0,0d0)
-   complex(8), public, parameter :: ghgsgs4 = (0.00d0,0d0)
+   complex(8), public :: ghzgs2  = (0.00d0,0d0)
+   complex(8), public :: ghzgs3  = (0.00d0,0d0)
+   complex(8), public :: ghzgs4  = (0.00d0,0d0)
+   complex(8), public :: ghgsgs2 = (0.00d0,0d0)
+   complex(8), public :: ghgsgs3 = (0.00d0,0d0)
+   complex(8), public :: ghgsgs4 = (0.00d0,0d0)
 
 
 !-- parameters that define q^2 dependent form factors
-   complex(8), public, parameter :: ghz1_prime = (0.0d0,0d0)
-   complex(8), public            :: ghz1_prime2= (0.0d0,0d0)
-   complex(8), public, parameter :: ghz1_prime3= (0.0d0,0d0)
-   complex(8), public, parameter :: ghz1_prime4= (0.0d0,0d0)
-   complex(8), public, parameter :: ghz1_prime5= (0.0d0,0d0)
-   complex(8), public, parameter :: ghz1_prime6= (0.0d0,0d0)
-   complex(8), public, parameter :: ghz1_prime7= (0.0d0,0d0)
+   complex(8), public :: ghz1_prime = (0.0d0,0d0)
+   complex(8), public :: ghz1_prime2= (0.0d0,0d0)
+   complex(8), public :: ghz1_prime3= (0.0d0,0d0)
+   complex(8), public :: ghz1_prime4= (0.0d0,0d0)
+   complex(8), public :: ghz1_prime5= (0.0d0,0d0)
+   complex(8), public :: ghz1_prime6= (0.0d0,0d0)
+   complex(8), public :: ghz1_prime7= (0.0d0,0d0)
 
-   complex(8), public, parameter :: ghz2_prime = (0.0d0,0d0)
-   complex(8), public, parameter :: ghz2_prime2= (0.0d0,0d0)
-   complex(8), public, parameter :: ghz2_prime3= (0.0d0,0d0)
-   complex(8), public, parameter :: ghz2_prime4= (0.0d0,0d0)
-   complex(8), public, parameter :: ghz2_prime5= (0.0d0,0d0)
-   complex(8), public, parameter :: ghz2_prime6= (0.0d0,0d0)
-   complex(8), public, parameter :: ghz2_prime7= (0.0d0,0d0)
+   complex(8), public :: ghz2_prime = (0.0d0,0d0)
+   complex(8), public :: ghz2_prime2= (0.0d0,0d0)
+   complex(8), public :: ghz2_prime3= (0.0d0,0d0)
+   complex(8), public :: ghz2_prime4= (0.0d0,0d0)
+   complex(8), public :: ghz2_prime5= (0.0d0,0d0)
+   complex(8), public :: ghz2_prime6= (0.0d0,0d0)
+   complex(8), public :: ghz2_prime7= (0.0d0,0d0)
 
-   complex(8), public, parameter :: ghz3_prime = (0.0d0,0d0)
-   complex(8), public, parameter :: ghz3_prime2= (0.0d0,0d0)
-   complex(8), public, parameter :: ghz3_prime3= (0.0d0,0d0)
-   complex(8), public, parameter :: ghz3_prime4= (0.0d0,0d0)
-   complex(8), public, parameter :: ghz3_prime5= (0.0d0,0d0)
-   complex(8), public, parameter :: ghz3_prime6= (0.0d0,0d0)
-   complex(8), public, parameter :: ghz3_prime7= (0.0d0,0d0)
+   complex(8), public :: ghz3_prime = (0.0d0,0d0)
+   complex(8), public :: ghz3_prime2= (0.0d0,0d0)
+   complex(8), public :: ghz3_prime3= (0.0d0,0d0)
+   complex(8), public :: ghz3_prime4= (0.0d0,0d0)
+   complex(8), public :: ghz3_prime5= (0.0d0,0d0)
+   complex(8), public :: ghz3_prime6= (0.0d0,0d0)
+   complex(8), public :: ghz3_prime7= (0.0d0,0d0)
 
-   complex(8), public, parameter :: ghz4_prime = (0.0d0,0d0)
-   complex(8), public, parameter :: ghz4_prime2= (0.0d0,0d0)
-   complex(8), public, parameter :: ghz4_prime3= (0.0d0,0d0)
-   complex(8), public, parameter :: ghz4_prime4= (0.0d0,0d0)
-   complex(8), public, parameter :: ghz4_prime5= (0.0d0,0d0)
-   complex(8), public, parameter :: ghz4_prime6= (0.0d0,0d0)
-   complex(8), public, parameter :: ghz4_prime7= (0.0d0,0d0)
-   complex(8), public, parameter :: ghzgs1_prime2= (0.0d0,0d0)
+   complex(8), public :: ghz4_prime = (0.0d0,0d0)
+   complex(8), public :: ghz4_prime2= (0.0d0,0d0)
+   complex(8), public :: ghz4_prime3= (0.0d0,0d0)
+   complex(8), public :: ghz4_prime4= (0.0d0,0d0)
+   complex(8), public :: ghz4_prime5= (0.0d0,0d0)
+   complex(8), public :: ghz4_prime6= (0.0d0,0d0)
+   complex(8), public :: ghz4_prime7= (0.0d0,0d0)
+
+   complex(8), public :: ghzgs1_prime2= (0.0d0,0d0)
 
    real(8),    public, parameter :: Lambda_z1 = 10000d0*GeV
    real(8),    public, parameter :: Lambda_z2 = 10000d0*GeV
@@ -295,9 +296,9 @@ real(8), public :: scale_alpha_W_tn = 1d0        ! scaling factor of alpha (~par
    real(8),    public, parameter :: Lambda_zgs1 = 10000d0*GeV
    real(8),    public, parameter :: Lambda_Q  = 10000d0*GeV
 
-   integer,    public, parameter :: cz_q1sq = 0d0 ! Sign of q1,2,12**2 for the following Lambda's, set to 1 or -1 to get q**2-dependence from these form factor Lambdas
-   integer,    public, parameter :: cz_q2sq = 0d0
-   integer,    public, parameter :: cz_q12sq = 0d0
+   integer,    public :: cz_q1sq = 0 ! Sign of q1,2,12**2 for the following Lambda's, set to 1 or -1 to get q**2-dependence from these form factor Lambdas
+   integer,    public :: cz_q2sq = 0
+   integer,    public :: cz_q12sq = 0
    ! These Lambdas all have a numerical value of 1d0
    real(8),    public, parameter :: Lambda_z11 = 100d0*GeV ! For Z1
    real(8),    public, parameter :: Lambda_z21 = 100d0*GeV
@@ -315,35 +316,35 @@ real(8), public :: scale_alpha_W_tn = 1d0        ! scaling factor of alpha (~par
 
 
 !---parameters that define spin 1 coupling to SM fields, see note
-   complex(8), public, parameter :: zprime_qq_left  = (1.0d0,0d0)
-   complex(8), public, parameter :: zprime_qq_right = (1.0d0,0d0)
-   complex(8), public, parameter :: zprime_zz_1 =  (1.0d0,0d0)!  =1 for JP=1- vector
-   complex(8), public, parameter :: zprime_zz_2 =  (0.0d0,0d0)!  =1 for JP=1+ pseudovector
+   complex(8), public :: zprime_qq_left  = (1.0d0,0d0)
+   complex(8), public :: zprime_qq_right = (1.0d0,0d0)
+   complex(8), public :: zprime_zz_1 =  (1.0d0,0d0)!  =1 for JP=1- vector
+   complex(8), public :: zprime_zz_2 =  (0.0d0,0d0)!  =1 for JP=1+ pseudovector
 
 !-- parameters that define spin 2 coupling to SM fields, see note
 ! minimal coupling corresponds to a1 = b1 = b5 = 1 everything else 0
-  complex(8), public            :: a1 = (0.0d0,0d0)    ! g1  -- c.f. draft
-  complex(8), public            :: a2 = (1.0d0,0d0)    ! g2
-  complex(8), public, parameter :: a3 = (0.0d0,0d0)    ! g3
-  complex(8), public, parameter :: a4 = (0.0d0,0d0)    ! g4
-  complex(8), public, parameter :: a5 = (0.0d0,0d0)    ! pseudoscalar, g8
-  complex(8), public, parameter :: graviton_qq_left  = (1.0d0,0d0)! graviton coupling to quarks
-  complex(8), public, parameter :: graviton_qq_right = (1.0d0,0d0)
+  complex(8), public :: a1 = (0.0d0,0d0)    ! g1  -- c.f. draft
+  complex(8), public :: a2 = (1.0d0,0d0)    ! g2
+  complex(8), public :: a3 = (0.0d0,0d0)    ! g3
+  complex(8), public :: a4 = (0.0d0,0d0)    ! g4
+  complex(8), public :: a5 = (0.0d0,0d0)    ! pseudoscalar, g8
+  complex(8), public :: graviton_qq_left  = (1.0d0,0d0)! graviton coupling to quarks
+  complex(8), public :: graviton_qq_right = (1.0d0,0d0)
 
 !-- see mod_Graviton
   logical, public, parameter :: generate_bis = .true.
   logical, public, parameter :: use_dynamic_MG = .true.
 
-  complex(8), public            :: b1 = (0.0d0,0d0)  !  all b' below are g's in the draft
-  complex(8), public            :: b2 = (1.0d0,0d0)
-  complex(8), public, parameter :: b3 = (0.0d0,0d0)
-  complex(8), public, parameter :: b4 = (0.0d0,0d0)
-  complex(8), public            :: b5 = (0.0d0,0d0)
-  complex(8), public, parameter :: b6 = (0.0d0,0d0)
-  complex(8), public, parameter :: b7 = (0.0d0,0d0)
-  complex(8), public, parameter :: b8 = (0.0d0,0d0)
-  complex(8), public, parameter :: b9 = (0.0d0,0d0)  ! this coupling does not contribute to gamma+gamma final states
-  complex(8), public, parameter :: b10 =(0.0d0,0d0)  ! this coupling does not contribute to gamma+gamma final states
+  complex(8), public :: b1 = (0.0d0,0d0)  !  all b' below are g's in the draft
+  complex(8), public :: b2 = (1.0d0,0d0)
+  complex(8), public :: b3 = (0.0d0,0d0)
+  complex(8), public :: b4 = (0.0d0,0d0)
+  complex(8), public :: b5 = (0.0d0,0d0)
+  complex(8), public :: b6 = (0.0d0,0d0)
+  complex(8), public :: b7 = (0.0d0,0d0)
+  complex(8), public :: b8 = (0.0d0,0d0)
+  complex(8), public :: b9 = (0.0d0,0d0)  ! this coupling does not contribute to gamma+gamma final states
+  complex(8), public :: b10 =(0.0d0,0d0)  ! this coupling does not contribute to gamma+gamma final states
 
 
   complex(8), public, parameter  :: c1 = (1.0d0,0d0)
