@@ -362,44 +362,44 @@ real(8), public :: scale_alpha_W_tn = 1d0        ! scaling factor of alpha (~par
 
 !-- extra couplings for weak boson fusion when WW-spin-0 couplings are required to be different from ZZ-spin-0
 !-- note: ZZ-spin-0 couplings are used in processes other than VBF
-   logical, public, parameter :: distinguish_HWWcouplings=.false.
-   complex(8), public, parameter :: ghw1 = (0.0d0,0d0)
-   complex(8), public, parameter :: ghw2 = (0.0d0,0d0)
-   complex(8), public, parameter :: ghw3 = (0.0d0,0d0)
-   complex(8), public, parameter :: ghw4 = (0.0d0,0d0)
+   logical, public :: distinguish_HWWcouplings=.false.
+   complex(8), public :: ghw1 = (0.0d0,0d0)
+   complex(8), public :: ghw2 = (0.0d0,0d0)
+   complex(8), public :: ghw3 = (0.0d0,0d0)
+   complex(8), public :: ghw4 = (0.0d0,0d0)
 
 !-- parameters that define q^2 dependent form factors in WBF WW-spin-0 case described above
-   complex(8), public, parameter :: ghw1_prime = (0.0d0,0d0)
-   complex(8), public, parameter :: ghw1_prime2= (0.0d0,0d0)
-   complex(8), public, parameter :: ghw1_prime3= (0.0d0,0d0)
-   complex(8), public, parameter :: ghw1_prime4= (0.0d0,0d0)
-   complex(8), public, parameter :: ghw1_prime5= (0.0d0,0d0)
-   complex(8), public, parameter :: ghw1_prime6= (0.0d0,0d0)
-   complex(8), public, parameter :: ghw1_prime7= (0.0d0,0d0)
+   complex(8), public :: ghw1_prime = (0.0d0,0d0)
+   complex(8), public :: ghw1_prime2= (0.0d0,0d0)
+   complex(8), public :: ghw1_prime3= (0.0d0,0d0)
+   complex(8), public :: ghw1_prime4= (0.0d0,0d0)
+   complex(8), public :: ghw1_prime5= (0.0d0,0d0)
+   complex(8), public :: ghw1_prime6= (0.0d0,0d0)
+   complex(8), public :: ghw1_prime7= (0.0d0,0d0)
 
-   complex(8), public, parameter :: ghw2_prime = (0.0d0,0d0)
-   complex(8), public, parameter :: ghw2_prime2= (0.0d0,0d0)
-   complex(8), public, parameter :: ghw2_prime3= (0.0d0,0d0)
-   complex(8), public, parameter :: ghw2_prime4= (0.0d0,0d0)
-   complex(8), public, parameter :: ghw2_prime5= (0.0d0,0d0)
-   complex(8), public, parameter :: ghw2_prime6= (0.0d0,0d0)
-   complex(8), public, parameter :: ghw2_prime7= (0.0d0,0d0)
+   complex(8), public :: ghw2_prime = (0.0d0,0d0)
+   complex(8), public :: ghw2_prime2= (0.0d0,0d0)
+   complex(8), public :: ghw2_prime3= (0.0d0,0d0)
+   complex(8), public :: ghw2_prime4= (0.0d0,0d0)
+   complex(8), public :: ghw2_prime5= (0.0d0,0d0)
+   complex(8), public :: ghw2_prime6= (0.0d0,0d0)
+   complex(8), public :: ghw2_prime7= (0.0d0,0d0)
 
-   complex(8), public, parameter :: ghw3_prime = (0.0d0,0d0)
-   complex(8), public, parameter :: ghw3_prime2= (0.0d0,0d0)
-   complex(8), public, parameter :: ghw3_prime3= (0.0d0,0d0)
-   complex(8), public, parameter :: ghw3_prime4= (0.0d0,0d0)
-   complex(8), public, parameter :: ghw3_prime5= (0.0d0,0d0)
-   complex(8), public, parameter :: ghw3_prime6= (0.0d0,0d0)
-   complex(8), public, parameter :: ghw3_prime7= (0.0d0,0d0)
+   complex(8), public :: ghw3_prime = (0.0d0,0d0)
+   complex(8), public :: ghw3_prime2= (0.0d0,0d0)
+   complex(8), public :: ghw3_prime3= (0.0d0,0d0)
+   complex(8), public :: ghw3_prime4= (0.0d0,0d0)
+   complex(8), public :: ghw3_prime5= (0.0d0,0d0)
+   complex(8), public :: ghw3_prime6= (0.0d0,0d0)
+   complex(8), public :: ghw3_prime7= (0.0d0,0d0)
 
-   complex(8), public, parameter :: ghw4_prime = (0.0d0,0d0)
-   complex(8), public, parameter :: ghw4_prime2= (0.0d0,0d0)
-   complex(8), public, parameter :: ghw4_prime3= (0.0d0,0d0)
-   complex(8), public, parameter :: ghw4_prime4= (0.0d0,0d0)
-   complex(8), public, parameter :: ghw4_prime5= (0.0d0,0d0)
-   complex(8), public, parameter :: ghw4_prime6= (0.0d0,0d0)
-   complex(8), public, parameter :: ghw4_prime7= (0.0d0,0d0)
+   complex(8), public :: ghw4_prime = (0.0d0,0d0)
+   complex(8), public :: ghw4_prime2= (0.0d0,0d0)
+   complex(8), public :: ghw4_prime3= (0.0d0,0d0)
+   complex(8), public :: ghw4_prime4= (0.0d0,0d0)
+   complex(8), public :: ghw4_prime5= (0.0d0,0d0)
+   complex(8), public :: ghw4_prime6= (0.0d0,0d0)
+   complex(8), public :: ghw4_prime7= (0.0d0,0d0)
    
    real(8),    public, parameter :: Lambda_w1 = 10000d0*GeV
    real(8),    public, parameter :: Lambda_w2 = 10000d0*GeV
@@ -407,9 +407,9 @@ real(8), public :: scale_alpha_W_tn = 1d0        ! scaling factor of alpha (~par
    real(8),    public, parameter :: Lambda_w4 = 10000d0*GeV
    !real(8),    public, parameter :: Lambda_w5 = 10000d0*GeV ! Not used
 
-   integer,    public, parameter :: cw_q1sq = 0d0 ! Sign of q1,2,12**2 for the following Lambda's, set to 1 or -1 to get q**2-dependence from these form factor Lambdas
-   integer,    public, parameter :: cw_q2sq = 0d0
-   integer,    public, parameter :: cw_q12sq = 0d0
+   integer,    public :: cw_q1sq = 0 ! Sign of q1,2,12**2 for the following Lambda's, set to 1 or -1 to get q**2-dependence from these form factor Lambdas
+   integer,    public :: cw_q2sq = 0
+   integer,    public :: cw_q12sq = 0
    real(8),    public, parameter :: Lambda_w11 = 100d0*GeV ! For W+
    real(8),    public, parameter :: Lambda_w21 = 100d0*GeV
    real(8),    public, parameter :: Lambda_w31 = 100d0*GeV
