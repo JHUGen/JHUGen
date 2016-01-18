@@ -424,8 +424,8 @@ real(8), public :: scale_alpha_W_tn = 1d0        ! scaling factor of alpha (~par
    real(8),    public, parameter :: Lambda_w40 = 100d0*GeV
 
 !  couplings for ttbar+H and bbar+H
-   complex(8),    public, parameter :: kappa       = (1d0,0d0)
-   complex(8),    public, parameter :: kappa_tilde = (0d0,0d0) 
+   complex(8),    public :: kappa       = (1d0,0d0)
+   complex(8),    public :: kappa_tilde = (0d0,0d0) 
 !=====================================================
 
 !=====================================================
