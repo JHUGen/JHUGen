@@ -80,10 +80,8 @@ logical, public, parameter :: importExternal_LHEinit = .true.
 
 logical, public, parameter :: writeWeightedLHE = .false. 
 
-logical, public, parameter :: includeGammaStar = .false. 
-real(8),parameter :: MPhotonCutoff = 4d0*GeV
-
 integer, public  :: WidthScheme    ! 0=fixed BW-width, 1=runing BW-width, 2=Passarino's CPS
+
 logical, public, parameter :: RandomizeVVdecays = .true.    ! randomize DecayMode1 and DecayMode2 in H-->VV and TTBAR decays
 
 logical, public, parameter :: UseUnformattedRead = .false.  !Set this to true if the regular reading fails for whatever reason
@@ -95,11 +93,12 @@ logical, public, parameter :: H_DK =.false.                 ! default to false s
 
 !=====================================================
 !cuts - should be set on the command line
-real(8), public :: pTjetcut = 15d0*GeV                            ! jet min pt
-real(8), public :: Rjet = 0.3d0                                   ! jet deltaR, anti-kt algorithm
-real(8), public :: mJJcut = 0d0*GeV                               ! minimum mJJ for VBF, HJJ, bbH
+real(8), public :: pTjetcut = 15d0*GeV                        ! jet min pt
+real(8), public :: Rjet = 0.3d0                               ! jet deltaR, anti-kt algorithm
+real(8), public :: mJJcut = 0d0*GeV                           ! minimum mJJ for VBF, HJJ, bbH
 ! real(8), public :: m4l_minmax(1:2) = (/ -1d0,-1d0 /)*GeV    ! min and max for m_4l in off-shell VBF production;   default is (-1,-1): m_4l ~ Higgs resonance (on-shell)
 real(8), public :: m4l_minmax(1:2) = (/ 200d0,14000d0 /)*GeV  ! min and max for m_4l in off-shell VBF production, default is (-1,-1): m_4l ~ Higgs resonance (on-shell)
+real(8) :: MPhotonCutoff = 4d0*GeV                            !minimum mass for offshell photons
 !=====================================================
 
 
@@ -246,6 +245,7 @@ real(8), public :: scale_alpha_W_tn = 1d0        ! scaling factor of alpha (~par
    complex(8), public :: ghz3 = (0.0d0,0d0)
    complex(8), public :: ghz4 = (0.0d0,0d0)   ! pseudoscalar 
 
+   logical, public :: includeGammaStar = .false. 
    complex(8), public :: ghzgs2  = (0.00d0,0d0)
    complex(8), public :: ghzgs3  = (0.00d0,0d0)
    complex(8), public :: ghzgs4  = (0.00d0,0d0)
@@ -424,8 +424,8 @@ real(8), public :: scale_alpha_W_tn = 1d0        ! scaling factor of alpha (~par
    real(8),    public, parameter :: Lambda_w40 = 100d0*GeV
 
 !  couplings for ttbar+H and bbar+H
-   complex(8),    public :: kappa       = (1d0,0d0)
-   complex(8),    public :: kappa_tilde = (0d0,0d0) 
+   complex(8), public :: kappa       = (1d0,0d0)
+   complex(8), public :: kappa_tilde = (0d0,0d0) 
 !=====================================================
 
 !=====================================================
@@ -1385,18 +1385,18 @@ end subroutine ComputeQCDVariables
 
 !ReadCommandLineArgument is overloaded.  Pass the type needed as "dest"
 !success is set to true if the argument passed matches argumentname, otherwise it's left alone
-!same for success2 (optional, can be used for other things, see main.F90)
+!same for success2 and success3 (optional, can be used for other things, see main.F90)
 !success2Re and success2Im (optional, for complex overload only) are set if the respective parts are set
 !SetLastArgument (optional) is set to true if the argument matches, otherwise it's set to false
 !for examples of all of them see main.F90
 
-subroutine ReadCommandLineArgument_logical(argument, argumentname, success, dest, SetLastArgument, success2)
+subroutine ReadCommandLineArgument_logical(argument, argumentname, success, dest, SetLastArgument, success2, success3)
 implicit none
 character(len=*) :: argument, argumentname
 logical, intent(inout) :: dest
 logical, intent(inout) :: success
 integer :: length
-logical, optional, intent(inout) :: SetLastArgument, success2
+logical, optional, intent(inout) :: SetLastArgument, success2, success3
 integer :: temp_int
 character(len=*), parameter :: numbers = "0123456789"
 
@@ -1409,11 +1409,13 @@ character(len=*), parameter :: numbers = "0123456789"
         success=.true.
         if (present(SetLastArgument)) SetLastArgument=.true.
         if (present(success2)) success2=.true.
+        if (present(success3)) success3=.true.
     elseif( trim(argument).eq."No"//trim(argumentname) ) then
         dest=.false.
         success=.true.
         if (present(SetLastArgument)) SetLastArgument=.true.
         if (present(success2)) success2=.true.
+        if (present(success3)) success3=.true.
     elseif( argument(1:length+1) .eq. trim(argumentname)//"=" ) then
         if( Index(numbers, argument(length+2:length+2)) .ne. 0 ) then
             read(argument(length+2:len(argument)), *) temp_int
@@ -1421,23 +1423,25 @@ character(len=*), parameter :: numbers = "0123456789"
             success=.true.
             if (present(SetLastArgument)) SetLastArgument=.true.
             if (present(success2)) success2=.true.
+            if (present(success3)) success3=.true.
         else
             read(argument(length+2:len(argument)), *) dest
             success=.true.
             if (present(SetLastArgument)) SetLastArgument=.true.
             if (present(success2)) success2=.true.
+            if (present(success3)) success3=.true.
         endif
     endif
 
 end subroutine ReadCommandLineArgument_logical
 
 
-subroutine ReadCommandLineArgument_integer(argument, argumentname, success, dest, SetLastArgument, success2)
+subroutine ReadCommandLineArgument_integer(argument, argumentname, success, dest, SetLastArgument, success2, success3)
 implicit none
 character(len=*) :: argument, argumentname
 integer, intent(inout) :: dest
 logical, intent(inout) :: success
-logical, optional, intent(inout) :: SetLastArgument, success2
+logical, optional, intent(inout) :: SetLastArgument, success2, success3
 integer :: length
 
     if (present(SetLastArgument)) SetLastArgument=.false.
@@ -1449,17 +1453,18 @@ integer :: length
         success=.true.
         if (present(SetLastArgument)) SetLastArgument=.true.
         if (present(success2)) success2=.true.
+        if (present(success3)) success3=.true.
     endif
 
 end subroutine ReadCommandLineArgument_integer
 
 
-subroutine ReadCommandLineArgument_real8(argument, argumentname, success, dest, SetLastArgument, success2)
+subroutine ReadCommandLineArgument_real8(argument, argumentname, success, dest, SetLastArgument, success2, success3)
 implicit none
 character(len=*) :: argument, argumentname
 real(8), intent(inout) :: dest
 logical, intent(inout) :: success
-logical, optional, intent(inout) :: SetLastArgument, success2
+logical, optional, intent(inout) :: SetLastArgument, success2, success3
 integer :: length
 
     if (present(SetLastArgument)) SetLastArgument=.false.
@@ -1471,18 +1476,19 @@ integer :: length
         success=.true.
         if (present(SetLastArgument)) SetLastArgument=.true.
         if (present(success2)) success2=.true.
+        if (present(success3)) success3=.true.
     endif
 
 end subroutine ReadCommandLineArgument_real8
 
 
-subroutine ReadCommandLineArgument_complex8(argument, argumentname, success, dest, SetLastArgument, success2, success2Re, success2Im)
+subroutine ReadCommandLineArgument_complex8(argument, argumentname, success, dest, SetLastArgument, success2, success3, success2Re, success2Im)
 implicit none
 character(len=*) :: argument, argumentname
 complex(8), intent(inout) :: dest
 real(8) :: re, im
 logical, intent(inout) :: success
-logical, optional, intent(inout) :: SetLastArgument, success2, success2Re, success2Im
+logical, optional, intent(inout) :: SetLastArgument, success2, success3, success2Re, success2Im
 integer :: length
 
     if (present(SetLastArgument)) SetLastArgument=.false.
@@ -1495,6 +1501,7 @@ integer :: length
         success=.true.
         if (present(SetLastArgument)) SetLastArgument=.true.
         if (present(success2)) success2=.true.
+        if (present(success3)) success3=.true.
         if (present(success2Re)) success2Re=.true.
         if (present(success2Im)) success2Im=.true.
     elseif( argument(1:length+3) .eq. "Re"//trim(argumentname)//"=" ) then
@@ -1503,6 +1510,7 @@ integer :: length
         success=.true.
         if (present(SetLastArgument)) SetLastArgument=.true.
         if (present(success2)) success2=.true.
+        if (present(success3)) success3=.true.
         if (present(success2Re)) success2Re=.true.
     elseif( argument(1:length+3) .eq. "Im"//trim(argumentname)//"=" ) then
         read(argument(length+4:len(argument)), *) im
@@ -1510,18 +1518,19 @@ integer :: length
         success=.true.
         if (present(SetLastArgument)) SetLastArgument=.true.
         if (present(success2)) success2=.true.
+        if (present(success3)) success3=.true.
         if (present(success2Im)) success2Im=.true.
     endif
 
 end subroutine ReadCommandLineArgument_complex8
 
 
-subroutine ReadCommandLineArgument_string(argument, argumentname, success, dest, SetLastArgument, success2)
+subroutine ReadCommandLineArgument_string(argument, argumentname, success, dest, SetLastArgument, success2, success3)
 implicit none
 character(len=*) :: argument, argumentname
 character(len=*), intent(inout) :: dest
 logical, intent(inout) :: success
-logical, optional, intent(inout) :: SetLastArgument, success2
+logical, optional, intent(inout) :: SetLastArgument, success2, success3
 integer :: length
 
     if (present(SetLastArgument)) SetLastArgument=.false.
@@ -1537,6 +1546,7 @@ integer :: length
         success=.true.
         if (present(SetLastArgument)) SetLastArgument=.true.
         if (present(success2)) success2=.true.
+        if (present(success3)) success3=.true.
     endif
 
 end subroutine ReadCommandLineArgument_string

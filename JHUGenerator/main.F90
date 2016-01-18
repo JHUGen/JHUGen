@@ -227,6 +227,7 @@ character :: arg*(500), argmatch*(30)
 integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg
 logical :: help, success, SetLastArgument, interfSet
 logical :: SetAnomalousSpin0gg, Setghg2, SetAnomalousSpin0ZZ, Setghz1
+logical :: SetZgammacoupling, Setgammagammacoupling
 logical :: SetAnomalousSpin1qq, Setspin1qqleft, Setspin1qqright, SetAnomalousSpin1ZZ, Set1minus
 logical :: SetAnomalousSpin2gg, Seta2, SetAnomalousSpin2qq, Setspin2qqleft, Setspin2qqright,SetAnomalousSpin2ZZ, Setb2
 logical :: SetAnomalousHff, Setkappa
@@ -286,6 +287,8 @@ logical :: SetAnomalousHff, Setkappa
    Setghg2=.false.
    SetAnomalousSpin0ZZ=.false.
    Setghz1=.false.
+   SetZgammacoupling=.false.
+   Setgammagammacoupling=.false.
    SetAnomalousSpin1qq=.false.
    Setspin1qqleft=.false.
    Setspin1qqright=.false.
@@ -376,14 +379,14 @@ logical :: SetAnomalousHff, Setkappa
     call ReadCommandLineArgument(arg, "ghz4", success, ghz4, success2=SetAnomalousSpin0ZZ)
 
     !spin 0 Zgamma couplings
-    call ReadCommandLineArgument(arg, "ghzgs2", success, ghzgs2, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ghzgs3", success, ghzgs3, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ghzgs4", success, ghzgs4, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghzgs2", success, ghzgs2, success2=SetZgammacoupling)
+    call ReadCommandLineArgument(arg, "ghzgs3", success, ghzgs3, success2=SetZgammacoupling)
+    call ReadCommandLineArgument(arg, "ghzgs4", success, ghzgs4, success2=SetZgammacoupling)
 
     !spin 0 gammagamma couplings
-    call ReadCommandLineArgument(arg, "ghgsgs2", success, ghgsgs2, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ghgsgs3", success, ghgsgs3, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ghgsgs4", success, ghgsgs4, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghgsgs2", success, ghgsgs2, success2=Setgammagammacoupling)
+    call ReadCommandLineArgument(arg, "ghgsgs3", success, ghgsgs3, success2=Setgammagammacoupling)
+    call ReadCommandLineArgument(arg, "ghgsgs4", success, ghgsgs4, success2=Setgammagammacoupling)
 
     !spin 0 ZZ momentum dependent couplings
     call ReadCommandLineArgument(arg, "ghz1_prime", success, ghz1_prime, success2=SetAnomalousSpin0ZZ)
@@ -419,7 +422,7 @@ logical :: SetAnomalousHff, Setkappa
     call ReadCommandLineArgument(arg, "ghz4_prime7", success, ghz4_prime7, success2=SetAnomalousSpin0ZZ)
 
     !spin 0 Zgamma momentum dependent coupling
-    call ReadCommandLineArgument(arg, "ghzgs1_prime2", success, ghzgs1_prime2, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghzgs1_prime2", success, ghzgs1_prime2, success2=SetZgammacoupling)
 
     ! Sign of q1,2,12**2 for the Lambda's, set to 1 or -1 to get q**2-dependence from these form factor Lambdas
     call ReadCommandLineArgument(arg, "cz_q1sq", success, cz_q1sq, success2=SetAnomalousSpin0ZZ)
@@ -498,7 +501,7 @@ logical :: SetAnomalousHff, Setkappa
     call ReadCommandLineArgument(arg, "kappa", success, kappa, success2=SetAnomalousHff, success2Re=Setkappa)
     call ReadCommandLineArgument(arg, "kappa_tilde", success, kappa_tilde, success2=SetAnomalousHff)
 
-    !jet cuts
+    !cuts
     call ReadCommandLineArgument(arg, "pTjetcut", success, pTjetcut, SetLastArgument)
     if( SetLastArgument ) pTjetcut = pTjetcut*GeV
     call ReadCommandLineArgument(arg, "deltaRcut", success, Rjet)
@@ -508,14 +511,24 @@ logical :: SetAnomalousHff, Setkappa
     if( SetLastArgument ) m4l_minmax(1) = m4l_minmax(1)*GeV
     call ReadCommandLineArgument(arg, "VBF_m4l_max", success, m4l_minmax(2), SetLastArgument)
     if( SetLastArgument ) m4l_minmax(2) = m4l_minmax(2)*GeV
+    call ReadCommandLineArgument(arg, "MPhotonCutoff", success, MPhotonCutoff, SetLastArgument)
+    if( SetLastArgument ) MPhotonCutoff = MPhotonCutoff*GeV
 
     if( .not.success ) then
         call Error("Unknown command line argument: " // trim(arg))
     endif
    enddo
 
+    !================================
+    !Command line argument processing
+    !================================
+
+    !PChannel
+
     if (Process.eq.0) PChannel = 0   !only gluons
     if (Process.eq.1 .or. Process.eq.50 .or. Process.eq.60 .or. Process.eq.66) PChannel = 1   !only quarks
+
+    !OffXVV
 
     if(OffShell_XVV.ge.100) then
         OffShell_XVV=OffShell_XVV-100
@@ -536,6 +549,8 @@ logical :: SetAnomalousHff, Setkappa
         OffShellV2=.false.
     endif
 
+    !LHAPDF
+
 #if useLHAPDF==1
     if( LHAPDFString.eq."" ) then
        print *, "Need to specify pdf file name in command line argument LHAPDF"
@@ -543,16 +558,37 @@ logical :: SetAnomalousHff, Setkappa
     endif
 #endif    
     
-!     if( ((OffShellV1).or.(OffShellV2).or.(OffShellReson)) ) then
-!         print *, "off shell Z/W's only allowed for spin 0,2 resonance"
-! !         stop
-!     endif
+    !Renormalization/factorization schemes
+
+    if((abs(FacScheme) .ge. nRenFacSchemes) .or. (abs(RenScheme) .ge. nRenFacSchemes) .or. (MuFacMultiplier.le.0d0) .or. (MuRenMultiplier.le.0d0)) call Error("The renormalization or factorization scheme is invalid, or the scale multiplier to either is not positive.")
+
+    !ReadLHE and ConvertLHE
+    !MUST HAPPEN BEFORE DETERMINING INTERFERENCE
+    !so that the mass can be read
+
+    if( ReadLHEFile .and. Process.ne.0  ) then
+        print *, "ReadLHE option is only allowed for spin-0 resonances"
+        stop 1
+    endif
+    if( ConvertLHEFile .and. Process.ne.0  ) then
+        print *, "ConvertLHE option is only allowed for spin-0 resonances"
+        stop 1
+    endif
+    if( ReadLHEFile .and. .not. Unweighted ) then
+        print *, "ReadLHE option is only allowed for generating unweighted events"
+        stop 1
+    endif
+
+    if (ReadLHEFile .or. ConvertLHEFile) then
+       call OpenFiles()
+       call ReadMassWidth()
+    endif
+
+    !DecayModes, interference, photon couplings, ...
 
     if( ConvertLHEFile ) then
        DecayMode2 = DecayMode1
     endif 
-
-    if((abs(FacScheme) .ge. nRenFacSchemes) .or. (abs(RenScheme) .ge. nRenFacSchemes) .or. (MuFacMultiplier.le.0d0) .or. (MuRenMultiplier.le.0d0)) call Error("The renormalization or factorization scheme is invalid, or the scale multiplier to either is not positive.")
 
     if( Process.eq.50 ) then
         DecayMode2=DecayMode1
@@ -580,11 +616,6 @@ logical :: SetAnomalousHff, Setkappa
        Ga_V= 0d0    
     endif
 
-    if (ReadLHEFile .or. ConvertLHEFile) then
-       call OpenFiles()
-       call ReadMassWidth()
-    endif
-
     if( (DecayMode1.eq.DecayMode2 .and. IsAZDecay(DecayMode1)) .or.  &
         (DecayMode1.eq.9) .or. (DecayMode2.eq.9)               .or.  &
         (DecayMode1.eq.8  .and. DecayMode2.eq.0)               .or.  &
@@ -602,9 +633,15 @@ logical :: SetAnomalousHff, Setkappa
         includeInterference = .false.   ! no interference if decay mode does not allow 4 same flavor leptons
     endif
 
+    if( IsAZDecay(DecayMode1) .and. IsAZDecay(DecayMode2) ) then
+        includeGammaStar = (SetZgammacoupling .or. Setgammagammacoupling)
+    elseif( IsAZDecay(DecayMode1) .and. IsAPhoton(DecayMode2) ) then
+        includeGammaStar = Setgammagammacoupling
+    endif
+
     if( IsAZDecay(DecayMode1) .and. IsAWDecay(DecayMode2) ) then
        print *, " DecayMode1=",DecayMode1," and DecayMode2=",DecayMode2," are not allowed."
-       stop
+       stop 1
     endif
 
 !     if( IsAZDecay(DecayMode1) .and. IsAPhoton(DecayMode2) ) then
@@ -614,54 +651,53 @@ logical :: SetAnomalousHff, Setkappa
 
     if( IsAWDecay(DecayMode1) .and. IsAZDecay(DecayMode2) ) then
        print *, " DecayMode1=",DecayMode1," and DecayMode2=",DecayMode2," are not allowed."
-       stop
+       stop 1
     endif
 
-    if( IsAWDecay(DecayMode1) .and. IsAPhoton(DecayMode2) ) then
+    if( (IsAWDecay(DecayMode1) .and. IsAPhoton(DecayMode2)) .or. (IsAPhoton(DecayMode1) .and. IsAWDecay(DecayMode2)) ) then
        print *, " DecayMode1=",DecayMode1," and DecayMode2=",DecayMode2," are not allowed."
-       stop
+       stop 1
     endif
 
     if( IsAPhoton(DecayMode1) .and. (IsAZDecay(DecayMode2) .or. IsAWDecay(DecayMode2)) ) then
        print *, " DecayMode1=",DecayMode1," and DecayMode2=",DecayMode2," are not allowed."
        print *, " Please try swapping the decay modes."
-       stop
+       stop 1
     endif
 
     if( IsAPhoton(DecayMode2) .and. (IsAZDecay(DecayMode1) .or. IsAWDecay(DecayMode1)) ) then! require OffXVV=010 for Z+photon
        if( .not. ((.not.OffShellReson) .and. OffShellV1 .and. (.not.OffShellV2)) ) then
           print *, "OffXVV has to be 010 for Z+photon production"
-          stop
+          stop 1
        endif
     endif
 
     if( IsAPhoton(DecayMode2) .and. (.not.IsAPhoton(DecayMode1) .and. .not. IsAZDecay(DecayMode1)) ) then
-       print *, " DecayMode1=",DecayMode1," and DecayMode2=",DecayMode2," are not allowed."
-       stop
+       print *, "DecayMode1=",DecayMode1," and DecayMode2=",DecayMode2," are not allowed."
+       stop 1
     endif
 
     if( IsAPhoton(DecayMode1) .and. (OffShellV1 .or. OffShellV2) ) then
-       print *, " Photons have to be on-shell."
-       stop
+       print *, "Photons have to be on-shell."
+       stop 1
+    endif
+
+    if( IsAZDecay(DecayMode1) .and. IsAPhoton(DecayMode2) .and. .not.SetZgammacoupling .and. .not.Setgammagammacoupling ) then
+        print *, "To decay to Zgamma, you need to set one of the HZgamma (ghzgs*) or Hgammagamma (ghgsgs*) couplings."
+        stop 1
+    endif
+
+    if( IsAPhoton(DecayMode1) .and. IsAPhoton(DecayMode2) .and. .not.Setgammagammacoupling ) then
+        print *, "To decay to gammagamma, you need to set one of the Hgammagamma couplings (ghgsgs*)."
+        stop 1
     endif
 
     if( (DecayMode1.ge.12) .or. (DecayMode2.ge.12) .or. (DecayMode1.lt..0) .or. (DecayMode2.lt.0) ) then
        print *, " DecayMode1=",DecayMode1," and DecayMode2=",DecayMode2," are not allowed."
-       stop
+       stop 1
     endif
 
-    if( ReadLHEFile .and. Process.ne.0  ) then
-        print *, "ReadLHE option is only allowed for spin-0 resonances"
-        stop
-    endif
-    if( ConvertLHEFile .and. Process.ne.0  ) then
-        print *, "ConvertLHE option is only allowed for spin-0 resonances"
-        stop
-    endif
-    if( ReadLHEFile .and. .not. Unweighted ) then
-        print *, "ReadLHE option is only allowed for generating unweighted events"
-        stop
-    endif
+    !lepton filter
 
     if( RequestOS.lt.RequestOSSF ) then
         RequestOS = RequestOSSF
@@ -670,9 +706,13 @@ logical :: SetAnomalousHff, Setkappa
         RequestNLeptons = 2*RequestOS
     endif
 
+    !WriteFailedEvents
+
     if( WriteFailedEvents.lt.0 .or. WriteFailedEvents.gt.2 ) then
         call Error("WriteFailedEvents can only be 0, 1, or 2.  Please see the manual.")
     endif
+
+    !couplings
 
     if( SetAnomalousSpin0gg .and. .not.Setghg2 ) then
         call Error("If you set an anomalous spin 0 gg coupling, you need to explicitly set ghg2 as well")
@@ -3813,13 +3853,20 @@ character :: arg*(500)
             write(TheUnit,"(6X,A,2E16.8,A1)") "ghz2=",ghz2,"i"
             write(TheUnit,"(6X,A,2E16.8,A1)") "ghz3=",ghz3,"i"
             write(TheUnit,"(6X,A,2E16.8,A1)") "ghz4=",ghz4,"i"
-            if( (includeGammaStar .and. ((IsAZDecay(DecayMode1)) .or. (IsAZDecay(DecayMode2)))) ) then
-                write(TheUnit,"(6X,A,2E16.8,A1)") "ghzgs2=",ghzgs2,"i"
-                write(TheUnit,"(6X,A,2E16.8,A1)") "ghzgs3=",ghzgs3,"i"
-                write(TheUnit,"(6X,A,2E16.8,A1)") "ghzgs4=",ghzgs4,"i"
-                write(TheUnit,"(6X,A,2E16.8,A1)") "ghgsgs2=",ghgsgs2,"i"
-                write(TheUnit,"(6X,A,2E16.8,A1)") "ghgsgs3=",ghgsgs3,"i"
-                write(TheUnit,"(6X,A,2E16.8,A1)") "ghgsgs4=",ghgsgs4,"i"
+            if( includeGammaStar .or. IsAPhoton(DecayMode2) ) then
+                if( includeGammaStar .or. IsAZDecay(DecayMode1) ) then
+                    write(TheUnit,"(6X,A,2E16.8,A1)") "ghzgs2=",ghzgs2,"i"
+                    write(TheUnit,"(6X,A,2E16.8,A1)") "ghzgs3=",ghzgs3,"i"
+                    write(TheUnit,"(6X,A,2E16.8,A1)") "ghzgs4=",ghzgs4,"i"
+                endif
+                if( includeGammaStar .or. IsAPhoton(DecayMode1) ) then
+                    write(TheUnit,"(6X,A,2E16.8,A1)") "ghgsgs2=",ghgsgs2,"i"
+                    write(TheUnit,"(6X,A,2E16.8,A1)") "ghgsgs3=",ghgsgs3,"i"
+                    write(TheUnit,"(6X,A,2E16.8,A1)") "ghgsgs4=",ghgsgs4,"i"
+                endif
+                if( includeGammaStar) then
+                    write(TheUnit,"(6X,A,F8.2,A)") "m(gammastar) >= ", MPhotonCutoff/GeV, " GeV"
+                endif
             endif
             if( cdabs(ghz1_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz1_prime= ",ghz1_prime ,"i,","Lambda_z1=",Lambda_z1*100d0
             if( cdabs(ghz1_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz1_prime2=",ghz1_prime2,"i,","Lambda_z1=",Lambda_z1*100d0
