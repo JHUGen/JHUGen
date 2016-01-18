@@ -371,10 +371,10 @@ logical :: help, success, SetLastArgument, SetAnomalousSpin0, Setg1, SetAnomalou
     call ReadCommandLineArgument(arg, "deltaRcut", success, Rjet)
     call ReadCommandLineArgument(arg, "mJJcut", success, mJJcut, SetLastArgument)
     if( SetLastArgument ) mJJcut = mJJcut*GeV
-    call ReadCommandLineArgument(arg, "VBF_m4l_min", success, VBF_4ml_minmax(1), SetLastArgument)
-    if( SetLastArgument ) VBF_4ml_minmax(1) = VBF_4ml_minmax(1)*GeV
-    call ReadCommandLineArgument(arg, "VBF_m4l_max", success, VBF_4ml_minmax(2), SetLastArgument)
-    if( SetLastArgument ) VBF_4ml_minmax(2) = VBF_4ml_minmax(2)*GeV
+    call ReadCommandLineArgument(arg, "VBF_m4l_min", success, m4l_minmax(1), SetLastArgument)
+    if( SetLastArgument ) m4l_minmax(1) = m4l_minmax(1)*GeV
+    call ReadCommandLineArgument(arg, "VBF_m4l_max", success, m4l_minmax(2), SetLastArgument)
+    if( SetLastArgument ) m4l_minmax(2) = m4l_minmax(2)*GeV
 
     if( .not.success ) then
         call Error("Unknown command line argument: " // trim(arg))
