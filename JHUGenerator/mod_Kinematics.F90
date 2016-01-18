@@ -4725,10 +4725,10 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
 IF( iChannel.EQ.1 ) THEN! 34 + WW-->H-->ZZ
 
 !  masses
-   if( VBF_4ml_minmax(1).lt.0d0 ) then
+   if( m4l_minmax(1).lt.0d0 ) then
       Jac1 = s_channel_propagator(M_Reso**2,RescaleWidth*Ga_Reso,0d0,Energy**2,xRnd(1),s56)                                                    !  int d(s56)    = Higgs resonance
    else
-      Jac1 = k_l(xRnd(1),VBF_4ml_minmax(1)**2,min(Energy**2,VBF_4ml_minmax(2)**2),s56)                                            !  int d(s56)    = linear mapping
+      Jac1 = k_l(xRnd(1),m4l_minmax(1)**2,min(Energy**2,m4l_minmax(2)**2),s56)                                            !  int d(s56)    = linear mapping
    endif
    Jac2 = k_l(xRnd(2),s56,Energy**2,s3H)                                                                                          !  int d(s3H)     
    Jac3 = s_channel_propagator(M_Z**2,Ga_Z,0d0,s56,xRnd(3),s78)                                                                   !  int d(s78)    = Z1
@@ -4745,10 +4745,10 @@ IF( iChannel.EQ.1 ) THEN! 34 + WW-->H-->ZZ
 ELSEIF( iChannel.EQ.3 ) THEN! 34 + ZZ-->H-->ZZ
 
 !  masses
-   if( VBF_4ml_minmax(1).lt.0d0 ) then
+   if( m4l_minmax(1).lt.0d0 ) then
       Jac1 = s_channel_propagator(M_Reso**2,RescaleWidth*Ga_Reso,0d0,Energy**2,xRnd(1),s56)                                                    !  int d(s56)    = Higgs resonance
    else
-      Jac1 = k_l(xRnd(1),VBF_4ml_minmax(1)**2,min(Energy**2,VBF_4ml_minmax(2)**2),s56)                                            !  int d(s56)    = linear mapping
+      Jac1 = k_l(xRnd(1),m4l_minmax(1)**2,min(Energy**2,m4l_minmax(2)**2),s56)                                            !  int d(s56)    = linear mapping
    endif    
    Jac2 = k_l(xRnd(2),s56,Energy**2,s3H)                                                                                          !  int d(s3H)     
    Jac3 = s_channel_propagator(M_Z**2,Ga_Z,0d0,s56,xRnd(3),s78)                                                                   !  int d(s78)    = Z1
@@ -4765,10 +4765,10 @@ ELSEIF( iChannel.EQ.3 ) THEN! 34 + ZZ-->H-->ZZ
 ELSEIF( iChannel.EQ.2 ) THEN! 43 + WW-->H-->ZZ   
 
 !  masses
-   if( VBF_4ml_minmax(1).lt.0d0 ) then
+   if( m4l_minmax(1).lt.0d0 ) then
       Jac1 = s_channel_propagator(M_Reso**2,RescaleWidth*Ga_Reso,0d0,Energy**2,xRnd(1),s56)                                                    !  int d(s56)    = Higgs resonance
    else
-      Jac1 = k_l(xRnd(1),VBF_4ml_minmax(1)**2,min(Energy**2,VBF_4ml_minmax(2)**2),s56)                                            !  int d(s56)    = linear mapping
+      Jac1 = k_l(xRnd(1),m4l_minmax(1)**2,min(Energy**2,m4l_minmax(2)**2),s56)                                            !  int d(s56)    = linear mapping
    endif
    Jac2 = k_l(xRnd(2),s56,Energy**2,s4H)                                                                                          !  int d(s4H)     
    Jac3 = s_channel_propagator(M_Z**2,Ga_Z,0d0,s56,xRnd(3),s78)                                                                   !  int d(s78)    = Z1
@@ -4785,10 +4785,10 @@ ELSEIF( iChannel.EQ.2 ) THEN! 43 + WW-->H-->ZZ
 ELSEIF( iChannel.EQ.4 ) THEN! 43 + ZZ-->H-->ZZ   
 
 !  masses
-   if( VBF_4ml_minmax(1).lt.0d0 ) then
+   if( m4l_minmax(1).lt.0d0 ) then
       Jac1 = s_channel_propagator(M_Reso**2,RescaleWidth*Ga_Reso,0d0,Energy**2,xRnd(1),s56)                                                    !  int d(s56)    = Higgs resonance
    else
-      Jac1 = k_l(xRnd(1),VBF_4ml_minmax(1)**2,min(Energy**2,VBF_4ml_minmax(2)**2),s56)                                            !  int d(s56)    = linear mapping
+      Jac1 = k_l(xRnd(1),m4l_minmax(1)**2,min(Energy**2,m4l_minmax(2)**2),s56)                                            !  int d(s56)    = linear mapping
    endif  
    Jac2 = k_l(xRnd(2),s56,Energy**2,s4H)                                                                                          !  int d(s4H)     
    Jac3 = s_channel_propagator(M_Z**2,Ga_Z,0d0,s56,xRnd(3),s78)                                                                   !  int d(s78)    = Z1
