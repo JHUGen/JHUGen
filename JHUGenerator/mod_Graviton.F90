@@ -504,7 +504,7 @@ enddo
       complex(dp) :: e1_q3,e1_q4,e2_q3,e2_q4
       complex(dp) :: e3_q4,e4_q3
       complex(dp) :: q1(4),q2(4),q3(4),q4(4),q(4)
-      complex(dp) :: e1(4),e2(4),e3(4),e4(4)
+      complex(dp) :: e1(4),e2(4),e3(4),e4(4),abr1
       complex(dp) :: yyy1,yyy2,yyy3,yyy41,yyy42,yyy5,yyy6,yyy7,yyy4
       real(dp) :: q34,MG,MZ3,MZ4
       real(dp) :: rr
@@ -631,7 +631,7 @@ enddo
 
 
 
-!     new code with c41 c42 coupligs
+! !     new code with c41 c42 coupligs
       res =&
      & q1_e3*e1_e4*yyy1 - q1_e3*e1_q3*e4_q3*yyy41 + q1_e4*e1_e3*yyy1 + &
      & q1_e4*e1_q3*e3_q4*yyy42 - q1_q3*e1_e3*e4_q3*yyy41 + q1_q3*e1_e4*&
@@ -671,6 +671,31 @@ enddo
      & q3,q4)*e1_q3*MG**(-2)*MZ3**2*yyy5 + et1(e3,e4,q3,q4)*e1_q3*yyy5
 
 ! print *, "res new QQB",res
+
+
+
+! ! ! ! ! ! ! ! ! ! ! ! ! ! !  SAME AS ABOVE BUT SHORTER ONLY CHECKED FOR DEFAULT COUPLINGS  ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! 
+
+!        abr1 = (MG**2 + MZ3**2 - MZ4**2 + 4*q1_q3)
+! 
+!         res =  (e1_e3*(4*yyy1*q1_e4 + e4_q3*(2*yyy1 - (MG**2 + MZ3**2 - MZ4**2)*yyy41 - 4*yyy41*q1_q3)) +    & 
+!           e1_e4*(4*yyy1*q1_e3 + e3_q4*(2*yyy1 + (MG**2 + MZ3**2 - MZ4**2)*yyy42 + 4*yyy42*q1_q3)) +    & 
+!           2*e1_q3*(-2*yyy41*e4_q3*q1_e3 + 2*yyy2*e3_e4*abr1 +    & 
+!          e3_q4*(2*yyy42*q1_e4 + e4_q3*(2*(MG**2 + MZ3**2 - MZ4**2)*yyy3 - yyy41 + yyy42 + 8*yyy3*q1_q3))))/4d0 +    & 
+!        (yyy6*abr1*et1(e3,e4,e1,q))/4d0 + (yyy6*e1_q3*et1(e3,e4,q1,q))/2d0    & 
+!       - (yyy6*e1_q3*et1(e3,e4,q2,q))/2d0 +    & 
+!        (yyy5*e1_q3*abr1*et1(e3,e4,q3,q4))/MG**2 +    & 
+!        yyy7*((e4_q3*abr1*et1(e1,e3,q,q3))/(4d0*MG**2) -    & 
+!           (e4_q3*abr1*et1(e1,e3,q,q4))/(4d0*MG**2) +    & 
+!           (e3_q4*abr1*et1(e1,e4,q,q3))/(4d0*MG**2) -    & 
+!           (e3_q4*abr1*et1(e1,e4,q,q4))/(4d0*MG**2)    & 
+!          + (e1_q3*e4_q3*et1(q1,e3,q,q3))/(2d0*MG**2) -    & 
+!           (e1_q3*e4_q3*et1(q1,e3,q,q4))/(2d0*MG**2) + (e1_q3*e3_q4*et1(q1,e4,q,q3))/(2d0*MG**2) -    & 
+!           (e1_q3*e3_q4*et1(q1,e4,q,q4))/(2d0*MG**2) - (e1_q3*e4_q3*et1(q2,e3,q,q3))/(2d0*MG**2) +    & 
+!           (e1_q3*e4_q3*et1(q2,e3,q,q4))/(2d0*MG**2) - (e1_q3*e3_q4*et1(q2,e4,q,q3))/(2d0*MG**2) +    & 
+!           (e1_q3*e3_q4*et1(q2,e4,q,q4))/(2d0*MG**2))
+
+! print *, "res newer  ",res
 ! pause
 
       end subroutine qqGZZampl
@@ -697,7 +722,7 @@ enddo
       complex(dp) :: q1(4),q2(4),q3(4),q4(4),q(4)
       complex(dp) :: e1(4),e2(4),e3(4),e4(4)
       complex(dp) :: xxx1,xxx2,xxx3,xxx4,yyy1,yyy2,yyy3,yyy4,yyy41,yyy42,yyy5,yyy6
-      complex(dp) :: yyy7
+      complex(dp) :: yyy7,abr1
       real(dp) :: q34,MZ3,MZ4,MG
       logical :: new
       real(dp) :: rr_gam, rr
@@ -1002,7 +1027,7 @@ enddo
 !           ,q3,q4)*e1_e2*MZ3**2*yyy5*xxx1 + 2.D0/3.D0*et1(e3,e4,q3,q4)* &
 !           e1_e2*MG**2*yyy5*xxx2 + 1.D0/3.D0*et1(e3,e4,q3,q4)*e1_e2* &
 !           MG**2*yyy5*xxx1 + 4.D0*et1(e3,e4,q3,q4)*e1_q3*e2_q3*yyy5*xxx1
-
+! 
 ! print *, "old res GG",res
 
 
@@ -1220,9 +1245,55 @@ enddo
         &    et1(e3,e4,q3,q4)*e1_q3*e2_q3*yyy5*xxx1
 
 
-! print *, "new res GG",res
+! print *, "new  ",res
+
+
+! ! ! ! ! ! ! ! ! ! ! ! ! ! !  SAME AS ABOVE BUT SHORTER ONLY CHECKED FOR DEFAULT COUPLINGS  ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! 
+! 
+!         abr1 = MG**2 + MZ3**2 - MZ4**2 + 4*q1_q3
+! 
+!         res =  MG**2*xxx1*(e1_e4*(yyy1*e2_e3 + yyy42*e2_q3*e3_q4) + e1_e3*(yyy1*e2_e4 - yyy41*e2_q3*e4_q3) + &
+!            e1_q3*(yyy42*e2_e4*e3_q4 - yyy41*e2_e3*e4_q3 + 4*e2_q3*(yyy2*e3_e4 + yyy3*e3_q4*e4_q3))) + &
+!         e1_e2*((xxx1*((MG**4*yyy2 + (MZ3**2 - MZ4**2)**2*yyy2 - 2*MG**2*(yyy1 + (MZ3**2 + MZ4**2)*yyy2))*e3_e4 + &
+!                 (2*yyy1 + MG**4*yyy3 + (MZ3 - MZ4)*(MZ3 + MZ4)*((MZ3 - MZ4)*(MZ3 + MZ4)*yyy3 - yyy41 + yyy42) - MG**2*(2*(MZ3**2 + MZ4**2)*yyy3 + yyy41 + yyy42))* &
+!                  e3_q4*e4_q3))/3d0 + (2*xxx2*(3*q1_e3*((2*yyy1 - abr1*yyy41)*e4_q3 + 4*yyy1*q1_e4) + &
+!                 e3_e4*(abr1**2*yyy2 + abr1*(yyy1 + 2*MZ3**2*yyy2) - (MZ3 - MZ4)*(MZ3 + MZ4)*(yyy1 + 2*MZ3**2*yyy2) - &
+!                    4*q1_q3*(yyy1 - abr1*yyy2 + 2*MZ3**2*yyy2 + 8*yyy2*q1_q3) + 24*yyy2*q1_q3**2) + &
+!                 e3_q4*(3*(2*yyy1 + abr1*yyy42)*q1_e4 + e4_q3* &
+!                     (2*yyy1 + abr1**2*yyy3 - (MZ3 - MZ4)*(MZ3 + MZ4)*(2*MZ3**2*yyy3 + yyy42) + abr1*(2*MZ3**2*yyy3 - yyy41 + 2*yyy42 ) - &
+!                       2*q1_q3*(-2*abr1*yyy3 + 4*MZ3**2*yyy3 + yyy41 + yyy42 + 16*yyy3*q1_q3) + 24*yyy3*q1_q3**2))))/3d0) - &
+!         MG**2*xxx1*yyy6*e2_q3*et1(q,e1,e3,e4) + xxx1*yyy7*e2_q3*e4_q3*et1(q,e1,e3,q3) - xxx1*yyy7*e2_q3*e4_q3*et1(q,e1,e3,q4) + &
+!         xxx1*yyy7*e2_q3*e3_q4*et1(q,e1,e4,q3) - xxx1*yyy7*e2_q3*e3_q4*et1(q,e1,e4,q4) - MG**2*xxx1*yyy6*e1_q3*et1(q,e2,e3,e4) + &
+!         xxx1*yyy7*e1_q3*e4_q3*et1(q,e2,e3,q3) - xxx1*yyy7*e1_q3*e4_q3*et1(q,e2,e3,q4) + xxx1*yyy7*e1_q3*e3_q4*et1(q,e2,e4,q3) - &
+!         xxx1*yyy7*e1_q3*e3_q4*et1(q,e2,e4,q4) + et1(q,e3,e4,q3)* &
+!          (((MG**2*xxx1*yyy6)/3d0 - (MG**2*xxx2*yyy6)/3d0)*e1_e2 - (xxx3*yyy6*et1(q1,q2,e1,e2))/3d0) + &
+!         et1(q,e3,e4,q4)*((-(MG**2*xxx1*yyy6)/3d0 + (MG**2*xxx2*yyy6)/3d0)*e1_e2 + (xxx3*yyy6*et1(q1,q2,e1,e2))/3d0) + &
+!         et1(q1,q,e3,e4)*(abr1*xxx2*yyy6*e1_e2 + (abr1*xxx3*yyy6*et1(q1,q2,e1,e2))/MG**2) + &
+!         et1(q1,q,e4,q3)*(-((abr1*xxx2*yyy7*e1_e2*e3_q4)/MG**2) - (abr1*xxx3*yyy7*e3_q4*et1(q1,q2,e1,e2))/MG**4) + &
+!         et1(q1,q,e4,q4)*((abr1*xxx2*yyy7*e1_e2*e3_q4)/MG**2 + (abr1*xxx3*yyy7*e3_q4*et1(q1,q2,e1,e2))/MG**4) + &
+!         et1(q1,q,e3,q3)*(-((abr1*xxx2*yyy7*e1_e2*e4_q3)/MG**2) - (abr1*xxx3*yyy7*e4_q3*et1(q1,q2,e1,e2))/MG**4) + &
+!         et1(q1,q,e3,q4)*((abr1*xxx2*yyy7*e1_e2*e4_q3)/MG**2 + (abr1*xxx3*yyy7*e4_q3*et1(q1,q2,e1,e2))/MG**4) + &
+!         et1(e3,e4,q3,q4)*(4*xxx1*yyy5*e1_q3*e2_q3 + e1_e2* &
+!             (((MG - MZ3 - MZ4)*(MG + MZ3 - MZ4)*(MG - MZ3 + MZ4)*(MG + MZ3 + MZ4)*xxx1*yyy5)/(3d0*MG**2) + &
+!               (2*xxx2*yyy5*(abr1**2 + 2*abr1*MZ3**2 - 2*MZ3**4 + 2*MZ3**2*MZ4**2 + 4*(abr1 - 2*MZ3**2 - 8*q1_q3)*q1_q3 + 24*q1_q3**2))/(3d0*MG**2)) + &
+!            (2*xxx3*yyy5*(abr1**2 + 2*abr1*MZ3**2 - 2*MZ3**4 + 2*MZ3**2*MZ4**2 + 4*(abr1 - 2*MZ3**2 - 8*q1_q3)*q1_q3 + 24*q1_q3**2)*et1(q1,q2,e1,e2))/ &
+!             (3d0*MG**4)) - abr1*xxx2*yyy6*e1_e2*et1(q2,q,e3,e4) + (abr1*xxx2*yyy7*e1_e2*e4_q3*et1(q2,q,e3,q3))/MG**2 - &
+!         (abr1*xxx2*yyy7*e1_e2*e4_q3*et1(q2,q,e3,q4))/MG**2 + (abr1*xxx2*yyy7*e1_e2*e3_q4*et1(q2,q,e4,q3))/MG**2 - &
+!         (abr1*xxx2*yyy7*e1_e2*e3_q4*et1(q2,q,e4,q4))/MG**2 + &
+!         et1(q1,q2,e1,e2)*((2*xxx3*(3*q1_e3*((2*yyy1 - abr1*yyy41)*e4_q3 + 4*yyy1*q1_e4) + &
+!                 e3_e4*(abr1**2*yyy2 + abr1*(yyy1 + 2*MZ3**2*yyy2) - (MZ3 - MZ4)*(MZ3 + MZ4)*(yyy1 + 2*MZ3**2*yyy2) - &
+!                    4*q1_q3*(yyy1 - abr1*yyy2 + 2*MZ3**2*yyy2 + 8*yyy2*q1_q3) + 24*yyy2*q1_q3**2) + &
+!                 e3_q4*(3*(2*yyy1 + abr1*yyy42)*q1_e4 + e4_q3* &
+!                     (2*yyy1 + abr1**2*yyy3 - (MZ3 - MZ4)*(MZ3 + MZ4)*(2*MZ3**2*yyy3 + yyy42) + abr1*(2*MZ3**2*yyy3 - yyy41 + 2*yyy42) - &
+!                       2*q1_q3*(-2*abr1*yyy3 + 4*MZ3**2*yyy3 + yyy41 + yyy42 + 16*yyy3*q1_q3) + 24*yyy3*q1_q3**2))))/(3d0*MG**2) - &
+!            (abr1*xxx3*yyy6*et1(q2,q,e3,e4))/MG**2 + (abr1*xxx3*yyy7*e4_q3*et1(q2,q,e3,q3))/MG**4 - (abr1*xxx3*yyy7*e4_q3*et1(q2,q,e3,q4))/MG**4 +  &
+!            (abr1*xxx3*yyy7*e3_q4*et1(q2,q,e4,q3))/MG**4 - (abr1*xxx3*yyy7*e3_q4*et1(q2,q,e4,q4))/MG**4)
+
+
+! print *, "newer",res
 ! pause
 
+! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! 
 
      else
 
