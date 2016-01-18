@@ -225,7 +225,10 @@ use ModMisc
 implicit none
 character :: arg*(500), argmatch*(30)
 integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg
-logical :: help, success, SetLastArgument, SetAnomalousSpin0, Setg1, SetAnomalousSpin0ggH, Setghg2, SetAnomalousSpin2, Seta2, Setb2, interfSet
+logical :: help, success, SetLastArgument, interfSet
+logical :: SetAnomalousSpin0gg, Setghg2, SetAnomalousSpin0ZZ, Setghz1
+logical :: SetAnomalousSpin1qq, Setspin1qqleft, Setspin1qqright, SetAnomalousSpin1ZZ, Set1minus
+logical :: SetAnomalousSpin2gg, Seta2, SetAnomalousSpin2qq, Setspin2qqleft, Setspin2qqright,SetAnomalousSpin2ZZ, Setb2
 
    help = .false.
 
@@ -278,12 +281,21 @@ logical :: help, success, SetLastArgument, SetAnomalousSpin0, Setg1, SetAnomalou
    FacScheme = kRenFacScheme_default
    RenScheme = kRenFacScheme_default
 
-   SetAnomalousSpin0=.false.
-   Setg1=.false.
-   SetAnomalousSpin0ggH=.false.
+   SetAnomalousSpin0gg=.false.
    Setghg2=.false.
-   SetAnomalousSpin2=.false.
+   SetAnomalousSpin0ZZ=.false.
+   Setghz1=.false.
+   SetAnomalousSpin1qq=.false.
+   Setspin1qqleft=.false.
+   Setspin1qqright=.false.
+   SetAnomalousSpin1ZZ=.false.
+   Set1minus=.false.
+   SetAnomalousSpin2gg=.false.
    Seta2=.false.
+   SetAnomalousSpin2qq=.false.
+   Setspin2qqleft=.false.
+   Setspin2qqright=.false.
+   SetAnomalousSpin2ZZ=.false.
    Setb2=.false.
 
    DataFile="./data/output"
@@ -345,25 +357,94 @@ logical :: help, success, SetLastArgument, SetAnomalousSpin0, Setg1, SetAnomalou
     call ReadCommandLineArgument(arg, "CalcPMZZ", success, CalcPMZZ)
     call ReadCommandLineArgument(arg, "WriteFailedEvents", success, WriteFailedEvents)
 
-    !anomalous couplings - only the most common ones for now
+    !anomalous couplings
     !If any anomalous couplings are set, the default ones have to be set explicitly to keep them on or turn them off
     !e.g. just setting ghz4=0.2982,0 is ambiguous if you mean to leave g1 on (so fa3=0.5)
     !                                                      or to turn it off (fa3=1 with a weird prefactor)
-    call ReadCommandLineArgument(arg, "ghz1",        success, ghz1,        success2=SetAnomalousSpin0, success2Re=Setg1)
-    call ReadCommandLineArgument(arg, "ghz2",        success, ghz2,        success2=SetAnomalousSpin0)
-    call ReadCommandLineArgument(arg, "ghz4",        success, ghz4,        success2=SetAnomalousSpin0)
-    call ReadCommandLineArgument(arg, "ghz1_prime2", success, ghz1_prime2, success2=SetAnomalousSpin0)
-
     !spin 0 gg couplings
-    call ReadCommandLineArgument(arg, "ghg2", success, ghg2, success2=SetAnomalousSpin0ggH, success2Re=Setghg2)
-    call ReadCommandLineArgument(arg, "ghg4", success, ghg4, success2=SetAnomalousSpin0ggH)
+    call ReadCommandLineArgument(arg, "ghg2", success, ghg2, success2=SetAnomalousSpin0gg, success2Re=Setghg2)
+    call ReadCommandLineArgument(arg, "ghg3", success, ghg3, success2=SetAnomalousSpin0gg)
+    call ReadCommandLineArgument(arg, "ghg4", success, ghg4, success2=SetAnomalousSpin0gg)
+
+    !spin 0 ZZ couplings
+    call ReadCommandLineArgument(arg, "ghz1", success, ghz1, success2=SetAnomalousSpin0ZZ, success2Re=Setghz1)
+    call ReadCommandLineArgument(arg, "ghz2", success, ghz2, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghz3", success, ghz3, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghz4", success, ghz4, success2=SetAnomalousSpin0ZZ)
+
+    !spin 0 Zgamma couplings
+    call ReadCommandLineArgument(arg, "ghzgs2", success, ghzgs2, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghzgs3", success, ghzgs3, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghzgs4", success, ghzgs4, success2=SetAnomalousSpin0ZZ)
+
+    !spin 0 gammagamma couplings
+    call ReadCommandLineArgument(arg, "ghgsgs2", success, ghgsgs2, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghgsgs3", success, ghgsgs3, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghgsgs4", success, ghgsgs4, success2=SetAnomalousSpin0ZZ)
+
+    !spin 0 momentum dependent couplings
+    call ReadCommandLineArgument(arg, "ghz1_prime", success, ghz1_prime, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghz1_prime2", success, ghz1_prime2, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghz1_prime3", success, ghz1_prime3, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghz1_prime4", success, ghz1_prime4, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghz1_prime5", success, ghz1_prime5, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghz1_prime6", success, ghz1_prime6, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghz1_prime7", success, ghz1_prime7, success2=SetAnomalousSpin0ZZ)
+
+    call ReadCommandLineArgument(arg, "ghz2_prime", success, ghz2_prime, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghz2_prime2", success, ghz2_prime2, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghz2_prime3", success, ghz2_prime3, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghz2_prime4", success, ghz2_prime4, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghz2_prime5", success, ghz2_prime5, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghz2_prime6", success, ghz2_prime6, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghz2_prime7", success, ghz2_prime7, success2=SetAnomalousSpin0ZZ)
+
+    call ReadCommandLineArgument(arg, "ghz3_prime", success, ghz3_prime, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghz3_prime2", success, ghz3_prime2, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghz3_prime3", success, ghz3_prime3, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghz3_prime4", success, ghz3_prime4, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghz3_prime5", success, ghz3_prime5, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghz3_prime6", success, ghz3_prime6, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghz3_prime7", success, ghz3_prime7, success2=SetAnomalousSpin0ZZ)
+
+    call ReadCommandLineArgument(arg, "ghz4_prime", success, ghz4_prime, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghz4_prime2", success, ghz4_prime2, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghz4_prime3", success, ghz4_prime3, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghz4_prime4", success, ghz4_prime4, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghz4_prime5", success, ghz4_prime5, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghz4_prime6", success, ghz4_prime6, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghz4_prime7", success, ghz4_prime7, success2=SetAnomalousSpin0ZZ)
+
+    call ReadCommandLineArgument(arg, "ghzgs1_prime2", success, ghzgs1_prime2, success2=SetAnomalousSpin0ZZ)
+
+    call ReadCommandLineArgument(arg, "cz_q1sq", success, cz_q1sq, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "cz_q2sq", success, cz_q1sq, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "cz_q12sq", success, cz_q1sq, success2=SetAnomalousSpin0ZZ)
+
+    !spin 1
+    call ReadCommandLineArgument(arg, "zprime_qq_left", success, zprime_qq_left, success2=SetAnomalousSpin1qq, success2Re=Setspin1qqleft)
+    call ReadCommandLineArgument(arg, "zprime_qq_right", success, zprime_qq_right, success2=SetAnomalousSpin1qq, success2Re=Setspin1qqright)
+    call ReadCommandLineArgument(arg, "zprime_zz_1", success, zprime_zz_1, success2=SetAnomalousSpin1ZZ, success2Re=Set1minus)
+    call ReadCommandLineArgument(arg, "zprime_zz_2", success, zprime_zz_2, success2=SetAnomalousSpin1ZZ)
 
     !spin 2
-    call ReadCommandLineArgument(arg, "a2", success, a2, success2=SetAnomalousSpin2, success2Re=Seta2)
-    call ReadCommandLineArgument(arg, "b2", success, b2, success2=SetAnomalousSpin2, success2Re=Setb2)
-    call ReadCommandLineArgument(arg, "a1", success, a1, success2=SetAnomalousSpin2)
-    call ReadCommandLineArgument(arg, "b1", success, b1, success2=SetAnomalousSpin2)
-    call ReadCommandLineArgument(arg, "b5", success, b5, success2=SetAnomalousSpin2)
+    call ReadCommandLineArgument(arg, "a1", success, a1, success2=SetAnomalousSpin2gg)
+    call ReadCommandLineArgument(arg, "a2", success, a2, success2=SetAnomalousSpin2gg, success2Re=Seta2)
+    call ReadCommandLineArgument(arg, "a3", success, a3, success2=SetAnomalousSpin2gg)
+    call ReadCommandLineArgument(arg, "a4", success, a4, success2=SetAnomalousSpin2gg)
+    call ReadCommandLineArgument(arg, "a5", success, a5, success2=SetAnomalousSpin2gg)
+    call ReadCommandLineArgument(arg, "graviton_qq_left", success, graviton_qq_left, success2=SetAnomalousSpin2qq, success2Re=Setspin2qqleft)
+    call ReadCommandLineArgument(arg, "graviton_qq_right", success, graviton_qq_right, success2=SetAnomalousSpin2qq, success2Re=Setspin2qqright)
+    call ReadCommandLineArgument(arg, "b1", success, b1, success2=SetAnomalousSpin2ZZ)
+    call ReadCommandLineArgument(arg, "b2", success, b2, success2=SetAnomalousSpin2ZZ, success2Re=Setb2)
+    call ReadCommandLineArgument(arg, "b3", success, b3, success2=SetAnomalousSpin2ZZ)
+    call ReadCommandLineArgument(arg, "b4", success, b4, success2=SetAnomalousSpin2ZZ)
+    call ReadCommandLineArgument(arg, "b5", success, b5, success2=SetAnomalousSpin2ZZ)
+    call ReadCommandLineArgument(arg, "b6", success, b6, success2=SetAnomalousSpin2ZZ)
+    call ReadCommandLineArgument(arg, "b7", success, b7, success2=SetAnomalousSpin2ZZ)
+    call ReadCommandLineArgument(arg, "b8", success, b8, success2=SetAnomalousSpin2ZZ)
+    call ReadCommandLineArgument(arg, "b9", success, b9, success2=SetAnomalousSpin2ZZ)
+    call ReadCommandLineArgument(arg, "b10", success, b10, success2=SetAnomalousSpin2ZZ)
 
     !jet cuts
     call ReadCommandLineArgument(arg, "pTjetcut", success, pTjetcut, SetLastArgument)
@@ -541,14 +622,26 @@ logical :: help, success, SetLastArgument, SetAnomalousSpin0, Setg1, SetAnomalou
         call Error("WriteFailedEvents can only be 0, 1, or 2.  Please see the manual.")
     endif
 
-    if( SetAnomalousSpin0.and. .not.Setg1 ) then
-        call Error("If you set an anomalous spin 0 coupling, you need to explicitly set ghz1 as well")
-    endif
-    if( SetAnomalousSpin0ggH.and. .not.Setghg2 ) then
+    if( SetAnomalousSpin0gg .and. .not.Setghg2 ) then
         call Error("If you set an anomalous spin 0 gg coupling, you need to explicitly set ghg2 as well")
     endif
-    if( SetAnomalousSpin2 .and. .not.(Seta2.and.Setb2) ) then
-        call Error("If you set an anomalous spin 2 coupling, you need to explicitly set a2 and b2 as well")
+    if( SetAnomalousSpin0ZZ .and. .not.Setghz1 ) then
+        call Error("If you set an anomalous spin 0 ZZ coupling, you need to explicitly set ghz1 as well")
+    endif
+    if( SetAnomalousSpin1qq .and. .not.(Setspin1qqleft.and.Setspin1qqright) ) then
+        call Error("If you set an anomalous spin 1 qq coupling, you need to set both zprime_qq_left and zprime_qq_right")
+    endif
+    if( SetAnomalousSpin1ZZ .and. .not.Set1minus ) then
+        call Error("If you set an anomalous spin 1 ZZ coupling, you need to explicitly set zprime_zz_1 as well")
+    endif
+    if( SetAnomalousSpin2gg .and. .not.Seta2 ) then
+        call Error("If you set an anomalous spin 2 gg coupling, you need to explicitly set a2 as well")
+    endif
+    if( SetAnomalousSpin2qq .and. .not.(Setspin2qqleft.and.Setspin2qqright) ) then
+        call Error("If you set an anomalous spin 2 qq coupling, you need to explicitly set both graviton_qq_left and graviton_qq_right")
+    endif
+    if( SetAnomalousSpin2ZZ .and. .not.Setb2 ) then
+        call Error("If you set an anomalous spin 2 ZZ coupling, you need to explicitly set b2 as well")
     endif
 
 return
