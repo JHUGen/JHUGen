@@ -229,6 +229,7 @@ logical :: help, success, SetLastArgument, interfSet
 logical :: SetAnomalousSpin0gg, Setghg2, SetAnomalousSpin0ZZ, Setghz1
 logical :: SetAnomalousSpin1qq, Setspin1qqleft, Setspin1qqright, SetAnomalousSpin1ZZ, Set1minus
 logical :: SetAnomalousSpin2gg, Seta2, SetAnomalousSpin2qq, Setspin2qqleft, Setspin2qqright,SetAnomalousSpin2ZZ, Setb2
+logical :: SetAnomalousHff, Setkappa
 
    help = .false.
 
@@ -297,6 +298,8 @@ logical :: SetAnomalousSpin2gg, Seta2, SetAnomalousSpin2qq, Setspin2qqleft, Sets
    Setspin2qqright=.false.
    SetAnomalousSpin2ZZ=.false.
    Setb2=.false.
+   SetAnomalousHff=.false.
+   Setkappa=.false.
 
    DataFile="./data/output"
 
@@ -490,6 +493,10 @@ logical :: SetAnomalousSpin2gg, Seta2, SetAnomalousSpin2qq, Setspin2qqleft, Sets
     call ReadCommandLineArgument(arg, "b8", success, b8, success2=SetAnomalousSpin2ZZ)
     call ReadCommandLineArgument(arg, "b9", success, b9, success2=SetAnomalousSpin2ZZ)
     call ReadCommandLineArgument(arg, "b10", success, b10, success2=SetAnomalousSpin2ZZ)
+
+    !Hff couplings
+    call ReadCommandLineArgument(arg, "kappa", success, kappa, success2=SetAnomalousHff, success2Re=Setkappa)
+    call ReadCommandLineArgument(arg, "kappa_tilde", success, kappa_tilde, success2=SetAnomalousHff)
 
     !jet cuts
     call ReadCommandLineArgument(arg, "pTjetcut", success, pTjetcut, SetLastArgument)
@@ -687,6 +694,9 @@ logical :: SetAnomalousSpin2gg, Seta2, SetAnomalousSpin2qq, Setspin2qqleft, Sets
     endif
     if( SetAnomalousSpin2ZZ .and. .not.Setb2 ) then
         call Error("If you set an anomalous spin 2 ZZ coupling, you need to explicitly set b2 as well")
+    endif
+    if( SetAnomalousHff .and. .not.Setkappa ) then
+        call Error("If you set an anomalous Hff coupling, you need to explicitly set kappa as well")
     endif
     if( distinguish_HWWcouplings .and. Process.ne.60 .and. Process.ne.66 ) then
         call Error("The separate HWW couplings are only used for VBF.  For H->WW decay or WH production, please set ghz* instead.")
