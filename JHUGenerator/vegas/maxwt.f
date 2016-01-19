@@ -5,6 +5,3 @@ c --- if unweighting is selected :
       logical unweight
       logical skipnt
       common/maxwt/wtmin,wtmax,newwt,evtgen,skipnt,unweight
-
-c --- Useful local variables where weights are being checked :
-      double precision wtabs
