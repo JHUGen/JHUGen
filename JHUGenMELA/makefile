@@ -117,7 +117,7 @@ MCFMforVBF: $(MCFM_Dep)
 	@echo " compiling MCFM WBF files with ifort to link with JHUGenerator"
 	@echo " compiling with ifort causes error messages in the testprograms"
 #	ifort  -O0 -implicitnone -zero -check bounds -check pointer -warn interfaces -ftrapuv  -diag-disable remark -debug extended -g -traceback -fpe0 -check uninit  -c -I./WBFZZ_MCFM/src/Inc/ $(MCFM_Dep)
-	ifort  -O2 -c -I./WBFZZ_MCFM/src/Inc/ $(MCFM_Dep)
+	$(fcomp) -c -I./WBFZZ_MCFM/src/Inc/ $(MCFM_Dep)
 
 clean:
 	@echo " deleting object files"
