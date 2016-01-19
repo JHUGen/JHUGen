@@ -554,7 +554,7 @@ logical :: SetAnomalousHff, Setkappa
 #if useLHAPDF==1
     if( LHAPDFString.eq."" ) then
        print *, "Need to specify pdf file name in command line argument LHAPDF"
-       stop    
+       stop 1
     endif
 #endif    
     
