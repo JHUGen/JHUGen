@@ -224,7 +224,15 @@ use ModKinematics
 use ModMisc
 implicit none
 character :: arg*(500)
-integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
+integer :: NumArgs,NArg,OffShell_XVV
+logical :: help, success, SetLastArgument, interfSet
+logical :: SetAnomalousSpin0gg, Setghg2, SetAnomalousSpin0ZZ, Setghz1
+logical :: SetZgammacoupling, Setgammagammacoupling
+logical :: SetAnomalousSpin1qq, Setspin1qqleft, Setspin1qqright, SetAnomalousSpin1ZZ, Set1minus
+logical :: SetAnomalousSpin2gg, Seta2, SetAnomalousSpin2qq, Setspin2qqleft, Setspin2qqright,SetAnomalousSpin2ZZ, Setb2
+logical :: SetAnomalousHff, Setkappa
+
+   help = .false.
 
    Collider=1
    VegasIt1=-1
@@ -267,13 +275,34 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
    CountTauAsAny = .true.
    LHAPDFString = ""
    LHAPDFMember = 0
-   iinterf = -1
+   interfSet = .false.
    WriteFailedEvents=0
 
    MuFacMultiplier = 1d0
    MuRenMultiplier = 1d0
    FacScheme = kRenFacScheme_default
    RenScheme = kRenFacScheme_default
+
+   SetAnomalousSpin0gg=.false.
+   Setghg2=.false.
+   SetAnomalousSpin0ZZ=.false.
+   Setghz1=.false.
+   SetZgammacoupling=.false.
+   Setgammagammacoupling=.false.
+   SetAnomalousSpin1qq=.false.
+   Setspin1qqleft=.false.
+   Setspin1qqright=.false.
+   SetAnomalousSpin1ZZ=.false.
+   Set1minus=.false.
+   SetAnomalousSpin2gg=.false.
+   Seta2=.false.
+   SetAnomalousSpin2qq=.false.
+   Setspin2qqleft=.false.
+   Setspin2qqright=.false.
+   SetAnomalousSpin2ZZ=.false.
+   Setb2=.false.
+   SetAnomalousHff=.false.
+   Setkappa=.false.
 
    DataFile="./data/output"
 
@@ -284,146 +313,221 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
    NumArgs = COMMAND_ARGUMENT_COUNT()
 #endif
 
-   CountArg = 0
    do NArg=1,NumArgs
     call GetArg(NArg,arg)
-    if( arg(1:4).eq."help" .or. arg(1:4).eq."Help" .or. arg(1:4).eq."HELP") then
+    success = .false.
+    call ReadCommandLineArgument(arg, "help", success, help)
+    if( help ) then
         call PrintCommandLineArgs()
-        stop
-    elseif( arg(1:9).eq."Collider=" ) then
-        read(arg(10:10),*) Collider
-        CountArg = CountArg + 1
-    elseif( arg(1:7).eq."PDFSet=" ) then
-        read(arg(8:10),*) PDFSet
-        CountArg = CountArg + 1
-    elseif( arg(1:7).eq."LHAPDF=" ) then
-        read(arg(8:107),"(A)") LHAPDFString
-        CountArg = CountArg + 1
-    elseif( arg(1:10).eq."LHAPDFMem=" ) then
-        read(arg(11:13),*) LHAPDFMember
-        CountArg = CountArg + 1
-    elseif( arg(1:6).eq."MReso=" ) then
-        read(arg(7:12),*) M_Reso
-        M_Reso = M_Reso*GeV
-        CountArg = CountArg + 1
-    elseif( arg(1:7).eq."GaReso=" ) then
-        read(arg(8:13),*) Ga_Reso
-        Ga_Reso = Ga_Reso*GeV
-        CountArg = CountArg + 1
-    elseif( arg(1:9).eq."VegasNc0=" ) then
-        read(arg(10:17),*) VegasNc0
-        CountArg = CountArg + 1
-    elseif( arg(1:9).eq."VegasNc1=" ) then
-        read(arg(10:17),*) VegasNc1
-        CountArg = CountArg + 1
-    elseif( arg(1:9).eq."VegasNc2=" ) then
-        read(arg(10:17),*) VegasNc2
-        CountArg = CountArg + 1
-    elseif( arg(1:9).eq."PChannel=" ) then
-        read(arg(10:11),*) PChannel
-        CountArg = CountArg + 1
-    elseif( arg(1:9).eq."DataFile=" ) then
-        read(arg(10:500),"(A)") DataFile
-        CountArg = CountArg + 1
-    elseif( arg(1:8).eq."Process=" ) then
-        read(arg(9:11),*) Process
-        CountArg = CountArg + 1
-    elseif( arg(1:11).eq."DecayMode1=" ) then
-        read(arg(12:13),*) DecayMode1
-        CountArg = CountArg + 1
-    elseif( arg(1:11).eq."DecayMode2=" ) then
-        read(arg(12:13),*) DecayMode2
-        CountArg = CountArg + 1
-    elseif( arg(1:10).eq."FacScheme=" ) then
-        read(arg(11:13),*) FacScheme
-        CountArg = CountArg + 1
-    elseif( arg(1:10).eq."RenScheme=" ) then
-        read(arg(11:13),*) RenScheme
-        CountArg = CountArg + 1
-    elseif( arg(1:16).eq."MuFacMultiplier=" ) then
-        read(arg(17:24),*) MuFacMultiplier
-        CountArg = CountArg + 1
-    elseif( arg(1:16).eq."MuRenMultiplier=" ) then
-        read(arg(17:24),*) MuRenMultiplier
-        CountArg = CountArg + 1
-    elseif( arg(1:6).eq."TopDK=" ) then
-        read(arg(7:7),*) TopDecays
-        CountArg = CountArg + 1
-    elseif( arg(1:6).eq."TauDK=" ) then
-        read(arg(7:7),*) TauDecays
-        CountArg = CountArg + 1
-    elseif( arg(1:12).eq."WidthScheme=" ) then
-        read(arg(13:13),*) WidthScheme
-        CountArg = CountArg + 1
-    elseif( arg(1:7) .eq."OffXVV=" ) then
-        read(arg(8:10),*) OffShell_XVV
-        CountArg = CountArg + 1
-    elseif( arg(1:12).eq."FilterNLept=" ) then
-        read(arg(13:13),*) RequestNLeptons
-        CountArg = CountArg + 1
-    elseif( arg(1:14) .eq."FilterOSPairs=" ) then
-        read(arg(15:15),*) RequestOS
-        CountArg = CountArg + 1
-    elseif( arg(1:16) .eq."FilterOSSFPairs=" ) then
-        read(arg(17:17),*) RequestOSSF
-        CountArg = CountArg + 1
-    elseif( arg(1:14) .eq."CountTauAsAny=" ) then
-        read(arg(15:15),*) iargument
-        if( iargument.eq.1 ) then
-            CountTauAsAny = .true.
-        else
-            CountTauAsAny = .false.
-        endif
-        CountArg = CountArg + 1
-    elseif( arg(1:11) .eq."FilterOSSF=" ) then
-        read(arg(12:12),*) iargument
-        write(*,*), "The filtering syntax has changed to become more general.  Please see the manual for more details."
-        if( iargument.eq.1 ) then
-            write(*,*), "Setting FilterOSSFPairs=2"
-            RequestOSSF = 2
-        endif        
-        CountArg = CountArg + 1
-    elseif( arg(1:11) .eq."Unweighted=" ) then
-        read(arg(12:12),*) iargument
-        if( iargument.eq.0 ) then
-            Unweighted = .false.
-        else
-            Unweighted = .true.
-        endif
-        CountArg = CountArg + 1
-    elseif( arg(1:7) .eq."Interf=" ) then
-        read(arg(8:8),*) iinterf
-        CountArg = CountArg + 1
-    elseif( arg(1:8) .eq."ReadLHE=" ) then
-        read(arg(9:500),"(A)") LHEProdFile
-        ReadLHEFile=.true.
-        CountArg = CountArg + 1
-    elseif( arg(1:11) .eq."ConvertLHE=" ) then
-        read(arg(12:500),"(A)") LHEProdFile
-        ConvertLHEFile=.true.
-        CountArg = CountArg + 1
-    elseif( arg(1:9) .eq."ReadCSmax" ) then
-        ReadCSmax=.true.
-        CountArg = CountArg + 1
-    elseif( arg(1:9) .eq."CalcPMZZ" ) then
-        CalcPMZZ=.true.
-        CountArg = CountArg + 1
-    elseif( arg(1:9) .eq."GenEvents" ) then
-        GenerateEvents=.true.
-        Unweighted=.false.
-        CountArg = CountArg + 1
-    elseif( arg(1:18) .eq."WriteFailedEvents=" ) then
-        read(arg(19:19),*) WriteFailedEvents
-        CountArg = CountArg + 1
+        stop 1
+    endif
+    !ReadCommandLineArgument is overloaded, it puts the value into the last argument
+    ! by detecting the type.  It also sets success to .true. if the argument name (before =)
+    ! is correct.
+    call ReadCommandLineArgument(arg, "Collider", success, Collider)
+    call ReadCommandLineArgument(arg, "PDFSet", success, PDFSet)
+    call ReadCommandLineArgument(arg, "LHAPDF", success, LHAPDFString)
+    call ReadCommandLineArgument(arg, "LHAPDFMem", success, LHAPDFMember)
+    call ReadCommandLineArgument(arg, "MReso", success, M_Reso, SetLastArgument)
+    if( SetLastArgument ) M_Reso = M_Reso*GeV
+    call ReadCommandLineArgument(arg, "GaReso", success, Ga_Reso, SetLastArgument)
+    if( SetLastArgument ) Ga_Reso = Ga_Reso*GeV
+    call ReadCommandLineArgument(arg, "VegasNc0", success, VegasNc0)
+    call ReadCommandLineArgument(arg, "VegasNc1", success, VegasNc1)
+    call ReadCommandLineArgument(arg, "VegasNc2", success, VegasNc2)
+    call ReadCommandLineArgument(arg, "PChannel", success, PChannel)
+    call ReadCommandLineArgument(arg, "DataFile", success, DataFile)
+    call ReadCommandLineArgument(arg, "Process", success, Process)
+    call ReadCommandLineArgument(arg, "DecayMode1", success, DecayMode1)
+    call ReadCommandLineArgument(arg, "DecayMode2", success, DecayMode2)
+    call ReadCommandLineArgument(arg, "FacScheme", success, FacScheme)
+    call ReadCommandLineArgument(arg, "RenScheme", success, RenScheme)
+    call ReadCommandLineArgument(arg, "MuFacMultiplier", success, MuFacMultiplier)
+    call ReadCommandLineArgument(arg, "MuRenMultiplier", success, MuRenMultiplier)
+    call ReadCommandLineArgument(arg, "TopDK", success, TopDecays)
+    call ReadCommandLineArgument(arg, "TauDK", success, TauDecays)
+    call ReadCommandLineArgument(arg, "WidthScheme", success, WidthScheme)
+    call ReadCommandLineArgument(arg, "OffXVV", success, OffShell_XVV)
+    call ReadCommandLineArgument(arg, "FilterNLept", success, RequestNLeptons)
+    call ReadCommandLineArgument(arg, "FilterOSPairs", success, RequestOS)
+    call ReadCommandLineArgument(arg, "FilterOSSFPairs", success, RequestOSSF)
+    call ReadCommandLineArgument(arg, "CountTauAsAny", success, CountTauAsAny)
+    call ReadCommandLineArgument(arg, "Unweighted", success, Unweighted)
+    call ReadCommandLineArgument(arg, "Interf", success, includeInterference, success2=interfSet)
+    call ReadCommandLineArgument(arg, "ReadLHE", success, LHEProdFile, success2=ReadLHEFile)
+    call ReadCommandLineArgument(arg, "ConvertLHE", success, LHEProdFile, success2=ConvertLHEFile)
+    call ReadCommandLineArgument(arg, "ReadCSmax", success, ReadCSmax)
+    call ReadCommandLineArgument(arg, "GenEvents", success, GenerateEvents, SetLastArgument)
+    if( SetLastArgument ) Unweighted = .false.
+    call ReadCommandLineArgument(arg, "CalcPMZZ", success, CalcPMZZ)
+    call ReadCommandLineArgument(arg, "WriteFailedEvents", success, WriteFailedEvents)
+
+    !anomalous couplings
+    !If any anomalous couplings are set, the default ones have to be set explicitly to keep them on or turn them off
+    !e.g. just setting ghz4=0.2982,0 is ambiguous if you mean to leave g1 on (so fa3=0.5)
+    !                                                      or to turn it off (fa3=1 with a weird prefactor)
+    !spin 0 gg couplings
+    call ReadCommandLineArgument(arg, "ghg2", success, ghg2, success2=SetAnomalousSpin0gg, success3=Setghg2)
+    call ReadCommandLineArgument(arg, "ghg3", success, ghg3, success2=SetAnomalousSpin0gg)
+    call ReadCommandLineArgument(arg, "ghg4", success, ghg4, success2=SetAnomalousSpin0gg)
+
+    !spin 0 ZZ couplings
+    call ReadCommandLineArgument(arg, "ghz1", success, ghz1, success2=SetAnomalousSpin0ZZ, success3=Setghz1)
+    call ReadCommandLineArgument(arg, "ghz2", success, ghz2, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghz3", success, ghz3, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghz4", success, ghz4, success2=SetAnomalousSpin0ZZ)
+
+    !spin 0 Zgamma couplings
+    call ReadCommandLineArgument(arg, "ghzgs2", success, ghzgs2, success2=SetZgammacoupling)
+    call ReadCommandLineArgument(arg, "ghzgs3", success, ghzgs3, success2=SetZgammacoupling)
+    call ReadCommandLineArgument(arg, "ghzgs4", success, ghzgs4, success2=SetZgammacoupling)
+
+    !spin 0 gammagamma couplings
+    call ReadCommandLineArgument(arg, "ghgsgs2", success, ghgsgs2, success2=Setgammagammacoupling)
+    call ReadCommandLineArgument(arg, "ghgsgs3", success, ghgsgs3, success2=Setgammagammacoupling)
+    call ReadCommandLineArgument(arg, "ghgsgs4", success, ghgsgs4, success2=Setgammagammacoupling)
+
+    !spin 0 ZZ momentum dependent couplings
+    call ReadCommandLineArgument(arg, "ghz1_prime", success, ghz1_prime, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghz1_prime2", success, ghz1_prime2, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghz1_prime3", success, ghz1_prime3, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghz1_prime4", success, ghz1_prime4, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghz1_prime5", success, ghz1_prime5, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghz1_prime6", success, ghz1_prime6, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghz1_prime7", success, ghz1_prime7, success2=SetAnomalousSpin0ZZ)
+
+    call ReadCommandLineArgument(arg, "ghz2_prime", success, ghz2_prime, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghz2_prime2", success, ghz2_prime2, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghz2_prime3", success, ghz2_prime3, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghz2_prime4", success, ghz2_prime4, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghz2_prime5", success, ghz2_prime5, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghz2_prime6", success, ghz2_prime6, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghz2_prime7", success, ghz2_prime7, success2=SetAnomalousSpin0ZZ)
+
+    call ReadCommandLineArgument(arg, "ghz3_prime", success, ghz3_prime, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghz3_prime2", success, ghz3_prime2, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghz3_prime3", success, ghz3_prime3, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghz3_prime4", success, ghz3_prime4, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghz3_prime5", success, ghz3_prime5, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghz3_prime6", success, ghz3_prime6, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghz3_prime7", success, ghz3_prime7, success2=SetAnomalousSpin0ZZ)
+
+    call ReadCommandLineArgument(arg, "ghz4_prime", success, ghz4_prime, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghz4_prime2", success, ghz4_prime2, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghz4_prime3", success, ghz4_prime3, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghz4_prime4", success, ghz4_prime4, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghz4_prime5", success, ghz4_prime5, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghz4_prime6", success, ghz4_prime6, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghz4_prime7", success, ghz4_prime7, success2=SetAnomalousSpin0ZZ)
+
+    !spin 0 Zgamma momentum dependent coupling
+    call ReadCommandLineArgument(arg, "ghzgs1_prime2", success, ghzgs1_prime2, success2=SetZgammacoupling)
+
+    ! Sign of q1,2,12**2 for the Lambda's, set to 1 or -1 to get q**2-dependence from these form factor Lambdas
+    call ReadCommandLineArgument(arg, "cz_q1sq", success, cz_q1sq, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "cz_q2sq", success, cz_q1sq, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "cz_q12sq", success, cz_q1sq, success2=SetAnomalousSpin0ZZ)
+
+    !spin 0 WW couplings
+    call ReadCommandLineArgument(arg, "ghw1", success, ghw1, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "ghw2", success, ghw2, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "ghw3", success, ghw3, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "ghw4", success, ghw4, success2=distinguish_HWWcouplings)
+
+    call ReadCommandLineArgument(arg, "ghw1_prime", success, ghw1_prime, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "ghw1_prime2", success, ghw1_prime2, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "ghw1_prime3", success, ghw1_prime3, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "ghw1_prime4", success, ghw1_prime4, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "ghw1_prime5", success, ghw1_prime5, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "ghw1_prime6", success, ghw1_prime6, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "ghw1_prime7", success, ghw1_prime7, success2=distinguish_HWWcouplings)
+
+    call ReadCommandLineArgument(arg, "ghw2_prime", success, ghw2_prime, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "ghw2_prime2", success, ghw2_prime2, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "ghw2_prime3", success, ghw2_prime3, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "ghw2_prime4", success, ghw2_prime4, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "ghw2_prime5", success, ghw2_prime5, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "ghw2_prime6", success, ghw2_prime6, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "ghw2_prime7", success, ghw2_prime7, success2=distinguish_HWWcouplings)
+
+    call ReadCommandLineArgument(arg, "ghw3_prime", success, ghw3_prime, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "ghw3_prime2", success, ghw3_prime2, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "ghw3_prime3", success, ghw3_prime3, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "ghw3_prime4", success, ghw3_prime4, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "ghw3_prime5", success, ghw3_prime5, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "ghw3_prime6", success, ghw3_prime6, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "ghw3_prime7", success, ghw3_prime7, success2=distinguish_HWWcouplings)
+
+    call ReadCommandLineArgument(arg, "ghw4_prime", success, ghw4_prime, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "ghw4_prime2", success, ghw4_prime2, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "ghw4_prime3", success, ghw4_prime3, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "ghw4_prime4", success, ghw4_prime4, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "ghw4_prime5", success, ghw4_prime5, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "ghw4_prime6", success, ghw4_prime6, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "ghw4_prime7", success, ghw4_prime7, success2=distinguish_HWWcouplings)
+
+    ! Sign of q1,2,12**2 for the Lambda's, set to 1 or -1 to get q**2-dependence from these form factor Lambdas
+    call ReadCommandLineArgument(arg, "cw_q1sq", success, cw_q1sq, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "cw_q2sq", success, cw_q1sq, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "cw_q12sq", success, cw_q1sq, success2=distinguish_HWWcouplings)
+
+    !spin 1
+    call ReadCommandLineArgument(arg, "zprime_qq_left", success, zprime_qq_left, success2=SetAnomalousSpin1qq, success3=Setspin1qqleft)
+    call ReadCommandLineArgument(arg, "zprime_qq_right", success, zprime_qq_right, success2=SetAnomalousSpin1qq, success3=Setspin1qqright)
+    call ReadCommandLineArgument(arg, "zprime_zz_1", success, zprime_zz_1, success2=SetAnomalousSpin1ZZ, success3=Set1minus)
+    call ReadCommandLineArgument(arg, "zprime_zz_2", success, zprime_zz_2, success2=SetAnomalousSpin1ZZ)
+
+    !spin 2
+    call ReadCommandLineArgument(arg, "a1", success, a1, success2=SetAnomalousSpin2gg)
+    call ReadCommandLineArgument(arg, "a2", success, a2, success2=SetAnomalousSpin2gg, success3=Seta2)
+    call ReadCommandLineArgument(arg, "a3", success, a3, success2=SetAnomalousSpin2gg)
+    call ReadCommandLineArgument(arg, "a4", success, a4, success2=SetAnomalousSpin2gg)
+    call ReadCommandLineArgument(arg, "a5", success, a5, success2=SetAnomalousSpin2gg)
+    call ReadCommandLineArgument(arg, "graviton_qq_left", success, graviton_qq_left, success2=SetAnomalousSpin2qq, success3=Setspin2qqleft)
+    call ReadCommandLineArgument(arg, "graviton_qq_right", success, graviton_qq_right, success2=SetAnomalousSpin2qq, success3=Setspin2qqright)
+    call ReadCommandLineArgument(arg, "b1", success, b1, success2=SetAnomalousSpin2ZZ)
+    call ReadCommandLineArgument(arg, "b2", success, b2, success2=SetAnomalousSpin2ZZ, success3=Setb2)
+    call ReadCommandLineArgument(arg, "b3", success, b3, success2=SetAnomalousSpin2ZZ)
+    call ReadCommandLineArgument(arg, "b4", success, b4, success2=SetAnomalousSpin2ZZ)
+    call ReadCommandLineArgument(arg, "b5", success, b5, success2=SetAnomalousSpin2ZZ)
+    call ReadCommandLineArgument(arg, "b6", success, b6, success2=SetAnomalousSpin2ZZ)
+    call ReadCommandLineArgument(arg, "b7", success, b7, success2=SetAnomalousSpin2ZZ)
+    call ReadCommandLineArgument(arg, "b8", success, b8, success2=SetAnomalousSpin2ZZ)
+    call ReadCommandLineArgument(arg, "b9", success, b9, success2=SetAnomalousSpin2ZZ)
+    call ReadCommandLineArgument(arg, "b10", success, b10, success2=SetAnomalousSpin2ZZ)
+
+    !Hff couplings
+    call ReadCommandLineArgument(arg, "kappa", success, kappa, success2=SetAnomalousHff, success3=Setkappa)
+    call ReadCommandLineArgument(arg, "kappa_tilde", success, kappa_tilde, success2=SetAnomalousHff)
+
+    !cuts
+    call ReadCommandLineArgument(arg, "pTjetcut", success, pTjetcut, SetLastArgument)
+    if( SetLastArgument ) pTjetcut = pTjetcut*GeV
+    call ReadCommandLineArgument(arg, "deltaRcut", success, Rjet)
+    call ReadCommandLineArgument(arg, "mJJcut", success, mJJcut, SetLastArgument)
+    if( SetLastArgument ) mJJcut = mJJcut*GeV
+    call ReadCommandLineArgument(arg, "VBF_m4l_min", success, m4l_minmax(1), SetLastArgument)
+    if( SetLastArgument ) m4l_minmax(1) = m4l_minmax(1)*GeV
+    call ReadCommandLineArgument(arg, "VBF_m4l_max", success, m4l_minmax(2), SetLastArgument)
+    if( SetLastArgument ) m4l_minmax(2) = m4l_minmax(2)*GeV
+    call ReadCommandLineArgument(arg, "MPhotonCutoff", success, MPhotonCutoff, SetLastArgument)
+    if( SetLastArgument ) MPhotonCutoff = MPhotonCutoff*GeV
+
+    if( .not.success ) then
+        call Error("Unknown command line argument: " // trim(arg))
     endif
    enddo
 
-    if( CountArg.ne.NumArgs ) then
-        call Error("Unknown command line argument")
-    endif
+    !================================
+    !Command line argument processing
+    !================================
+
+    !PChannel
 
     if (Process.eq.0) PChannel = 0   !only gluons
     if (Process.eq.1 .or. Process.eq.50 .or. Process.eq.60 .or. Process.eq.66) PChannel = 1   !only quarks
+
+    !OffXVV
 
     if(OffShell_XVV.ge.100) then
         OffShell_XVV=OffShell_XVV-100
@@ -444,23 +548,46 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
         OffShellV2=.false.
     endif
 
+    !LHAPDF
+
 #if useLHAPDF==1
     if( LHAPDFString.eq."" ) then
        print *, "Need to specify pdf file name in command line argument LHAPDF"
-       stop    
+       stop 1
     endif
 #endif    
     
-!     if( ((OffShellV1).or.(OffShellV2).or.(OffShellReson)) ) then
-!         print *, "off shell Z/W's only allowed for spin 0,2 resonance"
-! !         stop
-!     endif
+    !Renormalization/factorization schemes
+
+    if((abs(FacScheme) .ge. nRenFacSchemes) .or. (abs(RenScheme) .ge. nRenFacSchemes) .or. (MuFacMultiplier.le.0d0) .or. (MuRenMultiplier.le.0d0)) call Error("The renormalization or factorization scheme is invalid, or the scale multiplier to either is not positive.")
+
+    !ReadLHE and ConvertLHE
+    !MUST HAPPEN BEFORE DETERMINING INTERFERENCE
+    !so that the mass can be read
+
+    if( ReadLHEFile .and. Process.ne.0  ) then
+        print *, "ReadLHE option is only allowed for spin-0 resonances"
+        stop 1
+    endif
+    if( ConvertLHEFile .and. Process.ne.0  ) then
+        print *, "ConvertLHE option is only allowed for spin-0 resonances"
+        stop 1
+    endif
+    if( ReadLHEFile .and. .not. Unweighted ) then
+        print *, "ReadLHE option is only allowed for generating unweighted events"
+        stop 1
+    endif
+
+    if (ReadLHEFile .or. ConvertLHEFile) then
+       call OpenFiles()
+       call ReadMassWidth()
+    endif
+
+    !DecayModes, interference, photon couplings, ...
 
     if( ConvertLHEFile ) then
        DecayMode2 = DecayMode1
     endif 
-
-    if((abs(FacScheme) .ge. nRenFacSchemes) .or. (abs(RenScheme) .ge. nRenFacSchemes) .or. (MuFacMultiplier.le.0d0) .or. (MuRenMultiplier.le.0d0)) call Error("The renormalization or factorization scheme is invalid, or the scale multiplier to either is not positive.")
 
     if( Process.eq.50 ) then
         DecayMode2=DecayMode1
@@ -488,35 +615,32 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
        Ga_V= 0d0    
     endif
 
-    if (ReadLHEFile .or. ConvertLHEFile) then
-       call OpenFiles()
-       call ReadMassWidth()
-    endif
-
     if( (DecayMode1.eq.DecayMode2 .and. IsAZDecay(DecayMode1)) .or.  &
         (DecayMode1.eq.9) .or. (DecayMode2.eq.9)               .or.  &
         (DecayMode1.eq.8  .and. DecayMode2.eq.0)               .or.  &
         (DecayMode1.eq.8  .and. DecayMode2.eq.2)               .or.  &
         (DecayMode1.eq.0  .and. DecayMode2.eq.8)               .or.  &
         (DecayMode1.eq.2  .and. DecayMode2.eq.8)               ) then !  allow interference
-            if( iinterf.eq.-1 ) then!  set default interference switch
+            if( .not.interfSet ) then!  set default interference switch
                 if( M_Reso.gt.2d0*M_Z ) then
                     includeInterference = .false.
                 else
                     includeInterference = .true.
                 endif
-            elseif( iinterf.eq.0 ) then! overwrite default and use user selection
-                includeInterference = .false.
-            else
-                includeInterference = .true.
             endif
     else
         includeInterference = .false.   ! no interference if decay mode does not allow 4 same flavor leptons
     endif
 
+    if( IsAZDecay(DecayMode1) .and. IsAZDecay(DecayMode2) ) then
+        includeGammaStar = (SetZgammacoupling .or. Setgammagammacoupling)
+    elseif( IsAZDecay(DecayMode1) .and. IsAPhoton(DecayMode2) ) then
+        includeGammaStar = Setgammagammacoupling
+    endif
+
     if( IsAZDecay(DecayMode1) .and. IsAWDecay(DecayMode2) ) then
        print *, " DecayMode1=",DecayMode1," and DecayMode2=",DecayMode2," are not allowed."
-       stop
+       stop 1
     endif
 
 !     if( IsAZDecay(DecayMode1) .and. IsAPhoton(DecayMode2) ) then
@@ -526,54 +650,53 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
 
     if( IsAWDecay(DecayMode1) .and. IsAZDecay(DecayMode2) ) then
        print *, " DecayMode1=",DecayMode1," and DecayMode2=",DecayMode2," are not allowed."
-       stop
+       stop 1
     endif
 
-    if( IsAWDecay(DecayMode1) .and. IsAPhoton(DecayMode2) ) then
+    if( (IsAWDecay(DecayMode1) .and. IsAPhoton(DecayMode2)) .or. (IsAPhoton(DecayMode1) .and. IsAWDecay(DecayMode2)) ) then
        print *, " DecayMode1=",DecayMode1," and DecayMode2=",DecayMode2," are not allowed."
-       stop
+       stop 1
     endif
 
     if( IsAPhoton(DecayMode1) .and. (IsAZDecay(DecayMode2) .or. IsAWDecay(DecayMode2)) ) then
        print *, " DecayMode1=",DecayMode1," and DecayMode2=",DecayMode2," are not allowed."
        print *, " Please try swapping the decay modes."
-       stop
+       stop 1
     endif
 
     if( IsAPhoton(DecayMode2) .and. (IsAZDecay(DecayMode1) .or. IsAWDecay(DecayMode1)) ) then! require OffXVV=010 for Z+photon
        if( .not. ((.not.OffShellReson) .and. OffShellV1 .and. (.not.OffShellV2)) ) then
           print *, "OffXVV has to be 010 for Z+photon production"
-          stop
+          stop 1
        endif
     endif
 
     if( IsAPhoton(DecayMode2) .and. (.not.IsAPhoton(DecayMode1) .and. .not. IsAZDecay(DecayMode1)) ) then
-       print *, " DecayMode1=",DecayMode1," and DecayMode2=",DecayMode2," are not allowed."
-       stop
+       print *, "DecayMode1=",DecayMode1," and DecayMode2=",DecayMode2," are not allowed."
+       stop 1
     endif
 
     if( IsAPhoton(DecayMode1) .and. (OffShellV1 .or. OffShellV2) ) then
-       print *, " Photons have to be on-shell."
-       stop
+       print *, "Photons have to be on-shell."
+       stop 1
+    endif
+
+    if( IsAZDecay(DecayMode1) .and. IsAPhoton(DecayMode2) .and. .not.SetZgammacoupling .and. .not.Setgammagammacoupling ) then
+        print *, "To decay to Zgamma, you need to set one of the HZgamma (ghzgs*) or Hgammagamma (ghgsgs*) couplings."
+        stop 1
+    endif
+
+    if( IsAPhoton(DecayMode1) .and. IsAPhoton(DecayMode2) .and. .not.Setgammagammacoupling ) then
+        print *, "To decay to gammagamma, you need to set one of the Hgammagamma couplings (ghgsgs*)."
+        stop 1
     endif
 
     if( (DecayMode1.ge.12) .or. (DecayMode2.ge.12) .or. (DecayMode1.lt..0) .or. (DecayMode2.lt.0) ) then
        print *, " DecayMode1=",DecayMode1," and DecayMode2=",DecayMode2," are not allowed."
-       stop
+       stop 1
     endif
 
-    if( ReadLHEFile .and. Process.ne.0  ) then
-        print *, "ReadLHE option is only allowed for spin-0 resonances"
-        stop
-    endif
-    if( ConvertLHEFile .and. Process.ne.0  ) then
-        print *, "ConvertLHE option is only allowed for spin-0 resonances"
-        stop
-    endif
-    if( ReadLHEFile .and. .not. Unweighted ) then
-        print *, "ReadLHE option is only allowed for generating unweighted events"
-        stop
-    endif
+    !lepton filter
 
     if( RequestOS.lt.RequestOSSF ) then
         RequestOS = RequestOSSF
@@ -582,8 +705,40 @@ integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg,iinterf
         RequestNLeptons = 2*RequestOS
     endif
 
+    !WriteFailedEvents
+
     if( WriteFailedEvents.lt.0 .or. WriteFailedEvents.gt.2 ) then
         call Error("WriteFailedEvents can only be 0, 1, or 2.  Please see the manual.")
+    endif
+
+    !couplings
+
+    if( SetAnomalousSpin0gg .and. .not.Setghg2 ) then
+        call Error("If you set an anomalous spin 0 gg coupling, you need to explicitly set ghg2 as well")
+    endif
+    if( SetAnomalousSpin0ZZ .and. .not.Setghz1 ) then
+        call Error("If you set an anomalous spin 0 ZZ coupling, you need to explicitly set ghz1 as well")
+    endif
+    if( SetAnomalousSpin1qq .and. .not.(Setspin1qqleft.and.Setspin1qqright) ) then
+        call Error("If you set an anomalous spin 1 qq coupling, you need to set both zprime_qq_left and zprime_qq_right")
+    endif
+    if( SetAnomalousSpin1ZZ .and. .not.Set1minus ) then
+        call Error("If you set an anomalous spin 1 ZZ coupling, you need to explicitly set zprime_zz_1 as well")
+    endif
+    if( SetAnomalousSpin2gg .and. .not.Seta2 ) then
+        call Error("If you set an anomalous spin 2 gg coupling, you need to explicitly set a2 as well")
+    endif
+    if( SetAnomalousSpin2qq .and. .not.(Setspin2qqleft.and.Setspin2qqright) ) then
+        call Error("If you set an anomalous spin 2 qq coupling, you need to explicitly set both graviton_qq_left and graviton_qq_right")
+    endif
+    if( SetAnomalousSpin2ZZ .and. .not.Setb2 ) then
+        call Error("If you set an anomalous spin 2 ZZ coupling, you need to explicitly set b2 as well")
+    endif
+    if( SetAnomalousHff .and. .not.Setkappa ) then
+        call Error("If you set an anomalous Hff coupling, you need to explicitly set kappa as well")
+    endif
+    if( distinguish_HWWcouplings .and. Process.ne.60 .and. Process.ne.66 ) then
+        call Error("The separate HWW couplings are only used for VBF.  For H->WW decay or WH production, please set ghz* instead.")
     endif
 
 return
@@ -3614,7 +3769,7 @@ character :: arg*(500)
         write(TheUnit,"(12X,A,F8.2,A)") "pT >= ", pTjetcut/GeV, " GeV"
         if( Process.eq.60 .or. Process.eq.61 .or. Process.eq.80 .or. Process.eq.90) then
             write(TheUnit,"(8X,A,F8.2)") "DeltaR >= ", Rjet
-            write(TheUnit,"(11X,A,F8.2,A)") "mJJ >= ", mJJcut, " GeV"
+            write(TheUnit,"(11X,A,F8.2,A)") "mJJ >= ", mJJcut/GeV, " GeV"
         endif
     endif
     if( (ReadLHEFile) .and. (RequestNLeptons.gt.0) ) then
@@ -3697,13 +3852,20 @@ character :: arg*(500)
             write(TheUnit,"(6X,A,2E16.8,A1)") "ghz2=",ghz2,"i"
             write(TheUnit,"(6X,A,2E16.8,A1)") "ghz3=",ghz3,"i"
             write(TheUnit,"(6X,A,2E16.8,A1)") "ghz4=",ghz4,"i"
-            if( (includeGammaStar .and. ((IsAZDecay(DecayMode1)) .or. (IsAZDecay(DecayMode2)))) ) then
-                write(TheUnit,"(6X,A,2E16.8,A1)") "ghzgs2=",ghzgs2,"i"
-                write(TheUnit,"(6X,A,2E16.8,A1)") "ghzgs3=",ghzgs3,"i"
-                write(TheUnit,"(6X,A,2E16.8,A1)") "ghzgs4=",ghzgs4,"i"
-                write(TheUnit,"(6X,A,2E16.8,A1)") "ghgsgs2=",ghgsgs2,"i"
-                write(TheUnit,"(6X,A,2E16.8,A1)") "ghgsgs3=",ghgsgs3,"i"
-                write(TheUnit,"(6X,A,2E16.8,A1)") "ghgsgs4=",ghgsgs4,"i"
+            if( includeGammaStar .or. IsAPhoton(DecayMode2) ) then
+                if( includeGammaStar .or. IsAZDecay(DecayMode1) ) then
+                    write(TheUnit,"(6X,A,2E16.8,A1)") "ghzgs2=",ghzgs2,"i"
+                    write(TheUnit,"(6X,A,2E16.8,A1)") "ghzgs3=",ghzgs3,"i"
+                    write(TheUnit,"(6X,A,2E16.8,A1)") "ghzgs4=",ghzgs4,"i"
+                endif
+                if( includeGammaStar .or. IsAPhoton(DecayMode1) ) then
+                    write(TheUnit,"(6X,A,2E16.8,A1)") "ghgsgs2=",ghgsgs2,"i"
+                    write(TheUnit,"(6X,A,2E16.8,A1)") "ghgsgs3=",ghgsgs3,"i"
+                    write(TheUnit,"(6X,A,2E16.8,A1)") "ghgsgs4=",ghgsgs4,"i"
+                endif
+                if( includeGammaStar) then
+                    write(TheUnit,"(6X,A,F8.2,A)") "m(gammastar) >= ", MPhotonCutoff/GeV, " GeV"
+                endif
             endif
             if( cdabs(ghz1_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz1_prime= ",ghz1_prime ,"i,","Lambda_z1=",Lambda_z1*100d0
             if( cdabs(ghz1_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz1_prime2=",ghz1_prime2,"i,","Lambda_z1=",Lambda_z1*100d0

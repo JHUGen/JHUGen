@@ -26,7 +26,7 @@ Manual for the JHU generator
 \begin{center}
 \small
 For simulation of a single-produced resonance at hadron colliders \\
-(version v6.8.4, release date Jan. 07, 2016, manual date Jan. 07, 2016) \\
+(version v6.8.6, release date Jan. 07, 2016, manual date Jan. 07, 2016) \\
 \normalsize
 \end{center}
 
@@ -77,7 +77,8 @@ The list of command line configurables and the default values are (also defined 
                        60=weakVBF, 61=pp->Hjj, 62=pp->Hj, 80=ttH, 90=bbH,
                        110=t+H t channel, 111=tbar+H t channel,
                        112=t+H s channel, 113=tbar+H s channel
-    MReso:             resonance mass (default=125.00), format: yyy.xx
+    MReso:             resonance mass in GeV (default=125.00)
+    GaReso:            resonance width in GeV (default=0.00407)
     DecayMode1:        decay mode for vector boson 1 (Z/W/gamma)
     DecayMode2:        decay mode for vector boson 2 (Z/W/gamma)
                          0=Z->2l,  1=Z->2q, 2=Z->2tau, 3=Z->2nu,
@@ -117,6 +118,11 @@ The list of command line configurables and the default values are (also defined 
                          and 2 for the CPS
     WriteFailedEvents: Write events that fail in the LHE file, but with a weight of 0
                          (off by default)
+    pTjetcut:          Minimum pT for jets in GeV (default: 15)
+    deltaRcut:         Minimum deltaR for jets (default: 0.3)
+    mJJcut:            Minimum dijet mass in GeV (default: 0)
+    MPhotonCutoff:     Minimum mass for offshell photons in GeV, when included (default: 4)
+    (Couplings):       See below
 \end{verbatim}
 
 \noindent
@@ -146,6 +152,23 @@ A few more details on some particular parameters:
      \end{itemize}
 \item \verb|WidthScheme|: This option controls the width scheme in JHUGen. The options are 0 for fixed width, 1 for running width, and 2 for the complex pole scheme~\cite{Passarino:2010qk,Goria:2011wa}. 0 is the default option.
 \item \verb|WriteFailedEvents|: In \verb|ReadLHE| mode, events that fail in decay or that fail the lepton filter are by default not written to the LHE file.  If this option is set to 1, they are written, but their weight is set to 0.  If it is set to 2, they are written with a weight of zero and with no particles in the event.  This option is useful if the same number of events are required to be in the input and the output.
+\item \verb|pTjetcut|, \verb|deltaRcut|, \verb|mJJcut| All three cuts are used in processes 60 (VBF), 61 ($H+jj$), 90 ($bbH$), and also 80 ($ttH$) if \verb|m_Top| is set to be light ($<10 \text{GeV}$).  In addition, \verb|pTjetcut| is used in process 62 ($H+j$) and also processes 110--113 ($t/\bar{t}+H$) if \verb|m_Top| is light.
+\item Couplings: anomalous couplings can be set on the command line.  For the full list see sections \ref{spin0}, \ref{spin1}, and \ref{spin2}; the parameters can be set in the command line include:
+\begin{itemize}
+\item \verb|ghgX|, \verb|ghzX|, \verb|ghzX_primeY|, \verb|cz_qXsq|, \verb|ghwX|, \verb|ghwX_primeY|, \verb|cw_qXsq|, \verb|ghzgsX|, \verb|ghzgs1_prime2|, and \verb|ghgsgsX| for spin 0 (see the list for the ranges of X and Y)
+\item \verb|zprime_qq_left|, \verb|zprime_qq_right|, \verb|zprime_zz_1|, and \verb|zprime_zz_2| for spin 1
+\item \verb|aX|, \verb|bX|, \verb|graviton_qq_left|, \verb|and graviton_qq_right| (see the list for the range of X)
+\item The $Hff$ couplings \verb|kappa| and \verb|kappa_tilde|
+\end{itemize}
+The couplings are complex, and must be set with a comma between the real and imaginary parts.  For example:
+\begin{verbatim}
+ghz1=0,0 ghz4=1,0
+\end{verbatim}
+If an anomalous coupling is turned on, the default coupling in the same category must also be specified to leave it on or turn it off.  For example, if \verb|ghz4| is specified, \verb|ghz1| must either be set to \verb|0,0| to generate a pure pseudoscalar or to some other value to generate a $CP$-violating mixture.
+
+In the weak vector boson fusion process (VBF) we also allow for different $ZZH$ and $WWH$ couplings.  Per default, they are assumed to be equal, set by the $Z$ couplings; however, if any of the $W$ couplings are set, they will be used instead for $WWH$ fusion.  $WWH$ can be turned off entirely by explicitly setting one of them to \verb|0,0|.
+
+\item \verb|MPhotoncutoff| If the decay is to $ZZ$ and any of the couplings to photons (\verb|ghzgsX| or \verb|ghgsgsX|) is set, the $\gamma^*$ contribution will be included along with the $Z$'s.  Similarly, if the decay is to $Z\gamma$ and any of the \verb|ghgsgsX| couplings are set, the $\gamma\gamma^*$ contribution will be included as well.  In this case, a lower cut on the photon invariant mass has to be placed in order to avoid the collinear singularity.  This can be set using MPhotonCutoff.
 \end{itemize}
 
 Examples of running the generator:
@@ -154,6 +177,11 @@ Examples of running the generator:
 \begin{verbatim}
 ./JHUGen Collider=1 Process=0 VegasNc2=100000 PChannel=0 OffXVV=011 DecayMode1=0 \\
 		DecayMode2=0 Unweighted=1 DataFile=ggHZZ4l
+\end{verbatim}
+\item $gg$ production, pseudoscalar resonance:
+\begin{verbatim}
+./JHUGen Collider=1 Process=0 VegasNc2=100000 PChannel=0 OffXVV=011 DecayMode1=0 \\
+		DecayMode2=0 Unweighted=1 DataFile=ggHZZ4l_0- ghz1=0,0 ghz4=1,0
 \end{verbatim}
 \item $ggH \to Z\gamma$
 \begin{verbatim}
@@ -171,8 +199,10 @@ Examples of running the generator:
 \end{verbatim}
 \item VBF:
 \begin{verbatim}
-./JHUGen Collider=1 Process=60 Unweighted=1 VegasNc2=100000 OffXVV=011 DataFile=VBF
+./JHUGen Collider=1 Process=60 Unweighted=1 VegasNc2=100000 OffXVV=011 DataFile=VBF \\
+		pTjetcut=0 deltaRcut=0
 \end{verbatim}
+(Jet cuts are generally not needed for VBF production, since there is no divergence.)
 \item $H+jj$:
 \begin{verbatim}
 ./JHUGen Collider=1 Process=61 Unweighted=1 VegasNc2=100000 OffXVV=011 DataFile=Hjj
@@ -216,7 +246,7 @@ Examples of running the generator:
 \noindent
 For generating Higgs decay in VBF, $H+j(j)$, $VH$, $ttbH$, or $tH$ production
 modes by the JHU generator or NLO gluon fusion with another generator (e.g. POWHEG), use JHU generator in \verb|ReadLHE|
-mode and specify the decay mode of interest (ZZ, WW, gam gam, Z gam), while the SM fermionic decays
+mode and specify the decay mode of interest ($ZZ$, $WW$, $\gamma\gamma$, $Z\gamma$), while the SM fermionic decays
 may be generated by Pythia without loss of generality.
 
 \subsection{ Configuration in parameter file  }
@@ -252,21 +282,6 @@ fix_channels_ratio = .true.
 channels_ratio_fix = 0.25d0    ! desired ratio of N_qq/(N_qq+N_gg)
 \end{verbatim}
 
-
-\item
-For final states with a Z-boson decaying into $f\bar f$, intermediate off-shell photons can be included by switching
-\begin{verbatim}
-logical, public, parameter :: includeGammaStar = .false.
-\end{verbatim}
-to the value \verb|.true.|.
-\begin{itemize}
-\item
-In such case, a lower cut on the photon invariant mass has to be placed in order to athe collinear singularity. This cutoff parameter is controlled by
-\begin{verbatim}
-real(8),parameter :: MPhotonCutoff = 4d0*GeV.
-\end{verbatim}
-\end{itemize}
-
 \item
 For $VV$ decay (and similarly in $ttH$ production), by default the $V$'s are randomized so that, for example, \verb|DecayMode1=5 DecayMode2=11| will produce all combinations that include at least one hadronic $W$ decay (rather of specifically hadronic decay of the $W^+$).  This can be switched off by changing
 \begin{verbatim}
@@ -292,20 +307,15 @@ is set to \verb|.true.|.
 \end{itemize}
 
 \item
-Jet cuts:
-\begin{verbatim}
-real(8), public, parameter :: pTjetcut = 15d0*GeV           ! jet min pt
-real(8), public, parameter :: Rjet = 0.3d0                  ! jet deltaR, antikt algorithm
-real(8), public, parameter :: mJJcut = 0d0*GeV              ! minimum mJJ for VBF, HJJ, bbH
-\end{verbatim}
-All three cuts are used in processes 60 (VBF), 61 ($H+jj$), 90 ($bbH$), and also 80 ($ttH$) if \verb|m_Top| is set to be light ($<10 \text{GeV}$).  \verb|pTjetcut| is also used in process 62 ($H+j$) and processes 110--113 ($t/\bar{t}+H$).
+Jet cuts, as described above, which should generally be set by command line options.
 
 \item Constants, more or less self-explanatory, including the masses of particles and width of Standard Model particles and the generated resonance, CKM matrix elements, $Z$ and $W$ branching fractions and scale factors for NLO QCD corrections ($1+\alpha_s/\pi$), and collider energies.  They are documented in comments in \verb|mod_Parameters.F90|.
 
-\item Resonance couplings to SM fields, described in detail in the next few sections
+\item Resonance couplings to SM fields, described in detail in the next few sections.  The couplings should be set using command line options.
 \end{itemize}
 
 \subsubsection{ Spin-0 parameters }
+\label{spin0}
 
 \noindent
 The \verb|*hg*| parameters control the coupling of a spin-0 resonance to gluons in the production mechanism.
@@ -432,17 +442,12 @@ is set by
    real(8),    public, parameter :: Lambda_zgs1 = 10000d0*GeV.
 \end{verbatim}
 
-In the weak vector boson fusion process (VBF) we also allow for different $ZZH$ and $WWH$ couplings.
-Per default, they are assumed to be equal, set by 
-\begin{verbatim}
-   logical, public, parameter :: distinguish_HWWcouplings=.false.
-\end{verbatim}
-If this value is set to \verb|.true.|, their value will be used instead for the $WWH$ interactions. Each \verb|Lambda_z|
-and \verb|cz_q1sq| parameter has a \verb|Lambda_w| and \verb|cw_q1sq| counterpart.
+Each \verb|ghzX|, \verb|ghzX_primeY|, \verb|Lambda_z|, and \verb|cz_q1sq| parameter has a \verb|ghwX|, \verb|ghzwX_primeY|, \verb|Lambda_w|, and \verb|cw_q1sq| counterpart, which are used for the $WWH$ coupling in VBF if at least one of them is set on the command line.
 
 
 
 \subsubsection{ Spin-1 parameters }
+\label{spin1}
 
 The parameters below represent the couplings given in Eq.~(16) from Ref.~\cite{Bolognesi:2012}. The \verb|*left*| and \verb|*right*| parameters control the production of the spin-1 resonance while the \verb|*_v| and \verb|*_a| parameters control the decay.
 
@@ -455,6 +460,7 @@ The parameters below represent the couplings given in Eq.~(16) from Ref.~\cite{B
 \end{verbatim}
 
 \subsubsection{ Spin-2 parameters }
+\label{spin2}
 
 \noindent
 The \verb|a*| parameters control the coupling of a spin-2 resonance to gluons in the production mechanism.  The \verb|b*| and \verb|c*| parameters control the decay.
@@ -691,6 +697,13 @@ For the interface, you can also see the beginning declarations in \verb|TVar.hh|
 %%%%%%%%%%%
 
 \section{ Release notes }
+
+\noindent
+In going from \verb|v6.8.4| to \verb|v6.8.6|, the updates are as follows:
+
+\begin{itemize}
+\item Resonance width, jet cuts, and anomalous couplings are now command line parameters
+\end{itemize}
 
 \noindent
 In going from \verb|v6.7.8| to \verb|v6.8.4|, the updates are as follows:

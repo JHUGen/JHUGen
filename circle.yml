@@ -36,9 +36,6 @@ test:
     - mkdir -p $CIRCLE_ARTIFACTS/{ggH,VBF,HJJ,other}/{SM,PS,fa30.5,fa30.5i,a2}
     - sed -i -r -e "s/(Comp *= *)ifort/\1gfort/" makefile
     - make
-    - sed -i -r -e "s/(pTjetcut = )[0-9.d]*/\10d0/" -e "s/(Rjet = )[0-9.d]*/\10d0/" mod_Parameters.F90
-    - git diff > ~/VBFvsHJJ.diff
-    - git checkout -- mod_Parameters.F90
     - make:
          pwd:
            ../JHUGenMELA
@@ -57,7 +54,7 @@ test:
     - ./JHUGen PDFSet=3 Process=90  VegasNc0=100000 VegasNc2=10  DataFile=$CIRCLE_ARTIFACTS/other/gg_bbH PChannel=0
     - ./JHUGen PDFSet=3 Process=90  VegasNc0=100000 VegasNc2=10  DataFile=$CIRCLE_ARTIFACTS/other/qq_bbH PChannel=1
     - ./JHUGen PDFSet=3 Process=110 VegasNc0=100000 VegasNc2=100 DataFile=$CIRCLE_ARTIFACTS/other/tH_t    DecayMode1=11 TopDK=1
-    - ./JHUGen PDFSet=3 Process=111 VegasNc0=100000 VegasNc2=100 DataFile=$CIRCLE_ARTIFACTS/other/tbarH_t DecayMode1=11 TopDK=1 MReso=750
+    - ./JHUGen PDFSet=3 Process=111 VegasNc0=100000 VegasNc2=100 DataFile=$CIRCLE_ARTIFACTS/other/tbarH_t DecayMode1=11 TopDK=1 MReso=750 GaReso=247
     - ./JHUGen PDFSet=3 Process=112 VegasNc0=100000 VegasNc2=100 DataFile=$CIRCLE_ARTIFACTS/other/tH_s    DecayMode1=11 TopDK=1
     - ./JHUGen PDFSet=3 Process=113 VegasNc0=100000 VegasNc2=100 DataFile=$CIRCLE_ARTIFACTS/other/tbarH_s DecayMode1=11 TopDK=1
     #Decays for t(t)H which have complicated quarks, to check colors
@@ -74,9 +71,7 @@ test:
     - ./JHUGen PDFSet=3 VegasNc0=100000 VegasNc2=10000 Interf=0 DataFile=$CIRCLE_ARTIFACTS/ggH/SM
     - analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/ggH/ outfile=SM.root indir=$CIRCLE_ARTIFACTS/ggH/ computeVBFProdAngles=1 computeVHProdAngles=1 SM.lhe
 
-    - git apply ~/VBFvsHJJ.diff && make
-    - ./JHUGen PDFSet=3 Process=60 VegasNc0=10000000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/VBF/SM
-    - git apply --reverse ~/VBFvsHJJ.diff && make
+    - ./JHUGen PDFSet=3 Process=60 VegasNc0=10000000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/VBF/SM pTjetcut=0 deltaRcut=0
     - ./JHUGen PDFSet=3 VegasNc0=100000 DecayMode1=8 DecayMode2=8 Interf=0 ReadLHE=$CIRCLE_ARTIFACTS/VBF/SM.lhe DataFile=$CIRCLE_ARTIFACTS/VBF/SM_decayed
     - analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/VBF/ outfile=SM.root indir=$CIRCLE_ARTIFACTS/VBF/ computeVBFProdAngles=1 computeVHProdAngles=1 SM_decayed.lhe
     - ./JHUGen PDFSet=3 Process=61 VegasNc0=10000000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/HJJ/SM
@@ -84,42 +79,27 @@ test:
     - analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/HJJ/ outfile=SM.root indir=$CIRCLE_ARTIFACTS/HJJ/ computeVBFProdAngles=1 computeVHProdAngles=1 SM_decayed.lhe
 
     #pseudoscalar
-    - sed -i -r -e "s/( ghz1 = \()[^,]*/\10d0/" -e "s/( ghz4 = \()[^,]*/\11d0/" mod_Parameters.F90
-    - sed -i -r -e "s/( ghg2 = \()[^,]*/\10d0/" -e "s/( ghg4 = \()[^,]*/\11d0/" mod_Parameters.F90
-    - make
-    - ./JHUGen PDFSet=3 VegasNc0=100000 VegasNc2=10000 Interf=0 DataFile=$CIRCLE_ARTIFACTS/ggH/PS
+    - ./JHUGen PDFSet=3 VegasNc0=100000 VegasNc2=10000 Interf=0 DataFile=$CIRCLE_ARTIFACTS/ggH/PS ghz1=0,0 ghz4=1,0
     - analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/ggH/ outfile=PS.root indir=$CIRCLE_ARTIFACTS/ggH/ computeVBFProdAngles=1 computeVHProdAngles=1 PS.lhe
 
-    - git apply ~/VBFvsHJJ.diff && make
-    - ./JHUGen PDFSet=3 Process=60 VegasNc0=10000000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/VBF/PS
-    - git apply --reverse ~/VBFvsHJJ.diff && make
-    - ./JHUGen PDFSet=3 VegasNc0=100000 DecayMode1=8 DecayMode2=8 Interf=0 ReadLHE=$CIRCLE_ARTIFACTS/VBF/PS.lhe DataFile=$CIRCLE_ARTIFACTS/VBF/PS_decayed
+    - ./JHUGen PDFSet=3 Process=60 VegasNc0=10000000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/VBF/PS ghz1=0,0 ghz4=1,0  pTjetcut=0 deltaRcut=0
+    - ./JHUGen PDFSet=3 VegasNc0=100000 DecayMode1=8 DecayMode2=8 Interf=0 ReadLHE=$CIRCLE_ARTIFACTS/VBF/PS.lhe DataFile=$CIRCLE_ARTIFACTS/VBF/PS_decayed ghz1=0,0 ghz4=1,0
     - analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/VBF/ outfile=PS.root indir=$CIRCLE_ARTIFACTS/VBF/ computeVBFProdAngles=1 computeVHProdAngles=1 PS_decayed.lhe
-    - ./JHUGen PDFSet=3 Process=61 VegasNc0=10000000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/HJJ/PS
-    - ./JHUGen PDFSet=3 VegasNc0=100000 DecayMode1=8 DecayMode2=8 Interf=0 ReadLHE=$CIRCLE_ARTIFACTS/HJJ/PS.lhe DataFile=$CIRCLE_ARTIFACTS/HJJ/PS_decayed
-    - analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/HJJ/ outfile=PS.root indir=$CIRCLE_ARTIFACTS/HJJ/ computeVBFProdAngles=1 computeVHProdAngles=1 PS_decayed.lhe
 
     #ggH mixtures - don't need this every time, so need to manually ssh in and enable this by touching ~/mixtures
-    - if [ -f ~/mixtures ]; then sed -i -r -e "s/( ghz1 = \()[^,]*/\11d0/" -e "s/( ghz4 = \()[^,]*/\12.55052d0/" mod_Parameters.F90; fi
-    - if [ -f ~/mixtures ]; then sed -i -r -e "s/( ghg2 = \()[^,]*/\11d0/" -e "s/( ghg4 = \()[^,]*/\10d0/" mod_Parameters.F90; fi
-    - if [ -f ~/mixtures ]; then make; fi
-    - if [ -f ~/mixtures ]; then ./JHUGen PDFSet=3 VegasNc0=100000 VegasNc2=10000 Interf=0 DataFile=$CIRCLE_ARTIFACTS/ggH/fa30.5; fi
+    - if [ -f ~/mixtures ]; then ./JHUGen PDFSet=3 VegasNc0=100000 VegasNc2=10000 Interf=0 DataFile=$CIRCLE_ARTIFACTS/ggH/fa30.5 ghz1=1,0 ghz4=2.55052,0; fi
     - if [ -f ~/mixtures ]; then analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/ggH/ outfile=fa30.5.root indir=$CIRCLE_ARTIFACTS/ggH/ computeVBFProdAngles=1 computeVHProdAngles=1 fa30.5.lhe; fi
-    - if [ -f ~/mixtures ]; then sed -i -r -e "s/( ghz4 = \()[^,]*,[^)]*/\10d0,2.55052d0/" mod_Parameters.F90; fi
-    - if [ -f ~/mixtures ]; then make; fi
-    - if [ -f ~/mixtures ]; then ./JHUGen PDFSet=3 VegasNc0=100000 VegasNc2=10000 Interf=0 DataFile=$CIRCLE_ARTIFACTS/ggH/fa30.5i; fi
+    - if [ -f ~/mixtures ]; then ./JHUGen PDFSet=3 VegasNc0=100000 VegasNc2=10000 Interf=0 DataFile=$CIRCLE_ARTIFACTS/ggH/fa30.5i ghz1=1,0 ghz4=0,2.55052; fi
     - if [ -f ~/mixtures ]; then analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/ggH/ outfile=fa30.5i.root indir=$CIRCLE_ARTIFACTS/ggH/ computeVBFProdAngles=1 computeVHProdAngles=1 fa30.5i.lhe; fi
 
     #a2
     - sed -i -r -e "s/( ghz1 = \()[^,]*/\10d0/" -e "s/( ghz2 = \()[^,]*/\11d0/" -e "s/( ghz4 = \()[^,]*/\10d0/" mod_Parameters.F90
     - make
-    - ./JHUGen PDFSet=3 VegasNc0=100000 VegasNc2=10000 Interf=0 DataFile=$CIRCLE_ARTIFACTS/ggH/a2
+    - ./JHUGen PDFSet=3 VegasNc0=100000 VegasNc2=10000 Interf=0 DataFile=$CIRCLE_ARTIFACTS/ggH/a2 ghz1=0,0 ghz2=1,0
     - analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/ggH/ outfile=a2.root indir=$CIRCLE_ARTIFACTS/ggH/ computeVBFProdAngles=1 computeVHProdAngles=1 a2.lhe
 
-    - git apply ~/VBFvsHJJ.diff && make
-    - ./JHUGen PDFSet=3 Process=60 VegasNc0=10000000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/VBF/a2
-    - git apply --reverse ~/VBFvsHJJ.diff && make
-    - ./JHUGen PDFSet=3 VegasNc0=100000 DecayMode1=8 DecayMode2=8 Interf=0 ReadLHE=$CIRCLE_ARTIFACTS/VBF/a2.lhe DataFile=$CIRCLE_ARTIFACTS/VBF/a2_decayed
+    - ./JHUGen PDFSet=3 Process=60 VegasNc0=10000000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/VBF/a2 ghz1=0,0 ghz2=1,0 pTjetcut=0 deltaRcut=0
+    - ./JHUGen PDFSet=3 VegasNc0=100000 DecayMode1=8 DecayMode2=8 Interf=0 ReadLHE=$CIRCLE_ARTIFACTS/VBF/a2.lhe DataFile=$CIRCLE_ARTIFACTS/VBF/a2_decayed ghz1=0,0 ghz2=1,0
     - analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/VBF/ outfile=a2.root indir=$CIRCLE_ARTIFACTS/VBF/ computeVBFProdAngles=1 computeVHProdAngles=1 a2_decayed.lhe
 
     #make sure MELA compiles and runs
@@ -142,7 +122,7 @@ test:
     - cd ~/CMSJHU_AnalysisMacros/ZZ4lanalyticalfits && echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$CIRCLE_ARTIFACTS/ggH/SM.root", "$CIRCLE_ARTIFACTS/ggH/SM/", 1, 0, 0, 0, 0)' | root -b
     - cd ~/CMSJHU_AnalysisMacros/ZZ4lanalyticalfits && echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$CIRCLE_ARTIFACTS/ggH/PS.root", "$CIRCLE_ARTIFACTS/ggH/PS/", 0, 0, 0, 1, 0)' | root -b
     - cd ~/CMSJHU_AnalysisMacros/ZZ4lanalyticalfits && echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$CIRCLE_ARTIFACTS/ggH/a2.root", "$CIRCLE_ARTIFACTS/ggH/a2/", 0, 1, 0, 0, 0)' | root -b
-    - if [ -f ~/mixtures ]; then cd ~/CMSJHU_AnalysisMacros/ZZ4lanalyticalfits && echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$CIRCLE_ARTIFACTS/ggH/fa30.5.root", "$CIRCLE_ARTIFACTS/ggH/fa30.5/", 1, 2.55052, 0)' | root -b; fi
-    - if [ -f ~/mixtures ]; then cd ~/CMSJHU_AnalysisMacros/ZZ4lanalyticalfits && echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$CIRCLE_ARTIFACTS/ggH/fa30.5i.root", "$CIRCLE_ARTIFACTS/ggH/fa30.5i/", 1, 0, 2.55052)' | root -b; fi
+    - if [ -f ~/mixtures ]; then cd ~/CMSJHU_AnalysisMacros/ZZ4lanalyticalfits && echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$CIRCLE_ARTIFACTS/ggH/fa30.5.root", "$CIRCLE_ARTIFACTS/ggH/fa30.5/", 1, 2.55052, 0, 0, 0)' | root -b; fi
+    - if [ -f ~/mixtures ]; then cd ~/CMSJHU_AnalysisMacros/ZZ4lanalyticalfits && echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$CIRCLE_ARTIFACTS/ggH/fa30.5i.root", "$CIRCLE_ARTIFACTS/ggH/fa30.5i/", 1, 0, 2.55052, 0, 0)' | root -b; fi
     #VBF plots
     - cd ~/CMSJHU_AnalysisMacros/MCProductionValidation && root -b -q VBFplots.C+
