@@ -79,27 +79,27 @@ test:
     - analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/HJJ/ outfile=SM.root indir=$CIRCLE_ARTIFACTS/HJJ/ computeVBFProdAngles=1 computeVHProdAngles=1 SM_decayed.lhe
 
     #pseudoscalar
-    - ./JHUGen PDFSet=3 VegasNc0=100000 VegasNc2=10000 Interf=0 DataFile=$CIRCLE_ARTIFACTS/ggH/PS Reghz1=0 Reghz4=1
+    - ./JHUGen PDFSet=3 VegasNc0=100000 VegasNc2=10000 Interf=0 DataFile=$CIRCLE_ARTIFACTS/ggH/PS ghz1=0,0 ghz4=1,0
     - analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/ggH/ outfile=PS.root indir=$CIRCLE_ARTIFACTS/ggH/ computeVBFProdAngles=1 computeVHProdAngles=1 PS.lhe
 
-    - ./JHUGen PDFSet=3 Process=60 VegasNc0=10000000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/VBF/PS Reghz1=0 Reghz4=1  pTjetcut=0 deltaRcut=0
-    - ./JHUGen PDFSet=3 VegasNc0=100000 DecayMode1=8 DecayMode2=8 Interf=0 ReadLHE=$CIRCLE_ARTIFACTS/VBF/PS.lhe DataFile=$CIRCLE_ARTIFACTS/VBF/PS_decayed Reghz1=0 Reghz4=1
+    - ./JHUGen PDFSet=3 Process=60 VegasNc0=10000000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/VBF/PS ghz1=0,0 ghz4=1,0  pTjetcut=0 deltaRcut=0
+    - ./JHUGen PDFSet=3 VegasNc0=100000 DecayMode1=8 DecayMode2=8 Interf=0 ReadLHE=$CIRCLE_ARTIFACTS/VBF/PS.lhe DataFile=$CIRCLE_ARTIFACTS/VBF/PS_decayed ghz1=0,0 ghz4=1,0
     - analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/VBF/ outfile=PS.root indir=$CIRCLE_ARTIFACTS/VBF/ computeVBFProdAngles=1 computeVHProdAngles=1 PS_decayed.lhe
 
     #ggH mixtures - don't need this every time, so need to manually ssh in and enable this by touching ~/mixtures
-    - if [ -f ~/mixtures ]; then ./JHUGen PDFSet=3 VegasNc0=100000 VegasNc2=10000 Interf=0 DataFile=$CIRCLE_ARTIFACTS/ggH/fa30.5 Reghz1=1 Reghz4=2.55052; fi
+    - if [ -f ~/mixtures ]; then ./JHUGen PDFSet=3 VegasNc0=100000 VegasNc2=10000 Interf=0 DataFile=$CIRCLE_ARTIFACTS/ggH/fa30.5 ghz1=1,0 ghz4=2.55052,0; fi
     - if [ -f ~/mixtures ]; then analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/ggH/ outfile=fa30.5.root indir=$CIRCLE_ARTIFACTS/ggH/ computeVBFProdAngles=1 computeVHProdAngles=1 fa30.5.lhe; fi
-    - if [ -f ~/mixtures ]; then ./JHUGen PDFSet=3 VegasNc0=100000 VegasNc2=10000 Interf=0 DataFile=$CIRCLE_ARTIFACTS/ggH/fa30.5i Reghz1=1 Imghz4=2.55052; fi
+    - if [ -f ~/mixtures ]; then ./JHUGen PDFSet=3 VegasNc0=100000 VegasNc2=10000 Interf=0 DataFile=$CIRCLE_ARTIFACTS/ggH/fa30.5i ghz1=1,0 ghz4=0,2.55052; fi
     - if [ -f ~/mixtures ]; then analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/ggH/ outfile=fa30.5i.root indir=$CIRCLE_ARTIFACTS/ggH/ computeVBFProdAngles=1 computeVHProdAngles=1 fa30.5i.lhe; fi
 
     #a2
     - sed -i -r -e "s/( ghz1 = \()[^,]*/\10d0/" -e "s/( ghz2 = \()[^,]*/\11d0/" -e "s/( ghz4 = \()[^,]*/\10d0/" mod_Parameters.F90
     - make
-    - ./JHUGen PDFSet=3 VegasNc0=100000 VegasNc2=10000 Interf=0 DataFile=$CIRCLE_ARTIFACTS/ggH/a2 Reghz1=0 Reghz2=1
+    - ./JHUGen PDFSet=3 VegasNc0=100000 VegasNc2=10000 Interf=0 DataFile=$CIRCLE_ARTIFACTS/ggH/a2 ghz1=0,0 ghz2=1,0
     - analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/ggH/ outfile=a2.root indir=$CIRCLE_ARTIFACTS/ggH/ computeVBFProdAngles=1 computeVHProdAngles=1 a2.lhe
 
-    - ./JHUGen PDFSet=3 Process=60 VegasNc0=10000000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/VBF/a2 Reghz1=0 Reghz2=1 pTjetcut=0 deltaRcut=0
-    - ./JHUGen PDFSet=3 VegasNc0=100000 DecayMode1=8 DecayMode2=8 Interf=0 ReadLHE=$CIRCLE_ARTIFACTS/VBF/a2.lhe DataFile=$CIRCLE_ARTIFACTS/VBF/a2_decayed Reghz1=0 Reghz2=1
+    - ./JHUGen PDFSet=3 Process=60 VegasNc0=10000000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/VBF/a2 ghz1=0,0 ghz2=1,0 pTjetcut=0 deltaRcut=0
+    - ./JHUGen PDFSet=3 VegasNc0=100000 DecayMode1=8 DecayMode2=8 Interf=0 ReadLHE=$CIRCLE_ARTIFACTS/VBF/a2.lhe DataFile=$CIRCLE_ARTIFACTS/VBF/a2_decayed ghz1=0,0 ghz2=1,0
     - analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/VBF/ outfile=a2.root indir=$CIRCLE_ARTIFACTS/VBF/ computeVBFProdAngles=1 computeVHProdAngles=1 a2_decayed.lhe
 
     #make sure MELA compiles and runs
