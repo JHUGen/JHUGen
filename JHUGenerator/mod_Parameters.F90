@@ -1386,7 +1386,6 @@ end subroutine ComputeQCDVariables
 !ReadCommandLineArgument is overloaded.  Pass the type needed as "dest"
 !success is set to true if the argument passed matches argumentname, otherwise it's left alone
 !same for success2 and success3 (optional, can be used for other things, see main.F90)
-!success2Re and success2Im (optional, for complex overload only) are set if the respective parts are set
 !SetLastArgument (optional) is set to true if the argument matches, otherwise it's set to false
 !for examples of all of them see main.F90
 
@@ -1482,13 +1481,13 @@ integer :: length
 end subroutine ReadCommandLineArgument_real8
 
 
-subroutine ReadCommandLineArgument_complex8(argument, argumentname, success, dest, SetLastArgument, success2, success3, success2Re, success2Im)
+subroutine ReadCommandLineArgument_complex8(argument, argumentname, success, dest, SetLastArgument, success2, success3)
 implicit none
 character(len=*) :: argument, argumentname
 complex(8), intent(inout) :: dest
 real(8) :: re, im
 logical, intent(inout) :: success
-logical, optional, intent(inout) :: SetLastArgument, success2, success3, success2Re, success2Im
+logical, optional, intent(inout) :: SetLastArgument, success2, success3
 integer :: length
 
     if (present(SetLastArgument)) SetLastArgument=.false.
@@ -1496,30 +1495,21 @@ integer :: length
     length=len(trim(argumentname))
 
     if( argument(1:length+1) .eq. trim(argumentname)//"=" ) then
+        if( Index(argument(length+2:len(trim(argument))),",").eq.0 &
+       .and. Index(argument(length+2:len(trim(argument)))," ").eq.0 ) then
+            print *, "Argument ", argumentname, " is complex."
+            print *, "Example syntax for complex arguments:"
+            print *, "      ", argumentname, "=1,2"
+            print *, "   or ", argumentname, "=1.0d0,2.0d0"
+            print *, "for 1+2i"
+            stop 1
+        endif
         read(argument(length+2:len(argument)), *) re, im
         dest = dcmplx(re, im)
         success=.true.
         if (present(SetLastArgument)) SetLastArgument=.true.
         if (present(success2)) success2=.true.
         if (present(success3)) success3=.true.
-        if (present(success2Re)) success2Re=.true.
-        if (present(success2Im)) success2Im=.true.
-    elseif( argument(1:length+3) .eq. "Re"//trim(argumentname)//"=" ) then
-        read(argument(length+4:len(argument)), *) re
-        dest = dcmplx(re, dimag(dest))
-        success=.true.
-        if (present(SetLastArgument)) SetLastArgument=.true.
-        if (present(success2)) success2=.true.
-        if (present(success3)) success3=.true.
-        if (present(success2Re)) success2Re=.true.
-    elseif( argument(1:length+3) .eq. "Im"//trim(argumentname)//"=" ) then
-        read(argument(length+4:len(argument)), *) im
-        dest = dcmplx(dreal(dest), im)
-        success=.true.
-        if (present(SetLastArgument)) SetLastArgument=.true.
-        if (present(success2)) success2=.true.
-        if (present(success3)) success3=.true.
-        if (present(success2Im)) success2Im=.true.
     endif
 
 end subroutine ReadCommandLineArgument_complex8

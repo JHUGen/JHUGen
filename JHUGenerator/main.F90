@@ -368,12 +368,12 @@ logical :: SetAnomalousHff, Setkappa
     !e.g. just setting ghz4=0.2982,0 is ambiguous if you mean to leave g1 on (so fa3=0.5)
     !                                                      or to turn it off (fa3=1 with a weird prefactor)
     !spin 0 gg couplings
-    call ReadCommandLineArgument(arg, "ghg2", success, ghg2, success2=SetAnomalousSpin0gg, success2Re=Setghg2)
+    call ReadCommandLineArgument(arg, "ghg2", success, ghg2, success2=SetAnomalousSpin0gg, success3=Setghg2)
     call ReadCommandLineArgument(arg, "ghg3", success, ghg3, success2=SetAnomalousSpin0gg)
     call ReadCommandLineArgument(arg, "ghg4", success, ghg4, success2=SetAnomalousSpin0gg)
 
     !spin 0 ZZ couplings
-    call ReadCommandLineArgument(arg, "ghz1", success, ghz1, success2=SetAnomalousSpin0ZZ, success2Re=Setghz1)
+    call ReadCommandLineArgument(arg, "ghz1", success, ghz1, success2=SetAnomalousSpin0ZZ, success3=Setghz1)
     call ReadCommandLineArgument(arg, "ghz2", success, ghz2, success2=SetAnomalousSpin0ZZ)
     call ReadCommandLineArgument(arg, "ghz3", success, ghz3, success2=SetAnomalousSpin0ZZ)
     call ReadCommandLineArgument(arg, "ghz4", success, ghz4, success2=SetAnomalousSpin0ZZ)
@@ -473,21 +473,21 @@ logical :: SetAnomalousHff, Setkappa
     call ReadCommandLineArgument(arg, "cw_q12sq", success, cw_q1sq, success2=distinguish_HWWcouplings)
 
     !spin 1
-    call ReadCommandLineArgument(arg, "zprime_qq_left", success, zprime_qq_left, success2=SetAnomalousSpin1qq, success2Re=Setspin1qqleft)
-    call ReadCommandLineArgument(arg, "zprime_qq_right", success, zprime_qq_right, success2=SetAnomalousSpin1qq, success2Re=Setspin1qqright)
-    call ReadCommandLineArgument(arg, "zprime_zz_1", success, zprime_zz_1, success2=SetAnomalousSpin1ZZ, success2Re=Set1minus)
+    call ReadCommandLineArgument(arg, "zprime_qq_left", success, zprime_qq_left, success2=SetAnomalousSpin1qq, success3=Setspin1qqleft)
+    call ReadCommandLineArgument(arg, "zprime_qq_right", success, zprime_qq_right, success2=SetAnomalousSpin1qq, success3=Setspin1qqright)
+    call ReadCommandLineArgument(arg, "zprime_zz_1", success, zprime_zz_1, success2=SetAnomalousSpin1ZZ, success3=Set1minus)
     call ReadCommandLineArgument(arg, "zprime_zz_2", success, zprime_zz_2, success2=SetAnomalousSpin1ZZ)
 
     !spin 2
     call ReadCommandLineArgument(arg, "a1", success, a1, success2=SetAnomalousSpin2gg)
-    call ReadCommandLineArgument(arg, "a2", success, a2, success2=SetAnomalousSpin2gg, success2Re=Seta2)
+    call ReadCommandLineArgument(arg, "a2", success, a2, success2=SetAnomalousSpin2gg, success3=Seta2)
     call ReadCommandLineArgument(arg, "a3", success, a3, success2=SetAnomalousSpin2gg)
     call ReadCommandLineArgument(arg, "a4", success, a4, success2=SetAnomalousSpin2gg)
     call ReadCommandLineArgument(arg, "a5", success, a5, success2=SetAnomalousSpin2gg)
-    call ReadCommandLineArgument(arg, "graviton_qq_left", success, graviton_qq_left, success2=SetAnomalousSpin2qq, success2Re=Setspin2qqleft)
-    call ReadCommandLineArgument(arg, "graviton_qq_right", success, graviton_qq_right, success2=SetAnomalousSpin2qq, success2Re=Setspin2qqright)
+    call ReadCommandLineArgument(arg, "graviton_qq_left", success, graviton_qq_left, success2=SetAnomalousSpin2qq, success3=Setspin2qqleft)
+    call ReadCommandLineArgument(arg, "graviton_qq_right", success, graviton_qq_right, success2=SetAnomalousSpin2qq, success3=Setspin2qqright)
     call ReadCommandLineArgument(arg, "b1", success, b1, success2=SetAnomalousSpin2ZZ)
-    call ReadCommandLineArgument(arg, "b2", success, b2, success2=SetAnomalousSpin2ZZ, success2Re=Setb2)
+    call ReadCommandLineArgument(arg, "b2", success, b2, success2=SetAnomalousSpin2ZZ, success3=Setb2)
     call ReadCommandLineArgument(arg, "b3", success, b3, success2=SetAnomalousSpin2ZZ)
     call ReadCommandLineArgument(arg, "b4", success, b4, success2=SetAnomalousSpin2ZZ)
     call ReadCommandLineArgument(arg, "b5", success, b5, success2=SetAnomalousSpin2ZZ)
@@ -498,7 +498,7 @@ logical :: SetAnomalousHff, Setkappa
     call ReadCommandLineArgument(arg, "b10", success, b10, success2=SetAnomalousSpin2ZZ)
 
     !Hff couplings
-    call ReadCommandLineArgument(arg, "kappa", success, kappa, success2=SetAnomalousHff, success2Re=Setkappa)
+    call ReadCommandLineArgument(arg, "kappa", success, kappa, success2=SetAnomalousHff, success3=Setkappa)
     call ReadCommandLineArgument(arg, "kappa_tilde", success, kappa_tilde, success2=SetAnomalousHff)
 
     !cuts
