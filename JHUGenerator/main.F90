@@ -3999,7 +3999,7 @@ use modParameters
 use modMisc
 implicit none
 integer, dimension(:), allocatable :: gen_seed
-integer :: n,i,sclock,SeedSize
+integer :: n,i,sclock
 real :: tmp_real, tmp_real2
 logical :: finished
 
@@ -4045,7 +4045,6 @@ logical :: finished
     allocate(gen_seed(n))
     do i=1,n
         call random_number(tmp_real)
-        print *, tmp_real
         gen_seed(i) = floor(tmp_real * 1000000000.)
     enddo
     call random_seed(put = gen_seed)
