@@ -63,15 +63,26 @@ integer, public :: Br_W_ud_counter=0
 integer, public :: Br_counter(1:5,1:5)=0
 integer, public :: LeptInEvent(0:8) = 0
 logical, public, parameter :: ReweightDecay = .false.
+integer, public :: UserSeed = 0
 !=====================================================
 
 
 
 !=====================================================
+!these fixed random seeds are NOT actually used to generate events
+!the seed provided via the command line (or, if none is provided, one generated randomly using the system time)
+! is put in place of the first seed that makes a difference in generating a random number
+! then the seeds are used to generate the (compiler dependent) required number of seeds
+! and THOSE are used for event generation
+!note that even if the same seed is provided, results are compiler dependent
+integer, public, parameter :: nmaxseeds = 20
+integer, public, parameter :: DefaultSeeds(1:nmaxseeds) = (/847362834,470115596,392845769,191039475,372910496,192049687,695820194,218930493,902943834,471748302,123958674,390534012,938576849,386472918,938576483,891928354,593857698,938576432,948576849,192847564/)
+integer, public            :: TheSeeds(1:nmaxseeds) = DefaultSeeds
+!changing the default seeds is not advised, since then results from before the change
+! will not be reproducible
+!=====================================================
+
 !switches
-logical, public, parameter :: seed_random = .true.
-integer, public :: TheSeeds(0:20) = (/2,700470849,470115596,3,4,5,6,7,8,9,10,11,12,0,0,0,0,0,0,0,0/)! only used if seed_random=.false., the first entry is the total number of seeds
-
 logical, public, parameter :: fix_channels_ratio = .false.
 
 real(8), public, parameter :: channels_ratio_fix = 0.25d0   ! desired ratio of  N_qq/(N_qq+N_gg)
@@ -80,7 +91,7 @@ logical, public, parameter :: importExternal_LHEinit = .true.
 
 logical, public, parameter :: writeWeightedLHE = .false. 
 
-integer, public  :: WidthScheme    ! 0=fixed BW-width, 1=runing BW-width, 2=Passarino's CPS
+integer, public  :: WidthScheme    ! 0=fixed BW-width, 1=running BW-width, 2=Passarino's CPS
 
 logical, public, parameter :: RandomizeVVdecays = .true.    ! randomize DecayMode1 and DecayMode2 in H-->VV and TTBAR decays
 

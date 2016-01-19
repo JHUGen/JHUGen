@@ -119,10 +119,10 @@ test:
     - "! find $CIRCLE_ARTIFACTS -name *.lhe.lhe | grep ."
 
     #ggH analytical fits
-    - cd ~/CMSJHU_AnalysisMacros/ZZ4lanalyticalfits && echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$CIRCLE_ARTIFACTS/ggH/SM.root", "$CIRCLE_ARTIFACTS/ggH/SM/", 1, 0, 0, 0, 0)' | root -b
-    - cd ~/CMSJHU_AnalysisMacros/ZZ4lanalyticalfits && echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$CIRCLE_ARTIFACTS/ggH/PS.root", "$CIRCLE_ARTIFACTS/ggH/PS/", 0, 0, 0, 1, 0)' | root -b
-    - cd ~/CMSJHU_AnalysisMacros/ZZ4lanalyticalfits && echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$CIRCLE_ARTIFACTS/ggH/a2.root", "$CIRCLE_ARTIFACTS/ggH/a2/", 0, 1, 0, 0, 0)' | root -b
-    - if [ -f ~/mixtures ]; then cd ~/CMSJHU_AnalysisMacros/ZZ4lanalyticalfits && echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$CIRCLE_ARTIFACTS/ggH/fa30.5.root", "$CIRCLE_ARTIFACTS/ggH/fa30.5/", 1, 2.55052, 0, 0, 0)' | root -b; fi
-    - if [ -f ~/mixtures ]; then cd ~/CMSJHU_AnalysisMacros/ZZ4lanalyticalfits && echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$CIRCLE_ARTIFACTS/ggH/fa30.5i.root", "$CIRCLE_ARTIFACTS/ggH/fa30.5i/", 1, 0, 2.55052, 0, 0)' | root -b; fi
+    - cd ~/CMSJHU_AnalysisMacros/MCProductionValidation && echo -e '.x loadLib.C\n.x angularDistributions_spin0_ggH.cc+("$CIRCLE_ARTIFACTS/ggH/SM.root", "$CIRCLE_ARTIFACTS/ggH/", 1, 0, 0, 0, 0, 0, 0)' | root -b
+    - cd ~/CMSJHU_AnalysisMacros/MCProductionValidation && echo -e '.x loadLib.C\n.x angularDistributions_spin0_ggH.cc+("$CIRCLE_ARTIFACTS/ggH/PS.root", "$CIRCLE_ARTIFACTS/ggH/", 0, 0, 1, 0, 0, 0, 0)' | root -b
+    - cd ~/CMSJHU_AnalysisMacros/MCProductionValidation && echo -e '.x loadLib.C\n.x angularDistributions_spin0_ggH.cc+("$CIRCLE_ARTIFACTS/ggH/a2.root", "$CIRCLE_ARTIFACTS/ggH/", 0, 1, 0, 0, 0, 0, 0)' | root -b
+    - if [ -f ~/mixtures ]; then cd ~/CMSJHU_AnalysisMacros/MCProductionValidation && echo -e '.x loadLib.C\n.x angularDistributions_spin0_ggH.cc+("$CIRCLE_ARTIFACTS/ggH/fa30.5.root", "$CIRCLE_ARTIFACTS/ggH/", 1, 0, 2.55052, 0, 0, 0, 0)' | root -b; fi
+    - if [ -f ~/mixtures ]; then cd ~/CMSJHU_AnalysisMacros/MCProductionValidation && echo -e '.x loadLib.C\n.x angularDistributions_spin0_ggH.cc+("$CIRCLE_ARTIFACTS/ggH/fa30.5i.root", "$CIRCLE_ARTIFACTS/ggH/", 1, 0, 0, 0, 0, 2.55052, 0)' | root -b; fi
     #VBF plots
     - cd ~/CMSJHU_AnalysisMacros/MCProductionValidation && root -b -q VBFplots.C+
