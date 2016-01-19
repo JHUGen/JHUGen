@@ -223,8 +223,8 @@ use ModParameters
 use ModKinematics
 use ModMisc
 implicit none
-character :: arg*(500), argmatch*(30)
-integer :: NumArgs,NArg,OffShell_XVV,iargument,CountArg
+character :: arg*(500)
+integer :: NumArgs,NArg,OffShell_XVV
 logical :: help, success, SetLastArgument, interfSet
 logical :: SetAnomalousSpin0gg, Setghg2, SetAnomalousSpin0ZZ, Setghz1
 logical :: SetZgammacoupling, Setgammagammacoupling
@@ -313,7 +313,6 @@ logical :: SetAnomalousHff, Setkappa
    NumArgs = COMMAND_ARGUMENT_COUNT()
 #endif
 
-   CountArg = 0
    do NArg=1,NumArgs
     call GetArg(NArg,arg)
     success = .false.
