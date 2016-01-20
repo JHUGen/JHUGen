@@ -1971,6 +1971,7 @@ contains
       CALL HTO_FMMsplineSingleHt(bc,cc,dc,top,gdim)
 
       u= mass
+      u = min(u, YR_HiggsMass(YR_nMassPoints))
       CALL HTO_Seval3SingleHt(u,bc,cc,dc,top,gdim,value)
 
       BranchingRatio= value
