@@ -26,7 +26,7 @@ Manual for the JHU generator
 \begin{center}
 \small
 For simulation of a single-produced resonance at hadron colliders \\
-(version v6.8.6, release date Jan. 07, 2016, manual date Jan. 07, 2016) \\
+(version v6.8.7, release date Jan. 07, 2016, manual date Jan. 07, 2016) \\
 \normalsize
 \end{center}
 
@@ -118,6 +118,7 @@ The list of command line configurables and the default values are (also defined 
                          and 2 for the CPS
     WriteFailedEvents: Write events that fail in the LHE file, but with a weight of 0
                          (off by default)
+    Seed:              Random seed for event generation
     pTjetcut:          Minimum pT for jets in GeV (default: 15)
     deltaRcut:         Minimum deltaR for jets (default: 0.3)
     mJJcut:            Minimum dijet mass in GeV (default: 0)
@@ -152,12 +153,17 @@ A few more details on some particular parameters:
      \end{itemize}
 \item \verb|WidthScheme|: This option controls the width scheme in JHUGen. The options are 0 for fixed width, 1 for running width, and 2 for the complex pole scheme~\cite{Passarino:2010qk,Goria:2011wa}. 0 is the default option.
 \item \verb|WriteFailedEvents|: In \verb|ReadLHE| mode, events that fail in decay or that fail the lepton filter are by default not written to the LHE file.  If this option is set to 1, they are written, but their weight is set to 0.  If it is set to 2, they are written with a weight of zero and with no particles in the event.  This option is useful if the same number of events are required to be in the input and the output.
+
+\item \verb|Seed|: To reproduce previous results, the random seed can be set on the command line.  Because Fortran uses multiple random seeds (the exact number is compiler dependent), the seed provided is used along with other fixed seeds specified in \verb|mod_Parameters.F90| to generate however many seeds are needed.  If no seed is provided on the command line, the seed is determined from the system time.  Either way, it is printed in the header of the output file so that the results can be reproduced.
+
+Please note that random number generation is compiler dependent, so to ensure reproducibility the same compiler (and the same version of the compiler) should be used.  It is also not guaranteed that the results can be reproduced using a different version of the generator.
+
 \item \verb|pTjetcut|, \verb|deltaRcut|, \verb|mJJcut| All three cuts are used in processes 60 (VBF), 61 ($H+jj$), 90 ($bbH$), and also 80 ($ttH$) if \verb|m_Top| is set to be light ($<10 \text{GeV}$).  In addition, \verb|pTjetcut| is used in process 62 ($H+j$) and also processes 110--113 ($t/\bar{t}+H$) if \verb|m_Top| is light.
 \item Couplings: anomalous couplings can be set on the command line.  For the full list see sections \ref{spin0}, \ref{spin1}, and \ref{spin2}; the parameters can be set in the command line include:
 \begin{itemize}
-\item \verb|ghgX|, \verb|ghzX|, \verb|ghzX_primeY|, \verb|cz_qXsq|, \verb|ghwX|, \verb|ghwX_primeY|, \verb|cw_qXsq|, \verb|ghzgsX|, \verb|ghzgs1_prime2|, and \verb|ghgsgsX| for spin 0 (see the list for the ranges of X and Y)
+\item \verb|ghgX|, \verb|ghzX|, \verb|ghzX_primeY|, \verb|cz_qXsq|, \verb|ghwX|, \verb|ghwX_primeY|, \verb|cw_qXsq|, \verb|ghzgsX|, \verb|ghzgs1_prime2|, and \verb|ghgsgsX| for spin 0 $HVV$ couplings (see the list for the ranges of X and Y)
 \item \verb|zprime_qq_left|, \verb|zprime_qq_right|, \verb|zprime_zz_1|, and \verb|zprime_zz_2| for spin 1
-\item \verb|aX|, \verb|bX|, \verb|graviton_qq_left|, \verb|and graviton_qq_right| (see the list for the range of X)
+\item \verb|aX|, \verb|bX|, \verb|graviton_qq_left|, \verb|and graviton_qq_right| for spin 2 (see the list for the range of X)
 \item The $Hff$ couplings \verb|kappa| and \verb|kappa_tilde|
 \end{itemize}
 The couplings are complex, and must be set with a comma between the real and imaginary parts.  For example:
@@ -259,20 +265,6 @@ After modifying this file, one needs to recompile.
 \begin{itemize}
 \item Switches:
 \begin{itemize}
-\item
-Each generation run is different when this is \verb|.true.|
-
-\begin{verbatim}
-seed_random = .true.
-\end{verbatim}
-
-\begin{itemize}
-\item
-If \verb|seed_random| is false, the seeds are set through
-\begin{verbatim}
-integer, public :: TheSeeds(0:20)
-\end{verbatim}
-\end{itemize}
 
 \item
 In the case when \verb|PChannel=2| for a spin-2 resonance, the user can define an approximate ratio of the production of gg and $q\bar{q}$ production.
@@ -699,10 +691,16 @@ For the interface, you can also see the beginning declarations in \verb|TVar.hh|
 \section{ Release notes }
 
 \noindent
-In going from \verb|v6.8.4| to \verb|v6.8.6|, the updates are as follows:
+In going from \verb|v6.8.4| to \verb|v6.8.7|, the updates are as follows:
 
 \begin{itemize}
-\item Resonance width, jet cuts, and anomalous couplings are now command line parameters
+\item Additional command line parameters have been added:
+\begin{itemize}
+\item Resonance width
+\item Anomalous $XVV$ and $Xff$ couplings
+\item Jet cuts
+\item Random seed
+\end{itemize}
 \end{itemize}
 
 \noindent
