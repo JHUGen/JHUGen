@@ -707,9 +707,13 @@ logical :: SetAnomalousHff, Setkappa
         RequestNLeptons = 2*RequestOS
     endif
 
-    !WidthScheme
+    !WidthScheme and reweighting
     if( WidthScheme.le.0 ) then
         WidthScheme = 2
+    endif
+
+    if( .not. ReadLHEFile ) then
+        ReweightDecay = .false.
     endif
 
     !WriteFailedEvents
