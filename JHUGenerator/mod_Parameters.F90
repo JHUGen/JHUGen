@@ -62,7 +62,7 @@ integer, public :: Br_W_ll_counter=0
 integer, public :: Br_W_ud_counter=0
 integer, public :: Br_counter(1:5,1:5)=0
 integer, public :: LeptInEvent(0:8) = 0
-logical, public, parameter :: ReweightDecay = .false.
+logical, public :: ReweightDecay = .false.
 integer, public :: UserSeed = 0
 !=====================================================
 
@@ -91,7 +91,7 @@ logical, public, parameter :: importExternal_LHEinit = .true.
 
 logical, public, parameter :: writeWeightedLHE = .false. 
 
-integer, public  :: WidthScheme    ! 0=fixed BW-width, 1=running BW-width, 2=Passarino's CPS
+integer, public  :: WidthScheme    ! 1=running BW-width, 2=fixed BW-width (default), 3=Passarino's CPS
 
 logical, public, parameter :: RandomizeVVdecays = .true.    ! randomize DecayMode1 and DecayMode2 in H-->VV and TTBAR decays
 

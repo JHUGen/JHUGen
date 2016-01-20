@@ -114,8 +114,8 @@ The list of command line configurables and the default values are (also defined 
     MuFacMultiplier:   Multiplier for the factorization scale chosen by FacScheme
     RenScheme:         QCD renormalization scale scheme
     MuRenMultiplier:   Multiplier for the renormalization scale chosen by RenScheme
-    WidthScheme:       Higgs width scheme: 0 for fixed width (default), 1 for running width,
-                         and 2 for the CPS
+    WidthScheme:       Higgs width scheme: 1 for running width, 2 for fixed width (default),
+                         and 3 for the CPS
     WriteFailedEvents: Write events that fail in the LHE file, but with a weight of 0
                          (off by default)
     Seed:              Random seed for event generation
@@ -151,7 +151,7 @@ A few more details on some particular parameters:
      \item $\pm8$: If the scheme number is positive, $\mu_{F,\,R} \propto \sqrt{q^2_{J}}+\sqrt{q^2_{H}}$, where $J$ is the more massive associated particle. If the scheme number is negative and the matrix element treats an associated particle as massive (\eg $t$ in $t+H$), $\mu_{F,\,R} \propto m_{J}+m_{H}$ for the most massive associated particle (same as option -7).  $-8$ is the default value for \verb|Process| 110, 111, 112 and 113. with scale multiplier $0.25$.
      \item $\pm9$: If the scheme number is positive, $\mu_{F,\,R} \propto \sqrt{q^2_{J}}$, where $J$ is the more massive associated particle. If the scheme number is negative and the matrix element treats an associated particle as massive (\eg $t$ in $t+H$), $\mu_{F,\,R} \propto m_{J}$.
      \end{itemize}
-\item \verb|WidthScheme|: This option controls the width scheme in JHUGen. The options are 0 for fixed width, 1 for running width, and 2 for the complex pole scheme~\cite{Passarino:2010qk,Goria:2011wa}. 0 is the default option.
+\item \verb|WidthScheme|: This option controls the width scheme in JHUGen. The options are 1 for running width, 2 for fixed width, and 3 for the complex pole scheme~\cite{Passarino:2010qk,Goria:2011wa}. 2 is the default option.
 \item \verb|WriteFailedEvents|: In \verb|ReadLHE| mode, events that fail in decay or that fail the lepton filter are by default not written to the LHE file.  If this option is set to 1, they are written, but their weight is set to 0.  If it is set to 2, they are written with a weight of zero and with no particles in the event.  This option is useful if the same number of events are required to be in the input and the output.
 
 \item \verb|Seed|: To reproduce previous results, the random seed can be set on the command line.  Because Fortran uses multiple random seeds (the exact number is compiler dependent), the seed provided is used along with other fixed seeds specified in \verb|mod_Parameters.F90| to generate however many seeds are needed.  If no seed is provided on the command line, the seed is determined from the system time.  Either way, it is printed in the header of the output file so that the results can be reproduced.

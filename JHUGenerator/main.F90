@@ -346,6 +346,7 @@ logical :: SetAnomalousHff, Setkappa
     call ReadCommandLineArgument(arg, "MuRenMultiplier", success, MuRenMultiplier)
     call ReadCommandLineArgument(arg, "TopDK", success, TopDecays)
     call ReadCommandLineArgument(arg, "TauDK", success, TauDecays)
+    call ReadCommandLineArgument(arg, "ReweightDecay", success, ReweightDecay)
     call ReadCommandLineArgument(arg, "WidthScheme", success, WidthScheme)
     call ReadCommandLineArgument(arg, "OffXVV", success, OffShell_XVV)
     call ReadCommandLineArgument(arg, "FilterNLept", success, RequestNLeptons)
@@ -704,6 +705,11 @@ logical :: SetAnomalousHff, Setkappa
     endif
     if( RequestNLeptons .lt. 2*RequestOS ) then
         RequestNLeptons = 2*RequestOS
+    endif
+
+    !WidthScheme
+    if( WidthScheme.le.0 ) then
+        WidthScheme = 2
     endif
 
     !WriteFailedEvents
@@ -1978,6 +1984,18 @@ integer :: i, j, stat
                endif
         endif
 
+        !Read the generated mass shape for reweighting, POWHEG only
+        if (ReweightDecay .and. WidthScheme.le.0 .and. FirstLines(1:7).eq."bwshape") then
+            i = 8
+            do while(FirstLines(i:i).eq." ")
+                i = i+1
+            enddo
+            do while(FirstLines(i:i).ne." ")
+                i = i+1
+            enddo
+            read(FirstLines(8:i),*) WidthScheme
+        endif
+
         if( Index(FirstLines, "<event").ne.0 ) FirstEvent=.true.
      enddo
 99   continue
@@ -2751,7 +2769,7 @@ integer,parameter :: nmax=20
 real(8),parameter :: ScanRange=120d0*GeV
 
 
-     if( WidthScheme.eq.1 ) then
+     if( WidthScheme.eq.2 ) then
          GetMZZProbability = 0d0
          do evals=1,Ncalls
              call random_number(yRnd)
@@ -3837,6 +3855,9 @@ character :: arg*(500)
 #endif
         write(TheUnit,"(4X,A,L)") "Unweighted: ",Unweighted
     endif
+    if( ReweightDecay .and. ReadLHEFile ) then
+        write(TheUnit,"(4X,A,I3)") "Reweighting from POWHEG WidthScheme ", WidthScheme
+    endif
     if( Process.le.2 .or. ReadLHEFile ) write(TheUnit,"(4X,A,L)") "Interference: ",includeInterference
     if( (Process.le.2 .or. ReadLHEFile) .and. (IsAZDecay(DecayMode1) .or. IsAZDecay(DecayMode2))  ) write(TheUnit,"(4X,A,L)") "Intermediate off-shell photons: ",includeGammaStar
 
@@ -4166,7 +4187,7 @@ implicit none
         write(io_stdout,"(4X,A)") "BotDK:      decay mode for bottom quarks in H->bbar, 0=deactivated, 1=activated"
         write(io_stdout,"(4X,A)") "PChannel:   0=g+g, 1=q+qb, 2=both"
         write(io_stdout,"(4X,A)") "OffXVV:     off-shell option for resonance(X),or vector bosons(VV)"
-        write(io_stdout,"(4X,A)") "WidthScheme:0=fixed width, 1=running width, 2=complex pole scheme"
+        write(io_stdout,"(4X,A)") "WidthScheme:1=running width, 2=fixed width (default), 3=complex pole scheme"
         write(io_stdout,"(4X,A)") "PDFSet:     1=CTEQ6L1(default), 2=MSTW2008LO,  2xx=MSTW with eigenvector set xx=01..40), 3=NNPDF3.0LO"
 #if useLHAPDF==1
         write(io_stdout,"(4X,A)") "LHAPDF:     name of the LHA PDF file, e.g. NNPDF30_lo_as_0130/NNPDF30_lo_as_0130.info"
