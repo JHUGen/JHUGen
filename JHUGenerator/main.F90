@@ -18,7 +18,7 @@ real(8) :: VG_Result,VG_Error
    call InitParameters()
    call InitProcess()
    call InitVegas()
-   call InitRandomSeed(TheSeeds)
+   call InitRandomSeed()
    call OpenFiles()
    call PrintLogo(io_stdout)
    call PrintLogo(io_LogFile)
@@ -361,6 +361,7 @@ logical :: SetAnomalousHff, Setkappa
     if( SetLastArgument ) Unweighted = .false.
     call ReadCommandLineArgument(arg, "CalcPMZZ", success, CalcPMZZ)
     call ReadCommandLineArgument(arg, "WriteFailedEvents", success, WriteFailedEvents)
+    call ReadCommandLineArgument(arg, "Seed", success, UserSeed)
 
     !anomalous couplings
     !If any anomalous couplings are set, the default ones have to be set explicitly to keep them on or turn them off
@@ -3814,7 +3815,7 @@ character :: arg*(500)
     if( CountTauAsAny .and. RequestOSSF.gt.0 ) then
         write(TheUnit,"(8X,A)") "(counting tau in place of e or mu of the same sign, if necessary)"
     endif
-    write(TheUnit,"(4X,A,20I11)") "Random seeds: ",TheSeeds(1:TheSeeds(0))
+    write(TheUnit,"(4X,A,20I11)") "Random seed: ",UserSeed
 
     if( .not. (ReadLHEFile .or. ConvertLHEFile) ) then
         write(TheUnit,"(4X,A)") ""
@@ -3830,8 +3831,6 @@ character :: arg*(500)
     endif
     if( Process.le.2 .or. ReadLHEFile ) write(TheUnit,"(4X,A,L)") "Interference: ",includeInterference
     if( (Process.le.2 .or. ReadLHEFile) .and. (IsAZDecay(DecayMode1) .or. IsAZDecay(DecayMode2))  ) write(TheUnit,"(4X,A,L)") "Intermediate off-shell photons: ",includeGammaStar
-
-    if( .not. seed_random ) write(TheUnit,"(4X,A)") "NOTE: seed_random==FALSE (switched off)"
 
     write(TheUnit,"(4X,A)") ""
     if( Process.eq.0 .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.62 .or. Process.eq.66 .or. Process.eq.50 ) then
@@ -3995,18 +3994,17 @@ END SUBROUTINE
 
 
 
-! if seed_random=true:  "Seeds" returns the seeds chosen according to system clock
-! is seed_random=false: "Seeds" is used as input for initializing the random number generator
-SUBROUTINE InitRandomSeed(Seeds)
+SUBROUTINE InitRandomSeed()
 use modParameters
 use modMisc
 implicit none
-integer :: Seeds(0:20)
 integer, dimension(:), allocatable :: gen_seed
-integer :: n,i,sclock,SeedSize
+integer :: n,i,sclock
+real :: tmp_real, tmp_real2
+logical :: finished
 
 
-    if (seed_random) then 
+    if (UserSeed.eq.0) then
 #if compiler==1
         call random_seed()
 #elif compiler==2
@@ -4017,14 +4015,40 @@ integer :: n,i,sclock,SeedSize
         call random_seed(put = gen_seed)
         deallocate(gen_seed)
 #endif
-        call random_seed(size=SeedSize)
-        Seeds(0) = SeedSize
-        call random_seed(get=Seeds(1:SeedSize))
-    else        
-        call random_seed(size=n)
-        if( n.ne.Seeds(0) ) call Error("Number of input seeds does not match random_seed(size=n)",n)
-        call random_seed(put = Seeds(1:n))
+        call random_number(tmp_real)
+        UserSeed = floor(tmp_real * 1000000000.)
     endif
+
+    call random_seed(size=n)
+    if( n.gt.nmaxseeds ) then
+        print *, "Your compiler wants ", n, " seeds, but nmaxseeds=", nmaxseeds
+        print *, "Try changing nmaxseeds and adding to DefaultSeeds (both in mod_Parameters)"
+        stop 1
+    endif
+
+    call random_seed(put = DefaultSeeds(1:n))
+    call random_number(tmp_real)
+    do i=1,n   !Sometimes not all of the seeds requested matter.  Put UserSeed in place of the first one that does
+        TheSeeds = DefaultSeeds
+        TheSeeds(i) = UserSeed
+        call random_seed(put = TheSeeds(1:n))
+        call random_number(tmp_real2)
+        if( abs(tmp_real2-tmp_real).ge.0.001 ) then
+            exit
+        endif
+    enddo
+    if( abs(tmp_real2-tmp_real).lt.0.001 ) then
+        print *, "Fatal error: the random seed doesn't seem to make a difference!?!?"
+        stop 1
+    endif
+
+    allocate(gen_seed(n))
+    do i=1,n
+        call random_number(tmp_real)
+        gen_seed(i) = floor(tmp_real * 1000000000.)
+    enddo
+    call random_seed(put = gen_seed)
+    deallocate(gen_seed)
 
 return
 END SUBROUTINE
