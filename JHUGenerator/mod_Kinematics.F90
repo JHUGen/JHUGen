@@ -3917,30 +3917,81 @@ RETURN
 END SUBROUTINE
 
 
-
-FUNCTION ReweightBWPropagator(shat)! shat is the resonance inv. mass squared
+RECURSIVE FUNCTION GetBWPropagator(sHat, scheme, CPStype) result(BWPropagator)
+use modMisc
 use modParameters
+use modYRdata
 implicit none
-real(8) :: ReweightBWPropagator,shat
-real(8) :: BreitWigner,BreitWigner_Run,Ga_shat,muH,gaH
+real(8) :: BWPropagator, sHat
+real(8) :: Ga_sHat, muH, gaH, BranchingRatio
+integer :: scheme
+integer, optional :: CPStype
 
+    if( scheme.eq.3 .and. .not.present(CPStype) ) then
+        call Error("GetBWpropagator called with scheme=3 (CPS), but no CPStype!")
+    endif
 
-    ReweightBWPropagator = 1d0
-    
-    if( WidthScheme.eq.1) then! running width
-        BreitWigner = M_Reso*Ga_Reso/( (shat-M_Reso**2)**2 + (M_Reso*Ga_Reso)**2 )
-        BreitWigner_Run =  shat*Ga_Reso/M_Reso/( (shat-M_Reso**2)**2 + (shat*Ga_Reso/M_Reso)**2 )
-       
-    elseif( WidthScheme.eq.3) then! Passarino'S CPS
-        BreitWigner = M_Reso*Ga_Reso/( (shat-M_Reso**2)**2 + (M_Reso*Ga_Reso)**2 )
+    if( scheme.eq.1 ) then! running width
+        BWPropagator = sHat*Ga_Reso/M_Reso/( (sHat-M_Reso**2)**2 + (sHat*Ga_Reso/M_Reso)**2 )
 
+    elseif( scheme.eq.2 ) then! fixed width
+        BWPropagator = M_Reso*Ga_Reso/( (sHat-M_Reso**2)**2 + (M_Reso*Ga_Reso)**2 )
+
+    elseif( scheme.eq.3 .and. CPStype.eq.1 ) then
+       ! CPS - INCORRECT for event generation, as it includes the decay width
+       !          which is almost equivalent to the decay ME, already included
+       !          in JHUGen decay
+       !       this should ONLY be used for unweighting POWHEG samples
         muH = dsqrt( M_Reso**2/(1d0+(Ga_Reso/M_Reso)**2) )
         gaH = muH/M_Reso*Ga_Reso
-        call CALL_HTO(dsqrt(dabs(shat))*100d0,m_top*100d0,Ga_shat)
-        Ga_shat = Ga_shat/100d0
-        
-        BreitWigner_Run = dsqrt(dabs(shat)) * Ga_shat /( (shat-muH**2)**2 + (muH*gaH) )
+        call CALL_HTO(dsqrt(dabs(sHat))/GeV,m_top/GeV,Ga_sHat)
+        Ga_sHat = Ga_sHat*GeV
+
+        BWPropagator = dsqrt(dabs(sHat)) * Ga_sHat /( (sHat-muH**2)**2 + (muH*gaH) )
+
+    elseif( scheme.eq.3 .and. CPStype.eq.2 ) then
+       ! CPS times the branching fraction to VV, so that Ga_sHat is not the total width,
+       !   but the partial width to VV (VV determined by DecayModes1,2)
+       ! again, this is wrong for event generation, but should be used for decaying POWHEG CPS
+        call YR_GetBranchingFraction(dsqrt(sHat)/GeV, BranchingRatio)
+        BWPropagator = GetBWPropagator(sHat, 3, 1) * BranchingRatio
+
+    elseif( scheme.eq.3 .and. CPStype.eq.3 ) then
+       ! CPS, but without Ga_sHat
+        call Error("Not implemented yet because I am confused")
+
+    else
+        if( scheme.eq.3 ) then
+            print *, "Invalid CPStype argument to GetBWpropagator: ", CPStype
+        else
+            print *, "Invalid scheme argument to GetBWpropagator: ", scheme
+        endif
+        stop 1
     endif
+
+
+RETURN
+END FUNCTION
+
+FUNCTION ReweightBWPropagator(sHat)! sHat is the resonance inv. mass squared
+use modMisc
+use modParameters
+implicit none
+real(8) :: ReweightBWPropagator,sHat
+real(8) :: BreitWigner,BreitWigner_Run,Ga_sHat,muH,gaH
+
+
+     ReweightBWPropagator = 1d0
+     BreitWigner = GetBWPropagator(sHat, 2)
+     if( WidthScheme.eq.1 ) then
+        BreitWigner_Run = GetBWPropagator(sHat, 1)
+     elseif( WidthScheme.eq.2 ) then
+        BreitWigner_Run = BreitWigner
+     elseif( WidthScheme.eq.3 ) then
+        BreitWigner_Run = GetBWPropagator(sHat, 3, 1)
+     else
+         call Error("Invalid WidthScheme!")
+     endif
 
     ReweightBWPropagator = BreitWigner_Run/BreitWigner
     
