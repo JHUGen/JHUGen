@@ -3931,7 +3931,7 @@ real(8) :: BreitWigner,BreitWigner_Run,Ga_shat,muH,gaH
         BreitWigner = M_Reso*Ga_Reso/( (shat-M_Reso**2)**2 + (M_Reso*Ga_Reso)**2 )
         BreitWigner_Run =  shat*Ga_Reso/M_Reso/( (shat-M_Reso**2)**2 + (shat*Ga_Reso/M_Reso)**2 )
        
-    elseif( WidthScheme.eq.2) then! Passarino'S CPS
+    elseif( WidthScheme.eq.3) then! Passarino'S CPS
         BreitWigner = M_Reso*Ga_Reso/( (shat-M_Reso**2)**2 + (M_Reso*Ga_Reso)**2 )
 
         muH = dsqrt( M_Reso**2/(1d0+(Ga_Reso/M_Reso)**2) )
