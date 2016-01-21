@@ -3922,24 +3922,33 @@ FUNCTION ReweightBWPropagator(shat)! shat is the resonance inv. mass squared
 use modParameters
 implicit none
 real(8) :: ReweightBWPropagator,shat
-real(8) :: BreitWigner,BreitWigner_Run,Ga_shat,muH,gaH
+real(8) :: BreitWigner,BreitWigner_Run,muH,gaH,mubarH,gabarH
 
 
     ReweightBWPropagator = 1d0
     
     if( WidthScheme.eq.1) then! running width
-        BreitWigner = M_Reso*Ga_Reso/( (shat-M_Reso**2)**2 + (M_Reso*Ga_Reso)**2 )
-        BreitWigner_Run =  shat*Ga_Reso/M_Reso/( (shat-M_Reso**2)**2 + (shat*Ga_Reso/M_Reso)**2 )
+        BreitWigner = 1d0/( (shat-M_Reso**2)**2 + (M_Reso*Ga_Reso)**2 )
+        BreitWigner_Run =  1d0/( (shat-M_Reso**2)**2 + (shat*Ga_Reso/M_Reso)**2 )
        
     elseif( WidthScheme.eq.2) then! Passarino'S CPS
-        BreitWigner = M_Reso*Ga_Reso/( (shat-M_Reso**2)**2 + (M_Reso*Ga_Reso)**2 )
+        BreitWigner = 1d0/( (shat-M_Reso**2)**2 + (M_Reso*Ga_Reso)**2 )
 
-        muH = dsqrt( M_Reso**2/(1d0+(Ga_Reso/M_Reso)**2) )
-        gaH = muH/M_Reso*Ga_Reso
-        call CALL_HTO(dsqrt(dabs(shat))*100d0,m_top*100d0,Ga_shat)
-        Ga_shat = Ga_shat/100d0
+        call CALL_HTO(dsqrt(dabs(shat))*100d0,m_top*100d0,gabarH,mubarH)
+        if( IsNaN(gabarH) .or. IsNaN(mubarH) ) then
+          print *, "Passarino's CALL_HTO returned a NaN"
+          print *, "gabarH,mubarH,Ehat)",gabarH,mubarH,dsqrt(dabs(shat))*100d0
+          print *, "returning weight 1.0"          
+          ReweightBWPropagator = 1d0
+          RETURN
+        endif       
+        mubarH = mubarH/100d0
+        gabarH = gabarH/100d0
+
+        muH = dsqrt( mubarH**2/(1d0+(gabarH/mubarH)**2) )
+        gaH = muH/mubarH*gabarH
         
-        BreitWigner_Run = dsqrt(dabs(shat)) * Ga_shat /( (shat-muH**2)**2 + (muH*gaH) )
+        BreitWigner_Run = 1d0 /( (shat-muH**2)**2 + (muH*gaH)**2 )
     endif
 
     ReweightBWPropagator = BreitWigner_Run/BreitWigner
