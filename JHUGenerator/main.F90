@@ -2817,10 +2817,10 @@ real(8),parameter :: ScanRange=120d0*GeV
              GetMZZProbability = GetMZZProbability + DecayWeight
          enddo
          GetMZZProbability = GetMZZProbability/dble(evals)
-         GetMZZProbability = GetMZZProbability * GetBWPropagator(EHat**2, 2) / GetBWPropagator(EHat**2, 3, 1)
+         GetMZZProbability = GetMZZProbability * GetBWPropagator(EHat**2, 2) / GetBWPropagator(EHat**2, 3)
      elseif( WidthSchemeIn.eq.2 .and. WidthScheme.eq.3 ) then !BW --> CPS
          call YR_GetBranchingFraction(EHat/GeV, GetMZZProbability)  !so that Gamma(tot) --> Gamma(ZZ)
-         GetMZZProbability = GetMZZProbability * GetBWPropagator(EHat**2, 3, 1) / GetBWPropagator(EHat**2, 2)
+         GetMZZProbability = GetMZZProbability * GetBWPropagator(EHat**2, 3) / GetBWPropagator(EHat**2, 2)
      else
          call Error("Invalid WidthScheme!")
      endif
