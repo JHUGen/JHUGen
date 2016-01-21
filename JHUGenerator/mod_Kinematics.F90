@@ -3938,7 +3938,7 @@ integer, optional :: CPStype
         BWPropagator = M_Reso*Ga_Reso/( (sHat-M_Reso**2)**2 + (M_Reso*Ga_Reso)**2 )
 
     elseif( scheme.eq.3 .and. CPStype.eq.1 ) then
-       ! CPS - INCORRECT for event generation, as it includes the decay width
+       ! CPS - INCORRECT for event generation, as it contains the decay width
        !          which is almost equivalent to the decay ME, already included
        !          in JHUGen decay
        !       this should ONLY be used for unweighting POWHEG samples

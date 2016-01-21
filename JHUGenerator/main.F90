@@ -258,6 +258,7 @@ logical :: SetAnomalousHff, Setkappa
 ! !       DecayMode=11: W --> anything
 
    WidthScheme=0
+   WidthSchemeIn=0
    TopDecays=-1
    TauDecays=-1
    Process = 0   ! select 0, 1 or 2 to represent the spin of the resonance
@@ -348,6 +349,7 @@ logical :: SetAnomalousHff, Setkappa
     call ReadCommandLineArgument(arg, "TauDK", success, TauDecays)
     call ReadCommandLineArgument(arg, "ReweightDecay", success, ReweightDecay)
     call ReadCommandLineArgument(arg, "WidthScheme", success, WidthScheme)
+    call ReadCommandLineArgument(arg, "WidthSchemeIn", success, WidthSchemeIn)
     call ReadCommandLineArgument(arg, "OffXVV", success, OffShell_XVV)
     call ReadCommandLineArgument(arg, "FilterNLept", success, RequestNLeptons)
     call ReadCommandLineArgument(arg, "FilterOSPairs", success, RequestOS)
@@ -708,12 +710,29 @@ logical :: SetAnomalousHff, Setkappa
     endif
 
     !WidthScheme and reweighting
-    if( WidthScheme.le.0 ) then
-        WidthScheme = 2
-    endif
-
-    if( .not. ReadLHEFile ) then
-        ReweightDecay = .false.
+    if( .not.ReadLHEFile .and. .not.ConvertLHEFile ) then
+        if( ReweightDecay .or. WidthSchemeIn.gt.0 ) then
+            call Error("ReweightDecay and WidthSchemeIn only make sense in ReadLHE mode")
+        endif
+        if( WidthScheme.le.0 ) then
+            WidthScheme = 2
+        endif
+    else
+        if( WidthScheme.le.0 .and. WidthSchemeIn.le.0 ) then
+            if( ReweightDecay ) then
+                print *, "If you want to reweight the decay, you need to specify a width scheme to correct"
+                print *, " for the VV branching fraction/matrix element, or both to reweight from one scheme to another"
+                stop 1
+            endif
+            WidthScheme = 2
+            WidthSchemeIn = 2
+        elseif( WidthScheme.le.0 .and. WidthSchemeIn.gt.0 ) then
+            WidthScheme = WidthSchemeIn
+        elseif( WidthScheme.gt.0 .and. WidthSchemeIn.le.0 ) then
+            WidthSchemeIn = WidthScheme
+        else !both > 0
+            ReweightDecay = .true.
+        endif
     endif
 
     !WriteFailedEvents
@@ -1989,7 +2008,7 @@ integer :: i, j, stat
         endif
 
         !Read the generated mass shape for reweighting, POWHEG only
-        if (ReweightDecay .and. WidthScheme.le.0 .and. FirstLines(1:7).eq."bwshape") then
+        if (ReweightDecay .and. FirstLines(1:7).eq."bwshape") then
             i = 8
             do while(FirstLines(i:i).eq." ")
                 i = i+1
@@ -1997,7 +2016,14 @@ integer :: i, j, stat
             do while(FirstLines(i:i).ne." ")
                 i = i+1
             enddo
-            read(FirstLines(8:i),*) WidthScheme
+            read(FirstLines(8:i),*) j
+            if( WidthSchemeIn.gt.0 .and. j.ne.WidthSchemeIn ) then
+                print *, "WidthSchemeIn is specified to be ", WidthSchemeIn, " but the LHE file says:"
+                print *, FirstLines
+                stop 1
+            endif
+            if( WidthScheme.le.0 ) read(FirstLines(8:i),*) WidthScheme
+            if( WidthSchemeIn.le.0 ) read(FirstLines(8:i),*) WidthSchemeIn
         endif
 
         if( Index(FirstLines, "<event").ne.0 ) FirstEvent=.true.
@@ -2761,6 +2787,7 @@ END SUBROUTINE
 
 FUNCTION GetMZZProbability(EHat,Ncalls)
 use ModCrossSection
+use ModKinematics
 use ModMisc
 use ModParameters
 use ModYRdata
@@ -2772,8 +2799,7 @@ integer :: evals,Ncalls
 integer,parameter :: nmax=20
 real(8),parameter :: ScanRange=120d0*GeV
 
-
-     if( WidthScheme.eq.2 ) then
+     if( WidthSchemeIn.eq.2 .and. WidthScheme.eq.2 ) then  !BW --> BW, multiply by P_{decay}(mZZ)
          GetMZZProbability = 0d0
          do evals=1,Ncalls
              call random_number(yRnd)
@@ -2781,8 +2807,20 @@ real(8),parameter :: ScanRange=120d0*GeV
              GetMZZProbability = GetMZZProbability + DecayWeight
          enddo
          GetMZZProbability = GetMZZProbability/dble(evals)
-     elseif( WidthScheme.eq.3 ) then
-         call YR_GetBranchingFraction(EHat/GeV, GetMZZProbability)
+     elseif( WidthSchemeIn.eq.3 .and. WidthScheme.eq.3 ) then  !CPS --> CPS, multiply by the branching fraction
+         call YR_GetBranchingFraction(EHat/GeV, GetMZZProbability)  !so that Gamma(tot) --> Gamma(ZZ)
+     elseif( WidthSchemeIn.eq.3 .and. WidthScheme.eq.2 ) then  !CPS --> BW
+         GetMZZProbability = 0d0
+         do evals=1,Ncalls
+             call random_number(yRnd)
+             DecayWeight = EvalUnWeighted_DecayToVV(yRnd,.false.,EHat,Res,HiggsDK_Mom(1:4,6:9),HiggsDK_IDUP(1:9),HiggsDK_ICOLUP)
+             GetMZZProbability = GetMZZProbability + DecayWeight
+         enddo
+         GetMZZProbability = GetMZZProbability/dble(evals)
+         GetMZZProbability = GetMZZProbability * GetBWPropagator(EHat**2, 2) / GetBWPropagator(EHat**2, 3, 1)
+     elseif( WidthSchemeIn.eq.2 .and. WidthScheme.eq.3 ) then !BW --> CPS
+         call YR_GetBranchingFraction(EHat/GeV, GetMZZProbability)  !so that Gamma(tot) --> Gamma(ZZ)
+         GetMZZProbability = GetMZZProbability * GetBWPropagator(EHat**2, 3, 1) / GetBWPropagator(EHat**2, 2)
      else
          call Error("Invalid WidthScheme!")
      endif
@@ -2790,8 +2828,6 @@ real(8),parameter :: ScanRange=120d0*GeV
 
 RETURN
 END FUNCTION
-
-
 
 
 
@@ -3859,8 +3895,8 @@ character :: arg*(500)
 #endif
         write(TheUnit,"(4X,A,L)") "Unweighted: ",Unweighted
     endif
-    if( ReweightDecay .and. ReadLHEFile ) then
-        write(TheUnit,"(4X,A,I3)") "Reweighting from POWHEG WidthScheme ", WidthScheme
+    if( ReweightDecay ) then
+        write(TheUnit,"(4X,A,I3,A,I3)") "Reweighting from WidthScheme ", WidthSchemeIn, " to WidthScheme ", WidthScheme
     endif
     if( Process.le.2 .or. ReadLHEFile ) write(TheUnit,"(4X,A,L)") "Interference: ",includeInterference
     if( (Process.le.2 .or. ReadLHEFile) .and. (IsAZDecay(DecayMode1) .or. IsAZDecay(DecayMode2))  ) write(TheUnit,"(4X,A,L)") "Intermediate off-shell photons: ",includeGammaStar
