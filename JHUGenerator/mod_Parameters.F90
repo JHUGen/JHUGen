@@ -64,6 +64,8 @@ integer, public :: Br_counter(1:5,1:5)=0
 integer, public :: LeptInEvent(0:8) = 0
 logical, public :: ReweightDecay = .false.
 integer, public :: UserSeed = 0
+integer, public  :: WidthScheme = 0   ! 1=running BW-width, 2=fixed BW-width (default), 3=Passarino's CPS
+integer, public  :: WidthSchemeIn = 0   ! 1=running BW-width, 2=fixed BW-width (default), 3=Passarino's CPS
 !=====================================================
 
 
@@ -90,8 +92,6 @@ real(8), public, parameter :: channels_ratio_fix = 0.25d0   ! desired ratio of  
 logical, public, parameter :: importExternal_LHEinit = .true.
 
 logical, public, parameter :: writeWeightedLHE = .false. 
-
-integer, public  :: WidthScheme    ! 1=running BW-width, 2=fixed BW-width (default), 3=Passarino's CPS
 
 logical, public, parameter :: RandomizeVVdecays = .true.    ! randomize DecayMode1 and DecayMode2 in H-->VV and TTBAR decays
 
