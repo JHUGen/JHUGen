@@ -2807,19 +2807,13 @@ real(8),parameter :: ScanRange=120d0*GeV
              GetMZZProbability = GetMZZProbability + DecayWeight
          enddo
          GetMZZProbability = GetMZZProbability/dble(evals)
-     elseif( WidthSchemeIn.eq.3 .and. WidthScheme.eq.3 ) then  !CPS --> CPS, multiply by the branching fraction
+     elseif( WidthSchemeIn.eq.3 .and. WidthScheme.eq.3 ) then       !CPS --> CPS, multiply by the branching fraction
          call YR_GetBranchingFraction(EHat/GeV, GetMZZProbability)  !so that Gamma(tot) --> Gamma(ZZ)
-     elseif( WidthSchemeIn.eq.3 .and. WidthScheme.eq.2 ) then  !CPS --> BW
-         GetMZZProbability = 0d0
-         do evals=1,Ncalls
-             call random_number(yRnd)
-             DecayWeight = EvalUnWeighted_DecayToVV(yRnd,.false.,EHat,Res,HiggsDK_Mom(1:4,6:9),HiggsDK_IDUP(1:9),HiggsDK_ICOLUP)
-             GetMZZProbability = GetMZZProbability + DecayWeight
-         enddo
-         GetMZZProbability = GetMZZProbability/dble(evals)
+     elseif( WidthSchemeIn.eq.3 .and. WidthScheme.eq.2 ) then       !CPS --> BW
+         call YR_GetBranchingFraction(EHat/GeV, GetMZZProbability)
          GetMZZProbability = GetMZZProbability * GetBWPropagator(EHat**2, 2) / GetBWPropagator(EHat**2, 3)
-     elseif( WidthSchemeIn.eq.2 .and. WidthScheme.eq.3 ) then !BW --> CPS
-         call YR_GetBranchingFraction(EHat/GeV, GetMZZProbability)  !so that Gamma(tot) --> Gamma(ZZ)
+     elseif( WidthSchemeIn.eq.2 .and. WidthScheme.eq.3 ) then       !BW --> CPS
+         call YR_GetBranchingFraction(EHat/GeV, GetMZZProbability)
          GetMZZProbability = GetMZZProbability * GetBWPropagator(EHat**2, 3) / GetBWPropagator(EHat**2, 2)
      else
          call Error("Invalid WidthScheme!")
