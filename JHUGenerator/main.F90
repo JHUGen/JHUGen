@@ -710,7 +710,7 @@ logical :: SetAnomalousHff, Setkappa
     endif
 
     !WidthScheme and reweighting
-    if( .not.ReadLHEFile .and. .not.ConvertLHEFile ) then
+    if( .not.ReadLHEFile .and. .not.ConvertLHEFile .and. .not.CalcPMZZ ) then
         if( ReweightDecay .or. WidthSchemeIn.gt.0 ) then
             call Error("ReweightDecay and WidthSchemeIn only make sense in ReadLHE mode")
         endif
