@@ -45,7 +45,7 @@ character(len=100) :: LogFile
 character(len=500) :: LHEProdFile
 character(len=100) :: LHAPDFString
 integer, public :: LHAPDFMember
-logical, public :: includeInterference
+logical, public :: includeInterference, writegit
 real(8), public :: M_V,Ga_V
 real(8), public, parameter :: GeV=1d0/100d0 ! we are using units of 100GeV, i.e. Lambda=10 is 1TeV 
 real(8), public, parameter :: percent=1d0/100d0
