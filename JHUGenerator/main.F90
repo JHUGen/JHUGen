@@ -4017,6 +4017,7 @@ logical :: finished
 #endif
         call random_number(tmp_real)
         UserSeed = floor(tmp_real * 1000000000.)
+        UserSeed = UserSeed + getpid()
     endif
 
     call random_seed(size=n)
