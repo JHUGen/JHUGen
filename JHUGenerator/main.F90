@@ -365,6 +365,7 @@ logical :: SetAnomalousHff, Setkappa
     call ReadCommandLineArgument(arg, "CalcPMZZ", success, CalcPMZZ)
     call ReadCommandLineArgument(arg, "WriteFailedEvents", success, WriteFailedEvents)
     call ReadCommandLineArgument(arg, "Seed", success, UserSeed)
+    call ReadCommandLineArgument(arg, "WriteGit", success, writegit) !for testing purposes
 
     !anomalous couplings
     !If any anomalous couplings are set, the default ones have to be set explicitly to keep them on or turn them off
@@ -3694,6 +3695,7 @@ SUBROUTINE InitOutput(CrossSection, CrossSectionError)
 use ModParameters
 implicit none
 
+integer :: exitstatus
 real(8) :: CrossSection, CrossSectionError
 
     if( (unweighted) .or. ( (.not.unweighted) .and. (writeWeightedLHE) )  ) then 
@@ -3703,6 +3705,19 @@ real(8) :: CrossSection, CrossSectionError
         write(io_LHEOutFile ,'(A)') '<!--'
         write(io_LHEOutFile ,'(A,A6,A)') 'Output from the JHUGenerator ',trim(JHUGen_Version),' described in arXiv:1001.3396 [hep-ph],arXiv:1208.4018 [hep-ph],arXiv:1309.4819 [hep-ph]'
 
+        if( writegit ) then
+            write(io_LHEOutFile,'(A)') ""
+            write(io_LHEOutFile,'(A)') "Current git commit:"
+            close(io_LHEOutFile)
+            call system("git rev-parse HEAD >> "//trim(DataFile)//".lhe")
+            call system("! git diff --name-only | grep .", exitstatus)
+            if( exitstatus.ne.0 ) then
+                print *, "can't write git commit to the lhe file with a dirty working tree!"
+                stop 1
+            endif
+            open(unit=io_LHEOutFile,file=trim(DataFile)//'.lhe',form='formatted',access='append',status='old')
+            write(io_LHEOutFile,'(A)') ""
+        endif
         call WriteParameters(io_LHEOutFile)
 
         if( (ReadLHEFile .or. ConvertLHEFile) .and. (importExternal_LHEinit) ) then
