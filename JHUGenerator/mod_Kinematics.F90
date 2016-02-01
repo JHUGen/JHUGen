@@ -3923,29 +3923,30 @@ use modParameters
 use modYRdata
 implicit none
 real(8) :: GetBWPropagator,sHat
-real(8) :: muH,gaH,mubarH,gabarH
+real(8) :: gabarH, BigGamma
 integer :: scheme
 
     if( scheme.eq.1) then! running width
         GetBWPropagator =  1d0/( (sHat-M_Reso**2)**2 + (sHat*Ga_Reso/M_Reso)**2 )
     elseif( scheme.eq.2 ) then! fixed width
         GetBWPropagator = 1d0/( (sHat-M_Reso**2)**2 + (M_Reso*Ga_Reso)**2 )
-    elseif( scheme.eq.3) then! Passarino'S CPS
-        call CALL_HTO(dsqrt(dabs(sHat))*100d0,m_top*100d0,gabarH,mubarH)
-        if( IsNaN(gabarH) .or. IsNaN(mubarH) ) then
+    elseif( scheme.eq.3) then! Passarino's CPS
+        call CALL_HTO(dsqrt(dabs(sHat))/GeV,m_top/GeV,gabarH)
+        if( IsNaN(gabarH) ) then
           print *, "Passarino's CALL_HTO returned a NaN"
-          print *, "gabarH,mubarH,Ehat)",gabarH,mubarH,dsqrt(dabs(sHat))*100d0
-          print *, "returning weight 1.0"          
-          GetBWPropagator = 1d0
+          print *, "gabarH,Ehat)",gabarH,dsqrt(dabs(sHat))/GeV
+          print *, "returning weight 1.0"
+          GetBWPropagator = 1d0/( (sHat-M_Reso**2)**2 + (M_Reso*Ga_Reso)**2 )
           RETURN
-        endif       
-        mubarH = mubarH/100d0
-        gabarH = gabarH/100d0
+        endif
+        gabarH = gabarH*GeV
 
-        muH = dsqrt( mubarH**2/(1d0+(gabarH/mubarH)**2) )
-        gaH = muH/mubarH*gabarH
-        
-        GetBWPropagator = 1d0 /( (sHat-muH**2)**2 + (muH*gaH)**2 )
+        GetBWPropagator = 1d0/( (sHat-M_Reso**2)**2 + (sHat*gabarH/M_Reso)**2 )
+
+        !call HTO_gridHt(dsqrt(dabs(sHat))/GeV,BigGamma)
+        !BigGamma = BigGamma*GeV
+
+        !print *, dsqrt(dabs(sHat))/GeV, gabarH/GeV, BigGamma/GeV
     else
         print *, "Invalid scheme: ", scheme
         stop 1
@@ -3976,7 +3977,7 @@ real(8) :: BreitWigner,BreitWigner_Run,Ga_sHat,muH,gaH
      endif
 
     ReweightBWPropagator = BreitWigner_Run/BreitWigner
-    
+
 
 RETURN
 END FUNCTION
