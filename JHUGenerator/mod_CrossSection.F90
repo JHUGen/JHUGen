@@ -1715,7 +1715,6 @@ ENDIF! GENEVT
    endif
 
    if( WidthScheme.ne.2 ) EvalWeighted = EvalWeighted * ReweightBWPropagator( Get_MInv2( MomExt(1:4,3)+MomExt(1:4,4) ) )
-!    print *, ReweightToCPS( Get_MInv( MomExt(1:4,3)+MomExt(1:4,4) ) );pause
 
    if( writeWeightedLHE .and. (.not. warmup) ) then
       if (PChannel.eq.0) then
