@@ -66,6 +66,8 @@ logical, public :: ReweightDecay = .false.
 integer, public :: UserSeed = 0
 integer, public  :: WidthScheme = 0   ! 1=running BW-width, 2=fixed BW-width (default), 3=Passarino's CPS
 integer, public  :: WidthSchemeIn = 0   ! 1=running BW-width, 2=fixed BW-width (default), 3=Passarino's CPS
+real(8), public :: mubarH = -999d0   !for CPS
+real(8), public :: gabarH = -999d0   !for CPS
 !=====================================================
 
 
