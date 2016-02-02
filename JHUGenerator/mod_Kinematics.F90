@@ -3932,7 +3932,6 @@ integer :: scheme
         GetBWPropagator = 1d0/( (sHat-M_Reso**2)**2 + (M_Reso*Ga_Reso)**2 )
     elseif( scheme.eq.3) then! Passarino's CPS
         if( mubarH.lt.0 .or. gabarH.lt.0 ) then
-          print *, M_Reso/GeV, m_top/GeV
           call CALL_HTO(M_Reso/GeV, m_top/GeV, mhb, ghb)
           if( IsNaN(mubarH).or.IsNaN(gabarH) ) then
             print *, "Passarino's CALL_HTO returned a NaN"
