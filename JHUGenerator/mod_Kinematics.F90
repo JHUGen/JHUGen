@@ -3923,7 +3923,7 @@ use modParameters
 use modYRdata
 implicit none
 real(8) :: GetBWPropagator,sHat
-real(8) :: mhb, ghb, mubarH, gabarH, BigGamma
+real(8) :: mhb, ghb, BigGamma
 integer :: scheme
 
     if( scheme.eq.1) then! running width
@@ -3931,19 +3931,21 @@ integer :: scheme
     elseif( scheme.eq.2 ) then! fixed width
         GetBWPropagator = 1d0/( (sHat-M_Reso**2)**2 + (M_Reso*Ga_Reso)**2 )
     elseif( scheme.eq.3) then! Passarino's CPS
-        call CALL_HTO(dsqrt(dabs(sHat))/GeV, m_top/GeV, mhb, ghb)
-        if( IsNaN(mubarH).or.IsNaN(gabarH) ) then
-          print *, "Passarino's CALL_HTO returned a NaN"
-          print *, "gabarH,Ehat)",gabarH,dsqrt(dabs(sHat))/GeV
-          print *, "returning weight 1.0"
-          GetBWPropagator = 1d0/( (sHat-M_Reso**2)**2 + (M_Reso*Ga_Reso)**2 )
-          RETURN
-        endif
-        mhb = mhb*GeV
-        ghb = ghb*GeV
+        if( mubarH.lt.0 .or. gabarH.lt.0 ) then
+          print *, M_Reso/GeV, m_top/GeV
+          call CALL_HTO(M_Reso/GeV, m_top/GeV, mhb, ghb)
+          if( IsNaN(mubarH).or.IsNaN(gabarH) ) then
+            print *, "Passarino's CALL_HTO returned a NaN"
+            print *, "gabarH,Ehat)",gabarH,dsqrt(dabs(sHat))/GeV
+            stop 1
+            RETURN
+          endif
+          mhb = mhb*GeV
+          ghb = ghb*GeV
 
-        mubarH = sqrt(mhb**2/(1+(ghb/mhb)**2))
-        gabarH = mubarH/mhb*ghb
+          mubarH = sqrt(mhb**2/(1+(ghb/mhb)**2))
+          gabarH = mubarH/mhb*ghb
+        endif
 
         GetBWPropagator = 1d0/( (sHat-mubarH**2)**2 + (mubarH*gabarH)**2 )
 
