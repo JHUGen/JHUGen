@@ -45,6 +45,7 @@ character(len=100) :: LogFile
 character(len=500) :: LHEProdFile
 #if useLHAPDF==1
 character(len=100) :: LHAPDFString
+character(len=500) :: LHAPDF_DATA_PATH
 integer, public :: LHAPDFMember
 #else
 integer, public :: PDFSet
@@ -554,6 +555,7 @@ integer,parameter :: io_LogFile=17
 integer,parameter :: io_CSmaxFile=18
 integer,parameter :: io_LHEOutFile2=19
 integer,parameter :: io_LHEOutFile3=20
+integer,parameter :: io_TmpFile=21   !to use for whatever purpose is needed, but close afterwards
 
 integer, public :: DebugCounter(0:10) = 0
 real(8), public :: debugvar(0:10) = 0d0
