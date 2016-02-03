@@ -3665,7 +3665,12 @@ integer :: stat
         pdfsup2 = 0
     else
 #if useLHAPDF==1
-        !temporary fix, there must be a better way than this
+        !temporary fix, this seems to be the only way
+        !email from Andy Buckley:
+        !  Hi,
+        !  The Fortran interface was originally written in the era when PDFs could *only* be accessed by number rather than name. Accordingly it doesn't provide a way to look up the ID code, because it expects that you need to have known it in advance!
+        !  We can add an ID-lookup function in the "new" Fortran interface for the next version, but I think for now this information isn't available other than through the C++ and Python APIs.
+        !  Andy
         open(unit=io_LHEInFile,file=trim(LHAPDF_DATA_PATH)//"/"//LHAPDFString,form='formatted',access= 'sequential',status='old')
         pdfsup1 = -999
         do while( pdfsup1.lt.0 )
