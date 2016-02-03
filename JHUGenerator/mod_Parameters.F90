@@ -9,7 +9,7 @@ character(len=6),parameter :: JHUGen_Version="v6.8.7"
 !=====================================================
 !internal
 integer, public, parameter  :: dp = selected_real_kind(15)
-integer, public :: Collider, PDFSet,PChannel,Process,DecayMode1,DecayMode2,TopDecays,TauDecays
+integer, public :: Collider,PChannel,Process,DecayMode1,DecayMode2,TopDecays,TauDecays
 integer, public :: VegasIt1,VegasNc0,VegasNc1,VegasNc2
 real(8), public :: Collider_Energy
 integer, public :: FacScheme,RenScheme
@@ -43,8 +43,12 @@ logical, public :: warmup
 character(len=500) :: DataFile
 character(len=100) :: LogFile
 character(len=500) :: LHEProdFile
+#if useLHAPDF==1
 character(len=100) :: LHAPDFString
 integer, public :: LHAPDFMember
+#else
+integer, public :: PDFSet
+#endif
 logical, public :: includeInterference
 real(8), public :: M_V,Ga_V
 real(8), public, parameter :: GeV=1d0/100d0 ! we are using units of 100GeV, i.e. Lambda=10 is 1TeV 
