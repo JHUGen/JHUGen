@@ -3640,7 +3640,52 @@ SUBROUTINE InitOutput(CrossSection, CrossSectionError)
 use ModParameters
 implicit none
 
+integer :: incoming1, incoming2
+real(8) :: beamenergy1, beamenergy2
+integer :: pdfgup1, pdfgup2, pdfsup1, pdfsup2  !pdfgup is outdated, set to 0.  pdfsup = LHAGLUE code
+integer :: weightscheme, nprocesses
 real(8) :: CrossSection, CrossSectionError
+
+    if( Collider.eq.0 ) then
+        incoming1 = -11
+        incoming2 = 11
+    else
+        incoming1=2212
+        incoming2=2212
+    endif
+    beamenergy1 = Collider_Energy/GeV / 2d0
+    beamenergy2 = Collider_Energy/GeV / 2d0
+    pdfgup1 = 0
+    pdfgup2 = 0
+    if( Collider.eq.0 ) then
+        pdfsup1 = 0
+        pdfsup2 = 0
+    else
+#if useLHAPDF==1
+        call GetNset(pdfsup1)
+        call GetNset(pdfsup2)
+#else
+        if( PDFSet.eq.1 ) then
+            pdfsup1 = 10042
+            pdfsup2 = 10042
+        elseif( PDFSet.eq.2 ) then
+            pdfsup1 = 21000
+            pdfsup2 = 21000
+        elseif( PDFSet.ge.201.and.PDFSet.le.240 ) then !21041-21080
+            pdfsup1 = 21040 + PDFSet - 200
+            pdfsup2 = 21040 + PDFSet - 200
+        elseif( PDFSet.eq.3 ) then
+            pdfsup1 = 263000
+            pdfsup2 = 263000
+        endif
+#endif
+    endif
+    if( .not.unweighted ) then
+        weightscheme = 4
+    else
+        weightscheme = 3
+    endif
+    nprocesses = 1
 
     if( (unweighted) .or. ( (.not.unweighted) .and. (writeWeightedLHE) )  ) then 
         if ( .not. ReadLHEFile .and. .not. ConvertLHEFile ) then
@@ -3656,19 +3701,7 @@ real(8) :: CrossSection, CrossSectionError
         else
             write(io_LHEOutFile ,'(A)') '-->'
             write(io_LHEOutFile ,'(A)') '<init>'
-            if( (.not.unweighted) .and. (writeWeightedLHE) ) then
-              if(Collider.eq.0)then
-                write(io_LHEOutFile ,'(A,2F24.16,A)') ' -11   11',(Collider_Energy*50d0),(Collider_Energy*50d0),' 0 0     0     0 4  1' 
-              else
-                write(io_LHEOutFile ,'(A,2F24.16,A)') '2212 2212',(Collider_Energy*50d0),(Collider_Energy*50d0),' 0 0 10042 10042 4  1' 
-              endif
-            else
-              if(Collider.eq.0)then
-                write(io_LHEOutFile ,'(A,2F24.16,A)') ' -11   11',(Collider_Energy*50d0),(Collider_Energy*50d0),' 0 0     0     0 3  1' 
-              else
-                write(io_LHEOutFile ,'(A,2F24.16,A)') '2212 2212',(Collider_Energy*50d0),(Collider_Energy*50d0),' 0 0 10042 10042 3  1' 
-              endif
-            endif
+            write(io_LHEOutFile ,'(I4,X,I4,F24.16,X,F24.16,I1,X,I1,X,I7,X,I7,X,I2,X,I2)') incoming1, incoming2, beamenergy1, beamenergy2, pdfgup1, pdfgup2, pdfsup1, pdfsup2, weightscheme, nprocesses
 ! in order of appearance:  (see also http://arxiv.org/abs/hep-ph/0109068 and http://arxiv.org/abs/hep-ph/0609017)
 ! (*) incoming particle1 (2212=proton), incoming particle2, 
 ! (*) energies of colliding particles, 
