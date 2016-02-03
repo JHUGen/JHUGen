@@ -13,12 +13,13 @@ Comp = gfort
 
 # link pdfs via LHA library ('Yes' or 'No')
 UseLHAPDF=No
-
-# directory which contains libLHAPDF.a, libLHAPDF.la, libLHAPDF.so
-MyLHADir=/home/schulze/lib/LHAPDF-6.1.5/lib/
 # remember to export 
 #          LD_LIBRARY_PATH=/.../LHAPDF-x.y.z/lib/:${LD_LIBRARY_PATH}
 #          LHAPDF_DATA_PATH=/.../LHAPDF-x.y.z/share/LHAPDF/:${LHAPDF_DATA_PATH}
+
+# directory which contains libLHAPDF.a, libLHAPDF.la, libLHAPDF.so
+# this one in terms of the environment variable should work in most cases
+MyLHADir=${LHAPDF_DATA_PATH}/../../lib/
 
 
 

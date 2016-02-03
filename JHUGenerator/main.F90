@@ -236,7 +236,12 @@ logical :: SetAnomalousHff, Setkappa
 
    Collider=1
    VegasIt1=-1
+#if useLHAPDF==1
+   LHAPDFString = ""
+   LHAPDFMember = 0
+#else
    PDFSet=1      ! 1: CTEQ6L1   2: MRSW with best fit, 2xx: MSTW with eigenvector set xx=01..40
+#endif
    VegasNc0=-1
    VegasNc1=-1
    VegasNc2=-1
@@ -274,8 +279,6 @@ logical :: SetAnomalousHff, Setkappa
    RequestOS=-1
    RequestOSSF=-1
    CountTauAsAny = .true.
-   LHAPDFString = ""
-   LHAPDFMember = 0
    interfSet = .false.
    WriteFailedEvents=0
 
@@ -326,9 +329,12 @@ logical :: SetAnomalousHff, Setkappa
     ! by detecting the type.  It also sets success to .true. if the argument name (before =)
     ! is correct.
     call ReadCommandLineArgument(arg, "Collider", success, Collider)
-    call ReadCommandLineArgument(arg, "PDFSet", success, PDFSet)
+#if useLHAPDF==1
     call ReadCommandLineArgument(arg, "LHAPDF", success, LHAPDFString)
     call ReadCommandLineArgument(arg, "LHAPDFMem", success, LHAPDFMember)
+#else
+    call ReadCommandLineArgument(arg, "PDFSet", success, PDFSet)
+#endif
     call ReadCommandLineArgument(arg, "MReso", success, M_Reso, SetLastArgument)
     if( SetLastArgument ) M_Reso = M_Reso*GeV
     call ReadCommandLineArgument(arg, "GaReso", success, Ga_Reso, SetLastArgument)
@@ -560,6 +566,7 @@ logical :: SetAnomalousHff, Setkappa
        print *, "Need to specify pdf file name in command line argument LHAPDF"
        stop 1
     endif
+    call GET_ENVIRONMENT_VARIABLE("LHAPDF_DATA_PATH", LHAPDF_DATA_PATH)
 #endif    
     
     !Renormalization/factorization schemes
@@ -3696,7 +3703,74 @@ use ModParameters
 implicit none
 
 integer :: exitstatus
+integer :: incoming1, incoming2
+real(8) :: beamenergy1, beamenergy2
+integer :: pdfgup1, pdfgup2, pdfsup1, pdfsup2  !pdfgup is outdated, set to 0.  pdfsup = LHAGLUE code
+integer :: weightscheme, nprocesses
 real(8) :: CrossSection, CrossSectionError
+character(len=500) :: ReadLines
+integer :: stat
+
+    if( Collider.eq.0 ) then
+        incoming1 = -11
+        incoming2 = 11
+    else
+        incoming1=2212
+        incoming2=2212
+    endif
+    beamenergy1 = Collider_Energy/GeV / 2d0
+    beamenergy2 = Collider_Energy/GeV / 2d0
+    pdfgup1 = 0
+    pdfgup2 = 0
+    if( Collider.eq.0 ) then
+        pdfsup1 = 0
+        pdfsup2 = 0
+    else
+#if useLHAPDF==1
+        !temporary fix, this seems to be the only way
+        !email from Andy Buckley:
+        !  Hi,
+        !  The Fortran interface was originally written in the era when PDFs could *only* be accessed by number rather than name. Accordingly it doesn't provide a way to look up the ID code, because it expects that you need to have known it in advance!
+        !  We can add an ID-lookup function in the "new" Fortran interface for the next version, but I think for now this information isn't available other than through the C++ and Python APIs.
+        !  Andy
+        open(unit=io_LHEInFile,file=trim(LHAPDF_DATA_PATH)//"/"//LHAPDFString,form='formatted',access= 'sequential',status='old')
+        pdfsup1 = -999
+        do while( pdfsup1.lt.0 )
+            read(16,fmt="(A160)",IOSTAT=stat,END=99) ReadLines
+            if( ReadLines(1:8).eq."SetIndex" ) then
+                read(ReadLines(10:500),*) pdfsup1
+                pdfsup1 = pdfsup1 + LHAPDFMember
+                exit
+            endif
+        enddo
+99      CONTINUE
+        if( pdfsup1.lt.0 ) then
+            print *, "Error: couldn't get the PDF set index.  Writing 0."
+            pdfsup2 = 0
+        endif
+        pdfsup2 = pdfsup1
+#else
+        if( PDFSet.eq.1 ) then
+            pdfsup1 = 10042
+            pdfsup2 = 10042
+        elseif( PDFSet.eq.2 ) then
+            pdfsup1 = 21000
+            pdfsup2 = 21000
+        elseif( PDFSet.ge.201.and.PDFSet.le.240 ) then !21041-21080
+            pdfsup1 = 21040 + PDFSet - 200
+            pdfsup2 = 21040 + PDFSet - 200
+        elseif( PDFSet.eq.3 ) then
+            pdfsup1 = 263000
+            pdfsup2 = 263000
+        endif
+#endif
+    endif
+    if( .not.unweighted ) then
+        weightscheme = 4
+    else
+        weightscheme = 3
+    endif
+    nprocesses = 1
 
     if( (unweighted) .or. ( (.not.unweighted) .and. (writeWeightedLHE) )  ) then 
         if ( .not. ReadLHEFile .and. .not. ConvertLHEFile ) then
@@ -3725,19 +3799,7 @@ real(8) :: CrossSection, CrossSectionError
         else
             write(io_LHEOutFile ,'(A)') '-->'
             write(io_LHEOutFile ,'(A)') '<init>'
-            if( (.not.unweighted) .and. (writeWeightedLHE) ) then
-              if(Collider.eq.0)then
-                write(io_LHEOutFile ,'(A,2F24.16,A)') ' -11   11',(Collider_Energy*50d0),(Collider_Energy*50d0),' 0 0     0     0 4  1' 
-              else
-                write(io_LHEOutFile ,'(A,2F24.16,A)') '2212 2212',(Collider_Energy*50d0),(Collider_Energy*50d0),' 0 0 10042 10042 4  1' 
-              endif
-            else
-              if(Collider.eq.0)then
-                write(io_LHEOutFile ,'(A,2F24.16,A)') ' -11   11',(Collider_Energy*50d0),(Collider_Energy*50d0),' 0 0     0     0 3  1' 
-              else
-                write(io_LHEOutFile ,'(A,2F24.16,A)') '2212 2212',(Collider_Energy*50d0),(Collider_Energy*50d0),' 0 0 10042 10042 3  1' 
-              endif
-            endif
+            write(io_LHEOutFile ,'(I4,X,I4,F24.16,X,F24.16,I1,X,I1,X,I7,X,I7,X,I2,X,I2)') incoming1, incoming2, beamenergy1, beamenergy2, pdfgup1, pdfgup2, pdfsup1, pdfsup2, weightscheme, nprocesses
 ! in order of appearance:  (see also http://arxiv.org/abs/hep-ph/0109068 and http://arxiv.org/abs/hep-ph/0609017)
 ! (*) incoming particle1 (2212=proton), incoming particle2, 
 ! (*) energies of colliding particles, 
@@ -4238,10 +4300,11 @@ implicit none
         write(io_stdout,"(4X,A)") "PChannel:   0=g+g, 1=q+qb, 2=both"
         write(io_stdout,"(4X,A)") "OffXVV:     off-shell option for resonance(X),or vector bosons(VV)"
         write(io_stdout,"(4X,A)") "WidthScheme:1=running width, 2=fixed width (default), 3=complex pole scheme"
-        write(io_stdout,"(4X,A)") "PDFSet:     1=CTEQ6L1(default), 2=MSTW2008LO,  2xx=MSTW with eigenvector set xx=01..40), 3=NNPDF3.0LO"
 #if useLHAPDF==1
         write(io_stdout,"(4X,A)") "LHAPDF:     name of the LHA PDF file, e.g. NNPDF30_lo_as_0130/NNPDF30_lo_as_0130.info"
         write(io_stdout,"(4X,A)") "LHAPDFMem:  member PDF number, default=0 (best fit)"
+#else
+        write(io_stdout,"(4X,A)") "PDFSet:     1=CTEQ6L1(default), 2=MSTW2008LO,  2xx=MSTW with eigenvector set xx=01..40), 3=NNPDF3.0LO"
 #endif        
         write(io_stdout,"(4X,A)") "VegasNc0:   number of evaluations for integrand scan"
         write(io_stdout,"(4X,A)") "VegasNc1:   number of evaluations for accept-reject sampling"
