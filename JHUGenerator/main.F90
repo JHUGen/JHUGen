@@ -562,6 +562,7 @@ logical :: SetAnomalousHff, Setkappa
        print *, "Need to specify pdf file name in command line argument LHAPDF"
        stop 1
     endif
+    call GET_ENVIRONMENT_VARIABLE("LHAPDF_DATA_PATH", LHAPDF_DATA_PATH)
 #endif    
     
     !Renormalization/factorization schemes
@@ -3645,6 +3646,8 @@ real(8) :: beamenergy1, beamenergy2
 integer :: pdfgup1, pdfgup2, pdfsup1, pdfsup2  !pdfgup is outdated, set to 0.  pdfsup = LHAGLUE code
 integer :: weightscheme, nprocesses
 real(8) :: CrossSection, CrossSectionError
+character(len=500) :: ReadLines
+integer :: stat
 
     if( Collider.eq.0 ) then
         incoming1 = -11
@@ -3662,8 +3665,23 @@ real(8) :: CrossSection, CrossSectionError
         pdfsup2 = 0
     else
 #if useLHAPDF==1
-        call GetNset(pdfsup1)
-        call GetNset(pdfsup2)
+        !temporary fix, there must be a better way than this
+        open(unit=io_LHEInFile,file=trim(LHAPDF_DATA_PATH)//"/"//LHAPDFString,form='formatted',access= 'sequential',status='old')
+        pdfsup1 = -999
+        do while( pdfsup1.lt.0 )
+            read(16,fmt="(A160)",IOSTAT=stat,END=99) ReadLines
+            if( ReadLines(1:8).eq."SetIndex" ) then
+                read(ReadLines(10:500),*) pdfsup1
+                pdfsup1 = pdfsup1 + LHAPDFMember
+                exit
+            endif
+        enddo
+99      CONTINUE
+        if( pdfsup1.lt.0 ) then
+            print *, "Error: couldn't get the PDF set index.  Writing 0."
+            pdfsup2 = 0
+        endif
+        pdfsup2 = pdfsup1
 #else
         if( PDFSet.eq.1 ) then
             pdfsup1 = 10042
