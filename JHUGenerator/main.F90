@@ -236,7 +236,12 @@ logical :: SetAnomalousHff, Setkappa
 
    Collider=1
    VegasIt1=-1
+#if useLHAPDF==1
+   LHAPDFString = ""
+   LHAPDFMember = 0
+#else
    PDFSet=1      ! 1: CTEQ6L1   2: MRSW with best fit, 2xx: MSTW with eigenvector set xx=01..40
+#endif
    VegasNc0=-1
    VegasNc1=-1
    VegasNc2=-1
@@ -273,8 +278,6 @@ logical :: SetAnomalousHff, Setkappa
    RequestOS=-1
    RequestOSSF=-1
    CountTauAsAny = .true.
-   LHAPDFString = ""
-   LHAPDFMember = 0
    interfSet = .false.
    WriteFailedEvents=0
 
@@ -325,10 +328,11 @@ logical :: SetAnomalousHff, Setkappa
     ! by detecting the type.  It also sets success to .true. if the argument name (before =)
     ! is correct.
     call ReadCommandLineArgument(arg, "Collider", success, Collider)
-    call ReadCommandLineArgument(arg, "PDFSet", success, PDFSet)
 #if useLHAPDF==1
     call ReadCommandLineArgument(arg, "LHAPDF", success, LHAPDFString)
     call ReadCommandLineArgument(arg, "LHAPDFMem", success, LHAPDFMember)
+#else
+    call ReadCommandLineArgument(arg, "PDFSet", success, PDFSet)
 #endif
     call ReadCommandLineArgument(arg, "MReso", success, M_Reso, SetLastArgument)
     if( SetLastArgument ) M_Reso = M_Reso*GeV
@@ -4162,10 +4166,11 @@ implicit none
         write(io_stdout,"(4X,A)") "PChannel:   0=g+g, 1=q+qb, 2=both"
         write(io_stdout,"(4X,A)") "OffXVV:     off-shell option for resonance(X),or vector bosons(VV)"
         write(io_stdout,"(4X,A)") "WidthScheme:0=fixed width, 1=running width, 2=complex pole scheme"
-        write(io_stdout,"(4X,A)") "PDFSet:     1=CTEQ6L1(default), 2=MSTW2008LO,  2xx=MSTW with eigenvector set xx=01..40), 3=NNPDF3.0LO"
 #if useLHAPDF==1
         write(io_stdout,"(4X,A)") "LHAPDF:     name of the LHA PDF file, e.g. NNPDF30_lo_as_0130/NNPDF30_lo_as_0130.info"
         write(io_stdout,"(4X,A)") "LHAPDFMem:  member PDF number, default=0 (best fit)"
+#else
+        write(io_stdout,"(4X,A)") "PDFSet:     1=CTEQ6L1(default), 2=MSTW2008LO,  2xx=MSTW with eigenvector set xx=01..40), 3=NNPDF3.0LO"
 #endif        
         write(io_stdout,"(4X,A)") "VegasNc0:   number of evaluations for integrand scan"
         write(io_stdout,"(4X,A)") "VegasNc1:   number of evaluations for accept-reject sampling"
