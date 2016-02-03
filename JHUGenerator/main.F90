@@ -326,8 +326,10 @@ logical :: SetAnomalousHff, Setkappa
     ! is correct.
     call ReadCommandLineArgument(arg, "Collider", success, Collider)
     call ReadCommandLineArgument(arg, "PDFSet", success, PDFSet)
+#if useLHAPDF==1
     call ReadCommandLineArgument(arg, "LHAPDF", success, LHAPDFString)
     call ReadCommandLineArgument(arg, "LHAPDFMem", success, LHAPDFMember)
+#endif
     call ReadCommandLineArgument(arg, "MReso", success, M_Reso, SetLastArgument)
     if( SetLastArgument ) M_Reso = M_Reso*GeV
     call ReadCommandLineArgument(arg, "GaReso", success, Ga_Reso, SetLastArgument)
