@@ -2830,7 +2830,7 @@ integer :: Ncalls
              call YR_GetBranchingFraction(EHat/GeV, BranchingRatio)
              call HTO_gridHt(EHat/GeV,BigGamma)
              BigGamma = BigGamma*GeV
-             GetMZZProbability = BigGamma * BranchingRatio
+             GetMZZProbability = EHat*BigGamma * BranchingRatio
          else
              GetMZZProbability = CalcMZZProbability(EHat, Ncalls)
          endif
@@ -2861,7 +2861,7 @@ integer :: Ncalls
              call YR_GetBranchingFraction(EHat/GeV, BranchingRatio)
              call HTO_gridHt(EHat/GeV,BigGamma)
              BigGamma = BigGamma*GeV
-             GetMZZProbability = GetMZZProbability * BigGamma * BranchingRatio
+             GetMZZProbability = GetMZZProbability * EHat*BigGamma * BranchingRatio
          else
              GetMZZProbability = GetMZZProbability * CalcMZZProbability(EHat, Ncalls)
          endif
