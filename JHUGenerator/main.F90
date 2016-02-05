@@ -2790,6 +2790,27 @@ END SUBROUTINE
 
 
 
+FUNCTION CalcMZZProbability(EHat,Ncalls)
+use ModCrossSection
+use ModKinematics
+use ModMisc
+use ModParameters
+implicit none
+real(8) :: DecayWeight,yRnd(1:22),Res,CalcMZZProbability
+real(8) :: HiggsDK_Mom(1:4,1:13),Ehat
+integer :: HiggsDK_IDUP(1:13),HiggsDK_ICOLUP(1:2,1:13)
+integer :: evals,Ncalls
+
+     CalcMZZProbability = 0d0
+     do evals=1,Ncalls
+         call random_number(yRnd)
+         DecayWeight = EvalUnWeighted_DecayToVV(yRnd,.false.,EHat,Res,HiggsDK_Mom(1:4,6:9),HiggsDK_IDUP(1:9),HiggsDK_ICOLUP)
+         CalcMZZProbability = CalcMZZProbability + DecayWeight
+     enddo
+     CalcMZZProbability = CalcMZZProbability/dble(evals)
+
+RETURN
+END FUNCTION
 
 
 
@@ -2800,29 +2821,50 @@ use ModMisc
 use ModParameters
 use ModYRdata
 implicit none
-real(8) :: DecayWeight,yRnd(1:22),Res,GetMZZProbability
-real(8) :: HiggsDK_Mom(1:4,1:13),Ehat
-integer :: HiggsDK_IDUP(1:13),HiggsDK_ICOLUP(1:2,1:13)
-integer :: evals,Ncalls
-integer,parameter :: nmax=20
-real(8),parameter :: ScanRange=120d0*GeV
+logical, parameter :: FastVersion = .false.
+real(8) :: EHat, BigGamma, CalcMZZProbability, BranchingRatio, GetMZZProbability
+integer :: Ncalls
 
      if( WidthSchemeIn.eq.2 .and. WidthScheme.eq.2 ) then  !BW --> BW, multiply by P_{decay}(mZZ)
-         GetMZZProbability = 0d0
-         do evals=1,Ncalls
-             call random_number(yRnd)
-             DecayWeight = EvalUnWeighted_DecayToVV(yRnd,.false.,EHat,Res,HiggsDK_Mom(1:4,6:9),HiggsDK_IDUP(1:9),HiggsDK_ICOLUP)
-             GetMZZProbability = GetMZZProbability + DecayWeight
-         enddo
-         GetMZZProbability = GetMZZProbability/dble(evals)
-     elseif( WidthSchemeIn.eq.3 .and. WidthScheme.eq.3 ) then       !CPS --> CPS, multiply by the branching fraction
-         call YR_GetBranchingFraction(EHat/GeV, GetMZZProbability)  !so that Gamma(tot) --> Gamma(ZZ)
+         if( FastVersion ) then
+             call YR_GetBranchingFraction(EHat/GeV, BranchingRatio)
+             call HTO_gridHt(EHat/GeV,BigGamma)
+             BigGamma = BigGamma*GeV
+             GetMZZProbability = BigGamma * BranchingRatio
+         else
+             GetMZZProbability = CalcMZZProbability(EHat, Ncalls)
+         endif
+     elseif( WidthSchemeIn.eq.3 .and. WidthScheme.eq.3 ) then  !CPS --> CPS
+          if( FastVersion ) then
+              call YR_GetBranchingFraction(EHat/GeV, GetMZZProbability)
+          else
+              GetMZZProbability = CalcMZZProbability(EHat, Ncalls)
+              !BUT need to divide by overcompensated factor of m4l*BigGamma from POWHEG
+              call HTO_gridHt(EHat/GeV,BigGamma)
+              BigGamma = BigGamma*GeV
+              GetMZZProbability = GetMZZProbability / (EHat*BigGamma)
+          endif
      elseif( WidthSchemeIn.eq.3 .and. WidthScheme.eq.2 ) then       !CPS --> BW
-         call YR_GetBranchingFraction(EHat/GeV, GetMZZProbability)
-         GetMZZProbability = GetMZZProbability * GetBWPropagator(EHat**2, 2) / GetBWPropagator(EHat**2, 3)
+         GetMZZProbability = GetBWPropagator(EHat**2, 2) / GetBWPropagator(EHat**2, 3)
+         if ( FastVersion ) then
+             call YR_GetBranchingFraction(EHat/GeV, BranchingRatio)
+             GetMZZProbability = GetMZZProbability * BranchingRatio
+         else
+              GetMZZProbability = GetMZZProbability*CalcMZZProbability(EHat, Ncalls)
+              call HTO_gridHt(EHat/GeV,BigGamma)
+              BigGamma = BigGamma*GeV
+              GetMZZProbability = GetMZZProbability / (EHat*BigGamma)
+         endif
      elseif( WidthSchemeIn.eq.2 .and. WidthScheme.eq.3 ) then       !BW --> CPS
-         call YR_GetBranchingFraction(EHat/GeV, GetMZZProbability)
-         GetMZZProbability = GetMZZProbability * GetBWPropagator(EHat**2, 3) / GetBWPropagator(EHat**2, 2)
+         GetMZZProbability = GetBWPropagator(EHat**2, 3) / GetBWPropagator(EHat**2, 2)
+         if( FastVersion ) then
+             call YR_GetBranchingFraction(EHat/GeV, BranchingRatio)
+             call HTO_gridHt(EHat/GeV,BigGamma)
+             BigGamma = BigGamma*GeV
+             GetMZZProbability = GetMZZProbability * BigGamma * BranchingRatio
+         else
+             GetMZZProbability = GetMZZProbability * CalcMZZProbability(EHat, Ncalls)
+         endif
      else
          call Error("Invalid WidthScheme!")
      endif
