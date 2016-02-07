@@ -2766,7 +2766,7 @@ ELSE! NOT GENEVT
 
 
       if (Process.eq.0) then
-         MomExt(1:4,1) = (/M_Reso,0d0,0d0,0d0/)
+         MomExt(1:4,1) = (/EHat,0d0,0d0,0d0/)
          MomExt(1:4,2) = (/0d0,0d0,0d0,0d0/)
 
          if( ML1.gt.1d-6 .or. ML2.gt.1d-6 .or. ML3.gt.1d-6 .or. ML4.gt.1d-6 ) then
