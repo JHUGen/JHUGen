@@ -3878,6 +3878,16 @@ character :: arg*(500)
         write(TheUnit,"(8X,A)") "(counting tau in place of e or mu of the same sign, if necessary)"
     endif
     write(TheUnit,"(4X,A,20I11)") "Random seed: ",UserSeed
+    write(TheUnit,"(4X,A)") "To reproduce results using this seed, JHUGen should be compiled with the same compiler:"
+#if compiler==1
+    if( modulo(__INTEL_COMPILER, 10) == 0 ) then !last digit is 0, e.g. 1110.  ifort --version writes this as 11.1, not 11.10
+        write(TheUnit,"(6X,A,I2,A,I1,A,I8)") "ifort (IFORT) ", __INTEL_COMPILER/100, ".", modulo(__INTEL_COMPILER, 100)/10, " ", __INTEL_COMPILER_BUILD_DATE
+    else
+        write(TheUnit,"(6X,A,I2,A,I2,A,I8)") "ifort (IFORT) ", __INTEL_COMPILER/100, ".", modulo(__INTEL_COMPILER, 100), " ", __INTEL_COMPILER_BUILD_DATE
+    endif
+#elif compiler==2
+    write(TheUnit,"(6X,A,A)") "GNU Fortran (GCC) ", __VERSION__
+#endif
 
     if( .not. (ReadLHEFile .or. ConvertLHEFile) ) then
         write(TheUnit,"(4X,A)") ""
@@ -4059,6 +4069,9 @@ END SUBROUTINE
 SUBROUTINE InitRandomSeed()
 use modParameters
 use modMisc
+#if compiler==1
+use ifport   !needed for getpid()
+#endif
 implicit none
 integer, dimension(:), allocatable :: gen_seed
 integer :: n,i,sclock
