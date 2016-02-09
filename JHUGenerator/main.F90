@@ -729,7 +729,7 @@ logical :: SetAnomalousHff, Setkappa
         if( WidthScheme.le.0 .and. WidthSchemeIn.le.0 ) then
             if( ReweightDecay ) then
                 print *, "If you want to reweight the decay, you need to specify a width scheme to correct"
-                print *, " for the VV branching fraction/matrix element, or both to reweight from one scheme to another"
+                print *, " for the VV branching fraction/matrix element."
                 stop 1
             endif
             WidthScheme = 2
@@ -739,7 +739,7 @@ logical :: SetAnomalousHff, Setkappa
         elseif( WidthScheme.gt.0 .and. WidthSchemeIn.le.0 ) then
             WidthSchemeIn = WidthScheme
         else !both > 0
-            ReweightDecay = .true.
+            !nothing
         endif
     endif
 
@@ -2029,6 +2029,11 @@ integer :: i, j, stat
                 print *, "WidthSchemeIn is specified to be ", WidthSchemeIn, " but the LHE file says:"
                 print *, FirstLines
                 stop 1
+            elseif( WidthScheme.gt.0 .and. WidthSchemeIn.lt.0 .and. .not.ReweightDecay .and. j.ne.WidthScheme ) then
+                print *, "WidthScheme is specified to be ", WidthSchemeIn, " but the LHE file says:"
+                print *, FirstLines
+                print *, "If you want to reweight the propagator from ", WidthSchemeIn, " to ", WidthScheme, " please specify ReweightDecay=1"
+                stop 1
             endif
             if( WidthScheme.le.0 ) read(FirstLines(8:i),*) WidthScheme
             if( WidthSchemeIn.le.0 ) read(FirstLines(8:i),*) WidthSchemeIn
@@ -2825,48 +2830,36 @@ logical, parameter :: FastVersion = .false.
 real(8) :: EHat, BigGamma, CalcMZZProbability, BranchingRatio, GetMZZProbability
 integer :: Ncalls
 
-     if( WidthSchemeIn.eq.2 .and. WidthScheme.eq.2 ) then  !BW --> BW, multiply by P_{decay}(mZZ)
+     GetMZZProbability = 1d0
+
+     if( ReweightDecay ) then
+         call HTO_gridHt(EHat/GeV,BigGamma)
+         call YR_GetBranchingFraction(EHat/GeV, BranchingRatio)
+
          if( FastVersion ) then
-             call YR_GetBranchingFraction(EHat/GeV, BranchingRatio)
-             call HTO_gridHt(EHat/GeV,BigGamma)
-             BigGamma = BigGamma*GeV
-             GetMZZProbability = EHat*BigGamma * BranchingRatio
-         else
-             GetMZZProbability = CalcMZZProbability(EHat, Ncalls)
-         endif
-     elseif( WidthSchemeIn.eq.3 .and. WidthScheme.eq.3 ) then  !CPS --> CPS
-          if( FastVersion ) then
-              call YR_GetBranchingFraction(EHat/GeV, GetMZZProbability)
-          else
-              GetMZZProbability = CalcMZZProbability(EHat, Ncalls)
-              !BUT need to divide by overcompensated factor of m4l*BigGamma from POWHEG
-              call HTO_gridHt(EHat/GeV,BigGamma)
-              BigGamma = BigGamma*GeV
-              GetMZZProbability = GetMZZProbability / (EHat*BigGamma)
-          endif
-     elseif( WidthSchemeIn.eq.3 .and. WidthScheme.eq.2 ) then       !CPS --> BW
-         GetMZZProbability = GetBWPropagator(EHat**2, 2) / GetBWPropagator(EHat**2, 3)
-         if ( FastVersion ) then
-             call YR_GetBranchingFraction(EHat/GeV, BranchingRatio)
-             GetMZZProbability = GetMZZProbability * BranchingRatio
-         else
-              GetMZZProbability = GetMZZProbability*CalcMZZProbability(EHat, Ncalls)
-              call HTO_gridHt(EHat/GeV,BigGamma)
-              BigGamma = BigGamma*GeV
-              GetMZZProbability = GetMZZProbability / (EHat*BigGamma)
-         endif
-     elseif( WidthSchemeIn.eq.2 .and. WidthScheme.eq.3 ) then       !BW --> CPS
-         GetMZZProbability = GetBWPropagator(EHat**2, 3) / GetBWPropagator(EHat**2, 2)
-         if( FastVersion ) then
-             call YR_GetBranchingFraction(EHat/GeV, BranchingRatio)
-             call HTO_gridHt(EHat/GeV,BigGamma)
-             BigGamma = BigGamma*GeV
-             GetMZZProbability = GetMZZProbability * EHat*BigGamma * BranchingRatio
+             GetMZZProbability = GetMZZProbability * EHat * BigGamma*BranchingRatio
          else
              GetMZZProbability = GetMZZProbability * CalcMZZProbability(EHat, Ncalls)
          endif
-     else
-         call Error("Invalid WidthScheme!")
+
+         if( WidthSchemeIn.eq.3 ) then
+             !need to divide by overcompensated factor of m4l*BigGamma from POWHEG
+             !if( FastVersion ) this is a bit redundant, but BigGamma is basically a lookup table
+             !  so it doesn't take much time
+             GetMZZProbability = GetMZZProbability / (EHat*BigGamma)
+         elseif( WidthSchemeIn.eq.1 ) then
+             !divide by overcompensated gamma_running in the numerator
+             GetMZZProbability = GetMZZProbability / (EHat**2*Ga_Reso/M_Reso)
+         elseif( WidthSchemeIn.eq.2 ) then
+             !numerator is a constant M_Reso*Ga_Reso, do nothing
+         else
+             call Error("Invalid WidthSchemeIn!")
+         endif
+     endif
+
+     if( WidthScheme.ne.WidthSchemeIn ) then
+         !reweight the propagator
+         GetMZZProbability = GetMZZProbability * GetBWPropagator(EHat**2, WidthScheme) / GetBWPropagator(EHat**2, WidthSchemeIn)
      endif
 
 
