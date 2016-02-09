@@ -730,7 +730,7 @@ logical :: SetAnomalousHff, Setkappa
         endif
     else
         if( WidthScheme.le.0 .and. WidthSchemeIn.le.0 ) then
-            if( ReweightDecay ) then
+            if( ReweightDecay.and..not.CalcPMZZ ) then
                 print *, "If you want to reweight the decay, you need to specify a width scheme to correct"
                 print *, " for the VV branching fraction/matrix element."
                 stop 1
@@ -2826,6 +2826,11 @@ use ModMisc
 use ModParameters
 use ModYRdata
 implicit none
+!Turning on FastVersion is not advised, even though it it faster
+!For the MZZProbability, it uses EHat*Gamma*BR, with Gamma and BR obtained from the yellow report
+!1) with anomalous couplings, these values are no longer correct
+!2) at high mass, which is where this function is most useful, the YR branching ratio integrates over
+!     the wide Higgs mass shape, making the value less correct for this purpose
 logical, parameter :: FastVersion = .false.
 real(8) :: EHat, BigGamma, CalcMZZProbability, BranchingRatio, GetMZZProbability
 integer :: Ncalls
