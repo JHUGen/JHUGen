@@ -718,6 +718,9 @@ logical :: SetAnomalousHff, Setkappa
     endif
 
     !WidthScheme and reweighting
+    if( CalcPMZZ .and. (WidthScheme.le.0 .or. WidthSchemeIn.le.0) ) then
+        ReweightDecay=.true.
+    endif
     if( .not.ReadLHEFile .and. .not.ConvertLHEFile .and. .not.CalcPMZZ ) then
         if( ReweightDecay .or. WidthSchemeIn.gt.0 ) then
             call Error("ReweightDecay and WidthSchemeIn only make sense in ReadLHE mode")
@@ -2136,6 +2139,7 @@ character(len=160) :: EventLine(0:maxpart)
 integer :: n,stat,iHiggs,VegasSeed,AccepLastPrinted
 character(len=100) :: BeginEventLine
 integer,parameter :: PMZZcalls = 200000
+integer,parameter :: PMZZ0calls = 1000000
 logical :: Empty
 
 
@@ -2147,12 +2151,8 @@ AccepLastPrinted = 0
 
 call InitReadLHE(BeginEventLine)
 
-     if( TauDecays.lt.0 .and. ReweightDecay ) then
-        print *, " finding P_H4l(m_Reso) with ",1000000," points" 
-        DecayWidth0 = GetMZZProbability(m_Reso,1000000)
-     else
-        DecayWidth0 = 1
-     endif
+     if( ReweightDecay ) print *, " finding P_decay(m_Reso) with ",PMZZ0calls," points" !otherwise it happens instantaneously, so no need to print
+     DecayWidth0 = GetMZZProbability(m_Reso,PMZZ0calls)
 
      print *, " finding maximal weight for mZZ=mReso with ",VegasNc0," points"
      VG = zero
@@ -2227,15 +2227,11 @@ call InitReadLHE(BeginEventLine)
 !         accept/reject sampling for H->VV decay contribution
           EHat = pH2sq
           DecayWeight = 0d0
-          if( TauDecays.lt.0 ) then
           
-                if( ReweightDecay ) then
-                    DecayWidth = GetMZZProbability(EHat,PMZZcalls)!  could also be used to determine csmax for this particular event to improve efficiency (-->future work)
-                else
-                    DecayWidth = 1
-                endif
-                WeightScaleAqedAqcd(1) = WeightScaleAqedAqcd(1) *   DecayWidth/DecayWidth0
-                
+          DecayWidth = GetMZZProbability(EHat,PMZZcalls)!  could also be used to determine csmax for this particular event to improve efficiency (-->future work)
+          WeightScaleAqedAqcd(1) = WeightScaleAqedAqcd(1) * DecayWidth/DecayWidth0
+
+          if( TauDecays.lt.0 ) then
                 do tries=1,5000000
                     call random_number(yRnd)
                     DecayWeight = EvalUnWeighted_DecayToVV(yRnd,.true.,EHat,Res,HiggsDK_Mom(1:4,6:9),HiggsDK_IDUP(1:9),HiggsDK_ICOLUP(1:2,1:9))
@@ -2809,7 +2805,11 @@ integer :: evals,Ncalls
      CalcMZZProbability = 0d0
      do evals=1,Ncalls
          call random_number(yRnd)
-         DecayWeight = EvalUnWeighted_DecayToVV(yRnd,.false.,EHat,Res,HiggsDK_Mom(1:4,6:9),HiggsDK_IDUP(1:9),HiggsDK_ICOLUP)
+         if( TauDecays.lt.0 ) then
+             DecayWeight = EvalUnWeighted_DecayToVV(yRnd,.false.,EHat,Res,HiggsDK_Mom(1:4,6:9),HiggsDK_IDUP(1:9),HiggsDK_ICOLUP)
+         else
+             DecayWeight = EvalUnWeighted_DecayToTauTau(yRnd,.false.,EHat,Res,HiggsDK_Mom(1:4,4:13),HiggsDK_IDUP(1:13),HiggsDK_ICOLUP(1:2,1:13))
+         endif
          CalcMZZProbability = CalcMZZProbability + DecayWeight
      enddo
      CalcMZZProbability = CalcMZZProbability/dble(evals)
@@ -2848,7 +2848,7 @@ integer :: Ncalls
              !  so it doesn't take much time
              GetMZZProbability = GetMZZProbability / (EHat*BigGamma)
          elseif( WidthSchemeIn.eq.1 ) then
-             !divide by overcompensated gamma_running in the numerator
+             !divide by overcompensated m4l*gamma_running in the numerator
              GetMZZProbability = GetMZZProbability / (EHat**2*Ga_Reso/M_Reso)
          elseif( WidthSchemeIn.eq.2 ) then
              !numerator is a constant M_Reso*Ga_Reso, do nothing
