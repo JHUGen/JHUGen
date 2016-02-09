@@ -1513,7 +1513,7 @@ ENDIF! GENEVT
             MZ2 = dsqrt( M_V*Ga_V * dtan(dr*yz2-datan(M_V/Ga_V)) + M_V**2 )
             sHatJacobi = sHatJacobi*dr/(Ga_V*M_V)*( (MZ2**2 - M_V**2)**2 + M_V**2*Ga_V**2 )
 
-        elseif(M_Reso.lt.2d0*M_V) then
+        else   !M_Reso.le.2d0*M_V
             if (offzchannel.le.0.5d0) then
                 EZ_max = EHat
                 dr = datan((EZ_max**2-M_V**2)/(Ga_V*M_V)) + datan(M_V/Ga_V)
@@ -1930,7 +1930,7 @@ include 'csmaxvalue.f'
             MZ2 = dsqrt( M_V*Ga_V * dtan(dr*yz2-datan(M_V/Ga_V)) + M_V**2 )
             sHatJacobi = sHatJacobi*dr/(Ga_V*M_V)*( (MZ2**2 - M_V**2)**2 + M_V**2*Ga_V**2 )
 
-        elseif(M_Reso.lt.2d0*M_V) then
+        else   !M_Reso.le.2d0*M_V
             if (offzchannel.le.0.5d0) then
                 EZ_max = EHat
                 dr = datan((EZ_max**2-M_V**2)/(Ga_V*M_V)) + datan(M_V/Ga_V)
@@ -2522,7 +2522,7 @@ include 'csmaxvalue.f'
             MZ2 = dsqrt( M_V*Ga_V * dtan(dr*yz2-datan(M_V/Ga_V)) + M_V**2 )
             sHatJacobi = sHatJacobi*dr/(Ga_V*M_V)*( (MZ2**2 - M_V**2)**2 + M_V**2*Ga_V**2 )
 
-        elseif(M_Reso.lt.2d0*M_V) then
+        else   !M_Reso.le.2d0*M_V
             if (offzchannel.le.0.5d0) then
                 EZ_max = EHat
                 dr = datan((EZ_max**2-M_V**2)/(Ga_V*M_V)) + datan(M_V/Ga_V)
@@ -2766,7 +2766,7 @@ ELSE! NOT GENEVT
 
 
       if (Process.eq.0) then
-         MomExt(1:4,1) = (/M_Reso,0d0,0d0,0d0/)
+         MomExt(1:4,1) = (/EHat,0d0,0d0,0d0/)
          MomExt(1:4,2) = (/0d0,0d0,0d0,0d0/)
 
          if( ML1.gt.1d-6 .or. ML2.gt.1d-6 .or. ML3.gt.1d-6 .or. ML4.gt.1d-6 ) then
@@ -2981,7 +2981,7 @@ END FUNCTION
             MZ2 = dsqrt( M_V*Ga_V * dtan(dr*yz2-datan(M_V/Ga_V)) + M_V**2 )
             sHatJacobi = sHatJacobi*dr/(Ga_V*M_V)*( (MZ2**2 - M_V**2)**2 + M_V**2*Ga_V**2 )
 
-        elseif(M_Reso.lt.2d0*M_V) then
+        else   !M_Reso.le.2d0*M_V
             if (offzchannel.le.0.5d0) then
                 EZ_max = EHat
                 dr = datan((EZ_max**2-M_V**2)/(Ga_V*M_V)) + datan(M_V/Ga_V)
