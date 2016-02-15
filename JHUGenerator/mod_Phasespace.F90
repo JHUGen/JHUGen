@@ -253,14 +253,17 @@ MODULE ModPhasespace
            if( dabs(sMin + sMax -2d0*PropMass_sq).lt.1d-10 .and.PropMass_sq.gt.1d-14 ) then! this is the narrow-width mapping (i.e. no integration)
               InvMass_sq = PropMass_sq
               s_channel_propagator = pi/(dsqrt(PropMass_sq)*Width)
-           else ! this is the normal s-channel mapping  
-              if( sMax.gt.PropMass_sq-Width**2 ) then
-!                   InvMass_sq = h_BreitWigner(xRnd, PropMass_sq, Width, Power, sMin, sMax)
-!                   s_channel_propagator = 1d0/g_s_BreitWigner(InvMass_sq, PropMass_sq, Width, Power, sMin, sMax)
-                  s_channel_propagator = k_BreitWigner(xRnd, PropMass_sq, Width, Power, sMin, sMax,InvMass_sq)
+              
+           else ! this is the normal s-channel mapping
+           
+!               if( dabs(sMax-PropMass_sq).gt.5d0*Width**2 ) then!   MARKUS NOTE: this if-condition is not smooth --> maybe needs improvement
+              if( sMax.gt.(dsqrt(PropMass_sq+1d-10)-3d0*Width)**2 ) then!   MARKUS NOTE: this if-condition is not smooth --> maybe needs improvement
+                  InvMass_sq = h_BreitWigner(xRnd, PropMass_sq, Width, Power, sMin, sMax)
+                  s_channel_propagator = 1d0/g_s_BreitWigner(InvMass_sq, PropMass_sq, Width, Power, sMin, sMax)
+                  s_channel_propagator = k_BreitWigner(xRnd, PropMass_sq, Width, sMin, sMax,InvMass_sq)
               else
-!                   InvMass_sq = sMin + (sMax-sMin) * xRnd
-!                   s_channel_propagator = sMax-sMin
+                  InvMass_sq = sMin + (sMax-sMin) * xRnd
+                  s_channel_propagator = sMax-sMin
                   s_channel_propagator = k_l(xRnd,sMin,sMax,InvMass_sq)
               endif
            endif
@@ -280,11 +283,19 @@ MODULE ModPhasespace
   implicit none
   real(8) :: s_channel_decay
   real(8) :: p0(1:4),Mass1_sq,Mass2_sq,xRnd(1:2),Mom1(1:4),Mom2(1:4)
-  real(8) :: E1,p1z,phi,theta,Jac,Mandelstam_S
+  real(8) :: E1,p1z,phi,theta,Jac,Mandelstam_S,cosTheta
 
         phi   = 2d0*pi * xRnd(1)
-        theta = 1d0*pi * xRnd(2)
+!         theta = 1d0*pi * xRnd(2)
+        cosTheta = 2*xRnd(2)-1d0
+        theta = dacos(cosTheta)
         Mandelstam_S = p0(1)**2 - p0(2)**2 - p0(3)**2 - p0(4)**2 
+        if( dabs(Mandelstam_S/(p0(1)**2+1d-15)).lt.1d-13 .or. dabs(Mandelstam_S).lt.1d-8 ) then
+            Mom1(1:4) = 0d0 
+            Mom2(1:4) = 0d0
+            s_channel_decay = 0d0
+            return
+        endif
 
         E1 = ( Mandelstam_S + Mass1_sq - Mass2_sq )/2d0/dsqrt(Mandelstam_S)
         p1z= sqrt_lambda(Mandelstam_S,Mass1_sq,Mass2_sq)/2d0/dsqrt(Mandelstam_S)
@@ -296,8 +307,8 @@ MODULE ModPhasespace
         call boost_from_CMS_to_RefMom(p0,Mom1,Mom2)
 !         call boost_from_CMS_to_RefMom(p0,Mom2)
  
-        s_channel_decay = 1d0/g_d(Mandelstam_S, Mass1_sq,Mass2_sq)  *  dSin(pi*xRnd(2))
-        
+        s_channel_decay = 1d0/g_d(Mandelstam_S,Mass1_sq,Mass2_sq)   !   *  dSin(theta)
+                
   RETURN
   END FUNCTION
  
@@ -449,12 +460,18 @@ MODULE ModPhasespace
 
 
 
-  FUNCTION h(RandomVar,m_sq,nu,smin,smax)! inv. mass mapping for s- and t-channel propagator
+  FUNCTION h(RandomVar,m_sq_in,nu,smin,smax)! inv. mass mapping for s- and t-channel propagator
   implicit none
-  real(8) :: h,RandomVar,m_sq,nu,smin,smax
+  real(8) :: h,RandomVar,m_sq_in,m_sq,nu,smin,smax
+  
+        if( m_sq_in.gt.1d-10 ) then
+           m_sq = m_sq_in
+        else
+           m_sq = -1d-9
+        endif
   
         if( nu.ne.1d0 ) then
-           h =   ( RandomVar*(smax-m_sq)**(1d0-nu) + (1d0-RandomVar)*(smin-m_sq)**(1d0-nu) )**(1d0/(1d0-nu))   +  m_sq
+           h = ( RandomVar*((smax-m_sq)**(1d0-nu)) + (1d0-RandomVar)*((smin-m_sq)**(1d0-nu)) )**(1d0/(1d0-nu))   +  m_sq
         else
            h = dexp( RandomVar*dlog(smax-m_sq) - (1d0-RandomVar)*dlog(smin-m_sq)  )    +  m_sq 
         endif
@@ -551,17 +568,21 @@ MODULE ModPhasespace
 
 
 
-  FUNCTION k_BreitWigner(RandomVar,m_sq,gamma,nu,smin,smax,InvMass_sq)
+  FUNCTION k_BreitWigner(RandomVar,m_sq,gamma,smin,smax,InvMass_sq)
   implicit none
-  real(8) :: k_BreitWigner,RandomVar,m_sq,gamma,nu,smin,smax,m,y1,y2,InvMass_sq
+  real(8) :: k_BreitWigner,RandomVar,m_sq,gamma,smin,smax,m,y1,y2,InvMass_sq
 
         m  = dsqrt(m_sq)
         y1 = datan( (smin-m_sq)/m/gamma )
         y2 = datan( (smax-m_sq)/m/gamma )  
-        InvMass_sq = dsqrt(m_sq)*gamma * dtan(y1 + (y2-y1)*RandomVar) + m_sq
+        InvMass_sq = m*gamma * dtan(y1 + (y2-y1)*RandomVar) + m_sq
 
         k_BreitWigner = (y2-y1)*( (InvMass_sq-m_sq)**2 + m_sq*gamma**2 )/(m*gamma)!  = 1/g_s_BreitWigner(...)
-                               
+        
+!         print *, "k_BreitWigner",1d0/((InvMass_sq-m_sq)**2 + m_sq*gamma**2 )
+!         print *, "k_BreitWigner inv.mass",InvMass_sq
+        
+        
   RETURN
   END FUNCTION
 
