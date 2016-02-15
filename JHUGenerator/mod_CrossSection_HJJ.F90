@@ -170,7 +170,7 @@ real(8) :: MomExt(1:4,1:10),PSWgt,CS_Max
 real(8) :: p_MCFM(mxpart,1:4),msq_MCFM(-5:5,-5:5)
 complex(8) :: HZZcoupl(1:32),HWWcoupl(1:32)
 integer :: i,j,MY_IDUP(1:10),ICOLUP(1:2,1:10),NBin(1:NumHistograms),NHisto,iPartons(1:2)
-real(8) :: LO_Res_Unpol, PreFac,BWJacobi
+real(8) :: LO_Res_Unpol,LO_Res_Pol, PreFac,BWJacobi
 logical :: applyPSCut,genEvt
 integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, Lep1M=8, Lep2P=9, Lep2M=10
 include 'csmaxvalue.f'  
@@ -178,13 +178,13 @@ EvalUnWeighted_HJJ_fulldecay = 0d0
 
 
    call PDFMapping(2,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
-   if( ehat.lt.m_reso+2*pTjetcut ) return ! 30GeV = pTcut on fwd jets
+!    if( ehat.lt. max(m_reso+2*pTjetcut,VBF_4ml_minmax(1)) ) return ! 30GeV = pTcut on fwd jets
+   if( ehat.lt. m_reso+2*pTjetcut ) return ! 30GeV = pTcut on fwd jets
 !   if( ehat.lt.300d0*GeV+30d0*GeV ) return ! 30GeV = pTcut on fwd jets
 
    call EvalPhasespace_VBF_H4f(yRnd(17),yRnd(3:16),EHat,MomExt(1:4,1:10),PSWgt)
    call boost2Lab(eta1,eta2,11,MomExt(1:4,1:10))
    PSWgt = PSWgt * (100d0)**8
-
 
    call Kinematics_HVBF_fulldecay(MomExt,applyPSCut,NBin)
    if( applyPSCut .or. PSWgt.lt.1d-12 ) return
@@ -218,25 +218,25 @@ EvalUnWeighted_HJJ_fulldecay = 0d0
    
    
    
-   
-   
 IF( GENEVT ) THEN   
       
-      if( iPartons(1).eq.+1 .and. iPartons(2).eq.+1 ) then
 !          call qq_ZZqq(p_MCFM,msq_MCFM,HZZcoupl,HWWcoupl,Lambda*100d0,Lambda_Q*100d0,(/Lambda_z1,Lambda_z2,Lambda_z3,Lambda_z4/)*100d0)!  q(-p1)+q(-p2)->Z(p3,p4)+Z(p5,p6)+q(p7)+q(p8)
           LO_Res_Unpol = 0d0
-          do i = -5,5
-              do j = -5,5
-                LO_Res_Unpol = LO_Res_Unpol + msq_MCFM(i,j)*pdf(LHA2M_pdf(i),1)*pdf(LHA2M_pdf(j),2)
+!           do i = -5,5
+!               do j = -5,5
+do i = 1,1
+do j = 2,2
+                LO_Res_Unpol = LO_Res_Unpol + msq_MCFM(i,j) * pdf(LHA2M_pdf(i),1)*pdf(LHA2M_pdf(j),2)
               enddo
           enddo
           PreFac = fbGeV2 * FluxFac * PSWgt * sHatJacobi
           EvalUnWeighted_HJJ_fulldecay = LO_Res_Unpol * PreFac
-      else
-          call Error("zzz")
-      endif
 
       CS_max = CSmax(iPartons(1),iPartons(2))
+      
+! print *, "check",iPartons(1:2)
+! print *, "check",EvalUnWeighted_HJJ_fulldecay ,yRnd(16)*CS_max,CS_max;pause
+      
       if( EvalUnWeighted_HJJ_fulldecay .gt. CS_max) then
          write(*,"(2X,A,1PE13.6,1PE13.6)") "CS_max is too small.",EvalUnWeighted_HJJ_fulldecay, CS_max
          write(io_LogFile,"(2X,A,1PE13.6,1PE13.6)") "CS_max is too small.",EvalUnWeighted_HJJ_fulldecay, CS_max
@@ -256,19 +256,26 @@ ELSE! NOT GENEVT
 
 
 !    call qq_ZZqq(p_MCFM,msq_MCFM,HZZcoupl,HWWcoupl,Lambda*100d0,Lambda_Q*100d0,(/Lambda_z1,Lambda_z2,Lambda_z3,Lambda_z4/)*100d0)!  q(-p1)+q(-p2)->Z(p3,p4)+Z(p5,p6)+q(p7)+q(p8)
+   PreFac = fbGeV2 * FluxFac * PSWgt * sHatJacobi
+
    LO_Res_Unpol = 0d0
-   do i = -5,5
-      do j = -5,5
-         LO_Res_Unpol = LO_Res_Unpol + msq_MCFM(i,j)*pdf(LHA2M_pdf(i),1)*pdf(LHA2M_pdf(j),2)
+!    do i = -5,5
+!       do j = -5,5
+do i = 1,1
+do j = 2,2
+         LO_Res_Pol = msq_MCFM(i,j) * pdf(LHA2M_pdf(i),1)*pdf(LHA2M_pdf(j),2) * PreFac
+         
+         RES(i,j) = LO_Res_Pol
+         if( RES(i,j).gt.CSmax(i,j) ) then
+           CSmax(i,j) = RES(i,j)
+         endif
+
+         LO_Res_Unpol = LO_Res_Unpol + LO_Res_Pol
+                  
       enddo
    enddo
-   PreFac = fbGeV2 * FluxFac * PSWgt * sHatJacobi
-   EvalUnWeighted_HJJ_fulldecay = LO_Res_Unpol * PreFac
+   EvalUnWeighted_HJJ_fulldecay = LO_Res_Unpol
    
-   RES(+1,+1) = EvalUnWeighted_HJJ_fulldecay
-   if (EvalUnWeighted_HJJ_fulldecay.gt.csmax(+1,+1)) then
-         CSmax(+1,+1) = EvalUnWeighted_HJJ_fulldecay
-   endif
 
 
 ENDIF! GENEVT 
@@ -302,8 +309,6 @@ END FUNCTION
    integer :: iPartChannel,PartChannelAvg,NumPartonicChannels,ijSel(1:121,1:3),flavor_tag
    real(8) :: LO_Res_Unpol, PreFac,xRnd,partonic_flip
    logical :: applyPSCut,ZZ_Fusion
-   integer, parameter :: ij_neg_offset=6, ij_max=+5
-   integer, parameter :: ij_num=ij_max+ij_neg_offset
    include 'vegas_common.f'   
 
    EvalWeighted_HJJ = 0d0
@@ -331,7 +336,6 @@ END FUNCTION
    if( unweighted .and. .not.warmup .and.  sum(AccepCounter_part(:,:)) .eq. sum(RequEvents(:,:)) ) then 
       stopvegas=.true.
    endif
-   
    if( (unweighted) .and. (.not. warmup) .and. (AccepCounter_part(iPart_sel,jPart_sel) .ge. RequEvents(iPart_sel,jPart_Sel))  ) return
    
    call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
@@ -547,7 +551,7 @@ END FUNCTION
 
    if( jPart_Sel.gt.iPart_sel ) call swapi(iPart_sel,jPart_sel) ! iPar,jPart are no longer used in parton id determination or ME calculations
    if( unweighted ) then 
-
+   
      if( warmup ) then
 
        CrossSec(iPart_sel,jPart_sel) = CrossSec(iPart_sel,jPart_sel) + VegasWeighted_HJJ
