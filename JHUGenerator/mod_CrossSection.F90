@@ -3436,6 +3436,7 @@ END FUNCTION
   integer, intent(out) :: ijSel(:,:)
 
 
+      ijSel(:,:) = 0
       ijSel( 1,1:3) = (/ 0, 0, 1/)
       ijSel( 2,1:3) = (/-1,+1, 1/)
       ijSel( 3,1:3) = (/+1,-1, 1/)
