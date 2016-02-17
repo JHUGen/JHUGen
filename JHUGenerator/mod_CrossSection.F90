@@ -42,17 +42,17 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
     EvalCounter = EvalCounter+1
 
 
-   if( Process.eq.0 ) then 
+   if( Process.eq.0 .or. PChannel.eq.0) then 
       NumPartonicChannels = 1
       iPart_sel = 0
       jPart_sel = 0
-   elseif( Process.eq.1 ) then
+   elseif( Process.eq.1 .or. PChannel.eq.1 ) then
       NumPartonicChannels = 10
       iPartChannel = int(yRnd(12) * (NumPartonicChannels)) +2 ! this runs from 2..11
       call get_PPXchannelHash(ijSel)
       iPart_sel = ijSel(iPartChannel,1)
       jPart_sel = ijSel(iPartChannel,2)
-   elseif( Process.eq.2 ) then
+   elseif( Process.eq.2 .or. PChannel.eq.2 ) then
       NumPartonicChannels = 11
       iPartChannel = int(yRnd(12) * (NumPartonicChannels)) +1 ! this runs from 1..11
       call get_PPXchannelHash(ijSel)
@@ -112,10 +112,11 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
       endif
     endif
     endif  
-      
- if( EHat.lt.100d0*GeV .or. EHat.gt.145d0*GeV) return ! for some reason this removes 3% of the cross section, but significantly improves speed for OffXVV=111 !!
-      
-    
+
+    if(OffShellReson) then
+      if(abs(EHat-M_Reso).ge.20.0d0*Ga_Reso) return ! for some reason this removes some of the cross section, but significantly improves speed for OffXVV=111 !!
+    endif
+
     if( any(yRnd(4:5).gt.0.99d0) .or. EHat.lt.5d0*GeV ) return 
     call EvalPhasespace_H4f(yRnd(3),yRnd(4:11),EHat,MomExt(1:4,1:8),PSWgt)
     call boost2Lab(eta1,eta2,8,MomExt(1:4,1:8))
