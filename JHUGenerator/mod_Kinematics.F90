@@ -3920,7 +3920,6 @@ END SUBROUTINE
 FUNCTION GetBWPropagator(sHat, scheme)
 use modMisc
 use modParameters
-use modYRdata
 implicit none
 real(8) :: GetBWPropagator,sHat
 real(8) :: mhb, ghb, BigGamma
