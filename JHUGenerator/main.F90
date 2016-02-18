@@ -2824,14 +2824,7 @@ use ModCrossSection
 use ModKinematics
 use ModMisc
 use ModParameters
-use ModYRdata
 implicit none
-!Turning on FastVersion is not advised, even though it it faster
-!For the MZZProbability, it uses EHat*Gamma*BR, with Gamma and BR obtained from the yellow report
-!1) with anomalous couplings, these values are no longer correct
-!2) at high mass, which is where this function is most useful, the YR branching ratio integrates over
-!     the wide Higgs mass shape, making the value less correct for this purpose
-logical, parameter :: FastVersion = .false.
 real(8) :: EHat, BigGamma, CalcMZZProbability, BranchingRatio, GetMZZProbability
 integer :: Ncalls
 
@@ -2839,18 +2832,11 @@ integer :: Ncalls
 
      if( ReweightDecay ) then
          call HTO_gridHt(EHat/GeV,BigGamma)
-         call YR_GetBranchingFraction(EHat/GeV, BranchingRatio)
 
-         if( FastVersion ) then
-             GetMZZProbability = GetMZZProbability * EHat * BigGamma*BranchingRatio
-         else
-             GetMZZProbability = GetMZZProbability * CalcMZZProbability(EHat, Ncalls)
-         endif
+         GetMZZProbability = GetMZZProbability * CalcMZZProbability(EHat, Ncalls)
 
          if( WidthSchemeIn.eq.3 ) then
              !need to divide by overcompensated factor of m4l*BigGamma from POWHEG
-             !if( FastVersion ) this is a bit redundant, but BigGamma is basically a lookup table
-             !  so it doesn't take much time
              GetMZZProbability = GetMZZProbability / (EHat*BigGamma)
          elseif( WidthSchemeIn.eq.1 ) then
              !divide by overcompensated m4l*gamma_running in the numerator
