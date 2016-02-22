@@ -4165,7 +4165,7 @@ use modParameters
 use modMisc
 implicit none
 integer, dimension(:), allocatable :: gen_seed
-integer :: n,i,sclock
+integer :: n,i,sclock,getpid
 real :: tmp_real, tmp_real2
 logical :: finished
 
