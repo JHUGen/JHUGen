@@ -46,7 +46,7 @@ logical :: doprint
 real(8) :: MZZdistribution(0:nsteps,1:2)
 
 
-  if( PMZZ_mReso.lt.0 ) PMZZ_mReso = GetMZZProbability(M_Reso,Ncalls,-1d0,.false.)
+  if( PMZZ_mReso.lt.0 ) PMZZ_mReso = CalcMZZProbability(M_Reso,Ncalls)
 
   do nscan=0, nsteps
 
@@ -75,7 +75,7 @@ real(8) :: minm4l, maxm4l
     endif
 
     mResoindex = PMZZsize/2
-    PMZZ_mReso = GetMZZProbability(M_Reso,Ncalls,-1d0,.true.)
+    PMZZ_mReso = CalcMZZProbability(M_Reso,Ncalls)
     PMZZdistribution(mResoindex,1:2) = (/M_Reso, PMZZ_mReso/)
     PMZZminindex = mResoindex
     PMZZmaxindex = mResoindex
