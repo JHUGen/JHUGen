@@ -2155,8 +2155,8 @@ call InitReadLHE(BeginEventLine)
      if( ReweightDecay ) then
          print *, " finding P_decay(m4l) distribution with", PMZZcalls, " calls per point"
          call InitMZZdistribution(PMZZcalls)
-         DecayWidth0 = GetMZZProbability(M_Reso,PMZZcalls,-1d0,.true.)
      endif
+     DecayWidth0 = GetMZZProbability(M_Reso,PMZZcalls,-1d0,.true.)
 
      print *, " finding maximal weight for mZZ=mReso with ",VegasNc0," points"
      VG = zero
