@@ -2,12 +2,13 @@
 !                                     Phys.Rev. D86 (2012) 095031; arXiv:1208.4018 [hep-ph],
 !                                 and Phys.Rev. D89 (2014) 035007; arXiv:1309.4819 [hep-ph].
 PROGRAM JHUGenerator
-use ModParameters
-use ModKinematics
-use ModCrossSection
 #if compiler==1
 use ifport
 #endif
+use ModCrossSection
+use ModKinematics
+use ModParameters
+use ModPMZZ
 implicit none
 real(8) :: VG_Result,VG_Error
 
@@ -33,7 +34,7 @@ real(8) :: VG_Result,VG_Error
    elseif( ReadLHEFile ) then
         call StartReadLHE_NEW(VG_Result,VG_Error)
    elseif( CalcPMZZ ) then
-        call GetMZZdistribution()
+        call PrintMZZdistribution()
    else
         if( Process.eq.80 .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.66 .or. Process.eq.90 .or. &
             Process.eq.110 .or. Process.eq.111 .or. Process.eq.112 .or. Process.eq.113 ) then
@@ -2119,14 +2120,15 @@ END SUBROUTINE
 SUBROUTINE StartReadLHE_NEW(VG_Result,VG_Error)
 use ModCrossSection
 use ModKinematics
-use ModParameters
 use ModMisc
+use ModParameters
+use ModPMZZ
 implicit none
 include 'csmaxvalue.f'
 integer,parameter :: maxpart=30!=max.part particles in LHE file; this parameter should match the one in WriteOutEvent of mod_Kinematics
 real(8) :: VG_Result,VG_Error,VG_Chi2
 real(8) :: yRnd(1:22),Res,EMcheck(1:4),DecayWeight,DecayWidth,DecayWidth0
-real(8) :: HiggsDK_Mom(1:4,1:13),Ehat,GetMZZProbability
+real(8) :: HiggsDK_Mom(1:4,1:13),Ehat
 real(8) :: MomExt(1:4,1:maxpart),MomHiggs(1:4),Mass(1:maxpart),pH2sq
 integer :: tries, nParticle,  ICOLUP(1:2,1:7+maxpart),LHE_IntExt(1:7+maxpart),HiggsDK_IDUP(1:13),HiggsDK_ICOLUP(1:2,1:13)
 character(len=150) :: InputFmt0,InputFmt1
@@ -2139,7 +2141,6 @@ character(len=160) :: EventLine(0:maxpart)
 integer :: n,stat,iHiggs,VegasSeed,AccepLastPrinted
 character(len=100) :: BeginEventLine
 integer,parameter :: PMZZcalls = 200000
-integer,parameter :: PMZZ0calls = 1000000
 logical :: Empty
 
 
@@ -2151,8 +2152,11 @@ AccepLastPrinted = 0
 
 call InitReadLHE(BeginEventLine)
 
-     if( ReweightDecay ) print *, " finding P_decay(m_Reso) with ",PMZZ0calls," points" !otherwise it happens instantaneously, so no need to print
-     DecayWidth0 = GetMZZProbability(m_Reso,PMZZ0calls)
+     if( ReweightDecay ) then
+         print *, " finding P_decay(m4l) distribution with", PMZZcalls, " calls per point"
+         call InitMZZdistribution(PMZZcalls)
+         DecayWidth0 = GetMZZProbability(M_Reso,PMZZcalls,-1d0,.true.)
+     endif
 
      print *, " finding maximal weight for mZZ=mReso with ",VegasNc0," points"
      VG = zero
@@ -2228,7 +2232,7 @@ call InitReadLHE(BeginEventLine)
           EHat = pH2sq
           DecayWeight = 0d0
           
-          DecayWidth = GetMZZProbability(EHat,PMZZcalls)!  could also be used to determine csmax for this particular event to improve efficiency (-->future work)
+          DecayWidth = GetMZZProbability(EHat,PMZZcalls,-1d0,.true.)!  could also be used to determine csmax for this particular event to improve efficiency (-->future work)
           WeightScaleAqedAqcd(1) = WeightScaleAqedAqcd(1) * DecayWidth/DecayWidth0
 
           if( TauDecays.lt.0 ) then
@@ -2759,103 +2763,6 @@ call InitReadLHE(BeginEventLine)
 
 RETURN
 END SUBROUTINE
-
-
-
-
-
-SUBROUTINE GetMZZdistribution()
-use ModCrossSection
-use ModParameters
-implicit none
-real(8) :: DecayWeight,DecayWidth,DecayWidth0
-real(8) :: Ehat,GetMZZProbability
-integer :: nscan
-integer,parameter :: nmax=20, Ncalls=200000
-real(8),parameter :: ScanRange=120d0*GeV
-
-
-
-  DecayWidth0 = GetMZZProbability(M_Reso,Ncalls)
-  
-  do nscan=-nmax,+nmax,1
-     
-     EHat = M_Reso+ScanRange*nscan/dble(nmax)
-     DecayWidth = GetMZZProbability(EHat,Ncalls)
-     write(*,"(1F10.5,1PE16.9)") EHat*100d0,DecayWidth/DecayWidth0
-     
-  enddo
-
-RETURN
-END SUBROUTINE
-
-
-
-FUNCTION CalcMZZProbability(EHat,Ncalls)
-use ModCrossSection
-use ModKinematics
-use ModMisc
-use ModParameters
-implicit none
-real(8) :: DecayWeight,yRnd(1:22),Res,CalcMZZProbability
-real(8) :: HiggsDK_Mom(1:4,1:13),Ehat
-integer :: HiggsDK_IDUP(1:13),HiggsDK_ICOLUP(1:2,1:13)
-integer :: evals,Ncalls
-
-     CalcMZZProbability = 0d0
-     do evals=1,Ncalls
-         call random_number(yRnd)
-         if( TauDecays.lt.0 ) then
-             DecayWeight = EvalUnWeighted_DecayToVV(yRnd,.false.,EHat,Res,HiggsDK_Mom(1:4,6:9),HiggsDK_IDUP(1:9),HiggsDK_ICOLUP)
-         else
-             DecayWeight = EvalUnWeighted_DecayToTauTau(yRnd,.false.,EHat,Res,HiggsDK_Mom(1:4,4:13),HiggsDK_IDUP(1:13),HiggsDK_ICOLUP(1:2,1:13))
-         endif
-         CalcMZZProbability = CalcMZZProbability + DecayWeight
-     enddo
-     CalcMZZProbability = CalcMZZProbability/dble(evals)
-
-RETURN
-END FUNCTION
-
-
-
-FUNCTION GetMZZProbability(EHat,Ncalls)
-use ModCrossSection
-use ModKinematics
-use ModMisc
-use ModParameters
-implicit none
-real(8) :: EHat, BigGamma, CalcMZZProbability, BranchingRatio, GetMZZProbability
-integer :: Ncalls
-
-     GetMZZProbability = 1d0
-
-     if( ReweightDecay ) then
-         call HTO_gridHt(EHat/GeV,BigGamma)
-
-         GetMZZProbability = GetMZZProbability * CalcMZZProbability(EHat, Ncalls)
-
-         if( WidthSchemeIn.eq.3 ) then
-             !need to divide by overcompensated factor of m4l*BigGamma from POWHEG
-             GetMZZProbability = GetMZZProbability / (EHat*BigGamma)
-         elseif( WidthSchemeIn.eq.1 ) then
-             !divide by overcompensated m4l*gamma_running in the numerator
-             GetMZZProbability = GetMZZProbability / (EHat**2*Ga_Reso/M_Reso)
-         elseif( WidthSchemeIn.eq.2 ) then
-             !numerator is a constant M_Reso*Ga_Reso, do nothing
-         else
-             call Error("Invalid WidthSchemeIn!")
-         endif
-     endif
-
-     if( WidthScheme.ne.WidthSchemeIn ) then
-         !reweight the propagator
-         GetMZZProbability = GetMZZProbability * GetBWPropagator(EHat**2, WidthScheme) / GetBWPropagator(EHat**2, WidthSchemeIn)
-     endif
-
-
-RETURN
-END FUNCTION
 
 
 

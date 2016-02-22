@@ -801,7 +801,192 @@ subroutine spinoru(p,za,zb,s)
     end subroutine convert_to_MCFM
 
 
-    
+!========================================================================
+!borrowed from Passarino's file, some internal variable names or comments
+!might not be correct in this context
+!========================================================================
+
+    SUBROUTINE EvaluateSpline(EvalPoint, SplineData, SplineDataLength, TheResult)
+    !SplineData: SplineDataLength by 2 array
+    !    SplineData(SplineDataLength,1) is the x value
+    !    SplineData(SplineDataLength,2) is the y value
+
+    IMPLICIT NONE
+
+    INTEGER i,top,gdim,SplineDataLength
+    REAL(8) u,value,EvalPoint
+    REAL(8), intent(out) :: TheResult
+    REAL(8), dimension(SplineDataLength) :: bc,cc,dc
+    REAL(8) :: SplineData(1:SplineDataLength, 1:2)
+
+! u value of M_H at which the spline is to be evaluated
+
+    gdim= SplineDataLength
+
+    CALL HTO_FMMsplineSingleHt(bc,cc,dc,top,gdim,SplineData(1:SplineDataLength,1),SplineData(1:SplineDataLength,2))
+
+    u= EvalPoint
+    CALL HTO_Seval3SingleHt(u,bc,cc,dc,top,gdim,value,xc=SplineData(1:SplineDataLength,1),yc=SplineData(1:SplineDataLength,2))
+
+    TheResult= value
+
+    RETURN
+
+!-----------------------------------------------------------------------
+
+    CONTAINS
+
+    SUBROUTINE HTO_FMMsplineSingleHt(b,c,d,top,gdim,xc,yc)
+
+!---------------------------------------------------------------------------
+
+    INTEGER k,n,i,top,gdim,l
+
+    REAL(8), dimension(gdim) :: xc,yc
+    REAL(8), dimension(gdim) :: x,y
+
+    REAL(8), DIMENSION(gdim) :: b
+! linear coeff
+
+    REAL(8), DIMENSION(gdim) :: c
+! quadratic coeff.
+
+    REAL(8), DIMENSION(gdim) :: d
+! cubic coeff.
+
+    REAL(8) :: t
+    REAL(8),PARAMETER:: ZERO=0.0, TWO=2.0, THREE=3.0
+
+! The grid
+
+
+    n= gdim
+    FORALL(l=1:gdim)
+     x(l)= xc(l)
+     y(l)= yc(l)
+    ENDFORALL
+
+!.....Set up tridiagonal system.........................................
+!     b=diagonal, d=offdiagonal, c=right-hand side
+
+    d(1)= x(2)-x(1)
+    c(2)= (y(2)-y(1))/d(1)
+    DO k= 2,n-1
+     d(k)= x(k+1)-x(k)
+     b(k)= TWO*(d(k-1)+d(k))
+     c(k+1)= (y(k+1)-y(k))/d(k)
+     c(k)= c(k+1)-c(k)
+    END DO
+
+!.....End conditions.  third derivatives at x(1) and x(n) obtained
+!     from divided differences.......................................
+
+    b(1)= -d(1)
+    b(n)= -d(n-1)
+    c(1)= ZERO
+    c(n)= ZERO
+    IF (n > 3) THEN
+     c(1)= c(3)/(x(4)-x(2))-c(2)/(x(3)-x(1))
+     c(n)= c(n-1)/(x(n)-x(n-2))-c(n-2)/(x(n-1)-x(n-3))
+     c(1)= c(1)*d(1)*d(1)/(x(4)-x(1))
+     c(n)= -c(n)*d(n-1)*d(n-1)/(x(n)-x(n-3))
+    END IF
+
+    DO k=2,n    ! forward elimination
+     t= d(k-1)/b(k-1)
+     b(k)= b(k)-t*d(k-1)
+     c(k)= c(k)-t*c(k-1)
+    END DO
+
+    c(n)= c(n)/b(n)
+
+! back substitution ( makes c the sigma of text)
+
+    DO k=n-1,1,-1
+     c(k)= (c(k)-d(k)*c(k+1))/b(k)
+    END DO
+
+!.....Compute polynomial coefficients...................................
+
+    b(n)= (y(n)-y(n-1))/d(n-1)+d(n-1)*(c(n-1)+c(n)+c(n))
+    DO k=1,n-1
+     b(k)= (y(k+1)-y(k))/d(k)-d(k)*(c(k+1)+c(k)+c(k))
+     d(k)= (c(k+1)-c(k))/d(k)
+     c(k)= THREE*c(k)
+    END DO
+    c(n)= THREE*c(n)
+    d(n)= d(n-1)
+
+    RETURN
+
+    END SUBROUTINE HTO_FMMsplineSingleHt
+
+!------------------------------------------------------------------------
+
+    SUBROUTINE HTO_Seval3SingleHt(u,b,c,d,top,gdim,f,fp,fpp,fppp,xc,yc)
+
+! ---------------------------------------------------------------------------
+
+    REAL(8),INTENT(IN) :: u
+! abscissa at which the spline is to be evaluated
+
+    INTEGER j,k,n,l,top,gdim
+
+    REAL(8), dimension(gdim) :: xc,yc
+    REAL(8), dimension(gdim) :: x,y
+    REAL(8), DIMENSION(gdim) :: b,c,d
+! linear,quadratic,cubic coeff
+
+    REAL(8),INTENT(OUT),OPTIONAL:: f,fp,fpp,fppp
+! function, 1st,2nd,3rd deriv
+
+    INTEGER, SAVE :: i=1
+    REAL(8)    :: dx
+    REAL(8),PARAMETER:: TWO=2.0, THREE=3.0, SIX=6.0
+
+! The grid
+
+    n= gdim
+    FORALL(l=1:gdim)
+     x(l)= xc(l)
+     y(l)= yc(l)
+    ENDFORALL
+
+!.....First check if u is in the same interval found on the
+!     last call to Seval.............................................
+
+    IF (  (i<1) .OR. (i >= n) ) i=1
+    IF ( (u < x(i))  .OR.  (u >= x(i+1)) ) THEN
+     i=1
+
+! binary search
+
+     j= n+1
+     DO
+      k= (i+j)/2
+      IF (u < x(k)) THEN
+       j= k
+      ELSE
+       i= k
+      ENDIF
+      IF (j <= i+1) EXIT
+     ENDDO
+    ENDIF
+
+    dx= u-x(i)
+
+! evaluate the spline
+
+    IF (Present(f))    f= y(i)+dx*(b(i)+dx*(c(i)+dx*d(i)))
+    IF (Present(fp))   fp= b(i)+dx*(TWO*c(i) + dx*THREE*d(i))
+    IF (Present(fpp))  fpp= TWO*c(i) + dx*SIX*d(i)
+    IF (Present(fppp)) fppp= SIX*d(i)
+
+    RETURN
+
+    END SUBROUTINE HTO_Seval3SingleHt
+
+    END SUBROUTINE EvaluateSpline
 
 END MODULE
 
