@@ -77,40 +77,40 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
     ICOLUP(1:2,1:9) = 0
     call VVBranchings(MY_IDUP(4:9),ICOLUP(1:2,6:9))
     MY_IDUP(1:3) = 0
-    if( (RandomizeVVdecays.eqv..true.) ) then
-    call random_number(yrnd(17:18))
-    if( (MY_IDUP(6).ne.MY_IDUP(8)) .and. (IsAZDecay(DecayMode1)) .and. (IsAZDecay(DecayMode2)) ) then
-      if( (yrnd(18).le.0.5d0) ) then
-        call swapi(MY_IDUP(4),MY_IDUP(5))
-        call swapi(MY_IDUP(6),MY_IDUP(8))
-        call swapi(MY_IDUP(7),MY_IDUP(9))
-        call swapi(ICOLUP(1,6),ICOLUP(1,8))
-        call swapi(ICOLUP(1,7),ICOLUP(1,9))
-        call swapi(ICOLUP(2,6),ICOLUP(2,8))
-        call swapi(ICOLUP(2,7),ICOLUP(2,9))
-      endif
-    elseif( (IsAWDecay(DecayMode1)) .and. (IsAWDecay(DecayMode2)) ) then
-      if( (yrnd(18).le.0.5d0) ) then
-      MY_IDUP(4) = ChargeFlip(MY_IDUP(4))
-        MY_IDUP(5) = ChargeFlip(MY_IDUP(5))
-        MY_IDUP(6) = ChargeFlip(MY_IDUP(6))
-        MY_IDUP(7) = ChargeFlip(MY_IDUP(7))
-        MY_IDUP(8) = ChargeFlip(MY_IDUP(8))
-        MY_IDUP(9) = ChargeFlip(MY_IDUP(9))      
-        ! if there's a charge flip then the order of particle and anti-particles needs to be flipped, too
-        call swapi(MY_IDUP(6),MY_IDUP(7))
-        call swapi(MY_IDUP(8),MY_IDUP(9))
-      endif 
-      if( (yrnd(17).le.0.5d0) ) then
-        call swapi(MY_IDUP(4),MY_IDUP(5))
-        call swapi(MY_IDUP(6),MY_IDUP(8))
-        call swapi(MY_IDUP(7),MY_IDUP(9))
-        call swapi(ICOLUP(1,6),ICOLUP(1,8))
-        call swapi(ICOLUP(1,7),ICOLUP(1,9))
-        call swapi(ICOLUP(2,6),ICOLUP(2,8))
-        call swapi(ICOLUP(2,7),ICOLUP(2,9))
-      endif
-    endif
+    if( RandomizeVVdecays .and. OffShellV1.eqv.OffShellV2) then
+       call random_number(yrnd(17:18))
+       if( (MY_IDUP(6).ne.MY_IDUP(8)) .and. (IsAZDecay(DecayMode1)) .and. (IsAZDecay(DecayMode2)) ) then
+         if( (yrnd(18).le.0.5d0) ) then
+           call swapi(MY_IDUP(4),MY_IDUP(5))
+           call swapi(MY_IDUP(6),MY_IDUP(8))
+           call swapi(MY_IDUP(7),MY_IDUP(9))
+           call swapi(ICOLUP(1,6),ICOLUP(1,8))
+           call swapi(ICOLUP(1,7),ICOLUP(1,9))
+           call swapi(ICOLUP(2,6),ICOLUP(2,8))
+           call swapi(ICOLUP(2,7),ICOLUP(2,9))
+         endif
+       elseif( (IsAWDecay(DecayMode1)) .and. (IsAWDecay(DecayMode2)) ) then
+         if( (yrnd(18).le.0.5d0) ) then
+           MY_IDUP(4) = ChargeFlip(MY_IDUP(4))
+           MY_IDUP(5) = ChargeFlip(MY_IDUP(5))
+           MY_IDUP(6) = ChargeFlip(MY_IDUP(6))
+           MY_IDUP(7) = ChargeFlip(MY_IDUP(7))
+           MY_IDUP(8) = ChargeFlip(MY_IDUP(8))
+           MY_IDUP(9) = ChargeFlip(MY_IDUP(9))      
+           ! if there's a charge flip then the order of particle and anti-particles needs to be flipped, too
+           call swapi(MY_IDUP(6),MY_IDUP(7))
+           call swapi(MY_IDUP(8),MY_IDUP(9))
+         endif 
+         if( (yrnd(17).le.0.5d0) ) then
+           call swapi(MY_IDUP(4),MY_IDUP(5))
+           call swapi(MY_IDUP(6),MY_IDUP(8))
+           call swapi(MY_IDUP(7),MY_IDUP(9))
+           call swapi(ICOLUP(1,6),ICOLUP(1,8))
+           call swapi(ICOLUP(1,7),ICOLUP(1,9))
+           call swapi(ICOLUP(2,6),ICOLUP(2,8))
+           call swapi(ICOLUP(2,7),ICOLUP(2,9))
+         endif
+       endif ! Do not swap any state with no two identical VV decays! This would break mass determination in EvalPhasespace_H4f.
     endif  
 
     if(OffShellReson) then
@@ -118,7 +118,7 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
     endif
 
     if( any(yRnd(4:5).gt.0.99d0) .or. EHat.lt.5d0*GeV ) return 
-    call EvalPhasespace_H4f(yRnd(3),yRnd(4:11),EHat,MomExt(1:4,1:8),PSWgt)
+    call EvalPhasespace_H4f(yRnd(3),yRnd(4:11),EHat,MomExt(1:4,1:8),MY_IDUP(6:9),PSWgt)
     call boost2Lab(eta1,eta2,8,MomExt(1:4,1:8))
     
     call Kinematics(4,MomExt,MomExt(1:4,5:8),applyPSCut,NBin)
@@ -205,8 +205,18 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
            call intoHisto(NHisto,NBin(NHisto),1d0)
          enddo
          
-         call ShiftMass(MomExt(1:4,5),MomExt(1:4,6), GetMass(MY_IDUP(7)),GetMass(MY_IDUP(6)),  MomDK(1:4,1),MomDK(1:4,2) )
-         call ShiftMass(MomExt(1:4,7),MomExt(1:4,8), GetMass(MY_IDUP(9)),GetMass(MY_IDUP(8)),  MomDK(1:4,3),MomDK(1:4,4) )
+         if(OffShellV1) then
+           call ShiftMass(MomExt(1:4,5),MomExt(1:4,6), GetMass(MY_IDUP(7)),GetMass(MY_IDUP(6)),  MomDK(1:4,1),MomDK(1:4,2) )
+         else
+           MomDK(:,1)=MomExt(:,5)
+           MomDK(:,2)=MomExt(:,6)
+         endif
+         if(OffShellV2) then
+           call ShiftMass(MomExt(1:4,7),MomExt(1:4,8), GetMass(MY_IDUP(9)),GetMass(MY_IDUP(8)),  MomDK(1:4,3),MomDK(1:4,4) )
+         else
+           MomDK(:,3)=MomExt(:,7)
+           MomDK(:,4)=MomExt(:,8)
+         endif
          call WriteOutEvent((/MomExt(1:4,1),MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(1:9),ICOLUP(1:2,1:9))
 
 
@@ -247,8 +257,8 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
       if( EvalWeighted.ne.0d0 ) then
         AccepCounter=AccepCounter+1
         if( writeWeightedLHE .and. (.not. warmup) ) then
-            call ShiftMass(MomExt(1:4,5),MomExt(1:4,6), GetMass(MY_IDUP(7)),GetMass(MY_IDUP(6)),  MomDK(1:4,1),MomDK(1:4,2) )
-            call ShiftMass(MomExt(1:4,7),MomExt(1:4,8), GetMass(MY_IDUP(9)),GetMass(MY_IDUP(8)),  MomDK(1:4,3),MomDK(1:4,4) )        
+            if(OffShellV1) call ShiftMass(MomExt(1:4,5),MomExt(1:4,6), GetMass(MY_IDUP(7)),GetMass(MY_IDUP(6)),  MomDK(1:4,1),MomDK(1:4,2) )
+            if(OffShellV2) call ShiftMass(MomExt(1:4,7),MomExt(1:4,8), GetMass(MY_IDUP(9)),GetMass(MY_IDUP(8)),  MomDK(1:4,3),MomDK(1:4,4) )        
             call WriteOutEvent((/MomExt(1:4,1),MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(1:9),ICOLUP(1:2,1:9),EventWeight=EvalWeighted)
         endif
         do NHisto=1,NumHistograms-3
@@ -644,39 +654,39 @@ include 'csmaxvalue.f'
 !                                                            50/50%              48/52%         52/48%               48%                52%
 
 
-   if( (RandomizeVVdecays.eqv..true.) ) then
-   if( (MY_IDUP(6).ne.MY_IDUP(8)) .and. (IsAZDecay(DecayMode1)) .and. (IsAZDecay(DecayMode2)) ) then
-     if( (yrnd(18).le.0.5d0) ) then
-      call swapi(MY_IDUP(4),MY_IDUP(5))
-      call swapi(MY_IDUP(6),MY_IDUP(8))
-      call swapi(MY_IDUP(7),MY_IDUP(9))
-      call swapi(ICOLUP(1,6),ICOLUP(1,8))
-      call swapi(ICOLUP(1,7),ICOLUP(1,9))
-      call swapi(ICOLUP(2,6),ICOLUP(2,8))
-      call swapi(ICOLUP(2,7),ICOLUP(2,9))
-     endif
-  elseif( (IsAWDecay(DecayMode1)) .and. (IsAWDecay(DecayMode2)) ) then
-     if( (yrnd(18).le.0.5d0) ) then
-     MY_IDUP(4) = ChargeFlip(MY_IDUP(4))
-      MY_IDUP(5) = ChargeFlip(MY_IDUP(5))
-      MY_IDUP(6) = ChargeFlip(MY_IDUP(6))
-      MY_IDUP(7) = ChargeFlip(MY_IDUP(7))
-      MY_IDUP(8) = ChargeFlip(MY_IDUP(8))
-      MY_IDUP(9) = ChargeFlip(MY_IDUP(9))      
-      ! if there's a charge flip then the order of particle and anti-particles needs to be flipped, too
-      call swapi(MY_IDUP(6),MY_IDUP(7))
-      call swapi(MY_IDUP(8),MY_IDUP(9))
-     endif 
-     if( (yrnd(17).le.0.5d0) ) then
-      call swapi(MY_IDUP(4),MY_IDUP(5))
-      call swapi(MY_IDUP(6),MY_IDUP(8))
-      call swapi(MY_IDUP(7),MY_IDUP(9))
-      call swapi(ICOLUP(1,6),ICOLUP(1,8))
-      call swapi(ICOLUP(1,7),ICOLUP(1,9))
-      call swapi(ICOLUP(2,6),ICOLUP(2,8))
-      call swapi(ICOLUP(2,7),ICOLUP(2,9))
-     endif
-  endif
+   if( RandomizeVVdecays .and. OffShellV1.eqv.OffShellV2 ) then
+      if( (MY_IDUP(6).ne.MY_IDUP(8)) .and. (IsAZDecay(DecayMode1)) .and. (IsAZDecay(DecayMode2)) ) then
+        if( (yrnd(18).le.0.5d0) ) then
+         call swapi(MY_IDUP(4),MY_IDUP(5))
+         call swapi(MY_IDUP(6),MY_IDUP(8))
+         call swapi(MY_IDUP(7),MY_IDUP(9))
+         call swapi(ICOLUP(1,6),ICOLUP(1,8))
+         call swapi(ICOLUP(1,7),ICOLUP(1,9))
+         call swapi(ICOLUP(2,6),ICOLUP(2,8))
+         call swapi(ICOLUP(2,7),ICOLUP(2,9))
+        endif
+     elseif( (IsAWDecay(DecayMode1)) .and. (IsAWDecay(DecayMode2)) ) then
+        if( (yrnd(18).le.0.5d0) ) then
+         MY_IDUP(4) = ChargeFlip(MY_IDUP(4))
+         MY_IDUP(5) = ChargeFlip(MY_IDUP(5))
+         MY_IDUP(6) = ChargeFlip(MY_IDUP(6))
+         MY_IDUP(7) = ChargeFlip(MY_IDUP(7))
+         MY_IDUP(8) = ChargeFlip(MY_IDUP(8))
+         MY_IDUP(9) = ChargeFlip(MY_IDUP(9))      
+         ! if there's a charge flip then the order of particle and anti-particles needs to be flipped, too
+         call swapi(MY_IDUP(6),MY_IDUP(7))
+         call swapi(MY_IDUP(8),MY_IDUP(9))
+        endif 
+        if( (yrnd(17).le.0.5d0) ) then
+         call swapi(MY_IDUP(4),MY_IDUP(5))
+         call swapi(MY_IDUP(6),MY_IDUP(8))
+         call swapi(MY_IDUP(7),MY_IDUP(9))
+         call swapi(ICOLUP(1,6),ICOLUP(1,8))
+         call swapi(ICOLUP(1,7),ICOLUP(1,9))
+         call swapi(ICOLUP(2,6),ICOLUP(2,8))
+         call swapi(ICOLUP(2,7),ICOLUP(2,9))
+        endif
+     endif ! Do not swap for VV'
   endif  
   
   yz1 = yRnd(10)
