@@ -113,9 +113,7 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
        endif ! Do not swap any state with no two identical VV decays! This would break mass determination in EvalPhasespace_H4f.
     endif  
 
-    if(OffShellReson) then
-      if(abs(EHat-M_Reso).ge.20.0d0*Ga_Reso) return ! for some reason this removes some of the cross section, but significantly improves speed for OffXVV=111 !!
-    endif
+    if(abs(EHat-M_Reso).ge.20.0d0*Ga_Reso) return ! for some reason this removes some of the cross section, but significantly improves speed for OffXVV=111 !!
 
     if( any(yRnd(4:5).gt.0.99d0) .or. EHat.lt.5d0*GeV ) return 
     call EvalPhasespace_H4f(yRnd(3),yRnd(4:11),EHat,MomExt(1:4,1:8),MY_IDUP(6:9),PSWgt)
