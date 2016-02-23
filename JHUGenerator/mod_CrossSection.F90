@@ -205,13 +205,13 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
            call intoHisto(NHisto,NBin(NHisto),1d0)
          enddo
          
-         if(OffShellV1) then
+         if(IsAPhoton(DecayMode1)) then
            call ShiftMass(MomExt(1:4,5),MomExt(1:4,6), GetMass(MY_IDUP(7)),GetMass(MY_IDUP(6)),  MomDK(1:4,1),MomDK(1:4,2) )
          else
            MomDK(:,1)=MomExt(:,5)
            MomDK(:,2)=MomExt(:,6)
          endif
-         if(OffShellV2) then
+         if(IsAPhoton(DecayMode2)) then
            call ShiftMass(MomExt(1:4,7),MomExt(1:4,8), GetMass(MY_IDUP(9)),GetMass(MY_IDUP(8)),  MomDK(1:4,3),MomDK(1:4,4) )
          else
            MomDK(:,3)=MomExt(:,7)
@@ -257,8 +257,8 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
       if( EvalWeighted.ne.0d0 ) then
         AccepCounter=AccepCounter+1
         if( writeWeightedLHE .and. (.not. warmup) ) then
-            if(OffShellV1) call ShiftMass(MomExt(1:4,5),MomExt(1:4,6), GetMass(MY_IDUP(7)),GetMass(MY_IDUP(6)),  MomDK(1:4,1),MomDK(1:4,2) )
-            if(OffShellV2) call ShiftMass(MomExt(1:4,7),MomExt(1:4,8), GetMass(MY_IDUP(9)),GetMass(MY_IDUP(8)),  MomDK(1:4,3),MomDK(1:4,4) )        
+            if(IsAPhoton(DecayMode1)) call ShiftMass(MomExt(1:4,5),MomExt(1:4,6), GetMass(MY_IDUP(7)),GetMass(MY_IDUP(6)),  MomDK(1:4,1),MomDK(1:4,2) )
+            if(IsAPhoton(DecayMode2)) call ShiftMass(MomExt(1:4,7),MomExt(1:4,8), GetMass(MY_IDUP(9)),GetMass(MY_IDUP(8)),  MomDK(1:4,3),MomDK(1:4,4) )        
             call WriteOutEvent((/MomExt(1:4,1),MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(1:9),ICOLUP(1:2,1:9),EventWeight=EvalWeighted)
         endif
         do NHisto=1,NumHistograms-3
