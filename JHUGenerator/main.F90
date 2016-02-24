@@ -25,7 +25,7 @@ real(8) :: VG_Result,VG_Error
    call PrintLogo(io_LogFile)
    call WriteParameters(io_stdout)
    call WriteParameters(io_LogFile)
-   if ( .not. ReadLHEFile .and. .not. ConvertLHEFile .and. .not.((Process.eq.60 .or. Process.eq.61) .and. unweighted) ) then
+   if ( .not. ReadLHEFile .and. .not. ConvertLHEFile .and. .not.((Process.le.2 .or. Process.eq.60 .or. Process.eq.61) .and. unweighted) ) then
       call InitOutput(1d0, 1d14)   !for VBF/HJJ the cross section is calculated, so use that in the <init> block
    endif
    write(io_stdout,*) " Running"
@@ -36,7 +36,7 @@ real(8) :: VG_Result,VG_Error
    elseif( CalcPMZZ ) then
         call PrintMZZdistribution()
    else
-        if( Process.eq.80 .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.66 .or. Process.eq.90 .or. &
+        if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 .or. Process.eq.80 .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.66 .or. Process.eq.90 .or. &
             Process.eq.110 .or. Process.eq.111 .or. Process.eq.112 .or. Process.eq.113 ) then
            call StartVegas_NEW(VG_Result,VG_Error)
         else
@@ -1026,7 +1026,7 @@ include "vegas_common.f"
 ! NOTE: NDim for weighted vegas run is not minimal
 
       NDim = 0
-      NDim = NDim + 6    ! PS integration
+      NDim = NDim + 7    ! PS integration
       if( .not.ReadLHEFile ) NDim = NDim + 2    ! shat integration
       NDim = NDim + 1    ! offzchannel
       if( includeInterference ) NDim = NDim + 1    ! for interference
@@ -1046,6 +1046,19 @@ include "vegas_common.f"
           VegasNc2_default = 10000
       endif
 
+      !- gg-->spin0-->4f
+      if(Process.eq.0 ) then
+        NDim = 11
+      endif
+      !- gg-->spin1-->4f
+      if(Process.eq.1 ) then
+        NDim = 12
+      endif
+      !- gg-->spin2-->4f
+      if(Process.eq.2 ) then
+        NDim = 12
+      endif
+      
       !- HVBF
       if(Process.eq.60) then
          NDim = 5        ! for phase space
@@ -1057,6 +1070,7 @@ include "vegas_common.f"
          VegasNc1_default = 500000
          VegasNc2_default = 10000
       endif
+      
       !- HVBF with decays
       if(Process.eq.66) then
          NDim = 5
@@ -1254,6 +1268,7 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
     EvalCounter=0
     RejeCounter=0
     AccepCounter=0
+    Br_counter(:,:) = 0
     AlertCounter=0
 
     avgcs = 0d0
@@ -1423,6 +1438,9 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
     endif
     write(io_stdout,*)  " event generation rate (events/sec)",dble(AccepCounter)/(time_end-time_start)
 
+                 
+  endif! unweighted
+  
 
     if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) then
           write(*,*) ""
@@ -1460,10 +1478,6 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
       !                                  )/4d0/(one-sitW**2)/sitW**2      
 
     endif
-               
-   
-  endif! unweighted
-  
   
 
 
@@ -1521,7 +1535,9 @@ logical :: UseBetaVersion=.false.
       write(ProcessStr,"(I3)") Process
     endif
 
+! nprn = -1
 
+    
     call cpu_time(time_start)    
     warmup = .false.
     itmx = VegasIt1
@@ -1546,6 +1562,7 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
     itmx = VegasIt1
     ncall= VegasNc1
     warmup = .true.
+    if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) call vegas(EvalWeighted,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.80 ) call vegas(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.90 ) call vegas(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
     
@@ -1562,6 +1579,7 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
     !DATA RUN
     call ClearHisto()   
     warmup = .false.
+    Br_counter(:,:) = 0
     EvalCounter=0
     RejeCounter=0
     AccepCounter=0
@@ -1569,6 +1587,7 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
     avgcs = 0d0
     itmx = 2
     ncall= VegasNc2
+    if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) call vegas1(EvalWeighted,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.80 ) call vegas1(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.90 ) call vegas1(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
 
@@ -1586,13 +1605,14 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
 
 elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
 
+if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) UseBetaVersion=.true.
 if( Process.eq.60 ) UseBetaVersion=.true.
 if( Process.eq.61 ) UseBetaVersion=.true.
 
 
 if( UseBetaVersion ) then 
 ! !-------------------new stuff -------------------
-    write(io_stdout,"(1X,A)")  "Scanning the integrand"
+    write(io_stdout,"(2X,A)")  "Scanning the integrand"
     warmup = .true.
     itmx = 5
     ncall= VegasNc0
@@ -1606,6 +1626,7 @@ if( UseBetaVersion ) then
     else
         readin=.false.
         writeout=.true.
+        if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) call vegas(EvalWeighted,VG_Result,VG_Error,VG_Chi2)
         if( Process.eq.60 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
         if( Process.eq.61 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
         itmx = 3
@@ -1614,7 +1635,8 @@ if( UseBetaVersion ) then
     
     CrossSecMax(:,:) = 0d0
     CrossSec(:,:) = 0d0
-        
+
+    if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) call vegas1(EvalWeighted,VG_Result,VG_Error,VG_Chi2)
 !     if( Process.eq.80 ) call vegas(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2) ! adjust to LHE format
 !     if( Process.eq.90 ) call vegas(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.60 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
@@ -1629,8 +1651,9 @@ if( UseBetaVersion ) then
     call vegas_get_calls(calls1)
     CrossSec(:,:) = CrossSec(:,:)/dble(itmx)    
     write(io_stdout,"(A)")  ""
-    write(io_stdout,"(2X,A,F10.3,A,F10.3,A,F10.3)") "Total xsec: ",VG_Result, " +/-",VG_Error, " fb    vs.",sum(CrossSec(:,:))
+    write(io_stdout,*) "Total xsec: ",VG_Result, " +/-",VG_Error, " fb    vs.",sum(CrossSec(:,:))
     call InitOutput(VG_Result, VG_Error)
+
 
     RequEvents(:,:)=0
     do i1=-5,5
@@ -1641,7 +1664,9 @@ if( UseBetaVersion ) then
 
 
 
-    if( Process.eq.60 ) then
+    if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2) then
+       call get_PPXchannelHash(ijSel)
+    elseif( Process.eq.60 ) then
        call get_VBFchannelHash(ijSel)
     else
 !        call get_GENchannelHash(ijSel)
@@ -1693,12 +1718,13 @@ if( UseBetaVersion ) then
       
     
     write(io_stdout,"(A)")  ""
-    write(io_stdout,"(1X,A)")  "Event generation"
+    write(io_stdout,"(2X,A)")  "Event generation"
     call ClearHisto()   
     warmup = .false.
     itmx = 1
 !     nprn = 0  
     EvalCounter = 0
+    Br_counter(:,:) = 0
     RejeCounter = 0
     AlertCounter = 0
     AccepCounter_part(:,:) = 0 
@@ -1709,13 +1735,14 @@ if( UseBetaVersion ) then
     
 
     itmx=200000
-    ncall= 1000000
+    ncall= VegasNc0/10
     call vegas_get_calls(calls2)
     calls_rescale = calls1/calls2
     CrossSecMax(:,:) = CrossSecMax(:,:) * calls_rescale    
 
     
 !     do while( StatusPercent.lt.100d0  )
+        if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) call vegas1(EvalWeighted,VG_Result,VG_Error,VG_Chi2)
 !         if( Process.eq.80 ) call vegas1(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)! adjust to LHE format
     !     if( Process.eq.90 ) call vegas1(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
         if( Process.eq.60 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
@@ -1725,17 +1752,17 @@ if( UseBetaVersion ) then
 !         if( Process.eq.111) call vegas1(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)      
 !         if( Process.eq.112) call vegas1(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)      
 !         if( Process.eq.113) call vegas1(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)      
-        call system('clear')
-        write(io_stdout,*) ""
-        do i1=-5,5
-        do j1=-5,5
-            if( RequEvents(i1,j1).gt.0 ) then 
-!                write(io_stdout,"(1X,A,I4,I4,2X,I7,2X,I7,2X,F8.3,1X,A)") "Generated events ", i1,j1,(AccepCounter_part(i1,j1)),(RequEvents(i1,j1)),dble(AccepCounter_part(i1,j1))/dble(RequEvents(i1,j1))*100d0,"%"
-               call PrintStatusBar2(int(dble(AccepCounter_part(i1,j1))/(dble(RequEvents(i1,j1)))*100),"channel "//getLHEParticle(i1)//" "//getLHEParticle(j1)//" ")
-            endif   
-        enddo
-        enddo  
-        StatusPercent = int(100d0*dble(sum(AccepCounter_part(:,:)))/dble(sum(RequEvents(:,:)))  )   
+!         call system('clear')
+!         write(io_stdout,*) ""
+!         do i1=-5,5
+!         do j1=-5,5
+!             if( RequEvents(i1,j1).gt.0 ) then 
+! !                write(io_stdout,"(1X,A,I4,I4,2X,I7,2X,I7,2X,F8.3,1X,A)") "Generated events ", i1,j1,(AccepCounter_part(i1,j1)),(RequEvents(i1,j1)),dble(AccepCounter_part(i1,j1))/dble(RequEvents(i1,j1))*100d0,"%"
+!                call PrintStatusBar2(int(dble(AccepCounter_part(i1,j1))/(dble(RequEvents(i1,j1)))*100),"channel "//getLHEParticle(i1)//" "//getLHEParticle(j1)//" ")
+!             endif   
+!         enddo
+!         enddo  
+!         StatusPercent = int(100d0*dble(sum(AccepCounter_part(:,:)))/dble(sum(RequEvents(:,:)))  )   
 !     enddo
     call cpu_time(time_end)  
     
@@ -1748,6 +1775,32 @@ if( UseBetaVersion ) then
     endif
     write(io_stdout,*)  " event generation rate (events/sec)",dble(sum(AccepCounter_part(:,:)))/(time_end-time_start+1d-10)
 
+
+
+
+    if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) then
+          write(*,*) ""
+          write(*,"(A)") "                 el              mu             tau             neu              jet"
+          write(*,"(A,5F16.4)") " el ",dble(Br_counter(1,1:5))/dble(AccepCounter)
+          write(*,"(A,5F16.4)") " mu ",dble(Br_counter(2,1:5))/dble(AccepCounter)
+          write(*,"(A,5F16.4)") " tau",dble(Br_counter(3,1:5))/dble(AccepCounter)
+          write(*,"(A,5F16.4)") " neu",dble(Br_counter(4,1:5))/dble(AccepCounter)
+          write(*,"(A,5F16.4)") " jet",dble(Br_counter(5,1:5))/dble(AccepCounter)
+          write(*,*) ""
+          write(*,"(A,5F16.3)") "llll: ",(dble(Br_counter(1,1))+dble(Br_counter(2,2))+dble(Br_counter(3,3)))/dble(AccepCounter)
+          write(*,"(A,5F16.3)") "llLL: ",(dble(Br_counter(1,2))+dble(Br_counter(1,3))+  &
+                                          dble(Br_counter(2,1))+dble(Br_counter(2,3))+  &
+                                          dble(Br_counter(3,1))+dble(Br_counter(3,2)))/dble(AccepCounter)
+          write(*,"(A,5F16.3)") "2l2q: ",(dble(Br_counter(1,5))+dble(Br_counter(2,5))+dble(Br_counter(3,5))+  &
+                                          dble(Br_counter(5,1))+dble(Br_counter(5,2))+dble(Br_counter(5,3)) )/dble(AccepCounter)
+            
+          write(*,"(A,5F16.3)") "4l/2q2l: ",(dble(Br_counter(1,2))+dble(Br_counter(1,3))+ dble(Br_counter(1,1))+dble(Br_counter(2,2))+dble(Br_counter(3,3)) &
+                                        + dble(Br_counter(2,1))+dble(Br_counter(2,3))+   &
+                                          dble(Br_counter(3,1))+dble(Br_counter(3,2)))/  &
+                                          (dble(Br_counter(1,5))+dble(Br_counter(2,5))+dble(Br_counter(3,5))+  &
+                                          dble(Br_counter(5,1))+dble(Br_counter(5,2))+dble(Br_counter(5,3)) )
+    endif
+  
     
 
 
@@ -3890,6 +3943,16 @@ character :: arg*(500)
         write(TheUnit,"(8X,A)") "(counting tau in place of e or mu of the same sign, if necessary)"
     endif
     write(TheUnit,"(4X,A,20I11)") "Random seed: ",UserSeed
+    write(TheUnit,"(4X,A)") "To reproduce results using this seed, JHUGen should be compiled with the same compiler:"
+#if compiler==1
+    if( modulo(__INTEL_COMPILER, 10) == 0 ) then !last digit is 0, e.g. 1110.  ifort --version writes this as 11.1, not 11.10
+        write(TheUnit,"(6X,A,I2,A,I1,A,I8)") "ifort (IFORT) ", __INTEL_COMPILER/100, ".", modulo(__INTEL_COMPILER, 100)/10, " ", __INTEL_COMPILER_BUILD_DATE
+    else
+        write(TheUnit,"(6X,A,I2,A,I2,A,I8)") "ifort (IFORT) ", __INTEL_COMPILER/100, ".", modulo(__INTEL_COMPILER, 100), " ", __INTEL_COMPILER_BUILD_DATE
+    endif
+#elif compiler==2
+    write(TheUnit,"(6X,A,A)") "GNU Fortran (GCC) ", __VERSION__
+#endif
 
     if( .not. (ReadLHEFile .or. ConvertLHEFile) ) then
         write(TheUnit,"(4X,A)") ""
@@ -4077,6 +4140,9 @@ END SUBROUTINE
 SUBROUTINE InitRandomSeed()
 use modParameters
 use modMisc
+#if compiler==1
+use ifport   !needed for getpid()
+#endif
 implicit none
 integer, dimension(:), allocatable :: gen_seed
 integer :: n,i,sclock,getpid
