@@ -275,6 +275,7 @@ logical :: SetAnomalousHff, Setkappa
    ConvertLHEFile=.false.
    ReadCSmax=.false.
    CalcPMZZ = .false.
+   ReadPMZZ = .false.
    GenerateEvents=.false.
    RequestNLeptons = -1
    RequestOS=-1
@@ -357,6 +358,7 @@ logical :: SetAnomalousHff, Setkappa
     call ReadCommandLineArgument(arg, "ReweightDecay", success, ReweightDecay)
     call ReadCommandLineArgument(arg, "WidthScheme", success, WidthScheme)
     call ReadCommandLineArgument(arg, "WidthSchemeIn", success, WidthSchemeIn)
+    call ReadCommandLineArgument(arg, "ReadPMZZ", success, ReadPMZZ)
     call ReadCommandLineArgument(arg, "OffXVV", success, OffShell_XVV)
     call ReadCommandLineArgument(arg, "FilterNLept", success, RequestNLeptons)
     call ReadCommandLineArgument(arg, "FilterOSPairs", success, RequestOS)
@@ -722,7 +724,7 @@ logical :: SetAnomalousHff, Setkappa
     if( CalcPMZZ .and. (WidthScheme.le.0 .or. WidthSchemeIn.le.0) ) then
         ReweightDecay=.true.
     endif
-    if( .not.ReadLHEFile .and. .not.ConvertLHEFile .and. .not.CalcPMZZ ) then
+    if( .not.ReadLHEFile .and. .not.CalcPMZZ ) then
         if( ReweightDecay .or. WidthSchemeIn.gt.0 ) then
             call Error("ReweightDecay and WidthSchemeIn only make sense in ReadLHE mode")
         endif
@@ -731,7 +733,7 @@ logical :: SetAnomalousHff, Setkappa
         endif
     else
         if( WidthScheme.le.0 .and. WidthSchemeIn.le.0 ) then
-            if( ReweightDecay.and..not.CalcPMZZ ) then
+            if( ReweightDecay ) then
                 print *, "If you want to reweight the decay, you need to specify a width scheme to correct"
                 print *, " for the VV branching fraction/matrix element."
                 stop 1
@@ -2020,7 +2022,7 @@ integer :: i, j, stat
         endif
 
         !Read the generated mass shape for reweighting, POWHEG only
-        if (ReweightDecay .and. FirstLines(1:7).eq."bwshape") then
+        if (FirstLines(1:7).eq."bwshape") then
             i = 8
             do while(FirstLines(i:i).eq." ")
                 i = i+1
@@ -2033,10 +2035,10 @@ integer :: i, j, stat
                 print *, "WidthSchemeIn is specified to be ", WidthSchemeIn, " but the LHE file says:"
                 print *, FirstLines
                 stop 1
-            elseif( WidthScheme.gt.0 .and. WidthSchemeIn.lt.0 .and. .not.ReweightDecay .and. j.ne.WidthScheme ) then
-                print *, "WidthScheme is specified to be ", WidthSchemeIn, " but the LHE file says:"
+            elseif( WidthScheme.gt.0 .and. WidthSchemeIn.le.0 .and. j.ne.WidthScheme ) then
+                print *, "WidthScheme is specified to be ", WidthScheme, " but the LHE file says:"
                 print *, FirstLines
-                print *, "If you want to reweight the propagator from ", WidthSchemeIn, " to ", WidthScheme, " please specify ReweightDecay=1"
+                print "(A,I1,A,I1,A,I1,A,I1)", "If you want to reweight the propagator from ", j, " to ", WidthScheme, " please specify WidthSchemeIn=", j, " WidthScheme=", WidthScheme
                 stop 1
             endif
             if( WidthScheme.le.0 ) read(FirstLines(8:i),*) WidthScheme
