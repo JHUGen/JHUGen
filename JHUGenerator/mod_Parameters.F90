@@ -76,7 +76,7 @@ real(8), public :: gabarH = -999d0   !for CPS
 logical, public :: ReadPMZZ
 character(len=500), public :: PMZZfile = "PMZZdistribution.out"
 real(8), public :: PMZZ_mReso = -1d0
-integer, public, parameter :: PMZZsize = 1000
+integer, public, parameter :: PMZZsize = 10000
 real(8), public :: PMZZdistribution(1:PMZZsize,1:2)  !huge array, in normal cases will never get near the edge
 integer, public :: PMZZminindex=-1, PMZZmaxindex=-1  !store the largest and smallest values currently used
 !=====================================================
