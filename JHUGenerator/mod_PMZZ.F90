@@ -137,6 +137,9 @@ real(8) :: extendto, intervalsize, minm4l, maxm4l, ScanMin, ScanMax
         return
     endif
 
+    if( maxindex.gt.PMZZSize.or.minindex.lt.1 ) then
+        call Error("Not enough room for the P_decay(m4f) distribution!  Try increasing PMZZsize in mod_Parameters")
+    endif
     call GetMZZDistribution(ScanMin, ScanMax, nsteps, .false., PMZZdistribution(minindex:maxindex,1:2))
 
 RETURN
@@ -160,9 +163,11 @@ logical :: usespline
 
          if( usespline ) then
              if( intervalsize.gt.0d0 ) then
-                 call ExtendMZZdistribution(EHat, intervalsize, Ncalls)
+                 call ExtendMZZdistribution(EHat+3*intervalsize, intervalsize, Ncalls)
+                 call ExtendMZZdistribution(EHat-3*intervalsize, intervalsize, Ncalls)
              else
-                 call ExtendMZZdistribution(EHat, 5*GeV, Ncalls)
+                 call ExtendMZZdistribution(EHat+15*GeV,         5*GeV,        Ncalls)
+                 call ExtendMZZdistribution(EHat-15*GeV,         5*GeV,        Ncalls)
              endif
              call EvaluateSpline(EHat, PMZZdistribution(PMZZminindex:PMZZmaxindex,1:2), PMZZmaxindex-PMZZminindex+1, PMZZ)
              GetMZZProbability = GetMZZProbability * PMZZ
