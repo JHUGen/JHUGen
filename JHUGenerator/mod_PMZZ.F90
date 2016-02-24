@@ -94,6 +94,10 @@ real(8) :: minm4l, maxm4l
     !then out to 5Gamma in steps of 5 GeV
     call ExtendMZZdistribution(M_Reso+5*Ga_Reso, 5*GeV, Ncalls)
     call ExtendMZZdistribution(M_Reso-5*Ga_Reso, 5*GeV, Ncalls)
+    !make sure there are a few data points even for a tiny width
+    !so that we don't get NaN
+    call ExtendMZZdistribution(M_Reso+2*GeV,     1*GeV, Ncalls)
+    call ExtendMZZdistribution(M_Reso-2*GeV,     1*GeV, Ncalls)
     !leave it at that for now
 
     call WriteMZZdistribution(PMZZfile)
