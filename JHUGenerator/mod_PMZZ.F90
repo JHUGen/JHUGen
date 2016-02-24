@@ -76,18 +76,17 @@ real(8) :: minm4l, maxm4l
 
     if( ReadPMZZ ) then
         call ReadMZZdistribution(PMZZfile)
-        return
-    endif
+    else
+        if( PMZZminindex.ne.-1 .or. PMZZmaxindex.ne.-1 ) then
+            call Error("InitMZZdistribution called twice!")
+        endif
 
-    if( PMZZminindex.ne.-1 .or. PMZZmaxindex.ne.-1 ) then
-        call Error("InitMZZdistribution called twice!")
+        mResoindex = PMZZsize/2
+        PMZZ_mReso = CalcMZZProbability(M_Reso,Ncalls)
+        PMZZdistribution(mResoindex,1:2) = (/M_Reso, PMZZ_mReso/)
+        PMZZminindex = mResoindex
+        PMZZmaxindex = mResoindex
     endif
-
-    mResoindex = PMZZsize/2
-    PMZZ_mReso = CalcMZZProbability(M_Reso,Ncalls)
-    PMZZdistribution(mResoindex,1:2) = (/M_Reso, PMZZ_mReso/)
-    PMZZminindex = mResoindex
-    PMZZmaxindex = mResoindex
 
     !extend out to Gamma in steps of 1 GeV
     call ExtendMZZdistribution(M_Reso+Ga_Reso,   1*GeV,  Ncalls)
