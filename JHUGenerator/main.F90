@@ -578,7 +578,9 @@ logical :: SetAnomalousHff, Setkappa
 
     !ReadLHE and ConvertLHE
     !MUST HAPPEN BEFORE DETERMINING INTERFERENCE
-    !so that the mass can be read
+    !so that the mass and width can be read
+    !AND BEFORE DEALING WITH WIDTHSCHEMES
+    !so that WidthSchemeIn can be read
 
     if( ReadLHEFile .and. Process.ne.0  ) then
         print *, "ReadLHE option is only allowed for spin-0 resonances"
@@ -3901,8 +3903,11 @@ character :: arg*(500)
 #endif
         write(TheUnit,"(4X,A,L)") "Unweighted: ",Unweighted
     endif
+    if( WidthScheme.ne.WidthSchemeIn ) then
+        write(TheUnit,"(4X,A,I1,A,I1)") "Reweighting propagator from WidthScheme ", WidthSchemeIn, " to WidthScheme ", WidthScheme
+    endif
     if( ReweightDecay ) then
-        write(TheUnit,"(4X,A,I3,A,I3)") "Reweighting from WidthScheme ", WidthSchemeIn, " to WidthScheme ", WidthScheme
+        write(TheUnit,"(4X,A,I1)") "Reweighting events using the decay matrix element, using input WidthScheme ", WidthSchemeIn
     endif
     if( Process.le.2 .or. ReadLHEFile ) write(TheUnit,"(4X,A,L)") "Interference: ",includeInterference
     if( (Process.le.2 .or. ReadLHEFile) .and. (IsAZDecay(DecayMode1) .or. IsAZDecay(DecayMode2))  ) write(TheUnit,"(4X,A,L)") "Intermediate off-shell photons: ",includeGammaStar

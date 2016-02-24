@@ -808,8 +808,8 @@ subroutine spinoru(p,za,zb,s)
 
     SUBROUTINE EvaluateSpline(EvalPoint, SplineData, SplineDataLength, TheResult)
     !SplineData: SplineDataLength by 2 array
-    !    SplineData(SplineDataLength,1) is the x value
-    !    SplineData(SplineDataLength,2) is the y value
+    !    SplineData(1:SplineDataLength,1) are the x values
+    !    SplineData(1:SplineDataLength,2) are the corresponding y values
 
     IMPLICIT NONE
 
