@@ -50,9 +50,13 @@ real(8) :: MZZdistribution(0:nsteps,1:2)
 
   do nscan=0, nsteps
 
-     EHat = ScanMin + (ScanMax-ScanMin)*nscan/dble(nsteps)
+     if( nsteps.eq.0 ) then
+         EHat = (ScanMin+ScanMax)/2
+     else
+         EHat = ScanMin + (ScanMax-ScanMin)*nscan/dble(nsteps)
+     endif
      DecayWidth = CalcMZZProbability(EHat,Ncalls)
-     MZZdistribution(nscan,1:2) = (/EHat, DecayWidth/PMZZ_mReso/)
+     MZZdistribution(nscan,1:2) = (/EHat, DecayWidth/)
 
   enddo
 
@@ -70,6 +74,11 @@ implicit none
 integer :: minindex, maxindex, n, mResoindex, Ncalls
 real(8) :: minm4l, maxm4l
 
+    if( ReadPMZZ ) then
+        call ReadMZZdistribution(PMZZfile)
+        return
+    endif
+
     if( PMZZminindex.ne.-1 .or. PMZZmaxindex.ne.-1 ) then
         call Error("InitMZZdistribution called twice!")
     endif
@@ -80,16 +89,15 @@ real(8) :: minm4l, maxm4l
     PMZZminindex = mResoindex
     PMZZmaxindex = mResoindex
 
-    !extend out to Gamma in steps of 5 GeV
-    call ExtendMZZdistribution(M_Reso+Ga_Reso,   5*GeV,  Ncalls)
-    call ExtendMZZdistribution(M_Reso-Ga_Reso,   5*GeV,  Ncalls)
-    !out to 3Gamma in steps of 10 GeV
-    call ExtendMZZdistribution(M_Reso+3*Ga_Reso, 10*GeV, Ncalls)
-    call ExtendMZZdistribution(M_Reso-3*Ga_Reso, 10*GeV, Ncalls)
-    !then out to 5Gamma in steps of 20 GeV
-    call ExtendMZZdistribution(M_Reso+5*Ga_Reso, 20*GeV, Ncalls)
-    call ExtendMZZdistribution(M_Reso-5*Ga_Reso, 20*GeV, Ncalls)
+    !extend out to Gamma in steps of 1 GeV
+    call ExtendMZZdistribution(M_Reso+Ga_Reso,   1*GeV,  Ncalls)
+    call ExtendMZZdistribution(M_Reso-Ga_Reso,   1*GeV,  Ncalls)
+    !then out to 5Gamma in steps of 5 GeV
+    call ExtendMZZdistribution(M_Reso+5*Ga_Reso, 5*GeV, Ncalls)
+    call ExtendMZZdistribution(M_Reso-5*Ga_Reso, 5*GeV, Ncalls)
     !leave it at that for now
+
+    call WriteMZZdistribution(PMZZfile)
 
 RETURN
 END SUBROUTINE
@@ -105,6 +113,7 @@ real(8) :: extendto, intervalsize, minm4l, maxm4l, ScanMin, ScanMax
     if( PMZZminindex.eq.-1 .or. PMZZmaxindex.eq.-1 ) call Error("Calling ExtendMZZdistribution without calling InitMZZdistribution first!")
     minm4l = PMZZdistribution(PMZZminindex,1)
     maxm4l = PMZZdistribution(PMZZmaxindex,1)
+    extendto = max(extendto, 1d-5)
     if( extendto.gt.maxm4l ) then
         ScanMax = extendto
         npoints = ceiling((extendto - maxm4l)/intervalsize)
@@ -150,7 +159,7 @@ logical :: usespline
              if( intervalsize.gt.0d0 ) then
                  call ExtendMZZdistribution(EHat, intervalsize, Ncalls)
              else
-                 call ExtendMZZdistribution(EHat, 40*GeV, Ncalls)
+                 call ExtendMZZdistribution(EHat, 5*GeV, Ncalls)
              endif
              call EvaluateSpline(EHat, PMZZdistribution(PMZZminindex:PMZZmaxindex,1:2), PMZZmaxindex-PMZZminindex+1, PMZZ)
              GetMZZProbability = GetMZZProbability * PMZZ
@@ -182,6 +191,40 @@ RETURN
 END FUNCTION
 
 
+SUBROUTINE WriteMZZdistribution(outfile)
+use ModParameters
+implicit none
+integer :: i
+character(len=*) :: outfile
+
+    open(unit=io_TmpFile,file=outfile,form='unformatted',status='replace')
+    do i=PMZZminindex, PMZZmaxindex
+        write(io_TmpFile) i, PMZZdistribution(i,1), PMZZdistribution(i,2)
+    end do
+    close(io_TmpFile)
+
+RETURN
+END SUBROUTINE
+
+SUBROUTINE ReadMZZdistribution(infile)
+use ModParameters
+implicit none
+integer :: i, stat
+real(8) :: EHat, PMZZ
+character(len=*) :: infile
+
+    open(unit=io_TmpFile,file=trim(infile),form='unformatted',access= 'sequential',status='old')
+    do while (.true.)
+        read(io_TmpFile,iostat=stat,END=99) i, EHat, PMZZ
+        PMZZdistribution(i,1:2) = (/EHat, PMZZ/)
+        if (PMZZminindex.le.0 .or. PMZZminindex.gt.i) PMZZminindex = i
+        if (PMZZmaxindex.lt.i) PMZZmaxindex = i
+    end do
+99  CONTINUE
+    close(io_TmpFile)
+
+RETURN
+END SUBROUTINE
 
 SUBROUTINE PrintMZZdistribution()
 use ModCrossSection
