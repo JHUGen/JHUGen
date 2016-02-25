@@ -94,7 +94,6 @@ c--- compute total Higgs amplitude
      &  +ggH_tquark(h1,h2,h34,h56)   
      &  +ggSMH_bquark(h1,h2,h34,h56)   
      &  +ggSMH_tquark(h1,h2,h34,h56)   
-     
 c---- This accumulates all contributions
       Mamp=Acont+AHiggs
       
