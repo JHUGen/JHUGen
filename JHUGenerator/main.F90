@@ -4260,7 +4260,7 @@ implicit none
         write(io_stdout,"(4X,A)") "TauDK:      decay mode for taus in H->tautau, 0=stable, 1=decaying (use DecayMode1/2 = 4,5 for W+/W-"
         write(io_stdout,"(4X,A)") "BotDK:      decay mode for bottom quarks in H->bbar, 0=deactivated, 1=activated"
         write(io_stdout,"(4X,A)") "PChannel:   0=g+g, 1=q+qb, 2=both"
-        write(io_stdout,"(4X,A)") "OffshellX:     off-shell option for resonance(X),or vector bosons(VV)"
+        write(io_stdout,"(4X,A)") "OffshellX:     Off-shellness option for resonance (X)"
         write(io_stdout,"(4X,A)") "WidthScheme:0=fixed width, 1=running width, 2=complex pole scheme"
 #if useLHAPDF==1
         write(io_stdout,"(4X,A)") "LHAPDF:     name of the LHA PDF file, e.g. NNPDF30_lo_as_0130/NNPDF30_lo_as_0130.info"
