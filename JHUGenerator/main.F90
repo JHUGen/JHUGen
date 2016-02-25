@@ -276,6 +276,7 @@ logical :: SetAnomalousHff, Setkappa
    ReadCSmax=.false.
    CalcPMZZ = .false.
    ReadPMZZ = .false.
+   PMZZEvals=200000
    GenerateEvents=.false.
    RequestNLeptons = -1
    RequestOS=-1
@@ -359,6 +360,7 @@ logical :: SetAnomalousHff, Setkappa
     call ReadCommandLineArgument(arg, "WidthScheme", success, WidthScheme)
     call ReadCommandLineArgument(arg, "WidthSchemeIn", success, WidthSchemeIn)
     call ReadCommandLineArgument(arg, "ReadPMZZ", success, ReadPMZZ)
+    call ReadCommandLineArgument(arg, "PMZZEvals", success, PMZZEvals)
     call ReadCommandLineArgument(arg, "OffXVV", success, OffShell_XVV)
     call ReadCommandLineArgument(arg, "FilterNLept", success, RequestNLeptons)
     call ReadCommandLineArgument(arg, "FilterOSPairs", success, RequestOS)
@@ -2197,7 +2199,6 @@ character(len=160) :: OtherLines
 character(len=160) :: EventLine(0:maxpart)
 integer :: n,stat,iHiggs,VegasSeed,AccepLastPrinted
 character(len=100) :: BeginEventLine
-integer,parameter :: PMZZcalls = 200000
 logical :: Empty
 
 
@@ -2210,10 +2211,10 @@ AccepLastPrinted = 0
 call InitReadLHE(BeginEventLine)
 
      if( ReweightDecay ) then
-         print *, " finding P_decay(m4l) distribution with", PMZZcalls, " calls per point"
-         call InitMZZdistribution(PMZZcalls)
+         print *, " finding P_decay(m4l) distribution with ", PMZZEvals, " calls per point"
+         call InitMZZdistribution()
      endif
-     DecayWidth0 = GetMZZProbability(M_Reso,PMZZcalls,-1d0,.true.)
+     DecayWidth0 = GetMZZProbability(M_Reso,-1d0,.true.)
 
      print *, " finding maximal weight for mZZ=mReso with ",VegasNc0," points"
      VG = zero
@@ -2289,7 +2290,7 @@ call InitReadLHE(BeginEventLine)
           EHat = pH2sq
           DecayWeight = 0d0
           
-          DecayWidth = GetMZZProbability(EHat,PMZZcalls,-1d0,.true.)!  could also be used to determine csmax for this particular event to improve efficiency (-->future work)
+          DecayWidth = GetMZZProbability(EHat,-1d0,.true.)!  could also be used to determine csmax for this particular event to improve efficiency (-->future work)
           WeightScaleAqedAqcd(1) = WeightScaleAqedAqcd(1) * DecayWidth/DecayWidth0
 
           if( TauDecays.lt.0 ) then

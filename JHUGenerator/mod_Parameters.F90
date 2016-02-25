@@ -10,7 +10,7 @@ character(len=6),parameter :: JHUGen_Version="v6.9.0"
 !internal
 integer, public, parameter  :: dp = selected_real_kind(15)
 integer, public :: Collider,PChannel,Process,DecayMode1,DecayMode2,TopDecays,TauDecays
-integer, public :: VegasIt1,VegasNc0,VegasNc1,VegasNc2
+integer, public :: VegasIt1,VegasNc0,VegasNc1,VegasNc2,PMZZEvals
 real(8), public :: Collider_Energy
 integer, public :: FacScheme,RenScheme
 real(8), public :: MuFacMultiplier,MuRenMultiplier
