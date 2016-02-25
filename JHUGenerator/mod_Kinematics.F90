@@ -686,7 +686,7 @@ real(8) :: xi,eta,a,b,c,p1sq,p2sq,p1p2
   p1sq = p1(1:4).dot.p1(1:4)
   p2sq = p2(1:4).dot.p2(1:4)
   p1p2 = p1(1:4).dot.p2(1:4)
-
+  
   a = ( p1sq*p2(1:4) - p2sq*p1(1:4) + p1p2*(p2(1:4)-p1(1:4)) ).dot.( p1sq*p2(1:4) - p2sq*p1(1:4) + p1p2*(p2(1:4)-p1(1:4)) )
   b = ( p1sq+p2sq+2d0*p1p2+m2**2-m1**2 ) * ( p1p2**2 - p1sq*p2sq )
   c = 0.25d0*( p1sq+p2sq+2d0*p1p2+m2**2-m1**2 )**2*p1sq - (p1sq+p1p2)**2*m2**2
@@ -695,6 +695,22 @@ real(8) :: xi,eta,a,b,c,p1sq,p2sq,p1p2
 
   p2hat(1:4) = xi*p1(1:4) + eta*p2(1:4)
   p1hat(1:4) = (1d0-xi)*p1(1:4) + (1d0-eta)*p2(1:4)
+
+
+! if( dabs( (p1hat.dot.p1hat)-m1**2 )/m1**2.gt.1d-3 ) then
+!     print *, "1",p1hat.dot.p1hat , m1**2
+!     print *, p1
+!     print *, p1hat
+!     print *, a,b,c,eta,xi,p1sq + p1p2
+!     pause
+! endif
+! if( dabs( (p2hat.dot.p2hat)-m2**2 )/m2**2.gt.1d-3 ) then
+!     print *, "2",p2hat.dot.p2hat , m2**2
+!     print *, p2
+!     print *, p2hat
+!     print *, a,b,c,eta,xi,p1sq + p1p2
+!     pause
+! endif
 
 
 RETURN
