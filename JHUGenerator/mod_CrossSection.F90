@@ -9,7 +9,7 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
  
 
  
- 
+  
  ! This function handles weighted and unweighted events for PP-->spin0,1,2-->VV
  FUNCTION EvalWeighted(yRnd,VgsWgt)   
  use ModKinematics                    
@@ -27,7 +27,7 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
  real(8) :: pdf(-6:6,1:2)
  integer :: NBin(1:NumHistograms),NHisto,i,MY_IDUP(1:9), ICOLUP(1:2,1:9),xBin(1:4)
  integer :: NumPartonicChannels,iPartChannel,ijSel(1:121,1:3),PartChannelAvg,flav1,flav2
- real(8) :: EHat,PSWgt,PSWgt2,PSWgt3
+ real(8) :: EHat,PSWgt,PSWgt2,PSWgt3,ML1,ML2,ML3,ML4,MZ1,MZ2
  real(8) :: MomExt(1:4,1:8),MomDK(1:4,1:4),xRnd
  logical :: applyPSCut
  include 'vegas_common.f'   
@@ -124,6 +124,18 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
         call EvalPhasespace_H4f(yRnd(3),yRnd(4:11),EHat,MomExt(1:4,1:8),PSWgt)  ! VV-->4l
     endif
 
+    ML1 = getMass(MY_IDUP(7))
+    ML2 = getMass(MY_IDUP(6))
+    ML3 = getMass(MY_IDUP(9))
+    ML4 = getMass(MY_IDUP(8))
+    MZ1 = get_MInv(MomExt(1:4,5)+MomExt(1:4,6))
+    MZ2 = get_MInv(MomExt(1:4,7)+MomExt(1:4,8))
+    
+    if( (MZ1.lt.ML1+ML2) .or. (MZ2.lt.ML3+ML4) .or. MZ1.lt.0.5d0*GeV .or. MZ2.lt.0.5d0*GeV) then
+      EvalWeighted = 0d0
+      return
+    endif
+    
     call boost2Lab(eta1,eta2,8,MomExt(1:4,1:8))    
 
     call Kinematics(4,MomExt,MomExt(1:4,5:8),applyPSCut,NBin)
@@ -211,8 +223,8 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
            call intoHisto(NHisto,NBin(NHisto),1d0)
          enddo
          
-         call ShiftMass(MomExt(1:4,5),MomExt(1:4,6), GetMass(MY_IDUP(7)),GetMass(MY_IDUP(6)),  MomDK(1:4,1),MomDK(1:4,2) )
-         call ShiftMass(MomExt(1:4,7),MomExt(1:4,8), GetMass(MY_IDUP(9)),GetMass(MY_IDUP(8)),  MomDK(1:4,3),MomDK(1:4,4) )
+         call ShiftMass(MomExt(1:4,5),MomExt(1:4,6),ML1,ML2, MomDK(1:4,1),MomDK(1:4,2) )
+         call ShiftMass(MomExt(1:4,7),MomExt(1:4,8),ML3,ML4, MomDK(1:4,3),MomDK(1:4,4) )
          call WriteOutEvent((/MomExt(1:4,1),MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(1:9),ICOLUP(1:2,1:9))
 
 
@@ -250,6 +262,7 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
 
    else! weighted
 
+   
       if( EvalWeighted.ne.0d0 ) then
         AccepCounter=AccepCounter+1
         if( writeWeightedLHE .and. (.not. warmup) ) then
