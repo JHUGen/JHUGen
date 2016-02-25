@@ -735,6 +735,7 @@ logical :: SetAnomalousHff, Setkappa
         if( WidthScheme.le.0 ) then
             WidthScheme = 2
         endif
+        WidthSchemeIn = WidthScheme
     else
         if( WidthScheme.le.0 .and. WidthSchemeIn.le.0 ) then
             if( ReweightDecay ) then
@@ -3963,7 +3964,7 @@ character :: arg*(500)
 #if useLHAPDF==1
         write(TheUnit,"(4X,A,A,A,I3)") "LHAPDF set ",trim(LHAPDFString), ", member=",LHAPDFMember
 #else
-        write(TheUnit,"(4X,A,I1)") "PDFSet: ",PDFSet
+        write(TheUnit,"(4X,A,I3)") "PDFSet: ",PDFSet
 #endif
         write(TheUnit,"(4X,A,L)") "Unweighted: ",Unweighted
     endif
