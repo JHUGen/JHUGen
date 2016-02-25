@@ -4,7 +4,7 @@ implicit none
 contains
 
 
-FUNCTION CalcMZZProbability(EHat,Ncalls)
+FUNCTION CalcMZZProbability(EHat)
 use ModCrossSection
 use ModKinematics
 use ModMisc
@@ -13,10 +13,10 @@ implicit none
 real(8) :: DecayWeight,yRnd(1:22),Res,CalcMZZProbability
 real(8) :: HiggsDK_Mom(1:4,1:13),Ehat
 integer :: HiggsDK_IDUP(1:13),HiggsDK_ICOLUP(1:2,1:13)
-integer :: evals,Ncalls
+integer :: evals
 
      CalcMZZProbability = 0d0
-     do evals=1,Ncalls
+     do evals=1,PMZZEvals
          call random_number(yRnd)
          if( TauDecays.lt.0 ) then
              DecayWeight = EvalUnWeighted_DecayToVV(yRnd,.false.,EHat,Res,HiggsDK_Mom(1:4,6:9),HiggsDK_IDUP(1:9),HiggsDK_ICOLUP)
@@ -26,6 +26,7 @@ integer :: evals,Ncalls
          CalcMZZProbability = CalcMZZProbability + DecayWeight
      enddo
      CalcMZZProbability = CalcMZZProbability/dble(evals)
+     !print *, EHat*100d0, CalcMZZProbability
 
 RETURN
 END FUNCTION
@@ -40,13 +41,10 @@ implicit none
 real(8) :: DecayWeight,DecayWidth,DecayWidth0
 real(8) :: Ehat
 integer :: nscan, nsteps
-integer,parameter :: Ncalls=200000
 real(8) :: ScanMin, ScanMax
 logical :: doprint
 real(8) :: MZZdistribution(0:nsteps,1:2)
 
-
-  if( PMZZ_mReso.lt.0 ) PMZZ_mReso = CalcMZZProbability(M_Reso,Ncalls)
 
   do nscan=0, nsteps
 
@@ -55,7 +53,7 @@ real(8) :: MZZdistribution(0:nsteps,1:2)
      else
          EHat = ScanMin + (ScanMax-ScanMin)*nscan/dble(nsteps)
      endif
-     DecayWidth = CalcMZZProbability(EHat,Ncalls)
+     DecayWidth = CalcMZZProbability(EHat)
      MZZdistribution(nscan,1:2) = (/EHat, DecayWidth/)
 
   enddo
@@ -65,13 +63,13 @@ END SUBROUTINE
 
 
 
-SUBROUTINE InitMZZdistribution(Ncalls)
+SUBROUTINE InitMZZdistribution()
 !ScanRange: how far above and below M_Reso to go
 !nmax:      number of points above and below M_Reso
 use ModMisc
 use ModParameters
 implicit none
-integer :: minindex, maxindex, n, mResoindex, Ncalls
+integer :: minindex, maxindex, n, mResoindex
 real(8) :: minm4l, maxm4l
 
     if( ReadPMZZ ) then
@@ -82,22 +80,22 @@ real(8) :: minm4l, maxm4l
         endif
 
         mResoindex = PMZZsize/2
-        PMZZ_mReso = CalcMZZProbability(M_Reso,Ncalls)
+        PMZZ_mReso = CalcMZZProbability(M_Reso)
         PMZZdistribution(mResoindex,1:2) = (/M_Reso, PMZZ_mReso/)
         PMZZminindex = mResoindex
         PMZZmaxindex = mResoindex
     endif
 
     !extend out to Gamma in steps of 1 GeV
-    call ExtendMZZdistribution(M_Reso+Ga_Reso,   1*GeV,  Ncalls)
-    call ExtendMZZdistribution(M_Reso-Ga_Reso,   1*GeV,  Ncalls)
+    call ExtendMZZdistribution(M_Reso+Ga_Reso,   1*GeV)
+    call ExtendMZZdistribution(M_Reso-Ga_Reso,   1*GeV)
     !then out to 5Gamma in steps of 5 GeV
-    call ExtendMZZdistribution(M_Reso+5*Ga_Reso, 5*GeV, Ncalls)
-    call ExtendMZZdistribution(M_Reso-5*Ga_Reso, 5*GeV, Ncalls)
+    call ExtendMZZdistribution(M_Reso+5*Ga_Reso, 5*GeV)
+    call ExtendMZZdistribution(M_Reso-5*Ga_Reso, 5*GeV)
     !make sure there are a few data points even for a tiny width
     !so that we don't get NaN
-    call ExtendMZZdistribution(M_Reso+2*GeV,     1*GeV, Ncalls)
-    call ExtendMZZdistribution(M_Reso-2*GeV,     1*GeV, Ncalls)
+    call ExtendMZZdistribution(M_Reso+2*GeV,     1*GeV)
+    call ExtendMZZdistribution(M_Reso-2*GeV,     1*GeV)
     !leave it at that for now
 
     call WriteMZZdistribution(PMZZfile)
@@ -106,11 +104,11 @@ RETURN
 END SUBROUTINE
 
 
-SUBROUTINE ExtendMZZdistribution(extendto, intervalsize, Ncalls)
+SUBROUTINE ExtendMZZdistribution(extendto, intervalsize)
 use ModMisc
 use ModParameters
 implicit none
-integer :: npoints, nsteps, Ncalls, minindex, maxindex
+integer :: npoints, nsteps, minindex, maxindex
 real(8) :: extendto, intervalsize, minm4l, maxm4l, ScanMin, ScanMax
 
     if( PMZZminindex.eq.-1 .or. PMZZmaxindex.eq.-1 ) call Error("Calling ExtendMZZdistribution without calling InitMZZdistribution first!")
@@ -147,14 +145,13 @@ END SUBROUTINE
 
 
 
-FUNCTION GetMZZProbability(EHat,Ncalls,intervalsize,usespline)
+FUNCTION GetMZZProbability(EHat,intervalsize,usespline)
 use ModCrossSection
 use ModKinematics
 use ModMisc
 use ModParameters
 implicit none
 real(8) :: EHat, BigGamma, GetMZZProbability, PMZZ, intervalsize
-integer :: Ncalls
 logical :: usespline
 
      GetMZZProbability = 1d0
@@ -163,16 +160,16 @@ logical :: usespline
 
          if( usespline ) then
              if( intervalsize.gt.0d0 ) then
-                 call ExtendMZZdistribution(EHat+3*intervalsize, intervalsize, Ncalls)
-                 call ExtendMZZdistribution(EHat-3*intervalsize, intervalsize, Ncalls)
+                 call ExtendMZZdistribution(EHat+3*intervalsize, intervalsize)
+                 call ExtendMZZdistribution(EHat-3*intervalsize, intervalsize)
              else
-                 call ExtendMZZdistribution(EHat+15*GeV,         5*GeV,        Ncalls)
-                 call ExtendMZZdistribution(EHat-15*GeV,         5*GeV,        Ncalls)
+                 call ExtendMZZdistribution(EHat+15*GeV,         5*GeV)
+                 call ExtendMZZdistribution(EHat-15*GeV,         5*GeV)
              endif
              call EvaluateSpline(EHat, PMZZdistribution(PMZZminindex:PMZZmaxindex,1:2), PMZZmaxindex-PMZZminindex+1, PMZZ)
              GetMZZProbability = GetMZZProbability * PMZZ
          else
-             GetMZZProbability = CalcMZZProbability(EHat,Ncalls)
+             GetMZZProbability = CalcMZZProbability(EHat)
          endif
 
          if( WidthSchemeIn.eq.3 ) then
@@ -241,16 +238,16 @@ implicit none
 real(8) :: DecayWeight,DecayWidth,DecayWidth0
 real(8) :: Ehat
 integer :: nscan
-integer,parameter :: nmax=20, Ncalls=200000
+integer,parameter :: nmax=20
 real(8),parameter :: ScanRange=120d0*GeV
 
 
-  DecayWidth0 = GetMZZProbability(M_Reso,Ncalls,-1d0,.false.)
+  DecayWidth0 = GetMZZProbability(M_Reso,-1d0,.false.)
 
   do nscan=-nmax,+nmax,1
 
      EHat = M_Reso+ScanRange*nscan/dble(nmax)
-     DecayWidth = GetMZZProbability(EHat,Ncalls,-1d0,.false.)
+     DecayWidth = GetMZZProbability(EHat,-1d0,.false.)
      write(*,"(1F10.5,1PE16.9)") EHat*100d0,DecayWidth/DecayWidth0
 
   enddo
