@@ -4900,13 +4900,20 @@ integer :: NumChannels
    Mom(1:4,2) = 0.5d0*Energy * (/+1d0,0d0,0d0,-1d0/)
 
    ! If does not have 4f-interference, then use the first two channels only
-   if(.not.includeInterference .or. (IsAWDecay(DecayMode1).and.IsAWDecay(DecayMode2)) .or. .not.(id(1).eq.id(3) .and. id(2).eq.id(4)) ) NumChannels=2
+   if(.not.includeInterference .or. (IsAWDecay(DecayMode1).and.IsAWDecay(DecayMode2)) .or. .not.(id(1).eq.id(3) .and. id(2).eq.id(4)) ) then
+      NumChannels=2
+   endif
 
    ! Ordering becomes important if the on-shellness of V1 and V2 are not specified to be the same.
    ! If one V is off-shell and the other is on-shell, or if exactly one decay mode is a photon, use the first channel.
-   if(OffShellV1.neqv.OffShellV2 .or. ((IsAPhoton(DecayMode1) .or. IsAPhoton(DecayMode2)) .and. DecayMode1.ne.DecayMode2 )) NumChannels=1
-   if(NumChannels.gt.1) iChannel = int(xchannel * NumChannels -1d-10)+1
-   
+   if((OffShellV1.neqv.OffShellV2) .or. ((IsAPhoton(DecayMode1) .or. IsAPhoton(DecayMode2)) .and. DecayMode1.ne.DecayMode2 )) then
+      !print *,"Passes this if-statement!"
+      NumChannels=1
+   endif
+   if(NumChannels.gt.1) then
+      iChannel = int(xchannel * NumChannels -1d-10)+1
+   endif
+
    !print *, "PS channel / NumChannels ",iChannel,NumChannels
    
    ! masses
@@ -4929,7 +4936,8 @@ integer :: NumChannels
    endif
 
    !print *, "x",xrnd(1:2)
-   !print *, "s",s56,s78,s910;pause
+   !print *, "s",s56,s78,s910
+   !pause
 
    Jac = Jac1*Jac2*Jac3
    if(Jac.eq.0d0) return ! Checkpoint for on/off-shellness
@@ -4978,7 +4986,15 @@ ENDIF
 
    Jac = Jac*Jac4*Jac5*Jac6 * PSNorm4  !*NumChannels                                                                                 !  combine   
 
-   !print *, energy,dsqrt(s56);pause
+   !print *, energy,dsqrt(s56)
+   !print *,"Generated momenta: "
+   !print *,Mom(:,3)
+   !print *,Mom(:,4)
+   !print *,Mom(:,5)
+   !print *,Mom(:,6)
+   !print *,Mom(:,7)
+   !print *,Mom(:,8)
+   !pause
 
 
    if( isNan(jac) ) then
