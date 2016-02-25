@@ -686,7 +686,7 @@ real(8) :: xi,eta,a,b,c,p1sq,p2sq,p1p2
   p1sq = p1(1:4).dot.p1(1:4)
   p2sq = p2(1:4).dot.p2(1:4)
   p1p2 = p1(1:4).dot.p2(1:4)
-
+  
   a = ( p1sq*p2(1:4) - p2sq*p1(1:4) + p1p2*(p2(1:4)-p1(1:4)) ).dot.( p1sq*p2(1:4) - p2sq*p1(1:4) + p1p2*(p2(1:4)-p1(1:4)) )
   b = ( p1sq+p2sq+2d0*p1p2+m2**2-m1**2 ) * ( p1p2**2 - p1sq*p2sq )
   c = 0.25d0*( p1sq+p2sq+2d0*p1p2+m2**2-m1**2 )**2*p1sq - (p1sq+p1p2)**2*m2**2
@@ -695,6 +695,22 @@ real(8) :: xi,eta,a,b,c,p1sq,p2sq,p1p2
 
   p2hat(1:4) = xi*p1(1:4) + eta*p2(1:4)
   p1hat(1:4) = (1d0-xi)*p1(1:4) + (1d0-eta)*p2(1:4)
+
+
+! if( dabs( (p1hat.dot.p1hat)-m1**2 )/m1**2.gt.1d-3 ) then
+!     print *, "1",p1hat.dot.p1hat , m1**2
+!     print *, p1
+!     print *, p1hat
+!     print *, a,b,c,eta,xi,p1sq + p1p2
+!     pause
+! endif
+! if( dabs( (p2hat.dot.p2hat)-m2**2 )/m2**2.gt.1d-3 ) then
+!     print *, "2",p2hat.dot.p2hat , m2**2
+!     print *, p2
+!     print *, p2hat
+!     print *, a,b,c,eta,xi,p1sq + p1p2
+!     pause
+! endif
 
 
 RETURN
@@ -5033,6 +5049,61 @@ END SUBROUTINE
 
 
 
+
+! H-->gaga or H-->Zga phase space
+SUBROUTINE EvalPhasespace_HVga(xRnd,Energy,Mom,Jac)
+use ModParameters
+use ModPhasespace
+use ModMisc
+implicit none
+real(8) :: xRnd(:), Energy, s56,s78, Mom(:,:)
+real(8) :: Jac,Jac1,Jac2,Jac3,Mom_Dummy(1:4)
+
+
+   Mom(1:4,1) = 0.5d0*Energy * (/+1d0,0d0,0d0,+1d0/)
+   Mom(1:4,2) = 0.5d0*Energy * (/+1d0,0d0,0d0,-1d0/)
+      
+   Mom_Dummy(1:4) = (/Energy,0d0,0d0,0d0/)
+   if( .not.IsAPhoton(DecayMode1) ) then
+      s56=Energy**2   
+      Jac1 = s_channel_propagator(M_V**2,Ga_V,0d0,s56,xRnd(1),s78)
+      Jac2 = s_channel_decay(Mom_Dummy(1:4),s78,0d0,xRnd(2:3),Mom(:,3),Mom(:,7)) 
+      Jac3 = s_channel_decay(Mom(:,3),0d0,0d0,xRnd(4:5),Mom(:,5),Mom(:,6))
+      Jac = Jac1 * Jac2 * Jac3 * PSNorm3
+   else
+      Jac1 = s_channel_decay(Mom_Dummy(1:4),0d0,0d0,xRnd(1:2),Mom(:,5),Mom(:,7))
+      Jac = Jac1 * PSNorm2
+   endif
+   
+   if( isNan(jac) ) then
+      print *, "EvalPhasespace_Hgaga NaN"
+      print *, Energy,Jac
+      print *, xRnd
+!       pause
+      Jac = 0d0
+   endif
+
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,3).dot.Mom(1:4,3) ))
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,4).dot.Mom(1:4,4) ))
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,5).dot.Mom(1:4,5) ))
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,6).dot.Mom(1:4,6) ))
+!    print *, "----------"
+!    if( .not.IsAPhoton(DecayMode1) ) then   
+!       print *, "Mom.cons. ",Mom(1:4,1)+Mom(1:4,2)-Mom(1:4,4) -Mom(1:4,5)-Mom(1:4,6)
+!       print *, "Mom.cons. ",Mom(1:4,3)-Mom(1:4,5)-Mom(1:4,6)
+!    else   
+!       print *, "Mom.cons. ",Mom(1:4,1)+Mom(1:4,2)-Mom(1:4,3) -Mom(1:4,4)
+!    endif
+!    print *, "----------"
+!    pause
+   
+   
+   
+RETURN
+END SUBROUTINE
+
+
+
 ! Breit-Wigner mass^2
 function bw_sq(x, m, ga, smax, jacobian)
 implicit none
@@ -5258,6 +5329,7 @@ integer idx,ip
    ! Never ever allow the scales to go negative
    Mu_Fact = abs(Mu_Fact) * MuFacMultiplier
    Mu_Ren = abs(Mu_Ren) * MuRenMultiplier
+
 
 return
 end subroutine SetRunningScales
