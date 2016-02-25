@@ -152,8 +152,8 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
 
     call Kinematics(4,MomExt,MomExt(1:4,5:8),applyPSCut,NBin)
     if( applyPSCut  .or. PSWgt.eq.0d0  ) then
-      EvalWeighted = 0d0
-      return
+       EvalWeighted = 0d0
+       return
     endif
 
    call SetRunningScales( (/ (MomExt(1:4,3)+MomExt(1:4,4)),Mom_Not_a_particle(1:4),Mom_Not_a_particle(1:4) /) , (/ Not_a_particle_,Not_a_particle_,Not_a_particle_,Not_a_particle_ /) )
