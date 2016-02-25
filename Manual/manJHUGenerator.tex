@@ -86,7 +86,7 @@ The list of command line configurables and the default values are (also defined 
                          7=gamma, 8=Z->2l+2tau,
                          9=Z->anything, 10=W->lnu+taunu, 11=W->anything
     PChannel:          0=g+g, 1=q+qb, 2=both
-    OffshellX:          Off-shellness option for resonance (X) in decay processes (0, 1 or 2)
+    OffshellX:          Off-shellness option for resonance (X) in decay processes 0, 1 or 2
     PDFSet:            1=CTEQ6L1(2001),  2=MSTW(2008),
                                          2xx=MSTW with eigenvector set xx=01..40,
                                          3=NNPDF3.0LO
@@ -131,13 +131,13 @@ A few more details on some particular parameters:
 
 \begin{itemize}
 \item {\verb|VegasNc0,1,2|}: For unweighted event generation \verb|VegasNc0| specifies the number of evaluations for the initial integrand scan.  The actual event generation is controlled by either \verb|VegasNc1| or \verb|VegasNc2|. \verb|VegasNc1| specifies the number of tries in the accept/reject phase and \verb|VegasNc2| is the number of generated events. When generating unweighted events in \verb|ReadLHE| mode, both \verb|VegasNc1| or \verb|VegasNc2| can be used to specify the number of generated events. For the generation of weighted events \verb|VegasNc1| specifies the number of evaluations for each of 5 iterations during the initial integrand scan. \verb|VegasNc2| gives the (approximate) number of generated weighted events.
-\item {\verb|OffshellX|}: The flag specifies whether the events for processes 0, 1 or 2 feature a delta-function resonance mass (when set to \verb|.false.|) at or a finite-width distribution around the resonance mass. This option replaces the \verb|OffXVV| numerical flag in previous versions.
+\item {\verb|OffshellX|}: The flag specifies whether the events for processes 0, 1 or 2 feature a delta-function resonance mass (when set to 0) at or a finite-width distribution around the resonance mass (when set to 1). This option replaces the \verb|OffXVV| numerical flag in previous versions.
 \item \verb|PChannel|: This parameter is only meaningful in the spin-2 case and for the $ttH$ and $bbH$ production mechanisms.  For spin-0, production is possible only via the $gg$ process; for spin-1 and for the VBF and $VH$ processes, production is only possible via the $q\bar{q}$ process.  For $H+jj$ and $H+j$, all four parton channels $gg$, $q\bar{q}$, $qg$, and $\bar{q}g$ are included.
 \item \verb|DecayMode1,2=7|: Valid for spin-0 and spin-2.  Only OffXVV=000 or 100 are possible.
 \item In $VH$ production and \verb|ConvertLHE| mode, \verb|DecayMode1| is used for the decay of the $V$.  If it is a $Z$ decay mode, $ZH$ will be produced; if it is a $W$ decay mode, $WH$ will be produced.
 \item In $ttH$ production, \verb|DecayMode1| and \verb|DecayMode2| are used to decay the $W$ bosons from the top decay.  Only $W$ decay modes are allowed.
 \item In $t+H$ production, \verb|DecayMode1| is used to decay the W boson from the top decay.
-\item \verb|Interf|: For final states with 4 same flavor fermions, this parameter controls whether or not to include interference effects.
+\item \verb|Interf|: For final states with 4 same flavor fermions, this parameter controls whether or not to include interference effects. It receives 0 or 1.
 \item \verb|FacScheme|, \verb|MuFacMultiplier|, and \verb|RenScheme|, \verb|MuRenMultiplier|: There are currently 10 different schemes, which set the basis of the scale up to the scale multiplier. A postive integer uses running scales per event whereas a negative one uses a fixed scale, and \verb|MuFacMultiplier| and \verb|MuRenMultiplier| determine the scale multipliers for the factorization and renormalization scales, respectively:
      \begin{itemize}
      \item $\pm0$: $\mu_{F,\,R}$ are set to the default values of each process. The command line values of \verb|MuFacMultiplier| and \verb|MuRenMultiplier| are disregarded.
