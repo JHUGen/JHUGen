@@ -14,7 +14,7 @@
 !----- a subroutinefor gg -> G -> ZZ/WW
 !----- all outgoing convention and the following momentum assignment
 !-----  0 -> g(p1) + g(p2) + e-(p3) + e+(p4) +mu-(p5) +mu+(p6)
-      subroutine EvalAmp_gg_G_VV(p,MY_IDUP,sum)                         ! modify p -> pp
+      subroutine EvalAmp_gg_G_VV(p,MY_IDUP,sum)  
       use ModMisc
       implicit none
       real(dp), intent(out) ::  sum
@@ -34,7 +34,8 @@
       else
          intcolfac=1_dp
       endif
-
+ 
+      
       gZ_sq = 4.0_dp*pi*alpha_QED/4.0_dp/(one-sitW**2)/sitW**2
 
 !---- the 1/Lambda coupling
@@ -225,7 +226,7 @@ enddo
             s = scr(p(:,l3)+p(:,l4),p(:,l3)+p(:,l4))
             propZ2 = s/dcmplx(s - M_V**2,M_V*Ga_V)
 
-         elseif( IsAPhoton(DecayMode1) ) then 
+         elseif( IsAPhoton(DecayMode1) ) then !  ga ga
             pin(3,:) = p(:,l1)
             pin(4,:) = p(:,l3)
             sp(3,:) = pol_mless2(dcmplx(p(:,l1)),-3+2*i3,'out')  ! photon
@@ -233,6 +234,18 @@ enddo
 !            sp(3,1:4)=pin(3,1:4);print *,"  this checks FS gauge invariance"
 !            sp(4,1:4)=pin(4,1:4);print *,"  this checks FS gauge invariance"
             propz1=1d0
+            propz2=1d0
+            
+         elseif( .not.IsAPhoton(DecayMode1) .and. IsAPhoton(DecayMode2) ) then !  Z ga
+            pin(3,:) = p(:,l1)+p(:,l2)
+            pin(4,:) = p(:,l3)
+            sp(3,:) = pol_dk2mom(dcmplx(p(:,l1)),dcmplx(p(:,l2)),-3+2*i3)  ! ubar(l1), v(l2)
+            sp(3,:) = -sp(3,:) + pin(3,:)*( sc(sp(3,:),dcmplx(pin(3,:))) )/scr(pin(3,:),pin(3,:))! full propagator numerator
+            sp(4,:) = pol_mless2(dcmplx(p(:,l3)),-3+2*i4,'out')  ! photon
+!            sp(3,1:4)=pin(3,1:4);print *,"  this checks FS gauge invariance"
+!            sp(4,1:4)=pin(4,1:4);print *,"  this checks FS gauge invariance"            
+            s = scr(p(:,l1)+p(:,l2),p(:,l1)+p(:,l2))
+            propZ1 = s/dcmplx(s - M_V**2,M_V*Ga_V)
             propz2=1d0
          endif
 
@@ -435,11 +448,9 @@ enddo
       l2=ordering(2)
       l3=ordering(3)
       l4=ordering(4)
-
-
+      
       s  = 2d0 * scr(p(:,1),p(:,2))
       propG = s/dcmplx(s - M_Reso**2,M_Reso*Ga_Reso)
-
 
          pin(1,:) = p(:,1)
          pin(2,:) = p(:,2)
@@ -468,7 +479,7 @@ enddo
             s = scr(p(:,l3)+p(:,l4),p(:,l3)+p(:,l4))
             propZ2 = s/dcmplx(s - M_V**2,M_V*Ga_V)
 
-         elseif( IsAPhoton(DecayMode1) ) then 
+         elseif( IsAPhoton(DecayMode1) ) then ! ga ga 
             pin(3,:) = p(:,l1)
             pin(4,:) = p(:,l3)
             sp(3,:) = pol_mless2(dcmplx(p(:,l1)),-3+2*i3,'out')  ! photon
@@ -477,6 +488,18 @@ enddo
 !            sp(4,1:4)=pin(4,1:4);print *,"  this checks FS gauge invariance"
             propZ1 = 1d0
             propZ2 = 1d0
+
+         elseif( .not.IsAPhoton(DecayMode1) .and. IsAPhoton(DecayMode2) ) then !  Z ga
+            pin(3,:) = p(:,l1)+p(:,l2)
+            pin(4,:) = p(:,l3)
+            sp(3,:) = pol_dk2mom(dcmplx(p(:,l1)),dcmplx(p(:,l2)),-3+2*i3)  ! ubar(l1), v(l2)
+            sp(3,:) = -sp(3,:) + pin(3,:)*( sc(sp(3,:),dcmplx(pin(3,:))) )/scr(pin(3,:),pin(3,:))! full propagator numerator
+            sp(4,:) = pol_mless2(dcmplx(p(:,l3)),-3+2*i4,'out')  ! photon
+!            sp(3,1:4)=pin(3,1:4);print *,"  this checks FS gauge invariance"
+!            sp(4,1:4)=pin(4,1:4);print *,"  this checks FS gauge invariance"            
+            s = scr(p(:,l1)+p(:,l2),p(:,l1)+p(:,l2))
+            propZ1 = s/dcmplx(s - M_V**2,M_V*Ga_V)
+            propz2=1d0            
          endif
 
          call qqGZZampl(pin,sp,A(1))

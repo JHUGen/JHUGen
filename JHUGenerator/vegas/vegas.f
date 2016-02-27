@@ -220,8 +220,16 @@ c        write(6,201)it,ti,tsi,avgi,sd,chi2a
         !call flush(15)
         
         if(nprn.ge.0)go to 21
-        do 20 j=1,ndim
- 20     write(6,202) j,(xi(i,j),di(i,j),d(i,j),i=1,nd)
+c        do 20 j=1,ndim
+c 20     write(6,202) j,(xi(i,j),di(i,j),d(i,j),i=1,nd)
+
+        do  j=1,ndim
+        write(6,*) ""
+        write(6,*) "axis",j
+ 20     do i=1,nd
+        write(6,*) xi(i,j),di(i,j),d(i,j)
+        enddo
+        enddo
 c
 c      refine grid
 c

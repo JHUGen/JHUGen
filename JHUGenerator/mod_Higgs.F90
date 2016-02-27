@@ -34,9 +34,9 @@
       real(dp) :: intcolfac
 
          if(IsAQuark(MY_IDUP(6)) .and. IsAQuark(MY_IDUP(8))) then
-            intcolfac=1_dp/3_dp
+            intcolfac=1.0_dp/3.0_dp
          else
-            intcolfac=1_dp
+            intcolfac=1.0_dp
          endif
 
          if( IsAZDecay(DecayMode1) .and. IsAZDecay(DecayMode2) ) then
@@ -56,7 +56,7 @@
          gZ_sq = 4.0_dp*pi*alpha_QED/4.0_dp/(one-sitW**2)/sitW**2
          Lambda_inv = 1.0d0/Lambda
          if( IsAZDecay(DecayMode1) ) then!  Z decay
-              prefactor = 8d0*(Lambda_inv**2)**2 * (one/two*M_V*Ga_V)**2 *gZ_sq**2
+prefactor = 8d0!*(Lambda_inv**2)**2 * (one/two*M_V*Ga_V)**2 *gZ_sq**2          ! removed this for the moment to have O(1) cross sections!
          elseif( IsAWDecay(DecayMode1) ) then !  W decay
               prefactor = 8d0*(Lambda_inv**2)**2 * (one/two*M_V*Ga_V)**2 *gZ_sq**2! the last factor doesnt belong here
          elseif( IsAPhoton(DecayMode1) ) then !  photon "decay"
@@ -110,7 +110,7 @@
                   res = res + (A_VV(1)+A_VV(3)+A_VV(5)+A_VV(7))*dconjg(A_VV(1)+A_VV(3)+A_VV(5)+A_VV(7))!   interfere the 3456 pieces
                   res = res + (A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8))*dconjg(A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8))!   interfere the 5436 pieces
                   if( (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) .and. (i3.eq.i4) ) then! interfere the 3456 with 5436 pieces
-                      res = res + 2d0*intcolfac*dreal(  A_VV(1)*dconjg( A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8) )  )
+                      res = res + 2d0*intcolfac*dreal(  A_VV(1)*dconjg( A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8) )  ) 
                       res = res + 2d0*intcolfac*dreal(  A_VV(3)*dconjg( A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8) )  )
                       res = res + 2d0*intcolfac*dreal(  A_VV(5)*dconjg( A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8) )  )
                       res = res + 2d0*intcolfac*dreal(  A_VV(7)*dconjg( A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8) )  )
@@ -169,7 +169,6 @@
          s  = 2d0 * scr(p(:,1),p(:,2))
          
          propG = one/dcmplx(s - M_Reso**2,M_Reso*Ga_Reso)
-
 
          pin(1,:) = p(:,1)
          pin(2,:) = p(:,2)
@@ -532,6 +531,13 @@
          endif
          A(1) = A(1) * propG*propZ1*propZ2
 
+! print *, "ordering",ordering(:)
+! s=scr(p(:,l1)+p(:,l2),p(:,l1)+p(:,l2))
+! print *, "props",cdabs(propz1/s)**2,s
+! s=scr(p(:,l3)+p(:,l4),p(:,l3)+p(:,l4))
+! print *, "props",cdabs(propz2/s)**2,s
+! pause
+
      end subroutine
 
 
@@ -852,10 +858,6 @@
 
           res = res*prefactor
           if(  (VVMode.eq.ZZMode) .and. (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) res = res * symmFact
-
-
-          
-
 
           
       RETURN
