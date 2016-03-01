@@ -55,11 +55,13 @@
 ! this block can be removed... only global normalization
          gZ_sq = 4.0_dp*pi*alpha_QED/4.0_dp/(one-sitW**2)/sitW**2
          Lambda_inv = 1.0d0/Lambda
-         if( IsAZDecay(DecayMode1) ) then!  Z decay
-prefactor = 8d0!*(Lambda_inv**2)**2 * (one/two*M_V*Ga_V)**2 *gZ_sq**2          ! removed this for the moment to have O(1) cross sections!
-         elseif( IsAWDecay(DecayMode1) ) then !  W decay
-              prefactor = 8d0*(Lambda_inv**2)**2 * (one/two*M_V*Ga_V)**2 *gZ_sq**2! the last factor doesnt belong here
-         elseif( IsAPhoton(DecayMode1) ) then !  photon "decay"
+         if( VVMode.eq.ZZMode ) then!  Z decay
+              prefactor = 8d0!*(Lambda_inv**2)**2 * (one/two*M_V*Ga_V)**2 *gZ_sq**2          ! removed this for the moment to have O(1) cross sections!
+         elseif( VVMode.eq.WWMode ) then !  W decay
+              prefactor = 8d0*(Lambda_inv**2)**2 * (one/two*M_V*Ga_V)**2 *gZ_sq**2 ! the last factor doesnt belong here
+         elseif( VVMode.eq.ZgMode ) then !  Z+photon "decay"
+              prefactor = 8d0*(Lambda_inv**2)**2 * (one/two*M_V*Ga_V) *gZ_sq ! Only single powers
+         elseif( VVMode.eq.ggMode ) then !  photon "decay"
               prefactor = 8d0*(Lambda_inv**2)**2
          else
               prefactor = 0d0
@@ -772,16 +774,17 @@ prefactor = 8d0!*(Lambda_inv**2)**2 * (one/two*M_V*Ga_V)**2 *gZ_sq**2          !
 ! this block can be removed... only global normalization
          gZ_sq = 4.0_dp*pi*alpha_QED/4.0_dp/(one-sitW**2)/sitW**2
          Lambda_inv = 1.0d0/Lambda
-         if( IsAZDecay(DecayMode1) ) then!  Z decay
+         if( VVMode.eq.ZZMode ) then!  Z decay
               prefactor = 8d0*(Lambda_inv**2)**2 * (one/two*M_V*Ga_V)**2 *gZ_sq**2
-         elseif( IsAWDecay(DecayMode1) ) then !  W decay
-              prefactor = 8d0*(Lambda_inv**2)**2 * (one/two*M_V*Ga_V)**2 *gZ_sq**2! the last factor doesnt belong here
-         elseif( IsAPhoton(DecayMode1) ) then !  photon "decay"
+         elseif( VVMode.eq.WWMode ) then !  W decay
+              prefactor = 8d0*(Lambda_inv**2)**2 * (one/two*M_V*Ga_V)**2 *gZ_sq**2 ! the last factor doesnt belong here
+         elseif( VVMode.eq.ZgMode ) then !  Z+photon "decay"
+              prefactor = 8d0*(Lambda_inv**2)**2 * (one/two*M_V*Ga_V) *gZ_sq ! Only single powers
+         elseif( VVMode.eq.ggMode ) then !  photon "decay"
               prefactor = 8d0*(Lambda_inv**2)**2
          else
-              prefactor=0d0
+              prefactor = 0d0
          endif
-
 
 
 ! ! MADGRAPH CHECK

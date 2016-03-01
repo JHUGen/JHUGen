@@ -652,20 +652,6 @@ logical :: SetAnomalousHff, Setkappa
        DecayMode1 = DecayMode1 - DecayMode2
     endif
 
-    if( IsAPhoton(DecayMode2) .and. IsAZDecay(DecayMode1) ) then ! require OffXVV=*10 for Z+photon
-       print *,"Z is off-shell and photon is on-shell in Z+photon production."
-       OffShellV1=.true.
-       OffShellV2=.false.
-
-       print *,"Randomization of the order of writing of the decay products to the LHE file is disabled."
-       RandomizeVVdecays = .false.
-    endif
-
-    if( IsAPhoton(DecayMode2) .and. IsAPhoton(DecayMode1) ) then ! require OffXVV=*00 for photon+photon
-       print *,"Both photons are on-shell in photon+photon production."
-       OffShellV1=.true.
-       OffShellV2=.false.
-    endif
 
     if( IsAZDecay(DecayMode1) .and. IsAPhoton(DecayMode2) .and. .not.SetZgammacoupling .and. .not.Setgammagammacoupling .and. (Process.eq.0)) then
         print *, "To decay the resonance to Z+photon, you need to set one of the HZgamma (ghzgs*) or Hgammagamma (ghgsgs*) couplings."
@@ -676,6 +662,19 @@ logical :: SetAnomalousHff, Setkappa
         print *, "To decay the resonance to photon+photon, you need to set one of the Hgammagamma (ghgsgs*) couplings."
         stop 1
     endif
+
+    !---------------------------------------!
+    !           Set OffShellV1/V2           !
+    !---------------------------------------!
+    if( IsAPhoton(DecayMode2) .and. IsAZDecay(DecayMode1) ) then ! require OffXVV=*10 for Z+photon
+       print *,"Z is off-shell and photon is on-shell in Z+photon production."
+       print *,"Randomization of the order of writing of the decay products to the LHE file is disabled."
+       RandomizeVVdecays = .false.
+    elseif( IsAPhoton(DecayMode2) .and. IsAPhoton(DecayMode1) ) then ! require OffXVV=*00 for photon+photon
+       print *,"Both photons are on-shell in photon+photon production."
+    endif
+    OffShellV1=.not.IsAPhoton(DecayMode1)
+    OffShellV2=.not.IsAPhoton(DecayMode2)
 
 
     !lepton filter
