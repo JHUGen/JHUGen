@@ -35,6 +35,7 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
 
     MomExt(:,:)=0d0
     MomDK(:,:)=0d0
+    LO_Res_Unpol = 0d0
     EvalWeighted = 0d0
     if( OffShellReson ) then
       call PDFMapping(10,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
@@ -158,12 +159,25 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
 
    call SetRunningScales( (/ (MomExt(1:4,3)+MomExt(1:4,4)),Mom_Not_a_particle(1:4),Mom_Not_a_particle(1:4) /) , (/ Not_a_particle_,Not_a_particle_,Not_a_particle_,Not_a_particle_ /) )
    call EvalAlphaS()
-   FluxFac = 1d0/(2d0*EHat**2)
-
    call setPDFs(eta1,eta2,pdf)
+
+   FluxFac = 1d0/(2d0*EHat**2)
    PDFFac = pdf(LHA2M_pdf(iPart_sel),1)  *  pdf(LHA2M_pdf(jPart_sel),2)
+   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * PDFFac * VgsWgt * PartChannelAvg
+   if( abs(MY_IDUP(6)).ge.1 .and. abs(MY_IDUP(6)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
+   if( abs(MY_IDUP(8)).ge.1 .and. abs(MY_IDUP(8)).le.6 ) PreFac = PreFac * 3d0 ! =Nc     
    
-   if (PChannel.eq.0.or.PChannel.eq.2) then
+   !print *,"Mom1: ",MomExt(1:4,1)
+   !print *,"Mom2: ",MomExt(1:4,2)
+   !print *,"Mom3: ",MomExt(1:4,3)
+   !print *,"Mom4: ",MomExt(1:4,4)
+   !print *,"Mom5: ",MomExt(1:4,5)
+   !print *,"Mom6: ",MomExt(1:4,6)
+   !print *,"Mom7: ",MomExt(1:4,7)
+   !print *,"Mom8: ",MomExt(1:4,8)
+   !print *,"iPart, jPart: ",iPart_sel,jPart_sel
+
+   if ( PChannel.eq.0 .or.(PChannel.eq.2 .and. iPart_sel.eq.0 .and. jPart_sel.eq.0)) then
       if (Process.eq.0) then
           call EvalAmp_gg_H_VV( (/-MomExt(1:4,1),-MomExt(1:4,2),MomExt(1:4,5),MomExt(1:4,6),MomExt(1:4,7),MomExt(1:4,8)/),MY_IDUP(6:9),LO_Res_Unpol)
       elseif(Process.eq.2) then
@@ -174,38 +188,32 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
       ICOLUP(1:2,2) = (/502,501/)
       
       LO_Res_Unpol = LO_Res_Unpol * SpinAvg * GluonColAvg**2
-      PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * PDFFac * VgsWgt * PartChannelAvg
-      if( abs(MY_IDUP(6)).ge.1 .and. abs(MY_IDUP(6)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
-      if( abs(MY_IDUP(8)).ge.1 .and. abs(MY_IDUP(8)).le.6 ) PreFac = PreFac * 3d0 ! =Nc     
-      EvalWeighted = LO_Res_Unpol * PreFac
-    endif
-
-   if (PChannel.eq.1.or.PChannel.eq.2) then
+      !print *,"LO_Res_Unpol gg:",LO_Res_Unpol
+   elseif (PChannel.eq.1.or.PChannel.eq.2) then
       if( Process.eq.1 .and. iPart_sel.gt.0d0 ) then
           call EvalAmp_qqb_Zprime_VV((/-MomExt(1:4,1),-MomExt(1:4,2),MomExt(1:4,5),MomExt(1:4,6),MomExt(1:4,7),MomExt(1:4,8)/),MY_IDUP(6:9),LO_Res_Unpol)
           ICOLUP(1:2,1) = (/501,000/)
           ICOLUP(1:2,2) = (/000,501/)  
       elseif( Process.eq.1 .and. iPart_sel.lt.0d0 ) then
           call EvalAmp_qqb_Zprime_VV((/-MomExt(1:4,2),-MomExt(1:4,1),MomExt(1:4,5),MomExt(1:4,6),MomExt(1:4,7),MomExt(1:4,8)/),MY_IDUP(6:9),LO_Res_Unpol)
-          ICOLUP(1:2,1) = (/0,502/)
-          ICOLUP(1:2,2) = (/502,0/)          
+          ICOLUP(1:2,1) = (/000,502/)
+          ICOLUP(1:2,2) = (/502,000/)          
       elseif( Process.eq.2 .and. iPart_sel.gt.0d0 ) then
           call EvalAmp_qqb_G_VV((/-MomExt(1:4,1),-MomExt(1:4,2),MomExt(1:4,5),MomExt(1:4,6),MomExt(1:4,7),MomExt(1:4,8)/),MY_IDUP(6:9),LO_Res_Unpol)
           ICOLUP(1:2,1) = (/501,000/)
           ICOLUP(1:2,2) = (/000,501/)            
       elseif( Process.eq.2 .and. iPart_sel.lt.0d0 ) then
           call EvalAmp_qqb_G_VV((/-MomExt(1:4,2),-MomExt(1:4,1),MomExt(1:4,5),MomExt(1:4,6),MomExt(1:4,7),MomExt(1:4,8)/),MY_IDUP(6:9),LO_Res_Unpol)
-          ICOLUP(1:2,1) = (/0,502/)
-          ICOLUP(1:2,2) = (/502,0/)                    
+          ICOLUP(1:2,1) = (/000,502/)
+          ICOLUP(1:2,2) = (/502,000/)                    
       endif
       MY_IDUP(1:2)=(/LHA2M_pdf(iPart_sel),LHA2M_pdf(jPart_sel)/)
 
-      LO_Res_Unpol = LO_Res_Unpol * SpinAvg * QuarkColAvg**2 * PDFFac
-      PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt * PartChannelAvg
-      if( abs(MY_IDUP(6)).ge.1 .and. abs(MY_IDUP(6)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
-      if( abs(MY_IDUP(8)).ge.1 .and. abs(MY_IDUP(8)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
-      EvalWeighted = LO_Res_Unpol * PreFac
+      LO_Res_Unpol = LO_Res_Unpol * SpinAvg * QuarkColAvg**2
+      !print *,"LO_Res_Unpol qq:",LO_Res_Unpol
    endif
+
+   EvalWeighted = LO_Res_Unpol * PreFac
 
    if( WidthScheme.ne.0 .and. Process.eq.0 ) EvalWeighted = EvalWeighted * ReweightBWPropagator( Get_MInv( MomExt(1:4,3)+MomExt(1:4,4) ) )
 
