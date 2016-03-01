@@ -667,12 +667,12 @@ logical :: SetAnomalousHff, Setkappa
        OffShellV2=.false.
     endif
 
-    if( IsAZDecay(DecayMode1) .and. IsAPhoton(DecayMode2) .and. .not.SetZgammacoupling .and. .not.Setgammagammacoupling ) then
+    if( IsAZDecay(DecayMode1) .and. IsAPhoton(DecayMode2) .and. .not.SetZgammacoupling .and. .not.Setgammagammacoupling .and. (Process.eq.0)) then
         print *, "To decay the resonance to Z+photon, you need to set one of the HZgamma (ghzgs*) or Hgammagamma (ghgsgs*) couplings."
         stop 1
     endif
 
-    if( IsAPhoton(DecayMode1) .and. IsAPhoton(DecayMode2) .and. .not.Setgammagammacoupling ) then
+    if( IsAPhoton(DecayMode1) .and. IsAPhoton(DecayMode2) .and. .not.Setgammagammacoupling .and. (Process.eq.0)) then
         print *, "To decay the resonance to photon+photon, you need to set one of the Hgammagamma (ghgsgs*) couplings."
         stop 1
     endif
