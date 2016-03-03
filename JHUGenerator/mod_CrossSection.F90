@@ -30,6 +30,7 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
  real(8) :: EHat,PSWgt,PSWgt2,PSWgt3
  real(8) :: MomExt(1:4,1:8),MomDK(1:4,1:4),xRnd
  logical :: applyPSCut
+ real(8) :: ML1, ML2, ML3, ML4, MZ1, MZ2
  include 'vegas_common.f'   
 
 
@@ -122,6 +123,17 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
         call EvalPhasespace_HVga(yRnd(3:7),EHat,MomExt(1:4,1:8),PSWgt)  !    Z-ga
     else
         call EvalPhasespace_H4f(yRnd(3),yRnd(4:11),EHat,MomExt(1:4,1:8),PSWgt)  ! VV-->4l
+    endif
+
+    ML1 = getMass(MY_IDUP(7))
+    ML2 = getMass(MY_IDUP(6))
+    ML3 = getMass(MY_IDUP(9))
+    ML4 = getMass(MY_IDUP(8))
+    MZ1 = get_MInv(MomExt(1:4,5)+MomExt(1:4,6))
+    MZ2 = get_MInv(MomExt(1:4,7)+MomExt(1:4,8))
+    if( (MZ1.lt.ML1+ML2) .or. (MZ2.lt.ML3+ML4) .or. MZ1.lt.0.5d0*GeV .or. MZ2.lt.0.5d0*GeV) then
+      EvalWeighted = 0d0
+      return
     endif
 
     call boost2Lab(eta1,eta2,8,MomExt(1:4,1:8))    
