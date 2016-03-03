@@ -113,13 +113,19 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
     endif
     endif  
       
- if( EHat.lt.100d0*GeV .or. EHat.gt.145d0*GeV) return ! for some reason this removes 3% of the cross section, but significantly improves speed for OffXVV=111 !!
-      
-    
-    if( any(yRnd(4:5).gt.0.99d0) .or. EHat.lt.5d0*GeV ) return 
-    call EvalPhasespace_H4f(yRnd(3),yRnd(4:11),EHat,MomExt(1:4,1:8),PSWgt)
-    call boost2Lab(eta1,eta2,8,MomExt(1:4,1:8))
-    
+    if( EHat.lt.100d0*GeV .or. EHat.gt.145d0*GeV) return ! for some reason this removes 3% of the cross section, but significantly improves speed for OffXVV=111 !!
+    if( any(yRnd(4:5).gt.0.99d0) .or. EHat.lt.5d0*GeV ) return ! the cut at 0.99 is required for EvalPhasespace_H4f when interference is turned on. Otherwise, it becomes unstable.
+
+    if( IsAPhoton(DecayMode1) .and. IsAPhoton(DecayMode2) ) then
+        call EvalPhasespace_HVga(yRnd(3:4),EHat,MomExt(1:4,1:8),PSWgt)  !   ga-ga 
+    elseif( .not. IsAPhoton(DecayMode1) .and. IsAPhoton(DecayMode2) ) then
+        call EvalPhasespace_HVga(yRnd(3:7),EHat,MomExt(1:4,1:8),PSWgt)  !    Z-ga
+    else
+        call EvalPhasespace_H4f(yRnd(3),yRnd(4:11),EHat,MomExt(1:4,1:8),PSWgt)  ! VV-->4l
+    endif
+
+    call boost2Lab(eta1,eta2,8,MomExt(1:4,1:8))    
+
     call Kinematics(4,MomExt,MomExt(1:4,5:8),applyPSCut,NBin)
     if( applyPSCut  .or. PSWgt.eq.0d0  ) then
       EvalWeighted = 0d0
@@ -196,8 +202,9 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
          AlertCounter = AlertCounter + 1
          
          CrossSecMax(iPart_sel,jPart_sel)=CrossSecMax(iPart_sel,jPart_sel) * 1.1d0
-         
+
        elseif( EvalWeighted .gt. xRnd*CrossSecMax(iPart_sel,jPart_sel) ) then
+       
          AccepCounter = AccepCounter + 1
          AccepCounter_part(iPart_sel,jPart_sel) = AccepCounter_part(iPart_sel,jPart_sel) + 1
          do NHisto=1,NumHistograms
@@ -756,10 +763,10 @@ include 'csmaxvalue.f'
    call EvalPhaseSpace_2to2(EHat,(/MZ1,MZ2/),yRnd(3:4),MomExt(1:4,1:4),PSWgt)
    call boost2Lab(eta1,eta2,4,MomExt(1:4,1:4))
     if( .not.IsAPhoton(DecayMode1) .and. .not.IsAPhoton(DecayMode2) ) then ! don't decay the photon
-      ML1 = getMass(MY_IDUP(7))  *0d0
-      ML2 = getMass(MY_IDUP(6))  *0d0
-      ML3 = getMass(MY_IDUP(9))  *0d0
-      ML4 = getMass(MY_IDUP(8))  *0d0
+      ML1 = getMass(MY_IDUP(7))  !*0d0
+      ML2 = getMass(MY_IDUP(6))  !*0d0
+      ML3 = getMass(MY_IDUP(9))  !*0d0
+      ML4 = getMass(MY_IDUP(8))  !*0d0
       if( (MZ1.lt.ML1+ML2) .or. (MZ2.lt.ML3+ML4) ) then
           EvalUnWeighted = 0d0
           RejeCounter = RejeCounter + 1

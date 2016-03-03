@@ -214,6 +214,7 @@ subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to t
          )                     &
       ) call Error("Invalid scheme for the H+0J processes. Choose a different renormalization or factorization scheme.")
 
+
    return
 end subroutine
 
@@ -227,6 +228,7 @@ implicit none
 character :: arg*(500)
 integer :: NumArgs,NArg,OffShell_XVV
 logical :: help, success, SetLastArgument, interfSet
+logical :: SetRenScheme, SetMuRenMultiplier, SetFacScheme, SetMuFacMultiplier
 logical :: SetAnomalousSpin0gg, Setghg2, SetAnomalousSpin0ZZ, Setghz1
 logical :: SetZgammacoupling, Setgammagammacoupling
 logical :: SetAnomalousSpin1qq, Setspin1qqleft, Setspin1qqright, SetAnomalousSpin1ZZ, Set1minus
@@ -290,6 +292,10 @@ logical :: SetAnomalousHff, Setkappa
    MuRenMultiplier = 1d0
    FacScheme = kRenFacScheme_default
    RenScheme = kRenFacScheme_default
+   SetMuFacMultiplier = .false.
+   SetMuRenMultiplier = .false.
+   SetFacScheme = .false.
+   SetRenScheme = .false.
 
    SetAnomalousSpin0gg=.false.
    Setghg2=.false.
@@ -351,10 +357,10 @@ logical :: SetAnomalousHff, Setkappa
     call ReadCommandLineArgument(arg, "Process", success, Process)
     call ReadCommandLineArgument(arg, "DecayMode1", success, DecayMode1)
     call ReadCommandLineArgument(arg, "DecayMode2", success, DecayMode2)
-    call ReadCommandLineArgument(arg, "FacScheme", success, FacScheme)
-    call ReadCommandLineArgument(arg, "RenScheme", success, RenScheme)
-    call ReadCommandLineArgument(arg, "MuFacMultiplier", success, MuFacMultiplier)
-    call ReadCommandLineArgument(arg, "MuRenMultiplier", success, MuRenMultiplier)
+    call ReadCommandLineArgument(arg, "FacScheme", success, FacScheme, success2=SetFacScheme)
+    call ReadCommandLineArgument(arg, "RenScheme", success, RenScheme, SetLastArgument, success2=SetRenScheme)
+    call ReadCommandLineArgument(arg, "MuFacMultiplier", success, MuFacMultiplier, success2=SetMuFacMultiplier)
+    call ReadCommandLineArgument(arg, "MuRenMultiplier", success, MuRenMultiplier, success2=SetMuRenMultiplier)
     call ReadCommandLineArgument(arg, "TopDK", success, TopDecays)
     call ReadCommandLineArgument(arg, "TauDK", success, TauDecays)
     call ReadCommandLineArgument(arg, "ReweightDecay", success, ReweightDecay)
@@ -580,6 +586,8 @@ logical :: SetAnomalousHff, Setkappa
     !Renormalization/factorization schemes
 
     if((abs(FacScheme) .ge. nRenFacSchemes) .or. (abs(RenScheme) .ge. nRenFacSchemes) .or. (MuFacMultiplier.le.0d0) .or. (MuRenMultiplier.le.0d0)) call Error("The renormalization or factorization scheme is invalid, or the scale multiplier to either is not positive.")
+    if( SetFacScheme.neqv.SetMuFacMultiplier ) call Error("If you want to set the factorization scale, please set both the scheme (FacScheme) and the multiplier (MuFacMultiplier)")
+    if( SetRenScheme.neqv.SetMuRenMultiplier ) call Error("If you want to set the renormalization scale, please set both the scheme (RenScheme) and the multiplier (MuRenMultiplier)")
 
     !ReadLHE and ConvertLHE
     !MUST HAPPEN BEFORE DETERMINING INTERFERENCE
