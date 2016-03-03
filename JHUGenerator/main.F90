@@ -265,8 +265,8 @@ logical :: SetAnomalousHff, Setkappa
 ! !       DecayMode=10: W --> l nu_l (l=e,mu,tau)
 ! !       DecayMode=11: W --> anything
 
-   WidthScheme=0
-   WidthSchemeIn=0
+   WidthScheme=-1
+   WidthSchemeIn=-1
    TopDecays=-1
    TauDecays=-1
    Process = 0   ! select 0, 1 or 2 to represent the spin of the resonance
@@ -736,16 +736,25 @@ logical :: SetAnomalousHff, Setkappa
     endif
 
     !WidthScheme and reweighting
+    if( (WidthScheme.eq.0 .or. WidthSchemeIn.eq.0) .and. .not.DoPrintPMZZ ) then
+        print *, "WidthScheme=0 removes the propagator entirely!  This generally only makes sense in PrintPMZZ mode."
+        print *, "If you really want to use it anyway, remove this error in main.F90 and recompile."
+        stop 1
+    endif
     if( .not.ReadLHEFile .and. .not.DoPrintPMZZ ) then
         if( ReweightDecay .or. WidthSchemeIn.gt.0 ) then
             call Error("ReweightDecay and WidthSchemeIn only make sense in ReadLHE mode")
         endif
-        if( WidthScheme.le.0 ) then
+        if( WidthScheme.lt.0 ) then
             WidthScheme = 2
         endif
         WidthSchemeIn = WidthScheme
     else
-        if( WidthScheme.le.0 .and. WidthSchemeIn.le.0 ) then
+        if( WidthSchemeIn.eq.0 .and. ReweightDecay ) then
+            print *, "Can't ReweightDecay for WidthSchemeIn=0"
+            stop 1
+        endif
+        if( WidthScheme.lt.0 .and. WidthSchemeIn.lt.0 ) then
             if( ReweightDecay ) then
                 print *, "If you want to reweight the decay, you need to specify a width scheme to correct"
                 print *, " for the VV branching fraction/matrix element."
@@ -753,9 +762,9 @@ logical :: SetAnomalousHff, Setkappa
             endif
             WidthScheme = 2
             WidthSchemeIn = 2
-        elseif( WidthScheme.le.0 .and. WidthSchemeIn.gt.0 ) then
+        elseif( WidthScheme.lt.0 .and. WidthSchemeIn.ge.0 ) then
             WidthScheme = WidthSchemeIn
-        elseif( WidthScheme.gt.0 .and. WidthSchemeIn.le.0 ) then
+        elseif( WidthScheme.ge.0 .and. WidthSchemeIn.lt.0 ) then
             WidthSchemeIn = WidthScheme
         else !both > 0
             !nothing
@@ -2107,8 +2116,8 @@ integer :: i, j, stat
                 print "(A,I1,A,I1,A,I1,A,I1)", "If you want to reweight the propagator from ", j, " to ", WidthScheme, " please specify WidthSchemeIn=", j, " WidthScheme=", WidthScheme
                 stop 1
             endif
-            if( WidthScheme.le.0 ) read(FirstLines(8:i),*) WidthScheme
-            if( WidthSchemeIn.le.0 ) read(FirstLines(8:i),*) WidthSchemeIn
+            if( WidthScheme.lt.0 ) read(FirstLines(8:i),*) WidthScheme
+            if( WidthSchemeIn.lt.0 ) read(FirstLines(8:i),*) WidthSchemeIn
         endif
 
         if( Index(FirstLines, "<event").ne.0 ) FirstEvent=.true.

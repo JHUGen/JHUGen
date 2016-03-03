@@ -3936,11 +3936,11 @@ real(8) :: GetBWPropagator,sHat
 real(8) :: mhb, ghb, BigGamma
 integer :: scheme
 
-    if( scheme.eq.1) then! running width
+    if( scheme.eq.1 ) then! running width
         GetBWPropagator =  1d0/( (sHat-M_Reso**2)**2 + (sHat*Ga_Reso/M_Reso)**2 )
     elseif( scheme.eq.2 ) then! fixed width
         GetBWPropagator = 1d0/( (sHat-M_Reso**2)**2 + (M_Reso*Ga_Reso)**2 )
-    elseif( scheme.eq.3) then! Passarino's CPS
+    elseif( scheme.eq.3 ) then! Passarino's CPS
         if( mubarH.lt.0 .or. gabarH.lt.0 ) then
           call CALL_HTO(M_Reso/GeV, m_top/GeV, mhb, ghb)
           if( IsNaN(mubarH).or.IsNaN(gabarH) ) then
@@ -3962,6 +3962,8 @@ integer :: scheme
         !BigGamma = BigGamma*GeV
 
         !print *, dsqrt(dabs(sHat))/GeV, gabarH/GeV, BigGamma/GeV
+    elseif( scheme.eq.0 ) then  !remove the propagator completely
+        GetBWPropagator = 1
     else
         print *, "Invalid scheme: ", scheme
         stop 1
@@ -3976,20 +3978,12 @@ use modMisc
 use modParameters
 implicit none
 real(8) :: ReweightBWPropagator,sHat
-real(8) :: BreitWigner,BreitWigner_Run,Ga_sHat,muH,gaH
+real(8) :: BreitWigner,BreitWigner_Run
 
 
      ReweightBWPropagator = 1d0
      BreitWigner = GetBWPropagator(sHat, 2)
-     if( WidthScheme.eq.1 ) then
-        BreitWigner_Run = GetBWPropagator(sHat, 1)
-     elseif( WidthScheme.eq.2 ) then
-        BreitWigner_Run = BreitWigner
-     elseif( WidthScheme.eq.3 ) then
-        BreitWigner_Run = GetBWPropagator(sHat, 3)
-     else
-         call Error("Invalid WidthScheme!")
-     endif
+     BreitWigner_Run = GetBWPropagator(sHat, WidthScheme)
 
     ReweightBWPropagator = BreitWigner_Run/BreitWigner
 
