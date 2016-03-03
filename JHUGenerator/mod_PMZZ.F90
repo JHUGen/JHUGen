@@ -34,7 +34,7 @@ END FUNCTION
 
 
 
-SUBROUTINE GetMZZdistribution(ScanMin, ScanMax, nsteps, doprint, MZZdistribution)
+SUBROUTINE GetMZZDistribution(ScanMin, ScanMax, nsteps, MZZdistribution)
 use ModCrossSection
 use ModParameters
 implicit none
@@ -42,7 +42,6 @@ real(8) :: DecayWeight,DecayWidth,DecayWidth0
 real(8) :: Ehat
 integer :: nscan, nsteps
 real(8) :: ScanMin, ScanMax
-logical :: doprint
 real(8) :: MZZdistribution(0:nsteps,1:2)
 
 
@@ -138,7 +137,7 @@ real(8) :: extendto, intervalsize, minm4l, maxm4l, ScanMin, ScanMax
     if( maxindex.gt.PMZZSize.or.minindex.lt.1 ) then
         call Error("Not enough room for the P_decay(m4f) distribution!  Try increasing PMZZsize in mod_Parameters")
     endif
-    call GetMZZDistribution(ScanMin, ScanMax, nsteps, .false., PMZZdistribution(minindex:maxindex,1:2))
+    call GetMZZDistribution(ScanMin, ScanMax, nsteps, PMZZdistribution(minindex:maxindex,1:2))
 
 RETURN
 END SUBROUTINE
@@ -235,18 +234,19 @@ SUBROUTINE PrintMZZdistribution()
 use ModCrossSection
 use ModParameters
 implicit none
-real(8) :: DecayWeight,DecayWidth,DecayWidth0
-real(8) :: Ehat
+real(8) :: DecayWidth,DecayWidth0
+real(8) :: Ehat,minEhat, maxEhat
 integer :: nscan
-integer,parameter :: nmax=20
 real(8),parameter :: ScanRange=120d0*GeV
 
 
   DecayWidth0 = GetMZZProbability(M_Reso,-1d0,.false.)
+  minEhat = dreal(PrintPMZZ)
+  maxEhat = dimag(PrintPMZZ)
 
-  do nscan=-nmax,+nmax,1
+  do nscan=0,PrintPMZZIntervals
 
-     EHat = M_Reso+ScanRange*nscan/dble(nmax)
+     EHat = minEhat+nscan*(maxEhat-minEhat)/PrintPMZZIntervals
      DecayWidth = GetMZZProbability(EHat,-1d0,.false.)
      write(*,"(1F10.5,1PE16.9)") EHat*100d0,DecayWidth/DecayWidth0
 

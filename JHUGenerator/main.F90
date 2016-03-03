@@ -33,7 +33,7 @@ real(8) :: VG_Result,VG_Error
         call StartConvertLHE(VG_Result,VG_Error)
    elseif( ReadLHEFile ) then
         call StartReadLHE_NEW(VG_Result,VG_Error)
-   elseif( CalcPMZZ ) then
+   elseif( DoPrintPMZZ ) then
         call PrintMZZdistribution()
    else
         if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 .or. Process.eq.80 .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.66 .or. Process.eq.90 .or. &
@@ -274,9 +274,10 @@ logical :: SetAnomalousHff, Setkappa
    ReadLHEFile=.false.
    ConvertLHEFile=.false.
    ReadCSmax=.false.
-   CalcPMZZ = .false.
    ReadPMZZ = .false.
    PMZZEvals=200000
+   DoPrintPMZZ = .false.
+   PrintPMZZIntervals = 20
    GenerateEvents=.false.
    RequestNLeptons = -1
    RequestOS=-1
@@ -360,6 +361,9 @@ logical :: SetAnomalousHff, Setkappa
     call ReadCommandLineArgument(arg, "WidthScheme", success, WidthScheme)
     call ReadCommandLineArgument(arg, "WidthSchemeIn", success, WidthSchemeIn)
     call ReadCommandLineArgument(arg, "ReadPMZZ", success, ReadPMZZ)
+    call ReadCommandLineArgument(arg, "PrintPMZZ", success, PrintPMZZ, SetLastArgument, success2=DoPrintPMZZ)
+    if( SetLastArgument ) PrintPMZZ = PrintPMZZ*GeV !PrintPMZZ is a complex(8), the real and imaginary parts are the minimum and maximum values to print
+    call ReadCommandLineArgument(arg, "PrintPMZZIntervals", success, PrintPMZZIntervals)
     call ReadCommandLineArgument(arg, "PMZZEvals", success, PMZZEvals)
     call ReadCommandLineArgument(arg, "OffXVV", success, OffShell_XVV)
     call ReadCommandLineArgument(arg, "FilterNLept", success, RequestNLeptons)
@@ -373,7 +377,6 @@ logical :: SetAnomalousHff, Setkappa
     call ReadCommandLineArgument(arg, "ReadCSmax", success, ReadCSmax)
     call ReadCommandLineArgument(arg, "GenEvents", success, GenerateEvents, SetLastArgument)
     if( SetLastArgument ) Unweighted = .false.
-    call ReadCommandLineArgument(arg, "CalcPMZZ", success, CalcPMZZ)
     call ReadCommandLineArgument(arg, "WriteFailedEvents", success, WriteFailedEvents)
     call ReadCommandLineArgument(arg, "Seed", success, UserSeed)
     call ReadCommandLineArgument(arg, "WriteGit", success, writegit) !for testing purposes
@@ -725,10 +728,7 @@ logical :: SetAnomalousHff, Setkappa
     endif
 
     !WidthScheme and reweighting
-    if( CalcPMZZ .and. (WidthScheme.le.0 .or. WidthSchemeIn.le.0) ) then
-        ReweightDecay=.true.
-    endif
-    if( .not.ReadLHEFile .and. .not.CalcPMZZ ) then
+    if( .not.ReadLHEFile .and. .not.DoPrintPMZZ ) then
         if( ReweightDecay .or. WidthSchemeIn.gt.0 ) then
             call Error("ReweightDecay and WidthSchemeIn only make sense in ReadLHE mode")
         endif

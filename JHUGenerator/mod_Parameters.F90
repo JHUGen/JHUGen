@@ -16,7 +16,7 @@ integer, public :: FacScheme,RenScheme
 real(8), public :: MuFacMultiplier,MuRenMultiplier
 integer, public :: VegasIt1_default,VegasNc0_default,VegasNc1_default,VegasNc2_default
 integer, public :: NumHistograms,RequestNLeptons,RequestOS,RequestOSSF
-logical, public :: Unweighted,OffShellReson,OffShellV1,OffShellV2,ReadLHEFile,ConvertLHEFile,CalcPMZZ
+logical, public :: Unweighted,OffShellReson,OffShellV1,OffShellV2,ReadLHEFile,ConvertLHEFile,DoPrintPMZZ
 logical, public :: ReadCSmax,GenerateEvents,CountTauAsAny,HasLeptonFilter, FoundHiggsMass, FoundHiggsWidth
 integer, public :: WriteFailedEvents
 logical, public :: FilesOpened = .false.
@@ -79,6 +79,8 @@ real(8), public :: PMZZ_mReso = -1d0
 integer, public, parameter :: PMZZsize = 10000
 real(8), public :: PMZZdistribution(1:PMZZsize,1:2)  !huge array, in normal cases will never get near the edge
 integer, public :: PMZZminindex=-1, PMZZmaxindex=-1  !store the largest and smallest values currently used
+complex(8), public :: PrintPMZZ   !real part is the minimum, imaginary part is the maximum
+integer, public :: PrintPMZZIntervals
 !=====================================================
 
 
