@@ -686,7 +686,7 @@ real(8) :: xi,eta,a,b,c,p1sq,p2sq,p1p2
   p1sq = p1(1:4).dot.p1(1:4)
   p2sq = p2(1:4).dot.p2(1:4)
   p1p2 = p1(1:4).dot.p2(1:4)
-
+  
   a = ( p1sq*p2(1:4) - p2sq*p1(1:4) + p1p2*(p2(1:4)-p1(1:4)) ).dot.( p1sq*p2(1:4) - p2sq*p1(1:4) + p1p2*(p2(1:4)-p1(1:4)) )
   b = ( p1sq+p2sq+2d0*p1p2+m2**2-m1**2 ) * ( p1p2**2 - p1sq*p2sq )
   c = 0.25d0*( p1sq+p2sq+2d0*p1p2+m2**2-m1**2 )**2*p1sq - (p1sq+p1p2)**2*m2**2
@@ -695,6 +695,22 @@ real(8) :: xi,eta,a,b,c,p1sq,p2sq,p1p2
 
   p2hat(1:4) = xi*p1(1:4) + eta*p2(1:4)
   p1hat(1:4) = (1d0-xi)*p1(1:4) + (1d0-eta)*p2(1:4)
+
+
+! if( dabs( (p1hat.dot.p1hat)-m1**2 )/m1**2.gt.1d-3 ) then
+!     print *, "1",p1hat.dot.p1hat , m1**2
+!     print *, p1
+!     print *, p1hat
+!     print *, a,b,c,eta,xi,p1sq + p1p2
+!     pause
+! endif
+! if( dabs( (p2hat.dot.p2hat)-m2**2 )/m2**2.gt.1d-3 ) then
+!     print *, "2",p2hat.dot.p2hat , m2**2
+!     print *, p2
+!     print *, p2hat
+!     print *, a,b,c,eta,xi,p1sq + p1p2
+!     pause
+! endif
 
 
 RETURN
@@ -4866,108 +4882,135 @@ RETURN
 END SUBROUTINE
 
 
-
-
-SUBROUTINE EvalPhasespace_H4f(xchannel,xRnd,Energy,Mom,Jac)
+SUBROUTINE EvalPhasespace_H4f(xchannel,xRnd,Energy,Mom,id,Jac)
 use ModParameters
 use ModPhasespace
 use ModMisc
 implicit none
 real(8) :: xchannel,xRnd(1:8), Energy, Mom(4,8)
+integer, intent(in) :: id(1:4) ! 4f ids
 integer :: iChannel
 real(8) :: Jac,Jac1,Jac2,Jac3,Jac4,Jac5,Jac6,Jac7,Jac8,Jac9
-real(8) :: s3H,s4H,s56,s78,s910,Mom_Dummy(1:4)
-real(8), parameter :: RescaleWidth=10d0
-integer :: NumChannels=   4
+real(8) :: s3H,s4H,s56,s78,s910,Mom_Dummy(1:4),xRndOffShellZ,vectormass(1:2,1:2)
+integer :: NumChannels
 
+   NumChannels=4 ! IMPORTANT: Have to set it here rather than declaration!
+   iChannel = 1
+   Jac1=1d0;Jac2=1d0;Jac3=1d0;Jac4=1d0;Jac5=1d0;Jac6=1d0;Jac7=1d0;Jac8=1d0;Jac9=1d0;Jac=1d0;
+   s56=Energy**2
+
+   vectormass(1,1)=M_V ! Test is already done in main.90
+   vectormass(1,2)=Ga_V ! Test is already done in main.90
+   if( IsAZDecay(DecayMode2) ) then
+      vectormass(2,1)=M_Z
+      vectormass(2,2)=Ga_Z
+   elseif( IsAWDecay(DecayMode2) ) then
+      vectormass(2,1)=M_W
+      vectormass(2,2)=Ga_W
+   elseif( IsAPhoton(DecayMode2) ) then
+      vectormass(2,1)=0d0
+      vectormass(2,2)=0d0
+   endif
 
    Mom(1:4,1) = 0.5d0*Energy * (/+1d0,0d0,0d0,+1d0/)
    Mom(1:4,2) = 0.5d0*Energy * (/+1d0,0d0,0d0,-1d0/)
-   
-   if( .not. includeInterference ) NumChannels=2
-   iChannel = int(xchannel * NumChannels -1d-10)+1
-!    print *, "PS channel ",iChannel
 
-! if( iChannel.eq.2 ) iChannel=1! turn this on only when mX > 2mV
-! if( iChannel.eq.4 ) iChannel=3
+   ! If does not have 4f-interference, then use the first two channels only
+   if(.not.includeInterference .or. (IsAWDecay(DecayMode1).and.IsAWDecay(DecayMode2)) .or. .not.(id(1).eq.id(3) .and. id(2).eq.id(4)) ) then
+      NumChannels=2
+   endif
+
+   ! Ordering becomes important if the on-shellness of V1 and V2 are not specified to be the same.
+   ! If one V is off-shell and the other is on-shell, or if exactly one decay mode is a photon, use the first channel.
+   if((OffShellV1.neqv.OffShellV2) .or. ((IsAPhoton(DecayMode1) .or. IsAPhoton(DecayMode2)) .and. DecayMode1.ne.DecayMode2 )) then
+      !print *,"Passes this if-statement!"
+      NumChannels=1
+   endif
+   if(NumChannels.gt.1) then
+      iChannel = int(xchannel * NumChannels -1d-10)+1
+   endif
+
+   !print *, "PS channel / NumChannels ",iChannel,NumChannels
    
-   
-   
+   ! masses
+   if(OffShellV1) then
+      if(OffShellV2) then ! OffXVV=X11
+         Jac2 = s_channel_propagator((vectormass(1,1))**2,vectormass(1,2),0d0,s56,xRnd(1),s78)                                          !  int d(s78)    = Z1
+         Jac3 = s_channel_propagator((vectormass(2,1))**2,vectormass(2,2),0d0,(Energy-dsqrt(s78))**2,xRnd(2),s910)                  !  int d(s910)   = Z2
+      else                ! OffXVV=X10
+         s910 = (vectormass(2,1))**2                                                                                                    !  int d(s910)   = Z2
+         Jac2 = s_channel_propagator((vectormass(1,1))**2,vectormass(1,2),0d0,(Energy-dsqrt(s910))**2,xRnd(1),s78)                  !  int d(s78)    = Z1
+      endif
+   else
+      s78 = (vectormass(1,1))**2                                                                                                        !  int d(s78)    = Z1
+      if(OffShellV2) then ! OffXVV=X01
+         Jac3 = s_channel_propagator((vectormass(2,1))**2,vectormass(2,2),0d0,(Energy-dsqrt(s78))**2,xRnd(2),s910)                  !  int d(s910)   = Z2
+      else                ! OffXVV=X00
+         s910 = (vectormass(2,1))**2                                                                                                    !  int d(s910)   = Z2
+         if( s910.gt.((dsqrt(s56)-dsqrt(s910))**2) ) Jac3=0d0
+      endif
+   endif
+
+   !print *, "x",xrnd(1:2)
+   !print *, "s",s56,s78,s910
+   !pause
+
+   Jac = Jac1*Jac2*Jac3
+   if(Jac.eq.0d0) return ! Checkpoint for on/off-shellness
+
+   Mom_Dummy(1:4) = (/Energy,0d0,0d0,0d0/)   
+
+!  splittings
 IF( iChannel.EQ.1 ) THEN
-
-
-!  masses
-   Jac1=1d0; s56=Energy**2   
-! print *, "entering Jac2"
-   Jac2 = s_channel_propagator(M_V**2,Ga_V,0d0,s56,xRnd(1),s78)                                                                   !  int d(s78)    = Z1
-! print *, "entering Jac3"
-   Jac3 = s_channel_propagator(M_V**2,Ga_V,0d0,(Energy-dsqrt(s78))**2,xRnd(2),s910)                                           !  int d(s910) = Z2
-   
-   
-!    print *, "x",xrnd(1:2)
-!    print *, "s",s56,s78,s910;pause
-   
-!  splittings
-   Mom_Dummy(1:4) = (/Energy,0d0,0d0,0d0/)
-   Jac4 = s_channel_decay(Mom_Dummy(1:4),s78,s910,xRnd(3:4),Mom(:,3),Mom(:,4))                                                   !  H --> 5+6       
-   Jac5 = s_channel_decay(Mom(:,3),0d0,0d0,xRnd(5:6),Mom(:,5),Mom(:,6))                                                         !  5 --> 7+8       
-   Jac6 = s_channel_decay(Mom(:,4),0d0,0d0,xRnd(7:8),Mom(:,7),Mom(:,8))                                                        !  6 --> 9+10      
-   
-   Jac = Jac1*Jac2*Jac3*Jac4*Jac5*Jac6 * PSNorm4  !*NumChannels                                                         !  combine   
-
-
+   Jac4 = s_channel_decay(Mom_Dummy(1:4),s78,s910,xRnd(3:4),Mom(:,3),Mom(:,4))                                                   !  H --> 5+6
+   if(.not.IsAPhoton(DecayMode1)) then
+      Jac5 = s_channel_decay(Mom(:,3),0d0,0d0,xRnd(5:6),Mom(:,5),Mom(:,6))                                                       !  5 --> 7+8
+   else
+      Mom(:,5) = Mom(:,3)
+      Mom(:,6) = 0d0
+   endif
+   if(.not.IsAPhoton(DecayMode2)) then
+      Jac6 = s_channel_decay(Mom(:,4),0d0,0d0,xRnd(7:8),Mom(:,7),Mom(:,8))                                                       !  6 --> 9+10
+   else
+      Mom(:,7) = Mom(:,4)
+      Mom(:,8) = 0d0
+   endif
 ELSEIF( iChannel.EQ.2 ) THEN
+   Jac4 = s_channel_decay(Mom_Dummy(1:4),s78,s910,xRnd(3:4),Mom(:,4),Mom(:,3))                                                   !  H --> 6+5       
+   if(.not.IsAPhoton(DecayMode2)) then
+      Jac5 = s_channel_decay(Mom(:,3),0d0,0d0,xRnd(5:6),Mom(:,5),Mom(:,6))                                                       !  5 --> 7+8
+   else
+      Mom(:,5) = Mom(:,3)
+      Mom(:,6) = 0d0
+   endif
+   if(.not.IsAPhoton(DecayMode1)) then
+      Jac6 = s_channel_decay(Mom(:,4),0d0,0d0,xRnd(7:8),Mom(:,7),Mom(:,8))                                                       !  6 --> 9+10
+   else
+      Mom(:,7) = Mom(:,4)
+      Mom(:,8) = 0d0
+   endif
 
-!  masses
-   Jac1=1d0; s56=Energy**2   
-   Jac2 = s_channel_propagator(M_V**2,Ga_V,0d0,s56,xRnd(1),s78)                                                                   !  int d(s78)    = Z1
-   Jac3 = s_channel_propagator(M_V**2,Ga_V,0d0,(Energy-dsqrt(s78))**2,xRnd(2),s910)                                           !  int d(s910) = Z2
-
-!  splittings
-   Mom_Dummy(1:4) = (/Energy,0d0,0d0,0d0/)
-   Jac4 = s_channel_decay(Mom_Dummy(1:4),s78,s910,xRnd(3:4),Mom(:,4),Mom(:,3))                                                   !  H --> 5+6       
-   Jac5 = s_channel_decay(Mom(:,3),0d0,0d0,xRnd(5:6),Mom(:,5),Mom(:,6))                                                         !  5 --> 7+8       
-   Jac6 = s_channel_decay(Mom(:,4),0d0,0d0,xRnd(7:8),Mom(:,7),Mom(:,8))                                                        !  6 --> 9+10      
-      
-   Jac = Jac1*Jac2*Jac3*Jac4*Jac5*Jac6 * PSNorm4  !*NumChannels                                                         !  combine   
-
-   
-   
-ELSEIF( iChannel.EQ.3 ) THEN
-
-!  masses
-   Jac1=1d0; s56=Energy**2   
-   Jac2 = s_channel_propagator(M_V**2,Ga_V,0d0,s56,xRnd(1),s78)                                                                   !  int d(s78)    = Z1
-   Jac3 = s_channel_propagator(M_V**2,Ga_V,0d0,(Energy-dsqrt(s78))**2,xRnd(2),s910)                                           !  int d(s910) = Z2
-
-!  splittings
-   Mom_Dummy(1:4) = (/Energy,0d0,0d0,0d0/)
+ELSEIF( iChannel.EQ.3 ) THEN                                                                                                     !  Interference scenarios
    Jac4 = s_channel_decay(Mom_Dummy(1:4),s78,s910,xRnd(3:4),Mom(:,3),Mom(:,4))                                                   !  H --> 5+6       
-   Jac5 = s_channel_decay(Mom(:,3),0d0,0d0,xRnd(5:6),Mom(:,7),Mom(:,6))                                                         !  5 --> 7+8       
-   Jac6 = s_channel_decay(Mom(:,4),0d0,0d0,xRnd(7:8),Mom(:,5),Mom(:,8))                                                        !  6 --> 9+10      
-      
-   Jac = Jac1*Jac2*Jac3*Jac4*Jac5*Jac6 * PSNorm4  !*NumChannels                                                         !  combine   
-
-
+   Jac5 = s_channel_decay(Mom(:,3),0d0,0d0,xRnd(5:6),Mom(:,7),Mom(:,6))                                                          !  5 --> 9+8       
+   Jac6 = s_channel_decay(Mom(:,4),0d0,0d0,xRnd(7:8),Mom(:,5),Mom(:,8))                                                          !  6 --> 7+10      
 ELSEIF( iChannel.EQ.4 ) THEN
-
-!  masses
-   Jac1=1d0; s56=Energy**2   
-   Jac2 = s_channel_propagator(M_V**2,Ga_V,0d0,s56,xRnd(1),s78)                                                                   !  int d(s78)    = Z1
-   Jac3 = s_channel_propagator(M_V**2,Ga_V,0d0,(Energy-dsqrt(s78))**2,xRnd(2),s910)                                           !  int d(s910) = Z2
-
-!  splittings
-   Mom_Dummy(1:4) = (/Energy,0d0,0d0,0d0/)
-   Jac4 = s_channel_decay(Mom_Dummy(1:4),s78,s910,xRnd(3:4),Mom(:,4),Mom(:,3))                                                   !  H --> 5+6       
-   Jac5 = s_channel_decay(Mom(:,3),0d0,0d0,xRnd(5:6),Mom(:,7),Mom(:,6))                                                         !  5 --> 7+8       
-   Jac6 = s_channel_decay(Mom(:,4),0d0,0d0,xRnd(7:8),Mom(:,5),Mom(:,8))                                                        !  6 --> 9+10      
-      
-   Jac = Jac1*Jac2*Jac3*Jac4*Jac5*Jac6 * PSNorm4  !*NumChannels                                                         !  combine   
-   
- 
+   Jac4 = s_channel_decay(Mom_Dummy(1:4),s78,s910,xRnd(3:4),Mom(:,4),Mom(:,3))                                                   !  H --> 6+5       
+   Jac5 = s_channel_decay(Mom(:,3),0d0,0d0,xRnd(5:6),Mom(:,7),Mom(:,6))                                                          !  5 --> 9+8       
+   Jac6 = s_channel_decay(Mom(:,4),0d0,0d0,xRnd(7:8),Mom(:,5),Mom(:,8))                                                          !  6 --> 7+10      
 ENDIF
 
-! print *, energy,dsqrt(s56);pause
+   Jac = Jac*Jac4*Jac5*Jac6 * PSNorm4  !*NumChannels                                                                                 !  combine   
+
+   !print *, energy,dsqrt(s56)
+   !print *,"Generated momenta: "
+   !print *,Mom(:,3)
+   !print *,Mom(:,4)
+   !print *,Mom(:,5)
+   !print *,Mom(:,6)
+   !print *,Mom(:,7)
+   !print *,Mom(:,8)
+   !pause
 
 
    if( isNan(jac) ) then
