@@ -286,10 +286,10 @@ MODULE ModPhasespace
   real(8) :: E1,p1z,phi,theta,Jac,Mandelstam_S,cosTheta
 
         phi   = 2d0*pi * xRnd(1)
-!         theta = 1d0*pi * xRnd(2)
         cosTheta = 2*xRnd(2)-1d0
         theta = dacos(cosTheta)
         Mandelstam_S = p0(1)**2 - p0(2)**2 - p0(3)**2 - p0(4)**2 
+
         if( dabs(Mandelstam_S/(p0(1)**2+1d-15)).lt.1d-13 .or. dabs(Mandelstam_S).lt.1d-8 ) then
             Mom1(1:4) = 0d0 
             Mom2(1:4) = 0d0
@@ -299,13 +299,21 @@ MODULE ModPhasespace
 
         E1 = ( Mandelstam_S + Mass1_sq - Mass2_sq )/2d0/dsqrt(Mandelstam_S)
         p1z= sqrt_lambda(Mandelstam_S,Mass1_sq,Mass2_sq)/2d0/dsqrt(Mandelstam_S)
+
+        if(E1.lt.p1z) then
+          print *,"s_channel_decay: E1<p1z! E,p:",E1,p1z
+          Mom1(1:4) = 0d0 
+          Mom2(1:4) = 0d0
+          s_channel_decay = 0d0
+          return
+        endif
+
         Mom1(1:4) = (/ E1,0d0,0d0,p1z /)
         call rotate3D_phi_theta(phi,theta,Mom1)
         
         Mom2(1)   = dsqrt(Mandelstam_S) - Mom1(1)
         Mom2(2:4) = - Mom1(2:4)
         call boost_from_CMS_to_RefMom(p0,Mom1,Mom2)
-!         call boost_from_CMS_to_RefMom(p0,Mom2)
  
         s_channel_decay = 1d0/g_d(Mandelstam_S,Mass1_sq,Mass2_sq)   !   *  dSin(theta)
                 
