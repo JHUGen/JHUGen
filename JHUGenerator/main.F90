@@ -282,7 +282,7 @@ logical :: SetAnomalousHff, Setkappa
    ConvertLHEFile=.false.
    ReadCSmax=.false.
    ReadPMZZ = .false.
-   PMZZEvals=200000
+   PMZZEvals=-1
    DoPrintPMZZ = .false.
    PrintPMZZIntervals = 20
    GenerateEvents=.false.
@@ -741,6 +741,12 @@ logical :: SetAnomalousHff, Setkappa
         else !both > 0
             !nothing
         endif
+    endif
+
+    if( PMZZEvals.lt.0 ) then
+        !more evals for a lower mass Higgs because the integration converges slower there
+        PMZZEvals = int(200000 * (1 + 24*dexp((1d0-m_Reso/(125d0*GeV))*4d0)))
+        if( PMZZEvals.gt.10000000 ) PMZZEvals = 10000000
     endif
 
     !WriteFailedEvents

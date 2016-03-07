@@ -25,7 +25,7 @@ integer :: evals
          endif
          CalcMZZProbability = CalcMZZProbability + DecayWeight
      enddo
-     CalcMZZProbability = CalcMZZProbability/dble(evals)
+     CalcMZZProbability = CalcMZZProbability/dble(PMZZEvals)
      !print *, EHat*100d0, CalcMZZProbability
 
 RETURN
@@ -240,6 +240,7 @@ integer :: nscan
 real(8),parameter :: ScanRange=120d0*GeV
 
 
+  print *, " finding P_decay(m4l) distribution with ", PMZZEvals, " calls per point"
   DecayWidth0 = GetMZZProbability(M_Reso,-1d0,.false.)
   minEhat = dreal(PrintPMZZ)
   maxEhat = dimag(PrintPMZZ)
