@@ -13,7 +13,7 @@ Comp = gfort
 
 # link pdfs via LHA library ('Yes' or 'No')
 UseLHAPDF=No
-# remember to export 
+# remember to export
 #          LD_LIBRARY_PATH=/.../LHAPDF-x.y.z/lib/:${LD_LIBRARY_PATH}
 #          LHAPDF_DATA_PATH=/.../LHAPDF-x.y.z/share/LHAPDF/:${LHAPDF_DATA_PATH}
 
@@ -21,7 +21,21 @@ UseLHAPDF=No
 # this one in terms of the environment variable should work in most cases
 MyLHADir=${LHAPDF_DATA_PATH}/../../lib/
 
+#link MCFM libraries from MELA
+linkMELA = No
 
+
+ifeq ($(UseLHAPDF),Yes)
+   LHAPDFflags = -L$(MyLHADir) -lLHAPDF -DuseLHAPDF=1
+else
+   LHAPDFflags = -DuseLHAPDF=0
+endif
+
+ifeq ($(linkMELA),Yes)
+   MELAflags = -DlinkMELA=1
+else
+   MELAflags = -DlinkMELA=0
+endif
 
 ifeq ($(Comp),gfort)
  ifeq ($(Opt),Yes)
@@ -29,12 +43,7 @@ ifeq ($(Comp),gfort)
  else
     OptOpts  = -O0 -fcheck=all
  endif
- ifeq ($(UseLHAPDF),Yes)
-    LHAPDFflags = -L$(MyLHADir) -lLHAPDF -DuseLHAPDF=1
- else
-    LHAPDFflags = -DuseLHAPDF=0
- endif 
- fcomp = gfortran $(OptOpts) -ffree-line-length-none -I$(VegasDir) -I$(ModuleDir) -J$(ModuleDir) $(LHAPDFflags) -Dcompiler=2
+ fcomp = gfortran $(OptOpts) -ffree-line-length-none -I$(VegasDir) -I$(ModuleDir) -J$(ModuleDir) $(LHAPDFflags) $(MELAflags) -Dcompiler=2
 endif
 
 
@@ -44,12 +53,7 @@ ifeq ($(Comp),ifort)
  else
     OptOpts  = -O0 -implicitnone -check bounds -check pointer -warn interfaces -ftrapuv  -diag-disable remark -debug extended -g -traceback -fpe0 -check uninit
  endif
- ifeq ($(UseLHAPDF),Yes)
-    LHAPDFflags = -L$(MyLHADir) -lLHAPDF -DuseLHAPDF=1
- else
-    LHAPDFflags = -DuseLHAPDF=0
- endif 
- fcomp = ifort -fpp $(OptOpts) -module $(ModuleDir) -I$(VegasDir) -Dcompiler=1 $(LHAPDFflags)
+ fcomp = ifort -fpp $(OptOpts) -module $(ModuleDir) -I$(VegasDir) -Dcompiler=1 $(LHAPDFflags) $(MELAflags)
 endif
 
 
@@ -128,37 +132,28 @@ PSGenDep = genps.c \
 PSGenObj = $(ObjectDir)/genps.o \
            $(ObjectDir)/boost.o
 
-JHUGenMELA = 
-
-MCFM_Obj = $(MCFMDir)/anomamp.o \
-           $(MCFMDir)/cdotpr.o \
-           $(MCFMDir)/jtwo3456.o \
-           $(MCFMDir)/jtwo.o \
-           $(MCFMDir)/jzero.o \
-           $(MCFMDir)/qq_ZZqq.o \
-           $(MCFMDir)/setupzprops.o \
-           $(MCFMDir)/spinorcurr.o \
-           $(MCFMDir)/WWZZ.o \
-           $(MCFMDir)/ZZHZZamp.o \
-           $(MCFMDir)/ZZSingleres.o \
-           $(MCFMDir)/jone.o
+JHUGenMELA =
 
 CPSDep = ./CPS/CALLING_cpHTO.f
 
-CPSObj = $(ObjectDir)/CALLING_cpHTO.o 
+CPSObj = $(ObjectDir)/CALLING_cpHTO.o
 
-MCFM_Obj = $(MCFMDir)/anomamp.o \
-           $(MCFMDir)/cdotpr.o \
-           $(MCFMDir)/jtwo3456.o \
-           $(MCFMDir)/jtwo.o \
-           $(MCFMDir)/jzero.o \
-           $(MCFMDir)/qq_ZZqq.o \
-           $(MCFMDir)/setupzprops.o \
-           $(MCFMDir)/spinorcurr.o \
-           $(MCFMDir)/WWZZ.o \
-           $(MCFMDir)/ZZHZZamp.o \
-           $(MCFMDir)/ZZSingleres.o \
-           $(MCFMDir)/jone.o
+ifeq ($(linkMELA),Yes)
+  MCFM_Obj = $(MCFMDir)/anomamp.o \
+             $(MCFMDir)/cdotpr.o \
+             $(MCFMDir)/jtwo3456.o \
+             $(MCFMDir)/jtwo.o \
+             $(MCFMDir)/jzero.o \
+             $(MCFMDir)/qq_ZZqq.o \
+             $(MCFMDir)/setupzprops.o \
+             $(MCFMDir)/spinorcurr.o \
+             $(MCFMDir)/WWZZ.o \
+             $(MCFMDir)/ZZHZZamp.o \
+             $(MCFMDir)/ZZSingleres.o \
+             $(MCFMDir)/jone.o
+else
+  MCFM_Obj =
+endif
 
 # MadGraphDep = h_emepemep.f \
 #               h_emepemep_noint.f \
@@ -181,7 +176,7 @@ JHUGenerator: $(CPSObj) $(PSGenObj) $(VegasObj) $(PDFObj) $(AmpObj) $(MainObj)
 ifeq ($(UseLHAPDF),Yes)
 	echo " interfaced with LHAPDF"
 else
-	echo " using internal PDF sets" 
+	echo " using internal PDF sets"
 endif
 	@echo " executable file is "$(Exec) "compiled with "$(Comp)
 	@echo " "
