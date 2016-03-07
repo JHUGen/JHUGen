@@ -5034,7 +5034,8 @@ c      REAL*8 HTO_SSHH,rgh,muc,scalc,x
 *----- Main ---------------------------------------------------------------
 *--------------------------------------------------------------------------
 *
-      SUBROUTINE HTO_pole(m,gammaH)
+!       SUBROUTINE HTO_pole(m,gammaH)
+      SUBROUTINE HTO_pole(m,gammaH,mhb) ! MARKUS: added the last argument in accordance with POWHEG
       USE HTO_masses
       USE HTO_riemann
       USE HTO_sp_fun
@@ -7653,7 +7654,8 @@ c      REAL*8 HTO_SSHH,rgh,muc,scalc,x
 *
 *----------------------------------------------------------------------
 *
-      SUBROUTINE CALL_HTO(mhiggs,mtop,gH)
+      SUBROUTINE CALL_HTO(mhiggs,mtop,gH,mhb)! MARKUS: added the last argument in accordance with POWHEG
+!       SUBROUTINE CALL_HTO(mhiggs,mtop,gH)
       USE HTO_masses
       USE HTO_aux_Hcp
       USE HTO_puttime
@@ -7670,7 +7672,7 @@ c      REAL*8 HTO_SSHH,rgh,muc,scalc,x
 * top-quark mass
 *
       mt= mtop
-      CALL HTO_pole(mhiggs,gammaH)
+      CALL HTO_pole(mhiggs,gammaH,mhb)
       gH= gammaH
 *
       RETURN
