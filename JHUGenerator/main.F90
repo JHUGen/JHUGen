@@ -1020,7 +1020,7 @@ include "vegas_common.f"
          NDim = NDim + 8
          NDim = NDim + 1
          NDim = NDim + 1
-         if( unweighted ) NDim = NDim + 1  ! random number which decides if event is accepted
+         NDim = NDim + 1
          
          VegasIt1_default = 5
          VegasNc0_default = 10000000
@@ -1550,6 +1550,7 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
 if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) UseBetaVersion=.true.
 if( Process.eq.60 ) UseBetaVersion=.true.
 if( Process.eq.61 ) UseBetaVersion=.true.
+if( Process.eq.66 ) UseBetaVersion=.true.
 
 
 if( UseBetaVersion ) then 
@@ -1571,6 +1572,7 @@ if( UseBetaVersion ) then
         if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) call vegas(EvalWeighted,VG_Result,VG_Error,VG_Chi2)
         if( Process.eq.60 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
         if( Process.eq.61 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
+        if( Process.eq.66 ) call vegas(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
         itmx = 3
     endif
       
@@ -1582,7 +1584,7 @@ if( UseBetaVersion ) then
 !     if( Process.eq.80 ) call vegas(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2) ! adjust to LHE format
 !     if( Process.eq.90 ) call vegas(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.60 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
-!     if( Process.eq.66 ) call vegas(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
+    if( Process.eq.66 ) call vegas1(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.61 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
 !     if( Process.eq.110) call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
 !     if( Process.eq.111) call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)    
@@ -1610,9 +1612,10 @@ if( UseBetaVersion ) then
        call get_PPXchannelHash(ijSel)
     elseif( Process.eq.60 ) then
        call get_VBFchannelHash(ijSel)
-    else
-!        call get_GENchannelHash(ijSel)
+    elseif( Process.eq.61 ) then
        call get_HJJchannelHash(ijSel)
+    else
+       call get_GENchannelHash(ijSel)
     endif
 ! do i=1,121
 !          i1 = ijSel(i,1)
@@ -1688,7 +1691,7 @@ if( UseBetaVersion ) then
 !         if( Process.eq.80 ) call vegas1(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)! adjust to LHE format
     !     if( Process.eq.90 ) call vegas1(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
         if( Process.eq.60 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
-    !     if( Process.eq.66 ) call vegas1(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
+        if( Process.eq.66 ) call vegas1(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
         if( Process.eq.61 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
 !         if( Process.eq.110) call vegas1(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
 !         if( Process.eq.111) call vegas1(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)      
@@ -3506,7 +3509,8 @@ implicit none
 integer :: AllocStatus,NHisto
 
           it_sav = 1
-          NumHistograms = 8
+          NumHistograms =  45!   9;     
+print *, "extending no. of histograms for vbf tests"
           if( .not.allocated(Histo) ) then
                 allocate( Histo(1:NumHistograms), stat=AllocStatus  )
                 if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
@@ -3559,6 +3563,20 @@ integer :: AllocStatus,NHisto
           Histo(8)%BinSize= 10d0*GeV
           Histo(8)%LowVal = 120d0*GeV
           Histo(8)%SetScale= 1d0/GeV
+
+          Histo(9)%Info   = "Phi1"  ! angle between plane of beam-scatterin axis and the lepton plane of Z1 in the resonance rest frame
+          Histo(9)%NBins  = 40
+          Histo(9)%BinSize= 0.078539d0 *2d0
+          Histo(9)%LowVal =-3.14159d0
+          Histo(9)%SetScale= 1d0
+
+do NHisto=10,45
+          Histo(NHisto)%Info   = "sij"
+          Histo(NHisto)%NBins  = 200
+          Histo(NHisto)%BinSize= 2d0*GeV
+          Histo(NHisto)%LowVal = 0d0*GeV
+          Histo(NHisto)%SetScale= 1d0/GeV
+enddo
 ! 
 !           Histo(7)%Info   = "weights"
 !           Histo(7)%NBins  = 50

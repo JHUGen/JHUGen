@@ -8,7 +8,7 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
 
 
  
- 
+! since the me2(:,:) array is defined from -5..+5, the iPart_sel,jPart_sel have to follow the LHE numbering convention
 FUNCTION EvalWeighted_HJJ_fulldecay(yRnd,VgsWgt)
 use ModKinematics
 use ModParameters
@@ -19,39 +19,70 @@ use ifport
 #endif
 implicit none
 integer,parameter :: mxpart=14 ! this has to match the MCFM parameter
-real(8) :: yRnd(1:17),VgsWgt, EvalWeighted_HJJ_fulldecay
+real(8) :: yRnd(1:18),VgsWgt, EvalWeighted_HJJ_fulldecay
 real(8) :: pdf(-6:6,1:2)           ,me2(-5:5,-5:5)
 real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi
 real(8) :: MomExt(1:4,1:10),PSWgt
 real(8) :: p_MCFM(mxpart,1:4),msq_MCFM(-5:5,-5:5)
 complex(8) :: HZZcoupl(1:32),HWWcoupl(1:32)
-integer :: i,j,MY_IDUP(1:10),ICOLUP(1:2,1:10),NBin(1:NumHistograms),NHisto
-real(8) :: LO_Res_Unpol, PreFac
+integer :: MY_IDUP(1:10),ICOLUP(1:2,1:10),NBin(1:NumHistograms),NHisto
+integer :: iPartChannel,PartChannelAvg,NumPartonicChannels,ijSel(1:121,1:3)
+real(8) :: LO_Res_Unpol, PreFac,VegasWeighted_HJJ_fulldecay,xRnd
 logical :: applyPSCut
 integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, Lep1M=8, Lep2P=9, Lep2M=10
+real(8) :: s13,s14,s15,s16,s23,s24,s25,s26,s34,s35,s36,s45,s46,s56,s78,s910,s710,s89
+include 'vegas_common.f'   
 EvalWeighted_HJJ_fulldecay = 0d0
+
+
+
+   NumPartonicChannels = 121
+
+! selecting only u-d channels for checks
+NumPartonicChannels = 2
+! after removing also repair get_GENchannelHash !!
+
+   iPartChannel = int(yRnd(18) * (NumPartonicChannels)) +1 ! this runs from 1..121
+   call get_GENchannelHash(ijSel)
+   iPart_sel = ijSel(iPartChannel,1)
+   jPart_sel = ijSel(iPartChannel,2)
+   PartChannelAvg = NumPartonicChannels
+   if( unweighted .and. .not.warmup .and.  sum(AccepCounter_part(:,:)) .eq. sum(RequEvents(:,:)) ) then 
+      stopvegas=.true.
+   endif
+   if( (unweighted) .and. (.not. warmup) .and. (AccepCounter_part(iPart_sel,jPart_sel) .ge. RequEvents(iPart_sel,jPart_Sel))  ) return
    
 
-   call PDFMapping(1,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)   
-!    if( Ehat.lt.m_reso+2*pTjetcut ) return ! 30GeV = pTcut on fwd jets  ! this should probably be removed when background is present
-
-
+   call PDFMapping(2,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)   
    call EvalPhasespace_VBF_H4f(yRnd(3),yRnd(4:17),EHat,MomExt(1:4,1:10),PSWgt)
-!       call genps(6,EHat,yRnd(3:16),(/0d0,0d0,0d0,0d0,0d0,0d0/),MomExt(1:4,3:10),PSWgt)
-!       PSWgt = PSWgt * (2d0*Pi)**(4-(6)*3) * (4d0*Pi)**((6)-1)
 
+!       call genps(6,EHat,yRnd(3:16),(/0d0,0d0,0d0,0d0,0d0,0d0/),MomExt(1:4,3:8),PSWgt)
+!       MomExt(1:4,1)=(/Ehat,0d0,0d0,+Ehat/)/2d0
+!       MomExt(1:4,2)=(/Ehat,0d0,0d0,-Ehat/)/2d0
+!       MomExt(1:4,10)=MomExt(1:4,8)
+!       MomExt(1:4,9) =MomExt(1:4,7)
+!       MomExt(1:4,8) =MomExt(1:4,6)
+!       MomExt(1:4,7) =MomExt(1:4,5)
+!       MomExt(1:4,5) = MomExt(1:4,7)+MomExt(1:4,8)
+!       MomExt(1:4,6) = MomExt(1:4,9)+MomExt(1:4,10)
+!       PSWgt = PSWgt * (2d0*Pi)**(4-(6)*3) * (4d0*Pi)**((6)-1)
+ 
+!      
+!       EvalWeighted_HJJ_fulldecay=PSWgt*sHatJacobi  * ( MomExt(1:4,3).dot.MomExt(1:4,7) ) * ( MomExt(1:4,4).dot.MomExt(1:4,10) ) * ( MomExt(1:4,8).dot.MomExt(1:4,9) ) * ( MomExt(1:4,7).dot.MomExt(1:4,10) ) / EHat**8
+!       return
 
 !    call EvalPhasespace_VBF_NEW2(yRnd(17),yRnd(3:7),EHat,MomExt(1:4,1:10),PSWgt)! stable Higgs
 !       call genps(3,EHat,yRnd(3:7),(/0d0,0d0,M_Reso/),MomExt(1:4,3:5),PSWgt)
 !       PSWgt = PSWgt * (2d0*Pi)**(4-(3)*3) * (4d0*Pi)**((3)-1)
    call boost2Lab(eta1,eta2,10,MomExt(1:4,1:10))
-   PSWgt = PSWgt * (100d0)**8  ! adjust PSWgt for GeV units of MCFM mat.el.
+   PSWgt = PSWgt * (100d0)**8 * PartChannelAvg ! adjust PSWgt for GeV units of MCFM mat.el.
 
 
    call Kinematics_HVBF_fulldecay(MomExt,applyPSCut,NBin)
    if( applyPSCut .or. PSWgt.lt.1d-12 ) return
    call setPDFs(eta1,eta2,pdf)
    FluxFac = 1d0/(2d0*EHat**2)
+   EvalCounter = EvalCounter+1
 
 
    MY_IDUP(1:10) = (/Up_,Up_,Up_,Up_, Z0_,Z0_, ElM_,ElP_,MuM_,MuP_/)
@@ -104,9 +135,12 @@ EvalWeighted_HJJ_fulldecay = 0d0
   
 
 
-!   i=+2; j=+2;
-  msq_MCFM(:,:) = 0d0
-!  call qq_ZZqq(p_MCFM,msq_MCFM,HZZcoupl,HWWcoupl,Lambda*100d0,Lambda_Q*100d0,(/Lambda_z1,Lambda_z2,Lambda_z3,Lambda_z4/)*100d0)!  q(-p1)+q(-p2)->Z(p3,p4)+Z(p5,p6)+q(p7)+q(p8)
+ msq_MCFM(:,:) = 0d0
+ call qq_ZZqq(p_MCFM,msq_MCFM,HZZcoupl,HWWcoupl,Lambda*100d0,Lambda_Q*100d0,(/Lambda_z1,Lambda_z2,Lambda_z3,Lambda_z4/)*100d0)!  q(-p1)+q(-p2)->Z(p3,p4)+Z(p5,p6)+q(p7)+q(p8)
+ ! large overhead here because MCFM computes all partonic channels and we only use msq_MCFM(iPart_sel,jPart_sel)  !
+
+
+!   CHECKS:
 !   print *, "new ",msq_MCFM(j,i)
 !   call EvalAmp_WBFH_UnSymm_SA(MomExt(1:4,1:5),me2)
 ! !   msq_MCFM(:,:) = me2(:,:)
@@ -115,36 +149,141 @@ EvalWeighted_HJJ_fulldecay = 0d0
 !   pause
   
   
-  LO_Res_Unpol = 0d0
-   do i =  -5,5
-      do j = -5,5
-!    do i =  +2,+2,1
-!       do j = +2,+2,1
-         LO_Res_Unpol = LO_Res_Unpol + msq_MCFM(i,j)*pdf(LHA2M_pdf(i),1)*pdf(LHA2M_pdf(j),2)
-      enddo
-   enddo
+   LO_Res_Unpol = msq_MCFM(iPart_sel,jPart_sel)  *  pdf(LHA2M_pdf(iPart_sel),1) * pdf(LHA2M_pdf(jPart_sel),2)
    
-
    PreFac = fbGeV2 * FluxFac * PSWgt * sHatJacobi
    EvalWeighted_HJJ_fulldecay = LO_Res_Unpol * PreFac
+   VegasWeighted_HJJ_fulldecay = EvalWeighted_HJJ_fulldecay*VgsWgt
 
-   AccepCounter=AccepCounter+1
-   EvalCounter = EvalCounter+1
 
+
+   if( unweighted ) then 
    
-   if( writeWeightedLHE .and. (.not. warmup) ) then
-       call WriteOutEvent_HJJ_fulldecay(MomExt,MY_IDUP,ICOLUP,EventWeight=EvalWeighted_HJJ_fulldecay*VgsWgt)
-   endif
+     if( warmup ) then
 
+       CrossSec(iPart_sel,jPart_sel) = CrossSec(iPart_sel,jPart_sel) + VegasWeighted_HJJ_fulldecay
+       CrossSecMax(iPart_sel,jPart_sel) = max(CrossSecMax(iPart_sel,jPart_sel),VegasWeighted_HJJ_fulldecay)
+
+     else! not warmup
+
+       call random_number(xRnd)
+       if( VegasWeighted_HJJ_fulldecay.gt.CrossSecMax(iPart_sel,jPart_sel) ) then
+         write(io_LogFile,"(2X,A,1PE13.6,1PE13.6)") "CrossSecMax is too small.",VegasWeighted_HJJ_fulldecay, CrossSecMax(iPart_sel,jPart_sel)
+         write(io_stdout, "(2X,A,1PE13.6,1PE13.6,1PE13.6,I3,I3)") "CrossSecMax is too small.",VegasWeighted_HJJ_fulldecay, CrossSecMax(iPart_sel,jPart_sel),VegasWeighted_HJJ_fulldecay/CrossSecMax(iPart_sel,jPart_sel),iPart_sel,jPart_sel
+         AlertCounter = AlertCounter + 1
+       elseif( VegasWeighted_HJJ_fulldecay .gt. xRnd*CrossSecMax(iPart_sel,jPart_sel) ) then
+         AccepCounter = AccepCounter + 1
+         AccepCounter_part(iPart_sel,jPart_sel) = AccepCounter_part(iPart_sel,jPart_sel) + 1
+!         call WriteOutEvent_HVBF((/MomExt(1:4,1),MomExt(1:4,2),MomExt(1:4,3),MomExt(1:4,4),MomExt(1:4,5)/),MY_IDUP(1:5),ICOLUP(1:2,1:5),EventWeight=1d0)
+         call WriteOutEvent_HJJ_fulldecay(MomExt,MY_IDUP,ICOLUP)
+         do NHisto=1,NumHistograms
+           call intoHisto(NHisto,NBin(NHisto),1d0)
+         enddo
+       endif
+
+     endif! warmup
+
+   else! weighted
+
+      if( VegasWeighted_HJJ_fulldecay.ne.0d0 ) then
+        AccepCounter=AccepCounter+1
+        if( writeWeightedLHE .and. (.not. warmup) ) then
+            call WriteOutEvent_HJJ_fulldecay(MomExt,MY_IDUP,ICOLUP,EventWeight=VegasWeighted_HJJ_fulldecay)
+        endif
+        do NHisto=1,9 !NumHistograms
+          call intoHisto(NHisto,NBin(NHisto),VegasWeighted_HJJ_fulldecay)
+        enddo
+
+
+
+! compute all invariants to check PS performance
+
+ s13=get_MInv(MomExt(1:4,1)-MomExt(1:4,3))
+ s14=get_MInv(MomExt(1:4,1)-MomExt(1:4,4))
+ s15=get_MInv(MomExt(1:4,1)-MomExt(1:4,5))
+ s16=get_MInv(MomExt(1:4,1)-MomExt(1:4,6))
+
+ s23=get_MInv(MomExt(1:4,2)-MomExt(1:4,3))
+ s24=get_MInv(MomExt(1:4,2)-MomExt(1:4,4))
+ s25=get_MInv(MomExt(1:4,2)-MomExt(1:4,5))
+ s26=get_MInv(MomExt(1:4,2)-MomExt(1:4,6))
+
+ s34=get_MInv(MomExt(1:4,3)+MomExt(1:4,4))
+ s35=get_MInv(MomExt(1:4,3)+MomExt(1:4,5))
+ s36=get_MInv(MomExt(1:4,3)+MomExt(1:4,6))
+
+ s45=get_MInv(MomExt(1:4,4)+MomExt(1:4,5))
+ s46=get_MInv(MomExt(1:4,4)+MomExt(1:4,6))
+
+ s56=get_MInv(MomExt(1:4,5)+MomExt(1:4,6))
+
+ s78=get_MInv(MomExt(1:4,7)+MomExt(1:4,8))
+ s910=get_MInv(MomExt(1:4,9)+MomExt(1:4,10))
+ s710=get_MInv(MomExt(1:4,7)+MomExt(1:4,10))
+ s89=get_MInv(MomExt(1:4,8)+MomExt(1:4,9))
+
+ LO_Res_Unpol = LO_Res_Unpol * VgsWgt
+
+ call intoHisto(10,WhichBin(NHisto,dsqrt(s13)),LO_Res_Unpol)
+ call intoHisto(11,WhichBin(NHisto,dsqrt(s13)),1d0/PSWgt)
+
+ call intoHisto(12,WhichBin(NHisto,dsqrt(s14)),LO_Res_Unpol)
+ call intoHisto(13,WhichBin(NHisto,dsqrt(s14)),1d0/PSWgt)
+
+ call intoHisto(14,WhichBin(NHisto,dsqrt(s15)),LO_Res_Unpol)
+ call intoHisto(15,WhichBin(NHisto,dsqrt(s15)),1d0/PSWgt)
+
+ call intoHisto(16,WhichBin(NHisto,dsqrt(s16)),LO_Res_Unpol)
+ call intoHisto(17,WhichBin(NHisto,dsqrt(s16)),1d0/PSWgt)
+
+ call intoHisto(18,WhichBin(NHisto,dsqrt(s23)),LO_Res_Unpol)
+ call intoHisto(19,WhichBin(NHisto,dsqrt(s23)),1d0/PSWgt)
+
+ call intoHisto(20,WhichBin(NHisto,dsqrt(s24)),LO_Res_Unpol)
+ call intoHisto(21,WhichBin(NHisto,dsqrt(s24)),1d0/PSWgt)
+
+ call intoHisto(22,WhichBin(NHisto,dsqrt(s25)),LO_Res_Unpol)
+ call intoHisto(23,WhichBin(NHisto,dsqrt(s25)),1d0/PSWgt)
+
+ call intoHisto(24,WhichBin(NHisto,dsqrt(s26)),LO_Res_Unpol)
+ call intoHisto(25,WhichBin(NHisto,dsqrt(s26)),1d0/PSWgt)
+
+ call intoHisto(26,WhichBin(NHisto,dsqrt(s34)),LO_Res_Unpol)
+ call intoHisto(27,WhichBin(NHisto,dsqrt(s34)),1d0/PSWgt)
+
+ call intoHisto(28,WhichBin(NHisto,dsqrt(s35)),LO_Res_Unpol)
+ call intoHisto(29,WhichBin(NHisto,dsqrt(s35)),1d0/PSWgt)
+
+ call intoHisto(30,WhichBin(NHisto,dsqrt(s36)),LO_Res_Unpol)
+ call intoHisto(31,WhichBin(NHisto,dsqrt(s36)),1d0/PSWgt)
+
+ call intoHisto(32,WhichBin(NHisto,dsqrt(s45)),LO_Res_Unpol)
+ call intoHisto(33,WhichBin(NHisto,dsqrt(s45)),1d0/PSWgt)
+
+ call intoHisto(34,WhichBin(NHisto,dsqrt(s46)),LO_Res_Unpol)
+ call intoHisto(35,WhichBin(NHisto,dsqrt(s46)),1d0/PSWgt)
+
+ call intoHisto(36,WhichBin(NHisto,dsqrt(s56)),LO_Res_Unpol)
+ call intoHisto(37,WhichBin(NHisto,dsqrt(s56)),1d0/PSWgt)
+
+ call intoHisto(38,WhichBin(NHisto,dsqrt(s78)),LO_Res_Unpol)
+ call intoHisto(39,WhichBin(NHisto,dsqrt(s78)),1d0/PSWgt)
+
+ call intoHisto(40,WhichBin(NHisto,dsqrt(s910)),LO_Res_Unpol)
+ call intoHisto(41,WhichBin(NHisto,dsqrt(s910)),1d0/PSWgt)
+
+ call intoHisto(42,WhichBin(NHisto,dsqrt(s710)),LO_Res_Unpol)
+ call intoHisto(43,WhichBin(NHisto,dsqrt(s710)),1d0/PSWgt)
+
+ call intoHisto(44,WhichBin(NHisto,dsqrt(s89)),LO_Res_Unpol)
+ call intoHisto(45,WhichBin(NHisto,dsqrt(s89)),1d0/PSWgt)
+
+
+
+      endif
+
+   endif! unweighted
    
-   
-!    NBin(7) = WhichBin(7, dlog10( EvalWeighted_HJJ_fulldecay*VgsWgt )  )
-   do NHisto=1,NumHistograms
-       call intoHisto(NHisto,NBin(NHisto),EvalWeighted_HJJ_fulldecay*VgsWgt)
-   enddo
-
-
-
 
 RETURN
 END FUNCTION
