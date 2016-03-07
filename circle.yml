@@ -38,10 +38,10 @@ test:
     - "! grep 'Comp *= *ifort' makefile"
     #but continue the other tests even if it is
     - sed -i -r -e "s/(Comp *= *)ifort/\1gfort/" makefile
-    - make
     - make:
          pwd:
            ../JHUGenMELA
+    - make
   override:
     #here we want to generate as many production modes as possible and get the widest range of events to check for syntax issues
     #the actual checking (checklhe) is done in post
