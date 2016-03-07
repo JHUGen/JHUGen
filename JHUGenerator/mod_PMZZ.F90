@@ -247,6 +247,7 @@ real(8),parameter :: ScanRange=120d0*GeV
   do nscan=0,PrintPMZZIntervals
 
      EHat = minEhat+nscan*(maxEhat-minEhat)/PrintPMZZIntervals
+     if( PrintPMZZIntervals.eq.0 ) EHat = minEhat
      DecayWidth = GetMZZProbability(EHat,-1d0,.false.)
      write(*,"(1F10.5,1PE16.9)") EHat*100d0,DecayWidth/DecayWidth0
 
