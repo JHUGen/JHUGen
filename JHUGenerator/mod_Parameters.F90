@@ -3,7 +3,7 @@ implicit none
 save
 ! 
 ! 
-character(len=6),parameter :: JHUGen_Version="v6.9.0"
+character(len=6),parameter :: JHUGen_Version="v6.9.2"
 ! 
 ! 
 !=====================================================
@@ -108,12 +108,11 @@ logical, public, parameter :: importExternal_LHEinit = .true.
 
 logical, public, parameter :: writeWeightedLHE = .false. 
 
-logical, public, parameter :: RandomizeVVdecays = .true.    ! randomize DecayMode1 and DecayMode2 in H-->VV and TTBAR decays
+logical, public            :: RandomizeVVdecays = .true.    ! randomize DecayMode1 and DecayMode2 in H-->VV and TTBAR decays whenever appropriate
 
 logical, public, parameter :: UseUnformattedRead = .false.  !Set this to true if the regular reading fails for whatever reason
 
 logical, public, parameter :: H_DK =.false.                 ! default to false so H in V* > VH (Process = 50) does not decay
-!logical, public, parameter :: V_DK =.true.                 ! default to true so V in V* > VH (Process = 50) decays
 !=====================================================
 
 
@@ -122,9 +121,8 @@ logical, public, parameter :: H_DK =.false.                 ! default to false s
 real(8), public :: pTjetcut = 15d0*GeV                        ! jet min pt
 real(8), public :: Rjet = 0.3d0                               ! jet deltaR, anti-kt algorithm
 real(8), public :: mJJcut = 0d0*GeV                           ! minimum mJJ for VBF, HJJ, bbH
-! real(8), public :: m4l_minmax(1:2) = (/ -1d0,-1d0 /)*GeV    ! min and max for m_4l in off-shell VBF production;   default is (-1,-1): m_4l ~ Higgs resonance (on-shell)
-real(8), public :: m4l_minmax(1:2) = (/ 200d0,14000d0 /)*GeV  ! min and max for m_4l in off-shell VBF production, default is (-1,-1): m_4l ~ Higgs resonance (on-shell)
-real(8) :: MPhotonCutoff = 4d0*GeV                            !minimum mass for offshell photons
+real(8), public :: m4l_minmax(1:2) = (/ -1d0,-1d0 /)*GeV      ! min and max for m_4l in off-shell VBF production;   default is (-1,-1): m_4l ~ Higgs resonance (on-shell)
+real(8), public :: MPhotonCutoff = 4d0*GeV                    ! minimum mass for offshell photons
 !=====================================================
 
 

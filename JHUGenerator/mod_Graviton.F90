@@ -14,7 +14,7 @@
 !----- a subroutinefor gg -> G -> ZZ/WW
 !----- all outgoing convention and the following momentum assignment
 !-----  0 -> g(p1) + g(p2) + e-(p3) + e+(p4) +mu-(p5) +mu+(p6)
-      subroutine EvalAmp_gg_G_VV(p,MY_IDUP,sum)                         ! modify p -> pp
+      subroutine EvalAmp_gg_G_VV(p,MY_IDUP,sum)  
       use ModMisc
       implicit none
       real(dp), intent(out) ::  sum
@@ -34,7 +34,8 @@
       else
          intcolfac=1_dp
       endif
-
+ 
+      
       gZ_sq = 4.0_dp*pi*alpha_QED/4.0_dp/(one-sitW**2)/sitW**2
 
 !---- the 1/Lambda coupling
@@ -76,14 +77,14 @@
                  aL1 = bL * dsqrt(scale_alpha_W_tn)
                  aR1 = bR * dsqrt(scale_alpha_W_tn)! = 0
               else
-                    aL1=0d0
-                    aR1=0d0
+                 aL1=0d0
+                 aR1=0d0
               endif
               prefactor = prefactor *(one/two*M_V*Ga_V)**2
          elseif( IsAPhoton(DecayMode1) ) then !  photon "decay"
               aL1=1d0
               aR1=1d0
-              prefactor = prefactor/gZ_sq**2! cancel the overall z coupling
+              prefactor = prefactor/gZ_sq ! cancel the overall Z/W coupling
          else
               aL1=0d0
               aR1=0d0            
@@ -120,12 +121,13 @@
                  aL2 = bL * dsqrt(scale_alpha_W_tn)
                  aR2 = bR * dsqrt(scale_alpha_W_tn)! = 0
               else
-                    aL2=0d0
-                    aR2=0d0
+                 aL2=0d0
+                 aR2=0d0
               endif
          elseif( IsAPhoton(DecayMode2) ) then !  photon "decay"
               aL2=1d0
-              aR2=1d0  
+              aR2=1d0
+              prefactor = prefactor/gZ_sq ! cancel the overall Z/W coupling
          else
               aL2=0d0
               aR2=0d0
@@ -204,36 +206,32 @@ enddo
           !careful: for gluon gauge invariance check the terms ~c3,c4 are needed because e1.q2 is not zero for e1-->q1
 
 !-------- -1 == left, 1 == right
-         if( .not.IsAPhoton(DecayMode1) ) then 
-!             pin(3,:) = p(:,3)+p(:,4)
-!             pin(4,:) = p(:,5)+p(:,6)
-!             sp(3,:) = pol_dk2mom(dcmplx(p(:,3)),dcmplx(p(:,4)),-3+2*i3)  !e-,e+
-!             sp(4,:) = pol_dk2mom(dcmplx(p(:,5)),dcmplx(p(:,6)),-3+2*i4)  !mu-,mu+ / Q,Qbar
-!             s = 2d0 * scr(p(:,3),p(:,4))
-!             propZ1 = s/dcmplx(s - M_V**2,M_V*Ga_V)
-!             s = 2d0 * scr(p(:,5),p(:,6))
-!             propZ2 = s/dcmplx(s - M_V**2,M_V*Ga_V)
-
+         if( .not.IsAPhoton(DecayMode1) ) then ! ZZ, WW, Z ga
             pin(3,:) = p(:,l1)+p(:,l2)
-            pin(4,:) = p(:,l3)+p(:,l4)
             sp(3,:) = pol_dk2mom(dcmplx(p(:,l1)),dcmplx(p(:,l2)),-3+2*i3)  ! ubar(l1), v(l2)
             sp(3,:) = -sp(3,:) + pin(3,:)*( sc(sp(3,:),dcmplx(pin(3,:))) )/scr(pin(3,:),pin(3,:))! full propagator numerator
-            sp(4,:) = pol_dk2mom(dcmplx(p(:,l3)),dcmplx(p(:,l4)),-3+2*i4)  ! ubar(l3), v(l4)
-            sp(4,:) = -sp(4,:) + pin(4,:)*( sc(sp(4,:),dcmplx(pin(4,:))) )/scr(pin(4,:),pin(4,:))! full propagator numerator
             s = scr(p(:,l1)+p(:,l2),p(:,l1)+p(:,l2))
             propZ1 = s/dcmplx(s - M_V**2,M_V*Ga_V)
-            s = scr(p(:,l3)+p(:,l4),p(:,l3)+p(:,l4))
-            propZ2 = s/dcmplx(s - M_V**2,M_V*Ga_V)
 
-         elseif( IsAPhoton(DecayMode1) ) then 
+            if( .not.IsAPhoton(DecayMode2) ) then
+               pin(4,:) = p(:,l3)+p(:,l4)
+               sp(4,:) = pol_dk2mom(dcmplx(p(:,l3)),dcmplx(p(:,l4)),-3+2*i4)  ! ubar(l3), v(l4)
+               sp(4,:) = -sp(4,:) + pin(4,:)*( sc(sp(4,:),dcmplx(pin(4,:))) )/scr(pin(4,:),pin(4,:))! full propagator numerator
+               s = scr(p(:,l3)+p(:,l4),p(:,l3)+p(:,l4))
+               propZ2 = s/dcmplx(s - M_V**2,M_V*Ga_V)
+            else
+               pin(4,:) = p(:,l3)
+               sp(4,:) = pol_mless2(dcmplx(p(:,l3)),-3+2*i4,'out')  ! photon
+               propZ2=1d0
+            endif
+
+         else !  ga ga
             pin(3,:) = p(:,l1)
-            pin(4,:) = p(:,l3)
             sp(3,:) = pol_mless2(dcmplx(p(:,l1)),-3+2*i3,'out')  ! photon
+            pin(4,:) = p(:,l3)
             sp(4,:) = pol_mless2(dcmplx(p(:,l3)),-3+2*i4,'out')  ! photon
-!            sp(3,1:4)=pin(3,1:4);print *,"  this checks FS gauge invariance"
-!            sp(4,1:4)=pin(4,1:4);print *,"  this checks FS gauge invariance"
-            propz1=1d0
-            propz2=1d0
+            propZ1=1d0
+            propZ2=1d0
          endif
 
          call ggGZZampl(pin,sp,A(1))
@@ -318,13 +316,13 @@ enddo
                  aL1 = bL * dsqrt(scale_alpha_W_tn)
                  aR1 = bR * dsqrt(scale_alpha_W_tn)! = 0
               else
-                    aL1=0d0
-                    aR1=0d0
+                 aL1=0d0
+                 aR1=0d0
               endif
          elseif( IsAPhoton(DecayMode1) ) then !  photon decay
               aL1=1d0
               aR1=1d0
-              prefactor = prefactor/gZ_sq**2! cancel the overall z coupling
+              prefactor = prefactor/gZ_sq ! cancel the overall Z/W coupling
          else
               aL1=0d0
               aR1=0d0            
@@ -361,12 +359,13 @@ enddo
                  aL2 = bL * dsqrt(scale_alpha_W_tn)
                  aR2 = bR * dsqrt(scale_alpha_W_tn)! = 0
               else
-                    aL2=0d0
-                    aR2=0d0
+                 aL2=0d0
+                 aR2=0d0
               endif
          elseif( IsAPhoton(DecayMode2) ) then !  photon decay
               aL2=1d0
               aR2=1d0  
+              prefactor = prefactor/gZ_sq ! cancel the overall Z/W coupling
          else
               aL2=0d0
               aR2=0d0  
@@ -435,11 +434,9 @@ enddo
       l2=ordering(2)
       l3=ordering(3)
       l4=ordering(4)
-
-
+      
       s  = 2d0 * scr(p(:,1),p(:,2))
       propG = s/dcmplx(s - M_Reso**2,M_Reso*Ga_Reso)
-
 
          pin(1,:) = p(:,1)
          pin(2,:) = p(:,2)
@@ -447,36 +444,32 @@ enddo
          sp(2,:) = sp(1,:)  !-- the same, isn't really needed but for uniform bookeeping
 
 !-------- -1 == left, 1 == right
-         if( .not.IsAPhoton(DecayMode1) ) then 
-!             pin(3,:) = p(:,3)+p(:,4)
-!             pin(4,:) = p(:,5)+p(:,6)
-!             sp(3,:) = pol_dk2mom(dcmplx(p(:,3)),dcmplx(p(:,4)),-3+2*i3)  !e-,e+
-!             sp(4,:) = pol_dk2mom(dcmplx(p(:,5)),dcmplx(p(:,6)),-3+2*i4)  !mu-,mu+ / Q,Qbar
-!             s = 2d0 * scr(p(:,3),p(:,4))
-!             propZ1 = s/dcmplx(s - M_V**2,M_V*Ga_V)
-!             s = 2d0 * scr(p(:,5),p(:,6))
-!             propZ2 = s/dcmplx(s - M_V**2,M_V*Ga_V)
-
+         if( .not.IsAPhoton(DecayMode1) ) then ! ZZ, WW, Z ga
             pin(3,:) = p(:,l1)+p(:,l2)
-            pin(4,:) = p(:,l3)+p(:,l4)
             sp(3,:) = pol_dk2mom(dcmplx(p(:,l1)),dcmplx(p(:,l2)),-3+2*i3)  ! ubar(l1), v(l2)
             sp(3,:) = -sp(3,:) + pin(3,:)*( sc(sp(3,:),dcmplx(pin(3,:))) )/scr(pin(3,:),pin(3,:))! full propagator numerator
-            sp(4,:) = pol_dk2mom(dcmplx(p(:,l3)),dcmplx(p(:,l4)),-3+2*i4)  ! ubar(l3), v(l4)
-            sp(4,:) = -sp(4,:) + pin(4,:)*( sc(sp(4,:),dcmplx(pin(4,:))) )/scr(pin(4,:),pin(4,:))! full propagator numerator
             s = scr(p(:,l1)+p(:,l2),p(:,l1)+p(:,l2))
             propZ1 = s/dcmplx(s - M_V**2,M_V*Ga_V)
-            s = scr(p(:,l3)+p(:,l4),p(:,l3)+p(:,l4))
-            propZ2 = s/dcmplx(s - M_V**2,M_V*Ga_V)
 
-         elseif( IsAPhoton(DecayMode1) ) then 
+            if( .not.IsAPhoton(DecayMode2) ) then
+               pin(4,:) = p(:,l3)+p(:,l4)
+               sp(4,:) = pol_dk2mom(dcmplx(p(:,l3)),dcmplx(p(:,l4)),-3+2*i4)  ! ubar(l3), v(l4)
+               sp(4,:) = -sp(4,:) + pin(4,:)*( sc(sp(4,:),dcmplx(pin(4,:))) )/scr(pin(4,:),pin(4,:))! full propagator numerator
+               s = scr(p(:,l3)+p(:,l4),p(:,l3)+p(:,l4))
+               propZ2 = s/dcmplx(s - M_V**2,M_V*Ga_V)
+            else
+               pin(4,:) = p(:,l3)
+               sp(4,:) = pol_mless2(dcmplx(p(:,l3)),-3+2*i4,'out')  ! photon
+               propZ2=1d0
+            endif
+
+         else !  ga ga
             pin(3,:) = p(:,l1)
-            pin(4,:) = p(:,l3)
             sp(3,:) = pol_mless2(dcmplx(p(:,l1)),-3+2*i3,'out')  ! photon
+            pin(4,:) = p(:,l3)
             sp(4,:) = pol_mless2(dcmplx(p(:,l3)),-3+2*i4,'out')  ! photon
-!            sp(3,1:4)=pin(3,1:4);print *,"  this checks FS gauge invariance"
-!            sp(4,1:4)=pin(4,1:4);print *,"  this checks FS gauge invariance"
-            propZ1 = 1d0
-            propZ2 = 1d0
+            propZ1=1d0
+            propZ2=1d0
          endif
 
          call qqGZZampl(pin,sp,A(1))
