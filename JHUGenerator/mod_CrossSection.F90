@@ -9,7 +9,7 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
  
 
  
- 
+  
  ! This function handles weighted and unweighted events for PP-->spin0,1,2-->VV
  FUNCTION EvalWeighted(yRnd,VgsWgt)   
  use ModKinematics                    
@@ -27,12 +27,15 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
  real(8) :: pdf(-6:6,1:2)
  integer :: NBin(1:NumHistograms),NHisto,i,MY_IDUP(1:9), ICOLUP(1:2,1:9),xBin(1:4)
  integer :: NumPartonicChannels,iPartChannel,ijSel(1:121,1:3),PartChannelAvg,flav1,flav2
- real(8) :: EHat,PSWgt,PSWgt2,PSWgt3
+ real(8) :: EHat,PSWgt,PSWgt2,PSWgt3,ML1,ML2,ML3,ML4,MZ1,MZ2
  real(8) :: MomExt(1:4,1:8),MomDK(1:4,1:4),xRnd
  logical :: applyPSCut
  include 'vegas_common.f'   
 
 
+    MomExt(:,:)=0d0
+    MomDK(:,:)=0d0
+    LO_Res_Unpol = 0d0
     EvalWeighted = 0d0
     if( OffShellReson ) then
       call PDFMapping(10,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
@@ -42,17 +45,17 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
     EvalCounter = EvalCounter+1
 
 
-   if( Process.eq.0 ) then 
+   if( Process.eq.0 .or. PChannel.eq.0) then 
       NumPartonicChannels = 1
       iPart_sel = 0
       jPart_sel = 0
-   elseif( Process.eq.1 ) then
+   elseif( Process.eq.1 .or. PChannel.eq.1 ) then
       NumPartonicChannels = 10
       iPartChannel = int(yRnd(12) * (NumPartonicChannels)) +2 ! this runs from 2..11
       call get_PPXchannelHash(ijSel)
       iPart_sel = ijSel(iPartChannel,1)
       jPart_sel = ijSel(iPartChannel,2)
-   elseif( Process.eq.2 ) then
+   elseif( Process.eq.2 .or. PChannel.eq.2 ) then
       NumPartonicChannels = 11
       iPartChannel = int(yRnd(12) * (NumPartonicChannels)) +1 ! this runs from 1..11
       call get_PPXchannelHash(ijSel)
@@ -77,69 +80,104 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
     ICOLUP(1:2,1:9) = 0
     call VVBranchings(MY_IDUP(4:9),ICOLUP(1:2,6:9))
     MY_IDUP(1:3) = 0
-    if( (RandomizeVVdecays.eqv..true.) ) then
-    call random_number(yrnd(17:18))
-    if( (MY_IDUP(6).ne.MY_IDUP(8)) .and. (IsAZDecay(DecayMode1)) .and. (IsAZDecay(DecayMode2)) ) then
-      if( (yrnd(18).le.0.5d0) ) then
-        call swapi(MY_IDUP(4),MY_IDUP(5))
-        call swapi(MY_IDUP(6),MY_IDUP(8))
-        call swapi(MY_IDUP(7),MY_IDUP(9))
-        call swapi(ICOLUP(1,6),ICOLUP(1,8))
-        call swapi(ICOLUP(1,7),ICOLUP(1,9))
-        call swapi(ICOLUP(2,6),ICOLUP(2,8))
-        call swapi(ICOLUP(2,7),ICOLUP(2,9))
-      endif
-    elseif( (IsAWDecay(DecayMode1)) .and. (IsAWDecay(DecayMode2)) ) then
-      if( (yrnd(18).le.0.5d0) ) then
-      MY_IDUP(4) = ChargeFlip(MY_IDUP(4))
-        MY_IDUP(5) = ChargeFlip(MY_IDUP(5))
-        MY_IDUP(6) = ChargeFlip(MY_IDUP(6))
-        MY_IDUP(7) = ChargeFlip(MY_IDUP(7))
-        MY_IDUP(8) = ChargeFlip(MY_IDUP(8))
-        MY_IDUP(9) = ChargeFlip(MY_IDUP(9))      
-        ! if there's a charge flip then the order of particle and anti-particles needs to be flipped, too
-        call swapi(MY_IDUP(6),MY_IDUP(7))
-        call swapi(MY_IDUP(8),MY_IDUP(9))
-      endif 
-      if( (yrnd(17).le.0.5d0) ) then
-        call swapi(MY_IDUP(4),MY_IDUP(5))
-        call swapi(MY_IDUP(6),MY_IDUP(8))
-        call swapi(MY_IDUP(7),MY_IDUP(9))
-        call swapi(ICOLUP(1,6),ICOLUP(1,8))
-        call swapi(ICOLUP(1,7),ICOLUP(1,9))
-        call swapi(ICOLUP(2,6),ICOLUP(2,8))
-        call swapi(ICOLUP(2,7),ICOLUP(2,9))
-      endif
-    endif
+    if( RandomizeVVdecays .and. OffShellV1.eqv.OffShellV2) then
+       call random_number(yrnd(17:18))
+       if( (MY_IDUP(6).ne.MY_IDUP(8)) .and. (IsAZDecay(DecayMode1)) .and. (IsAZDecay(DecayMode2)) ) then
+         if( (yrnd(18).le.0.5d0) ) then
+           call swapi(MY_IDUP(4),MY_IDUP(5))
+           call swapi(MY_IDUP(6),MY_IDUP(8))
+           call swapi(MY_IDUP(7),MY_IDUP(9))
+           call swapi(ICOLUP(1,6),ICOLUP(1,8))
+           call swapi(ICOLUP(1,7),ICOLUP(1,9))
+           call swapi(ICOLUP(2,6),ICOLUP(2,8))
+           call swapi(ICOLUP(2,7),ICOLUP(2,9))
+         endif
+       elseif( (IsAWDecay(DecayMode1)) .and. (IsAWDecay(DecayMode2)) ) then
+         if( (yrnd(18).le.0.5d0) ) then
+           MY_IDUP(4) = ChargeFlip(MY_IDUP(4))
+           MY_IDUP(5) = ChargeFlip(MY_IDUP(5))
+           MY_IDUP(6) = ChargeFlip(MY_IDUP(6))
+           MY_IDUP(7) = ChargeFlip(MY_IDUP(7))
+           MY_IDUP(8) = ChargeFlip(MY_IDUP(8))
+           MY_IDUP(9) = ChargeFlip(MY_IDUP(9))      
+           ! if there's a charge flip then the order of particle and anti-particles needs to be flipped, too
+           call swapi(MY_IDUP(6),MY_IDUP(7))
+           call swapi(MY_IDUP(8),MY_IDUP(9))
+         endif 
+         if( (yrnd(17).le.0.5d0) ) then
+           call swapi(MY_IDUP(4),MY_IDUP(5))
+           call swapi(MY_IDUP(6),MY_IDUP(8))
+           call swapi(MY_IDUP(7),MY_IDUP(9))
+           call swapi(ICOLUP(1,6),ICOLUP(1,8))
+           call swapi(ICOLUP(1,7),ICOLUP(1,9))
+           call swapi(ICOLUP(2,6),ICOLUP(2,8))
+           call swapi(ICOLUP(2,7),ICOLUP(2,9))
+         endif
+       endif ! Do not swap any state with no two identical VV decays! This would break mass determination in EvalPhasespace_H4f.
     endif  
-      
-    if( EHat.lt.100d0*GeV .or. EHat.gt.145d0*GeV) return ! for some reason this removes 3% of the cross section, but significantly improves speed for OffXVV=111 !!
+
+    if(abs(EHat-M_Reso).ge.20.0d0*Ga_Reso) return ! for some reason this removes some of the cross section, but significantly improves speed for OffXVV=111 !!
     if( any(yRnd(4:5).gt.0.99d0) .or. EHat.lt.5d0*GeV ) return ! the cut at 0.99 is required for EvalPhasespace_H4f when interference is turned on. Otherwise, it becomes unstable.
 
-    if( IsAPhoton(DecayMode1) .and. IsAPhoton(DecayMode2) ) then
-        call EvalPhasespace_HVga(yRnd(3:4),EHat,MomExt(1:4,1:8),PSWgt)  !   ga-ga 
-    elseif( .not. IsAPhoton(DecayMode1) .and. IsAPhoton(DecayMode2) ) then
-        call EvalPhasespace_HVga(yRnd(3:7),EHat,MomExt(1:4,1:8),PSWgt)  !    Z-ga
-    else
-        call EvalPhasespace_H4f(yRnd(3),yRnd(4:11),EHat,MomExt(1:4,1:8),PSWgt)  ! VV-->4l
+    call EvalPhasespace_H4f(yRnd(3),yRnd(4:11),EHat,MomExt(1:4,1:8),MY_IDUP(6:9),PSWgt)
+
+    ! Line above can handle Zgam and gamgam as well
+    !if( IsAPhoton(DecayMode1) .and. IsAPhoton(DecayMode2) ) then
+    !   call EvalPhasespace_HVga(yRnd(3:4),EHat,MomExt(1:4,1:8),PSWgt)  !   ga-ga 
+    !elseif( .not. IsAPhoton(DecayMode1) .and. IsAPhoton(DecayMode2) ) then
+    !   call EvalPhasespace_HVga(yRnd(3:7),EHat,MomExt(1:4,1:8),PSWgt)  !    Z-ga
+    !else
+    !   call EvalPhasespace_H4f(yRnd(3),yRnd(4:11),EHat,MomExt(1:4,1:8),PSWgt)  ! VV-->4l
+    !endif
+
+    if(.not.IsAPhoton(DecayMode1)) then
+       ML1 = getMass(MY_IDUP(7))
+       ML2 = getMass(MY_IDUP(6))
+       MZ1 = get_MInv(MomExt(1:4,5)+MomExt(1:4,6))
+       if( (MZ1.lt.ML1+ML2) .or. (MZ1.lt.0.5d0*GeV)) then
+          EvalWeighted = 0d0
+          return
+       endif
+    endif
+    if(.not.IsAPhoton(DecayMode2)) then
+       ML3 = getMass(MY_IDUP(9))
+       ML4 = getMass(MY_IDUP(8))
+       MZ2 = get_MInv(MomExt(1:4,7)+MomExt(1:4,8))
+       if( (MZ2.lt.ML3+ML4) .or. (MZ2.lt.0.5d0*GeV)) then
+          EvalWeighted = 0d0
+          return
+       endif
     endif
 
     call boost2Lab(eta1,eta2,8,MomExt(1:4,1:8))    
 
     call Kinematics(4,MomExt,MomExt(1:4,5:8),applyPSCut,NBin)
     if( applyPSCut  .or. PSWgt.eq.0d0  ) then
-      EvalWeighted = 0d0
-      return
+       EvalWeighted = 0d0
+       return
     endif
 
    call SetRunningScales( (/ (MomExt(1:4,3)+MomExt(1:4,4)),Mom_Not_a_particle(1:4),Mom_Not_a_particle(1:4) /) , (/ Not_a_particle_,Not_a_particle_,Not_a_particle_,Not_a_particle_ /) )
    call EvalAlphaS()
-   FluxFac = 1d0/(2d0*EHat**2)
-
    call setPDFs(eta1,eta2,pdf)
+
+   FluxFac = 1d0/(2d0*EHat**2)
    PDFFac = pdf(LHA2M_pdf(iPart_sel),1)  *  pdf(LHA2M_pdf(jPart_sel),2)
+   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * PDFFac * VgsWgt * PartChannelAvg
+   if( abs(MY_IDUP(6)).ge.1 .and. abs(MY_IDUP(6)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
+   if( abs(MY_IDUP(8)).ge.1 .and. abs(MY_IDUP(8)).le.6 ) PreFac = PreFac * 3d0 ! =Nc     
    
-   if (PChannel.eq.0.or.PChannel.eq.2) then
+   !print *,"Mom1: ",MomExt(1:4,1)
+   !print *,"Mom2: ",MomExt(1:4,2)
+   !print *,"Mom3: ",MomExt(1:4,3)
+   !print *,"Mom4: ",MomExt(1:4,4)
+   !print *,"Mom5: ",MomExt(1:4,5)
+   !print *,"Mom6: ",MomExt(1:4,6)
+   !print *,"Mom7: ",MomExt(1:4,7)
+   !print *,"Mom8: ",MomExt(1:4,8)
+   !print *,"iPart, jPart: ",iPart_sel,jPart_sel
+
+   if ( PChannel.eq.0 .or.(PChannel.eq.2 .and. iPart_sel.eq.0 .and. jPart_sel.eq.0)) then
       if (Process.eq.0) then
           call EvalAmp_gg_H_VV( (/-MomExt(1:4,1),-MomExt(1:4,2),MomExt(1:4,5),MomExt(1:4,6),MomExt(1:4,7),MomExt(1:4,8)/),MY_IDUP(6:9),LO_Res_Unpol)
       elseif(Process.eq.2) then
@@ -150,38 +188,32 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
       ICOLUP(1:2,2) = (/502,501/)
       
       LO_Res_Unpol = LO_Res_Unpol * SpinAvg * GluonColAvg**2
-      PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * PDFFac * VgsWgt * PartChannelAvg
-      if( abs(MY_IDUP(6)).ge.1 .and. abs(MY_IDUP(6)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
-      if( abs(MY_IDUP(8)).ge.1 .and. abs(MY_IDUP(8)).le.6 ) PreFac = PreFac * 3d0 ! =Nc     
-      EvalWeighted = LO_Res_Unpol * PreFac
-    endif
-
-   if (PChannel.eq.1.or.PChannel.eq.2) then
+      !print *,"LO_Res_Unpol gg:",LO_Res_Unpol
+   elseif (PChannel.eq.1.or.PChannel.eq.2) then
       if( Process.eq.1 .and. iPart_sel.gt.0d0 ) then
           call EvalAmp_qqb_Zprime_VV((/-MomExt(1:4,1),-MomExt(1:4,2),MomExt(1:4,5),MomExt(1:4,6),MomExt(1:4,7),MomExt(1:4,8)/),MY_IDUP(6:9),LO_Res_Unpol)
           ICOLUP(1:2,1) = (/501,000/)
           ICOLUP(1:2,2) = (/000,501/)  
       elseif( Process.eq.1 .and. iPart_sel.lt.0d0 ) then
           call EvalAmp_qqb_Zprime_VV((/-MomExt(1:4,2),-MomExt(1:4,1),MomExt(1:4,5),MomExt(1:4,6),MomExt(1:4,7),MomExt(1:4,8)/),MY_IDUP(6:9),LO_Res_Unpol)
-          ICOLUP(1:2,1) = (/0,502/)
-          ICOLUP(1:2,2) = (/502,0/)          
+          ICOLUP(1:2,1) = (/000,502/)
+          ICOLUP(1:2,2) = (/502,000/)          
       elseif( Process.eq.2 .and. iPart_sel.gt.0d0 ) then
           call EvalAmp_qqb_G_VV((/-MomExt(1:4,1),-MomExt(1:4,2),MomExt(1:4,5),MomExt(1:4,6),MomExt(1:4,7),MomExt(1:4,8)/),MY_IDUP(6:9),LO_Res_Unpol)
           ICOLUP(1:2,1) = (/501,000/)
           ICOLUP(1:2,2) = (/000,501/)            
       elseif( Process.eq.2 .and. iPart_sel.lt.0d0 ) then
           call EvalAmp_qqb_G_VV((/-MomExt(1:4,2),-MomExt(1:4,1),MomExt(1:4,5),MomExt(1:4,6),MomExt(1:4,7),MomExt(1:4,8)/),MY_IDUP(6:9),LO_Res_Unpol)
-          ICOLUP(1:2,1) = (/0,502/)
-          ICOLUP(1:2,2) = (/502,0/)                    
+          ICOLUP(1:2,1) = (/000,502/)
+          ICOLUP(1:2,2) = (/502,000/)                    
       endif
       MY_IDUP(1:2)=(/LHA2M_pdf(iPart_sel),LHA2M_pdf(jPart_sel)/)
 
-      LO_Res_Unpol = LO_Res_Unpol * SpinAvg * QuarkColAvg**2 * PDFFac
-      PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * VgsWgt * PartChannelAvg
-      if( abs(MY_IDUP(6)).ge.1 .and. abs(MY_IDUP(6)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
-      if( abs(MY_IDUP(8)).ge.1 .and. abs(MY_IDUP(8)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
-      EvalWeighted = LO_Res_Unpol * PreFac
+      LO_Res_Unpol = LO_Res_Unpol * SpinAvg * QuarkColAvg**2
+      !print *,"LO_Res_Unpol qq:",LO_Res_Unpol
    endif
+
+   EvalWeighted = LO_Res_Unpol * PreFac
 
    if( WidthScheme.ne.2 .and. Process.eq.0 ) EvalWeighted = EvalWeighted * ReweightBWPropagator( Get_MInv2( MomExt(1:4,3)+MomExt(1:4,4) ) )
 
@@ -211,8 +243,18 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
            call intoHisto(NHisto,NBin(NHisto),1d0)
          enddo
          
-         call ShiftMass(MomExt(1:4,5),MomExt(1:4,6), GetMass(MY_IDUP(7)),GetMass(MY_IDUP(6)),  MomDK(1:4,1),MomDK(1:4,2) )
-         call ShiftMass(MomExt(1:4,7),MomExt(1:4,8), GetMass(MY_IDUP(9)),GetMass(MY_IDUP(8)),  MomDK(1:4,3),MomDK(1:4,4) )
+         if(.not.IsAPhoton(DecayMode1)) then
+           call ShiftMass(MomExt(1:4,5),MomExt(1:4,6), GetMass(MY_IDUP(7)),GetMass(MY_IDUP(6)),  MomDK(1:4,1),MomDK(1:4,2) )
+         else
+           MomDK(:,1)=MomExt(:,5)
+           MomDK(:,2)=MomExt(:,6)
+         endif
+         if(.not.IsAPhoton(DecayMode2)) then
+           call ShiftMass(MomExt(1:4,7),MomExt(1:4,8), GetMass(MY_IDUP(9)),GetMass(MY_IDUP(8)),  MomDK(1:4,3),MomDK(1:4,4) )
+         else
+           MomDK(:,3)=MomExt(:,7)
+           MomDK(:,4)=MomExt(:,8)
+         endif
          call WriteOutEvent((/MomExt(1:4,1),MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(1:9),ICOLUP(1:2,1:9))
 
 
@@ -250,11 +292,12 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
 
    else! weighted
 
+   
       if( EvalWeighted.ne.0d0 ) then
         AccepCounter=AccepCounter+1
         if( writeWeightedLHE .and. (.not. warmup) ) then
-            call ShiftMass(MomExt(1:4,5),MomExt(1:4,6), GetMass(MY_IDUP(7)),GetMass(MY_IDUP(6)),  MomDK(1:4,1),MomDK(1:4,2) )
-            call ShiftMass(MomExt(1:4,7),MomExt(1:4,8), GetMass(MY_IDUP(9)),GetMass(MY_IDUP(8)),  MomDK(1:4,3),MomDK(1:4,4) )        
+            if(.not.IsAPhoton(DecayMode1)) call ShiftMass(MomExt(1:4,5),MomExt(1:4,6), GetMass(MY_IDUP(7)),GetMass(MY_IDUP(6)),  MomDK(1:4,1),MomDK(1:4,2) )
+            if(.not.IsAPhoton(DecayMode2)) call ShiftMass(MomExt(1:4,7),MomExt(1:4,8), GetMass(MY_IDUP(9)),GetMass(MY_IDUP(8)),  MomDK(1:4,3),MomDK(1:4,4) )        
             call WriteOutEvent((/MomExt(1:4,1),MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(1:9),ICOLUP(1:2,1:9),EventWeight=EvalWeighted)
         endif
         do NHisto=1,NumHistograms-3
@@ -650,39 +693,39 @@ include 'csmaxvalue.f'
 !                                                            50/50%              48/52%         52/48%               48%                52%
 
 
-   if( (RandomizeVVdecays.eqv..true.) ) then
-   if( (MY_IDUP(6).ne.MY_IDUP(8)) .and. (IsAZDecay(DecayMode1)) .and. (IsAZDecay(DecayMode2)) ) then
-     if( (yrnd(18).le.0.5d0) ) then
-      call swapi(MY_IDUP(4),MY_IDUP(5))
-      call swapi(MY_IDUP(6),MY_IDUP(8))
-      call swapi(MY_IDUP(7),MY_IDUP(9))
-      call swapi(ICOLUP(1,6),ICOLUP(1,8))
-      call swapi(ICOLUP(1,7),ICOLUP(1,9))
-      call swapi(ICOLUP(2,6),ICOLUP(2,8))
-      call swapi(ICOLUP(2,7),ICOLUP(2,9))
-     endif
-  elseif( (IsAWDecay(DecayMode1)) .and. (IsAWDecay(DecayMode2)) ) then
-     if( (yrnd(18).le.0.5d0) ) then
-     MY_IDUP(4) = ChargeFlip(MY_IDUP(4))
-      MY_IDUP(5) = ChargeFlip(MY_IDUP(5))
-      MY_IDUP(6) = ChargeFlip(MY_IDUP(6))
-      MY_IDUP(7) = ChargeFlip(MY_IDUP(7))
-      MY_IDUP(8) = ChargeFlip(MY_IDUP(8))
-      MY_IDUP(9) = ChargeFlip(MY_IDUP(9))      
-      ! if there's a charge flip then the order of particle and anti-particles needs to be flipped, too
-      call swapi(MY_IDUP(6),MY_IDUP(7))
-      call swapi(MY_IDUP(8),MY_IDUP(9))
-     endif 
-     if( (yrnd(17).le.0.5d0) ) then
-      call swapi(MY_IDUP(4),MY_IDUP(5))
-      call swapi(MY_IDUP(6),MY_IDUP(8))
-      call swapi(MY_IDUP(7),MY_IDUP(9))
-      call swapi(ICOLUP(1,6),ICOLUP(1,8))
-      call swapi(ICOLUP(1,7),ICOLUP(1,9))
-      call swapi(ICOLUP(2,6),ICOLUP(2,8))
-      call swapi(ICOLUP(2,7),ICOLUP(2,9))
-     endif
-  endif
+   if( RandomizeVVdecays .and. OffShellV1.eqv.OffShellV2 ) then
+      if( (MY_IDUP(6).ne.MY_IDUP(8)) .and. (IsAZDecay(DecayMode1)) .and. (IsAZDecay(DecayMode2)) ) then
+        if( (yrnd(18).le.0.5d0) ) then
+         call swapi(MY_IDUP(4),MY_IDUP(5))
+         call swapi(MY_IDUP(6),MY_IDUP(8))
+         call swapi(MY_IDUP(7),MY_IDUP(9))
+         call swapi(ICOLUP(1,6),ICOLUP(1,8))
+         call swapi(ICOLUP(1,7),ICOLUP(1,9))
+         call swapi(ICOLUP(2,6),ICOLUP(2,8))
+         call swapi(ICOLUP(2,7),ICOLUP(2,9))
+        endif
+     elseif( (IsAWDecay(DecayMode1)) .and. (IsAWDecay(DecayMode2)) ) then
+        if( (yrnd(18).le.0.5d0) ) then
+         MY_IDUP(4) = ChargeFlip(MY_IDUP(4))
+         MY_IDUP(5) = ChargeFlip(MY_IDUP(5))
+         MY_IDUP(6) = ChargeFlip(MY_IDUP(6))
+         MY_IDUP(7) = ChargeFlip(MY_IDUP(7))
+         MY_IDUP(8) = ChargeFlip(MY_IDUP(8))
+         MY_IDUP(9) = ChargeFlip(MY_IDUP(9))      
+         ! if there's a charge flip then the order of particle and anti-particles needs to be flipped, too
+         call swapi(MY_IDUP(6),MY_IDUP(7))
+         call swapi(MY_IDUP(8),MY_IDUP(9))
+        endif 
+        if( (yrnd(17).le.0.5d0) ) then
+         call swapi(MY_IDUP(4),MY_IDUP(5))
+         call swapi(MY_IDUP(6),MY_IDUP(8))
+         call swapi(MY_IDUP(7),MY_IDUP(9))
+         call swapi(ICOLUP(1,6),ICOLUP(1,8))
+         call swapi(ICOLUP(1,7),ICOLUP(1,9))
+         call swapi(ICOLUP(2,6),ICOLUP(2,8))
+         call swapi(ICOLUP(2,7),ICOLUP(2,9))
+        endif
+     endif ! Do not swap for VV'
   endif  
   
   yz1 = yRnd(10)

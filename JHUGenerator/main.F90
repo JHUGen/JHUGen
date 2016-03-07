@@ -226,7 +226,7 @@ use ModKinematics
 use ModMisc
 implicit none
 character :: arg*(500)
-integer :: NumArgs,NArg,OffShell_XVV
+integer :: NumArgs,NArg
 logical :: help, success, SetLastArgument, interfSet
 logical :: SetRenScheme, SetMuRenMultiplier, SetFacScheme, SetMuFacMultiplier
 logical :: SetAnomalousSpin0gg, Setghg2, SetAnomalousSpin0ZZ, Setghz1
@@ -271,7 +271,12 @@ logical :: SetAnomalousHff, Setkappa
    TauDecays=-1
    Process = 0   ! select 0, 1 or 2 to represent the spin of the resonance
    Unweighted =.true.
-   OffShell_XVV=011! 000: X,V1,V2 on-shell; 010: X,V2 on-shell, V1 off-shell; and so on
+
+   ! Old OffXVV flag is disabled
+   OffShellReson=.true.
+   OffShellV1=.true.
+   OffShellV2=.true.
+
    LHEProdFile=""
    ReadLHEFile=.false.
    ConvertLHEFile=.false.
@@ -371,7 +376,7 @@ logical :: SetAnomalousHff, Setkappa
     if( SetLastArgument ) PrintPMZZ = PrintPMZZ*GeV !PrintPMZZ is a complex(8), the real and imaginary parts are the minimum and maximum values to print
     call ReadCommandLineArgument(arg, "PrintPMZZIntervals", success, PrintPMZZIntervals)
     call ReadCommandLineArgument(arg, "PMZZEvals", success, PMZZEvals)
-    call ReadCommandLineArgument(arg, "OffXVV", success, OffShell_XVV)
+    call ReadCommandLineArgument(arg, "OffshellX", success, OffShellReson)
     call ReadCommandLineArgument(arg, "FilterNLept", success, RequestNLeptons)
     call ReadCommandLineArgument(arg, "FilterOSPairs", success, RequestOS)
     call ReadCommandLineArgument(arg, "FilterOSSFPairs", success, RequestOSSF)
@@ -552,27 +557,6 @@ logical :: SetAnomalousHff, Setkappa
     if (Process.eq.0) PChannel = 0   !only gluons
     if (Process.eq.1 .or. Process.eq.50 .or. Process.eq.60 .or. Process.eq.66) PChannel = 1   !only quarks
 
-    !OffXVV
-
-    if(OffShell_XVV.ge.100) then
-        OffShell_XVV=OffShell_XVV-100
-        OffShellReson=.true.
-    else
-        OffShellReson=.false.
-    endif
-    if(OffShell_XVV.ge.10) then
-        OffShell_XVV=OffShell_XVV-10
-        OffShellV1=.true.
-    else
-        OffShellV1=.false.
-    endif
-    if(OffShell_XVV.ge.1) then
-        OffShell_XVV=OffShell_XVV-1
-        OffShellV2=.true.
-    else
-        OffShellV2=.false.
-    endif
-
     !LHAPDF
 
 #if useLHAPDF==1
@@ -668,63 +652,51 @@ logical :: SetAnomalousHff, Setkappa
         includeGammaStar = Setgammagammacoupling
     endif
 
-    if( IsAZDecay(DecayMode1) .and. IsAWDecay(DecayMode2) ) then
-       print *, " DecayMode1=",DecayMode1," and DecayMode2=",DecayMode2," are not allowed."
-       stop 1
-    endif
-
-!     if( IsAZDecay(DecayMode1) .and. IsAPhoton(DecayMode2) ) then
-!        print *, " DecayMode1=",DecayMode1," and DecayMode2=",DecayMode2," are not allowed."
-!        stop
-!     endif
-
-    if( IsAWDecay(DecayMode1) .and. IsAZDecay(DecayMode2) ) then
-       print *, " DecayMode1=",DecayMode1," and DecayMode2=",DecayMode2," are not allowed."
-       stop 1
-    endif
-
-    if( (IsAWDecay(DecayMode1) .and. IsAPhoton(DecayMode2)) .or. (IsAPhoton(DecayMode1) .and. IsAWDecay(DecayMode2)) ) then
-       print *, " DecayMode1=",DecayMode1," and DecayMode2=",DecayMode2," are not allowed."
-       stop 1
-    endif
-
-    if( IsAPhoton(DecayMode1) .and. (IsAZDecay(DecayMode2) .or. IsAWDecay(DecayMode2)) ) then
-       print *, " DecayMode1=",DecayMode1," and DecayMode2=",DecayMode2," are not allowed."
-       print *, " Please try swapping the decay modes."
-       stop 1
-    endif
-
-    if( IsAPhoton(DecayMode2) .and. (IsAZDecay(DecayMode1) .or. IsAWDecay(DecayMode1)) ) then! require OffXVV=010 for Z+photon
-       if( .not. ((.not.OffShellReson) .and. OffShellV1 .and. (.not.OffShellV2)) ) then
-          print *, "OffXVV has to be 010 for Z+photon production"
-          stop 1
-       endif
-    endif
-
-    if( IsAPhoton(DecayMode2) .and. (.not.IsAPhoton(DecayMode1) .and. .not. IsAZDecay(DecayMode1)) ) then
-       print *, "DecayMode1=",DecayMode1," and DecayMode2=",DecayMode2," are not allowed."
-       stop 1
-    endif
-
-    if( IsAPhoton(DecayMode1) .and. (OffShellV1 .or. OffShellV2) ) then
-       print *, "Photons have to be on-shell."
-       stop 1
-    endif
-
-    if( IsAZDecay(DecayMode1) .and. IsAPhoton(DecayMode2) .and. .not.SetZgammacoupling .and. .not.Setgammagammacoupling ) then
-        print *, "To decay to Zgamma, you need to set one of the HZgamma (ghzgs*) or Hgammagamma (ghgsgs*) couplings."
-        stop 1
-    endif
-
-    if( IsAPhoton(DecayMode1) .and. IsAPhoton(DecayMode2) .and. .not.Setgammagammacoupling ) then
-        print *, "To decay to gammagamma, you need to set one of the Hgammagamma couplings (ghgsgs*)."
-        stop 1
-    endif
 
     if( (DecayMode1.ge.12) .or. (DecayMode2.ge.12) .or. (DecayMode1.lt..0) .or. (DecayMode2.lt.0) ) then
+       print *," DecayMode1=",DecayMode1," and DecayMode2=",DecayMode2," are not allowed."
+       stop 1
+    endif
+
+    if( &
+        ( IsAWDecay(DecayMode1).and.(IsAZDecay(DecayMode2).or.IsAPhoton(DecayMode2)) ) .or. &
+        ( IsAWDecay(DecayMode2).and.(IsAZDecay(DecayMode1).or.IsAPhoton(DecayMode1)) )     &
+        ) then
        print *, " DecayMode1=",DecayMode1," and DecayMode2=",DecayMode2," are not allowed."
        stop 1
     endif
+
+    if( IsAPhoton(DecayMode1) .and. IsAZDecay(DecayMode2) ) then
+       print *, " DecayMode1=",DecayMode1," and DecayMode2=",DecayMode2," are not allowed. Swapping the decay modes."
+       DecayMode1 = DecayMode1 + DecayMode2
+       DecayMode2 = DecayMode1 - DecayMode2
+       DecayMode1 = DecayMode1 - DecayMode2
+    endif
+
+
+    if( IsAZDecay(DecayMode1) .and. IsAPhoton(DecayMode2) .and. .not.SetZgammacoupling .and. .not.Setgammagammacoupling .and. (Process.eq.0)) then
+        print *, "To decay the resonance to Z+photon, you need to set one of the HZgamma (ghzgs*) or Hgammagamma (ghgsgs*) couplings."
+        stop 1
+    endif
+
+    if( IsAPhoton(DecayMode1) .and. IsAPhoton(DecayMode2) .and. .not.Setgammagammacoupling .and. (Process.eq.0)) then
+        print *, "To decay the resonance to photon+photon, you need to set one of the Hgammagamma (ghgsgs*) couplings."
+        stop 1
+    endif
+
+    !---------------------------------------!
+    !           Set OffShellV1/V2           !
+    !---------------------------------------!
+    if( IsAPhoton(DecayMode2) .and. IsAZDecay(DecayMode1) ) then ! require OffXVV=*10 for Z+photon
+       print *,"Z is off-shell and photon is on-shell in Z+photon production."
+       print *,"Randomization of the order of writing of the decay products to the LHE file is disabled."
+       RandomizeVVdecays = .false.
+    elseif( IsAPhoton(DecayMode2) .and. IsAPhoton(DecayMode1) ) then ! require OffXVV=*00 for photon+photon
+       print *,"Both photons are on-shell in photon+photon production."
+    endif
+    OffShellV1=.not.IsAPhoton(DecayMode1)
+    OffShellV2=.not.IsAPhoton(DecayMode2)
+
 
     !lepton filter
 
@@ -1098,7 +1070,7 @@ include "vegas_common.f"
          NDim = NDim + 8
          NDim = NDim + 1
          NDim = NDim + 1
-         if( unweighted ) NDim = NDim + 1  ! random number which decides if event is accepted
+         NDim = NDim + 1
          
          VegasIt1_default = 5
          VegasNc0_default = 10000000
@@ -1628,6 +1600,7 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
 if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) UseBetaVersion=.true.
 if( Process.eq.60 ) UseBetaVersion=.true.
 if( Process.eq.61 ) UseBetaVersion=.true.
+if( Process.eq.66 ) UseBetaVersion=.true.
 
 
 if( UseBetaVersion ) then 
@@ -1649,6 +1622,7 @@ if( UseBetaVersion ) then
         if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) call vegas(EvalWeighted,VG_Result,VG_Error,VG_Chi2)
         if( Process.eq.60 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
         if( Process.eq.61 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
+        if( Process.eq.66 ) call vegas(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
         itmx = 3
     endif
       
@@ -1660,7 +1634,7 @@ if( UseBetaVersion ) then
 !     if( Process.eq.80 ) call vegas(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2) ! adjust to LHE format
 !     if( Process.eq.90 ) call vegas(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.60 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
-!     if( Process.eq.66 ) call vegas(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
+    if( Process.eq.66 ) call vegas1(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.61 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
 !     if( Process.eq.110) call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
 !     if( Process.eq.111) call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)    
@@ -1688,9 +1662,10 @@ if( UseBetaVersion ) then
        call get_PPXchannelHash(ijSel)
     elseif( Process.eq.60 ) then
        call get_VBFchannelHash(ijSel)
-    else
-!        call get_GENchannelHash(ijSel)
+    elseif( Process.eq.61 ) then
        call get_HJJchannelHash(ijSel)
+    else
+       call get_GENchannelHash(ijSel)
     endif
 ! do i=1,121
 !          i1 = ijSel(i,1)
@@ -1766,7 +1741,7 @@ if( UseBetaVersion ) then
 !         if( Process.eq.80 ) call vegas1(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)! adjust to LHE format
     !     if( Process.eq.90 ) call vegas1(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
         if( Process.eq.60 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
-    !     if( Process.eq.66 ) call vegas1(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
+        if( Process.eq.66 ) call vegas1(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
         if( Process.eq.61 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
 !         if( Process.eq.110) call vegas1(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
 !         if( Process.eq.111) call vegas1(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)      
@@ -3543,7 +3518,8 @@ implicit none
 integer :: AllocStatus,NHisto
 
           it_sav = 1
-          NumHistograms = 8
+          NumHistograms =  45!   9;     
+print *, "extending no. of histograms for vbf tests"
           if( .not.allocated(Histo) ) then
                 allocate( Histo(1:NumHistograms), stat=AllocStatus  )
                 if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
@@ -3596,6 +3572,20 @@ integer :: AllocStatus,NHisto
           Histo(8)%BinSize= 10d0*GeV
           Histo(8)%LowVal = 120d0*GeV
           Histo(8)%SetScale= 1d0/GeV
+
+          Histo(9)%Info   = "Phi1"  ! angle between plane of beam-scatterin axis and the lepton plane of Z1 in the resonance rest frame
+          Histo(9)%NBins  = 40
+          Histo(9)%BinSize= 0.078539d0 *2d0
+          Histo(9)%LowVal =-3.14159d0
+          Histo(9)%SetScale= 1d0
+
+do NHisto=10,45
+          Histo(NHisto)%Info   = "sij"
+          Histo(NHisto)%NBins  = 200
+          Histo(NHisto)%BinSize= 2d0*GeV
+          Histo(NHisto)%LowVal = 0d0*GeV
+          Histo(NHisto)%SetScale= 1d0/GeV
+enddo
 ! 
 !           Histo(7)%Info   = "weights"
 !           Histo(7)%NBins  = 50
@@ -4323,7 +4313,7 @@ implicit none
         write(io_stdout,"(4X,A)") "TauDK:      decay mode for taus in H->tautau, 0=stable, 1=decaying (use DecayMode1/2 = 4,5 for W+/W-"
         write(io_stdout,"(4X,A)") "BotDK:      decay mode for bottom quarks in H->bbar, 0=deactivated, 1=activated"
         write(io_stdout,"(4X,A)") "PChannel:   0=g+g, 1=q+qb, 2=both"
-        write(io_stdout,"(4X,A)") "OffXVV:     off-shell option for resonance(X),or vector bosons(VV)"
+        write(io_stdout,"(4X,A)") "OffshellX:     Off-shellness option for resonance (X)"
         write(io_stdout,"(4X,A)") "WidthScheme:1=running width, 2=fixed width (default), 3=complex pole scheme"
 #if useLHAPDF==1
         write(io_stdout,"(4X,A)") "LHAPDF:     name of the LHA PDF file, e.g. NNPDF30_lo_as_0130/NNPDF30_lo_as_0130.info"

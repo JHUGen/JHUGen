@@ -9,7 +9,7 @@ VegasDir = $(Here)/vegas
 
 # compiler options, Comp='ifort' or 'gfort'
 Opt  = Yes
-Comp = gfort
+Comp = ifort
 
 # link pdfs via LHA library ('Yes' or 'No')
 UseLHAPDF=No
@@ -147,6 +147,19 @@ CPSDep = ./CPS/CALLING_cpHTO.f
 
 CPSObj = $(ObjectDir)/CALLING_cpHTO.o 
 
+MCFM_Obj = $(MCFMDir)/anomamp.o \
+           $(MCFMDir)/cdotpr.o \
+           $(MCFMDir)/jtwo3456.o \
+           $(MCFMDir)/jtwo.o \
+           $(MCFMDir)/jzero.o \
+           $(MCFMDir)/qq_ZZqq.o \
+           $(MCFMDir)/setupzprops.o \
+           $(MCFMDir)/spinorcurr.o \
+           $(MCFMDir)/WWZZ.o \
+           $(MCFMDir)/ZZHZZamp.o \
+           $(MCFMDir)/ZZSingleres.o \
+           $(MCFMDir)/jone.o
+
 # MadGraphDep = h_emepemep.f \
 #               h_emepemep_noint.f \
 #               h_tamtaptamtap.f \
@@ -172,7 +185,7 @@ else
 endif
 	@echo " executable file is "$(Exec) "compiled with "$(Comp)
 	@echo " "
-	$(fcomp) -o $(Exec) $(MainObj) $(AmpObj) $(PSGenObj) $(VegasObj) $(PDFObj) $(CPSObj)
+	$(fcomp) -o $(Exec) $(MainObj) $(AmpObj) $(PSGenObj) $(VegasObj) $(PDFObj) $(CPSObj) $(MCFM_Obj)
 
 
 

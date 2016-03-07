@@ -26,7 +26,7 @@ Manual for the JHU generator
 \begin{center}
 \small
 For simulation of a single-produced resonance at hadron colliders \\
-(version v6.8.7, release date Jan. 07, 2016, manual date Jan. 07, 2016) \\
+(version v6.9.1, release date Feb. 25, 2016, manual date Feb. 25, 2016) \\
 \normalsize
 \end{center}
 
@@ -86,7 +86,7 @@ The list of command line configurables and the default values are (also defined 
                          7=gamma, 8=Z->2l+2tau,
                          9=Z->anything, 10=W->lnu+taunu, 11=W->anything
     PChannel:          0=g+g, 1=q+qb, 2=both
-    OffXVV:            off-shell option for resonance(X),or vector bosons(VV)
+    OffshellX:          Off-shellness option for resonance (X) in decay processes 0, 1 or 2
     PDFSet:            1=CTEQ6L1(2001),  2=MSTW(2008),
                                          2xx=MSTW with eigenvector set xx=01..40,
                                          3=NNPDF3.0LO
@@ -136,13 +136,13 @@ A few more details on some particular parameters:
 
 \begin{itemize}
 \item {\verb|VegasNc0,1,2|}: For unweighted event generation \verb|VegasNc0| specifies the number of evaluations for the initial integrand scan.  The actual event generation is controlled by either \verb|VegasNc1| or \verb|VegasNc2|. \verb|VegasNc1| specifies the number of tries in the accept/reject phase and \verb|VegasNc2| is the number of generated events. When generating unweighted events in \verb|ReadLHE| mode, both \verb|VegasNc1| or \verb|VegasNc2| can be used to specify the number of generated events. For the generation of weighted events \verb|VegasNc1| specifies the number of evaluations for each of 5 iterations during the initial integrand scan. \verb|VegasNc2| gives the (approximate) number of generated weighted events.
-\item {\verb|OffXVV|}: The program does not work for $ZZ$ or $WW$ if you set them to be on-shell (\verb|OffXVV="000"|) and the mass of the $X$ resonance to be below the $m_{VV}$ threshold.  In general, the more off-shell the process, or the more "1" you have, the less efficient the \verb|VegasNc1| evaluations are.  Specifically, if you are interested then, in producing a resonance with mass below threshold $m_{VV}$ with a very narrow resonance, it is most efficient to generate with \verb|OffXVV="011"|
+\item {\verb|OffshellX|}: The flag specifies whether the events for processes 0, 1 or 2 feature a delta-function resonance mass (when set to 0) at or a finite-width distribution around the resonance mass (when set to 1). This option replaces the \verb|OffXVV| numerical flag in previous versions.
 \item \verb|PChannel|: This parameter is only meaningful in the spin-2 case and for the $ttH$ and $bbH$ production mechanisms.  For spin-0, production is possible only via the $gg$ process; for spin-1 and for the VBF and $VH$ processes, production is only possible via the $q\bar{q}$ process.  For $H+jj$ and $H+j$, all four parton channels $gg$, $q\bar{q}$, $qg$, and $\bar{q}g$ are included.
 \item \verb|DecayMode1,2=7|: Valid for spin-0 and spin-2.  Only OffXVV=000 or 100 are possible.
 \item In $VH$ production and \verb|ConvertLHE| mode, \verb|DecayMode1| is used for the decay of the $V$.  If it is a $Z$ decay mode, $ZH$ will be produced; if it is a $W$ decay mode, $WH$ will be produced.
 \item In $ttH$ production, \verb|DecayMode1| and \verb|DecayMode2| are used to decay the $W$ bosons from the top decay.  Only $W$ decay modes are allowed.
 \item In $t+H$ production, \verb|DecayMode1| is used to decay the W boson from the top decay.
-\item \verb|Interf|: For final states with 4 same flavor fermions, this parameter controls whether or not to include interference effects.
+\item \verb|Interf|: For final states with 4 same flavor fermions, this parameter controls whether or not to include interference effects. It receives 0 or 1.
 \item \verb|FacScheme|, \verb|MuFacMultiplier|, and \verb|RenScheme|, \verb|MuRenMultiplier|: There are currently 10 different schemes, which set the basis of the scale up to the scale multiplier. A postive integer uses running scales per event whereas a negative one uses a fixed scale, and \verb|MuFacMultiplier| and \verb|MuRenMultiplier| determine the scale multipliers for the factorization and renormalization scales, respectively:
      \begin{itemize}
      \item $\pm0$: $\mu_{F,\,R}$ are set to the default values of each process. The command line values of \verb|MuFacMultiplier| and \verb|MuRenMultiplier| are disregarded.
@@ -199,17 +199,17 @@ Examples of running the generator:
 \begin{itemize}
 \item $gg$ production:
 \begin{verbatim}
-./JHUGen Collider=1 Process=0 VegasNc2=100000 PChannel=0 OffXVV=011 DecayMode1=0 \\
+./JHUGen Collider=1 Process=0 VegasNc2=100000 PChannel=0 DecayMode1=0 \\
 		DecayMode2=0 Unweighted=1 DataFile=ggHZZ4l
 \end{verbatim}
 \item $gg$ production, pseudoscalar resonance:
 \begin{verbatim}
-./JHUGen Collider=1 Process=0 VegasNc2=100000 PChannel=0 OffXVV=011 DecayMode1=0 \\
+./JHUGen Collider=1 Process=0 VegasNc2=100000 PChannel=0 DecayMode1=0 \\
 		DecayMode2=0 Unweighted=1 DataFile=ggHZZ4l_0- ghz1=0,0 ghz4=1,0
 \end{verbatim}
 \item $ggH \to Z\gamma$
 \begin{verbatim}
-./JHUGen DecayMode1=0 DecayMode2=7 OffXVV=010 DataFile=ggHgammaZ2l ghzgs2=1
+./JHUGen DecayMode1=0 DecayMode2=7 DataFile=ggHgammaZ2l ghzgs2=1
 \end{verbatim}
 \item $ZH$ with hadronic $Z$ decay (change \verb|DecayMode1| for other $Z$ decays; both $pp$ and $e^+e^-$ Collider options possible):
 \begin{verbatim}
@@ -223,31 +223,31 @@ Examples of running the generator:
 \end{verbatim}
 \item VBF:
 \begin{verbatim}
-./JHUGen Collider=1 Process=60 Unweighted=1 VegasNc2=100000 OffXVV=011 DataFile=VBF \\
+./JHUGen Collider=1 Process=60 Unweighted=1 VegasNc2=100000 DataFile=VBF \\
 		pTjetcut=0 deltaRcut=0
 \end{verbatim}
 (Jet cuts are generally not needed for VBF production, since there is no divergence.)
 \item $H+jj$:
 \begin{verbatim}
-./JHUGen Collider=1 Process=61 Unweighted=1 VegasNc2=100000 OffXVV=011 DataFile=Hjj
+./JHUGen Collider=1 Process=61 Unweighted=1 VegasNc2=100000 DataFile=Hjj
 \end{verbatim}
 \item $H+j$:
 \begin{verbatim}
-./JHUGen Collider=1 Process=62 Unweighted=1 VegasNc2=100000 OffXVV=011 DataFile=Hj
+./JHUGen Collider=1 Process=62 Unweighted=1 VegasNc2=100000 DataFile=Hj
 \end{verbatim}
 \item $pp \to t\bar{t}+H$ with inclusive top decay (change \verb|DecayMode1,2| for specific $tt$ decays):
 \begin{verbatim}
 ./JHUGen Collider=1 Process=80 DecayMode1=11 DecayMode2=11 Unweighted=1 \\
-		VegasNc2=100000 OffXVV=011 DataFile=ttH
+		VegasNc2=100000 DataFile=ttH
 \end{verbatim}
 \item $pp \to b\bar{b}+H$:
 \begin{verbatim}
-./JHUGen Collider=1 Process=90 Unweighted=1 VegasNc2=100000 OffXVV=011 DataFile=bbH
+./JHUGen Collider=1 Process=90 Unweighted=1 VegasNc2=100000 DataFile=bbH
 \end{verbatim}
 \item $pp \to t+H$, $t$ channel with inclusive top decay (change \verb|DecayMode1| for specific $t$ decays; similar syntax for processes 111--113):
 \begin{verbatim}
 ./JHUGen Collider=1 Process=110 DecayMode1=11 Unweighted=1 \\
-		VegasNc2=100000 OffXVV=011 DataFile=tH_s
+		VegasNc2=100000 DataFile=tH_s
 \end{verbatim}
 \end{itemize}
 
@@ -657,6 +657,13 @@ For the interface, you can also see the beginning declarations in \verb|TVar.hh|
 %%%%%%%%%%%
 
 \section{ Release notes }
+
+\noindent
+In going from \verb|v6.8.7| to \verb|v6.9.1|, the updates are as follows:
+
+\begin{itemize}
+\item The command line \verb|OffXVV| (000-111) is replaced with the command line \verb|OffshellX| (\verb|.true.|/\verb|.false.|)
+\end{itemize}
 
 \noindent
 In going from \verb|v6.8.4| to \verb|v6.8.7|, the updates are as follows:
