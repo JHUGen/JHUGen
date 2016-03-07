@@ -2,12 +2,13 @@
 !                                     Phys.Rev. D86 (2012) 095031; arXiv:1208.4018 [hep-ph],
 !                                 and Phys.Rev. D89 (2014) 035007; arXiv:1309.4819 [hep-ph].
 PROGRAM JHUGenerator
-use ModParameters
-use ModKinematics
-use ModCrossSection
 #if compiler==1
 use ifport
 #endif
+use ModCrossSection
+use ModKinematics
+use ModParameters
+use ModPMZZ
 implicit none
 real(8) :: VG_Result,VG_Error
 
@@ -32,8 +33,8 @@ real(8) :: VG_Result,VG_Error
         call StartConvertLHE(VG_Result,VG_Error)
    elseif( ReadLHEFile ) then
         call StartReadLHE_NEW(VG_Result,VG_Error)
-   elseif( CalcPMZZ ) then
-        call GetMZZdistribution()
+   elseif( DoPrintPMZZ ) then
+        call PrintMZZdistribution()
    else
         if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 .or. Process.eq.80 .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.66 .or. Process.eq.90 .or. &
             Process.eq.110 .or. Process.eq.111 .or. Process.eq.112 .or. Process.eq.113 ) then
@@ -264,7 +265,8 @@ logical :: SetAnomalousHff, Setkappa
 ! !       DecayMode=10: W --> l nu_l (l=e,mu,tau)
 ! !       DecayMode=11: W --> anything
 
-   WidthScheme=0
+   WidthScheme=-1
+   WidthSchemeIn=-1
    TopDecays=-1
    TauDecays=-1
    Process = 0   ! select 0, 1 or 2 to represent the spin of the resonance
@@ -279,7 +281,10 @@ logical :: SetAnomalousHff, Setkappa
    ReadLHEFile=.false.
    ConvertLHEFile=.false.
    ReadCSmax=.false.
-   CalcPMZZ = .false.
+   ReadPMZZ = .false.
+   PMZZEvals=-1
+   DoPrintPMZZ = .false.
+   PrintPMZZIntervals = 20
    GenerateEvents=.false.
    RequestNLeptons = -1
    RequestOS=-1
@@ -363,7 +368,14 @@ logical :: SetAnomalousHff, Setkappa
     call ReadCommandLineArgument(arg, "MuRenMultiplier", success, MuRenMultiplier, success2=SetMuRenMultiplier)
     call ReadCommandLineArgument(arg, "TopDK", success, TopDecays)
     call ReadCommandLineArgument(arg, "TauDK", success, TauDecays)
+    call ReadCommandLineArgument(arg, "ReweightDecay", success, ReweightDecay)
     call ReadCommandLineArgument(arg, "WidthScheme", success, WidthScheme)
+    call ReadCommandLineArgument(arg, "WidthSchemeIn", success, WidthSchemeIn)
+    call ReadCommandLineArgument(arg, "ReadPMZZ", success, ReadPMZZ)
+    call ReadCommandLineArgument(arg, "PrintPMZZ", success, PrintPMZZ, SetLastArgument, success2=DoPrintPMZZ)
+    if( SetLastArgument ) PrintPMZZ = PrintPMZZ*GeV !PrintPMZZ is a complex(8), the real and imaginary parts are the minimum and maximum values to print
+    call ReadCommandLineArgument(arg, "PrintPMZZIntervals", success, PrintPMZZIntervals)
+    call ReadCommandLineArgument(arg, "PMZZEvals", success, PMZZEvals)
     call ReadCommandLineArgument(arg, "OffshellX", success, OffShellReson)
     call ReadCommandLineArgument(arg, "FilterNLept", success, RequestNLeptons)
     call ReadCommandLineArgument(arg, "FilterOSPairs", success, RequestOS)
@@ -376,9 +388,9 @@ logical :: SetAnomalousHff, Setkappa
     call ReadCommandLineArgument(arg, "ReadCSmax", success, ReadCSmax)
     call ReadCommandLineArgument(arg, "GenEvents", success, GenerateEvents, SetLastArgument)
     if( SetLastArgument ) Unweighted = .false.
-    call ReadCommandLineArgument(arg, "CalcPMZZ", success, CalcPMZZ)
     call ReadCommandLineArgument(arg, "WriteFailedEvents", success, WriteFailedEvents)
     call ReadCommandLineArgument(arg, "Seed", success, UserSeed)
+    call ReadCommandLineArgument(arg, "WriteGit", success, writegit) !for testing purposes
 
     !anomalous couplings
     !If any anomalous couplings are set, the default ones have to be set explicitly to keep them on or turn them off
@@ -563,7 +575,9 @@ logical :: SetAnomalousHff, Setkappa
 
     !ReadLHE and ConvertLHE
     !MUST HAPPEN BEFORE DETERMINING INTERFERENCE
-    !so that the mass can be read
+    !so that the mass and width can be read
+    !AND BEFORE DEALING WITH WIDTHSCHEMES
+    !so that WidthSchemeIn can be read
 
     if( ReadLHEFile .and. Process.ne.0  ) then
         print *, "ReadLHE option is only allowed for spin-0 resonances"
@@ -691,6 +705,48 @@ logical :: SetAnomalousHff, Setkappa
     endif
     if( RequestNLeptons .lt. 2*RequestOS ) then
         RequestNLeptons = 2*RequestOS
+    endif
+
+    !WidthScheme and reweighting
+    if( (WidthScheme.eq.0 .or. WidthSchemeIn.eq.0) .and. .not.DoPrintPMZZ ) then
+        print *, "WidthScheme=0 removes the propagator entirely!  This generally only makes sense in PrintPMZZ mode."
+        print *, "If you really want to use it anyway, remove this error in main.F90 and recompile."
+        stop 1
+    endif
+    if( .not.ReadLHEFile .and. .not.DoPrintPMZZ ) then
+        if( ReweightDecay .or. WidthSchemeIn.gt.0 ) then
+            call Error("ReweightDecay and WidthSchemeIn only make sense in ReadLHE mode")
+        endif
+        if( WidthScheme.lt.0 ) then
+            WidthScheme = 2
+        endif
+        WidthSchemeIn = WidthScheme
+    else
+        if( WidthSchemeIn.eq.0 .and. ReweightDecay ) then
+            print *, "Can't ReweightDecay for WidthSchemeIn=0"
+            stop 1
+        endif
+        if( WidthScheme.lt.0 .and. WidthSchemeIn.lt.0 ) then
+            if( ReweightDecay ) then
+                print *, "If you want to reweight the decay, you need to specify a width scheme to correct"
+                print *, " for the VV branching fraction/matrix element."
+                stop 1
+            endif
+            WidthScheme = 2
+            WidthSchemeIn = 2
+        elseif( WidthScheme.lt.0 .and. WidthSchemeIn.ge.0 ) then
+            WidthScheme = WidthSchemeIn
+        elseif( WidthScheme.ge.0 .and. WidthSchemeIn.lt.0 ) then
+            WidthSchemeIn = WidthScheme
+        else !both > 0
+            !nothing
+        endif
+    endif
+
+    if( PMZZEvals.lt.0 ) then
+        !more evals for a lower mass Higgs because the integration converges slower there
+        PMZZEvals = int(200000 * (1 + 24*dexp((1d0-m_Reso/(125d0*GeV))*4d0)))
+        if( PMZZEvals.gt.10000000 ) PMZZEvals = 10000000
     endif
 
     !WriteFailedEvents
@@ -2021,6 +2077,30 @@ integer :: i, j, stat
                endif
         endif
 
+        !Read the generated mass shape for reweighting, POWHEG only
+        if (FirstLines(1:7).eq."bwshape") then
+            i = 8
+            do while(FirstLines(i:i).eq." ")
+                i = i+1
+            enddo
+            do while(FirstLines(i:i).ne." ")
+                i = i+1
+            enddo
+            read(FirstLines(8:i),*) j
+            if( WidthSchemeIn.gt.0 .and. j.ne.WidthSchemeIn ) then
+                print *, "WidthSchemeIn is specified to be ", WidthSchemeIn, " but the LHE file says:"
+                print *, FirstLines
+                stop 1
+            elseif( WidthScheme.gt.0 .and. WidthSchemeIn.le.0 .and. j.ne.WidthScheme ) then
+                print *, "WidthScheme is specified to be ", WidthScheme, " but the LHE file says:"
+                print *, FirstLines
+                print "(A,I1,A,I1,A,I1,A,I1)", "If you want to reweight the propagator from ", j, " to ", WidthScheme, " please specify WidthSchemeIn=", j, " WidthScheme=", WidthScheme
+                stop 1
+            endif
+            if( WidthScheme.lt.0 ) read(FirstLines(8:i),*) WidthScheme
+            if( WidthSchemeIn.lt.0 ) read(FirstLines(8:i),*) WidthSchemeIn
+        endif
+
         if( Index(FirstLines, "<event").ne.0 ) FirstEvent=.true.
      enddo
 99   continue
@@ -2098,14 +2178,15 @@ END SUBROUTINE
 SUBROUTINE StartReadLHE_NEW(VG_Result,VG_Error)
 use ModCrossSection
 use ModKinematics
-use ModParameters
 use ModMisc
+use ModParameters
+use ModPMZZ
 implicit none
 include 'csmaxvalue.f'
 integer,parameter :: maxpart=30!=max.part particles in LHE file; this parameter should match the one in WriteOutEvent of mod_Kinematics
 real(8) :: VG_Result,VG_Error,VG_Chi2
 real(8) :: yRnd(1:22),Res,EMcheck(1:4),DecayWeight,DecayWidth,DecayWidth0
-real(8) :: HiggsDK_Mom(1:4,1:13),Ehat,GetMZZProbability
+real(8) :: HiggsDK_Mom(1:4,1:13),Ehat
 real(8) :: MomExt(1:4,1:maxpart),MomHiggs(1:4),Mass(1:maxpart),pH2sq
 integer :: tries, nParticle,  ICOLUP(1:2,1:7+maxpart),LHE_IntExt(1:7+maxpart),HiggsDK_IDUP(1:13),HiggsDK_ICOLUP(1:2,1:13)
 character(len=150) :: InputFmt0,InputFmt1
@@ -2117,7 +2198,6 @@ character(len=160) :: OtherLines
 character(len=160) :: EventLine(0:maxpart)
 integer :: n,stat,iHiggs,VegasSeed,AccepLastPrinted
 character(len=100) :: BeginEventLine
-integer,parameter :: PMZZcalls = 200000
 logical :: Empty
 
 
@@ -2129,12 +2209,11 @@ AccepLastPrinted = 0
 
 call InitReadLHE(BeginEventLine)
 
-     if( TauDecays.lt.0 .and. ReweightDecay ) then
-        print *, " finding P_H4l(m_Reso) with ",1000000," points" 
-        DecayWidth0 = GetMZZProbability(m_Reso,1000000)
-     else
-        DecayWidth0 = 1
+     if( ReweightDecay ) then
+         print *, " finding P_decay(m4l) distribution with ", PMZZEvals, " calls per point"
+         call InitMZZdistribution()
      endif
+     DecayWidth0 = GetMZZProbability(M_Reso,-1d0,.true.)
 
      print *, " finding maximal weight for mZZ=mReso with ",VegasNc0," points"
      VG = zero
@@ -2209,15 +2288,11 @@ call InitReadLHE(BeginEventLine)
 !         accept/reject sampling for H->VV decay contribution
           EHat = pH2sq
           DecayWeight = 0d0
-          if( TauDecays.lt.0 ) then
           
-                if( ReweightDecay ) then
-                    DecayWidth = GetMZZProbability(EHat,PMZZcalls)!  could also be used to determine csmax for this particular event to improve efficiency (-->future work)
-                else
-                    DecayWidth = 1
-                endif
-                WeightScaleAqedAqcd(1) = WeightScaleAqedAqcd(1) *   DecayWidth/DecayWidth0
-                
+          DecayWidth = GetMZZProbability(EHat,-1d0,.true.)!  could also be used to determine csmax for this particular event to improve efficiency (-->future work)
+          WeightScaleAqedAqcd(1) = WeightScaleAqedAqcd(1) * DecayWidth/DecayWidth0
+
+          if( TauDecays.lt.0 ) then
                 do tries=1,5000000
                     call random_number(yRnd)
                     DecayWeight = EvalUnWeighted_DecayToVV(yRnd,.true.,EHat,Res,HiggsDK_Mom(1:4,6:9),HiggsDK_IDUP(1:9),HiggsDK_ICOLUP(1:2,1:9))
@@ -2745,66 +2820,6 @@ call InitReadLHE(BeginEventLine)
 
 RETURN
 END SUBROUTINE
-
-
-
-
-
-SUBROUTINE GetMZZdistribution()
-use ModCrossSection
-use ModParameters
-implicit none
-real(8) :: DecayWeight,DecayWidth,DecayWidth0
-real(8) :: Ehat,GetMZZProbability
-integer :: nscan
-integer,parameter :: nmax=20, Ncalls=200000
-real(8),parameter :: ScanRange=120d0*GeV
-
-
-
-  DecayWidth0 = GetMZZProbability(M_Reso,Ncalls)
-  
-  do nscan=-nmax,+nmax,1
-     
-     EHat = M_Reso+ScanRange*nscan/dble(nmax)
-     DecayWidth = GetMZZProbability(EHat,Ncalls)
-     write(*,"(1F10.5,1PE16.9)") EHat*100d0,DecayWidth/DecayWidth0
-     
-  enddo
-
-RETURN
-END SUBROUTINE
-
-
-
-
-
-
-FUNCTION GetMZZProbability(EHat,Ncalls)
-use ModCrossSection
-use ModParameters
-implicit none
-real(8) :: DecayWeight,yRnd(1:22),Res,GetMZZProbability
-real(8) :: HiggsDK_Mom(1:4,1:13),Ehat
-integer :: HiggsDK_IDUP(1:13),HiggsDK_ICOLUP(1:2,1:13)
-integer :: evals,Ncalls
-integer,parameter :: nmax=20
-real(8),parameter :: ScanRange=120d0*GeV
-
-
-     GetMZZProbability = 0d0     
-     do evals=1,Ncalls
-         call random_number(yRnd)
-         DecayWeight = EvalUnWeighted_DecayToVV(yRnd,.false.,EHat,Res,HiggsDK_Mom(1:4,6:9),HiggsDK_IDUP(1:9),HiggsDK_ICOLUP)
-         GetMZZProbability = GetMZZProbability + DecayWeight
-     enddo
-     GetMZZProbability = GetMZZProbability/dble(evals)
-    
-
-RETURN
-END FUNCTION
-
-
 
 
 
@@ -3692,6 +3707,7 @@ SUBROUTINE InitOutput(CrossSection, CrossSectionError)
 use ModParameters
 implicit none
 
+integer :: exitstatus
 integer :: incoming1, incoming2
 real(8) :: beamenergy1, beamenergy2
 integer :: pdfgup1, pdfgup2, pdfsup1, pdfsup2  !pdfgup is outdated, set to 0.  pdfsup = LHAGLUE code
@@ -3768,6 +3784,19 @@ integer :: stat
         write(io_LHEOutFile ,'(A)') '<!--'
         write(io_LHEOutFile ,'(A,A6,A)') 'Output from the JHUGenerator ',trim(JHUGen_Version),' described in arXiv:1001.3396 [hep-ph],arXiv:1208.4018 [hep-ph],arXiv:1309.4819 [hep-ph]'
 
+        if( writegit ) then
+            write(io_LHEOutFile,'(A)') ""
+            write(io_LHEOutFile,'(A)') "Current git commit:"
+            close(io_LHEOutFile)
+            call system("git rev-parse HEAD >> "//trim(DataFile)//".lhe")
+            call system("! git diff --name-only | grep .", exitstatus)
+            if( exitstatus.ne.0 ) then
+                print *, "can't write git commit to the lhe file with a dirty working tree!"
+                stop 1
+            endif
+            open(unit=io_LHEOutFile,file=trim(DataFile)//'.lhe',form='formatted',access='append',status='old')
+            write(io_LHEOutFile,'(A)') ""
+        endif
         call WriteParameters(io_LHEOutFile)
 
         if( (ReadLHEFile .or. ConvertLHEFile) .and. (importExternal_LHEinit) ) then
@@ -3948,9 +3977,15 @@ character :: arg*(500)
 #if useLHAPDF==1
         write(TheUnit,"(4X,A,A,A,I3)") "LHAPDF set ",trim(LHAPDFString), ", member=",LHAPDFMember
 #else
-        write(TheUnit,"(4X,A,I1)") "PDFSet: ",PDFSet
+        write(TheUnit,"(4X,A,I3)") "PDFSet: ",PDFSet
 #endif
         write(TheUnit,"(4X,A,L)") "Unweighted: ",Unweighted
+    endif
+    if( WidthScheme.ne.WidthSchemeIn ) then
+        write(TheUnit,"(4X,A,I1,A,I1)") "Reweighting propagator from WidthScheme ", WidthSchemeIn, " to WidthScheme ", WidthScheme
+    endif
+    if( ReweightDecay ) then
+        write(TheUnit,"(4X,A,I1)") "Reweighting events using the decay matrix element, using input WidthScheme ", WidthSchemeIn
     endif
     if( Process.le.2 .or. ReadLHEFile ) write(TheUnit,"(4X,A,L)") "Interference: ",includeInterference
     if( (Process.le.2 .or. ReadLHEFile) .and. (IsAZDecay(DecayMode1) .or. IsAZDecay(DecayMode2))  ) write(TheUnit,"(4X,A,L)") "Intermediate off-shell photons: ",includeGammaStar
@@ -4125,7 +4160,7 @@ use ifport   !needed for getpid()
 #endif
 implicit none
 integer, dimension(:), allocatable :: gen_seed
-integer :: n,i,sclock
+integer :: n,i,sclock,getpid
 real :: tmp_real, tmp_real2
 logical :: finished
 
@@ -4285,7 +4320,7 @@ implicit none
         write(io_stdout,"(4X,A)") "BotDK:      decay mode for bottom quarks in H->bbar, 0=deactivated, 1=activated"
         write(io_stdout,"(4X,A)") "PChannel:   0=g+g, 1=q+qb, 2=both"
         write(io_stdout,"(4X,A)") "OffshellX:     Off-shellness option for resonance (X)"
-        write(io_stdout,"(4X,A)") "WidthScheme:0=fixed width, 1=running width, 2=complex pole scheme"
+        write(io_stdout,"(4X,A)") "WidthScheme:1=running width, 2=fixed width (default), 3=complex pole scheme"
 #if useLHAPDF==1
         write(io_stdout,"(4X,A)") "LHAPDF:     name of the LHA PDF file, e.g. NNPDF30_lo_as_0130/NNPDF30_lo_as_0130.info"
         write(io_stdout,"(4X,A)") "LHAPDFMem:  member PDF number, default=0 (best fit)"

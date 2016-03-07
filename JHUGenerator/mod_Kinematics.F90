@@ -3988,42 +3988,65 @@ RETURN
 END SUBROUTINE
 
 
-
-FUNCTION ReweightBWPropagator(shat)! shat is the resonance inv. mass squared
+FUNCTION GetBWPropagator(sHat, scheme)
+use modMisc
 use modParameters
 implicit none
-real(8) :: ReweightBWPropagator,shat
-real(8) :: BreitWigner,BreitWigner_Run,muH,gaH,mubarH,gabarH
+real(8) :: GetBWPropagator,sHat
+real(8) :: mhb, ghb, BigGamma
+integer :: scheme
 
+    if( scheme.eq.1 ) then! running width
+        GetBWPropagator =  1d0/( (sHat-M_Reso**2)**2 + (sHat*Ga_Reso/M_Reso)**2 )
+    elseif( scheme.eq.2 ) then! fixed width
+        GetBWPropagator = 1d0/( (sHat-M_Reso**2)**2 + (M_Reso*Ga_Reso)**2 )
+    elseif( scheme.eq.3 ) then! Passarino's CPS
+        if( mubarH.lt.0 .or. gabarH.lt.0 ) then
+          call CALL_HTO(M_Reso/GeV, m_top/GeV, mhb, ghb)
+          if( IsNaN(mubarH).or.IsNaN(gabarH) ) then
+            print *, "Passarino's CALL_HTO returned a NaN"
+            print *, "gabarH,Ehat)",gabarH,dsqrt(dabs(sHat))/GeV
+            stop 1
+            RETURN
+          endif
+          mhb = mhb*GeV
+          ghb = ghb*GeV
 
-    ReweightBWPropagator = 1d0
-    
-    if( WidthScheme.eq.1) then! running width
-        BreitWigner = 1d0/( (shat-M_Reso**2)**2 + (M_Reso*Ga_Reso)**2 )
-        BreitWigner_Run =  1d0/( (shat-M_Reso**2)**2 + (shat*Ga_Reso/M_Reso)**2 )
-       
-    elseif( WidthScheme.eq.2) then! Passarino'S CPS
-        BreitWigner = 1d0/( (shat-M_Reso**2)**2 + (M_Reso*Ga_Reso)**2 )
+          mubarH = sqrt(mhb**2/(1+(ghb/mhb)**2))
+          gabarH = mubarH/mhb*ghb
+        endif
 
-        call CALL_HTO(dsqrt(dabs(shat))*100d0,m_top*100d0,gabarH,mubarH)
-        if( IsNaN(gabarH) .or. IsNaN(mubarH) ) then
-          print *, "Passarino's CALL_HTO returned a NaN"
-          print *, "gabarH,mubarH,Ehat)",gabarH,mubarH,dsqrt(dabs(shat))*100d0
-          print *, "returning weight 1.0"          
-          ReweightBWPropagator = 1d0
-          RETURN
-        endif       
-        mubarH = mubarH/100d0
-        gabarH = gabarH/100d0
+        GetBWPropagator = 1d0/( (sHat-mubarH**2)**2 + (mubarH*gabarH)**2 )
 
-        muH = dsqrt( mubarH**2/(1d0+(gabarH/mubarH)**2) )
-        gaH = muH/mubarH*gabarH
-        
-        BreitWigner_Run = 1d0 /( (shat-muH**2)**2 + (muH*gaH)**2 )
+        !call HTO_gridHt(dsqrt(dabs(sHat))/GeV,BigGamma)
+        !BigGamma = BigGamma*GeV
+
+        !print *, dsqrt(dabs(sHat))/GeV, gabarH/GeV, BigGamma/GeV
+    elseif( scheme.eq.0 ) then  !remove the propagator completely
+        GetBWPropagator = 1
+    else
+        print *, "Invalid scheme: ", scheme
+        stop 1
     endif
 
+
+RETURN
+END FUNCTION
+
+FUNCTION ReweightBWPropagator(sHat)! sHat is the resonance inv. mass squared
+use modMisc
+use modParameters
+implicit none
+real(8) :: ReweightBWPropagator,sHat
+real(8) :: BreitWigner,BreitWigner_Run
+
+
+     ReweightBWPropagator = 1d0
+     BreitWigner = GetBWPropagator(sHat, 2)
+     BreitWigner_Run = GetBWPropagator(sHat, WidthScheme)
+
     ReweightBWPropagator = BreitWigner_Run/BreitWigner
-    
+
 
 RETURN
 END FUNCTION
