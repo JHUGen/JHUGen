@@ -10,13 +10,13 @@ character(len=6),parameter :: JHUGen_Version="v6.9.2"
 !internal
 integer, public, parameter  :: dp = selected_real_kind(15)
 integer, public :: Collider,PChannel,Process,DecayMode1,DecayMode2,TopDecays,TauDecays
-integer, public :: VegasIt1,VegasNc0,VegasNc1,VegasNc2
+integer, public :: VegasIt1,VegasNc0,VegasNc1,VegasNc2,PMZZEvals
 real(8), public :: Collider_Energy
 integer, public :: FacScheme,RenScheme
 real(8), public :: MuFacMultiplier,MuRenMultiplier
 integer, public :: VegasIt1_default,VegasNc0_default,VegasNc1_default,VegasNc2_default
 integer, public :: NumHistograms,RequestNLeptons,RequestOS,RequestOSSF
-logical, public :: Unweighted,OffShellReson,OffShellV1,OffShellV2,ReadLHEFile,ConvertLHEFile,CalcPMZZ
+logical, public :: Unweighted,OffShellReson,OffShellV1,OffShellV2,ReadLHEFile,ConvertLHEFile,DoPrintPMZZ
 logical, public :: ReadCSmax,GenerateEvents,CountTauAsAny,HasLeptonFilter, FoundHiggsMass, FoundHiggsWidth
 integer, public :: WriteFailedEvents
 logical, public :: FilesOpened = .false.
@@ -50,7 +50,7 @@ integer, public :: LHAPDFMember
 #else
 integer, public :: PDFSet
 #endif
-logical, public :: includeInterference
+logical, public :: includeInterference, writegit
 real(8), public :: M_V,Ga_V
 real(8), public, parameter :: GeV=1d0/100d0 ! we are using units of 100GeV, i.e. Lambda=10 is 1TeV 
 real(8), public, parameter :: percent=1d0/100d0
@@ -67,8 +67,20 @@ integer, public :: Br_W_ll_counter=0
 integer, public :: Br_W_ud_counter=0
 integer, public :: Br_counter(1:5,1:5)=0
 integer, public :: LeptInEvent(0:8) = 0
-logical, public, parameter :: ReweightDecay = .false.
+logical, public :: ReweightDecay = .false.
 integer, public :: UserSeed = 0
+integer, public  :: WidthScheme = 0   ! 1=running BW-width, 2=fixed BW-width (default), 3=Passarino's CPS
+integer, public  :: WidthSchemeIn = 0   ! 1=running BW-width, 2=fixed BW-width (default), 3=Passarino's CPS
+real(8), public :: mubarH = -999d0   !for CPS
+real(8), public :: gabarH = -999d0   !for CPS
+logical, public :: ReadPMZZ
+character(len=500), public :: PMZZfile = "PMZZdistribution.out"
+real(8), public :: PMZZ_mReso = -1d0
+integer, public, parameter :: PMZZsize = 10000
+real(8), public :: PMZZdistribution(1:PMZZsize,1:2)  !huge array, in normal cases will never get near the edge
+integer, public :: PMZZminindex=-1, PMZZmaxindex=-1  !store the largest and smallest values currently used
+complex(8), public :: PrintPMZZ   !real part is the minimum, imaginary part is the maximum
+integer, public :: PrintPMZZIntervals
 !=====================================================
 
 
@@ -95,8 +107,6 @@ real(8), public, parameter :: channels_ratio_fix = 0.25d0   ! desired ratio of  
 logical, public, parameter :: importExternal_LHEinit = .true.
 
 logical, public, parameter :: writeWeightedLHE = .false. 
-
-integer, public            :: WidthScheme    ! 0=fixed BW-width, 1=running BW-width, 2=Passarino's CPS
 
 logical, public            :: RandomizeVVdecays = .true.    ! randomize DecayMode1 and DecayMode2 in H-->VV and TTBAR decays whenever appropriate
 

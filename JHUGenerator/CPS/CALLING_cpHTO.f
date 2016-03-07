@@ -5,7 +5,7 @@
 * Not the program alone but a SUBROUTINE to call the program + the program                *
 *                                                                                         *
 *                                                                                         *
-*     CALL CALL_HTO(mhiggs,mtop,gH)                                                       *
+*     CALL CALL_HTO(mhiggs,mtop,mhb,ghb)                                                  *
 *                                                                                         *
 * REAL*8 mhiggs         |  I - your value for muH                                         *
 * REAL*8 mtop           |  I - your value for m_top                                       *
@@ -5034,8 +5034,7 @@ c      REAL*8 HTO_SSHH,rgh,muc,scalc,x
 *----- Main ---------------------------------------------------------------
 *--------------------------------------------------------------------------
 *
-!       SUBROUTINE HTO_pole(m,gammaH)
-      SUBROUTINE HTO_pole(m,gammaH,mhb) ! MARKUS: added the last argument in accordance with POWHEG
+      SUBROUTINE HTO_pole(m,mhb,ghb)
       USE HTO_masses
       USE HTO_riemann
       USE HTO_sp_fun
@@ -5044,7 +5043,7 @@ c      REAL*8 HTO_SSHH,rgh,muc,scalc,x
       IMPLICIT NONE
 *
       INTEGER i
-      REAL*8 muh,cpgh,gos,mhb,ghb,m,sclaec,expgHi,EWC,ghi,gammaH
+      REAL*8 muh,cpgh,gos,mhb,ghb,m,sclaec,expgHi,EWC,ghi
       REAL*8, dimension(10,2) :: expc
 *
       INTERFACE
@@ -5081,8 +5080,6 @@ c      REAL*8 HTO_SSHH,rgh,muc,scalc,x
       ELSE 
        CALL HTO_GH(muh,cpgh)
       ENDIF
-*
-      gammaH= cpgh
 *
       mhb= sqrt(muh*muh+cpgh*cpgh)
       ghb= mhb/muh*cpgh
@@ -7654,13 +7651,13 @@ c      REAL*8 HTO_SSHH,rgh,muc,scalc,x
 *
 *----------------------------------------------------------------------
 *
-      SUBROUTINE CALL_HTO(mhiggs,mtop,gH,mhb)! MARKUS: added the last argument in accordance with POWHEG
-!       SUBROUTINE CALL_HTO(mhiggs,mtop,gH)
+!Heshy note: I added mhb, copied from POWHEG
+      SUBROUTINE CALL_HTO(mhiggs,mtop,mhb,ghb)
       USE HTO_masses
       USE HTO_aux_Hcp
       USE HTO_puttime
       IMPLICIT NONE
-      REAL*8 mhiggs,mtop,mhb,ghb,gammaH,gH
+      REAL*8 mhiggs,mtop,mhb,ghb
 *
       qcdc= 1
       gtop= 1
@@ -7672,8 +7669,7 @@ c      REAL*8 HTO_SSHH,rgh,muc,scalc,x
 * top-quark mass
 *
       mt= mtop
-      CALL HTO_pole(mhiggs,gammaH,mhb)
-      gH= gammaH
+      CALL HTO_pole(mhiggs,mhb,ghb)
 *
       RETURN
 * 
