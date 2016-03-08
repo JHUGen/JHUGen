@@ -4160,7 +4160,7 @@ use ifport   !needed for getpid()
 #endif
 implicit none
 integer, dimension(:), allocatable :: gen_seed
-integer :: n,i,sclock,getpid
+integer :: n,i,sclock
 real :: tmp_real, tmp_real2
 logical :: finished
 
