@@ -615,6 +615,15 @@ logical :: SetAnomalousHff, Setkappa
     if( (TauDecays.eq.1) .and. .not. IsAWDecay(DecayMode1) ) call Error("Invalid DecayMode1 for tau decays")
     if( (TauDecays.eq.1) .and. .not. IsAWDecay(DecayMode2) ) call Error("Invalid DecayMode2 for tau decays")
 
+    ! Checks on DecayMode1 and 2
+    ! First check!
+    if( IsAPhoton(DecayMode1) .and. IsAZDecay(DecayMode2) ) then
+       print *, " DecayMode1=",DecayMode1," and DecayMode2=",DecayMode2," are not allowed. Swapping the decay modes."
+       DecayMode1 = DecayMode1 + DecayMode2
+       DecayMode2 = DecayMode1 - DecayMode2
+       DecayMode1 = DecayMode1 - DecayMode2
+    endif
+
     if( IsAZDecay(DecayMode1) ) then
        M_V = M_Z
        Ga_V= Ga_Z
@@ -661,13 +670,6 @@ logical :: SetAnomalousHff, Setkappa
         ) then
        print *, " DecayMode1=",DecayMode1," and DecayMode2=",DecayMode2," are not allowed."
        stop 1
-    endif
-
-    if( IsAPhoton(DecayMode1) .and. IsAZDecay(DecayMode2) ) then
-       print *, " DecayMode1=",DecayMode1," and DecayMode2=",DecayMode2," are not allowed. Swapping the decay modes."
-       DecayMode1 = DecayMode1 + DecayMode2
-       DecayMode2 = DecayMode1 - DecayMode2
-       DecayMode1 = DecayMode1 - DecayMode2
     endif
 
 
@@ -760,7 +762,7 @@ logical :: SetAnomalousHff, Setkappa
     if( SetAnomalousSpin0gg .and. .not.Setghg2 ) then
         call Error("If you set an anomalous spin 0 gg coupling, you need to explicitly set ghg2 as well. This couplings is initialized to a non-zero value.")
     endif
-    if( SetAnomalousSpin0ZZ .and. .not.Setghz1 ) then
+    if( .not.Setghz1 .and. OffShellV1 .and. OffShellV2 .and. (SetAnomalousSpin0ZZ .or. ((SetZgammacoupling .or. Setgammagammacoupling) .and. IsAZDecay(DecayMode1)))) then
         call Error("If you set an anomalous spin 0 VV coupling, you need to explicitly set ghz1 as well. This couplings is initialized to a non-zero value.")
     endif
     if( SetAnomalousHff .and. .not.Setkappa ) then
@@ -795,7 +797,7 @@ logical :: SetAnomalousHff, Setkappa
        if (b1.eq.czero .and. b2.eq.czero .and. b3.eq.czero .and. b4.eq.czero .and. b5.eq.czero .and. b6.eq.czero .and. b7.eq.czero .and. b8.eq.czero .and. b9.eq.czero .and. b10.eq.czero) then
           call Error("Spin 2 VV decay cannot be done with zero couplings.")
        endif
-       if ((OffShellV1 .or. OffShellV2) .and. (b5.ne.czero .or. b6.ne.czero .or. b7.ne.czero .or. b9.ne.czero .or. b10.ne.czero)) then
+       if (.not.(OffShellV1 .and. OffShellV2) .and. (b5.ne.czero .or. b6.ne.czero .or. b7.ne.czero .or. b9.ne.czero .or. b10.ne.czero)) then
           call Error("Spin 2 Z+gamma or gamma+gamma decay cannot be done with b5-7 or b9-10.")
        endif
     endif
