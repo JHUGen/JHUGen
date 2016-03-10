@@ -231,8 +231,8 @@ logical :: help, success, SetLastArgument, interfSet
 logical :: SetRenScheme, SetMuRenMultiplier, SetFacScheme, SetMuFacMultiplier
 logical :: SetAnomalousSpin0gg, Setghg2, SetAnomalousSpin0ZZ, Setghz1
 logical :: SetZgammacoupling, Setgammagammacoupling
-logical :: SetAnomalousSpin1qq, Setspin1qqleft, Setspin1qqright, SetAnomalousSpin1ZZ, Set1minus
-logical :: SetAnomalousSpin2gg, Seta2, SetAnomalousSpin2qq, Setspin2qqleft, Setspin2qqright,SetAnomalousSpin2ZZ, Setb2
+logical :: SetAnomalousSpin1qq, Setspin1qqleft, Setspin1qqright, SetAnomalousSpin1ZZ
+logical :: SetAnomalousSpin2gg, SetAnomalousSpin2qq, Setspin2qqleft, Setspin2qqright,SetAnomalousSpin2ZZ
 logical :: SetAnomalousHff, Setkappa
 
    help = .false.
@@ -312,14 +312,11 @@ logical :: SetAnomalousHff, Setkappa
    Setspin1qqleft=.false.
    Setspin1qqright=.false.
    SetAnomalousSpin1ZZ=.false.
-   Set1minus=.false.
    SetAnomalousSpin2gg=.false.
-   Seta2=.false.
    SetAnomalousSpin2qq=.false.
    Setspin2qqleft=.false.
    Setspin2qqright=.false.
    SetAnomalousSpin2ZZ=.false.
-   Setb2=.false.
    SetAnomalousHff=.false.
    Setkappa=.false.
 
@@ -504,19 +501,19 @@ logical :: SetAnomalousHff, Setkappa
     !spin 1
     call ReadCommandLineArgument(arg, "zprime_qq_left", success, zprime_qq_left, success2=SetAnomalousSpin1qq, success3=Setspin1qqleft)
     call ReadCommandLineArgument(arg, "zprime_qq_right", success, zprime_qq_right, success2=SetAnomalousSpin1qq, success3=Setspin1qqright)
-    call ReadCommandLineArgument(arg, "zprime_zz_1", success, zprime_zz_1, success2=SetAnomalousSpin1ZZ, success3=Set1minus)
+    call ReadCommandLineArgument(arg, "zprime_zz_1", success, zprime_zz_1, success2=SetAnomalousSpin1ZZ)
     call ReadCommandLineArgument(arg, "zprime_zz_2", success, zprime_zz_2, success2=SetAnomalousSpin1ZZ)
 
     !spin 2
     call ReadCommandLineArgument(arg, "a1", success, a1, success2=SetAnomalousSpin2gg)
-    call ReadCommandLineArgument(arg, "a2", success, a2, success2=SetAnomalousSpin2gg, success3=Seta2)
+    call ReadCommandLineArgument(arg, "a2", success, a2, success2=SetAnomalousSpin2gg)
     call ReadCommandLineArgument(arg, "a3", success, a3, success2=SetAnomalousSpin2gg)
     call ReadCommandLineArgument(arg, "a4", success, a4, success2=SetAnomalousSpin2gg)
     call ReadCommandLineArgument(arg, "a5", success, a5, success2=SetAnomalousSpin2gg)
     call ReadCommandLineArgument(arg, "graviton_qq_left", success, graviton_qq_left, success2=SetAnomalousSpin2qq, success3=Setspin2qqleft)
     call ReadCommandLineArgument(arg, "graviton_qq_right", success, graviton_qq_right, success2=SetAnomalousSpin2qq, success3=Setspin2qqright)
     call ReadCommandLineArgument(arg, "b1", success, b1, success2=SetAnomalousSpin2ZZ)
-    call ReadCommandLineArgument(arg, "b2", success, b2, success2=SetAnomalousSpin2ZZ, success3=Setb2)
+    call ReadCommandLineArgument(arg, "b2", success, b2, success2=SetAnomalousSpin2ZZ)
     call ReadCommandLineArgument(arg, "b3", success, b3, success2=SetAnomalousSpin2ZZ)
     call ReadCommandLineArgument(arg, "b4", success, b4, success2=SetAnomalousSpin2ZZ)
     call ReadCommandLineArgument(arg, "b5", success, b5, success2=SetAnomalousSpin2ZZ)
@@ -755,31 +752,52 @@ logical :: SetAnomalousHff, Setkappa
         call Error("WriteFailedEvents can only be 0, 1, or 2.  Please see the manual.")
     endif
 
-    !couplings
 
+    !---------------------------------------!
+    !            Check couplings            !
+    !---------------------------------------!
+    ! Spin-0 (incomplete)
     if( SetAnomalousSpin0gg .and. .not.Setghg2 ) then
-        call Error("If you set an anomalous spin 0 gg coupling, you need to explicitly set ghg2 as well")
+        call Error("If you set an anomalous spin 0 gg coupling, you need to explicitly set ghg2 as well. This couplings is initialized to a non-zero value.")
     endif
     if( SetAnomalousSpin0ZZ .and. .not.Setghz1 ) then
-        call Error("If you set an anomalous spin 0 ZZ coupling, you need to explicitly set ghz1 as well")
-    endif
-    if( SetAnomalousSpin1qq .and. .not.(Setspin1qqleft.and.Setspin1qqright) ) then
-        call Error("If you set an anomalous spin 1 qq coupling, you need to set both zprime_qq_left and zprime_qq_right")
-    endif
-    if( SetAnomalousSpin1ZZ .and. .not.Set1minus ) then
-        call Error("If you set an anomalous spin 1 ZZ coupling, you need to explicitly set zprime_zz_1 as well")
-    endif
-    if( SetAnomalousSpin2gg .and. .not.Seta2 ) then
-        call Error("If you set an anomalous spin 2 gg coupling, you need to explicitly set a2 as well")
-    endif
-    if( SetAnomalousSpin2qq .and. .not.(Setspin2qqleft.and.Setspin2qqright) ) then
-        call Error("If you set an anomalous spin 2 qq coupling, you need to explicitly set both graviton_qq_left and graviton_qq_right")
-    endif
-    if( SetAnomalousSpin2ZZ .and. .not.Setb2 ) then
-        call Error("If you set an anomalous spin 2 ZZ coupling, you need to explicitly set b2 as well")
+        call Error("If you set an anomalous spin 0 VV coupling, you need to explicitly set ghz1 as well. This couplings is initialized to a non-zero value.")
     endif
     if( SetAnomalousHff .and. .not.Setkappa ) then
-        call Error("If you set an anomalous Hff coupling, you need to explicitly set kappa as well")
+        call Error("If you set an anomalous Hff coupling, you need to explicitly set kappa as well. This couplings is initialized to a non-zero value.")
+    endif
+
+
+    ! Spin-1
+    if( Process.eq.1) then
+       if( SetAnomalousSpin1qq .and. .not.(Setspin1qqleft.and.Setspin1qqright) ) then
+           call Error("If you set an anomalous spin 1 qq coupling, you need to set both zprime_qq_left and zprime_qq_right.")
+       endif
+       if (zprime_zz_1.eq.czero .and. zprime_zz_2.eq.czero) then
+          call Error("If you set an spin 1 VV coupling, you need to explicitly set zprime_zz_1 (1-) or zprime_zz_2 (1+) non-zero.")
+       endif
+       if (zprime_qq_left.eq.czero .and. zprime_qq_left.eq.czero) then
+          call Error("If you set spin 1 qq couplings, you need to set zprime_qq_left or zprime_qq_right non-zero.")
+       endif
+    endif
+
+    ! Spin-2
+    if( Process.eq.2) then
+       if( SetAnomalousSpin2qq .and. .not.(Setspin2qqleft.and.Setspin2qqright) ) then
+           call Error("If you set an anomalous spin 2 qq coupling, you need to explicitly set both graviton_qq_left and graviton_qq_right.")
+       endif
+       if ((graviton_qq_left.eq.czero .and. graviton_qq_right.eq.czero) .and. PChannel.ne.0) then
+          call Error("In spin 2 qq production, the couplings cannot all be zero. You can use PChannel=0 for gg-only production.")
+       endif
+       if ((a1.eq.czero .and. a2.eq.czero .and. a3.eq.czero .and. a4.eq.czero .and. a5.eq.czero) .and. PChannel.ne.1) then
+          call Error("In spin 2 gg production, the couplings cannot all be zero. You can use PChannel=1 for qq-only production.")
+       endif
+       if (b1.eq.czero .and. b2.eq.czero .and. b3.eq.czero .and. b4.eq.czero .and. b5.eq.czero .and. b6.eq.czero .and. b7.eq.czero .and. b8.eq.czero .and. b9.eq.czero .and. b10.eq.czero) then
+          call Error("Spin 2 VV decay cannot be done with zero couplings.")
+       endif
+       if ((OffShellV1 .or. OffShellV2) .and. (b5.ne.czero .or. b6.ne.czero .or. b7.ne.czero .or. b9.ne.czero .or. b10.ne.czero)) then
+          call Error("Spin 2 Z+gamma or gamma+gamma decay cannot be done with b5-7 or b9-10.")
+       endif
     endif
     if( distinguish_HWWcouplings .and. Process.ne.60 .and. Process.ne.66 ) then
         call Error("The separate HWW couplings are only used for VBF.  For H->WW decay or WH production, please set ghz* instead.")
