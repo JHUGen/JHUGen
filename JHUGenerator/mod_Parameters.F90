@@ -3,7 +3,7 @@ implicit none
 save
 ! 
 ! 
-character(len=6),parameter :: JHUGen_Version="v6.9.2"
+character(len=6),parameter :: JHUGen_Version="v6.9.3"
 ! 
 ! 
 !=====================================================
@@ -342,13 +342,13 @@ real(8), public :: scale_alpha_W_tn = 1d0        ! scaling factor of alpha (~par
 !---parameters that define spin 1 coupling to SM fields, see note
    complex(8), public :: zprime_qq_left  = (1.0d0,0d0)
    complex(8), public :: zprime_qq_right = (1.0d0,0d0)
-   complex(8), public :: zprime_zz_1 =  (1.0d0,0d0)!  =1 for JP=1- vector
+   complex(8), public :: zprime_zz_1 =  (0.0d0,0d0)!  =1 for JP=1- vector
    complex(8), public :: zprime_zz_2 =  (0.0d0,0d0)!  =1 for JP=1+ pseudovector
 
 !-- parameters that define spin 2 coupling to SM fields, see note
 ! minimal coupling corresponds to a1 = b1 = b5 = 1 everything else 0
   complex(8), public :: a1 = (0.0d0,0d0)    ! g1  -- c.f. draft
-  complex(8), public :: a2 = (1.0d0,0d0)    ! g2
+  complex(8), public :: a2 = (0.0d0,0d0)    ! g2
   complex(8), public :: a3 = (0.0d0,0d0)    ! g3
   complex(8), public :: a4 = (0.0d0,0d0)    ! g4
   complex(8), public :: a5 = (0.0d0,0d0)    ! pseudoscalar, g8
@@ -360,7 +360,7 @@ real(8), public :: scale_alpha_W_tn = 1d0        ! scaling factor of alpha (~par
   logical, public, parameter :: use_dynamic_MG = .true.
 
   complex(8), public :: b1 = (0.0d0,0d0)  !  all b' below are g's in the draft
-  complex(8), public :: b2 = (1.0d0,0d0)
+  complex(8), public :: b2 = (0.0d0,0d0)
   complex(8), public :: b3 = (0.0d0,0d0)
   complex(8), public :: b4 = (0.0d0,0d0)
   complex(8), public :: b5 = (0.0d0,0d0)
