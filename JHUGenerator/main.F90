@@ -760,13 +760,13 @@ logical :: SetAnomalousHff, Setkappa
     !---------------------------------------!
     ! Spin-0 (incomplete)
     if( SetAnomalousSpin0gg .and. .not.Setghg2 ) then
-        call Error("If you set an anomalous spin 0 gg coupling, you need to explicitly set ghg2 as well. This couplings is initialized to a non-zero value.")
+        call Error("If you set an anomalous spin 0 gg coupling, you need to explicitly set ghg2 as well. This coupling is initialized to a non-zero value.")
     endif
     if( .not.Setghz1 .and. OffShellV1 .and. OffShellV2 .and. (SetAnomalousSpin0ZZ .or. ((SetZgammacoupling .or. Setgammagammacoupling) .and. IsAZDecay(DecayMode1)))) then
         call Error("If you set an anomalous spin 0 VV coupling, you need to explicitly set ghz1 as well. This couplings is initialized to a non-zero value.")
     endif
     if( SetAnomalousHff .and. .not.Setkappa ) then
-        call Error("If you set an anomalous Hff coupling, you need to explicitly set kappa as well. This couplings is initialized to a non-zero value.")
+        call Error("If you set an anomalous Hff coupling, you need to explicitly set kappa as well. This coupling is initialized to a non-zero value.")
     endif
 
 
@@ -776,10 +776,10 @@ logical :: SetAnomalousHff, Setkappa
            call Error("If you set an anomalous spin 1 qq coupling, you need to set both zprime_qq_left and zprime_qq_right.")
        endif
        if (zprime_zz_1.eq.czero .and. zprime_zz_2.eq.czero) then
-          call Error("If you set an spin 1 VV coupling, you need to explicitly set zprime_zz_1 (1-) or zprime_zz_2 (1+) non-zero.")
+          call Error("For spin 1 production, you need to explicitly set zprime_zz_1 (1-) or zprime_zz_2 (1+) non-zero.")
        endif
-       if (zprime_qq_left.eq.czero .and. zprime_qq_left.eq.czero) then
-          call Error("If you set spin 1 qq couplings, you need to set zprime_qq_left or zprime_qq_right non-zero.")
+       if (zprime_qq_left.eq.czero .and. zprime_qq_right.eq.czero) then
+          call Error("For spin 1 production, zprime_qq_left and zprime_qq_right cannot both be 0.")
        endif
     endif
 
@@ -797,10 +797,16 @@ logical :: SetAnomalousHff, Setkappa
        if (b1.eq.czero .and. b2.eq.czero .and. b3.eq.czero .and. b4.eq.czero .and. b5.eq.czero .and. b6.eq.czero .and. b7.eq.czero .and. b8.eq.czero .and. b9.eq.czero .and. b10.eq.czero) then
           call Error("Spin 2 VV decay cannot be done with zero couplings.")
        endif
+<<<<<<< HEAD
        if (.not.(OffShellV1 .and. OffShellV2) .and. (b5.ne.czero .or. b6.ne.czero .or. b7.ne.czero .or. b9.ne.czero .or. b10.ne.czero)) then
+=======
+       if ((IsAPhoton(DecayMode1) .or. IsAPhoton(DecayMode2)) .and. (b5.ne.czero .or. b6.ne.czero .or. b7.ne.czero .or. b9.ne.czero .or. b10.ne.czero)) then
+>>>>>>> 95f3dcda91e405f93afa079e390de6b803a67915
           call Error("Spin 2 Z+gamma or gamma+gamma decay cannot be done with b5-7 or b9-10.")
        endif
     endif
+
+    ! VBF
     if( distinguish_HWWcouplings .and. Process.ne.60 .and. Process.ne.66 ) then
         call Error("The separate HWW couplings are only used for VBF.  For H->WW decay or WH production, please set ghz* instead.")
     endif
