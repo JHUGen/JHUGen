@@ -47,14 +47,20 @@ test:
     #the actual checking (checklhe) is done in post
     #later is more specific generation with different hypotheses to get plots (which of course have to be checked manually)
 
-    #Should move VH in the other section once we set up the plotting code
-    - ./JHUGen PDFSet=3 Process=1  VegasNc0=100000 VegasNc2=100 DataFile=$CIRCLE_ARTIFACTS/other/spin1_WW DecayMode1=11 DecayMode2=11 zprime_zz_1=1,0
-    - ./JHUGen PDFSet=3 Process=2  VegasNc0=100000 VegasNc2=100 DataFile=$CIRCLE_ARTIFACTS/other/spin2_ZZ DecayMode1=9  DecayMode2=9 a1=1,0 b1=1,0 b5=1,0
+    #gg/qqbar -> spin0/1/2
+    - ./JHUGen PDFSet=3 Process=0  VegasNc0=100000 VegasNc2=100 DataFile=$CIRCLE_ARTIFACTS/other/spin0_Zgamma     DecayMode1=9  DecayMode2=7 ghzgs2=1,0
+    - ./JHUGen PDFSet=3 Process=0  VegasNc0=100000 VegasNc2=100 DataFile=$CIRCLE_ARTIFACTS/other/spin0_gammagamma DecayMode1=7  DecayMode2=7 ghgsgs2=1,0
+    - ./JHUGen PDFSet=3 Process=1  VegasNc0=100000 VegasNc2=100 DataFile=$CIRCLE_ARTIFACTS/other/spin1_WW         DecayMode1=11 DecayMode2=11 zprime_zz_1=1,0
+    - ./JHUGen PDFSet=3 Process=2  VegasNc0=100000 VegasNc2=100 DataFile=$CIRCLE_ARTIFACTS/other/spin2_ZZ         DecayMode1=9  DecayMode2=9 a1=1,0 b1=1,0 b5=1,0
+    - ./JHUGen PDFSet=3 Process=2  VegasNc0=100000 VegasNc2=100 DataFile=$CIRCLE_ARTIFACTS/other/spin2_Zgamma     DecayMode1=9  DecayMode2=7 a1=1,0 b1=1,0
+    - ./JHUGen PDFSet=3 Process=2  VegasNc0=100000 VegasNc2=100 DataFile=$CIRCLE_ARTIFACTS/other/spin2_gammagamma DecayMode1=7  DecayMode2=7 a1=1,0 b1=1,0
+    #ZH
     - ./JHUGen PDFSet=3 Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/other/WH  DecayMode1=11
     - ./JHUGen PDFSet=3 Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/other/ZH  DecayMode1=9
     #- ./JHUGen PDFSet=3 VegasNc0=100000 ConvertLHE=$CIRCLE_ARTIFACTS/other/ZH.lhe DataFile=$CIRCLE_ARTIFACTS/other/ZH_converted.lhe DecayMode1=1
+    #H+J
     - ./JHUGen PDFSet=3 Process=62 VegasNc0=100000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/other/HJ
-    #only generate a few of ttH, bbH, and various tqH, they're slow
+    #ttH, bbH, tH
     - ./JHUGen PDFSet=3 Process=80  VegasNc0=100000 VegasNc2=100 DataFile=$CIRCLE_ARTIFACTS/other/ttH DecayMode1=11 DecayMode2=11 TopDK=1
     - ./JHUGen PDFSet=3 Process=90  VegasNc0=100000 VegasNc2=10  DataFile=$CIRCLE_ARTIFACTS/other/gg_bbH PChannel=0
     - ./JHUGen PDFSet=3 Process=90  VegasNc0=100000 VegasNc2=10  DataFile=$CIRCLE_ARTIFACTS/other/qq_bbH PChannel=1
