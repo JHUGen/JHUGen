@@ -797,11 +797,7 @@ logical :: SetAnomalousHff, Setkappa
        if (b1.eq.czero .and. b2.eq.czero .and. b3.eq.czero .and. b4.eq.czero .and. b5.eq.czero .and. b6.eq.czero .and. b7.eq.czero .and. b8.eq.czero .and. b9.eq.czero .and. b10.eq.czero) then
           call Error("Spin 2 VV decay cannot be done with zero couplings.")
        endif
-<<<<<<< HEAD
        if (.not.(OffShellV1 .and. OffShellV2) .and. (b5.ne.czero .or. b6.ne.czero .or. b7.ne.czero .or. b9.ne.czero .or. b10.ne.czero)) then
-=======
-       if ((IsAPhoton(DecayMode1) .or. IsAPhoton(DecayMode2)) .and. (b5.ne.czero .or. b6.ne.czero .or. b7.ne.czero .or. b9.ne.czero .or. b10.ne.czero)) then
->>>>>>> 95f3dcda91e405f93afa079e390de6b803a67915
           call Error("Spin 2 Z+gamma or gamma+gamma decay cannot be done with b5-7 or b9-10.")
        endif
     endif
