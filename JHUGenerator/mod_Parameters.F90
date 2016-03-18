@@ -586,7 +586,7 @@ CONTAINS
 function HVVSpinZeroDynamicCoupling (index,sWplus,sWminus,sWW,tryWWcoupl)
 integer, intent(in) :: index
 real(8), intent(in) :: sWplus, sWminus, sWW
-real(8) :: sWplus_signed, sWminus_signed, sWW_signed
+real(8) :: sWplus_signed, sWminus_signed, sWW_signed, QsqCompoundFactor
 logical,optional :: tryWWcoupl
 complex(8) :: HVVSpinZeroDynamicCoupling
 complex(8) :: vvcoupl(1:8)
@@ -595,106 +595,118 @@ real(8) :: lambda_v120(1:3)
 logical :: forceZZcoupl
 logical :: computeQsqCompundCoupl
 
-	if(present(tryWWcoupl)) then
-		forceZZcoupl = (.not.tryWWcoupl .or. .not.distinguish_HWWcouplings .or. index.gt.4)
-	else
-		forceZZcoupl = .true.
-	endif
-	computeQsqCompundCoupl = .false.
-	sWplus_signed=0d0
-	sWminus_signed=0d0
-	sWW_signed=0d0
-	vvcoupl(:)=czero
-	HVVSpinZeroDynamicCoupling=czero
-	if( forceZZcoupl ) then
-		if(cz_q1sq.ne.0) sWplus_signed=abs(sWplus)*dble(sign(1,cz_q1sq))
-		if(cz_q2sq.ne.0) sWminus_signed=abs(sWminus)*dble(sign(1,cz_q2sq))
-		if(cz_q12sq.ne.0) sWW_signed=abs(sWW)*dble(sign(1,cz_q12sq))
-		if(cz_q1sq.ne.0 .or. cz_q2sq.ne.0 .or. cz_q12sq.ne.0) computeQsqCompundCoupl=.true.
-		if(index.eq.1) then
-			vvcoupl = (/ ghz1, ghz1_prime, ghz1_prime2, ghz1_prime3, ghz1_prime4, ghz1_prime5, ghz1_prime6, ghz1_prime7 /)
-			lambda_v = Lambda_z1
-			lambda_v120 = (/ Lambda_z11, Lambda_z12, Lambda_z10 /)
-		elseif(index.eq.2) then
-			vvcoupl = (/ ghz2, ghz2_prime, ghz2_prime2, ghz2_prime3, ghz2_prime4, ghz2_prime5, ghz2_prime6, ghz2_prime7 /)
-			lambda_v = Lambda_z2
-			lambda_v120 = (/ Lambda_z21, Lambda_z22, Lambda_z20 /)
-		elseif(index.eq.3) then
-			vvcoupl = (/ ghz3, ghz3_prime, ghz3_prime2, ghz3_prime3, ghz3_prime4, ghz3_prime5, ghz3_prime6, ghz3_prime7 /)
-			lambda_v = Lambda_z3
-			lambda_v120 = (/ Lambda_z31, Lambda_z32, Lambda_z30 /)
-		elseif(index.eq.4) then
-			vvcoupl = (/ ghz4, ghz4_prime, ghz4_prime2, ghz4_prime3, ghz4_prime4, ghz4_prime5, ghz4_prime6, ghz4_prime7 /)
-			lambda_v = Lambda_z4
-			lambda_v120 = (/ Lambda_z41, Lambda_z42, Lambda_z40 /)
-		elseif(index.eq.5) then ! Zgs 1
-			if(sWW.gt.0d0) vvcoupl(3) = ghzgs1_prime2
-			lambda_v = Lambda_zgs1
-			lambda_v120 = (/ Lambda_z11, Lambda_z12, Lambda_z10 /)
-		elseif(index.eq.6) then ! Zgs 2-4
-			vvcoupl(1) = ghzgs2
-			lambda_v = 1d0 ! Not present
-			lambda_v120 = (/ Lambda_z21, Lambda_z22, Lambda_z20 /)
-		elseif(index.eq.7) then
-			vvcoupl(1) = ghzgs3
-			lambda_v = 1d0 ! Not present
-			lambda_v120 = (/ Lambda_z31, Lambda_z32, Lambda_z30 /)
-		elseif(index.eq.8) then
-			vvcoupl(1) = ghzgs4
-			lambda_v = 1d0 ! Not present
-			lambda_v120 = (/ Lambda_z41, Lambda_z42, Lambda_z40 /)
-		elseif(index.eq.9) then ! gsgs 2-4
-			vvcoupl(1) = ghgsgs2
-			lambda_v = 1d0 ! Not present
-			lambda_v120 = (/ Lambda_z21, Lambda_z22, Lambda_z20 /)
-		elseif(index.eq.10) then
-			vvcoupl(1) = ghgsgs3
-			lambda_v = 1d0 ! Not present
-			lambda_v120 = (/ Lambda_z31, Lambda_z32, Lambda_z30 /)
-		elseif(index.eq.11) then
-			vvcoupl(1) = ghgsgs4
-			lambda_v = 1d0 ! Not present
-			lambda_v120 = (/ Lambda_z41, Lambda_z42, Lambda_z40 /)
-		endif
-	else
-		if(cw_q1sq.ne.0) sWplus_signed=abs(sWplus)*dble(sign(1,cw_q1sq))
-		if(cw_q2sq.ne.0) sWminus_signed=abs(sWminus)*dble(sign(1,cw_q2sq))
-		if(cw_q12sq.ne.0) sWW_signed=abs(sWW)*dble(sign(1,cw_q12sq))
-		if(cw_q1sq.ne.0 .or. cw_q2sq.ne.0 .or. cw_q12sq.ne.0) computeQsqCompundCoupl=.true.
-		if(index.eq.1) then
-			vvcoupl = (/ ghw1, ghw1_prime, ghw1_prime2, ghw1_prime3, ghw1_prime4, ghw1_prime5, ghw1_prime6, ghw1_prime7 /)
-			lambda_v = Lambda_w1
-			lambda_v120 = (/ Lambda_w11, Lambda_w12, Lambda_w10 /)
-		elseif(index.eq.2) then
-			vvcoupl = (/ ghw2, ghw2_prime, ghw2_prime2, ghw2_prime3, ghw2_prime4, ghw2_prime5, ghw2_prime6, ghw2_prime7 /)
-			lambda_v = Lambda_w2
-			lambda_v120 = (/ Lambda_w21, Lambda_w22, Lambda_w20 /)
-		elseif(index.eq.3) then
-			vvcoupl = (/ ghw3, ghw3_prime, ghw3_prime2, ghw3_prime3, ghw3_prime4, ghw3_prime5, ghw3_prime6, ghw3_prime7 /)
-			lambda_v = Lambda_w3
-			lambda_v120 = (/ Lambda_w31, Lambda_w32, Lambda_w30 /)
-		elseif(index.eq.4) then
-			vvcoupl = (/ ghw4, ghw4_prime, ghw4_prime2, ghw4_prime3, ghw4_prime4, ghw4_prime5, ghw4_prime6, ghw4_prime7 /)
-			lambda_v = Lambda_w4
-			lambda_v120 = (/ Lambda_w41, Lambda_w42, Lambda_w40 /)
-		endif
-	endif
+   if(present(tryWWcoupl)) then
+      forceZZcoupl = (.not.tryWWcoupl .or. .not.distinguish_HWWcouplings .or. index.gt.4)
+   else
+      forceZZcoupl = .true.
+   endif
+   computeQsqCompundCoupl = .false.
+   sWplus_signed=0d0
+   sWminus_signed=0d0
+   sWW_signed=0d0
+   vvcoupl(:)=czero
+   HVVSpinZeroDynamicCoupling=czero
+   if( forceZZcoupl ) then
+      if(cz_q1sq.ne.0) sWplus_signed=abs(sWplus)*dble(sign(1,cz_q1sq))
+      if(cz_q2sq.ne.0) sWminus_signed=abs(sWminus)*dble(sign(1,cz_q2sq))
+      if(cz_q12sq.ne.0) sWW_signed=abs(sWW)*dble(sign(1,cz_q12sq))
+      if(cz_q1sq.ne.0 .or. cz_q2sq.ne.0 .or. cz_q12sq.ne.0) computeQsqCompundCoupl=.true.
+      if(index.eq.1) then
+         vvcoupl = (/ ghz1, ghz1_prime, ghz1_prime2, ghz1_prime3, ghz1_prime4, ghz1_prime5, ghz1_prime6, ghz1_prime7 /)
+         lambda_v = Lambda_z1
+         lambda_v120 = (/ Lambda_z11, Lambda_z12, Lambda_z10 /)
+      elseif(index.eq.2) then
+         vvcoupl = (/ ghz2, ghz2_prime, ghz2_prime2, ghz2_prime3, ghz2_prime4, ghz2_prime5, ghz2_prime6, ghz2_prime7 /)
+         lambda_v = Lambda_z2
+         lambda_v120 = (/ Lambda_z21, Lambda_z22, Lambda_z20 /)
+      elseif(index.eq.3) then
+         vvcoupl = (/ ghz3, ghz3_prime, ghz3_prime2, ghz3_prime3, ghz3_prime4, ghz3_prime5, ghz3_prime6, ghz3_prime7 /)
+         lambda_v = Lambda_z3
+         lambda_v120 = (/ Lambda_z31, Lambda_z32, Lambda_z30 /)
+      elseif(index.eq.4) then
+         vvcoupl = (/ ghz4, ghz4_prime, ghz4_prime2, ghz4_prime3, ghz4_prime4, ghz4_prime5, ghz4_prime6, ghz4_prime7 /)
+         lambda_v = Lambda_z4
+         lambda_v120 = (/ Lambda_z41, Lambda_z42, Lambda_z40 /)
+      elseif(index.eq.5) then ! Zgs 1
+         vvcoupl(3) = ghzgs1_prime2
+         lambda_v = Lambda_zgs1
+         lambda_v120 = (/ Lambda_z11, Lambda_z12, Lambda_z10 /)
+      elseif(index.eq.6) then ! Zgs 2-4
+         vvcoupl(1) = ghzgs2
+         lambda_v = 1d0 ! Not present
+         lambda_v120 = (/ Lambda_z21, Lambda_z22, Lambda_z20 /)
+      elseif(index.eq.7) then
+         vvcoupl(1) = ghzgs3
+         lambda_v = 1d0 ! Not present
+         lambda_v120 = (/ Lambda_z31, Lambda_z32, Lambda_z30 /)
+      elseif(index.eq.8) then
+         vvcoupl(1) = ghzgs4
+         lambda_v = 1d0 ! Not present
+         lambda_v120 = (/ Lambda_z41, Lambda_z42, Lambda_z40 /)
+      elseif(index.eq.9) then ! gsgs 2-4
+         vvcoupl(1) = ghgsgs2
+         lambda_v = 1d0 ! Not present
+         lambda_v120 = (/ Lambda_z21, Lambda_z22, Lambda_z20 /)
+      elseif(index.eq.10) then
+         vvcoupl(1) = ghgsgs3
+         lambda_v = 1d0 ! Not present
+         lambda_v120 = (/ Lambda_z31, Lambda_z32, Lambda_z30 /)
+      elseif(index.eq.11) then
+         vvcoupl(1) = ghgsgs4
+         lambda_v = 1d0 ! Not present
+         lambda_v120 = (/ Lambda_z41, Lambda_z42, Lambda_z40 /)
+      endif
+   else
+      if(cw_q1sq.ne.0) sWplus_signed=abs(sWplus)*dble(sign(1,cw_q1sq))
+      if(cw_q2sq.ne.0) sWminus_signed=abs(sWminus)*dble(sign(1,cw_q2sq))
+      if(cw_q12sq.ne.0) sWW_signed=abs(sWW)*dble(sign(1,cw_q12sq))
+      if(cw_q1sq.ne.0 .or. cw_q2sq.ne.0 .or. cw_q12sq.ne.0) computeQsqCompundCoupl=.true.
+      if(index.eq.1) then
+         vvcoupl = (/ ghw1, ghw1_prime, ghw1_prime2, ghw1_prime3, ghw1_prime4, ghw1_prime5, ghw1_prime6, ghw1_prime7 /)
+         lambda_v = Lambda_w1
+         lambda_v120 = (/ Lambda_w11, Lambda_w12, Lambda_w10 /)
+      elseif(index.eq.2) then
+         vvcoupl = (/ ghw2, ghw2_prime, ghw2_prime2, ghw2_prime3, ghw2_prime4, ghw2_prime5, ghw2_prime6, ghw2_prime7 /)
+         lambda_v = Lambda_w2
+         lambda_v120 = (/ Lambda_w21, Lambda_w22, Lambda_w20 /)
+      elseif(index.eq.3) then
+         vvcoupl = (/ ghw3, ghw3_prime, ghw3_prime2, ghw3_prime3, ghw3_prime4, ghw3_prime5, ghw3_prime6, ghw3_prime7 /)
+         lambda_v = Lambda_w3
+         lambda_v120 = (/ Lambda_w31, Lambda_w32, Lambda_w30 /)
+      elseif(index.eq.4) then
+         vvcoupl = (/ ghw4, ghw4_prime, ghw4_prime2, ghw4_prime3, ghw4_prime4, ghw4_prime5, ghw4_prime6, ghw4_prime7 /)
+         lambda_v = Lambda_w4
+         lambda_v120 = (/ Lambda_w41, Lambda_w42, Lambda_w40 /)
+      endif
+   endif
 
-	if(vvcoupl(2).ne.czero) HVVSpinZeroDynamicCoupling = HVVSpinZeroDynamicCoupling + vvcoupl(2) * lambda_v**4/(lambda_v**2 + abs(sWplus))/(lambda_v**2 + abs(sWminus))
-	if(vvcoupl(3).ne.czero) HVVSpinZeroDynamicCoupling = HVVSpinZeroDynamicCoupling + vvcoupl(3) * ( sWplus + sWminus )/lambda_v**2
-	if(vvcoupl(4).ne.czero) HVVSpinZeroDynamicCoupling = HVVSpinZeroDynamicCoupling + vvcoupl(4) * ( sWplus - sWminus )/lambda_v**2
-	if(vvcoupl(5).ne.czero) HVVSpinZeroDynamicCoupling = HVVSpinZeroDynamicCoupling + vvcoupl(5) * ( sWW )/Lambda_Q**2
-	if(vvcoupl(6).ne.czero) HVVSpinZeroDynamicCoupling = HVVSpinZeroDynamicCoupling + vvcoupl(6) * ( sWplus**2 + sWminus**2 )/lambda_v**4
-	if(vvcoupl(7).ne.czero) HVVSpinZeroDynamicCoupling = HVVSpinZeroDynamicCoupling + vvcoupl(7) * ( sWplus**2 - sWminus**2 )/lambda_v**4
-	if(vvcoupl(8).ne.czero) HVVSpinZeroDynamicCoupling = HVVSpinZeroDynamicCoupling + vvcoupl(8) * ( sWplus    * sWminus    )/lambda_v**4
+   if(vvcoupl(2).ne.czero) HVVSpinZeroDynamicCoupling = HVVSpinZeroDynamicCoupling + vvcoupl(2) * lambda_v**4/(lambda_v**2 + abs(sWplus))/(lambda_v**2 + abs(sWminus))
+   if(vvcoupl(3).ne.czero) HVVSpinZeroDynamicCoupling = HVVSpinZeroDynamicCoupling + vvcoupl(3) * ( sWplus + sWminus )/lambda_v**2
+   if(vvcoupl(4).ne.czero) HVVSpinZeroDynamicCoupling = HVVSpinZeroDynamicCoupling + vvcoupl(4) * ( sWplus - sWminus )/lambda_v**2
+   if(vvcoupl(5).ne.czero) HVVSpinZeroDynamicCoupling = HVVSpinZeroDynamicCoupling + vvcoupl(5) * ( sWW )/Lambda_Q**2
+   if(vvcoupl(6).ne.czero) HVVSpinZeroDynamicCoupling = HVVSpinZeroDynamicCoupling + vvcoupl(6) * ( sWplus**2 + sWminus**2 )/lambda_v**4
+   if(vvcoupl(7).ne.czero) HVVSpinZeroDynamicCoupling = HVVSpinZeroDynamicCoupling + vvcoupl(7) * ( sWplus**2 - sWminus**2 )/lambda_v**4
+   if(vvcoupl(8).ne.czero) HVVSpinZeroDynamicCoupling = HVVSpinZeroDynamicCoupling + vvcoupl(8) * ( sWplus    * sWminus    )/lambda_v**4
 
-	if(index.eq.1) then
-		if(computeQsqCompundCoupl) HVVSpinZeroDynamicCoupling = HVVSpinZeroDynamicCoupling * (lambda_v120(1)*lambda_v120(2)*lambda_v120(3))**2 / ( (lambda_v120(1)**2 + sWplus_signed)*(lambda_v120(2)**2 + sWminus_signed)*(lambda_v120(3)**2 + sWW_signed) )
-		if(vvcoupl(1).ne.czero) HVVSpinZeroDynamicCoupling = HVVSpinZeroDynamicCoupling + vvcoupl(1)
-	else
-		if(vvcoupl(1).ne.czero) HVVSpinZeroDynamicCoupling = HVVSpinZeroDynamicCoupling + vvcoupl(1)
-		if(computeQsqCompundCoupl) HVVSpinZeroDynamicCoupling = HVVSpinZeroDynamicCoupling * (lambda_v120(1)*lambda_v120(2)*lambda_v120(3))**2 / ( (lambda_v120(1)**2 + sWplus_signed)*(lambda_v120(2)**2 + sWminus_signed)*(lambda_v120(3)**2 + sWW_signed) )
-	endif
+   if(index.eq.1) then
+      if(computeQsqCompundCoupl) then
+         QsqCompoundFactor = (lambda_v120(1)**2 + sWplus_signed)*(lambda_v120(2)**2 + sWminus_signed)*(lambda_v120(3)**2 + sWW_signed)
+         if(QsqCompoundFactor.ne.0d0) then
+            QsqCompoundFactor = (lambda_v120(1)*lambda_v120(2)*lambda_v120(3))**2/QsqCompoundFactor
+         fi
+         HVVSpinZeroDynamicCoupling = HVVSpinZeroDynamicCoupling * QsqCompoundFactor
+      fi
+      if(vvcoupl(1).ne.czero) HVVSpinZeroDynamicCoupling = HVVSpinZeroDynamicCoupling + vvcoupl(1)
+   else
+      if(vvcoupl(1).ne.czero) HVVSpinZeroDynamicCoupling = HVVSpinZeroDynamicCoupling + vvcoupl(1)
+      if(computeQsqCompundCoupl) then
+         QsqCompoundFactor = (lambda_v120(1)**2 + sWplus_signed)*(lambda_v120(2)**2 + sWminus_signed)*(lambda_v120(3)**2 + sWW_signed)
+         if(QsqCompoundFactor.ne.0d0) then
+            QsqCompoundFactor = (lambda_v120(1)*lambda_v120(2)*lambda_v120(3))**2/QsqCompoundFactor
+         fi
+         HVVSpinZeroDynamicCoupling = HVVSpinZeroDynamicCoupling * QsqCompoundFactor
+      fi
+   endif
 
 end function
 
