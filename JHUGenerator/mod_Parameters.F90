@@ -3,7 +3,7 @@ implicit none
 save
 ! 
 ! 
-character(len=6),parameter :: JHUGen_Version="v6.9.3"
+character(len=6),parameter :: JHUGen_Version="v6.9.4"
 ! 
 ! 
 !=====================================================
@@ -628,7 +628,7 @@ logical :: computeQsqCompundCoupl
 			lambda_v = Lambda_z4
 			lambda_v120 = (/ Lambda_z41, Lambda_z42, Lambda_z40 /)
 		elseif(index.eq.5) then ! Zgs 1
-			if(sWW.gt.0d0) vvcoupl(3) = ghzgs1_prime2 * M_Z**2/sWW**2
+			if(sWW.gt.0d0) vvcoupl(3) = ghzgs1_prime2
 			lambda_v = Lambda_zgs1
 			lambda_v120 = (/ Lambda_z11, Lambda_z12, Lambda_z10 /)
 		elseif(index.eq.6) then ! Zgs 2-4
