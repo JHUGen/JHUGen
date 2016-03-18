@@ -25,7 +25,7 @@
       integer :: i1,i2,i3,i4,ordering(1:4)
       real(dp) :: aL1,aR1,aL2,aR2
       real(dp) :: gZ_sq
-      real(dp) :: prefactor, Lambda_inv
+      real(dp) :: prefactor
       real(dp), parameter :: symmFact=1d0/2d0
       real(dp) :: intcolfac
 
@@ -38,11 +38,9 @@
       
       gZ_sq = 4.0_dp*pi*alpha_QED/4.0_dp/(one-sitW**2)/sitW**2
 
-!---- the 1/Lambda coupling
-      Lambda_inv = 1.0d0/Lambda
 
 !---- full prefactor; 8 is  the color factor
-      prefactor = 8d0*(Lambda_inv**2)**2*gZ_sq**2
+      prefactor = 8d0*gZ_sq**2
 
 
          if( IsAZDecay(DecayMode1) ) then!  Z decay
@@ -65,7 +63,7 @@
                     aL1=0d0
                     aR1=0d0
               endif
-              prefactor = prefactor *(one/two*M_V*Ga_V)**2
+              prefactor = prefactor
          elseif( IsAWDecay(DecayMode1) ) then !  W decay
               if( IsAQuark(MY_IDUP(6)) ) then
                  aL1 = bL * dsqrt(scale_alpha_W_ud)
@@ -80,7 +78,7 @@
                  aL1=0d0
                  aR1=0d0
               endif
-              prefactor = prefactor *(one/two*M_V*Ga_V)**2
+              prefactor = prefactor
          elseif( IsAPhoton(DecayMode1) ) then !  photon "decay"
               aL1=1d0
               aR1=1d0
@@ -258,7 +256,7 @@ enddo
       integer :: i1,i2,i3,i4,ordering(1:4)
       real(dp) :: aL1,aR1,aL2,aR2,qL,qR
       real(dp) :: gZ_sq
-      real(dp) :: prefactor, Lambda_inv
+      real(dp) :: prefactor
       real(dp), parameter :: symmFact=1d0/2d0
       real(dp) :: intcolfac
 
@@ -278,11 +276,8 @@ enddo
       qL = graviton_qq_left
       qR = graviton_qq_right
 
-!---- the 1/Lambda coupling
-      Lambda_inv = 1.0_dp/Lambda
-
 !---- full prefactor; 3 is  the color factor
-      prefactor = 3d0*(Lambda_inv**2)**2*gZ_sq**2
+      prefactor = 3d0*gZ_sq**2
 
 
          if( IsAZDecay(DecayMode1) ) then!  Z decay
@@ -1436,7 +1431,7 @@ enddo
       integer :: i1,i2,i3,i4
       real(dp) :: aL,aR
       real(dp) :: gZ_sq
-      real(dp) :: prefactor, Lambda_inv
+      real(dp) :: prefactor
 
 
 !---- electroweak couplings
@@ -1446,14 +1441,10 @@ enddo
 
       gZ_sq = 4.0_dp*pi*alpha_QED/4.0_dp/(one-sitW**2)/sitW**2
 
-!---- the 1/Lambda coupling
-
-
-      Lambda_inv = 1.0_dp/Lambda
 
 !---- full prefactor; 3 is  the color factor
 
-      prefactor = 3d0*(Lambda_inv**2)**2*(one/two*M_V*Ga_V)**2*gZ_sq**2
+      prefactor = 3d0*gZ_sq**2
 
       sum = zero
 
@@ -1531,7 +1522,7 @@ enddo
       integer :: i1,i2,i3,i4
       real(dp) :: aL,aR
       real(dp) :: gZ_sq
-      real(dp) :: prefactor, Lambda_inv
+      real(dp) :: prefactor
 
 !---- electroweak couplings
       aL = -one + two*sitW**2
@@ -1540,11 +1531,8 @@ enddo
 
       gZ_sq = 4.0_dp*pi*alpha_QED/4.0_dp/(one-sitW**2)/sitW**2
 
-!---- the 1/Lambda coupling
-      Lambda_inv = 1.0d0/Lambda
-
 !---- full prefactor; 8 is  the color factor
-      prefactor = 8d0*(Lambda_inv**2)**2*(one/two*M_V*Ga_V)**2*gZ_sq**2
+      prefactor = 8d0*gZ_sq**2
 
 
       sum = zero
