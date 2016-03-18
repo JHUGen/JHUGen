@@ -23,7 +23,7 @@
       integer :: i1,i2,i3,i4,ordering(1:4)
       real(dp) :: aL1,aR1,aL2,aR2
       real(dp) :: gZ_sq
-      real(dp) :: prefactor, Lambda_inv
+      real(dp) :: prefactor
       real(dp), parameter :: symmFact=1d0/2d0
       real(dp) :: intcolfac
 
@@ -39,10 +39,8 @@
       qL = zprime_qq_left
       qR = zprime_qq_right
 
-!---- the 1/Lambda coupling
-      Lambda_inv = 1.0_dp/Lambda
 !---- full prefactor; 3 is  the color factor
-      prefactor = 3d0*(Lambda_inv**2)**2*(one/two*M_V*Ga_V)**2*gZ_sq**2
+      prefactor = 3d0*gZ_sq**2
 
          if( IsAZDecay(DecayMode1) ) then!  Z decay
               if( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_) ) then
