@@ -693,9 +693,9 @@ logical :: computeQsqCompundCoupl
          QsqCompoundFactor = (lambda_v120(1)**2 + sWplus_signed)*(lambda_v120(2)**2 + sWminus_signed)*(lambda_v120(3)**2 + sWW_signed)
          if(QsqCompoundFactor.ne.0d0) then
             QsqCompoundFactor = (lambda_v120(1)*lambda_v120(2)*lambda_v120(3))**2/QsqCompoundFactor
-         fi
+         endif
          HVVSpinZeroDynamicCoupling = HVVSpinZeroDynamicCoupling * QsqCompoundFactor
-      fi
+      endif
       if(vvcoupl(1).ne.czero) HVVSpinZeroDynamicCoupling = HVVSpinZeroDynamicCoupling + vvcoupl(1)
    else
       if(vvcoupl(1).ne.czero) HVVSpinZeroDynamicCoupling = HVVSpinZeroDynamicCoupling + vvcoupl(1)
@@ -703,9 +703,9 @@ logical :: computeQsqCompundCoupl
          QsqCompoundFactor = (lambda_v120(1)**2 + sWplus_signed)*(lambda_v120(2)**2 + sWminus_signed)*(lambda_v120(3)**2 + sWW_signed)
          if(QsqCompoundFactor.ne.0d0) then
             QsqCompoundFactor = (lambda_v120(1)*lambda_v120(2)*lambda_v120(3))**2/QsqCompoundFactor
-         fi
+         endif
          HVVSpinZeroDynamicCoupling = HVVSpinZeroDynamicCoupling * QsqCompoundFactor
-      fi
+      endif
    endif
 
 end function
