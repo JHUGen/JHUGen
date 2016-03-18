@@ -2818,6 +2818,7 @@ integer, parameter :: inLeft=1, inRight=2, Hig=3, tauP=4, tauM=5, Wp=6, Wm=7,   
     
 RETURN
 END SUBROUTINE
+
 FUNCTION ZLepBranching(xRnd)
 use ModParameters
 implicit none
@@ -2840,6 +2841,21 @@ integer :: ZLepBranching
 RETURN
 END FUNCTION
 
+FUNCTION ZLepBranching_flat(xRnd)
+use ModParameters
+implicit none
+real(8) :: xRnd
+integer :: ZLepBranching_flat
+
+
+  if( xRnd .le. 0.5d0 ) then
+      ZLepBranching_flat = ElM_
+  else
+      ZLepBranching_flat = MuM_
+  endif
+
+RETURN
+END FUNCTION
 
 
 
@@ -2863,6 +2879,23 @@ integer :: ZLepPlusTauBranching
 ! print *, "checker 3",Brlept_Z_ee
 ! print *, "checker 3",Brlept_Z_ee+Brlept_Z_mm
 ! print *, "checker 3",Brlept_Z_ee+Brlept_Z_mm+Brlept_Z_tt
+
+RETURN
+END FUNCTION
+
+FUNCTION ZLepPlusTauBranching_flat(xRnd)
+use ModParameters
+implicit none
+real(8) :: xRnd
+integer :: ZLepPlusTauBranching_flat
+
+  if( xRnd .le. (1d0/3d0) ) then
+      ZLepPlusTauBranching_flat = ElM_
+  elseif(xRnd .le. (2d0/3d0) ) then
+      ZLepPlusTauBranching_flat = MuM_
+  else
+      ZLepPlusTauBranching_flat = TaM_
+  endif
 
 RETURN
 END FUNCTION
@@ -2893,6 +2926,22 @@ integer :: ZNuBranching
 RETURN
 END FUNCTION
 
+FUNCTION ZNuBranching_flat(xRnd)
+use ModParameters
+implicit none
+real(8) :: xRnd
+integer :: ZNuBranching_flat
+
+  if( xRnd .le. (1d0/3d0) ) then
+      ZNuBranching_flat = NuE_
+  elseif(xRnd .le. (2d0/3d0) ) then
+      ZNuBranching_flat = NuM_
+  else
+      ZNuBranching_flat = NuT_
+  endif
+
+RETURN
+END FUNCTION
 
 
 
@@ -3140,6 +3189,20 @@ integer :: WLepBranching
 RETURN
 END FUNCTION
 
+FUNCTION WLepBranching_flat(xRnd)
+use ModParameters
+implicit none
+real(8) :: xRnd
+integer :: WLepBranching_flat
+
+  if( xRnd .le. 0.5d0 ) then
+      WLepBranching_flat = ElM_
+  else
+      WLepBranching_flat = MuM_
+  endif
+
+RETURN
+END FUNCTION
 
 
 FUNCTION WLepPlusTauBranching(xRnd)
@@ -3166,6 +3229,22 @@ integer :: WLepPlusTauBranching
 RETURN
 END FUNCTION
 
+FUNCTION WLepPlusTauBranching_flat(xRnd)
+use ModParameters
+implicit none
+real(8) :: xRnd
+integer :: WLepPlusTauBranching_flat
+
+  if( xRnd .le. (1d0/3d0) ) then
+      WLepPlusTauBranching_flat = ElM_
+  elseif(xRnd .le. (2d0/3d0) ) then
+      WLepPlusTauBranching_flat = MuM_
+  else
+      WLepPlusTauBranching_flat = TaM_
+  endif
+
+RETURN
+END FUNCTION
 
 
 
@@ -3191,7 +3270,20 @@ integer :: WQuaUpBranching
 RETURN
 END FUNCTION
 
+FUNCTION WQuaUpBranching_flat(xRnd)
+use ModParameters
+implicit none
+real(8) :: xRnd
+integer :: WQuaUpBranching_flat
 
+  if( xRnd .le. 0.5d0 ) then
+      WQuaUpBranching_flat = Up_
+  else
+      WQuaUpBranching_flat = Chm_
+  endif
+
+RETURN
+END FUNCTION
 
 
 FUNCTION WAnyBranching_flat(xRnd)
@@ -3218,7 +3310,6 @@ real(8),parameter :: yy=Ncol*xx
       print *, "error ",xRnd
       stop
   endif
-
 
 RETURN
 END FUNCTION
@@ -3300,7 +3391,7 @@ real(8) :: DKRnd
    if( DecayMode1.eq.0 ) then! Z1->2l
         call random_number(DKRnd)
         MY_IDUP(4) = Z0_
-        DKFlavor = ZLepBranching( DKRnd )!= ElM or MuM
+        DKFlavor = ZLepBranching_flat( DKRnd )!= ElM or MuM
         MY_IDUP(6) =-DKFlavor
         MY_IDUP(7) =+DKFlavor
    elseif( DecayMode1.eq.1 ) then! Z1->2q
@@ -3318,19 +3409,19 @@ real(8) :: DKRnd
    elseif( DecayMode1.eq.3 ) then! Z1->2nu
         call random_number(DKRnd)
         MY_IDUP(4) = Z0_
-        DKFlavor = ZNuBranching( DKRnd )!= NuE,NuM,NuT
+        DKFlavor = ZNuBranching_flat( DKRnd )!= NuE,NuM,NuT
         MY_IDUP(6) =-DKFlavor
         MY_IDUP(7) =+DKFlavor
    elseif( DecayMode1.eq.4 ) then! W1(+)->lnu
         call random_number(DKRnd)
         MY_IDUP(4) = Wp_
-        DKFlavor = WLepBranching( DKRnd )!= ElM or MuM
+        DKFlavor = WLepBranching_flat( DKRnd )!= ElM or MuM
         MY_IDUP(6) = +abs(DKFlavor)     ! lepton(+)
         MY_IDUP(7) = +abs(DKFlavor)+7   ! neutrino        
    elseif( DecayMode1.eq.5 ) then! W1(+)->2q
         call random_number(DKRnd)
         MY_IDUP(4) = Wp_
-        DKFlavor = WQuaUpBranching( DKRnd )!= Up,Chm
+        DKFlavor = WQuaUpBranching_flat( DKRnd )!= Up,Chm
 !         MY_IDUP(6) = -abs(DKFlavor)-1  ! anti-dn flavor
 !         MY_IDUP(7) = +abs(DKFlavor)    ! up flavor
         MY_IDUP(7) = +abs(DKFlavor)           ! up flavor
@@ -3348,7 +3439,7 @@ real(8) :: DKRnd
    elseif( DecayMode1.eq.8 ) then! Z1->2l+2tau
         call random_number(DKRnd)
         MY_IDUP(4) = Z0_
-        DKFlavor = ZLepPlusTauBranching( DKRnd )!= ElM or MuM or TaM
+        DKFlavor = ZLepPlusTauBranching_flat( DKRnd )!= ElM or MuM or TaM
         MY_IDUP(6) =-DKFlavor
         MY_IDUP(7) =+DKFlavor
    elseif( DecayMode1.eq.9 ) then! Z1-> anything
@@ -3364,7 +3455,7 @@ real(8) :: DKRnd
    elseif( DecayMode1.eq.10 ) then! W1(+)->l+tau  +nu
         call random_number(DKRnd)
         MY_IDUP(4) = Wp_
-        DKFlavor = WLepPlusTauBranching( DKRnd )!= ElM or MuM or TaM
+        DKFlavor = WLepPlusTauBranching_flat( DKRnd )!= ElM or MuM or TaM
         MY_IDUP(6) = +abs(DKFlavor)     ! lepton(+)
         MY_IDUP(7) = +abs(DKFlavor)+7   ! neutrino
    elseif( DecayMode1.eq.11 ) then! W1(+)-> anything
@@ -3388,7 +3479,7 @@ real(8) :: DKRnd
    if( DecayMode2.eq.0 ) then! Z2->2l (sample over el,mu)
         call random_number(DKRnd)
         MY_IDUP(5) = Z0_
-        DKFlavor = ZLepBranching( DKRnd )!= ElM or MuM
+        DKFlavor = ZLepBranching_flat( DKRnd )!= ElM or MuM
         MY_IDUP(8) =-DKFlavor
         MY_IDUP(9) =+DKFlavor
    elseif( DecayMode2.eq.1 ) then! Z2->2q
@@ -3406,19 +3497,19 @@ real(8) :: DKRnd
    elseif( DecayMode2.eq.3 ) then! Z2->2nu
         call random_number(DKRnd)
         MY_IDUP(5) = Z0_
-        DKFlavor = ZNuBranching( DKRnd )!= NuE,NuM,NuT
+        DKFlavor = ZNuBranching_flat( DKRnd )!= NuE,NuM,NuT
         MY_IDUP(8) =-DKFlavor
         MY_IDUP(9) =+DKFlavor
    elseif( DecayMode2.eq.4 ) then! W2(-)->lnu
         call random_number(DKRnd)
         MY_IDUP(5) = Wm_
-        DKFlavor = WLepBranching( DKRnd )!= ElM or MuM
+        DKFlavor = WLepBranching_flat( DKRnd )!= ElM or MuM
         MY_IDUP(8) = -abs(DKFlavor)-7   ! anti-neutrino
         MY_IDUP(9) = -abs(DKFlavor)     ! lepton(-)
    elseif( DecayMode2.eq.5 ) then! W2(-)->2q (sample over u,d,s,c)
         call random_number(DKRnd)
         MY_IDUP(5) = Wm_
-        DKFlavor = WQuaUpBranching( DKRnd )!= Up,Chm
+        DKFlavor = WQuaUpBranching_flat( DKRnd )!= Up,Chm
 !         MY_IDUP(8) = -abs(DKFlavor)    ! anti-up flavor
 !         MY_IDUP(9) = +abs(DKFlavor)+1  ! dn flavor
         MY_IDUP(8) = -abs(DKFlavor)           ! up flavor
@@ -3436,7 +3527,7 @@ real(8) :: DKRnd
    elseif( DecayMode2.eq.8 ) then! Z2->2l+2tau
         call random_number(DKRnd)
         MY_IDUP(5) = Z0_
-        DKFlavor = ZLepPlusTauBranching( DKRnd )!= ElM or MuM or TaM
+        DKFlavor = ZLepPlusTauBranching_flat( DKRnd )!= ElM or MuM or TaM
         MY_IDUP(8) =-DKFlavor
         MY_IDUP(9) =+DKFlavor
    elseif( DecayMode2.eq.9 ) then! Z2-> anything
@@ -3452,7 +3543,7 @@ real(8) :: DKRnd
    elseif( DecayMode2.eq.10 ) then! W2(-)->l+tau + nu
         call random_number(DKRnd)
         MY_IDUP(5) = Wm_
-        DKFlavor = WLepPlusTauBranching( DKRnd )!= ElM or MuM or TaM
+        DKFlavor = WLepPlusTauBranching_flat( DKRnd )!= ElM or MuM or TaM
         MY_IDUP(8) = -abs(DKFlavor)-7   ! anti-neutrino
         MY_IDUP(9) = -abs(DKFlavor)     ! lepton(-)
    elseif( DecayMode2.eq.11 ) then! W2(-)-> anything
