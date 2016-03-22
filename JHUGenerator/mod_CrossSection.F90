@@ -23,7 +23,7 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
 #endif
  implicit none
  real(8) :: EvalWeighted,LO_Res_Unpol,yRnd(1:22),VgsWgt 
- real(8) :: eta1,eta2,tau,x1,x2,sHatJacobi,PreFac,FluxFac,PDFFac 
+ real(8) :: eta1,eta2,tau,x1,x2,sHatJacobi,PreFac,FluxFac,PDFFac,m1ffwgt,m2ffwgt
  real(8) :: pdf(-6:6,1:2)
  integer :: NBin(1:NumHistograms),NHisto,i,MY_IDUP(1:9), ICOLUP(1:2,1:9),xBin(1:4)
  integer :: NumPartonicChannels,iPartChannel,ijSel(1:121,1:3),PartChannelAvg,flav1,flav2
@@ -37,6 +37,9 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
     MomDK(:,:)=0d0
     LO_Res_Unpol = 0d0
     EvalWeighted = 0d0
+    m1ffwgt = 1d0 ! Multiplicative factor
+    m2ffwgt = 1d0 ! Multiplicative factor
+
     if( OffShellReson ) then
       call PDFMapping(10,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
     else
@@ -213,10 +216,24 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
       !print *,"LO_Res_Unpol qq:",LO_Res_Unpol
    endif
 
+   if(.not.IsAPhoton(DecayMode1)) then
+      call ShiftMass(MomExt(1:4,5),MomExt(1:4,6), GetMass(MY_IDUP(7)),GetMass(MY_IDUP(6)),  MomDK(1:4,1),MomDK(1:4,2), MassWeight=m1ffwgt)
+      PreFac = PreFac*m1ffwgt
+   else
+      MomDK(:,1)=MomExt(:,5)
+      MomDK(:,2)=MomExt(:,6)
+   endif
+   if(.not.IsAPhoton(DecayMode2)) then
+      call ShiftMass(MomExt(1:4,7),MomExt(1:4,8), GetMass(MY_IDUP(9)),GetMass(MY_IDUP(8)),  MomDK(1:4,3),MomDK(1:4,4), MassWeight=m2ffwgt)
+      PreFac = PreFac*m2ffwgt
+   else
+      MomDK(:,3)=MomExt(:,7)
+      MomDK(:,4)=MomExt(:,8)
+   endif
+
+
    EvalWeighted = LO_Res_Unpol * PreFac
-
    if( WidthScheme.ne.2 .and. Process.eq.0 ) EvalWeighted = EvalWeighted * ReweightBWPropagator( Get_MInv2( MomExt(1:4,3)+MomExt(1:4,4) ) )
-
 
      
    if( unweighted ) then 
@@ -242,21 +259,8 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
          do NHisto=1,NumHistograms
            call intoHisto(NHisto,NBin(NHisto),1d0)
          enddo
-         
-         if(.not.IsAPhoton(DecayMode1)) then
-           call ShiftMass(MomExt(1:4,5),MomExt(1:4,6), GetMass(MY_IDUP(7)),GetMass(MY_IDUP(6)),  MomDK(1:4,1),MomDK(1:4,2) )
-         else
-           MomDK(:,1)=MomExt(:,5)
-           MomDK(:,2)=MomExt(:,6)
-         endif
-         if(.not.IsAPhoton(DecayMode2)) then
-           call ShiftMass(MomExt(1:4,7),MomExt(1:4,8), GetMass(MY_IDUP(9)),GetMass(MY_IDUP(8)),  MomDK(1:4,3),MomDK(1:4,4) )
-         else
-           MomDK(:,3)=MomExt(:,7)
-           MomDK(:,4)=MomExt(:,8)
-         endif
-         call WriteOutEvent((/MomExt(1:4,1),MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(1:9),ICOLUP(1:2,1:9))
 
+         call WriteOutEvent((/MomExt(1:4,1),MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(1:9),ICOLUP(1:2,1:9))
 
          if( abs(MY_IDUP(7)).eq.abs(ElM_) ) then
              flav1 = 1
@@ -296,8 +300,6 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
       if( EvalWeighted.ne.0d0 ) then
         AccepCounter=AccepCounter+1
         if( writeWeightedLHE .and. (.not. warmup) ) then
-            if(.not.IsAPhoton(DecayMode1)) call ShiftMass(MomExt(1:4,5),MomExt(1:4,6), GetMass(MY_IDUP(7)),GetMass(MY_IDUP(6)),  MomDK(1:4,1),MomDK(1:4,2) )
-            if(.not.IsAPhoton(DecayMode2)) call ShiftMass(MomExt(1:4,7),MomExt(1:4,8), GetMass(MY_IDUP(9)),GetMass(MY_IDUP(8)),  MomDK(1:4,3),MomDK(1:4,4) )        
             call WriteOutEvent((/MomExt(1:4,1),MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(1:9),ICOLUP(1:2,1:9),EventWeight=EvalWeighted)
         endif
         do NHisto=1,NumHistograms-3
@@ -3179,14 +3181,15 @@ use ifport
 #endif
 implicit none
 real(8) :: EvalUnWeighted_DecayToTauTau,Ehat,Res,AcceptedEvent(:,:),DKRnd
-real(8) :: yRnd(:),Mom(1:4,1:13),pHiggs(1:4),PSWgt,PreFac,LO_Res_Unpol,CS_max
+real(8) :: yRnd(:),Mom(1:4,1:13),pHiggs(1:4),PSWgt,PreFac,LO_Res_Unpol,CS_max,m1ffwgt,m2ffwgt
 integer :: MY_IDUP(:),ICOLUP(:,:),NBin(1:NumHistograms),NHisto=1,DK_IDUP(1:6),DK_ICOLUP(1:2,3:6)
 logical :: applyPSCut,genEvt
 integer, parameter :: inLeft=1, inRight=2, Hig=3, tauP=4, tauM=5, Wp=6, Wm=7,   nu=8, nubar_tau=9, lepP=10,   lepM=11, nu_tau=12, nubar=13
 include 'vegas_common.f'
 include 'csmaxvalue.f'
 EvalUnWeighted_DecayToTauTau = 0d0
-
+m1ffwgt=1d0
+m2ffwgt=1d0
   
 
   ICOLUP(1:2,tauP) = (/000,000/)
@@ -3224,22 +3227,28 @@ EvalUnWeighted_DecayToTauTau = 0d0
   call SetRunningScales( (/ pHiggs(1:4),Mom_Not_a_particle(1:4),Mom_Not_a_particle(1:4) /) , (/ Not_a_particle_,Not_a_particle_,Not_a_particle_,Not_a_particle_ /) ) ! Call anyway
   call EvalAlphaS()
 
+  if( TauDecays.eq.0 ) then
+     if (genevt) then
+        call printMom(Mom(1:4,tauP:tauM))
+     endif
+     call EvalAmp_H_FF(Mom(1:4,tauP:tauM),m_tau,LO_Res_Unpol)
+  else
+     call EvalAmp_H_TT_decay((/Mom(1:4,lepM),Mom(1:4,nubar),Mom(1:4,nu_tau),Mom(1:4,nu),Mom(1:4,lepP),Mom(1:4,nubar_tau)/),m_tau,ga_tau,LO_Res_Unpol)
+  endif
+
+  if( TauDecays.ne.0 ) then
+     call ShiftMass(Mom(1:4,LepP),Mom(1:4,Wp)-Mom(1:4,LepP), GetMass(MY_IDUP(LepP)),0d0,  AcceptedEvent(1:4,LepP),AcceptedEvent(1:4,Nu), MassWeight=m1ffwgt )
+     call ShiftMass(Mom(1:4,LepM),Mom(1:4,Wm)-Mom(1:4,LepM), GetMass(MY_IDUP(LepM)),0d0,  AcceptedEvent(1:4,LepM),AcceptedEvent(1:4,Nubar), MassWeight=m2ffwgt )
+     PreFac = PreFac*m1ffwgt*m2ffwgt
+  endif
+
+  EvalUnWeighted_DecayToTauTau = LO_Res_Unpol * PreFac
+
 IF( GENEVT ) THEN
 
-      if( TauDecays.eq.0 ) then
-      call printMom(Mom(1:4,tauP:tauM))
-         call EvalAmp_H_FF(Mom(1:4,tauP:tauM),m_tau,LO_Res_Unpol)
-      else
-         call EvalAmp_H_TT_decay((/Mom(1:4,lepM),Mom(1:4,nubar),Mom(1:4,nu_tau),Mom(1:4,nu),Mom(1:4,lepP),Mom(1:4,nubar_tau)/),m_tau,ga_tau,LO_Res_Unpol)
-      endif
-      EvalUnWeighted_DecayToTauTau = LO_Res_Unpol * PreFac
       CS_max = csmax(0,0)
 
       AcceptedEvent(:,:) = Mom(:,:)
-      if( TauDecays.ne.0 ) then
-          call ShiftMass(Mom(1:4,LepP),Mom(1:4,Wp)-Mom(1:4,LepP), GetMass(MY_IDUP(LepP)),0d0,  AcceptedEvent(1:4,LepP),AcceptedEvent(1:4,Nu) )
-          call ShiftMass(Mom(1:4,LepM),Mom(1:4,Wm)-Mom(1:4,LepM), GetMass(MY_IDUP(LepM)),0d0,  AcceptedEvent(1:4,LepM),AcceptedEvent(1:4,Nubar) )
-      endif
       
       if( EvalUnWeighted_DecayToTauTau .gt. CS_max) then
           write(io_stdout,"(2X,A,1PE13.6,1PE13.6)")  "CS_max is too small.",EvalUnWeighted_DecayToTauTau, CS_max
@@ -3254,28 +3263,18 @@ IF( GENEVT ) THEN
 
          Res = 1d0
       else
-          RejeCounter = RejeCounter + 1
-          Res = 0d0
+         RejeCounter = RejeCounter + 1
+         Res = 0d0
       endif
       EvalCounter = EvalCounter + 1
 
 
 ELSE! NOT GENEVT
 
-
-      if( TauDecays.eq.0 ) then
-         call EvalAmp_H_FF(Mom(1:4,tauP:tauM),m_tau,LO_Res_Unpol)
-      else
-         call EvalAmp_H_TT_decay((/Mom(1:4,lepM),Mom(1:4,nubar),Mom(1:4,nu_tau),Mom(1:4,nu),Mom(1:4,lepP),Mom(1:4,nubar_tau)/),m_tau,ga_tau,LO_Res_Unpol)
-      endif
-      EvalUnWeighted_DecayToTauTau = LO_Res_Unpol * PreFac
       Res = EvalUnWeighted_DecayToTauTau
-
       if( EvalUnWeighted_DecayToTauTau.gt.csmax(0,0) ) then
           csmax(0,0) = EvalUnWeighted_DecayToTauTau
       endif
-
-
 
 ENDIF! GENEVT
   
