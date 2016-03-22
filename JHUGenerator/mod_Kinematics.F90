@@ -703,6 +703,7 @@ real(8) :: p1hatsq, p2hatsq, p12hatsq
      p2hatsq = p2hat(1:4).dot.p2hat(1:4)
      p12hatsq = (p1hat(1:4)+p2hat(1:4)).dot.(p1hat(1:4)+p2hat(1:4)) ! Should be p1p2*2d0, but better to avoid un-anticipated uses
 
+     ! Below is the same as 2d0/pi/g_d(p12hatsq,p1hatsq,p2hatsq)
      MassWeight = (p12hatsq**2+p1hatsq**2+p2hatsq**2-2d0*(p1hatsq*p2hatsq+p1hatsq*p12hatsq+p12hatsq*p2hatsq)) ! Writing this way instead of get_MInv should avoid the issue of - vs + invariant masses
      if(MassWeight.ge.0d0 .and. p12hatsq.ne.0d0) then
         MassWeight = sqrt(MassWeight/(p12hatsq**2))
