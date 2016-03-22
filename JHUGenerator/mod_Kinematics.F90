@@ -676,12 +676,14 @@ RETURN
 END SUBROUTINE
 
 
-SUBROUTINE ShiftMass(p1,p2,m1,m2,p1hat,p2hat)
+SUBROUTINE ShiftMass(p1,p2,m1,m2,p1hat,p2hat,MassWeight)
 use ModMisc
 implicit none
 real(8),intent(in) :: p1(1:4),p2(1:4)
 real(8) :: m1,m2,p1hat(1:4),p2hat(1:4)
+real(8),optional :: MassWeight
 real(8) :: xi,eta,a,b,c,p1sq,p2sq,p1p2
+real(8) :: p1hatsq, p2hatsq, p12hatsq
 
   p1sq = p1(1:4).dot.p1(1:4)
   p2sq = p2(1:4).dot.p2(1:4)
@@ -696,6 +698,19 @@ real(8) :: xi,eta,a,b,c,p1sq,p2sq,p1p2
   p2hat(1:4) = xi*p1(1:4) + eta*p2(1:4)
   p1hat(1:4) = (1d0-xi)*p1(1:4) + (1d0-eta)*p2(1:4)
 
+  if( present(MassWeight) ) then
+     p1hatsq = p1hat(1:4).dot.p1hat(1:4)
+     p2hatsq = p2hat(1:4).dot.p2hat(1:4)
+     p12hatsq = (p1hat(1:4)+p2hat(1:4)).dot.(p1hat(1:4)+p2hat(1:4)) ! Should be p1p2*2d0, but better to avoid un-anticipated uses
+
+     ! Below is the same as 2d0/pi/g_d(p12hatsq,p1hatsq,p2hatsq)
+     MassWeight = (p12hatsq**2+p1hatsq**2+p2hatsq**2-2d0*(p1hatsq*p2hatsq+p1hatsq*p12hatsq+p12hatsq*p2hatsq)) ! Writing this way instead of get_MInv should avoid the issue of - vs + invariant masses
+     if(MassWeight.ge.0d0 .and. p12hatsq.ne.0d0) then
+        MassWeight = sqrt(MassWeight/(p12hatsq**2))
+     else
+        MassWeight = 0d0
+     endif
+  endif
 
 ! if( dabs( (p1hat.dot.p1hat)-m1**2 )/m1**2.gt.1d-3 ) then
 !     print *, "1",p1hat.dot.p1hat , m1**2
