@@ -570,31 +570,7 @@ logical :: SetAnomalousHff, Setkappa
     if( SetFacScheme.neqv.SetMuFacMultiplier ) call Error("If you want to set the factorization scale, please set both the scheme (FacScheme) and the multiplier (MuFacMultiplier)")
     if( SetRenScheme.neqv.SetMuRenMultiplier ) call Error("If you want to set the renormalization scale, please set both the scheme (RenScheme) and the multiplier (MuRenMultiplier)")
 
-    !ReadLHE and ConvertLHE
-    !MUST HAPPEN BEFORE DETERMINING INTERFERENCE
-    !so that the mass and width can be read
-    !AND BEFORE DEALING WITH WIDTHSCHEMES
-    !so that WidthSchemeIn can be read
-
-    if( ReadLHEFile .and. Process.ne.0  ) then
-        print *, "ReadLHE option is only allowed for spin-0 resonances"
-        stop 1
-    endif
-    if( ConvertLHEFile .and. Process.ne.0  ) then
-        print *, "ConvertLHE option is only allowed for spin-0 resonances"
-        stop 1
-    endif
-    if( ReadLHEFile .and. .not. Unweighted ) then
-        print *, "ReadLHE option is only allowed for generating unweighted events"
-        stop 1
-    endif
-
-    if (ReadLHEFile .or. ConvertLHEFile) then
-       call OpenFiles()
-       call ReadMassWidth()
-    endif
-
-    !DecayModes, interference, photon couplings, ...
+    !DecayModes
 
     if( ConvertLHEFile ) then
        DecayMode2 = DecayMode1
@@ -635,6 +611,35 @@ logical :: SetAnomalousHff, Setkappa
        Ga_V= 0d0    
     endif
 
+    !ReadLHE and ConvertLHE
+    !MUST HAPPEN BEFORE DETERMINING INTERFERENCE
+    !so that the mass and width can be read
+    !AND BEFORE DEALING WITH WIDTHSCHEMES
+    !so that WidthSchemeIn can be read
+
+    if( ReadLHEFile .and. Process.ne.0  ) then
+        print *, "ReadLHE option is only allowed for spin-0 resonances"
+        stop 1
+    endif
+    if( ConvertLHEFile .and. Process.ne.0  ) then
+        print *, "ConvertLHE option is only allowed for spin-0 resonances"
+        stop 1
+    endif
+    if( ReadLHEFile .and. .not. Unweighted ) then
+        print *, "ReadLHE option is only allowed for generating unweighted events"
+        stop 1
+    endif
+
+    if (ReadLHEFile .or. ConvertLHEFile) then
+       call OpenFiles()
+       if( ReadLHEFile .and. m_Reso.gt.2*m_V) then
+           call ReadMassWidth(.true.)
+       else
+           call ReadMassWidth(.false.)
+       endif
+    endif
+
+    !interference, photon couplings, ...
     if( (DecayMode1.eq.DecayMode2 .and. IsAZDecay(DecayMode1)) .or.  &
         (DecayMode1.eq.9) .or. (DecayMode2.eq.9)               .or.  &
         (DecayMode1.eq.8  .and. DecayMode2.eq.0)               .or.  &
@@ -652,6 +657,7 @@ logical :: SetAnomalousHff, Setkappa
         includeInterference = .false.   ! no interference if decay mode does not allow 4 same flavor leptons
     endif
 
+    !decay mode checks
     if( IsAZDecay(DecayMode1) .and. IsAZDecay(DecayMode2) ) then
         includeGammaStar = (SetZgammacoupling .or. Setgammagammacoupling)
     elseif( IsAZDecay(DecayMode1) .and. IsAPhoton(DecayMode2) ) then
@@ -1986,13 +1992,20 @@ END SUBROUTINE
 
 
 
-SUBROUTINE ReadMassWidth()
+SUBROUTINE ReadMassWidth(FindMaxm4l)
 use ModParameters
 use ModMisc
 implicit none
 logical :: FirstEvent,InMadgraphMassBlock
 character(len=160) :: FirstLines
 integer :: i, j, stat
+logical :: FindMaxm4l
+character(len=150) :: InputFmt0,InputFmt1
+integer :: nline, tries
+integer :: EventNumPart, OtherInts(1:5), LHE_IDUP(1:maxpart)
+real(8) :: Mass(1:maxpart), OtherReal8s(1:4)
+character(len=160) :: OtherLines
+character(len=160) :: EventLine(0:maxpart)
 
 !    search for line with first event
      FirstEvent = .false.
@@ -2127,6 +2140,68 @@ integer :: i, j, stat
      enddo
 99   continue
 
+     if( .not.FindMaxm4l ) then
+         call ReopenInFile()
+         return
+     endif
+
+     print *, "Finding max m4l in the LHE input file..."
+
+
+     InputFmt0 = ""
+     InputFmt1 = ""
+
+     do while ( .true. )
+         read(16,"(A)") EventLine(0)
+         if (UseUnformattedRead) then
+             read(EventLine(0),*) EventNumPart
+         else
+             if (InputFmt0.eq."") then
+                 InputFmt0 = FindInputFmt0(EventLine(0))
+             endif
+             read(EventLine(0),InputFmt0) EventNumPart, OtherInts(1), OtherReal8s(1:4)
+         endif
+!        read event lines
+         do nline=1,EventNumPart
+            read(16,fmt="(A160)") EventLine(nline)
+         enddo
+         if( EventNumPart.lt.3 .or. EventNumPart.gt.maxpart ) then
+            call Error("Number of particles in LHE input exceeds allowed limit",EventNumPart)
+         endif
+         do nline=1,EventNumPart
+            if (UseUnformattedRead) then
+                read(EventLine(nline),*) LHE_IDUP(nline),OtherInts(1:5),OtherReal8s(1:4),Mass(nline)
+            else
+                if (InputFmt1.eq."") then
+                    InputFmt1 = FindInputFmt1(EventLine(nline))
+                endif
+                read(EventLine(nline),InputFmt1) LHE_IDUP(nline),OtherInts(1:5),OtherReal8s(1:4),Mass(nline)
+            endif
+            if( abs(LHE_IDUP(nline)).eq.25 ) then!   select the Higgs (ID=25, h0)
+                  Mass(nline) = Mass(nline)*GeV            !  convert to units of 100GeV
+                  if( Mass(nline).gt.maxinputm4l ) maxinputm4l = Mass(nline)
+                  exit
+            endif
+         enddo
+!        read optional lines
+         tries = 0
+         do while (.true.)
+              tries = tries +1
+              read(16,fmt="(A160)",IOSTAT=stat,END=98) OtherLines(1:160)
+              if(OtherLines(1:30).eq."</LesHouchesEvents>") then
+                  goto 98
+              elseif( Index(OtherLines,"<event").ne.0 ) then
+                  exit
+              elseif( tries.gt.10000000 ) then
+                  write(io_LHEOutFile,"(A)") "</event>"
+                  print *, "ERROR: cannot find </event>"
+                  exit
+              endif              
+         enddo
+     enddo
+     print *, "... and it's ", maxinputm4l/GeV, " GeV"
+98   continue
+
      call ReopenInFile()
 
 return
@@ -2205,7 +2280,6 @@ use ModParameters
 use ModPMZZ
 implicit none
 include 'csmaxvalue.f'
-integer,parameter :: maxpart=30!=max.part particles in LHE file; this parameter should match the one in WriteOutEvent of mod_Kinematics
 real(8) :: VG_Result,VG_Error,VG_Chi2
 real(8) :: yRnd(1:22),Res,EMcheck(1:4),DecayWeight,DecayWidth,DecayWidth0
 real(8) :: HiggsDK_Mom(1:4,1:13),Ehat
@@ -2240,7 +2314,7 @@ call InitReadLHE(BeginEventLine)
      print *, " finding maximal weight for mZZ=mReso with ",VegasNc0," points"
      VG = zero
      CSmax = zero
-     EHat = M_Reso! fixing Ehat to M_Reso which should determine the max. of the integrand
+     EHat = maxinputm4l! fixing Ehat to maxinputm4l which should determine the max. of the integrand
      if( TauDecays.lt.0 ) then
          do tries=1,VegasNc0
              call random_number(yRnd)
@@ -2253,7 +2327,7 @@ call InitReadLHE(BeginEventLine)
              DecayWeight = EvalUnWeighted_DecayToTauTau(yRnd,.false.,EHat,Res,HiggsDK_Mom(1:4,4:13),HiggsDK_IDUP(1:13),HiggsDK_ICOLUP(1:2,1:13))
          enddo      
      endif
-     csmax(0,0)   = 1.5d0*csmax(0,0)    !  savety buffer
+     csmax(0,0)   = 1.5d0*csmax(0,0)    !  safety buffer
 
      InputFmt0 = ""
      InputFmt1 = ""
@@ -2477,7 +2551,6 @@ use ModParameters
 use ModMisc
 implicit none
 include 'csmaxvalue.f'
-integer,parameter :: maxpart=15!=max.partons; this parameter should match the one in WriteOutEvent of mod_Kinematics
 real(8) :: VG_Result,VG_Error,VG_Chi2
 real(8) :: yRnd(1:22),Res,dum,EMcheck(1:4),xRnd
 real(8) :: AcceptedEvent(1:4,1:maxpart),Ehat,pH2sq

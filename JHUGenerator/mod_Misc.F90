@@ -318,7 +318,7 @@ integer :: i, j, fieldwidth, spaces(1:6)
 integer :: ProcessIdCharacters, WeightScaleAqedAqcdCharacters(1:4), WeightScaleAqedAqcdAfterDecimal(1:4)
 character(len=40) :: FormatParts(1:6)
 
-!find the nubmer of spaces at the beginning
+!find the number of spaces at the beginning
 spaces(1) = 0
 i = 1
 do while (EventInfoLine(i:i) .eq. " ")
