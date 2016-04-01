@@ -632,11 +632,7 @@ logical :: SetAnomalousHff, Setkappa
 
     if (ReadLHEFile .or. ConvertLHEFile) then
        call OpenFiles()
-       if( ReadLHEFile .and. m_Reso.gt.2*m_V) then
-           call ReadMassWidth(.true.)
-       else
-           call ReadMassWidth(.false.)
-       endif
+       call ReadMassWidth()
     endif
 
     !interference, photon couplings, ...
@@ -1992,14 +1988,13 @@ END SUBROUTINE
 
 
 
-SUBROUTINE ReadMassWidth(FindMaxm4l)
+SUBROUTINE ReadMassWidth()
 use ModParameters
 use ModMisc
 implicit none
 logical :: FirstEvent,InMadgraphMassBlock
 character(len=160) :: FirstLines
 integer :: i, j, stat
-logical :: FindMaxm4l
 character(len=150) :: InputFmt0,InputFmt1
 integer :: nline, tries
 integer :: EventNumPart, OtherInts(1:5), LHE_IDUP(1:maxpart)
@@ -2140,12 +2135,13 @@ character(len=160) :: EventLine(0:maxpart)
      enddo
 99   continue
 
-     if( .not.FindMaxm4l ) then
+     if( .not.ReadLHEFile .or. m_Reso.lt.2*m_V) then
          call ReopenInFile()
+         maxinputm4l = m_Reso
          return
      endif
 
-     print *, "Finding max m4l in the LHE input file..."
+     print *, "Finding max mH in the LHE input file..."
 
 
      InputFmt0 = ""
@@ -2199,8 +2195,8 @@ character(len=160) :: EventLine(0:maxpart)
               endif              
          enddo
      enddo
-     print *, "... and it's ", maxinputm4l/GeV, " GeV"
 98   continue
+     print *, "... and it's ", maxinputm4l/GeV, " GeV"
 
      call ReopenInFile()
 
@@ -2311,7 +2307,7 @@ call InitReadLHE(BeginEventLine)
      endif
      DecayWidth0 = GetMZZProbability(M_Reso,-1d0,.true.)
 
-     print *, " finding maximal weight for mZZ=mReso with ",VegasNc0," points"
+     print *, " finding maximal weight for mZZ=", maxinputm4l/GeV, " GeV with ",VegasNc0," points"
      VG = zero
      CSmax = zero
      EHat = maxinputm4l! fixing Ehat to maxinputm4l which should determine the max. of the integrand
