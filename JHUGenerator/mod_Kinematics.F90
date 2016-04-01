@@ -27,7 +27,6 @@ use ModParameters
 use modMisc
 implicit none
 real(8) :: Mom(1:4,1:6)
-integer,parameter :: maxpart=15! this parameter should match the one in main.F90
 real(8),optional :: MomFSPartons(:,:)
 real(8),optional :: EventWeight
 character(len=160),optional :: EventInfoLine,PDFLine
@@ -364,7 +363,6 @@ character(len=*),optional :: InputFmt0
 real(8) :: Spin, Lifetime, s34,s56,s36,s45,smallestInv
 integer :: IDUP(:),ISTUP(:),MOTHUP(:,:),ICOLUP(:,:)
 integer :: HiggsDK_IDUP(:),HiggsDK_ICOLUP(:,:),HiggsDK_ISTUP(4:9),HiggsDK_MOTHUP(1:2,4:9)
-integer,parameter :: maxpart=30
 integer :: i,iHiggs
 integer :: NUP,NUP_NEW,IDPRUP
 real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP,HiggsDKLength
@@ -543,7 +541,6 @@ character(len=*),optional :: InputFmt0
 real(8) :: Spin, Lifetime, s34,s56,s36,s45,smallestInv
 integer :: IDUP(:),ISTUP(:),MOTHUP(:,:),ICOLUP(:,:)
 integer :: HiggsDK_IDUP(:),HiggsDK_ICOLUP(:,:),HiggsDK_ISTUP(4:13),HiggsDK_MOTHUP(1:2,4:13)
-integer,parameter :: maxpart=30
 integer :: i,iHiggs
 integer :: NUP,NUP_NEW,IDPRUP
 real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP,HiggsDKLength
