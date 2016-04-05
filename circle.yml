@@ -4,6 +4,7 @@ machine:
     - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.6 10
     - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.6 10
     - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.9 20
+    - sudo apt-get install dos2unix
   environment:
     #environment variables can only be set in this section so . bin/thisroot.sh doesn't work
     PATH: "$(echo /home/ubuntu/root/bin:/home/ubuntu/CMSJHU_AnalysisMacros/JHUSpinWidthPaper_2015/LHEAnalyzer:$PATH | sed s/:$//)"
@@ -122,7 +123,7 @@ test:
 
 
   post:
-    - python ~/checklhe/checklhe.py $(find $CIRCLE_ARTIFACTS -name *.lhe) | tee checklheoutput.txt
+    - unbuffer python ~/checklhe/checklhe.py $(find $CIRCLE_ARTIFACTS -name *.lhe) | tee checklheoutput.txt
     #if there are any errors this command will exit 1 and so the test will fail
     - "! grep -q '!' checklheoutput.txt"    #all the error messages end with !
     - "! find $CIRCLE_ARTIFACTS -name *.lhe.lhe | grep ."
@@ -135,3 +136,18 @@ test:
     - if [ -f ~/mixtures ]; then cd ~/CMSJHU_AnalysisMacros/ZZ4lanalyticalfits && echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$CIRCLE_ARTIFACTS/ggH/fa30.5i.root", "$CIRCLE_ARTIFACTS/ggH/fa30.5i/", 1, 0, 2.55052, 0, 0)' | root -b; fi
     #VBF plots
     - cd ~/CMSJHU_AnalysisMacros/MCProductionValidation && root -b -q VBFplots.C+
+
+deployment:
+  fixnewlines:
+    branch: /.*/
+    owner: JHUGen
+    commands:
+      - git config user.email JHUGencircle@gmail.com
+      - git config user.name CircleCI
+      - git config user.github JHUGen-circle
+      - git checkout -- .:
+          pwd: ..
+      - dos2unix $(git ls-files):
+          pwd: ..
+      #if pushing doesn't work because there has been a more recent push, don't mark the tests as failed
+      - if [ $CIRCLE_BRANCH ] && git diff | grep -q .; then git commit -a -m "CircleCI - use unix style newlines" && git push git@github.com:$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME $CIRCLE_BRANCH; fi || true
