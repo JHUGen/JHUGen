@@ -14,7 +14,7 @@ real(8) :: VG_Result,VG_Error
 
    call GetCommandlineArgs()
    call InitProcessScaleSchemes()
-   call InitPDFs()!  
+   call InitPDFs()!
    call InitHisto()
    call InitParameters()
    call InitProcess()
@@ -47,7 +47,7 @@ real(8) :: VG_Result,VG_Error
    call FinalizeOutput()
    call CloseFiles()
    write(io_stdout,*) "Done"
-   
+
 
 END PROGRAM
 
@@ -562,8 +562,8 @@ logical :: SetAnomalousHff, Setkappa
        stop 1
     endif
     call GET_ENVIRONMENT_VARIABLE("LHAPDF_DATA_PATH", LHAPDF_DATA_PATH)
-#endif    
-    
+#endif
+
     !Renormalization/factorization schemes
 
     if((abs(FacScheme) .ge. nRenFacSchemes) .or. (abs(RenScheme) .ge. nRenFacSchemes) .or. (MuFacMultiplier.le.0d0) .or. (MuRenMultiplier.le.0d0)) call Error("The renormalization or factorization scheme is invalid, or the scale multiplier to either is not positive.")
@@ -574,7 +574,7 @@ logical :: SetAnomalousHff, Setkappa
 
     if( ConvertLHEFile ) then
        DecayMode2 = DecayMode1
-    endif 
+    endif
 
     if( Process.eq.50 ) then
         DecayMode2=DecayMode1
@@ -583,7 +583,7 @@ logical :: SetAnomalousHff, Setkappa
     endif
 
     if( Process.ge.110 .and. Process.le.113 ) DecayMode2 = DecayMode1
-    
+
     if( (TopDecays.ne.0 .and. TopDecays.ne.1) .and. (Process.eq.80 .or. (Process.ge.110 .and. Process.le.113)) ) call Error("Specify TopDK=0,1")
     if( (TopDecays.eq.1) .and. .not. IsAWDecay(DecayMode1) ) call Error("Invalid DecayMode1 for top decays")
     if( (TopDecays.eq.1) .and. .not. IsAWDecay(DecayMode2) ) call Error("Invalid DecayMode2 for top decays")
@@ -605,10 +605,10 @@ logical :: SetAnomalousHff, Setkappa
        Ga_V= Ga_Z
     elseif( IsAWDecay(DecayMode1) ) then
        M_V = M_W
-       Ga_V= Ga_W    
+       Ga_V= Ga_W
     elseif( IsAPhoton(DecayMode1) ) then
        M_V = 0d0
-       Ga_V= 0d0    
+       Ga_V= 0d0
     endif
 
     !ReadLHE and ConvertLHE
@@ -841,7 +841,7 @@ SUBROUTINE InitPDFValues()
    implicit none
 
 #if useLHAPDF==0
-   IF (alphas_mz .LE. 0d0) THEN 
+   IF (alphas_mz .LE. 0d0) THEN
       WRITE(6,*) 'alphas_mz .le. 0:',alphas_mz
       WRITE(6,*) 'continuing with alphas_mz=0.118'
       alphas_mz=0.118d0
@@ -917,7 +917,7 @@ SUBROUTINE InitParameters
 use ModParameters
 implicit none
 
-IF( COLLIDER.EQ.1) THEN 
+IF( COLLIDER.EQ.1) THEN
   Collider_Energy  = LHC_Energy
 ELSEIF( COLLIDER.EQ.2 ) THEN
   Collider_Energy  = TEV_Energy
@@ -927,7 +927,7 @@ ENDIF
 
 
 ! rescale V branchings to preserve the correct branching proportions in partial decays
-if( (DecayMode1.eq.8 .and. DecayMode2.eq.9) .or.  & 
+if( (DecayMode1.eq.8 .and. DecayMode2.eq.9) .or.  &
     (DecayMode1.eq.9 .and. DecayMode2.eq.8) ) then
         scale_alpha_Z_uu = scale_alpha_Z_uu * 2d0
         scale_alpha_Z_dd = scale_alpha_Z_dd * 2d0
@@ -936,7 +936,7 @@ if( (DecayMode1.eq.8 .and. DecayMode2.eq.9) .or.  &
         scale_alpha_Z_tt = scale_alpha_Z_tt * 1d0
 
 
-elseif( (DecayMode1.eq.0 .and. DecayMode2.eq.9) .or.  & 
+elseif( (DecayMode1.eq.0 .and. DecayMode2.eq.9) .or.  &
         (DecayMode1.eq.9 .and. DecayMode2.eq.0) ) then
         scale_alpha_Z_uu = scale_alpha_Z_uu * 2d0
         scale_alpha_Z_dd = scale_alpha_Z_dd * 2d0
@@ -945,7 +945,7 @@ elseif( (DecayMode1.eq.0 .and. DecayMode2.eq.9) .or.  &
         scale_alpha_Z_tt = scale_alpha_Z_tt * 2d0
 
 
-elseif( (DecayMode1.eq.1 .and. DecayMode2.eq.9) .or.  & 
+elseif( (DecayMode1.eq.1 .and. DecayMode2.eq.9) .or.  &
         (DecayMode1.eq.9 .and. DecayMode2.eq.1) ) then
         scale_alpha_Z_uu = scale_alpha_Z_uu * 1d0
         scale_alpha_Z_dd = scale_alpha_Z_dd * 1d0
@@ -954,7 +954,7 @@ elseif( (DecayMode1.eq.1 .and. DecayMode2.eq.9) .or.  &
         scale_alpha_Z_tt = scale_alpha_Z_tt * 2d0
 
 
-elseif( (DecayMode1.eq.2 .and. DecayMode2.eq.9) .or.  & 
+elseif( (DecayMode1.eq.2 .and. DecayMode2.eq.9) .or.  &
         (DecayMode1.eq.9 .and. DecayMode2.eq.2) ) then
         scale_alpha_Z_uu = scale_alpha_Z_uu * 2d0
         scale_alpha_Z_dd = scale_alpha_Z_dd * 2d0
@@ -963,7 +963,7 @@ elseif( (DecayMode1.eq.2 .and. DecayMode2.eq.9) .or.  &
         scale_alpha_Z_tt = scale_alpha_Z_tt * 1d0
 
 
-elseif( (DecayMode1.eq.3 .and. DecayMode2.eq.9) .or.  & 
+elseif( (DecayMode1.eq.3 .and. DecayMode2.eq.9) .or.  &
         (DecayMode1.eq.9 .and. DecayMode2.eq.3) ) then
         scale_alpha_Z_uu = scale_alpha_Z_uu * 2d0
         scale_alpha_Z_dd = scale_alpha_Z_dd * 2d0
@@ -971,7 +971,7 @@ elseif( (DecayMode1.eq.3 .and. DecayMode2.eq.9) .or.  &
         scale_alpha_Z_ll = scale_alpha_Z_ll * 2d0
         scale_alpha_Z_tt = scale_alpha_Z_tt * 2d0
 
-elseif( (DecayMode1.eq.8 .and. DecayMode2.eq.0) .or.  & 
+elseif( (DecayMode1.eq.8 .and. DecayMode2.eq.0) .or.  &
         (DecayMode1.eq.0 .and. DecayMode2.eq.8) ) then
         scale_alpha_Z_uu = scale_alpha_Z_uu * 1d0
         scale_alpha_Z_dd = scale_alpha_Z_dd * 1d0
@@ -979,7 +979,7 @@ elseif( (DecayMode1.eq.8 .and. DecayMode2.eq.0) .or.  &
         scale_alpha_Z_ll = scale_alpha_Z_ll * 1d0
         scale_alpha_Z_tt = scale_alpha_Z_tt * 2d0
 
-elseif( (DecayMode1.eq.8 .and. DecayMode2.eq.2) .or.  & 
+elseif( (DecayMode1.eq.8 .and. DecayMode2.eq.2) .or.  &
         (DecayMode1.eq.2 .and. DecayMode2.eq.8) ) then
         scale_alpha_Z_uu = scale_alpha_Z_uu * 1d0
         scale_alpha_Z_dd = scale_alpha_Z_dd * 1d0
@@ -987,7 +987,7 @@ elseif( (DecayMode1.eq.8 .and. DecayMode2.eq.2) .or.  &
         scale_alpha_Z_ll = scale_alpha_Z_ll * 2d0
         scale_alpha_Z_tt = scale_alpha_Z_tt * 1d0
 
-elseif( (DecayMode1.eq.4 .and. DecayMode2.eq.11) .or.  & 
+elseif( (DecayMode1.eq.4 .and. DecayMode2.eq.11) .or.  &
         (DecayMode1.eq.11.and. DecayMode2.eq.4) ) then
         scale_alpha_W_ud = scale_alpha_W_ud * 2d0
         scale_alpha_W_cs = scale_alpha_W_cs * 2d0
@@ -995,35 +995,35 @@ elseif( (DecayMode1.eq.4 .and. DecayMode2.eq.11) .or.  &
         scale_alpha_W_tn = scale_alpha_W_tn * 2d0
 
 
-elseif( (DecayMode1.eq.5 .and. DecayMode2.eq.11) .or.  & 
+elseif( (DecayMode1.eq.5 .and. DecayMode2.eq.11) .or.  &
         (DecayMode1.eq.11.and. DecayMode2.eq.5) ) then
         scale_alpha_W_ud = scale_alpha_W_ud * 1d0
         scale_alpha_W_cs = scale_alpha_W_cs * 1d0
         scale_alpha_W_ln = scale_alpha_W_ln * 2d0
         scale_alpha_W_tn = scale_alpha_W_tn * 2d0
 
-elseif( (DecayMode1.eq.6 .and. DecayMode2.eq.11) .or.  & 
+elseif( (DecayMode1.eq.6 .and. DecayMode2.eq.11) .or.  &
         (DecayMode1.eq.11.and. DecayMode2.eq.6) ) then
         scale_alpha_W_ud = scale_alpha_W_ud * 2d0
         scale_alpha_W_cs = scale_alpha_W_cs * 2d0
         scale_alpha_W_ln = scale_alpha_W_ln * 2d0
         scale_alpha_W_tn = scale_alpha_W_tn * 1d0
 
-elseif( (DecayMode1.eq.10.and. DecayMode2.eq.11) .or.  & 
+elseif( (DecayMode1.eq.10.and. DecayMode2.eq.11) .or.  &
         (DecayMode1.eq.11.and. DecayMode2.eq.10) ) then
         scale_alpha_W_ud = scale_alpha_W_ud * 2d0
         scale_alpha_W_cs = scale_alpha_W_cs * 2d0
         scale_alpha_W_ln = scale_alpha_W_ln * 1d0
         scale_alpha_W_tn = scale_alpha_W_tn * 1d0
 
-elseif( (DecayMode1.eq.4 .and. DecayMode2.eq.10) .or.  & 
+elseif( (DecayMode1.eq.4 .and. DecayMode2.eq.10) .or.  &
         (DecayMode1.eq.10.and. DecayMode2.eq.4) ) then
         scale_alpha_W_ud = scale_alpha_W_ud * 1d0
         scale_alpha_W_cs = scale_alpha_W_cs * 1d0
         scale_alpha_W_ln = scale_alpha_W_ln * 1d0
         scale_alpha_W_tn = scale_alpha_W_tn * 2d0
 
-elseif( (DecayMode1.eq.6 .and. DecayMode2.eq.10) .or.  & 
+elseif( (DecayMode1.eq.6 .and. DecayMode2.eq.10) .or.  &
         (DecayMode1.eq.10.and. DecayMode2.eq.6) ) then
         scale_alpha_W_ud = scale_alpha_W_ud * 1d0
         scale_alpha_W_cs = scale_alpha_W_cs * 1d0
@@ -1058,7 +1058,7 @@ include "vegas_common.f"
           NDim = NDim + 3    ! integration over mz1, mz2, mg for adjusted kinematics but with on-shell matrix elements
       endif
       VegasIt1_default = 5
-      if( .not.ReadLHEFile ) then 
+      if( .not.ReadLHEFile ) then
           VegasNc0_default = 10000000
           VegasNc1_default = 50000000
           VegasNc2_default = 10000
@@ -1080,19 +1080,19 @@ include "vegas_common.f"
       if(Process.eq.2 ) then
         NDim = 12
       endif
-      
+
       !- HVBF
       if(Process.eq.60) then
          NDim = 5        ! for phase space
          NDim = NDim + 2 ! sHat integration
          NDim = NDim + 1 ! for pdf sampling
-         NDim = NDim + 1 ! for PS sampling 
+         NDim = NDim + 1 ! for PS sampling
          VegasIt1_default = 15
          VegasNc0_default = 10000000
          VegasNc1_default = 500000
          VegasNc2_default = 10000
       endif
-      
+
       !- HVBF with decays
       if(Process.eq.66) then
          NDim = 5
@@ -1101,7 +1101,7 @@ include "vegas_common.f"
          NDim = NDim + 1
          NDim = NDim + 1
          NDim = NDim + 1
-         
+
          VegasIt1_default = 5
          VegasNc0_default = 10000000
          VegasNc1_default = 500000
@@ -1112,7 +1112,7 @@ include "vegas_common.f"
       if(Process.eq.61) then
          NDim = 5        ! phase space
          NDim = NDim + 2 ! sHat integration
-         NDim = NDim + 1 ! for pdf sampling       
+         NDim = NDim + 1 ! for pdf sampling
          NDim = NDim + 1 ! for PS sampling
          VegasIt1_default = 15
          VegasNc0_default = 10000000
@@ -1124,7 +1124,7 @@ include "vegas_common.f"
          NDim = 5+1 !1 for color flow ramdomization in gg > Hg
          NDim = NDim + 2 ! sHat integration
          if( unweighted ) NDim = NDim + 1  ! random number which decides if event is accepted
-         
+
          VegasIt1_default = 5
          VegasNc0_default = 10000000
          VegasNc1_default = 500000
@@ -1135,7 +1135,7 @@ include "vegas_common.f"
          NDim = 17
          NDim = NDim + 2 ! sHat integration
          if( unweighted ) NDim = NDim + 1  ! random number which decides if event is accepted
-         
+
          VegasIt1_default = 5
          VegasNc0_default = 10000000
          VegasNc1_default = 500000
@@ -1148,7 +1148,7 @@ include "vegas_common.f"
          if( TopDecays.ne.0 ) NDim = Ndim + 8      ! phase space
          NDim = NDim + 2 ! sHat integration
          NDim = NDim + 1  ! MC sampling for gg and qqb channel
-         
+
          VegasIt1_default = 5
          VegasNc0_default =  100000
          VegasNc1_default =  500000
@@ -1158,12 +1158,12 @@ include "vegas_common.f"
       if(Process.eq.90) then
          TopDecays = 0
          m_Top = m_Bot
-         
+
          call InitProcess_TTBH()
          NDim = 12
          NDim = NDim + 2 ! sHat integration
          if( unweighted ) NDim = NDim + 1  ! random number which decides if event is accepted
-         
+
          VegasIt1_default = 5
          VegasNc0_default =  100000
          VegasNc1_default =  500000
@@ -1174,7 +1174,7 @@ include "vegas_common.f"
          NDim = 9
          NDim = NDim + 2 ! sHat integration
          if( unweighted ) NDim = NDim + 1  ! random number which decides if event is accepted
-         
+
          VegasIt1_default = 5
          VegasNc0_default =  500000
          VegasNc1_default =  500000
@@ -1237,7 +1237,7 @@ integer, dimension(:), allocatable :: gen_seed
 
 if( VegasIt1.eq.-1 ) VegasIt1 = VegasIt1_default
 if( VegasNc0.eq.-1 ) VegasNc0 = VegasNc0_default
-if( VegasNc1.eq.-1 .and. VegasNc2.eq.-1 .and.  (unweighted) ) then 
+if( VegasNc1.eq.-1 .and. VegasNc2.eq.-1 .and.  (unweighted) ) then
       VegasNc1 = VegasNc1_default
       VegasNc2 = VegasNc2_default
 endif
@@ -1285,7 +1285,7 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
     endif
 
     !DATA RUN
-    call ClearHisto()   
+    call ClearHisto()
     warmup = .false.
     EvalCounter=0
     RejeCounter=0
@@ -1297,9 +1297,9 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
 
     itmx = 1
     ncall= VegasNc2
-    if (process.eq.60 .or. process.eq.61) then 
+    if (process.eq.60 .or. process.eq.61) then
       call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
-    elseif (process.eq.62 .or. process.eq.61) then 
+    elseif (process.eq.62 .or. process.eq.61) then
       call vegas1(EvalWeighted_HJ,VG_Result,VG_Error,VG_Chi2)
     elseif (Process.eq.50) then
       call vegas1(EvalWeighted_VHiggs,VG_Result,VG_Error,VG_Chi2)
@@ -1315,7 +1315,7 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
     endif
 
 
-    
+
 elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
 
     VG = zero
@@ -1371,7 +1371,7 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
 
 
 !        print *, " gg/qqb ratio = ", VG(0,0)/(VG(+1,-1) + VG(+2,-2) + VG(+3,-3) + VG(+4,-4) + VG(+5,-5)   &
-!                                             +VG(-1,+1) + VG(-2,+2) + VG(-3,+3) + VG(-4,+4) + VG(-5,+5))  
+!                                             +VG(-1,+1) + VG(-2,+2) + VG(-3,+3) + VG(-4,+4) + VG(-5,+5))
 
 !------------------adj_par fixes by how much the quark-induced channels need to be adjusted
 
@@ -1460,9 +1460,9 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
     endif
     write(io_stdout,*)  " event generation rate (events/sec)",dble(AccepCounter)/(time_end-time_start)
 
-                 
+
   endif! unweighted
-  
+
 
     if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) then
           write(*,*) ""
@@ -1479,13 +1479,13 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
                                           dble(Br_counter(3,1))+dble(Br_counter(3,2)))/dble(AccepCounter)
           write(*,"(A,5F16.3)") "2l2q: ",(dble(Br_counter(1,5))+dble(Br_counter(2,5))+dble(Br_counter(3,5))+  &
                                           dble(Br_counter(5,1))+dble(Br_counter(5,2))+dble(Br_counter(5,3)) )/dble(AccepCounter)
-            
+
           write(*,"(A,5F16.3)") "4l/2q2l: ",(dble(Br_counter(1,2))+dble(Br_counter(1,3))+ dble(Br_counter(1,1))+dble(Br_counter(2,2))+dble(Br_counter(3,3)) &
                                         + dble(Br_counter(2,1))+dble(Br_counter(2,3))+   &
                                           dble(Br_counter(3,1))+dble(Br_counter(3,2)))/  &
                                           (dble(Br_counter(1,5))+dble(Br_counter(2,5))+dble(Br_counter(3,5))+  &
                                           dble(Br_counter(5,1))+dble(Br_counter(5,2))+dble(Br_counter(5,3)) )
-                                          
+
       !     print *, alpha_QED/12d0*M_Z * (   (aR_lep+aL_lep)**2 + (aR_lep-aL_lep)**2        &
       !                                      +(aR_lep+aL_lep)**2 + (aR_lep-aL_lep)**2        &
       !                                      +(aR_lep+aL_lep)**2 + (aR_lep-aL_lep)**2        &
@@ -1497,10 +1497,10 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
       !                                      +((aR_Qup+aL_Qup)**2 + (aR_Qup-aL_Qup)**2 )*3d0 *1.0366d0 &
       !                                      +((aR_Qdn+aL_Qdn)**2 + (aR_Qdn-aL_Qdn)**2 )*3d0 *1.0366d0 &
       !                                      +((aR_Qdn+aL_Qdn)**2 + (aR_Qdn-aL_Qdn)**2 )*3d0 *1.0366d0 *(1d0-3d0/2d0/(M_Z/2d0/m_bot)**2) &
-      !                                  )/4d0/(one-sitW**2)/sitW**2      
+      !                                  )/4d0/(one-sitW**2)/sitW**2
 
     endif
-  
+
 
 
 return
@@ -1539,7 +1539,7 @@ logical :: UseBetaVersion=.false.
 
     if( VegasIt1.eq.-1 ) VegasIt1 = VegasIt1_default
     if( VegasNc0.eq.-1 ) VegasNc0 = VegasNc0_default
-    if( VegasNc1.eq.-1 .and. VegasNc2.eq.-1 .and.  (unweighted) ) then 
+    if( VegasNc1.eq.-1 .and. VegasNc2.eq.-1 .and.  (unweighted) ) then
           VegasNc1 = VegasNc1_default
           VegasNc2 = VegasNc2_default
     endif
@@ -1559,16 +1559,16 @@ logical :: UseBetaVersion=.false.
 
 ! nprn = -1
 
-    
-    call cpu_time(time_start)    
+
+    call cpu_time(time_start)
     warmup = .false.
     itmx = VegasIt1
     ncall= VegasNc1
     PChannel_aux = PChannel
 
-   
-   
-   
+
+
+
 if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !----------------------- weighted events
 
 
@@ -1587,7 +1587,7 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
     if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) call vegas(EvalWeighted,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.80 ) call vegas(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.90 ) call vegas(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
-    
+
     if( Process.eq.60 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.66 ) call vegas(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.61 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
@@ -1599,7 +1599,7 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
     if( Process.eq.113) call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
 
     !DATA RUN
-    call ClearHisto()   
+    call ClearHisto()
     warmup = .false.
     Br_counter(:,:) = 0
     EvalCounter=0
@@ -1633,19 +1633,19 @@ if( Process.eq.61 ) UseBetaVersion=.true.
 if( Process.eq.66 ) UseBetaVersion=.true.
 
 
-if( UseBetaVersion ) then 
+if( UseBetaVersion ) then
 ! !-------------------new stuff -------------------
     write(io_stdout,"(2X,A)")  "Scanning the integrand"
     warmup = .true.
     itmx = 5
     ncall= VegasNc0
-    outgridfile="vegas_"//trim(ProcessStr)//".grid"  
+    outgridfile="vegas_"//trim(ProcessStr)//".grid"
     ingridfile=trim(outgridfile)
-    
+
     if( ReadCSmax ) then
         readin=.true.
         writeout=.false.
-        itmx = 3 
+        itmx = 3
     else
         readin=.false.
         writeout=.true.
@@ -1655,8 +1655,8 @@ if( UseBetaVersion ) then
         if( Process.eq.66 ) call vegas(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
         itmx = 3
     endif
-      
-    
+
+
     CrossSecMax(:,:) = 0d0
     CrossSec(:,:) = 0d0
 
@@ -1667,13 +1667,13 @@ if( UseBetaVersion ) then
     if( Process.eq.66 ) call vegas1(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.61 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
 !     if( Process.eq.110) call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
-!     if( Process.eq.111) call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)    
-!     if( Process.eq.112) call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)    
-!     if( Process.eq.113) call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)    
+!     if( Process.eq.111) call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
+!     if( Process.eq.112) call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
+!     if( Process.eq.113) call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
 
 
     call vegas_get_calls(calls1)
-    CrossSec(:,:) = CrossSec(:,:)/dble(itmx)    
+    CrossSec(:,:) = CrossSec(:,:)/dble(itmx)
     write(io_stdout,"(A)")  ""
     write(io_stdout,*) "Total xsec: ",VG_Result, " +/-",VG_Error, " fb    vs.",sum(CrossSec(:,:))
     call InitOutput(VG_Result, VG_Error)
@@ -1701,20 +1701,20 @@ if( UseBetaVersion ) then
 !          i1 = ijSel(i,1)
 !          j1 = ijSel(i,2)
 !          if( j1.gt.i1 ) cycle
-!          write(io_stdout,"(1X,I3,A,I3,I3,A,3X,F8.3,I9)") i," Fractional partonic xsec ",i1,j1," "//getLHEParticle(i1)//" "//getLHEParticle(j1)//" ",CrossSec(i1,j1)/VG_Result,RequEvents(i1,j1) 
+!          write(io_stdout,"(1X,I3,A,I3,I3,A,3X,F8.3,I9)") i," Fractional partonic xsec ",i1,j1," "//getLHEParticle(i1)//" "//getLHEParticle(j1)//" ",CrossSec(i1,j1)/VG_Result,RequEvents(i1,j1)
 ! enddo
 ! pause
-    
+
     do i=1,121
          i1 = ijSel(i,1)
          j1 = ijSel(i,2)
-         if( RequEvents(i1,j1).gt.0 .and. ijSel(i,3).eq.1 ) write(io_stdout,"(1X,I3,A,I3,I3,A,3X,F8.3,I9)") i," Fractional partonic xsec ",i1,j1," "//getLHEParticle(i1)//" "//getLHEParticle(j1)//" ",CrossSec(i1,j1)/VG_Result,RequEvents(i1,j1) 
+         if( RequEvents(i1,j1).gt.0 .and. ijSel(i,3).eq.1 ) write(io_stdout,"(1X,I3,A,I3,I3,A,3X,F8.3,I9)") i," Fractional partonic xsec ",i1,j1," "//getLHEParticle(i1)//" "//getLHEParticle(j1)//" ",CrossSec(i1,j1)/VG_Result,RequEvents(i1,j1)
     enddo
     write(io_stdout,"(2X,A,F8.3,I9)") "Sum        partonic xsec   x   x    ",sum(CrossSec(:,:))/VG_Result,sum(RequEvents(:,:))
-  
-  
-  
-  
+
+
+
+
 !   add some events that got lost due to rounding errors
 !   distribute them according to the partonic cross section fractions and finally add the last pieces to the largest partonic contribution
     MissingEvents = VegasNc2 - sum(RequEvents(:,:))
@@ -1730,7 +1730,7 @@ if( UseBetaVersion ) then
               imax=i
             endif
 !             print *, "adding",i1,j1,nint( CrossSec(i1,j1)/VG_Result * MissingEvents )
-        enddo       
+        enddo
         MissingEvents = VegasNc2 - sum(RequEvents(:,:))
 !         print *, "MISSING EVENTS",MissingEvents
         i1 = ijSel(imax,1)
@@ -1738,34 +1738,34 @@ if( UseBetaVersion ) then
         RequEvents(i1,j1) = RequEvents(i1,j1) + MissingEvents
         write(*,"(2X,A,I9)") "Adjusting number of events. New event count=",sum(RequEvents(:,:))
     endif
-    
-      
-      
-    
+
+
+
+
     write(io_stdout,"(A)")  ""
     write(io_stdout,"(2X,A)")  "Event generation"
-    call ClearHisto()   
+    call ClearHisto()
     warmup = .false.
     itmx = 1
-!     nprn = 0  
+!     nprn = 0
     EvalCounter = 0
     Br_counter(:,:) = 0
     RejeCounter = 0
     AlertCounter = 0
-    AccepCounter_part(:,:) = 0 
+    AccepCounter_part(:,:) = 0
     StatusPercent = 0d0
-    
+
     CrossSecMax(:,:) = 1.0d0 * CrossSecMax(:,:)    !  adjustment factor
-    call cpu_time(time_start)    
-    
+    call cpu_time(time_start)
+
 
     itmx=200000
     ncall= VegasNc0/10
     call vegas_get_calls(calls2)
     calls_rescale = calls1/calls2
-    CrossSecMax(:,:) = CrossSecMax(:,:) * calls_rescale    
+    CrossSecMax(:,:) = CrossSecMax(:,:) * calls_rescale
 
-    
+
 !     do while( StatusPercent.lt.100d0  )
         if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) call vegas1(EvalWeighted,VG_Result,VG_Error,VG_Chi2)
 !         if( Process.eq.80 ) call vegas1(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)! adjust to LHE format
@@ -1774,23 +1774,23 @@ if( UseBetaVersion ) then
         if( Process.eq.66 ) call vegas1(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
         if( Process.eq.61 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
 !         if( Process.eq.110) call vegas1(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
-!         if( Process.eq.111) call vegas1(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)      
-!         if( Process.eq.112) call vegas1(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)      
-!         if( Process.eq.113) call vegas1(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)      
+!         if( Process.eq.111) call vegas1(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
+!         if( Process.eq.112) call vegas1(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
+!         if( Process.eq.113) call vegas1(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
 !         call system('clear')
 !         write(io_stdout,*) ""
 !         do i1=-5,5
 !         do j1=-5,5
-!             if( RequEvents(i1,j1).gt.0 ) then 
+!             if( RequEvents(i1,j1).gt.0 ) then
 ! !                write(io_stdout,"(1X,A,I4,I4,2X,I7,2X,I7,2X,F8.3,1X,A)") "Generated events ", i1,j1,(AccepCounter_part(i1,j1)),(RequEvents(i1,j1)),dble(AccepCounter_part(i1,j1))/dble(RequEvents(i1,j1))*100d0,"%"
 !                call PrintStatusBar2(int(dble(AccepCounter_part(i1,j1))/(dble(RequEvents(i1,j1)))*100),"channel "//getLHEParticle(i1)//" "//getLHEParticle(j1)//" ")
-!             endif   
+!             endif
 !         enddo
-!         enddo  
-!         StatusPercent = int(100d0*dble(sum(AccepCounter_part(:,:)))/dble(sum(RequEvents(:,:)))  )   
+!         enddo
+!         StatusPercent = int(100d0*dble(sum(AccepCounter_part(:,:)))/dble(sum(RequEvents(:,:)))  )
 !     enddo
-    call cpu_time(time_end)  
-    
+    call cpu_time(time_end)
+
     print *, " Alert  Counter: ",AlertCounter
     if( dble(AlertCounter)/dble(AccepCounter+1d-10) .gt. 1d0*percent ) then
         write(io_LogFile,*) "ALERT: The number of rejected events with too small CSMAX exceeds 1%."
@@ -1818,15 +1818,15 @@ if( UseBetaVersion ) then
                                           dble(Br_counter(3,1))+dble(Br_counter(3,2)))/dble(AccepCounter)
           write(*,"(A,5F16.3)") "2l2q: ",(dble(Br_counter(1,5))+dble(Br_counter(2,5))+dble(Br_counter(3,5))+  &
                                           dble(Br_counter(5,1))+dble(Br_counter(5,2))+dble(Br_counter(5,3)) )/dble(AccepCounter)
-            
+
           write(*,"(A,5F16.3)") "4l/2q2l: ",(dble(Br_counter(1,2))+dble(Br_counter(1,3))+ dble(Br_counter(1,1))+dble(Br_counter(2,2))+dble(Br_counter(3,3)) &
                                         + dble(Br_counter(2,1))+dble(Br_counter(2,3))+   &
                                           dble(Br_counter(3,1))+dble(Br_counter(3,2)))/  &
                                           (dble(Br_counter(1,5))+dble(Br_counter(2,5))+dble(Br_counter(3,5))+  &
                                           dble(Br_counter(5,1))+dble(Br_counter(5,2))+dble(Br_counter(5,3)) )
     endif
-  
-    
+
+
 
 
 else! beta version
@@ -1873,12 +1873,12 @@ else! beta version
         READ(io_CSmaxFile) CSMAX,VG
         close(io_CSmaxFile)
     endif
-   
+
    CSmax(:,:)   = 1.5d0 * CSmax(:,:)    !  adjustment factor
 
    VG(:,:) = VG(:,:)/dble(VegasNc0)
    TotalXSec = sum(  VG(:,:) )
-   print *, ""    
+   print *, ""
    write(io_stdout,"(1X,A,F10.3)") "Total xsec: ",TotalXSec
 
 
@@ -1888,14 +1888,14 @@ else! beta version
          RequEvents(i1,j1) = RequEvents(i1,j1) + int( VG(i1,j1)/TotalXSec * VegasNc2 )
     enddo
     enddo
-    
-   
+
+
     do i1=-5,5
     do j1=-5,5
          if( VG(i1,j1).gt.1d-9 ) write(io_stdout,"(1X,A,I4,I4,F8.3,I9)") "Fractional partonic xsec ", i1,j1,VG(i1,j1)/TotalXSec,RequEvents(i1,j1)
     enddo
     enddo
-   
+
 
 
 
@@ -1916,12 +1916,12 @@ else! beta version
     if(RequEvents(i1,j1).ne.0) then
           if( (PChannel.eq.0) .and. (abs(i1)+abs(j1).ne.0) ) cycle
           if( (PChannel.eq.1) .and. i1*j1.eq.0 ) cycle
-          
+
           write(io_stdout,*) ""
           write(io_stdout,*) ""
           write(io_stdout,"(X,A,I8,A,I4,I4,A)",advance='no') "generating ",RequEvents(i1,j1)," events for channel",i1,j1,":  "
           flush(io_stdout)
-          
+
           do while( AccepCounter_part(i1,j1)  .lt. RequEvents(i1,j1) )
               call random_number(yRnd)
               if( Process.eq.80 ) then
@@ -1949,11 +1949,11 @@ else! beta version
 
     endif
     enddo
-    enddo    
+    enddo
 
-    
-    
-    
+
+
+
     call cpu_time(time_end)
     print *, ""
     print *, ""
@@ -1974,12 +1974,12 @@ else! beta version
     endif
     write(io_stdout,*)  " event generation rate (events/sec)",dble(AccepCounter)/(time_end-time_start+1d-10)
 
-    
+
 endif! beta version
-                                         
+
   endif! unweighted
-  
-  
+
+
 
 
 return
@@ -2030,7 +2030,7 @@ character(len=160) :: EventLine(0:maxpart)
             FoundHiggsMass=.true.
         endif
         !POWHEG
-        if( FirstLines(1:5).eq."hmass" ) then 
+        if( FirstLines(1:5).eq."hmass" ) then
                i = 6
                do while(FirstLines(i:i).eq." ")
                    i = i+1
@@ -2137,7 +2137,7 @@ character(len=160) :: EventLine(0:maxpart)
 
      if( .not.ReadLHEFile .or. m_Reso.lt.2*m_V) then
          call ReopenInFile()
-         maxinputm4l = m_Reso
+         maxInputmHstar = m_Reso
          return
      endif
 
@@ -2173,9 +2173,9 @@ character(len=160) :: EventLine(0:maxpart)
                 endif
                 read(EventLine(nline),InputFmt1) LHE_IDUP(nline),OtherInts(1:5),OtherReal8s(1:4),Mass(nline)
             endif
-            if( abs(LHE_IDUP(nline)).eq.25 ) then!   select the Higgs (ID=25, h0)
+            if( abs(LHE_IDUP(nline)).eq.25 ) then!   select the Higgs (ID=25, h0) ! Ulascan: Should be safer to have 'if( abs(LHE_IDUP(nline)).eq.abs(convertLHE(Hig_)) )'
                   Mass(nline) = Mass(nline)*GeV            !  convert to units of 100GeV
-                  if( Mass(nline).gt.maxinputm4l ) maxinputm4l = Mass(nline)
+                  if( Mass(nline).gt.maxInputmHstar ) maxInputmHstar = Mass(nline)
                   exit
             endif
          enddo
@@ -2192,11 +2192,11 @@ character(len=160) :: EventLine(0:maxpart)
                   write(io_LHEOutFile,"(A)") "</event>"
                   print *, "ERROR: cannot find </event>"
                   exit
-              endif              
+              endif
          enddo
      enddo
 98   continue
-     print *, "... and it's ", maxinputm4l/GeV, " GeV"
+     print *, "... and it's ", maxInputmHstar/GeV, " GeV"
 
      call ReopenInFile()
 
@@ -2307,10 +2307,10 @@ call InitReadLHE(BeginEventLine)
      endif
      DecayWidth0 = GetMZZProbability(M_Reso,-1d0,.true.)
 
-     print *, " finding maximal weight for mZZ=", maxinputm4l/GeV, " GeV with ",VegasNc0," points"
+     print *, " finding maximal weight for mZZ=", maxInputmHstar/GeV, " GeV with ",VegasNc0," points"
      VG = zero
      CSmax = zero
-     EHat = maxinputm4l! fixing Ehat to maxinputm4l which should determine the max. of the integrand
+     EHat = maxInputmHstar! fixing Ehat to maxInputmHstar which should determine the max. of the integrand
      if( TauDecays.lt.0 ) then
          do tries=1,VegasNc0
              call random_number(yRnd)
@@ -2321,7 +2321,7 @@ call InitReadLHE(BeginEventLine)
          do tries=1,VegasNc0
              call random_number(yRnd)
              DecayWeight = EvalUnWeighted_DecayToTauTau(yRnd,.false.,EHat,Res,HiggsDK_Mom(1:4,4:13),HiggsDK_IDUP(1:13),HiggsDK_ICOLUP(1:2,1:13))
-         enddo      
+         enddo
      endif
      csmax(0,0)   = 1.5d0*csmax(0,0)    !  safety buffer
 
@@ -2335,7 +2335,7 @@ call InitReadLHE(BeginEventLine)
      AccepCounter_part = 0
      call cpu_time(time_start)
      NEvent=0
-     do while ( .true. ) 
+     do while ( .true. )
          NEvent=NEvent + 1
          LeptInEvent(:) = 0
          read(16,"(A)") EventLine(0)
@@ -2375,14 +2375,14 @@ call InitReadLHE(BeginEventLine)
                   LeptInEvent( LeptInEvent(0) ) = LHE_IDUP(nline)
             endif
          enddo
-            
-         
+
+
 !         accept/reject sampling for H->VV decay contribution
           EHat = pH2sq
           DecayWeight = 0d0
-          
+
           DecayWidth = GetMZZProbability(EHat,-1d0,.true.)!  could also be used to determine csmax for this particular event to improve efficiency (-->future work)
-          WeightScaleAqedAqcd(1) = WeightScaleAqedAqcd(1) * DecayWidth/DecayWidth0
+          WeightScaleAqedAqcd(1) = WeightScaleAqedAqcd(1) * DecayWidth/DecayWidth0 ! This line does nothing unless either WidthScheme.ne.WidthSchemeIn or ReweightDecay
 
           if( TauDecays.lt.0 ) then
                 do tries=1,5000000
@@ -2409,7 +2409,7 @@ call InitReadLHE(BeginEventLine)
                   Empty = .true.
               endif
           endif
-          
+
           if( Res.gt.0d0 ) then ! decay event was accepted
              if( TauDecays.lt.0 ) then!  H->VV->4f
                 call boost(HiggsDK_Mom(1:4,6),MomHiggs(1:4),pH2sq)
@@ -2467,7 +2467,7 @@ call InitReadLHE(BeginEventLine)
 
           elseif( Res.eq.0d0 ) then ! decay event was not accepted after ncall evaluations, read next production event
              print *, "Rejected event after ",tries-1," evaluations"
-             AlertCounter = AlertCounter + 1 
+             AlertCounter = AlertCounter + 1
           endif
 
 
@@ -2475,8 +2475,8 @@ call InitReadLHE(BeginEventLine)
 
 !        read optional lines
          tries = 0
-         do while (.true.) 
-              tries = tries +1 
+         do while (.true.)
+              tries = tries +1
               read(16,fmt="(A160)",IOSTAT=stat,END=99) OtherLines(1:160)
               if(OtherLines(1:30).eq."</LesHouchesEvents>") then
                   if( RequestNLeptons.gt.0 ) then
@@ -2498,8 +2498,8 @@ call InitReadLHE(BeginEventLine)
                   print *, "ERROR: cannot find </event>"
                   exit
               endif
-         enddo         
-         
+         enddo
+
      enddo
 99   continue
      call cpu_time(time_end)
@@ -2510,7 +2510,7 @@ call InitReadLHE(BeginEventLine)
     write(io_stdout,*) ""
     write(io_stdout,*) "Evaluation Counter: ",EvalCounter
     write(io_stdout,*) "Acceptance Counter: ",AccepCounter
-    write(io_stdout,*) "Rejection  Counter: ",RejeCounter    
+    write(io_stdout,*) "Rejection  Counter: ",RejeCounter
     write(io_stdout,*) "Alert  Counter: ",AlertCounter
     if( dble(AlertCounter)/dble(AccepCounter) .gt. 1d0*percent ) then
         write(io_stdout,*) "ALERT: The number of rejected events exceeds 1%."
@@ -2519,7 +2519,7 @@ call InitReadLHE(BeginEventLine)
    write(io_stdout,*)  "Event generation rate (events/sec)",dble(AccepCounter)/(time_end-time_start)
    if( RequestNLeptons.gt.0 ) write(io_stdout,"(A,1F6.2,A)") " Lepton filter efficiency:",dble(AccepCounter)/dble(NEvent)*100d0," %"
 
-   
+
     write(io_LogFile,*) ""
     write(io_LogFile,*) "Evaluation Counter: ",EvalCounter
     write(io_LogFile,*) "Acceptance Counter: ",AccepCounter
@@ -2585,7 +2585,7 @@ call InitReadLHE(BeginEventLine)
      print *, " converting events"
      call cpu_time(time_start)
      NEvent=0
-     do while ( .true. ) 
+     do while ( .true. )
          NEvent=NEvent + 1
          read(16,"(A)") EventLine(0)
          if (UseUnformattedRead) then
@@ -2621,7 +2621,7 @@ call InitReadLHE(BeginEventLine)
 
             if( IntExt(nline).eq.2 .and. (LHE_IDUP(nline).eq.convertLHE(Z0_) .or. LHE_IDUP(nline).eq.convertLHE(Wp_) .or. LHE_IDUP(nline).eq.convertLHE(Wm_)) ) then
                convertparent = nline
-            endif 
+            endif
 ! print *, nline
 ! print *, MomExt(1:4,nline)
 ! print *, get_MInv(MomExt(1:4,nline))
@@ -2634,7 +2634,7 @@ call InitReadLHE(BeginEventLine)
 ! print *, get_MInv2(MomExt(1:4,5)),get_MInv2(MomExt(1:4,6))
 ! call ShiftMass(MomExt(1:4,5),MomExt(1:4,6),0d0,0d0,MomExt(1:4,1),MomExt(1:4,2))
 ! print *, get_MInv2(MomExt(1:4,1)),get_MInv2(MomExt(1:4,2))
-! 
+!
 ! print *, MomExt(1:4,5)+MomExt(1:4,6) - MomExt(1:4,1)-MomExt(1:4,2)
 ! print *, MomExt(1:4,5) - MomExt(1:4,1)
 ! print *, MomExt(1:4,6) - MomExt(1:4,2)
@@ -2654,12 +2654,12 @@ call InitReadLHE(BeginEventLine)
               if( LHE_MOTHUP(1,nline).eq.convertparent .and. LHE_MOTHUP(2,nline).eq.convertparent ) then! found a decay particle
                if( DecayMode1.eq.0 .and. LHE_IDUP(convertparent).eq.convertLHE(Z0_) ) then! convert Z decay products to 2 leptons
                   if( LHE_IDUP(nline).gt.0 ) then
-                         LHE_IDUP(nline) = convertLHE( ZLepBranching(xRnd) )   
+                         LHE_IDUP(nline) = convertLHE( ZLepBranching(xRnd) )
                          LHE_ICOLUP(1:2,nline) = (/0,0/)
                          Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) ) /GeV
                          DecayParticles(i) = nline; i=i+1;
                   else
-                         LHE_IDUP(nline) = convertLHE( -ZLepBranching(xRnd) )    
+                         LHE_IDUP(nline) = convertLHE( -ZLepBranching(xRnd) )
                          LHE_ICOLUP(1:2,nline) = (/0,0/)
                          Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) ) /GeV
                          DecayParticles(i) = nline; i=i+1;
@@ -2667,13 +2667,13 @@ call InitReadLHE(BeginEventLine)
 
                elseif( DecayMode1.eq.4 .and. LHE_IDUP(convertparent).eq.convertLHE(Wp_) ) then! convert W+ decay products to 2 leptons
                   if( LHE_IDUP(nline).gt.0 ) then
-                         LHE_IDUP(nline) = convertLHE( WLepBranching(xRnd) )   
+                         LHE_IDUP(nline) = convertLHE( WLepBranching(xRnd) )
                          LHE_IDUP(nline) = -LHE_IDUP(nline)! converts LepM to LepP
                          LHE_ICOLUP(1:2,nline) = (/0,0/)
                          Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) ) /GeV
                          DecayParticles(i) = nline; i=i+1;
                   else
-                         LHE_IDUP(nline) = convertLHE( - SU2flip(WLepBranching(xRnd)) )  
+                         LHE_IDUP(nline) = convertLHE( - SU2flip(WLepBranching(xRnd)) )
                          LHE_ICOLUP(1:2,nline) = (/0,0/)
                          Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) ) /GeV
                          DecayParticles(i) = nline; i=i+1;
@@ -2681,12 +2681,12 @@ call InitReadLHE(BeginEventLine)
 
                elseif( DecayMode1.eq.4 .and. LHE_IDUP(convertparent).eq.convertLHE(Wm_) ) then! convert W- decay products to 2 leptons
                   if( LHE_IDUP(nline).gt.0 ) then
-                         LHE_IDUP(nline) = convertLHE( Su2flip(WLepBranching(xRnd)) )   
+                         LHE_IDUP(nline) = convertLHE( Su2flip(WLepBranching(xRnd)) )
                          LHE_ICOLUP(1:2,nline) = (/0,0/)
                          Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) ) /GeV
                          DecayParticles(i) = nline; i=i+1;
                   else
-                         LHE_IDUP(nline) = convertLHE( -WLepBranching(xRnd) )   
+                         LHE_IDUP(nline) = convertLHE( -WLepBranching(xRnd) )
                          LHE_IDUP(nline) = -LHE_IDUP(nline)! converts -LepM to +LepM
                          LHE_ICOLUP(1:2,nline) = (/0,0/)
                          Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) ) /GeV
@@ -2695,26 +2695,26 @@ call InitReadLHE(BeginEventLine)
 
                elseif( DecayMode1.eq.8 .and. LHE_IDUP(convertparent).eq.convertLHE(Z0_) ) then! convert Z decay products to 3 leptons
                   if( LHE_IDUP(nline).gt.0 ) then
-                         LHE_IDUP(nline) = convertLHE( ZLepPlusTauBranching(xRnd) )   
+                         LHE_IDUP(nline) = convertLHE( ZLepPlusTauBranching(xRnd) )
                          LHE_ICOLUP(1:2,nline) = (/0,0/)
                          Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) ) /GeV
                          DecayParticles(i) = nline; i=i+1;
                   else
-                         LHE_IDUP(nline) = convertLHE( -ZLepPlusTauBranching(xRnd) )    
+                         LHE_IDUP(nline) = convertLHE( -ZLepPlusTauBranching(xRnd) )
                          LHE_ICOLUP(1:2,nline) = (/0,0/)
                          Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) ) /GeV
                          DecayParticles(i) = nline; i=i+1;
                   endif
 
-               elseif( DecayMode1.eq.10 .and. LHE_IDUP(convertparent).eq.convertLHE(Wp_) ) then! convert W+ decay products to 3 leptons   
+               elseif( DecayMode1.eq.10 .and. LHE_IDUP(convertparent).eq.convertLHE(Wp_) ) then! convert W+ decay products to 3 leptons
                   if( LHE_IDUP(nline).gt.0 ) then
-                         LHE_IDUP(nline) = convertLHE( WLepPlusTauBranching(xRnd) )   
+                         LHE_IDUP(nline) = convertLHE( WLepPlusTauBranching(xRnd) )
                          LHE_IDUP(nline) = -LHE_IDUP(nline)! converts LepM to LepP
                          LHE_ICOLUP(1:2,nline) = (/0,0/)
                          Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) ) /GeV
                          DecayParticles(i) = nline; i=i+1;
                   else
-                         LHE_IDUP(nline) = convertLHE( - SU2flip(WLepPlusTauBranching(xRnd)) )  
+                         LHE_IDUP(nline) = convertLHE( - SU2flip(WLepPlusTauBranching(xRnd)) )
                          LHE_ICOLUP(1:2,nline) = (/0,0/)
                          Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) ) /GeV
                          DecayParticles(i) = nline; i=i+1;
@@ -2722,60 +2722,60 @@ call InitReadLHE(BeginEventLine)
 
                elseif( DecayMode1.eq.10 .and. LHE_IDUP(convertparent).eq.convertLHE(Wm_) ) then! convert W- decay products to 3 leptons
                   if( LHE_IDUP(nline).gt.0 ) then
-                         LHE_IDUP(nline) = convertLHE( Su2flip(WLepPlusTauBranching(xRnd)) )   
+                         LHE_IDUP(nline) = convertLHE( Su2flip(WLepPlusTauBranching(xRnd)) )
                          LHE_ICOLUP(1:2,nline) = (/0,0/)
                          Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) ) /GeV
                          DecayParticles(i) = nline; i=i+1;
                   else
-                         LHE_IDUP(nline) = convertLHE( -WLepPlusTauBranching(xRnd) )   
+                         LHE_IDUP(nline) = convertLHE( -WLepPlusTauBranching(xRnd) )
                          LHE_IDUP(nline) = -LHE_IDUP(nline)! converts -LepM to +LepM
                          LHE_ICOLUP(1:2,nline) = (/0,0/)
                          Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) ) /GeV
                          DecayParticles(i) = nline; i=i+1;
                   endif
-              
+
                elseif( DecayMode1.eq.1 .and. LHE_IDUP(convertparent).eq.convertLHE(Z0_) ) then! convert Z decay products to quarks
                   if( LHE_IDUP(nline).gt.0 ) then
-                         LHE_IDUP(nline) = convertLHE( ZQuaBranching(xRnd) )   
+                         LHE_IDUP(nline) = convertLHE( ZQuaBranching(xRnd) )
                          LHE_ICOLUP(1:2,nline) = (/805,0/)
                          Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) ) /GeV
                          DecayParticles(i) = nline; i=i+1;
                   else
-                         LHE_IDUP(nline) = convertLHE( -ZQuaBranching(xRnd) )    
-                         LHE_ICOLUP(1:2,nline) = (/0,805/)
-                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) ) /GeV
-                         DecayParticles(i) = nline; i=i+1;                      
-                  endif
-
-               elseif( DecayMode1.eq.5 .and. LHE_IDUP(convertparent).eq.convertLHE(Wp_) ) then! convert W+ decay products to quarks                  
-                  if( LHE_IDUP(nline).gt.0 ) then
-                         LHE_IDUP(nline) = convertLHE( WQuaUpBranching(xRnd) )   
-                         LHE_ICOLUP(1:2,nline) = (/805,0/)
-                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) ) /GeV
-                         DecayParticles(i) = nline; i=i+1;
-                  else
-                         LHE_IDUP(nline) = convertLHE( - SU2flip(WQuaUpBranching(xRnd)) )  
+                         LHE_IDUP(nline) = convertLHE( -ZQuaBranching(xRnd) )
                          LHE_ICOLUP(1:2,nline) = (/0,805/)
                          Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) ) /GeV
                          DecayParticles(i) = nline; i=i+1;
                   endif
 
-               elseif( DecayMode1.eq.5 .and. LHE_IDUP(convertparent).eq.convertLHE(Wm_) ) then! convert W- decay products to quarks                  
+               elseif( DecayMode1.eq.5 .and. LHE_IDUP(convertparent).eq.convertLHE(Wp_) ) then! convert W+ decay products to quarks
                   if( LHE_IDUP(nline).gt.0 ) then
-                         LHE_IDUP(nline) = convertLHE( Su2flip(WQuaUpBranching(xRnd)) )   
+                         LHE_IDUP(nline) = convertLHE( WQuaUpBranching(xRnd) )
                          LHE_ICOLUP(1:2,nline) = (/805,0/)
                          Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) ) /GeV
                          DecayParticles(i) = nline; i=i+1;
                   else
-                         LHE_IDUP(nline) = convertLHE( -WQuaUpBranching(xRnd) )   
+                         LHE_IDUP(nline) = convertLHE( - SU2flip(WQuaUpBranching(xRnd)) )
                          LHE_ICOLUP(1:2,nline) = (/0,805/)
                          Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) ) /GeV
                          DecayParticles(i) = nline; i=i+1;
                   endif
-              
+
+               elseif( DecayMode1.eq.5 .and. LHE_IDUP(convertparent).eq.convertLHE(Wm_) ) then! convert W- decay products to quarks
+                  if( LHE_IDUP(nline).gt.0 ) then
+                         LHE_IDUP(nline) = convertLHE( Su2flip(WQuaUpBranching(xRnd)) )
+                         LHE_ICOLUP(1:2,nline) = (/805,0/)
+                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) ) /GeV
+                         DecayParticles(i) = nline; i=i+1;
+                  else
+                         LHE_IDUP(nline) = convertLHE( -WQuaUpBranching(xRnd) )
+                         LHE_ICOLUP(1:2,nline) = (/0,805/)
+                         Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) ) /GeV
+                         DecayParticles(i) = nline; i=i+1;
+                  endif
+
                elseif( DecayMode1.eq.9 .and. LHE_IDUP(convertparent).eq.convertLHE(Z0_) ) then! convert Z decay products to quarks and leptons
                   if( LHE_IDUP(nline).gt.0 ) then
-                         LHE_IDUP(nline) = convertLHE( ZAnyBranching(xRnd) )   
+                         LHE_IDUP(nline) = convertLHE( ZAnyBranching(xRnd) )
                          if( IsAQuark(convertLHEreverse(LHE_IDUP(nline))) ) then
                              LHE_ICOLUP(1:2,nline) = (/805,0/)
                          else
@@ -2784,14 +2784,14 @@ call InitReadLHE(BeginEventLine)
                          Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) ) /GeV
                          DecayParticles(i) = nline; i=i+1;
                   else
-                         LHE_IDUP(nline) = convertLHE( -ZAnyBranching(xRnd) )    
+                         LHE_IDUP(nline) = convertLHE( -ZAnyBranching(xRnd) )
                          if( IsAQuark(convertLHEreverse(LHE_IDUP(nline))) ) then
                              LHE_ICOLUP(1:2,nline) = (/0,805/)
                          else
                              LHE_ICOLUP(1:2,nline) = (/0,0/)
                          endif
                          Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) ) /GeV
-                         DecayParticles(i) = nline; i=i+1;                      
+                         DecayParticles(i) = nline; i=i+1;
                   endif
 
 ! branching counter
@@ -2801,9 +2801,9 @@ call InitReadLHE(BeginEventLine)
 ! if( abs(convertLHEreverse(LHE_IDUP(nline))).eq.Dn_ .or. abs(convertLHEreverse(LHE_IDUP(nline))).eq.Str_ .or. abs(convertLHEreverse(LHE_IDUP(nline))).eq.Bot_) Br_Z_dd_counter=Br_Z_dd_counter+1
 ! EvalCounter=EvalCounter+1
 
-               elseif( DecayMode1.eq.11 .and. LHE_IDUP(convertparent).eq.convertLHE(Wp_) ) then! convert W+ decay products to quarks and leptons         
+               elseif( DecayMode1.eq.11 .and. LHE_IDUP(convertparent).eq.convertLHE(Wp_) ) then! convert W+ decay products to quarks and leptons
                   if( LHE_IDUP(nline).gt.0 ) then
-                         LHE_IDUP(nline) = convertLHE( WAnyBranching(xRnd) )   
+                         LHE_IDUP(nline) = convertLHE( WAnyBranching(xRnd) )
                          if( IsAQuark(convertLHEreverse(LHE_IDUP(nline))) ) then
                               LHE_ICOLUP(1:2,nline) = (/805,0/)
                          else
@@ -2815,58 +2815,58 @@ call InitReadLHE(BeginEventLine)
 !                          print *, "here 2",  -WAnyBranching(xRnd), - SU2flip(WAnyBranching(xRnd))
 !                          pause
                   else
-                         LHE_IDUP(nline) = convertLHE( - SU2flip(WAnyBranching(xRnd)) )  
+                         LHE_IDUP(nline) = convertLHE( - SU2flip(WAnyBranching(xRnd)) )
                          if( IsAQuark(convertLHEreverse(LHE_IDUP(nline))) ) then
                               LHE_ICOLUP(1:2,nline) = (/0,805/)
                          else
                               LHE_ICOLUP(1:2,nline) = (/0,0/)
-                         endif                         
+                         endif
                          Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) ) /GeV
                          DecayParticles(i) = nline; i=i+1;
                   endif
 
-               elseif( DecayMode1.eq.11 .and. LHE_IDUP(convertparent).eq.convertLHE(Wm_) ) then! convert W- decay products to quarks   
+               elseif( DecayMode1.eq.11 .and. LHE_IDUP(convertparent).eq.convertLHE(Wm_) ) then! convert W- decay products to quarks
                   if( LHE_IDUP(nline).gt.0 ) then
-                         LHE_IDUP(nline) = convertLHE( SU2flip(WAnyBranching(xRnd)) )   
+                         LHE_IDUP(nline) = convertLHE( SU2flip(WAnyBranching(xRnd)) )
                          if( IsAQuark(convertLHEreverse(LHE_IDUP(nline))) ) then
                               LHE_ICOLUP(1:2,nline) = (/805,0/)
                          else
                               LHE_ICOLUP(1:2,nline) = (/0,0/)
-                         endif                         
+                         endif
                          Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) ) /GeV
                          DecayParticles(i) = nline; i=i+1;
-!                          print *, "here", ( SU2flip(WAnyBranching(xRnd)) ),-( -WAnyBranching(xRnd) ) 
+!                          print *, "here", ( SU2flip(WAnyBranching(xRnd)) ),-( -WAnyBranching(xRnd) )
 !                          pause
                   else
-                         LHE_IDUP(nline) = convertLHE( -WAnyBranching(xRnd) )   
+                         LHE_IDUP(nline) = convertLHE( -WAnyBranching(xRnd) )
                          if( IsAQuark(convertLHEreverse(LHE_IDUP(nline))) ) then
                               LHE_ICOLUP(1:2,nline) = (/0,805/)
                          else
                               LHE_ICOLUP(1:2,nline) = (/0,0/)
                               LHE_IDUP(nline) = -LHE_IDUP(nline)! converts -LepM to +LepM
-                         endif                  
+                         endif
                          Mass(nline) = getMass( convertLHEreverse(LHE_IDUP(nline)) ) /GeV
                          DecayParticles(i) = nline; i=i+1;
                   endif
-                  
+
                else
                   call Error("Invalid DecayMode1 in StartConvertLHE")
                endif! DecayMode
-               
+
               endif
          enddo! nline
-         
+
          call ShiftMass(MomExt(1:4,DecayParticles(1)),MomExt(1:4,DecayParticles(2)),         &
                         getMass( convertLHEreverse(LHE_IDUP(DecayParticles(1))) )/GeV, getMass( convertLHEreverse(LHE_IDUP(DecayParticles(2))) )/GeV,                                                &
                         MomShift(1:4,DecayParticles(1)),MomShift(1:4,DecayParticles(2)))
-         
+
 !          print *, getMass( convertLHEreverse(LHE_IDUP(DecayParticles(1))) ), getMass( convertLHEreverse(LHE_IDUP(DecayParticles(2))) )
 !          print *, get_MInv(MomShift(1:4,DecayParticles(1)))
 !          print *, get_MInv(MomShift(1:4,DecayParticles(2)))
 !          print *, MomShift(1:4,DecayParticles(1))
 !          print *, MomShift(1:4,DecayParticles(2))
 !          pause
-         
+
          write(io_LHEOutFile,"(A)") trim(BeginEventLine)
          indent = 0
          do while (BeginEventLine(indent+1:indent+1).eq." ")
@@ -2890,9 +2890,9 @@ call InitReadLHE(BeginEventLine)
          do nline=1,EventNumPart
             write(io_LHEOutFile,fmt=IndentedFmt1) LHE_IDUP(nline),IntExt(nline),LHE_MOTHUP(1,nline),LHE_MOTHUP(2,nline),LHE_ICOLUP(1,nline),LHE_ICOLUP(2,nline),MomShift(2,nline),MomShift(3,nline),MomShift(4,nline),MomShift(1,nline),Mass(nline),Lifetime(nline),Spin(nline)
          enddo
-         
+
 !        read optional lines
-         do while (.true.) 
+         do while (.true.)
               read(16,fmt="(A120)",IOSTAT=stat,END=99) PDFLine(1:120)
               if(PDFLine(1:30).eq."</LesHouchesEvents>") then
                   goto 99
@@ -2905,7 +2905,7 @@ call InitReadLHE(BeginEventLine)
               endif
          enddo
      enddo
-     
+
 99   continue
      call cpu_time(time_end)
 
@@ -2941,8 +2941,8 @@ integer :: i
        open(unit=io_LogFile,file=trim(DataFile)//'.log',form='formatted',access= 'sequential',status='replace')              ! log file
 
 
-       if( ReadLHEFile .or. ConvertLHEFile ) then 
-          open(unit=io_LHEInFile,file=trim(LHEProdFile),form='formatted',access= 'sequential',status='old')                  ! LHE input file      
+       if( ReadLHEFile .or. ConvertLHEFile ) then
+          open(unit=io_LHEInFile,file=trim(LHEProdFile),form='formatted',access= 'sequential',status='old')                  ! LHE input file
        endif
    endif
 
@@ -2972,7 +2972,7 @@ implicit none
    if( ReadLHEFile .or. ConvertLHEFile ) close(io_LHEInFile)
    close(io_LogFile)
 
- 
+
 return
 END SUBROUTINE
 
@@ -3017,13 +3017,13 @@ implicit none
   elseif (Process.eq.110 .or. Process .eq. 111 .or. Process.eq.112 .or. Process .eq. 113) then
      call InitHisto_TH()
   else
-  
+
      if( TauDecays.eq.0 .or. TauDecays.eq.1 ) then
          call InitHisto_Htautau()
      else
          call InitHisto_HZZ()
      endif
-     
+
 !      call InitHisto_Htoptop()
   endif
 
@@ -3143,19 +3143,19 @@ integer :: AllocStatus,NHisto
 !           Histo(12)%BinSize= 1d0
 !           Histo(12)%LowVal =  0d0
 !           Histo(12)%SetScale= 1d0
-! 
+!
 !           Histo(13)%Info   = "total mm cross section"
 !           Histo(13)%NBins  = 1
 !           Histo(13)%BinSize= 1d0
 !           Histo(13)%LowVal = 0d0
 !           Histo(13)%SetScale= 1d0
-! 
+!
 !           Histo(14)%Info   = "total tt cross section"
 !           Histo(14)%NBins  = 1
 !           Histo(14)%BinSize= 1d0
 !           Histo(14)%LowVal = 0d010
 !           Histo(14)%SetScale= 1d0
-! 
+!
 !           Histo(15)%Info   = "total em cross section"
 !           Histo(15)%NBins  = 1
 !           Histo(15)%BinSize= 1d0
@@ -3283,7 +3283,7 @@ integer :: AllocStatus,NHisto
           Histo(5)%BinSize= 0.2d0
           Histo(5)%LowVal = -5d0
           Histo(5)%SetScale= 1d0
-          
+
           Histo(6)%Info   = "dy(y1-j2)"
           Histo(6)%NBins  = 50
           Histo(6)%BinSize= 0.2d0
@@ -3361,13 +3361,13 @@ integer :: AllocStatus,NHisto
           Histo(8)%BinSize= 10d0*GeV
           Histo(8)%LowVal = 0d0
           Histo(8)%SetScale= 1d0/GeV
-          
+
           Histo(9)%Info   = "pT_miss"
           Histo(9)%NBins  = 50
           Histo(9)%BinSize= 10d0*GeV
           Histo(9)%LowVal = 0d0
           Histo(9)%SetScale= 1d0/GeV
-          
+
           Histo(10)%Info   = "D_0minus"
           Histo(10)%NBins  = 50
           Histo(10)%BinSize= 0.02
@@ -3523,25 +3523,25 @@ integer :: AllocStatus,NHisto
           Histo(3)%BinSize= 0.05d0*GeV
           Histo(3)%LowVal = 0d0*GeV
           Histo(3)%SetScale= 1d0/GeV
-          
+
           Histo(4)%Info   = "m_Wm"
           Histo(4)%NBins  = 50
           Histo(4)%BinSize= 0.05d0*GeV
           Histo(4)%LowVal = 0d0*GeV
           Histo(4)%SetScale= 1d0/GeV
-            
+
           Histo(5)%Info   = "y_tau+"
           Histo(5)%NBins  = 40
           Histo(5)%BinSize= 0.25d0
           Histo(5)%LowVal = -5d0
           Histo(5)%SetScale= 1d0
-            
+
           Histo(6)%Info   = "y_tau-"
           Histo(6)%NBins  = 40
           Histo(6)%BinSize= 0.25d0
           Histo(6)%LowVal = -5d0
           Histo(6)%SetScale= 1d0
-            
+
 
           do NHisto=1,NumHistograms
               Histo(NHisto)%Value(:) = 0d0
@@ -3583,22 +3583,22 @@ integer :: AllocStatus,NHisto
           Histo(2)%BinSize= 0.25d0*GeV
           Histo(2)%LowVal = 166d0*GeV
           Histo(2)%SetScale= 1d0/GeV
-          
-          
+
+
           Histo(3)%Info   = "m_Wp"
           Histo(3)%NBins  = 50
           Histo(3)%BinSize= 0.2d0*GeV
           Histo(3)%LowVal = 75d0*GeV
           Histo(3)%SetScale= 1d0/GeV
-          
-          
+
+
           Histo(4)%Info   = "m_Wm"
           Histo(4)%NBins  = 50
           Histo(4)%BinSize= 0.2d0*GeV
           Histo(4)%LowVal = 75d0*GeV
           Histo(4)%SetScale= 1d0/GeV
-          
-          
+
+
           do NHisto=1,NumHistograms
               Histo(NHisto)%Value(:) = 0d0
               Histo(NHisto)%Value2(:)= 0d0
@@ -3615,7 +3615,7 @@ implicit none
 integer :: AllocStatus,NHisto
 
           it_sav = 1
-          NumHistograms =  45!   9;     
+          NumHistograms =  45!   9;
 print *, "extending no. of histograms for vbf tests"
           if( .not.allocated(Histo) ) then
                 allocate( Histo(1:NumHistograms), stat=AllocStatus  )
@@ -3651,7 +3651,7 @@ print *, "extending no. of histograms for vbf tests"
           Histo(5)%BinSize= 0.2d0
           Histo(5)%LowVal = -5d0
           Histo(5)%SetScale= 1d0
-          
+
           Histo(6)%Info   = "y(j1)"
           Histo(6)%NBins  = 50
           Histo(6)%BinSize= 0.2d0
@@ -3663,7 +3663,7 @@ print *, "extending no. of histograms for vbf tests"
           Histo(7)%BinSize= 0.2d0
           Histo(7)%LowVal = -5d0
           Histo(7)%SetScale= 1d0
-          
+
           Histo(8)%Info   = "m_4l"
           Histo(8)%NBins  = 50
           Histo(8)%BinSize= 10d0*GeV
@@ -3683,7 +3683,7 @@ do NHisto=10,45
           Histo(NHisto)%LowVal = 0d0*GeV
           Histo(NHisto)%SetScale= 1d0/GeV
 enddo
-! 
+!
 !           Histo(7)%Info   = "weights"
 !           Histo(7)%NBins  = 50
 !           Histo(7)%BinSize= 0.25d0
@@ -3868,7 +3868,7 @@ integer :: stat
     endif
     nprocesses = 1
 
-    if( (unweighted) .or. ( (.not.unweighted) .and. (writeWeightedLHE) )  ) then 
+    if( (unweighted) .or. ( (.not.unweighted) .and. (writeWeightedLHE) )  ) then
         if ( .not. ReadLHEFile .and. .not. ConvertLHEFile ) then
             write(io_LHEOutFile ,'(A)') '<LesHouchesEvents version="1.0">'
         endif
@@ -3897,14 +3897,14 @@ integer :: stat
             write(io_LHEOutFile ,'(A)') '<init>'
             write(io_LHEOutFile ,'(I4,X,I4,F24.16,X,F24.16,X,I1,X,I1,X,I7,X,I7,X,I2,X,I2)') incoming1, incoming2, beamenergy1, beamenergy2, pdfgup1, pdfgup2, pdfsup1, pdfsup2, weightscheme, nprocesses
 ! in order of appearance:  (see also http://arxiv.org/abs/hep-ph/0109068 and http://arxiv.org/abs/hep-ph/0609017)
-! (*) incoming particle1 (2212=proton), incoming particle2, 
-! (*) energies of colliding particles, 
-! (*) out-dated pdf information for colliding particles (supposed to be 0), 
-! (*) pdf code of LHAGLUE for colliding particles (10042=CTEQ6Ll, MSTW2008=21000,21041-21080)    
+! (*) incoming particle1 (2212=proton), incoming particle2,
+! (*) energies of colliding particles,
+! (*) out-dated pdf information for colliding particles (supposed to be 0),
+! (*) pdf code of LHAGLUE for colliding particles (10042=CTEQ6Ll, MSTW2008=21000,21041-21080)
 ! (*) weighting strategy (3=unweighted events, 4=weighted events,  otherwise=see LHE manuals)
 ! (*) number of process types to be accepted (default=1, otherwise=see manual)
             write(io_LHEOutFile ,'(1PE14.7,1X,1PE14.7,1X,1PE14.7,1X,I3)') CrossSection, CrossSectionError, 1.00000000000E-00, Process
-! in order of appearance: 
+! in order of appearance:
 ! (*) total cross section in pb
 ! (*) stat. error in the total cross section in pb
 ! (*) maximum weight
@@ -3924,7 +3924,7 @@ SUBROUTINE FinalizeOutput
 use ModParameters
 implicit none
 
-    if( (unweighted) .or. ( (.not.unweighted) .and. (writeWeightedLHE) )  ) then 
+    if( (unweighted) .or. ( (.not.unweighted) .and. (writeWeightedLHE) )  ) then
         write(io_LHEOutFile ,'(A)') '</LesHouchesEvents>'
 
         write(io_LogFile,'(A)') ''
@@ -3937,13 +3937,13 @@ implicit none
         write(io_LogFile,'(12X,A,F6.3,A,F6.3,A)') 'Br_W_ll_counter  ',dble(Br_W_ll_counter)/AccepCounter *100d0," %    +/-",dsqrt(dble(Br_W_ll_counter))/AccepCounter *100d0," %"
         write(io_LogFile,'(12X,A,F6.3,A,F6.3,A)') 'Br_W_ud_counter  ',dble(Br_W_ud_counter)/AccepCounter *100d0," %    +/-",dsqrt(dble(Br_W_ud_counter))/AccepCounter *100d0," %"
     endif
-    
+
     if( any(DebugCounter.ne.0) ) then
-       
+
        print *, "DebugCounter(:)=",DebugCounter(:)
-    
+
     endif
-  
+
 END SUBROUTINE
 
 
@@ -4085,7 +4085,7 @@ character :: arg*(500)
     if( Process.eq.0 .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.62 .or. Process.eq.66 .or. Process.eq.50 ) then
         write(TheUnit,"(4X,A)") "spin-0-VV couplings: "
         write(TheUnit,"(6X,A,L)") "generate_as=",generate_as
-        if( generate_as ) then 
+        if( generate_as ) then
             write(TheUnit,"(6X,A,2E16.8,A1)") "ahg1=",ahg1,"i"
             write(TheUnit,"(6X,A,2E16.8,A1)") "ahg2=",ahg2,"i"
             write(TheUnit,"(6X,A,2E16.8,A1)") "ahg3=",ahg3,"i"
@@ -4147,7 +4147,7 @@ character :: arg*(500)
         write(TheUnit,"(6X,A,2E16.8,A1)") "a3=",a3,"i"
         write(TheUnit,"(6X,A,2E16.8,A1)") "a4=",a4,"i"
         write(TheUnit,"(6X,A,2E16.8,A1)") "a5=",a5,"i"
-        if( generate_bis ) then 
+        if( generate_bis ) then
             write(TheUnit,"(6X,A,2E16.8,A1)") "b1 =",b1,"i"
             write(TheUnit,"(6X,A,2E16.8,A1)") "b2= ",b2,"i"
             write(TheUnit,"(6X,A,2E16.8,A1)") "b3 =",b3,"i"
@@ -4379,7 +4379,7 @@ character(len=*):: ThePreface
       else
           write(*,"(2X,A,A,I4,A)") trim(ThePreface)," |-----------------------*| (",StatusPercent,"%)"
       endif
-   
+
 return
 END SUBROUTINE
 
@@ -4417,7 +4417,7 @@ implicit none
         write(io_stdout,"(4X,A)") "LHAPDFMem:  member PDF number, default=0 (best fit)"
 #else
         write(io_stdout,"(4X,A)") "PDFSet:     1=CTEQ6L1(default), 2=MSTW2008LO,  2xx=MSTW with eigenvector set xx=01..40), 3=NNPDF3.0LO"
-#endif        
+#endif
         write(io_stdout,"(4X,A)") "VegasNc0:   number of evaluations for integrand scan"
         write(io_stdout,"(4X,A)") "VegasNc1:   number of evaluations for accept-reject sampling"
         write(io_stdout,"(4X,A)") "VegasNc2:   number of events for accept-reject sampling"
@@ -4446,7 +4446,7 @@ integer :: TheUnit
     write(TheUnit,"(A90)") " *   Spin and parity determination of single-produced resonances at hadron colliders   *"
     write(TheUnit,"(A90)") " *                                                                                     *"
     write(TheUnit,"(A90)") " *          I. Anderson, S. Bolognesi, F. Caola, Y. Gao, A. Gritsan, Z. Guo,           *"
-    write(TheUnit,"(A90)") " *        C. Martin, K. Melnikov, R.Rontsch, H. Roskes, U. Sarica, M. Schulze,         *" 
+    write(TheUnit,"(A90)") " *        C. Martin, K. Melnikov, R.Rontsch, H. Roskes, U. Sarica, M. Schulze,         *"
     write(TheUnit,"(A90)") " *                   N. Tran, A. Whitbeck, M. Xiao, C. You, Y. Zhou                    *"
     write(TheUnit,"(A90)") " *                Phys.Rev. D81 (2010) 075022;  arXiv:1001.3396 [hep-ph],              *"
     write(TheUnit,"(A90)") " *                Phys.Rev. D86 (2012) 095031;  arXiv:1208.4018 [hep-ph],              *"

@@ -179,7 +179,7 @@ logical :: usespline
              !divide by overcompensated m4l*gamma_running in the numerator
              GetMZZProbability = GetMZZProbability / (EHat**2*Ga_Reso/M_Reso)
          elseif( WidthSchemeIn.eq.2 ) then
-             !numerator is a constant M_Reso*Ga_Reso, do nothing
+             continue ! numerator is a constant M_Reso*Ga_Reso, do nothing
          else
              call Error("Invalid WidthSchemeIn!")
          endif
