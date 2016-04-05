@@ -1,11 +1,11 @@
 MODULE ModParameters
 implicit none
 save
-! 
-! 
-character(len=6),parameter :: JHUGen_Version="v6.9.5"
-! 
-! 
+!
+!
+character(len=6),parameter :: JHUGen_Version="v6.9.6"
+!
+!
 !=====================================================
 !internal
 integer, public, parameter  :: dp = selected_real_kind(15)
@@ -53,7 +53,7 @@ integer, public :: PDFSet
 #endif
 logical, public :: includeInterference, writegit
 real(8), public :: M_V,Ga_V
-real(8), public, parameter :: GeV=1d0/100d0 ! we are using units of 100GeV, i.e. Lambda=10 is 1TeV 
+real(8), public, parameter :: GeV=1d0/100d0 ! we are using units of 100GeV, i.e. Lambda=10 is 1TeV
 real(8), public, parameter :: percent=1d0/100d0
 ! real(8),public :: GlobalMax=-1d99
 ! real(8),public :: GlobalMin=+1d99
@@ -108,7 +108,7 @@ real(8), public, parameter :: channels_ratio_fix = 0.25d0   ! desired ratio of  
 
 logical, public, parameter :: importExternal_LHEinit = .true.
 
-logical, public, parameter :: writeWeightedLHE = .false. 
+logical, public, parameter :: writeWeightedLHE = .false.
 
 logical, public            :: RandomizeVVdecays = .true.    ! randomize DecayMode1 and DecayMode2 in H-->VV and TTBAR decays whenever appropriate
 
@@ -176,7 +176,7 @@ real(dp), public, parameter :: B0_PDF(0:6) = (/ 0.8753521870054244D0,0.822300539
 
 
 
-! CKM squared matrix entries 
+! CKM squared matrix entries
 real(8), public, parameter :: VCKM_ud = 0.974285d0
 real(8), public, parameter :: VCKM_us = 0.225290d0
 real(8), public, parameter :: VCKM_cs = 0.9734244d0
@@ -265,13 +265,13 @@ real(8), public :: scale_alpha_W_tn = 1d0        ! scaling factor of alpha (~par
    complex(8), public :: ghg2 = (1.0d0,0d0)
    complex(8), public :: ghg3 = (0.0d0,0d0)
    complex(8), public :: ghg4 = (0.0d0,0d0)   ! pseudoscalar
-   
+
    complex(8), public :: ghz1 = (2.0d0,0d0)   ! SM=2
    complex(8), public :: ghz2 = (0.0d0,0d0)
    complex(8), public :: ghz3 = (0.0d0,0d0)
-   complex(8), public :: ghz4 = (0.0d0,0d0)   ! pseudoscalar 
+   complex(8), public :: ghz4 = (0.0d0,0d0)   ! pseudoscalar
 
-   logical, public :: includeGammaStar = .false. 
+   logical, public :: includeGammaStar = .false.
    complex(8), public :: ghzgs2  = (0.00d0,0d0)
    complex(8), public :: ghzgs3  = (0.00d0,0d0)
    complex(8), public :: ghzgs4  = (0.00d0,0d0)
@@ -426,7 +426,7 @@ real(8), public :: scale_alpha_W_tn = 1d0        ! scaling factor of alpha (~par
    complex(8), public :: ghw4_prime5= (0.0d0,0d0)
    complex(8), public :: ghw4_prime6= (0.0d0,0d0)
    complex(8), public :: ghw4_prime7= (0.0d0,0d0)
-   
+
    real(8),    public, parameter :: Lambda_w1 = 10000d0*GeV
    real(8),    public, parameter :: Lambda_w2 = 10000d0*GeV
    real(8),    public, parameter :: Lambda_w3 = 10000d0*GeV
@@ -451,7 +451,7 @@ real(8), public :: scale_alpha_W_tn = 1d0        ! scaling factor of alpha (~par
 
 !  couplings for ttbar+H and bbar+H
    complex(8), public :: kappa       = (1d0,0d0)
-   complex(8), public :: kappa_tilde = (0d0,0d0) 
+   complex(8), public :: kappa_tilde = (0d0,0d0)
 !=====================================================
 
 !=====================================================
@@ -552,7 +552,7 @@ real(dp), public, parameter :: pisq = pi**2
 real(8), public, parameter :: one = 1.0d0, mone = -1.0d0
 real(8), public, parameter :: half  = 0.5d0,two = 2.0d0
 real(8), public, parameter :: zero  = 0.0d0
-complex(8), parameter, public :: czero = (0.0d0,0.0d0) 
+complex(8), parameter, public :: czero = (0.0d0,0.0d0)
 complex(8), parameter, public :: cone = 1.0d0
 complex(8), parameter, public :: ci=(0.0d0,1.0d0)
 complex(8), parameter, public :: ne=(0.0d0,1.0d0)
