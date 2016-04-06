@@ -4,6 +4,7 @@ machine:
     - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.6 10
     - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.6 10
     - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.9 20
+    - sudo apt-get install dos2unix
   environment:
     #environment variables can only be set in this section so . bin/thisroot.sh doesn't work
     PATH: "$(echo /home/ubuntu/root/bin:/home/ubuntu/CMSJHU_AnalysisMacros/JHUSpinWidthPaper_2015/LHEAnalyzer:$PATH | sed s/:$//)"
@@ -122,7 +123,7 @@ test:
 
 
   post:
-    - python ~/checklhe/checklhe.py $(find $CIRCLE_ARTIFACTS -name *.lhe) | tee checklheoutput.txt
+    - unbuffer python ~/checklhe/checklhe.py $(find $CIRCLE_ARTIFACTS -name *.lhe) | tee checklheoutput.txt
     #if there are any errors this command will exit 1 and so the test will fail
     - "! grep -q '!' checklheoutput.txt"    #all the error messages end with !
     - "! find $CIRCLE_ARTIFACTS -name *.lhe.lhe | grep ."
