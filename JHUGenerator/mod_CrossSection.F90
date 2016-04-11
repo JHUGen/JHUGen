@@ -167,8 +167,6 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
    FluxFac = 1d0/(2d0*EHat**2)
    PDFFac = pdf(LHA2M_pdf(iPart_sel),1)  *  pdf(LHA2M_pdf(jPart_sel),2)
    PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * PDFFac * VgsWgt * PartChannelAvg
-   if( abs(MY_IDUP(6)).ge.1 .and. abs(MY_IDUP(6)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
-   if( abs(MY_IDUP(8)).ge.1 .and. abs(MY_IDUP(8)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
 
    !print *,"Mom1: ",MomExt(1:4,1)
    !print *,"Mom2: ",MomExt(1:4,2)
@@ -547,8 +545,6 @@ END FUNCTION
 !
 !       LO_Res_Unpol = LO_Res_Unpol * SpinAvg * GluonColAvg**2
 !       PreFac = 2d0 * fbGeV2 * FluxFac * sHatJacobi * PSWgt * PDFFac * SymmFac
-!       if( abs(MY_IDUP(6)).ge.1 .and. abs(MY_IDUP(6)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
-!       if( abs(MY_IDUP(8)).ge.1 .and. abs(MY_IDUP(8)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
 !       EvalWeighted = LO_Res_Unpol * PreFac
 !
 ! ! EvalWeighted = PreFac  ! for PS output   (only run 1 iteration without vegas adaptation)
@@ -598,8 +594,6 @@ END FUNCTION
 !       LO_Res_Unpol = LO_Res_Unpol1 + LO_Res_Unpol2
 !       PreFac = 2d0 * fbGeV2 * FluxFac * sHatJacobi * PSWgt * SymmFac
 !
-!       if( abs(MY_IDUP(6)).ge.1 .and. abs(MY_IDUP(6)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
-!       if( abs(MY_IDUP(8)).ge.1 .and. abs(MY_IDUP(8)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
 !       EvalWeighted = LO_Res_Unpol * PreFac
 !    endif
 !
@@ -1205,8 +1199,6 @@ ELSE! NOT GENEVT
 
       LO_Res_Unpol1 = LO_Res_Unpol1 * SpinAvg * QuarkColAvg**2
       LO_Res_Unpol2 = LO_Res_Unpol2 * SpinAvg * QuarkColAvg**2
-!       if( abs(MY_IDUP(6)).ge.1 .and. abs(MY_IDUP(6)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
-!       if( abs(MY_IDUP(8)).ge.1 .and. abs(MY_IDUP(8)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
       PreFac = 2d0 * fbGeV2 * FluxFac * sHatJacobi * PSWgt *   SymmFac
 
       do i1 = -5,5
@@ -2957,8 +2949,6 @@ IF( GENEVT ) THEN
 
 
       PreFac = 2d0 * fbGeV2 * sHatJacobi * PSWgt * SymmFac
-!       if( abs(MY_IDUP(6)).ge.1 .and. abs(MY_IDUP(6)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
-!       if( abs(MY_IDUP(8)).ge.1 .and. abs(MY_IDUP(8)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
       EvalUnWeighted_DecayToVV = LO_Res_Unpol * PreFac
 
       CS_max = csmax(0,0)
@@ -3074,10 +3064,8 @@ ELSE! NOT GENEVT
       endif
 
      PreFac = 2d0 * fbGeV2 * sHatJacobi * PSWgt * SymmFac
-!       if( abs(MY_IDUP(6)).ge.1 .and. abs(MY_IDUP(6)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
-!       if( abs(MY_IDUP(8)).ge.1 .and. abs(MY_IDUP(8)).le.6 ) PreFac = PreFac * 3d0 ! =Nc
-      EvalUnWeighted_DecayToVV = LO_Res_Unpol * PreFac
-      Res = EvalUnWeighted_DecayToVV
+     EvalUnWeighted_DecayToVV = LO_Res_Unpol * PreFac
+     Res = EvalUnWeighted_DecayToVV
 
 
       if (EvalUnWeighted_DecayToVV.gt.csmax(0,0)) then
