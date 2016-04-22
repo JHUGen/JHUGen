@@ -74,7 +74,7 @@ integer, public  :: WidthScheme = 0   ! 1=running BW-width, 2=fixed BW-width (de
 integer, public  :: WidthSchemeIn = 0   ! 1=running BW-width, 2=fixed BW-width (default), 3=Passarino's CPS
 real(8), public :: mubarH = -999d0   !for CPS
 real(8), public :: gabarH = -999d0   !for CPS
-real(8), public :: maxInputmHstar = -999d0
+real(8), public :: maxInputmHstar = -999d0, minInputmHstar = 1d15, mHstarforphasespace
 logical, public :: ReadPMZZ
 character(len=500), public :: PMZZfile = "PMZZdistribution.out"
 real(8), public :: PMZZ_mReso = -1d0
