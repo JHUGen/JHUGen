@@ -88,9 +88,10 @@ real(8) :: minm4l, maxm4l
     !extend out to Gamma in steps of 1 GeV
     call ExtendMZZdistribution(M_Reso+Ga_Reso,   1*GeV)
     call ExtendMZZdistribution(M_Reso-Ga_Reso,   1*GeV)
-    !then out to 5Gamma in steps of 5 GeV
-    call ExtendMZZdistribution(M_Reso+5*Ga_Reso, 5*GeV)
-    call ExtendMZZdistribution(M_Reso-5*Ga_Reso, 5*GeV)
+    !then out to the edge of the distribution in intervals of 5 GeV
+    !  with 3 extra points to avoid boundary effects
+    call ExtendMZZdistribution(maxinputmHstar+15*GeV, 5*GeV)
+    call ExtendMZZdistribution(mininputmHstar-15*GeV, 5*GeV)
     !make sure there are a few data points even for a tiny width
     !so that we don't get NaN
     call ExtendMZZdistribution(M_Reso+2*GeV,     1*GeV)
@@ -113,7 +114,8 @@ real(8) :: extendto, intervalsize, minm4l, maxm4l, ScanMin, ScanMax
     if( PMZZminindex.eq.-1 .or. PMZZmaxindex.eq.-1 ) call Error("Calling ExtendMZZdistribution without calling InitMZZdistribution first!")
     minm4l = PMZZdistribution(PMZZminindex,1)
     maxm4l = PMZZdistribution(PMZZmaxindex,1)
-    extendto = max(extendto, 1d-5)
+    extendto = max(extendto, mininputmHstar-3*intervalsize)
+    extendto = min(extendto, maxinputmHstar+3*intervalsize)
     if( extendto.gt.maxm4l ) then
         ScanMax = extendto
         npoints = ceiling((extendto - maxm4l)/intervalsize)
@@ -159,9 +161,11 @@ logical :: usespline
 
          if( usespline ) then
              if( intervalsize.gt.0d0 ) then
+                 !shouldn't need this anymore, with maxinputmHstar and mininputmHstar above
                  call ExtendMZZdistribution(EHat+3*intervalsize, intervalsize)
                  call ExtendMZZdistribution(EHat-3*intervalsize, intervalsize)
              else
+                 !shouldn't need this anymore, with maxinputmHstar and mininputmHstar above
                  call ExtendMZZdistribution(EHat+15*GeV,         5*GeV)
                  call ExtendMZZdistribution(EHat-15*GeV,         5*GeV)
              endif
