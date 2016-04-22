@@ -2135,13 +2135,15 @@ character(len=160) :: EventLine(0:maxpart)
      enddo
 99   continue
 
-     if( .not.ReadLHEFile .or. m_Reso.lt.2*m_V) then
+     if(.not.ReadLHEFile .or. (m_Reso.lt.2*m_V .and. .not.ReweightDecay)) then
          call ReopenInFile()
          maxInputmHstar = m_Reso
+         minInputmHstar = m_Reso
+         mHstarforphasespace = m_Reso
          return
      endif
 
-     print *, "Finding max mH in the LHE input file..."
+     print *, "Finding range of mHstar in the LHE input file..."
 
 
      InputFmt0 = ""
@@ -2176,6 +2178,7 @@ character(len=160) :: EventLine(0:maxpart)
             if( abs(LHE_IDUP(nline)).eq.25 ) then!   select the Higgs (ID=25, h0) ! Ulascan: Should be safer to have 'if( abs(LHE_IDUP(nline)).eq.abs(convertLHE(Hig_)) )'
                   Mass(nline) = Mass(nline)*GeV            !  convert to units of 100GeV
                   if( Mass(nline).gt.maxInputmHstar ) maxInputmHstar = Mass(nline)
+                  if( Mass(nline).lt.minInputmHstar ) minInputmHstar = Mass(nline)
                   exit
             endif
          enddo
@@ -2196,7 +2199,17 @@ character(len=160) :: EventLine(0:maxpart)
          enddo
      enddo
 98   continue
-     print *, "... and it's ", maxInputmHstar/GeV, " GeV"
+     if(maxinputmHstar.lt.0) then !no events in the file
+         mininputmHstar = m_Reso
+         maxinputmHstar = m_Reso
+     endif
+     print *, "... and it's ", minInputmHstar/GeV, "  -  ", maxInputmHstar/GeV, " GeV"
+
+     if(m_Reso.lt.2*m_V) then
+         mHstarforphasespace = m_Reso
+     else
+         mHstarforphasespace = maxinputmHstar
+     endif
 
      call ReopenInFile()
 
@@ -2310,7 +2323,8 @@ call InitReadLHE(BeginEventLine)
      print *, " finding maximal weight for mZZ=", maxInputmHstar/GeV, " GeV with ",VegasNc0," points"
      VG = zero
      CSmax = zero
-     EHat = maxInputmHstar! fixing Ehat to maxInputmHstar which should determine the max. of the integrand
+     EHat = mHstarforphasespace! for m > 2mV: max mHstar found in the LHE file, which should give the max value of the integrand
+                               ! for m < 2mV: m_Reso
      if( TauDecays.lt.0 ) then
          do tries=1,VegasNc0
              call random_number(yRnd)
