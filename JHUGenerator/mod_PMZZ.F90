@@ -68,8 +68,8 @@ SUBROUTINE InitMZZdistribution()
 use ModMisc
 use ModParameters
 implicit none
-integer :: minindex, maxindex, n, mResoindex
-real(8) :: minm4l, maxm4l
+integer :: minindex, maxindex, mResoindex
+real(8) :: minm4l, maxm4l, total, progress
 
     if( ReadPMZZ ) then
         call ReadMZZdistribution(PMZZfile)
@@ -85,13 +85,22 @@ real(8) :: minm4l, maxm4l
         PMZZmaxindex = mResoindex
     endif
 
+    !this is approximate, but just for printing
+    total = 2*Ga_Reso/(1*GeV) + (maxinputmHstar - mininputmHstar + 30*GeV - 2*Ga_Reso)/(5*GeV)
     !extend out to Gamma in steps of 1 GeV
     call ExtendMZZdistribution(M_Reso+Ga_Reso,   1*GeV)
+    progress = Ga_Reso/(1*Gev)
+    print *, progress/total*100, "%"
     call ExtendMZZdistribution(M_Reso-Ga_Reso,   1*GeV)
+    progress = 2*progress
+    print *, progress/total*100, "%"
     !then out to the edge of the distribution in intervals of 5 GeV
     !  with 3 extra points to avoid boundary effects
     call ExtendMZZdistribution(maxinputmHstar+15*GeV, 5*GeV)
+    progress = progress+(maxinputmHstar+15*GeV-M_Reso-Ga_Reso)/(5*GeV)
+    print *, progress/total*100, "%"
     call ExtendMZZdistribution(mininputmHstar-15*GeV, 5*GeV)
+    print *, 100d0, "%"
     !make sure there are a few data points even for a tiny width
     !so that we don't get NaN
     call ExtendMZZdistribution(M_Reso+2*GeV,     1*GeV)
