@@ -351,6 +351,7 @@ logical :: SetAnomalousHff, Setkappa
     if( SetLastArgument ) M_Reso = M_Reso*GeV
     call ReadCommandLineArgument(arg, "GaReso", success, Ga_Reso, SetLastArgument)
     if( SetLastArgument ) Ga_Reso = Ga_Reso*GeV
+    call ReadCommandLineArgument(arg, "ctauReso", success, HiggsDecayLengthMM)
     call ReadCommandLineArgument(arg, "VegasNc0", success, VegasNc0)
     call ReadCommandLineArgument(arg, "VegasNc1", success, VegasNc1)
     call ReadCommandLineArgument(arg, "VegasNc2", success, VegasNc2)
