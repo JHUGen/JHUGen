@@ -138,6 +138,7 @@ real(8), public, parameter :: M_W     = 80.399d0  *GeV      ! W boson mass (PDG-
 real(8), public, parameter :: Ga_W    = 2.085d0   *GeV      ! W boson width(PDG-2011)
 real(8), public            :: M_Reso  = 125.0d0   *GeV      ! X resonance mass (spin 0, spin 1, spin 2)     (can be overwritten by command line argument)
 real(8), public            :: Ga_Reso = 0.00407d0 *GeV      ! X resonance width
+real(8), public            :: HiggsDecayLengthMM = 0d0      ! Higgs decay length in [mm]
 real(8), public, parameter :: Lambda  = 1000d0    *GeV      ! Lambda coupling enters in two places
                                                             ! overal scale for x-section and in power suppressed
                                                             ! operators/formfactors (former r).
@@ -149,7 +150,6 @@ real(8), public, parameter :: m_mu = 0.10566d0     *GeV     ! muon mass
 real(8), public, parameter :: m_tau = 1.7768d0     *GeV     ! tau mass
 real(8), public, parameter :: Ga_tau =2.267d-12    *GeV     ! tau width
 
-real(8), public, parameter :: HiggsDecayLengthMM = 0d0      ! Higgs decay length in [mm]
 real(8), public, parameter :: Gf = 1.16639d-5/GeV**2        ! Fermi constant
 real(8), public, parameter :: vev = 1.0d0/sqrt(Gf*sqrt(2.0d0))
 real(8), public, parameter :: gwsq = 4.0d0 * M_W**2/vev**2  ! weak constant squared
