@@ -2649,14 +2649,14 @@ return
   function A0_ZZ_4f(j1,j2,j3,j4,za,zb,sprod,line1,line2)
     use modMisc
     implicit none
-    real(dp), parameter :: Qup = 2_dp/3_dp
-    real(dp), parameter :: Qdn = -1_dp/3_dp
+    real(dp), parameter :: Qup = 2.0_dp/3.0_dp
+    real(dp), parameter :: Qdn = -1.0_dp/3.0_dp
     real(dp), parameter, dimension(2) :: Lz = (/aL_Qup,aL_Qdn/)
     real(dp), parameter, dimension(2) :: Rz = (/aR_Qup,aR_Qdn/)
     real(dp), parameter, dimension(2) :: La = (/Qup,Qdn/)
     real(dp), parameter, dimension(2) :: Ra = (/Qup,Qdn/)
-    real(dp), parameter :: czsq = gwsq/4_dp/(1_dp-xw)
-    real(dp), parameter :: caz = -gwsq*sitW/2_dp/sqrt(1_dp-xw)
+    real(dp), parameter :: czsq = gwsq/4.0_dp/(1.0_dp-xw)
+    real(dp), parameter :: caz = -gwsq*sitW/2.0_dp/sqrt(1.0_dp-xw)
     real(dp), parameter :: casq = gwsq*xw
     complex(dp) :: A0_ZZ_4f(-1:1,-1:1)
     integer :: j1,j2,j3,j4,line1,line2
@@ -2666,7 +2666,7 @@ return
     complex(dp) :: a1_zz,a2_zz,a3_zz,struc_zz(3)
     complex(dp) :: a1_aa,a2_aa,a3_aa,a1_az,a2_az,a3_az,a1_za,a2_za,a3_za
     complex(dp) :: struc_aa(3),struc_az(3),struc_za(3)
-    complex(dp) :: helcoup(1:3,-1:1,-1:1)
+    complex(dp) :: helcoup(1:3,-1:1,-1:1) = 0
     complex(dp) :: zab2
     complex(dp) :: iprop12,iprop34
     complex(dp) :: vvcoupl_prime_zz(4),vvcoupl_prime_az(4),vvcoupl_prime_za(4),vvcoupl_prime_aa(2:4)

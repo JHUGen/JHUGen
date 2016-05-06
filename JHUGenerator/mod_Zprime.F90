@@ -28,9 +28,9 @@
       real(dp) :: intcolfac
 
          if(IsAQuark(MY_IDUP(6)) .and. IsAQuark(MY_IDUP(8))) then
-            intcolfac=1_dp/3_dp
+            intcolfac=1.0_dp/3.0_dp
          else
-            intcolfac=1_dp
+            intcolfac=1.0_dp
          endif
 
 
