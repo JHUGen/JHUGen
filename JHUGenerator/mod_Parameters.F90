@@ -3,7 +3,7 @@ implicit none
 save
 !
 !
-character(len=6),parameter :: JHUGen_Version="v6.9.8"
+character(len=6),parameter :: JHUGen_Version="v6.9.9"
 !
 !
 !=====================================================
@@ -124,7 +124,8 @@ real(8), public :: pTjetcut = 15d0*GeV                        ! jet min pt
 real(8), public :: Rjet = 0.3d0                               ! jet deltaR, anti-kt algorithm
 real(8), public :: mJJcut = 0d0*GeV                           ! minimum mJJ for VBF, HJJ, bbH
 real(8), public :: m4l_minmax(1:2) = (/ -1d0,-1d0 /)*GeV      ! min and max for m_4l in off-shell VBF production;   default is (-1,-1): m_4l ~ Higgs resonance (on-shell)
-real(8), public :: MPhotonCutoff = 4d0*GeV                    ! minimum mass for offshell photons
+logical, public :: includeGammaStar = .false.                 ! include offshell photons?
+real(8), public :: MPhotonCutoff = 4d0*GeV                    ! minimum |mass| for offshell photons when includeGammaStar = .true.
 !=====================================================
 
 
@@ -271,7 +272,6 @@ real(8), public :: scale_alpha_W_tn = 1d0        ! scaling factor of alpha (~par
    complex(8), public :: ghz3 = (0.0d0,0d0)
    complex(8), public :: ghz4 = (0.0d0,0d0)   ! pseudoscalar
 
-   logical, public :: includeGammaStar = .false.
    complex(8), public :: ghzgs2  = (0.00d0,0d0)
    complex(8), public :: ghzgs3  = (0.00d0,0d0)
    complex(8), public :: ghzgs4  = (0.00d0,0d0)
