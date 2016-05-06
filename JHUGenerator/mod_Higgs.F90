@@ -638,9 +638,9 @@
            ghzgs4_dyn = czero
       endif
       if( (VVMode.eq.ggMode) .or. (VVMode.eq.gsgsMode)  .or. (VVMode.eq.gsgMode) ) then
-          ghgsgs2_dyn = HVVSpinZeroDynamicCoupling(9,0d0,0d0,q_q)
-          ghgsgs3_dyn = HVVSpinZeroDynamicCoupling(10,0d0,0d0,q_q)
-          ghgsgs4_dyn = HVVSpinZeroDynamicCoupling(11,0d0,0d0,q_q)
+          ghgsgs2_dyn = HVVSpinZeroDynamicCoupling(9,q3_q3,q4_q4,q_q)
+          ghgsgs3_dyn = HVVSpinZeroDynamicCoupling(10,q3_q3,q4_q4,q_q)
+          ghgsgs4_dyn = HVVSpinZeroDynamicCoupling(11,q3_q3,q4_q4,q_q)
       else
           ghgsgs2_dyn = czero
           ghgsgs3_dyn = czero
@@ -1305,9 +1305,9 @@
            ghzgs4_dyn = czero
       endif
       if( (VVMode.eq.ggMode) .or. (VVMode.eq.gsgsMode)  .or. (VVMode.eq.gsgMode) ) then
-          ghgsgs2_dyn = HVVSpinZeroDynamicCoupling(9,0d0,0d0,q_q)
-          ghgsgs3_dyn = HVVSpinZeroDynamicCoupling(10,0d0,0d0,q_q)
-          ghgsgs4_dyn = HVVSpinZeroDynamicCoupling(11,0d0,0d0,q_q)
+          ghgsgs2_dyn = HVVSpinZeroDynamicCoupling(9,q3_q3,q4_q4,q_q)
+          ghgsgs3_dyn = HVVSpinZeroDynamicCoupling(10,q3_q3,q4_q4,q_q)
+          ghgsgs4_dyn = HVVSpinZeroDynamicCoupling(11,q3_q3,q4_q4,q_q)
       else
           ghgsgs2_dyn = czero
           ghgsgs3_dyn = czero
