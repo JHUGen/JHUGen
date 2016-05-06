@@ -6,6 +6,7 @@ module modHiggsJJ
 
   public :: EvalAmp_WBFH_UnSymm_SA,EvalAmp_WBFH_UnSymm_SA_Select,EvalAmp_WBFH_UnSymm_SA_Select_exact
   public :: EvalAmp_SBFH_UnSymm_SA,EvalAmp_SBFH_UnSymm_SA_Select,EvalAmp_SBFH_UnSymm_SA_Select_exact
+  !public :: wrapHVV
   public :: get_VBFchannelHash,get_VBFchannelHash_nosplit,get_HJJchannelHash,get_GENchannelHash
 
   !-- general definitions, to be merged with Markus final structure
@@ -2331,6 +2332,208 @@ return
     RETURN
   END SUBROUTINE EvalAmp_WBFH_UnSymm_SA_Select_exact
 
+
+
+
+!-- TEST FUNCTION THAT WRAPS THE HVV AMPLITUDE
+!-- FOR IT TO WORK, COMMENT OUT THE LINES BELOW,
+!-- AND THE QUOTED LINE IN MODHIGGS::CALCHELAMP2:
+!-- "if ((q_q).lt.-0.1d0 .or. (q3_q3).lt.-0.1d0 .or. (q4_q4).lt.-0.1d0) return  ! if negative invariant masses return zero"
+
+!  SUBROUTINE wrapHVV(p,iSel,jSel,rSel,sSel,res)
+!    use ModHiggs
+!    implicit none
+!    real(dp), intent(in) :: p(4,5)
+!    real(dp), intent(out) :: res
+!    integer, intent(in) :: iSel,jSel,rSel,sSel
+!    integer :: i, j, jz1, jz2, jw1, jw2, pdfindex(2)
+!    integer :: kz1, kz2, kw1, kw2
+!    logical :: ZZ_fusion,WW_fusion
+!    complex(dp) :: A_VV(1:8)
+!    integer, parameter :: ZZMode=00,ZgsMode=01,gsZMode=02,gsgsMode=03
+!    integer, parameter :: WWMode=10
+!    integer, parameter :: ggMode=20
+!    integer, parameter :: ZgMode=30,gsgMode=31
+!    integer :: MY_IDUP(3:6),i3,i4
+!    real(dp) :: pUsed(4,6)
+
+!    if( (abs(iSel).eq.pdfTop_ .or. abs(jSel).eq.pdfTop_) .or. (abs(rSel).eq.pdfTop_ .or. abs(sSel).eq.pdfTop_) ) return
+
+!    res=0.0_dp
+
+!    ZZ_fusion=.false.
+!    WW_fusion=.false.
+
+!    jz1 = 1
+!    jz2 = 2
+!    jw1 = jz1
+!    jw2 = jz2
+
+!    if( &
+!         (iSel.eq.rSel .and. jSel.eq.sSel) &
+!         .or. &
+!         (iSel.eq.sSel .and. jSel.eq.rSel) &
+!         ) then
+!       ZZ_fusion=.true.
+!       if( iSel.eq.sSel .and. jSel.eq.rSel ) then
+!          kz1 = 4
+!          kz2 = 3
+!       else
+!          kz1 = 3
+!          kz2 = 4
+!       endif
+!    endif
+
+!    if( &
+!         ( (sign(iSel,rSel).eq.iSel .and. sign(jSel,sSel).eq.jSel) .and. (abs(iSel-rSel).eq.1 .or. abs(iSel-rSel).eq.3 .or. abs(iSel-rSel).eq.5) .and. (abs(jSel-sSel).eq.1 .or. abs(jSel-sSel).eq.3 .or. abs(jSel-sSel).eq.5) ) &
+!         .or. &
+!         ( (sign(iSel,sSel).eq.iSel .and. sign(jSel,rSel).eq.jSel) .and. (abs(iSel-sSel).eq.1 .or. abs(iSel-sSel).eq.3 .or. abs(iSel-sSel).eq.5) .and. (abs(jSel-rSel).eq.1 .or. abs(jSel-rSel).eq.3 .or. abs(jSel-rSel).eq.5) ) &
+!         ) then
+!       WW_fusion=.true.
+!       ! W_is W_jr fusion
+!       if( (sign(iSel,sSel).eq.iSel .and. sign(jSel,rSel).eq.jSel) .and. (abs(iSel-sSel).eq.1 .or. abs(iSel-sSel).eq.3 .or. abs(iSel-sSel).eq.5) .and. (abs(jSel-rSel).eq.1 .or. abs(jSel-rSel).eq.3 .or. abs(jSel-rSel).eq.5) ) then
+!          kw1 = 4
+!          kw2 = 3
+!       else	! W_ir W_js fusion
+!          kw1 = 3
+!          kw2 = 4
+!       endif
+!    endif
+
+
+!    if( .not.(ZZ_fusion .or. WW_fusion) ) return
+!    if(iSel.lt.0) then
+!       if(ZZ_fusion) call swapi(jz1,kz1)
+!       if(WW_fusion) call swapi(jw1,kw1)
+!    endif
+!    if(jSel.lt.0) then
+!       if(ZZ_fusion) call swapi(jz2,kz2)
+!       if(WW_fusion) call swapi(jw2,kw2)
+!    endif
+
+!    if(WW_fusion) then
+!       if (iSel.eq.pdfUp_ .or. iSel.eq.pdfChm_ .or. iSel.eq.pdfADn_ .or. iSel.eq.pdfAStr_ .or. iSel.eq.pdfABot_) then ! W+ should be passed as the second set of partons
+!          call swapi(jw1,jw2)
+!          call swapi(kw1,kw2)
+!          if(ZZ_fusion) then ! If also ZZ fusion, swap it as well
+!             call swapi(jz1,jz2)
+!             call swapi(kz1,kz2)
+!          endif
+!       endif
+!    endif
+
+!    if(jz1.eq.1) then
+!      MY_IDUP(4) = -convertFromPartIndex(iSel)
+!      pUsed(:,4) = -p(:,1)
+!    else if(jz1.eq.2) then
+!      MY_IDUP(4) = -convertFromPartIndex(jSel)
+!      pUsed(:,4) = -p(:,2)
+!    else if(jz1.eq.3) then
+!      MY_IDUP(4) = convertFromPartIndex(rSel)
+!      pUsed(:,4) = p(:,3)
+!    else if(jz1.eq.4) then
+!      MY_IDUP(4) = convertFromPartIndex(sSel)
+!      pUsed(:,4) = p(:,4)
+!    endif
+!    if(kz1.eq.1) then
+!      MY_IDUP(3) = -convertFromPartIndex(iSel)
+!      pUsed(:,3) = -p(:,1)
+!    else if(kz1.eq.2) then
+!      MY_IDUP(3) = -convertFromPartIndex(jSel)
+!      pUsed(:,3) = -p(:,2)
+!    else if(kz1.eq.3) then
+!      MY_IDUP(3) = convertFromPartIndex(rSel)
+!      pUsed(:,3) = p(:,3)
+!    else if(kz1.eq.4) then
+!      MY_IDUP(3) = convertFromPartIndex(sSel)
+!      pUsed(:,3) = p(:,4)
+!    endif
+!    if(jz2.eq.1) then
+!      MY_IDUP(6) = -convertFromPartIndex(iSel)
+!      pUsed(:,6) = -p(:,1)
+!    else if(jz2.eq.2) then
+!      MY_IDUP(6) = -convertFromPartIndex(jSel)
+!      pUsed(:,6) = -p(:,2)
+!    else if(jz2.eq.3) then
+!      MY_IDUP(6) = convertFromPartIndex(rSel)
+!      pUsed(:,6) = p(:,3)
+!    else if(jz2.eq.4) then
+!      MY_IDUP(6) = convertFromPartIndex(sSel)
+!      pUsed(:,6) = p(:,4)
+!    endif
+!    if(kz2.eq.1) then
+!      MY_IDUP(5) = -convertFromPartIndex(iSel)
+!      pUsed(:,5) = -p(:,1)
+!    else if(kz2.eq.2) then
+!      MY_IDUP(5) = -convertFromPartIndex(jSel)
+!      pUsed(:,5) = -p(:,2)
+!    else if(kz2.eq.3) then
+!      MY_IDUP(5) = convertFromPartIndex(rSel)
+!      pUsed(:,5) = p(:,3)
+!    else if(kz2.eq.4) then
+!      MY_IDUP(5) = convertFromPartIndex(sSel)
+!      pUsed(:,5) = p(:,4)
+!    endif
+
+!    pUSed(:,1) = pUSed(:,3) + pUSed(:,4) + pUSed(:,5) + pUSed(:,6)
+!    pUSed(:,2) = zero
+
+!    if(ZZ_fusion) then
+!       print *, "iSel: ",iSel,", jSel: ",jSel," rSel: ",rSel," sSel: ",sSel
+!       print *, "jz1: ",jz1,", jz2: ",jz2," kz1: ",kz1," kz2: ",kz2
+!       print *,"MY_IDUP:",MY_IDUP
+!       print *,"p1:",p(:,1)
+!       print *,"p2:",p(:,2)
+!       print *,"p3:",p(:,3)
+!       print *,"p4:",p(:,4)
+!       print *,"p5:",p(:,5)
+!       print *,"pUsed1:",pUsed(:,1)
+!       print *,"pUsed2:",pUsed(:,2)
+!       print *,"pUsed3:",pUsed(:,3)
+!       print *,"pUsed4:",pUsed(:,4)
+!       print *,"pUsed5:",pUsed(:,5)
+!       print *,"pUsed6:",pUsed(:,6)
+
+!       A_VV(:) = 0d0
+!       do i3=1,2;  do i4=1,2!  sum over helicities
+!          call calcHelAmp2((/3,4,5,6/),ZZMode,MY_IDUP,pUsed,i3,i4,A_VV(1))
+!          if( includeGammaStar ) then
+!             call calcHelAmp2((/3,4,5,6/),ZgsMode,MY_IDUP,pUsed,i3,i4,A_VV(3))
+!             call calcHelAmp2((/3,4,5,6/),gsZMode,MY_IDUP,pUsed,i3,i4,A_VV(5))
+!             call calcHelAmp2((/3,4,5,6/),gsgsMode,MY_IDUP,pUsed,i3,i4,A_VV(7))
+!          endif
+
+!          if( (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then
+!             call calcHelAmp2((/5,4,3,6/),ZZMode,MY_IDUP,pUsed,i3,i4,A_VV(2))
+!             if( includeGammaStar ) then
+!                call calcHelAmp2((/5,4,3,6/),ZgsMode,MY_IDUP,pUsed,i3,i4,A_VV(4))
+!                call calcHelAmp2((/5,4,3,6/),gsZMode,MY_IDUP,pUsed,i3,i4,A_VV(6))
+!                call calcHelAmp2((/5,4,3,6/),gsgsMode,MY_IDUP,pUsed,i3,i4,A_VV(8))
+!             endif
+!             A_VV(2) = -A_VV(2)! minus from Fermi statistics
+!             A_VV(4) = -A_VV(4)
+!             A_VV(6) = -A_VV(6)
+!             A_VV(8) = -A_VV(8)
+!          endif
+
+!          res = res + (A_VV(1)+A_VV(3)+A_VV(5)+A_VV(7))*dconjg(A_VV(1)+A_VV(3)+A_VV(5)+A_VV(7))!   interfere the 3456 pieces
+!          res = res + (A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8))*dconjg(A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8))!   interfere the 5436 pieces
+!          if( (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) .and. (i3.eq.i4) ) then! interfere the 3456 with 5436 pieces
+!             res = res + 2d0/3d0*dreal(  A_VV(1)*dconjg( A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8) )  )
+!             res = res + 2d0/3d0*dreal(  A_VV(3)*dconjg( A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8) )  )
+!             res = res + 2d0/3d0*dreal(  A_VV(5)*dconjg( A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8) )  )
+!             res = res + 2d0/3d0*dreal(  A_VV(7)*dconjg( A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8) )  )
+!          endif
+
+!          print *,"i3 i4 res: ",i3,i4,res
+!       enddo;  enddo
+!       if(  (MY_IDUP(3).eq.MY_IDUP(5)) .and. (MY_IDUP(4).eq.MY_IDUP(6)) ) res = res/2d0
+
+!    endif
+!    res = res * aveqq
+
+!    RETURN
+!  END SUBROUTINE
 
 
 
