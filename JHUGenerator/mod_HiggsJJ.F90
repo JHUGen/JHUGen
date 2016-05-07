@@ -2503,7 +2503,7 @@ return
 !             call calcHelAmp2((/3,4,5,6/),gsgsMode,MY_IDUP,pUsed,i3,i4,A_VV(7))
 !          endif
 
-!          if( (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then
+!          if( (MY_IDUP(3).eq.MY_IDUP(5)) .and. (MY_IDUP(4).eq.MY_IDUP(6)) .and. iSel.eq.jSel ) then ! iSel.eq.jSel to avoid ZH diagram
 !             call calcHelAmp2((/5,4,3,6/),ZZMode,MY_IDUP,pUsed,i3,i4,A_VV(2))
 !             if( includeGammaStar ) then
 !                call calcHelAmp2((/5,4,3,6/),ZgsMode,MY_IDUP,pUsed,i3,i4,A_VV(4))
@@ -2518,7 +2518,7 @@ return
 
 !          res = res + (A_VV(1)+A_VV(3)+A_VV(5)+A_VV(7))*dconjg(A_VV(1)+A_VV(3)+A_VV(5)+A_VV(7))!   interfere the 3456 pieces
 !          res = res + (A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8))*dconjg(A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8))!   interfere the 5436 pieces
-!          if( (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) .and. (i3.eq.i4) ) then! interfere the 3456 with 5436 pieces
+!          if( (MY_IDUP(3).eq.MY_IDUP(5)) .and. (MY_IDUP(4).eq.MY_IDUP(6)) .and. (i3.eq.i4) .and. iSel.eq.jSel ) then! interfere the 3456 with 5436 pieces
 !             res = res + 2d0/3d0*dreal(  A_VV(1)*dconjg( A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8) )  )
 !             res = res + 2d0/3d0*dreal(  A_VV(3)*dconjg( A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8) )  )
 !             res = res + 2d0/3d0*dreal(  A_VV(5)*dconjg( A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8) )  )
@@ -2527,7 +2527,7 @@ return
 
 !          print *,"i3 i4 res: ",i3,i4,res
 !       enddo;  enddo
-!       if(  (MY_IDUP(3).eq.MY_IDUP(5)) .and. (MY_IDUP(4).eq.MY_IDUP(6)) ) res = res/2d0
+!       if(  (MY_IDUP(3).eq.MY_IDUP(5)) .and. (MY_IDUP(4).eq.MY_IDUP(6)) .and. iSel.eq.jSel ) res = res/2d0
 
 !    endif
 !    res = res * aveqq
