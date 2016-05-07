@@ -2666,7 +2666,7 @@ return
     complex(dp) :: a1_zz,a2_zz,a3_zz,struc_zz(3)
     complex(dp) :: a1_aa,a2_aa,a3_aa,a1_az,a2_az,a3_az,a1_za,a2_za,a3_za
     complex(dp) :: struc_aa(3),struc_az(3),struc_za(3)
-    complex(dp) :: helcoup(1:3,-1:1,-1:1) = 0
+    complex(dp) :: helcoup(1:3,-1:1,-1:1)
     complex(dp) :: zab2
     complex(dp) :: iprop12,iprop34
     complex(dp) :: vvcoupl_prime_zz(4),vvcoupl_prime_az(4),vvcoupl_prime_za(4),vvcoupl_prime_aa(2:4)
