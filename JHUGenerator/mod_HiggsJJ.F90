@@ -2649,14 +2649,14 @@ return
   function A0_ZZ_4f(j1,j2,j3,j4,za,zb,sprod,line1,line2)
     use modMisc
     implicit none
-    real(dp), parameter :: Qup = 2_dp/3_dp
-    real(dp), parameter :: Qdn = -1_dp/3_dp
+    real(dp), parameter :: Qup = 2.0_dp/3.0_dp
+    real(dp), parameter :: Qdn = -1.0_dp/3.0_dp
     real(dp), parameter, dimension(2) :: Lz = (/aL_Qup,aL_Qdn/)
     real(dp), parameter, dimension(2) :: Rz = (/aR_Qup,aR_Qdn/)
     real(dp), parameter, dimension(2) :: La = (/Qup,Qdn/)
     real(dp), parameter, dimension(2) :: Ra = (/Qup,Qdn/)
-    real(dp), parameter :: czsq = gwsq/4_dp/(1_dp-xw)
-    real(dp), parameter :: caz = -gwsq*sitW/2_dp/sqrt(1_dp-xw)
+    real(dp), parameter :: czsq = gwsq/4.0_dp/(1.0_dp-xw)
+    real(dp), parameter :: caz = -gwsq*sitW/2.0_dp/sqrt(1.0_dp-xw)
     real(dp), parameter :: casq = gwsq*xw
     complex(dp) :: A0_ZZ_4f(-1:1,-1:1)
     integer :: j1,j2,j3,j4,line1,line2
