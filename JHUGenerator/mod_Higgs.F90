@@ -2,11 +2,6 @@
       use ModParameters
       implicit none
       private
-      real(dp), private, parameter :: tol = 0.00000010_dp
-      integer, private, parameter :: ZZMode=00,ZgsMode=01,gsZMode=02,gsgsMode=03
-      integer, private, parameter :: WWMode=10
-      integer, private, parameter :: ggMode=20
-      integer, private, parameter :: ZgMode=30,gsgMode=31
 
 
 !----- notation for subroutines
@@ -31,7 +26,6 @@
       integer :: i1,i2,i3,i4,VVMode
       real(dp) :: gZ_sq
       real(dp) :: prefactor,res2
-      real(dp), parameter :: symmFact=1d0/2d0
       real(dp) :: intcolfac
 
          if(IsAQuark(MY_IDUP(6)) .and. IsAQuark(MY_IDUP(8))) then
@@ -141,7 +135,7 @@
 
 
           res = res*prefactor
-          if( (VVMode.eq.ZZMode) .and. (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) res = res * symmFact
+          if( (VVMode.eq.ZZMode) .and. (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) res = res * SymmFac
 
 
       RETURN
@@ -733,7 +727,6 @@
       integer :: i3,i4,VVMode
       real(dp) :: gZ_sq,s
       real(dp) :: prefactor!,res2
-      real(dp), parameter :: symmFact=1d0/2d0
       real(dp) :: intcolfac
 
          if(IsAQuark(MY_IDUP(6)) .and. IsAQuark(MY_IDUP(8))) then
@@ -845,7 +838,7 @@
 
 
           res = res*prefactor
-          if(  (VVMode.eq.ZZMode) .and. (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) res = res * symmFact
+          if(  (VVMode.eq.ZZMode) .and. (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) res = res * SymmFac
 
 
       RETURN
