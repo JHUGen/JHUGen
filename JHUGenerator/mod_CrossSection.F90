@@ -1573,20 +1573,14 @@ Function EvalWeighted_VHiggs(yRnd,VgsWgt)
     EvalWeighted_VHiggs=0d0
     EvalCounter = EvalCounter+1
 
+    mass(1:2,1:2)=0d0
     mass(3,1)=M_V
     mass(4,1)=M_V
     mass(3,2)=Ga_V
     mass(4,2)=Ga_V
     mass(5,1)=M_Reso
     mass(5,2)=Ga_Reso
-    mass(6,1)=0d0
-    mass(7,1)=0d0
-    mass(8,1)=0d0
-    mass(9,1)=0d0
-    mass(6,2)=0d0
-    mass(7,2)=0d0
-    mass(8,2)=0d0
-    mass(9,2)=0d0
+    mass(6:9,1:2)=0d0
 
     id(5)=convertLHE(Hig_)
     id(8)=convertLHE(Bot_)
@@ -1859,7 +1853,7 @@ if( IsAZDecay(DecayMode1) ) then
         j = -i
         id(1:2) = (/LHA2M_PDF(i),LHA2M_PDF(j)/)
         if (abs(LHA2M_PDF(i)).ne.6   .and.   abs(LHA2M_PDF(j)).ne.6.  .and.  i.ne.0)then
-          call EvalAmp_VHiggs(id,helicity,MomExt,inv_mass,mass,me2)
+          call EvalAmp_VHiggs(id,helicity,MomExt,me2)
         else
           me2=0d0
         endif
@@ -1900,7 +1894,7 @@ if( IsAZDecay(DecayMode1) ) then
       !print *, "let the show begin"
       !print *, "MomExt"
       !print *, MomExt
-      call EvalAmp_VHiggs(id,helicity,MomExt,inv_mass,mass,me2)
+      call EvalAmp_VHiggs(id,helicity,MomExt,me2)
 
       LO_Res_Unpol =me2 * PreFac
       EvalWeighted_VHiggs = LO_Res_Unpol
@@ -1948,7 +1942,7 @@ elseif( IsAWDecay(DecayMode1) ) then
          (id(1).eq.convertLHE(ADn_) .or. id(1).eq.convertLHE(AStr_) .or. id(1).eq.convertLHE(ABot_)))   )then
               helicity(6)=sign(1d0,-dble(id(6)))
               helicity(7)=-helicity(6)
-              call EvalAmp_VHiggs(id,helicity,MomExt,inv_mass,mass,me2)
+              call EvalAmp_VHiggs(id,helicity,MomExt,me2)
         elseif( ((id(1).eq.convertLHE(AUp_).or.id(1).eq.convertLHE(AChm_)) .and. &
          (id(2).eq.convertLHE(Dn_) .or. id(2).eq.convertLHE(Str_) .or. id(2).eq.convertLHE(Bot_))) .or. &
         ((id(2).eq.convertLHE(AUp_).or. id(2).eq.convertLHE(AChm_)) .and. &
@@ -1959,7 +1953,7 @@ elseif( IsAWDecay(DecayMode1) ) then
               id2(7)=-id(7)
               helicity(6)=sign(1d0,-dble(id2(6)))
               helicity(7)=-helicity(6)
-              call EvalAmp_VHiggs(id2,helicity,MomExt,inv_mass,mass,me2)
+              call EvalAmp_VHiggs(id2,helicity,MomExt,me2)
         else
               me2=0d0
         endif
@@ -2132,20 +2126,14 @@ include 'csmaxvalue.f'
 
 EvalUnWeighted_VHiggs = 0d0
 
+mass(1:2,1:2)=0d0
 mass(3,1)=M_V
 mass(4,1)=M_V
 mass(3,2)=Ga_V
 mass(4,2)=Ga_V
 mass(5,1)=M_Reso
 mass(5,2)=Ga_Reso
-mass(6,1)=0d0
-mass(7,1)=0d0
-mass(8,1)=0d0
-mass(9,1)=0d0
-mass(6,2)=0d0
-mass(7,2)=0d0
-mass(8,2)=0d0
-mass(9,2)=0d0
+mass(6:9,1:2)=0d0
 
 id(5)=convertLHE(Hig_)
 id(8)=convertLHE(Bot_)
@@ -2504,7 +2492,7 @@ if( IsAZDecay(DecayMode1) ) then
   if(Collider.eq.1)then
     id(1:2) = (/ifound,jfound/)
 
-    call EvalAmp_VHiggs(id,helicity,MomExt,inv_mass,mass,me2)
+    call EvalAmp_VHiggs(id,helicity,MomExt,me2)
 
     LO_Res_Unpol = me2 *pdf(LHA2M_PDF(ifound),1)*pdf(LHA2M_PDF(jfound),2) * PreFac
     EvalUnWeighted_VHiggs = LO_Res_Unpol
@@ -2515,7 +2503,7 @@ if( IsAZDecay(DecayMode1) ) then
     jfound=0
     id(2)=convertLHE(ElM_)
     id(1)=-id(2)
-    call EvalAmp_VHiggs(id,helicity,MomExt,inv_mass,mass,me2)
+    call EvalAmp_VHiggs(id,helicity,MomExt,me2)
     LO_Res_Unpol = me2 * PreFac
     EvalUnWeighted_VHiggs = LO_Res_Unpol
   endif
@@ -2535,7 +2523,7 @@ elseif( IsAWDecay(DecayMode1) ) then
       helicity(6)=sign(1d0,-dble(id(6)))
       helicity(7)=-helicity(6)
     endif
-    call EvalAmp_VHiggs(id,helicity,MomExt,inv_mass,mass,me2)
+    call EvalAmp_VHiggs(id,helicity,MomExt,me2)
 
     LO_Res_Unpol = me2 *pdf(LHA2M_PDF(ifound),1)*pdf(LHA2M_PDF(jfound),2) * PreFac
     EvalUnWeighted_VHiggs = LO_Res_Unpol
@@ -2613,7 +2601,7 @@ if( IsAZDecay(DecayMode1) ) then
     j = -i
     id(1:2) = (/i,j/)
     if (abs(i).ne.0)then
-      call EvalAmp_VHiggs(id,helicity,MomExt,inv_mass,mass,me2)
+      call EvalAmp_VHiggs(id,helicity,MomExt,me2)
     else
       me2=0d0
     endif
@@ -2630,7 +2618,7 @@ if( IsAZDecay(DecayMode1) ) then
   else if(Collider.eq.0)then
     id(2)=convertLHE(ElM_)
     id(1)=-id(2)
-    call EvalAmp_VHiggs(id,helicity,MomExt,inv_mass,mass,me2)
+    call EvalAmp_VHiggs(id,helicity,MomExt,me2)
     LO_Res_Unpol = me2 * PreFac
     EvalUnWeighted_VHiggs = EvalUnWeighted_VHiggs + LO_Res_Unpol
     RES(0,0) = LO_Res_Unpol
@@ -2651,7 +2639,7 @@ elseif( IsAWDecay(DecayMode1) ) then
      (id(1).eq.convertLHE(ADn_).or. id(1).eq.convertLHE(AStr_) .or. id(1).eq.convertLHE(ABot_)))   )then
       helicity(6)=sign(1d0,-dble(id(6)))
       helicity(7)=-helicity(6)
-      call EvalAmp_VHiggs(id,helicity,MomExt,inv_mass,mass,me2)
+      call EvalAmp_VHiggs(id,helicity,MomExt,me2)
     elseif( ((id(1).eq.convertLHE(AUp_).or.id(1).eq.convertLHE(AChm_)) .and. &
      (id(2).eq.convertLHE(Dn_) .or. id(2).eq.convertLHE(Str_) .or. id(2).eq.convertLHE(Bot_))) .or. &
     ((id(2).eq.convertLHE(AUp_).or. id(2).eq.convertLHE(AChm_)) .and. &
@@ -2662,7 +2650,7 @@ elseif( IsAWDecay(DecayMode1) ) then
       id(7)=-id(7)
       helicity(6)=sign(1d0,-dble(id(6)))
       helicity(7)=-helicity(6)
-      call EvalAmp_VHiggs(id,helicity,MomExt,inv_mass,mass,me2)
+      call EvalAmp_VHiggs(id,helicity,MomExt,me2)
     else
       me2=0d0
     endif

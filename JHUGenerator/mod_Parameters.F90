@@ -1096,8 +1096,29 @@ integer :: Part
      stop
   endif
 
+END FUNCTION
+
+
+FUNCTION getDecayWidth(Part)
+implicit none
+real(8) :: getDecayWidth
+integer :: Part
+
+  getDecayWidth = 0d0
+  if( abs(Part).eq.abs(Top_) ) then
+      getDecayWidth = Ga_Top
+  elseif( abs(Part).eq.abs(Z0_) ) then
+      getDecayWidth = Ga_Z
+  elseif( abs(Part).eq.abs(Wp_) ) then
+      getDecayWidth = Ga_W
+  elseif( abs(Part).eq.abs(Hig_) ) then
+      getDecayWidth = Ga_Reso
+  elseif( abs(Part).eq.abs(TaM_) ) then
+      getDecayWidth = Ga_tau
+  endif
 
 END FUNCTION
+
 
 FUNCTION getParticle(Part)
 implicit none
