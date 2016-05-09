@@ -9,6 +9,11 @@ character(len=6),parameter :: JHUGen_Version="v6.9.9"
 !=====================================================
 !internal
 integer, public, parameter  :: dp = selected_real_kind(15)
+real(8), public, parameter :: tol = 0.0000001d0
+integer, public, parameter :: ZZMode=00,ZgsMode=01,gsZMode=02,gsgsMode=03
+integer, public, parameter :: WWMode=10
+integer, public, parameter :: ggMode=20
+integer, public, parameter :: ZgMode=30,gsgMode=31
 integer, public :: Collider,PChannel,Process,DecayMode1,DecayMode2,TopDecays,TauDecays
 integer, public :: VegasIt1,VegasNc0,VegasNc1,VegasNc2,PMZZEvals
 real(8), public :: Collider_Energy

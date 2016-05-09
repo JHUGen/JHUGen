@@ -2,7 +2,6 @@
       use ModParameters
       implicit none
       private
-      real(dp), private, parameter :: tol = 0.00000010_dp
 
 
 !----- notation for subroutines
@@ -14,7 +13,7 @@
 !----- a subroutinefor gg -> G -> ZZ/WW
 !----- all outgoing convention and the following momentum assignment
 !-----  0 -> g(p1) + g(p2) + e-(p3) + e+(p4) +mu-(p5) +mu+(p6)
-      subroutine EvalAmp_gg_G_VV(p,MY_IDUP,sum)  
+      subroutine EvalAmp_gg_G_VV(p,MY_IDUP,sum)
       use ModMisc
       implicit none
       real(dp), intent(out) ::  sum
@@ -26,7 +25,6 @@
       real(dp) :: aL1,aR1,aL2,aR2
       real(dp) :: gZ_sq
       real(dp) :: prefactor
-      real(dp), parameter :: symmFact=1d0/2d0
       real(dp) :: intcolfac
 
       if(IsAQuark(MY_IDUP(6)) .and. IsAQuark(MY_IDUP(8))) then
@@ -34,8 +32,8 @@
       else
          intcolfac=1.0_dp
       endif
- 
-      
+
+
       gZ_sq = 4.0_dp*pi*alpha_QED/4.0_dp/(one-sitW**2)/sitW**2
 
 
@@ -85,7 +83,7 @@
               prefactor = prefactor/gZ_sq ! cancel the overall Z/W coupling
          else
               aL1=0d0
-              aR1=0d0            
+              aR1=0d0
          endif
 
          if( IsAZDecay(DecayMode2) ) then!  Z decay
@@ -160,8 +158,8 @@ do i4 = 1,2
 
 
          if( (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then
-             sum = sum + symmFact * (cdabs( A(1)*dconjg(A(1)) ) +  cdabs( A(2)*dconjg(A(2)) ))
-             if( i3.eq.i4 ) sum = sum + symmFact * 2d0*intcolfac*dreal(A(1)*dconjg(A(2)))  
+             sum = sum + SymmFac * (cdabs( A(1)*dconjg(A(1)) ) +  cdabs( A(2)*dconjg(A(2)) ))
+             if( i3.eq.i4 ) sum = sum + SymmFac * 2d0*intcolfac*dreal(A(1)*dconjg(A(2)))
          else
              sum = sum + cdabs( A(1)*dconjg(A(1)) )
          endif
@@ -257,7 +255,6 @@ enddo
       real(dp) :: aL1,aR1,aL2,aR2,qL,qR
       real(dp) :: gZ_sq
       real(dp) :: prefactor
-      real(dp), parameter :: symmFact=1d0/2d0
       real(dp) :: intcolfac
 
       if(IsAQuark(MY_IDUP(6)) .and. IsAQuark(MY_IDUP(8))) then
@@ -320,7 +317,7 @@ enddo
               prefactor = prefactor/gZ_sq ! cancel the overall Z/W coupling
          else
               aL1=0d0
-              aR1=0d0            
+              aR1=0d0
          endif
 
          if( IsAZDecay(DecayMode2) ) then!  Z decay
@@ -359,11 +356,11 @@ enddo
               endif
          elseif( IsAPhoton(DecayMode2) ) then !  photon decay
               aL2=1d0
-              aR2=1d0  
+              aR2=1d0
               prefactor = prefactor/gZ_sq ! cancel the overall Z/W coupling
          else
               aL2=0d0
-              aR2=0d0  
+              aR2=0d0
          endif
 
       sum = zero
@@ -398,8 +395,8 @@ do i4 = 1,2
 
 
          if( (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then
-             sum = sum + symmFact * (cdabs( A(1)*dconjg(A(1)) ) + cdabs( A(2)*dconjg(A(2)) ))
-             if( i3.eq.i4 ) sum = sum + symmFact * 2d0*intcolfac*dreal(A(1)*dconjg(A(2)))  
+             sum = sum + SymmFac * (cdabs( A(1)*dconjg(A(1)) ) + cdabs( A(2)*dconjg(A(2)) ))
+             if( i3.eq.i4 ) sum = sum + SymmFac * 2d0*intcolfac*dreal(A(1)*dconjg(A(2)))
          else
              sum = sum + cdabs( A(1)*dconjg(A(1)) )
          endif
@@ -429,7 +426,7 @@ enddo
       l2=ordering(2)
       l3=ordering(3)
       l4=ordering(4)
-      
+
       s  = 2d0 * scr(p(:,1),p(:,2))
       propG = s/dcmplx(s - M_Reso**2,M_Reso*Ga_Reso)
 
@@ -546,7 +543,7 @@ enddo
       MZ3=dsqrt(cdabs(q3_q3))
       MZ4=dsqrt(cdabs(q4_q4))
       if( use_dynamic_MG ) then
-          MG = dsqrt(cdabs(q_q))          
+          MG = dsqrt(cdabs(q_q))
       else
           MG = M_Reso
       endif
@@ -595,13 +592,13 @@ enddo
 !      e4_q3*yyy3 + 1./2.*e1_e3*e4_q3*yyy1 - 1./4.*e1_e3*e4_q3*MG**2*   &
 !      yyy4 + 1./2.*e1_e4*e3_q4*yyy1 + 1./4.*e1_e4*e3_q4*MG**2*yyy4 +   &
 !      e1_q3*e3_e4*MG**2*yyy2 + e1_q3*e3_q4*e4_q3*MG**2*yyy3
-! 
+!
 !       res = res +                                                        &
 !       1./2.*et1(e3,e4,q1,q)*e1_q3*yyy6 - 1./2.*et1(e3,e4,q2,q)*e1_q3*  &
 !       yyy6 + 1./4.*et1(e3,e4,e1,q)*MG**2*yyy6 + et1(e3,e4,e1,q)*q1_q3* &
 !       yyy6 + 4*et1(e3,e4,q3,q4)*q1_q3*e1_q3*MG**(-2)*yyy5 + et1(e3,e4, &
 !       q3,q4)*e1_q3*yyy5
-! 
+!
 !       res = res +                                                               &
 !      1./2.*et1(q1,e3,q,q3)*e1_q3*e4_q3*MG**(-2)*yyy7 - 1./2.*et1(q1,        &
 !       e3,q,q4)*e1_q3*e4_q3*MG**(-2)*yyy7 + 1./2.*et1(q1,e4,q,q3)*e1_q3      &
@@ -662,25 +659,25 @@ enddo
 
 
 
-! ! ! ! ! ! ! ! ! ! ! ! ! ! !  SAME AS ABOVE BUT SHORTER  ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! 
+! ! ! ! ! ! ! ! ! ! ! ! ! ! !  SAME AS ABOVE BUT SHORTER  ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
 
         abr1 = (MG**2 + MZ3**2 - MZ4**2 + 4*q1_q3)
- 
-         res =  (e1_e3*(4*yyy1*q1_e4 + e4_q3*(2*yyy1 - (MG**2 + MZ3**2 - MZ4**2)*yyy41 - 4*yyy41*q1_q3)) +    & 
-           e1_e4*(4*yyy1*q1_e3 + e3_q4*(2*yyy1 + (MG**2 + MZ3**2 - MZ4**2)*yyy42 + 4*yyy42*q1_q3)) +    & 
-           2*e1_q3*(-2*yyy41*e4_q3*q1_e3 + 2*yyy2*e3_e4*abr1 +    & 
-          e3_q4*(2*yyy42*q1_e4 + e4_q3*(2*(MG**2 + MZ3**2 - MZ4**2)*yyy3 - yyy41 + yyy42 + 8*yyy3*q1_q3))))/4d0 +    & 
-        (yyy6*abr1*et1(e3,e4,e1,q))/4d0 + (yyy6*e1_q3*et1(e3,e4,q1,q))/2d0    & 
-       - (yyy6*e1_q3*et1(e3,e4,q2,q))/2d0 +    & 
-        (yyy5*e1_q3*abr1*et1(e3,e4,q3,q4))/MG**2 +    & 
-        yyy7*((e4_q3*abr1*et1(e1,e3,q,q3))/(4d0*MG**2) -    & 
-           (e4_q3*abr1*et1(e1,e3,q,q4))/(4d0*MG**2) +    & 
-           (e3_q4*abr1*et1(e1,e4,q,q3))/(4d0*MG**2) -    & 
-           (e3_q4*abr1*et1(e1,e4,q,q4))/(4d0*MG**2)    & 
-          + (e1_q3*e4_q3*et1(q1,e3,q,q3))/(2d0*MG**2) -    & 
-           (e1_q3*e4_q3*et1(q1,e3,q,q4))/(2d0*MG**2) + (e1_q3*e3_q4*et1(q1,e4,q,q3))/(2d0*MG**2) -    & 
-           (e1_q3*e3_q4*et1(q1,e4,q,q4))/(2d0*MG**2) - (e1_q3*e4_q3*et1(q2,e3,q,q3))/(2d0*MG**2) +    & 
-           (e1_q3*e4_q3*et1(q2,e3,q,q4))/(2d0*MG**2) - (e1_q3*e3_q4*et1(q2,e4,q,q3))/(2d0*MG**2) +    & 
+
+         res =  (e1_e3*(4*yyy1*q1_e4 + e4_q3*(2*yyy1 - (MG**2 + MZ3**2 - MZ4**2)*yyy41 - 4*yyy41*q1_q3)) +    &
+           e1_e4*(4*yyy1*q1_e3 + e3_q4*(2*yyy1 + (MG**2 + MZ3**2 - MZ4**2)*yyy42 + 4*yyy42*q1_q3)) +    &
+           2*e1_q3*(-2*yyy41*e4_q3*q1_e3 + 2*yyy2*e3_e4*abr1 +    &
+          e3_q4*(2*yyy42*q1_e4 + e4_q3*(2*(MG**2 + MZ3**2 - MZ4**2)*yyy3 - yyy41 + yyy42 + 8*yyy3*q1_q3))))/4d0 +    &
+        (yyy6*abr1*et1(e3,e4,e1,q))/4d0 + (yyy6*e1_q3*et1(e3,e4,q1,q))/2d0    &
+       - (yyy6*e1_q3*et1(e3,e4,q2,q))/2d0 +    &
+        (yyy5*e1_q3*abr1*et1(e3,e4,q3,q4))/MG**2 +    &
+        yyy7*((e4_q3*abr1*et1(e1,e3,q,q3))/(4d0*MG**2) -    &
+           (e4_q3*abr1*et1(e1,e3,q,q4))/(4d0*MG**2) +    &
+           (e3_q4*abr1*et1(e1,e4,q,q3))/(4d0*MG**2) -    &
+           (e3_q4*abr1*et1(e1,e4,q,q4))/(4d0*MG**2)    &
+          + (e1_q3*e4_q3*et1(q1,e3,q,q3))/(2d0*MG**2) -    &
+           (e1_q3*e4_q3*et1(q1,e3,q,q4))/(2d0*MG**2) + (e1_q3*e3_q4*et1(q1,e4,q,q3))/(2d0*MG**2) -    &
+           (e1_q3*e3_q4*et1(q1,e4,q,q4))/(2d0*MG**2) - (e1_q3*e4_q3*et1(q2,e3,q,q3))/(2d0*MG**2) +    &
+           (e1_q3*e4_q3*et1(q2,e3,q,q4))/(2d0*MG**2) - (e1_q3*e3_q4*et1(q2,e4,q,q3))/(2d0*MG**2) +    &
            (e1_q3*e3_q4*et1(q2,e4,q,q4))/(2d0*MG**2))
 
 ! print *, "res newer QQB ",res
@@ -1015,7 +1012,7 @@ enddo
 !           ,q3,q4)*e1_e2*MZ3**2*yyy5*xxx1 + 2.D0/3.D0*et1(e3,e4,q3,q4)* &
 !           e1_e2*MG**2*yyy5*xxx2 + 1.D0/3.D0*et1(e3,e4,q3,q4)*e1_e2* &
 !           MG**2*yyy5*xxx1 + 4.D0*et1(e3,e4,q3,q4)*e1_q3*e2_q3*yyy5*xxx1
-! 
+!
 ! print *, "old res GG",res
 
 
@@ -1236,10 +1233,10 @@ enddo
 ! print *, "new  ",res
 
 
-! ! ! ! ! ! ! ! ! ! ! ! ! ! !  SAME AS ABOVE BUT SHORTER  ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! 
- 
+! ! ! ! ! ! ! ! ! ! ! ! ! ! !  SAME AS ABOVE BUT SHORTER  ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
+
          abr1 = MG**2 + MZ3**2 - MZ4**2 + 4*q1_q3
- 
+
          res =  MG**2*xxx1*(e1_e4*(yyy1*e2_e3 + yyy42*e2_q3*e3_q4) + e1_e3*(yyy1*e2_e4 - yyy41*e2_q3*e4_q3) + &
             e1_q3*(yyy42*e2_e4*e3_q4 - yyy41*e2_e3*e4_q3 + 4*e2_q3*(yyy2*e3_e4 + yyy3*e3_q4*e4_q3))) + &
          e1_e2*((xxx1*((MG**4*yyy2 + (MZ3**2 - MZ4**2)**2*yyy2 - 2*MG**2*(yyy1 + (MZ3**2 + MZ4**2)*yyy2))*e3_e4 + &
@@ -1281,7 +1278,7 @@ enddo
 ! print *, "newer",res
 ! pause
 
-! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! 
+! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
 
      else
 
