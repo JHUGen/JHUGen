@@ -29,23 +29,27 @@ contains
 
 
 
-  subroutine EvalAmp_VHiggs(id,helicity,MomExt,inv_mass,mass,me2)
-      real(8), intent(in) :: MomExt(1:4,1:9) !beam_momentum(2,4),four_momentum(7,4)
-      !real(8) :: MomExt(1:4,1:9)
-      real(8), intent(in) :: inv_mass(9)
-      !real(8) :: inv_mass(9)
+subroutine EvalAmp_VHiggs(id,helicity,MomExt,me2)
+      integer, intent(in) :: id(9)
+      real(8), intent(in) :: helicity(9)
+      real(8), intent(in) :: MomExt(1:4,1:9)
       real(8), intent(out) :: me2
-      real(8), intent(in) :: helicity(9)!, beam_h(2)
-      real(8), intent(in) ::  mass(9,2) !(mass, width)
-      integer, intent(in) ::  id(9)
+      real(8) :: inv_mass(9)
+      real(8) :: mass(3:5,1:2)
+      integer :: i
       complex(8) amplitude
+      inv_mass(:)=0d0
+      do i=3,5
+        inv_mass(i) = dsqrt(MomExt(1,i)**2 - MomExt(2,i)**2 - MomExt(3,i)**2 - MomExt(4,i)**2)
+        mass(i,1) = getMass(convertLHEreverse(id(i)))
+        mass(i,2) = getDecayWidth(convertLHEreverse(id(i)))
+      enddo
 
       amplitude=MATRIXELEMENT0(MomExt,inv_mass,mass,helicity,id)
       me2=dble(amplitude*dconjg(amplitude))
 
-    return
-
-  end subroutine EvalAmp_VHiggs
+      return
+end subroutine EvalAmp_VHiggs
 
 
 
@@ -59,12 +63,12 @@ contains
       complex(8) :: SME(1:3,-1:+1,-1:+1),HelAmp
       real(8) :: p(1:4,1:9),UnpolSqAmp,PreFac,IZis(-1:+1)
       real(8) :: qsq_V1,qsq_V2,qsq_V1V2,qsq_H
-      complex(8) ghz1_dyn,ghz2_dyn,ghz3_dyn,ghz4_dyn      
+      complex(8) ghz1_dyn,ghz2_dyn,ghz3_dyn,ghz4_dyn
       complex(8) :: a1HVV,a2HVV,a3HVV,Prop
       integer :: ishel,fshel,FermFlav(1:6)! 12:IS, 34:ZDK, 56:HDK
       real(8),parameter :: CF=4d0/3d0
-      
-          ! q1 qbar2 --> 3 --> 45 --> Z4-->f6 fbar7 + H5-->89      
+
+          ! q1 qbar2 --> 3 --> 45 --> Z4-->f6 fbar7 + H5-->89
           call getSME(p,FermFlav,SME)
           if( H_DK ) call Error("Higgs decay not implemented")
 
@@ -97,8 +101,8 @@ contains
 
           a1HVV = ghz1_dyn*M_V**2 + qsq_V1V2*( 2d0*ghz2_dyn + ghz3_dyn*qsq_V1V2/Lambda**2 )
           a2HVV =-2d0*ghz2_dyn - ghz3_dyn*qsq_V1V2/Lambda**2
-          a3HVV =-2d0*ghz4_dyn 
-          
+          a3HVV =-2d0*ghz4_dyn
+
           UnPolSqAmp = 0d0
           do ishel=-1,+1,2
           do fshel=-1,+1,2
@@ -110,13 +114,13 @@ contains
           enddo
           enddo
           UnPolSqAmp = UnPolSqAmp * CF
-          
+
       RETURN
 END SUBROUTINE
 
-      
 
-      
+
+
       SUBROUTINE getSME(p,FermFlav,SME)
       use ModParameters
       use ModMisc
@@ -125,10 +129,10 @@ END SUBROUTINE
       real(8) :: sprod(9,9),p(1:4,1:9),IZfs(-1:+1)
       complex(8) :: za(9,9), zb(9,9),Prop
       integer :: FermFlav(1:6)
-      
+
           call spinoru2(9,(/-p(1:4,1),-p(1:4,2),-p(1:4,1)-p(1:4,2),p(1:4,6)+p(1:4,7),p(1:4,8)+p(1:4,9),p(1:4,6),p(1:4,7),p(1:4,8),p(1:4,9)/),za,zb,sprod)
-          
-          
+
+
           ! Z-final state couplings
           if( IsAWDecay(DecayMode1) ) then
               IZfs(+1) = bR   *CKM(FermFlav(3),FermFlav(4))
@@ -140,11 +144,11 @@ END SUBROUTINE
                IZfs(-1)=aL_neu    * dsqrt(scale_alpha_Z_nn)
                IZfs(+1)=aR_neu    * dsqrt(scale_alpha_Z_nn)
           elseif( abs(FermFlav(3)).eq.2 .or. abs(FermFlav(3)).eq.4 ) then
-               IZfs(-1)=aL_QUp    * dsqrt(scale_alpha_Z_uu) 
-               IZfs(+1)=aR_QUp    * dsqrt(scale_alpha_Z_uu) 
+               IZfs(-1)=aL_QUp    * dsqrt(scale_alpha_Z_uu)
+               IZfs(+1)=aR_QUp    * dsqrt(scale_alpha_Z_uu)
           elseif( abs(FermFlav(3)).eq.1 .or. abs(FermFlav(3)).eq.3 .or. abs(FermFlav(3)).eq.5 ) then
-               IZfs(-1)=aL_QDn    * dsqrt(scale_alpha_Z_dd) 
-               IZfs(+1)=aR_QDn    * dsqrt(scale_alpha_Z_dd) 
+               IZfs(-1)=aL_QDn    * dsqrt(scale_alpha_Z_dd)
+               IZfs(+1)=aR_QDn    * dsqrt(scale_alpha_Z_dd)
           else
                call Error("Wrong flavor in getSME",FermFlav(3))
           endif
@@ -160,17 +164,17 @@ END SUBROUTINE
           SME(3,-1,+1) = cI*IZfs(1)*(za(2,7)*(za(7,8)*zb(1,8) + za(7,9)*zb(1,9))*zb(6,7) + za(6,7)*zb(1,6)*(za(2,8)*zb(6,8) + za(2,9)*zb(6,9)))
           SME(1,-1,-1) = -2*IZfs(-1)*za(2,6)*zb(1,7)
           SME(2,-1,-1) =  IZfs(-1)*(za(2,6)*zb(1,6) + za(2,7)*zb(1,7))*(za(6,8)*zb(7,8) + za(6,9)*zb(7,9))
-          SME(3,-1,-1) =   -(cI*IZfs(-1)*(za(2,6)*(za(6,8)*zb(1,8) + za(6,9)*zb(1,9))*zb(6,7) + za(6,7)*zb(1,7)*(za(2,8)*zb(7,8) + za(2,9)*zb(7,9))))      
-          
-          Prop = (0d0,1d0)/(2*(p(1:4,6).dot.p(1:4,7)) - M_V**2 + (0d0,1d0)*M_V*Ga_V )         
+          SME(3,-1,-1) =   -(cI*IZfs(-1)*(za(2,6)*(za(6,8)*zb(1,8) + za(6,9)*zb(1,9))*zb(6,7) + za(6,7)*zb(1,7)*(za(2,8)*zb(7,8) + za(2,9)*zb(7,9))))
+
+          Prop = (0d0,1d0)/(2*(p(1:4,6).dot.p(1:4,7)) - M_V**2 + (0d0,1d0)*M_V*Ga_V )
           SME(:,:,:) = SME(:,:,:) * Prop
 
      RETURN
      END SUBROUTINE
-      
-      
-      
-      
+
+
+
+
 !MATRIXELEMENT0.F
 !VERSION 20130710
       complex(8) function MATRIXELEMENT0(MomExt,inv_mass,mass,helicity,id)
@@ -178,13 +182,13 @@ END SUBROUTINE
       complex(8) dMATRIXELEMENT
       real(8), intent(in) :: MomExt(1:4,1:9) !,four_momentum(7,4)
       real(8), intent(in) :: inv_mass(9)
-      real(8), intent(in) ::  mass(9,2)
+      real(8), intent(in) ::  mass(3:5,1:2)
       !real(8), intent(in) ::  beam_momentum(2,4)
       real(8), intent(in) ::  helicity(9)!, beam_h(2) !helicities
       integer, intent(in) ::  id(9)!, beam_id(2)
 
       integer mu1,mu2,mu3,mu4,lambda1,lambda2
-      complex(8) PVVX0P      
+      complex(8) PVVX0P
       complex(8) Vcurrent1(4), Acurrent1(4), current1(4), Vcurrent2(4)
       complex(8) Acurrent2(4), current2(4),POL1(3,4), POL2(3,4)
       complex(8) g_mu_nu(4,4), pp(4,4), epp(4,4)
@@ -197,7 +201,7 @@ END SUBROUTINE
 
       gFFZ = (0d0,1d0)*dsqrt(4d0*pi*alpha_QED/(1d0-sitW**2))/sitW
       gFFW = (0d0,1d0)*dsqrt(2d0*pi*alpha_QED)/sitW
-!qq = s in the paper      
+!qq = s in the paper
       qq=-MomExt(1,3)*MomExt(1,4) +MomExt(2,3)*MomExt(2,4) +MomExt(3,3)*MomExt(3,4) +MomExt(4,3)*MomExt(4,4)
 !narrow-width approximation
 !      qq=(H_mass**2-Z_mass**2-(inv_mass(1)**2))/2d0
@@ -297,7 +301,7 @@ END SUBROUTINE
           else
             current2=(0.5d0*T3lL - QlL*sitW**2) *Vcurrent2 -(0.5d0*T3lL)*Acurrent2
           endif
-          current2=current2*gFFZ*dsqrt(scale_alpha_Z_ll)        
+          current2=current2*gFFZ*dsqrt(scale_alpha_Z_ll)
 
 !tau+ tau- Z vertex for final state
         else if((abs(id(6)).eq.15))then
@@ -326,7 +330,7 @@ END SUBROUTINE
           endif
           current2=current2*gFFZ*dsqrt(scale_alpha_Z_dd)
 
-!nu nu~ Z vertex for final state        
+!nu nu~ Z vertex for final state
         else if((abs(id(6)).eq.12).or.(abs(id(6)).eq.14).or.(abs(id(6)).eq.16))then
           current2=(0.5d0*T3nL - QnL*sitW**2) *Vcurrent2 -(0.5d0*T3nL)*Acurrent2
           current2=current2*gFFZ*dsqrt(scale_alpha_Z_nn)
@@ -342,7 +346,7 @@ END SUBROUTINE
 
       call POLARIZATION(MomExt(:,3), POL1)
       call POLARIZATION(MomExt(:,4), POL2)
-   
+
 
 !ZZX vertex
       q3_q3 = inv_mass(3)**2
@@ -384,7 +388,7 @@ END SUBROUTINE
       MATRIXELEMENT0=(0d0,0d0)
       dMATRIXELEMENT=(0d0,0d0)
       do lambda1=1,3
-      do lambda2=1,3  
+      do lambda2=1,3
       dMATRIXELEMENT=current1(1)*POL1(lambda1, 1) -current1(2)*POL1(lambda1, 2) -current1(3)*POL1(lambda1, 3)-current1(4)*POL1(lambda1, 4)
       dMATRIXELEMENT=dMATRIXELEMENT *(current2(1)*dconjg(POL2(lambda2, 1)) -current2(2)*dconjg(POL2(lambda2, 2)) -current2(3)*dconjg(POL2(lambda2, 3)) -current2(4)*dconjg(POL2(lambda2, 4)))
       PVVX0P=(0d0,0d0)
@@ -436,8 +440,8 @@ END SUBROUTINE
 !ANGLES.F
 !VERSION 20130531
 !
-!A subroutine that calculates the polar and azimuthal angles of a 
-!given vector(4) in terms of their sin and cos, which will be 
+!A subroutine that calculates the polar and azimuthal angles of a
+!given vector(4) in terms of their sin and cos, which will be
 !returned by the array sincos(4).
 
       subroutine ANGLES(sincos, vector)
@@ -515,7 +519,7 @@ END SUBROUTINE
 !ANTISYMMETRIC2.F
 !VERSION 20130702
 
-!in epp(_mu, _nu) returns the 
+!in epp(_mu, _nu) returns the
 
       subroutine ANTISYMMETRIC2(p1,p2,epp)
 
@@ -574,7 +578,7 @@ END SUBROUTINE
 !ANTISYMMETRIC.F
 !VERSION 20130618
 
-!returns the element of the rank-4 COVARIANT total antysymmetric 
+!returns the element of the rank-4 COVARIANT total antysymmetric
 !tensor.
 !ANTISYMMETRIC(0,1,2,3)=1.
 
@@ -627,7 +631,7 @@ END SUBROUTINE
       complex(8) epep(4,4),emem(4,4),epe0(4,4),eme0(4,4),e0e0(4,4)
       complex(8) epem(4,4),e0ep(4,4),e0em(4,4),emep(4,4)
       complex(8) POL(3,4), T_mu_nu(5,4,4)
-      
+
       call CONTRA_OUTER(POL(1,:), POL(1,:), epep)
       call CONTRA_OUTER(POL(2,:), POL(2,:), emem)
       call CONTRA_OUTER(POL(1,:), POL(3,:), epe0)
@@ -745,7 +749,7 @@ END SUBROUTINE
       complex(8) epep(4,4),emem(4,4),epe0(4,4),eme0(4,4),e0e0(4,4)
       complex(8) epem(4,4),e0ep(4,4),e0em(4,4),emep(4,4)
       complex(8) POL(3,4), T_mu_nu(5,4,4)
-      
+
       call COVARIANT_OUTER(POL(1,:), POL(1,:), epep)
       call COVARIANT_OUTER(POL(2,:), POL(2,:), emem)
       call COVARIANT_OUTER(POL(1,:), POL(3,:), epe0)
@@ -890,7 +894,7 @@ END SUBROUTINE
 
       implicit none
       real(8), parameter :: epsilon = 1d-13 !a small quantity slightly above machine precision
-      
+
       real(8) p1(4), p2(4), h1, h2
       integer pdg_code1, pdg_code2
       real(8) sqrt_pp1Dpp2
@@ -910,11 +914,11 @@ END SUBROUTINE
       endif
 
       FFP=FFP*(0d0,-1d0)
-      
+
       if( (dble(pdg_code1)*h1) .lt. 0d0)then
         FFP=-dconjg(FFP)
-        
-      endif    
+
+      endif
 
       return
       END function FFP
@@ -948,7 +952,7 @@ END SUBROUTINE
 
       implicit none
       real(8), parameter :: epsilon = 1d-13 !a small quantity slightly above machine precision
-      
+
       real(8) p1(4), p2(4), h1, h2
       integer pdg_code1, pdg_code2
       real(8) sqrt_pp1Dpp2, sqrt_pp1Xpp2
@@ -1007,8 +1011,8 @@ END SUBROUTINE
 !       print *, Acurrent
         do mu=1,4
           Acurrent(mu)=-dconjg(Acurrent(mu))
-        enddo       
-      endif    
+        enddo
+      endif
 
       return
       END subroutine FFA
@@ -1041,7 +1045,7 @@ END SUBROUTINE
 
       implicit none
       real(8), parameter :: epsilon = 1d-13 !a small quantity slightly above machine precision
-      
+
       real(8) p1(4), p2(4), h1, h2
       integer pdg_code1, pdg_code2
       real(8) sqrt_pp1Dpp2
@@ -1064,8 +1068,8 @@ END SUBROUTINE
 
       if( (dble(pdg_code1)*h1) .lt. 0d0)then
         FFS=-dconjg(FFS)
-        
-      endif    
+
+      endif
 
       return
       END function FFS
@@ -1098,7 +1102,7 @@ END SUBROUTINE
 
       implicit none
       real(8), parameter :: epsilon = 1d-13 !a small quantity slightly above machine precision
-      
+
       real(8) p1(4), p2(4), h1, h2
       integer pdg_code1, pdg_code2
       real(8) sqrt_pp1Dpp2, sqrt_pp1Xpp2
@@ -1152,8 +1156,8 @@ END SUBROUTINE
       if( (dble(pdg_code1)*h1) .lt. 0d0)then
         do mu=1,4
           Vcurrent(mu)=dconjg(Vcurrent(mu))
-        enddo       
-      endif    
+        enddo
+      endif
 
       return
       END subroutine FFV
@@ -1226,7 +1230,7 @@ END SUBROUTINE
 
       implicit none
 
-      real(8) vector(4), boost(4) 
+      real(8) vector(4), boost(4)
       real(8) lambda(4,4), vector_copy(4)
       real(8) beta(2:4), beta_sq, gamma
       integer i,j
@@ -1408,7 +1412,7 @@ END SUBROUTINE
       real(8) p(4), sincos(4), inv_mass, abs3p
       complex(8) POL(3,4)
 !     integer lambda, mu
-      
+
       call ANGLES(sincos, p)
 
 !lambda = +1
@@ -1423,7 +1427,7 @@ END SUBROUTINE
       POL(2,4)= -sincos(2)/dsqrt(2d0)
 !|3-momentum|
       abs3p = dsqrt(p(2)**2+p(3)**2+p(4)**2)
-!invariant mass     
+!invariant mass
       inv_mass= dsqrt(p(1)**2-abs3p**2)
 !lambda = L
       POL(3,1)= abs3p/inv_mass
@@ -1467,7 +1471,7 @@ END SUBROUTINE
       implicit none
       real(8) p(4), sincos(4), inv_mass, abs3p
       complex(8) POL(2,4)
-      
+
       call ANGLES(sincos, p)
 
 !lambda = +1
@@ -1525,7 +1529,7 @@ END SUBROUTINE
       real(8) p(4), sincos(4), inv_mass, abs3p
       complex(8) POL(3,4)
 !     integer lambda, mu
-      
+
       call ANGLES(sincos, p)
 
 !lambda = +1
@@ -1540,7 +1544,7 @@ END SUBROUTINE
       POL(2,4)= -sincos(2)/dsqrt(2d0)
 !|3-momentum|
       abs3p = dsqrt(p(2)**2+p(3)**2+p(4)**2)
-!invariant mass     
+!invariant mass
       inv_mass= dsqrt(p(1)**2-abs3p**2)
 !lambda = L
       POL(3,1)= 0d0
@@ -1631,7 +1635,7 @@ END SUBROUTINE
 !VVP.F
 !VERSION 20130524
 
-!in epp(_mu, _nu) returns the 
+!in epp(_mu, _nu) returns the
 
       subroutine VVP(p1,p2,epp)
 
@@ -1754,7 +1758,7 @@ END SUBROUTINE
 
 
   !-- generic functions below
-  function scr(p1,p2) 
+  function scr(p1,p2)
     real(8), intent(in) :: p1(4), p2(4)
     real(8) :: scr
     scr = p1(1)*p2(1)-p1(2)*p2(2)-p1(3)*p2(3)-p1(4)*p2(4)
@@ -1770,7 +1774,7 @@ END SUBROUTINE
     integer :: i,j
     complex(8) :: c23(n), f(n)
     real(8) :: rt(n)
-      
+
     !---if one of the vectors happens to be zero this routine fails.
     do j=1,N
        za(j,j)=czero
@@ -1790,27 +1794,27 @@ END SUBROUTINE
     enddo
 
     do i=2,N
-  
+
      do j=1,i-1
           s(i,j)=two*scr(p(:,i),p(:,j))
           za(i,j)=f(i)*f(j)  * ( c23(i)*dcmplx(rt(j)/(rt(i)+1d-16))-c23(j)*dcmplx(rt(i)/(rt(j)+1d-16)) )
-          
+
           if (abs(s(i,j)).lt.1d-5) then
              zb(i,j)=-(f(i)*f(j))**2*conjg(za(i,j))
           else
              zb(i,j)=-dcmplx(s(i,j))/(za(i,j)+1d-16)
           endif
-          
+
           za(j,i)=-za(i,j)
           zb(j,i)=-zb(i,j)
           s(j,i)=s(i,j)
-          
+
        enddo
 
     enddo
 
     return
-    
+
   end subroutine spinoru2
 
 
