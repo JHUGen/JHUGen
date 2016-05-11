@@ -33,18 +33,21 @@ subroutine EvalAmp_VHiggs(id,helicity,MomExt,me2)
       real(8), intent(in) :: helicity(9)
       real(8), intent(in) :: MomExt(1:4,1:9)
       real(8), intent(out) :: me2
-      real(8) :: inv_mass(9)
       real(8) :: mass(3:5,1:2)
       integer :: i
       complex(8) amplitude!, amptest
-      inv_mass(:)=0d0
+
       do i=3,5
-        inv_mass(i) = dsqrt(MomExt(1,i)**2 - MomExt(2,i)**2 - MomExt(3,i)**2 - MomExt(4,i)**2)
         mass(i,1) = getMass(convertLHEreverse(id(i)))
         mass(i,2) = getDecayWidth(convertLHEreverse(id(i)))
       enddo
 
       amplitude=MATRIXELEMENT0(MomExt,mass,helicity,id,(/.false., .false./))
+      if(includeGammaStar) then
+         amplitude = amplitude + MATRIXELEMENT0(MomExt,mass,helicity,id,(/.false., .true./))
+         amplitude = amplitude + MATRIXELEMENT0(MomExt,mass,helicity,id,(/.true., .false./))
+         amplitude = amplitude + MATRIXELEMENT0(MomExt,mass,helicity,id,(/.true., .true./))
+      endif
       !print *,"Original: ",amplitude
       !pause
       me2=dble(amplitude*dconjg(amplitude))
