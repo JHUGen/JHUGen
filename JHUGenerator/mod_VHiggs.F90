@@ -36,34 +36,70 @@ subroutine EvalAmp_VHiggs(id,helicity,MomExt,me2)
       real(8) :: mass(3:5,1:2)
       integer :: i
       complex(8) amplitude, A_VV(1:4), amptest
+      integer :: idin(9)
+      real(8) :: helin(9)
+      real(8) :: pin(1:4,1:9)
+
+      idin(:)=id(:)
+      helin(:)=helicity(:)
+      pin(:,:)=MomExt(:,:)
+
+      if(id(2).eq.convertLHE(Pho_)) then
+         call swap(idin(1),idin(2))
+         call swap(helin(1),helin(2))
+         call swap(pin(:,1),pin(:,2))
+      endif
+      if(id(7).eq.convertLHE(Pho_)) then
+         call swap(idin(6),idin(7))
+         call swap(helin(6),helin(7))
+         call swap(pin(:,6),pin(:,7))
+      endif
+
 
       A_VV(:)=czero
 
       do i=3,5
-        mass(i,1) = getMass(convertLHEreverse(id(i)))
-        mass(i,2) = getDecayWidth(convertLHEreverse(id(i)))
+        mass(i,1) = getMass(convertLHEreverse(idin(i)))
+        mass(i,2) = getDecayWidth(convertLHEreverse(idin(i)))
       enddo
 
       print *,"EvalAmp_VHiggs::"
 
-      print *,"id: ",id
-      print *,"helicity: ",helicity
-      print *,"MomExt1: ",MomExt(:,1)
-      print *,"MomExt2: ",MomExt(:,2)
-      print *,"MomExt3: ",MomExt(:,3)
-      print *,"MomExt4: ",MomExt(:,4)
-      print *,"MomExt5: ",MomExt(:,5)
-      print *,"MomExt6: ",MomExt(:,6)
-      print *,"MomExt7: ",MomExt(:,7)
-      print *,"MomExt8: ",MomExt(:,8)
-      print *,"MomExt9: ",MomExt(:,9)
+      print *,"idin: ",idin
+      print *,"helin: ",helin
+      print *,"pin1: ",pin(:,1)
+      print *,"pin2: ",pin(:,2)
+      print *,"pin3: ",pin(:,3)
+      print *,"pin4: ",pin(:,4)
+      print *,"pin5: ",pin(:,5)
+      print *,"pin6: ",pin(:,6)
+      print *,"pin7: ",pin(:,7)
+      print *,"pin8: ",pin(:,8)
+      print *,"pin9: ",pin(:,9)
 
-      A_VV(1)=MATRIXELEMENT0(MomExt,mass,helicity,id,(/.false., .false./))
-      if(includeGammaStar) then
-         A_VV(2) = MATRIXELEMENT0(MomExt,mass,helicity,id,(/.false., .true./))
-         A_VV(3) = MATRIXELEMENT0(MomExt,mass,helicity,id,(/.true., .false./))
-         A_VV(4) = MATRIXELEMENT0(MomExt,mass,helicity,id,(/.true., .true./))
+      if(idin(1).ne.convertLHE(Pho_) .and. idin(6).ne.convertLHE(Pho_)) then
+         A_VV(1)=MATRIXELEMENT0(pin,mass,helin,idin,(/.false., .false./))
+         if(includeGammaStar) then
+            A_VV(2) = MATRIXELEMENT0(pin,mass,helin,idin,(/.false., .true./))
+            A_VV(3) = MATRIXELEMENT0(pin,mass,helin,idin,(/.true., .false./))
+            A_VV(4) = MATRIXELEMENT0(pin,mass,helin,idin,(/.true., .true./))
+         endif
+      else if(idin(1).eq.convertLHE(Pho_) .and. idin(6).eq.convertLHE(Pho_)) then
+         A_VV(1)=MATRIXELEMENT0(pin,mass,helin,idin,(/.true., .true./))
+      else if(idin(1).eq.convertLHE(Pho_)) then
+         A_VV(1)=MATRIXELEMENT0(pin,mass,helin,idin,(/.true., .false./))
+         if(includeGammaStar) then
+            A_VV(2) = MATRIXELEMENT0(pin,mass,helin,idin,(/.true., .true./))
+         endif
+      else !if(idin(6).eq.convertLHE(Pho_)) then
+         A_VV(1)=MATRIXELEMENT0(pin,mass,helin,idin,(/.false., .true./))
+         if(includeGammaStar) then
+            A_VV(2) = MATRIXELEMENT0(pin,mass,helin,idin,(/.true., .true./))
+         endif
       endif
+
+
+
       amplitude = A_VV(1)+A_VV(2)+A_VV(3)+A_VV(4)
       print *,"AV1 = ",A_VV(1)
       print *,"AV2 = ",A_VV(2)
@@ -71,7 +107,7 @@ subroutine EvalAmp_VHiggs(id,helicity,MomExt,me2)
       print *,"AV4 = ",A_VV(4)
       print *,"Original: ",amplitude
 
-      amptest = MATRIXELEMENT02(MomExt,mass,helicity,id)
+      amptest = MATRIXELEMENT02(pin,mass,helin,idin)
       print *,"Test: ",amptest
       pause
 
@@ -1456,11 +1492,18 @@ END SUBROUTINE
 
       A_VV(:) = 0d0
       PROPH = PROPAGATOR(dsqrt(scr(p(:,5),p(:,5))),mass(5,1),mass(5,2))
-      call calcHelAmp2((/3,4,5,6/),ZZMode,MY_IDUP,pUsed,i3,i4,A_VV(1))
-      if( includeGammaStar ) then
-         call calcHelAmp2((/3,4,5,6/),ZgsMode,MY_IDUP,pUsed,i3,i4,A_VV(2))
-         call calcHelAmp2((/3,4,5,6/),gsZMode,MY_IDUP,pUsed,i3,i4,A_VV(3))
-         call calcHelAmp2((/3,4,5,6/),gsgsMode,MY_IDUP,pUsed,i3,i4,A_VV(4))
+      if(MY_IDUP(5).ne.Pho_) then
+         call calcHelAmp2((/3,4,5,6/),ZZMode,MY_IDUP,pUsed,i3,i4,A_VV(1))
+         if( includeGammaStar ) then
+            call calcHelAmp2((/3,4,5,6/),ZgsMode,MY_IDUP,pUsed,i3,i4,A_VV(2))
+            call calcHelAmp2((/3,4,5,6/),gsZMode,MY_IDUP,pUsed,i3,i4,A_VV(3))
+            call calcHelAmp2((/3,4,5,6/),gsgsMode,MY_IDUP,pUsed,i3,i4,A_VV(4))
+         endif
+      else
+         call calcHelAmp2((/3,4,5,6/),ZgMode,MY_IDUP,pUsed,i3,i4,A_VV(1))
+         if( includeGammaStar ) then
+            call calcHelAmp2((/3,4,5,6/),gsgMode,MY_IDUP,pUsed,i3,i4,A_VV(2))
+         endif
       endif
       A_VV(:) = -A_VV(:) * propH
 
