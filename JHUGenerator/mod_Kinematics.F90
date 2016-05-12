@@ -1424,11 +1424,11 @@ character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE
 
 
 
-MomDummy = MomExt*1d2
-MassDummy = inv_mass*1d2
+MomDummy = MomExt/GeV
+MassDummy = inv_mass/GeV
 
 IDPRUP=Process
-SCALUP=Mu_Fact * 100d0
+SCALUP=Mu_Fact/GeV
 AQEDUP=alpha_QED
 AQCDUP=alphas
 
@@ -1446,11 +1446,6 @@ endif
 write(io_LHEOutFile,"(A)") "<event>"
 if( .not. ReadLHEFile ) write(io_LHEOutFile,"(I2,X,I3,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7)") NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
 
-
-!if((COLLIDER.ne.0) .and. (unweighted.eqv..false.))then
-!    beam_id(1)=2212
-!    beam_id(2)=2212
-!endif
 helicity(3:5)=0d0
 Spin = 0.1d0
 
@@ -1483,7 +1478,7 @@ elseif((id(6).eq.convertLHE(AUp_)).or.(id(6).eq.convertLHE(ADn_)).or.(id(6).eq.c
 else
     ICOLUP(3:4,1:2)=0
 endif
-!!print *, helicity!!!!!!!!!!
+
 do i=1,2
     write(io_LHEOutFile,fmt1) id(i), -1,0,0,ICOLUP(i,1),ICOLUP(i,2),MomDummy(2:4,i), MomDummy(1,i), 0.0d0, 0.0d0, Spin
 enddo
@@ -1496,15 +1491,16 @@ else
   write(io_LHEOutFile,fmt1) id(5), 1,1,2,0,0,MomDummy(2:4,5), MomDummy(1,5), MassDummy(5), HiggsDKLength, Spin
 endif
 
-write(io_LHEOutFile,fmt1) id(6), 1,3,3,ICOLUP(3,1),ICOLUP(3,2),MomDummy(2:4,6), MomDummy(1,6), MassDummy(6), 0.0d0, Spin
-
-write(io_LHEOutFile,fmt1) id(7), 1,3,3,ICOLUP(4,1),ICOLUP(4,2),MomDummy(2:4,7), MomDummy(1,7), MassDummy(7), 0.0d0, Spin
+if(.not.IsAPhoton(DecayMode1)) then
+  write(io_LHEOutFile,fmt1) id(6), 1,3,3,ICOLUP(3,1),ICOLUP(3,2),MomDummy(2:4,6), MomDummy(1,6), MassDummy(6), 0.0d0, Spin
+  write(io_LHEOutFile,fmt1) id(7), 1,3,3,ICOLUP(4,1),ICOLUP(4,2),MomDummy(2:4,7), MomDummy(1,7), MassDummy(7), 0.0d0, Spin
+endif
 
 if(H_DK.eqv..true.)then
-write(io_LHEOutFile,fmt1) id(8), 1,4,4,501,0,MomDummy(2:4,8), MomDummy(1,8), MassDummy(8), 0.0d0, Spin
-
-write(io_LHEOutFile,fmt1) id(9), 1,4,4,0,501,MomDummy(2:4,9), MomDummy(1,9), MassDummy(9), 0.0d0, Spin
+  write(io_LHEOutFile,fmt1) id(8), 1,4,4,501,0,MomDummy(2:4,8), MomDummy(1,8), MassDummy(8), 0.0d0, Spin
+  write(io_LHEOutFile,fmt1) id(9), 1,4,4,0,501,MomDummy(2:4,9), MomDummy(1,9), MassDummy(9), 0.0d0, Spin
 endif
+
 write(io_LHEOutFile,"(A)") "</event>"
 
 
@@ -2507,34 +2503,40 @@ END SUBROUTINE
 
 
 
-SUBROUTINE Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut)
+SUBROUTINE Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut,useAonshell)
 use ModMisc
 use ModParameters
 implicit none
 
+logical, optional :: useAonshell
 logical :: applyPSCut
 integer :: NumPart,NBin(:),id(:)
 real(8) :: m_jj,y_j1,y_j2,dphi_jj, m_ll, pt_V, pt_H, m_Vstar, costheta1, costheta2, phistar1, phi
 double precision MomBoost(1:4), MomFerm(1:4), inv_mass(1:9), MomLeptX(1:4,1:4), ScatteringAxis(1:4), MomReso(1:4)
 double precision MomLeptPlane1(2:4), MomLeptPlane2(2:4), dummy(2:4), signPhi
-double precision, intent(in) :: MomExt(1:4,1:9) !,beam_momentum(2,4),four_momentum(7,4)
+double precision, intent(in) :: MomExt(1:4,1:9)
+logical :: hasAonshell
 
+     hasAonshell = .false.
+     if(present(useAonshell)) then
+        hasAonshell=useAonshell
+     endif
 
      applyPSCut = .false.
      m_jj = inv_mass(5)
      m_ll = inv_mass(4)
 
-     if(inv_mass(4).le.getMass(convertLHEreverse(id(6)))+getMass(convertLHEreverse(id(7))))then
+     if(.not.hasAonshell .and. inv_mass(4).le.getMass(convertLHEreverse(id(6)))+getMass(convertLHEreverse(id(7))))then
       applyPSCut=.true.
      endif
      if(inv_mass(5).le.getMass(convertLHEreverse(id(8)))+getMass(convertLHEreverse(id(9))))then
       applyPSCut=.true.
      endif
 
-     pt_V = get_PT(MomExt(1:4,6)+MomExt(1:4,7))
-     pt_H = get_PT(MomExt(1:4,8)+MomExt(1:4,9))
+     pt_V = get_PT(MomExt(1:4,4))
+     pt_H = get_PT(MomExt(1:4,5))
      !inv_mass(4,5,6,7)
-     m_Vstar = get_MInv(MomExt(1:4,6)+MomExt(1:4,7)+MomExt(1:4,8)+MomExt(1:4,9))
+     m_Vstar = get_MInv(MomExt(1:4,3))
 !     y_j1 = get_eta(MomExt(1:4,3))
 !     y_j2 = get_eta(MomExt(1:4,4))
 
@@ -2546,125 +2548,96 @@ double precision, intent(in) :: MomExt(1:4,1:9) !,beam_momentum(2,4),four_moment
 !     dphi_jj = abs( Get_PHI(MomExt(1:4,3)) - Get_PHI(MomExt(1:4,4)) )
 !     if( dphi_jj.gt.Pi ) dphi_jj=2d0*Pi-dphi_jj
 
-!costheta2 - Z decay angle
-      MomBoost(1)   = +MomExt(1,4)
-      MomBoost(2:4) = -MomExt(2:4,4)
-
-      MomFerm(1:4)  = MomExt(1:4,6)
-      call boost(MomFerm(1:4),MomBoost(1:4),inv_mass(4))! boost fermion from Z1 into Z1 rest frame
-
-      costheta2 = Get_CosAlpha( MomFerm(1:4),MomExt(1:4,4) )
-
-
 !costheta1 - production angle
-! no boost for now
-      MomBoost(1)   = +MomExt(1,3)
-      MomBoost(2:4) = -MomExt(2:4,3)
-
-      MomFerm(1:4)  = MomExt(1:4,4)
-      !call boost(MomFerm(1:4),MomBoost(1:4),inv_mass(1))! boost fermion from Z1 into Z1 rest frame
-      call LORENTZ(MomFerm(1:4),MomBoost(1:4))
-
-      !if(beam_momentum(1,1).gt.beam_momentum(2,1))then
-      !  costheta1 = Get_CosAlpha( MomFerm(1:4),beam_momentum(1,1:4) )
-      !else
-      !  costheta1 = Get_CosAlpha( MomFerm(1:4),beam_momentum(2,1:4) )
-      !endif
-
-      ScatteringAxis(1:4)=(/1,0,0,1/)
-      costheta1 = Get_CosAlpha( MomFerm(1:4), ScatteringAxis(1:4) )
-
-      !if(beam_momentum(1,4).lt.0d0)then
-       ! print *, '!!!'
-      !endif
-
-
-     !costheta1 = -(four_momentum(2,2)*beam_momentum(1,2)+four_momentum(2,3)*beam_momentum(1,3)+four_momentum(2,4)*beam_momentum(1,4)) &
-     !         / dsqrt((four_momentum(2,2)**2+four_momentum(2,3)**2+four_momentum(2,4)**2) &
-     !               *(beam_momentum(1,2)**2+beam_momentum(1,3)**2+beam_momentum(1,4)**2))
-
+      MomBoost(1)   = -MomExt(1,3)
+      MomBoost(2:4) = +MomExt(2:4,3)
+      if(id(2).lt.0) then
+         MomFerm(1:4)  = -MomExt(1:4,2)
+      else
+         MomFerm(1:4)  = -MomExt(1:4,1)
+      endif
+      call boost(MomFerm(1:4),MomBoost(1:4),inv_mass(3))! boost fermion from Z1 into Z1 rest frame
+      costheta1 = Get_CosAlpha( MomFerm(1:4), -MomExt(1:4,3) )
 
 !phistar1
-      MomReso(1:4)= MomExt(1:4,5)!MomExt(1:4,3) + MomExt(1:4,4)
+      MomReso(1:4)  = -MomExt(1:4,5)
       MomBoost(1)   = +MomReso(1)
       MomBoost(2:4) = -MomReso(2:4)
-      MomLeptX(1:4,1) = MomExt(1:4,6)
-      MomLeptX(1:4,2) = MomExt(1:4,7)
-      MomLeptX(1:4,3) = MomExt(1:4,8)
-      MomLeptX(1:4,4) = MomExt(1:4,9)
-      ScatteringAxis(1:4) = MomExt(1:4,4)
+      if(id(2).lt.0) then
+         MomLeptX(1:4,1) = -MomExt(1:4,2)
+         MomLeptX(1:4,2) = -MomExt(1:4,1)
+      else
+         MomLeptX(1:4,1) = -MomExt(1:4,1)
+         MomLeptX(1:4,2) = -MomExt(1:4,2)
+      endif
+      if(id(8).gt.0) then
+         MomLeptX(1:4,3) = MomExt(1:4,8)
+         MomLeptX(1:4,4) = MomExt(1:4,9)
+      else
+         MomLeptX(1:4,3) = MomExt(1:4,9)
+         MomLeptX(1:4,4) = MomExt(1:4,8)
+      endif
       call boost(MomLeptX(1:4,1),MomBoost(1:4),inv_mass(5))! boost all leptons into the resonance frame
       call boost(MomLeptX(1:4,2),MomBoost(1:4),inv_mass(5))
       call boost(MomLeptX(1:4,3),MomBoost(1:4),inv_mass(5))
       call boost(MomLeptX(1:4,4),MomBoost(1:4),inv_mass(5))
-      call boost(ScatteringAxis(1:4),MomBoost(1:4),inv_mass(5))
-!test
-!print *, MomLeptX(1:4,3)+MomLeptX(1:4,4)
-!print *, four_momentum(2,1:4)
-!print *, four_momentum(3,1:4)
-!pause
-
-
+      ScatteringAxis(1:4) = MomLeptX(1:4,3)-MomLeptX(1:4,4)
+      ScatteringAxis(1:4) = ScatteringAxis(1:4) / dsqrt(dabs(ScatteringAxis(2)**2+ScatteringAxis(3)**2+ScatteringAxis(4)**2 +1d-15 ))
 !     orthogonal vectors defined as p(fermion) x p(antifermion)
       MomLeptPlane1(2:4) = (MomLeptX(2:4,1)).cross.(MomLeptX(2:4,2))! orthogonal vector to lepton plane
       MomLeptPlane1(2:4) = MomLeptPlane1(2:4)/dsqrt(dabs(MomLeptPlane1(2)**2+MomLeptPlane1(3)**2+MomLeptPlane1(4)**2 +1d-15) )! normalize
-
-      MomLeptPlane2(2:4) = (MomLeptX(2:4,3)).cross.(MomLeptX(2:4,4))! orthogonal vector to lepton plane
+      MomLeptPlane2(2:4) = (ScatteringAxis(2:4)).cross.(MomLeptX(2:4,1)+MomLeptX(2:4,2))
       MomLeptPlane2(2:4) = MomLeptPlane2(2:4)/dsqrt(dabs(MomLeptPlane2(2)**2+MomLeptPlane2(3)**2+MomLeptPlane2(4)**2 +1d-15 ))! normalize
-
 !     get the sign
       dummy(2:4) = (MomLeptPlane1(2:4)).cross.(MomLeptPlane2(2:4))
-      signPhi = sign(1d0,  (dummy(2)*ScatteringAxis(2)+dummy(3)*ScatteringAxis(3)+dummy(4)*ScatteringAxis(4))  )! use q1
-    !test
-    !signPhi = 1d0
-      Phistar1 = signPhi * acos(-1d0*(MomLeptPlane1(2)*MomLeptPlane2(2) + MomLeptPlane1(3)*MomLeptPlane2(3) + MomLeptPlane1(4)*MomLeptPlane2(4)))
+      signPhi = sign(1d0,  (dummy(2)*(MomLeptX(2,1)+MomLeptX(2,2))+dummy(3)*(MomLeptX(3,1)+MomLeptX(3,2))+dummy(4)*(MomLeptX(4,1)+MomLeptX(4,2)))  )! use q1
+      Phistar1 = signPhi * acos(MomLeptPlane1(2)*MomLeptPlane2(2) + MomLeptPlane1(3)*MomLeptPlane2(3) + MomLeptPlane1(4)*MomLeptPlane2(4))
 
+
+      costheta2=0d0
+      phi=0d0
+      if(.not.hasAonshell) then
+
+!costheta2 - Z2 decay angle
+         MomBoost(1)   = +MomExt(1,4)
+         MomBoost(2:4) = -MomExt(2:4,4)
+         if(id(6).gt.0) then
+            MomFerm(1:4)  = MomExt(1:4,6)
+         else
+            MomFerm(1:4)  = MomExt(1:4,7)
+         endif
+         call boost(MomFerm(1:4),MomBoost(1:4),inv_mass(4))! boost fermion from Z2 into Z2 rest frame
+         costheta2 = Get_CosAlpha( MomFerm(1:4),MomExt(1:4,4) )
 
 !phi
-      !MomReso(1:4)= MomExt(1:4,5)!MomExt(1:4,8) + MomExt(1:4,9)
-      !MomBoost(1)   = +MomReso(1)
-      !MomBoost(2:4) = -MomReso(2:4)
-      MomLeptX(1:4,1) = MomExt(1:4,6)
-      MomLeptX(1:4,2) = MomExt(1:4,7)
-      !MomLeptX(1:4,3) = MomExt(1:4,1)
-      !MomLeptX(1:4,4) = MomExt(1:4,2)
-
-      !if(beam_momentum(1,1).gt.beam_momentum(2,1))then
-        !MomLeptX(1:4,3) = beam_momentum(1,1:4)
-      !else
-      !  MomLeptX(1:4,3) = beam_momentum(2,1:4)
-      !endif
-
-
-      !ScatteringAxis(1:4) = MomExt(1:4,5)
-      ScatteringAxis(1:4)=(/1,0,0,1/)
-      !call boost(MomLeptX(1:4,1),MomBoost(1:4),inv_mass(5))! boost all leptons into the resonance frame
-      !call boost(MomLeptX(1:4,2),MomBoost(1:4),inv_mass(5))
-      !call boost(MomLeptX(1:4,3),MomBoost(1:4),inv_mass(5))
-      !call boost(MomLeptX(1:4,4),MomBoost(1:4),inv_mass(5))
-      !call boost(ScatteringAxis(1:4),MomBoost(1:4),inv_mass(5))
-!test
-!print *, MomLeptX(1:4,3)+MomLeptX(1:4,4)
-!print *, four_momentum(2,1:4)
-!print *, four_momentum(3,1:4)
-!pause
-
-
+         MomReso(1:4)  = -MomExt(1:4,5)
+         MomBoost(1)   = +MomReso(1)
+         MomBoost(2:4) = -MomReso(2:4)
+         if(id(2).lt.0) then
+            MomLeptX(1:4,1) = -MomExt(1:4,2)
+            MomLeptX(1:4,2) = -MomExt(1:4,1)
+         else
+            MomLeptX(1:4,1) = -MomExt(1:4,1)
+            MomLeptX(1:4,2) = -MomExt(1:4,2)
+         endif
+         if(id(6).gt.0) then
+            MomLeptX(1:4,3) = MomExt(1:4,6)
+            MomLeptX(1:4,4) = MomExt(1:4,7)
+         else
+            MomLeptX(1:4,3) = MomExt(1:4,7)
+            MomLeptX(1:4,4) = MomExt(1:4,6)
+         endif
 !     orthogonal vectors defined as p(fermion) x p(antifermion)
-      MomLeptPlane1(2:4) = (MomLeptX(2:4,1)).cross.(MomLeptX(2:4,2))! orthogonal vector to lepton plane
-      MomLeptPlane1(2:4) = MomLeptPlane1(2:4)/dsqrt( MomLeptPlane1(2)**2+MomLeptPlane1(3)**2+MomLeptPlane1(4)**2 )! normalize
-
-      MomLeptPlane2(2:4) = (ScatteringAxis(2:4)).cross.(MomExt(2:4,4))! orthogonal vector to lepton plane
-      MomLeptPlane2(2:4) = MomLeptPlane2(2:4)/dsqrt( MomLeptPlane2(2)**2+MomLeptPlane2(3)**2+MomLeptPlane2(4)**2 )! normalize
-      !MomLeptPlane2(2:4) = (/0d0,1d0,0d0/)
-
+         MomLeptPlane1(2:4) = (MomLeptX(2:4,1)).cross.(MomLeptX(2:4,2))! orthogonal vector to lepton plane
+         MomLeptPlane1(2:4) = MomLeptPlane1(2:4)/dsqrt( MomLeptPlane1(2)**2+MomLeptPlane1(3)**2+MomLeptPlane1(4)**2 )! normalize
+         MomLeptPlane2(2:4) = (MomLeptX(2:4,3)).cross.(MomLeptX(2:4,4))! orthogonal vector to lepton plane
+         MomLeptPlane2(2:4) = MomLeptPlane2(2:4)/dsqrt( MomLeptPlane2(2)**2+MomLeptPlane2(3)**2+MomLeptPlane2(4)**2 )! normalize
 !     get the sign
-      dummy(2:4) = (MomLeptPlane1(2:4)).cross.(MomLeptPlane2(2:4))
-      signPhi = -sign(1d0,  (dummy(2)*ScatteringAxis(2)+dummy(3)*ScatteringAxis(3)+dummy(4)*ScatteringAxis(4))  )! use q1
-    !test
-    !signPhi = 1d0
-      phi = signPhi * acos(1d0*(MomLeptPlane1(2)*MomLeptPlane2(2) + MomLeptPlane1(3)*MomLeptPlane2(3) + MomLeptPlane1(4)*MomLeptPlane2(4)))
+         dummy(2:4) = (MomLeptPlane1(2:4)).cross.(MomLeptPlane2(2:4))
+         signPhi = sign(1d0,  (dummy(2)*(MomLeptX(2,1)+MomLeptX(2,2))+dummy(3)*(MomLeptX(3,1)+MomLeptX(3,2))+dummy(4)*(MomLeptX(4,1)+MomLeptX(4,2)))  )! use q1
+         phi = signPhi * acos(-1d0*(MomLeptPlane1(2)*MomLeptPlane2(2) + MomLeptPlane1(3)*MomLeptPlane2(3) + MomLeptPlane1(4)*MomLeptPlane2(4)))
 
+      endif
 
 !     binning
      NBin(1)  = WhichBin(1,m_jj)
@@ -3897,33 +3870,6 @@ END FUNCTION
 
 
 
-
-! FUNCTION WhichXBin(NHisto,XValue)
-! use ModParameters
-! implicit none
-! integer :: WhichXBin,NHisto
-! real(8) :: XValue
-! integer :: i
-! include "vegas_common.f"
-!
-!     whichxbin = int( xValue*NPart )!  uniform distribution
-!
-!
-! !    do i=1,50!                         distribution according to vegas grid
-! !       if( XValue .lt. xi(i,NHisto) ) then
-! !           WhichXBin=i
-! !           return
-! !       endif
-! !    enddo
-! RETURN
-! END FUNCTION
-
-
-
-
-
-
-
 SUBROUTINE IntoHisto(NHisto,NBin,Value)
 implicit none
 integer :: NHisto,NBin
@@ -4311,10 +4257,11 @@ END SUBROUTINE
 
 
 
-SUBROUTINE EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt)
+SUBROUTINE EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt,useAonshell)
 !use modMisc
 implicit none
 
+      logical, optional :: useAonshell
       real(8), intent(in) :: yRnd(1:20),mass(9,2)
       real(8) :: phi, beta, gamma
       real(8) :: temp_vector(4), temp_boost(4)
@@ -4333,28 +4280,18 @@ implicit none
 !use Cauchy distribution for Breit-Wigner distribution for the invariant mass of 2 and 3?
 !      logical, parameter :: breit_wigner = .true.
       real(8) :: jacobian4, jacobian5
+      logical :: hasAonshell
+
+      hasAonshell = .false.
+      if(present(useAonshell)) then
+         hasAonshell=useAonshell
+      endif
 
 !3333333333
 !invariant mass of 3
       inv_mass(3) = dsqrt((MomExt(1,3)+MomExt(4,3))*(MomExt(1,3)-MomExt(4,3)))
-!generating invariant mass of 4 and 5
-!if using uniform distribution
-!      if(breit_wigner.eqv..false.)then
-!        inv_mass(4) = yRnd(12)
-!        inv_mass(5) = yRnd(13)*(1d0-inv_mass(4))
-!        jacobian4 = (1d0-inv_mass(4))
-!        inv_mass(4) = inv_mass(4) * inv_mass(3)
-!        jacobian4 = inv_mass(3)
-!        inv_mass(5) = inv_mass(5) * inv_mass(3)
-!        jacobian5 = jacobian5 * inv_mass(3)
-!      else
-!if using Breit-Wigner distribution
-!
-        inv_mass(4) = dsqrt(dabs(bw_sq(yRnd(12),mass(4,1), mass(4,2), inv_mass(3)**2, jacobian4)))
-        inv_mass(5) = dsqrt(dabs(bw_sq(yRnd(13),mass(5,1), mass(5,2), (inv_mass(3)-inv_mass(4))**2, jacobian5)))
-!print *, bw_sq(yRnd(13),mass(5,1), mass(5,2), (inv_mass(3)-inv_mass(4))**2, jacobian5), inv_mass(4:5)
-!      endif
-
+      inv_mass(4) = dsqrt(dabs(bw_sq(yRnd(12),mass(4,1), mass(4,2), inv_mass(3)**2, jacobian4)))
+      inv_mass(5) = dsqrt(dabs(bw_sq(yRnd(13),mass(5,1), mass(5,2), (inv_mass(3)-inv_mass(4))**2, jacobian5)))
 
 !444444444444
 !energy of 4 in the CM frame of 3
@@ -4382,41 +4319,46 @@ implicit none
       MomExt(4,4)=(MomDummy(4)+MomDummy(1)*beta) *gamma
 !energy
       MomExt(1,4)=(MomDummy(1)+MomDummy(4)*beta) *gamma
+
 !555555555555555555
       MomExt(1:4,5) = MomExt(1:4,3) - MomExt(1:4,4)
 
 !666666666666666666
+      if(.not.hasAonshell) then
 !invariant mass of 6
-      inv_mass(6)=0d0
+         inv_mass(6)=0d0
 !energy of 6 in the CM frame of 4
-      MomExt(1,6)=inv_mass(4)/2d0
+         MomExt(1,6)=inv_mass(4)/2d0
 !|3-momentum| of 6 in the CM frame of 4
-      cm_abs3p(6)=MomExt(1,6)
+         cm_abs3p(6)=MomExt(1,6)
 !generating cos(theta_6) and phi_6 in the CM frame of 4
 !z-axis is along the boost of 2
-      cm_cos_theta(6) = yRnd(8)
-      cm_cos_theta(6) = cm_cos_theta(6)*2d0-1d0
-      cm_sin_theta(6) = dsqrt((1d0+cm_cos_theta(6)) *(1d0-cm_cos_theta(6)))
-      cm_cos_phi(6) = yRnd(9)
-      phi=Twopi*cm_cos_phi(6)
-      cm_cos_phi(6) = dcos(phi)
-      cm_sin_phi(6) = dsin(phi)
+         cm_cos_theta(6) = yRnd(8)
+         cm_cos_theta(6) = cm_cos_theta(6)*2d0-1d0
+         cm_sin_theta(6) = dsqrt((1d0+cm_cos_theta(6)) *(1d0-cm_cos_theta(6)))
+         cm_cos_phi(6) = yRnd(9)
+         phi=Twopi*cm_cos_phi(6)
+         cm_cos_phi(6) = dcos(phi)
+         cm_sin_phi(6) = dsin(phi)
 !3-momentum of 6 in the CM frame of 4
-      MomExt(2,6)=cm_abs3p(6)*cm_sin_theta(6)*cm_cos_phi(6)
-      MomExt(3,6)=cm_abs3p(6)*cm_sin_theta(6)*cm_sin_phi(6)
-      MomExt(4,6)=cm_abs3p(6)*cm_cos_theta(6)
+         MomExt(2,6)=cm_abs3p(6)*cm_sin_theta(6)*cm_cos_phi(6)
+         MomExt(3,6)=cm_abs3p(6)*cm_sin_theta(6)*cm_sin_phi(6)
+         MomExt(4,6)=cm_abs3p(6)*cm_cos_theta(6)
 !boost the 4-momentum of 6 to the lab frame
-      temp_vector = MomExt(1:4,6)
-      temp_boost = MomExt(1:4,4)
+         temp_vector = MomExt(1:4,6)
+         temp_boost = MomExt(1:4,4)
+         call LORENTZ(temp_vector, temp_boost)
+         MomExt(1:4,6) = temp_vector
+      else
+         MomExt(1:4,6)=MomExt(1:4,4)
+      endif
 
-      call LORENTZ(temp_vector, temp_boost)
-
-      MomExt(1:4,6) = temp_vector
 !7777777777777777777777
 !invariant mass of 7
       inv_mass(7)=0d0
 !4-momentum of 7 (lab frame) by energy-momentum conservation
       MomExt(1:4,7)=MomExt(1:4,4)-MomExt(1:4,6)
+
 !8888888888888888888888
 !invariant mass of 8
       inv_mass(8)=0d0
@@ -4441,10 +4383,9 @@ implicit none
 !boost the 4-momentum of 6 to the lab frame
       temp_vector = MomExt(1:4,8)
       temp_boost = MomExt(1:4,5)
-
       call LORENTZ(temp_vector, temp_boost)
-
       MomExt(1:4,8) = temp_vector
+
 !9999999999999999999999
 !invariant mass of 9
       inv_mass(9)=0d0
