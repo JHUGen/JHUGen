@@ -35,23 +35,47 @@ subroutine EvalAmp_VHiggs(id,helicity,MomExt,me2)
       real(8), intent(out) :: me2
       real(8) :: mass(3:5,1:2)
       integer :: i
-      complex(8) amplitude!, amptest
+      complex(8) amplitude, A_VV(1:4), amptest
+
+      A_VV(:)=czero
 
       do i=3,5
         mass(i,1) = getMass(convertLHEreverse(id(i)))
         mass(i,2) = getDecayWidth(convertLHEreverse(id(i)))
       enddo
 
-      amplitude=MATRIXELEMENT0(MomExt,mass,helicity,id,(/.false., .false./))
-      if(includeGammaStar) then
-         amplitude = amplitude + MATRIXELEMENT0(MomExt,mass,helicity,id,(/.false., .true./))
-         amplitude = amplitude + MATRIXELEMENT0(MomExt,mass,helicity,id,(/.true., .false./))
-         amplitude = amplitude + MATRIXELEMENT0(MomExt,mass,helicity,id,(/.true., .true./))
-      endif
-      !print *,"Original: ",amplitude
-      !pause
-      me2=dble(amplitude*dconjg(amplitude))
+      print *,"EvalAmp_VHiggs::"
 
+      print *,"id: ",id
+      print *,"helicity: ",helicity
+      print *,"MomExt1: ",MomExt(:,1)
+      print *,"MomExt2: ",MomExt(:,2)
+      print *,"MomExt3: ",MomExt(:,3)
+      print *,"MomExt4: ",MomExt(:,4)
+      print *,"MomExt5: ",MomExt(:,5)
+      print *,"MomExt6: ",MomExt(:,6)
+      print *,"MomExt7: ",MomExt(:,7)
+      print *,"MomExt8: ",MomExt(:,8)
+      print *,"MomExt9: ",MomExt(:,9)
+
+      A_VV(1)=MATRIXELEMENT0(MomExt,mass,helicity,id,(/.false., .false./))
+      if(includeGammaStar) then
+         A_VV(2) = MATRIXELEMENT0(MomExt,mass,helicity,id,(/.false., .true./))
+         A_VV(3) = MATRIXELEMENT0(MomExt,mass,helicity,id,(/.true., .false./))
+         A_VV(4) = MATRIXELEMENT0(MomExt,mass,helicity,id,(/.true., .true./))
+      endif
+      amplitude = A_VV(1)+A_VV(2)+A_VV(3)+A_VV(4)
+      print *,"AV1 = ",A_VV(1)
+      print *,"AV2 = ",A_VV(2)
+      print *,"AV3 = ",A_VV(3)
+      print *,"AV4 = ",A_VV(4)
+      print *,"Original: ",amplitude
+
+      amptest = MATRIXELEMENT02(MomExt,mass,helicity,id)
+      print *,"Test: ",amptest
+      pause
+
+      me2=dble(amplitude*dconjg(amplitude))
       return
 end subroutine EvalAmp_VHiggs
 
@@ -231,7 +255,7 @@ END SUBROUTINE
            endif
          !ZH
          !e+ e- Z vertex for incoming states
-         else if((abs(id(1)).eq.11).or.(abs(id(1)).eq.13))then
+         else if((abs(id(1)).eq.11).or.(abs(id(1)).eq.13).or.(abs(id(1)).eq.15))then
            if((id(1)*helicity(1)).gt.0d0)then
              current1=(0.5d0*T3lR - QlR*sitW**2) *Vcurrent1 -(0.5d0*T3lR)*Acurrent1
            else
@@ -262,7 +286,7 @@ END SUBROUTINE
          PROP1 = PROPAGATOR(dsqrt(q3_q3),0d0,0d0)
 
          if(abs(id(1)).eq.convertLHE(Pho_)) then
-           PROP2=cone
+           PROP1=cone
            if((id(1)*helicity(1)).gt.0d0) then
              call POLARIZATION_SINGLE(MomExt(:,3),+1,Vcurrent1)
            else
@@ -278,7 +302,7 @@ END SUBROUTINE
          if(abs(id(1)).eq.convertLHE(Pho_))then
            current1=Vcurrent1
          !e+ e- Z vertex for incoming states
-         else if((abs(id(1)).eq.11).or.(abs(id(1)).eq.13))then
+         else if((abs(id(1)).eq.11).or.(abs(id(1)).eq.13).or.(abs(id(1)).eq.15))then
            if((id(1)*helicity(1)).gt.0d0)then
              current1 = QlR*Vcurrent1
            else
@@ -1360,6 +1384,94 @@ END SUBROUTINE
     return
 
   end subroutine spinoru2
+
+
+!MATRIXELEMENT0.F
+!VERSION 20160511
+      complex(8) function MATRIXELEMENT02(p,mass,helicity,id)
+      use ModHiggs
+      implicit none
+      real(8), intent(in) :: p(1:4,1:9)
+      real(8), intent(in) :: mass(3:5,1:2)
+      real(8), intent(in) :: helicity(9)
+      integer, intent(in) :: id(9)
+
+      complex(dp) :: A_VV(1:4), propH
+      integer, parameter :: ZZMode=00,ZgsMode=01,gsZMode=02,gsgsMode=03
+      integer, parameter :: WWMode=10
+      integer, parameter :: ggMode=20
+      integer, parameter :: ZgMode=30,gsgMode=31
+      integer :: MY_IDUP(3:6),i3,i4
+      real(dp) :: pUsed(4,6)
+
+      if(id(1).lt.0) then
+         MY_IDUP(3) = -convertLHEreverse(id(1))
+         MY_IDUP(4) = -convertLHEreverse(id(2))
+         pUsed(:,3) = -p(:,1)
+         pUsed(:,4) = -p(:,2)
+      else
+         MY_IDUP(4) = -convertLHEreverse(id(1))
+         MY_IDUP(3) = -convertLHEreverse(id(2))
+         pUsed(:,4) = -p(:,1)
+         pUsed(:,3) = -p(:,2)
+      endif
+      if(id(6).gt.0) then
+         MY_IDUP(5) = convertLHEreverse(id(6))
+         if(MY_IDUP(5).ne.Pho_) then
+            MY_IDUP(6) = convertLHEreverse(id(7))
+         endif
+         pUsed(:,5) = p(:,6)
+         pUsed(:,6) = p(:,7)
+      else
+         MY_IDUP(5) = convertLHEreverse(id(7))
+         if(MY_IDUP(5).ne.Pho_) then
+            MY_IDUP(6) = convertLHEreverse(id(6))
+         endif
+         pUsed(:,6) = p(:,6)
+         pUsed(:,5) = p(:,7)
+      endif
+      pUSed(:,1) = pUSed(:,3) + pUSed(:,4) + pUSed(:,5) + pUSed(:,6)
+      pUSed(:,2) = zero
+
+      if(id(1)*helicity(1).gt.0) then
+         i3=2
+      else
+         i3=1
+      endif
+      if(id(6)*helicity(6).gt.0) then
+         i4=2
+      else
+         i4=1
+      endif
+
+      print *,"MATRIXELEMENT02::"
+      print *,"i3 / i4 = ",i3,i4
+      print *,"ids used = ",MY_IDUP
+      print *,"pUsed1 = ",pUsed(:,1)
+      print *,"pUsed2 = ",pUsed(:,2)
+      print *,"pUsed3 = ",pUsed(:,3)
+      print *,"pUsed4 = ",pUsed(:,4)
+      print *,"pUsed5 = ",pUsed(:,5)
+      print *,"pUsed6 = ",pUsed(:,6)
+
+      A_VV(:) = 0d0
+      PROPH = PROPAGATOR(dsqrt(scr(p(:,5),p(:,5))),mass(5,1),mass(5,2))
+      call calcHelAmp2((/3,4,5,6/),ZZMode,MY_IDUP,pUsed,i3,i4,A_VV(1))
+      if( includeGammaStar ) then
+         call calcHelAmp2((/3,4,5,6/),ZgsMode,MY_IDUP,pUsed,i3,i4,A_VV(2))
+         call calcHelAmp2((/3,4,5,6/),gsZMode,MY_IDUP,pUsed,i3,i4,A_VV(3))
+         call calcHelAmp2((/3,4,5,6/),gsgsMode,MY_IDUP,pUsed,i3,i4,A_VV(4))
+      endif
+      A_VV(:) = -A_VV(:) * propH
+
+      print *,"AV1 = ",A_VV(1)
+      print *,"AV2 = ",A_VV(2)
+      print *,"AV3 = ",A_VV(3)
+      print *,"AV4 = ",A_VV(4)
+
+      MATRIXELEMENT02 = A_VV(1)+A_VV(2)+A_VV(3)+A_VV(4)
+      return
+      END function
 
 
 end module ModVHiggs
