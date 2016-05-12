@@ -2,6 +2,13 @@ MODULE ModMisc
 implicit none
 
 
+INTERFACE swap
+   MODULE PROCEDURE swapi
+   MODULE PROCEDURE swapr
+   MODULE PROCEDURE swapc
+   MODULE PROCEDURE swap_mom
+   MODULE PROCEDURE swap_cmom
+END INTERFACE swap
 
 INTERFACE OPERATOR (.dot.)
    MODULE PROCEDURE MinkowskyProduct
@@ -276,11 +283,8 @@ implicit none
 logical IsNan
 real(8) :: x
 
-   if( .not.x.le.0d0 .and. .not.x.gt.0d0 ) then
-       IsNaN=.true.
-   else
-      IsNaN=.false.
-   endif
+   IsNaN = .not.(x.eq.x)
+
 RETURN
 END FUNCTION
 
@@ -308,6 +312,18 @@ real(8) :: i,j,temp
     i=temp
 
 END SUBROUTINE
+
+
+SUBROUTINE swapc(i,j)
+implicit none
+complex(8) :: i,j,temp
+
+    temp=j
+    j=i
+    i=temp
+
+END SUBROUTINE
+
 
 
 function FindInputFmt0(EventInfoLine)
@@ -713,18 +729,18 @@ end function Capitalize
 
 
 subroutine spinoru(p,za,zb,s)
-!---Calculate spinor products      
+!---Calculate spinor products
 !---taken from MCFM & modified by R. Rontsch, May 2015
-!---extended to deal with negative energies ie with all momenta outgoing                                                                
-!---Arbitrary conventions of Bern, Dixon, Kosower, Weinzierl,                                                                                  
-!---za(i,j)*zb(j,i)=s(i,j)                      
+!---extended to deal with negative energies ie with all momenta outgoing
+!---Arbitrary conventions of Bern, Dixon, Kosower, Weinzierl,
+!---za(i,j)*zb(j,i)=s(i,j)
       implicit none
       real(8) :: p(:,:),two
       integer, parameter :: mxpart=14
       complex(8):: c23(mxpart),f(mxpart),rt(mxpart),za(:,:),zb(:,:),czero,cone,ci
       real(8)   :: s(:,:)
       integer i,j,N
-      
+
       N = size(p,1)
 !       if (size(p,1) .ne. N) then
 !          call Error("spinorz: momentum mismatch",size(p,1))
@@ -733,20 +749,20 @@ subroutine spinoru(p,za,zb,s)
       czero=dcmplx(0d0,0d0)
       cone=dcmplx(1d0,0d0)
       ci=dcmplx(0d0,1d0)
-      
 
-!---if one of the vectors happens to be zero this routine fails.                                                                                                                
+
+!---if one of the vectors happens to be zero this routine fails.
       do j=1,N
          za(j,j)=czero
          zb(j,j)=za(j,j)
 
-!-----positive energy case                                                                                                                                                      
+!-----positive energy case
          if (p(j,4) .gt. 0d0) then
             rt(j)=dsqrt(p(j,4)+p(j,1))
             c23(j)=dcmplx(p(j,3),-p(j,2))
             f(j)=cone
          else
-!-----negative energy case                                                                                                                                                      
+!-----negative energy case
             rt(j)=dsqrt(-p(j,4)-p(j,1))
             c23(j)=dcmplx(-p(j,3),p(j,2))
             f(j)=ci
@@ -770,11 +786,11 @@ subroutine spinoru(p,za,zb,s)
 
     end subroutine spinoru
 
-    
-    
-    
-    
-    
+
+
+
+
+
     subroutine convert_to_MCFM(p,pout)
       implicit none
 ! converts from (E,px,py,pz) to (px,py,pz,E)
@@ -782,22 +798,22 @@ subroutine spinoru(p,za,zb,s)
       real(8), optional :: pout(1:4)
 
       if( present(pout) ) then
-          pout(1)=p(2)  
-          pout(2)=p(3)  
-          pout(3)=p(4) 
-          pout(4)=p(1)  
+          pout(1)=p(2)
+          pout(2)=p(3)
+          pout(3)=p(4)
+          pout(4)=p(1)
       else
           tmp(1)=p(1)
           tmp(2)=p(2)
           tmp(3)=p(3)
           tmp(4)=p(4)
 
-          p(1)=tmp(2)  
-          p(2)=tmp(3) 
-          p(3)=tmp(4)  
-          p(4)=tmp(1)  
-      endif  
-      
+          p(1)=tmp(2)
+          p(2)=tmp(3)
+          p(3)=tmp(4)
+          p(4)=tmp(1)
+      endif
+
     end subroutine convert_to_MCFM
 
 

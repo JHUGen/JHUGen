@@ -655,9 +655,9 @@ logical :: SetAnomalousHff, Setkappa
     endif
 
     !decay mode checks
-    if( (IsAZDecay(DecayMode1) .and. IsAZDecay(DecayMode2)) .or. Process.eq.60 .or. Process.eq.66 ) then
+    if( (IsAZDecay(DecayMode1) .and. IsAZDecay(DecayMode2)) .or. (Process.eq.50 .and. .not.IsAWDecay(DecayMode1)) .or. Process.eq.60 .or. Process.eq.66 ) then
         includeGammaStar = (SetZgammacoupling .or. Setgammagammacoupling)
-    elseif( (IsAZDecay(DecayMode1) .and. IsAPhoton(DecayMode2)) .or. Process.eq.60 .or. Process.eq.66 ) then
+    elseif( (IsAZDecay(DecayMode1) .and. IsAPhoton(DecayMode2)) ) then
         includeGammaStar = Setgammagammacoupling
     endif
     ! includeGammaStar check

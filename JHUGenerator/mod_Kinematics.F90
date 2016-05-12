@@ -2526,8 +2526,10 @@ logical :: hasAonshell
      m_jj = inv_mass(5)
      m_ll = inv_mass(4)
 
-     if(.not.hasAonshell .and. inv_mass(4).le.getMass(convertLHEreverse(id(6)))+getMass(convertLHEreverse(id(7))))then
-      applyPSCut=.true.
+     if(.not.hasAonshell) then
+        if(inv_mass(4).le.getMass(convertLHEreverse(id(6)))+getMass(convertLHEreverse(id(7))))then
+           applyPSCut=.true.
+        endif
      endif
      if(inv_mass(5).le.getMass(convertLHEreverse(id(8)))+getMass(convertLHEreverse(id(9))))then
       applyPSCut=.true.

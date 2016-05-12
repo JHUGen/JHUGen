@@ -2133,6 +2133,12 @@ mass(3,1)=M_V
 mass(4,1)=M_V
 mass(3,2)=Ga_V
 mass(4,2)=Ga_V
+if(IsAPhoton(DecayMode1))then
+   mass(3,1)=M_Z
+   mass(4,1)=M_Z
+   mass(3,2)=Ga_Z
+   mass(4,2)=Ga_Z
+endif
 mass(5,1)=M_Reso
 mass(5,2)=Ga_Reso
 mass(6:9,1:2)=0d0
