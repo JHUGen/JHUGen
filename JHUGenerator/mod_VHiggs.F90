@@ -43,7 +43,6 @@ subroutine EvalAmp_VHiggs(id,helicity,MomExt,me2)
       idin(:)=id(:)
       helin(:)=helicity(:)
       pin(:,:)=MomExt(:,:)
-
       if(id(2).eq.convertLHE(Pho_)) then
          call swap(idin(1),idin(2))
          call swap(helin(1),helin(2))
@@ -55,28 +54,12 @@ subroutine EvalAmp_VHiggs(id,helicity,MomExt,me2)
          call swap(pin(:,6),pin(:,7))
       endif
 
-
-      A_VV(:)=czero
-
       do i=3,5
         mass(i,1) = getMass(convertLHEreverse(idin(i)))
         mass(i,2) = getDecayWidth(convertLHEreverse(idin(i)))
       enddo
 
-      print *,"EvalAmp_VHiggs::"
-
-      print *,"idin: ",idin
-      print *,"helin: ",helin
-      print *,"pin1: ",pin(:,1)
-      print *,"pin2: ",pin(:,2)
-      print *,"pin3: ",pin(:,3)
-      print *,"pin4: ",pin(:,4)
-      print *,"pin5: ",pin(:,5)
-      print *,"pin6: ",pin(:,6)
-      print *,"pin7: ",pin(:,7)
-      print *,"pin8: ",pin(:,8)
-      print *,"pin9: ",pin(:,9)
-
+      A_VV(:)=czero
       if(idin(1).ne.convertLHE(Pho_) .and. idin(6).ne.convertLHE(Pho_)) then
          A_VV(1)=MATRIXELEMENT0(pin,mass,helin,idin,(/.false., .false./))
          if(includeGammaStar) then
@@ -97,20 +80,7 @@ subroutine EvalAmp_VHiggs(id,helicity,MomExt,me2)
             A_VV(2) = MATRIXELEMENT0(pin,mass,helin,idin,(/.true., .true./))
          endif
       endif
-
-
-
       amplitude = A_VV(1)+A_VV(2)+A_VV(3)+A_VV(4)
-      print *,"AV1 = ",A_VV(1)
-      print *,"AV2 = ",A_VV(2)
-      print *,"AV3 = ",A_VV(3)
-      print *,"AV4 = ",A_VV(4)
-      print *,"Original: ",amplitude
-
-      amptest = MATRIXELEMENT02(pin,mass,helin,idin)
-      print *,"Test: ",amptest
-      pause
-
       me2=dble(amplitude*dconjg(amplitude))
       return
 end subroutine EvalAmp_VHiggs
@@ -503,8 +473,10 @@ END SUBROUTINE
 
 !XVV vertex
       if(id(3).eq.convertLHE(Wp_))then
-         call swapr(q3_q3,q4_q4)
+         call swap(q3_q3,q4_q4)
+         call swap(current1,current2)
       endif
+
       if(.not.useA(1) .and. .not.useA(2)) then
          ghz1_dyn = HVVSpinZeroDynamicCoupling(1,q3_q3,q4_q4,q5_q5)
          ghz2_dyn = HVVSpinZeroDynamicCoupling(2,q3_q3,q4_q4,q5_q5)
@@ -614,10 +586,10 @@ END SUBROUTINE
       endif
 !shift phi so that 0 < phi < 2Pi
       if(vector(2).lt.0d0)then
-            phi=phi+Pi
+         phi=phi+Pi
       endif
       if(phi.lt.0d0)then
-            phi=phi+Twopi
+         phi=phi+Twopi
       endif
 !     print *,phi
       sincos(3)=dcos(phi)
@@ -1181,8 +1153,8 @@ END SUBROUTINE
 !lambda = -1
       else if(lambda.eq.-1) then
          POL(1)= 0d0
-         POL(2)= ( sincos(3)*sincos(1)+(0d0,1d0)*sincos(4))/dsqrt(2d0)
-         POL(3)= ( sincos(4)*sincos(1)-(0d0,1d0)*sincos(3))/dsqrt(2d0)
+         POL(2)= (sincos(3)*sincos(1)+(0d0,1d0)*sincos(4))/dsqrt(2d0)
+         POL(3)= (sincos(4)*sincos(1)-(0d0,1d0)*sincos(3))/dsqrt(2d0)
          POL(4)= -sincos(2)/dsqrt(2d0)
 !lambda = 0 (z)
       else if(lambda.eq.0) then
@@ -1422,99 +1394,84 @@ END SUBROUTINE
   end subroutine spinoru2
 
 
-!MATRIXELEMENT0.F
-!VERSION 20160511
-      complex(8) function MATRIXELEMENT02(p,mass,helicity,id)
-      use ModHiggs
-      implicit none
-      real(8), intent(in) :: p(1:4,1:9)
-      real(8), intent(in) :: mass(3:5,1:2)
-      real(8), intent(in) :: helicity(9)
-      integer, intent(in) :: id(9)
+!MATRIXELEMENT02.F
+!VERSION 20160513
+!      complex(8) function MATRIXELEMENT02(p,mass,helicity,id)
+!      use ModHiggs
+!      implicit none
+!      real(8), intent(in) :: p(1:4,1:9)
+!      real(8), intent(in) :: mass(3:5,1:2)
+!      real(8), intent(in) :: helicity(9)
+!      integer, intent(in) :: id(9)
 
-      complex(dp) :: A_VV(1:4), propH
-      integer, parameter :: ZZMode=00,ZgsMode=01,gsZMode=02,gsgsMode=03
-      integer, parameter :: WWMode=10
-      integer, parameter :: ggMode=20
-      integer, parameter :: ZgMode=30,gsgMode=31
-      integer :: MY_IDUP(3:6),i3,i4
-      real(dp) :: pUsed(4,6)
+!      complex(dp) :: A_VV(1:4), propH
+!      integer, parameter :: ZZMode=00,ZgsMode=01,gsZMode=02,gsgsMode=03
+!      integer, parameter :: WWMode=10
+!      integer, parameter :: ggMode=20
+!      integer, parameter :: ZgMode=30,gsgMode=31
+!      integer :: MY_IDUP(3:6),i3,i4
+!      real(dp) :: pUsed(4,6)
 
-      if(id(1).lt.0) then
-         MY_IDUP(3) = -convertLHEreverse(id(1))
-         MY_IDUP(4) = -convertLHEreverse(id(2))
-         pUsed(:,3) = -p(:,1)
-         pUsed(:,4) = -p(:,2)
-      else
-         MY_IDUP(4) = -convertLHEreverse(id(1))
-         MY_IDUP(3) = -convertLHEreverse(id(2))
-         pUsed(:,4) = -p(:,1)
-         pUsed(:,3) = -p(:,2)
-      endif
-      if(id(6).gt.0) then
-         MY_IDUP(5) = convertLHEreverse(id(6))
-         if(MY_IDUP(5).ne.Pho_) then
-            MY_IDUP(6) = convertLHEreverse(id(7))
-         endif
-         pUsed(:,5) = p(:,6)
-         pUsed(:,6) = p(:,7)
-      else
-         MY_IDUP(5) = convertLHEreverse(id(7))
-         if(MY_IDUP(5).ne.Pho_) then
-            MY_IDUP(6) = convertLHEreverse(id(6))
-         endif
-         pUsed(:,6) = p(:,6)
-         pUsed(:,5) = p(:,7)
-      endif
-      pUSed(:,1) = pUSed(:,3) + pUSed(:,4) + pUSed(:,5) + pUSed(:,6)
-      pUSed(:,2) = zero
+!      if(id(1).lt.0) then
+!         MY_IDUP(3) = -convertLHEreverse(id(1))
+!         MY_IDUP(4) = -convertLHEreverse(id(2))
+!         pUsed(:,3) = -p(:,1)
+!         pUsed(:,4) = -p(:,2)
+!      else
+!         MY_IDUP(4) = -convertLHEreverse(id(1))
+!         MY_IDUP(3) = -convertLHEreverse(id(2))
+!         pUsed(:,4) = -p(:,1)
+!         pUsed(:,3) = -p(:,2)
+!      endif
+!      if(id(6).gt.0) then
+!         MY_IDUP(5) = convertLHEreverse(id(6))
+!         if(MY_IDUP(5).ne.Pho_) then
+!            MY_IDUP(6) = convertLHEreverse(id(7))
+!         endif
+!         pUsed(:,5) = p(:,6)
+!         pUsed(:,6) = p(:,7)
+!      else
+!         MY_IDUP(5) = convertLHEreverse(id(7))
+!         if(MY_IDUP(5).ne.Pho_) then
+!            MY_IDUP(6) = convertLHEreverse(id(6))
+!         endif
+!         pUsed(:,6) = p(:,6)
+!         pUsed(:,5) = p(:,7)
+!      endif
+!      pUSed(:,1) = pUSed(:,3) + pUSed(:,4) + pUSed(:,5) + pUSed(:,6)
+!      pUSed(:,2) = zero
 
-      if(id(1)*helicity(1).gt.0) then
-         i3=2
-      else
-         i3=1
-      endif
-      if(id(6)*helicity(6).gt.0) then
-         i4=2
-      else
-         i4=1
-      endif
+!      if(id(1)*helicity(1).gt.0) then
+!         i3=2
+!      else
+!         i3=1
+!      endif
+!      if(id(6)*helicity(6).gt.0) then
+!         i4=2
+!      else
+!         i4=1
+!      endif
 
-      print *,"MATRIXELEMENT02::"
-      print *,"i3 / i4 = ",i3,i4
-      print *,"ids used = ",MY_IDUP
-      print *,"pUsed1 = ",pUsed(:,1)
-      print *,"pUsed2 = ",pUsed(:,2)
-      print *,"pUsed3 = ",pUsed(:,3)
-      print *,"pUsed4 = ",pUsed(:,4)
-      print *,"pUsed5 = ",pUsed(:,5)
-      print *,"pUsed6 = ",pUsed(:,6)
+!      A_VV(:) = 0d0
+!      PROPH = PROPAGATOR(dsqrt(scr(p(:,5),p(:,5))),mass(5,1),mass(5,2))
+!      if(MY_IDUP(5).ne.Pho_) then
+!         call calcHelAmp2((/3,4,5,6/),ZZMode,MY_IDUP,pUsed,i3,i4,A_VV(1))
+!         if( includeGammaStar ) then
+!            call calcHelAmp2((/3,4,5,6/),ZgsMode,MY_IDUP,pUsed,i3,i4,A_VV(2))
+!            call calcHelAmp2((/3,4,5,6/),gsZMode,MY_IDUP,pUsed,i3,i4,A_VV(3))
+!            call calcHelAmp2((/3,4,5,6/),gsgsMode,MY_IDUP,pUsed,i3,i4,A_VV(4))
+!         endif
+!      else
+!         call calcHelAmp2((/3,4,5,6/),ZgMode,MY_IDUP,pUsed,i3,i4,A_VV(1))
+!         if( includeGammaStar ) then
+!            call calcHelAmp2((/3,4,5,6/),gsgMode,MY_IDUP,pUsed,i3,i4,A_VV(2))
+!         endif
+!      endif
+!      A_VV(:) = -A_VV(:) * propH
 
-      A_VV(:) = 0d0
-      PROPH = PROPAGATOR(dsqrt(scr(p(:,5),p(:,5))),mass(5,1),mass(5,2))
-      if(MY_IDUP(5).ne.Pho_) then
-         call calcHelAmp2((/3,4,5,6/),ZZMode,MY_IDUP,pUsed,i3,i4,A_VV(1))
-         if( includeGammaStar ) then
-            call calcHelAmp2((/3,4,5,6/),ZgsMode,MY_IDUP,pUsed,i3,i4,A_VV(2))
-            call calcHelAmp2((/3,4,5,6/),gsZMode,MY_IDUP,pUsed,i3,i4,A_VV(3))
-            call calcHelAmp2((/3,4,5,6/),gsgsMode,MY_IDUP,pUsed,i3,i4,A_VV(4))
-         endif
-      else
-         call calcHelAmp2((/3,4,5,6/),ZgMode,MY_IDUP,pUsed,i3,i4,A_VV(1))
-         if( includeGammaStar ) then
-            call calcHelAmp2((/3,4,5,6/),gsgMode,MY_IDUP,pUsed,i3,i4,A_VV(2))
-         endif
-      endif
-      A_VV(:) = -A_VV(:) * propH
-
-      print *,"AV1 = ",A_VV(1)
-      print *,"AV2 = ",A_VV(2)
-      print *,"AV3 = ",A_VV(3)
-      print *,"AV4 = ",A_VV(4)
-
-      MATRIXELEMENT02 = A_VV(1)+A_VV(2)+A_VV(3)+A_VV(4)
-      return
-      END function
+!      MATRIXELEMENT02 = A_VV(1)+A_VV(2)+A_VV(3)+A_VV(4)
+!      return
+!      END function
 
 
 end module ModVHiggs

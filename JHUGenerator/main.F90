@@ -601,7 +601,7 @@ logical :: SetAnomalousHff, Setkappa
        DecayMode1 = DecayMode1 - DecayMode2
     endif
 
-    if( IsAZDecay(DecayMode1) ) then
+    if( IsAZDecay(DecayMode1) .or. (Process.eq.50.and.IsAPhoton(DecayMode1)) ) then
        M_V = M_Z
        Ga_V= Ga_Z
     elseif( IsAWDecay(DecayMode1) ) then
