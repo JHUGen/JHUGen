@@ -1573,14 +1573,24 @@ Function EvalWeighted_VHiggs(yRnd,VgsWgt)
     EvalWeighted_VHiggs=0d0
     EvalCounter = EvalCounter+1
 
+    id(:)=0
+    helicity(:)=0
     mass(1:2,1:2)=0d0
-    mass(3,1)=M_V
-    mass(4,1)=M_V
-    mass(3,2)=Ga_V
-    mass(4,2)=Ga_V
+    if(IsAPhoton(DecayMode1))then
+       mass(3,1)=M_Z
+       mass(3,2)=Ga_Z
+       mass(4,1)=getMass(Pho_)
+       mass(4,2)=getDecayWidth(Pho_)
+    else
+       mass(3,1)=M_V
+       mass(3,2)=Ga_V
+       mass(4,1)=M_V
+       mass(4,2)=Ga_V
+    endif
     mass(5,1)=M_Reso
     mass(5,2)=Ga_Reso
     mass(6:9,1:2)=0d0
+
 
     id(5)=convertLHE(Hig_)
     id(8)=convertLHE(Bot_)
@@ -1711,8 +1721,10 @@ elseif(DecayMode1.eq.6)then
   helicity(7)=-helicity(6)
 
 elseif(DecayMode1.eq.7)then
-  print *, "invalid final states for V > VH"
-  stop
+  id(3)=convertLHE(Z0_)
+  id(4)=convertLHE(Pho_)
+  id(6)=convertLHE(Pho_)
+  id(7)=Not_a_particle_
 
 elseif(DecayMode1.eq.8)then
   id(3)=convertLHE(Z0_)
@@ -1839,9 +1851,6 @@ if( IsAZDecay(DecayMode1) ) then
       call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt)
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut)
       if( applyPSCut .or. PSWgt.eq.zero ) return
-      if(H_DK.eqv..false.) then
-        if(dabs(inv_mass(5)-M_Reso).gt.10d0*Ga_Reso) return
-      endif
 
       call SetRunningScales( (/ MomExt(1:4,5),MomExt(1:4,6),MomExt(1:4,7) /) , (/ convertLHEreverse(id(3)),convertLHEreverse(id(6)),convertLHEreverse(id(7)),convertLHEreverse(id(4)) /) )
       call setPDFs(eta1,eta2,pdf)
@@ -1881,9 +1890,6 @@ if( IsAZDecay(DecayMode1) ) then
       call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt)
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut)
       if( applyPSCut .or. PSWgt.eq.zero ) return
-      if(H_DK.eqv..false.) then
-        if(dabs(inv_mass(5)-M_Reso).gt.10d0*Ga_Reso) return
-      endif
 
       FluxFac = 1d0/(2d0*ILC_Energy**2)
       PreFac = fbGeV2 * FluxFac * PSWgt *6d0 !2 for e and mu, 3 for colors of b
@@ -1891,16 +1897,10 @@ if( IsAZDecay(DecayMode1) ) then
       EvalWeighted_VHiggs=0d0
       id(2)=convertLHE(ElM_)
       id(1)=-id(2)
-      !print *, "let the show begin"
-      !print *, "MomExt"
-      !print *, MomExt
       call EvalAmp_VHiggs(id,helicity,MomExt,me2)
-
       LO_Res_Unpol =me2 * PreFac
       EvalWeighted_VHiggs = LO_Res_Unpol
-      !print *, "FluxFac = ", FluxFac
-      !print *, "me2 = ", me2
-      !print *, "PSWgt = ", PSWgt
+
     endif
 
 elseif( IsAWDecay(DecayMode1) ) then
@@ -1923,9 +1923,6 @@ elseif( IsAWDecay(DecayMode1) ) then
       call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt)
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut)
       if( applyPSCut .or. PSWgt.eq.zero ) return
-      if(H_DK.eqv..false.) then
-        if(dabs(inv_mass(5)-M_Reso).gt.10d0*Ga_Reso) return
-      endif
 
       call SetRunningScales( (/ MomExt(1:4,5),MomExt(1:4,6),MomExt(1:4,7) /) , (/ convertLHEreverse(id(3)),convertLHEreverse(id(6)),convertLHEreverse(id(7)),convertLHEreverse(id(4)) /) )
       call setPDFs(eta1,eta2,pdf)
@@ -1965,139 +1962,121 @@ elseif( IsAWDecay(DecayMode1) ) then
 
 
 elseif( IsAPhoton(DecayMode1) ) then
-  print *, "invalid process"
-  stop
+!if pp collider
+    if(Collider.eq.1)then
+      call PDFMapping(14,yrnd(14:15),eta1,eta2,Ehat,sHatJacobi)
+
+      MomExt(1,3)=EHat
+      MomExt(2,3)=0d0
+      MomExt(3,3)=0d0
+      MomExt(4,3)=0d0
+
+      MomExt(1,1)=EHat/2d0
+      MomExt(2,1)=0d0
+      MomExt(3,1)=0d0
+      MomExt(4,1)=MomExt(1,1)
+      MomExt(1,2)=EHat/2d0
+      MomExt(2,2)=0d0
+      MomExt(3,2)=0d0
+      MomExt(4,2)=-MomExt(1,2)
+
+      call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt,useAonshell=.true.)
+      call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut,useAonshell=.true.)
+      if( applyPSCut .or. PSWgt.eq.zero ) return
+
+      call SetRunningScales( (/ MomExt(1:4,5),MomExt(1:4,6),Mom_Not_a_particle(1:4) /) , (/ convertLHEreverse(id(3)),convertLHEreverse(id(6)),Not_a_particle_,convertLHEreverse(id(4)) /) )
+      call setPDFs(eta1,eta2,pdf)
+      FluxFac = 1d0/(2d0*EHat**2)
+      PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt *6d0 !2 for e and mu, 3 for colors of b
+      LO_Res_Unpol=0d0
+      EvalWeighted_VHiggs=0d0
+      do i = -6,6
+        j = -i
+        id(1:2) = (/LHA2M_PDF(i),LHA2M_PDF(j)/)
+        if (abs(LHA2M_PDF(i)).ne.6   .and.   abs(LHA2M_PDF(j)).ne.6.  .and.  i.ne.0)then
+          call EvalAmp_VHiggs(id,helicity,MomExt,me2)
+        else
+          me2=0d0
+        endif
+        LO_Res_Unpol = me2/3d0*pdf(i,1)*pdf(j,2)* PreFac
+        EvalWeighted_VHiggs = EvalWeighted_VHiggs + LO_Res_Unpol
+      enddo
+
+!if e+ e- collider
+    else if(Collider.eq.0)then
+      MomExt(1,3)=ILC_Energy
+      MomExt(2,3)=0d0
+      MomExt(3,3)=0d0
+      MomExt(4,3)=0d0
+
+      MomExt(1,1)=ILC_Energy/2d0
+      MomExt(2,1)=0d0
+      MomExt(3,1)=0d0
+      MomExt(4,1)=MomExt(1,1)
+      MomExt(1,2)=ILC_Energy/2d0
+      MomExt(2,2)=0d0
+      MomExt(3,2)=0d0
+      MomExt(4,2)=-MomExt(1,2)
+
+      call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt,useAonshell=.true.)
+      call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut,useAonshell=.true.)
+      if( applyPSCut .or. PSWgt.eq.zero ) return
+
+      FluxFac = 1d0/(2d0*ILC_Energy**2)
+      PreFac = fbGeV2 * FluxFac * PSWgt *6d0 !2 for e and mu, 3 for colors of b
+      LO_Res_Unpol=0d0
+      EvalWeighted_VHiggs=0d0
+      id(2)=convertLHE(ElM_)
+      id(1)=-id(2)
+      call EvalAmp_VHiggs(id,helicity,MomExt,me2)
+      LO_Res_Unpol =me2 * PreFac
+      EvalWeighted_VHiggs = LO_Res_Unpol
+
+    endif
+
 endif
-
-! boost to the lab frame before writing .lhe
-
-!   do i=1,4
-!   do j=1,7
-!     MomExt(i,j)=four_momentum(j,i)
-!   enddo
-!   enddo
-!   do i=1,4
-!   MomExt(i,8)=beam_momentum(1,i)
-!   MomExt(i,9)=beam_momentum(2,i)
-!   enddo
-
-
-!print *, MomExt(:,6:7)
 
    cyRnd(1)=yRnd(9)
    cyRnd(2)=yRnd(8)
-!   cyRnd(3)=yRnd(11)
-!   cyRnd(4)=yRnd(10)
-   call EvalPhasespace_VDecay(MomExt(1:4,4),inv_mass(4),getMass(convertLHEreverse(id(6))),getMass(convertLHEreverse(id(7))),cyRnd(1:2),MomExt(1:4,6:7),PSWgt2)
-!   call EvalPhasespace_VDecay(MomExt(1:4,3),inv_mass(3),getMass(convertLHEreverse(id(6)))*1d2,getMass(convertLHEreverse(id(7)))*1d2,cyRnd(3:4),MomExt(1:4,6:7),PSWgt2)
-
-!print *, MomExt(:,6:7)
-!print *, "end"
-!  pause
-
-
-
-   if(Collider.eq.1)then
-     call boost2Lab(eta1,eta2,9,MomExt(1:4,1:9))
+   if(.not.IsAPhoton(DecayMode1)) then
+      call EvalPhasespace_VDecay(MomExt(1:4,4),inv_mass(4),getMass(convertLHEreverse(id(6))),getMass(convertLHEreverse(id(7))),cyRnd(1:2),MomExt(1:4,6:7),PSWgt2)
    endif
-
-!   do i=1,4
-!   do j=1,7
-!     four_momentum(j,i)=MomExt(i,j)
-!   enddo
-!   enddo
-!   do i=1,4
-!   beam_momentum(1,i)=MomExt(i,8)
-!   beam_momentum(2,i)=MomExt(i,9)
-!   enddo
-
+   if(Collider.eq.1)then
+      call boost2Lab(eta1,eta2,9,MomExt(1:4,1:9))
+   endif
    do i=6,7
-     !inv_mass(i)=getMass(convertLHEreverse(id(i)))*1d2
-     inv_mass(i)=dsqrt(dabs(MomExt(1:4,i).dot.MomExt(1:4,i)))
+      inv_mass(i)=dsqrt(dabs(MomExt(1:4,i).dot.MomExt(1:4,i)))
    enddo
-!print *, inv_mass(4),inv_mass(5)!,inv_mass(6),inv_mass(7)
+
    AccepCounter=AccepCounter+1
 
-  if( writeWeightedLHE ) then
-! temporary solution enabling parton shower
-    if( IsAZDecay(DecayMode1) ) then
-      if(Collider.eq.1)then
-        id(1:2) = (/convertLHE(Up_),convertLHE(AUp_)/)
-!        do i = -6,6
-!          j = -i
-!          id(1:2) = (/LHA2M_PDF(i),LHA2M_PDF(j)/)
-!          if (abs(LHA2M_PDF(i)).ne.6   .and.   abs(LHA2M_PDF(j)).ne.6.  .and.  i.ne.0)then
-!            if(lheweight(i,j).ne.0d0)then
-!              call WriteOutEvent_VHiggs(id,helicity,MomExt,inv_mass,EventWeight=lheweight(i,j)*VgsWgt)
-!            endif
-!          endif
-!        enddo
+   if( writeWeightedLHE ) then
+      if( IsAZDecay(DecayMode1) .or. IsAPhoton(DecayMode1) ) then
+         if(Collider.eq.1)then
+            id(1:2) = (/convertLHE(Up_),convertLHE(AUp_)/)
 !if e+ e- collider
-      else if(Collider.eq.0)then
-        id(1:2) = (/convertLHE(ElP_),convertLHE(ElM_)/)
+         else if(Collider.eq.0)then
+            id(1:2) = (/convertLHE(ElP_),convertLHE(ElM_)/)
+         endif
+      elseif( IsAWDecay(DecayMode1) ) then
+         id(1:2) = (/convertLHE(Up_),convertLHE(ADn_)/)
       endif
-    elseif( IsAWDecay(DecayMode1) ) then
-      id(1:2) = (/convertLHE(Up_),convertLHE(ADn_)/)
-!      do i = -6,6
-!      do j = -6,6
-!       if(lheweight(i,j).ne.0d0)then
-!        id(1:2) = (/LHA2M_PDF(i),LHA2M_PDF(j)/)
-!        if    ( ((id(1).eq.convertLHE(Up_).or.id(1).eq.convertLHE(Chm_)) .and. &
-!         (id(2).eq.convertLHE(ADn_) .or. id(2).eq.convertLHE(AStr_) .or. id(2).eq.convertLHE(ABot_))) .or. &
-!        ((id(2).eq.convertLHE(Up_) .or. id(2).eq.convertLHE(Chm_)) .and. &
-!         (id(1).eq.convertLHE(ADn_) .or. id(1).eq.convertLHE(AStr_) .or. id(1).eq.convertLHE(ABot_)))   )then
-!              helicity(6)=sign(1d0,-dble(id(6)))
-!              helicity(7)=-helicity(6)
-!              call WriteOutEvent_VHiggs(id,helicity,MomExt,inv_mass,EventWeight=lheweight(i,j)*VgsWgt)
-!        elseif( ((id(1).eq.convertLHE(AUp_).or.id(1).eq.convertLHE(AChm_)) .and. &
-!         (id(2).eq.convertLHE(Dn_) .or. id(2).eq.convertLHE(Str_) .or. id(2).eq.convertLHE(Bot_))) .or. &
-!        ((id(2).eq.convertLHE(AUp_).or. id(2).eq.convertLHE(AChm_)) .and. &
-!         (id(1).eq.convertLHE(Dn_) .or. id(1).eq.convertLHE(Str_) .or. id(1).eq.convertLHE(Bot_)))   )then
-!              id2=id
-!              id2(4)=-id(4)
-!              id2(6)=-id(6)
-!              id2(7)=-id(7)
-!              helicity(6)=sign(1d0,-dble(id2(6)))
-!              helicity(7)=-helicity(6)
-!              call WriteOutEvent_VHiggs(id2,helicity,MomExt,inv_mass,EventWeight=lheweight(i,j)*VgsWgt)
-!        endif
-!       endif
-!      enddo
-!      enddo
-
-    elseif( IsAPhoton(DecayMode1) ) then
-      print *, "invalid final states"
-      stop
-    endif
-
-    if( IsNaN(EvalWeighted_VHiggs) ) then
-        EvalWeighted_VHiggs = 0d0
-        return
-    endif
-
-    if(EvalWeighted_VHiggs.ne.0d0)then
-      call WriteOutEvent_VHiggs(id,helicity,MomExt,inv_mass,EventWeight=EvalWeighted_VHiggs*VgsWgt)
-    endif
-! temporary solution enabling parton shower END
-  endif
+      if( IsNaN(EvalWeighted_VHiggs) ) then
+         EvalWeighted_VHiggs = 0d0
+         return
+      endif
+      if(EvalWeighted_VHiggs.ne.0d0)then
+         call WriteOutEvent_VHiggs(id,helicity,MomExt,inv_mass,EventWeight=EvalWeighted_VHiggs*VgsWgt)
+      endif
+   endif
 
    do NHisto = 1,NumHistograms
-    call intoHisto(NHisto,NBin(NHisto),EvalWeighted_VHiggs*VgsWgt)
+      call intoHisto(NHisto,NBin(NHisto),EvalWeighted_VHiggs*VgsWgt)
    enddo
-
 
    RETURN
 
  end Function EvalWeighted_VHiggs
-
-
-
-
-
-
-
-
-
 
 Function EvalUnWeighted_VHiggs(yRnd,genEvt,RES)
 use ModKinematics
@@ -2125,12 +2104,21 @@ integer :: id(9), id2(9)
 include 'csmaxvalue.f'
 
 EvalUnWeighted_VHiggs = 0d0
+id(:)=0
+helicity(:)=0
 
 mass(1:2,1:2)=0d0
-mass(3,1)=M_V
-mass(4,1)=M_V
-mass(3,2)=Ga_V
-mass(4,2)=Ga_V
+if(IsAPhoton(DecayMode1))then
+   mass(3,1)=M_Z
+   mass(3,2)=Ga_Z
+   mass(4,1)=getMass(Pho_)
+   mass(4,2)=getDecayWidth(Pho_)
+else
+   mass(3,1)=M_V
+   mass(3,2)=Ga_V
+   mass(4,1)=M_V
+   mass(4,2)=Ga_V
+endif
 mass(5,1)=M_Reso
 mass(5,2)=Ga_Reso
 mass(6:9,1:2)=0d0
@@ -2264,8 +2252,10 @@ elseif(DecayMode1.eq.6)then
   helicity(7)=-helicity(6)
 
 elseif(DecayMode1.eq.7)then
-  print *, "invalid final states for V > VH"
-  stop
+  id(3)=convertLHE(Z0_)
+  id(4)=convertLHE(Pho_)
+  id(6)=convertLHE(Pho_)
+  id(7)=Not_a_particle_
 
 elseif(DecayMode1.eq.8)then
   id(3)=convertLHE(Z0_)
@@ -2392,9 +2382,6 @@ if( IsAZDecay(DecayMode1) ) then
       call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt)
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut)
       if( applyPSCut .or. PSWgt.eq.zero ) return
-      if(H_DK.eqv..false.) then
-        if(dabs(inv_mass(5)-M_Reso).gt.10d0*Ga_Reso) return
-      endif
 
       call SetRunningScales( (/ MomExt(1:4,5),MomExt(1:4,6),MomExt(1:4,7) /) , (/ convertLHEreverse(id(3)),convertLHEreverse(id(6)),convertLHEreverse(id(7)),convertLHEreverse(id(4)) /) )
       call setPDFs(eta1,eta2,pdf)
@@ -2420,9 +2407,6 @@ if( IsAZDecay(DecayMode1) ) then
       call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt)
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut)
       if( applyPSCut .or. PSWgt.eq.zero ) return
-      if(H_DK.eqv..false.) then
-        if(dabs(inv_mass(5)-M_Reso).gt.10d0*Ga_Reso) return
-      endif
 
       FluxFac = 1d0/(2d0*ILC_Energy**2)
       PreFac = fbGeV2 * FluxFac * PSWgt
@@ -2448,9 +2432,6 @@ elseif( IsAWDecay(DecayMode1) ) then
       call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt)
       call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut)
       if( applyPSCut .or. PSWgt.eq.zero ) return
-      if(H_DK.eqv..false.) then
-        if(dabs(inv_mass(5)-M_Reso).gt.10d0*Ga_Reso) return
-      endif
 
       call SetRunningScales( (/ MomExt(1:4,5),MomExt(1:4,6),MomExt(1:4,7) /) , (/ convertLHEreverse(id(3)),convertLHEreverse(id(6)),convertLHEreverse(id(7)),convertLHEreverse(id(4)) /) )
       call setPDFs(eta1,eta2,pdf)
@@ -2458,8 +2439,57 @@ elseif( IsAWDecay(DecayMode1) ) then
       PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt/3d0! *6d0 !2 for e and mu, 3 for colors of qqb
 
 elseif( IsAPhoton(DecayMode1) ) then
-  print *, "invalid process"
-  stop
+!if pp collider
+    if(Collider.eq.1)then
+      call PDFMapping(14,yrnd(14:15),eta1,eta2,Ehat,sHatJacobi)
+
+      MomExt(1,3)=EHat
+      MomExt(2,3)=0d0
+      MomExt(3,3)=0d0
+      MomExt(4,3)=0d0
+
+      MomExt(1,1)=EHat/2d0
+      MomExt(2,1)=0d0
+      MomExt(3,1)=0d0
+      MomExt(4,1)=MomExt(1,1)
+      MomExt(1,2)=EHat/2d0
+      MomExt(2,2)=0d0
+      MomExt(3,2)=0d0
+      MomExt(4,2)=-MomExt(1,2)
+
+      call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt,useAonshell=.true.)
+      call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut,useAonshell=.true.)
+      if( applyPSCut .or. PSWgt.eq.zero ) return
+
+      call SetRunningScales( (/ MomExt(1:4,5),MomExt(1:4,6),Mom_Not_a_particle(1:4) /) , (/ convertLHEreverse(id(3)),convertLHEreverse(id(6)),Not_a_particle_,convertLHEreverse(id(4)) /) )
+      call setPDFs(eta1,eta2,pdf)
+      FluxFac = 1d0/(2d0*EHat**2)
+      PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt/3d0! *6d0 !2 for e and mu, 3 for colors of b
+
+!if e+ e- collider
+    else if(Collider.eq.0)then
+      MomExt(1,3)=ILC_Energy
+      MomExt(2,3)=0d0
+      MomExt(3,3)=0d0
+      MomExt(4,3)=0d0
+
+      MomExt(1,1)=ILC_Energy/2d0
+      MomExt(2,1)=0d0
+      MomExt(3,1)=0d0
+      MomExt(4,1)=MomExt(1,1)
+      MomExt(1,2)=ILC_Energy/2d0
+      MomExt(2,2)=0d0
+      MomExt(3,2)=0d0
+      MomExt(4,2)=-MomExt(1,2)
+
+      call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt,useAonshell=.true.)
+      call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut,useAonshell=.true.)
+      if( applyPSCut .or. PSWgt.eq.zero ) return
+
+      FluxFac = 1d0/(2d0*ILC_Energy**2)
+      PreFac = fbGeV2 * FluxFac * PSWgt
+    endif
+
 endif
 
 EvalCounter = EvalCounter+1
@@ -2487,16 +2517,13 @@ IF( GENEVT ) THEN
 1313 continue
 
 
-if( IsAZDecay(DecayMode1) ) then
+if( IsAZDecay(DecayMode1) .or. IsAPhoton(DecayMode1) ) then
 !if pp collider
   if(Collider.eq.1)then
     id(1:2) = (/ifound,jfound/)
-
     call EvalAmp_VHiggs(id,helicity,MomExt,me2)
-
     LO_Res_Unpol = me2 *pdf(LHA2M_PDF(ifound),1)*pdf(LHA2M_PDF(jfound),2) * PreFac
     EvalUnWeighted_VHiggs = LO_Res_Unpol
-
 !if e+ e- collider
   else if(Collider.eq.0)then
     ifound=0
@@ -2511,7 +2538,6 @@ if( IsAZDecay(DecayMode1) ) then
 elseif( IsAWDecay(DecayMode1) ) then
 !pp>WH
     id(1:2) = (/ifound,jfound/)
-
     if( ((id(1).eq.convertLHE(AUp_).or.id(1).eq.convertLHE(AChm_)) .and. &
      (id(2).eq.convertLHE(Dn_) .or. id(2).eq.convertLHE(Str_) .or. id(2).eq.convertLHE(Bot_))) .or. &
     ((id(2).eq.convertLHE(AUp_).or. id(2).eq.convertLHE(AChm_)) .and. &
@@ -2524,13 +2550,8 @@ elseif( IsAWDecay(DecayMode1) ) then
       helicity(7)=-helicity(6)
     endif
     call EvalAmp_VHiggs(id,helicity,MomExt,me2)
-
     LO_Res_Unpol = me2 *pdf(LHA2M_PDF(ifound),1)*pdf(LHA2M_PDF(jfound),2) * PreFac
     EvalUnWeighted_VHiggs = LO_Res_Unpol
-
-elseif( IsAPhoton(DecayMode1) ) then
-  print *, "invalid process"
-  stop
 endif
 
 
@@ -2542,51 +2563,23 @@ endif
     AlertCounter = AlertCounter + 1
     Res = 0d0
   elseif( EvalUnWeighted_VHiggs .gt. yRnd(17)*CS_max ) then
-
-    call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut)
-
+    call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut,useAonshell=(IsAPhoton(DecayMode1)))
     do NHisto=1,NumHistograms
       call intoHisto(NHisto,NBin(NHisto),1d0)  ! CS_Max is the integration volume
     enddo
     AccepCounter = AccepCounter + 1
-!    do i=1,4
-!    do j=1,7
-!      MomExt(i,j)=four_momentum(j,i)
-!    enddo
-!    enddo
-!    do i=1,4
-!      MomExt(i,8)=beam_momentum(1,i)
-!      MomExt(i,9)=beam_momentum(2,i)
-!    enddo
     cyRnd(1)=yRnd(9)
     cyRnd(2)=yRnd(8)
-    !if(inv_mass(4).le.getMass(convertLHEreverse(id(6)))+getMass(convertLHEreverse(id(7))))then
-    !  print *, "Warning, invalid kinematics, event rejected!"
-    !  RejeCounter = RejeCounter + 1
-    !  return
-    !endif
-    call EvalPhasespace_VDecay(MomExt(1:4,4),inv_mass(4),getMass(convertLHEreverse(id(6))),getMass(convertLHEreverse(id(7))),cyRnd(1:2),MomExt(1:4,6:7),PSWgt2)
+    if(.not.IsAPhoton(DecayMode1)) then
+      call EvalPhasespace_VDecay(MomExt(1:4,4),inv_mass(4),getMass(convertLHEreverse(id(6))),getMass(convertLHEreverse(id(7))),cyRnd(1:2),MomExt(1:4,6:7),PSWgt2)
+    endif
     if(Collider.eq.1)then
       call boost2Lab(eta1,eta2,9,MomExt(1:4,1:9))
     endif
-
-!    do i=1,4
-!    do j=1,7
-!      four_momentum(j,i)=MomExt(i,j)
-!    enddo
-!    enddo
-!    do i=1,4
-!    beam_momentum(1,i)=MomExt(i,8)
-!    beam_momentum(2,i)=MomExt(i,9)
-!    enddo
-
     do i=6,7
       inv_mass(i)=dsqrt(dabs(MomExt(1:4,i).dot.MomExt(1:4,i)))
     enddo
-
     call WriteOutEvent_VHiggs(id,helicity,MomExt,inv_mass,EventWeight=1d0)
-
-
   else
     RejeCounter = RejeCounter + 1
   endif
@@ -2594,7 +2587,7 @@ endif
 
 ELSE! NOT GENEVT
 
-if( IsAZDecay(DecayMode1) ) then
+if( IsAZDecay(DecayMode1) .or. IsAPhoton(DecayMode1) ) then
 !if pp collider
   if(Collider.eq.1)then
   do i = -5,5
@@ -2607,13 +2600,11 @@ if( IsAZDecay(DecayMode1) ) then
     endif
     LO_Res_Unpol = me2 *pdf(LHA2M_PDF(i),1)*pdf(LHA2M_PDF(j),2) * PreFac
     EvalUnWeighted_VHiggs = EvalUnWeighted_VHiggs+LO_Res_Unpol
-
     RES(i,j) = LO_Res_Unpol
     if (LO_Res_Unpol.gt.csmax(i,j)) then
       csmax(i,j) = LO_Res_Unpol
     endif
   enddo
-
 !if e+ e- collider
   else if(Collider.eq.0)then
     id(2)=convertLHE(ElM_)
@@ -2625,9 +2616,7 @@ if( IsAZDecay(DecayMode1) ) then
     if (LO_Res_Unpol.gt.csmax(0,0)) then
       csmax(0,0) = LO_Res_Unpol
     endif
-
   endif
-
 elseif( IsAWDecay(DecayMode1) ) then
 !pp>WH
   do i = -5,5
@@ -2656,17 +2645,12 @@ elseif( IsAWDecay(DecayMode1) ) then
     endif
     LO_Res_Unpol = me2 *pdf(LHA2M_PDF(i),1)*pdf(LHA2M_PDF(j),2) * PreFac
     EvalUnWeighted_VHiggs = EvalUnWeighted_VHiggs+LO_Res_Unpol
-
     RES(i,j) = LO_Res_Unpol
     if (LO_Res_Unpol.gt.csmax(i,j)) then
       csmax(i,j) = LO_Res_Unpol
     endif
   enddo
   enddo
-
-elseif( IsAPhoton(DecayMode1) ) then
-  print *, "invalid process"
-  stop
 endif
 
 

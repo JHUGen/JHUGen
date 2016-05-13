@@ -1,6 +1,7 @@
 !--YaofuZhou-----------------------------------------
 module ModVHiggs
   use ModParameters
+  use ModMisc
   implicit none
   private
   real(8), parameter :: T3lL= -0.5d0
@@ -27,34 +28,62 @@ module ModVHiggs
 
 contains
 
-
-
 subroutine EvalAmp_VHiggs(id,helicity,MomExt,me2)
       integer, intent(in) :: id(9)
       real(8), intent(in) :: helicity(9)
       real(8), intent(in) :: MomExt(1:4,1:9)
       real(8), intent(out) :: me2
-      real(8) :: inv_mass(9)
       real(8) :: mass(3:5,1:2)
       integer :: i
-      complex(8) amplitude
-      inv_mass(:)=0d0
+      complex(8) amplitude, A_VV(1:4), amptest
+      integer :: idin(9)
+      real(8) :: helin(9)
+      real(8) :: pin(1:4,1:9)
+
+      idin(:)=id(:)
+      helin(:)=helicity(:)
+      pin(:,:)=MomExt(:,:)
+      if(id(2).eq.convertLHE(Pho_)) then
+         call swap(idin(1),idin(2))
+         call swap(helin(1),helin(2))
+         call swap(pin(:,1),pin(:,2))
+      endif
+      if(id(7).eq.convertLHE(Pho_)) then
+         call swap(idin(6),idin(7))
+         call swap(helin(6),helin(7))
+         call swap(pin(:,6),pin(:,7))
+      endif
+
       do i=3,5
-        inv_mass(i) = dsqrt(MomExt(1,i)**2 - MomExt(2,i)**2 - MomExt(3,i)**2 - MomExt(4,i)**2)
-        mass(i,1) = getMass(convertLHEreverse(id(i)))
-        mass(i,2) = getDecayWidth(convertLHEreverse(id(i)))
+        mass(i,1) = getMass(convertLHEreverse(idin(i)))
+        mass(i,2) = getDecayWidth(convertLHEreverse(idin(i)))
       enddo
 
-      amplitude=MATRIXELEMENT0(MomExt,inv_mass,mass,helicity,id)
+      A_VV(:)=czero
+      if(idin(1).ne.convertLHE(Pho_) .and. idin(6).ne.convertLHE(Pho_)) then
+         A_VV(1)=MATRIXELEMENT0(pin,mass,helin,idin,(/.false., .false./))
+         if(includeGammaStar) then
+            A_VV(2) = MATRIXELEMENT0(pin,mass,helin,idin,(/.false., .true./))
+            A_VV(3) = MATRIXELEMENT0(pin,mass,helin,idin,(/.true., .false./))
+            A_VV(4) = MATRIXELEMENT0(pin,mass,helin,idin,(/.true., .true./))
+         endif
+      else if(idin(1).eq.convertLHE(Pho_) .and. idin(6).eq.convertLHE(Pho_)) then
+         A_VV(1)=MATRIXELEMENT0(pin,mass,helin,idin,(/.true., .true./))
+      else if(idin(1).eq.convertLHE(Pho_)) then
+         A_VV(1)=MATRIXELEMENT0(pin,mass,helin,idin,(/.true., .false./))
+         if(includeGammaStar) then
+            A_VV(2) = MATRIXELEMENT0(pin,mass,helin,idin,(/.true., .true./))
+         endif
+      else !if(idin(6).eq.convertLHE(Pho_)) then
+         A_VV(1)=MATRIXELEMENT0(pin,mass,helin,idin,(/.false., .true./))
+         if(includeGammaStar) then
+            A_VV(2) = MATRIXELEMENT0(pin,mass,helin,idin,(/.true., .true./))
+         endif
+      endif
+      amplitude = A_VV(1)+A_VV(2)+A_VV(3)+A_VV(4)
       me2=dble(amplitude*dconjg(amplitude))
-
       return
 end subroutine EvalAmp_VHiggs
-
-
-
-
-
 
       SUBROUTINE MATRIXELEMENT1(p,FermFlav,UnPolSqAmp)
       use ModParameters
@@ -118,9 +147,6 @@ end subroutine EvalAmp_VHiggs
       RETURN
 END SUBROUTINE
 
-
-
-
       SUBROUTINE getSME(p,FermFlav,SME)
       use ModParameters
       use ModMisc
@@ -172,194 +198,306 @@ END SUBROUTINE
      RETURN
      END SUBROUTINE
 
-
-
-
 !MATRIXELEMENT0.F
-!VERSION 20130710
-      complex(8) function MATRIXELEMENT0(MomExt,inv_mass,mass,helicity,id)
+!VERSION 20160511
+      complex(8) function MATRIXELEMENT0(MomExt,mass,helicity,id,useA)
       implicit none
-      complex(8) dMATRIXELEMENT
-      real(8), intent(in) :: MomExt(1:4,1:9) !,four_momentum(7,4)
-      real(8), intent(in) :: inv_mass(9)
-      real(8), intent(in) ::  mass(3:5,1:2)
-      !real(8), intent(in) ::  beam_momentum(2,4)
-      real(8), intent(in) ::  helicity(9)!, beam_h(2) !helicities
-      integer, intent(in) ::  id(9)!, beam_id(2)
+      real(8), intent(in) :: MomExt(1:4,1:9)
+      real(8), intent(in) :: mass(3:5,1:2)
+      real(8), intent(in) :: helicity(9)
+      integer, intent(in) :: id(9)
+      logical, intent(in) :: useA(2)
 
-      integer mu1,mu2,mu3,mu4,lambda1,lambda2
+      integer mu3,mu4
       complex(8) PVVX0P
       complex(8) Vcurrent1(4), Acurrent1(4), current1(4), Vcurrent2(4)
       complex(8) Acurrent2(4), current2(4),POL1(3,4), POL2(3,4)
       complex(8) g_mu_nu(4,4), pp(4,4), epp(4,4)
       complex(8) VVX0(4,4)
-      complex(8) PROP1, PROP2, PROP3, qq, gVVP, gVVS1, gVVS2, gFFZ, gFFW
+      complex(8) PROP1, PROP2, PROP3, gVVP, gVVS1, gVVS2, gFFZ, gFFA, gFFW
       complex(8) ghz1_dyn,ghz2_dyn,ghz3_dyn,ghz4_dyn
-      real(8) q3_q3,q4_q4
+      real(8) qq,q3_q3,q4_q4,q5_q5
 
+      if( &
+         (id(1).ne.convertLHE(Pho_) .and. useA(1) .and. .not.includeGammaStar) .or. &
+         (id(6).ne.convertLHE(Pho_) .and. useA(2) .and. .not.includeGammaStar) .or. &
+         ((id(1)+id(2)).ne.0 .and. id(1).ne.convertLHE(Pho_) .and. useA(1)) .or. &
+         ((id(6)+id(7)).ne.0 .and. id(6).ne.convertLHE(Pho_) .and. useA(2))      &
+        ) then
+         MATRIXELEMENT0=czero
+         return
+      endif
 
+      gFFZ = ci*dsqrt(4d0*pi*alpha_QED/(1d0-sitW**2))/sitW
+      gFFA = -ci*dsqrt(4d0*pi*alpha_QED)
+      gFFW = ci*dsqrt(2d0*pi*alpha_QED)/sitW
 
-      gFFZ = (0d0,1d0)*dsqrt(4d0*pi*alpha_QED/(1d0-sitW**2))/sitW
-      gFFW = (0d0,1d0)*dsqrt(2d0*pi*alpha_QED)/sitW
-!qq = s in the paper
-      qq=-MomExt(1,3)*MomExt(1,4) +MomExt(2,3)*MomExt(2,4) +MomExt(3,3)*MomExt(3,4) +MomExt(4,3)*MomExt(4,4)
-!narrow-width approximation
-!      qq=(H_mass**2-Z_mass**2-(inv_mass(1)**2))/2d0
-!     print *,qq
-
-      PROP1 = PROPAGATOR(inv_mass(3),mass(3,1),mass(3,2))
-      PROP2 = PROPAGATOR(inv_mass(4),mass(4,1),mass(4,2))
-      PROP3 = PROPAGATOR(inv_mass(5),mass(5,1),mass(5,2))
+      qq = -scr(MomExt(:,3),MomExt(:,4))
+      q3_q3 = scr(MomExt(:,3),MomExt(:,3))
+      q4_q4 = scr(MomExt(:,4),MomExt(:,4))
+      q5_q5 = scr(MomExt(:,5),MomExt(:,5))
+      PROP3 = PROPAGATOR(dsqrt(q5_q5),mass(5,1),mass(5,2))
 
       Vcurrent1 = (0d0,0d0)
       Acurrent1 = (0d0,0d0)
       Vcurrent2 = (0d0,0d0)
       Acurrent2 = (0d0,0d0)
 
-      if(id(1).gt.0)then
-        call FFV(id(2), MomExt(:,2), helicity(2), id(1), MomExt(:,1), helicity(1), Vcurrent1)
-!        if((id(1)+id(2)).eq.0)then
-          call FFA(id(2), MomExt(:,2), helicity(2), id(1), MomExt(:,1), helicity(1), Acurrent1)
-!        endif
+      if(.not.useA(1)) then
+         PROP1 = PROPAGATOR(dsqrt(q3_q3),mass(3,1),mass(3,2))
+         if(id(1).gt.0)then
+           call FFV(id(2), MomExt(:,2), helicity(2), id(1), MomExt(:,1), helicity(1), Vcurrent1)
+           call FFA(id(2), MomExt(:,2), helicity(2), id(1), MomExt(:,1), helicity(1), Acurrent1)
+         else
+           call FFV(id(1), MomExt(:,1), helicity(1), id(2), MomExt(:,2), helicity(2), Vcurrent1)
+           call FFA(id(1), MomExt(:,1), helicity(1), id(2), MomExt(:,2), helicity(2), Acurrent1)
+         endif
+         !WH
+         if((id(1)+id(2)).ne.0)then
+           if((id(1)*helicity(1)).le.0d0)then
+             current1=(Vcurrent1-Acurrent1)/2d0*gFFW*CKM(id(1),id(2))/dsqrt(ScaleFactor(id(1),id(2)))
+           else
+             current1=0d0
+           endif
+         !ZH
+         !e+ e- Z vertex for incoming states
+         else if((abs(id(1)).eq.11).or.(abs(id(1)).eq.13).or.(abs(id(1)).eq.15))then
+           if((id(1)*helicity(1)).gt.0d0)then
+             current1=(0.5d0*T3lR - QlR*sitW**2) *Vcurrent1 -(0.5d0*T3lR)*Acurrent1
+           else
+             current1=(0.5d0*T3lL - QlL*sitW**2) *Vcurrent1 -(0.5d0*T3lL)*Acurrent1
+           endif
+           current1=current1*gFFZ
+         !u u~ Z vertex for incoming states
+         else if((abs(id(1)).eq.2).or.(abs(id(1)).eq.4))then
+           if((id(1)*helicity(1)).gt.0d0)then
+             current1=(0.5d0*T3uR - QuR*sitW**2) *Vcurrent1 -(0.5d0*T3uR)*Acurrent1
+           else
+             current1=(0.5d0*T3uL - QuL*sitW**2) *Vcurrent1 -(0.5d0*T3uL)*Acurrent1
+           endif
+           current1=current1*gFFZ
+         !d d~ Z vertex for incoming states
+         else if((abs(id(1)).eq.1).or.(abs(id(1)).eq.3).or.(abs(id(1)).eq.5))then
+           if((id(1)*helicity(1)).gt.0d0)then
+             current1=(0.5d0*T3dR - QdR*sitW**2) *Vcurrent1 -(0.5d0*T3dR)*Acurrent1
+           else
+             current1=(0.5d0*T3dL - QdL*sitW**2) *Vcurrent1 -(0.5d0*T3dL)*Acurrent1
+           endif
+           current1=current1*gFFZ
+         else
+           current1=0d0
+           print *, "invalid incoming state"
+         endif
       else
-        call FFV(id(1), MomExt(:,1), helicity(1), id(2), MomExt(:,2), helicity(2), Vcurrent1)
-!        if((id(1)+id(2)).eq.0)then
-          call FFA(id(1), MomExt(:,1), helicity(1), id(2), MomExt(:,2), helicity(2), Acurrent1)
-!        endif
+         PROP1 = PROPAGATOR(dsqrt(q3_q3),0d0,0d0)
+
+         if(abs(id(1)).eq.convertLHE(Pho_)) then
+           PROP1=cone
+           if((id(1)*helicity(1)).gt.0d0) then
+             call POLARIZATION_SINGLE(MomExt(:,3),+1,Vcurrent1)
+           else
+             call POLARIZATION_SINGLE(MomExt(:,3),-1,Vcurrent1)
+           endif
+         else if(id(1).gt.0)then
+           call FFV(id(2), MomExt(:,2), helicity(2), id(1), MomExt(:,1), helicity(1), Vcurrent1)
+         else
+           call FFV(id(1), MomExt(:,1), helicity(1), id(2), MomExt(:,2), helicity(2), Vcurrent1)
+         endif
+
+         !ZH
+         if(abs(id(1)).eq.convertLHE(Pho_))then
+           current1=Vcurrent1
+         !e+ e- Z vertex for incoming states
+         else if((abs(id(1)).eq.11).or.(abs(id(1)).eq.13).or.(abs(id(1)).eq.15))then
+           if((id(1)*helicity(1)).gt.0d0)then
+             current1 = QlR*Vcurrent1
+           else
+             current1 = QlL*Vcurrent1
+           endif
+           current1=current1*gFFA
+         !u u~ Z vertex for incoming states
+         else if((abs(id(1)).eq.2).or.(abs(id(1)).eq.4))then
+           if((id(1)*helicity(1)).gt.0d0)then
+             current1 = QuR*Vcurrent1
+           else
+             current1 = QuL*Vcurrent1
+           endif
+           current1=current1*gFFA
+         !d d~ Z vertex for incoming states
+         else if((abs(id(1)).eq.1).or.(abs(id(1)).eq.3).or.(abs(id(1)).eq.5))then
+           if((id(1)*helicity(1)).gt.0d0)then
+             current1 = QdR*Vcurrent1
+           else
+             current1 = QdL*Vcurrent1
+           endif
+           current1=current1*gFFA
+         else
+           current1=0d0
+           print *, "invalid incoming state"
+         endif
       endif
 
-      if(id(6).gt.0)then
-        call FFV(id(6), MomExt(:,6), helicity(6), id(7), MomExt(:,7), helicity(7), Vcurrent2)
-!        if((id(6)+id(7)).eq.0)then
-          call FFA(id(6), MomExt(:,6), helicity(6), id(7), MomExt(:,7), helicity(7), Acurrent2)
-!        endif
+      if(.not.useA(2)) then
+         PROP2 = PROPAGATOR(dsqrt(q4_q4),mass(4,1),mass(4,2))
+
+         if(id(6).gt.0)then
+           call FFV(id(6), MomExt(:,6), helicity(6), id(7), MomExt(:,7), helicity(7), Vcurrent2)
+           call FFA(id(6), MomExt(:,6), helicity(6), id(7), MomExt(:,7), helicity(7), Acurrent2)
+         else
+           call FFV(id(7), MomExt(:,7), helicity(7), id(6), MomExt(:,6), helicity(6), Vcurrent2)
+           call FFA(id(7), MomExt(:,7), helicity(7), id(6), MomExt(:,6), helicity(6), Acurrent2)
+         endif
+
+         !WH
+         if((id(6)+id(7)).ne.0)then
+           if((id(6)*helicity(6)).le.0d0)then
+             current2=(Vcurrent2-Acurrent2)/2d0*gFFW*CKM(id(6),id(7))
+           else
+             current2=0d0
+           endif
+         !ZH
+         else
+           !l+ l- Z vertex for final state
+           if((abs(id(6)).eq.11).or.(abs(id(6)).eq.13))then
+             if((id(6)*helicity(6)).gt.0d0)then
+               current2=(0.5d0*T3lR - QlR*sitW**2) *Vcurrent2 -(0.5d0*T3lR)*Acurrent2
+             else
+               current2=(0.5d0*T3lL - QlL*sitW**2) *Vcurrent2 -(0.5d0*T3lL)*Acurrent2
+             endif
+             current2=current2*gFFZ*dsqrt(scale_alpha_Z_ll)
+           !tau+ tau- Z vertex for final state
+           else if((abs(id(6)).eq.15))then
+             if((id(6)*helicity(6)).gt.0d0)then
+               current2=(0.5d0*T3lR - QlR*sitW**2) *Vcurrent2 -(0.5d0*T3lR)*Acurrent2
+             else
+               current2=(0.5d0*T3lL - QlL*sitW**2) *Vcurrent2 -(0.5d0*T3lL)*Acurrent2
+             endif
+             current2=current2*gFFZ*dsqrt(scale_alpha_Z_tt)
+           !u u~ Z vertex for final state
+           else if((abs(id(6)).eq.2).or.(abs(id(6)).eq.4))then
+             if((id(6)*helicity(6)).gt.0d0)then
+               current2=(0.5d0*T3uR - QuR*sitW**2) *Vcurrent2 -(0.5d0*T3uR)*Acurrent2
+             else
+               current2=(0.5d0*T3uL - QuL*sitW**2) *Vcurrent2 -(0.5d0*T3uL)*Acurrent2
+             endif
+             current2=current2*gFFZ*dsqrt(scale_alpha_Z_uu)
+           !d d~ Z vertex for final state
+           else if((abs(id(6)).eq.1).or.(abs(id(6)).eq.3).or.(abs(id(6)).eq.5))then
+             if((id(6)*helicity(6)).gt.0d0)then
+               current2=(0.5d0*T3dR - QdR*sitW**2) *Vcurrent2 -(0.5d0*T3dR)*Acurrent2
+             else
+               current2=(0.5d0*T3dL - QdL*sitW**2) *Vcurrent2 -(0.5d0*T3dL)*Acurrent2
+             endif
+             current2=current2*gFFZ*dsqrt(scale_alpha_Z_dd)
+           !nu nu~ Z vertex for final state
+           else if((abs(id(6)).eq.12).or.(abs(id(6)).eq.14).or.(abs(id(6)).eq.16))then
+             current2=(0.5d0*T3nL - QnL*sitW**2) *Vcurrent2 -(0.5d0*T3nL)*Acurrent2
+             current2=current2*gFFZ*dsqrt(scale_alpha_Z_nn)
+           else
+             current2=0d0
+             print *, "invalid final state"!, id(4:5)
+             stop
+           endif
+         endif
       else
-        call FFV(id(7), MomExt(:,7), helicity(7), id(6), MomExt(:,6), helicity(6), Vcurrent2)
-!        if((id(6)+id(7)).eq.0)then
-          call FFA(id(7), MomExt(:,7), helicity(7), id(6), MomExt(:,6), helicity(6), Acurrent2)
-!        endif
+         PROP2 = PROPAGATOR(dsqrt(q4_q4),0d0,0d0)
+
+         if(abs(id(6)).eq.convertLHE(Pho_)) then
+           PROP2=cone
+           if((id(6)*helicity(6)).gt.0d0) then
+             call POLARIZATION_SINGLE(MomExt(:,4),+1,Vcurrent2)
+           else
+             call POLARIZATION_SINGLE(MomExt(:,4),-1,Vcurrent2)
+           endif
+           Vcurrent2 = dconjg(Vcurrent2)
+         else if(id(6).gt.0)then
+           call FFV(id(6), MomExt(:,6), helicity(6), id(7), MomExt(:,7), helicity(7), Vcurrent2)
+         else
+           call FFV(id(7), MomExt(:,7), helicity(7), id(6), MomExt(:,6), helicity(6), Vcurrent2)
+         endif
+
+         !ZH
+         if(abs(id(6)).eq.convertLHE(Pho_)) then
+           current2=Vcurrent2
+         !l+ l- Z vertex for final state
+         else if((abs(id(6)).eq.11).or.(abs(id(6)).eq.13))then
+           if((id(6)*helicity(6)).gt.0d0)then
+             current2=QlR*Vcurrent2
+           else
+             current2=QlL*Vcurrent2
+           endif
+           current2=current2*gFFA*dsqrt(scale_alpha_Z_ll)
+         !tau+ tau- Z vertex for final state
+         else if((abs(id(6)).eq.15))then
+           if((id(6)*helicity(6)).gt.0d0)then
+             current2=QlR*Vcurrent2
+           else
+             current2=QlL*Vcurrent2
+           endif
+           current2=current2*gFFA*dsqrt(scale_alpha_Z_tt)
+         !u u~ Z vertex for final state
+         else if((abs(id(6)).eq.2).or.(abs(id(6)).eq.4))then
+           if((id(6)*helicity(6)).gt.0d0)then
+             current2=QuR*Vcurrent2
+           else
+             current2=QuL*Vcurrent2
+           endif
+           current2=current2*gFFA*dsqrt(scale_alpha_Z_uu)
+         !d d~ Z vertex for final state
+         else if((abs(id(6)).eq.1).or.(abs(id(6)).eq.3).or.(abs(id(6)).eq.5))then
+           if((id(6)*helicity(6)).gt.0d0)then
+             current2=QdR*Vcurrent2
+           else
+             current2=QdL*Vcurrent2
+           endif
+           current2=current2*gFFA*dsqrt(scale_alpha_Z_dd)
+         !nu nu~ Z vertex for final state
+         else if((abs(id(6)).eq.12).or.(abs(id(6)).eq.14).or.(abs(id(6)).eq.16))then
+           current2=QnL*Vcurrent2
+           current2=current2*gFFA*dsqrt(scale_alpha_Z_nn)
+         else
+           current2=0d0
+           print *, "invalid final state"!, id(4:5)
+           stop
+         endif
       endif
 
-!        print *, Vcurrent1
-!        Print *, Acurrent1
-!        print *, Vcurrent2
-!        Print *, Acurrent2
-!        print *, "----"
-
-!WH
-      if((id(1)+id(2)).ne.0)then
-        if((id(1)*helicity(1)).le.0d0)then
-          current1=(Vcurrent1-Acurrent1)/2d0*gFFW*CKM(id(1),id(2))/dsqrt(ScaleFactor(id(1),id(2)))
-        else
-          current1=0d0
-        endif
-        if((id(6)*helicity(6)).le.0d0)then
-          current2=(Vcurrent2-Acurrent2)/2d0*gFFW*CKM(id(6),id(7))
-        else
-          current2=0d0
-        endif
-
-!ZH
-      else if((abs(id(1)).eq.11).or.(abs(id(1)).eq.13))then
-!        print *, beam_id, beam_h
-!e+ e- Z vertex for incoming states
-        if((id(1)*helicity(1)).gt.0d0)then
-          current1=(0.5d0*T3lR - QlR*sitW**2) *Vcurrent1 -(0.5d0*T3lR)*Acurrent1
-        else
-          current1=(0.5d0*T3lL - QlL*sitW**2) *Vcurrent1 -(0.5d0*T3lL)*Acurrent1
-        endif
-        current1=current1*gFFZ
-
-!u u~ Z vertex for incoming states
-      else if((abs(id(1)).eq.2).or.(abs(id(1)).eq.4))then
-        if((id(1)*helicity(1)).gt.0d0)then
-          current1=(0.5d0*T3uR - QuR*sitW**2) *Vcurrent1 -(0.5d0*T3uR)*Acurrent1
-        else
-          current1=(0.5d0*T3uL - QuL*sitW**2) *Vcurrent1 -(0.5d0*T3uL)*Acurrent1
-        endif
-        current1=current1*gFFZ
-!d d~ Z vertex for incoming states
-      else if((abs(id(1)).eq.1).or.(abs(id(1)).eq.3).or.(abs(id(1)).eq.5))then
-        if((id(1)*helicity(1)).gt.0d0)then
-          current1=(0.5d0*T3dR - QdR*sitW**2) *Vcurrent1 -(0.5d0*T3dR)*Acurrent1
-        else
-          current1=(0.5d0*T3dL - QdL*sitW**2) *Vcurrent1 -(0.5d0*T3dL)*Acurrent1
-        endif
-        current1=current1*gFFZ
-      else
-      current1=0d0
-      print *, "invalid incoming state"
-
+      if(.not.(useA(1) .and. abs(id(1)).eq.convertLHE(Pho_))) then
+         current1 = -current1 + scrc(MomExt(:,3),current1)/q3_q3
       endif
-
-!f+ f- Z vertex for final states
-      if((id(6)+id(7)).eq.0)then
-!l+ l- Z vertex for final state
-        if((abs(id(6)).eq.11).or.(abs(id(6)).eq.13))then
-          if((id(6)*helicity(6)).gt.0d0)then
-            current2=(0.5d0*T3lR - QlR*sitW**2) *Vcurrent2 -(0.5d0*T3lR)*Acurrent2
-          else
-            current2=(0.5d0*T3lL - QlL*sitW**2) *Vcurrent2 -(0.5d0*T3lL)*Acurrent2
-          endif
-          current2=current2*gFFZ*dsqrt(scale_alpha_Z_ll)
-
-!tau+ tau- Z vertex for final state
-        else if((abs(id(6)).eq.15))then
-          if((id(6)*helicity(6)).gt.0d0)then
-            current2=(0.5d0*T3lR - QlR*sitW**2) *Vcurrent2 -(0.5d0*T3lR)*Acurrent2
-          else
-            current2=(0.5d0*T3lL - QlL*sitW**2) *Vcurrent2 -(0.5d0*T3lL)*Acurrent2
-          endif
-          current2=current2*gFFZ*dsqrt(scale_alpha_Z_tt)
-
-!u u~ Z vertex for final state
-        else if((abs(id(6)).eq.2).or.(abs(id(6)).eq.4))then
-          if((id(6)*helicity(6)).gt.0d0)then
-            current2=(0.5d0*T3uR - QuR*sitW**2) *Vcurrent2 -(0.5d0*T3uR)*Acurrent2
-          else
-            current2=(0.5d0*T3uL - QuL*sitW**2) *Vcurrent2 -(0.5d0*T3uL)*Acurrent2
-          endif
-          current2=current2*gFFZ*dsqrt(scale_alpha_Z_uu)
-
-!d d~ Z vertex for final state
-        else if((abs(id(6)).eq.1).or.(abs(id(6)).eq.3).or.(abs(id(6)).eq.5))then
-          if((id(6)*helicity(6)).gt.0d0)then
-            current2=(0.5d0*T3dR - QdR*sitW**2) *Vcurrent2 -(0.5d0*T3dR)*Acurrent2
-          else
-            current2=(0.5d0*T3dL - QdL*sitW**2) *Vcurrent2 -(0.5d0*T3dL)*Acurrent2
-          endif
-          current2=current2*gFFZ*dsqrt(scale_alpha_Z_dd)
-
-!nu nu~ Z vertex for final state
-        else if((abs(id(6)).eq.12).or.(abs(id(6)).eq.14).or.(abs(id(6)).eq.16))then
-          current2=(0.5d0*T3nL - QnL*sitW**2) *Vcurrent2 -(0.5d0*T3nL)*Acurrent2
-          current2=current2*gFFZ*dsqrt(scale_alpha_Z_nn)
-
-        else
-        current2=0d0
-        print *, "invalid final state"!, id(4:5)
-        stop
-        endif
-
+      if(.not.(useA(2) .and. abs(id(6)).eq.convertLHE(Pho_))) then
+         current2 = -current2 + scrc(MomExt(:,4),current2)/q4_q4
       endif
-!f+ f- Z vertex for final states END
+      current1 = current1*PROP1
+      current2 = current2*PROP2
 
-      call POLARIZATION(MomExt(:,3), POL1)
-      call POLARIZATION(MomExt(:,4), POL2)
-
-
-!ZZX vertex
-      q3_q3 = inv_mass(3)**2
-      q4_q4 = inv_mass(4)**2
+!XVV vertex
       if(id(3).eq.convertLHE(Wp_))then
-        q3_q3 = inv_mass(4)**2
-        q4_q4 = inv_mass(3)**2
+         call swap(q3_q3,q4_q4)
+         call swap(current1,current2)
       endif
 
-      ghz1_dyn = HVVSpinZeroDynamicCoupling(1,q3_q3,q4_q4,inv_mass(5)**2)
-      ghz2_dyn = HVVSpinZeroDynamicCoupling(2,q3_q3,q4_q4,inv_mass(5)**2)
-      ghz3_dyn = HVVSpinZeroDynamicCoupling(3,q3_q3,q4_q4,inv_mass(5)**2)
-      ghz4_dyn = HVVSpinZeroDynamicCoupling(4,q3_q3,q4_q4,inv_mass(5)**2)
+      if(.not.useA(1) .and. .not.useA(2)) then
+         ghz1_dyn = HVVSpinZeroDynamicCoupling(1,q3_q3,q4_q4,q5_q5)
+         ghz2_dyn = HVVSpinZeroDynamicCoupling(2,q3_q3,q4_q4,q5_q5)
+         ghz3_dyn = HVVSpinZeroDynamicCoupling(3,q3_q3,q4_q4,q5_q5)
+         ghz4_dyn = HVVSpinZeroDynamicCoupling(4,q3_q3,q4_q4,q5_q5)
+      else if(useA(1) .and. useA(2)) then
+         ghz1_dyn = czero
+         ghz2_dyn = HVVSpinZeroDynamicCoupling(9,q3_q3,q4_q4,q5_q5)
+         ghz3_dyn = HVVSpinZeroDynamicCoupling(10,q3_q3,q4_q4,q5_q5)
+         ghz4_dyn = HVVSpinZeroDynamicCoupling(11,q3_q3,q4_q4,q5_q5)
+      else if(useA(1)) then
+         ghz1_dyn = HVVSpinZeroDynamicCoupling(5,0d0,q3_q3,q5_q5)
+         ghz2_dyn = HVVSpinZeroDynamicCoupling(6,0d0,q3_q3,q5_q5)
+         ghz3_dyn = HVVSpinZeroDynamicCoupling(7,0d0,q3_q3,q5_q5)
+         ghz4_dyn = HVVSpinZeroDynamicCoupling(8,0d0,q3_q3,q5_q5)
+      else !if(useA(2)) then
+         ghz1_dyn = HVVSpinZeroDynamicCoupling(5,0d0,q4_q4,q5_q5)
+         ghz2_dyn = HVVSpinZeroDynamicCoupling(6,0d0,q4_q4,q5_q5)
+         ghz3_dyn = HVVSpinZeroDynamicCoupling(7,0d0,q4_q4,q5_q5)
+         ghz4_dyn = HVVSpinZeroDynamicCoupling(8,0d0,q4_q4,q5_q5)
+      endif
 
       gVVS1 = ghz1_dyn*(mass(3,1)**2) + qq * ( 2d0*ghz2_dyn + ghz3_dyn*qq/Lambda**2 )
       gVVS2 = -( 2d0*ghz2_dyn + ghz3_dyn*qq/Lambda**2 )
@@ -386,56 +524,23 @@ END SUBROUTINE
 
 ! assemble everything and get iM
       MATRIXELEMENT0=(0d0,0d0)
-      dMATRIXELEMENT=(0d0,0d0)
-      do lambda1=1,3
-      do lambda2=1,3
-      dMATRIXELEMENT=current1(1)*POL1(lambda1, 1) -current1(2)*POL1(lambda1, 2) -current1(3)*POL1(lambda1, 3)-current1(4)*POL1(lambda1, 4)
-      dMATRIXELEMENT=dMATRIXELEMENT *(current2(1)*dconjg(POL2(lambda2, 1)) -current2(2)*dconjg(POL2(lambda2, 2)) -current2(3)*dconjg(POL2(lambda2, 3)) -current2(4)*dconjg(POL2(lambda2, 4)))
-      PVVX0P=(0d0,0d0)
       do mu3=1,4
       do mu4=1,4
-      PVVX0P=PVVX0P +dconjg(POL1(lambda1,mu3))*VVX0(mu3,mu4)*POL2(lambda2,mu4)
+         MATRIXELEMENT0=MATRIXELEMENT0 + VVX0(mu3,mu4)*current1(mu3)*current2(mu4)
       enddo !mu4
       enddo !mu3
-      dMATRIXELEMENT=dMATRIXELEMENT*PVVX0P
-      MATRIXELEMENT0=MATRIXELEMENT0+dMATRIXELEMENT
-      enddo !lambda2
-      enddo !lambda1
 
       if(H_DK.eqv..false.)then
-        MATRIXELEMENT0=MATRIXELEMENT0 *PROP1*PROP2*PROP3
+        MATRIXELEMENT0=MATRIXELEMENT0 *PROP3
       else
-        MATRIXELEMENT0=MATRIXELEMENT0 *PROP1*PROP2*PROP3 &
+        MATRIXELEMENT0=MATRIXELEMENT0 *PROP3 &
         *(gFFS*FFS(id(8), MomExt(:,8), helicity(8), id(9), MomExt(:,9), helicity(9)) &
          +gFFP*FFP(id(8), MomExt(:,8), helicity(8), id(9), MomExt(:,9), helicity(9)))&
         *(0d0,-1d0)*m_bot/vev
       endif
 
       return
-      END function MATRIXELEMENT0
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+      END function
 
 !ANGLES.F
 !VERSION 20130531
@@ -443,7 +548,6 @@ END SUBROUTINE
 !A subroutine that calculates the polar and azimuthal angles of a
 !given vector(4) in terms of their sin and cos, which will be
 !returned by the array sincos(4).
-
       subroutine ANGLES(sincos, vector)
       implicit none
 !     real(8) Pi
@@ -482,10 +586,10 @@ END SUBROUTINE
       endif
 !shift phi so that 0 < phi < 2Pi
       if(vector(2).lt.0d0)then
-            phi=phi+Pi
+         phi=phi+Pi
       endif
       if(phi.lt.0d0)then
-            phi=phi+Twopi
+         phi=phi+Twopi
       endif
 !     print *,phi
       sincos(3)=dcos(phi)
@@ -494,33 +598,8 @@ END SUBROUTINE
       return
       END subroutine ANGLES
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 !ANTISYMMETRIC2.F
 !VERSION 20130702
-
-!in epp(_mu, _nu) returns the
-
       subroutine ANTISYMMETRIC2(p1,p2,epp)
 
       implicit none
@@ -557,31 +636,12 @@ END SUBROUTINE
       return
       END subroutine ANTISYMMETRIC2
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 !ANTISYMMETRIC.F
 !VERSION 20130618
 
 !returns the element of the rank-4 COVARIANT total antysymmetric
 !tensor.
 !ANTISYMMETRIC(0,1,2,3)=1.
-
       real(8) function ANTISYMMETRIC(i,j,k,l)
 
       implicit none
@@ -594,31 +654,11 @@ END SUBROUTINE
       return
       END function ANTISYMMETRIC
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 !CONTRA_FIELD_TENSOR.F
 !VERSION 20130630
 
 !in T_mu_nu(lambda, ^mu, ^nu) returns the contrvariant field tensors
 !for given polarization vectors.
-
       subroutine CONTRA_FIELD_TENSOR(POL, T_mu_nu)
 
       implicit none
@@ -657,43 +697,11 @@ END SUBROUTINE
       return
       END subroutine CONTRA_FIELD_TENSOR
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 !CONTRA_OUTER.F
 !VERSION 20130620
 
 !in pp(_mu, _nu) returns the CONTRAVARIANT tensor of
 !p1 p2 outer product.
-
       subroutine CONTRA_OUTER(p1,p2,pp)
 
       implicit none
@@ -711,32 +719,11 @@ END SUBROUTINE
       return
       END subroutine CONTRA_OUTER
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 !COVARIANT_FIELD_TENSOR.F
 !VERSION 20130630
 
 !in T_mu_nu(lambda, _mu, _nu) returns the covariant field tensors
 !for given polarization vectors.
-
       subroutine COVARIANT_FIELD_TENSOR(POL, T_mu_nu)
 
       implicit none
@@ -774,28 +761,11 @@ END SUBROUTINE
       return
       END subroutine COVARIANT_FIELD_TENSOR
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 !COVARIANT_OUTER.F
 !VERSION 20130620
 
 !in pp(_mu, _nu) returns the COVARIANT tensor of p1 p2
 !outer product.
-
       subroutine COVARIANT_OUTER(p1,p2,pp)
 
       implicit none
@@ -817,35 +787,11 @@ END SUBROUTINE
       return
       END subroutine COVARIANT_OUTER
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 !COVARIANT_VECTOR.F
 !VERSION 20130703
 
 !returns the component of the COVARIANT vector for given 4-vector
 !and Lorentz index.
-
       complex(8) function COVARIANT_VECTOR(p,mu)
 
       implicit none
@@ -862,34 +808,10 @@ END SUBROUTINE
       return
       END function COVARIANT_VECTOR
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 !FFP.A
 !VERSION 20130522
 
 !returns i.Psi~(p1,s1).gamma5.Psi(p2,s2) for massless states
-
       complex(8) function FFP(pdg_code1, p1, h1, pdg_code2, p2, h2)
 
       implicit none
@@ -923,31 +845,11 @@ END SUBROUTINE
       return
       END function FFP
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 !FFA.F
 !VERSION 20130523
 
 !in Acurrent(4) returns Psi~(p1,s1).gamma^mu.gamma5.Psi(p2,s2) for massless
 !states.
-
       subroutine FFA(pdg_code1, p1, h1, pdg_code2, p2, h2, Acurrent)
 
       implicit none
@@ -1017,30 +919,10 @@ END SUBROUTINE
       return
       END subroutine FFA
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 !FFS.F
 !VERSION 20130522
 
 !returns Psi~(p1,s1).Psi(p2,s2) for massless states
-
       complex(8) function FFS(pdg_code1, p1, h1, pdg_code2, p2, h2)
 
       implicit none
@@ -1074,30 +956,11 @@ END SUBROUTINE
       return
       END function FFS
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 !FFV.F
 !VERSION 20130523
 
 !in Vcurrent(4) returns Psi~(p1,s1).gamma^mu.Psi(p2,s2) for massless
 !states.
-
       subroutine FFV(pdg_code1, p1, h1, pdg_code2, p2, h2, Vcurrent)
 
       implicit none
@@ -1163,61 +1026,6 @@ END SUBROUTINE
       END subroutine FFV
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-!INNER.F
-!VERSION 20130620
-
-!returns the (complex) inner product of p1 and p2, p1_mu p2^nu.
-
-      complex(8) function INNER(p1,p2)
-
-      implicit none
-      complex(8) p1(4), p2(4)
-
-      INNER = p1(1)*p2(1) - p1(2)*p2(2) - p1(3)*p2(3) - p1(4)*p2(4)
-
-      return
-      END function INNER
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 !INV_LORENTZ.F
 !VERSION 20130602
 !
@@ -1225,7 +1033,6 @@ END SUBROUTINE
 !(vector) based on another four vector (boost). The primed and
 !unprimed frames have their axes in parallel to one another.
 !Rotation is not performed by this subroutine.
-
       subroutine INV_LORENTZ(vector, boost)
 
       implicit none
@@ -1268,28 +1075,6 @@ END SUBROUTINE
       return
       END subroutine INV_LORENTZ
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 !KRONECKER_DELTA.F
 
 !KRONECKER_DELTA(i,j)
@@ -1305,62 +1090,11 @@ END SUBROUTINE
       return
       end function KRONECKER_DELTA
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 !METRIC.F
 !VERSION 20130524
 
 !in METRIC returns the element of the Minkovski metric, with
 !signature (1,-1,-1,-1), for given (_mu, _nu) or given (^mu, ^nu).
-
       real(8) function METRIC(mu,nu)
 
       implicit none
@@ -1377,144 +1111,94 @@ END SUBROUTINE
       return
       END function METRIC
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 !`.F
 !VERSION 20130524
 
 !in POL(lambda,^mu) returns the polarization vectors for given
 !4-momentum p
-
       subroutine POLARIZATION(p, POL)
 
       implicit none
-      real(8) p(4), sincos(4), inv_mass, abs3p
+      real(8) p(4)
       complex(8) POL(3,4)
-!     integer lambda, mu
 
-      call ANGLES(sincos, p)
-
-!lambda = +1
-      POL(1,1)= 0d0
-      POL(1,2)= (sincos(3)*sincos(1)-(0d0,1d0)*sincos(4))/dsqrt(2d0)
-      POL(1,3)= (sincos(4)*sincos(1)+(0d0,1d0)*sincos(3))/dsqrt(2d0)
-      POL(1,4)= -sincos(2)/dsqrt(2d0)
-!lambda = -1
-      POL(2,1)= 0d0
-      POL(2,2)= ( sincos(3)*sincos(1)+(0d0,1d0)*sincos(4))/dsqrt(2d0)
-      POL(2,3)= ( sincos(4)*sincos(1)-(0d0,1d0)*sincos(3))/dsqrt(2d0)
-      POL(2,4)= -sincos(2)/dsqrt(2d0)
-!|3-momentum|
-      abs3p = dsqrt(p(2)**2+p(3)**2+p(4)**2)
-!invariant mass
-      inv_mass= dsqrt(p(1)**2-abs3p**2)
-!lambda = L
-      POL(3,1)= abs3p/inv_mass
-      POL(3,2)= sincos(3)*sincos(2)*p(1)/inv_mass
-      POL(3,3)= sincos(4)*sincos(2)*p(1)/inv_mass
-      POL(3,4)= sincos(1)*p(1)/inv_mass
+      call POLARIZATION_SINGLE(p,+1,POL(1,:))
+      call POLARIZATION_SINGLE(p,-1,POL(2,:))
+      call POLARIZATION_SINGLE(p, 0,POL(3,:))
 
       return
       END subroutine POLARIZATION
 
+      subroutine POLARIZATION_SINGLE(p, lambda, POL)
 
+      implicit none
+      real(8) p(4), sincos(4), inv_mass, abs3p
+      complex(8) POL(4)
+      integer lambda
 
+      POL(:)=czero
 
+      call ANGLES(sincos, p)
+      !sincos(1)=cos(theta)
+      !sincos(2)=sin(theta)
+      !sincos(3)=cos(phi)
+      !sincos(4)=sin(phi)
 
+!lambda = +1
+      if(lambda.eq.1) then
+         POL(1)= 0d0
+         POL(2)= (sincos(3)*sincos(1)-(0d0,1d0)*sincos(4))/dsqrt(2d0)
+         POL(3)= (sincos(4)*sincos(1)+(0d0,1d0)*sincos(3))/dsqrt(2d0)
+         POL(4)= -sincos(2)/dsqrt(2d0)
+!lambda = -1
+      else if(lambda.eq.-1) then
+         POL(1)= 0d0
+         POL(2)= (sincos(3)*sincos(1)+(0d0,1d0)*sincos(4))/dsqrt(2d0)
+         POL(3)= (sincos(4)*sincos(1)-(0d0,1d0)*sincos(3))/dsqrt(2d0)
+         POL(4)= -sincos(2)/dsqrt(2d0)
+!lambda = 0 (z)
+      else if(lambda.eq.0) then
+!|3-momentum|
+         abs3p = dsqrt(p(2)**2+p(3)**2+p(4)**2)
+!invariant mass
+         inv_mass= dsqrt(p(1)**2-abs3p**2)
+         POL(1)= abs3p/inv_mass
+         POL(2)= sincos(3)*sincos(2)*p(1)/inv_mass
+         POL(3)= sincos(4)*sincos(2)*p(1)/inv_mass
+         POL(4)= sincos(1)*p(1)/inv_mass
+!lambda = 2 (vec{p-hat})
+      else if(lambda.eq.2) then
+         POL(1)= 0d0
+         POL(2)= sincos(3)*sincos(2)
+         POL(3)= sincos(4)*sincos(2)
+         POL(4)= sincos(1)
+!lambda = -2 (-vec{p-hat})
+      else if(lambda.eq.-2) then
+         POL(1)= 0d0
+         POL(2)= -sincos(3)*sincos(2)
+         POL(3)= -sincos(4)*sincos(2)
+         POL(4)= -sincos(1)
+      endif
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+      return
+      END subroutine POLARIZATION_SINGLE
 
 !POLARIZATIONA.F
 !VERSION 20130529
 
 !in POL(lambda,^mu) returns the photon polarization vectors for given
 !4-momentum p
-
       subroutine POLARIZATIONA(p, POL)
 
       implicit none
-      real(8) p(4), sincos(4), inv_mass, abs3p
+      real(8) p(4)
       complex(8) POL(2,4)
 
-      call ANGLES(sincos, p)
-
-!lambda = +1
-      POL(1,1)= 0d0
-      POL(1,2)= (-sincos(3)*sincos(1)+(0d0,1d0)*sincos(4))/dsqrt(2d0)
-      POL(1,3)= (-sincos(4)*sincos(1)-(0d0,1d0)*sincos(3))/dsqrt(2d0)
-      POL(1,4)= sincos(2)/dsqrt(2d0)
-!lambda = -1
-      POL(2,1)= 0d0
-      POL(2,2)= ( sincos(3)*sincos(1)+(0d0,1d0)*sincos(4))/dsqrt(2d0)
-      POL(2,3)= ( sincos(4)*sincos(1)-(0d0,1d0)*sincos(3))/dsqrt(2d0)
-      POL(2,4)= -sincos(2)/dsqrt(2d0)
-
+      call POLARIZATION_SINGLE(p,+1,POL(1,:))
+      call POLARIZATION_SINGLE(p,-1,POL(2,:))
 
       return
       END subroutine POLARIZATIONA
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 !POLARIZATIONX.F
 !VERSION 20130529
@@ -1522,75 +1206,24 @@ END SUBROUTINE
 !in POL(lambda,^mu) returns the polarization vectors for given
 !4-momentum p, with POL(L, ^mu) = (0, 0, 0, 1) when p is along the
 !Z direction.
-
       subroutine POLARIZATIONX(p, POL)
 
       implicit none
-      real(8) p(4), sincos(4), inv_mass, abs3p
+      real(8) p(4)
       complex(8) POL(3,4)
-!     integer lambda, mu
 
-      call ANGLES(sincos, p)
-
-!lambda = +1
-      POL(1,1)= 0d0
-      POL(1,2)= (-sincos(3)*sincos(1)+(0d0,1d0)*sincos(4))/dsqrt(2d0)
-      POL(1,3)= (-sincos(4)*sincos(1)-(0d0,1d0)*sincos(3))/dsqrt(2d0)
-      POL(1,4)= sincos(2)/dsqrt(2d0)
-!lambda = -1
-      POL(2,1)= 0d0
-      POL(2,2)= ( sincos(3)*sincos(1)+(0d0,1d0)*sincos(4))/dsqrt(2d0)
-      POL(2,3)= ( sincos(4)*sincos(1)-(0d0,1d0)*sincos(3))/dsqrt(2d0)
-      POL(2,4)= -sincos(2)/dsqrt(2d0)
-!|3-momentum|
-      abs3p = dsqrt(p(2)**2+p(3)**2+p(4)**2)
-!invariant mass
-      inv_mass= dsqrt(p(1)**2-abs3p**2)
-!lambda = L
-      POL(3,1)= 0d0
-      POL(3,2)= sincos(3)*sincos(2)
-      POL(3,3)= sincos(4)*sincos(2)
-      POL(3,4)= sincos(1)
+      call POLARIZATION_SINGLE(p,+1,POL(1,:))
+      call POLARIZATION_SINGLE(p,-1,POL(2,:))
+      call POLARIZATION_SINGLE(p,+2,POL(3,:))
 
       return
       END subroutine POLARIZATIONX
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 !PROPAGATOR.F
 !VERSION 20130522
 !
 !PROPAGATOR() returns the generi!complex-valued propagator
 !without tensor structure (numerator), given mass, invariant mass
 !and width.
-
       complex(8) function PROPAGATOR(inv_mass, mass, width)
       implicit none
 
@@ -1602,41 +1235,16 @@ END SUBROUTINE
 !    &             (0d0,1d0)*dcmplx(mass,0d0)*dcmplx(width,0d0))
 
 !assuming auto-conversion. works with gfortran
-      PROPAGATOR = (0d0,1d0) / ( inv_mass**2 - mass**2 + (0d0,1d0)*mass*width )
+      PROPAGATOR = ci / ( inv_mass**2 - mass**2 + ci*mass*width )
 !     print *, PROPAGATOR
 
       return
       END function PROPAGATOR
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 !VVP.F
 !VERSION 20130524
 
 !in epp(_mu, _nu) returns the
-
       subroutine VVP(p1,p2,epp)
 
       implicit none
@@ -1666,29 +1274,10 @@ END SUBROUTINE
       return
       END subroutine VVP
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 !VVS1.F
 !VERSION 20130524
 
 !in g_mu_nu(_mu, _nu) returns the VVS1 4*4 tensor.
-
       subroutine VVS1(g_mu_nu)
 
       implicit none
@@ -1704,34 +1293,10 @@ END SUBROUTINE
       return
       END subroutine VVS1
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 !VVS2.F
 !VERSION 20130524
 
 !in pp(_mu, _nu) returns the tensor of p1_mu * p2_nu.
-
       subroutine VVS2(p1,p2,pp)
 
       implicit none
@@ -1752,17 +1317,28 @@ END SUBROUTINE
       return
       END subroutine VVS2
 
-
-
-
-
-
   !-- generic functions below
   function scr(p1,p2)
     real(8), intent(in) :: p1(4), p2(4)
     real(8) :: scr
     scr = p1(1)*p2(1)-p1(2)*p2(2)-p1(3)*p2(3)-p1(4)*p2(4)
   end function scr
+
+  !-- generic functions below
+  function sc(p1,p2)
+    complex(8), intent(in) :: p1(4), p2(4)
+    complex(8) :: sc
+    sc = p1(1)*p2(1)-p1(2)*p2(2)-p1(3)*p2(3)-p1(4)*p2(4)
+  end function sc
+
+  !-- generic functions below
+  function scrc(p1,p2)
+    real(8), intent(in) :: p1(4)
+    complex(8), intent(in) :: p2(4)
+    complex(8) :: scrc
+    scrc = sc(dcmplx(p1(:)),p2)
+  end function scrc
+
 
   !- MCFM spinors in non-MCFM momentum convention
   subroutine spinoru2(n,p,za,zb,s)
@@ -1818,21 +1394,84 @@ END SUBROUTINE
   end subroutine spinoru2
 
 
+!MATRIXELEMENT02.F
+!VERSION 20160513
+!      complex(8) function MATRIXELEMENT02(p,mass,helicity,id)
+!      use ModHiggs
+!      implicit none
+!      real(8), intent(in) :: p(1:4,1:9)
+!      real(8), intent(in) :: mass(3:5,1:2)
+!      real(8), intent(in) :: helicity(9)
+!      integer, intent(in) :: id(9)
 
+!      complex(dp) :: A_VV(1:4), propH
+!      integer, parameter :: ZZMode=00,ZgsMode=01,gsZMode=02,gsgsMode=03
+!      integer, parameter :: WWMode=10
+!      integer, parameter :: ggMode=20
+!      integer, parameter :: ZgMode=30,gsgMode=31
+!      integer :: MY_IDUP(3:6),i3,i4
+!      real(dp) :: pUsed(4,6)
 
+!      if(id(1).lt.0) then
+!         MY_IDUP(3) = -convertLHEreverse(id(1))
+!         MY_IDUP(4) = -convertLHEreverse(id(2))
+!         pUsed(:,3) = -p(:,1)
+!         pUsed(:,4) = -p(:,2)
+!      else
+!         MY_IDUP(4) = -convertLHEreverse(id(1))
+!         MY_IDUP(3) = -convertLHEreverse(id(2))
+!         pUsed(:,4) = -p(:,1)
+!         pUsed(:,3) = -p(:,2)
+!      endif
+!      if(id(6).gt.0) then
+!         MY_IDUP(5) = convertLHEreverse(id(6))
+!         if(MY_IDUP(5).ne.Pho_) then
+!            MY_IDUP(6) = convertLHEreverse(id(7))
+!         endif
+!         pUsed(:,5) = p(:,6)
+!         pUsed(:,6) = p(:,7)
+!      else
+!         MY_IDUP(5) = convertLHEreverse(id(7))
+!         if(MY_IDUP(5).ne.Pho_) then
+!            MY_IDUP(6) = convertLHEreverse(id(6))
+!         endif
+!         pUsed(:,6) = p(:,6)
+!         pUsed(:,5) = p(:,7)
+!      endif
+!      pUSed(:,1) = pUSed(:,3) + pUSed(:,4) + pUSed(:,5) + pUSed(:,6)
+!      pUSed(:,2) = zero
 
+!      if(id(1)*helicity(1).gt.0) then
+!         i3=2
+!      else
+!         i3=1
+!      endif
+!      if(id(6)*helicity(6).gt.0) then
+!         i4=2
+!      else
+!         i4=1
+!      endif
 
+!      A_VV(:) = 0d0
+!      PROPH = PROPAGATOR(dsqrt(scr(p(:,5),p(:,5))),mass(5,1),mass(5,2))
+!      if(MY_IDUP(5).ne.Pho_) then
+!         call calcHelAmp2((/3,4,5,6/),ZZMode,MY_IDUP,pUsed,i3,i4,A_VV(1))
+!         if( includeGammaStar ) then
+!            call calcHelAmp2((/3,4,5,6/),ZgsMode,MY_IDUP,pUsed,i3,i4,A_VV(2))
+!            call calcHelAmp2((/3,4,5,6/),gsZMode,MY_IDUP,pUsed,i3,i4,A_VV(3))
+!            call calcHelAmp2((/3,4,5,6/),gsgsMode,MY_IDUP,pUsed,i3,i4,A_VV(4))
+!         endif
+!      else
+!         call calcHelAmp2((/3,4,5,6/),ZgMode,MY_IDUP,pUsed,i3,i4,A_VV(1))
+!         if( includeGammaStar ) then
+!            call calcHelAmp2((/3,4,5,6/),gsgMode,MY_IDUP,pUsed,i3,i4,A_VV(2))
+!         endif
+!      endif
+!      A_VV(:) = -A_VV(:) * propH
 
-
-
-
-
-
-
-
-
-
-
+!      MATRIXELEMENT02 = A_VV(1)+A_VV(2)+A_VV(3)+A_VV(4)
+!      return
+!      END function
 
 
 end module ModVHiggs
