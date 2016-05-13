@@ -270,6 +270,7 @@ logical :: SetpTcut, SetdeltaRcut
    WidthSchemeIn=-1
    TopDecays=-1
    TauDecays=-1
+   H_DK = .false.
    Process = 0   ! select 0, 1 or 2 to represent the spin of the resonance
    Unweighted =.true.
 
@@ -370,6 +371,7 @@ logical :: SetpTcut, SetdeltaRcut
     call ReadCommandLineArgument(arg, "MuRenMultiplier", success, MuRenMultiplier, success2=SetMuRenMultiplier)
     call ReadCommandLineArgument(arg, "TopDK", success, TopDecays)
     call ReadCommandLineArgument(arg, "TauDK", success, TauDecays)
+    call ReadCommandLineArgument(arg, "HbbDK", success, H_DK)
     call ReadCommandLineArgument(arg, "ReweightDecay", success, ReweightDecay)
     call ReadCommandLineArgument(arg, "WidthScheme", success, WidthScheme)
     call ReadCommandLineArgument(arg, "WidthSchemeIn", success, WidthSchemeIn)
