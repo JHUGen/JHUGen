@@ -234,6 +234,7 @@ logical :: SetZgammacoupling, Setgammagammacoupling
 logical :: SetAnomalousSpin1qq, Setspin1qqleft, Setspin1qqright, SetAnomalousSpin1ZZ
 logical :: SetAnomalousSpin2gg, SetAnomalousSpin2qq, Setspin2qqleft, Setspin2qqright,SetAnomalousSpin2ZZ
 logical :: SetAnomalousHff, Setkappa
+logical :: SetpTcut, SetdeltaRcut
 
    help = .false.
 
@@ -319,6 +320,9 @@ logical :: SetAnomalousHff, Setkappa
    SetAnomalousSpin2ZZ=.false.
    SetAnomalousHff=.false.
    Setkappa=.false.
+
+   SetpTcut=.false.
+   SetdeltaRcut=.false.
 
    DataFile="./data/output"
 
@@ -529,9 +533,9 @@ logical :: SetAnomalousHff, Setkappa
     call ReadCommandLineArgument(arg, "kappa_tilde", success, kappa_tilde, success2=SetAnomalousHff)
 
     !cuts
-    call ReadCommandLineArgument(arg, "pTjetcut", success, pTjetcut, SetLastArgument)
+    call ReadCommandLineArgument(arg, "pTjetcut", success, pTjetcut, SetLastArgument, success2=SetpTcut)
     if( SetLastArgument ) pTjetcut = pTjetcut*GeV
-    call ReadCommandLineArgument(arg, "deltaRcut", success, Rjet)
+    call ReadCommandLineArgument(arg, "deltaRcut", success, Rjet, success2=SetdeltaRcut)
     call ReadCommandLineArgument(arg, "mJJcut", success, mJJcut, SetLastArgument)
     if( SetLastArgument ) mJJcut = mJJcut*GeV
     call ReadCommandLineArgument(arg, "VBF_m4l_min", success, m4l_minmax(1), SetLastArgument)
@@ -580,7 +584,7 @@ logical :: SetAnomalousHff, Setkappa
     if( Process.eq.50 ) then
         DecayMode2=DecayMode1
         if( Collider.eq.2 ) call Error("Collider 2 not available for VH")
-        if( (IsAZDecay(DecayMode1).eqv..false.) .and. (Collider.ne.1) ) call Error("WH with Collider 1 only")
+        if( (IsAWDecay(DecayMode1) ) .and. (Collider.ne.1) ) call Error("WH with Collider 1 only")
     endif
 
     if( Process.ge.110 .and. Process.le.113 ) DecayMode2 = DecayMode1
@@ -660,12 +664,6 @@ logical :: SetAnomalousHff, Setkappa
     elseif( (IsAZDecay(DecayMode1) .and. IsAPhoton(DecayMode2)) ) then
         includeGammaStar = Setgammagammacoupling
     endif
-    ! includeGammaStar check
-    if((Process.eq.60 .or. Process.eq.66) .and. includeGammaStar .and. pTjetcut.le.0d0) then
-       print *, " Process=",Process," with off-shell photons requires a non-zero pT cut instead of photon mass cutoff. Current setting cut ",pTjetcut," is not allowed."
-       stop 1
-    endif
-
 
     if( (DecayMode1.ge.12) .or. (DecayMode2.ge.12) .or. (DecayMode1.lt..0) .or. (DecayMode2.lt.0) ) then
        print *," DecayMode1=",DecayMode1," and DecayMode2=",DecayMode2," are not allowed."
@@ -689,6 +687,35 @@ logical :: SetAnomalousHff, Setkappa
     if( IsAPhoton(DecayMode1) .and. IsAPhoton(DecayMode2) .and. .not.Setgammagammacoupling .and. (Process.eq.0)) then
         print *, "To decay the resonance to photon+photon, you need to set one of the Hgammagamma (ghgsgs*) couplings."
         stop 1
+    endif
+
+    if( Process.eq.50 .and. IsAPhoton(DecayMode1) .and. .not.SetZgammacoupling .and. .not.Setgammagammacoupling ) then
+        print *, "To produce gammaH, you need to set one of the HZgamma (ghzgs*) or Hgammagamma(ghgsgs*) couplings."
+        stop 1
+    endif
+
+    !cut checks
+    if(.not.SetpTcut) then
+        if(Process.eq.50) then
+            pTjetcut = 0d0*GeV
+        else
+            pTjetcut=15d0*GeV
+        endif
+    endif
+    if(.not.SetdeltaRcut) then
+        if(Process.eq.50) then
+            Rjet = 0d0
+        else
+            Rjet = 0.3d0
+        endif
+    endif
+    if((Process.eq.60 .or. Process.eq.66) .and. includeGammaStar .and. pTjetcut.le.0d0) then
+       print *, " Process=",Process," with off-shell photons requires a non-zero pT cut instead of photon mass cutoff. Current setting cut ",pTjetcut/GeV," GeV is not allowed."
+       stop 1
+    endif
+    if((Process.eq.61 .or. Process.eq.62) .and. pTjetcut.le.0d0) then
+       print *, " Process=",Process," requires a non-zero pT cut. Current setting cut ",pTjetcut/GeV," GeV is not allowed."
+       stop 1
     endif
 
     !---------------------------------------!
@@ -4018,11 +4045,11 @@ character :: arg*(500)
     if( Process.eq.80 .or. Process.eq.110 .or. Process.eq.111 .or.Process.eq.112 .or. Process.eq.113 ) write(TheUnit,"(4X,A,F8.4,A,F6.4)") "Top quark mass=",m_top*100d0,", width=",Ga_top*100d0
     if( Process.eq.80 .or. Process.eq.110 .or. Process.eq.111 .or. Process.eq.112 .or. Process.eq.113) write(TheUnit,"(4X,A,I2)") "Top quark decay=",TOPDECAYS
     if( Process.eq.90 ) write(TheUnit,"(4X,A,F8.4,A,F6.4)") "Bottom quark mass=",m_top*100d0
-    if( Process.eq.60 .or. Process.eq.61 .or. Process.eq.62 .or. Process.eq.66 .or. Process.eq.90 .or. &
+    if( Process.eq.50 .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.62 .or. Process.eq.66 .or. Process.eq.90 .or. &
        ((Process.eq.80 .or. (Process.ge.110 .and. Process.le.113)) .and. m_Top.lt.10d0*GeV) ) then
         write(TheUnit,"(4X,A)") "Jet cuts:"
         write(TheUnit,"(12X,A,F8.2,A)") "pT >= ", pTjetcut/GeV, " GeV"
-        if( Process.eq.60 .or. Process.eq.61 .or. Process.eq.66 .or. Process.eq.80 .or. Process.eq.90) then
+        if( Process.eq.50 .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.66 .or. Process.eq.80 .or. Process.eq.90) then
             write(TheUnit,"(8X,A,F8.2)") "DeltaR >= ", Rjet
             write(TheUnit,"(11X,A,F8.2,A)") "mJJ >= ", mJJcut/GeV, " GeV"
         endif

@@ -2223,7 +2223,7 @@ implicit none
 logical, optional :: useAonshell
 logical :: applyPSCut
 integer :: NumPart,NBin(:),id(:)
-real(8) :: m_jj,y_j1,y_j2,dphi_jj, m_ll, pt_V, pt_H, m_Vstar, costheta1, costheta2, phistar1, phi
+real(8) :: m_jj,y_j1,y_j2,dphi_jj, m_ll, pt_V, pt_H, pt1, pt2, deltaR, m_Vstar, costheta1, costheta2, phistar1, phi
 double precision MomBoost(1:4), MomFerm(1:4), inv_mass(1:9), MomLeptX(1:4,1:4), ScatteringAxis(1:4), MomReso(1:4)
 double precision MomLeptPlane1(2:4), MomLeptPlane2(2:4), dummy(2:4), signPhi
 double precision, intent(in) :: MomExt(1:4,1:9)
@@ -2249,8 +2249,13 @@ logical :: hasAonshell
         if(includeGammaStar .and. .not.IsAWDecay(DecayMode1) .and. (m_ll.lt.MPhotonCutoff .or. m_Vstar.lt.MPhotonCutoff))then
            applyPSCut=.true.
         endif
-        if(m_ll.lt.mJJcut .and. IsAQuark(convertLHEreverse(id(6)))) then
-           applyPSCut=.true.
+        if(IsAQuark(convertLHEreverse(id(6)))) then
+           pt1 = get_PT(MomExt(1:4,6))
+           pt2 = get_PT(MomExt(1:4,7))
+           deltaR = get_R(MomExt(1:4,6), MomExt(1:4,7))
+           if(m_ll.lt.mJJcut .or. pt1.lt.ptjetcut .or. pt2.lt.ptjetcut .or. deltaR.lt.Rjet) then
+              applyPSCut=.true.
+           endif
         endif
      else
         if(includeGammaStar .and. m_Vstar.lt.MPhotonCutoff)then
@@ -2261,8 +2266,13 @@ logical :: hasAonshell
         if(m_jj.le.(getMass(convertLHEreverse(id(8)))+getMass(convertLHEreverse(id(9)))))then
            applyPSCut=.true.
         endif
-        if(m_jj.lt.mJJcut .and. IsAQuark(convertLHEreverse(id(8)))) then
-           applyPSCut=.true.
+        if(IsAQuark(convertLHEreverse(id(8)))) then
+           pt1 = get_PT(MomExt(1:4,8))
+           pt2 = get_PT(MomExt(1:4,9))
+           deltaR = get_R(MomExt(1:4,8), MomExt(1:4,9))
+           if(m_jj.lt.mJJcut .or. pt1.lt.ptjetcut .or. pt2.lt.ptjetcut .or. deltaR.lt.Rjet) then
+              applyPSCut=.true.
+           endif
         endif
      else
         if(dabs(m_jj-M_Reso).gt.10d0*Ga_Reso) then
