@@ -721,11 +721,11 @@ logical :: SetpTcut, SetdeltaRcut
     !---------------------------------------!
     !           Set OffShellV1/V2           !
     !---------------------------------------!
-    if( IsAPhoton(DecayMode2) .and. IsAZDecay(DecayMode1) ) then ! require OffXVV=*10 for Z+photon
+    if( IsAPhoton(DecayMode2) .and. IsAZDecay(DecayMode1) ) then
        print *,"Z is off-shell and photon is on-shell in Z+photon production."
        print *,"Randomization of the order of writing of the decay products to the LHE file is disabled."
        RandomizeVVdecays = .false.
-    elseif( IsAPhoton(DecayMode2) .and. IsAPhoton(DecayMode1) ) then ! require OffXVV=*00 for photon+photon
+    elseif( IsAPhoton(DecayMode2) .and. IsAPhoton(DecayMode1) .and. Process.le.2 ) then
        print *,"Both photons are on-shell in photon+photon production."
     endif
     OffShellV1=.not.IsAPhoton(DecayMode1)
