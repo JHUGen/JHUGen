@@ -119,7 +119,7 @@ logical, public            :: RandomizeVVdecays = .true.    ! randomize DecayMod
 
 logical, public, parameter :: UseUnformattedRead = .false.  !Set this to true if the regular reading fails for whatever reason
 
-logical, public, parameter :: H_DK =.false.                 ! default to false so H in V* > VH (Process = 50) does not decay
+logical, public            :: H_DK =.false.                 ! default to false so H in V* > VH (Process = 50) does not decay
 !=====================================================
 
 
