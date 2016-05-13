@@ -1206,7 +1206,9 @@
          endif
 
 
+
          call HZZampl(VVMode,pin,sp,A(1))
+
 
          if (i3.eq.1) then
             A(1) = aL1 * A(1)
@@ -1539,10 +1541,10 @@
 
 
   function pol_mless2(p,i,out)
-    integer, intent(in)       :: i
+    integer, intent(in) :: i
     complex(dp), intent(in) :: p(4)
     character(len=*), intent(in):: out
-    complex(dp)             :: pol_mless2(4)
+    complex(dp) :: pol_mless2(4)
     ! -------------------------------------
 
     if (out == 'out') then
