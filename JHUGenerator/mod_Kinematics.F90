@@ -1434,12 +1434,9 @@ AQCDUP=alphas
 
 call getHiggsDecayLength(HiggsDKLength)
 
-
-if(H_DK.eqv..false.)then
-    NUP=6
-else
-    NUP=8
-endif
+NUP = 4
+if(H_DK) NUP=NUP+2
+if(.not.IsAPhoton(DecayMode1)) NUP=NUP+2
 
     XWGTUP=EventWeight
 
@@ -1483,7 +1480,11 @@ do i=1,2
     write(io_LHEOutFile,fmt1) id(i), -1,0,0,ICOLUP(i,1),ICOLUP(i,2),MomDummy(2:4,i), MomDummy(1,i), 0.0d0, 0.0d0, Spin
 enddo
 
-write(io_LHEOutFile,fmt1) id(4), 2,1,2,0,0,MomDummy(2:4,4), MomDummy(1,4), MassDummy(4), 0d0, Spin
+if(IsAPhoton(DecayMode1)) then
+  write(io_LHEOutFile,fmt1) id(4), 1,1,2,0,0,MomDummy(2:4,4), MomDummy(1,4), MassDummy(4), 0d0, Spin
+else
+  write(io_LHEOutFile,fmt1) id(4), 2,1,2,0,0,MomDummy(2:4,4), MomDummy(1,4), MassDummy(4), 0d0, Spin
+endif
 
 if(H_DK.eqv..true.)then
   write(io_LHEOutFile,fmt1) id(5), 2,1,2,0,0,MomDummy(2:4,5), MomDummy(1,5), MassDummy(5), HiggsDKLength, Spin
