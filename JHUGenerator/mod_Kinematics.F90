@@ -297,25 +297,25 @@ write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(
 
 ! decay product 1 (V1): l-, nu or q
 i=7
-if (LHE_IDUP(i).gt.-9000) then
+if (LHE_IDUP(i).gt.Not_a_particle_) then
 write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,3),MomDummy(1,3),L12Mass,Lifetime,Spin
 endif
 
 ! decay product 2 (V1): l+, nubar or qbar
 i=6
-if (LHE_IDUP(i).gt.-9000) then
+if (LHE_IDUP(i).gt.Not_a_particle_) then
 write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,4),MomDummy(1,4),L11Mass,Lifetime,Spin
 endif
 
 ! decay product 1 (V2): l-, nu or q
 i=9
-if (LHE_IDUP(i).gt.-9000) then
+if (LHE_IDUP(i).gt.Not_a_particle_) then
 write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,5),MomDummy(1,5),L22Mass,Lifetime,Spin
 endif
 
 ! decay product 2 (V2): l+, nubar or qbar
 i=8
-if (LHE_IDUP(i).gt.-9000) then
+if (LHE_IDUP(i).gt.Not_a_particle_) then
 write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,6),MomDummy(1,6),L21Mass,Lifetime,Spin
 endif
 
@@ -3208,8 +3208,8 @@ real(8) :: DKRnd
         MY_IDUP(7) = NuT_
    elseif( DecayMode1.eq.7 ) then! photon
         MY_IDUP(4) = Pho_
-        MY_IDUP(6) = -9999
-        MY_IDUP(7) = -9999
+        MY_IDUP(6) = Pho_
+        MY_IDUP(7) = Not_a_particle_
    elseif( DecayMode1.eq.8 ) then! Z1->2l+2tau
         call random_number(DKRnd)
         MY_IDUP(4) = Z0_
@@ -3296,8 +3296,8 @@ real(8) :: DKRnd
         MY_IDUP(9) = TaM_
    elseif( DecayMode2.eq.7 ) then! photon
         MY_IDUP(5) = Pho_
-        MY_IDUP(8) = -9999
-        MY_IDUP(9) = -9999
+        MY_IDUP(8) = Pho_
+        MY_IDUP(9) = Not_a_particle_
    elseif( DecayMode2.eq.8 ) then! Z2->2l+2tau
         call random_number(DKRnd)
         MY_IDUP(5) = Z0_
