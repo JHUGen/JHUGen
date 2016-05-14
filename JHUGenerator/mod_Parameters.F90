@@ -965,10 +965,8 @@ integer :: Part
       convertLHE =32
   elseif( Part.eq.Gra_) then
       convertLHE =39
-  elseif( Part.eq.Not_a_particle_) then
-      convertLHE = Part
-  elseif( Part.lt.-9000) then
-      convertLHE = Part
+  elseif( Part.le.Not_a_particle_) then
+      convertLHE = Not_a_particle_
   else
       print *, "LHE format not implemented for ",Part
       stop
