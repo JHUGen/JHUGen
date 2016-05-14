@@ -25,8 +25,8 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
  real(8) :: EvalWeighted,LO_Res_Unpol,yRnd(1:22),VgsWgt
  real(8) :: eta1,eta2,tau,x1,x2,sHatJacobi,PreFac,FluxFac,PDFFac,m1ffwgt,m2ffwgt
  real(8) :: pdf(-6:6,1:2)
- integer :: NBin(1:NumHistograms),NHisto,i,MY_IDUP(1:9), ICOLUP(1:2,1:9),xBin(1:4)
- integer :: NumPartonicChannels,iPartChannel,ijSel(1:121,1:3),PartChannelAvg,flav1,flav2
+ integer :: NBin(1:NumHistograms),NHisto,i,MY_IDUP(1:9),ICOLUP(1:2,1:9),xBin(1:4)
+ integer :: NumPartonicChannels,iPartChannel,ijSel(1:121,1:3),PartChannelAvg,flav1,flav2,ID_DK(6:9)
  real(8) :: EHat,PSWgt,PSWgt2,PSWgt3,ML1,ML2,ML3,ML4,MZ1,MZ2
  real(8) :: MomExt(1:4,1:8),MomDK(1:4,1:4),xRnd
  logical :: applyPSCut
@@ -118,11 +118,18 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
          endif
        endif ! Do not swap any state with no two identical VV decays! This would break mass determination in EvalPhasespace_H4f.
     endif
+    ID_DK(6:9)=MY_IDUP(6:9) ! Decay ids to pass into the ME
+    if(MY_IDUP(4).eq.Pho_ .and. ID_DK(6).eq.Not_a_particle_) then
+      ID_DK(6)=MY_IDUP(4)
+    endif
+    if(MY_IDUP(5).eq.Pho_ .and. ID_DK(8).eq.Not_a_particle_) then
+      ID_DK(8)=MY_IDUP(5)
+    endif
 
     if(abs(EHat-M_Reso).ge.20.0d0*Ga_Reso) return ! for some reason this removes some of the cross section, but significantly improves speed for OffXVV=111 !!
     if( any(yRnd(4:5).gt.0.99d0) .or. EHat.lt.5d0*GeV ) return ! the cut at 0.99 is required for EvalPhasespace_H4f when interference is turned on. Otherwise, it becomes unstable.
 
-    call EvalPhasespace_H4f(yRnd(3),yRnd(4:11),EHat,MomExt(1:4,1:8),MY_IDUP(6:9),PSWgt)
+    call EvalPhasespace_H4f(yRnd(3),yRnd(4:11),EHat,MomExt(1:4,1:8),ID_DK(6:9),PSWgt)
 
     ! Line above can handle Zgam and gamgam as well
     !if( IsAPhoton(DecayMode1) .and. IsAPhoton(DecayMode2) ) then
@@ -180,9 +187,9 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
 
    if ( PChannel.eq.0 .or.(PChannel.eq.2 .and. iPart_sel.eq.0 .and. jPart_sel.eq.0)) then
       if (Process.eq.0) then
-          call EvalAmp_gg_H_VV( (/-MomExt(1:4,1),-MomExt(1:4,2),MomExt(1:4,5),MomExt(1:4,6),MomExt(1:4,7),MomExt(1:4,8)/),MY_IDUP(6:9),LO_Res_Unpol)
+          call EvalAmp_gg_H_VV( (/-MomExt(1:4,1),-MomExt(1:4,2),MomExt(1:4,5),MomExt(1:4,6),MomExt(1:4,7),MomExt(1:4,8)/),ID_DK(6:9),LO_Res_Unpol)
       elseif(Process.eq.2) then
-          call EvalAmp_gg_G_VV( (/-MomExt(1:4,1),-MomExt(1:4,2),MomExt(1:4,5),MomExt(1:4,6),MomExt(1:4,7),MomExt(1:4,8)/),MY_IDUP(6:9),LO_Res_Unpol)
+          call EvalAmp_gg_G_VV( (/-MomExt(1:4,1),-MomExt(1:4,2),MomExt(1:4,5),MomExt(1:4,6),MomExt(1:4,7),MomExt(1:4,8)/),ID_DK(6:9),LO_Res_Unpol)
       endif
       MY_IDUP(1:2)=(/Glu_,Glu_/)
       ICOLUP(1:2,1) = (/501,502/)
@@ -192,19 +199,19 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
       !print *,"LO_Res_Unpol gg:",LO_Res_Unpol
    elseif (PChannel.eq.1.or.PChannel.eq.2) then
       if( Process.eq.1 .and. iPart_sel.gt.0d0 ) then
-          call EvalAmp_qqb_Zprime_VV((/-MomExt(1:4,1),-MomExt(1:4,2),MomExt(1:4,5),MomExt(1:4,6),MomExt(1:4,7),MomExt(1:4,8)/),MY_IDUP(6:9),LO_Res_Unpol)
+          call EvalAmp_qqb_Zprime_VV((/-MomExt(1:4,1),-MomExt(1:4,2),MomExt(1:4,5),MomExt(1:4,6),MomExt(1:4,7),MomExt(1:4,8)/),ID_DK(6:9),LO_Res_Unpol)
           ICOLUP(1:2,1) = (/501,000/)
           ICOLUP(1:2,2) = (/000,501/)
       elseif( Process.eq.1 .and. iPart_sel.lt.0d0 ) then
-          call EvalAmp_qqb_Zprime_VV((/-MomExt(1:4,2),-MomExt(1:4,1),MomExt(1:4,5),MomExt(1:4,6),MomExt(1:4,7),MomExt(1:4,8)/),MY_IDUP(6:9),LO_Res_Unpol)
+          call EvalAmp_qqb_Zprime_VV((/-MomExt(1:4,2),-MomExt(1:4,1),MomExt(1:4,5),MomExt(1:4,6),MomExt(1:4,7),MomExt(1:4,8)/),ID_DK(6:9),LO_Res_Unpol)
           ICOLUP(1:2,1) = (/000,502/)
           ICOLUP(1:2,2) = (/502,000/)
       elseif( Process.eq.2 .and. iPart_sel.gt.0d0 ) then
-          call EvalAmp_qqb_G_VV((/-MomExt(1:4,1),-MomExt(1:4,2),MomExt(1:4,5),MomExt(1:4,6),MomExt(1:4,7),MomExt(1:4,8)/),MY_IDUP(6:9),LO_Res_Unpol)
+          call EvalAmp_qqb_G_VV((/-MomExt(1:4,1),-MomExt(1:4,2),MomExt(1:4,5),MomExt(1:4,6),MomExt(1:4,7),MomExt(1:4,8)/),ID_DK(6:9),LO_Res_Unpol)
           ICOLUP(1:2,1) = (/501,000/)
           ICOLUP(1:2,2) = (/000,501/)
       elseif( Process.eq.2 .and. iPart_sel.lt.0d0 ) then
-          call EvalAmp_qqb_G_VV((/-MomExt(1:4,2),-MomExt(1:4,1),MomExt(1:4,5),MomExt(1:4,6),MomExt(1:4,7),MomExt(1:4,8)/),MY_IDUP(6:9),LO_Res_Unpol)
+          call EvalAmp_qqb_G_VV((/-MomExt(1:4,2),-MomExt(1:4,1),MomExt(1:4,5),MomExt(1:4,6),MomExt(1:4,7),MomExt(1:4,8)/),ID_DK(6:9),LO_Res_Unpol)
           ICOLUP(1:2,1) = (/000,502/)
           ICOLUP(1:2,2) = (/502,000/)
       endif
@@ -334,7 +341,7 @@ real(8) :: MomExt(1:4,1:4),MomDK(1:4,1:4),MomExt_f(1:4,1:4),MomDK_f(1:4,1:4),Mom
 logical :: applyPSCut,genEvt
 real(8) :: CS_max,eta1,eta2
 real(8) :: oneovervolume, bound(1:11), sumtot,yz1,yz2,EZ_max,dr,MZ1,MZ2,ML1,ML2,ML3,ML4
-integer :: i1, i2, MY_IDUP(1:9), ICOLUP(1:2,1:9),OSPair,OSSFPair,LeptInEvent_tmp(0:8),ordered_Lept(1:8)
+integer :: i1, i2, MY_IDUP(1:9), ICOLUP(1:2,1:9),OSPair,OSSFPair,LeptInEvent_tmp(0:8),ordered_Lept(1:8), ID_DK(6:9)
 real(8)::  ntRnd,ZMass(1:2),AcceptedEvent(1:4,1:4)
 real(8) :: offzchannel
 include 'vegas_common.f'
@@ -360,40 +367,46 @@ include 'csmaxvalue.f'
 !    print *, MY_IDUP(4:9);pause
 
    if( (RandomizeVVdecays.eqv..true.) ) then
-   if( (MY_IDUP(6).ne.MY_IDUP(8)) .and. (IsAZDecay(DecayMode1)) .and. (IsAZDecay(DecayMode2)) ) then
-     if( (yrnd(16).le.0.5d0) ) then
-      call swapi(MY_IDUP(4),MY_IDUP(5))
-      call swapi(MY_IDUP(6),MY_IDUP(8))
-      call swapi(MY_IDUP(7),MY_IDUP(9))
-      call swapi(ICOLUP(1,6),ICOLUP(1,8))
-      call swapi(ICOLUP(1,7),ICOLUP(1,9))
-      call swapi(ICOLUP(2,6),ICOLUP(2,8))
-      call swapi(ICOLUP(2,7),ICOLUP(2,9))
-     endif
-  elseif( (IsAWDecay(DecayMode1)) .and. (IsAWDecay(DecayMode2)) ) then
-     if( (yrnd(16).le.0.5d0) ) then
-      MY_IDUP(4) = ChargeFlip(MY_IDUP(4))
-      MY_IDUP(5) = ChargeFlip(MY_IDUP(5))
-      MY_IDUP(6) = ChargeFlip(MY_IDUP(6))
-      MY_IDUP(7) = ChargeFlip(MY_IDUP(7))
-      MY_IDUP(8) = ChargeFlip(MY_IDUP(8))
-      MY_IDUP(9) = ChargeFlip(MY_IDUP(9))
-      ! if there's a charge flip then the order of particle and anti-particles needs to be flipped, too
-      call swapi(MY_IDUP(6),MY_IDUP(7))
-      call swapi(MY_IDUP(8),MY_IDUP(9))
-     endif
-     if( (yrnd(17).le.0.5d0) ) then
-      call swapi(MY_IDUP(4),MY_IDUP(5))
-      call swapi(MY_IDUP(6),MY_IDUP(8))
-      call swapi(MY_IDUP(7),MY_IDUP(9))
-      call swapi(ICOLUP(1,6),ICOLUP(1,8))
-      call swapi(ICOLUP(1,7),ICOLUP(1,9))
-      call swapi(ICOLUP(2,6),ICOLUP(2,8))
-      call swapi(ICOLUP(2,7),ICOLUP(2,9))
+      if( (MY_IDUP(6).ne.MY_IDUP(8)) .and. (IsAZDecay(DecayMode1)) .and. (IsAZDecay(DecayMode2)) ) then
+        if( (yrnd(16).le.0.5d0) ) then
+         call swapi(MY_IDUP(4),MY_IDUP(5))
+         call swapi(MY_IDUP(6),MY_IDUP(8))
+         call swapi(MY_IDUP(7),MY_IDUP(9))
+         call swapi(ICOLUP(1,6),ICOLUP(1,8))
+         call swapi(ICOLUP(1,7),ICOLUP(1,9))
+         call swapi(ICOLUP(2,6),ICOLUP(2,8))
+         call swapi(ICOLUP(2,7),ICOLUP(2,9))
+        endif
+     elseif( (IsAWDecay(DecayMode1)) .and. (IsAWDecay(DecayMode2)) ) then
+        if( (yrnd(16).le.0.5d0) ) then
+         MY_IDUP(4) = ChargeFlip(MY_IDUP(4))
+         MY_IDUP(5) = ChargeFlip(MY_IDUP(5))
+         MY_IDUP(6) = ChargeFlip(MY_IDUP(6))
+         MY_IDUP(7) = ChargeFlip(MY_IDUP(7))
+         MY_IDUP(8) = ChargeFlip(MY_IDUP(8))
+         MY_IDUP(9) = ChargeFlip(MY_IDUP(9))
+         ! if there's a charge flip then the order of particle and anti-particles needs to be flipped, too
+         call swapi(MY_IDUP(6),MY_IDUP(7))
+         call swapi(MY_IDUP(8),MY_IDUP(9))
+        endif
+        if( (yrnd(17).le.0.5d0) ) then
+         call swapi(MY_IDUP(4),MY_IDUP(5))
+         call swapi(MY_IDUP(6),MY_IDUP(8))
+         call swapi(MY_IDUP(7),MY_IDUP(9))
+         call swapi(ICOLUP(1,6),ICOLUP(1,8))
+         call swapi(ICOLUP(1,7),ICOLUP(1,9))
+         call swapi(ICOLUP(2,6),ICOLUP(2,8))
+         call swapi(ICOLUP(2,7),ICOLUP(2,9))
+        endif
      endif
   endif
+  ID_DK(6:9)=MY_IDUP(6:9) ! Decay ids to pass into the ME
+  if(MY_IDUP(4).eq.Pho_ .and. ID_DK(6).eq.Not_a_particle_) then
+    ID_DK(6)=MY_IDUP(4)
   endif
-
+  if(MY_IDUP(5).eq.Pho_ .and. ID_DK(8).eq.Not_a_particle_) then
+    ID_DK(8)=MY_IDUP(5)
+  endif
 
   eta1=1d0; eta2=1d0
   sHatJacobi = 1d0
@@ -548,9 +561,9 @@ IF( GENEVT ) THEN
                if( (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then
                   if( yrnd(16).gt.0.5d0 ) call swapmom( MomDK_massless(1:4,1),MomDK_massless(1:4,3) )
                endif
-               call EvalAmp_H_VV( (/-MomExt(1:4,1)-MomExt(1:4,2),(/0d0,0d0,0d0,0d0/),MomDK_massless(1:4,1),MomDK_massless(1:4,2),MomDK_massless(1:4,3),MomDK_massless(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol)
+               call EvalAmp_H_VV( (/-MomExt(1:4,1)-MomExt(1:4,2),(/0d0,0d0,0d0,0d0/),MomDK_massless(1:4,1),MomDK_massless(1:4,2),MomDK_massless(1:4,3),MomDK_massless(1:4,4)/),ID_DK(6:9),LO_Res_Unpol)
             else
-               call EvalAmp_H_VV( (/-MomExt(1:4,1)-MomExt(1:4,2),(/0d0,0d0,0d0,0d0/),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol)
+               call EvalAmp_H_VV( (/-MomExt(1:4,1)-MomExt(1:4,2),(/0d0,0d0,0d0,0d0/),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),ID_DK(6:9),LO_Res_Unpol)
             endif
       endif
 
@@ -664,9 +677,9 @@ ELSE! NOT GENEVT
                if( (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then
                   if( yrnd(16).gt.0.5d0 ) call swapmom( MomDK_massless(1:4,1),MomDK_massless(1:4,3) )
                endif
-               call EvalAmp_H_VV( (/-MomExt(1:4,1)-MomExt(1:4,2),(/0d0,0d0,0d0,0d0/),MomDK_massless(1:4,1),MomDK_massless(1:4,2),MomDK_massless(1:4,3),MomDK_massless(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol)
+               call EvalAmp_H_VV( (/-MomExt(1:4,1)-MomExt(1:4,2),(/0d0,0d0,0d0,0d0/),MomDK_massless(1:4,1),MomDK_massless(1:4,2),MomDK_massless(1:4,3),MomDK_massless(1:4,4)/),ID_DK(6:9),LO_Res_Unpol)
          else
-               call EvalAmp_H_VV( (/-MomExt(1:4,1)-MomExt(1:4,2),(/0d0,0d0,0d0,0d0/),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol)
+               call EvalAmp_H_VV( (/-MomExt(1:4,1)-MomExt(1:4,2),(/0d0,0d0,0d0,0d0/),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),ID_DK(6:9),LO_Res_Unpol)
          endif
       endif
 
@@ -1015,7 +1028,7 @@ real(8) :: MomExt(1:4,1:8),MomDK(1:4,1:4),MomDK_massless(1:4,1:4),MomExt_f(1:4,1
 logical :: applyPSCut,genEvt
 real(8) :: CS_max, channel_ratio
 real(8) :: oneovervolume, bound(1:11), sumtot,yz1,yz2,EZ_max,dr,MZ1,MZ2,ML1,ML2,ML3,ML4
-integer :: parton(-5:5,-5:5), i1, ifound, i2, MY_IDUP(1:9), ICOLUP(1:2,1:9),flav1,flav2
+integer :: parton(-5:5,-5:5), i1, ifound, i2, MY_IDUP(1:9), ICOLUP(1:2,1:9),flav1,flav2, ID_DK(6:9)
 real(8)::ntRnd,ZMass(1:2)
 real(8) :: offzchannel
 include 'vegas_common.f'
@@ -1083,6 +1096,13 @@ include 'csmaxvalue.f'
          call swapi(ICOLUP(2,7),ICOLUP(2,9))
         endif
      endif ! Do not swap for VV'
+  endif
+  ID_DK(6:9)=MY_IDUP(6:9) ! Decay ids to pass into the ME
+  if(MY_IDUP(4).eq.Pho_ .and. ID_DK(6).eq.Not_a_particle_) then
+    ID_DK(6)=MY_IDUP(4)
+  endif
+  if(MY_IDUP(5).eq.Pho_ .and. ID_DK(8).eq.Not_a_particle_) then
+    ID_DK(8)=MY_IDUP(5)
   endif
 
   yz1 = yRnd(10)
@@ -1293,9 +1313,9 @@ IF( GENEVT ) THEN
                if( (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then
                   if( yrnd(16).gt.0.5d0 ) call swapmom( MomDK_massless(1:4,1),MomDK_massless(1:4,3) )
                endif
-               call EvalAmp_gg_H_VV( (/-MomExt(1:4,1),-MomExt(1:4,2),MomDK_massless(1:4,1),MomDK_massless(1:4,2),MomDK_massless(1:4,3),MomDK_massless(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol)
+               call EvalAmp_gg_H_VV( (/-MomExt(1:4,1),-MomExt(1:4,2),MomDK_massless(1:4,1),MomDK_massless(1:4,2),MomDK_massless(1:4,3),MomDK_massless(1:4,4)/),ID_DK(6:9),LO_Res_Unpol)
             else
-               call EvalAmp_gg_H_VV( (/-MomExt(1:4,1),-MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol)
+               call EvalAmp_gg_H_VV( (/-MomExt(1:4,1),-MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),ID_DK(6:9),LO_Res_Unpol)
             endif
 
       elseif(Process.eq.2) then
@@ -1305,9 +1325,9 @@ IF( GENEVT ) THEN
                if( (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then
                   if( yrnd(16).gt.0.5d0 ) call swapmom( MomDK_massless(1:4,1),MomDK_massless(1:4,3) )
                endif
-               call EvalAmp_gg_G_VV( (/-MomExt(1:4,1),-MomExt(1:4,2),MomDK_massless(1:4,1),MomDK_massless(1:4,2),MomDK_massless(1:4,3),MomDK_massless(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol)
+               call EvalAmp_gg_G_VV( (/-MomExt(1:4,1),-MomExt(1:4,2),MomDK_massless(1:4,1),MomDK_massless(1:4,2),MomDK_massless(1:4,3),MomDK_massless(1:4,4)/),ID_DK(6:9),LO_Res_Unpol)
             else
-               call EvalAmp_gg_G_VV( (/-MomExt(1:4,1),-MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol)
+               call EvalAmp_gg_G_VV( (/-MomExt(1:4,1),-MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),ID_DK(6:9),LO_Res_Unpol)
             endif
       else
             LO_Res_Unpol = 0d0
@@ -1323,11 +1343,11 @@ IF( GENEVT ) THEN
                if( (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then
                   if( yrnd(16).gt.0.5d0 ) call swapmom( MomDK_massless(1:4,1),MomDK_massless(1:4,3) )
                endif
-               call EvalAmp_qqb_Zprime_VV((/-MomExt(1:4,1),-MomExt(1:4,2),MomDK_massless(1:4,1),MomDK_massless(1:4,2),MomDK_massless(1:4,3),MomDK_massless(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol1)
-               call EvalAmp_qqb_Zprime_VV((/-MomExt(1:4,2),-MomExt(1:4,1),MomDK_massless(1:4,1),MomDK_massless(1:4,2),MomDK_massless(1:4,3),MomDK_massless(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol2)
+               call EvalAmp_qqb_Zprime_VV((/-MomExt(1:4,1),-MomExt(1:4,2),MomDK_massless(1:4,1),MomDK_massless(1:4,2),MomDK_massless(1:4,3),MomDK_massless(1:4,4)/),ID_DK(6:9),LO_Res_Unpol1)
+               call EvalAmp_qqb_Zprime_VV((/-MomExt(1:4,2),-MomExt(1:4,1),MomDK_massless(1:4,1),MomDK_massless(1:4,2),MomDK_massless(1:4,3),MomDK_massless(1:4,4)/),ID_DK(6:9),LO_Res_Unpol2)
             else
-               call EvalAmp_qqb_Zprime_VV((/-MomExt(1:4,1),-MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol1)
-               call EvalAmp_qqb_Zprime_VV((/-MomExt(1:4,2),-MomExt(1:4,1),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol2)
+               call EvalAmp_qqb_Zprime_VV((/-MomExt(1:4,1),-MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),ID_DK(6:9),LO_Res_Unpol1)
+               call EvalAmp_qqb_Zprime_VV((/-MomExt(1:4,2),-MomExt(1:4,1),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),ID_DK(6:9),LO_Res_Unpol2)
             endif
 
       elseif(Process.eq.2) then
@@ -1337,11 +1357,11 @@ IF( GENEVT ) THEN
                if( (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then
                   if( yrnd(16).gt.0.5d0 ) call swapmom( MomDK_massless(1:4,1),MomDK_massless(1:4,3) )
                endif
-               call EvalAmp_qqb_G_VV((/-MomExt(1:4,1),-MomExt(1:4,2),MomDK_massless(1:4,1),MomDK_massless(1:4,2),MomDK_massless(1:4,3),MomDK_massless(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol1)
-               call EvalAmp_qqb_G_VV((/-MomExt(1:4,2),-MomExt(1:4,1),MomDK_massless(1:4,1),MomDK_massless(1:4,2),MomDK_massless(1:4,3),MomDK_massless(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol2)
+               call EvalAmp_qqb_G_VV((/-MomExt(1:4,1),-MomExt(1:4,2),MomDK_massless(1:4,1),MomDK_massless(1:4,2),MomDK_massless(1:4,3),MomDK_massless(1:4,4)/),ID_DK(6:9),LO_Res_Unpol1)
+               call EvalAmp_qqb_G_VV((/-MomExt(1:4,2),-MomExt(1:4,1),MomDK_massless(1:4,1),MomDK_massless(1:4,2),MomDK_massless(1:4,3),MomDK_massless(1:4,4)/),ID_DK(6:9),LO_Res_Unpol2)
             else
-               call EvalAmp_qqb_G_VV((/-MomExt(1:4,1),-MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol1)
-               call EvalAmp_qqb_G_VV((/-MomExt(1:4,2),-MomExt(1:4,1),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol2)
+               call EvalAmp_qqb_G_VV((/-MomExt(1:4,1),-MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),ID_DK(6:9),LO_Res_Unpol1)
+               call EvalAmp_qqb_G_VV((/-MomExt(1:4,2),-MomExt(1:4,1),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),ID_DK(6:9),LO_Res_Unpol2)
             endif
       else
          LO_Res_Unpol1 = 0d0
@@ -1493,9 +1513,9 @@ ELSE! NOT GENEVT
                if( (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then
                   if( yrnd(16).gt.0.5d0 ) call swapmom( MomDK_massless(1:4,1),MomDK_massless(1:4,3) )
                endif
-               call EvalAmp_gg_H_VV( (/-MomExt(1:4,1),-MomExt(1:4,2),MomDK_massless(1:4,1),MomDK_massless(1:4,2),MomDK_massless(1:4,3),MomDK_massless(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol)
+               call EvalAmp_gg_H_VV( (/-MomExt(1:4,1),-MomExt(1:4,2),MomDK_massless(1:4,1),MomDK_massless(1:4,2),MomDK_massless(1:4,3),MomDK_massless(1:4,4)/),ID_DK(6:9),LO_Res_Unpol)
             else
-               call EvalAmp_gg_H_VV( (/-MomExt(1:4,1),-MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol)
+               call EvalAmp_gg_H_VV( (/-MomExt(1:4,1),-MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),ID_DK(6:9),LO_Res_Unpol)
             endif
 
       elseif(Process.eq.2) then
@@ -1505,9 +1525,9 @@ ELSE! NOT GENEVT
                if( (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then
                   if( yrnd(16).gt.0.5d0 ) call swapmom( MomDK_massless(1:4,1),MomDK_massless(1:4,3) )
                endif
-               call EvalAmp_gg_G_VV( (/-MomExt(1:4,1),-MomExt(1:4,2),MomDK_massless(1:4,1),MomDK_massless(1:4,2),MomDK_massless(1:4,3),MomDK_massless(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol)
+               call EvalAmp_gg_G_VV( (/-MomExt(1:4,1),-MomExt(1:4,2),MomDK_massless(1:4,1),MomDK_massless(1:4,2),MomDK_massless(1:4,3),MomDK_massless(1:4,4)/),ID_DK(6:9),LO_Res_Unpol)
             else
-               call EvalAmp_gg_G_VV( (/-MomExt(1:4,1),-MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol)
+               call EvalAmp_gg_G_VV( (/-MomExt(1:4,1),-MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),ID_DK(6:9),LO_Res_Unpol)
             endif
       else
          LO_Res_Unpol = 0d0
@@ -1533,11 +1553,11 @@ ELSE! NOT GENEVT
                if( (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then
                   if( yrnd(16).gt.0.5d0 ) call swapmom( MomDK_massless(1:4,1),MomDK_massless(1:4,3) )
                endif
-               call EvalAmp_qqb_Zprime_VV((/-MomExt(1:4,1),-MomExt(1:4,2),MomDK_massless(1:4,1),MomDK_massless(1:4,2),MomDK_massless(1:4,3),MomDK_massless(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol1)
-               call EvalAmp_qqb_Zprime_VV((/-MomExt(1:4,2),-MomExt(1:4,1),MomDK_massless(1:4,1),MomDK_massless(1:4,2),MomDK_massless(1:4,3),MomDK_massless(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol2)
+               call EvalAmp_qqb_Zprime_VV((/-MomExt(1:4,1),-MomExt(1:4,2),MomDK_massless(1:4,1),MomDK_massless(1:4,2),MomDK_massless(1:4,3),MomDK_massless(1:4,4)/),ID_DK(6:9),LO_Res_Unpol1)
+               call EvalAmp_qqb_Zprime_VV((/-MomExt(1:4,2),-MomExt(1:4,1),MomDK_massless(1:4,1),MomDK_massless(1:4,2),MomDK_massless(1:4,3),MomDK_massless(1:4,4)/),ID_DK(6:9),LO_Res_Unpol2)
             else
-               call EvalAmp_qqb_Zprime_VV((/-MomExt(1:4,1),-MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol1)
-               call EvalAmp_qqb_Zprime_VV((/-MomExt(1:4,2),-MomExt(1:4,1),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol2)
+               call EvalAmp_qqb_Zprime_VV((/-MomExt(1:4,1),-MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),ID_DK(6:9),LO_Res_Unpol1)
+               call EvalAmp_qqb_Zprime_VV((/-MomExt(1:4,2),-MomExt(1:4,1),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),ID_DK(6:9),LO_Res_Unpol2)
             endif
 
       elseif(Process.eq.2) then
@@ -1547,11 +1567,11 @@ ELSE! NOT GENEVT
                if( (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then
                   if( yrnd(16).gt.0.5d0 ) call swapmom( MomDK_massless(1:4,1),MomDK_massless(1:4,3) )
                endif
-               call EvalAmp_qqb_G_VV((/-MomExt(1:4,1),-MomExt(1:4,2),MomDK_massless(1:4,1),MomDK_massless(1:4,2),MomDK_massless(1:4,3),MomDK_massless(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol1)
-               call EvalAmp_qqb_G_VV((/-MomExt(1:4,2),-MomExt(1:4,1),MomDK_massless(1:4,1),MomDK_massless(1:4,2),MomDK_massless(1:4,3),MomDK_massless(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol2)
+               call EvalAmp_qqb_G_VV((/-MomExt(1:4,1),-MomExt(1:4,2),MomDK_massless(1:4,1),MomDK_massless(1:4,2),MomDK_massless(1:4,3),MomDK_massless(1:4,4)/),ID_DK(6:9),LO_Res_Unpol1)
+               call EvalAmp_qqb_G_VV((/-MomExt(1:4,2),-MomExt(1:4,1),MomDK_massless(1:4,1),MomDK_massless(1:4,2),MomDK_massless(1:4,3),MomDK_massless(1:4,4)/),ID_DK(6:9),LO_Res_Unpol2)
             else
-               call EvalAmp_qqb_G_VV((/-MomExt(1:4,1),-MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol1)
-               call EvalAmp_qqb_G_VV((/-MomExt(1:4,2),-MomExt(1:4,1),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),MY_IDUP(6:9),LO_Res_Unpol2)
+               call EvalAmp_qqb_G_VV((/-MomExt(1:4,1),-MomExt(1:4,2),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),ID_DK(6:9),LO_Res_Unpol1)
+               call EvalAmp_qqb_G_VV((/-MomExt(1:4,2),-MomExt(1:4,1),MomDK(1:4,1),MomDK(1:4,2),MomDK(1:4,3),MomDK(1:4,4)/),ID_DK(6:9),LO_Res_Unpol2)
             endif
       else
          LO_Res_Unpol1 = 0d0
