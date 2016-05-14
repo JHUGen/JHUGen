@@ -82,6 +82,12 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
 !    IDUP(9)  -->  MomExt(:,7) == MomDK(:,3)  -->  ubar-spinor
     ICOLUP(1:2,1:9) = 0
     call VVBranchings(MY_IDUP(4:9),ICOLUP(1:2,6:9))
+    if(MY_IDUP(4).eq.Pho_) then
+      MY_IDUP(6)=MY_IDUP(4)
+    endif
+    if(MY_IDUP(5).eq.Pho_) then
+      MY_IDUP(8)=MY_IDUP(5)
+    endif
     MY_IDUP(1:3) = 0
     if( RandomizeVVdecays .and. OffShellV1.eqv.OffShellV2) then
        call random_number(yrnd(17:18))
