@@ -3208,7 +3208,7 @@ real(8) :: DKRnd
         MY_IDUP(7) = NuT_
    elseif( DecayMode1.eq.7 ) then! photon
         MY_IDUP(4) = Pho_
-        MY_IDUP(6) = Pho_
+        MY_IDUP(6) = Not_a_particle_
         MY_IDUP(7) = Not_a_particle_
    elseif( DecayMode1.eq.8 ) then! Z1->2l+2tau
         call random_number(DKRnd)
@@ -3296,7 +3296,7 @@ real(8) :: DKRnd
         MY_IDUP(9) = TaM_
    elseif( DecayMode2.eq.7 ) then! photon
         MY_IDUP(5) = Pho_
-        MY_IDUP(8) = Pho_
+        MY_IDUP(8) = Not_a_particle_
         MY_IDUP(9) = Not_a_particle_
    elseif( DecayMode2.eq.8 ) then! Z2->2l+2tau
         call random_number(DKRnd)
