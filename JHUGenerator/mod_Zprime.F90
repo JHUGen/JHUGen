@@ -21,7 +21,7 @@
       integer, intent(in) :: MY_IDUP(6:9)
       real(dp) :: pin(4,4)
       complex(dp) :: A(2),qL,qR
-      integer :: i1,i2,i3,i4,ordering(1:4)
+      integer :: i1,i2,i3,i4,ordering(1:4),ordering_swap(1:4),MY_IDUP_ordered(6:9),j
       real(dp) :: aL1,aR1,aL2,aR2
       real(dp) :: gZ_sq
       real(dp) :: prefactor
@@ -42,42 +42,62 @@
 !---- full prefactor; 3 is  the color factor
       prefactor = 3d0*gZ_sq**2
 
+      ordering=(/3,4,5,6/)
+      if(convertLHE(MY_IDUP(6)).lt.0 .or. MY_IDUP(6).eq.Not_a_particle_) then
+         call swap(ordering(1),ordering(2))
+      endif
+      if(convertLHE(MY_IDUP(8)).lt.0 .or. MY_IDUP(8).eq.Not_a_particle_) then
+         call swap(ordering(3),ordering(4))
+      endif
+      if( &
+         (CoupledVertex(MY_IDUP(6:7),-1).eq.Wm_ .and. CoupledVertex(MY_IDUP(8:9),-1).eq.Wp_) .or. &
+         (CoupledVertex(MY_IDUP(8:9),-1).eq.Z0_ .and. (MY_IDUP(6).eq.Pho_ .or. MY_IDUP(7).eq.Pho_)) &
+      ) then
+         call swap(ordering(1),ordering(3))
+         call swap(ordering(2),ordering(4))
+      endif
+      ordering_swap(:)=ordering(:)
+      call swap(ordering_swap(1),ordering_swap(3))
 
-         if( CoupledVertex(MY_IDUP(6:7),-1).eq.Z0_ ) then!  Z decay
-              if( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_) ) then
+      do j=1,4
+         MY_IDUP_ordered(j+5)=MY_IDUP(ordering(j)+3)
+      enddo
+
+         if( CoupledVertex(MY_IDUP_ordered(6:7),-1).eq.Z0_ ) then!  Z decay
+              if( abs(MY_IDUP_ordered(6)).eq.abs(ElM_) .or. abs(MY_IDUP_ordered(6)).eq.abs(MuM_) ) then
                     aL1=aL_lep    * dsqrt(scale_alpha_Z_ll)
                     aR1=aR_lep    * dsqrt(scale_alpha_Z_ll)
-              elseif( abs(MY_IDUP(6)).eq.abs(TaM_) ) then
+              elseif( abs(MY_IDUP_ordered(6)).eq.abs(TaM_) ) then
                     aL1=aL_lep    * dsqrt(scale_alpha_Z_tt)
                     aR1=aR_lep    * dsqrt(scale_alpha_Z_tt)
-              elseif( abs(MY_IDUP(6)).eq.abs(NuE_) .or. abs(MY_IDUP(6)).eq.abs(NuM_) .or. abs(MY_IDUP(6)).eq.abs(NuT_) ) then
+              elseif( abs(MY_IDUP_ordered(6)).eq.abs(NuE_) .or. abs(MY_IDUP_ordered(6)).eq.abs(NuM_) .or. abs(MY_IDUP_ordered(6)).eq.abs(NuT_) ) then
                     aL1=aL_neu    * dsqrt(scale_alpha_Z_nn)
                     aR1=aR_neu    * dsqrt(scale_alpha_Z_nn)
-              elseif( abs(MY_IDUP(6)).eq.abs(Up_) .or. abs(MY_IDUP(6)).eq.abs(Chm_) ) then
+              elseif( abs(MY_IDUP_ordered(6)).eq.abs(Up_) .or. abs(MY_IDUP_ordered(6)).eq.abs(Chm_) ) then
                     aL1=aL_QUp    * dsqrt(scale_alpha_Z_uu)
                     aR1=aR_QUp    * dsqrt(scale_alpha_Z_uu)
-              elseif( abs(MY_IDUP(6)).eq.abs(Dn_) .or. abs(MY_IDUP(6)).eq.abs(Str_) .or. abs(MY_IDUP(6)).eq.abs(Bot_) ) then
+              elseif( abs(MY_IDUP_ordered(6)).eq.abs(Dn_) .or. abs(MY_IDUP_ordered(6)).eq.abs(Str_) .or. abs(MY_IDUP_ordered(6)).eq.abs(Bot_) ) then
                     aL1=aL_QDn    * dsqrt(scale_alpha_Z_dd)
                     aR1=aR_QDn    * dsqrt(scale_alpha_Z_dd)
               else
                     aL1=0d0
                     aR1=0d0
               endif
-         elseif( (CoupledVertex(MY_IDUP(6:7),-1).eq.Wp_ .or. CoupledVertex(MY_IDUP(6:7),-1).eq.Wm_) ) then !  W decay
-              if( IsAQuark(MY_IDUP(6)) ) then
+         elseif( (CoupledVertex(MY_IDUP_ordered(6:7),-1).eq.Wp_ .or. CoupledVertex(MY_IDUP_ordered(6:7),-1).eq.Wm_) ) then !  W decay
+              if( IsAQuark(MY_IDUP_ordered(6)) ) then
                  aL1 = bL * dsqrt(scale_alpha_W_ud)
                  aR1 = bR * dsqrt(scale_alpha_W_ud)! = 0
-              elseif( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_) ) then
+              elseif( abs(MY_IDUP_ordered(6)).eq.abs(ElM_) .or. abs(MY_IDUP_ordered(6)).eq.abs(MuM_) ) then
                  aL1 = bL * dsqrt(scale_alpha_W_ln)
                  aR1 = bR * dsqrt(scale_alpha_W_ln)! = 0
-              elseif( abs(MY_IDUP(6)).eq.abs(TaM_) ) then
+              elseif( abs(MY_IDUP_ordered(6)).eq.abs(TaM_) ) then
                  aL1 = bL * dsqrt(scale_alpha_W_tn)
                  aR1 = bR * dsqrt(scale_alpha_W_tn)! = 0
               else
                  aL1=0d0
                  aR1=0d0
               endif
-         elseif( MY_IDUP(6).eq.Pho_ ) then !  photon
+         elseif( MY_IDUP_ordered(6).eq.Pho_ ) then !  photon
               aL1=1d0
               aR1=1d0
               prefactor = prefactor/gZ_sq ! cancel the overall Z/W coupling
@@ -86,41 +106,41 @@
               aR1=0d0
          endif
 
-         if( CoupledVertex(MY_IDUP(8:9),-1).eq.Z0_ ) then!  Z decay
-              if( abs(MY_IDUP(8)).eq.abs(ElM_) .or. abs(MY_IDUP(8)).eq.abs(MuM_) ) then
+         if( CoupledVertex(MY_IDUP_ordered(8:9),-1).eq.Z0_ ) then!  Z decay
+              if( abs(MY_IDUP_ordered(8)).eq.abs(ElM_) .or. abs(MY_IDUP_ordered(8)).eq.abs(MuM_) ) then
                     aL2=aL_lep    * dsqrt(scale_alpha_Z_ll)
                     aR2=aR_lep    * dsqrt(scale_alpha_Z_ll)
-              elseif( abs(MY_IDUP(8)).eq.abs(TaM_) ) then
+              elseif( abs(MY_IDUP_ordered(8)).eq.abs(TaM_) ) then
                     aL2=aL_lep    * dsqrt(scale_alpha_Z_tt)
                     aR2=aR_lep    * dsqrt(scale_alpha_Z_tt)
-              elseif( abs(MY_IDUP(8)).eq.abs(NuE_) .or. abs(MY_IDUP(8)).eq.abs(NuM_) .or. abs(MY_IDUP(8)).eq.abs(NuT_) ) then
+              elseif( abs(MY_IDUP_ordered(8)).eq.abs(NuE_) .or. abs(MY_IDUP_ordered(8)).eq.abs(NuM_) .or. abs(MY_IDUP_ordered(8)).eq.abs(NuT_) ) then
                     aL2=aL_neu    * dsqrt(scale_alpha_Z_nn)
                     aR2=aR_neu    * dsqrt(scale_alpha_Z_nn)
-              elseif( abs(MY_IDUP(8)).eq.abs(Up_) .or. abs(MY_IDUP(8)).eq.abs(Chm_) ) then
+              elseif( abs(MY_IDUP_ordered(8)).eq.abs(Up_) .or. abs(MY_IDUP_ordered(8)).eq.abs(Chm_) ) then
                     aL2=aL_QUp    * dsqrt(scale_alpha_Z_uu)
                     aR2=aR_QUp    * dsqrt(scale_alpha_Z_uu)
-              elseif( abs(MY_IDUP(8)).eq.abs(Dn_) .or. abs(MY_IDUP(8)).eq.abs(Str_) .or. abs(MY_IDUP(8)).eq.abs(Bot_) ) then
+              elseif( abs(MY_IDUP_ordered(8)).eq.abs(Dn_) .or. abs(MY_IDUP_ordered(8)).eq.abs(Str_) .or. abs(MY_IDUP_ordered(8)).eq.abs(Bot_) ) then
                     aL2=aL_QDn    * dsqrt(scale_alpha_Z_dd)
                     aR2=aR_QDn    * dsqrt(scale_alpha_Z_dd)
               else
                     aL2=0d0
                     aR2=0d0
               endif
-         elseif( (CoupledVertex(MY_IDUP(8:9),-1).eq.Wp_ .or. CoupledVertex(MY_IDUP(8:9),-1).eq.Wm_) ) then !  W decay
-              if( IsAQuark(MY_IDUP(8)) ) then
+         elseif( (CoupledVertex(MY_IDUP_ordered(8:9),-1).eq.Wp_ .or. CoupledVertex(MY_IDUP_ordered(8:9),-1).eq.Wm_) ) then !  W decay
+              if( IsAQuark(MY_IDUP_ordered(8)) ) then
                  aL2 = bL * dsqrt(scale_alpha_W_ud)
                  aR2 = bR * dsqrt(scale_alpha_W_ud)! = 0
-              elseif( abs(MY_IDUP(9)).eq.abs(ElM_) .or. abs(MY_IDUP(9)).eq.abs(MuM_) ) then
+              elseif( abs(MY_IDUP_ordered(9)).eq.abs(ElM_) .or. abs(MY_IDUP_ordered(9)).eq.abs(MuM_) ) then
                  aL2 = bL * dsqrt(scale_alpha_W_ln)
                  aR2 = bR * dsqrt(scale_alpha_W_ln)! = 0
-              elseif( abs(MY_IDUP(9)).eq.abs(TaM_) ) then
+              elseif( abs(MY_IDUP_ordered(9)).eq.abs(TaM_) ) then
                  aL2 = bL * dsqrt(scale_alpha_W_tn)
                  aR2 = bR * dsqrt(scale_alpha_W_tn)! = 0
               else
                  aL2=0d0
                  aR2=0d0
               endif
-         elseif( MY_IDUP(8).eq.Pho_ ) then !  photon
+         elseif( MY_IDUP_ordered(8).eq.Pho_ ) then !  photon
               aL2=1d0
               aR2=1d0
               prefactor = prefactor/gZ_sq ! cancel the overall Z/W coupling
@@ -139,15 +159,9 @@ do i4 = 1,2
 !do i3 = -1,1! on-shell check!
 !do i4 = -1,1! on-shell check!
 
-         if(CoupledVertex(MY_IDUP(8:9),-1).eq.Wp_ .and. CoupledVertex(MY_IDUP(6:7),-1).eq.Wm_) then
-            ordering = (/5,6,3,4/)
-         else
-            ordering = (/3,4,5,6/)
-         endif
          call calcHelAmp(ordering,p(1:4,1:6),i1,i3,i4,A(1))
          if( (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then
-             call swap(ordering(2),ordering(4))
-             call calcHelAmp(ordering,p(1:4,1:6),i1,i3,i4,A(2))
+             call calcHelAmp(ordering_swap,p(1:4,1:6),i1,i3,i4,A(2))
              A(2) = -A(2) ! minus comes from fermi statistics
          endif
 
@@ -200,6 +214,12 @@ enddo
       l2=ordering(2)
       l3=ordering(3)
       l4=ordering(4)
+
+      !print *,"p(6)=",(p(:,l1))
+      !print *,"p(7)=",(p(:,l2))
+      !print *,"p(8)=",(p(:,l3))
+      !print *,"p(9)=",(p(:,l4))
+      !pause
 
       s  = two*scr(p(:,1),p(:,2))
       propG = s/dcmplx(s - M_Reso**2,M_Reso*Ga_Reso)
@@ -381,7 +401,7 @@ enddo
       integer, intent(in) :: MY_IDUP(6:9)
       real(dp) :: pin(4,4)
       complex(dp) :: A(2)
-      integer :: i1,i2,i3,i4,ordering(1:4)
+      integer :: i1,i2,i3,i4,ordering(1:4),ordering_swap(1:4),MY_IDUP_ordered(6:9),j
       real(dp) :: aL1,aR1,aL2,aR2
       real(dp) :: gZ_sq
       real(dp) :: prefactor
@@ -399,41 +419,62 @@ enddo
       prefactor = gZ_sq**2
 
 
-         if( CoupledVertex(MY_IDUP(6:7),-1).eq.Z0_ ) then!  Z decay
-              if( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_) ) then
+      ordering=(/3,4,5,6/)
+      if(convertLHE(MY_IDUP(6)).lt.0 .or. MY_IDUP(6).eq.Not_a_particle_) then
+         call swap(ordering(1),ordering(2))
+      endif
+      if(convertLHE(MY_IDUP(8)).lt.0 .or. MY_IDUP(8).eq.Not_a_particle_) then
+         call swap(ordering(3),ordering(4))
+      endif
+      if( &
+         (CoupledVertex(MY_IDUP(6:7),-1).eq.Wm_ .and. CoupledVertex(MY_IDUP(8:9),-1).eq.Wp_) .or. &
+         (CoupledVertex(MY_IDUP(8:9),-1).eq.Z0_ .and. (MY_IDUP(6).eq.Pho_ .or. MY_IDUP(7).eq.Pho_)) &
+      ) then
+         call swap(ordering(1),ordering(3))
+         call swap(ordering(2),ordering(4))
+      endif
+      ordering_swap(:)=ordering(:)
+      call swap(ordering_swap(1),ordering_swap(3))
+
+      do j=1,4
+         MY_IDUP_ordered(j+5)=MY_IDUP(ordering(j)+3)
+      enddo
+
+         if( CoupledVertex(MY_IDUP_ordered(6:7),-1).eq.Z0_ ) then!  Z decay
+              if( abs(MY_IDUP_ordered(6)).eq.abs(ElM_) .or. abs(MY_IDUP_ordered(6)).eq.abs(MuM_) ) then
                     aL1=aL_lep    * dsqrt(scale_alpha_Z_ll)
                     aR1=aR_lep    * dsqrt(scale_alpha_Z_ll)
-              elseif( abs(MY_IDUP(6)).eq.abs(TaM_) ) then
+              elseif( abs(MY_IDUP_ordered(6)).eq.abs(TaM_) ) then
                     aL1=aL_lep    * dsqrt(scale_alpha_Z_tt)
                     aR1=aR_lep    * dsqrt(scale_alpha_Z_tt)
-              elseif( abs(MY_IDUP(6)).eq.abs(NuE_) .or. abs(MY_IDUP(6)).eq.abs(NuM_) .or. abs(MY_IDUP(6)).eq.abs(NuT_) ) then
+              elseif( abs(MY_IDUP_ordered(6)).eq.abs(NuE_) .or. abs(MY_IDUP_ordered(6)).eq.abs(NuM_) .or. abs(MY_IDUP_ordered(6)).eq.abs(NuT_) ) then
                     aL1=aL_neu    * dsqrt(scale_alpha_Z_nn)
                     aR1=aR_neu    * dsqrt(scale_alpha_Z_nn)
-              elseif( abs(MY_IDUP(6)).eq.abs(Up_) .or. abs(MY_IDUP(6)).eq.abs(Chm_) ) then
+              elseif( abs(MY_IDUP_ordered(6)).eq.abs(Up_) .or. abs(MY_IDUP_ordered(6)).eq.abs(Chm_) ) then
                     aL1=aL_QUp    * dsqrt(scale_alpha_Z_uu)
                     aR1=aR_QUp    * dsqrt(scale_alpha_Z_uu)
-              elseif( abs(MY_IDUP(6)).eq.abs(Dn_) .or. abs(MY_IDUP(6)).eq.abs(Str_) .or. abs(MY_IDUP(6)).eq.abs(Bot_) ) then
+              elseif( abs(MY_IDUP_ordered(6)).eq.abs(Dn_) .or. abs(MY_IDUP_ordered(6)).eq.abs(Str_) .or. abs(MY_IDUP_ordered(6)).eq.abs(Bot_) ) then
                     aL1=aL_QDn    * dsqrt(scale_alpha_Z_dd)
                     aR1=aR_QDn    * dsqrt(scale_alpha_Z_dd)
               else
                     aL1=0d0
                     aR1=0d0
               endif
-         elseif( (CoupledVertex(MY_IDUP(6:7),-1).eq.Wp_ .or. CoupledVertex(MY_IDUP(6:7),-1).eq.Wm_) ) then !  W decay
-              if( IsAQuark(MY_IDUP(6)) ) then
+         elseif( (CoupledVertex(MY_IDUP_ordered(6:7),-1).eq.Wp_ .or. CoupledVertex(MY_IDUP_ordered(6:7),-1).eq.Wm_) ) then !  W decay
+              if( IsAQuark(MY_IDUP_ordered(6)) ) then
                  aL1 = bL * dsqrt(scale_alpha_W_ud)
                  aR1 = bR * dsqrt(scale_alpha_W_ud)! = 0
-              elseif( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_) ) then
+              elseif( abs(MY_IDUP_ordered(6)).eq.abs(ElM_) .or. abs(MY_IDUP_ordered(6)).eq.abs(MuM_) ) then
                  aL1 = bL * dsqrt(scale_alpha_W_ln)
                  aR1 = bR * dsqrt(scale_alpha_W_ln)! = 0
-              elseif( abs(MY_IDUP(6)).eq.abs(TaM_) ) then
+              elseif( abs(MY_IDUP_ordered(6)).eq.abs(TaM_) ) then
                  aL1 = bL * dsqrt(scale_alpha_W_tn)
                  aR1 = bR * dsqrt(scale_alpha_W_tn)! = 0
               else
                  aL1=0d0
                  aR1=0d0
               endif
-         elseif( MY_IDUP(6).eq.Pho_ ) then !  photon
+         elseif( MY_IDUP_ordered(6).eq.Pho_ ) then !  photon
               aL1=1d0
               aR1=1d0
               prefactor = prefactor/gZ_sq ! cancel the overall Z/W coupling
@@ -442,41 +483,41 @@ enddo
               aR1=0d0
          endif
 
-         if( CoupledVertex(MY_IDUP(8:9),-1).eq.Z0_ ) then!  Z decay
-              if( abs(MY_IDUP(8)).eq.abs(ElM_) .or. abs(MY_IDUP(8)).eq.abs(MuM_) ) then
+         if( CoupledVertex(MY_IDUP_ordered(8:9),-1).eq.Z0_ ) then!  Z decay
+              if( abs(MY_IDUP_ordered(8)).eq.abs(ElM_) .or. abs(MY_IDUP_ordered(8)).eq.abs(MuM_) ) then
                     aL2=aL_lep    * dsqrt(scale_alpha_Z_ll)
                     aR2=aR_lep    * dsqrt(scale_alpha_Z_ll)
-              elseif( abs(MY_IDUP(8)).eq.abs(TaM_) ) then
+              elseif( abs(MY_IDUP_ordered(8)).eq.abs(TaM_) ) then
                     aL2=aL_lep    * dsqrt(scale_alpha_Z_tt)
                     aR2=aR_lep    * dsqrt(scale_alpha_Z_tt)
-              elseif( abs(MY_IDUP(8)).eq.abs(NuE_) .or. abs(MY_IDUP(8)).eq.abs(NuM_) .or. abs(MY_IDUP(8)).eq.abs(NuT_) ) then
+              elseif( abs(MY_IDUP_ordered(8)).eq.abs(NuE_) .or. abs(MY_IDUP_ordered(8)).eq.abs(NuM_) .or. abs(MY_IDUP_ordered(8)).eq.abs(NuT_) ) then
                     aL2=aL_neu    * dsqrt(scale_alpha_Z_nn)
                     aR2=aR_neu    * dsqrt(scale_alpha_Z_nn)
-              elseif( abs(MY_IDUP(8)).eq.abs(Up_) .or. abs(MY_IDUP(8)).eq.abs(Chm_) ) then
+              elseif( abs(MY_IDUP_ordered(8)).eq.abs(Up_) .or. abs(MY_IDUP_ordered(8)).eq.abs(Chm_) ) then
                     aL2=aL_QUp    * dsqrt(scale_alpha_Z_uu)
                     aR2=aR_QUp    * dsqrt(scale_alpha_Z_uu)
-              elseif( abs(MY_IDUP(8)).eq.abs(Dn_) .or. abs(MY_IDUP(8)).eq.abs(Str_) .or. abs(MY_IDUP(8)).eq.abs(Bot_) ) then
+              elseif( abs(MY_IDUP_ordered(8)).eq.abs(Dn_) .or. abs(MY_IDUP_ordered(8)).eq.abs(Str_) .or. abs(MY_IDUP_ordered(8)).eq.abs(Bot_) ) then
                     aL2=aL_QDn    * dsqrt(scale_alpha_Z_dd)
                     aR2=aR_QDn    * dsqrt(scale_alpha_Z_dd)
               else
                     aL2=0d0
                     aR2=0d0
               endif
-         elseif( (CoupledVertex(MY_IDUP(8:9),-1).eq.Wp_ .or. CoupledVertex(MY_IDUP(8:9),-1).eq.Wm_) ) then !  W decay
-              if( IsAQuark(MY_IDUP(8)) ) then
+         elseif( (CoupledVertex(MY_IDUP_ordered(8:9),-1).eq.Wp_ .or. CoupledVertex(MY_IDUP_ordered(8:9),-1).eq.Wm_) ) then !  W decay
+              if( IsAQuark(MY_IDUP_ordered(8)) ) then
                  aL2 = bL * dsqrt(scale_alpha_W_ud)
                  aR2 = bR * dsqrt(scale_alpha_W_ud)! = 0
-              elseif( abs(MY_IDUP(9)).eq.abs(ElM_) .or. abs(MY_IDUP(9)).eq.abs(MuM_) ) then
+              elseif( abs(MY_IDUP_ordered(9)).eq.abs(ElM_) .or. abs(MY_IDUP_ordered(9)).eq.abs(MuM_) ) then
                  aL2 = bL * dsqrt(scale_alpha_W_ln)
                  aR2 = bR * dsqrt(scale_alpha_W_ln)! = 0
-              elseif( abs(MY_IDUP(9)).eq.abs(TaM_) ) then
+              elseif( abs(MY_IDUP_ordered(9)).eq.abs(TaM_) ) then
                  aL2 = bL * dsqrt(scale_alpha_W_tn)
                  aR2 = bR * dsqrt(scale_alpha_W_tn)! = 0
               else
                  aL2=0d0
                  aR2=0d0
               endif
-         elseif( MY_IDUP(8).eq.Pho_ ) then !  photon
+         elseif( MY_IDUP_ordered(8).eq.Pho_ ) then !  photon
               aL2=1d0
               aR2=1d0
               prefactor = prefactor/gZ_sq ! cancel the overall Z/W coupling
@@ -493,15 +534,9 @@ do i1 =-1,1! Z' boson
 do i3 = 1,2! lepton string1
 do i4 = 1,2! lepton string2
 
-         if(CoupledVertex(MY_IDUP(8:9),-1).eq.Wp_ .and. CoupledVertex(MY_IDUP(6:7),-1).eq.Wm_) then
-            ordering = (/5,6,3,4/)
-         else
-            ordering = (/3,4,5,6/)
-         endif
          call calcHelAmp2(ordering,p(1:4,1:6),i1,i3,i4,A(1))
          if( (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then
-             call swap(ordering(2),ordering(4))
-             call calcHelAmp2(ordering,p(1:4,1:6),i1,i3,i4,A(2))
+             call calcHelAmp2(ordering_swap,p(1:4,1:6),i1,i3,i4,A(2))
              A(2) = -A(2) ! minus comes from fermi statistics
          endif
 

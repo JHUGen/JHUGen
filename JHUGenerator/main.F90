@@ -461,6 +461,19 @@ logical :: SetpTcut, SetdeltaRcut
     call ReadCommandLineArgument(arg, "cz_q1sq", success, cz_q1sq, success2=SetAnomalousSpin0ZZ)
     call ReadCommandLineArgument(arg, "cz_q2sq", success, cz_q1sq, success2=SetAnomalousSpin0ZZ)
     call ReadCommandLineArgument(arg, "cz_q12sq", success, cz_q1sq, success2=SetAnomalousSpin0ZZ)
+    ! Lambda's for q1,2,12**2 for the Lambda's
+    call ReadCommandLineArgument(arg, "Lambda_z11", success, Lambda_z11, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "Lambda_z21", success, Lambda_z21, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "Lambda_z31", success, Lambda_z31, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "Lambda_z41", success, Lambda_z41, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "Lambda_z12", success, Lambda_z12, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "Lambda_z22", success, Lambda_z22, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "Lambda_z32", success, Lambda_z32, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "Lambda_z42", success, Lambda_z42, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "Lambda_z10", success, Lambda_z10, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "Lambda_z20", success, Lambda_z20, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "Lambda_z30", success, Lambda_z30, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "Lambda_z40", success, Lambda_z40, success2=SetAnomalousSpin0ZZ)
 
     !spin 0 WW couplings
     call ReadCommandLineArgument(arg, "ghw1", success, ghw1, success2=distinguish_HWWcouplings)
@@ -504,6 +517,19 @@ logical :: SetpTcut, SetdeltaRcut
     call ReadCommandLineArgument(arg, "cw_q1sq", success, cw_q1sq, success2=distinguish_HWWcouplings)
     call ReadCommandLineArgument(arg, "cw_q2sq", success, cw_q1sq, success2=distinguish_HWWcouplings)
     call ReadCommandLineArgument(arg, "cw_q12sq", success, cw_q1sq, success2=distinguish_HWWcouplings)
+    ! Lambda's for q1,2,12**2 for the Lambda's
+    call ReadCommandLineArgument(arg, "Lambda_w11", success, Lambda_w11, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "Lambda_w21", success, Lambda_w21, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "Lambda_w31", success, Lambda_w31, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "Lambda_w41", success, Lambda_w41, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "Lambda_w12", success, Lambda_w12, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "Lambda_w22", success, Lambda_w22, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "Lambda_w32", success, Lambda_w32, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "Lambda_w42", success, Lambda_w42, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "Lambda_w10", success, Lambda_w10, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "Lambda_w20", success, Lambda_w20, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "Lambda_w30", success, Lambda_w30, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "Lambda_w40", success, Lambda_w40, success2=distinguish_HWWcouplings)
 
     !spin 1
     call ReadCommandLineArgument(arg, "zprime_qq_left", success, zprime_qq_left, success2=SetAnomalousSpin1qq, success3=Setspin1qqleft)
@@ -4146,44 +4172,104 @@ character :: arg*(500)
             write(TheUnit,"(6X,A,2E16.8,A1)") "ahz2=",ahz2,"i"
             write(TheUnit,"(6X,A,2E16.8,A1)") "ahz3=",ahz3,"i"
         else
-            write(TheUnit,"(6X,A,2E16.8,A1)") "ghg2=",ghg2,"i"
-            write(TheUnit,"(6X,A,2E16.8,A1)") "ghg3=",ghg3,"i"
-            write(TheUnit,"(6X,A,2E16.8,A1)") "ghg4=",ghg4,"i"
-            write(TheUnit,"(6X,A,2E16.8,A1)") "ghz1=",ghz1,"i"
-            write(TheUnit,"(6X,A,2E16.8,A1)") "ghz2=",ghz2,"i"
-            write(TheUnit,"(6X,A,2E16.8,A1)") "ghz3=",ghz3,"i"
-            write(TheUnit,"(6X,A,2E16.8,A1)") "ghz4=",ghz4,"i"
+            if( cdabs(ghg2 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghg2=",ghg2,"i"
+            if( cdabs(ghg3 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghg3=",ghg3,"i"
+            if( cdabs(ghg4 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghg4=",ghg4,"i"
+            if( cdabs(ghz1 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghz1=",ghz1,"i"
+            if( cdabs(ghz2 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghz2=",ghz2,"i"
+            if( cdabs(ghz3 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghz3=",ghz3,"i"
+            if( cdabs(ghz4 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghz4=",ghz4,"i"
             if( includeGammaStar .or. IsAPhoton(DecayMode2) ) then
                 if( includeGammaStar .or. IsAZDecay(DecayMode1) ) then
-                    write(TheUnit,"(6X,A,2E16.8,A1)") "ghzgs2=",ghzgs2,"i"
-                    write(TheUnit,"(6X,A,2E16.8,A1)") "ghzgs3=",ghzgs3,"i"
-                    write(TheUnit,"(6X,A,2E16.8,A1)") "ghzgs4=",ghzgs4,"i"
+                    if( cdabs(ghzgs2 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzgs2=",ghzgs2,"i"
+                    if( cdabs(ghzgs3 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzgs3=",ghzgs3,"i"
+                    if( cdabs(ghzgs4 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzgs4=",ghzgs4,"i"
                 endif
                 if( includeGammaStar .or. IsAPhoton(DecayMode1) ) then
-                    write(TheUnit,"(6X,A,2E16.8,A1)") "ghgsgs2=",ghgsgs2,"i"
-                    write(TheUnit,"(6X,A,2E16.8,A1)") "ghgsgs3=",ghgsgs3,"i"
-                    write(TheUnit,"(6X,A,2E16.8,A1)") "ghgsgs4=",ghgsgs4,"i"
+                    if( cdabs(ghgsgs2 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghgsgs2=",ghgsgs2,"i"
+                    if( cdabs(ghgsgs3 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghgsgs3=",ghgsgs3,"i"
+                    if( cdabs(ghgsgs4 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghgsgs4=",ghgsgs4,"i"
                 endif
                 if( includeGammaStar .and. .not.(Process.eq.60 .or. Process.eq.66)) then
                     write(TheUnit,"(6X,A,F8.2,A)") "m(gammastar) >= ", MPhotonCutoff/GeV, " GeV"
                 endif
             endif
-            if( cdabs(ghz1_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz1_prime= ",ghz1_prime ,"i,","Lambda_z1=",Lambda_z1*100d0
-            if( cdabs(ghz1_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz1_prime2=",ghz1_prime2,"i,","Lambda_z1=",Lambda_z1*100d0
-            if( cdabs(ghz1_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz1_prime3=",ghz1_prime3,"i,","Lambda_z1=",Lambda_z1*100d0
-            if( cdabs(ghz1_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz1_prime4=",ghz1_prime4,"i,","Lambda_z1=",Lambda_z1*100d0
-            if( cdabs(ghz2_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz2_prime= ",ghz2_prime ,"i,","Lambda_z2=",Lambda_z2*100d0
-            if( cdabs(ghz2_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz2_prime2=",ghz2_prime2,"i,","Lambda_z2=",Lambda_z2*100d0
-            if( cdabs(ghz2_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz2_prime3=",ghz2_prime3,"i,","Lambda_z2=",Lambda_z2*100d0
-            if( cdabs(ghz2_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz2_prime4=",ghz2_prime4,"i,","Lambda_z2=",Lambda_z2*100d0
-            if( cdabs(ghz3_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz3_prime= ",ghz3_prime ,"i,","Lambda_z3=",Lambda_z3*100d0
-            if( cdabs(ghz3_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz3_prime2=",ghz3_prime2,"i,","Lambda_z3=",Lambda_z3*100d0
-            if( cdabs(ghz3_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz3_prime3=",ghz3_prime3,"i,","Lambda_z3=",Lambda_z3*100d0
-            if( cdabs(ghz3_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz3_prime4=",ghz3_prime4,"i,","Lambda_z3=",Lambda_z3*100d0
-            if( cdabs(ghz4_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz4_prime= ",ghz4_prime ,"i,","Lambda_z4=",Lambda_z4*100d0
-            if( cdabs(ghz4_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz4_prime2=",ghz4_prime2,"i,","Lambda_z4=",Lambda_z4*100d0
-            if( cdabs(ghz4_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz4_prime3=",ghz4_prime3,"i,","Lambda_z4=",Lambda_z4*100d0
-            if( cdabs(ghz4_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz4_prime4=",ghz4_prime4,"i,","Lambda_z4=",Lambda_z4*100d0
+            if( cdabs(ghz1_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz1_prime= ",ghz1_prime ,"i,","Lambda_z1=",Lambda_z1/GeV
+            if( cdabs(ghz1_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz1_prime2=",ghz1_prime2,"i,","Lambda_z1=",Lambda_z1/GeV
+            if( cdabs(ghz1_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz1_prime3=",ghz1_prime3,"i,","Lambda_z1=",Lambda_z1/GeV
+            if( cdabs(ghz1_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz1_prime4=",ghz1_prime4,"i,","Lambda_z1=",Lambda_z1/GeV
+            if( cdabs(ghz2_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz2_prime= ",ghz2_prime ,"i,","Lambda_z2=",Lambda_z2/GeV
+            if( cdabs(ghz2_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz2_prime2=",ghz2_prime2,"i,","Lambda_z2=",Lambda_z2/GeV
+            if( cdabs(ghz2_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz2_prime3=",ghz2_prime3,"i,","Lambda_z2=",Lambda_z2/GeV
+            if( cdabs(ghz2_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz2_prime4=",ghz2_prime4,"i,","Lambda_z2=",Lambda_z2/GeV
+            if( cdabs(ghz3_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz3_prime= ",ghz3_prime ,"i,","Lambda_z3=",Lambda_z3/GeV
+            if( cdabs(ghz3_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz3_prime2=",ghz3_prime2,"i,","Lambda_z3=",Lambda_z3/GeV
+            if( cdabs(ghz3_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz3_prime3=",ghz3_prime3,"i,","Lambda_z3=",Lambda_z3/GeV
+            if( cdabs(ghz3_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz3_prime4=",ghz3_prime4,"i,","Lambda_z3=",Lambda_z3/GeV
+            if( cdabs(ghz4_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz4_prime= ",ghz4_prime ,"i,","Lambda_z4=",Lambda_z4/GeV
+            if( cdabs(ghz4_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz4_prime2=",ghz4_prime2,"i,","Lambda_z4=",Lambda_z4/GeV
+            if( cdabs(ghz4_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz4_prime3=",ghz4_prime3,"i,","Lambda_z4=",Lambda_z4/GeV
+            if( cdabs(ghz4_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz4_prime4=",ghz4_prime4,"i,","Lambda_z4=",Lambda_z4/GeV
+            if( cz_q1sq.ne.0) then
+               write(TheUnit,"(6X,A,1PE12.4)") "Lambda_z11= ",Lambda_z11/GeV
+               write(TheUnit,"(6X,A,1PE12.4)") "Lambda_z21= ",Lambda_z21/GeV
+               write(TheUnit,"(6X,A,1PE12.4)") "Lambda_z31= ",Lambda_z31/GeV
+               write(TheUnit,"(6X,A,1PE12.4)") "Lambda_z41= ",Lambda_z41/GeV
+            endif
+            if( cz_q2sq.ne.0) then
+               write(TheUnit,"(6X,A,1PE12.4)") "Lambda_z12= ",Lambda_z12/GeV
+               write(TheUnit,"(6X,A,1PE12.4)") "Lambda_z22= ",Lambda_z22/GeV
+               write(TheUnit,"(6X,A,1PE12.4)") "Lambda_z32= ",Lambda_z32/GeV
+               write(TheUnit,"(6X,A,1PE12.4)") "Lambda_z42= ",Lambda_z42/GeV
+            endif
+            if( cz_q12sq.ne.0) then
+               write(TheUnit,"(6X,A,1PE12.4)") "Lambda_z10= ",Lambda_z10/GeV
+               write(TheUnit,"(6X,A,1PE12.4)") "Lambda_z20= ",Lambda_z20/GeV
+               write(TheUnit,"(6X,A,1PE12.4)") "Lambda_z30= ",Lambda_z30/GeV
+               write(TheUnit,"(6X,A,1PE12.4)") "Lambda_z40= ",Lambda_z40/GeV
+            endif
+
+            if(distinguish_HWWcouplings) then
+               if( cdabs(ghw1 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghw1=",ghw1,"i"
+               if( cdabs(ghw2 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghw2=",ghw2,"i"
+               if( cdabs(ghw3 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghw3=",ghw3,"i"
+               if( cdabs(ghw4 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghw4=",ghw4,"i"
+               if( cdabs(ghw1_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw1_prime= ",ghw1_prime ,"i,","Lambda_z1=",Lambda_z1/GeV
+               if( cdabs(ghw1_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw1_prime2=",ghw1_prime2,"i,","Lambda_z1=",Lambda_z1/GeV
+               if( cdabs(ghw1_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw1_prime3=",ghw1_prime3,"i,","Lambda_z1=",Lambda_z1/GeV
+               if( cdabs(ghw1_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw1_prime4=",ghw1_prime4,"i,","Lambda_z1=",Lambda_z1/GeV
+               if( cdabs(ghw2_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw2_prime= ",ghw2_prime ,"i,","Lambda_z2=",Lambda_z2/GeV
+               if( cdabs(ghw2_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw2_prime2=",ghw2_prime2,"i,","Lambda_z2=",Lambda_z2/GeV
+               if( cdabs(ghw2_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw2_prime3=",ghw2_prime3,"i,","Lambda_z2=",Lambda_z2/GeV
+               if( cdabs(ghw2_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw2_prime4=",ghw2_prime4,"i,","Lambda_z2=",Lambda_z2/GeV
+               if( cdabs(ghw3_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw3_prime= ",ghw3_prime ,"i,","Lambda_z3=",Lambda_z3/GeV
+               if( cdabs(ghw3_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw3_prime2=",ghw3_prime2,"i,","Lambda_z3=",Lambda_z3/GeV
+               if( cdabs(ghw3_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw3_prime3=",ghw3_prime3,"i,","Lambda_z3=",Lambda_z3/GeV
+               if( cdabs(ghw3_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw3_prime4=",ghw3_prime4,"i,","Lambda_z3=",Lambda_z3/GeV
+               if( cdabs(ghw4_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw4_prime= ",ghw4_prime ,"i,","Lambda_z4=",Lambda_z4/GeV
+               if( cdabs(ghw4_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw4_prime2=",ghw4_prime2,"i,","Lambda_z4=",Lambda_z4/GeV
+               if( cdabs(ghw4_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw4_prime3=",ghw4_prime3,"i,","Lambda_z4=",Lambda_z4/GeV
+               if( cdabs(ghw4_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw4_prime4=",ghw4_prime4,"i,","Lambda_z4=",Lambda_z4/GeV
+               if( cw_q1sq.ne.0) then
+                  write(TheUnit,"(6X,A,1PE12.4)") "Lambda_w11= ",Lambda_w11/GeV
+                  write(TheUnit,"(6X,A,1PE12.4)") "Lambda_w21= ",Lambda_w21/GeV
+                  write(TheUnit,"(6X,A,1PE12.4)") "Lambda_w31= ",Lambda_w31/GeV
+                  write(TheUnit,"(6X,A,1PE12.4)") "Lambda_w41= ",Lambda_w41/GeV
+               endif
+               if( cw_q2sq.ne.0) then
+                  write(TheUnit,"(6X,A,1PE12.4)") "Lambda_w12= ",Lambda_w12/GeV
+                  write(TheUnit,"(6X,A,1PE12.4)") "Lambda_w22= ",Lambda_w22/GeV
+                  write(TheUnit,"(6X,A,1PE12.4)") "Lambda_w32= ",Lambda_w32/GeV
+                  write(TheUnit,"(6X,A,1PE12.4)") "Lambda_w42= ",Lambda_w42/GeV
+               endif
+               if( cw_q12sq.ne.0) then
+                  write(TheUnit,"(6X,A,1PE12.4)") "Lambda_w10= ",Lambda_w10/GeV
+                  write(TheUnit,"(6X,A,1PE12.4)") "Lambda_w20= ",Lambda_w20/GeV
+                  write(TheUnit,"(6X,A,1PE12.4)") "Lambda_w30= ",Lambda_w30/GeV
+                  write(TheUnit,"(6X,A,1PE12.4)") "Lambda_w40= ",Lambda_w40/GeV
+               endif
+            endif
+
         endif
     elseif( Process.eq.1 ) then
         write(TheUnit,"(4X,A)") "spin-1-VV couplings: "

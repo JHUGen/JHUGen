@@ -28,6 +28,7 @@
       real(dp) :: gZ_sq
       real(dp) :: prefactor,res2
       real(dp) :: intcolfac
+      integer :: ordering(1:4),ordering_swap(1:4)
 
          if(IsAQuark(MY_IDUP(6)) .and. IsAQuark(MY_IDUP(8))) then
             intcolfac=1.0_dp/3.0_dp
@@ -39,7 +40,7 @@
              VVMode = ZZMode
          elseif( (CoupledVertex(MY_IDUP(6:7),-1).eq.Wp_ .and. CoupledVertex(MY_IDUP(8:9),-1).eq.Wm_) .or. (CoupledVertex(MY_IDUP(6:7),-1).eq.Wm_ .and. CoupledVertex(MY_IDUP(8:9),-1).eq.Wp_) ) then
              VVMode = WWMode
-         elseif(CoupledVertex(MY_IDUP(6:7),-1).eq.Z0_ .and. MY_IDUP(8).eq.Pho_) then
+         elseif((CoupledVertex(MY_IDUP(6:7),-1).eq.Z0_ .and. (MY_IDUP(8).eq.Pho_ .or. MY_IDUP(9).eq.Pho_)) .or. (CoupledVertex(MY_IDUP(8:9),-1).eq.Z0_ .and. (MY_IDUP(6).eq.Pho_ .or. MY_IDUP(7).eq.Pho_))) then
              VVMode = ZgMode
          elseif(MY_IDUP(6).eq.Pho_ .and. MY_IDUP(8).eq.Pho_) then
              VVMode = ggMode
@@ -63,6 +64,22 @@
          endif
          prefactor = prefactor * (alphas/(3.0_dp*pi*vev))**2
 
+         ordering=(/3,4,5,6/)
+         if(convertLHE(MY_IDUP(6)).lt.0 .or. MY_IDUP(6).eq.Not_a_particle_) then
+            call swap(ordering(1),ordering(2))
+         endif
+         if(convertLHE(MY_IDUP(8)).lt.0 .or. MY_IDUP(8).eq.Not_a_particle_) then
+            call swap(ordering(3),ordering(4))
+         endif
+         if( &
+            (CoupledVertex(MY_IDUP(6:7),-1).eq.Wm_ .and. CoupledVertex(MY_IDUP(8:9),-1).eq.Wp_) .or. &
+            (CoupledVertex(MY_IDUP(8:9),-1).eq.Z0_ .and. (MY_IDUP(6).eq.Pho_ .or. MY_IDUP(7).eq.Pho_)) &
+         ) then
+            call swap(ordering(1),ordering(3))
+            call swap(ordering(2),ordering(4))
+         endif
+         ordering_swap(:)=ordering(:)
+         call swap(ordering_swap(1),ordering_swap(3))
 
 
 ! ! MADGRAPH CHECK
@@ -82,21 +99,21 @@
           res = zero
           A_VV(:) = 0d0
           do i1=1,2;  do i2=1,2;  do i3=1,2;  do i4=1,2!  sum over helicities
-                  call calcHelAmp((/3,4,5,6/),VVMode,MY_IDUP,p(1:4,1:6),i1,i2,i3,i4,A_VV(1))
+                  call calcHelAmp(ordering,VVMode,MY_IDUP,p(1:4,1:6),i1,i2,i3,i4,A_VV(1))
                   if( (VVMode.eq.ZZMode) .and. includeGammaStar ) then
-                      call calcHelAmp((/3,4,5,6/),ZgsMode,MY_IDUP,p(1:4,1:6),i1,i2,i3,i4,A_VV(3))
-                      call calcHelAmp((/3,4,5,6/),gsZMode,MY_IDUP,p(1:4,1:6),i1,i2,i3,i4,A_VV(5))
-                      call calcHelAmp((/3,4,5,6/),gsgsMode,MY_IDUP,p(1:4,1:6),i1,i2,i3,i4,A_VV(7))
+                      call calcHelAmp(ordering,ZgsMode,MY_IDUP,p(1:4,1:6),i1,i2,i3,i4,A_VV(3))
+                      call calcHelAmp(ordering,gsZMode,MY_IDUP,p(1:4,1:6),i1,i2,i3,i4,A_VV(5))
+                      call calcHelAmp(ordering,gsgsMode,MY_IDUP,p(1:4,1:6),i1,i2,i3,i4,A_VV(7))
                   elseif( VVMode.eq.ZgMode .and. includeGammaStar ) then
-                      call calcHelAmp((/3,4,5,6/),gsgMode,MY_IDUP,p(1:4,1:6),i1,i2,i3,i4,A_VV(3))
+                      call calcHelAmp(ordering,gsgMode,MY_IDUP,p(1:4,1:6),i1,i2,i3,i4,A_VV(3))
                   endif
 
                   if( (VVMode.eq.ZZMode) .and. (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then
-                      call calcHelAmp((/5,4,3,6/),VVMode,MY_IDUP,p(1:4,1:6),i1,i2,i3,i4,A_VV(2))
+                      call calcHelAmp(ordering_swap,VVMode,MY_IDUP,p(1:4,1:6),i1,i2,i3,i4,A_VV(2))
                       if( includeGammaStar ) then
-                          call calcHelAmp((/5,4,3,6/),ZgsMode,MY_IDUP,p(1:4,1:6),i1,i2,i3,i4,A_VV(4))
-                          call calcHelAmp((/5,4,3,6/),gsZMode,MY_IDUP,p(1:4,1:6),i1,i2,i3,i4,A_VV(6))
-                          call calcHelAmp((/5,4,3,6/),gsgsMode,MY_IDUP,p(1:4,1:6),i1,i2,i3,i4,A_VV(8))
+                          call calcHelAmp(ordering_swap,ZgsMode,MY_IDUP,p(1:4,1:6),i1,i2,i3,i4,A_VV(4))
+                          call calcHelAmp(ordering_swap,gsZMode,MY_IDUP,p(1:4,1:6),i1,i2,i3,i4,A_VV(6))
+                          call calcHelAmp(ordering_swap,gsgsMode,MY_IDUP,p(1:4,1:6),i1,i2,i3,i4,A_VV(8))
                       endif
                       A_VV(2) = -A_VV(2) ! minus from Fermi statistics
                       A_VV(4) = -A_VV(4)
@@ -138,6 +155,10 @@
           res = res*prefactor
           if( (VVMode.eq.ZZMode) .and. (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) res = res * SymmFac
 
+         !print *,"VVmode:",VVmode
+         !print *,"ids:",MY_IDUP
+         !print *,"res:",res
+         !pause
 
       RETURN
       END SUBROUTINE
@@ -158,6 +179,19 @@
          l2=ordering(2)
          l3=ordering(3)
          l4=ordering(4)
+
+         !print *,"l1=",l1
+         !print *,"l2=",l2
+         !print *,"l3=",l3
+         !print *,"l4=",l4
+         !print *,"id(6)=",convertLHE(MY_IDUP(6))
+         !print *,"id(7)=",convertLHE(MY_IDUP(7))
+         !print *,"id(8)=",convertLHE(MY_IDUP(8))
+         !print *,"id(9)=",convertLHE(MY_IDUP(9))
+         !print *,"p(6)=",(p(:,l1))
+         !print *,"p(7)=",(p(:,l2))
+         !print *,"p(8)=",(p(:,l3))
+         !print *,"p(9)=",(p(:,l4))
 
          s  = 2d0 * scr(p(:,1),p(:,2))
 
@@ -262,9 +296,12 @@
               s = scr(p(:,l3)+p(:,l4),p(:,l3)+p(:,l4))
               propZ2 = s/dcmplx(s - M_V**2,M_V*Ga_V)
 
-             if( convertLHE(MY_IDUP(6))+convertLHE(MY_IDUP(7)).lt.0 ) then! this assigns the W+/W- to the first/second set of inputs; important for q^2-dependent form factors. Everything else is symmetric any ways.
-                  call swap_cmom(sp(3,1:4),sp(4,1:4))
-                  call swap_mom(pin(3,1:4),pin(4,1:4))
+             if( CoupledVertex(MY_IDUP(6:7),-1).eq.Wm_ ) then! this assigns the W+/W- to the first/second set of inputs; important for q^2-dependent form factors. Everything else is symmetric any ways.
+                  call swap(sp(3,1:4),sp(4,1:4))
+                  call swap(pin(3,1:4),pin(4,1:4))
+                  call swap(aL1,aL2)
+                  call swap(aR1,aR2)
+                  call swap(propZ1,propZ2)
               endif
 
          elseif( VVMode.eq.ZgMode ) then
@@ -524,6 +561,7 @@
          endif
          A(1) = A(1) * propG*propZ1*propZ2
 
+
 ! print *, "ordering",ordering(:)
 ! s=scr(p(:,l1)+p(:,l2),p(:,l1)+p(:,l2))
 ! print *, "props",cdabs(propz1/s)**2,s
@@ -715,6 +753,7 @@
       real(dp) :: gZ_sq,s
       real(dp) :: prefactor!,res2
       real(dp) :: intcolfac
+      integer :: ordering(1:4),ordering_swap(1:4)
 
          if(IsAQuark(MY_IDUP(6)) .and. IsAQuark(MY_IDUP(8))) then
             intcolfac=1.0_dp/3.0_dp
@@ -727,13 +766,14 @@
              VVMode = ZZMode
          elseif( (CoupledVertex(MY_IDUP(6:7),-1).eq.Wp_ .and. CoupledVertex(MY_IDUP(8:9),-1).eq.Wm_) .or. (CoupledVertex(MY_IDUP(6:7),-1).eq.Wm_ .and. CoupledVertex(MY_IDUP(8:9),-1).eq.Wp_) ) then
              VVMode = WWMode
-         elseif(CoupledVertex(MY_IDUP(6:7),-1).eq.Z0_ .and. MY_IDUP(8).eq.Pho_) then
+         elseif((CoupledVertex(MY_IDUP(6:7),-1).eq.Z0_ .and. (MY_IDUP(8).eq.Pho_ .or. MY_IDUP(9).eq.Pho_)) .or. (CoupledVertex(MY_IDUP(8:9),-1).eq.Z0_ .and. (MY_IDUP(6).eq.Pho_ .or. MY_IDUP(7).eq.Pho_))) then
              VVMode = ZgMode
          elseif(MY_IDUP(6).eq.Pho_ .and. MY_IDUP(8).eq.Pho_) then
              VVMode = ggMode
          else
              call Error("Unsupported decay modes")
          endif
+
 
 
 ! Global normalization
@@ -751,6 +791,22 @@
          endif
          prefactor = prefactor * (alphas/(3.0_dp*pi*vev))**2
 
+         ordering=(/3,4,5,6/)
+         if(convertLHE(MY_IDUP(6)).lt.0 .or. MY_IDUP(6).eq.Not_a_particle_) then
+            call swap(ordering(1),ordering(2))
+         endif
+         if(convertLHE(MY_IDUP(8)).lt.0 .or. MY_IDUP(8).eq.Not_a_particle_) then
+            call swap(ordering(3),ordering(4))
+         endif
+         if( &
+            (CoupledVertex(MY_IDUP(6:7),-1).eq.Wm_ .and. CoupledVertex(MY_IDUP(8:9),-1).eq.Wp_) .or. &
+            (CoupledVertex(MY_IDUP(8:9),-1).eq.Z0_ .and. (MY_IDUP(6).eq.Pho_ .or. MY_IDUP(7).eq.Pho_)) &
+         ) then
+            call swap(ordering(1),ordering(3))
+            call swap(ordering(2),ordering(4))
+         endif
+         ordering_swap(:)=ordering(:)
+         call swap(ordering_swap(1),ordering_swap(3))
 
 ! ! MADGRAPH CHECK
 ! res=0d0
@@ -770,21 +826,21 @@
           res = zero
           A_VV(:) = 0d0
           do i3=1,2;  do i4=1,2!  sum over helicities
-                  call calcHelAmp2((/3,4,5,6/),VVMode,MY_IDUP,p(1:4,1:6),i3,i4,A_VV(1))
+                  call calcHelAmp2(ordering,VVMode,MY_IDUP,p(1:4,1:6),i3,i4,A_VV(1))
                   if( (VVMode.eq.ZZMode) .and. includeGammaStar ) then
-                      call calcHelAmp2((/3,4,5,6/),ZgsMode,MY_IDUP,p(1:4,1:6),i3,i4,A_VV(3))
-                      call calcHelAmp2((/3,4,5,6/),gsZMode,MY_IDUP,p(1:4,1:6),i3,i4,A_VV(5))
-                      call calcHelAmp2((/3,4,5,6/),gsgsMode,MY_IDUP,p(1:4,1:6),i3,i4,A_VV(7))
+                      call calcHelAmp2(ordering,ZgsMode,MY_IDUP,p(1:4,1:6),i3,i4,A_VV(3))
+                      call calcHelAmp2(ordering,gsZMode,MY_IDUP,p(1:4,1:6),i3,i4,A_VV(5))
+                      call calcHelAmp2(ordering,gsgsMode,MY_IDUP,p(1:4,1:6),i3,i4,A_VV(7))
                   elseif( VVMode.eq.ZgMode .and. includeGammaStar ) then
-                      call calcHelAmp2((/3,4,5,6/),gsgMode,MY_IDUP,p(1:4,1:6),i3,i4,A_VV(3))
+                      call calcHelAmp2(ordering,gsgMode,MY_IDUP,p(1:4,1:6),i3,i4,A_VV(3))
                   endif
 
                   if( (VVMode.eq.ZZMode) .and. (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then
-                      call calcHelAmp2((/5,4,3,6/),VVMode,MY_IDUP,p(1:4,1:6),i3,i4,A_VV(2))
+                      call calcHelAmp2(ordering_swap,VVMode,MY_IDUP,p(1:4,1:6),i3,i4,A_VV(2))
                       if( includeGammaStar ) then
-                          call calcHelAmp2((/5,4,3,6/),ZgsMode,MY_IDUP,p(1:4,1:6),i3,i4,A_VV(4))
-                          call calcHelAmp2((/5,4,3,6/),gsZMode,MY_IDUP,p(1:4,1:6),i3,i4,A_VV(6))
-                          call calcHelAmp2((/5,4,3,6/),gsgsMode,MY_IDUP,p(1:4,1:6),i3,i4,A_VV(8))
+                          call calcHelAmp2(ordering_swap,ZgsMode,MY_IDUP,p(1:4,1:6),i3,i4,A_VV(4))
+                          call calcHelAmp2(ordering_swap,gsZMode,MY_IDUP,p(1:4,1:6),i3,i4,A_VV(6))
+                          call calcHelAmp2(ordering_swap,gsgsMode,MY_IDUP,p(1:4,1:6),i3,i4,A_VV(8))
                       endif
                       A_VV(2) = -A_VV(2)! minus from Fermi statistics
                       A_VV(4) = -A_VV(4)
@@ -845,6 +901,7 @@
          l2=ordering(2)
          l3=ordering(3)
          l4=ordering(4)
+
          pin(1,:) = p(:,1)
 
 
@@ -940,9 +997,11 @@
               s = scr(p(:,l3)+p(:,l4),p(:,l3)+p(:,l4))
               propZ2 = s/dcmplx(s - M_V**2,M_V*Ga_V)
 
-             if( convertLHE(MY_IDUP(6))+convertLHE(MY_IDUP(7)).lt.0 ) then! this assigns the W+/W- to the first/second set of inputs; important for q^2-dependent form factors. Everything else is symmetric any ways.
-                  call swap_cmom(sp(3,1:4),sp(4,1:4))
-                  call swap_mom(pin(3,1:4),pin(4,1:4))
+             if( CoupledVertex(MY_IDUP(6:7),-1).eq.Wm_ ) then! this assigns the W+/W- to the first/second set of inputs; important for q^2-dependent form factors. Everything else is symmetric any ways.
+                  call swap(sp(3,1:4),sp(4,1:4))
+                  call swap(pin(3,1:4),pin(4,1:4))
+                  call swap(aL1,aL2)
+                  call swap(aR1,aR2)
               endif
 
          elseif( VVMode.eq.ZgMode ) then
