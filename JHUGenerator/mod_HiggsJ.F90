@@ -1,5 +1,6 @@
 module ModHiggsJ
   use modParameters
+  use ModMisc
   implicit none
   private
 
@@ -28,11 +29,11 @@ subroutine EvalAmp_HJ(p,res)
     heftcoupl = gs*alphas/(6.0_dp * pi * vev)
 		res=zero
 
-    call spinoru(3,(/-p(:,1),-p(:,2),p(:,4)/),za,zb,sprod)
+    call spinoru2(3,(/-p(:,1),-p(:,2),p(:,4)/),za,zb,sprod)
 
     call me2_ggg_tree(1,2,3,sprod,res(0,0))
     res(0,0) = res(0,0)*avegg
-    
+
     do i=1,5
       call me2_qbqg_tree(2,3,1,sprod,res(0,i))
       res(0,i) = -res(0,i)*aveqg
@@ -141,7 +142,7 @@ end subroutine me2_qbqg_tree
   !-------------------------------------------------------------------------
   !-- generic functions below
   !- MCFM spinors
-  subroutine spinoru(n,p,za,zb,s)
+  subroutine spinoru2(n,p,za,zb,s)
     implicit none
     integer, intent(in) :: n
     real(dp), intent(in) :: p(4,n)
@@ -150,7 +151,7 @@ end subroutine me2_qbqg_tree
     integer :: i,j
     complex(dp) :: c23(n), f(n)
     real(dp) :: rt(n)
-      
+
     !---if one of the vectors happens to be zero this routine fails.
     do j=1,N
        za(j,j)=czero
@@ -170,38 +171,29 @@ end subroutine me2_qbqg_tree
     enddo
 
     do i=2,N
-  
+
      do j=1,i-1
           s(i,j)=two*scr(p(:,i),p(:,j))
           za(i,j)=f(i)*f(j) &
                *(c23(i)*cmplx(rt(j)/rt(i),kind=dp)-c23(j)*cmplx(rt(i)/rt(j),kind=dp))
-          
+
           if (abs(s(i,j)).lt.1d-5) then
              zb(i,j)=-(f(i)*f(j))**2*conjg(za(i,j))
           else
              zb(i,j)=-cmplx(s(i,j),kind=dp)/za(i,j)
           endif
-          
+
           za(j,i)=-za(i,j)
           zb(j,i)=-zb(i,j)
           s(j,i)=s(i,j)
-          
+
        enddo
 
     enddo
 
     return
-    
-  end subroutine spinoru
 
-
-  function scr(p1,p2) !coincide with MinkowskyProduct() in mod_Misc
-    real(dp), intent(in) :: p1(4), p2(4)
-    real(dp) :: scr
-    scr = p1(1)*p2(1)-p1(2)*p2(2)-p1(3)*p2(3)-p1(4)*p2(4)
-  end function scr
-
-
+  end subroutine spinoru2
 
 
 end module ModHiggsJ
