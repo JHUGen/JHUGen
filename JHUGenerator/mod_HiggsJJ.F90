@@ -3161,12 +3161,6 @@ return
 
   !-------------------------------------------------------------------------
   !-- generic functions below
-  function scr(p1,p2)
-    real(dp), intent(in) :: p1(4), p2(4)
-    real(dp) :: scr
-    scr = p1(1)*p2(1)-p1(2)*p2(2)-p1(3)*p2(3)-p1(4)*p2(4)
-  end function scr
-
   !- MCFM spinors
   subroutine spinoru2(n,p,za,zb,s)
     implicit none

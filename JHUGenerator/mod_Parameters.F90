@@ -9,6 +9,11 @@ character(len=6),parameter :: JHUGen_Version="v6.9.9"
 !=====================================================
 !internal
 integer, public, parameter  :: dp = selected_real_kind(15)
+real(8), public, parameter :: tol = 0.0000001d0
+integer, public, parameter :: ZZMode=00,ZgsMode=01,gsZMode=02,gsgsMode=03
+integer, public, parameter :: WWMode=10
+integer, public, parameter :: ggMode=20
+integer, public, parameter :: ZgMode=30,gsgMode=31
 integer, public :: Collider,PChannel,Process,DecayMode1,DecayMode2,TopDecays,TauDecays
 integer, public :: VegasIt1,VegasNc0,VegasNc1,VegasNc2,PMZZEvals
 real(8), public :: Collider_Energy
@@ -114,15 +119,15 @@ logical, public            :: RandomizeVVdecays = .true.    ! randomize DecayMod
 
 logical, public, parameter :: UseUnformattedRead = .false.  !Set this to true if the regular reading fails for whatever reason
 
-logical, public, parameter :: H_DK =.false.                 ! default to false so H in V* > VH (Process = 50) does not decay
+logical, public            :: H_DK =.false.                 ! default to false so H in V* > VH (Process = 50) does not decay
 !=====================================================
 
 
 !=====================================================
 !cuts - should be set on the command line
-real(8), public :: pTjetcut = 15d0*GeV                        ! jet min pt
-real(8), public :: Rjet = 0.3d0                               ! jet deltaR, anti-kt algorithm
-real(8), public :: mJJcut = 0d0*GeV                           ! minimum mJJ for VBF, HJJ, bbH
+real(8), public :: pTjetcut = -1d0*GeV                        ! jet min pt, default is set in main (0 in VH, 15 GeV otherwise)
+real(8), public :: Rjet = -1d0                                ! jet deltaR, anti-kt algorithm, default is set in main (0 in VH, 0.3 otherwise)
+real(8), public :: mJJcut = 0d0*GeV                           ! minimum mJJ for VBF, HJJ, bbH, VH
 real(8), public :: m4l_minmax(1:2) = (/ -1d0,-1d0 /)*GeV      ! min and max for m_4l in off-shell VBF production;   default is (-1,-1): m_4l ~ Higgs resonance (on-shell)
 logical, public :: includeGammaStar = .false.                 ! include offshell photons?
 real(8), public :: MPhotonCutoff = 4d0*GeV                    ! minimum |mass| for offshell photons when includeGammaStar = .true.
@@ -253,8 +258,11 @@ real(8), public :: scale_alpha_W_tn = 1d0        ! scaling factor of alpha (~par
 !=====================================================
 !resonance couplings
 
+!--------------------!
+!-----! Spin-0 !-----!
+!--------------------!
 !-- parameters that define on-shell spin 0 coupling to SM fields, see note
-   logical, public, parameter :: generate_as = .false.
+   logical, public, parameter :: generate_as = .false. ! .true. uses ah* instead of gh*
    complex(8), public, parameter :: ahg1 = (1.0d0,0d0)
    complex(8), public, parameter :: ahg2 = (0.0d0,0d0)
    complex(8), public, parameter :: ahg3 = (0.0d0,0d0)  ! pseudoscalar
@@ -263,10 +271,12 @@ real(8), public :: scale_alpha_W_tn = 1d0        ! scaling factor of alpha (~par
    complex(8), public, parameter :: ahz3 = (0.0d0,0d0)  ! pseudoscalar
 
 !-- parameters that define off-shell spin 0 coupling to SM fields, see note
+!-- Hgg couplings to gluons for point-like vertices
    complex(8), public :: ghg2 = (1.0d0,0d0)
    complex(8), public :: ghg3 = (0.0d0,0d0)
    complex(8), public :: ghg4 = (0.0d0,0d0)   ! pseudoscalar
 
+!-- HVV' couplings to ZZ/ZA/AA and WW
    complex(8), public :: ghz1 = (2.0d0,0d0)   ! SM=2
    complex(8), public :: ghz2 = (0.0d0,0d0)
    complex(8), public :: ghz3 = (0.0d0,0d0)
@@ -278,7 +288,6 @@ real(8), public :: scale_alpha_W_tn = 1d0        ! scaling factor of alpha (~par
    complex(8), public :: ghgsgs2 = (0.00d0,0d0)
    complex(8), public :: ghgsgs3 = (0.00d0,0d0)
    complex(8), public :: ghgsgs4 = (0.00d0,0d0)
-
 
 !-- parameters that define q^2 dependent form factors
    complex(8), public :: ghz1_prime = (0.0d0,0d0)
@@ -339,55 +348,8 @@ real(8), public :: scale_alpha_W_tn = 1d0        ! scaling factor of alpha (~par
    real(8),    public, parameter :: Lambda_z30 = 100d0*GeV
    real(8),    public, parameter :: Lambda_z40 = 100d0*GeV
 
-
-
-!---parameters that define spin 1 coupling to SM fields, see note
-   complex(8), public :: zprime_qq_left  = (1.0d0,0d0)
-   complex(8), public :: zprime_qq_right = (1.0d0,0d0)
-   complex(8), public :: zprime_zz_1 =  (0.0d0,0d0)!  =1 for JP=1- vector
-   complex(8), public :: zprime_zz_2 =  (0.0d0,0d0)!  =1 for JP=1+ pseudovector
-
-!-- parameters that define spin 2 coupling to SM fields, see note
-! minimal coupling corresponds to a1 = b1 = b5 = 1 everything else 0
-  complex(8), public :: a1 = (0.0d0,0d0)    ! g1  -- c.f. draft
-  complex(8), public :: a2 = (0.0d0,0d0)    ! g2
-  complex(8), public :: a3 = (0.0d0,0d0)    ! g3
-  complex(8), public :: a4 = (0.0d0,0d0)    ! g4
-  complex(8), public :: a5 = (0.0d0,0d0)    ! pseudoscalar, g8
-  complex(8), public :: graviton_qq_left  = (1.0d0,0d0)! graviton coupling to quarks
-  complex(8), public :: graviton_qq_right = (1.0d0,0d0)
-
-!-- see mod_Graviton
-  logical, public, parameter :: generate_bis = .true.
-  logical, public, parameter :: use_dynamic_MG = .true.
-
-  complex(8), public :: b1 = (0.0d0,0d0)  !  all b' below are g's in the draft
-  complex(8), public :: b2 = (0.0d0,0d0)
-  complex(8), public :: b3 = (0.0d0,0d0)
-  complex(8), public :: b4 = (0.0d0,0d0)
-  complex(8), public :: b5 = (0.0d0,0d0)
-  complex(8), public :: b6 = (0.0d0,0d0)
-  complex(8), public :: b7 = (0.0d0,0d0)
-  complex(8), public :: b8 = (0.0d0,0d0)
-  complex(8), public :: b9 = (0.0d0,0d0)  ! this coupling does not contribute to gamma+gamma final states
-  complex(8), public :: b10 =(0.0d0,0d0)  ! this coupling does not contribute to gamma+gamma final states
-
-
-  complex(8), public, parameter  :: c1 = (1.0d0,0d0)
-  complex(8), public, parameter  :: c2 = (0.0d0,0d0)
-  complex(8), public, parameter  :: c3 = (0.0d0,0d0)
-  complex(8), public, parameter  :: c41= (0.0d0,0d0)
-  complex(8), public, parameter  :: c42= (0.0d0,0d0)
-  complex(8), public, parameter  :: c5 = (0.0d0,0d0)
-  complex(8), public, parameter  :: c6 = (0.0d0,0d0) ! this coupling does not contribute to gamma+gamma final states
-  complex(8), public, parameter  :: c7 = (0.0d0,0d0) ! this coupling does not contribute to gamma+gamma final states
-
-
-
-
-
-!-- extra couplings for weak boson fusion when WW-spin-0 couplings are required to be different from ZZ-spin-0
-!-- note: ZZ-spin-0 couplings are used in processes other than VBF
+!-- extra HWW couplings for weak boson fusion when WW-spin-0 couplings are required to be different from ZZ-spin-0
+!-- note: ZZ-spin-0 couplings are used in processes other than VBF, and WW is distinguished from ZZ only in case distinguish_HWWcouplings=.true.
    logical, public :: distinguish_HWWcouplings=.false.
    complex(8), public :: ghw1 = (0.0d0,0d0)
    complex(8), public :: ghw2 = (0.0d0,0d0)
@@ -449,9 +411,58 @@ real(8), public :: scale_alpha_W_tn = 1d0        ! scaling factor of alpha (~par
    real(8),    public, parameter :: Lambda_w30 = 100d0*GeV
    real(8),    public, parameter :: Lambda_w40 = 100d0*GeV
 
-!  couplings for ttbar+H and bbar+H
+!-- Hff couplings for ttbar+H and bbar+H
    complex(8), public :: kappa       = (1d0,0d0)
    complex(8), public :: kappa_tilde = (0d0,0d0)
+
+!--------------------!
+!-----! Spin-1 !-----!
+!--------------------!
+!---parameters that define spin 1 coupling to SM fields, see note
+   complex(8), public :: zprime_qq_left  = (1.0d0,0d0)
+   complex(8), public :: zprime_qq_right = (1.0d0,0d0)
+   complex(8), public :: zprime_zz_1 =  (0.0d0,0d0)!  =1 for JP=1- vector
+   complex(8), public :: zprime_zz_2 =  (0.0d0,0d0)!  =1 for JP=1+ pseudovector
+
+
+!--------------------!
+!-----! Spin-2 !-----!
+!--------------------!
+!-- parameters that define spin 2 coupling to SM fields, see note
+! minimal coupling corresponds to a1 = b1 = b5 = 1 everything else 0
+  complex(8), public :: a1 = (0.0d0,0d0)    ! g1  -- c.f. draft
+  complex(8), public :: a2 = (0.0d0,0d0)    ! g2
+  complex(8), public :: a3 = (0.0d0,0d0)    ! g3
+  complex(8), public :: a4 = (0.0d0,0d0)    ! g4
+  complex(8), public :: a5 = (0.0d0,0d0)    ! pseudoscalar, g8
+  complex(8), public :: graviton_qq_left  = (1.0d0,0d0)! graviton coupling to quarks
+  complex(8), public :: graviton_qq_right = (1.0d0,0d0)
+
+!-- see mod_Graviton for these two parameters
+  logical, public, parameter :: generate_bis = .true.
+  logical, public, parameter :: use_dynamic_MG = .true.
+
+  complex(8), public :: b1 = (0.0d0,0d0)  !  all b' below are g's in the draft
+  complex(8), public :: b2 = (0.0d0,0d0)
+  complex(8), public :: b3 = (0.0d0,0d0)
+  complex(8), public :: b4 = (0.0d0,0d0)
+  complex(8), public :: b5 = (0.0d0,0d0)
+  complex(8), public :: b6 = (0.0d0,0d0)
+  complex(8), public :: b7 = (0.0d0,0d0)
+  complex(8), public :: b8 = (0.0d0,0d0)
+  complex(8), public :: b9 = (0.0d0,0d0)  ! this coupling does not contribute to gamma+gamma final states
+  complex(8), public :: b10 =(0.0d0,0d0)  ! this coupling does not contribute to gamma+gamma final states
+
+  complex(8), public, parameter  :: c1 = (1.0d0,0d0)
+  complex(8), public, parameter  :: c2 = (0.0d0,0d0)
+  complex(8), public, parameter  :: c3 = (0.0d0,0d0)
+  complex(8), public, parameter  :: c41= (0.0d0,0d0)
+  complex(8), public, parameter  :: c42= (0.0d0,0d0)
+  complex(8), public, parameter  :: c5 = (0.0d0,0d0)
+  complex(8), public, parameter  :: c6 = (0.0d0,0d0) ! this coupling does not contribute to gamma+gamma final states
+  complex(8), public, parameter  :: c7 = (0.0d0,0d0) ! this coupling does not contribute to gamma+gamma final states
+
+
 !=====================================================
 
 !=====================================================
@@ -1091,8 +1102,29 @@ integer :: Part
      stop
   endif
 
+END FUNCTION
+
+
+FUNCTION getDecayWidth(Part)
+implicit none
+real(8) :: getDecayWidth
+integer :: Part
+
+  getDecayWidth = 0d0
+  if( abs(Part).eq.abs(Top_) ) then
+      getDecayWidth = Ga_Top
+  elseif( abs(Part).eq.abs(Z0_) ) then
+      getDecayWidth = Ga_Z
+  elseif( abs(Part).eq.abs(Wp_) ) then
+      getDecayWidth = Ga_W
+  elseif( abs(Part).eq.abs(Hig_) ) then
+      getDecayWidth = Ga_Reso
+  elseif( abs(Part).eq.abs(TaM_) ) then
+      getDecayWidth = Ga_tau
+  endif
 
 END FUNCTION
+
 
 FUNCTION getParticle(Part)
 implicit none
@@ -1341,6 +1373,68 @@ integer :: PartType
 END FUNCTION
 
 
+function CoupledVertex(id,hel,useAHcoupl)
+   implicit none
+   integer, optional :: useAHcoupl
+   integer, intent(in) :: id(1:2),hel
+   integer :: testAHcoupl
+   integer :: CoupledVertex
+
+   testAHcoupl = 0
+   if(present(useAHcoupl)) then
+      testAHcoupl = useAHcoupl
+   endif
+   if( (&
+   (id(1).eq.ElP_ .and. id(2).eq.NuE_) .or. (id(2).eq.ElP_ .and. id(1).eq.NuE_) .or. &
+   (id(1).eq.MuP_ .and. id(2).eq.NuM_) .or. (id(2).eq.MuP_ .and. id(1).eq.NuM_) .or. &
+   (id(1).eq.TaP_ .and. id(2).eq.NuT_) .or. (id(2).eq.TaP_ .and. id(1).eq.NuT_) .or. &
+   (id(1).eq.Up_  .and. (id(2).eq.ADn_ .or. id(2).eq.AStr_ .or. id(2).eq.ABot_)) .or. (id(2).eq.Up_  .and. (id(1).eq.ADn_ .or. id(1).eq.AStr_ .or. id(1).eq.ABot_)) .or. &
+   (id(1).eq.Chm_ .and. (id(2).eq.ADn_ .or. id(2).eq.AStr_ .or. id(2).eq.ABot_)) .or. (id(2).eq.Chm_ .and. (id(1).eq.ADn_ .or. id(1).eq.AStr_ .or. id(1).eq.ABot_)) .or. &
+   (id(1).eq.Top_ .and. (id(2).eq.ADn_ .or. id(2).eq.AStr_ .or. id(2).eq.ABot_)) .or. (id(2).eq.Top_ .and. (id(1).eq.ADn_ .or. id(1).eq.AStr_ .or. id(1).eq.ABot_))      &
+   ) .and. hel.lt.0) then
+      CoupledVertex=Wp_
+   elseif( (&
+   (id(1).eq.ElM_ .and. id(2).eq.ANuE_) .or. (id(2).eq.ElM_ .and. id(1).eq.ANuE_) .or. &
+   (id(1).eq.MuM_ .and. id(2).eq.ANuM_) .or. (id(2).eq.MuM_ .and. id(1).eq.ANuM_) .or. &
+   (id(1).eq.TaM_ .and. id(2).eq.ANuT_) .or. (id(2).eq.TaM_ .and. id(1).eq.ANuT_) .or. &
+   (id(1).eq.AUp_  .and. (id(2).eq.Dn_ .or. id(2).eq.Str_ .or. id(2).eq.Bot_)) .or. (id(2).eq.AUp_  .and. (id(1).eq.Dn_ .or. id(1).eq.Str_ .or. id(1).eq.Bot_)) .or. &
+   (id(1).eq.AChm_ .and. (id(2).eq.Dn_ .or. id(2).eq.Str_ .or. id(2).eq.Bot_)) .or. (id(2).eq.AChm_ .and. (id(1).eq.Dn_ .or. id(1).eq.Str_ .or. id(1).eq.Bot_)) .or. &
+   (id(1).eq.ATop_ .and. (id(2).eq.Dn_ .or. id(2).eq.Str_ .or. id(2).eq.Bot_)) .or. (id(2).eq.ATop_ .and. (id(1).eq.Dn_ .or. id(1).eq.Str_ .or. id(1).eq.Bot_))      &
+   ) .and. hel.lt.0) then
+      CoupledVertex=Wm_
+   elseif( (&
+   (id(1).eq.ElM_ .and. id(2).eq.ElP_) .or. (id(2).eq.ElM_ .and. id(1).eq.ElP_) .or. &
+   (id(1).eq.MuM_ .and. id(2).eq.MuP_) .or. (id(2).eq.MuM_ .and. id(1).eq.MuP_) .or. &
+   (id(1).eq.TaM_ .and. id(2).eq.TaP_) .or. (id(2).eq.TaM_ .and. id(1).eq.TaP_) .or. &
+   (id(1).eq.Up_  .and. id(2).eq.AUp_) .or. (id(2).eq.Up_  .and. id(1).eq.AUp_) .or. &
+   (id(1).eq.Dn_  .and. id(2).eq.ADn_) .or. (id(2).eq.Dn_  .and. id(1).eq.ADn_) .or. &
+   (id(1).eq.Chm_ .and. id(2).eq.AChm_) .or. (id(2).eq.Chm_ .and. id(1).eq.AChm_) .or. &
+   (id(1).eq.Str_ .and. id(2).eq.AStr_) .or. (id(2).eq.Str_ .and. id(1).eq.Astr_) .or. &
+   (id(1).eq.Top_ .and. id(2).eq.ATop_) .or. (id(2).eq.Top_ .and. id(1).eq.ATop_) .or. &
+   (id(1).eq.Bot_ .and. id(2).eq.ABot_) .or. (id(2).eq.Bot_ .and. id(1).eq.ABot_)      &
+   ) .and. hel.ne.0) then
+      if(testAHcoupl.eq.1) then
+         CoupledVertex=Pho_
+      elseif(testAHcoupl.eq.2) then
+         CoupledVertex=Hig_
+      else
+         CoupledVertex=Z0_
+      endif
+   elseif( (&
+   (id(1).eq.NuE_ .and. id(2).eq.ANuE_) .or. (id(2).eq.NuE_ .and. id(1).eq.ANuE_) .or. &
+   (id(1).eq.NuM_ .and. id(2).eq.ANuM_) .or. (id(2).eq.NuM_ .and. id(1).eq.ANuM_) .or. &
+   (id(1).eq.NuT_ .and. id(2).eq.ANuT_) .or. (id(2).eq.NuT_ .and. id(1).eq.ANuT_)      &
+   ) .and. hel.lt.0) then
+      CoupledVertex=Z0_ ! Only Z coupling to nuL-nubR
+   else
+      CoupledVertex=Not_a_particle_
+   endif
+
+   return
+end function CoupledVertex
+
+
+
 FUNCTION CountLeptons( MY_IDUP )
 implicit none
 integer :: MY_IDUP(:),CountLeptons
@@ -1579,6 +1673,404 @@ integer :: length
     endif
 
 end subroutine ReadCommandLineArgument_string
+
+
+!========================================================================
+!---- THESE ARE POLARIZATION ROUTINES
+  ! -- massless vector polarization subroutine
+  function pol_mless(p,i,outgoing)
+  implicit none
+    complex(dp), intent(in)    :: p(4)
+    integer, intent(in)          :: i
+    logical, intent(in),optional :: outgoing
+    ! -------------------------------
+    integer :: pol
+    real(dp) :: p0,px,py,pz
+    real(dp) :: pv,ct,st,cphi,sphi
+    complex(dp) :: pol_mless(4)
+
+!^^^IFmp
+!    p0=(p(1)+conjg(p(1)))/two
+!    px=(p(2)+conjg(p(2)))/two
+!    py=(p(3)+conjg(p(3)))/two
+!    pz=(p(4)+conjg(p(4)))/two
+!^^^ELSE
+    p0=real(p(1),dp)
+    px=real(p(2),dp)
+    py=real(p(3),dp)
+    pz=real(p(4),dp)
+!^^^END
+
+
+    pv=sqrt(abs(p0**2))
+    ct=pz/pv
+    st=sqrt(abs(1.0_dp-ct**2))
+
+    if (st < tol) then
+       cphi=1.0_dp
+       sphi=0.0_dp
+    else
+       cphi= px/pv/st
+       sphi= py/pv/st
+    endif
+
+
+    ! -- distinguish between positive and negative energies
+    if ( p0 > 0.0_dp) then
+       pol=i
+    else
+       pol=-i
+    endif
+
+    ! -- take complex conjugate for outgoing
+    if (present(outgoing)) then
+       if (outgoing) pol = -pol
+    endif
+
+    pol_mless(1)=czero
+    pol_mless(2)=ct*cphi/sqrt2 - ci*pol*sphi/sqrt2
+    pol_mless(3)=ct*sphi/sqrt2 + ci*pol*cphi/sqrt2
+    pol_mless(4)=-st/sqrt2
+
+  end function pol_mless
+
+  function pol_mless2(p,i,out)
+  implicit none
+    integer, intent(in) :: i
+    complex(dp), intent(in) :: p(4)
+    character(len=*), intent(in):: out
+    complex(dp) :: pol_mless2(4)
+    ! -------------------------------------
+
+    if (out == 'out') then
+       pol_mless2 = pol_mless(p,i,outgoing=.true.)
+    else
+       pol_mless2 = pol_mless(p,i,outgoing=.false.)
+    endif
+  end function pol_mless2
+
+  function pol_dk2mom(plepton,antilepton,i,outgoing)
+  implicit none
+    integer, intent(in) :: i
+    integer :: j
+    complex(dp), intent(in) :: plepton(1:4),antilepton(1:4)
+    logical, intent(in),optional :: outgoing
+    complex(dp) :: pol_dk2mom(4),Ub(4),V(4),q(4),qsq
+
+
+    q=plepton+antilepton
+    qsq=q(1)**2-q(2)**2-q(3)**2-q(4)**2
+
+    Ub(:)=ubar0(plepton,i)
+    V(:)=v0(antilepton,-i)
+    !---Now return in Kirill's notation  1=E,2=px,3=py,4=pz
+    !   This is an expression for (-i)/qsq* (-i) Ub(+/-)) Gamma^\mu V(-/+)
+    pol_dk2mom(1)=-(Ub(2)*V(4)+V(2)*Ub(4)+Ub(1)*V(3)+V(1)*Ub(3))
+    pol_dk2mom(2)=-(-Ub(1)*V(4)+V(1)*Ub(4)-Ub(2)*V(3)+V(2)*Ub(3))
+    pol_dk2mom(3)=-ci*(Ub(1)*V(4)+V(1)*Ub(4)-Ub(2)*V(3)-V(2)*Ub(3))
+    pol_dk2mom(4)=-(Ub(2)*V(4)-V(2)*Ub(4)-Ub(1)*V(3)+V(1)*Ub(3))
+
+
+    do j=1,4
+       pol_dk2mom(j)=pol_dk2mom(j)/qsq
+    enddo
+
+    ! -- do nothing in this case
+    if (present(outgoing)) then
+       !if (outgoing) pol_dk2mom = conjg(pol_dk2mom)
+    endif
+
+  end function pol_dk2mom
+
+! -- massive vector polarization subroutine
+   function pol_mass(p,i,outgoing)
+   implicit none
+   integer, intent(in) :: i
+   integer :: pol
+   complex(8), intent(in) :: p(4)
+   logical, intent(in),optional :: outgoing
+   complex(8) :: pol_mass(4)
+   complex(8) :: msq,m
+   real(8) :: p0,px,py,pz, pv,pvsq
+   real(8) :: ct,st,cphi,sphi
+
+      p0=dreal(p(1))
+      px=dreal(p(2))
+      py=dreal(p(3))
+      pz=dreal(p(4))
+
+      pv=px**2 + py**2 + pz**2
+      m=p0**2-pv
+      m=sqrt(m)
+      pv=sqrt(pv)
+
+      if(cdabs(pv/m).lt.1d-8) then
+         if(i.eq.0) then
+            pol_mass(1:3)=czero
+            pol_mass( 4 )=cone
+            return
+         endif
+         ct = 1d0; st=0d0
+      else
+         ct= pz/pv
+         st= dsqrt(dabs(1.0d0-ct**2))
+      endif
+
+
+      if (st .lt. 1D-15) then
+         cphi=1.0d0
+         sphi=0.0d0
+      else
+         cphi= px/pv/st
+         sphi= py/pv/st
+      endif
+
+
+!     i=0 is longitudinal polarization
+!     the following ifstatement distinguishes between
+!     positive and negative energies
+      if ( p0 .gt. 0.0d0) then
+         pol=i
+      else
+         pol=-i
+      endif
+
+      ! -- take complex conjugate for outgoing
+      if (present(outgoing)) then
+         if (outgoing) pol = -pol
+      endif
+
+      if(pol.eq.-1 .or. pol.eq.1) then
+         pol_mass(1)=czero
+         pol_mass(2)=(ct*cphi-pol*ci*sphi)/sqrt2
+         pol_mass(3)=(ct*sphi+pol*ci*cphi)/sqrt2
+         pol_mass(4)=-st/sqrt2
+      elseif (pol.eq.0) then
+         pol_mass(1)= pv/m
+         pol_mass(2)= p0/m/pv*px
+         pol_mass(3)= p0/m/pv*py
+         pol_mass(4)= p0/m/pv*pz
+      else
+         print *,"wrong helicity setting in pol_mass"
+         stop
+      endif
+
+   end function pol_mass
+
+  function pol_mass2(p,i,out)
+   implicit none
+    integer, intent(in) :: i
+    complex(dp), intent(in) :: p(4)
+    character(len=*), intent(in):: out
+    complex(dp) :: pol_mass2(4)
+    ! -------------------------------------
+
+    if (out == 'out') then
+       pol_mass2 = pol_mass(p,i,outgoing=.true.)
+    else
+       pol_mass2 = pol_mass(p,i,outgoing=.false.)
+    endif
+  end function pol_mass2
+
+!---- THESE ARE SPINOR ROUTINES
+!     ubar spinor, massless
+  function ubar0(p,i)
+   implicit none
+    complex(dp), intent(in) :: p(4)
+    integer, intent(in) :: i
+    complex(dp) :: ubar0(4)
+    complex(dp) :: fc, fc2
+    real(dp)    :: p0,px,py,pz,mass
+
+
+    p0=real(p(1),dp)
+    px=real(p(2),dp)
+    py=real(p(3),dp)
+    pz=real(p(4),dp)
+    mass=dsqrt(dabs(p0**2-px**2-py**2-pz**2))
+    if( mass.lt.1d-4 ) mass=0d0
+
+
+    fc2 = p0 + pz
+    fc=sqrt(fc2)
+
+    if (abs(fc2).gt. tol) then
+       if (i.eq.1) then
+          ubar0(1)=czero
+          ubar0(2)=czero
+          ubar0(3)=fc
+          ubar0(4)=(px-ci*py)/fc
+       elseif (i.eq.-1) then
+          ubar0(1)=(px+ci*py)/fc
+          ubar0(2)=-fc
+          ubar0(3)=czero
+          ubar0(4)=czero
+       else
+          stop 'ubar0: i out of range'
+       endif
+    else
+       if (i.eq.1) then
+          ubar0(1) = czero
+          ubar0(2) = czero
+          ubar0(3) = czero
+          ubar0(4) = sqrt(cone*two*p0)
+       elseif (i.eq.-1) then
+          ubar0(1) = sqrt(cone*(two*p0))
+          ubar0(2) = czero
+          ubar0(3) = czero
+          ubar0(4) = czero
+       else
+          stop 'ubar0: i out of range'
+       endif
+    endif
+
+
+!       if (i.eq.1) then
+!           ubar0(1)=dcmplx(mass,0d0)/fc
+!           ubar0(2)=czero
+!           ubar0(3)=fc
+!           ubar0(4)=dcmplx(px,-py)/fc
+!       elseif (i.eq.-1) then
+!           ubar0(1)=dcmplx(px,py)/fc
+!           ubar0(2)=-fc
+!           ubar0(3)=czero
+!           ubar0(4)=-dcmplx(mass,0d0)/fc
+!        else
+!           stop 'ubar0: i out of range'
+!       endif
+
+
+
+  end function ubar0
+
+  ! -- v0  spinor, massless
+  function v0(p,i)
+   implicit none
+    complex(dp), intent(in) :: p(4)
+    integer, intent(in)       :: i
+    complex(dp) :: v0(4)
+    complex(dp) :: fc2, fc
+    real(dp)    :: p0,px,py,pz,mass
+
+    p0=real(p(1),dp)
+    px=real(p(2),dp)
+    py=real(p(3),dp)
+    pz=real(p(4),dp)
+    mass=dsqrt(dabs(p0**2-px**2-py**2-pz**2))
+    if( mass.lt.1d-4 ) mass=0d0
+
+
+    fc2 = p0 + pz
+    fc=sqrt(fc2)
+
+    if (abs(fc2).gt. tol) then
+       if (i.eq.1) then
+          v0(1)=czero
+          v0(2)=czero
+          v0(3)=(px-ci*py)/fc
+          v0(4)=-fc
+       elseif (i.eq.-1) then
+          v0(1)=fc
+          v0(2)=(px+ci*py)/fc
+          v0(3)=czero
+          v0(4)=czero
+       else
+          stop 'v0: i out of range'
+       endif
+    else
+       if (i.eq.1) then
+          v0(1)=czero
+          v0(2)=czero
+          v0(3)=sqrt(cone*two*p0)
+          v0(4)=czero
+       elseif (i.eq.-1) then
+          v0(1)=czero
+          v0(2)=sqrt(cone*two*p0)
+          v0(3)=czero
+          v0(4)=czero
+       else
+          stop 'v0: i out of range'
+       endif
+    endif
+
+
+!       if (i.eq.+1) then
+!           v0(1)=czero
+!           v0(2)=dcmplx(mass,0d0)/fc
+!           v0(3)=dcmplx(px,-py)/fc
+!           v0(4)=-fc
+!       elseif (i.eq.-1) then
+!           v0(1)=fc
+!           v0(2)=dcmplx(px,py)/fc
+!           v0(3)=dcmplx(-mass,0d0)/fc
+!           v0(4)=czero
+!        else
+!           stop 'v0: i out of range'
+!       endif
+
+
+
+  end function v0
+
+subroutine spinoru(p,za,zb,s)
+!---Calculate spinor products
+!---taken from MCFM & modified by R. Rontsch, May 2015
+!---extended to deal with negative energies ie with all momenta outgoing
+!---Arbitrary conventions of Bern, Dixon, Kosower, Weinzierl,
+!---za(i,j)*zb(j,i)=s(i,j)
+      implicit none
+      real(dp) :: p(:,:),two
+      integer, parameter :: mxpart=14
+      complex(dp):: c23(mxpart),f(mxpart),rt(mxpart),za(:,:),zb(:,:),czero,cone,ci
+      real(dp)   :: s(:,:)
+      integer i,j,N
+
+      N = size(p,1)
+!       if (size(p,1) .ne. N) then
+!          call Error("spinorz: momentum mismatch",size(p,1))
+!       endif
+      two=2d0
+      czero=dcmplx(0d0,0d0)
+      cone=dcmplx(1d0,0d0)
+      ci=dcmplx(0d0,1d0)
+
+
+!---if one of the vectors happens to be zero this routine fails.
+      do j=1,N
+         za(j,j)=czero
+         zb(j,j)=za(j,j)
+
+!-----positive energy case
+         if (p(j,4) .gt. 0d0) then
+            rt(j)=dsqrt(p(j,4)+p(j,1))
+            c23(j)=dcmplx(p(j,3),-p(j,2))
+            f(j)=cone
+         else
+!-----negative energy case
+            rt(j)=dsqrt(-p(j,4)-p(j,1))
+            c23(j)=dcmplx(-p(j,3),p(j,2))
+            f(j)=ci
+         endif
+      enddo
+      do i=2,N
+         do j=1,i-1
+         s(i,j)=two*(p(i,4)*p(j,4)-p(i,1)*p(j,1)-p(i,2)*p(j,2)-p(i,3)*p(j,3))
+         za(i,j)=f(i)*f(j)*(c23(i)*dcmplx(rt(j)/rt(i))-c23(j)*dcmplx(rt(i)/rt(j)))
+
+         if (abs(s(i,j)).lt.1d-5) then
+         zb(i,j)=-(f(i)*f(j))**2*dconjg(za(i,j))
+         else
+         zb(i,j)=-dcmplx(s(i,j))/za(i,j)
+         endif
+         za(j,i)=-za(i,j)
+         zb(j,i)=-zb(i,j)
+         s(j,i)=s(i,j)
+         enddo
+      enddo
+
+    end subroutine spinoru
+!========================================================================
+
 
 
 END MODULE

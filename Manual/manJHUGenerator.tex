@@ -431,7 +431,7 @@ All parameters can be modified in \verb|mod_Parameters.F90| by:
    real(8),    public, parameter :: Lambda_z40 = 100d0*GeV         
 \end{verbatim}
 
-If the switch \verb|includeGammaStar| is set to \verb|.true.| then intermediate off-shell photons are included for $Z$ boson final states.
+Intermediate off-shell photons can be included along with the $Z$ boson for $Z$ boson final states, $ZH$ production, and VBF production.
 Their couplings to the spin-0 resonance are controlled by separate parameters,
 \begin{verbatim}
    complex(8), public, parameter :: ghzgs2  = (0.00d0,0d0)
@@ -442,7 +442,7 @@ Their couplings to the spin-0 resonance are controlled by separate parameters,
    complex(8), public, parameter :: ghgsgs4 = (0.00d0,0d0)
 \end{verbatim}
 where the first three correspond to $Z\gamma^*$ couplings and the latter three corresponds to $\gamma^* \gamma^*$ interactions.
-These two sets of parameters also control the coupling strength in final states with on-shell photons, i.e. $Z\gamma$ and $\gamma\gamma$.
+These two sets of parameters also control the coupling strength in final states with on-shell photons, i.e. $H\to Z\gamma$ or $H\to \gamma\gamma$ decays and $Z^*/\gamma^*\to\gamma H$ production.
 The anomalous coupling involving the off-shell photon momentum (in $\gamma^* Z$ interactions)
 \[
 g_1' \frac{ q^2_\gamma }{ \Lambda_2^{Z\gamma} } m_Z^2 \epsilon^*_1 \epsilon^*_2
