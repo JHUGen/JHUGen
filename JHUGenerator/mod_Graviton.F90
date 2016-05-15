@@ -137,13 +137,14 @@ enddo
                                        -3+2*i3,-3+2*i4,                                             &
                                        sp(3:4,:),pin(3:4,:)                                         &
                                       )
-      call ggGZZampl(pin,sp,A(1))
+      call ggGZZampl(VVMode,pin,sp,A(1))
       A(1) = A(1)*propG
 
    end subroutine
 
-      subroutine ggGZZampl(p,sp,res)
+      subroutine ggGZZampl(VVMode,p,sp,res)
       implicit none
+      integer, intent(in) :: VVMode
       real(dp), intent(in) :: p(4,4)
       complex(dp), intent(in) :: sp(4,4)
       complex(dp), intent(out) :: res
@@ -230,32 +231,35 @@ enddo
 
       if (generate_bis) then
           rr = q34/Lambda**2! kappa for FS
-! !           yyy1 = q34*(b1 + b2*rr*(one + two*M_V**2/q34+ M_V**4/q34**2)   + b5*M_V**2/q34)
-          yyy1 = q34*(b1 + b2*rr*(one+MZ3**2/q34)*(one+MZ4**2/q34)  + b5*M_V**2/q34)
-!           yyy2 = -b1/two + b3*rr*(one-M_V**2/q34) + two*b4*rr + b7*rr*M_V**2/q34
-          yyy2 = -b1/two + b3*rr*(1d0-(MZ3**2+MZ4**2)/(2d0*q34)) + two*b4*rr+b7*rr*M_V**2/q34
+
+          yyy1 = q34*( b1 + b2*rr*(one+MZ3**2/q34)*(one+MZ4**2/q34) )
+          yyy2 = -b1/two + b3*rr*(1d0-(MZ3**2+MZ4**2)/(2d0*q34)) + two*b4*rr
           yyy3 = (-b2/two - b3- two*b4)*rr/q34
-!           yyy4 = -b1 - b2*rr -(b2+b3+2d0*b6)*rr*M_V**2/q34
-          yyy41 = -b1 - b2*(q34+MZ3**2)/Lambda**2 - b3*MZ4**2/Lambda**2 - 2d0*b6*M_V**2/Lambda**2
-          yyy42 = -b1 - b2*(q34+MZ4**2)/Lambda**2 - b3*MZ3**2/Lambda**2 - 2d0*b6*M_V**2/Lambda**2
+          yyy41 = -b1 - b2*(q34+MZ3**2)/Lambda**2 - b3*MZ4**2/Lambda**2
+          yyy42 = -b1 - b2*(q34+MZ4**2)/Lambda**2 - b3*MZ3**2/Lambda**2
           yyy5 = two*b8*rr*MG**2/q34
-!           yyy6 = b9
-          yyy6 = b9 * M_V**2/Lambda**2
-!           yyy7 = b10*rr*MG**2/q34
-          yyy7 = b10 * MG**2 * M_V**2/Lambda**4
+          yyy6 = czero
+          yyy7 = czero
+          if(VVMode.eq.ZZMode .or. VVMode.eq.WWMode) then
+             yyy1 = yyy1 + b5*M_V**2
+             yyy2 = yyy2 + b7*rr*M_V**2/q34
+             yyy41 = yyy41 - 2d0*b6*M_V**2/Lambda**2
+             yyy42 = yyy42 - 2d0*b6*M_V**2/Lambda**2
+             yyy6 = b9 * M_V**2/Lambda**2
+             yyy7 = b10 * MG**2 * M_V**2/Lambda**4
+          endif
       else
           yyy1 = q34*c1/2d0
           yyy2 = c2
           yyy3 = c3/MG**2
-!           yyy4 = c4
           yyy41 = c41
           yyy42 = c42
           yyy5 = c5
-          yyy6 = c6
-          yyy7 = c7
-          if( IsAPhoton(DecayMode1) .and. IsAPhoton(DecayMode2) ) then
-              yyy6=0d0
-              yyy7=0d0
+          yyy6 = czero
+          yyy7 = czero
+          if(VVMode.eq.ZZMode .or. VVMode.eq.WWMode) then
+             yyy6 = c6
+             yyy7 = c7
           endif
       endif
 
@@ -903,7 +907,7 @@ enddo
                                        -3+2*i3,-3+2*i4,                                             &
                                        sp(3:4,:),pin(3:4,:)                                         &
                                       )
-      call qqGZZampl(pin,sp,A(1))
+      call qqGZZampl(VVMode,pin,sp,A(1))
 !---- chiral couplings of quarks to gravitons
       if (i1.eq.1) then
          A(1) = graviton_qq_left*A(1)
@@ -913,8 +917,9 @@ enddo
       A(1) = A(1)*propG
    end subroutine
 
-      subroutine qqGZZampl(p,sp,res)
+      subroutine qqGZZampl(VVMode,p,sp,res)
       implicit none
+      integer, intent(in) :: VVMode
       real(dp), intent(in) :: p(4,4)
       complex(dp), intent(in) :: sp(4,4)
       complex(dp), intent(out) :: res
@@ -991,36 +996,38 @@ enddo
       q34 = (MG**2-MZ3**2-MZ4**2)/2d0
 
       if (generate_bis) then
-          rr = q34/Lambda**2
-!           yyy1 = q34*(b1 + b2*rr*(one + two*M_V**2/q34+ M_V**4/q34**2)  + b5*M_V**2/q34)
-          yyy1 = q34*(b1 + b2*rr*(one+MZ3**2/q34)*(one+MZ4**2/q34)  + b5*M_V**2/q34)
-!           yyy2 = -b1/two + b3*rr*(1d0-M_V**2/q34) + two*b4*rr+b7*rr*M_V**2/q34
-          yyy2 = -b1/two + b3*rr*(1d0-(MZ3**2+MZ4**2)/(2d0*q34)) + two*b4*rr+b7*rr*M_V**2/q34
+          rr = q34/Lambda**2! kappa for FS
+
+          yyy1 = q34*( b1 + b2*rr*(one+MZ3**2/q34)*(one+MZ4**2/q34) )
+          yyy2 = -b1/two + b3*rr*(1d0-(MZ3**2+MZ4**2)/(2d0*q34)) + two*b4*rr
           yyy3 = (-b2/two - b3- two*b4)*rr/q34
-!           yyy4 = -b1 - b2*rr -(b2+b3+2d0*b6)*rr*M_V**2/q34
-          yyy41 = -b1 - b2*(q34+MZ3**2)/Lambda**2 - b3*MZ4**2/Lambda**2 - 2d0*b6*M_V**2/Lambda**2
-          yyy42 = -b1 - b2*(q34+MZ4**2)/Lambda**2 - b3*MZ3**2/Lambda**2 - 2d0*b6*M_V**2/Lambda**2
+          yyy41 = -b1 - b2*(q34+MZ3**2)/Lambda**2 - b3*MZ4**2/Lambda**2
+          yyy42 = -b1 - b2*(q34+MZ4**2)/Lambda**2 - b3*MZ3**2/Lambda**2
           yyy5 = two*b8*rr*MG**2/q34
-!           yyy6 = b9
-          yyy6 = b9 * M_V**2/Lambda**2
-!           yyy7 = b10*rr*MG**2/q34
-          yyy7 = b10 * MG**2 * M_V**2/Lambda**4
+          yyy6 = czero
+          yyy7 = czero
+          if(VVMode.eq.ZZMode .or. VVMode.eq.WWMode) then
+             yyy1 = yyy1 + b5*M_V**2
+             yyy2 = yyy2 + b7*rr*M_V**2/q34
+             yyy41 = yyy41 - 2d0*b6*M_V**2/Lambda**2
+             yyy42 = yyy42 - 2d0*b6*M_V**2/Lambda**2
+             yyy6 = b9 * M_V**2/Lambda**2
+             yyy7 = b10 * MG**2 * M_V**2/Lambda**4
+          endif
       else
-          yyy1 = (q34)*c1/2d0
+          yyy1 = q34*c1/2d0
           yyy2 = c2
           yyy3 = c3/MG**2
-!           yyy4 = c4
-          yyy41= c41
-          yyy42= c42
+          yyy41 = c41
+          yyy42 = c42
           yyy5 = c5
-          yyy6 = c6
-          yyy7 = c7
-          if( IsAPhoton(DecayMode1) .and. IsAPhoton(DecayMode2) ) then
-              yyy6=0d0
-              yyy7=0d0
+          yyy6 = czero
+          yyy7 = czero
+          if(VVMode.eq.ZZMode .or. VVMode.eq.WWMode) then
+             yyy6 = c6
+             yyy7 = c7
           endif
       endif
-
 
       res = czero
 
@@ -1245,11 +1252,12 @@ enddo
                                        -3+2*i3,-3+2*i4,                                             &
                                        sp(3:4,:),pin(3:4,:)                                         &
                                       )
-      call GZZampl(pin,sp,i1,A(1))
+      call GZZampl(VVMode,pin,sp,i1,A(1))
    end subroutine
 
-      subroutine GZZampl(p,sp,i1,res)
+      subroutine GZZampl(VVMode,p,sp,i1,res)
       implicit none
+      integer, intent(in) :: VVMode
       real(dp), intent(in) :: p(4,4)
       complex(dp), intent(in) :: sp(0:4,4)
       integer,intent(in) :: i1
@@ -1301,13 +1309,8 @@ enddo
         e2 = sp(1,:)! -
       endif
 
-
-
-
       e3 = sp(3,:)
       e4 = sp(4,:)
-
-
 
       q = -q1-q2
 
@@ -1362,33 +1365,36 @@ enddo
       q34 = (MG**2-MZ3**2-MZ4**2)/2d0
 
       if (generate_bis) then
-          rr = q34/Lambda**2
-!           yyy1 = q34*(b1   + b2*rr*(one + two*M_V**2/q34+ M_V**4/q34**2)  + b5*M_V**2/q34)
-          yyy1 = q34*(b1 + b2*rr*(one+MZ3**2/q34)*(one+MZ4**2/q34)  + b5*M_V**2/q34)
-!           yyy2 = -b1/two + b3*rr*(1d0-M_V**2/q34) + two*b4*rr+b7*rr*M_V**2/q34
-          yyy2 = -b1/two + b3*rr*(1d0-(MZ3**2+MZ4**2)/(2d0*q34)) + two*b4*rr+b7*rr*M_V**2/q34
+          rr = q34/Lambda**2! kappa for FS
+
+          yyy1 = q34*( b1 + b2*rr*(one+MZ3**2/q34)*(one+MZ4**2/q34) )
+          yyy2 = -b1/two + b3*rr*(1d0-(MZ3**2+MZ4**2)/(2d0*q34)) + two*b4*rr
           yyy3 = (-b2/two - b3- two*b4)*rr/q34
-!           yyy4 = -b1 - b2*rr -(b2+b3+b6)*rr*M_V**2/q34
-          yyy41 = -b1 - b2*(q34+MZ3**2)/Lambda**2 - b3*MZ4**2/Lambda**2 - b6*M_V**2/Lambda**2
-          yyy42 = -b1 - b2*(q34+MZ4**2)/Lambda**2 - b3*MZ3**2/Lambda**2 - b6*M_V**2/Lambda**2
+          yyy41 = -b1 - b2*(q34+MZ3**2)/Lambda**2 - b3*MZ4**2/Lambda**2
+          yyy42 = -b1 - b2*(q34+MZ4**2)/Lambda**2 - b3*MZ3**2/Lambda**2
           yyy5 = two*b8*rr*MG**2/q34
-!           yyy6 = b9
-          yyy6 = b9 * M_V**2/Lambda**2
-!           yyy7 = b10*rr*MG**2/q34
-          yyy7 = b10 * MG**2 * M_V**2/Lambda**4
+          yyy6 = czero
+          yyy7 = czero
+          if(VVMode.eq.ZZMode .or. VVMode.eq.WWMode) then
+             yyy1 = yyy1 + b5*M_V**2
+             yyy2 = yyy2 + b7*rr*M_V**2/q34
+             yyy41 = yyy41 - 2d0*b6*M_V**2/Lambda**2
+             yyy42 = yyy42 - 2d0*b6*M_V**2/Lambda**2
+             yyy6 = b9 * M_V**2/Lambda**2
+             yyy7 = b10 * MG**2 * M_V**2/Lambda**4
+          endif
       else
-          yyy1 = (q34)*c1/2d0
+          yyy1 = q34*c1/2d0
           yyy2 = c2
           yyy3 = c3/MG**2
-!           yyy4 = c4
-          yyy41= c41
-          yyy42= c42
+          yyy41 = c41
+          yyy42 = c42
           yyy5 = c5
-          yyy6 = c6
-          yyy7 = c7
-          if( DecayMode1.eq.7 .and. DecayMode2.eq.7 ) then
-              yyy6=0d0
-              yyy7=0d0
+          yyy6 = czero
+          yyy7 = czero
+          if(VVMode.eq.ZZMode .or. VVMode.eq.WWMode) then
+             yyy6 = c6
+             yyy7 = c7
           endif
       endif
 
