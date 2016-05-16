@@ -1843,7 +1843,7 @@ end subroutine ReadCommandLineArgument_string
          pol_mass(2)=(ct*cphi-pol*ci*sphi)/sqrt2
          pol_mass(3)=(ct*sphi+pol*ci*cphi)/sqrt2
          pol_mass(4)=-st/sqrt2
-      elseif (pol.eq.0) then
+      else if(pol.eq.0) then
          pol_mass(1)= pv/m
          pol_mass(2)= p0/m/pv*px
          pol_mass(3)= p0/m/pv*py
