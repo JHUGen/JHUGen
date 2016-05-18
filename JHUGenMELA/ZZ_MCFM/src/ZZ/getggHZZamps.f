@@ -33,16 +33,18 @@ c---
       double precision shat,q3_q3,q4_q4
       double complex ghz1_dyn,ghz2_dyn,ghz3_dyn,ghz4_dyn
 
-! !==== for width studies rescale by appropriate factor 
-!       if((keep_smhiggs_norm).and.(anom_higgs)) then 
-!          rescale=chi_higgs**2 
-!       else
-!          rescale=1d0
-!       endif
+!==== for width studies rescale by appropriate factor 
+      if((keep_smhiggs_norm).and.(anom_higgs)) then 
+         rescale=chi_higgs**2 
+      else
+         rescale=1d0
+      endif
 
       Mloop_bquark(:,:,:,:)=czip
       Mloop_tquark(:,:,:,:)=czip
-     
+      if(hmass.lt.zip) then
+         return
+      endif
       call spinoru(6,p,za,zb)
 
 c--- squared masses and sin(thetaw)     
@@ -123,50 +125,10 @@ c R1R2:
       FFa3 = FFa3 * (0d0,-1d0)!  phase convention to match JHUGen
 
 c--- MARKUS: define q^2 dependent couplings
-      ghz1_dyn = ghz1 
-     &         + ghz1_prime * Lambda_z1**4/( Lambda_z1**2 
-     &         + abs(q3_q3) )/(Lambda_z1**2 + abs(q4_q4))
-     &         + ghz1_prime2*(abs(q3_q3)+abs(q4_q4))/Lambda_z1**2                                   
-     &         + ghz1_prime3*(abs(q3_q3)-abs(q4_q4))/Lambda_z1**2                                                                                   
-     &         + ghz1_prime4*(        shat         )/Lambda_Q**2                                                                                    
-     &         + ghz1_prime5*(abs(q3_q3)**2+abs(q4_q4)**2)/Lambda_z1**4
-     &         + ghz1_prime6*(abs(q3_q3)**2-abs(q4_q4)**2)/Lambda_z1**4
-     &         + ghz1_prime7*(abs(q3_q3)*abs(q4_q4))/Lambda_z1**4
-
-
-
-      ghz2_dyn = ghz2 
-     &         + ghz2_prime * Lambda_z2**4/( Lambda_z2**2 
-     &         + abs(q3_q3) )/(Lambda_z2**2 + abs(q4_q4))
-     &         + ghz2_prime2*(abs(q3_q3)+abs(q4_q4))/Lambda_z2**2                                   
-     &         + ghz2_prime3*(abs(q3_q3)-abs(q4_q4))/Lambda_z2**2                                                                                   
-     &         + ghz2_prime4*(        shat         )/Lambda_Q**2                                                                                    
-     &         + ghz2_prime5*(abs(q3_q3)**2+abs(q4_q4)**2)/Lambda_z2**4
-     &         + ghz2_prime6*(abs(q3_q3)**2-abs(q4_q4)**2)/Lambda_z2**4
-     &         + ghz2_prime7*(abs(q3_q3)*abs(q4_q4))/Lambda_z2**4
-
-
-      ghz3_dyn = ghz3 
-     &         + ghz3_prime * Lambda_z3**4/( Lambda_z3**2 
-     &         + abs(q3_q3) )/(Lambda_z3**2 + abs(q4_q4))
-     &         + ghz3_prime2*(abs(q3_q3)+abs(q4_q4))/Lambda_z3**2                                   
-     &         + ghz3_prime3*(abs(q3_q3)-abs(q4_q4))/Lambda_z3**2                                                                                   
-     &         + ghz3_prime4*(        shat         )/Lambda_Q**2                                                                                    
-     &         + ghz3_prime5*(abs(q3_q3)**2+abs(q4_q4)**2)/Lambda_z3**4
-     &         + ghz3_prime6*(abs(q3_q3)**2-abs(q4_q4)**2)/Lambda_z3**4
-     &         + ghz3_prime7*(abs(q3_q3)*abs(q4_q4))/Lambda_z3**4
-
-
-      ghz4_dyn = ghz4 
-     &         + ghz4_prime * Lambda_z4**4/( Lambda_z4**2 
-     &         + abs(q3_q3) )/(Lambda_z4**2 + abs(q4_q4))
-     &         + ghz4_prime2*(abs(q3_q3)+abs(q4_q4))/Lambda_z4**2                                   
-     &         + ghz4_prime3*(abs(q3_q3)-abs(q4_q4))/Lambda_z4**2                                                                                   
-     &         + ghz4_prime4*(        shat         )/Lambda_Q**2                                                                                    
-     &         + ghz4_prime5*(abs(q3_q3)**2+abs(q4_q4)**2)/Lambda_z4**4
-     &         + ghz4_prime6*(abs(q3_q3)**2-abs(q4_q4)**2)/Lambda_z4**4
-     &         + ghz4_prime7*(abs(q3_q3)*abs(q4_q4))/Lambda_z4**4
-
+      call HVVSpinZeroDynCoupl(ghz1_dyn,1,1,q3_q3,q4_q4,shat,.false.)
+      call HVVSpinZeroDynCoupl(ghz2_dyn,2,1,q3_q3,q4_q4,shat,.false.)
+      call HVVSpinZeroDynCoupl(ghz3_dyn,3,1,q3_q3,q4_q4,shat,.false.)
+      call HVVSpinZeroDynCoupl(ghz4_dyn,4,1,q3_q3,q4_q4,shat,.false.)
 
       aa1 =ghz1_dyn*zmass**2/shat
      &     + (s(1,2)-s(3,4)-s(5,6))/shat*
@@ -175,7 +137,6 @@ c--- MARKUS: define q^2 dependent couplings
       aa2 =-2d0*ghz2_dyn
      &     -ghz3_dyn*(s(1,2)-s(3,4)-s(5,6))/2d0/LambdaBSM**2
       aa3 =-2d0*ghz4_dyn
-
 
       aa1 = aa1 / zmass**2 *wmass/(sinthw*(1d0-xw))*prop34*prop56 
       aa2 = aa2 / zmass**2 *wmass/(sinthw*(1d0-xw))*prop34*prop56 
@@ -231,20 +192,7 @@ c--- Rescale for width study
       end
       
 
-      
-      
-      
-
-      subroutine getggSMHZZamps(p,Mloop_bquark,Mloop_tquark)
-c--- Returns a series of arrays representing the dressed amp[itudes
-c--- for the process gg->Higgs->ZZ; there are:
-c---        Mloop_bquark(h1,h2,h34,h56)   top quark mass=mt
-c---        Mloop_tquark(h1,h2,h34,h56)   bottom quark mass=mb
-c---
-c--- The overall factor on the amplitude is:
-c---
-c---      4d0*esq*gsq/(16d0*pisq)*esq * delta(a,b)
-c---
+      subroutine getggH2ZZamps(p,Mloop_bquark,Mloop_tquark)
       implicit none
       include 'constants.f'
       include 'masses.f'
@@ -259,22 +207,25 @@ c---
       double precision p(mxpart,4),mb2,mt2
       double complex Mloop_bquark(2,2,2,2),Mloop_tquark(2,2,2,2),
      & ggHmt(2,2),ggHmb(2,2),qlI3,C0mt,C0mb,prop12,prop34,prop56,
-     & H4l(2,2),sinthw,SMhiggsprop
+     & H4l(2,2),sinthw,higgs2prop
       double precision rescale 
       double complex FFa1(2,2), FFa2(2,2), FFa3(2,2)
       double complex aa1,aa2,aa3
       double precision shat,q3_q3,q4_q4
-      double complex gSMhz1_dyn,gSMhz2_dyn,gSMhz3_dyn,gSMhz4_dyn
+      double complex ghz1_dyn,ghz2_dyn,ghz3_dyn,ghz4_dyn
 
-! !==== for width studies rescale by appropriate factor 
-!       if((keep_smhiggs_norm).and.(anom_higgs)) then 
-!          rescale=chi_higgs**2 
-!       else
+!==== for width studies rescale by appropriate factor 
+      if((keep_smhiggs_norm).and.(anom_higgs)) then 
+         rescale=chi_higgs**2 
+      else
          rescale=1d0
-!       endif
+      endif
 
       Mloop_bquark(:,:,:,:)=czip
       Mloop_tquark(:,:,:,:)=czip
+      if(h2mass.lt.zip) then
+         return
+      endif
      
       call spinoru(6,p,za,zb)
 
@@ -285,7 +236,7 @@ c--- squared masses and sin(thetaw)
       
       
 c--- propagator factors
-      prop12=SMhiggsprop(s(1,2))
+      prop12=higgs2prop(s(1,2))
       prop34=cone/dcmplx(s(3,4)-zmass**2,zmass*zwidth)
       prop56=cone/dcmplx(s(5,6)-zmass**2,zmass*zwidth)
 
@@ -356,59 +307,18 @@ c R1R2:
       FFa3 = FFa3 * (0d0,-1d0)!  phase convention to match JHUGen
 
 c--- MARKUS: define q^2 dependent couplings
-      gSMhz1_dyn = gSMhz1 
-     &         + gSMhz1_prime * LambdaSM_z1**4/( LambdaSM_z1**2 
-     &         + abs(q3_q3) )/(LambdaSM_z1**2 + abs(q4_q4))
-     &         + gSMhz1_prime2*(abs(q3_q3)+abs(q4_q4))/LambdaSM_z1**2                                   
-     &         + gSMhz1_prime3*(abs(q3_q3)-abs(q4_q4))/LambdaSM_z1**2                                                                                   
-     &         + gSMhz1_prime4*(        shat         )/LambdaSM_Q**2                                                                                    
-     &         + gSMhz1_prime5*(abs(q3_q3)**2+abs(q4_q4)**2)/LambdaSM_z1**4
-     &         + gSMhz1_prime6*(abs(q3_q3)**2-abs(q4_q4)**2)/LambdaSM_z1**4
-     &         + gSMhz1_prime7*(abs(q3_q3)*abs(q4_q4))/LambdaSM_z1**4
+      call HVVSpinZeroDynCoupl(ghz1_dyn,1,2,q3_q3,q4_q4,shat,.false.)
+      call HVVSpinZeroDynCoupl(ghz2_dyn,2,2,q3_q3,q4_q4,shat,.false.)
+      call HVVSpinZeroDynCoupl(ghz3_dyn,3,2,q3_q3,q4_q4,shat,.false.)
+      call HVVSpinZeroDynCoupl(ghz4_dyn,4,2,q3_q3,q4_q4,shat,.false.)
 
-
-
-      gSMhz2_dyn = gSMhz2 
-     &         + gSMhz2_prime * LambdaSM_z2**4/( LambdaSM_z2**2 
-     &         + abs(q3_q3) )/(LambdaSM_z2**2 + abs(q4_q4))
-     &         + gSMhz2_prime2*(abs(q3_q3)+abs(q4_q4))/LambdaSM_z2**2                                   
-     &         + gSMhz2_prime3*(abs(q3_q3)-abs(q4_q4))/LambdaSM_z2**2                                                                                   
-     &         + gSMhz2_prime4*(        shat         )/LambdaSM_Q**2                                                                                    
-     &         + gSMhz2_prime5*(abs(q3_q3)**2+abs(q4_q4)**2)/LambdaSM_z2**4
-     &         + gSMhz2_prime6*(abs(q3_q3)**2-abs(q4_q4)**2)/LambdaSM_z2**4
-     &         + gSMhz2_prime7*(abs(q3_q3)*abs(q4_q4))/LambdaSM_z2**4
-
-
-      gSMhz3_dyn = gSMhz3 
-     &         + gSMhz3_prime * LambdaSM_z3**4/( LambdaSM_z3**2 
-     &         + abs(q3_q3) )/(LambdaSM_z3**2 + abs(q4_q4))
-     &         + gSMhz3_prime2*(abs(q3_q3)+abs(q4_q4))/LambdaSM_z3**2                                   
-     &         + gSMhz3_prime3*(abs(q3_q3)-abs(q4_q4))/LambdaSM_z3**2                                                                                   
-     &         + gSMhz3_prime4*(        shat         )/LambdaSM_Q**2                                                                                    
-     &         + gSMhz3_prime5*(abs(q3_q3)**2+abs(q4_q4)**2)/LambdaSM_z3**4
-     &         + gSMhz3_prime6*(abs(q3_q3)**2-abs(q4_q4)**2)/LambdaSM_z3**4
-     &         + gSMhz3_prime7*(abs(q3_q3)*abs(q4_q4))/LambdaSM_z3**4
-
-
-      gSMhz4_dyn = gSMhz4 
-     &         + gSMhz4_prime * LambdaSM_z4**4/( LambdaSM_z4**2 
-     &         + abs(q3_q3) )/(LambdaSM_z4**2 + abs(q4_q4))
-     &         + gSMhz4_prime2*(abs(q3_q3)+abs(q4_q4))/LambdaSM_z4**2                                   
-     &         + gSMhz4_prime3*(abs(q3_q3)-abs(q4_q4))/LambdaSM_z4**2                                                                                   
-     &         + gSMhz4_prime4*(        shat         )/LambdaSM_Q**2                                                                                    
-     &         + gSMhz4_prime5*(abs(q3_q3)**2+abs(q4_q4)**2)/LambdaSM_z4**4
-     &         + gSMhz4_prime6*(abs(q3_q3)**2-abs(q4_q4)**2)/LambdaSM_z4**4
-     &         + gSMhz4_prime7*(abs(q3_q3)*abs(q4_q4))/LambdaSM_z4**4
-
-
-      aa1 =gSMhz1_dyn*zmass**2/shat
+      aa1 =ghz1_dyn*zmass**2/shat
      &     + (s(1,2)-s(3,4)-s(5,6))/shat*
-     &       (gSMhz2_dyn
-     &       +gSMhz3_dyn*(s(1,2)-s(3,4)-s(5,6))/4d0/LambdaSM**2)
-      aa2 =-2d0*gSMhz2_dyn
-     &     -gSMhz3_dyn*(s(1,2)-s(3,4)-s(5,6))/2d0/LambdaSM**2
-      aa3 =-2d0*gSMhz4_dyn
-
+     &       (ghz2_dyn
+     &       +ghz3_dyn*(s(1,2)-s(3,4)-s(5,6))/4d0/LambdaBSM**2)
+      aa2 =-2d0*ghz2_dyn
+     &     -ghz3_dyn*(s(1,2)-s(3,4)-s(5,6))/2d0/LambdaBSM**2
+      aa3 =-2d0*ghz4_dyn
 
       aa1 = aa1 / zmass**2 *wmass/(sinthw*(1d0-xw))*prop34*prop56 
       aa2 = aa2 / zmass**2 *wmass/(sinthw*(1d0-xw))*prop34*prop56 
@@ -424,7 +334,7 @@ c--- MARKUS: NEW amplitudes with anomalous couplings for Higgs decay
       ELSE
 
 c--- original MCFM amplitudes for the Higgs decay
-c--- gives identical values to the above implementation if gSMhz1=1
+c--- gives identical values to the above implementation if gh2z1=1
       H4l(1,1)=za(3,5)*zb(4,6)*l1*l2
      &        *wmass/(sinthw*(1d0-xw))*prop34*prop56
       H4l(2,1)=za(4,5)*zb(3,6)*r1*l2
@@ -433,6 +343,7 @@ c--- gives identical values to the above implementation if gSMhz1=1
      &        *wmass/(sinthw*(1d0-xw))*prop34*prop56
       H4l(2,2)=za(4,6)*zb(3,5)*r1*r2
      &        *wmass/(sinthw*(1d0-xw))*prop34*prop56
+
 
       ENDIF
 
@@ -461,4 +372,4 @@ c--- Rescale for width study
 
       return
       end
-      
+
