@@ -315,9 +315,9 @@ c--- MARKUS: define q^2 dependent couplings
       aa1 =ghz1_dyn*zmass**2/shat
      &     + (s(1,2)-s(3,4)-s(5,6))/shat*
      &       (ghz2_dyn
-     &       +ghz3_dyn*(s(1,2)-s(3,4)-s(5,6))/4d0/LambdaBSM**2)
+     &       +ghz3_dyn*(s(1,2)-s(3,4)-s(5,6))/4d0/Lambda2BSM**2)
       aa2 =-2d0*ghz2_dyn
-     &     -ghz3_dyn*(s(1,2)-s(3,4)-s(5,6))/2d0/LambdaBSM**2
+     &     -ghz3_dyn*(s(1,2)-s(3,4)-s(5,6))/2d0/Lambda2BSM**2
       aa3 =-2d0*ghz4_dyn
 
       aa1 = aa1 / zmass**2 *wmass/(sinthw*(1d0-xw))*prop34*prop56 
