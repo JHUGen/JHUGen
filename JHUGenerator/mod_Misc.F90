@@ -1004,5 +1004,13 @@ subroutine spinoru(p,za,zb,s)
 
     END SUBROUTINE EvaluateSpline
 
-END MODULE
+function infinity()
+real :: infinity, x
+!http://stackoverflow.com/a/25996548/5228524
 
+    x = 0
+    infinity=-log(x)
+
+end function infinity
+
+END MODULE

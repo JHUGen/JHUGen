@@ -126,8 +126,11 @@ logical, public            :: H_DK =.false.                 ! default to false s
 !=====================================================
 !cuts - should be set on the command line
 real(8), public :: pTjetcut = -1d0*GeV                        ! jet min pt, default is set in main (0 in VH, 15 GeV otherwise)
+real(8), public :: etajetcut = 0d0                            ! jet max |eta|
 real(8), public :: Rjet = -1d0                                ! jet deltaR, anti-kt algorithm, default is set in main (0 in VH, 0.3 otherwise)
 real(8), public :: mJJcut = 0d0*GeV                           ! minimum mJJ for VBF, HJJ, bbH, VH
+real(8), public :: pTlepcut = 0d0*GeV                         ! lepton min pT
+real(8), public :: etalepcut = 0d0                            ! lepton max |eta|
 real(8), public :: m4l_minmax(1:2) = (/ -1d0,-1d0 /)*GeV      ! min and max for m_4l in off-shell VBF production;   default is (-1,-1): m_4l ~ Higgs resonance (on-shell)
 logical, public :: includeGammaStar = .false.                 ! include offshell photons?
 real(8), public :: MPhotonCutoff = 4d0*GeV                    ! minimum |mass| for offshell photons when includeGammaStar = .true.
@@ -1284,6 +1287,35 @@ integer :: DKMode
 END FUNCTION
 
 
+
+FUNCTION HasQuarkDecay(DKMode)
+implicit none
+logical :: HasQuarkDecay
+integer :: DKMode
+
+
+  if( DKMode.eq.1 .or. DKMode.eq.5 .or. DKMode.eq.9 .or. DKMode.eq.11 ) then
+     HasQuarkDecay = .true.
+  else
+     HasQuarkDecay = .false.
+  endif
+
+END FUNCTION
+
+
+FUNCTION HasLeptonDecay(DKMode)
+implicit none
+logical :: HasLeptonDecay
+integer :: DKMode
+
+
+  if( DKMode.eq.0 .or. DKMode.eq.2 .or. DKMode.eq.4 .or. DKMode.eq.6 .or. (DKMode.ge.8 .and. DKMode.le.11) ) then
+     HasLeptonDecay = .true.
+  else
+     HasLeptonDecay = .false.
+  endif
+
+END FUNCTION
 
 
 
