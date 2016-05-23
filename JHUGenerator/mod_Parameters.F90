@@ -49,13 +49,12 @@ logical, public :: warmup
 character(len=500) :: DataFile
 character(len=100) :: LogFile
 character(len=500) :: LHEProdFile
-#if useLHAPDF==1
+! PDFset variables, present regardless of useLHAPDF value due to MELA
 character(len=100) :: LHAPDFString
 character(len=500) :: LHAPDF_DATA_PATH
-integer, public :: LHAPDFMember
-#else
+integer, public :: LHAPDFMember, lenLHAPDFString ! lenLHAPDFString is needed in MELA
 integer, public :: PDFSet
-#endif
+! End PDFset variables
 logical, public :: includeInterference, writegit
 real(8), public :: M_V,Ga_V
 real(8), public, parameter :: GeV=1d0/100d0 ! we are using units of 100GeV, i.e. Lambda=10 is 1TeV

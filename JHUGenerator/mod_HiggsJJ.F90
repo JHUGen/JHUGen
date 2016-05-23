@@ -7,7 +7,7 @@ module modHiggsJJ
   public :: EvalAmp_WBFH_UnSymm_SA,EvalAmp_WBFH_UnSymm_SA_Select,EvalAmp_WBFH_UnSymm_SA_Select_exact
   public :: EvalAmp_SBFH_UnSymm_SA,EvalAmp_SBFH_UnSymm_SA_Select,EvalAmp_SBFH_UnSymm_SA_Select_exact
   !public :: wrapHVV
-  public :: get_VBFchannelHash,get_VBFchannelHash_nosplit,get_HJJchannelHash,get_GENchannelHash
+  public :: get_VBFchannelHash,get_VBFchannelHash_nosplit,get_HJJchannelHash,get_HJJchannelHash_nosplit,get_GENchannelHash
 
   !-- general definitions, to be merged with Markus final structure
   real(dp), parameter :: nf = 5.0_dp
@@ -311,6 +311,96 @@ module modHiggsJJ
   return
   end subroutine
 
+
+  subroutine get_HJJchannelHash_nosplit(ijSel,nijchannels)
+  implicit none
+  integer, intent(out) :: ijSel(1:121,1:3)
+  integer, intent(out) :: nijchannels
+
+      ijSel(  1,1:3) = (/ 0, 0, 1/)
+      ijSel(  2,1:3) = (/ 0, 0, 2/)
+      ijSel(  3,1:3) = (/ 2, 0, 1/)
+      ijSel(  4,1:3) = (/ 1, 0, 1/)
+      ijSel(  5,1:3) = (/ 0,-1, 1/)
+      ijSel(  6,1:3) = (/ 0,-2, 1/)
+      ijSel(  7,1:3) = (/ 3, 0, 1/)
+      ijSel(  8,1:3) = (/ 0,-3, 1/)
+      ijSel(  9,1:3) = (/ 4, 0, 1/)
+      ijSel( 10,1:3) = (/ 0,-4, 1/)
+      ijSel( 11,1:3) = (/ 5, 0, 1/)
+      ijSel( 12,1:3) = (/ 0,-5, 1/)
+      ijSel( 13,1:3) = (/ 2, 2, 1/)
+      ijSel( 14,1:3) = (/ 2, 1, 1/)
+      ijSel( 15,1:3) = (/ 2,-2, 1/)
+      ijSel( 16,1:3) = (/ 2,-2, 2/)
+      ijSel( 17,1:3) = (/ 2,-2, 3/)
+      ijSel( 18,1:3) = (/ 1,-1, 1/)
+      ijSel( 19,1:3) = (/ 1,-1, 2/)
+      ijSel( 20,1:3) = (/ 1,-1, 3/)
+      ijSel( 21,1:3) = (/ 2,-1, 1/)
+      ijSel( 22,1:3) = (/ 1, 1, 1/)
+      ijSel( 23,1:3) = (/ 3, 2, 1/)
+      ijSel( 24,1:3) = (/ 2,-3, 1/)
+      ijSel( 25,1:3) = (/ 4, 2, 1/)
+      ijSel( 26,1:3) = (/ 1,-2, 1/)
+      ijSel( 27,1:3) = (/ 2,-4, 1/)
+      ijSel( 28,1:3) = (/ 1,-3, 1/)
+      ijSel( 29,1:3) = (/ 2,-5, 1/)
+      ijSel( 30,1:3) = (/ 3, 1, 1/)
+      ijSel( 31,1:3) = (/ 5, 2, 1/)
+      ijSel( 32,1:3) = (/ 4, 1, 1/)
+      ijSel( 33,1:3) = (/ 1,-4, 1/)
+      ijSel( 34,1:3) = (/ 5, 1, 1/)
+      ijSel( 35,1:3) = (/ 1,-5, 1/)
+      ijSel( 36,1:3) = (/-1,-2, 1/)
+      ijSel( 37,1:3) = (/ 3,-1, 1/)
+      ijSel( 38,1:3) = (/ 3,-3, 1/)
+      ijSel( 39,1:3) = (/ 3,-3, 2/)
+      ijSel( 40,1:3) = (/ 3,-3, 3/)
+      ijSel( 41,1:3) = (/-2,-3, 1/)
+      ijSel( 42,1:3) = (/-1,-3, 1/)
+      ijSel( 43,1:3) = (/ 3,-2, 1/)
+      ijSel( 44,1:3) = (/-1,-1, 1/)
+      ijSel( 45,1:3) = (/ 4,-1, 1/)
+      ijSel( 46,1:3) = (/-2,-2, 1/)
+      ijSel( 47,1:3) = (/-1,-4, 1/)
+      ijSel( 48,1:3) = (/ 4,-2, 1/)
+      ijSel( 49,1:3) = (/-2,-4, 1/)
+      ijSel( 50,1:3) = (/ 5,-1, 1/)
+      ijSel( 51,1:3) = (/-1,-5, 1/)
+      ijSel( 52,1:3) = (/ 4,-4, 1/)
+      ijSel( 53,1:3) = (/ 4,-4, 2/)
+      ijSel( 54,1:3) = (/ 4,-4, 3/)
+      ijSel( 55,1:3) = (/ 4,-3, 1/)
+      ijSel( 56,1:3) = (/ 4, 3, 1/)
+      ijSel( 57,1:3) = (/ 3,-4, 1/)
+      ijSel( 58,1:3) = (/-2,-5, 1/)
+      ijSel( 59,1:3) = (/-3,-4, 1/)
+      ijSel( 60,1:3) = (/ 5,-2, 1/)
+      ijSel( 61,1:3) = (/ 3, 3, 1/)
+      ijSel( 62,1:3) = (/-3,-3, 1/)
+      ijSel( 63,1:3) = (/ 5, 3, 1/)
+      ijSel( 64,1:3) = (/ 3,-5, 1/)
+      ijSel( 65,1:3) = (/ 5,-3, 1/)
+      ijSel( 66,1:3) = (/-3,-5, 1/)
+      ijSel( 67,1:3) = (/ 5, 4, 1/)
+      ijSel( 68,1:3) = (/ 5,-4, 1/)
+      ijSel( 69,1:3) = (/-4,-5, 1/)
+      ijSel( 70,1:3) = (/ 4,-5, 1/)
+      ijSel( 71,1:3) = (/ 5,-5, 1/)
+      ijSel( 72,1:3) = (/ 5,-5, 2/)
+      ijSel( 73,1:3) = (/ 5,-5, 3/)
+      ijSel( 74,1:3) = (/-4,-4, 1/)
+      ijSel( 75,1:3) = (/ 4, 4, 1/)
+      ijSel( 76,1:3) = (/-5,-5, 1/)
+      ijSel( 77,1:3) = (/ 5, 5, 1/)
+
+      nijchannels=77
+
+      ijSel( 78:,:) = 0
+
+  return
+  end subroutine
 
 
   subroutine get_GENchannelHash(ijSel)
@@ -714,7 +804,6 @@ return
 	integer :: j1,j2,k1,k2
 	logical :: isGGGG,isQQGG,isQQQQ,isQQQQ_idQ
 
-	if( (abs(iSel).eq.pdfTop_ .or. abs(jSel).eq.pdfTop_) .or. (abs(rSel).eq.pdfTop_ .or. abs(sSel).eq.pdfTop_) ) return
 	restmp=0.0_dp
 	restmpid=0.0_dp
 	res(:,:)=0.0_dp
@@ -726,6 +815,7 @@ return
 	j2 = 0
 	k1 = 0
 	k2 = 0
+	if( (abs(iSel).eq.pdfTop_ .or. abs(jSel).eq.pdfTop_) .or. (abs(rSel).eq.pdfTop_ .or. abs(sSel).eq.pdfTop_) ) return
 
 	!print *, "Begin EvalAmp_SBFH_UnSymm_SA_Select_exact"
 	!print *, "iSel: ",iSel,", jSel: ",jSel," rSel: ",rSel," sSel: ",sSel
@@ -734,44 +824,44 @@ return
 	   if(jSel.eq.pdfGlu_) then ! gg
 	      if(rSel.eq.pdfGlu_ .and. sSel .eq. pdfGlu_) then ! gg->gg
 			 isGGGG=.true.
-		     j1=1
-	         j2=2
+		    j1=1
+          j2=2
 			 k1=3
 			 k2=4
 
 	      elseif(sSel.eq.(-rSel)) then ! gg->qqb/qbq
 			 isQQGG=.true.
-		     if(rSel.gt.0) then ! gg->qqb
-		        j1=4
+		    if(rSel.gt.0) then ! gg->qqb
+		       j1=4
 			    j2=3
-		     else ! gg->qbq
-		        j1=3
+		    else ! gg->qbq
+		       j1=3
 			    j2=4
 			 endif
-		     k1=1
-	         k2=2
+		       k1=1
+	          k2=2
 		  endif
 
 	   elseif(abs(jSel).eq.pdfUp_ .or. abs(jSel).eq.pdfChm_ .or. abs(jSel).eq.pdfDn_ .or. abs(jSel).eq.pdfStr_ .or. abs(jSel).eq.pdfBot_) then ! gq/gqb
-		  isQQGG=.true.
+		   isQQGG=.true.
 	      k1=1
 	      if(jSel.gt.0) then ! gq
 		     j1=2
 		     if(rSel.eq.iSel .and. sSel.eq.jSel) then ! gq->gq
 		        k2=3
-				j2=4
+				  j2=4
 			 elseif(sSel.eq.iSel .and. rSel.eq.jSel) then ! gq->qg
-			    j2=3
-				k2=4
+			     j2=3
+				  k2=4
 			 endif
 	      else ! gqb
 			 j2=2
-		     if(rSel.eq.iSel .and. sSel.eq.jSel) then ! gqb->gqb
+		    if(rSel.eq.iSel .and. sSel.eq.jSel) then ! gqb->gqb
 		        k2=3
-				j1=4
+				  j1=4
 			 elseif(sSel.eq.iSel .and. rSel.eq.jSel) then ! gqb->qbg
-			    j1=3
-				k1=4
+			     j1=3
+				  k1=4
 			 endif
 	      endif
 	   endif
@@ -2184,8 +2274,6 @@ return
     integer :: kz1, kz2, kw1, kw2
     logical :: ZZ_fusion,WW_fusion
 
-    if( (abs(iSel).eq.pdfTop_ .or. abs(jSel).eq.pdfTop_) .or. (abs(rSel).eq.pdfTop_ .or. abs(sSel).eq.pdfTop_) ) return
-
     !print *, "Begin EvalAmp_WBFH_UnSymm_SA_Select_exact"
     !print *, "iSel: ",iSel,", jSel: ",jSel," rSel: ",rSel," sSel: ",sSel
 
@@ -2203,6 +2291,9 @@ return
     jz2 = 2
     jw1 = jz1
     jw2 = jz2
+
+    if( (abs(iSel).eq.pdfTop_ .or. abs(jSel).eq.pdfTop_) .or. (abs(rSel).eq.pdfTop_ .or. abs(sSel).eq.pdfTop_) ) return
+    if( (abs(iSel).eq.pdfGlu_ .or. abs(jSel).eq.pdfGlu_) .or. (abs(rSel).eq.pdfGlu_ .or. abs(sSel).eq.pdfGlu_) ) return
 
     if( &
          (iSel.eq.rSel .and. jSel.eq.sSel) &
