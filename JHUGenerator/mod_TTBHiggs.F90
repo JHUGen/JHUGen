@@ -3,7 +3,7 @@ use ModParameters
 implicit none
 
 
-public :: EvalXSec_PP_TTBH, EvalAmp_GG_TTBH, EvalAmp_QQB_TTBH, InitProcess_TTBH
+public :: EvalXSec_PP_TTBH, EvalXSec_PP_BBBH, EvalAmp_GG_TTBH, EvalAmp_QQB_TTBH, InitProcess_TTBH
 private
 
 integer,parameter :: ColorlessTag = 1
@@ -77,6 +77,8 @@ real(8), intent(out) :: Res(-5:5,-5:5)
 real(8) :: MatElSq_GG,MatElSq_QQB,MatElSq_QBQ
 integer :: iq
 
+   call InitProcess_TTBH()
+
    MatElSq_QQB = 0d0
    MatElSq_QBQ = 0d0
    MatElSq_GG  = 0d0
@@ -102,6 +104,24 @@ integer :: iq
    RETURN
 END SUBROUTINE
 
+SUBROUTINE EvalXSec_PP_BBBH(Mom,SelectProcess,Res)
+implicit none
+real(8), intent(in) :: Mom(1:4,1:13)
+integer,intent(in) :: SelectProcess! 0=gg, 1=qqb, 2=all
+real(8), intent(out) :: Res(-5:5,-5:5)
+real(8) :: tmptopmass
+integer :: tmptopdec
+   tmptopmass = M_Top
+   tmptopdec = TopDecays
+
+   M_Top = M_Bot
+   TopDecays=0
+   call EvalXSec_PP_TTBH(Mom,SelectProcess,Res)
+
+   M_Top = tmptopmass
+   TopDecays = tmptopdec
+   RETURN
+END SUBROUTINE
 
 
 
