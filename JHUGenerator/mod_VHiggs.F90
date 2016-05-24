@@ -532,11 +532,13 @@ END SUBROUTINE
 
       if(H_DK.eqv..false.)then
         MATRIXELEMENT0=MATRIXELEMENT0 *PROP3
-      else
+      else if(id(8).ne.Not_a_particle_) then
         MATRIXELEMENT0=MATRIXELEMENT0 *PROP3 &
         *(gFFS*FFS(id(8), MomExt(:,8), helicity(8), id(9), MomExt(:,9), helicity(9)) &
          +gFFP*FFP(id(8), MomExt(:,8), helicity(8), id(9), MomExt(:,9), helicity(9)))&
-        *(0d0,-1d0)*m_bot/vev
+        *(-ci/vev*getMass(convertLHEreverse(id(8))))
+      else
+        MATRIXELEMENT0=czero
       endif
 
       return

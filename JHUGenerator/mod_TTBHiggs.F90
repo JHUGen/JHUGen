@@ -3,7 +3,7 @@ use ModParameters
 implicit none
 
 
-public :: EvalAmp_GG_TTBH, EvalAmp_QQB_TTBH, InitProcess_TTBH
+public :: EvalXSec_PP_TTBH, EvalAmp_GG_TTBH, EvalAmp_QQB_TTBH, InitProcess_TTBH
 private
 
 integer,parameter :: ColorlessTag = 1
@@ -69,6 +69,38 @@ complex(8) :: couplHTT_right_dyn,couplHTT_left_dyn
    CONTAINS
 
 
+SUBROUTINE EvalXSec_PP_TTBH(Mom,SelectProcess,Res)
+implicit none
+real(8), intent(in) :: Mom(1:4,1:13)
+integer,intent(in) :: SelectProcess! 0=gg, 1=qqb, 2=all
+real(8), intent(out) :: Res(-5:5,-5:5)
+real(8) :: MatElSq_GG,MatElSq_QQB,MatElSq_QBQ
+integer :: iq
+
+   MatElSq_QQB = 0d0
+   MatElSq_QBQ = 0d0
+   MatElSq_GG  = 0d0
+   if( SelectProcess.eq.0 ) then
+      call EvalAmp_GG_TTBH(Mom(1:4,1:13),MatElSq_GG)
+   elseif( SelectProcess.eq.1 ) then
+      call EvalAmp_QQB_TTBH(Mom(1:4,1:13),MatElSq_QQB)
+      MatElSq_QBQ = MatElSq_QQB
+   else
+      call EvalAmp_GG_TTBH(Mom(1:4,1:13),MatElSq_GG)
+      call EvalAmp_QQB_TTBH(Mom(1:4,1:13),MatElSq_QQB)
+      MatElSq_QBQ = MatElSq_QQB
+   endif
+   do iq=0,5
+      if(iq.eq.pdfGlu_) then
+         Res(iq,iq) = MatElSq_GG
+      else
+         Res(iq,-iq) = MatElSq_QQB
+         Res(-iq,iq) = MatElSq_QBQ
+      endif
+   enddo
+
+   RETURN
+END SUBROUTINE
 
 
 
