@@ -254,15 +254,20 @@ real(8),parameter :: ScanRange=120d0*GeV
 
 
   print *, " finding P_decay(m4l) distribution with ", PMZZEvals, " calls per point"
-  DecayWidth0 = GetMZZProbability(M_Reso,-1d0,.false.)
   minEhat = dreal(PrintPMZZ)
   maxEhat = dimag(PrintPMZZ)
+  if (ReadPMZZ) then
+     mininputmHstar = minEhat
+     maxinputmHstar = maxEhat
+     call InitMZZdistribution()
+  endif
+  DecayWidth0 = GetMZZProbability(M_Reso,-1d0,ReadPMZZ)
 
   do nscan=0,PrintPMZZIntervals
 
      EHat = minEhat+nscan*(maxEhat-minEhat)/PrintPMZZIntervals
      if( PrintPMZZIntervals.eq.0 ) EHat = minEhat
-     DecayWidth = GetMZZProbability(EHat,-1d0,.false.)
+     DecayWidth = GetMZZProbability(EHat,-1d0,ReadPMZZ)
      write(*,"(1F10.5,1PE16.9)") EHat*100d0,DecayWidth/DecayWidth0
 
   enddo
