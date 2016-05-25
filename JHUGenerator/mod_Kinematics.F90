@@ -1976,10 +1976,10 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
           applyPSCut=.true.
           return
        endif
-       if( m_4l.lt.70d0*GeV ) then
-          applyPSCut=.true.
-          return
-       endif
+!       if( m_4l.lt.70d0*GeV ) then
+!          applyPSCut=.true.
+!          return
+!       endif
 
        if( pT_l1.lt.3d0*GeV .or. pT_l2.lt.3d0*GeV .or. pT_l3.lt.3d0*GeV .or. pT_l4.lt.3d0*GeV ) then
           applyPSCut=.true.
@@ -2007,10 +2007,6 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
 !           return
 !        endif
 
-       if( dabs(m_4l).lt.70d0*GeV ) then
-          applyPSCut=.true.
-          return
-       endif
 
         if( abs(y_j1).gt.4d0 .or. abs(y_j2).gt.4d0 ) then
            applyPSCut=.true.
@@ -2075,8 +2071,8 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
        NBin(3)  = WhichBin(3,pT_H)
        NBin(4)  = WhichBin(4,pT_jl)
        NBin(5)  = WhichBin(5,dy_j1j2)
-       NBin(6)  = WhichBin(6,y_j1)
-       NBin(7)  = WhichBin(7,y_j2)
+       NBin(6)  = WhichBin(6,mZ1)
+       NBin(7)  = WhichBin(7,mZ2)
        NBin(8)  = WhichBin(8,m_4l)
        NBin(9)  = WhichBin(9,Phi1)
 

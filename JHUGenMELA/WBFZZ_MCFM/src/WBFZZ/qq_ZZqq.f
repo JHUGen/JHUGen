@@ -72,7 +72,6 @@ c     ,j3_4(4,2),j5_6(4,2),
       integer,parameter:: j7(jmax)=(/7,7,2,1,1,8,2,8,2,8,1,8/)
       integer,parameter:: j8(jmax)=(/8,8,1,2,8,1,8,2,8,2,8,1/)
       save doHO,doBO,mult
-
       data Q(-5)/+0.333333333333333d0/
       data Q(-4)/-0.666666666666667d0/
       data Q(-3)/+0.333333333333333d0/
@@ -269,12 +268,14 @@ c--- and the following lines set up the appropriate masses and sin^2(theta_w)
        cxw=cone-cwmass2/czmass2
        call couplz(xw)
        
-       ! MARKUS: choosing ZZ final state
+       ! MARKUS: choosing ZZ/gaga-->3l final states (not included in signal)
        l1=le
        l2=le
        r1=re
        r2=re
-       
+       q1=-1d0
+       q2=-1d0
+
 c       cxw=dcmplx(xw,0d0) ! DEBUG: Madgraph comparison
        write(6,*)
        write(6,*) '**************** Complex-mass scheme ***************'
@@ -288,7 +289,7 @@ c       cxw=dcmplx(xw,0d0) ! DEBUG: Madgraph comparison
        doHO=.false.
        doBO=.false.
        
-       runstring(4:5)="what-nonsense-this-is"
+       runstring(4:5)="XX"
 !        runstring(4:5)="HO"
        
        

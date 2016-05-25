@@ -1137,7 +1137,7 @@ include "vegas_common.f"
          NDim = NDim + 1
          NDim = NDim + 1
 
-         VegasIt1_default = 5
+         VegasIt1_default = 15
          VegasNc0_default = 10000000
          VegasNc1_default = 500000
          VegasNc2_default = 10000
@@ -1614,26 +1614,40 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
         return
     endif
 
+    outgridfile=trim(DataFile)//'.grid'
+    ingridfile=trim(outgridfile)
 
     ! WARM-UP RUN
-    itmx = VegasIt1
-    ncall= VegasNc1
-    warmup = .true.
-    if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) call vegas(EvalWeighted,VG_Result,VG_Error,VG_Chi2)
-    if( Process.eq.80 ) call vegas(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
-    if( Process.eq.90 ) call vegas(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
+    if( .not. ReadCSmax ) then 
+      readin=.false.
+      writeout=.true.
 
-    if( Process.eq.60 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
-    if( Process.eq.66 ) call vegas(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
-    if( Process.eq.61 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
+      itmx = VegasIt1
+      ncall= VegasNc1
+      warmup = .true.
+      if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) call vegas(EvalWeighted,VG_Result,VG_Error,VG_Chi2)
+      if( Process.eq.80 ) call vegas(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
+      if( Process.eq.90 ) call vegas(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
 
-    if( Process.eq.110) call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
-    if( Process.eq.111) call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
+      if( Process.eq.60 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
+      if( Process.eq.66 ) call vegas(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
+      if( Process.eq.61 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
 
-    if( Process.eq.112) call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
-    if( Process.eq.113) call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
+      if( Process.eq.110) call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
+      if( Process.eq.111) call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
+
+      if( Process.eq.112) call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
+      if( Process.eq.113) call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
+    endif
 
     !DATA RUN
+    writeout=.false.
+    if( ReadCSmax ) then 
+        readin=.true.
+    else
+        readin=.false.
+    endif
+
     call ClearHisto()
     warmup = .false.
     Br_counter(:,:) = 0
@@ -3701,17 +3715,17 @@ print *, "extending no. of histograms for vbf tests"
           Histo(5)%LowVal = -5d0
           Histo(5)%SetScale= 1d0
 
-          Histo(6)%Info   = "y(j1)"
-          Histo(6)%NBins  = 50
-          Histo(6)%BinSize= 0.2d0
-          Histo(6)%LowVal = -5d0
-          Histo(6)%SetScale= 1d0
+          Histo(6)%Info   = "mz1"
+          Histo(6)%NBins  = 100
+          Histo(6)%BinSize= 2d0*GeV
+          Histo(6)%LowVal = 0d0*GeV
+          Histo(6)%SetScale= 1d0/GeV
 
-          Histo(7)%Info   = "y(j2)"
-          Histo(7)%NBins  = 50
-          Histo(7)%BinSize= 0.2d0
-          Histo(7)%LowVal = -5d0
-          Histo(7)%SetScale= 1d0
+          Histo(7)%Info   = "mz2"
+          Histo(7)%NBins  = 100
+          Histo(7)%BinSize= 2d0*GeV
+          Histo(7)%LowVal = 0d0*GeV
+          Histo(7)%SetScale= 1d0/GeV
 
           Histo(8)%Info   = "m_4l"
           Histo(8)%NBins  = 50
@@ -4054,6 +4068,7 @@ character :: arg*(500)
         if( Process.eq.50 .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.66 .or. Process.eq.80 .or. Process.eq.90) then
             write(TheUnit,"(8X,A,F8.2)") "DeltaR >= ", Rjet
             write(TheUnit,"(11X,A,F8.2,A)") "mJJ >= ", mJJcut/GeV, " GeV"
+            write(TheUnit,"(11X,A,F10.2,F10.2,A)") "m4l_min/max ", m4l_minmax(1)/GeV,m4l_minmax(2)/GeV, " GeV"
         endif
     endif
     if( (ReadLHEFile) .and. (RequestNLeptons.gt.0) ) then
