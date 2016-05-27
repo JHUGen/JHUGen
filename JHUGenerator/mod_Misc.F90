@@ -13,6 +13,7 @@ END INTERFACE swap
 INTERFACE OPERATOR (.dot.)
    MODULE PROCEDURE MinkowskyProduct
    MODULE PROCEDURE MinkowskyProductC
+   MODULE PROCEDURE MinkowskyProductRC
 END INTERFACE OPERATOR (.dot.)
 
 INTERFACE OPERATOR (.cross.)
@@ -41,23 +42,77 @@ implicit none
 real(8), intent(in) :: p1(1:4),p2(1:4)
 real(8)             :: MinkowskyProduct
 
-     MinkowskyProduct = p1(1)*p2(1)  &
-                      - p1(2)*p2(2)  &
-                      - p1(3)*p2(3)  &
-                       -p1(4)*p2(4)
+   MinkowskyProduct = p1(1)*p2(1)  &
+                    - p1(2)*p2(2)  &
+                    - p1(3)*p2(3)  &
+                    -p1(4)*p2(4)
 END FUNCTION MinkowskyProduct
-
 
 FUNCTION MinkowskyProductC(p1,p2)
 implicit none
 complex(8), intent(in) :: p1(1:4),p2(1:4)
 complex(8)             :: MinkowskyProductC
 
-     MinkowskyProductC = p1(1)*p2(1)  &
+   MinkowskyProductC = p1(1)*p2(1)  &
+                     - p1(2)*p2(2)  &
+                     - p1(3)*p2(3)  &
+                     - p1(4)*p2(4)
+END FUNCTION MinkowskyProductC
+
+FUNCTION MinkowskyProductRC(p1,p2)
+implicit none
+real(8),    intent(in) :: p1(1:4)
+complex(8), intent(in) :: p2(1:4)
+complex(8)             :: MinkowskyProductRC
+
+   MinkowskyProductRC = p1(1)*p2(1)  &
                       - p1(2)*p2(2)  &
                       - p1(3)*p2(3)  &
-                       -p1(4)*p2(4)
-END FUNCTION MinkowskyProductC
+                      - p1(4)*p2(4)
+END FUNCTION MinkowskyProductRC
+
+
+double complex function et1(e1,e2,e3,e4)
+implicit none
+complex(8), intent(in) :: e1(4), e2(4), e3(4), e4(4)
+   et1 =  e1(1)*e2(2)*e3(3)*e4(4)-e1(1)*e2(2)*e3(4)*e4(3) &
+   -e1(1)*e2(3)*e3(2)*e4(4)+e1(1)*e2(3)*e3(4)*e4(2) &
+   +e1(1)*e2(4)*e3(2)*e4(3)-e1(1)*e2(4)*e3(3)*e4(2) &
+   -e1(2)*e2(1)*e3(3)*e4(4)+e1(2)*e2(1)*e3(4)*e4(3) &
+   +e1(2)*e2(3)*e3(1)*e4(4)-e1(2)*e2(3)*e3(4)*e4(1) &
+   -e1(2)*e2(4)*e3(1)*e4(3)+e1(2)*e2(4)*e3(3)*e4(1) &
+   +e1(3)*e2(1)*e3(2)*e4(4)-e1(3)*e2(1)*e3(4)*e4(2) &
+   -e1(3)*e2(2)*e3(1)*e4(4)+e1(3)*e2(2)*e3(4)*e4(1) &
+   +e1(3)*e2(4)*e3(1)*e4(2)-e1(3)*e2(4)*e3(2)*e4(1) &
+   -e1(4)*e2(1)*e3(2)*e4(3)+e1(4)*e2(1)*e3(3)*e4(2) &
+   +e1(4)*e2(2)*e3(1)*e4(3)-e1(4)*e2(2)*e3(3)*e4(1) &
+   -e1(4)*e2(3)*e3(1)*e4(2)+e1(4)*e2(3)*e3(2)*e4(1)
+   return
+end function et1
+
+double complex function sc(q1,q2)
+implicit none
+complex(8), intent(in) :: q1(4)
+complex(8), intent(in) :: q2(4)
+   sc = q1.dot.q2
+   return
+end function sc
+
+double precision function scr(p1,p2)
+implicit none
+real(8), intent(in) :: p1(4),p2(4)
+   scr = p1.dot.p2
+   return
+end function scr
+
+double complex function scrc(p1,p2)
+implicit none
+real(8), intent(in) :: p1(4)
+complex(8), intent(in) :: p2(4)
+   scrc = p1.dot.p2
+   return
+end function scrc
+
 
 
 FUNCTION Get_PT(Mom)
@@ -159,29 +214,6 @@ RETURN
 END FUNCTION
 
 
-
-SUBROUTINE swap_mom(Mom1,Mom2)
-implicit none
-real(8) :: Mom1(1:4),Mom2(1:4),tmp(1:4)
-
-    tmp(1:4) = Mom2(1:4)
-    Mom2(1:4) = Mom1(1:4)
-    Mom1(1:4) = tmp(1:4)
-
-RETURN
-END SUBROUTINE
-
-
-SUBROUTINE swap_cmom(Mom1,Mom2)
-implicit none
-complex(8) :: Mom1(1:4),Mom2(1:4),tmp(1:4)
-
-    tmp(1:4) = Mom2(1:4)
-    Mom2(1:4) = Mom1(1:4)
-    Mom1(1:4) = tmp(1:4)
-
-RETURN
-END SUBROUTINE
 
 
 SUBROUTINE pT_order(N,Mom)
@@ -301,8 +333,6 @@ integer :: i,j,temp
 
 END SUBROUTINE
 
-
-
 SUBROUTINE swapr(i,j)
 implicit none
 real(8) :: i,j,temp
@@ -313,7 +343,6 @@ real(8) :: i,j,temp
 
 END SUBROUTINE
 
-
 SUBROUTINE swapc(i,j)
 implicit none
 complex(8) :: i,j,temp
@@ -322,6 +351,28 @@ complex(8) :: i,j,temp
     j=i
     i=temp
 
+END SUBROUTINE
+
+SUBROUTINE swap_mom(Mom1,Mom2)
+implicit none
+real(8) :: Mom1(1:4),Mom2(1:4),tmp(1:4)
+
+    tmp(1:4) = Mom2(1:4)
+    Mom2(1:4) = Mom1(1:4)
+    Mom1(1:4) = tmp(1:4)
+
+RETURN
+END SUBROUTINE
+
+SUBROUTINE swap_cmom(Mom1,Mom2)
+implicit none
+complex(8) :: Mom1(1:4),Mom2(1:4),tmp(1:4)
+
+    tmp(1:4) = Mom2(1:4)
+    Mom2(1:4) = Mom1(1:4)
+    Mom1(1:4) = tmp(1:4)
+
+RETURN
 END SUBROUTINE
 
 
@@ -726,70 +777,7 @@ end function Capitalize
 
 
 
-
-
-subroutine spinoru(p,za,zb,s)
-!---Calculate spinor products
-!---taken from MCFM & modified by R. Rontsch, May 2015
-!---extended to deal with negative energies ie with all momenta outgoing
-!---Arbitrary conventions of Bern, Dixon, Kosower, Weinzierl,
-!---za(i,j)*zb(j,i)=s(i,j)
-      implicit none
-      real(8) :: p(:,:),two
-      integer, parameter :: mxpart=14
-      complex(8):: c23(mxpart),f(mxpart),rt(mxpart),za(:,:),zb(:,:),czero,cone,ci
-      real(8)   :: s(:,:)
-      integer i,j,N
-
-      N = size(p,1)
-!       if (size(p,1) .ne. N) then
-!          call Error("spinorz: momentum mismatch",size(p,1))
-!       endif
-      two=2d0
-      czero=dcmplx(0d0,0d0)
-      cone=dcmplx(1d0,0d0)
-      ci=dcmplx(0d0,1d0)
-
-
-!---if one of the vectors happens to be zero this routine fails.
-      do j=1,N
-         za(j,j)=czero
-         zb(j,j)=za(j,j)
-
-!-----positive energy case
-         if (p(j,4) .gt. 0d0) then
-            rt(j)=dsqrt(p(j,4)+p(j,1))
-            c23(j)=dcmplx(p(j,3),-p(j,2))
-            f(j)=cone
-         else
-!-----negative energy case
-            rt(j)=dsqrt(-p(j,4)-p(j,1))
-            c23(j)=dcmplx(-p(j,3),p(j,2))
-            f(j)=ci
-         endif
-      enddo
-      do i=2,N
-         do j=1,i-1
-         s(i,j)=two*(p(i,4)*p(j,4)-p(i,1)*p(j,1)-p(i,2)*p(j,2)-p(i,3)*p(j,3))
-         za(i,j)=f(i)*f(j)*(c23(i)*dcmplx(rt(j)/rt(i))-c23(j)*dcmplx(rt(i)/rt(j)))
-
-         if (abs(s(i,j)).lt.1d-5) then
-         zb(i,j)=-(f(i)*f(j))**2*dconjg(za(i,j))
-         else
-         zb(i,j)=-dcmplx(s(i,j))/za(i,j)
-         endif
-         za(j,i)=-za(i,j)
-         zb(j,i)=-zb(i,j)
-         s(j,i)=s(i,j)
-         enddo
-      enddo
-
-    end subroutine spinoru
-
-
-
-
-
+!========================================================================
 
     subroutine convert_to_MCFM(p,pout)
       implicit none
@@ -815,7 +803,6 @@ subroutine spinoru(p,za,zb,s)
       endif
 
     end subroutine convert_to_MCFM
-
 
 !========================================================================
 !borrowed from Passarino's file, some internal variable names or comments

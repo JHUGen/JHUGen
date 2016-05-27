@@ -1,5 +1,6 @@
       MODULE modHiggs
       use ModParameters
+      use ModMisc
       implicit none
       private
 
@@ -17,7 +18,6 @@
 !----- all outgoing convention and the following momentum assignment
 !-----  0 -> g(p1) + g(p2) + e-(p3) + e+(p4) +mu-(p5) +mu+(p6)
       SUBROUTINE EvalAmp_gg_H_VV(p,MY_IDUP,res)
-      use ModMisc
       implicit none
       real(dp), intent(out) ::  res
       real(dp), intent(in) :: p(4,6)
@@ -25,43 +25,32 @@
       complex(dp) :: A_VV(1:8)
       integer :: i1,i2,i3,i4,VVMode
       real(dp) :: gZ_sq
-      real(dp) :: prefactor,res2
+      real(dp) :: prefactor!,res2
       real(dp) :: intcolfac
+      integer :: ordering(1:4),ordering_swap(1:4)
 
-         if(IsAQuark(MY_IDUP(6)) .and. IsAQuark(MY_IDUP(8))) then
-            intcolfac=1.0_dp/3.0_dp
-         else
-            intcolfac=1.0_dp
-         endif
+      if(IsAQuark(MY_IDUP(6)) .and. IsAQuark(MY_IDUP(8))) then
+         intcolfac=1.0_dp/3.0_dp
+      else
+         intcolfac=1.0_dp
+      endif
 
-         if( IsAZDecay(DecayMode1) .and. IsAZDecay(DecayMode2) ) then
-             VVMode = ZZMode
-         elseif( IsAWDecay(DecayMode1) .and. IsAWDecay(DecayMode2) ) then
-             VVMode = WWMode
-         elseif( IsAZDecay(DecayMode1) .and. IsAPhoton(DecayMode2) ) then
-             VVMode = ZgMode
-         elseif( IsAPhoton(DecayMode1) .and. IsAPhoton(DecayMode2) ) then
-             VVMode = ggMode
-         else
-             call Error("Unsupported decay modes")
-         endif
-
+      call getDecay_VVMode_Ordering(MY_IDUP(6:9),VVMode,ordering,ordering_swap)
 
 ! Global normalization
-         gZ_sq = 4.0_dp*pi*alpha_QED/4.0_dp/(one-sitW**2)/sitW**2
-         if( VVMode.eq.ZZMode ) then!  Z decay
-              prefactor = 8d0*gZ_sq**2
-         elseif( VVMode.eq.WWMode ) then !  W decay
-              prefactor = 8d0*gZ_sq**2
-         elseif( VVMode.eq.ZgMode ) then !  Z+photon "decay"
-              prefactor = 8d0*gZ_sq ! Only single powers
-         elseif( VVMode.eq.ggMode ) then !  photon "decay"
-              prefactor = 8d0
-         else
-              prefactor = 0d0
-         endif
-         prefactor = prefactor * (alphas/(3.0_dp*pi*vev))**2
-
+      gZ_sq = 4.0_dp*pi*alpha_QED/4.0_dp/(one-sitW**2)/sitW**2
+      if( VVMode.eq.ZZMode ) then!  Z decay
+         prefactor = 8d0*gZ_sq**2
+      elseif( VVMode.eq.WWMode ) then !  W decay
+         prefactor = 8d0*gZ_sq**2
+      elseif( VVMode.eq.ZgMode ) then !  Z+photon "decay"
+         prefactor = 8d0*gZ_sq ! Only single powers
+      elseif( VVMode.eq.ggMode ) then !  photon "decay"
+         prefactor = 8d0
+      else
+         prefactor = 0d0
+      endif
+      prefactor = prefactor * (alphas/(3.0_dp*pi*vev))**2
 
 
 ! ! MADGRAPH CHECK
@@ -81,21 +70,21 @@
           res = zero
           A_VV(:) = 0d0
           do i1=1,2;  do i2=1,2;  do i3=1,2;  do i4=1,2!  sum over helicities
-                  call calcHelAmp((/3,4,5,6/),VVMode,MY_IDUP,p(1:4,1:6),i1,i2,i3,i4,A_VV(1))
+                  call calcHelAmp(ordering,VVMode,MY_IDUP,p(1:4,1:6),i1,i2,i3,i4,A_VV(1))
                   if( (VVMode.eq.ZZMode) .and. includeGammaStar ) then
-                      call calcHelAmp((/3,4,5,6/),ZgsMode,MY_IDUP,p(1:4,1:6),i1,i2,i3,i4,A_VV(3))
-                      call calcHelAmp((/3,4,5,6/),gsZMode,MY_IDUP,p(1:4,1:6),i1,i2,i3,i4,A_VV(5))
-                      call calcHelAmp((/3,4,5,6/),gsgsMode,MY_IDUP,p(1:4,1:6),i1,i2,i3,i4,A_VV(7))
+                      call calcHelAmp(ordering,ZgsMode,MY_IDUP,p(1:4,1:6),i1,i2,i3,i4,A_VV(3))
+                      call calcHelAmp(ordering,gsZMode,MY_IDUP,p(1:4,1:6),i1,i2,i3,i4,A_VV(5))
+                      call calcHelAmp(ordering,gsgsMode,MY_IDUP,p(1:4,1:6),i1,i2,i3,i4,A_VV(7))
                   elseif( VVMode.eq.ZgMode .and. includeGammaStar ) then
-                      call calcHelAmp((/3,4,5,6/),gsgMode,MY_IDUP,p(1:4,1:6),i1,i2,i3,i4,A_VV(3))
+                      call calcHelAmp(ordering,gsgMode,MY_IDUP,p(1:4,1:6),i1,i2,i3,i4,A_VV(3))
                   endif
 
-                  if( (VVMode.eq.ZZMode) .and. (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then
-                      call calcHelAmp((/5,4,3,6/),VVMode,MY_IDUP,p(1:4,1:6),i1,i2,i3,i4,A_VV(2))
+                  if( (VVMode.eq.ZZMode) .and. includeInterference .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then
+                      call calcHelAmp(ordering_swap,VVMode,MY_IDUP,p(1:4,1:6),i1,i2,i3,i4,A_VV(2))
                       if( includeGammaStar ) then
-                          call calcHelAmp((/5,4,3,6/),ZgsMode,MY_IDUP,p(1:4,1:6),i1,i2,i3,i4,A_VV(4))
-                          call calcHelAmp((/5,4,3,6/),gsZMode,MY_IDUP,p(1:4,1:6),i1,i2,i3,i4,A_VV(6))
-                          call calcHelAmp((/5,4,3,6/),gsgsMode,MY_IDUP,p(1:4,1:6),i1,i2,i3,i4,A_VV(8))
+                          call calcHelAmp(ordering_swap,ZgsMode,MY_IDUP,p(1:4,1:6),i1,i2,i3,i4,A_VV(4))
+                          call calcHelAmp(ordering_swap,gsZMode,MY_IDUP,p(1:4,1:6),i1,i2,i3,i4,A_VV(6))
+                          call calcHelAmp(ordering_swap,gsgsMode,MY_IDUP,p(1:4,1:6),i1,i2,i3,i4,A_VV(8))
                       endif
                       A_VV(2) = -A_VV(2) ! minus from Fermi statistics
                       A_VV(4) = -A_VV(4)
@@ -105,7 +94,7 @@
 
                   res = res + (A_VV(1)+A_VV(3)+A_VV(5)+A_VV(7))*dconjg(A_VV(1)+A_VV(3)+A_VV(5)+A_VV(7))!   interfere the 3456 pieces
                   res = res + (A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8))*dconjg(A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8))!   interfere the 5436 pieces
-                  if( (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) .and. (i3.eq.i4) ) then! interfere the 3456 with 5436 pieces
+                  if( (VVMode.eq.ZZMode) .and. includeInterference .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) .and. (i3.eq.i4) ) then! interfere the 3456 with 5436 pieces
                       res = res + 2d0*intcolfac*dreal(  A_VV(1)*dconjg( A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8) )  )
                       res = res + 2d0*intcolfac*dreal(  A_VV(3)*dconjg( A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8) )  )
                       res = res + 2d0*intcolfac*dreal(  A_VV(5)*dconjg( A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8) )  )
@@ -135,410 +124,60 @@
 
 
           res = res*prefactor
-          if( (VVMode.eq.ZZMode) .and. (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) res = res * SymmFac
+          if( (VVMode.eq.ZZMode) .and. includeInterference .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) res = res * SymmFac
 
+         !print *,"VVmode:",VVmode
+         !print *,"ids:",MY_IDUP
+         !print *,"res:",res
+         !pause
 
       RETURN
       END SUBROUTINE
 
+   subroutine calcHelAmp(ordering,VVMode,MY_IDUP,p,i1,i2,i3,i4,A)
+      implicit none
+      integer :: ordering(1:4),VVMode,i1,i2,i3,i4,l1,l2,l3,l4,MY_IDUP(6:9)
+      real(dp) :: p(1:4,1:6)
+      complex(dp) :: propG
+      real(dp) :: pin(4,4)
+      complex(dp) :: A(1:1), sp(4,4)
 
+      l1=ordering(1)
+      l2=ordering(2)
+      l3=ordering(3)
+      l4=ordering(4)
 
+      !print *,"l1=",l1
+      !print *,"l2=",l2
+      !print *,"l3=",l3
+      !print *,"l4=",l4
+      !print *,"id(6)=",convertLHE(MY_IDUP(l1))
+      !print *,"id(7)=",convertLHE(MY_IDUP(l2))
+      !print *,"id(8)=",convertLHE(MY_IDUP(l3))
+      !print *,"id(9)=",convertLHE(MY_IDUP(l4))
+      !print *,"p(6)=",(p(:,l1))
+      !print *,"p(7)=",(p(:,l2))
+      !print *,"p(8)=",(p(:,l3))
+      !print *,"p(9)=",(p(:,l4))
 
+      propG = one/dcmplx(2d0*scr(p(:,1),p(:,2)) - M_Reso**2,M_Reso*Ga_Reso)
 
-     subroutine calcHelAmp(ordering,VVMode,MY_IDUP,p,i1,i2,i3,i4,A)
-     use ModMisc
-     implicit none
-     integer :: ordering(1:4),VVMode,i1,i2,i3,i4,l1,l2,l3,l4,MY_IDUP(6:9)
-     real(dp) :: p(1:4,1:6)
-     complex(dp) :: propG, propZ1, propZ2
-     real(dp) :: s, pin(4,4)
-     complex(dp) :: A(1:1), sp(4,4)
-     real(dp) :: aL1,aR1,aL2,aR2
-
-
-
-         l1=ordering(1)
-         l2=ordering(2)
-         l3=ordering(3)
-         l4=ordering(4)
-
-         s  = 2d0 * scr(p(:,1),p(:,2))
-
-         propG = one/dcmplx(s - M_Reso**2,M_Reso*Ga_Reso)
-
-         pin(1,:) = p(:,1)
-         pin(2,:) = p(:,2)
-         sp(1,:) = pol_mless2(dcmplx(p(:,1)),-3+2*i1,'in')  ! gluon
-         sp(2,:) = pol_mless2(dcmplx(p(:,2)),-3+2*i2,'in')  ! gluon
-!          sp(1,1:4)=pin(1,1:4);print *, "this checks IS gauge invariance"
-!          sp(2,1:4)=pin(2,1:4);print *, "this checks IS gauge invariance"
-
-
-!        ij helicicites: -1 == left, 1 == right
-         if( VVMode.eq.ZZMode ) then
-!        ZZ DECAYS
-              if( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_) ) then
-                    aL1=aL_lep    * dsqrt(scale_alpha_Z_ll)
-                    aR1=aR_lep    * dsqrt(scale_alpha_Z_ll)
-              elseif( abs(MY_IDUP(6)).eq.abs(TaM_) ) then
-                    aL1=aL_lep    * dsqrt(scale_alpha_Z_tt)
-                    aR1=aR_lep    * dsqrt(scale_alpha_Z_tt)
-              elseif( abs(MY_IDUP(6)).eq.abs(NuE_) .or. abs(MY_IDUP(6)).eq.abs(NuM_) .or. abs(MY_IDUP(6)).eq.abs(NuT_) ) then
-                    aL1=aL_neu    * dsqrt(scale_alpha_Z_nn)
-                    aR1=aR_neu    * dsqrt(scale_alpha_Z_nn)
-              elseif( abs(MY_IDUP(6)).eq.abs(Up_) .or. abs(MY_IDUP(6)).eq.abs(Chm_) ) then
-                    aL1=aL_QUp    * dsqrt(scale_alpha_Z_uu)
-                    aR1=aR_QUp    * dsqrt(scale_alpha_Z_uu)
-              elseif( abs(MY_IDUP(6)).eq.abs(Dn_) .or. abs(MY_IDUP(6)).eq.abs(Str_) .or. abs(MY_IDUP(6)).eq.abs(Bot_) ) then
-                    aL1=aL_QDn    * dsqrt(scale_alpha_Z_dd)
-                    aR1=aR_QDn    * dsqrt(scale_alpha_Z_dd)
-              else
-                    aL1=0d0
-                    aR1=0d0
-              endif
-              if( abs(MY_IDUP(8)).eq.abs(ElM_) .or. abs(MY_IDUP(8)).eq.abs(MuM_)  ) then
-                    aL2=aL_lep    * dsqrt(scale_alpha_Z_ll)
-                    aR2=aR_lep    * dsqrt(scale_alpha_Z_ll)
-              elseif( abs(MY_IDUP(8)).eq.abs(TaM_) ) then
-                    aL2=aL_lep    * dsqrt(scale_alpha_Z_tt)
-                    aR2=aR_lep    * dsqrt(scale_alpha_Z_tt)
-              elseif( abs(MY_IDUP(8)).eq.abs(NuE_) .or. abs(MY_IDUP(8)).eq.abs(NuM_) .or. abs(MY_IDUP(8)).eq.abs(NuT_) ) then
-                    aL2=aL_neu    * dsqrt(scale_alpha_Z_nn)
-                    aR2=aR_neu    * dsqrt(scale_alpha_Z_nn)
-              elseif( abs(MY_IDUP(8)).eq.abs(Up_) .or. abs(MY_IDUP(8)).eq.abs(Chm_) ) then
-                    aL2=aL_QUp    * dsqrt(scale_alpha_Z_uu)
-                    aR2=aR_QUp    * dsqrt(scale_alpha_Z_uu)
-              elseif( abs(MY_IDUP(8)).eq.abs(Dn_) .or. abs(MY_IDUP(8)).eq.abs(Str_) .or. abs(MY_IDUP(8)).eq.abs(Bot_) ) then
-                    aL2=aL_QDn    * dsqrt(scale_alpha_Z_dd)
-                    aR2=aR_QDn    * dsqrt(scale_alpha_Z_dd)
-              else
-                    aL2=0d0
-                    aR2=0d0
-              endif
-              pin(3,:) = p(:,l1)+p(:,l2)
-              pin(4,:) = p(:,l3)+p(:,l4)
-              sp(3,:) = pol_dk2mom(dcmplx(p(:,l1)),dcmplx(p(:,l2)),-3+2*i3)  ! ubar(l1), v(l2)
-              sp(3,:) = -sp(3,:) + pin(3,:)*( sc(sp(3,:),dcmplx(pin(3,:))) )/scr(pin(3,:),pin(3,:))! full propagator numerator
-              sp(4,:) = pol_dk2mom(dcmplx(p(:,l3)),dcmplx(p(:,l4)),-3+2*i4)  ! ubar(l3), v(l4)
-              sp(4,:) = -sp(4,:) + pin(4,:)*( sc(sp(4,:),dcmplx(pin(4,:))) )/scr(pin(4,:),pin(4,:))! full propagator numerator
-              s = scr(p(:,l1)+p(:,l2),p(:,l1)+p(:,l2))
-              propZ1 = s/dcmplx(s - M_V**2,M_V*Ga_V)
-              s = scr(p(:,l3)+p(:,l4),p(:,l3)+p(:,l4))
-              propZ2 = s/dcmplx(s - M_V**2,M_V*Ga_V)
-
-         elseif( VVMode.eq.WWMode ) then
-!        WW DECAYS
-              if( IsAQuark(MY_IDUP(6)) ) then
-                 aL1 = bL * dsqrt(scale_alpha_W_ud)
-                 aR1 = bR * dsqrt(scale_alpha_W_ud)! = 0
-              elseif( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_) ) then
-                 aL1 = bL * dsqrt(scale_alpha_W_ln)
-                 aR1 = bR * dsqrt(scale_alpha_W_ln)! = 0
-              elseif( abs(MY_IDUP(6)).eq.abs(TaM_) ) then
-                 aL1 = bL * dsqrt(scale_alpha_W_tn)
-                 aR1 = bR * dsqrt(scale_alpha_W_tn)! = 0
-              else
-                    aL1=0d0
-                    aR1=0d0
-              endif
-              if( IsAQuark(MY_IDUP(8)) ) then
-                 aL2 = bL * dsqrt(scale_alpha_W_ud)
-                 aR2 = bR * dsqrt(scale_alpha_W_ud)! = 0
-              elseif( abs(MY_IDUP(9)).eq.abs(ElM_) .or. abs(MY_IDUP(9)).eq.abs(MuM_) ) then
-                 aL2 = bL * dsqrt(scale_alpha_W_ln)
-                 aR2 = bR * dsqrt(scale_alpha_W_ln)! = 0
-              elseif( abs(MY_IDUP(9)).eq.abs(TaM_) ) then
-                 aL2 = bL * dsqrt(scale_alpha_W_tn)
-                 aR2 = bR * dsqrt(scale_alpha_W_tn)! = 0
-              else
-                    aL2=0d0
-                    aR2=0d0
-              endif
-              pin(3,:) = p(:,l1)+p(:,l2)
-              pin(4,:) = p(:,l3)+p(:,l4)
-              sp(3,:) = pol_dk2mom(dcmplx(p(:,l1)),dcmplx(p(:,l2)),-3+2*i3)  ! ubar(l1), v(l2)
-              sp(3,:) = -sp(3,:) + pin(3,:)*( sc(sp(3,:),dcmplx(pin(3,:))) )/scr(pin(3,:),pin(3,:))! full propagator numerator
-              sp(4,:) = pol_dk2mom(dcmplx(p(:,l3)),dcmplx(p(:,l4)),-3+2*i4)  ! ubar(l3), v(l4)
-              sp(4,:) = -sp(4,:) + pin(4,:)*( sc(sp(4,:),dcmplx(pin(4,:))) )/scr(pin(4,:),pin(4,:))! full propagator numerator
-              s = scr(p(:,l1)+p(:,l2),p(:,l1)+p(:,l2))
-              propZ1 = s/dcmplx(s - M_V**2,M_V*Ga_V)
-              s = scr(p(:,l3)+p(:,l4),p(:,l3)+p(:,l4))
-              propZ2 = s/dcmplx(s - M_V**2,M_V*Ga_V)
-
-             if( convertLHE(MY_IDUP(6))+convertLHE(MY_IDUP(7)).lt.0 ) then! this assigns the W+/W- to the first/second set of inputs; important for q^2-dependent form factors. Everything else is symmetric any ways.
-                  call swap_cmom(sp(3,1:4),sp(4,1:4))
-                  call swap_mom(pin(3,1:4),pin(4,1:4))
-              endif
-
-         elseif( VVMode.eq.ZgMode ) then
-!        Zgamma DECAYS
-              if( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_)  ) then
-                    aL1=aL_lep    * dsqrt(scale_alpha_Z_ll)
-                    aR1=aR_lep    * dsqrt(scale_alpha_Z_ll)
-              elseif( abs(MY_IDUP(6)).eq.abs(TaM_) ) then
-                    aL1=aL_lep    * dsqrt(scale_alpha_Z_tt)
-                    aR1=aR_lep    * dsqrt(scale_alpha_Z_tt)
-              elseif( abs(MY_IDUP(6)).eq.abs(NuE_) .or. abs(MY_IDUP(6)).eq.abs(NuM_) .or. abs(MY_IDUP(6)).eq.abs(NuT_) ) then
-                    aL1=aL_neu    * dsqrt(scale_alpha_Z_nn)
-                    aR1=aR_neu    * dsqrt(scale_alpha_Z_nn)
-              elseif( abs(MY_IDUP(6)).eq.abs(Up_) .or. abs(MY_IDUP(6)).eq.abs(Chm_) ) then
-                    aL1=aL_QUp    * dsqrt(scale_alpha_Z_uu)
-                    aR1=aR_QUp    * dsqrt(scale_alpha_Z_uu)
-              elseif( abs(MY_IDUP(6)).eq.abs(Dn_) .or. abs(MY_IDUP(6)).eq.abs(Str_) .or. abs(MY_IDUP(6)).eq.abs(Bot_) ) then
-                    aL1=aL_QDn    * dsqrt(scale_alpha_Z_dd)
-                    aR1=aR_QDn    * dsqrt(scale_alpha_Z_dd)
-              else
-                    aL1=0d0
-                    aR1=0d0
-              endif
-              aL2=1d0
-              aR2=1d0
-              pin(3,:) = p(:,l1)+p(:,l2)
-              pin(4,:) = p(:,l3)
-              sp(3,:) = pol_dk2mom(dcmplx(p(:,l1)),dcmplx(p(:,l2)),-3+2*i3)  ! ubar(l1), v(l2)
-              sp(3,:) = -sp(3,:) + pin(3,:)*( sc(sp(3,:),dcmplx(pin(3,:))) )/scr(pin(3,:),pin(3,:))! full propagator numerator
-              sp(4,:) = pol_mless2(dcmplx(p(:,l3)),-3+2*i4,'out')  ! photon
-!               sp(4,1:4)=pin(4,1:4); print *, "this checks gauge invariance"
-              s = scr(p(:,l1)+p(:,l2),p(:,l1)+p(:,l2))
-              propZ1 = s/dcmplx(s - M_V**2,M_V*Ga_V)
-              propZ2=1d0
-
-         elseif( VVMode.eq.ggMode ) then
-!        gamma gamma DECAYS
-              aL1=1d0
-              aR1=1d0
-              aL2=1d0
-              aR2=1d0
-              pin(3,:) = p(:,l1)
-              pin(4,:) = p(:,l3)
-              sp(3,:) = pol_mless2(dcmplx(p(:,l1)),-3+2*i3,'out')  ! photon
-              sp(4,:) = pol_mless2(dcmplx(p(:,l3)),-3+2*i4,'out')  ! photon
-!               sp(3,1:4)=pin(3,1:4); print *, "this checks gauge invariance"
-!               sp(4,1:4)=pin(4,1:4)
-              propz1=1d0
-              propz2=1d0
-
-         elseif( VVMode.eq.gsgMode ) then
-!        gamma* gamma DECAYS
-              if( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_)  ) then
-                    aL1=cL_lep    * dsqrt(scale_alpha_Z_ll)
-                    aR1=cR_lep    * dsqrt(scale_alpha_Z_ll)
-              elseif( abs(MY_IDUP(6)).eq.abs(TaM_) ) then
-                    aL1=cL_lep    * dsqrt(scale_alpha_Z_tt)
-                    aR1=cR_lep    * dsqrt(scale_alpha_Z_tt)
-              elseif( abs(MY_IDUP(6)).eq.abs(NuE_) .or. abs(MY_IDUP(6)).eq.abs(NuM_) .or. abs(MY_IDUP(6)).eq.abs(NuT_) ) then
-                    aL1=cL_neu    * dsqrt(scale_alpha_Z_nn)! = 0
-                    aR1=cR_neu    * dsqrt(scale_alpha_Z_nn)! = 0
-              elseif( abs(MY_IDUP(6)).eq.abs(Up_) .or. abs(MY_IDUP(6)).eq.abs(Chm_) ) then
-                    aL1=cL_QUp    * dsqrt(scale_alpha_Z_uu)
-                    aR1=cR_QUp    * dsqrt(scale_alpha_Z_uu)
-              elseif( abs(MY_IDUP(6)).eq.abs(Dn_) .or. abs(MY_IDUP(6)).eq.abs(Str_) .or. abs(MY_IDUP(6)).eq.abs(Bot_) ) then
-                    aL1=cL_QDn    * dsqrt(scale_alpha_Z_dd)
-                    aR1=cR_QDn    * dsqrt(scale_alpha_Z_dd)
-              else
-                    aL1=0d0
-                    aR1=0d0
-              endif
-              aL2=1d0
-              aR2=1d0
-              pin(3,:) = p(:,l1)+p(:,l2)
-              pin(4,:) = p(:,l3)
-              sp(3,:) = pol_dk2mom(dcmplx(p(:,l1)),dcmplx(p(:,l2)),-3+2*i3)  ! ubar(l1), v(l2)
-              sp(3,:) = -sp(3,:) ! photon propagator
-              sp(4,:) = pol_mless2(dcmplx(p(:,l3)),-3+2*i4,'out')  ! photon
-!               sp(4,1:4)=pin(4,1:4); print *, "this checks gauge invariance"
-              s = scr(p(:,l1)+p(:,l2),p(:,l1)+p(:,l2))
-              propZ1 = 1d0
-              propZ2 = 1d0
-              if( s.lt.MPhotonCutoff**2 ) propZ2=0d0
-
-         elseif( VVMode.eq.gsZMode ) then
-!        gamma* Z DECAYS
-              if( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_) ) then
-                    aL1=cL_lep    * dsqrt(scale_alpha_Z_ll)
-                    aR1=cR_lep    * dsqrt(scale_alpha_Z_ll)
-              elseif( abs(MY_IDUP(6)).eq.abs(TaM_) ) then
-                    aL1=cL_lep    * dsqrt(scale_alpha_Z_tt)
-                    aR1=cR_lep    * dsqrt(scale_alpha_Z_tt)
-              elseif( abs(MY_IDUP(6)).eq.abs(NuE_) .or. abs(MY_IDUP(6)).eq.abs(NuM_) .or. abs(MY_IDUP(6)).eq.abs(NuT_) ) then
-                    aL1=cL_neu    * dsqrt(scale_alpha_Z_nn)! = 0
-                    aR1=cR_neu    * dsqrt(scale_alpha_Z_nn)! = 0
-              elseif( abs(MY_IDUP(6)).eq.abs(Up_) .or. abs(MY_IDUP(6)).eq.abs(Chm_) ) then
-                    aL1=cL_QUp    * dsqrt(scale_alpha_Z_uu)
-                    aR1=cR_QUp    * dsqrt(scale_alpha_Z_uu)
-              elseif( abs(MY_IDUP(6)).eq.abs(Dn_) .or. abs(MY_IDUP(6)).eq.abs(Str_) .or. abs(MY_IDUP(6)).eq.abs(Bot_) ) then
-                    aL1=cL_QDn    * dsqrt(scale_alpha_Z_dd)
-                    aR1=cR_QDn    * dsqrt(scale_alpha_Z_dd)
-              else
-                    aL1=0d0
-                    aR1=0d0
-              endif
-              if( abs(MY_IDUP(8)).eq.abs(ElM_) .or. abs(MY_IDUP(8)).eq.abs(MuM_) ) then
-                    aL2=aL_lep    * dsqrt(scale_alpha_Z_ll)
-                    aR2=aR_lep    * dsqrt(scale_alpha_Z_ll)
-              elseif( abs(MY_IDUP(8)).eq.abs(TaM_) ) then
-                    aL2=aL_lep    * dsqrt(scale_alpha_Z_tt)
-                    aR2=aR_lep    * dsqrt(scale_alpha_Z_tt)
-              elseif( abs(MY_IDUP(8)).eq.abs(NuE_) .or. abs(MY_IDUP(8)).eq.abs(NuM_) .or. abs(MY_IDUP(8)).eq.abs(NuT_) ) then
-                    aL2=aL_neu    * dsqrt(scale_alpha_Z_nn)
-                    aR2=aR_neu    * dsqrt(scale_alpha_Z_nn)
-              elseif( abs(MY_IDUP(8)).eq.abs(Up_) .or. abs(MY_IDUP(8)).eq.abs(Chm_) ) then
-                    aL2=aL_QUp    * dsqrt(scale_alpha_Z_uu)
-                    aR2=aR_QUp    * dsqrt(scale_alpha_Z_uu)
-              elseif( abs(MY_IDUP(8)).eq.abs(Dn_) .or. abs(MY_IDUP(8)).eq.abs(Str_) .or. abs(MY_IDUP(8)).eq.abs(Bot_) ) then
-                    aL2=aL_QDn    * dsqrt(scale_alpha_Z_dd)
-                    aR2=aR_QDn    * dsqrt(scale_alpha_Z_dd)
-              else
-                    aL2=0d0
-                    aR2=0d0
-              endif
-              pin(3,:) = p(:,l1)+p(:,l2)
-              pin(4,:) = p(:,l3)+p(:,l4)
-              sp(3,:) = pol_dk2mom(dcmplx(p(:,l1)),dcmplx(p(:,l2)),-3+2*i3)  ! ubar(l1), v(l2)
-              sp(3,:) = -sp(3,:)
-              sp(4,:) = pol_dk2mom(dcmplx(p(:,l3)),dcmplx(p(:,l4)),-3+2*i4)  ! ubar(l3), v(l4)
-              sp(4,:) = -sp(4,:) + pin(4,:)*( sc(sp(4,:),dcmplx(pin(4,:))) )/scr(pin(4,:),pin(4,:))! full propagator numerator
-              s = scr(p(:,l1)+p(:,l2),p(:,l1)+p(:,l2))
-              propZ1 = 1d0! = s/dcmplx(s)
-              if( s.lt.MPhotonCutoff**2 ) propZ1=0d0
-              s = scr(p(:,l3)+p(:,l4),p(:,l3)+p(:,l4))
-              propZ2 = s/dcmplx(s - M_V**2,M_V*Ga_V)
-
-         elseif( VVMode.eq.ZgsMode ) then
-!        Z gamma* DECAYS
-              if( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_) ) then
-                    aL1=aL_lep    * dsqrt(scale_alpha_Z_ll)
-                    aR1=aR_lep    * dsqrt(scale_alpha_Z_ll)
-              elseif( abs(MY_IDUP(6)).eq.abs(TaM_) ) then
-                    aL1=aL_lep    * dsqrt(scale_alpha_Z_tt)
-                    aR1=aR_lep    * dsqrt(scale_alpha_Z_tt)
-              elseif( abs(MY_IDUP(6)).eq.abs(NuE_) .or. abs(MY_IDUP(6)).eq.abs(NuM_) .or. abs(MY_IDUP(6)).eq.abs(NuT_) ) then
-                    aL1=aL_neu    * dsqrt(scale_alpha_Z_nn)
-                    aR1=aR_neu    * dsqrt(scale_alpha_Z_nn)
-              elseif( abs(MY_IDUP(6)).eq.abs(Up_) .or. abs(MY_IDUP(6)).eq.abs(Chm_) ) then
-                    aL1=aL_QUp    * dsqrt(scale_alpha_Z_uu)
-                    aR1=aR_QUp    * dsqrt(scale_alpha_Z_uu)
-              elseif( abs(MY_IDUP(6)).eq.abs(Dn_) .or. abs(MY_IDUP(6)).eq.abs(Str_) .or. abs(MY_IDUP(6)).eq.abs(Bot_) ) then
-                    aL1=aL_QDn    * dsqrt(scale_alpha_Z_dd)
-                    aR1=aR_QDn    * dsqrt(scale_alpha_Z_dd)
-              else
-                    aL1=0d0
-                    aR1=0d0
-              endif
-              if( abs(MY_IDUP(8)).eq.abs(ElM_) .or. abs(MY_IDUP(8)).eq.abs(MuM_) ) then
-                    aL2=cL_lep    * dsqrt(scale_alpha_Z_ll)
-                    aR2=cR_lep    * dsqrt(scale_alpha_Z_ll)
-              elseif( abs(MY_IDUP(8)).eq.abs(TaM_) ) then
-                    aL2=cL_lep    * dsqrt(scale_alpha_Z_tt)
-                    aR2=cR_lep    * dsqrt(scale_alpha_Z_tt)
-              elseif( abs(MY_IDUP(8)).eq.abs(NuE_) .or. abs(MY_IDUP(8)).eq.abs(NuM_) .or. abs(MY_IDUP(8)).eq.abs(NuT_) ) then
-                    aL2=cL_neu    * dsqrt(scale_alpha_Z_nn)! = 0
-                    aR2=cR_neu    * dsqrt(scale_alpha_Z_nn)! = 0
-              elseif( abs(MY_IDUP(8)).eq.abs(Up_) .or. abs(MY_IDUP(8)).eq.abs(Chm_) ) then
-                    aL2=cL_QUp    * dsqrt(scale_alpha_Z_uu)
-                    aR2=cR_QUp    * dsqrt(scale_alpha_Z_uu)
-              elseif( abs(MY_IDUP(8)).eq.abs(Dn_) .or. abs(MY_IDUP(8)).eq.abs(Str_) .or. abs(MY_IDUP(8)).eq.abs(Bot_) ) then
-                    aL2=cL_QDn    * dsqrt(scale_alpha_Z_dd)
-                    aR2=cR_QDn    * dsqrt(scale_alpha_Z_dd)
-              else
-                    aL2=0d0
-                    aR2=0d0
-              endif
-              pin(3,:) = p(:,l1)+p(:,l2)
-              pin(4,:) = p(:,l3)+p(:,l4)
-              sp(3,:) = pol_dk2mom(dcmplx(p(:,l1)),dcmplx(p(:,l2)),-3+2*i3)  ! ubar(l1), v(l2)
-              sp(3,:) = -sp(3,:) + pin(3,:)*( sc(sp(3,:),dcmplx(pin(3,:))) )/scr(pin(3,:),pin(3,:))! full propagator numerator
-              sp(4,:) = pol_dk2mom(dcmplx(p(:,l3)),dcmplx(p(:,l4)),-3+2*i4)  ! ubar(l3), v(l4)
-              sp(4,:) = -sp(4,:)
-              s = scr(p(:,l1)+p(:,l2),p(:,l1)+p(:,l2))
-              propZ1 = s/dcmplx(s - M_V**2,M_V*Ga_V)
-              s = scr(p(:,l3)+p(:,l4),p(:,l3)+p(:,l4))
-              propZ2 = 1d0 ! = s/dcmplx(s)
-              if( s.lt.MPhotonCutoff**2 ) propZ2=0d0
-
-         elseif( VVMode.eq.gsgsMode ) then
-!        gamma* gamma* DECAYS
-              if( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_)  ) then
-                    aL1=cL_lep    * dsqrt(scale_alpha_Z_ll)
-                    aR1=cR_lep    * dsqrt(scale_alpha_Z_ll)
-              elseif( abs(MY_IDUP(6)).eq.abs(TaM_) ) then
-                    aL1=cL_lep    * dsqrt(scale_alpha_Z_tt)
-                    aR1=cR_lep    * dsqrt(scale_alpha_Z_tt)
-              elseif( abs(MY_IDUP(6)).eq.abs(NuE_) .or. abs(MY_IDUP(6)).eq.abs(NuM_) .or. abs(MY_IDUP(6)).eq.abs(NuT_) ) then
-                    aL1=cL_neu    * dsqrt(scale_alpha_Z_nn)! = 0
-                    aR1=cR_neu    * dsqrt(scale_alpha_Z_nn)! = 0
-              elseif( abs(MY_IDUP(6)).eq.abs(Up_) .or. abs(MY_IDUP(6)).eq.abs(Chm_) ) then
-                    aL1=cL_QUp    * dsqrt(scale_alpha_Z_uu)
-                    aR1=cR_QUp    * dsqrt(scale_alpha_Z_uu)
-              elseif( abs(MY_IDUP(6)).eq.abs(Dn_) .or. abs(MY_IDUP(6)).eq.abs(Str_) .or. abs(MY_IDUP(6)).eq.abs(Bot_) ) then
-                    aL1=cL_QDn    * dsqrt(scale_alpha_Z_dd)
-                    aR1=cR_QDn    * dsqrt(scale_alpha_Z_dd)
-              else
-                    aL1=0d0
-                    aR1=0d0
-              endif
-              if( abs(MY_IDUP(8)).eq.abs(ElM_) .or. abs(MY_IDUP(8)).eq.abs(MuM_) ) then
-                    aL2=cL_lep    * dsqrt(scale_alpha_Z_ll)
-                    aR2=cR_lep    * dsqrt(scale_alpha_Z_ll)
-              elseif( abs(MY_IDUP(8)).eq.abs(TaM_) ) then
-                    aL2=cL_lep    * dsqrt(scale_alpha_Z_tt)
-                    aR2=cR_lep    * dsqrt(scale_alpha_Z_tt)
-              elseif( abs(MY_IDUP(8)).eq.abs(NuE_) .or. abs(MY_IDUP(8)).eq.abs(NuM_) .or. abs(MY_IDUP(8)).eq.abs(NuT_) ) then
-                    aL2=cL_neu    * dsqrt(scale_alpha_Z_nn)! = 0
-                    aR2=cR_neu    * dsqrt(scale_alpha_Z_nn)! = 0
-              elseif( abs(MY_IDUP(8)).eq.abs(Up_) .or. abs(MY_IDUP(8)).eq.abs(Chm_) ) then
-                    aL2=cL_QUp    * dsqrt(scale_alpha_Z_uu)
-                    aR2=cR_QUp    * dsqrt(scale_alpha_Z_uu)
-              elseif( abs(MY_IDUP(8)).eq.abs(Dn_) .or. abs(MY_IDUP(8)).eq.abs(Str_) .or. abs(MY_IDUP(8)).eq.abs(Bot_) ) then
-                    aL2=cL_QDn    * dsqrt(scale_alpha_Z_dd)
-                    aR2=cR_QDn    * dsqrt(scale_alpha_Z_dd)
-              else
-                    aL2=0d0
-                    aR2=0d0
-              endif
-              pin(3,:) = p(:,l1)+p(:,l2)
-              pin(4,:) = p(:,l3)+p(:,l4)
-              sp(3,:) = pol_dk2mom(dcmplx(p(:,l1)),dcmplx(p(:,l2)),-3+2*i3)  ! ubar(l1), v(l2)
-              sp(3,:) = -sp(3,:)
-              sp(4,:) = pol_dk2mom(dcmplx(p(:,l3)),dcmplx(p(:,l4)),-3+2*i4)  ! ubar(l3), v(l4)
-              sp(4,:) = -sp(4,:)
-              s = scr(p(:,l1)+p(:,l2),p(:,l1)+p(:,l2))
-              propZ1 = 1d0 ! = s/dcmplx(s)
-              if( s.lt.MPhotonCutoff**2 ) propZ1=0d0
-              s = scr(p(:,l3)+p(:,l4),p(:,l3)+p(:,l4))
-              propZ2 = 1d0 ! = s/dcmplx(s)
-              if( s.lt.MPhotonCutoff**2 ) propZ2=0d0
-         else
-             call Error("Unsupported decay modes")
-         endif
-
-
-         call ggHZZampl(VVMode,pin,sp,A(1))
-
-         if (i3.eq.1) then
-            A(1) = aL1 * A(1)
-         elseif(i3.eq.2) then
-            A(1) = aR1 * A(1)
-         endif
-         if (i4.eq.1) then
-            A(1) = aL2 * A(1)
-         elseif(i4.eq.2) then
-            A(1) = aR2 * A(1)
-         endif
-         A(1) = A(1) * propG*propZ1*propZ2
-
-! print *, "ordering",ordering(:)
-! s=scr(p(:,l1)+p(:,l2),p(:,l1)+p(:,l2))
-! print *, "props",cdabs(propz1/s)**2,s
-! s=scr(p(:,l3)+p(:,l4),p(:,l3)+p(:,l4))
-! print *, "props",cdabs(propz2/s)**2,s
-! pause
-
-     end subroutine
-
-
-
-
+      pin(1,:) = p(:,1)
+      pin(2,:) = p(:,2)
+      sp(1,:) = pol_mless2(dcmplx(p(:,1)),-3+2*i1,'in')  ! gluon
+      sp(2,:) = pol_mless2(dcmplx(p(:,2)),-3+2*i2,'in')  ! gluon
+      !sp(1,1:4)=pin(1,1:4);print *, "this checks IS gauge invariance"
+      !sp(2,1:4)=pin(2,1:4);print *, "this checks IS gauge invariance"
+      call getDecay_Couplings_Spinors_Props(                                                             &
+                                       VVMode,                                                      &
+                                       (/MY_IDUP(l1+3),MY_IDUP(l2+3),MY_IDUP(l3+3),MY_IDUP(l4+3)/), &
+                                       (/p(:,l1),p(:,l2),p(:,l3),p(:,l4)/),                         &
+                                       -3+2*i3,-3+2*i4,                                             &
+                                       sp(3:4,:),pin(3:4,:)                                         &
+                                      )
+      call ggHZZampl(VVMode,pin,sp,A(1))
+      A(1) = A(1) * propG
+   end subroutine
 
       SUBROUTINE ggHZZampl(VVMode,p,sp,res)
       implicit none
@@ -708,17 +347,10 @@
   END SUBROUTINE ggHZZampl
 
 
-
-
-
-
-
-
 !----- a subroutinefor H -> (Z+gamma*)(Z+gamma*)/WW/gammagamma
 !----- all outgoing convention and the following momentum assignment
 !-----  0 -> Higgs(p1) + e-(p3) + e+(p4) +mu-(p5) +mu+(p6)
       subroutine EvalAmp_H_VV(p,MY_IDUP,res)
-      use ModMisc
       implicit none
       real(dp), intent(out) ::  res
       real(dp), intent(in) :: p(4,6)
@@ -726,28 +358,17 @@
       complex(dp) :: A_VV(1:8),VVHg1,VVHg2,VVHg3
       integer :: i3,i4,VVMode
       real(dp) :: gZ_sq,s
-      real(dp) :: prefactor!,res2
+      real(dp) :: prefactor
       real(dp) :: intcolfac
+      integer :: ordering(1:4),ordering_swap(1:4)
 
-         if(IsAQuark(MY_IDUP(6)) .and. IsAQuark(MY_IDUP(8))) then
-            intcolfac=1.0_dp/3.0_dp
-         else
-            intcolfac=1.0_dp
-         endif
+      if(IsAQuark(MY_IDUP(6)) .and. IsAQuark(MY_IDUP(8))) then
+         intcolfac=1.0_dp/3.0_dp
+      else
+         intcolfac=1.0_dp
+      endif
 
-
-         if( IsAZDecay(DecayMode1) .and. IsAZDecay(DecayMode2) ) then
-             VVMode = ZZMode
-         elseif( IsAWDecay(DecayMode1) .and. IsAWDecay(DecayMode2) ) then
-             VVMode = WWMode
-         elseif( IsAZDecay(DecayMode1) .and. IsAPhoton(DecayMode2) ) then
-             VVMode = ZgMode
-         elseif( IsAPhoton(DecayMode1) .and. IsAPhoton(DecayMode2) ) then
-             VVMode = ggMode
-         else
-             call Error("Unsupported decay modes")
-         endif
-
+      call getDecay_VVMode_Ordering(MY_IDUP(6:9),VVMode,ordering,ordering_swap)
 
 ! Global normalization
          gZ_sq = 4.0_dp*pi*alpha_QED/4.0_dp/(one-sitW**2)/sitW**2
@@ -763,7 +384,6 @@
               prefactor = 0d0
          endif
          prefactor = prefactor * (alphas/(3.0_dp*pi*vev))**2
-
 
 ! ! MADGRAPH CHECK
 ! res=0d0
@@ -783,21 +403,21 @@
           res = zero
           A_VV(:) = 0d0
           do i3=1,2;  do i4=1,2!  sum over helicities
-                  call calcHelAmp2((/3,4,5,6/),VVMode,MY_IDUP,p(1:4,1:6),i3,i4,A_VV(1))
+                  call calcHelAmp2(ordering,VVMode,MY_IDUP,p(1:4,1:6),i3,i4,A_VV(1))
                   if( (VVMode.eq.ZZMode) .and. includeGammaStar ) then
-                      call calcHelAmp2((/3,4,5,6/),ZgsMode,MY_IDUP,p(1:4,1:6),i3,i4,A_VV(3))
-                      call calcHelAmp2((/3,4,5,6/),gsZMode,MY_IDUP,p(1:4,1:6),i3,i4,A_VV(5))
-                      call calcHelAmp2((/3,4,5,6/),gsgsMode,MY_IDUP,p(1:4,1:6),i3,i4,A_VV(7))
+                      call calcHelAmp2(ordering,ZgsMode,MY_IDUP,p(1:4,1:6),i3,i4,A_VV(3))
+                      call calcHelAmp2(ordering,gsZMode,MY_IDUP,p(1:4,1:6),i3,i4,A_VV(5))
+                      call calcHelAmp2(ordering,gsgsMode,MY_IDUP,p(1:4,1:6),i3,i4,A_VV(7))
                   elseif( VVMode.eq.ZgMode .and. includeGammaStar ) then
-                      call calcHelAmp2((/3,4,5,6/),gsgMode,MY_IDUP,p(1:4,1:6),i3,i4,A_VV(3))
+                      call calcHelAmp2(ordering,gsgMode,MY_IDUP,p(1:4,1:6),i3,i4,A_VV(3))
                   endif
 
-                  if( (VVMode.eq.ZZMode) .and. (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then
-                      call calcHelAmp2((/5,4,3,6/),VVMode,MY_IDUP,p(1:4,1:6),i3,i4,A_VV(2))
-                      if( IsAZDecay(DecayMode1) .and. IsAZDecay(DecayMode2) .and. includeGammaStar ) then
-                          call calcHelAmp2((/5,4,3,6/),ZgsMode,MY_IDUP,p(1:4,1:6),i3,i4,A_VV(4))
-                          call calcHelAmp2((/5,4,3,6/),gsZMode,MY_IDUP,p(1:4,1:6),i3,i4,A_VV(6))
-                          call calcHelAmp2((/5,4,3,6/),gsgsMode,MY_IDUP,p(1:4,1:6),i3,i4,A_VV(8))
+                  if( (VVMode.eq.ZZMode) .and. includeInterference .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then
+                      call calcHelAmp2(ordering_swap,VVMode,MY_IDUP,p(1:4,1:6),i3,i4,A_VV(2))
+                      if( includeGammaStar ) then
+                          call calcHelAmp2(ordering_swap,ZgsMode,MY_IDUP,p(1:4,1:6),i3,i4,A_VV(4))
+                          call calcHelAmp2(ordering_swap,gsZMode,MY_IDUP,p(1:4,1:6),i3,i4,A_VV(6))
+                          call calcHelAmp2(ordering_swap,gsgsMode,MY_IDUP,p(1:4,1:6),i3,i4,A_VV(8))
                       endif
                       A_VV(2) = -A_VV(2)! minus from Fermi statistics
                       A_VV(4) = -A_VV(4)
@@ -807,7 +427,7 @@
 
                   res = res + (A_VV(1)+A_VV(3)+A_VV(5)+A_VV(7))*dconjg(A_VV(1)+A_VV(3)+A_VV(5)+A_VV(7))!   interfere the 3456 pieces
                   res = res + (A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8))*dconjg(A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8))!   interfere the 5436 pieces
-                  if( (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) .and. (i3.eq.i4) ) then! interfere the 3456 with 5436 pieces
+                  if( (VVMode.eq.ZZMode) .and. includeInterference .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) .and. (i3.eq.i4) ) then! interfere the 3456 with 5436 pieces
                       res = res + 2d0*intcolfac*dreal(  A_VV(1)*dconjg( A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8) )  )
                       res = res + 2d0*intcolfac*dreal(  A_VV(3)*dconjg( A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8) )  )
                       res = res + 2d0*intcolfac*dreal(  A_VV(5)*dconjg( A_VV(2)+A_VV(4)+A_VV(6)+A_VV(8) )  )
@@ -838,396 +458,35 @@
 
 
           res = res*prefactor
-          if(  (VVMode.eq.ZZMode) .and. (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) res = res * SymmFac
+          if(  (VVMode.eq.ZZMode) .and. includeInterference .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) res = res * SymmFac
 
 
       RETURN
       END SUBROUTINE
 
+   subroutine calcHelAmp2(ordering,VVMode,MY_IDUP,p,i3,i4,A)
+   implicit none
+   integer :: ordering(1:4),VVMode,i3,i4,l1,l2,l3,l4,MY_IDUP(6:9)
+   real(dp) :: p(1:4,1:6)
+   real(dp) :: pin(4,4)
+   complex(dp) :: A(1:1), sp(3:4,4)
 
+      l1=ordering(1)
+      l2=ordering(2)
+      l3=ordering(3)
+      l4=ordering(4)
 
+      pin(1,:) = p(:,1)
 
-     subroutine calcHelAmp2(ordering,VVMode,MY_IDUP,p,i3,i4,A)
-     use ModMisc
-     implicit none
-     integer :: ordering(1:4),VVMode,i3,i4,l1,l2,l3,l4,MY_IDUP(6:9)
-     real(dp) :: p(1:4,1:6)
-     complex(dp) :: propZ1, propZ2
-     real(dp) :: s, pin(4,4), aL1,aR1,aL2,aR2
-     complex(dp) :: A(1:1), sp(3:4,4)
-
-
-         l1=ordering(1)
-         l2=ordering(2)
-         l3=ordering(3)
-         l4=ordering(4)
-         pin(1,:) = p(:,1)
-
-
-
-!        ij helicicites: -1 == left, 1 == right
-         if( VVMode.eq.ZZMode ) then
-!        ZZ DECAYS
-              if( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_)  ) then
-                    aL1=aL_lep    * dsqrt(scale_alpha_Z_ll)
-                    aR1=aR_lep    * dsqrt(scale_alpha_Z_ll)
-              elseif( abs(MY_IDUP(6)).eq.abs(TaM_) ) then
-                    aL1=aL_lep    * dsqrt(scale_alpha_Z_tt)
-                    aR1=aR_lep    * dsqrt(scale_alpha_Z_tt)
-              elseif( abs(MY_IDUP(6)).eq.abs(NuE_) .or. abs(MY_IDUP(6)).eq.abs(NuM_) .or. abs(MY_IDUP(6)).eq.abs(NuT_) ) then
-                    aL1=aL_neu    * dsqrt(scale_alpha_Z_nn)
-                    aR1=aR_neu    * dsqrt(scale_alpha_Z_nn)
-              elseif( abs(MY_IDUP(6)).eq.abs(Up_) .or. abs(MY_IDUP(6)).eq.abs(Chm_) ) then
-                    aL1=aL_QUp    * dsqrt(scale_alpha_Z_uu)
-                    aR1=aR_QUp    * dsqrt(scale_alpha_Z_uu)
-              elseif( abs(MY_IDUP(6)).eq.abs(Dn_) .or. abs(MY_IDUP(6)).eq.abs(Str_) .or. abs(MY_IDUP(6)).eq.abs(Bot_) ) then
-                    aL1=aL_QDn    * dsqrt(scale_alpha_Z_dd)
-                    aR1=aR_QDn    * dsqrt(scale_alpha_Z_dd)
-              else
-                    aL1=0d0
-                    aR1=0d0
-              endif
-              if( abs(MY_IDUP(8)).eq.abs(ElM_) .or. abs(MY_IDUP(8)).eq.abs(MuM_)  ) then
-                    aL2=aL_lep    * dsqrt(scale_alpha_Z_ll)
-                    aR2=aR_lep    * dsqrt(scale_alpha_Z_ll)
-              elseif( abs(MY_IDUP(8)).eq.abs(TaM_) ) then
-                    aL2=aL_lep    * dsqrt(scale_alpha_Z_tt)
-                    aR2=aR_lep    * dsqrt(scale_alpha_Z_tt)
-              elseif( abs(MY_IDUP(8)).eq.abs(NuE_) .or. abs(MY_IDUP(8)).eq.abs(NuM_) .or. abs(MY_IDUP(8)).eq.abs(NuT_) ) then
-                    aL2=aL_neu    * dsqrt(scale_alpha_Z_nn)
-                    aR2=aR_neu    * dsqrt(scale_alpha_Z_nn)
-              elseif( abs(MY_IDUP(8)).eq.abs(Up_) .or. abs(MY_IDUP(8)).eq.abs(Chm_) ) then
-                    aL2=aL_QUp    * dsqrt(scale_alpha_Z_uu)
-                    aR2=aR_QUp    * dsqrt(scale_alpha_Z_uu)
-              elseif( abs(MY_IDUP(8)).eq.abs(Dn_) .or. abs(MY_IDUP(8)).eq.abs(Str_) .or. abs(MY_IDUP(8)).eq.abs(Bot_) ) then
-                    aL2=aL_QDn    * dsqrt(scale_alpha_Z_dd)
-                    aR2=aR_QDn    * dsqrt(scale_alpha_Z_dd)
-              else
-                    aL2=0d0
-                    aR2=0d0
-              endif
-              pin(3,:) = p(:,l1)+p(:,l2)
-              pin(4,:) = p(:,l3)+p(:,l4)
-              sp(3,:) = pol_dk2mom(dcmplx(p(:,l1)),dcmplx(p(:,l2)),-3+2*i3)  ! ubar(l1), v(l2)
-              sp(3,:) = -sp(3,:) + pin(3,:)*( sc(sp(3,:),dcmplx(pin(3,:))) )/scr(pin(3,:),pin(3,:))! full propagator numerator
-              sp(4,:) = pol_dk2mom(dcmplx(p(:,l3)),dcmplx(p(:,l4)),-3+2*i4)  ! ubar(l3), v(l4)
-              sp(4,:) = -sp(4,:) + pin(4,:)*( sc(sp(4,:),dcmplx(pin(4,:))) )/scr(pin(4,:),pin(4,:))! full propagator numerator
-              s = scr(p(:,l1)+p(:,l2),p(:,l1)+p(:,l2))
-              propZ1 = s/dcmplx(s - M_V**2,M_V*Ga_V)
-              s = scr(p(:,l3)+p(:,l4),p(:,l3)+p(:,l4))
-              propZ2 = s/dcmplx(s - M_V**2,M_V*Ga_V)
-
-         elseif( VVMode.eq.WWMode ) then
-!        WW DECAYS
-              if( IsAQuark(MY_IDUP(6)) ) then
-                 aL1 = bL * dsqrt(scale_alpha_W_ud)
-                 aR1 = bR * dsqrt(scale_alpha_W_ud)! = 0
-              elseif( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_) ) then
-                 aL1 = bL * dsqrt(scale_alpha_W_ln)
-                 aR1 = bR * dsqrt(scale_alpha_W_ln)! = 0
-              elseif( abs(MY_IDUP(6)).eq.abs(TaM_) ) then
-                 aL1 = bL * dsqrt(scale_alpha_W_tn)
-                 aR1 = bR * dsqrt(scale_alpha_W_tn)! = 0
-              else
-                    aL1=0d0
-                    aR1=0d0
-              endif
-              if( IsAQuark(MY_IDUP(8)) ) then
-                 aL2 = bL * dsqrt(scale_alpha_W_ud)
-                 aR2 = bR * dsqrt(scale_alpha_W_ud)! = 0
-              elseif( abs(MY_IDUP(9)).eq.abs(ElM_) .or. abs(MY_IDUP(9)).eq.abs(MuM_) ) then
-                 aL2 = bL * dsqrt(scale_alpha_W_ln)
-                 aR2 = bR * dsqrt(scale_alpha_W_ln)! = 0
-              elseif( abs(MY_IDUP(9)).eq.abs(TaM_) ) then
-                 aL2 = bL * dsqrt(scale_alpha_W_tn)
-                 aR2 = bR * dsqrt(scale_alpha_W_tn)! = 0
-              else
-                    aL2=0d0
-                    aR2=0d0
-              endif
-              pin(3,:) = p(:,l1)+p(:,l2)
-              pin(4,:) = p(:,l3)+p(:,l4)
-              sp(3,:) = pol_dk2mom(dcmplx(p(:,l1)),dcmplx(p(:,l2)),-3+2*i3)  ! ubar(l1), v(l2)
-              sp(3,:) = -sp(3,:) + pin(3,:)*( sc(sp(3,:),dcmplx(pin(3,:))) )/scr(pin(3,:),pin(3,:))! full propagator numerator
-              sp(4,:) = pol_dk2mom(dcmplx(p(:,l3)),dcmplx(p(:,l4)),-3+2*i4)  ! ubar(l3), v(l4)
-              sp(4,:) = -sp(4,:) + pin(4,:)*( sc(sp(4,:),dcmplx(pin(4,:))) )/scr(pin(4,:),pin(4,:))! full propagator numerator
-              s = scr(p(:,l1)+p(:,l2),p(:,l1)+p(:,l2))
-              propZ1 = s/dcmplx(s - M_V**2,M_V*Ga_V)
-              s = scr(p(:,l3)+p(:,l4),p(:,l3)+p(:,l4))
-              propZ2 = s/dcmplx(s - M_V**2,M_V*Ga_V)
-
-             if( convertLHE(MY_IDUP(6))+convertLHE(MY_IDUP(7)).lt.0 ) then! this assigns the W+/W- to the first/second set of inputs; important for q^2-dependent form factors. Everything else is symmetric any ways.
-                  call swap_cmom(sp(3,1:4),sp(4,1:4))
-                  call swap_mom(pin(3,1:4),pin(4,1:4))
-              endif
-
-         elseif( VVMode.eq.ZgMode ) then
-!        Zgamma DECAYS
-              if( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_) ) then
-                    aL1=aL_lep    * dsqrt(scale_alpha_Z_ll)
-                    aR1=aR_lep    * dsqrt(scale_alpha_Z_ll)
-              elseif( abs(MY_IDUP(6)).eq.abs(TaM_) ) then
-                    aL1=aL_lep    * dsqrt(scale_alpha_Z_tt)
-                    aR1=aR_lep    * dsqrt(scale_alpha_Z_tt)
-              elseif( abs(MY_IDUP(6)).eq.abs(NuE_) .or. abs(MY_IDUP(6)).eq.abs(NuM_) .or. abs(MY_IDUP(6)).eq.abs(NuT_) ) then
-                    aL1=aL_neu    * dsqrt(scale_alpha_Z_nn)
-                    aR1=aR_neu    * dsqrt(scale_alpha_Z_nn)
-              elseif( abs(MY_IDUP(6)).eq.abs(Up_) .or. abs(MY_IDUP(6)).eq.abs(Chm_) ) then
-                    aL1=aL_QUp    * dsqrt(scale_alpha_Z_uu)
-                    aR1=aR_QUp    * dsqrt(scale_alpha_Z_uu)
-              elseif( abs(MY_IDUP(6)).eq.abs(Dn_) .or. abs(MY_IDUP(6)).eq.abs(Str_) .or. abs(MY_IDUP(6)).eq.abs(Bot_) ) then
-                    aL1=aL_QDn    * dsqrt(scale_alpha_Z_dd)
-                    aR1=aR_QDn    * dsqrt(scale_alpha_Z_dd)
-              else
-                    aL1=0d0
-                    aR1=0d0
-              endif
-              aL2=1d0
-              aR2=1d0
-              pin(3,:) = p(:,l1)+p(:,l2)
-              pin(4,:) = p(:,l3)
-              sp(3,:) = pol_dk2mom(dcmplx(p(:,l1)),dcmplx(p(:,l2)),-3+2*i3)  ! ubar(l1), v(l2)
-              sp(3,:) = -sp(3,:) + pin(3,:)*( sc(sp(3,:),dcmplx(pin(3,:))) )/scr(pin(3,:),pin(3,:))! full propagator numerator
-              sp(4,:) = pol_mless2(dcmplx(p(:,l3)),-3+2*i4,'out')  ! photon
-!               sp(4,1:4)=pin(4,1:4); print *, "this checks gauge invariance"
-              s = scr(p(:,l1)+p(:,l2),p(:,l1)+p(:,l2))
-              propZ1 = s/dcmplx(s - M_V**2,M_V*Ga_V)
-              propZ2=1d0
-
-         elseif( VVMode.eq.ggMode ) then
-!        gamma gamma DECAYS
-              aL1=1d0
-              aR1=1d0
-              aL2=1d0
-              aR2=1d0
-              pin(3,:) = p(:,l1)
-              pin(4,:) = p(:,l3)
-              sp(3,:) = pol_mless2(dcmplx(p(:,l1)),-3+2*i3,'out')  ! photon
-              sp(4,:) = pol_mless2(dcmplx(p(:,l3)),-3+2*i4,'out')  ! photon
-!               sp(3,1:4)=pin(3,1:4); print *, "this checks gauge invariance"
-!               sp(4,1:4)=pin(4,1:4)
-              propz1=1d0
-              propz2=1d0
-
-         elseif( VVMode.eq.gsgMode ) then
-!        gamma* gamma DECAYS
-              if( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_) ) then
-                    aL1=cL_lep    * dsqrt(scale_alpha_Z_ll)
-                    aR1=cR_lep    * dsqrt(scale_alpha_Z_ll)
-              elseif( abs(MY_IDUP(6)).eq.abs(TaM_) ) then
-                    aL1=cL_lep    * dsqrt(scale_alpha_Z_tt)
-                    aR1=cR_lep    * dsqrt(scale_alpha_Z_tt)
-              elseif( abs(MY_IDUP(6)).eq.abs(NuE_) .or. abs(MY_IDUP(6)).eq.abs(NuM_) .or. abs(MY_IDUP(6)).eq.abs(NuT_) ) then
-                    aL1=cL_neu    * dsqrt(scale_alpha_Z_nn)! = 0
-                    aR1=cR_neu    * dsqrt(scale_alpha_Z_nn)! = 0
-              elseif( abs(MY_IDUP(6)).eq.abs(Up_) .or. abs(MY_IDUP(6)).eq.abs(Chm_) ) then
-                    aL1=cL_QUp    * dsqrt(scale_alpha_Z_uu)
-                    aR1=cR_QUp    * dsqrt(scale_alpha_Z_uu)
-              elseif( abs(MY_IDUP(6)).eq.abs(Dn_) .or. abs(MY_IDUP(6)).eq.abs(Str_) .or. abs(MY_IDUP(6)).eq.abs(Bot_) ) then
-                    aL1=cL_QDn    * dsqrt(scale_alpha_Z_dd)
-                    aR1=cR_QDn    * dsqrt(scale_alpha_Z_dd)
-              else
-                    aL1=0d0
-                    aR1=0d0
-              endif
-              aL2=1d0
-              aR2=1d0
-              pin(3,:) = p(:,l1)+p(:,l2)
-              pin(4,:) = p(:,l3)
-              sp(3,:) = pol_dk2mom(dcmplx(p(:,l1)),dcmplx(p(:,l2)),-3+2*i3)  ! ubar(l1), v(l2)
-              sp(3,:) = -sp(3,:) ! photon propagator
-              sp(4,:) = pol_mless2(dcmplx(p(:,l3)),-3+2*i4,'out')  ! photon
-!               sp(4,1:4)=pin(4,1:4); print *, "this checks gauge invariance"
-              s = scr(p(:,l1)+p(:,l2),p(:,l1)+p(:,l2))
-              propZ1 = 1d0
-              propZ2 = 1d0
-              if( s.lt.MPhotonCutoff**2 ) propZ2=0d0
-
-         elseif( VVMode.eq.gsZMode ) then
-!        gamma* Z DECAYS
-              if( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_)  ) then
-                    aL1=cL_lep    * dsqrt(scale_alpha_Z_ll)
-                    aR1=cR_lep    * dsqrt(scale_alpha_Z_ll)
-              elseif( abs(MY_IDUP(6)).eq.abs(TaM_) ) then
-                    aL1=cL_lep    * dsqrt(scale_alpha_Z_tt)
-                    aR1=cR_lep    * dsqrt(scale_alpha_Z_tt)
-              elseif( abs(MY_IDUP(6)).eq.abs(NuE_) .or. abs(MY_IDUP(6)).eq.abs(NuM_) .or. abs(MY_IDUP(6)).eq.abs(NuT_) ) then
-                    aL1=cL_neu    * dsqrt(scale_alpha_Z_nn)
-                    aR1=cR_neu    * dsqrt(scale_alpha_Z_nn)
-              elseif( abs(MY_IDUP(6)).eq.abs(Up_) .or. abs(MY_IDUP(6)).eq.abs(Chm_) ) then
-                    aL1=cL_QUp    * dsqrt(scale_alpha_Z_uu)
-                    aR1=cR_QUp    * dsqrt(scale_alpha_Z_uu)
-              elseif( abs(MY_IDUP(6)).eq.abs(Dn_) .or. abs(MY_IDUP(6)).eq.abs(Str_) .or. abs(MY_IDUP(6)).eq.abs(Bot_) ) then
-                    aL1=cL_QDn    * dsqrt(scale_alpha_Z_dd)
-                    aR1=cR_QDn    * dsqrt(scale_alpha_Z_dd)
-              else
-                    aL1=0d0
-                    aR1=0d0
-              endif
-              if( abs(MY_IDUP(8)).eq.abs(ElM_) .or. abs(MY_IDUP(8)).eq.abs(MuM_) ) then
-                    aL2=aL_lep    * dsqrt(scale_alpha_Z_ll)
-                    aR2=aR_lep    * dsqrt(scale_alpha_Z_ll)
-              elseif( abs(MY_IDUP(8)).eq.abs(TaM_) ) then
-                    aL2=aL_lep    * dsqrt(scale_alpha_Z_tt)
-                    aR2=aR_lep    * dsqrt(scale_alpha_Z_tt)
-              elseif( abs(MY_IDUP(8)).eq.abs(NuE_) .or. abs(MY_IDUP(8)).eq.abs(NuM_) .or. abs(MY_IDUP(8)).eq.abs(NuT_) ) then
-                    aL2=aL_neu    * dsqrt(scale_alpha_Z_nn)
-                    aR2=aR_neu    * dsqrt(scale_alpha_Z_nn)
-              elseif( abs(MY_IDUP(8)).eq.abs(Up_) .or. abs(MY_IDUP(8)).eq.abs(Chm_) ) then
-                    aL2=aL_QUp    * dsqrt(scale_alpha_Z_uu)
-                    aR2=aR_QUp    * dsqrt(scale_alpha_Z_uu)
-              elseif( abs(MY_IDUP(8)).eq.abs(Dn_) .or. abs(MY_IDUP(8)).eq.abs(Str_) .or. abs(MY_IDUP(8)).eq.abs(Bot_) ) then
-                    aL2=aL_QDn    * dsqrt(scale_alpha_Z_dd)
-                    aR2=aR_QDn    * dsqrt(scale_alpha_Z_dd)
-              else
-                    aL2=0d0
-                    aR2=0d0
-              endif
-              pin(3,:) = p(:,l1)+p(:,l2)
-              pin(4,:) = p(:,l3)+p(:,l4)
-              sp(3,:) = pol_dk2mom(dcmplx(p(:,l1)),dcmplx(p(:,l2)),-3+2*i3)  ! ubar(l1), v(l2)
-              sp(3,:) = -sp(3,:)
-              sp(4,:) = pol_dk2mom(dcmplx(p(:,l3)),dcmplx(p(:,l4)),-3+2*i4)  ! ubar(l3), v(l4)
-              sp(4,:) = -sp(4,:) + pin(4,:)*( sc(sp(4,:),dcmplx(pin(4,:))) )/scr(pin(4,:),pin(4,:))! full propagator numerator
-              s = scr(p(:,l1)+p(:,l2),p(:,l1)+p(:,l2))
-              propZ1 = 1d0! = s/dcmplx(s)
-              if( s.lt.MPhotonCutoff**2 ) propZ1=0d0
-              s = scr(p(:,l3)+p(:,l4),p(:,l3)+p(:,l4))
-              propZ2 = s/dcmplx(s - M_V**2,M_V*Ga_V)
-
-
-         elseif( VVMode.eq.ZgsMode ) then
-!        Z gamma* DECAYS
-              if( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_) ) then
-                    aL1=aL_lep    * dsqrt(scale_alpha_Z_ll)
-                    aR1=aR_lep    * dsqrt(scale_alpha_Z_ll)
-              elseif( abs(MY_IDUP(6)).eq.abs(TaM_) ) then
-                    aL1=aL_lep    * dsqrt(scale_alpha_Z_tt)
-                    aR1=aR_lep    * dsqrt(scale_alpha_Z_tt)
-              elseif( abs(MY_IDUP(6)).eq.abs(NuE_) .or. abs(MY_IDUP(6)).eq.abs(NuM_) .or. abs(MY_IDUP(6)).eq.abs(NuT_) ) then
-                    aL1=aL_neu    * dsqrt(scale_alpha_Z_nn)
-                    aR1=aR_neu    * dsqrt(scale_alpha_Z_nn)
-              elseif( abs(MY_IDUP(6)).eq.abs(Up_) .or. abs(MY_IDUP(6)).eq.abs(Chm_) ) then
-                    aL1=aL_QUp    * dsqrt(scale_alpha_Z_uu)
-                    aR1=aR_QUp    * dsqrt(scale_alpha_Z_uu)
-              elseif( abs(MY_IDUP(6)).eq.abs(Dn_) .or. abs(MY_IDUP(6)).eq.abs(Str_) .or. abs(MY_IDUP(6)).eq.abs(Bot_) ) then
-                    aL1=aL_QDn    * dsqrt(scale_alpha_Z_dd)
-                    aR1=aR_QDn    * dsqrt(scale_alpha_Z_dd)
-              else
-                    aL1=0d0
-                    aR1=0d0
-              endif
-              if( abs(MY_IDUP(8)).eq.abs(ElM_) .or. abs(MY_IDUP(8)).eq.abs(MuM_) ) then
-                    aL2=cL_lep    * dsqrt(scale_alpha_Z_ll)
-                    aR2=cR_lep    * dsqrt(scale_alpha_Z_ll)
-              elseif( abs(MY_IDUP(8)).eq.abs(TaM_) ) then
-                    aL2=cL_lep    * dsqrt(scale_alpha_Z_tt)
-                    aR2=cR_lep    * dsqrt(scale_alpha_Z_tt)
-              elseif( abs(MY_IDUP(8)).eq.abs(NuE_) .or. abs(MY_IDUP(8)).eq.abs(NuM_) .or. abs(MY_IDUP(8)).eq.abs(NuT_) ) then
-                    aL2=cL_neu    * dsqrt(scale_alpha_Z_nn)! = 0
-                    aR2=cR_neu    * dsqrt(scale_alpha_Z_nn)! = 0
-              elseif( abs(MY_IDUP(8)).eq.abs(Up_) .or. abs(MY_IDUP(8)).eq.abs(Chm_) ) then
-                    aL2=cL_QUp    * dsqrt(scale_alpha_Z_uu)
-                    aR2=cR_QUp    * dsqrt(scale_alpha_Z_uu)
-              elseif( abs(MY_IDUP(8)).eq.abs(Dn_) .or. abs(MY_IDUP(8)).eq.abs(Str_) .or. abs(MY_IDUP(8)).eq.abs(Bot_) ) then
-                    aL2=cL_QDn    * dsqrt(scale_alpha_Z_dd)
-                    aR2=cR_QDn    * dsqrt(scale_alpha_Z_dd)
-              else
-                    aL2=0d0
-                    aR2=0d0
-              endif
-              pin(3,:) = p(:,l1)+p(:,l2)
-              pin(4,:) = p(:,l3)+p(:,l4)
-              sp(3,:) = pol_dk2mom(dcmplx(p(:,l1)),dcmplx(p(:,l2)),-3+2*i3)  ! ubar(l1), v(l2)
-              sp(3,:) = -sp(3,:) + pin(3,:)*( sc(sp(3,:),dcmplx(pin(3,:))) )/scr(pin(3,:),pin(3,:))! full propagator numerator
-              sp(4,:) = pol_dk2mom(dcmplx(p(:,l3)),dcmplx(p(:,l4)),-3+2*i4)  ! ubar(l3), v(l4)
-              sp(4,:) = -sp(4,:)
-              s = scr(p(:,l1)+p(:,l2),p(:,l1)+p(:,l2))
-              propZ1 = s/dcmplx(s - M_V**2,M_V*Ga_V)
-              s = scr(p(:,l3)+p(:,l4),p(:,l3)+p(:,l4))
-              propZ2 = 1d0 ! = s/dcmplx(s)
-              if( s.lt.MPhotonCutoff**2 ) propZ2=0d0
-
-
-         elseif( VVMode.eq.gsgsMode ) then
-!        gamma* gamma* DECAYS
-              if( abs(MY_IDUP(6)).eq.abs(ElM_) .or. abs(MY_IDUP(6)).eq.abs(MuM_) ) then
-                    aL1=cL_lep    * dsqrt(scale_alpha_Z_ll)
-                    aR1=cR_lep    * dsqrt(scale_alpha_Z_ll)
-              elseif( abs(MY_IDUP(6)).eq.abs(TaM_) ) then
-                    aL1=cL_lep    * dsqrt(scale_alpha_Z_tt)
-                    aR1=cR_lep    * dsqrt(scale_alpha_Z_tt)
-              elseif( abs(MY_IDUP(6)).eq.abs(NuE_) .or. abs(MY_IDUP(6)).eq.abs(NuM_) .or. abs(MY_IDUP(6)).eq.abs(NuT_) ) then
-                    aL1=cL_neu    * dsqrt(scale_alpha_Z_nn)! = 0
-                    aR1=cR_neu    * dsqrt(scale_alpha_Z_nn)! = 0
-              elseif( abs(MY_IDUP(6)).eq.abs(Up_) .or. abs(MY_IDUP(6)).eq.abs(Chm_) ) then
-                    aL1=cL_QUp    * dsqrt(scale_alpha_Z_uu)
-                    aR1=cR_QUp    * dsqrt(scale_alpha_Z_uu)
-              elseif( abs(MY_IDUP(6)).eq.abs(Dn_) .or. abs(MY_IDUP(6)).eq.abs(Str_) .or. abs(MY_IDUP(6)).eq.abs(Bot_) ) then
-                    aL1=cL_QDn    * dsqrt(scale_alpha_Z_dd)
-                    aR1=cR_QDn    * dsqrt(scale_alpha_Z_dd)
-              else
-                    aL1=0d0
-                    aR1=0d0
-              endif
-              if( abs(MY_IDUP(8)).eq.abs(ElM_) .or. abs(MY_IDUP(8)).eq.abs(MuM_) ) then
-                    aL2=cL_lep    * dsqrt(scale_alpha_Z_ll)
-                    aR2=cR_lep    * dsqrt(scale_alpha_Z_ll)
-              elseif( abs(MY_IDUP(8)).eq.abs(TaM_) ) then
-                    aL2=cL_lep    * dsqrt(scale_alpha_Z_tt)
-                    aR2=cR_lep    * dsqrt(scale_alpha_Z_tt)
-              elseif( abs(MY_IDUP(8)).eq.abs(NuE_) .or. abs(MY_IDUP(8)).eq.abs(NuM_) .or. abs(MY_IDUP(8)).eq.abs(NuT_) ) then
-                    aL2=cL_neu    * dsqrt(scale_alpha_Z_nn)! = 0
-                    aR2=cR_neu    * dsqrt(scale_alpha_Z_nn)! = 0
-              elseif( abs(MY_IDUP(8)).eq.abs(Up_) .or. abs(MY_IDUP(8)).eq.abs(Chm_) ) then
-                    aL2=cL_QUp    * dsqrt(scale_alpha_Z_uu)
-                    aR2=cR_QUp    * dsqrt(scale_alpha_Z_uu)
-              elseif( abs(MY_IDUP(8)).eq.abs(Dn_) .or. abs(MY_IDUP(8)).eq.abs(Str_) .or. abs(MY_IDUP(8)).eq.abs(Bot_) ) then
-                    aL2=cL_QDn    * dsqrt(scale_alpha_Z_dd)
-                    aR2=cR_QDn    * dsqrt(scale_alpha_Z_dd)
-              else
-                    aL2=0d0
-                    aR2=0d0
-              endif
-              pin(3,:) = p(:,l1)+p(:,l2)
-              pin(4,:) = p(:,l3)+p(:,l4)
-              sp(3,:) = pol_dk2mom(dcmplx(p(:,l1)),dcmplx(p(:,l2)),-3+2*i3)  ! ubar(l1), v(l2)
-              sp(3,:) = -sp(3,:)
-              sp(4,:) = pol_dk2mom(dcmplx(p(:,l3)),dcmplx(p(:,l4)),-3+2*i4)  ! ubar(l3), v(l4)
-              sp(4,:) = -sp(4,:)
-              s = scr(p(:,l1)+p(:,l2),p(:,l1)+p(:,l2))
-              propZ1 = 1d0 ! = s/dcmplx(s)
-              if( s.lt.MPhotonCutoff**2 ) propZ1=0d0
-              s = scr(p(:,l3)+p(:,l4),p(:,l3)+p(:,l4))
-              propZ2 = 1d0 ! = s/dcmplx(s)
-              if( s.lt.MPhotonCutoff**2 ) propZ2=0d0
-         else
-             call Error("Unsupported decay modes")
-         endif
-
-
-
-         call HZZampl(VVMode,pin,sp,A(1))
-
-
-         if (i3.eq.1) then
-            A(1) = aL1 * A(1)
-         elseif(i3.eq.2) then
-            A(1) = aR1 * A(1)
-         endif
-         if (i4.eq.1) then
-            A(1) = aL2 * A(1)
-         elseif(i4.eq.2) then
-            A(1) = aR2 * A(1)
-         endif
-         A(1) = A(1) * propZ1*propZ2
-
-
-     end subroutine
-
-
-
-
+      call getDecay_Couplings_Spinors_Props(                                                             &
+                                       VVMode,                                                      &
+                                       (/MY_IDUP(l1+3),MY_IDUP(l2+3),MY_IDUP(l3+3),MY_IDUP(l4+3)/), &
+                                       (/p(:,l1),p(:,l2),p(:,l3),p(:,l4)/),                         &
+                                       -3+2*i3,-3+2*i4,                                             &
+                                       sp(3:4,:),pin(3:4,:)                                         &
+                                      )
+      call HZZampl(VVMode,pin,sp,A(1))
+   end subroutine
 
       subroutine HZZampl(VVMode,p,sp,res)
       implicit none
@@ -1358,10 +617,6 @@
    END SUBROUTINE HZZampl
 
 
-
-
-
-
 ! Higgs decay to tau^+ tau^-   or    top anti-top
 ! Decay amplitude H --> tau^-(p1) + tau^+(p2)
 ! or              H --> tbar(p1)  + top(p2)
@@ -1369,8 +624,6 @@
 ! Since this is an isotropic scalar decay, just provide a matrix element SQUARED
 ! R.Rontsch July 2015
    SUBROUTINE EvalAmp_H_FF(pin,mass_F,res)
-   use ModMisc
-   use ModParameters
    implicit none
    real(dp), intent(out) ::  res
    real(dp), intent(in) :: pin(1:4,1:2),mass_F
@@ -1384,10 +637,6 @@
    END SUBROUTINE
 
 
-
-
-
-
 ! Decay amplitude H --> tau^-(-->l^-(p1)+nubar(p2)+nutau(p3))  +  tau^+(-->nu(p4)+l^+(p5)+nutaubar(p6))
 ! or H --> tbar^-(-->l^-(p1)+nubar(p2)+bbar(p3))+top(-->nu(p4)+l^+(p5)+b(p6))
 ! Note: 1. Value of m allows to change between H->tau^+tau^- and H->ttbar
@@ -1396,8 +645,6 @@
 !       4. At present, no width in the tau/top propagator
 ! R. Rontsch July 2015
    SUBROUTINE EvalAmp_H_TT_decay(pin,mass_F,ga_F,res)
-   use ModMisc
-   use ModParameters
    implicit none
    real(dp), intent(out) ::  res
    real(dp), intent(in) :: pin(1:4,1:6),mass_F,ga_F
@@ -1432,590 +679,417 @@
    END SUBROUTINE
 
 
+subroutine getDecay_Couplings_Spinors_Props(VVMode,idordered,pordered,h3,h4, sp,pV)
+   implicit none
+   integer, intent(in) :: VVMode,idordered(6:9),h3,h4
+   real(dp), intent(in) :: pordered(1:4,6:9)
+   complex(dp), intent(out) :: sp(3:4,1:4)
+   real(dp), intent(out) :: pV(3:4,1:4)
+   real(dp) :: s, aL1,aR1,aL2,aR2
+   complex(dp) :: propV(1:2)
 
+   !        h3/h4 helicities: -1 == left, 1 == right
+   if( VVMode.eq.ZZMode ) then
+   !        ZZ DECAYS
+      if( abs(idordered(6)).eq.abs(ElM_) .or. abs(idordered(6)).eq.abs(MuM_)  ) then
+         aL1=aL_lep    * dsqrt(scale_alpha_Z_ll)
+         aR1=aR_lep    * dsqrt(scale_alpha_Z_ll)
+      elseif( abs(idordered(6)).eq.abs(TaM_) ) then
+         aL1=aL_lep    * dsqrt(scale_alpha_Z_tt)
+         aR1=aR_lep    * dsqrt(scale_alpha_Z_tt)
+      elseif( abs(idordered(6)).eq.abs(NuE_) .or. abs(idordered(6)).eq.abs(NuM_) .or. abs(idordered(6)).eq.abs(NuT_) ) then
+         aL1=aL_neu    * dsqrt(scale_alpha_Z_nn)
+         aR1=aR_neu    * dsqrt(scale_alpha_Z_nn)
+      elseif( abs(idordered(6)).eq.abs(Up_) .or. abs(idordered(6)).eq.abs(Chm_) ) then
+         aL1=aL_QUp    * dsqrt(scale_alpha_Z_uu)
+         aR1=aR_QUp    * dsqrt(scale_alpha_Z_uu)
+      elseif( abs(idordered(6)).eq.abs(Dn_) .or. abs(idordered(6)).eq.abs(Str_) .or. abs(idordered(6)).eq.abs(Bot_) ) then
+         aL1=aL_QDn    * dsqrt(scale_alpha_Z_dd)
+         aR1=aR_QDn    * dsqrt(scale_alpha_Z_dd)
+      else
+         aL1=0d0
+         aR1=0d0
+      endif
+      if( abs(idordered(8)).eq.abs(ElM_) .or. abs(idordered(8)).eq.abs(MuM_)  ) then
+         aL2=aL_lep    * dsqrt(scale_alpha_Z_ll)
+         aR2=aR_lep    * dsqrt(scale_alpha_Z_ll)
+      elseif( abs(idordered(8)).eq.abs(TaM_) ) then
+         aL2=aL_lep    * dsqrt(scale_alpha_Z_tt)
+         aR2=aR_lep    * dsqrt(scale_alpha_Z_tt)
+      elseif( abs(idordered(8)).eq.abs(NuE_) .or. abs(idordered(8)).eq.abs(NuM_) .or. abs(idordered(8)).eq.abs(NuT_) ) then
+         aL2=aL_neu    * dsqrt(scale_alpha_Z_nn)
+         aR2=aR_neu    * dsqrt(scale_alpha_Z_nn)
+      elseif( abs(idordered(8)).eq.abs(Up_) .or. abs(idordered(8)).eq.abs(Chm_) ) then
+         aL2=aL_QUp    * dsqrt(scale_alpha_Z_uu)
+         aR2=aR_QUp    * dsqrt(scale_alpha_Z_uu)
+      elseif( abs(idordered(8)).eq.abs(Dn_) .or. abs(idordered(8)).eq.abs(Str_) .or. abs(idordered(8)).eq.abs(Bot_) ) then
+         aL2=aL_QDn    * dsqrt(scale_alpha_Z_dd)
+         aR2=aR_QDn    * dsqrt(scale_alpha_Z_dd)
+      else
+         aL2=0d0
+         aR2=0d0
+      endif
+      pV(3,:) = pordered(:,6)+pordered(:,7)
+      pV(4,:) = pordered(:,8)+pordered(:,9)
+      sp(3,:) = pol_dk2mom(dcmplx(pordered(:,6)),dcmplx(pordered(:,7)),h3)  ! ubar(l1), v(l2)
+      sp(3,:) = -sp(3,:) + pV(3,:)*( sc(sp(3,:),dcmplx(pV(3,:))) )/scr(pV(3,:),pV(3,:))! full propagator numerator
+      sp(4,:) = pol_dk2mom(dcmplx(pordered(:,8)),dcmplx(pordered(:,9)),h4)  ! ubar(l3), v(l4)
+      sp(4,:) = -sp(4,:) + pV(4,:)*( sc(sp(4,:),dcmplx(pV(4,:))) )/scr(pV(4,:),pV(4,:))! full propagator numerator
+      s = scr(pordered(:,6)+pordered(:,7),pordered(:,6)+pordered(:,7))
+      propV(1) = s/dcmplx(s - M_V**2,M_V*Ga_V)
+      s = scr(pordered(:,8)+pordered(:,9),pordered(:,8)+pordered(:,9))
+      propV(2) = s/dcmplx(s - M_V**2,M_V*Ga_V)
 
+   elseif( VVMode.eq.WWMode ) then
+   !        WW DECAYS
+      if( IsAQuark(idordered(6)) ) then
+         aL1 = bL * dsqrt(scale_alpha_W_ud)
+         aR1 = bR * dsqrt(scale_alpha_W_ud)! = 0
+      elseif( &
+               (abs(idordered(6)).eq.abs(ElP_) .and. abs(idordered(7)).eq.abs(NuE_)) .or. (abs(idordered(7)).eq.abs(ElP_) .and. abs(idordered(6)).eq.abs(NuE_)) .or. &
+               (abs(idordered(6)).eq.abs(MuP_) .and. abs(idordered(7)).eq.abs(NuM_)) .or. (abs(idordered(7)).eq.abs(MuP_) .and. abs(idordered(6)).eq.abs(NuM_))      &
+            ) then
+         aL1 = bL * dsqrt(scale_alpha_W_ln)
+         aR1 = bR * dsqrt(scale_alpha_W_ln)! = 0
+      elseif( &
+               (abs(idordered(6)).eq.abs(TaP_) .and. abs(idordered(7)).eq.abs(NuT_)) .or. (abs(idordered(7)).eq.abs(TaP_) .and. abs(idordered(6)).eq.abs(NuT_))      &
+            ) then
+         aL1 = bL * dsqrt(scale_alpha_W_tn)
+         aR1 = bR * dsqrt(scale_alpha_W_tn)! = 0
+      else
+         aL1=0d0
+         aR1=0d0
+      endif
+      if( IsAQuark(idordered(8)) ) then
+         aL2 = bL * dsqrt(scale_alpha_W_ud)
+         aR2 = bR * dsqrt(scale_alpha_W_ud)! = 0
+      elseif( &
+               (abs(idordered(8)).eq.abs(ElM_) .and. abs(idordered(9)).eq.abs(ANuE_)) .or. (abs(idordered(9)).eq.abs(ElM_) .and. abs(idordered(8)).eq.abs(ANuE_)) .or. &
+               (abs(idordered(8)).eq.abs(MuM_) .and. abs(idordered(9)).eq.abs(ANuM_)) .or. (abs(idordered(9)).eq.abs(MuM_) .and. abs(idordered(8)).eq.abs(ANuM_))      &
+            ) then
+         aL2 = bL * dsqrt(scale_alpha_W_ln)
+         aR2 = bR * dsqrt(scale_alpha_W_ln)! = 0
+      elseif( &
+               (abs(idordered(8)).eq.abs(TaM_) .and. abs(idordered(9)).eq.abs(ANuT_)) .or. (abs(idordered(9)).eq.abs(TaM_) .and. abs(idordered(8)).eq.abs(ANuT_))      &
+            ) then
+         aL2 = bL * dsqrt(scale_alpha_W_tn)
+         aR2 = bR * dsqrt(scale_alpha_W_tn)! = 0
+      else
+         aL2=0d0
+         aR2=0d0
+      endif
+      pV(3,:) = pordered(:,6)+pordered(:,7)
+      pV(4,:) = pordered(:,8)+pordered(:,9)
+      sp(3,:) = pol_dk2mom(dcmplx(pordered(:,6)),dcmplx(pordered(:,7)),h3)  ! ubar(l1), v(l2)
+      sp(3,:) = -sp(3,:) + pV(3,:)*( sc(sp(3,:),dcmplx(pV(3,:))) )/scr(pV(3,:),pV(3,:))! full propagator numerator
+      sp(4,:) = pol_dk2mom(dcmplx(pordered(:,8)),dcmplx(pordered(:,9)),h4)  ! ubar(l3), v(l4)
+      sp(4,:) = -sp(4,:) + pV(4,:)*( sc(sp(4,:),dcmplx(pV(4,:))) )/scr(pV(4,:),pV(4,:))! full propagator numerator
+      s = scr(pordered(:,6)+pordered(:,7),pordered(:,6)+pordered(:,7))
+      propV(1) = s/dcmplx(s - M_V**2,M_V*Ga_V)
+      s = scr(pordered(:,8)+pordered(:,9),pordered(:,8)+pordered(:,9))
+      propV(2) = s/dcmplx(s - M_V**2,M_V*Ga_V)
 
+   elseif( VVMode.eq.ZgMode ) then
+   !        Zgamma DECAYS
+      if( abs(idordered(6)).eq.abs(ElM_) .or. abs(idordered(6)).eq.abs(MuM_) ) then
+         aL1=aL_lep    * dsqrt(scale_alpha_Z_ll)
+         aR1=aR_lep    * dsqrt(scale_alpha_Z_ll)
+      elseif( abs(idordered(6)).eq.abs(TaM_) ) then
+         aL1=aL_lep    * dsqrt(scale_alpha_Z_tt)
+         aR1=aR_lep    * dsqrt(scale_alpha_Z_tt)
+      elseif( abs(idordered(6)).eq.abs(NuE_) .or. abs(idordered(6)).eq.abs(NuM_) .or. abs(idordered(6)).eq.abs(NuT_) ) then
+         aL1=aL_neu    * dsqrt(scale_alpha_Z_nn)
+         aR1=aR_neu    * dsqrt(scale_alpha_Z_nn)
+      elseif( abs(idordered(6)).eq.abs(Up_) .or. abs(idordered(6)).eq.abs(Chm_) ) then
+         aL1=aL_QUp    * dsqrt(scale_alpha_Z_uu)
+         aR1=aR_QUp    * dsqrt(scale_alpha_Z_uu)
+      elseif( abs(idordered(6)).eq.abs(Dn_) .or. abs(idordered(6)).eq.abs(Str_) .or. abs(idordered(6)).eq.abs(Bot_) ) then
+         aL1=aL_QDn    * dsqrt(scale_alpha_Z_dd)
+         aR1=aR_QDn    * dsqrt(scale_alpha_Z_dd)
+      else
+         aL1=0d0
+         aR1=0d0
+      endif
+      aL2=1d0
+      aR2=1d0
+      pV(3,:) = pordered(:,6)+pordered(:,7)
+      pV(4,:) = pordered(:,8)
+      sp(3,:) = pol_dk2mom(dcmplx(pordered(:,6)),dcmplx(pordered(:,7)),h3)  ! ubar(l1), v(l2)
+      sp(3,:) = -sp(3,:) + pV(3,:)*( sc(sp(3,:),dcmplx(pV(3,:))) )/scr(pV(3,:),pV(3,:))! full propagator numerator
+      sp(4,:) = pol_mless2(dcmplx(pordered(:,8)),h4,'out')  ! photon
+      !sp(4,1:4)=pV(4,1:4); print *, "this checks gauge invariance"
+      s = scr(pordered(:,6)+pordered(:,7),pordered(:,6)+pordered(:,7))
+      propV(1) = s/dcmplx(s - M_V**2,M_V*Ga_V)
+      propV(2)=1d0
 
+   elseif( VVMode.eq.ggMode ) then
+   !        gamma gamma DECAYS
+      aL1=1d0
+      aR1=1d0
+      aL2=1d0
+      aR2=1d0
+      pV(3,:) = pordered(:,6)
+      pV(4,:) = pordered(:,8)
+      sp(3,:) = pol_mless2(dcmplx(pordered(:,6)),h3,'out')  ! photon
+      sp(4,:) = pol_mless2(dcmplx(pordered(:,8)),h4,'out')  ! photon
+      !sp(3,1:4)=pV(3,1:4); print *, "this checks gauge invariance"
+      !sp(4,1:4)=pV(4,1:4)
+      propV(1)=1d0
+      propV(2)=1d0
 
+   elseif( VVMode.eq.gsgMode ) then
+   !        gamma* gamma DECAYS
+      if( abs(idordered(6)).eq.abs(ElM_) .or. abs(idordered(6)).eq.abs(MuM_) ) then
+         aL1=cL_lep    * dsqrt(scale_alpha_Z_ll)
+         aR1=cR_lep    * dsqrt(scale_alpha_Z_ll)
+      elseif( abs(idordered(6)).eq.abs(TaM_) ) then
+         aL1=cL_lep    * dsqrt(scale_alpha_Z_tt)
+         aR1=cR_lep    * dsqrt(scale_alpha_Z_tt)
+      elseif( abs(idordered(6)).eq.abs(NuE_) .or. abs(idordered(6)).eq.abs(NuM_) .or. abs(idordered(6)).eq.abs(NuT_) ) then
+         aL1=cL_neu    * dsqrt(scale_alpha_Z_nn)! = 0
+         aR1=cR_neu    * dsqrt(scale_alpha_Z_nn)! = 0
+      elseif( abs(idordered(6)).eq.abs(Up_) .or. abs(idordered(6)).eq.abs(Chm_) ) then
+         aL1=cL_QUp    * dsqrt(scale_alpha_Z_uu)
+         aR1=cR_QUp    * dsqrt(scale_alpha_Z_uu)
+      elseif( abs(idordered(6)).eq.abs(Dn_) .or. abs(idordered(6)).eq.abs(Str_) .or. abs(idordered(6)).eq.abs(Bot_) ) then
+         aL1=cL_QDn    * dsqrt(scale_alpha_Z_dd)
+         aR1=cR_QDn    * dsqrt(scale_alpha_Z_dd)
+      else
+         aL1=0d0
+         aR1=0d0
+      endif
+      aL2=1d0
+      aR2=1d0
+      pV(3,:) = pordered(:,6)+pordered(:,7)
+      pV(4,:) = pordered(:,8)
+      sp(3,:) = pol_dk2mom(dcmplx(pordered(:,6)),dcmplx(pordered(:,7)),h3)  ! ubar(l1), v(l2)
+      sp(3,:) = -sp(3,:) ! photon propagator
+      sp(4,:) = pol_mless2(dcmplx(pordered(:,8)),h4,'out')  ! photon
+      !sp(4,1:4)=pV(4,1:4); print *, "this checks gauge invariance"
+      s = scr(pordered(:,6)+pordered(:,7),pordered(:,6)+pordered(:,7))
+      propV(1) = 1d0
+      propV(2) = 1d0
+      if( s.lt.MPhotonCutoff**2 ) propV(2)=czero
 
+   elseif( VVMode.eq.gsZMode ) then
+   !        gamma* Z DECAYS
+      if( abs(idordered(6)).eq.abs(ElM_) .or. abs(idordered(6)).eq.abs(MuM_)  ) then
+         aL1=cL_lep    * dsqrt(scale_alpha_Z_ll)
+         aR1=cR_lep    * dsqrt(scale_alpha_Z_ll)
+      elseif( abs(idordered(6)).eq.abs(TaM_) ) then
+         aL1=cL_lep    * dsqrt(scale_alpha_Z_tt)
+         aR1=cR_lep    * dsqrt(scale_alpha_Z_tt)
+      elseif( abs(idordered(6)).eq.abs(NuE_) .or. abs(idordered(6)).eq.abs(NuM_) .or. abs(idordered(6)).eq.abs(NuT_) ) then
+         aL1=cL_neu    * dsqrt(scale_alpha_Z_nn)
+         aR1=cR_neu    * dsqrt(scale_alpha_Z_nn)
+      elseif( abs(idordered(6)).eq.abs(Up_) .or. abs(idordered(6)).eq.abs(Chm_) ) then
+         aL1=cL_QUp    * dsqrt(scale_alpha_Z_uu)
+         aR1=cR_QUp    * dsqrt(scale_alpha_Z_uu)
+      elseif( abs(idordered(6)).eq.abs(Dn_) .or. abs(idordered(6)).eq.abs(Str_) .or. abs(idordered(6)).eq.abs(Bot_) ) then
+         aL1=cL_QDn    * dsqrt(scale_alpha_Z_dd)
+         aR1=cR_QDn    * dsqrt(scale_alpha_Z_dd)
+      else
+         aL1=0d0
+         aR1=0d0
+      endif
+      if( abs(idordered(8)).eq.abs(ElM_) .or. abs(idordered(8)).eq.abs(MuM_) ) then
+         aL2=aL_lep    * dsqrt(scale_alpha_Z_ll)
+         aR2=aR_lep    * dsqrt(scale_alpha_Z_ll)
+      elseif( abs(idordered(8)).eq.abs(TaM_) ) then
+         aL2=aL_lep    * dsqrt(scale_alpha_Z_tt)
+         aR2=aR_lep    * dsqrt(scale_alpha_Z_tt)
+      elseif( abs(idordered(8)).eq.abs(NuE_) .or. abs(idordered(8)).eq.abs(NuM_) .or. abs(idordered(8)).eq.abs(NuT_) ) then
+         aL2=aL_neu    * dsqrt(scale_alpha_Z_nn)
+         aR2=aR_neu    * dsqrt(scale_alpha_Z_nn)
+      elseif( abs(idordered(8)).eq.abs(Up_) .or. abs(idordered(8)).eq.abs(Chm_) ) then
+         aL2=aL_QUp    * dsqrt(scale_alpha_Z_uu)
+         aR2=aR_QUp    * dsqrt(scale_alpha_Z_uu)
+      elseif( abs(idordered(8)).eq.abs(Dn_) .or. abs(idordered(8)).eq.abs(Str_) .or. abs(idordered(8)).eq.abs(Bot_) ) then
+         aL2=aL_QDn    * dsqrt(scale_alpha_Z_dd)
+         aR2=aR_QDn    * dsqrt(scale_alpha_Z_dd)
+      else
+         aL2=0d0
+         aR2=0d0
+      endif
+      pV(3,:) = pordered(:,6)+pordered(:,7)
+      pV(4,:) = pordered(:,8)+pordered(:,9)
+      sp(3,:) = pol_dk2mom(dcmplx(pordered(:,6)),dcmplx(pordered(:,7)),h3)  ! ubar(l1), v(l2)
+      sp(3,:) = -sp(3,:)
+      sp(4,:) = pol_dk2mom(dcmplx(pordered(:,8)),dcmplx(pordered(:,9)),h4)  ! ubar(l3), v(l4)
+      sp(4,:) = -sp(4,:) + pV(4,:)*( sc(sp(4,:),dcmplx(pV(4,:))) )/scr(pV(4,:),pV(4,:))! full propagator numerator
+      s = scr(pordered(:,6)+pordered(:,7),pordered(:,6)+pordered(:,7))
+      propV(1) = 1d0! = s/dcmplx(s)
+      if( s.lt.MPhotonCutoff**2 ) propV(1)=0d0
+      s = scr(pordered(:,8)+pordered(:,9),pordered(:,8)+pordered(:,9))
+      propV(2) = s/dcmplx(s - M_V**2,M_V*Ga_V)
 
-! ---------------------------------------------------------------------------
+   elseif( VVMode.eq.ZgsMode ) then
+   !        Z gamma* DECAYS
+      if( abs(idordered(6)).eq.abs(ElM_) .or. abs(idordered(6)).eq.abs(MuM_) ) then
+         aL1=aL_lep    * dsqrt(scale_alpha_Z_ll)
+         aR1=aR_lep    * dsqrt(scale_alpha_Z_ll)
+      elseif( abs(idordered(6)).eq.abs(TaM_) ) then
+         aL1=aL_lep    * dsqrt(scale_alpha_Z_tt)
+         aR1=aR_lep    * dsqrt(scale_alpha_Z_tt)
+      elseif( abs(idordered(6)).eq.abs(NuE_) .or. abs(idordered(6)).eq.abs(NuM_) .or. abs(idordered(6)).eq.abs(NuT_) ) then
+         aL1=aL_neu    * dsqrt(scale_alpha_Z_nn)
+         aR1=aR_neu    * dsqrt(scale_alpha_Z_nn)
+      elseif( abs(idordered(6)).eq.abs(Up_) .or. abs(idordered(6)).eq.abs(Chm_) ) then
+         aL1=aL_QUp    * dsqrt(scale_alpha_Z_uu)
+         aR1=aR_QUp    * dsqrt(scale_alpha_Z_uu)
+      elseif( abs(idordered(6)).eq.abs(Dn_) .or. abs(idordered(6)).eq.abs(Str_) .or. abs(idordered(6)).eq.abs(Bot_) ) then
+         aL1=aL_QDn    * dsqrt(scale_alpha_Z_dd)
+         aR1=aR_QDn    * dsqrt(scale_alpha_Z_dd)
+      else
+         aL1=0d0
+         aR1=0d0
+      endif
+      if( abs(idordered(8)).eq.abs(ElM_) .or. abs(idordered(8)).eq.abs(MuM_) ) then
+         aL2=cL_lep    * dsqrt(scale_alpha_Z_ll)
+         aR2=cR_lep    * dsqrt(scale_alpha_Z_ll)
+      elseif( abs(idordered(8)).eq.abs(TaM_) ) then
+         aL2=cL_lep    * dsqrt(scale_alpha_Z_tt)
+         aR2=cR_lep    * dsqrt(scale_alpha_Z_tt)
+      elseif( abs(idordered(8)).eq.abs(NuE_) .or. abs(idordered(8)).eq.abs(NuM_) .or. abs(idordered(8)).eq.abs(NuT_) ) then
+         aL2=cL_neu    * dsqrt(scale_alpha_Z_nn)! = 0
+         aR2=cR_neu    * dsqrt(scale_alpha_Z_nn)! = 0
+      elseif( abs(idordered(8)).eq.abs(Up_) .or. abs(idordered(8)).eq.abs(Chm_) ) then
+         aL2=cL_QUp    * dsqrt(scale_alpha_Z_uu)
+         aR2=cR_QUp    * dsqrt(scale_alpha_Z_uu)
+      elseif( abs(idordered(8)).eq.abs(Dn_) .or. abs(idordered(8)).eq.abs(Str_) .or. abs(idordered(8)).eq.abs(Bot_) ) then
+         aL2=cL_QDn    * dsqrt(scale_alpha_Z_dd)
+         aR2=cR_QDn    * dsqrt(scale_alpha_Z_dd)
+      else
+         aL2=0d0
+         aR2=0d0
+      endif
+      pV(3,:) = pordered(:,6)+pordered(:,7)
+      pV(4,:) = pordered(:,8)+pordered(:,9)
+      sp(3,:) = pol_dk2mom(dcmplx(pordered(:,6)),dcmplx(pordered(:,7)),h3)  ! ubar(l1), v(l2)
+      sp(3,:) = -sp(3,:) + pV(3,:)*( sc(sp(3,:),dcmplx(pV(3,:))) )/scr(pV(3,:),pV(3,:))! full propagator numerator
+      sp(4,:) = pol_dk2mom(dcmplx(pordered(:,8)),dcmplx(pordered(:,9)),h4)  ! ubar(l3), v(l4)
+      sp(4,:) = -sp(4,:)
+      s = scr(pordered(:,6)+pordered(:,7),pordered(:,6)+pordered(:,7))
+      propV(1) = s/dcmplx(s - M_V**2,M_V*Ga_V)
+      s = scr(pordered(:,8)+pordered(:,9),pordered(:,8)+pordered(:,9))
+      propV(2) = 1d0 ! = s/dcmplx(s)
+      if( s.lt.MPhotonCutoff**2 ) propV(2)=czero
 
+   elseif( VVMode.eq.gsgsMode ) then
+   !        gamma* gamma* DECAYS
+      if( abs(idordered(6)).eq.abs(ElM_) .or. abs(idordered(6)).eq.abs(MuM_) ) then
+         aL1=cL_lep    * dsqrt(scale_alpha_Z_ll)
+         aR1=cR_lep    * dsqrt(scale_alpha_Z_ll)
+      elseif( abs(idordered(6)).eq.abs(TaM_) ) then
+         aL1=cL_lep    * dsqrt(scale_alpha_Z_tt)
+         aR1=cR_lep    * dsqrt(scale_alpha_Z_tt)
+      elseif( abs(idordered(6)).eq.abs(NuE_) .or. abs(idordered(6)).eq.abs(NuM_) .or. abs(idordered(6)).eq.abs(NuT_) ) then
+         aL1=cL_neu    * dsqrt(scale_alpha_Z_nn)! = 0
+         aR1=cR_neu    * dsqrt(scale_alpha_Z_nn)! = 0
+      elseif( abs(idordered(6)).eq.abs(Up_) .or. abs(idordered(6)).eq.abs(Chm_) ) then
+         aL1=cL_QUp    * dsqrt(scale_alpha_Z_uu)
+         aR1=cR_QUp    * dsqrt(scale_alpha_Z_uu)
+      elseif( abs(idordered(6)).eq.abs(Dn_) .or. abs(idordered(6)).eq.abs(Str_) .or. abs(idordered(6)).eq.abs(Bot_) ) then
+         aL1=cL_QDn    * dsqrt(scale_alpha_Z_dd)
+         aR1=cR_QDn    * dsqrt(scale_alpha_Z_dd)
+      else
+         aL1=0d0
+         aR1=0d0
+      endif
+      if( abs(idordered(8)).eq.abs(ElM_) .or. abs(idordered(8)).eq.abs(MuM_) ) then
+         aL2=cL_lep    * dsqrt(scale_alpha_Z_ll)
+         aR2=cR_lep    * dsqrt(scale_alpha_Z_ll)
+      elseif( abs(idordered(8)).eq.abs(TaM_) ) then
+         aL2=cL_lep    * dsqrt(scale_alpha_Z_tt)
+         aR2=cR_lep    * dsqrt(scale_alpha_Z_tt)
+      elseif( abs(idordered(8)).eq.abs(NuE_) .or. abs(idordered(8)).eq.abs(NuM_) .or. abs(idordered(8)).eq.abs(NuT_) ) then
+         aL2=cL_neu    * dsqrt(scale_alpha_Z_nn)! = 0
+         aR2=cR_neu    * dsqrt(scale_alpha_Z_nn)! = 0
+      elseif( abs(idordered(8)).eq.abs(Up_) .or. abs(idordered(8)).eq.abs(Chm_) ) then
+         aL2=cL_QUp    * dsqrt(scale_alpha_Z_uu)
+         aR2=cR_QUp    * dsqrt(scale_alpha_Z_uu)
+      elseif( abs(idordered(8)).eq.abs(Dn_) .or. abs(idordered(8)).eq.abs(Str_) .or. abs(idordered(8)).eq.abs(Bot_) ) then
+         aL2=cL_QDn    * dsqrt(scale_alpha_Z_dd)
+         aR2=cR_QDn    * dsqrt(scale_alpha_Z_dd)
+      else
+         aL2=0d0
+         aR2=0d0
+      endif
+      pV(3,:) = pordered(:,6)+pordered(:,7)
+      pV(4,:) = pordered(:,8)+pordered(:,9)
+      sp(3,:) = pol_dk2mom(dcmplx(pordered(:,6)),dcmplx(pordered(:,7)),h3)  ! ubar(l1), v(l2)
+      sp(3,:) = -sp(3,:)
+      sp(4,:) = pol_dk2mom(dcmplx(pordered(:,8)),dcmplx(pordered(:,9)),h4)  ! ubar(l3), v(l4)
+      sp(4,:) = -sp(4,:)
+      s = scr(pordered(:,6)+pordered(:,7),pordered(:,6)+pordered(:,7))
+      propV(1) = 1d0 ! = s/dcmplx(s)
+      if( s.lt.MPhotonCutoff**2 ) propV(1)=czero
+      s = scr(pordered(:,8)+pordered(:,9),pordered(:,8)+pordered(:,9))
+      propV(2) = 1d0 ! = s/dcmplx(s)
+      if( s.lt.MPhotonCutoff**2 ) propV(2)=czero
 
+   else
+      call Error("Unsupported decay modes")
+   endif
 
-
-
-   double complex function et1(e1,e2,e3,e4)
-    implicit none
-    complex(dp), intent(in) :: e1(4), e2(4), e3(4), e4(4)
-
-    et1 =  e1(1)*e2(2)*e3(3)*e4(4)-e1(1)*e2(2)*e3(4)*e4(3) &
-          -e1(1)*e2(3)*e3(2)*e4(4)+e1(1)*e2(3)*e3(4)*e4(2) &
-          +e1(1)*e2(4)*e3(2)*e4(3)-e1(1)*e2(4)*e3(3)*e4(2) &
-          -e1(2)*e2(1)*e3(3)*e4(4)+e1(2)*e2(1)*e3(4)*e4(3) &
-          +e1(2)*e2(3)*e3(1)*e4(4)-e1(2)*e2(3)*e3(4)*e4(1) &
-          -e1(2)*e2(4)*e3(1)*e4(3)+e1(2)*e2(4)*e3(3)*e4(1) &
-          +e1(3)*e2(1)*e3(2)*e4(4)-e1(3)*e2(1)*e3(4)*e4(2) &
-          -e1(3)*e2(2)*e3(1)*e4(4)+e1(3)*e2(2)*e3(4)*e4(1) &
-          +e1(3)*e2(4)*e3(1)*e4(2)-e1(3)*e2(4)*e3(2)*e4(1) &
-          -e1(4)*e2(1)*e3(2)*e4(3)+e1(4)*e2(1)*e3(3)*e4(2) &
-          +e1(4)*e2(2)*e3(1)*e4(3)-e1(4)*e2(2)*e3(3)*e4(1) &
-          -e1(4)*e2(3)*e3(1)*e4(2)+e1(4)*e2(3)*e3(2)*e4(1)
+   sp(3,:) = sp(3,:)*propV(1)
+   sp(4,:) = sp(4,:)*propV(2)
+   if (h3.eq.-1) then
+      sp(3,:) = aL1 * sp(3,:)
+   elseif(h3.eq.1) then
+      sp(3,:) = aR1 * sp(3,:)
+   endif
+   if (h4.eq.-1) then
+      sp(4,:) = aL2 * sp(4,:)
+   elseif(h4.eq.1) then
+      sp(4,:) = aR2 * sp(4,:)
+   endif
 
    return
-   end function et1
-
-
-      double complex function sc(q1,q2)
-        complex(dp), intent(in) :: q1(4)
-        complex(dp), intent(in) :: q2(4)
-
-        sc = q1(1)*q2(1) - q1(2)*q2(2)-q1(3)*q2(3) -q1(4)*q2(4)
-
-      end function sc
-
-      double precision function scr(p1,p2)
-        real(dp), intent(in) :: p1(4),p2(4)
-
-        scr = p1(1)*p2(1) - p1(2)*p2(2)-p1(3)*p2(3) -p1(4)*p2(4)
-
-      end function scr
-
-!---- THESE ARE POLARIZATION ROUTINES
-
-  ! -- massless vector polarization subroutine
-  function pol_mless(p,i,outgoing)
-    complex(dp), intent(in)    :: p(4)
-    integer, intent(in)          :: i
-    logical, intent(in),optional :: outgoing
-    ! -------------------------------
-    integer :: pol
-    real(dp) :: p0,px,py,pz
-    real(dp) :: pv,ct,st,cphi,sphi
-    complex(dp) :: pol_mless(4)
-
-!^^^IFmp
-!    p0=(p(1)+conjg(p(1)))/two
-!    px=(p(2)+conjg(p(2)))/two
-!    py=(p(3)+conjg(p(3)))/two
-!    pz=(p(4)+conjg(p(4)))/two
-!^^^ELSE
-    p0=real(p(1),dp)
-    px=real(p(2),dp)
-    py=real(p(3),dp)
-    pz=real(p(4),dp)
-!^^^END
-
-
-    pv=sqrt(abs(p0**2))
-    ct=pz/pv
-    st=sqrt(abs(1.0_dp-ct**2))
-
-    if (st < tol) then
-       cphi=1.0_dp
-       sphi=0.0_dp
-    else
-       cphi= px/pv/st
-       sphi= py/pv/st
-    endif
-
-
-    ! -- distinguish between positive and negative energies
-    if ( p0 > 0.0_dp) then
-       pol=i
-    else
-       pol=-i
-    endif
-
-    ! -- take complex conjugate for outgoing
-    if (present(outgoing)) then
-       if (outgoing) pol = -pol
-    endif
-
-    pol_mless(1)=czero
-    pol_mless(2)=ct*cphi/sqrt2 - ci*pol*sphi/sqrt2
-    pol_mless(3)=ct*sphi/sqrt2 + ci*pol*cphi/sqrt2
-    pol_mless(4)=-st/sqrt2
-
-  end function pol_mless
-
-
-  function pol_mless2(p,i,out)
-    integer, intent(in) :: i
-    complex(dp), intent(in) :: p(4)
-    character(len=*), intent(in):: out
-    complex(dp) :: pol_mless2(4)
-    ! -------------------------------------
-
-    if (out == 'out') then
-       pol_mless2 = pol_mless(p,i,outgoing=.true.)
-    else
-       pol_mless2 = pol_mless(p,i,outgoing=.false.)
-    endif
-  end function pol_mless2
-
-
-
-
-  function pol_dk2mom(plepton,antilepton,i,outgoing)
-  use ModMisc
-  implicit none
-    integer, intent(in) :: i
-    integer :: j
-    complex(dp), intent(in) :: plepton(1:4),antilepton(1:4)
-    logical, intent(in),optional :: outgoing
-    complex(dp) :: pol_dk2mom(4),Ub(4),V(4),q(4),qsq
-
-
-    q=plepton+antilepton
-    qsq=q(1)**2-q(2)**2-q(3)**2-q(4)**2
-
-    Ub(:)=ubar0(plepton,i)
-    V(:)=v0(antilepton,-i)
-    !---Now return in Kirill's notation  1=E,2=px,3=py,4=pz
-    !   This is an expression for (-i)/qsq* (-i) Ub(+/-)) Gamma^\mu V(-/+)
-    pol_dk2mom(1)=-(Ub(2)*V(4)+V(2)*Ub(4)+Ub(1)*V(3)+V(1)*Ub(3))
-    pol_dk2mom(2)=-(-Ub(1)*V(4)+V(1)*Ub(4)-Ub(2)*V(3)+V(2)*Ub(3))
-    pol_dk2mom(3)=-ci*(Ub(1)*V(4)+V(1)*Ub(4)-Ub(2)*V(3)-V(2)*Ub(3))
-    pol_dk2mom(4)=-(Ub(2)*V(4)-V(2)*Ub(4)-Ub(1)*V(3)+V(1)*Ub(3))
-
-
-    do j=1,4
-       pol_dk2mom(j)=pol_dk2mom(j)/qsq
-    enddo
-
-    ! -- do nothing in this case
-    if (present(outgoing)) then
-       !if (outgoing) pol_dk2mom = conjg(pol_dk2mom)
-    endif
-
-  end function pol_dk2mom
-
-
-
-
-
-
-
-
-
-!     ubar spinor, massless
-  function ubar0(p,i)
-  implicit none
-    complex(dp), intent(in) :: p(4)
-    integer, intent(in) :: i
-    complex(dp) :: ubar0(4)
-    complex(dp) :: fc, fc2
-    real(dp)    :: p0,px,py,pz,mass
-
-
-    p0=real(p(1),dp)
-    px=real(p(2),dp)
-    py=real(p(3),dp)
-    pz=real(p(4),dp)
-    mass=dsqrt(dabs(p0**2-px**2-py**2-pz**2))
-    if( mass.lt.1d-4 ) mass=0d0
-
-
-    fc2 = p0 + pz
-    fc=sqrt(fc2)
-
-    if (abs(fc2).gt. tol) then
-       if (i.eq.1) then
-          ubar0(1)=czero
-          ubar0(2)=czero
-          ubar0(3)=fc
-          ubar0(4)=(px-ci*py)/fc
-       elseif (i.eq.-1) then
-          ubar0(1)=(px+ci*py)/fc
-          ubar0(2)=-fc
-          ubar0(3)=czero
-          ubar0(4)=czero
-       else
-          stop 'ubar0: i out of range'
-       endif
-    else
-       if (i.eq.1) then
-          ubar0(1) = czero
-          ubar0(2) = czero
-          ubar0(3) = czero
-          ubar0(4) = sqrt(cone*two*p0)
-       elseif (i.eq.-1) then
-          ubar0(1) = sqrt(cone*(two*p0))
-          ubar0(2) = czero
-          ubar0(3) = czero
-          ubar0(4) = czero
-       else
-          stop 'ubar0: i out of range'
-       endif
-    endif
-
-
-!       if (i.eq.1) then
-!           ubar0(1)=dcmplx(mass,0d0)/fc
-!           ubar0(2)=czero
-!           ubar0(3)=fc
-!           ubar0(4)=dcmplx(px,-py)/fc
-!       elseif (i.eq.-1) then
-!           ubar0(1)=dcmplx(px,py)/fc
-!           ubar0(2)=-fc
-!           ubar0(3)=czero
-!           ubar0(4)=-dcmplx(mass,0d0)/fc
-!        else
-!           stop 'ubar0: i out of range'
-!       endif
-
-
-
-  end function ubar0
-
-
-
-  ! -- v0  spinor, massless
-  function v0(p,i)
-  implicit none
-    complex(dp), intent(in) :: p(4)
-    integer, intent(in)       :: i
-    complex(dp) :: v0(4)
-    complex(dp) :: fc2, fc
-    real(dp)    :: p0,px,py,pz,mass
-
-    p0=real(p(1),dp)
-    px=real(p(2),dp)
-    py=real(p(3),dp)
-    pz=real(p(4),dp)
-    mass=dsqrt(dabs(p0**2-px**2-py**2-pz**2))
-    if( mass.lt.1d-4 ) mass=0d0
-
-
-    fc2 = p0 + pz
-    fc=sqrt(fc2)
-
-    if (abs(fc2).gt. tol) then
-       if (i.eq.1) then
-          v0(1)=czero
-          v0(2)=czero
-          v0(3)=(px-ci*py)/fc
-          v0(4)=-fc
-       elseif (i.eq.-1) then
-          v0(1)=fc
-          v0(2)=(px+ci*py)/fc
-          v0(3)=czero
-          v0(4)=czero
-       else
-          stop 'v0: i out of range'
-       endif
-    else
-       if (i.eq.1) then
-          v0(1)=czero
-          v0(2)=czero
-          v0(3)=sqrt(cone*two*p0)
-          v0(4)=czero
-       elseif (i.eq.-1) then
-          v0(1)=czero
-          v0(2)=sqrt(cone*two*p0)
-          v0(3)=czero
-          v0(4)=czero
-       else
-          stop 'v0: i out of range'
-       endif
-    endif
-
-
-!       if (i.eq.+1) then
-!           v0(1)=czero
-!           v0(2)=dcmplx(mass,0d0)/fc
-!           v0(3)=dcmplx(px,-py)/fc
-!           v0(4)=-fc
-!       elseif (i.eq.-1) then
-!           v0(1)=fc
-!           v0(2)=dcmplx(px,py)/fc
-!           v0(3)=dcmplx(-mass,0d0)/fc
-!           v0(4)=czero
-!        else
-!           stop 'v0: i out of range'
-!       endif
-
-
-
-  end function v0
-
-
-
-
-
-
-  ! -- v  spinor, massive (from HELAS)
-  FUNCTION vspi(p,pol)
-  implicit none
-  complex(dp), intent(in) :: p(1:4)
-  integer, intent(in)     :: pol
-  complex(dp) :: vspi(1:4),chi(1:2)
-  real(dp)    :: p0,px,py,pz,pabs,omegaP,omegaM
-
-
-    p0=real(p(1),dp)
-    px=real(p(2),dp)
-    py=real(p(3),dp)
-    pz=real(p(4),dp)
-    pabs = sqrt( px**2+py**2+pz**2 )
-
-    omegaP = sqrt(abs( p0+pabs ))
-    omegaM = sqrt(abs( p0-pabs ))
-
-
-    if( pol.eq.+1 ) then
-        chi(1) =-px + (0.0_dp,1.0_dp)*py ! this is chi-
-        chi(2) = pabs + pz
-        chi(1:2) = chi(1:2)/sqrt(abs(2.0_dp*pabs*(pabs+pz)))
-
-        vspi(1:2) = -pol * omegaP * chi(1:2)
-        vspi(3:4) = +pol * omegaM * chi(1:2)
-    elseif( pol.eq.-1 ) then
-        chi(1) = pabs + pz ! this is chi+
-        chi(2) = px + (0.0_dp,1.0_dp)*py
-        chi(1:2) = chi(1:2)/sqrt(abs(2.0_dp*pabs*(pabs+pz)))
-
-        vspi(1:2) = -pol * omegaM * chi(1:2)
-        vspi(3:4) = +pol * omegaP * chi(1:2)
-    else
-        print *,  'vspi: pol out of range'
-        stop
-    endif
-
-
-  RETURN
-  END FUNCTION vspi
-
-
-  ! -- u  spinor, massive (from HELAS)
-  FUNCTION uspi(p,pol)
-  implicit none
-  complex(dp), intent(in) :: p(1:4)
-  integer, intent(in)     :: pol
-  complex(dp) :: uspi(1:4),chi(1:2)
-  real(dp)    :: p0,px,py,pz,pabs,omegaP,omegaM
-
-
-    p0=real(p(1),dp)
-    px=real(p(2),dp)
-    py=real(p(3),dp)
-    pz=real(p(4),dp)
-    pabs = sqrt( px**2+py**2+pz**2 )
-
-    omegaP = sqrt(abs( p0+pabs ))
-    omegaM = sqrt(abs( p0-pabs ))
-
-    if( pol.eq.+1 ) then
-        chi(1) = pabs + pz ! this is chi+
-        chi(2) = px + (0.0_dp,1.0_dp)*py
-        chi(1:2) = chi(1:2)/sqrt(abs(2.0_dp*pabs*(pabs+pz)))
-
-        uspi(1:2) = omegaM * chi(1:2)
-        uspi(3:4) = omegaP * chi(1:2)
-    elseif( pol.eq.-1 ) then
-        chi(1) =-px + (0.0_dp,1.0_dp)*py ! this is chi-
-        chi(2) = pabs + pz
-        chi(1:2) = chi(1:2)/sqrt(abs(2.0_dp*pabs*(pabs+pz)))
-
-        uspi(1:2) = omegaP * chi(1:2)
-        uspi(3:4) = omegaM * chi(1:2)
-    else
-        print *,  'uspi: pol out of range'
-        stop
-    endif
-
-
-  RETURN
-  END FUNCTION uspi
-
-
-  ! -- ubar  spinor, massive (from HELAS)
-  FUNCTION ubarspi(p,pol)
-  implicit none
-  complex(dp), intent(in) :: p(1:4)
-  integer, intent(in)     :: pol
-  complex(dp) :: uspi_tmp(1:4),ubarspi(1:4)
-
-    uspi_tmp(1:4) = uspi(p,pol)
-    ubarspi(1) = dconjg(uspi_tmp(3))
-    ubarspi(2) = dconjg(uspi_tmp(4))
-    ubarspi(3) = dconjg(uspi_tmp(1))
-    ubarspi(4) = dconjg(uspi_tmp(2))
-
-  RETURN
-  END FUNCTION ubarspi
-
-
-
-
-          subroutine vSpiDIRAC(p,m,i,f)!   Dirac spinor, massive  (from TOPAZ)
-          implicit none
-          integer i
-          real(8) m
-          complex(8) p(4)
-          complex(8) f(4),fc
-          real(8) p0,px,py,pz,fc2
-
-          p0=dreal(p(1))
-          px=dreal(p(2))
-          py=dreal(p(3))
-          pz=dreal(p(4))
-
-          fc2 = p0+m
-          fc=cdsqrt(dcmplx(fc2))
-!           fc=dsqrt(fc2)
-
-          if (i.eq.1) then
-            f(1)=pz*fc/fc2
-            f(2)=(px+(0d0,1d0)*py)*fc/fc2
-            f(3)=fc
-            f(4)=dcmplx(0d0,0d0)
-          elseif (i.eq.-1) then
-            f(1)=(px-(0d0,1d0)*py)*fc/fc2
-            f(2)=-pz*fc/fc2
-            f(3)=dcmplx(0d0,0d0)
-            f(4)=fc
-          else
-              print *, "wrong helicity setting in vspi"
-              stop
-          endif
-
-          return
-          end SUBROUTINE
-
-
-
-          subroutine ubarSpiDIRAC(p,m,i,f)!   Dirac spinor, massive  (from TOPAZ)
-          implicit none
-          integer i
-          real(8) m
-          complex(8) p(4)
-          complex(8) f(4),fc
-          real(8)  p0,px,py,pz,fc2
-
-          p0=dreal(p(1))
-          px=dreal(p(2))
-          py=dreal(p(3))
-          pz=dreal(p(4))
-
-          fc2=p0+m
-          fc=cdsqrt( dcmplx(fc2))
-!           fc=dsqrt(fc2)
-
-          if (i.eq.1) then
-            f(1)=fc
-            f(2)=dcmplx(0d0,0d0)
-            f(3)=-1d0*pz*fc/fc2
-            f(4)=-(px-(0d0,1d0)*py)*fc/fc2
-          elseif (i.eq.-1) then
-            f(1)=dcmplx(0d0,0d0)
-            f(2)=fc
-            f(3)=-(px+(0d0,1d0)*py)*fc/fc2
-            f(4)=pz*fc/fc2
-          else
-              print *, "wrong helicity setting in ubarSpi"
-              stop
-          endif
-
-          return
-          end subroutine
-
-
-
-
-
-      function vbqq(sp1,sp2)!  (from TOPAZ)
-      implicit none
-      complex(8), intent(in) :: sp1(:), sp2(:)
-      integer :: i
-      complex(8) :: vbqq(4)
-      complex(8) :: sp1a(4)
-      real(8) :: va(1:4,1:4)
-
-         va(1,1:4)=(/+1d0,0d0,0d0,0d0/)
-         va(2,1:4)=(/0d0,-1d0,0d0,0d0/)
-         va(3,1:4)=(/0d0,0d0,-1d0,0d0/)
-         va(4,1:4)=(/0d0,0d0,0d0,-1d0/)
-
-          do i=1,4
-             call spb2(sp1,dcmplx(va(i,1:4)),sp1a)
-             vbqq(i) = sp1a(1)*sp2(1)+sp1a(2)*sp2(2)+sp1a(3)*sp2(3)+sp1a(4)*sp2(4)
-          enddo
-
-      end function vbqq
-
-
-
-         subroutine spb2(sp,v,f)!  (from TOPAZ)
-         implicit none
-         integer i,i1,i2,i3,Dv,Ds,imax
-         double complex sp(4),v(4),f(4)
-         double complex x0(4,4),xx(4,4),xy(4,4)
-         double complex xz(4,4),x5(4,4)
-         double complex y1,y2,y3,y4,bp,bm,cp,cm
-
-
-           Ds=4
-           Dv=4
-           imax = Ds/4
-
-           do i=1,imax
-           i1= 1+4*(i-1)
-           i2=i1+3
-
-           y1=sp(i1)
-           y2=sp(i1+1)
-           y3=sp(i1+2)
-           y4=sp(i1+3)
-
-           x0(1,i)=y1
-           x0(2,i)=y2
-           x0(3,i)=-y3
-           x0(4,i)=-y4
-
-           xx(1,i) = -y4
-           xx(2,i) = -y3
-           xx(3,i) = y2
-           xx(4,i) = y1
-
-           xy(1,i)=dcmplx(0d0,-1d0)*y4
-           xy(2,i)=dcmplx(0d0,1d0)*y3
-           xy(3,i)=dcmplx(0d0,1d0)*y2
-           xy(4,i)=dcmplx(0d0,-1d0)*y1
-
-           xz(1,i)=-y3
-           xz(2,i)=y4
-           xz(3,i)=y1
-           xz(4,i)=-y2
-
-           x5(1,i)=y3
-           x5(2,i)=y4
-           x5(3,i)=y1
-           x5(4,i)=y2
-
-           enddo
-
-           if (Dv.eq.4) then
-
-           do i=1,4
-
-           f(i)=v(1)*x0(i,1)-v(2)*xx(i,1)-v(3)*xy(i,1)-v(4)*xz(i,1)
-
-           enddo
-
-           endif
-
-           return
-           end SUBROUTINE
-
-
-
-
-
-
-
-
+end subroutine
+
+subroutine getDecay_VVMode_Ordering(MY_IDUP, VVMode,ordering,ordering_swap)
+   implicit none
+   integer, intent(in) :: MY_IDUP(6:9)
+   integer, intent(out) :: VVMode,ordering(1:4),ordering_swap(1:4)
+   integer :: idV(1:2)
+
+   ordering=(/3,4,5,6/)
+   idV(1)=CoupledVertex(MY_IDUP(6:7),-1)
+   idV(2)=CoupledVertex(MY_IDUP(8:9),-1)
+   if(MY_IDUP(6).eq.Pho_ .or. MY_IDUP(7).eq.Pho_) idV(1)=Pho_
+   if(MY_IDUP(8).eq.Pho_ .or. MY_IDUP(9).eq.Pho_) idV(2)=Pho_
+   if(convertLHE(MY_IDUP(6)).lt.0 .or. MY_IDUP(6).eq.Not_a_particle_) then
+      call swap(ordering(1),ordering(2))
+   endif
+   if(convertLHE(MY_IDUP(8)).lt.0 .or. MY_IDUP(8).eq.Not_a_particle_) then
+      call swap(ordering(3),ordering(4))
+   endif
+   if( &
+         (idV(1).eq.Wm_ .and. idV(2).eq.Wp_) .or. &
+         (idV(2).eq.Z0_ .and. idV(1).eq.Pho_) &
+     ) then
+      call swap(ordering(1),ordering(3))
+      call swap(ordering(2),ordering(4))
+      call swap(idV(1),idV(2))
+   endif
+   ordering_swap(:)=ordering(:)
+   call swap(ordering_swap(1),ordering_swap(3))
+
+   if(idV(1).eq.Z0_ .and. idV(2).eq.Z0_) then
+      VVMode=ZZMode
+   elseif(idV(1).eq.Z0_ .and. idV(2).eq.Pho_) then
+      VVMode=ZgMode
+   elseif(idV(1).eq.Pho_ .and. idV(2).eq.Pho_) then
+      VVMode=ggMode
+   elseif(idV(1).eq.Wp_ .and. idV(2).eq.Wm_) then
+      VVMode=WWMode
+   else
+      print *,"idV=",idV
+      call Error("Unsupported decay Modes")
+   endif
+   return
+end subroutine
 
 
 END MODULE
