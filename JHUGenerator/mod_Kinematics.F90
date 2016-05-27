@@ -2217,7 +2217,7 @@ END SUBROUTINE
 
 
 
-SUBROUTINE Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut,useAonshell)
+SUBROUTINE Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut,eta1_input,eta2_input,useAonshell)
 use ModMisc
 use ModParameters
 implicit none
@@ -2229,6 +2229,8 @@ real(8) :: m_jj,y_j1,y_j2,dphi_jj, m_ll, pt_V, pt_H, pt1, pt2, eta1, eta2, delta
 double precision MomBoost(1:4), MomFerm(1:4), inv_mass(1:9), MomLeptX(1:4,1:4), ScatteringAxis(1:4), MomReso(1:4)
 double precision MomLeptPlane1(2:4), MomLeptPlane2(2:4), dummy(2:4), signPhi
 double precision, intent(in) :: MomExt(1:4,1:9)
+double precision :: MomExt_copy(1:4,1:9)
+real(8) :: eta1_input, eta2_input
 logical :: hasAonshell
 
      hasAonshell = .false.
@@ -2236,13 +2238,16 @@ logical :: hasAonshell
         hasAonshell=useAonshell
      endif
 
-     applyPSCut = .false.
-     m_jj = get_MInv(MomExt(1:4,5))
-     m_ll = get_MInv(MomExt(1:4,4))
-     m_Vstar = get_MInv(MomExt(1:4,3))
+     MomExt_copy(:,:) = MomExt(:,:)
+     call boost2Lab(eta1_input,eta2_input,9,MomExt_copy(1:4,1:9))
 
-     pt_H = get_PT(MomExt(1:4,5))
-     pt_V = get_PT(MomExt(1:4,4))
+     applyPSCut = .false.
+     m_jj = get_MInv(MomExt_copy(1:4,5))
+     m_ll = get_MInv(MomExt_copy(1:4,4))
+     m_Vstar = get_MInv(MomExt_copy(1:4,3))
+
+     pt_H = get_PT(MomExt_copy(1:4,5))
+     pt_V = get_PT(MomExt_copy(1:4,4))
 
      if(.not.hasAonshell) then
         if(m_ll.le.getMass(convertLHEreverse(id(6)))+getMass(convertLHEreverse(id(7))))then
@@ -2251,12 +2256,12 @@ logical :: hasAonshell
         if(includeGammaStar .and. .not.IsAWDecay(DecayMode1) .and. (m_ll.lt.MPhotonCutoff .or. m_Vstar.lt.MPhotonCutoff))then
            applyPSCut=.true.
         endif
-        pt1 = get_PT(MomExt(1:4,6))
-        pt2 = get_PT(MomExt(1:4,7))
-        eta1 = get_eta(MomExt(1:4,6))
-        eta2 = get_eta(MomExt(1:4,7))
+        pt1 = get_PT(MomExt_copy(1:4,6))
+        pt2 = get_PT(MomExt_copy(1:4,7))
+        eta1 = get_eta(MomExt_copy(1:4,6))
+        eta2 = get_eta(MomExt_copy(1:4,7))
         if(IsAQuark(convertLHEreverse(id(6)))) then
-           deltaR = get_R(MomExt(1:4,6), MomExt(1:4,7))
+           deltaR = get_R(MomExt_copy(1:4,6), MomExt_copy(1:4,7))
            if(m_ll.lt.mJJcut .or. pt1.lt.ptjetcut .or. pt2.lt.ptjetcut .or. abs(eta1).gt.etajetcut .or. abs(eta2).gt.etajetcut .or. deltaR.lt.Rjet) then
               applyPSCut=.true.
            endif
@@ -2281,11 +2286,11 @@ logical :: hasAonshell
            applyPSCut=.true.
         endif
         if(IsAQuark(convertLHEreverse(id(8)))) then
-           pt1 = get_PT(MomExt(1:4,8))
-           pt2 = get_PT(MomExt(1:4,9))
-           eta1 = get_eta(MomExt(1:4,8))
-           eta2 = get_eta(MomExt(1:4,9))
-           deltaR = get_R(MomExt(1:4,8), MomExt(1:4,9))
+           pt1 = get_PT(MomExt_copy(1:4,8))
+           pt2 = get_PT(MomExt_copy(1:4,9))
+           eta1 = get_eta(MomExt_copy(1:4,8))
+           eta2 = get_eta(MomExt_copy(1:4,9))
+           deltaR = get_R(MomExt_copy(1:4,8), MomExt_copy(1:4,9))
            if(m_jj.lt.mJJcut .or. pt1.lt.ptjetcut .or. pt2.lt.ptjetcut .or. abs(eta1).gt.etajetcut .or. abs(eta2).gt.etajetcut .or. deltaR.lt.Rjet) then
               applyPSCut=.true.
            endif
