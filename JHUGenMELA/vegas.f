@@ -38,7 +38,7 @@ c
          integer jj
          dimension d(50,mxdim),di(50,mxdim),xin(50),r(50),
      1   dx(mxdim),dt(mxdim),x(mxdim),kg(mxdim),ia(mxdim)
-         data ndmx/50/,alph/1.5d0/,one/1d0/,mds/1/
+         data ndmx/50/,alph/1.5d0/,one/1d0/,mds/0/
 !          data idum/-113123/
 
          if(ndim .gt. mxdim) then
@@ -337,7 +337,7 @@ c
          integer jj
          dimension d(50,mxdim),di(50,mxdim),xin(50),r(50),
      1   dx(mxdim),dt(mxdim),x(mxdim),kg(mxdim),ia(mxdim)
-         data ndmx/50/,alph/1.5d0/,one/1d0/,mds/1/
+         data ndmx/50/,alph/1.5d0/,one/1d0/,mds/0/
 !          data idum/-113123/
          
          nd=ndmx
