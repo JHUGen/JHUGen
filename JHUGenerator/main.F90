@@ -4068,6 +4068,8 @@ character :: arg*(500)
         if( Process.eq.50 .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.66 .or. Process.eq.80 .or. Process.eq.90) then
             write(TheUnit,"(8X,A,F8.2)") "DeltaR >= ", Rjet
             write(TheUnit,"(11X,A,F8.2,A)") "mJJ >= ", mJJcut/GeV, " GeV"
+        endif
+        if( Process.eq.66 ) then
             write(TheUnit,"(11X,A,F10.2,F10.2,A)") "m4l_min/max ", m4l_minmax(1)/GeV,m4l_minmax(2)/GeV, " GeV"
         endif
     endif
