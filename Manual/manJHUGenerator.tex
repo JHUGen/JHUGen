@@ -243,14 +243,15 @@ Examples of running the generator:
 \item $\gamma^*\gamma^*\to H$:
 \begin{verbatim}
 ./JHUGen Process=60 VegasNc2=100000 DataFile=gammagammaVBF ghgsgs2=1,0 \\
-			pTjetcut=15 deltaRcut=0.3
+			pTjetcut=15 deltaRcut=0
 \end{verbatim}
-(Requires jet cuts to avoid divergences when $q_\gamma^2\to 0$.  The ones here are the default cuts, but are shown explicitly as an example.)
+(Requires cut on jet $p_T$ to avoid divergences when $q_\gamma^2\to 0$.  15 GeV is the default cut, but is shown explicitly as an example.)
 \end{itemize}
 \item $H+jj$:
 \begin{verbatim}
 ./JHUGen Process=61 Unweighted=1 VegasNc2=100000 DataFile=Hjj pTjetcut=15 deltaRcut=0.3
 \end{verbatim}
+(Requires cuts on jet $p_T$ and $\Delta r$ to avoid divergences when $q_g^2\to 0$.  15 GeV and 0.3 are the default cuts, but are shown explicitly as an example.)
 \item $H+j$:
 \begin{verbatim}
 ./JHUGen Process=62 Unweighted=1 VegasNc2=100000 DataFile=Hj pTjetcut=15
