@@ -139,8 +139,8 @@ A few more details on some particular parameters:
 \item {\verb|VegasNc0,1,2|}: For unweighted event generation \verb|VegasNc0| specifies the number of evaluations for the initial integrand scan.  The actual event generation is controlled by either \verb|VegasNc1| or \verb|VegasNc2|. \verb|VegasNc1| specifies the number of tries in the accept/reject phase and \verb|VegasNc2| is the number of generated events. When generating unweighted events in \verb|ReadLHE| mode, both \verb|VegasNc1| or \verb|VegasNc2| can be used to specify the number of generated events. For the generation of weighted events \verb|VegasNc1| specifies the number of evaluations for each of 5 iterations during the initial integrand scan. \verb|VegasNc2| gives the (approximate) number of generated weighted events.
 \item {\verb|OffshellX|}: The flag specifies whether the events for processes 0, 1 or 2 feature a delta-function resonance mass (when set to 0) at or a finite-width distribution around the resonance mass (when set to 1). This option replaces the \verb|OffXVV| numerical flag in previous versions.
 \item \verb|PChannel|: This parameter is only meaningful in the spin-2 case and for the $ttH$ and $bbH$ production mechanisms.  For spin-0, production is possible only via the $gg$ process; for spin-1 and for the VBF and $VH$ processes, production is only possible via the $q\bar{q}$ process.  For $H+jj$ and $H+j$, all four parton channels $gg$, $q\bar{q}$, $qg$, and $\bar{q}g$ are included.
-\item \verb|DecayMode1,2=7|: Valid for spin-0 and spin-2.  Only OffXVV=000 or 100 are possible.
-\item In $VH$ production and \verb|ConvertLHE| mode, \verb|DecayMode1| is used for the decay of the $V$.  If it is a $Z$ decay mode, $ZH$ will be produced; if it is a $W$ decay mode, $WH$ will be produced.
+\item \verb|DecayMode1,2=7|: Valid for spin-0 and spin-2 or for $VH$.
+\item In $VH$ production and \verb|ConvertLHE| mode, \verb|DecayMode1| is used for the decay of the $V$.  If it is a $Z$ decay mode, $ZH$ will be produced; if it is a $W$ decay mode, $WH$ will be produced; if it is $7$, $\gamma H$ will be produced, with $\gamma$ stable.
 \item In $ttH$ production, \verb|DecayMode1| and \verb|DecayMode2| are used to decay the $W$ bosons from the top decay.  Only $W$ decay modes are allowed.
 \item In $t+H$ production, \verb|DecayMode1| is used to decay the W boson from the top decay.
 \item \verb|Interf|: For final states with 4 same flavor fermions, this parameter controls whether or not to include interference effects. It receives 0 or 1.
@@ -199,56 +199,73 @@ In the weak vector boson fusion process (VBF) we also allow for different $ZZH$ 
 Examples of running the generator:
 \begin{itemize}
 \item $gg$ production:
+\begin{itemize}
+\item SM resonance, decay to $ZZ\to 4l$
 \begin{verbatim}
-./JHUGen Collider=1 Process=0 VegasNc2=100000 PChannel=0 DecayMode1=0 \\
-		DecayMode2=0 Unweighted=1 DataFile=ggHZZ4l
+./JHUGen Process=0 VegasNc2=100000 DecayMode1=0 DecayMode2=0 DataFile=ggHZZ4l
 \end{verbatim}
-\item $gg$ production, pseudoscalar resonance:
+\item pseudoscalar resonance, decay $WW\to 2l2\nu$:
 \begin{verbatim}
-./JHUGen Collider=1 Process=0 VegasNc2=100000 PChannel=0 DecayMode1=0 \\
-		DecayMode2=0 Unweighted=1 DataFile=ggHZZ4l_0- ghz1=0,0 ghz4=1,0
+./JHUGen Process=0 VegasNc2=100000 DecayMode1=4 DecayMode2=4 DataFile=ggHWW2l2nu_0- \\
+		ghz1=0,0 ghz4=1,0
 \end{verbatim}
-\item $ggH \to Z\gamma$
+\item SM resonance, decay to $Z\gamma\to 2l\gamma$
 \begin{verbatim}
 ./JHUGen DecayMode1=0 DecayMode2=7 DataFile=ggHgammaZ2l ghzgs2=1
 \end{verbatim}
-\item $ZH$ with hadronic $Z$ decay (change \verb|DecayMode1| for other $Z$ decays; both $pp$ and $e^+e^-$ Collider options possible):
+\end{itemize}
+\item $VH$:
+\begin{itemize}
+\item $ZH$ with hadronic $Z$ decay (change \verb|DecayMode1| for other $Z$ decays; both $pp$ (default) and $e^+e^-$ Collider options possible):
 \begin{verbatim}
-./JHUGen Collider=1 Process=50 DecayMode1=1 Unweighted=1 VegasNc2=100000 \\
-		OffXVV=011 DataFile=ZH
+./JHUGen Process=50 DecayMode1=1 VegasNc2=100000 DataFile=ZH
 \end{verbatim}
 \item $WH$ with leptonic $W$ decay (change \verb|DecayMode1| for other $W$ decays):
 \begin{verbatim}
-./JHUGen Collider=1 Process=50 DecayMode1=4 Unweighted=1 VegasNc2=100000 \\
-		OffXVV=011 DataFile=WH
+./JHUGen Process=50 DecayMode1=4 VegasNc2=100000 DataFile=WH
 \end{verbatim}
-\item VBF:
+\item $\gamma^*\to\gamma H$ (both $pp$ (default) and $e^+e^-$ Collider options possible):
 \begin{verbatim}
-./JHUGen Collider=1 Process=60 Unweighted=1 VegasNc2=100000 DataFile=VBF \\
-		pTjetcut=0 deltaRcut=0
+./JHUGen Process=50 DecayMode1=7 VegasNc2=100000 DataFile=gammatogammaH ghgsgs2=1,0
 \end{verbatim}
-(Jet cuts are generally not needed for VBF production, since there is no divergence.)
+\item $Z^*\to\gamma H$ (both $pp$ (default) and $e^+e^-$ Collider options possible):
+\begin{verbatim}
+./JHUGen Process=50 DecayMode1=7 VegasNc2=100000 DataFile=ZtogammaH ghzgs2=1,0
+\end{verbatim}
+\end{itemize}
+\item VBF:
+\begin{itemize}
+\item $Z^*Z^*/W^*W^*\to H$:
+\begin{verbatim}
+./JHUGen Process=60 VegasNc2=100000 DataFile=VBF pTjetcut=0 deltaRcut=0
+\end{verbatim}
+(Jet cuts are generally not needed for VBF production with only $ZZ$ and $WW$, since there is no divergence.)
+\item $\gamma^*\gamma^*\to H$:
+\begin{verbatim}
+./JHUGen Process=60 VegasNc2=100000 DataFile=gammagammaVBF ghgsgs2=1,0 \\
+			pTjetcut=15 deltaRcut=0.3
+\end{verbatim}
+(Requires jet cuts to avoid divergences when $q_\gamma^2\to 0$.  The ones here are the default cuts, but are shown explicitly as an example.)
+\end{itemize}
 \item $H+jj$:
 \begin{verbatim}
-./JHUGen Collider=1 Process=61 Unweighted=1 VegasNc2=100000 DataFile=Hjj
+./JHUGen Process=61 Unweighted=1 VegasNc2=100000 DataFile=Hjj pTjetcut=15 deltaRcut=0.3
 \end{verbatim}
 \item $H+j$:
 \begin{verbatim}
-./JHUGen Collider=1 Process=62 Unweighted=1 VegasNc2=100000 DataFile=Hj
+./JHUGen Process=62 Unweighted=1 VegasNc2=100000 DataFile=Hj pTjetcut=15
 \end{verbatim}
 \item $pp \to t\bar{t}+H$ with inclusive top decay (change \verb|DecayMode1,2| for specific $tt$ decays):
 \begin{verbatim}
-./JHUGen Collider=1 Process=80 DecayMode1=11 DecayMode2=11 Unweighted=1 \\
-		VegasNc2=100000 DataFile=ttH
+./JHUGen Process=80 DecayMode1=11 DecayMode2=11 VegasNc2=100000 DataFile=ttH
 \end{verbatim}
 \item $pp \to b\bar{b}+H$:
 \begin{verbatim}
-./JHUGen Collider=1 Process=90 Unweighted=1 VegasNc2=100000 DataFile=bbH
+./JHUGen Process=90 VegasNc2=100000 DataFile=bbH
 \end{verbatim}
 \item $pp \to t+H$, $t$ channel with inclusive top decay (change \verb|DecayMode1| for specific $t$ decays; similar syntax for processes 111--113):
 \begin{verbatim}
-./JHUGen Collider=1 Process=110 DecayMode1=11 Unweighted=1 \\
-		VegasNc2=100000 DataFile=tH_s
+./JHUGen Process=110 DecayMode1=11 VegasNc2=100000 DataFile=tH_s
 \end{verbatim}
 \end{itemize}
 
@@ -540,14 +557,14 @@ In practice, the example $X \to \gamma \gamma$ from this section, Sec.~\ref{sec:
 kinematically the same but are presented only to illustrate how one takes care of this final state.
 
 \begin{verbatim}
-./JHUGen DecayMode1=7 DecayMode2=7 OffXVV=100 ghgsgs2=1,0 (...other options)
+./JHUGen DecayMode1=7 DecayMode2=7 ghgsgs2=1,0 (...other options)
 \end{verbatim}
 
 \subsection{ $J^P = 0^-_m$ resonance, $X \to \gamma \gamma$}
 \label{sec:exD}
 
 \begin{verbatim}
-./JHUGen DecayMode1=7 DecayMode2=7 OffXVV=100 ghgsgs4=1,0 (...other options)
+./JHUGen DecayMode1=7 DecayMode2=7 ghgsgs4=1,0 (...other options)
 \end{verbatim}
 
 \subsection{ $J^P = 2^+_m$ resonance, $X \to ZZ~{\rm or}~WW~{\rm or}~\gamma \gamma$}
