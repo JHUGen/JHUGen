@@ -858,7 +858,7 @@ return
 				  j1=4
 			 elseif(sSel.eq.iSel .and. rSel.eq.jSel) then ! gqb->qbg
 			     j1=3
-				  k1=4
+				  k2=4
 			 endif
 	      endif
 	   endif
@@ -879,10 +879,10 @@ return
 		     j2=1
 		     if(rSel.eq.iSel .and. sSel.eq.jSel) then ! qbg->qbg
 		        k2=4
-				j1=3
+				  j1=3
 			 elseif(sSel.eq.iSel .and. rSel.eq.jSel) then ! qbg->gqb
 			    j1=4
-				k1=3
+				 k2=3
 			 endif
 	      endif
 
@@ -980,28 +980,23 @@ return
 	   endif
 	endif
 
-!	if(j1.eq.0 .and. j2.eq.0 .and. k1.eq.0 .and. k2.eq.0) then
-!	   print *,"Could not recognize the incoming flavors!"
-!	   print *,"iSel: ",iSel,", jSel: ",jSel," rSel: ",rSel," sSel: ",sSel
-!	   print *,"j1: ",j1,", j2: ",j2," k1: ",k1," k2: ",k2
-!		if(isGGGG) then
-!			print *,"is gggg"
-!		endif
-!		if(isQQGG) then
-!			print *,"is qbqgg"
-!		endif
-!		if(isQQQQ) then
-!			print *,"is qbqQBQ"
-!		endif
-!		if(isQQQQ_idQ) then
-!			print *,"is qbqQBQ id"
-!		endif
-!	   isGGGG=.false.
-!	   isQQGG=.false.
-!	   isQQQQ=.false.
-!	   isQQQQ_idQ=.false.
-!	   return
-!	endif
+	if(j1.eq.0 .or. j2.eq.0 .or. k1.eq.0 .or. k2.eq.0) then
+	   print *,"Could not recognize the incoming flavors!"
+	   print *,"iSel: ",iSel,", jSel: ",jSel," rSel: ",rSel," sSel: ",sSel
+	   print *,"j1: ",j1,", j2: ",j2," k1: ",k1," k2: ",k2
+		if(isGGGG) then
+			print *,"is gggg"
+		endif
+		if(isQQGG) then
+			print *,"is qbqgg"
+		endif
+		if(isQQQQ) then
+			print *,"is qbqQBQ"
+		endif
+		if(isQQQQ_idQ) then
+			print *,"is qbqQBQ id"
+		endif
+	endif
 
     call spinoru2(4,(/-p(:,1),-p(:,2),p(:,3),p(:,4)/),za,zb,sprod)
 
