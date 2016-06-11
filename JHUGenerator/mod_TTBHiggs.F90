@@ -3,7 +3,7 @@ use ModParameters
 implicit none
 
 
-public :: EvalAmp_GG_TTBH, EvalAmp_QQB_TTBH, InitProcess_TTBH
+public :: EvalXSec_PP_TTBH, EvalXSec_PP_BBBH, EvalAmp_GG_TTBH, EvalAmp_QQB_TTBH, InitProcess_TTBH
 private
 
 integer,parameter :: ColorlessTag = 1
@@ -67,11 +67,63 @@ complex(8) :: couplHTT_right_dyn,couplHTT_left_dyn
 
 
    CONTAINS
-   
-   
-   
-   
-   
+
+
+SUBROUTINE EvalXSec_PP_TTBH(Mom,SelectProcess,Res)
+implicit none
+real(8), intent(in) :: Mom(1:4,1:13)
+integer,intent(in) :: SelectProcess! 0=gg, 1=qqb, 2=all
+real(8), intent(out) :: Res(-5:5,-5:5)
+real(8) :: MatElSq_GG,MatElSq_QQB,MatElSq_QBQ
+integer :: iq
+
+   call InitProcess_TTBH()
+
+   MatElSq_QQB = 0d0
+   MatElSq_QBQ = 0d0
+   MatElSq_GG  = 0d0
+   if( SelectProcess.eq.0 ) then
+      call EvalAmp_GG_TTBH(Mom(1:4,1:13),MatElSq_GG)
+   elseif( SelectProcess.eq.1 ) then
+      call EvalAmp_QQB_TTBH(Mom(1:4,1:13),MatElSq_QQB)
+      MatElSq_QBQ = MatElSq_QQB
+   else
+      call EvalAmp_GG_TTBH(Mom(1:4,1:13),MatElSq_GG)
+      call EvalAmp_QQB_TTBH(Mom(1:4,1:13),MatElSq_QQB)
+      MatElSq_QBQ = MatElSq_QQB
+   endif
+   do iq=0,5
+      if(iq.eq.pdfGlu_) then
+         Res(iq,iq) = MatElSq_GG
+      else
+         Res(iq,-iq) = MatElSq_QQB
+         Res(-iq,iq) = MatElSq_QBQ
+      endif
+   enddo
+
+   RETURN
+END SUBROUTINE
+
+SUBROUTINE EvalXSec_PP_BBBH(Mom,SelectProcess,Res)
+implicit none
+real(8), intent(in) :: Mom(1:4,1:13)
+integer,intent(in) :: SelectProcess! 0=gg, 1=qqb, 2=all
+real(8), intent(out) :: Res(-5:5,-5:5)
+real(8) :: tmptopmass
+integer :: tmptopdec
+   tmptopmass = M_Top
+   tmptopdec = TopDecays
+
+   M_Top = M_Bot
+   TopDecays=0
+   call EvalXSec_PP_TTBH(Mom,SelectProcess,Res)
+
+   M_Top = tmptopmass
+   TopDecays = tmptopdec
+   RETURN
+END SUBROUTINE
+
+
 
 SUBROUTINE InitProcess_TTBH()
 implicit none
@@ -94,8 +146,8 @@ integer :: iTree,NumParticles
       allocate( TheTreeAmps_GG_TTBH(iTree)%Gluons(1:NumGluons) )
       TheTreeAmps_GG_TTBH(iTree)%NumGlu(0) = NumGluons
       TheTreeAmps_GG_TTBH(iTree)%NumSca = 0
-  enddo             
-             
+  enddo
+
 ! qqbar->ttbar+H
   NumQuarks=4; NumGluons=0; NumBoson=1;
   NumParticles=NumQuarks+NumGluons+NumBoson
@@ -110,8 +162,8 @@ integer :: iTree,NumParticles
       allocate( TheTreeAmps_QQB_TTBH(iTree)%Gluons(1:NumGluons) )
       TheTreeAmps_QQB_TTBH(iTree)%NumGlu(0) = NumGluons
       TheTreeAmps_QQB_TTBH(iTree)%NumSca = 0
-  enddo             
-  
+  enddo
+
   ExtParticles(1)%PartType = ATop_
   ExtParticles(1)%ExtRef   = 1
   ExtParticles(1)%Mass = m_Top
@@ -154,28 +206,28 @@ integer :: iTree,NumParticles
   ExtParticles(7)%Mass2= ExtParticles(5)%Mass**2
   ExtParticles(7)%Helicity = 0
 
-             
+
   TheTreeAmps_GG_TTBH(1)%PartRef(1:5) = (/3,4,1,7,2/)! (/1,7,2,3,4/)
-  TheTreeAmps_GG_TTBH(2)%PartRef(1:5) = (/3,1,7,2,4/)! (/1,7,2,4,3/)            
+  TheTreeAmps_GG_TTBH(2)%PartRef(1:5) = (/3,1,7,2,4/)! (/1,7,2,4,3/)
   do iTree=1,2
       call LinkTreeParticles(TheTreeAmps_GG_TTBH(iTree),ExtParticles(1:7))
   enddo
-  
+
   TheTreeAmps_QQB_TTBH(1)%PartRef(1:5) = (/5,6,1,7,2/)! (/1,7,2,5,6/)
   call LinkTreeParticles(TheTreeAmps_QQB_TTBH(1),ExtParticles(1:7))
 
-  
+
   couplHTT_right_dyn = m_top/vev/2d0 * ( kappa + (0d0,1d0)*kappa_tilde )
   couplHTT_left_dyn  = m_top/vev/2d0 * ( kappa - (0d0,1d0)*kappa_tilde )
-  
-  
+
+
 RETURN
 END SUBROUTINE
-  
 
-      
 
-      
+
+
+
 SUBROUTINE EvalAmp_GG_TTBH(Mom,SqAmp)
 use ModTopDecay
 implicit none
@@ -205,7 +257,7 @@ SqAmp = 0d0
      GluPol(1:4,2,1) = pol_mless(ExtParticles(4)%Mom(1:4),+1,outgoing=.true.)
      GluPol(1:4,2,2) = pol_mless(ExtParticles(4)%Mom(1:4),-1,outgoing=.true.)
 !      GluPol(1:4,1,1) = ExtParticles(3)%Mom(1:4);  GluPol(1:4,1,2) = ExtParticles(3)%Mom(1:4); print *, "checking gauge invariance"
-       
+
 
      nhel=-1
      if( TOPDECAYS.EQ.0 ) nhel=+1
@@ -213,41 +265,41 @@ SqAmp = 0d0
      do TopHel2=-1,nhel,2
      if( TOPDECAYS.eq.0 ) then
              call ubarSpi_Dirac(ExtParticles(2)%Mom(1:4),M_Top,TopHel1,ExtParticles(2)%Pol(1:4))
-             call    vSpi_Dirac(ExtParticles(1)%Mom(1:4),M_Top,TopHel2,ExtParticles(1)%Pol(1:4))    
+             call    vSpi_Dirac(ExtParticles(1)%Mom(1:4),M_Top,TopHel2,ExtParticles(1)%Pol(1:4))
      endif
      do hel4=1,2
-     
-        ExtParticles(4)%Pol(1:4) = GluPol(1:4,2,hel4)  
+
+        ExtParticles(4)%Pol(1:4) = GluPol(1:4,2,hel4)
 !         ExtParticles(4)%Pol(1:4) = ExtParticles(4)%Mom(1:4); print *, "checking gauge invariance"
         call new_calc_ampl(0,0,TheTreeAmps_GG_TTBH(1),ResOffSh(1:4,1))
         call new_calc_ampl(0,0,TheTreeAmps_GG_TTBH(2),ResOffSh(1:4,2))
 
-        Res(1,1) = (ResOffSh(1:4,1).Ndot.GluPol(1:4,1,1))! col1 hel+ 
+        Res(1,1) = (ResOffSh(1:4,1).Ndot.GluPol(1:4,1,1))! col1 hel+
         Res(2,1) = (ResOffSh(1:4,2).Ndot.GluPol(1:4,1,1))! col2 hel+
         Res(1,2) = (ResOffSh(1:4,1).Ndot.GluPol(1:4,1,2))! col1 hel-
         Res(2,2) = (ResOffSh(1:4,2).Ndot.GluPol(1:4,1,2))! col2 hel-
-        
+
         SqAmp = SqAmp   &
               + c_aa * dreal( Res(1,1)*dconjg(Res(1,1)) + Res(1,2)*dconjg(Res(1,2)) )  &
               + c_ab * dreal( Res(1,1)*dconjg(Res(2,1)) + Res(1,2)*dconjg(Res(2,2)) )  &
               + c_ab * dreal( Res(2,1)*dconjg(Res(1,1)) + Res(2,2)*dconjg(Res(1,2)) )  &
               + c_aa * dreal( Res(2,1)*dconjg(Res(2,1)) + Res(2,2)*dconjg(Res(2,2)) )
-    enddo    
-    enddo   
     enddo
-    
+    enddo
+    enddo
+
     SqAmp = SqAmp * SpinAvg * GluonColAvg**2 * (4d0*Pi*alphas)**2  !* (4d0*pi*alpha_QED) * (m_top/(2d0*sitW*M_W))**2
 
-    
+
 RETURN
 END SUBROUTINE
-      
 
-      
-      
-      
 
-      
+
+
+
+
+
 SUBROUTINE EvalAmp_QQB_TTBH(Mom,SqAmp)
 use ModTopDecay
 implicit none
@@ -273,45 +325,45 @@ SqAmp = 0d0
 !    call HDecay(ExtParticles(7),DK_LO,MomExt(1:4,12:13))
      call ubarSpi_Dirac(ExtParticles(6)%Mom(1:4),0d0,-1,QuaPol(1:4,1,1))
      call ubarSpi_Dirac(ExtParticles(6)%Mom(1:4),0d0,+1,QuaPol(1:4,1,2))
-     call    vSpi_Dirac(ExtParticles(5)%Mom(1:4),0d0,-1,QuaPol(1:4,2,1))    
-     call    vSpi_Dirac(ExtParticles(5)%Mom(1:4),0d0,+1,QuaPol(1:4,2,2))    
-       
-       
-       
+     call    vSpi_Dirac(ExtParticles(5)%Mom(1:4),0d0,-1,QuaPol(1:4,2,1))
+     call    vSpi_Dirac(ExtParticles(5)%Mom(1:4),0d0,+1,QuaPol(1:4,2,2))
+
+
+
      nhel=-1
      if( TOPDECAYS.EQ.0 ) nhel=+1
      do TopHel1=-1,nhel,2
      do TopHel2=-1,nhel,2
      if( TOPDECAYS.eq.0 ) then
              call ubarSpi_Dirac(ExtParticles(2)%Mom(1:4),M_Top,TopHel1,ExtParticles(2)%Pol(1:4))
-             call    vSpi_Dirac(ExtParticles(1)%Mom(1:4),M_Top,TopHel2,ExtParticles(1)%Pol(1:4))    
+             call    vSpi_Dirac(ExtParticles(1)%Mom(1:4),M_Top,TopHel2,ExtParticles(1)%Pol(1:4))
      endif
      do hel4=1,2
-     
-        ExtParticles(6)%Pol(1:4) = QuaPol(1:4,2,hel4)  
+
+        ExtParticles(6)%Pol(1:4) = QuaPol(1:4,2,hel4)
 !         ExtParticles(4)%Pol(1:4) = ExtParticles(4)%Mom(1:4); print *, "checking gauge invariance"
         call new_calc_ampl(0,0,TheTreeAmps_QQB_TTBH(1),ResOffSh(1:4))
 
-        Res(1) = psp1_(ResOffSh(1:4),QuaPol(1:4,1,1))! hel+ 
+        Res(1) = psp1_(ResOffSh(1:4),QuaPol(1:4,1,1))! hel+
         Res(2) = psp1_(ResOffSh(1:4),QuaPol(1:4,1,2))! hel-
-        
+
         SqAmp = SqAmp   &
-              + c_aa * dreal( Res(1)*dconjg(Res(1)) + Res(2)*dconjg(Res(2)) ) 
-    enddo    
-    enddo   
+              + c_aa * dreal( Res(1)*dconjg(Res(1)) + Res(2)*dconjg(Res(2)) )
+    enddo
+    enddo
     enddo
     SqAmp = SqAmp * SpinAvg * QuarkColAvg**2 * (4d0*Pi*alphas)**2  !* (4d0*pi*alpha_QED) * (m_top/(2d0*sitW*M_W))**2
-    
+
 RETURN
 END SUBROUTINE
-      
 
-      
-      
-      
-      
-      
- 
+
+
+
+
+
+
+
 SUBROUTINE new_calc_ampl(tag_f,tag_Z,TreeProc,Res)
 implicit none
 integer :: tag_f,tag_Z,n
@@ -326,7 +378,7 @@ integer :: i,j,Order(1:6)
              Res(1:Dv) = cur_g_2fV( TreeProc%Gluons(2:TreeProc%NumGlu(0)),TreeProc%Quarks(1:TreeProc%NumQua),TreeProc%Boson,TreeProc%NumGlu(0:3) )
           elseif( IsAQuark(TreeProc%PartType(1)) .and. Boson ) then
              if( TreeProc%NumV.eq.1 ) then
-                Res(1:Ds) = cur_f_2fV(TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(2:2),TreeProc%Quarks(1)%PartType,TreeProc%Boson,TreeProc%NumGlu(0:2))   
+                Res(1:Ds) = cur_f_2fV(TreeProc%Gluons(1:TreeProc%NumGlu(0)),TreeProc%Quarks(2:2),TreeProc%Quarks(1)%PartType,TreeProc%Boson,TreeProc%NumGlu(0:2))
              else
                 print *, "requested current with a boson is not available"
                 stop
@@ -354,8 +406,8 @@ return
 END SUBROUTINE
 
 
- 
- 
+
+
 SUBROUTINE LinkTreeParticles(TheTreeAmp,TheParticles)
 implicit none
 type(TreeProcess) :: TheTreeAmp
@@ -377,7 +429,7 @@ integer :: iPart,PartRef,PartType,ig,iq,ib,NPart,counterQ,counterG,LastQuark,Qua
                      LastQuark = counterQ! only required for BosonVertex below
 !                   elseif( IsAScalar(TheTreeAmp%PartType(NPart)) ) then
 ! !                      TheTreeAmp%NumSca = TheTreeAmp%NumSca + 1   ! this is suppoed to be done outside this subroutine
-!                      counterQ = counterQ + 1!     treat the scalar like a quark here because this is only to determine NumGlu 
+!                      counterQ = counterQ + 1!     treat the scalar like a quark here because this is only to determine NumGlu
 !                      QuarkPos(counterQ) = counterQ + counterG
                   elseif( TheTreeAmp%PartType(NPart).eq.Glu_ ) then
                      counterG = counterG + 1
@@ -443,7 +495,7 @@ integer :: iPart,PartRef,PartType,ig,iq,ib,NPart,counterQ,counterG,LastQuark,Qua
   do iPart=1,TheTreeAmp%NumPart
      PartRef = TheTreeAmp%PartRef(iPart)
      PartType= TheParticles(PartRef)%PartType
-     if( PartType.eq.Glu_ ) then 
+     if( PartType.eq.Glu_ ) then
            ig=ig+1
            TheTreeAmp%Gluons(ig)%PartType => TheParticles(PartRef)%PartType
            TheTreeAmp%Gluons(ig)%ExtRef   => TheParticles(PartRef)%ExtRef
@@ -482,18 +534,18 @@ integer :: iPart,PartRef,PartType,ig,iq,ib,NPart,counterQ,counterG,LastQuark,Qua
 RETURN
 END SUBROUTINE
 
- 
- 
- 
- 
-! ----------------------------------------------------      
-      
+
+
+
+
+! ----------------------------------------------------
+
 
 FUNCTION cur_f_2fV(Gluons,Quark,Quark1PartType,Boson,NumGlu) result(Res)           ! Quarks(:) DOES include the OFF-shell quark, in contrast to all other routines!
 implicit none
 complex(8) :: Res(1:Ds)
 integer :: NumGlu(0:2),i,rIn,rOut,Quark1PartType
-type(PtrToParticle) :: Gluons(1:),Boson,Quark(2:2) 
+type(PtrToParticle) :: Gluons(1:),Boson,Quark(2:2)
 complex(8) :: GluMom(1:Dv,NumGlu(0)), QuarkMom(1:Dv)
 complex(8) :: GluPol(1:Dv,NumGlu(0)), QuarkPol(1:Ds)
 
@@ -513,7 +565,7 @@ complex(8) :: GluPol(1:Dv,NumGlu(0)), QuarkPol(1:Ds)
    rOut=NumGlu(0)
    if( Quark(2)%PartType .gt.0 ) then      !    X----->----
       Res(:) = fV(GluPol(1:Dv,rIn:rOut),GluMom(1:Dv,rIn:rOut),QuarkPol(1:Ds),QuarkMom(1:Dv),Quark(2)%Mass,Quark1PartType,Boson%Pol(1:Dv),Boson%Mom(1:Dv),NumGlu(1))
-   else            
+   else
       Res(:) = bfV(GluPol(1:Dv,rIn:rOut),GluMom(1:Dv,rIn:rOut),QuarkPol(1:Ds),QuarkMom(1:Dv),Quark(2)%Mass,Quark1PartType,Boson%Pol(1:Dv),Boson%Mom(1:Dv),NumGlu(1))
    endif
 
@@ -555,7 +607,7 @@ END FUNCTION
       if (ng2 < 0) write(*,*) 'WRONG DEFINITION OF CURRENT fV'
 
       if( abs(QuarkFlavor).eq.Top_ .or. abs(QuarkFlavor).eq.Bot_ ) then!   note that Bot_ is treated as top quark in TOPAZ!
-         couplVQQ_left  = couplHTT_left_dyn 
+         couplVQQ_left  = couplHTT_left_dyn
          couplVQQ_right = couplHTT_right_dyn
       else
          couplVQQ_left=0d0
@@ -684,7 +736,7 @@ end function fV
       if (ng2 < 0) write(*,*) 'WRONG DEFINITION OF CURRENT fbV'
 
       if( abs(QuarkFlavor).eq.Top_ .or. abs(QuarkFlavor).eq.Bot_ ) then!   note that Bot_ is treated as top quark in TOPAZ!
-          couplVQQ_left  = couplHTT_left_dyn 
+          couplVQQ_left  = couplHTT_left_dyn
           couplVQQ_right = couplHTT_right_dyn
       else
           couplVQQ_left=0d0
@@ -778,7 +830,7 @@ else
         tmp = vVq(eV,sp2,couplVQQ_left,couplVQQ_right)
         if (abs(k2sq) > propcut) then
                tmp = (0d0,1d0)/k2sq*tmp
-        else 
+        else
                tmp = (0d0,0d0)
         endif
         res = res + tmp
@@ -789,7 +841,7 @@ endif
 
 
       end function bfV
-      
+
 
 
 
@@ -845,11 +897,11 @@ integer :: rIn,rOut,i,counter
                   ubar1(:) = cur_f_2fV(Gluons(rIn:rOut),Quarks(2:2),-Quarks(2)%PartType,Boson,(/n2a+n1b,n1b,n2a/) )
                   PMom2(:) = Quarks(2)%Mom(:) + SumMom(Gluons,rIn,rOut) + Boson%Mom(:)
                   PropFac2 = (0d0,1d0)/(sc_(PMom2,PMom2)-Quarks(2)%Mass2)
-                  
+
                   if( abs(sc_(PMom2,PMom2)-Quarks(2)%Mass2).lt.PropCut ) then
                      PropFac2=(0d0,0d0)
                   endif
-                  
+
                   if( Quarks(2)%PartType.lt.0 ) then
                      ubar1(:) = (-spi2_(PMom2,ubar1)+Quarks(2)%Mass*ubar1(:))*PropFac2
                   else
@@ -861,7 +913,7 @@ integer :: rIn,rOut,i,counter
                   else
                      ubar0(:) = vqg(ubar1,eps2)
                   endif
-                  
+
                   PMom1 = Quarks(2)%Mom+Quarks(3)%Mom+Quarks(4)%Mom+SumMom(Gluons,n1a+1,NumGlu(1)+NumGlu(2)+NumGlu(3)+n4a) + Boson%Mom(:)
                   if(n1a.ge.1 .or. n4b.ge.1) then
                      PropFac1 = (0d0,1d0)/(sc_(PMom1,PMom1)-Quarks(2)%Mass2)
@@ -874,7 +926,7 @@ integer :: rIn,rOut,i,counter
                         ubar0(:) = (+spb2_(ubar0,PMom1)+Quarks(2)%Mass*ubar0(:))*PropFac1
                      endif
                   endif
-                  
+
                   TmpQuark(1)%Mom  => PMom1(:)
                   TmpQuark(1)%Pol  => ubar0(:)
                   TmpQuark(1)%Mass => Quarks(2)%Mass
@@ -976,7 +1028,7 @@ integer :: rIn,rOut,i,counter
                    else
                       ubar0(:) = vqg(ubar1,eps2)
                    endif
-                   
+
                    PMom1 = Quarks(2)%Mom+Quarks(3)%Mom+Quarks(4)%Mom+SumMom(Gluons,n1a+1,NumGlu(1)+NumGlu(2)+NumGlu(3)+n4a)+Boson%Mom
                    if(n1a.ge.1 .or. n4b.ge.1) then
                       PropFac1 = (0d0,1d0)/(sc_(PMom1,PMom1)-Quarks(2)%Mass2)
@@ -1024,13 +1076,13 @@ integer :: rIn,rOut,i,counter
           do n3a=0,NumGlu(3)
              n1b = NumGlu(1)-n1a
              n3b = NumGlu(3)-n3a
- 
+
              rIn =n1a+1
              rOut=NumGlu(1)+NumGlu(2)+n3a
 
-! This means that all the ext gluons are on this lines, 
+! This means that all the ext gluons are on this lines,
 ! and we must remove this to prevent color issues with a Z on the quark loop, see RR notes
-            
+
              if (BosonVertex.eq.1 .or. BosonVertex.eq.3 .or. BosonVertex.eq.4)  then
                 if ( tag_Z .eq. 1 .and. n1b+NumGlu(2)+n3a .eq. NumGlu(0) ) then
 !                     print  * , "cycle for tag_Z=1 in cur_f_4fV"
@@ -1052,14 +1104,14 @@ integer :: rIn,rOut,i,counter
                 if (BosonVertex .eq. 3 .or. BosonVertex .eq. 4) then
                    rIn =NumGlu(1)+NumGlu(2)+n3a+1
                    rOut=NumGlu(1)+NumGlu(2)+NumGlu(3)+n4a
-                   
+
                    ubar1(:) = cur_f_2fV(Gluons(rIn:rOut),Quarks(4:4),-Quarks(4)%PartType,Boson,(/n3b+n4a,n3b,n4a/) )
                    PMom2(:) = Quarks(4)%Mom(:) + SumMom(Gluons,rIn,rOut) + Boson%Mom(:)
                    PropFac2 = (0d0,1d0)/(sc_(PMom2,PMom2)-Quarks(4)%Mass2)
                    if( abs(sc_(PMom2,PMom2)-Quarks(4)%Mass2).lt.PropCut ) then
                       PropFac2=(0d0,0d0)
                    endif
-                   
+
                    if( Quarks(4)%PartType.lt.0 ) then
                       ubar1(:) = (-spi2_(PMom2,ubar1)+Quarks(4)%Mass*ubar1(:))*PropFac2
                    else
@@ -1070,7 +1122,7 @@ integer :: rIn,rOut,i,counter
                    else
                       ubar0(:) = vgq(eps2,ubar1)
                    endif
-               
+
                    PMom1 = Quarks(2)%Mom+Quarks(3)%Mom+Quarks(4)%Mom+SumMom(Gluons,n1a+1,NumGlu(1)+NumGlu(2)+NumGlu(3)+n4a) + Boson%Mom(:)
                    if(n1a.ge.1 .or. n4b.ge.1) then
                       PropFac1 = (0d0,1d0)/(sc_(PMom1,PMom1)-Quarks(4)%Mass2)
@@ -1083,7 +1135,7 @@ integer :: rIn,rOut,i,counter
                          ubar0(:) = (+spb2_(ubar0,PMom1)+Quarks(4)%Mass*ubar0(:))*PropFac1
                       endif
                    endif
-                   
+
                    TmpQuark(1)%Mom  => PMom1(:)
                    TmpQuark(1)%Pol  => ubar0(:)
                    TmpQuark(1)%Mass => Quarks(4)%Mass
@@ -1108,7 +1160,7 @@ integer :: rIn,rOut,i,counter
                    Res(:) = Res(:) + tmp(:)
                 endif
 
-                if (BosonVertex .eq. 1 .or. BosonVertex .eq. 4) then              
+                if (BosonVertex .eq. 1 .or. BosonVertex .eq. 4) then
                    ! radiate V off Fer1
                    rIn =NumGlu(1)+NumGlu(2)+n3a+1
                    rOut=NumGlu(1)+NumGlu(2)+NumGlu(3)+n4a
@@ -1119,7 +1171,7 @@ integer :: rIn,rOut,i,counter
                       if( abs(sc_(PMom2,PMom2)-Quarks(4)%Mass2).lt.PropCut ) then
                          PropFac2=(0d0,0d0)
                       endif
-                      
+
                       if( Quarks(4)%PartType.lt.0 ) then
                          ubar1(:) = (-spi2_(PMom2,ubar1)+Quarks(4)%Mass*ubar1(:))*PropFac2
                       else
@@ -1129,9 +1181,9 @@ integer :: rIn,rOut,i,counter
                    if( Quarks(4)%PartType.lt.0 ) then
                       ubar0(:) = vgbq(eps2,ubar1)
                    else
-                      ubar0(:) = vgq(eps2,ubar1) 
+                      ubar0(:) = vgq(eps2,ubar1)
                    endif
-                   
+
                    PMom1 = Quarks(2)%Mom+Quarks(3)%Mom+Quarks(4)%Mom+SumMom(Gluons,n1a+1,NumGlu(1)+NumGlu(2)+NumGlu(3)+n4a)
                    PropFac1 = (0d0,1d0)/(sc_(PMom1,PMom1)-Quarks(4)%Mass2)
                    if( abs(sc_(PMom1,PMom1)-Quarks(4)%Mass2).lt.PropCut ) then
@@ -1142,7 +1194,7 @@ integer :: rIn,rOut,i,counter
                    else
                       ubar0(:) = (+spb2_(ubar0,PMom1)+Quarks(4)%Mass*ubar0(:))*PropFac1
                    endif
-                   
+
                    TmpQuark(1)%Mom  => PMom1(:)
                    TmpQuark(1)%Pol  => ubar0(:)
                    TmpQuark(1)%Mass => Quarks(4)%Mass
@@ -1166,7 +1218,7 @@ integer :: rIn,rOut,i,counter
                    tmp(:) = cur_f_2fV(TmpGluons(1:counter-1),TmpQuark(1:1),-TmpQuark(1)%PartType,Boson,(/counter-1,n1a,n4b/) )
                    Res(:) = Res(:) + tmp(:)
                 endif
-                
+
 
                 if (BosonVertex .eq. 2) then
                    rIn =NumGlu(1)+NumGlu(2)+n3a+1
@@ -1175,11 +1227,11 @@ integer :: rIn,rOut,i,counter
                    if ( n3b .ge. 1 .or. n4a .ge. 1) then
                       PMom2(:) = Quarks(4)%Mom(:) + SumMom(Gluons,rIn,rOut)
                       PropFac2 = (0d0,1d0)/(sc_(PMom2,PMom2)-Quarks(4)%Mass2)
-                      
+
                       if( abs(sc_(PMom2,PMom2)-Quarks(4)%Mass2).lt.PropCut ) then
                          PropFac2=(0d0,0d0)
                       endif
-                      
+
                       if( Quarks(4)%PartType.lt.0 ) then
                          ubar1(:) = (-spi2_(PMom2,ubar1)+Quarks(4)%Mass*ubar1(:))*PropFac2
                       else
@@ -1203,7 +1255,7 @@ integer :: rIn,rOut,i,counter
                          ubar0(:) = (+spb2_(ubar0,PMom1)+Quarks(4)%Mass*ubar0(:))*PropFac1
                       endif
                    endif
-                   
+
                    TmpQuark(1)%Mom  => PMom1(:)
                    TmpQuark(1)%Pol  => ubar0(:)
                    TmpQuark(1)%Mass => Quarks(4)%Mass
@@ -1372,7 +1424,7 @@ integer :: rIn,rOut,i,counter
             cycle
          endif
 
-            
+
 
 
          Eps2 = cur_g_2f(Gluons(rIn:rOut),Quarks(2:3),(/1+n1b+NumGlu(2)+n3a,n1b,NumGlu(2),n3a/))
@@ -1543,7 +1595,7 @@ END FUNCTION
 
 
 
-  
+
 
 FUNCTION cur_g(Gluons,NumGlu)!  note the off-shell gluon has be counted in NumGlu
 implicit none
@@ -1841,9 +1893,9 @@ END FUNCTION
           endif ! endif for flavor consisency condition
       end function bf
 
-      
-      
-      
+
+
+
 
 
 FUNCTION cur_g_2f(Gluons,Quarks,NumGlu) result(Res)           ! Gluons(:) does not include the OFF-shell gluon,  however NumGlu(0) is the number of all gluons
@@ -1947,7 +1999,7 @@ return
 END FUNCTION
 
 
-      
+
 
 
 FUNCTION cur_g_2fV(Gluons,Quarks,Boson,NumGlu) result(Res)           ! Gluons(:) does not include the OFF-shell gluon,  however NumGlu(0) is the number of all gluons
@@ -2065,7 +2117,7 @@ integer :: PartKey,HelKey,CurrKey,Hel_Tmp
       else
          Eps1(:)= Eps1(:) + vbqq(Dv,u1,ubar2)
       endif
-! 
+!
 
       PMom3(:) = Quarks(1)%Mom(:)+Quarks(2)%Mom(:) + SumMom(Gluons,n1a+1,NumGlu(1)+NumGlu(2)+n3a) + Boson%Mom(:)
       counter=1
@@ -2096,13 +2148,13 @@ integer :: PartKey,HelKey,CurrKey,Hel_Tmp
       endif
 
       Res(:) = Res(:) + Eps2(:)
-        
+
    enddo
    enddo
    enddo
 
 
-   
+
 return
 END FUNCTION
 
@@ -2181,7 +2233,7 @@ END FUNCTION
 
 
 
-      
+
 
 
 FUNCTION cur_g_4f(Gluons,Quarks,NumGlu) result(res)           ! Gluons(:) does not include the OFF-shell gluon,  however NumGlu is the number of all gluons
@@ -2689,7 +2741,7 @@ integer :: rIn,rOut,i,counter
             Res(:) = Res(:) + tmp(:)
 
 !             Res2(:) = Res2(:) + tmp(:)
-            
+
 !             print *, "2",tmp(:)
          enddo
       enddo
@@ -2844,7 +2896,7 @@ integer :: rIn,rOut,i,counter
             rIn = n1a+1
             rOut= NumGlu(1)+NumGlu(2)+n3a
 
-            
+
             Eps2 = cur_g_2f(Gluons(rIn:rOut),Quarks(2:3),(/1+n1b+NumGlu(2)+n3a,n1b,NumGlu(2),n3a/))
             PMom1(:) = SumMom(Gluons,rIn,rOut) + Quarks(2)%Mom + Quarks(3)%Mom
             PropFac1 = (0d0,-1d0)/sc_(PMom1,PMom1)
@@ -2994,7 +3046,7 @@ complex(8) :: PMom4(1:Dv)
     if (Quarks(1)%PartType.eq.-Quarks(4)%PartType .and. Quarks(2)%PartType.eq.-Quarks(3)%PartType) then
        ! for this flavor structure, the BosonVertex implies the following:
        ! BV = 1 : Boson on quark 1 only
-       ! BV = 2 : Boson on both quarks 2 and 3 
+       ! BV = 2 : Boson on both quarks 2 and 3
        ! BV = 3 : Boson on quark 4 only
        ! See RR notes
 
@@ -3073,7 +3125,7 @@ complex(8) :: PMom4(1:Dv)
 !        type (2)
          do na=0,NumGlu(1)
          do nc=0,NumGlu(4)
-         do ne=0,NumGlu(5)        
+         do ne=0,NumGlu(5)
             nb=NumGlu(1)-na
             nd=NumGlu(4)-nc
             nf=NumGlu(5)-ne
@@ -3107,9 +3159,9 @@ complex(8) :: PMom4(1:Dv)
             endif
 
             if( Quarks(4)%PartType.lt.0 ) then
-              Eps1 = +vbqq(Dv,u1,ubar2)       
+              Eps1 = +vbqq(Dv,u1,ubar2)
             else
-              Eps1 = -vbqq(Dv,ubar2,u1)       
+              Eps1 = -vbqq(Dv,ubar2,u1)
             endif
 
             counter=1
@@ -3147,7 +3199,7 @@ complex(8) :: PMom4(1:Dv)
 
       endif ! BosonVertex
 
-      
+
       if (BosonVertex .eq. 1 .or. BosonVertex .eq. 2 .or. BosonVertex .eq. 3 ) then
 
          do na=0,NumGlu(1)
@@ -3172,7 +3224,7 @@ complex(8) :: PMom4(1:Dv)
             rIn = na+1
             rOut= NumGlu(1)+nc
             ubar2 = cur_f_2f(Gluons(rIn:rOut),Quarks(1:1),-Quarks(1)%PartType,(/nb+nc,nb,nc/))
-            PMom3 = SumMom(Gluons,rIn,rOut) + Quarks(1)%Mom 
+            PMom3 = SumMom(Gluons,rIn,rOut) + Quarks(1)%Mom
             PropFac3 = (0d0,1d0)/(sc_(PMom3,PMom3) - Quarks(1)%Mass2)
             if ( nb .ge. 1 .or. nc .ge. 1) then
                if( abs(sc_(PMom3,PMom3) - Quarks(1)%Mass2).lt.PropCut ) cycle
@@ -3227,7 +3279,7 @@ complex(8) :: PMom4(1:Dv)
 !        type (2)
          do na=0,NumGlu(1)
          do nc=0,NumGlu(4)
-         do ne=0,NumGlu(5)        
+         do ne=0,NumGlu(5)
             nb=NumGlu(1)-na
             nd=NumGlu(4)-nc
             nf=NumGlu(5)-ne
@@ -3283,7 +3335,7 @@ complex(8) :: PMom4(1:Dv)
               counter=counter+1
             enddo
             Eps2(:) = cur_g(TmpGluons(1:counter-1),1+na+nf+1)
-            
+
             if( na.ge.1 .or. nf.ge.1 ) then
                PropFac1 = (0d0,-1d0)/sc_(TmpMom1,TmpMom1)
                if( abs(sc_(TmpMom1,TmpMom1)).lt.PropCut ) cycle
@@ -3366,18 +3418,18 @@ complex(8) :: PMom4(1:Dv)
                    counter=counter+1
                 enddo
                 Eps2(:) = cur_g(TmpGluons(1:counter-1),1+na+nf+1)
-                
+
                 if( na.ge.1 .or. nf.ge.1 ) then
                    PropFac1 = (0d0,-1d0)/sc_(TmpMom1,TmpMom1)
                    if( abs(sc_(TmpMom1,TmpMom1)).lt.PropCut ) cycle
                    Eps2 = Eps2*PropFac1
                 endif
-                
+
                 Res = Res + Eps2
              enddo
              enddo
           enddo
-       endif   
+       endif
 
        if (BosonVertex .eq. 1) then
           do na=0,NumGlu(1)
@@ -3397,7 +3449,7 @@ complex(8) :: PMom4(1:Dv)
              else
                 u1 = (-spi2_(PMom2,u1) + Quarks(1)%Mass*u1 )*PropFac2
              endif
-             
+
              rIn = na+1
              rOut= NumGlu(1)+nc
              ubar2 = cur_f_2fV(Gluons(rIn:rOut),Quarks(1:1),-Quarks(1)%PartType,Boson,(/nb+nc,nb,nc/))
@@ -3409,13 +3461,13 @@ complex(8) :: PMom4(1:Dv)
              else
                 ubar2 = (+spb2_(ubar2,PMom3) + Quarks(1)%Mass*ubar2 )*PropFac3
              endif
-             
+
              if( Quarks(1)%PartType.lt.0 ) then
                 Eps1 = -vbqq(Dv,u1,ubar2)       ! re-checked
              else
                 Eps1 = +vbqq(Dv,ubar2,u1)       ! re-checked
              endif
-             
+
              counter=1
              rIn =1
              rOut=na
@@ -3436,13 +3488,13 @@ complex(8) :: PMom4(1:Dv)
                 counter=counter+1
              enddo
              Eps2(:) = cur_g(TmpGluons(1:counter-1),1+na+nf+1)
-             
+
              if( na.ge.1 .or. nf.ge.1 ) then
                 PropFac1 = (0d0,-1d0)/sc_(TmpMom1,TmpMom1)
                 if( abs(sc_(TmpMom1,TmpMom1)).lt.PropCut ) cycle
                 Eps2 = Eps2*PropFac1
              endif
-             
+
              Res = Res + Eps2
           enddo
        enddo
@@ -3458,7 +3510,7 @@ complex(8) :: PMom4(1:Dv)
        nb=NumGlu(1)-na
        nd=NumGlu(4)-nc
        nf=NumGlu(5)-ne
-       
+
        rIn = na+1
        rOut= NumGlu(1)+NumGlu(2)+NumGlu(3)+nc
        BosonVertex_mod=BosonVertex+1
@@ -3486,13 +3538,13 @@ complex(8) :: PMom4(1:Dv)
              ubar2 = (+spb2_(ubar2,PMom3) + Quarks(4)%Mass*ubar2 )*PropFac3
           endif
        endif
-       
+
        if( Quarks(4)%PartType.lt.0 ) then
           Eps1 = +vbqq(Dv,u1,ubar2)       ! re-checked
        else
           Eps1 = -vbqq(Dv,ubar2,u1)       ! re-checked
        endif
-       
+
        counter=1
        rIn =1
        rOut=na
@@ -3513,19 +3565,19 @@ complex(8) :: PMom4(1:Dv)
           counter=counter+1
        enddo
        Eps2(:) = cur_g(TmpGluons(1:counter-1),1+na+nf+1)
-       
+
        if( na.ge.1 .or. nf.ge.1 ) then
           PropFac1 = (0d0,-1d0)/sc_(TmpMom1,TmpMom1)
           if( abs(sc_(TmpMom1,TmpMom1)).lt.PropCut ) cycle
           Eps2 = Eps2*PropFac1
        endif
-       
+
        Res = Res + Eps2
     enddo
     enddo
     enddo
    endif
-      
+
    if (BosonVertex .eq. 1) then
 ! type(4)
       do na=0,NumGlu(1)
@@ -3547,7 +3599,7 @@ complex(8) :: PMom4(1:Dv)
          PropFac3 = (0d0,-1d0)/sc_(TmpMom1,TmpMom1)
          if( abs(sc_(TmpMom1,TmpMom1)).lt.PropCut ) cycle
          Eps1 = Eps1*PropFac3
-         
+
          rIn = NumGlu(1)+NumGlu(2)+ne+nf+1
          rOut= NumGlu(1)+NumGlu(2)+NumGlu(3)+nh
          u1 = cur_f_2f(Gluons(rIn:rOut),Quarks(3:3),-Quarks(3)%PartType,(/ng+nh,ng,nh/))
@@ -3574,7 +3626,7 @@ complex(8) :: PMom4(1:Dv)
                ubar2 = (+spb2_(ubar2,PMom4) + Quarks(4)%Mass*ubar2 )*PropFac4
             endif
          endif
-         
+
          if( Quarks(4)%PartType.lt.0 ) then
             Eps2 = +vbqq(Dv,u1,ubar2)       ! re-checked
          else
@@ -3584,8 +3636,8 @@ complex(8) :: PMom4(1:Dv)
          PropFac1 = (0d0,-1d0)/sc_(TmpMom2,TmpMom2)
          if( abs(sc_(TmpMom2,TmpMom2)).lt.PropCut ) cycle
          Eps2 = Eps2*PropFac1
-         
-         
+
+
          counter=1
          rIn =1
          rOut=na
@@ -3746,7 +3798,7 @@ complex(8) :: PMom4(1:Dv)
             if( abs(sc_(TmpMom1,TmpMom1)).lt.PropCut ) cycle
             Eps1 = Eps1*PropFac3
 
-            rIn = NumGlu(1)+NumGlu(2)+ne+nf+1 
+            rIn = NumGlu(1)+NumGlu(2)+ne+nf+1
             rOut= NumGlu(1)+NumGlu(2)+NumGlu(3)+NumGlu(4)+nj
             Eps2=cur_g_2fV(Gluons(rIn:rOut),Quarks(3:4),Boson,(/1+ng+nh+ni+nj,ng,nh,ni,nj /) )
             TmpMom2 = SumMom(Gluons,rIn,rOut) +Quarks(3)%Mom + Quarks(4)%Mom + Boson%Mom
@@ -3863,7 +3915,7 @@ integer :: rIn,rOut,i,counter
           print *, 'BosonVertex =', BosonVertex
        endif
     endif
-      
+
 
 ! probably some tag_Z checks are needed here: not yet implemented
 
@@ -3905,11 +3957,11 @@ integer :: rIn,rOut,i,counter
                   ubar1(:) = (+spb2_(ubar1,PMom2)+Quarks(2)%Mass*ubar1(:))*PropFac2
                endif
                if( Quarks(2)%PartType.lt.0 ) then
-                  ubar0(:) = vbqg(ubar1,eps2)   
+                  ubar0(:) = vbqg(ubar1,eps2)
                else
-                  ubar0(:) = vqg(ubar1,eps2)    
+                  ubar0(:) = vqg(ubar1,eps2)
                endif
-               
+
                rIn = n1a+1
                rOut= NumGlu(1)+NumGlu(2)+NumGlu(3)+NumGlu(4)+NumGlu(5)+n6a
                PMom1 = SumMom(Gluons,rIn,rOut) + Quarks(2)%Mom + Quarks(3)%Mom + Quarks(4)%Mom + Quarks(5)%Mom + Quarks(6)%Mom + Boson%Mom  ! can be simplified with PMom1(:)
@@ -3918,7 +3970,7 @@ integer :: rIn,rOut,i,counter
                   if( abs(sc_(PMom1,PMom1)-Quarks(2)%Mass2).lt.PropCut ) then
                      PropFac1=(0d0,0d0)
                   endif
-                  
+
                   if( Quarks(2)%PartType.lt.0 ) then
                      ubar0(:) = (-spi2_(PMom1,ubar0)+Quarks(2)%Mass*ubar0(:))*PropFac1
                   else
@@ -3969,7 +4021,7 @@ integer :: rIn,rOut,i,counter
                else
                   ubar0(:) = vqg(ubar1,eps2)       ! re-checked
                endif
-               
+
                rIn = n1a+1
                rOut= NumGlu(1)+NumGlu(2)+NumGlu(3)+NumGlu(4)+NumGlu(5)+n6a
                PMom1 = SumMom(Gluons,rIn,rOut) + Quarks(2)%Mom + Quarks(3)%Mom + Quarks(4)%Mom + Quarks(5)%Mom + Quarks(6)%Mom
@@ -4009,7 +4061,7 @@ integer :: rIn,rOut,i,counter
          enddo
       enddo
    endif
-   
+
 
 
 !   (A)
@@ -4033,7 +4085,7 @@ integer :: rIn,rOut,i,counter
          Eps2 = Eps2*PropFac1
          do n1a=0,NumGlu(1)
             n1b = NumGlu(1)-n1a
-            ! Fer2 
+            ! Fer2
             rIn =n1a+1
             rOut=NumGlu(1)+n2a
             ubar1(:) = cur_f_2f(Gluons(rIn:rOut),Quarks(2:2),-Quarks(2)%PartType,(/n1b+n2a,n1b,n2a/) )
@@ -4050,7 +4102,7 @@ integer :: rIn,rOut,i,counter
             if( Quarks(2)%PartType.lt.0 ) then
                ubar0(:) = vbqg(ubar1,eps2)
             else
-               ubar0(:) = vqg(ubar1,eps2) 
+               ubar0(:) = vqg(ubar1,eps2)
             endif
 
             rIn = n1a+1
@@ -4173,7 +4225,7 @@ integer :: rIn,rOut,i,counter
                   PropFac2 = (0d0,1d0)/(sc_(PMom2,PMom2) - Quarks(4)%Mass2)
                   if( abs(sc_(PMom2,PMom2) - Quarks(4)%Mass2).lt.PropCut ) cycle
                   u1 = (-spi2_(PMom2,u1) + Quarks(4)%Mass*u1 )*PropFac2
-                  ubar0 = vbqg(u1,eps2)   
+                  ubar0 = vbqg(u1,eps2)
                   rIn = NumGlu(1)+NumGlu(2)+NumGlu(3)+n4a+1
                   rOut= NumGlu(1)+NumGlu(2)+NumGlu(3)+NumGlu(4)+NumGlu(5)+n6a
                   PMom2 = PMom2 + SumMom(Gluons,rIn,rOut) + Quarks(5)%Mom + Quarks(6)%Mom
@@ -4186,7 +4238,7 @@ integer :: rIn,rOut,i,counter
                   PropFac2 = (0d0,1d0)/(sc_(PMom2,PMom2) - Quarks(4)%Mass2)
                   if( abs(sc_(PMom2,PMom2) - Quarks(4)%Mass2).lt.PropCut ) cycle
                   u1 = ( spb2_(u1,PMom2) + Quarks(4)%Mass*u1 )*PropFac2
-                  ubar0 = vqg(u1,eps2)    
+                  ubar0 = vqg(u1,eps2)
                   rIn = NumGlu(1)+NumGlu(2)+NumGlu(3)+n4a+1
                   rOut= NumGlu(1)+NumGlu(2)+NumGlu(3)+NumGlu(4)+NumGlu(5)+n6a
                   PMom2 = PMom2 + SumMom(Gluons,rIn,rOut) + Quarks(5)%Mom + Quarks(6)%Mom
@@ -4293,7 +4345,7 @@ integer :: rIn,rOut,i,counter
                   PropFac2 = (0d0,1d0)/(sc_(PMom2,PMom2) - Quarks(4)%Mass2)
                   if( abs(sc_(PMom2,PMom2) - Quarks(4)%Mass2).lt.PropCut ) cycle
                   u1 = (-spi2_(PMom2,u1) + Quarks(4)%Mass*u1 )*PropFac2
-                  ubar0 = vbqg(u1,eps2)   
+                  ubar0 = vbqg(u1,eps2)
                   rIn = NumGlu(1)+NumGlu(2)+NumGlu(3)+n4a+1
                   rOut= NumGlu(1)+NumGlu(2)+NumGlu(3)+NumGlu(4)+NumGlu(5)+n6a
                   PMom2 = PMom2 + SumMom(Gluons,rIn,rOut) + Quarks(5)%Mom + Quarks(6)%Mom
@@ -4306,7 +4358,7 @@ integer :: rIn,rOut,i,counter
                   PropFac2 = (0d0,1d0)/(sc_(PMom2,PMom2) - Quarks(4)%Mass2)
                   if( abs(sc_(PMom2,PMom2) - Quarks(4)%Mass2).lt.PropCut ) cycle
                   u1 = ( spb2_(u1,PMom2) + Quarks(4)%Mass*u1 )*PropFac2
-                  ubar0 = vqg(u1,eps2)    
+                  ubar0 = vqg(u1,eps2)
                   rIn = NumGlu(1)+NumGlu(2)+NumGlu(3)+n4a+1
                   rOut= NumGlu(1)+NumGlu(2)+NumGlu(3)+NumGlu(4)+NumGlu(5)+n6a
                   PMom2 = PMom2 + SumMom(Gluons,rIn,rOut) + Quarks(5)%Mom + Quarks(6)%Mom
@@ -4387,7 +4439,7 @@ integer :: rIn,rOut,i,counter
                    PMom2 = PMom2 + SumMom(Gluons,rIn,rOut) + Quarks(5)%Mom + Quarks(6)%Mom   + Boson%Mom! this PMom2 will be re-used below
                    if( n1a.ge.1 .or. n6b.ge.1 ) then
                        PropFac2 = (0d0,1d0)/(sc_(PMom2,PMom2) - Quarks(2)%Mass2)
-                       if( abs(sc_(PMom2,PMom2) - Quarks(2)%Mass2).lt.PropCut ) cycle                     
+                       if( abs(sc_(PMom2,PMom2) - Quarks(2)%Mass2).lt.PropCut ) cycle
                        ubar0 = (-spi2_(PMom2,ubar0) + Quarks(2)%Mass*ubar0 )*PropFac2
                    endif
                  elseif( Quarks(2)%PartType.gt.0 ) then
@@ -4413,7 +4465,7 @@ integer :: rIn,rOut,i,counter
                   PropFac2 = (0d0,1d0)/(sc_(PMom2,PMom2) - Quarks(4)%Mass2)
                   if( abs(sc_(PMom2,PMom2) - Quarks(4)%Mass2).lt.PropCut ) cycle
                   u1 = (-spi2_(PMom2,u1) + Quarks(4)%Mass*u1 )*PropFac2
-                  ubar0 = vbqg(u1,eps2)   
+                  ubar0 = vbqg(u1,eps2)
                   rIn = NumGlu(1)+NumGlu(2)+NumGlu(3)+n4a+1
                   rOut= NumGlu(1)+NumGlu(2)+NumGlu(3)+NumGlu(4)+NumGlu(5)+n6a
                   PMom2 = PMom2 + SumMom(Gluons,rIn,rOut) + Quarks(5)%Mom + Quarks(6)%Mom
@@ -4426,7 +4478,7 @@ integer :: rIn,rOut,i,counter
                   PropFac2 = (0d0,1d0)/(sc_(PMom2,PMom2) - Quarks(4)%Mass2)
                   if( abs(sc_(PMom2,PMom2) - Quarks(4)%Mass2).lt.PropCut ) cycle
                   u1 = ( spb2_(u1,PMom2) + Quarks(4)%Mass*u1 )*PropFac2
-                  ubar0 = vqg(u1,eps2)    
+                  ubar0 = vqg(u1,eps2)
                   rIn = NumGlu(1)+NumGlu(2)+NumGlu(3)+n4a+1
                   rOut= NumGlu(1)+NumGlu(2)+NumGlu(3)+NumGlu(4)+NumGlu(5)+n6a
                   PMom2 = PMom2 + SumMom(Gluons,rIn,rOut) + Quarks(5)%Mom + Quarks(6)%Mom
@@ -4464,8 +4516,8 @@ integer :: rIn,rOut,i,counter
          enddo
       enddo
    enddo
-   
-  
+
+
 endif
 
 
@@ -4473,7 +4525,7 @@ endif
 !   (D)
     if( Quarks(2)%PartType.eq.-Quarks(3)%PartType .AND. ( &
         (Quark1PartType.eq.-Quarks(4)%PartType .and. (Quarks(4)%ExtRef.ne.-1.or.tag_f.ne.1)) &
-   .OR. (Quark1PartType.eq.-Quarks(6)%PartType .and. (Quarks(6)%ExtRef.ne.-1.or.tag_f.ne.1))  )  & 
+   .OR. (Quark1PartType.eq.-Quarks(6)%PartType .and. (Quarks(6)%ExtRef.ne.-1.or.tag_f.ne.1))  )  &
    .AND. ( BosonVertex.eq.1  )  &
      ) then
 !       print *, 'D-1'
@@ -4551,7 +4603,7 @@ endif
                   ubar0 = vgq(eps2,u1)       ! re-checked
                   rIn = n1a+1
                   rOut= NumGlu(1)+NumGlu(2)+n3a
-                  PMom2 = PMom2 + SumMom(Gluons,rIn,rOut) + Quarks(2)%Mom + Quarks(3)%Mom 
+                  PMom2 = PMom2 + SumMom(Gluons,rIn,rOut) + Quarks(2)%Mom + Quarks(3)%Mom
                   if( n1a.ge.1 .or. n6b.ge.1  .or. BosonVertex.eq.1 .or. BosonVertex.eq.6 ) then
                       PropFac2 = (0d0,1d0)/(sc_(PMom2,PMom2) - Quarks(6)%Mass2)
                       if( abs(sc_(PMom2,PMom2) - Quarks(6)%Mass2).lt.PropCut ) cycle
@@ -4590,7 +4642,7 @@ endif
 !   (D)
     if( Quarks(2)%PartType.eq.-Quarks(3)%PartType .AND. ( &
         (Quark1PartType.eq.-Quarks(4)%PartType .and. (Quarks(4)%ExtRef.ne.-1.or.tag_f.ne.1)) &
-   .OR. (Quark1PartType.eq.-Quarks(6)%PartType .and. (Quarks(6)%ExtRef.ne.-1.or.tag_f.ne.1))  ) & 
+   .OR. (Quark1PartType.eq.-Quarks(6)%PartType .and. (Quarks(6)%ExtRef.ne.-1.or.tag_f.ne.1))  ) &
    .AND. ( BosonVertex.eq.2)  &
      ) then
 !       print *, 'D-2'
@@ -4827,9 +4879,9 @@ END FUNCTION
 
 
 
-      
-      
-      
+
+
+
 !---------------------------------------
 
 
@@ -4923,135 +4975,9 @@ END SUBROUTINE
 
 
 
-      
-      
+
+
 !---------------------------------------
-
-
-
-         subroutine spb2(Dv,Ds,sp,v,f)
-         implicit none
-         integer i,i1,i2,i3,Dv,Ds,imax
-         double complex sp(Ds),v(Dv),f(Ds)
-         double complex x0(4,4),xx(4,4),xy(4,4)
-         double complex xz(4,4),x5(4,4)
-         double complex y1,y2,y3,y4,bp,bm,cp,cm
-         double complex test(Ds)
-
-           imax = Ds/4
-
-           do i=1,imax
-           i1= 1+4*(i-1)
-           i2=i1+3
-
-           y1=sp(i1)
-           y2=sp(i1+1)
-           y3=sp(i1+2)
-           y4=sp(i1+3)
-
-           x0(1,i)=y1
-           x0(2,i)=y2
-           x0(3,i)=-y3
-           x0(4,i)=-y4
-
-           xx(1,i) = -y4
-           xx(2,i) = -y3
-           xx(3,i) = y2
-           xx(4,i) = y1
-
-           xy(1,i)=dcmplx(0d0,-1d0)*y4
-           xy(2,i)=dcmplx(0d0,1d0)*y3
-           xy(3,i)=dcmplx(0d0,1d0)*y2
-           xy(4,i)=dcmplx(0d0,-1d0)*y1
-
-           xz(1,i)=-y3
-           xz(2,i)=y4
-           xz(3,i)=y1
-           xz(4,i)=-y2
-
-           x5(1,i)=y3
-           x5(2,i)=y4
-           x5(3,i)=y1
-           x5(4,i)=y2
-
-           enddo
-
-           if (Dv.eq.4) then
-
-           do i=1,4
-
-           f(i)=v(1)*x0(i,1)-v(2)*xx(i,1)-v(3)*xy(i,1)-v(4)*xz(i,1)
-
-           enddo
-
-           endif
-
-           if (Dv.eq.6) then
-           bp = (v(5)+dcmplx(0d0,1d0)*v(6))
-           bm=(v(5)-dcmplx(0d0,1d0)*v(6))
-
-           do i=1,4
-
-           f(i)=v(1)*x0(i,1)-v(2)*xx(i,1)-v(3)*xy(i,1)-v(4)*xz(i,1)+bm*x5(i,2)
-
-            i1 = i+4
-
-            f(i1)= v(1)*x0(i,2)-v(2)*xx(i,2)-v(3)*xy(i,2)-v(4)*xz(i,2)-bp*x5(i,1)
-
-
-            enddo
-
-           endif
-
-           if (Dv.eq.8) then
-           bp=(v(5)+dcmplx(0d0,1d0)*v(6))
-           bm=(v(5)-dcmplx(0d0,1d0)*v(6))
-           cp=(v(7)+dcmplx(0d0,1d0)*v(8))
-           cm=(v(7)-dcmplx(0d0,1d0)*v(8))
-
-           do i=1,4
-
-           f(i)=v(1)*x0(i,1)-v(2)*xx(i,1)-v(3)*xy(i,1)-v(4)*xz(i,1)+bm*x5(i,2)-cm*x5(i,3)
-
-            i1 = i+4
-
-            f(i1)= v(1)*x0(i,2)-v(2)*xx(i,2)-v(3)*xy(i,2)-v(4)*xz(i,2)-bp*x5(i,1)+cm*x5(i,4)
-
-             i2 = i1+4
-
-             f(i2)=v(1)*x0(i,3)-v(2)*xx(i,3)-v(3)*xy(i,3)-v(4)*xz(i,3)+bm*x5(i,4)+cp*x5(i,1)
-
-              i3=i2+4
-
-              f(i3)=v(1)*x0(i,4)-v(2)*xx(i,4)-v(3)*xy(i,4)-v(4)*xz(i,4)-bp*x5(i,3)-cp*x5(i,2)
-
-              enddo
-
-              endif
-
-
-
-! if(Ds.eq.16) then
-!   test(:) = SpiVL(sp,v)
-!   print *, ""
-!   print *, "spb2",f(1:Ds)
-!   print *, "test",test(1:Ds)
-!   print *, "diff",test(1:Ds)-f(1:Ds)
-!   if( any( abs(test(1:Ds)-f(1:Ds) ).gt.1d-10  ) ) pause
-! endif
-
-
-
-
-               return
-               end SUBROUTINE
-
-
-
-
-
-
-
 
 
 
@@ -5179,7 +5105,7 @@ END SUBROUTINE
            end subroutine
 
 
-           
+
          function spi2_(v,sp)
          implicit none
          double complex, intent(in) :: sp(:),v(:)
@@ -5195,7 +5121,7 @@ END SUBROUTINE
 !  tmp = VSpiL(v,sp)
 !  print *, "diff1",tmp-spi2_
 ! pause
- 
+
         return
         end function
 
@@ -5210,9 +5136,128 @@ END SUBROUTINE
             SpiVL(2) = sp(2)*v(1) + sp(3)*(v(2) - (0d0,1d0)*v(3)) - sp(4)*v(4)
             SpiVL(3) =-sp(3)*v(1) - sp(2)*(v(2) + (0d0,1d0)*v(3)) - sp(1)*v(4)
             SpiVL(4) =-sp(4)*v(1) - sp(1)*(v(2) - (0d0,1d0)*v(3)) + sp(2)*v(4)
-        
+
       return
       end function
+
+
+
+subroutine spb2(Dv,Ds,sp,v,f)
+         implicit none
+         integer i,i1,i2,i3,Dv,Ds,imax
+         double complex sp(Ds),v(Dv),f(Ds)
+         double complex x0(4,4),xx(4,4),xy(4,4)
+         double complex xz(4,4),x5(4,4)
+         double complex y1,y2,y3,y4,bp,bm,cp,cm
+         double complex test(Ds)
+
+           imax = Ds/4
+
+           do i=1,imax
+           i1= 1+4*(i-1)
+           i2=i1+3
+
+           y1=sp(i1)
+           y2=sp(i1+1)
+           y3=sp(i1+2)
+           y4=sp(i1+3)
+
+           x0(1,i)=y1
+           x0(2,i)=y2
+           x0(3,i)=-y3
+           x0(4,i)=-y4
+
+           xx(1,i) = -y4
+           xx(2,i) = -y3
+           xx(3,i) = y2
+           xx(4,i) = y1
+
+           xy(1,i)=dcmplx(0d0,-1d0)*y4
+           xy(2,i)=dcmplx(0d0,1d0)*y3
+           xy(3,i)=dcmplx(0d0,1d0)*y2
+           xy(4,i)=dcmplx(0d0,-1d0)*y1
+
+           xz(1,i)=-y3
+           xz(2,i)=y4
+           xz(3,i)=y1
+           xz(4,i)=-y2
+
+           x5(1,i)=y3
+           x5(2,i)=y4
+           x5(3,i)=y1
+           x5(4,i)=y2
+
+           enddo
+
+           if (Dv.eq.4) then
+
+           do i=1,4
+
+           f(i)=v(1)*x0(i,1)-v(2)*xx(i,1)-v(3)*xy(i,1)-v(4)*xz(i,1)
+
+           enddo
+
+           endif
+
+           if (Dv.eq.6) then
+           bp = (v(5)+dcmplx(0d0,1d0)*v(6))
+           bm=(v(5)-dcmplx(0d0,1d0)*v(6))
+
+           do i=1,4
+
+           f(i)=v(1)*x0(i,1)-v(2)*xx(i,1)-v(3)*xy(i,1)-v(4)*xz(i,1)+bm*x5(i,2)
+
+            i1 = i+4
+
+            f(i1)= v(1)*x0(i,2)-v(2)*xx(i,2)-v(3)*xy(i,2)-v(4)*xz(i,2)-bp*x5(i,1)
+
+
+            enddo
+
+           endif
+
+           if (Dv.eq.8) then
+           bp=(v(5)+dcmplx(0d0,1d0)*v(6))
+           bm=(v(5)-dcmplx(0d0,1d0)*v(6))
+           cp=(v(7)+dcmplx(0d0,1d0)*v(8))
+           cm=(v(7)-dcmplx(0d0,1d0)*v(8))
+
+           do i=1,4
+
+           f(i)=v(1)*x0(i,1)-v(2)*xx(i,1)-v(3)*xy(i,1)-v(4)*xz(i,1)+bm*x5(i,2)-cm*x5(i,3)
+
+            i1 = i+4
+
+            f(i1)= v(1)*x0(i,2)-v(2)*xx(i,2)-v(3)*xy(i,2)-v(4)*xz(i,2)-bp*x5(i,1)+cm*x5(i,4)
+
+             i2 = i1+4
+
+             f(i2)=v(1)*x0(i,3)-v(2)*xx(i,3)-v(3)*xy(i,3)-v(4)*xz(i,3)+bm*x5(i,4)+cp*x5(i,1)
+
+              i3=i2+4
+
+              f(i3)=v(1)*x0(i,4)-v(2)*xx(i,4)-v(3)*xy(i,4)-v(4)*xz(i,4)-bp*x5(i,3)-cp*x5(i,2)
+
+              enddo
+
+              endif
+
+
+
+! if(Ds.eq.16) then
+!   test(:) = SpiVL(sp,v)
+!   print *, ""
+!   print *, "spb2",f(1:Ds)
+!   print *, "test",test(1:Ds)
+!   print *, "diff",test(1:Ds)-f(1:Ds)
+!   if( any( abs(test(1:Ds)-f(1:Ds) ).gt.1d-10  ) ) pause
+! endif
+
+
+
+
+               return
+end subroutine
 
 
         function spb2_(sp,v)
@@ -5235,7 +5280,7 @@ END SUBROUTINE
 
 
 
-          
+
           function psp1_(sp1,sp2) result(res)
           implicit none
           complex(8), intent(in) :: sp1(:)
@@ -5246,17 +5291,17 @@ END SUBROUTINE
 
            end function
 
-        
-        
-        
+
+
+
 ! RR -- new for D-dim chirality
              recursive function Chir(sign,sp) result(res)
                implicit none
                logical :: sign
                double complex :: sp(:)
-               double complex :: res(size(sp))               
+               double complex :: res(size(sp))
                integer        :: D
-               
+
                D = size(sp)
                if ( D .eq. 4) then
                   if(sign) then !omega_+
@@ -5278,8 +5323,8 @@ END SUBROUTINE
              end function Chir
 
 
-             
-             
+
+
              recursive function iChir(sign,sp) result(res)
 ! RR -- this function is needed for the electric and dipole moment like couplings,
 !!      which have a 1 +\- i*gamma5 (see 0811.3842)
@@ -5293,12 +5338,12 @@ END SUBROUTINE
                ci=(0d0,1d0)
                D = size(sp)
                if ( D .eq. 4) then
-                  if(sign) then !omega_+                                                                                                          
+                  if(sign) then !omega_+
                      res(1) = 0.5d0*(sp(1)+ci*sp(3))
                      res(2) = 0.5d0*(sp(2)+ci*sp(4))
                      res(3) = 0.5d0*(ci*sp(1)+sp(3))
                      res(4) = 0.5d0*(ci*sp(2)+sp(4))
-                  else !omega_-                                                                                                                   
+                  else !omega_-
                      res(1) = 0.5d0*(sp(1)-ci*sp(3))
                      res(2) = 0.5d0*(sp(2)-ci*sp(4))
                      res(3) = 0.5d0*(-ci*sp(1)+sp(3))
@@ -5313,16 +5358,16 @@ END SUBROUTINE
 
 
 
-      
+
       function vbqV(sp,e1,coupl_left,coupl_right)
       implicit none
       complex(8), intent(in) :: e1(:)
       complex(8), intent(in) :: sp(:)
       complex(8), intent(in) :: coupl_left,coupl_right
-      complex(8) :: vbqV(size(sp))       
+      complex(8) :: vbqV(size(sp))
 
 !            vbqV = -(0d0,1d0)*( coupl_left*Chir(.false.,spb2_(sp,e1)) + coupl_right*Chir(.true.,spb2_(sp,e1)) )
-           vbqV = -(0d0,1d0)*( coupl_left*Chir(.false.,sp) + coupl_right*Chir(.true.,sp) )  
+           vbqV = -(0d0,1d0)*( coupl_left*Chir(.false.,sp) + coupl_right*Chir(.true.,sp) )
 
       return
       end function
@@ -5334,12 +5379,12 @@ END SUBROUTINE
       complex(8), intent(in) :: e1(:)
       complex(8), intent(in) :: sp(:)
       complex(8), intent(in) :: coupl_left,coupl_right
-      complex(8) :: vVq(size(sp)) 
+      complex(8) :: vVq(size(sp))
 
-!            vVq = -(0d0,1d0)*( coupl_left*Chir(.true., spi2_(e1,sp)) + coupl_right*Chir(.false., spi2_(e1,sp)) )  
+!            vVq = -(0d0,1d0)*( coupl_left*Chir(.true., spi2_(e1,sp)) + coupl_right*Chir(.false., spi2_(e1,sp)) )
            vVq = -(0d0,1d0)*( coupl_left*Chir(.false.,sp) + coupl_right*Chir(.true.,sp) )
 
-           
+
       return
       end function
 
@@ -5357,7 +5402,7 @@ END SUBROUTINE
 
           return
           end function
-      
+
 
 
          subroutine rsc_(n,x,y,r)
@@ -5372,10 +5417,10 @@ END SUBROUTINE
             enddo
 
          return
-         end subroutine      
-             
+         end subroutine
 
-             
+
+
 
 
 
@@ -5465,7 +5510,7 @@ END SUBROUTINE
       end function vgbq
 
 
-      
+
 !       function vbqq(Dv,sp1,sp2)
 !       implicit none
 !       complex(8), intent(in) :: sp1(:), sp2(:)
@@ -5474,10 +5519,10 @@ END SUBROUTINE
 !       complex(8) :: vbqq(Dv)
 !       complex(8) :: rr, va(Dv),sp1a(size(sp1))
 !       real(8), parameter :: sqrt2 = 1.4142135623730950488016887242096980786d0
-! 
+!
 !           va=(0d0,0d0)
 !           vbqq=(0d0,0d0)
-! 
+!
 !           do i=1,Dv
 !              if (i.eq.1) then
 !                va(1)=(1d0,0d0)
@@ -5485,7 +5530,7 @@ END SUBROUTINE
 !                va(i)=(-1d0,0d0)
 !              endif
 !              sp1a=spb2_(sp1,va)
-! 
+!
 !              rr=(0d0,-1d0)/sqrt2*psp1_(sp1a,sp2)
 !              if (i.eq.1) then
 !                   vbqq = vbqq + rr*va
@@ -5494,7 +5539,7 @@ END SUBROUTINE
 !              endif
 !              va(i)=(0d0,0d0)
 !           enddo
-! 
+!
 !       end function vbqq
 
 
@@ -5510,16 +5555,16 @@ END SUBROUTINE
       real(8) :: va(1:4,1:4)
       real(8), parameter :: sqrt2 = 1.4142135623730950488016887242096980786d0
 
-         va(1,1:4)=(/+1d0,0d0,0d0,0d0/)      
-         va(2,1:4)=(/0d0,-1d0,0d0,0d0/)      
-         va(3,1:4)=(/0d0,0d0,-1d0,0d0/)      
+         va(1,1:4)=(/+1d0,0d0,0d0,0d0/)
+         va(2,1:4)=(/0d0,-1d0,0d0,0d0/)
+         va(3,1:4)=(/0d0,0d0,-1d0,0d0/)
          va(4,1:4)=(/0d0,0d0,0d0,-1d0/)
 
           do i=1,4
              sp1a=SpiVL(sp1,dcmplx(va(i,1:4)))
              vbqq(i) = (sp1a(1)*sp2(1)+sp1a(2)*sp2(2)+sp1a(3)*sp2(3)+sp1a(4)*sp2(4)) * (0d0,-1d0)/sqrt2
           enddo
-          
+
 
       end function vbqq
 
@@ -5534,9 +5579,9 @@ END SUBROUTINE
       complex(8) :: sp1a(4)
       real(8) :: va(1:4,1:4)
 
-         va(1,1:4)=(/+1d0,0d0,0d0,0d0/)      
-         va(2,1:4)=(/0d0,-1d0,0d0,0d0/)      
-         va(3,1:4)=(/0d0,0d0,-1d0,0d0/)      
+         va(1,1:4)=(/+1d0,0d0,0d0,0d0/)
+         va(2,1:4)=(/0d0,-1d0,0d0,0d0/)
+         va(3,1:4)=(/0d0,0d0,-1d0,0d0/)
          va(4,1:4)=(/0d0,0d0,0d0,-1d0/)
 
          do i=1,4
@@ -5550,59 +5595,9 @@ END SUBROUTINE
       end function vvbqq
 
 
-      
-      
-
-      
-! -- massless vector polarization subroutine
-  function pol_mless(p,i,outgoing)
-  implicit none
-    complex(8), intent(in)    :: p(4)
-    integer, intent(in)          :: i
-    logical, intent(in),optional :: outgoing
-    integer :: pol
-    real(8) :: p0,px,py,pz
-    real(8) :: pv,ct,st,cphi,sphi
-    complex(8) :: pol_mless(4)
-    real(8), parameter :: sqrt2 = 1.4142135623730950488016887242096980786d0
-
-    p0=dreal(p(1))
-    px=dreal(p(2))
-    py=dreal(p(3))
-    pz=dreal(p(4))
 
 
-    pv=sqrt(abs(p0**2))
-    ct=pz/pv
-    st=sqrt(abs(1.0d0-ct**2))
 
-    if ( st < 1d-7 ) then
-       cphi=1.0d0
-       sphi=0.0d0
-    else
-       cphi= px/pv/st
-       sphi= py/pv/st
-    endif
-
-
-    ! -- distinguish between positive and negative energies
-    if ( p0 > 0.0d0) then
-       pol=i
-    else
-       pol=-i
-    endif
-
-    ! -- take complex conjugate for outgoing
-    if (present(outgoing)) then
-       if (outgoing) pol = -pol
-    endif
-
-    pol_mless(1)=(0d0,0d0)
-    pol_mless(2)=ct*cphi/sqrt2 - (0d0,1d0)*pol*sphi/sqrt2
-    pol_mless(3)=ct*sphi/sqrt2 + (0d0,1d0)*pol*cphi/sqrt2
-    pol_mless(4)=-st/sqrt2
-
-  end function pol_mless
 
 
           subroutine ubarSpi_Dirac(p,m,i,f)

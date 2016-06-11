@@ -717,7 +717,7 @@ use ifport
       PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt  * PartChannelAvg
       if( iStore.ne.jStore ) PreFac = PreFac*2d0
 
-      call EvalAmp_SBFH_UnSymm_SA_Select_exact(MomExt,(/ghg2,ghg3,ghg4/),iPart_sel,jPart_sel,rPart_sel,sPart_sel,me2)
+      call EvalAmp_SBFH_UnSymm_SA_Select_exact(MomExt,iPart_sel,jPart_sel,rPart_sel,sPart_sel,me2)
       !write(6,*) me2(iPart_sel,jPart_sel)
       !pause
       me2 = me2 * (2d0/3d0*alphas**2)**2
@@ -901,7 +901,7 @@ END FUNCTION
 
    elseif( Process.eq.61 ) then
 
-      call EvalAmp_SBFH_UnSymm_SA_Select(MomExt,(/ghg2,ghg3,ghg4/),iPart_sel,jPart_sel,flavor_tag,iflip,me2)
+      call EvalAmp_SBFH_UnSymm_SA_Select(MomExt,iPart_sel,jPart_sel,flavor_tag,iflip,me2)
       me2 = me2 * (2d0/3d0*alphas**2)**2
 
       MY_IDUP(1:5) = (/LHA2M_ID(iPart_sel),LHA2M_ID(jPart_sel),LHA2M_ID(iPart_sel),LHA2M_ID(jPart_sel),Hig_/)! flavor default is out3=in1 out4=in2
@@ -1207,7 +1207,7 @@ IF( GENEVT ) THEN
 
 
    elseif( Process.eq.61 ) then
-      call EvalAmp_SBFH_UnSymm_SA(MomExt,(/ghg2,ghg3,ghg4/),me2)
+      call EvalAmp_SBFH_UnSymm_SA(MomExt,me2)
       me2 = me2 * (2d0/3d0*alphas**2)**2 !-- (alphas/sixpi gs^2)^2
       MY_IDUP(1:5)  = (/LHA2M_ID(iPartons(1)),LHA2M_ID(iPartons(2)),LHA2M_ID(iPartons(1)),LHA2M_ID(iPartons(2)),Hig_/)
 
@@ -1305,7 +1305,7 @@ ELSE! NOT GENEVT
    if( Process.eq.60 ) then
       call EvalAmp_WBFH_UnSymm_SA(MomExt,me2)
    elseif( Process.eq.61 ) then
-      call EvalAmp_SBFH_UnSymm_SA(MomExt,(/ghg2,ghg3,ghg4/),me2)
+      call EvalAmp_SBFH_UnSymm_SA(MomExt,me2)
       me2 = me2 * (2d0/3d0*alphas**2)**2
    endif
 
