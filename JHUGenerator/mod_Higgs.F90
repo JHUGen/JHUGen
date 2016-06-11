@@ -373,17 +373,16 @@
 ! Global normalization
          gZ_sq = 4.0_dp*pi*alpha_QED/4.0_dp/(one-sitW**2)/sitW**2
          if( VVMode.eq.ZZMode ) then!  Z decay
-              prefactor = 8d0*gZ_sq**2
+            prefactor = gZ_sq**2
          elseif( VVMode.eq.WWMode ) then !  W decay
-              prefactor = 8d0*gZ_sq**2
+            prefactor = gZ_sq**2
          elseif( VVMode.eq.ZgMode ) then !  Z+photon "decay"
-              prefactor = 8d0*gZ_sq ! Only single powers
+            prefactor = gZ_sq ! Only single powers
          elseif( VVMode.eq.ggMode ) then !  photon "decay"
-              prefactor = 8d0
+            prefactor = 1d0
          else
-              prefactor = 0d0
+            prefactor = 0d0
          endif
-         prefactor = prefactor * (alphas/(3.0_dp*pi*vev))**2
 
 ! ! MADGRAPH CHECK
 ! res=0d0
