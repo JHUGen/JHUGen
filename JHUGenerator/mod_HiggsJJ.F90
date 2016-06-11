@@ -7,7 +7,7 @@ module modHiggsJJ
   public :: EvalAmp_WBFH_UnSymm_SA,EvalAmp_WBFH_UnSymm_SA_Select,EvalAmp_WBFH_UnSymm_SA_Select_exact
   public :: EvalAmp_SBFH_UnSymm_SA,EvalAmp_SBFH_UnSymm_SA_Select,EvalAmp_SBFH_UnSymm_SA_Select_exact
   !public :: wrapHVV
-  public :: get_VBFchannelHash,get_VBFchannelHash_nosplit,get_HJJchannelHash,get_GENchannelHash
+  public :: get_VBFchannelHash,get_VBFchannelHash_nosplit,get_HJJchannelHash,get_HJJchannelHash_nosplit,get_GENchannelHash
 
   !-- general definitions, to be merged with Markus final structure
   real(dp), parameter :: nf = 5.0_dp
@@ -312,6 +312,96 @@ module modHiggsJJ
   end subroutine
 
 
+  subroutine get_HJJchannelHash_nosplit(ijSel,nijchannels)
+  implicit none
+  integer, intent(out) :: ijSel(1:121,1:3)
+  integer, intent(out) :: nijchannels
+
+      ijSel(  1,1:3) = (/ 0, 0, 1/)
+      ijSel(  2,1:3) = (/ 0, 0, 2/)
+      ijSel(  3,1:3) = (/ 2, 0, 1/)
+      ijSel(  4,1:3) = (/ 1, 0, 1/)
+      ijSel(  5,1:3) = (/ 0,-1, 1/)
+      ijSel(  6,1:3) = (/ 0,-2, 1/)
+      ijSel(  7,1:3) = (/ 3, 0, 1/)
+      ijSel(  8,1:3) = (/ 0,-3, 1/)
+      ijSel(  9,1:3) = (/ 4, 0, 1/)
+      ijSel( 10,1:3) = (/ 0,-4, 1/)
+      ijSel( 11,1:3) = (/ 5, 0, 1/)
+      ijSel( 12,1:3) = (/ 0,-5, 1/)
+      ijSel( 13,1:3) = (/ 2, 2, 1/)
+      ijSel( 14,1:3) = (/ 2, 1, 1/)
+      ijSel( 15,1:3) = (/ 2,-2, 1/)
+      ijSel( 16,1:3) = (/ 2,-2, 2/)
+      ijSel( 17,1:3) = (/ 2,-2, 3/)
+      ijSel( 18,1:3) = (/ 1,-1, 1/)
+      ijSel( 19,1:3) = (/ 1,-1, 2/)
+      ijSel( 20,1:3) = (/ 1,-1, 3/)
+      ijSel( 21,1:3) = (/ 2,-1, 1/)
+      ijSel( 22,1:3) = (/ 1, 1, 1/)
+      ijSel( 23,1:3) = (/ 3, 2, 1/)
+      ijSel( 24,1:3) = (/ 2,-3, 1/)
+      ijSel( 25,1:3) = (/ 4, 2, 1/)
+      ijSel( 26,1:3) = (/ 1,-2, 1/)
+      ijSel( 27,1:3) = (/ 2,-4, 1/)
+      ijSel( 28,1:3) = (/ 1,-3, 1/)
+      ijSel( 29,1:3) = (/ 2,-5, 1/)
+      ijSel( 30,1:3) = (/ 3, 1, 1/)
+      ijSel( 31,1:3) = (/ 5, 2, 1/)
+      ijSel( 32,1:3) = (/ 4, 1, 1/)
+      ijSel( 33,1:3) = (/ 1,-4, 1/)
+      ijSel( 34,1:3) = (/ 5, 1, 1/)
+      ijSel( 35,1:3) = (/ 1,-5, 1/)
+      ijSel( 36,1:3) = (/-1,-2, 1/)
+      ijSel( 37,1:3) = (/ 3,-1, 1/)
+      ijSel( 38,1:3) = (/ 3,-3, 1/)
+      ijSel( 39,1:3) = (/ 3,-3, 2/)
+      ijSel( 40,1:3) = (/ 3,-3, 3/)
+      ijSel( 41,1:3) = (/-2,-3, 1/)
+      ijSel( 42,1:3) = (/-1,-3, 1/)
+      ijSel( 43,1:3) = (/ 3,-2, 1/)
+      ijSel( 44,1:3) = (/-1,-1, 1/)
+      ijSel( 45,1:3) = (/ 4,-1, 1/)
+      ijSel( 46,1:3) = (/-2,-2, 1/)
+      ijSel( 47,1:3) = (/-1,-4, 1/)
+      ijSel( 48,1:3) = (/ 4,-2, 1/)
+      ijSel( 49,1:3) = (/-2,-4, 1/)
+      ijSel( 50,1:3) = (/ 5,-1, 1/)
+      ijSel( 51,1:3) = (/-1,-5, 1/)
+      ijSel( 52,1:3) = (/ 4,-4, 1/)
+      ijSel( 53,1:3) = (/ 4,-4, 2/)
+      ijSel( 54,1:3) = (/ 4,-4, 3/)
+      ijSel( 55,1:3) = (/ 4,-3, 1/)
+      ijSel( 56,1:3) = (/ 4, 3, 1/)
+      ijSel( 57,1:3) = (/ 3,-4, 1/)
+      ijSel( 58,1:3) = (/-2,-5, 1/)
+      ijSel( 59,1:3) = (/-3,-4, 1/)
+      ijSel( 60,1:3) = (/ 5,-2, 1/)
+      ijSel( 61,1:3) = (/ 3, 3, 1/)
+      ijSel( 62,1:3) = (/-3,-3, 1/)
+      ijSel( 63,1:3) = (/ 5, 3, 1/)
+      ijSel( 64,1:3) = (/ 3,-5, 1/)
+      ijSel( 65,1:3) = (/ 5,-3, 1/)
+      ijSel( 66,1:3) = (/-3,-5, 1/)
+      ijSel( 67,1:3) = (/ 5, 4, 1/)
+      ijSel( 68,1:3) = (/ 5,-4, 1/)
+      ijSel( 69,1:3) = (/-4,-5, 1/)
+      ijSel( 70,1:3) = (/ 4,-5, 1/)
+      ijSel( 71,1:3) = (/ 5,-5, 1/)
+      ijSel( 72,1:3) = (/ 5,-5, 2/)
+      ijSel( 73,1:3) = (/ 5,-5, 3/)
+      ijSel( 74,1:3) = (/-4,-4, 1/)
+      ijSel( 75,1:3) = (/ 4, 4, 1/)
+      ijSel( 76,1:3) = (/-5,-5, 1/)
+      ijSel( 77,1:3) = (/ 5, 5, 1/)
+
+      nijchannels=77
+
+      ijSel( 78:,:) = 0
+
+  return
+  end subroutine
+
 
   subroutine get_GENchannelHash(ijSel)
   implicit none
@@ -452,9 +542,8 @@ return
 
   !-- SM: |g2| = alphas/(six*pi)
   !-- g3 not supported yet
-  subroutine EvalAmp_SBFH_UnSymm_SA(p,ggcoupl,res)
+  subroutine EvalAmp_SBFH_UnSymm_SA(p,res)
     real(dp), intent(in) :: p(4,5)
-    complex(dp), intent(in) :: ggcoupl(2:4)
     real(dp), intent(out) :: res(-5:5,-5:5)
     real(dp) :: sprod(4,4)
     complex(dp) :: za(4,4), zb(4,4)
@@ -466,23 +555,23 @@ return
     call spinoru2(4,(/-p(:,1),-p(:,2),p(:,3),p(:,4)/),za,zb,sprod)
 
     !-- gg -> gg
-    call me2_ggggh(ggcoupl,1,2,3,4,za,zb,sprod,restmp)
+    call me2_ggggh(1,2,3,4,za,zb,sprod,restmp)
     restmp = restmp * avegg * SymmFac
     res(0,0) = res(0,0) + restmp
 
     !-- gg -> qqb
-    call me2_qbqggh(ggcoupl,4,3,1,2,za,zb,sprod,restmp)
+    call me2_qbqggh(4,3,1,2,za,zb,sprod,restmp)
     restmp = restmp * avegg
     res(0,0) = res(0,0) + restmp * nf
 
     !-- gq -> gq
-    call me2_qbqggh(ggcoupl,2,4,1,3,za,zb,sprod,restmp)
+    call me2_qbqggh(2,4,1,3,za,zb,sprod,restmp)
     restmp = restmp * aveqg
     do i = 1,5
        res(0,i) = res(0,i) + restmp
        res(0,-i) = res(0,-i) + restmp
     enddo
-    call me2_qbqggh(ggcoupl,1,4,2,3,za,zb,sprod,restmp)
+    call me2_qbqggh(1,4,2,3,za,zb,sprod,restmp)
     restmp = restmp * aveqg
     do i = 1,5
        res(i,0) = res(i,0) + restmp
@@ -490,7 +579,7 @@ return
     enddo
 
     !-- qqb -> gg
-    call me2_qbqggh(ggcoupl,1,2,3,4,za,zb,sprod,restmp)
+    call me2_qbqggh(1,2,3,4,za,zb,sprod,restmp)
     restmp = restmp * aveqq * SymmFac
     do i = 1,5
        res(i,-i) = res(i,-i) + restmp
@@ -498,19 +587,19 @@ return
     enddo
 
     !-- qqb -> qqb
-    call me2_qbqQBQ(ggcoupl,1,2,4,3,za,zb,sprod,restmp,restmpid)
+    call me2_qbqQBQ(1,2,4,3,za,zb,sprod,restmp,restmpid)
     restmp = restmpid * aveqq
     do i = 1,5
        res(i,-i) =res(i,-i) + restmp
     enddo
-    call me2_qbqQBQ(ggcoupl,2,1,4,3,za,zb,sprod,restmp,restmpid)
+    call me2_qbqQBQ(2,1,4,3,za,zb,sprod,restmp,restmpid)
     restmp = restmpid * aveqq
     do i = 1,5
        res(-i,i) =res(-i,i) + restmp
     enddo
 
     !-- qqb -> rrb
-    call me2_qbqQBQ(ggcoupl,1,2,4,3,za,zb,sprod,restmp,restmpid)
+    call me2_qbqQBQ(1,2,4,3,za,zb,sprod,restmp,restmpid)
     restmp = restmp * aveqq
     do i = 1,5
        res(i,-i) =res(i,-i) + restmp * (nf-1.0_dp)
@@ -518,14 +607,14 @@ return
     enddo
 
     !-- qrb -> qrb
-    call me2_qbqQBQ(ggcoupl,1,3,4,2,za,zb,sprod,restmp,restmpid)
+    call me2_qbqQBQ(1,3,4,2,za,zb,sprod,restmp,restmpid)
     restmp = restmp * aveqq
     do i = 1,5
        do j = 1,5
           if (i.ne.j) res(i,-j) = res(i,-j) + restmp
        enddo
     enddo
-    call me2_qbqQBQ(ggcoupl,2,3,4,1,za,zb,sprod,restmp,restmpid)
+    call me2_qbqQBQ(2,3,4,1,za,zb,sprod,restmp,restmpid)
     restmp = restmp * aveqq
     do i = 1,5
        do j = 1,5
@@ -534,7 +623,7 @@ return
     enddo
 
     !-- qq -> qq
-    call me2_qbqQBQ(ggcoupl,1,3,2,4,za,zb,sprod,restmp,restmpid)
+    call me2_qbqQBQ(1,3,2,4,za,zb,sprod,restmp,restmpid)
     restmp = restmpid * aveqq * SymmFac
     do i = 1,5
        res(i,i) = res(i,i) + restmp
@@ -542,7 +631,7 @@ return
     enddo
 
     !-- qr -> qr
-    call me2_qbqQBQ(ggcoupl,1,3,2,4,za,zb,sprod,restmp,restmpid)
+    call me2_qbqQBQ(1,3,2,4,za,zb,sprod,restmp,restmpid)
     restmp = restmp * aveqq
     do i = 1,5
        do j = 1,5
@@ -563,10 +652,9 @@ return
 
   !-- SM: |g2| = alphas/(six*pi)
   !-- g3 not supported yet
-  subroutine EvalAmp_SBFH_UnSymm_SA_Select(p,ggcoupl,iSel,jSel,flav_tag,iflip,res)
+  subroutine EvalAmp_SBFH_UnSymm_SA_Select(p,iSel,jSel,flav_tag,iflip,res)
     real(dp), intent(in) :: p(4,5)
     integer, intent(in) :: iSel,jSel,flav_tag
-    complex(dp), intent(in) :: ggcoupl(2:4)
     real(dp), intent(out) :: res(-5:5,-5:5)
     real(dp) :: sprod(4,4)
     complex(dp) :: za(4,4), zb(4,4)
@@ -580,7 +668,7 @@ return
 
     !-- gg -> gg
     if( iSel.eq.pdfGlu_ .and. jSel.eq.pdfGlu_ .and. flav_tag.eq.1 ) then
-        call me2_ggggh(ggcoupl,1,2,3,4,za,zb,sprod,restmp)
+        call me2_ggggh(1,2,3,4,za,zb,sprod,restmp)
         restmp = restmp * avegg * SymmFac
         res(iSel,jSel) = restmp
         return
@@ -589,7 +677,7 @@ return
 
     !-- gg -> qqb
     if( iSel.eq.pdfGlu_ .and. jSel.eq.pdfGlu_ .and. flav_tag.eq.2 ) then
-        call me2_qbqggh(ggcoupl,4,3,1,2,za,zb,sprod,restmp)
+        call me2_qbqggh(4,3,1,2,za,zb,sprod,restmp)
         restmp = restmp * avegg
         res(iSel,jSel) = restmp * nf
         return
@@ -599,7 +687,7 @@ return
 
     !-- gq -> gq
     if( iSel.eq.pdfGlu_ .and. jSel.ne.0 ) then
-        call me2_qbqggh(ggcoupl,2,4,1,3,za,zb,sprod,restmp)
+        call me2_qbqggh(2,4,1,3,za,zb,sprod,restmp)
         restmp = restmp * aveqg
         res(iSel,jSel) = restmp
         return
@@ -607,7 +695,7 @@ return
 
     if( jSel.eq.pdfGlu_ .and. iSel.ne.0 ) then
         iflip = 2
-        call me2_qbqggh(ggcoupl,1,4,2,3,za,zb,sprod,restmp)
+        call me2_qbqggh(1,4,2,3,za,zb,sprod,restmp)
         restmp = restmp * aveqg
         res(iSel,jSel) = restmp
         return
@@ -617,7 +705,7 @@ return
 
     !-- qqb -> gg
     if( iSel.ne.0 .and. jSel.eq.-iSel .and. flav_tag.eq.1 ) then
-        call me2_qbqggh(ggcoupl,1,2,3,4,za,zb,sprod,restmp)
+        call me2_qbqggh(1,2,3,4,za,zb,sprod,restmp)
         restmp = restmp * aveqq * SymmFac
         res(iSel,jSel) = restmp
         return
@@ -626,7 +714,7 @@ return
 
     !-- qqb -> qqb
     if( iSel.gt.0 .and. jSel.eq.-iSel .and. flav_tag.eq.2 ) then
-        call me2_qbqQBQ(ggcoupl,1,2,4,3,za,zb,sprod,restmp,restmpid)
+        call me2_qbqQBQ(1,2,4,3,za,zb,sprod,restmp,restmpid)
         restmp = restmpid * aveqq
         res(iSel,jSel) = restmp
         return
@@ -634,7 +722,7 @@ return
 
     if( iSel.lt.0 .and. jSel.eq.-iSel .and. flav_tag.eq.2 ) then
         iflip = 2
-        call me2_qbqQBQ(ggcoupl,2,1,4,3,za,zb,sprod,restmp,restmpid)
+        call me2_qbqQBQ(2,1,4,3,za,zb,sprod,restmp,restmpid)
         restmp = restmpid * aveqq
         res(iSel,jSel) = restmp
         return
@@ -643,7 +731,7 @@ return
 
     !-- qqb -> rrb
     if( iSel.ne.0 .and. jSel.eq.-iSel .and. flav_tag.eq.3 ) then
-        call me2_qbqQBQ(ggcoupl,1,2,4,3,za,zb,sprod,restmp,restmpid)
+        call me2_qbqQBQ(1,2,4,3,za,zb,sprod,restmp,restmpid)
         restmp = restmp * aveqq
         res(iSel,jSel) = restmp     * (nf-1.0_dp)
         return
@@ -653,7 +741,7 @@ return
 
     !-- qrb -> qrb
     if( iSel.gt.0 .and. jSel.lt.0 .and. iSel.ne.jSel ) then
-        call me2_qbqQBQ(ggcoupl,1,3,4,2,za,zb,sprod,restmp,restmpid)
+        call me2_qbqQBQ(1,3,4,2,za,zb,sprod,restmp,restmpid)
         restmp = restmp * aveqq
         res(iSel,jSel) = restmp
         return
@@ -661,7 +749,7 @@ return
 
     if( iSel.lt.0 .and. jSel.gt.0 .and. iSel.ne.jSel ) then
         iflip = 2
-        call me2_qbqQBQ(ggcoupl,2,3,4,1,za,zb,sprod,restmp,restmpid)
+        call me2_qbqQBQ(2,3,4,1,za,zb,sprod,restmp,restmpid)
         restmp = restmp * aveqq
         res(iSel,jSel) = restmp
         return
@@ -672,7 +760,7 @@ return
 
     !-- qq -> qq
     if( iSel.ne.0 .and. iSel.eq.jSel ) then
-        call me2_qbqQBQ(ggcoupl,1,3,2,4,za,zb,sprod,restmp,restmpid)
+        call me2_qbqQBQ(1,3,2,4,za,zb,sprod,restmp,restmpid)
         restmp = restmpid * aveqq * SymmFac
         res(iSel,jSel) = restmp
         return
@@ -682,14 +770,14 @@ return
 
     !-- qr -> qr
     if( iSel.gt.0 .and. jSel.gt.0 .and. iSel.ne.jSel ) then
-        call me2_qbqQBQ(ggcoupl,1,3,2,4,za,zb,sprod,restmp,restmpid)
+        call me2_qbqQBQ(1,3,2,4,za,zb,sprod,restmp,restmpid)
         restmp = restmp * aveqq
         res(iSel,jSel) = restmp
         return
     endif
 
     if( iSel.lt.0 .and. jSel.lt.0 .and. iSel.ne.jSel ) then
-        call me2_qbqQBQ(ggcoupl,1,3,2,4,za,zb,sprod,restmp,restmpid)
+        call me2_qbqQBQ(1,3,2,4,za,zb,sprod,restmp,restmpid)
         restmp = restmp * aveqq
         res(iSel,jSel) = restmp
         return
@@ -702,10 +790,9 @@ return
   end subroutine
 
 
-    subroutine EvalAmp_SBFH_UnSymm_SA_Select_exact(p,ggcoupl,iSel,jSel,rSel,sSel,res)
+    subroutine EvalAmp_SBFH_UnSymm_SA_Select_exact(p,iSel,jSel,rSel,sSel,res)
     real(dp), intent(in) :: p(4,5)
     integer, intent(in) :: iSel,jSel,rSel,sSel!,flavor_tag ! flavor_tag for TEST
-    complex(dp), intent(in) :: ggcoupl(2:4)
     real(dp), intent(out) :: res(-5:5,-5:5)
     real(dp) :: sprod(4,4)
     complex(dp) :: za(4,4), zb(4,4)
@@ -714,7 +801,6 @@ return
 	integer :: j1,j2,k1,k2
 	logical :: isGGGG,isQQGG,isQQQQ,isQQQQ_idQ
 
-	if( (abs(iSel).eq.pdfTop_ .or. abs(jSel).eq.pdfTop_) .or. (abs(rSel).eq.pdfTop_ .or. abs(sSel).eq.pdfTop_) ) return
 	restmp=0.0_dp
 	restmpid=0.0_dp
 	res(:,:)=0.0_dp
@@ -726,6 +812,7 @@ return
 	j2 = 0
 	k1 = 0
 	k2 = 0
+	if( (abs(iSel).eq.pdfTop_ .or. abs(jSel).eq.pdfTop_) .or. (abs(rSel).eq.pdfTop_ .or. abs(sSel).eq.pdfTop_) ) return
 
 	!print *, "Begin EvalAmp_SBFH_UnSymm_SA_Select_exact"
 	!print *, "iSel: ",iSel,", jSel: ",jSel," rSel: ",rSel," sSel: ",sSel
@@ -734,44 +821,44 @@ return
 	   if(jSel.eq.pdfGlu_) then ! gg
 	      if(rSel.eq.pdfGlu_ .and. sSel .eq. pdfGlu_) then ! gg->gg
 			 isGGGG=.true.
-		     j1=1
-	         j2=2
+		    j1=1
+          j2=2
 			 k1=3
 			 k2=4
 
 	      elseif(sSel.eq.(-rSel)) then ! gg->qqb/qbq
 			 isQQGG=.true.
-		     if(rSel.gt.0) then ! gg->qqb
-		        j1=4
+		    if(rSel.gt.0) then ! gg->qqb
+		       j1=4
 			    j2=3
-		     else ! gg->qbq
-		        j1=3
+		    else ! gg->qbq
+		       j1=3
 			    j2=4
 			 endif
-		     k1=1
-	         k2=2
+		       k1=1
+	          k2=2
 		  endif
 
 	   elseif(abs(jSel).eq.pdfUp_ .or. abs(jSel).eq.pdfChm_ .or. abs(jSel).eq.pdfDn_ .or. abs(jSel).eq.pdfStr_ .or. abs(jSel).eq.pdfBot_) then ! gq/gqb
-		  isQQGG=.true.
+		   isQQGG=.true.
 	      k1=1
 	      if(jSel.gt.0) then ! gq
 		     j1=2
 		     if(rSel.eq.iSel .and. sSel.eq.jSel) then ! gq->gq
 		        k2=3
-				j2=4
+				  j2=4
 			 elseif(sSel.eq.iSel .and. rSel.eq.jSel) then ! gq->qg
-			    j2=3
-				k2=4
+			     j2=3
+				  k2=4
 			 endif
 	      else ! gqb
 			 j2=2
-		     if(rSel.eq.iSel .and. sSel.eq.jSel) then ! gqb->gqb
+		    if(rSel.eq.iSel .and. sSel.eq.jSel) then ! gqb->gqb
 		        k2=3
-				j1=4
+				  j1=4
 			 elseif(sSel.eq.iSel .and. rSel.eq.jSel) then ! gqb->qbg
-			    j1=3
-				k1=4
+			     j1=3
+				  k2=4
 			 endif
 	      endif
 	   endif
@@ -792,10 +879,10 @@ return
 		     j2=1
 		     if(rSel.eq.iSel .and. sSel.eq.jSel) then ! qbg->qbg
 		        k2=4
-				j1=3
+				  j1=3
 			 elseif(sSel.eq.iSel .and. rSel.eq.jSel) then ! qbg->gqb
 			    j1=4
-				k1=3
+				 k2=3
 			 endif
 	      endif
 
@@ -893,36 +980,31 @@ return
 	   endif
 	endif
 
-!	if(j1.eq.0 .and. j2.eq.0 .and. k1.eq.0 .and. k2.eq.0) then
-!	   print *,"Could not recognize the incoming flavors!"
-!	   print *,"iSel: ",iSel,", jSel: ",jSel," rSel: ",rSel," sSel: ",sSel
-!	   print *,"j1: ",j1,", j2: ",j2," k1: ",k1," k2: ",k2
-!		if(isGGGG) then
-!			print *,"is gggg"
-!		endif
-!		if(isQQGG) then
-!			print *,"is qbqgg"
-!		endif
-!		if(isQQQQ) then
-!			print *,"is qbqQBQ"
-!		endif
-!		if(isQQQQ_idQ) then
-!			print *,"is qbqQBQ id"
-!		endif
-!	   isGGGG=.false.
-!	   isQQGG=.false.
-!	   isQQQQ=.false.
-!	   isQQQQ_idQ=.false.
-!	   return
-!	endif
+	if(j1.eq.0 .or. j2.eq.0 .or. k1.eq.0 .or. k2.eq.0) then
+	   print *,"Could not recognize the incoming flavors!"
+	   print *,"iSel: ",iSel,", jSel: ",jSel," rSel: ",rSel," sSel: ",sSel
+	   print *,"j1: ",j1,", j2: ",j2," k1: ",k1," k2: ",k2
+		if(isGGGG) then
+			print *,"is gggg"
+		endif
+		if(isQQGG) then
+			print *,"is qbqgg"
+		endif
+		if(isQQQQ) then
+			print *,"is qbqQBQ"
+		endif
+		if(isQQQQ_idQ) then
+			print *,"is qbqQBQ id"
+		endif
+	endif
 
     call spinoru2(4,(/-p(:,1),-p(:,2),p(:,3),p(:,4)/),za,zb,sprod)
 
 	if(isGGGG) then
-	   call me2_ggggh(ggcoupl,j1,j2,k1,k2,za,zb,sprod,restmp)
+	   call me2_ggggh(j1,j2,k1,k2,za,zb,sprod,restmp)
 	   restmp = restmp * avegg * SymmFac
 	elseif(isQQQQ) then
-        call me2_qbqQBQ(ggcoupl,j1,j2,k1,k2,za,zb,sprod,restmp,restmpid)
+        call me2_qbqQBQ(j1,j2,k1,k2,za,zb,sprod,restmp,restmpid)
         if(isQQQQ_idQ) then
 		   restmp = restmpid * aveqq
 		   if(iSel.eq.jSel) restmp = restmp * SymmFac
@@ -931,7 +1013,7 @@ return
 		   if(iSel .eq. (-jSel) .and. rSel .eq. (-sSel) .and. abs(iSel) .ne. abs(rSel)) restmp = restmp * (nf-1.0_dp)
 		endif
 	elseif(isQQGG) then
-	    call me2_qbqggh(ggcoupl,j1,j2,k1,k2,za,zb,sprod,restmp)
+	    call me2_qbqggh(j1,j2,k1,k2,za,zb,sprod,restmp)
 	    if( iSel.eq.pdfGlu_ .and. jSel.eq.pdfGlu_) then
 	       restmp = restmp * avegg * nf
 	    elseif( iSel.ne.pdfGlu_ .and. jSel.ne.pdfGlu_) then
@@ -2184,8 +2266,6 @@ return
     integer :: kz1, kz2, kw1, kw2
     logical :: ZZ_fusion,WW_fusion
 
-    if( (abs(iSel).eq.pdfTop_ .or. abs(jSel).eq.pdfTop_) .or. (abs(rSel).eq.pdfTop_ .or. abs(sSel).eq.pdfTop_) ) return
-
     !print *, "Begin EvalAmp_WBFH_UnSymm_SA_Select_exact"
     !print *, "iSel: ",iSel,", jSel: ",jSel," rSel: ",rSel," sSel: ",sSel
 
@@ -2203,6 +2283,9 @@ return
     jz2 = 2
     jw1 = jz1
     jw2 = jz2
+
+    if( (abs(iSel).eq.pdfTop_ .or. abs(jSel).eq.pdfTop_) .or. (abs(rSel).eq.pdfTop_ .or. abs(sSel).eq.pdfTop_) ) return
+    if( (abs(iSel).eq.pdfGlu_ .or. abs(jSel).eq.pdfGlu_) .or. (abs(rSel).eq.pdfGlu_ .or. abs(sSel).eq.pdfGlu_) ) return
 
     if( &
          (iSel.eq.rSel .and. jSel.eq.sSel) &
@@ -2855,8 +2938,7 @@ return
 
 
   !-- QCD amplitudes squared below
-  subroutine me2_ggggh(ggcoupl,j1,j2,j3,j4,za,zb,sprod,res)
-    complex(dp), intent(in) :: ggcoupl(2:4)
+  subroutine me2_ggggh(j1,j2,j3,j4,za,zb,sprod,res)
     integer, intent(in) :: j1,j2,j3,j4
     complex(dp), intent(in) :: za(4,4), zb(4,4)
     real(dp), intent(in) :: sprod(4,4)
@@ -2869,8 +2951,8 @@ return
 
     res = zero
 
-    scalar = ggcoupl(2)
-    pseudo = -ggcoupl(4)
+    scalar = ghg2
+    pseudo = -ghg4
 
     aphi1234 = A0phigggg_xxxx(j1,j2,j3,j4,za,zb,sprod)
     aphi1324 = A0phigggg_xxxx(j1,j3,j2,j4,za,zb,sprod)
@@ -2901,8 +2983,7 @@ return
 
   end subroutine me2_ggggh
 
-  subroutine me2_qbqggh(ggcoupl,j1,j2,j3,j4,za,zb,sprod,res)
-    complex(dp), intent(in) :: ggcoupl(2:4)
+  subroutine me2_qbqggh(j1,j2,j3,j4,za,zb,sprod,res)
     integer, intent(in) :: j1,j2,j3,j4
     complex(dp), intent(in) :: za(4,4), zb(4,4)
     real(dp), intent(in) :: sprod(4,4)
@@ -2916,8 +2997,8 @@ return
 
     res = zero
 
-    scalar = ggcoupl(2)
-    pseudo = -ggcoupl(4)
+    scalar = ghg2
+    pseudo = -ghg4
 
     aphi1234 = A0phiqbqgg_xxx(j1,j2,j3,j4,za,zb,sprod)
     aphi1243 = A0phiqbqgg_xxx(j1,j2,j4,j3,za,zb,sprod)
@@ -2946,8 +3027,7 @@ return
 
   end subroutine me2_qbqggh
 
-   subroutine me2_qbqQBQ(ggcoupl,j1,j2,j3,j4,za,zb,sprod,res_diff,res_id)
-    complex(dp), intent(in) :: ggcoupl(2:4)
+   subroutine me2_qbqQBQ(j1,j2,j3,j4,za,zb,sprod,res_diff,res_id)
     integer, intent(in) :: j1,j2,j3,j4
     complex(dp), intent(in) :: za(4,4), zb(4,4)
     real(dp), intent(in) :: sprod(4,4)
@@ -2961,8 +3041,8 @@ return
     res_diff = zero
     res_id = zero
 
-    scalar = ggcoupl(2)
-    pseudo = -ggcoupl(4)
+    scalar = ghg2
+    pseudo = -ghg4
 
     aphi_a = A0phiqbqQBQ_xx(j1,j2,j3,j4,za,zb,sprod)
     aphi_b = -A0phiqbqQBQ_xx(j1,j4,j3,j2,za,zb,sprod)
@@ -3161,12 +3241,6 @@ return
 
   !-------------------------------------------------------------------------
   !-- generic functions below
-  function scr(p1,p2)
-    real(dp), intent(in) :: p1(4), p2(4)
-    real(dp) :: scr
-    scr = p1(1)*p2(1)-p1(2)*p2(2)-p1(3)*p2(3)-p1(4)*p2(4)
-  end function scr
-
   !- MCFM spinors
   subroutine spinoru2(n,p,za,zb,s)
     implicit none

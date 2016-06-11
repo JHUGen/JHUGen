@@ -532,11 +532,13 @@ END SUBROUTINE
 
       if(H_DK.eqv..false.)then
         MATRIXELEMENT0=MATRIXELEMENT0 *PROP3
-      else
+      else if(id(8).ne.Not_a_particle_) then
         MATRIXELEMENT0=MATRIXELEMENT0 *PROP3 &
         *(gFFS*FFS(id(8), MomExt(:,8), helicity(8), id(9), MomExt(:,9), helicity(9)) &
          +gFFP*FFP(id(8), MomExt(:,8), helicity(8), id(9), MomExt(:,9), helicity(9)))&
-        *(0d0,-1d0)*m_bot/vev
+        *(-ci/vev*getMass(convertLHEreverse(id(8))))
+      else
+        MATRIXELEMENT0=czero
       endif
 
       return
@@ -1318,28 +1320,6 @@ END SUBROUTINE
       END subroutine VVS2
 
   !-- generic functions below
-  function scr(p1,p2)
-    real(8), intent(in) :: p1(4), p2(4)
-    real(8) :: scr
-    scr = p1(1)*p2(1)-p1(2)*p2(2)-p1(3)*p2(3)-p1(4)*p2(4)
-  end function scr
-
-  !-- generic functions below
-  function sc(p1,p2)
-    complex(8), intent(in) :: p1(4), p2(4)
-    complex(8) :: sc
-    sc = p1(1)*p2(1)-p1(2)*p2(2)-p1(3)*p2(3)-p1(4)*p2(4)
-  end function sc
-
-  !-- generic functions below
-  function scrc(p1,p2)
-    real(8), intent(in) :: p1(4)
-    complex(8), intent(in) :: p2(4)
-    complex(8) :: scrc
-    scrc = sc(dcmplx(p1(:)),p2)
-  end function scrc
-
-
   !- MCFM spinors in non-MCFM momentum convention
   subroutine spinoru2(n,p,za,zb,s)
     implicit none
