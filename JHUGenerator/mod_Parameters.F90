@@ -3,12 +3,12 @@ implicit none
 save
 !
 !
-character(len=6),parameter :: JHUGen_Version="v6.9.9"
+character(len=6),parameter :: JHUGen_Version="v7.0.0"
 !
 !
 !=====================================================
 !internal
-integer, public, parameter  :: dp = selected_real_kind(15)
+integer, public, parameter :: dp = selected_real_kind(15)
 real(8), public, parameter :: tol = 0.0000001d0
 integer, public, parameter :: ZZMode=00,ZgsMode=01,gsZMode=02,gsgsMode=03
 integer, public, parameter :: WWMode=10
