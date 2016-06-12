@@ -3,7 +3,9 @@ use ModParameters
 implicit none
 
 
-public :: EvalXSec_PP_TTBH, EvalXSec_PP_BBBH, EvalAmp_GG_TTBH, EvalAmp_QQB_TTBH, InitProcess_TTBH
+public :: EvalXSec_PP_TTBH, EvalXSec_PP_BBBH, EvalAmp_GG_TTBH, EvalAmp_QQB_TTBH
+public :: InitProcess_TTBH
+public :: ExitProcess_TTBH
 private
 
 integer,parameter :: ColorlessTag = 1
@@ -101,6 +103,7 @@ integer :: iq
       endif
    enddo
 
+   call ExitProcess_TTBH()
    RETURN
 END SUBROUTINE
 
@@ -225,6 +228,63 @@ RETURN
 END SUBROUTINE
 
 
+SUBROUTINE ExitProcess_TTBH()
+implicit none
+integer :: NumTrees, iTree
+
+
+! gg->ttbar+H
+  NumTrees=2
+  do iTree=1,NumTrees
+      !call UnLinkTreeParticles(TheTreeAmps_GG_TTBH(iTree))
+
+      if(allocated( TheTreeAmps_GG_TTBH(iTree)%NumGlu )) then
+         deallocate( TheTreeAmps_GG_TTBH(iTree)%NumGlu )
+      endif
+      if(allocated( TheTreeAmps_GG_TTBH(iTree)%PartRef )) then
+         deallocate( TheTreeAmps_GG_TTBH(iTree)%PartRef )
+      endif
+      if(allocated( TheTreeAmps_GG_TTBH(iTree)%PartType )) then
+         deallocate( TheTreeAmps_GG_TTBH(iTree)%PartType )
+      endif
+      if(allocated( TheTreeAmps_GG_TTBH(iTree)%Quarks )) then
+         deallocate( TheTreeAmps_GG_TTBH(iTree)%Quarks )
+      endif
+      if(allocated( TheTreeAmps_GG_TTBH(iTree)%Gluons )) then
+         deallocate( TheTreeAmps_GG_TTBH(iTree)%Gluons )
+      endif
+      if(allocated( TheTreeAmps_GG_TTBH(iTree)%Scalars )) then
+         deallocate( TheTreeAmps_GG_TTBH(iTree)%Scalars )
+      endif
+  enddo
+
+  NumTrees=1
+  do iTree=1,NumTrees
+      !call UnLinkTreeParticles(TheTreeAmps_QQB_TTBH(iTree))
+
+      if(allocated( TheTreeAmps_QQB_TTBH(iTree)%NumGlu )) then
+         deallocate( TheTreeAmps_QQB_TTBH(iTree)%NumGlu )
+      endif
+      if(allocated( TheTreeAmps_QQB_TTBH(iTree)%PartRef )) then
+         deallocate( TheTreeAmps_QQB_TTBH(iTree)%PartRef )
+      endif
+      if(allocated( TheTreeAmps_QQB_TTBH(iTree)%PartType )) then
+         deallocate( TheTreeAmps_QQB_TTBH(iTree)%PartType )
+      endif
+      if(allocated( TheTreeAmps_QQB_TTBH(iTree)%Quarks )) then
+         deallocate( TheTreeAmps_QQB_TTBH(iTree)%Quarks )
+      endif
+      if(allocated( TheTreeAmps_QQB_TTBH(iTree)%Gluons )) then
+         deallocate( TheTreeAmps_QQB_TTBH(iTree)%Gluons )
+      endif
+      if(allocated( TheTreeAmps_QQB_TTBH(iTree)%Scalars )) then
+         deallocate( TheTreeAmps_QQB_TTBH(iTree)%Scalars )
+      endif
+  enddo
+
+
+RETURN
+END SUBROUTINE
 
 
 
@@ -534,6 +594,50 @@ integer :: iPart,PartRef,PartType,ig,iq,ib,NPart,counterQ,counterG,LastQuark,Qua
 RETURN
 END SUBROUTINE
 
+
+
+!SUBROUTINE UnLinkTreeParticles(TheTreeAmp)
+!implicit none
+!type(TreeProcess) :: TheTreeAmp
+!integer :: iPart,PartType,PartRef,ig,iq,ib
+
+!  ig=0; iq=0; ib=0;
+!  do iPart=1,TheTreeAmp%NumPart
+!     PartRef = TheTreeAmp%PartRef(iPart)
+!     PartType = TheParticles(PartRef)%PartType
+
+!     if( PartType.eq.Glu_ ) then
+!           ig=ig+1
+!           nullify(TheTreeAmp%Gluons(ig)%PartType)
+!           nullify(TheTreeAmp%Gluons(ig)%ExtRef)
+!           nullify(TheTreeAmp%Gluons(ig)%Mass)
+!           nullify(TheTreeAmp%Gluons(ig)%Mass2)
+!           nullify(TheTreeAmp%Gluons(ig)%Helicity)
+!           nullify(TheTreeAmp%Gluons(ig)%Mom)
+!           nullify(TheTreeAmp%Gluons(ig)%Pol)
+!     elseif( IsAQuark(PartType) ) then ! PartType==Quark
+!           iq=iq+1
+!           nullify(TheTreeAmp%Quarks(iq)%PartType)
+!           nullify(TheTreeAmp%Quarks(iq)%ExtRef)
+!           nullify(TheTreeAmp%Quarks(iq)%Mass)
+!           nullify(TheTreeAmp%Quarks(iq)%Mass2)
+!           nullify(TheTreeAmp%Quarks(iq)%Helicity)
+!           nullify(TheTreeAmp%Quarks(iq)%Mom)
+!           nullify(TheTreeAmp%Quarks(iq)%Pol)
+!     elseif( IsABoson(PartType) ) then  ! PartType==Boson
+!           ib=ib+1
+!           nullify(TheTreeAmp%Boson%PartType)
+!           nullify(TheTreeAmp%Boson%ExtRef)
+!           nullify(TheTreeAmp%Boson%Mass)
+!           nullify(TheTreeAmp%Boson%Mass2)
+!           nullify(TheTreeAmp%Boson%Helicity)
+!           nullify(TheTreeAmp%Boson%Mom)
+!           nullify(TheTreeAmp%Boson%Pol)
+!     endif
+!  enddo
+
+!RETURN
+!END SUBROUTINE
 
 
 
