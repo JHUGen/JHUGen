@@ -3,7 +3,7 @@
 *     Calculational scheme for EW couplings                            *
 ************************************************************************
 c
-c     ewscheme=-1  : Old MCFM default 
+c     ewscheme=-1  : Old MCFM default
 c                    input values = Gf,alpha(m_Z),m_W,m_Z
 c                    output values = sin^2(theta_W),mtop
 c
@@ -61,7 +61,7 @@ c--- Masses: note that "mtausq" is typically used throughout the
 c--- program to calculate couplings that depend on the mass, while
 c--- "mtau" is the mass that appears in the rest of the matrix
 c--- elements and phase space (and may be set to zero in the program,
-c--- depending on the process number) 
+c--- depending on the process number)
 
       data mtau,mtausq/1.7768d0,3.15701824d0/
 c----   Note: after v5.6, the masses for top, bottom and charm quarks
@@ -76,7 +76,7 @@ c---    for Mw=80.399 GeV
 c--- Number of active flavours in the initial state: this parameter
 c--- may be changed in the program for some processes
       data nflav/5/
-c--- Masses below here are currently unused      
+c--- Masses below here are currently unused
       data md,mu,ms/5d-3,5d-3,1d-1/
       data mel,mmu/0.510997d-3,0.105658389d0/
       end
@@ -92,8 +92,12 @@ c--- Masses below here are currently unused
       common/cabib/Vud,Vus,Vub,Vcd,Vcs,Vcb
       data  Vud  ,  Vus  ,  Vub  ,
      .      Vcd  ,  Vcs  ,  Vcb
-     .   /0.97425d0,0.2253d0,0.0413d0,
-     .    0.225d0,0.986d0,0.0411d0/
+     .   /0.974285d0,0.22529d0,0.00362693741331522731d0,
+     .    0.225182d0,0.9734244d0,0.0416893794705567033/
+c      data  Vud  ,  Vus  ,  Vub  ,
+c     .      Vcd  ,  Vcs  ,  Vcb
+c     .   /0.97425d0,0.2253d0,0.0413d0,
+c     .    0.225d0,0.986d0,0.0411d0/
 c      data  Vud  ,  Vus  ,  Vub  ,
 c     .      Vcd  ,  Vcs  ,  Vcb
 c     .   /1d0,0d0,0.000d0,
