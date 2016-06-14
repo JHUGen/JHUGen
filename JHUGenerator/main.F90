@@ -1,6 +1,7 @@
-! If you use this program please cite Phys.Rev. D81 (2010) 075022; arXiv:1001.3396 [hep-ph],
-!                                     Phys.Rev. D86 (2012) 095031; arXiv:1208.4018 [hep-ph],
-!                                 and Phys.Rev. D89 (2014) 035007; arXiv:1309.4819 [hep-ph].
+! If you use this program please cite Phys.Rev. D81 (2010) 075022; arXiv:1001.3396  [hep-ph],
+!                                     Phys.Rev. D86 (2012) 095031; arXiv:1208.4018  [hep-ph],
+!                                     Phys.Rev. D89 (2014) 035007; arXiv:1309.4819  [hep-ph],
+!                                 and                              arXiv:1606.03107 [hep-ph].
 PROGRAM JHUGenerator
 #if compiler==1
 use ifport
@@ -3962,7 +3963,7 @@ integer :: stat
             write(io_LHEOutFile ,'(A)') '<LesHouchesEvents version="1.0">'
         endif
         write(io_LHEOutFile ,'(A)') '<!--'
-        write(io_LHEOutFile ,'(A,A6,A)') 'Output from the JHUGenerator ',trim(JHUGen_Version),' described in arXiv:1001.3396 [hep-ph],arXiv:1208.4018 [hep-ph],arXiv:1309.4819 [hep-ph]'
+        write(io_LHEOutFile ,'(A,A6,A)') 'Output from the JHUGenerator ',trim(JHUGen_Version),' described in arXiv:1001.3396 [hep-ph], arXiv:1208.4018 [hep-ph], arXiv:1309.4819 [hep-ph], arXiv:1606.03107 [hep-ph]'
 
         if( writegit ) then
             write(io_LHEOutFile,'(A)') ""
@@ -4604,9 +4605,10 @@ integer :: TheUnit
     write(TheUnit,"(A90)") " *          I. Anderson, S. Bolognesi, F. Caola, Y. Gao, A. Gritsan, Z. Guo,           *"
     write(TheUnit,"(A90)") " *        C. Martin, K. Melnikov, R.Rontsch, H. Roskes, U. Sarica, M. Schulze,         *"
     write(TheUnit,"(A90)") " *                   N. Tran, A. Whitbeck, M. Xiao, C. You, Y. Zhou                    *"
-    write(TheUnit,"(A90)") " *                Phys.Rev. D81 (2010) 075022;  arXiv:1001.3396 [hep-ph],              *"
-    write(TheUnit,"(A90)") " *                Phys.Rev. D86 (2012) 095031;  arXiv:1208.4018 [hep-ph],              *"
-    write(TheUnit,"(A90)") " *                Phys.Rev. D89 (2014) 035007;  arXiv:1309.4819 [hep-ph].              *"
+    write(TheUnit,"(A90)") " *               Phys.Rev. D81 (2010) 075022;  arXiv:1001.3396  [hep-ph],              *"
+    write(TheUnit,"(A90)") " *               Phys.Rev. D86 (2012) 095031;  arXiv:1208.4018  [hep-ph],              *"
+    write(TheUnit,"(A90)") " *               Phys.Rev. D89 (2014) 035007;  arXiv:1309.4819  [hep-ph],              *"
+    write(TheUnit,"(A90)") " *                                             arXiv:1606.03107 [hep-ph].              *"
     write(TheUnit,"(A90)") " *                                                                                     *"
     write(TheUnit,"(A90)") " ***************************************************************************************"
     write(TheUnit,"(A90)") " "
