@@ -991,13 +991,5 @@ end function Capitalize
 
     END SUBROUTINE EvaluateSpline
 
-function infinity()
-real :: infinity, x
-!http://stackoverflow.com/a/25996548/5228524
-
-    x = 0
-    infinity=-log(x)
-
-end function infinity
-
 END MODULE
+

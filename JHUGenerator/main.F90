@@ -235,7 +235,7 @@ logical :: SetZgammacoupling, Setgammagammacoupling
 logical :: SetAnomalousSpin1qq, Setspin1qqleft, Setspin1qqright, SetAnomalousSpin1ZZ
 logical :: SetAnomalousSpin2gg, SetAnomalousSpin2qq, Setspin2qqleft, Setspin2qqright,SetAnomalousSpin2ZZ
 logical :: SetAnomalousHff, Setkappa
-logical :: SetpTjetcut, Setetajetcut, SetdeltaRcut, Setetalepcut
+logical :: SetpTcut, SetdeltaRcut
 
    help = .false.
 
@@ -323,10 +323,8 @@ logical :: SetpTjetcut, Setetajetcut, SetdeltaRcut, Setetalepcut
    SetAnomalousHff=.false.
    Setkappa=.false.
 
-   SetpTjetcut=.false.
-   Setetajetcut=.false.
+   SetpTcut=.false.
    SetdeltaRcut=.false.
-   Setetalepcut=.false.
 
    DataFile="./data/output"
 
@@ -564,15 +562,11 @@ logical :: SetpTjetcut, Setetajetcut, SetdeltaRcut, Setetalepcut
     call ReadCommandLineArgument(arg, "kappa_tilde", success, kappa_tilde, success2=SetAnomalousHff)
 
     !cuts
-    call ReadCommandLineArgument(arg, "pTjetcut", success, pTjetcut, SetLastArgument, success2=SetpTjetcut)
+    call ReadCommandLineArgument(arg, "pTjetcut", success, pTjetcut, SetLastArgument, success2=SetpTcut)
     if( SetLastArgument ) pTjetcut = pTjetcut*GeV
-    call ReadCommandLineArgument(arg, "etajetcut", success, etajetcut, success2=Setetajetcut)
     call ReadCommandLineArgument(arg, "deltaRcut", success, Rjet, success2=SetdeltaRcut)
     call ReadCommandLineArgument(arg, "mJJcut", success, mJJcut, SetLastArgument)
     if( SetLastArgument ) mJJcut = mJJcut*GeV
-    call ReadCommandLineArgument(arg, "pTlepcut", success, pTlepcut, SetLastArgument)
-    if( SetLastArgument ) pTlepcut = pTlepcut*GeV
-    call ReadCommandLineArgument(arg, "etalepcut", success, etalepcut, success2=Setetalepcut)
     call ReadCommandLineArgument(arg, "VBF_m4l_min", success, m4l_minmax(1), SetLastArgument)
     if( SetLastArgument ) m4l_minmax(1) = m4l_minmax(1)*GeV
     call ReadCommandLineArgument(arg, "VBF_m4l_max", success, m4l_minmax(2), SetLastArgument)
@@ -730,18 +724,11 @@ logical :: SetpTjetcut, Setetajetcut, SetdeltaRcut, Setetalepcut
     endif
 
     !cut checks
-    if(.not.SetpTjetcut) then
+    if(.not.SetpTcut) then
         if(Process.eq.50) then
             pTjetcut = 0d0*GeV
         else
-            pTjetcut = 15d0*GeV
-        endif
-    endif
-    if(.not.Setetajetcut) then
-        if(Process.eq.66) then
-            etajetcut = 4d0
-        else
-            etajetcut = infinity()
+            pTjetcut=15d0*GeV
         endif
     endif
     if(.not.SetdeltaRcut) then
@@ -750,9 +737,6 @@ logical :: SetpTjetcut, Setetajetcut, SetdeltaRcut, Setetalepcut
         else
             Rjet = 0.3d0
         endif
-    endif
-    if(.not.Setetalepcut) then
-        etalepcut = infinity()
     endif
     if((Process.eq.60 .or. Process.eq.66) .and. includeGammaStar .and. pTjetcut.le.0d0) then
        print *, " Process=",Process," with off-shell photons requires a non-zero pT cut instead of photon mass cutoff. Current setting cut ",pTjetcut/GeV," GeV is not allowed."
@@ -4104,12 +4088,10 @@ character :: arg*(500)
     if( Process.eq.80 .or. Process.eq.110 .or. Process.eq.111 .or.Process.eq.112 .or. Process.eq.113 ) write(TheUnit,"(4X,A,F8.4,A,F6.4)") "Top quark mass=",m_top*100d0,", width=",Ga_top*100d0
     if( Process.eq.80 .or. Process.eq.110 .or. Process.eq.111 .or. Process.eq.112 .or. Process.eq.113) write(TheUnit,"(4X,A,I2)") "Top quark decay=",TOPDECAYS
     if( Process.eq.90 ) write(TheUnit,"(4X,A,F8.4,A,F6.4)") "Bottom quark mass=",m_top*100d0
-    if( (Process.eq.50 .and. (HasQuarkDecay(DecayMode1) .or. H_DK)) .or. &
-         Process.eq.60 .or. Process.eq.61 .or. Process.eq.62 .or. Process.eq.66 .or. Process.eq.90 .or. &
+    if( Process.eq.50 .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.62 .or. Process.eq.66 .or. Process.eq.90 .or. &
        ((Process.eq.80 .or. (Process.ge.110 .and. Process.le.113)) .and. m_Top.lt.10d0*GeV) ) then
         write(TheUnit,"(4X,A)") "Jet cuts:"
         write(TheUnit,"(12X,A,F8.2,A)") "pT >= ", pTjetcut/GeV, " GeV"
-        write(TheUnit,"(9X,A,F8.2)") "|eta| <= ", etajetcut
         if( Process.eq.50 .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.66 .or. Process.eq.80 .or. Process.eq.90) then
             write(TheUnit,"(8X,A,F8.2)") "DeltaR >= ", Rjet
             write(TheUnit,"(11X,A,F8.2,A)") "mJJ >= ", mJJcut/GeV, " GeV"
@@ -4117,11 +4099,6 @@ character :: arg*(500)
         if( Process.eq.66 ) then
             write(TheUnit,"(11X,A,F10.2,F10.2,A)") "m4l_min/max ", m4l_minmax(1)/GeV,m4l_minmax(2)/GeV, " GeV"
         endif
-    endif
-    if( Process.eq.50 .and. HasLeptonDecay(DecayMode1) ) then
-        write(TheUnit,"(4X,A)") "Lepton cuts:"
-        write(TheUnit,"(12X,A,F8.2,A)") "pT >= ", pTlepcut/GeV, " GeV"
-        write(TheUnit,"(9X,A,F8.2)") "|eta| <= ", etalepcut
     endif
     if( (ReadLHEFile) .and. (RequestNLeptons.gt.0) ) then
         if ( RequestOS .le. 0 ) then

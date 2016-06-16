@@ -1900,7 +1900,7 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, Higgs=5
 !           return
 !        endif
 
-       if(  pT_j1.lt.pTjetcut .or. pT_j2.lt.pTjetcut .or. abs(y_j1).gt.etajetcut .or. abs(y_j2).gt.etajetcut .or. m_jj.lt.mJJcut)  then
+       if(  pT_j1.lt.pTjetcut .or. pT_j2.lt.pTjetcut .or. m_jj.lt.mJJcut)  then
           applyPSCut=.true.
           return
        endif
@@ -2008,7 +2008,7 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
 !        endif
 
 
-        if( abs(y_j1).gt.etajetcut .or. abs(y_j2).gt.etajetcut ) then
+        if( abs(y_j1).gt.4d0 .or. abs(y_j2).gt.4d0 ) then
            applyPSCut=.true.
            return
         endif
@@ -2097,7 +2097,7 @@ logical :: applyPSCut
 integer :: NBin(:),NumPart!NumHadr,JetList(1:2),NJEt,PartList(1:2)
 !real(8) :: pT_lepM,pT_lepP,y_lepM,y_lepP,MomFerm(1:4),MomZ2(1:4),MomReso(1:4),CosTheta1,Phi,Phi1,signPhi,signPhi1
 !real(8) :: CosPhi_LepPZ,InvM_Lep,CosPhi_LepPlanes,CosThetaZ,CosThetaStar
-real(8) :: MomHadr(1:4,1:2),MomJet(1:4,1:2),pT_j1,eta_j1!,pT_j2,pT_3, pT_4,m_jj,dphi_jj
+real(8) :: MomHadr(1:4,1:2),MomJet(1:4,1:2),pT_j1!,pT_j2,pT_3, pT_4,m_jj,dphi_jj
 
 
 
@@ -2119,9 +2119,8 @@ applyPSCut = .false.
 !    endif
 
     pT_j1 = get_PT(MomJet(1:4,1))
-    eta_j1 = get_eta(MomJet(1:4,1))
 
-    if( pT_j1.lt.ptjetcut .or. abs(eta_j1).gt.etajetcut) then
+    if( pT_j1.lt.ptjetcut) then
     !print *, "cut",pT_j1
       applyPSCut=.true.
       return
@@ -2189,7 +2188,7 @@ applyPSCut = .false.
 
     m_jj = get_MInv( MomJet(1:4,1)+MomJet(1:4,2) )
 
-    if( pT_j1.lt.ptjetcut .or. pT_j2.lt.ptjetcut .or. abs(y_j1).gt.etajetcut .or. abs(y_j2).gt.etajetcut .or. m_jj.lt.mJJcut) then
+    if( pT_j1.lt.ptjetcut .or. pT_j2.lt.ptjetcut .or. m_jj.lt.mJJcut) then
       applyPSCut=.true.
       return
     endif
@@ -2213,7 +2212,7 @@ END SUBROUTINE
 
 
 
-SUBROUTINE Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut,eta1_input,eta2_input,useAonshell)
+SUBROUTINE Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut,useAonshell)
 use ModMisc
 use ModParameters
 implicit none
@@ -2221,12 +2220,10 @@ implicit none
 logical, optional :: useAonshell
 logical :: applyPSCut
 integer :: NumPart,NBin(:),id(:)
-real(8) :: m_jj,y_j1,y_j2,dphi_jj, m_ll, pt_V, pt_H, pt1, pt2, eta1, eta2, deltaR, m_Vstar, costheta1, costheta2, phistar1, phi
+real(8) :: m_jj,y_j1,y_j2,dphi_jj, m_ll, pt_V, pt_H, pt1, pt2, deltaR, m_Vstar, costheta1, costheta2, phistar1, phi
 double precision MomBoost(1:4), MomFerm(1:4), inv_mass(1:9), MomLeptX(1:4,1:4), ScatteringAxis(1:4), MomReso(1:4)
 double precision MomLeptPlane1(2:4), MomLeptPlane2(2:4), dummy(2:4), signPhi
 double precision, intent(in) :: MomExt(1:4,1:9)
-double precision :: MomExt_copy(1:4,1:9)
-real(8) :: eta1_input, eta2_input
 logical :: hasAonshell
 
      hasAonshell = .false.
@@ -2234,16 +2231,13 @@ logical :: hasAonshell
         hasAonshell=useAonshell
      endif
 
-     MomExt_copy(:,:) = MomExt(:,:)
-     call boost2Lab(eta1_input,eta2_input,9,MomExt_copy(1:4,1:9))
-
      applyPSCut = .false.
-     m_jj = get_MInv(MomExt_copy(1:4,5))
-     m_ll = get_MInv(MomExt_copy(1:4,4))
-     m_Vstar = get_MInv(MomExt_copy(1:4,3))
+     m_jj = get_MInv(MomExt(1:4,5))
+     m_ll = get_MInv(MomExt(1:4,4))
+     m_Vstar = get_MInv(MomExt(1:4,3))
 
-     pt_H = get_PT(MomExt_copy(1:4,5))
-     pt_V = get_PT(MomExt_copy(1:4,4))
+     pt_H = get_PT(MomExt(1:4,5))
+     pt_V = get_PT(MomExt(1:4,4))
 
      if(.not.hasAonshell) then
         if(m_ll.le.getMass(convertLHEreverse(id(6)))+getMass(convertLHEreverse(id(7))))then
@@ -2252,23 +2246,11 @@ logical :: hasAonshell
         if(includeGammaStar .and. .not.IsAWDecay(DecayMode1) .and. (m_ll.lt.MPhotonCutoff .or. m_Vstar.lt.MPhotonCutoff))then
            applyPSCut=.true.
         endif
-        pt1 = get_PT(MomExt_copy(1:4,6))
-        pt2 = get_PT(MomExt_copy(1:4,7))
-        eta1 = get_eta(MomExt_copy(1:4,6))
-        eta2 = get_eta(MomExt_copy(1:4,7))
         if(IsAQuark(convertLHEreverse(id(6)))) then
-           deltaR = get_R(MomExt_copy(1:4,6), MomExt_copy(1:4,7))
-           if(m_ll.lt.mJJcut .or. pt1.lt.ptjetcut .or. pt2.lt.ptjetcut .or. abs(eta1).gt.etajetcut .or. abs(eta2).gt.etajetcut .or. deltaR.lt.Rjet) then
-              applyPSCut=.true.
-           endif
-        endif
-        if(IsALepton(convertLHEreverse(id(6)))) then
-           if(pt1.lt.ptlepcut .or. abs(eta1).gt.etalepcut) then
-              applyPSCut=.true.
-           endif
-        endif
-        if(IsALepton(convertLHEreverse(id(7)))) then
-           if(pt2.lt.ptlepcut .or. abs(eta2).gt.etalepcut) then
+           pt1 = get_PT(MomExt(1:4,6))
+           pt2 = get_PT(MomExt(1:4,7))
+           deltaR = get_R(MomExt(1:4,6), MomExt(1:4,7))
+           if(m_ll.lt.mJJcut .or. pt1.lt.ptjetcut .or. pt2.lt.ptjetcut .or. deltaR.lt.Rjet) then
               applyPSCut=.true.
            endif
         endif
@@ -2282,12 +2264,10 @@ logical :: hasAonshell
            applyPSCut=.true.
         endif
         if(IsAQuark(convertLHEreverse(id(8)))) then
-           pt1 = get_PT(MomExt_copy(1:4,8))
-           pt2 = get_PT(MomExt_copy(1:4,9))
-           eta1 = get_eta(MomExt_copy(1:4,8))
-           eta2 = get_eta(MomExt_copy(1:4,9))
-           deltaR = get_R(MomExt_copy(1:4,8), MomExt_copy(1:4,9))
-           if(m_jj.lt.mJJcut .or. pt1.lt.ptjetcut .or. pt2.lt.ptjetcut .or. abs(eta1).gt.etajetcut .or. abs(eta2).gt.etajetcut .or. deltaR.lt.Rjet) then
+           pt1 = get_PT(MomExt(1:4,8))
+           pt2 = get_PT(MomExt(1:4,9))
+           deltaR = get_R(MomExt(1:4,8), MomExt(1:4,9))
+           if(m_jj.lt.mJJcut .or. pt1.lt.ptjetcut .or. pt2.lt.ptjetcut .or. deltaR.lt.Rjet) then
               applyPSCut=.true.
            endif
         endif
@@ -2415,7 +2395,7 @@ real(8) :: Mom(1:4,1:13),MomMELA(1:4,1:13)
 logical :: applyPSCut
 integer :: NBin(:)
 real(8) :: pT_t,pT_H,pT_tbar,MatElSq_H0,MatElSq_H1,D_0minus
-real(8) :: mt,mtbar,mttbar,mWp,mWm,pT_b,pT_l,pT_miss,eta_t,eta_tbar
+real(8) :: mt,mtbar,mttbar,mWp,mWm,pT_b,pT_l,pT_miss
 integer, parameter :: inLeft=1,inRight=2,Hbos=3,tbar=4,t=5,  bbar=6,Wm=7,lepM=8,nubar=9,  b=10,Wp=11,lepP=12,nu=13
 logical,save :: FirstTime=.true.
 
@@ -2424,8 +2404,6 @@ logical,save :: FirstTime=.true.
 
     pT_t = get_PT(Mom(1:4,t))
     pT_tbar = get_PT(Mom(1:4,tbar))
-    eta_t = get_eta(Mom(1:4,t))
-    eta_tbar = get_eta(Mom(1:4,tbar))
     pT_H = get_PT(Mom(1:4,Hbos))
     pT_b = get_PT(Mom(1:4,b))
     pT_l = get_PT(Mom(1:4,LepP))
@@ -2436,7 +2414,7 @@ logical,save :: FirstTime=.true.
     mWp = get_MInv(Mom(1:4,Wp))
     mWm = get_MInv(Mom(1:4,Wm))
 
-    if( m_Top.lt.10d0*GeV  .and. (pT_t.lt.pTjetcut .or. pT_tbar.lt.pTjetcut .or. abs(eta_t).gt.etajetcut .or. abs(eta_tbar).gt.etajetcut .or. mttbar.lt.mJJcut) ) applyPSCut=.true.
+    if( m_Top.lt.10d0*GeV  .and. (pT_t.lt.pTjetcut .or. pT_tbar.lt.pTjetcut .or. mttbar.lt.mJJcut) ) applyPSCut=.true.
 
 
 !     if( FirstTime ) then
@@ -2483,7 +2461,7 @@ implicit none
 real(8) :: Mom(1:4,1:11)
 logical :: applyPSCut
 integer :: NBin(:)
-real(8) :: pT_b,pT_H,pT_bbar,mbbbar,eta_b,eta_bbar
+real(8) :: pT_b,pT_H,pT_bbar,mbbbar
 integer, parameter :: bbar=4,b=5,Hbos=3,inLeft=1,inRight=2
 
 
@@ -2491,12 +2469,10 @@ integer, parameter :: bbar=4,b=5,Hbos=3,inLeft=1,inRight=2
 
     pT_b = get_PT(Mom(1:4,b))
     pT_bbar = get_PT(Mom(1:4,bbar))
-    eta_b = get_eta(Mom(1:4,b))
-    eta_bbar = get_eta(Mom(1:4,bbar))
     pT_H = get_PT(Mom(1:4,Hbos))
     mbbbar = get_MInv(Mom(1:4,b)+Mom(1:4,bbar))
 
-    if( pT_b.lt.pTjetcut .or. pT_bbar.lt.pTjetcut .or. abs(eta_b).gt.etajetcut .or. abs(eta_bbar).gt.etajetcut .or. mbbbar.lt.mJJcut) applyPSCut=.true.
+    if( pT_b.lt.pTjetcut .or. pT_bbar.lt.pTjetcut .or. mbbbar.lt.mJJcut) applyPSCut=.true.
 
 !   binning
     NBin(1)  = WhichBin(1,pT_b)
@@ -2535,7 +2511,7 @@ logical,save :: FirstTime=.true.
        y_j=get_eta(Mom(1:4,ljet))
 
 
-    if( m_Top.lt.10d0*GeV  .and. (pT_top.lt.pTjetcut .or. y_top.gt.etajetcut) ) applyPSCut=.true.
+    if( m_Top.lt.10d0*GeV  .and. (pT_top.lt.pTjetcut) ) applyPSCut=.true.
 
 
 
