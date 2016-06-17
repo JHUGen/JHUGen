@@ -540,7 +540,7 @@ return
 
 
 
-  !-- SM: |g2| = alphas/(six*pi)
+  !-- SM: |g2| = alphas/(six*pi), so multiply ME**2 by (|g2|*gs)**2
   !-- g3 not supported yet
   subroutine EvalAmp_SBFH_UnSymm_SA(p,res)
     real(dp), intent(in) :: p(4,5)
@@ -642,6 +642,7 @@ return
        enddo
     enddo
 
+    res(:,:) = res(:,:) * (2d0/3d0*alphas**2)**2
     return
 
   end subroutine EvalAmp_SBFH_UnSymm_SA
@@ -650,7 +651,7 @@ return
 
 
 
-  !-- SM: |g2| = alphas/(six*pi)
+  !-- SM: |g2| = alphas/(six*pi), so multiply ME**2 by (|g2|*gs)**2
   !-- g3 not supported yet
   subroutine EvalAmp_SBFH_UnSymm_SA_Select(p,iSel,jSel,flav_tag,iflip,res)
     real(dp), intent(in) :: p(4,5)
@@ -670,6 +671,7 @@ return
     if( iSel.eq.pdfGlu_ .and. jSel.eq.pdfGlu_ .and. flav_tag.eq.1 ) then
         call me2_ggggh(1,2,3,4,za,zb,sprod,restmp)
         restmp = restmp * avegg * SymmFac
+        restmp = restmp * (2d0/3d0*alphas**2)**2
         res(iSel,jSel) = restmp
         return
     endif
@@ -679,6 +681,7 @@ return
     if( iSel.eq.pdfGlu_ .and. jSel.eq.pdfGlu_ .and. flav_tag.eq.2 ) then
         call me2_qbqggh(4,3,1,2,za,zb,sprod,restmp)
         restmp = restmp * avegg
+        restmp = restmp * (2d0/3d0*alphas**2)**2
         res(iSel,jSel) = restmp * nf
         return
     endif
@@ -689,6 +692,7 @@ return
     if( iSel.eq.pdfGlu_ .and. jSel.ne.0 ) then
         call me2_qbqggh(2,4,1,3,za,zb,sprod,restmp)
         restmp = restmp * aveqg
+        restmp = restmp * (2d0/3d0*alphas**2)**2
         res(iSel,jSel) = restmp
         return
     endif
@@ -697,6 +701,7 @@ return
         iflip = 2
         call me2_qbqggh(1,4,2,3,za,zb,sprod,restmp)
         restmp = restmp * aveqg
+        restmp = restmp * (2d0/3d0*alphas**2)**2
         res(iSel,jSel) = restmp
         return
     endif
@@ -707,6 +712,7 @@ return
     if( iSel.ne.0 .and. jSel.eq.-iSel .and. flav_tag.eq.1 ) then
         call me2_qbqggh(1,2,3,4,za,zb,sprod,restmp)
         restmp = restmp * aveqq * SymmFac
+        restmp = restmp * (2d0/3d0*alphas**2)**2
         res(iSel,jSel) = restmp
         return
     endif
@@ -716,6 +722,7 @@ return
     if( iSel.gt.0 .and. jSel.eq.-iSel .and. flav_tag.eq.2 ) then
         call me2_qbqQBQ(1,2,4,3,za,zb,sprod,restmp,restmpid)
         restmp = restmpid * aveqq
+        restmp = restmp * (2d0/3d0*alphas**2)**2
         res(iSel,jSel) = restmp
         return
     endif
@@ -724,6 +731,7 @@ return
         iflip = 2
         call me2_qbqQBQ(2,1,4,3,za,zb,sprod,restmp,restmpid)
         restmp = restmpid * aveqq
+        restmp = restmp * (2d0/3d0*alphas**2)**2
         res(iSel,jSel) = restmp
         return
     endif
@@ -733,7 +741,8 @@ return
     if( iSel.ne.0 .and. jSel.eq.-iSel .and. flav_tag.eq.3 ) then
         call me2_qbqQBQ(1,2,4,3,za,zb,sprod,restmp,restmpid)
         restmp = restmp * aveqq
-        res(iSel,jSel) = restmp     * (nf-1.0_dp)
+        restmp = restmp * (2d0/3d0*alphas**2)**2
+        res(iSel,jSel) = restmp * (nf-1.0_dp)
         return
     endif
 
@@ -743,6 +752,7 @@ return
     if( iSel.gt.0 .and. jSel.lt.0 .and. iSel.ne.jSel ) then
         call me2_qbqQBQ(1,3,4,2,za,zb,sprod,restmp,restmpid)
         restmp = restmp * aveqq
+        restmp = restmp * (2d0/3d0*alphas**2)**2
         res(iSel,jSel) = restmp
         return
     endif
@@ -751,6 +761,7 @@ return
         iflip = 2
         call me2_qbqQBQ(2,3,4,1,za,zb,sprod,restmp,restmpid)
         restmp = restmp * aveqq
+        restmp = restmp * (2d0/3d0*alphas**2)**2
         res(iSel,jSel) = restmp
         return
     endif
@@ -762,6 +773,7 @@ return
     if( iSel.ne.0 .and. iSel.eq.jSel ) then
         call me2_qbqQBQ(1,3,2,4,za,zb,sprod,restmp,restmpid)
         restmp = restmpid * aveqq * SymmFac
+        restmp = restmp * (2d0/3d0*alphas**2)**2
         res(iSel,jSel) = restmp
         return
     endif
@@ -772,6 +784,7 @@ return
     if( iSel.gt.0 .and. jSel.gt.0 .and. iSel.ne.jSel ) then
         call me2_qbqQBQ(1,3,2,4,za,zb,sprod,restmp,restmpid)
         restmp = restmp * aveqq
+        restmp = restmp * (2d0/3d0*alphas**2)**2
         res(iSel,jSel) = restmp
         return
     endif
@@ -779,6 +792,7 @@ return
     if( iSel.lt.0 .and. jSel.lt.0 .and. iSel.ne.jSel ) then
         call me2_qbqQBQ(1,3,2,4,za,zb,sprod,restmp,restmpid)
         restmp = restmp * aveqq
+        restmp = restmp * (2d0/3d0*alphas**2)**2
         res(iSel,jSel) = restmp
         return
     endif
@@ -1023,6 +1037,7 @@ return
 		endif
 	endif
 
+   restmp = restmp * (2d0/3d0*alphas**2)**2
 	res(iSel,jSel) = restmp
 	return
   end subroutine

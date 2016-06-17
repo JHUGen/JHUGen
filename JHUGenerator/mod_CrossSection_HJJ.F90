@@ -720,7 +720,6 @@ use ifport
       call EvalAmp_SBFH_UnSymm_SA_Select_exact(MomExt,iPart_sel,jPart_sel,rPart_sel,sPart_sel,me2)
       !write(6,*) me2(iPart_sel,jPart_sel)
       !pause
-      me2 = me2 * (2d0/3d0*alphas**2)**2
    endif
 
    LO_Res_Unpol = me2(iPart_sel,jPart_sel) * pdf(LHA2M_pdf(iPart_sel),1)*pdf(LHA2M_pdf(jPart_sel),2)
@@ -902,7 +901,6 @@ END FUNCTION
    elseif( Process.eq.61 ) then
 
       call EvalAmp_SBFH_UnSymm_SA_Select(MomExt,iPart_sel,jPart_sel,flavor_tag,iflip,me2)
-      me2 = me2 * (2d0/3d0*alphas**2)**2
 
       MY_IDUP(1:5) = (/LHA2M_ID(iPart_sel),LHA2M_ID(jPart_sel),LHA2M_ID(iPart_sel),LHA2M_ID(jPart_sel),Hig_/)! flavor default is out3=in1 out4=in2
 
@@ -1208,7 +1206,6 @@ IF( GENEVT ) THEN
 
    elseif( Process.eq.61 ) then
       call EvalAmp_SBFH_UnSymm_SA(MomExt,me2)
-      me2 = me2 * (2d0/3d0*alphas**2)**2 !-- (alphas/sixpi gs^2)^2
       MY_IDUP(1:5)  = (/LHA2M_ID(iPartons(1)),LHA2M_ID(iPartons(2)),LHA2M_ID(iPartons(1)),LHA2M_ID(iPartons(2)),Hig_/)
 
       if( MY_IDUP(1).eq.Glu_ .and. MY_IDUP(2).eq.Glu_ ) then! gg->gg
@@ -1306,7 +1303,6 @@ ELSE! NOT GENEVT
       call EvalAmp_WBFH_UnSymm_SA(MomExt,me2)
    elseif( Process.eq.61 ) then
       call EvalAmp_SBFH_UnSymm_SA(MomExt,me2)
-      me2 = me2 * (2d0/3d0*alphas**2)**2
    endif
 
 

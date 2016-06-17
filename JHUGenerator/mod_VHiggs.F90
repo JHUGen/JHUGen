@@ -395,7 +395,7 @@ END SUBROUTINE
              current2=current2*gFFZ*dsqrt(scale_alpha_Z_nn)
            else
              current2=0d0
-             print *, "invalid final state"!, id(4:5)
+             print *, "invalid final state", id(6:7), helicity(6:7)
              stop
            endif
          endif
@@ -457,7 +457,7 @@ END SUBROUTINE
            current2=current2*gFFA*dsqrt(scale_alpha_Z_nn)
          else
            current2=0d0
-           print *, "invalid final state"!, id(4:5)
+           print *, "invalid final state", id(6:7), helicity(6:7)
            stop
          endif
       endif
