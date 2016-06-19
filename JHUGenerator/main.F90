@@ -2084,7 +2084,7 @@ character(len=160) :: EventLine(0:maxpart)
      FoundHiggsWidth=.false.
      InMadgraphMassBlock=.false.
      do while ( .not.FirstEvent )
-        read(16,fmt="(A160)",IOSTAT=stat,END=99) FirstLines
+        read(io_LHEOutFile,fmt="(A160)",IOSTAT=stat,END=99) FirstLines
 
         !Read the Higgs mass
         !JHUGen
@@ -2226,7 +2226,7 @@ character(len=160) :: EventLine(0:maxpart)
      InputFmt1 = ""
 
      do while ( .true. )
-         read(16,"(A)") EventLine(0)
+         read(io_LHEOutFile,"(A)") EventLine(0)
          if (UseUnformattedRead) then
              read(EventLine(0),*) EventNumPart
          else
@@ -2237,7 +2237,7 @@ character(len=160) :: EventLine(0:maxpart)
          endif
 !        read event lines
          do nline=1,EventNumPart
-            read(16,fmt="(A160)") EventLine(nline)
+            read(io_LHEOutFile,fmt="(A160)") EventLine(nline)
          enddo
          if( EventNumPart.lt.3 .or. EventNumPart.gt.maxpart ) then
             call Error("Number of particles in LHE input exceeds allowed limit",EventNumPart)
@@ -2262,7 +2262,7 @@ character(len=160) :: EventLine(0:maxpart)
          tries = 0
          do while (.true.)
               tries = tries +1
-              read(16,fmt="(A160)",IOSTAT=stat,END=98) OtherLines(1:160)
+              read(io_LHEOutFile,fmt="(A160)",IOSTAT=stat,END=98) OtherLines(1:160)
               if(OtherLines(1:30).eq."</LesHouchesEvents>") then
                   goto 98
               elseif( Index(OtherLines,"<event").ne.0 ) then
@@ -2305,7 +2305,7 @@ character(len=100), intent(out) :: BeginEventLine
      FirstEvent = .false.
      WroteHeader = .false.
      do while ( .not.FirstEvent )
-        read(16,fmt="(A160)",IOSTAT=stat,END=99) FirstLines
+        read(io_LHEOutFile,fmt="(A160)",IOSTAT=stat,END=99) FirstLines
         if ( FirstLines(1:4).eq."<!--" .and. .not.WroteHeader ) then
             call InitOutput(1d0, 1d14)
             WroteHeader = .true.
@@ -2428,7 +2428,7 @@ call InitReadLHE(BeginEventLine)
      do while ( .true. )
          NEvent=NEvent + 1
          LeptInEvent(:) = 0
-         read(16,"(A)") EventLine(0)
+         read(io_LHEOutFile,"(A)") EventLine(0)
          if (UseUnformattedRead) then
              read(EventLine(0),*) EventNumPart, EventProcessId, WeightScaleAqedAqcd
          else
@@ -2439,7 +2439,7 @@ call InitReadLHE(BeginEventLine)
          endif
 !        read event lines
          do nline=1,EventNumPart
-            read(16,fmt="(A160)") EventLine(nline)
+            read(io_LHEOutFile,fmt="(A160)") EventLine(nline)
          enddo
          if( EventNumPart.lt.3 .or. EventNumPart.gt.maxpart ) then
             call Error("Number of particles in LHE input exceeds allowed limit",EventNumPart)
@@ -2567,7 +2567,7 @@ call InitReadLHE(BeginEventLine)
          tries = 0
          do while (.true.)
               tries = tries +1
-              read(16,fmt="(A160)",IOSTAT=stat,END=99) OtherLines(1:160)
+              read(io_LHEOutFile,fmt="(A160)",IOSTAT=stat,END=99) OtherLines(1:160)
               if(OtherLines(1:30).eq."</LesHouchesEvents>") then
                   if( RequestNLeptons.gt.0 ) then
                     write(io_LHEOutFile,"(A)") "<!-- Lepton filter information:"
@@ -2677,7 +2677,7 @@ call InitReadLHE(BeginEventLine)
      NEvent=0
      do while ( .true. )
          NEvent=NEvent + 1
-         read(16,"(A)") EventLine(0)
+         read(io_LHEOutFile,"(A)") EventLine(0)
          if (UseUnformattedRead) then
              read(EventLine(0),*) EventNumPart, EventProcessId, WeightScaleAqedAqcd
          else
@@ -2689,7 +2689,7 @@ call InitReadLHE(BeginEventLine)
 
 !        read event lines
          do nline=1,EventNumPart
-            read(16,"(A)") EventLine(nline)
+            read(io_LHEOutFile,"(A)") EventLine(nline)
          enddo
          if( EventNumPart.lt.3 .or. EventNumPart.gt.maxpart ) then
             call Error("Number of particles in LHE input exceeds allowed limit",EventNumPart)
@@ -2983,7 +2983,7 @@ call InitReadLHE(BeginEventLine)
 
 !        read optional lines
          do while (.true.)
-              read(16,fmt="(A120)",IOSTAT=stat,END=99) PDFLine(1:120)
+              read(io_LHEOutFile,fmt="(A120)",IOSTAT=stat,END=99) PDFLine(1:120)
               if(PDFLine(1:30).eq."</LesHouchesEvents>") then
                   goto 99
               elseif( Index(PDFLine,"</event").ne.0 ) then
@@ -3919,10 +3919,10 @@ integer :: stat
         !  The Fortran interface was originally written in the era when PDFs could *only* be accessed by number rather than name. Accordingly it doesn't provide a way to look up the ID code, because it expects that you need to have known it in advance!
         !  We can add an ID-lookup function in the "new" Fortran interface for the next version, but I think for now this information isn't available other than through the C++ and Python APIs.
         !  Andy
-        open(unit=io_LHEInFile,file=trim(LHAPDF_DATA_PATH)//"/"//LHAPDFString,form='formatted',access= 'sequential',status='old')
+        open(unit=io_TmpFile,file=trim(LHAPDF_DATA_PATH)//"/"//LHAPDFString,form='formatted',access= 'sequential',status='old')
         pdfsup1 = -999
         do while( pdfsup1.lt.0 )
-            read(16,fmt="(A160)",IOSTAT=stat,END=99) ReadLines
+            read(io_TmpFile,fmt="(A160)",IOSTAT=stat,END=99) ReadLines
             if( ReadLines(1:8).eq."SetIndex" ) then
                 read(ReadLines(10:500),*) pdfsup1
                 pdfsup1 = pdfsup1 + LHAPDFMember
@@ -3930,9 +3930,10 @@ integer :: stat
             endif
         enddo
 99      CONTINUE
+        close(io_TmpFile)
         if( pdfsup1.lt.0 ) then
             print *, "Error: couldn't get the PDF set index.  Writing 0."
-            pdfsup2 = 0
+            pdfsup1 = 0
         endif
         pdfsup2 = pdfsup1
 #else
