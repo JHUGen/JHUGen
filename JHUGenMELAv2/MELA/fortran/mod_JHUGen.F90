@@ -1,0 +1,212 @@
+MODULE ModJHUGen
+   use ModParameters
+   use ModJHUGenMELA
+   use ModKinematics
+#if compiler==1
+   use ifport
+#endif
+   implicit none
+
+   public :: InitFirstTime,ResetPDFs
+
+   CONTAINS
+
+
+
+SUBROUTINE InitFirstTime(pdftable,pdfstrlength,pdfmember)
+   use ModParameters
+   use ModKinematics
+   use ModMisc
+   implicit none
+   integer :: pdfstrlength
+   character(len=pdfstrlength) pdftable
+   integer :: pdfmember
+
+   Collider=1
+   VegasIt1=-1
+   VegasNc0=-1
+   VegasNc1=-1
+   VegasNc2=-1
+   PChannel=2
+
+   includeInterference=.true.
+   includeGammaStar=.true.
+   DecayMode1=0  ! Z/W+
+   DecayMode2=0  ! Z/W-
+   WidthScheme=0
+   TopDecays=-1
+   TauDecays=-1
+   Process = 0   ! select 0, 1 or 2 to represent the spin of the resonance
+   PDFSet=3      ! 1: CTEQ6L1   2: MRSW with best fit, 2xx: MSTW with eigenvector set xx=01..40
+   LHAPDFString = pdftable
+   LHAPDFMember = pdfmember
+   lenLHAPDFString = pdfstrlength
+
+   MuFacMultiplier = 1d0
+   MuRenMultiplier = 1d0
+   FacScheme = kRenFacScheme_default
+   RenScheme = kRenFacScheme_default
+
+   call ResetMubarHGabarH()
+
+!---------------------------
+   call PrintLogo(io_stdout)
+!---------------------------
+
+#if useLHAPDF==1
+   if( LHAPDFString.eq."" ) then
+      print *, "Need to specify pdf file for LHAPDF"
+      stop
+   endif
+#else
+   if( LHAPDFString.eq."" .and. PDFSet.eq.3) then
+      print *, "Need to specify pdf file for NNPDF"
+      stop
+   endif
+#endif
+
+   if( IsAZDecay(DecayMode1) ) then
+      M_V = M_Z
+      Ga_V= Ga_Z
+   elseif( IsAWDecay(DecayMode1) ) then
+      M_V = M_W
+      Ga_V= Ga_W
+   elseif( IsAPhoton(DecayMode1) ) then
+      M_V = 0d0
+      Ga_V= 0d0
+   endif
+
+   call InitPDFs()
+   IF( COLLIDER.EQ.1) THEN
+      Collider_Energy  = LHC_Energy
+   ELSE
+      print *,"Collider not implemented."
+      stop
+   ENDIF
+   return
+
+END SUBROUTINE
+
+
+
+SUBROUTINE InitPDFValues()
+   use ModParameters
+   use ModKinematics
+   implicit none
+
+#if useLHAPDF==0
+   IF (alphas_mz .LE. 0d0) THEN
+      WRITE(6,*) 'alphas_mz .le. 0:',alphas_mz
+      WRITE(6,*) 'continuing with alphas_mz=0.118'
+      alphas_mz=0.118d0
+   ENDIF
+#endif
+
+   Mu_Fact = M_Reso ! Set pdf scale to resonance mass by default, later changed as necessary in the EvalWeighted/EvalUnweighted subroutines
+	Mu_Ren = M_Reso ! Set renorm. scale to resonance mass by default, later changed as necessary in the EvalWeighted/EvalUnweighted subroutines
+   call EvalAlphaS() ! Set alphas at default Mu_Ren. Notice ModParameters::ComputeQCDVariables is automatically called!
+   return
+END SUBROUTINE
+
+SUBROUTINE InitPDFs()
+
+   use ModParameters
+   use ModKinematics
+   implicit none
+
+#if useLHAPDF==1
+
+   implicit none
+   DOUBLE PRECISION alphasPDF
+
+     call InitPDFset(trim(LHAPDFString,lenLHAPDFString)) ! Let LHAPDF handle everything
+     call InitPDF(LHAPDFMember)
+
+     alphas_mz=alphasPDF(zmass_pdf)
+     ! Dummy initialization, just in case. These values are not used.
+     !nloops_pdf = 1
+     zmass_pdf = M_Z
+
+#else
+
+     zmass_pdf = M_Z ! Take zmass_pdf=M_Z in pdfs that do not specify this value
+
+     if( PDFSet.eq.1 ) then ! CTEQ6L1
+        call SetCtq6(4)  ! 4    CTEQ6L1  Leading Order cteq6l1.tbl
+
+        alphas_mz=0.130d0
+        !nloops_pdf=1
+     elseif( PDFSet.eq.3 ) then  ! NNPDF 3.0 LO with a_s=0.13
+        call NNPDFDriver(LHAPDFString,lenLHAPDFString)
+        call NNinitPDF(LHAPDFMember)
+
+        alphas_mz=0.130d0
+        !nloops_pdf=1
+        zmass_pdf=91.199996948242188d0*GeV
+     elseif( (PDFSet.eq.2) .or. (PDFSet.ge.201 .and. PDFSet.le.240) ) then ! MSTW2008 and variations
+        alphas_mz=0.13939d0
+        !nloops_pdf=1
+     else ! Everything else
+        write(6,*),"mod_JHUGen.F90::InitPDFs: PDFSet",PDFSet,"QCD parameters are unknown. Please double-check! Stopping JHUGen..."
+        stop
+        ! Could also have used these instead of the stop statement, but why introduce arbitrary number?
+        !alphas_mz = 0.13229060d0
+        !nloops_pdf = 1
+     endif
+
+#endif
+
+     call InitPDFValues() ! Call this only once
+   return
+END SUBROUTINE
+
+subroutine ResetPDFs(pdftable,pdfstrlength,pdfmember,pdfid)
+implicit none
+integer :: pdfstrlength
+character(len=pdfstrlength) pdftable
+integer :: pdfmember
+integer, intent(in) :: pdfid
+   PDFSet=pdfid      ! 1: CTEQ6L1   2: MRSW with best fit, 2xx: MSTW with eigenvector set xx=01..40    3: NNPDF3.0
+   LHAPDFString = pdftable
+   LHAPDFMember = pdfmember
+   lenLHAPDFString = pdfstrlength
+#if useLHAPDF==1
+   if( LHAPDFString.eq."" ) then
+      print *, "Need to specify pdf file for LHAPDF"
+      stop
+   endif
+#else
+   if( LHAPDFString.eq."" .and. PDFSet.eq.3) then
+      print *, "Need to specify pdf file for NNPDF"
+      stop
+   endif
+#endif
+   call InitPDFs()
+end subroutine
+
+
+SUBROUTINE PrintLogo(TheUnit)
+use modParameters
+implicit none
+integer :: TheUnit
+
+    write(TheUnit,"(A90)") " "
+    write(TheUnit,"(A90)") " ***************************************************************************************"
+    write(TheUnit,"(A50,A6,A34)") " *                                  JHUGen MELA ",trim(JHUGen_Version),"              *"
+    write(TheUnit,"(A90)") " ***************************************************************************************"
+    write(TheUnit,"(A90)") " *                                                                                     *"
+    write(TheUnit,"(A90)") " *   Spin and parity determination of single-produced resonances at hadron colliders   *"
+    write(TheUnit,"(A90)") " *                                                                                     *"
+    write(TheUnit,"(A90)") " *          I. Anderson, S. Bolognesi, F. Caola, Y. Gao, A. Gritsan, Z. Guo,           *"
+    write(TheUnit,"(A90)") " *        C. Martin, K. Melnikov, R.Rontsch, H. Roskes, U. Sarica, M. Schulze,         *"
+    write(TheUnit,"(A90)") " *                   N. Tran, A. Whitbeck, M. Xiao, C. You, Y. Zhou                    *"
+    write(TheUnit,"(A90)") " *                Phys.Rev. D81 (2010) 075022;  arXiv:1001.3396 [hep-ph],              *"
+    write(TheUnit,"(A90)") " *                Phys.Rev. D86 (2012) 095031;  arXiv:1208.4018 [hep-ph],              *"
+    write(TheUnit,"(A90)") " *                Phys.Rev. D89 (2014) 035007;  arXiv:1309.4819 [hep-ph].              *"
+    write(TheUnit,"(A90)") " *                                                                                     *"
+    write(TheUnit,"(A90)") " ***************************************************************************************"
+    write(TheUnit,"(A90)") " "
+return
+END SUBROUTINE
+
+END MODULE ModJHUGen

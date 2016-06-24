@@ -578,7 +578,7 @@ use ifport
       PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt  * PartChannelAvg
       if( iStore.ne.jStore ) PreFac = PreFac*2d0
 
-      call EvalAmp_WBFH_UnSymm_SA_Select_exact( MomExt,iPart_sel,jPart_sel,rPart_Sel,sPart_Sel,me2)
+      call EvalAmp_WBFH_UnSymm_SA_Select_exact( MomExt,iPart_sel,jPart_sel,rPart_Sel,sPart_Sel,me2(iPart_sel,jPart_sel))
       !call wrapHVV(MomExt,iPart_sel,jPart_sel,rPart_Sel,sPart_Sel,me2_testhvv)
       !write(6,*) me2(iPart_sel,jPart_sel)
       !write(6,*) me2_testhvv
@@ -717,7 +717,7 @@ use ifport
       PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt  * PartChannelAvg
       if( iStore.ne.jStore ) PreFac = PreFac*2d0
 
-      call EvalAmp_SBFH_UnSymm_SA_Select_exact(MomExt,iPart_sel,jPart_sel,rPart_sel,sPart_sel,me2)
+      call EvalAmp_SBFH_UnSymm_SA_Select_exact(MomExt,iPart_sel,jPart_sel,rPart_sel,sPart_sel,me2(iPart_sel,jPart_sel))
       !write(6,*) me2(iPart_sel,jPart_sel)
       !pause
    endif
