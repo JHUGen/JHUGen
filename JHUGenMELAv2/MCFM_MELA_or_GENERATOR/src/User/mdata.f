@@ -24,7 +24,7 @@ c                    input here. You have to know what you're doing.
 c
       implicit none
       include 'ewinput.f'
-#if linkMELA==1
+#if CompileForMELA==1
       include 'spinzerohiggs_anomcoupl.f'
 #endif
       data ewscheme  / +3                  /   ! Chooses EW scheme
@@ -34,7 +34,7 @@ c
       data wmass_inp / 80.399d0            /   ! W mass
       data zmass_inp / 91.1876d0           /   ! Z mass
 
-#if linkMELA==1
+#if CompileForMELA==1
 c     MARKUS: mass and width for second resonance
       data h2mass  /750.0d0/
       data h2width /20.0d0/
