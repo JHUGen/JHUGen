@@ -24,12 +24,108 @@ c                    input here. You have to know what you're doing.
 c
       implicit none
       include 'ewinput.f'
+#if linkMELA==1
+      include 'spinzerohiggs_anomcoupl.f'
+#endif
       data ewscheme  / +3                  /   ! Chooses EW scheme
       data Gf_inp    / 1.16639d-5          /   ! G_F
       data aemmz_inp / 7.8125d-03 /   ! alpha_EM(m_Z)=1/128
       data xw_inp    / 0.23119d0            /   ! sin^2(theta_W)
       data wmass_inp / 80.399d0            /   ! W mass
       data zmass_inp / 91.1876d0           /   ! Z mass
+
+#if linkMELA==1
+c     MARKUS: mass and width for second resonance
+      data h2mass  /750.0d0/
+      data h2width /20.0d0/
+
+c     MARKUS: anomalous couplings for H resonance
+      data LambdaBSM /1000d0/
+      data Lambda_z1 /1000d0/
+      data Lambda_z2 /1000d0/
+      data Lambda_z3 /1000d0/
+      data Lambda_z4 /1000d0/
+      data Lambda_Q  /1000d0/
+      data AnomalCouplPR,AnomalCouplDK /.true.,.true./
+
+      data ghz1,ghz2,ghz3,ghz4 /1d0,0d0,0d0,0d0/
+      data ghw1,ghw2,ghw3,ghw4 /1d0,0d0,0d0,0d0/
+
+      data ghz1_prime,ghz2_prime,ghz3_prime,ghz4_prime 
+     .     /0d0,0d0,0d0,0d0/
+      data ghz1_prime2,ghz2_prime2,ghz3_prime2,ghz4_prime2
+     .     /0d0,0d0,0d0,0d0/
+      data ghz1_prime3,ghz2_prime3,ghz3_prime3,ghz4_prime3
+     .     /0d0,0d0,0d0,0d0/
+      data ghz1_prime4,ghz2_prime4,ghz3_prime4,ghz4_prime4
+     .     /0d0,0d0,0d0,0d0/
+      data ghz1_prime5,ghz2_prime5,ghz3_prime5,ghz4_prime5
+     .     /0d0,0d0,0d0,0d0/
+      data ghz1_prime6,ghz2_prime6,ghz3_prime6,ghz4_prime6
+     .     /0d0,0d0,0d0,0d0/
+      data ghz1_prime7,ghz2_prime7,ghz3_prime7,ghz4_prime7
+     .     /0d0,0d0,0d0,0d0/
+      data Lambda_w1,Lambda_w2,Lambda_w3,Lambda_w4
+     .     /0d0,0d0,0d0,0d0/
+      data ghw1_prime,ghw2_prime,ghw3_prime,ghw4_prime
+     .     /0d0,0d0,0d0,0d0/
+      data ghw1_prime2,ghw2_prime2,ghw3_prime2,ghw4_prime2
+     .     /0d0,0d0,0d0,0d0/
+      data ghw1_prime3,ghw2_prime3,ghw3_prime3,ghw4_prime3
+     .     /0d0,0d0,0d0,0d0/
+      data ghw1_prime4,ghw2_prime4,ghw3_prime4,ghw4_prime4
+     .     /0d0,0d0,0d0,0d0/
+      data ghw1_prime5,ghw2_prime5,ghw3_prime5,ghw4_prime5
+     .     /0d0,0d0,0d0,0d0/
+      data ghw1_prime6,ghw2_prime6,ghw3_prime6,ghw4_prime6
+     .     /0d0,0d0,0d0,0d0/
+      data ghw1_prime7,ghw2_prime7,ghw3_prime7,ghw4_prime7
+     .     /0d0,0d0,0d0,0d0/
+
+
+c     MARKUS: anomalous couplings for 2nd resonance
+      data Lambda2BSM /1000d0/
+      data Lambda2_z1 /1000d0/
+      data Lambda2_z2 /1000d0/
+      data Lambda2_z3 /1000d0/
+      data Lambda2_z4 /1000d0/
+      data Lambda2_Q  /1000d0/
+
+      data gh2z1,gh2z2,gh2z3,gh2z4 /0d0,0d0,0d0,0d0/
+      data gh2w1,gh2w2,gh2w3,gh2w4 /0d0,0d0,0d0,0d0/
+
+      data gh2z1_prime,gh2z2_prime,gh2z3_prime,gh2z4_prime 
+     .     /0d0,0d0,0d0,0d0/
+      data gh2z1_prime2,gh2z2_prime2,gh2z3_prime2,gh2z4_prime2
+     .     /0d0,0d0,0d0,0d0/
+      data gh2z1_prime3,gh2z2_prime3,gh2z3_prime3,gh2z4_prime3
+     .     /0d0,0d0,0d0,0d0/
+      data gh2z1_prime4,gh2z2_prime4,gh2z3_prime4,gh2z4_prime4
+     .     /0d0,0d0,0d0,0d0/
+      data gh2z1_prime5,gh2z2_prime5,gh2z3_prime5,gh2z4_prime5
+     .     /0d0,0d0,0d0,0d0/
+      data gh2z1_prime6,gh2z2_prime6,gh2z3_prime6,gh2z4_prime6
+     .     /0d0,0d0,0d0,0d0/
+      data gh2z1_prime7,gh2z2_prime7,gh2z3_prime7,gh2z4_prime7
+     .     /0d0,0d0,0d0,0d0/
+      data Lambda_w1,Lambda_w2,Lambda_w3,Lambda_w4
+     .     /0d0,0d0,0d0,0d0/
+      data gh2w1_prime,gh2w2_prime,gh2w3_prime,gh2w4_prime
+     .     /0d0,0d0,0d0,0d0/
+      data gh2w1_prime2,gh2w2_prime2,gh2w3_prime2,gh2w4_prime2
+     .     /0d0,0d0,0d0,0d0/
+      data gh2w1_prime3,gh2w2_prime3,gh2w3_prime3,gh2w4_prime3
+     .     /0d0,0d0,0d0,0d0/
+      data gh2w1_prime4,gh2w2_prime4,gh2w3_prime4,gh2w4_prime4
+     .     /0d0,0d0,0d0,0d0/
+      data gh2w1_prime5,gh2w2_prime5,gh2w3_prime5,gh2w4_prime5
+     .     /0d0,0d0,0d0,0d0/
+      data gh2w1_prime6,gh2w2_prime6,gh2w3_prime6,gh2w4_prime6
+     .     /0d0,0d0,0d0,0d0/
+      data gh2w1_prime7,gh2w2_prime7,gh2w3_prime7,gh2w4_prime7
+     .     /0d0,0d0,0d0,0d0/
+#endif
+
       end
 ************************************************************************
 
