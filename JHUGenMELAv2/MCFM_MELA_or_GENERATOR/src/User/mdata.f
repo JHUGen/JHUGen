@@ -32,13 +32,13 @@ c     MARKUS: anomalous couplings for H resonance
       data distinguish_HWWcouplings / .false. /
       data AnomalCouplPR,AnomalCouplDK / .true., .true./
 
-      data LambdaBSM / 10000d0 /
-      data Lambda_Q  / 1000d0 /
+      data LambdaBSM / 1000d0 /
+      data Lambda_Q  / 10000d0 /
 
-      data Lambda_z1 / 1000d0 /
-      data Lambda_z2 / 1000d0 /
-      data Lambda_z3 / 1000d0 /
-      data Lambda_z4 / 1000d0 /
+      data Lambda_z1 / 10000d0 /
+      data Lambda_z2 / 10000d0 /
+      data Lambda_z3 / 10000d0 /
+      data Lambda_z4 / 10000d0 /
 
       data cz_q1sq / 0 /
       data cz_q2sq / 0 /
@@ -92,7 +92,7 @@ c     MARKUS: anomalous couplings for H resonance
       data ghz4_prime6 / (0d0,0d0) /
       data ghz4_prime7 / (0d0,0d0) /
 
-      data Lambda_zgs1 /1000d0/
+      data Lambda_zgs1 / 10000d0 /
 
       data ghzgs1_prime2 / (0d0,0d0) /
       data ghzgs2 / (0d0,0d0) /
@@ -103,10 +103,10 @@ c     MARKUS: anomalous couplings for H resonance
       data ghgsgs3 / (0d0,0d0) /
       data ghgsgs4 / (0d0,0d0) /
 
-      data Lambda_w1 / 1000d0 /
-      data Lambda_w2 / 1000d0 /
-      data Lambda_w3 / 1000d0 /
-      data Lambda_w4 / 1000d0 /
+      data Lambda_w1 / 10000d0 /
+      data Lambda_w2 / 10000d0 /
+      data Lambda_w3 / 10000d0 /
+      data Lambda_w4 / 10000d0 /
 
       data cw_q1sq / 0 /
       data cw_q2sq / 0 /
@@ -167,13 +167,13 @@ c     MARKUS: mass and width for second resonance
 
 c     MARKUS: anomalous couplings for 2nd resonance
 
-      data Lambda2BSM / 10000d0 /
-      data Lambda2_Q  / 1000d0 /
+      data Lambda2BSM / 1000d0 /
+      data Lambda2_Q  / 10000d0 /
 
-      data Lambda2_z1 / 1000d0 /
-      data Lambda2_z2 / 1000d0 /
-      data Lambda2_z3 / 1000d0 /
-      data Lambda2_z4 / 1000d0 /
+      data Lambda2_z1 / 10000d0 /
+      data Lambda2_z2 / 10000d0 /
+      data Lambda2_z3 / 10000d0 /
+      data Lambda2_z4 / 10000d0 /
 
       data c2z_q1sq / 0 /
       data c2z_q2sq / 0 /
@@ -227,7 +227,7 @@ c     MARKUS: anomalous couplings for 2nd resonance
       data gh2z4_prime6 / (0d0,0d0) /
       data gh2z4_prime7 / (0d0,0d0) /
 
-      data Lambda2_zgs1 /1000d0/
+      data Lambda2_zgs1 / 10000d0 /
 
       data gh2zgs1_prime2 / (0d0,0d0) /
       data gh2zgs2 / (0d0,0d0) /
@@ -238,10 +238,10 @@ c     MARKUS: anomalous couplings for 2nd resonance
       data gh2gsgs3 / (0d0,0d0) /
       data gh2gsgs4 / (0d0,0d0) /
 
-      data Lambda2_w1 / 1000d0 /
-      data Lambda2_w2 / 1000d0 /
-      data Lambda2_w3 / 1000d0 /
-      data Lambda2_w4 / 1000d0 /
+      data Lambda2_w1 / 10000d0 /
+      data Lambda2_w2 / 10000d0 /
+      data Lambda2_w3 / 10000d0 /
+      data Lambda2_w4 / 10000d0 /
 
       data c2w_q1sq / 0 /
       data c2w_q2sq / 0 /
