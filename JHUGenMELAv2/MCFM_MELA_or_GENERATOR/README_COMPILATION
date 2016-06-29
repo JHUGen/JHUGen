@@ -1,0 +1,68 @@
+#========================================================
+# Instruction for using the JHUGenMELAv2/MELA
+# Contact Yanyan Gao (Yanyan.Gao@cern.SPAMNOT.ch) or Ulascan Sarica (ulascan.sarica@cern.SPAMNOT.ch)
+#========================================================
+
+0. Skip Step (1) if you use the libmcfm_701.so provided.
+
+1. Make the MCFM library libmcfm_701.so (a copy that works for a good range of software releases in slc6 and slc5 is provided) inside JHUGenMELAv2/MELA/data/
+
+   1) Download MCFM 7.0 (.0 or .1 does not make much difference)
+   
+   cd ../
+   wget http://mcfm.fnal.gov/MCFM-7.0.tar.gz
+   tar -xf MCFM-7.0.tar.gz
+   cd MCFM-7.0/
+
+   2) Modify makefile: Replace the gfortran code tags to output library and add -fPIC -g if not present
+
+USEOMP = NO
+...
+# Define CompileForMELA to compile for MELA libraries
+DoCompileForMELA = YES
+ifeq ($(DoCompileForMELA),YES)
+  FFLAGS 	= -fno-automatic -fno-f2c -cpp -DCompileForMELA $(OMPFLAG) -O0 -fPIC -g -I$(INCPATH) -I$(TENSORREDDIR)/Include -I$(OBJNAME)
+  #FFLAGS 	=  -fno-f2c $(OMPFLAG) -O2 -I$(INCPATH) -I$(TENSORREDDIR)/Include -I$(OBJNAME)
+  F90FLAGS = -fno-automatic -fno-f2c -DCompileForMELA $(OMPFLAG) -O2 -fPIC -g -I$(INCPATH) -I$(OBJNAME) -J$(OBJNAME)
+  #F90FLAGS = -fno-f2c $(OMPFLAG) -I$(INCPATH) -I$(OBJNAME) -J$(OBJNAME)
+else
+  FFLAGS 	= -fno-automatic -fno-f2c -cpp $(OMPFLAG) -O0 -fPIC -g -I$(INCPATH) -I$(TENSORREDDIR)/Include -I$(OBJNAME)
+  #FFLAGS 	=  -fno-f2c $(OMPFLAG) -O2 -I$(INCPATH) -I$(TENSORREDDIR)/Include -I$(OBJNAME)
+  F90FLAGS = -fno-automatic -fno-f2c $(OMPFLAG) -O2 -fPIC -g -I$(INCPATH) -I$(OBJNAME) -J$(OBJNAME)
+  #F90FLAGS = -fno-f2c $(OMPFLAG) -I$(INCPATH) -I$(OBJNAME) -J$(OBJNAME)
+endif
+
+   3) Modify the makefiles in QCDLoop/ql/, QCDLoop/ff/, TensorStructure/ov/, TensorStructure/pv/, TensorStructure/recur/*/, adding the -fPIC in FFLAGS
+
+      Ex. FFLAGS  = -g -fPIC
+
+   4) Copy contents of JHUGenMELAv2/MCFM_MELA_or_GENERATOR/src/ into MCFM-7.0/src/.
+
+   5) Add following lines in MCFM-7.0/makefile:
+      Under "ZZFILES = \":
+                           gg_ZZ_int_freenorm.o \
+                           qqb_zz_stu.o \
+
+   6) Compile the package and export the library
+   
+    ./Install
+    make
+    cd obj/
+    g++ -Wl,-soname,libmcfm_701.so -shared -o libmcfm_701.so *.o ../QCDLoop/ql/obj/ql*.o ../QCDLoop/ql/obj/a*.o ../QCDLoop/ff/obj/*.o ../TensorReduction/ov/*.a ../TensorReduction/pv/*.a ../TensorReduction/recur/*.a  
+
+    Note here that the order "../TensorReduction/ov/*.a ../TensorReduction/pv/*.a" matters.
+
+   7) Link library libmcfm_701.so to the working directory
+          ---> Sample file compiled for SLC5/6 gcc 4.6.2+ is provided. Earlier gcc 4.3.4 needs to be compiled from scratch as described above.
+
+
+2. Go back to JHUGenMELAv2/MELA/fortran/ and compile the JHUGenMELA code
+
+make clean; make
+
+3. Also compile the C++ wrapper as above
+
+4. You can now run your script interactively using
+
+root -l -b -q loadMELA.C myScript.C+
+
