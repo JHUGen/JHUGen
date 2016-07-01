@@ -9,15 +9,17 @@
       include 'zprods_decl.f'
 !      include 'first.f'
       include 'WWbits.f'
+      include 'spinzerohiggs_anomcoupl.f'
       double precision s34,s56,s17,s28,s3456,t3,t4,
      & xl1,xr1,xq1,xl2,xr2,xq2
-      double complex WWZZamp(2,2),ggWW(2,2),
+      double complex WWZZamp(2,2),ggWW(2,2),propX3456,
      & prop34,prop56,propw17,propw28,propWBF,prop3456,propz3456,
      & zab2,zba2,srWW(2,2),srL,srR,srggWW34(2,2),srggWW56(2,2),rxw,
-     & sqzmass
+     & sqzmass,Amp_S_DK,Amp_S_PR
       integer h34,h56,i1,i2,i3,i4,i5,i6,i7,i8,
      & n1,n2,n3,n4,n5,n6,n7,n8
       double complex, save:: ZZ3456(2,2)
+      double complex anomhzzamp,anomhwwamp
 !$omp threadprivate(ZZ3456)
       t4(i1,i2,i3,i4)=     
      & +s(i1,i2)+s(i1,i3)+s(i1,i4)
@@ -98,6 +100,7 @@ C---setting up couplings dependent on whether we are doing 34-line or 56-line
       prop3456=dcmplx(s3456-hmass**2,hmass*hwidth)
       propWBF=propw17*propw28*prop34*prop56
 
+      propX3456=dcmplx(s3456-h2mass**2,h2mass*h2width)
 C----setup couplings and propagators
 c      ggWW(1,1)=dcmplx(q1**2/(s34*s56))+dcmplx(rxw*l1**2)/prop34/prop56
 c      ggWW(1,2)=dcmplx(q1**2/(s34*s56))+dcmplx(rxw*l1*r1)/prop34/prop56
@@ -160,14 +163,53 @@ c--- Make sure WWZA vertices included
      &        -za(i3,i8)*zb(i2,i4)*za(i5,i7)*zb(i1,i6)))
      &    *ggWW(h34,h56)/(propw17*propw28)*Bbit
 
-
-
-
 C----Higgs contribution
-         WWZZamp(h34,h56)=WWZZamp(h34,h56)
+C-- MARKUS: this is the old (original) MCFM code
+
+!        print *,"for check: WWZZamp(h34,h56)=0";WWZZamp(h34,h56)=0d0
+! 
+!          WWZZamp(h34,h56)=WWZZamp(h34,h56)
+!      &    -2d0*sqzmass/cxw**2*ZZ3456(h34,h56)
+!      &    *za(i7,i8)*zb(i2,i1)*za(i3,i5)*zb(i6,i4)
+!      &    /(propWBF*prop3456)*Hbit
+! 
+!        print *, "config",h34,h56
+!        print *, "old ww",WWZZamp(h34,h56)
+!        print *,"for check: WWZZamp(h34,h56)=0";WWZZamp(h34,h56)=0d0
+
+
+C--   MARKUS: separate production and decay for s-channel Higgs
+!        print *,"for check: WWZZamp(h34,h56)=0";WWZZamp(h34,h56)=0d0
+
+      if( AnomalCouplPR ) then
+       Amp_S_PR=anomhwwamp(i7,i1,i8,i2,1,s3456,s(i7,i1),s(i8,i2),za,zb)  !anomwwamp(i7,i1,i8,i2,s3456,s(i7,i1),s(i8,i2),za,zb)
+      else
+       Amp_S_PR=za(i7,i8)*zb(i2,i1)
+      endif
+      if( AnomalCouplDK ) then
+       Amp_S_DK=anomhzzamp(i3,i4,i5,i6,1,s3456,s(i7,i1),s(i8,i2),za,zb)  ! anomzzamp(i3,i4,i5,i6,s3456,s(i3,i4),s(i5,i6),za,zb)
+      else
+       Amp_S_DK=za(i3,i5)*zb(i6,i4)
+      endif
+
+C-- MARKUS: this is the new code with anomalous couplings from Fabrizio and me
+        WWZZamp(h34,h56)=WWZZamp(h34,h56)
      &    -2d0*sqzmass/cxw**2*ZZ3456(h34,h56)
-     &    *za(i7,i8)*zb(i2,i1)*za(i3,i5)*zb(i6,i4)
+     &     *Amp_S_DK*Amp_S_PR
      &    /(propWBF*prop3456)*Hbit
+!        print *, "new ww",WWZZamp(h34,h56)
+!        pause
+
+
+
+
+
+C-- MARKUS: this is the new code with a second resonance 
+        WWZZamp(h34,h56)=WWZZamp(h34,h56)
+     &    -2d0*sqzmass/cxw**2*ZZ3456(h34,h56)
+     &     *anomhzzamp(i3,i4,i5,i6,2,s3456,s(i7,i1),s(i8,i2),za,zb)  !anomzzampX(i3,i4,i5,i6,s3456,s(i3,i4),s(i5,i6),za,zb)
+     &     *anomhwwamp(i7,i1,i8,i2,2,s3456,s(i7,i1),s(i8,i2),za,zb)  !anomwwampX(i7,i1,i8,i2,s3456,s(i7,i1),s(i8,i2),za,zb)
+     &    /(propWBF*propX3456)*Hbit
         enddo
       enddo
 

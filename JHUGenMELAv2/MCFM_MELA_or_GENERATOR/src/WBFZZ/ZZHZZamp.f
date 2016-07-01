@@ -8,15 +8,17 @@ c      include 'ewcouple.f'
       include 'sprods_com.f'
       include 'zprods_decl.f'
 !      include 'first.f'
+      include 'spinzerohiggs_anomcoupl.f'
       double precision t4,s3456,s1734,s1756,htheta,
      & ZZ3456(2,2),ZZ1728(2,2,2,2),ZZ1734(2,2,2),ZZ2856(2,2,2)
       double complex ZZHamp(2,2,2,2,2,2),propWBF,
-     & prop34,prop56,prop17,prop28,prop3456,prop1734,prop1756,fac
-      save ZZ3456,ZZ1734,ZZ2856,ZZ1728
+     & prop34,prop56,prop17,prop28,prop3456,prop1734,prop1756,fac,
+     & propX3456,propX1734,propX1756
+      save ZZ3456,ZZ1734,ZZ2856,ZZ1728,fac
 C---order of indices jdu1,jdu2,h17,h28,h34,h56)
       integer h17,h28,h34,h56,i1,i2,i3,i4,i5,i6,i7,i8,
      & n1,n2,n3,n4,n5,n6,n7,n8,jdu1,jdu2
-      double complex anomzzamp
+      double complex Amp_S_PR,Amp_S_DK,anomhzzamp
 C---begin statement functions
       t4(i1,i2,i3,i4)=
      & +s(i1,i2)+s(i1,i3)+s(i1,i4)
@@ -25,7 +27,7 @@ C--- define Heaviside theta function (=1 for x>0) and (0 for x < 0)
 c      htheta(s3456)=half+sign(half,s3456)
       htheta(s3456)=one ! propdebug
 C---end statement functions
-!$omp threadprivate(ZZ3456,ZZ1734,ZZ2856,ZZ1728)
+!$omp threadprivate(ZZ3456,ZZ1734,ZZ2856,ZZ1728,fac)
       
 
       ZZ3456(1,1)=2d0*l1*l2
@@ -65,6 +67,9 @@ C---setup propagators
       prop1756=dcmplx(s1756-hmass**2,htheta(s1756)*hmass*hwidth)
       propWBF=prop17*prop28*prop34*prop56
 
+      propX3456=dcmplx(s3456-h2mass**2,htheta(s3456)*h2mass*h2width)
+      propX1734=dcmplx(s1734-h2mass**2,htheta(s1734)*h2mass*h2width)
+      propX1756=dcmplx(s1756-h2mass**2,htheta(s1756)*h2mass*h2width)
       do h17=1,2
          if (h17.eq.1) then 
             i1=n1
@@ -100,19 +105,116 @@ C---setup propagators
       do jdu1=1,2
       do jdu2=1,2
 
+C-- MARKUS: this is the old (original) MCFM code
+! C---s-channel
+!       ZZHamp(jdu1,jdu2,h17,h28,h34,h56)=
+!      & +fac*ZZ3456(h34,h56)*ZZ1728(jdu1,jdu2,h17,h28)
+!      & *za(i7,i8)*zb(i2,i1)*za(i3,i5)*zb(i6,i4)
+!      & /(propWBF*prop3456)
+! C---t-channel
+!      & +fac*ZZ1734(jdu1,h17,h34)*ZZ2856(jdu2,h28,h56)
+!      & *za(i7,i3)*zb(i4,i1)*za(i8,i5)*zb(i6,i2)
+!      & /(propWBF*prop1734)
+! C---u-channel
+!      & +fac*ZZ2856(jdu1,h17,h56)*ZZ1734(jdu2,h28,h34)
+!      & *za(i7,i5)*zb(i6,i1)*za(i8,i3)*zb(i4,i2)
+!      & /(propWBF*prop1756)
+
+!        print *, "config",jdu1,jdu2,h17,h28,h34,h56
+!        print *, "old   zz",ZZHamp(jdu1,jdu2,h17,h28,h34,h56)
+
+
+
+C--   MARKUS: separate production and decay for s-channel Higgs
+!       if( AnomalCouplPR ) then
+!          Amp_S_PR = anomzzamp(i7,i1,i8,i2,s3456,s(i7,i1),s(i8,i2),za,zb)
+!       else
+!          Amp_S_PR = za(i7,i8)*zb(i2,i1)
+!       endif
+!       if( AnomalCouplDK ) then
+!          Amp_S_DK = anomzzamp(i3,i4,i5,i6,s3456,s(i3,i4),s(i5,i6),za,zb)
+!       else
+!         Amp_S_DK = za(i3,i5)*zb(i6,i4)
+!       endif
+
+
+C-- MARKUS: this is the new code with anomalous couplings from Fabrizio and me
 C---s-channel
+!       ZZHamp(jdu1,jdu2,h17,h28,h34,h56)=
+!      & +fac*ZZ3456(h34,h56)*ZZ1728(jdu1,jdu2,h17,h28)
+!      & *Amp_S_DK * Amp_S_PR
+!      & /(propWBF*prop3456)
+! C---t-channel
+!      & +fac*ZZ1734(jdu1,h17,h34)*ZZ2856(jdu2,h28,h56)
+!      & *anomzzamp(i3,i4,i7,i1,s1734,s(i3,i4),s(i7,i1),za,zb)
+!      & *anomzzamp(i5,i6,i8,i2,s1734,s(i5,i6),s(i8,i2),za,zb)
+!      & /(propWBF*prop1734) 
+! C---u-channel
+!      & +fac*ZZ2856(jdu1,h17,h56)*ZZ1734(jdu2,h28,h34)
+!      & *anomzzamp(i5,i6,i7,i1,s1756,s(i5,i6),s(i7,i1),za,zb)
+!      & *anomzzamp(i3,i4,i8,i2,s1756,s(i3,i4),s(i8,i2),za,zb)
+!      & /(propWBF*prop1756) 
+! 
+!        print *, "new   zz",ZZHamp(jdu1,jdu2,h17,h28,h34,h56)
+
+
+
+
+
+C-- MARKUS: this is the new code with anomalous couplings from Fabrizio and me
+      if( AnomalCouplPR ) then
+       Amp_S_PR=anomhzzamp(i7,i1,i8,i2,1,s3456,s(i7,i1),s(i8,i2),za,zb)  !   anomzzamp(i7,i1,i8,i2,s3456,s(i7,i1),s(i8,i2),za,zb)
+      else
+       Amp_S_PR=za(i7,i8)*zb(i2,i1)
+       prop1734 = 1d20!   remove t/u channel
+       prop1756 = 1d20
+      endif
+      if( AnomalCouplDK ) then
+       Amp_S_DK=anomhzzamp(i3,i4,i5,i6,1,s3456,s(i3,i4),s(i5,i6),za,zb)  !  anomzzamp(i3,i4,i5,i6,s3456,s(i3,i4),s(i5,i6),za,zb)
+      else
+       Amp_S_DK=za(i3,i5)*zb(i6,i4)
+       prop1734 = 1d20!   remove t/u channel
+       prop1756 = 1d20
+      endif
       ZZHamp(jdu1,jdu2,h17,h28,h34,h56)=
      & +fac*ZZ3456(h34,h56)*ZZ1728(jdu1,jdu2,h17,h28)
-     & *za(i7,i8)*zb(i2,i1)*za(i3,i5)*zb(i6,i4)
+     & *Amp_S_DK * Amp_S_PR
      & /(propWBF*prop3456)
 C---t-channel
      & +fac*ZZ1734(jdu1,h17,h34)*ZZ2856(jdu2,h28,h56)
-     & *za(i7,i3)*zb(i4,i1)*za(i8,i5)*zb(i6,i2)
-     & /(propWBF*prop1734)
+     & *anomhzzamp(i3,i4,i7,i1,1,s1734,s(i3,i4),s(i7,i1),za,zb)
+     & *anomhzzamp(i5,i6,i8,i2,1,s1734,s(i5,i6),s(i8,i2),za,zb)
+     & /(propWBF*prop1734) 
 C---u-channel
      & +fac*ZZ2856(jdu1,h17,h56)*ZZ1734(jdu2,h28,h34)
-     & *za(i7,i5)*zb(i6,i1)*za(i8,i3)*zb(i4,i2)
-     & /(propWBF*prop1756)
+     & *anomhzzamp(i5,i6,i7,i1,1,s1756,s(i5,i6),s(i7,i1),za,zb)
+     & *anomhzzamp(i3,i4,i8,i2,1,s1756,s(i3,i4),s(i8,i2),za,zb)
+     & /(propWBF*prop1756) 
+       
+!        print *, "newer zz",ZZHamp(jdu1,jdu2,h17,h28,h34,h56)
+!        pause
+
+
+
+
+
+! C-- MARKUS: this is the new code with a second resonance 
+      ZZHamp(jdu1,jdu2,h17,h28,h34,h56)=
+     & ZZHamp(jdu1,jdu2,h17,h28,h34,h56)
+     & +fac*ZZ3456(h34,h56)*ZZ1728(jdu1,jdu2,h17,h28)
+     & *anomhzzamp(i3,i4,i5,i6,2,s3456,s(i3,i4),s(i5,i6),za,zb)
+     & *anomhzzamp(i7,i1,i8,i2,2,s3456,s(i7,i1),s(i8,i2),za,zb)
+     & /(propWBF*propX3456)
+C--t-channel
+     & +fac*ZZ1734(jdu1,h17,h34)*ZZ2856(jdu2,h28,h56)
+     & *anomhzzamp(i3,i4,i7,i1,2,s1734,s(i3,i4),s(i7,i1),za,zb)
+     & *anomhzzamp(i5,i6,i8,i2,2,s1734,s(i5,i6),s(i8,i2),za,zb)
+     & /(propWBF*propX1734) 
+C---u-channel
+     & +fac*ZZ2856(jdu1,h17,h56)*ZZ1734(jdu2,h28,h34)
+     & *anomhzzamp(i5,i6,i7,i1,2,s1756,s(i5,i6),s(i7,i1),za,zb)
+     & *anomhzzamp(i3,i4,i8,i2,2,s1756,s(i3,i4),s(i8,i2),za,zb)
+     & /(propWBF*propX1756) 
 
       enddo
       enddo
