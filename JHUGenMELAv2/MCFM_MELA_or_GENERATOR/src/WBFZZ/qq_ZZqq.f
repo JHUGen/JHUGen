@@ -113,6 +113,11 @@ C---setup spinors and spinorvector products
       amp(:,:,:,:,:)=czip
       ampa(:,:,:,:,:)=czip
       ampb(:,:,:,:,:)=czip
+      
+C--   MARKUS: adding switches to remove VH or VBF contributions           
+      if( (removeVH .eqv..true.) .and. (j.ge.9) ) cycle
+      if( (removeVBF.eqv..true.) .and. (j.le.8) ) cycle
+
 
 c--- propagators and currents are not used in calculation of Higgs contribution
       if (doHO .eqv. .false.) then

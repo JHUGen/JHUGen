@@ -184,12 +184,12 @@ C---t-channel
      & +fac*ZZ1734(jdu1,h17,h34)*ZZ2856(jdu2,h28,h56)
      & *anomhzzamp(i3,i4,i7,i1,1,s1734,s(i3,i4),s(i7,i1),za,zb)
      & *anomhzzamp(i5,i6,i8,i2,1,s1734,s(i5,i6),s(i8,i2),za,zb)
-     & /(propWBF*prop1734) 
+     & /(propWBF*prop1734) * IncludeTUChannels
 C---u-channel
      & +fac*ZZ2856(jdu1,h17,h56)*ZZ1734(jdu2,h28,h34)
      & *anomhzzamp(i5,i6,i7,i1,1,s1756,s(i5,i6),s(i7,i1),za,zb)
      & *anomhzzamp(i3,i4,i8,i2,1,s1756,s(i3,i4),s(i8,i2),za,zb)
-     & /(propWBF*prop1756) 
+     & /(propWBF*prop1756) * IncludeTUChannels
        
 !        print *, "newer zz",ZZHamp(jdu1,jdu2,h17,h28,h34,h56)
 !        pause
@@ -209,12 +209,12 @@ C--t-channel
      & +fac*ZZ1734(jdu1,h17,h34)*ZZ2856(jdu2,h28,h56)
      & *anomhzzamp(i3,i4,i7,i1,2,s1734,s(i3,i4),s(i7,i1),za,zb)
      & *anomhzzamp(i5,i6,i8,i2,2,s1734,s(i5,i6),s(i8,i2),za,zb)
-     & /(propWBF*propX1734) 
+     & /(propWBF*propX1734) * IncludeTUChannels
 C---u-channel
      & +fac*ZZ2856(jdu1,h17,h56)*ZZ1734(jdu2,h28,h34)
      & *anomhzzamp(i5,i6,i7,i1,2,s1756,s(i5,i6),s(i7,i1),za,zb)
      & *anomhzzamp(i3,i4,i8,i2,2,s1756,s(i3,i4),s(i8,i2),za,zb)
-     & /(propWBF*propX1756) 
+     & /(propWBF*propX1756) * IncludeTUChannels
 
       enddo
       enddo

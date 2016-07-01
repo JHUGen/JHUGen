@@ -79,7 +79,8 @@ c---- NOTE: Please add new future couplings in the same order for both declarati
       double complex gh2w1_prime7,gh2w2_prime7,gh2w3_prime7,gh2w4_prime7
 
       logical AllowAnomalousCouplings,distinguish_HWWcouplings
-      logical AnomalCouplPR,AnomalCouplDK
+      logical AnomalCouplPR,AnomalCouplDK,removeVH,removeVBF
+      double precision IncludeTUChannels
 
       common/spinzerohiggs_anomcoupl/
      & cz_q1sq,cz_q2sq,cz_q12sq,

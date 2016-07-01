@@ -30,7 +30,9 @@ c
 c     MARKUS: anomalous couplings for H resonance
       data AllowAnomalousCouplings / .false. /
       data distinguish_HWWcouplings / .false. /
-      data AnomalCouplPR,AnomalCouplDK / .true., .true./
+      data AnomalCouplPR,AnomalCouplDK / .true., .true. /
+      data removeVH,removeVBF / .false., .false. /
+      data IncludeTUChannels /1d0/
 
       data LambdaBSM / 1000d0 /
       data Lambda_Q  / 10000d0 /
