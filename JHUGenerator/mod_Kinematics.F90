@@ -20,6 +20,7 @@ type(Histogram),allocatable :: Histo(:)
 contains
 
 
+
 SUBROUTINE WriteOutEvent(Mom,MY_IDUP,ICOLUP)
 use ModParameters
 implicit none
@@ -35,162 +36,198 @@ real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP
 real(8) :: ntRnd
 character(len=*),parameter :: fmt1 = "(I3,X,I2,X,I2,X,I2,X,I3,X,I3,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7)"
 
-    do i=1,9
+do i=1,9
 !        print *, "my_idup(i) ",MY_IDUP(i)
-        LHE_IDUP(i) = convertLHE( MY_IDUP(i) )
+LHE_IDUP(i) = convertLHE( MY_IDUP(i) )
 !        print *, "LHE_IDUP(i) ",LHE_IDUP(i)
-    enddo
+enddo
 
 ! NUP changes for gamma gamma final state
-    if (LHE_IDUP(4).eq.22) then
-        NUP=5
-    else 
-        NUP=9
-    endif
-    
-    IDPRUP=100
-    XWGTUP=1.
-    SCALUP=1000.
-    AQEDUP=alpha_QED
-    AQCDUP=0d0
+if (LHE_IDUP(4).eq.22) then
+NUP=5
+else
+NUP=9
+endif
 
-    ISTUP(1) = - 1
-    ISTUP(2) =  -1
-    ISTUP(3) = 2
-    ISTUP(4) = 2
-    ISTUP(5) = 2
-    ISTUP(6) = 1
-    ISTUP(7) = 1
-    ISTUP(8) = 1
-    ISTUP(9) = 1
+IDPRUP=100
+XWGTUP=1.
+SCALUP=1000.
+AQEDUP=alpha_QED
+AQCDUP=0d0
 
-    MOTHUP(1,1) = 0
-    MOTHUP(2,1) = 0
-    MOTHUP(1,2) = 0
-    MOTHUP(2,2) = 0
-    MOTHUP(1,3) = 1
-    MOTHUP(2,3) = 2
-    MOTHUP(1,4) = 3
-    MOTHUP(2,4) = 3
-    MOTHUP(1,5) = 3
-    MOTHUP(2,5) = 3
-    MOTHUP(1,6) = 4
-    MOTHUP(2,6) = 4
-    MOTHUP(1,7) = 4
-    MOTHUP(2,7) = 4
-    MOTHUP(1,8) = 5
-    MOTHUP(2,8) = 5
-    MOTHUP(1,9) = 5
-    MOTHUP(2,9) = 5
+ISTUP(1) = - 1
+ISTUP(2) =  -1
+ISTUP(3) = 2
+ISTUP(4) = 2
+ISTUP(5) = 2
+ISTUP(6) = 1
+ISTUP(7) = 1
+ISTUP(8) = 1
+ISTUP(9) = 1
 
-	! Added by Nhan
-	LHE_IDUP(3) = 39 ! X particle
-	Lifetime = 0.0
-	Spin = 1.0
-
-	do a=1,6
-		MomDummy(1,a) = 100.0d0*Mom(1,a)
-		MomDummy(2,a) = 100.0d0*Mom(2,a)
-		MomDummy(3,a) = 100.0d0*Mom(3,a)
-		MomDummy(4,a) = 100.0d0*Mom(4,a)
-        enddo
-
-	do b=1,4
-		Z1FV(b) = MomDummy(b,3)+MomDummy(b,4)
-		Z2FV(b) = MomDummy(b,5)+MomDummy(b,6)
-	enddo
-
-	do c=1,4
-		XFV(c) = Z1FV(c) + Z2FV(c)
-	enddo
-
-        tmp = MomDummy(1,1)*MomDummy(1,1)-MomDummy(2,1)*MomDummy(2,1)-MomDummy(3,1)*MomDummy(3,1)-MomDummy(4,1)*MomDummy(4,1)
-        if( tmp.lt. -1d-3 ) print *, "Error: large negative mass!"
-	Part1Mass = dSQRT(dabs(tmp))
-
-        tmp = MomDummy(1,2)*MomDummy(1,2)-MomDummy(2,2)*MomDummy(2,2)-MomDummy(3,2)*MomDummy(3,2)-MomDummy(4,2)*MomDummy(4,2)
-        if( tmp.lt. -1d-3 ) print *, "Error: large negative mass!"
-	Part2Mass = dSQRT(dabs(tmp))
-
-        tmp = XFV(1)*XFV(1)-XFV(2)*XFV(2)-XFV(3)*XFV(3)-XFV(4)*XFV(4)
-        if( tmp.lt. -1d-3 ) print *, "Error: large negative mass!"
-	XMass = dSQRT(dabs(tmp))
-
-        tmp = Z1FV(1)*Z1FV(1)-Z1FV(2)*Z1FV(2)-Z1FV(3)*Z1FV(3)-Z1FV(4)*Z1FV(4)
-        if( tmp.lt. -1d-3 ) print *, "Error: large negative mass!"
-	V1Mass = dSQRT(dabs(tmp))
-
-        tmp = Z2FV(1)*Z2FV(1)-Z2FV(2)*Z2FV(2)-Z2FV(3)*Z2FV(3)-Z2FV(4)*Z2FV(4)
-        if( tmp.lt. -1d-3 ) print *, "Error: large negative mass!"
-	V2Mass = dSQRT(dabs(tmp))
-
-        tmp = MomDummy(1,3)*MomDummy(1,3)-MomDummy(2,3)*MomDummy(2,3)-MomDummy(3,3)*MomDummy(3,3)-MomDummy(4,3)*MomDummy(4,3)
-        if( tmp.lt. -1d-3 ) print *, "Error: large negative mass!"
-	L11Mass = dSQRT(dABS(tmp))
-
-        tmp = MomDummy(1,4)*MomDummy(1,4)-MomDummy(2,4)*MomDummy(2,4)-MomDummy(3,4)*MomDummy(3,4)-MomDummy(4,4)*MomDummy(4,4)
-        if( tmp.lt. -1d-3 ) print *, "Error: large negative mass!"
-	L12Mass = dSQRT(dABS(tmp))
-
-        tmp = MomDummy(1,5)*MomDummy(1,5)-MomDummy(2,5)*MomDummy(2,5)-MomDummy(3,5)*MomDummy(3,5)-MomDummy(4,5)*MomDummy(4,5)
-        if( tmp.lt. -1d-3 ) print *, "Error: large negative mass!"
-	L21Mass = dSQRT(dABS(tmp))
-
-        tmp = MomDummy(1,6)*MomDummy(1,6)-MomDummy(2,6)*MomDummy(2,6)-MomDummy(3,6)*MomDummy(3,6)-MomDummy(4,6)*MomDummy(4,6)
-        if( tmp.lt. -1d-3 ) print *, "Error: large negative mass!"
-	L22Mass = dSQRT(dABS(tmp))
+if (LHE_IDUP(4).eq.22) then
+ISTUP(4) = 1
+ISTUP(5) = 1
+endif
 
 
-    write(14,"(A)") "<event>"
-    write(14,"(I1,X,I3,X,1PE13.7,X,1PE13.7,X,1PE13.7,X,1PE13.7)") NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
+MOTHUP(1,1) = 0
+MOTHUP(2,1) = 0
+MOTHUP(1,2) = 0
+MOTHUP(2,2) = 0
+MOTHUP(1,3) = 1
+MOTHUP(2,3) = 2
+MOTHUP(1,4) = 3
+MOTHUP(2,4) = 3
+MOTHUP(1,5) = 3
+MOTHUP(2,5) = 3
+MOTHUP(1,6) = 4
+MOTHUP(2,6) = 4
+MOTHUP(1,7) = 4
+MOTHUP(2,7) = 4
+MOTHUP(1,8) = 5
+MOTHUP(2,8) = 5
+MOTHUP(1,9) = 5
+MOTHUP(2,9) = 5
+
+! Added by Nhan
+LHE_IDUP(3) = 39 ! X particle
+Lifetime = 0.0
+Spin = 1.0
+
+do a=1,6
+MomDummy(1,a) = 100.0d0*Mom(1,a)
+MomDummy(2,a) = 100.0d0*Mom(2,a)
+MomDummy(3,a) = 100.0d0*Mom(3,a)
+MomDummy(4,a) = 100.0d0*Mom(4,a)
+enddo
+
+do b=1,4
+Z1FV(b) = MomDummy(b,3)+MomDummy(b,4)
+Z2FV(b) = MomDummy(b,5)+MomDummy(b,6)
+enddo
+
+do c=1,4
+XFV(c) = Z1FV(c) + Z2FV(c)
+enddo
+
+tmp = MomDummy(1,1)*MomDummy(1,1)-MomDummy(2,1)*MomDummy(2,1)-MomDummy(3,1)*MomDummy(3,1)-MomDummy(4,1)*MomDummy(4,1)
+if( tmp.lt. -1d-3 ) print *, "Error: large negative mass!"
+Part1Mass = dSQRT(dabs(tmp))
+
+tmp = MomDummy(1,2)*MomDummy(1,2)-MomDummy(2,2)*MomDummy(2,2)-MomDummy(3,2)*MomDummy(3,2)-MomDummy(4,2)*MomDummy(4,2)
+if( tmp.lt. -1d-3 ) print *, "Error: large negative mass!"
+Part2Mass = dSQRT(dabs(tmp))
+
+tmp = XFV(1)*XFV(1)-XFV(2)*XFV(2)-XFV(3)*XFV(3)-XFV(4)*XFV(4)
+if( tmp.lt. -1d-3 ) print *, "Error: large negative mass!"
+XMass = dSQRT(dabs(tmp))
+
+tmp = Z1FV(1)*Z1FV(1)-Z1FV(2)*Z1FV(2)-Z1FV(3)*Z1FV(3)-Z1FV(4)*Z1FV(4)
+if( tmp.lt. -1d-3 ) print *, "Error: large negative mass!"
+V1Mass = dSQRT(dabs(tmp))
+if( V1Mass.lt.1d-5 ) then
+V1Mass=0d0
+endif
+
+tmp = Z2FV(1)*Z2FV(1)-Z2FV(2)*Z2FV(2)-Z2FV(3)*Z2FV(3)-Z2FV(4)*Z2FV(4)
+if( tmp.lt. -1d-3 ) print *, "Error: large negative mass!"
+V2Mass = dSQRT(dabs(tmp))
+if( V2Mass.lt.1d-5 ) then
+V2Mass=0d0
+endif
+
+tmp = MomDummy(1,3)*MomDummy(1,3)-MomDummy(2,3)*MomDummy(2,3)-MomDummy(3,3)*MomDummy(3,3)-MomDummy(4,3)*MomDummy(4,3)
+if( tmp.lt. -1d-3 ) print *, "Error: large negative mass!"
+L12Mass = dSQRT(dABS(tmp))
+if( L12Mass.lt.1d-5 ) then
+L12Mass=0d0
+endif
+if( tmp.lt.0d0 ) then
+MomDummy(1,3) = MomDummy(1,3) + 1d-7
+endif
+
+tmp = MomDummy(1,4)*MomDummy(1,4)-MomDummy(2,4)*MomDummy(2,4)-MomDummy(3,4)*MomDummy(3,4)-MomDummy(4,4)*MomDummy(4,4)
+if( tmp.lt. -1d-3 ) print *, "Error: large negative mass!"
+L11Mass = dSQRT(dABS(tmp))
+if( L11Mass.lt.1d-5 ) then
+L11Mass=0d0
+endif
+if( tmp.lt.0d0 ) then
+MomDummy(1,4) = MomDummy(1,4) + 1d-7
+endif
+
+tmp = MomDummy(1,5)*MomDummy(1,5)-MomDummy(2,5)*MomDummy(2,5)-MomDummy(3,5)*MomDummy(3,5)-MomDummy(4,5)*MomDummy(4,5)
+if( tmp.lt. -1d-3 ) print *, "Error: large negative mass!"
+L22Mass = dSQRT(dABS(tmp))
+if( L22Mass.lt.1d-5 ) then
+L22Mass=0d0
+endif
+if( tmp.lt.0d0 ) then
+MomDummy(1,5) = MomDummy(1,5) + 1d-7
+endif
+
+tmp = MomDummy(1,6)*MomDummy(1,6)-MomDummy(2,6)*MomDummy(2,6)-MomDummy(3,6)*MomDummy(3,6)-MomDummy(4,6)*MomDummy(4,6)
+if( tmp.lt. -1d-3 ) print *, "Error: large negative mass!"
+L21Mass = dSQRT(dABS(tmp))
+if( L21Mass.lt.1d-5 ) then
+L21Mass=0d0
+endif
+if( tmp.lt.0d0 ) then
+MomDummy(1,6) = MomDummy(1,6) + 1d-7
+endif
+
+
+write(14,"(A)") "<event>"
+write(14,"(I1,X,I3,X,1PE13.7,X,1PE13.7,X,1PE13.7,X,1PE13.7)") NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
 
 
 ! parton_a
-    i=1
-    write(14,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,1),MomDummy(1,1),Part1Mass,Lifetime,Spin
+i=1
+write(14,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,1),MomDummy(1,1),Part1Mass,Lifetime,Spin
 
 ! parton_b
-    i=2
-    write(14,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,2),MomDummy(1,2),Part2Mass,Lifetime,Spin
+i=2
+write(14,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,2),MomDummy(1,2),Part2Mass,Lifetime,Spin
 
 ! X
-    i=3
-    write(14,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),XFV(2:4),XFV(1),XMass,Lifetime,Spin
+i=3
+write(14,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),XFV(2:4),XFV(1),XMass,Lifetime,Spin
 
 ! V1
-    i=4
-    write(14,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),Z1FV(2:4),Z1FV(1),V1Mass,Lifetime,Spin
+i=4
+write(14,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),Z1FV(2:4),Z1FV(1),V1Mass,Lifetime,Spin
 
 ! V2
-    i=5
-    write(14,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),Z2FV(2:4),Z2FV(1),V2Mass,Lifetime,Spin
+i=5
+write(14,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),Z2FV(2:4),Z2FV(1),V2Mass,Lifetime,Spin
 
 
 ! decay product 1 (V1): l-, nu or q
-    i=7
-    if (LHE_IDUP(i).gt.-9000) then
-        write(14,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,3),MomDummy(1,3),L12Mass,Lifetime,Spin
-    endif
+i=7
+if (LHE_IDUP(i).gt.-9000) then
+write(14,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,3),MomDummy(1,3),L12Mass,Lifetime,Spin
+endif
 
 ! decay product 2 (V1): l+, nubar or qbar
-    i=6
-    if (LHE_IDUP(i).gt.-9000) then
-        write(14,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,4),MomDummy(1,4),L11Mass,Lifetime,Spin
-    endif
+i=6
+if (LHE_IDUP(i).gt.-9000) then
+write(14,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,4),MomDummy(1,4),L11Mass,Lifetime,Spin
+endif
 
 ! decay product 1 (V2): l-, nu or q
-    i=9
-    if (LHE_IDUP(i).gt.-9000) then
-        write(14,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,5),MomDummy(1,5),L22Mass,Lifetime,Spin
-    endif
+i=9
+if (LHE_IDUP(i).gt.-9000) then
+write(14,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,5),MomDummy(1,5),L22Mass,Lifetime,Spin
+endif
 
 ! decay product 2 (V2): l+, nubar or qbar
-    i=8
-    if (LHE_IDUP(i).gt.-9000) then
-        write(14,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,6),MomDummy(1,6),L21Mass,Lifetime,Spin
-    endif
+i=8
+if (LHE_IDUP(i).gt.-9000) then
+write(14,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,6),MomDummy(1,6),L21Mass,Lifetime,Spin
+endif
 
-    write(14,"(A)") "</event>"
+write(14,"(A)") "</event>"
 
 ! print * ,"check ", LHE_IDUP(6),MomDummy(1:4,4)
 ! print * ,"check ", LHE_IDUP(7),MomDummy(1:4,3)
@@ -199,7 +236,6 @@ character(len=*),parameter :: fmt1 = "(I3,X,I2,X,I2,X,I2,X,I3,X,I3,X,1PE14.7,X,1
 ! pause
 
 END SUBROUTINE
-
 
 
 SUBROUTINE EvalPhasespace_VDecay(VMom,MV,ML1,ML2,xRndPS,MomDK,PSWgt)

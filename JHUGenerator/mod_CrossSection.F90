@@ -820,6 +820,12 @@ include 'csmaxvalue.f'
       call EvalPhasespace_VDecay(MomExt(1:4,3),MZ1,ML1,ML2,yRnd(5:6),MomDK(1:4,1:2),PSWgt2)
       call EvalPhasespace_VDecay(MomExt(1:4,4),MZ2,ML3,ML4,yRnd(7:8),MomDK(1:4,3:4),PSWgt3)
       PSWgt = PSWgt * PSWgt2*PSWgt3
+
+      if( includeInterference.eqv..true.) then! introduce this momentum flip to allow proper mapping of integrand with Z-poles at MZ2=(p2+p3)^2 and MZ2=(p1+p4)^2
+         if( yrnd(13).gt.0.5d0 ) call swapmom( MomDK(1:4,1),MomDK(1:4,3) )
+         !             PSWgt = PSWgt * 2d0
+      endif
+
     else
         MomDK(1:4,1) = MomExt(1:4,3)
         MomDK(1:4,2) = 0d0

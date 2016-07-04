@@ -77,8 +77,8 @@ real(8), public, parameter :: Br_Z_bo = 1d0-Br_Z_up-Br_Z_ch-Br_Z_dn-Br_Z_st  ! b
 !---parameters that define spin 1 coupling to SM fields, see note
    complex(8), public, parameter :: zprime_qq_left  = (1.0d0,0d0)
    complex(8), public, parameter :: zprime_qq_right = (1.0d0,0d0)
-   complex(8), public, parameter :: zprime_zz_1 =  (0.0d0,0d0)!  =1 for JP=1- vector
-   complex(8), public, parameter :: zprime_zz_2 =  (1.0d0,0d0)!  =1 for JP=1+ pseudovector
+   complex(8), public, parameter :: zprime_zz_1 =  (1.0d0,0d0)!  =1 for JP=1- vector
+   complex(8), public, parameter :: zprime_zz_2 =  (0.0d0,0d0)!  =1 for JP=1+ pseudovector
 
 !-- parameters that define spin 2 coupling to SM fields, see note
 ! minimal coupling corresponds to a1 = b1 = b5 = 1 everything else 0
@@ -98,7 +98,7 @@ real(8), public, parameter :: Br_Z_bo = 1d0-Br_Z_up-Br_Z_ch-Br_Z_dn-Br_Z_st  ! b
   complex(8), public, parameter :: b2 = (0.0d0,0d0)
   complex(8), public, parameter :: b3 = (0.0d0,0d0)
   complex(8), public, parameter :: b4 = (0.0d0,0d0)
-  complex(8), public, parameter :: b5 = (0.0d0,0d0)
+  complex(8), public, parameter :: b5 = (1.0d0,0d0)
   complex(8), public, parameter :: b6 = (0.0d0,0d0)
   complex(8), public, parameter :: b7 = (0.0d0,0d0)
   complex(8), public, parameter :: b8 = (0.0d0,0d0)

@@ -400,7 +400,7 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
         adj_par = VG(0,0)/(VG(-5,5)+VG(-4,4)+VG(-3,3)+VG(-2,2)+VG(-1,1)  &
                 + VG(1,-1)+VG(2,-2)+VG(3,-3)+VG(4,-4)+VG(5,-5))*channels_ratio_fix/(one-channels_ratio_fix)
     else
-        adj_par = one
+        adj_par = 100000
     endif
 
 !--- rescale the gluon induced channel
@@ -413,6 +413,7 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
     AccepCounter = 0
     RejeCounter = 0
     AccepCounter_part = 0
+
     if (seed_random) then 
 #if compiler==1
         call random_seed()
@@ -425,8 +426,6 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
         deallocate(gfort_seed)        
 #endif
     endif
-
-
 
     print *, "generating events"
     call cpu_time(time_start)
@@ -466,6 +465,8 @@ real(8) :: dum, RES(-5:5,-5:5)
 logical :: warmup
 integer :: i, i1, PChannel_aux, PChannel_aux1,n1,n2,n3,n4
 include 'csmaxvalue.f'
+integer :: n,clock
+integer, dimension(:), allocatable :: gfort_seed
 
 if( VegasIt1.eq.-1 ) VegasIt1 = VegasIt1_default
 if( VegasNc1.eq.-1 ) VegasNc1 = 5000
@@ -523,6 +524,19 @@ enddo
 
 !pause
    call ClearHisto()
+
+    if (seed_random) then 
+#if compiler==1
+        call random_seed()
+#elif compiler==2
+        call random_seed(size=n)
+        allocate(gfort_seed(n))
+        call system_clock(count=clock)
+        gfort_seed = clock + 37 * (/ (i - 1, i = 1, n) /)
+        call random_seed(put = gfort_seed)
+        deallocate(gfort_seed)        
+#endif
+    endif
 
    print *, " generating events"
    call cpu_time(time_start)
