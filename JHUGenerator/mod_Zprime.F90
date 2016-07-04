@@ -25,7 +25,7 @@
       real(dp) :: aL1,aR1,aL2,aR2
       real(dp) :: gZ_sq
       real(dp) :: prefactor, Lambda_inv
-      real(dp), parameter :: symmFact=1d0/2d0/2d0
+      real(dp), parameter :: symmFact=1d0/2d0
 
 
       gZ_sq = 4.0_dp*pi*alpha_QED/4.0_dp/(one-sitW**2)/sitW**2
