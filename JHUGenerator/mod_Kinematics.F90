@@ -41,7 +41,13 @@ character(len=*),parameter :: fmt1 = "(I3,X,I2,X,I2,X,I2,X,I3,X,I3,X,1PE14.7,X,1
 !        print *, "LHE_IDUP(i) ",LHE_IDUP(i)
     enddo
 
-    NUP=9
+! NUP changes for gamma gamma final state
+    if (LHE_IDUP(4).eq.22) then
+        NUP=5
+    else 
+        NUP=9
+    endif
+    
     IDPRUP=100
     XWGTUP=1.
     SCALUP=1000.
@@ -186,29 +192,29 @@ character(len=*),parameter :: fmt1 = "(I3,X,I2,X,I2,X,I2,X,I3,X,I3,X,1PE14.7,X,1
 
     write(14,"(A)") "</event>"
 
-!print * ,"check ", LHE_IDUP(6),MomDummy(1:4,4)
-!print * ,"check ", LHE_IDUP(7),MomDummy(1:4,3)
-!print * ,"check ", LHE_IDUP(8),MomDummy(1:4,6)
-!print * ,"check ", LHE_IDUP(9),MomDummy(1:4,5)
-!pause
+! print * ,"check ", LHE_IDUP(6),MomDummy(1:4,4)
+! print * ,"check ", LHE_IDUP(7),MomDummy(1:4,3)
+! print * ,"check ", LHE_IDUP(8),MomDummy(1:4,6)
+! print * ,"check ", LHE_IDUP(9),MomDummy(1:4,5)
+! pause
 
 END SUBROUTINE
 
 
 
-SUBROUTINE EvalPhasespace_VDecay(VMom,MV,xRndPS,MomDK,PSWgt)
+SUBROUTINE EvalPhasespace_VDecay(VMom,MV,ML1,ML2,xRndPS,MomDK,PSWgt)
 use ModMisc
 use ModParameters
 implicit none
 real(8) :: PSWgt,PSWgt2,PSWgt3
 real(8) :: VMom(1:4),MomChk(1:4,1:3)
 real(8) :: MomDK(1:4,1:2)
-real(8) :: xRndPS(1:2),MV
+real(8) :: xRndPS(1:2),MV,ML1,ML2
 integer,parameter :: N2=2
 real(8),parameter :: PiWgt2 = (2d0*Pi)**(4-N2*3) * (4d0*Pi)**(N2-1)
 
 
-      call genps(2,MV,xRndPS(1:2),(/0d0,0d0/),MomDK(1:4,1:2),PSWgt2)
+      call genps(2,MV,xRndPS(1:2),(/ML1,ML2/),MomDK(1:4,1:2),PSWgt2)
 
 !     boost all guys to the V boson frame:
       call boost(MomDK(1:4,1),VMom(1:4),MV)
@@ -384,13 +390,17 @@ SUBROUTINE Kinematics(NumPart,MomExt,MomDK,applyPSCut,NBin)
 use ModMisc
 use ModParameters
 implicit none
-real(8) :: MomExt(:,:),MomDK(:,:), mZ1, mZ2, MG
-real(8) :: MomLepP(1:4),MomLepM(1:4),MomBoost(1:4),MomZ(1:4),MomG(1:4)
-real(8) :: MomLept(1:4,1:4)
+real(8) :: MomExt(:,:),MomDK(:,:), mZ1, mZ2, MReso
+real(8) :: MomLepP(1:4),MomLepM(1:4),MomBoost(1:4),BeamAxis(1:4),ScatteringAxis(1:4),dummy(1:4)
+real(8) :: MomLept(1:4,1:4),MomLeptX(1:4,1:4),MomLeptPlane1(2:4),MomLeptPlane2(2:4),MomBeamScatterPlane(2:4)
 logical :: applyPSCut
 integer :: NumPart,NBin(:)
-real(8) :: pT_lepM,pT_lepP
-real(8) :: CosPhi_LepPZ,InvM_Lep,CosPhi_LepPlanes,CosThetaZ
+real(8) :: pT_lepM,pT_lepP,y_lepM,y_lepP,MomFerm(1:4),MomZ2(1:4),MomReso(1:4),CosTheta1,Phi,Phi1,signPhi,signPhi1
+real(8) :: CosPhi_LepPZ,InvM_Lep,CosPhi_LepPlanes,CosThetaZ,CosThetaStar
+
+
+!  W^+/Z(MomExt(:,3))    -->    e^+(MomDK(:,2)) + nu_e(MomDK(:,1))       /   e^+(MomDK(:,2)) + e^-(MomDK(:,1))
+!  W^-/Z(MomExt(:,4))    -->    e^-(MomDK(:,3)) + nubar_e(MomDK(:,4))    /   e^-(MomDK(:,3)) + e^+(MomDK(:,4))
 
 !   MomDK(:,i): i=1 fermion
 !   MomDK(:,i): i=2 anti-fermion
@@ -399,83 +409,173 @@ real(8) :: CosPhi_LepPZ,InvM_Lep,CosPhi_LepPlanes,CosThetaZ
 
       applyPSCut = .false.
 
-!--- compute the invariant mass of the ``graviton''
-
-      mG = sqrt(2d0*(MomExt(1,1)*MomExt(1,2) - MomExt(2,1)*MomExt(2,2)   &
-      - MomExt(3,1)*MomExt(3,2) - MomExt(4,1)*MomExt(4,2)))
-
-!--- compute the invariant mass of the two pairs of leptons -- the ``Z'' masses
-      mZ1 = sqrt(2d0*(MomDK(1,1)*MomDK(1,2) - MomDK(2,1)*MomDK(2,2) &
-      - MomDK(3,1)*MomDK(3,2)  - MomDK(4,1)*MomDK(4,2)))
-
-      mZ2 = sqrt(2d0*(MomDK(1,3)*MomDK(1,4) - MomDK(2,3)*MomDK(2,4) &
-      - MomDK(3,3)*MomDK(3,4)  - MomDK(4,3)*MomDK(4,4)))
 
 
-!  eval kinematic variables
-!     angle
-      MomBoost(1)   =+MomExt(1,3)
-      MomBoost(2:4) =-MomExt(2:4,3)
 
-      MomLepP(1:4)  = MomDK(1:4,1)
-      call boost(MomLepP(1:4),MomBoost(1:4),mZ1)
+!--- compute the invariant mass of the resonance
+      MReso = sqrt(abs(   2d0*(MomExt(1:4,1).dot.MomExt(1:4,2))  ))
 
-      MomZ(1:4) = MomExt(1:4,4)
-      call boost(MomZ(1:4),MomBoost(1:4),mZ1)
 
-      CosPhi_LepPZ = (MomLepP(2)*MomZ(2)+MomLepP(3)*MomZ(3)  &
-      +MomLepP(4)*MomZ(4))/MomLepP(1)/dsqrt(MomZ(1)**2-mZ2**2)
 
-!     pT of leptons
-      pT_lepP = get_PT(MomDK(1:4,1))
-      pT_lepM = get_PT(MomDK(1:4,2))
+! !     associte lepton pairs 
+!       mZ1 = Get_MInv( MomDK(1:4,1)+MomDK(1:4,2) )
+!       mZ2 = Get_MInv( MomDK(1:4,1)+MomDK(1:4,4) )
+!       if( dabs(mZ1-m_V) .lt. dabs(mZ2-m_V)  ) then
+!           MomLept(1:4,1) = MomDK(1:4,1)
+!           MomLept(1:4,2) = MomDK(1:4,2)
+!           MomLept(1:4,3) = MomDK(1:4,3)
+!           MomLept(1:4,4) = MomDK(1:4,4)
+!       else
+!           MomLept(1:4,1) = MomDK(1:4,1)
+!           MomLept(1:4,2) = MomDK(1:4,4)
+!           MomLept(1:4,3) = MomDK(1:4,3)
+!           MomLept(1:4,4) = MomDK(1:4,2)
+!       endif
+      
+!     MC truth for lepton pairs 
+      MomLept(1:4,1:4) = MomDK(1:4,1:4)
 
-!     angle between lepton planes
-!      MomLepP(2:4) = MomDK(2:4,1).cross.MomDK(2:4,2)
-!      MomLepP(2:4) = MomLepP(2:4)/dsqrt( MomLepP(2)**2+MomLepP(3)**2+MomLepP(4)**2 )
-!      MomLepM(2:4) = MomDK(2:4,3).cross.MomDK(2:4,4)
-!      MomLepM(2:4) = MomLepM(2:4)/dsqrt( MomLepM(2)**2+MomLepM(3)**2+MomLepM(4)**2 )
 
-      MomG(1:4)= MomExt(1:4,3) + MomExt(1:4,4)
-      MomBoost(1)   =+MomG(1)
-      MomBoost(2:4) =-MomG(2:4)
-      MomLept = MomDK
-      call boost(MomLept(1:4,1),MomBoost(1:4),mG)
-      call boost(MomLept(1:4,2),MomBoost(1:4),mG)
-      call boost(MomLept(1:4,3),MomBoost(1:4),mG)
-      call boost(MomLept(1:4,4),MomBoost(1:4),mG)
+!--- compute the invariant mass of the two vector bosons, assuming Z1->l1+l2 and Z2->l3+l4
+      mZ1 = sqrt(abs( 2d0*(MomLept(1:4,1).dot.MomLept(1:4,2))  ))
+      mZ2 = sqrt(abs( 2d0*(MomLept(1:4,3).dot.MomLept(1:4,4))  ))
+
+
+
+
+
+!   compute pT of leptons in the lab frame
+      pT_lepP = get_PT(MomLept(1:4,2))
+      pT_lepM = get_PT(MomLept(1:4,3))
+
+      y_lepP = get_eta(MomLept(1:4,2))
+      y_lepM = get_eta(MomLept(1:4,3))
+
+
+
+
+
+
+! construct cos(theta1): angle between direction of fermion from Z1 and negative direction of opposite Z in Z1 rest frame
+
+      MomBoost(1)   = +MomExt(1,3)
+      MomBoost(2:4) = -MomExt(2:4,3)
+
+      MomFerm(1:4)  = MomLept(1:4,1)
+      call boost(MomFerm(1:4),MomBoost(1:4),mZ1)! boost fermion from Z1 into Z1 rest frame
+
+      MomZ2(1) = MomExt(1,4)
+      MomZ2(2:4) = -MomExt(2:4,4)
+      call boost(MomZ2(1:4),MomBoost(1:4),mZ1)! boost -Z2 into Z1 rest frame
+
+      CosTheta1 = Get_CosAlpha( MomFerm(1:4),MomZ2(1:4) )
+
+
+
+
+
+
+! construct Phi: angle between lepton planes in resonance rest frame
+!                equivalent to angle between normal vectors of lepton planes in resonance rest frame
+
+      MomReso(1:4)= MomExt(1:4,3) + MomExt(1:4,4)
+      MomBoost(1)   = +MomReso(1)
+      MomBoost(2:4) = -MomReso(2:4)
+      MomLeptX(1:4,1:4) = MomLept(1:4,1:4)
+      ScatteringAxis(1:4) = MomExt(1:4,3)
+      call boost(MomLeptX(1:4,1),MomBoost(1:4),MReso)! boost all leptons into the resonance frame
+      call boost(MomLeptX(1:4,2),MomBoost(1:4),MReso)
+      call boost(MomLeptX(1:4,3),MomBoost(1:4),MReso)
+      call boost(MomLeptX(1:4,4),MomBoost(1:4),MReso)
+      call boost(ScatteringAxis(1:4),MomBoost(1:4),MReso)
 
 
 !     orthogonal vectors defined as p(fermion) x p(antifermion)
-      MomLepP(2:4) = (MomLept(2:4,1)).cross.(MomLept(2:4,2))! orthogonal vector to lepton plane
-      MomLepP(2:4) = MomLepP(2:4)/dsqrt( MomLepP(2)**2+MomLepP(3)**2+MomLepP(4)**2 )! normalize
+      MomLeptPlane1(2:4) = (MomLeptX(2:4,1)).cross.(MomLeptX(2:4,2))! orthogonal vector to lepton plane
+      MomLeptPlane1(2:4) = MomLeptPlane1(2:4)/dsqrt( MomLeptPlane1(2)**2+MomLeptPlane1(3)**2+MomLeptPlane1(4)**2 )! normalize
       
-      MomLepM(2:4) = (MomLept(2:4,3)).cross.(MomLept(2:4,4))! orthogonal vector to lepton plane
-      MomLepM(2:4) = MomLepM(2:4)/dsqrt( MomLepM(2)**2+MomLepM(3)**2+MomLepM(4)**2 )! normalize
+      MomLeptPlane2(2:4) = (MomLeptX(2:4,3)).cross.(MomLeptX(2:4,4))! orthogonal vector to lepton plane
+      MomLeptPlane2(2:4) = MomLeptPlane2(2:4)/dsqrt( MomLeptPlane2(2)**2+MomLeptPlane2(3)**2+MomLeptPlane2(4)**2 )! normalize
 
-      CosPhi_LepPlanes = acos(MomLepP(2)*MomLepM(2)+MomLepP(3)*MomLepM(3)+MomLepP(4)*MomLepM(4))
+!     get the sign
+      dummy(2:4) = (MomLeptPlane1(2:4)).cross.(MomLeptPlane2(2:4))
+      signPhi = sign(1d0,  (dummy(2)*ScatteringAxis(2)+dummy(3)*ScatteringAxis(3)+dummy(4)*ScatteringAxis(4))  )! use q1
+
+      Phi = signPhi * acos(-1d0*(MomLeptPlane1(2)*MomLeptPlane2(2) + MomLeptPlane1(3)*MomLeptPlane2(3) + MomLeptPlane1(4)*MomLeptPlane2(4)))
+
+!print *, "phi",phi
+!pause
+
+! phi(ll)
+! Phi = acos((MomLept(2,2)*MomLept(2,3) + MomLept(3,2)*MomLept(3,3))/dsqrt(MomLept(2,2)**2+MomLept(3,2)**2)/dsqrt(MomLept(2,3)**2+MomLept(3,3)**2) )
 
 
 
-!     scattering angle of Z in graviton rest frame
-      MomG(1:4)= MomExt(1:4,3) + MomExt(1:4,4)
-      MomBoost(1)   =+MomG(1)
-      MomBoost(2:4) =-MomG(2:4)
-      MomZ(1:4) = MomExt(1:4,4)
-      call boost(MomZ(1:4),MomBoost(1:4),mG)
-      CosThetaZ = MomZ(4)/dsqrt(MomZ(2)**2+MomZ(3)**2+MomZ(4)**2)
 
-!     lepton invariant mass distribuion - should be Breit-Wigner
+! construct cos(theta*):    scattering angle of Z's in graviton rest frame
+
+      MomReso(1:4)= MomExt(1:4,3) + MomExt(1:4,4)
+      MomBoost(1)   = +MomReso(1)
+      MomBoost(2:4) = -MomReso(2:4)
+      MomZ2(1:4) = MomExt(1:4,4)
+!       if( mz1.lt.mz2 ) then 
+!           MomZ2(1:4) = MomExt(1:4,3)
+!       else
+!           MomZ2(1:4) = MomExt(1:4,4)          
+!       endif
+      call boost(MomZ2(1:4),MomBoost(1:4),MReso)
+      CosThetaStar = Get_CosTheta( MomZ2(1:4) )
+
+! print *, MomReso(1:4)
+!       MomZ2(1:4) = MomReso(1:4)
+!       call boost(MomZ2(1:4),MomBoost(1:4),MReso)
+! print *, MomZ2(1:4)
+! pause
+
+
+
+! construct Phi1:  angle between beam-scattering plane and the lepton plane of Z1 in the resonance rest frame
+
+      BeamAxis(1:4) = (/1d0,0d0,0d0,1d0/)!  energy components are dummies here and will not be used
+      ScatteringAxis(1:4) = MomExt(1:4,3)
+      MomReso(1:4)= MomExt(1:4,3) + MomExt(1:4,4)
+      MomBoost(1)   = +MomReso(1)
+      MomBoost(2:4) = -MomReso(2:4)
+!       call boost(BeamAxis(1:4),MomBoost(1:4),MReso)
+      call boost(ScatteringAxis(1:4),MomBoost(1:4),MReso)
+
+
+      MomBeamScatterPlane(2:4) = (BeamAxis(2:4)).cross.(ScatteringAxis(2:4))! orthogonal vector to beam-scattering plane
+      MomBeamScatterPlane(2:4) = MomBeamScatterPlane(2:4)/dsqrt( MomBeamScatterPlane(2)**2+MomBeamScatterPlane(3)**2+MomBeamScatterPlane(4)**2 ) 
+
+!     get the sign
+      dummy(2:4) = (MomLeptPlane1(2:4)).cross.(MomBeamScatterPlane(2:4))
+      signPhi1 = sign(1d0,  (dummy(2)*ScatteringAxis(2)+dummy(3)*ScatteringAxis(3)+dummy(4)*ScatteringAxis(4))  )! use q1
+
+      Phi1 = signPhi1 * acos(MomLeptPlane1(2)*MomBeamScatterPlane(2) + MomLeptPlane1(3)*MomBeamScatterPlane(3) + MomLeptPlane1(4)*MomBeamScatterPlane(4))
+
+
+
 
 !     binning
-      NBin(1) = WhichBin(1,pT_lepP)
-      NBin(2) = WhichBin(2,pT_lepM)
-      NBin(3) = WhichBin(3,CosPhi_LepPZ)
-      NBin(4) = WhichBin(4,CosPhi_LepPlanes)
-      NBin(5) = WhichBin(5,CosThetaZ)
-      NBin(6) = WhichBin(6,mZ1)
-      NBin(7) = WhichBin(7,mZ2)
-      NBin(8) = WhichBin(8,mG)
+      NBin(1)  = WhichBin(1,pT_lepP)
+      NBin(2)  = WhichBin(2,pT_lepM)
+      NBin(3)  = WhichBin(3,y_lepP)
+      NBin(4)  = WhichBin(4,y_lepM)
+      NBin(5)  = WhichBin(5,CosThetaStar)
+      NBin(6)  = WhichBin(6,Phi1)
+      NBin(7)  = WhichBin(7,CosTheta1)
+      NBin(8)  = WhichBin(8,Phi)
+
+if( mz1.gt.mz2 ) then 
+      NBin(9)  = WhichBin(9,mZ2)
+      NBin(10) = WhichBin(10,mZ1)
+else
+      NBin(9)  = WhichBin(9,mZ1)
+      NBin(10) = WhichBin(10,mZ2)
+endif
+
+      NBin(11) = WhichBin(11,mReso)
 
 return
 END SUBROUTINE
@@ -728,6 +828,32 @@ real(8) :: Value
 
 RETURN
 END FUNCTION
+
+
+
+
+
+FUNCTION WhichXBin(NHisto,XValue)
+use ModParameters
+implicit none
+integer :: WhichXBin,NHisto
+real(8) :: XValue
+integer :: i
+include "vegas_common.f"
+
+    whichxbin = int( xValue*NPart )!  uniform distribution
+
+
+!    do i=1,50!                         distribution according to vegas grid
+!       if( XValue .lt. xi(i,NHisto) ) then
+!           WhichXBin=i
+!           return
+!       endif
+!    enddo
+RETURN
+END FUNCTION
+
+
 
 
 

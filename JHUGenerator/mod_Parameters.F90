@@ -11,6 +11,7 @@ integer(8), public :: EvalCounter=0
 integer(8), public :: RejeCounter=0
 integer(8), public :: AccepCounter=0
 integer(8), public :: AccepCounter_part(-5:5,-5:5)=0
+real(8) :: time_start,time_end
 character :: DataFile*(20)
 
 logical, public, parameter :: seed_random = .true.
@@ -18,6 +19,13 @@ logical, public, parameter :: seed_random = .true.
 logical, public, parameter :: fix_channels_ratio = .true.
 real(8), public, parameter :: channels_ratio_fix = 0.25d0    ! desired ratio of
                                                              ! N_qq/(N_qq+N_gg)
+logical, public, parameter :: includeInterference=.false.    ! include interference effecs in ZZ production with decays to 4 leptons
+
+real(8),public :: GlobalMax=-1d99
+real(8),public :: GlobalMin=+1d99
+integer,parameter :: NPart=200
+real(8),public :: PartitionMax(0:NPart,0:NPart)=-1d99
+
 
 real(8),public :: minCS=1d10,maxCS=0d0,avgCS=0d0
 ! we are using units of 100GeV, i.e. Lambda=10 is 1TeV
@@ -28,15 +36,19 @@ real(8), public, parameter :: Ga_Z    = 2.4952d0  *GeV      ! Z boson width(PDG-
 real(8), public, parameter :: M_W     = 80.399d0  *GeV      ! W boson mass (PDG-2011)
 real(8), public, parameter :: Ga_W    = 2.085d0   *GeV      ! W boson width(PDG-2011)
 real(8), public, parameter :: M_Reso  = 125d0     *GeV      ! X resonance mass (spin 0, spin 1, spin 2)
-real(8), public, parameter :: Ga_Reso = 5d0       *GeV      ! X resonance width
+real(8), public, parameter :: Ga_Reso = 0.1d0     *GeV      ! X resonance width
 real(8), public, parameter :: Lambda  = 1000d0    *GeV      ! Lambda coupling enters in two places
                                                             ! overal scale for x-section and in power suppressed
                                                             ! operators/formfactors (former r).
+
+real(8), public, parameter :: m_tau = 1.8d0  *GeV           ! tau lepton mass
+
 real(8), public, parameter :: alpha_QED = 1d0/128.0d0       ! el.magn. coupling
 real(8), public, parameter :: sitW = dsqrt(0.23119d0)       ! sin(Theta_Weinberg) (PDG-2008)
 real(8), public, parameter :: Mu_Fact = M_Reso              ! pdf factorization scale
-real(8), public, parameter :: LHC_Energy=7000d0  *GeV       ! LHC hadronic center of mass energy
+real(8), public, parameter :: LHC_Energy=8000d0  *GeV       ! LHC hadronic center of mass energy
 real(8), public, parameter :: TEV_Energy=1960d0  *GeV       ! Tevatron hadronic center of mass energy
+
 
 real(8), public, parameter :: Br_Z_up = 0.1657d0  ! branching fraction Ga(up)/Ga(hadronic)
 real(8), public, parameter :: Br_Z_ch = 0.1657d0  ! branching fraction Ga(charm)/Ga(hadronic)
@@ -45,59 +57,63 @@ real(8), public, parameter :: Br_Z_st = 0.2229d0  ! branching fraction Ga(strang
 real(8), public, parameter :: Br_Z_bo = 1d0-Br_Z_up-Br_Z_ch-Br_Z_dn-Br_Z_st  ! branching fraction Ga(bottom)/Ga(hadronic)
 
 !-- parameters that define on-shell spin 0 coupling to SM fields, see note
+   logical, public, parameter :: generate_as = .false.
    complex(8), public, parameter :: ahg1 = (1.0d0,0d0)
    complex(8), public, parameter :: ahg2 = (0.0d0,0d0)
    complex(8), public, parameter :: ahg3 = (0.0d0,0d0)  ! pseudoscalar
    complex(8), public, parameter :: ahz1 = (1.0d0,0d0)
-   complex(8), public, parameter :: ahz2 = (0.0d0,0d0)
+   complex(8), public, parameter :: ahz2 = (0.0d0,0d0)  ! this coupling does not contribute for gamma+gamma final states
    complex(8), public, parameter :: ahz3 = (0.0d0,0d0)  ! pseudoscalar
 
 !-- parameters that define off-shell spin 0 coupling to SM fields, see note
    complex(8), public, parameter :: ghg2 = (1.0d0,0d0)
    complex(8), public, parameter :: ghg3 = (0.0d0,0d0)
    complex(8), public, parameter :: ghg4 = (0.0d0,0d0)   ! pseudoscalar
-   complex(8), public, parameter :: ghz1 = (0.0d0,0d0)
-   complex(8), public, parameter :: ghz2 = (1.0d0,0d0)
+   complex(8), public, parameter :: ghz1 = (1.0d0,0d0)
+   complex(8), public, parameter :: ghz2 = (0.0d0,0d0)
    complex(8), public, parameter :: ghz3 = (0.0d0,0d0)
    complex(8), public, parameter :: ghz4 = (0.0d0,0d0)   ! pseudoscalar 
 
 !---parameters that define spin 1 coupling to SM fields, see note
    complex(8), public, parameter :: zprime_qq_left  = (1.0d0,0d0)
-   complex(8), public, parameter :: zprime_qq_right = (0.0d0,0d0)
-   complex(8), public, parameter :: zprime_zz_v =  (1.0d0,0d0)!  =1 for JP=1-
-   complex(8), public, parameter :: zprime_zz_a =  (0.0d0,0d0)!  =1 for JP=1+
+   complex(8), public, parameter :: zprime_qq_right = (1.0d0,0d0)
+   complex(8), public, parameter :: zprime_zz_1 =  (0.0d0,0d0)!  =1 for JP=1- vector
+   complex(8), public, parameter :: zprime_zz_2 =  (1.0d0,0d0)!  =1 for JP=1+ pseudovector
 
 !-- parameters that define spin 2 coupling to SM fields, see note
 ! minimal coupling corresponds to a1 = b1 = b5 = 1 everything else 0
-  complex(8), public, parameter :: a1 = (1.0d0,1d0)    ! g1  -- c.f. draft
-  complex(8), public, parameter :: a2 = (2.0d0,0d0)    ! g2
-  complex(8), public, parameter :: a3 = (3.0d0,0d0)    ! g3
-  complex(8), public, parameter :: a4 = (4.0d0,0d0)    ! g4
-  complex(8), public, parameter :: a5 = (5.0d0,0d0)    ! pseudoscalar, g8
+  complex(8), public, parameter :: a1 = (1.0d0,0d0)    ! g1  -- c.f. draft
+  complex(8), public, parameter :: a2 = (0.0d0,0d0)    ! g2
+  complex(8), public, parameter :: a3 = (0.0d0,0d0)    ! g3
+  complex(8), public, parameter :: a4 = (0.0d0,0d0)    ! g4
+  complex(8), public, parameter :: a5 = (0.0d0,0d0)    ! pseudoscalar, g8
+  complex(8), public, parameter :: graviton_qq_left  = (1.0d0,0d0)! graviton coupling to quarks
+  complex(8), public, parameter :: graviton_qq_right = (1.0d0,0d0)
 
 !-- see mod_Graviton
   logical, public, parameter :: generate_bis = .true.
   logical, public, parameter :: use_dynamic_MG = .true.
 
-  complex(8), public, parameter :: b1 = (1.0d0,1d0)    !  all b' below are g's in the draft
-  complex(8), public, parameter :: b2 = (2.0d0,0d0)
-  complex(8), public, parameter :: b3 = (3.0d0,0d0)
-  complex(8), public, parameter :: b4 = (4.0d0,0d0)
-  complex(8), public, parameter :: b5 = (5.0d0,2d0)
-  complex(8), public, parameter :: b6 = (6.0d0,0d0)
-  complex(8), public, parameter :: b7 = (7.0d0,0d0)
-  complex(8), public, parameter :: b8 = (8.0d0,0d0)
-  complex(8), public, parameter :: b9 = (9.0d0,0d0)
-  complex(8), public, parameter :: b10 = (11.0d0,0d0)
+  complex(8), public, parameter :: b1 = (1.0d0,0d0)    !  all b' below are g's in the draft
+  complex(8), public, parameter :: b2 = (0.0d0,0d0)
+  complex(8), public, parameter :: b3 = (0.0d0,0d0)
+  complex(8), public, parameter :: b4 = (0.0d0,0d0)
+  complex(8), public, parameter :: b5 = (0.0d0,0d0)
+  complex(8), public, parameter :: b6 = (0.0d0,0d0)
+  complex(8), public, parameter :: b7 = (0.0d0,0d0)
+  complex(8), public, parameter :: b8 = (0.0d0,0d0)
+  complex(8), public, parameter :: b9 = (0.0d0,0d0)  ! this coupling does not contribute to gamma+gamma final states
+  complex(8), public, parameter :: b10 =(0.0d0,0d0)  ! this coupling does not contribute to gamma+gamma final states
 
 
   complex(8), public, parameter  :: c1 = (1.0d0,0d0)
-  complex(8), public, parameter  :: c2 = (-0.5d0,0d0)
-  complex(8), public, parameter  :: c3 = (2.0d0,0d0)
-  complex(8), public, parameter  :: c4 = (-0.9d0,0d0)
-  complex(8), public, parameter  :: c5 = (3d0,0d0)
-  complex(8), public, parameter  :: c6 = (4d0,0d0)
-  complex(8), public, parameter  :: c7 = (5d0,0d0)
+  complex(8), public, parameter  :: c2 = (0.0d0,0d0)
+  complex(8), public, parameter  :: c3 = (0.0d0,0d0)
+  complex(8), public, parameter  :: c41= (0.0d0,0d0)
+  complex(8), public, parameter  :: c42= (0.0d0,0d0)
+  complex(8), public, parameter  :: c5 = (0.0d0,0d0)
+  complex(8), public, parameter  :: c6 = (0.0d0,0d0)  ! this coupling does not contribute to gamma+gamma final states
+  complex(8), public, parameter  :: c7 = (0.0d0,0d0)  ! this coupling does not contribute to gamma+gamma final states
 
 
 ! V-f-fbar couplings:
@@ -246,6 +262,56 @@ integer :: Part
   endif
 
 END FUNCTION
+
+
+
+
+
+
+FUNCTION getMass(Part)
+implicit none
+real :: getMass
+integer :: Part
+
+
+  if( Part.eq.Glu_ ) then
+      getMass = 0d0
+  elseif( abs(Part).eq.abs(ElM_) ) then
+      getMass = 0d0
+  elseif( abs(Part).eq.abs(MuM_) ) then
+      getMass = 0d0
+  elseif( abs(Part).eq.abs(TaM_) ) then
+      getMass = m_Tau
+  elseif( abs(Part).eq.abs(NuE_) ) then
+      getMass = 0d0
+  elseif( abs(Part).eq.abs(NuM_) ) then
+      getMass = 0d0
+  elseif( abs(Part).eq.abs(NuT_) ) then
+      getMass = 0d0
+  elseif( abs(Part).eq.abs(Up_) ) then
+      getMass = 0d0
+  elseif( abs(Part).eq.abs(Dn_) ) then
+      getMass = 0d0
+  elseif( abs(Part).eq.abs(Chm_) ) then
+      getMass = 0d0
+  elseif( abs(Part).eq.abs(Str_) ) then
+      getMass = 0d0
+  elseif( abs(Part).eq.abs(Bot_) ) then
+      getMass = 0d0
+  elseif( abs(Part).eq.abs(Z0_) ) then
+      getMass = M_Z
+  elseif( abs(Part).eq.abs(Wp_) ) then
+      getMass = M_W
+  elseif( abs(Part).eq.abs(Pho_) ) then
+      getMass = 0d0
+  else
+     print *, "Error in getMass"
+     stop
+  endif
+
+
+END FUNCTION
+
 
 
 

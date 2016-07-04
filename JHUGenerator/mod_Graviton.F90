@@ -21,13 +21,13 @@
       real(dp), intent(out) ::  sum
       real(dp), intent(in) :: p(4,6)
       integer, intent(in) :: MY_IDUP(6:9)
-      real(dp) :: s, pin(4,4)
-      complex(dp) :: A(2), sp(4,4), propG, propZ1, propZ2
-      integer :: i1,i2,i3,i4
+      real(dp) :: pin(4,4)
+      complex(dp) :: A(2)
+      integer :: i1,i2,i3,i4,ordering(1:4)
       real(dp) :: aL1,aR1,aL2,aR2
       real(dp) :: gZ_sq
       real(dp) :: prefactor, Lambda_inv
-
+      real(dp), parameter :: symmFact=1d0/2d0/2d0
 
       gZ_sq = 4.0_dp*pi*alpha_QED/4.0_dp/(one-sitW**2)/sitW**2
 
@@ -56,23 +56,13 @@
                     aR1=0d0
               endif
               prefactor = prefactor *(one/two*M_V*Ga_V)**2
-              s = 2d0 * scr(p(:,3),p(:,4))
-              propZ1 = s/dcmplx(s - M_V**2,M_V*Ga_V)
-              s = 2d0 * scr(p(:,5),p(:,6))
-              propZ2 = s/dcmplx(s - M_V**2,M_V*Ga_V)
          elseif( DecayMode1.ge.4 .and. DecayMode1.le.6 ) then !  W decay
               aL1 = bL
               aR1 = bR
               prefactor = prefactor *(one/two*M_V*Ga_V)**2
-              s = 2d0 * scr(p(:,3),p(:,4))
-              propZ1 = s/dcmplx(s - M_V**2,M_V*Ga_V)
-              s = 2d0 * scr(p(:,5),p(:,6))
-              propZ2 = s/dcmplx(s - M_V**2,M_V*Ga_V)
          elseif( DecayMode1.eq.7 ) then !  photon "decay"
               aL1=1d0
               aR1=1d0
-              propZ1 = 1d0
-              propZ2 = 1d0
               prefactor = prefactor/gZ_sq**2! cancel the overall z coupling
          else
               aL1=0d0
@@ -107,47 +97,41 @@
               aR2=0d0
          endif
 
-      s  = 2d0 * scr(p(:,1),p(:,2))
-      propG = one/dcmplx(s - M_Reso**2,M_Reso*Ga_Reso)
 
 sum = zero
-
 do i1=1,2
 do i2 = 1,2
 do i3 = 1,2
 do i4 = 1,2
-         pin(1,:) = p(:,1)
-         pin(2,:) = p(:,2)
-         sp(1,:) = pol_mless2(dcmplx(p(:,1)),-3+2*i1,'in')  ! gluon
-         sp(2,:) = pol_mless2(dcmplx(p(:,2)),-3+2*i2,'in')  ! gluon
 
-!-------- -1 == left, 1 == right
-         if( DecayMode1.ne.7 ) then 
-            pin(3,:) = p(:,3)+p(:,4)
-            pin(4,:) = p(:,5)+p(:,6)
-            sp(3,:) = pol_dk2mom(dcmplx(p(:,3)),dcmplx(p(:,4)),-3+2*i3)  !e-,e+
-            sp(4,:) = pol_dk2mom(dcmplx(p(:,5)),dcmplx(p(:,6)),-3+2*i4)  !mu-,mu+ / Q,Qbar
-         elseif( DecayMode1.eq.7 ) then 
-            pin(3,:) = p(:,3)
-            pin(4,:) = p(:,5)
-            sp(3,:) = pol_mless2(dcmplx(pin(3,:)),-3+2*i3,'out')  ! photon
-            sp(4,:) = pol_mless2(dcmplx(pin(4,:)),-3+2*i4,'out')  ! photon
+         ordering = (/3,4,5,6/)
+         call calcHelAmp_gg(ordering,p(1:4,1:6),i1,i2,i3,i4,A(1))
+
+         if( (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then
+             ordering = (/5,4,3,6/)
+             call calcHelAmp_gg(ordering,p(1:4,1:6),i1,i2,i3,i4,A(2))
+             A(2) = -A(2) ! minus comes from fermi statistics
          endif
-
-         call ggGZZampl(pin,sp,A(1))
 
          if (i3.eq.1) then
-            A(1) = aL1*A(1)
+            A(:) = aL1*A(:)
          elseif(i3.eq.2) then
-            A(1) = aR1*A(1)
+            A(:) = aR1*A(:)
          endif
          if (i4.eq.1) then
-            A(1) = aL2*A(1)
+            A(:) = aL2*A(:)
          elseif(i4.eq.2) then
-            A(1) = aR2*A(1)
+            A(:) = aR2*A(:)
          endif
 
-         sum = sum + abs(propG*propZ1*propZ2*A(1))**2
+
+         if( (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then
+             sum = sum + symmFact * (cdabs( A(1)*dconjg(A(1)) ) + cdabs( A(2)*dconjg(A(2)) ))
+             if( i3.eq.i4 ) sum = sum + symmFact * 2d0*dreal(A(1)*dconjg(A(2)))  
+         else
+             sum = sum + cdabs( A(1)*dconjg(A(1)) )
+         endif
+
 enddo
 enddo
 enddo
@@ -156,6 +140,75 @@ enddo
       sum = sum*prefactor
 
       end subroutine
+
+
+
+     subroutine calcHelAmp_gg(ordering,p,i1,i2,i3,i4,A)
+     implicit none
+     integer :: ordering(1:4),i1,i2,i3,i4,l1,l2,l3,l4
+     real(dp) :: p(1:4,1:6)
+     complex(dp) :: propG, propZ1, propZ2
+     real(dp) :: s, pin(4,4)
+     complex(dp) :: A(1:1), sp(4,4)
+
+
+      l1=ordering(1)
+      l2=ordering(2)
+      l3=ordering(3)
+      l4=ordering(4)
+
+
+      s  = 2d0 * scr(p(:,1),p(:,2))
+      propG = one/dcmplx(s - M_Reso**2,M_Reso*Ga_Reso)
+
+         pin(1,:) = p(:,1)
+         pin(2,:) = p(:,2)
+         sp(1,:) = pol_mless2(dcmplx(p(:,1)),-3+2*i1,'in')  ! gluon
+         sp(2,:) = pol_mless2(dcmplx(p(:,2)),-3+2*i2,'in')  ! gluon
+          !sp(1,1:4)=pin(1,1:4);print *, "this checks IS gauge invariance"
+          !sp(2,1:4)=pin(2,1:4);print *, "this checks IS gauge invariance"
+          !careful: for gluon gauge invariance check the terms ~c3,c4 are needed because e1.q2 is not zero for e1-->q1
+
+!-------- -1 == left, 1 == right
+         if( DecayMode1.ne.7 ) then 
+!             pin(3,:) = p(:,3)+p(:,4)
+!             pin(4,:) = p(:,5)+p(:,6)
+!             sp(3,:) = pol_dk2mom(dcmplx(p(:,3)),dcmplx(p(:,4)),-3+2*i3)  !e-,e+
+!             sp(4,:) = pol_dk2mom(dcmplx(p(:,5)),dcmplx(p(:,6)),-3+2*i4)  !mu-,mu+ / Q,Qbar
+!             s = 2d0 * scr(p(:,3),p(:,4))
+!             propZ1 = s/dcmplx(s - M_V**2,M_V*Ga_V)
+!             s = 2d0 * scr(p(:,5),p(:,6))
+!             propZ2 = s/dcmplx(s - M_V**2,M_V*Ga_V)
+
+            pin(3,:) = p(:,l1)+p(:,l2)
+            pin(4,:) = p(:,l3)+p(:,l4)
+            sp(3,:) = pol_dk2mom(dcmplx(p(:,l1)),dcmplx(p(:,l2)),-3+2*i3)  ! ubar(l1), v(l2)
+            sp(3,:) = -sp(3,:) + pin(3,:)*( sc(sp(3,:),dcmplx(pin(3,:))) )/scr(pin(3,:),pin(3,:))! full propagator numerator
+            sp(4,:) = pol_dk2mom(dcmplx(p(:,l3)),dcmplx(p(:,l4)),-3+2*i4)  ! ubar(l3), v(l4)
+            sp(4,:) = -sp(4,:) + pin(4,:)*( sc(sp(4,:),dcmplx(pin(4,:))) )/scr(pin(4,:),pin(4,:))! full propagator numerator
+            s = scr(p(:,l1)+p(:,l2),p(:,l1)+p(:,l2))
+            propZ1 = s/dcmplx(s - M_V**2,M_V*Ga_V)
+            s = scr(p(:,l3)+p(:,l4),p(:,l3)+p(:,l4))
+            propZ2 = s/dcmplx(s - M_V**2,M_V*Ga_V)
+
+         elseif( DecayMode1.eq.7 ) then 
+            pin(3,:) = p(:,l1)
+            pin(4,:) = p(:,l3)
+            sp(3,:) = pol_mless2(dcmplx(p(:,l1)),-3+2*i3,'out')  ! photon
+            sp(4,:) = pol_mless2(dcmplx(p(:,l3)),-3+2*i4,'out')  ! photon
+!            sp(3,1:4)=pin(3,1:4);print *,"  this checks FS gauge invariance"
+!            sp(4,1:4)=pin(4,1:4);print *,"  this checks FS gauge invariance"
+            propz1=1d0
+            propz2=1d0
+         endif
+
+         call ggGZZampl(pin,sp,A(1))
+
+         A(1) = A(1) * propG*propZ1*propZ2
+
+      end subroutine
+
+
 
 
 
@@ -168,17 +221,24 @@ enddo
       real(dp), intent(out) ::  sum
       real(dp), intent(in) :: p(4,6)
       integer, intent(in) :: MY_IDUP(6:9)
-      real(dp) :: s, pin(4,4)
-      complex(dp) :: A(2), sp(4,4), propG, propZ1, propZ2
-      integer :: i1,i2,i3,i4
-      real(dp) :: aL1,aR1,aL2,aR2
+      real(dp) ::  pin(4,4)
+      complex(dp) :: A(2)
+      integer :: i1,i2,i3,i4,ordering(1:4)
+      real(dp) :: aL1,aR1,aL2,aR2,qL,qR
       real(dp) :: gZ_sq
       real(dp) :: prefactor, Lambda_inv
+      real(dp), parameter :: symmFact=1d0/2d0/2d0
+
 
 !---- electroweak couplings
 !       aL = -one + two*sitW**2
 !       aR = aL+one
       gZ_sq = 4.0_dp*pi*alpha_QED/4.0_dp/(one-sitW**2)/sitW**2
+
+
+!---- chiral couplings of quarks to gravitons
+      qL = graviton_qq_left
+      qR = graviton_qq_right
 
 !---- the 1/Lambda coupling
       Lambda_inv = 1.0_dp/Lambda
@@ -205,23 +265,13 @@ enddo
                     aR1=0d0
               endif
               prefactor = prefactor *(one/two*M_V*Ga_V)**2
-              s = 2d0 * scr(p(:,3),p(:,4))
-              propZ1 = s/dcmplx(s - M_V**2,M_V*Ga_V)
-              s = 2d0 * scr(p(:,5),p(:,6))
-              propZ2 = s/dcmplx(s - M_V**2,M_V*Ga_V)
          elseif( DecayMode1.ge.4 .and. DecayMode1.le.6 ) then !  W decay
               aL1 = bL
               aR1 = bR
               prefactor = prefactor *(one/two*M_V*Ga_V)**2
-              s = 2d0 * scr(p(:,3),p(:,4))
-              propZ1 = s/dcmplx(s - M_V**2,M_V*Ga_V)
-              s = 2d0 * scr(p(:,5),p(:,6))
-              propZ2 = s/dcmplx(s - M_V**2,M_V*Ga_V)
          elseif( DecayMode1.eq.7 ) then !  photon decay
               aL1=1d0
               aR1=1d0
-              propZ1 = 1d0
-              propZ2 = 1d0
               prefactor = prefactor/gZ_sq**2! cancel the overall z coupling
          else
               aL1=0d0
@@ -256,46 +306,44 @@ enddo
               aR2=0d0  
          endif
 
-      s  = two*scr(p(:,1),p(:,2))
-      propG = one/dcmplx(s - M_Reso**2,M_Reso*Ga_Reso)
-
-
       sum = zero
 do i1=1,2
 do i3 = 1,2
 do i4 = 1,2
-         pin(1,:) = p(:,1)
-         pin(2,:) = p(:,2)
-         sp(1,:) = pol_dk2mom(dcmplx(p(:,2)),dcmplx(p(:,1)),-3+2*i1)  !qbq
-         sp(2,:) = sp(1,:)  !-- the same, isn't really needed but for uniform bookeeping
 
-!-------- -1 == left, 1 == right
-         if( DecayMode1.ne.7 ) then 
-            pin(3,:) = p(:,3)+p(:,4)
-            pin(4,:) = p(:,5)+p(:,6)
-            sp(3,:) = pol_dk2mom(dcmplx(p(:,3)),dcmplx(p(:,4)),-3+2*i3)  !e-,e+
-            sp(4,:) = pol_dk2mom(dcmplx(p(:,5)),dcmplx(p(:,6)),-3+2*i4)  !mu-,mu+ / Q,Qbar
-         elseif( DecayMode1.eq.7 ) then 
-            pin(3,:) = p(:,3)
-            pin(4,:) = p(:,5)
-            sp(3,:) = pol_mless2(dcmplx(pin(3,:)),-3+2*i3,'out')  ! photon
-            sp(4,:) = pol_mless2(dcmplx(pin(4,:)),-3+2*i4,'out')  ! photon
+         ordering = (/3,4,5,6/)
+         call calcHelAmp_qq(ordering,p(1:4,1:6),i1,i3,i4,A(1))
+
+         if( (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then
+             ordering = (/5,4,3,6/)
+             call calcHelAmp_qq(ordering,p(1:4,1:6),i1,i3,i4,A(2))
+             A(2) = -A(2) ! minus comes from fermi statistics
          endif
 
-         call qqGZZampl(pin,sp,A(1))
-
+         if (i1.eq.1) then
+            A(:) = qL*A(:)
+         elseif(i1.eq.2) then
+            A(:) = qR*A(:)
+         endif
          if (i3.eq.1) then
-            A(1) = aL1*A(1)
+            A(:) = aL1*A(:)
           elseif(i3.eq.2) then
-            A(1) = aR1*A(1)
+            A(:) = aR1*A(:)
          endif
          if (i4.eq.1) then
-            A(1) = aL2*A(1)
+            A(:) = aL2*A(:)
           elseif(i4.eq.2) then
-            A(1) = aR2*A(1)
+            A(:) = aR2*A(:)
          endif
 
-         sum = sum + abs(propG*propZ1*propZ2*A(1))**2
+
+         if( (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then
+             sum = sum + symmFact * (cdabs( A(1)*dconjg(A(1)) ) + cdabs( A(2)*dconjg(A(2)) ))
+             if( i3.eq.i4 ) sum = sum + symmFact * 2d0*dreal(A(1)*dconjg(A(2)))  
+         else
+             sum = sum + cdabs( A(1)*dconjg(A(1)) )
+         endif
+
 enddo
 enddo
 enddo
@@ -304,6 +352,72 @@ enddo
 
       end subroutine
 
+
+
+
+
+     subroutine calcHelAmp_qq(ordering,p,i1,i3,i4,A)
+     implicit none
+     integer :: ordering(1:4),i1,i3,i4,l1,l2,l3,l4
+     real(dp) :: p(1:4,1:6)
+     complex(dp) :: propG, propZ1, propZ2
+     real(dp) :: s, pin(4,4)
+     complex(dp) :: A(1:1), sp(4,4)
+
+
+      l1=ordering(1)
+      l2=ordering(2)
+      l3=ordering(3)
+      l4=ordering(4)
+
+
+      s  = 2d0 * scr(p(:,1),p(:,2))
+      propG = one/dcmplx(s - M_Reso**2,M_Reso*Ga_Reso)
+
+
+         pin(1,:) = p(:,1)
+         pin(2,:) = p(:,2)
+         sp(1,:) = pol_dk2mom(dcmplx(p(:,2)),dcmplx(p(:,1)),-3+2*i1)  !qbq
+         sp(2,:) = sp(1,:)  !-- the same, isn't really needed but for uniform bookeeping
+
+!-------- -1 == left, 1 == right
+         if( DecayMode1.ne.7 ) then 
+!             pin(3,:) = p(:,3)+p(:,4)
+!             pin(4,:) = p(:,5)+p(:,6)
+!             sp(3,:) = pol_dk2mom(dcmplx(p(:,3)),dcmplx(p(:,4)),-3+2*i3)  !e-,e+
+!             sp(4,:) = pol_dk2mom(dcmplx(p(:,5)),dcmplx(p(:,6)),-3+2*i4)  !mu-,mu+ / Q,Qbar
+!             s = 2d0 * scr(p(:,3),p(:,4))
+!             propZ1 = s/dcmplx(s - M_V**2,M_V*Ga_V)
+!             s = 2d0 * scr(p(:,5),p(:,6))
+!             propZ2 = s/dcmplx(s - M_V**2,M_V*Ga_V)
+
+            pin(3,:) = p(:,l1)+p(:,l2)
+            pin(4,:) = p(:,l3)+p(:,l4)
+            sp(3,:) = pol_dk2mom(dcmplx(p(:,l1)),dcmplx(p(:,l2)),-3+2*i3)  ! ubar(l1), v(l2)
+            sp(3,:) = -sp(3,:) + pin(3,:)*( sc(sp(3,:),dcmplx(pin(3,:))) )/scr(pin(3,:),pin(3,:))! full propagator numerator
+            sp(4,:) = pol_dk2mom(dcmplx(p(:,l3)),dcmplx(p(:,l4)),-3+2*i4)  ! ubar(l3), v(l4)
+            sp(4,:) = -sp(4,:) + pin(4,:)*( sc(sp(4,:),dcmplx(pin(4,:))) )/scr(pin(4,:),pin(4,:))! full propagator numerator
+            s = scr(p(:,l1)+p(:,l2),p(:,l1)+p(:,l2))
+            propZ1 = s/dcmplx(s - M_V**2,M_V*Ga_V)
+            s = scr(p(:,l3)+p(:,l4),p(:,l3)+p(:,l4))
+            propZ2 = s/dcmplx(s - M_V**2,M_V*Ga_V)
+
+         elseif( DecayMode1.eq.7 ) then 
+            pin(3,:) = p(:,l1)
+            pin(4,:) = p(:,l3)
+            sp(3,:) = pol_mless2(dcmplx(p(:,l1)),-3+2*i3,'out')  ! photon
+            sp(4,:) = pol_mless2(dcmplx(p(:,l3)),-3+2*i4,'out')  ! photon
+!            sp(3,1:4)=pin(3,1:4);print *,"  this checks FS gauge invariance"
+!            sp(4,1:4)=pin(4,1:4);print *,"  this checks FS gauge invariance"
+            propZ1 = 1d0
+            propZ2 = 1d0
+         endif
+
+         call qqGZZampl(pin,sp,A(1))
+
+         A(1) = A(1) * propG*propZ1*propZ2
+
+      end subroutine
 
 
 
@@ -325,7 +439,7 @@ enddo
       complex(dp) :: e3_q4,e4_q3
       complex(dp) :: q1(4),q2(4),q3(4),q4(4),q(4)
       complex(dp) :: e1(4),e2(4),e3(4),e4(4)
-      complex(dp) :: yyy1,yyy2,yyy3,yyy4,yyy5,yyy6, yyy7
+      complex(dp) :: yyy1,yyy2,yyy3,yyy41,yyy42,yyy5,yyy6,yyy7
       real(dp) :: q34,MG,MZ3,MZ4
       real(dp) :: rr
 
@@ -385,77 +499,111 @@ enddo
 
       q34 = (MG**2-MZ3**2-MZ4**2)/2d0
 
+      if (generate_bis) then
+          rr = q34/Lambda**2
+          yyy1 = q34*(b1   + b2*rr*(one + two*M_V**2/q34+ M_V**4/q34**2)  + b5*M_V**2/q34)
+          yyy2 = -b1/two + b3*rr*(1d0-M_V**2/q34) + two*b4*rr+b7*rr*M_V**2/q34
+          yyy3 = (-b2/two - b3- two*b4)*rr/q34
+!           yyy4 = -b1 - b2*rr -(b2+b3+b6)*rr*M_V**2/q34
+          yyy41 = -b1 - b2*(q34+MZ3**2)/Lambda**2 - b3*MZ4**2/Lambda**2 - b6*M_V**2/Lambda**2
+          yyy42 = -b1 - b2*(q34+MZ4**2)/Lambda**2 - b3*MZ3**2/Lambda**2 - b6*M_V**2/Lambda**2
+          yyy5 = two*b8*rr*MG**2/q34
+!           yyy6 = b9
+          yyy6 = b9 * M_V**2/Lambda**2
+!           yyy7 = b10*rr*MG**2/q34
+          yyy7 = b10 * MG**2 * M_V**2/Lambda**4
+      else
+          yyy1 = (q34)*c1/2d0
+          yyy2 = c2
+          yyy3 = c3/MG**2
+!           yyy4 = c4
+          yyy41= c41
+          yyy42= c42
+          yyy5 = c5
+          yyy6 = c6
+          yyy7 = c7
+          if( DecayMode1.eq.7 .and. DecayMode2.eq.7 ) then
+              yyy6=0d0
+              yyy7=0d0
+          endif
+      endif
 
-if( DecayMode1.le.3 .or. ((DecayMode1.ge.4) .and. (DecayMode1.le.6)) ) then! decay into Z's or W's
-      if (generate_bis) then
-          rr = q34/Lambda**2
-          yyy1 = q34*(b1   + b2*rr*(one + two*M_V**2/q34+ M_V**4/q34**2)  + b5*M_V**2/q34)
-          yyy2 = -b1/two + b3*rr*(1d0-M_V**2/q34) + two*b4*rr+b7*rr*M_V**2/q34
-          yyy3 = (-b2/two - b3- two*b4)*rr/q34
-          yyy4 = -b1 - b2*rr -(b2+b3+b6)*rr*M_V**2/q34
-          yyy5 = two*b8*rr*MG**2/q34
-          yyy6 = b9
-          yyy7 = b10*rr*MG**2/q34
-      else
-          yyy1 = (q34)*c1
-          yyy2 = c2
-          yyy3 = c3
-          yyy4 = c4
-          yyy5 = c5
-          yyy6 = c6
-          yyy7 = c7
-      endif
-elseif( DecayMode1.eq.7 ) then! decay into photons
-      if (generate_bis) then
-          rr = q34/Lambda**2
-          yyy1 = q34*(b1   + b2*rr*(one + two*M_V**2/q34+ M_V**4/q34**2)  + b5*M_V**2/q34)
-          yyy2 = -b1/two + b3*rr*(1d0-M_V**2/q34) + two*b4*rr+b7*rr*M_V**2/q34
-          yyy3 = (-b2/two - b3- two*b4)*rr/q34
-          yyy4 = -b1 - b2*rr -(b2+b3+b6)*rr*M_V**2/q34
-          yyy5 = two*b8*rr*MG**2/q34
-          yyy6 = 0d0
-          yyy7 = b10*rr*MG**2/q34
-      else
-          yyy1 = q34*c1
-          yyy2 = c2
-          yyy3 = c3
-          yyy4 = c4
-          yyy5 = c5
-          yyy6 = c6
-          yyy7 = c7
-      endif
-endif
 
       res = czero
-      res =                                                               &
-     q1_e3*e1_e4*yyy1 - q1_e3*e1_q3*e4_q3*yyy4 + q1_e4*e1_e3*yyy1 +       &
-     q1_e4*e1_q3*e3_q4*yyy4 - q1_q3*e1_e3*e4_q3*yyy4 + q1_q3*e1_e4*       &
-     e3_q4*yyy4 + 4*q1_q3*e1_q3*e3_e4*yyy2 + 4*q1_q3*e1_q3*e3_q4*         &
-     e4_q3*yyy3 + 1./2.*e1_e3*e4_q3*yyy1 - 1./4.*e1_e3*e4_q3*MG**2*   &
-     yyy4 + 1./2.*e1_e4*e3_q4*yyy1 + 1./4.*e1_e4*e3_q4*MG**2*yyy4 +   &
-     e1_q3*e3_e4*MG**2*yyy2 + e1_q3*e3_q4*e4_q3*MG**2*yyy3
 
-      res = res +                                                        &
-      1./2.*et1(e3,e4,q1,q)*e1_q3*yyy6 - 1./2.*et1(e3,e4,q2,q)*e1_q3*  &
-      yyy6 + 1./4.*et1(e3,e4,e1,q)*MG**2*yyy6 + et1(e3,e4,e1,q)*q1_q3* &
-      yyy6 + 4*et1(e3,e4,q3,q4)*q1_q3*e1_q3*MG**(-2)*yyy5 + et1(e3,e4, &
-      q3,q4)*e1_q3*yyy5
+!      old code without c41 c42 coupligs
+!       res =                                                               &
+!      q1_e3*e1_e4*yyy1 - q1_e3*e1_q3*e4_q3*yyy4 + q1_e4*e1_e3*yyy1 +       &
+!      q1_e4*e1_q3*e3_q4*yyy4 - q1_q3*e1_e3*e4_q3*yyy4 + q1_q3*e1_e4*       &
+!      e3_q4*yyy4 + 4*q1_q3*e1_q3*e3_e4*yyy2 + 4*q1_q3*e1_q3*e3_q4*         &
+!      e4_q3*yyy3 + 1./2.*e1_e3*e4_q3*yyy1 - 1./4.*e1_e3*e4_q3*MG**2*   &
+!      yyy4 + 1./2.*e1_e4*e3_q4*yyy1 + 1./4.*e1_e4*e3_q4*MG**2*yyy4 +   &
+!      e1_q3*e3_e4*MG**2*yyy2 + e1_q3*e3_q4*e4_q3*MG**2*yyy3
+! 
+!       res = res +                                                        &
+!       1./2.*et1(e3,e4,q1,q)*e1_q3*yyy6 - 1./2.*et1(e3,e4,q2,q)*e1_q3*  &
+!       yyy6 + 1./4.*et1(e3,e4,e1,q)*MG**2*yyy6 + et1(e3,e4,e1,q)*q1_q3* &
+!       yyy6 + 4*et1(e3,e4,q3,q4)*q1_q3*e1_q3*MG**(-2)*yyy5 + et1(e3,e4, &
+!       q3,q4)*e1_q3*yyy5
+! 
+!       res = res +                                                               &
+!      1./2.*et1(q1,e3,q,q3)*e1_q3*e4_q3*MG**(-2)*yyy7 - 1./2.*et1(q1,        &
+!       e3,q,q4)*e1_q3*e4_q3*MG**(-2)*yyy7 + 1./2.*et1(q1,e4,q,q3)*e1_q3      &
+!       *e3_q4*MG**(-2)*yyy7 - 1./2.*et1(q1,e4,q,q4)*e1_q3*e3_q4*             &
+!       MG**(-2)*yyy7 - 1./2.*et1(q2,e3,q,q3)*e1_q3*e4_q3*MG**(-2)*yyy7   &
+!        + 1./2.*et1(q2,e3,q,q4)*e1_q3*e4_q3*MG**(-2)*yyy7 - 1./2.*et1(       &
+!       q2,e4,q,q3)*e1_q3*e3_q4*MG**(-2)*yyy7 + 1./2.*et1(q2,e4,q,q4)*        &
+!       e1_q3*e3_q4*MG**(-2)*yyy7 + et1(e1,e3,q,q3)*q1_q3*e4_q3*MG**(-2)  &
+!       *yyy7 + 1./4.*et1(e1,e3,q,q3)*e4_q3*yyy7 - et1(e1,e3,q,q4)*q1_q3          &
+!       *e4_q3*MG**(-2)*yyy7 - 1./4.*et1(e1,e3,q,q4)*e4_q3*yyy7 + et1(e1      &
+!       ,e4,q,q3)*q1_q3*e3_q4*MG**(-2)*yyy7 + 1./4.*et1(e1,e4,q,q3)*          &
+!       e3_q4*yyy7 - et1(e1,e4,q,q4)*q1_q3*e3_q4*MG**(-2)*yyy7 - 1./4.*       &
+!       et1(e1,e4,q,q4)*e3_q4*yyy7
+! print *, "res old QQB",res
 
-      res = res +                                                               &
-     1./2.*et1(q1,e3,q,q3)*e1_q3*e4_q3*MG**(-2)*yyy7 - 1./2.*et1(q1,        &
-      e3,q,q4)*e1_q3*e4_q3*MG**(-2)*yyy7 + 1./2.*et1(q1,e4,q,q3)*e1_q3      &
-      *e3_q4*MG**(-2)*yyy7 - 1./2.*et1(q1,e4,q,q4)*e1_q3*e3_q4*             &
-      MG**(-2)*yyy7 - 1./2.*et1(q2,e3,q,q3)*e1_q3*e4_q3*MG**(-2)*yyy7   &
-       + 1./2.*et1(q2,e3,q,q4)*e1_q3*e4_q3*MG**(-2)*yyy7 - 1./2.*et1(       &
-      q2,e4,q,q3)*e1_q3*e3_q4*MG**(-2)*yyy7 + 1./2.*et1(q2,e4,q,q4)*        &
-      e1_q3*e3_q4*MG**(-2)*yyy7 + et1(e1,e3,q,q3)*q1_q3*e4_q3*MG**(-2)  &
-      *yyy7 + 1./4.*et1(e1,e3,q,q3)*e4_q3*yyy7 - et1(e1,e3,q,q4)*q1_q3          &
-      *e4_q3*MG**(-2)*yyy7 - 1./4.*et1(e1,e3,q,q4)*e4_q3*yyy7 + et1(e1      &
-      ,e4,q,q3)*q1_q3*e3_q4*MG**(-2)*yyy7 + 1./4.*et1(e1,e4,q,q3)*          &
-      e3_q4*yyy7 - et1(e1,e4,q,q4)*q1_q3*e3_q4*MG**(-2)*yyy7 - 1./4.*       &
-      et1(e1,e4,q,q4)*e3_q4*yyy7
 
 
+!     new code with c41 c42 coupligs
+      res =&
+     & q1_e3*e1_e4*yyy1 - q1_e3*e1_q3*e4_q3*yyy41 + q1_e4*e1_e3*yyy1 + &
+     & q1_e4*e1_q3*e3_q4*yyy42 - q1_q3*e1_e3*e4_q3*yyy41 + q1_q3*e1_e4*&
+     & e3_q4*yyy42 + 4.*q1_q3*e1_q3*e3_e4*yyy2 + 4.*q1_q3*e1_q3*e3_q4*&
+     & e4_q3*yyy3 + 1./2.*e1_e3*e4_q3*yyy1 + 1./4.*e1_e3*e4_q3*MZ4**2*&
+     & yyy41 - 1./4.*e1_e3*e4_q3*MZ3**2*yyy41 - 1./4.*e1_e3*e4_q3*MG**2&
+     & *yyy41 + 1./2.*e1_e4*e3_q4*yyy1 - 1./4.*e1_e4*e3_q4*MZ4**2*yyy42&
+     &  + 1./4.*e1_e4*e3_q4*MZ3**2*yyy42 + 1./4.*e1_e4*e3_q4*MG**2*&
+     & yyy42 - e1_q3*e3_e4*MZ4**2*yyy2 + e1_q3*e3_e4*MZ3**2*yyy2 + &
+     & e1_q3*e3_e4*MG**2*yyy2 + 1./2.*e1_q3*e3_q4*e4_q3*yyy42 - 1./2.*&
+     & e1_q3*e3_q4*e4_q3*yyy41 - e1_q3*e3_q4*e4_q3*MZ4**2*yyy3 + e1_q3*&
+     & e3_q4*e4_q3*MZ3**2*yyy3 + e1_q3*e3_q4*e4_q3*MG**2*yyy3 + 1./2.*&
+     & et1(q1,e3,q,q3)*e1_q3*e4_q3*MG**(-2)*yyy7 - 1./2.*et1(q1,e3,q,q4&
+     & )*e1_q3*e4_q3*MG**(-2)*yyy7 + 1./2.*et1(q1,e4,q,q3)*e1_q3*e3_q4*&
+     & MG**(-2)*yyy7 - 1./2.*et1(q1,e4,q,q4)*e1_q3*e3_q4*MG**(-2)*yyy7&
+     &  - 1./2.*et1(q2,e3,q,q3)*e1_q3*e4_q3*MG**(-2)*yyy7
+      res = res + 1./2.*et1(q2,e3,q,q4)*e1_q3*e4_q3*MG**(-2)*yyy7 - 1./&
+     & 2.*et1(q2,e4,q,q3)*e1_q3*e3_q4*MG**(-2)*yyy7 + 1./2.*et1(q2,e4,q&
+     & ,q4)*e1_q3*e3_q4*MG**(-2)*yyy7 + et1(e1,e3,q,q3)*q1_q3*e4_q3*&
+     & MG**(-2)*yyy7 - 1./4.*et1(e1,e3,q,q3)*e4_q3*MG**(-2)*MZ4**2*yyy7&
+     &  + 1./4.*et1(e1,e3,q,q3)*e4_q3*MG**(-2)*MZ3**2*yyy7 + 1./4.*et1(&
+     & e1,e3,q,q3)*e4_q3*yyy7 - et1(e1,e3,q,q4)*q1_q3*e4_q3*MG**(-2)*&
+     & yyy7 + 1./4.*et1(e1,e3,q,q4)*e4_q3*MG**(-2)*MZ4**2*yyy7 - 1./4.*&
+     & et1(e1,e3,q,q4)*e4_q3*MG**(-2)*MZ3**2*yyy7 - 1./4.*et1(e1,e3,q,&
+     & q4)*e4_q3*yyy7 + et1(e1,e4,q,q3)*q1_q3*e3_q4*MG**(-2)*yyy7 - 1./&
+     & 4.*et1(e1,e4,q,q3)*e3_q4*MG**(-2)*MZ4**2*yyy7 + 1./4.*et1(e1,e4,&
+     & q,q3)*e3_q4*MG**(-2)*MZ3**2*yyy7 + 1./4.*et1(e1,e4,q,q3)*e3_q4*&
+     & yyy7 - et1(e1,e4,q,q4)*q1_q3*e3_q4*MG**(-2)*yyy7 + 1./4.*et1(e1,&
+     & e4,q,q4)*e3_q4*MG**(-2)*MZ4**2*yyy7 - 1./4.*et1(e1,e4,q,q4)*&
+     & e3_q4*MG**(-2)*MZ3**2*yyy7 - 1./4.*et1(e1,e4,q,q4)*e3_q4*yyy7 + &
+     & 1./2.*et1(e3,e4,q1,q)*e1_q3*yyy6 - 1./2.*et1(e3,e4,q2,q)*e1_q3*&
+     & yyy6
+      res = res - 1./4.*et1(e3,e4,e1,q)*MZ4**2*yyy6 + 1./4.*et1(e3,e4,&
+     & e1,q)*MZ3**2*yyy6 + 1./4.*et1(e3,e4,e1,q)*MG**2*yyy6 + et1(e3,e4&
+     & ,e1,q)*q1_q3*yyy6 + 4.*et1(e3,e4,q3,q4)*q1_q3*e1_q3*MG**(-2)*&
+     & yyy5 - et1(e3,e4,q3,q4)*e1_q3*MG**(-2)*MZ4**2*yyy5 + et1(e3,e4,&
+     & q3,q4)*e1_q3*MG**(-2)*MZ3**2*yyy5 + et1(e3,e4,q3,q4)*e1_q3*yyy5
+
+! print *, "res new QQB",res
+! pause
 
       end subroutine qqGZZampl
 
@@ -476,11 +624,11 @@ endif
       complex(dp) :: q2_q3,q2_q4
       complex(dp) :: q3_q4
       complex(dp) :: q1_e3,q1_e4,q2_e3,q2_e4
-      complex(dp) :: e1_q3,e1_q4,e2_q3,e2_q4
+      complex(dp) :: e1_q3,e1_q4,e2_q3,e2_q4,   q1_e1,q1_e2,q2_e1,q2_e2,q4_e1,q3_e1
       complex(dp) :: e3_q4,e4_q3
       complex(dp) :: q1(4),q2(4),q3(4),q4(4),q(4)
       complex(dp) :: e1(4),e2(4),e3(4),e4(4)
-      complex(dp) :: xxx1,xxx2,xxx3,yyy1,yyy2,yyy3,yyy4,yyy5,yyy6
+      complex(dp) :: xxx1,xxx2,xxx3,xxx4,yyy1,yyy2,yyy3,yyy41,yyy42,yyy5,yyy6
       complex(dp) :: yyy7
       real(dp) :: q34,MZ3,MZ4,MG
       logical :: new
@@ -520,6 +668,7 @@ endif
       e2_e4 = sc(e2,e4)
       e3_e4 = sc(e3,e4)
 
+
       q1_e3 = sc(q1,e3)
       q1_e4 = sc(q1,e4)
       q2_e3 = sc(q2,e3)
@@ -541,52 +690,42 @@ endif
 
 !---- define couplings
       q34 = (MG**2-MZ3**2-MZ4**2)/2d0!  = s = pV1.pV2    = (q_q-MZ3^2-MZ4^2)/2
+
       rr_gam = q_q/two/Lambda**2! kappa for IS
-      xxx1 = (a1 + a2*rr_gam)
+      xxx1 = (a1 + a2*rr_gam)     ! those a's correspond to g's in eq.(7) for the IS
       xxx2 = -a1/two + (a3+two*a4)*rr_gam
-      xxx3 = 4d0*a5*rr_gam
+      xxx3 = 4d0*a5*rr_gam * MG**2/q_q
+      ! for gluon gauge invariance check the terms ~c3,c4 are needed because e1.q2 is not zero for e1-->q1
 
-if( DecayMode1.le.3 .or. ((DecayMode1.ge.4) .and. (DecayMode1.le.6)) ) then! decay into Z's or W's
       if (generate_bis) then
           rr = q34/Lambda**2! kappa for FS
           yyy1 = q34*(b1 + b2*rr*(one + two*M_V**2/q34+ M_V**4/q34**2)   + b5*M_V**2/q34)
-          yyy2 = -b1/two + b3*rr*(one-M_V**2/q34) + two*b4*rr+b7*rr*M_V**2/q34
+          yyy2 = -b1/two + b3*rr*(one-M_V**2/q34) + two*b4*rr + b7*rr*M_V**2/q34
           yyy3 = (-b2/two - b3- two*b4)*rr/q34
-          yyy4 = -b1 - b2*rr -(b2+b3+b6)*rr*M_V**2/q34
+!           yyy4 = -b1 - b2*rr -(b2+b3+b6)*rr*M_V**2/q34
+          yyy41 = -b1 - b2*(q34+MZ3**2)/Lambda**2 - b3*MZ4**2/Lambda**2 - b6*M_V**2/Lambda**2
+          yyy42 = -b1 - b2*(q34+MZ4**2)/Lambda**2 - b3*MZ3**2/Lambda**2 - b6*M_V**2/Lambda**2
           yyy5 = two*b8*rr*MG**2/q34
-          yyy6 = b9
-          yyy7 = b10*rr*MG**2/q34
+!           yyy6 = b9
+          yyy6 = b9 * M_V**2/Lambda**2
+!           yyy7 = b10*rr*MG**2/q34
+          yyy7 = b10 * MG**2 * M_V**2/Lambda**4
+
       else
-          yyy1 = q34*c1
+          yyy1 = q34*c1/2d0
           yyy2 = c2
-          yyy3 = c3
-          yyy4 = c4
+          yyy3 = c3/MG**2
+!           yyy4 = c4
+          yyy41 = c41
+          yyy42 = c42
           yyy5 = c5
           yyy6 = c6
           yyy7 = c7
+          if( DecayMode1.eq.7 .and. DecayMode2.eq.7 ) then
+              yyy6=0d0
+              yyy7=0d0
+          endif
       endif
-elseif( DecayMode1.eq.7 ) then! decay into photons
-      if (generate_bis) then
-          rr = q34/Lambda**2! kappa for FS
-          yyy1 = q34*(b1 + b2*rr*(one + two*M_V**2/q34+ M_V**4/q34**2)   + b5*M_V**2/q34)
-          yyy2 = -b1/two + b3*rr*(one-M_V**2/q34) + two*b4*rr+b7*rr*M_V**2/q34
-          yyy3 = (-b2/two - b3- two*b4)*rr/q34
-          yyy4 = -b1 - b2*rr -(b2+b3+b6)*rr*M_V**2/q34
-          yyy5 = two*b8*rr*MG**2/q34
-          yyy6 = 0d0
-          yyy7 = b10*rr*MG**2/q34
-      else
-          yyy1 = q34*c1
-          yyy2 = c2
-          yyy3 = c3
-          yyy4 = c4
-          yyy5 = c5
-          yyy6 = c6
-          yyy7 = c7
-      endif
-endif
-
-
 
       res = czero
 
@@ -594,207 +733,428 @@ endif
      if (new) then
 
 
-      res = &
-        + 8.D0*q1_e3*q1_e4*e1_e2*yyy1*xxx2 - 8.D0*q1_e3*q1_q3*e1_e2* &
-          e4_q3*yyy4*xxx2 + 4.D0*q1_e3*e1_e2*e4_q3*yyy1*xxx2 + 2.D0* &
-          q1_e3*e1_e2*e4_q3*MZ4**2*yyy4*xxx2 - 2.D0*q1_e3*e1_e2*e4_q3* &
-          MZ3**2*yyy4*xxx2 - 2.D0*q1_e3*e1_e2*e4_q3*MG**2*yyy4*xxx2 + 8.d0 &
-          *q1_e4*q1_q3*e1_e2*e3_q4*yyy4*xxx2 + 4.D0*q1_e4*e1_e2*e3_q4 &
-          *yyy1*xxx2 - 2.D0*q1_e4*e1_e2*e3_q4*MZ4**2*yyy4*xxx2 + 2.D0* &
-          q1_e4*e1_e2*e3_q4*MZ3**2*yyy4*xxx2 + 2.D0*q1_e4*e1_e2*e3_q4* &
-          MG**2*yyy4*xxx2 - 8.D0*q1_q3*e1_e2*e3_e4*MZ4**2*yyy2*xxx2 + 8.d0 &
-          *q1_q3*e1_e2*e3_e4*MZ3**2*yyy2*xxx2 + 8.D0*q1_q3*e1_e2* &
-          e3_e4*MG**2*yyy2*xxx2 - 8.D0*q1_q3*e1_e2*e3_q4*e4_q3*MZ4**2* &
-          yyy3*xxx2 + 8.D0*q1_q3*e1_e2*e3_q4*e4_q3*MZ3**2*yyy3*xxx2 + 8.d0 &
-          *q1_q3*e1_e2*e3_q4*e4_q3*MG**2*yyy3*xxx2 + 16.D0*q1_q3**2* &
-          e1_e2*e3_e4*yyy2*xxx2 + 16.D0*q1_q3**2*e1_e2*e3_q4*e4_q3*yyy3 &
-          *xxx2 + 2.D0/3.D0*e1_e2*e3_e4*MZ4**4*yyy2*xxx2 + 1.D0/3.D0* &
-          e1_e2*e3_e4*MZ4**4*yyy2*xxx1
-      res = res - 4.D0/3.D0*e1_e2*e3_e4*MZ3**2*MZ4**2*yyy2*xxx2 - 2.D0/ &
-          3.D0*e1_e2*e3_e4*MZ3**2*MZ4**2*yyy2*xxx1 + 2.D0/3.D0*e1_e2* &
-          e3_e4*MZ3**4*yyy2*xxx2 + 1.D0/3.D0*e1_e2*e3_e4*MZ3**4*yyy2* &
-          xxx1 + 2.D0/3.D0*e1_e2*e3_e4*MG**2*yyy1*xxx2 - 2.D0/3.D0* &
-          e1_e2*e3_e4*MG**2*yyy1*xxx1 - 4.D0/3.D0*e1_e2*e3_e4*MG**2* &
-          MZ4**2*yyy2*xxx2 - 2.D0/3.D0*e1_e2*e3_e4*MG**2*MZ4**2*yyy2* &
-          xxx1 + 8.D0/3.D0*e1_e2*e3_e4*MG**2*MZ3**2*yyy2*xxx2 - 2.D0/3.D0 &
-          *e1_e2*e3_e4*MG**2*MZ3**2*yyy2*xxx1 + 2.D0/3.D0*e1_e2*e3_e4* &
-          MG**4*yyy2*xxx2 + 1.D0/3.D0*e1_e2*e3_e4*MG**4*yyy2*xxx1 + 4.D0 &
-          /3.D0*e1_e2*e3_q4*e4_q3*yyy1*xxx2 + 2.D0/3.D0*e1_e2*e3_q4* &
-          e4_q3*yyy1*xxx1 + 2.D0/3.D0*e1_e2*e3_q4*e4_q3*MZ4**4*yyy3* &
-          xxx2 + 1.D0/3.D0*e1_e2*e3_q4*e4_q3*MZ4**4*yyy3*xxx1 - 4.D0/3.D0 &
-          *e1_e2*e3_q4*e4_q3*MZ3**2*MZ4**2*yyy3*xxx2 - 2.D0/3.D0*e1_e2 &
-          *e3_q4*e4_q3*MZ3**2*MZ4**2*yyy3*xxx1 + 2.D0/3.D0*e1_e2*e3_q4* &
-          e4_q3*MZ3**4*yyy3*xxx2 + 1.D0/3.D0*e1_e2*e3_q4*e4_q3*MZ3**4* &
-          yyy3*xxx1
-      res = res + 2.D0/3.D0*e1_e2*e3_q4*e4_q3*MG**2*yyy4*xxx2 - 2.D0/3.D0 &
-          *e1_e2*e3_q4*e4_q3*MG**2*yyy4*xxx1 - 4.D0/3.D0*e1_e2*e3_q4* &
-          e4_q3*MG**2*MZ4**2*yyy3*xxx2 - 2.D0/3.D0*e1_e2*e3_q4*e4_q3* &
-          MG**2*MZ4**2*yyy3*xxx1 + 8.D0/3.D0*e1_e2*e3_q4*e4_q3*MG**2* &
-          MZ3**2*yyy3*xxx2 - 2.D0/3.D0*e1_e2*e3_q4*e4_q3*MG**2*MZ3**2* &
-          yyy3*xxx1 + 2.D0/3.D0*e1_e2*e3_q4*e4_q3*MG**4*yyy3*xxx2 + 1.D0 &
-          /3.D0*e1_e2*e3_q4*e4_q3*MG**4*yyy3*xxx1 + e1_e3*e2_e4*MG**2* &
-          yyy1*xxx1 - e1_e3*e2_q3*e4_q3*MG**2*yyy4*xxx1 + e1_e4*e2_e3* &
-          MG**2*yyy1*xxx1 + e1_e4*e2_q3*e3_q4*MG**2*yyy4*xxx1 - e1_q3* &
-          e2_e3*e4_q3*MG**2*yyy4*xxx1 + e1_q3*e2_e4*e3_q4*MG**2*yyy4* &
-          xxx1 + 4.D0*e1_q3*e2_q3*e3_e4*MG**2*yyy2*xxx1 + 4.D0*e1_q3* &
-          e2_q3*e3_q4*e4_q3*MG**2*yyy3*xxx1 + 8.D0*et1(q1,q2,e1,e2)* &
-          q1_e3*q1_e4*MG**(-2)*yyy1*xxx3 - 8.D0*et1(q1,q2,e1,e2)*q1_e3* &
-          q1_q3*e4_q3*MG**(-2)*yyy4*xxx3 + 4.D0*et1(q1,q2,e1,e2)*q1_e3* &
-          e4_q3*MG**(-2)*yyy1*xxx3 + 2.D0*et1(q1,q2,e1,e2)*q1_e3*e4_q3* &
-          MG**(-2)*MZ4**2*yyy4*xxx3
-      res = res - 2.D0*et1(q1,q2,e1,e2)*q1_e3*e4_q3*MG**(-2)*MZ3**2* &
-       yyy4*xxx3 - 2.D0*et1(q1,q2,e1,e2)*q1_e3*e4_q3*yyy4*xxx3 + 8.D0* &
-          et1(q1,q2,e1,e2)*q1_e4*q1_q3*e3_q4*MG**(-2)*yyy4*xxx3 + 4.D0* &
-          et1(q1,q2,e1,e2)*q1_e4*e3_q4*MG**(-2)*yyy1*xxx3 - 2.D0*et1(q1 &
-          ,q2,e1,e2)*q1_e4*e3_q4*MG**(-2)*MZ4**2*yyy4*xxx3 + 2.D0*et1( &
-          q1,q2,e1,e2)*q1_e4*e3_q4*MG**(-2)*MZ3**2*yyy4*xxx3 + 2.D0* &
-          et1(q1,q2,e1,e2)*q1_e4*e3_q4*yyy4*xxx3 - 8.D0*et1(q1,q2,e1,e2 &
-          )*q1_q3*e3_e4*MG**(-2)*MZ4**2*yyy2*xxx3 + 8.D0*et1(q1,q2,e1, &
-          e2)*q1_q3*e3_e4*MG**(-2)*MZ3**2*yyy2*xxx3 + 8.D0*et1(q1,q2,e1 &
-          ,e2)*q1_q3*e3_e4*yyy2*xxx3 - 8.D0*et1(q1,q2,e1,e2)*q1_q3* &
-          e3_q4*e4_q3*MG**(-2)*MZ4**2*yyy3*xxx3 + 8.D0*et1(q1,q2,e1,e2) &
-          *q1_q3*e3_q4*e4_q3*MG**(-2)*MZ3**2*yyy3*xxx3 + 8.D0*et1(q1,q2 &
-          ,e1,e2)*q1_q3*e3_q4*e4_q3*yyy3*xxx3 + 16.D0*et1(q1,q2,e1,e2)* &
-          q1_q3**2*e3_e4*MG**(-2)*yyy2*xxx3 + 16.D0*et1(q1,q2,e1,e2)* &
-          q1_q3**2*e3_q4*e4_q3*MG**(-2)*yyy3*xxx3 + 2.D0/3.D0*et1(q1,q2 &
-          ,e1,e2)*e3_e4*MG**(-2)*MZ4**4*yyy2*xxx3
-      res = res - 4.D0/3.D0*et1(q1,q2,e1,e2)*e3_e4*MG**(-2)*MZ3**2* &
-       MZ4**2*yyy2*xxx3 + 2.D0/3.D0*et1(q1,q2,e1,e2)*e3_e4*MG**(-2)* &
-          MZ3**4*yyy2*xxx3 + 2.D0/3.D0*et1(q1,q2,e1,e2)*e3_e4*yyy1*xxx3 &
-           - 4.D0/3.D0*et1(q1,q2,e1,e2)*e3_e4*MZ4**2*yyy2*xxx3 + 8.D0/3.D0 &
-          *et1(q1,q2,e1,e2)*e3_e4*MZ3**2*yyy2*xxx3 + 2.D0/3.D0*et1(q1 &
-          ,q2,e1,e2)*e3_e4*MG**2*yyy2*xxx3 + 4.D0/3.D0*et1(q1,q2,e1,e2) &
-          *e3_q4*e4_q3*MG**(-2)*yyy1*xxx3 + 2.D0/3.D0*et1(q1,q2,e1,e2)* &
-          e3_q4*e4_q3*MG**(-2)*MZ4**4*yyy3*xxx3 - 4.D0/3.D0*et1(q1,q2, &
-          e1,e2)*e3_q4*e4_q3*MG**(-2)*MZ3**2*MZ4**2*yyy3*xxx3 + 2.D0/3.D0 &
-          *et1(q1,q2,e1,e2)*e3_q4*e4_q3*MG**(-2)*MZ3**4*yyy3*xxx3 + 2.D0 &
-          /3.D0*et1(q1,q2,e1,e2)*e3_q4*e4_q3*yyy4*xxx3 - 4.D0/3.D0* &
-          et1(q1,q2,e1,e2)*e3_q4*e4_q3*MZ4**2*yyy3*xxx3 + 8.D0/3.D0* &
-          et1(q1,q2,e1,e2)*e3_q4*e4_q3*MZ3**2*yyy3*xxx3 + 2.D0/3.D0* &
-          et1(q1,q2,e1,e2)*e3_q4*e4_q3*MG**2*yyy3*xxx3 - et1(q1,q2,e1, &
-          e2)*et1(q1,q,e3,e4)*MG**(-2)*MZ4**2*yyy6*xxx3 + et1(q1,q2,e1, &
-          e2)*et1(q1,q,e3,e4)*MG**(-2)*MZ3**2*yyy6*xxx3
-      res = res + et1(q1,q2,e1,e2)*et1(q1,q,e3,e4)*yyy6*xxx3 + 4.D0* &
-          et1(q1,q2,e1,e2)*et1(q1,q,e3,e4)*q1_q3*MG**(-2)*yyy6*xxx3 - 4.0d0 &
-          *et1(q1,q2,e1,e2)*et1(q1,q,e3,q3)*q1_q3*e4_q3*MG**(-4)*yyy7 &
-          *xxx3 + et1(q1,q2,e1,e2)*et1(q1,q,e3,q3)*e4_q3*MG**(-4)* &
-          MZ4**2*yyy7*xxx3 - et1(q1,q2,e1,e2)*et1(q1,q,e3,q3)*e4_q3* &
-          MG**(-4)*MZ3**2*yyy7*xxx3 - et1(q1,q2,e1,e2)*et1(q1,q,e3,q3)* &
-          e4_q3*MG**(-2)*yyy7*xxx3 + 4.D0*et1(q1,q2,e1,e2)*et1(q1,q,e3, &
-          q4)*q1_q3*e4_q3*MG**(-4)*yyy7*xxx3 - et1(q1,q2,e1,e2)*et1(q1, &
-          q,e3,q4)*e4_q3*MG**(-4)*MZ4**2*yyy7*xxx3 + et1(q1,q2,e1,e2)* &
-          et1(q1,q,e3,q4)*e4_q3*MG**(-4)*MZ3**2*yyy7*xxx3 + et1(q1,q2, &
-          e1,e2)*et1(q1,q,e3,q4)*e4_q3*MG**(-2)*yyy7*xxx3 - 4.D0*et1(q1 &
-          ,q2,e1,e2)*et1(q1,q,e4,q3)*q1_q3*e3_q4*MG**(-4)*yyy7*xxx3 + &
-          et1(q1,q2,e1,e2)*et1(q1,q,e4,q3)*e3_q4*MG**(-4)*MZ4**2*yyy7* &
-          xxx3 - et1(q1,q2,e1,e2)*et1(q1,q,e4,q3)*e3_q4*MG**(-4)*MZ3**2 &
-          *yyy7*xxx3 - et1(q1,q2,e1,e2)*et1(q1,q,e4,q3)*e3_q4*MG**(-2)* &
-          yyy7*xxx3
-      res = res + 4.D0*et1(q1,q2,e1,e2)*et1(q1,q,e4,q4)*q1_q3*e3_q4* &
-       MG**(-4)*yyy7*xxx3 - et1(q1,q2,e1,e2)*et1(q1,q,e4,q4)*e3_q4* &
-          MG**(-4)*MZ4**2*yyy7*xxx3 + et1(q1,q2,e1,e2)*et1(q1,q,e4,q4)* &
-          e3_q4*MG**(-4)*MZ3**2*yyy7*xxx3 + et1(q1,q2,e1,e2)*et1(q1,q, &
-          e4,q4)*e3_q4*MG**(-2)*yyy7*xxx3 + et1(q1,q2,e1,e2)*et1(q2,q, &
-          e3,e4)*MG**(-2)*MZ4**2*yyy6*xxx3 - et1(q1,q2,e1,e2)*et1(q2,q, &
-          e3,e4)*MG**(-2)*MZ3**2*yyy6*xxx3 - et1(q1,q2,e1,e2)*et1(q2,q, &
-          e3,e4)*yyy6*xxx3 - 4.D0*et1(q1,q2,e1,e2)*et1(q2,q,e3,e4)* &
-          q1_q3*MG**(-2)*yyy6*xxx3 + 4.D0*et1(q1,q2,e1,e2)*et1(q2,q,e3, &
-          q3)*q1_q3*e4_q3*MG**(-4)*yyy7*xxx3 - et1(q1,q2,e1,e2)*et1(q2, &
-          q,e3,q3)*e4_q3*MG**(-4)*MZ4**2*yyy7*xxx3 + et1(q1,q2,e1,e2)* &
-          et1(q2,q,e3,q3)*e4_q3*MG**(-4)*MZ3**2*yyy7*xxx3 + et1(q1,q2, &
-          e1,e2)*et1(q2,q,e3,q3)*e4_q3*MG**(-2)*yyy7*xxx3 - 4.D0*et1(q1 &
-          ,q2,e1,e2)*et1(q2,q,e3,q4)*q1_q3*e4_q3*MG**(-4)*yyy7*xxx3 + &
-          et1(q1,q2,e1,e2)*et1(q2,q,e3,q4)*e4_q3*MG**(-4)*MZ4**2*yyy7* &
-          xxx3
-      res = res - et1(q1,q2,e1,e2)*et1(q2,q,e3,q4)*e4_q3*MG**(-4)* &
-       MZ3**2*yyy7*xxx3 - et1(q1,q2,e1,e2)*et1(q2,q,e3,q4)*e4_q3* &
-          MG**(-2)*yyy7*xxx3 + 4.D0*et1(q1,q2,e1,e2)*et1(q2,q,e4,q3)* &
-          q1_q3*e3_q4*MG**(-4)*yyy7*xxx3 - et1(q1,q2,e1,e2)*et1(q2,q,e4 &
-          ,q3)*e3_q4*MG**(-4)*MZ4**2*yyy7*xxx3 + et1(q1,q2,e1,e2)*et1( &
-          q2,q,e4,q3)*e3_q4*MG**(-4)*MZ3**2*yyy7*xxx3 + et1(q1,q2,e1,e2 &
-          )*et1(q2,q,e4,q3)*e3_q4*MG**(-2)*yyy7*xxx3 - 4.D0*et1(q1,q2, &
-          e1,e2)*et1(q2,q,e4,q4)*q1_q3*e3_q4*MG**(-4)*yyy7*xxx3 + et1( &
-          q1,q2,e1,e2)*et1(q2,q,e4,q4)*e3_q4*MG**(-4)*MZ4**2*yyy7*xxx3 &
-           - et1(q1,q2,e1,e2)*et1(q2,q,e4,q4)*e3_q4*MG**(-4)*MZ3**2* &
-          yyy7*xxx3 - et1(q1,q2,e1,e2)*et1(q2,q,e4,q4)*e3_q4*MG**(-2)* &
-          yyy7*xxx3 - 1.D0/3.D0*et1(q1,q2,e1,e2)*et1(q,e3,e4,q3)*yyy6* &
-          xxx3 + 1.D0/3.D0*et1(q1,q2,e1,e2)*et1(q,e3,e4,q4)*yyy6*xxx3 &
-           + 2.D0/3.D0*et1(q1,q2,e1,e2)*et1(e3,e4,q3,q4)*MG**(-4)* &
-          MZ4**4*yyy5*xxx3 - 4.D0/3.D0*et1(q1,q2,e1,e2)*et1(e3,e4,q3,q4 &
-          )*MG**(-4)*MZ3**2*MZ4**2*yyy5*xxx3
-      res = res + 2.D0/3.D0*et1(q1,q2,e1,e2)*et1(e3,e4,q3,q4)*MG**(-4)* &
-       MZ3**4*yyy5*xxx3 - 4.D0/3.D0*et1(q1,q2,e1,e2)*et1(e3,e4,q3,q4)* &
-          MG**(-2)*MZ4**2*yyy5*xxx3 + 8.D0/3.D0*et1(q1,q2,e1,e2)*et1(e3 &
-          ,e4,q3,q4)*MG**(-2)*MZ3**2*yyy5*xxx3 + 2.D0/3.D0*et1(q1,q2,e1 &
-          ,e2)*et1(e3,e4,q3,q4)*yyy5*xxx3 - 8.D0*et1(q1,q2,e1,e2)*et1( &
-          e3,e4,q3,q4)*q1_q3*MG**(-4)*MZ4**2*yyy5*xxx3 + 8.D0*et1(q1,q2 &
-          ,e1,e2)*et1(e3,e4,q3,q4)*q1_q3*MG**(-4)*MZ3**2*yyy5*xxx3 + 8.D0 &
-          *et1(q1,q2,e1,e2)*et1(e3,e4,q3,q4)*q1_q3*MG**(-2)*yyy5*xxx3 &
-           + 16.D0*et1(q1,q2,e1,e2)*et1(e3,e4,q3,q4)*q1_q3**2*MG**(-4)* &
-          yyy5*xxx3 + 4.D0*et1(q1,q,e3,e4)*q1_q3*e1_e2*yyy6*xxx2 - et1( &
-          q1,q,e3,e4)*e1_e2*MZ4**2*yyy6*xxx2 + et1(q1,q,e3,e4)*e1_e2* &
-          MZ3**2*yyy6*xxx2 + et1(q1,q,e3,e4)*e1_e2*MG**2*yyy6*xxx2 - 4.D0 &
-          *et1(q1,q,e3,q3)*q1_q3*e1_e2*e4_q3*MG**(-2)*yyy7*xxx2 + et1( &
-          q1,q,e3,q3)*e1_e2*e4_q3*MG**(-2)*MZ4**2*yyy7*xxx2 - et1(q1,q, &
-          e3,q3)*e1_e2*e4_q3*MG**(-2)*MZ3**2*yyy7*xxx2 - et1(q1,q,e3,q3 &
-          )*e1_e2*e4_q3*yyy7*xxx2
-      res = res + 4.D0*et1(q1,q,e3,q4)*q1_q3*e1_e2*e4_q3*MG**(-2)*yyy7* &
-       xxx2 - et1(q1,q,e3,q4)*e1_e2*e4_q3*MG**(-2)*MZ4**2*yyy7*xxx2 + &
-          et1(q1,q,e3,q4)*e1_e2*e4_q3*MG**(-2)*MZ3**2*yyy7*xxx2 + et1( &
-          q1,q,e3,q4)*e1_e2*e4_q3*yyy7*xxx2 - 4.D0*et1(q1,q,e4,q3)* &
-          q1_q3*e1_e2*e3_q4*MG**(-2)*yyy7*xxx2 + et1(q1,q,e4,q3)*e1_e2* &
-          e3_q4*MG**(-2)*MZ4**2*yyy7*xxx2 - et1(q1,q,e4,q3)*e1_e2*e3_q4 &
-          *MG**(-2)*MZ3**2*yyy7*xxx2 - et1(q1,q,e4,q3)*e1_e2*e3_q4*yyy7 &
-          *xxx2 + 4.D0*et1(q1,q,e4,q4)*q1_q3*e1_e2*e3_q4*MG**(-2)*yyy7* &
-          xxx2 - et1(q1,q,e4,q4)*e1_e2*e3_q4*MG**(-2)*MZ4**2*yyy7*xxx2 &
-           + et1(q1,q,e4,q4)*e1_e2*e3_q4*MG**(-2)*MZ3**2*yyy7*xxx2 + &
-          et1(q1,q,e4,q4)*e1_e2*e3_q4*yyy7*xxx2 - 4.D0*et1(q2,q,e3,e4)* &
-          q1_q3*e1_e2*yyy6*xxx2 + et1(q2,q,e3,e4)*e1_e2*MZ4**2*yyy6* &
-          xxx2 - et1(q2,q,e3,e4)*e1_e2*MZ3**2*yyy6*xxx2 - et1(q2,q,e3, &
-          e4)*e1_e2*MG**2*yyy6*xxx2 + 4.D0*et1(q2,q,e3,q3)*q1_q3*e1_e2* &
-          e4_q3*MG**(-2)*yyy7*xxx2 - et1(q2,q,e3,q3)*e1_e2*e4_q3* &
-          MG**(-2)*MZ4**2*yyy7*xxx2
-      res = res + et1(q2,q,e3,q3)*e1_e2*e4_q3*MG**(-2)*MZ3**2*yyy7*xxx2 &
-           + et1(q2,q,e3,q3)*e1_e2*e4_q3*yyy7*xxx2 - 4.D0*et1(q2,q,e3, &
-          q4)*q1_q3*e1_e2*e4_q3*MG**(-2)*yyy7*xxx2 + et1(q2,q,e3,q4)* &
-          e1_e2*e4_q3*MG**(-2)*MZ4**2*yyy7*xxx2 - et1(q2,q,e3,q4)*e1_e2 &
-          *e4_q3*MG**(-2)*MZ3**2*yyy7*xxx2 - et1(q2,q,e3,q4)*e1_e2* &
-          e4_q3*yyy7*xxx2 + 4.D0*et1(q2,q,e4,q3)*q1_q3*e1_e2*e3_q4* &
-          MG**(-2)*yyy7*xxx2 - et1(q2,q,e4,q3)*e1_e2*e3_q4*MG**(-2)* &
-          MZ4**2*yyy7*xxx2 + et1(q2,q,e4,q3)*e1_e2*e3_q4*MG**(-2)* &
-          MZ3**2*yyy7*xxx2 + et1(q2,q,e4,q3)*e1_e2*e3_q4*yyy7*xxx2 - 4.D0 &
-          *et1(q2,q,e4,q4)*q1_q3*e1_e2*e3_q4*MG**(-2)*yyy7*xxx2 + et1( &
-          q2,q,e4,q4)*e1_e2*e3_q4*MG**(-2)*MZ4**2*yyy7*xxx2 - et1(q2,q, &
-          e4,q4)*e1_e2*e3_q4*MG**(-2)*MZ3**2*yyy7*xxx2 - et1(q2,q,e4,q4 &
-          )*e1_e2*e3_q4*yyy7*xxx2 - et1(q,e1,e3,e4)*e2_q3*MG**2*yyy6* &
-          xxx1 + et1(q,e1,e3,q3)*e2_q3*e4_q3*yyy7*xxx1 - et1(q,e1,e3,q4 &
-          )*e2_q3*e4_q3*yyy7*xxx1 + et1(q,e1,e4,q3)*e2_q3*e3_q4*yyy7* &
-          xxx1
-      res = res - et1(q,e1,e4,q4)*e2_q3*e3_q4*yyy7*xxx1 - et1(q,e2,e3, &
-          e4)*e1_q3*MG**2*yyy6*xxx1 + et1(q,e2,e3,q3)*e1_q3*e4_q3*yyy7* &
-          xxx1 - et1(q,e2,e3,q4)*e1_q3*e4_q3*yyy7*xxx1 + et1(q,e2,e4,q3 &
-          )*e1_q3*e3_q4*yyy7*xxx1 - et1(q,e2,e4,q4)*e1_q3*e3_q4*yyy7* &
-          xxx1 - 1.D0/3.D0*et1(q,e3,e4,q3)*e1_e2*MG**2*yyy6*xxx2 + 1.D0/ &
-          3.D0*et1(q,e3,e4,q3)*e1_e2*MG**2*yyy6*xxx1 + 1.D0/3.D0*et1(q, &
-          e3,e4,q4)*e1_e2*MG**2*yyy6*xxx2 - 1.D0/3.D0*et1(q,e3,e4,q4)* &
-          e1_e2*MG**2*yyy6*xxx1 - 8.D0*et1(e3,e4,q3,q4)*q1_q3*e1_e2* &
-          MG**(-2)*MZ4**2*yyy5*xxx2 + 8.D0*et1(e3,e4,q3,q4)*q1_q3*e1_e2 &
-          *MG**(-2)*MZ3**2*yyy5*xxx2 + 8.D0*et1(e3,e4,q3,q4)*q1_q3* &
-          e1_e2*yyy5*xxx2 + 16.D0*et1(e3,e4,q3,q4)*q1_q3**2*e1_e2* &
-          MG**(-2)*yyy5*xxx2 + 2.D0/3.D0*et1(e3,e4,q3,q4)*e1_e2* &
-          MG**(-2)*MZ4**4*yyy5*xxx2 + 1.D0/3.D0*et1(e3,e4,q3,q4)*e1_e2* &
-          MG**(-2)*MZ4**4*yyy5*xxx1 - 4.D0/3.D0*et1(e3,e4,q3,q4)*e1_e2* &
-          MG**(-2)*MZ3**2*MZ4**2*yyy5*xxx2 - 2.D0/3.D0*et1(e3,e4,q3,q4) &
-          *e1_e2*MG**(-2)*MZ3**2*MZ4**2*yyy5*xxx1
-      res = res + 2.D0/3.D0*et1(e3,e4,q3,q4)*e1_e2*MG**(-2)*MZ3**4*yyy5 &
-       *xxx2 + 1.D0/3.D0*et1(e3,e4,q3,q4)*e1_e2*MG**(-2)*MZ3**4*yyy5* &
-          xxx1 - 4.D0/3.D0*et1(e3,e4,q3,q4)*e1_e2*MZ4**2*yyy5*xxx2 - 2.D0 &
-          /3.D0*et1(e3,e4,q3,q4)*e1_e2*MZ4**2*yyy5*xxx1 + 8.D0/3.D0* &
-          et1(e3,e4,q3,q4)*e1_e2*MZ3**2*yyy5*xxx2 - 2.D0/3.D0*et1(e3,e4 &
-          ,q3,q4)*e1_e2*MZ3**2*yyy5*xxx1 + 2.D0/3.D0*et1(e3,e4,q3,q4)* &
-          e1_e2*MG**2*yyy5*xxx2 + 1.D0/3.D0*et1(e3,e4,q3,q4)*e1_e2* &
-          MG**2*yyy5*xxx1 + 4.D0*et1(e3,e4,q3,q4)*e1_q3*e2_q3*yyy5*xxx1
+!       res = &
+!         + 8.D0*q1_e3*q1_e4*e1_e2*yyy1*xxx2 - 8.D0*q1_e3*q1_q3*e1_e2* &
+!           e4_q3*yyy4*xxx2 + 4.D0*q1_e3*e1_e2*e4_q3*yyy1*xxx2 + 2.D0* &
+!           q1_e3*e1_e2*e4_q3*MZ4**2*yyy4*xxx2 - 2.D0*q1_e3*e1_e2*e4_q3* &
+!           MZ3**2*yyy4*xxx2 - 2.D0*q1_e3*e1_e2*e4_q3*MG**2*yyy4*xxx2 + 8.d0 &
+!           *q1_e4*q1_q3*e1_e2*e3_q4*yyy4*xxx2 + 4.D0*q1_e4*e1_e2*e3_q4 &
+!           *yyy1*xxx2 - 2.D0*q1_e4*e1_e2*e3_q4*MZ4**2*yyy4*xxx2 + 2.D0* &
+!           q1_e4*e1_e2*e3_q4*MZ3**2*yyy4*xxx2 + 2.D0*q1_e4*e1_e2*e3_q4* &
+!           MG**2*yyy4*xxx2 - 8.D0*q1_q3*e1_e2*e3_e4*MZ4**2*yyy2*xxx2 + 8.d0 &
+!           *q1_q3*e1_e2*e3_e4*MZ3**2*yyy2*xxx2 + 8.D0*q1_q3*e1_e2* &
+!           e3_e4*MG**2*yyy2*xxx2 - 8.D0*q1_q3*e1_e2*e3_q4*e4_q3*MZ4**2* &
+!           yyy3*xxx2 + 8.D0*q1_q3*e1_e2*e3_q4*e4_q3*MZ3**2*yyy3*xxx2 + 8.d0 &
+!           *q1_q3*e1_e2*e3_q4*e4_q3*MG**2*yyy3*xxx2 + 16.D0*q1_q3**2* &
+!           e1_e2*e3_e4*yyy2*xxx2 + 16.D0*q1_q3**2*e1_e2*e3_q4*e4_q3*yyy3 &
+!           *xxx2 + 2.D0/3.D0*e1_e2*e3_e4*MZ4**4*yyy2*xxx2 + 1.D0/3.D0* &
+!           e1_e2*e3_e4*MZ4**4*yyy2*xxx1
+!       res = res - 4.D0/3.D0*e1_e2*e3_e4*MZ3**2*MZ4**2*yyy2*xxx2 - 2.D0/ &
+!           3.D0*e1_e2*e3_e4*MZ3**2*MZ4**2*yyy2*xxx1 + 2.D0/3.D0*e1_e2* &
+!           e3_e4*MZ3**4*yyy2*xxx2 + 1.D0/3.D0*e1_e2*e3_e4*MZ3**4*yyy2* &
+!           xxx1 + 2.D0/3.D0*e1_e2*e3_e4*MG**2*yyy1*xxx2 - 2.D0/3.D0* &
+!           e1_e2*e3_e4*MG**2*yyy1*xxx1 - 4.D0/3.D0*e1_e2*e3_e4*MG**2* &
+!           MZ4**2*yyy2*xxx2 - 2.D0/3.D0*e1_e2*e3_e4*MG**2*MZ4**2*yyy2* &
+!           xxx1 + 8.D0/3.D0*e1_e2*e3_e4*MG**2*MZ3**2*yyy2*xxx2 - 2.D0/3.D0 &
+!           *e1_e2*e3_e4*MG**2*MZ3**2*yyy2*xxx1 + 2.D0/3.D0*e1_e2*e3_e4* &
+!           MG**4*yyy2*xxx2 + 1.D0/3.D0*e1_e2*e3_e4*MG**4*yyy2*xxx1 + 4.D0 &
+!           /3.D0*e1_e2*e3_q4*e4_q3*yyy1*xxx2 + 2.D0/3.D0*e1_e2*e3_q4* &
+!           e4_q3*yyy1*xxx1 + 2.D0/3.D0*e1_e2*e3_q4*e4_q3*MZ4**4*yyy3* &
+!           xxx2 + 1.D0/3.D0*e1_e2*e3_q4*e4_q3*MZ4**4*yyy3*xxx1 - 4.D0/3.D0 &
+!           *e1_e2*e3_q4*e4_q3*MZ3**2*MZ4**2*yyy3*xxx2 - 2.D0/3.D0*e1_e2 &
+!           *e3_q4*e4_q3*MZ3**2*MZ4**2*yyy3*xxx1 + 2.D0/3.D0*e1_e2*e3_q4* &
+!           e4_q3*MZ3**4*yyy3*xxx2 + 1.D0/3.D0*e1_e2*e3_q4*e4_q3*MZ3**4* &
+!           yyy3*xxx1
+!       res = res + 2.D0/3.D0*e1_e2*e3_q4*e4_q3*MG**2*yyy4*xxx2 - 2.D0/3.D0 &
+!           *e1_e2*e3_q4*e4_q3*MG**2*yyy4*xxx1 - 4.D0/3.D0*e1_e2*e3_q4* &
+!           e4_q3*MG**2*MZ4**2*yyy3*xxx2 - 2.D0/3.D0*e1_e2*e3_q4*e4_q3* &
+!           MG**2*MZ4**2*yyy3*xxx1 + 8.D0/3.D0*e1_e2*e3_q4*e4_q3*MG**2* &
+!           MZ3**2*yyy3*xxx2 - 2.D0/3.D0*e1_e2*e3_q4*e4_q3*MG**2*MZ3**2* &
+!           yyy3*xxx1 + 2.D0/3.D0*e1_e2*e3_q4*e4_q3*MG**4*yyy3*xxx2 + 1.D0 &
+!           /3.D0*e1_e2*e3_q4*e4_q3*MG**4*yyy3*xxx1 + e1_e3*e2_e4*MG**2* &
+!           yyy1*xxx1 - e1_e3*e2_q3*e4_q3*MG**2*yyy4*xxx1 + e1_e4*e2_e3* &
+!           MG**2*yyy1*xxx1 + e1_e4*e2_q3*e3_q4*MG**2*yyy4*xxx1 - e1_q3* &
+!           e2_e3*e4_q3*MG**2*yyy4*xxx1 + e1_q3*e2_e4*e3_q4*MG**2*yyy4* &
+!           xxx1 + 4.D0*e1_q3*e2_q3*e3_e4*MG**2*yyy2*xxx1 + 4.D0*e1_q3* &
+!           e2_q3*e3_q4*e4_q3*MG**2*yyy3*xxx1 + 8.D0*et1(q1,q2,e1,e2)* &
+!           q1_e3*q1_e4*MG**(-2)*yyy1*xxx3 - 8.D0*et1(q1,q2,e1,e2)*q1_e3* &
+!           q1_q3*e4_q3*MG**(-2)*yyy4*xxx3 + 4.D0*et1(q1,q2,e1,e2)*q1_e3* &
+!           e4_q3*MG**(-2)*yyy1*xxx3 + 2.D0*et1(q1,q2,e1,e2)*q1_e3*e4_q3* &
+!           MG**(-2)*MZ4**2*yyy4*xxx3
+!       res = res - 2.D0*et1(q1,q2,e1,e2)*q1_e3*e4_q3*MG**(-2)*MZ3**2* &
+!        yyy4*xxx3 - 2.D0*et1(q1,q2,e1,e2)*q1_e3*e4_q3*yyy4*xxx3 + 8.D0* &
+!           et1(q1,q2,e1,e2)*q1_e4*q1_q3*e3_q4*MG**(-2)*yyy4*xxx3 + 4.D0* &
+!           et1(q1,q2,e1,e2)*q1_e4*e3_q4*MG**(-2)*yyy1*xxx3 - 2.D0*et1(q1 &
+!           ,q2,e1,e2)*q1_e4*e3_q4*MG**(-2)*MZ4**2*yyy4*xxx3 + 2.D0*et1( &
+!           q1,q2,e1,e2)*q1_e4*e3_q4*MG**(-2)*MZ3**2*yyy4*xxx3 + 2.D0* &
+!           et1(q1,q2,e1,e2)*q1_e4*e3_q4*yyy4*xxx3 - 8.D0*et1(q1,q2,e1,e2 &
+!           )*q1_q3*e3_e4*MG**(-2)*MZ4**2*yyy2*xxx3 + 8.D0*et1(q1,q2,e1, &
+!           e2)*q1_q3*e3_e4*MG**(-2)*MZ3**2*yyy2*xxx3 + 8.D0*et1(q1,q2,e1 &
+!           ,e2)*q1_q3*e3_e4*yyy2*xxx3 - 8.D0*et1(q1,q2,e1,e2)*q1_q3* &
+!           e3_q4*e4_q3*MG**(-2)*MZ4**2*yyy3*xxx3 + 8.D0*et1(q1,q2,e1,e2) &
+!           *q1_q3*e3_q4*e4_q3*MG**(-2)*MZ3**2*yyy3*xxx3 + 8.D0*et1(q1,q2 &
+!           ,e1,e2)*q1_q3*e3_q4*e4_q3*yyy3*xxx3 + 16.D0*et1(q1,q2,e1,e2)* &
+!           q1_q3**2*e3_e4*MG**(-2)*yyy2*xxx3 + 16.D0*et1(q1,q2,e1,e2)* &
+!           q1_q3**2*e3_q4*e4_q3*MG**(-2)*yyy3*xxx3 + 2.D0/3.D0*et1(q1,q2 &
+!           ,e1,e2)*e3_e4*MG**(-2)*MZ4**4*yyy2*xxx3
+!       res = res - 4.D0/3.D0*et1(q1,q2,e1,e2)*e3_e4*MG**(-2)*MZ3**2* &
+!        MZ4**2*yyy2*xxx3 + 2.D0/3.D0*et1(q1,q2,e1,e2)*e3_e4*MG**(-2)* &
+!           MZ3**4*yyy2*xxx3 + 2.D0/3.D0*et1(q1,q2,e1,e2)*e3_e4*yyy1*xxx3 &
+!            - 4.D0/3.D0*et1(q1,q2,e1,e2)*e3_e4*MZ4**2*yyy2*xxx3 + 8.D0/3.D0 &
+!           *et1(q1,q2,e1,e2)*e3_e4*MZ3**2*yyy2*xxx3 + 2.D0/3.D0*et1(q1 &
+!           ,q2,e1,e2)*e3_e4*MG**2*yyy2*xxx3 + 4.D0/3.D0*et1(q1,q2,e1,e2) &
+!           *e3_q4*e4_q3*MG**(-2)*yyy1*xxx3 + 2.D0/3.D0*et1(q1,q2,e1,e2)* &
+!           e3_q4*e4_q3*MG**(-2)*MZ4**4*yyy3*xxx3 - 4.D0/3.D0*et1(q1,q2, &
+!           e1,e2)*e3_q4*e4_q3*MG**(-2)*MZ3**2*MZ4**2*yyy3*xxx3 + 2.D0/3.D0 &
+!           *et1(q1,q2,e1,e2)*e3_q4*e4_q3*MG**(-2)*MZ3**4*yyy3*xxx3 + 2.D0 &
+!           /3.D0*et1(q1,q2,e1,e2)*e3_q4*e4_q3*yyy4*xxx3 - 4.D0/3.D0* &
+!           et1(q1,q2,e1,e2)*e3_q4*e4_q3*MZ4**2*yyy3*xxx3 + 8.D0/3.D0* &
+!           et1(q1,q2,e1,e2)*e3_q4*e4_q3*MZ3**2*yyy3*xxx3 + 2.D0/3.D0* &
+!           et1(q1,q2,e1,e2)*e3_q4*e4_q3*MG**2*yyy3*xxx3 - et1(q1,q2,e1, &
+!           e2)*et1(q1,q,e3,e4)*MG**(-2)*MZ4**2*yyy6*xxx3 + et1(q1,q2,e1, &
+!           e2)*et1(q1,q,e3,e4)*MG**(-2)*MZ3**2*yyy6*xxx3
+!       res = res + et1(q1,q2,e1,e2)*et1(q1,q,e3,e4)*yyy6*xxx3 + 4.D0* &
+!           et1(q1,q2,e1,e2)*et1(q1,q,e3,e4)*q1_q3*MG**(-2)*yyy6*xxx3 - 4.0d0 &
+!           *et1(q1,q2,e1,e2)*et1(q1,q,e3,q3)*q1_q3*e4_q3*MG**(-4)*yyy7 &
+!           *xxx3 + et1(q1,q2,e1,e2)*et1(q1,q,e3,q3)*e4_q3*MG**(-4)* &
+!           MZ4**2*yyy7*xxx3 - et1(q1,q2,e1,e2)*et1(q1,q,e3,q3)*e4_q3* &
+!           MG**(-4)*MZ3**2*yyy7*xxx3 - et1(q1,q2,e1,e2)*et1(q1,q,e3,q3)* &
+!           e4_q3*MG**(-2)*yyy7*xxx3 + 4.D0*et1(q1,q2,e1,e2)*et1(q1,q,e3, &
+!           q4)*q1_q3*e4_q3*MG**(-4)*yyy7*xxx3 - et1(q1,q2,e1,e2)*et1(q1, &
+!           q,e3,q4)*e4_q3*MG**(-4)*MZ4**2*yyy7*xxx3 + et1(q1,q2,e1,e2)* &
+!           et1(q1,q,e3,q4)*e4_q3*MG**(-4)*MZ3**2*yyy7*xxx3 + et1(q1,q2, &
+!           e1,e2)*et1(q1,q,e3,q4)*e4_q3*MG**(-2)*yyy7*xxx3 - 4.D0*et1(q1 &
+!           ,q2,e1,e2)*et1(q1,q,e4,q3)*q1_q3*e3_q4*MG**(-4)*yyy7*xxx3 + &
+!           et1(q1,q2,e1,e2)*et1(q1,q,e4,q3)*e3_q4*MG**(-4)*MZ4**2*yyy7* &
+!           xxx3 - et1(q1,q2,e1,e2)*et1(q1,q,e4,q3)*e3_q4*MG**(-4)*MZ3**2 &
+!           *yyy7*xxx3 - et1(q1,q2,e1,e2)*et1(q1,q,e4,q3)*e3_q4*MG**(-2)* &
+!           yyy7*xxx3
+!       res = res + 4.D0*et1(q1,q2,e1,e2)*et1(q1,q,e4,q4)*q1_q3*e3_q4* &
+!        MG**(-4)*yyy7*xxx3 - et1(q1,q2,e1,e2)*et1(q1,q,e4,q4)*e3_q4* &
+!           MG**(-4)*MZ4**2*yyy7*xxx3 + et1(q1,q2,e1,e2)*et1(q1,q,e4,q4)* &
+!           e3_q4*MG**(-4)*MZ3**2*yyy7*xxx3 + et1(q1,q2,e1,e2)*et1(q1,q, &
+!           e4,q4)*e3_q4*MG**(-2)*yyy7*xxx3 + et1(q1,q2,e1,e2)*et1(q2,q, &
+!           e3,e4)*MG**(-2)*MZ4**2*yyy6*xxx3 - et1(q1,q2,e1,e2)*et1(q2,q, &
+!           e3,e4)*MG**(-2)*MZ3**2*yyy6*xxx3 - et1(q1,q2,e1,e2)*et1(q2,q, &
+!           e3,e4)*yyy6*xxx3 - 4.D0*et1(q1,q2,e1,e2)*et1(q2,q,e3,e4)* &
+!           q1_q3*MG**(-2)*yyy6*xxx3 + 4.D0*et1(q1,q2,e1,e2)*et1(q2,q,e3, &
+!           q3)*q1_q3*e4_q3*MG**(-4)*yyy7*xxx3 - et1(q1,q2,e1,e2)*et1(q2, &
+!           q,e3,q3)*e4_q3*MG**(-4)*MZ4**2*yyy7*xxx3 + et1(q1,q2,e1,e2)* &
+!           et1(q2,q,e3,q3)*e4_q3*MG**(-4)*MZ3**2*yyy7*xxx3 + et1(q1,q2, &
+!           e1,e2)*et1(q2,q,e3,q3)*e4_q3*MG**(-2)*yyy7*xxx3 - 4.D0*et1(q1 &
+!           ,q2,e1,e2)*et1(q2,q,e3,q4)*q1_q3*e4_q3*MG**(-4)*yyy7*xxx3 + &
+!           et1(q1,q2,e1,e2)*et1(q2,q,e3,q4)*e4_q3*MG**(-4)*MZ4**2*yyy7* &
+!           xxx3
+!       res = res - et1(q1,q2,e1,e2)*et1(q2,q,e3,q4)*e4_q3*MG**(-4)* &
+!        MZ3**2*yyy7*xxx3 - et1(q1,q2,e1,e2)*et1(q2,q,e3,q4)*e4_q3* &
+!           MG**(-2)*yyy7*xxx3 + 4.D0*et1(q1,q2,e1,e2)*et1(q2,q,e4,q3)* &
+!           q1_q3*e3_q4*MG**(-4)*yyy7*xxx3 - et1(q1,q2,e1,e2)*et1(q2,q,e4 &
+!           ,q3)*e3_q4*MG**(-4)*MZ4**2*yyy7*xxx3 + et1(q1,q2,e1,e2)*et1( &
+!           q2,q,e4,q3)*e3_q4*MG**(-4)*MZ3**2*yyy7*xxx3 + et1(q1,q2,e1,e2 &
+!           )*et1(q2,q,e4,q3)*e3_q4*MG**(-2)*yyy7*xxx3 - 4.D0*et1(q1,q2, &
+!           e1,e2)*et1(q2,q,e4,q4)*q1_q3*e3_q4*MG**(-4)*yyy7*xxx3 + et1( &
+!           q1,q2,e1,e2)*et1(q2,q,e4,q4)*e3_q4*MG**(-4)*MZ4**2*yyy7*xxx3 &
+!            - et1(q1,q2,e1,e2)*et1(q2,q,e4,q4)*e3_q4*MG**(-4)*MZ3**2* &
+!           yyy7*xxx3 - et1(q1,q2,e1,e2)*et1(q2,q,e4,q4)*e3_q4*MG**(-2)* &
+!           yyy7*xxx3 - 1.D0/3.D0*et1(q1,q2,e1,e2)*et1(q,e3,e4,q3)*yyy6* &
+!           xxx3 + 1.D0/3.D0*et1(q1,q2,e1,e2)*et1(q,e3,e4,q4)*yyy6*xxx3 &
+!            + 2.D0/3.D0*et1(q1,q2,e1,e2)*et1(e3,e4,q3,q4)*MG**(-4)* &
+!           MZ4**4*yyy5*xxx3 - 4.D0/3.D0*et1(q1,q2,e1,e2)*et1(e3,e4,q3,q4 &
+!           )*MG**(-4)*MZ3**2*MZ4**2*yyy5*xxx3
+!       res = res + 2.D0/3.D0*et1(q1,q2,e1,e2)*et1(e3,e4,q3,q4)*MG**(-4)* &
+!        MZ3**4*yyy5*xxx3 - 4.D0/3.D0*et1(q1,q2,e1,e2)*et1(e3,e4,q3,q4)* &
+!           MG**(-2)*MZ4**2*yyy5*xxx3 + 8.D0/3.D0*et1(q1,q2,e1,e2)*et1(e3 &
+!           ,e4,q3,q4)*MG**(-2)*MZ3**2*yyy5*xxx3 + 2.D0/3.D0*et1(q1,q2,e1 &
+!           ,e2)*et1(e3,e4,q3,q4)*yyy5*xxx3 - 8.D0*et1(q1,q2,e1,e2)*et1( &
+!           e3,e4,q3,q4)*q1_q3*MG**(-4)*MZ4**2*yyy5*xxx3 + 8.D0*et1(q1,q2 &
+!           ,e1,e2)*et1(e3,e4,q3,q4)*q1_q3*MG**(-4)*MZ3**2*yyy5*xxx3 + 8.D0 &
+!           *et1(q1,q2,e1,e2)*et1(e3,e4,q3,q4)*q1_q3*MG**(-2)*yyy5*xxx3 &
+!            + 16.D0*et1(q1,q2,e1,e2)*et1(e3,e4,q3,q4)*q1_q3**2*MG**(-4)* &
+!           yyy5*xxx3 + 4.D0*et1(q1,q,e3,e4)*q1_q3*e1_e2*yyy6*xxx2 - et1( &
+!           q1,q,e3,e4)*e1_e2*MZ4**2*yyy6*xxx2 + et1(q1,q,e3,e4)*e1_e2* &
+!           MZ3**2*yyy6*xxx2 + et1(q1,q,e3,e4)*e1_e2*MG**2*yyy6*xxx2 - 4.D0 &
+!           *et1(q1,q,e3,q3)*q1_q3*e1_e2*e4_q3*MG**(-2)*yyy7*xxx2 + et1( &
+!           q1,q,e3,q3)*e1_e2*e4_q3*MG**(-2)*MZ4**2*yyy7*xxx2 - et1(q1,q, &
+!           e3,q3)*e1_e2*e4_q3*MG**(-2)*MZ3**2*yyy7*xxx2 - et1(q1,q,e3,q3 &
+!           )*e1_e2*e4_q3*yyy7*xxx2
+!       res = res + 4.D0*et1(q1,q,e3,q4)*q1_q3*e1_e2*e4_q3*MG**(-2)*yyy7* &
+!        xxx2 - et1(q1,q,e3,q4)*e1_e2*e4_q3*MG**(-2)*MZ4**2*yyy7*xxx2 + &
+!           et1(q1,q,e3,q4)*e1_e2*e4_q3*MG**(-2)*MZ3**2*yyy7*xxx2 + et1( &
+!           q1,q,e3,q4)*e1_e2*e4_q3*yyy7*xxx2 - 4.D0*et1(q1,q,e4,q3)* &
+!           q1_q3*e1_e2*e3_q4*MG**(-2)*yyy7*xxx2 + et1(q1,q,e4,q3)*e1_e2* &
+!           e3_q4*MG**(-2)*MZ4**2*yyy7*xxx2 - et1(q1,q,e4,q3)*e1_e2*e3_q4 &
+!           *MG**(-2)*MZ3**2*yyy7*xxx2 - et1(q1,q,e4,q3)*e1_e2*e3_q4*yyy7 &
+!           *xxx2 + 4.D0*et1(q1,q,e4,q4)*q1_q3*e1_e2*e3_q4*MG**(-2)*yyy7* &
+!           xxx2 - et1(q1,q,e4,q4)*e1_e2*e3_q4*MG**(-2)*MZ4**2*yyy7*xxx2 &
+!            + et1(q1,q,e4,q4)*e1_e2*e3_q4*MG**(-2)*MZ3**2*yyy7*xxx2 + &
+!           et1(q1,q,e4,q4)*e1_e2*e3_q4*yyy7*xxx2 - 4.D0*et1(q2,q,e3,e4)* &
+!           q1_q3*e1_e2*yyy6*xxx2 + et1(q2,q,e3,e4)*e1_e2*MZ4**2*yyy6* &
+!           xxx2 - et1(q2,q,e3,e4)*e1_e2*MZ3**2*yyy6*xxx2 - et1(q2,q,e3, &
+!           e4)*e1_e2*MG**2*yyy6*xxx2 + 4.D0*et1(q2,q,e3,q3)*q1_q3*e1_e2* &
+!           e4_q3*MG**(-2)*yyy7*xxx2 - et1(q2,q,e3,q3)*e1_e2*e4_q3* &
+!           MG**(-2)*MZ4**2*yyy7*xxx2
+!       res = res + et1(q2,q,e3,q3)*e1_e2*e4_q3*MG**(-2)*MZ3**2*yyy7*xxx2 &
+!            + et1(q2,q,e3,q3)*e1_e2*e4_q3*yyy7*xxx2 - 4.D0*et1(q2,q,e3, &
+!           q4)*q1_q3*e1_e2*e4_q3*MG**(-2)*yyy7*xxx2 + et1(q2,q,e3,q4)* &
+!           e1_e2*e4_q3*MG**(-2)*MZ4**2*yyy7*xxx2 - et1(q2,q,e3,q4)*e1_e2 &
+!           *e4_q3*MG**(-2)*MZ3**2*yyy7*xxx2 - et1(q2,q,e3,q4)*e1_e2* &
+!           e4_q3*yyy7*xxx2 + 4.D0*et1(q2,q,e4,q3)*q1_q3*e1_e2*e3_q4* &
+!           MG**(-2)*yyy7*xxx2 - et1(q2,q,e4,q3)*e1_e2*e3_q4*MG**(-2)* &
+!           MZ4**2*yyy7*xxx2 + et1(q2,q,e4,q3)*e1_e2*e3_q4*MG**(-2)* &
+!           MZ3**2*yyy7*xxx2 + et1(q2,q,e4,q3)*e1_e2*e3_q4*yyy7*xxx2 - 4.D0 &
+!           *et1(q2,q,e4,q4)*q1_q3*e1_e2*e3_q4*MG**(-2)*yyy7*xxx2 + et1( &
+!           q2,q,e4,q4)*e1_e2*e3_q4*MG**(-2)*MZ4**2*yyy7*xxx2 - et1(q2,q, &
+!           e4,q4)*e1_e2*e3_q4*MG**(-2)*MZ3**2*yyy7*xxx2 - et1(q2,q,e4,q4 &
+!           )*e1_e2*e3_q4*yyy7*xxx2 - et1(q,e1,e3,e4)*e2_q3*MG**2*yyy6* &
+!           xxx1 + et1(q,e1,e3,q3)*e2_q3*e4_q3*yyy7*xxx1 - et1(q,e1,e3,q4 &
+!           )*e2_q3*e4_q3*yyy7*xxx1 + et1(q,e1,e4,q3)*e2_q3*e3_q4*yyy7* &
+!           xxx1
+!       res = res - et1(q,e1,e4,q4)*e2_q3*e3_q4*yyy7*xxx1 - et1(q,e2,e3, &
+!           e4)*e1_q3*MG**2*yyy6*xxx1 + et1(q,e2,e3,q3)*e1_q3*e4_q3*yyy7* &
+!           xxx1 - et1(q,e2,e3,q4)*e1_q3*e4_q3*yyy7*xxx1 + et1(q,e2,e4,q3 &
+!           )*e1_q3*e3_q4*yyy7*xxx1 - et1(q,e2,e4,q4)*e1_q3*e3_q4*yyy7* &
+!           xxx1 - 1.D0/3.D0*et1(q,e3,e4,q3)*e1_e2*MG**2*yyy6*xxx2 + 1.D0/ &
+!           3.D0*et1(q,e3,e4,q3)*e1_e2*MG**2*yyy6*xxx1 + 1.D0/3.D0*et1(q, &
+!           e3,e4,q4)*e1_e2*MG**2*yyy6*xxx2 - 1.D0/3.D0*et1(q,e3,e4,q4)* &
+!           e1_e2*MG**2*yyy6*xxx1 - 8.D0*et1(e3,e4,q3,q4)*q1_q3*e1_e2* &
+!           MG**(-2)*MZ4**2*yyy5*xxx2 + 8.D0*et1(e3,e4,q3,q4)*q1_q3*e1_e2 &
+!           *MG**(-2)*MZ3**2*yyy5*xxx2 + 8.D0*et1(e3,e4,q3,q4)*q1_q3* &
+!           e1_e2*yyy5*xxx2 + 16.D0*et1(e3,e4,q3,q4)*q1_q3**2*e1_e2* &
+!           MG**(-2)*yyy5*xxx2 + 2.D0/3.D0*et1(e3,e4,q3,q4)*e1_e2* &
+!           MG**(-2)*MZ4**4*yyy5*xxx2 + 1.D0/3.D0*et1(e3,e4,q3,q4)*e1_e2* &
+!           MG**(-2)*MZ4**4*yyy5*xxx1 - 4.D0/3.D0*et1(e3,e4,q3,q4)*e1_e2* &
+!           MG**(-2)*MZ3**2*MZ4**2*yyy5*xxx2 - 2.D0/3.D0*et1(e3,e4,q3,q4) &
+!           *e1_e2*MG**(-2)*MZ3**2*MZ4**2*yyy5*xxx1
+!       res = res + 2.D0/3.D0*et1(e3,e4,q3,q4)*e1_e2*MG**(-2)*MZ3**4*yyy5 &
+!        *xxx2 + 1.D0/3.D0*et1(e3,e4,q3,q4)*e1_e2*MG**(-2)*MZ3**4*yyy5* &
+!           xxx1 - 4.D0/3.D0*et1(e3,e4,q3,q4)*e1_e2*MZ4**2*yyy5*xxx2 - 2.D0 &
+!           /3.D0*et1(e3,e4,q3,q4)*e1_e2*MZ4**2*yyy5*xxx1 + 8.D0/3.D0* &
+!           et1(e3,e4,q3,q4)*e1_e2*MZ3**2*yyy5*xxx2 - 2.D0/3.D0*et1(e3,e4 &
+!           ,q3,q4)*e1_e2*MZ3**2*yyy5*xxx1 + 2.D0/3.D0*et1(e3,e4,q3,q4)* &
+!           e1_e2*MG**2*yyy5*xxx2 + 1.D0/3.D0*et1(e3,e4,q3,q4)*e1_e2* &
+!           MG**2*yyy5*xxx1 + 4.D0*et1(e3,e4,q3,q4)*e1_q3*e2_q3*yyy5*xxx1
 
+
+
+!   this is the new code that includes couplings yyy41 and yyy42 instead of yyy4
+    res =&
+        &  + 8.*q1_e3*q1_e4*e1_e2*yyy1*xxx2 - 8.*q1_e3*q1_q3*e1_e2*e4_q3*&
+        &    yyy41*xxx2 + 4.*q1_e3*e1_e2*e4_q3*yyy1*xxx2 + 2.*q1_e3*e1_e2*&
+        &    e4_q3*MZ4**2*yyy41*xxx2 - 2.*q1_e3*e1_e2*e4_q3*MZ3**2*yyy41*&
+        &    xxx2 - 2.*q1_e3*e1_e2*e4_q3*MG**2*yyy41*xxx2 + 8.*q1_e4*q1_q3&
+        &    *e1_e2*e3_q4*yyy42*xxx2 + 4.*q1_e4*e1_e2*e3_q4*yyy1*xxx2 - 2.&
+        &    *q1_e4*e1_e2*e3_q4*MZ4**2*yyy42*xxx2 + 2.*q1_e4*e1_e2*e3_q4*&
+        &    MZ3**2*yyy42*xxx2 + 2.*q1_e4*e1_e2*e3_q4*MG**2*yyy42*xxx2 - 8.&
+        &    *q1_q3*e1_e2*e3_e4*MZ4**2*yyy2*xxx2 + 8.*q1_q3*e1_e2*e3_e4*&
+        &    MZ3**2*yyy2*xxx2 + 8.*q1_q3*e1_e2*e3_e4*MG**2*yyy2*xxx2 + 4.*&
+        &    q1_q3*e1_e2*e3_q4*e4_q3*yyy42*xxx2 - 4.*q1_q3*e1_e2*e3_q4*&
+        &    e4_q3*yyy41*xxx2 - 8.*q1_q3*e1_e2*e3_q4*e4_q3*MZ4**2*yyy3*&
+        &    xxx2 + 8.*q1_q3*e1_e2*e3_q4*e4_q3*MZ3**2*yyy3*xxx2 + 8.*q1_q3&
+        &    *e1_e2*e3_q4*e4_q3*MG**2*yyy3*xxx2 + 16.*q1_q3**2*e1_e2*e3_e4&
+        &    *yyy2*xxx2 + 16.*q1_q3**2*e1_e2*e3_q4*e4_q3*yyy3*xxx2 + 2./3.&
+        &    *e1_e2*e3_e4*MZ4**4*yyy2*xxx2
+          res = res + 1./3.*e1_e2*e3_e4*MZ4**4*yyy2*xxx1 - 4./3.*e1_e2*&
+        &    e3_e4*MZ3**2*MZ4**2*yyy2*xxx2 - 2./3.*e1_e2*e3_e4*MZ3**2*&
+        &    MZ4**2*yyy2*xxx1 + 2./3.*e1_e2*e3_e4*MZ3**4*yyy2*xxx2 + 1./3.&
+        &    *e1_e2*e3_e4*MZ3**4*yyy2*xxx1 + 2./3.*e1_e2*e3_e4*MG**2*yyy1*&
+        &    xxx2 - 2./3.*e1_e2*e3_e4*MG**2*yyy1*xxx1 - 4./3.*e1_e2*e3_e4*&
+        &    MG**2*MZ4**2*yyy2*xxx2 - 2./3.*e1_e2*e3_e4*MG**2*MZ4**2*yyy2*&
+        &    xxx1 + 8./3.*e1_e2*e3_e4*MG**2*MZ3**2*yyy2*xxx2 - 2./3.*e1_e2&
+        &    *e3_e4*MG**2*MZ3**2*yyy2*xxx1 + 2./3.*e1_e2*e3_e4*MG**4*yyy2*&
+        &    xxx2 + 1./3.*e1_e2*e3_e4*MG**4*yyy2*xxx1 + 4./3.*e1_e2*e3_q4*&
+        &    e4_q3*yyy1*xxx2 + 2./3.*e1_e2*e3_q4*e4_q3*yyy1*xxx1 - 2./3.*&
+        &    e1_e2*e3_q4*e4_q3*MZ4**2*yyy42*xxx2 - 1./3.*e1_e2*e3_q4*e4_q3&
+        &    *MZ4**2*yyy42*xxx1 + 2./3.*e1_e2*e3_q4*e4_q3*MZ4**2*yyy41*&
+        &    xxx2 + 1./3.*e1_e2*e3_q4*e4_q3*MZ4**2*yyy41*xxx1 + 2./3.*&
+        &    e1_e2*e3_q4*e4_q3*MZ4**4*yyy3*xxx2 + 1./3.*e1_e2*e3_q4*e4_q3*&
+        &    MZ4**4*yyy3*xxx1 + 2./3.*e1_e2*e3_q4*e4_q3*MZ3**2*yyy42*xxx2&
+        &     + 1./3.*e1_e2*e3_q4*e4_q3*MZ3**2*yyy42*xxx1
+          res = res - 2./3.*e1_e2*e3_q4*e4_q3*MZ3**2*yyy41*xxx2 - 1./3.*&
+        &    e1_e2*e3_q4*e4_q3*MZ3**2*yyy41*xxx1 - 4./3.*e1_e2*e3_q4*e4_q3&
+        &    *MZ3**2*MZ4**2*yyy3*xxx2 - 2./3.*e1_e2*e3_q4*e4_q3*MZ3**2*&
+        &    MZ4**2*yyy3*xxx1 + 2./3.*e1_e2*e3_q4*e4_q3*MZ3**4*yyy3*xxx2&
+        &     + 1./3.*e1_e2*e3_q4*e4_q3*MZ3**4*yyy3*xxx1 + 4./3.*e1_e2*&
+        &    e3_q4*e4_q3*MG**2*yyy42*xxx2 - 1./3.*e1_e2*e3_q4*e4_q3*MG**2*&
+        &    yyy42*xxx1 - 2./3.*e1_e2*e3_q4*e4_q3*MG**2*yyy41*xxx2 - 1./3.&
+        &    *e1_e2*e3_q4*e4_q3*MG**2*yyy41*xxx1 - 4./3.*e1_e2*e3_q4*e4_q3&
+        &    *MG**2*MZ4**2*yyy3*xxx2 - 2./3.*e1_e2*e3_q4*e4_q3*MG**2*&
+        &    MZ4**2*yyy3*xxx1 + 8./3.*e1_e2*e3_q4*e4_q3*MG**2*MZ3**2*yyy3*&
+        &    xxx2 - 2./3.*e1_e2*e3_q4*e4_q3*MG**2*MZ3**2*yyy3*xxx1 + 2./3.&
+        &    *e1_e2*e3_q4*e4_q3*MG**4*yyy3*xxx2 + 1./3.*e1_e2*e3_q4*e4_q3*&
+        &    MG**4*yyy3*xxx1 + e1_e3*e2_e4*MG**2*yyy1*xxx1 - e1_e3*e2_q3*&
+        &    e4_q3*MG**2*yyy41*xxx1 + e1_e4*e2_e3*MG**2*yyy1*xxx1 + e1_e4*&
+        &    e2_q3*e3_q4*MG**2*yyy42*xxx1 - e1_q3*e2_e3*e4_q3*MG**2*yyy41*&
+        &    xxx1
+          res = res + e1_q3*e2_e4*e3_q4*MG**2*yyy42*xxx1 + 4.*e1_q3*e2_q3*&
+        &    e3_e4*MG**2*yyy2*xxx1 + 4.*e1_q3*e2_q3*e3_q4*e4_q3*MG**2*yyy3&
+        &    *xxx1 + 8.*et1(q1,q2,e1,e2)*q1_e3*q1_e4*MG**(-2)*yyy1*xxx3 - &
+        &    8.*et1(q1,q2,e1,e2)*q1_e3*q1_q3*e4_q3*MG**(-2)*yyy41*xxx3 + 4.&
+        &    *et1(q1,q2,e1,e2)*q1_e3*e4_q3*MG**(-2)*yyy1*xxx3 + 2.*et1(q1,&
+        &    q2,e1,e2)*q1_e3*e4_q3*MG**(-2)*MZ4**2*yyy41*xxx3 - 2.*et1(q1,&
+        &    q2,e1,e2)*q1_e3*e4_q3*MG**(-2)*MZ3**2*yyy41*xxx3 - 2.*et1(q1,&
+        &    q2,e1,e2)*q1_e3*e4_q3*yyy41*xxx3 + 8.*et1(q1,q2,e1,e2)*q1_e4*&
+        &    q1_q3*e3_q4*MG**(-2)*yyy42*xxx3 + 4.*et1(q1,q2,e1,e2)*q1_e4*&
+        &    e3_q4*MG**(-2)*yyy1*xxx3 - 2.*et1(q1,q2,e1,e2)*q1_e4*e3_q4*&
+        &    MG**(-2)*MZ4**2*yyy42*xxx3 + 2.*et1(q1,q2,e1,e2)*q1_e4*e3_q4*&
+        &    MG**(-2)*MZ3**2*yyy42*xxx3 + 2.*et1(q1,q2,e1,e2)*q1_e4*e3_q4*&
+        &    yyy42*xxx3 - 8.*et1(q1,q2,e1,e2)*q1_q3*e3_e4*MG**(-2)*MZ4**2*&
+        &    yyy2*xxx3 + 8.*et1(q1,q2,e1,e2)*q1_q3*e3_e4*MG**(-2)*MZ3**2*&
+        &    yyy2*xxx3 + 8.*et1(q1,q2,e1,e2)*q1_q3*e3_e4*yyy2*xxx3 + 4.*&
+        &    et1(q1,q2,e1,e2)*q1_q3*e3_q4*e4_q3*MG**(-2)*yyy42*xxx3
+          res = res - 4.*et1(q1,q2,e1,e2)*q1_q3*e3_q4*e4_q3*MG**(-2)*yyy41*&
+        & xxx3 - 8.*et1(q1,q2,e1,e2)*q1_q3*e3_q4*e4_q3*MG**(-2)*MZ4**2*&
+        &    yyy3*xxx3 + 8.*et1(q1,q2,e1,e2)*q1_q3*e3_q4*e4_q3*MG**(-2)*&
+        &    MZ3**2*yyy3*xxx3 + 8.*et1(q1,q2,e1,e2)*q1_q3*e3_q4*e4_q3*yyy3&
+        &    *xxx3 + 16.*et1(q1,q2,e1,e2)*q1_q3**2*e3_e4*MG**(-2)*yyy2*&
+        &    xxx3 + 16.*et1(q1,q2,e1,e2)*q1_q3**2*e3_q4*e4_q3*MG**(-2)*&
+        &    yyy3*xxx3 + 2./3.*et1(q1,q2,e1,e2)*e3_e4*MG**(-2)*MZ4**4*yyy2&
+        &    *xxx3 - 4./3.*et1(q1,q2,e1,e2)*e3_e4*MG**(-2)*MZ3**2*MZ4**2*&
+        &    yyy2*xxx3 + 2./3.*et1(q1,q2,e1,e2)*e3_e4*MG**(-2)*MZ3**4*yyy2&
+        &    *xxx3 + 2./3.*et1(q1,q2,e1,e2)*e3_e4*yyy1*xxx3 - 4./3.*et1(q1&
+        &    ,q2,e1,e2)*e3_e4*MZ4**2*yyy2*xxx3 + 8./3.*et1(q1,q2,e1,e2)*&
+        &    e3_e4*MZ3**2*yyy2*xxx3 + 2./3.*et1(q1,q2,e1,e2)*e3_e4*MG**2*&
+        &    yyy2*xxx3 + 4./3.*et1(q1,q2,e1,e2)*e3_q4*e4_q3*MG**(-2)*yyy1*&
+        &    xxx3 - 2./3.*et1(q1,q2,e1,e2)*e3_q4*e4_q3*MG**(-2)*MZ4**2*&
+        &    yyy42*xxx3 + 2./3.*et1(q1,q2,e1,e2)*e3_q4*e4_q3*MG**(-2)*&
+        &    MZ4**2*yyy41*xxx3
+          res = res + 2./3.*et1(q1,q2,e1,e2)*e3_q4*e4_q3*MG**(-2)*MZ4**4*&
+        & yyy3*xxx3 + 2./3.*et1(q1,q2,e1,e2)*e3_q4*e4_q3*MG**(-2)*MZ3**2*&
+        &    yyy42*xxx3 - 2./3.*et1(q1,q2,e1,e2)*e3_q4*e4_q3*MG**(-2)*&
+        &    MZ3**2*yyy41*xxx3 - 4./3.*et1(q1,q2,e1,e2)*e3_q4*e4_q3*&
+        &    MG**(-2)*MZ3**2*MZ4**2*yyy3*xxx3 + 2./3.*et1(q1,q2,e1,e2)*&
+        &    e3_q4*e4_q3*MG**(-2)*MZ3**4*yyy3*xxx3 + 4./3.*et1(q1,q2,e1,e2&
+        &    )*e3_q4*e4_q3*yyy42*xxx3 - 2./3.*et1(q1,q2,e1,e2)*e3_q4*e4_q3&
+        &    *yyy41*xxx3 - 4./3.*et1(q1,q2,e1,e2)*e3_q4*e4_q3*MZ4**2*yyy3*&
+        &    xxx3 + 8./3.*et1(q1,q2,e1,e2)*e3_q4*e4_q3*MZ3**2*yyy3*xxx3 + &
+        &    2./3.*et1(q1,q2,e1,e2)*e3_q4*e4_q3*MG**2*yyy3*xxx3 - et1(q1,&
+        &    q2,e1,e2)*et1(q1,q,e3,e4)*MG**(-2)*MZ4**2*yyy6*xxx3 + et1(q1,&
+        &    q2,e1,e2)*et1(q1,q,e3,e4)*MG**(-2)*MZ3**2*yyy6*xxx3 + et1(q1,&
+        &    q2,e1,e2)*et1(q1,q,e3,e4)*yyy6*xxx3 + 4.*et1(q1,q2,e1,e2)*&
+        &    et1(q1,q,e3,e4)*q1_q3*MG**(-2)*yyy6*xxx3 - 4.*et1(q1,q2,e1,e2&
+        &    )*et1(q1,q,e3,q3)*q1_q3*e4_q3*MG**(-4)*yyy7*xxx3 + et1(q1,q2,&
+        &    e1,e2)*et1(q1,q,e3,q3)*e4_q3*MG**(-4)*MZ4**2*yyy7*xxx3
+          res = res - et1(q1,q2,e1,e2)*et1(q1,q,e3,q3)*e4_q3*MG**(-4)*&
+        & MZ3**2*yyy7*xxx3 - et1(q1,q2,e1,e2)*et1(q1,q,e3,q3)*e4_q3*&
+        &    MG**(-2)*yyy7*xxx3 + 4.*et1(q1,q2,e1,e2)*et1(q1,q,e3,q4)*&
+        &    q1_q3*e4_q3*MG**(-4)*yyy7*xxx3 - et1(q1,q2,e1,e2)*et1(q1,q,e3&
+        &    ,q4)*e4_q3*MG**(-4)*MZ4**2*yyy7*xxx3 + et1(q1,q2,e1,e2)*et1(&
+        &    q1,q,e3,q4)*e4_q3*MG**(-4)*MZ3**2*yyy7*xxx3 + et1(q1,q2,e1,e2&
+        &    )*et1(q1,q,e3,q4)*e4_q3*MG**(-2)*yyy7*xxx3 - 4.*et1(q1,q2,e1,&
+        &    e2)*et1(q1,q,e4,q3)*q1_q3*e3_q4*MG**(-4)*yyy7*xxx3 + et1(q1,&
+        &    q2,e1,e2)*et1(q1,q,e4,q3)*e3_q4*MG**(-4)*MZ4**2*yyy7*xxx3 - &
+        &    et1(q1,q2,e1,e2)*et1(q1,q,e4,q3)*e3_q4*MG**(-4)*MZ3**2*yyy7*&
+        &    xxx3 - et1(q1,q2,e1,e2)*et1(q1,q,e4,q3)*e3_q4*MG**(-2)*yyy7*&
+        &    xxx3 + 4.*et1(q1,q2,e1,e2)*et1(q1,q,e4,q4)*q1_q3*e3_q4*&
+        &    MG**(-4)*yyy7*xxx3 - et1(q1,q2,e1,e2)*et1(q1,q,e4,q4)*e3_q4*&
+        &    MG**(-4)*MZ4**2*yyy7*xxx3 + et1(q1,q2,e1,e2)*et1(q1,q,e4,q4)*&
+        &    e3_q4*MG**(-4)*MZ3**2*yyy7*xxx3 + et1(q1,q2,e1,e2)*et1(q1,q,&
+        &    e4,q4)*e3_q4*MG**(-2)*yyy7*xxx3
+          res = res + et1(q1,q2,e1,e2)*et1(q2,q,e3,e4)*MG**(-2)*MZ4**2*yyy6&
+        & *xxx3 - et1(q1,q2,e1,e2)*et1(q2,q,e3,e4)*MG**(-2)*MZ3**2*yyy6*&
+        &    xxx3 - et1(q1,q2,e1,e2)*et1(q2,q,e3,e4)*yyy6*xxx3 - 4.*et1(q1&
+        &    ,q2,e1,e2)*et1(q2,q,e3,e4)*q1_q3*MG**(-2)*yyy6*xxx3 + 4.*et1(&
+        &    q1,q2,e1,e2)*et1(q2,q,e3,q3)*q1_q3*e4_q3*MG**(-4)*yyy7*xxx3&
+        &     - et1(q1,q2,e1,e2)*et1(q2,q,e3,q3)*e4_q3*MG**(-4)*MZ4**2*&
+        &    yyy7*xxx3 + et1(q1,q2,e1,e2)*et1(q2,q,e3,q3)*e4_q3*MG**(-4)*&
+        &    MZ3**2*yyy7*xxx3 + et1(q1,q2,e1,e2)*et1(q2,q,e3,q3)*e4_q3*&
+        &    MG**(-2)*yyy7*xxx3 - 4.*et1(q1,q2,e1,e2)*et1(q2,q,e3,q4)*&
+        &    q1_q3*e4_q3*MG**(-4)*yyy7*xxx3 + et1(q1,q2,e1,e2)*et1(q2,q,e3&
+        &    ,q4)*e4_q3*MG**(-4)*MZ4**2*yyy7*xxx3 - et1(q1,q2,e1,e2)*et1(&
+        &    q2,q,e3,q4)*e4_q3*MG**(-4)*MZ3**2*yyy7*xxx3 - et1(q1,q2,e1,e2&
+        &    )*et1(q2,q,e3,q4)*e4_q3*MG**(-2)*yyy7*xxx3 + 4.*et1(q1,q2,e1,&
+        &    e2)*et1(q2,q,e4,q3)*q1_q3*e3_q4*MG**(-4)*yyy7*xxx3 - et1(q1,&
+        &    q2,e1,e2)*et1(q2,q,e4,q3)*e3_q4*MG**(-4)*MZ4**2*yyy7*xxx3 + &
+        &    et1(q1,q2,e1,e2)*et1(q2,q,e4,q3)*e3_q4*MG**(-4)*MZ3**2*yyy7*&
+        &    xxx3
+          res = res + et1(q1,q2,e1,e2)*et1(q2,q,e4,q3)*e3_q4*MG**(-2)*yyy7*&
+        & xxx3 - 4.*et1(q1,q2,e1,e2)*et1(q2,q,e4,q4)*q1_q3*e3_q4*MG**(-4)*&
+        &    yyy7*xxx3 + et1(q1,q2,e1,e2)*et1(q2,q,e4,q4)*e3_q4*MG**(-4)*&
+        &    MZ4**2*yyy7*xxx3 - et1(q1,q2,e1,e2)*et1(q2,q,e4,q4)*e3_q4*&
+        &    MG**(-4)*MZ3**2*yyy7*xxx3 - et1(q1,q2,e1,e2)*et1(q2,q,e4,q4)*&
+        &    e3_q4*MG**(-2)*yyy7*xxx3 - 1./3.*et1(q1,q2,e1,e2)*et1(q,e3,e4&
+        &    ,q3)*yyy6*xxx3 + 1./3.*et1(q1,q2,e1,e2)*et1(q,e3,e4,q4)*yyy6*&
+        &    xxx3 + 2./3.*et1(q1,q2,e1,e2)*et1(e3,e4,q3,q4)*MG**(-4)*&
+        &    MZ4**4*yyy5*xxx3 - 4./3.*et1(q1,q2,e1,e2)*et1(e3,e4,q3,q4)*&
+        &    MG**(-4)*MZ3**2*MZ4**2*yyy5*xxx3 + 2./3.*et1(q1,q2,e1,e2)*&
+        &    et1(e3,e4,q3,q4)*MG**(-4)*MZ3**4*yyy5*xxx3 - 4./3.*et1(q1,q2,&
+        &    e1,e2)*et1(e3,e4,q3,q4)*MG**(-2)*MZ4**2*yyy5*xxx3 + 8./3.*&
+        &    et1(q1,q2,e1,e2)*et1(e3,e4,q3,q4)*MG**(-2)*MZ3**2*yyy5*xxx3&
+        &     + 2./3.*et1(q1,q2,e1,e2)*et1(e3,e4,q3,q4)*yyy5*xxx3 - 8.*&
+        &    et1(q1,q2,e1,e2)*et1(e3,e4,q3,q4)*q1_q3*MG**(-4)*MZ4**2*yyy5*&
+        &    xxx3
+          res = res + 8.*et1(q1,q2,e1,e2)*et1(e3,e4,q3,q4)*q1_q3*MG**(-4)*&
+        & MZ3**2*yyy5*xxx3 + 8.*et1(q1,q2,e1,e2)*et1(e3,e4,q3,q4)*q1_q3*&
+        &    MG**(-2)*yyy5*xxx3 + 16.*et1(q1,q2,e1,e2)*et1(e3,e4,q3,q4)*&
+        &    q1_q3**2*MG**(-4)*yyy5*xxx3 + 4.*et1(q1,q,e3,e4)*q1_q3*e1_e2*&
+        &    yyy6*xxx2 - et1(q1,q,e3,e4)*e1_e2*MZ4**2*yyy6*xxx2 + et1(q1,q&
+        &    ,e3,e4)*e1_e2*MZ3**2*yyy6*xxx2 + et1(q1,q,e3,e4)*e1_e2*MG**2*&
+        &    yyy6*xxx2 - 4.*et1(q1,q,e3,q3)*q1_q3*e1_e2*e4_q3*MG**(-2)*&
+        &    yyy7*xxx2 + et1(q1,q,e3,q3)*e1_e2*e4_q3*MG**(-2)*MZ4**2*yyy7*&
+        &    xxx2 - et1(q1,q,e3,q3)*e1_e2*e4_q3*MG**(-2)*MZ3**2*yyy7*xxx2&
+        &     - et1(q1,q,e3,q3)*e1_e2*e4_q3*yyy7*xxx2 + 4.*et1(q1,q,e3,q4)&
+        &    *q1_q3*e1_e2*e4_q3*MG**(-2)*yyy7*xxx2 - et1(q1,q,e3,q4)*e1_e2&
+        &    *e4_q3*MG**(-2)*MZ4**2*yyy7*xxx2 + et1(q1,q,e3,q4)*e1_e2*&
+        &    e4_q3*MG**(-2)*MZ3**2*yyy7*xxx2 + et1(q1,q,e3,q4)*e1_e2*e4_q3&
+        &    *yyy7*xxx2 - 4.*et1(q1,q,e4,q3)*q1_q3*e1_e2*e3_q4*MG**(-2)*&
+        &    yyy7*xxx2 + et1(q1,q,e4,q3)*e1_e2*e3_q4*MG**(-2)*MZ4**2*yyy7*&
+        &    xxx2
+          res = res - et1(q1,q,e4,q3)*e1_e2*e3_q4*MG**(-2)*MZ3**2*yyy7*xxx2&
+        &     - et1(q1,q,e4,q3)*e1_e2*e3_q4*yyy7*xxx2 + 4.*et1(q1,q,e4,q4)&
+        &    *q1_q3*e1_e2*e3_q4*MG**(-2)*yyy7*xxx2 - et1(q1,q,e4,q4)*e1_e2&
+        &    *e3_q4*MG**(-2)*MZ4**2*yyy7*xxx2 + et1(q1,q,e4,q4)*e1_e2*&
+        &    e3_q4*MG**(-2)*MZ3**2*yyy7*xxx2 + et1(q1,q,e4,q4)*e1_e2*e3_q4&
+        &    *yyy7*xxx2 - 4.*et1(q2,q,e3,e4)*q1_q3*e1_e2*yyy6*xxx2 + et1(&
+        &    q2,q,e3,e4)*e1_e2*MZ4**2*yyy6*xxx2 - et1(q2,q,e3,e4)*e1_e2*&
+        &    MZ3**2*yyy6*xxx2 - et1(q2,q,e3,e4)*e1_e2*MG**2*yyy6*xxx2 + 4.&
+        &    *et1(q2,q,e3,q3)*q1_q3*e1_e2*e4_q3*MG**(-2)*yyy7*xxx2 - et1(&
+        &    q2,q,e3,q3)*e1_e2*e4_q3*MG**(-2)*MZ4**2*yyy7*xxx2 + et1(q2,q,&
+        &    e3,q3)*e1_e2*e4_q3*MG**(-2)*MZ3**2*yyy7*xxx2 + et1(q2,q,e3,q3&
+        &    )*e1_e2*e4_q3*yyy7*xxx2 - 4.*et1(q2,q,e3,q4)*q1_q3*e1_e2*&
+        &    e4_q3*MG**(-2)*yyy7*xxx2 + et1(q2,q,e3,q4)*e1_e2*e4_q3*&
+        &    MG**(-2)*MZ4**2*yyy7*xxx2 - et1(q2,q,e3,q4)*e1_e2*e4_q3*&
+        &    MG**(-2)*MZ3**2*yyy7*xxx2 - et1(q2,q,e3,q4)*e1_e2*e4_q3*yyy7*&
+        &    xxx2
+          res = res + 4.*et1(q2,q,e4,q3)*q1_q3*e1_e2*e3_q4*MG**(-2)*yyy7*&
+        & xxx2 - et1(q2,q,e4,q3)*e1_e2*e3_q4*MG**(-2)*MZ4**2*yyy7*xxx2 + &
+        &    et1(q2,q,e4,q3)*e1_e2*e3_q4*MG**(-2)*MZ3**2*yyy7*xxx2 + et1(&
+        &    q2,q,e4,q3)*e1_e2*e3_q4*yyy7*xxx2 - 4.*et1(q2,q,e4,q4)*q1_q3*&
+        &    e1_e2*e3_q4*MG**(-2)*yyy7*xxx2 + et1(q2,q,e4,q4)*e1_e2*e3_q4*&
+        &    MG**(-2)*MZ4**2*yyy7*xxx2 - et1(q2,q,e4,q4)*e1_e2*e3_q4*&
+        &    MG**(-2)*MZ3**2*yyy7*xxx2 - et1(q2,q,e4,q4)*e1_e2*e3_q4*yyy7*&
+        &    xxx2 - et1(q,e1,e3,e4)*e2_q3*MG**2*yyy6*xxx1 + et1(q,e1,e3,q3&
+        &    )*e2_q3*e4_q3*yyy7*xxx1 - et1(q,e1,e3,q4)*e2_q3*e4_q3*yyy7*&
+        &    xxx1 + et1(q,e1,e4,q3)*e2_q3*e3_q4*yyy7*xxx1 - et1(q,e1,e4,q4&
+        &    )*e2_q3*e3_q4*yyy7*xxx1 - et1(q,e2,e3,e4)*e1_q3*MG**2*yyy6*&
+        &    xxx1 + et1(q,e2,e3,q3)*e1_q3*e4_q3*yyy7*xxx1 - et1(q,e2,e3,q4&
+        &    )*e1_q3*e4_q3*yyy7*xxx1 + et1(q,e2,e4,q3)*e1_q3*e3_q4*yyy7*&
+        &    xxx1 - et1(q,e2,e4,q4)*e1_q3*e3_q4*yyy7*xxx1 - 1./3.*et1(q,e3&
+        &    ,e4,q3)*e1_e2*MG**2*yyy6*xxx2 + 1./3.*et1(q,e3,e4,q3)*e1_e2*&
+        &    MG**2*yyy6*xxx1
+          res = res + 1./3.*et1(q,e3,e4,q4)*e1_e2*MG**2*yyy6*xxx2 - 1./3.*&
+        &    et1(q,e3,e4,q4)*e1_e2*MG**2*yyy6*xxx1 - 8.*et1(e3,e4,q3,q4)*&
+        &    q1_q3*e1_e2*MG**(-2)*MZ4**2*yyy5*xxx2 + 8.*et1(e3,e4,q3,q4)*&
+        &    q1_q3*e1_e2*MG**(-2)*MZ3**2*yyy5*xxx2 + 8.*et1(e3,e4,q3,q4)*&
+        &    q1_q3*e1_e2*yyy5*xxx2 + 16.*et1(e3,e4,q3,q4)*q1_q3**2*e1_e2*&
+        &    MG**(-2)*yyy5*xxx2 + 2./3.*et1(e3,e4,q3,q4)*e1_e2*MG**(-2)*&
+        &    MZ4**4*yyy5*xxx2 + 1./3.*et1(e3,e4,q3,q4)*e1_e2*MG**(-2)*&
+        &    MZ4**4*yyy5*xxx1 - 4./3.*et1(e3,e4,q3,q4)*e1_e2*MG**(-2)*&
+        &    MZ3**2*MZ4**2*yyy5*xxx2 - 2./3.*et1(e3,e4,q3,q4)*e1_e2*&
+        &    MG**(-2)*MZ3**2*MZ4**2*yyy5*xxx1 + 2./3.*et1(e3,e4,q3,q4)*&
+        &    e1_e2*MG**(-2)*MZ3**4*yyy5*xxx2 + 1./3.*et1(e3,e4,q3,q4)*&
+        &    e1_e2*MG**(-2)*MZ3**4*yyy5*xxx1 - 4./3.*et1(e3,e4,q3,q4)*&
+        &    e1_e2*MZ4**2*yyy5*xxx2 - 2./3.*et1(e3,e4,q3,q4)*e1_e2*MZ4**2*&
+        &    yyy5*xxx1 + 8./3.*et1(e3,e4,q3,q4)*e1_e2*MZ3**2*yyy5*xxx2 - 2.&
+          &   /3.*et1(e3,e4,q3,q4)*e1_e2*MZ3**2*yyy5*xxx1 + 2./3.*et1(e3,e4&
+        &    ,q3,q4)*e1_e2*MG**2*yyy5*xxx2
+          res = res + 1./3.*et1(e3,e4,q3,q4)*e1_e2*MG**2*yyy5*xxx1 + 4.*&
+        &    et1(e3,e4,q3,q4)*e1_q3*e2_q3*yyy5*xxx1
+
+
+
+
+
+! print *, "res GG",res
+! pause
 
 
      else
@@ -827,6 +1187,12 @@ endif
       res = res + e1_q3*e2_q4*e3_e4 * ( M_Reso**2 )
       res = res + e1_q4*e2_e3*e4_q3 * (  - M_Reso**2 )
       res = res + e1_q4*e2_q3*e3_e4 * ( M_Reso**2 )
+
+      print *,"this code should no longer be used"; stop
+
+!print *, "res GG old",res
+!pause
+
 
      endif
 

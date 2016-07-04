@@ -247,9 +247,9 @@ c
         tsi=dsqrt(tsi)
 c        write(6,201)it,ti,tsi,avgi,sd,chi2a
         write(6,201)it,ti,avgi,tsi,sd,wtmax,chi2a
-        write(15,201)it,ti,avgi,tsi,sd,wtmax,chi2a
+        !write(15,201)it,ti,avgi,tsi,sd,wtmax,chi2a
         call flush(6)
-        call flush(15)
+        !call flush(15)
         if(nprn.ge.0)go to 21
         do 20 j=1,ndim
  20     write(6,202) j,(xi(i,j),di(i,j),d(i,j),i=1,nd)

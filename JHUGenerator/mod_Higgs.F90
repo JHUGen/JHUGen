@@ -21,13 +21,12 @@
       real(dp), intent(out) ::  sum
       real(dp), intent(in) :: p(4,6)
       integer, intent(in) :: MY_IDUP(6:9)
-      real(dp) :: s, pin(4,4)
-      complex(dp) :: A(2), sp(4,4), propG, propZ1, propZ2
-      integer :: i1,i2,i3,i4
+      complex(dp) :: A(1:4)
+      integer :: i1,i2,i3,i4,ordering(1:4)
       real(dp) :: aL1,aR1,aL2,aR2
       real(dp) :: gZ_sq
       real(dp) :: prefactor, Lambda_inv
-
+      real(dp), parameter :: symmFact=1d0/2d0/2d0
 
       gZ_sq = 4.0_dp*pi*alpha_QED/4.0_dp/(one-sitW**2)/sitW**2
 
@@ -56,23 +55,13 @@
                     aR1=0d0
               endif
               prefactor = prefactor *(one/two*M_V*Ga_V)**2
-              s = 2d0 * scr(p(:,3),p(:,4))
-              propZ1 = s/dcmplx(s - M_V**2,M_V*Ga_V)
-              s = 2d0 * scr(p(:,5),p(:,6))
-              propZ2 = s/dcmplx(s - M_V**2,M_V*Ga_V)
          elseif( DecayMode1.ge.4 .and. DecayMode1.le.6 ) then !  W decay
               aL1 = bL
               aR1 = bR
               prefactor = prefactor *(one/two*M_V*Ga_V)**2
-              s = 2d0 * scr(p(:,3),p(:,4))
-              propZ1 = s/dcmplx(s - M_V**2,M_V*Ga_V)
-              s = 2d0 * scr(p(:,5),p(:,6))
-              propZ2 = s/dcmplx(s - M_V**2,M_V*Ga_V)
          elseif( DecayMode1.eq.7 ) then !  photon "decay"
               aL1=1d0
               aR1=1d0
-              propZ1 = 1d0
-              propZ2 = 1d0
               prefactor = prefactor/gZ_sq**2! cancel the overall z coupling
          else
               aL1=0d0
@@ -101,60 +90,46 @@
               aR2 = bR
          elseif( DecayMode2.eq.7 ) then !  photon "decay"
               aL2=1d0
-              aR2=1d0  
+              aR2=1d0 
          else
               aL2=0d0
               aR2=0d0  
          endif
 
 
-
-      sum = zero
-      s  = 2d0 * scr(p(:,1),p(:,2))
-      propG = one/dcmplx(s - M_Reso**2,M_Reso*Ga_Reso)
-
-
-do i1=1,2
+sum = zero
+do i1 = 1,2
 do i2 = 1,2
 do i3 = 1,2
 do i4 = 1,2
-         pin(1,:) = p(:,1)
-         pin(2,:) = p(:,2)
-         sp(1,:) = pol_mless2(dcmplx(p(:,1)),-3+2*i1,'in')  ! gluon
-         sp(2,:) = pol_mless2(dcmplx(p(:,2)),-3+2*i2,'in')  ! gluon
+   
+         ordering = (/3,4,5,6/)
+         call calcHelAmp(ordering,p(1:4,1:6),i1,i2,i3,i4,A(1))
 
-!-------- -1 == left, 1 == right
-         if( DecayMode1.ne.7 ) then 
-            pin(3,:) = p(:,3)+p(:,4)
-            pin(4,:) = p(:,5)+p(:,6)
-            sp(3,:) = pol_dk2mom(dcmplx(p(:,3)),dcmplx(p(:,4)),-3+2*i3)  !e-,e+
-            sp(4,:) = pol_dk2mom(dcmplx(p(:,5)),dcmplx(p(:,6)),-3+2*i4)  !mu-,mu+ / Q,Qbar
-         elseif( DecayMode1.eq.7 ) then 
-            pin(3,:) = p(:,3)
-            pin(4,:) = p(:,5)
-            sp(3,:) = pol_mless2(dcmplx(pin(3,:)),-3+2*i3,'out')  ! photon
-            sp(4,:) = pol_mless2(dcmplx(pin(4,:)),-3+2*i4,'out')  ! photon
-         endif
-
-         if( OffShellReson ) then! NEW
-              call ggOffHZZampl(pin,sp,A(1))
-         else
-              call ggHZZampl(pin,sp,A(1))
+         if( (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then
+             ordering = (/5,4,3,6/)
+             call calcHelAmp(ordering,p(1:4,1:6),i1,i2,i3,i4,A(2))
+             A(2) = -A(2) ! minus comes from fermi statistics
          endif
 
 
          if (i3.eq.1) then
-            A(1) = aL1*A(1)
-          elseif(i3.eq.2) then
-            A(1) = aR1*A(1)
+            A(:) = aL1*A(:)
+         elseif(i3.eq.2) then
+            A(:) = aR1*A(:)
          endif
          if (i4.eq.1) then
-            A(1) = aL2*A(1)
+            A(:) = aL2*A(:)
          elseif(i4.eq.2) then
-            A(1) = aR2*A(1)
+            A(:) = aR2*A(:)
          endif
-       
-         sum = sum + abs(propG*propZ1*propZ2*A(1))**2
+
+         if( (includeInterference.eqv..true.) .and. (MY_IDUP(6).eq.MY_IDUP(8)) .and. (MY_IDUP(7).eq.MY_IDUP(9)) ) then
+             sum = sum + symmFact * (cdabs( A(1)*dconjg(A(1)) ) + cdabs( A(2)*dconjg(A(2)) ))
+             if( i3.eq.i4 ) sum = sum + symmFact * 2d0*dreal(A(1)*dconjg(A(2)))  
+         else
+             sum = sum + cdabs( A(1)*dconjg(A(1)) )
+         endif
 enddo
 enddo
 enddo
@@ -163,6 +138,76 @@ enddo
       sum = sum*prefactor
 
       end subroutine
+
+
+
+
+
+     subroutine calcHelAmp(ordering,p,i1,i2,i3,i4,A)
+     implicit none
+     integer :: ordering(1:4),i1,i2,i3,i4,l1,l2,l3,l4
+     real(dp) :: p(1:4,1:6)
+     complex(dp) :: propG, propZ1, propZ2
+     real(dp) :: s, pin(4,4)
+     complex(dp) :: A(1:1), sp(4,4)
+
+
+      l1=ordering(1)
+      l2=ordering(2)
+      l3=ordering(3)
+      l4=ordering(4)
+
+      s  = 2d0 * scr(p(:,1),p(:,2))
+      propG = one/dcmplx(s - M_Reso**2,M_Reso*Ga_Reso)
+
+
+         pin(1,:) = p(:,1)
+         pin(2,:) = p(:,2)
+         sp(1,:) = pol_mless2(dcmplx(p(:,1)),-3+2*i1,'in')  ! gluon
+         sp(2,:) = pol_mless2(dcmplx(p(:,2)),-3+2*i2,'in')  ! gluon
+!          sp(1,1:4)=pin(1,1:4);print *, "this checks IS gauge invariance"
+!          sp(2,1:4)=pin(2,1:4);print *, "this checks IS gauge invariance"
+
+
+!-------- -1 == left, 1 == right
+         if( DecayMode1.ne.7 ) then 
+            pin(3,:) = p(:,l1)+p(:,l2)
+            pin(4,:) = p(:,l3)+p(:,l4)
+            sp(3,:) = pol_dk2mom(dcmplx(p(:,l1)),dcmplx(p(:,l2)),-3+2*i3)  ! ubar(l1), v(l2)
+            sp(3,:) = -sp(3,:) + pin(3,:)*( sc(sp(3,:),dcmplx(pin(3,:))) )/scr(pin(3,:),pin(3,:))! full propagator numerator
+            sp(4,:) = pol_dk2mom(dcmplx(p(:,l3)),dcmplx(p(:,l4)),-3+2*i4)  ! ubar(l3), v(l4)
+            sp(4,:) = -sp(4,:) + pin(4,:)*( sc(sp(4,:),dcmplx(pin(4,:))) )/scr(pin(4,:),pin(4,:))! full propagator numerator
+!print *, "ubar, v, ubar, v"
+!print *, "masses",scr(p(:,l1),p(:,l1)),scr(p(:,l2),p(:,l2)),scr(p(:,l3),p(:,l3)),scr(p(:,l4),p(:,l4))
+!print *, "check", sc(sp(3,:),dcmplx(pin(3,:))), sc(sp(4,:),dcmplx(pin(4,:)))
+!pause
+            s = scr(p(:,l1)+p(:,l2),p(:,l1)+p(:,l2))
+            propZ1 = s/dcmplx(s - M_V**2,M_V*Ga_V)
+            s = scr(p(:,l3)+p(:,l4),p(:,l3)+p(:,l4))
+            propZ2 = s/dcmplx(s - M_V**2,M_V*Ga_V)
+         elseif( DecayMode1.eq.7 ) then 
+            pin(3,:) = p(:,l1)
+            pin(4,:) = p(:,l3)
+            sp(3,:) = pol_mless2(dcmplx(p(:,l1)),-3+2*i3,'out')  ! photon
+            sp(4,:) = pol_mless2(dcmplx(p(:,l3)),-3+2*i4,'out')  ! photon
+!             sp(3,1:4)=pin(3,1:4)! this checks gauge invariance
+!             sp(4,1:4)=pin(4,1:4)
+            propz1=1d0
+            propz2=1d0
+         endif
+
+         if( OffShellReson ) then
+              call ggOffHZZampl(pin,sp,A(1))
+         else
+              call ggHZZampl(pin,sp,A(1))
+         endif
+
+         A(1) = A(1) * propG*propZ1*propZ2
+
+
+
+     end subroutine
+
 
 
 
@@ -186,7 +231,9 @@ enddo
       complex(dp) :: e1(4),e2(4),e3(4),e4(4)
       complex(dp) :: xxx1,xxx2,xxx3,yyy1,yyy2,yyy3,yyy4
       real(dp) :: q34
-      logical :: new
+      real(dp) :: MG, MZ3, MZ4, q3_q3, q4_q4
+
+
 
       res = 0d0
 
@@ -204,6 +251,8 @@ enddo
       q = -q1-q2
 
       q_q =sc(q,q)
+      q3_q3 = sc(q3,q3)
+      q4_q4 = sc(q4,q4)
 
 
       q1_q2 = sc(q1,q2)
@@ -234,42 +283,73 @@ enddo
       e3_q4 = sc(e3,q4)
       e4_q3 = sc(e4,q3)
 
+
+      if (cdabs(q_q).lt.-0.1d0.or.(q3_q3).lt.-0.1d0.or.(q4_q4).lt.-0.1d0) return  ! if negative invariant masses return zero
+      MG =dsqrt(cdabs(q_q))
+      MZ3=dsqrt(dabs(q3_q3))
+      MZ4=dsqrt(dabs(q4_q4))
+
+
 !---- data that defines couplings
   if( DecayMode1.le.3 .or. ((DecayMode1.ge.4) .and. (DecayMode1.le.6)) ) then! decay into Z's or W's
 
+    if( generate_as ) then 
       xxx1 = ahg1
       xxx3 = ahg3
-
       yyy1 = ahz1
       yyy2 = ahz2
       yyy3 = ahz3
+    else
+      xxx1 = ghg2+ghg3/4d0/Lambda**2*MG**2
+      xxx3 = -2d0*ghg4
+      yyy1 = ghz1*M_V**2/MG**2 &  ! in this line M_V is indeed correct, not a misprint
+           + ghz2*(MG**2-MZ3**2-MZ4**2)/MG**2 &
+           + ghz3/Lambda**2*(MG**2-MZ3**2-MZ4**2)*(MG**2-MZ4**2-MZ3**2)/4d0/MG**2
+      yyy2 = -2d0*ghz2-ghz3/2d0/Lambda**2*(MG**2-MZ3**2-MZ4**2)
+      yyy3 = -2d0*ghz4
+    endif
 
-     res=e1_e2*e3_e4*M_Reso**4*yyy1*xxx1                 &
-      + e1_e2*e3_q4*e4_q3*M_Reso**2*yyy2*xxx1            &
-      + et1(e1,e2,q1,q2)*e3_e4*M_Reso**2*yyy1*xxx3       &
-      + et1(e1,e2,q1,q2)*e3_q4*e4_q3*yyy2*xxx3           &
-      + et1(e1,e2,q1,q2)*et1(e3,e4,q3,q4)*yyy3*xxx3      &
-      + et1(e3,e4,q3,q4)*e1_e2*M_Reso**2*yyy3*xxx1
+      res = e1_e2*e3_e4*M_Reso**4*yyy1*xxx1                  &
+          + e1_e2*e3_q4*e4_q3*M_Reso**2*yyy2*xxx1            &
+          + et1(e1,e2,q1,q2)*e3_e4*M_Reso**2*yyy1*xxx3       &
+          + et1(e1,e2,q1,q2)*e3_q4*e4_q3*yyy2*xxx3           &
+          + et1(e1,e2,q1,q2)*et1(e3,e4,q3,q4)*yyy3*xxx3      &
+          + et1(e3,e4,q3,q4)*e1_e2*M_Reso**2*yyy3*xxx1
 
 
   elseif( DecayMode1.eq.7 ) then! decay into photons
+
+    if( generate_as ) then 
       xxx1 = ahg1
       xxx3 = ahg3
-
       yyy1 = ahz1
-      yyy2 = ahz2
+      yyy2 = -2*ahz1 !ahz2  ! gauge invariance fixes ahz2 in this case
       yyy3 = ahz3
+    else
+      xxx1 = ghg2+ghg3/4d0/Lambda**2*MG**2
+      xxx3 = -2d0*ghg4
+      yyy1 = ghz1*M_V**2/MG**2 &  ! in this line M_V is indeed correct, not a misprint
+           + ghz2*(MG**2-MZ3**2-MZ4**2)/MG**2 &
+           + ghz3/Lambda**2*(MG**2-MZ3**2-MZ4**2)*(MG**2-MZ4**2-MZ3**2)/4d0/MG**2
+      yyy2 = -2d0*ghz2-ghz3/2d0/Lambda**2*(MG**2-MZ3**2-MZ4**2)
+      yyy3 = -2d0*ghz4
+    endif
 
-     res=e1_e2*e3_e4*M_Reso**4*yyy1*xxx1                 &
-      + e1_e2*e3_q4*e4_q3*M_Reso**2*yyy2*xxx1            &
-      + et1(e1,e2,q1,q2)*e3_e4*M_Reso**2*yyy1*xxx3       &
-      + et1(e1,e2,q1,q2)*e3_q4*e4_q3*yyy2*xxx3           &
-      + et1(e1,e2,q1,q2)*et1(e3,e4,q3,q4)*yyy3*xxx3      &
-      + et1(e3,e4,q3,q4)*e1_e2*M_Reso**2*yyy3*xxx1
+
+     res = e1_e2*e3_e4*M_Reso**4*yyy1*xxx1                  &
+         + e1_e2*e3_q4*e4_q3*M_Reso**2*yyy2*xxx1            &
+         + et1(e1,e2,q1,q2)*e3_e4*M_Reso**2*yyy1*xxx3       &
+         + et1(e1,e2,q1,q2)*e3_q4*e4_q3*yyy2*xxx3           &
+         + et1(e1,e2,q1,q2)*et1(e3,e4,q3,q4)*yyy3*xxx3      &
+         + et1(e3,e4,q3,q4)*e1_e2*M_Reso**2*yyy3*xxx1
 
   endif
 
+
       end subroutine ggHZZampl
+
+
+
 
 
 
@@ -293,7 +373,6 @@ enddo
       complex(dp) :: e1(4),e2(4),e3(4),e4(4)
       complex(dp) :: xxx1,xxx2,xxx3,yyy1,yyy2,yyy3,yyy4
       real(dp) :: q34, MG, MZ3, MZ4, q3_q3, q4_q4
-      logical :: new
 
       res = 0d0
 
@@ -352,47 +431,60 @@ enddo
 
 !---- data that defines couplings
   if( DecayMode1.le.6 ) then! decay into Z's or W's
-      xxx1 = ghg2+ghg3/4d0/Lambda**2*MG**2
-      xxx3 = ghg4
 
+    if( generate_as ) then 
+      xxx1 = ahg1
+      xxx3 = ahg3
+      yyy1 = ahz1
+      yyy2 = ahz2
+      yyy3 = ahz3
+    else
+      xxx1 = ghg2+ghg3/4d0/Lambda**2*MG**2
+      xxx3 = -2d0*ghg4
       yyy1 = ghz1*M_V**2/MG**2 &  ! in this line M_V is indeed correct, not a misprint
            + ghz2*(MG**2-MZ3**2-MZ4**2)/MG**2 &
-           + ghz3/Lambda**2*(MG**2-MZ3**2-MZ4**2)*(MG**2-MZ4**2-MZ3**2)/4d0/MG**2!     I think this is wrong: all MZ3 and MZ4 should have a minus sign
+           + ghz3/Lambda**2*(MG**2-MZ3**2-MZ4**2)*(MG**2-MZ4**2-MZ3**2)/4d0/MG**2
+      yyy2 = -2d0*ghz2-ghz3/2d0/Lambda**2*(MG**2-MZ3**2-MZ4**2)
+      yyy3 = -2d0*ghz4
+    endif
 
-      yyy2 = -2d0*ghz2-ghz3/2d0/Lambda**2*(MG**2-MZ3**2-MZ4**2)!   I think this is wrong: MZ3 and MZ4 should have a minus sign!  both corrected
-      yyy3 = ghz4
-
-
-     res=e1_e2*e3_e4*MG**4*yyy1*xxx1                 &
-      + e1_e2*e3_q4*e4_q3*MG**2*yyy2*xxx1            &
-      + et1(e1,e2,q1,q2)*e3_e4*MG**2*yyy1*xxx3       &
-      + et1(e1,e2,q1,q2)*e3_q4*e4_q3*yyy2*xxx3           &
-      + et1(e1,e2,q1,q2)*et1(e3,e4,q3,q4)*yyy3*xxx3      &
-      + et1(e3,e4,q3,q4)*e1_e2*M_Reso**2*yyy3*xxx1
+     res = e1_e2*e3_e4*MG**4*yyy1*xxx1                    &
+         + e1_e2*e3_q4*e4_q3*MG**2*yyy2*xxx1              &
+         + et1(e1,e2,q1,q2)*e3_e4*MG**2*yyy1*xxx3         &
+         + et1(e1,e2,q1,q2)*e3_q4*e4_q3*yyy2*xxx3         &
+         + et1(e1,e2,q1,q2)*et1(e3,e4,q3,q4)*yyy3*xxx3    &
+         + et1(e3,e4,q3,q4)*e1_e2*M_Reso**2*yyy3*xxx1
 
 
   elseif( DecayMode1.eq.7 ) then! decay into photons
 
-      xxx1 = ghg2+ghg3/4d0/Lambda**2*MG**2
-      xxx3 = ghg4
 
+    if( generate_as ) then 
+      xxx1 = ahg1
+      xxx3 = ahg3
+      yyy1 = ahz1
+      yyy2 = -2*ahz1 !ahz2  ! gauge invariance fixes ahz2 in this case
+      yyy3 = ahz3
+    else
+      xxx1 = ghg2+ghg3/4d0/Lambda**2*MG**2
+      xxx3 = -2d0*ghg4
       yyy1 = ghz1*M_V**2/MG**2 &  ! in this line M_V is indeed correct, not a misprint
            + ghz2*(MG**2-MZ3**2-MZ4**2)/MG**2 &
-           + ghz3/Lambda**2*(MG**2-MZ3**2-MZ4**2)*(MG**2-MZ4**2-MZ3**2)/4d0/MG**2!     I think this is wrong: all MZ3 and MZ4 should have a minus sign
+           + ghz3/Lambda**2*(MG**2-MZ3**2-MZ4**2)*(MG**2-MZ4**2-MZ3**2)/4d0/MG**2
+      yyy2 = -2d0*ghz2-ghz3/2d0/Lambda**2*(MG**2-MZ3**2-MZ4**2)
+      yyy3 = -2d0*ghz4
+    endif
 
-      yyy2 = -2d0*ghz2-ghz3/2d0/Lambda**2*(MG**2-MZ3**2-MZ4**2)!   I think this is wrong: MZ3 and MZ4 should have a minus sign!  both corrected
-      yyy3 = ghz4
-
-
-     res=e1_e2*e3_e4*MG**4*yyy1*xxx1                 &
-      + e1_e2*e3_q4*e4_q3*MG**2*yyy2*xxx1            &
-      + et1(e1,e2,q1,q2)*e3_e4*MG**2*yyy1*xxx3       &
-      + et1(e1,e2,q1,q2)*e3_q4*e4_q3*yyy2*xxx3           &
-      + et1(e1,e2,q1,q2)*et1(e3,e4,q3,q4)*yyy3*xxx3      &
-      + et1(e3,e4,q3,q4)*e1_e2*M_Reso**2*yyy3*xxx1
-
+     res = e1_e2*e3_e4*MG**4*yyy1*xxx1                    &
+         + e1_e2*e3_q4*e4_q3*MG**2*yyy2*xxx1              &
+         + et1(e1,e2,q1,q2)*e3_e4*MG**2*yyy1*xxx3         &
+         + et1(e1,e2,q1,q2)*e3_q4*e4_q3*yyy2*xxx3         &
+         + et1(e1,e2,q1,q2)*et1(e3,e4,q3,q4)*yyy3*xxx3    &
+         + et1(e3,e4,q3,q4)*e1_e2*M_Reso**2*yyy3*xxx1
 
   endif
+
+
       end subroutine ggOffHZZampl
 
 
@@ -525,6 +617,9 @@ enddo
     Ub(:)=ubar0(plepton,i)
     V(:)=v0(antilepton,-i)
 
+! print *, "ubar spinor",plepton
+! print *, "v spinor   ",antilepton
+
     !---Now return in Kirill's notation  1=E,2=px,3=py,4=pz
     !   This is an expression for (-i)/qsq* (-i) Ub(+/-)) Gamma^\mu V(-/+)
     pol_dk2mom(1)=-(Ub(2)*V(4)+V(2)*Ub(4)+Ub(1)*V(3)+V(1)*Ub(3))
@@ -540,6 +635,7 @@ enddo
     if (present(outgoing)) then
        !if (outgoing) pol_dk2mom = conjg(pol_dk2mom)
     endif
+
   end function pol_dk2mom
 
 
