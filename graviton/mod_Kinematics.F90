@@ -8,9 +8,12 @@ type :: Histogram
     real(8) :: BinSize
     real(8) :: LowVal
     real(8) :: SetScale
-    real(8),allocatable :: Value(:)
-    real(8),allocatable :: Value2(:)
-    integer,allocatable :: Hits(:)
+!    real(8),allocatable :: Value(:)
+!    real(8),allocatable :: Value2(:)
+!    integer,allocatable :: Hits(:)
+	real(8) :: Value(0:300)
+	real(8) :: Value2(0:300)
+	integer :: Hits(0:300)
     character :: Info*(50)
 end type
 
@@ -20,7 +23,7 @@ type(Histogram),allocatable :: Histo(:)
 contains
 
 
-SUBROUTINE WriteOutEvent(Mom,MY_IDUP)
+SUBROUTINE WriteOutEvent(Mom,MY_IDUP,ICOLUP)
 use ModParameters
 implicit none
 real(8) :: Mom(1:4,1:6)
@@ -32,8 +35,29 @@ integer :: a,b,c
 integer :: MY_IDUP(1:9),LHE_IDUP(1:9),i,ISTUP(1:9),MOTHUP(1:2,1:9),ICOLUP(1:2,1:9)
 integer :: NUP,IDPRUP
 real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP
-character(len=*),parameter :: fmt1 = "(I3,X,I2,X,I2,X,I2,X,I3,X,I3,X,PE14.7,X,PE14.7,X,PE14.7,X,PE14.7,X,PE14.7,X,PE14.7,X,PE14.7)"
+real(8) :: ntRnd
+character(len=*),parameter :: fmt1 = "(I3,X,I2,X,I2,X,I2,X,I3,X,I3,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7,X,1PE14.7)"
 
+	!!!!!! Randomize lepton channel
+	call random_number(ntRnd)	
+	if( DecayMode.eq.0 ) then
+		if ((ntRnd .GE. 0.0) .AND. (ntRnd .LE. 0.25)) then
+		MY_IDUP(6:9) =(/ElM_,ElP_,MuM_,MuP_/)
+		elseif ((ntRnd .GT. 0.25) .AND. (ntRnd .LE. 0.50)) then
+		MY_IDUP(6:9) =(/MuM_,MuP_,ElM_,ElP_/)
+		elseif ((ntRnd .GT. 0.50) .AND. (ntRnd .LE. 0.75)) then
+		MY_IDUP(6:9) =(/ElM_,ElP_,ElM_,ElP_/)
+		elseif ((ntRnd .GT. 0.75) .AND. (ntRnd .LE. 1.0)) then
+		MY_IDUP(6:9) =(/MuM_,MuP_,MuM_,MuP_/) 
+		endif
+	endif
+	if( DecayMode.eq.1 ) then
+		if ((ntRnd .GE. 0.0) .AND. (ntRnd .LE. 0.50)) then
+		MY_IDUP(6:7) =(/ElM_,ElP_/)
+		elseif ((ntRnd .GT. 0.50) .AND. (ntRnd .LE. 1.0)) then
+		MY_IDUP(6:7) =(/MuM_,MuP_/)
+		endif
+	endif
 
     do i=1,9
         LHE_IDUP(i) = convertLHE( MY_IDUP(i) )
@@ -75,14 +99,6 @@ character(len=*),parameter :: fmt1 = "(I3,X,I2,X,I2,X,I2,X,I3,X,I3,X,PE14.7,X,PE
     MOTHUP(2,8) = 5
     MOTHUP(1,9) = 5
     MOTHUP(2,9) = 5
-
-    ICOLUP(1,1) = 501
-    ICOLUP(2,1) = 502
-    ICOLUP(1,2) = 502
-    ICOLUP(2,2) = 501
-    ICOLUP(1,3:9) = 0
-    ICOLUP(2,3:9) = 0
-
 	
 	! Added by Nhan
 	LHE_IDUP(3) = 39 ! X particle	
@@ -119,7 +135,7 @@ character(len=*),parameter :: fmt1 = "(I3,X,I2,X,I2,X,I2,X,I3,X,I3,X,PE14.7,X,PE
 
 
     write(14,"(A)") "<event>"
-    write(14,"(I1,X,I1,X,PE13.7,X,PE13.7,X,PE13.7,X,PE13.7)") NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
+    write(14,"(I1,X,I3,X,1PE13.7,X,1PE13.7,X,1PE13.7,X,1PE13.7)") NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
 
 ! parton_a
     i=1
@@ -173,8 +189,9 @@ real(8) :: PSWgt,PSWgt2,PSWgt3
 real(8) :: ZMom(1:4),MomChk(1:4,1:3)
 real(8) :: MomDK(1:4,1:2)
 real(8) :: xRndPS(1:2)
-real(8),parameter :: N2=2, PiWgt2 = (2d0*Pi)**(4-N2*3) * (4d0*Pi)**(N2-1)
-
+!real(8),parameter :: N2=2, PiWgt2 = (2d0*Pi)**(4-N2*3) * (4d0*Pi)**(N2-1)
+integer,parameter :: N2=2
+real(8),parameter :: PiWgt2 = (2d0*Pi)**(4-N2*3) * (4d0*Pi)**(N2-1)
 
 !     MomDK(1:4,i): i= 1:l+, 2:l-
       call genps(2,m_Z,xRndPS(1:2),(/0d0,0d0/),MomDK(1:4,1:2),PSWgt2)
@@ -197,7 +214,9 @@ implicit none
 real(8) :: EHat
 real(8) :: PSWgt,PSWgt2,PSWgt3,PSWgt4,PSWgt5
 real(8) :: Mom(1:4,1:4),MomW(1:4),xRndPS(1:2)
-real(8),parameter :: N2=2, PiWgt2 = (2d0*Pi)**(4-N2*3) * (4d0*Pi)**(N2-1)
+!real(8),parameter :: N2=2, PiWgt2 = (2d0*Pi)**(4-N2*3) * (4d0*Pi)**(N2-1)
+integer,parameter :: N2=2
+real(8),parameter :: PiWgt2 = (2d0*Pi)**(4-N2*3) * (4d0*Pi)**(N2-1)
 
 
 !  generate PS: massless + massless --> massive(anti-top) + massive(top)
@@ -224,7 +243,9 @@ END SUBROUTINE
 subroutine AdjustKinematics(eta1,eta2,MomExt,MomDK,xgr,xz2,xz1,MomExt_f,MomDK_f)
  use ModParameters
  use ModMisc
+#if compiler==1
  use ifport
+#endif
  implicit none
  real(8) :: eta1,eta2,MomExt(1:4,1:4),MomDK(1:4,1:4),xgr,xz1,xz2
  real(8) :: MomG(1:4),MomBoost(1:4),MomZ1(1:4),MomZ2(1:4)

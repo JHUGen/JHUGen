@@ -253,7 +253,7 @@ C                                        Adapted from "Numerical Recipes"
           HP=XA(I+M)-X
           W=C(I+1)-D(I)
           DEN=HO-HP
-          IF(DEN.EQ.0.)PAUSE
+!           IF(DEN.EQ.0.)PAUSE
           DEN=W/DEN
           D(I)=HP*DEN
           C(I)=HO*DEN

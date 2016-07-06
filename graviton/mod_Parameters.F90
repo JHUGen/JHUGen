@@ -7,10 +7,10 @@ integer, public :: VegasIt1,VegasNc1,Collider_Energy
 integer, public :: VegasIt1_default,VegasNc1_default
 integer, public :: NumHistograms
 logical, public :: unweighted
-integer(8), public, save :: EvalCounter=0
-integer(8), public, save :: RejeCounter=0
-integer(8), public, save :: AccepCounter=0
-integer(8), public, save :: AccepCounter_part(-5:5,-5:5)=0
+integer(8), public :: EvalCounter=0
+integer(8), public :: RejeCounter=0
+integer(8), public :: AccepCounter=0
+integer(8), public :: AccepCounter_part(-5:5,-5:5)=0
 character :: DataFile*(20)
 
 logical, public, parameter :: seed_random = .true.
@@ -22,7 +22,7 @@ real(8), public, parameter :: channels_ratio_fix = 0.5d0    ! desired ratio of
 
 ! we are using units of 100GeV, i.e. Lambda=10 is 1TeV
 real(8), public, parameter :: m_Z     = 91.1876d0    /100d0  ! Z boson mass (PDG-2008)
-real(8), public, parameter :: m_Grav  = 1000d0      /100d0  !  X  mass (spin 0, spin 1, spin 2)
+real(8), public, parameter :: m_Grav  = 250d0      /100d0  !  X  mass (spin 0, spin 1, spin 2)
 real(8), public, parameter :: Ga_Z    = 2.4952d0    /100d0  ! Z boson width(PDG-2008)! NOT USED; Z's are on-shell
 real(8), public, parameter :: Ga_Grav = 10d0        /100d0  ! Graviton width (not used directly)
 real(8), public, parameter :: Lambda  = 1000d0      /100d0  ! Lambda coupling enters in two places

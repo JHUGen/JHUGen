@@ -1,7 +1,8 @@
 Program: Graviton
 
 source code: Fortran 90 and C
-compiler: ifort, gcc
+compiler: ifort or f95 (gfortran), gcc
+makefile contains the switch "Comp" which can be set to "gfort" or "ifort" for compilation with f95 or ifort, respectively.
 
 to compile the code: make
 executable file: ./graviton

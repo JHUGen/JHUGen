@@ -11,7 +11,9 @@ contains
  use ModHiggs
  use ModZprime
  use ModMisc
+#if compiler==1
  use ifport
+#endif
  implicit none
  real(8) :: EvalCS,LO_Res_Unpol_old,LO_Res_Unpol,yRnd(1:22),VgsWgt
  real(8) :: eta1,eta2,tau,x1,x2,sHatJacobi,PreFac,FluxFac,PDFFac
@@ -119,7 +121,9 @@ use ModGraviton
 use ModHiggs
 use ModZprime
 use ModMisc
+#if compiler==1
 use ifport
+#endif
 implicit none
 real(8) :: RES(-5:5,-5:5)
 real(8) :: EvalCS,LO_Res_Unpol_old,LO_Res_Unpol,yRnd(1:22),VgsWgt
@@ -251,7 +255,9 @@ use ModHiggs
 use ModZprime
 use ModGraviton
 use ModMisc
+#if compiler==1
 use ifport
+#endif
 implicit none
 real(8) :: EvalCS_LO_ppllll,LO_Res_Unpol_old,LO_Res_Unpol,yRnd(1:22),VgsWgt
 real(8) :: eta1,eta2,tau,x1,x2,sHatJacobi,PreFac,FluxFac,PDFFac
@@ -263,6 +269,7 @@ logical :: applyPSCut
 real(8) :: CS_max, channel_ratio
 real(8) :: oneovervolume, bound(1:11), sumtot
 integer :: parton(-5:5,-5:5), i1, ifound, i2, MY_IDUP(1:9), ICOLUP(1:2,1:9)
+real(8)::ntRnd	
 include 'vegas_common.f'
 include 'csmaxvalue.f'
 
@@ -455,6 +462,7 @@ include 'csmaxvalue.f'
            enddo
           AccepCounter = AccepCounter + 1
           AccepCounter_part = AccepCounter_part  + parton
+
           call WriteOutEvent((/MomExt_f(1:4,1),MomExt_f(1:4,2),MomDK_f(1:4,1),MomDK_f(1:4,2),MomDK_f(1:4,3),MomDK_f(1:4,4)/),MY_IDUP(1:9),ICOLUP(1:2,1:9))
       else
           RejeCounter = RejeCounter + 1

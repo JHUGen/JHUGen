@@ -2,7 +2,9 @@ PROGRAM Graviton
 use ModParameters
 use ModKinematics
 use ModCrossSection
+#if compiler==1
 use ifport
+#endif
 implicit none
 real(8) :: time_start,time_end
 real(8) :: VG_Result,VG_Error
@@ -44,11 +46,16 @@ integer :: NumArgs,NArg
    VegasNc1=-1
    PChannel=2
    DecayMode=0   ! 0: leptonic Z decays,  1: semi-leptonic Z decays
-   Process = 2   ! here, select 0, 1 or 2 to represent the spin of the resonance
+   Process = 0   ! here, select 0, 1 or 2 to represent the spin of the resonance
    Unweighted = .true.
    DataFile="./data/test"
 
+
+#if compiler==1
    NumArgs = NArgs()-1
+#elif compiler==2
+   NumArgs = COMMAND_ARGUMENT_COUNT()
+#endif
    do NArg=1,NumArgs
     call GetArg(NArg,arg)
     if( arg(1:9).eq."Collider=" ) then
@@ -243,23 +250,23 @@ integer :: AllocStatus,NHisto
           Histo(8)%SetScale= 1d0
 
 
-  do NHisto=1,NumHistograms
-      if( .not.allocated(Histo(NHisto)%Value) ) then
-        allocate( Histo(NHisto)%Value(0:Histo(NHisto)%NBins+1), stat=AllocStatus  )
-        if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
-      endif
-      if( .not.allocated(Histo(NHisto)%Value2) ) then
-        allocate( Histo(NHisto)%Value2(0:Histo(NHisto)%NBins+1), stat=AllocStatus  )
-        if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
-      endif
-      if( .not.allocated(Histo(NHisto)%Hits) ) then
-        allocate( Histo(NHisto)%Hits(0:Histo(NHisto)%NBins+1), stat=AllocStatus  )
-        if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
-      endif
-      Histo(NHisto)%Value(0:Histo(NHisto)%NBins+1) = 0d0
-      Histo(NHisto)%Value2(0:Histo(NHisto)%NBins+1)= 0d0
-      Histo(NHisto)%Hits(0:Histo(NHisto)%NBins+1)  = 0
-  enddo
+!  do NHisto=1,NumHistograms
+!      if( .not.allocated(Histo(NHisto)%Value) ) then
+!        allocate( Histo(NHisto)%Value(0:Histo(NHisto)%NBins+1), stat=AllocStatus  )
+!        if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
+!      endif
+!      if( .not.allocated(Histo(NHisto)%Value2) ) then
+!        allocate( Histo(NHisto)%Value2(0:Histo(NHisto)%NBins+1), stat=AllocStatus  )
+!        if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
+!      endif
+!      if( .not.allocated(Histo(NHisto)%Hits) ) then
+!        allocate( Histo(NHisto)%Hits(0:Histo(NHisto)%NBins+1), stat=AllocStatus  )
+!        if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
+!      endif
+!      Histo(NHisto)%Value(0:Histo(NHisto)%NBins+1) = 0d0
+!      Histo(NHisto)%Value2(0:Histo(NHisto)%NBins+1)= 0d0
+!      Histo(NHisto)%Hits(0:Histo(NHisto)%NBins+1)  = 0
+!  enddo
 
 
 RETURN
@@ -292,11 +299,11 @@ if( VegasNc1.eq.-1 ) VegasNc1 = VegasNc1_default
 
    PChannel_aux = PChannel
 
-   if (unweighted.eq..false.) then  !----------------------- for unweighted events
+   if (unweighted.eqv..false.) then  !----------------------- for unweighted events
 
   call vegas(EvalCS,VG_Result,VG_Error,VG_Chi2)    ! usual call of vegas for weighted events
 
-   elseif(unweighted.eq..true.) then
+   elseif(unweighted.eqv..true.) then
 
       VG = zero
       csmax = zero
@@ -395,9 +402,9 @@ use ModParameters
 implicit none
 
    print *, ""
-   print *, "Data file:         "//trim(DataFile)//'.dat'
+   print *, "Data file:         "//trim(DataFile)//'.lhe'
    print *, "Vegas status file: "//trim(DataFile)//'.status'
-   open(unit=14,file=trim(DataFile)//'.dat',form='formatted',access= 'sequential',status='replace')            ! Histogram file
+   open(unit=14,file=trim(DataFile)//'.lhe',form='formatted',access= 'sequential',status='replace')            ! Histogram file
    open(unit=15,file=trim(DataFile)//'.status',form='formatted',access= 'sequential',status='replace')         ! Vegas status file
 
 return
@@ -465,6 +472,7 @@ real(8) :: VG_Result,VG_Error,RunTime
       !!write(14,*) ""
   enddo
 
+  write(14, '(A,X,I9,X,A)') '<!-- Number of events:', AccepCounter,' -->'
   write(14 ,'(A)') '</LesHouchesEvents>'
 
 return
