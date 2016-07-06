@@ -1,0 +1,6 @@
+This is sample gnuplot command; it means 
+
+plot from test.dat file <u>sing x-axis -- second column, y axis : histogram number = .. ? third column 
+
+
+plot 'test.dat' u ($2):($1 == 5 ? $3 : 1/0) 

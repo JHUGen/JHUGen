@@ -1,0 +1,59 @@
+Program: Graviton
+
+source code: Fortran 90 and C
+compiler: ifort, gcc
+
+to compile the code: make
+executable file: ./graviton
+
+command line parameters:
+   Collider=x  (Collider: 1=LHC, 2=Tevatron), default value:1
+   VegasNc1=x  (number of evaluations), default value:5000000
+   PChannel=x  (partonic channel: 0=glu+glu, 1=quark+antiquark, 2=both), default value:2
+   DecayMode=x (4l channel: 0, 2l2j channel: 1)
+   DataFile=x  (name of the output file), default value: "test"
+   if a parameter is not specified, the default value is choosen
+example call:
+   ./graviton Collider=1 VegasNc1=100000 PChannel=2 DecayMode=0 DataFile=testOutput
+   * out-of-the-box: output datafile example is "data/outputTest.lhe" and terminal output is "data/outputTest_terminal.txt"
+   
+
+setting parameters to identify resonance properties:
+*Process (in main.f90, line 47) gives the resonance spin (0,1,2)
+*All other parameters in mod_Parameters.f90 (selected parameters described below)
+	- seed_random: seed for generation can be set to random
+	- fix_channels_ratio/channels_ratio_fix: with PChannel=2, one can fix the ratio of gg to qqbar production
+	- m_Z/m_Grav: mass of Z and X particles
+	- Ga_Z/Ga_Grav: width of Z and X particles
+	- LHC_Energy: energy of LHC
+	
+	All couplings are given in the file where they are defined in the paper (http://arxiv.org/abs/1001.3396)
+	Dimensionless couplings are given in Eq.2 (spin 0), Eq.4 (spin 1), Eq.5 [b's] and Eq.6 [c's] (spin 2)
+	Example Scenarios given in Table I.  
+
+-----------------------------------------
+file descriptions
+-----------------------------------------
+
+main file: main.f90
+  some initializations and call to MC routine
+
+input parameter:  mod_Parameters.f90
+  note that energies are defined in units of 100GeV, i.e. Energy=10d0 means 1TeV,
+  after changing one of these parameters the program needs to be recompiled!
+
+cross section file: mod_CrossSection.f90, mod_Graviton.f90
+  the call to the rountine that writes out events is "WriteOutEvent(...)" in mod_CrossSection.f90 (line 86),
+  the routine itself can be found in mod_Kinematics.f90 (line 23)
+
+what needs to be done to change the pdf set:
+  main.f90, line 96: change initialization call in "InitPDFs()",
+  mod_Kinematics, line 335: change pdf routine "CTEQ6(...)",
+  mod_Kinematics, line 17,18: change calls to pdf routine in "setPDFs(...)",
+  include data tables and change makefile accordingly
+
+
+
+
+
+
