@@ -44,6 +44,15 @@ test:
     - make:
          pwd:
            ../JHUGenMELA
+
+    #make sure no big files are accidentally committed (>50 MB)
+    #can change this if we need a bigger file in the repository, but at least get a warning
+    #http://stackoverflow.com/questions/10622179/how-to-find-identify-large-files-commits-in-git-history#comment46022100_20460121
+    #file sizes are written in bytes, 50 MB = 50*1024^2 bytes
+    - git gc && join -e ERROR -a 2 -j 1 -o 2.1,2.3,1.2 --check-order <( git rev-list --objects --all | sort -k 1 ) <( git verify-pack -v .git/objects/pack/pack-*.idx | gawk '( NF == 5 && $2 == "blob" ){print}' | sort -k1 ) | sort -k2gr > $CIRCLE_ARTIFACTS/filesizes.txt:
+         pwd:
+           ../
+    - "if ! [ $(head -1 $CIRCLE_ARTIFACTS/filesizes.txt | sed -r 's/.* (.*) .*/\\1/') -lt 52428800 ]; then echo 'There is a big file committed to the repository.  Check filesizes.txt in the artifacts.  If big files are listed that are not actually in the repository, try retrying the build with no cache.'; exit 1; fi"
   override:
     #here we want to generate as many production modes as possible and get the widest range of events to check for syntax issues
     #the actual checking (checklhe) is done in post
