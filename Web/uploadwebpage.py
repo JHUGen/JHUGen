@@ -187,7 +187,7 @@ Download_template = """
 #arguments:
 #   - version (mandatory), by default this is in the name of the tar ball and is also a git tag to checkout
 #   the rest are optional
-#   - gitcommit, what to checkout to make the tar ball.  Could be anything understood by git commit,
+#   - gitcommit, what to checkout to make the tar ball.  Could be anything understood by git checkout,
 #       a tag or just an SHA id (or a branch, but bad idea).  Default=version
 #   - tarballname, will be used for both the link title and the name of the actual downloaded tarball.
 #       Default=JHUGenerator.(version).tar.gz
@@ -197,7 +197,7 @@ Download_template = """
 versions = (
             Version("v6.9.8", manualcommit="618c41c"),
             Version("v6.9.5", manualcommit="2be45c4"),
-            Version("v6.8.4"),
+            Version("v6.8.4", gitcommit="v6.8.4.1.1"),
             Version("v6.7.8", manualcommit="36c3348"),
             Version("v6.2.8"),
             Version("v5.6.3"),
