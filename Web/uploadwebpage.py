@@ -140,6 +140,9 @@ def create_Download(mostrecentversion, *olderversions):
     with open(os.path.join(WebGeneratordir, "Download.html"), "w") as f:
         f.write(Download)
 
+    #download MCFM libraries
+    check_call(["wget", "-O", os.path.join(WebGeneratordir, "libmcfm_7p0.so"), "https://github.com/JHUGen/JHUGen-backup/raw/081536e660a6712d73721eb2f7dfaded1333525f/JHUGenMELA/ggZZ_MCFM/libmcfm_7p0.so"])
+
 @contextmanager
 def cd(newdir):
     #http://stackoverflow.com/a/24176022/5228524
@@ -165,7 +168,9 @@ Download_template = """
     Download:<br>
     Latest version: {latest}
     <br>
-    Older versions:<br>
+    Compiled MCFM libraries that work for a good variety of software releases: <a href="libmcfm_7p0.so">libmcfm_7p0.so</a>
+    <br>
+    Older generator versions:<br>
     {older}
     <br>
     Much older versions:<br>

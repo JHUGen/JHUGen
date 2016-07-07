@@ -9,4 +9,4 @@ if [ -f libmcfm_7p0.so ]; then
     exit 0
 fi
 
-wget http://spin.pha.jhu.edu/otherdownloads/libmcfm_7p0.so
+wget http://spin.pha.jhu.edu/Generator/libmcfm_7p0.so
