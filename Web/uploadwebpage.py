@@ -67,7 +67,6 @@ class CadaverRC(RC):
 
 def getuploadfiles(dir):
     files = os.listdir(dir)
-    print files
     result = ""
     for f in files:
         if f in dontupload:
@@ -168,7 +167,9 @@ Download_template = """
     Download:<br>
     Latest version: {latest}
     <br>
-    Compiled MCFM libraries that work for a good variety of software releases: <a href="libmcfm_7p0.so">libmcfm_7p0.so</a>
+    Compiled MCFM libraries to interface with MELA that work for a good variety of software releases: <a href="libmcfm_7p0.so">libmcfm_7p0.so</a><br>
+    (See JHUGenMELA/ggZZ_MCFM/README for further information)
+    <br>
     <br>
     Older generator versions:<br>
     {older}
