@@ -18,7 +18,10 @@ c      include 'ewcouple.f'
 C---order of indices jdu1,jdu2,h17,h28,h34,h56)
       integer h17,h28,h34,h56,i1,i2,i3,i4,i5,i6,i7,i8,
      & n1,n2,n3,n4,n5,n6,n7,n8,jdu1,jdu2
-      double complex Amp_S_PR,Amp_S_DK,anomhzzamp
+      double complex Amp_S_PR,Amp_S_DK
+      double complex Amp_T_PR,Amp_T_DK
+      double complex Amp_U_PR,Amp_U_DK
+      double complex anomhzzamp
 C---begin statement functions
       t4(i1,i2,i3,i4)=
      & +s(i1,i2)+s(i1,i3)+s(i1,i4)
@@ -28,7 +31,7 @@ c      htheta(s3456)=half+sign(half,s3456)
       htheta(s3456)=one ! propdebug
 C---end statement functions
 !$omp threadprivate(ZZ3456,ZZ1734,ZZ2856,ZZ1728,fac)
-      
+
 
       ZZ3456(1,1)=2d0*l1*l2
       ZZ3456(1,2)=2d0*l1*r2
@@ -71,7 +74,7 @@ C---setup propagators
       propX1734=dcmplx(s1734-h2mass**2,htheta(s1734)*h2mass*h2width)
       propX1756=dcmplx(s1756-h2mass**2,htheta(s1756)*h2mass*h2width)
       do h17=1,2
-         if (h17.eq.1) then 
+         if (h17.eq.1) then
             i1=n1
             i7=n7
          elseif (h17.eq.2) then
@@ -79,7 +82,7 @@ C---setup propagators
             i7=n1
          endif
       do h28=1,2
-         if (h28.eq.1) then 
+         if (h28.eq.1) then
             i2=n2
             i8=n8
          elseif (h28.eq.2) then
@@ -87,7 +90,7 @@ C---setup propagators
             i8=n2
          endif
       do h34=1,2
-         if (h34.eq.1) then 
+         if (h34.eq.1) then
             i3=n3
             i4=n4
          elseif (h34.eq.2) then
@@ -95,7 +98,7 @@ C---setup propagators
             i4=n3
          endif
       do h56=1,2
-         if (h56.eq.1) then 
+         if (h56.eq.1) then
             i5=n5
             i6=n6
          elseif (h56.eq.2) then
@@ -119,102 +122,99 @@ C-- MARKUS: this is the old (original) MCFM code
 !      & +fac*ZZ2856(jdu1,h17,h56)*ZZ1734(jdu2,h28,h34)
 !      & *za(i7,i5)*zb(i6,i1)*za(i8,i3)*zb(i4,i2)
 !      & /(propWBF*prop1756)
+      Amp_S_PR=czip
+      Amp_S_DK=czip
+      Amp_T_PR=czip
+      Amp_T_DK=czip
+      Amp_U_PR=czip
+      Amp_U_DK=czip
+      if( hmass.ge.zip ) then
 
-!        print *, "config",jdu1,jdu2,h17,h28,h34,h56
-!        print *, "old   zz",ZZHamp(jdu1,jdu2,h17,h28,h34,h56)
+        if(channeltoggle_stu.ne.1) then
+          if( AnomalCouplPR ) then
+      Amp_S_PR=-anomhzzamp(i7,i1,i8,i2,1,s3456,s(i7,i1),s(i8,i2),za,zb)
+     & /prop3456
+          else
+      Amp_S_PR=za(i7,i8)*zb(i2,i1)/prop3456
+          endif
+          if( AnomalCouplDK ) then
+      Amp_S_DK=-anomhzzamp(i3,i4,i5,i6,1,s3456,s(i3,i4),s(i5,i6),za,zb)
+     & /prop3456
+          else
+      Amp_S_DK=za(i3,i5)*zb(i6,i4)/prop3456
+          endif
+        endif
+        if(channeltoggle_stu.ne.0) then
+          if( AnomalCouplPR ) then
+      Amp_T_PR=-anomhzzamp(i7,i1,i3,i4,1,s3456,s(i7,i1),s(i8,i2),za,zb)
+     & /prop1734
+      Amp_U_PR=-anomhzzamp(i7,i1,i5,i6,1,s3456,s(i7,i1),s(i8,i2),za,zb)
+     & /prop1756
+          else
+      Amp_T_PR=za(i7,i3)*zb(i4,i1)/prop1734
+      Amp_U_PR=za(i7,i5)*zb(i6,i1)/prop1756
+          endif
+          if( AnomalCouplDK ) then
+      Amp_T_DK=-anomhzzamp(i8,i2,i5,i6,1,s3456,s(i3,i4),s(i5,i6),za,zb)
+     & /prop1734
+      Amp_U_DK=-anomhzzamp(i8,i2,i3,i4,1,s3456,s(i3,i4),s(i5,i6),za,zb)
+     & /prop1756
+          else
+      Amp_T_DK=za(i8,i5)*zb(i6,i2)/prop1734
+      Amp_U_DK=za(i8,i3)*zb(i4,i2)/prop1756
+          endif
+        endif
 
+      endif
+      if( h2mass.ge.zip ) then
 
+        if(channeltoggle_stu.ne.1) then
+          if( AnomalCouplPR ) then
+      Amp_S_PR=-anomhzzamp(i7,i1,i8,i2,2,s3456,s(i7,i1),s(i8,i2),za,zb)
+     & /propX3456
+          else
+      Amp_S_PR=za(i7,i8)*zb(i2,i1)/propX3456
+          endif
+          if( AnomalCouplDK ) then
+      Amp_S_DK=-anomhzzamp(i3,i4,i5,i6,2,s3456,s(i3,i4),s(i5,i6),za,zb)
+     & /propX3456
+          else
+      Amp_S_DK=za(i3,i5)*zb(i6,i4)/propX3456
+          endif
+        endif
+        if(channeltoggle_stu.ne.0) then
+          if( AnomalCouplPR ) then
+      Amp_T_PR=-anomhzzamp(i7,i1,i3,i4,2,s3456,s(i7,i1),s(i8,i2),za,zb)
+     & /propX1734
+      Amp_U_PR=-anomhzzamp(i7,i1,i5,i6,2,s3456,s(i7,i1),s(i8,i2),za,zb)
+     & /propX1756
+          else
+      Amp_T_PR=za(i7,i3)*zb(i4,i1)/propX1734
+      Amp_U_PR=za(i7,i5)*zb(i6,i1)/propX1756
+          endif
+          if( AnomalCouplDK ) then
+      Amp_T_DK=-anomhzzamp(i8,i2,i5,i6,2,s3456,s(i3,i4),s(i5,i6),za,zb)
+     & /propX1734
+      Amp_U_DK=-anomhzzamp(i8,i2,i3,i4,2,s3456,s(i3,i4),s(i5,i6),za,zb)
+     & /propX1756
+          else
+      Amp_T_DK=za(i8,i5)*zb(i6,i2)/propX1734
+      Amp_U_DK=za(i8,i3)*zb(i4,i2)/propX1756
+          endif
+        endif
 
-C--   MARKUS: separate production and decay for s-channel Higgs
-!       if( AnomalCouplPR ) then
-!          Amp_S_PR = anomzzamp(i7,i1,i8,i2,s3456,s(i7,i1),s(i8,i2),za,zb)
-!       else
-!          Amp_S_PR = za(i7,i8)*zb(i2,i1)
-!       endif
-!       if( AnomalCouplDK ) then
-!          Amp_S_DK = anomzzamp(i3,i4,i5,i6,s3456,s(i3,i4),s(i5,i6),za,zb)
-!       else
-!         Amp_S_DK = za(i3,i5)*zb(i6,i4)
-!       endif
+      endif
 
-
-C-- MARKUS: this is the new code with anomalous couplings from Fabrizio and me
+      ZZHamp(jdu1,jdu2,h17,h28,h34,h56)=
+     & +fac/propWBF*(
 C---s-channel
-!       ZZHamp(jdu1,jdu2,h17,h28,h34,h56)=
-!      & +fac*ZZ3456(h34,h56)*ZZ1728(jdu1,jdu2,h17,h28)
-!      & *Amp_S_DK * Amp_S_PR
-!      & /(propWBF*prop3456)
-! C---t-channel
-!      & +fac*ZZ1734(jdu1,h17,h34)*ZZ2856(jdu2,h28,h56)
-!      & *anomzzamp(i3,i4,i7,i1,s1734,s(i3,i4),s(i7,i1),za,zb)
-!      & *anomzzamp(i5,i6,i8,i2,s1734,s(i5,i6),s(i8,i2),za,zb)
-!      & /(propWBF*prop1734) 
-! C---u-channel
-!      & +fac*ZZ2856(jdu1,h17,h56)*ZZ1734(jdu2,h28,h34)
-!      & *anomzzamp(i5,i6,i7,i1,s1756,s(i5,i6),s(i7,i1),za,zb)
-!      & *anomzzamp(i3,i4,i8,i2,s1756,s(i3,i4),s(i8,i2),za,zb)
-!      & /(propWBF*prop1756) 
-! 
-!        print *, "new   zz",ZZHamp(jdu1,jdu2,h17,h28,h34,h56)
-
-
-
-
-
-C-- MARKUS: this is the new code with anomalous couplings from Fabrizio and me
-      if( AnomalCouplPR ) then
-       Amp_S_PR=anomhzzamp(i7,i1,i8,i2,1,s3456,s(i7,i1),s(i8,i2),za,zb)  !   anomzzamp(i7,i1,i8,i2,s3456,s(i7,i1),s(i8,i2),za,zb)
-      else
-       Amp_S_PR=za(i7,i8)*zb(i2,i1)
-       prop1734 = 1d20!   remove t/u channel
-       prop1756 = 1d20
-      endif
-      if( AnomalCouplDK ) then
-       Amp_S_DK=anomhzzamp(i3,i4,i5,i6,1,s3456,s(i3,i4),s(i5,i6),za,zb)  !  anomzzamp(i3,i4,i5,i6,s3456,s(i3,i4),s(i5,i6),za,zb)
-      else
-       Amp_S_DK=za(i3,i5)*zb(i6,i4)
-       prop1734 = 1d20!   remove t/u channel
-       prop1756 = 1d20
-      endif
-      ZZHamp(jdu1,jdu2,h17,h28,h34,h56)=
-     & +fac*ZZ3456(h34,h56)*ZZ1728(jdu1,jdu2,h17,h28)
-     & *Amp_S_DK * Amp_S_PR
-     & /(propWBF*prop3456)
+     & ZZ3456(h34,h56)*ZZ1728(jdu1,jdu2,h17,h28)*Amp_S_DK*Amp_S_PR
 C---t-channel
-     & +fac*ZZ1734(jdu1,h17,h34)*ZZ2856(jdu2,h28,h56)
-     & *anomhzzamp(i3,i4,i7,i1,1,s1734,s(i3,i4),s(i7,i1),za,zb)
-     & *anomhzzamp(i5,i6,i8,i2,1,s1734,s(i5,i6),s(i8,i2),za,zb)
-     & /(propWBF*prop1734) * IncludeTUChannels
+     & +ZZ1734(jdu1,h17,h34)*ZZ2856(jdu2,h28,h56)*Amp_T_DK*Amp_T_PR
 C---u-channel
-     & +fac*ZZ2856(jdu1,h17,h56)*ZZ1734(jdu2,h28,h34)
-     & *anomhzzamp(i5,i6,i7,i1,1,s1756,s(i5,i6),s(i7,i1),za,zb)
-     & *anomhzzamp(i3,i4,i8,i2,1,s1756,s(i3,i4),s(i8,i2),za,zb)
-     & /(propWBF*prop1756) * IncludeTUChannels
-       
-!        print *, "newer zz",ZZHamp(jdu1,jdu2,h17,h28,h34,h56)
-!        pause
+     & +ZZ2856(jdu1,h17,h56)*ZZ1734(jdu2,h28,h34)*Amp_U_DK*Amp_U_PR
+     & )
 
-
-
-
-
-! C-- MARKUS: this is the new code with a second resonance 
-      ZZHamp(jdu1,jdu2,h17,h28,h34,h56)=
-     & ZZHamp(jdu1,jdu2,h17,h28,h34,h56)
-     & +fac*ZZ3456(h34,h56)*ZZ1728(jdu1,jdu2,h17,h28)
-     & *anomhzzamp(i3,i4,i5,i6,2,s3456,s(i3,i4),s(i5,i6),za,zb)
-     & *anomhzzamp(i7,i1,i8,i2,2,s3456,s(i7,i1),s(i8,i2),za,zb)
-     & /(propWBF*propX3456)
-C--t-channel
-     & +fac*ZZ1734(jdu1,h17,h34)*ZZ2856(jdu2,h28,h56)
-     & *anomhzzamp(i3,i4,i7,i1,2,s1734,s(i3,i4),s(i7,i1),za,zb)
-     & *anomhzzamp(i5,i6,i8,i2,2,s1734,s(i5,i6),s(i8,i2),za,zb)
-     & /(propWBF*propX1734) * IncludeTUChannels
-C---u-channel
-     & +fac*ZZ2856(jdu1,h17,h56)*ZZ1734(jdu2,h28,h34)
-     & *anomhzzamp(i5,i6,i7,i1,2,s1756,s(i5,i6),s(i7,i1),za,zb)
-     & *anomhzzamp(i3,i4,i8,i2,2,s1756,s(i3,i4),s(i8,i2),za,zb)
-     & /(propWBF*propX1756) * IncludeTUChannels
 
       enddo
       enddo

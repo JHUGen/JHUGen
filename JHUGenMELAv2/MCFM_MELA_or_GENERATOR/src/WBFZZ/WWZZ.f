@@ -21,7 +21,7 @@
       double complex, save:: ZZ3456(2,2)
       double complex anomhzzamp,anomhwwamp
 !$omp threadprivate(ZZ3456)
-      t4(i1,i2,i3,i4)=     
+      t4(i1,i2,i3,i4)=
      & +s(i1,i2)+s(i1,i3)+s(i1,i4)
      & +s(i2,i3)+s(i2,i4)+s(i3,i4)
       t3(i1,i2,i3)=s(i1,i2)+s(i1,i3)+s(i2,i3)
@@ -52,12 +52,12 @@
      & +za(i5,i3)*(zba2(i3,i2,i8,i4)-zba2(i3,i1,i7,i4)))
      & *za(i7,i8)*zb(i2,i1)*zb(i3,i6))/t3(i3,i5,i6)
 C---end statement functions
- 
+
 c--- special fix for Madgraph check
 !      if (index(runstring,'mad') .gt. 0) then
-        sqzmass=dcmplx(zmass**2,0d0)
+!       sqzmass=dcmplx(zmass**2,0d0)
 !      else
-!        sqzmass=czmass2
+         sqzmass=czmass2
 !      endif
 
 C---setting up couplings dependent on whether we are doing 34-line or 56-line
@@ -85,7 +85,7 @@ C---setting up couplings dependent on whether we are doing 34-line or 56-line
       ZZ3456(1,2)=xl1*xr2
       ZZ3456(2,1)=xr1*xl2
       ZZ3456(2,2)=xr1*xr2
-      
+
       rxw=sqrt((cone-cxw)/cxw)
       s34=s(n3,n4)
       s56=s(n5,n6)
@@ -140,7 +140,7 @@ c--- Make sure WWZA vertices included
       i7=n7
       i8=n8
       do h56=1,2
-        if (h56.eq.1) then 
+        if (h56.eq.1) then
           i5=n5
           i6=n6
         elseif (h56.eq.2) then
@@ -148,7 +148,7 @@ c--- Make sure WWZA vertices included
           i6=n5
         endif
         do h34=1,2
-         if (h34.eq.1) then 
+         if (h34.eq.1) then
             i3=n3
             i4=n4
          elseif (h34.eq.2) then
@@ -164,57 +164,65 @@ c--- Make sure WWZA vertices included
      &    *ggWW(h34,h56)/(propw17*propw28)*Bbit
 
 C----Higgs contribution
+C----First resonance
 C-- MARKUS: this is the old (original) MCFM code
-
-!        print *,"for check: WWZZamp(h34,h56)=0";WWZZamp(h34,h56)=0d0
-! 
+!
 !          WWZZamp(h34,h56)=WWZZamp(h34,h56)
 !      &    -2d0*sqzmass/cxw**2*ZZ3456(h34,h56)
 !      &    *za(i7,i8)*zb(i2,i1)*za(i3,i5)*zb(i6,i4)
 !      &    /(propWBF*prop3456)*Hbit
-! 
-!        print *, "config",h34,h56
-!        print *, "old ww",WWZZamp(h34,h56)
-!        print *,"for check: WWZZamp(h34,h56)=0";WWZZamp(h34,h56)=0d0
-
+!
 
 C--   MARKUS: separate production and decay for s-channel Higgs
-!        print *,"for check: WWZZamp(h34,h56)=0";WWZZamp(h34,h56)=0d0
-
-      if( AnomalCouplPR ) then
-       Amp_S_PR=anomhwwamp(i7,i1,i8,i2,1,s3456,s(i7,i1),s(i8,i2),za,zb)  !anomwwamp(i7,i1,i8,i2,s3456,s(i7,i1),s(i8,i2),za,zb)
-      else
-       Amp_S_PR=za(i7,i8)*zb(i2,i1)
-      endif
-      if( AnomalCouplDK ) then
-       Amp_S_DK=anomhzzamp(i3,i4,i5,i6,1,s3456,s(i7,i1),s(i8,i2),za,zb)  ! anomzzamp(i3,i4,i5,i6,s3456,s(i3,i4),s(i5,i6),za,zb)
-      else
-       Amp_S_DK=za(i3,i5)*zb(i6,i4)
-      endif
-
-C-- MARKUS: this is the new code with anomalous couplings from Fabrizio and me
-        WWZZamp(h34,h56)=WWZZamp(h34,h56)
+         if( hmass.lt.zip ) then
+           Amp_S_PR=czip
+           Amp_S_DK=czip
+         else
+           if( AnomalCouplPR ) then
+      Amp_S_PR=-anomhwwamp(i7,i1,i8,i2,1,s3456,s(i7,i1),s(i8,i2),za,zb)
+           else
+      Amp_S_PR=za(i7,i8)*zb(i2,i1)
+          endif
+           if( AnomalCouplDK ) then
+      Amp_S_DK=-anomhzzamp(i3,i4,i5,i6,1,s3456,s(i7,i1),s(i8,i2),za,zb)
+           else
+      Amp_S_DK=za(i3,i5)*zb(i6,i4)
+           endif
+         endif
+         WWZZamp(h34,h56)=WWZZamp(h34,h56)
      &    -2d0*sqzmass/cxw**2*ZZ3456(h34,h56)
      &     *Amp_S_DK*Amp_S_PR
      &    /(propWBF*prop3456)*Hbit
-!        print *, "new ww",WWZZamp(h34,h56)
-!        pause
 
-
-
-
-
-C-- MARKUS: this is the new code with a second resonance 
-        WWZZamp(h34,h56)=WWZZamp(h34,h56)
+C----Second resonance
+        if( h2mass.lt.zip ) then
+           Amp_S_PR=czip
+           Amp_S_DK=czip
+         else
+           if( AnomalCouplPR ) then
+      Amp_S_PR=-anomhwwamp(i7,i1,i8,i2,2,s3456,s(i7,i1),s(i8,i2),za,zb)
+           else
+      Amp_S_PR=za(i7,i8)*zb(i2,i1)
+          endif
+           if( AnomalCouplDK ) then
+      Amp_S_DK=-anomhzzamp(i3,i4,i5,i6,2,s3456,s(i7,i1),s(i8,i2),za,zb)
+           else
+      Amp_S_DK=za(i3,i5)*zb(i6,i4)
+           endif
+         endif
+         WWZZamp(h34,h56)=WWZZamp(h34,h56)
      &    -2d0*sqzmass/cxw**2*ZZ3456(h34,h56)
-     &     *anomhzzamp(i3,i4,i5,i6,2,s3456,s(i7,i1),s(i8,i2),za,zb)  !anomzzampX(i3,i4,i5,i6,s3456,s(i3,i4),s(i5,i6),za,zb)
-     &     *anomhwwamp(i7,i1,i8,i2,2,s3456,s(i7,i1),s(i8,i2),za,zb)  !anomwwampX(i7,i1,i8,i2,s3456,s(i7,i1),s(i8,i2),za,zb)
+     &     *anomhzzamp(i3,i4,i5,i6,2,s3456,s(i7,i1),s(i8,i2),za,zb)
+     &     *anomhwwamp(i7,i1,i8,i2,2,s3456,s(i7,i1),s(i8,i2),za,zb)
      &    /(propWBF*propX3456)*Hbit
         enddo
       enddo
 
+
+C----Background contribution
+
       do h56=1,2
-      if (h56.eq.1) then 
+      if (h56.eq.1) then
         i5=n5
         i6=n6
       elseif (h56.eq.2) then
@@ -230,7 +238,7 @@ C-- MARKUS: this is the new code with a second resonance
       enddo
 
       do h34=1,2
-      if (h34.eq.1) then 
+      if (h34.eq.1) then
         i3=n3
         i4=n4
       elseif (h34.eq.2) then
@@ -244,6 +252,6 @@ C-- MARKUS: this is the new code with a second resonance
       srWW(h34,2)=srWW(h34,2)+2d0/(cxw*propw17*propw28)
      & *srggWW34(2,h34)*srR(i1,i2,i5,i6,i3,i4,i7,i8)*BBit
       enddo
-      
+
       return
       end

@@ -10,6 +10,8 @@ c---- prime 7: |q1**2| * |q2**2|
 c---- NOTE: Please add new future couplings in the same order for both declaration and the common block
 
 
+      integer channeltoggle_stu ! 0, 1, 2 for s, t+u and s+t+u
+      integer vvhvvtoggle_vbfvh ! 0, 1, 2 for VBF, VH and VB+VH
       integer cz_q1sq,cz_q2sq,cz_q12sq
       integer cw_q1sq,cw_q2sq,cw_q12sq
       integer c2z_q1sq,c2z_q2sq,c2z_q12sq
@@ -79,10 +81,10 @@ c---- NOTE: Please add new future couplings in the same order for both declarati
       double complex gh2w1_prime7,gh2w2_prime7,gh2w3_prime7,gh2w4_prime7
 
       logical AllowAnomalousCouplings,distinguish_HWWcouplings
-      logical AnomalCouplPR,AnomalCouplDK,removeVH,removeVBF
-      double precision IncludeTUChannels
+      logical AnomalCouplPR,AnomalCouplDK
 
       common/spinzerohiggs_anomcoupl/
+     & channeltoggle_stu,vvhvvtoggle_vbfvh,
      & cz_q1sq,cz_q2sq,cz_q12sq,
      & cw_q1sq,cw_q2sq,cw_q12sq,
      & c2z_q1sq,c2z_q2sq,c2z_q12sq,

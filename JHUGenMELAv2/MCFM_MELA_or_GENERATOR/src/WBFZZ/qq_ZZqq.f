@@ -10,6 +10,7 @@ c--- q(-p1)+q(-p2)->Z(p3,p4)+Z(p5,p6)+q(p7)+q(p8);
       include 'zprods_decl.f'
       include 'anom_higgs.f'
 !      include 'first.f'
+      include 'spinzerohiggs_anomcoupl.f'
       include 'WWbits.f'
       integer nmax,jmax
       parameter(jmax=12,nmax=10)
@@ -67,9 +68,9 @@ c     ,j3_4(4,2),j5_6(4,2),
       integer,parameter:: j8(jmax)=(/8,8,1,2,8,1,8,2,8,2,8,1/)
       save doHO,doBO,mult
 
-      
-      
-!$omp threadprivate(doHO,doBO,mult)      
+
+
+!$omp threadprivate(doHO,doBO,mult)
       msq(:,:)=0d0
 
 c--- This calculation uses the complex-mass scheme (c.f. arXiv:hep-ph/0605312)
@@ -77,7 +78,7 @@ c--- and the following lines set up the appropriate masses and sin^2(theta_w)
       cwmass2=dcmplx(wmass**2,-wmass*wwidth)
       czmass2=dcmplx(zmass**2,-zmass*zwidth)
       cxw=cone-cwmass2/czmass2
-      
+
       doHO=.false.
       doBO=.false.
       if     (runstring(4:5) .eq. 'HO') then
@@ -113,10 +114,10 @@ C---setup spinors and spinorvector products
       amp(:,:,:,:,:)=czip
       ampa(:,:,:,:,:)=czip
       ampb(:,:,:,:,:)=czip
-      
-C--   MARKUS: adding switches to remove VH or VBF contributions           
-      if( (removeVH .eqv..true.) .and. (j.ge.9) ) cycle
-      if( (removeVBF.eqv..true.) .and. (j.le.8) ) cycle
+
+C--   MARKUS: adding switches to remove VH or VBF contributions
+      if( (vvhvvtoggle_vbfvh.eq.0) .and. (j.ge.9) ) cycle ! No VH-like diagram
+      if( (vvhvvtoggle_vbfvh.eq.1) .and. (j.le.8) ) cycle ! No VBF-like diagram
 
 
 c--- propagators and currents are not used in calculation of Higgs contribution
@@ -134,7 +135,7 @@ c--- propagators and currents are not used in calculation of Higgs contribution
       call jzero(j7(j),j2(j),zab,zba,j7_2)
       call jzero(j8(j),j1(j),zab,zba,j8_1)
       call jzero(j8(j),j2(j),zab,zba,j8_2)
- 
+
       call jone(j7(j),3,4,j1(j),za,zb,zab,zba,j7_34_1,jw7_34_1,jl7_34_1)
       call jone(j7(j),3,4,j2(j),za,zb,zab,zba,j7_34_2,jw7_34_2,jl7_34_2)
       call jone(j7(j),5,6,j1(j),za,zb,zab,zba,j7_56_1,jw7_56_1,jl7_56_1)
@@ -168,19 +169,19 @@ C-----Singly resonant production in VBF style diagrams
       call ZZSingleres(j1(j),j2(j),5,6,3,4,j8(j),j7(j),za,zb,
      & ZZ8561,WWp8561,WWm8561)
       endif
-      
-      
-      
+
+
+
 C----ZZ->ZZ scattering with the exchange of a H
       call ZZHZZamp(j1(j),j2(j),3,4,5,6,j7(j),j8(j),
      & za,zb,ZZHamp71_82)
       call ZZHZZamp(j1(j),j2(j),3,4,5,6,j8(j),j7(j),
      & za,zb,ZZHamp81_72)
-C----Four boson vertex + WW->Higgs diagram 
+C----Four boson vertex + WW->Higgs diagram
       call WWZZ(j1(j),j2(j),3,4,5,6,j7(j),j8(j),
-     & za,zb,WWZZ71_82amp,srWWZZ71_82amp) 
+     & za,zb,WWZZ71_82amp,srWWZZ71_82amp)
       call WWZZ(j1(j),j2(j),3,4,5,6,j8(j),j7(j),
-     & za,zb,WWZZ81_72amp,srWWZZ81_72amp) 
+     & za,zb,WWZZ81_72amp,srWWZZ81_72amp)
 
 C-----setup for (uqbq_uqbq) (2,5)->(2,5)
       do h1=1,2
@@ -193,7 +194,7 @@ C-----setup for (uqbq_uqbq) (2,5)->(2,5)
      & +cdotpr(jl7_34_1(:,2,h1,h3),jl8_56_2(:,1,h2,h5))*ll7341(h3,h5)
      & +cdotpr(j7_34_1(:,2,h1,h3),jl8_56_2(:,1,h2,h5))*gmZl8562(2,h1,h5)
      & +cdotpr(jl7_34_1(:,2,h1,h3),j8_56_2(:,1,h2,h5))*gmZl7341(1,h2,h3)
-     
+
       amp(uqbq_uqbq,h1,h2,h3,h5)=amp(uqbq_uqbq,h1,h2,h3,h5)
      & +cdotpr(j7_56_1(:,2,h1,h5),j8_34_2(:,1,h2,h3))*gmZ7561(2,1,h1,h2)
      & +cdotpr(jl7_56_1(:,2,h1,h5),jl8_34_2(:,1,h2,h3))*ll7561(h3,h5)
@@ -238,7 +239,7 @@ C-----setup for (uqcq_uqcq) (2,4)->(2,4)
      & +cdotpr(jl7_56_1(:,2,h1,h5),jl8_34_2(:,2,h2,h3))*ll7561(h3,h5)
      & +cdotpr(j7_56_1(:,2,h1,h5),jl8_34_2(:,2,h2,h3))*gmZl8342(2,h1,h3)
      & +cdotpr(jl7_56_1(:,2,h1,h5),j8_34_2(:,2,h2,h3))*gmZl7561(2,h2,h5)
-      
+
       amp(uqcq_uqcq,h1,h2,h3,h5)=amp(uqcq_uqcq,h1,h2,h3,h5)
      & +cdotpr(j7_3456_1(:,2,h1,h3,h5),j8_2(:,h2))*gmZ82(2,2,h1,h2)
      & +cdotpr(j7_1(:,h1),j8_3456_2(:,2,h2,h3,h5))*gmZ71(2,2,h1,h2)
@@ -259,7 +260,7 @@ c      write(6,*) h1,h2,h3,h5,esq**6*spinavge
 c     &   *dble(amp(uqcq_uqcq,h1,h2,h3,h5)
 c     & *dconjg(amp(uqcq_uqcq,h1,h2,h3,h5)))
 c      endif
-      
+
       enddo
       enddo
       enddo
@@ -305,10 +306,10 @@ C-----setup for uqsq_dqcq W diagrams (2,3)->(1,4)
       tempw(2,3)=tempw(2,3)+esq**6*spinavge
      &   *dble(amp(uqsq_dqcq,h1,h2,h3,h5)
      & *dconjg(amp(uqsq_dqcq,h1,h2,h3,h5)))
-      enddo     
-      enddo     
-      enddo     
-      enddo     
+      enddo
+      enddo
+      enddo
+      enddo
       temp(2,3)=temp(2,5)
 
 C-----setup for dqcq_uqsq (1,4)-->(2,3)
@@ -350,10 +351,10 @@ C-----setup for dqcq_uqsq (1,4)-->(2,3)
       tempw(1,4)=tempw(1,4)+esq**6*spinavge
      &   *dble(amp(dqcq_uqsq,h1,h2,h3,h5)
      & *dconjg(amp(dqcq_uqsq,h1,h2,h3,h5)))
-      enddo     
-      enddo     
-      enddo     
-      enddo     
+      enddo
+      enddo
+      enddo
+      enddo
 
 C-----setup for (dqcq_dqcq) (1,4)-->(1,4)
       do h1=1,2
@@ -427,14 +428,14 @@ C-----setup for dquq_dquq W diagrams (1,2)-->(1,2)
       ampa(dquq_dquq,h1,h2,h3,h5)=ampa(dquq_dquq,h1,h2,h3,h5)
      & -srWWZZ81_72amp(h3,h5) ! note minus sign instead of exchanging 1<->7,2<->8
       endif
-      
+
       ampa(dquq_dquq,h1,h2,h3,h5)=Bbit*ampa(dquq_dquq,h1,h2,h3,h5)
      & +WWZZ81_72amp(h3,h5)
       endif
 
 C--Fill Z exchange diagrams
       ampb(dquq_dquq,h1,h2,h3,h5)=amp(dqcq_dqcq,h1,h2,h3,h5)
-       
+
       temp(1,2)=temp(1,2)+esq**6*spinavge
      &   *dble(ampa(dquq_dquq,h1,h2,h3,h5)
      & *dconjg(ampa(dquq_dquq,h1,h2,h3,h5)))
@@ -476,10 +477,10 @@ C-----setup for (dqsq_dqsq) (1,3)-->(1,3)
       amp(dqsq_dqsq,h1,h2,h3,h5)=amp(dqsq_dqsq,h1,h2,h3,h5)
      & +ZZ7341(1,1,h1,h2,h3,h5)+ZZ7561(1,1,h1,h2,h5,h3)
       endif
-     
+
       amp(dqsq_dqsq,h1,h2,h3,h5)=Bbit*amp(dqsq_dqsq,h1,h2,h3,h5)
      & +Hbit*ZZHamp71_82(1,1,h1,h2,h3,h5)
-     
+
       temp(1,3)=temp(1,3)+esq**6*spinavge
      &   *dble(amp(dqsq_dqsq,h1,h2,h3,h5)
      & *dconjg(amp(dqsq_dqsq,h1,h2,h3,h5)))
@@ -548,7 +549,7 @@ C-----setup for ((dqdq_dqdq)  (1,1)-->(1,1)
       do h2=1,2
       do h3=1,2
       do h5=1,2
-     
+
 C-----------------ampa
       ampa(dqdq_dqdq,h1,h2,h3,h5)=amp(dqsq_dqsq,h1,h2,h3,h5)
 
@@ -646,7 +647,7 @@ c--- qbar-q
       enddo
       msq(-1,3)=msq(-1,3)+tempw(2,3)
       msq(-2,4)=msq(-2,4)+tempw(1,4)
-      
+
 c--- qbar-q
       elseif (j.eq.6) then
       do k=-nf,-1
@@ -683,7 +684,7 @@ c--- q-qbar
       enddo
       msq(1,-3)=msq(1,-3)+tempw(1,4)
       msq(2,-4)=msq(2,-4)+tempw(2,3)
-      
+
 c--- q-qbar extra pieces
       elseif (j.eq.9) then
       do k=1,nf
@@ -707,7 +708,7 @@ c--- q-qbar extra pieces
       endif
       enddo
       enddo
- 
+
 c--- qbar-q extra pieces
       elseif (j.eq.11) then
       do k=1,nf
@@ -731,7 +732,7 @@ c--- qbar-q extra pieces
       endif
       enddo
       enddo
-  
+
       endif
 
       enddo
