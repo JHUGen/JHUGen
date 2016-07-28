@@ -51,7 +51,7 @@ password {password}
 """
 
 cadaverrctemplate = """
-open {machine}/{JHED}/esgwebphp2/spin/public_html/heshy
+open {machine}/{JHED}/esgwebphp2/spin/public_html
 ls
 {uploadfiles}
 exit
@@ -101,7 +101,7 @@ class Version(object):
         if gitdir is None:
             tmpdir = tempfile.mkdtemp()
             with cd(tmpdir):
-                check_call(["git", "clone", "git@github.com:hroskes/JHUGen"])
+                check_call(["git", "clone", "git@github.com:JHUGen/JHUGen"])
                 gitdir = os.path.join(tmpdir, "JHUGen")
 
         with cd(gitdir):
