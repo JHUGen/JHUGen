@@ -230,7 +230,7 @@ reallyold = (
 
 #things that get stored in the tarball if present
 #graviton and graviton_mod_off are in the really old versions
-storefolders = ["JHUGenerator", "JHUGenMELA", "JHUGenMELAv2", "AnalyticMELA", "graviton", "graviton_mod_off"]
+storefolders = ["JHUGenerator", "JHUGenMELA", "AnalyticMELA", "graviton", "graviton_mod_off"]
 #plus the manual which is treated separately
 
 #files in this directory that should not be uploaded to the spin page
