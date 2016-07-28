@@ -78,7 +78,7 @@ def getuploadfiles(dir):
     return result
 
 class Version(object):
-    def __init__(self, version, gitcommit=None, tarballname=None, manualname=None, manualcommit=None):
+    def __init__(self, version, gitcommit=None, tarballname=None, manualname=None, manualcommit=None, melacommit=None):
         self.version = version
         if gitcommit is None: gitcommit = version
         if tarballname is None: tarballname = "JHUGenerator.{}.tar.gz".format(self.version)
@@ -88,6 +88,7 @@ class Version(object):
         self.tarballname = tarballname
         self.manualname = manualname
         self.manualcommit = manualcommit
+        self.melacommit = melacommit
 
     def getlink(self):
         return link_template.format(tarballname=self.tarballname)
@@ -105,6 +106,7 @@ class Version(object):
 
         with cd(gitdir):
             check_call(["git", "clean", "-f", "-x", "-d"])
+            check_call(["git", "reset", "--hard", "HEAD"])
             store = []
 
             #manual
@@ -119,6 +121,8 @@ class Version(object):
                 pass
 
             check_call(["git", "checkout", self.gitcommit])
+            if self.melacommit is not None:
+                check_call(["git", "checkout", self.melacommit, "--", "JHUGenMELA"])
             for folder in storefolders:
                 if os.path.exists(folder):
                     store.append(folder)
@@ -140,7 +144,9 @@ def create_Download(mostrecentversion, *olderversions):
         f.write(Download)
 
     #download MCFM libraries
-    check_call(["wget", "-O", os.path.join(WebGeneratordir, "libmcfm_7p0.so"), "https://github.com/JHUGen/JHUGen-backup/raw/081536e660a6712d73721eb2f7dfaded1333525f/JHUGenMELA/ggZZ_MCFM/libmcfm_7p0.so"])
+    libmcfmfilename = os.path.join(WebGeneratordir, "libmcfm_7p0.so")
+    if not os.path.exists(libmcfmfilename):
+        check_call(["wget", "-O", libmcfmfilename, "https://github.com/JHUGen/JHUGen-backup/raw/081536e660a6712d73721eb2f7dfaded1333525f/JHUGenMELA/ggZZ_MCFM/libmcfm_7p0.so"])
 
 @contextmanager
 def cd(newdir):
@@ -196,6 +202,7 @@ Download_template = """
 #   - manualcommit, name of the commit to checkout to compile the manual.  Default=gitcommit
 #       could use a later version if the manual is updated after the generator is tagged
 versions = (
+            Version("v7.0.0", gitcommit="v7.0.0.beta1", manualcommit="5fc5446", melacommit="v6.9.8"),
             Version("v6.9.8", manualcommit="971ad57"),
             Version("v6.9.5", manualcommit="157d32c"),
             Version("v6.8.4", gitcommit="v6.8.4.1.1"),
