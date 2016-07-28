@@ -128,32 +128,43 @@ C-- MARKUS: this is the old (original) MCFM code
       Amp_T_DK=czip
       Amp_U_PR=czip
       Amp_U_DK=czip
+
+!      write(6,*) "channeltoggle_stu=",channeltoggle_stu
+!      write(6,*) "AnomalCouplPR=",AnomalCouplPR
+!      write(6,*) "AnomalCouplDK=",AnomalCouplDK
+!      write(6,*) "AllowAnomalousCouplings=",AllowAnomalousCouplings
+!      write(6,*) "distinguish_HWWcouplings=",distinguish_HWWcouplings
+
       if( hmass.ge.zip ) then
 
         if(channeltoggle_stu.ne.1) then
-          if( AnomalCouplPR ) then
+          if( AnomalCouplPR.eq.1 ) then
+!          write(6,*) "AnomalCouplPR.eq.1"
       Amp_S_PR=Amp_S_PR
      & -anomhzzamp(i7,i1,i8,i2,1,s3456,s(i7,i1),s(i8,i2),za,zb)
      & /prop3456
           else
+!          write(6,*) "AnomalCouplPR.ne.1"
       Amp_S_PR=Amp_S_PR
      & +za(i7,i8)*zb(i2,i1)/prop3456
           endif
-          if( AnomalCouplDK ) then
+          if( AnomalCouplDK.eq.1 ) then
+!          write(6,*) "AnomalCouplDK.eq.1"
       Amp_S_DK=Amp_S_DK
      & -anomhzzamp(i3,i4,i5,i6,1,s3456,s(i3,i4),s(i5,i6),za,zb)
           else
+!          write(6,*) "AnomalCouplDK.ne.1"
       Amp_S_DK=Amp_S_DK
      & +za(i3,i5)*zb(i6,i4)
           endif
         endif
         if(channeltoggle_stu.ne.0) then
-          if( AnomalCouplPR ) then
+          if( AnomalCouplPR.eq.1 ) then
       Amp_T_PR=Amp_T_PR
-     & -anomhzzamp(i7,i1,i3,i4,1,s3456,s(i7,i1),s(i8,i2),za,zb)
+     & -anomhzzamp(i7,i1,i3,i4,1,s1734,s(i3,i4),s(i7,i1),za,zb)
      & /prop1734
       Amp_U_PR=Amp_U_PR
-     & -anomhzzamp(i7,i1,i5,i6,1,s3456,s(i7,i1),s(i8,i2),za,zb)
+     & -anomhzzamp(i7,i1,i5,i6,1,s1756,s(i5,i6),s(i7,i1),za,zb)
      & /prop1756
           else
       Amp_T_PR=Amp_T_PR
@@ -161,11 +172,11 @@ C-- MARKUS: this is the old (original) MCFM code
       Amp_U_PR=Amp_U_PR
      & +za(i7,i5)*zb(i6,i1)/prop1756
           endif
-          if( AnomalCouplDK ) then
+          if( AnomalCouplDK.eq.1 ) then
       Amp_T_DK=Amp_T_DK
-     & -anomhzzamp(i8,i2,i5,i6,1,s3456,s(i3,i4),s(i5,i6),za,zb)
+     & -anomhzzamp(i8,i2,i5,i6,1,s1734,s(i5,i6),s(i8,i2),za,zb)
       Amp_U_DK=Amp_U_DK
-     & -anomhzzamp(i8,i2,i3,i4,1,s3456,s(i3,i4),s(i5,i6),za,zb)
+     & -anomhzzamp(i8,i2,i3,i4,1,s1756,s(i3,i4),s(i8,i2),za,zb)
           else
       Amp_T_DK=Amp_T_DK
      & +za(i8,i5)*zb(i6,i2)
@@ -178,7 +189,7 @@ C-- MARKUS: this is the old (original) MCFM code
       if( h2mass.ge.zip ) then
 
         if(channeltoggle_stu.ne.1) then
-          if( AnomalCouplPR ) then
+          if( AnomalCouplPR.eq.1 ) then
       Amp_S_PR=Amp_S_PR
      & -anomhzzamp(i7,i1,i8,i2,2,s3456,s(i7,i1),s(i8,i2),za,zb)
      & /propX3456
@@ -186,7 +197,7 @@ C-- MARKUS: this is the old (original) MCFM code
       Amp_S_PR=Amp_S_PR
      & +za(i7,i8)*zb(i2,i1)/propX3456
           endif
-          if( AnomalCouplDK ) then
+          if( AnomalCouplDK.eq.1 ) then
       Amp_S_DK=Amp_S_DK
      & -anomhzzamp(i3,i4,i5,i6,2,s3456,s(i3,i4),s(i5,i6),za,zb)
           else
@@ -195,12 +206,12 @@ C-- MARKUS: this is the old (original) MCFM code
           endif
         endif
         if(channeltoggle_stu.ne.0) then
-          if( AnomalCouplPR ) then
+          if( AnomalCouplPR.eq.1 ) then
       Amp_T_PR=Amp_T_PR
-     & -anomhzzamp(i7,i1,i3,i4,2,s3456,s(i7,i1),s(i8,i2),za,zb)
+     & -anomhzzamp(i7,i1,i3,i4,2,s1734,s(i3,i4),s(i7,i1),za,zb)
      & /propX1734
       Amp_U_PR=Amp_U_PR
-     & -anomhzzamp(i7,i1,i5,i6,2,s3456,s(i7,i1),s(i8,i2),za,zb)
+     & -anomhzzamp(i7,i1,i5,i6,2,s1756,s(i5,i6),s(i7,i1),za,zb)
      & /propX1756
           else
       Amp_T_PR=Amp_T_PR
@@ -208,11 +219,11 @@ C-- MARKUS: this is the old (original) MCFM code
       Amp_U_PR=Amp_U_PR
      & +za(i7,i5)*zb(i6,i1)/propX1756
           endif
-          if( AnomalCouplDK ) then
+          if( AnomalCouplDK.eq.1 ) then
       Amp_T_DK=Amp_T_DK
-     & -anomhzzamp(i8,i2,i5,i6,2,s3456,s(i3,i4),s(i5,i6),za,zb)
+     & -anomhzzamp(i8,i2,i5,i6,2,s1734,s(i5,i6),s(i8,i2),za,zb)
       Amp_U_DK=Amp_U_DK
-     & -anomhzzamp(i8,i2,i3,i4,2,s3456,s(i3,i4),s(i5,i6),za,zb)
+     & -anomhzzamp(i8,i2,i3,i4,2,s1756,s(i3,i4),s(i8,i2),za,zb)
           else
       Amp_T_DK=Amp_T_DK
      & +za(i8,i5)*zb(i6,i2)

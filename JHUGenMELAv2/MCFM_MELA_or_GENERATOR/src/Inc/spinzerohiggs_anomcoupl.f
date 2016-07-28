@@ -10,8 +10,11 @@ c---- prime 7: |q1**2| * |q2**2|
 c---- NOTE: Please add new future couplings in the same order for both declaration and the common block
 
 
+      integer AnomalCouplPR
+      integer AnomalCouplDK
       integer channeltoggle_stu ! 0, 1, 2 for s, t+u and s+t+u
       integer vvhvvtoggle_vbfvh ! 0, 1, 2 for VBF, VH and VB+VH
+
       integer cz_q1sq,cz_q2sq,cz_q12sq
       integer cw_q1sq,cw_q2sq,cw_q12sq
       integer c2z_q1sq,c2z_q2sq,c2z_q12sq
@@ -22,6 +25,7 @@ c---- NOTE: Please add new future couplings in the same order for both declarati
       double precision Lambda_z11,Lambda_z21,Lambda_z31,Lambda_z41
       double precision Lambda_z12,Lambda_z22,Lambda_z32,Lambda_z42
       double precision Lambda_z10,Lambda_z20,Lambda_z30,Lambda_z40
+
       double complex ghz1,ghz2,ghz3,ghz4
       double complex ghz1_prime,ghz2_prime,ghz3_prime,ghz4_prime
       double complex ghz1_prime2,ghz2_prime2,ghz3_prime2,ghz4_prime2
@@ -39,6 +43,7 @@ c---- NOTE: Please add new future couplings in the same order for both declarati
       double precision Lambda_w11,Lambda_w21,Lambda_w31,Lambda_w41
       double precision Lambda_w12,Lambda_w22,Lambda_w32,Lambda_w42
       double precision Lambda_w10,Lambda_w20,Lambda_w30,Lambda_w40
+
       double complex ghw1,ghw2,ghw3,ghw4
       double complex ghw1_prime,ghw2_prime,ghw3_prime,ghw4_prime
       double complex ghw1_prime2,ghw2_prime2,ghw3_prime2,ghw4_prime2
@@ -49,11 +54,13 @@ c---- NOTE: Please add new future couplings in the same order for both declarati
       double complex ghw1_prime7,ghw2_prime7,ghw3_prime7,ghw4_prime7
 
       double precision h2mass,h2width
+
       double precision Lambda2BSM,Lambda2_Q
       double precision Lambda2_z1,Lambda2_z2,Lambda2_z3,Lambda2_z4
       double precision Lambda2_z11,Lambda2_z21,Lambda2_z31,Lambda2_z41
       double precision Lambda2_z12,Lambda2_z22,Lambda2_z32,Lambda2_z42
       double precision Lambda2_z10,Lambda2_z20,Lambda2_z30,Lambda2_z40
+
       double complex gh2z1,gh2z2,gh2z3,gh2z4
       double complex gh2z1_prime,gh2z2_prime,gh2z3_prime,gh2z4_prime
       double complex gh2z1_prime2,gh2z2_prime2,gh2z3_prime2,gh2z4_prime2
@@ -71,6 +78,7 @@ c---- NOTE: Please add new future couplings in the same order for both declarati
       double precision Lambda2_w11,Lambda2_w21,Lambda2_w31,Lambda2_w41
       double precision Lambda2_w12,Lambda2_w22,Lambda2_w32,Lambda2_w42
       double precision Lambda2_w10,Lambda2_w20,Lambda2_w30,Lambda2_w40
+
       double complex gh2w1,gh2w2,gh2w3,gh2w4
       double complex gh2w1_prime,gh2w2_prime,gh2w3_prime,gh2w4_prime
       double complex gh2w1_prime2,gh2w2_prime2,gh2w3_prime2,gh2w4_prime2
@@ -81,9 +89,9 @@ c---- NOTE: Please add new future couplings in the same order for both declarati
       double complex gh2w1_prime7,gh2w2_prime7,gh2w3_prime7,gh2w4_prime7
 
       logical AllowAnomalousCouplings,distinguish_HWWcouplings
-      logical AnomalCouplPR,AnomalCouplDK
 
       common/spinzerohiggs_anomcoupl/
+     & AnomalCouplPR,AnomalCouplDK,
      & channeltoggle_stu,vvhvvtoggle_vbfvh,
      & cz_q1sq,cz_q2sq,cz_q12sq,
      & cw_q1sq,cw_q2sq,cw_q12sq,
@@ -117,7 +125,6 @@ c---- NOTE: Please add new future couplings in the same order for both declarati
      & ghw1_prime5,ghw2_prime5,ghw3_prime5,ghw4_prime5,
      & ghw1_prime6,ghw2_prime6,ghw3_prime6,ghw4_prime6,
      & ghw1_prime7,ghw2_prime7,ghw3_prime7,ghw4_prime7,
-
      & h2mass,h2width,
      & Lambda2BSM,Lambda2_Q,
      & Lambda2_z1,Lambda2_z2,Lambda2_z3,Lambda2_z4,
@@ -147,7 +154,5 @@ c---- NOTE: Please add new future couplings in the same order for both declarati
      & gh2w1_prime5,gh2w2_prime5,gh2w3_prime5,gh2w4_prime5,
      & gh2w1_prime6,gh2w2_prime6,gh2w3_prime6,gh2w4_prime6,
      & gh2w1_prime7,gh2w2_prime7,gh2w3_prime7,gh2w4_prime7,
-
      & AllowAnomalousCouplings,
-     & distinguish_HWWcouplings,
-     & AnomalCouplPR,AnomalCouplDK
+     & distinguish_HWWcouplings

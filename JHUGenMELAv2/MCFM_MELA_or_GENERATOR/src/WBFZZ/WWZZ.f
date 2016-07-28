@@ -178,12 +178,12 @@ C--   MARKUS: separate production and decay for s-channel Higgs
            Amp_S_PR=czip
            Amp_S_DK=czip
          else
-           if( AnomalCouplPR ) then
+           if( AnomalCouplPR.eq.1 ) then
       Amp_S_PR=-anomhwwamp(i7,i1,i8,i2,1,s3456,s(i7,i1),s(i8,i2),za,zb)
            else
       Amp_S_PR=za(i7,i8)*zb(i2,i1)
           endif
-           if( AnomalCouplDK ) then
+           if( AnomalCouplDK.eq.1 ) then
       Amp_S_DK=-anomhzzamp(i3,i4,i5,i6,1,s3456,s(i7,i1),s(i8,i2),za,zb)
            else
       Amp_S_DK=za(i3,i5)*zb(i6,i4)
@@ -199,12 +199,12 @@ C----Second resonance
            Amp_S_PR=czip
            Amp_S_DK=czip
          else
-           if( AnomalCouplPR ) then
+           if( AnomalCouplPR.eq.1 ) then
       Amp_S_PR=-anomhwwamp(i7,i1,i8,i2,2,s3456,s(i7,i1),s(i8,i2),za,zb)
            else
       Amp_S_PR=za(i7,i8)*zb(i2,i1)
           endif
-           if( AnomalCouplDK ) then
+           if( AnomalCouplDK.eq.1 ) then
       Amp_S_DK=-anomhzzamp(i3,i4,i5,i6,2,s3456,s(i7,i1),s(i8,i2),za,zb)
            else
       Amp_S_DK=za(i3,i5)*zb(i6,i4)
@@ -212,8 +212,7 @@ C----Second resonance
          endif
          WWZZamp(h34,h56)=WWZZamp(h34,h56)
      &    -2d0*sqzmass/cxw**2*ZZ3456(h34,h56)
-     &     *anomhzzamp(i3,i4,i5,i6,2,s3456,s(i7,i1),s(i8,i2),za,zb)
-     &     *anomhwwamp(i7,i1,i8,i2,2,s3456,s(i7,i1),s(i8,i2),za,zb)
+     &     *Amp_S_DK*Amp_S_PR
      &    /(propWBF*propX3456)*Hbit
         enddo
       enddo
