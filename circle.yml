@@ -5,6 +5,7 @@ machine:
     - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.6 10
     - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.9 20
     - sudo apt-get install dos2unix
+    - sudo apt-get install cadaver
   environment:
     #environment variables can only be set in this section so . bin/thisroot.sh doesn't work
     PATH: "$(echo /home/ubuntu/root/bin:/home/ubuntu/CMSJHU_AnalysisMacros/JHUSpinWidthPaper_2015/LHEAnalyzer:$PATH | sed s/:$//)"
@@ -22,6 +23,31 @@ dependencies:
      - if ! [ -d ~/root ]; then cd && wget https://root.cern.ch/download/root_v6.04.08.Linux-ubuntu14-x86_64-gcc4.8.tar.gz && tar -xvzf root_v6.04.08.Linux-ubuntu14-x86_64-gcc4.8.tar.gz; fi
      - cd ~ && if ! [ -d CMSJHU_AnalysisMacros ]; then git clone -b noMELA git@github.com:hroskes/CMSJHU_AnalysisMacros; fi && cd CMSJHU_AnalysisMacros/JHUSpinWidthPaper_2015/LHEAnalyzer && git pull && make all
      - if ! [ -d ~/checklhe ]; then cd ~ && git clone -b lite git@github.com:hroskes/checklhe; else cd ~/checklhe && git pull; fi
+     #make sure no big files are accidentally committed (>50 MB)
+     #can change this if we need a bigger file in the repository, but at least get a warning
+     #http://stackoverflow.com/questions/10622179/how-to-find-identify-large-files-commits-in-git-history#comment46022100_20460121
+     #file sizes are written in bytes, 50 MB = 50*1024^2 bytes
+     - |
+       cd .. &&
+       git gc &&
+       join -e ERROR -a 2 -j 1 -o 2.1,2.3,1.2 --check-order <( git rev-list --objects --all | sort -k 1 ) <( git verify-pack -v .git/objects/pack/pack-*.idx | gawk '( NF == 5 && $2 == "blob" ){print}' | sort -k1 ) | sort -k2gr > $CIRCLE_ARTIFACTS/filesizes.txt &&
+       if ! [ $(head -1 $CIRCLE_ARTIFACTS/filesizes.txt | sed -r 's/.* (.*) .*/\1/') -lt 52428800 ]; then
+          cd ~ &&
+          rm -rf JHUGen &&
+          git clone "git@github.com:$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME" &&
+          cd JHUGen &&
+          if [ "$CIRCLE_BRANCH" ]; then
+            git checkout "$CIRCLE_BRANCH"
+          elif [ "$CIRCLE_TAG" ]; then
+            git checkout "$CIRCLE_TAG"
+          else
+            git checkout "$CIRCLE_SHA1"
+          fi &&
+          join -e ERROR -a 2 -j 1 -o 2.1,2.3,1.2 --check-order <( git rev-list --objects --all | sort -k 1 ) <( git verify-pack -v .git/objects/pack/pack-*.idx | gawk '( NF == 5 && $2 == "blob" ){print}' | sort -k1 ) | sort -k2gr > $CIRCLE_ARTIFACTS/filesizes.txt &&
+          if ! [ $(head -1 $CIRCLE_ARTIFACTS/filesizes.txt | sed -r 's/.* (.*) .*/\1/') -lt 52428800 ]; then
+            echo 'There is a big file committed to the repository.  Check filesizes.txt in the artifacts.'; exit 1
+          fi
+       fi
      - cd pdfs && ./downloadNNPDF.sh
      - cd pdfs && ./downloadNNPDF.sh:
          pwd:
@@ -43,6 +69,7 @@ test:
     - make:
          pwd:
            ../JHUGenMELA
+
   override:
     #here we want to generate as many production modes as possible and get the widest range of events to check for syntax issues
     #the actual checking (checklhe) is done in post

@@ -4,7 +4,7 @@
 # contact Yanyan Gao (Yanyan.Gao@cern.SPAMNOT.ch) or Ulascan Sarica (ulascan.sarica@cern.SPAMNOT.ch)
 #========================================================
 
-1. Make the MCFM library libmcfm_7p0.so (a copy that works for a good range of software releases in slc6 and slc5 is provided) outside of the JHUGenMELA/ggZZ_MCFM
+1. Make the MCFM library libmcfm_7p0.so (a copy that works for a good range of software releases in slc6 and slc5 is available on the downloads page of the website, or using the script downloadlibmcfm.sh in this directory) outside of the JHUGenMELA/ggZZ_MCFM
 
    1) Download MCFM 
    
