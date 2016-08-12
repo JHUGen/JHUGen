@@ -80,13 +80,13 @@ c------ HZZ=-HWW DECAY CONVENTIONS
 
 c------ FORM FACTORS FOR ANOMALOUS COUPLINGS
 c L1L2
-      FFa1 = za(3,5)*zb(4,6)*shat
-      FFa2 = -0.5d0*za(3,5)**2*zb(3,6)*zb(4,5) 
-     &       -0.5d0*za(3,5)*za(3,6)*zb(3,6)*zb(4,6) 
-     &       -0.5d0*za(3,5)*za(4,5)*zb(4,5)*zb(4,6) 
-     &       -0.5d0*za(3,6)*za(4,5)*zb(4,6)**2
-      FFa3 =  0.5d0*za(3,4)*za(5,6)*zb(4,6)**2 
-     &       -0.5d0*za(3,5)**2*zb(3,4)*zb(5,6)
+      FFa1 = za(i3,i5)*zb(i4,i6)*shat
+      FFa2 = -0.5d0*za(i3,i5)**2*zb(i3,i6)*zb(i4,i5) 
+     &       -0.5d0*za(i3,i5)*za(i3,i6)*zb(i3,i6)*zb(i4,i6) 
+     &       -0.5d0*za(i3,i5)*za(i4,i5)*zb(i4,i5)*zb(i4,i6) 
+     &       -0.5d0*za(i3,i6)*za(i4,i5)*zb(i4,i6)**2
+      FFa3 =  0.5d0*za(i3,i4)*za(i5,i6)*zb(i4,i6)**2 
+     &       -0.5d0*za(i3,i5)**2*zb(i3,i4)*zb(i5,i6)
 
       FFa3 = FFa3 * (0d0,-1d0)!  phase convention to match JHUGen
 

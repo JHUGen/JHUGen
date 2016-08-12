@@ -173,18 +173,17 @@ C-- MARKUS: this is the old (original) MCFM code
 !      &    /(propWBF*prop3456)*Hbit
 !
 
-C--   MARKUS: separate production and decay for s-channel Higgs
-         if( hmass.lt.zip ) then
-           Amp_S_PR=czip
-           Amp_S_DK=czip
-         else
+         WWZZamp(h34,h56)=czip
+         Amp_S_PR=czip
+         Amp_S_DK=czip
+         if( hmass.ge.zip ) then
            if( AnomalCouplPR.eq.1 ) then
       Amp_S_PR=-anomhwwamp(i7,i1,i8,i2,1,s3456,s(i7,i1),s(i8,i2),za,zb)
            else
       Amp_S_PR=za(i7,i8)*zb(i2,i1)
           endif
            if( AnomalCouplDK.eq.1 ) then
-      Amp_S_DK=-anomhzzamp(i3,i4,i5,i6,1,s3456,s(i7,i1),s(i8,i2),za,zb)
+      Amp_S_DK=-anomhzzamp(i3,i4,i5,i6,1,s3456,s(i3,i4),s(i5,i6),za,zb)
            else
       Amp_S_DK=za(i3,i5)*zb(i6,i4)
            endif
@@ -195,10 +194,9 @@ C--   MARKUS: separate production and decay for s-channel Higgs
      &    /(propWBF*prop3456)*Hbit
 
 C----Second resonance
-        if( h2mass.lt.zip ) then
-           Amp_S_PR=czip
-           Amp_S_DK=czip
-         else
+         Amp_S_PR=czip
+         Amp_S_DK=czip
+         if( h2mass.ge.zip ) then
            if( AnomalCouplPR.eq.1 ) then
       Amp_S_PR=-anomhwwamp(i7,i1,i8,i2,2,s3456,s(i7,i1),s(i8,i2),za,zb)
            else

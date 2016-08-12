@@ -122,19 +122,15 @@ C-- MARKUS: this is the old (original) MCFM code
 !      & +fac*ZZ2856(jdu1,h17,h56)*ZZ1734(jdu2,h28,h34)
 !      & *za(i7,i5)*zb(i6,i1)*za(i8,i3)*zb(i4,i2)
 !      & /(propWBF*prop1756)
+
+      ZZHamp(jdu1,jdu2,h17,h28,h34,h56)=czip
+      
       Amp_S_PR=czip
       Amp_S_DK=czip
       Amp_T_PR=czip
       Amp_T_DK=czip
       Amp_U_PR=czip
       Amp_U_DK=czip
-
-!      write(6,*) "channeltoggle_stu=",channeltoggle_stu
-!      write(6,*) "AnomalCouplPR=",AnomalCouplPR
-!      write(6,*) "AnomalCouplDK=",AnomalCouplDK
-!      write(6,*) "AllowAnomalousCouplings=",AllowAnomalousCouplings
-!      write(6,*) "distinguish_HWWcouplings=",distinguish_HWWcouplings
-
       if( hmass.ge.zip ) then
 
         if(channeltoggle_stu.ne.1) then
@@ -186,6 +182,23 @@ C-- MARKUS: this is the old (original) MCFM code
         endif
 
       endif
+      ZZHamp(jdu1,jdu2,h17,h28,h34,h56)=
+     & ZZHamp(jdu1,jdu2,h17,h28,h34,h56)
+     & +fac/propWBF*(
+C---s-channel
+     & ZZ3456(h34,h56)*ZZ1728(jdu1,jdu2,h17,h28)*Amp_S_DK*Amp_S_PR
+C---t-channel
+     & +ZZ1734(jdu1,h17,h34)*ZZ2856(jdu2,h28,h56)*Amp_T_DK*Amp_T_PR
+C---u-channel
+     & +ZZ2856(jdu1,h17,h56)*ZZ1734(jdu2,h28,h34)*Amp_U_DK*Amp_U_PR
+     & )
+
+      Amp_S_PR=czip
+      Amp_S_DK=czip
+      Amp_T_PR=czip
+      Amp_T_DK=czip
+      Amp_U_PR=czip
+      Amp_U_DK=czip
       if( h2mass.ge.zip ) then
 
         if(channeltoggle_stu.ne.1) then
@@ -233,8 +246,8 @@ C-- MARKUS: this is the old (original) MCFM code
         endif
 
       endif
-
       ZZHamp(jdu1,jdu2,h17,h28,h34,h56)=
+     & ZZHamp(jdu1,jdu2,h17,h28,h34,h56)
      & +fac/propWBF*(
 C---s-channel
      & ZZ3456(h34,h56)*ZZ1728(jdu1,jdu2,h17,h28)*Amp_S_DK*Amp_S_PR
