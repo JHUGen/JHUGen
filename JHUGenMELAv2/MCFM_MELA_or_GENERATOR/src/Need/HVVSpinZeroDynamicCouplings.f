@@ -17,8 +17,8 @@
          logical doQ2_012_Coupl
 
          forceZZcoupl = .not.tryWW
-         forceZZcoupl = forceZZcoupl .or. .not.distinguish_HWWcouplings
-         forceZZcoupl = forceZZcoupl .or. (ic.gt.4)
+         forceZZcoupl = forceZZcoupl.or.(distinguish_HWWcouplings.ne.1)
+         forceZZcoupl = forceZZcoupl.or.(ic.gt.4)
 
          doQ2_012_Coupl = .false.
          sWp_signed=zip

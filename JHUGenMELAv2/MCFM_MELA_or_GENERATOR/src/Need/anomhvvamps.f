@@ -3,7 +3,7 @@
       implicit none
       include 'mxpart.f'
       include 'masses.f'
-      include 'anom_higgs.f' 
+      include 'anom_higgs.f'
       include 'spinzerohiggs_anomcoupl.f'
       include 'zprods_decl.f'
       double complex anomhzzamp
@@ -14,16 +14,16 @@
       double complex aa1,aa2,aa3
 
 c------ HZZ DECAY CONVENTIONS
-      IF( AllowAnomalousCouplings ) THEN
+      IF( AllowAnomalousCouplings.eq.1 ) THEN
 
 c------ FORM FACTORS FOR ANOMALOUS COUPLINGS
 c L1L2
       FFa1 = za(i3,i5)*zb(i4,i6)*shat
-      FFa2 = -0.5d0*za(i3,i5)**2*zb(i3,i6)*zb(i4,i5) 
-     &       -0.5d0*za(i3,i5)*za(i3,i6)*zb(i3,i6)*zb(i4,i6) 
-     &       -0.5d0*za(i3,i5)*za(i4,i5)*zb(i4,i5)*zb(i4,i6) 
+      FFa2 = -0.5d0*za(i3,i5)**2*zb(i3,i6)*zb(i4,i5)
+     &       -0.5d0*za(i3,i5)*za(i3,i6)*zb(i3,i6)*zb(i4,i6)
+     &       -0.5d0*za(i3,i5)*za(i4,i5)*zb(i4,i5)*zb(i4,i6)
      &       -0.5d0*za(i3,i6)*za(i4,i5)*zb(i4,i6)**2
-      FFa3 =  0.5d0*za(i3,i4)*za(i5,i6)*zb(i4,i6)**2 
+      FFa3 =  0.5d0*za(i3,i4)*za(i5,i6)*zb(i4,i6)**2
      &       -0.5d0*za(i3,i5)**2*zb(i3,i4)*zb(i5,i6)
 
       FFa3 = FFa3 * (0d0,-1d0)!  phase convention to match JHUGen
@@ -58,14 +58,14 @@ c--- q^2 dependent couplings
       return
 
       end
-      
+
 
       !-- H -> [l^-(i3) lb(i4)] [l^-(i5) lb(i6)]
       function anomhwwamp(i3,i4,i5,i6,jh,shat,q3_q3,q4_q4,za,zb)
       implicit none
       include 'mxpart.f'
       include 'masses.f'
-      include 'anom_higgs.f' 
+      include 'anom_higgs.f'
       include 'spinzerohiggs_anomcoupl.f'
       include 'zprods_decl.f'
       double complex anomhwwamp
@@ -76,16 +76,16 @@ c--- q^2 dependent couplings
       double complex aa1,aa2,aa3
 
 c------ HZZ=-HWW DECAY CONVENTIONS
-      IF( AllowAnomalousCouplings ) THEN
+      IF( AllowAnomalousCouplings.eq.1 ) THEN
 
 c------ FORM FACTORS FOR ANOMALOUS COUPLINGS
 c L1L2
       FFa1 = za(i3,i5)*zb(i4,i6)*shat
-      FFa2 = -0.5d0*za(i3,i5)**2*zb(i3,i6)*zb(i4,i5) 
-     &       -0.5d0*za(i3,i5)*za(i3,i6)*zb(i3,i6)*zb(i4,i6) 
-     &       -0.5d0*za(i3,i5)*za(i4,i5)*zb(i4,i5)*zb(i4,i6) 
+      FFa2 = -0.5d0*za(i3,i5)**2*zb(i3,i6)*zb(i4,i5)
+     &       -0.5d0*za(i3,i5)*za(i3,i6)*zb(i3,i6)*zb(i4,i6)
+     &       -0.5d0*za(i3,i5)*za(i4,i5)*zb(i4,i5)*zb(i4,i6)
      &       -0.5d0*za(i3,i6)*za(i4,i5)*zb(i4,i6)**2
-      FFa3 =  0.5d0*za(i3,i4)*za(i5,i6)*zb(i4,i6)**2 
+      FFa3 =  0.5d0*za(i3,i4)*za(i5,i6)*zb(i4,i6)**2
      &       -0.5d0*za(i3,i5)**2*zb(i3,i4)*zb(i5,i6)
 
       FFa3 = FFa3 * (0d0,-1d0)!  phase convention to match JHUGen
@@ -104,8 +104,8 @@ c--- q^2-dependent couplings
      &     -ghw3_dyn*(shat-q3_q3-q4_q4)/2d0/LambdaBSM**2
       aa3 =-2d0*ghw4_dyn
 
-      aa1 = aa1 / wmass**2 
-      aa2 = aa2 / wmass**2 
+      aa1 = aa1 / wmass**2
+      aa2 = aa2 / wmass**2
       aa3 = aa3 / wmass**2
 
       anomhwwamp = ( aa1*FFa1 + aa2*FFa2 + aa3*FFa3 )
@@ -119,4 +119,4 @@ c--- q^2-dependent couplings
       return
 
       end
-      
+

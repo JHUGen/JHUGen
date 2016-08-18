@@ -10,6 +10,8 @@ c---- prime 7: |q1**2| * |q2**2|
 c---- NOTE: Please add new future couplings in the same order for both declaration and the common block
 
 
+      integer AllowAnomalousCouplings,distinguish_HWWcouplings
+
       integer AnomalCouplPR
       integer AnomalCouplDK
       integer channeltoggle_stu ! 0, 1, 2 for s, t+u and s+t+u
@@ -88,9 +90,9 @@ c---- NOTE: Please add new future couplings in the same order for both declarati
       double complex gh2w1_prime6,gh2w2_prime6,gh2w3_prime6,gh2w4_prime6
       double complex gh2w1_prime7,gh2w2_prime7,gh2w3_prime7,gh2w4_prime7
 
-      logical AllowAnomalousCouplings,distinguish_HWWcouplings
-
       common/spinzerohiggs_anomcoupl/
+     & AllowAnomalousCouplings,
+     & distinguish_HWWcouplings,
      & AnomalCouplPR,AnomalCouplDK,
      & channeltoggle_stu,vvhvvtoggle_vbfvh,
      & cz_q1sq,cz_q2sq,cz_q12sq,
@@ -153,6 +155,4 @@ c---- NOTE: Please add new future couplings in the same order for both declarati
      & gh2w1_prime4,gh2w2_prime4,gh2w3_prime4,gh2w4_prime4,
      & gh2w1_prime5,gh2w2_prime5,gh2w3_prime5,gh2w4_prime5,
      & gh2w1_prime6,gh2w2_prime6,gh2w3_prime6,gh2w4_prime6,
-     & gh2w1_prime7,gh2w2_prime7,gh2w3_prime7,gh2w4_prime7,
-     & AllowAnomalousCouplings,
-     & distinguish_HWWcouplings
+     & gh2w1_prime7,gh2w2_prime7,gh2w3_prime7,gh2w4_prime7

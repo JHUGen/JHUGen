@@ -28,9 +28,9 @@ c#ifndef CompileForMELA
 c      include 'spinzerohiggs_anomcoupl.f'
 
 cc     MARKUS: anomalous couplings for H resonance
-c      data AllowAnomalousCouplings / .false. /
-c      data distinguish_HWWcouplings / .false. /
-c      data AnomalCouplPR,AnomalCouplDK / .true., .true./
+c      data AllowAnomalousCouplings / 0 /
+c      data distinguish_HWWcouplings / 0 /
+c      data AnomalCouplPR,AnomalCouplDK / 1, 1/
 
 c      data LambdaBSM / 1000d0 /
 c      data Lambda_Q  / 10000d0 /
