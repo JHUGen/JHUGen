@@ -4604,7 +4604,7 @@ integer :: TheUnit
     write(TheUnit,"(A90)") " *   Spin and parity determination of single-produced resonances at hadron colliders   *"
     write(TheUnit,"(A90)") " *                                                                                     *"
     write(TheUnit,"(A90)") " *          I. Anderson, S. Bolognesi, F. Caola, Y. Gao, A. Gritsan, Z. Guo,           *"
-    write(TheUnit,"(A90)") " *        C. Martin, K. Melnikov, R.Rontsch, H. Roskes, U. Sarica, M. Schulze,         *"
+    write(TheUnit,"(A90)") " *        C. Martin, K. Melnikov, R. Rontsch, H. Roskes, U. Sarica, M. Schulze,        *"
     write(TheUnit,"(A90)") " *                   N. Tran, A. Whitbeck, M. Xiao, C. You, Y. Zhou                    *"
     write(TheUnit,"(A90)") " *               Phys.Rev. D81 (2010) 075022;  arXiv:1001.3396  [hep-ph],              *"
     write(TheUnit,"(A90)") " *               Phys.Rev. D86 (2012) 095031;  arXiv:1208.4018  [hep-ph],              *"
