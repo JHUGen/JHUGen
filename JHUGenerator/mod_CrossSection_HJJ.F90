@@ -13,6 +13,7 @@ FUNCTION EvalWeighted_HJJ_fulldecay(yRnd,VgsWgt)
 use ModKinematics
 use ModParameters
 use ModHiggsjj
+use ModHiggs
 use ModMisc
 #if compiler==1
 use ifport
@@ -20,13 +21,13 @@ use ifport
 implicit none
 integer,parameter :: mxpart=14 ! this has to match the MCFM parameter
 real(8) :: yRnd(1:18),VgsWgt, EvalWeighted_HJJ_fulldecay
-real(8) :: pdf(-6:6,1:2)           ,me2(-5:5,-5:5)
+real(8) :: pdf(-6:6,1:2)           ,me2(-5:5,-5:5),me2_tmpzz(-5:5,-5:5),me2_tmpww(-5:5,-5:5),me2_hdk,me2_prop
 real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi
 real(8) :: MomExt(1:4,1:10),PSWgt
 real(8) :: p_MCFM(mxpart,1:4),msq_MCFM(-5:5,-5:5)
 complex(8) :: HZZcoupl(1:32),HWWcoupl(1:32)
 integer :: MY_IDUP(1:10),ICOLUP(1:2,1:10),NBin(1:NumHistograms),NHisto
-integer :: iPartChannel,PartChannelAvg,NumPartonicChannels,ijSel(1:121,1:3)
+integer :: iPartChannel,PartChannelAvg,NumPartonicChannels,ijSel(1:121,1:3),i,j,iflip
 real(8) :: LO_Res_Unpol, PreFac,VegasWeighted_HJJ_fulldecay,xRnd
 logical :: applyPSCut
 integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, Lep1M=8, Lep2P=9, Lep2M=10
@@ -113,24 +114,13 @@ NumPartonicChannels = 2
    HWWcoupl(4) = ghw4
    HWWcoupl(5:) = (0d0,0d0)
 
-!    print *, (MomExt(1:4,1)).dot.(MomExt(1:4,1))
-!    print *, (MomExt(1:4,2)).dot.(MomExt(1:4,2))
-!    print *, (MomExt(1:4,3)).dot.(MomExt(1:4,3))
-!    print *, (MomExt(1:4,4)).dot.(MomExt(1:4,4))
-!    print *, (MomExt(1:4,7)).dot.(MomExt(1:4,7))
-!    print *, (MomExt(1:4,8)).dot.(MomExt(1:4,8))
-!    print *, (MomExt(1:4,9)).dot.(MomExt(1:4,9))
-!    print *, (MomExt(1:4,10)).dot.(MomExt(1:4,10))
-!    print *, "---"
-!    print *, p_MCFM(1,1:4)+p_MCFM(2,1:4)  +p_MCFM(3,1:4)+p_MCFM(4,1:4)  +p_MCFM(5,1:4)+p_MCFM(6,1:4)  +p_MCFM(7,1:4) +p_MCFM(8,1:4)
-!    print *, p_MCFM(1,4)**2-p_MCFM(1,1)**2-p_MCFM(1,2)**2-p_MCFM(1,3)**2
-!    print *, p_MCFM(2,4)**2-p_MCFM(2,1)**2-p_MCFM(2,2)**2-p_MCFM(2,3)**2
-!    print *, p_MCFM(3,4)**2-p_MCFM(3,1)**2-p_MCFM(3,2)**2-p_MCFM(3,3)**2
-!    print *, p_MCFM(4,4)**2-p_MCFM(4,1)**2-p_MCFM(4,2)**2-p_MCFM(4,3)**2
-!    print *, p_MCFM(5,4)**2-p_MCFM(5,1)**2-p_MCFM(5,2)**2-p_MCFM(5,3)**2
-!    print *, p_MCFM(6,4)**2-p_MCFM(6,1)**2-p_MCFM(6,2)**2-p_MCFM(6,3)**2
-!    print *, p_MCFM(7,4)**2-p_MCFM(7,1)**2-p_MCFM(7,2)**2-p_MCFM(7,3)**2
-!    print *, p_MCFM(8,4)**2-p_MCFM(8,1)**2-p_MCFM(8,2)**2-p_MCFM(8,3)**2
+   do i=1,10
+   print *,MomExt(1:4,i),(MomExt(1:4,i)).dot.(MomExt(1:4,i))
+   enddo
+    print *, "---"
+   do i=1,8
+   print *,p_MCFM(i,1:4)
+   enddo
 !    pause
 
 
@@ -147,12 +137,45 @@ NumPartonicChannels = 2
 
 
 !   CHECKS:
-!   print *, "new ",msq_MCFM(j,i)
+   print *,"msq_MCFM:"
+   do j=-5,5
+   print *, msq_MCFM(-5,j), msq_MCFM(-4,j), msq_MCFM(-3,j), msq_MCFM(-2,j), msq_MCFM(-1,j), msq_MCFM(0,j), msq_MCFM(1,j), msq_MCFM(2,j), msq_MCFM(3,j), msq_MCFM(4,j), msq_MCFM(5,j)
+   enddo
+   print *,""
+
+   me2(:,:)=0d0
+   do i=-5,5
+   do j=-5,5
+   me2_tmpzz(:,:)=0d0
+   me2_tmpww(:,:)=0d0
+   call EvalAmp_WBFH_UnSymm_SA_Select( (/MomExt(1:4,1),MomExt(1:4,2),MomExt(1:4,3),MomExt(1:4,4),MomExt(1:4,5)+MomExt(1:4,6)/),i,j,.true.,iflip,me2_tmpzz) ! calling on-shell VBF with stable Higgs
+   if (iflip.eq.2) then
+   call swap(me2_tmpzz(i,j),me2_tmpzz(j,i))
+   endif
+   call EvalAmp_WBFH_UnSymm_SA_Select( (/MomExt(1:4,1),MomExt(1:4,2),MomExt(1:4,3),MomExt(1:4,4),MomExt(1:4,5)+MomExt(1:4,6)/),i,j,.true.,iflip,me2_tmpww) ! calling on-shell VBF with stable Higgs
+   if (iflip.eq.1) then
+   call swap(me2_tmpww(i,j),me2_tmpww(j,i))
+   endif
+   me2 = me2 + me2_tmpzz + me2_tmpww
+   enddo
+   enddo
 !   call EvalAmp_WBFH_UnSymm_SA(MomExt(1:4,1:5),me2)
 ! !   msq_MCFM(:,:) = me2(:,:)
-!   print *, "old ",me2(i,j)
-!   print *, "rat", msq_MCFM(j,i)/me2(i,j)
-!   pause
+
+   call EvalAmp_H_VV( (/MomExt(1:4,5)+MomExt(1:4,6),(/0d0,0d0,0d0,0d0/),MomExt(1:4,7),MomExt(1:4,8),MomExt(1:4,9),MomExt(1:4,10)/),(/ElM_,ElP_,MuM_,MuP_/),me2_hdk)                     ! adding higgs decay
+   print *,"me2_hdk:",me2_hdk
+
+   me2_prop = cdabs(1d0/( ((MomExt(1:4,5)+MomExt(1:4,6)).dot.(MomExt(1:4,5)+MomExt(1:4,6))) - m_Reso**2 + (0d0,1d0)*m_Reso*Ga_Reso ))**2
+   print *,"me2_prop:",me2_prop
+
+   me2(:,:) = me2(:,:) * me2_hdk * me2_prop !  adding higgs propagator
+   print *,"me2:"
+   do j=-5,5
+   print *, me2(-5,j), me2(-4,j), me2(-3,j), me2(-2,j), me2(-1,j), me2(0,j), me2(1,j), me2(2,j), me2(3,j), me2(4,j), me2(5,j)
+   enddo
+   print *,""
+   !print *, "rat", msq_MCFM(j,i)/me2(i,j)
+   pause
 
 
    LO_Res_Unpol = msq_MCFM(iPart_sel,jPart_sel)  *  pdf(LHA2M_pdf(iPart_sel),1) * pdf(LHA2M_pdf(jPart_sel),2)
