@@ -98,6 +98,10 @@ c     ,j3_4(4,2),j5_6(4,2),
       lambda_z2 = lambda(2)
       lambda_z3 = lambda(3)
       lambda_z4 = lambda(4)
+      lambda_w1 = lambda_z1
+      lambda_w2 = lambda_z2
+      lambda_w3 = lambda_z3
+      lambda_w4 = lambda_z4
 
       !-- coupling 1-4 and lambdas are missing
       ghz1 = zzcoupl(1) !-- check that these are correct according to Markus' definition
