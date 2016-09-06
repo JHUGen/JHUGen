@@ -89,7 +89,7 @@ c     ,j3_4(4,2),j5_6(4,2),
       data wmass,wwidth/80.399d0,2.085d0/
       data zmass,zwidth/91.1876d0,2.4952d0/
       data Gf,vevsq/1.16639d-5,246d0/
-      data gw,xw,gwsq,esq/0.42464d0,0.23119d0,0.1d0,0.3133285d0/
+      data gw,xw,gwsq,esq/0.65307d0,0.23119d0,0.426501d0,0.313329d0/
 
       lambdaBSM = lambda_BSM
       lambda_Q = lambdaQ
@@ -110,74 +110,74 @@ c     ,j3_4(4,2),j5_6(4,2),
       ghz4 = zzcoupl(4)
 
       ghz1_prime = zzcoupl(5) !-- from here on taken from Markus
-      ghz1_prime2= zzcoupl(6) 
-      ghz1_prime3= zzcoupl(7) 
+      ghz1_prime2= zzcoupl(6)
+      ghz1_prime3= zzcoupl(7)
       ghz1_prime4= zzcoupl(8)
       ghz1_prime5= zzcoupl(9)
-      
-      ghz2_prime = zzcoupl(10) 
+
+      ghz2_prime = zzcoupl(10)
       ghz2_prime2= zzcoupl(11)
       ghz2_prime3= zzcoupl(12)
       ghz2_prime4= zzcoupl(13)
       ghz2_prime5= zzcoupl(14)
-      
+
       ghz3_prime = zzcoupl(15)
       ghz3_prime2= zzcoupl(16)
       ghz3_prime3= zzcoupl(17)
       ghz3_prime4= zzcoupl(18)
       ghz3_prime5= zzcoupl(19)
-      
+
       ghz4_prime = zzcoupl(20)
       ghz4_prime2= zzcoupl(21)
       ghz4_prime3= zzcoupl(22)
       ghz4_prime4= zzcoupl(23)
       ghz4_prime5= zzcoupl(24)
-      
+
       ghz1_prime6= zzcoupl(25)
       ghz1_prime7= zzcoupl(26)
-      
+
       ghz2_prime6= zzcoupl(27)
       ghz2_prime7= zzcoupl(28)
-      
+
       ghz3_prime6= zzcoupl(29)
       ghz3_prime7= zzcoupl(30)
-      
+
       ghz4_prime6= zzcoupl(31)
       ghz4_prime7= zzcoupl(32)
-      
-      ghz1_prime = zzcoupl(5) 
-      ghz1_prime2= zzcoupl(6) 
-      ghz1_prime3= zzcoupl(7) 
+
+      ghz1_prime = zzcoupl(5)
+      ghz1_prime2= zzcoupl(6)
+      ghz1_prime3= zzcoupl(7)
       ghz1_prime4= zzcoupl(8)
       ghz1_prime5= zzcoupl(9)
-      
-      ghz2_prime = zzcoupl(10) 
+
+      ghz2_prime = zzcoupl(10)
       ghz2_prime2= zzcoupl(11)
       ghz2_prime3= zzcoupl(12)
       ghz2_prime4= zzcoupl(13)
       ghz2_prime5= zzcoupl(14)
-      
+
       ghz3_prime = zzcoupl(15)
       ghz3_prime2= zzcoupl(16)
       ghz3_prime3= zzcoupl(17)
       ghz3_prime4= zzcoupl(18)
       ghz3_prime5= zzcoupl(19)
-      
+
       ghz4_prime = zzcoupl(20)
       ghz4_prime2= zzcoupl(21)
       ghz4_prime3= zzcoupl(22)
       ghz4_prime4= zzcoupl(23)
       ghz4_prime5= zzcoupl(24)
-      
+
       ghz1_prime6= zzcoupl(25)
       ghz1_prime7= zzcoupl(26)
-      
+
       ghz2_prime6= zzcoupl(27)
       ghz2_prime7= zzcoupl(28)
-      
+
       ghz3_prime6= zzcoupl(29)
       ghz3_prime7= zzcoupl(30)
-      
+
       ghz4_prime6= zzcoupl(31)
       ghz4_prime7= zzcoupl(32)
 
@@ -187,80 +187,80 @@ c     ,j3_4(4,2),j5_6(4,2),
       ghw3 = wwcoupl(3)
       ghw4 = wwcoupl(4)
 
-      ghw1_prime = wwcoupl(5) 
-      ghw1_prime2= wwcoupl(6) 
-      ghw1_prime3= wwcoupl(7) 
+      ghw1_prime = wwcoupl(5)
+      ghw1_prime2= wwcoupl(6)
+      ghw1_prime3= wwcoupl(7)
       ghw1_prime4= wwcoupl(8)
       ghw1_prime5= wwcoupl(9)
-      
-      ghw2_prime = wwcoupl(10) 
+
+      ghw2_prime = wwcoupl(10)
       ghw2_prime2= wwcoupl(11)
       ghw2_prime3= wwcoupl(12)
       ghw2_prime4= wwcoupl(13)
       ghw2_prime5= wwcoupl(14)
-      
+
       ghw3_prime = wwcoupl(15)
       ghw3_prime2= wwcoupl(16)
       ghw3_prime3= wwcoupl(17)
       ghw3_prime4= wwcoupl(18)
       ghw3_prime5= wwcoupl(19)
-      
+
       ghw4_prime = wwcoupl(20)
       ghw4_prime2= wwcoupl(21)
       ghw4_prime3= wwcoupl(22)
       ghw4_prime4= wwcoupl(23)
       ghw4_prime5= wwcoupl(24)
-      
+
       ghw1_prime6= wwcoupl(25)
       ghw1_prime7= wwcoupl(26)
-      
+
       ghw2_prime6= wwcoupl(27)
       ghw2_prime7= wwcoupl(28)
-      
+
       ghw3_prime6= wwcoupl(29)
       ghw3_prime7= wwcoupl(30)
-      
+
       ghw4_prime6= wwcoupl(31)
       ghw4_prime7= wwcoupl(32)
-      
-      ghw1_prime = wwcoupl(5) 
-      ghw1_prime2= wwcoupl(6) 
-      ghw1_prime3= wwcoupl(7) 
+
+      ghw1_prime = wwcoupl(5)
+      ghw1_prime2= wwcoupl(6)
+      ghw1_prime3= wwcoupl(7)
       ghw1_prime4= wwcoupl(8)
       ghw1_prime5= wwcoupl(9)
-      
-      ghw2_prime = wwcoupl(10) 
+
+      ghw2_prime = wwcoupl(10)
       ghw2_prime2= wwcoupl(11)
       ghw2_prime3= wwcoupl(12)
       ghw2_prime4= wwcoupl(13)
       ghw2_prime5= wwcoupl(14)
-      
+
       ghw3_prime = wwcoupl(15)
       ghw3_prime2= wwcoupl(16)
       ghw3_prime3= wwcoupl(17)
       ghw3_prime4= wwcoupl(18)
       ghw3_prime5= wwcoupl(19)
-      
+
       ghw4_prime = wwcoupl(20)
       ghw4_prime2= wwcoupl(21)
       ghw4_prime3= wwcoupl(22)
       ghw4_prime4= wwcoupl(23)
       ghw4_prime5= wwcoupl(24)
-      
+
       ghw1_prime6= wwcoupl(25)
       ghw1_prime7= wwcoupl(26)
-      
+
       ghw2_prime6= wwcoupl(27)
       ghw2_prime7= wwcoupl(28)
-      
+
       ghw3_prime6= wwcoupl(29)
       ghw3_prime7= wwcoupl(30)
-      
+
       ghw4_prime6= wwcoupl(31)
       ghw4_prime7= wwcoupl(32)
-      
-      
-!$omp threadprivate(doHO,doBO,mult)      
+
+
+!$omp threadprivate(doHO,doBO,mult)
       msq(:,:)=0d0
 
 c--- This calculation uses the complex-mass scheme (c.f. arXiv:hep-ph/0605312)
@@ -271,7 +271,7 @@ c--- and the following lines set up the appropriate masses and sin^2(theta_w)
        czmass2=dcmplx(zmass**2,-zmass*zwidth)
        cxw=cone-cwmass2/czmass2
        call couplz(xw)
-       
+
        ! MARKUS: choosing ZZ/gaga-->3l final states (not included in signal)
        l1=le
        l2=le
@@ -292,11 +292,12 @@ c       cxw=dcmplx(xw,0d0) ! DEBUG: Madgraph comparison
        write(6,*)
        doHO=.false.
        doBO=.false.
-       
-       runstring(4:5)="XX"
-!        runstring(4:5)="HO"
-       
-       
+
+
+!       runstring(4:5)="XX"
+        runstring(4:5)="HO"
+
+
        if     (runstring(4:5) .eq. 'HO') then
          doHO=.true.
        write(6,*) '>>>>>>>>>>>>>> Higgs contribution only <<<<<<<<<<<<<'
@@ -355,7 +356,7 @@ c--- propagators and currents are not used in calculation of Higgs contribution
       call jzero(j7(j),j2(j),zab,zba,j7_2)
       call jzero(j8(j),j1(j),zab,zba,j8_1)
       call jzero(j8(j),j2(j),zab,zba,j8_2)
- 
+
       call jone(j7(j),3,4,j1(j),za,zb,zab,zba,j7_34_1,jw7_34_1,jl7_34_1)
       call jone(j7(j),3,4,j2(j),za,zb,zab,zba,j7_34_2,jw7_34_2,jl7_34_2)
       call jone(j7(j),5,6,j1(j),za,zb,zab,zba,j7_56_1,jw7_56_1,jl7_56_1)
@@ -388,23 +389,23 @@ C-----Singly resonant production in VBF style diagrams
      & ZZ8341,WWp8341,WWm8341)
       call ZZSingleres(j1(j),j2(j),5,6,3,4,j8(j),j7(j),za,zb,
      & ZZ8561,WWp8561,WWm8561)
-     
+
       endif
-      
-      
-      
+
+
+
 ! C----ZZ->ZZ scattering with the exchange of a H
       call ZZHZZamp(j1(j),j2(j),3,4,5,6,j7(j),j8(j),
      & za,zb,ZZHamp71_82)
       call ZZHZZamp(j1(j),j2(j),3,4,5,6,j8(j),j7(j),
      & za,zb,ZZHamp81_72)
-C----Four boson vertex + WW->Higgs diagram 
+C----Four boson vertex + WW->Higgs diagram
       call WWZZ(j1(j),j2(j),3,4,5,6,j7(j),j8(j),
-     & za,zb,WWZZ71_82amp,srWWZZ71_82amp) 
+     & za,zb,WWZZ71_82amp,srWWZZ71_82amp)
       call WWZZ(j1(j),j2(j),3,4,5,6,j8(j),j7(j),
-     & za,zb,WWZZ81_72amp,srWWZZ81_72amp) 
+     & za,zb,WWZZ81_72amp,srWWZZ81_72amp)
 
- 
+
 
 C-----setup for (uqbq_uqbq) (2,5)->(2,5)
       do h1=1,2
@@ -416,8 +417,8 @@ C-----setup for (uqbq_uqbq) (2,5)->(2,5)
      & +cdotpr(j7_34_1(:,2,h1,h3),j8_56_2(:,1,h2,h5))*gmZ7341(2,1,h1,h2)
      & +cdotpr(jl7_34_1(:,2,h1,h3),jl8_56_2(:,1,h2,h5))*ll7341(h3,h5)
      & +cdotpr(j7_34_1(:,2,h1,h3),jl8_56_2(:,1,h2,h5))*gmZl8562(2,h1,h5)
-     & +cdotpr(jl7_34_1(:,2,h1,h3),j8_56_2(:,1,h2,h5))*gmZl7341(1,h2,h3) 
-         
+     & +cdotpr(jl7_34_1(:,2,h1,h3),j8_56_2(:,1,h2,h5))*gmZl7341(1,h2,h3)
+
       amp(uqbq_uqbq,h1,h2,h3,h5)=amp(uqbq_uqbq,h1,h2,h3,h5)
      & +cdotpr(j7_56_1(:,2,h1,h5),j8_34_2(:,1,h2,h3))*gmZ7561(2,1,h1,h2)
      & +cdotpr(jl7_56_1(:,2,h1,h5),jl8_34_2(:,1,h2,h3))*ll7561(h3,h5)
@@ -469,7 +470,7 @@ C-----setup for (uqcq_uqcq) (2,4)->(2,4)
      & +cdotpr(jl7_56_1(:,2,h1,h5),jl8_34_2(:,2,h2,h3))*ll7561(h3,h5)
      & +cdotpr(j7_56_1(:,2,h1,h5),jl8_34_2(:,2,h2,h3))*gmZl8342(2,h1,h3)
      & +cdotpr(jl7_56_1(:,2,h1,h5),j8_34_2(:,2,h2,h3))*gmZl7561(2,h2,h5)
-      
+
       amp(uqcq_uqcq,h1,h2,h3,h5)=amp(uqcq_uqcq,h1,h2,h3,h5)
      & +cdotpr(j7_3456_1(:,2,h1,h3,h5),j8_2(:,h2))*gmZ82(2,2,h1,h2)
      & +cdotpr(j7_1(:,h1),j8_3456_2(:,2,h2,h3,h5))*gmZ71(2,2,h1,h2)
@@ -490,7 +491,7 @@ c      write(6,*) h1,h2,h3,h5,esq**6*spinavge
 c     &   *dble(amp(uqcq_uqcq,h1,h2,h3,h5)
 c     & *dconjg(amp(uqcq_uqcq,h1,h2,h3,h5)))
 c      endif
-      
+
       enddo
       enddo
       enddo
@@ -536,10 +537,10 @@ C-----setup for uqsq_dqcq W diagrams (2,3)->(1,4)
       tempw(2,3)=tempw(2,3)+esq**6*spinavge
      &   *dble(amp(uqsq_dqcq,h1,h2,h3,h5)
      & *dconjg(amp(uqsq_dqcq,h1,h2,h3,h5)))
-      enddo     
-      enddo     
-      enddo     
-      enddo     
+      enddo
+      enddo
+      enddo
+      enddo
       temp(2,3)=temp(2,5)
 
 C-----setup for dqcq_uqsq (1,4)-->(2,3)
@@ -581,10 +582,10 @@ C-----setup for dqcq_uqsq (1,4)-->(2,3)
       tempw(1,4)=tempw(1,4)+esq**6*spinavge
      &   *dble(amp(dqcq_uqsq,h1,h2,h3,h5)
      & *dconjg(amp(dqcq_uqsq,h1,h2,h3,h5)))
-      enddo     
-      enddo     
-      enddo     
-      enddo     
+      enddo
+      enddo
+      enddo
+      enddo
 
 C-----setup for (dqcq_dqcq) (1,4)-->(1,4)
       do h1=1,2
@@ -658,21 +659,21 @@ C-----setup for dquq_dquq W diagrams (1,2)-->(1,2)
       ampa(dquq_dquq,h1,h2,h3,h5)=ampa(dquq_dquq,h1,h2,h3,h5)
      & -srWWZZ81_72amp(h3,h5) ! note minus sign instead of exchanging 1<->7,2<->8
       endif
-      
+
       ampa(dquq_dquq,h1,h2,h3,h5)=Bbit*ampa(dquq_dquq,h1,h2,h3,h5)         !  MARKUS: WW-->H
      & +WWZZ81_72amp(h3,h5)
       endif
 
 C--Fill Z exchange diagrams
       ampb(dquq_dquq,h1,h2,h3,h5)=amp(dqcq_dqcq,h1,h2,h3,h5)                ! MARKUS:  ZZ-->H
-       
+
       temp(1,2)=temp(1,2)+esq**6*spinavge           ! MARKUS:  WW-->H
      &   *dble(ampa(dquq_dquq,h1,h2,h3,h5)
      & *dconjg(ampa(dquq_dquq,h1,h2,h3,h5)))
       temp(1,2)=temp(1,2)+esq**6*spinavge           ! MARKUS:  ZZ-->H
      &   *dble(ampb(dquq_dquq,h1,h2,h3,h5)
      & *dconjg(ampb(dquq_dquq,h1,h2,h3,h5)))
-      temp(1,2)=temp(1,2)-2d0/xn*esq**6*spinavge    ! MARKUS:  interf. term 
+      temp(1,2)=temp(1,2)-2d0/xn*esq**6*spinavge    ! MARKUS:  interf. term
      &   *dble(ampa(dquq_dquq,h1,h2,h3,h5)
      & *dconjg(ampb(dquq_dquq,h1,h2,h3,h5)))
       enddo
@@ -707,10 +708,10 @@ C-----setup for (dqsq_dqsq) (1,3)-->(1,3)
       amp(dqsq_dqsq,h1,h2,h3,h5)=amp(dqsq_dqsq,h1,h2,h3,h5)
      & +ZZ7341(1,1,h1,h2,h3,h5)+ZZ7561(1,1,h1,h2,h5,h3)
       endif
-     
+
       amp(dqsq_dqsq,h1,h2,h3,h5)=Bbit*amp(dqsq_dqsq,h1,h2,h3,h5)
      & +Hbit*ZZHamp71_82(1,1,h1,h2,h3,h5)
-     
+
       temp(1,3)=temp(1,3)+esq**6*spinavge
      &   *dble(amp(dqsq_dqsq,h1,h2,h3,h5)
      & *dconjg(amp(dqsq_dqsq,h1,h2,h3,h5)))
@@ -779,7 +780,7 @@ C-----setup for ((dqdq_dqdq)  (1,1)-->(1,1)
       do h2=1,2
       do h3=1,2
       do h5=1,2
-     
+
 C-----------------ampa
       ampa(dqdq_dqdq,h1,h2,h3,h5)=amp(dqsq_dqsq,h1,h2,h3,h5)
 
@@ -825,8 +826,8 @@ C-----------------ampb
       enddo
       temp(3,3)=temp(1,1)
       temp(5,5)=temp(1,1)
-      
-      
+
+
  100  continue
 
       if (j.eq.1) then
@@ -879,7 +880,7 @@ c--- qbar-q
       enddo
       msq(-1,3)=msq(-1,3)+tempw(2,3)
       msq(-2,4)=msq(-2,4)+tempw(1,4)
-      
+
 c--- qbar-q
       elseif (j.eq.6) then
       do k=-nf,-1
@@ -916,7 +917,7 @@ c--- q-qbar
       enddo
       msq(1,-3)=msq(1,-3)+tempw(1,4)
       msq(2,-4)=msq(2,-4)+tempw(2,3)
-      
+
 c--- q-qbar extra pieces
       elseif (j.eq.9) then
       do k=1,nf
@@ -940,7 +941,7 @@ c--- q-qbar extra pieces
       endif
       enddo
       enddo
- 
+
 c--- qbar-q extra pieces
       elseif (j.eq.11) then
       do k=1,nf
@@ -964,16 +965,16 @@ c--- qbar-q extra pieces
       endif
       enddo
       enddo
-  
+
       endif
 
       enddo! MARKUS: this is the end of the j=1..jmax loop
 
-      
-      
-      
-      
-      
+
+
+
+
+
       return
 
    77 format(' *      W-mass^2     (',f11.5,',',f11.5,')      *')
@@ -981,11 +982,11 @@ c--- qbar-q extra pieces
    79 format(' *  sin^2(theta_w)   (',f11.5,',',f11.5,')      *')
 
       end
-      
+
 
 
       subroutine couplz(xw)
-      implicit none       
+      implicit none
       include 'constants.f'
       include 'zcouple.f'
       include 'ewcharge.f'
@@ -1005,6 +1006,6 @@ c---xw=sin^2 theta_w
 
       ln=(+1d0-two*(+0d0)*xw)/sin2w
       rn=0d0
-             
+
       return
       end
