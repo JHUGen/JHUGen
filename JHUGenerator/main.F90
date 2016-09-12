@@ -591,11 +591,22 @@ logical :: SetpTcut, SetdeltaRcut
     !LHAPDF
 
 #if useLHAPDF==1
-    if( LHAPDFString.eq."" ) then
-       print *, "Need to specify pdf file name in command line argument LHAPDF"
-       stop 1
-    endif
     call GET_ENVIRONMENT_VARIABLE("LHAPDF_DATA_PATH", LHAPDF_DATA_PATH)
+    if( LHAPDFString.eq."" ) then
+       if( ReadLHEFile .or. ConvertLHEFile ) then
+         !doesn't matter what we pass here, but needs to be able to open something
+         LHAPDFString = "NNPDF30_lo_as_0130/NNPDF30_lo_as_0130.info"
+         !check that it exists
+         inquire(file=trim(LHAPDF_DATA_PATH)//"/"//LHAPDFString, exist=success)
+         if ( .not. success ) then
+           print *, "Please pass in a pdf file name that exists in ", trim(LHAPDF_DATA_PATH), " or recompile with no LHAPDF."
+           stop 1
+         endif
+       else
+         print *, "Need to specify pdf file name in command line argument LHAPDF"
+         stop 1
+       endif
+    endif
 #endif
 
     !Renormalization/factorization schemes
@@ -911,7 +922,7 @@ SUBROUTINE InitPDFValues()
 #endif
 
    Mu_Fact = M_Reso ! Set pdf scale to resonance mass by default, later changed as necessary in the EvalWeighted/EvalUnweighted subroutines
-	Mu_Ren = M_Reso ! Set renorm. scale to resonance mass by default, later changed as necessary in the EvalWeighted/EvalUnweighted subroutines
+   Mu_Ren = M_Reso ! Set renorm. scale to resonance mass by default, later changed as necessary in the EvalWeighted/EvalUnweighted subroutines
    call EvalAlphaS() ! Set alphas at default Mu_Ren. Notice ModParameters::ComputeQCDVariables is automatically called!
    return
 END SUBROUTINE
@@ -3908,7 +3919,7 @@ integer :: stat
     beamenergy2 = Collider_Energy/GeV / 2d0
     pdfgup1 = 0
     pdfgup2 = 0
-    if( Collider.eq.0 ) then
+    if( Collider.eq.0 .or. ReadLHEFile .or. ConvertLHEFile ) then
         pdfsup1 = 0
         pdfsup2 = 0
     else
