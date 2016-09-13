@@ -89,7 +89,7 @@ c     ,j3_4(4,2),j5_6(4,2),
       data wmass,wwidth/80.399d0,2.085d0/
       data zmass,zwidth/91.1876d0,2.4952d0/
       data Gf,vevsq/1.16639d-5,246d0/
-      data gw,xw,gwsq,esq/0.65307d0,0.23119d0,0.426501d0,0.313329d0/
+      data gw,xw,gwsq,esq/0.65307d0,0.23119d0,0.426501d0,0.0981748d0/
 
       lambdaBSM = lambda_BSM
       lambda_Q = lambdaQ
