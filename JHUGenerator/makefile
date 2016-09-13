@@ -12,7 +12,7 @@ Opt  = Yes
 Comp = gfort
 
 # link pdfs via LHA library ('Yes' or 'No')
-UseLHAPDF=Yes
+UseLHAPDF=No
 # remember to export
 #          LD_LIBRARY_PATH=/.../LHAPDF-x.y.z/lib/:${LD_LIBRARY_PATH}
 #          LHAPDF_DATA_PATH=/.../LHAPDF-x.y.z/share/LHAPDF/:${LHAPDF_DATA_PATH}
