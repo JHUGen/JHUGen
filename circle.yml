@@ -8,21 +8,53 @@ machine:
     - sudo apt-get install cadaver
   environment:
     #environment variables can only be set in this section so . bin/thisroot.sh doesn't work
-    PATH: "$(echo /home/ubuntu/root/bin:/home/ubuntu/CMSJHU_AnalysisMacros/JHUSpinWidthPaper_2015/LHEAnalyzer:$PATH | sed s/:$//)"
-    LD_LIBRARY_PATH: "$(echo /home/ubuntu/root/lib:$LD_LIBRARY_PATH | sed s/:$//)"
-    SHLIB_PATH: "$(echo /home/ubuntu/root/lib:$SHLIB_PATH | sed s/:$//)"
-    LIBPATH: "$(echo /home/ubuntu/root/lib:$LIBPATH | sed s/:$//)"
-    PYTHONPATH: "$(echo /home/ubuntu/root/lib:$PYTHONPATH | sed s/:$//)"
-    MANPATH: "$(echo /home/ubuntu/JHUGen/JHUGenerator/root/man:$MANPATH | sed s/:$//)"
+    PATH: "$(echo $HOME/root/bin:$HOME/CMSJHU_AnalysisMacros/JHUSpinWidthPaper_2015/LHEAnalyzer:$PATH | sed s/:$//)"
+    LD_LIBRARY_PATH: "$(echo $HOME/root/lib:$HOME/LHAPDF-6.1.6/lib:$LD_LIBRARY_PATH | sed s/:$//)"
+    SHLIB_PATH: "$(echo $HOME/root/lib:$SHLIB_PATH | sed s/:$//)"
+    LIBPATH: "$(echo $HOME/root/lib:$LIBPATH | sed s/:$//)"
+    PYTHONPATH: "$(echo $HOME/root/lib:$PYTHONPATH | sed s/:$//)"
+    MANPATH: "$(echo $HOME/JHUGen/JHUGenerator/root/man:$MANPATH | sed s/:$//)"
+    LHAPDF_DATA_PATH: "/home/ubuntu/LHAPDF-6.1.6/share/LHAPDF"
 
 general:
   build_dir: JHUGenerator
 
 dependencies:
   override:
-    - if ! [ -d ~/root ]; then cd && wget https://root.cern.ch/download/root_v6.04.08.Linux-ubuntu14-x86_64-gcc4.8.tar.gz && tar -xvzf root_v6.04.08.Linux-ubuntu14-x86_64-gcc4.8.tar.gz; fi
-    - cd ~ && if ! [ -d CMSJHU_AnalysisMacros ]; then git clone -b noMELA git@github.com:hroskes/CMSJHU_AnalysisMacros; fi && cd CMSJHU_AnalysisMacros/JHUSpinWidthPaper_2015/LHEAnalyzer && git pull && make all
-    - if ! [ -d ~/checklhe ]; then cd ~ && git clone -b lite git@github.com:hroskes/checklhe; else cd ~/checklhe && git pull; fi
+    - |
+      if ! [ -d ~/root ]; then
+        cd &&
+        wget https://root.cern.ch/download/root_v6.04.08.Linux-ubuntu14-x86_64-gcc4.8.tar.gz &&
+        tar -xvzf root_v6.04.08.Linux-ubuntu14-x86_64-gcc4.8.tar.gz
+      fi
+    - |
+      cd ~ &&
+      if ! [ -d CMSJHU_AnalysisMacros ]; then
+        git clone -b noMELA git@github.com:hroskes/CMSJHU_AnalysisMacros;
+      fi &&
+      cd CMSJHU_AnalysisMacros/JHUSpinWidthPaper_2015/LHEAnalyzer &&
+      git pull &&
+      make all
+    - |
+      if ! [ -d ~/checklhe ]; then
+        cd ~ &&
+        git clone -b lite git@github.com:hroskes/checklhe
+      else
+        cd ~/checklhe &&
+        git pull
+      fi
+    - |
+      if ! [ -d ~/LHAPDF-6.1.6 ]; then
+        cd $(mktemp -d) &&
+        wget http://www.hepforge.org/archive/lhapdf/LHAPDF-6.1.6.tar.gz &&
+        tar xvzf LHAPDF-6.1.6.tar.gz &&
+        cd LHAPDF-6.1.6 &&
+        ./configure --prefix=$HOME/LHAPDF-6.1.6 &&
+        make &&
+        make install
+      fi &&
+      cd ~/LHAPDF-6.1.6/bin &&
+      ./lhapdf install NNPDF30_lo_as_0130
     #make sure no big files are accidentally committed (>50 MB)
     #can change this if we need a bigger file in the repository, but at least get a warning
     #http://stackoverflow.com/questions/10622179/how-to-find-identify-large-files-commits-in-git-history#comment46022100_20460121
@@ -53,6 +85,7 @@ dependencies:
     - ~/root
     - ~/CMSJHU_AnalysisMacros
     - ~/checklhe
+    - ~/LHAPDF-6.1.6
 
 test:
 
@@ -66,6 +99,9 @@ test:
     - "! grep 'Comp *= *ifort' makefile"
     #but continue the other tests even if it is
     - sed -i -r -e "s/(Comp *= *)ifort/\1gfort/" makefile
+    #same with lhapdf
+    - "! grep 'UseLHAPDF *= *Yes' makefile"
+    - sed -i -r -e "s/(UseLHAPDF *= *)Yes/\1No/" makefile
     - make
     - make:
          pwd:
@@ -141,6 +177,13 @@ test:
     - ./JHUGen PDFSet=3 Process=60 VegasNc0=10000000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/VBF/a2 ghz1=0,0 ghz2=1,0 pTjetcut=0 deltaRcut=0
     - ./JHUGen PDFSet=3 VegasNc0=100000 DecayMode1=8 DecayMode2=8 Interf=0 ReadLHE=$CIRCLE_ARTIFACTS/VBF/a2.lhe DataFile=$CIRCLE_ARTIFACTS/VBF/a2_decayed ghz1=0,0 ghz2=1,0
     - analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/VBF/ outfile=a2.root indir=$CIRCLE_ARTIFACTS/VBF/ computeVBFProdAngles=1 computeVHProdAngles=1 a2_decayed.lhe
+
+    #now test with LHAPDF
+    - sed -i -r -e "s/(UseLHAPDF *= *)No/\1Yes/" makefile
+    - make clean
+    - make
+    - ./JHUGen LHAPDF=NNPDF30_lo_as_0130/NNPDF30_lo_as_0130.info Process=50 VegasNc0=100000 VegasNc2=100 DataFile=$CIRCLE_ARTIFACTS/other/ZH_LHAPDF DecayMode1=9
+    - ./JHUGen VegasNc0=100000 DecayMode1=11 DecayMode2=11 ReadLHE=$CIRCLE_ARTIFACTS/other/ZH_LHAPDF.lhe DataFile=$CIRCLE_ARTIFACTS/other/ZH_LHAPDF_WW
 
     #make sure MELA compiles and runs
     - ./testC:
