@@ -212,7 +212,7 @@ Download_template = """
 #   - manualcommit, name of the commit to checkout to compile the manual.  Default=gitcommit
 #       could use a later version if the manual is updated after the generator is tagged
 versions = (
-            Version("v7.0.0", gitcommit="v7.0.0.beta1", manualcommit="388d95a", melacommit="v6.9.8"),
+            Version("v7.0.0", gitcommit="v7.0.0.beta1", manualcommit="18221e3", melacommit="v6.9.8"),
             Version("v6.9.8", manualcommit="971ad57"),
             Version("v6.9.5", manualcommit="157d32c"),
             Version("v6.8.4", gitcommit="v6.8.4.1.1"),
