@@ -775,6 +775,67 @@ end function Capitalize
 
 
 
+subroutine HouseOfRepresentatives(XSecArray, NumberOfSeats, TotalNumberOfSeats)
+!Want to generate TotalNumberOfSeats events among the partonic channels, proportional to the xsec.
+!But can't generate half an event, so need to round in some way.
+!Apparently this is a major political issue.  https://en.wikipedia.org/wiki/Apportionment_paradox
+!The first US presidential veto was when George Washington vetoed a change in rounding scheme
+! because Virginia would have lost seats in the House.
+!Also, if the US had used a different system, Rutherford B. Hayes wouldn't have been president.
+
+!For our case, it's much easier because we can and should distribute randomly, not deterministically
+! so that if you run 1000 times with 50 events each the fluctuations average out.
+!Also states with small xsec like Wyoming don't get a seat.
+implicit none
+real(8) :: totalxsec, CrossSecNormalized(-5:5,-5:5), yRnd, maxxsec
+integer :: n, i, j, maxi, maxj
+integer, intent(in) :: TotalNumberOfSeats
+real(8), intent(in) :: XSecArray(-5:5,-5:5)
+integer(8), intent(out) :: NumberOfSeats(-5:5,-5:5)
+
+  NumberOfSeats(:,:) = 0
+
+  totalxsec = sum(XSecArray(:,:))
+  CrossSecNormalized = XSecArray / totalxsec
+
+  maxxsec = -999d0
+  maxi = 1
+  maxj = 1
+  do i=-5,5
+    do j=-5,5
+      if (CrossSecNormalized(i,j) .gt. maxxsec) then
+        maxi = i
+        maxj = j
+        maxxsec = CrossSecNormalized(i,j)
+      endif
+    enddo
+  enddo
+
+  do n=1,TotalNumberOfSeats
+    call random_number(yRnd)
+    do i=-5,5
+      do j=-5,5
+        if (yRnd .lt. CrossSecNormalized(i,j)) then
+          NumberOfSeats(i,j) = NumberOfSeats(i,j)+1
+          goto 99
+        endif
+        yRnd = yRnd - CrossSecNormalized(i,j)
+      enddo
+    enddo
+    !in case a rounding error causes sum(CrossSecNormalized) != 1
+    !don't want to add to any particular channel because that one could have xsec=0
+    ! and we get nonsense
+    print *, "Warning: rounding error, assigning event to", maxi, maxj
+    NumberOfSeats(maxi,maxj) = NumberOfSeats(maxi,maxj)+1
+99  continue
+  enddo
+
+  if (sum(NumberOfSeats(:,:)).ne.TotalNumberOfSeats) then
+    print *, "Wrong total number of events, shouldn't be able to happen"
+    stop 1
+  endif
+end subroutine
+
 
 
 !========================================================================
