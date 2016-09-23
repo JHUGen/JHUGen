@@ -593,16 +593,7 @@ logical :: SetpTcut, SetdeltaRcut
 #if useLHAPDF==1
     call GET_ENVIRONMENT_VARIABLE("LHAPDF_DATA_PATH", LHAPDF_DATA_PATH)
     if( LHAPDFString.eq."" ) then
-       if( ReadLHEFile .or. ConvertLHEFile ) then
-         !doesn't matter what we pass here, but needs to be able to open something
-         LHAPDFString = "NNPDF30_lo_as_0130/NNPDF30_lo_as_0130.info"
-         !check that it exists
-         inquire(file=trim(LHAPDF_DATA_PATH)//"/"//LHAPDFString, exist=success)
-         if ( .not. success ) then
-           print *, "Please pass in a pdf file name that exists in ", trim(LHAPDF_DATA_PATH), " or recompile with no LHAPDF."
-           stop 1
-         endif
-       else
+       if (.not. (ReadLHEFile .or. ConvertLHEFile)) then
          print *, "Need to specify pdf file name in command line argument LHAPDF"
          stop 1
        endif
@@ -923,7 +914,7 @@ SUBROUTINE InitPDFValues()
 
    Mu_Fact = M_Reso ! Set pdf scale to resonance mass by default, later changed as necessary in the EvalWeighted/EvalUnweighted subroutines
    Mu_Ren = M_Reso ! Set renorm. scale to resonance mass by default, later changed as necessary in the EvalWeighted/EvalUnweighted subroutines
-   call EvalAlphaS() ! Set alphas at default Mu_Ren. Notice ModParameters::ComputeQCDVariables is automatically called!
+   if (.not.ReadLHEFile .and. .not.ConvertLHEFile) call EvalAlphaS() ! Set alphas at default Mu_Ren. Notice ModParameters::ComputeQCDVariables is automatically called!
    return
 END SUBROUTINE
 
@@ -936,6 +927,7 @@ SUBROUTINE InitPDFs()
    implicit none
    DOUBLE PRECISION alphasPDF
 
+   if (.not.ReadLHEFile .and. .not.ConvertLHEFile) then
      call InitPDFset(trim(LHAPDFString)) ! Let LHAPDF handle everything
      call InitPDF(LHAPDFMember)
 
@@ -943,6 +935,7 @@ SUBROUTINE InitPDFs()
      ! Dummy initialization, just in case. These values are not used.
      !nloops_pdf = 1
      zmass_pdf = M_Z
+   endif
 
 #else
 
@@ -950,6 +943,8 @@ SUBROUTINE InitPDFs()
    use ModKinematics
    implicit none
    character :: pdftable*(100)
+
+   if (.not.ReadLHEFile .and. .not.ConvertLHEFile) then
 
      zmass_pdf = M_Z ! Take zmass_pdf=M_Z in pdfs that do not specify this value
 
@@ -976,6 +971,8 @@ SUBROUTINE InitPDFs()
         !alphas_mz = 0.13229060d0
         !nloops_pdf = 1
      endif
+
+   endif
 
 #endif
 

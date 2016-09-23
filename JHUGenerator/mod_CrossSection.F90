@@ -540,7 +540,6 @@ include 'csmaxvalue.f'
 
 
     call SetRunningScales( (/ (MomExt(1:4,3)+MomExt(1:4,4)),Mom_Not_a_particle(1:4),Mom_Not_a_particle(1:4) /) , (/ Not_a_particle_,Not_a_particle_,Not_a_particle_,Not_a_particle_ /) ) ! Call anyway
-    call EvalAlphaS()
 
 IF( GENEVT ) THEN
 
@@ -3138,7 +3137,6 @@ m2ffwgt=1d0
   PreFac = fbGeV2 * PSWgt
 
   call SetRunningScales( (/ pHiggs(1:4),Mom_Not_a_particle(1:4),Mom_Not_a_particle(1:4) /) , (/ Not_a_particle_,Not_a_particle_,Not_a_particle_,Not_a_particle_ /) ) ! Call anyway
-  call EvalAlphaS()
 
   if( TauDecays.eq.0 ) then
      if (genevt) then
