@@ -1585,13 +1585,14 @@ END SUBROUTINE
 
 SUBROUTINE StartVegas_NEW(VG_Result,VG_Error)
 use ModCrossSection
-use ModCrossSection_HJJ
-use ModCrossSection_TTBH
 use ModCrossSection_BBBH
+use ModCrossSection_HJJ
 use ModCrossSection_TH
-use ModKinematics
-use ModParameters
+use ModCrossSection_TTBH
 use modHiggsJJ
+use ModKinematics
+use ModMisc
+use ModParameters
 implicit none
 include "vegas_common.f"
 real(8) :: VG_Result,VG_Error,VG_Chi2
@@ -1762,15 +1763,10 @@ if( UseBetaVersion ) then
     write(io_stdout,*) "Total xsec: ",VG_Result, " +/-",VG_Error, " fb    vs.",sum(CrossSec(:,:))
     call InitOutput(VG_Result, VG_Error)
 
-
-    RequEvents(:,:)=0
-    do i1=-5,5
-    do j1=-5,5
-        RequEvents(i1,j1) = RequEvents(i1,j1) + nint( CrossSec(i1,j1)/VG_Result * VegasNc2 )
-    enddo
-    enddo
-
-
+    RequEvents(:,:) = 0
+    if (VegasNc2.ne.-1) then
+      call HouseOfRepresentatives(CrossSec(-5:5,-5:5), RequEvents(-5:5,-5:5), VegasNc2)
+    endif
 
     if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2) then
        call get_PPXchannelHash(ijSel)
@@ -1798,36 +1794,9 @@ if( UseBetaVersion ) then
 
 
 
-
-!   add some events that got lost due to rounding errors
-!   distribute them according to the partonic cross section fractions and finally add the last pieces to the largest partonic contribution
-    MissingEvents = VegasNc2 - sum(RequEvents(:,:))
-    if( MissingEvents.ne.0 ) then
-!         print *, "MISSING EVENTS",MissingEvents
-        MaxEvts = -10000
-        do i=1,121
-            i1 = ijSel(i,1)
-            j1 = ijSel(i,2)
-            RequEvents(i1,j1) = RequEvents(i1,j1) + nint( CrossSec(i1,j1)/VG_Result * MissingEvents )
-            if( RequEvents(i1,j1).gt.MaxEvts ) then
-              MaxEvts = RequEvents(i1,j1)
-              imax=i
-            endif
-!             print *, "adding",i1,j1,nint( CrossSec(i1,j1)/VG_Result * MissingEvents )
-        enddo
-        MissingEvents = VegasNc2 - sum(RequEvents(:,:))
-!         print *, "MISSING EVENTS",MissingEvents
-        i1 = ijSel(imax,1)
-        j1 = ijSel(imax,2)
-        RequEvents(i1,j1) = RequEvents(i1,j1) + MissingEvents
-        write(*,"(2X,A,I9)") "Adjusting number of events. New event count=",sum(RequEvents(:,:))
-    endif
-
-
-
-
     write(io_stdout,"(A)")  ""
     write(io_stdout,"(2X,A)")  "Event generation"
+
     call ClearHisto()
     warmup = .false.
     itmx = 1
@@ -1966,13 +1935,10 @@ else! beta version
    write(io_stdout,"(1X,A,F10.3)") "Total xsec: ",TotalXSec
 
 
-    RequEvents(:,:)=0
-    do i1=-5,5
-    do j1=-5,5
-         RequEvents(i1,j1) = RequEvents(i1,j1) + int( VG(i1,j1)/TotalXSec * VegasNc2 )
-    enddo
-    enddo
-
+    RequEvents(:,:) = 0
+    if (VegasNc2.ne.-1) then
+      call HouseOfRepresentatives(VG(:,:), RequEvents(-5:5,-5:5), VegasNc2)
+    endif
 
     do i1=-5,5
     do j1=-5,5
