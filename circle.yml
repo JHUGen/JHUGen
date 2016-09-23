@@ -140,7 +140,7 @@ test:
     - ./JHUGen PDFSet=3 VegasNc0=100000 TauDK=1 DecayMode1=5 DecayMode2=5 ReadLHE=$CIRCLE_ARTIFACTS/other/ttH.lhe DataFile=$CIRCLE_ARTIFACTS/other/ttH_tautau
     - ./JHUGen PDFSet=3 VegasNc0=100000         DecayMode1=5 DecayMode2=5 ReadLHE=$CIRCLE_ARTIFACTS/other/tH_t.lhe DataFile=$CIRCLE_ARTIFACTS/other/tH_t_WW
     - ./JHUGen PDFSet=3 VegasNc0=100000         DecayMode1=1 DecayMode2=1 ReadLHE=$CIRCLE_ARTIFACTS/other/tbarH_t.lhe DataFile=$CIRCLE_ARTIFACTS/other/tbarH_t_ZZ
-    - ./JHUGen PDFSet=3 VegasNc0=100000 TauDK=1 DecayMode1=5 DecayMode2=5 ReadLHE=$CIRCLE_ARTIFACTS/other/tH_s.lhe DataFile=$CIRCLE_ARTIFACTS/other/tH_s_WW
+    - ./JHUGen PDFSet=3 VegasNc0=100000 TauDK=1 DecayMode1=5 DecayMode2=5 ReadLHE=$CIRCLE_ARTIFACTS/other/tH_s.lhe DataFile=$CIRCLE_ARTIFACTS/other/tH_s_tautau
     #make sure that the mass was read correctly and the interference determined
     - "grep -q 'Interference: T' $CIRCLE_ARTIFACTS/other/ttH_ZZ.lhe"
     - "grep -q 'Interference: F' $CIRCLE_ARTIFACTS/other/tbarH_t_ZZ.lhe"
@@ -184,6 +184,7 @@ test:
     - make
     - ./JHUGen LHAPDF=NNPDF30_lo_as_0130/NNPDF30_lo_as_0130.info Process=50 VegasNc0=100000 VegasNc2=100 DataFile=$CIRCLE_ARTIFACTS/other/ZH_LHAPDF DecayMode1=9
     - ./JHUGen VegasNc0=100000 DecayMode1=11 DecayMode2=11 ReadLHE=$CIRCLE_ARTIFACTS/other/ZH_LHAPDF.lhe DataFile=$CIRCLE_ARTIFACTS/other/ZH_LHAPDF_WW
+    - ./JHUGen VegasNc0=100000 TauDK=0                     ReadLHE=$CIRCLE_ARTIFACTS/other/ZH_LHAPDF.lhe DataFile=$CIRCLE_ARTIFACTS/other/ZH_LHAPDF_tautau
 
     #make sure MELA compiles and runs
     - ./testC:
