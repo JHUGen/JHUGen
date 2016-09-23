@@ -106,6 +106,18 @@ test:
     - make:
          pwd:
            ../JHUGenMELA
+    #check sync between generator and MELA
+    - cmp mod_Graviton.F90 ../JHUGenMELAv2/MELA/fortran/mod_Graviton.F90
+    - cmp mod_Higgs.F90 ../JHUGenMELAv2/MELA/fortran/mod_Higgs.F90
+    - cmp mod_HiggsJ.F90 ../JHUGenMELAv2/MELA/fortran/mod_HiggsJ.F90
+    - cmp mod_HiggsJJ.F90 ../JHUGenMELAv2/MELA/fortran/mod_HiggsJJ.F90
+    - cmp mod_Misc.F90 ../JHUGenMELAv2/MELA/fortran/mod_Misc.F90
+    - cmp mod_Parameters.F90 ../JHUGenMELAv2/MELA/fortran/mod_Parameters.F90
+    - cmp mod_THiggs.F90 ../JHUGenMELAv2/MELA/fortran/mod_THiggs.F90
+    - cmp mod_TTBHiggs.F90 ../JHUGenMELAv2/MELA/fortran/mod_TTBHiggs.F90
+    - cmp mod_TopDecay.F90 ../JHUGenMELAv2/MELA/fortran/mod_TopDecay.F90
+    - cmp mod_VHiggs.F90 ../JHUGenMELAv2/MELA/fortran/mod_VHiggs.F90
+    - cmp mod_Zprime.F90 ../JHUGenMELAv2/MELA/fortran/mod_Zprime.F90
 
   override:
     #here we want to generate as many production modes as possible and get the widest range of events to check for syntax issues
