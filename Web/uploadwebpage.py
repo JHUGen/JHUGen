@@ -1,6 +1,6 @@
 #Inputs are down at the bottom.  No need to change anything above that unless there's a bug
 
-
+import argparse
 from contextlib import contextmanager
 from getpass import getpass
 import os
@@ -14,9 +14,12 @@ WebGeneratordir = os.path.join(Webdir, "Generator")
 if not os.path.isdir(WebGeneratordir):
      raise OSerror("You should run this from the Web directory")
 
-def uploadwebpage():
-    JHED = raw_input("Enter your JHED ID: ")
-    password = getpass("Enter your JHED password: ")
+def uploadwebpage(dryrun=False):
+    if dryrun:
+        JHED = password = ""
+    else:
+        JHED = raw_input("Enter your JHED ID: ")
+        password = getpass("Enter your JHED password: ")
     with cd("Generator"):
         create_Download(*versions)
     repmap = {
@@ -25,8 +28,13 @@ def uploadwebpage():
               "machine": "https://webdav.johnshopkins.edu/",
               "uploadfiles": getuploadfiles("."),
              }
-    with NetRC(**repmap), CadaverRC(**repmap):
-        check_call(["cadaver"])
+    if dryrun:
+        print "Would open cadaver, then run:"
+        print
+        print CadaverRC(**repmap)
+    else:
+        with NetRC(**repmap), CadaverRC(**repmap):
+            check_call(["cadaver"])
 
 
 class RC(object):
@@ -39,6 +47,8 @@ class RC(object):
         if os.path.exists(self.filename): raise OSError(self.filename+" already exists!")
         with open(self.filename, "w") as f:
             f.write(self.template.format(**self.repmap))
+    def __str__(self):
+        return self.template.format(**self.repmap)
 
     def __exit__(self, exception_type, exception_value, traceback):
         os.remove(self.filename)
@@ -202,7 +212,7 @@ Download_template = """
 #   - manualcommit, name of the commit to checkout to compile the manual.  Default=gitcommit
 #       could use a later version if the manual is updated after the generator is tagged
 versions = (
-            Version("v7.0.0", gitcommit="v7.0.0.beta1", manualcommit="388d95a", melacommit="v6.9.8"),
+            Version("v7.0.0", gitcommit="v7.0.0.beta1", manualcommit="18221e3", melacommit="v6.9.8"),
             Version("v6.9.8", manualcommit="971ad57"),
             Version("v6.9.5", manualcommit="157d32c"),
             Version("v6.8.4", gitcommit="v6.8.4.1.1"),
@@ -242,4 +252,7 @@ dontupload = [
 ########################################################################################
 
 if __name__ == "__main__":
-    uploadwebpage()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-n", "--dry-run", help="create all the tarballs but don't actually upload", action="store_true", dest="dryrun")
+    args = parser.parse_args()
+    uploadwebpage(dryrun=args.dryrun)
