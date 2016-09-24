@@ -83,13 +83,14 @@ subroutine EvalAmp_VHiggs(id,helicity,MomExt,me2)
       amplitude = A_VV(1)+A_VV(2)+A_VV(3)+A_VV(4)
 
       ! XCHECK FROM DECAY ME
-      amptest = MATRIXELEMENT02(pin,mass,helin,idin)
       print *,pin(:,1)
       print *,pin(:,2)
       print *,pin(:,6)
       print *,pin(:,7)
       print *,idin(1)
       print *,idin(2)
+      print *,idin(3)
+      print *,idin(4)
       print *,idin(6)
       print *,idin(7)
       print *,helin(1)
@@ -97,6 +98,7 @@ subroutine EvalAmp_VHiggs(id,helicity,MomExt,me2)
       print *,helin(6)
       print *,helin(7)
       print *,amplitude
+      amptest = MATRIXELEMENT02(pin,mass,helin,idin)
       print *,amptest
       pause
 
@@ -161,7 +163,7 @@ end subroutine EvalAmp_VHiggs
          !WH
          if((id(1)+id(2)).ne.0)then
            if((id(1)*helicity(1)).le.0d0)then
-             current1=(Vcurrent1-Acurrent1)/2d0*gFFW*CKM(id(1),id(2))/dsqrt(ScaleFactor(id(1),id(2)))
+             current1=(Vcurrent1-Acurrent1)/2d0*gFFW!*CKM(id(1),id(2))/dsqrt(ScaleFactor(id(1),id(2)))
            else
              current1=0d0
            endif
@@ -257,7 +259,7 @@ end subroutine EvalAmp_VHiggs
          !WH
          if((id(6)+id(7)).ne.0)then
            if((id(6)*helicity(6)).le.0d0)then
-             current2=(Vcurrent2-Acurrent2)/2d0*gFFW*CKM(id(6),id(7))
+             current2=(Vcurrent2-Acurrent2)/2d0*gFFW!*CKM(id(6),id(7))
            else
              current2=0d0
            endif
