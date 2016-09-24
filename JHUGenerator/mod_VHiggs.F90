@@ -83,24 +83,24 @@ subroutine EvalAmp_VHiggs(id,helicity,MomExt,me2)
       amplitude = A_VV(1)+A_VV(2)+A_VV(3)+A_VV(4)
 
       ! XCHECK FROM DECAY ME
-      print *,pin(:,1)
-      print *,pin(:,2)
-      print *,pin(:,6)
-      print *,pin(:,7)
-      print *,idin(1)
-      print *,idin(2)
-      print *,idin(3)
-      print *,idin(4)
-      print *,idin(6)
-      print *,idin(7)
-      print *,helin(1)
-      print *,helin(2)
-      print *,helin(6)
-      print *,helin(7)
-      print *,amplitude
-      amptest = MATRIXELEMENT02(pin,mass,helin,idin)
-      print *,amptest
-      pause
+      !print *,pin(:,1)
+      !print *,pin(:,2)
+      !print *,pin(:,6)
+      !print *,pin(:,7)
+      !print *,idin(1)
+      !print *,idin(2)
+      !print *,idin(3)
+      !print *,idin(4)
+      !print *,idin(6)
+      !print *,idin(7)
+      !print *,helin(1)
+      !print *,helin(2)
+      !print *,helin(6)
+      !print *,helin(7)
+      !print *,amplitude
+      !amptest = MATRIXELEMENT02(pin,mass,helin,idin)
+      !print *,amptest
+      !pause
 
       me2=dble(amplitude*dconjg(amplitude))
       return
@@ -163,7 +163,7 @@ end subroutine EvalAmp_VHiggs
          !WH
          if((id(1)+id(2)).ne.0)then
            if((id(1)*helicity(1)).le.0d0)then
-             current1=(Vcurrent1-Acurrent1)/2d0*gFFW!*CKM(id(1),id(2))/dsqrt(ScaleFactor(id(1),id(2)))
+             current1=(Vcurrent1-Acurrent1)/2d0*gFFW*CKM(id(1),id(2))/dsqrt(ScaleFactor(id(1),id(2)))
            else
              current1=0d0
            endif
@@ -259,7 +259,7 @@ end subroutine EvalAmp_VHiggs
          !WH
          if((id(6)+id(7)).ne.0)then
            if((id(6)*helicity(6)).le.0d0)then
-             current2=(Vcurrent2-Acurrent2)/2d0*gFFW!*CKM(id(6),id(7))
+             current2=(Vcurrent2-Acurrent2)/2d0*gFFW*CKM(id(6),id(7))
            else
              current2=0d0
            endif
@@ -423,7 +423,11 @@ end subroutine EvalAmp_VHiggs
       endif
 
       if(gVVP.ne.0d0)then
-        call VVP(-MomExt(:,3),MomExt(:,4),epp)
+        if(id(3).eq.convertLHE(Wp_))then
+          call VVP(MomExt(:,4),-MomExt(:,3),epp)
+        else
+          call VVP(-MomExt(:,3),MomExt(:,4),epp)
+        endif
         VVX0 = VVX0 + gVVP*epp
       endif
 
@@ -1288,109 +1292,109 @@ end subroutine EvalAmp_VHiggs
 
 !MATRIXELEMENT02.F
 !VERSION 20160924
-      complex(8) function MATRIXELEMENT02(p,mass,helicity,id)
-      use ModHiggs
-      implicit none
-      real(8), intent(in) :: p(1:4,1:9)
-      real(8), intent(in) :: mass(3:5,1:2)
-      real(8), intent(in) :: helicity(9)
-      integer, intent(in) :: id(9)
+!complex(8) function MATRIXELEMENT02(p,mass,helicity,id)
+!use ModHiggs
+!implicit none
+!real(8), intent(in) :: p(1:4,1:9)
+!real(8), intent(in) :: mass(3:5,1:2)
+!real(8), intent(in) :: helicity(9)
+!integer, intent(in) :: id(9)
 
-      complex(dp) :: A_VV(1:4), propH
-      integer :: MY_IDUP(6:9),i3,i4,j,VVMode
-      real(dp) :: pUsed(4,6)
-      integer :: ordering(1:4),ordering_swap(1:4)
+!complex(dp) :: A_VV(1:4), propH
+!integer :: MY_IDUP(6:9),i3,i4,j,VVMode
+!real(dp) :: pUsed(4,6)
+!integer :: ordering(1:4),ordering_swap(1:4)
 
-      ! Set the ids and momenta
-      MY_IDUP(:)=Not_a_particle_
-      pUsed(:,:)=zero
-      do j=1,4
-         if(id(j) .ne. Not_a_particle_) then
-            if(j.le.2) then
-               MY_IDUP(j+5) = -convertLHEreverse(id(j))
-               pUsed(:,j+2) = -p(:,j)
-            else
-               MY_IDUP(j+5) = convertLHEreverse(id(j+3))
-               pUsed(:,j+2) = p(:,j+3)
-            endif
-         endif
-         pUsed(:,1) = pUsed(:,1) + pUsed(:,j+2)
-      enddo
-      call getDecay_VVMode_Ordering(MY_IDUP, VVMode,ordering,ordering_swap)
+!! Set the ids and momenta
+!MY_IDUP(:)=Not_a_particle_
+!pUsed(:,:)=zero
+!do j=1,4
+!   if(id(j) .ne. Not_a_particle_) then
+!      if(j.le.2) then
+!         MY_IDUP(j+5) = -convertLHEreverse(id(j))
+!         pUsed(:,j+2) = -p(:,j)
+!      else
+!         MY_IDUP(j+5) = convertLHEreverse(id(j+3))
+!         pUsed(:,j+2) = p(:,j+3)
+!      endif
+!   endif
+!   pUsed(:,1) = pUsed(:,1) + pUsed(:,j+2)
+!enddo
+!call getDecay_VVMode_Ordering(MY_IDUP, VVMode,ordering,ordering_swap)
 
-      ! Set the helicities
-      if(id(1)*helicity(1).gt.0) then
-         i3=2
-      else
-         i3=1
-      endif
-      if(id(6)*helicity(6).gt.0) then
-         i4=2
-      else
-         i4=1
-      endif
-      if(ordering(1).eq.5 .or. ordering(2).eq.5) then
-         call swap(i3,i4)
-      endif
+!! Set the helicities
+!if(id(1)*helicity(1).gt.0) then
+!   i3=2
+!else
+!   i3=1
+!endif
+!if(id(6)*helicity(6).gt.0) then
+!   i4=2
+!else
+!   i4=1
+!endif
+!if(ordering(1).eq.5 .or. ordering(2).eq.5) then
+!   call swap(i3,i4)
+!endif
 
-      A_VV(:) = 0d0
-      PROPH = PROPAGATOR(dsqrt(scr(p(:,5),p(:,5))),mass(5,1),mass(5,2))
-      call calcHelAmp2(ordering,VVMode,MY_IDUP,pUsed,i3,i4,A_VV(1))
-      if( (VVMode.eq.ZZMode) .and. includeGammaStar ) then
-          call calcHelAmp2(ordering,ZgsMode,MY_IDUP,pUsed,i3,i4,A_VV(2))
-          call calcHelAmp2(ordering,gsZMode,MY_IDUP,pUsed,i3,i4,A_VV(3))
-          call calcHelAmp2(ordering,gsgsMode,MY_IDUP,pUsed,i3,i4,A_VV(4))
-      elseif( VVMode.eq.ZgMode .and. includeGammaStar ) then
-          call calcHelAmp2(ordering,gsgMode,MY_IDUP,pUsed,i3,i4,A_VV(2))
-      endif
-      A_VV(:) = -A_VV(:) * propH
+!A_VV(:) = 0d0
+!PROPH = PROPAGATOR(dsqrt(scr(p(:,5),p(:,5))),mass(5,1),mass(5,2))
+!call calcHelAmp2(ordering,VVMode,MY_IDUP,pUsed,i3,i4,A_VV(1))
+!if( (VVMode.eq.ZZMode) .and. includeGammaStar ) then
+!    call calcHelAmp2(ordering,ZgsMode,MY_IDUP,pUsed,i3,i4,A_VV(2))
+!    call calcHelAmp2(ordering,gsZMode,MY_IDUP,pUsed,i3,i4,A_VV(3))
+!    call calcHelAmp2(ordering,gsgsMode,MY_IDUP,pUsed,i3,i4,A_VV(4))
+!elseif( VVMode.eq.ZgMode .and. includeGammaStar ) then
+!    call calcHelAmp2(ordering,gsgMode,MY_IDUP,pUsed,i3,i4,A_VV(2))
+!endif
+!A_VV(:) = -A_VV(:) * propH
 
-      MATRIXELEMENT02 = A_VV(1)+A_VV(2)+A_VV(3)+A_VV(4)
-      return
-      END function
+!MATRIXELEMENT02 = A_VV(1)+A_VV(2)+A_VV(3)+A_VV(4)
+!return
+!END function
 
-subroutine getDecay_VVMode_Ordering(MY_IDUP, VVMode,ordering,ordering_swap)
-   implicit none
-   integer, intent(in) :: MY_IDUP(6:9)
-   integer, intent(out) :: VVMode,ordering(1:4),ordering_swap(1:4)
-   integer :: idV(1:2)
+!subroutine getDecay_VVMode_Ordering(MY_IDUP, VVMode,ordering,ordering_swap)
+!   implicit none
+!   integer, intent(in) :: MY_IDUP(6:9)
+!   integer, intent(out) :: VVMode,ordering(1:4),ordering_swap(1:4)
+!   integer :: idV(1:2)
 
-   ordering=(/3,4,5,6/)
-   idV(1)=CoupledVertex(MY_IDUP(6:7),-1)
-   idV(2)=CoupledVertex(MY_IDUP(8:9),-1)
-   if(MY_IDUP(6).eq.Pho_ .or. MY_IDUP(7).eq.Pho_) idV(1)=Pho_
-   if(MY_IDUP(8).eq.Pho_ .or. MY_IDUP(9).eq.Pho_) idV(2)=Pho_
-   if(convertLHE(MY_IDUP(6)).lt.0 .or. MY_IDUP(6).eq.Not_a_particle_) then
-      call swap(ordering(1),ordering(2))
-   endif
-   if(convertLHE(MY_IDUP(8)).lt.0 .or. MY_IDUP(8).eq.Not_a_particle_) then
-      call swap(ordering(3),ordering(4))
-   endif
-   if( &
-         (idV(1).eq.Wm_ .and. idV(2).eq.Wp_) .or. &
-         (idV(2).eq.Z0_ .and. idV(1).eq.Pho_) &
-     ) then
-      call swap(ordering(1),ordering(3))
-      call swap(ordering(2),ordering(4))
-      call swap(idV(1),idV(2))
-   endif
-   ordering_swap(:)=ordering(:)
-   call swap(ordering_swap(1),ordering_swap(3))
+!   ordering=(/3,4,5,6/)
+!   idV(1)=CoupledVertex(MY_IDUP(6:7),-1)
+!   idV(2)=CoupledVertex(MY_IDUP(8:9),-1)
+!   if(MY_IDUP(6).eq.Pho_ .or. MY_IDUP(7).eq.Pho_) idV(1)=Pho_
+!   if(MY_IDUP(8).eq.Pho_ .or. MY_IDUP(9).eq.Pho_) idV(2)=Pho_
+!   if(convertLHE(MY_IDUP(6)).lt.0 .or. MY_IDUP(6).eq.Not_a_particle_) then
+!      call swap(ordering(1),ordering(2))
+!   endif
+!   if(convertLHE(MY_IDUP(8)).lt.0 .or. MY_IDUP(8).eq.Not_a_particle_) then
+!      call swap(ordering(3),ordering(4))
+!   endif
+!   if( &
+!         (idV(1).eq.Wm_ .and. idV(2).eq.Wp_) .or. &
+!         (idV(2).eq.Z0_ .and. idV(1).eq.Pho_) &
+!     ) then
+!      call swap(ordering(1),ordering(3))
+!      call swap(ordering(2),ordering(4))
+!      call swap(idV(1),idV(2))
+!   endif
+!   ordering_swap(:)=ordering(:)
+!   call swap(ordering_swap(1),ordering_swap(3))
 
-   if(idV(1).eq.Z0_ .and. idV(2).eq.Z0_) then
-      VVMode=ZZMode
-   elseif(idV(1).eq.Z0_ .and. idV(2).eq.Pho_) then
-      VVMode=ZgMode
-   elseif(idV(1).eq.Pho_ .and. idV(2).eq.Pho_) then
-      VVMode=ggMode
-   elseif(idV(1).eq.Wp_ .and. idV(2).eq.Wm_) then
-      VVMode=WWMode
-   else
-      print *,"idV=",idV
-      call Error("Unsupported decay Modes")
-   endif
-   return
-end subroutine
+!   if(idV(1).eq.Z0_ .and. idV(2).eq.Z0_) then
+!      VVMode=ZZMode
+!   elseif(idV(1).eq.Z0_ .and. idV(2).eq.Pho_) then
+!      VVMode=ZgMode
+!   elseif(idV(1).eq.Pho_ .and. idV(2).eq.Pho_) then
+!      VVMode=ggMode
+!   elseif(idV(1).eq.Wp_ .and. idV(2).eq.Wm_) then
+!      VVMode=WWMode
+!   else
+!      print *,"idV=",idV
+!      call Error("Unsupported decay Modes")
+!   endif
+!   return
+!end subroutine
 
 
 SUBROUTINE MATRIXELEMENT1(p,FermFlav,UnPolSqAmp)
