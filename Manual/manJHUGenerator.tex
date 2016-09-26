@@ -26,7 +26,7 @@ Manual for the JHU generator
 \begin{center}
 \small
 For simulation of a single-produced resonance at hadron colliders \\
-(version v7.0.0, release date Jul. 29, 2016, manual date Jul. 29, 2016) \\
+(version v7.0.0, release date Jul. 29, 2016, manual date Sep. 26, 2016) \\
 \normalsize
 \end{center}
 
@@ -347,41 +347,29 @@ Jet cuts, as described above, which should generally be set by command line opti
 \label{spin0}
 
 \noindent
-The \verb|*hg*| parameters control the coupling of a spin-0 resonance to gluons in the production mechanism.
+The \verb|ghg*| parameters control the coupling of a spin-0 resonance to gluons in the production mechanism.
 In practice, the production parameters do not have a large effect since angular corrections from the production mechanism are lost for spinless particles.
-The \verb|*hz*| parameters control the decay into $Z$ and $W$ bosons.
-One has the options to set the spin-0 couplings either from Eq.(9) or Eq.(11) from Ref.~\cite{Bolognesi:2012}.
-To switch between the two, use the parameter \verb|generate_as|.
-%For the parameters in Eq.(9) from Ref.~\cite{Bolognesi:2012}, we now allow for $q^2$ dependent form factors as described in Eq.(3) of~\cite{Anderson:2013} as:
+The \verb|ghz*| parameters control the decay into $Z$ and $W$ bosons.
+These spin-0 couplings are described in Eq.(9) from Ref.~\cite{Bolognesi:2012}, and can be set from the command line.
 We allow for $q^2$ dependent form factors similar to those described in Ref.~\cite{Anderson:2013}:
 \begin{eqnarray*}
-g^\Lambda_i(q_1,q_2) &=& 
-g_i' \frac{\Lambda_i^4}{(\Lambda_i^2 + |q_1^2|)(\Lambda_i^2 + |q_2^2|)} \\
-&+& g_i^{\prime 2}  \frac{(q_1^2+q_2^2)}{\Lambda_i^2} 
-+ g_i^{\prime 3}  \frac{(q_1^2-q_2^2)}{\Lambda_i^2} 
-+ g_i^{\prime 4}  \frac{(q_1+q_2)^2}{\Lambda_Q^2} \\
-&+& g_i^{\prime 5}  \frac{((q_1^2)^2+(q_2^2)^2)}{\Lambda_i^4}  
-+ g_i^{\prime 6}  \frac{((q_1^2)^2-(q_2^2)^2)}{\Lambda_i^4}
+g^\Lambda_i(q_1,q_2) &=&
+g_i' \frac{\Lambda_i^4}{\left(\Lambda_i^2 + |q_1^2|\right)\left(\Lambda_i^2 + |q_2^2|\right)} \\
+&+& g_i^{\prime 2}  \frac{\left(q_1^2+q_2^2\right)}{\Lambda_i^2}
++ g_i^{\prime 3}  \frac{\left(q_1^2-q_2^2\right)}{\Lambda_i^2}
++ g_i^{\prime 4}  \frac{\left(q_1+q_2\right)^2}{\Lambda_Q^2} \\
+&+& g_i^{\prime 5}  \frac{\left(\left(q_1^2\right)^2+\left(q_2^2\right)^2\right)}{\Lambda_i^4}
++ g_i^{\prime 6}  \frac{\left(\left(q_1^2\right)^2-\left(q_2^2\right)^2\right)}{\Lambda_i^4}
 + g_i^{\prime 7}  \frac{q_1^2 \, q_2^2}{\Lambda_i^4} \\
-g_i(q_1,q_2) &=& g_i \delta_{i1} + (g^\Lambda_i (q_1,q_2) + g_i (1- \delta_{i1}))
+g_i\left(q_1,q_2\right) &=& g_i \delta_{i1} + \left(g^\Lambda_i \left(q_1,q_2\right) + g_i \left(1- \delta_{i1}\right)\right)
 \frac{\Lambda^2_{i1}\,\Lambda^2_{i2}\,\Lambda^2_{i3}}
-{(\Lambda^2_{i1}+c_{i1}|q_1|^2)\,(\Lambda^2_{i2}+c_{i2}|q_2|^2)\,(\Lambda^2_{i3}+c_{i3}|q_1+q_2|^2)}
+{\left(\Lambda^2_{i1}+c_{i1}\left|q_1^2\right|\right)\,\left(\Lambda^2_{i2}+c_{i2}\left|q_2^2\right|\right)\,\left(\Lambda^2_{i3}+c_{i3}\left|(q_1+q_2)^2\right|\right)}
 \noindent
 \end{eqnarray*}
 The user has the option to choose between these functional forms,
-where the term multiplying $g_i'$ corresponds to the full functional form and the $g_i''... g_i'''''' $ correspond to an expansion in $\Lambda^2$.
-All parameters can be modified in \verb|mod_Parameters.F90| by:
+where the term multiplying $g_i^\prime$ corresponds to the full functional form and the $g_i^{\prime 2}... g_i^{\prime 7}$ correspond to an expansion in $\Lambda^2$.
+The names and default values of these parameters are found in \verb|mod_Parameters.F90|.  To set them on the command line, use, for example, \verb|ghz1=1,0|, where 1 represents the real part and 0 represents the imaginary part.
 \begin{verbatim}
-
-!-- parameters that define on-shell spin 0 coupling to SM fields, see note
-   logical, public, parameter :: generate_as = .false.
-   complex(8), public, parameter :: ahg1 = (1.0d0,0d0)
-   complex(8), public, parameter :: ahg2 = (0.0d0,0d0)
-   complex(8), public, parameter :: ahg3 = (0.0d0,0d0)  ! pseudoscalar
-   complex(8), public, parameter :: ahz1 = (1.0d0,0d0)
-   complex(8), public, parameter :: ahz2 = (0.0d0,0d0)  ! this coupling does not contribute for
-                                                        ! gamma+gamma final states
-   complex(8), public, parameter :: ahz3 = (0.0d0,0d0)  ! pseudoscalar
 
 !-- parameters that define off-shell spin 0 coupling to SM fields, see note
    complex(8), public, parameter :: ghg2 = (1.0d0,0d0)
@@ -430,11 +418,11 @@ All parameters can be modified in \verb|mod_Parameters.F90| by:
    real(8),    public, parameter :: Lambda_z3 = 10000d0*GeV
    real(8),    public, parameter :: Lambda_z4 = 10000d0*GeV
    real(8),    public, parameter :: Lambda_Q  = 10000d0*GeV
-   
+
    integer,    public, parameter :: cz_q1sq = 0d0 ! Sign of q1,2,12**2 for the following Lambda's
    integer,    public, parameter :: cz_q2sq = 0d0
    integer,    public, parameter :: cz_q12sq = 0d0
-   
+
    real(8),    public, parameter :: Lambda_z11 = 100d0*GeV ! For Z1
    real(8),    public, parameter :: Lambda_z21 = 100d0*GeV
    real(8),    public, parameter :: Lambda_z31 = 100d0*GeV
@@ -446,7 +434,7 @@ All parameters can be modified in \verb|mod_Parameters.F90| by:
    real(8),    public, parameter :: Lambda_z10 = 100d0*GeV ! For the Higgs
    real(8),    public, parameter :: Lambda_z20 = 100d0*GeV
    real(8),    public, parameter :: Lambda_z30 = 100d0*GeV
-   real(8),    public, parameter :: Lambda_z40 = 100d0*GeV         
+   real(8),    public, parameter :: Lambda_z40 = 100d0*GeV
 \end{verbatim}
 
 Intermediate off-shell photons can be included along with the $Z$ boson for $Z$ boson final states, $ZH$ production, and VBF production.
@@ -1151,7 +1139,7 @@ See webpage: www.pha.jhu.edu/spin
   Nucl.\ Phys.\ B  {\bf 864} (2012)
   [arXiv:1112.5517 [hep-ph]].
 \bibitem{Passarino:2010qk}
-  G.~Passarino, C.~Sturm and S.~Uccirati, 
+  G.~Passarino, C.~Sturm and S.~Uccirati,
   ``Higgs pseudo-observables, second riemann sheet and all that,''
   Nucl.\ Phys.\ B {\bf 834} (2010)
   [arXiv:1001.3360 [hep-ph]].
