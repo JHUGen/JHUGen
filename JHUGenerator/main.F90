@@ -232,8 +232,8 @@ logical :: help, success, SetLastArgument, interfSet
 logical :: SetRenScheme, SetMuRenMultiplier, SetFacScheme, SetMuFacMultiplier
 logical :: SetAnomalousSpin0gg, Setghg2, SetAnomalousSpin0ZZ, Setghz1
 logical :: SetZgammacoupling, Setgammagammacoupling
-logical :: SetAnomalousSpin1qq, Setspin1qqleft, Setspin1qqright, SetAnomalousSpin1ZZ
-logical :: SetAnomalousSpin2gg, SetAnomalousSpin2qq, Setspin2qqleft, Setspin2qqright,SetAnomalousSpin2ZZ
+logical :: SetAnomalousSpin1qq, Setspin1qqleft, Setspin1qqright
+logical :: SetAnomalousSpin2gg, SetAnomalousSpin2qq, Setspin2qqleft, Setspin2qqright
 logical :: SetAnomalousHff, Setkappa
 logical :: SetpTcut, SetdeltaRcut
 
@@ -314,12 +314,10 @@ logical :: SetpTcut, SetdeltaRcut
    SetAnomalousSpin1qq=.false.
    Setspin1qqleft=.false.
    Setspin1qqright=.false.
-   SetAnomalousSpin1ZZ=.false.
    SetAnomalousSpin2gg=.false.
    SetAnomalousSpin2qq=.false.
    Setspin2qqleft=.false.
    Setspin2qqright=.false.
-   SetAnomalousSpin2ZZ=.false.
    SetAnomalousHff=.false.
    Setkappa=.false.
 
@@ -535,8 +533,8 @@ logical :: SetpTcut, SetdeltaRcut
     !spin 1
     call ReadCommandLineArgument(arg, "zprime_qq_left", success, zprime_qq_left, success2=SetAnomalousSpin1qq, success3=Setspin1qqleft)
     call ReadCommandLineArgument(arg, "zprime_qq_right", success, zprime_qq_right, success2=SetAnomalousSpin1qq, success3=Setspin1qqright)
-    call ReadCommandLineArgument(arg, "zprime_zz_1", success, zprime_zz_1, success2=SetAnomalousSpin1ZZ)
-    call ReadCommandLineArgument(arg, "zprime_zz_2", success, zprime_zz_2, success2=SetAnomalousSpin1ZZ)
+    call ReadCommandLineArgument(arg, "zprime_zz_1", success, zprime_zz_1)
+    call ReadCommandLineArgument(arg, "zprime_zz_2", success, zprime_zz_2)
 
     !spin 2
     call ReadCommandLineArgument(arg, "a1", success, a1, success2=SetAnomalousSpin2gg)
@@ -546,16 +544,16 @@ logical :: SetpTcut, SetdeltaRcut
     call ReadCommandLineArgument(arg, "a5", success, a5, success2=SetAnomalousSpin2gg)
     call ReadCommandLineArgument(arg, "graviton_qq_left", success, graviton_qq_left, success2=SetAnomalousSpin2qq, success3=Setspin2qqleft)
     call ReadCommandLineArgument(arg, "graviton_qq_right", success, graviton_qq_right, success2=SetAnomalousSpin2qq, success3=Setspin2qqright)
-    call ReadCommandLineArgument(arg, "b1", success, b1, success2=SetAnomalousSpin2ZZ)
-    call ReadCommandLineArgument(arg, "b2", success, b2, success2=SetAnomalousSpin2ZZ)
-    call ReadCommandLineArgument(arg, "b3", success, b3, success2=SetAnomalousSpin2ZZ)
-    call ReadCommandLineArgument(arg, "b4", success, b4, success2=SetAnomalousSpin2ZZ)
-    call ReadCommandLineArgument(arg, "b5", success, b5, success2=SetAnomalousSpin2ZZ)
-    call ReadCommandLineArgument(arg, "b6", success, b6, success2=SetAnomalousSpin2ZZ)
-    call ReadCommandLineArgument(arg, "b7", success, b7, success2=SetAnomalousSpin2ZZ)
-    call ReadCommandLineArgument(arg, "b8", success, b8, success2=SetAnomalousSpin2ZZ)
-    call ReadCommandLineArgument(arg, "b9", success, b9, success2=SetAnomalousSpin2ZZ)
-    call ReadCommandLineArgument(arg, "b10", success, b10, success2=SetAnomalousSpin2ZZ)
+    call ReadCommandLineArgument(arg, "b1", success, b1)
+    call ReadCommandLineArgument(arg, "b2", success, b2)
+    call ReadCommandLineArgument(arg, "b3", success, b3)
+    call ReadCommandLineArgument(arg, "b4", success, b4)
+    call ReadCommandLineArgument(arg, "b5", success, b5)
+    call ReadCommandLineArgument(arg, "b6", success, b6)
+    call ReadCommandLineArgument(arg, "b7", success, b7)
+    call ReadCommandLineArgument(arg, "b8", success, b8)
+    call ReadCommandLineArgument(arg, "b9", success, b9)
+    call ReadCommandLineArgument(arg, "b10", success, b10)
 
     !Hff couplings
     call ReadCommandLineArgument(arg, "kappa", success, kappa, success2=SetAnomalousHff, success3=Setkappa)
@@ -867,10 +865,10 @@ logical :: SetpTcut, SetdeltaRcut
           call Error("In spin 2 qq production, the couplings cannot all be zero. You can use PChannel=0 for gg-only production.")
        endif
        if ((a1.eq.czero .and. a2.eq.czero .and. a3.eq.czero .and. a4.eq.czero .and. a5.eq.czero) .and. PChannel.ne.1) then
-          call Error("In spin 2 gg production, the couplings cannot all be zero. You can use PChannel=1 for qq-only production.")
+          call Error("In spin 2 gg production, the couplings cannot all be zero. You can use PChannel=1 for qq-only production, or explicitly set at least one of the gg couplings a1, a2, a3, a4, or a5 non-zero.")
        endif
        if (b1.eq.czero .and. b2.eq.czero .and. b3.eq.czero .and. b4.eq.czero .and. b5.eq.czero .and. b6.eq.czero .and. b7.eq.czero .and. b8.eq.czero .and. b9.eq.czero .and. b10.eq.czero) then
-          call Error("Spin 2 VV decay cannot be done with zero couplings.")
+          call Error("Spin 2 VV decay cannot be done with zero couplings.  You need to explicitly set b1, b2, b3, b4, b5, b6, b7, b8, b9, or b10 non-zero.")
        endif
        if (.not.(OffShellV1 .and. OffShellV2) .and. (b5.ne.czero .or. b6.ne.czero .or. b7.ne.czero .or. b9.ne.czero .or. b10.ne.czero)) then
           call Error("Spin 2 Z+gamma or gamma+gamma decay cannot be done with b5-7 or b9-10.")

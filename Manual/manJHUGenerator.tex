@@ -480,13 +480,10 @@ The parameters below represent the couplings given in Eq.~(16) from Ref.~\cite{B
 \label{spin2}
 
 \noindent
-The \verb|a*| parameters control the coupling of a spin-2 resonance to gluons in the production mechanism.  The \verb|b*| and \verb|c*| parameters control the decay.
-One has the options to set the spin-2 couplings either from Eq.(18) or Eq.(19) from Ref.~\cite{Bolognesi:2012}.  To switch between the two, use the parameter \verb|generate_bis|.
+The \verb|a*| parameters control the coupling of a spin-2 resonance to gluons in the production mechanism.  The \verb|b*| parameters control the decay.
+The spin-2 couplings are described by Eq.(18) from Ref.~\cite{Bolognesi:2012}, and can be set on the command line.
 
 \begin{verbatim}
-  logical, public, parameter :: generate_bis = .true.
-  logical, public, parameter :: use_dynamic_MG = .true. ! .true. (=default),
-													    ! the spin-2 resonance mass with MG^2=(p1+p2)^2, otherwise fixed at M_Reso^2.
 
   complex(8), public, parameter :: a1 = (1.0d0,0d0)    ! g1  -- c.f. note
   complex(8), public, parameter :: a2 = (0.0d0,0d0)    ! g2
@@ -507,16 +504,6 @@ One has the options to set the spin-2 couplings either from Eq.(18) or Eq.(19) f
   complex(8), public, parameter :: b8 = (0.0d0,0d0)
   complex(8), public, parameter :: b9 = (0.0d0,0d0)
   complex(8), public, parameter :: b10 =(0.0d0,0d0)
-
-
-  complex(8), public, parameter  :: c1 = (1.0d0,0d0)
-  complex(8), public, parameter  :: c2 = (0.0d0,0d0)
-  complex(8), public, parameter  :: c3 = (0.0d0,0d0)
-  complex(8), public, parameter  :: c41= (0.0d0,0d0)
-  complex(8), public, parameter  :: c42= (0.0d0,0d0)
-  complex(8), public, parameter  :: c5 = (0.0d0,0d0)
-  complex(8), public, parameter  :: c6 = (0.0d0,0d0)
-  complex(8), public, parameter  :: c7 = (0.0d0,0d0)
 \end{verbatim}
 
 \section{ Examples }
@@ -881,234 +868,57 @@ In going from \verb|v2.0.2| to \verb|v2.1.x|, (August 20, 2012) the updates are 
 
 We define configurations for certain models which are defined in Table~1 of~\cite{Bolognesi:2012}.
 
+\subsection{Spin 0}
+All couplings not specified are 0 by default except for the SM couplings \verb|ghz1| and \verb|ghg2|, which must be set to 0 explicitly if that is desired.  For protection, if any anomalous couplings in the same category are set, those couplings must be explicitly set either to 0,0 or to some other value.
+
 %%%-------- 0+
-\subsection{"SM-like spin-zero", $0^+$}
+\subsubsection{"SM-like spin-zero", $0^+$}
 
-\footnotesize
-\begin{verbatim}
-!-- parameters that define on-shell spin 0 coupling to SM fields, see note
-   logical, public, parameter :: generate_as = .false.
-   complex(8), public, parameter :: ahg1 = (1.0d0,0d0)
-   complex(8), public, parameter :: ahg2 = (0.0d0,0d0)
-   complex(8), public, parameter :: ahg3 = (0.0d0,0d0)  ! pseudoscalar
-   complex(8), public, parameter :: ahz1 = (1.0d0,0d0)
-   complex(8), public, parameter :: ahz2 = (0.0d0,0d0)  ! this coupling does not contribute for gamma+gamma final states
-   complex(8), public, parameter :: ahz3 = (0.0d0,0d0)  ! pseudoscalar
-
-!-- parameters that define off-shell spin 0 coupling to SM fields, see note
-   complex(8), public, parameter :: ghg2 = (1.0d0,0d0)
-   complex(8), public, parameter :: ghg3 = (0.0d0,0d0)
-   complex(8), public, parameter :: ghg4 = (0.0d0,0d0)   ! pseudoscalar
-   complex(8), public, parameter :: ghz1 = (1.0d0,0d0)
-   complex(8), public, parameter :: ghz2 = (0.0d0,0d0)
-   complex(8), public, parameter :: ghz3 = (0.0d0,0d0)
-   complex(8), public, parameter :: ghz4 = (0.0d0,0d0)   ! pseudoscalar
-\end{verbatim}
-\normalsize
+\verb|ghz1=1,0|
 
 %%%-------- 0+h
-\subsection{"Higher order spin-zero", $0_h^+$}
+\subsubsection{"Higher order spin-zero", $0_h^+$}
 
-\footnotesize
-\begin{verbatim}
-!-- parameters that define on-shell spin 0 coupling to SM fields, see note
-   logical, public, parameter :: generate_as = .false.
-   complex(8), public, parameter :: ahg1 = (1.0d0,0d0)
-   complex(8), public, parameter :: ahg2 = (0.0d0,0d0)
-   complex(8), public, parameter :: ahg3 = (0.0d0,0d0)  ! pseudoscalar
-   complex(8), public, parameter :: ahz1 = (1.0d0,0d0)
-   complex(8), public, parameter :: ahz2 = (0.0d0,0d0)  ! this coupling does not contribute for gamma+gamma final states
-   complex(8), public, parameter :: ahz3 = (0.0d0,0d0)  ! pseudoscalar
-
-!-- parameters that define off-shell spin 0 coupling to SM fields, see note
-   complex(8), public, parameter :: ghg2 = (1.0d0,0d0)
-   complex(8), public, parameter :: ghg3 = (0.0d0,0d0)
-   complex(8), public, parameter :: ghg4 = (0.0d0,0d0)   ! pseudoscalar
-   complex(8), public, parameter :: ghz1 = (0.0d0,0d0)
-   complex(8), public, parameter :: ghz2 = (1.0d0,0d0)
-   complex(8), public, parameter :: ghz3 = (0.0d0,0d0)
-   complex(8), public, parameter :: ghz4 = (0.0d0,0d0)   ! pseudoscalar
-\end{verbatim}
-\normalsize
+\verb|ghz1=0,0 ghz2=1,0|
 
 %%%-------- 0-
-\subsection{"Pseudoscalar spin-zero", $0^-$}
+\subsubsection{"Pseudoscalar spin-zero", $0^-$}
 
-\footnotesize
-\begin{verbatim}
-!-- parameters that define on-shell spin 0 coupling to SM fields, see note
-   logical, public, parameter :: generate_as = .false.
-   complex(8), public, parameter :: ahg1 = (1.0d0,0d0)
-   complex(8), public, parameter :: ahg2 = (0.0d0,0d0)
-   complex(8), public, parameter :: ahg3 = (0.0d0,0d0)  ! pseudoscalar
-   complex(8), public, parameter :: ahz1 = (1.0d0,0d0)
-   complex(8), public, parameter :: ahz2 = (0.0d0,0d0)  ! this coupling does not contribute for gamma+gamma final states
-   complex(8), public, parameter :: ahz3 = (0.0d0,0d0)  ! pseudoscalar
+\verb|ghz1=0,0 ghz4=1,0 ghg2=0,0 ghg4=1,0|
 
-!-- parameters that define off-shell spin 0 coupling to SM fields, see note
-   complex(8), public, parameter :: ghg2 = (0.0d0,0d0)
-   complex(8), public, parameter :: ghg3 = (0.0d0,0d0)
-   complex(8), public, parameter :: ghg4 = (1.0d0,0d0)   ! pseudoscalar
-   complex(8), public, parameter :: ghz1 = (0.0d0,0d0)
-   complex(8), public, parameter :: ghz2 = (0.0d0,0d0)
-   complex(8), public, parameter :: ghz3 = (0.0d0,0d0)
-   complex(8), public, parameter :: ghz4 = (1.0d0,0d0)   ! pseudoscalar
-\end{verbatim}
-\normalsize
+\subsection{spin 1}
+The $Z^\prime VV$ couplings \verb|zprime_zz_1| and \verb|zprime_zz_2| are both 0 by default; at least one of them must be explicitly turned on.  The $Z^{\prime}q\bar{q}$ couplings \verb|zprime_qq_left| and \verb|zprime_qq_right| are both set to 1 by default; if one is changed, then both must be explicitly set.
 
 %%%-------- 1-
-\subsection{"Vector spin-one", $1^-$}
+\subsubsection{"Vector spin-one", $1^-$}
 
-\footnotesize
-\begin{verbatim}
-!---parameters that define spin 1 coupling to SM fields, see note
-   complex(8), public, parameter :: zprime_qq_left  = (1.0d0,0d0)
-   complex(8), public, parameter :: zprime_qq_right = (0.0d0,0d0)
-   complex(8), public, parameter :: zprime_zz_v =  (1.0d0,0d0)!  =1 for JP=1-
-   complex(8), public, parameter :: zprime_zz_a =  (0.0d0,0d0)!  =1 for JP=1+
-\end{verbatim}
-\normalsize
+\verb|zprime_qq_left=1,0 zprime_qq_right=0,0 zprime_zz_1=1,0|
 
 %%%-------- 1+
-\subsection{"Pseudovector spin-one", $1^+$}
+\subsubsection{"Pseudovector spin-one", $1^+$}
 
-\footnotesize
-\begin{verbatim}
-!---parameters that define spin 1 coupling to SM fields, see note
-   complex(8), public, parameter :: zprime_qq_left  = (1.0d0,0d0)
-   complex(8), public, parameter :: zprime_qq_right = (0.0d0,0d0)
-   complex(8), public, parameter :: zprime_zz_v =  (0.0d0,0d0)!  =1 for JP=1-
-   complex(8), public, parameter :: zprime_zz_a =  (1.0d0,0d0)!  =1 for JP=1+
-\end{verbatim}
-\normalsize
+\verb|zprime_qq_left=1,0 zprime_qq_right=0,0 zprime_zz_2=1,0|
+
+\subsection{spin 2}
+The $Ggg$ and $GVV$ couplings \verb|a1-5| and \verb|b1-10| are set to 0 by default; at least one in each category must be explicitly turned on.  The $Gq\bar{q}$ couplings \verb|graviton_qq_left| and \verb|graviton_qq_right| are both set to 1 by default; if one is changed, then both must be explicitly set.
+
+If an exclusive production mode is desired (e.g. $q\bar{q}$ or $gg$), this is handled at command-line configuration level via the \verb|PChannel| variable.
 
 %%%-------- 2+
-\subsection{"Minimal Graviton, spin-two", $2^+$}
-
-N.B. If an exclusive production mode is desired (e.g. $q\bar{q}$ or $gg$), this is handled at command-line configuration level via the \verb|PChannel| variable.
-
-\footnotesize
-\begin{verbatim}
-!-- parameters that define spin 2 coupling to SM fields, see note
-! minimal coupling corresponds to a1 = b1 = b5 = 1 everything else 0
-  complex(8), public, parameter :: a1 = (1.0d0,0d0)    ! g1  -- c.f. draft
-  complex(8), public, parameter :: a2 = (0.0d0,0d0)    ! g2
-  complex(8), public, parameter :: a3 = (0.0d0,0d0)    ! g3
-  complex(8), public, parameter :: a4 = (0.0d0,0d0)    ! g4
-  complex(8), public, parameter :: a5 = (0.0d0,0d0)    ! pseudoscalar, g8
-  complex(8), public, parameter :: graviton_qq_left  = (1.0d0,0d0)! graviton coupling to quarks
-  complex(8), public, parameter :: graviton_qq_right = (1.0d0,0d0)
-
-!-- see mod_Graviton
-  logical, public, parameter :: generate_bis = .true.
-  logical, public, parameter :: use_dynamic_MG = .true.
-
-  complex(8), public, parameter :: b1 = (1.0d0,0d0)    !  all b' below are g's in the draft
-  complex(8), public, parameter :: b2 = (0.0d0,0d0)
-  complex(8), public, parameter :: b3 = (0.0d0,0d0)
-  complex(8), public, parameter :: b4 = (0.0d0,0d0)
-  complex(8), public, parameter :: b5 = (1.0d0,0d0)
-  complex(8), public, parameter :: b6 = (0.0d0,0d0)
-  complex(8), public, parameter :: b7 = (0.0d0,0d0)
-  complex(8), public, parameter :: b8 = (0.0d0,0d0)
-  complex(8), public, parameter :: b9 = (0.0d0,0d0)
-  complex(8), public, parameter :: b10 =(0.0d0,0d0)  ! this coupling does not contribute for gamma+gamma final states
+\subsubsection{"Minimal Graviton, spin-two", $2^+$}
 
 
-  complex(8), public, parameter  :: c1 = (1.0d0,0d0)
-  complex(8), public, parameter  :: c2 = (0.0d0,0d0)
-  complex(8), public, parameter  :: c3 = (0.0d0,0d0)
-  complex(8), public, parameter  :: c41= (0.0d0,0d0)
-  complex(8), public, parameter  :: c42= (0.0d0,0d0)
-  complex(8), public, parameter  :: c5 = (0.0d0,0d0)
-  complex(8), public, parameter  :: c6 = (0.0d0,0d0)
-  complex(8), public, parameter  :: c7 = (0.0d0,0d0)
-\end{verbatim}
-\normalsize
+\verb|a1=1,0 b1=1,0 b5=1,0|
 
 %%%-------- 2+h
-\subsection{"Higher order Graviton, spin-two", $2^+_h$}
+\subsubsection{"Higher order Graviton, spin-two", $2^+_h$}
 
-\footnotesize
-\begin{verbatim}
-!-- parameters that define spin 2 coupling to SM fields, see note
-! minimal coupling corresponds to a1 = b1 = b5 = 1 everything else 0
-  complex(8), public, parameter :: a1 = (0.0d0,0d0)    ! g1  -- c.f. draft
-  complex(8), public, parameter :: a2 = (0.0d0,0d0)    ! g2
-  complex(8), public, parameter :: a3 = (0.0d0,0d0)    ! g3
-  complex(8), public, parameter :: a4 = (1.0d0,0d0)    ! g4
-  complex(8), public, parameter :: a5 = (0.0d0,0d0)    ! pseudoscalar, g8
-  complex(8), public, parameter :: graviton_qq_left  = (1.0d0,0d0)! graviton coupling to quarks
-  complex(8), public, parameter :: graviton_qq_right = (1.0d0,0d0)
-
-!-- see mod_Graviton
-  logical, public, parameter :: generate_bis = .true.
-  logical, public, parameter :: use_dynamic_MG = .true.
-
-  complex(8), public, parameter :: b1 = (0.0d0,0d0)    !  all b' below are g's in the draft
-  complex(8), public, parameter :: b2 = (0.0d0,0d0)
-  complex(8), public, parameter :: b3 = (0.0d0,0d0)
-  complex(8), public, parameter :: b4 = (1.0d0,0d0)
-  complex(8), public, parameter :: b5 = (0.0d0,0d0)
-  complex(8), public, parameter :: b6 = (0.0d0,0d0)
-  complex(8), public, parameter :: b7 = (0.0d0,0d0)
-  complex(8), public, parameter :: b8 = (0.0d0,0d0)
-  complex(8), public, parameter :: b9 = (0.0d0,0d0)
-  complex(8), public, parameter :: b10 =(0.0d0,0d0)  ! this coupling does not contribute for gamma+gamma final states
-
-
-  complex(8), public, parameter  :: c1 = (1.0d0,0d0)
-  complex(8), public, parameter  :: c2 = (0.0d0,0d0)
-  complex(8), public, parameter  :: c3 = (0.0d0,0d0)
-  complex(8), public, parameter  :: c41= (0.0d0,0d0)
-  complex(8), public, parameter  :: c42= (0.0d0,0d0)
-  complex(8), public, parameter  :: c5 = (0.0d0,0d0)
-  complex(8), public, parameter  :: c6 = (0.0d0,0d0)
-  complex(8), public, parameter  :: c7 = (0.0d0,0d0)
-\end{verbatim}
-\normalsize
+\verb|a4=1,0 b4=1,0|
 
 %%%-------- 2-h
-\subsection{"Higher order Graviton, spin-two", $2^-_h$}
+\subsubsection{"Higher order Graviton, spin-two", $2^-_h$}
 
-\footnotesize
-\begin{verbatim}
-!-- parameters that define spin 2 coupling to SM fields, see note
-! minimal coupling corresponds to a1 = b1 = b5 = 1 everything else 0
-  complex(8), public, parameter :: a1 = (0.0d0,0d0)    ! g1  -- c.f. draft
-  complex(8), public, parameter :: a2 = (0.0d0,0d0)    ! g2
-  complex(8), public, parameter :: a3 = (0.0d0,0d0)    ! g3
-  complex(8), public, parameter :: a4 = (0.0d0,0d0)    ! g4
-  complex(8), public, parameter :: a5 = (1.0d0,0d0)    ! pseudoscalar, g8
-  complex(8), public, parameter :: graviton_qq_left  = (1.0d0,0d0)! graviton coupling to quarks
-  complex(8), public, parameter :: graviton_qq_right = (1.0d0,0d0)
-
-!-- see mod_Graviton
-  logical, public, parameter :: generate_bis = .true.
-  logical, public, parameter :: use_dynamic_MG = .true.
-
-  complex(8), public, parameter :: b1 = (0.0d0,0d0)    !  all b' below are g's in the draft
-  complex(8), public, parameter :: b2 = (0.0d0,0d0)
-  complex(8), public, parameter :: b3 = (0.0d0,0d0)
-  complex(8), public, parameter :: b4 = (0.0d0,0d0)
-  complex(8), public, parameter :: b5 = (0.0d0,0d0)
-  complex(8), public, parameter :: b6 = (0.0d0,0d0)
-  complex(8), public, parameter :: b7 = (0.0d0,0d0)
-  complex(8), public, parameter :: b8 = (1.0d0,0d0)
-  complex(8), public, parameter :: b9 = (0.0d0,0d0)
-  complex(8), public, parameter :: b10 =(0.0d0,0d0)  ! this coupling does not contribute for gamma+gamma final states
-
-
-  complex(8), public, parameter  :: c1 = (1.0d0,0d0)
-  complex(8), public, parameter  :: c2 = (0.0d0,0d0)
-  complex(8), public, parameter  :: c3 = (0.0d0,0d0)
-  complex(8), public, parameter  :: c41= (0.0d0,0d0)
-  complex(8), public, parameter  :: c42= (0.0d0,0d0)
-  complex(8), public, parameter  :: c5 = (0.0d0,0d0)
-  complex(8), public, parameter  :: c6 = (0.0d0,0d0)
-  complex(8), public, parameter  :: c7 = (0.0d0,0d0)
-\end{verbatim}
-\normalsize
+\verb|a5=1,0 b8=1,0|
 
 
 \begin{thebibliography}{99}
