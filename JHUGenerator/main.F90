@@ -591,11 +591,13 @@ logical :: SetpTcut, SetdeltaRcut
     !LHAPDF
 
 #if useLHAPDF==1
-    if( LHAPDFString.eq."" ) then
-       print *, "Need to specify pdf file name in command line argument LHAPDF"
-       stop 1
-    endif
     call GET_ENVIRONMENT_VARIABLE("LHAPDF_DATA_PATH", LHAPDF_DATA_PATH)
+    if( LHAPDFString.eq."" ) then
+       if (.not. (ReadLHEFile .or. ConvertLHEFile)) then
+         print *, "Need to specify pdf file name in command line argument LHAPDF"
+         stop 1
+       endif
+    endif
 #endif
 
     !Renormalization/factorization schemes
@@ -911,8 +913,8 @@ SUBROUTINE InitPDFValues()
 #endif
 
    Mu_Fact = M_Reso ! Set pdf scale to resonance mass by default, later changed as necessary in the EvalWeighted/EvalUnweighted subroutines
-	Mu_Ren = M_Reso ! Set renorm. scale to resonance mass by default, later changed as necessary in the EvalWeighted/EvalUnweighted subroutines
-   call EvalAlphaS() ! Set alphas at default Mu_Ren. Notice ModParameters::ComputeQCDVariables is automatically called!
+   Mu_Ren = M_Reso ! Set renorm. scale to resonance mass by default, later changed as necessary in the EvalWeighted/EvalUnweighted subroutines
+   if (.not.ReadLHEFile .and. .not.ConvertLHEFile) call EvalAlphaS() ! Set alphas at default Mu_Ren. Notice ModParameters::ComputeQCDVariables is automatically called!
    return
 END SUBROUTINE
 
@@ -925,6 +927,7 @@ SUBROUTINE InitPDFs()
    implicit none
    DOUBLE PRECISION alphasPDF
 
+   if (.not.ReadLHEFile .and. .not.ConvertLHEFile) then
      call InitPDFset(trim(LHAPDFString)) ! Let LHAPDF handle everything
      call InitPDF(LHAPDFMember)
 
@@ -932,6 +935,7 @@ SUBROUTINE InitPDFs()
      ! Dummy initialization, just in case. These values are not used.
      !nloops_pdf = 1
      zmass_pdf = M_Z
+   endif
 
 #else
 
@@ -939,6 +943,8 @@ SUBROUTINE InitPDFs()
    use ModKinematics
    implicit none
    character :: pdftable*(100)
+
+   if (.not.ReadLHEFile .and. .not.ConvertLHEFile) then
 
      zmass_pdf = M_Z ! Take zmass_pdf=M_Z in pdfs that do not specify this value
 
@@ -965,6 +971,8 @@ SUBROUTINE InitPDFs()
         !alphas_mz = 0.13229060d0
         !nloops_pdf = 1
      endif
+
+   endif
 
 #endif
 
@@ -1577,13 +1585,14 @@ END SUBROUTINE
 
 SUBROUTINE StartVegas_NEW(VG_Result,VG_Error)
 use ModCrossSection
-use ModCrossSection_HJJ
-use ModCrossSection_TTBH
 use ModCrossSection_BBBH
+use ModCrossSection_HJJ
 use ModCrossSection_TH
-use ModKinematics
-use ModParameters
+use ModCrossSection_TTBH
 use modHiggsJJ
+use ModKinematics
+use ModMisc
+use ModParameters
 implicit none
 include "vegas_common.f"
 real(8) :: VG_Result,VG_Error,VG_Chi2
@@ -1754,15 +1763,10 @@ if( UseBetaVersion ) then
     write(io_stdout,*) "Total xsec: ",VG_Result, " +/-",VG_Error, " fb    vs.",sum(CrossSec(:,:))
     call InitOutput(VG_Result, VG_Error)
 
-
-    RequEvents(:,:)=0
-    do i1=-5,5
-    do j1=-5,5
-        RequEvents(i1,j1) = RequEvents(i1,j1) + nint( CrossSec(i1,j1)/VG_Result * VegasNc2 )
-    enddo
-    enddo
-
-
+    RequEvents(:,:) = 0
+    if (VegasNc2.ne.-1) then
+      call HouseOfRepresentatives(CrossSec(-5:5,-5:5), RequEvents(-5:5,-5:5), VegasNc2)
+    endif
 
     if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2) then
        call get_PPXchannelHash(ijSel)
@@ -1790,36 +1794,9 @@ if( UseBetaVersion ) then
 
 
 
-
-!   add some events that got lost due to rounding errors
-!   distribute them according to the partonic cross section fractions and finally add the last pieces to the largest partonic contribution
-    MissingEvents = VegasNc2 - sum(RequEvents(:,:))
-    if( MissingEvents.ne.0 ) then
-!         print *, "MISSING EVENTS",MissingEvents
-        MaxEvts = -10000
-        do i=1,121
-            i1 = ijSel(i,1)
-            j1 = ijSel(i,2)
-            RequEvents(i1,j1) = RequEvents(i1,j1) + nint( CrossSec(i1,j1)/VG_Result * MissingEvents )
-            if( RequEvents(i1,j1).gt.MaxEvts ) then
-              MaxEvts = RequEvents(i1,j1)
-              imax=i
-            endif
-!             print *, "adding",i1,j1,nint( CrossSec(i1,j1)/VG_Result * MissingEvents )
-        enddo
-        MissingEvents = VegasNc2 - sum(RequEvents(:,:))
-!         print *, "MISSING EVENTS",MissingEvents
-        i1 = ijSel(imax,1)
-        j1 = ijSel(imax,2)
-        RequEvents(i1,j1) = RequEvents(i1,j1) + MissingEvents
-        write(*,"(2X,A,I9)") "Adjusting number of events. New event count=",sum(RequEvents(:,:))
-    endif
-
-
-
-
     write(io_stdout,"(A)")  ""
     write(io_stdout,"(2X,A)")  "Event generation"
+
     call ClearHisto()
     warmup = .false.
     itmx = 1
@@ -1958,13 +1935,10 @@ else! beta version
    write(io_stdout,"(1X,A,F10.3)") "Total xsec: ",TotalXSec
 
 
-    RequEvents(:,:)=0
-    do i1=-5,5
-    do j1=-5,5
-         RequEvents(i1,j1) = RequEvents(i1,j1) + int( VG(i1,j1)/TotalXSec * VegasNc2 )
-    enddo
-    enddo
-
+    RequEvents(:,:) = 0
+    if (VegasNc2.ne.-1) then
+      call HouseOfRepresentatives(VG(:,:), RequEvents(-5:5,-5:5), VegasNc2)
+    endif
 
     do i1=-5,5
     do j1=-5,5
@@ -3908,7 +3882,7 @@ integer :: stat
     beamenergy2 = Collider_Energy/GeV / 2d0
     pdfgup1 = 0
     pdfgup2 = 0
-    if( Collider.eq.0 ) then
+    if( Collider.eq.0 .or. ReadLHEFile .or. ConvertLHEFile ) then
         pdfsup1 = 0
         pdfsup2 = 0
     else
@@ -4604,7 +4578,7 @@ integer :: TheUnit
     write(TheUnit,"(A90)") " *   Spin and parity determination of single-produced resonances at hadron colliders   *"
     write(TheUnit,"(A90)") " *                                                                                     *"
     write(TheUnit,"(A90)") " *          I. Anderson, S. Bolognesi, F. Caola, Y. Gao, A. Gritsan, Z. Guo,           *"
-    write(TheUnit,"(A90)") " *        C. Martin, K. Melnikov, R.Rontsch, H. Roskes, U. Sarica, M. Schulze,         *"
+    write(TheUnit,"(A90)") " *        C. Martin, K. Melnikov, R. Rontsch, H. Roskes, U. Sarica, M. Schulze,        *"
     write(TheUnit,"(A90)") " *                   N. Tran, A. Whitbeck, M. Xiao, C. You, Y. Zhou                    *"
     write(TheUnit,"(A90)") " *               Phys.Rev. D81 (2010) 075022;  arXiv:1001.3396  [hep-ph],              *"
     write(TheUnit,"(A90)") " *               Phys.Rev. D86 (2012) 095031;  arXiv:1208.4018  [hep-ph],              *"
