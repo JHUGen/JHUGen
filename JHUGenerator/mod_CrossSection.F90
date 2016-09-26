@@ -540,7 +540,6 @@ include 'csmaxvalue.f'
 
 
     call SetRunningScales( (/ (MomExt(1:4,3)+MomExt(1:4,4)),Mom_Not_a_particle(1:4),Mom_Not_a_particle(1:4) /) , (/ Not_a_particle_,Not_a_particle_,Not_a_particle_,Not_a_particle_ /) ) ! Call anyway
-    call EvalAlphaS()
 
 IF( GENEVT ) THEN
 
@@ -3139,12 +3138,11 @@ m2ffwgt=1d0
   PreFac = fbGeV2 * PSWgt
 
   call SetRunningScales( (/ pHiggs(1:4),Mom_Not_a_particle(1:4),Mom_Not_a_particle(1:4) /) , (/ Not_a_particle_,Not_a_particle_,Not_a_particle_,Not_a_particle_ /) ) ! Call anyway
-  call EvalAlphaS()
 
   if( TauDecays.eq.0 ) then
-     if (genevt) then
-        call printMom(Mom(1:4,tauP:tauM))
-     endif
+!     if (genevt) then
+!        call printMom(Mom(1:4,tauP:tauM))
+!     endif
      call EvalAmp_H_FF(Mom(1:4,tauP:tauM),m_tau,LO_Res_Unpol)
   else
      call EvalAmp_H_TT_decay((/Mom(1:4,lepM),Mom(1:4,nubar),Mom(1:4,nu_tau),Mom(1:4,nu),Mom(1:4,lepP),Mom(1:4,nubar_tau)/),m_tau,ga_tau,LO_Res_Unpol)
