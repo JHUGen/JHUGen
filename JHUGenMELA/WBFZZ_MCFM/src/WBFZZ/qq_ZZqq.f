@@ -89,7 +89,9 @@ c     ,j3_4(4,2),j5_6(4,2),
       data wmass,wwidth/80.399d0,2.085d0/
       data zmass,zwidth/91.1876d0,2.4952d0/
       data Gf,vevsq/1.16639d-5,246d0/
-      data gw,xw,gwsq,esq/0.65307d0,0.23119d0,0.426501d0,0.0981748d0/
+!      data gw,xw,gwsq,esq/0.65307d0,0.23119d0,0.426501d0,0.0981748d0/
+      data gw,xw,gwsq,esq/0.65306233025595339d0,0.22264585341299603d0,
+     & 0.42649040719933595d0,0.094956320683352344d0/ 
 
       lambdaBSM = lambda_BSM
       lambda_Q = lambdaQ
@@ -333,8 +335,13 @@ c--- rescaling factor for Higgs amplitudes, if anomalous Higgs width
 
 C---setup spinors and spinorvector products
       call spinorcurr(8,p,za,zb,zab,zba)
-      do j=1,jmax
-!       do j=2,2; print *, "cut loop over qq-->Hqq",j
+!       do j=1,jmax
+      do j=1,1; print *, "cut loop over qq-->Hqq",j
+
+!         if( j.lt.9  ) cycle !  select VH only
+!         if( j.ge.9  ) cycle !  remove VH 
+
+
       temp(:,:)=0d0
       tempw(:,:)=0d0
       amp(:,:,:,:,:)=czip
@@ -397,13 +404,13 @@ C-----Singly resonant production in VBF style diagrams
 ! C----ZZ->ZZ scattering with the exchange of a H
       call ZZHZZamp(j1(j),j2(j),3,4,5,6,j7(j),j8(j),
      & za,zb,ZZHamp71_82)
-      call ZZHZZamp(j1(j),j2(j),3,4,5,6,j8(j),j7(j),
-     & za,zb,ZZHamp81_72)
+!      call ZZHZZamp(j1(j),j2(j),3,4,5,6,j8(j),j7(j),
+!     & za,zb,ZZHamp81_72)  !    MARKUS: removing the crossed diagram for this check  
 C----Four boson vertex + WW->Higgs diagram
       call WWZZ(j1(j),j2(j),3,4,5,6,j7(j),j8(j),
      & za,zb,WWZZ71_82amp,srWWZZ71_82amp)
-      call WWZZ(j1(j),j2(j),3,4,5,6,j8(j),j7(j),
-     & za,zb,WWZZ81_72amp,srWWZZ81_72amp)
+!      call WWZZ(j1(j),j2(j),3,4,5,6,j8(j),j7(j),
+!     & za,zb,WWZZ81_72amp,srWWZZ81_72amp)  !    MARKUS: removing the crossed diagram for this check  
 
 
 

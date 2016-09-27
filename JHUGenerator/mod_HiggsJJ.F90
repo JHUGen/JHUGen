@@ -407,9 +407,9 @@ module modHiggsJJ
   implicit none
   integer, intent(out) :: ijSel(1:121,1:3)
 
-ijSel(  1,1:3) = (/1,2, 1/)
-ijSel(  2,1:3) = (/2,1, 1/)
-return
+!ijSel(  1,1:3) = (/1,2, 1/)
+!ijSel(  2,1:3) = (/2,1, 1/)
+!return
 
 
       ijSel(  1,1:3) = (/-5,-5, 1/)
