@@ -107,17 +107,42 @@ test:
          pwd:
            ../JHUGenMELA
     #check sync between generator and MELA
-    - cmp mod_Graviton.F90 ../JHUGenMELAv2/MELA/fortran/mod_Graviton.F90
-    - cmp mod_Higgs.F90 ../JHUGenMELAv2/MELA/fortran/mod_Higgs.F90
-    - cmp mod_HiggsJ.F90 ../JHUGenMELAv2/MELA/fortran/mod_HiggsJ.F90
-    - cmp mod_HiggsJJ.F90 ../JHUGenMELAv2/MELA/fortran/mod_HiggsJJ.F90
-    - cmp mod_Misc.F90 ../JHUGenMELAv2/MELA/fortran/mod_Misc.F90
-    - cmp mod_Parameters.F90 ../JHUGenMELAv2/MELA/fortran/mod_Parameters.F90
-    - cmp mod_THiggs.F90 ../JHUGenMELAv2/MELA/fortran/mod_THiggs.F90
-    - cmp mod_TTBHiggs.F90 ../JHUGenMELAv2/MELA/fortran/mod_TTBHiggs.F90
-    - cmp mod_TopDecay.F90 ../JHUGenMELAv2/MELA/fortran/mod_TopDecay.F90
-    - cmp mod_VHiggs.F90 ../JHUGenMELAv2/MELA/fortran/mod_VHiggs.F90
-    - cmp mod_Zprime.F90 ../JHUGenMELAv2/MELA/fortran/mod_Zprime.F90
+    - sdiff -s mod_Graviton.F90 ../JHUGenMELAv2/MELA/fortran/mod_Graviton.F90
+    - sdiff -s mod_Higgs.F90 ../JHUGenMELAv2/MELA/fortran/mod_Higgs.F90
+    - sdiff -s mod_HiggsJ.F90 ../JHUGenMELAv2/MELA/fortran/mod_HiggsJ.F90
+    - sdiff -s mod_HiggsJJ.F90 ../JHUGenMELAv2/MELA/fortran/mod_HiggsJJ.F90
+    - sdiff -s mod_Misc.F90 ../JHUGenMELAv2/MELA/fortran/mod_Misc.F90
+    - sdiff -s mod_Parameters.F90 ../JHUGenMELAv2/MELA/fortran/mod_Parameters.F90
+    - sdiff -s mod_THiggs.F90 ../JHUGenMELAv2/MELA/fortran/mod_THiggs.F90
+    - sdiff -s mod_TTBHiggs.F90 ../JHUGenMELAv2/MELA/fortran/mod_TTBHiggs.F90
+    - sdiff -s mod_TopDecay.F90 ../JHUGenMELAv2/MELA/fortran/mod_TopDecay.F90
+    - sdiff -s mod_VHiggs.F90 ../JHUGenMELAv2/MELA/fortran/mod_VHiggs.F90
+    - sdiff -s mod_Zprime.F90 ../JHUGenMELAv2/MELA/fortran/mod_Zprime.F90
+    #check sync between manual, README, and ./JHUGen help
+    - |
+      commandlineconfigstartline=$(grep -n "[{]Command line configuration[}]" ../Manual/manJHUGenerator.tex | head -1 | sed "s/:.*//") &&
+      startline=$(expr $(tail -n +$commandlineconfigstartline ../Manual/manJHUGenerator.tex | grep -n "begin[{]verbatim[}]" | head -1 | sed "s/:.*//") + $commandlineconfigstartline) &&
+      endline=$(expr $(tail -n +$commandlineconfigstartline ../Manual/manJHUGenerator.tex | grep -n "end[{]verbatim[}]" | head -1 | sed "s/:.*//") + $commandlineconfigstartline - 2) &&
+      sdiff -s <(grep "^  " README) <(sed -n "${startline},${endline}p" ../Manual/manJHUGenerator.tex | sed "s/See below/See manual/")
+    - sdiff -s <(grep "^  " README) <(./JHUGen help 2> /dev/null | grep "[^ ]")
+    #check that all command line options are documented
+    - |
+      exitstatus=0
+      for a in $(grep -i 'call *ReadCommandLineArgument' main.F90 | sed -r 's/.*"(.*)".*/\1/'); do
+        if ! grep -q $a ../Manual/manJHUGenerator.tex &&
+           ! grep -q ${a/w/z} ../Manual/manJHUGenerator.tex &&        #ghw*, etc. are mentioned collectively
+           ! [ $a == WriteGit ] && ! [ $a == HbbDK ] &&               #for internal testing
+           ! [ $a == VBF_m4l_min ] && ! [ $a == VBF_m4l_max ] &&      #for internal testing
+           ! [ $a == PrintPMZZ ] && ! [ $a == PrintPMZZIntervals ] && #for internal testing
+           ! [ $a == GenEvents ]                                      #not sure what this does
+        then
+          echo "$a is undocumented!"
+          exitstatus=1
+        fi
+      done
+      exit $exitstatus
+
+
 
   override:
     #here we want to generate as many production modes as possible and get the widest range of events to check for syntax issues

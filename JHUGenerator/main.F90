@@ -235,10 +235,11 @@ logical :: help, success, SetLastArgument, interfSet
 logical :: SetRenScheme, SetMuRenMultiplier, SetFacScheme, SetMuFacMultiplier
 logical :: SetAnomalousSpin0gg, Setghg2, SetAnomalousSpin0ZZ, Setghz1
 logical :: SetZgammacoupling, Setgammagammacoupling
-logical :: SetAnomalousSpin1qq, Setspin1qqleft, Setspin1qqright, SetAnomalousSpin1ZZ
-logical :: SetAnomalousSpin2gg, SetAnomalousSpin2qq, Setspin2qqleft, Setspin2qqright,SetAnomalousSpin2ZZ
+logical :: SetAnomalousSpin1qq, Setspin1qqleft, Setspin1qqright
+logical :: SetAnomalousSpin2gg, SetAnomalousSpin2qq, Setspin2qqleft, Setspin2qqright
 logical :: SetAnomalousHff, Setkappa
 logical :: SetpTcut, SetdeltaRcut
+logical :: SetColliderEnergy
 
    help = .false.
 
@@ -317,17 +318,17 @@ logical :: SetpTcut, SetdeltaRcut
    SetAnomalousSpin1qq=.false.
    Setspin1qqleft=.false.
    Setspin1qqright=.false.
-   SetAnomalousSpin1ZZ=.false.
    SetAnomalousSpin2gg=.false.
    SetAnomalousSpin2qq=.false.
    Setspin2qqleft=.false.
    Setspin2qqright=.false.
-   SetAnomalousSpin2ZZ=.false.
    SetAnomalousHff=.false.
    Setkappa=.false.
 
    SetpTcut=.false.
    SetdeltaRcut=.false.
+
+   SetColliderEnergy=.false.
 
    DataFile="./data/output"
 
@@ -350,6 +351,8 @@ logical :: SetpTcut, SetdeltaRcut
     ! by detecting the type.  It also sets success to .true. if the argument name (before =)
     ! is correct.
     call ReadCommandLineArgument(arg, "Collider", success, Collider)
+    call ReadCommandLineArgument(arg, "ColliderEnergy", success, Collider_Energy, SetLastArgument, success2=SetColliderEnergy)
+    if( SetLastArgument ) Collider_Energy = Collider_Energy * 1000*GeV
 #if useLHAPDF==1
     call ReadCommandLineArgument(arg, "LHAPDF", success, LHAPDFString)
     call ReadCommandLineArgument(arg, "LHAPDFMem", success, LHAPDFMember)
@@ -399,6 +402,10 @@ logical :: SetpTcut, SetdeltaRcut
     call ReadCommandLineArgument(arg, "WriteFailedEvents", success, WriteFailedEvents)
     call ReadCommandLineArgument(arg, "Seed", success, UserSeed)
     call ReadCommandLineArgument(arg, "WriteGit", success, writegit) !for testing purposes
+    call ReadCommandLineArgument(arg, "RandomizeVVdecays", success, RandomizeVVdecays)
+    call ReadCommandLineArgument(arg, "ChannelRatio", success, channels_ratio_fix, success2=fix_channels_ratio)
+    call ReadCommandLineArgument(arg, "UnformattedRead", success, UseUnformattedRead)
+    call REadCommandLineArgument(arg, "WriteWeightedLHE", success, WriteWeightedLHE)
 
     !anomalous couplings
     !If any anomalous couplings are set, the default ones have to be set explicitly to keep them on or turn them off
@@ -562,8 +569,8 @@ logical :: SetpTcut, SetdeltaRcut
     !spin 1
     call ReadCommandLineArgument(arg, "zprime_qq_left", success, zprime_qq_left, success2=SetAnomalousSpin1qq, success3=Setspin1qqleft)
     call ReadCommandLineArgument(arg, "zprime_qq_right", success, zprime_qq_right, success2=SetAnomalousSpin1qq, success3=Setspin1qqright)
-    call ReadCommandLineArgument(arg, "zprime_zz_1", success, zprime_zz_1, success2=SetAnomalousSpin1ZZ)
-    call ReadCommandLineArgument(arg, "zprime_zz_2", success, zprime_zz_2, success2=SetAnomalousSpin1ZZ)
+    call ReadCommandLineArgument(arg, "zprime_zz_1", success, zprime_zz_1)
+    call ReadCommandLineArgument(arg, "zprime_zz_2", success, zprime_zz_2)
 
     !spin 2
     call ReadCommandLineArgument(arg, "a1", success, a1, success2=SetAnomalousSpin2gg)
@@ -573,16 +580,16 @@ logical :: SetpTcut, SetdeltaRcut
     call ReadCommandLineArgument(arg, "a5", success, a5, success2=SetAnomalousSpin2gg)
     call ReadCommandLineArgument(arg, "graviton_qq_left", success, graviton_qq_left, success2=SetAnomalousSpin2qq, success3=Setspin2qqleft)
     call ReadCommandLineArgument(arg, "graviton_qq_right", success, graviton_qq_right, success2=SetAnomalousSpin2qq, success3=Setspin2qqright)
-    call ReadCommandLineArgument(arg, "b1", success, b1, success2=SetAnomalousSpin2ZZ)
-    call ReadCommandLineArgument(arg, "b2", success, b2, success2=SetAnomalousSpin2ZZ)
-    call ReadCommandLineArgument(arg, "b3", success, b3, success2=SetAnomalousSpin2ZZ)
-    call ReadCommandLineArgument(arg, "b4", success, b4, success2=SetAnomalousSpin2ZZ)
-    call ReadCommandLineArgument(arg, "b5", success, b5, success2=SetAnomalousSpin2ZZ)
-    call ReadCommandLineArgument(arg, "b6", success, b6, success2=SetAnomalousSpin2ZZ)
-    call ReadCommandLineArgument(arg, "b7", success, b7, success2=SetAnomalousSpin2ZZ)
-    call ReadCommandLineArgument(arg, "b8", success, b8, success2=SetAnomalousSpin2ZZ)
-    call ReadCommandLineArgument(arg, "b9", success, b9, success2=SetAnomalousSpin2ZZ)
-    call ReadCommandLineArgument(arg, "b10", success, b10, success2=SetAnomalousSpin2ZZ)
+    call ReadCommandLineArgument(arg, "b1", success, b1)
+    call ReadCommandLineArgument(arg, "b2", success, b2)
+    call ReadCommandLineArgument(arg, "b3", success, b3)
+    call ReadCommandLineArgument(arg, "b4", success, b4)
+    call ReadCommandLineArgument(arg, "b5", success, b5)
+    call ReadCommandLineArgument(arg, "b6", success, b6)
+    call ReadCommandLineArgument(arg, "b7", success, b7)
+    call ReadCommandLineArgument(arg, "b8", success, b8)
+    call ReadCommandLineArgument(arg, "b9", success, b9)
+    call ReadCommandLineArgument(arg, "b10", success, b10)
 
     !Hff couplings
     call ReadCommandLineArgument(arg, "kappa", success, kappa, success2=SetAnomalousHff, success3=Setkappa)
@@ -626,6 +633,17 @@ logical :: SetpTcut, SetdeltaRcut
        endif
     endif
 #endif
+
+    !Collider and energy
+     if (.not.SetColliderEnergy) then
+      IF( COLLIDER.EQ.1) THEN
+        Collider_Energy  = LHC_Energy
+      ELSEIF( COLLIDER.EQ.2 ) THEN
+        Collider_Energy  = TEV_Energy
+      ELSEIF( COLLIDER.EQ.0 ) THEN
+        Collider_Energy  = ILC_Energy
+      ENDIF
+    endif
 
     !Renormalization/factorization schemes
 
@@ -885,10 +903,10 @@ logical :: SetpTcut, SetdeltaRcut
           call Error("In spin 2 qq production, the couplings cannot all be zero. You can use PChannel=0 for gg-only production.")
        endif
        if ((a1.eq.czero .and. a2.eq.czero .and. a3.eq.czero .and. a4.eq.czero .and. a5.eq.czero) .and. PChannel.ne.1) then
-          call Error("In spin 2 gg production, the couplings cannot all be zero. You can use PChannel=1 for qq-only production.")
+          call Error("In spin 2 gg production, the couplings cannot all be zero. You can use PChannel=1 for qq-only production, or explicitly set at least one of the gg couplings a1, a2, a3, a4, or a5 non-zero.")
        endif
        if (b1.eq.czero .and. b2.eq.czero .and. b3.eq.czero .and. b4.eq.czero .and. b5.eq.czero .and. b6.eq.czero .and. b7.eq.czero .and. b8.eq.czero .and. b9.eq.czero .and. b10.eq.czero) then
-          call Error("Spin 2 VV decay cannot be done with zero couplings.")
+          call Error("Spin 2 VV decay cannot be done with zero couplings.  You need to explicitly set b1, b2, b3, b4, b5, b6, b7, b8, b9, or b10 non-zero.")
        endif
        if (.not.(OffShellV1 .and. OffShellV2) .and. (b5.ne.czero .or. b6.ne.czero .or. b7.ne.czero .or. b9.ne.czero .or. b10.ne.czero)) then
           call Error("Spin 2 Z+gamma or gamma+gamma decay cannot be done with b5-7 or b9-10.")
@@ -1013,15 +1031,6 @@ END SUBROUTINE
 SUBROUTINE InitParameters
 use ModParameters
 implicit none
-
-IF( COLLIDER.EQ.1) THEN
-  Collider_Energy  = LHC_Energy
-ELSEIF( COLLIDER.EQ.2 ) THEN
-  Collider_Energy  = TEV_Energy
-ELSEIF( COLLIDER.EQ.0 ) THEN
-  Collider_Energy  = ILC_Energy
-ENDIF
-
 
 ! rescale V branchings to preserve the correct branching proportions in partial decays
 if( (DecayMode1.eq.8 .and. DecayMode2.eq.9) .or.  &
@@ -4590,45 +4599,97 @@ SUBROUTINE PrintCommandLineArgs()
 use modParameters
 implicit none
 
-        write(io_stdout,*) ""
-        write(io_stdout,"(2X,A)") "Command line arguments:"
-        write(io_stdout,"(4X,A)") "Collider:   1=LHC, 2=Tevatron, 0=e+e-"
-        write(io_stdout,"(4X,A)") "Process: 0=spin-0, 1=spin-1, 2=spin-2 resonance"
-        write(io_stdout,"(4X,A)") "         50=pp/ee->VH, 60=weakVBF, 61=pp->Hjj, 62=pp->Hj"
-!         write(io_stdout,"(4X,A)") "         50=pp/ee->VH, 60/66=weakVBF (without/with decay+SM bkg), 61=pp->Hjj, 62=pp->Hj"
-        write(io_stdout,"(4X,A)") "         80=pp->ttbar+H, 90=pp->bbbar+H"
-        write(io_stdout,"(4X,A)") "         110=pp->t+H (t-channel), 111=pp->tbar+H (t-ch.), 112=pp->t+H (s-ch.), 113=pp->tbar+H (s-ch.), 114=pp->t/tbar+H (s/t-ch.)"
-        write(io_stdout,"(4X,A)") "MReso:      resonance mass (default=125.60), format: yyy.xx"
-        write(io_stdout,"(4X,A)") "DecayMode1: decay mode for vector boson 1 (Z/W+/gamma)"
-        write(io_stdout,"(4X,A)") "DecayMode2: decay mode for vector boson 2 (Z/W-/gamma)"
-        write(io_stdout,"(4X,A)") "              0=Z->2l,  1=Z->2q, 2=Z->2tau, 3=Z->3nu,"
-        write(io_stdout,"(4X,A)") "              4=W->lnu, 5=W->2q, 6=W->taunu,"
-        write(io_stdout,"(4X,A)") "              7=gamma, 8=Z->2l+2tau,"
-        write(io_stdout,"(4X,A)") "              9=Z->anything, 10=W->lnu+taunu, 11=W->anything"
-        write(io_stdout,"(4X,A)") "              20=tau->nu + W(select with TauDK)"
-        write(io_stdout,"(4X,A)") "              30=top->b bbar"
-        write(io_stdout,"(4X,A)") "              40=top->b + W(select with TopDK)"
-        write(io_stdout,"(4X,A)") "TopDK:      decay mode for tops in ttbar+H or H->ttbar, 0=stable, 1=decaying (use DecayMode1/2 = 4,5 for W+/W-"
-        write(io_stdout,"(4X,A)") "TauDK:      decay mode for taus in H->tautau, 0=stable, 1=decaying (use DecayMode1/2 = 4,5 for W+/W-"
-        write(io_stdout,"(4X,A)") "BotDK:      decay mode for bottom quarks in H->bbar, 0=deactivated, 1=activated"
-        write(io_stdout,"(4X,A)") "PChannel:   0=g+g, 1=q+qb, 2=both"
-        write(io_stdout,"(4X,A)") "OffshellX:     Off-shellness option for resonance (X)"
-        write(io_stdout,"(4X,A)") "WidthScheme:1=running width, 2=fixed width (default), 3=complex pole scheme"
-#if useLHAPDF==1
-        write(io_stdout,"(4X,A)") "LHAPDF:     name of the LHA PDF file, e.g. NNPDF30_lo_as_0130/NNPDF30_lo_as_0130.info"
-        write(io_stdout,"(4X,A)") "LHAPDFMem:  member PDF number, default=0 (best fit)"
-#else
-        write(io_stdout,"(4X,A)") "PDFSet:     1=CTEQ6L1(default), 2=MSTW2008LO,  2xx=MSTW with eigenvector set xx=01..40), 3=NNPDF3.0LO"
-#endif
-        write(io_stdout,"(4X,A)") "VegasNc0:   number of evaluations for integrand scan"
-        write(io_stdout,"(4X,A)") "VegasNc1:   number of evaluations for accept-reject sampling"
-        write(io_stdout,"(4X,A)") "VegasNc2:   number of events for accept-reject sampling"
-        write(io_stdout,"(4X,A)") "Unweighted: 0=weighted events, 1=unweighted events"
-        write(io_stdout,"(4X,A)") "Interf:     0=neglect interference for 4f final states, 1=include interference"
-        write(io_stdout,"(4X,A)") "DataFile:   LHE output file"
-        write(io_stdout,"(4X,A)") "ReadLHE:    LHE input file from external file (only spin-0)"
-        write(io_stdout,"(4X,A)") "ConvertLHE: LHE input file from external file (only spin-0)"
-        write(io_stdout,*) ""
+        print *, ""
+        print *, " help:                Print all command line options"
+        print *, " Process configuration:"
+        print *, "   Collider:          1=LHC (default), 2=Tevatron, 0=e+e-"
+        print *, "   ColliderEnergy:    in TeV.  default is 13 TeV for LHC, 1.96 TeV for Tevatron,"
+        print *, "                      250 GeV for e+e-"
+        print *, "   Process:           0=spin-0, 1=spin-1, 2=spin-2 resonance, 50=pp/ee->VH,"
+        print *, "                      60=weakVBF, 61=pp->Hjj, 62=pp->Hj, 80=ttH, 90=bbH,"
+        print *, "                      110=t+H t channel, 111=tbar+H t channel,"
+        print *, "                      112=t+H s channel, 113=tbar+H s channel"
+        print *, "                      114=t/tbar+H t/s channels"
+        print *, "   DecayMode1:        decay mode for vector boson 1 (Z/W/gamma)"
+        print *, "   DecayMode2:        decay mode for vector boson 2 (Z/W/gamma)"
+        print *, "                        0=Z->2l,  1=Z->2q, 2=Z->2tau, 3=Z->2nu,"
+        print *, "                        4=W->lnu, 5=W->2q, 6=W->taunu,"
+        print *, "                        7=gamma, 8=Z->2l+2tau,"
+        print *, "                        9=Z->anything, 10=W->lnu+taunu, 11=W->anything"
+        print *, "   Interf:            0=neglect interference for 4f final states,"
+        print *, "                      1=include interference"
+        print *, "   RandomizeVVdecays: Randomizes the order of DecayMode1 and DecayMode2,"
+        print *, "                      per event (default true)"
+        print *, "                      For a WW decay, turning this off will mean"
+        print *, "                      DecayMode1 is W+ and DecayMode2 is W-"
+        print *, "   PChannel:          0=g+g, 1=q+qb, 2=both"
+        print *, "   ChannelRatio:      ratio of qqb / (qqb + gg), for Process=2 PChannel=2"
+        print *, "                       default is to allow this ratio to come from the couplings"
+        print *, "   PDFSet:            1=CTEQ6L1(2001),  2=MSTW(2008),"
+        print *, "                      2xx=MSTW with eigenvector set xx=01..40,"
+        print *, "                      3=NNPDF3.0LO"
+        print *, "                      (only valid if not interfaced with LHAPDF)"
+        print *, "   LHAPDF:            info file to use if interfaced with LHAPDF"
+        print *, "                      (example: NNPDF30_lo_as_0130/NNPDF30_lo_as_0130.info)"
+        print *, "   LHAPDFMem:         member number in LHAPDF set"
+        print *, "   TopDK:             For ttH or t+H, 0=leave top quarks as stable, 1=decay top quarks"
+        print *, "   TauDK:             In ReadLHE mode, specify this option as either 0 or 1"
+        print *, "                      to decay H->tautau.  If it is 0, the taus are written as"
+        print *, "                      stable; if it is 1, they decay to Wnu, with the W's decaying"
+        print *, "                      according to DecayModes1,2."
+        print *, " Resonance parameters:"
+        print *, "   MReso:             resonance mass in GeV (default=125.00)"
+        print *, "   GaReso:            resonance width in GeV (default=0.00407)"
+        print *, "   ctauReso:          resonance decay length in mm (default=0)"
+        print *, "   OffshellX:         Whether to allow resonance (X) to go offshell"
+        print *, "                      in processes 0, 1 or 2"
+        print *, " Cuts:"
+        print *, "   pTjetcut:          Minimum pT for jets in GeV (default: 15)"
+        print *, "   deltaRcut:         Minimum deltaR for jets (default: 0.3)"
+        print *, "   mJJcut:            Minimum dijet mass in GeV (default: 0)"
+        print *, "   MPhotonCutoff:     Minimum mass for offshell photons in GeV, when included (default: 4)"
+        print *, " Renormalization and factorization scales:"
+        print *, "   FacScheme:         PDF factorization scale scheme"
+        print *, "   MuFacMultiplier:   Multiplier for the factorization scale chosen by FacScheme"
+        print *, "   RenScheme:         QCD renormalization scale scheme"
+        print *, "   MuRenMultiplier:   Multiplier for the renormalization scale chosen by RenScheme"
+        print *, " Lepton filter:"
+        print *, "   FilterNLept:       For decay mode, reject events that have less than FilterNLept leptons"
+        print *, "   FilterOSPairs:     For decay mode, reject events that have less than FilterOSPairs pairs of"
+        print *, "                      sign leptons of any flavor."
+        print *, "   FilterOSSFPairs:   For decay mode, reject events that have less than FilterOSSFPairs pairs of"
+        print *, "                      opposite-sign-same-flavor leptons."
+        print *, "   CountTauAsAny:     For FilterOSSFPairs, taus can stand in place of electrons or muons"
+        print *, "                      of the same charge."
+        print *, "   WriteFailedEvents: Write events that fail in the LHE file, but with a weight of 0"
+        print *, "                      (off by default)"
+        print *, " Higgs propagator and decay width:"
+        print *, "   WidthScheme:       Higgs width scheme: 1 for running width, 2 for fixed width (default),"
+        print *, "                      and 3 for the CPS"
+        print *, "   WidthSchemeIn:     For decay mode, reweight from one propagator to another by setting"
+        print *, "                      WidthScheme and WidthSchemeIn to different values"
+        print *, "   ReweightDecay:     For decay mode, reweight input decay by the decay probability"
+        print *, "   PMZZEvals:         For ReweightDecay, number of evaluations per mass point (default: 200000)"
+        print *, "   ReadPMZZ:          For ReweightDecay, read the decay probability distribution from a file"
+        print *, " Statistics options:"
+        print *, "   VegasNc0:          number of evaluations for integrand scan"
+        print *, "   VegasNc1:          number of evaluations for accept-reject sampling"
+        print *, "   VegasNc2:          number of events for accept-reject sampling"
+        print *, "   ReadCSmax:         Read the results of the grid generation step from a file"
+        print *, "   Seed:              Random seed for event generation"
+        print *, " I/O options:"
+        print *, "   Unweighted:        0=weighted events, 1=unweighted events"
+        print *, "   WriteWeightedLHE:  For Unweighted=0, write weighted events to an LHE file"
+        print *, "                      (note that the output could be huge)"
+        print *, "   DataFile:          LHE output file"
+        print *, "   ReadLHE:           LHE input file from external file (only spin-0)"
+        print *, "   ConvertLHE:        Convert decay of the V from VH production."
+        print *, "                      Use DecayMode1 to specify the decay."
+        print *, "                      (should be a Z or W mode, depending on the input file)"
+        print *, "   UnformattedRead:   Turn this on if the normal, faster reading fails"
+        print *, " Couplings:"
+        print *, "   See manual for the full list"
+        print *, ""
 
 END SUBROUTINE
 

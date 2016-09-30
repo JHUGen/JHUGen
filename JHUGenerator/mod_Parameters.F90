@@ -105,20 +105,22 @@ integer, public            :: TheSeeds(1:nmaxseeds) = DefaultSeeds
 ! will not be reproducible
 !=====================================================
 
-!switches
-logical, public, parameter :: fix_channels_ratio = .false.
+!=====================================================
+!switches - should be set on the command line
+logical, public :: fix_channels_ratio = .false.
 
-real(8), public, parameter :: channels_ratio_fix = 0.25d0   ! desired ratio of  N_qq/(N_qq+N_gg)
+real(8), public :: channels_ratio_fix = 0.25d0   ! desired ratio of  N_qq/(N_qq+N_gg)
 
+logical, public :: writeWeightedLHE = .false.
+
+logical, public :: RandomizeVVdecays = .true.    ! randomize DecayMode1 and DecayMode2 in H-->VV and TTBAR decays whenever appropriate
+
+logical, public :: UseUnformattedRead = .false.  !Set this to true if the regular reading fails for whatever reason
+
+logical, public :: H_DK =.false.                 ! default to false so H in V* > VH (Process = 50) does not decay to bbbar
+
+!leave this one as a parameter, no reason to ever turn it off
 logical, public, parameter :: importExternal_LHEinit = .true.
-
-logical, public, parameter :: writeWeightedLHE = .false.
-
-logical, public            :: RandomizeVVdecays = .true.    ! randomize DecayMode1 and DecayMode2 in H-->VV and TTBAR decays whenever appropriate
-
-logical, public, parameter :: UseUnformattedRead = .false.  !Set this to true if the regular reading fails for whatever reason
-
-logical, public            :: H_DK =.false.                 ! default to false so H in V* > VH (Process = 50) does not decay
 !=====================================================
 
 
@@ -145,7 +147,7 @@ real(8), public            :: M_Reso  = 125.0d0   *GeV      ! X resonance mass (
 real(8), public            :: Ga_Reso = 0.00407d0 *GeV      ! X resonance width
 real(8), public            :: HiggsDecayLengthMM = 0d0      ! Higgs decay length in [mm]
 real(8), public, parameter :: Lambda  = 1000d0    *GeV      ! Lambda coupling enters in two places
-                                                            ! overal scale for x-section and in power suppressed
+                                                            ! overall scale for x-section and in power suppressed
                                                             ! operators/formfactors (former r).
 
 real(8), public, parameter :: m_bot = 4.75d0       *GeV     ! bottom quark mass

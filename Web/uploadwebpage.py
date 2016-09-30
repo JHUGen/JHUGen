@@ -211,6 +211,8 @@ Download_template = """
 #   - manualname, name of the manual pdf stored in the tarball.  Default=manJHUGenerator.(version).pdf
 #   - manualcommit, name of the commit to checkout to compile the manual.  Default=gitcommit
 #       could use a later version if the manual is updated after the generator is tagged
+#   - melacommit, name of the commit to checkout for the JHUGenMELA folder.  Default is the same
+#       as the generator
 versions = (
             Version("v7.0.0", gitcommit="v7.0.0.beta1", manualcommit="18221e3", melacommit="v6.9.8"),
             Version("v6.9.8", manualcommit="971ad57"),
