@@ -3,7 +3,7 @@ implicit none
 save
 !
 !
-character(len=6),parameter :: JHUGen_Version="v7.0.1"
+character(len=6),parameter :: JHUGen_Version="v7.1.0"
 !
 !
 !=====================================================
@@ -1478,7 +1478,7 @@ integer :: Part
   elseif( abs(Part).eq.NuT_ ) then
       SU2flip = sign(1,Part)*TaP_
   else
-      print *, "Error: Invalid flavor in SU2flip"
+      print *, "Error: Invalid flavor in SU2flip ",Part
       stop
   endif
 

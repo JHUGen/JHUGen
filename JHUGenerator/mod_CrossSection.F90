@@ -540,7 +540,6 @@ include 'csmaxvalue.f'
 
 
     call SetRunningScales( (/ (MomExt(1:4,3)+MomExt(1:4,4)),Mom_Not_a_particle(1:4),Mom_Not_a_particle(1:4) /) , (/ Not_a_particle_,Not_a_particle_,Not_a_particle_,Not_a_particle_ /) ) ! Call anyway
-    call EvalAlphaS()
 
 IF( GENEVT ) THEN
 
@@ -2284,33 +2283,33 @@ elseif( IsAWDecay(DecayMode1) ) then
       PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt *6d0 !2 for e and mu, 3 for colors of b
       LO_Res_Unpol=0d0
       EvalWeighted_VHiggs=0d0
-      do i = -6,6
-      do j = -6,6
-        id(1:2) = (/LHA2M_PDF(i),LHA2M_PDF(j)/)
-        if    ( ((id(1).eq.convertLHE(Up_).or.id(1).eq.convertLHE(Chm_)) .and. &
-         (id(2).eq.convertLHE(ADn_) .or. id(2).eq.convertLHE(AStr_) .or. id(2).eq.convertLHE(ABot_))) .or. &
-        ((id(2).eq.convertLHE(Up_).or.id(2).eq.convertLHE(Chm_)) .and. &
-         (id(1).eq.convertLHE(ADn_) .or. id(1).eq.convertLHE(AStr_) .or. id(1).eq.convertLHE(ABot_)))   )then
-              helicity(6)=sign(1d0,-dble(id(6)))
-              helicity(7)=-helicity(6)
-              call EvalAmp_VHiggs(id,helicity,MomExt,me2)
-        elseif( ((id(1).eq.convertLHE(AUp_).or.id(1).eq.convertLHE(AChm_)) .and. &
-         (id(2).eq.convertLHE(Dn_) .or. id(2).eq.convertLHE(Str_) .or. id(2).eq.convertLHE(Bot_))) .or. &
-        ((id(2).eq.convertLHE(AUp_).or. id(2).eq.convertLHE(AChm_)) .and. &
-         (id(1).eq.convertLHE(Dn_) .or. id(1).eq.convertLHE(Str_) .or. id(1).eq.convertLHE(Bot_)))   )then
-              id2=id
-              id2(4)=-id(4)
-              id2(6)=-id(6)
-              id2(7)=-id(7)
-              helicity(6)=sign(1d0,-dble(id2(6)))
-              helicity(7)=-helicity(6)
-              call EvalAmp_VHiggs(id2,helicity,MomExt,me2)
-        else
-              me2=0d0
-        endif
-          LO_Res_Unpol = me2/3d0*pdf(i,1)*pdf(j,2) * PreFac
-          EvalWeighted_VHiggs = EvalWeighted_VHiggs+LO_Res_Unpol
-          !lheweight(i,j)=LO_Res_Unpol
+      do i = -5,5
+      do j = -5,5
+         id2=id
+         id2(1:2) = (/i,j/)
+         if    ( ((id2(1).eq.convertLHE(Up_).or.id2(1).eq.convertLHE(Chm_)) .and. &
+          (id2(2).eq.convertLHE(ADn_) .or. id2(2).eq.convertLHE(AStr_) .or. id2(2).eq.convertLHE(ABot_))) .or. &
+         ((id2(2).eq.convertLHE(Up_).or.id2(2).eq.convertLHE(Chm_)) .and. &
+          (id2(1).eq.convertLHE(ADn_) .or. id2(1).eq.convertLHE(AStr_) .or. id2(1).eq.convertLHE(ABot_)))   )then
+             helicity(6)=sign(1d0,-dble(id2(6)))
+             helicity(7)=-helicity(6)
+             call EvalAmp_VHiggs(id2,helicity,MomExt,me2)
+         elseif( ((id2(1).eq.convertLHE(AUp_).or.id2(1).eq.convertLHE(AChm_)) .and. &
+          (id2(2).eq.convertLHE(Dn_) .or. id2(2).eq.convertLHE(Str_) .or. id2(2).eq.convertLHE(Bot_))) .or. &
+         ((id2(2).eq.convertLHE(AUp_).or. id2(2).eq.convertLHE(AChm_)) .and. &
+          (id2(1).eq.convertLHE(Dn_) .or. id2(1).eq.convertLHE(Str_) .or. id2(1).eq.convertLHE(Bot_)))   )then
+             id2(3)=-id2(3)
+             id2(4)=-id2(4)
+             id2(6)=-id2(6)
+             id2(7)=-id2(7)
+             helicity(6)=sign(1d0,-dble(id2(6)))
+             helicity(7)=-helicity(6)
+             call EvalAmp_VHiggs(id2,helicity,MomExt,me2)
+         else
+             me2=0d0
+         endif
+        LO_Res_Unpol = me2 *pdf(LHA2M_PDF(i),1)*pdf(LHA2M_PDF(j),2) * PreFac
+        EvalWeighted_VHiggs = EvalWeighted_VHiggs+LO_Res_Unpol
       enddo
       enddo
 
@@ -2975,28 +2974,29 @@ elseif( IsAWDecay(DecayMode1) ) then
 !pp>WH
   do i = -5,5
   do j = -5,5
-    id(1:2) = (/i,j/)
-    if    ( ((id(1).eq.convertLHE(Up_).or.id(1).eq.convertLHE(Chm_)) .and. &
-     (id(2).eq.convertLHE(ADn_).or. id(2).eq.convertLHE(AStr_) .or. id(2).eq.convertLHE(ABot_))) .or. &
-    ((id(2).eq.convertLHE(Up_) .or. id(2).eq.convertLHE(Chm_)) .and. &
-     (id(1).eq.convertLHE(ADn_).or. id(1).eq.convertLHE(AStr_) .or. id(1).eq.convertLHE(ABot_)))   )then
-      helicity(6)=sign(1d0,-dble(id(6)))
-      helicity(7)=-helicity(6)
-      call EvalAmp_VHiggs(id,helicity,MomExt,me2)
-    elseif( ((id(1).eq.convertLHE(AUp_).or.id(1).eq.convertLHE(AChm_)) .and. &
-     (id(2).eq.convertLHE(Dn_) .or. id(2).eq.convertLHE(Str_) .or. id(2).eq.convertLHE(Bot_))) .or. &
-    ((id(2).eq.convertLHE(AUp_).or. id(2).eq.convertLHE(AChm_)) .and. &
-     (id(1).eq.convertLHE(Dn_) .or. id(1).eq.convertLHE(Str_) .or. id(1).eq.convertLHE(Bot_)))   )then
-      id(3)=-id(3)
-      id(4)=-id(4)
-      id(6)=-id(6)
-      id(7)=-id(7)
-      helicity(6)=sign(1d0,-dble(id(6)))
-      helicity(7)=-helicity(6)
-      call EvalAmp_VHiggs(id,helicity,MomExt,me2)
-    else
-      me2=0d0
-    endif
+     id2=id
+     id2(1:2) = (/i,j/)
+     if    ( ((id2(1).eq.convertLHE(Up_).or.id2(1).eq.convertLHE(Chm_)) .and. &
+      (id2(2).eq.convertLHE(ADn_) .or. id2(2).eq.convertLHE(AStr_) .or. id2(2).eq.convertLHE(ABot_))) .or. &
+     ((id2(2).eq.convertLHE(Up_).or.id2(2).eq.convertLHE(Chm_)) .and. &
+      (id2(1).eq.convertLHE(ADn_) .or. id2(1).eq.convertLHE(AStr_) .or. id2(1).eq.convertLHE(ABot_)))   )then
+           helicity(6)=sign(1d0,-dble(id2(6)))
+           helicity(7)=-helicity(6)
+           call EvalAmp_VHiggs(id2,helicity,MomExt,me2)
+     elseif( ((id2(1).eq.convertLHE(AUp_).or.id2(1).eq.convertLHE(AChm_)) .and. &
+      (id2(2).eq.convertLHE(Dn_) .or. id2(2).eq.convertLHE(Str_) .or. id2(2).eq.convertLHE(Bot_))) .or. &
+     ((id2(2).eq.convertLHE(AUp_).or. id2(2).eq.convertLHE(AChm_)) .and. &
+      (id2(1).eq.convertLHE(Dn_) .or. id2(1).eq.convertLHE(Str_) .or. id2(1).eq.convertLHE(Bot_)))   )then
+           id2(3)=-id2(3)
+           id2(4)=-id2(4)
+           id2(6)=-id2(6)
+           id2(7)=-id2(7)
+           helicity(6)=sign(1d0,-dble(id2(6)))
+           helicity(7)=-helicity(6)
+           call EvalAmp_VHiggs(id2,helicity,MomExt,me2)
+     else
+           me2=0d0
+     endif
     LO_Res_Unpol = me2 *pdf(LHA2M_PDF(i),1)*pdf(LHA2M_PDF(j),2) * PreFac
     EvalUnWeighted_VHiggs = EvalUnWeighted_VHiggs+LO_Res_Unpol
     RES(i,j) = LO_Res_Unpol
@@ -3138,12 +3138,11 @@ m2ffwgt=1d0
   PreFac = fbGeV2 * PSWgt
 
   call SetRunningScales( (/ pHiggs(1:4),Mom_Not_a_particle(1:4),Mom_Not_a_particle(1:4) /) , (/ Not_a_particle_,Not_a_particle_,Not_a_particle_,Not_a_particle_ /) ) ! Call anyway
-  call EvalAlphaS()
 
   if( TauDecays.eq.0 ) then
-     if (genevt) then
-        call printMom(Mom(1:4,tauP:tauM))
-     endif
+!     if (genevt) then
+!        call printMom(Mom(1:4,tauP:tauM))
+!     endif
      call EvalAmp_H_FF(Mom(1:4,tauP:tauM),m_tau,LO_Res_Unpol)
   else
      call EvalAmp_H_TT_decay((/Mom(1:4,lepM),Mom(1:4,nubar),Mom(1:4,nu_tau),Mom(1:4,nu),Mom(1:4,lepP),Mom(1:4,nubar_tau)/),m_tau,ga_tau,LO_Res_Unpol)

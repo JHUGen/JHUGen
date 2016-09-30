@@ -1,7 +1,7 @@
 ! If you use this program please cite Phys.Rev. D81 (2010) 075022; arXiv:1001.3396  [hep-ph],
 !                                     Phys.Rev. D86 (2012) 095031; arXiv:1208.4018  [hep-ph],
 !                                     Phys.Rev. D89 (2014) 035007; arXiv:1309.4819  [hep-ph],
-!                                 and                              arXiv:1606.03107 [hep-ph].
+!                                 and Phys.Rev. D94 (2016) 055023; arXiv:1606.03107 [hep-ph].
 PROGRAM JHUGenerator
 #if compiler==1
 use ifport
@@ -26,7 +26,7 @@ real(8) :: VG_Result,VG_Error
    call PrintLogo(io_LogFile)
    call WriteParameters(io_stdout)
    call WriteParameters(io_LogFile)
-   if ( .not. ReadLHEFile .and. .not. ConvertLHEFile .and. .not.((Process.le.2 .or. Process.eq.60 .or. Process.eq.61) .and. unweighted) ) then
+   if ( .not. ReadLHEFile .and. .not. ConvertLHEFile .and. .not.((Process.le.2 .or. Process.eq.60 .or. Process.eq.61 .or. (Process.ge.110.and.Process.le.114)) .and. unweighted) ) then
       call InitOutput(1d0, 1d14)   !for VBF/HJJ the cross section is calculated, so use that in the <init> block
    endif
    write(io_stdout,*) " Running"
@@ -38,7 +38,7 @@ real(8) :: VG_Result,VG_Error
         call PrintMZZdistribution()
    else
         if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 .or. Process.eq.80 .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.66 .or. Process.eq.90 .or. &
-            Process.eq.110 .or. Process.eq.111 .or. Process.eq.112 .or. Process.eq.113 ) then
+            Process.eq.110 .or. Process.eq.111 .or. Process.eq.112 .or. Process.eq.113 .or. Process.eq.114 ) then
            call StartVegas_NEW(VG_Result,VG_Error)
         else
            call StartVegas(VG_Result,VG_Error)
@@ -85,7 +85,8 @@ subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to t
             Process.eq.110 .or. &
             Process.eq.111 .or. &
             Process.eq.112 .or. &
-            Process.eq.113      &
+            Process.eq.113 .or. &
+            Process.eq.114      &
          )                      &
       ) call Error("main::InitProcessScaleSchemes: Renormalization and factorization schemes are not implemented for process",Process)
 
@@ -120,7 +121,8 @@ subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to t
          Process.eq.110 .or. & !- t+H
          Process.eq.111 .or. & !- tb+H
          Process.eq.112 .or. & !- t+H s-channel
-         Process.eq.113      & !- tb+H s-channel
+         Process.eq.113 .or. & !- tb+H s-channel
+         Process.eq.114      & !- sum of all channels
          ) then
             FacScheme = -kRenFacScheme_mj_mhstar
             MuFacMultiplier = 0.25d0
@@ -158,7 +160,8 @@ subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to t
          Process.eq.110 .or. & !- t+H
          Process.eq.111 .or. & !- tb+H
          Process.eq.112 .or. & !- t+H s-channel
-         Process.eq.113      & !- tb+H s-channel
+         Process.eq.113 .or. & !- tb+H s-channel
+         Process.eq.114      & !- sum of all channels
          ) then
             RenScheme = -kRenFacScheme_mj_mhstar
             MuRenMultiplier = 0.25d0
@@ -591,16 +594,7 @@ logical :: SetpTcut, SetdeltaRcut
 #if useLHAPDF==1
     call GET_ENVIRONMENT_VARIABLE("LHAPDF_DATA_PATH", LHAPDF_DATA_PATH)
     if( LHAPDFString.eq."" ) then
-       if( ReadLHEFile .or. ConvertLHEFile ) then
-         !doesn't matter what we pass here, but needs to be able to open something
-         LHAPDFString = "NNPDF30_lo_as_0130/NNPDF30_lo_as_0130.info"
-         !check that it exists
-         inquire(file=trim(LHAPDF_DATA_PATH)//"/"//LHAPDFString, exist=success)
-         if ( .not. success ) then
-           print *, "Please pass in a pdf file name that exists in ", trim(LHAPDF_DATA_PATH), " or recompile with no LHAPDF."
-           stop 1
-         endif
-       else
+       if (.not. (ReadLHEFile .or. ConvertLHEFile)) then
          print *, "Need to specify pdf file name in command line argument LHAPDF"
          stop 1
        endif
@@ -625,9 +619,9 @@ logical :: SetpTcut, SetdeltaRcut
         if( (IsAWDecay(DecayMode1) ) .and. (Collider.ne.1) ) call Error("WH with Collider 1 only")
     endif
 
-    if( Process.ge.110 .and. Process.le.113 ) DecayMode2 = DecayMode1
+    if( Process.ge.110 .and. Process.le.114 ) DecayMode2 = DecayMode1
 
-    if( (TopDecays.ne.0 .and. TopDecays.ne.1) .and. (Process.eq.80 .or. (Process.ge.110 .and. Process.le.113)) ) call Error("Specify TopDK=0,1")
+    if( (TopDecays.ne.0 .and. TopDecays.ne.1) .and. (Process.eq.80 .or. (Process.ge.110 .and. Process.le.114)) ) call Error("Specify TopDK=0,1")
     if( (TopDecays.eq.1) .and. .not. IsAWDecay(DecayMode1) ) call Error("Invalid DecayMode1 for top decays")
     if( (TopDecays.eq.1) .and. .not. IsAWDecay(DecayMode2) ) call Error("Invalid DecayMode2 for top decays")
 
@@ -921,7 +915,7 @@ SUBROUTINE InitPDFValues()
 
    Mu_Fact = M_Reso ! Set pdf scale to resonance mass by default, later changed as necessary in the EvalWeighted/EvalUnweighted subroutines
    Mu_Ren = M_Reso ! Set renorm. scale to resonance mass by default, later changed as necessary in the EvalWeighted/EvalUnweighted subroutines
-   call EvalAlphaS() ! Set alphas at default Mu_Ren. Notice ModParameters::ComputeQCDVariables is automatically called!
+   if (.not.ReadLHEFile .and. .not.ConvertLHEFile) call EvalAlphaS() ! Set alphas at default Mu_Ren. Notice ModParameters::ComputeQCDVariables is automatically called!
    return
 END SUBROUTINE
 
@@ -934,6 +928,7 @@ SUBROUTINE InitPDFs()
    implicit none
    DOUBLE PRECISION alphasPDF
 
+   if (.not.ReadLHEFile .and. .not.ConvertLHEFile) then
      call InitPDFset(trim(LHAPDFString)) ! Let LHAPDF handle everything
      call InitPDF(LHAPDFMember)
 
@@ -941,6 +936,7 @@ SUBROUTINE InitPDFs()
      ! Dummy initialization, just in case. These values are not used.
      !nloops_pdf = 1
      zmass_pdf = M_Z
+   endif
 
 #else
 
@@ -948,6 +944,8 @@ SUBROUTINE InitPDFs()
    use ModKinematics
    implicit none
    character :: pdftable*(100)
+
+   if (.not.ReadLHEFile .and. .not.ConvertLHEFile) then
 
      zmass_pdf = M_Z ! Take zmass_pdf=M_Z in pdfs that do not specify this value
 
@@ -974,6 +972,8 @@ SUBROUTINE InitPDFs()
         !alphas_mz = 0.13229060d0
         !nloops_pdf = 1
      endif
+
+   endif
 
 #endif
 
@@ -1244,7 +1244,7 @@ include "vegas_common.f"
       if(Process.eq.110) then
          NDim = 9
          NDim = NDim + 2 ! sHat integration
-         if( unweighted ) NDim = NDim + 1  ! random number which decides if event is accepted
+         NDim = NDim + 1 ! select partonic channel
 
          VegasIt1_default = 5
          VegasNc0_default =  500000
@@ -1255,6 +1255,8 @@ include "vegas_common.f"
       if(Process.eq.111) then
          NDim = 9
          NDim = NDim + 2 ! sHat integration
+         NDim = NDim + 1 ! select partonic channel
+         
          VegasIt1_default = 5
          VegasNc0_default =  500000
          VegasNc1_default =  500000
@@ -1265,6 +1267,8 @@ include "vegas_common.f"
       if(Process.eq.112) then
          NDim = 9
          NDim = NDim + 2 ! sHat integration
+         NDim = NDim + 1 ! select partonic channel
+         
          VegasIt1_default = 5
          VegasNc0_default =  500000
          VegasNc1_default =  500000
@@ -1274,6 +1278,19 @@ include "vegas_common.f"
       if(Process.eq.113) then
          NDim = 9
          NDim = NDim + 2 ! sHat integration
+         NDim = NDim + 1 ! select partonic channel
+         
+         VegasIt1_default = 5
+         VegasNc0_default =  500000
+         VegasNc1_default =  500000
+         VegasNc2_default =  500000
+      endif
+     ! sum of all TH channels
+      if(Process.eq.114) then
+         NDim = 9
+         NDim = NDim + 2 ! sHat integration
+         NDim = NDim + 1 ! select partonic channel
+         
          VegasIt1_default = 5
          VegasNc0_default =  500000
          VegasNc1_default =  500000
@@ -1586,13 +1603,15 @@ END SUBROUTINE
 
 SUBROUTINE StartVegas_NEW(VG_Result,VG_Error)
 use ModCrossSection
-use ModCrossSection_HJJ
-use ModCrossSection_TTBH
 use ModCrossSection_BBBH
+use ModCrossSection_HJJ
 use ModCrossSection_TH
-use ModKinematics
-use ModParameters
+use ModCrossSection_TTBH
 use modHiggsJJ
+use modTHiggs
+use ModKinematics
+use ModMisc
+use ModParameters
 implicit none
 include "vegas_common.f"
 real(8) :: VG_Result,VG_Error,VG_Chi2
@@ -1669,11 +1688,11 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
       if( Process.eq.66 ) call vegas(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
       if( Process.eq.61 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
 
-      if( Process.eq.110) call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
-      if( Process.eq.111) call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
-
-      if( Process.eq.112) call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
-      if( Process.eq.113) call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
+      if( Process.eq.110) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)      
+      if( Process.eq.111) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+      if( Process.eq.112) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+      if( Process.eq.113) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+      if( Process.eq.114) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
     endif
 
     !DATA RUN
@@ -1702,10 +1721,11 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
     if( Process.eq.66 ) call vegas1(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.61 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
 
-    if( Process.eq.110) call vegas1(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
-    if( Process.eq.111) call vegas1(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
-    if( Process.eq.112) call vegas1(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
-    if( Process.eq.113) call vegas1(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
+    if( Process.eq.110) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+    if( Process.eq.111) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+    if( Process.eq.112) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+    if( Process.eq.113) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+    if( Process.eq.114) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
 
 
 
@@ -1716,6 +1736,12 @@ if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) UseBetaVersion=.true.
 if( Process.eq.60 ) UseBetaVersion=.true.
 if( Process.eq.61 ) UseBetaVersion=.true.
 if( Process.eq.66 ) UseBetaVersion=.true.
+
+if( Process.eq.110 ) UseBetaVersion=.true.
+if( Process.eq.111 ) UseBetaVersion=.true.
+if( Process.eq.112 ) UseBetaVersion=.true.
+if( Process.eq.113 ) UseBetaVersion=.true.
+if( Process.eq.114 ) UseBetaVersion=.true.
 
 
 if( UseBetaVersion ) then
@@ -1738,6 +1764,11 @@ if( UseBetaVersion ) then
         if( Process.eq.60 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
         if( Process.eq.61 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
         if( Process.eq.66 ) call vegas(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
+        if( Process.eq.110) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+        if( Process.eq.111) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+        if( Process.eq.112) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+        if( Process.eq.113) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+        if( Process.eq.114) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
         itmx = 3
     endif
 
@@ -1751,10 +1782,11 @@ if( UseBetaVersion ) then
     if( Process.eq.60 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.66 ) call vegas1(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.61 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
-!     if( Process.eq.110) call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
-!     if( Process.eq.111) call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
-!     if( Process.eq.112) call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
-!     if( Process.eq.113) call vegas(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
+    if( Process.eq.110) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+    if( Process.eq.111) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+    if( Process.eq.112) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+    if( Process.eq.113) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+    if( Process.eq.114) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
 
 
     call vegas_get_calls(calls1)
@@ -1763,15 +1795,10 @@ if( UseBetaVersion ) then
     write(io_stdout,*) "Total xsec: ",VG_Result, " +/-",VG_Error, " fb    vs.",sum(CrossSec(:,:))
     call InitOutput(VG_Result, VG_Error)
 
-
-    RequEvents(:,:)=0
-    do i1=-5,5
-    do j1=-5,5
-        RequEvents(i1,j1) = RequEvents(i1,j1) + nint( CrossSec(i1,j1)/VG_Result * VegasNc2 )
-    enddo
-    enddo
-
-
+    RequEvents(:,:) = 0
+    if (VegasNc2.ne.-1) then
+      call HouseOfRepresentatives(CrossSec(-5:5,-5:5), RequEvents(-5:5,-5:5), VegasNc2)
+    endif
 
     if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2) then
        call get_PPXchannelHash(ijSel)
@@ -1779,6 +1806,16 @@ if( UseBetaVersion ) then
        call get_VBFchannelHash(ijSel)
     elseif( Process.eq.61 ) then
        call get_HJJchannelHash(ijSel)
+    elseif( Process.eq.110 ) then
+       call get_THchannelHash(ijSel)
+    elseif( Process.eq.111 ) then
+       call get_THchannelHash(ijSel)
+    elseif( Process.eq.112 ) then
+       call get_THchannelHash(ijSel)
+    elseif( Process.eq.113 ) then
+       call get_THchannelHash(ijSel)
+    elseif( Process.eq.114 ) then
+       call get_THchannelHash(ijSel)
     else
        call get_GENchannelHash(ijSel)
     endif
@@ -1793,42 +1830,15 @@ if( UseBetaVersion ) then
     do i=1,121
          i1 = ijSel(i,1)
          j1 = ijSel(i,2)
-         if( RequEvents(i1,j1).gt.0 .and. ijSel(i,3).eq.1 ) write(io_stdout,"(1X,I3,A,I3,I3,A,3X,F8.3,I9)") i," Fractional partonic xsec ",i1,j1," "//getLHEParticle(i1)//" "//getLHEParticle(j1)//" ",CrossSec(i1,j1)/VG_Result,RequEvents(i1,j1)
+         if( RequEvents(i1,j1).gt.0 ) write(io_stdout,"(1X,I3,A,I3,I3,I4,A,3X,F8.3,I9)") i," Fractional partonic xsec ",i1,j1,ijSel(i,3)," "//getLHEParticle(i1)//" "//getLHEParticle(j1)//" ",CrossSec(i1,j1)/VG_Result,RequEvents(i1,j1)
     enddo
     write(io_stdout,"(2X,A,F8.3,I9)") "Sum        partonic xsec   x   x    ",sum(CrossSec(:,:))/VG_Result,sum(RequEvents(:,:))
 
 
 
-
-!   add some events that got lost due to rounding errors
-!   distribute them according to the partonic cross section fractions and finally add the last pieces to the largest partonic contribution
-    MissingEvents = VegasNc2 - sum(RequEvents(:,:))
-    if( MissingEvents.ne.0 ) then
-!         print *, "MISSING EVENTS",MissingEvents
-        MaxEvts = -10000
-        do i=1,121
-            i1 = ijSel(i,1)
-            j1 = ijSel(i,2)
-            RequEvents(i1,j1) = RequEvents(i1,j1) + nint( CrossSec(i1,j1)/VG_Result * MissingEvents )
-            if( RequEvents(i1,j1).gt.MaxEvts ) then
-              MaxEvts = RequEvents(i1,j1)
-              imax=i
-            endif
-!             print *, "adding",i1,j1,nint( CrossSec(i1,j1)/VG_Result * MissingEvents )
-        enddo
-        MissingEvents = VegasNc2 - sum(RequEvents(:,:))
-!         print *, "MISSING EVENTS",MissingEvents
-        i1 = ijSel(imax,1)
-        j1 = ijSel(imax,2)
-        RequEvents(i1,j1) = RequEvents(i1,j1) + MissingEvents
-        write(*,"(2X,A,I9)") "Adjusting number of events. New event count=",sum(RequEvents(:,:))
-    endif
-
-
-
-
     write(io_stdout,"(A)")  ""
     write(io_stdout,"(2X,A)")  "Event generation"
+
     call ClearHisto()
     warmup = .false.
     itmx = 1
@@ -1858,10 +1868,11 @@ if( UseBetaVersion ) then
         if( Process.eq.60 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
         if( Process.eq.66 ) call vegas1(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
         if( Process.eq.61 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
-!         if( Process.eq.110) call vegas1(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
-!         if( Process.eq.111) call vegas1(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
-!         if( Process.eq.112) call vegas1(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
-!         if( Process.eq.113) call vegas1(EvalWeighted_TH,VG_Result,VG_Error,VG_Chi2)
+        if( Process.eq.110) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+        if( Process.eq.111) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+        if( Process.eq.112) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+        if( Process.eq.113) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+        if( Process.eq.114) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
 !         call system('clear')
 !         write(io_stdout,*) ""
 !         do i1=-5,5
@@ -1914,7 +1925,7 @@ if( UseBetaVersion ) then
 
 
 
-else! beta version
+else! not beta version
 
 
 
@@ -1967,13 +1978,10 @@ else! beta version
    write(io_stdout,"(1X,A,F10.3)") "Total xsec: ",TotalXSec
 
 
-    RequEvents(:,:)=0
-    do i1=-5,5
-    do j1=-5,5
-         RequEvents(i1,j1) = RequEvents(i1,j1) + int( VG(i1,j1)/TotalXSec * VegasNc2 )
-    enddo
-    enddo
-
+    RequEvents(:,:) = 0
+    if (VegasNc2.ne.-1) then
+      call HouseOfRepresentatives(VG(:,:), RequEvents(-5:5,-5:5), VegasNc2)
+    endif
 
     do i1=-5,5
     do j1=-5,5
@@ -3113,7 +3121,7 @@ implicit none
      call InitHisto_TTBH()
   elseif (Process.eq.90) then
      call InitHisto_BBBH()
-  elseif (Process.eq.110 .or. Process .eq. 111 .or. Process.eq.112 .or. Process .eq. 113) then
+  elseif (Process.eq.110 .or. Process .eq. 111 .or. Process.eq.112 .or. Process .eq. 113 .or. Process .eq. 114) then
      call InitHisto_TH()
   else
 
@@ -4079,6 +4087,7 @@ character :: arg*(500)
     if( Process.eq.111) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( Process.eq.112) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( Process.eq.113) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
+    if( Process.eq.114) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( ReadLHEFile )    write(TheUnit,"(4X,A)") "           (This is ReadLHEFile mode. Resonance mass/width are read from LHE input parameters.)"
     if( ConvertLHEFile ) write(TheUnit,"(4X,A)") "           (This is ConvertLHEFile mode. Resonance mass/width are read from LHE input parameters.)"
     if( HiggsDecayLengthMM.ne.0d0 ) write(TheUnit,"(4X,A,F10.5,A)") "           ctau=", HiggsDecayLengthMM, " mm"
@@ -4087,7 +4096,7 @@ character :: arg*(500)
     .or. (ReadLHEFile .and. TauDecays.ne.0) &
     .or. ConvertLHEFile ) &
     then
-        if( .not.ReadLHEFile .and. (ConvertLHEFile .or. Process.eq.50 .or. (Process.ge.110 .and. Process.le.113)) ) then
+        if( .not.ReadLHEFile .and. (ConvertLHEFile .or. Process.eq.50 .or. (Process.ge.110 .and. Process.le.114)) ) then
             write(TheUnit,"(4X,A,I2,2X,A,I2)") "DecayMode1:",DecayMode1
         else if( ReadLHEFile .or. Process.le.2 .or. Process .eq. 80 ) then
             write(TheUnit,"(4X,A,I2,2X,A,I2)") "DecayMode1:",DecayMode1, "DecayMode2:",DecayMode2
@@ -4095,11 +4104,11 @@ character :: arg*(500)
         if( Process.eq.60 .or. Process.eq.66 .or. IsAZDecay(DecayMode1) .or. IsAZDecay(DecayMode2) ) write(TheUnit,"(4X,A,F6.3,A,F6.4)") "Z-boson: mass=",M_Z*100d0,", width=",Ga_Z*100d0
         if( Process.eq.60 .or. Process.eq.66 .or. IsAWDecay(DecayMode1) .or. IsAWDecay(DecayMode2) ) write(TheUnit,"(4X,A,F6.3,A,F6.4)") "W-boson: mass=",M_W*100d0,", width=",Ga_W*100d0
     endif
-    if( Process.eq.80 .or. Process.eq.110 .or. Process.eq.111 .or.Process.eq.112 .or. Process.eq.113 ) write(TheUnit,"(4X,A,F8.4,A,F6.4)") "Top quark mass=",m_top*100d0,", width=",Ga_top*100d0
-    if( Process.eq.80 .or. Process.eq.110 .or. Process.eq.111 .or. Process.eq.112 .or. Process.eq.113) write(TheUnit,"(4X,A,I2)") "Top quark decay=",TOPDECAYS
+    if( Process.eq.80 .or. Process.eq.110 .or. Process.eq.111 .or.Process.eq.112 .or. Process.eq.113 .or. Process.eq.114) write(TheUnit,"(4X,A,F8.4,A,F6.4)") "Top quark mass=",m_top*100d0,", width=",Ga_top*100d0
+    if( Process.eq.80 .or. Process.eq.110 .or. Process.eq.111 .or. Process.eq.112 .or. Process.eq.113 .or. Process.eq.114) write(TheUnit,"(4X,A,I2)") "Top quark decay=",TOPDECAYS
     if( Process.eq.90 ) write(TheUnit,"(4X,A,F8.4,A,F6.4)") "Bottom quark mass=",m_top*100d0
     if( Process.eq.50 .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.62 .or. Process.eq.66 .or. Process.eq.90 .or. &
-       ((Process.eq.80 .or. (Process.ge.110 .and. Process.le.113)) .and. m_Top.lt.10d0*GeV) ) then
+       ((Process.eq.80 .or. (Process.ge.110 .and. Process.le.114)) .and. m_Top.lt.10d0*GeV) ) then
         write(TheUnit,"(4X,A)") "Jet cuts:"
         write(TheUnit,"(12X,A,F8.2,A)") "pT >= ", pTjetcut/GeV, " GeV"
         if( Process.eq.50 .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.66 .or. Process.eq.80 .or. Process.eq.90) then
@@ -4562,7 +4571,7 @@ implicit none
         write(io_stdout,"(4X,A)") "         50=pp/ee->VH, 60=weakVBF, 61=pp->Hjj, 62=pp->Hj"
 !         write(io_stdout,"(4X,A)") "         50=pp/ee->VH, 60/66=weakVBF (without/with decay+SM bkg), 61=pp->Hjj, 62=pp->Hj"
         write(io_stdout,"(4X,A)") "         80=pp->ttbar+H, 90=pp->bbbar+H"
-        write(io_stdout,"(4X,A)") "         110=pp->t+H (t-channel), 111=pp->tbar+H (t-ch.), 112=pp->t+H (s-ch.), 113=pp->tbar+H (s-ch.)"
+        write(io_stdout,"(4X,A)") "         110=pp->t+H (t-channel), 111=pp->tbar+H (t-ch.), 112=pp->t+H (s-ch.), 113=pp->tbar+H (s-ch.), 114=pp->t/tbar+H (s/t-ch.)"
         write(io_stdout,"(4X,A)") "MReso:      resonance mass (default=125.60), format: yyy.xx"
         write(io_stdout,"(4X,A)") "DecayMode1: decay mode for vector boson 1 (Z/W+/gamma)"
         write(io_stdout,"(4X,A)") "DecayMode2: decay mode for vector boson 2 (Z/W-/gamma)"
@@ -4618,7 +4627,7 @@ integer :: TheUnit
     write(TheUnit,"(A90)") " *               Phys.Rev. D81 (2010) 075022;  arXiv:1001.3396  [hep-ph],              *"
     write(TheUnit,"(A90)") " *               Phys.Rev. D86 (2012) 095031;  arXiv:1208.4018  [hep-ph],              *"
     write(TheUnit,"(A90)") " *               Phys.Rev. D89 (2014) 035007;  arXiv:1309.4819  [hep-ph],              *"
-    write(TheUnit,"(A90)") " *                                             arXiv:1606.03107 [hep-ph].              *"
+    write(TheUnit,"(A90)") " *               Phys.Rev. D94 (2016) 055023;  arXiv:1606.03107 [hep-ph].              *"
     write(TheUnit,"(A90)") " *                                                                                     *"
     write(TheUnit,"(A90)") " ***************************************************************************************"
     write(TheUnit,"(A90)") " "
