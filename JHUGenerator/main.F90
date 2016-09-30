@@ -473,18 +473,30 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "cz_q2sq", success, cz_q1sq, success2=SetAnomalousSpin0ZZ)
     call ReadCommandLineArgument(arg, "cz_q12sq", success, cz_q1sq, success2=SetAnomalousSpin0ZZ)
     ! Lambda's for q1,2,12**2 for the Lambda's
-    call ReadCommandLineArgument(arg, "Lambda_z11", success, Lambda_z11, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "Lambda_z21", success, Lambda_z21, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "Lambda_z31", success, Lambda_z31, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "Lambda_z41", success, Lambda_z41, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "Lambda_z12", success, Lambda_z12, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "Lambda_z22", success, Lambda_z22, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "Lambda_z32", success, Lambda_z32, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "Lambda_z42", success, Lambda_z42, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "Lambda_z10", success, Lambda_z10, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "Lambda_z20", success, Lambda_z20, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "Lambda_z30", success, Lambda_z30, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "Lambda_z40", success, Lambda_z40, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "Lambda_z11", success, Lambda_z11, SetLastArgument, success2=SetAnomalousSpin0ZZ)
+    if (SetLastArgument)  Lambda_z11 = Lambda_z11*GeV
+    call ReadCommandLineArgument(arg, "Lambda_z21", success, Lambda_z21, SetLastArgument, success2=SetAnomalousSpin0ZZ)
+    if (SetLastArgument)  Lambda_z21 = Lambda_z21*GeV
+    call ReadCommandLineArgument(arg, "Lambda_z31", success, Lambda_z31, SetLastArgument, success2=SetAnomalousSpin0ZZ)
+    if (SetLastArgument)  Lambda_z31 = Lambda_z31*GeV
+    call ReadCommandLineArgument(arg, "Lambda_z41", success, Lambda_z41, SetLastArgument, success2=SetAnomalousSpin0ZZ)
+    if (SetLastArgument)  Lambda_z41 = Lambda_z41*GeV
+    call ReadCommandLineArgument(arg, "Lambda_z12", success, Lambda_z12, SetLastArgument, success2=SetAnomalousSpin0ZZ)
+    if (SetLastArgument)  Lambda_z12 = Lambda_z12*GeV
+    call ReadCommandLineArgument(arg, "Lambda_z22", success, Lambda_z22, SetLastArgument, success2=SetAnomalousSpin0ZZ)
+    if (SetLastArgument)  Lambda_z22 = Lambda_z22*GeV
+    call ReadCommandLineArgument(arg, "Lambda_z32", success, Lambda_z32, SetLastArgument, success2=SetAnomalousSpin0ZZ)
+    if (SetLastArgument)  Lambda_z32 = Lambda_z32*GeV
+    call ReadCommandLineArgument(arg, "Lambda_z42", success, Lambda_z42, SetLastArgument, success2=SetAnomalousSpin0ZZ)
+    if (SetLastArgument)  Lambda_z42 = Lambda_z42*GeV
+    call ReadCommandLineArgument(arg, "Lambda_z10", success, Lambda_z10, SetLastArgument, success2=SetAnomalousSpin0ZZ)
+    if (SetLastArgument)  Lambda_z10 = Lambda_z10*GeV
+    call ReadCommandLineArgument(arg, "Lambda_z20", success, Lambda_z20, SetLastArgument, success2=SetAnomalousSpin0ZZ)
+    if (SetLastArgument)  Lambda_z20 = Lambda_z20*GeV
+    call ReadCommandLineArgument(arg, "Lambda_z30", success, Lambda_z30, SetLastArgument, success2=SetAnomalousSpin0ZZ)
+    if (SetLastArgument)  Lambda_z30 = Lambda_z30*GeV
+    call ReadCommandLineArgument(arg, "Lambda_z40", success, Lambda_z40, SetLastArgument, success2=SetAnomalousSpin0ZZ)
+    if (SetLastArgument)  Lambda_z40 = Lambda_z40*GeV
 
     !spin 0 WW couplings
     call ReadCommandLineArgument(arg, "ghw1", success, ghw1, success2=distinguish_HWWcouplings)
@@ -529,18 +541,30 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "cw_q2sq", success, cw_q1sq, success2=distinguish_HWWcouplings)
     call ReadCommandLineArgument(arg, "cw_q12sq", success, cw_q1sq, success2=distinguish_HWWcouplings)
     ! Lambda's for q1,2,12**2 for the Lambda's
-    call ReadCommandLineArgument(arg, "Lambda_w11", success, Lambda_w11, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "Lambda_w21", success, Lambda_w21, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "Lambda_w31", success, Lambda_w31, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "Lambda_w41", success, Lambda_w41, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "Lambda_w12", success, Lambda_w12, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "Lambda_w22", success, Lambda_w22, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "Lambda_w32", success, Lambda_w32, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "Lambda_w42", success, Lambda_w42, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "Lambda_w10", success, Lambda_w10, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "Lambda_w20", success, Lambda_w20, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "Lambda_w30", success, Lambda_w30, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "Lambda_w40", success, Lambda_w40, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "Lambda_w11", success, Lambda_w11, SetLastArgument, success2=distinguish_HWWcouplings)
+    if (SetLastArgument)  Lambda_w11 = Lambda_w11*GeV
+    call ReadCommandLineArgument(arg, "Lambda_w21", success, Lambda_w21, SetLastArgument, success2=distinguish_HWWcouplings)
+    if (SetLastArgument)  Lambda_w21 = Lambda_w21*GeV
+    call ReadCommandLineArgument(arg, "Lambda_w31", success, Lambda_w31, SetLastArgument, success2=distinguish_HWWcouplings)
+    if (SetLastArgument)  Lambda_w31 = Lambda_w31*GeV
+    call ReadCommandLineArgument(arg, "Lambda_w41", success, Lambda_w41, SetLastArgument, success2=distinguish_HWWcouplings)
+    if (SetLastArgument)  Lambda_w41 = Lambda_w41*GeV
+    call ReadCommandLineArgument(arg, "Lambda_w12", success, Lambda_w12, SetLastArgument, success2=distinguish_HWWcouplings)
+    if (SetLastArgument)  Lambda_w12 = Lambda_w12*GeV
+    call ReadCommandLineArgument(arg, "Lambda_w22", success, Lambda_w22, SetLastArgument, success2=distinguish_HWWcouplings)
+    if (SetLastArgument)  Lambda_w22 = Lambda_w22*GeV
+    call ReadCommandLineArgument(arg, "Lambda_w32", success, Lambda_w32, SetLastArgument, success2=distinguish_HWWcouplings)
+    if (SetLastArgument)  Lambda_w32 = Lambda_w32*GeV
+    call ReadCommandLineArgument(arg, "Lambda_w42", success, Lambda_w42, SetLastArgument, success2=distinguish_HWWcouplings)
+    if (SetLastArgument)  Lambda_w42 = Lambda_w42*GeV
+    call ReadCommandLineArgument(arg, "Lambda_w10", success, Lambda_w10, SetLastArgument, success2=distinguish_HWWcouplings)
+    if (SetLastArgument)  Lambda_w10 = Lambda_w10*GeV
+    call ReadCommandLineArgument(arg, "Lambda_w20", success, Lambda_w20, SetLastArgument, success2=distinguish_HWWcouplings)
+    if (SetLastArgument)  Lambda_w20 = Lambda_w20*GeV
+    call ReadCommandLineArgument(arg, "Lambda_w30", success, Lambda_w30, SetLastArgument, success2=distinguish_HWWcouplings)
+    if (SetLastArgument)  Lambda_w30 = Lambda_w30*GeV
+    call ReadCommandLineArgument(arg, "Lambda_w40", success, Lambda_w40, SetLastArgument, success2=distinguish_HWWcouplings)
+    if (SetLastArgument)  Lambda_w40 = Lambda_w40*GeV
 
     !spin 1
     call ReadCommandLineArgument(arg, "zprime_qq_left", success, zprime_qq_left, success2=SetAnomalousSpin1qq, success3=Setspin1qqleft)

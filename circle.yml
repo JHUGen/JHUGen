@@ -149,12 +149,12 @@ test:
     - ./JHUGen PDFSet=3 Process=113 VegasNc0=100000 VegasNc2=100 DataFile=$CIRCLE_ARTIFACTS/other/tbarH_s DecayMode1=11 TopDK=1
     - ./JHUGen PDFSet=3 Process=114 VegasNc0=100000 VegasNc2=100 DataFile=$CIRCLE_ARTIFACTS/other/tH_all  DecayMode1=11 TopDK=1
     #Decays for t(t)H which have complicated quarks, to check colors
-    - ./JHUGen PDFSet=3 VegasNc0=100000          DecayMode1=1 DecayMode2=1 ReadLHE=$CIRCLE_ARTIFACTS/other/ttH.lhe DataFile=$CIRCLE_ARTIFACTS/other/ttH_ZZ
-    - ./JHUGen PDFSet=3 VegasNc0=100000 TauDK=1  DecayMode1=5 DecayMode2=5 ReadLHE=$CIRCLE_ARTIFACTS/other/ttH.lhe DataFile=$CIRCLE_ARTIFACTS/other/ttH_tautau
-    - ./JHUGen PDFSet=3 VegasNc0=100000          DecayMode1=5 DecayMode2=5 ReadLHE=$CIRCLE_ARTIFACTS/other/tH_t.lhe DataFile=$CIRCLE_ARTIFACTS/other/tH_t_WW
-    - ./JHUGen PDFSet=3 VegasNc0=100000          DecayMode1=1 DecayMode2=1 ReadLHE=$CIRCLE_ARTIFACTS/other/tbarH_t.lhe DataFile=$CIRCLE_ARTIFACTS/other/tbarH_t_ZZ
-    - ./JHUGen PDFSet=3 VegasNc0=100000 TauDK=1  DecayMode1=5 DecayMode2=5 ReadLHE=$CIRCLE_ARTIFACTS/other/tH_s.lhe DataFile=$CIRCLE_ARTIFACTS/other/tH_s_tautau
-    - ./JHUGen PDFSet=3 VegasNc0=100000 ghzgs2=1 DecayMode1=5 DecayMode2=7 ReadLHE=$CIRCLE_ARTIFACTS/other/tH_all.lhe DataFile=$CIRCLE_ARTIFACTS/other/tH_all_Zgamma.lhe
+    - ./JHUGen PDFSet=3 VegasNc0=100000            DecayMode1=1 DecayMode2=1 ReadLHE=$CIRCLE_ARTIFACTS/other/ttH.lhe DataFile=$CIRCLE_ARTIFACTS/other/ttH_ZZ
+    - ./JHUGen PDFSet=3 VegasNc0=100000 TauDK=1    DecayMode1=5 DecayMode2=5 ReadLHE=$CIRCLE_ARTIFACTS/other/ttH.lhe DataFile=$CIRCLE_ARTIFACTS/other/ttH_tautau
+    - ./JHUGen PDFSet=3 VegasNc0=100000            DecayMode1=5 DecayMode2=5 ReadLHE=$CIRCLE_ARTIFACTS/other/tH_t.lhe DataFile=$CIRCLE_ARTIFACTS/other/tH_t_WW
+    - ./JHUGen PDFSet=3 VegasNc0=100000            DecayMode1=1 DecayMode2=1 ReadLHE=$CIRCLE_ARTIFACTS/other/tbarH_t.lhe DataFile=$CIRCLE_ARTIFACTS/other/tbarH_t_ZZ
+    - ./JHUGen PDFSet=3 VegasNc0=100000 TauDK=1    DecayMode1=5 DecayMode2=5 ReadLHE=$CIRCLE_ARTIFACTS/other/tH_s.lhe DataFile=$CIRCLE_ARTIFACTS/other/tH_s_tautau
+    - ./JHUGen PDFSet=3 VegasNc0=100000 ghzgs2=1,0 DecayMode1=0 DecayMode2=7 ReadLHE=$CIRCLE_ARTIFACTS/other/tH_all.lhe DataFile=$CIRCLE_ARTIFACTS/other/tH_all_Zgamma.lhe
     #make sure that the mass was read correctly and the interference determined
     - "grep -q 'Interference: T' $CIRCLE_ARTIFACTS/other/ttH_ZZ.lhe"
     - "grep -q 'Interference: F' $CIRCLE_ARTIFACTS/other/tbarH_t_ZZ.lhe"
