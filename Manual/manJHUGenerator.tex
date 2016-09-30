@@ -158,6 +158,7 @@ Most parameters should be set on the command line.
 This is the list of command line configurables (also defined in the \verb|README|).  The following sections give further details about some of these parameters.
 
 \begin{verbatim}
+  help:                Print all command line options
   Process configuration:
     Collider:          1=LHC (default), 2=Tevatron, 0=e+e-
     ColliderEnergy:    in TeV.  default is 13 TeV for LHC, 1.96 TeV for Tevatron,
@@ -175,7 +176,7 @@ This is the list of command line configurables (also defined in the \verb|README
                          9=Z->anything, 10=W->lnu+taunu, 11=W->anything
     Interf:            0=neglect interference for 4f final states,
                        1=include interference
-    RandomizeVVDecays: Randomizes the order of DecayMode1 and DecayMode2,
+    RandomizeVVdecays: Randomizes the order of DecayMode1 and DecayMode2,
                        per event (default true)
                        For a WW decay, turning this off will mean
                        DecayMode1 is W+ and DecayMode2 is W-
@@ -190,6 +191,10 @@ This is the list of command line configurables (also defined in the \verb|README
                        (example: NNPDF30_lo_as_0130/NNPDF30_lo_as_0130.info)
     LHAPDFMem:         member number in LHAPDF set
     TopDK:             For ttH or t+H, 0=leave top quarks as stable, 1=decay top quarks
+    TauDK:             In ReadLHE mode, specify this option as either 0 or 1
+                       to decay H->tautau.  If it is 0, the taus are written as
+                       stable; if it is 1, they decay to Wnu, with the W's decaying
+                       according to DecayModes1,2.
   Resonance parameters:
     MReso:             resonance mass in GeV (default=125.00)
     GaReso:            resonance width in GeV (default=0.00407)
@@ -223,10 +228,12 @@ This is the list of command line configurables (also defined in the \verb|README
                        WidthScheme and WidthSchemeIn to different values
     ReweightDecay:     For decay mode, reweight input decay by the decay probability
     PMZZEvals:         For ReweightDecay, number of evaluations per mass point (default: 200000)
+    ReadPMZZ:          For ReweightDecay, read the decay probability distribution from a file
   Statistics options:
     VegasNc0:          number of evaluations for integrand scan
     VegasNc1:          number of evaluations for accept-reject sampling
     VegasNc2:          number of events for accept-reject sampling
+    ReadCSmax:         Read the results of the grid generation step from a file
     Seed:              Random seed for event generation
   I/O options:
     Unweighted:        0=weighted events, 1=unweighted events
@@ -250,9 +257,10 @@ This is the list of command line configurables (also defined in the \verb|README
 \item In $VH$ production and \verb|ConvertLHE| mode, \verb|DecayMode1| is used for the decay of the $V$.  If it is a $Z$ decay mode, $ZH$ will be produced; if it is a $W$ decay mode, $WH$ will be produced; if it is $7$, $\gamma H$ will be produced, with $\gamma$ stable.
 \item In $ttH$ production, if \verb|TopDK| is true, \verb|DecayMode1| and \verb|DecayMode2| are used to decay the $W$ bosons from the top decay.  Only $W$ decay modes are allowed.
 \item In $t+H$ production, if \verb|TopDK| is true, \verb|DecayMode1| is used to decay the $W$ boson from the top decay.
+\item In $H\to \tau\tau$ decay, if \verb|TauDK| is true, \verb|DecayMode1,2| are used to decay the $W$ bosons from the $\tau$ decays.
 \end{itemize}
 \item \verb|Interf|: For final states with 4 same flavor fermions, this parameter controls whether or not to include interference effects.
-\item \verb|RandomizeVVDecays|: For $VV$ decay (and similarly in $ttH$ production), by default the $V$'s are randomized so that, for example, \verb|DecayMode1=5 DecayMode2=11| will produce all combinations that include at least one hadronic $W$ decay (rather of specifically hadronic decay of the $W^+$).  This can be switched off by setting \verb|RandomizeVVDecays=0|.  In this case, \verb|DecayMode1| will refer specifically to the $W^+$ and \verb|DecayMode2| to the $W^-$.  For $ZZ$ decay, this parameter only determines whether the decays of first and second $Z$ written to the LHE file are randomized or not; in this case the only effect is the appearance of the output.
+\item \verb|RandomizeVVdecays|: For $VV$ decay (and similarly in $ttH$ production), by default the $V$'s are randomized so that, for example, \verb|DecayMode1=5 DecayMode2=11| will produce all combinations that include at least one hadronic $W$ decay (rather of specifically hadronic decay of the $W^+$).  This can be switched off by setting \verb|RandomizeVVdecays=0|.  In this case, \verb|DecayMode1| will refer specifically to the $W^+$ and \verb|DecayMode2| to the $W^-$.  For $ZZ$ decay, this parameter only determines whether the decays of first and second $Z$ written to the LHE file are randomized or not; in this case the only effect is the appearance of the output.
 \item \verb|PChannel|: This parameter is only meaningful in the spin-2 case and for the $ttH$ and $bbH$ production mechanisms.  For spin-0, production is possible only via the $gg$ process; for spin-1 and for the VBF, $VH$, and $tH$ processes, production is only possible via the $qq^\prime$ process.  For $H+jj$ and $H+j$, all parton channels $gg$, $qq^\prime$, and $qg$ are included.
 \item \verb|ChannelRatio|: In the case when \verb|PChannel=2| for a spin-2 resonance, this parameter determines an approximate fraction of the events that should come from $q\bar{q}$.  This is equivalent to appropriately scaling the $Xq\bar{q}$ couplings with respect to the $Xgg$ ones, but can be done without advance knowledge of the relative cross sections.
 \item \verb|PDFSet|, \verb|LHAPDF|, \verb|LHAPDFMem|: To use LHAPDF, this functionality must be enabled in the makefile and the relevant environment variables must be set.  See the instructions in Sec.~\ref{sec:LHAPDF}.  Otherwise \verb|PDFSet| gives the choice between a more limited number of PDF sets.
@@ -303,10 +311,12 @@ While the first factor is generated by the input generator and the third by JHUG
 To select one of these options, POWHEG input decay mode is specified by \verb|WidthSchemeIn|.  Alternatively, JHUGen will try to read the parameter \verb|bwshape| from the header of the POWHEG file.  Using other input generators requires an advance knowledge of how the line shape is generated; if neither of these options applies it may be simpler to apply a similar weight after the fact rather than in the LHE file.
 \begin{itemize}
 \item \verb|PMZZEvals|: Controls the number of evaluations per mass point.  The default is 200000 at high masses, corresponding to a precision of about $0.2\%$, but increases at lower \verb|m_Reso|, where the offshell $Z$'s make the integration less efficient.
+\item \verb|ReadPMZZ|: After each run using \verb|ReweightDecay|, the distribution is written to a file \verb|PMZZdistribution.out|.  This can be read in the next run if you specify \verb|ReadPMZZ=1| on the command line.  This only makes sense if the \verb|DecayModes|, couplings, etc. are the same as last time; otherwise you will read a distribution that no longer makes sense.
 \end{itemize}
 \subsubsection{Statistics options}
 \begin{itemize}
 \item \verb|VegasNc0,1,2|: For unweighted event generation \verb|VegasNc0| specifies the number of evaluations for the initial integrand scan.  The actual event generation is controlled by either \verb|VegasNc1| or \verb|VegasNc2|. \verb|VegasNc1| specifies the number of tries in the accept/reject phase and \verb|VegasNc2| is the number of generated events. When generating unweighted events in \verb|ReadLHE| mode, both \verb|VegasNc1| or \verb|VegasNc2| can be used to specify the number of generated events. For the generation of weighted events \verb|VegasNc1| specifies the number of evaluations for each of 5 iterations during the initial integrand scan. \verb|VegasNc2| gives the (approximate) number of generated weighted events.
+\item \verb|ReadCSmax|: If \verb|ReadCSmax| is specified on the command line, the grid generation step is skipped and the results are read from a file.  This can speed up the process by running a short job first, and then many jobs in parallel using this option.  This only makes sense if the couplings, etc. are the same as last time; otherwise your results won't make sense.
 \item \verb|Seed|: To reproduce previous results, the random seed can be set on the command line.  Because Fortran uses multiple random seeds (the exact number is compiler dependent), the seed provided is used along with other fixed seeds specified in \verb|mod_Parameters.F90| to generate however many seeds are needed.  If no seed is provided on the command line, the seed is determined from the system time and process id.  Either way, it is printed in the header of the output file so that the results can be reproduced.
 
 Please note that random number generation is compiler dependent, so to ensure reproducibility the same compiler (and preferably the same version of the compiler) should be used.  To facilitate this, the compiler and version are written in the header of the LHE file.  It is also not guaranteed that the results can be reproduced using a different version of the generator.

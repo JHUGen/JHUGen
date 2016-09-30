@@ -10,6 +10,7 @@ to run: ./JHUGen Parameter1=value1 Parameter2=value2 ...
 See the manual for more details
 
 command line parameter quick reference:
+  help:                Print all command line options
   Process configuration:
     Collider:          1=LHC (default), 2=Tevatron, 0=e+e-
     ColliderEnergy:    in TeV.  default is 13 TeV for LHC, 1.96 TeV for Tevatron,
@@ -27,7 +28,7 @@ command line parameter quick reference:
                          9=Z->anything, 10=W->lnu+taunu, 11=W->anything
     Interf:            0=neglect interference for 4f final states,
                        1=include interference
-    RandomizeVVDecays: Randomizes the order of DecayMode1 and DecayMode2,
+    RandomizeVVdecays: Randomizes the order of DecayMode1 and DecayMode2,
                        per event (default true)
                        For a WW decay, turning this off will mean
                        DecayMode1 is W+ and DecayMode2 is W-
@@ -42,6 +43,10 @@ command line parameter quick reference:
                        (example: NNPDF30_lo_as_0130/NNPDF30_lo_as_0130.info)
     LHAPDFMem:         member number in LHAPDF set
     TopDK:             For ttH or t+H, 0=leave top quarks as stable, 1=decay top quarks
+    TauDK:             In ReadLHE mode, specify this option as either 0 or 1
+                       to decay H->tautau.  If it is 0, the taus are written as
+                       stable; if it is 1, they decay to Wnu, with the W's decaying
+                       according to DecayModes1,2.
   Resonance parameters:
     MReso:             resonance mass in GeV (default=125.00)
     GaReso:            resonance width in GeV (default=0.00407)
@@ -75,10 +80,12 @@ command line parameter quick reference:
                        WidthScheme and WidthSchemeIn to different values
     ReweightDecay:     For decay mode, reweight input decay by the decay probability
     PMZZEvals:         For ReweightDecay, number of evaluations per mass point (default: 200000)
+    ReadPMZZ:          For ReweightDecay, read the decay probability distribution from a file
   Statistics options:
     VegasNc0:          number of evaluations for integrand scan
     VegasNc1:          number of evaluations for accept-reject sampling
     VegasNc2:          number of events for accept-reject sampling
+    ReadCSmax:         Read the results of the grid generation step from a file
     Seed:              Random seed for event generation
   I/O options:
     Unweighted:        0=weighted events, 1=unweighted events
