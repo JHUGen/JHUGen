@@ -239,7 +239,7 @@ This is the list of command line configurables (also defined in the \verb|README
                        (should be a Z or W mode, depending on the input file)
     UnformattedRead:   Turn this on if the normal, faster reading fails
   Couplings:
-    See below
+    See below for the full list
 \end{verbatim}
 
 \subsubsection{Process configuration}
@@ -499,6 +499,8 @@ Some more advanced parameters can be found in \verb|mod_Parameters.F90|.  These 
 \verb|mod_Parameters.F90| also contains alternate schemes for setting the spin 0 and spin 2 couplings, specified by Eq.~(11) of \cite{Bolognesi:2012} instead of Eq.~(9) and Eq.~(20) instead of Eq.~(18).  To enable these couplings, set \verb|generate_as| to \verb|.true.| and set the \verb|ahg*| and \verb|ahz*| couplings for spin 0, or set \verb|generate_bis| to \verb|.false.| and set the \verb|c*| couplings for spin 2.
 
 Note that these alternate couplings only work for processes 0 and 2, not for other production modes that use spin 0 couplings.
+
+Any modification to \verb|mod_Parameters.F90| requires recompiling JHUGen.
 
 \section{Examples}
 
