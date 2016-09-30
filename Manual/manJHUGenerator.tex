@@ -26,7 +26,7 @@ Manual for the JHU generator
 \begin{center}
 \small
 For simulation of a single-produced resonance at hadron colliders \\
-(version v7.0.0, release date Jul. 29, 2016, manual date Sep. 26, 2016) \\
+(version v7.1.0, release date Oct. 3, 2016, manual date Oct. 3, 2016) \\
 \normalsize
 \end{center}
 
@@ -55,108 +55,240 @@ on MCFM libraries for background parameterization which should be referenced~\ci
 
 %\newpage
 
-\section{ Installation }
+\section{Installation}
 
 \noindent
-Register and download the package from \verb|www.pha.jhu.edu/spin| and untar the file.  Go to the directory \verb|JHUGenerator| where the code exists for generating events with the JHU Generator. In the \verb|makefile|, you have two options for compiler, \verb|Comp = ifort| or \verb|Comp = gfort|.  Then simply compile with:
+Register and download the package from \url{spin.pha.jhu.edu} and untar the file.  Go to the directory \verb|JHUGenerator| where the code exists for generating events with the JHU Generator. In the \verb|makefile|, you have two options for compiler, \verb|Comp = ifort| or \verb|Comp = gfort|.  Then simply compile with:
 \begin{verbatim}
 $ make
 \end{verbatim}
 
-\section{ Configuration }
+\section{Quick start}
 
-There are two ways to configure the program, from the command line and in the file \verb|mod_Parameters.F90|.  For documentation from the command line, one can use \verb|JHUGen help|.  In addition, the command line configurables are defined in the file \verb|main.F90|.  When one change the fortran code directly, one should also recompile the code for changes to take effect.  In general, command-line configuration handles general event properties while the configuration file handles all of the couplings and physics handles.
+Examples of running the generator.  The number of events is determined using VegasNc2.
+\begin{itemize}
+	\item $gg$ production:
+	\begin{itemize}
+		\item SM resonance, decay to $ZZ\to 4l$
+		\begin{verbatim}
+		./JHUGen Process=0 VegasNc2=100000 DecayMode1=0 DecayMode2=0 DataFile=ggHZZ4l
+		\end{verbatim}
+		\item pseudoscalar resonance, decay $WW\to 2l2\nu$:
+		\begin{verbatim}
+		./JHUGen Process=0 VegasNc2=100000 DecayMode1=4 DecayMode2=4 DataFile=ggHWW2l2nu_0- \\
+		ghz1=0,0 ghz4=1,0
+		\end{verbatim}
+		\item SM resonance, decay to $Z\gamma\to 2l\gamma$
+		\begin{verbatim}
+		./JHUGen Process=0 VegasNc2=100000 DecayMode1=0 DecayMode2=7 DataFile=ggHgammaZ2l \\
+		ghzgs2=1
+		\end{verbatim}
+	\end{itemize}
+	\item $VH$:
+	\begin{itemize}
+		\item $ZH$ with hadronic $Z$ decay (change \verb|DecayMode1| for other $Z$ decays; both $pp$ (default) and $e^+e^-$ Collider options possible):
+		\begin{verbatim}
+		./JHUGen Process=50 DecayMode1=1 VegasNc2=100000 DataFile=ZH
+		\end{verbatim}
+		\item $WH$ with leptonic $W$ decay (change \verb|DecayMode1| for other $W$ decays):
+		\begin{verbatim}
+		./JHUGen Process=50 DecayMode1=4 VegasNc2=100000 DataFile=WH
+		\end{verbatim}
+		\item $\gamma^*\to\gamma H$ (both $pp$ (default) and $e^+e^-$ Collider options possible):
+		\begin{verbatim}
+		./JHUGen Process=50 DecayMode1=7 VegasNc2=100000 DataFile=gammatogammaH ghgsgs2=1,0
+		\end{verbatim}
+		\item $Z^*\to\gamma H$ (both $pp$ (default) and $e^+e^-$ Collider options possible):
+		\begin{verbatim}
+		./JHUGen Process=50 DecayMode1=7 VegasNc2=100000 DataFile=ZtogammaH ghzgs2=1,0
+		\end{verbatim}
+	\end{itemize}
+	\item VBF:
+	\begin{itemize}
+		\item $Z^*Z^*/W^*W^*\to H$:
+		\begin{verbatim}
+		./JHUGen Process=60 VegasNc2=100000 DataFile=VBF pTjetcut=0 deltaRcut=0
+		\end{verbatim}
+		(Jet cuts are generally not needed for VBF production with only $ZZ$ and $WW$, since there is no divergence.)
+		\item $\gamma^*\gamma^*\to H$:
+		\begin{verbatim}
+		./JHUGen Process=60 VegasNc2=100000 DataFile=gammagammaVBF ghgsgs2=1,0 \\
+		pTjetcut=15 deltaRcut=0
+		\end{verbatim}
+		(Requires cut on jet $p_T$ to avoid divergences when $q_\gamma^2\to 0$.  15 GeV is the default cut, but is shown explicitly as an example.)
+	\end{itemize}
+	\item $H+jj$:
+	\begin{verbatim}
+	./JHUGen Process=61 Unweighted=1 VegasNc2=100000 DataFile=Hjj pTjetcut=15 deltaRcut=0.3
+	\end{verbatim}
+	(Requires cuts on jet $p_T$ and $\Delta r$ to avoid divergences when $q_g^2\to 0$.  15 GeV and 0.3 are the default cuts, but are shown explicitly as an example.)
+	\item $H+j$:
+	\begin{verbatim}
+	./JHUGen Process=62 Unweighted=1 VegasNc2=100000 DataFile=Hj pTjetcut=15
+	\end{verbatim}
+	\item $pp \to t\bar{t}+H$ with inclusive top decay (change \verb|DecayMode1,2| for specific $tt$ decays):
+	\begin{verbatim}
+	./JHUGen Process=80 DecayMode1=11 DecayMode2=11 VegasNc2=100000 DataFile=ttH
+	\end{verbatim}
+	\item $pp \to b\bar{b}+H$:
+	\begin{verbatim}
+	./JHUGen Process=90 VegasNc2=100000 DataFile=bbH pTjetcut=15 deltaRcut=0.3
+	\end{verbatim}
+	\item $pp \to t+H\text{ and }\bar{t}+H$ with inclusive top decay (change \verb|DecayMode1| for specific $t$ decays; use processes 110--113 restrict to either $t$ or $\bar{t}$ and either $s$ or $t$ channels):
+	\begin{verbatim}
+	./JHUGen Process=114 DecayMode1=11 VegasNc2=100000 DataFile=tH_s
+	\end{verbatim}
+	\item Decay-only mode, for generating $H\to VV$ decay in VBF, $H+j(j)$, $VH$, $ttbH$, or $tH$ production
+	modes by the JHU generator or NLO gluon fusion with another generator (e.g. POWHEG).
+	\begin{verbatim}
+	./JHUGen ReadLHE=ZH.lhe DecayMode1=0 DecayMode2=0 DataFile=ZH_ZZ4l
+	./JHUGen ReadLHE=myPOWHEGfile.lhe DecayMode1=0 DecayMode2=0 ghz1=0,0 ghz4=1,0 \\
+    DataFile=myPOWHEGfile_0-_ZZ4l
+	\end{verbatim}
+\end{itemize}
 
-\subsection{ Command line configuration }
+\section{Configuration}
 
-The list of command line configurables and the default values are (also defined in the \verb|README|):
+Most parameters should be set on the command line.
+
+\subsection{Command line configuration}
+
+\subsubsection{Quick reference}
+
+This is the list of command line configurables (also defined in the \verb|README|).  The following sections give further details about some of these parameters.
 
 \begin{verbatim}
-    Collider:          1=LHC, 2=Tevatron, 0=e+e-
+  Process configuration:
+    Collider:          1=LHC (default), 2=Tevatron, 0=e+e-
+    ColliderEnergy:    in TeV.  default is 13 TeV for LHC, 1.96 TeV for Tevatron,
+                       250 GeV for e+e-
     Process:           0=spin-0, 1=spin-1, 2=spin-2 resonance, 50=pp/ee->VH,
                        60=weakVBF, 61=pp->Hjj, 62=pp->Hj, 80=ttH, 90=bbH,
                        110=t+H t channel, 111=tbar+H t channel,
                        112=t+H s channel, 113=tbar+H s channel
-    MReso:             resonance mass in GeV (default=125.00)
-    GaReso:            resonance width in GeV (default=0.00407)
-    ctauReso:          resonance decay length in mm (default=0)
+                       114=t/tbar+H t/s channels
     DecayMode1:        decay mode for vector boson 1 (Z/W/gamma)
     DecayMode2:        decay mode for vector boson 2 (Z/W/gamma)
                          0=Z->2l,  1=Z->2q, 2=Z->2tau, 3=Z->2nu,
                          4=W->lnu, 5=W->2q, 6=W->taunu,
                          7=gamma, 8=Z->2l+2tau,
                          9=Z->anything, 10=W->lnu+taunu, 11=W->anything
+    Interf:            0=neglect interference for 4f final states,
+                       1=include interference
+    RandomizeVVDecays: Randomizes the order of DecayMode1 and DecayMode2,
+                       per event (default true)
+                       For a WW decay, turning this off will mean
+                       DecayMode1 is W+ and DecayMode2 is W-
     PChannel:          0=g+g, 1=q+qb, 2=both
-    OffshellX:          Off-shellness option for resonance (X) in decay processes 0, 1 or 2
+    ChannelRatio:      ratio of qqb / (qqb + gg), for Process=2 PChannel=2
+                        default is to allow this ratio to come from the couplings
     PDFSet:            1=CTEQ6L1(2001),  2=MSTW(2008),
-                                         2xx=MSTW with eigenvector set xx=01..40,
-                                         3=NNPDF3.0LO
+                       2xx=MSTW with eigenvector set xx=01..40,
+                       3=NNPDF3.0LO
+                       (only valid if not interfaced with LHAPDF)
+    LHAPDF:            info file to use if interfaced with LHAPDF
+                       (example: NNPDF30_lo_as_0130/NNPDF30_lo_as_0130.info)
+    LHAPDFMem:         member number in LHAPDF set
+    TopDK:             For ttH or t+H, 0=leave top quarks as stable, 1=decay top quarks
+  Resonance parameters:
+    MReso:             resonance mass in GeV (default=125.00)
+    GaReso:            resonance width in GeV (default=0.00407)
+    ctauReso:          resonance decay length in mm (default=0)
+    OffshellX:         Whether to allow resonance (X) to go offshell
+                       in processes 0, 1 or 2
+  Cuts:
+    pTjetcut:          Minimum pT for jets in GeV (default: 15)
+    deltaRcut:         Minimum deltaR for jets (default: 0.3)
+    mJJcut:            Minimum dijet mass in GeV (default: 0)
+    MPhotonCutoff:     Minimum mass for offshell photons in GeV, when included (default: 4)
+  Renormalization and factorization scales:
+    FacScheme:         PDF factorization scale scheme
+    MuFacMultiplier:   Multiplier for the factorization scale chosen by FacScheme
+    RenScheme:         QCD renormalization scale scheme
+    MuRenMultiplier:   Multiplier for the renormalization scale chosen by RenScheme
+  Lepton filter:
+    FilterNLept:       For decay mode, reject events that have less than FilterNLept leptons
+    FilterOSPairs:     For decay mode, reject events that have less than FilterOSPairs pairs of
+                       sign leptons of any flavor.
+    FilterOSSFPairs:   For decay mode, reject events that have less than FilterOSSFPairs pairs of
+                       opposite-sign-same-flavor leptons.
+    CountTauAsAny:     For FilterOSSFPairs, taus can stand in place of electrons or muons
+                       of the same charge.
+    WriteFailedEvents: Write events that fail in the LHE file, but with a weight of 0
+                       (off by default)
+  Higgs propagator and decay width:
+    WidthScheme:       Higgs width scheme: 1 for running width, 2 for fixed width (default),
+                       and 3 for the CPS
+    WidthSchemeIn:     For decay mode, reweight from one propagator to another by setting
+                       WidthScheme and WidthSchemeIn to different values
+    ReweightDecay:     For decay mode, reweight input decay by the decay probability
+    PMZZEvals:         For ReweightDecay, number of evaluations per mass point (default: 200000)
+  Statistics options:
     VegasNc0:          number of evaluations for integrand scan
     VegasNc1:          number of evaluations for accept-reject sampling
     VegasNc2:          number of events for accept-reject sampling
+    Seed:              Random seed for event generation
+  I/O options:
     Unweighted:        0=weighted events, 1=unweighted events
-    Interf:            0=neglect interference for 4f final states,
-                       1=include interference
+    WriteWeightedLHE:  For Unweighted=0, write weighted events to an LHE file
+                       (note that the output could be huge)
     DataFile:          LHE output file
     ReadLHE:           LHE input file from external file (only spin-0)
     ConvertLHE:        Convert decay of the V from VH production.
                        Use DecayMode1 to specify the decay.
                        (should be a Z or W mode, depending on the input file)
-    TopDK:             For ttH or t+H, 0=leave top quarks as stable, 1=decay top quarks
-    FilterNLept:       For decay mode, reject events that have less than FilterNLept leptons
-    FilterOSPairs:     For decay mode, reject events that have less than FilterOSPairs pairs of
-                         sign leptons of any flavor.
-    FilterOSSFPairs:   For decay mode, reject events that have less than FilterOSSFPairs pairs of
-                         opposite-sign-same-flavor leptons.
-    CountTauAsAny:     For FilterOSSFPairs, taus can stand in place of electrons or muons
-                         of the same charge.
-    LHAPDF:            PDF set to use if interfaced with LHAPDF. See below.
-    FacScheme:         PDF factorization scale scheme
-    MuFacMultiplier:   Multiplier for the factorization scale chosen by FacScheme
-    RenScheme:         QCD renormalization scale scheme
-    MuRenMultiplier:   Multiplier for the renormalization scale chosen by RenScheme
-    WidthScheme:       Higgs width scheme: 1 for running width, 2 for fixed width (default),
-                         and 3 for the CPS
-    WidthSchemeIn:     For decay mode, reweight from one propagator to another by setting
-                         WidthScheme and WidthSchemeIn to different values
-    ReweightDecay:     For decay mode, reweight input decay by the decay probability
-    PMZZEvals:         For ReweightDecay, number of evaluations per mass point (default: 200000)
-    WriteFailedEvents: Write events that fail in the LHE file, but with a weight of 0
-                         (off by default)
-
-    Seed:              Random seed for event generation
-    pTjetcut:          Minimum pT for jets in GeV (default: 15)
-    deltaRcut:         Minimum deltaR for jets (default: 0.3)
-    mJJcut:            Minimum dijet mass in GeV (default: 0)
-    MPhotonCutoff:     Minimum mass for offshell photons in GeV, when included (default: 4)
-    (Couplings):       See below
+    UnformattedRead:   Turn this on if the normal, faster reading fails
+  Couplings:
+    See below
 \end{verbatim}
 
-\noindent
-A few more details on some particular parameters:
-
+\subsubsection{Process configuration}
 \begin{itemize}
-\item {\verb|VegasNc0,1,2|}: For unweighted event generation \verb|VegasNc0| specifies the number of evaluations for the initial integrand scan.  The actual event generation is controlled by either \verb|VegasNc1| or \verb|VegasNc2|. \verb|VegasNc1| specifies the number of tries in the accept/reject phase and \verb|VegasNc2| is the number of generated events. When generating unweighted events in \verb|ReadLHE| mode, both \verb|VegasNc1| or \verb|VegasNc2| can be used to specify the number of generated events. For the generation of weighted events \verb|VegasNc1| specifies the number of evaluations for each of 5 iterations during the initial integrand scan. \verb|VegasNc2| gives the (approximate) number of generated weighted events.
-\item {\verb|OffshellX|}: The flag specifies whether the events for processes 0, 1 or 2 feature a delta-function resonance mass (when set to 0) at or a finite-width distribution around the resonance mass (when set to 1). This option replaces the \verb|OffXVV| numerical flag in previous versions.
-\item \verb|PChannel|: This parameter is only meaningful in the spin-2 case and for the $ttH$ and $bbH$ production mechanisms.  For spin-0, production is possible only via the $gg$ process; for spin-1 and for the VBF, $VH$, and $tH$ processes, production is only possible via the $qq^\prime$ process.  For $H+jj$ and $H+j$, all parton channels $gg$, $qq^\prime$, and $qg$ are included.
+\item \verb|DecayMode1,2|:
+\begin{itemize}
 \item \verb|DecayMode1,2=7|: Valid for spin-0 and spin-2 or for $VH$.
 \item In $VH$ production and \verb|ConvertLHE| mode, \verb|DecayMode1| is used for the decay of the $V$.  If it is a $Z$ decay mode, $ZH$ will be produced; if it is a $W$ decay mode, $WH$ will be produced; if it is $7$, $\gamma H$ will be produced, with $\gamma$ stable.
-\item In $ttH$ production, \verb|DecayMode1| and \verb|DecayMode2| are used to decay the $W$ bosons from the top decay.  Only $W$ decay modes are allowed.
-\item In $t+H$ production, \verb|DecayMode1| is used to decay the W boson from the top decay.
-\item \verb|Interf|: For final states with 4 same flavor fermions, this parameter controls whether or not to include interference effects. It receives 0 or 1.
-\item \verb|FacScheme|, \verb|MuFacMultiplier|, and \verb|RenScheme|, \verb|MuRenMultiplier|: There are currently 10 different schemes, which set the basis of the scale up to the scale multiplier. A postive integer uses running scales per event whereas a negative one uses a fixed scale, and \verb|MuFacMultiplier| and \verb|MuRenMultiplier| determine the scale multipliers for the factorization and renormalization scales, respectively:
-     \begin{itemize}
-     \item $\pm0$: $\mu_{F,\,R}$ are set to the default values of each process. The command line values of \verb|MuFacMultiplier| and \verb|MuRenMultiplier| are disregarded.
-     \item $\pm1$: $\mu_{F,\,R} \propto \sqrt{q^2_H}$ if the scheme number is positive, or $\mu_{F,\,R} \propto m_H$ if the scheme number is negative. $+1$ is the default value for \verb|Process| 0, 1 and 2 with scale multiplier $0.5$, and  $-1$ is the default value for \verb|Process| 50, 60, 61 and 62 with scale multiplier $1$.
-     \item $\pm2$: If the scheme number is positive, $\mu_{F,\,R} \propto \sqrt{q^2_{JJH}}$, where $J$ refers to a particle (partons or leptons) immediately associated in the Higgs production. If the scheme number is negative and the Higgs and the associated partons originate from a common particle (\eg $V^{*}$ in $VH$), $\mu_{F,\,R} \propto m_{JJH}$.
-     \item $\pm3$: If the scheme number is positive, $\mu_{F,\,R} \propto \sqrt{q^2_{JJ}}+\sqrt{q^2_{H}}$. If the scheme number is negative and the associated particles originate from a common particle without the Higgs (\eg $V$ in $VH$), $\mu_{F,\,R} \propto m_{JJ}+m_{H}$.
-     \item $\pm4$: If the scheme number is positive, $\mu_{F,\,R} \propto \sqrt{q^2_{J1}}+\sqrt{q^2_{J2}}+\sqrt{q^2_{H}}$, where $J_{1,\,2}$ are the associated particles. If the scheme number is negative and the matrix element treats the associated particles as massive (\eg $t$ and $\bar{t}$ in $t\bar{t}H$), $\mu_{F,\,R} \propto m_{J1}+m_{J2}+m_{H}$.  $-4$ is the default value for \verb|Process| 80 and 90 with scale multiplier $0.5$.
-     \item $\pm5$: If the scheme number is positive, $\mu_{F,\,R} \propto \sqrt{q^2_{JJ}}$. If the scheme number is negative and the associated particles originate from a common particle without the Higgs (\eg $V$ in $VH$), $\mu_{F,\,R} \propto m_{JJ}$.
-     \item $\pm6$: If the scheme number is positive, $\mu_{F,\,R} \propto \sqrt{q^2_{J1}}+\sqrt{q^2_{J2}}$, where $J_{1,\,2}$ are the associated particles. If the scheme number is negative and the matrix element treats the associated particles as massive (\eg $t$ and $\bar{t}$ in $t\bar{t}H$), $\mu_{F,\,R} \propto m_{J1}+m_{J2}$.
-     \item $\pm7$: If the scheme number is positive, $\mu_{F,\,R} \propto \sqrt{q^2_{JH}}$, where $J$ is the more massive associated particle by its pole mass. If the scheme number is negative and the matrix element treats an associated particle as massive (\eg $t$ in $t+H$), $\mu_{F,\,R} \propto m_{J}+m_{H}$ for the most massive associated particle.
-     \item $\pm8$: If the scheme number is positive, $\mu_{F,\,R} \propto \sqrt{q^2_{J}}+\sqrt{q^2_{H}}$, where $J$ is the more massive associated particle. If the scheme number is negative and the matrix element treats an associated particle as massive (\eg $t$ in $t+H$), $\mu_{F,\,R} \propto m_{J}+m_{H}$ for the most massive associated particle (same as option -7).  $-8$ is the default value for \verb|Process| 110, 111, 112 and 113. with scale multiplier $0.25$.
-     \item $\pm9$: If the scheme number is positive, $\mu_{F,\,R} \propto \sqrt{q^2_{J}}$, where $J$ is the more massive associated particle. If the scheme number is negative and the matrix element treats an associated particle as massive (\eg $t$ in $t+H$), $\mu_{F,\,R} \propto m_{J}$.
-     \end{itemize}
+\item In $ttH$ production, if \verb|TopDK| is true, \verb|DecayMode1| and \verb|DecayMode2| are used to decay the $W$ bosons from the top decay.  Only $W$ decay modes are allowed.
+\item In $t+H$ production, if \verb|TopDK| is true, \verb|DecayMode1| is used to decay the $W$ boson from the top decay.
+\end{itemize}
+\item \verb|Interf|: For final states with 4 same flavor fermions, this parameter controls whether or not to include interference effects.
+\item \verb|RandomizeVVDecays|: For $VV$ decay (and similarly in $ttH$ production), by default the $V$'s are randomized so that, for example, \verb|DecayMode1=5 DecayMode2=11| will produce all combinations that include at least one hadronic $W$ decay (rather of specifically hadronic decay of the $W^+$).  This can be switched off by setting \verb|RandomizeVVDecays=0|.  In this case, \verb|DecayMode1| will refer specifically to the $W^+$ and \verb|DecayMode2| to the $W^-$.  For $ZZ$ decay, this parameter only determines whether the decays of first and second $Z$ written to the LHE file are randomized or not; in this case the only effect is the appearance of the output.
+\item \verb|PChannel|: This parameter is only meaningful in the spin-2 case and for the $ttH$ and $bbH$ production mechanisms.  For spin-0, production is possible only via the $gg$ process; for spin-1 and for the VBF, $VH$, and $tH$ processes, production is only possible via the $qq^\prime$ process.  For $H+jj$ and $H+j$, all parton channels $gg$, $qq^\prime$, and $qg$ are included.
+\item \verb|ChannelRatio|: In the case when \verb|PChannel=2| for a spin-2 resonance, this parameter determines an approximate fraction of the events that should come from $q\bar{q}$.  This is equivalent to appropriately scaling the $Xq\bar{q}$ couplings with respect to the $Xgg$ ones, but can be done without advance knowledge of the relative cross sections.
+\item \verb|PDFSet|, \verb|LHAPDF|, \verb|LHAPDFMem|: To use LHAPDF, this functionality must be enabled in the makefile and the relevant environment variables must be set.  See the instructions in Sec.~\ref{sec:LHAPDF}.  Otherwise \verb|PDFSet| gives the choice between a more limited number of PDF sets.
+\end{itemize}
+\subsubsection{Resonance parameters}
+\begin{itemize}
+\item {\verb|OffshellX|}: The flag specifies whether the events for processes 0, 1 or 2 feature a delta-function resonance mass (when set to 0) at or a finite-width distribution around the resonance mass (when set to 1). This option replaces the \verb|OffXVV| numerical flag in previous versions.
+\end{itemize}
+\subsubsection{Cuts}
+\begin{itemize}
+\item \verb|pTjetcut|, \verb|deltaRcut|, \verb|mJJcut| All three cuts are used in processes 60 (VBF), 61 ($H+jj$), 90 ($bbH$), and also 80 ($ttH$) if \verb|m_Top| is set to be light ($<10 \text{GeV}$).  In addition, \verb|pTjetcut| is used in process 62 ($H+j$) and also processes 110--113 ($t/\bar{t}+H$) if \verb|m_Top| is light.
+\item \verb|MPhotoncutoff| If the decay is to $ZZ$ and any of the couplings to photons (\verb|ghzgsX| or \verb|ghgsgsX|) is set, the $\gamma^*$ contribution will be included along with the $Z$'s.  Similarly, if the decay is to $Z\gamma$ and any of the \verb|ghgsgsX| couplings are set, the $\gamma\gamma^*$ contribution will be included as well.  In this case, a lower cut on the photon invariant mass has to be placed in order to avoid the collinear singularity.  This can be set using MPhotonCutoff.
+\end{itemize}
+\subsubsection{Renormalization and factorization scales}
+\begin{itemize}
+	\item \verb|FacScheme|, \verb|MuFacMultiplier|, and \verb|RenScheme|, \verb|MuRenMultiplier|: There are currently 10 different schemes, which set the basis of the scale up to the scale multiplier. A postive integer uses running scales per event whereas a negative one uses a fixed scale, and \verb|MuFacMultiplier| and \verb|MuRenMultiplier| determine the scale multipliers for the factorization and renormalization scales, respectively:
+	\begin{itemize}
+		\item $\pm0$: $\mu_{F,\,R}$ are set to the default values of each process. The command line values of \verb|MuFacMultiplier| and \verb|MuRenMultiplier| are disregarded.
+		\item $\pm1$: $\mu_{F,\,R} \propto \sqrt{q^2_H}$ if the scheme number is positive, or $\mu_{F,\,R} \propto m_H$ if the scheme number is negative. $+1$ is the default value for \verb|Process| 0, 1 and 2 with scale multiplier $0.5$, and  $-1$ is the default value for \verb|Process| 50, 60, 61 and 62 with scale multiplier $1$.
+		\item $\pm2$: If the scheme number is positive, $\mu_{F,\,R} \propto \sqrt{q^2_{JJH}}$, where $J$ refers to a particle (partons or leptons) immediately associated in the Higgs production. If the scheme number is negative and the Higgs and the associated partons originate from a common particle (\eg $V^{*}$ in $VH$), $\mu_{F,\,R} \propto m_{JJH}$.
+		\item $\pm3$: If the scheme number is positive, $\mu_{F,\,R} \propto \sqrt{q^2_{JJ}}+\sqrt{q^2_{H}}$. If the scheme number is negative and the associated particles originate from a common particle without the Higgs (\eg $V$ in $VH$), $\mu_{F,\,R} \propto m_{JJ}+m_{H}$.
+		\item $\pm4$: If the scheme number is positive, $\mu_{F,\,R} \propto \sqrt{q^2_{J1}}+\sqrt{q^2_{J2}}+\sqrt{q^2_{H}}$, where $J_{1,\,2}$ are the associated particles. If the scheme number is negative and the matrix element treats the associated particles as massive (\eg $t$ and $\bar{t}$ in $t\bar{t}H$), $\mu_{F,\,R} \propto m_{J1}+m_{J2}+m_{H}$.  $-4$ is the default value for \verb|Process| 80 and 90 with scale multiplier $0.5$.
+		\item $\pm5$: If the scheme number is positive, $\mu_{F,\,R} \propto \sqrt{q^2_{JJ}}$. If the scheme number is negative and the associated particles originate from a common particle without the Higgs (\eg $V$ in $VH$), $\mu_{F,\,R} \propto m_{JJ}$.
+		\item $\pm6$: If the scheme number is positive, $\mu_{F,\,R} \propto \sqrt{q^2_{J1}}+\sqrt{q^2_{J2}}$, where $J_{1,\,2}$ are the associated particles. If the scheme number is negative and the matrix element treats the associated particles as massive (\eg $t$ and $\bar{t}$ in $t\bar{t}H$), $\mu_{F,\,R} \propto m_{J1}+m_{J2}$.
+		\item $\pm7$: If the scheme number is positive, $\mu_{F,\,R} \propto \sqrt{q^2_{JH}}$, where $J$ is the more massive associated particle by its pole mass. If the scheme number is negative and the matrix element treats an associated particle as massive (\eg $t$ in $t+H$), $\mu_{F,\,R} \propto m_{J}+m_{H}$ for the most massive associated particle.
+		\item $\pm8$: If the scheme number is positive, $\mu_{F,\,R} \propto \sqrt{q^2_{J}}+\sqrt{q^2_{H}}$, where $J$ is the more massive associated particle. If the scheme number is negative and the matrix element treats an associated particle as massive (\eg $t$ in $t+H$), $\mu_{F,\,R} \propto m_{J}+m_{H}$ for the most massive associated particle (same as option -7).  $-8$ is the default value for \verb|Process| 110, 111, 112 and 113. with scale multiplier $0.25$.
+		\item $\pm9$: If the scheme number is positive, $\mu_{F,\,R} \propto \sqrt{q^2_{J}}$, where $J$ is the more massive associated particle. If the scheme number is negative and the matrix element treats an associated particle as massive (\eg $t$ in $t+H$), $\mu_{F,\,R} \propto m_{J}$.
+	\end{itemize}
+\end{itemize}
+\subsubsection{Lepton filter}
+\begin{itemize}
+\item Any combination of \verb|FilterNLept|, \verb|FilterOSPairs|, \verb|FilterOSSFPairs| can be used in ReadLHE mode to filter the events.  \verb|CountTauAsAny|, off by default, counts each tau as an electron or muon of the same sign towards an OSSF pair.
+\item \verb|WriteFailedEvents|: By default, events that fail the lepton filter are not written to the LHE file.  If this option is set to 1, they are written, but their weight is set to 0.  If it is set to 2, they are written with a weight of zero and with no particles in the event (this saves disk space with  and is accepted by Pythia, but some parsers may not like it).  This option is useful if the same number of events are required to be in the input and the output.
+\end{itemize}
+\subsubsection{Higgs propagator and decay width}
+\begin{itemize}
 \item \verb|WidthScheme|: This option controls the width scheme in JHUGen. The options are 1 for running width, 2 for fixed width, and 3 for the complex pole scheme~\cite{Passarino:2010qk,Goria:2011wa}. 2 is the default option.  Note that the parameter values have the same meaning as in POWHEG.
 \item \verb|WidthSchemeIn|: In \verb|ReadLHE| mode, if this is specified and is different than \verb|WidthScheme|, the resonance propagator will be reweighted between the three options specified above by multiplying the LHE weight of each event by the ratio of the propagators.
 \item \verb|ReweightDecay|: By default, in \verb|ReadLHE| mode, output events are written with the same weight as in the input file.  For a wide resonance, this is not fully correct.  The full probability for a $gg\to X\to VV\to 4f$ event can be written as
@@ -172,20 +304,22 @@ To select one of these options, POWHEG input decay mode is specified by \verb|Wi
 \begin{itemize}
 \item \verb|PMZZEvals|: Controls the number of evaluations per mass point.  The default is 200000 at high masses, corresponding to a precision of about $0.2\%$, but increases at lower \verb|m_Reso|, where the offshell $Z$'s make the integration less efficient.
 \end{itemize}
-\item \verb|WriteFailedEvents|: In \verb|ReadLHE| mode, events that fail in decay or that fail the lepton filter are by default not written to the LHE file.  If this option is set to 1, they are written, but their weight is set to 0.  If it is set to 2, they are written with a weight of zero and with no particles in the event.  This option is useful if the same number of events are required to be in the input and the output.
-\item \verb|Seed|: To reproduce previous results, the random seed can be set on the command line.  Because Fortran uses multiple random seeds (the exact number is compiler dependent), the seed provided is used along with other fixed seeds specified in \verb|mod_Parameters.F90| to generate however many seeds are needed.  If no seed is provided on the command line, the seed is determined from the system time.  Either way, it is printed in the header of the output file so that the results can be reproduced.
+\subsubsection{Statistics options}
+\begin{itemize}
+\item \verb|VegasNc0,1,2|: For unweighted event generation \verb|VegasNc0| specifies the number of evaluations for the initial integrand scan.  The actual event generation is controlled by either \verb|VegasNc1| or \verb|VegasNc2|. \verb|VegasNc1| specifies the number of tries in the accept/reject phase and \verb|VegasNc2| is the number of generated events. When generating unweighted events in \verb|ReadLHE| mode, both \verb|VegasNc1| or \verb|VegasNc2| can be used to specify the number of generated events. For the generation of weighted events \verb|VegasNc1| specifies the number of evaluations for each of 5 iterations during the initial integrand scan. \verb|VegasNc2| gives the (approximate) number of generated weighted events.
+\item \verb|Seed|: To reproduce previous results, the random seed can be set on the command line.  Because Fortran uses multiple random seeds (the exact number is compiler dependent), the seed provided is used along with other fixed seeds specified in \verb|mod_Parameters.F90| to generate however many seeds are needed.  If no seed is provided on the command line, the seed is determined from the system time and process id.  Either way, it is printed in the header of the output file so that the results can be reproduced.
 
 Please note that random number generation is compiler dependent, so to ensure reproducibility the same compiler (and preferably the same version of the compiler) should be used.  To facilitate this, the compiler and version are written in the header of the LHE file.  It is also not guaranteed that the results can be reproduced using a different version of the generator.
-
-\item \verb|pTjetcut|, \verb|deltaRcut|, \verb|mJJcut| All three cuts are used in processes 60 (VBF), 61 ($H+jj$), 90 ($bbH$), and also 80 ($ttH$) if \verb|m_Top| is set to be light ($<10 \text{GeV}$).  In addition, \verb|pTjetcut| is used in process 62 ($H+j$) and also processes 110--113 ($t/\bar{t}+H$) if \verb|m_Top| is light.
-\item Couplings: anomalous couplings can be set on the command line.  For the full list see sections \ref{spin0}, \ref{spin1}, and \ref{spin2}; the parameters can be set in the command line include:
+\end{itemize}
+\subsubsection{Couplings}
+The general syntax is:
 \begin{itemize}
-\item \verb|ghgX|, \verb|ghzX|, \verb|ghzX_primeY|, \verb|cz_qXsq|, \verb|ghwX|, \verb|ghwX_primeY|, \verb|cw_qXsq|, \verb|ghzgsX|, \verb|ghzgs1_prime2|, and \verb|ghgsgsX| for spin 0 $HVV$ couplings (see the list for the ranges of X and Y)
+\item \verb|ghgX|, \verb|ghzX|, \verb|ghzX_primeY|, \verb|cz_qXsq|, \verb|Lambda_zXY|, \verb|ghwX|, \verb|ghwX_primeY|, \verb|cw_qXsq|, \verb|Lambda_wXY|, \verb|ghzgsX|, \verb|ghzgs1_prime2|, and \verb|ghgsgsX| for spin 0 $HVV$ couplings (see the list for the ranges of X and Y)
 \item \verb|zprime_qq_left|, \verb|zprime_qq_right|, \verb|zprime_zz_1|, and \verb|zprime_zz_2| for spin 1
 \item \verb|aX|, \verb|bX|, \verb|graviton_qq_left|, \verb|and graviton_qq_right| for spin 2 (see the list for the range of X)
 \item The $Hff$ couplings \verb|kappa| and \verb|kappa_tilde|
 \end{itemize}
-The couplings are complex, and must be set with a comma between the real and imaginary parts.  For example:
+Except for the form factors (\verb|cz_qXsq|, \verb|Lambda_zXY|, and their $WW$ equivalents), the couplings are complex, and must be set with a comma between the real and imaginary parts.  For example:
 \begin{verbatim}
 ghz1=0,0 ghz4=1,0
 \end{verbatim}
@@ -193,157 +327,9 @@ If an anomalous coupling is turned on, the default coupling in the same category
 
 In the weak vector boson fusion process (VBF) we also allow for different $ZZH$ and $WWH$ couplings.  Per default, they are assumed to be equal, set by the $Z$ couplings; however, if any of the $W$ couplings are set, they will be used instead for $WWH$ fusion.  $WWH$ can be turned off entirely by explicitly setting one of them to \verb|0,0|.
 
-\item \verb|MPhotoncutoff| If the decay is to $ZZ$ and any of the couplings to photons (\verb|ghzgsX| or \verb|ghgsgsX|) is set, the $\gamma^*$ contribution will be included along with the $Z$'s.  Similarly, if the decay is to $Z\gamma$ and any of the \verb|ghgsgsX| couplings are set, the $\gamma\gamma^*$ contribution will be included as well.  In this case, a lower cut on the photon invariant mass has to be placed in order to avoid the collinear singularity.  This can be set using MPhotonCutoff.
 \end{itemize}
 
-Examples of running the generator:
-\begin{itemize}
-\item $gg$ production:
-\begin{itemize}
-\item SM resonance, decay to $ZZ\to 4l$
-\begin{verbatim}
-./JHUGen Process=0 VegasNc2=100000 DecayMode1=0 DecayMode2=0 DataFile=ggHZZ4l
-\end{verbatim}
-\item pseudoscalar resonance, decay $WW\to 2l2\nu$:
-\begin{verbatim}
-./JHUGen Process=0 VegasNc2=100000 DecayMode1=4 DecayMode2=4 DataFile=ggHWW2l2nu_0- \\
-		ghz1=0,0 ghz4=1,0
-\end{verbatim}
-\item SM resonance, decay to $Z\gamma\to 2l\gamma$
-\begin{verbatim}
-./JHUGen DecayMode1=0 DecayMode2=7 DataFile=ggHgammaZ2l ghzgs2=1
-\end{verbatim}
-\end{itemize}
-\item $VH$:
-\begin{itemize}
-\item $ZH$ with hadronic $Z$ decay (change \verb|DecayMode1| for other $Z$ decays; both $pp$ (default) and $e^+e^-$ Collider options possible):
-\begin{verbatim}
-./JHUGen Process=50 DecayMode1=1 VegasNc2=100000 DataFile=ZH
-\end{verbatim}
-\item $WH$ with leptonic $W$ decay (change \verb|DecayMode1| for other $W$ decays):
-\begin{verbatim}
-./JHUGen Process=50 DecayMode1=4 VegasNc2=100000 DataFile=WH
-\end{verbatim}
-\item $\gamma^*\to\gamma H$ (both $pp$ (default) and $e^+e^-$ Collider options possible):
-\begin{verbatim}
-./JHUGen Process=50 DecayMode1=7 VegasNc2=100000 DataFile=gammatogammaH ghgsgs2=1,0
-\end{verbatim}
-\item $Z^*\to\gamma H$ (both $pp$ (default) and $e^+e^-$ Collider options possible):
-\begin{verbatim}
-./JHUGen Process=50 DecayMode1=7 VegasNc2=100000 DataFile=ZtogammaH ghzgs2=1,0
-\end{verbatim}
-\end{itemize}
-\item VBF:
-\begin{itemize}
-\item $Z^*Z^*/W^*W^*\to H$:
-\begin{verbatim}
-./JHUGen Process=60 VegasNc2=100000 DataFile=VBF pTjetcut=0 deltaRcut=0
-\end{verbatim}
-(Jet cuts are generally not needed for VBF production with only $ZZ$ and $WW$, since there is no divergence.)
-\item $\gamma^*\gamma^*\to H$:
-\begin{verbatim}
-./JHUGen Process=60 VegasNc2=100000 DataFile=gammagammaVBF ghgsgs2=1,0 \\
-			pTjetcut=15 deltaRcut=0
-\end{verbatim}
-(Requires cut on jet $p_T$ to avoid divergences when $q_\gamma^2\to 0$.  15 GeV is the default cut, but is shown explicitly as an example.)
-\end{itemize}
-\item $H+jj$:
-\begin{verbatim}
-./JHUGen Process=61 Unweighted=1 VegasNc2=100000 DataFile=Hjj pTjetcut=15 deltaRcut=0.3
-\end{verbatim}
-(Requires cuts on jet $p_T$ and $\Delta r$ to avoid divergences when $q_g^2\to 0$.  15 GeV and 0.3 are the default cuts, but are shown explicitly as an example.)
-\item $H+j$:
-\begin{verbatim}
-./JHUGen Process=62 Unweighted=1 VegasNc2=100000 DataFile=Hj pTjetcut=15
-\end{verbatim}
-\item $pp \to t\bar{t}+H$ with inclusive top decay (change \verb|DecayMode1,2| for specific $tt$ decays):
-\begin{verbatim}
-./JHUGen Process=80 DecayMode1=11 DecayMode2=11 VegasNc2=100000 DataFile=ttH
-\end{verbatim}
-\item $pp \to b\bar{b}+H$:
-\begin{verbatim}
-./JHUGen Process=90 VegasNc2=100000 DataFile=bbH
-\end{verbatim}
-\item $pp \to t+H$, $t$ channel with inclusive top decay (change \verb|DecayMode1| for specific $t$ decays; similar syntax for processes 111--113):
-\begin{verbatim}
-./JHUGen Process=110 DecayMode1=11 VegasNc2=100000 DataFile=tH_s
-\end{verbatim}
-\end{itemize}
-
-%\begin{center}
-%\line(1,0){250}
-%\end{center}
-%\noindent
-%\footnotesize
-%{\it N.B.}
-%There is a beta-version of the generator which has improved efficiency for the generation.  However, it is currently only available for gluon-gluon initiated processes.
-%It is by default turned off, but it can be accessed in the file \verb|main.F90|.  The beta version is currently still under validation.
-%\begin{verbatim}
-%logical,parameter :: useBetaVersion=.false.
-%\end{verbatim}
-%\normalsize
-%\begin{center}
-%\line(1,0){250}
-%\end{center}
-
-\noindent
-For generating Higgs decay in VBF, $H+j(j)$, $VH$, $ttbH$, or $tH$ production
-modes by the JHU generator or NLO gluon fusion with another generator (e.g. POWHEG), use JHU generator in \verb|ReadLHE|
-mode and specify the decay mode of interest ($ZZ$, $WW$, $\gamma\gamma$, $Z\gamma$), while the SM fermionic decays
-may be generated by Pythia without loss of generality.
-
-\subsection{ Configuration in parameter file  }
-
-In the file \verb|mod_Parameters.F90|, one does all the configuration of the couplings of the resonance.
-After modifying this file, one needs to recompile.
-
-\subsubsection{ General parameters }
-
-\begin{itemize}
-\item Switches:
-\begin{itemize}
-
-\item
-In the case when \verb|PChannel=2| for a spin-2 resonance, the user can define an approximate ratio of the production of gg and $q\bar{q}$ production.
-
-\begin{verbatim}
-fix_channels_ratio = .true.
-channels_ratio_fix = 0.25d0    ! desired ratio of N_qq/(N_qq+N_gg)
-\end{verbatim}
-
-\item
-For $VV$ decay (and similarly in $ttH$ production), by default the $V$'s are randomized so that, for example, \verb|DecayMode1=5 DecayMode2=11| will produce all combinations that include at least one hadronic $W$ decay (rather of specifically hadronic decay of the $W^+$).  This can be switched off by changing
-\begin{verbatim}
-logical, public, parameter :: RandomizeVV = .true.
-\end{verbatim}
-to \verb|.false.|.  In this case, \verb|DecayMode1| will refer specifically to the $W^+$ and \verb|DecayMode2| to the $W^-$.  For $ZZ$ decay, this parameter only determines whether the decays of first and second $Z$ written to the LHE file are randomized or not; in this case the only effect is the appearance of the output.
-
-\item
-When reading in LHE files, JHUGen determines the format by looking at the first lines of the first event.  If this determination fails for any reason (for example, if different events are written in inconsistent formats), try changing
-\begin{verbatim}
-+logical, public, parameter :: UseUnformattedRead = .false.
-\end{verbatim}
-to \verb|.true.|.  However, this will noticeably slow down event generation in \verb|ReadLHE| mode.
-
-
-
-\item
-For the generation of weighted events (command line \verb|Unweighted=0|) an LHE output file is created if
-\begin{verbatim}
-logical, public, parameter :: writeWeightedLHE = .false.
-\end{verbatim}
-is set to \verb|.true.|.
-\end{itemize}
-
-\item
-Jet cuts, as described above, which should generally be set by command line options.
-
-\item Constants, more or less self-explanatory, including the masses of particles and width of Standard Model particles and the generated resonance, CKM matrix elements, $Z$ and $W$ branching fractions and scale factors for NLO QCD corrections ($1+\alpha_s/\pi$), and collider energies.  They are documented in comments in \verb|mod_Parameters.F90|.
-
-\item Resonance couplings to SM fields, described in detail in the next few sections.  The couplings should be set using command line options.
-\end{itemize}
-
-\subsubsection{ Spin-0 parameters }
+\paragraph{Spin-0 parameters}
 \label{spin0}
 
 \noindent
@@ -353,18 +339,18 @@ The \verb|ghz*| parameters control the decay into $Z$ and $W$ bosons.
 These spin-0 couplings are described in Eq.(9) from Ref.~\cite{Bolognesi:2012}, and can be set from the command line.
 We allow for $q^2$ dependent form factors similar to those described in Ref.~\cite{Anderson:2013}:
 \begin{eqnarray*}
-g^\Lambda_i(q_1,q_2) &=&
-g_i' \frac{\Lambda_i^4}{\left(\Lambda_i^2 + |q_1^2|\right)\left(\Lambda_i^2 + |q_2^2|\right)} \\
-&+& g_i^{\prime 2}  \frac{\left(q_1^2+q_2^2\right)}{\Lambda_i^2}
-+ g_i^{\prime 3}  \frac{\left(q_1^2-q_2^2\right)}{\Lambda_i^2}
-+ g_i^{\prime 4}  \frac{\left(q_1+q_2\right)^2}{\Lambda_Q^2} \\
-&+& g_i^{\prime 5}  \frac{\left(\left(q_1^2\right)^2+\left(q_2^2\right)^2\right)}{\Lambda_i^4}
-+ g_i^{\prime 6}  \frac{\left(\left(q_1^2\right)^2-\left(q_2^2\right)^2\right)}{\Lambda_i^4}
-+ g_i^{\prime 7}  \frac{q_1^2 \, q_2^2}{\Lambda_i^4} \\
-g_i\left(q_1,q_2\right) &=& g_i \delta_{i1} + \left(g^\Lambda_i \left(q_1,q_2\right) + g_i \left(1- \delta_{i1}\right)\right)
-\frac{\Lambda^2_{i1}\,\Lambda^2_{i2}\,\Lambda^2_{i3}}
-{\left(\Lambda^2_{i1}+c_{i1}\left|q_1^2\right|\right)\,\left(\Lambda^2_{i2}+c_{i2}\left|q_2^2\right|\right)\,\left(\Lambda^2_{i3}+c_{i3}\left|(q_1+q_2)^2\right|\right)}
-\noindent
+	g^\Lambda_i(q_1,q_2) &=&
+	g_i' \frac{\Lambda_i^4}{\left(\Lambda_i^2 + |q_1^2|\right)\left(\Lambda_i^2 + |q_2^2|\right)} \\
+	&+& g_i^{\prime 2}  \frac{\left(q_1^2+q_2^2\right)}{\Lambda_i^2}
+	+ g_i^{\prime 3}  \frac{\left(q_1^2-q_2^2\right)}{\Lambda_i^2}
+	+ g_i^{\prime 4}  \frac{\left(q_1+q_2\right)^2}{\Lambda_Q^2} \\
+	&+& g_i^{\prime 5}  \frac{\left(\left(q_1^2\right)^2+\left(q_2^2\right)^2\right)}{\Lambda_i^4}
+	+ g_i^{\prime 6}  \frac{\left(\left(q_1^2\right)^2-\left(q_2^2\right)^2\right)}{\Lambda_i^4}
+	+ g_i^{\prime 7}  \frac{q_1^2 \, q_2^2}{\Lambda_i^4} \\
+	g_i\left(q_1,q_2\right) &=& g_i \delta_{i1} + \left(g^\Lambda_i \left(q_1,q_2\right) + g_i \left(1- \delta_{i1}\right)\right)
+	\frac{\Lambda^2_{i1}\,\Lambda^2_{i2}\,\Lambda^2_{i3}}
+	{\left(\Lambda^2_{i1}+c_{i1}\left|q_1^2\right|\right)\,\left(\Lambda^2_{i2}+c_{i2}\left|q_2^2\right|\right)\,\left(\Lambda^2_{i3}+c_{i3}\left|(q_1+q_2)^2\right|\right)}
+	\noindent
 \end{eqnarray*}
 The user has the option to choose between these functional forms,
 where the term multiplying $g_i^\prime$ corresponds to the full functional form and the $g_i^{\prime 2}... g_i^{\prime 7}$ correspond to an expansion in $\Lambda^2$.
@@ -372,80 +358,80 @@ The names and default values of these parameters are found in \verb|mod_Paramete
 \begin{verbatim}
 
 !-- parameters that define off-shell spin 0 coupling to SM fields, see note
-   complex(8), public, parameter :: ghg2 = (1.0d0,0d0)
-   complex(8), public, parameter :: ghg3 = (0.0d0,0d0)
-   complex(8), public, parameter :: ghg4 = (0.0d0,0d0)   ! pseudoscalar
-   complex(8), public, parameter :: ghz1 = (2.0d0,0d0)
-   complex(8), public, parameter :: ghz2 = (0.0d0,0d0)
-   complex(8), public, parameter :: ghz3 = (0.0d0,0d0)
-   complex(8), public, parameter :: ghz4 = (0.0d0,0d0)   ! pseudoscalar
+complex(8), public :: ghg2 = (1.0d0,0d0)
+complex(8), public :: ghg3 = (0.0d0,0d0)
+complex(8), public :: ghg4 = (0.0d0,0d0)   ! pseudoscalar
+complex(8), public :: ghz1 = (2.0d0,0d0)
+complex(8), public :: ghz2 = (0.0d0,0d0)
+complex(8), public :: ghz3 = (0.0d0,0d0)
+complex(8), public :: ghz4 = (0.0d0,0d0)   ! pseudoscalar
 
 !-- parameters that define q^2 dependent form factors
-   complex(8), public, parameter :: ghz1_prime = (0.0d0,0d0)
-   complex(8), public, parameter :: ghz1_prime2= (0.0d0,0d0)
-   complex(8), public, parameter :: ghz1_prime3= (0.0d0,0d0)
-   complex(8), public, parameter :: ghz1_prime4= (0.0d0,0d0)
-   complex(8), public, parameter :: ghz1_prime5= (0.0d0,0d0)
-   complex(8), public, parameter :: ghz1_prime6= (0.0d0,0d0)
-   complex(8), public, parameter :: ghz1_prime7= (0.0d0,0d0)
+complex(8), public :: ghz1_prime = (0.0d0,0d0)
+complex(8), public :: ghz1_prime2= (0.0d0,0d0)
+complex(8), public :: ghz1_prime3= (0.0d0,0d0)
+complex(8), public :: ghz1_prime4= (0.0d0,0d0)
+complex(8), public :: ghz1_prime5= (0.0d0,0d0)
+complex(8), public :: ghz1_prime6= (0.0d0,0d0)
+complex(8), public :: ghz1_prime7= (0.0d0,0d0)
 
-   complex(8), public, parameter :: ghz2_prime = (0.0d0,0d0)
-   complex(8), public, parameter :: ghz2_prime2= (0.0d0,0d0)
-   complex(8), public, parameter :: ghz2_prime3= (0.0d0,0d0)
-   complex(8), public, parameter :: ghz2_prime4= (0.0d0,0d0)
-   complex(8), public, parameter :: ghz2_prime5= (0.0d0,0d0)
-   complex(8), public, parameter :: ghz2_prime6= (0.0d0,0d0)
-   complex(8), public, parameter :: ghz2_prime7= (0.0d0,0d0)
+complex(8), public :: ghz2_prime = (0.0d0,0d0)
+complex(8), public :: ghz2_prime2= (0.0d0,0d0)
+complex(8), public :: ghz2_prime3= (0.0d0,0d0)
+complex(8), public :: ghz2_prime4= (0.0d0,0d0)
+complex(8), public :: ghz2_prime5= (0.0d0,0d0)
+complex(8), public :: ghz2_prime6= (0.0d0,0d0)
+complex(8), public :: ghz2_prime7= (0.0d0,0d0)
 
-   complex(8), public, parameter :: ghz3_prime = (0.0d0,0d0)
-   complex(8), public, parameter :: ghz3_prime2= (0.0d0,0d0)
-   complex(8), public, parameter :: ghz3_prime3= (0.0d0,0d0)
-   complex(8), public, parameter :: ghz3_prime4= (0.0d0,0d0)
-   complex(8), public, parameter :: ghz3_prime5= (0.0d0,0d0)
-   complex(8), public, parameter :: ghz3_prime6= (0.0d0,0d0)
-   complex(8), public, parameter :: ghz3_prime7= (0.0d0,0d0)
+complex(8), public :: ghz3_prime = (0.0d0,0d0)
+complex(8), public :: ghz3_prime2= (0.0d0,0d0)
+complex(8), public :: ghz3_prime3= (0.0d0,0d0)
+complex(8), public :: ghz3_prime4= (0.0d0,0d0)
+complex(8), public :: ghz3_prime5= (0.0d0,0d0)
+complex(8), public :: ghz3_prime6= (0.0d0,0d0)
+complex(8), public :: ghz3_prime7= (0.0d0,0d0)
 
-   complex(8), public, parameter :: ghz4_prime = (0.0d0,0d0)
-   complex(8), public, parameter :: ghz4_prime2= (0.0d0,0d0)
-   complex(8), public, parameter :: ghz4_prime3= (0.0d0,0d0)
-   complex(8), public, parameter :: ghz4_prime4= (0.0d0,0d0)
-   complex(8), public, parameter :: ghz4_prime5= (0.0d0,0d0)
-   complex(8), public, parameter :: ghz4_prime6= (0.0d0,0d0)
-   complex(8), public, parameter :: ghz4_prime7= (0.0d0,0d0)
+complex(8), public :: ghz4_prime = (0.0d0,0d0)
+complex(8), public :: ghz4_prime2= (0.0d0,0d0)
+complex(8), public :: ghz4_prime3= (0.0d0,0d0)
+complex(8), public :: ghz4_prime4= (0.0d0,0d0)
+complex(8), public :: ghz4_prime5= (0.0d0,0d0)
+complex(8), public :: ghz4_prime6= (0.0d0,0d0)
+complex(8), public :: ghz4_prime7= (0.0d0,0d0)
 
-   real(8),    public, parameter :: Lambda_z1 = 10000d0*GeV
-   real(8),    public, parameter :: Lambda_z2 = 10000d0*GeV
-   real(8),    public, parameter :: Lambda_z3 = 10000d0*GeV
-   real(8),    public, parameter :: Lambda_z4 = 10000d0*GeV
-   real(8),    public, parameter :: Lambda_Q  = 10000d0*GeV
+real(8),    public, parameter :: Lambda_z1 = 10000d0*GeV
+real(8),    public, parameter :: Lambda_z2 = 10000d0*GeV
+real(8),    public, parameter :: Lambda_z3 = 10000d0*GeV
+real(8),    public, parameter :: Lambda_z4 = 10000d0*GeV
+real(8),    public, parameter :: Lambda_Q  = 10000d0*GeV
 
-   integer,    public, parameter :: cz_q1sq = 0d0 ! Sign of q1,2,12**2 for the following Lambda's
-   integer,    public, parameter :: cz_q2sq = 0d0
-   integer,    public, parameter :: cz_q12sq = 0d0
+integer,    public :: cz_q1sq = 0d0 ! Sign of q1,2,12**2 for the following Lambda's
+integer,    public :: cz_q2sq = 0d0
+integer,    public :: cz_q12sq = 0d0
 
-   real(8),    public, parameter :: Lambda_z11 = 100d0*GeV ! For Z1
-   real(8),    public, parameter :: Lambda_z21 = 100d0*GeV
-   real(8),    public, parameter :: Lambda_z31 = 100d0*GeV
-   real(8),    public, parameter :: Lambda_z41 = 100d0*GeV
-   real(8),    public, parameter :: Lambda_z12 = 100d0*GeV ! For Z2
-   real(8),    public, parameter :: Lambda_z22 = 100d0*GeV
-   real(8),    public, parameter :: Lambda_z32 = 100d0*GeV
-   real(8),    public, parameter :: Lambda_z42 = 100d0*GeV
-   real(8),    public, parameter :: Lambda_z10 = 100d0*GeV ! For the Higgs
-   real(8),    public, parameter :: Lambda_z20 = 100d0*GeV
-   real(8),    public, parameter :: Lambda_z30 = 100d0*GeV
-   real(8),    public, parameter :: Lambda_z40 = 100d0*GeV
+real(8),    public :: Lambda_z11 = 100d0*GeV ! For Z1
+real(8),    public :: Lambda_z21 = 100d0*GeV
+real(8),    public :: Lambda_z31 = 100d0*GeV
+real(8),    public :: Lambda_z41 = 100d0*GeV
+real(8),    public :: Lambda_z12 = 100d0*GeV ! For Z2
+real(8),    public :: Lambda_z22 = 100d0*GeV
+real(8),    public :: Lambda_z32 = 100d0*GeV
+real(8),    public :: Lambda_z42 = 100d0*GeV
+real(8),    public :: Lambda_z10 = 100d0*GeV ! For the Higgs
+real(8),    public :: Lambda_z20 = 100d0*GeV
+real(8),    public :: Lambda_z30 = 100d0*GeV
+real(8),    public :: Lambda_z40 = 100d0*GeV
 \end{verbatim}
 
 Intermediate off-shell photons can be included along with the $Z$ boson for $Z$ boson final states, $ZH$ production, and VBF production.
 Their couplings to the spin-0 resonance are controlled by separate parameters,
 \begin{verbatim}
-   complex(8), public, parameter :: ghzgs2  = (0.00d0,0d0)
-   complex(8), public, parameter :: ghzgs3  = (0.00d0,0d0)
-   complex(8), public, parameter :: ghzgs4  = (0.00d0,0d0)
-   complex(8), public, parameter :: ghgsgs2 = (0.00d0,0d0)
-   complex(8), public, parameter :: ghgsgs3 = (0.00d0,0d0)
-   complex(8), public, parameter :: ghgsgs4 = (0.00d0,0d0)
+complex(8), public :: ghzgs2  = (0.00d0,0d0)
+complex(8), public :: ghzgs3  = (0.00d0,0d0)
+complex(8), public :: ghzgs4  = (0.00d0,0d0)
+complex(8), public :: ghgsgs2 = (0.00d0,0d0)
+complex(8), public :: ghgsgs3 = (0.00d0,0d0)
+complex(8), public :: ghgsgs4 = (0.00d0,0d0)
 \end{verbatim}
 where the first three correspond to $Z\gamma^*$ couplings and the latter three corresponds to $\gamma^* \gamma^*$ interactions.
 These two sets of parameters also control the coupling strength in final states with on-shell photons, i.e. $H\to Z\gamma$ or $H\to \gamma\gamma$ decays and $Z^*/\gamma^*\to\gamma H$ production.
@@ -455,28 +441,28 @@ g_1' \frac{ q^2_\gamma }{ \Lambda_1^{Z\gamma} } m_Z^2 \epsilon^*_1 \epsilon^*_2
 \]
 is set by
 \begin{verbatim}
-   complex(8), public, parameter :: ghzgs1_prime2= (0.0d0,0d0)
-   real(8),    public, parameter :: Lambda_zgs1 = 10000d0*GeV.
+complex(8), public :: ghzgs1_prime2= (0.0d0,0d0)
+real(8),    public, parameter :: Lambda_zgs1 = 10000d0*GeV.
 \end{verbatim}
 
-Each \verb|ghzX|, \verb|ghzX_primeY|, \verb|Lambda_z|, and \verb|cz_q1sq| parameter has a \verb|ghwX|, \verb|ghzwX_primeY|, \verb|Lambda_w|, and \verb|cw_q1sq| counterpart, which are used for the $WWH$ coupling in VBF if at least one of them is set on the command line.
+Each \verb|ghzX|, \verb|ghzX_primeY|, \verb|Lambda_zXY|, and \verb|cz_qXsq| parameter has a \verb|ghwX|, \verb|ghzwX_primeY|, \verb|Lambda_wXY|, and \verb|cw_qXsq| counterpart, which are used for the $WWH$ coupling in VBF if at least one of them is set on the command line.
 
 
 
-\subsubsection{ Spin-1 parameters }
+\paragraph{Spin-1 parameters}
 \label{spin1}
 
-The parameters below represent the couplings given in Eq.~(16) from Ref.~\cite{Bolognesi:2012}. The \verb|*left*| and \verb|*right*| parameters control the production of the spin-1 resonance while the \verb|*_v| and \verb|*_a| parameters control the decay.
+The parameters below represent the couplings given in Eq.~(16) from Ref.~\cite{Bolognesi:2012}. The \verb|zprime_qq_*| parameters control the production of the spin-1 resonance while the \verb|zprime_zz_*| parameters control the decay.
 
 \begin{verbatim}
 !---parameters that define spin 1 coupling to SM fields, see note
-   complex(8), public, parameter :: zprime_qq_left  = (1.0d0,0d0)   !  see note Eq. (4)
-   complex(8), public, parameter :: zprime_qq_right = (1.0d0,0d0)
-   complex(8), public, parameter :: zprime_zz_1 =  (0.0d0,0d0)!  =1 for JP=1-
-   complex(8), public, parameter :: zprime_zz_2 =  (0.0d0,0d0)!  =1 for JP=1+
+complex(8), public :: zprime_qq_left  = (1.0d0,0d0)   !  see note Eq. (4)
+complex(8), public :: zprime_qq_right = (1.0d0,0d0)
+complex(8), public :: zprime_zz_1 =  (0.0d0,0d0)!  =1 for JP=1-
+complex(8), public :: zprime_zz_2 =  (0.0d0,0d0)!  =1 for JP=1+
 \end{verbatim}
 
-\subsubsection{ Spin-2 parameters }
+\paragraph{Spin-2 parameters}
 \label{spin2}
 
 \noindent
@@ -485,65 +471,80 @@ The spin-2 couplings are described by Eq.(18) from Ref.~\cite{Bolognesi:2012}, a
 
 \begin{verbatim}
 
-  complex(8), public, parameter :: a1 = (1.0d0,0d0)    ! g1  -- c.f. note
-  complex(8), public, parameter :: a2 = (0.0d0,0d0)    ! g2
-  complex(8), public, parameter :: a3 = (0.0d0,0d0)    ! g3
-  complex(8), public, parameter :: a4 = (0.0d0,0d0)    ! g4
-  complex(8), public, parameter :: a5 = (0.0d0,0d0)    ! pseudoscalar, g8
+complex(8), public :: a1 = (1.0d0,0d0)    ! g1  -- c.f. note
+complex(8), public :: a2 = (0.0d0,0d0)    ! g2
+complex(8), public :: a3 = (0.0d0,0d0)    ! g3
+complex(8), public :: a4 = (0.0d0,0d0)    ! g4
+complex(8), public :: a5 = (0.0d0,0d0)    ! pseudoscalar, g8
 
-  complex(8), public, parameter :: graviton_qq_left  = (1.0d0,0d0)! graviton coupling to quarks
-  complex(8), public, parameter :: graviton_qq_right = (1.0d0,0d0)
+complex(8), public :: graviton_qq_left  = (1.0d0,0d0)! graviton coupling to quarks
+complex(8), public :: graviton_qq_right = (1.0d0,0d0)
 
-  complex(8), public, parameter :: b1 = (1.0d0,0d0)
-  complex(8), public, parameter :: b2 = (0.0d0,0d0)
-  complex(8), public, parameter :: b3 = (0.0d0,0d0)
-  complex(8), public, parameter :: b4 = (0.0d0,0d0)
-  complex(8), public, parameter :: b5 = (0.0d0,0d0)
-  complex(8), public, parameter :: b6 = (0.0d0,0d0)
-  complex(8), public, parameter :: b7 = (0.0d0,0d0)
-  complex(8), public, parameter :: b8 = (0.0d0,0d0)
-  complex(8), public, parameter :: b9 = (0.0d0,0d0)
-  complex(8), public, parameter :: b10 =(0.0d0,0d0)
+complex(8), public :: b1 = (1.0d0,0d0)
+complex(8), public :: b2 = (0.0d0,0d0)
+complex(8), public :: b3 = (0.0d0,0d0)
+complex(8), public :: b4 = (0.0d0,0d0)
+complex(8), public :: b5 = (0.0d0,0d0)
+complex(8), public :: b6 = (0.0d0,0d0)
+complex(8), public :: b7 = (0.0d0,0d0)
+complex(8), public :: b8 = (0.0d0,0d0)
+complex(8), public :: b9 = (0.0d0,0d0)
+complex(8), public :: b10 =(0.0d0,0d0)
 \end{verbatim}
 
-\section{ Examples }
+\subsection{Configuration in parameter file }
+
+Some more advanced parameters can be found in \verb|mod_Parameters.F90|.  These include SM parameters such as the masses of particles and electroweak couplings, which can be changed for precise syncing with other generators used, for example.  Look for the \verb|!constants| section.
+
+\verb|mod_Parameters.F90| also contains alternate schemes for setting the spin 0 and spin 2 couplings, specified by Eq.~(11) of \cite{Bolognesi:2012} instead of Eq.~(9) and Eq.~(20) instead of Eq.~(18).  To enable these couplings, set \verb|generate_as| to \verb|.true.| and set the \verb|ahg*| and \verb|ahz*| couplings for spin 0, or set \verb|generate_bis| to \verb|.false.| and set the \verb|c*| couplings for spin 2.
+
+Note that these alternate couplings only work for processes 0 and 2, not for other production modes that use spin 0 couplings.
+
+\section{Examples}
 
 \noindent
 The below examples are not meant to be a complete set, but rather some interesting and relevant cases.
 In many cases, the example is not the only way to produce such a scenario.
 
-\subsection{ $J^P = 0^+_m$ resonance, $X \to ZZ~{\rm or}~WW$}
+\subsection{$J^P = 0^+_m$ resonance, $X \to ZZ~{\rm or}~WW$}
 \label{sec:exA}
 
 \begin{verbatim}
 ./JHUGen ghz1=1,0 (...other options)
 \end{verbatim}
 
-\subsection{ $J^P = 0^-_m$ resonance, $X \to ZZ~{\rm or}~WW$}
+\subsection{$J^P = 0^-_m$ resonance, $X \to ZZ~{\rm or}~WW$}
 \label{sec:exB}
 
 \begin{verbatim}
 ./JHUGen ghz1=0,0 ghz4=1,0 (...other options)
 \end{verbatim}
 
-\subsection{ $J^P = 0^+_m$ resonance, $X \to \gamma \gamma$}
+\subsection{$J^P = 0^+_m$ resonance, $X \to \gamma \gamma$}
 \label{sec:exC}
 
 In practice, the example $X \to \gamma \gamma$ from this section, Sec.~\ref{sec:exC} and the next Sec.~\ref{sec:exD} are
-kinematically the same but are presented only to illustrate how one takes care of this final state.
+kinematically the same but are presented only to illustrate how one takes care of this final state.  However, in the case of Sec.~\ref{sec:exE}, the couplings chosen do affect the kinematics.
 
 \begin{verbatim}
 ./JHUGen DecayMode1=7 DecayMode2=7 ghgsgs2=1,0 (...other options)
 \end{verbatim}
 
-\subsection{ $J^P = 0^-_m$ resonance, $X \to \gamma \gamma$}
+\subsection{$J^P = 0^-_m$ resonance, $X \to \gamma \gamma$}
 \label{sec:exD}
 
 \begin{verbatim}
 ./JHUGen DecayMode1=7 DecayMode2=7 ghgsgs4=1,0 (...other options)
 \end{verbatim}
 
-\subsection{ $J^P = 2^+_m$ resonance, $X \to ZZ~{\rm or}~WW~{\rm or}~\gamma \gamma$}
+\subsection{$J^P=0^-_m$ resonance, $X\to\gamma^*\gamma^*\to4\ell$}
+\label{sec:exE}
+
+\begin{verbatim}
+./JHUGen DecayMode1=0 DecayMode2=0 ghz1=0,0 ghgsgs4=1,0 (...other options)
+\end{verbatim}
+
+\subsection{$J^P = 2^+_m$ resonance, $X \to ZZ\text{ or }WW\text{ or }~\gamma\gamma$}
 
 \begin{verbatim}
 ./JHUGen Process=2 a1=1,0 a2=0,0 b1=1,0 b2=0,0 b5=1,0 (...other options)
@@ -570,6 +571,7 @@ generate large enough (e.g. VegasNc1=1000000, VegasNc2=50000000) number of weigh
 ({\tt Unweighted=0}) with the corresponding couplings setup ($g^{}_{i}=1$, $g^{}_{j\ne i}=0$).
 
 \subsection{LHAPDF}
+\label{sec:LHAPDF}
 
 It is possible to interface to an LHAPDF setup instead of compiling with local PDF's.  To accomplish this:
 
@@ -577,7 +579,7 @@ It is possible to interface to an LHAPDF setup instead of compiling with local P
 \item In the makefile:
 \begin{itemize}
 \item Set UseLHAPDF=Yes
-\item Set MyLHADir to a directory with your LHAPDF setup.  This can be in terms of environment variables; for example \verb|MyLHADir=${LHAPDF_DATA_PATH}/../../lib/|.
+\item Set MyLHADir to a directory with your LHAPDF setup.  This can be in terms of environment variables; for example \verb|MyLHADir=${LHAPDF_DATA_PATH}/../../lib/| should work as long as \verb|${LHAPDF_DATA_PATH}| only contains one directory.
 \end{itemize}
 \item Ensure that \verb|$LHAPDF_DATA_PATH| and \verb|$LD_LIBRARY_PATH| are set (both when compiling and when running).
 \item Compile
@@ -586,7 +588,7 @@ It is possible to interface to an LHAPDF setup instead of compiling with local P
 
 
 %%%%%%%%%%%
-\section{ JHU Generator Matrix Elements (JHUGenMELA)}
+\section{JHU Generator Matrix Elements (JHUGenMELA)}
 
 After extracting the code, you can go to the directory \verb|JHUGenMELA| to find code for computing matrix elements directly.
 To compile the code, simply run \texttt{make}.
@@ -650,7 +652,15 @@ For the interface, you can also see the beginning declarations in \verb|TVar.hh|
 
 %%%%%%%%%%%
 
-\section{ Release notes }
+\section{Release notes}
+
+\noindent
+In going from \verb|v7.0.0| to \verb|v7.1.0| (October 2, 2016), the updates are as follows:
+
+\begin{itemize}
+	\item Improvements in $WH$, $VBF$, $H+JJ$, $ttH$, $bbH$, and $t+H$ production.
+	\item New process 114, which combines all $t+H$ channels together.
+\end{itemize}
 
 \noindent
 In going from \verb|v6.9.8| to \verb|v7.0.0| (July 29, 2016), the updates are as follows:
@@ -931,7 +941,7 @@ I. Anderson, S. Bolognesi, F. Caola, Y.Y. Gao, A. V. Gritsan, C. B. Martin, K. M
 \bibitem{Gritsan:2016}
 A. V. Gritsan, R. R\"ontsch, M. Schulze, M. Xiao, "Constraining anomalous Higgs boson couplings to the heavy flavor fermions using matrix element techniques". arXiv:1606.03107 [hep-ph].
 \bibitem{thesite}
-See webpage: www.pha.jhu.edu/spin
+See webpage: \url{spin.pha.jhu.edu}
 \bibitem{Chatrchyan:2012ufa}
   S.~Chatrchyan {\it et al.}  [CMS Collaboration],
   ``Observation of a new boson at a mass of 125 GeV with the CMS experiment at the LHC,''

@@ -239,6 +239,7 @@ logical :: SetAnomalousSpin1qq, Setspin1qqleft, Setspin1qqright
 logical :: SetAnomalousSpin2gg, SetAnomalousSpin2qq, Setspin2qqleft, Setspin2qqright
 logical :: SetAnomalousHff, Setkappa
 logical :: SetpTcut, SetdeltaRcut
+logical :: SetColliderEnergy
 
    help = .false.
 
@@ -327,6 +328,8 @@ logical :: SetpTcut, SetdeltaRcut
    SetpTcut=.false.
    SetdeltaRcut=.false.
 
+   SetColliderEnergy=.false.
+
    DataFile="./data/output"
 
 
@@ -348,6 +351,8 @@ logical :: SetpTcut, SetdeltaRcut
     ! by detecting the type.  It also sets success to .true. if the argument name (before =)
     ! is correct.
     call ReadCommandLineArgument(arg, "Collider", success, Collider)
+    call ReadCommandLineArgument(arg, "ColliderEnergy", success, Collider_Energy, SetLastArgument, success2=SetColliderEnergy)
+    if( SetLastArgument ) Collider_Energy = Collider_Energy * 1000*GeV
 #if useLHAPDF==1
     call ReadCommandLineArgument(arg, "LHAPDF", success, LHAPDFString)
     call ReadCommandLineArgument(arg, "LHAPDFMem", success, LHAPDFMember)
@@ -397,6 +402,10 @@ logical :: SetpTcut, SetdeltaRcut
     call ReadCommandLineArgument(arg, "WriteFailedEvents", success, WriteFailedEvents)
     call ReadCommandLineArgument(arg, "Seed", success, UserSeed)
     call ReadCommandLineArgument(arg, "WriteGit", success, writegit) !for testing purposes
+    call ReadCommandLineArgument(arg, "RandomizeVVdecays", success, RandomizeVVdecays)
+    call ReadCommandLineArgument(arg, "ChannelRatio", success, channels_ratio_fix, success2=fix_channels_ratio)
+    call ReadCommandLineArgument(arg, "UnformattedRead", success, UseUnformattedRead)
+    call REadCommandLineArgument(arg, "WriteWeightedLHE", success, WriteWeightedLHE)
 
     !anomalous couplings
     !If any anomalous couplings are set, the default ones have to be set explicitly to keep them on or turn them off
@@ -600,6 +609,17 @@ logical :: SetpTcut, SetdeltaRcut
        endif
     endif
 #endif
+
+    !Collider and energy
+     if (.not.SetColliderEnergy) then
+      IF( COLLIDER.EQ.1) THEN
+        Collider_Energy  = LHC_Energy
+      ELSEIF( COLLIDER.EQ.2 ) THEN
+        Collider_Energy  = TEV_Energy
+      ELSEIF( COLLIDER.EQ.0 ) THEN
+        Collider_Energy  = ILC_Energy
+      ENDIF
+    endif
 
     !Renormalization/factorization schemes
 
@@ -987,15 +1007,6 @@ END SUBROUTINE
 SUBROUTINE InitParameters
 use ModParameters
 implicit none
-
-IF( COLLIDER.EQ.1) THEN
-  Collider_Energy  = LHC_Energy
-ELSEIF( COLLIDER.EQ.2 ) THEN
-  Collider_Energy  = TEV_Energy
-ELSEIF( COLLIDER.EQ.0 ) THEN
-  Collider_Energy  = ILC_Energy
-ENDIF
-
 
 ! rescale V branchings to preserve the correct branching proportions in partial decays
 if( (DecayMode1.eq.8 .and. DecayMode2.eq.9) .or.  &
