@@ -13,6 +13,7 @@ FUNCTION EvalWeighted_HJJ_fulldecay(yRnd,VgsWgt)
 use ModKinematics
 use ModParameters
 use ModHiggsjj
+use ModHiggs
 use ModMisc
 #if compiler==1
 use ifport
@@ -26,8 +27,8 @@ real(8) :: MomExt(1:4,1:10),PSWgt
 real(8) :: p_MCFM(mxpart,1:4),msq_MCFM(-5:5,-5:5)
 complex(8) :: HZZcoupl(1:32),HWWcoupl(1:32)
 integer :: MY_IDUP(1:10),ICOLUP(1:2,1:10),NBin(1:NumHistograms),NHisto
-integer :: iPartChannel,PartChannelAvg,NumPartonicChannels,ijSel(1:121,1:3)
-real(8) :: LO_Res_Unpol, PreFac,VegasWeighted_HJJ_fulldecay,xRnd
+integer :: iPartChannel,PartChannelAvg,NumPartonicChannels,ijSel(1:121,1:3),iflip
+real(8) :: LO_Res_Unpol, PreFac,VegasWeighted_HJJ_fulldecay,xRnd,me_HDK
 logical :: applyPSCut
 integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, Lep1M=8, Lep2P=9, Lep2M=10
 real(8) :: s13,s14,s15,s16,s23,s24,s25,s26,s34,s35,s36,s45,s46,s56,s78,s910,s710,s89
@@ -156,6 +157,31 @@ EvalWeighted_HJJ_fulldecay = 0d0
 
 
    LO_Res_Unpol = msq_MCFM(iPart_sel,jPart_sel)  *  pdf(LHA2M_pdf(iPart_sel),1) * pdf(LHA2M_pdf(jPart_sel),2)
+
+
+
+
+
+! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! 
+
+call EvalAmp_WBFH_UnSymm_SA_Select( (/MomExt(1:4,1),MomExt(1:4,2),MomExt(1:4,3),MomExt(1:4,4),MomExt(1:4,5)+MomExt(1:4,6)/),2,4,.true.,iflip,me2)                ! calling on-shell VBF with stable Higgs
+
+call EvalAmp_H_VV( (/MomExt(1:4,5)+MomExt(1:4,6),(/0d0,0d0,0d0,0d0/),MomExt(1:4,7),MomExt(1:4,8),MomExt(1:4,9),MomExt(1:4,10)/),(/ElM_,ElP_,MuM_,MuP_/),me_HDK) ! adding higgs decay
+me2 = me2 * me_HDK ! 
+
+me2 = me2 * cdabs(1d0/( ((MomExt(1:4,5)+MomExt(1:4,6)).dot.(MomExt(1:4,5)+MomExt(1:4,6))) - m_Reso**2 + (0d0,1d0)*m_Reso*Ga_Reso ))**2 !  adding higgs propagator
+
+
+print *, "MCFM", msq_MCFM(2,4) 
+print *, "JHUG",me2(2,4)
+print *, "ratio",msq_MCFM(2,4)/me2(2,4)
+pause
+
+! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! 
+
+
+
+
 
    PreFac = fbGeV2 * FluxFac * PSWgt * sHatJacobi
    EvalWeighted_HJJ_fulldecay = LO_Res_Unpol * PreFac
