@@ -39,7 +39,7 @@ EvalWeighted_HJJ_fulldecay = 0d0
    NumPartonicChannels = 121
 
 ! selecting only u-d channels for checks
-NumPartonicChannels = 2
+! NumPartonicChannels = 2
 ! after removing also repair get_GENchannelHash !!
 
    iPartChannel = int(yRnd(18) * (NumPartonicChannels)) +1 ! this runs from 1..121
