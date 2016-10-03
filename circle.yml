@@ -102,9 +102,6 @@ test:
     #same with lhapdf
     - "! grep 'UseLHAPDF *= *Yes' makefile"
     - sed -i -r -e "s/(UseLHAPDF *= *)Yes/\1No/" makefile
-    #and same with MELA
-    - "! grep 'linkMELA *= *Yes' makefile"
-    - sed -i -r -e "s/(linkMELA *= *)Yes/\1No/" makefile
     - make
     - make:
          pwd:
