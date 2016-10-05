@@ -128,13 +128,9 @@ test:
     #check that all command line options are documented
     - |
       exitstatus=0
-      for a in $(grep -i 'call *ReadCommandLineArgument' main.F90 | sed -r 's/.*"(.*)".*/\1/'); do
+      for a in $(grep -i 'call *ReadCommandLineArgument' main.F90 | grep -v '!undocumented' | sed -r 's/.*"(.*)".*/\1/'); do
         if ! grep -q $a ../Manual/manJHUGenerator.tex &&
-           ! grep -q ${a/w/z} ../Manual/manJHUGenerator.tex &&        #ghw*, etc. are mentioned collectively
-           ! [ $a == WriteGit ] && ! [ $a == HbbDK ] &&               #for internal testing
-           ! [ $a == VBF_m4l_min ] && ! [ $a == VBF_m4l_max ] &&      #for internal testing
-           ! [ $a == PrintPMZZ ] && ! [ $a == PrintPMZZIntervals ] && #for internal testing
-           ! [ $a == GenEvents ]                                      #not sure what this does
+           ! grep -q ${a/w/z} ../Manual/manJHUGenerator.tex        #ghw*, etc. are mentioned collectively
         then
           echo "$a is undocumented!"
           exitstatus=1

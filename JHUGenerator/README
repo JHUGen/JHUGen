@@ -79,8 +79,9 @@ command line parameter quick reference:
     WidthSchemeIn:     For decay mode, reweight from one propagator to another by setting
                        WidthScheme and WidthSchemeIn to different values
     ReweightDecay:     For decay mode, reweight input decay by the decay probability
-    PMZZEvals:         For ReweightDecay, number of evaluations per mass point (default: 200000)
-    ReadPMZZ:          For ReweightDecay, read the decay probability distribution from a file
+    PmHstarEvals:      For ReweightDecay, number of evaluations per mass point (default: 200000)
+    ReadPmHstar:       For ReweightDecay, read the decay probability distribution from a file
+    PmHstarFile:       File to write and read the decay probability distribution
   Statistics options:
     VegasNc0:          number of evaluations for integrand scan
     VegasNc1:          number of evaluations for accept-reject sampling
