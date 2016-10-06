@@ -9,12 +9,13 @@
       include 'runstring.f'
       include 'zcouple.f'
       include 'WWbits.f'
+      include 'spinzerohiggs_anomcoupl.f'      
       integer jdu1,jdu2,h28,h17,i1,i2,i3,i4,i5,i6,i7,i8,
      & p1,p2,p3,p4,p5,p6,p7,p8
       double complex zab2,amp(2,2,2,2),sqzmass,Amp_S_PR,Amp_S_DK,
      & propw34,propw56,propz28,propz17,propH,propw1347,propw1567,
      & gamZ17(2,2),gamz28(2,2),ZZ17(2,2),ZZ28(2,2),rxw,
-     & anomhzzamp,anomhwwamp
+     & anomhzzamp,anomhwwamp,propX
       double precision t4,s17,s28,s34,s56,s3456,s1347,s1567
 C     amp(jdu1,jdu2,h17,h28)
 C-----Begin statement functions
@@ -98,6 +99,18 @@ c--- special fix for Madgraph check
      &  *ZZ17(jdu1,h17)*ZZ28(jdu2,h28)*propH**(-1)*sqzmass )     
 !       print *, "MARKUS check: new ZZ-->H-->WW:",amp(jdu1,jdu2,h17,h28)
 !       pause
+
+
+!     adding a second resonance
+      if( h2mass.ge.zip ) then      
+      propX=dcmplx(s3456-h2mass**2,h2mass*h2width)
+      Amp_S_PR=-anomhzzamp(p7,p1,p8,p2,2,s3456,s(p7,p1),s(p8,p2),za,zb)
+      Amp_S_DK=-anomhwwamp(p3,p4,p5,p6,2,s3456,s(p3,p4),s(p5,p6),za,zb)
+      amp(jdu1,jdu2,h17,h28)= amp(jdu1,jdu2,h17,h28) 
+     &                      + propw56**(-1)*propw34**(-1)*cxw**(-2)*
+     & Hbit * ( - 2.D0*Amp_S_PR*Amp_S_DK
+     &  *ZZ17(jdu1,h17)*ZZ28(jdu2,h28)*propX**(-1)*sqzmass )     
+      endif
      
       amp(jdu1,jdu2,h17,h28) = amp(jdu1,jdu2,h17,h28) + gamz17(jdu1,h17
      & )*gamz28(jdu2,h28)*propw56**(-1)*propw34**(-1)*propw1347**(-1)*
