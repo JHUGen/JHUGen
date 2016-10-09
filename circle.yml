@@ -123,18 +123,14 @@ test:
       commandlineconfigstartline=$(grep -n "[{]Command line configuration[}]" ../Manual/manJHUGenerator.tex | head -1 | sed "s/:.*//") &&
       startline=$(expr $(tail -n +$commandlineconfigstartline ../Manual/manJHUGenerator.tex | grep -n "begin[{]verbatim[}]" | head -1 | sed "s/:.*//") + $commandlineconfigstartline) &&
       endline=$(expr $(tail -n +$commandlineconfigstartline ../Manual/manJHUGenerator.tex | grep -n "end[{]verbatim[}]" | head -1 | sed "s/:.*//") + $commandlineconfigstartline - 2) &&
-      sdiff -s <(grep "^  " README) <(sed -n "${startline},${endline}p" ../Manual/manJHUGenerator.tex | sed "s/See below/See manual/")
-    - sdiff -s <(grep "^  " README) <(./JHUGen help 2> /dev/null | grep "[^ ]")
+      sdiff -sb <(grep "^  " README) <(sed -n "${startline},${endline}p" ../Manual/manJHUGenerator.tex | sed "s/See below/See manual/")
+    - sdiff -sb <(grep "^  " README) <(./JHUGen help 2> /dev/null | grep "[^ ]")
     #check that all command line options are documented
     - |
       exitstatus=0
-      for a in $(grep -i 'call *ReadCommandLineArgument' main.F90 | sed -r 's/.*"(.*)".*/\1/'); do
+      for a in $(grep -i 'call *ReadCommandLineArgument' main.F90 | grep -v '!undocumented' | sed -r 's/.*"(.*)".*/\1/'); do
         if ! grep -q $a ../Manual/manJHUGenerator.tex &&
-           ! grep -q ${a/w/z} ../Manual/manJHUGenerator.tex &&        #ghw*, etc. are mentioned collectively
-           ! [ $a == WriteGit ] && ! [ $a == HbbDK ] &&               #for internal testing
-           ! [ $a == VBF_m4l_min ] && ! [ $a == VBF_m4l_max ] &&      #for internal testing
-           ! [ $a == PrintPMZZ ] && ! [ $a == PrintPMZZIntervals ] && #for internal testing
-           ! [ $a == GenEvents ]                                      #not sure what this does
+           ! grep -q ${a/w/z} ../Manual/manJHUGenerator.tex        #ghw*, etc. are mentioned collectively
         then
           echo "$a is undocumented!"
           exitstatus=1
@@ -233,6 +229,10 @@ test:
         pwd:
           ../JHUGenMELA
     #should check that all the "should be" ME's are correct...
+    #make sure JHUGen compiles with linkMELA
+    - sed -i -r -e "s/(linkMELA *= *)No/\1Yes/" makefile
+    - make clean
+    - make
 
 
   post:

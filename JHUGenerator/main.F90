@@ -289,6 +289,7 @@ logical :: SetColliderEnergy
    ConvertLHEFile=.false.
    ReadCSmax=.false.
    ReadPMZZ = .false.
+   PMZZFile="PMZZdistribution.out"
    PMZZEvals=-1
    DoPrintPMZZ = .false.
    PrintPMZZIntervals = 20
@@ -378,15 +379,26 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "MuRenMultiplier", success, MuRenMultiplier, success2=SetMuRenMultiplier)
     call ReadCommandLineArgument(arg, "TopDK", success, TopDecays)
     call ReadCommandLineArgument(arg, "TauDK", success, TauDecays)
-    call ReadCommandLineArgument(arg, "HbbDK", success, H_DK)
+    call ReadCommandLineArgument(arg, "HbbDK", success, H_DK)      !undocumented, for internal testing
     call ReadCommandLineArgument(arg, "ReweightDecay", success, ReweightDecay)
     call ReadCommandLineArgument(arg, "WidthScheme", success, WidthScheme)
     call ReadCommandLineArgument(arg, "WidthSchemeIn", success, WidthSchemeIn)
-    call ReadCommandLineArgument(arg, "ReadPMZZ", success, ReadPMZZ)
-    call ReadCommandLineArgument(arg, "PrintPMZZ", success, PrintPMZZ, SetLastArgument, success2=DoPrintPMZZ)
+
+    call ReadCommandLineArgument(arg, "ReadPmHstar", success, ReadPMZZ)
+    call ReadCommandLineArgument(arg, "PmHstarFile", success, PMZZfile)
+    call ReadCommandLineArgument(arg, "PrintPmHstar", success, PrintPMZZ, SetLastArgument, success2=DoPrintPMZZ) !undocumented, for internal testing
     if( SetLastArgument ) PrintPMZZ = PrintPMZZ*GeV !PrintPMZZ is a complex(8), the real and imaginary parts are the minimum and maximum values to print
-    call ReadCommandLineArgument(arg, "PrintPMZZIntervals", success, PrintPMZZIntervals)
-    call ReadCommandLineArgument(arg, "PMZZEvals", success, PMZZEvals)
+    call ReadCommandLineArgument(arg, "PrintPmHstarIntervals", success, PrintPMZZIntervals)                      !undocumented, for internal testing
+    call ReadCommandLineArgument(arg, "PmHstarEvals", success, PMZZEvals)
+
+    !same thing again for compatibility
+    call ReadCommandLineArgument(arg, "ReadPMZZ", success, ReadPMZZ)   !undocumented, for compatibility
+    call ReadCommandLineArgument(arg, "PMZZFile", success, PMZZfile)   !undocumented, for compatibility
+    call ReadCommandLineArgument(arg, "PrintPMZZ", success, PrintPMZZ, SetLastArgument, success2=DoPrintPMZZ)   !undocumented, for compatibility
+    if( SetLastArgument ) PrintPMZZ = PrintPMZZ*GeV !PrintPMZZ is a complex(8), the real and imaginary parts are the minimum and maximum values to print
+    call ReadCommandLineArgument(arg, "PrintPMZZIntervals", success, PrintPMZZIntervals)                        !undocumented, for compatibility
+    call ReadCommandLineArgument(arg, "PMZZEvals", success, PMZZEvals)   !undocumented, for compatibility
+
     call ReadCommandLineArgument(arg, "OffshellX", success, OffShellReson)
     call ReadCommandLineArgument(arg, "FilterNLept", success, RequestNLeptons)
     call ReadCommandLineArgument(arg, "FilterOSPairs", success, RequestOS)
@@ -397,11 +409,11 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "ReadLHE", success, LHEProdFile, success2=ReadLHEFile)
     call ReadCommandLineArgument(arg, "ConvertLHE", success, LHEProdFile, success2=ConvertLHEFile)
     call ReadCommandLineArgument(arg, "ReadCSmax", success, ReadCSmax)
-    call ReadCommandLineArgument(arg, "GenEvents", success, GenerateEvents, SetLastArgument)
+    call ReadCommandLineArgument(arg, "GenEvents", success, GenerateEvents, SetLastArgument)   !undocumented, not sure what this does
     if( SetLastArgument ) Unweighted = .false.
     call ReadCommandLineArgument(arg, "WriteFailedEvents", success, WriteFailedEvents)
     call ReadCommandLineArgument(arg, "Seed", success, UserSeed)
-    call ReadCommandLineArgument(arg, "WriteGit", success, writegit) !for testing purposes
+    call ReadCommandLineArgument(arg, "WriteGit", success, writegit) !undocumented, for testing purposes
     call ReadCommandLineArgument(arg, "RandomizeVVdecays", success, RandomizeVVdecays)
     call ReadCommandLineArgument(arg, "ChannelRatio", success, channels_ratio_fix, success2=fix_channels_ratio)
     call ReadCommandLineArgument(arg, "UnformattedRead", success, UseUnformattedRead)
@@ -601,9 +613,9 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "deltaRcut", success, Rjet, success2=SetdeltaRcut)
     call ReadCommandLineArgument(arg, "mJJcut", success, mJJcut, SetLastArgument)
     if( SetLastArgument ) mJJcut = mJJcut*GeV
-    call ReadCommandLineArgument(arg, "VBF_m4l_min", success, m4l_minmax(1), SetLastArgument)
+    call ReadCommandLineArgument(arg, "VBF_m4l_min", success, m4l_minmax(1), SetLastArgument)   !undocumented, for internal testing
     if( SetLastArgument ) m4l_minmax(1) = m4l_minmax(1)*GeV
-    call ReadCommandLineArgument(arg, "VBF_m4l_max", success, m4l_minmax(2), SetLastArgument)
+    call ReadCommandLineArgument(arg, "VBF_m4l_max", success, m4l_minmax(2), SetLastArgument)   !undocumented, for internal testing
     if( SetLastArgument ) m4l_minmax(2) = m4l_minmax(2)*GeV
     call ReadCommandLineArgument(arg, "MPhotonCutoff", success, MPhotonCutoff, SetLastArgument)
     if( SetLastArgument ) MPhotonCutoff = MPhotonCutoff*GeV
@@ -4669,8 +4681,9 @@ implicit none
         print *, "   WidthSchemeIn:     For decay mode, reweight from one propagator to another by setting"
         print *, "                      WidthScheme and WidthSchemeIn to different values"
         print *, "   ReweightDecay:     For decay mode, reweight input decay by the decay probability"
-        print *, "   PMZZEvals:         For ReweightDecay, number of evaluations per mass point (default: 200000)"
-        print *, "   ReadPMZZ:          For ReweightDecay, read the decay probability distribution from a file"
+        print *, "   PmHstarEvals:      For ReweightDecay, number of evaluations per mass point (default: 200000)"
+        print *, "   ReadPmHstar:       For ReweightDecay, read the decay probability distribution from a file"
+        print *, "   PmHstarFile:       File to write and read the decay probability distribution"
         print *, " Statistics options:"
         print *, "   VegasNc0:          number of evaluations for integrand scan"
         print *, "   VegasNc1:          number of evaluations for accept-reject sampling"
