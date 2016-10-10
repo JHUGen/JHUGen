@@ -14,12 +14,12 @@ c      include 'ewcouple.f'
       include 'zcouple.f'
       include 'ewcharge.f'
 c      include 'runstring.f'
-c      include 'masses.f'
+      include 'masses.f'
       include 'sprods_com.f'
       integer i1,i2,i3,i4,i5,i6,i7,i8,jdu1,jdu2
       double precision t4,bit,s7341,s7561,s7342,s7562,
      & s34,s56,s17,s27,s18,s28
-      double complex 
+      double complex
      & prop17,prop27,prop18,prop28,prop7341,prop7561,prop7342,prop7562,
      & prop34,prop56,
      & propw17,propw18,propw27,propw28,
@@ -54,25 +54,25 @@ c      endif
       s27=s(i2,i7)
       s18=s(i1,i8)
       s28=s(i2,i8)
-      prop34=dcmplx(s34)-czmass2
-      prop56=dcmplx(s56)-czmass2
-      prop17=dcmplx(s17)-czmass2
-      prop27=dcmplx(s27)-czmass2
-      prop18=dcmplx(s18)-czmass2
-      prop28=dcmplx(s28)-czmass2
-      prop7341=dcmplx(s7341)-czmass2
-      prop7561=dcmplx(s7561)-czmass2
-      prop7342=dcmplx(s7342)-czmass2
-      prop7562=dcmplx(s7562)-czmass2
+      prop34=dcmplx(s34)-dcmplx(zmass**2,-zmass*zwidth)
+      prop56=dcmplx(s56)-dcmplx(zmass**2,-zmass*zwidth)
+      prop17=dcmplx(s17)-dcmplx(zmass**2,-zmass*zwidth)
+      prop27=dcmplx(s27)-dcmplx(zmass**2,-zmass*zwidth)
+      prop18=dcmplx(s18)-dcmplx(zmass**2,-zmass*zwidth)
+      prop28=dcmplx(s28)-dcmplx(zmass**2,-zmass*zwidth)
+      prop7341=dcmplx(s7341)-dcmplx(zmass**2,-zmass*zwidth)
+      prop7561=dcmplx(s7561)-dcmplx(zmass**2,-zmass*zwidth)
+      prop7342=dcmplx(s7342)-dcmplx(zmass**2,-zmass*zwidth)
+      prop7562=dcmplx(s7562)-dcmplx(zmass**2,-zmass*zwidth)
 
-      propw17=dcmplx(s17)-cwmass2
-      propw18=dcmplx(s18)-cwmass2
-      propw27=dcmplx(s27)-cwmass2
-      propw28=dcmplx(s28)-cwmass2
-      propw7341=dcmplx(s7341)-cwmass2
-      propw7561=dcmplx(s7561)-cwmass2
-      propw7342=dcmplx(s7342)-cwmass2
-      propw7562=dcmplx(s7562)-cwmass2
+      propw17=dcmplx(s17)-dcmplx(wmass**2,-wmass*wwidth)
+      propw18=dcmplx(s18)-dcmplx(wmass**2,-wmass*wwidth)
+      propw27=dcmplx(s27)-dcmplx(wmass**2,-wmass*wwidth)
+      propw28=dcmplx(s28)-dcmplx(wmass**2,-wmass*wwidth)
+      propw7341=dcmplx(s7341)-dcmplx(wmass**2,-wmass*wwidth)
+      propw7561=dcmplx(s7561)-dcmplx(wmass**2,-wmass*wwidth)
+      propw7342=dcmplx(s7342)-dcmplx(wmass**2,-wmass*wwidth)
+      propw7562=dcmplx(s7562)-dcmplx(wmass**2,-wmass*wwidth)
 
 C----setup couplings and propagators
       rxw=(cone-cxw)/cxw
@@ -237,7 +237,7 @@ c--- gamma/Z-lepton couplings
       gmZl7562(jdu1,2,2)=
      & dcmplx(Q(jdu1)*q2/s7562)+dcmplx(R(jdu1)*r2)/prop7562
       enddo
-      
+
 c--- gamma/Z-lepton couplings
       do jdu1=1,2
       gmZl8562(jdu1,1,1)=
@@ -276,6 +276,6 @@ c--- gamma/Z-lepton couplings
       gmZl8341(jdu1,2,2)=
      & dcmplx(Q(jdu1)*q1/s7562)+dcmplx(R(jdu1)*r1)/prop7562
       enddo
-      
+
       return
       end

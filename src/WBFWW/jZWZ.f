@@ -2,6 +2,7 @@
       implicit none
       include 'constants.f'
       include 'cmplxmass.f'
+      include 'masses.f'
       include 'zprods_decl.f'
       include 'sprods_com.f'
       include 'ewcharge.f'
@@ -49,9 +50,9 @@ c--- set up lepton couplings according to call
         l6=ln
       endif
 
-      propz17=s17-czmass2
-      propz28=s28-czmass2
-      propw1347=t4(i1,i3,i4,i7)-cwmass2
+      propz17=s17-dcmplx(zmass**2,-zmass*zwidth)
+      propz28=s28-dcmplx(zmass**2,-zmass*zwidth)
+      propw1347=t4(i1,i3,i4,i7)-dcmplx(wmass**2,-wmass*wwidth)
 
       do jdu1=1,2
       gamZ17lept3(jdu1,1)=Q(jdu1)*q3/s17+L(jdu1)*l3/propZ17

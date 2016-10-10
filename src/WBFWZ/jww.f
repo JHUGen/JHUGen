@@ -2,6 +2,7 @@
       implicit none
       include 'constants.f'
       include 'cmplxmass.f'
+      include 'masses.f'
       include 'zprods_decl.f'
       include 'sprods_com.f'
       include 'ewcharge.f'
@@ -29,8 +30,8 @@ C-----end statement functions
       p17(:)=0.5d0*dble(zab(p1,:,p1)+zab(p7,:,p7))
       p34(:)=0.5d0*dble(zab(p3,:,p3)+zab(p4,:,p4))
 
-      propz17=s17-czmass2
-      propw34=s34-cwmass2
+      propz17=s17-dcmplx(zmass**2,-zmass*zwidth)
+      propw34=s34-dcmplx(wmass**2,-wmass*wwidth)
 
       q3=qn
       l3=ln

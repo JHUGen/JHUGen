@@ -2,6 +2,7 @@
       implicit none
       include 'constants.f'
       include 'cmplxmass.f'
+      include 'masses.f'
       include 'zprods_decl.f'
       include 'sprods_com.f'
       integer p1,p2,p3,p4,p7,ro
@@ -15,11 +16,11 @@ C-----end statement functions
       s134=t3(p1,p3,p4)
       s347=t3(p3,p4,p7)
 
-      propw34=s34-cwmass2
+      propw34=s34-dcmplx(wmass**2,-wmass*wwidth)
 
       do ro=1,4
       jqcd(1,ro)= + propw34**(-1) * ( za(p7,p3)*zb(p7,p4)*zab(p7,ro,p1)
-     &    *s347**(-1) + za(p7,p3)*zb(p3,p4)*zab(p3,ro,p1)*s347**(-1) - 
+     &    *s347**(-1) + za(p7,p3)*zb(p3,p4)*zab(p3,ro,p1)*s347**(-1) -
      &    za(p1,p3)*zb(p1,p4)*zab(p7,ro,p1)*s134**(-1) + za(p3,p4)*zb(
      &    p1,p4)*zab(p7,ro,p4)*s134**(-1) )
       jqcd(2,ro)=jqcd(1,ro)

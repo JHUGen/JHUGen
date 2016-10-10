@@ -53,9 +53,9 @@ c--- q(-p1)+q(-p2)->W(p3,p4)+W(p5,p6)+q(p7)+q(p8);
 
 c--- This calculation uses the complex-mass scheme (c.f. arXiv:hep-ph/0605312)
 c--- and the following lines set up the appropriate masses and sin^2(theta_w)
-      cwmass2=dcmplx(wmass**2,-wmass*wwidth)
-      czmass2=dcmplx(zmass**2,-zmass*zwidth)
-      cxw=cone-cwmass2/czmass2
+      cwmass2=dcmplx(wmass**2,0d0)
+      czmass2=dcmplx(zmass**2,0d0)
+      cxw=cone-dcmplx(wmass**2,-wmass*wwidth)/czmass2
 
       doHO=.false.
       doBO=.false.
@@ -223,7 +223,8 @@ C-----setup for (dqcq_uqsq)
      & +cdotpr(j7_34_1g(1,:),j8_56_2g(2,:))/s7341
      & +(cdotpr(j7_34_1z(1,:),j8_56_2z(2,:))
      &  -cdotpr(j7_34_1z(1,:),k7341(:))
-     &  *cdotpr(k7341(:),j8_56_2z(2,:))/czmass2)/(s7341-czmass2)
+     &  *cdotpr(k7341(:),j8_56_2z(2,:))/czmass2)
+     & /(s7341-dcmplx(zmass**2,-zmass*zwidth))
 
       tempw(1,4)=tempw(1,4)+esq**6*spinavge
      &   *dble(amp(dqcq_uqsq,1,1)
@@ -343,7 +344,8 @@ c-------- ampb
      & +cdotpr(j8_34_1g(1,:),j7_56_2g(2,:))/s8341
      & +(cdotpr(j8_34_1z(1,:),j7_56_2z(2,:))
      &  -cdotpr(j8_34_1z(1,:),k8341(:))
-     &  *cdotpr(k8341(:),j7_56_2z(2,:))/czmass2)/(s8341-czmass2)
+     &  *cdotpr(k8341(:),j7_56_2z(2,:))/czmass2)
+     & /(s8341-dcmplx(zmass**2,-zmass*zwidth))
 
       do h1=1,2
       do h2=1,2
@@ -393,7 +395,8 @@ C-----setup for (uqsq_dqcq)
      & +cdotpr(j8_34_2g(1,:),j7_56_1g(2,:))/s8342
      & +(cdotpr(j8_34_2z(1,:),j7_56_1z(2,:))
      &  -cdotpr(j8_34_2z(1,:),k8342(:))
-     &  *cdotpr(k8342(:),j7_56_1z(2,:))/czmass2)/(s8342-czmass2)
+     &  *cdotpr(k8342(:),j7_56_1z(2,:))/czmass2)
+     & /(s8342-dcmplx(zmass**2,-zmass*zwidth))
 
       tempw(2,3)=tempw(2,3)+esq**6*spinavge
      &   *dble(amp(uqsq_dqcq,1,1)

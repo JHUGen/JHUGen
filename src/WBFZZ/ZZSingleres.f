@@ -2,6 +2,7 @@
       implicit none
       include 'constants.f'
       include 'cmplxmass.f'
+      include 'masses.f'
       include 'ewcharge.f'
       include 'zcouple.f'
       include 'sprods_com.f'
@@ -53,12 +54,12 @@ C---setting up couplings dependent on whether we are doing 34-line or 56-line
       s238=t3(n2,n3,n8)
       s248=t3(n2,n4,n8)
 
-      prop17=dcmplx(s17)-czmass2
-      prop28=dcmplx(s28)-czmass2
-      prop56=dcmplx(s56)-czmass2
+      prop17=dcmplx(s17)-dcmplx(zmass**2,-zmass*zwidth)
+      prop28=dcmplx(s28)-dcmplx(zmass**2,-zmass*zwidth)
+      prop56=dcmplx(s56)-dcmplx(zmass**2,-zmass*zwidth)
 
-      propw17=dcmplx(s17)-cwmass2
-      propw28=dcmplx(s28)-cwmass2
+      propw17=dcmplx(s17)-dcmplx(wmass**2,-wmass*wwidth)
+      propw28=dcmplx(s28)-dcmplx(wmass**2,-wmass*wwidth)
 
       do jdu1=1,2
       ZZ17(jdu1,1,1)=dcmplx(Q(jdu1)*xq1/s17)+dcmplx(L(jdu1)*xl1)/prop17

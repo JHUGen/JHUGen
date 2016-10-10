@@ -2,6 +2,7 @@
       implicit none
       include 'constants.f'
       include 'cmplxmass.f'
+      include 'masses.f'
       include 'zprods_decl.f'
       include 'sprods_com.f'
       include 'ewcharge.f'
@@ -37,9 +38,9 @@ C-----end statement functions
       s567=t3(i5,i6,i7)
       s3456=t4(i3,i4,i5,i6)
 
-      propw34=s34-cwmass2
-      propw56=s56-cwmass2
-      propZ3456=s3456-czmass2
+      propw34=s34-dcmplx(wmass**2,-wmass*wwidth)
+      propw56=s56-dcmplx(wmass**2,-wmass*wwidth)
+      propZ3456=s3456-dcmplx(zmass**2,-zmass*zwidth)
 
       do jdu1=1,2
       game3456(jdu1,1,1)=Q(jdu1)*qe/s3456+L(jdu1)*le/propZ3456
@@ -143,7 +144,7 @@ C-----end statement functions
       amp(1,jdu2,2,h28)= + propw56**(-1)*s28**(-1)*s128**(-1) * ( 4.D0*
      &    za(p1,p8)*za(p5,p6)*zb(p7,p6)*zb(p6,p4)*zab2(p3,p1,p8,p2)*
      &    game3456(1,2,1)*s456**(-1) + 4.D0*za(p1,p8)*za(p5,p3)*zb(p7,
-     &    p4)*zb(p5,p6)*zab2(p5,p1,p8,p2)*gamn3456(1,2,1)*s356**(-1) - 
+     &    p4)*zb(p5,p6)*zab2(p5,p1,p8,p2)*gamn3456(1,2,1)*s356**(-1) -
      &    4.D0*za(p1,p8)*za(p5,p3)*zb(p7,p4)*zb(p6,p3)*zab2(p3,p1,p8,p2
      &    )*gamn3456(1,2,1)*s356**(-1) + 4.D0*za(p1,p8)*za(p5,p4)*zb(p7
      &    ,p4)*zb(p6,p4)*zab2(p3,p1,p8,p2)*game3456(1,2,1)*s456**(-1) )
@@ -177,7 +178,7 @@ C-----end statement functions
      &    za(p5,p3)*zb(p1,p2)*zb(p6,p4)*zba2(p7,p3,p4,p1) - 2.D0*za(p1,
      &    p8)*za(p5,p3)*zb(p6,p4)*zb(p8,p2)*zba2(p7,p5,p6,p8) + 2.D0*
      &    za(p1,p8)*za(p5,p3)*zb(p6,p4)*zb(p8,p2)*zba2(p7,p3,p4,p8) - 4.
-     &    D0*za(p1,p8)*zb(p7,p6)*zab2(p5,p1,p8,p2)*zab2(p3,p5,p6,p4) + 
+     &    D0*za(p1,p8)*zb(p7,p6)*zab2(p5,p1,p8,p2)*zab2(p3,p5,p6,p4) +
      &    4.D0*za(p1,p8)*zb(p7,p4)*zab2(p5,p3,p4,p6)*zab2(p3,p1,p8,p2)
      &     )
       amp(1,jdu2,2,h28) = amp(1,jdu2,2,h28) + gamv(1,2)*propw56**(-1)*
@@ -257,7 +258,7 @@ C-----end statement functions
       amp(2,jdu2,2,h28)= + propw56**(-1)*s28**(-1)*s128**(-1) * ( 4.D0*
      &    za(p1,p8)*za(p5,p6)*zb(p7,p6)*zb(p6,p4)*zab2(p3,p1,p8,p2)*
      &    game3456(2,2,1)*s456**(-1) + 4.D0*za(p1,p8)*za(p5,p3)*zb(p7,
-     &    p4)*zb(p5,p6)*zab2(p5,p1,p8,p2)*gamn3456(2,2,1)*s356**(-1) - 
+     &    p4)*zb(p5,p6)*zab2(p5,p1,p8,p2)*gamn3456(2,2,1)*s356**(-1) -
      &    4.D0*za(p1,p8)*za(p5,p3)*zb(p7,p4)*zb(p6,p3)*zab2(p3,p1,p8,p2
      &    )*gamn3456(2,2,1)*s356**(-1) + 4.D0*za(p1,p8)*za(p5,p4)*zb(p7
      &    ,p4)*zb(p6,p4)*zab2(p3,p1,p8,p2)*game3456(2,2,1)*s456**(-1) )
@@ -291,7 +292,7 @@ C-----end statement functions
      &    za(p5,p3)*zb(p1,p2)*zb(p6,p4)*zba2(p7,p3,p4,p1) - 2.D0*za(p1,
      &    p8)*za(p5,p3)*zb(p6,p4)*zb(p8,p2)*zba2(p7,p5,p6,p8) + 2.D0*
      &    za(p1,p8)*za(p5,p3)*zb(p6,p4)*zb(p8,p2)*zba2(p7,p3,p4,p8) - 4.
-     &    D0*za(p1,p8)*zb(p7,p6)*zab2(p5,p1,p8,p2)*zab2(p3,p5,p6,p4) + 
+     &    D0*za(p1,p8)*zb(p7,p6)*zab2(p5,p1,p8,p2)*zab2(p3,p5,p6,p4) +
      &    4.D0*za(p1,p8)*zb(p7,p4)*zab2(p5,p3,p4,p6)*zab2(p3,p1,p8,p2)
      &     )
       amp(2,jdu2,2,h28) = amp(2,jdu2,2,h28) + gamv(2,2)*propw56**(-1)*

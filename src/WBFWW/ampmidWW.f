@@ -57,12 +57,12 @@ c--- special fix for Madgraph check
 
       proph3456=dcmplx(s3456-hmass**2,hmass*hwidth)
       proph1347=dcmplx(s1347-hmass**2,hmass*hwidth)
-      propz3456=s3456-czmass2
+      propz3456=s3456-dcmplx(zmass**2,-zmass*zwidth)
       propa3456=s3456
-      propw34=s34-cwmass2
-      propw56=s56-cwmass2
-      propw17=s17-cwmass2
-      propw28=s28-cwmass2
+      propw34=s34-dcmplx(wmass**2,-wmass*wwidth)
+      propw56=s56-dcmplx(wmass**2,-wmass*wwidth)
+      propw17=s17-dcmplx(wmass**2,-wmass*wwidth)
+      propw28=s28-dcmplx(wmass**2,-wmass*wwidth)
 
       game=qe/propa3456+le*rxw/propz3456
       gamn=ln*rxw/propz3456

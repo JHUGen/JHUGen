@@ -2,6 +2,7 @@
       implicit none
       include 'constants.f'
       include 'cmplxmass.f'
+      include 'masses.f'
       include 'zprods_decl.f'
       include 'sprods_com.f'
       integer p1,p2,p3,p4,p5,p6,p7,p8
@@ -25,10 +26,10 @@ C-----end statement functions
       s348=t3(p3,p4,p8)
       s567=t3(p5,p6,p7)
       s568=t3(p5,p6,p8)
-      propw28=s28-cwmass2
-      propw17=s17-cwmass2
-      propW34=s34-cwmass2
-      propW56=s56-cwmass2
+      propw28=s28-dcmplx(wmass**2,-wmass*wwidth)
+      propw17=s17-dcmplx(wmass**2,-wmass*wwidth)
+      propW34=s34-dcmplx(wmass**2,-wmass*wwidth)
+      propW56=s56-dcmplx(wmass**2,-wmass*wwidth)
       amp=za(p8,p3)*zb(p2,p6)*zba2(p4,p3,p8,p7)*zba2(p1,p2,p6,p5)*
      & propw56**(-1)*propw34**(-1)*s256**(-1)*s348**(-1)*propw17**(-1)
      &  + za(p8,p5)*zb(p2,p4)*zba2(p1,p2,p4,p3)*zba2(p6,p5,p8,p7)*

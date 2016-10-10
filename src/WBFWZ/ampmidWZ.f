@@ -58,11 +58,11 @@ c--- special fix for Madgraph check
       twop34Dp3456=s34-s56+s3456
 
       proph1347=dcmplx(s1347-hmass**2,hmass*hwidth)
-      propw34=s34-cwmass2
-      propz56=s56-czmass2
-      propw3456=s3456-cwmass2
-      propw17=s17-cwmass2
-      propz28=s28-czmass2
+      propw34=s34-dcmplx(wmass**2,-wmass*wwidth)
+      propz56=s56-dcmplx(zmass**2,-zmass*zwidth)
+      propw3456=s3456-dcmplx(wmass**2,-wmass*wwidth)
+      propw17=s17-dcmplx(wmass**2,-wmass*wwidth)
+      propz28=s28-dcmplx(zmass**2,-zmass*zwidth)
 
       q3=qn
       l3=ln
