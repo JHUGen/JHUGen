@@ -40,12 +40,12 @@ c--- special fix for Madgraph check
       s1567=t4(i1,i5,i6,i7)
       s3456=t4(i3,i4,i5,i6)
 
-      propw1347=s1347-cwmass2
-      propw1567=s1567-cwmass2
-      propw34=s34-cwmass2
-      propw56=s56-cwmass2
-      propz17=s17-czmass2
-      propz28=s28-czmass2
+      propw1347=s1347-dcmplx(wmass**2,-wmass*wwidth)
+      propw1567=s1567-dcmplx(wmass**2,-wmass*wwidth)
+      propw34=s34-dcmplx(wmass**2,-wmass*wwidth)
+      propw56=s56-dcmplx(wmass**2,-wmass*wwidth)
+      propz17=s17-dcmplx(zmass**2,-zmass*zwidth)
+      propz28=s28-dcmplx(zmass**2,-zmass*zwidth)
       propH=dcmplx(s3456-hmass**2,hmass*hwidth)
 
       do jdu1=1,2

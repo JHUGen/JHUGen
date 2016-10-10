@@ -27,7 +27,7 @@ c--- q(-p1)+q(-p2)->W(p3,p4)+Z(p5,p6)+q(p7)+q(p8);
      & amp(nmax,2,2,2,2),ampa(nmax,2,2,2,2),ampb(nmax,2,2,2,2),
      & k7341(4),k7561(4),k7342(4),k7562(4),
      & tmpz1(mxpart,mxpart),tmpz2(mxpart,4,mxpart)
-      double complex 
+      double complex
      & jz7_56_1z(4,2,2,2),jz7_56_1g(4,2,2,2),jz7_56_1w(4,2,2,2),
      & jz7_56_2z(4,2,2,2),jz7_56_2g(4,2,2,2),jz7_56_2w(4,2,2,2),
      & jz8_56_1z(4,2,2,2),jz8_56_1g(4,2,2,2),jz8_56_1w(4,2,2,2),
@@ -53,10 +53,10 @@ c--- q(-p1)+q(-p2)->W(p3,p4)+Z(p5,p6)+q(p7)+q(p8);
 
 c--- This calculation uses the complex-mass scheme (c.f. arXiv:hep-ph/0605312)
 c--- and the following lines set up the appropriate masses and sin^2(theta_w)
-      cwmass2=dcmplx(wmass**2,-wmass*wwidth)
-      czmass2=dcmplx(zmass**2,-zmass*zwidth)
-      cxw=cone-cwmass2/czmass2
-      
+      cwmass2=dcmplx(wmass**2,0d0)
+      czmass2=dcmplx(zmass**2,0d0)
+      cxw=cone-dcmplx(wmass**2,-wmass*wwidth)/czmass2
+
       doHO=.false.
       doBO=.false.
       if     (runstring(4:5) .eq. 'HO') then
@@ -81,7 +81,7 @@ c--- rescaling factor for Higgs amplitudes, if anomalous Higgs width
          mult=chi_higgs**2
        endif
        Hbit=mult*Hbit
-      
+
       if (nwz .eq. +1) then
         p(:,:)=pin(:,:)
       else
@@ -147,13 +147,13 @@ c---- W2 contributions
       call jW2exch2(j1(j),j2(j),3,4,5,6,j8(j),j7(j),za,zb,ampW2_1827)
       call jW2exch2(j2(j),j1(j),3,4,5,6,j8(j),j7(j),za,zb,ampW2_2817)
       call jW2exch2(j2(j),j1(j),3,4,5,6,j7(j),j8(j),za,zb,ampW2_2718)
-      
+
 c---- Z2 contributions
       call jZexch2(j1(j),j2(j),3,4,5,6,j7(j),j8(j),za,zb,ampZ2_1728)
       call jZexch2(j1(j),j2(j),3,4,5,6,j8(j),j7(j),za,zb,ampZ2_1827)
       call jZexch2(j2(j),j1(j),3,4,5,6,j8(j),j7(j),za,zb,ampZ2_2817)
       call jZexch2(j2(j),j1(j),3,4,5,6,j7(j),j8(j),za,zb,ampZ2_2718)
-      
+
       k7341(:)=0.5d0*(zab(j1(j),:,j1(j))+zab(3,:,3)
      & +zab(4,:,4)+zab(j7(j),:,j7(j)))
       k7561(:)=0.5d0*(zab(j1(j),:,j1(j))+zab(5,:,5)
@@ -166,9 +166,9 @@ c---- Z2 contributions
       s7561=cdotpr(k7561,k7561)
       s7562=cdotpr(k7562,k7562)
       s7342=cdotpr(k7342,k7342)
-      
+
       else
-      
+
       ampZ2_1728=czip
       ampZ2_1827=czip
       ampZ2_2817=czip
@@ -203,7 +203,7 @@ c---- Z2 contributions
       jz8_56_2w=czip
 
       endif
-      
+
 c---- Mid contributions
       call ampmidWZ(j1(j),j2(j),3,4,5,6,j7(j),j8(j),za,zb,ampmid_1728)
       call ampmidWZ(j1(j),j2(j),3,4,5,6,j8(j),j7(j),za,zb,ampmid_1827)
@@ -218,15 +218,17 @@ C-----setup for (uqsq_dqsq) (2,3)->(1,3)
      & +cdotpr(jw7_34_1g(2,:),jz8_56_2g(:,1,h2,h5))/s7341
      & +(cdotpr(jw7_34_1z(2,:),jz8_56_2z(:,1,h2,h5))
      &  -cdotpr(jw7_34_1z(2,:),k7341(:))
-     &  *cdotpr(k7341(:),jz8_56_2z(:,1,h2,h5))/czmass2)/(s7341-czmass2)
+     &  *cdotpr(k7341(:),jz8_56_2z(:,1,h2,h5))/czmass2)
+     & /(s7341-dcmplx(zmass**2,-zmass*zwidth))
       amp(uqsq_dqsq,1,h2,1,h5)=amp(uqsq_dqsq,1,h2,1,h5)
      & +(cdotpr(jz7_56_1w(:,2,1,h5),jw8_34_2w(:,1,h2))
      &  -cdotpr(jz7_56_1w(:,2,1,h5),k7561(:))
-     &  *cdotpr(k7561(:),jw8_34_2w(:,1,h2))/cwmass2)/(s7561-cwmass2)
+     &  *cdotpr(k7561(:),jw8_34_2w(:,1,h2))/cwmass2)
+     & /(s7561-dcmplx(wmass**2,-wmass*wwidth))
       amp(uqsq_dqsq,1,h2,1,h5)=amp(uqsq_dqsq,1,h2,1,h5)
      & +ampZ2_1728(1,h2,h5)
       enddo
-      enddo      
+      enddo
       do h5=1,2
       amp(uqsq_dqsq,1,1,1,h5)=amp(uqsq_dqsq,1,1,1,h5)
      & +ampW2_1728(1,h5)
@@ -251,7 +253,7 @@ C-----setup for (uqsq_dqsq) (2,3)->(1,3)
       enddo
       enddo
       enddo
-      
+
 c-----setup for (cqdq_dqsq)
       if (doHO .eqv. .false.) then
       do h2=1,2
@@ -260,15 +262,17 @@ c-----setup for (cqdq_dqsq)
      & +cdotpr(jw8_34_1g(2,:),jz7_56_2g(:,1,h2,h5))/s7562
      & +(cdotpr(jw8_34_1z(2,:),jz7_56_2z(:,1,h2,h5))
      &  -cdotpr(jw8_34_1z(2,:),k7562(:))
-     &  *cdotpr(k7562(:),jz7_56_2z(:,1,h2,h5))/czmass2)/(s7562-czmass2)
+     &  *cdotpr(k7562(:),jz7_56_2z(:,1,h2,h5))/czmass2)
+     & /(s7562-dcmplx(zmass**2,-zmass*zwidth))
       amp(cqdq_dqsq,1,h2,1,h5)=amp(cqdq_dqsq,1,h2,1,h5)
      & +(cdotpr(jz8_56_1w(:,2,1,h5),jw7_34_2w(:,1,h2))
      &  -cdotpr(jz8_56_1w(:,2,1,h5),k7342(:))
-     &  *cdotpr(k7342(:),jw7_34_2w(:,1,h2))/cwmass2)/(s7342-cwmass2)
+     &  *cdotpr(k7342(:),jw7_34_2w(:,1,h2))/cwmass2)
+     & /(s7342-dcmplx(wmass**2,-wmass*wwidth))
       amp(cqdq_dqsq,1,h2,1,h5)=amp(cqdq_dqsq,1,h2,1,h5)
      & +ampZ2_1827(1,h2,h5)
       enddo
-      enddo      
+      enddo
       do h5=1,2
       amp(cqdq_dqsq,1,1,1,h5)=amp(cqdq_dqsq,1,1,1,h5)
      & +ampW2_1827(1,h5)
@@ -298,7 +302,7 @@ c-----setup for (cqdq_dqsq)
 C-----setup for (uqdq_dqdq) (2,1)->(1,1)
       ampa(uqdq_dqdq,:,:,:,:)=amp(uqsq_dqsq,:,:,:,:)
       ampb(uqdq_dqdq,:,:,:,:)=amp(cqdq_dqsq,:,:,:,:)
-      
+
       do h1=1,2
       do h2=1,2
       do h3=1,2
@@ -328,11 +332,13 @@ C-----setup for (uqcq_dqcq) (2,4)->(1,4)
      & +cdotpr(jw7_34_1g(2,:),jz8_56_2g(:,2,h2,h5))/s7341
      & +(cdotpr(jw7_34_1z(2,:),jz8_56_2z(:,2,h2,h5))
      &  -cdotpr(jw7_34_1z(2,:),k7341(:))
-     &  *cdotpr(k7341(:),jz8_56_2z(:,2,h2,h5))/czmass2)/(s7341-czmass2)
+     &  *cdotpr(k7341(:),jz8_56_2z(:,2,h2,h5))/czmass2)
+     & /(s7341-dcmplx(zmass**2,-zmass*zwidth))
       amp(uqcq_dqcq,1,h2,1,h5)=amp(uqcq_dqcq,1,h2,1,h5)
      & +(cdotpr(jz7_56_1w(:,2,1,h5),jw8_34_2w(:,2,h2))
      &  -cdotpr(jz7_56_1w(:,2,1,h5),k7561(:))
-     &  *cdotpr(k7561(:),jw8_34_2w(:,2,h2))/cwmass2)/(s7561-cwmass2)
+     &  *cdotpr(k7561(:),jw8_34_2w(:,2,h2))/cwmass2)
+     & /(s7561-dcmplx(wmass**2,-wmass*wwidth))
       amp(uqcq_dqcq,1,h2,1,h5)=amp(uqcq_dqcq,1,h2,1,h5)
      & +ampZ2_1728(2,h2,h5)
       enddo
@@ -342,7 +348,7 @@ C-----setup for (uqcq_dqcq) (2,4)->(1,4)
      & +ampW2_1728(2,h5)
       enddo
       endif
-      
+
       do h2=1,2
       do h5=1,2
       amp(uqcq_dqcq,1,h2,1,h5)=amp(uqcq_dqcq,1,h2,1,h5)
@@ -361,10 +367,10 @@ C-----setup for (uqcq_dqcq) (2,4)->(1,4)
       enddo
       enddo
       enddo
-      
+
 c      write(6,*) 'temp(2,4)',temp(2,4)
 c      stop
-      
+
 C-----setup for (uqcq_uqsq) (2,4)->(2,3)
       if (doHO .eqv. .false.) then
       do h2=1,2
@@ -373,11 +379,13 @@ C-----setup for (uqcq_uqsq) (2,4)->(2,3)
      & +cdotpr(jw8_34_2g(2,:),jz7_56_1g(:,2,h2,h5))/s7561
      & +(cdotpr(jw8_34_2z(2,:),jz7_56_1z(:,2,h2,h5))
      &  -cdotpr(jw8_34_2z(2,:),k7561(:))
-     &  *cdotpr(k7561(:),jz7_56_1z(:,2,h2,h5))/czmass2)/(s7561-czmass2)
+     &  *cdotpr(k7561(:),jz7_56_1z(:,2,h2,h5))/czmass2)
+     & /(s7561-dcmplx(zmass**2,-zmass*zwidth))
       amp(uqcq_uqsq,1,h2,1,h5)=amp(uqcq_uqsq,1,h2,1,h5)
      & +(cdotpr(jz8_56_2w(:,2,1,h5),jw7_34_1w(:,2,h2))
      &  -cdotpr(jz8_56_2w(:,2,1,h5),k7341(:))
-     &  *cdotpr(k7341(:),jw7_34_1w(:,2,h2))/cwmass2)/(s7341-cwmass2)
+     &  *cdotpr(k7341(:),jw7_34_1w(:,2,h2))/cwmass2)
+     & /(s7341-dcmplx(wmass**2,-wmass*wwidth))
       amp(uqcq_uqsq,1,h2,1,h5)=amp(uqcq_uqsq,1,h2,1,h5)
      & +ampZ2_2817(2,h2,h5)
       enddo
@@ -387,7 +395,7 @@ C-----setup for (uqcq_uqsq) (2,4)->(2,3)
      & +ampW2_2817(2,h5)
       enddo
       endif
-      
+
       do h2=1,2
       do h5=1,2
       amp(uqcq_uqsq,1,h2,1,h5)=amp(uqcq_uqsq,1,h2,1,h5)
@@ -406,7 +414,7 @@ C-----setup for (uqcq_uqsq) (2,4)->(2,3)
       enddo
       enddo
       enddo
-            
+
 C-----setup for (uquq_dquq) (2,4)->(1,4)
       ampa(uquq_dquq,:,:,:,:)=amp(uqcq_dqcq,:,:,:,:)
       if (doHO .eqv. .false.) then
@@ -416,11 +424,13 @@ C-----setup for (uquq_dquq) (2,4)->(1,4)
      & +cdotpr(jw7_34_2g(2,:),jz8_56_1g(:,2,h2,h5))/s7342
      & +(cdotpr(jw7_34_2z(2,:),jz8_56_1z(:,2,h2,h5))
      &  -cdotpr(jw7_34_2z(2,:),k7342(:))
-     &  *cdotpr(k7342(:),jz8_56_1z(:,2,h2,h5))/czmass2)/(s7342-czmass2)
+     &  *cdotpr(k7342(:),jz8_56_1z(:,2,h2,h5))/czmass2)
+     & /(s7342-dcmplx(zmass**2,-zmass*zwidth))
       ampb(uquq_dquq,1,h2,1,h5)=ampb(uquq_dquq,1,h2,1,h5)
      & +(cdotpr(jz7_56_2w(:,2,1,h5),jw8_34_1w(:,2,h2))
      &  -cdotpr(jz7_56_2w(:,2,1,h5),k7562(:))
-     &  *cdotpr(k7562(:),jw8_34_1w(:,2,h2))/cwmass2)/(s7562-cwmass2)
+     &  *cdotpr(k7562(:),jw8_34_1w(:,2,h2))/cwmass2)
+     & /(s7562-dcmplx(wmass**2,-wmass*wwidth))
       ampb(uquq_dquq,1,h2,1,h5)=ampb(uquq_dquq,1,h2,1,h5)
      & +ampZ2_2718(2,h2,h5)
       enddo
@@ -430,7 +440,7 @@ C-----setup for (uquq_dquq) (2,4)->(1,4)
      & +ampW2_2718(2,h5)
       enddo
       endif
-      
+
       do h2=1,2
       do h5=1,2
       ampb(uquq_dquq,1,h2,1,h5)=ampb(uquq_dquq,1,h2,1,h5)
@@ -457,7 +467,7 @@ C-----setup for (uquq_dquq) (2,4)->(1,4)
       enddo
       enddo
       enddo
-      
+
 C-----setup for (uquq_uqdq) (2,2)->(2,1) :: not canonical order, but useful for crossings
       ampa(uquq_uqdq,:,:,:,:)=amp(uqcq_uqsq,:,:,:,:)
       if (doHO .eqv. .false.) then
@@ -467,11 +477,13 @@ C-----setup for (uquq_uqdq) (2,2)->(2,1) :: not canonical order, but useful for 
      & +cdotpr(jw8_34_1g(2,:),jz7_56_2g(:,2,h2,h5))/s7562
      & +(cdotpr(jw8_34_1z(2,:),jz7_56_2z(:,2,h2,h5))
      &  -cdotpr(jw8_34_1z(2,:),k7562(:))
-     &  *cdotpr(k7562(:),jz7_56_2z(:,2,h2,h5))/czmass2)/(s7562-czmass2)
+     &  *cdotpr(k7562(:),jz7_56_2z(:,2,h2,h5))/czmass2)
+     & /(s7562-dcmplx(zmass**2,-zmass*zwidth))
       ampb(uquq_uqdq,1,h2,1,h5)=ampb(uquq_uqdq,1,h2,1,h5)
      & +(cdotpr(jz8_56_1w(:,2,1,h5),jw7_34_2w(:,2,h2))
      &  -cdotpr(jz8_56_1w(:,2,1,h5),k7342(:))
-     &  *cdotpr(k7342(:),jw7_34_2w(:,2,h2))/cwmass2)/(s7342-cwmass2)
+     &  *cdotpr(k7342(:),jw7_34_2w(:,2,h2))/cwmass2)
+     & /(s7342-dcmplx(wmass**2,-wmass*wwidth))
       ampb(uquq_uqdq,1,h2,1,h5)=ampb(uquq_uqdq,1,h2,1,h5)
      & +ampZ2_1827(2,h2,h5)
       enddo
@@ -481,7 +493,7 @@ C-----setup for (uquq_uqdq) (2,2)->(2,1) :: not canonical order, but useful for 
      & +ampW2_1827(2,h5)
       enddo
       endif
-      
+
       do h2=1,2
       do h5=1,2
       ampb(uquq_uqdq,1,h2,1,h5)=ampb(uquq_uqdq,1,h2,1,h5)
@@ -521,7 +533,7 @@ c--- setup for (cquq_squq) (4,2)->(3,2) :: not canonical order, but useful for c
       enddo
       enddo
       enddo
-      
+
       if (j.eq.1) then
       msq(2,3)=temp(2,3)
       msq(4,1)=temp(4,1)
@@ -557,7 +569,7 @@ c--- qbar-qbar
       msq(-4,-1)=tempb(2,4)
       msq(-1,-3)=msq(-1,-3)+temp(4,1)
       msq(-3,-1)=msq(-3,-1)+temp(2,3)
-      
+
 c--- qbar-q
       elseif (j.eq.5) then
       msq(-3,1)=temp(2,3)
@@ -593,7 +605,7 @@ c--- q-qbar
       msq(4,-3)=msq(2,-1)
       msq(4,-2)=temp(2,4)
       msq(4,-1)=tempb(2,4)+temp(2,3)
-      
+
 c      write(6,*) 'temp(2,3)',temp(2,3)
 c      write(6,*) 'temp(4,1)',temp(4,1)
 c      write(6,*) 'temp(2,2)',temp(2,2)
@@ -625,4 +637,4 @@ c--- swap elements to correct places for nwz=-1
    79 format(' *  sin^2(theta_w)   (',f11.5,',',f11.5,')      *')
 
       end
-      
+

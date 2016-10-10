@@ -3,6 +3,7 @@
       implicit none
       include 'constants.f'
       include 'cmplxmass.f'
+      include 'masses.f'
       include 'zprods_decl.f'
       include 'sprods_com.f'
       include 'ewcharge.f'
@@ -49,9 +50,9 @@ C-----end statement functions
       s456=t3(i4,i5,i6)
       s3456=t4(i3,i4,i5,i6)
 
-      propz3456=s3456-czmass2
-      propz34=s34-czmass2
-      propz56=s56-czmass2
+      propz3456=s3456-dcmplx(zmass**2,-zmass*zwidth)
+      propz34=s34-dcmplx(zmass**2,-zmass*zwidth)
+      propz56=s56-dcmplx(zmass**2,-zmass*zwidth)
 
 C---set up couplings dependent on whether we are doing 34- or 56- line
       if (i3+i4 == 7) then
@@ -148,7 +149,7 @@ C---  bmp78(jdu,h12,h34,h56,h7,h8)
      &    p3)*s78**(-1)*s278**(-1)*s456**(-1) + 4.D0*za(p2,p8)*za(p5,p6
      &    )*za(p7,p8)*zb(p1,p6)*zb(p4,p6)*izb(p1,p7)*zba3(p1,p2,p7,p8,
      &    p3)*s78**(-1)*s278**(-1)*s456**(-1) )
-      bmp78(jdu,1,1,h56,2,1)= + gamz3456(jdu,1,1)*gamll56(1,h56) * ( 
+      bmp78(jdu,1,1,h56,2,1)= + gamz3456(jdu,1,1)*gamll56(1,h56) * (
      &     - 4.D0*za(p2,p3)*za(p2,p8)*za(p1,p8)*za(p3,p5)*zb(p2,p7)*zb(
      &    p1,p4)*zb(p1,p7)*zb(p3,p6)*iza(p7,p8)*izb(p7,p8)*s18**(-1)*
      &    s27**(-1)*s356**(-1) + 4.D0*za(p2,p3)*za(p2,p8)*za(p1,p8)*za(
@@ -179,7 +180,7 @@ C---  bmp78(jdu,h12,h34,h56,h7,h8)
      &    s456**(-1) - 4.D0*za(p2,p8)**2*za(p5,p6)*zb(p2,p7)*zb(p1,p6)*
      &    zb(p4,p6)*zba2(p7,p2,p8,p3)*iza(p7,p8)*izb(p7,p8)*s27**(-1)*
      &    s278**(-1)*s456**(-1) )
-      bmp78(jdu,1,1,h56,1,2)= + gamz3456(jdu,1,1)*gamll56(1,h56) * ( 
+      bmp78(jdu,1,1,h56,1,2)= + gamz3456(jdu,1,1)*gamll56(1,h56) * (
      &     - 4.D0*za(p2,p3)*za(p1,p7)*za(p3,p5)*zb(p1,p8)**2*zb(p3,p6)*
      &    zba2(p4,p1,p8,p7)*iza(p7,p8)*izb(p7,p8)*s18**(-1)*s178**(-1)*
      &    s356**(-1) + 4.D0*za(p2,p3)*za(p1,p7)*za(p4,p5)*zb(p1,p8)**2*
@@ -209,7 +210,7 @@ C---  bmp78(jdu,h12,h34,h56,h7,h8)
      &    s18**(-1)*s27**(-1)*s456**(-1) - 4.D0*za(p2,p7)*za(p5,p6)*zb(
      &    p1,p8)*zb(p4,p6)*zba2(p6,p1,p8,p7)*zba2(p8,p2,p7,p3)*iza(p7,
      &    p8)*izb(p7,p8)*s18**(-1)*s27**(-1)*s456**(-1) )
-      bmp78(jdu,1,1,h56,2,2)= + gamz3456(jdu,1,1)*gamll56(1,h56) * ( 
+      bmp78(jdu,1,1,h56,2,2)= + gamz3456(jdu,1,1)*gamll56(1,h56) * (
      &     - 4.D0*za(p2,p3)*za(p3,p5)*zb(p1,p7)*zb(p3,p6)*zb(p7,p8)*
      &    iza(p2,p8)*zba3(p4,p1,p7,p8,p2)*s78**(-1)*s178**(-1)*
      &    s356**(-1) - 4.D0*za(p2,p3)*za(p3,p5)*zb(p1,p8)*zb(p3,p6)*zb(
@@ -238,7 +239,7 @@ C---  bmp78(jdu,h12,h34,h56,h7,h8)
      &    za(p3,p5)*zb(p1,p8)*zb(p5,p6)*zba2(p7,p1,p8,p2)*iza(p2,p7)*
      &    iza(p2,p8)*zba3(p4,p1,p7,p8,p2)*s18**(-1)*s178**(-1)*
      &    s356**(-1) )
-      bmp78(jdu,2,1,h56,1,1)= + gamz3456(jdu,2,1)*gamll56(1,h56) * ( 
+      bmp78(jdu,2,1,h56,1,1)= + gamz3456(jdu,2,1)*gamll56(1,h56) * (
      &     - 4.D0*za(p2,p7)*za(p1,p3)*za(p3,p5)*zb(p2,p1)**2*zb(p3,p6)*
      &    zab2(p8,p2,p7,p4)*izb(p1,p7)*izb(p1,p8)*s27**(-1)*s278**(-1)*
      &    s356**(-1) + 4.D0*za(p2,p7)*za(p1,p3)*za(p4,p5)*zb(p2,p1)**2*
@@ -302,7 +303,7 @@ C---  bmp78(jdu,h12,h34,h56,h7,h8)
      &    s178**(-1)*s456**(-1) - 4.D0*za(p1,p8)*za(p5,p6)*za(p7,p8)*
      &    zb(p2,p6)*zb(p4,p6)*zab2(p3,p7,p8,p1)*izb(p1,p7)*s18**(-1)*
      &    s178**(-1)*s456**(-1) )
-      bmp78(jdu,2,1,h56,2,1)= + gamz3456(jdu,2,1)*gamll56(1,h56) * ( 
+      bmp78(jdu,2,1,h56,2,1)= + gamz3456(jdu,2,1)*gamll56(1,h56) * (
      &     - 4.D0*za(p2,p8)*za(p1,p3)*za(p3,p5)*zb(p2,p7)**2*zb(p3,p6)*
      &    zab2(p8,p2,p7,p4)*iza(p7,p8)*izb(p7,p8)*s27**(-1)*s278**(-1)*
      &    s356**(-1) + 4.D0*za(p2,p8)*za(p1,p3)*za(p4,p5)*zb(p2,p7)**2*
@@ -332,7 +333,7 @@ C---  bmp78(jdu,h12,h34,h56,h7,h8)
      &    s18**(-1)*s27**(-1)*s456**(-1) - 4.D0*za(p1,p8)*za(p5,p6)*zb(
      &    p2,p7)*zb(p4,p6)*zab2(p3,p1,p8,p7)*zab2(p8,p2,p7,p6)*iza(p7,
      &    p8)*izb(p7,p8)*s18**(-1)*s27**(-1)*s456**(-1) )
-      bmp78(jdu,2,1,h56,1,2)= + gamz3456(jdu,2,1)*gamll56(1,h56) * ( 
+      bmp78(jdu,2,1,h56,1,2)= + gamz3456(jdu,2,1)*gamll56(1,h56) * (
      &     - 4.D0*za(p2,p7)*za(p1,p3)*za(p1,p7)*za(p3,p5)*zb(p2,p4)*zb(
      &    p2,p8)*zb(p1,p8)*zb(p3,p6)*iza(p7,p8)*izb(p7,p8)*s18**(-1)*
      &    s27**(-1)*s356**(-1) + 4.D0*za(p2,p7)*za(p1,p3)*za(p1,p7)*za(
@@ -363,7 +364,7 @@ C---  bmp78(jdu,h12,h34,h56,h7,h8)
      &    s456**(-1) - 4.D0*za(p1,p7)**2*za(p5,p6)*zb(p2,p6)*zb(p1,p8)*
      &    zb(p4,p6)*zab2(p3,p1,p7,p8)*iza(p7,p8)*izb(p7,p8)*s18**(-1)*
      &    s178**(-1)*s456**(-1) )
-      bmp78(jdu,2,1,h56,2,2)= + gamz3456(jdu,2,1)*gamll56(1,h56) * ( 
+      bmp78(jdu,2,1,h56,2,2)= + gamz3456(jdu,2,1)*gamll56(1,h56) * (
      &     - 4.D0*za(p2,p1)**2*za(p3,p5)*zb(p2,p4)*zb(p1,p8)*zb(p3,p6)*
      &    zab2(p3,p1,p8,p7)*iza(p2,p7)*iza(p2,p8)*s18**(-1)*s178**(-1)*
      &    s356**(-1) - 4.D0*za(p2,p1)**2*za(p3,p5)*zb(p2,p4)*zb(p1,p8)*
@@ -457,7 +458,7 @@ C---  bmp78(jdu,h12,h34,h56,h7,h8)
      &    p8,p5)*s78**(-1)*s278**(-1)*s456**(-1) - 4.D0*za(p2,p8)*za(p5
      &    ,p6)*za(p7,p8)*zb(p1,p6)*zb(p3,p6)*izb(p1,p7)*zba3(p1,p2,p7,
      &    p8,p4)*s78**(-1)*s278**(-1)*s356**(-1) )
-      bmp78(jdu,1,2,h56,2,1)= + gamz3456(jdu,1,2)*gamll56(2,h56) * ( 
+      bmp78(jdu,1,2,h56,2,1)= + gamz3456(jdu,1,2)*gamll56(2,h56) * (
      &     - 4.D0*za(p2,p4)*za(p2,p8)*za(p1,p8)*za(p3,p5)*zb(p2,p7)*zb(
      &    p1,p3)*zb(p1,p7)*zb(p3,p6)*iza(p7,p8)*izb(p7,p8)*s18**(-1)*
      &    s27**(-1)*s356**(-1) + 4.D0*za(p2,p4)*za(p2,p8)*za(p1,p8)*za(
@@ -488,7 +489,7 @@ C---  bmp78(jdu,h12,h34,h56,h7,h8)
      &    s456**(-1) + 4.D0*za(p2,p8)**2*za(p5,p6)*zb(p2,p7)*zb(p1,p6)*
      &    zb(p3,p6)*zba2(p7,p2,p8,p4)*iza(p7,p8)*izb(p7,p8)*s27**(-1)*
      &    s278**(-1)*s356**(-1) )
-      bmp78(jdu,1,2,h56,1,2)= + gamz3456(jdu,1,2)*gamll56(2,h56) * ( 
+      bmp78(jdu,1,2,h56,1,2)= + gamz3456(jdu,1,2)*gamll56(2,h56) * (
      &     - 4.D0*za(p2,p4)*za(p1,p7)*za(p3,p5)*zb(p1,p8)**2*zb(p3,p6)*
      &    zba2(p3,p1,p8,p7)*iza(p7,p8)*izb(p7,p8)*s18**(-1)*s178**(-1)*
      &    s356**(-1) + 4.D0*za(p2,p4)*za(p1,p7)*za(p4,p5)*zb(p1,p8)**2*
@@ -518,7 +519,7 @@ C---  bmp78(jdu,h12,h34,h56,h7,h8)
      &    s18**(-1)*s27**(-1)*s456**(-1) + 4.D0*za(p2,p7)*za(p5,p6)*zb(
      &    p1,p8)*zb(p3,p6)*zba2(p6,p1,p8,p7)*zba2(p8,p2,p7,p4)*iza(p7,
      &    p8)*izb(p7,p8)*s18**(-1)*s27**(-1)*s356**(-1) )
-      bmp78(jdu,1,2,h56,2,2)= + gamz3456(jdu,1,2)*gamll56(2,h56) * ( 
+      bmp78(jdu,1,2,h56,2,2)= + gamz3456(jdu,1,2)*gamll56(2,h56) * (
      &     - 4.D0*za(p2,p4)*za(p3,p5)*zb(p1,p7)*zb(p3,p6)*zb(p7,p8)*
      &    iza(p2,p8)*zba3(p3,p1,p7,p8,p2)*s78**(-1)*s178**(-1)*
      &    s356**(-1) - 4.D0*za(p2,p4)*za(p3,p5)*zb(p1,p8)*zb(p3,p6)*zb(
@@ -547,7 +548,7 @@ C---  bmp78(jdu,h12,h34,h56,h7,h8)
      &    za(p4,p5)*zb(p1,p8)*zb(p5,p6)*zba2(p7,p1,p8,p2)*iza(p2,p7)*
      &    iza(p2,p8)*zba3(p3,p1,p7,p8,p2)*s18**(-1)*s178**(-1)*
      &    s456**(-1) )
-      bmp78(jdu,2,2,h56,1,1)= + gamz3456(jdu,2,2)*gamll56(2,h56) * ( 
+      bmp78(jdu,2,2,h56,1,1)= + gamz3456(jdu,2,2)*gamll56(2,h56) * (
      &     - 4.D0*za(p2,p7)*za(p1,p4)*za(p3,p5)*zb(p2,p1)**2*zb(p3,p6)*
      &    zab2(p8,p2,p7,p3)*izb(p1,p7)*izb(p1,p8)*s27**(-1)*s278**(-1)*
      &    s356**(-1) + 4.D0*za(p2,p7)*za(p1,p4)*za(p4,p5)*zb(p2,p1)**2*
@@ -611,7 +612,7 @@ C---  bmp78(jdu,h12,h34,h56,h7,h8)
      &    s178**(-1)*s356**(-1) + 4.D0*za(p1,p8)*za(p5,p6)*za(p7,p8)*
      &    zb(p2,p6)*zb(p3,p6)*zab2(p4,p7,p8,p1)*izb(p1,p7)*s18**(-1)*
      &    s178**(-1)*s356**(-1) )
-      bmp78(jdu,2,2,h56,2,1)= + gamz3456(jdu,2,2)*gamll56(2,h56) * ( 
+      bmp78(jdu,2,2,h56,2,1)= + gamz3456(jdu,2,2)*gamll56(2,h56) * (
      &     - 4.D0*za(p2,p8)*za(p1,p4)*za(p3,p5)*zb(p2,p7)**2*zb(p3,p6)*
      &    zab2(p8,p2,p7,p3)*iza(p7,p8)*izb(p7,p8)*s27**(-1)*s278**(-1)*
      &    s356**(-1) + 4.D0*za(p2,p8)*za(p1,p4)*za(p4,p5)*zb(p2,p7)**2*
@@ -641,7 +642,7 @@ C---  bmp78(jdu,h12,h34,h56,h7,h8)
      &    s18**(-1)*s27**(-1)*s456**(-1) + 4.D0*za(p1,p8)*za(p5,p6)*zb(
      &    p2,p7)*zb(p3,p6)*zab2(p4,p1,p8,p7)*zab2(p8,p2,p7,p6)*iza(p7,
      &    p8)*izb(p7,p8)*s18**(-1)*s27**(-1)*s356**(-1) )
-      bmp78(jdu,2,2,h56,1,2)= + gamz3456(jdu,2,2)*gamll56(2,h56) * ( 
+      bmp78(jdu,2,2,h56,1,2)= + gamz3456(jdu,2,2)*gamll56(2,h56) * (
      &     - 4.D0*za(p2,p7)*za(p1,p4)*za(p1,p7)*za(p3,p5)*zb(p2,p3)*zb(
      &    p2,p8)*zb(p1,p8)*zb(p3,p6)*iza(p7,p8)*izb(p7,p8)*s18**(-1)*
      &    s27**(-1)*s356**(-1) + 4.D0*za(p2,p7)*za(p1,p4)*za(p1,p7)*za(
@@ -672,7 +673,7 @@ C---  bmp78(jdu,h12,h34,h56,h7,h8)
      &    s456**(-1) + 4.D0*za(p1,p7)**2*za(p5,p6)*zb(p2,p6)*zb(p1,p8)*
      &    zb(p3,p6)*zab2(p4,p1,p7,p8)*iza(p7,p8)*izb(p7,p8)*s18**(-1)*
      &    s178**(-1)*s356**(-1) )
-      bmp78(jdu,2,2,h56,2,2)= + gamz3456(jdu,2,2)*gamll56(2,h56) * ( 
+      bmp78(jdu,2,2,h56,2,2)= + gamz3456(jdu,2,2)*gamll56(2,h56) * (
      &     - 4.D0*za(p2,p1)**2*za(p3,p5)*zb(p2,p3)*zb(p1,p8)*zb(p3,p6)*
      &    zab2(p4,p1,p8,p7)*iza(p2,p7)*iza(p2,p8)*s18**(-1)*s178**(-1)*
      &    s356**(-1) + 4.D0*za(p2,p1)**2*za(p4,p5)*zb(p2,p3)*zb(p1,p8)*
@@ -766,7 +767,7 @@ C---  bmp78(jdu,h12,h34,h56,h7,h8)
      &    p3)*s78**(-1)*s278**(-1)*s456**(-1) + 4.D0*za(p2,p8)*za(p5,p6
      &    )*za(p7,p8)*zb(p1,p6)*zb(p4,p6)*izb(p1,p7)*zba3(p1,p2,p7,p8,
      &    p3)*s78**(-1)*s278**(-1)*s456**(-1) )
-      bmp87(jdu,1,1,h56,1,2)= + gamz3456(jdu,1,1)*gamll56(1,h56) * ( 
+      bmp87(jdu,1,1,h56,1,2)= + gamz3456(jdu,1,1)*gamll56(1,h56) * (
      &     - 4.D0*za(p2,p3)*za(p2,p8)*za(p1,p8)*za(p3,p5)*zb(p2,p7)*zb(
      &    p1,p4)*zb(p1,p7)*zb(p3,p6)*iza(p7,p8)*izb(p7,p8)*s18**(-1)*
      &    s27**(-1)*s356**(-1) + 4.D0*za(p2,p3)*za(p2,p8)*za(p1,p8)*za(
@@ -797,7 +798,7 @@ C---  bmp78(jdu,h12,h34,h56,h7,h8)
      &    s456**(-1) - 4.D0*za(p2,p8)**2*za(p5,p6)*zb(p2,p7)*zb(p1,p6)*
      &    zb(p4,p6)*zba2(p7,p2,p8,p3)*iza(p7,p8)*izb(p7,p8)*s27**(-1)*
      &    s278**(-1)*s456**(-1) )
-      bmp87(jdu,1,1,h56,2,1)= + gamz3456(jdu,1,1)*gamll56(1,h56) * ( 
+      bmp87(jdu,1,1,h56,2,1)= + gamz3456(jdu,1,1)*gamll56(1,h56) * (
      &     - 4.D0*za(p2,p3)*za(p1,p7)*za(p3,p5)*zb(p1,p8)**2*zb(p3,p6)*
      &    zba2(p4,p1,p8,p7)*iza(p7,p8)*izb(p7,p8)*s18**(-1)*s178**(-1)*
      &    s356**(-1) + 4.D0*za(p2,p3)*za(p1,p7)*za(p4,p5)*zb(p1,p8)**2*
@@ -827,7 +828,7 @@ C---  bmp78(jdu,h12,h34,h56,h7,h8)
      &    s18**(-1)*s27**(-1)*s456**(-1) - 4.D0*za(p2,p7)*za(p5,p6)*zb(
      &    p1,p8)*zb(p4,p6)*zba2(p6,p1,p8,p7)*zba2(p8,p2,p7,p3)*iza(p7,
      &    p8)*izb(p7,p8)*s18**(-1)*s27**(-1)*s456**(-1) )
-      bmp87(jdu,1,1,h56,2,2)= + gamz3456(jdu,1,1)*gamll56(1,h56) * ( 
+      bmp87(jdu,1,1,h56,2,2)= + gamz3456(jdu,1,1)*gamll56(1,h56) * (
      &     - 4.D0*za(p2,p3)*za(p3,p5)*zb(p1,p7)*zb(p3,p6)*zb(p7,p8)*
      &    iza(p2,p8)*zba3(p4,p1,p7,p8,p2)*s78**(-1)*s178**(-1)*
      &    s356**(-1) - 4.D0*za(p2,p3)*za(p3,p5)*zb(p1,p8)*zb(p3,p6)*zb(
@@ -856,7 +857,7 @@ C---  bmp78(jdu,h12,h34,h56,h7,h8)
      &    za(p3,p5)*zb(p1,p8)*zb(p5,p6)*zba2(p7,p1,p8,p2)*iza(p2,p7)*
      &    iza(p2,p8)*zba3(p4,p1,p7,p8,p2)*s18**(-1)*s178**(-1)*
      &    s356**(-1) )
-      bmp87(jdu,2,1,h56,1,1)= + gamz3456(jdu,2,1)*gamll56(1,h56) * ( 
+      bmp87(jdu,2,1,h56,1,1)= + gamz3456(jdu,2,1)*gamll56(1,h56) * (
      &     - 4.D0*za(p2,p7)*za(p1,p3)*za(p3,p5)*zb(p2,p1)**2*zb(p3,p6)*
      &    zab2(p8,p2,p7,p4)*izb(p1,p7)*izb(p1,p8)*s27**(-1)*s278**(-1)*
      &    s356**(-1) + 4.D0*za(p2,p7)*za(p1,p3)*za(p4,p5)*zb(p2,p1)**2*
@@ -920,7 +921,7 @@ C---  bmp78(jdu,h12,h34,h56,h7,h8)
      &    s178**(-1)*s456**(-1) - 4.D0*za(p1,p8)*za(p5,p6)*za(p7,p8)*
      &    zb(p2,p6)*zb(p4,p6)*zab2(p3,p7,p8,p1)*izb(p1,p7)*s18**(-1)*
      &    s178**(-1)*s456**(-1) )
-      bmp87(jdu,2,1,h56,1,2)= + gamz3456(jdu,2,1)*gamll56(1,h56) * ( 
+      bmp87(jdu,2,1,h56,1,2)= + gamz3456(jdu,2,1)*gamll56(1,h56) * (
      &     - 4.D0*za(p2,p8)*za(p1,p3)*za(p3,p5)*zb(p2,p7)**2*zb(p3,p6)*
      &    zab2(p8,p2,p7,p4)*iza(p7,p8)*izb(p7,p8)*s27**(-1)*s278**(-1)*
      &    s356**(-1) + 4.D0*za(p2,p8)*za(p1,p3)*za(p4,p5)*zb(p2,p7)**2*
@@ -950,7 +951,7 @@ C---  bmp78(jdu,h12,h34,h56,h7,h8)
      &    s18**(-1)*s27**(-1)*s456**(-1) - 4.D0*za(p1,p8)*za(p5,p6)*zb(
      &    p2,p7)*zb(p4,p6)*zab2(p3,p1,p8,p7)*zab2(p8,p2,p7,p6)*iza(p7,
      &    p8)*izb(p7,p8)*s18**(-1)*s27**(-1)*s456**(-1) )
-      bmp87(jdu,2,1,h56,2,1)= + gamz3456(jdu,2,1)*gamll56(1,h56) * ( 
+      bmp87(jdu,2,1,h56,2,1)= + gamz3456(jdu,2,1)*gamll56(1,h56) * (
      &     - 4.D0*za(p2,p7)*za(p1,p3)*za(p1,p7)*za(p3,p5)*zb(p2,p4)*zb(
      &    p2,p8)*zb(p1,p8)*zb(p3,p6)*iza(p7,p8)*izb(p7,p8)*s18**(-1)*
      &    s27**(-1)*s356**(-1) + 4.D0*za(p2,p7)*za(p1,p3)*za(p1,p7)*za(
@@ -981,7 +982,7 @@ C---  bmp78(jdu,h12,h34,h56,h7,h8)
      &    s456**(-1) - 4.D0*za(p1,p7)**2*za(p5,p6)*zb(p2,p6)*zb(p1,p8)*
      &    zb(p4,p6)*zab2(p3,p1,p7,p8)*iza(p7,p8)*izb(p7,p8)*s18**(-1)*
      &    s178**(-1)*s456**(-1) )
-      bmp87(jdu,2,1,h56,2,2)= + gamz3456(jdu,2,1)*gamll56(1,h56) * ( 
+      bmp87(jdu,2,1,h56,2,2)= + gamz3456(jdu,2,1)*gamll56(1,h56) * (
      &     - 4.D0*za(p2,p1)**2*za(p3,p5)*zb(p2,p4)*zb(p1,p8)*zb(p3,p6)*
      &    zab2(p3,p1,p8,p7)*iza(p2,p7)*iza(p2,p8)*s18**(-1)*s178**(-1)*
      &    s356**(-1) - 4.D0*za(p2,p1)**2*za(p3,p5)*zb(p2,p4)*zb(p1,p8)*
@@ -1075,7 +1076,7 @@ C---  bmp78(jdu,h12,h34,h56,h7,h8)
      &    p8,p5)*s78**(-1)*s278**(-1)*s456**(-1) - 4.D0*za(p2,p8)*za(p5
      &    ,p6)*za(p7,p8)*zb(p1,p6)*zb(p3,p6)*izb(p1,p7)*zba3(p1,p2,p7,
      &    p8,p4)*s78**(-1)*s278**(-1)*s356**(-1) )
-      bmp87(jdu,1,2,h56,1,2)= + gamz3456(jdu,1,2)*gamll56(2,h56) * ( 
+      bmp87(jdu,1,2,h56,1,2)= + gamz3456(jdu,1,2)*gamll56(2,h56) * (
      &     - 4.D0*za(p2,p4)*za(p2,p8)*za(p1,p8)*za(p3,p5)*zb(p2,p7)*zb(
      &    p1,p3)*zb(p1,p7)*zb(p3,p6)*iza(p7,p8)*izb(p7,p8)*s18**(-1)*
      &    s27**(-1)*s356**(-1) + 4.D0*za(p2,p4)*za(p2,p8)*za(p1,p8)*za(
@@ -1106,7 +1107,7 @@ C---  bmp78(jdu,h12,h34,h56,h7,h8)
      &    s456**(-1) + 4.D0*za(p2,p8)**2*za(p5,p6)*zb(p2,p7)*zb(p1,p6)*
      &    zb(p3,p6)*zba2(p7,p2,p8,p4)*iza(p7,p8)*izb(p7,p8)*s27**(-1)*
      &    s278**(-1)*s356**(-1) )
-      bmp87(jdu,1,2,h56,2,1)= + gamz3456(jdu,1,2)*gamll56(2,h56) * ( 
+      bmp87(jdu,1,2,h56,2,1)= + gamz3456(jdu,1,2)*gamll56(2,h56) * (
      &     - 4.D0*za(p2,p4)*za(p1,p7)*za(p3,p5)*zb(p1,p8)**2*zb(p3,p6)*
      &    zba2(p3,p1,p8,p7)*iza(p7,p8)*izb(p7,p8)*s18**(-1)*s178**(-1)*
      &    s356**(-1) + 4.D0*za(p2,p4)*za(p1,p7)*za(p4,p5)*zb(p1,p8)**2*
@@ -1136,7 +1137,7 @@ C---  bmp78(jdu,h12,h34,h56,h7,h8)
      &    s18**(-1)*s27**(-1)*s456**(-1) + 4.D0*za(p2,p7)*za(p5,p6)*zb(
      &    p1,p8)*zb(p3,p6)*zba2(p6,p1,p8,p7)*zba2(p8,p2,p7,p4)*iza(p7,
      &    p8)*izb(p7,p8)*s18**(-1)*s27**(-1)*s356**(-1) )
-      bmp87(jdu,1,2,h56,2,2)= + gamz3456(jdu,1,2)*gamll56(2,h56) * ( 
+      bmp87(jdu,1,2,h56,2,2)= + gamz3456(jdu,1,2)*gamll56(2,h56) * (
      &     - 4.D0*za(p2,p4)*za(p3,p5)*zb(p1,p7)*zb(p3,p6)*zb(p7,p8)*
      &    iza(p2,p8)*zba3(p3,p1,p7,p8,p2)*s78**(-1)*s178**(-1)*
      &    s356**(-1) - 4.D0*za(p2,p4)*za(p3,p5)*zb(p1,p8)*zb(p3,p6)*zb(
@@ -1165,7 +1166,7 @@ C---  bmp78(jdu,h12,h34,h56,h7,h8)
      &    za(p4,p5)*zb(p1,p8)*zb(p5,p6)*zba2(p7,p1,p8,p2)*iza(p2,p7)*
      &    iza(p2,p8)*zba3(p3,p1,p7,p8,p2)*s18**(-1)*s178**(-1)*
      &    s456**(-1) )
-      bmp87(jdu,2,2,h56,1,1)= + gamz3456(jdu,2,2)*gamll56(2,h56) * ( 
+      bmp87(jdu,2,2,h56,1,1)= + gamz3456(jdu,2,2)*gamll56(2,h56) * (
      &     - 4.D0*za(p2,p7)*za(p1,p4)*za(p3,p5)*zb(p2,p1)**2*zb(p3,p6)*
      &    zab2(p8,p2,p7,p3)*izb(p1,p7)*izb(p1,p8)*s27**(-1)*s278**(-1)*
      &    s356**(-1) + 4.D0*za(p2,p7)*za(p1,p4)*za(p4,p5)*zb(p2,p1)**2*
@@ -1229,7 +1230,7 @@ C---  bmp78(jdu,h12,h34,h56,h7,h8)
      &    s178**(-1)*s356**(-1) + 4.D0*za(p1,p8)*za(p5,p6)*za(p7,p8)*
      &    zb(p2,p6)*zb(p3,p6)*zab2(p4,p7,p8,p1)*izb(p1,p7)*s18**(-1)*
      &    s178**(-1)*s356**(-1) )
-      bmp87(jdu,2,2,h56,1,2)= + gamz3456(jdu,2,2)*gamll56(2,h56) * ( 
+      bmp87(jdu,2,2,h56,1,2)= + gamz3456(jdu,2,2)*gamll56(2,h56) * (
      &     - 4.D0*za(p2,p8)*za(p1,p4)*za(p3,p5)*zb(p2,p7)**2*zb(p3,p6)*
      &    zab2(p8,p2,p7,p3)*iza(p7,p8)*izb(p7,p8)*s27**(-1)*s278**(-1)*
      &    s356**(-1) + 4.D0*za(p2,p8)*za(p1,p4)*za(p4,p5)*zb(p2,p7)**2*
@@ -1259,7 +1260,7 @@ C---  bmp78(jdu,h12,h34,h56,h7,h8)
      &    s18**(-1)*s27**(-1)*s456**(-1) + 4.D0*za(p1,p8)*za(p5,p6)*zb(
      &    p2,p7)*zb(p3,p6)*zab2(p4,p1,p8,p7)*zab2(p8,p2,p7,p6)*iza(p7,
      &    p8)*izb(p7,p8)*s18**(-1)*s27**(-1)*s356**(-1) )
-      bmp87(jdu,2,2,h56,2,1)= + gamz3456(jdu,2,2)*gamll56(2,h56) * ( 
+      bmp87(jdu,2,2,h56,2,1)= + gamz3456(jdu,2,2)*gamll56(2,h56) * (
      &     - 4.D0*za(p2,p7)*za(p1,p4)*za(p1,p7)*za(p3,p5)*zb(p2,p3)*zb(
      &    p2,p8)*zb(p1,p8)*zb(p3,p6)*iza(p7,p8)*izb(p7,p8)*s18**(-1)*
      &    s27**(-1)*s356**(-1) + 4.D0*za(p2,p7)*za(p1,p4)*za(p1,p7)*za(
@@ -1290,7 +1291,7 @@ C---  bmp78(jdu,h12,h34,h56,h7,h8)
      &    s456**(-1) + 4.D0*za(p1,p7)**2*za(p5,p6)*zb(p2,p6)*zb(p1,p8)*
      &    zb(p3,p6)*zab2(p4,p1,p7,p8)*iza(p7,p8)*izb(p7,p8)*s18**(-1)*
      &    s178**(-1)*s356**(-1) )
-      bmp87(jdu,2,2,h56,2,2)= + gamz3456(jdu,2,2)*gamll56(2,h56) * ( 
+      bmp87(jdu,2,2,h56,2,2)= + gamz3456(jdu,2,2)*gamll56(2,h56) * (
      &     - 4.D0*za(p2,p1)**2*za(p3,p5)*zb(p2,p3)*zb(p1,p8)*zb(p3,p6)*
      &    zab2(p4,p1,p8,p7)*iza(p2,p7)*iza(p2,p8)*s18**(-1)*s178**(-1)*
      &    s356**(-1) + 4.D0*za(p2,p1)**2*za(p4,p5)*zb(p2,p3)*zb(p1,p8)*

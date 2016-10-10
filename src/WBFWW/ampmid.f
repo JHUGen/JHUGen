@@ -4,6 +4,7 @@
       include 'zprods_decl.f'
       include 'sprods_com.f'
       include 'cmplxmass.f'
+      include 'masses.f'
       include 'ewcharge.f'
       include 'zcouple.f'
       integer jdu1,jdu2,h28,h17,i1,i2,i3,i4,i5,i6,i7,i8,
@@ -31,10 +32,10 @@ C-----end statement functions
       s258=t3(i2,i5,i8)
       s268=t3(i2,i6,i8)
 
-      propw34=s(i3,i4)-cwmass2
-      propw56=s(i5,i6)-cwmass2
-      propz17=s(i1,i7)-czmass2
-      propz28=s(i2,i8)-czmass2
+      propw34=s(i3,i4)-dcmplx(wmass**2,-wmass*wwidth)
+      propw56=s(i5,i6)-dcmplx(wmass**2,-wmass*wwidth)
+      propz17=s(i1,i7)-dcmplx(zmass**2,-zmass*zwidth)
+      propz28=s(i2,i8)-dcmplx(zmass**2,-zmass*zwidth)
 
       do jdu1=1,2
       gam17e(jdu1,1)=Q(jdu1)*qe/s(i1,i7)+L(jdu1)*le/propz17
@@ -70,7 +71,7 @@ C-----end statement functions
       endif
       do jdu1=1,2
       do jdu2=1,2
-      amp(jdu1,jdu2,h17,h28)= + gam17e(jdu1,h17)*gam28e(jdu2,h28) * ( 
+      amp(jdu1,jdu2,h17,h28)= + gam17e(jdu1,h17)*gam28e(jdu2,h28) * (
      &     - 4.D0*za(p3,p5)*zb(p6,p1)*zba2(p4,p3,p5,p8)*zba2(p2,p1,p6,
      &    p7)*propw34**(-1)*s345**(-1)*s167**(-1) - 4.D0*za(p3,p5)*zb(
      &    p6,p2)*zba2(p4,p3,p5,p7)*zba2(p1,p2,p6,p8)*propw34**(-1)*

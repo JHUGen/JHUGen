@@ -53,10 +53,10 @@ c--- q(-p1)+q(-p2)->W(p3,p4)+W(p5,p6)+q(p7)+q(p8);
 
 c--- This calculation uses the complex-mass scheme (c.f. arXiv:hep-ph/0605312)
 c--- and the following lines set up the appropriate masses and sin^2(theta_w)
-      cwmass2=dcmplx(wmass**2,-wmass*wwidth)
-      czmass2=dcmplx(zmass**2,-zmass*zwidth)
-      cxw=cone-cwmass2/czmass2
-      
+      cwmass2=dcmplx(wmass**2,0d0)
+      czmass2=dcmplx(zmass**2,0d0)
+      cxw=cone-dcmplx(wmass**2,-wmass*wwidth)/czmass2
+
       doHO=.false.
       doBO=.false.
       if     (runstring(4:5) .eq. 'HO') then
@@ -122,7 +122,7 @@ c--- W mid diagrams: contribution from jmidWW
       call ampmidWW(j1(j),j2(j),i3,i4,i5,i6,j7(j),j8(j),za,zb,jmidWW17)
       call ampmidWW(j1(j),j2(j),i3,i4,i5,i6,j8(j),j7(j),za,zb,jmidWW18)
       call ampmidWW(j2(j),j1(j),i3,i4,i5,i6,j8(j),j7(j),za,zb,jmidWW28)
-      
+
 c--- these are not used in calculation of Higgs contribution
       if (doHO .eqv. .false.) then
 
@@ -165,7 +165,7 @@ c--- W exchange diagrams for flavor-changing contributions: contribution from jt
       call jonew(j7(j),i5,i6,j1(j),za,zb,zab,j7_56_1z,j7_56_1g)
 
       else
-      
+
       jmid17=czip
       jmid18=czip
       jtwo17=czip
@@ -196,9 +196,9 @@ c--- W exchange diagrams for flavor-changing contributions: contribution from jt
       j7_56_1g=czip
 
       endif
-      
 
-C-----setup for (dqcq_dqcq) 
+
+C-----setup for (dqcq_dqcq)
       do h1=1,2
       do h2=1,2
 
@@ -216,20 +216,21 @@ C-----setup for (dqcq_dqcq)
       enddo
       enddo
 
-C-----setup for (dqcq_uqsq) 
+C-----setup for (dqcq_uqsq)
       amp(dqcq_uqsq,1,1)=
      & +jtwoWexch17(1,2)+jtwoWexch28(2,1)
      & +jmidWW17
      & +cdotpr(j7_34_1g(1,:),j8_56_2g(2,:))/s7341
      & +(cdotpr(j7_34_1z(1,:),j8_56_2z(2,:))
      &  -cdotpr(j7_34_1z(1,:),k7341(:))
-     &  *cdotpr(k7341(:),j8_56_2z(2,:))/czmass2)/(s7341-czmass2)
+     &  *cdotpr(k7341(:),j8_56_2z(2,:))/czmass2)
+     & /(s7341-dcmplx(zmass**2,-zmass*zwidth))
 
       tempw(1,4)=tempw(1,4)+esq**6*spinavge
      &   *dble(amp(dqcq_uqsq,1,1)
      & *dconjg(amp(dqcq_uqsq,1,1)))
 
-C-----setup for (uqcq_uqcq) 
+C-----setup for (uqcq_uqcq)
       do h1=1,2
       do h2=1,2
 
@@ -249,7 +250,7 @@ c--- contribution from jcentre
       enddo
 
 
-C-----setup for (dqsq_dqsq) 
+C-----setup for (dqsq_dqsq)
       do h1=1,2
       do h2=1,2
 
@@ -269,8 +270,8 @@ c--- contribution from jcentre
       enddo
       temp(1,5)=temp(1,3)
       temp(3,5)=temp(1,3)
-      
-C-----setup for (dqdq_dqdq) 
+
+C-----setup for (dqdq_dqdq)
       do h1=1,2
       do h2=1,2
 
@@ -302,8 +303,8 @@ c-------- ampb
       enddo
       temp(3,3)=temp(1,1)
       temp(5,5)=temp(1,1)
-      
-C-----setup for (uquq_uquq) 
+
+C-----setup for (uquq_uquq)
       do h1=1,2
       do h2=1,2
 
@@ -335,7 +336,7 @@ c-------- ampb
       enddo
       temp(4,4)=temp(2,2)
 
-C-----setup for (dquq_dquq) 
+C-----setup for (dquq_dquq)
 c-------- ampb
       ampb(dquq_dquq,1,1)=
      & +jtwoWexch18(1,2)+jtwoWexch27(2,1)
@@ -343,7 +344,8 @@ c-------- ampb
      & +cdotpr(j8_34_1g(1,:),j7_56_2g(2,:))/s8341
      & +(cdotpr(j8_34_1z(1,:),j7_56_2z(2,:))
      &  -cdotpr(j8_34_1z(1,:),k8341(:))
-     &  *cdotpr(k8341(:),j7_56_2z(2,:))/czmass2)/(s8341-czmass2)
+     &  *cdotpr(k8341(:),j7_56_2z(2,:))/czmass2)
+     & /(s8341-dcmplx(zmass**2,-zmass*zwidth))
 
       do h1=1,2
       do h2=1,2
@@ -361,12 +363,12 @@ c-------- ampa
      &   *dble(ampa(dquq_dquq,h1,h2)
      & *dconjg(ampb(dquq_dquq,h1,h2)))
       endif
-      
+
       enddo
       enddo
       temp(3,4)=temp(1,2)
 
-C-----setup for (uqbq_uqbq) 
+C-----setup for (uqbq_uqbq)
       do h1=1,2
       do h2=1,2
 
@@ -386,14 +388,15 @@ C-----setup for (uqbq_uqbq)
       temp(4,5)=temp(2,5)
       temp(2,3)=temp(2,5)
 
-C-----setup for (uqsq_dqcq) 
+C-----setup for (uqsq_dqcq)
       amp(uqsq_dqcq,1,1)=
      & +jtwoWexch17(2,1)+jtwoWexch28(1,2)
      & +jmidWW28
      & +cdotpr(j8_34_2g(1,:),j7_56_1g(2,:))/s8342
      & +(cdotpr(j8_34_2z(1,:),j7_56_1z(2,:))
      &  -cdotpr(j8_34_2z(1,:),k8342(:))
-     &  *cdotpr(k8342(:),j7_56_1z(2,:))/czmass2)/(s8342-czmass2)
+     &  *cdotpr(k8342(:),j7_56_1z(2,:))/czmass2)
+     & /(s8342-dcmplx(zmass**2,-zmass*zwidth))
 
       tempw(2,3)=tempw(2,3)+esq**6*spinavge
      &   *dble(amp(uqsq_dqcq,1,1)
@@ -451,7 +454,7 @@ c--- qbar-q
       enddo
       msq(-1,3)=msq(-1,3)+tempw(2,3)
       msq(-2,4)=msq(-2,4)+tempw(1,4)
-      
+
 c--- qbar-q
       elseif (j.eq.6) then
       do k=-nfinc,-1
@@ -488,7 +491,7 @@ c--- q-qbar
       enddo
       msq(1,-3)=msq(1,-3)+tempw(1,4)
       msq(2,-4)=msq(2,-4)+tempw(2,3)
-      
+
 c--- q-qbar extra pieces
       elseif (j.eq.9) then
       do k=1,nfinc
@@ -512,7 +515,7 @@ c--- q-qbar extra pieces
       endif
       enddo
       enddo
- 
+
 c--- qbar-q extra pieces
       elseif (j.eq.11) then
       do k=1,nfinc
@@ -536,9 +539,9 @@ c--- qbar-q extra pieces
       endif
       enddo
       enddo
-  
+
       endif
-      
+
       enddo
 
       return
@@ -548,4 +551,4 @@ c--- qbar-q extra pieces
    79 format(' *  sin^2(theta_w)   (',f11.5,',',f11.5,')      *')
 
       end
-      
+

@@ -2,6 +2,7 @@
       implicit none
       include 'constants.f'
       include 'cmplxmass.f'
+      include 'masses.f'
       include 'zprods_decl.f'
       include 'sprods_com.f'
       integer i1,i2,i3,i4,i5,i6,i7,i8,
@@ -45,10 +46,10 @@ c--- need to check corresponding result for (2,1,1,1)
       s347=t3(p3,p4,p7)
       s348=t3(p3,p4,p8)
       s567=t3(p5,p6,p7)
-      propW34=s34-cwmass2
-      propW56=s56-cwmass2
-      propW1347=s1347-cwmass2
-      propW1567=s1567-cwmass2
+      propW34=s34-dcmplx(wmass**2,-wmass*wwidth)
+      propW56=s56-dcmplx(wmass**2,-wmass*wwidth)
+      propW1347=s1347-dcmplx(wmass**2,-wmass*wwidth)
+      propW1567=s1567-dcmplx(wmass**2,-wmass*wwidth)
       tmp= + s134**(-1)*s256**(-1)*propW34**(-1)*propW56**(-1)*
      & propW1347**(-1) * (  - za(p7,p8)*za(p1,p3)*za(p2,p5)*zb(p1,p2)*
      &    zb(p1,p4)*zb(p2,p6) + za(p7,p8)*za(p1,p3)*za(p5,p6)*zb(p1,p6)

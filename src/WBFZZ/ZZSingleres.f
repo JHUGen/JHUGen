@@ -2,11 +2,12 @@
       implicit none
       include 'constants.f'
       include 'cmplxmass.f'
+      include 'masses.f'
       include 'ewcharge.f'
       include 'zcouple.f'
       include 'sprods_com.f'
       include 'zprods_decl.f'
-      
+
       double precision s17,s28,s56,t3,
      & s356,s456,s137,s147,s238,s248,xl1,xr1,xq1,xl2,xr2,xq2
       double complex zab2,ZZ17(2,2,2),ZZ28(2,2,2),
@@ -53,12 +54,12 @@ C---setting up couplings dependent on whether we are doing 34-line or 56-line
       s238=t3(n2,n3,n8)
       s248=t3(n2,n4,n8)
 
-      prop17=dcmplx(s17)-czmass2
-      prop28=dcmplx(s28)-czmass2
-      prop56=dcmplx(s56)-czmass2
+      prop17=dcmplx(s17)-dcmplx(zmass**2,-zmass*zwidth)
+      prop28=dcmplx(s28)-dcmplx(zmass**2,-zmass*zwidth)
+      prop56=dcmplx(s56)-dcmplx(zmass**2,-zmass*zwidth)
 
-      propw17=dcmplx(s17)-cwmass2
-      propw28=dcmplx(s28)-cwmass2
+      propw17=dcmplx(s17)-dcmplx(wmass**2,-wmass*wwidth)
+      propw28=dcmplx(s28)-dcmplx(wmass**2,-wmass*wwidth)
 
       do jdu1=1,2
       ZZ17(jdu1,1,1)=dcmplx(Q(jdu1)*xq1/s17)+dcmplx(L(jdu1)*xl1)/prop17
@@ -88,7 +89,7 @@ C---setting up couplings dependent on whether we are doing 34-line or 56-line
       i3=n3
       i4=n4
       do h17=1,2
-         if (h17.eq.1) then 
+         if (h17.eq.1) then
             i7=n7
             i1=n1
          elseif (h17.eq.2) then
@@ -96,7 +97,7 @@ C---setting up couplings dependent on whether we are doing 34-line or 56-line
             i1=n7
          endif
       do h28=1,2
-         if (h28.eq.1) then 
+         if (h28.eq.1) then
             i8=n8
             i2=n2
          elseif (h28.eq.2) then
@@ -104,14 +105,14 @@ C---setting up couplings dependent on whether we are doing 34-line or 56-line
             i2=n8
          endif
       do h56=1,2
-         if (h56.eq.1) then 
+         if (h56.eq.1) then
             i5=n5
             i6=n6
          elseif (h56.eq.2) then
             i5=n6
             i6=n5
          endif
-      
+
 
 C---  Id,srmbl=-8*e^6/s356/s248
 C---   *zab2(i8,i2,i4,i1)*za(i3,i5)*zab2(i7,i3,i5,i6)*zb(i2,i4);
@@ -191,7 +192,7 @@ C---   *zab2(i8,i2,i3,i1)*za(i4,i5)*zab2(i7,i4,i5,i6)*zb(i2,i3);
      &  +srpa(h17,h28,h34,h56))
       enddo
       enddo
-      
+
       if (xq1 < 0) then
       if ((h17.eq.1).and.(h28.eq.1).and.(h34.eq.1)) then
       WWm(h56)=0.25d0/(cxw**2*propw17*propw28)

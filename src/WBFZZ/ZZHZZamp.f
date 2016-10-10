@@ -61,10 +61,10 @@ C---setup propagators
       s1734=t4(n1,n7,n3,n4)
       s1756=t4(n1,n7,n5,n6)
 
-      prop17=dcmplx(s(n1,n7))-czmass2
-      prop28=dcmplx(s(n2,n8))-czmass2
-      prop34=dcmplx(s(n3,n4))-czmass2
-      prop56=dcmplx(s(n5,n6))-czmass2
+      prop17=dcmplx(s(n1,n7))-dcmplx(zmass**2,-zmass*zwidth)
+      prop28=dcmplx(s(n2,n8))-dcmplx(zmass**2,-zmass*zwidth)
+      prop34=dcmplx(s(n3,n4))-dcmplx(zmass**2,-zmass*zwidth)
+      prop56=dcmplx(s(n5,n6))-dcmplx(zmass**2,-zmass*zwidth)
       prop3456=dcmplx(s3456-hmass**2,htheta(s3456)*hmass*hwidth)
       prop1734=dcmplx(s1734-hmass**2,htheta(s1734)*hmass*hwidth)
       prop1756=dcmplx(s1756-hmass**2,htheta(s1756)*hmass*hwidth)

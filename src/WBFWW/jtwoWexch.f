@@ -2,6 +2,7 @@
       implicit none
       include 'constants.f'
       include 'cmplxmass.f'
+      include 'masses.f'
       include 'zprods_decl.f'
       include 'sprods_com.f'
       include 'ewcharge.f'
@@ -39,10 +40,10 @@ C-----end statement functions
       s567=t3(i5,i6,i7)
       s3456=t4(i3,i4,i5,i6)
 
-      propw34=s34-cwmass2
-      propw56=s56-cwmass2
-      propw28=s28-cwmass2
-      propz3456=s3456-czmass2
+      propw34=s34-dcmplx(wmass**2,-wmass*wwidth)
+      propw56=s56-dcmplx(wmass**2,-wmass*wwidth)
+      propw28=s28-dcmplx(wmass**2,-wmass*wwidth)
+      propz3456=s3456-dcmplx(zmass**2,-zmass*zwidth)
 
       do jdu1=1,2
       game3456(jdu1,1,1)=Q(jdu1)*qe/s3456+L(jdu1)*le/propZ3456
@@ -77,7 +78,7 @@ C-----end statement functions
      & cxw**(-1)*s278**(-1) * (  - za(p7,p8)*za(p1,p3)*zb(p1,p6)*zb(p1,
      &    p4)*zba2(p2,p7,p8,p5)*s134**(-1) - za(p7,p8)*za(p3,p4)*zb(p1,
      &    p4)*zb(p6,p4)*zba2(p2,p7,p8,p5)*s134**(-1) )
-      amp(1,2) = amp(1,2) + propw56**(-1)*propw28**(-1)*s128**(-1) * ( 
+      amp(1,2) = amp(1,2) + propw56**(-1)*propw28**(-1)*s128**(-1) * (
      &    2.D0*za(p7,p5)*za(p5,p3)*zb(p1,p2)*zb(p5,p6)*zba2(p4,p1,p2,p8
      &    )*gamn3456(2,1,1)*s356**(-1) + 2.D0*za(p7,p3)*za(p5,p6)*zb(p1
      &    ,p2)*zb(p6,p4)*zba2(p6,p1,p2,p8)*game3456(2,1,1)*s456**(-1)
@@ -85,7 +86,7 @@ C-----end statement functions
      &    ,p8)*gamn3456(2,1,1)*s356**(-1) + 2.D0*za(p7,p3)*za(p5,p4)*
      &    zb(p1,p2)*zb(p6,p4)*zba2(p4,p1,p2,p8)*game3456(2,1,1)*
      &    s456**(-1) )
-      amp(1,2) = amp(1,2) + propw56**(-1)*propw28**(-1)*s278**(-1) * ( 
+      amp(1,2) = amp(1,2) + propw56**(-1)*propw28**(-1)*s278**(-1) * (
      &     - 2.D0*za(p7,p8)*za(p5,p6)*zb(p1,p6)*zb(p6,p4)*zba2(p2,p7,p8
      &    ,p3)*game3456(1,1,1)*s456**(-1) - 2.D0*za(p7,p8)*za(p5,p3)*
      &    zb(p1,p4)*zb(p5,p6)*zba2(p2,p7,p8,p5)*gamn3456(1,1,1)*
@@ -93,7 +94,7 @@ C-----end statement functions
      &    zba2(p2,p7,p8,p3)*gamn3456(1,1,1)*s356**(-1) - 2.D0*za(p7,p8)
      &    *za(p5,p4)*zb(p1,p4)*zb(p6,p4)*zba2(p2,p7,p8,p3)*game3456(1,1
      &    ,1)*s456**(-1) )
-      amp(1,2) = amp(1,2) + propw34**(-1)*propw28**(-1)*s128**(-1) * ( 
+      amp(1,2) = amp(1,2) + propw34**(-1)*propw28**(-1)*s128**(-1) * (
      &     - 2.D0*za(p7,p5)*za(p5,p3)*zb(p1,p2)*zb(p5,p4)*zba2(p6,p1,p2
      &    ,p8)*game3456(2,1,1)*s345**(-1) + 2.D0*za(p7,p5)*za(p6,p3)*
      &    zb(p1,p2)*zb(p6,p4)*zba2(p6,p1,p2,p8)*gamn3456(2,1,1)*
@@ -101,7 +102,7 @@ C-----end statement functions
      &    zba2(p4,p1,p2,p8)*gamn3456(2,1,1)*s346**(-1) - 2.D0*za(p7,p3)
      &    *za(p5,p3)*zb(p1,p2)*zb(p3,p4)*zba2(p6,p1,p2,p8)*game3456(2,1
      &    ,1)*s345**(-1) )
-      amp(1,2) = amp(1,2) + propw34**(-1)*propw28**(-1)*s278**(-1) * ( 
+      amp(1,2) = amp(1,2) + propw34**(-1)*propw28**(-1)*s278**(-1) * (
      &    2.D0*za(p7,p8)*za(p5,p3)*zb(p1,p6)*zb(p5,p4)*zba2(p2,p7,p8,p5
      &    )*game3456(1,1,1)*s345**(-1) + 2.D0*za(p7,p8)*za(p5,p3)*zb(p1
      &    ,p6)*zb(p3,p4)*zba2(p2,p7,p8,p3)*game3456(1,1,1)*s345**(-1)
@@ -133,7 +134,7 @@ C-----end statement functions
      & cxw**(-1)*s278**(-1) * (  - za(p7,p8)*za(p1,p5)*zb(p1,p6)*zb(p1,
      &    p4)*zba2(p2,p7,p8,p3)*s156**(-1) + za(p7,p8)*za(p5,p6)*zb(p1,
      &    p6)*zb(p6,p4)*zba2(p2,p7,p8,p3)*s156**(-1) )
-      amp(2,1) = amp(2,1) + propw56**(-1)*propw28**(-1)*s128**(-1) * ( 
+      amp(2,1) = amp(2,1) + propw56**(-1)*propw28**(-1)*s128**(-1) * (
      &    2.D0*za(p7,p5)*za(p5,p3)*zb(p1,p2)*zb(p5,p6)*zba2(p4,p1,p2,p8
      &    )*gamn3456(1,1,1)*s356**(-1) + 2.D0*za(p7,p3)*za(p5,p6)*zb(p1
      &    ,p2)*zb(p6,p4)*zba2(p6,p1,p2,p8)*game3456(1,1,1)*s456**(-1)
@@ -141,7 +142,7 @@ C-----end statement functions
      &    ,p8)*gamn3456(1,1,1)*s356**(-1) + 2.D0*za(p7,p3)*za(p5,p4)*
      &    zb(p1,p2)*zb(p6,p4)*zba2(p4,p1,p2,p8)*game3456(1,1,1)*
      &    s456**(-1) )
-      amp(2,1) = amp(2,1) + propw56**(-1)*propw28**(-1)*s278**(-1) * ( 
+      amp(2,1) = amp(2,1) + propw56**(-1)*propw28**(-1)*s278**(-1) * (
      &     - 2.D0*za(p7,p8)*za(p5,p6)*zb(p1,p6)*zb(p6,p4)*zba2(p2,p7,p8
      &    ,p3)*game3456(2,1,1)*s456**(-1) - 2.D0*za(p7,p8)*za(p5,p3)*
      &    zb(p1,p4)*zb(p5,p6)*zba2(p2,p7,p8,p5)*gamn3456(2,1,1)*
@@ -149,7 +150,7 @@ C-----end statement functions
      &    zba2(p2,p7,p8,p3)*gamn3456(2,1,1)*s356**(-1) - 2.D0*za(p7,p8)
      &    *za(p5,p4)*zb(p1,p4)*zb(p6,p4)*zba2(p2,p7,p8,p3)*game3456(2,1
      &    ,1)*s456**(-1) )
-      amp(2,1) = amp(2,1) + propw34**(-1)*propw28**(-1)*s128**(-1) * ( 
+      amp(2,1) = amp(2,1) + propw34**(-1)*propw28**(-1)*s128**(-1) * (
      &     - 2.D0*za(p7,p5)*za(p5,p3)*zb(p1,p2)*zb(p5,p4)*zba2(p6,p1,p2
      &    ,p8)*game3456(1,1,1)*s345**(-1) + 2.D0*za(p7,p5)*za(p6,p3)*
      &    zb(p1,p2)*zb(p6,p4)*zba2(p6,p1,p2,p8)*gamn3456(1,1,1)*
@@ -157,7 +158,7 @@ C-----end statement functions
      &    zba2(p4,p1,p2,p8)*gamn3456(1,1,1)*s346**(-1) - 2.D0*za(p7,p3)
      &    *za(p5,p3)*zb(p1,p2)*zb(p3,p4)*zba2(p6,p1,p2,p8)*game3456(1,1
      &    ,1)*s345**(-1) )
-      amp(2,1) = amp(2,1) + propw34**(-1)*propw28**(-1)*s278**(-1) * ( 
+      amp(2,1) = amp(2,1) + propw34**(-1)*propw28**(-1)*s278**(-1) * (
      &    2.D0*za(p7,p8)*za(p5,p3)*zb(p1,p6)*zb(p5,p4)*zba2(p2,p7,p8,p5
      &    )*game3456(2,1,1)*s345**(-1) + 2.D0*za(p7,p8)*za(p5,p3)*zb(p1
      &    ,p6)*zb(p3,p4)*zba2(p2,p7,p8,p3)*game3456(2,1,1)*s345**(-1)

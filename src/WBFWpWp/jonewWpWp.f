@@ -2,6 +2,7 @@
       implicit none
       include 'constants.f'
       include 'cmplxmass.f'
+      include 'masses.f'
       include 'zprods_decl.f'
       include 'sprods_com.f'
       include 'zcouple.f'
@@ -28,8 +29,8 @@ C-----end statement functions
       p17(:)=0.5d0*dble(zab(p1,:,p1)+zab(p7,:,p7))
       p34(:)=0.5d0*dble(zab(p3,:,p3)+zab(p4,:,p4))
 
-      propw17=s17-cwmass2
-      propw34=s34-cwmass2
+      propw17=s17-dcmplx(wmass**2,-wmass*wwidth)
+      propw34=s34-dcmplx(wmass**2,-wmass*wwidth)
 
 c--- determine correct couplings from nwz
       if (nwz .eq. +1) then
@@ -52,7 +53,7 @@ c--- determine correct couplings from nwz
      &    p1)*s347**(-1) + L(1)*za(p7,p3)*zb(p3,p4)*zab(p3,ro,p1)*
      &    s347**(-1) - L(2)*za(p1,p3)*zb(p1,p4)*zab(p7,ro,p1)*
      &    s134**(-1) + L(2)*za(p3,p4)*zb(p1,p4)*zab(p7,ro,p4)*
-     &    s134**(-1) + za(p7,p3)*zb(p1,p4)*p17(ro)*propw17**(-1)*rxw - 
+     &    s134**(-1) + za(p7,p3)*zb(p1,p4)*p17(ro)*propw17**(-1)*rxw -
      &    za(p7,p3)*zb(p1,p4)*p34(ro)*propw17**(-1)*rxw - zab2(p7,p3,p4
      &    ,p1)*zab(p3,ro,p4)*propw17**(-1)*rxw + zab2(p3,p1,p7,p4)*zab(
      &    p7,ro,p1)*propw17**(-1)*rxw )
@@ -65,7 +66,7 @@ c--- determine correct couplings from nwz
      &    ro,p1)*s134**(-1) + L(1)*za(p3,p4)*zb(p1,p4)*zab(p7,ro,p4)*
      &    s134**(-1) + L(2)*za(p7,p3)*zb(p7,p4)*zab(p7,ro,p1)*
      &    s347**(-1) + L(2)*za(p7,p3)*zb(p3,p4)*zab(p3,ro,p1)*
-     &    s347**(-1) - za(p7,p3)*zb(p1,p4)*p17(ro)*propw17**(-1)*rxw + 
+     &    s347**(-1) - za(p7,p3)*zb(p1,p4)*p17(ro)*propw17**(-1)*rxw +
      &    za(p7,p3)*zb(p1,p4)*p34(ro)*propw17**(-1)*rxw + zab2(p7,p3,p4
      &    ,p1)*zab(p3,ro,p4)*propw17**(-1)*rxw - zab2(p3,p1,p7,p4)*zab(
      &    p7,ro,p1)*propw17**(-1)*rxw )
@@ -75,11 +76,11 @@ c--- determine correct couplings from nwz
      &    p4)*propw17**(-1)*l4*s137**(-1) - za(p7,p4)*zb(p1,p4)*zab(p3,
      &    ro,p4)*propw17**(-1)*l3*s147**(-1)
       jg(1,ro)= + propw34**(-1) * ( za(p7,p3)*zb(p7,p4)*zab(p7,ro,p1)*
-     &    Qd*s347**(-1) + za(p7,p3)*zb(p1,p4)*p17(ro)*propw17**(-1) - 
+     &    Qd*s347**(-1) + za(p7,p3)*zb(p1,p4)*p17(ro)*propw17**(-1) -
      &    za(p7,p3)*zb(p1,p4)*p34(ro)*propw17**(-1) + za(p7,p3)*zb(p3,
      &    p4)*zab(p3,ro,p1)*Qd*s347**(-1) - za(p1,p3)*zb(p1,p4)*zab(p7,
      &    ro,p1)*Qu*s134**(-1) + za(p3,p4)*zb(p1,p4)*zab(p7,ro,p4)*Qu*
-     &    s134**(-1) - zab2(p7,p3,p4,p1)*zab(p3,ro,p4)*propw17**(-1) + 
+     &    s134**(-1) - zab2(p7,p3,p4,p1)*zab(p3,ro,p4)*propw17**(-1) +
      &    zab2(p3,p1,p7,p4)*zab(p7,ro,p1)*propw17**(-1) )
       jg(1,ro) = jg(1,ro) - za(p7,p1)*zb(p1,p4)*zab(p3,ro,p1)*
      & propw17**(-1)*q3*s147**(-1) - za(p7,p3)*zb(p7,p1)*zab(p7,ro,p4)*
@@ -87,11 +88,11 @@ c--- determine correct couplings from nwz
      &    p4)*propw17**(-1)*q4*s137**(-1) - za(p7,p4)*zb(p1,p4)*zab(p3,
      &    ro,p4)*propw17**(-1)*q3*s147**(-1)
       jg(2,ro)= + propw34**(-1) * ( za(p7,p3)*zb(p7,p4)*zab(p7,ro,p1)*
-     &    Qu*s347**(-1) - za(p7,p3)*zb(p1,p4)*p17(ro)*propw17**(-1) + 
+     &    Qu*s347**(-1) - za(p7,p3)*zb(p1,p4)*p17(ro)*propw17**(-1) +
      &    za(p7,p3)*zb(p1,p4)*p34(ro)*propw17**(-1) + za(p7,p3)*zb(p3,
      &    p4)*zab(p3,ro,p1)*Qu*s347**(-1) - za(p1,p3)*zb(p1,p4)*zab(p7,
      &    ro,p1)*Qd*s134**(-1) + za(p3,p4)*zb(p1,p4)*zab(p7,ro,p4)*Qd*
-     &    s134**(-1) + zab2(p7,p3,p4,p1)*zab(p3,ro,p4)*propw17**(-1) - 
+     &    s134**(-1) + zab2(p7,p3,p4,p1)*zab(p3,ro,p4)*propw17**(-1) -
      &    zab2(p3,p1,p7,p4)*zab(p7,ro,p1)*propw17**(-1) )
       jg(2,ro) = jg(2,ro) - za(p7,p1)*zb(p1,p4)*zab(p3,ro,p1)*
      & propw17**(-1)*q3*s147**(-1) - za(p7,p3)*zb(p7,p1)*zab(p7,ro,p4)*

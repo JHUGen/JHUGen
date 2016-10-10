@@ -83,10 +83,10 @@ c--- q(-p1) + q(-p2) -> e-(p3) e-(p4) nu_e(p5) nu_ebar(p6);
 
 c--- This calculation uses the complex-mass scheme (c.f. arXiv:hep-ph/0605312)
 c--- and the following lines set up the appropriate masses and sin^2(theta_w)
-      cwmass2=dcmplx(wmass**2,-wmass*wwidth)
-      czmass2=dcmplx(zmass**2,-zmass*zwidth)
-      cxw=cone-cwmass2/czmass2
-      
+      cwmass2=dcmplx(wmass**2,0d0)
+      czmass2=dcmplx(zmass**2,0d0)
+      cxw=cone-dcmplx(wmass**2,-wmass*wwidth)/czmass2
+
       doHO=.false.
       doBO=.false.
       if     (runstring(4:5) .eq. 'HO') then
@@ -151,7 +151,7 @@ c--- W mid diagrams: contribution from jmidWW
       call ampmidWW(j1(j),j2(j),i3,i4,i5,i6,j7(j),j8(j),za,zb,jmidWW17)
       call ampmidWW(j1(j),j2(j),i3,i4,i5,i6,j8(j),j7(j),za,zb,jmidWW18)
       call ampmidWW(j2(j),j1(j),i3,i4,i5,i6,j8(j),j7(j),za,zb,jmidWW28)
-      
+
 c--- these are not used in calculation of Higgs contribution
       if (doHO .eqv. .false.) then
 
@@ -194,7 +194,7 @@ c--- W exchange diagrams for flavor-changing contributions: contribution from jt
       call jonew(j7(j),i5,i6,j1(j),za,zb,zab,j7_56_1z,j7_56_1g)
 
       else
-      
+
       jmid17=czip
       jmid18=czip
       jtwo17=czip
@@ -225,7 +225,7 @@ c--- W exchange diagrams for flavor-changing contributions: contribution from jt
       j7_56_1g=czip
 
       endif
-      
+
 c-----------------------------------------
 c---- SET-UP FOR ZZ-like AMPLITUDES ------
 c-----------------------------------------
@@ -245,7 +245,7 @@ c--- propagators and currents are not used in calculation of Higgs contribution
       call jzero(j7(j),j2(j),zab,zba,j7_2)
       call jzero(j8(j),j1(j),zab,zba,j8_1)
       call jzero(j8(j),j2(j),zab,zba,j8_2)
- 
+
       call jone(j7(j),3,4,j1(j),za,zb,zab,zba,j7_34_1,jw7_34_1,jl7_34_1)
       call jone(j7(j),3,4,j2(j),za,zb,zab,zba,j7_34_2,jw7_34_2,jl7_34_2)
       call jone(j7(j),5,6,j1(j),za,zb,zab,zba,j7_56_1,jw7_56_1,jl7_56_1)
@@ -279,20 +279,20 @@ C-----Singly resonant production in VBF style diagrams
       call ZZSingleres(j1(j),j2(j),5,6,3,4,j8(j),j7(j),za,zb,
      & ZZ8561,WWp8561,WWm8561)
       endif
-      
+
 C----ZZ->ZZ scattering with the exchange of a H
       call ZZHZZamp(j1(j),j2(j),3,4,5,6,j7(j),j8(j),
      & za,zb,ZZHamp71_82)
       call ZZHZZamp(j1(j),j2(j),3,4,5,6,j8(j),j7(j),
      & za,zb,ZZHamp81_72)
-C----Four boson vertex + WW->Higgs diagram 
+C----Four boson vertex + WW->Higgs diagram
       call WWZZ(j1(j),j2(j),3,4,5,6,j7(j),j8(j),
-     & za,zb,WWZZ71_82amp,srWWZZ71_82amp) 
+     & za,zb,WWZZ71_82amp,srWWZZ71_82amp)
       call WWZZ(j1(j),j2(j),3,4,5,6,j8(j),j7(j),
-     & za,zb,WWZZ81_72amp,srWWZZ81_72amp) 
+     & za,zb,WWZZ81_72amp,srWWZZ81_72amp)
 
 
-C-----setup for (dqcq_dqcq) 
+C-----setup for (dqcq_dqcq)
 c----- WW-like
       do h1=1,2
       do h2=1,2
@@ -349,7 +349,7 @@ c----- ZZ-like
       enddo
 
 
-C-----setup for (dqcq_uqsq) 
+C-----setup for (dqcq_uqsq)
 c----- WW-like
       amp(dqcq_uqsq,1,1,1,1)=
      & +jtwoWexch17(1,2)+jtwoWexch28(2,1)
@@ -357,7 +357,8 @@ c----- WW-like
      & +cdotpr(j7_34_1g(1,:),j8_56_2g(2,:))/s7341
      & +(cdotpr(j7_34_1z(1,:),j8_56_2z(2,:))
      &  -cdotpr(j7_34_1z(1,:),k7341(:))
-     &  *cdotpr(k7341(:),j8_56_2z(2,:))/czmass2)/(s7341-czmass2)
+     &  *cdotpr(k7341(:),j8_56_2z(2,:))/czmass2)
+     & /(s7341-dcmplx(zmass**2,-zmass*zwidth))
 
 c--- the following minus sign accounts for one less fermion loop in interference
       amp(dqcq_uqsq,1,1,1,1)=-amp(dqcq_uqsq,1,1,1,1)
@@ -402,12 +403,12 @@ c----- ZZ-like
      &   *dble(amp(dqcq_uqsq,h1,h2,h3,h5)
      & *dconjg(amp(dqcq_uqsq,h1,h2,h3,h5)))
 
-      enddo     
-      enddo     
-      enddo     
-      enddo     
+      enddo
+      enddo
+      enddo
+      enddo
 
-C-----setup for (uqcq_uqcq) 
+C-----setup for (uqcq_uqcq)
 c----- WW-like
       do h1=1,2
       do h2=1,2
@@ -444,7 +445,7 @@ c----- ZZ-like
      & +cdotpr(jl7_56_1(:,2,h1,h5),jl8_34_2(:,2,h2,h3))*ll7561(h3,h5)
      & +cdotpr(j7_56_1(:,2,h1,h5),jl8_34_2(:,2,h2,h3))*gmZl8342(2,h1,h3)
      & +cdotpr(jl7_56_1(:,2,h1,h5),j8_34_2(:,2,h2,h3))*gmZl7561(2,h2,h5)
-      
+
       amp(uqcq_uqcq,h1,h2,h3,h5)=amp(uqcq_uqcq,h1,h2,h3,h5)
      & +cdotpr(j7_3456_1(:,2,h1,h3,h5),j8_2(:,h2))*gmZ82(2,2,h1,h2)
      & +cdotpr(j7_1(:,h1),j8_3456_2(:,2,h2,h3,h5))*gmZ71(2,2,h1,h2)
@@ -452,10 +453,10 @@ c----- ZZ-like
       amp(uqcq_uqcq,h1,h2,h3,h5)=amp(uqcq_uqcq,h1,h2,h3,h5)
      & +ZZ7341(2,2,h1,h2,h3,h5)+ZZ7561(2,2,h1,h2,h5,h3)
       endif
-      
+
       amp(uqcq_uqcq,h1,h2,h3,h5)=amp(uqcq_uqcq,h1,h2,h3,h5)
      & +Hbit*ZZHamp71_82(2,2,h1,h2,h3,h5)
-     
+
       temp(2,4)=temp(2,4)+esq**6*spinavge
      &   *dble(amp(uqcq_uqcq,h1,h2,h3,h5)
      & *dconjg(amp(uqcq_uqcq,h1,h2,h3,h5)))
@@ -466,7 +467,7 @@ c----- ZZ-like
       enddo
 
 
-C-----setup for (dqsq_dqsq) 
+C-----setup for (dqsq_dqsq)
 c----- WW-like
       do h1=1,2
       do h2=1,2
@@ -510,10 +511,10 @@ c----- ZZ-like
       amp(dqsq_dqsq,h1,h2,h3,h5)=amp(dqsq_dqsq,h1,h2,h3,h5)
      & +ZZ7341(1,1,h1,h2,h3,h5)+ZZ7561(1,1,h1,h2,h5,h3)
       endif
-     
+
       amp(dqsq_dqsq,h1,h2,h3,h5)=amp(dqsq_dqsq,h1,h2,h3,h5)
      & +Hbit*ZZHamp71_82(1,1,h1,h2,h3,h5)
-     
+
       temp(1,3)=temp(1,3)+esq**6*spinavge
      &   *dble(amp(dqsq_dqsq,h1,h2,h3,h5)
      & *dconjg(amp(dqsq_dqsq,h1,h2,h3,h5)))
@@ -524,8 +525,8 @@ c----- ZZ-like
 
       temp(1,5)=temp(1,3)
       temp(3,5)=temp(1,3)
-      
-C-----setup for (dqdq_dqdq) 
+
+C-----setup for (dqdq_dqdq)
 c----- WW-like
       do h1=1,2
       do h2=1,2
@@ -547,11 +548,11 @@ c--- the following minus sign accounts for one less fermion loop in interference
 
       enddo
       enddo
-      
+
       do h1=1,2
       do h2=1,2
       do h3=1,2
-      do h5=1,2      
+      do h5=1,2
 
 C-------- ampb: ZZ-like
       if (doHO .eqv. .false.) then
@@ -595,8 +596,8 @@ C-------- ampb: ZZ-like
       enddo
       temp(3,3)=temp(1,1)
       temp(5,5)=temp(1,1)
-      
-C-----setup for (uquq_uquq) 
+
+C-----setup for (uquq_uquq)
 c----- WW-like
       do h1=1,2
       do h2=1,2
@@ -612,7 +613,7 @@ c-------- ampb: WW-like
      & +jtwo18(2,2,h1,h2)+jtwo27(2,2,h2,h1)
      & +jZWZa18(2,2,h1,h2)+jZWZb18(2,2,h1,h2)
      & +jtwodiags18(2,2,h1,h2)
-     
+
 c--- the following minus sign accounts for one less fermion loop in interference
       ampb(uquq_uquq,h1,h2,1,1)=-ampb(uquq_uquq,h1,h2,1,1)
 
@@ -666,7 +667,7 @@ c-------- ampb: ZZ-like
       enddo
       temp(4,4)=temp(2,2)
 
-C-----setup for (dquq_dquq) 
+C-----setup for (dquq_dquq)
 c----- WW-like
 c-------- ampb
       ampa(dquq_dquq,1,1,1,1)=
@@ -675,7 +676,8 @@ c-------- ampb
      & +cdotpr(j8_34_1g(1,:),j7_56_2g(2,:))/s8341
      & +(cdotpr(j8_34_1z(1,:),j7_56_2z(2,:))
      &  -cdotpr(j8_34_1z(1,:),k8341(:))
-     &  *cdotpr(k8341(:),j7_56_2z(2,:))/czmass2)/(s8341-czmass2)
+     &  *cdotpr(k8341(:),j7_56_2z(2,:))/czmass2)
+     & /(s8341-dcmplx(zmass**2,-zmass*zwidth))
 
 c--- the following minus sign accounts for one less fermion loop in interference
       ampa(dquq_dquq,1,1,1,1)=-ampa(dquq_dquq,1,1,1,1)
@@ -722,7 +724,7 @@ c-------- ampa: ZZ-like
       ampa(dquq_dquq,h1,h2,h3,h5)=ampa(dquq_dquq,h1,h2,h3,h5)
      & -srWWZZ81_72amp(h3,h5) ! note minus sign instead of exchanging 1<->7,2<->8
       endif
-      
+
       ampa(dquq_dquq,h1,h2,h3,h5)=ampa(dquq_dquq,h1,h2,h3,h5)
      & +WWZZ81_72amp(h3,h5)
       endif
@@ -740,10 +742,10 @@ c-------- ampa: ZZ-like
       enddo
       enddo
       enddo
-      
+
       temp(3,4)=temp(1,2)
 
-C-----setup for (uqbq_uqbq) 
+C-----setup for (uqbq_uqbq)
 c----- WW-like
       do h1=1,2
       do h2=1,2
@@ -761,7 +763,7 @@ c--- the following minus sign accounts for one less fermion loop in interference
 
       enddo
       enddo
-      
+
 c----- ZZ-like
       do h1=1,2
       do h2=1,2
@@ -773,7 +775,7 @@ c----- ZZ-like
      & +cdotpr(jl7_34_1(:,2,h1,h3),jl8_56_2(:,1,h2,h5))*ll7341(h3,h5)
      & +cdotpr(j7_34_1(:,2,h1,h3),jl8_56_2(:,1,h2,h5))*gmZl8562(2,h1,h5)
      & +cdotpr(jl7_34_1(:,2,h1,h3),j8_56_2(:,1,h2,h5))*gmZl7341(1,h2,h3)
-     
+
       amp(uqbq_uqbq,h1,h2,h3,h5)=amp(uqbq_uqbq,h1,h2,h3,h5)
      & +cdotpr(j7_56_1(:,2,h1,h5),j8_34_2(:,1,h2,h3))*gmZ7561(2,1,h1,h2)
      & +cdotpr(jl7_56_1(:,2,h1,h5),jl8_34_2(:,1,h2,h3))*ll7561(h3,h5)
@@ -801,7 +803,7 @@ c----- ZZ-like
       temp(4,5)=temp(2,5)
       temp(2,3)=temp(2,5)
 
-C-----setup for (uqsq_dqcq) 
+C-----setup for (uqsq_dqcq)
 c----- WW-like
       amp(uqsq_dqcq,1,1,1,1)=
      & +jtwoWexch17(2,1)+jtwoWexch28(1,2)
@@ -809,7 +811,8 @@ c----- WW-like
      & +cdotpr(j8_34_2g(1,:),j7_56_1g(2,:))/s8342
      & +(cdotpr(j8_34_2z(1,:),j7_56_1z(2,:))
      &  -cdotpr(j8_34_2z(1,:),k8342(:))
-     &  *cdotpr(k8342(:),j7_56_1z(2,:))/czmass2)/(s8342-czmass2)
+     &  *cdotpr(k8342(:),j7_56_1z(2,:))/czmass2)
+     & /(s8342-dcmplx(zmass**2,-zmass*zwidth))
 
 c--- the following minus sign accounts for one less fermion loop in interference
       amp(uqsq_dqcq,1,1,1,1)=-amp(uqsq_dqcq,1,1,1,1)
@@ -853,10 +856,10 @@ c----- ZZ-like
       tempw(2,3)=tempw(2,3)+esq**6*spinavge
      &   *dble(amp(uqsq_dqcq,h1,h2,h3,h5)
      & *dconjg(amp(uqsq_dqcq,h1,h2,h3,h5)))
-      enddo     
-      enddo     
-      enddo     
-      enddo     
+      enddo
+      enddo
+      enddo
+      enddo
 
 c--- fill matrix elements
       if (j .eq. 1) then
@@ -910,7 +913,7 @@ c--- qbar-q
       enddo
       msq(-1,3)=msq(-1,3)+tempw(2,3)
       msq(-2,4)=msq(-2,4)+tempw(1,4)
-      
+
 c--- qbar-q
       elseif (j.eq.6) then
       do k=-nfinc,-1
@@ -947,7 +950,7 @@ c--- q-qbar
       enddo
       msq(1,-3)=msq(1,-3)+tempw(1,4)
       msq(2,-4)=msq(2,-4)+tempw(2,3)
-      
+
 c--- q-qbar extra pieces
       elseif (j.eq.9) then
       do k=1,nfinc
@@ -971,7 +974,7 @@ c--- q-qbar extra pieces
       endif
       enddo
       enddo
- 
+
 c--- qbar-q extra pieces
       elseif (j.eq.11) then
       do k=1,nfinc
@@ -995,9 +998,9 @@ c--- qbar-q extra pieces
       endif
       enddo
       enddo
-  
+
       endif
-      
+
       enddo
 
       return
@@ -1007,4 +1010,4 @@ c--- qbar-q extra pieces
    79 format(' *  sin^2(theta_w)   (',f11.5,',',f11.5,')      *')
 
       end
-      
+
