@@ -46,7 +46,7 @@ c--- This calculation uses the complex-mass scheme (c.f. arXiv:hep-ph/0605312)
 c--- and the following lines set up the appropriate masses and sin^2(theta_w)
       cwmass2=dcmplx(wmass**2,0d0)
       czmass2=dcmplx(zmass**2,0d0)
-      cxw=cone-dcmplx(wmass**2,-wmass*wwidth)/czmass2
+      cxw=dcmplx(xw,0d0)
       
 c--- note that this is the special ordering to agree with Madgraph
       i3=3
