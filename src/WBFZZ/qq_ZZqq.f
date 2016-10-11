@@ -52,13 +52,15 @@ c--- q(-p1)+q(-p2)->Z(p3,p4)+Z(p5,p6)+q(p7)+q(p8);
      & amp(nmax,2,2,2,2),ampa(nmax,2,2,2,2),ampb(nmax,2,2,2,2),
      & ZZHamp71_82(2,2,2,2,2,2),ZZHamp81_72(2,2,2,2,2,2),
      & WWZZ71_82amp(2,2),WWZZ81_72amp(2,2),
+     & WWZZ82_71amp(2,2),WWZZ72_81amp(2,2),
      & gmZ7341(2,2,2,2),gmZ7561(2,2,2,2),gmZ71(2,2,2,2),gmZ82(2,2,2,2),
      & gmZ7342(2,2,2,2),gmZ7562(2,2,2,2),gmZ72(2,2,2,2),gmZ81(2,2,2,2),
      & ll7341(2,2),ll7561(2,2),ll7342(2,2),ll7562(2,2),
      & gmZl7341(2,2,2),gmZl7561(2,2,2),gmZl7342(2,2,2),gmZl7562(2,2,2),
      & gmZl8562(2,2,2),gmZl8342(2,2,2),gmZl8561(2,2,2),gmZl8341(2,2,2),
      & k7341(4),k1567(4),k7342(4),k7562(4),ggWW(2,2),
-     & srWWZZ71_82amp(2,2),srWWZZ81_72amp(2,2)
+     & srWWZZ71_82amp(2,2),srWWZZ81_72amp(2,2),
+     & srWWZZ82_71amp(2,2),srWWZZ72_81amp(2,2)
 c     ,j3_4(4,2),j5_6(4,2),
       logical doHO,doBO
       parameter(spinavge=0.25d0,stat=0.5d0)
@@ -182,6 +184,10 @@ C----Four boson vertex + WW->Higgs diagram
      & za,zb,WWZZ71_82amp,srWWZZ71_82amp)
       call WWZZ(j1(j),j2(j),3,4,5,6,j8(j),j7(j),
      & za,zb,WWZZ81_72amp,srWWZZ81_72amp)
+      call WWZZ(j2(j),j1(j),3,4,5,6,j8(j),j7(j),
+     & za,zb,WWZZ82_71amp,srWWZZ82_71amp)
+      call WWZZ(j2(j),j1(j),3,4,5,6,j7(j),j8(j),
+     & za,zb,WWZZ72_81amp,srWWZZ72_81amp)
 
 C-----setup for (uqbq_uqbq) (2,5)->(2,5)
       do h1=1,2
@@ -301,7 +307,7 @@ C-----setup for uqsq_dqcq W diagrams (2,3)->(1,4)
       endif
 
       amp(uqsq_dqcq,h1,h2,h3,h5)=Bbit*amp(uqsq_dqcq,h1,h2,h3,h5)
-     & +WWZZ71_82amp(h3,h5)
+     & +WWZZ82_71amp(h3,h5)
 
       tempw(2,3)=tempw(2,3)+esq**6*spinavge
      &   *dble(amp(uqsq_dqcq,h1,h2,h3,h5)
