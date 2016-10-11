@@ -9,7 +9,7 @@
       include 'runstring.f'
       include 'zcouple.f'
       include 'WWbits.f'
-      include 'spinzerohiggs_anomcoupl.f'      
+      include 'spinzerohiggs_anomcoupl.f'
       integer jdu1,jdu2,h28,h17,i1,i2,i3,i4,i5,i6,i7,i8,
      & p1,p2,p3,p4,p5,p6,p7,p8
       double complex zab2,amp(2,2,2,2),sqzmass,Amp_S_PR,Amp_S_DK,
@@ -47,6 +47,7 @@ c--- special fix for Madgraph check
       propz17=s17-dcmplx(zmass**2,-zmass*zwidth)
       propz28=s28-dcmplx(zmass**2,-zmass*zwidth)
       propH=dcmplx(s3456-hmass**2,hmass*hwidth)
+      propX=dcmplx(s3456-h2mass**2,h2mass*h2width)
 
       do jdu1=1,2
       gamz17(jdu1,1)=Q(jdu1)/s(i1,i7)+rxW*L(jdu1)/propz17
@@ -82,8 +83,8 @@ c--- special fix for Madgraph check
       endif
       do jdu1=1,2
       do jdu2=1,2
-      
-!     MARKUS: this is the ZZ-->H-->WW contribution 
+
+!     MARKUS: this is the ZZ-->H-->WW contribution
 
 !     original MCFM code
 !       amp(jdu1,jdu2,h17,h28)= + propw56**(-1)*propw34**(-1)*cxw**(-2)*
@@ -92,26 +93,31 @@ c--- special fix for Madgraph check
 !       print *, "MARKUS check: old ZZ-->H-->WW:",amp(jdu1,jdu2,h17,h28)
 
 !     new code with anomalous couplings
-      Amp_S_PR=-anomhzzamp(p7,p1,p8,p2,1,s3456,s(p7,p1),s(p8,p2),za,zb)
-      Amp_S_DK=-anomhwwamp(p3,p4,p5,p6,1,s3456,s(p3,p4),s(p5,p6),za,zb)
-      amp(jdu1,jdu2,h17,h28)= + propw56**(-1)*propw34**(-1)*cxw**(-2)*
+      amp(jdu1,jdu2,h17,h28)=czip
+      if( hmass.ge.zip ) then
+      Amp_S_PR=anomhzzamp(p7,p1,p8,p2,1,s3456,s(p7,p1),s(p8,p2),za,zb)
+      ! MCFM uses W-W+!
+      Amp_S_DK=anomhwwamp(p5,p6,p3,p4,1,s3456,s(p5,p6),s(p3,p4),za,zb)
+      amp(jdu1,jdu2,h17,h28)= amp(jdu1,jdu2,h17,h28)
+     &                      + propw56**(-1)*propw34**(-1)*cxw**(-2)*
      & Hbit * ( - 2.D0*Amp_S_PR*Amp_S_DK
-     &  *ZZ17(jdu1,h17)*ZZ28(jdu2,h28)*propH**(-1)*sqzmass )     
+     &  *ZZ17(jdu1,h17)*ZZ28(jdu2,h28)*propH**(-1)*sqzmass )
+      endif
 !       print *, "MARKUS check: new ZZ-->H-->WW:",amp(jdu1,jdu2,h17,h28)
 !       pause
 
 
 !     adding a second resonance
-      if( h2mass.ge.zip ) then      
-      propX=dcmplx(s3456-h2mass**2,h2mass*h2width)
-      Amp_S_PR=-anomhzzamp(p7,p1,p8,p2,2,s3456,s(p7,p1),s(p8,p2),za,zb)
-      Amp_S_DK=-anomhwwamp(p3,p4,p5,p6,2,s3456,s(p3,p4),s(p5,p6),za,zb)
-      amp(jdu1,jdu2,h17,h28)= amp(jdu1,jdu2,h17,h28) 
+      if( h2mass.ge.zip ) then
+      Amp_S_PR=anomhzzamp(p7,p1,p8,p2,2,s3456,s(p7,p1),s(p8,p2),za,zb)
+      ! MCFM uses W-W+!
+      Amp_S_DK=anomhwwamp(p5,p6,p3,p4,2,s3456,s(p5,p6),s(p3,p4),za,zb)
+      amp(jdu1,jdu2,h17,h28)= amp(jdu1,jdu2,h17,h28)
      &                      + propw56**(-1)*propw34**(-1)*cxw**(-2)*
      & Hbit * ( - 2.D0*Amp_S_PR*Amp_S_DK
-     &  *ZZ17(jdu1,h17)*ZZ28(jdu2,h28)*propX**(-1)*sqzmass )     
+     &  *ZZ17(jdu1,h17)*ZZ28(jdu2,h28)*propX**(-1)*sqzmass )
       endif
-     
+
       amp(jdu1,jdu2,h17,h28) = amp(jdu1,jdu2,h17,h28) + gamz17(jdu1,h17
      & )*gamz28(jdu2,h28)*propw56**(-1)*propw34**(-1)*propw1347**(-1)*
      & cxw**(-1)*Bbit * ( 4.D0*za(p3,p5)*zb(p4,p6)*zab2(p7,p3,p4,p1)*
