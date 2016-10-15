@@ -124,7 +124,7 @@ C-- MARKUS: this is the old (original) MCFM code
 !      & /(propWBF*prop1756)
 
       ZZHamp(jdu1,jdu2,h17,h28,h34,h56)=czip
-      
+
       Amp_S_PR=czip
       Amp_S_DK=czip
       Amp_T_PR=czip
@@ -135,44 +135,38 @@ C-- MARKUS: this is the old (original) MCFM code
 
         if(channeltoggle_stu.ne.1) then
           if( AnomalCouplPR.eq.1 ) then
-!          write(6,*) "AnomalCouplPR.eq.1"
       Amp_S_PR=Amp_S_PR
      & -anomhzzamp(i7,i1,i8,i2,1,s3456,s(i7,i1),s(i8,i2),za,zb)
-     & /prop3456
           else
-!          write(6,*) "AnomalCouplPR.ne.1"
       Amp_S_PR=Amp_S_PR
-     & +za(i7,i8)*zb(i2,i1)/prop3456
+     & +za(i7,i8)*zb(i2,i1)
           endif
           if( AnomalCouplDK.eq.1 ) then
-!          write(6,*) "AnomalCouplDK.eq.1"
       Amp_S_DK=Amp_S_DK
      & -anomhzzamp(i3,i4,i5,i6,1,s3456,s(i3,i4),s(i5,i6),za,zb)
           else
-!          write(6,*) "AnomalCouplDK.ne.1"
       Amp_S_DK=Amp_S_DK
      & +za(i3,i5)*zb(i6,i4)
           endif
         endif
+
         if(channeltoggle_stu.ne.0) then
           if( AnomalCouplPR.eq.1 ) then
       Amp_T_PR=Amp_T_PR
-     & -anomhzzamp(i7,i1,i3,i4,1,s1734,s(i3,i4),s(i7,i1),za,zb)
-     & /prop1734
+     & -anomhzzamp(i3,i4,i7,i1,1,s1734,s(i3,i4),s(i7,i1),za,zb)
       Amp_U_PR=Amp_U_PR
-     & -anomhzzamp(i7,i1,i5,i6,1,s1756,s(i5,i6),s(i7,i1),za,zb)
-     & /prop1756
+     & -anomhzzamp(i5,i6,i7,i1,1,s1756,s(i5,i6),s(i7,i1),za,zb)
           else
       Amp_T_PR=Amp_T_PR
-     & +za(i7,i3)*zb(i4,i1)/prop1734
+     & +za(i7,i3)*zb(i4,i1)
       Amp_U_PR=Amp_U_PR
-     & +za(i7,i5)*zb(i6,i1)/prop1756
+     & +za(i7,i5)*zb(i6,i1)
           endif
           if( AnomalCouplDK.eq.1 ) then
       Amp_T_DK=Amp_T_DK
-     & -anomhzzamp(i8,i2,i5,i6,1,s1734,s(i5,i6),s(i8,i2),za,zb)
+     & -anomhzzamp(i5,i6,i8,i2,1,s1734,s(i5,i6),s(i8,i2),za,zb)
       Amp_U_DK=Amp_U_DK
-     & -anomhzzamp(i8,i2,i3,i4,1,s1756,s(i3,i4),s(i8,i2),za,zb)
+     & -anomhzzamp(i3,i4,i8,i2,1,s1756,s(i3,i4),s(i8,i2),za,zb)
           else
       Amp_T_DK=Amp_T_DK
      & +za(i8,i5)*zb(i6,i2)
@@ -187,10 +181,13 @@ C-- MARKUS: this is the old (original) MCFM code
      & +fac/propWBF*(
 C---s-channel
      & ZZ3456(h34,h56)*ZZ1728(jdu1,jdu2,h17,h28)*Amp_S_DK*Amp_S_PR
+     & /prop3456
 C---t-channel
      & +ZZ1734(jdu1,h17,h34)*ZZ2856(jdu2,h28,h56)*Amp_T_DK*Amp_T_PR
+     & /prop1734
 C---u-channel
      & +ZZ2856(jdu1,h17,h56)*ZZ1734(jdu2,h28,h34)*Amp_U_DK*Amp_U_PR
+     & /prop1756
      & )
 
       Amp_S_PR=czip
@@ -205,10 +202,9 @@ C---u-channel
           if( AnomalCouplPR.eq.1 ) then
       Amp_S_PR=Amp_S_PR
      & -anomhzzamp(i7,i1,i8,i2,2,s3456,s(i7,i1),s(i8,i2),za,zb)
-     & /propX3456
           else
       Amp_S_PR=Amp_S_PR
-     & +za(i7,i8)*zb(i2,i1)/propX3456
+     & +za(i7,i8)*zb(i2,i1)
           endif
           if( AnomalCouplDK.eq.1 ) then
       Amp_S_DK=Amp_S_DK
@@ -218,25 +214,24 @@ C---u-channel
      & +za(i3,i5)*zb(i6,i4)
           endif
         endif
+
         if(channeltoggle_stu.ne.0) then
           if( AnomalCouplPR.eq.1 ) then
       Amp_T_PR=Amp_T_PR
-     & -anomhzzamp(i7,i1,i3,i4,2,s1734,s(i3,i4),s(i7,i1),za,zb)
-     & /propX1734
+     & -anomhzzamp(i3,i4,i7,i1,2,s1734,s(i3,i4),s(i7,i1),za,zb)
       Amp_U_PR=Amp_U_PR
-     & -anomhzzamp(i7,i1,i5,i6,2,s1756,s(i5,i6),s(i7,i1),za,zb)
-     & /propX1756
+     & -anomhzzamp(i5,i6,i7,i1,2,s1756,s(i5,i6),s(i7,i1),za,zb)
           else
       Amp_T_PR=Amp_T_PR
-     & +za(i7,i3)*zb(i4,i1)/propX1734
+     & +za(i7,i3)*zb(i4,i1)
       Amp_U_PR=Amp_U_PR
-     & +za(i7,i5)*zb(i6,i1)/propX1756
+     & +za(i7,i5)*zb(i6,i1)
           endif
           if( AnomalCouplDK.eq.1 ) then
       Amp_T_DK=Amp_T_DK
-     & -anomhzzamp(i8,i2,i5,i6,2,s1734,s(i5,i6),s(i8,i2),za,zb)
+     & -anomhzzamp(i5,i6,i8,i2,2,s1734,s(i5,i6),s(i8,i2),za,zb)
       Amp_U_DK=Amp_U_DK
-     & -anomhzzamp(i8,i2,i3,i4,2,s1756,s(i3,i4),s(i8,i2),za,zb)
+     & -anomhzzamp(i3,i4,i8,i2,2,s1756,s(i3,i4),s(i8,i2),za,zb)
           else
       Amp_T_DK=Amp_T_DK
      & +za(i8,i5)*zb(i6,i2)
@@ -251,10 +246,13 @@ C---u-channel
      & +fac/propWBF*(
 C---s-channel
      & ZZ3456(h34,h56)*ZZ1728(jdu1,jdu2,h17,h28)*Amp_S_DK*Amp_S_PR
+     & /propX3456
 C---t-channel
      & +ZZ1734(jdu1,h17,h34)*ZZ2856(jdu2,h28,h56)*Amp_T_DK*Amp_T_PR
+     & /propX1734
 C---u-channel
      & +ZZ2856(jdu1,h17,h56)*ZZ1734(jdu2,h28,h34)*Amp_U_DK*Amp_U_PR
+     & /propX1756
      & )
 
 
@@ -268,3 +266,4 @@ C---u-channel
 
       return
       end
+

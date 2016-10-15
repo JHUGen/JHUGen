@@ -58,6 +58,10 @@ c--- special fix for Madgraph check
 !       sqzmass=dcmplx(zmass**2,0d0)
 !      else
          sqzmass=czmass2
+         ! REMOVE CMS
+         !sqzmass=dcmplx(zmass**2,0d0)
+         !
+
 !      endif
 
 C---setting up couplings dependent on whether we are doing 34-line or 56-line
@@ -97,6 +101,14 @@ C---setting up couplings dependent on whether we are doing 34-line or 56-line
       propw17=dcmplx(s17)-cwmass2
       propw28=dcmplx(s28)-cwmass2
       propz3456=dcmplx(s3456)-czmass2
+      ! REMOVE CMS
+      !prop34=dcmplx(s34)-dcmplx(zmass**2,-zmass*zwidth)
+      !prop56=dcmplx(s56)-dcmplx(zmass**2,-zmass*zwidth)
+      !propw17=dcmplx(s17)-dcmplx(wmass**2,-wmass*wwidth)
+      !propw28=dcmplx(s28)-dcmplx(wmass**2,-wmass*wwidth)
+      !
+      propz3456=dcmplx(s3456)-czmass2
+
       prop3456=dcmplx(s3456-hmass**2,hmass*hwidth)
       propWBF=propw17*propw28*prop34*prop56
 
@@ -173,7 +185,6 @@ C-- MARKUS: this is the old (original) MCFM code
 !      &    /(propWBF*prop3456)*Hbit
 !
 
-         WWZZamp(h34,h56)=czip
          Amp_S_PR=czip
          Amp_S_DK=czip
          if( hmass.ge.zip ) then
@@ -203,7 +214,7 @@ C----Second resonance
       Amp_S_PR=za(i7,i8)*zb(i2,i1)
           endif
            if( AnomalCouplDK.eq.1 ) then
-      Amp_S_DK=-anomhzzamp(i3,i4,i5,i6,2,s3456,s(i7,i1),s(i8,i2),za,zb)
+      Amp_S_DK=-anomhzzamp(i3,i4,i5,i6,2,s3456,s(i3,i4),s(i5,i6),za,zb)
            else
       Amp_S_DK=za(i3,i5)*zb(i6,i4)
            endif

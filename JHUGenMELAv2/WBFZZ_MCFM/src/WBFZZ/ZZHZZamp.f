@@ -26,7 +26,7 @@ c      htheta(s3456)=half+sign(half,s3456)
       htheta(s3456)=one ! propdebug
 C---end statement functions
 !$omp threadprivate(ZZ3456,ZZ1734,ZZ2856,ZZ1728,fac)
-      
+
       if (first) then
       first=.false.
       ZZ3456(1,1)=2d0*l1*l2
@@ -75,7 +75,7 @@ C---setup propagators
 
 
       do h17=1,2
-         if (h17.eq.1) then 
+         if (h17.eq.1) then
             i1=n1
             i7=n7
          elseif (h17.eq.2) then
@@ -83,7 +83,7 @@ C---setup propagators
             i7=n1
          endif
       do h28=1,2
-         if (h28.eq.1) then 
+         if (h28.eq.1) then
             i2=n2
             i8=n8
          elseif (h28.eq.2) then
@@ -91,7 +91,7 @@ C---setup propagators
             i8=n2
          endif
       do h34=1,2
-         if (h34.eq.1) then 
+         if (h34.eq.1) then
             i3=n3
             i4=n4
          elseif (h34.eq.2) then
@@ -99,16 +99,16 @@ C---setup propagators
             i4=n3
          endif
       do h56=1,2
-         if (h56.eq.1) then 
+         if (h56.eq.1) then
             i5=n5
             i6=n6
          elseif (h56.eq.2) then
             i5=n6
             i6=n5
          endif
-         
+
       do jdu1=1,2
-      
+
       do jdu2=1,2
 
 
