@@ -78,11 +78,6 @@ c--- and the following lines set up the appropriate masses and sin^2(theta_w)
       cwmass2=dcmplx(wmass**2,-wmass*wwidth)
       czmass2=dcmplx(zmass**2,-zmass*zwidth)
       cxw=cone-cwmass2/czmass2
-      ! REMOVE CMS
-      !cwmass2=dcmplx(wmass**2,0d0)
-      !czmass2=dcmplx(zmass**2,0d0)
-      !cxw=cone-dcmplx(xw,0d0)
-      !
 
       doHO=.false.
       doBO=.false.
