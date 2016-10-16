@@ -1,4 +1,4 @@
-      subroutine qq_ZZqq(p,msq)
+      subroutine qq_ZZqq_perpart(p,pid,msq)
       implicit none
 c--- Author: R.K. Ellis, October 2014
 c--- q(-p1)+q(-p2)->Z(p3,p4)+Z(p5,p6)+q(p7)+q(p8);
@@ -23,6 +23,7 @@ c--- q(-p1)+q(-p2)->Z(p3,p4)+Z(p5,p6)+q(p7)+q(p8);
      & dqdq_dqdq=4,uqbq_uqbq=5,dqcq_dqcq=6,
      & dquq_dquq=7,dqcq_uqsq=8,uqsq_dqcq=9)
       integer h1,h2,h3,h5
+      integer pid(mxpart)
       double precision p(mxpart,4),msq(fn:nf,fn:nf),temp(fn:nf,fn:nf),
      & tempw(fn:nf,fn:nf),stat,spinavge,mult
       double complex zab(mxpart,4,mxpart),zba(mxpart,4,mxpart),cdotpr,
@@ -748,6 +749,16 @@ c--- qbar-q extra pieces
    77 format(' *      W-mass^2     (',f11.5,',',f11.5,')      *')
    78 format(' *      Z-mass^2     (',f11.5,',',f11.5,')      *')
    79 format(' *  sin^2(theta_w)   (',f11.5,',',f11.5,')      *')
+
+      end
+
+      subroutine qq_ZZqq(p,msq)
+      implicit none
+      include 'constants.f'
+      double precision p(mxpart,4),msq(fn:nf,fn:nf)
+      integer pid(mxpart)
+
+      call qq_ZZqq_perpart(p,pid,msq)
 
       end
 
