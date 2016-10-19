@@ -11,6 +11,7 @@ c---- NOTE: Please add new future couplings in the same order for both declarati
 
 
       integer AllowAnomalousCouplings,distinguish_HWWcouplings
+      integer usePointlikeggh
 
       integer AnomalCouplPR
       integer AnomalCouplDK
@@ -89,6 +90,9 @@ c---- NOTE: Please add new future couplings in the same order for both declarati
       double complex gh2w1_prime5,gh2w2_prime5,gh2w3_prime5,gh2w4_prime5
       double complex gh2w1_prime6,gh2w2_prime6,gh2w3_prime6,gh2w4_prime6
       double complex gh2w1_prime7,gh2w2_prime7,gh2w3_prime7,gh2w4_prime7
+      
+      double precision gh2g2_4gen_top,gh2g2_4gen_bot
+      double precision mb_4gen,mt_4gen
 
       common/spinzerohiggs_anomcoupl/
      & AllowAnomalousCouplings,
@@ -155,4 +159,5 @@ c---- NOTE: Please add new future couplings in the same order for both declarati
      & gh2w1_prime4,gh2w2_prime4,gh2w3_prime4,gh2w4_prime4,
      & gh2w1_prime5,gh2w2_prime5,gh2w3_prime5,gh2w4_prime5,
      & gh2w1_prime6,gh2w2_prime6,gh2w3_prime6,gh2w4_prime6,
-     & gh2w1_prime7,gh2w2_prime7,gh2w3_prime7,gh2w4_prime7
+     & gh2w1_prime7,gh2w2_prime7,gh2w3_prime7,gh2w4_prime7,
+     & gh2g2_4gen_top,gh2g2_4gen_bot,mb_4gen,mt_4gen

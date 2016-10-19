@@ -62,8 +62,42 @@ c--- Amplitudes for production
 c------ top quark in the loop
       ggHmt(2,2)=mt2*(2d0-s(1,2)*C0mt*(1d0-4d0*mt2/s(1,2)))
      & /(2d0*wmass*sinthw)
+
+     
+c------ MARKUS new code: the approximation for the above ggHmt in the limit mt-->infinity is:
+!       ggHmt(2,2)=s(1,2)/3d0/(2d0*wmass*sinthw)
+     
+     
+c------ MARKUS comment: below this is the multiplication with -ep_glu1(mu)*ep_glu2(nu) * g_{mu,nu}
       ggHmt(1,1)=ggHmt(2,2)*za(1,2)/zb(1,2)
       ggHmt(2,2)=ggHmt(2,2)*zb(1,2)/za(1,2)
+      
+      
+      
+      
+      
+! c_________________________________________________________________
+!       print *, ""
+!       print *, dsqrt(dabs(s(1,2)))
+!       print *, "orig ggHmt(2,2)",ggHmt(2,2)
+!       print *, ""
+! 
+!       mt2=(mt*1000d0)**2 
+! c--- Amplitudes for production 
+!       C0mt=qlI3(zip,zip,s(1,2),mt2,mt2,mt2,musq,0)
+!       C0mb=qlI3(zip,zip,s(1,2),mb2,mb2,mb2,musq,0)
+!    
+! c------ top quark in the loop
+!       ggHmt(2,2)=mt2*(2d0-s(1,2)*C0mt*(1d0-4d0*mt2/s(1,2)))
+!      & /(2d0*wmass*sinthw)
+!     
+!       print *, "resc ggHmt(2,2)",ggHmt(2,2)
+!       print *, "resc approx    ",s(1,2)/(6d0*wmass*sinthw)
+!       print *, "ratio    ",ggHmt(2,2)
+!      &          /(s(1,2)/(6d0*wmass*sinthw))
+!          pause
+! c_________________________________________________________________
+
 
 c------ bottom quark in the loop
       ggHmb(2,2)=mb2*(2d0-s(1,2)*C0mb*(1d0-4d0*mb2/s(1,2)))
@@ -120,7 +154,7 @@ c--- Rescale for width study
       include 'anom_higgs.f' 
       include 'spinzerohiggs_anomcoupl.f'
       integer h1,h34,h56
-      double precision p(mxpart,4),mb2,mt2
+      double precision p(mxpart,4),mb2,mt2,mbX2,mtX2
       double complex Mloop_bquark(2,2,2,2),Mloop_tquark(2,2,2,2),
      & ggHmt(2,2),ggHmb(2,2),qlI3,C0mt,C0mb,prop12,prop34,prop56,
      & H4l(2,2),sinthw,higgs2prop
@@ -158,14 +192,56 @@ c--- Amplitudes for production
       C0mb=qlI3(zip,zip,s(1,2),mb2,mb2,mb2,musq,0)
    
 c------ top quark in the loop
-      ggHmt(2,2)=mt2*(2d0-s(1,2)*C0mt*(1d0-4d0*mt2/s(1,2)))
-     & /(2d0*wmass*sinthw)
-      ggHmt(1,1)=ggHmt(2,2)*za(1,2)/zb(1,2)
-      ggHmt(2,2)=ggHmt(2,2)*zb(1,2)/za(1,2)
-
+      if( usePointlikeggh.eq.1 ) then
+         ggHmt(2,2)=mt2*(2d0-s(1,2)*C0mt*(1d0-4d0*mt2/s(1,2)))
+     &    /(2d0*wmass*sinthw)
+      else
+         ggHmt(2,2)=s(1,2)/3d0/(2d0*wmass*sinthw)           
+      endif
+          
+c------ MARKUS: adding 4th generation top          
+      if( gh2g2_4gen_top.ne.0d0 ) then 
+        if( usePointlikeggh.eq.1 ) then
+            ggHmt(2,2)=ggHmt(2,2) + gh2g2_4gen_top *
+     &        s(1,2)/3d0/(2d0*wmass*sinthw)             
+        else
+            mtX2=mt_4gen**2     
+            C0mt=qlI3(zip,zip,s(1,2),mtX2,mtX2,mtX2,musq,0)
+            ggHmt(2,2)=ggHmt(2,2) + gh2g2_4gen_top * 
+     &        mtX2*(2d0-s(1,2)*C0mt*(1d0-4d0*mtX2/s(1,2)))
+     &        /(2d0*wmass*sinthw)
+        endif   
+      endif
+          
+          
+          
+          
 c------ bottom quark in the loop
-      ggHmb(2,2)=mb2*(2d0-s(1,2)*C0mb*(1d0-4d0*mb2/s(1,2)))
-     & /(2d0*wmass*sinthw)
+      if( usePointlikeggh.eq.1 ) then
+         ggHmb(2,2)=mb2*(2d0-s(1,2)*C0mb*(1d0-4d0*mb2/s(1,2)))
+     &    /(2d0*wmass*sinthw)
+      else
+         ggHmb(2,2)=s(1,2)/3d0/(2d0*wmass*sinthw)                 
+      endif
+
+c------ MARKUS: adding 4th generation bot          
+      if( gh2g2_4gen_bot.ne.0d0 ) then 
+        if( usePointlikeggh.eq.1 ) then      
+            ggHmb(2,2)=ggHmb(2,2) + gh2g2_4gen_bot *
+     &        s(1,2)/3d0/(2d0*wmass*sinthw)                     
+        else
+            mbX2=mb_4gen**2
+            C0mb=qlI3(zip,zip,s(1,2),mbX2,mbX2,mbX2,musq,0)      
+            ggHmb(2,2)=ggHmb(2,2) + gh2g2_4gen_bot * 
+     &      mbX2*(2d0-s(1,2)*C0mb*(1d0-4d0*mbX2/s(1,2)))
+     &   /(2d0*wmass*sinthw)
+        endif
+      endif
+     
+     
+c------ MARKUS comment: below this is the multiplication with -ep_glu1(mu)*ep_glu2(nu) * g_{mu,nu}
+      ggHmt(1,1)=ggHmt(2,2)*za(1,2)/zb(1,2)
+      ggHmt(2,2)=ggHmt(2,2)*zb(1,2)/za(1,2)     
       ggHmb(1,1)=ggHmb(2,2)*za(1,2)/zb(1,2)
       ggHmb(2,2)=ggHmb(2,2)*zb(1,2)/za(1,2)
 
