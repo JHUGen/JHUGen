@@ -11,7 +11,6 @@ c---- NOTE: Please add new future couplings in the same order for both declarati
 
 
       integer AllowAnomalousCouplings,distinguish_HWWcouplings
-      integer usePointlikeggh
 
       integer AnomalCouplPR
       integer AnomalCouplDK
@@ -91,8 +90,22 @@ c---- NOTE: Please add new future couplings in the same order for both declarati
       double complex gh2w1_prime6,gh2w2_prime6,gh2w3_prime6,gh2w4_prime6
       double complex gh2w1_prime7,gh2w2_prime7,gh2w3_prime7,gh2w4_prime7
       
-      double precision gh2g2_4gen_top,gh2g2_4gen_bot
       double precision mb_4gen,mt_4gen
+
+      double precision kappa_top,kappa_tilde_top
+      double precision kappa_bot,kappa_tilde_bot
+      double precision kappa_4gen_top,kappa_tilde_4gen_top
+      double precision kappa_4gen_bot,kappa_tilde_4gen_bot
+      double precision ghg2,ghg3,ghg4
+      double precision ghg2_4gen,ghg3_4gen,ghg4_4gen
+      
+      double precision kappa2_top,kappa2_tilde_top
+      double precision kappa2_bot,kappa2_tilde_bot
+      double precision kappa2_4gen_top,kappa2_tilde_4gen_top
+      double precision kappa2_4gen_bot,kappa2_tilde_4gen_bot
+      double precision gh2g2,gh2g3,gh2g4
+      double precision gh2g2_4gen,gh2g3_4gen,gh2g4_4gen
+
 
       common/spinzerohiggs_anomcoupl/
      & AllowAnomalousCouplings,
@@ -160,4 +173,16 @@ c---- NOTE: Please add new future couplings in the same order for both declarati
      & gh2w1_prime5,gh2w2_prime5,gh2w3_prime5,gh2w4_prime5,
      & gh2w1_prime6,gh2w2_prime6,gh2w3_prime6,gh2w4_prime6,
      & gh2w1_prime7,gh2w2_prime7,gh2w3_prime7,gh2w4_prime7,
-     & gh2g2_4gen_top,gh2g2_4gen_bot,mb_4gen,mt_4gen
+     & mb_4gen,mt_4gen,
+     & kappa_top,kappa_tilde_top,
+     & kappa_bot,kappa_tilde_bot,
+     & kappa_4gen_top,kappa_tilde_4gen_top,
+     & kappa_4gen_bot,kappa_tilde_4gen_bot,
+     & ghg2,ghg3,ghg4,
+     & ghg2_4gen,ghg3_4gen,ghg4_4gen,
+     & kappa2_top,kappa2_tilde_top,
+     & kappa2_bot,kappa2_tilde_bot,
+     & kappa2_4gen_top,kappa2_tilde_4gen_top,
+     & kappa2_4gen_bot,kappa2_tilde_4gen_bot,
+     & gh2g2,gh2g3,gh2g4,
+     & gh2g2_4gen,gh2g3_4gen,gh2g4_4gen

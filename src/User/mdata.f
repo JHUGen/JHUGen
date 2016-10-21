@@ -294,6 +294,38 @@ c      data gh2w4_prime4 / (0d0,0d0) /
 c      data gh2w4_prime5 / (0d0,0d0) /
 c      data gh2w4_prime6 / (0d0,0d0) /
 c      data gh2w4_prime7 / (0d0,0d0) /
+     
+c      data mt_4gen / 10000d0 /
+c      data mb_4gen / 10000d0 /
+c      data kappa_top / (1d0,0d0) /
+c      data kappa_tilde_top / (0d0,0d0) /
+c      data kappa_bot / (1d0,0d0) /
+c      data kappa_tilde_bot / (0d0,0d0) /
+c      data kappa_4gen_top / (0d0,0d0) /
+c      data kappa_tilde_4gen_top / (0d0,0d0) /
+c      data kappa_4gen_bot / (0d0,0d0) /
+c      data kappa_tilde_4gen_bot / (0d0,0d0) /
+c      data ghg2 / (0d0,0d0) /
+c      data ghg3 / (0d0,0d0) /
+c      data ghg4 / (0d0,0d0) /
+c      data ghg2_4gen / (0d0,0d0) /
+c      data ghg3_4gen / (0d0,0d0) /
+c      data ghg4_4gen / (0d0,0d0) /
+c      data kappa2_top / (0d0,0d0) /
+c      data kappa2_tilde_top / (0d0,0d0) /
+c      data kappa2_bot / (0d0,0d0) /
+c      data kappa2_tilde_bot / (0d0,0d0) /
+c      data kappa2_4gen_top / (0d0,0d0) /
+c      data kappa2_tilde_4gen_top / (0d0,0d0) /
+c      data kappa2_4gen_bot / (0d0,0d0) /
+c      data kappa2_tilde_4gen_bot / (0d0,0d0) /
+c      data gh2g2 / (0d0,0d0) /
+c      data gh2g3 / (0d0,0d0) /
+c      data gh2g4 / (0d0,0d0) /
+c      data gh2g2_4gen / (0d0,0d0) /
+c      data gh2g3_4gen / (0d0,0d0) /
+c      data gh2g4_4gen / (0d0,0d0) /
+
 
 c#endif
 
