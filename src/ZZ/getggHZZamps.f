@@ -23,12 +23,13 @@ c---
       include 'anom_higgs.f' 
       include 'spinzerohiggs_anomcoupl.f'
       integer h1,h34,h56
-      double precision p(mxpart,4),mb2,mt2
+      double precision p(mxpart,4),mb2,mt2,mtX2,mbX2
       double complex Mloop_bquark(2,2,2,2),Mloop_tquark(2,2,2,2),
      & ggHmt(2,2),ggHmb(2,2),qlI3,C0mt,C0mb,prop12,prop34,prop56,
-     & H4l(2,2),sinthw,higgsprop
+     & H4l(2,2),sinthw,higgsprop,B0a,B0b,qlI2
       double precision rescale 
       double complex anomhzzamp
+      double complex a1,a3,a1_4gen,a3_4gen,C0mXt,C0mXb
 
 !==== for width studies rescale by appropriate factor 
       if((keep_smhiggs_norm).and.(anom_higgs)) then 
@@ -47,6 +48,8 @@ c---
 c--- squared masses and sin(thetaw)     
       mt2=mt**2
       mb2=mb**2
+      mtX2=mt_4gen**2     
+      mbX2=mb_4gen**2  
       sinthw=dsqrt(xw)
       
       
@@ -58,19 +61,129 @@ c--- propagator factors
 c--- Amplitudes for production 
       C0mt=qlI3(zip,zip,s(1,2),mt2,mt2,mt2,musq,0)
       C0mb=qlI3(zip,zip,s(1,2),mb2,mb2,mb2,musq,0)
-   
-c------ top quark in the loop
-      ggHmt(2,2)=mt2*(2d0-s(1,2)*C0mt*(1d0-4d0*mt2/s(1,2)))
-     & /(2d0*wmass*sinthw)
+      C0mXt=qlI3(zip,zip,s(1,2),mtX2,mtX2,mtX2,musq,0)
+      C0mXb=qlI3(zip,zip,s(1,2),mbX2,mbX2,mbX2,musq,0)       
 
+      
+c    Couplings for point-like interactions
+      a1 = ghg2+ghg3*s(1,2)/4d0/LambdaBSM**2
+      a3 = -2d0*ghg4
+      a1_4gen= ghg2_4gen+ghg3_4gen*s(1,2)/4d0/LambdaBSM**2
+      a3_4gen= -2d0*ghg4_4gen      
+      
+      
+c------ top-flavor quarks
+c        SM top
+c        kappa couplings (quark loop interaction)
+         ggHmt(2,2)=mt2/(2d0*wmass*sinthw)*
+     &   (-s(1,2)*C0mt*kappa_top*(1d0-4d0*mt2/s(1,2)) 
+     &   +2d0*kappa_top-kappa_tilde_top )*zb(1,2)/za(1,2)
      
+c        ghg couplings (point-like interaction)         
+         ggHmt(2,2)=ggHmt(2,2) + 
+     &              s(1,2)/3d0/(2d0*wmass*sinthw)*
+     &   (a1*zb(1,2)/za(1,2)+a3*0.5d0*zb(1,2)**2)
+     
+c        4th generation top
+c        kappa couplings (quark loop interaction)     
+         ggHmt(2,2)=ggHmt(2,2) + 
+     &              mtX2/(2d0*wmass*sinthw)*
+     &   (-s(1,2)*C0mXt*kappa_4gen_top*(1d0-4d0*mtX2/s(1,2)) 
+     &   +2d0*kappa_4gen_top-kappa_tilde_4gen_top )*zb(1,2)/za(1,2)
+
+c        ghg couplings (point-like interaction)         
+         ggHmt(2,2)=ggHmt(2,2) + 
+     &              s(1,2)/3d0/(2d0*wmass*sinthw)*
+     &   (a1_4gen*zb(1,2)/za(1,2)+a3_4gen*0.5d0*zb(1,2)**2)
+     
+     
+c        same as above for other helicity         
+         ggHmt(1,1)=mt2/(2d0*wmass*sinthw)*
+     &   (-s(1,2)*C0mt*kappa_top*(1d0-4d0*mt2/s(1,2)) 
+     &    +2d0*kappa_top+kappa_tilde_top )*za(1,2)/zb(1,2)
+
+         ggHmt(1,1)=ggHmt(1,1) + 
+     &              s(1,2)/3d0/(2d0*wmass*sinthw)*
+     &   (a1*za(1,2)/zb(1,2)-a3*0.5d0*za(1,2)**2)     
+     
+         ggHmt(1,1)=ggHmt(1,1) + 
+     &              mtX2/(2d0*wmass*sinthw)*
+     &   (-s(1,2)*C0mXt*kappa_4gen_top*(1d0-4d0*mtX2/s(1,2)) 
+     &    +2d0*kappa_4gen_top+kappa_tilde_4gen_top )*za(1,2)/zb(1,2)
+         
+         ggHmt(1,1)=ggHmt(1,1) + 
+     &             s(1,2)/3d0/(2d0*wmass*sinthw)*
+     &   (a1_4gen*zb(1,2)/za(1,2)+a3_4gen*0.5d0*zb(1,2)**2)     
+     
+     
+     
+      
+      
+      
+c------ bot-flavor quarks
+c        SM bot
+c        kappa couplings (quark loop interaction)
+         ggHmb(2,2)=mb2/(2d0*wmass*sinthw)*
+     &   (-s(1,2)*C0mb*kappa_bot*(1d0-4d0*mb2/s(1,2)) 
+     &   +2d0*kappa_bot-kappa_tilde_bot )*zb(1,2)/za(1,2)
+
+c        ghg couplings (point-like interaction)         
+         ggHmb(2,2)=ggHmb(2,2) + 
+     &              s(1,2)/3d0/(2d0*wmass*sinthw)*
+     &   (a1*zb(1,2)/za(1,2)+a3*0.5d0*zb(1,2)**2)     
+     
+c        4th generation bot
+c        kappa couplings (quark loop interaction)      
+         ggHmb(2,2)=ggHmb(2,2) + 
+     &              mbX2/(2d0*wmass*sinthw)*
+     &   (-s(1,2)*C0mXb*kappa_4gen_bot*(1d0-4d0*mbX2/s(1,2)) 
+     &   +2d0*kappa_4gen_bot-kappa_tilde_4gen_bot )*zb(1,2)/za(1,2)
+         
+c        ghg couplings (point-like interaction)         
+         ggHmb(2,2)=ggHmb(2,2) + 
+     &              s(1,2)/3d0/(2d0*wmass*sinthw)*
+     &   (a1_4gen*zb(1,2)/za(1,2)+a3_4gen*0.5d0*zb(1,2)**2) 
+     
+     
+         
+c        same as above for other helicity             
+         ggHmb(1,1)=mb2/(2d0*wmass*sinthw)*
+     &   (-s(1,2)*C0mb*kappa_bot*(1d0-4d0*mb2/s(1,2)) 
+     &    +2d0*kappa_bot+kappa_tilde_bot )*za(1,2)/zb(1,2)
+
+         ggHmb(1,1)=ggHmb(1,1) + 
+     &              s(1,2)/3d0/(2d0*wmass*sinthw)*
+     &   (a1*za(1,2)/zb(1,2)-a3*0.5d0*za(1,2)**2)        
+     
+         ggHmb(1,1)=ggHmb(1,1) + 
+     &              mbX2/(2d0*wmass*sinthw)*
+     &   (-s(1,2)*C0mXb*kappa_4gen_bot*(1d0-4d0*mbX2/s(1,2)) 
+     &    +2d0*kappa_4gen_bot+kappa_tilde_4gen_bot )*za(1,2)/zb(1,2)
+         
+         ggHmb(1,1)=ggHmb(1,1) + 
+     &              s(1,2)/3d0/(2d0*wmass*sinthw)*
+     &   (a1_4gen*za(1,2)/zb(1,2)-a3_4gen*0.5d0*za(1,2)**2)           
+     
+   
+   
+   
+   
+   
+   
+   
+   
+   
+! c------ top quark in the loop
+!       ggHmt(2,2)=mt2*(2d0-s(1,2)*C0mt*(1d0-4d0*mt2/s(1,2)))
+!      & /(2d0*wmass*sinthw)
+
 c------ MARKUS new code: the approximation for the above ggHmt in the limit mt-->infinity is:
 !       ggHmt(2,2)=s(1,2)/3d0/(2d0*wmass*sinthw)
      
      
-c------ MARKUS comment: below this is the multiplication with -ep_glu1(mu)*ep_glu2(nu) * g_{mu,nu}
-      ggHmt(1,1)=ggHmt(2,2)*za(1,2)/zb(1,2)
-      ggHmt(2,2)=ggHmt(2,2)*zb(1,2)/za(1,2)
+! c------ MARKUS comment: below this is the multiplication with -ep_glu1(mu)*ep_glu2(nu) * g_{mu,nu}
+!       ggHmt(1,1)=ggHmt(2,2)*za(1,2)/zb(1,2)
+!       ggHmt(2,2)=ggHmt(2,2)*zb(1,2)/za(1,2)
       
       
       
@@ -99,11 +212,11 @@ c------ MARKUS comment: below this is the multiplication with -ep_glu1(mu)*ep_gl
 ! c_________________________________________________________________
 
 
-c------ bottom quark in the loop
-      ggHmb(2,2)=mb2*(2d0-s(1,2)*C0mb*(1d0-4d0*mb2/s(1,2)))
-     & /(2d0*wmass*sinthw)
-      ggHmb(1,1)=ggHmb(2,2)*za(1,2)/zb(1,2)
-      ggHmb(2,2)=ggHmb(2,2)*zb(1,2)/za(1,2)
+! c------ bottom quark in the loop
+!       ggHmb(2,2)=mb2*(2d0-s(1,2)*C0mb*(1d0-4d0*mb2/s(1,2)))
+!      & /(2d0*wmass*sinthw)
+!       ggHmb(1,1)=ggHmb(2,2)*za(1,2)/zb(1,2)
+!       ggHmb(2,2)=ggHmb(2,2)*zb(1,2)/za(1,2)
 
 
       H4l(1,1)=anomhzzamp(3,4,5,6,1,s(1,2),s(3,4),s(5,6),za,zb)*l1*l2
@@ -141,6 +254,25 @@ c--- Rescale for width study
       return
       end
       
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
 
       subroutine getggH2ZZamps(p,Mloop_bquark,Mloop_tquark)
       implicit none
@@ -160,6 +292,7 @@ c--- Rescale for width study
      & H4l(2,2),sinthw,higgs2prop
       double precision rescale 
       double complex anomhzzamp
+      double complex a1,a3,a1_4gen,a3_4gen,C0mXt,C0mXb
 
 !==== for width studies rescale by appropriate factor 
       if((keep_smhiggs_norm).and.(anom_higgs)) then 
@@ -179,6 +312,8 @@ c--- Rescale for width study
 c--- squared masses and sin(thetaw)     
       mt2=mt**2
       mb2=mb**2
+      mtX2=mt_4gen**2     
+      mbX2=mb_4gen**2     
       sinthw=dsqrt(xw)
       
       
@@ -188,62 +323,114 @@ c--- propagator factors
       prop56=cone/dcmplx(s(5,6)-zmass**2,zmass*zwidth)
 
 c--- Amplitudes for production 
-      C0mt=qlI3(zip,zip,s(1,2),mt2,mt2,mt2,musq,0)
-      C0mb=qlI3(zip,zip,s(1,2),mb2,mb2,mb2,musq,0)
-   
-c------ top quark in the loop
-      if( usePointlikeggh.eq.1 ) then
-         ggHmt(2,2)=mt2*(2d0-s(1,2)*C0mt*(1d0-4d0*mt2/s(1,2)))
-     &    /(2d0*wmass*sinthw)
-      else
-         ggHmt(2,2)=s(1,2)/3d0/(2d0*wmass*sinthw)           
-      endif
-          
-c------ MARKUS: adding 4th generation top          
-      if( gh2g2_4gen_top.ne.0d0 ) then 
-        if( usePointlikeggh.eq.1 ) then
-            ggHmt(2,2)=ggHmt(2,2) + gh2g2_4gen_top *
-     &        s(1,2)/3d0/(2d0*wmass*sinthw)             
-        else
-            mtX2=mt_4gen**2     
-            C0mt=qlI3(zip,zip,s(1,2),mtX2,mtX2,mtX2,musq,0)
-            ggHmt(2,2)=ggHmt(2,2) + gh2g2_4gen_top * 
-     &        mtX2*(2d0-s(1,2)*C0mt*(1d0-4d0*mtX2/s(1,2)))
-     &        /(2d0*wmass*sinthw)
-        endif   
-      endif
-          
-          
-          
-          
-c------ bottom quark in the loop
-      if( usePointlikeggh.eq.1 ) then
-         ggHmb(2,2)=mb2*(2d0-s(1,2)*C0mb*(1d0-4d0*mb2/s(1,2)))
-     &    /(2d0*wmass*sinthw)
-      else
-         ggHmb(2,2)=s(1,2)/3d0/(2d0*wmass*sinthw)                 
-      endif
+      C0mt =qlI3(zip,zip,s(1,2),mt2, mt2, mt2, musq,0)
+      C0mb =qlI3(zip,zip,s(1,2),mb2, mb2, mb2, musq,0)
+      C0mXt=qlI3(zip,zip,s(1,2),mtX2,mtX2,mtX2,musq,0)
+      C0mXb=qlI3(zip,zip,s(1,2),mbX2,mbX2,mbX2,musq,0)       
 
-c------ MARKUS: adding 4th generation bot          
-      if( gh2g2_4gen_bot.ne.0d0 ) then 
-        if( usePointlikeggh.eq.1 ) then      
-            ggHmb(2,2)=ggHmb(2,2) + gh2g2_4gen_bot *
-     &        s(1,2)/3d0/(2d0*wmass*sinthw)                     
-        else
-            mbX2=mb_4gen**2
-            C0mb=qlI3(zip,zip,s(1,2),mbX2,mbX2,mbX2,musq,0)      
-            ggHmb(2,2)=ggHmb(2,2) + gh2g2_4gen_bot * 
-     &      mbX2*(2d0-s(1,2)*C0mb*(1d0-4d0*mbX2/s(1,2)))
-     &   /(2d0*wmass*sinthw)
-        endif
-      endif
+      
+c    Couplings for point-like interactions
+      a1 = gh2g2+gh2g3*s(1,2)/4d0/LambdaBSM**2
+      a3 = -2d0*gh2g4
+      a1_4gen= gh2g2_4gen+gh2g3_4gen*s(1,2)/4d0/LambdaBSM**2
+      a3_4gen= -2d0*gh2g4_4gen      
+      
+      
+c------ top-flavor quarks
+c        SM top
+c        kappa2 couplings (quark loop interaction)
+         ggHmt(2,2)=mt2/(2d0*wmass*sinthw)*
+     &   (-s(1,2)*C0mt*kappa2_top*(1d0-4d0*mt2/s(1,2)) 
+     &   +2d0*kappa2_top-kappa2_tilde_top )*zb(1,2)/za(1,2)
+     
+c        ghg couplings (point-like interaction)         
+         ggHmt(2,2)=ggHmt(2,2) + 
+     &              s(1,2)/3d0/(2d0*wmass*sinthw)*
+     &   (a1*zb(1,2)/za(1,2)+a3*0.5d0*zb(1,2)**2)
+     
+c        4th generation top
+c        kappa2 couplings (quark loop interaction)     
+         ggHmt(2,2)=ggHmt(2,2) + 
+     &              mtX2/(2d0*wmass*sinthw)*
+     &   (-s(1,2)*C0mXt*kappa2_4gen_top*(1d0-4d0*mtX2/s(1,2)) 
+     &   +2d0*kappa2_4gen_top-kappa2_tilde_4gen_top )*zb(1,2)/za(1,2)
+
+c        ghg couplings (point-like interaction)         
+         ggHmt(2,2)=ggHmt(2,2) + 
+     &              s(1,2)/3d0/(2d0*wmass*sinthw)*
+     &   (a1_4gen*zb(1,2)/za(1,2)+a3_4gen*0.5d0*zb(1,2)**2)
      
      
-c------ MARKUS comment: below this is the multiplication with -ep_glu1(mu)*ep_glu2(nu) * g_{mu,nu}
-      ggHmt(1,1)=ggHmt(2,2)*za(1,2)/zb(1,2)
-      ggHmt(2,2)=ggHmt(2,2)*zb(1,2)/za(1,2)     
-      ggHmb(1,1)=ggHmb(2,2)*za(1,2)/zb(1,2)
-      ggHmb(2,2)=ggHmb(2,2)*zb(1,2)/za(1,2)
+c        same as above for other helicity         
+         ggHmt(1,1)=mt2/(2d0*wmass*sinthw)*
+     &   (-s(1,2)*C0mt*kappa2_top*(1d0-4d0*mt2/s(1,2)) 
+     &    +2d0*kappa2_top+kappa2_tilde_top )*za(1,2)/zb(1,2)
+
+         ggHmt(1,1)=ggHmt(1,1) + 
+     &              s(1,2)/3d0/(2d0*wmass*sinthw)*
+     &   (a1*za(1,2)/zb(1,2)-a3*0.5d0*za(1,2)**2)     
+     
+         ggHmt(1,1)=ggHmt(1,1) + 
+     &              mtX2/(2d0*wmass*sinthw)*
+     &   (-s(1,2)*C0mXt*kappa2_4gen_top*(1d0-4d0*mtX2/s(1,2)) 
+     &    +2d0*kappa2_4gen_top+kappa2_tilde_4gen_top )*za(1,2)/zb(1,2)
+         
+         ggHmt(1,1)=ggHmt(1,1) + 
+     &             s(1,2)/3d0/(2d0*wmass*sinthw)*
+     &   (a1_4gen*zb(1,2)/za(1,2)+a3_4gen*0.5d0*zb(1,2)**2)     
+     
+     
+     
+      
+      
+      
+c------ bot-flavor quarks
+c        SM bot
+c        kappa2 couplings (quark loop interaction)
+         ggHmb(2,2)=mb2/(2d0*wmass*sinthw)*
+     &   (-s(1,2)*C0mb*kappa2_bot*(1d0-4d0*mb2/s(1,2)) 
+     &   +2d0*kappa2_bot-kappa2_tilde_bot )*zb(1,2)/za(1,2)
+
+c        ghg couplings (point-like interaction)         
+         ggHmb(2,2)=ggHmb(2,2) + 
+     &              s(1,2)/3d0/(2d0*wmass*sinthw)*
+     &   (a1*zb(1,2)/za(1,2)+a3*0.5d0*zb(1,2)**2)     
+     
+c        4th generation bot
+c        kappa2 couplings (quark loop interaction)      
+         ggHmb(2,2)=ggHmb(2,2) + 
+     &              mbX2/(2d0*wmass*sinthw)*
+     &   (-s(1,2)*C0mXb*kappa2_4gen_bot*(1d0-4d0*mbX2/s(1,2)) 
+     &   +2d0*kappa2_4gen_bot-kappa2_tilde_4gen_bot )*zb(1,2)/za(1,2)
+         
+c        ghg couplings (point-like interaction)         
+         ggHmb(2,2)=ggHmb(2,2) + 
+     &              s(1,2)/3d0/(2d0*wmass*sinthw)*
+     &   (a1_4gen*zb(1,2)/za(1,2)+a3_4gen*0.5d0*zb(1,2)**2) 
+     
+     
+         
+c        same as above for other helicity             
+         ggHmb(1,1)=mb2/(2d0*wmass*sinthw)*
+     &   (-s(1,2)*C0mb*kappa2_bot*(1d0-4d0*mb2/s(1,2)) 
+     &    +2d0*kappa2_bot+kappa2_tilde_bot )*za(1,2)/zb(1,2)
+
+         ggHmb(1,1)=ggHmb(1,1) + 
+     &              s(1,2)/3d0/(2d0*wmass*sinthw)*
+     &   (a1*za(1,2)/zb(1,2)-a3*0.5d0*za(1,2)**2)        
+     
+         ggHmb(1,1)=ggHmb(1,1) + 
+     &              mbX2/(2d0*wmass*sinthw)*
+     &   (-s(1,2)*C0mXb*kappa2_4gen_bot*(1d0-4d0*mbX2/s(1,2)) 
+     &    +2d0*kappa2_4gen_bot+kappa2_tilde_4gen_bot )*za(1,2)/zb(1,2)
+         
+         ggHmb(1,1)=ggHmb(1,1) + 
+     &              s(1,2)/3d0/(2d0*wmass*sinthw)*
+     &   (a1_4gen*za(1,2)/zb(1,2)-a3_4gen*0.5d0*za(1,2)**2)           
+     
+
+
+
 
 
       H4l(1,1)=anomhzzamp(3,4,5,6,2,s(1,2),s(3,4),s(5,6),za,zb)*l1*l2
