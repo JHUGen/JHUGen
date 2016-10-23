@@ -48,8 +48,6 @@ c---
 c--- squared masses and sin(thetaw)
       mt2=mt**2
       mb2=mb**2
-      mtX2=mt_4gen**2
-      mbX2=mb_4gen**2
       sinthw=dsqrt(xw)
 
 
@@ -61,9 +59,14 @@ c--- propagator factors
 c--- Amplitudes for production
       C0mt=qlI3(zip,zip,s(1,2),mt2,mt2,mt2,musq,0)
       C0mb=qlI3(zip,zip,s(1,2),mb2,mb2,mb2,musq,0)
+
+
+      IF( AllowAnomalousCouplings.eq.1 ) THEN
+
+      mtX2=mt_4gen**2
+      mbX2=mb_4gen**2
       C0mtX=qlI3(zip,zip,s(1,2),mtX2,mtX2,mtX2,musq,0)
       C0mbX=qlI3(zip,zip,s(1,2),mbX2,mbX2,mbX2,musq,0)
-
 
 c    Couplings for point-like interactions
       a1 = ghg2+ghg3*s(1,2)/4d0/LambdaBSM**2
@@ -117,9 +120,6 @@ c        same as above for other helicity
 
 
 
-
-
-
 c------ bot-flavor quarks
 c        SM bot
 c        kappa couplings (quark loop interaction)
@@ -165,9 +165,19 @@ c        same as above for other helicity
      &   (a1_4gen*za(1,2)/zb(1,2)-a3_4gen*0.5d0*za(1,2)**2)
 
 
+      ELSE
 
+      ggHmt(2,2)=mt2*(2d0-s(1,2)*C0mt*(1d0-4d0*mt2/s(1,2)))
+     & /(2d0*wmass*sinthw)
+      ggHmt(1,1)=ggHmt(2,2)*za(1,2)/zb(1,2)
+      ggHmt(2,2)=ggHmt(2,2)*zb(1,2)/za(1,2)
 
+      ggHmb(2,2)=mb2*(2d0-s(1,2)*C0mb*(1d0-4d0*mb2/s(1,2)))
+     & /(2d0*wmass*sinthw)
+      ggHmb(1,1)=ggHmb(2,2)*za(1,2)/zb(1,2)
+      ggHmb(2,2)=ggHmb(2,2)*zb(1,2)/za(1,2)
 
+      ENDIF
 
 
 
@@ -258,22 +268,6 @@ c--- Rescale for width study
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
       subroutine getggH2ZZamps(p,Mloop_bquark,Mloop_tquark)
       implicit none
       include 'constants.f'
@@ -312,8 +306,6 @@ c--- Rescale for width study
 c--- squared masses and sin(thetaw)
       mt2=mt**2
       mb2=mb**2
-      mtX2=mt_4gen**2
-      mbX2=mb_4gen**2
       sinthw=dsqrt(xw)
 
 
@@ -325,9 +317,14 @@ c--- propagator factors
 c--- Amplitudes for production
       C0mt =qlI3(zip,zip,s(1,2),mt2, mt2, mt2, musq,0)
       C0mb =qlI3(zip,zip,s(1,2),mb2, mb2, mb2, musq,0)
+
+
+      IF( AllowAnomalousCouplings.eq.1 ) THEN
+
+      mtX2=mt_4gen**2
+      mbX2=mb_4gen**2
       C0mtX=qlI3(zip,zip,s(1,2),mtX2,mtX2,mtX2,musq,0)
       C0mbX=qlI3(zip,zip,s(1,2),mbX2,mbX2,mbX2,musq,0)
-
 
 c    Couplings for point-like interactions
       a1 = gh2g2+gh2g3*s(1,2)/4d0/Lambda2BSM**2
@@ -381,9 +378,6 @@ c        same as above for other helicity
 
 
 
-
-
-
 c------ bot-flavor quarks
 c        SM bot
 c        kappa2 couplings (quark loop interaction)
@@ -428,7 +422,19 @@ c        same as above for other helicity
      &              s(1,2)/3d0/(2d0*wmass*sinthw)*
      &   (a1_4gen*za(1,2)/zb(1,2)-a3_4gen*0.5d0*za(1,2)**2)
 
+      ELSE
 
+      ggHmt(2,2)=mt2*(2d0-s(1,2)*C0mt*(1d0-4d0*mt2/s(1,2)))
+     & /(2d0*wmass*sinthw)
+      ggHmt(1,1)=ggHmt(2,2)*za(1,2)/zb(1,2)
+      ggHmt(2,2)=ggHmt(2,2)*zb(1,2)/za(1,2)
+
+      ggHmb(2,2)=mb2*(2d0-s(1,2)*C0mb*(1d0-4d0*mb2/s(1,2)))
+     & /(2d0*wmass*sinthw)
+      ggHmb(1,1)=ggHmb(2,2)*za(1,2)/zb(1,2)
+      ggHmb(2,2)=ggHmb(2,2)*zb(1,2)/za(1,2)
+
+      ENDIF
 
 
 
