@@ -16,17 +16,37 @@ machine:
     MANPATH: "$(echo $HOME/JHUGen/JHUGenerator/root/man:$MANPATH | sed s/:$//)"
     LHAPDF_DATA_PATH: "/home/ubuntu/LHAPDF-6.1.6/share/LHAPDF"
 
+    ROOT_VERSIONPART1: "6"
+    ROOT_VERSIONPART2: "04"
+    ROOT_VERSIONPART3: "08"
+    ROOT_VERSIONSTRING: "${ROOT_VERSIONPART1}.${ROOT_VERSIONPART2}/${ROOT_VERSIONPART3}"
+
 general:
   build_dir: JHUGenerator
 
 dependencies:
   override:
     - |
+      if [ -d ~/root ]; then
+        set -o pipefail &&  #exit status will be nonzero if any of echo, root, grep, sed fails
+        CURRENT_ROOT_VERSION=$(echo | root -b | grep [0-9]*[.][0-9]*/[0-9]* | sed -r "s|.*[^0-9]+([0-9]*[.][0-9]*/[0-9]*).*|\1|") &&
+        echo "$CURRENT_ROOT_VERSION" "$ROOT_VERSIONSTRING" &&
+        if [ "$CURRENT_ROOT_VERSION" != "$ROOT_VERSIONSTRING" ]; then
+          rm -rf ~/root
+        fi
+      fi
+    - |
       if ! [ -d ~/root ]; then
         cd &&
-        wget https://root.cern.ch/download/root_v6.04.08.Linux-ubuntu14-x86_64-gcc4.8.tar.gz &&
-        tar -xvzf root_v6.04.08.Linux-ubuntu14-x86_64-gcc4.8.tar.gz
+        wget https://root.cern.ch/download/root_v${ROOT_VERSIONPART1}.${ROOT_VERSIONPART2}.${ROOT_VERSIONPART3}.Linux-ubuntu14-x86_64-gcc4.8.tar.gz &&
+        tar -xvzf root_v${ROOT_VERSIONPART1}.${ROOT_VERSIONPART2}.${ROOT_VERSIONPART3}.Linux-ubuntu14-x86_64-gcc4.8.tar.gz
       fi
+    - |
+      set -o pipefail &&  #exit status will be nonzero if any of echo, root, grep, sed fails
+      CURRENT_ROOT_VERSION=$(echo | root -b | grep [0-9]*[.][0-9]*/[0-9]* | sed -r "s|.*[^0-9]+([0-9]*[.][0-9]*/[0-9]*).*|\1|") &&
+      echo "$CURRENT_ROOT_VERSION" "$ROOT_VERSIONSTRING" &&
+      [ "$CURRENT_ROOT_VERSION" == "$ROOT_VERSIONSTRING" ]
+
     - |
       cd ~ &&
       if ! [ -d CMSJHU_AnalysisMacros ]; then
