@@ -66,8 +66,8 @@ c--- special fix for Madgraph check
       propw17=s17-dcmplx(wmass**2,-wmass*wwidth)
       propw28=s28-dcmplx(wmass**2,-wmass*wwidth)
 
-      game=qe/propa3456+le*rxw/propz3456
-      gamn=ln*rxw/propz3456
+      game=q1/propa3456+l1*rxw/propz3456
+      gamn=q2/propa3456+l2*rxw/propz3456
 
       p1=i1
       p2=i2
