@@ -69,9 +69,9 @@ c--- Amplitudes for production
       C0mbX=qlI3(zip,zip,s(1,2),mbX2,mbX2,mbX2,musq,0)
 
 c    Couplings for point-like interactions
-      a1 = ghg2+ghg3*s(1,2)/4d0/LambdaBSM**2
+      a1 = s(1,2)*( ghg2+ghg3*s(1,2)/4d0/LambdaBSM**2 )
       a3 = -2d0*ghg4
-      a1_4gen= ghg2_4gen+ghg3_4gen*s(1,2)/4d0/LambdaBSM**2
+      a1_4gen=s(1,2)*(ghg2_4gen+ghg3_4gen*s(1,2)/4d0/LambdaBSM**2)
       a3_4gen= -2d0*ghg4_4gen
 
 
@@ -335,9 +335,9 @@ c--- Amplitudes for production
       C0mbX=qlI3(zip,zip,s(1,2),mbX2,mbX2,mbX2,musq,0)
 
 c    Couplings for point-like interactions
-      a1 = gh2g2+gh2g3*s(1,2)/4d0/Lambda2BSM**2
+      a1 = s(1,2)*( gh2g2+gh2g3*s(1,2)/4d0/Lambda2BSM**2 )
       a3 = -2d0*gh2g4
-      a1_4gen= gh2g2_4gen+gh2g3_4gen*s(1,2)/4d0/Lambda2BSM**2
+      a1_4gen=s(1,2)*(gh2g2_4gen+gh2g3_4gen*s(1,2)/4d0/Lambda2BSM**2)
       a3_4gen= -2d0*gh2g4_4gen
 
 
