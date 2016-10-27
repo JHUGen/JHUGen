@@ -41,10 +41,10 @@ C-----end statement functions
       propa3456=s3456
       ratxw=sqrt((cone-cxw)/cxw)
       do jdu=1,2
-      coupel(jdu,1)=Q(jdu)*qe/propa3456+L(jdu)*le/propz3456
-      coupel(jdu,2)=Q(jdu)*qe/propa3456+R(jdu)*le/propz3456
-      coupnu(jdu,1)=L(jdu)*ln/propz3456
-      coupnu(jdu,2)=R(jdu)*ln/propz3456
+      coupel(jdu,1)=Q(jdu)*q1/propa3456+L(jdu)*l1/propz3456
+      coupel(jdu,2)=Q(jdu)*q1/propa3456+R(jdu)*l1/propz3456
+      coupnu(jdu,1)=Q(jdu)*q2/propa3456+L(jdu)*l2/propz3456
+      coupnu(jdu,2)=Q(jdu)*q2/propa3456+R(jdu)*l2/propz3456
       coupw(jdu,1)=ratxw*L(jdu)/propz3456+Q(jdu)/propa3456
       coupw(jdu,2)=ratxw*R(jdu)/propz3456+Q(jdu)/propa3456
       enddo

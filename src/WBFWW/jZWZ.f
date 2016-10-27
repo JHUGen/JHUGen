@@ -31,23 +31,23 @@ C-----end statement functions
 
 c--- set up lepton couplings according to call
       if (i3 .eq. 3) then
-        q3=qe
-        l3=le
-        q4=qn
-        l4=ln
-        q5=qn
-        l5=ln
-        q6=qe
-        l6=le
+        q3=q1
+        l3=l1
+        q4=q2
+        l4=l2
+        q5=q2
+        l5=l2
+        q6=q1
+        l6=l1
       else
-        q3=qn
-        l3=ln
-        q4=qe
-        l4=le
-        q5=qe
-        l5=le
-        q6=qn
-        l6=ln
+        q3=q2
+        l3=l2
+        q4=q1
+        l4=l1
+        q5=q1
+        l5=l1
+        q6=q2
+        l6=l2
       endif
 
       propz17=s17-dcmplx(zmass**2,-zmass*zwidth)

@@ -46,15 +46,15 @@ C-----end statement functions
       propz3456=s3456-dcmplx(zmass**2,-zmass*zwidth)
 
       do jdu1=1,2
-      game3456(jdu1,1,1)=Q(jdu1)*qe/s3456+L(jdu1)*le/propZ3456
-      game3456(jdu1,1,2)=Q(jdu1)*qe/s3456+L(jdu1)*re/propZ3456
-      game3456(jdu1,2,1)=Q(jdu1)*qe/s3456+R(jdu1)*le/propZ3456
-      game3456(jdu1,2,2)=Q(jdu1)*qe/s3456+R(jdu1)*re/propZ3456
+      game3456(jdu1,1,1)=Q(jdu1)*q1/s3456+L(jdu1)*l1/propZ3456
+      game3456(jdu1,1,2)=Q(jdu1)*q1/s3456+L(jdu1)*r1/propZ3456
+      game3456(jdu1,2,1)=Q(jdu1)*q1/s3456+R(jdu1)*l1/propZ3456
+      game3456(jdu1,2,2)=Q(jdu1)*q1/s3456+R(jdu1)*r1/propZ3456
 
-      gamn3456(jdu1,1,1)=Q(jdu1)*qn/s3456+L(jdu1)*ln/propZ3456
-      gamn3456(jdu1,1,2)=Q(jdu1)*qn/s3456+L(jdu1)*rn/propZ3456
-      gamn3456(jdu1,2,1)=Q(jdu1)*qn/s3456+R(jdu1)*ln/propZ3456
-      gamn3456(jdu1,2,2)=Q(jdu1)*qn/s3456+R(jdu1)*rn/propZ3456
+      gamn3456(jdu1,1,1)=Q(jdu1)*q2/s3456+L(jdu1)*l2/propZ3456
+      gamn3456(jdu1,1,2)=Q(jdu1)*q2/s3456+L(jdu1)*r2/propZ3456
+      gamn3456(jdu1,2,1)=Q(jdu1)*q2/s3456+R(jdu1)*l2/propZ3456
+      gamn3456(jdu1,2,2)=Q(jdu1)*q2/s3456+R(jdu1)*r2/propZ3456
 
       gamV(jdu1,1)=Q(jdu1)/s3456+L(jdu1)*rxw/propZ3456
       gamV(jdu1,2)=Q(jdu1)/s3456+R(jdu1)*rxw/propZ3456

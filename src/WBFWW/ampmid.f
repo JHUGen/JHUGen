@@ -38,14 +38,14 @@ C-----end statement functions
       propz28=s(i2,i8)-dcmplx(zmass**2,-zmass*zwidth)
 
       do jdu1=1,2
-      gam17e(jdu1,1)=Q(jdu1)*qe/s(i1,i7)+L(jdu1)*le/propz17
-      gam17e(jdu1,2)=Q(jdu1)*qe/s(i1,i7)+R(jdu1)*le/propz17
-      gam17n(jdu1,1)=L(jdu1)*ln/propz17
-      gam17n(jdu1,2)=R(jdu1)*ln/propz17
-      gam28e(jdu1,1)=Q(jdu1)*qe/s(i2,i8)+L(jdu1)*le/propz28
-      gam28e(jdu1,2)=Q(jdu1)*qe/s(i2,i8)+R(jdu1)*le/propz28
-      gam28n(jdu1,1)=L(jdu1)*ln/propz28
-      gam28n(jdu1,2)=R(jdu1)*ln/propz28
+      gam17e(jdu1,1)=Q(jdu1)*q1/s(i1,i7)+L(jdu1)*l1/propz17
+      gam17e(jdu1,2)=Q(jdu1)*q1/s(i1,i7)+R(jdu1)*l1/propz17
+      gam17n(jdu1,1)=Q(jdu1)*q2/s(i1,i7)+L(jdu1)*l2/propz17
+      gam17n(jdu1,2)=Q(jdu1)*q2/s(i1,i7)+R(jdu1)*l2/propz17
+      gam28e(jdu1,1)=Q(jdu1)*q1/s(i2,i8)+L(jdu1)*l1/propz28
+      gam28e(jdu1,2)=Q(jdu1)*q1/s(i2,i8)+R(jdu1)*l1/propz28
+      gam28n(jdu1,1)=Q(jdu1)*q2/s(i2,i8)+L(jdu1)*l2/propz28
+      gam28n(jdu1,2)=Q(jdu1)*q2/s(i2,i8)+R(jdu1)*l2/propz28
       enddo
 
       p3=i3

@@ -32,15 +32,15 @@ C-----end statement functions
 
 c--- determine correct couplings from calling parameters
       if (p3 .eq. 3) then
-        q3=qe
-        l3=le
-        q4=qn
-        l4=ln
+        q3=q1
+        l3=l1
+        q4=q2
+        l4=l2
       else
-        q3=qn
-        l3=ln
-        q4=qe
-        l4=le
+        q3=q2
+        l3=l2
+        q4=q1
+        l4=l1
       endif
 
       do ro=1,4
