@@ -117,6 +117,7 @@ c--- Make sure WWZA vertices included
       ggWW(2,2)=(dcmplx(xq1/s34)+rxw*dcmplx(xr1)/prop34)
      &         *(dcmplx(xq2/s56)+rxw*dcmplx(xr2)/prop56)
 
+c--- This is WW->Z/A->f fb(->Z/A->f'fb')+WW->Z/A->fb f(->Z/A->f'fb')
       srggWW34(1,1)=(dcmplx(xq2/s3456)+rxw*dcmplx(xl2)/propz3456)
      &         *(dcmplx(xq1*xq2/s34)+dcmplx(xl2*xl1)/prop34)
       srggWW34(1,2)=(dcmplx(xq2/s3456)+rxw*dcmplx(xl2)/propz3456)
