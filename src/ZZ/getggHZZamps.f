@@ -69,9 +69,9 @@ c--- Amplitudes for production
       C0mbX=qlI3(zip,zip,s(1,2),mbX2,mbX2,mbX2,musq,0)
 
 c    Couplings for point-like interactions
-      a1 = ghg2+ghg3*s(1,2)/4d0/LambdaBSM**2
+      a1 = s(1,2)*( ghg2+ghg3*s(1,2)/4d0/LambdaBSM**2 )
       a3 = -2d0*ghg4
-      a1_4gen= ghg2_4gen+ghg3_4gen*s(1,2)/4d0/LambdaBSM**2
+      a1_4gen=s(1,2)*(ghg2_4gen+ghg3_4gen*s(1,2)/4d0/LambdaBSM**2)
       a3_4gen= -2d0*ghg4_4gen
 
 
@@ -80,7 +80,8 @@ c        SM top
 c        kappa couplings (quark loop interaction)
          ggHmt(2,2)=mt2/(2d0*wmass*sinthw)*
      &   (-s(1,2)*C0mt*kappa_top*(1d0-4d0*mt2/s(1,2))
-     &   +2d0*kappa_top-kappa_tilde_top )*zb(1,2)/za(1,2)
+     &   +2d0*kappa_top
+     &   +s(1,2)*C0mt*kappa_tilde_top )*zb(1,2)/za(1,2)
 
 c        ghg couplings (point-like interaction)
          ggHmt(2,2)=ggHmt(2,2) +
@@ -92,7 +93,8 @@ c        kappa couplings (quark loop interaction)
          ggHmt(2,2)=ggHmt(2,2) +
      &              mtX2/(2d0*wmass*sinthw)*
      &   (-s(1,2)*C0mtX*kappa_4gen_top*(1d0-4d0*mtX2/s(1,2))
-     &   +2d0*kappa_4gen_top-kappa_tilde_4gen_top )*zb(1,2)/za(1,2)
+     &   +2d0*kappa_4gen_top
+     &   +s(1,2)*C0mtX*kappa_tilde_4gen_top )*zb(1,2)/za(1,2)
 
 c        ghg couplings (point-like interaction)
          ggHmt(2,2)=ggHmt(2,2) +
@@ -103,7 +105,8 @@ c        ghg couplings (point-like interaction)
 c        same as above for other helicity
          ggHmt(1,1)=mt2/(2d0*wmass*sinthw)*
      &   (-s(1,2)*C0mt*kappa_top*(1d0-4d0*mt2/s(1,2))
-     &    +2d0*kappa_top+kappa_tilde_top )*za(1,2)/zb(1,2)
+     &    +2d0*kappa_top
+     &    -s(1,2)*C0mt*kappa_tilde_top )*za(1,2)/zb(1,2)
 
          ggHmt(1,1)=ggHmt(1,1) +
      &              s(1,2)/3d0/(2d0*wmass*sinthw)*
@@ -112,7 +115,8 @@ c        same as above for other helicity
          ggHmt(1,1)=ggHmt(1,1) +
      &              mtX2/(2d0*wmass*sinthw)*
      &   (-s(1,2)*C0mtX*kappa_4gen_top*(1d0-4d0*mtX2/s(1,2))
-     &    +2d0*kappa_4gen_top+kappa_tilde_4gen_top )*za(1,2)/zb(1,2)
+     &    +2d0*kappa_4gen_top
+     &    -s(1,2)*C0mtX*kappa_tilde_4gen_top )*za(1,2)/zb(1,2)
 
          ggHmt(1,1)=ggHmt(1,1) +
      &             s(1,2)/3d0/(2d0*wmass*sinthw)*
@@ -125,7 +129,8 @@ c        SM bot
 c        kappa couplings (quark loop interaction)
          ggHmb(2,2)=mb2/(2d0*wmass*sinthw)*
      &   (-s(1,2)*C0mb*kappa_bot*(1d0-4d0*mb2/s(1,2))
-     &   +2d0*kappa_bot-kappa_tilde_bot )*zb(1,2)/za(1,2)
+     &   +2d0*kappa_bot
+     &   +s(1,2)*C0mb*kappa_tilde_bot )*zb(1,2)/za(1,2)
 
 c        ghg couplings (point-like interaction)
          ggHmb(2,2)=ggHmb(2,2) +
@@ -137,7 +142,8 @@ c        kappa couplings (quark loop interaction)
          ggHmb(2,2)=ggHmb(2,2) +
      &              mbX2/(2d0*wmass*sinthw)*
      &   (-s(1,2)*C0mbX*kappa_4gen_bot*(1d0-4d0*mbX2/s(1,2))
-     &   +2d0*kappa_4gen_bot-kappa_tilde_4gen_bot )*zb(1,2)/za(1,2)
+     &   +2d0*kappa_4gen_bot
+     &   +s(1,2)*C0mbX*kappa_tilde_4gen_bot )*zb(1,2)/za(1,2)
 
 c        ghg couplings (point-like interaction)
          ggHmb(2,2)=ggHmb(2,2) +
@@ -149,7 +155,8 @@ c        ghg couplings (point-like interaction)
 c        same as above for other helicity
          ggHmb(1,1)=mb2/(2d0*wmass*sinthw)*
      &   (-s(1,2)*C0mb*kappa_bot*(1d0-4d0*mb2/s(1,2))
-     &    +2d0*kappa_bot+kappa_tilde_bot )*za(1,2)/zb(1,2)
+     &    +2d0*kappa_bot
+     &    -s(1,2)*C0mb*kappa_tilde_bot )*za(1,2)/zb(1,2)
 
          ggHmb(1,1)=ggHmb(1,1) +
      &              s(1,2)/3d0/(2d0*wmass*sinthw)*
@@ -158,7 +165,8 @@ c        same as above for other helicity
          ggHmb(1,1)=ggHmb(1,1) +
      &              mbX2/(2d0*wmass*sinthw)*
      &   (-s(1,2)*C0mbX*kappa_4gen_bot*(1d0-4d0*mbX2/s(1,2))
-     &    +2d0*kappa_4gen_bot+kappa_tilde_4gen_bot )*za(1,2)/zb(1,2)
+     &    +2d0*kappa_4gen_bot
+     &    -s(1,2)*C0mbX*kappa_tilde_4gen_bot )*za(1,2)/zb(1,2)
 
          ggHmb(1,1)=ggHmb(1,1) +
      &              s(1,2)/3d0/(2d0*wmass*sinthw)*
@@ -327,9 +335,9 @@ c--- Amplitudes for production
       C0mbX=qlI3(zip,zip,s(1,2),mbX2,mbX2,mbX2,musq,0)
 
 c    Couplings for point-like interactions
-      a1 = gh2g2+gh2g3*s(1,2)/4d0/Lambda2BSM**2
+      a1 = s(1,2)*( gh2g2+gh2g3*s(1,2)/4d0/Lambda2BSM**2 )
       a3 = -2d0*gh2g4
-      a1_4gen= gh2g2_4gen+gh2g3_4gen*s(1,2)/4d0/Lambda2BSM**2
+      a1_4gen=s(1,2)*(gh2g2_4gen+gh2g3_4gen*s(1,2)/4d0/Lambda2BSM**2)
       a3_4gen= -2d0*gh2g4_4gen
 
 
@@ -338,7 +346,8 @@ c        SM top
 c        kappa2 couplings (quark loop interaction)
          ggHmt(2,2)=mt2/(2d0*wmass*sinthw)*
      &   (-s(1,2)*C0mt*kappa2_top*(1d0-4d0*mt2/s(1,2))
-     &   +2d0*kappa2_top-kappa2_tilde_top )*zb(1,2)/za(1,2)
+     &   +2d0*kappa2_top
+     &   +s(1,2)*C0mt*kappa2_tilde_top )*zb(1,2)/za(1,2)
 
 c        ghg couplings (point-like interaction)
          ggHmt(2,2)=ggHmt(2,2) +
@@ -350,7 +359,8 @@ c        kappa2 couplings (quark loop interaction)
          ggHmt(2,2)=ggHmt(2,2) +
      &              mtX2/(2d0*wmass*sinthw)*
      &   (-s(1,2)*C0mtX*kappa2_4gen_top*(1d0-4d0*mtX2/s(1,2))
-     &   +2d0*kappa2_4gen_top-kappa2_tilde_4gen_top )*zb(1,2)/za(1,2)
+     &   +2d0*kappa2_4gen_top
+     &   +s(1,2)*C0mtX*kappa2_tilde_4gen_top )*zb(1,2)/za(1,2)
 
 c        ghg couplings (point-like interaction)
          ggHmt(2,2)=ggHmt(2,2) +
@@ -361,7 +371,8 @@ c        ghg couplings (point-like interaction)
 c        same as above for other helicity
          ggHmt(1,1)=mt2/(2d0*wmass*sinthw)*
      &   (-s(1,2)*C0mt*kappa2_top*(1d0-4d0*mt2/s(1,2))
-     &    +2d0*kappa2_top+kappa2_tilde_top )*za(1,2)/zb(1,2)
+     &    +2d0*kappa2_top
+     &    -s(1,2)*C0mt*kappa2_tilde_top )*za(1,2)/zb(1,2)
 
          ggHmt(1,1)=ggHmt(1,1) +
      &              s(1,2)/3d0/(2d0*wmass*sinthw)*
@@ -370,7 +381,8 @@ c        same as above for other helicity
          ggHmt(1,1)=ggHmt(1,1) +
      &              mtX2/(2d0*wmass*sinthw)*
      &   (-s(1,2)*C0mtX*kappa2_4gen_top*(1d0-4d0*mtX2/s(1,2))
-     &    +2d0*kappa2_4gen_top+kappa2_tilde_4gen_top )*za(1,2)/zb(1,2)
+     &    +2d0*kappa2_4gen_top
+     &    -s(1,2)*C0mtX*kappa2_tilde_4gen_top )*za(1,2)/zb(1,2)
 
          ggHmt(1,1)=ggHmt(1,1) +
      &             s(1,2)/3d0/(2d0*wmass*sinthw)*
@@ -383,7 +395,8 @@ c        SM bot
 c        kappa2 couplings (quark loop interaction)
          ggHmb(2,2)=mb2/(2d0*wmass*sinthw)*
      &   (-s(1,2)*C0mb*kappa2_bot*(1d0-4d0*mb2/s(1,2))
-     &   +2d0*kappa2_bot-kappa2_tilde_bot )*zb(1,2)/za(1,2)
+     &   +2d0*kappa2_bot
+     &   +s(1,2)*C0mb*kappa2_tilde_bot )*zb(1,2)/za(1,2)
 
 c        ghg couplings (point-like interaction)
          ggHmb(2,2)=ggHmb(2,2) +
@@ -395,7 +408,8 @@ c        kappa2 couplings (quark loop interaction)
          ggHmb(2,2)=ggHmb(2,2) +
      &              mbX2/(2d0*wmass*sinthw)*
      &   (-s(1,2)*C0mbX*kappa2_4gen_bot*(1d0-4d0*mbX2/s(1,2))
-     &   +2d0*kappa2_4gen_bot-kappa2_tilde_4gen_bot )*zb(1,2)/za(1,2)
+     &   +2d0*kappa2_4gen_bot
+     &   +s(1,2)*C0mbX*kappa2_tilde_4gen_bot )*zb(1,2)/za(1,2)
 
 c        ghg couplings (point-like interaction)
          ggHmb(2,2)=ggHmb(2,2) +
@@ -407,7 +421,8 @@ c        ghg couplings (point-like interaction)
 c        same as above for other helicity
          ggHmb(1,1)=mb2/(2d0*wmass*sinthw)*
      &   (-s(1,2)*C0mb*kappa2_bot*(1d0-4d0*mb2/s(1,2))
-     &    +2d0*kappa2_bot+kappa2_tilde_bot )*za(1,2)/zb(1,2)
+     &    +2d0*kappa2_bot
+     &    -s(1,2)*C0mb*kappa2_tilde_bot )*za(1,2)/zb(1,2)
 
          ggHmb(1,1)=ggHmb(1,1) +
      &              s(1,2)/3d0/(2d0*wmass*sinthw)*
@@ -416,7 +431,8 @@ c        same as above for other helicity
          ggHmb(1,1)=ggHmb(1,1) +
      &              mbX2/(2d0*wmass*sinthw)*
      &   (-s(1,2)*C0mbX*kappa2_4gen_bot*(1d0-4d0*mbX2/s(1,2))
-     &    +2d0*kappa2_4gen_bot+kappa2_tilde_4gen_bot )*za(1,2)/zb(1,2)
+     &    +2d0*kappa2_4gen_bot
+     &    -s(1,2)*C0mbX*kappa2_tilde_4gen_bot )*za(1,2)/zb(1,2)
 
          ggHmb(1,1)=ggHmb(1,1) +
      &              s(1,2)/3d0/(2d0*wmass*sinthw)*
