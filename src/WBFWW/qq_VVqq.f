@@ -31,7 +31,7 @@ c--- q(-p1) + q(-p2) -> e-(p3) e-(p4) nu_e(p5) nu_ebar(p6);
       double complex zab(mxpart,4,mxpart),zba(mxpart,4,mxpart),
      & ampZZ(nmax,2,2,2,2),ampZZa(nmax,2,2,2,2),ampZZb(nmax,2,2,2,2),
      & ampWW(nmax,2,2,2,2),ampWWa(nmax,2,2,2,2),ampWWb(nmax,2,2,2,2)
-      logical doHO,doBO
+      logical doHO,doBO,comb1278ok
       parameter(spinavge=0.25d0,stat=0.5d0,nfinc=4)
       integer,parameter:: j1(jmax)=(/1,2,8,8,7,2,7,1,1,7,2,7/)
       integer,parameter:: j2(jmax)=(/2,1,7,7,2,7,1,7,7,1,7,2/)
@@ -85,6 +85,7 @@ c---color factors for W and Z decays
      & .or. (plabel(3) .eq. 'sq')
      & .or. (plabel(3) .eq. 'bq')
      & .or. (plabel(3) .eq. 'qj')
+     & .or. (plabel(3) .eq. 'pp')
      & )
      & .and.
      & (
@@ -94,6 +95,7 @@ c---color factors for W and Z decays
      & .or. (plabel(5) .eq. 'sq')
      & .or. (plabel(5) .eq. 'bq')
      & .or. (plabel(5) .eq. 'qj')
+     & .or. (plabel(5) .eq. 'pp')
      & )
      & ) then
         colfac34_56=colfac34_56*xn**2
@@ -109,20 +111,32 @@ c---color factors for W and Z decays
       ampZZa(:,:,:,:,:)=czip
       ampZZb(:,:,:,:,:)=czip
 
+C--   MARKUS: adding switches to remove VH or VBF contributions
+      ! No VH-like diagram
+      if( (vvhvvtoggle_vbfvh.eq.0) .and. (j.ge.9) ) cycle
+      ! No VBF-like diagram
+      if( (vvhvvtoggle_vbfvh.eq.1) .and. (j.le.8) ) cycle
+      ! U. Sarica: Test the combination
+      call testWBFVVApartComb(j1(j),j2(j),j7(j),j8(j),comb1278ok)
+      if (.not.comb1278ok) cycle
 
 c-----------------------------------------
 c---- SET-UP FOR WW-like AMPLITUDES ------
 c-----------------------------------------
 c---  Note 3654, this is the special ordering to agree with Madgraph
       ! This orders the decay bosons as W-W+ as in process.DAT
+      if (index(runstring,'_zz') .le. 0) then
       call getVVWWamps(ampWW,ampWWa,ampWWb,p,za,zb,zab,zba,
      & j1(j),j2(j),3,6,5,4,j7(j),j8(j),doHO,doBO)
+      endif
 
 c-----------------------------------------
 c---- SET-UP FOR ZZ-like AMPLITUDES ------
 c-----------------------------------------
+      if (index(runstring,'_ww') .le. 0) then
       call getVVZZamps(ampZZ,ampZZa,ampZZb,p,za,zb,zab,zba,
      & j1(j),j2(j),3,4,5,6,j7(j),j8(j),doHO,doBO)
+      endif
 
 
 C-----setup for (dqcq_dqcq)

@@ -30,7 +30,7 @@ c--- q(-p1)+q(-p2)->W(p3,p4)+W(p5,p6)+q(p7)+q(p8);
      & colfac34_56
       double complex zab(mxpart,4,mxpart),zba(mxpart,4,mxpart),
      & amp(nmax,2,2),ampa(nmax,2,2),ampb(nmax,2,2)
-      logical doHO,doBO
+      logical doHO,doBO,comb1278ok
       parameter(spinavge=0.25d0,stat=0.5d0,nfinc=4)
       integer,parameter:: j1(jmax)=(/1,2,8,8,7,2,7,1,1,7,2,7/)
       integer,parameter:: j2(jmax)=(/2,1,7,7,2,7,1,7,7,1,7,2/)
@@ -83,6 +83,7 @@ c---color factors for W decays
      & .or. (plabel(3) .eq. 'sq')
      & .or. (plabel(3) .eq. 'bq')
      & .or. (plabel(3) .eq. 'qj')
+     & .or. (plabel(3) .eq. 'pp')
      & ) then
         colfac34_56=colfac34_56*xn
       endif
@@ -93,6 +94,7 @@ c---color factors for W decays
      & .or. (plabel(5) .eq. 'sq')
      & .or. (plabel(5) .eq. 'bq')
      & .or. (plabel(5) .eq. 'qj')
+     & .or. (plabel(5) .eq. 'pp')
      & ) then
         colfac34_56=colfac34_56*xn
       endif
@@ -109,6 +111,10 @@ C--   MARKUS: adding switches to remove VH or VBF contributions
       if( (vvhvvtoggle_vbfvh.eq.0) .and. (j.ge.9) ) cycle
       ! No VBF-like diagram
       if( (vvhvvtoggle_vbfvh.eq.1) .and. (j.le.8) ) cycle
+      ! U. Sarica: Test the combination
+      call testWBFVVApartComb(j1(j),j2(j),j7(j),j8(j),comb1278ok)
+      if (.not.comb1278ok) cycle
+
 
 c---  Call the VVWW amplitudes
 c---  Note 3654, this is the special ordering to agree with Madgraph
