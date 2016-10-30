@@ -138,6 +138,8 @@ DIRS	=	$(MCFMHOME):\
 # Specify the object files. 
 
 WBFFILES = \
+getVVZZamps.o \
+getVVWWamps.o \
 getvbfpoint.o \
 comparevbf.o \
 qq_WZqqstrong.o \

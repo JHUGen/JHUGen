@@ -10,6 +10,8 @@ c--- q(-p1) + q(-p2) -> e-(p3) e-(p4) nu_e(p5) nu_ebar(p6);
       include 'zprods_decl.f'
       include 'anom_higgs.f'
       !include 'first.f'
+      include 'spinzerohiggs_anomcoupl.f'
+      include 'plabel.f'
       include 'WWbits.f'
       integer nmax,jmax
       parameter(jmax=12,nmax=10)
@@ -17,60 +19,18 @@ c--- q(-p1) + q(-p2) -> e-(p3) e-(p4) nu_e(p5) nu_ebar(p6);
      & uqcq_uqcq,uquq_uquq,dqsq_dqsq,
      & dqdq_dqdq,uqbq_uqbq,dqcq_dqcq,
      & dquq_dquq,dqcq_uqsq,uqsq_dqcq,
-     & i3,i4,i5,i6,nfinc
+     & nfinc
       parameter(
      & uqcq_uqcq=1,uquq_uquq=2,dqsq_dqsq=3,
      & dqdq_dqdq=4,uqbq_uqbq=5,dqcq_dqcq=6,
      & dquq_dquq=7,dqcq_uqsq=8,uqsq_dqcq=9)
       integer h1,h2,h3,h5
       double precision p(mxpart,4),msq(fn:nf,fn:nf),temp(fn:nf,fn:nf),
-     & tempw(fn:nf,fn:nf),stat,spinavge,mult
-      double complex zab(mxpart,4,mxpart),zba(mxpart,4,mxpart),cdotpr,
-     & propw71,propw81,propw72,propw82,
-     & propw7341,propw7561,propw7342,propw7562,
-     & amp(nmax,2,2,2,2),ampa(nmax,2,2,2,2),ampb(nmax,2,2,2,2),
-     & k7341(4),k8341(4),k8342(4),
-     & kw7341(4),kw1567(4),kw7342(4),kw7562(4),s7341,s8341,s8342
-      double complex
-     & jmid17(2,2,2,2),jvbf17(2,2,2,2),jtwodiags17(2,2,2,2),
-     &jtwo17(2,2,2,2),jtwo28(2,2,2,2),jZWZa17(2,2,2,2),jZWZb17(2,2,2,2),
-     & jmid18(2,2,2,2),jvbf18(2,2,2,2),jtwodiags18(2,2,2,2),
-     &jtwo18(2,2,2,2),jtwo27(2,2,2,2),jZWZa18(2,2,2,2),jZWZb18(2,2,2,2),
-     & jtwoWexch17(2,2),jtwoWexch28(2,2),
-     & j7_34_1z(2,4),j7_34_1g(2,4),j8_56_2z(2,4),j8_56_2g(2,4),
-     & jtwoWexch18(2,2),jtwoWexch27(2,2),
-     & j8_34_1z(2,4),j8_34_1g(2,4),j7_56_2z(2,4),j7_56_2g(2,4),
-     & jmidWW17,jmidWW18,jmidWW28,
-     & j8_34_2z(2,4),j8_34_2g(2,4),j7_56_1z(2,4),j7_56_1g(2,4),
-     & ZZ7341(2,2,2,2,2,2),ZZ7561(2,2,2,2,2,2),
-     & ZZ8341(2,2,2,2,2,2),ZZ8561(2,2,2,2,2,2),
-     & WWp7341(2),WWm7341(2),WWp7561(2),WWm7561(2),
-     & WWp8341(2),WWm8341(2),WWp8561(2),WWm8561(2),
-     & j7_1(4,2),j7_2(4,2),j8_1(4,2),j8_2(4,2),
-     & j7_34_1(4,2,2,2),j7_34_2(4,2,2,2),
-     & j7_56_1(4,2,2,2),j7_56_2(4,2,2,2),
-     & j8_34_1(4,2,2,2),j8_34_2(4,2,2,2),
-     & j8_56_1(4,2,2,2),j8_56_2(4,2,2,2),
-     & jl7_34_1(4,2,2,2),jl7_34_2(4,2,2,2),
-     & jl7_56_1(4,2,2,2),jl7_56_2(4,2,2,2),
-     & jl8_34_1(4,2,2,2),jl8_34_2(4,2,2,2),
-     & jl8_56_1(4,2,2,2),jl8_56_2(4,2,2,2),
-     & jw7_34_1(4,2,2),jw7_34_2(4,2,2),
-     & jw7_56_1(4,2,2),jw7_56_2(4,2,2),
-     & jw8_34_1(4,2,2),jw8_34_2(4,2,2),
-     & jw8_56_1(4,2,2),jw8_56_2(4,2,2),
-     & j7_3456_1(4,2,2,2,2),j8_3456_2(4,2,2,2,2),
-     & j7_3456_2(4,2,2,2,2),j8_3456_1(4,2,2,2,2),
-     & jw7_3456_1(4,2,2,2),jw8_3456_2(4,2,2,2),
-     & jw7_3456_2(4,2,2,2),jw8_3456_1(4,2,2,2),
-     & ZZHamp71_82(2,2,2,2,2,2),ZZHamp81_72(2,2,2,2,2,2),
-     & WWZZ71_82amp(2,2),WWZZ81_72amp(2,2),
-     & gmZ7341(2,2,2,2),gmZ7561(2,2,2,2),gmZ71(2,2,2,2),gmZ82(2,2,2,2),
-     & gmZ7342(2,2,2,2),gmZ7562(2,2,2,2),gmZ72(2,2,2,2),gmZ81(2,2,2,2),
-     & ll7341(2,2),ll7561(2,2),ll7342(2,2),ll7562(2,2),
-     & gmZl7341(2,2,2),gmZl7561(2,2,2),gmZl7342(2,2,2),gmZl7562(2,2,2),
-     & gmZl8562(2,2,2),gmZl8342(2,2,2),gmZl8561(2,2,2),gmZl8341(2,2,2),
-     & ggWW(2,2),srWWZZ71_82amp(2,2),srWWZZ81_72amp(2,2)
+     & tempw(fn:nf,fn:nf),stat,spinavge,mult,
+     & colfac34_56
+      double complex zab(mxpart,4,mxpart),zba(mxpart,4,mxpart),
+     & ampZZ(nmax,2,2,2,2),ampZZa(nmax,2,2,2,2),ampZZb(nmax,2,2,2,2),
+     & ampWW(nmax,2,2,2,2),ampWWa(nmax,2,2,2,2),ampWWb(nmax,2,2,2,2)
       logical doHO,doBO
       parameter(spinavge=0.25d0,stat=0.5d0,nfinc=4)
       integer,parameter:: j1(jmax)=(/1,2,8,8,7,2,7,1,1,7,2,7/)
@@ -112,237 +72,75 @@ c--- rescaling factor for Higgs amplitudes, if anomalous Higgs width
        endif
        Hbit=mult*Hbit
 
-c--- note that this is the ordering in process.DAT and in Madgraph
-      i3=3
-      i4=6
-      i5=5
-      i6=4
+C---setup spinors and spinorvector products
+      call spinorcurr(8,p,za,zb,zab,zba)
+
+c---color factors for W and Z decays
+      colfac34_56=1d0
+      if (
+     & (
+     &      (plabel(3) .eq. 'uq')
+     & .or. (plabel(3) .eq. 'dq')
+     & .or. (plabel(3) .eq. 'cq')
+     & .or. (plabel(3) .eq. 'sq')
+     & .or. (plabel(3) .eq. 'bq')
+     & .or. (plabel(3) .eq. 'qj')
+     & )
+     & .and.
+     & (
+     &      (plabel(5) .eq. 'uq')
+     & .or. (plabel(5) .eq. 'dq')
+     & .or. (plabel(5) .eq. 'cq')
+     & .or. (plabel(5) .eq. 'sq')
+     & .or. (plabel(5) .eq. 'bq')
+     & .or. (plabel(5) .eq. 'qj')
+     & )
+     & ) then
+        colfac34_56=colfac34_56*xn**2
+      endif
 
       do j=1,jmax
       temp(:,:)=0d0
       tempw(:,:)=0d0
-      amp(:,:,:,:,:)=czip
-      ampa(:,:,:,:,:)=czip
-      ampb(:,:,:,:,:)=czip
+      ampWW(:,:,:,:,:)=czip
+      ampWWa(:,:,:,:,:)=czip
+      ampWWb(:,:,:,:,:)=czip
+      ampZZ(:,:,:,:,:)=czip
+      ampZZa(:,:,:,:,:)=czip
+      ampZZb(:,:,:,:,:)=czip
 
-C---setup spinors and spinorvector products
-      call spinorcurr(8,p,za,zb,zab,zba)
-
-      k7341(:)=0.5d0*(zab(j1(j),:,j1(j))+zab(i3,:,i3)
-     & +zab(i4,:,i4)+zab(j7(j),:,j7(j)))
-      k8341(:)=0.5d0*(zab(j1(j),:,j1(j))+zab(i3,:,i3)
-     & +zab(i4,:,i4)+zab(j8(j),:,j8(j)))
-      k8342(:)=0.5d0*(zab(j2(j),:,j2(j))+zab(i3,:,i3)
-     & +zab(i4,:,i4)+zab(j8(j),:,j8(j)))
-      s7341=cdotpr(k7341,k7341)
-      s8341=cdotpr(k8341,k8341)
-      s8342=cdotpr(k8342,k8342)
 
 c-----------------------------------------
 c---- SET-UP FOR WW-like AMPLITUDES ------
 c-----------------------------------------
-
-c--- These contributions contain Hbit and Bbit
-c--- contribution from jVBF
-      call ampvbf(j1(j),j2(j),i3,i4,i5,i6,j7(j),j8(j),za,zb,jvbf17)
-      call ampvbf(j1(j),j2(j),i3,i4,i5,i6,j8(j),j7(j),za,zb,jvbf18)
-
-c--- W mid diagrams: contribution from jmidWW
-      call ampmidWW(j1(j),j2(j),i3,i4,i5,i6,j7(j),j8(j),za,zb,jmidWW17)
-      call ampmidWW(j1(j),j2(j),i3,i4,i5,i6,j8(j),j7(j),za,zb,jmidWW18)
-      call ampmidWW(j2(j),j1(j),i3,i4,i5,i6,j8(j),j7(j),za,zb,jmidWW28)
-
-c--- these are not used in calculation of Higgs contribution
-      if (doHO .eqv. .false.) then
-
-c--- mid diagrams: contribution from jcentre
-      call ampmid(j1(j),j2(j),i3,i4,i5,i6,j7(j),j8(j),za,zb,jmid17)
-      call ampmid(j1(j),j2(j),i3,i4,i5,i6,j8(j),j7(j),za,zb,jmid18)
-c--- contribution from jtwoWW
-      call amp2current(j1(j),j2(j),i3,i4,i5,i6,j7(j),j8(j),za,zb,jtwo17)
-      call amp2current(j2(j),j1(j),i3,i4,i5,i6,j8(j),j7(j),za,zb,jtwo28)
-      call amp2current(j1(j),j2(j),i3,i4,i5,i6,j8(j),j7(j),za,zb,jtwo18)
-      call amp2current(j2(j),j1(j),i3,i4,i5,i6,j7(j),j8(j),za,zb,jtwo27)
-
-c--- Z/W/Z diagrams: contribution from jZWZ
-      call ampZWZ(j1(j),j2(j),i3,i4,i5,i6,j7(j),j8(j),za,zb,jZWZa17)
-      call ampZWZ(j1(j),j2(j),i5,i6,i3,i4,j7(j),j8(j),za,zb,jZWZb17)
-      call ampZWZ(j1(j),j2(j),i3,i4,i5,i6,j8(j),j7(j),za,zb,jZWZa18)
-      call ampZWZ(j1(j),j2(j),i5,i6,i3,i4,j8(j),j7(j),za,zb,jZWZb18)
-
-c--- W-exchange diagrams: contribution from jtwodiags
-      call amptwodiags(j1(j),j2(j),i3,i4,i5,i6,j7(j),j8(j),za,zb,
-     & jtwodiags17)
-      call amptwodiags(j1(j),j2(j),i3,i4,i5,i6,j8(j),j7(j),za,zb,
-     & jtwodiags18)
-
-c--- W exchange diagrams for flavor-changing contributions: contribution from jtwoWexch
-      call amp2currentw(j1(j),j2(j),i3,i4,i5,i6,j7(j),j8(j),za,zb,
-     & jtwoWexch17)
-      call amp2currentw(j2(j),j1(j),i3,i4,i5,i6,j8(j),j7(j),za,zb,
-     & jtwoWexch28)
-      call amp2currentw(j1(j),j2(j),i3,i4,i5,i6,j8(j),j7(j),za,zb,
-     & jtwoWexch18)
-      call amp2currentw(j2(j),j1(j),i3,i4,i5,i6,j7(j),j8(j),za,zb,
-     & jtwoWexch27)
-
-      call jonew(j7(j),i3,i4,j1(j),za,zb,zab,j7_34_1z,j7_34_1g)
-      call jonew(j8(j),i5,i6,j2(j),za,zb,zab,j8_56_2z,j8_56_2g)
-      call jonew(j8(j),i3,i4,j1(j),za,zb,zab,j8_34_1z,j8_34_1g)
-      call jonew(j7(j),i5,i6,j2(j),za,zb,zab,j7_56_2z,j7_56_2g)
-      call jonew(j8(j),i3,i4,j2(j),za,zb,zab,j8_34_2z,j8_34_2g)
-      call jonew(j7(j),i5,i6,j1(j),za,zb,zab,j7_56_1z,j7_56_1g)
-
-      else
-
-      jmid17=czip
-      jmid18=czip
-      jtwo17=czip
-      jtwo28=czip
-      jtwo18=czip
-      jtwo27=czip
-      jZWZa17=czip
-      jZWZb17=czip
-      jZWZa18=czip
-      jZWZb18=czip
-      jtwodiags17=czip
-      jtwodiags18=czip
-      jtwoWexch17=czip
-      jtwoWexch28=czip
-      jtwoWexch18=czip
-      jtwoWexch27=czip
-      j7_34_1z=czip
-      j7_34_1g=czip
-      j8_56_2z=czip
-      j8_56_2g=czip
-      j8_34_1z=czip
-      j8_34_1g=czip
-      j7_56_2z=czip
-      j7_56_2g=czip
-      j8_34_2z=czip
-      j8_34_2g=czip
-      j7_56_1z=czip
-      j7_56_1g=czip
-
-      endif
+c---  Note 3654, this is the special ordering to agree with Madgraph
+      ! This orders the decay bosons as W-W+ as in process.DAT
+      call getVVWWamps(ampWW,ampWWa,ampWWb,p,za,zb,zab,zba,
+     & j1(j),j2(j),3,6,5,4,j7(j),j8(j),doHO,doBO)
 
 c-----------------------------------------
 c---- SET-UP FOR ZZ-like AMPLITUDES ------
 c-----------------------------------------
-
-c--- propagators and currents are not used in calculation of Higgs contribution
-      if (doHO .eqv. .false.) then
-      call setupzprops(j1(j),j2(j),3,4,5,6,j7(j),j8(j),
-     & gmZ7341,gmZ7561,gmZ71,gmZ82,
-     & gmZ7342,gmZ7562,gmZ72,gmZ81,
-     & ggWW,propw71,propw81,propw72,propw82,
-     & propw7341,propw7561,propw7342,propw7562,
-     & ll7341,ll7561,ll7342,ll7562,
-     & gmZl7341,gmZl7561,gmZl7342,gmZl7562,
-     & gmZl8562,gmZl8342,gmZl8561,gmZl8341)
-
-      call jzero(j7(j),j1(j),zab,zba,j7_1)
-      call jzero(j7(j),j2(j),zab,zba,j7_2)
-      call jzero(j8(j),j1(j),zab,zba,j8_1)
-      call jzero(j8(j),j2(j),zab,zba,j8_2)
-
-      call jone(j7(j),3,4,j1(j),za,zb,zab,zba,j7_34_1,jw7_34_1,jl7_34_1)
-      call jone(j7(j),3,4,j2(j),za,zb,zab,zba,j7_34_2,jw7_34_2,jl7_34_2)
-      call jone(j7(j),5,6,j1(j),za,zb,zab,zba,j7_56_1,jw7_56_1,jl7_56_1)
-      call jone(j7(j),5,6,j2(j),za,zb,zab,zba,j7_56_2,jw7_56_2,jl7_56_2)
-      call jone(j8(j),3,4,j1(j),za,zb,zab,zba,j8_34_1,jw8_34_1,jl8_34_1)
-      call jone(j8(j),3,4,j2(j),za,zb,zab,zba,j8_34_2,jw8_34_2,jl8_34_2)
-      call jone(j8(j),5,6,j1(j),za,zb,zab,zba,j8_56_1,jw8_56_1,jl8_56_1)
-      call jone(j8(j),5,6,j2(j),za,zb,zab,zba,j8_56_2,jw8_56_2,jl8_56_2)
-
-      call jtwo(j7(j),3,4,5,6,j1(j),za,zb,zab,zba,j7_3456_1,jw7_3456_1)
-      call jtwo(j7(j),3,4,5,6,j2(j),za,zb,zab,zba,j7_3456_2,jw7_3456_2)
-      call jtwo(j8(j),3,4,5,6,j1(j),za,zb,zab,zba,j8_3456_1,jw8_3456_1)
-      call jtwo(j8(j),3,4,5,6,j2(j),za,zb,zab,zba,j8_3456_2,jw8_3456_2)
-
-      kw7341(:)=0.5d0*(zab(j1(j),:,j1(j))+zab(3,:,3)
-     & +zab(4,:,4)+zab(j7(j),:,j7(j)))
-      kw1567(:)=0.5d0*(zab(j1(j),:,j1(j))+zab(5,:,5)
-     & +zab(6,:,6)+zab(j7(j),:,j7(j)))
-      kw7342(:)=0.5d0*(zab(j2(j),:,j2(j))+zab(3,:,3)
-     & +zab(4,:,4)+zab(j7(j),:,j7(j)))
-      kw7562(:)=0.5d0*(zab(j2(j),:,j2(j))+zab(5,:,5)
-     & +zab(6,:,6)+zab(j7(j),:,j7(j)))
-
-C-----Singly resonant production in VBF style diagrams
-      call ZZSingleres(j1(j),j2(j),3,4,5,6,j7(j),j8(j),za,zb,
-     & ZZ7341,WWp7341,WWm7341)
-      call ZZSingleres(j1(j),j2(j),5,6,3,4,j7(j),j8(j),za,zb,
-     & ZZ7561,WWp7561,WWm7561)
-      call ZZSingleres(j1(j),j2(j),3,4,5,6,j8(j),j7(j),za,zb,
-     & ZZ8341,WWp8341,WWm8341)
-      call ZZSingleres(j1(j),j2(j),5,6,3,4,j8(j),j7(j),za,zb,
-     & ZZ8561,WWp8561,WWm8561)
-      endif
-
-C----ZZ->ZZ scattering with the exchange of a H
-      call ZZHZZamp(j1(j),j2(j),3,4,5,6,j7(j),j8(j),
-     & za,zb,ZZHamp71_82)
-      call ZZHZZamp(j1(j),j2(j),3,4,5,6,j8(j),j7(j),
-     & za,zb,ZZHamp81_72)
-C----Four boson vertex + WW->Higgs diagram
-      call WWZZ(j1(j),j2(j),3,4,5,6,j7(j),j8(j),
-     & za,zb,WWZZ71_82amp,srWWZZ71_82amp)
-      call WWZZ(j1(j),j2(j),3,4,5,6,j8(j),j7(j),
-     & za,zb,WWZZ81_72amp,srWWZZ81_72amp)
+      call getVVZZamps(ampZZ,ampZZa,ampZZb,p,za,zb,zab,zba,
+     & j1(j),j2(j),3,4,5,6,j7(j),j8(j),doHO,doBO)
 
 
 C-----setup for (dqcq_dqcq)
-c----- WW-like
-      do h1=1,2
-      do h2=1,2
-
-      amp(dqcq_dqcq,h1,h2,1,1)=
-     & +jmid17(1,2,h1,h2)
-     & +jvbf17(1,2,h1,h2)
-     & +jtwo17(1,2,h1,h2)+jtwo28(2,1,h2,h1)
-     & +jZWZa17(1,2,h1,h2)+jZWZb17(1,2,h1,h2)
-     & +jtwodiags17(1,2,h1,h2)
-
-c--- the following minus sign accounts for one less fermion loop in interference
-      amp(dqcq_dqcq,h1,h2,1,1)=-amp(dqcq_dqcq,h1,h2,1,1)
-
-      enddo
-      enddo
-
-c----- ZZ-like
       do h1=1,2
       do h2=1,2
       do h3=1,2
       do h5=1,2
-      if (doHO .eqv. .false.) then
-      amp(dqcq_dqcq,h1,h2,h3,h5)=amp(dqcq_dqcq,h1,h2,h3,h5)
-     & +cdotpr(j7_34_1(:,1,h1,h3),j8_56_2(:,2,h2,h5))*gmZ7341(1,2,h1,h2)
-     & +cdotpr(jl7_34_1(:,1,h1,h3),jl8_56_2(:,2,h2,h5))*ll7341(h3,h5)
-     & +cdotpr(j7_34_1(:,1,h1,h3),jl8_56_2(:,2,h2,h5))*gmZl8562(1,h1,h5)
-     & +cdotpr(jl7_34_1(:,1,h1,h3),j8_56_2(:,2,h2,h5))*gmZl7341(2,h2,h3)
-      amp(dqcq_dqcq,h1,h2,h3,h5)=amp(dqcq_dqcq,h1,h2,h3,h5)
-     & +cdotpr(j7_56_1(:,1,h1,h5),j8_34_2(:,2,h2,h3))*gmZ7561(1,2,h1,h2)
-     & +cdotpr(jl7_56_1(:,1,h1,h5),jl8_34_2(:,2,h2,h3))*ll7561(h3,h5)
-     & +cdotpr(j7_56_1(:,1,h1,h5),jl8_34_2(:,2,h2,h3))*gmZl8342(1,h1,h3)
-     & +cdotpr(jl7_56_1(:,1,h1,h5),j8_34_2(:,2,h2,h3))*gmZl7561(2,h2,h5)
-
-      amp(dqcq_dqcq,h1,h2,h3,h5)=amp(dqcq_dqcq,h1,h2,h3,h5)
-     & +cdotpr(j7_3456_1(:,1,h1,h3,h5),j8_2(:,h2))*gmZ82(1,2,h1,h2)
-
-      amp(dqcq_dqcq,h1,h2,h3,h5)=amp(dqcq_dqcq,h1,h2,h3,h5)
-     & +cdotpr(j7_1(:,h1),j8_3456_2(:,2,h2,h3,h5))*gmZ71(1,2,h1,h2)
-
-      amp(dqcq_dqcq,h1,h2,h3,h5)=amp(dqcq_dqcq,h1,h2,h3,h5)
-     & +ZZ7341(1,2,h1,h2,h3,h5)+ZZ7561(1,2,h1,h2,h5,h3)
-      endif
-
-      amp(dqcq_dqcq,h1,h2,h3,h5)=amp(dqcq_dqcq,h1,h2,h3,h5)
-     & +Hbit*ZZHamp71_82(1,2,h1,h2,h3,h5)
-
       temp(1,4)=temp(1,4)+esq**6*spinavge
-     &   *dble(amp(dqcq_dqcq,h1,h2,h3,h5)
-     & *dconjg(amp(dqcq_dqcq,h1,h2,h3,h5)))
+     &   *dble(ampWW(dqcq_dqcq,h1,h2,h3,h5)
+     & *dconjg(ampWW(dqcq_dqcq,h1,h2,h3,h5)))
+      temp(1,4)=temp(1,4)+esq**6*spinavge
+     &   *dble(ampZZ(dqcq_dqcq,h1,h2,h3,h5)
+     & *dconjg(ampZZ(dqcq_dqcq,h1,h2,h3,h5)))
+      if(h3 .eq. h5) then
+      temp(1,4)=temp(1,4)-2d0*esq**6*spinavge/sqrt(colfac34_56)
+     &   *dble(ampWW(dqcq_dqcq,h1,h2,h3,h5)
+     & *dconjg(ampZZ(dqcq_dqcq,h1,h2,h3,h5)))
+      endif
       enddo
       enddo
       enddo
@@ -350,117 +148,43 @@ c----- ZZ-like
 
 
 C-----setup for (dqcq_uqsq)
-c----- WW-like
-      amp(dqcq_uqsq,1,1,1,1)=
-     & +jtwoWexch17(1,2)+jtwoWexch28(2,1)
-     & +jmidWW17
-     & +cdotpr(j7_34_1g(1,:),j8_56_2g(2,:))/s7341
-     & +(cdotpr(j7_34_1z(1,:),j8_56_2z(2,:))
-     &  -cdotpr(j7_34_1z(1,:),k7341(:))
-     &  *cdotpr(k7341(:),j8_56_2z(2,:))/czmass2)
-     & /(s7341-dcmplx(zmass**2,-zmass*zwidth))
-
-c--- the following minus sign accounts for one less fermion loop in interference
-      amp(dqcq_uqsq,1,1,1,1)=-amp(dqcq_uqsq,1,1,1,1)
-
-c----- ZZ-like
       do h1=1,1
       do h2=1,1
       do h3=1,2
       do h5=1,2
-      if (doHO .eqv. .false.) then
-      amp(dqcq_uqsq,h1,h2,h3,h5)=amp(dqcq_uqsq,h1,h2,h3,h5)
-     & +cdotpr(jw7_3456_1(:,1,h3,h5),j8_2(:,h2))*0.5d0/propw82/cxw
-
-      amp(dqcq_uqsq,h1,h2,h3,h5)=amp(dqcq_uqsq,h1,h2,h3,h5)
-     & +cdotpr(j7_1(:,h1),jw8_3456_2(:,2,h3,h5))*0.5d0/propw71/cxw
-
-      amp(dqcq_uqsq,h1,h2,h3,h5)=amp(dqcq_uqsq,h1,h2,h3,h5)
-     & +(cdotpr(jw7_34_1(:,1,h3),jw8_56_2(:,2,h5))
-     &  -cdotpr(jw7_34_1(:,1,h3),kw7341(:))
-     &  *cdotpr(kw7341(:),jw8_56_2(:,2,h5))/cwmass2)/propw7341
-
-      amp(dqcq_uqsq,h1,h2,h3,h5)=amp(dqcq_uqsq,h1,h2,h3,h5)
-     & +(cdotpr(jw7_56_1(:,1,h5),jw8_34_2(:,2,h3))
-     &  -cdotpr(jw7_56_1(:,1,h5),kw1567(:))
-     &  *cdotpr(kw1567(:),jw8_34_2(:,2,h3))/cwmass2)/propw7561
-
-      if (h3 .eq. 1)
-     & amp(dqcq_uqsq,h1,h2,h3,h5)=amp(dqcq_uqsq,h1,h2,h3,h5)
-     & +WWm7341(h5)
-      if (h5 .eq. 1)
-     & amp(dqcq_uqsq,h1,h2,h3,h5)=amp(dqcq_uqsq,h1,h2,h3,h5)
-     & +WWm7561(h3)
-
-      amp(dqcq_uqsq,h1,h2,h3,h5)=amp(dqcq_uqsq,h1,h2,h3,h5)
-     & -srWWZZ71_82amp(h3,h5) ! note minus sign instead of exchanging 1<->7,2<->8
-      endif
-
-      amp(dqcq_uqsq,h1,h2,h3,h5)=amp(dqcq_uqsq,h1,h2,h3,h5)
-     & +WWZZ71_82amp(h3,h5)
-
       tempw(1,4)=tempw(1,4)+esq**6*spinavge
-     &   *dble(amp(dqcq_uqsq,h1,h2,h3,h5)
-     & *dconjg(amp(dqcq_uqsq,h1,h2,h3,h5)))
+     &   *dble(ampWW(dqcq_uqsq,h1,h2,h3,h5)
+     & *dconjg(ampWW(dqcq_uqsq,h1,h2,h3,h5)))
+      tempw(1,4)=tempw(1,4)+esq**6*spinavge
+     &   *dble(ampZZ(dqcq_uqsq,h1,h2,h3,h5)
+     & *dconjg(ampZZ(dqcq_uqsq,h1,h2,h3,h5)))
+      if(h3 .eq. h5) then
+      temp(1,4)=temp(1,4)-2d0*esq**6*spinavge/sqrt(colfac34_56)
+     &   *dble(ampWW(dqcq_uqsq,h1,h2,h3,h5)
+     & *dconjg(ampZZ(dqcq_uqsq,h1,h2,h3,h5)))
+      endif
+      enddo
+      enddo
+      enddo
+      enddo
 
-      enddo
-      enddo
-      enddo
-      enddo
 
 C-----setup for (uqcq_uqcq)
-c----- WW-like
-      do h1=1,2
-      do h2=1,2
-
-c--- contribution from jcentre
-      amp(uqcq_uqcq,h1,h2,1,1)=
-     & +jmid17(2,2,h1,h2)
-     & +jvbf17(2,2,h1,h2)
-     & +jtwo17(2,2,h1,h2)+jtwo28(2,2,h2,h1)
-     & +jZWZa17(2,2,h1,h2)+jZWZb17(2,2,h1,h2)
-     & +jtwodiags17(2,2,h1,h2)
-
-c--- the following minus sign accounts for one less fermion loop in interference
-      amp(uqcq_uqcq,h1,h2,1,1)=-amp(uqcq_uqcq,h1,h2,1,1)
-
-      enddo
-      enddo
-
-c----- ZZ-like
       do h1=1,2
       do h2=1,2
       do h3=1,2
       do h5=1,2
-
-      if (doHO .eqv. .false.) then
-      amp(uqcq_uqcq,h1,h2,h3,h5)=amp(uqcq_uqcq,h1,h2,h3,h5)
-     & +cdotpr(j7_34_1(:,2,h1,h3),j8_56_2(:,2,h2,h5))*gmZ7341(2,2,h1,h2)
-     & +cdotpr(jl7_34_1(:,2,h1,h3),jl8_56_2(:,2,h2,h5))*ll7341(h3,h5)
-     & +cdotpr(j7_34_1(:,2,h1,h3),jl8_56_2(:,2,h2,h5))*gmZl8562(2,h1,h5)
-     & +cdotpr(jl7_34_1(:,2,h1,h3),j8_56_2(:,2,h2,h5))*gmZl7341(2,h2,h3)
-
-      amp(uqcq_uqcq,h1,h2,h3,h5)=amp(uqcq_uqcq,h1,h2,h3,h5)
-     & +cdotpr(j7_56_1(:,2,h1,h5),j8_34_2(:,2,h2,h3))*gmZ7561(2,2,h1,h2)
-     & +cdotpr(jl7_56_1(:,2,h1,h5),jl8_34_2(:,2,h2,h3))*ll7561(h3,h5)
-     & +cdotpr(j7_56_1(:,2,h1,h5),jl8_34_2(:,2,h2,h3))*gmZl8342(2,h1,h3)
-     & +cdotpr(jl7_56_1(:,2,h1,h5),j8_34_2(:,2,h2,h3))*gmZl7561(2,h2,h5)
-
-      amp(uqcq_uqcq,h1,h2,h3,h5)=amp(uqcq_uqcq,h1,h2,h3,h5)
-     & +cdotpr(j7_3456_1(:,2,h1,h3,h5),j8_2(:,h2))*gmZ82(2,2,h1,h2)
-     & +cdotpr(j7_1(:,h1),j8_3456_2(:,2,h2,h3,h5))*gmZ71(2,2,h1,h2)
-
-      amp(uqcq_uqcq,h1,h2,h3,h5)=amp(uqcq_uqcq,h1,h2,h3,h5)
-     & +ZZ7341(2,2,h1,h2,h3,h5)+ZZ7561(2,2,h1,h2,h5,h3)
-      endif
-
-      amp(uqcq_uqcq,h1,h2,h3,h5)=amp(uqcq_uqcq,h1,h2,h3,h5)
-     & +Hbit*ZZHamp71_82(2,2,h1,h2,h3,h5)
-
       temp(2,4)=temp(2,4)+esq**6*spinavge
-     &   *dble(amp(uqcq_uqcq,h1,h2,h3,h5)
-     & *dconjg(amp(uqcq_uqcq,h1,h2,h3,h5)))
-
+     &   *dble(ampWW(uqcq_uqcq,h1,h2,h3,h5)
+     & *dconjg(ampWW(uqcq_uqcq,h1,h2,h3,h5)))
+      temp(2,4)=temp(2,4)+esq**6*spinavge
+     &   *dble(ampZZ(uqcq_uqcq,h1,h2,h3,h5)
+     & *dconjg(ampZZ(uqcq_uqcq,h1,h2,h3,h5)))
+      if(h3 .eq. h5) then
+      temp(2,4)=temp(2,4)-2d0*esq**6*spinavge/sqrt(colfac34_56)
+     &   *dble(ampWW(uqcq_uqcq,h1,h2,h3,h5)
+     & *dconjg(ampZZ(uqcq_uqcq,h1,h2,h3,h5)))
+      endif
       enddo
       enddo
       enddo
@@ -468,128 +192,73 @@ c----- ZZ-like
 
 
 C-----setup for (dqsq_dqsq)
-c----- WW-like
-      do h1=1,2
-      do h2=1,2
-
-c--- contribution from jcentre
-      amp(dqsq_dqsq,h1,h2,1,1)=
-     & +jmid17(1,1,h1,h2)
-     & +jvbf17(1,1,h1,h2)
-     & +jtwo17(1,1,h1,h2)+jtwo28(1,1,h2,h1)
-     & +jZWZa17(1,1,h1,h2)+jZWZb17(1,1,h1,h2)
-     & +jtwodiags17(1,1,h1,h2)
-
-c--- the following minus sign accounts for one less fermion loop in interference
-      amp(dqsq_dqsq,h1,h2,1,1)=-amp(dqsq_dqsq,h1,h2,1,1)
-
-      enddo
-      enddo
-
-c----- ZZ-like
       do h1=1,2
       do h2=1,2
       do h3=1,2
       do h5=1,2
-      if (doHO .eqv. .false.) then
-      amp(dqsq_dqsq,h1,h2,h3,h5)=amp(dqsq_dqsq,h1,h2,h3,h5)
-     & +cdotpr(j7_34_1(:,1,h1,h3),j8_56_2(:,1,h2,h5))*gmZ7341(1,1,h1,h2)
-     & +cdotpr(jl7_34_1(:,1,h1,h3),jl8_56_2(:,1,h2,h5))*ll7341(h3,h5)
-     & +cdotpr(j7_34_1(:,1,h1,h3),jl8_56_2(:,1,h2,h5))*gmZl8562(1,h1,h5)
-     & +cdotpr(jl7_34_1(:,1,h1,h3),j8_56_2(:,1,h2,h5))*gmZl7341(1,h2,h3)
-
-      amp(dqsq_dqsq,h1,h2,h3,h5)=amp(dqsq_dqsq,h1,h2,h3,h5)
-     & +cdotpr(j7_56_1(:,1,h1,h5),j8_34_2(:,1,h2,h3))*gmZ7561(1,1,h1,h2)
-     & +cdotpr(jl7_56_1(:,1,h1,h5),jl8_34_2(:,1,h2,h3))*ll7561(h3,h5)
-     & +cdotpr(j7_56_1(:,1,h1,h5),jl8_34_2(:,1,h2,h3))*gmZl8342(1,h1,h3)
-     & +cdotpr(jl7_56_1(:,1,h1,h5),j8_34_2(:,1,h2,h3))*gmZl7561(1,h2,h5)
-
-      amp(dqsq_dqsq,h1,h2,h3,h5)=amp(dqsq_dqsq,h1,h2,h3,h5)
-     & +cdotpr(j7_3456_1(:,1,h1,h3,h5),j8_2(:,h2))*gmZ82(1,1,h2,h1)
-     & +cdotpr(j8_3456_2(:,1,h2,h3,h5),j7_1(:,h1))*gmZ71(1,1,h1,h2)
-
-      amp(dqsq_dqsq,h1,h2,h3,h5)=amp(dqsq_dqsq,h1,h2,h3,h5)
-     & +ZZ7341(1,1,h1,h2,h3,h5)+ZZ7561(1,1,h1,h2,h5,h3)
-      endif
-
-      amp(dqsq_dqsq,h1,h2,h3,h5)=amp(dqsq_dqsq,h1,h2,h3,h5)
-     & +Hbit*ZZHamp71_82(1,1,h1,h2,h3,h5)
-
       temp(1,3)=temp(1,3)+esq**6*spinavge
-     &   *dble(amp(dqsq_dqsq,h1,h2,h3,h5)
-     & *dconjg(amp(dqsq_dqsq,h1,h2,h3,h5)))
+     &   *dble(ampWW(dqsq_dqsq,h1,h2,h3,h5)
+     & *dconjg(ampWW(dqsq_dqsq,h1,h2,h3,h5)))
+      temp(1,3)=temp(1,3)+esq**6*spinavge
+     &   *dble(ampZZ(dqsq_dqsq,h1,h2,h3,h5)
+     & *dconjg(ampZZ(dqsq_dqsq,h1,h2,h3,h5)))
+      if(h3 .eq. h5) then
+      temp(1,3)=temp(1,3)-2d0*esq**6*spinavge/sqrt(colfac34_56)
+     &   *dble(ampWW(dqsq_dqsq,h1,h2,h3,h5)
+     & *dconjg(ampZZ(dqsq_dqsq,h1,h2,h3,h5)))
+      endif
       enddo
       enddo
       enddo
       enddo
-
       temp(1,5)=temp(1,3)
       temp(3,5)=temp(1,3)
 
 C-----setup for (dqdq_dqdq)
-c----- WW-like
-      do h1=1,2
-      do h2=1,2
-
-c--- contribution from jcentre
-c-------- ampa
-      ampa(dqdq_dqdq,h1,h2,:,:)=amp(dqsq_dqsq,h1,h2,:,:)
-
-c-------- ampb: WW-like
-      ampb(dqdq_dqdq,h1,h2,1,1)=
-     & +jmid18(1,1,h1,h2)
-     & +jvbf18(1,1,h1,h2)
-     & +jtwo18(1,1,h1,h2)+jtwo27(1,1,h2,h1)
-     & +jZWZa18(1,1,h1,h2)+jZWZb18(1,1,h1,h2)
-     & +jtwodiags18(1,1,h1,h2)
-
-c--- the following minus sign accounts for one less fermion loop in interference
-      ampb(dqdq_dqdq,h1,h2,1,1)=-ampb(dqdq_dqdq,h1,h2,1,1)
-
-      enddo
-      enddo
-
+      ! ampa/b in ZZ is 17-28/18-27
+      ! ampa/b in WW is 17-28/18-27
+      ! Note: MCFM uses ZZ(17_28)WW+ZZ(18_27)WW+ZZ(18_27)ZZ, omits ZZ(17_28)ZZ
+      ! Added this last contribution -- U. Sarica
       do h1=1,2
       do h2=1,2
       do h3=1,2
       do h5=1,2
-
-C-------- ampb: ZZ-like
-      if (doHO .eqv. .false.) then
-      ampb(dqdq_dqdq,h1,h2,h3,h5)=ampb(dqdq_dqdq,h1,h2,h3,h5)
-     & +cdotpr(j8_34_1(:,1,h1,h3),j7_56_2(:,1,h2,h5))*gmZ7562(1,1,h1,h2)
-     & +cdotpr(jl8_34_1(:,1,h1,h3),jl7_56_2(:,1,h2,h5))*ll7562(h3,h5)
-     & +cdotpr(j8_34_1(:,1,h1,h3),jl7_56_2(:,1,h2,h5))*gmZl7562(1,h1,h5)
-     & +cdotpr(jl8_34_1(:,1,h1,h3),j7_56_2(:,1,h2,h5))*gmZl8341(1,h2,h3)
-      ampb(dqdq_dqdq,h1,h2,h3,h5)=ampb(dqdq_dqdq,h1,h2,h3,h5)
-     & +cdotpr(j8_56_1(:,1,h1,h5),j7_34_2(:,1,h2,h3))*gmZ7342(1,1,h1,h2)
-     & +cdotpr(jl8_56_1(:,1,h1,h5),jl7_34_2(:,1,h2,h3))*ll7342(h3,h5)
-     & +cdotpr(j8_56_1(:,1,h1,h5),jl7_34_2(:,1,h2,h3))*gmZl7342(1,h1,h3)
-     & +cdotpr(jl8_56_1(:,1,h1,h5),j7_34_2(:,1,h2,h3))*gmZl8561(1,h2,h5)
-
-      ampb(dqdq_dqdq,h1,h2,h3,h5)=ampb(dqdq_dqdq,h1,h2,h3,h5)
-     & +cdotpr(j8_3456_1(:,1,h1,h3,h5),j7_2(:,h2))*gmZ72(1,1,h1,h2)
-     & +cdotpr(j8_1(:,h1),j7_3456_2(:,1,h2,h3,h5))*gmZ81(1,1,h1,h2)
-
-      ampb(dqdq_dqdq,h1,h2,h3,h5)=ampb(dqdq_dqdq,h1,h2,h3,h5)
-     & +ZZ8341(1,1,h1,h2,h3,h5)+ZZ8561(1,1,h1,h2,h5,h3)
-      endif
-
-      ampb(dqdq_dqdq,h1,h2,h3,h5)=ampb(dqdq_dqdq,h1,h2,h3,h5)
-     & +Hbit*ZZHamp81_72(1,1,h1,h2,h3,h5)
-
       temp(1,1)=temp(1,1)+esq**6*spinavge
-     & *dble(ampa(dqdq_dqdq,h1,h2,h3,h5)
-     & *dconjg(ampa(dqdq_dqdq,h1,h2,h3,h5)))
+     & *dble(ampWWa(dqdq_dqdq,h1,h2,h3,h5)
+     & *dconjg(ampWWa(dqdq_dqdq,h1,h2,h3,h5)))
       temp(1,1)=temp(1,1)+esq**6*spinavge
-     & *dble(ampb(dqdq_dqdq,h1,h2,h3,h5)
-     & *dconjg(ampb(dqdq_dqdq,h1,h2,h3,h5)))
+     & *dble(ampWWb(dqdq_dqdq,h1,h2,h3,h5)
+     & *dconjg(ampWWb(dqdq_dqdq,h1,h2,h3,h5)))
+      temp(1,1)=temp(1,1)+esq**6*spinavge
+     & *dble(ampZZa(dqdq_dqdq,h1,h2,h3,h5)
+     & *dconjg(ampZZa(dqdq_dqdq,h1,h2,h3,h5)))
+      temp(1,1)=temp(1,1)+esq**6*spinavge
+     & *dble(ampZZb(dqdq_dqdq,h1,h2,h3,h5)
+     & *dconjg(ampZZb(dqdq_dqdq,h1,h2,h3,h5)))
       if (h1 .eq. h2) then
       temp(1,1)=temp(1,1)-2d0/xn*esq**6*spinavge
-     & *dble(ampa(dqdq_dqdq,h1,h2,h3,h5)
-     & *dconjg(ampb(dqdq_dqdq,h1,h2,h3,h5)))
+     & *dble(ampWWa(dqdq_dqdq,h1,h2,h3,h5)
+     & *dconjg(ampWWb(dqdq_dqdq,h1,h2,h3,h5)))
+      temp(1,1)=temp(1,1)-2d0/xn*esq**6*spinavge
+     & *dble(ampZZa(dqdq_dqdq,h1,h2,h3,h5)
+     & *dconjg(ampZZb(dqdq_dqdq,h1,h2,h3,h5)))
       endif
-
+         if(h3 .eq. h5) then
+      temp(1,1)=temp(1,1)-2d0*esq**6*spinavge/sqrt(colfac34_56)
+     & *dble(ampWWa(dqdq_dqdq,h1,h2,h3,h5)
+     & *dconjg(ampZZa(dqdq_dqdq,h1,h2,h3,h5)))
+      temp(1,1)=temp(1,1)-2d0*esq**6*spinavge/sqrt(colfac34_56)
+     & *dble(ampWWb(dqdq_dqdq,h1,h2,h3,h5)
+     & *dconjg(ampZZb(dqdq_dqdq,h1,h2,h3,h5)))
+      if (h1 .eq. h2) then
+      temp(1,1)=temp(1,1)-2d0/xn*esq**6*spinavge/sqrt(colfac34_56)
+     & *dble(ampWWa(dqdq_dqdq,h1,h2,h3,h5)
+     & *dconjg(ampZZb(dqdq_dqdq,h1,h2,h3,h5)))
+      temp(1,1)=temp(1,1)-2d0/xn*esq**6*spinavge/sqrt(colfac34_56)
+     & *dble(ampZZa(dqdq_dqdq,h1,h2,h3,h5)
+     & *dconjg(ampWWb(dqdq_dqdq,h1,h2,h3,h5)))
+      endif
+         endif
       enddo
       enddo
       enddo
@@ -598,69 +267,50 @@ C-------- ampb: ZZ-like
       temp(5,5)=temp(1,1)
 
 C-----setup for (uquq_uquq)
-c----- WW-like
-      do h1=1,2
-      do h2=1,2
-
-c--- contribution from jcentre
-c-------- ampa
-      ampa(uquq_uquq,h1,h2,:,:)=amp(uqcq_uqcq,h1,h2,:,:)
-
-c-------- ampb: WW-like
-      ampb(uquq_uquq,h1,h2,1,1)=
-     & +jmid18(2,2,h1,h2)
-     & +jvbf18(2,2,h1,h2)
-     & +jtwo18(2,2,h1,h2)+jtwo27(2,2,h2,h1)
-     & +jZWZa18(2,2,h1,h2)+jZWZb18(2,2,h1,h2)
-     & +jtwodiags18(2,2,h1,h2)
-
-c--- the following minus sign accounts for one less fermion loop in interference
-      ampb(uquq_uquq,h1,h2,1,1)=-ampb(uquq_uquq,h1,h2,1,1)
-
-      enddo
-      enddo
-
-c-------- ampb: ZZ-like
+      ! ampa/b in ZZ is 17-28/18-27
+      ! ampa/b in WW is 17-28/18-27
+      ! Note: MCFM uses ZZ(17_28)WW+ZZ(18_27)WW+ZZ(18_27)ZZ, omits ZZ(17_28)ZZ
+      ! Added this last contribution -- U. Sarica
       do h1=1,2
       do h2=1,2
       do h3=1,2
       do h5=1,2
-
-      if (doHO .eqv. .false.) then
-      ampb(uquq_uquq,h1,h2,h3,h5)=ampb(uquq_uquq,h1,h2,h3,h5)
-     & +cdotpr(j8_34_1(:,2,h1,h3),j7_56_2(:,2,h2,h5))*gmZ7562(2,2,h1,h2)
-     & +cdotpr(jl8_34_1(:,2,h1,h3),jl7_56_2(:,2,h2,h5))*ll7562(h3,h5)
-     & +cdotpr(j8_34_1(:,2,h1,h3),jl7_56_2(:,2,h2,h5))*gmZl7562(2,h1,h5)
-     & +cdotpr(jl8_34_1(:,2,h1,h3),j7_56_2(:,2,h2,h5))*gmZl8341(2,h2,h3)
-      ampb(uquq_uquq,h1,h2,h3,h5)=ampb(uquq_uquq,h1,h2,h3,h5)
-     & +cdotpr(j8_56_1(:,2,h1,h5),j7_34_2(:,2,h2,h3))*gmZ7342(2,2,h1,h2)
-     & +cdotpr(jl8_56_1(:,2,h1,h5),jl7_34_2(:,2,h2,h3))*ll7342(h3,h5)
-     & +cdotpr(j8_56_1(:,2,h1,h5),jl7_34_2(:,2,h2,h3))*gmZl7342(2,h1,h3)
-     & +cdotpr(jl8_56_1(:,2,h1,h5),j7_34_2(:,2,h2,h3))*gmZl8561(2,h2,h5)
-
-      ampb(uquq_uquq,h1,h2,h3,h5)=ampb(uquq_uquq,h1,h2,h3,h5)
-     & +cdotpr(j8_3456_1(:,2,h1,h3,h5),j7_2(:,h2))*gmZ72(2,2,h1,h2)
-     & +cdotpr(j8_1(:,h1),j7_3456_2(:,2,h2,h3,h5))*gmZ81(2,2,h1,h2)
-
-      ampb(uquq_uquq,h1,h2,h3,h5)=ampb(uquq_uquq,h1,h2,h3,h5)
-     & +ZZ8341(2,2,h1,h2,h3,h5)+ZZ8561(2,2,h1,h2,h5,h3)
-      endif
-
-      ampb(uquq_uquq,h1,h2,h3,h5)=ampb(uquq_uquq,h1,h2,h3,h5)
-     & +Hbit*ZZHamp81_72(2,2,h1,h2,h3,h5)
-
       temp(2,2)=temp(2,2)+esq**6*spinavge
-     & *dble(ampa(uquq_uquq,h1,h2,h3,h5)
-     & *dconjg(ampa(uquq_uquq,h1,h2,h3,h5)))
+     & *dble(ampWWa(uquq_uquq,h1,h2,h3,h5)
+     & *dconjg(ampWWa(uquq_uquq,h1,h2,h3,h5)))
       temp(2,2)=temp(2,2)+esq**6*spinavge
-     & *dble(ampb(uquq_uquq,h1,h2,h3,h5)
-     & *dconjg(ampb(uquq_uquq,h1,h2,h3,h5)))
+     & *dble(ampWWb(uquq_uquq,h1,h2,h3,h5)
+     & *dconjg(ampWWb(uquq_uquq,h1,h2,h3,h5)))
+      temp(2,2)=temp(2,2)+esq**6*spinavge
+     & *dble(ampZZa(uquq_uquq,h1,h2,h3,h5)
+     & *dconjg(ampZZa(uquq_uquq,h1,h2,h3,h5)))
+      temp(2,2)=temp(2,2)+esq**6*spinavge
+     & *dble(ampZZb(uquq_uquq,h1,h2,h3,h5)
+     & *dconjg(ampZZb(uquq_uquq,h1,h2,h3,h5)))
       if (h1 .eq. h2) then
       temp(2,2)=temp(2,2)-2d0/xn*esq**6*spinavge
-     & *dble(ampa(uquq_uquq,h1,h2,h3,h5)
-     & *dconjg(ampb(uquq_uquq,h1,h2,h3,h5)))
+     & *dble(ampWWa(uquq_uquq,h1,h2,h3,h5)
+     & *dconjg(ampWWb(uquq_uquq,h1,h2,h3,h5)))
+      temp(2,2)=temp(2,2)-2d0/xn*esq**6*spinavge
+     & *dble(ampZZa(uquq_uquq,h1,h2,h3,h5)
+     & *dconjg(ampZZb(uquq_uquq,h1,h2,h3,h5)))
       endif
-
+         if (h3 .eq. h5) then
+      temp(2,2)=temp(2,2)-2d0*esq**6*spinavge/sqrt(colfac34_56)
+     & *dble(ampWWa(uquq_uquq,h1,h2,h3,h5)
+     & *dconjg(ampZZa(uquq_uquq,h1,h2,h3,h5)))
+      temp(2,2)=temp(2,2)-2d0*esq**6*spinavge/sqrt(colfac34_56)
+     & *dble(ampWWb(uquq_uquq,h1,h2,h3,h5)
+     & *dconjg(ampZZb(uquq_uquq,h1,h2,h3,h5)))
+      if (h1 .eq. h2) then
+      temp(2,2)=temp(2,2)-2d0/xn*esq**6*spinavge/sqrt(colfac34_56)
+     & *dble(ampWWa(uquq_uquq,h1,h2,h3,h5)
+     & *dconjg(ampZZb(uquq_uquq,h1,h2,h3,h5)))
+      temp(2,2)=temp(2,2)-2d0/xn*esq**6*spinavge/sqrt(colfac34_56)
+     & *dble(ampZZa(uquq_uquq,h1,h2,h3,h5)
+     & *dconjg(ampWWb(uquq_uquq,h1,h2,h3,h5)))
+      endif
+         endif
       enddo
       enddo
       enddo
@@ -668,134 +318,70 @@ c-------- ampb: ZZ-like
       temp(4,4)=temp(2,2)
 
 C-----setup for (dquq_dquq)
-c----- WW-like
-c-------- ampb
-      ampa(dquq_dquq,1,1,1,1)=
-     & +jtwoWexch18(1,2)+jtwoWexch27(2,1)
-     & +jmidWW18
-     & +cdotpr(j8_34_1g(1,:),j7_56_2g(2,:))/s8341
-     & +(cdotpr(j8_34_1z(1,:),j7_56_2z(2,:))
-     &  -cdotpr(j8_34_1z(1,:),k8341(:))
-     &  *cdotpr(k8341(:),j7_56_2z(2,:))/czmass2)
-     & /(s8341-dcmplx(zmass**2,-zmass*zwidth))
-
-c--- the following minus sign accounts for one less fermion loop in interference
-      ampa(dquq_dquq,1,1,1,1)=-ampa(dquq_dquq,1,1,1,1)
-
-
-      do h1=1,2
-      do h2=1,2
-c-------- ampa: WW-like
-      ampb(dquq_dquq,h1,h2,:,:)=amp(dqcq_dqcq,h1,h2,:,:)
-
-      enddo
-      enddo
-
-c-------- ampa: ZZ-like
+      ! ampa/b in ZZ is 17-28/18-27
+      ! ampa/b in WW is 17-28/18-27
       do h1=1,2
       do h2=1,2
       do h3=1,2
       do h5=1,2
-      if ((h1.eq.1) .and. (h2.eq.1)) then
-      if (doHO .eqv. .false.) then
-      ampa(dquq_dquq,h1,h2,h3,h5)=ampa(dquq_dquq,h1,h2,h3,h5)
-     & +cdotpr(jw8_3456_1(:,1,h3,h5),j7_2(:,h2))*0.5d0/propw72/cxw
-
-      ampa(dquq_dquq,h1,h2,h3,h5)=ampa(dquq_dquq,h1,h2,h3,h5)
-     & +cdotpr(j8_1(:,h1),jw7_3456_2(:,2,h3,h5))*0.5d0/propw81/cxw
-
-      ampa(dquq_dquq,h1,h2,h3,h5)=ampa(dquq_dquq,h1,h2,h3,h5)
-     & +(cdotpr(jw8_34_1(:,1,h3),jw7_56_2(:,2,h5))
-     &  -cdotpr(jw8_34_1(:,1,h3),kw7562(:))
-     &  *cdotpr(kw7562(:),jw7_56_2(:,2,h5))/cwmass2)/propw7562
-
-      ampa(dquq_dquq,h1,h2,h3,h5)=ampa(dquq_dquq,h1,h2,h3,h5)
-     & +(cdotpr(jw8_56_1(:,1,h5),jw7_34_2(:,2,h3))
-     &  -cdotpr(jw8_56_1(:,1,h5),kw7342(:))
-     &  *cdotpr(kw7342(:),jw7_34_2(:,2,h3))/cwmass2)/propw7342
-
-      if (h3 .eq. 1)
-     & ampa(dquq_dquq,h1,h2,h3,h5)=ampa(dquq_dquq,h1,h2,h3,h5)
-     & +WWm8341(h5)
-      if (h5 .eq. 1)
-     & ampa(dquq_dquq,h1,h2,h3,h5)=ampa(dquq_dquq,h1,h2,h3,h5)
-     & +WWm8561(h3)
-
-      ampa(dquq_dquq,h1,h2,h3,h5)=ampa(dquq_dquq,h1,h2,h3,h5)
-     & -srWWZZ81_72amp(h3,h5) ! note minus sign instead of exchanging 1<->7,2<->8
-      endif
-
-      ampa(dquq_dquq,h1,h2,h3,h5)=ampa(dquq_dquq,h1,h2,h3,h5)
-     & +WWZZ81_72amp(h3,h5)
-      endif
-
       temp(1,2)=temp(1,2)+esq**6*spinavge
-     &   *dble(ampa(dquq_dquq,h1,h2,h3,h5)
-     & *dconjg(ampa(dquq_dquq,h1,h2,h3,h5)))
+     &   *dble(ampWWa(dquq_dquq,h1,h2,h3,h5)
+     & *dconjg(ampWWa(dquq_dquq,h1,h2,h3,h5)))
       temp(1,2)=temp(1,2)+esq**6*spinavge
-     &   *dble(ampb(dquq_dquq,h1,h2,h3,h5)
-     & *dconjg(ampb(dquq_dquq,h1,h2,h3,h5)))
+     &   *dble(ampWWb(dquq_dquq,h1,h2,h3,h5)
+     & *dconjg(ampWWb(dquq_dquq,h1,h2,h3,h5)))
+      temp(1,2)=temp(1,2)+esq**6*spinavge
+     &   *dble(ampZZa(dquq_dquq,h1,h2,h3,h5)
+     & *dconjg(ampZZa(dquq_dquq,h1,h2,h3,h5)))
+      temp(1,2)=temp(1,2)+esq**6*spinavge
+     &   *dble(ampZZb(dquq_dquq,h1,h2,h3,h5)
+     & *dconjg(ampZZb(dquq_dquq,h1,h2,h3,h5)))
+      if (h1 .eq. h2) then
       temp(1,2)=temp(1,2)-2d0/xn*esq**6*spinavge
-     &   *dble(ampa(dquq_dquq,h1,h2,h3,h5)
-     & *dconjg(ampb(dquq_dquq,h1,h2,h3,h5)))
+     &   *dble(ampWWa(dquq_dquq,h1,h2,h3,h5)
+     & *dconjg(ampWWb(dquq_dquq,h1,h2,h3,h5)))
+      temp(1,2)=temp(1,2)-2d0/xn*esq**6*spinavge
+     &   *dble(ampZZa(dquq_dquq,h1,h2,h3,h5)
+     & *dconjg(ampZZb(dquq_dquq,h1,h2,h3,h5)))
+      endif
+         if (h3 .eq. h5) then
+      temp(1,2)=temp(1,2)-2d0*esq**6*spinavge/sqrt(colfac34_56)
+     &   *dble(ampWWa(dquq_dquq,h1,h2,h3,h5)
+     & *dconjg(ampZZa(dquq_dquq,h1,h2,h3,h5)))
+      temp(1,2)=temp(1,2)-2d0*esq**6*spinavge/sqrt(colfac34_56)
+     &   *dble(ampWWb(dquq_dquq,h1,h2,h3,h5)
+     & *dconjg(ampZZb(dquq_dquq,h1,h2,h3,h5)))
+      if (h1 .eq. h2) then
+      temp(1,2)=temp(1,2)-2d0/xn*esq**6*spinavge/sqrt(colfac34_56)
+     &   *dble(ampWWa(dquq_dquq,h1,h2,h3,h5)
+     & *dconjg(ampZZb(dquq_dquq,h1,h2,h3,h5)))
+      temp(1,2)=temp(1,2)-2d0/xn*esq**6*spinavge/sqrt(colfac34_56)
+     &   *dble(ampZZa(dquq_dquq,h1,h2,h3,h5)
+     & *dconjg(ampWWb(dquq_dquq,h1,h2,h3,h5)))
+      endif
+         endif
       enddo
       enddo
       enddo
       enddo
-
       temp(3,4)=temp(1,2)
 
 C-----setup for (uqbq_uqbq)
-c----- WW-like
-      do h1=1,2
-      do h2=1,2
-
-      amp(uqbq_uqbq,h1,h2,1,1)=
-     & +jmid17(2,1,h1,h2)
-     & +jvbf17(2,1,h1,h2)
-     & +jtwo17(2,1,h1,h2)+jtwo28(1,2,h2,h1)
-     & +jZWZa17(2,1,h1,h2)+jZWZb17(2,1,h1,h2)
-     & +jtwodiags17(2,1,h1,h2)
-
-c--- the following minus sign accounts for one less fermion loop in interference
-      amp(uqbq_uqbq,h1,h2,1,1)=-amp(uqbq_uqbq,h1,h2,1,1)
-
-
-      enddo
-      enddo
-
-c----- ZZ-like
       do h1=1,2
       do h2=1,2
       do h3=1,2
       do h5=1,2
-      if (doHO .eqv. .false.) then
-      amp(uqbq_uqbq,h1,h2,h3,h5)=amp(uqbq_uqbq,h1,h2,h3,h5)
-     & +cdotpr(j7_34_1(:,2,h1,h3),j8_56_2(:,1,h2,h5))*gmZ7341(2,1,h1,h2)
-     & +cdotpr(jl7_34_1(:,2,h1,h3),jl8_56_2(:,1,h2,h5))*ll7341(h3,h5)
-     & +cdotpr(j7_34_1(:,2,h1,h3),jl8_56_2(:,1,h2,h5))*gmZl8562(2,h1,h5)
-     & +cdotpr(jl7_34_1(:,2,h1,h3),j8_56_2(:,1,h2,h5))*gmZl7341(1,h2,h3)
-
-      amp(uqbq_uqbq,h1,h2,h3,h5)=amp(uqbq_uqbq,h1,h2,h3,h5)
-     & +cdotpr(j7_56_1(:,2,h1,h5),j8_34_2(:,1,h2,h3))*gmZ7561(2,1,h1,h2)
-     & +cdotpr(jl7_56_1(:,2,h1,h5),jl8_34_2(:,1,h2,h3))*ll7561(h3,h5)
-     & +cdotpr(j7_56_1(:,2,h1,h5),jl8_34_2(:,1,h2,h3))*gmZl8342(2,h1,h3)
-     & +cdotpr(jl7_56_1(:,2,h1,h5),j8_34_2(:,1,h2,h3))*gmZl7561(1,h2,h5)
-
-      amp(uqbq_uqbq,h1,h2,h3,h5)=amp(uqbq_uqbq,h1,h2,h3,h5)
-     & +cdotpr(j7_3456_1(:,2,h1,h3,h5),j8_2(:,h2))*gmZ82(2,1,h1,h2)
-     & +cdotpr(j7_1(:,h1),j8_3456_2(:,1,h2,h3,h5))*gmZ71(2,1,h1,h2)
-
-      amp(uqbq_uqbq,h1,h2,h3,h5)=amp(uqbq_uqbq,h1,h2,h3,h5)
-     & +ZZ7341(2,1,h1,h2,h3,h5)+ZZ7561(2,1,h1,h2,h5,h3)
-      endif
-
-      amp(uqbq_uqbq,h1,h2,h3,h5)=amp(uqbq_uqbq,h1,h2,h3,h5)
-     & +Hbit*ZZHamp71_82(2,1,h1,h2,h3,h5)
-
       temp(2,5)=temp(2,5)+esq**6*spinavge
-     &   *dble(amp(uqbq_uqbq,h1,h2,h3,h5)
-     & *dconjg(amp(uqbq_uqbq,h1,h2,h3,h5)))
+     &   *dble(ampWW(uqbq_uqbq,h1,h2,h3,h5)
+     & *dconjg(ampWW(uqbq_uqbq,h1,h2,h3,h5)))
+      temp(2,5)=temp(2,5)+esq**6*spinavge
+     &   *dble(ampZZ(uqbq_uqbq,h1,h2,h3,h5)
+     & *dconjg(ampZZ(uqbq_uqbq,h1,h2,h3,h5)))
+      if (h3 .eq. h5) then
+      temp(2,5)=temp(2,5)-2d0*esq**6*spinavge/sqrt(colfac34_56)
+     &   *dble(ampWW(uqbq_uqbq,h1,h2,h3,h5)
+     & *dconjg(ampZZ(uqbq_uqbq,h1,h2,h3,h5)))
+      endif
       enddo
       enddo
       enddo
@@ -804,62 +390,28 @@ c----- ZZ-like
       temp(2,3)=temp(2,5)
 
 C-----setup for (uqsq_dqcq)
-c----- WW-like
-      amp(uqsq_dqcq,1,1,1,1)=
-     & +jtwoWexch17(2,1)+jtwoWexch28(1,2)
-     & +jmidWW28
-     & +cdotpr(j8_34_2g(1,:),j7_56_1g(2,:))/s8342
-     & +(cdotpr(j8_34_2z(1,:),j7_56_1z(2,:))
-     &  -cdotpr(j8_34_2z(1,:),k8342(:))
-     &  *cdotpr(k8342(:),j7_56_1z(2,:))/czmass2)
-     & /(s8342-dcmplx(zmass**2,-zmass*zwidth))
-
-c--- the following minus sign accounts for one less fermion loop in interference
-      amp(uqsq_dqcq,1,1,1,1)=-amp(uqsq_dqcq,1,1,1,1)
-
-c----- ZZ-like
       do h1=1,1
       do h2=1,1
       do h3=1,2
       do h5=1,2
-      if (doHO .eqv. .false.) then
-      amp(uqsq_dqcq,h1,h2,h3,h5)=amp(uqsq_dqcq,h1,h2,h3,h5)
-     & +cdotpr(jw7_3456_1(:,2,h3,h5),j8_2(:,h2))*0.5d0/propw82/cxw
-
-      amp(uqsq_dqcq,h1,h2,h3,h5)=amp(uqsq_dqcq,h1,h2,h3,h5)
-     & +cdotpr(j7_1(:,h1),jw8_3456_2(:,1,h3,h5))*0.5d0/propw71/cxw
-
-      amp(uqsq_dqcq,h1,h2,h3,h5)=amp(uqsq_dqcq,h1,h2,h3,h5)
-     & +(cdotpr(jw7_34_1(:,2,h3),jw8_56_2(:,1,h5))
-     &  -cdotpr(jw7_34_1(:,2,h3),kw7341(:))
-     &  *cdotpr(kw7341(:),jw8_56_2(:,1,h5))/cwmass2)/propw7341
-
-      amp(uqsq_dqcq,h1,h2,h3,h5)=amp(uqsq_dqcq,h1,h2,h3,h5)
-     & +(cdotpr(jw7_56_1(:,2,h5),jw8_34_2(:,1,h3))
-     &  -cdotpr(jw7_56_1(:,2,h5),kw1567(:))
-     &  *cdotpr(kw1567(:),jw8_34_2(:,1,h3))/cwmass2)/propw7561
-
-      if (h3 .eq. 1)
-     & amp(uqsq_dqcq,h1,h2,h3,h5)=amp(uqsq_dqcq,h1,h2,h3,h5)
-     & +WWp7341(h5)
-      if (h5 .eq. 1)
-     & amp(uqsq_dqcq,h1,h2,h3,h5)=amp(uqsq_dqcq,h1,h2,h3,h5)
-     & +WWp7561(h3)
-
-      amp(uqsq_dqcq,h1,h2,h3,h5)=amp(uqsq_dqcq,h1,h2,h3,h5)
-     & +srWWZZ71_82amp(h3,h5)
-      endif
-
-      amp(uqsq_dqcq,h1,h2,h3,h5)=amp(uqsq_dqcq,h1,h2,h3,h5)
-     & +WWZZ71_82amp(h3,h5)
-
       tempw(2,3)=tempw(2,3)+esq**6*spinavge
-     &   *dble(amp(uqsq_dqcq,h1,h2,h3,h5)
-     & *dconjg(amp(uqsq_dqcq,h1,h2,h3,h5)))
+     &   *dble(ampWW(uqsq_dqcq,h1,h2,h3,h5)
+     & *dconjg(ampWW(uqsq_dqcq,h1,h2,h3,h5)))
+      tempw(2,3)=tempw(2,3)+esq**6*spinavge
+     &   *dble(ampZZ(uqsq_dqcq,h1,h2,h3,h5)
+     & *dconjg(ampZZ(uqsq_dqcq,h1,h2,h3,h5)))
+      if (h3 .eq. h5) then
+      tempw(2,3)=tempw(2,3)-2d0*esq**6*spinavge/sqrt(colfac34_56)
+     &   *dble(ampWW(uqsq_dqcq,h1,h2,h3,h5)
+     & *dconjg(ampZZ(uqsq_dqcq,h1,h2,h3,h5)))
+      endif
       enddo
       enddo
       enddo
       enddo
+
+      temp(:,:) = temp(:,:)*colfac34_56
+      tempw(:,:) = tempw(:,:)*colfac34_56
 
 c--- fill matrix elements
       if (j .eq. 1) then
