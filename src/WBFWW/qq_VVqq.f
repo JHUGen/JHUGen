@@ -30,7 +30,7 @@ c--- q(-p1) + q(-p2) -> e-(p3) e-(p4) nu_e(p5) nu_ebar(p6);
      & colfac34_56
       double complex zab(mxpart,4,mxpart),zba(mxpart,4,mxpart),
      & ampZZ(nmax,2,2,2,2),ampZZa(nmax,2,2,2,2),ampZZb(nmax,2,2,2,2),
-     & ampWW(nmax,2,2,2,2),ampWWa(nmax,2,2,2,2),ampWWb(nmax,2,2,2,2)
+     & ampWW(nmax,2,2),ampWWa(nmax,2,2),ampWWb(nmax,2,2)
       logical doHO,doBO,comb1278ok
       parameter(spinavge=0.25d0,stat=0.5d0,nfinc=4)
       integer,parameter:: j1(jmax)=(/1,2,8,8,7,2,7,1,1,7,2,7/)
@@ -104,18 +104,19 @@ c---color factors for W and Z decays
       do j=1,jmax
       temp(:,:)=0d0
       tempw(:,:)=0d0
-      ampWW(:,:,:,:,:)=czip
-      ampWWa(:,:,:,:,:)=czip
-      ampWWb(:,:,:,:,:)=czip
+      ampWW(:,:,:)=czip
+      ampWWa(:,:,:)=czip
+      ampWWb(:,:,:)=czip
       ampZZ(:,:,:,:,:)=czip
       ampZZa(:,:,:,:,:)=czip
       ampZZb(:,:,:,:,:)=czip
 
 C--   MARKUS: adding switches to remove VH or VBF contributions
       ! No VH-like diagram
-      if( (vvhvvtoggle_vbfvh.eq.0) .and. (j.ge.9) ) cycle
+      !if( (vvhvvtoggle_vbfvh.eq.0) .and. (j.ge.9) ) cycle
       ! No VBF-like diagram
-      if( (vvhvvtoggle_vbfvh.eq.1) .and. (j.le.8) ) cycle
+      !if( (vvhvvtoggle_vbfvh.eq.1) .and. (j.le.8) ) cycle
+      if( (vvhvvtoggle_vbfvh.eq.1) .and. (j.le.4) ) cycle
       ! U. Sarica: Test the combination
       call testWBFVVApartComb(j1(j),j2(j),j7(j),j8(j),comb1278ok)
       if (.not.comb1278ok) cycle
@@ -138,6 +139,27 @@ c-----------------------------------------
      & j1(j),j2(j),3,4,5,6,j7(j),j8(j),doHO,doBO)
       endif
 
+      ! Kill ampa in j=5,6,7,8 for VH
+      ! Kill ampa in j=9,10,11,12 for VBF
+      if( (
+     & (vvhvvtoggle_vbfvh.eq.1) .and. (j.le.8)
+     & ) .or. (
+     & (vvhvvtoggle_vbfvh.eq.0) .and. (j.ge.9)
+     & )
+     &  ) then
+         ampWWa(:,:,:)=czip
+         ampZZa(:,:,:,:,:)=czip
+      ! Kill ampb in j=9,10,11,12 for VH
+      ! Kill ampb in j=5,6,7,8 for VBF
+      else if( (
+     & (vvhvvtoggle_vbfvh.eq.1) .and. (j.ge.9)
+     & ) .or. (
+     & (vvhvvtoggle_vbfvh.eq.0) .and. (j.le.8)
+     & )
+     &  ) then
+         ampWWb(:,:,:)=czip
+         ampZZb(:,:,:,:,:)=czip
+      endif
 
 C-----setup for (dqcq_dqcq)
       do h1=1,2
@@ -145,14 +167,16 @@ C-----setup for (dqcq_dqcq)
       do h3=1,2
       do h5=1,2
       temp(1,4)=temp(1,4)+esq**6*spinavge
-     &   *dble(ampWW(dqcq_dqcq,h1,h2,h3,h5)
-     & *dconjg(ampWW(dqcq_dqcq,h1,h2,h3,h5)))
-      temp(1,4)=temp(1,4)+esq**6*spinavge
      &   *dble(ampZZ(dqcq_dqcq,h1,h2,h3,h5)
      & *dconjg(ampZZ(dqcq_dqcq,h1,h2,h3,h5)))
+
+      if (h3 .ne. 1 .or. h5 .ne. 1) cycle
+      temp(1,4)=temp(1,4)+esq**6*spinavge
+     &   *dble(ampWW(dqcq_dqcq,h1,h2)
+     & *dconjg(ampWW(dqcq_dqcq,h1,h2)))
       if(h3 .eq. h5) then
       temp(1,4)=temp(1,4)-2d0*esq**6*spinavge/sqrt(colfac34_56)
-     &   *dble(ampWW(dqcq_dqcq,h1,h2,h3,h5)
+     &   *dble(ampWW(dqcq_dqcq,h1,h2)
      & *dconjg(ampZZ(dqcq_dqcq,h1,h2,h3,h5)))
       endif
       enddo
@@ -167,14 +191,16 @@ C-----setup for (dqcq_uqsq)
       do h3=1,2
       do h5=1,2
       tempw(1,4)=tempw(1,4)+esq**6*spinavge
-     &   *dble(ampWW(dqcq_uqsq,h1,h2,h3,h5)
-     & *dconjg(ampWW(dqcq_uqsq,h1,h2,h3,h5)))
-      tempw(1,4)=tempw(1,4)+esq**6*spinavge
      &   *dble(ampZZ(dqcq_uqsq,h1,h2,h3,h5)
      & *dconjg(ampZZ(dqcq_uqsq,h1,h2,h3,h5)))
+
+      if (h3 .ne. 1 .or. h5 .ne. 1) cycle
+      tempw(1,4)=tempw(1,4)+esq**6*spinavge
+     &   *dble(ampWW(dqcq_uqsq,h1,h2)
+     & *dconjg(ampWW(dqcq_uqsq,h1,h2)))
       if(h3 .eq. h5) then
       temp(1,4)=temp(1,4)-2d0*esq**6*spinavge/sqrt(colfac34_56)
-     &   *dble(ampWW(dqcq_uqsq,h1,h2,h3,h5)
+     &   *dble(ampWW(dqcq_uqsq,h1,h2)
      & *dconjg(ampZZ(dqcq_uqsq,h1,h2,h3,h5)))
       endif
       enddo
@@ -189,14 +215,16 @@ C-----setup for (uqcq_uqcq)
       do h3=1,2
       do h5=1,2
       temp(2,4)=temp(2,4)+esq**6*spinavge
-     &   *dble(ampWW(uqcq_uqcq,h1,h2,h3,h5)
-     & *dconjg(ampWW(uqcq_uqcq,h1,h2,h3,h5)))
-      temp(2,4)=temp(2,4)+esq**6*spinavge
      &   *dble(ampZZ(uqcq_uqcq,h1,h2,h3,h5)
      & *dconjg(ampZZ(uqcq_uqcq,h1,h2,h3,h5)))
+
+      if (h3 .ne. 1 .or. h5 .ne. 1) cycle
+      temp(2,4)=temp(2,4)+esq**6*spinavge
+     &   *dble(ampWW(uqcq_uqcq,h1,h2)
+     & *dconjg(ampWW(uqcq_uqcq,h1,h2)))
       if(h3 .eq. h5) then
       temp(2,4)=temp(2,4)-2d0*esq**6*spinavge/sqrt(colfac34_56)
-     &   *dble(ampWW(uqcq_uqcq,h1,h2,h3,h5)
+     &   *dble(ampWW(uqcq_uqcq,h1,h2)
      & *dconjg(ampZZ(uqcq_uqcq,h1,h2,h3,h5)))
       endif
       enddo
@@ -211,14 +239,16 @@ C-----setup for (dqsq_dqsq)
       do h3=1,2
       do h5=1,2
       temp(1,3)=temp(1,3)+esq**6*spinavge
-     &   *dble(ampWW(dqsq_dqsq,h1,h2,h3,h5)
-     & *dconjg(ampWW(dqsq_dqsq,h1,h2,h3,h5)))
-      temp(1,3)=temp(1,3)+esq**6*spinavge
      &   *dble(ampZZ(dqsq_dqsq,h1,h2,h3,h5)
      & *dconjg(ampZZ(dqsq_dqsq,h1,h2,h3,h5)))
+
+      if (h3 .ne. 1 .or. h5 .ne. 1) cycle
+      temp(1,3)=temp(1,3)+esq**6*spinavge
+     &   *dble(ampWW(dqsq_dqsq,h1,h2)
+     & *dconjg(ampWW(dqsq_dqsq,h1,h2)))
       if(h3 .eq. h5) then
       temp(1,3)=temp(1,3)-2d0*esq**6*spinavge/sqrt(colfac34_56)
-     &   *dble(ampWW(dqsq_dqsq,h1,h2,h3,h5)
+     &   *dble(ampWW(dqsq_dqsq,h1,h2)
      & *dconjg(ampZZ(dqsq_dqsq,h1,h2,h3,h5)))
       endif
       enddo
@@ -238,12 +268,6 @@ C-----setup for (dqdq_dqdq)
       do h3=1,2
       do h5=1,2
       temp(1,1)=temp(1,1)+esq**6*spinavge
-     & *dble(ampWWa(dqdq_dqdq,h1,h2,h3,h5)
-     & *dconjg(ampWWa(dqdq_dqdq,h1,h2,h3,h5)))
-      temp(1,1)=temp(1,1)+esq**6*spinavge
-     & *dble(ampWWb(dqdq_dqdq,h1,h2,h3,h5)
-     & *dconjg(ampWWb(dqdq_dqdq,h1,h2,h3,h5)))
-      temp(1,1)=temp(1,1)+esq**6*spinavge
      & *dble(ampZZa(dqdq_dqdq,h1,h2,h3,h5)
      & *dconjg(ampZZa(dqdq_dqdq,h1,h2,h3,h5)))
       temp(1,1)=temp(1,1)+esq**6*spinavge
@@ -251,26 +275,37 @@ C-----setup for (dqdq_dqdq)
      & *dconjg(ampZZb(dqdq_dqdq,h1,h2,h3,h5)))
       if (h1 .eq. h2) then
       temp(1,1)=temp(1,1)-2d0/xn*esq**6*spinavge
-     & *dble(ampWWa(dqdq_dqdq,h1,h2,h3,h5)
-     & *dconjg(ampWWb(dqdq_dqdq,h1,h2,h3,h5)))
-      temp(1,1)=temp(1,1)-2d0/xn*esq**6*spinavge
      & *dble(ampZZa(dqdq_dqdq,h1,h2,h3,h5)
      & *dconjg(ampZZb(dqdq_dqdq,h1,h2,h3,h5)))
       endif
+
+      if (h3 .ne. 1 .or. h5 .ne. 1) cycle
+      temp(1,1)=temp(1,1)+esq**6*spinavge
+     & *dble(ampWWa(dqdq_dqdq,h1,h2)
+     & *dconjg(ampWWa(dqdq_dqdq,h1,h2)))
+      temp(1,1)=temp(1,1)+esq**6*spinavge
+     & *dble(ampWWb(dqdq_dqdq,h1,h2)
+     & *dconjg(ampWWb(dqdq_dqdq,h1,h2)))
+      if (h1 .eq. h2) then
+      temp(1,1)=temp(1,1)-2d0/xn*esq**6*spinavge
+     & *dble(ampWWa(dqdq_dqdq,h1,h2)
+     & *dconjg(ampWWb(dqdq_dqdq,h1,h2)))
+      endif
+
          if(h3 .eq. h5) then
       temp(1,1)=temp(1,1)-2d0*esq**6*spinavge/sqrt(colfac34_56)
-     & *dble(ampWWa(dqdq_dqdq,h1,h2,h3,h5)
+     & *dble(ampWWa(dqdq_dqdq,h1,h2)
      & *dconjg(ampZZa(dqdq_dqdq,h1,h2,h3,h5)))
       temp(1,1)=temp(1,1)-2d0*esq**6*spinavge/sqrt(colfac34_56)
-     & *dble(ampWWb(dqdq_dqdq,h1,h2,h3,h5)
+     & *dble(ampWWb(dqdq_dqdq,h1,h2)
      & *dconjg(ampZZb(dqdq_dqdq,h1,h2,h3,h5)))
       if (h1 .eq. h2) then
       temp(1,1)=temp(1,1)-2d0/xn*esq**6*spinavge/sqrt(colfac34_56)
-     & *dble(ampWWa(dqdq_dqdq,h1,h2,h3,h5)
+     & *dble(ampWWa(dqdq_dqdq,h1,h2)
      & *dconjg(ampZZb(dqdq_dqdq,h1,h2,h3,h5)))
       temp(1,1)=temp(1,1)-2d0/xn*esq**6*spinavge/sqrt(colfac34_56)
      & *dble(ampZZa(dqdq_dqdq,h1,h2,h3,h5)
-     & *dconjg(ampWWb(dqdq_dqdq,h1,h2,h3,h5)))
+     & *dconjg(ampWWb(dqdq_dqdq,h1,h2)))
       endif
          endif
       enddo
@@ -290,12 +325,6 @@ C-----setup for (uquq_uquq)
       do h3=1,2
       do h5=1,2
       temp(2,2)=temp(2,2)+esq**6*spinavge
-     & *dble(ampWWa(uquq_uquq,h1,h2,h3,h5)
-     & *dconjg(ampWWa(uquq_uquq,h1,h2,h3,h5)))
-      temp(2,2)=temp(2,2)+esq**6*spinavge
-     & *dble(ampWWb(uquq_uquq,h1,h2,h3,h5)
-     & *dconjg(ampWWb(uquq_uquq,h1,h2,h3,h5)))
-      temp(2,2)=temp(2,2)+esq**6*spinavge
      & *dble(ampZZa(uquq_uquq,h1,h2,h3,h5)
      & *dconjg(ampZZa(uquq_uquq,h1,h2,h3,h5)))
       temp(2,2)=temp(2,2)+esq**6*spinavge
@@ -303,28 +332,40 @@ C-----setup for (uquq_uquq)
      & *dconjg(ampZZb(uquq_uquq,h1,h2,h3,h5)))
       if (h1 .eq. h2) then
       temp(2,2)=temp(2,2)-2d0/xn*esq**6*spinavge
-     & *dble(ampWWa(uquq_uquq,h1,h2,h3,h5)
-     & *dconjg(ampWWb(uquq_uquq,h1,h2,h3,h5)))
-      temp(2,2)=temp(2,2)-2d0/xn*esq**6*spinavge
      & *dble(ampZZa(uquq_uquq,h1,h2,h3,h5)
      & *dconjg(ampZZb(uquq_uquq,h1,h2,h3,h5)))
       endif
+
+      if (h3 .ne. 1 .or. h5 .ne. 1) cycle
+      temp(2,2)=temp(2,2)+esq**6*spinavge
+     & *dble(ampWWa(uquq_uquq,h1,h2)
+     & *dconjg(ampWWa(uquq_uquq,h1,h2)))
+      temp(2,2)=temp(2,2)+esq**6*spinavge
+     & *dble(ampWWb(uquq_uquq,h1,h2)
+     & *dconjg(ampWWb(uquq_uquq,h1,h2)))
+      if (h1 .eq. h2) then
+      temp(2,2)=temp(2,2)-2d0/xn*esq**6*spinavge
+     & *dble(ampWWa(uquq_uquq,h1,h2)
+     & *dconjg(ampWWb(uquq_uquq,h1,h2)))
+      endif
+
          if (h3 .eq. h5) then
       temp(2,2)=temp(2,2)-2d0*esq**6*spinavge/sqrt(colfac34_56)
-     & *dble(ampWWa(uquq_uquq,h1,h2,h3,h5)
+     & *dble(ampWWa(uquq_uquq,h1,h2)
      & *dconjg(ampZZa(uquq_uquq,h1,h2,h3,h5)))
       temp(2,2)=temp(2,2)-2d0*esq**6*spinavge/sqrt(colfac34_56)
-     & *dble(ampWWb(uquq_uquq,h1,h2,h3,h5)
+     & *dble(ampWWb(uquq_uquq,h1,h2)
      & *dconjg(ampZZb(uquq_uquq,h1,h2,h3,h5)))
       if (h1 .eq. h2) then
       temp(2,2)=temp(2,2)-2d0/xn*esq**6*spinavge/sqrt(colfac34_56)
-     & *dble(ampWWa(uquq_uquq,h1,h2,h3,h5)
+     & *dble(ampWWa(uquq_uquq,h1,h2)
      & *dconjg(ampZZb(uquq_uquq,h1,h2,h3,h5)))
       temp(2,2)=temp(2,2)-2d0/xn*esq**6*spinavge/sqrt(colfac34_56)
      & *dble(ampZZa(uquq_uquq,h1,h2,h3,h5)
-     & *dconjg(ampWWb(uquq_uquq,h1,h2,h3,h5)))
+     & *dconjg(ampWWb(uquq_uquq,h1,h2)))
       endif
          endif
+
       enddo
       enddo
       enddo
@@ -339,12 +380,6 @@ C-----setup for (dquq_dquq)
       do h3=1,2
       do h5=1,2
       temp(1,2)=temp(1,2)+esq**6*spinavge
-     &   *dble(ampWWa(dquq_dquq,h1,h2,h3,h5)
-     & *dconjg(ampWWa(dquq_dquq,h1,h2,h3,h5)))
-      temp(1,2)=temp(1,2)+esq**6*spinavge
-     &   *dble(ampWWb(dquq_dquq,h1,h2,h3,h5)
-     & *dconjg(ampWWb(dquq_dquq,h1,h2,h3,h5)))
-      temp(1,2)=temp(1,2)+esq**6*spinavge
      &   *dble(ampZZa(dquq_dquq,h1,h2,h3,h5)
      & *dconjg(ampZZa(dquq_dquq,h1,h2,h3,h5)))
       temp(1,2)=temp(1,2)+esq**6*spinavge
@@ -352,28 +387,40 @@ C-----setup for (dquq_dquq)
      & *dconjg(ampZZb(dquq_dquq,h1,h2,h3,h5)))
       if (h1 .eq. h2) then
       temp(1,2)=temp(1,2)-2d0/xn*esq**6*spinavge
-     &   *dble(ampWWa(dquq_dquq,h1,h2,h3,h5)
-     & *dconjg(ampWWb(dquq_dquq,h1,h2,h3,h5)))
-      temp(1,2)=temp(1,2)-2d0/xn*esq**6*spinavge
      &   *dble(ampZZa(dquq_dquq,h1,h2,h3,h5)
      & *dconjg(ampZZb(dquq_dquq,h1,h2,h3,h5)))
       endif
+
+      if (h3 .ne. 1 .or. h5 .ne. 1) cycle
+      temp(1,2)=temp(1,2)+esq**6*spinavge
+     &   *dble(ampWWa(dquq_dquq,h1,h2)
+     & *dconjg(ampWWa(dquq_dquq,h1,h2)))
+      temp(1,2)=temp(1,2)+esq**6*spinavge
+     &   *dble(ampWWb(dquq_dquq,h1,h2)
+     & *dconjg(ampWWb(dquq_dquq,h1,h2)))
+      if (h1 .eq. h2) then
+      temp(1,2)=temp(1,2)-2d0/xn*esq**6*spinavge
+     &   *dble(ampWWa(dquq_dquq,h1,h2)
+     & *dconjg(ampWWb(dquq_dquq,h1,h2)))
+      endif
+
          if (h3 .eq. h5) then
       temp(1,2)=temp(1,2)-2d0*esq**6*spinavge/sqrt(colfac34_56)
-     &   *dble(ampWWa(dquq_dquq,h1,h2,h3,h5)
+     &   *dble(ampWWa(dquq_dquq,h1,h2)
      & *dconjg(ampZZa(dquq_dquq,h1,h2,h3,h5)))
       temp(1,2)=temp(1,2)-2d0*esq**6*spinavge/sqrt(colfac34_56)
-     &   *dble(ampWWb(dquq_dquq,h1,h2,h3,h5)
+     &   *dble(ampWWb(dquq_dquq,h1,h2)
      & *dconjg(ampZZb(dquq_dquq,h1,h2,h3,h5)))
       if (h1 .eq. h2) then
       temp(1,2)=temp(1,2)-2d0/xn*esq**6*spinavge/sqrt(colfac34_56)
-     &   *dble(ampWWa(dquq_dquq,h1,h2,h3,h5)
+     &   *dble(ampWWa(dquq_dquq,h1,h2)
      & *dconjg(ampZZb(dquq_dquq,h1,h2,h3,h5)))
       temp(1,2)=temp(1,2)-2d0/xn*esq**6*spinavge/sqrt(colfac34_56)
      &   *dble(ampZZa(dquq_dquq,h1,h2,h3,h5)
-     & *dconjg(ampWWb(dquq_dquq,h1,h2,h3,h5)))
+     & *dconjg(ampWWb(dquq_dquq,h1,h2)))
       endif
          endif
+
       enddo
       enddo
       enddo
@@ -386,14 +433,16 @@ C-----setup for (uqbq_uqbq)
       do h3=1,2
       do h5=1,2
       temp(2,5)=temp(2,5)+esq**6*spinavge
-     &   *dble(ampWW(uqbq_uqbq,h1,h2,h3,h5)
-     & *dconjg(ampWW(uqbq_uqbq,h1,h2,h3,h5)))
-      temp(2,5)=temp(2,5)+esq**6*spinavge
      &   *dble(ampZZ(uqbq_uqbq,h1,h2,h3,h5)
      & *dconjg(ampZZ(uqbq_uqbq,h1,h2,h3,h5)))
+
+      if (h3 .ne. 1 .or. h5 .ne. 1) cycle
+      temp(2,5)=temp(2,5)+esq**6*spinavge
+     &   *dble(ampWW(uqbq_uqbq,h1,h2)
+     & *dconjg(ampWW(uqbq_uqbq,h1,h2)))
       if (h3 .eq. h5) then
       temp(2,5)=temp(2,5)-2d0*esq**6*spinavge/sqrt(colfac34_56)
-     &   *dble(ampWW(uqbq_uqbq,h1,h2,h3,h5)
+     &   *dble(ampWW(uqbq_uqbq,h1,h2)
      & *dconjg(ampZZ(uqbq_uqbq,h1,h2,h3,h5)))
       endif
       enddo
@@ -409,14 +458,16 @@ C-----setup for (uqsq_dqcq)
       do h3=1,2
       do h5=1,2
       tempw(2,3)=tempw(2,3)+esq**6*spinavge
-     &   *dble(ampWW(uqsq_dqcq,h1,h2,h3,h5)
-     & *dconjg(ampWW(uqsq_dqcq,h1,h2,h3,h5)))
-      tempw(2,3)=tempw(2,3)+esq**6*spinavge
      &   *dble(ampZZ(uqsq_dqcq,h1,h2,h3,h5)
      & *dconjg(ampZZ(uqsq_dqcq,h1,h2,h3,h5)))
+
+      if (h3 .ne. 1 .or. h5 .ne. 1) cycle
+      tempw(2,3)=tempw(2,3)+esq**6*spinavge
+     &   *dble(ampWW(uqsq_dqcq,h1,h2)
+     & *dconjg(ampWW(uqsq_dqcq,h1,h2)))
       if (h3 .eq. h5) then
       tempw(2,3)=tempw(2,3)-2d0*esq**6*spinavge/sqrt(colfac34_56)
-     &   *dble(ampWW(uqsq_dqcq,h1,h2,h3,h5)
+     &   *dble(ampWW(uqsq_dqcq,h1,h2)
      & *dconjg(ampZZ(uqsq_dqcq,h1,h2,h3,h5)))
       endif
       enddo

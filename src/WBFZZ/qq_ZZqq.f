@@ -116,9 +116,10 @@ c---color factors for Z decays
 
 C--   MARKUS: adding switches to remove VH or VBF contributions
       ! No VH-like diagram
-      if( (vvhvvtoggle_vbfvh.eq.0) .and. (j.ge.9) ) cycle
+      !if( (vvhvvtoggle_vbfvh.eq.0) .and. (j.ge.9) ) cycle
       ! No VBF-like diagram
-      if( (vvhvvtoggle_vbfvh.eq.1) .and. (j.le.8) ) cycle
+      !if( (vvhvvtoggle_vbfvh.eq.1) .and. (j.le.8) ) cycle
+      if( (vvhvvtoggle_vbfvh.eq.1) .and. (j.le.4) ) cycle
       ! U. Sarica: Test the combination
       call testWBFVVApartComb(j1(j),j2(j),j7(j),j8(j),comb1278ok)
       if (.not.comb1278ok) cycle
@@ -129,6 +130,28 @@ c--   Call the VVZZ amplitudes
       if (interference) then
         call getVVZZamps(amp_swap,ampa_swap,ampb_swap,p,za,zb,zab,zba,
      &   j1(j),j2(j),3,6,5,4,j7(j),j8(j),doHO,doBO)
+      endif
+
+      ! Kill ampa in j=5,6,7,8 for VH
+      ! Kill ampa in j=9,10,11,12 for VBF
+      if( (
+     & (vvhvvtoggle_vbfvh.eq.1) .and. (j.le.8)
+     & ) .or. (
+     & (vvhvvtoggle_vbfvh.eq.0) .and. (j.ge.9)
+     & )
+     &  ) then
+         ampa(:,:,:,:,:)=czip
+         ampa_swap(:,:,:,:,:)=czip
+      ! Kill ampb in j=9,10,11,12 for VH
+      ! Kill ampb in j=5,6,7,8 for VBF
+      else if( (
+     & (vvhvvtoggle_vbfvh.eq.1) .and. (j.ge.9)
+     & ) .or. (
+     & (vvhvvtoggle_vbfvh.eq.0) .and. (j.le.8)
+     & )
+     &  ) then
+         ampb(:,:,:,:,:)=czip
+         ampb_swap(:,:,:,:,:)=czip
       endif
 
 C-----setup for (uqbq_uqbq) (2,5)->(2,5)
