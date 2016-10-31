@@ -7,6 +7,7 @@
       include 'masses.f'
       include 'ewcharge.f'
       include 'runstring.f'
+      include 'ewcouple.f'
       include 'zcouple.f'
       include 'WWbits.f'
       include 'spinzerohiggs_anomcoupl.f'
@@ -14,7 +15,7 @@
      & p1,p2,p3,p4,p5,p6,p7,p8
       double complex zab2,amp(2,2,2,2),sqzmass,Amp_S_PR,Amp_S_DK,
      & propw34,propw56,propz28,propz17,propH,propw1347,propw1567,
-     & gamZ17(2,2),gamz28(2,2),ZZ17(2,2),ZZ28(2,2),rxw,
+     & gamZ17(2,2),gamz28(2,2),ZZ17(2,2),ZZ28(2,2),rxw,facHiggs,
      & anomhzzamp,anomhwwamp,propX
       double precision t4,s17,s28,s34,s56,s3456,s1347,s1567
 C     amp(jdu1,jdu2,h17,h28)
@@ -30,6 +31,8 @@ c--- special fix for Madgraph check
       else
         sqzmass=czmass2
       endif
+      facHiggs = 2d0*sqzmass*cxw**(-2)*(4d0*cwmass2/vevsq*cxw/esq)
+
 
       rxw=sqrt((cone-cxw)/cxw)
       s17=s(i1,i7)
@@ -99,9 +102,9 @@ c--- special fix for Madgraph check
       ! MCFM uses W-W+!
       Amp_S_DK=anomhwwamp(p5,p6,p3,p4,1,s3456,s(p5,p6),s(p3,p4),za,zb)
       amp(jdu1,jdu2,h17,h28)= amp(jdu1,jdu2,h17,h28)
-     &                      + propw56**(-1)*propw34**(-1)*cxw**(-2)*
-     & Hbit * ( - 2.D0*Amp_S_PR*Amp_S_DK
-     &  *ZZ17(jdu1,h17)*ZZ28(jdu2,h28)*propH**(-1)*sqzmass )
+     &                      + propw56**(-1)*propw34**(-1)*facHiggs*
+     & Hbit * ( -Amp_S_PR*Amp_S_DK
+     &  *ZZ17(jdu1,h17)*ZZ28(jdu2,h28)*propH**(-1) )
       endif
 !       print *, "MARKUS check: new ZZ-->H-->WW:",amp(jdu1,jdu2,h17,h28)
 !       pause
@@ -113,9 +116,9 @@ c--- special fix for Madgraph check
       ! MCFM uses W-W+!
       Amp_S_DK=anomhwwamp(p5,p6,p3,p4,2,s3456,s(p5,p6),s(p3,p4),za,zb)
       amp(jdu1,jdu2,h17,h28)= amp(jdu1,jdu2,h17,h28)
-     &                      + propw56**(-1)*propw34**(-1)*cxw**(-2)*
-     & Hbit * ( - 2.D0*Amp_S_PR*Amp_S_DK
-     &  *ZZ17(jdu1,h17)*ZZ28(jdu2,h28)*propX**(-1)*sqzmass )
+     &                      + propw56**(-1)*propw34**(-1)*facHiggs*
+     & Hbit * ( -Amp_S_PR*Amp_S_DK
+     &  *ZZ17(jdu1,h17)*ZZ28(jdu2,h28)*propX**(-1) )
       endif
 
       amp(jdu1,jdu2,h17,h28) = amp(jdu1,jdu2,h17,h28) + gamz17(jdu1,h17
