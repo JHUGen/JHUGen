@@ -43,7 +43,8 @@ private
       ijSel( 24,1:3) = (/ 5, 4,110/)
 
 
-      ijSel( 25:121,:) = 0      
+      ijSel( 25:121,:) = 0
+      ijSel( 25:121,3) = -1
       
   return
   end subroutine

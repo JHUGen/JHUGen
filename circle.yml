@@ -16,17 +16,37 @@ machine:
     MANPATH: "$(echo $HOME/JHUGen/JHUGenerator/root/man:$MANPATH | sed s/:$//)"
     LHAPDF_DATA_PATH: "/home/ubuntu/LHAPDF-6.1.6/share/LHAPDF"
 
+    ROOT_VERSIONPART1: "6"
+    ROOT_VERSIONPART2: "06"
+    ROOT_VERSIONPART3: "08"
+    ROOT_VERSIONSTRING: "${ROOT_VERSIONPART1}.${ROOT_VERSIONPART2}/${ROOT_VERSIONPART3}"
+
 general:
   build_dir: JHUGenerator
 
 dependencies:
   override:
     - |
+      if [ -d ~/root ]; then
+        set -o pipefail &&  #exit status will be nonzero if any of echo, root, grep, sed fails
+        CURRENT_ROOT_VERSION=$(echo | root -b | grep [0-9]*[.][0-9]*/[0-9]* | sed -r "s|.*[^0-9]+([0-9]*[.][0-9]*/[0-9]*).*|\1|") &&
+        echo "$CURRENT_ROOT_VERSION" "$ROOT_VERSIONSTRING" &&
+        if [ "$CURRENT_ROOT_VERSION" != "$ROOT_VERSIONSTRING" ]; then
+          rm -rf ~/root
+        fi
+      fi
+    - |
       if ! [ -d ~/root ]; then
         cd &&
-        wget https://root.cern.ch/download/root_v6.04.08.Linux-ubuntu14-x86_64-gcc4.8.tar.gz &&
-        tar -xvzf root_v6.04.08.Linux-ubuntu14-x86_64-gcc4.8.tar.gz
+        wget https://root.cern.ch/download/root_v${ROOT_VERSIONPART1}.${ROOT_VERSIONPART2}.${ROOT_VERSIONPART3}.Linux-ubuntu14-x86_64-gcc4.8.tar.gz &&
+        tar -xvzf root_v${ROOT_VERSIONPART1}.${ROOT_VERSIONPART2}.${ROOT_VERSIONPART3}.Linux-ubuntu14-x86_64-gcc4.8.tar.gz
       fi
+    - |
+      set -o pipefail &&  #exit status will be nonzero if any of echo, root, grep, sed fails
+      CURRENT_ROOT_VERSION=$(echo | root -b | grep [0-9]*[.][0-9]*/[0-9]* | sed -r "s|.*[^0-9]+([0-9]*[.][0-9]*/[0-9]*).*|\1|") &&
+      echo "$CURRENT_ROOT_VERSION" "$ROOT_VERSIONSTRING" &&
+      [ "$CURRENT_ROOT_VERSION" == "$ROOT_VERSIONSTRING" ]
+
     - |
       cd ~ &&
       if ! [ -d CMSJHU_AnalysisMacros ]; then
@@ -153,11 +173,13 @@ test:
     - ./JHUGen PDFSet=3 Process=2  VegasNc0=100000 VegasNc2=100 DataFile=$CIRCLE_ARTIFACTS/other/spin2_Zgamma     DecayMode1=9  DecayMode2=7 a1=1,0 b1=1,0
     - ./JHUGen PDFSet=3 Process=2  VegasNc0=100000 VegasNc2=100 DataFile=$CIRCLE_ARTIFACTS/other/spin2_gammagamma DecayMode1=7  DecayMode2=7 a1=1,0 b1=1,0
     #WH, ZH, gammaH
-    - ./JHUGen PDFSet=3 Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/other/WH DecayMode1=11
-    - ./JHUGen PDFSet=3 Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/other/ZH DecayMode1=9 HbbDK
-    - ./JHUGen PDFSet=3 Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/other/gammaH DecayMode1=7 ghz1=0,0 ghzgs2=1,0
-    - ./JHUGen PDFSet=3 Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/other/gammaH_bb DecayMode1=7 ghz1=0,0 ghgsgs2=1,0 HbbDK
-    #- ./JHUGen PDFSet=3 VegasNc0=100000 ConvertLHE=$CIRCLE_ARTIFACTS/other/ZH.lhe DataFile=$CIRCLE_ARTIFACTS/other/ZH_converted.lhe DecayMode1=1
+    - ./JHUGen PDFSet=3   Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/other/WH DecayMode1=11
+    - ./JHUGen PDFSet=3   Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/other/ZH DecayMode1=9 HbbDK
+    - ./JHUGen PDFSet=3   Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/other/gammaH DecayMode1=7 ghz1=0,0 ghzgs2=1,0
+    - ./JHUGen PDFSet=3   Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/other/gammaH_bb DecayMode1=7 ghz1=0,0 ghgsgs2=1,0 HbbDK
+    - ./JHUGen Collider=0 Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/other/ee_ZH DecayMode1=9
+    - ./JHUGen VegasNc0=100000 TauDK=0 ReadLHE=$CIRCLE_ARTIFACTS/other/ee_ZH.lhe DataFile=$CIRCLE_ARTIFACTS/other/ee_ZH_tautau
+    - ./JHUGen Collider=0 Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/other/ee_gammaH_bb DecayMode1=7 HbbDK ghz1=0,0 ghgsgs2=1,0 epPolarization=100 emPolarization=-100
     #H+J
     - ./JHUGen PDFSet=3 Process=62 VegasNc0=100000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/other/HJ
     #ttH, bbH, tH

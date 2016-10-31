@@ -354,6 +354,8 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "Collider", success, Collider)
     call ReadCommandLineArgument(arg, "ColliderEnergy", success, Collider_Energy, SetLastArgument, success2=SetColliderEnergy)
     if( SetLastArgument ) Collider_Energy = Collider_Energy * 1000*GeV
+    call ReadCommandLineArgument(arg, "epPolarization", success, POL_A)
+    call ReadCommandLineArgument(arg, "emPolarization", success, POL_B)
 #if useLHAPDF==1
     call ReadCommandLineArgument(arg, "LHAPDF", success, LHAPDFString)
     call ReadCommandLineArgument(arg, "LHAPDFMem", success, LHAPDFMember)
@@ -379,7 +381,7 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "MuRenMultiplier", success, MuRenMultiplier, success2=SetMuRenMultiplier)
     call ReadCommandLineArgument(arg, "TopDK", success, TopDecays)
     call ReadCommandLineArgument(arg, "TauDK", success, TauDecays)
-    call ReadCommandLineArgument(arg, "HbbDK", success, H_DK)      !undocumented, for internal testing
+    call ReadCommandLineArgument(arg, "HbbDK", success, H_DK)
     call ReadCommandLineArgument(arg, "ReweightDecay", success, ReweightDecay)
     call ReadCommandLineArgument(arg, "WidthScheme", success, WidthScheme)
     call ReadCommandLineArgument(arg, "WidthSchemeIn", success, WidthSchemeIn)
@@ -1877,7 +1879,7 @@ if( UseBetaVersion ) then
     do i=1,121
          i1 = ijSel(i,1)
          j1 = ijSel(i,2)
-         if( RequEvents(i1,j1).gt.0 ) write(io_stdout,"(1X,I3,A,I3,I3,I4,A,3X,F8.3,I9)") i," Fractional partonic xsec ",i1,j1,ijSel(i,3)," "//getLHEParticle(i1)//" "//getLHEParticle(j1)//" ",CrossSec(i1,j1)/VG_Result,RequEvents(i1,j1)
+         if( RequEvents(i1,j1).gt.0 .and. ijSel(i,3).ge.0 ) write(io_stdout,"(1X,I3,A,I3,I3,I4,A,3X,F8.3,I9)") i," Fractional partonic xsec ",i1,j1,ijSel(i,3)," "//getLHEParticle(i1)//" "//getLHEParticle(j1)//" ",CrossSec(i1,j1)/VG_Result,RequEvents(i1,j1)
     enddo
     write(io_stdout,"(2X,A,F8.3,I9)") "Sum        partonic xsec   x   x    ",sum(CrossSec(:,:))/VG_Result,sum(RequEvents(:,:))
 
@@ -4644,11 +4646,16 @@ implicit none
         print *, "   LHAPDF:            info file to use if interfaced with LHAPDF"
         print *, "                      (example: NNPDF30_lo_as_0130/NNPDF30_lo_as_0130.info)"
         print *, "   LHAPDFMem:         member number in LHAPDF set"
+        print *, "   epPolarization:    Polarization of e+ for e+e- collider"
+        print *, "   emPolarization:    Polarization of e- for e+e- collider"
+        print *, "                        0:      no polarization"
+        print *, "                        +/-100: helicity=+/-1"
         print *, "   TopDK:             For ttH or t+H, 0=leave top quarks as stable, 1=decay top quarks"
         print *, "   TauDK:             In ReadLHE mode, specify this option as either 0 or 1"
         print *, "                      to decay H->tautau.  If it is 0, the taus are written as"
         print *, "                      stable; if it is 1, they decay to Wnu, with the W's decaying"
         print *, "                      according to DecayModes1,2."
+        print *, "   HbbDK:             For VH production, decay H->bb"
         print *, " Resonance parameters:"
         print *, "   MReso:             resonance mass in GeV (default=125.00)"
         print *, "   GaReso:            resonance width in GeV (default=0.00407)"
