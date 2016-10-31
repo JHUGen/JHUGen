@@ -132,14 +132,16 @@ c--   Call the VVZZ amplitudes
      &   j1(j),j2(j),3,6,5,4,j7(j),j8(j),doHO,doBO)
       endif
 
-      ! Kill ampa in j=5,6,7,8 for VH
-      ! Kill ampa in j=9,10,11,12 for VBF
+      ! Kill amp or ampa in j=5,6,7,8 for VH
+      ! Kill amp or ampa in j=9,10,11,12 for VBF
       if( (
      & (vvhvvtoggle_vbfvh.eq.1) .and. (j.le.8)
      & ) .or. (
      & (vvhvvtoggle_vbfvh.eq.0) .and. (j.ge.9)
      & )
      &  ) then
+         amp(:,:,:,:,:)=czip
+         amp_swap(:,:,:,:,:)=czip
          ampa(:,:,:,:,:)=czip
          ampa_swap(:,:,:,:,:)=czip
       ! Kill ampb in j=9,10,11,12 for VH
