@@ -5,80 +5,103 @@ compiler: ifort or f95 (gfortran), gcc
 makefile contains the switch "Comp" which can be set to "gfort" or "ifort" for compilation with f95 or ifort, respectively.
 
 to compile the code: make
-executable file: ./JHUGen
+to run: ./JHUGen Parameter1=value1 Parameter2=value2 ...
 
-command line parameters:
-   Collider=x    (Collider: 1=LHC, 2=Tevatron, 0=e+e-), default value:1
-   Process=x      0=spin-0, 1=spin-1, 2=spin-2 resonance 
-                  50=pp/ee->VH, 60/66=weakVBF (without/with decay+SM bkg), 61=pp->Hjj, 62=pp->Hj
-                  80=pp->ttbar+H, 90=pp->bbbar+H, 110=pp->t+H, 111=pp->tbar+H
-   VegasNc0,1,2=x(number of evaluations)
-   PChannel=x    (partonic channel: 0=glu+glu, 1=quark+antiquark, 2=both), default value:2
-   PDFSet=x      (parton distr. functions, 1=CTEQ6L1(default), 2=MSTW2008LO,  2xx=MSTW with eigenvector set xx=01..40), 3=NNPDF3.0LO
-   DecayMode1=x  (decay mode for vector boson 1), default x=0 
-   DecayMode2=x  (decay mode for vector boson 2), default x=0
-                  x=0:  X-> Z1 Z2, Z1->2l,
-                  x=1:  X-> Z1 Z2, Z1->2q,
-                  x=2:  X-> Z1 Z2, Z1->2tau,
-                  x=3:  X-> Z1 Z2, Z1->2nu,
-                  x=4:  X-> W1 W2, W1->lnu,
-                  x=5:  X-> W1 W2, W1->2q,
-                  x=6:  X-> W1 W2, W1->taunu
-                  x=7:  X-> gamma gamma 
-                  x=8:  Z --> l+ l- (l=e,mu,tau)
-                  x=9:  Z --> anything
-                  x=10: W --> l nu_l (l=e,mu,tau)
-                  x=11: W --> anyting       
-   TopDK         decay mode for tops in ttbar+H, 0=stable, 1=decaying (use DecayMode1/2 = 4,5 for W+/W-
-   TauDK         decay mode for taus in H-->tautau, 0=stable, 1=decaying (use DecayMode1/2 = 4,5 for W+/W-
-   BotDK         decay mode for bottom quarks in H->bbar, 0=deactivated, 1=activated
-   DataFile=x    (name of the output file), default value: "output"
-   MReso=yyy.xx  (resonance mass, default=125.60)
-   OffXVV=xyz    (only applies to Higgs production, x,y,z can be 1 or 0 indicating real off-shellness for Higgs, Z/W boson 1/2, resp.), default 011
-   Interf=x      (0=neglect interference for 4f final states, 1=include interference, default= 0 above threshold, 1 below threshold )
-   if a parameter is not specified, the default value is chosen
-   ReadLHE="x"   (allows LO/NLO production of spin-0 particles by reading in LHE file from LO/NLO generator, e.g., POWHEG)
-   ConvertLHE:   LHE input file from external file (only spin-0)
-   
-example call:
-   ./JHUGen Collider=1 Process=0 VegasNc1=100000 PChannel=0 OffXVV=011 DecayMode1=0 DecayMode2=0 DataFile=test1
-   * out-of-the-box: output datafile example is "data/outputTest.lhe" and terminal output is "data/outputTest_terminal.txt"
+See the manual for more details
 
-
-setting parameters to identify resonance properties:
-*All other parameters in mod_Parameters.f90 (selected parameters described below)
-	- seed_random: seed for generation can be set to random
-	- fix_channels_ratio/channels_ratio_fix: with PChannel=2, one can fix the ratio of gg to qqbar production
-	- m_Z,m_W,m_Reso: mass of Z and X particles
-	- Ga_Z,Ga_W,Ga_Reso: width of Z and X particles
-	- LHC_Energy: energy of LHC
-
-	All couplings are given in the file where they are defined in the paper (http://arxiv.org/abs/1001.3396)
-	Dimensionless couplings are given in Eq.2 (spin 0), Eq.4 (spin 1), Eq.5 [b's] and Eq.6 [c's] (spin 2)
-	Example Scenarios given in Table I.
-
-OffXVV=1XX note:
-      Eq.(7) uses m_V as the pole mass of the Z/W
-      "use_dynamic_MG" in mod_Parameters.F90 =>  
-      .true. (=default), the spin-2 resonance mass with MG^2=(p1+p2)^2, otherwise fixed at M_Reso^2. 
-
-DecayMode2=7 note:
-       Valid for spin-0 and spin-2, only OffXVV=000 or 100 are possible
-       photon couplings c3,c4,c7 are parameters to be specified (M_V=0 and g_9=0 in Eq.(7))
-
------------------------------------------
-file descriptions
------------------------------------------
-
-main file: main.f90
-  some initializations and call to MC routine
-
-input parameter:  mod_Parameters.f90
-  note that energies are defined in units of 100GeV, i.e. Energy=0.5d0 means 50GeV, alternatively Energy=50d0*GeV can be used
-  after changing one of these parameters the program needs to be recompiled!
-
-cross section file: mod_CrossSection.f90, mod_Graviton.f90, mod_Zprime.f90, mod_Higgs.f90,
-  the call to the rountine that writes out events is "WriteOutEvent(...)" in mod_CrossSection.f90,
-  the routine itself can be found in mod_Kinematics.f90
-
-
+command line parameter quick reference:
+  help:                Print all command line options
+  Process configuration:
+    Collider:          1=LHC (default), 2=Tevatron, 0=e+e-
+    ColliderEnergy:    in TeV.  default is 13 TeV for LHC, 1.96 TeV for Tevatron,
+                       250 GeV for e+e-
+    Process:           0=spin-0, 1=spin-1, 2=spin-2 resonance, 50=pp/ee->VH,
+                       60=weakVBF, 61=pp->Hjj, 62=pp->Hj, 80=ttH, 90=bbH,
+                       110=t+H t channel, 111=tbar+H t channel,
+                       112=t+H s channel, 113=tbar+H s channel
+                       114=t/tbar+H t/s channels
+    DecayMode1:        decay mode for vector boson 1 (Z/W/gamma)
+    DecayMode2:        decay mode for vector boson 2 (Z/W/gamma)
+                         0=Z->2l,  1=Z->2q, 2=Z->2tau, 3=Z->2nu,
+                         4=W->lnu, 5=W->2q, 6=W->taunu,
+                         7=gamma, 8=Z->2l+2tau,
+                         9=Z->anything, 10=W->lnu+taunu, 11=W->anything
+    Interf:            0=neglect interference for 4f final states,
+                       1=include interference
+    RandomizeVVdecays: Randomizes the order of DecayMode1 and DecayMode2,
+                       per event (default true)
+                       For a WW decay, turning this off will mean
+                       DecayMode1 is W+ and DecayMode2 is W-
+    PChannel:          0=g+g, 1=q+qb, 2=both
+    ChannelRatio:      ratio of qqb / (qqb + gg), for Process=2 PChannel=2
+                        default is to allow this ratio to come from the couplings
+    PDFSet:            1=CTEQ6L1(2001),  2=MSTW(2008),
+                       2xx=MSTW with eigenvector set xx=01..40,
+                       3=NNPDF3.0LO
+                       (only valid if not interfaced with LHAPDF)
+    LHAPDF:            info file to use if interfaced with LHAPDF
+                       (example: NNPDF30_lo_as_0130/NNPDF30_lo_as_0130.info)
+    LHAPDFMem:         member number in LHAPDF set
+    epPolarization:    Polarization of e+ for e+e- collider
+    emPolarization:    Polarization of e- for e+e- collider
+                       0:      no polarization
+                       +/-100: helicity=+/-1
+    TopDK:             For ttH or t+H, 0=leave top quarks as stable, 1=decay top quarks
+    TauDK:             In ReadLHE mode, specify this option as either 0 or 1
+                       to decay H->tautau.  If it is 0, the taus are written as
+                       stable; if it is 1, they decay to Wnu, with the W's decaying
+                       according to DecayModes1,2.
+    HbbDK:             For VH production, decay H->bb
+  Resonance parameters:
+    MReso:             resonance mass in GeV (default=125.00)
+    GaReso:            resonance width in GeV (default=0.00407)
+    ctauReso:          resonance decay length in mm (default=0)
+    OffshellX:         Whether to allow resonance (X) to go offshell
+                       in processes 0, 1 or 2
+  Cuts:
+    pTjetcut:          Minimum pT for jets in GeV (default: 15)
+    deltaRcut:         Minimum deltaR for jets (default: 0.3)
+    mJJcut:            Minimum dijet mass in GeV (default: 0)
+    MPhotonCutoff:     Minimum mass for offshell photons in GeV, when included (default: 4)
+  Renormalization and factorization scales:
+    FacScheme:         PDF factorization scale scheme
+    MuFacMultiplier:   Multiplier for the factorization scale chosen by FacScheme
+    RenScheme:         QCD renormalization scale scheme
+    MuRenMultiplier:   Multiplier for the renormalization scale chosen by RenScheme
+  Lepton filter:
+    FilterNLept:       For decay mode, reject events that have less than FilterNLept leptons
+    FilterOSPairs:     For decay mode, reject events that have less than FilterOSPairs pairs of
+                       sign leptons of any flavor.
+    FilterOSSFPairs:   For decay mode, reject events that have less than FilterOSSFPairs pairs of
+                       opposite-sign-same-flavor leptons.
+    CountTauAsAny:     For FilterOSSFPairs, taus can stand in place of electrons or muons
+                       of the same charge.
+    WriteFailedEvents: Write events that fail in the LHE file, but with a weight of 0
+                       (off by default)
+  Higgs propagator and decay width:
+    WidthScheme:       Higgs width scheme: 1 for running width, 2 for fixed width (default),
+                       and 3 for the CPS
+    WidthSchemeIn:     For decay mode, reweight from one propagator to another by setting
+                       WidthScheme and WidthSchemeIn to different values
+    ReweightDecay:     For decay mode, reweight input decay by the decay probability
+    PmHstarEvals:      For ReweightDecay, number of evaluations per mass point (default: 200000)
+    ReadPmHstar:       For ReweightDecay, read the decay probability distribution from a file
+    PmHstarFile:       File to write and read the decay probability distribution
+  Statistics options:
+    VegasNc0:          number of evaluations for integrand scan
+    VegasNc1:          number of evaluations for accept-reject sampling
+    VegasNc2:          number of events for accept-reject sampling
+    ReadCSmax:         Read the results of the grid generation step from a file
+    Seed:              Random seed for event generation
+  I/O options:
+    Unweighted:        0=weighted events, 1=unweighted events
+    WriteWeightedLHE:  For Unweighted=0, write weighted events to an LHE file
+                       (note that the output could be huge)
+    DataFile:          LHE output file
+    ReadLHE:           LHE input file from external file (only spin-0)
+    ConvertLHE:        Convert decay of the V from VH production.
+                       Use DecayMode1 to specify the decay.
+                       (should be a Z or W mode, depending on the input file)
+    UnformattedRead:   Turn this on if the normal, faster reading fails
+  Couplings:
+    See manual for the full list

@@ -111,6 +111,7 @@ module modHiggsJJ
       ijSel( 71,1:3) = (/ 5, 5, zz/)
 
       ijSel( 72:,:)  = 0
+      ijSel( 72:,3)  = -1
 
 
   return
@@ -218,6 +219,7 @@ module modHiggsJJ
       nijchannels = 68
 
       ijSel( 69:,:)  = 0
+      ijSel( 69:,3)  = -1
 
   return
   end subroutine
@@ -307,6 +309,7 @@ module modHiggsJJ
       ijSel( 77,1:3) = (/ 5, 5, 1/)
 
       ijSel( 78:,:) = 0
+      ijSel( 78:,3) = -1
 
   return
   end subroutine
@@ -398,6 +401,7 @@ module modHiggsJJ
       nijchannels=77
 
       ijSel( 78:,:) = 0
+      ijSel( 78:,3) = -1
 
   return
   end subroutine
@@ -407,9 +411,9 @@ module modHiggsJJ
   implicit none
   integer, intent(out) :: ijSel(1:121,1:3)
 
-ijSel(  1,1:3) = (/1,2, 1/)
-ijSel(  2,1:3) = (/2,1, 1/)
-return
+! ijSel(  1,1:3) = (/1,2, 1/)
+! ijSel(  2,1:3) = (/2,1, 1/)
+! return
 
 
       ijSel(  1,1:3) = (/-5,-5, 1/)
