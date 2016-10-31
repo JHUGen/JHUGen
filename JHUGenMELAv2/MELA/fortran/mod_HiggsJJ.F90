@@ -218,8 +218,8 @@ module modHiggsJJ
 
       nijchannels = 68
 
-      ijSel( 69:,:)  = 0
-      ijSel( 69:,3)  = -1
+      ijSel( nijchannels+1:,:)  = 0
+      ijSel( nijchannels+1:,3)  = -1
 
   return
   end subroutine
@@ -400,8 +400,8 @@ module modHiggsJJ
 
       nijchannels=77
 
-      ijSel( 78:,:) = 0
-      ijSel( 78:,3) = -1
+      ijSel( nijchannels+1:,:) = 0
+      ijSel( nijchannels+1:,3) = -1
 
   return
   end subroutine
