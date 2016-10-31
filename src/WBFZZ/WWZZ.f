@@ -2,6 +2,7 @@
       implicit none
       include 'constants.f'
       include 'cmplxmass.f'
+      include 'ewcouple.f'
       include 'zcouple.f'
       include 'runstring.f'
       include 'masses.f'
@@ -15,7 +16,7 @@
       double complex WWZZamp(2,2),ggWW(2,2),propX3456,
      & prop34,prop56,propw17,propw28,propWBF,prop3456,propz3456,
      & zab2,zba2,srWW(2,2),srL,srR,srggWW34(2,2),srggWW56(2,2),rxw,
-     & sqzmass,Amp_S_DK,Amp_S_PR
+     & sqzmass,Amp_S_DK,Amp_S_PR,facHiggs
       integer h34,h56,i1,i2,i3,i4,i5,i6,i7,i8,
      & n1,n2,n3,n4,n5,n6,n7,n8
       double complex, save:: ZZ3456(2,2)
@@ -59,6 +60,9 @@ c--- special fix for Madgraph check
 !      else
          sqzmass=czmass2
 !      endif
+!      facHiggs = 2d0*sqzmass/cxw**2
+      ! Multiply by 1=(4d0*cwmass2/vevsq*cxw/esq)
+      facHiggs = 2d0*sqzmass/cxw**2*(4d0*cwmass2/vevsq*cxw/esq)
 
 C---setting up couplings dependent on whether we are doing 34-line or 56-line
       if (n3+n4 == 7) then
@@ -189,7 +193,7 @@ C-- MARKUS: this is the old (original) MCFM code
            endif
          endif
          WWZZamp(h34,h56)=WWZZamp(h34,h56)
-     &    -2d0*sqzmass/cxw**2*ZZ3456(h34,h56)
+     &    -facHiggs*ZZ3456(h34,h56)
      &     *Amp_S_DK*Amp_S_PR
      &    /(propWBF*prop3456)*Hbit
 
@@ -209,7 +213,7 @@ C----Second resonance
            endif
          endif
          WWZZamp(h34,h56)=WWZZamp(h34,h56)
-     &    -2d0*sqzmass/cxw**2*ZZ3456(h34,h56)
+     &    -facHiggs*ZZ3456(h34,h56)
      &     *Amp_S_DK*Amp_S_PR
      &    /(propWBF*propX3456)*Hbit
         enddo

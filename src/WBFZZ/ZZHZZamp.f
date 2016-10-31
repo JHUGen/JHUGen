@@ -2,7 +2,7 @@
       implicit none
       include 'constants.f'
       include 'cmplxmass.f'
-c      include 'ewcouple.f'
+      include 'ewcouple.f'
       include 'zcouple.f'
       include 'masses.f'
       include 'sprods_com.f'
@@ -54,7 +54,9 @@ C---end statement functions
       enddo
       enddo
 
-      fac=-zmass**2/(cxw*(cone-cxw))
+      !fac=-zmass**2/(cxw*(cone-cxw))
+      fac=-czmass2/(cxw*(cone-cxw))
+     & *(4d0*czmass2/vevsq*cxw*(1-cxw)/esq)
 
 C---setup propagators
       s3456=t4(n3,n4,n5,n6)
