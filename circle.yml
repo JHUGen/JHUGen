@@ -179,7 +179,7 @@ test:
     - ./JHUGen PDFSet=3   Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/other/gammaH_bb DecayMode1=7 ghz1=0,0 ghgsgs2=1,0 HbbDK
     - ./JHUGen Collider=0 Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/other/ee_ZH DecayMode1=9
     - ./JHUGen VegasNc0=100000 TauDK=0 ReadLHE=$CIRCLE_ARTIFACTS/other/ee_ZH.lhe DataFile=$CIRCLE_ARTIFACTS/other/ee_ZH_tautau
-    - ./JHUGen Collider=0 Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/other/ee_gammaH_bb DecayMode1=7 HbbDK ghz1=0,0 ghgsgs2=1,0
+    - ./JHUGen Collider=0 Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/other/ee_gammaH_bb DecayMode1=7 HbbDK ghz1=0,0 ghgsgs2=1,0 epPolarization=100 emPolarization=-100
     #H+J
     - ./JHUGen PDFSet=3 Process=62 VegasNc0=100000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/other/HJ
     #ttH, bbH, tH

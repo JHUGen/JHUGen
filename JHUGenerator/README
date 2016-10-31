@@ -42,11 +42,16 @@ command line parameter quick reference:
     LHAPDF:            info file to use if interfaced with LHAPDF
                        (example: NNPDF30_lo_as_0130/NNPDF30_lo_as_0130.info)
     LHAPDFMem:         member number in LHAPDF set
+    epPolarization:    Polarization of e+ for e+e- collider
+    emPolarization:    Polarization of e- for e+e- collider
+                       0:      no polarization
+                       +/-100: helicity=+/-1
     TopDK:             For ttH or t+H, 0=leave top quarks as stable, 1=decay top quarks
     TauDK:             In ReadLHE mode, specify this option as either 0 or 1
                        to decay H->tautau.  If it is 0, the taus are written as
                        stable; if it is 1, they decay to Wnu, with the W's decaying
                        according to DecayModes1,2.
+    HbbDK:             For VH production, decay H->bb
   Resonance parameters:
     MReso:             resonance mass in GeV (default=125.00)
     GaReso:            resonance width in GeV (default=0.00407)
