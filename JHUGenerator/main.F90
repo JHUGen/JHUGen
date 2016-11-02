@@ -935,7 +935,7 @@ logical :: SetColliderEnergy
 
    ! Should revise CKM for user input, but let's put it here for the moment'
    call ComputeEWVariables()
-   call ComputeCKMElements(VCKM_ud, VCKM_us, VCKM_cs, VCKM_cd, VCKM_tb, VCKM_ts)
+   call ComputeCKMElements(VCKM_ud, VCKM_us, VCKM_cd, VCKM_cs, VCKM_ts, VCKM_tb)
 
 return
 END SUBROUTINE
