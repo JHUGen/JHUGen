@@ -11,8 +11,8 @@ private
  CONTAINS
 
 
- 
- 
+
+
   subroutine get_THchannelHash(ijSel)
   implicit none
   integer, intent(out) :: ijSel(1:121,1:3)
@@ -45,10 +45,10 @@ private
 
       ijSel( 25:121,:) = 0
       ijSel( 25:121,3) = -1
-      
+
   return
   end subroutine
- 
+
 
 subroutine EvalXsec_pp_TH(Mom,Channel,Res)
 implicit none
@@ -755,9 +755,9 @@ END SUBROUTINE
        implicit none
        integer :: k4,e4,b,ep,nu
        complex(8) :: za(:,:),zb(:,:),dkamp(1:2)
-       real(8),parameter :: g2_weak = 4d0*dsqrt(2d0)*m_W**2*GF
        real(8) :: NWAFactor_Top,NWAFactor_W
        complex(8) :: WProp
+
 
    ! if one flattens the top wrt to e, then amp(2) = 0
        dkamp(1) = za(b,nu)*zb(ep,e4)
@@ -767,7 +767,7 @@ END SUBROUTINE
        NWAFactor_W   = 1d0/dsqrt(2d0*Ga_W*m_W)
        WProp = (0d0,-1d0)*NWAFactor_W
 
-       dkamp = dkamp * WProp * NWAFactor_Top * g2_weak
+       dkamp = dkamp * WProp * NWAFactor_Top * gwsq
 
 
      END SUBROUTINE
@@ -779,7 +779,6 @@ END SUBROUTINE
        integer :: k4,e4,bbar,em,nubar
        complex(8) :: za(:,:),zb(:,:),dkamp(1:2)
        real(8) :: NWAFactor_Top,NWAFactor_W
-       real(8),parameter :: g2_weak = 4d0*dsqrt(2d0)*m_W**2*GF
        complex(8) :: WProp
 
    ! if one flattens the top wrt to e, then amp(2) = 0
@@ -790,7 +789,7 @@ END SUBROUTINE
        NWAFactor_W   = 1d0/dsqrt(2d0*Ga_W*m_W)
        WProp = (0d0,-1d0)*NWAFactor_W
 
-       dkamp = dkamp * WProp * NWAFactor_Top * g2_weak
+       dkamp = dkamp * WProp * NWAFactor_Top * gwsq
 
 
      END SUBROUTINE

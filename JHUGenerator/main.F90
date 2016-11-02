@@ -932,6 +932,11 @@ logical :: SetColliderEnergy
         call Error("The separate HWW couplings are only used for VBF.  For H->WW decay or WH production, please set ghz* instead.")
     endif
 
+
+   ! Should revise CKM for user input, but let's put it here for the moment'
+   call ComputeEWVariables()
+   call ComputeCKMElements(VCKM_ud, VCKM_us, VCKM_cs, VCKM_cd, VCKM_tb, VCKM_ts)
+
 return
 END SUBROUTINE
 
@@ -1305,7 +1310,7 @@ include "vegas_common.f"
          NDim = 9
          NDim = NDim + 2 ! sHat integration
          NDim = NDim + 1 ! select partonic channel
-         
+
          VegasIt1_default = 5
          VegasNc0_default =  500000
          VegasNc1_default =  500000
@@ -1317,7 +1322,7 @@ include "vegas_common.f"
          NDim = 9
          NDim = NDim + 2 ! sHat integration
          NDim = NDim + 1 ! select partonic channel
-         
+
          VegasIt1_default = 5
          VegasNc0_default =  500000
          VegasNc1_default =  500000
@@ -1328,7 +1333,7 @@ include "vegas_common.f"
          NDim = 9
          NDim = NDim + 2 ! sHat integration
          NDim = NDim + 1 ! select partonic channel
-         
+
          VegasIt1_default = 5
          VegasNc0_default =  500000
          VegasNc1_default =  500000
@@ -1339,7 +1344,7 @@ include "vegas_common.f"
          NDim = 9
          NDim = NDim + 2 ! sHat integration
          NDim = NDim + 1 ! select partonic channel
-         
+
          VegasIt1_default = 5
          VegasNc0_default =  500000
          VegasNc1_default =  500000
@@ -1722,7 +1727,7 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
     ingridfile=trim(outgridfile)
 
     ! WARM-UP RUN
-    if( .not. ReadCSmax ) then 
+    if( .not. ReadCSmax ) then
       readin=.false.
       writeout=.true.
 
@@ -1737,7 +1742,7 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
       if( Process.eq.66 ) call vegas(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
       if( Process.eq.61 ) call vegas(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
 
-      if( Process.eq.110) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)      
+      if( Process.eq.110) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
       if( Process.eq.111) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
       if( Process.eq.112) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
       if( Process.eq.113) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
@@ -1746,7 +1751,7 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
 
     !DATA RUN
     writeout=.false.
-    if( ReadCSmax ) then 
+    if( ReadCSmax ) then
         readin=.true.
     else
         readin=.false.

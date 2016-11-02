@@ -49,6 +49,9 @@ SUBROUTINE InitFirstTime(pdftable,pdfstrlength,pdfmember)
 
    call ResetMubarHGabarH()
 
+   call ComputeEWVariables()
+   call ComputeCKMElements(VCKM_ud, VCKM_us, VCKM_cs, VCKM_cd, VCKM_tb, VCKM_ts)
+
 !---------------------------
    call PrintLogo(io_stdout)
 !---------------------------

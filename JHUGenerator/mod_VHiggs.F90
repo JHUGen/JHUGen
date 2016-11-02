@@ -4,24 +4,7 @@ module ModVHiggs
   use ModMisc
   implicit none
   private
-  real(8), parameter :: T3lL= -0.5d0
-  real(8), parameter :: T3lR=  0d0
-  real(8), parameter :: T3nL=  0.5d0
-  real(8), parameter :: T3uL= 0.5d0
-  real(8), parameter :: T3uR= 0d0
-  real(8), parameter :: T3dL= -0.5d0
-  real(8), parameter :: T3dR= 0d0
-  real(8), parameter :: QlL = -1d0
-  real(8), parameter :: QlR = -1d0
-  real(8), parameter :: QnL =  0d0
-  real(8), parameter :: QuL = 0.66666666666666666666666666667d0
-  real(8), parameter :: QuR = 0.66666666666666666666666666667d0
-  real(8), parameter :: QdL = -0.33333333333333333333333333333d0
-  real(8), parameter :: QdR = -0.33333333333333333333333333333d0
 
-  !spin-0 couplings
-  real(8), parameter :: gFFS=1d0
-  real(8), parameter :: gFFP=0d0
 
   !----- notation for subroutines
   public :: EvalAmp_VHiggs
@@ -446,8 +429,8 @@ end subroutine EvalAmp_VHiggs
         MATRIXELEMENT0=MATRIXELEMENT0 *PROP3
       else if(id(8).ne.Not_a_particle_) then
         MATRIXELEMENT0=MATRIXELEMENT0 *PROP3 &
-        *(gFFS*FFS(id(8), MomExt(:,8), helicity(8), id(9), MomExt(:,9), helicity(9)) &
-         +gFFP*FFP(id(8), MomExt(:,8), helicity(8), id(9), MomExt(:,9), helicity(9)))&
+        *(kappa*FFS(id(8), MomExt(:,8), helicity(8), id(9), MomExt(:,9), helicity(9)) &
+         +kappa_tilde*FFP(id(8), MomExt(:,8), helicity(8), id(9), MomExt(:,9), helicity(9)))&
         *(-ci/vev*getMass(convertLHEreverse(id(8))))
       else
         MATRIXELEMENT0=czero
@@ -1407,7 +1390,6 @@ real(8) :: qsq_V1,qsq_V2,qsq_V1V2,qsq_H
 complex(8) ghz1_dyn,ghz2_dyn,ghz3_dyn,ghz4_dyn
 complex(8) :: a1HVV,a2HVV,a3HVV,Prop
 integer :: ishel,fshel,FermFlav(1:6)! 12:IS, 34:ZDK, 56:HDK
-real(8),parameter :: CF=4d0/3d0
 
     ! q1 qbar2 --> 3 --> 45 --> Z4-->f6 fbar7 + H5-->89
     call getSME(p,FermFlav,SME)
