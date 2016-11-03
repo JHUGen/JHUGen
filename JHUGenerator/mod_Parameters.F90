@@ -1595,51 +1595,69 @@ integer :: Part
 END FUNCTION
 
 
-subroutine ComputeCKMElements(inVCKM_ud, inVCKM_us, inVCKM_cs, inVCKM_cd, inVCKM_tb, inVCKM_ts, inVCKM_cb, inVCKM_ub, inVCKM_td)
+subroutine ComputeCKMElements(inVCKM_ud, inVCKM_us, inVCKM_cd, inVCKM_cs, inVCKM_ts, inVCKM_tb, inVCKM_ub, inVCKM_cb, inVCKM_td)
 implicit none
 real(8) :: inVCKM_ud
 real(8) :: inVCKM_us
-real(8) :: inVCKM_cs
 real(8) :: inVCKM_cd
-real(8) :: inVCKM_tb
+real(8) :: inVCKM_cs
 real(8) :: inVCKM_ts
-real(8), optional :: inVCKM_cb
+real(8) :: inVCKM_tb
 real(8), optional :: inVCKM_ub
+real(8), optional :: inVCKM_cb
 real(8), optional :: inVCKM_td
+real(8) :: sumVsq(1:3),diffVsq
 
    VCKM_ud=inVCKM_ud
    VCKM_us=inVCKM_us
-   VCKM_cs=inVCKM_cs
    VCKM_cd=inVCKM_cd
-   VCKM_tb=inVCKM_tb
+   VCKM_cs=inVCKM_cs
    VCKM_ts=inVCKM_ts
-   if(present(inVCKM_cb)) then
-      VCKM_cb = inVCKM_cb
+   VCKM_tb=inVCKM_tb
 
-      VCKM_cd=VCKM_cd/sqrt(VCKM_cb**2+VCKM_cd**2+VCKM_cs**2)
-      VCKM_cs=VCKM_cs/sqrt(VCKM_cb**2+VCKM_cd**2+VCKM_cs**2)
-      VCKM_cb=VCKM_cb/sqrt(VCKM_cb**2+VCKM_cd**2+VCKM_cs**2)
-   else
-      VCKM_cb = sqrt(1d0-VCKM_cd**2-VCKM_cs**2)
-   endif
    if(present(inVCKM_ub)) then
       VCKM_ub = inVCKM_ub
-
-      VCKM_ud=VCKM_ud/sqrt(VCKM_ub**2+VCKM_ud**2+VCKM_us**2)
-      VCKM_us=VCKM_us/sqrt(VCKM_ub**2+VCKM_ud**2+VCKM_us**2)
-      VCKM_ub=VCKM_ub/sqrt(VCKM_ub**2+VCKM_ud**2+VCKM_us**2)
    else
-      VCKM_ub = sqrt(1d0-VCKM_ud**2-VCKM_us**2)
+      diffVsq = 1d0-VCKM_ud**2-VCKM_us**2
+      if (diffVsq.ge.0d0) then
+         VCKM_ub = sqrt(diffVsq)
+      else
+         VCKM_ub = 0d0
+      endif
+   endif
+   if(present(inVCKM_cb)) then
+      VCKM_cb = inVCKM_cb
+   else
+      diffVsq = 1d0-VCKM_cd**2-VCKM_cs**2
+      if (diffVsq.ge.0d0) then
+         VCKM_cb = sqrt(diffVsq)
+      else
+         VCKM_cb = 0d0
+      endif
    endif
    if(present(inVCKM_td)) then
       VCKM_td = inVCKM_td
-
-      VCKM_td=VCKM_td/sqrt(VCKM_tb**2+VCKM_td**2+VCKM_ts**2)
-      VCKM_ts=VCKM_ts/sqrt(VCKM_tb**2+VCKM_td**2+VCKM_ts**2)
-      VCKM_tb=VCKM_tb/sqrt(VCKM_tb**2+VCKM_td**2+VCKM_ts**2)
    else
-      VCKM_td = sqrt(1d0-VCKM_tb**2-VCKM_ts**2)
+      diffVsq = 1d0-VCKM_td**2-VCKM_ts**2
+      if (diffVsq.ge.0d0) then
+         VCKM_tb = sqrt(diffVsq)
+      else
+         VCKM_tb = 0d0
+      endif
    endif
+
+   sumVsq(1) = VCKM_ub**2+VCKM_us**2+VCKM_ud**2
+   VCKM_ud=VCKM_ud/sqrt(sumVsq(1))
+   VCKM_us=VCKM_us/sqrt(sumVsq(1))
+   VCKM_ub=VCKM_ub/sqrt(sumVsq(1))
+   sumVsq(2) = VCKM_cb**2+VCKM_cs**2+VCKM_cd**2
+   VCKM_cd=VCKM_cd/sqrt(sumVsq(2))
+   VCKM_cs=VCKM_cs/sqrt(sumVsq(2))
+   VCKM_cb=VCKM_cb/sqrt(sumVsq(2))
+   sumVsq(3) = VCKM_tb**2+VCKM_ts**2+VCKM_td**2
+   VCKM_td=VCKM_td/sqrt(sumVsq(3))
+   VCKM_ts=VCKM_ts/sqrt(sumVsq(3))
+   VCKM_tb=VCKM_tb/sqrt(sumVsq(3))
 
 end subroutine ComputeCKMElements
 

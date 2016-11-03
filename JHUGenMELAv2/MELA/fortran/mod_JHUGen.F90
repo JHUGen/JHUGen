@@ -47,13 +47,23 @@ SUBROUTINE InitFirstTime(pdftable,pdfstrlength,pdfmember)
    FacScheme = kRenFacScheme_default
    RenScheme = kRenFacScheme_default
 
-   call ResetMubarHGabarH()
-
-   call ComputeEWVariables()
-   call ComputeCKMElements(VCKM_ud, VCKM_us, VCKM_cs, VCKM_cd, VCKM_tb, VCKM_ts)
-
 !---------------------------
    call PrintLogo(io_stdout)
+!---------------------------
+   call ResetMubarHGabarH()
+!---------------------------
+   call ComputeEWVariables()
+   call ComputeCKMElements(VCKM_ud, VCKM_us, VCKM_cd, VCKM_cs, VCKM_ts, VCKM_tb)
+   print *, "JHUGen CKM initialization"
+   print *, "Vud = ",VCKM_ud
+   print *, "Vus = ",VCKM_us
+   print *, "Vub = ",VCKM_ub
+   print *, "Vcd = ",VCKM_cd
+   print *, "Vcs = ",VCKM_cs
+   print *, "Vcb = ",VCKM_cb
+   print *, "Vtd = ",VCKM_td
+   print *, "Vts = ",VCKM_ts
+   print *, "Vtb = ",VCKM_tb
 !---------------------------
 
 #if useLHAPDF==1
@@ -106,7 +116,7 @@ SUBROUTINE InitPDFValues()
 #endif
 
    Mu_Fact = M_Reso ! Set pdf scale to resonance mass by default, later changed as necessary in the EvalWeighted/EvalUnweighted subroutines
-	Mu_Ren = M_Reso ! Set renorm. scale to resonance mass by default, later changed as necessary in the EvalWeighted/EvalUnweighted subroutines
+   Mu_Ren = M_Reso ! Set renorm. scale to resonance mass by default, later changed as necessary in the EvalWeighted/EvalUnweighted subroutines
    call EvalAlphaS() ! Set alphas at default Mu_Ren. Notice ModParameters::ComputeQCDVariables is automatically called!
    return
 END SUBROUTINE

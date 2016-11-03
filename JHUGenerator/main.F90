@@ -238,6 +238,7 @@ logical :: SetZgammacoupling, Setgammagammacoupling
 logical :: SetAnomalousSpin1qq, Setspin1qqleft, Setspin1qqright
 logical :: SetAnomalousSpin2gg, SetAnomalousSpin2qq, Setspin2qqleft, Setspin2qqright
 logical :: SetAnomalousHff, Setkappa
+logical :: SetCKM,SetCKMub,SetCKMcb,SetCKMtd
 logical :: SetpTcut, SetdeltaRcut
 logical :: SetColliderEnergy
 
@@ -310,6 +311,10 @@ logical :: SetColliderEnergy
    SetFacScheme = .false.
    SetRenScheme = .false.
 
+   SetCKM=.false.
+   SetCKMub=.false.
+   SetCKMcb=.false.
+   SetCKMtd=.false.
    SetAnomalousSpin0gg=.false.
    Setghg2=.false.
    SetAnomalousSpin0ZZ=.false.
@@ -419,7 +424,7 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "RandomizeVVdecays", success, RandomizeVVdecays)
     call ReadCommandLineArgument(arg, "ChannelRatio", success, channels_ratio_fix, success2=fix_channels_ratio)
     call ReadCommandLineArgument(arg, "UnformattedRead", success, UseUnformattedRead)
-    call REadCommandLineArgument(arg, "WriteWeightedLHE", success, WriteWeightedLHE)
+    call ReadCommandLineArgument(arg, "WriteWeightedLHE", success, WriteWeightedLHE)
 
     !anomalous couplings
     !If any anomalous couplings are set, the default ones have to be set explicitly to keep them on or turn them off
@@ -608,6 +613,18 @@ logical :: SetColliderEnergy
     !Hff couplings
     call ReadCommandLineArgument(arg, "kappa", success, kappa, success2=SetAnomalousHff, success3=Setkappa)
     call ReadCommandLineArgument(arg, "kappa_tilde", success, kappa_tilde, success2=SetAnomalousHff)
+
+    ! CKM elements
+    call ReadCommandLineArgument(arg, "Vud", success, VCKM_ud, success2=SetCKM)
+    call ReadCommandLineArgument(arg, "Vus", success, VCKM_us, success2=SetCKM)
+    call ReadCommandLineArgument(arg, "Vcd", success, VCKM_cd, success2=SetCKM)
+    call ReadCommandLineArgument(arg, "Vcs", success, VCKM_cs, success2=SetCKM)
+    call ReadCommandLineArgument(arg, "Vts", success, VCKM_ts, success2=SetCKM)
+    call ReadCommandLineArgument(arg, "Vtb", success, VCKM_tb, success2=SetCKM)
+    call ReadCommandLineArgument(arg, "Vub", success, VCKM_ub, success2=SetCKM, success3=SetCKMub)
+    call ReadCommandLineArgument(arg, "Vcb", success, VCKM_cb, success2=SetCKM, success3=SetCKMcb)
+    call ReadCommandLineArgument(arg, "Vtd", success, VCKM_td, success2=SetCKM, success3=SetCKMtd)
+
 
     !cuts
     call ReadCommandLineArgument(arg, "pTjetcut", success, pTjetcut, SetLastArgument, success2=SetpTcut)
@@ -933,9 +950,24 @@ logical :: SetColliderEnergy
     endif
 
 
-   ! Should revise CKM for user input, but let's put it here for the moment'
    call ComputeEWVariables()
-   call ComputeCKMElements(VCKM_ud, VCKM_us, VCKM_cs, VCKM_cd, VCKM_tb, VCKM_ts)
+   if(.not.SetCKMub .and. .not.SetCKMcb .and. .not.SetCKMtd) then
+      call ComputeCKMElements(VCKM_ud, VCKM_us, VCKM_cd, VCKM_cs, VCKM_ts, VCKM_tb)
+   else if(.not.SetCKMub .and. .not.SetCKMcb .and. SetCKMtd) then
+      call ComputeCKMElements(VCKM_ud, VCKM_us, VCKM_cd, VCKM_cs, VCKM_ts, VCKM_tb, inVCKM_td=VCKM_td)
+   else if(.not.SetCKMub .and. SetCKMcb .and. .not.SetCKMtd) then
+      call ComputeCKMElements(VCKM_ud, VCKM_us, VCKM_cd, VCKM_cs, VCKM_ts, VCKM_tb, inVCKM_cb=VCKM_cb)
+   else if(SetCKMub .and. .not.SetCKMcb .and. .not.SetCKMtd) then
+      call ComputeCKMElements(VCKM_ud, VCKM_us, VCKM_cd, VCKM_cs, VCKM_ts, VCKM_tb, inVCKM_ub=VCKM_ub)
+   else if(SetCKMub .and. SetCKMcb .and. .not.SetCKMtd) then
+      call ComputeCKMElements(VCKM_ud, VCKM_us, VCKM_cd, VCKM_cs, VCKM_ts, VCKM_tb, inVCKM_ub=VCKM_ub, inVCKM_cb=VCKM_cb)
+   else if(SetCKMub .and. .not.SetCKMcb .and. SetCKMtd) then
+      call ComputeCKMElements(VCKM_ud, VCKM_us, VCKM_cd, VCKM_cs, VCKM_ts, VCKM_tb, inVCKM_ub=VCKM_ub, inVCKM_td=VCKM_td)
+   else if(.not.SetCKMub .and. SetCKMcb .and. SetCKMtd) then
+      call ComputeCKMElements(VCKM_ud, VCKM_us, VCKM_cd, VCKM_cs, VCKM_ts, VCKM_tb, inVCKM_cb=VCKM_cb, inVCKM_td=VCKM_td)
+   else
+      call ComputeCKMElements(VCKM_ud, VCKM_us, VCKM_cd, VCKM_cs, VCKM_ts, VCKM_tb, inVCKM_ub=VCKM_ub, inVCKM_cb=VCKM_cb, inVCKM_td=VCKM_td)
+   endif
 
 return
 END SUBROUTINE
