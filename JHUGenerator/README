@@ -58,6 +58,16 @@ command line parameter quick reference:
     ctauReso:          resonance decay length in mm (default=0)
     OffshellX:         Whether to allow resonance (X) to go offshell
                        in processes 0, 1 or 2
+  EW coupling parameters:
+    Vud:               CKM element for W-ud couplings
+    Vus:               CKM element for W-us couplings
+    Vub:               CKM element for W-ub couplings
+    Vcd:               CKM element for W-cd couplings
+    Vcs:               CKM element for W-cs couplings
+    Vcb:               CKM element for W-cb couplings
+    Vtd:               CKM element for W-td couplings
+    Vts:               CKM element for W-ts couplings
+    Vtb:               CKM element for W-tb couplings
   Cuts:
     pTjetcut:          Minimum pT for jets in GeV (default: 15)
     deltaRcut:         Minimum deltaR for jets (default: 0.3)
