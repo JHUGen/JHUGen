@@ -155,9 +155,10 @@ real(8), public            :: m_tau = 1.7768d0     *GeV     ! tau mass
 real(8), public            :: Ga_tau =2.267d-12    *GeV     ! tau width
 
 real(8), public            :: Gf = 1.16639d-5/GeV**2        ! Fermi constant
+real(8), public            :: alpha_QED = 1d0/128d0         ! el.magn. coupling
 real(8), public            :: vev ! = 1.0d0/sqrt(Gf*sqrt(2.0d0))
 real(8), public            :: gwsq ! = 4.0d0 * M_W**2/vev**2  ! weak constant squared
-real(8), public            :: alpha_QED = 1d0/128d0         ! el.magn. coupling
+real(dp), public           :: esq ! = 4.0d0 * pi * alpha_QED  ! Fundamental charge
 
 real(8), public            :: xw = 0.23119d0                ! sin**2(Theta_Weinberg) (PDG-2008)
 real(8), public            :: sitW ! = dsqrt(xw)            ! sin(Theta_Weinberg) (PDG-2008)
@@ -178,14 +179,6 @@ real(8), public            :: Mu_Ren               ! QCD renormalization (alpha_
 real(dp), public           :: alphas               ! strong coupling per event, set to some reasonable value
 real(dp), public           :: alphas_mz            ! strong coupling at M_Z, reset later in main per PDF
 real(dp), public           :: gs                   ! = sqrt(alphas*4.0_dp*pi)
-
-real(dp), public, parameter :: nf = 5.0_dp
-real(dp), public, parameter :: xn = 3.0_dp
-real(dp), public, parameter :: Ca = 3.0_dp
-real(dp), public, parameter :: Cf = 4.0_dp/3.0_dp
-real(dp), public, parameter :: avegg = 1.0_dp/4.0_dp/64.0_dp
-real(dp), public, parameter :: aveqg = 1.0_dp/4.0_dp/24.0_dp
-real(dp), public, parameter :: aveqq = 1.0_dp/4.0_dp/9.0_dp
 
 
 ! CKM squared matrix entries
@@ -479,6 +472,13 @@ real(8), public, parameter :: Lambda  = 1000d0    *GeV      ! Lambda coupling en
 !internal
 !---     B0_PDF=(11.-2.*NF/3.)/4./PI
 real(dp), public, parameter :: B0_PDF(0:6) = (/ 0.8753521870054244D0,0.822300539308126D0,0.7692488916108274D0,0.716197243913529D0,0.6631455962162306D0,0.6100939485189321D0,0.5570423008216338D0 /)
+real(dp), public, parameter :: nf = 5.0_dp
+real(dp), public, parameter :: xn = 3.0_dp
+real(dp), public, parameter :: Ca = 3.0_dp
+real(dp), public, parameter :: Cf = 4.0_dp/3.0_dp
+real(dp), public, parameter :: avegg = 1.0_dp/4.0_dp/64.0_dp
+real(dp), public, parameter :: aveqg = 1.0_dp/4.0_dp/24.0_dp
+real(dp), public, parameter :: aveqq = 1.0_dp/4.0_dp/9.0_dp
 
 ! Particle isospin and charges
 real(8), public, parameter :: T3lL= -0.5d0
@@ -514,6 +514,7 @@ real(8), public, parameter :: QdR = -1d0/3d0
 !   cL = -2*sw*cw*Q(f)
 ! for V = photon*
 !
+real(8), public            :: overallCouplVffsq ! Overall coupling squared that goes along with the ones below
 real(8), public            :: aR_lep ! = -2d0*sitW**2*(-1d0)
 real(8), public            :: aL_lep ! = -2d0*sitW**2*(-1d0)-1d0
 real(8), public            :: aR_neu ! = -2d0*sitW**2*(0d0)
@@ -522,10 +523,8 @@ real(8), public            :: aR_QUp ! = -2d0*sitW**2*(2d0/3d0)
 real(8), public            :: aL_QUp ! = -2d0*sitW**2*(2d0/3d0)+1d0
 real(8), public            :: aR_QDn ! = -2d0*sitW**2*(-1d0/3d0)
 real(8), public            :: aL_QDn ! = -2d0*sitW**2*(-1d0/3d0)-1d0
-
 real(8), public            :: bL ! = dsqrt(2d0)*dsqrt(1d0-sitW**2)
 real(8), public            :: bR ! = 0d0
-
 real(8), public            :: cR_lep ! = -2d0*sitW*dsqrt(1d0-sitW**2)*(-1d0)
 real(8), public            :: cL_lep ! = -2d0*sitW*dsqrt(1d0-sitW**2)*(-1d0)
 real(8), public            :: cR_neu ! = -2d0*sitW*dsqrt(1d0-sitW**2)*(0d0)
@@ -534,6 +533,13 @@ real(8), public            :: cR_QUp ! = -2d0*sitW*dsqrt(1d0-sitW**2)*(2d0/3d0)
 real(8), public            :: cL_QUp ! = -2d0*sitW*dsqrt(1d0-sitW**2)*(2d0/3d0)
 real(8), public            :: cR_QDn ! = -2d0*sitW*dsqrt(1d0-sitW**2)*(-1d0/3d0)
 real(8), public            :: cL_QDn ! = -2d0*sitW*dsqrt(1d0-sitW**2)*(-1d0/3d0)
+
+! Coupling normalizations based on the common factor to be gwsq
+real(dp), public           :: couplWffsq
+real(dp), public           :: couplZffsq
+real(dp), public           :: couplAZff
+real(dp), public           :: couplAffsq
+!----------------------------------------------------------------------------------
 
 real(8), public, parameter :: fbGeV2=0.389379d12/(100d0**2)
 real(8), public, parameter :: SymmFac=1d0/2d0, SpinAvg=1d0/4d0, QuarkColAvg=1d0/3d0, GluonColAvg=1d0/8d0
@@ -1082,6 +1088,57 @@ integer :: Part
 END FUNCTION
 
 
+subroutine SetMass(mass, ipart)
+implicit none
+real(8), intent(in) :: mass
+integer, intent(in) :: ipart
+integer :: Part
+
+  Part=abs(ipart)
+  if( Part.eq.abs(ElM_) ) then
+      m_el = mass
+  elseif( Part.eq.abs(MuM_) ) then
+      m_mu = mass
+  elseif( Part.eq.abs(TaM_) ) then
+      m_tau = mass
+  elseif( Part.eq.abs(Chm_) ) then
+      m_charm = mass
+  elseif( Part.eq.abs(Bot_) ) then
+      m_bot = mass
+  elseif( Part.eq.abs(Top_) ) then
+      m_top = mass
+  elseif( Part.eq.abs(Z0_) ) then
+      M_Z = mass
+  elseif( Part.eq.abs(Wp_) ) then
+      M_W = mass
+  elseif( Part.eq.abs(Hig_) ) then
+      M_Reso = mass
+  endif
+
+end subroutine SetMass
+
+
+subroutine SetDecayWidth(width, ipart)
+implicit none
+real(8), intent(in) :: width
+integer, intent(in) :: ipart
+integer :: Part
+
+  Part=abs(ipart)
+  if( Part.eq.abs(TaM_) ) then
+      Ga_tau = width
+  elseif( Part.eq.abs(Top_) ) then
+      Ga_Top = width
+  elseif( Part.eq.abs(Z0_) ) then
+      Ga_Z = width
+  elseif( Part.eq.abs(Wp_) ) then
+      Ga_W = width
+  elseif( Part.eq.abs(Hig_) ) then
+      Ga_Reso = width
+  endif
+
+END subroutine SetDecayWidth
+
 
 
 FUNCTION getMass(Part)
@@ -1589,35 +1646,41 @@ end subroutine ComputeCKMElements
 subroutine ComputeEWVariables()
 implicit none
 
-! Calculate fundamental couplings
-vev = 1.0d0/sqrt(Gf*sqrt(2.0d0))
-gwsq = 4.0d0 * M_W**2/vev**2
-sitW = sqrt(xw)
-twosc = sqrt(4d0*xw*(1d0-xw))
+   ! Calculate fundamental couplings
+   vev = 1.0d0/sqrt(Gf*sqrt(2.0d0))
+   gwsq = 4.0d0 * M_W**2/vev**2
+   sitW = sqrt(xw)
+   twosc = sqrt(4d0*xw*(1d0-xw))
 
-! Z couplings
-aR_lep =2d0*(T3lR-QlR*xw)
-aL_lep =2d0*(T3lL-QlL*xw)
-aR_neu =2d0*(T3nR-QnR*xw)
-aL_neu =2d0*(T3nL-QnL*xw)
-aR_QUp =2d0*(T3uR-QuR*xw)
-aL_QUp =2d0*(T3uL-QuL*xw)
-aR_QDn =2d0*(T3dR-QdR*xw)
-aL_QDn =2d0*(T3dL-QdL*xw)
+   esq = 4.0_dp*pi*alpha_QED
+   overallCouplVffsq = esq/(twosc**2) ! ~= gwsq/4.0_dp/(1.0_dp-xw)
+   ! Z couplings
+   aR_lep =2d0*(T3lR-QlR*xw)
+   aL_lep =2d0*(T3lL-QlL*xw)
+   aR_neu =2d0*(T3nR-QnR*xw)
+   aL_neu =2d0*(T3nL-QnL*xw)
+   aR_QUp =2d0*(T3uR-QuR*xw)
+   aL_QUp =2d0*(T3uL-QuL*xw)
+   aR_QDn =2d0*(T3dR-QdR*xw)
+   aL_QDn =2d0*(T3dL-QdL*xw)
+   ! W couplings
+   bL = sqrt(2d0*(1d0-xw))
+   bR = 0d0
+   ! A couplings
+   cR_lep = -twosc*QlR
+   cL_lep = -twosc*QlL
+   cR_neu = -twosc*QnR
+   cL_neu = -twosc*QnL
+   cR_QUp = -twosc*QuR
+   cL_QUp = -twosc*QuL
+   cR_QDn = -twosc*QdR
+   cL_QDn = -twosc*QdL
 
-! W couplings
-bL = sqrt(2d0)*sqrt(1d0-xw)
-bR = 0d0
-
-! A couplings
-cR_lep = -2d0*sitW*sqrt(1d0-xw)*QlR
-cL_lep = -2d0*sitW*sqrt(1d0-xw)*QlL
-cR_neu = -2d0*sitW*sqrt(1d0-xw)*QnR
-cL_neu = -2d0*sitW*sqrt(1d0-xw)*QnL
-cR_QUp = -2d0*sitW*sqrt(1d0-xw)*QuR
-cL_QUp = -2d0*sitW*sqrt(1d0-xw)*QuL
-cR_QDn = -2d0*sitW*sqrt(1d0-xw)*QdR
-cL_QDn = -2d0*sitW*sqrt(1d0-xw)*QdL
+   ! Normalizations used in VH and VBF
+   couplWffsq = gwsq/2.0_dp
+   couplZffsq = gwsq/4.0_dp/(1.0_dp-xw)
+   couplAZff = -gwsq*sitW/2.0_dp/sqrt(1.0_dp-xw)
+   couplAffsq = gwsq*xw
 
 
 end subroutine ComputeEWVariables

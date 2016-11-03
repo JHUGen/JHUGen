@@ -119,9 +119,9 @@ end subroutine EvalAmp_VHiggs
          return
       endif
 
-      gFFZ = ci*dsqrt(4d0*pi*alpha_QED/(1d0-sitW**2))/sitW
-      gFFA = -ci*dsqrt(4d0*pi*alpha_QED)
-      gFFW = ci*dsqrt(2d0*pi*alpha_QED)/sitW
+      gFFZ = ci*2d0*dsqrt(couplZffsq) ! = gwsq/(1.0_dp-xw)
+      gFFA = -ci*dsqrt(couplAffsq) ! = gwsq*xw
+      gFFW = ci*dsqrt(couplWffsq) ! = gwsq/2.0_dp
 
       qq = -scr(MomExt(:,3),MomExt(:,4))
       q3_q3 = scr(MomExt(:,3),MomExt(:,3))

@@ -34,8 +34,8 @@ contains
 subroutine SetHiggsMassWidth(mass,width)
    implicit none
    real(8), intent(in) :: mass, width
-   M_Reso = mass
-   Ga_Reso = width
+   call SetMass(mass,Hig_)
+   call SetDecayWidth(width,Hig_)
    return
 end subroutine SetHiggsMassWidth
 
