@@ -21,8 +21,8 @@ machine:
     ROOT_VERSIONPART3: "08"
     ROOT_VERSIONSTRING: "${ROOT_VERSIONPART1}.${ROOT_VERSIONPART2}/${ROOT_VERSIONPART3}"
 
-    REFERENCE_LHES_USERNAME: ""
-    REFERENCE_LHES_BUILD_NUMBER: ""
+    REFERENCE_LHES_USERNAME: "hroskes"
+    REFERENCE_LHES_BUILD_NUMBER: "609"
     REFERENCE_LHES_FOLDER: "https://circleci.com/api/v1/project/$REFERENCE_LHES_USERNAME/JHUGen/$REFERENCE_LHES_BUILD_NUMBER/'artifacts/0/$CIRCLE_ARTIFACTS/reference/'"
     REFERENCE_FILENAMES: "ggH_ZZ.lhe ggH_WW.lhe ggH_Zgamma.lhe ggH_gammagamma.lhe spin1_ZZ.lhe spin1_WW.lhe gg_spin2_ZZ.lhe qq_spin2_WW.lhe gg_spin2_Zgamma.lhe qq_spin2_gammagamma.lhe ZH_bb.lhe WH_Zgamma.lhe ee_gammaH_bb.lhe VBF_ZZ.lhe HJJ_WW.lhe HJ_gammagamma.lhe ttH_tautau.lhe bbH_tautau.lhe tqH_110.lhe tqH_111.lhe tqH_112.lhe tqH_113.lhe tqH_114.lhe"
 
@@ -263,12 +263,6 @@ test:
     #this should NOT use a fixed seed so that we can catch very rare syntax problems too
 
     #this section takes ~10-15 minutes
-    - ./JHUGen PDFSet=3 Process=0  VegasNc0=100000 VegasNc2=100 DataFile=$CIRCLE_ARTIFACTS/other/spin0_Zgamma     DecayMode1=9  DecayMode2=7 ghzgs2=1,0
-    - ./JHUGen PDFSet=3 Process=0  VegasNc0=100000 VegasNc2=100 DataFile=$CIRCLE_ARTIFACTS/other/spin0_gammagamma DecayMode1=7  DecayMode2=7 ghgsgs2=1,0
-    - ./JHUGen PDFSet=3 Process=1  VegasNc0=100000 VegasNc2=100 DataFile=$CIRCLE_ARTIFACTS/other/spin1_WW         DecayMode1=11 DecayMode2=11 zprime_zz_1=1,0
-    - ./JHUGen PDFSet=3 Process=2  VegasNc0=100000 VegasNc2=100 DataFile=$CIRCLE_ARTIFACTS/other/spin2_ZZ         DecayMode1=9  DecayMode2=9 a1=1,0 b1=1,0 b5=1,0
-    - ./JHUGen PDFSet=3 Process=2  VegasNc0=100000 VegasNc2=100 DataFile=$CIRCLE_ARTIFACTS/other/spin2_Zgamma     DecayMode1=9  DecayMode2=7 a1=1,0 b1=1,0
-    - ./JHUGen PDFSet=3 Process=2  VegasNc0=100000 VegasNc2=100 DataFile=$CIRCLE_ARTIFACTS/other/spin2_gammagamma DecayMode1=7  DecayMode2=7 a1=1,0 b1=1,0
 
     #gg/qqbar -> spin0/1/2
     - ./JHUGen PDFSet=3 Process=0  VegasNc0=100000 VegasNc2=100 DataFile=$CIRCLE_ARTIFACTS/other/spin0_Zgamma     DecayMode1=9  DecayMode2=7 ghzgs2=1,0
@@ -316,23 +310,23 @@ test:
     #in that case the ME is the same, so no need to spend time making plots, they already exist
     #  in the run that produced the reference
     #this can take a good 2 hours
-    #- if [ -f ~/reference_failed ]; then ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$CIRCLE_ARTIFACTS/ggH/SM; fi
-    #- if [ -f ~/reference_failed ]; then analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/ggH/ outfile=SM.root indir=$CIRCLE_ARTIFACTS/ggH/ computeVBFProdAngles=1 computeVHProdAngles=1 SM.lhe; fi
+    - if [ -f ~/reference_failed ]; then ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$CIRCLE_ARTIFACTS/ggH/SM; fi
+    - if [ -f ~/reference_failed ]; then analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/ggH/ outfile=SM.root indir=$CIRCLE_ARTIFACTS/ggH/ computeVBFProdAngles=1 computeVHProdAngles=1 SM.lhe; fi
 
-    #- if [ -f ~/reference_failed ]; then ./JHUGen PDFSet=3 Process=60 VegasNc0=10000000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/VBF/SM pTjetcut=0 deltaRcut=0; fi
-    #- if [ -f ~/reference_failed ]; then ./JHUGen PDFSet=3 VegasNc0=100000 DecayMode1=8 DecayMode2=8 Interf=0 ReadLHE=$CIRCLE_ARTIFACTS/VBF/SM.lhe DataFile=$CIRCLE_ARTIFACTS/VBF/SM_decayed; fi
-    #- if [ -f ~/reference_failed ]; then analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/VBF/ outfile=SM.root indir=$CIRCLE_ARTIFACTS/VBF/ computeVBFProdAngles=1 computeVHProdAngles=1 SM_decayed.lhe; fi
-    #- if [ -f ~/reference_failed ]; then ./JHUGen PDFSet=3 Process=61 VegasNc0=10000000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/HJJ/SM; fi
-    #- if [ -f ~/reference_failed ]; then ./JHUGen PDFSet=3 VegasNc0=100000 DecayMode1=8 DecayMode2=8 Interf=0 ReadLHE=$CIRCLE_ARTIFACTS/HJJ/SM.lhe DataFile=$CIRCLE_ARTIFACTS/HJJ/SM_decayed; fi
-    #- if [ -f ~/reference_failed ]; then analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/HJJ/ outfile=SM.root indir=$CIRCLE_ARTIFACTS/HJJ/ computeVBFProdAngles=1 computeVHProdAngles=1 SM_decayed.lhe; fi
+    - if [ -f ~/reference_failed ]; then ./JHUGen PDFSet=3 Process=60 VegasNc0=10000000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/VBF/SM pTjetcut=0 deltaRcut=0; fi
+    - if [ -f ~/reference_failed ]; then ./JHUGen PDFSet=3 VegasNc0=100000 DecayMode1=8 DecayMode2=8 Interf=0 ReadLHE=$CIRCLE_ARTIFACTS/VBF/SM.lhe DataFile=$CIRCLE_ARTIFACTS/VBF/SM_decayed; fi
+    - if [ -f ~/reference_failed ]; then analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/VBF/ outfile=SM.root indir=$CIRCLE_ARTIFACTS/VBF/ computeVBFProdAngles=1 computeVHProdAngles=1 SM_decayed.lhe; fi
+    - if [ -f ~/reference_failed ]; then ./JHUGen PDFSet=3 Process=61 VegasNc0=10000000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/HJJ/SM; fi
+    - if [ -f ~/reference_failed ]; then ./JHUGen PDFSet=3 VegasNc0=100000 DecayMode1=8 DecayMode2=8 Interf=0 ReadLHE=$CIRCLE_ARTIFACTS/HJJ/SM.lhe DataFile=$CIRCLE_ARTIFACTS/HJJ/SM_decayed; fi
+    - if [ -f ~/reference_failed ]; then analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/HJJ/ outfile=SM.root indir=$CIRCLE_ARTIFACTS/HJJ/ computeVBFProdAngles=1 computeVHProdAngles=1 SM_decayed.lhe; fi
 
     #pseudoscalar
-    #- if [ -f ~/reference_failed ]; then ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$CIRCLE_ARTIFACTS/ggH/PS ghz1=0,0 ghz4=1,0; fi
-    #- if [ -f ~/reference_failed ]; then analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/ggH/ outfile=PS.root indir=$CIRCLE_ARTIFACTS/ggH/ computeVBFProdAngles=1 computeVHProdAngles=1 PS.lhe; fi
+    - if [ -f ~/reference_failed ]; then ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$CIRCLE_ARTIFACTS/ggH/PS ghz1=0,0 ghz4=1,0; fi
+    - if [ -f ~/reference_failed ]; then analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/ggH/ outfile=PS.root indir=$CIRCLE_ARTIFACTS/ggH/ computeVBFProdAngles=1 computeVHProdAngles=1 PS.lhe; fi
 
-    #- if [ -f ~/reference_failed ]; then ./JHUGen PDFSet=3 Process=60 VegasNc0=10000000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/VBF/PS ghz1=0,0 ghz4=1,0  pTjetcut=0 deltaRcut=0; fi
-    #- if [ -f ~/reference_failed ]; then ./JHUGen PDFSet=3 VegasNc0=100000 DecayMode1=8 DecayMode2=8 Interf=0 ReadLHE=$CIRCLE_ARTIFACTS/VBF/PS.lhe DataFile=$CIRCLE_ARTIFACTS/VBF/PS_decayed ghz1=0,0 ghz4=1,0; fi
-    #- if [ -f ~/reference_failed ]; then analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/VBF/ outfile=PS.root indir=$CIRCLE_ARTIFACTS/VBF/ computeVBFProdAngles=1 computeVHProdAngles=1 PS_decayed.lhe; fi
+    - if [ -f ~/reference_failed ]; then ./JHUGen PDFSet=3 Process=60 VegasNc0=10000000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/VBF/PS ghz1=0,0 ghz4=1,0  pTjetcut=0 deltaRcut=0; fi
+    - if [ -f ~/reference_failed ]; then ./JHUGen PDFSet=3 VegasNc0=100000 DecayMode1=8 DecayMode2=8 Interf=0 ReadLHE=$CIRCLE_ARTIFACTS/VBF/PS.lhe DataFile=$CIRCLE_ARTIFACTS/VBF/PS_decayed ghz1=0,0 ghz4=1,0; fi
+    - if [ -f ~/reference_failed ]; then analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/VBF/ outfile=PS.root indir=$CIRCLE_ARTIFACTS/VBF/ computeVBFProdAngles=1 computeVHProdAngles=1 PS_decayed.lhe; fi
 
     #fa3=0.5, phi=0 or pi
     #- if [ -f ~/reference_failed ]; then ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$CIRCLE_ARTIFACTS/ggH/fa30.5 ghz1=1,0 ghz4=2.55052,0; fi
@@ -341,12 +335,12 @@ test:
     #- if [ -f ~/reference_failed ]; then analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/ggH/ outfile=fa30.5i.root indir=$CIRCLE_ARTIFACTS/ggH/ computeVBFProdAngles=1 computeVHProdAngles=1 fa30.5i.lhe; fi
 
     #a2
-    #- if [ -f ~/reference_failed ]; then ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$CIRCLE_ARTIFACTS/ggH/a2 ghz1=0,0 ghz2=1,0; fi
-    #- if [ -f ~/reference_failed ]; then analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/ggH/ outfile=a2.root indir=$CIRCLE_ARTIFACTS/ggH/ computeVBFProdAngles=1 computeVHProdAngles=1 a2.lhe; fi
+    - if [ -f ~/reference_failed ]; then ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$CIRCLE_ARTIFACTS/ggH/a2 ghz1=0,0 ghz2=1,0; fi
+    - if [ -f ~/reference_failed ]; then analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/ggH/ outfile=a2.root indir=$CIRCLE_ARTIFACTS/ggH/ computeVBFProdAngles=1 computeVHProdAngles=1 a2.lhe; fi
 
-    #- if [ -f ~/reference_failed ]; then ./JHUGen PDFSet=3 Process=60 VegasNc0=10000000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/VBF/a2 ghz1=0,0 ghz2=1,0 pTjetcut=0 deltaRcut=0; fi
-    #- if [ -f ~/reference_failed ]; then ./JHUGen PDFSet=3 VegasNc0=100000 DecayMode1=8 DecayMode2=8 Interf=0 ReadLHE=$CIRCLE_ARTIFACTS/VBF/a2.lhe DataFile=$CIRCLE_ARTIFACTS/VBF/a2_decayed ghz1=0,0 ghz2=1,0; fi
-    #- if [ -f ~/reference_failed ]; then analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/VBF/ outfile=a2.root indir=$CIRCLE_ARTIFACTS/VBF/ computeVBFProdAngles=1 computeVHProdAngles=1 a2_decayed.lhe; fi
+    - if [ -f ~/reference_failed ]; then ./JHUGen PDFSet=3 Process=60 VegasNc0=10000000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/VBF/a2 ghz1=0,0 ghz2=1,0 pTjetcut=0 deltaRcut=0; fi
+    - if [ -f ~/reference_failed ]; then ./JHUGen PDFSet=3 VegasNc0=100000 DecayMode1=8 DecayMode2=8 Interf=0 ReadLHE=$CIRCLE_ARTIFACTS/VBF/a2.lhe DataFile=$CIRCLE_ARTIFACTS/VBF/a2_decayed ghz1=0,0 ghz2=1,0; fi
+    - if [ -f ~/reference_failed ]; then analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/VBF/ outfile=a2.root indir=$CIRCLE_ARTIFACTS/VBF/ computeVBFProdAngles=1 computeVHProdAngles=1 a2_decayed.lhe; fi
 
     #=============
     #miscellaneous
@@ -380,10 +374,10 @@ test:
     - "! grep -q '!' checklheoutput.txt"    #all the error messages end with !
 
     #ggH analytical fits
-    #- if [ -f ~/reference_failed ]; then cd ~/CMSJHU_AnalysisMacros/ZZ4lanalyticalfits && echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$CIRCLE_ARTIFACTS/ggH/SM.root", "$CIRCLE_ARTIFACTS/ggH/SM/", 1, 0, 0, 0, 0)' | root -b; fi
-    #- if [ -f ~/reference_failed ]; then cd ~/CMSJHU_AnalysisMacros/ZZ4lanalyticalfits && echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$CIRCLE_ARTIFACTS/ggH/PS.root", "$CIRCLE_ARTIFACTS/ggH/PS/", 0, 0, 0, 1, 0)' | root -b; fi
-    #- if [ -f ~/reference_failed ]; then cd ~/CMSJHU_AnalysisMacros/ZZ4lanalyticalfits && echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$CIRCLE_ARTIFACTS/ggH/a2.root", "$CIRCLE_ARTIFACTS/ggH/a2/", 0, 1, 0, 0, 0)' | root -b; fi
+    - if [ -f ~/reference_failed ]; then cd ~/CMSJHU_AnalysisMacros/ZZ4lanalyticalfits && echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$CIRCLE_ARTIFACTS/ggH/SM.root", "$CIRCLE_ARTIFACTS/ggH/SM/", 1, 0, 0, 0, 0)' | root -b; fi
+    - if [ -f ~/reference_failed ]; then cd ~/CMSJHU_AnalysisMacros/ZZ4lanalyticalfits && echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$CIRCLE_ARTIFACTS/ggH/PS.root", "$CIRCLE_ARTIFACTS/ggH/PS/", 0, 0, 0, 1, 0)' | root -b; fi
+    - if [ -f ~/reference_failed ]; then cd ~/CMSJHU_AnalysisMacros/ZZ4lanalyticalfits && echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$CIRCLE_ARTIFACTS/ggH/a2.root", "$CIRCLE_ARTIFACTS/ggH/a2/", 0, 1, 0, 0, 0)' | root -b; fi
     #- if [ -f ~/reference_failed ]; then cd ~/CMSJHU_AnalysisMacros/ZZ4lanalyticalfits && echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$CIRCLE_ARTIFACTS/ggH/fa30.5.root", "$CIRCLE_ARTIFACTS/ggH/fa30.5/", 1, 2.55052, 0, 0, 0)' | root -b; fi
     #- if [ -f ~/reference_failed ]; then cd ~/CMSJHU_AnalysisMacros/ZZ4lanalyticalfits && echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$CIRCLE_ARTIFACTS/ggH/fa30.5i.root", "$CIRCLE_ARTIFACTS/ggH/fa30.5i/", 1, 0, 2.55052, 0, 0)' | root -b; fi
     #VBF plots
-    #- if [ -f ~/reference_failed ]; then cd ~/CMSJHU_AnalysisMacros/MCProductionValidation && root -b -q VBFplots.C+; fi
+    - if [ -f ~/reference_failed ]; then cd ~/CMSJHU_AnalysisMacros/MCProductionValidation && root -b -q VBFplots.C+; fi
