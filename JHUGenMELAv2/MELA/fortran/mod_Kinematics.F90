@@ -984,18 +984,18 @@ integer :: scheme
     elseif( scheme.eq.2 ) then! fixed width
         GetBWPropagator = 1d0/( (sHat-M_Reso**2)**2 + (M_Reso*Ga_Reso)**2 )
     elseif( scheme.eq.3 ) then! Passarino's CPS
-        if( mubarH.lt.0 .or. gabarH.lt.0 ) then
+        if( mubarH.lt.0d0 .or. gabarH.lt.0d0 ) then
           call CALL_HTO(M_Reso/GeV, m_top/GeV, mhb, ghb)
           if( IsNaN(mubarH).or.IsNaN(gabarH) ) then
             print *, "Passarino's CALL_HTO returned a NaN"
-            print *, "gabarH,Ehat)",gabarH,dsqrt(dabs(sHat))/GeV
+            print *, "(gabarH,Ehat)",gabarH,dsqrt(dabs(sHat))/GeV
             stop 1
             RETURN
           endif
           mhb = mhb*GeV
           ghb = ghb*GeV
 
-          mubarH = sqrt(mhb**2/(1+(ghb/mhb)**2))
+          mubarH = sqrt(mhb**2/(1d0+(ghb/mhb)**2))
           gabarH = mubarH/mhb*ghb
         endif
 
