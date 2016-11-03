@@ -194,6 +194,8 @@ test:
     # then edit REFERENCE_LHES_USERNAME and REFERENCE_LHES_BUILD_NUMBER
     # in the environment variables section above to refer to that first build
 
+    #this section takes about 30 minutes
+
     - ./JHUGen Seed=765543533 PDFSet=3 Process=0 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/ggH_ZZ DecayMode1=9 DecayMode2=9 $REFERENCE_COUPLINGS
     - ./JHUGen Seed=765543533 PDFSet=3 Process=0 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/ggH_WW DecayMode1=11 DecayMode2=11 $REFERENCE_COUPLINGS
     - ./JHUGen Seed=765543533 PDFSet=3 Process=0 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/ggH_Zgamma DecayMode1=9 DecayMode2=7 $REFERENCE_COUPLINGS
@@ -220,16 +222,16 @@ test:
     - ./JHUGen Seed=765543533 PDFSet=3 Process=62 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/HJ $REFERENCE_COUPLINGS
     - ./JHUGen Seed=765543533 VegasNc0=100000 ReadLHE=compare_to_reference/HJ.lhe DataFile=compare_to_reference/HJ_gammagamma DecayMode1=7 DecayMode2=7 $REFERENCE_COUPLINGS
 
-    - ./JHUGen Seed=765543533 PDFSet=3 Process=80 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/ttH DecayMode1=11 DecayMode2=11 $REFERENCE_COUPLINGS
+    - ./JHUGen Seed=765543533 PDFSet=3 Process=80 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/ttH TopDK=1 DecayMode1=11 DecayMode2=11 $REFERENCE_COUPLINGS
     - ./JHUGen Seed=765543533 VegasNc0=100000 ReadLHE=compare_to_reference/ttH.lhe DataFile=compare_to_reference/ttH_tautau DecayMode1=11 DecayMode2=11 TauDK=1 $REFERENCE_COUPLINGS
     - ./JHUGen Seed=765543533 PDFSet=3 Process=90 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/bbH $REFERENCE_COUPLINGS
     - ./JHUGen Seed=765543533 VegasNc0=100000 ReadLHE=compare_to_reference/bbH.lhe DataFile=compare_to_reference/bbH_tautau TauDK=0 $REFERENCE_COUPLINGS
 
-    - ./JHUGen Seed=765543533 PDFSet=3 Process=110 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/tqH_110 DecayMode1=11 $REFERENCE_COUPLINGS
-    - ./JHUGen Seed=765543533 PDFSet=3 Process=111 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/tqH_111 DecayMode1=11 $REFERENCE_COUPLINGS
-    - ./JHUGen Seed=765543533 PDFSet=3 Process=112 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/tqH_112 DecayMode1=11 $REFERENCE_COUPLINGS
-    - ./JHUGen Seed=765543533 PDFSet=3 Process=113 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/tqH_113 DecayMode1=11 $REFERENCE_COUPLINGS
-    - ./JHUGen Seed=765543533 PDFSet=3 Process=114 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/tqH_114 DecayMode1=11 $REFERENCE_COUPLINGS
+    - ./JHUGen Seed=765543533 PDFSet=3 Process=110 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/tqH_110 TopDK=1 DecayMode1=11 $REFERENCE_COUPLINGS
+    - ./JHUGen Seed=765543533 PDFSet=3 Process=111 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/tqH_111 TopDK=1 DecayMode1=11 $REFERENCE_COUPLINGS
+    - ./JHUGen Seed=765543533 PDFSet=3 Process=112 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/tqH_112 TopDK=1 DecayMode1=11 $REFERENCE_COUPLINGS
+    - ./JHUGen Seed=765543533 PDFSet=3 Process=113 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/tqH_113 TopDK=1 DecayMode1=11 $REFERENCE_COUPLINGS
+    - ./JHUGen Seed=765543533 PDFSet=3 Process=114 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/tqH_114 TopDK=1 DecayMode1=11 $REFERENCE_COUPLINGS
 
     #now compare to reference
     - |
