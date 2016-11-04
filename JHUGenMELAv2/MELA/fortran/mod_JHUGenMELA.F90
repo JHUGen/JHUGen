@@ -9,6 +9,7 @@ MODULE ModJHUGenMELA
 
 ! JHUGenMELA-specific subroutines and functions
 
+public :: SetEWParameters
 public :: SetHiggsMassWidth
 public :: SetDecayModes
 public :: SetTopDecays
@@ -31,11 +32,23 @@ contains
 ! Subroutines visible to the user
 !=====================================================
 
+subroutine SetEWParameters(inMZ, inMW, inGf, inalpha_QED, inxw)
+   implicit none
+   real(8), intent(in) :: inMZ, inMW, inGf, inalpha_QED, inxw
+   M_Z = inMZ
+   M_W = inMW
+   Gf = inGf
+   alpha_QED = inalpha_QED
+   xw = inxw
+   call ComputeEWVariables()
+end subroutine SetEWParameters
+
+
 subroutine SetHiggsMassWidth(mass,width)
    implicit none
    real(8), intent(in) :: mass, width
-   M_Reso = mass
-   Ga_Reso = width
+   call SetMass(mass,Hig_)
+   call SetDecayWidth(width,Hig_)
    return
 end subroutine SetHiggsMassWidth
 

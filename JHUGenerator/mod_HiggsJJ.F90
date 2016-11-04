@@ -10,21 +10,9 @@ module modHiggsJJ
   public :: get_VBFchannelHash,get_VBFchannelHash_nosplit,get_HJJchannelHash,get_HJJchannelHash_nosplit,get_GENchannelHash
 
   !-- general definitions, to be merged with Markus final structure
-  real(dp), parameter :: nf = 5.0_dp
-  real(dp), parameter :: xw = sitW**2
-  real(dp), parameter :: twosc = sqrt(4.0_dp*xw*(1.0_dp-xw))
-
-  real(dp), parameter :: tag1 = 1.0_dp
-  real(dp), parameter :: tag2 = 1.0_dp
-  real(dp), parameter :: tagbot = 1.0_dp
-
-  real(dp), parameter :: xn = 3.0_dp
-  real(dp), parameter :: Ca = 3.0_dp
-  real(dp), parameter :: Cf = 4.0_dp/3.0_dp
-
-  real(dp), parameter :: avegg = 1.0_dp/4.0_dp/64.0_dp
-  real(dp), parameter :: aveqg = 1.0_dp/4.0_dp/24.0_dp
-  real(dp), parameter :: aveqq = 1.0_dp/4.0_dp/9.0_dp
+   real(dp), public, parameter :: tag1 = 1.0_dp
+   real(dp), public, parameter :: tag2 = 1.0_dp
+   real(dp), public, parameter :: tagbot = 1.0_dp
 
 
  CONTAINS
@@ -1052,12 +1040,19 @@ module modHiggsJJ
     complex(dp) :: amp_w(-1:1,-1:1)
     real(dp) :: sprod(4,4)
     complex(dp) :: za(4,4), zb(4,4)
-    real(dp), parameter :: Lu = aL_QUp**2, Ru = aR_QUp**2
-    real(dp), parameter :: Ld = aL_QDn**2, Rd = aR_QDn**2
-    real(dp), parameter :: couplz = gwsq * xw/twosc**2
-    real(dp), parameter :: couplw = gwsq/two
+    real(dp) :: Lu, Ru
+    real(dp) :: Ld, Rd
+    real(dp) :: couplz
+    real(dp) :: couplw
     real(dp) :: restmp=0d0
     integer :: i, j, j1, j2, iflip, pdfindex(2)
+
+    Lu = aL_QUp**2
+    Ru = aR_QUp**2
+    Ld = aL_QDn**2
+    Rd = aR_QDn**2
+    couplz = gwsq * xw/twosc**2
+    couplw = gwsq/two
 
     res = zero
 
@@ -2748,15 +2743,10 @@ module modHiggsJJ
   function A0_ZZ_4f(j1,j2,j3,j4,za,zb,sprod,line1,line2)
     use modMisc
     implicit none
-    real(dp), parameter :: Qup = 2.0_dp/3.0_dp
-    real(dp), parameter :: Qdn = -1.0_dp/3.0_dp
-    real(dp), parameter, dimension(2) :: Lz = (/aL_Qup,aL_Qdn/)
-    real(dp), parameter, dimension(2) :: Rz = (/aR_Qup,aR_Qdn/)
-    real(dp), parameter, dimension(2) :: La = (/Qup,Qdn/)
-    real(dp), parameter, dimension(2) :: Ra = (/Qup,Qdn/)
-    real(dp), parameter :: czsq = gwsq/4.0_dp/(1.0_dp-xw)
-    real(dp), parameter :: caz = -gwsq*sitW/2.0_dp/sqrt(1.0_dp-xw)
-    real(dp), parameter :: casq = gwsq*xw
+    real(dp), dimension(2) :: Lz
+    real(dp), dimension(2) :: Rz
+    real(dp), parameter, dimension(2) :: La = (/QuL,QdL/)
+    real(dp), parameter, dimension(2) :: Ra = (/QuR,QdR/)
     complex(dp) :: A0_ZZ_4f(-1:1,-1:1)
     integer :: j1,j2,j3,j4,line1,line2
     complex(dp) :: za(4,4),zb(4,4)
@@ -2773,6 +2763,11 @@ module modHiggsJJ
     integer :: i,j,k,l
 
     zab2(j1,j2,j3,j4) = za(j1,j2)*zb(j2,j4) + za(j1,j3)*zb(j3,j4)
+
+
+    Lz = (/aL_Qup,aL_Qdn/)
+    Rz = (/aR_Qup,aR_Qdn/)
+
 
     A0_ZZ_4f = czero
 
@@ -2796,9 +2791,10 @@ module modHiggsJJ
     a2_zz = -two * vvcoupl_prime_zz(2) - kcoupl * vvcoupl_prime_zz(3)
     a3_zz = -two * vvcoupl_prime_zz(4)
 
-    struc_zz(1) = two * (a1_zz * mhsq - ci * a3_zz * q1q2) * czsq
-    struc_zz(2) = (a2_zz + ci * a3_zz) * czsq
-    struc_zz(3) = two * ci * a3_zz * czsq
+    struc_zz(1) = two * (a1_zz * mhsq - ci * a3_zz * q1q2)
+    struc_zz(2) = (a2_zz + ci * a3_zz)
+    struc_zz(3) = two * ci * a3_zz
+    struc_zz(:) = struc_zz(:) * couplZffsq
 
     if( includeGammaStar ) then
 
@@ -2823,17 +2819,20 @@ module modHiggsJJ
        a2_az = -two * vvcoupl_prime_az(2) - kcoupl * vvcoupl_prime_az(3)
        a3_az = -two * vvcoupl_prime_az(4)
 
-       struc_aa(1) = two * (a1_aa * mhsq - ci * a3_aa * q1q2) * casq
-       struc_aa(2) = (a2_aa + ci * a3_aa) * casq
-       struc_aa(3) = two * ci * a3_aa * casq
+       struc_aa(1) = two * (a1_aa * mhsq - ci * a3_aa * q1q2)
+       struc_aa(2) = (a2_aa + ci * a3_aa)
+       struc_aa(3) = two * ci * a3_aa
+       struc_aa(:) = struc_aa(:) * couplAffsq
 
-       struc_az(1) = two * (a1_az * mhsq - ci * a3_az * q1q2) * caz
-       struc_az(2) = (a2_az + ci * a3_az) * caz
-       struc_az(3) = two * ci * a3_az * caz
+       struc_az(1) = two * (a1_az * mhsq - ci * a3_az * q1q2)
+       struc_az(2) = (a2_az + ci * a3_az)
+       struc_az(3) = two * ci * a3_az
+       struc_az(:) = struc_az(:) * couplAZff
 
-       struc_za(1) = two * (a1_za * mhsq - ci * a3_za * q1q2) * caz
-       struc_za(2) = (a2_za + ci * a3_za) * caz
-       struc_za(3) = two * ci * a3_za * caz
+       struc_za(1) = two * (a1_za * mhsq - ci * a3_za * q1q2)
+       struc_za(2) = (a2_za + ci * a3_za)
+       struc_za(3) = two * ci * a3_za
+       struc_za(:) = struc_za(:) * couplAZff
 
        !--
 
@@ -2891,7 +2890,6 @@ module modHiggsJJ
   function A0_WW_4f(j1,j2,j3,j4,za,zb,sprod,useWWcoupl,Wpm_flip)
   use modMisc
   implicit none
-    real(dp), parameter :: cwsq = gwsq/2d0
     complex(dp) :: A0_WW_4f(-1:1,-1:1)
     integer :: j1,j2,j3,j4
     complex(dp) :: za(4,4), zb(4,4)
@@ -2946,7 +2944,7 @@ module modHiggsJJ
     iprop12 = sprod(j1,j2) - M_W**2 + ci * M_W * Ga_W
     iprop34 = sprod(j3,j4) - M_W**2 + ci * M_W * Ga_W
 
-    A0_WW_4f = A0_WW_4f/vev /iprop12/iprop34 * cwsq
+    A0_WW_4f = A0_WW_4f/vev /iprop12/iprop34 * couplWffsq
 
     return
 
