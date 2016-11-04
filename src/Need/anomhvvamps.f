@@ -120,3 +120,130 @@ c--- q^2-dependent couplings
 
       end
 
+
+      !-- g(i1) g(i2) =|>- + >- H
+      function anomhggvtxamp(i1,i2,jh,za,zb)
+      implicit none
+      include 'constants.f'
+      include 'masses.f'
+      include 'scale.f'
+      include 'spinzerohiggs_anomcoupl.f'
+      include 'sprods_com.f'
+      include 'zprods_decl.f'
+      double complex anomhggvtxamp(2,2,2),hggpointvtx(2,2)
+      integer i1,i2,jh ! jh is Higgs 1, 2
+      integer iq,igen,iv
+      double precision mfsq(2,2) ! (qgen,b/t)
+      double complex a1(2),a3(2) ! (qgen)
+      double complex kappaj(2,2) ! (qgen,b/t)
+      double complex kappaj_tilde(2,2) ! (qgen,b/t)
+      double complex qlI3,C0mXq
+
+      mfsq(1,1)=mb**2
+      mfsq(1,2)=mt**2
+      mfsq(2,1)=mb_4gen**2
+      mfsq(2,2)=mt_4gen**2
+
+      anomhggvtxamp(:,:,:)=czip
+      a1(:)=czip
+      a3(:)=czip
+      kappaj(:,:)=czip
+      kappaj_tilde(:,:)=czip
+
+      IF( AllowAnomalousCouplings.eq.1 ) THEN
+
+      if(jh.eq.1) then
+
+      a1(1) = ghg2+ghg3*s(i1,i2)/4d0/LambdaBSM**2
+      a3(1) = -2d0*ghg4
+      a1(2)= ghg2_4gen+ghg3_4gen*s(i1,i2)/4d0/LambdaBSM**2
+      a3(2)= -2d0*ghg4_4gen
+
+      kappaj(1,1) = kappa_bot
+      kappaj_tilde(1,1) = kappa_tilde_bot
+      kappaj(1,2) = kappa_top
+      kappaj_tilde(1,2) = kappa_tilde_top
+      kappaj(2,1) = kappa_4gen_bot
+      kappaj_tilde(2,1) = kappa_tilde_4gen_bot
+      kappaj(2,2) = kappa_4gen_top
+      kappaj_tilde(2,2) = kappa_tilde_4gen_top
+
+      else
+
+      a1(1) = gh2g2+gh2g3*s(i1,i2)/4d0/Lambda2BSM**2
+      a3(1) = -2d0*gh2g4
+      a1(2)= gh2g2_4gen+gh2g3_4gen*s(i1,i2)/4d0/Lambda2BSM**2
+      a3(2)= -2d0*gh2g4_4gen
+
+      kappaj(1,1) = kappa2_bot
+      kappaj_tilde(1,1) = kappa2_tilde_bot
+      kappaj(1,2) = kappa2_top
+      kappaj_tilde(1,2) = kappa2_tilde_top
+      kappaj(2,1) = kappa2_4gen_bot
+      kappaj_tilde(2,1) = kappa2_tilde_4gen_bot
+      kappaj(2,2) = kappa2_4gen_top
+      kappaj_tilde(2,2) = kappa2_tilde_4gen_top
+
+      endif
+
+      ELSE
+
+      kappaj(1,1) = cone
+      kappaj(1,2) = cone
+
+      ENDIF
+
+
+      do igen=1,2
+      ! Compute the point interaction
+      hggpointvtx(1,1) = hggpointvtx(1,1) +
+     & (
+     & a1(igen)
+     & - a3(igen)*0.5d0*za(i1,i2)*zb(i1,i2)/s(i1,i2)
+     & )/3d0
+      hggpointvtx(2,2) = hggpointvtx(2,2) +
+     & (
+     & a1(igen)
+     & + a3(igen)*0.5d0*za(i1,i2)*zb(i1,i2)/s(i1,i2)
+     & )/3d0
+
+      do iq=1,2
+      iv = mod(iq,2)
+
+      ! Add one point interaction into each loop
+      anomhggvtxamp(iv,:,:) = anomhggvtxamp(iv,:,:) +
+     & hggpointvtx(:,:)
+
+      C0mXq =
+     & qlI3(
+     & zip,zip,s(i1,i2),
+     & mfsq(igen,iq),mfsq(igen,iq),mfsq(igen,iq),
+     & musq,0
+     & )
+
+      anomhggvtxamp(iv,1,1) = anomhggvtxamp(iv,1,1) +
+     & mfsq(igen,iq)/s(i1,i2)*(
+     &  kappaj(igen,iq)*(
+     &    2d0-C0mXq*(s(i1,i2)-4d0*mfsq(igen,iq))
+     &  )
+     &  -kappaj_tilde(igen,iq)*C0mXq*s(i1,i2)
+     & )
+
+      anomhggvtxamp(iv,2,2) = anomhggvtxamp(iv,2,2) +
+     & mfsq(igen,iq)/s(i1,i2)*(
+     &  kappaj(igen,iq)*(
+     &    2d0-C0mXq*(s(i1,i2)-4d0*mfsq(igen,iq))
+     &  )
+     &  +kappaj_tilde(igen,iq)*C0mXq*s(i1,i2)
+     & )
+
+      enddo
+      enddo
+
+      ! Multiply by the tensor structure
+      anomhggvtxamp(:,1,1) = anomhggvtxamp(:,1,1)*za(i1,i2)/zb(i1,i2)
+      anomhggvtxamp(:,2,2) = anomhggvtxamp(:,2,2)*zb(i1,i2)/za(i1,i2)
+
+      return
+      end
+
