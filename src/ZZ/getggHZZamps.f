@@ -57,7 +57,7 @@ c--- propagator factors
 c--- Amplitudes for production
       ggHmq = anomhggvtxamp(1,2,1,za,zb)
       ! Overall factor
-      ggHmq(:,:,:) = ggHmq(:,:,:)*s(1,2)/(2d0*wmass*sinthw)
+      ggHmq(:,:,:) = ggHmq(:,:,:)/(2d0*wmass*sinthw)
 
 c--- Amplitudes for decay
       H4l(1,1)=anomhzzamp(3,4,5,6,1,s(1,2),s(3,4),s(5,6),za,zb)*l1*l2
@@ -145,7 +145,7 @@ c--- propagator factors
 c--- Amplitudes for production
       ggHmq = anomhggvtxamp(1,2,2,za,zb)
       ! Overall factor
-      ggHmq(:,:,:) = ggHmq(:,:,:)*s(1,2)/(2d0*wmass*sinthw)
+      ggHmq(:,:,:) = ggHmq(:,:,:)/(2d0*wmass*sinthw)
 
 c--- Amplitudes for decay
       H4l(1,1)=anomhzzamp(3,4,5,6,2,s(1,2),s(3,4),s(5,6),za,zb)*l1*l2
