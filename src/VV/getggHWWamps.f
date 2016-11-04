@@ -40,9 +40,8 @@ c---
       call spinoru(6,p,za,zb)
 
 c--- Production amplitude
+      ! Overall factor=1
       ggHmq = anomhggvtxamp(1,2,1,za,zb)
-      ! Overall factor
-      ggHmq(:,:,:) = ggHmq(:,:,:)*s(1,2)
 
 c--- Decay amplitude
       e3De4=-2d0*anomhwwamp(3,4,5,6,1,s(1,2),s(3,4),s(5,6),za,zb)
@@ -103,9 +102,8 @@ c---
       call spinoru(6,p,za,zb)
 
 c--- Production amplitude
+      ! Overall factor=1
       ggHmq = anomhggvtxamp(1,2,2,za,zb)
-      ! Overall factor
-      ggHmq(:,:,:) = ggHmq(:,:,:)*s(1,2)
 
 c--- Decay amplitude
       e3De4=-2d0*anomhwwamp(3,4,5,6,2,s(1,2),s(3,4),s(5,6),za,zb)

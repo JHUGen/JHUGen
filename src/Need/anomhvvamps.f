@@ -241,8 +241,10 @@ c--- q^2-dependent couplings
       enddo
 
       ! Multiply by the tensor structure
-      anomhggvtxamp(:,1,1) = anomhggvtxamp(:,1,1)*za(i1,i2)/zb(i1,i2)
-      anomhggvtxamp(:,2,2) = anomhggvtxamp(:,2,2)*zb(i1,i2)/za(i1,i2)
+      anomhggvtxamp(:,1,1) = anomhggvtxamp(:,1,1)
+     & *s(i1,i2)*za(i1,i2)/zb(i1,i2)
+      anomhggvtxamp(:,2,2) = anomhggvtxamp(:,2,2)
+     & *s(i1,i2)*zb(i1,i2)/za(i1,i2)
 
       return
       end
