@@ -3,7 +3,6 @@
       implicit none
       include 'mxpart.f'
       include 'masses.f'
-      include 'anom_higgs.f'
       include 'spinzerohiggs_anomcoupl.f'
       include 'zprods_decl.f'
       double complex anomhzzamp
@@ -65,7 +64,6 @@ c--- q^2 dependent couplings
       implicit none
       include 'mxpart.f'
       include 'masses.f'
-      include 'anom_higgs.f'
       include 'spinzerohiggs_anomcoupl.f'
       include 'zprods_decl.f'
       double complex anomhwwamp
@@ -122,7 +120,7 @@ c--- q^2-dependent couplings
 
 
       !-- g(i1) g(i2) =|>- + >- H
-      function anomhggvtxamp(i1,i2,jh,za,zb)
+      subroutine anomhggvtxamp(i1,i2,jh,za,zb,hggvtxamp)
       implicit none
       include 'constants.f'
       include 'masses.f'
@@ -130,7 +128,6 @@ c--- q^2-dependent couplings
       include 'spinzerohiggs_anomcoupl.f'
       include 'sprods_com.f'
       include 'zprods_decl.f'
-      double complex anomhggvtxamp(2,2,2),hggpointvtx(2,2)
       integer i1,i2,jh ! jh is Higgs 1, 2
       integer iq,igen,iv
       double precision mfsq(2,2) ! (qgen,b/t)
@@ -138,13 +135,14 @@ c--- q^2-dependent couplings
       double complex kappaj(2,2) ! (qgen,b/t)
       double complex kappaj_tilde(2,2) ! (qgen,b/t)
       double complex qlI3,C0mXq
+      double complex hggvtxamp(2,2,2),hggpointvtx(2,2)
 
       mfsq(1,1)=mb**2
       mfsq(1,2)=mt**2
       mfsq(2,1)=mb_4gen**2
       mfsq(2,2)=mt_4gen**2
 
-      anomhggvtxamp(:,:,:)=czip
+      hggvtxamp(:,:,:)=czip
       a1(:)=czip
       a3(:)=czip
       kappaj(:,:)=czip
@@ -211,7 +209,7 @@ c--- q^2-dependent couplings
       iv = mod(iq,2)
 
       ! Add one point interaction into each loop
-      anomhggvtxamp(iv,:,:) = anomhggvtxamp(iv,:,:) +
+      hggvtxamp(iv,:,:) = hggvtxamp(iv,:,:) +
      & hggpointvtx(:,:)
 
       C0mXq =
@@ -221,7 +219,7 @@ c--- q^2-dependent couplings
      & musq,0
      & )
 
-      anomhggvtxamp(iv,1,1) = anomhggvtxamp(iv,1,1) +
+      hggvtxamp(iv,1,1) = hggvtxamp(iv,1,1) +
      & mfsq(igen,iq)/s(i1,i2)*(
      &  kappaj(igen,iq)*(
      &    2d0-C0mXq*(s(i1,i2)-4d0*mfsq(igen,iq))
@@ -229,7 +227,7 @@ c--- q^2-dependent couplings
      &  -kappaj_tilde(igen,iq)*C0mXq*s(i1,i2)
      & )
 
-      anomhggvtxamp(iv,2,2) = anomhggvtxamp(iv,2,2) +
+      hggvtxamp(iv,2,2) = hggvtxamp(iv,2,2) +
      & mfsq(igen,iq)/s(i1,i2)*(
      &  kappaj(igen,iq)*(
      &    2d0-C0mXq*(s(i1,i2)-4d0*mfsq(igen,iq))
@@ -241,9 +239,9 @@ c--- q^2-dependent couplings
       enddo
 
       ! Multiply by the tensor structure
-      anomhggvtxamp(:,1,1) = anomhggvtxamp(:,1,1)
+      hggvtxamp(:,1,1) = hggvtxamp(:,1,1)
      & *s(i1,i2)*za(i1,i2)/zb(i1,i2)
-      anomhggvtxamp(:,2,2) = anomhggvtxamp(:,2,2)
+      hggvtxamp(:,2,2) = hggvtxamp(:,2,2)
      & *s(i1,i2)*zb(i1,i2)/za(i1,i2)
 
       return
