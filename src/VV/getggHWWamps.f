@@ -21,7 +21,7 @@ c---
       double precision rescale
       double complex Mloop_tquark(2,2),Mloop_bquark(2,2),
      & fachiggs,ggHmq(2,2,2),e3De4,higgsprop,props
-      double complex anomhwwamp,anomhggvtxamp
+      double complex anomhwwamp
 
 !==== for width studies rescale by appropriate factor
       if((keep_smhiggs_norm).and.(anom_higgs)) then
@@ -41,7 +41,7 @@ c---
 
 c--- Production amplitude
       ! Overall factor=1
-      ggHmq = anomhggvtxamp(1,2,1,za,zb)
+      call anomhggvtxamp(1,2,1,za,zb,ggHmq)
 
 c--- Decay amplitude
       e3De4=-2d0*anomhwwamp(3,4,5,6,1,s(1,2),s(3,4),s(5,6),za,zb)
@@ -83,7 +83,7 @@ c---
       double precision rescale
       double complex Mloop_tquark(2,2),Mloop_bquark(2,2),
      & fachiggs,ggHmq(2,2,2),e3De4,higgs2prop,props
-      double complex anomhwwamp,anomhggvtxamp
+      double complex anomhwwamp
 
 !==== for width studies rescale by appropriate factor
       if((keep_smhiggs_norm).and.(anom_higgs)) then
@@ -103,7 +103,7 @@ c---
 
 c--- Production amplitude
       ! Overall factor=1
-      ggHmq = anomhggvtxamp(1,2,2,za,zb)
+      call anomhggvtxamp(1,2,2,za,zb,ggHmq)
 
 c--- Decay amplitude
       e3De4=-2d0*anomhwwamp(3,4,5,6,2,s(1,2),s(3,4),s(5,6),za,zb)

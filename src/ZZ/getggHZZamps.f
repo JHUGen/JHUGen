@@ -28,7 +28,7 @@ c---
      & ggHmq(2,2,2),prop12,prop34,prop56,
      & H4l(2,2),sinthw,higgsprop
       double precision rescale
-      double complex anomhzzamp,anomhggvtxamp
+      double complex anomhzzamp
 
 !==== for width studies rescale by appropriate factor
       if((keep_smhiggs_norm).and.(anom_higgs)) then
@@ -55,7 +55,7 @@ c--- propagator factors
       prop56=cone/dcmplx(s(5,6)-zmass**2,zmass*zwidth)
 
 c--- Amplitudes for production
-      ggHmq = anomhggvtxamp(1,2,1,za,zb)
+      call anomhggvtxamp(1,2,1,za,zb,ggHmq)
       ! Overall factor
       ggHmq(:,:,:) = ggHmq(:,:,:)/(2d0*wmass*sinthw)
 
@@ -116,7 +116,7 @@ c--- Rescale for width study
      & ggHmq(2,2,2),prop12,prop34,prop56,
      & H4l(2,2),sinthw,higgs2prop
       double precision rescale
-      double complex anomhzzamp,anomhggvtxamp
+      double complex anomhzzamp
 
 !==== for width studies rescale by appropriate factor
       if((keep_smhiggs_norm).and.(anom_higgs)) then
@@ -143,7 +143,7 @@ c--- propagator factors
       prop56=cone/dcmplx(s(5,6)-zmass**2,zmass*zwidth)
 
 c--- Amplitudes for production
-      ggHmq = anomhggvtxamp(1,2,2,za,zb)
+      call anomhggvtxamp(1,2,2,za,zb,ggHmq)
       ! Overall factor
       ggHmq(:,:,:) = ggHmq(:,:,:)/(2d0*wmass*sinthw)
 
