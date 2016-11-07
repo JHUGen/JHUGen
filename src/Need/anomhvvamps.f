@@ -131,6 +131,7 @@ c--- q^2-dependent couplings
       integer i1,i2,jh ! jh is Higgs 1, 2
       integer iq,igen,iv
       double precision mfsq(2,2) ! (qgen,b/t)
+      double precision tauinv(2,2) ! (qgen,b/t)
       double complex a1(2),a3(2) ! (qgen)
       double complex kappaj(2,2) ! (qgen,b/t)
       double complex kappaj_tilde(2,2) ! (qgen,b/t)
@@ -141,6 +142,10 @@ c--- q^2-dependent couplings
       mfsq(1,2)=mt**2
       mfsq(2,1)=mb_4gen**2
       mfsq(2,2)=mt_4gen**2
+      tauinv(:,:)=4d0*mfsq(:,:)/s(i1,i2)
+      print *,"s(i1,i2)=",s(i1,i2)
+      print *,"tauinv=",tauinv
+
 
       hggvtxamp(:,:,:)=czip
       a1(:)=czip
@@ -191,26 +196,35 @@ c--- q^2-dependent couplings
 
       ENDIF
 
+      print *,"kappaj=",kappaj
+      print *,"kappaj_tilde=",kappaj_tilde
+      print *,"a1=",a1
+      print *,"a3=",a3
 
       do igen=1,2
       ! Compute the point interaction
       hggpointvtx(1,1) = hggpointvtx(1,1) +
-     & (
+     & s(i1,i2)*(
      & a1(igen)
      & - a3(igen)*0.5d0*za(i1,i2)*zb(i1,i2)/s(i1,i2)
      & )/3d0
       hggpointvtx(2,2) = hggpointvtx(2,2) +
-     & (
+     & s(i1,i2)*(
      & a1(igen)
      & + a3(igen)*0.5d0*za(i1,i2)*zb(i1,i2)/s(i1,i2)
      & )/3d0
 
-      do iq=1,2
-      iv = mod(iq,2)
+      print *,"hggpointvtx(1,1)=",hggpointvtx(1,1)
+      print *,"hggpointvtx(2,2)=",hggpointvtx(2,2)
 
-      ! Add one point interaction into each loop
+      do iq=1,2
+      iv = mod((iq-1),2)+1
+
+      ! Add one point interaction into each iv-loop
+      if (iq.le.2) then
       hggvtxamp(iv,:,:) = hggvtxamp(iv,:,:) +
      & hggpointvtx(:,:)
+      endif
 
       C0mXq =
      & qlI3(
@@ -219,30 +233,40 @@ c--- q^2-dependent couplings
      & musq,0
      & )
 
+      print *,"C0mXq=",C0mXq
+
       hggvtxamp(iv,1,1) = hggvtxamp(iv,1,1) +
-     & mfsq(igen,iq)/s(i1,i2)*(
+     & mfsq(igen,iq)*(
      &  kappaj(igen,iq)*(
-     &    2d0-C0mXq*(s(i1,i2)-4d0*mfsq(igen,iq))
+     &    2d0-C0mXq*s(i1,i2)*(1d0-tauinv(igen,iq))
      &  )
      &  -kappaj_tilde(igen,iq)*C0mXq*s(i1,i2)
      & )
 
       hggvtxamp(iv,2,2) = hggvtxamp(iv,2,2) +
-     & mfsq(igen,iq)/s(i1,i2)*(
+     & mfsq(igen,iq)*(
      &  kappaj(igen,iq)*(
-     &    2d0-C0mXq*(s(i1,i2)-4d0*mfsq(igen,iq))
+     &    2d0-C0mXq*s(i1,i2)*(1d0-tauinv(igen,iq))
      &  )
      &  +kappaj_tilde(igen,iq)*C0mXq*s(i1,i2)
      & )
+
+      print *,"hggvtxamp(iv,1,1)=",hggvtxamp(iv,1,1)
+      print *,"hggvtxamp(iv,2,2)=",hggvtxamp(iv,2,2)
 
       enddo
       enddo
 
       ! Multiply by the tensor structure
-      hggvtxamp(:,1,1) = hggvtxamp(:,1,1)
-     & *s(i1,i2)*za(i1,i2)/zb(i1,i2)
-      hggvtxamp(:,2,2) = hggvtxamp(:,2,2)
-     & *s(i1,i2)*zb(i1,i2)/za(i1,i2)
+      do iv=1,2
+      hggvtxamp(iv,1,1)=hggvtxamp(iv,1,1)*za(i1,i2)/zb(i1,i2)
+      hggvtxamp(iv,2,2)=hggvtxamp(iv,2,2)*zb(i1,i2)/za(i1,i2)
+      enddo
+
+      print *,"hggvtxamp(1,1,1)=",hggvtxamp(1,1,1)
+      print *,"hggvtxamp(1,2,2)=",hggvtxamp(1,2,2)
+      print *,"hggvtxamp(2,1,1)=",hggvtxamp(2,1,1)
+      print *,"hggvtxamp(2,2,2)=",hggvtxamp(2,2,2)
 
       return
       end
