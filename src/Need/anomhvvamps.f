@@ -143,9 +143,6 @@ c--- q^2-dependent couplings
       mfsq(2,1)=mb_4gen**2
       mfsq(2,2)=mt_4gen**2
       tauinv(:,:)=4d0*mfsq(:,:)/s(i1,i2)
-      print *,"s(i1,i2)=",s(i1,i2)
-      print *,"tauinv=",tauinv
-
 
       hggvtxamp(:,:,:)=czip
       a1(:)=czip
@@ -196,11 +193,6 @@ c--- q^2-dependent couplings
 
       ENDIF
 
-      print *,"kappaj=",kappaj
-      print *,"kappaj_tilde=",kappaj_tilde
-      print *,"a1=",a1
-      print *,"a3=",a3
-
       do igen=1,2
       ! Compute the point interaction
       hggpointvtx(1,1) = hggpointvtx(1,1) +
@@ -213,9 +205,6 @@ c--- q^2-dependent couplings
      & a1(igen)
      & + a3(igen)*0.5d0*za(i1,i2)*zb(i1,i2)/s(i1,i2)
      & )/3d0
-
-      print *,"hggpointvtx(1,1)=",hggpointvtx(1,1)
-      print *,"hggpointvtx(2,2)=",hggpointvtx(2,2)
 
       do iq=1,2
       iv = mod((iq-1),2)+1
@@ -233,8 +222,6 @@ c--- q^2-dependent couplings
      & musq,0
      & )
 
-      print *,"C0mXq=",C0mXq
-
       hggvtxamp(iv,1,1) = hggvtxamp(iv,1,1) +
      & mfsq(igen,iq)*(
      &  kappaj(igen,iq)*(
@@ -251,9 +238,6 @@ c--- q^2-dependent couplings
      &  +kappaj_tilde(igen,iq)*C0mXq*s(i1,i2)
      & )
 
-      print *,"hggvtxamp(iv,1,1)=",hggvtxamp(iv,1,1)
-      print *,"hggvtxamp(iv,2,2)=",hggvtxamp(iv,2,2)
-
       enddo
       enddo
 
@@ -262,11 +246,6 @@ c--- q^2-dependent couplings
       hggvtxamp(iv,1,1)=hggvtxamp(iv,1,1)*za(i1,i2)/zb(i1,i2)
       hggvtxamp(iv,2,2)=hggvtxamp(iv,2,2)*zb(i1,i2)/za(i1,i2)
       enddo
-
-      print *,"hggvtxamp(1,1,1)=",hggvtxamp(1,1,1)
-      print *,"hggvtxamp(1,2,2)=",hggvtxamp(1,2,2)
-      print *,"hggvtxamp(2,1,1)=",hggvtxamp(2,1,1)
-      print *,"hggvtxamp(2,2,2)=",hggvtxamp(2,2,2)
 
       return
       end
