@@ -44,11 +44,11 @@ c--- Production amplitude
       call anomhggvtxamp(1,2,1,za,zb,ggHmq)
 
 c--- Decay amplitude
-      e3De4=-2d0*anomhwwamp(3,4,5,6,1,s(1,2),s(3,4),s(5,6),za,zb)
+      e3De4=-anomhwwamp(3,4,5,6,1,s(1,2),s(3,4),s(5,6),za,zb)
       props=
      &  cone/dcmplx(s(3,4)-wmass**2,wmass*wwidth)
      & *cone/dcmplx(s(5,6)-wmass**2,wmass*wwidth)
-      fachiggs=higgsprop(s(1,2))*e3De4*im/(-2d0)*props*rescale
+      fachiggs=higgsprop(s(1,2))*e3De4*im*props*rescale
 
       print *,"props=",props*(s(3,4)*s(5,6))
       print *,"e3De4=",e3De4/(s(3,4)*s(5,6))
@@ -56,9 +56,9 @@ c--- Decay amplitude
       print *,"s(1,2)=",s(1,2)
 
       print *,"amphiggs_bot=",ggHmq(1,1,1)*zb(1,2)/za(1,2)*im*e3De4
-     & /s(1,2)/(-2d0)
+     & /(s(3,4)*s(5,6))
       print *,"amphiggs_top=",ggHmq(2,1,1)*zb(1,2)/za(1,2)*im*e3De4
-     & /s(1,2)/(-2d0)
+     & /(s(3,4)*s(5,6))
 
 
       do h1=1,2
@@ -122,11 +122,11 @@ c--- Production amplitude
       call anomhggvtxamp(1,2,2,za,zb,ggHmq)
 
 c--- Decay amplitude
-      e3De4=-2d0*anomhwwamp(3,4,5,6,2,s(1,2),s(3,4),s(5,6),za,zb)
+      e3De4=-anomhwwamp(3,4,5,6,2,s(1,2),s(3,4),s(5,6),za,zb)
       props=
      &  cone/dcmplx(s(3,4)-wmass**2,wmass*wwidth)
      & *cone/dcmplx(s(5,6)-wmass**2,wmass*wwidth)
-      fachiggs=higgs2prop(s(1,2))*e3De4*im/(-2d0)*props*rescale
+      fachiggs=higgs2prop(s(1,2))*e3De4*im*props*rescale
 
       do h1=1,2
          Mloop_bquark(h1,h1)=fachiggs*ggHmq(1,h1,h1)
