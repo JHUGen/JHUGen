@@ -40,8 +40,9 @@ c---
       call spinoru(6,p,za,zb)
 
 c--- Production amplitude
-      ! Overall factor=1
+      ! Overall factor=-1 (MCFM divides by zb or za(2,1)
       call anomhggvtxamp(1,2,1,za,zb,ggHmq)
+      ggHmq(:,:,:)=-ggHmq(:,:,:)
 
 c--- Decay amplitude
       e3De4=-anomhwwamp(3,4,5,6,1,s(1,2),s(3,4),s(5,6),za,zb)
@@ -50,26 +51,10 @@ c--- Decay amplitude
      & *cone/dcmplx(s(5,6)-wmass**2,wmass*wwidth)
       fachiggs=higgsprop(s(1,2))*e3De4*im*props*rescale
 
-      print *,"props=",props*(s(3,4)*s(5,6))
-      print *,"e3De4=",e3De4/(s(3,4)*s(5,6))
-      print *,"fachiggs=",higgsprop(s(1,2))
-      print *,"s(1,2)=",s(1,2)
-
-      print *,"amphiggs_bot=",ggHmq(1,1,1)*zb(1,2)/za(1,2)*im*e3De4
-     & /(s(3,4)*s(5,6))
-      print *,"amphiggs_top=",ggHmq(2,1,1)*zb(1,2)/za(1,2)*im*e3De4
-     & /(s(3,4)*s(5,6))
-
-
       do h1=1,2
          Mloop_bquark(h1,h1)=fachiggs*ggHmq(1,h1,h1)
          Mloop_tquark(h1,h1)=fachiggs*ggHmq(2,h1,h1)
       enddo
-
-      print *,"Mloop_bquark(1,1)=",Mloop_bquark(1,1)
-      print *,"Mloop_bquark(2,2)=",Mloop_bquark(2,2)
-      print *,"Mloop_tquark(1,1)=",Mloop_tquark(1,1)
-      print *,"Mloop_tquark(2,2)=",Mloop_tquark(2,2)
 
       return
       end
@@ -118,8 +103,9 @@ c---
       call spinoru(6,p,za,zb)
 
 c--- Production amplitude
-      ! Overall factor=1
+      ! Overall factor=-1 (MCFM divides by zb or za(2,1)
       call anomhggvtxamp(1,2,2,za,zb,ggHmq)
+      ggHmq(:,:,:)=-ggHmq(:,:,:)
 
 c--- Decay amplitude
       e3De4=-anomhwwamp(3,4,5,6,2,s(1,2),s(3,4),s(5,6),za,zb)
