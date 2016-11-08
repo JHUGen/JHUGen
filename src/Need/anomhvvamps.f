@@ -193,17 +193,43 @@ c--- q^2-dependent couplings
 
       ENDIF
 
+      print *," "
+      print *,"kappaj bot3:",kappaj(1,1)
+      print *,"kappaj_tilde bot3:",kappaj_tilde(1,1)
+      print *,"kappaj top3:",kappaj(1,2)
+      print *,"kappaj_tilde top3:",kappaj_tilde(1,2)
+      print *,"a1 loop 1:",a1(1)
+      print *,"a3 loop 1:",a3(1)
+
+      print *,"kappaj bot4:",kappaj(2,1)
+      print *,"kappaj_tilde bot4:",kappaj_tilde(2,1)
+      print *,"kappaj top4:",kappaj(2,2)
+      print *,"kappaj_tilde top4:",kappaj_tilde(2,2)
+      print *,"a1 loop 2:",a1(2)
+      print *,"a3 loop 2:",a3(2)
+
       do igen=1,2
       ! Compute the point interaction
       hggpointvtx(1,1) = hggpointvtx(1,1) +
      & s(i1,i2)*(
      & a1(igen)
-     & - a3(igen)*0.5d0*za(i1,i2)*zb(i1,i2)/s(i1,i2)
+     & - a3(igen)*0.5d0*im*za(i1,i2)*zb(i1,i2)/s(i1,i2)
      & )/3d0
       hggpointvtx(2,2) = hggpointvtx(2,2) +
      & s(i1,i2)*(
      & a1(igen)
-     & + a3(igen)*0.5d0*za(i1,i2)*zb(i1,i2)/s(i1,i2)
+     & + a3(igen)*0.5d0*im*za(i1,i2)*zb(i1,i2)/s(i1,i2)
+     & )/3d0
+
+      print *,"Loop ",igen," hggpointvtx(1,1)+=",
+     & s(i1,i2)*(
+     & a1(igen)
+     & - a3(igen)*0.5d0*im*za(i1,i2)*zb(i1,i2)/s(i1,i2)
+     & )/3d0
+      print *,"Loop ",igen," hggpointvtx(2,2)+=",
+     & s(i1,i2)*(
+     & a1(igen)
+     & + a3(igen)*0.5d0*im*za(i1,i2)*zb(i1,i2)/s(i1,i2)
      & )/3d0
 
       do iq=1,2
@@ -222,12 +248,19 @@ c--- q^2-dependent couplings
      & musq,0
      & )
 
+      print *,"Loop ",igen," quark ",iq," mass=",sqrt(mfsq(igen,iq))
+      print *,"Loop ",igen," quark ",iq," tauinv=",tauinv(igen,iq)
+      print *,"Loop ",igen," quark ",iq," kterm=",
+     & (2d0-C0mXq*s(i1,i2)*(1d0-tauinv(igen,iq)))
+      print *,"Loop ",igen," quark ",iq," s=",s(i1,i2)
+      print *,"Loop ",igen," quark ",iq," C0=",C0mXq
+
       hggvtxamp(iv,1,1) = hggvtxamp(iv,1,1) +
      & mfsq(igen,iq)*(
      &  kappaj(igen,iq)*(
      &    2d0-C0mXq*s(i1,i2)*(1d0-tauinv(igen,iq))
      &  )
-     &  -kappaj_tilde(igen,iq)*C0mXq*s(i1,i2)
+     &  -kappaj_tilde(igen,iq)*(-im)*C0mXq*s(i1,i2)
      & )
 
       hggvtxamp(iv,2,2) = hggvtxamp(iv,2,2) +
@@ -235,7 +268,22 @@ c--- q^2-dependent couplings
      &  kappaj(igen,iq)*(
      &    2d0-C0mXq*s(i1,i2)*(1d0-tauinv(igen,iq))
      &  )
-     &  +kappaj_tilde(igen,iq)*C0mXq*s(i1,i2)
+     &  +kappaj_tilde(igen,iq)*(-im)*C0mXq*s(i1,i2)
+     & )
+
+      print *,"Loop ",igen," quark type ",iq," hggvtxamp(1,1)+=",
+     & mfsq(igen,iq)*(
+     &  kappaj(igen,iq)*(
+     &    2d0-C0mXq*s(i1,i2)*(1d0-tauinv(igen,iq))
+     &  )
+     &  -kappaj_tilde(igen,iq)*(-im)*C0mXq*s(i1,i2)
+     & )
+      print *,"Loop ",igen," quark type ",iq," hggvtxamp(2,2)+=",
+     & mfsq(igen,iq)*(
+     &  kappaj(igen,iq)*(
+     &    2d0-C0mXq*s(i1,i2)*(1d0-tauinv(igen,iq))
+     &  )
+     &  +kappaj_tilde(igen,iq)*(-im)*C0mXq*s(i1,i2)
      & )
 
       enddo
@@ -246,6 +294,8 @@ c--- q^2-dependent couplings
       hggvtxamp(iv,1,1)=hggvtxamp(iv,1,1)*za(i1,i2)/zb(i1,i2)
       hggvtxamp(iv,2,2)=hggvtxamp(iv,2,2)*zb(i1,i2)/za(i1,i2)
       enddo
+
+      print *," "
 
       return
       end
