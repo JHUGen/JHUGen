@@ -26,7 +26,7 @@ c---
       double precision p(mxpart,4),mb2,mt2,mtX2,mbX2
       double complex Mloop_bquark(2,2,2,2),Mloop_tquark(2,2,2,2),
      & ggHmq(2,2,2),prop12,prop34,prop56,
-     & H4l(2,2),sinthw,higgsprop
+     & H4l(2,2),facHiggs,higgsprop
       double precision rescale
       double complex anomhzzamp
 
@@ -43,54 +43,39 @@ c---
          return
       endif
       ggHmq(:,:,:)=czip
+      H4l(:,:)=czip
 
       call spinoru(6,p,za,zb)
-
-c--- sin(thetaw)
-      sinthw=dsqrt(xw)
 
 c--- propagator factors
       prop12=higgsprop(s(1,2))
       prop34=cone/dcmplx(s(3,4)-zmass**2,zmass*zwidth)
       prop56=cone/dcmplx(s(5,6)-zmass**2,zmass*zwidth)
 
+c--- Factor
+      facHiggs=im*rescale*prop12*prop34*prop56/(2d0*xw*(1d0-xw))
+
 c--- Amplitudes for production
       call anomhggvtxamp(1,2,1,za,zb,ggHmq)
-      ! Overall factor
-      ggHmq(:,:,:) = ggHmq(:,:,:)/(2d0*wmass*sinthw)
+      ! Overall factor=1
+      !ggHmq(:,:,:) = ggHmq(:,:,:)
 
 c--- Amplitudes for decay
       H4l(1,1)=anomhzzamp(3,4,5,6,1,s(1,2),s(3,4),s(5,6),za,zb)*l1*l2
-     &        *wmass/(sinthw*(1d0-xw))*prop34*prop56
       H4l(2,1)=anomhzzamp(4,3,5,6,1,s(1,2),s(3,4),s(5,6),za,zb)*r1*l2
-     &        *wmass/(sinthw*(1d0-xw))*prop34*prop56
       H4l(1,2)=anomhzzamp(3,4,6,5,1,s(1,2),s(3,4),s(5,6),za,zb)*l1*r2
-     &        *wmass/(sinthw*(1d0-xw))*prop34*prop56
       H4l(2,2)=anomhzzamp(4,3,6,5,1,s(1,2),s(3,4),s(5,6),za,zb)*r1*r2
-     &        *wmass/(sinthw*(1d0-xw))*prop34*prop56
+      H4l(:,:) = H4l(:,:)*facHiggs
 
-
-c--- Assemble: insert factor of (im) here
+c--- Assemble
       do h1=1,2
       do h34=1,2
       do h56=1,2
-      Mloop_bquark(h1,h1,h34,h56)=im*ggHmq(1,h1,h1)*H4l(h34,h56)*prop12
-      Mloop_tquark(h1,h1,h34,h56)=im*ggHmq(2,h1,h1)*H4l(h34,h56)*prop12
+      Mloop_bquark(h1,h1,h34,h56)=ggHmq(1,h1,h1)*H4l(h34,h56)
+      Mloop_tquark(h1,h1,h34,h56)=ggHmq(2,h1,h1)*H4l(h34,h56)
       enddo
       enddo
       enddo
-
-
-c--- Rescale for width study
-      do h1=1,2
-      do h34=1,2
-      do h56=1,2
-      Mloop_bquark(h1,h1,h34,h56)=rescale*Mloop_bquark(h1,h1,h34,h56)
-      Mloop_tquark(h1,h1,h34,h56)=rescale*Mloop_tquark(h1,h1,h34,h56)
-      enddo
-      enddo
-      enddo
-
 
       return
       end
@@ -114,7 +99,7 @@ c--- Rescale for width study
       double precision p(mxpart,4),mb2,mt2,mbX2,mtX2
       double complex Mloop_bquark(2,2,2,2),Mloop_tquark(2,2,2,2),
      & ggHmq(2,2,2),prop12,prop34,prop56,
-     & H4l(2,2),sinthw,higgs2prop
+     & H4l(2,2),facHiggs,higgs2prop
       double precision rescale
       double complex anomhzzamp
 
@@ -131,54 +116,39 @@ c--- Rescale for width study
          return
       endif
       ggHmq(:,:,:)=czip
+      H4l(:,:)=czip
 
       call spinoru(6,p,za,zb)
-
-c--- sin(thetaw)
-      sinthw=dsqrt(xw)
 
 c--- propagator factors
       prop12=higgs2prop(s(1,2))
       prop34=cone/dcmplx(s(3,4)-zmass**2,zmass*zwidth)
       prop56=cone/dcmplx(s(5,6)-zmass**2,zmass*zwidth)
 
+c--- Factor
+      facHiggs=im*rescale*prop12*prop34*prop56/(2d0*xw*(1d0-xw))
+
 c--- Amplitudes for production
       call anomhggvtxamp(1,2,2,za,zb,ggHmq)
-      ! Overall factor
-      ggHmq(:,:,:) = ggHmq(:,:,:)/(2d0*wmass*sinthw)
+      ! Overall factor=1
+      !ggHmq(:,:,:) = ggHmq(:,:,:)
 
 c--- Amplitudes for decay
       H4l(1,1)=anomhzzamp(3,4,5,6,2,s(1,2),s(3,4),s(5,6),za,zb)*l1*l2
-     &        *wmass/(sinthw*(1d0-xw))*prop34*prop56
       H4l(2,1)=anomhzzamp(4,3,5,6,2,s(1,2),s(3,4),s(5,6),za,zb)*r1*l2
-     &        *wmass/(sinthw*(1d0-xw))*prop34*prop56
       H4l(1,2)=anomhzzamp(3,4,6,5,2,s(1,2),s(3,4),s(5,6),za,zb)*l1*r2
-     &        *wmass/(sinthw*(1d0-xw))*prop34*prop56
       H4l(2,2)=anomhzzamp(4,3,6,5,2,s(1,2),s(3,4),s(5,6),za,zb)*r1*r2
-     &        *wmass/(sinthw*(1d0-xw))*prop34*prop56
+      H4l(:,:) = H4l(:,:)*facHiggs
 
-
-c--- Assemble: insert factor of (im) here
+c--- Assemble
       do h1=1,2
       do h34=1,2
       do h56=1,2
-      Mloop_bquark(h1,h1,h34,h56)=im*ggHmq(1,h1,h1)*H4l(h34,h56)*prop12
-      Mloop_tquark(h1,h1,h34,h56)=im*ggHmq(2,h1,h1)*H4l(h34,h56)*prop12
+      Mloop_bquark(h1,h1,h34,h56)=ggHmq(1,h1,h1)*H4l(h34,h56)
+      Mloop_tquark(h1,h1,h34,h56)=ggHmq(2,h1,h1)*H4l(h34,h56)
       enddo
       enddo
       enddo
-
-
-c--- Rescale for width study
-      do h1=1,2
-      do h34=1,2
-      do h56=1,2
-      Mloop_bquark(h1,h1,h34,h56)=rescale*Mloop_bquark(h1,h1,h34,h56)
-      Mloop_tquark(h1,h1,h34,h56)=rescale*Mloop_tquark(h1,h1,h34,h56)
-      enddo
-      enddo
-      enddo
-
 
       return
       end
