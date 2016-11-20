@@ -6,15 +6,6 @@ module ModHiggsJ
 
   public :: EvalAmp_HJ
 
-!-- general definitions, to be merged with Markus final structure
-  real(dp), parameter :: xn = 3.0_dp
-  real(dp), parameter :: Ca = 3.0_dp
-  real(dp), parameter :: Cf = 4.0_dp/3.0_dp
-
-  real(dp), parameter :: avegg = 1.0_dp/4.0_dp/64.0_dp
-  real(dp), parameter :: aveqg = 1.0_dp/4.0_dp/24.0_dp
-  real(dp), parameter :: aveqq = 1.0_dp/4.0_dp/9.0_dp
-
 contains
 
 subroutine EvalAmp_HJ(p,res)
