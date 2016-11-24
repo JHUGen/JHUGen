@@ -16,17 +16,49 @@ machine:
     MANPATH: "$(echo $HOME/JHUGen/JHUGenerator/root/man:$MANPATH | sed s/:$//)"
     LHAPDF_DATA_PATH: "/home/ubuntu/LHAPDF-6.1.6/share/LHAPDF"
 
+    ROOT_VERSIONPART1: "6"
+    ROOT_VERSIONPART2: "06"
+    ROOT_VERSIONPART3: "08"
+    ROOT_VERSIONSTRING: "${ROOT_VERSIONPART1}.${ROOT_VERSIONPART2}/${ROOT_VERSIONPART3}"
+
+    REFERENCE_LHES_USERNAME: "hroskes"
+    REFERENCE_LHES_BUILD_NUMBER: "609"
+    REFERENCE_LHES_FOLDER: "$(echo https://circleci.com/api/v1/project/$REFERENCE_LHES_USERNAME/JHUGen/$REFERENCE_LHES_BUILD_NUMBER/'artifacts/0/$CIRCLE_ARTIFACTS/reference')"
+    REFERENCE_FILENAMES: "ggH_ZZ.lhe ggH_WW.lhe ggH_Zgamma.lhe ggH_gammagamma.lhe spin1_ZZ.lhe spin1_WW.lhe gg_spin2_ZZ.lhe qq_spin2_WW.lhe gg_spin2_Zgamma.lhe qq_spin2_gammagamma.lhe ZH_bb.lhe WH_Zgamma.lhe ee_gammaH_bb.lhe VBF_ZZ.lhe HJJ_WW.lhe HJ_gammagamma.lhe ttH_tautau.lhe bbH_tautau.lhe tqH_110.lhe tqH_111.lhe tqH_112.lhe tqH_113.lhe tqH_114.lhe"
+
+    #everything besides WW is in here (ghg, ghz, ghzgs, ghgsgs, spin1, spin2, Hff)
+    #the ones that aren't needed are just ignored (except in the case of spin2->Vgamma, have to turn them off)
+    #don't need WW because in any case there is interference
+    REFERENCE_COUPLINGS: "ghg2=0.383432074687728,0.918260989345657 ghg3=6294.49296087723,2253.12941717723 ghg4=0.335495485382528,0.17285803562226 ghz1=0.154934976270359,0.453918144016304 ghz2=0.469297059144414,0.745302300947002 ghz3=3947.40921062637,3597.4885961919 ghz4=0.177791270766536,0.920170534486048 ghzgs2=0.0240331049939919,0.232175381101053 ghzgs3=0.331962910170583,0.0450183240308457 ghzgs4=0.808286540247172,0.133184346613754 ghgsgs2=0.530394804029869,0.211218112389125 ghgsgs3=0.914978695198138,0.055650585081425 ghgsgs4=0.694524307167701,0.511424456076726 ghz1_prime=0.143354267833606,0.0910761280837012 ghz1_prime2=7416.7007267243,4861.35525489789 ghz1_prime3=4431.44656075298,4436.48625894176 ghz1_prime4=2441.69123517064,6946.16318931911 ghz1_prime5=78314042.889773,69465359.939181 ghz1_prime6=51233058.8130761,29537873.5850789 ghz1_prime7=47832192.9001564,59559649.9633293 ghz2_prime=0.574657934630028,0.419921909647711 ghz2_prime2=4385.45874563721,6176.12459852571 ghz2_prime3=4592.16963616924,7549.93910627412 ghz2_prime4=8471.59059254828,7199.72377618203 ghz2_prime5=19558280.2853878,94843889.2606103 ghz2_prime6=23209661.2997162,67617823.213967 ghz2_prime7=7005990.36881107,53660190.8462267 ghz3_prime=4045.70652084481,1969.31611860658 ghz3_prime2=33402456.1975735,3761591.91683341 ghz3_prime3=44855079.5072533,12184926.2142809 ghz3_prime4=27878602.2354225,78237523.9345265 ghz3_prime5=932464343314.011,631580849953.887 ghz3_prime6=358115623918.415,410777463003.642 ghz3_prime7=622981476674.746,618278567362.628 ghz4_prime=0.416533954328515,0.331155934531404 ghz4_prime2=7588.37556838387,3923.43274304607 ghz4_prime3=8956.07552332742,9302.03148380015 ghz4_prime4=3203.44114317821,2863.76747251504 ghz4_prime5=49012574.439022,74595800.8833662 ghz4_prime6=73323809.5808115,53968832.1189929 ghz4_prime7=68563876.4508939,43025213.6236445 ghzgs1_prime2=5668.9642840505,7017.67588606661 zprime_qq_left=0.159847991225521,0.324512374690709 zprime_qq_right=0.514696145793129,0.150317974674483 zprime_zz_1=0.4084476008646,0.289302928999951 zprime_zz_2=0.328820833481286,0.910335641048151 a1=0.937975757145835,0.0862675302011808 a2=0.525646610895282,0.270023242162833 a3=0.828619106655766,0.907278117187348 a4=0.853796956695806,0.883046297308361 a5=0.196874483378909,0.400008066791416 graviton_qq_left=0.5049181979003,0.327360285207962 graviton_qq_right=0.474004828998714,0.337826183822731 b1=0.773894454518313,0.356509253551872 b2=0.611963485285581,0.517604060575373 b3=0.517046784436693,0.278595934220158 b4=0.498002413656408,0.719085874763941 b5=0.37181772187872,0.255137246282311 b6=0.497431828513849,0.714324156704701 b7=0.131774490564963,0.238483964950039 b8=0.312064180125662,0.479555186522064 b9=0.221471678113706,0.976703560709093 b10=0.907566021052922,0.940674709510495 kappa=0.689310602032707,0.649791728597345 kappa_tilde=0.202059494758542,0.398401745337368 cz_q1sq=1 cz_q2sq=1 cz_q12sq=-1 Lambda_z11=138.878490490027 Lambda_z21=154.519403407032 Lambda_z31=119.983302253928 Lambda_z41=181.363668458552 Lambda_z12=136.665079759304 Lambda_z22=166.590821204599 Lambda_z32=138.840555064043 Lambda_z42=49.0635744690497 Lambda_z10=9.69729610745373 Lambda_z20=193.257456475821 Lambda_z30=89.2044521747102 Lambda_z40=161.673304321983"
+
+    SPIN2_GAMMA: "b5=0,0 b6=0,0 b7=0,0 b9=0,0 b10=0,0"
+
 general:
   build_dir: JHUGenerator
 
 dependencies:
   override:
     - |
+      if [ -d ~/root ]; then
+        set -o pipefail &&  #exit status will be nonzero if any of echo, root, grep, sed fails
+        CURRENT_ROOT_VERSION=$(echo | root -b | grep [0-9]*[.][0-9]*/[0-9]* | sed -r "s|.*[^0-9]+([0-9]*[.][0-9]*/[0-9]*).*|\1|") &&
+        echo "$CURRENT_ROOT_VERSION" "$ROOT_VERSIONSTRING" &&
+        if [ "$CURRENT_ROOT_VERSION" != "$ROOT_VERSIONSTRING" ]; then
+          rm -rf ~/root
+        fi
+      fi
+    - |
       if ! [ -d ~/root ]; then
         cd &&
-        wget https://root.cern.ch/download/root_v6.04.08.Linux-ubuntu14-x86_64-gcc4.8.tar.gz &&
-        tar -xvzf root_v6.04.08.Linux-ubuntu14-x86_64-gcc4.8.tar.gz
+        wget https://root.cern.ch/download/root_v${ROOT_VERSIONPART1}.${ROOT_VERSIONPART2}.${ROOT_VERSIONPART3}.Linux-ubuntu14-x86_64-gcc4.8.tar.gz &&
+        tar -xvzf root_v${ROOT_VERSIONPART1}.${ROOT_VERSIONPART2}.${ROOT_VERSIONPART3}.Linux-ubuntu14-x86_64-gcc4.8.tar.gz
       fi
+    - |
+      set -o pipefail &&  #exit status will be nonzero if any of echo, root, grep, sed fails
+      CURRENT_ROOT_VERSION=$(echo | root -b | grep [0-9]*[.][0-9]*/[0-9]* | sed -r "s|.*[^0-9]+([0-9]*[.][0-9]*/[0-9]*).*|\1|") &&
+      echo "$CURRENT_ROOT_VERSION" "$ROOT_VERSIONSTRING" &&
+      [ "$CURRENT_ROOT_VERSION" == "$ROOT_VERSIONSTRING" ]
+
     - |
       cd ~ &&
       if ! [ -d CMSJHU_AnalysisMacros ]; then
@@ -138,12 +170,99 @@ test:
       done
       exit $exitstatus
 
-
+    #download reference lhes
+    - |
+      exitstatus=0 &&
+      mkdir reference compare_to_reference && cd reference &&
+      for filename in $REFERENCE_FILENAMES; do
+        wget $REFERENCE_LHES_FOLDER/$filename || exitstatus=1
+      done
+      if [ $exitstatus -ne 0 ]; then
+        touch ~/reference_failed
+      fi
+      exit $exitstatus
 
   override:
-    #here we want to generate as many production modes as possible and get the widest range of events to check for syntax issues
+
+    #====================
+    #compare to reference
+    #====================
+
+    #generate with a fixed set of command line parameters and fixed seed to compare to reference LHEs
+    #this means the tests will fail whenever the ME changes (including EW parameters, etc.)
+    #for a real change, run once and allow the tests to fail
+    # then edit REFERENCE_LHES_USERNAME and REFERENCE_LHES_BUILD_NUMBER
+    # in the environment variables section above to refer to that first build
+
+    #this section takes about 30 minutes
+
+    - ./JHUGen Seed=765543533 PDFSet=3 Process=0 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/ggH_ZZ DecayMode1=9 DecayMode2=9 $REFERENCE_COUPLINGS
+    - ./JHUGen Seed=765543533 PDFSet=3 Process=0 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/ggH_WW DecayMode1=11 DecayMode2=11 $REFERENCE_COUPLINGS
+    - ./JHUGen Seed=765543533 PDFSet=3 Process=0 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/ggH_Zgamma DecayMode1=9 DecayMode2=7 $REFERENCE_COUPLINGS
+    - ./JHUGen Seed=765543533 PDFSet=3 Process=0 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/ggH_gammagamma DecayMode1=7 DecayMode2=7 $REFERENCE_COUPLINGS
+
+    - ./JHUGen Seed=765543533 PDFSet=3 Process=1 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/spin1_ZZ DecayMode1=9 DecayMode2=9 $REFERENCE_COUPLINGS
+    - ./JHUGen Seed=765543533 PDFSet=3 Process=1 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/spin1_WW DecayMode1=11 DecayMode2=11 $REFERENCE_COUPLINGS
+
+    - ./JHUGen Seed=765543533 PDFSet=3 Process=2 PChannel=0 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/gg_spin2_ZZ DecayMode1=9 DecayMode2=9 $REFERENCE_COUPLINGS
+    - ./JHUGen Seed=765543533 PDFSet=3 Process=2 PChannel=1 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/qq_spin2_WW DecayMode1=11 DecayMode2=11 $REFERENCE_COUPLINGS
+    - ./JHUGen Seed=765543533 PDFSet=3 Process=2 PChannel=0 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/gg_spin2_Zgamma DecayMode1=9 DecayMode2=7 $REFERENCE_COUPLINGS $SPIN2_GAMMA
+    - ./JHUGen Seed=765543533 PDFSet=3 Process=2 PChannel=1 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/qq_spin2_gammagamma DecayMode1=7 DecayMode2=7 $REFERENCE_COUPLINGS $SPIN2_GAMMA
+
+    - ./JHUGen Seed=765543533 PDFSet=3 Process=50 VegasNc0=100000 VegasNc2=100 HbbDK DataFile=compare_to_reference/ZH_bb DecayMode1=9 $REFERENCE_COUPLINGS
+    - ./JHUGen Seed=765543533 PDFSet=3 Process=50 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/WH DecayMode1=11 $REFERENCE_COUPLINGS
+    - ./JHUGen Seed=765543533 VegasNc0=100000 ReadLHE=compare_to_reference/WH.lhe DataFile=compare_to_reference/WH_Zgamma DecayMode1=9 DecayMode2=7 $REFERENCE_COUPLINGS
+    - ./JHUGen Seed=765543533 Collider=0 Process=50 VegasNc0=100000 VegasNc2=100 HbbDK DataFile=compare_to_reference/ee_gammaH_bb DecayMode1=7 $REFERENCE_COUPLINGS
+
+    #don't use WW separate in VBF.  In any case, there is interference
+    - ./JHUGen Seed=765543533 PDFSet=3 Process=60 VegasNc0=5000000 VegasNc2=100 DataFile=compare_to_reference/VBF $REFERENCE_COUPLINGS
+    - ./JHUGen Seed=765543533 VegasNc0=100000 ReadLHE=compare_to_reference/VBF.lhe DataFile=compare_to_reference/VBF_ZZ DecayMode1=9 DecayMode2=9 $REFERENCE_COUPLINGS
+    - ./JHUGen Seed=765543533 PDFSet=3 Process=61 VegasNc0=5000000 VegasNc2=100 DataFile=compare_to_reference/HJJ $REFERENCE_COUPLINGS
+    - ./JHUGen Seed=765543533 VegasNc0=100000 ReadLHE=compare_to_reference/HJJ.lhe DataFile=compare_to_reference/HJJ_WW DecayMode1=11 DecayMode2=11 $REFERENCE_COUPLINGS
+    - ./JHUGen Seed=765543533 PDFSet=3 Process=62 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/HJ $REFERENCE_COUPLINGS
+    - ./JHUGen Seed=765543533 VegasNc0=100000 ReadLHE=compare_to_reference/HJ.lhe DataFile=compare_to_reference/HJ_gammagamma DecayMode1=7 DecayMode2=7 $REFERENCE_COUPLINGS
+
+    - ./JHUGen Seed=765543533 PDFSet=3 Process=80 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/ttH TopDK=1 DecayMode1=11 DecayMode2=11 $REFERENCE_COUPLINGS
+    - ./JHUGen Seed=765543533 VegasNc0=100000 ReadLHE=compare_to_reference/ttH.lhe DataFile=compare_to_reference/ttH_tautau DecayMode1=11 DecayMode2=11 TauDK=1 $REFERENCE_COUPLINGS
+    - ./JHUGen Seed=765543533 PDFSet=3 Process=90 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/bbH $REFERENCE_COUPLINGS
+    - ./JHUGen Seed=765543533 VegasNc0=100000 ReadLHE=compare_to_reference/bbH.lhe DataFile=compare_to_reference/bbH_tautau TauDK=0 $REFERENCE_COUPLINGS
+
+    - ./JHUGen Seed=765543533 PDFSet=3 Process=110 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/tqH_110 TopDK=1 DecayMode1=11 $REFERENCE_COUPLINGS
+    - ./JHUGen Seed=765543533 PDFSet=3 Process=111 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/tqH_111 TopDK=1 DecayMode1=11 $REFERENCE_COUPLINGS
+    - ./JHUGen Seed=765543533 PDFSet=3 Process=112 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/tqH_112 TopDK=1 DecayMode1=11 $REFERENCE_COUPLINGS
+    - ./JHUGen Seed=765543533 PDFSet=3 Process=113 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/tqH_113 TopDK=1 DecayMode1=11 $REFERENCE_COUPLINGS
+    - ./JHUGen Seed=765543533 PDFSet=3 Process=114 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/tqH_114 TopDK=1 DecayMode1=11 $REFERENCE_COUPLINGS
+
+    #now compare to reference
+    - |
+      exitstatus=0
+      for filename in $REFERENCE_FILENAMES; do
+        echo "================"
+        echo $filename
+        echo "================"
+        echo
+        sdiff -s reference/$filename compare_to_reference/$filename && echo "no change" || exitstatus=1
+      done
+      if [ $exitstatus -ne 0 ]; then
+        touch ~/reference_failed
+      fi
+      exit $exitstatus
+
+    - |
+      if [ -f ~/reference_failed ]; then
+        mv compare_to_reference $CIRCLE_ARTIFACTS/reference
+      fi
+
+    #============
+    #syntax check
+    #============
+
+    #here we want to generate as many production modes as possible and get the widest range of events
+    # to check for syntax issues
     #the actual checking (checklhe) is done in post
-    #later is more specific generation with different hypotheses to get plots (which of course have to be checked manually)
+    #this should NOT use a fixed seed so that we can catch very rare syntax problems too
+
+    #this section takes ~10-15 minutes
 
     #gg/qqbar -> spin0/1/2
     - ./JHUGen PDFSet=3 Process=0  VegasNc0=100000 VegasNc2=100 DataFile=$CIRCLE_ARTIFACTS/other/spin0_Zgamma     DecayMode1=9  DecayMode2=7 ghzgs2=1,0
@@ -153,11 +272,13 @@ test:
     - ./JHUGen PDFSet=3 Process=2  VegasNc0=100000 VegasNc2=100 DataFile=$CIRCLE_ARTIFACTS/other/spin2_Zgamma     DecayMode1=9  DecayMode2=7 a1=1,0 b1=1,0
     - ./JHUGen PDFSet=3 Process=2  VegasNc0=100000 VegasNc2=100 DataFile=$CIRCLE_ARTIFACTS/other/spin2_gammagamma DecayMode1=7  DecayMode2=7 a1=1,0 b1=1,0
     #WH, ZH, gammaH
-    - ./JHUGen PDFSet=3 Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/other/WH DecayMode1=11
-    - ./JHUGen PDFSet=3 Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/other/ZH DecayMode1=9 HbbDK
-    - ./JHUGen PDFSet=3 Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/other/gammaH DecayMode1=7 ghz1=0,0 ghzgs2=1,0
-    - ./JHUGen PDFSet=3 Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/other/gammaH_bb DecayMode1=7 ghz1=0,0 ghgsgs2=1,0 HbbDK
-    #- ./JHUGen PDFSet=3 VegasNc0=100000 ConvertLHE=$CIRCLE_ARTIFACTS/other/ZH.lhe DataFile=$CIRCLE_ARTIFACTS/other/ZH_converted.lhe DecayMode1=1
+    - ./JHUGen PDFSet=3   Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/other/WH DecayMode1=11
+    - ./JHUGen PDFSet=3   Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/other/ZH DecayMode1=9 HbbDK
+    - ./JHUGen PDFSet=3   Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/other/gammaH DecayMode1=7 ghz1=0,0 ghzgs2=1,0
+    - ./JHUGen PDFSet=3   Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/other/gammaH_bb DecayMode1=7 ghz1=0,0 ghgsgs2=1,0 HbbDK
+    - ./JHUGen Collider=0 Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/other/ee_ZH DecayMode1=9
+    - ./JHUGen VegasNc0=100000 TauDK=0 ReadLHE=$CIRCLE_ARTIFACTS/other/ee_ZH.lhe DataFile=$CIRCLE_ARTIFACTS/other/ee_ZH_tautau
+    - ./JHUGen Collider=0 Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/other/ee_gammaH_bb DecayMode1=7 HbbDK ghz1=0,0 ghgsgs2=1,0 epPolarization=100 emPolarization=-100
     #H+J
     - ./JHUGen PDFSet=3 Process=62 VegasNc0=100000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/other/HJ
     #ttH, bbH, tH
@@ -180,38 +301,50 @@ test:
     - "grep -q 'Interference: T' $CIRCLE_ARTIFACTS/other/ttH_ZZ.lhe"
     - "grep -q 'Interference: F' $CIRCLE_ARTIFACTS/other/tbarH_t_ZZ.lhe"
 
-    #generate with 0 interference and make plots
-    - ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$CIRCLE_ARTIFACTS/ggH/SM
-    - analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/ggH/ outfile=SM.root indir=$CIRCLE_ARTIFACTS/ggH/ computeVBFProdAngles=1 computeVHProdAngles=1 SM.lhe
+    #=====
+    #plots
+    #=====
 
-    - ./JHUGen PDFSet=3 Process=60 VegasNc0=10000000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/VBF/SM pTjetcut=0 deltaRcut=0
-    - ./JHUGen PDFSet=3 VegasNc0=100000 DecayMode1=8 DecayMode2=8 Interf=0 ReadLHE=$CIRCLE_ARTIFACTS/VBF/SM.lhe DataFile=$CIRCLE_ARTIFACTS/VBF/SM_decayed
-    - analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/VBF/ outfile=SM.root indir=$CIRCLE_ARTIFACTS/VBF/ computeVBFProdAngles=1 computeVHProdAngles=1 SM_decayed.lhe
-    - ./JHUGen PDFSet=3 Process=61 VegasNc0=10000000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/HJJ/SM
-    - ./JHUGen PDFSet=3 VegasNc0=100000 DecayMode1=8 DecayMode2=8 Interf=0 ReadLHE=$CIRCLE_ARTIFACTS/HJJ/SM.lhe DataFile=$CIRCLE_ARTIFACTS/HJJ/SM_decayed
-    - analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/HJJ/ outfile=SM.root indir=$CIRCLE_ARTIFACTS/HJJ/ computeVBFProdAngles=1 computeVHProdAngles=1 SM_decayed.lhe
+    #generate with 0 interference and make plots
+    #this is only done when the reference comparison fails
+    #in that case the ME is the same, so no need to spend time making plots, they already exist
+    #  in the run that produced the reference
+    #this can take a good 2 hours
+    - if [ -f ~/reference_failed ]; then ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$CIRCLE_ARTIFACTS/ggH/SM; fi
+    - if [ -f ~/reference_failed ]; then analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/ggH/ outfile=SM.root indir=$CIRCLE_ARTIFACTS/ggH/ computeVBFProdAngles=1 computeVHProdAngles=1 SM.lhe; fi
+
+    - if [ -f ~/reference_failed ]; then ./JHUGen PDFSet=3 Process=60 VegasNc0=10000000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/VBF/SM pTjetcut=0 deltaRcut=0; fi
+    - if [ -f ~/reference_failed ]; then ./JHUGen PDFSet=3 VegasNc0=100000 DecayMode1=8 DecayMode2=8 Interf=0 ReadLHE=$CIRCLE_ARTIFACTS/VBF/SM.lhe DataFile=$CIRCLE_ARTIFACTS/VBF/SM_decayed; fi
+    - if [ -f ~/reference_failed ]; then analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/VBF/ outfile=SM.root indir=$CIRCLE_ARTIFACTS/VBF/ computeVBFProdAngles=1 computeVHProdAngles=1 SM_decayed.lhe; fi
+    - if [ -f ~/reference_failed ]; then ./JHUGen PDFSet=3 Process=61 VegasNc0=10000000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/HJJ/SM; fi
+    - if [ -f ~/reference_failed ]; then ./JHUGen PDFSet=3 VegasNc0=100000 DecayMode1=8 DecayMode2=8 Interf=0 ReadLHE=$CIRCLE_ARTIFACTS/HJJ/SM.lhe DataFile=$CIRCLE_ARTIFACTS/HJJ/SM_decayed; fi
+    - if [ -f ~/reference_failed ]; then analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/HJJ/ outfile=SM.root indir=$CIRCLE_ARTIFACTS/HJJ/ computeVBFProdAngles=1 computeVHProdAngles=1 SM_decayed.lhe; fi
 
     #pseudoscalar
-    - ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$CIRCLE_ARTIFACTS/ggH/PS ghz1=0,0 ghz4=1,0
-    - analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/ggH/ outfile=PS.root indir=$CIRCLE_ARTIFACTS/ggH/ computeVBFProdAngles=1 computeVHProdAngles=1 PS.lhe
+    - if [ -f ~/reference_failed ]; then ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$CIRCLE_ARTIFACTS/ggH/PS ghz1=0,0 ghz4=1,0; fi
+    - if [ -f ~/reference_failed ]; then analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/ggH/ outfile=PS.root indir=$CIRCLE_ARTIFACTS/ggH/ computeVBFProdAngles=1 computeVHProdAngles=1 PS.lhe; fi
 
-    - ./JHUGen PDFSet=3 Process=60 VegasNc0=10000000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/VBF/PS ghz1=0,0 ghz4=1,0  pTjetcut=0 deltaRcut=0
-    - ./JHUGen PDFSet=3 VegasNc0=100000 DecayMode1=8 DecayMode2=8 Interf=0 ReadLHE=$CIRCLE_ARTIFACTS/VBF/PS.lhe DataFile=$CIRCLE_ARTIFACTS/VBF/PS_decayed ghz1=0,0 ghz4=1,0
-    - analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/VBF/ outfile=PS.root indir=$CIRCLE_ARTIFACTS/VBF/ computeVBFProdAngles=1 computeVHProdAngles=1 PS_decayed.lhe
+    - if [ -f ~/reference_failed ]; then ./JHUGen PDFSet=3 Process=60 VegasNc0=10000000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/VBF/PS ghz1=0,0 ghz4=1,0  pTjetcut=0 deltaRcut=0; fi
+    - if [ -f ~/reference_failed ]; then ./JHUGen PDFSet=3 VegasNc0=100000 DecayMode1=8 DecayMode2=8 Interf=0 ReadLHE=$CIRCLE_ARTIFACTS/VBF/PS.lhe DataFile=$CIRCLE_ARTIFACTS/VBF/PS_decayed ghz1=0,0 ghz4=1,0; fi
+    - if [ -f ~/reference_failed ]; then analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/VBF/ outfile=PS.root indir=$CIRCLE_ARTIFACTS/VBF/ computeVBFProdAngles=1 computeVHProdAngles=1 PS_decayed.lhe; fi
 
-    #ggH mixtures - don't need this every time, so need to manually ssh in and enable this by touching ~/mixtures
-    - if [ -f ~/mixtures ]; then ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$CIRCLE_ARTIFACTS/ggH/fa30.5 ghz1=1,0 ghz4=2.55052,0; fi
-    - if [ -f ~/mixtures ]; then analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/ggH/ outfile=fa30.5.root indir=$CIRCLE_ARTIFACTS/ggH/ computeVBFProdAngles=1 computeVHProdAngles=1 fa30.5.lhe; fi
-    - if [ -f ~/mixtures ]; then ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$CIRCLE_ARTIFACTS/ggH/fa30.5i ghz1=1,0 ghz4=0,2.55052; fi
-    - if [ -f ~/mixtures ]; then analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/ggH/ outfile=fa30.5i.root indir=$CIRCLE_ARTIFACTS/ggH/ computeVBFProdAngles=1 computeVHProdAngles=1 fa30.5i.lhe; fi
+    #fa3=0.5, phi=0 or pi
+    #- if [ -f ~/reference_failed ]; then ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$CIRCLE_ARTIFACTS/ggH/fa30.5 ghz1=1,0 ghz4=2.55052,0; fi
+    #- if [ -f ~/reference_failed ]; then analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/ggH/ outfile=fa30.5.root indir=$CIRCLE_ARTIFACTS/ggH/ computeVBFProdAngles=1 computeVHProdAngles=1 fa30.5.lhe; fi
+    #- if [ -f ~/reference_failed ]; then ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$CIRCLE_ARTIFACTS/ggH/fa30.5i ghz1=1,0 ghz4=0,2.55052; fi
+    #- if [ -f ~/reference_failed ]; then analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/ggH/ outfile=fa30.5i.root indir=$CIRCLE_ARTIFACTS/ggH/ computeVBFProdAngles=1 computeVHProdAngles=1 fa30.5i.lhe; fi
 
     #a2
-    - ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$CIRCLE_ARTIFACTS/ggH/a2 ghz1=0,0 ghz2=1,0
-    - analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/ggH/ outfile=a2.root indir=$CIRCLE_ARTIFACTS/ggH/ computeVBFProdAngles=1 computeVHProdAngles=1 a2.lhe
+    - if [ -f ~/reference_failed ]; then ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$CIRCLE_ARTIFACTS/ggH/a2 ghz1=0,0 ghz2=1,0; fi
+    - if [ -f ~/reference_failed ]; then analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/ggH/ outfile=a2.root indir=$CIRCLE_ARTIFACTS/ggH/ computeVBFProdAngles=1 computeVHProdAngles=1 a2.lhe; fi
 
-    - ./JHUGen PDFSet=3 Process=60 VegasNc0=10000000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/VBF/a2 ghz1=0,0 ghz2=1,0 pTjetcut=0 deltaRcut=0
-    - ./JHUGen PDFSet=3 VegasNc0=100000 DecayMode1=8 DecayMode2=8 Interf=0 ReadLHE=$CIRCLE_ARTIFACTS/VBF/a2.lhe DataFile=$CIRCLE_ARTIFACTS/VBF/a2_decayed ghz1=0,0 ghz2=1,0
-    - analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/VBF/ outfile=a2.root indir=$CIRCLE_ARTIFACTS/VBF/ computeVBFProdAngles=1 computeVHProdAngles=1 a2_decayed.lhe
+    - if [ -f ~/reference_failed ]; then ./JHUGen PDFSet=3 Process=60 VegasNc0=10000000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/VBF/a2 ghz1=0,0 ghz2=1,0 pTjetcut=0 deltaRcut=0; fi
+    - if [ -f ~/reference_failed ]; then ./JHUGen PDFSet=3 VegasNc0=100000 DecayMode1=8 DecayMode2=8 Interf=0 ReadLHE=$CIRCLE_ARTIFACTS/VBF/a2.lhe DataFile=$CIRCLE_ARTIFACTS/VBF/a2_decayed ghz1=0,0 ghz2=1,0; fi
+    - if [ -f ~/reference_failed ]; then analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/VBF/ outfile=a2.root indir=$CIRCLE_ARTIFACTS/VBF/ computeVBFProdAngles=1 computeVHProdAngles=1 a2_decayed.lhe; fi
+
+    #=============
+    #miscellaneous
+    #=============
 
     #now test with LHAPDF
     - sed -i -r -e "s/(UseLHAPDF *= *)No/\1Yes/" makefile
@@ -241,10 +374,10 @@ test:
     - "! grep -q '!' checklheoutput.txt"    #all the error messages end with !
 
     #ggH analytical fits
-    - cd ~/CMSJHU_AnalysisMacros/ZZ4lanalyticalfits && echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$CIRCLE_ARTIFACTS/ggH/SM.root", "$CIRCLE_ARTIFACTS/ggH/SM/", 1, 0, 0, 0, 0)' | root -b
-    - cd ~/CMSJHU_AnalysisMacros/ZZ4lanalyticalfits && echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$CIRCLE_ARTIFACTS/ggH/PS.root", "$CIRCLE_ARTIFACTS/ggH/PS/", 0, 0, 0, 1, 0)' | root -b
-    - cd ~/CMSJHU_AnalysisMacros/ZZ4lanalyticalfits && echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$CIRCLE_ARTIFACTS/ggH/a2.root", "$CIRCLE_ARTIFACTS/ggH/a2/", 0, 1, 0, 0, 0)' | root -b
-    - if [ -f ~/mixtures ]; then cd ~/CMSJHU_AnalysisMacros/ZZ4lanalyticalfits && echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$CIRCLE_ARTIFACTS/ggH/fa30.5.root", "$CIRCLE_ARTIFACTS/ggH/fa30.5/", 1, 2.55052, 0, 0, 0)' | root -b; fi
-    - if [ -f ~/mixtures ]; then cd ~/CMSJHU_AnalysisMacros/ZZ4lanalyticalfits && echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$CIRCLE_ARTIFACTS/ggH/fa30.5i.root", "$CIRCLE_ARTIFACTS/ggH/fa30.5i/", 1, 0, 2.55052, 0, 0)' | root -b; fi
+    - if [ -f ~/reference_failed ]; then cd ~/CMSJHU_AnalysisMacros/ZZ4lanalyticalfits && echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$CIRCLE_ARTIFACTS/ggH/SM.root", "$CIRCLE_ARTIFACTS/ggH/SM/", 1, 0, 0, 0, 0)' | root -b; fi
+    - if [ -f ~/reference_failed ]; then cd ~/CMSJHU_AnalysisMacros/ZZ4lanalyticalfits && echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$CIRCLE_ARTIFACTS/ggH/PS.root", "$CIRCLE_ARTIFACTS/ggH/PS/", 0, 0, 0, 1, 0)' | root -b; fi
+    - if [ -f ~/reference_failed ]; then cd ~/CMSJHU_AnalysisMacros/ZZ4lanalyticalfits && echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$CIRCLE_ARTIFACTS/ggH/a2.root", "$CIRCLE_ARTIFACTS/ggH/a2/", 0, 1, 0, 0, 0)' | root -b; fi
+    #- if [ -f ~/reference_failed ]; then cd ~/CMSJHU_AnalysisMacros/ZZ4lanalyticalfits && echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$CIRCLE_ARTIFACTS/ggH/fa30.5.root", "$CIRCLE_ARTIFACTS/ggH/fa30.5/", 1, 2.55052, 0, 0, 0)' | root -b; fi
+    #- if [ -f ~/reference_failed ]; then cd ~/CMSJHU_AnalysisMacros/ZZ4lanalyticalfits && echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$CIRCLE_ARTIFACTS/ggH/fa30.5i.root", "$CIRCLE_ARTIFACTS/ggH/fa30.5i/", 1, 0, 2.55052, 0, 0)' | root -b; fi
     #VBF plots
-    - cd ~/CMSJHU_AnalysisMacros/MCProductionValidation && root -b -q VBFplots.C+
+    - if [ -f ~/reference_failed ]; then cd ~/CMSJHU_AnalysisMacros/MCProductionValidation && root -b -q VBFplots.C+; fi

@@ -6,10 +6,10 @@ private
 
  CONTAINS
 
- 
 
- 
- 
+
+
+
 SUBROUTINE TopDecay(Flavor,Mom,Spinor,TopHel)
 use ModMisc
 use ModParameters
@@ -20,10 +20,12 @@ integer,optional :: TopHel
 complex(8) :: Spinor(1:4)
 real(8) :: zeros(1:6),TopMom(1:4),NWAFactor_Top
 complex(8) :: Spi(1:4),BarSpi(1:4),BotSpi(1:4),WCurr(1:4)
-real(8),parameter :: NWAFactor_W   = 1d0/dsqrt(2d0*Ga_W*m_W)
-complex(8),parameter :: WProp = (0d0,-1d0)*NWAFactor_W
-real(8),parameter :: g2_weak = 4d0*dsqrt(2d0)*m_W**2*GF
-real(8),parameter :: Nc=3,NFlav=2
+real(8) :: NWAFactor_W
+complex(8) :: WProp
+real(8),parameter :: Nc=xn,NFlav=2
+
+NWAFactor_W   = 1d0/dsqrt(2d0*Ga_W*m_W)
+WProp = (0d0,-1d0)*NWAFactor_W
 
 
 
@@ -33,7 +35,7 @@ real(8),parameter :: Nc=3,NFlav=2
 !         print *, "momentum dump:"
 !         print *, Mom(1:4,1:12)
 !     endif
-! 
+!
 !     zeros(1) = dble(TopMom(1:4).dot.TopMom(1:4)) - m_Top**2
 !     zeros(2) = Mom(1:4,1).dot.Mom(1:4,1)
 !     zeros(3) = Mom(1:4,2).dot.Mom(1:4,2)
@@ -56,7 +58,7 @@ real(8),parameter :: Nc=3,NFlav=2
 !     elseif( TOPDECAYS.eq.1 ) then
     NWAFactor_Top = 1d0/dsqrt(2d0*Ga_Top*m_Top)
 !     elseif( TOPDECAYS.eq.2 ) then
-!         NWAFactor_Top = 1d0/dsqrt(2d0*Ga_Top*m_Top)    
+!         NWAFactor_Top = 1d0/dsqrt(2d0*Ga_Top*m_Top)
 !         NWAFactor_Top = NWAFactor_Top * dsqrt(dsqrt(Nc*NFlav)**2)
 !     elseif( TOPDECAYS.eq.3 .or. TOPDECAYS.eq.4 ) then
 !         NWAFactor_Top = 1d0/dsqrt(2d0*Ga_Top*m_Top)
@@ -69,7 +71,7 @@ real(8),parameter :: Nc=3,NFlav=2
         call ubarSpi_Weyl(dcmplx(Mom(1:4,1)),-1,BotSpi(1:4))  ! bot
         call    vSpi_Weyl(dcmplx(Mom(1:4,2)),+1,Spi(1:4))     ! l+ or dn_bar
         call ubarSpi_Weyl(dcmplx(Mom(1:4,3)),-1,BarSpi(1:4))  ! nu or up
-        WCurr(1:4)  = vbqq_Weyl(BarSpi(1:4),Spi(1:4)) * WProp * g2_weak ! vbqq introduces -i/Sqrt(2)
+        WCurr(1:4)  = vbqq_Weyl(BarSpi(1:4),Spi(1:4)) * WProp * gwsq ! vbqq introduces -i/Sqrt(2)
 
 !       connect to quark current
         BarSpi(1:4) = BotSpi(1:4)
@@ -81,7 +83,7 @@ real(8),parameter :: Nc=3,NFlav=2
         call    vSpi_Weyl(dcmplx(Mom(1:4,1)),+1,BotSpi(1:4))  ! Abot
         call ubarSpi_Weyl(dcmplx(Mom(1:4,2)),-1,BarSpi(1:4))  ! l- or dn
         call    vSpi_Weyl(dcmplx(Mom(1:4,3)),+1,Spi(1:4))     ! nubar or up_bar
-        WCurr(1:4)  = vbqq_Weyl(BarSpi(1:4),Spi(1:4)) * WProp * g2_weak ! vbqq introduces -i/Sqrt(2)
+        WCurr(1:4)  = vbqq_Weyl(BarSpi(1:4),Spi(1:4)) * WProp * gwsq ! vbqq introduces -i/Sqrt(2)
 
 !       connect to quark current:
         Spi(1:4) = BotSpi(1:4)
@@ -90,14 +92,14 @@ real(8),parameter :: Nc=3,NFlav=2
         Spinor(1:4) = WeylToDirac(Spinor(1:4))
     endif
 
-    
+
 RETURN
 END SUBROUTINE
 
 
 
 
-      
+
           SUBROUTINE ubarSpi_Weyl(p,i,ubarSpi)  ! i=+1 is ES to Chir_Weyl(.false.), i=-1 is ES to Chir_Weyl(.true.)
           use modMisc
           implicit none
@@ -154,8 +156,8 @@ END SUBROUTINE
 
 
 
-        
-        
+
+
           SUBROUTINE vSpi_Weyl(p,i,vSpi)  ! i=+1 is ES to Chir_Weyl(.false.), i=-1 is ES to Chir_Weyl(.true.)
           use ModMisc
           implicit none
@@ -213,13 +215,13 @@ END SUBROUTINE
          RETURN
          END SUBROUTINE
 
-         
 
 
 
-         
-         
-         
+
+
+
+
         FUNCTION vbqg_Weyl(sp,e1)
         implicit none
         complex(8), intent(in) :: e1(:)
@@ -333,18 +335,18 @@ END SUBROUTINE
            enddo
 
 
-           
+
            do i=1,4
 
            spb2_Weyl(i)=v(1)*x0(i,1)-v(2)*xx(i,1)-v(3)*xy(i,1)-v(4)*xz(i,1)
 
            enddo
 
-           
+
            end function
 
-           
-           
+
+
 
 
          function spi2_Weyl(v,sp)
@@ -422,9 +424,9 @@ END SUBROUTINE
           return
           end function
 
-      
 
-          
+
+
           function psp1_(sp1,sp2) result(res)
           implicit none
           complex(8), intent(in) :: sp1(:)
