@@ -1342,7 +1342,7 @@
           ! overall factors and propagators
           amp=amp/(s123-mass_F**2+ci*mass_F*Ga_F)/(s456-mass_F**2+ci*mass_F*Ga_F)/(s12-m_w**2+ci*m_w*Ga_W)/(s45-m_w**2+ci*m_w*Ga_W)
           amp=amp*16d0*ci*mass_F*gwsq**2   
-          res = cdabs(amp)
+          res = cdabs(amp)**2
           
       else! stable
           s12=2d0*(pin(1,1)*pin(1,2)-pin(2,1)*pin(2,2)-pin(3,1)*pin(3,2)-pin(4,1)*pin(4,2)) + 2d0*mass_F**2
