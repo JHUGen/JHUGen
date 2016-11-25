@@ -13,6 +13,7 @@ use ModPMZZ
 implicit none
 real(8) :: VG_Result,VG_Error
 
+   call SetJHUGenDefaults()
    call GetCommandlineArgs()
    call InitProcessScaleSchemes()
    call InitPDFs()!
@@ -223,6 +224,62 @@ subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to t
 end subroutine
 
 
+SUBROUTINE SetJHUGenDefaults()
+   use ModParameters
+   implicit none
+
+   call SetDefaultCKM()
+
+   Collider=1
+   VegasIt1=-1
+   VegasNc0=-1
+   VegasNc1=-1
+   VegasNc2=-1
+   Process = 0   ! select 0, 1 or 2 to represent the spin of the resonance
+   PChannel=2
+   DecayMode1=0  ! Z/W+
+   DecayMode2=0  ! Z/W-
+! !       DecayMode=0:  Z --> l+ l- (l=e,mu)
+! !       DecayMode=1:  Z --> q qbar (q=u,d,c,s,b)
+! !       DecayMode=2:  Z --> tau+ tau-
+! !       DecayMode=3:  Z --> nu nubar (nu=nu_e,nu_mu,nu_tau)
+! !       DecayMode=4:  W --> l nu_l (l=e,mu)
+! !       DecayMode=5:  W --> q qbar' (q=u,c, qbar'=d,s)
+! !       DecayMode=6:  W --> tau nu_tau
+! !       DecayMode=7:  photon
+! !       DecayMode=8:  Z --> l+ l- (l=e,mu,tau)
+! !       DecayMode=9:  Z --> anything
+! !       DecayMode=10: W --> l nu_l (l=e,mu,tau)
+! !       DecayMode=11: W --> anything
+   TopDecays=-1
+   TauDecays=-1
+   H_DK = .false.
+   Unweighted =.true.
+   MuFacMultiplier = 1d0
+   MuRenMultiplier = 1d0
+   FacScheme = kRenFacScheme_default
+   RenScheme = kRenFacScheme_default
+   OffShellReson=.true.
+   OffShellV1=.true.
+   OffShellV2=.true.
+
+   LHEProdFile=""
+   ReadLHEFile=.false.
+   ConvertLHEFile=.false.
+   ReadCSmax=.false.
+   ReadPMZZ = .false.
+   PMZZFile="PMZZdistribution.out"
+   PMZZEvals=-1
+   DoPrintPMZZ = .false.
+   PrintPMZZIntervals = 20
+   GenerateEvents=.false.
+   RequestNLeptons = -1
+   RequestOS=-1
+   RequestOSSF=-1
+   CountTauAsAny = .true.
+   WriteFailedEvents=0
+
+END SUBROUTINE SetJHUGenDefaults
 
 SUBROUTINE GetCommandlineArgs()
 use ModParameters
@@ -244,68 +301,17 @@ logical :: SetColliderEnergy
 
    help = .false.
 
-   Collider=1
-   VegasIt1=-1
 #if useLHAPDF==1
    LHAPDFString = ""
    LHAPDFMember = 0
 #else
    PDFSet=1      ! 1: CTEQ6L1   2: MRSW with best fit, 2xx: MSTW with eigenvector set xx=01..40
 #endif
-   VegasNc0=-1
-   VegasNc1=-1
-   VegasNc2=-1
-   PChannel=2
-
-   DecayMode1=0  ! Z/W+
-   DecayMode2=0  ! Z/W-
-! !       DecayMode=0:  Z --> l+ l- (l=e,mu)
-! !       DecayMode=1:  Z --> q qbar (q=u,d,c,s,b)
-! !       DecayMode=2:  Z --> tau+ tau-
-! !       DecayMode=3:  Z --> nu nubar (nu=nu_e,nu_mu,nu_tau)
-! !       DecayMode=4:  W --> l nu_l (l=e,mu)
-! !       DecayMode=5:  W --> q qbar' (q=u,c, qbar'=d,s)
-! !       DecayMode=6:  W --> tau nu_tau
-! !       DecayMode=7:  photon
-! !       DecayMode=8:  Z --> l+ l- (l=e,mu,tau)
-! !       DecayMode=9:  Z --> anything
-! !       DecayMode=10: W --> l nu_l (l=e,mu,tau)
-! !       DecayMode=11: W --> anything
 
    WidthScheme=-1
    WidthSchemeIn=-1
-   TopDecays=-1
-   TauDecays=-1
-   H_DK = .false.
-   Process = 0   ! select 0, 1 or 2 to represent the spin of the resonance
-   Unweighted =.true.
 
-   ! Old OffXVV flag is disabled
-   OffShellReson=.true.
-   OffShellV1=.true.
-   OffShellV2=.true.
-
-   LHEProdFile=""
-   ReadLHEFile=.false.
-   ConvertLHEFile=.false.
-   ReadCSmax=.false.
-   ReadPMZZ = .false.
-   PMZZFile="PMZZdistribution.out"
-   PMZZEvals=-1
-   DoPrintPMZZ = .false.
-   PrintPMZZIntervals = 20
-   GenerateEvents=.false.
-   RequestNLeptons = -1
-   RequestOS=-1
-   RequestOSSF=-1
-   CountTauAsAny = .true.
    interfSet = .false.
-   WriteFailedEvents=0
-
-   MuFacMultiplier = 1d0
-   MuRenMultiplier = 1d0
-   FacScheme = kRenFacScheme_default
-   RenScheme = kRenFacScheme_default
    SetMuFacMultiplier = .false.
    SetMuRenMultiplier = .false.
    SetFacScheme = .false.
