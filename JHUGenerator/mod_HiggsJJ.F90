@@ -175,7 +175,7 @@ module modHiggsJJ
       ijSel( 47,1:3) = (/ pdfBot_,pdfBot_,zz/)
 
       ! u-db
-	  ijSel( 48,1:3) = (/ pdfUp_,pdfADn_,zz/)
+	   ijSel( 48,1:3) = (/ pdfUp_,pdfADn_,zz/)
       ijSel( 49,1:3) = (/ pdfUp_,pdfAStr_,zz/)
       ijSel( 50,1:3) = (/ pdfUp_,pdfABot_,zz/)
       ijSel( 51,1:3) = (/ pdfChm_,pdfADn_,zz/)

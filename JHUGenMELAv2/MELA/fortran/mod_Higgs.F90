@@ -669,7 +669,7 @@
 ! overall factors and propagators
       amp=amp/(s123-mass_F**2+ci*mass_F*ga_F)/(s456-mass_F**2+ci*mass_F*ga_F)/(s12-m_w**2+ci*m_w*Ga_W)/(s45-m_w**2+ci*m_w*Ga_W)
       amp=amp*16d0*ci*mass_F*gwsq**2
-      res = cdabs(amp)
+      res = cdabs(amp)**2
 
    RETURN
    END SUBROUTINE
