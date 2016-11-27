@@ -182,15 +182,15 @@ real(dp), public           :: gs                   ! = sqrt(alphas*4.0_dp*pi)
 
 
 ! CKM squared matrix entries
-real(8), public            :: VCKM_ud = 0.974285d0
-real(8), public            :: VCKM_us = 0.225290d0
-real(8), public            :: VCKM_cs = 0.9734244d0
-real(8), public            :: VCKM_cd =-0.225182d0
-real(8), public            :: VCKM_tb = 0.99912367d0
-real(8), public            :: VCKM_ts =-0.040920069d0
-real(8), public            :: VCKM_cb ! = dsqrt(1d0-VCKM_cd**2-VCKM_cs**2)
-real(8), public            :: VCKM_ub ! = dsqrt(1d0-VCKM_ud**2-VCKM_us**2)
-real(8), public            :: VCKM_td ! = dsqrt(1d0-VCKM_tb**2-VCKM_ts**2)
+real(8), public            :: VCKM_ud! = 0.974285d0
+real(8), public            :: VCKM_us! = 0.225290d0
+real(8), public            :: VCKM_cs! = 0.9734244d0
+real(8), public            :: VCKM_cd! =-0.225182d0
+real(8), public            :: VCKM_tb! = 0.99912367d0
+real(8), public            :: VCKM_ts! =-0.040920069d0
+real(8), public            :: VCKM_cb! = dsqrt(1d0-VCKM_cd**2-VCKM_cs**2)
+real(8), public            :: VCKM_ub! = dsqrt(1d0-VCKM_ud**2-VCKM_us**2)
+real(8), public            :: VCKM_td! = dsqrt(1d0-VCKM_tb**2-VCKM_ts**2)
 
 
 ! absolute branching fraction (taken from PDG-2014)
@@ -762,40 +762,6 @@ end function
 
 
 
-!--YaofuZhou
-FUNCTION CKM(id1in,id2in)
-implicit none
-real(8) :: CKM
-integer :: id1, id2, id1in, id2in
-id1 = abs(id1in)
-id2 = abs(id2in)
-if((id1.eq.convertLHE(Up_)  .and.  id2.eq.convertLHE(Dn_))  .or.  (id1.eq.convertLHE(Dn_)  .and.  id2.eq.convertLHE(Up_)))then
-  CKM= VCKM_ud * dsqrt(scale_alpha_W_ud)
-elseif((id1.eq.convertLHE(Up_)  .and.  id2.eq.convertLHE(Str_))  .or.  (id1.eq.convertLHE(Str_)  .and.  id2.eq.convertLHE(Up_)))then
-  CKM= VCKM_us * dsqrt(scale_alpha_W_ud)
-elseif((id1.eq.convertLHE(Up_)  .and.  id2.eq.convertLHE(Bot_))  .or.  (id1.eq.convertLHE(Bot_)  .and.  id2.eq.convertLHE(Up_)))then
-  CKM= VCKM_ub * dsqrt(scale_alpha_W_ud)
-elseif((id1.eq.convertLHE(Chm_)  .and.  id2.eq.convertLHE(Dn_))  .or.  (id1.eq.convertLHE(Dn_)  .and.  id2.eq.convertLHE(Chm_)))then
-  CKM= VCKM_cd * dsqrt(scale_alpha_W_cs)
-elseif((id1.eq.convertLHE(Chm_)  .and.  id2.eq.convertLHE(Str_))  .or.  (id1.eq.convertLHE(Str_)  .and.  id2.eq.convertLHE(Chm_)))then
-  CKM= VCKM_cs * dsqrt(scale_alpha_W_cs)
-elseif((id1.eq.convertLHE(Chm_)  .and.  id2.eq.convertLHE(Bot_))  .or.  (id1.eq.convertLHE(Bot_)  .and.  id2.eq.convertLHE(Chm_)))then
-  CKM= VCKM_cb * dsqrt(scale_alpha_W_cs)
-elseif((id1.eq.convertLHE(Top_)  .and.  id2.eq.convertLHE(Dn_))  .or.  (id1.eq.convertLHE(Dn_)  .and.  id2.eq.convertLHE(Top_)))then
-  CKM= VCKM_td
-elseif((id1.eq.convertLHE(Top_)  .and.  id2.eq.convertLHE(Str_))  .or.  (id1.eq.convertLHE(Str_)  .and.  id2.eq.convertLHE(Top_)))then
-  CKM= VCKM_ts
-elseif((id1.eq.convertLHE(Top_)  .and.  id2.eq.convertLHE(Bot_))  .or.  (id1.eq.convertLHE(Bot_)  .and.  id2.eq.convertLHE(Top_)))then
-  CKM= VCKM_tb
-elseif((abs(id1).eq.abs(convertLHE(NuT_))  .and.  abs(id2).eq.abs(convertLHE(TaP_)))  .or.  (abs(id1).eq.abs(convertLHE(TaP_))  .and.  abs(id2).eq.abs(convertLHE(NuT_))))then
-  CKM= 1d0 * dsqrt(scale_alpha_W_tn)
-else
-  CKM= 1d0 * dsqrt(scale_alpha_W_ln)
-endif
-
-END FUNCTION
-
-
 FUNCTION ScaleFactor(id1in,id2in)
 implicit none
 real(8) :: ScaleFactor
@@ -847,6 +813,43 @@ else
   ScaleFactor = 1d0
 endif
 
+END FUNCTION
+
+FUNCTION CKMbare(id1in,id2in)
+implicit none
+real(8) :: CKMbare
+integer :: id1, id2, id1in, id2in
+id1 = abs(id1in)
+id2 = abs(id2in)
+if((id1.eq.convertLHE(Up_)  .and.  id2.eq.convertLHE(Dn_))  .or.  (id1.eq.convertLHE(Dn_)  .and.  id2.eq.convertLHE(Up_)))then
+  CKMbare= VCKM_ud
+elseif((id1.eq.convertLHE(Up_)  .and.  id2.eq.convertLHE(Str_))  .or.  (id1.eq.convertLHE(Str_)  .and.  id2.eq.convertLHE(Up_)))then
+  CKMbare= VCKM_us
+elseif((id1.eq.convertLHE(Up_)  .and.  id2.eq.convertLHE(Bot_))  .or.  (id1.eq.convertLHE(Bot_)  .and.  id2.eq.convertLHE(Up_)))then
+  CKMbare= VCKM_ub
+elseif((id1.eq.convertLHE(Chm_)  .and.  id2.eq.convertLHE(Dn_))  .or.  (id1.eq.convertLHE(Dn_)  .and.  id2.eq.convertLHE(Chm_)))then
+  CKMbare= VCKM_cd
+elseif((id1.eq.convertLHE(Chm_)  .and.  id2.eq.convertLHE(Str_))  .or.  (id1.eq.convertLHE(Str_)  .and.  id2.eq.convertLHE(Chm_)))then
+  CKMbare= VCKM_cs
+elseif((id1.eq.convertLHE(Chm_)  .and.  id2.eq.convertLHE(Bot_))  .or.  (id1.eq.convertLHE(Bot_)  .and.  id2.eq.convertLHE(Chm_)))then
+  CKMbare= VCKM_cb
+elseif((id1.eq.convertLHE(Top_)  .and.  id2.eq.convertLHE(Dn_))  .or.  (id1.eq.convertLHE(Dn_)  .and.  id2.eq.convertLHE(Top_)))then
+  CKMbare= VCKM_td
+elseif((id1.eq.convertLHE(Top_)  .and.  id2.eq.convertLHE(Str_))  .or.  (id1.eq.convertLHE(Str_)  .and.  id2.eq.convertLHE(Top_)))then
+  CKMbare= VCKM_ts
+elseif((id1.eq.convertLHE(Top_)  .and.  id2.eq.convertLHE(Bot_))  .or.  (id1.eq.convertLHE(Bot_)  .and.  id2.eq.convertLHE(Top_)))then
+  CKMbare= VCKM_tb
+else
+  CKMbare= 1d0
+endif
+
+END FUNCTION
+
+FUNCTION CKM(id1in,id2in)
+implicit none
+real(8) :: CKM
+integer :: id1in, id2in
+  CKM=CKMbare(id1in, id2in)*ScaleFactor(id1in,id2in)
 END FUNCTION
 
 
@@ -1660,6 +1663,17 @@ real(8) :: sumVsq(1:3),diffVsq
    VCKM_tb=VCKM_tb/sqrt(sumVsq(3))
 
 end subroutine ComputeCKMElements
+
+subroutine SetDefaultCKM()
+implicit none
+   VCKM_ud = 0.974285d0
+   VCKM_us = 0.225290d0
+   VCKM_cs = 0.9734244d0
+   VCKM_cd =-0.225182d0
+   VCKM_tb = 0.99912367d0
+   VCKM_ts =-0.040920069d0
+   call ComputeCKMElements(VCKM_ud, VCKM_us, VCKM_cd, VCKM_cs, VCKM_ts, VCKM_tb)
+end subroutine SetDefaultCKM
 
 subroutine ComputeEWVariables()
 implicit none
