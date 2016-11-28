@@ -849,7 +849,7 @@ FUNCTION CKM(id1in,id2in)
 implicit none
 real(8) :: CKM
 integer :: id1in, id2in
-  CKM=CKMbare(id1in, id2in)*ScaleFactor(id1in,id2in)
+  CKM=CKMbare(id1in, id2in)*sqrt(ScaleFactor(id1in,id2in))
 END FUNCTION
 
 
