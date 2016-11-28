@@ -22,7 +22,7 @@ machine:
     ROOT_VERSIONSTRING: "${ROOT_VERSIONPART1}.${ROOT_VERSIONPART2}/${ROOT_VERSIONPART3}"
 
     REFERENCE_LHES_USERNAME: "hroskes"
-    REFERENCE_LHES_BUILD_NUMBER: "617"
+    REFERENCE_LHES_BUILD_NUMBER: "621"
     REFERENCE_LHES_FOLDER: "$(echo https://circleci.com/api/v1/project/$REFERENCE_LHES_USERNAME/JHUGen/$REFERENCE_LHES_BUILD_NUMBER/'artifacts/0/$CIRCLE_ARTIFACTS/reference')"
     REFERENCE_FILENAMES: "ggH_ZZ.lhe ggH_WW.lhe ggH_Zgamma.lhe ggH_gammagamma.lhe spin1_ZZ.lhe spin1_WW.lhe gg_spin2_ZZ.lhe qq_spin2_WW.lhe gg_spin2_Zgamma.lhe qq_spin2_gammagamma.lhe ZH_bb.lhe WH_Zgamma.lhe ee_gammaH_bb.lhe VBF_ZZ.lhe HJJ_WW.lhe HJ_gammagamma.lhe ttH_tautau.lhe bbH_tautau.lhe tqH_110.lhe tqH_111.lhe tqH_112.lhe tqH_113.lhe tqH_114.lhe"
 
@@ -307,7 +307,7 @@ test:
 
     #generate with 0 interference and make plots
     #this is only done when the reference comparison fails
-    #in that case the ME is the same, so no need to spend time making plots, they already exist
+    #if it succeeds the ME is the same, so no need to spend time making plots, they already exist
     #  in the run that produced the reference
     #this can take a good 2 hours
     - if [ -f ~/reference_failed ]; then ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$CIRCLE_ARTIFACTS/ggH/SM; fi
