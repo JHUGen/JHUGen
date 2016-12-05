@@ -180,7 +180,7 @@ test:
       mkdir reference compare_to_reference && cd reference &&
       for filename in $REFERENCE_FILENAMES; do
         wget $REFERENCE_LHES_FOLDER/$filename &&
-        sed -i "3 s/$REFERENCE_JHUGEN_VERSION/$JHUGEN_VERSION/" $filename ||
+        sed -i -r "s/(Output from the JHUGenerator )$REFERENCE_JHUGEN_VERSION/\1$JHUGEN_VERSION/" $filename ||
         exitstatus=1
       done
       if [ $exitstatus -ne 0 ]; then
