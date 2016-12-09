@@ -54,8 +54,8 @@ c--- propagator factors
 
 c--- Factor
       facHZZ=im*rescale*prop12*prop34*prop56/(2d0*xw*(1d0-xw))
-      facHZA=im*rescale*prop12*prop34/s(5,6)/(2d0*xw*(1d0-xw))
-      facHAZ=im*rescale*prop12/s(3,4)*prop56/(2d0*xw*(1d0-xw))
+      facHZA=-im*rescale*prop12*prop34/s(5,6)/(2d0*xw*(1d0-xw))
+      facHAZ=-im*rescale*prop12/s(3,4)*prop56/(2d0*xw*(1d0-xw))
       facHAA=im*rescale*prop12/s(3,4)/s(5,6)/(2d0*xw*(1d0-xw))
 
 c--- Amplitudes for production
@@ -145,8 +145,8 @@ c--- propagator factors
 
 c--- Factor
       facHZZ=im*rescale*prop12*prop34*prop56/(2d0*xw*(1d0-xw))
-      facHZA=im*rescale*prop12*prop34/s(5,6)/(2d0*xw*(1d0-xw))
-      facHAZ=im*rescale*prop12/s(3,4)*prop56/(2d0*xw*(1d0-xw))
+      facHZA=-im*rescale*prop12*prop34/s(5,6)/(2d0*xw*(1d0-xw))
+      facHAZ=-im*rescale*prop12/s(3,4)*prop56/(2d0*xw*(1d0-xw))
       facHAA=im*rescale*prop12/s(3,4)/s(5,6)/(2d0*xw*(1d0-xw))
 
 c--- Amplitudes for production
