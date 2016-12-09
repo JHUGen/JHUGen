@@ -26,9 +26,9 @@ c---
       double precision p(mxpart,4),mb2,mt2,mtX2,mbX2
       double complex Mloop_bquark(2,2,2,2),Mloop_tquark(2,2,2,2),
      & ggHmq(2,2,2),prop12,prop34,prop56,
-     & H4l(2,2),facHiggs,higgsprop
+     & H4l(2,2),facHZZ,facHZA,facHAZ,facHAA,higgsprop
       double precision rescale
-      double complex anomhzzamp
+      double complex anomhzzamp,anomhzaamp,anomhaaamp
 
 !==== for width studies rescale by appropriate factor
       if((keep_smhiggs_norm).and.(anom_higgs)) then
@@ -53,7 +53,10 @@ c--- propagator factors
       prop56=cone/dcmplx(s(5,6)-zmass**2,zmass*zwidth)
 
 c--- Factor
-      facHiggs=im*rescale*prop12*prop34*prop56/(2d0*xw*(1d0-xw))
+      facHZZ=im*rescale*prop12*prop34*prop56/(2d0*xw*(1d0-xw))
+      facHZA=im*rescale*prop12*prop34/s(5,6)/(2d0*xw*(1d0-xw))
+      facHAZ=im*rescale*prop12/s(3,4)*prop56/(2d0*xw*(1d0-xw))
+      facHAA=im*rescale*prop12/s(3,4)/s(5,6)/(2d0*xw*(1d0-xw))
 
 c--- Amplitudes for production
       call anomhggvtxamp(1,2,1,za,zb,ggHmq)
@@ -61,11 +64,26 @@ c--- Amplitudes for production
       !ggHmq(:,:,:) = ggHmq(:,:,:)
 
 c--- Amplitudes for decay
-      H4l(1,1)=anomhzzamp(3,4,5,6,1,s(1,2),s(3,4),s(5,6),za,zb)*l1*l2
-      H4l(2,1)=anomhzzamp(4,3,5,6,1,s(1,2),s(3,4),s(5,6),za,zb)*r1*l2
-      H4l(1,2)=anomhzzamp(3,4,6,5,1,s(1,2),s(3,4),s(5,6),za,zb)*l1*r2
-      H4l(2,2)=anomhzzamp(4,3,6,5,1,s(1,2),s(3,4),s(5,6),za,zb)*r1*r2
-      H4l(:,:) = H4l(:,:)*facHiggs
+      H4l(1,1)=
+     &  anomhzzamp(3,4,5,6,1,s(1,2),s(3,4),s(5,6),za,zb)*l1*l2*facHZZ
+     & +anomhzaamp(3,4,5,6,1,s(1,2),s(3,4),s(5,6),za,zb)*l1*q2*facHZA
+     & +anomhzaamp(5,6,3,4,1,s(1,2),s(5,6),s(3,4),za,zb)*q1*l2*facHAZ
+     & +anomhaaamp(3,4,5,6,1,s(1,2),s(3,4),s(5,6),za,zb)*q1*q2*facHAA
+      H4l(2,1)=
+     &  anomhzzamp(4,3,5,6,1,s(1,2),s(3,4),s(5,6),za,zb)*r1*l2*facHZZ
+     & +anomhzaamp(4,3,5,6,1,s(1,2),s(3,4),s(5,6),za,zb)*r1*q2*facHZA
+     & +anomhzaamp(5,6,4,3,1,s(1,2),s(5,6),s(3,4),za,zb)*q1*l2*facHAZ
+     & +anomhaaamp(4,3,5,6,1,s(1,2),s(3,4),s(5,6),za,zb)*q1*q2*facHAA
+      H4l(1,2)=
+     &  anomhzzamp(3,4,6,5,1,s(1,2),s(3,4),s(5,6),za,zb)*l1*r2*facHZZ
+     & +anomhzaamp(3,4,6,5,1,s(1,2),s(3,4),s(5,6),za,zb)*l1*q2*facHZA
+     & +anomhzaamp(6,5,3,4,1,s(1,2),s(5,6),s(3,4),za,zb)*q1*r2*facHAZ
+     & +anomhaaamp(3,4,6,5,1,s(1,2),s(3,4),s(5,6),za,zb)*q1*q2*facHAA
+      H4l(2,2)=
+     &  anomhzzamp(4,3,6,5,1,s(1,2),s(3,4),s(5,6),za,zb)*r1*r2*facHZZ
+     & +anomhzaamp(4,3,6,5,1,s(1,2),s(3,4),s(5,6),za,zb)*r1*q2*facHZA
+     & +anomhzaamp(6,5,4,3,1,s(1,2),s(5,6),s(3,4),za,zb)*q1*r2*facHAZ
+     & +anomhaaamp(4,3,6,5,1,s(1,2),s(3,4),s(5,6),za,zb)*q1*q2*facHAA
 
 c--- Assemble
       do h1=1,2
@@ -99,9 +117,9 @@ c--- Assemble
       double precision p(mxpart,4),mb2,mt2,mbX2,mtX2
       double complex Mloop_bquark(2,2,2,2),Mloop_tquark(2,2,2,2),
      & ggHmq(2,2,2),prop12,prop34,prop56,
-     & H4l(2,2),facHiggs,higgs2prop
+     & H4l(2,2),facHZZ,facHZA,facHAZ,facHAA,higgs2prop
       double precision rescale
-      double complex anomhzzamp
+      double complex anomhzzamp,anomhzaamp,anomhaaamp
 
 !==== for width studies rescale by appropriate factor
       if((keep_smhiggs_norm).and.(anom_higgs)) then
@@ -126,7 +144,10 @@ c--- propagator factors
       prop56=cone/dcmplx(s(5,6)-zmass**2,zmass*zwidth)
 
 c--- Factor
-      facHiggs=im*rescale*prop12*prop34*prop56/(2d0*xw*(1d0-xw))
+      facHZZ=im*rescale*prop12*prop34*prop56/(2d0*xw*(1d0-xw))
+      facHZA=im*rescale*prop12*prop34/s(5,6)/(2d0*xw*(1d0-xw))
+      facHAZ=im*rescale*prop12/s(3,4)*prop56/(2d0*xw*(1d0-xw))
+      facHAA=im*rescale*prop12/s(3,4)/s(5,6)/(2d0*xw*(1d0-xw))
 
 c--- Amplitudes for production
       call anomhggvtxamp(1,2,2,za,zb,ggHmq)
@@ -134,11 +155,26 @@ c--- Amplitudes for production
       !ggHmq(:,:,:) = ggHmq(:,:,:)
 
 c--- Amplitudes for decay
-      H4l(1,1)=anomhzzamp(3,4,5,6,2,s(1,2),s(3,4),s(5,6),za,zb)*l1*l2
-      H4l(2,1)=anomhzzamp(4,3,5,6,2,s(1,2),s(3,4),s(5,6),za,zb)*r1*l2
-      H4l(1,2)=anomhzzamp(3,4,6,5,2,s(1,2),s(3,4),s(5,6),za,zb)*l1*r2
-      H4l(2,2)=anomhzzamp(4,3,6,5,2,s(1,2),s(3,4),s(5,6),za,zb)*r1*r2
-      H4l(:,:) = H4l(:,:)*facHiggs
+      H4l(1,1)=
+     &  anomhzzamp(3,4,5,6,2,s(1,2),s(3,4),s(5,6),za,zb)*l1*l2*facHZZ
+     & +anomhzaamp(3,4,5,6,2,s(1,2),s(3,4),s(5,6),za,zb)*l1*q2*facHZA
+     & +anomhzaamp(5,6,3,4,2,s(1,2),s(5,6),s(3,4),za,zb)*q1*l2*facHAZ
+     & +anomhaaamp(3,4,5,6,2,s(1,2),s(3,4),s(5,6),za,zb)*q1*q2*facHAA
+      H4l(2,1)=
+     &  anomhzzamp(4,3,5,6,2,s(1,2),s(3,4),s(5,6),za,zb)*r1*l2*facHZZ
+     & +anomhzaamp(4,3,5,6,2,s(1,2),s(3,4),s(5,6),za,zb)*r1*q2*facHZA
+     & +anomhzaamp(5,6,4,3,2,s(1,2),s(5,6),s(3,4),za,zb)*q1*l2*facHAZ
+     & +anomhaaamp(4,3,5,6,2,s(1,2),s(3,4),s(5,6),za,zb)*q1*q2*facHAA
+      H4l(1,2)=
+     &  anomhzzamp(3,4,6,5,2,s(1,2),s(3,4),s(5,6),za,zb)*l1*r2*facHZZ
+     & +anomhzaamp(3,4,6,5,2,s(1,2),s(3,4),s(5,6),za,zb)*l1*q2*facHZA
+     & +anomhzaamp(6,5,3,4,2,s(1,2),s(5,6),s(3,4),za,zb)*q1*r2*facHAZ
+     & +anomhaaamp(3,4,6,5,2,s(1,2),s(3,4),s(5,6),za,zb)*q1*q2*facHAA
+      H4l(2,2)=
+     &  anomhzzamp(4,3,6,5,2,s(1,2),s(3,4),s(5,6),za,zb)*r1*r2*facHZZ
+     & +anomhzaamp(4,3,6,5,2,s(1,2),s(3,4),s(5,6),za,zb)*r1*q2*facHZA
+     & +anomhzaamp(6,5,4,3,2,s(1,2),s(5,6),s(3,4),za,zb)*q1*r2*facHAZ
+     & +anomhaaamp(4,3,6,5,2,s(1,2),s(3,4),s(5,6),za,zb)*q1*q2*facHAA
 
 c--- Assemble
       do h1=1,2
