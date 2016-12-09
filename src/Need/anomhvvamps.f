@@ -80,7 +80,7 @@ c--- q^2 dependent couplings
       double complex aa1,aa2,aa3
 
 c------ HZZ DECAY CONVENTIONS
-      IF( AllowAnomalousCouplings.eq.1 ) THEN
+      IF(AllowAnomalousCouplings.eq.1) THEN
 
 c------ FORM FACTORS FOR ANOMALOUS COUPLINGS
 c L1L2
@@ -148,7 +148,7 @@ c--- q^2 dependent couplings
       double complex aa1,aa2,aa3
 
 c------ HZZ DECAY CONVENTIONS
-      IF( AllowAnomalousCouplings.eq.1 ) THEN
+      IF(AllowAnomalousCouplings.eq.1) THEN
 
 c------ FORM FACTORS FOR ANOMALOUS COUPLINGS
 c L1L2
@@ -255,6 +255,7 @@ c--- q^2-dependent couplings
       aa3 = aa3 / wmass**2
 
       anomhwwamp = ( aa1*FFa1 + aa2*FFa2 + aa3*FFa3 )
+      print *,"anomhwwamp(",i3,i4,i5,i6,")=",anomhwwamp
 
       ELSE
 

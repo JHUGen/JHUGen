@@ -59,6 +59,58 @@
      & .or. (plabel(8) .eq. 'ma')
      & .or. (plabel(8) .eq. 'ta')
      & )
+     & ) .or. (! Tests from the opposite direction
+     & (j7.eq.1 .or. j8.eq.1) .and. (
+     &      (plabel(1) .eq. 'uq')
+     & .or. (plabel(1) .eq. 'dq')
+     & .or. (plabel(1) .eq. 'cq')
+     & .or. (plabel(1) .eq. 'sq')
+     & .or. (plabel(1) .eq. 'bq')
+     & .or. (plabel(1) .eq. 'nl')
+     & .or. (plabel(1) .eq. 'nm')
+     & .or. (plabel(1) .eq. 'nt')
+     & .or. (plabel(1) .eq. 'el')
+     & .or. (plabel(1) .eq. 'ml')
+     & .or. (plabel(1) .eq. 'tl')
+     & )
+     & ) .or. (
+     & (j7.eq.2 .or. j8.eq.2) .and. (
+     &      (plabel(2) .eq. 'uq')
+     & .or. (plabel(2) .eq. 'dq')
+     & .or. (plabel(2) .eq. 'cq')
+     & .or. (plabel(2) .eq. 'sq')
+     & .or. (plabel(2) .eq. 'bq')
+     & .or. (plabel(2) .eq. 'nl')
+     & .or. (plabel(2) .eq. 'nm')
+     & .or. (plabel(2) .eq. 'nt')
+     & .or. (plabel(2) .eq. 'el')
+     & .or. (plabel(2) .eq. 'ml')
+     & .or. (plabel(2) .eq. 'tl')
+     & )
+     & ) .or. (
+     & (j1.eq.1 .or. j2.eq.1) .and. (
+     &      (plabel(1) .eq. 'ua')
+     & .or. (plabel(1) .eq. 'da')
+     & .or. (plabel(1) .eq. 'ca')
+     & .or. (plabel(1) .eq. 'sa')
+     & .or. (plabel(1) .eq. 'ba')
+     & .or. (plabel(1) .eq. 'na')
+     & .or. (plabel(1) .eq. 'ea')
+     & .or. (plabel(1) .eq. 'ma')
+     & .or. (plabel(1) .eq. 'ta')
+     & )
+     & ) .or. (
+     & (j1.eq.2 .or. j2.eq.2) .and. (
+     &      (plabel(2) .eq. 'ua')
+     & .or. (plabel(2) .eq. 'da')
+     & .or. (plabel(2) .eq. 'ca')
+     & .or. (plabel(2) .eq. 'sa')
+     & .or. (plabel(2) .eq. 'ba')
+     & .or. (plabel(2) .eq. 'na')
+     & .or. (plabel(2) .eq. 'ea')
+     & .or. (plabel(2) .eq. 'ma')
+     & .or. (plabel(2) .eq. 'ta')
+     & )
      & ) ) then
       partSwapOk = .false.
       endif
