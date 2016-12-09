@@ -78,9 +78,13 @@ c--- q^2 dependent couplings
       double complex ghz1_dyn,ghz2_dyn,ghz3_dyn,ghz4_dyn
       double complex FFa1, FFa2, FFa3
       double complex aa1,aa2,aa3
+      logical checkHZAcouplings
+
+      anomhzaamp = czip ! No ZA->4f amplitude at LO SM
 
 c------ HZZ DECAY CONVENTIONS
       IF(AllowAnomalousCouplings.eq.1) THEN
+      if(checkHZAcouplings(jh)) then
 
 c------ FORM FACTORS FOR ANOMALOUS COUPLINGS
 c L1L2
@@ -121,11 +125,7 @@ c--- q^2 dependent couplings
       aa3 = aa3 / zmass**2 !-- F
 
       anomhzaamp = ( aa1*FFa1 + aa2*FFa2 + aa3*FFa3 )
-
-      ELSE
-
-      anomhzaamp = czip ! No ZA->4f amplitude at LO SM
-
+      endif
       ENDIF
 
       return
@@ -146,9 +146,13 @@ c--- q^2 dependent couplings
       double complex ghz2_dyn,ghz3_dyn,ghz4_dyn
       double complex FFa1, FFa2, FFa3
       double complex aa1,aa2,aa3
+      logical checkHAAcouplings
+
+      anomhaaamp = czip ! No AA->4f amplitude at LO SM
 
 c------ HZZ DECAY CONVENTIONS
       IF(AllowAnomalousCouplings.eq.1) THEN
+      if(checkHAAcouplings(jh)) then
 
 c------ FORM FACTORS FOR ANOMALOUS COUPLINGS
 c L1L2
@@ -190,10 +194,7 @@ c--- q^2 dependence in couplings does not exist in gsgs
 
       anomhaaamp = ( aa1*FFa1 + aa2*FFa2 + aa3*FFa3 )
 
-      ELSE
-
-      anomhaaamp = czip ! No AA->4f amplitude at LO SM
-
+      endif
       ENDIF
 
       return
