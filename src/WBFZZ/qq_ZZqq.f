@@ -104,6 +104,8 @@ c---color factors for Z decays
         colfac34_56=colfac34_56*xn
       endif
 
+      print *,plabel
+
       do j=1,jmax
       temp(:,:)=0d0
       tempw(:,:)=0d0
@@ -114,15 +116,20 @@ c---color factors for Z decays
       ampa_swap(:,:,:,:,:)=czip
       ampb_swap(:,:,:,:,:)=czip
 
+      print *,"Loop j=",j
+
 C--   MARKUS: adding switches to remove VH or VBF contributions
       ! No VH-like diagram
       !if( (vvhvvtoggle_vbfvh.eq.0) .and. (j.ge.9) ) cycle
       ! No VBF-like diagram
       !if( (vvhvvtoggle_vbfvh.eq.1) .and. (j.le.8) ) cycle
       if( (vvhvvtoggle_vbfvh.eq.1) .and. (j.le.4) ) cycle
+      print *,"j passes vvhvvtoggle_vbfvh=",vvhvvtoggle_vbfvh
       ! U. Sarica: Test the combination
       call testWBFVVApartComb(j1(j),j2(j),j7(j),j8(j),comb1278ok)
+      print *,"comb1278ok arguments: ",j1(j),j2(j),j7(j),j8(j)
       if (.not.comb1278ok) cycle
+      print *,"j passes comb1278ok"
 
 c--   Call the VVZZ amplitudes
       call getVVZZamps(amp,ampa,ampb,p,za,zb,zab,zba,
@@ -165,6 +172,7 @@ C-----setup for (uqbq_uqbq) (2,5)->(2,5)
       temp(2,5)=temp(2,5)+esq**6*spinavge
      &   *dble(amp(uqbq_uqbq,h1,h2,h3,h5)
      & *dconjg(amp(uqbq_uqbq,h1,h2,h3,h5)))
+      print *,"temp(2,5)=",temp(2,5)
 
       if (interference) then
       temp(2,5)=temp(2,5)+esq**6*spinavge
@@ -175,6 +183,7 @@ C-----setup for (uqbq_uqbq) (2,5)->(2,5)
      &   *dble(amp(uqbq_uqbq,h1,h2,h3,h5)
      & *dconjg(amp_swap(uqbq_uqbq,h1,h2,h3,h5)))
          endif
+      print *,"temp(2,5) after interf=",temp(2,5)
       endif
 
       enddo
@@ -192,6 +201,7 @@ C-----setup for (uqcq_uqcq) (2,4)->(2,4)
       temp(2,4)=temp(2,4)+esq**6*spinavge
      &   *dble(amp(uqcq_uqcq,h1,h2,h3,h5)
      & *dconjg(amp(uqcq_uqcq,h1,h2,h3,h5)))
+      print *,"temp(2,4)=",temp(2,4)
 
       if (interference) then
       temp(2,4)=temp(2,4)+esq**6*spinavge
@@ -202,6 +212,7 @@ C-----setup for (uqcq_uqcq) (2,4)->(2,4)
      &   *dble(amp(uqcq_uqcq,h1,h2,h3,h5)
      & *dconjg(amp_swap(uqcq_uqcq,h1,h2,h3,h5)))
          endif
+      print *,"temp(2,4) after interf.=",temp(2,4)
       endif
 
       enddo
@@ -219,6 +230,7 @@ C-----setup for uqsq_dqcq W diagrams (2,3)->(1,4)
       tempw(2,3)=tempw(2,3)+esq**6*spinavge
      &   *dble(amp(uqsq_dqcq,h1,h2,h3,h5)
      & *dconjg(amp(uqsq_dqcq,h1,h2,h3,h5)))
+      print *,"tempw(2,3)=",tempw(2,3)
 
       if (interference) then
       tempw(2,3)=tempw(2,3)+esq**6*spinavge
@@ -229,6 +241,7 @@ C-----setup for uqsq_dqcq W diagrams (2,3)->(1,4)
      &   *dble(amp(uqsq_dqcq,h1,h2,h3,h5)
      & *dconjg(amp_swap(uqsq_dqcq,h1,h2,h3,h5)))
          endif
+      print *,"tempw(2,3) after interf=",tempw(2,3)
       endif
 
       enddo
@@ -246,6 +259,7 @@ C-----setup for dqcq_uqsq (1,4)-->(2,3)
       tempw(1,4)=tempw(1,4)+esq**6*spinavge
      &   *dble(amp(dqcq_uqsq,h1,h2,h3,h5)
      & *dconjg(amp(dqcq_uqsq,h1,h2,h3,h5)))
+      print *,"tempw(1,4)=",tempw(1,4)
 
       if (interference) then
       tempw(1,4)=tempw(1,4)+esq**6*spinavge
@@ -256,6 +270,7 @@ C-----setup for dqcq_uqsq (1,4)-->(2,3)
      &   *dble(amp(dqcq_uqsq,h1,h2,h3,h5)
      & *dconjg(amp_swap(dqcq_uqsq,h1,h2,h3,h5)))
          endif
+      print *,"tempw(1,4) after interf=",tempw(1,4)
       endif
 
       enddo
@@ -272,6 +287,7 @@ C-----setup for (dqcq_dqcq) (1,4)-->(1,4)
       temp(1,4)=temp(1,4)+esq**6*spinavge
      &   *dble(amp(dqcq_dqcq,h1,h2,h3,h5)
      & *dconjg(amp(dqcq_dqcq,h1,h2,h3,h5)))
+      print *,"temp(1,4)=",temp(1,4)
 
       if (interference) then
       temp(1,4)=temp(1,4)+esq**6*spinavge
@@ -282,6 +298,7 @@ C-----setup for (dqcq_dqcq) (1,4)-->(1,4)
      &   *dble(amp(dqcq_dqcq,h1,h2,h3,h5)
      & *dconjg(amp_swap(dqcq_dqcq,h1,h2,h3,h5)))
          endif
+      print *,"temp(1,4) after interf=",temp(1,4)
       endif
 
       enddo
@@ -307,6 +324,7 @@ C-----setup for dquq_dquq W diagrams (1,2)-->(1,2)
      &   *dble(ampa(dquq_dquq,h1,h2,h3,h5)
      & *dconjg(ampb(dquq_dquq,h1,h2,h3,h5)))
       endif
+      print *,"temp(1,2)=",temp(1,2)
 
       if (interference) then
       temp(1,2)=temp(1,2)+esq**6*spinavge
@@ -336,6 +354,7 @@ C-----setup for dquq_dquq W diagrams (1,2)-->(1,2)
      & *dconjg(ampb(dquq_dquq,h1,h2,h3,h5)))
       endif
          endif
+      print *,"temp(1,2) after interf=",temp(1,2)
       endif
 
       enddo
@@ -354,6 +373,7 @@ C-----setup for (dqsq_dqsq) (1,3)-->(1,3)
       temp(1,3)=temp(1,3)+esq**6*spinavge
      &   *dble(amp(dqsq_dqsq,h1,h2,h3,h5)
      & *dconjg(amp(dqsq_dqsq,h1,h2,h3,h5)))
+      print *,"temp(1,3)=",temp(1,3)
 
       if (interference) then
       temp(1,3)=temp(1,3)+esq**6*spinavge
@@ -364,6 +384,7 @@ C-----setup for (dqsq_dqsq) (1,3)-->(1,3)
      &   *dble(amp(dqsq_dqsq,h1,h2,h3,h5)
      & *dconjg(amp_swap(dqsq_dqsq,h1,h2,h3,h5)))
          endif
+      print *,"temp(1,3) after interf=",temp(1,3)
       endif
 
       enddo
@@ -392,6 +413,7 @@ C-----setup for ((uquq_uquq)  (2,2)-->(2,2)
      & *dble(ampa(uquq_uquq,h1,h2,h3,h5)
      & *dconjg(ampb(uquq_uquq,h1,h2,h3,h5)))
       endif
+      print *,"temp(2,2)=",temp(2,2)
 
       if (interference) then
       temp(2,2)=temp(2,2)+esq**6*spinavge
@@ -421,6 +443,7 @@ C-----setup for ((uquq_uquq)  (2,2)-->(2,2)
      & *dconjg(ampb(uquq_uquq,h1,h2,h3,h5)))
       endif
          endif
+      print *,"temp(2,2) after interf=",temp(2,2)
       endif
 
       enddo
@@ -447,6 +470,7 @@ C-----setup for ((dqdq_dqdq)  (1,1)-->(1,1)
      & *dble(ampa(dqdq_dqdq,h1,h2,h3,h5)
      & *dconjg(ampb(dqdq_dqdq,h1,h2,h3,h5)))
       endif
+      print *,"temp(1,1)=",temp(1,1)
 
       if (interference) then
       temp(1,1)=temp(1,1)+esq**6*spinavge
@@ -476,6 +500,7 @@ C-----setup for ((dqdq_dqdq)  (1,1)-->(1,1)
      & *dconjg(ampb(dqdq_dqdq,h1,h2,h3,h5)))
       endif
          endif
+      print *,"temp(1,1) after interf=",temp(1,1)
       endif
 
       enddo

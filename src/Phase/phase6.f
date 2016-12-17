@@ -1,6 +1,7 @@
       subroutine phase6(r,p1,p2,p3,p4,p5,p6,p7,p8,wt,*)
       implicit none
       include 'constants.f'
+      include 'runstring.f'
       include 'masses.f'
       include 'mxdim.f'
       include 'zerowidth.f'
@@ -8,8 +9,9 @@
       include 'breit.f'
       include 'limits.f'
       include 'ipsgen.f'
+      include 'spinzerohiggs_anomcoupl.f'
 c******* generate phase space for 2-->4 process
-c******* r(mxdim),p1(4),p2(4) are inputs reversed in sign from physical values 
+c******* r(mxdim),p1(4),p2(4) are inputs reversed in sign from physical values
 c---- phase space for -p1-p2 --> p5+p6+p3+p4+p7+p8
 c---- with all 2 pi's (ie 1/(2*pi)^14)
       logical oldzerowidth,bw34_56
@@ -29,7 +31,7 @@ c---- with all 2 pi's (ie 1/(2*pi)^14)
       enddo
       smin=mb**2
 
-c---- calculate momenta of top and bbbar      
+c---- calculate momenta of top and bbbar
       n2=1
       n3=1
       if (
@@ -67,19 +69,38 @@ c---- calculate momenta of top and bbbar
         zerowidth=oldzerowidth
       elseif ((case .eq. 'qqZZqq') .or. (case .eq. 'qqWWqq')) then
 c--- Three different branches depending on cuts
-        if (m3456max .lt. 200d0) then
-c------ all events should be close to Higgs peak: use Higgs BW with 0.1 GeV width
-          call phi1_2bw(r(1),r(2),r(3),r(4),
-     &                  p12,p3456,p78,hmass,0.1d0,wt12,*99)
+        if ( (
+     &   ((m3456max .ge. hmass) .and. (m3456min .le. hmass)) .or.
+     &   ((m3456max .ge. h2mass) .and. (m3456min .le. h2mass))
+     &   ) .and. (runstring(4:5) .ne. 'BO')
+     &   ) then
+            if (hmass.ge.zip .and. h2mass.ge.zip) then
+              if (h2mass.gt.hmass) then
+         call phi1_2bw(r(1),r(2),r(3),r(4),
+     &                 p12,p3456,p78,h2mass,dabs(h2mass-hmass),wt12,*99)
+              else
+         call phi1_2bw(r(1),r(2),r(3),r(4),
+     &                  p12,p3456,p78,hmass,dabs(h2mass-hmass),wt12,*99)
+              endif
+            else if (hmass.ge.zip) then
+              if (10d0*hwidth .lt. hmass) then
+         call phi1_2bw(r(1),r(2),r(3),r(4),
+     &                  p12,p3456,p78,hmass,10d0*hwidth,wt12,*99)
+              else
+         call phi1_2bw(r(1),r(2),r(3),r(4),
+     &                  p12,p3456,p78,hmass,hmass,wt12,*99)
+              endif
+            else
+              if (10d0*h2width .lt. h2mass) then
+         call phi1_2bw(r(1),r(2),r(3),r(4),
+     &                  p12,p3456,p78,h2mass,10d0*hwidth,wt12,*99)
+              else
+         call phi1_2bw(r(1),r(2),r(3),r(4),
+     &                  p12,p3456,p78,h2mass,h2mass,wt12,*99)
+              endif
+            endif
         else
-          if (m3456min .gt. 135d0) then
-c------ range does not include peak so do not use BW form at all 
-          call phi1_2nobw(r(1),r(2),r(3),r(4),p12,p3456,p78,wt12,*99)
-          else
-c------ entire range of m3456, including peak:  use BW at Higgs mass with 10 GeV width 
-          call phi1_2bw(r(1),r(2),r(3),r(4),
-     &                  p12,p3456,p78,hmass,10d0,wt12,*99)
-          endif
+         call phi1_2nobw(r(1),r(2),r(3),r(4),p12,p3456,p78,wt12,*99)
         endif
         call phi1_2(r(5),r(6),r(7),r(8),p3456,p56,p34,wt3456,*99)
         call phi3m0(r(13),r(14),p34,p3,p4,wt34,*99)
@@ -95,19 +116,38 @@ c------ for qqWWqq, interchange 4<->6
         return
       elseif (case .eq. 'qqVVqq') then
 c--- Three different branches depending on cuts
-        if (m3456max .lt. 200d0) then
-c------ all events should be close to Higgs peak: use Higgs BW with 0.1 GeV width
-          call phi1_2bw(r(1),r(2),r(3),r(4),
-     &                  p12,p3456,p78,hmass,0.1d0,wt12,*99)
+        if ( (
+     &   ((m3456max .ge. hmass) .and. (m3456min .le. hmass)) .or.
+     &   ((m3456max .ge. h2mass) .and. (m3456min .le. h2mass))
+     &   ) .and. (runstring(4:5) .ne. 'BO')
+     &   ) then
+            if (hmass.ge.zip .and. h2mass.ge.zip) then
+              if (h2mass.gt.hmass) then
+         call phi1_2bw(r(1),r(2),r(3),r(4),
+     &                 p12,p3456,p78,h2mass,dabs(h2mass-hmass),wt12,*99)
+              else
+         call phi1_2bw(r(1),r(2),r(3),r(4),
+     &                  p12,p3456,p78,hmass,dabs(h2mass-hmass),wt12,*99)
+              endif
+            else if (hmass.ge.zip) then
+              if (10d0*hwidth .lt. hmass) then
+         call phi1_2bw(r(1),r(2),r(3),r(4),
+     &                  p12,p3456,p78,hmass,10d0*hwidth,wt12,*99)
+              else
+         call phi1_2bw(r(1),r(2),r(3),r(4),
+     &                  p12,p3456,p78,hmass,hmass,wt12,*99)
+              endif
+            else
+              if (10d0*h2width .lt. h2mass) then
+         call phi1_2bw(r(1),r(2),r(3),r(4),
+     &                  p12,p3456,p78,h2mass,10d0*hwidth,wt12,*99)
+              else
+         call phi1_2bw(r(1),r(2),r(3),r(4),
+     &                  p12,p3456,p78,h2mass,h2mass,wt12,*99)
+              endif
+            endif
         else
-          if (m3456min .gt. 135d0) then
-c------ range does not include peak so do not use BW form at all 
-          call phi1_2nobw(r(1),r(2),r(3),r(4),p12,p3456,p78,wt12,*99)
-          else
-c------ entire range of m3456, including peak:  use BW at Higgs mass with 10 GeV width 
-          call phi1_2bw(r(1),r(2),r(3),r(4),
-     &                  p12,p3456,p78,hmass,10d0,wt12,*99)
-          endif
+         call phi1_2nobw(r(1),r(2),r(3),r(4),p12,p3456,p78,wt12,*99)
         endif
 c--- Further branching of p3456 depends on ipsgen
         if (ipsgen .eq. 1) then
@@ -186,7 +226,7 @@ c--- wt_zz must also suppress possible photon pole for Z(34), in addition to BW
         call phi3m0(r(15),r(16),p78,p7,p8,wt78,*99)
         wt=wt0*wt12*wt3456*wt34*wt56*wt78
       return
-      elseif ((case .eq. 'HWWjet') 
+      elseif ((case .eq. 'HWWjet')
      . .or. (case .eq. 'HWW2jt')
      . .or. (case .eq. 'qq_HWW')) then
 c--- In the case of HWWjet, we should generate s3456 according to
@@ -294,7 +334,7 @@ c      write(6,*) '678',(p678(4)**2-p678(3)**2-p678(2)**2-p678(1)**2)
 
       mass3=wmass
       width3=wwidth
-      if (   (case .eq. 'tt_bbh')  
+      if (   (case .eq. 'tt_bbh')
      .  .or. (case .eq. 'tt_bbl')
      .  .or. (case .eq. 'tt_ldk')
      .  .or. (case .eq. 'tt_hdk')
@@ -323,16 +363,16 @@ c      write(6,*) '34',(p34(4)**2-p34(3)**2-p34(2)**2-p34(1)**2)
 c      write(6,*) '78',(p78(4)**2-p78(3)**2-p78(2)**2-p78(1)**2)
 
       call phi3m0(r(13),r(14),p34,p3,p4,wt34,*99)
-      if   ((case .eq. 'Wtbwdk') 
+      if   ((case .eq. 'Wtbwdk')
      . .or. (case .eq. 'W_twdk')
      . ) then
       call phi3m0(r(15),r(16),p56,p5,p6,wt78,*99)
       else
       call phi3m0(r(15),r(16),p78,p7,p8,wt78,*99)
       endif
-      
+
       wt=wt0*wt12*wt345*wt678*wt34*wt78
-      
+
       return
  99   wt=0d0
       zerowidth=oldzerowidth

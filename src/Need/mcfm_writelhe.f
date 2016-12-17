@@ -6,7 +6,7 @@ c--- Routine to write a generic LHE file for a given MCFM process
       include 'eventbuffer.f'
       include 'facscale.f'
       include 'qcdcouple.f'
-      include 'maxwt.f' 
+      include 'maxwt.f'
       include 'montecarlorpp.f'
       include 'hepeup.f'
       include 'heprup.f'
@@ -40,14 +40,14 @@ c--- (randomly, based on weights passed in xmsq)
 c--- fill simple particle labels for final state
       do i=3,ilomomenta
         idup(i)=plabeltoPDG(plabel(i))
-        istup(i)=1    
+        istup(i)=1
       enddo
 
 c--- copy array pin to new array p
       p(:,:)=pin(:,:)
 
 c--- get parent combinations: at the end of this loop there will be ip of them
-      call getparents(ip_parent,id_parent) 
+      call getparents(ip_parent,id_parent)
       ip=1
       do while (ip_parent(ip) .gt. 0)
         j=ip_parent(ip)
@@ -106,13 +106,18 @@ c---   for no jets in the final state, straightforward
           icolup(2,2)=501
         endif
       else
-        write(6,*) 'LHE output not yet available for nqcdjets=',nqcdjets
-        stop
+        !write(6,*) 'LHE output not yet available for nqcdjets=',nqcdjets
+        !stop
+        ! Workaround until better solution is found
+        icolup(1,1)=501
+        icolup(2,1)=502
+        icolup(1,2)=502
+        icolup(2,2)=501
       endif
 
 c--- number of entries to write
       nup=ilomomenta+ip
-      
+
 c--- fill momenta
       do i=1,nup
         do nu=1,4
@@ -123,7 +128,7 @@ c--- fill momenta
           else
             xx=p_parent(i-ilomomenta,nu)
           endif
-          pup(nu,i)=xx        
+          pup(nu,i)=xx
         enddo
         if     (i .le. 2) then
           mm=0d0
@@ -149,14 +154,14 @@ c--- Miscellaneous info
       aqedup=-1d0
       aqcdup=as
 
-c--- junk entries          
+c--- junk entries
       vtimup(:)=0d0
       spinup(:)=9d0
 
 c--- on the first pass, open unit 84 with the right file name and write header
-      if(first) then 
-         first=.false. 
-         ilen=len_trim(runname) 
+      if(first) then
+         first=.false.
+         ilen=len_trim(runname)
          outputstring=runname(1:ilen)//'.lhe'
          open(unit=84,file=outputstring,status='unknown')
          call init_lhe_events(84)
@@ -165,66 +170,66 @@ c--- on the first pass, open unit 84 with the right file name and write header
 c--- increment event counter and write out entry to unit 84
       numstored=numstored+1
       call lhefwritev(84)
-      
+
       return
       end
-      
+
 
 c--- Routine to specify parent particles
       subroutine getparents(ip_parent,id_parent)
       implicit none
-      include 'nwz.f' 
-      include 'process.f' 
+      include 'nwz.f'
+      include 'process.f'
       include 'montecarlorpp.f'
       integer j,ip_parent(10),id_parent(10)
-      
+
       ip_parent(:)=0
-      
+
       if ( (case.eq.'HZZ_4l') .or. (case.eq.'HZZ_tb')
      & .or.(case.eq.'HZZint') .or. (case.eq.'ggZZ4l')
      & .or.(case.eq.'HZZH+i') .or. (case.eq.'ZZlept')
-     & .or.(case.eq.'ggZZbx')) then 
+     & .or.(case.eq.'ggZZbx')) then
         ip_parent= (/ 34, 56, (0,j=1,8) /)
         id_parent= (/ z0_pdg, z0_pdg, (0,j=1,8) /)
       endif
-      
+
       if ( (case.eq.'HWW_4l') .or. (case.eq.'HWW_tb')
      & .or.(case.eq.'HWWint') .or. (case.eq.'ggWW4l')
      & .or.(case.eq.'HWWH+i') .or. (case.eq.'WWqqbr')
-     & .or.(case.eq.'ggWWbx')) then 
+     & .or.(case.eq.'ggWWbx')) then
         ip_parent= (/ 34, 56, (0,j=1,8) /)
         id_parent= (/ wp_pdg, wm_pdg, (0,j=1,8) /)
       endif
-      
-      if (case.eq.'W_only') then 
+
+      if (case.eq.'W_only') then
         ip_parent= (/ 34, (0,j=1,9) /)
         id_parent= (/ wp_pdg*nwz, (0,j=1,9) /)
       endif
-      
-      if (case.eq.'Z_only') then 
+
+      if (case.eq.'Z_only') then
         ip_parent= (/ 34, (0,j=1,9) /)
         id_parent= (/ z0_pdg, (0,j=1,9) /)
       endif
-      
-      if (case.eq.'ggfus0') then 
+
+      if (case.eq.'ggfus0') then
         ip_parent= (/ 34, (0,j=1,9) /)
         id_parent= (/ h_pdg, (0,j=1,9) /)
       endif
-      
+
       if ( (case.eq.'WWqqbr') .or. (case.eq.'WWnpol')
-     & .or.(case.eq.'WWqqdk')) then 
+     & .or.(case.eq.'WWqqdk')) then
         ip_parent= (/ 34, 56, (0,j=1,8) /)
         id_parent= (/ wp_pdg, wm_pdg, (0,j=1,8) /)
       endif
-      
-      if (case.eq.'WZbbar') then 
+
+      if (case.eq.'WZbbar') then
         ip_parent= (/ 34, 56, (0,j=1,8) /)
         id_parent= (/ wp_pdg*nwz, z0_pdg, (0,j=1,8) /)
       endif
-      
+
       return
       end
-      
+
 
 c--- Routine to transform massless momenta to massive momenta,
 c--- satisfying constraint that parent particle momentum is unchanged
@@ -242,7 +247,7 @@ c---  j1,j2 -> entries in momentum array for daughters
       include 'masses.f'
       double precision p(mxpart,4),dot,m,beta,p1(4),p2(4)
       integer idparent,id1,id2,j1,j2,imass
-      
+
       if     (idparent .eq. z0_pdg) then
 c--- Z parent
         if     ((abs(id1).eq.el_pdg) .and. (abs(id2).eq.el_pdg)) then
@@ -307,17 +312,17 @@ c--- W parent
         write(6,*) 'Unexpected parent in fixmasses: idparent=',idparent
         stop
       endif
-      
+
       return
       end
-      
+
 
 c--- Routine to convert MCFM plabel to PDG number
       integer function plabeltoPDG(ch)
       implicit none
       include 'montecarlorpp.f'
       character*2 ch
-      
+
       if     (ch .eq. 'el') then
         plabeltoPDG=el_pdg
       elseif (ch .eq. 'ea') then
@@ -355,7 +360,7 @@ c--- Routine to convert MCFM plabel to PDG number
 
       return
       end
-      
+
 
       subroutine mcfm_getflavour(msq,j,k)
       implicit none
@@ -363,18 +368,18 @@ c--- Routine to convert MCFM plabel to PDG number
       integer j,k
       double precision msq(-nf:nf,-nf:nf),msqsum,ran2,ptr
 
-c--- total of absolute weights      
+c--- total of absolute weights
       msqsum=0d0
       do j=-nf,nf
       do k=-nf,nf
         msqsum=msqsum+abs(msq(j,k))
       enddo
       enddo
-      
+
 c--- random weight between 0 and this total
       ptr=msqsum*ran2()
 
-c--- recover corresponding j,k      
+c--- recover corresponding j,k
       msqsum=0d0
       do j=-nf,nf
       do k=-nf,nf
@@ -385,5 +390,5 @@ c--- recover corresponding j,k
 
       return
       end
-      
-      
+
+
