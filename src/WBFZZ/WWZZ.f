@@ -65,7 +65,7 @@ c--- special fix for Madgraph check
       facHiggs = 2d0*sqzmass*cxw**(-2)*(4d0*cwmass2/vevsq*cxw/esq)
 
 C---setting up couplings dependent on whether we are doing 34-line or 56-line
-      if (n3+n4 == 7) then
+      if ((n3+n4 == 7) .or. (n3+n4 == 9)) then
       xl1=l1
       xr1=r1
       xq1=q1

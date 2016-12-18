@@ -55,7 +55,7 @@ C-----end statement functions
       propz56=s56-dcmplx(zmass**2,-zmass*zwidth)
 
 C---set up couplings dependent on whether we are doing 34- or 56- line
-      if (i3+i4 == 7) then
+      if ((i3+i4 == 7) .or. (i3+i3 == 9)) then
       xl1=l1
       xr1=r1
       xq1=q1

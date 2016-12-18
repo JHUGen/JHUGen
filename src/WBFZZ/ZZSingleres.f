@@ -24,7 +24,7 @@ C---begin statement functions
 C---end statement functions
 
 C---setting up couplings dependent on whether we are doing 34-line or 56-line
-      if (n3+n4 == 7) then
+      if ((n3+n4 == 7) .or. (n3+n4 == 9)) then
       xl1=l1
       xr1=r1
       xq1=q1
