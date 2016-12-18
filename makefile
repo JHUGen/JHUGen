@@ -141,7 +141,8 @@ WBFFILES = \
 testWBFVVApartComb.o \
 getVVZZamps.o \
 getVVWWamps.o \
-getQQZZQQstrong.o \
+getQQZZQQstrongamps.o \
+getQQWWQQstrongamps.o \
 getvbfpoint.o \
 comparevbf.o \
 qq_WZqqstrong.o \
