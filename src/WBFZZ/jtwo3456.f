@@ -37,7 +37,7 @@ C--- statement functions
 C--- end statement functions
 
 C---setting up couplings dependent on whether we are doing 34-line or 56-line
-      if (n3+n4 == 7) then
+      if ((n3+n4 == 7) .or. (n3+n4 == 9)) then
       xl1=l1
       xr1=r1
       xq1=q1
@@ -128,7 +128,7 @@ C---setting up couplings dependent on whether we are doing 34-line or 56-line
       enddo
       enddo
       do h56=1,2
-         if (h56.eq.1) then 
+         if (h56.eq.1) then
             i5=n5
             i6=n6
          elseif (h56.eq.2) then
@@ -146,7 +146,7 @@ C---setting up couplings dependent on whether we are doing 34-line or 56-line
      & -za(i5,i4)/s456*(zba(i3,:,i4)*zb(i4,i6)+zba(i3,:,i5)*zb(i5,i6))
 
       do h34=1,2
-         if (h34.eq.1) then 
+         if (h34.eq.1) then
             i3=n3
             i4=n4
         elseif (h34.eq.2) then
