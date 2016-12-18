@@ -138,7 +138,7 @@ c---  Note 3654, this is the special ordering to agree with Madgraph
       else if( (
      & (vvhvvtoggle_vbfvh.eq.1) .and. (j.ge.9)
      & ) .or. (
-     & (vvhvvtoggle_vbfvh.eq.0) .and. (j.le.8)
+     & (vvhvvtoggle_vbfvh.eq.0) .and. (j.le.8 .and. j.ge.5)
      & )
      &  ) then
          ampb(:,:,:)=czip
