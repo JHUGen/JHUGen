@@ -95,6 +95,9 @@ c--- W- amplitudes obtained by parity transformation on W+
         p(6,:)=pin(5,:)
       endif
 
+C---call plabel/pdgid conversion
+      call convertPLabelsToPDGIds()
+
 C---setup spinors and spinorvector products
       call spinorcurr(8,p,za,zb,zab,zba)
       if (nwz .eq. -1) then

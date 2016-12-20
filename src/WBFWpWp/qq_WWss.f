@@ -94,6 +94,9 @@ c--- set identity of quark line based on nwz
       ampa(:,:,:)=czip
       ampb(:,:,:)=czip
 
+C---call plabel/pdgid conversion
+      call convertPLabelsToPDGIds()
+
 C---setup spinors and spinorvector products
       call spinorcurr(8,p,za,zb,zab,zba)
 

@@ -892,6 +892,7 @@ writeinput.o \
 writeout.o \
 dips_mass.o \
 zeromsq.o \
+convertPLabelToPDGId.o \
 HVVSpinZeroDynamicCouplings.o \
 anomhvvamps.o
 

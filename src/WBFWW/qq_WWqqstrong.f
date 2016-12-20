@@ -47,7 +47,7 @@ c--- and the following lines set up the appropriate masses and sin^2(theta_w)
       cwmass2=dcmplx(wmass**2,0d0)
       czmass2=dcmplx(zmass**2,0d0)
       cxw=dcmplx(xw,0d0)
-      
+
 c--- note that this is the special ordering to agree with Madgraph
       i3=3
       i4=6
@@ -65,6 +65,9 @@ c      i6=6
       amp(:,:,:)=czip
       ampa(:,:,:)=czip
       ampb(:,:,:)=czip
+
+C---call plabel/pdgid conversion
+      call convertPLabelsToPDGIds()
 
 C---setup spinors and spinorvector products
       call spinorcurr(8,p,za,zb,zab,zba)
@@ -97,19 +100,19 @@ c--- flavor-changing contributions
       call jonewstrong(j8(j),i3,i4,j2(j),za,zb,zab,j8_34_2g)
       call jonewstrong(j7(j),i5,i6,j1(j),za,zb,zab,j7_56_1g)
 
-C-----setup for (dqcq_dqcq) 
+C-----setup for (dqcq_dqcq)
       do h1=1,2
       do h2=1,2
       amp(dqcq_dqcq,h1,h2)=
      & +jtwo17(1,2,h1,h2)+jtwo28(2,1,h2,h1)
-     
+
       temp(1,4)=temp(1,4)+esq**4*gsq**2*Colorfac*spinavge
      &   *dble(amp(dqcq_dqcq,h1,h2)
      & *dconjg(amp(dqcq_dqcq,h1,h2)))
       enddo
       enddo
 
-C-----setup for (dqcq_uqsq) 
+C-----setup for (dqcq_uqsq)
       amp(dqcq_uqsq,1,1)=
      & +cdotpr(j7_34_1g(1,:),j8_56_2g(2,:))/s7341
 
@@ -117,7 +120,7 @@ C-----setup for (dqcq_uqsq)
      &   *dble(amp(dqcq_uqsq,1,1)
      & *dconjg(amp(dqcq_uqsq,1,1)))
 
-C-----setup for (uqcq_uqcq) 
+C-----setup for (uqcq_uqcq)
       do h1=1,2
       do h2=1,2
 
@@ -133,7 +136,7 @@ c--- contribution from jcentre
       enddo
 
 
-C-----setup for (dqsq_dqsq) 
+C-----setup for (dqsq_dqsq)
       do h1=1,2
       do h2=1,2
 
@@ -149,8 +152,8 @@ c--- contribution from jcentre
       enddo
       temp(1,5)=temp(1,3)
       temp(3,5)=temp(1,3)
-      
-C-----setup for (dqdq_dqdq) 
+
+C-----setup for (dqdq_dqdq)
       do h1=1,2
       do h2=1,2
 
@@ -178,8 +181,8 @@ c-------- ampb
       enddo
       temp(3,3)=temp(1,1)
       temp(5,5)=temp(1,1)
-      
-C-----setup for (uquq_uquq) 
+
+C-----setup for (uquq_uquq)
       do h1=1,2
       do h2=1,2
 
@@ -207,7 +210,7 @@ c-------- ampb
       enddo
       temp(4,4)=temp(2,2)
 
-C-----setup for (dquq_dquq) 
+C-----setup for (dquq_dquq)
 c-------- ampb
       ampb(dquq_dquq,1,1)=
      & +cdotpr(j8_34_1g(1,:),j7_56_2g(2,:))/s8341
@@ -228,12 +231,12 @@ c-------- ampa
      &   *dble(ampa(dquq_dquq,h1,h2)
      & *dconjg(ampb(dquq_dquq,h1,h2)))
       endif
-      
+
       enddo
       enddo
       temp(3,4)=temp(1,2)
 
-C-----setup for (uqbq_uqbq) 
+C-----setup for (uqbq_uqbq)
       do h1=1,2
       do h2=1,2
 
@@ -249,7 +252,7 @@ C-----setup for (uqbq_uqbq)
       temp(4,5)=temp(2,5)
       temp(2,3)=temp(2,5)
 
-C-----setup for (uqsq_dqcq) 
+C-----setup for (uqsq_dqcq)
       amp(uqsq_dqcq,1,1)=
      & +cdotpr(j8_34_2g(1,:),j7_56_1g(2,:))/s8342
 
@@ -309,7 +312,7 @@ c--- qbar-q
       enddo
       msq(-1,3)=msq(-1,3)+tempw(2,3)
       msq(-2,4)=msq(-2,4)+tempw(1,4)
-      
+
 c--- qbar-q
       elseif (j.eq.6) then
       do k=-nfinc,-1
@@ -346,7 +349,7 @@ c--- q-qbar
       enddo
       msq(1,-3)=msq(1,-3)+tempw(1,4)
       msq(2,-4)=msq(2,-4)+tempw(2,3)
-      
+
 c--- q-qbar extra pieces
       elseif (j.eq.9) then
       do k=1,nfinc
@@ -370,7 +373,7 @@ c--- q-qbar extra pieces
       endif
       enddo
       enddo
- 
+
 c--- qbar-q extra pieces
       elseif (j.eq.11) then
       do k=1,nfinc
@@ -394,9 +397,9 @@ c--- qbar-q extra pieces
       endif
       enddo
       enddo
-  
+
       endif
-      
+
       enddo
 
 c--- 2-gluon amplitudes
@@ -431,7 +434,7 @@ c      msq(0,0)=msq(0,0)+avegg*(msqgg(1)+msqgg(2)) ! DEBUG
       msq(-3,0)=msq(-1,0)+aveqg*msqgg(1)
       msq(-4,0)=msq(-2,0)+aveqg*msqgg(2)
       msq(-5,0)=msq(-1,0)+aveqg*msqgg(1)
-      
+
       call qq2l2nuggamp(2,8,i3,i4,i5,i6,1,7,za,zb,msqgg)
       msq(0,1)=msq(0,1)+aveqg*msqgg(1)
       msq(0,2)=msq(0,2)+aveqg*msqgg(2)
@@ -453,6 +456,6 @@ c      msq(0,0)=msq(0,0)+avegg*(msqgg(1)+msqgg(2)) ! DEBUG
    79 format(' *  sin^2(theta_w)   (',f11.5,',',f11.5,')      *')
 
       end
-      
+
 
 C LocalWords:  nfinc
