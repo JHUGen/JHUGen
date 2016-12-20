@@ -13,6 +13,7 @@ c--- q(-p1)+q(-p2)->Z(p3,p4)+Z(p5,p6)+q(p7)+q(p8);
       include 'spinzerohiggs_anomcoupl.f'
       include 'interference.f'
       include 'plabel.f'
+      include 'pid_pdg.f'
       include 'WWbits.f'
       integer nmax,jmax
       parameter(jmax=12,nmax=10)
@@ -76,35 +77,23 @@ c--- rescaling factor for Higgs amplitudes, if anomalous Higgs width
        endif
        Hbit=mult*Hbit
 
+C---call plabel/pdgid conversion
+      call convertPLabelsToPDGIds()
+
 C---setup spinors and spinorvector products
       call spinorcurr(8,p,za,zb,zab,zba)
 
 c---color factors for Z decays
       colfac34_56=1d0
-      if (
-     &      (plabel(3) .eq. 'uq')
-     & .or. (plabel(3) .eq. 'dq')
-     & .or. (plabel(3) .eq. 'cq')
-     & .or. (plabel(3) .eq. 'sq')
-     & .or. (plabel(3) .eq. 'bq')
-     & .or. (plabel(3) .eq. 'qj')
-     & .or. (plabel(3) .eq. 'pp')
-     & ) then
+      if (abs(pid_pdg(3)).ge.0 .and. abs(pid_pdg(3)).le.5) then
         colfac34_56=colfac34_56*xn
       endif
-      if (
-     &      (plabel(5) .eq. 'uq')
-     & .or. (plabel(5) .eq. 'dq')
-     & .or. (plabel(5) .eq. 'cq')
-     & .or. (plabel(5) .eq. 'sq')
-     & .or. (plabel(5) .eq. 'bq')
-     & .or. (plabel(5) .eq. 'qj')
-     & .or. (plabel(5) .eq. 'pp')
-     & ) then
+      if (abs(pid_pdg(5)).ge.0 .and. abs(pid_pdg(5)).le.5) then
         colfac34_56=colfac34_56*xn
       endif
 
       print *,plabel
+      print *,pid_pdg
 
       do j=1,jmax
       temp(:,:)=0d0
@@ -163,6 +152,97 @@ c--   Call the VVZZ amplitudes
          ampb_swap(:,:,:,:,:)=czip
       endif
 
+      do h1=1,2;do h2=1,2;do h3=1,2;do h5=1,2
+      print *,"amp(uqcq_uqcq,h1,h2,h3,h5)=",amp(uqcq_uqcq,h1,h2,h3,h5)
+      enddo;enddo;enddo;enddo
+      do h1=1,2;do h2=1,2;do h3=1,2;do h5=1,2
+      print *,"ampa(uqcq_uqcq,h1,h2,h3,h5)=",ampa(uqcq_uqcq,h1,h2,h3,h5)
+      enddo;enddo;enddo;enddo
+      do h1=1,2;do h2=1,2;do h3=1,2;do h5=1,2
+      print *,"ampb(uqcq_uqcq,h1,h2,h3,h5)=",ampb(uqcq_uqcq,h1,h2,h3,h5)
+      enddo;enddo;enddo;enddo
+
+      do h1=1,2;do h2=1,2;do h3=1,2;do h5=1,2
+      print *,"amp(uquq_uquq,h1,h2,h3,h5)=",amp(uquq_uquq,h1,h2,h3,h5)
+      enddo;enddo;enddo;enddo
+      do h1=1,2;do h2=1,2;do h3=1,2;do h5=1,2
+      print *,"ampa(uquq_uquq,h1,h2,h3,h5)=",ampa(uquq_uquq,h1,h2,h3,h5)
+      enddo;enddo;enddo;enddo
+      do h1=1,2;do h2=1,2;do h3=1,2;do h5=1,2
+      print *,"ampb(uquq_uquq,h1,h2,h3,h5)=",ampb(uquq_uquq,h1,h2,h3,h5)
+      enddo;enddo;enddo;enddo
+
+      do h1=1,2;do h2=1,2;do h3=1,2;do h5=1,2
+      print *,"amp(dqsq_dqsq,h1,h2,h3,h5)=",amp(dqsq_dqsq,h1,h2,h3,h5)
+      enddo;enddo;enddo;enddo
+      do h1=1,2;do h2=1,2;do h3=1,2;do h5=1,2
+      print *,"ampa(dqsq_dqsq,h1,h2,h3,h5)=",ampa(dqsq_dqsq,h1,h2,h3,h5)
+      enddo;enddo;enddo;enddo
+      do h1=1,2;do h2=1,2;do h3=1,2;do h5=1,2
+      print *,"ampb(dqsq_dqsq,h1,h2,h3,h5)=",ampb(dqsq_dqsq,h1,h2,h3,h5)
+      enddo;enddo;enddo;enddo
+
+      do h1=1,2;do h2=1,2;do h3=1,2;do h5=1,2
+      print *,"amp(dqdq_dqdq,h1,h2,h3,h5)=",amp(dqdq_dqdq,h1,h2,h3,h5)
+      enddo;enddo;enddo;enddo
+      do h1=1,2;do h2=1,2;do h3=1,2;do h5=1,2
+      print *,"ampa(dqdq_dqdq,h1,h2,h3,h5)=",ampa(dqdq_dqdq,h1,h2,h3,h5)
+      enddo;enddo;enddo;enddo
+      do h1=1,2;do h2=1,2;do h3=1,2;do h5=1,2
+      print *,"ampb(dqdq_dqdq,h1,h2,h3,h5)=",ampb(dqdq_dqdq,h1,h2,h3,h5)
+      enddo;enddo;enddo;enddo
+
+      do h1=1,2;do h2=1,2;do h3=1,2;do h5=1,2
+      print *,"amp(uqbq_uqbq,h1,h2,h3,h5)=",amp(uqbq_uqbq,h1,h2,h3,h5)
+      enddo;enddo;enddo;enddo
+      do h1=1,2;do h2=1,2;do h3=1,2;do h5=1,2
+      print *,"ampa(uqbq_uqbq,h1,h2,h3,h5)=",ampa(uqbq_uqbq,h1,h2,h3,h5)
+      enddo;enddo;enddo;enddo
+      do h1=1,2;do h2=1,2;do h3=1,2;do h5=1,2
+      print *,"ampb(uqbq_uqbq,h1,h2,h3,h5)=",ampb(uqbq_uqbq,h1,h2,h3,h5)
+      enddo;enddo;enddo;enddo
+
+      do h1=1,2;do h2=1,2;do h3=1,2;do h5=1,2
+      print *,"amp(dqcq_dqcq,h1,h2,h3,h5)=",amp(dqcq_dqcq,h1,h2,h3,h5)
+      enddo;enddo;enddo;enddo
+      do h1=1,2;do h2=1,2;do h3=1,2;do h5=1,2
+      print *,"ampa(dqcq_dqcq,h1,h2,h3,h5)=",ampa(dqcq_dqcq,h1,h2,h3,h5)
+      enddo;enddo;enddo;enddo
+      do h1=1,2;do h2=1,2;do h3=1,2;do h5=1,2
+      print *,"ampb(dqcq_dqcq,h1,h2,h3,h5)=",ampb(dqcq_dqcq,h1,h2,h3,h5)
+      enddo;enddo;enddo;enddo
+
+      do h1=1,2;do h2=1,2;do h3=1,2;do h5=1,2
+      print *,"amp(dquq_dquq,h1,h2,h3,h5)=",amp(dquq_dquq,h1,h2,h3,h5)
+      enddo;enddo;enddo;enddo
+      do h1=1,2;do h2=1,2;do h3=1,2;do h5=1,2
+      print *,"ampa(dquq_dquq,h1,h2,h3,h5)=",ampa(dquq_dquq,h1,h2,h3,h5)
+      enddo;enddo;enddo;enddo
+      do h1=1,2;do h2=1,2;do h3=1,2;do h5=1,2
+      print *,"ampb(dquq_dquq,h1,h2,h3,h5)=",ampb(dquq_dquq,h1,h2,h3,h5)
+      enddo;enddo;enddo;enddo
+
+      do h1=1,2;do h2=1,2;do h3=1,2;do h5=1,2
+      print *,"amp(dqcq_uqsq,h1,h2,h3,h5)=",amp(dqcq_uqsq,h1,h2,h3,h5)
+      enddo;enddo;enddo;enddo
+      do h1=1,2;do h2=1,2;do h3=1,2;do h5=1,2
+      print *,"ampa(dqcq_uqsq,h1,h2,h3,h5)=",ampa(dqcq_uqsq,h1,h2,h3,h5)
+      enddo;enddo;enddo;enddo
+      do h1=1,2;do h2=1,2;do h3=1,2;do h5=1,2
+      print *,"ampb(dqcq_uqsq,h1,h2,h3,h5)=",ampb(dqcq_uqsq,h1,h2,h3,h5)
+      enddo;enddo;enddo;enddo
+
+      do h1=1,2;do h2=1,2;do h3=1,2;do h5=1,2
+      print *,"amp(uqsq_dqcq,h1,h2,h3,h5)=",amp(uqsq_dqcq,h1,h2,h3,h5)
+      enddo;enddo;enddo;enddo
+      do h1=1,2;do h2=1,2;do h3=1,2;do h5=1,2
+      print *,"ampa(uqsq_dqcq,h1,h2,h3,h5)=",ampa(uqsq_dqcq,h1,h2,h3,h5)
+      enddo;enddo;enddo;enddo
+      do h1=1,2;do h2=1,2;do h3=1,2;do h5=1,2
+      print *,"ampb(uqsq_dqcq,h1,h2,h3,h5)=",ampb(uqsq_dqcq,h1,h2,h3,h5)
+      enddo;enddo;enddo;enddo
+
+
 C-----setup for (uqbq_uqbq) (2,5)->(2,5)
       do h1=1,2
       do h2=1,2
@@ -191,6 +271,7 @@ C-----setup for (uqbq_uqbq) (2,5)->(2,5)
       enddo
       enddo
       temp(4,5)=temp(2,5)
+
 C--------------------------------------------------------------------------
 C-----setup for (uqcq_uqcq) (2,4)->(2,4)
       do h1=1,2
@@ -511,6 +592,23 @@ C-----setup for ((dqdq_dqdq)  (1,1)-->(1,1)
       temp(5,5)=temp(1,1)
  100  continue
 
+      do k=1,nf;do l=1,nf
+      if (.not.(
+     & (
+     & (pid_pdg(j1(j)).eq.0)
+     & .or. (j1(j).le.2 .and. pid_pdg(j1(j)).eq.k)
+     & .or. (j1(j).ge.7 .and. pid_pdg(j1(j)).eq.-k)
+     & ) .and. (
+     & (pid_pdg(j2(j)).eq.0)
+     & .or. (j2(j).le.2 .and. pid_pdg(j2(j)).eq.l)
+     & .or. (j2(j).ge.7 .and. pid_pdg(j2(j)).eq.-l)
+     & )
+     & )) then
+         temp(k,l)=zip
+         tempw(k,l)=zip
+      endif
+      enddo;enddo
+
       temp(:,:) = temp(:,:)*colfac34_56*vsymfact
       tempw(:,:) = tempw(:,:)*colfac34_56*vsymfact
 
@@ -556,9 +654,11 @@ c--- qbar-q
       elseif (j.eq.5) then
       do k=-nf,-1
       msq(k,-k)=temp(-k,-k)
+      print *,"Adding temp(",-k,",",-k,") to msq(",k,",",-k,")"
       do l=1,nf
       if (abs(k) .lt. abs(l)) then
       msq(k,l)=temp(-k,l)
+      print *,"Adding temp(",-k,",",l,") to msq(",k,",",l,")"
       endif
       enddo
       enddo
@@ -571,6 +671,7 @@ c--- qbar-q
       do l=1,nf
       if (abs(k) .gt. abs(l)) then
       msq(k,l)=temp(l,-k)
+      print *,"Adding temp(",l,",",-k,") to msq(",k,",",l,")"
       endif
       enddo
       enddo
@@ -581,9 +682,11 @@ c--- q-qbar
       elseif (j.eq.7) then
       do k=-nf,-1
       msq(-k,k)=temp(-k,-k)
+      print *,"Adding temp(",-k,",",-k,") to msq(",-k,",",k,")"
       do l=1,nf
       if (abs(k) .lt. abs(l)) then
       msq(l,k)=temp(-k,l)
+      print *,"Adding temp(",-k,",",l,") to msq(",l,",",k,")"
       endif
       enddo
       enddo
@@ -596,6 +699,7 @@ c--- q-qbar
       do l=-nf,-1
       if (abs(k) .lt. abs(l)) then
       msq(-k,l)=temp(-k,-l)
+      print *,"Adding temp(",-k,",",-l,") to msq(",-k,",",l,")"
       endif
       enddo
       enddo
@@ -608,6 +712,7 @@ c--- q-qbar extra pieces
       do l=1,nf
       if (k .lt. l) then
       msq(k,-k)=msq(k,-k)+temp(k,l)
+      print *,"Adding temp(",k,",",l,") to msq(",k,",",-k,")"
       endif
       enddo
       enddo
@@ -622,6 +727,7 @@ c--- q-qbar extra pieces
       do l=1,nf
       if (k .gt. l) then
       msq(k,-k)=msq(k,-k)+temp(l,k)
+      print *,"Adding temp(",l,",",k,") to msq(",k,",",-k,")"
       endif
       enddo
       enddo
@@ -632,6 +738,7 @@ c--- qbar-q extra pieces
       do l=1,nf
       if (k .lt. l) then
       msq(-k,k)=msq(-k,k)+temp(k,l)
+      print *,"Adding temp(",k,",",l,") to msq(",-k,",",k,")"
       endif
       enddo
       enddo
@@ -646,6 +753,7 @@ c--- qbar-q extra pieces
       do l=1,nf
       if (k .gt. l) then
       msq(-k,k)=msq(-k,k)+temp(l,k)
+      print *,"Adding temp(",l,",",k,") to msq(",-k,",",k,")"
       endif
       enddo
       enddo

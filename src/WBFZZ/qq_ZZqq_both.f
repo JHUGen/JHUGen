@@ -72,8 +72,8 @@ c     ,j3_4(4,2),j5_6(4,2),
 
 c--- Begin statement functions
       t4(i1,i2,i3,i4)=
-     & +s(i1,i2)+s(i1,i3)+s(i1,i4) 
-     & +s(i2,i3)+s(i2,i4)+s(i3,i4) 
+     & +s(i1,i2)+s(i1,i3)+s(i1,i4)
+     & +s(i2,i3)+s(i2,i4)+s(i3,i4)
 c--- End statement functions
 
       msq(:,:)=0d0
@@ -83,7 +83,7 @@ c--- and the following lines set up the appropriate masses and sin^2(theta_w)
       cwmass2=dcmplx(wmass**2,0d0)
       czmass2=dcmplx(zmass**2,0d0)
       cxw=dcmplx(xw,0d0)
-      
+
       doHO=.false.
       doBO=.false.
       if     (runstring(4:5) .eq. 'HO') then
@@ -108,6 +108,9 @@ c--- rescaling factor for Higgs amplitudes, if anomalous Higgs width
          mult=chi_higgs**2
        endif
        Hbit=mult*Hbit
+
+C---call plabel/pdgid conversion
+      call convertPLabelsToPDGIds()
 
 C---setup spinors and spinorvector products
       call spinorcurr(8,p,za,zb,zab,zba)
@@ -144,7 +147,7 @@ C---setup spinors and spinorvector products
       call jzero(j7(j),j2(j),zab,zba,j7_2)
       call jzero(j8(j),j1(j),zab,zba,j8_1)
       call jzero(j8(j),j2(j),zab,zba,j8_2)
- 
+
       call jone(j7(j),3,4,j1(j),za,zb,zab,zba,j7_34_1,jw7_34_1,jl7_34_1)
       call jone(j7(j),3,4,j2(j),za,zb,zab,zba,j7_34_2,jw7_34_2,jl7_34_2)
       call jone(j7(j),5,6,j1(j),za,zb,zab,zba,j7_56_1,jw7_56_1,jl7_56_1)
@@ -177,17 +180,17 @@ C-----Singly resonant production in VBF style diagrams
      & ZZ8341,WWp8341,WWm8341)
       call ZZSingleres(j1(j),j2(j),5,6,3,4,j8(j),j7(j),za,zb,
      & ZZ8561,WWp8561,WWm8561)
-      
+
 C----ZZ->ZZ scattering with the exchange of a H
       call ZZHZZamp(j1(j),j2(j),3,4,5,6,j7(j),j8(j),
      & za,zb,ZZHamp71_82)
       call ZZHZZamp(j1(j),j2(j),3,4,5,6,j8(j),j7(j),
      & za,zb,ZZHamp81_72)
-C----Four boson vertex + WW->Higgs diagram 
+C----Four boson vertex + WW->Higgs diagram
       call WWZZ(j1(j),j2(j),3,4,5,6,j7(j),j8(j),
-     & za,zb,WWZZ71_82amp,srWWZZ71_82amp) 
+     & za,zb,WWZZ71_82amp,srWWZZ71_82amp)
       call WWZZ(j1(j),j2(j),3,4,5,6,j8(j),j7(j),
-     & za,zb,WWZZ81_72amp,srWWZZ81_72amp) 
+     & za,zb,WWZZ81_72amp,srWWZZ81_72amp)
 
 C-----setup for (uqbq_uqbq) (2,5)->(2,5)
       do h1=1,2
@@ -200,7 +203,7 @@ C-----setup for (uqbq_uqbq) (2,5)->(2,5)
      & +cdotpr(jl7_34_1(:,2,h1,h3),jl8_56_2(:,1,h2,h5))*ll7341(h3,h5)
      & +cdotpr(j7_34_1(:,2,h1,h3),jl8_56_2(:,1,h2,h5))*gmZl7341(2,h1,h5)
      & +cdotpr(jl7_34_1(:,2,h1,h3),j8_56_2(:,1,h2,h5))*gmZl7341(1,h2,h3)
-     
+
       amp(uqbq_uqbq,h1,h2,h3,h5)=amp(uqbq_uqbq,h1,h2,h3,h5)
      & +cdotpr(j7_56_1(:,2,h1,h5),j8_34_2(:,1,h2,h3))*gmZ7561(2,1,h1,h2)
      & +cdotpr(jl7_56_1(:,2,h1,h5),jl8_34_2(:,1,h2,h3))*ll7561(h5,h3)
@@ -251,7 +254,7 @@ C-----setup for (uqcq_uqcq) (2,4)->(2,4)
      & +cdotpr(jl7_56_1(:,2,h1,h5),jl8_34_2(:,2,h2,h3))*ll7561(h5,h3)
      & +cdotpr(j7_56_1(:,2,h1,h5),jl8_34_2(:,2,h2,h3))*gmZl7561(2,h1,h3)
      & +cdotpr(jl7_56_1(:,2,h1,h5),j8_34_2(:,2,h2,h3))*gmZl7561(2,h2,h5)
-      
+
       amp(uqcq_uqcq,h1,h2,h3,h5)=amp(uqcq_uqcq,h1,h2,h3,h5)
      & +cdotpr(j7_3456_1(:,2,h1,h3,h5),j8_2(:,h2))*gmZ82(2,2,h1,h2)
      & +cdotpr(j7_1(:,h1),j8_3456_2(:,2,h2,h3,h5))*gmZ71(2,2,h1,h2)
@@ -278,7 +281,7 @@ c      write(6,*) h1,h2,h3,h5,esq**6*spinavge
 c     &   *dble(amp(uqcq_uqcq,h1,h2,h3,h5)
 c     & *dconjg(amp(uqcq_uqcq,h1,h2,h3,h5)))
 c      endif
-      
+
       enddo
       enddo
       enddo
@@ -324,10 +327,10 @@ C-----setup for uqsq_dqcq W diagrams (2,3)->(1,4)
       tempw(2,3)=tempw(2,3)+esq**6*spinavge
      &   *dble(amp(uqsq_dqcq,h1,h2,h3,h5)
      & *dconjg(amp(uqsq_dqcq,h1,h2,h3,h5)))
-      enddo     
-      enddo     
-      enddo     
-      enddo     
+      enddo
+      enddo
+      enddo
+      enddo
       temp(2,3)=temp(2,5)
 
 C-----setup for dqcq_uqsq (1,4)-->(2,3)
@@ -369,10 +372,10 @@ C-----setup for dqcq_uqsq (1,4)-->(2,3)
       tempw(1,4)=tempw(1,4)+esq**6*spinavge
      &   *dble(amp(dqcq_uqsq,h1,h2,h3,h5)
      & *dconjg(amp(dqcq_uqsq,h1,h2,h3,h5)))
-      enddo     
-      enddo     
-      enddo     
-      enddo     
+      enddo
+      enddo
+      enddo
+      enddo
 
 C-----setup for (dqcq_dqcq) (1,4)-->(1,4)
       do h1=1,2
@@ -459,7 +462,7 @@ C-----setup for dquq_dquq W diagrams (1,2)-->(1,2)
 
 C--Fill Z exchange diagrams
       ampb(dquq_dquq,h1,h2,h3,h5)=amp(dqcq_dqcq,h1,h2,h3,h5)
-       
+
       temp(1,2)=temp(1,2)+esq**6*spinavge
      &   *dble(ampa(dquq_dquq,h1,h2,h3,h5)
      & *dconjg(ampa(dquq_dquq,h1,h2,h3,h5)))
@@ -501,10 +504,10 @@ C-----setup for (dqsq_dqsq) (1,3)-->(1,3)
       amp(dqsq_dqsq,h1,h2,h3,h5)=amp(dqsq_dqsq,h1,h2,h3,h5)
      & +ZZ7341(1,1,h1,h2,h3,h5)+ZZ7561(1,1,h1,h2,h5,h3)
       endif
-     
+
       amp(dqsq_dqsq,h1,h2,h3,h5)=Bbit*amp(dqsq_dqsq,h1,h2,h3,h5)
      & +Hbit*ZZHamp71_82(1,1,h1,h2,h3,h5)
-     
+
       qcd(dqsq_dqsq,h1,h2,h3,h5)=
      & +cdotpr(j7_34_1(:,1,h1,h3),j8_56_2(:,1,h2,h5))/s7341
      & +cdotpr(j7_56_1(:,1,h1,h5),j8_34_2(:,1,h2,h3))/s7561
@@ -588,7 +591,7 @@ C-----setup for ((dqdq_dqdq)  (1,1)-->(1,1)
       do h2=1,2
       do h3=1,2
       do h5=1,2
-     
+
 C-----------------ampa
       ampa(dqdq_dqdq,h1,h2,h3,h5)=amp(dqsq_dqsq,h1,h2,h3,h5)
 
@@ -695,7 +698,7 @@ c--- qbar-q
       enddo
       msq(-1,3)=msq(-1,3)+tempw(2,3)
       msq(-2,4)=msq(-2,4)+tempw(1,4)
-      
+
 c--- qbar-q
       elseif (j.eq.6) then
       do k=-nf,-1
@@ -732,7 +735,7 @@ c--- q-qbar
       enddo
       msq(1,-3)=msq(1,-3)+tempw(1,4)
       msq(2,-4)=msq(2,-4)+tempw(2,3)
-      
+
 c--- q-qbar extra pieces
       elseif (j.eq.9) then
       do k=1,nf
@@ -756,7 +759,7 @@ c--- q-qbar extra pieces
       endif
       enddo
       enddo
- 
+
 c--- qbar-q extra pieces
       elseif (j.eq.11) then
       do k=1,nf
@@ -780,7 +783,7 @@ c--- qbar-q extra pieces
       endif
       enddo
       enddo
-  
+
       endif
 
 
@@ -793,4 +796,4 @@ c--- qbar-q extra pieces
    79 format(' *  sin^2(theta_w)   (',f11.5,',',f11.5,')      *')
 
       end
-      
+

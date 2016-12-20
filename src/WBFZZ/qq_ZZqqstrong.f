@@ -52,8 +52,8 @@ c     & dquq_dquq=7,dqcq_uqsq=8,uqsq_dqcq=9)
       integer,parameter:: j8(jmax)=(/8,8,1,2,8,1,8,2,8,2,8,1/)
 c--- Begin statement functions
       t4(i1,i2,i3,i4)=
-     & +s(i1,i2)+s(i1,i3)+s(i1,i4) 
-     & +s(i2,i3)+s(i2,i4)+s(i3,i4) 
+     & +s(i1,i2)+s(i1,i3)+s(i1,i4)
+     & +s(i2,i3)+s(i2,i4)+s(i3,i4)
 c--- End statement functions
 
       msq(:,:)=0d0
@@ -63,7 +63,10 @@ c--- and the following lines set up the appropriate masses and sin^2(theta_w)
       cwmass2=dcmplx(wmass**2,0d0)
       czmass2=dcmplx(zmass**2,0d0)
       cxw=dcmplx(xw,0d0)
-      
+
+C---call plabel/pdgid conversion
+      call convertPLabelsToPDGIds()
+
 C---setup spinors and spinorvector products
       call spinorcurr(8,p,za,zb,zab,zba)
 
@@ -87,7 +90,7 @@ C---setup spinors and spinorvector products
       call jzero(j7(j),j2(j),zab,zba,j7_2)
       call jzero(j8(j),j1(j),zab,zba,j8_1)
       call jzero(j8(j),j2(j),zab,zba,j8_2)
- 
+
       call jone(j7(j),3,4,j1(j),za,zb,zab,zba,j7_34_1,jw7_34_1,jl7_34_1)
       call jone(j7(j),3,4,j2(j),za,zb,zab,zba,j7_34_2,jw7_34_2,jl7_34_2)
       call jone(j7(j),5,6,j1(j),za,zb,zab,zba,j7_56_1,jw7_56_1,jl7_56_1)
@@ -139,7 +142,7 @@ C---one-one currents
       amp(uqcq_uqcq,h1,h2,h3,h5)=
      & +cdotpr(j7_34_1(:,2,h1,h3),j8_56_2(:,2,h2,h5))/s7341
      & +cdotpr(j7_56_1(:,2,h1,h5),j8_34_2(:,2,h2,h3))/s7561
-      
+
 C---two-one currents
       amp(uqcq_uqcq,h1,h2,h3,h5)=amp(uqcq_uqcq,h1,h2,h3,h5)
      & +cdotpr(j7_3456_1(:,2,h1,h3,h5),j8_2(:,h2))/s28
@@ -244,7 +247,7 @@ C-----setup for ((dqdq_dqdq)  (1,1)-->(1,1)
       do h2=1,2
       do h3=1,2
       do h5=1,2
-     
+
 C-----------------ampa
       ampa(dqdq_dqdq,h1,h2,h3,h5)=amp(dqsq_dqsq,h1,h2,h3,h5)
 
@@ -317,7 +320,7 @@ c--- qbar-q
       endif
       enddo
       enddo
-      
+
 c--- qbar-q
       elseif (j.eq.6) then
       do k=-nf,-1
@@ -348,7 +351,7 @@ c--- q-qbar
       endif
       enddo
       enddo
-      
+
 c--- q-qbar extra pieces
       elseif (j.eq.9) then
       do k=1,nf
@@ -369,7 +372,7 @@ c--- q-qbar extra pieces
       endif
       enddo
       enddo
- 
+
 c--- qbar-q extra pieces
       elseif (j.eq.11) then
       do k=1,nf
@@ -391,7 +394,7 @@ c--- qbar-q extra pieces
       endif
       enddo
       enddo
-  
+
       endif
 
       enddo
@@ -427,7 +430,7 @@ c--- 2-gluon amplitudes
       msq(-3,0)=msq(-1,0)+aveqg*msqgg(1)
       msq(-4,0)=msq(-2,0)+aveqg*msqgg(2)
       msq(-5,0)=msq(-1,0)+aveqg*msqgg(1)
-      
+
       call qq4lggampf(2,8,3,4,5,6,1,7,3,4,za,zb,msqgg)
       msq(0,1)=msq(0,1)+aveqg*msqgg(1)
       msq(0,2)=msq(0,2)+aveqg*msqgg(2)
@@ -449,4 +452,4 @@ c--- 2-gluon amplitudes
    79 format(' *  sin^2(theta_w)   (',f11.5,',',f11.5,')      *')
 
       end
-      
+

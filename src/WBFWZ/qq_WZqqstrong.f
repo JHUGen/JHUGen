@@ -26,7 +26,7 @@ c--- at O(alpha_em^4 alpha_s^2)
      & amp(nmax,2,2,2,2),ampa(nmax,2,2,2,2),ampb(nmax,2,2,2,2),
      & k7341(4),k7561(4),k7342(4),k7562(4),
      & tmpz1(mxpart,mxpart),tmpz2(mxpart,4,mxpart)
-      double complex 
+      double complex
      & jw7_34_1g(2,4),jw7_34_2g(2,4),
      & jw8_34_1g(2,4),jw8_34_2g(2,4),
      & jz7_56_1g(4,2,2,2),jz7_56_2g(4,2,2,2),
@@ -60,6 +60,9 @@ c--- W- amplitudes obtained by parity transformation on W+
         p(5,:)=pin(6,:)
         p(6,:)=pin(5,:)
       endif
+
+C---call plabel/pdgid conversion
+      call convertPLabelsToPDGIds()
 
 C---setup spinors and spinorvector products
       call spinorcurr(8,p,za,zb,zab,zba)
@@ -101,7 +104,7 @@ c---- Z2 contributions
      & (j2(j),j1(j),3,4,5,6,j8(j),j7(j),za,zb,ampZ2_2817)
       call jZexch2strong
      & (j2(j),j1(j),3,4,5,6,j7(j),j8(j),za,zb,ampZ2_2718)
-      
+
       k7341(:)=0.5d0*(zab(j1(j),:,j1(j))+zab(3,:,3)
      & +zab(4,:,4)+zab(j7(j),:,j7(j)))
       k7561(:)=0.5d0*(zab(j1(j),:,j1(j))+zab(5,:,5)
@@ -114,7 +117,7 @@ c---- Z2 contributions
       s7561=cdotpr(k7561,k7561)
       s7562=cdotpr(k7562,k7562)
       s7342=cdotpr(k7342,k7342)
-            
+
 C-----setup for (uqsq_dqsq) (2,3)->(1,3)
       do h2=1,2
       do h5=1,2
@@ -123,7 +126,7 @@ C-----setup for (uqsq_dqsq) (2,3)->(1,3)
       amp(uqsq_dqsq,1,h2,1,h5)=amp(uqsq_dqsq,1,h2,1,h5)
      & +ampZ2_1728(1,h2,h5)
       enddo
-      enddo      
+      enddo
 
       do h1=1,2
       do h2=1,2
@@ -136,7 +139,7 @@ C-----setup for (uqsq_dqsq) (2,3)->(1,3)
       enddo
       enddo
       enddo
-      
+
 c-----setup for (cqdq_dqsq)
       do h2=1,2
       do h5=1,2
@@ -145,7 +148,7 @@ c-----setup for (cqdq_dqsq)
       amp(cqdq_dqsq,1,h2,1,h5)=amp(cqdq_dqsq,1,h2,1,h5)
      & +ampZ2_1827(1,h2,h5)
       enddo
-      enddo      
+      enddo
 
       do h1=1,2
       do h2=1,2
@@ -163,7 +166,7 @@ c-----setup for (cqdq_dqsq)
 C-----setup for (uqdq_dqdq) (2,1)->(1,1)
       ampa(uqdq_dqdq,:,:,:,:)=amp(uqsq_dqsq,:,:,:,:)
       ampb(uqdq_dqdq,:,:,:,:)=amp(cqdq_dqsq,:,:,:,:)
-      
+
       do h1=1,2
       do h2=1,2
       do h3=1,2
@@ -194,7 +197,7 @@ C-----setup for (uqcq_dqcq) (2,4)->(1,4)
      & +ampZ2_1728(2,h2,h5)
       enddo
       enddo
-      
+
       do h1=1,2
       do h2=1,2
       do h3=1,2
@@ -206,10 +209,10 @@ C-----setup for (uqcq_dqcq) (2,4)->(1,4)
       enddo
       enddo
       enddo
-      
+
 c      write(6,*) 'temp(2,4)',temp(2,4)
 c      stop
-      
+
 C-----setup for (uqcq_uqsq) (2,4)->(2,3)
       do h2=1,2
       do h5=1,2
@@ -219,7 +222,7 @@ C-----setup for (uqcq_uqsq) (2,4)->(2,3)
      & +ampZ2_2817(2,h2,h5)
       enddo
       enddo
-      
+
       do h1=1,2
       do h2=1,2
       do h3=1,2
@@ -231,7 +234,7 @@ C-----setup for (uqcq_uqsq) (2,4)->(2,3)
       enddo
       enddo
       enddo
-            
+
 C-----setup for (uquq_dquq) (2,4)->(1,4)
       ampa(uquq_dquq,:,:,:,:)=amp(uqcq_dqcq,:,:,:,:)
       do h2=1,2
@@ -242,7 +245,7 @@ C-----setup for (uquq_dquq) (2,4)->(1,4)
      & +ampZ2_2718(2,h2,h5)
       enddo
       enddo
-      
+
       do h1=1,2
       do h2=1,2
       do h3=1,2
@@ -262,7 +265,7 @@ C-----setup for (uquq_dquq) (2,4)->(1,4)
       enddo
       enddo
       enddo
-      
+
 C-----setup for (uquq_uqdq) (2,2)->(2,1) :: not canonical order, but useful for crossings
       ampa(uquq_uqdq,:,:,:,:)=amp(uqcq_uqsq,:,:,:,:)
       do h2=1,2
@@ -273,7 +276,7 @@ C-----setup for (uquq_uqdq) (2,2)->(2,1) :: not canonical order, but useful for 
      & +ampZ2_1827(2,h2,h5)
       enddo
       enddo
-      
+
       do h1=1,2
       do h2=1,2
       do h3=1,2
@@ -306,7 +309,7 @@ c--- setup for (cquq_squq) (4,2)->(3,2) :: not canonical order, but useful for c
       enddo
       enddo
       enddo
-      
+
       if (j.eq.1) then
       msq(2,3)=temp(2,3)
       msq(4,1)=temp(4,1)
@@ -342,7 +345,7 @@ c--- qbar-qbar
       msq(-4,-1)=tempb(2,4)
       msq(-1,-3)=msq(-1,-3)+temp(4,1)
       msq(-3,-1)=msq(-3,-1)+temp(2,3)
-      
+
 c--- qbar-q
       elseif (j.eq.5) then
       msq(-3,1)=temp(2,3)
@@ -378,7 +381,7 @@ c--- q-qbar
       msq(4,-3)=msq(2,-1)
       msq(4,-2)=temp(2,4)
       msq(4,-1)=tempb(2,4)+temp(2,3)
-      
+
 c      write(6,*) 'temp(2,3)',temp(2,3)
 c      write(6,*) 'temp(4,1)',temp(4,1)
 c      write(6,*) 'temp(2,2)',temp(2,2)
@@ -412,7 +415,7 @@ c--- 2-gluon amplitudes
       call qqWZggampf(7,1,3,4,5,6,2,8,3,4,za,zb,msqgg)
       msq(-1,0)=msq(-1,0)+aveqg*msqgg
       msq(-3,0)=msq(-3,0)+aveqg*msqgg
-      
+
       call qqWZggampf(2,8,3,4,5,6,1,7,3,4,za,zb,msqgg)
       msq(0,2)=msq(0,2)+aveqg*msqgg
       msq(0,4)=msq(0,4)+aveqg*msqgg
@@ -430,7 +433,7 @@ c--- swap elements to correct places for nwz=-1
         enddo
         enddo
       endif
-      
+
       return
 
    77 format(' *      W-mass^2     (',f11.5,',',f11.5,')      *')
@@ -438,4 +441,4 @@ c--- swap elements to correct places for nwz=-1
    79 format(' *  sin^2(theta_w)   (',f11.5,',',f11.5,')      *')
 
       end
-      
+

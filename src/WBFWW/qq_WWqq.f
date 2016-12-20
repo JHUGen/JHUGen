@@ -11,7 +11,7 @@ c--- q(-p1)+q(-p2)->W(p3,p4)+W(p5,p6)+q(p7)+q(p8);
       include 'anom_higgs.f'
       !include 'first.f'
       include 'spinzerohiggs_anomcoupl.f'
-      include 'plabel.f'
+      include 'pid_pdg.f'
       include 'WWbits.f'
       integer nmax,jmax
       parameter(jmax=12,nmax=10)
@@ -71,31 +71,18 @@ c--- rescaling factor for Higgs amplitudes, if anomalous Higgs width
       endif
       Hbit=mult*Hbit
 
+C---call plabel/pdgid conversion
+      call convertPLabelsToPDGIds()
+
 C---setup spinors and spinorvector products
       call spinorcurr(8,p,za,zb,zab,zba)
 
 c---color factors for W decays
       colfac34_56=1d0
-      if (
-     &      (plabel(3) .eq. 'uq')
-     & .or. (plabel(3) .eq. 'dq')
-     & .or. (plabel(3) .eq. 'cq')
-     & .or. (plabel(3) .eq. 'sq')
-     & .or. (plabel(3) .eq. 'bq')
-     & .or. (plabel(3) .eq. 'qj')
-     & .or. (plabel(3) .eq. 'pp')
-     & ) then
+      if (abs(pid_pdg(3)).ge.0 .and. abs(pid_pdg(3)).le.5) then
         colfac34_56=colfac34_56*xn
       endif
-      if (
-     &      (plabel(5) .eq. 'uq')
-     & .or. (plabel(5) .eq. 'dq')
-     & .or. (plabel(5) .eq. 'cq')
-     & .or. (plabel(5) .eq. 'sq')
-     & .or. (plabel(5) .eq. 'bq')
-     & .or. (plabel(5) .eq. 'qj')
-     & .or. (plabel(5) .eq. 'pp')
-     & ) then
+      if (abs(pid_pdg(5)).ge.0 .and. abs(pid_pdg(5)).le.5) then
         colfac34_56=colfac34_56*xn
       endif
 
