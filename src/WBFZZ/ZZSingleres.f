@@ -7,9 +7,11 @@
       include 'zcouple.f'
       include 'sprods_com.f'
       include 'zprods_decl.f'
+      include 'pid_pdg.f'
 
       double precision s17,s28,s56,t3,
      & s356,s456,s137,s147,s238,s248,xl1,xr1,xq1,xl2,xr2,xq2
+      double precision yq1,yl1,yr1 ! complementary couplings
       double complex zab2,ZZ17(2,2,2),ZZ28(2,2,2),
      & prop28,prop17,prop56,propw28,propw17,
      & ZZ(2,2,2,2,2,2),ZZ56(2,2),lZ56(0:1,2,2),
@@ -42,6 +44,51 @@ C---setting up couplings dependent on whether we are doing 34-line or 56-line
       write(6,*) 'Unexpected case ZZSingleres.f'
       stop
       endif
+
+      ! Find the complementary charges for the n3-n4 line
+      if(pid_pdg(n3).eq.0 .and. pid_pdg(n4).eq.0) then
+         ! Assign same couplings if both particles are unknown (jets).
+         yl1=xl1
+         yr1=xr1
+         yq1=xq1
+      else if(
+     & abs(pid_pdg(n3)).eq.11 .or.
+     & abs(pid_pdg(n3)).eq.13 .or.
+     & abs(pid_pdg(n3)).eq.15) then
+         ! n3-n4 is an e current
+         yl1=ln
+         yr1=rn
+         yq1=0d0
+      else if(
+     & abs(pid_pdg(n3)).eq.12 .or.
+     & abs(pid_pdg(n3)).eq.14 .or.
+     & abs(pid_pdg(n3)).eq.16) then
+         ! n3-n4 is a nu current
+         yl1=le
+         yr1=re
+         yq1=qe
+      else if(
+     & abs(pid_pdg(n3)).eq.1 .or.
+     & abs(pid_pdg(n3)).eq.3 .or.
+     & abs(pid_pdg(n3)).eq.5) then
+         ! n3-n4 is a d quark current
+         yl1=L(2)
+         yr1=R(2)
+         yq1=Q(2)
+      else if(
+     & abs(pid_pdg(n3)).eq.2 .or.
+     & abs(pid_pdg(n3)).eq.4) then
+         ! n3-n4 is a u quark current
+         yl1=L(1)
+         yr1=R(1)
+         yq1=Q(1)
+      else
+         ! n3-n4 case is unknown, kill the relevant amplitude.
+         yl1=0d0
+         yr1=0d0
+         yq1=0d0
+      endif
+
 
       s17=s(n1,n7)
       s28=s(n2,n8)
@@ -77,14 +124,14 @@ C---setting up couplings dependent on whether we are doing 34-line or 56-line
       ZZ56(2,1)=dcmplx(xq1*xq2/s56)+dcmplx(xr1*xl2)/prop56
       ZZ56(2,2)=dcmplx(xq1*xq2/s56)+dcmplx(xr1*xr2)/prop56
 
-      lZ56(0,1,1)=dcmplx(ln*xl2)/prop56
-      lZ56(0,1,2)=dcmplx(ln*xr2)/prop56
-      lZ56(0,2,1)=dcmplx(rn*xl2)/prop56
-      lZ56(0,2,2)=dcmplx(rn*xr2)/prop56
-      lZ56(1,1,1)=dcmplx(qe*xq2/s56)+dcmplx(le*xl2)/prop56
-      lZ56(1,1,2)=dcmplx(qe*xq2/s56)+dcmplx(le*xr2)/prop56
-      lZ56(1,2,1)=dcmplx(qe*xq2/s56)+dcmplx(re*xl2)/prop56
-      lZ56(1,2,2)=dcmplx(qe*xq2/s56)+dcmplx(re*xr2)/prop56
+      lZ56(0,1,1)=dcmplx(yq1*xq2/s56)+dcmplx(yl1*xl2)/prop56
+      lZ56(0,1,2)=dcmplx(yq1*xq2/s56)+dcmplx(yl1*xr2)/prop56
+      lZ56(0,2,1)=dcmplx(yq1*xq2/s56)+dcmplx(yr1*xl2)/prop56
+      lZ56(0,2,2)=dcmplx(yq1*xq2/s56)+dcmplx(yr1*xr2)/prop56
+      lZ56(1,1,1)=dcmplx(xq1*xq2/s56)+dcmplx(xl1*xl2)/prop56
+      lZ56(1,1,2)=dcmplx(xq1*xq2/s56)+dcmplx(xl1*xr2)/prop56
+      lZ56(1,2,1)=dcmplx(xq1*xq2/s56)+dcmplx(xr1*xl2)/prop56
+      lZ56(1,2,2)=dcmplx(xq1*xq2/s56)+dcmplx(xr1*xr2)/prop56
 
       i3=n3
       i4=n4
@@ -193,7 +240,7 @@ C---   *zab2(i8,i2,i3,i1)*za(i4,i5)*zab2(i7,i4,i5,i6)*zb(i2,i3);
       enddo
       enddo
 
-      if (xq1 < 0) then
+      if (xq1 < 0d0) then
       if ((h17.eq.1).and.(h28.eq.1).and.(h34.eq.1)) then
       WWm(h56)=0.25d0/(cxw**2*propw17*propw28)
      & *(srmb(h17,h28,h34,h56)*lZ56(1,h34,h56)
@@ -210,14 +257,14 @@ C---   *zab2(i8,i2,i3,i1)*za(i4,i5)*zab2(i7,i4,i5,i6)*zb(i2,i3);
 
       if ((h17.eq.1).and.(h28.eq.1).and.(h34.eq.1)) then
       WWm(h56)=0.25d0/(cxw**2*propw17*propw28)
-     & *(srpb(h17,h28,h34,h56)*lZ56(0,h34,h56)
-     &  +srpm(h17,h28,h34,h56)*lZ56(1,h34,h56)
-     &  +srpa(h17,h28,h34,h56)*lZ56(0,h34,h56))
+     & *(srpb(h17,h28,h34,h56)*lZ56(1,h34,h56)
+     &  +srpm(h17,h28,h34,h56)*lZ56(0,h34,h56)
+     &  +srpa(h17,h28,h34,h56)*lZ56(1,h34,h56))
 
       WWp(h56)=0.25d0/(cxw**2*propw17*propw28)
-     & *(srmb(h17,h28,h34,h56)*lZ56(0,h34,h56)
-     &  +srmm(h17,h28,h34,h56)*lZ56(1,h34,h56)
-     &  +srma(h17,h28,h34,h56)*lZ56(0,h34,h56))
+     & *(srmb(h17,h28,h34,h56)*lZ56(1,h34,h56)
+     &  +srmm(h17,h28,h34,h56)*lZ56(0,h34,h56)
+     &  +srma(h17,h28,h34,h56)*lZ56(1,h34,h56))
       endif
 
       endif

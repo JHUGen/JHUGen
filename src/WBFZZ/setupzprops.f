@@ -78,13 +78,13 @@ C----setup couplings and propagators
       rxw=(cone-cxw)/cxw
 
       ggWW(1,1)=
-     & dcmplx(bit*qe**2/(s34*s56))+rxw*dcmplx(le**2)/prop34/prop56
+     & dcmplx(bit*q1*q2/(s34*s56))+rxw*dcmplx(l1*l2)/prop34/prop56
       ggWW(1,2)=
-     & dcmplx(bit*qe**2/(s34*s56))+rxw*dcmplx(le*re)/prop34/prop56
+     & dcmplx(bit*q1*q2/(s34*s56))+rxw*dcmplx(l1*r2)/prop34/prop56
       ggWW(2,1)=
-     & dcmplx(bit*qe**2/(s34*s56))+rxw*dcmplx(re*le)/prop34/prop56
+     & dcmplx(bit*q1*q2/(s34*s56))+rxw*dcmplx(r1*l2)/prop34/prop56
       ggWW(2,2)=
-     & dcmplx(bit*qe**2/(s34*s56))+rxw*dcmplx(re**2)/prop34/prop56
+     & dcmplx(bit*q1*q2/(s34*s56))+rxw*dcmplx(r1*r2)/prop34/prop56
 
       do jdu1=1,2
       do jdu2=1,2

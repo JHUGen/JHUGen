@@ -70,7 +70,6 @@ c---color factors for Z decays
       amp_swap(:,:,:,:,:)=czip
       ampa_swap(:,:,:,:,:)=czip
       ampb_swap(:,:,:,:,:)=czip
-      amp=czip
 
       ! Test combination for qq'->q''q''' states
       call testWBFVVApartComb(j1(j),j2(j),j7(j),j8(j),comb1278ok)
