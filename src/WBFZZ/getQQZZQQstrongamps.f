@@ -193,6 +193,9 @@ C-----------------ampb
       enddo
       enddo
 
+      ! U.Sarica: interference terms receive extra (-) in amp**2
+      ampb(:,:,:,:,:)=-ampb(:,:,:,:,:)
+
       return
 
       end
