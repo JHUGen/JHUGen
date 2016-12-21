@@ -12,7 +12,6 @@ c--- q(-p1)+q(-p2)->Z(p3,p4)+Z(p5,p6)+q(p7)+q(p8);
 !      include 'first.f'
       include 'spinzerohiggs_anomcoupl.f'
       include 'interference.f'
-      include 'plabel.f'
       include 'pid_pdg.f'
       include 'WWbits.f'
       integer nmax,jmax
@@ -28,7 +27,7 @@ c--- q(-p1)+q(-p2)->Z(p3,p4)+Z(p5,p6)+q(p7)+q(p8);
       integer h1,h2,h3,h5
       double precision p(mxpart,4),msq(fn:nf,fn:nf),temp(fn:nf,fn:nf),
      & tempw(fn:nf,fn:nf),stat,spinavge,mult,
-     & colfac34_56
+     & colfac34_56,ampsqfac
       double complex zab(mxpart,4,mxpart),zba(mxpart,4,mxpart),
      & amp(nmax,2,2,2,2),ampa(nmax,2,2,2,2),ampb(nmax,2,2,2,2),
      & amp_swap(nmax,2,2,2,2),
@@ -45,6 +44,7 @@ c--- q(-p1)+q(-p2)->Z(p3,p4)+Z(p5,p6)+q(p7)+q(p8);
 
 !$omp threadprivate(doHO,doBO,mult)
       msq(:,:)=0d0
+      ampsqfac = esq**6*spinavge
 
 c--- This calculation uses the complex-mass scheme (c.f. arXiv:hep-ph/0605312)
 c--- and the following lines set up the appropriate masses and sin^2(theta_w)
@@ -92,9 +92,6 @@ c---color factors for Z decays
         colfac34_56=colfac34_56*xn
       endif
 
-      print *,plabel
-      print *,pid_pdg
-
       do j=1,jmax
       temp(:,:)=0d0
       tempw(:,:)=0d0
@@ -105,20 +102,11 @@ c---color factors for Z decays
       ampa_swap(:,:,:,:,:)=czip
       ampb_swap(:,:,:,:,:)=czip
 
-      print *,"Loop j=",j
-
 C--   MARKUS: adding switches to remove VH or VBF contributions
-      ! No VH-like diagram
-      !if( (vvhvvtoggle_vbfvh.eq.0) .and. (j.ge.9) ) cycle
-      ! No VBF-like diagram
-      !if( (vvhvvtoggle_vbfvh.eq.1) .and. (j.le.8) ) cycle
       if( (vvhvvtoggle_vbfvh.eq.1) .and. (j.le.4) ) cycle
-      print *,"j passes vvhvvtoggle_vbfvh=",vvhvvtoggle_vbfvh
       ! U. Sarica: Test the combination
       call testWBFVVApartComb(j1(j),j2(j),j7(j),j8(j),comb1278ok)
-      print *,"comb1278ok arguments: ",j1(j),j2(j),j7(j),j8(j)
       if (.not.comb1278ok) cycle
-      print *,"j passes comb1278ok"
 
 c--   Call the VVZZ amplitudes
       call getVVZZamps(amp,ampa,ampb,p,za,zb,zab,zba,
@@ -152,96 +140,6 @@ c--   Call the VVZZ amplitudes
          ampb_swap(:,:,:,:,:)=czip
       endif
 
-      do h1=1,2;do h2=1,2;do h3=1,2;do h5=1,2
-      print *,"amp(uqcq_uqcq,h1,h2,h3,h5)=",amp(uqcq_uqcq,h1,h2,h3,h5)
-      enddo;enddo;enddo;enddo
-      do h1=1,2;do h2=1,2;do h3=1,2;do h5=1,2
-      print *,"ampa(uqcq_uqcq,h1,h2,h3,h5)=",ampa(uqcq_uqcq,h1,h2,h3,h5)
-      enddo;enddo;enddo;enddo
-      do h1=1,2;do h2=1,2;do h3=1,2;do h5=1,2
-      print *,"ampb(uqcq_uqcq,h1,h2,h3,h5)=",ampb(uqcq_uqcq,h1,h2,h3,h5)
-      enddo;enddo;enddo;enddo
-
-      do h1=1,2;do h2=1,2;do h3=1,2;do h5=1,2
-      print *,"amp(uquq_uquq,h1,h2,h3,h5)=",amp(uquq_uquq,h1,h2,h3,h5)
-      enddo;enddo;enddo;enddo
-      do h1=1,2;do h2=1,2;do h3=1,2;do h5=1,2
-      print *,"ampa(uquq_uquq,h1,h2,h3,h5)=",ampa(uquq_uquq,h1,h2,h3,h5)
-      enddo;enddo;enddo;enddo
-      do h1=1,2;do h2=1,2;do h3=1,2;do h5=1,2
-      print *,"ampb(uquq_uquq,h1,h2,h3,h5)=",ampb(uquq_uquq,h1,h2,h3,h5)
-      enddo;enddo;enddo;enddo
-
-      do h1=1,2;do h2=1,2;do h3=1,2;do h5=1,2
-      print *,"amp(dqsq_dqsq,h1,h2,h3,h5)=",amp(dqsq_dqsq,h1,h2,h3,h5)
-      enddo;enddo;enddo;enddo
-      do h1=1,2;do h2=1,2;do h3=1,2;do h5=1,2
-      print *,"ampa(dqsq_dqsq,h1,h2,h3,h5)=",ampa(dqsq_dqsq,h1,h2,h3,h5)
-      enddo;enddo;enddo;enddo
-      do h1=1,2;do h2=1,2;do h3=1,2;do h5=1,2
-      print *,"ampb(dqsq_dqsq,h1,h2,h3,h5)=",ampb(dqsq_dqsq,h1,h2,h3,h5)
-      enddo;enddo;enddo;enddo
-
-      do h1=1,2;do h2=1,2;do h3=1,2;do h5=1,2
-      print *,"amp(dqdq_dqdq,h1,h2,h3,h5)=",amp(dqdq_dqdq,h1,h2,h3,h5)
-      enddo;enddo;enddo;enddo
-      do h1=1,2;do h2=1,2;do h3=1,2;do h5=1,2
-      print *,"ampa(dqdq_dqdq,h1,h2,h3,h5)=",ampa(dqdq_dqdq,h1,h2,h3,h5)
-      enddo;enddo;enddo;enddo
-      do h1=1,2;do h2=1,2;do h3=1,2;do h5=1,2
-      print *,"ampb(dqdq_dqdq,h1,h2,h3,h5)=",ampb(dqdq_dqdq,h1,h2,h3,h5)
-      enddo;enddo;enddo;enddo
-
-      do h1=1,2;do h2=1,2;do h3=1,2;do h5=1,2
-      print *,"amp(uqbq_uqbq,h1,h2,h3,h5)=",amp(uqbq_uqbq,h1,h2,h3,h5)
-      enddo;enddo;enddo;enddo
-      do h1=1,2;do h2=1,2;do h3=1,2;do h5=1,2
-      print *,"ampa(uqbq_uqbq,h1,h2,h3,h5)=",ampa(uqbq_uqbq,h1,h2,h3,h5)
-      enddo;enddo;enddo;enddo
-      do h1=1,2;do h2=1,2;do h3=1,2;do h5=1,2
-      print *,"ampb(uqbq_uqbq,h1,h2,h3,h5)=",ampb(uqbq_uqbq,h1,h2,h3,h5)
-      enddo;enddo;enddo;enddo
-
-      do h1=1,2;do h2=1,2;do h3=1,2;do h5=1,2
-      print *,"amp(dqcq_dqcq,h1,h2,h3,h5)=",amp(dqcq_dqcq,h1,h2,h3,h5)
-      enddo;enddo;enddo;enddo
-      do h1=1,2;do h2=1,2;do h3=1,2;do h5=1,2
-      print *,"ampa(dqcq_dqcq,h1,h2,h3,h5)=",ampa(dqcq_dqcq,h1,h2,h3,h5)
-      enddo;enddo;enddo;enddo
-      do h1=1,2;do h2=1,2;do h3=1,2;do h5=1,2
-      print *,"ampb(dqcq_dqcq,h1,h2,h3,h5)=",ampb(dqcq_dqcq,h1,h2,h3,h5)
-      enddo;enddo;enddo;enddo
-
-      do h1=1,2;do h2=1,2;do h3=1,2;do h5=1,2
-      print *,"amp(dquq_dquq,h1,h2,h3,h5)=",amp(dquq_dquq,h1,h2,h3,h5)
-      enddo;enddo;enddo;enddo
-      do h1=1,2;do h2=1,2;do h3=1,2;do h5=1,2
-      print *,"ampa(dquq_dquq,h1,h2,h3,h5)=",ampa(dquq_dquq,h1,h2,h3,h5)
-      enddo;enddo;enddo;enddo
-      do h1=1,2;do h2=1,2;do h3=1,2;do h5=1,2
-      print *,"ampb(dquq_dquq,h1,h2,h3,h5)=",ampb(dquq_dquq,h1,h2,h3,h5)
-      enddo;enddo;enddo;enddo
-
-      do h1=1,2;do h2=1,2;do h3=1,2;do h5=1,2
-      print *,"amp(dqcq_uqsq,h1,h2,h3,h5)=",amp(dqcq_uqsq,h1,h2,h3,h5)
-      enddo;enddo;enddo;enddo
-      do h1=1,2;do h2=1,2;do h3=1,2;do h5=1,2
-      print *,"ampa(dqcq_uqsq,h1,h2,h3,h5)=",ampa(dqcq_uqsq,h1,h2,h3,h5)
-      enddo;enddo;enddo;enddo
-      do h1=1,2;do h2=1,2;do h3=1,2;do h5=1,2
-      print *,"ampb(dqcq_uqsq,h1,h2,h3,h5)=",ampb(dqcq_uqsq,h1,h2,h3,h5)
-      enddo;enddo;enddo;enddo
-
-      do h1=1,2;do h2=1,2;do h3=1,2;do h5=1,2
-      print *,"amp(uqsq_dqcq,h1,h2,h3,h5)=",amp(uqsq_dqcq,h1,h2,h3,h5)
-      enddo;enddo;enddo;enddo
-      do h1=1,2;do h2=1,2;do h3=1,2;do h5=1,2
-      print *,"ampa(uqsq_dqcq,h1,h2,h3,h5)=",ampa(uqsq_dqcq,h1,h2,h3,h5)
-      enddo;enddo;enddo;enddo
-      do h1=1,2;do h2=1,2;do h3=1,2;do h5=1,2
-      print *,"ampb(uqsq_dqcq,h1,h2,h3,h5)=",ampb(uqsq_dqcq,h1,h2,h3,h5)
-      enddo;enddo;enddo;enddo
-
 
 C-----setup for (uqbq_uqbq) (2,5)->(2,5)
       do h1=1,2
@@ -249,21 +147,19 @@ C-----setup for (uqbq_uqbq) (2,5)->(2,5)
       do h3=1,2
       do h5=1,2
 
-      temp(2,5)=temp(2,5)+esq**6*spinavge
+      temp(2,5)=temp(2,5)+ampsqfac
      &   *dble(amp(uqbq_uqbq,h1,h2,h3,h5)
      & *dconjg(amp(uqbq_uqbq,h1,h2,h3,h5)))
-      print *,"temp(2,5)=",temp(2,5)
 
       if (interference) then
-      temp(2,5)=temp(2,5)+esq**6*spinavge
+      temp(2,5)=temp(2,5)+ampsqfac
      &   *dble(amp_swap(uqbq_uqbq,h1,h2,h3,h5)
      & *dconjg(amp_swap(uqbq_uqbq,h1,h2,h3,h5)))
          if(h3 .eq. h5) then
-      temp(2,5)=temp(2,5)-2d0*esq**6*spinavge/sqrt(colfac34_56)
+      temp(2,5)=temp(2,5)-2d0*ampsqfac/sqrt(colfac34_56)
      &   *dble(amp(uqbq_uqbq,h1,h2,h3,h5)
      & *dconjg(amp_swap(uqbq_uqbq,h1,h2,h3,h5)))
          endif
-      print *,"temp(2,5) after interf=",temp(2,5)
       endif
 
       enddo
@@ -279,21 +175,19 @@ C-----setup for (uqcq_uqcq) (2,4)->(2,4)
       do h3=1,2
       do h5=1,2
 
-      temp(2,4)=temp(2,4)+esq**6*spinavge
+      temp(2,4)=temp(2,4)+ampsqfac
      &   *dble(amp(uqcq_uqcq,h1,h2,h3,h5)
      & *dconjg(amp(uqcq_uqcq,h1,h2,h3,h5)))
-      print *,"temp(2,4)=",temp(2,4)
 
       if (interference) then
-      temp(2,4)=temp(2,4)+esq**6*spinavge
+      temp(2,4)=temp(2,4)+ampsqfac
      &   *dble(amp_swap(uqcq_uqcq,h1,h2,h3,h5)
      & *dconjg(amp_swap(uqcq_uqcq,h1,h2,h3,h5)))
          if(h3 .eq. h5) then
-      temp(2,4)=temp(2,4)-2d0*esq**6*spinavge/sqrt(colfac34_56)
+      temp(2,4)=temp(2,4)-2d0*ampsqfac/sqrt(colfac34_56)
      &   *dble(amp(uqcq_uqcq,h1,h2,h3,h5)
      & *dconjg(amp_swap(uqcq_uqcq,h1,h2,h3,h5)))
          endif
-      print *,"temp(2,4) after interf.=",temp(2,4)
       endif
 
       enddo
@@ -308,21 +202,19 @@ C-----setup for uqsq_dqcq W diagrams (2,3)->(1,4)
       do h3=1,2
       do h5=1,2
 
-      tempw(2,3)=tempw(2,3)+esq**6*spinavge
+      tempw(2,3)=tempw(2,3)+ampsqfac
      &   *dble(amp(uqsq_dqcq,h1,h2,h3,h5)
      & *dconjg(amp(uqsq_dqcq,h1,h2,h3,h5)))
-      print *,"tempw(2,3)=",tempw(2,3)
 
       if (interference) then
-      tempw(2,3)=tempw(2,3)+esq**6*spinavge
+      tempw(2,3)=tempw(2,3)+ampsqfac
      &   *dble(amp_swap(uqsq_dqcq,h1,h2,h3,h5)
      & *dconjg(amp_swap(uqsq_dqcq,h1,h2,h3,h5)))
          if(h3 .eq. h5) then
-      tempw(2,3)=tempw(2,3)-2d0*esq**6*spinavge/sqrt(colfac34_56)
+      tempw(2,3)=tempw(2,3)-2d0*ampsqfac/sqrt(colfac34_56)
      &   *dble(amp(uqsq_dqcq,h1,h2,h3,h5)
      & *dconjg(amp_swap(uqsq_dqcq,h1,h2,h3,h5)))
          endif
-      print *,"tempw(2,3) after interf=",tempw(2,3)
       endif
 
       enddo
@@ -337,21 +229,19 @@ C-----setup for dqcq_uqsq (1,4)-->(2,3)
       do h3=1,2
       do h5=1,2
 
-      tempw(1,4)=tempw(1,4)+esq**6*spinavge
+      tempw(1,4)=tempw(1,4)+ampsqfac
      &   *dble(amp(dqcq_uqsq,h1,h2,h3,h5)
      & *dconjg(amp(dqcq_uqsq,h1,h2,h3,h5)))
-      print *,"tempw(1,4)=",tempw(1,4)
 
       if (interference) then
-      tempw(1,4)=tempw(1,4)+esq**6*spinavge
+      tempw(1,4)=tempw(1,4)+ampsqfac
      &   *dble(amp_swap(dqcq_uqsq,h1,h2,h3,h5)
      & *dconjg(amp_swap(dqcq_uqsq,h1,h2,h3,h5)))
          if(h3 .eq. h5) then
-      tempw(1,4)=tempw(1,4)-2d0*esq**6*spinavge/sqrt(colfac34_56)
+      tempw(1,4)=tempw(1,4)-2d0*ampsqfac/sqrt(colfac34_56)
      &   *dble(amp(dqcq_uqsq,h1,h2,h3,h5)
      & *dconjg(amp_swap(dqcq_uqsq,h1,h2,h3,h5)))
          endif
-      print *,"tempw(1,4) after interf=",tempw(1,4)
       endif
 
       enddo
@@ -365,21 +255,19 @@ C-----setup for (dqcq_dqcq) (1,4)-->(1,4)
       do h3=1,2
       do h5=1,2
 
-      temp(1,4)=temp(1,4)+esq**6*spinavge
+      temp(1,4)=temp(1,4)+ampsqfac
      &   *dble(amp(dqcq_dqcq,h1,h2,h3,h5)
      & *dconjg(amp(dqcq_dqcq,h1,h2,h3,h5)))
-      print *,"temp(1,4)=",temp(1,4)
 
       if (interference) then
-      temp(1,4)=temp(1,4)+esq**6*spinavge
+      temp(1,4)=temp(1,4)+ampsqfac
      &   *dble(amp_swap(dqcq_dqcq,h1,h2,h3,h5)
      & *dconjg(amp_swap(dqcq_dqcq,h1,h2,h3,h5)))
          if(h3 .eq. h5) then
-      temp(1,4)=temp(1,4)-2d0*esq**6*spinavge/sqrt(colfac34_56)
+      temp(1,4)=temp(1,4)-2d0*ampsqfac/sqrt(colfac34_56)
      &   *dble(amp(dqcq_dqcq,h1,h2,h3,h5)
      & *dconjg(amp_swap(dqcq_dqcq,h1,h2,h3,h5)))
          endif
-      print *,"temp(1,4) after interf=",temp(1,4)
       endif
 
       enddo
@@ -394,48 +282,46 @@ C-----setup for dquq_dquq W diagrams (1,2)-->(1,2)
       do h3=1,2
       do h5=1,2
 
-      temp(1,2)=temp(1,2)+esq**6*spinavge
+      temp(1,2)=temp(1,2)+ampsqfac
      &   *dble(ampa(dquq_dquq,h1,h2,h3,h5)
      & *dconjg(ampa(dquq_dquq,h1,h2,h3,h5)))
-      temp(1,2)=temp(1,2)+esq**6*spinavge
+      temp(1,2)=temp(1,2)+ampsqfac
      &   *dble(ampb(dquq_dquq,h1,h2,h3,h5)
      & *dconjg(ampb(dquq_dquq,h1,h2,h3,h5)))
       if ((h1 .eq. 1) .and. (h2.eq. 1)) then
-      temp(1,2)=temp(1,2)-2d0/xn*esq**6*spinavge
+      temp(1,2)=temp(1,2)-2d0/xn*ampsqfac
      &   *dble(ampa(dquq_dquq,h1,h2,h3,h5)
      & *dconjg(ampb(dquq_dquq,h1,h2,h3,h5)))
       endif
-      print *,"temp(1,2)=",temp(1,2)
 
       if (interference) then
-      temp(1,2)=temp(1,2)+esq**6*spinavge
+      temp(1,2)=temp(1,2)+ampsqfac
      &   *dble(ampa_swap(dquq_dquq,h1,h2,h3,h5)
      & *dconjg(ampa_swap(dquq_dquq,h1,h2,h3,h5)))
-      temp(1,2)=temp(1,2)+esq**6*spinavge
+      temp(1,2)=temp(1,2)+ampsqfac
      &   *dble(ampb_swap(dquq_dquq,h1,h2,h3,h5)
      & *dconjg(ampb_swap(dquq_dquq,h1,h2,h3,h5)))
       if ((h1 .eq. 1) .and. (h2.eq. 1)) then
-      temp(1,2)=temp(1,2)-2d0/xn*esq**6*spinavge
+      temp(1,2)=temp(1,2)-2d0/xn*ampsqfac
      &   *dble(ampa_swap(dquq_dquq,h1,h2,h3,h5)
      & *dconjg(ampb_swap(dquq_dquq,h1,h2,h3,h5)))
       endif
          if(h3 .eq. h5) then
-      temp(1,2)=temp(1,2)-2d0*esq**6*spinavge/sqrt(colfac34_56)
+      temp(1,2)=temp(1,2)-2d0*ampsqfac/sqrt(colfac34_56)
      &   *dble(ampa(dquq_dquq,h1,h2,h3,h5)
      & *dconjg(ampa_swap(dquq_dquq,h1,h2,h3,h5)))
-      temp(1,2)=temp(1,2)-2d0*esq**6*spinavge/sqrt(colfac34_56)
+      temp(1,2)=temp(1,2)-2d0*ampsqfac/sqrt(colfac34_56)
      &   *dble(ampb(dquq_dquq,h1,h2,h3,h5)
      & *dconjg(ampb_swap(dquq_dquq,h1,h2,h3,h5)))
       if ((h1 .eq. 1) .and. (h2.eq. 1)) then
-      temp(1,2)=temp(1,2)-2d0/xn*esq**6*spinavge/sqrt(colfac34_56)
+      temp(1,2)=temp(1,2)-2d0/xn*ampsqfac/sqrt(colfac34_56)
      &   *dble(ampa(dquq_dquq,h1,h2,h3,h5)
      & *dconjg(ampb_swap(dquq_dquq,h1,h2,h3,h5)))
-      temp(1,2)=temp(1,2)-2d0/xn*esq**6*spinavge/sqrt(colfac34_56)
+      temp(1,2)=temp(1,2)-2d0/xn*ampsqfac/sqrt(colfac34_56)
      &   *dble(ampa_swap(dquq_dquq,h1,h2,h3,h5)
      & *dconjg(ampb(dquq_dquq,h1,h2,h3,h5)))
       endif
          endif
-      print *,"temp(1,2) after interf=",temp(1,2)
       endif
 
       enddo
@@ -451,21 +337,19 @@ C-----setup for (dqsq_dqsq) (1,3)-->(1,3)
       do h3=1,2
       do h5=1,2
 
-      temp(1,3)=temp(1,3)+esq**6*spinavge
+      temp(1,3)=temp(1,3)+ampsqfac
      &   *dble(amp(dqsq_dqsq,h1,h2,h3,h5)
      & *dconjg(amp(dqsq_dqsq,h1,h2,h3,h5)))
-      print *,"temp(1,3)=",temp(1,3)
 
       if (interference) then
-      temp(1,3)=temp(1,3)+esq**6*spinavge
+      temp(1,3)=temp(1,3)+ampsqfac
      &   *dble(amp_swap(dqsq_dqsq,h1,h2,h3,h5)
      & *dconjg(amp_swap(dqsq_dqsq,h1,h2,h3,h5)))
          if(h3 .eq. h5) then
-      temp(1,3)=temp(1,3)-2d0*esq**6*spinavge/sqrt(colfac34_56)
+      temp(1,3)=temp(1,3)-2d0*ampsqfac/sqrt(colfac34_56)
      &   *dble(amp(dqsq_dqsq,h1,h2,h3,h5)
      & *dconjg(amp_swap(dqsq_dqsq,h1,h2,h3,h5)))
          endif
-      print *,"temp(1,3) after interf=",temp(1,3)
       endif
 
       enddo
@@ -483,48 +367,46 @@ C-----setup for ((uquq_uquq)  (2,2)-->(2,2)
       do h3=1,2
       do h5=1,2
 
-      temp(2,2)=temp(2,2)+esq**6*spinavge
+      temp(2,2)=temp(2,2)+ampsqfac
      & *dble(ampa(uquq_uquq,h1,h2,h3,h5)
      & *dconjg(ampa(uquq_uquq,h1,h2,h3,h5)))
-      temp(2,2)=temp(2,2)+esq**6*spinavge
+      temp(2,2)=temp(2,2)+ampsqfac
      & *dble(ampb(uquq_uquq,h1,h2,h3,h5)
      & *dconjg(ampb(uquq_uquq,h1,h2,h3,h5)))
       if (h1 .eq. h2) then
-      temp(2,2)=temp(2,2)-2d0/xn*esq**6*spinavge
+      temp(2,2)=temp(2,2)-2d0/xn*ampsqfac
      & *dble(ampa(uquq_uquq,h1,h2,h3,h5)
      & *dconjg(ampb(uquq_uquq,h1,h2,h3,h5)))
       endif
-      print *,"temp(2,2)=",temp(2,2)
 
       if (interference) then
-      temp(2,2)=temp(2,2)+esq**6*spinavge
+      temp(2,2)=temp(2,2)+ampsqfac
      & *dble(ampa_swap(uquq_uquq,h1,h2,h3,h5)
      & *dconjg(ampa_swap(uquq_uquq,h1,h2,h3,h5)))
-      temp(2,2)=temp(2,2)+esq**6*spinavge
+      temp(2,2)=temp(2,2)+ampsqfac
      & *dble(ampb_swap(uquq_uquq,h1,h2,h3,h5)
      & *dconjg(ampb_swap(uquq_uquq,h1,h2,h3,h5)))
       if (h1 .eq. h2) then
-      temp(2,2)=temp(2,2)-2d0/xn*esq**6*spinavge
+      temp(2,2)=temp(2,2)-2d0/xn*ampsqfac
      & *dble(ampa_swap(uquq_uquq,h1,h2,h3,h5)
      & *dconjg(ampb_swap(uquq_uquq,h1,h2,h3,h5)))
       endif
          if(h3 .eq. h5) then
-      temp(2,2)=temp(2,2)-2d0*esq**6*spinavge/sqrt(colfac34_56)
+      temp(2,2)=temp(2,2)-2d0*ampsqfac/sqrt(colfac34_56)
      & *dble(ampa(uquq_uquq,h1,h2,h3,h5)
      & *dconjg(ampa_swap(uquq_uquq,h1,h2,h3,h5)))
-      temp(2,2)=temp(2,2)-2d0*esq**6*spinavge/sqrt(colfac34_56)
+      temp(2,2)=temp(2,2)-2d0*ampsqfac/sqrt(colfac34_56)
      & *dble(ampb(uquq_uquq,h1,h2,h3,h5)
      & *dconjg(ampb_swap(uquq_uquq,h1,h2,h3,h5)))
       if (h1 .eq. h2) then
-      temp(2,2)=temp(2,2)-2d0/xn*esq**6*spinavge/sqrt(colfac34_56)
+      temp(2,2)=temp(2,2)-2d0/xn*ampsqfac/sqrt(colfac34_56)
      & *dble(ampa(uquq_uquq,h1,h2,h3,h5)
      & *dconjg(ampb_swap(uquq_uquq,h1,h2,h3,h5)))
-      temp(2,2)=temp(2,2)-2d0/xn*esq**6*spinavge/sqrt(colfac34_56)
+      temp(2,2)=temp(2,2)-2d0/xn*ampsqfac/sqrt(colfac34_56)
      & *dble(ampa_swap(uquq_uquq,h1,h2,h3,h5)
      & *dconjg(ampb(uquq_uquq,h1,h2,h3,h5)))
       endif
          endif
-      print *,"temp(2,2) after interf=",temp(2,2)
       endif
 
       enddo
@@ -540,48 +422,46 @@ C-----setup for ((dqdq_dqdq)  (1,1)-->(1,1)
       do h3=1,2
       do h5=1,2
 
-      temp(1,1)=temp(1,1)+esq**6*spinavge
+      temp(1,1)=temp(1,1)+ampsqfac
      & *dble(ampa(dqdq_dqdq,h1,h2,h3,h5)
      & *dconjg(ampa(dqdq_dqdq,h1,h2,h3,h5)))
-      temp(1,1)=temp(1,1)+esq**6*spinavge
+      temp(1,1)=temp(1,1)+ampsqfac
      & *dble(ampb(dqdq_dqdq,h1,h2,h3,h5)
      & *dconjg(ampb(dqdq_dqdq,h1,h2,h3,h5)))
       if (h1 .eq. h2) then
-      temp(1,1)=temp(1,1)-2d0/xn*esq**6*spinavge
+      temp(1,1)=temp(1,1)-2d0/xn*ampsqfac
      & *dble(ampa(dqdq_dqdq,h1,h2,h3,h5)
      & *dconjg(ampb(dqdq_dqdq,h1,h2,h3,h5)))
       endif
-      print *,"temp(1,1)=",temp(1,1)
 
       if (interference) then
-      temp(1,1)=temp(1,1)+esq**6*spinavge
+      temp(1,1)=temp(1,1)+ampsqfac
      & *dble(ampa_swap(dqdq_dqdq,h1,h2,h3,h5)
      & *dconjg(ampa_swap(dqdq_dqdq,h1,h2,h3,h5)))
-      temp(1,1)=temp(1,1)+esq**6*spinavge
+      temp(1,1)=temp(1,1)+ampsqfac
      & *dble(ampb_swap(dqdq_dqdq,h1,h2,h3,h5)
      & *dconjg(ampb_swap(dqdq_dqdq,h1,h2,h3,h5)))
       if (h1 .eq. h2) then
-      temp(1,1)=temp(1,1)-2d0/xn*esq**6*spinavge
+      temp(1,1)=temp(1,1)-2d0/xn*ampsqfac
      & *dble(ampa_swap(dqdq_dqdq,h1,h2,h3,h5)
      & *dconjg(ampb_swap(dqdq_dqdq,h1,h2,h3,h5)))
       endif
          if(h3 .eq. h5) then
-      temp(1,1)=temp(1,1)-2d0*esq**6*spinavge/sqrt(colfac34_56)
+      temp(1,1)=temp(1,1)-2d0*ampsqfac/sqrt(colfac34_56)
      & *dble(ampa(dqdq_dqdq,h1,h2,h3,h5)
      & *dconjg(ampa_swap(dqdq_dqdq,h1,h2,h3,h5)))
-      temp(1,1)=temp(1,1)-2d0*esq**6*spinavge/sqrt(colfac34_56)
+      temp(1,1)=temp(1,1)-2d0*ampsqfac/sqrt(colfac34_56)
      & *dble(ampb(dqdq_dqdq,h1,h2,h3,h5)
      & *dconjg(ampb_swap(dqdq_dqdq,h1,h2,h3,h5)))
       if (h1 .eq. h2) then
-      temp(1,1)=temp(1,1)-2d0/xn*esq**6*spinavge/sqrt(colfac34_56)
+      temp(1,1)=temp(1,1)-2d0/xn*ampsqfac/sqrt(colfac34_56)
      & *dble(ampa(dqdq_dqdq,h1,h2,h3,h5)
      & *dconjg(ampb_swap(dqdq_dqdq,h1,h2,h3,h5)))
-      temp(1,1)=temp(1,1)-2d0/xn*esq**6*spinavge/sqrt(colfac34_56)
+      temp(1,1)=temp(1,1)-2d0/xn*ampsqfac/sqrt(colfac34_56)
      & *dble(ampa_swap(dqdq_dqdq,h1,h2,h3,h5)
      & *dconjg(ampb(dqdq_dqdq,h1,h2,h3,h5)))
       endif
          endif
-      print *,"temp(1,1) after interf=",temp(1,1)
       endif
 
       enddo
@@ -654,11 +534,9 @@ c--- qbar-q
       elseif (j.eq.5) then
       do k=-nf,-1
       msq(k,-k)=temp(-k,-k)
-      print *,"Adding temp(",-k,",",-k,") to msq(",k,",",-k,")"
       do l=1,nf
       if (abs(k) .lt. abs(l)) then
       msq(k,l)=temp(-k,l)
-      print *,"Adding temp(",-k,",",l,") to msq(",k,",",l,")"
       endif
       enddo
       enddo
@@ -671,7 +549,6 @@ c--- qbar-q
       do l=1,nf
       if (abs(k) .gt. abs(l)) then
       msq(k,l)=temp(l,-k)
-      print *,"Adding temp(",l,",",-k,") to msq(",k,",",l,")"
       endif
       enddo
       enddo
@@ -682,11 +559,9 @@ c--- q-qbar
       elseif (j.eq.7) then
       do k=-nf,-1
       msq(-k,k)=temp(-k,-k)
-      print *,"Adding temp(",-k,",",-k,") to msq(",-k,",",k,")"
       do l=1,nf
       if (abs(k) .lt. abs(l)) then
       msq(l,k)=temp(-k,l)
-      print *,"Adding temp(",-k,",",l,") to msq(",l,",",k,")"
       endif
       enddo
       enddo
@@ -699,7 +574,6 @@ c--- q-qbar
       do l=-nf,-1
       if (abs(k) .lt. abs(l)) then
       msq(-k,l)=temp(-k,-l)
-      print *,"Adding temp(",-k,",",-l,") to msq(",-k,",",l,")"
       endif
       enddo
       enddo
@@ -712,7 +586,6 @@ c--- q-qbar extra pieces
       do l=1,nf
       if (k .lt. l) then
       msq(k,-k)=msq(k,-k)+temp(k,l)
-      print *,"Adding temp(",k,",",l,") to msq(",k,",",-k,")"
       endif
       enddo
       enddo
@@ -727,7 +600,6 @@ c--- q-qbar extra pieces
       do l=1,nf
       if (k .gt. l) then
       msq(k,-k)=msq(k,-k)+temp(l,k)
-      print *,"Adding temp(",l,",",k,") to msq(",k,",",-k,")"
       endif
       enddo
       enddo
@@ -738,7 +610,6 @@ c--- qbar-q extra pieces
       do l=1,nf
       if (k .lt. l) then
       msq(-k,k)=msq(-k,k)+temp(k,l)
-      print *,"Adding temp(",k,",",l,") to msq(",-k,",",k,")"
       endif
       enddo
       enddo
@@ -753,7 +624,6 @@ c--- qbar-q extra pieces
       do l=1,nf
       if (k .gt. l) then
       msq(-k,k)=msq(-k,k)+temp(l,k)
-      print *,"Adding temp(",l,",",k,") to msq(",-k,",",k,")"
       endif
       enddo
       enddo
