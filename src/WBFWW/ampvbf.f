@@ -98,9 +98,17 @@ c--- special fix for Madgraph check
 !     new code with anomalous couplings
       amp(jdu1,jdu2,h17,h28)=czip
       if( hmass.ge.zip ) then
+         if( AnomalCouplPR.eq.1 ) then
       Amp_S_PR=anomhzzamp(p7,p1,p8,p2,1,s3456,s(p7,p1),s(p8,p2),za,zb)
+         else
+      Amp_S_PR=za(i7,i8)*zb(i1,i2)
+         endif
       ! MCFM uses W-W+!
+         if( AnomalCouplDK.eq.1 ) then
       Amp_S_DK=anomhwwamp(p5,p6,p3,p4,1,s3456,s(p5,p6),s(p3,p4),za,zb)
+         else
+      Amp_S_DK=za(i3,i5)*zb(i4,i6)
+         endif
       amp(jdu1,jdu2,h17,h28)= amp(jdu1,jdu2,h17,h28)
      &                      + propw56**(-1)*propw34**(-1)*facHiggs*
      & Hbit * ( -Amp_S_PR*Amp_S_DK
@@ -112,9 +120,17 @@ c--- special fix for Madgraph check
 
 !     adding a second resonance
       if( h2mass.ge.zip ) then
+         if( AnomalCouplPR.eq.1 ) then
       Amp_S_PR=anomhzzamp(p7,p1,p8,p2,2,s3456,s(p7,p1),s(p8,p2),za,zb)
+         else
+      Amp_S_PR=za(i7,i8)*zb(i1,i2)
+         endif
       ! MCFM uses W-W+!
+         if( AnomalCouplDK.eq.1 ) then
       Amp_S_DK=anomhwwamp(p5,p6,p3,p4,2,s3456,s(p5,p6),s(p3,p4),za,zb)
+         else
+      Amp_S_DK=za(i3,i5)*zb(i4,i6)
+         endif
       amp(jdu1,jdu2,h17,h28)= amp(jdu1,jdu2,h17,h28)
      &                      + propw56**(-1)*propw34**(-1)*facHiggs*
      & Hbit * ( -Amp_S_PR*Amp_S_DK

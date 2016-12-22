@@ -185,7 +185,7 @@ C-- MARKUS: this is the old (original) MCFM code
       Amp_S_PR=-anomhwwamp(i7,i1,i8,i2,1,s3456,s(i7,i1),s(i8,i2),za,zb)
            else
       Amp_S_PR=za(i7,i8)*zb(i2,i1)
-          endif
+           endif
            if( AnomalCouplDK.eq.1 ) then
       Amp_S_DK=-anomhzzamp(i3,i4,i5,i6,1,s3456,s(i3,i4),s(i5,i6),za,zb)
            else
@@ -205,7 +205,7 @@ C----Second resonance
       Amp_S_PR=-anomhwwamp(i7,i1,i8,i2,2,s3456,s(i7,i1),s(i8,i2),za,zb)
            else
       Amp_S_PR=za(i7,i8)*zb(i2,i1)
-          endif
+           endif
            if( AnomalCouplDK.eq.1 ) then
       Amp_S_DK=-anomhzzamp(i3,i4,i5,i6,2,s3456,s(i3,i4),s(i5,i6),za,zb)
            else

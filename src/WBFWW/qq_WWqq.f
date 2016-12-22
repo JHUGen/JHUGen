@@ -236,6 +236,23 @@ C-----setup for (uqsq_dqcq)
      &   *dble(amp(uqsq_dqcq,1,1)
      & *dconjg(amp(uqsq_dqcq,1,1)))
 
+      do k=1,nf;do l=1,nf
+      if (.not.(
+     & (
+     & (pid_pdg(j1(j)).eq.0)
+     & .or. (j1(j).le.2 .and. pid_pdg(j1(j)).eq.k)
+     & .or. (j1(j).ge.7 .and. pid_pdg(j1(j)).eq.-k)
+     & ) .and. (
+     & (pid_pdg(j2(j)).eq.0)
+     & .or. (j2(j).le.2 .and. pid_pdg(j2(j)).eq.l)
+     & .or. (j2(j).ge.7 .and. pid_pdg(j2(j)).eq.-l)
+     & )
+     & )) then
+         temp(k,l)=zip
+         tempw(k,l)=zip
+      endif
+      enddo;enddo
+
 c---- Multiply by the decay color factor
       temp(:,:) = temp(:,:)*colfac34_56
       tempw(:,:) = tempw(:,:)*colfac34_56
