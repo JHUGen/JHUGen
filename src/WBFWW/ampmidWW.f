@@ -190,14 +190,38 @@ c--- special fix for Madgraph check
 
 
 !     new code with anomalous couplings
+      Amp_S_PR=czip
+      Amp_S_DK=czip
+      Amp_T_PR=czip
+      Amp_T_DK=czip
       if( hmass.ge.zip ) then
+        if(channeltoggle_stu.ne.1) then
+          if( AnomalCouplPR.eq.1 ) then
       Amp_S_PR=anomhwwamp(i7,i1,i8,i2,1,s3456,s(i7,i1),s(i8,i2),za,zb)
+          else
+      Amp_S_PR=za(i7,i8)*zb(i1,i2)
+          endif
+          if( AnomalCouplDK.eq.1 ) then
       ! MCFM uses W-W+!
       Amp_S_DK=anomhwwamp(i5,i6,i3,i4,1,s3456,s(i5,i6),s(i3,i4),za,zb)
+          else
+      Amp_S_DK=za(i3,i5)*zb(i4,i6)
+          endif
+        endif
+        if(channeltoggle_stu.ne.0) then
       ! MCFM uses W-W+!
+          if( AnomalCouplPR.eq.1 ) then
       Amp_T_PR=-anomhwwamp(i7,i1,i3,i4,1,s1347,s(i7,i1),s(i3,i4),za,zb)
+          else
+      Amp_T_PR=za(i7,i3)*zb(i4,i1)
+          endif
+          if( AnomalCouplDK.eq.1 ) then
       ! MCFM uses W-W+!
       Amp_T_DK=-anomhwwamp(i5,i6,i8,i2,1,s1347,s(i5,i6),s(i8,i2),za,zb)
+          else
+      Amp_T_DK=za(i5,i8)*zb(i2,i6)
+          endif
+        endif
       amp = amp   !*00000
      & + Hbit*propw17**(-1)*propw28**(-1)*propw34**(-1)*propw56**(-1)*(
      &   - Amp_S_PR*Amp_S_DK*proph3456**(-1)   ! MARKUS: this is the WW-->H-->WW contribution (s-channel Higgs)
@@ -209,14 +233,38 @@ c--- special fix for Madgraph check
 !       pause
 
 !     adding a second resonance
+      Amp_S_PR=czip
+      Amp_S_DK=czip
+      Amp_T_PR=czip
+      Amp_T_DK=czip
       if( h2mass.ge.zip ) then
+        if(channeltoggle_stu.ne.1) then
+          if( AnomalCouplPR.eq.1 ) then
       Amp_S_PR=anomhwwamp(i7,i1,i8,i2,2,s3456,s(i7,i1),s(i8,i2),za,zb)
+          else
+      Amp_S_PR=za(i7,i8)*zb(i1,i2)
+          endif
+          if( AnomalCouplDK.eq.1 ) then
       ! MCFM uses W-W+!
       Amp_S_DK=anomhwwamp(i5,i6,i3,i4,2,s3456,s(i5,i6),s(i3,i4),za,zb)
+          else
+      Amp_S_DK=za(i3,i5)*zb(i4,i6)
+          endif
+        endif
+        if(channeltoggle_stu.ne.0) then
       ! MCFM uses W-W+!
+          if( AnomalCouplPR.eq.1 ) then
       Amp_T_PR=-anomhwwamp(i7,i1,i3,i4,2,s1347,s(i7,i1),s(i3,i4),za,zb)
+          else
+      Amp_T_PR=za(i7,i3)*zb(i4,i1)
+          endif
+          if( AnomalCouplDK.eq.1 ) then
       ! MCFM uses W-W+!
       Amp_T_DK=-anomhwwamp(i5,i6,i8,i2,2,s1347,s(i5,i6),s(i8,i2),za,zb)
+          else
+      Amp_T_DK=za(i5,i8)*zb(i2,i6)
+          endif
+        endif
       amp = amp   !*00000
      & + Hbit*propw17**(-1)*propw28**(-1)*propw34**(-1)*propw56**(-1)*(
      &   - Amp_S_PR*Amp_S_DK*propX3456**(-1)

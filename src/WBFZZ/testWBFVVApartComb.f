@@ -7,6 +7,10 @@
 
       partSwapOk=.true.
       if (
+     & (pid_pdg(1).eq.21) .or.
+     & (pid_pdg(2).eq.21) .or.
+     & (pid_pdg(7).eq.21) .or.
+     & (pid_pdg(8).eq.21) .or.
      & (
      & (j1.eq.7 .or. j2.eq.7) .and. (
      &      (pid_pdg(7).ge.1 .and. pid_pdg(7).le.5)
