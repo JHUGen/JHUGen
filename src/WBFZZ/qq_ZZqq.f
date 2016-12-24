@@ -83,6 +83,9 @@ C---call plabel/pdgid conversion
 C---setup spinors and spinorvector products
       call spinorcurr(8,p,za,zb,zab,zba)
 
+c---setup Z/A couplings from PDG ids
+      call couplzajk()
+
 c---color factors for Z decays
       colfac34_56=1d0
       if (abs(pid_pdg(3)).ge.0 .and. abs(pid_pdg(3)).le.5) then
@@ -107,9 +110,6 @@ C--   MARKUS: adding switches to remove VH or VBF contributions
       ! U. Sarica: Test the combination
       call testWBFVVApartComb(j1(j),j2(j),j7(j),j8(j),comb1278ok)
       if (.not.comb1278ok) cycle
-
-c--   Determine 17 and 28 couplings
-      call couplza_1728(j1(j),j2(j),j7(j),j8(j))
 
 c--   Call the VVZZ amplitudes
       call getVVZZamps(amp,ampa,ampb,p,za,zb,zab,zba,
