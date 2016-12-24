@@ -108,6 +108,9 @@ C--   MARKUS: adding switches to remove VH or VBF contributions
       call testWBFVVApartComb(j1(j),j2(j),j7(j),j8(j),comb1278ok)
       if (.not.comb1278ok) cycle
 
+c--   Determine 17 and 28 couplings
+      call couplza_1728(j1(j),j2(j),j7(j),j8(j))
+
 c--   Call the VVZZ amplitudes
       call getVVZZamps(amp,ampa,ampb,p,za,zb,zab,zba,
      & j1(j),j2(j),3,4,5,6,j7(j),j8(j),doHO,doBO)
@@ -487,6 +490,12 @@ C-----setup for ((dqdq_dqdq)  (1,1)-->(1,1)
          temp(k,l)=zip
          tempw(k,l)=zip
       endif
+      if (temp(k,l).ne.zip) then
+         print *,"temp(",k,",",l,")=",temp(k,l),"in j=",j
+      endif
+      if (tempw(k,l).ne.zip) then
+         print *,"tempw(",k,",",l,")=",tempw(k,l),"in j=",j
+      endif
       enddo;enddo
 
       temp(:,:) = temp(:,:)*colfac34_56*vsymfact
@@ -499,8 +508,32 @@ C-----setup for ((dqdq_dqdq)  (1,1)-->(1,1)
       msq(k,l)=temp(k,l)
       enddo
       enddo
-      msq(2,3)=msq(2,3)+tempw(2,3)
-      msq(1,4)=msq(1,4)+tempw(1,4)
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.4) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.1)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.1) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.4)
+     & )
+     & ) then
+         msq(2,3)=msq(2,3)+tempw(2,3)
+      endif
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.3) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.2)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.2) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.3)
+     & )
+     & ) then
+         msq(1,4)=msq(1,4)+tempw(1,4)
+      endif
 
       elseif (j.eq.2) then
       do k=1,nf
@@ -508,8 +541,32 @@ C-----setup for ((dqdq_dqdq)  (1,1)-->(1,1)
       msq(l,k)=temp(k,l)
       enddo
       enddo
-      msq(3,2)=msq(3,2)+tempw(2,3)
-      msq(4,1)=msq(4,1)+tempw(1,4)
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.4) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.1)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.1) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.4)
+     & )
+     & ) then
+         msq(3,2)=msq(3,2)+tempw(2,3)
+      endif
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.3) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.2)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.2) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.3)
+     & )
+     & ) then
+         msq(4,1)=msq(4,1)+tempw(1,4)
+      endif
 
       elseif (j.eq.3) then
       do k=-nf,-1
@@ -518,8 +575,32 @@ C-----setup for ((dqdq_dqdq)  (1,1)-->(1,1)
       msq(k,l)=temp(-l,-k)
       enddo
       enddo
-      msq(-3,-2)=msq(-3,-2)+tempw(1,4)
-      msq(-4,-1)=msq(-4,-1)+tempw(2,3)
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-4) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-1)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-1) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-4)
+     & )
+     & ) then
+         msq(-3,-2)=msq(-3,-2)+tempw(1,4)
+      endif
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-3) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-2)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-2) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-3)
+     & )
+     & ) then
+         msq(-4,-1)=msq(-4,-1)+tempw(2,3)
+      endif
 
       elseif (j.eq.4) then
       do k=-nf,-1
@@ -527,8 +608,32 @@ C-----setup for ((dqdq_dqdq)  (1,1)-->(1,1)
       msq(l,k)=temp(-l,-k)
       enddo
       enddo
-      msq(-2,-3)=msq(-2,-3)+tempw(1,4)
-      msq(-1,-4)=msq(-1,-4)+tempw(2,3)
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-4) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-1)
+     & )
+     v .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-1) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-4)
+     & )
+     & ) then
+         msq(-2,-3)=msq(-2,-3)+tempw(1,4)
+      endif
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-3) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-2)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-2) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-3)
+     & )
+     & ) then
+         msq(-1,-4)=msq(-1,-4)+tempw(2,3)
+      endif
 
 c--- qbar-q
       elseif (j.eq.5) then
@@ -540,8 +645,32 @@ c--- qbar-q
       endif
       enddo
       enddo
-      msq(-1,3)=msq(-1,3)+tempw(2,3)
-      msq(-2,4)=msq(-2,4)+tempw(1,4)
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.4) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-2)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-2) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.4)
+     & )
+     & ) then
+         msq(-1,3)=msq(-1,3)+tempw(2,3)
+      endif
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.3) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-1)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-1) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.3)
+     & )
+     & ) then
+         msq(-2,4)=msq(-2,4)+tempw(1,4)
+      endif
 
 c--- qbar-q
       elseif (j.eq.6) then
@@ -552,8 +681,32 @@ c--- qbar-q
       endif
       enddo
       enddo
-      msq(-3,1)=msq(-3,1)+tempw(1,4)
-      msq(-4,2)=msq(-4,2)+tempw(2,3)
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-4) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.2)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.2) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-4)
+     & )
+     & ) then
+         msq(-3,1)=msq(-3,1)+tempw(1,4)
+      endif
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-3) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.1)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.1) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-3)
+     & )
+     & ) then
+         msq(-4,2)=msq(-4,2)+tempw(2,3)
+      endif
 
 c--- q-qbar
       elseif (j.eq.7) then
@@ -565,8 +718,32 @@ c--- q-qbar
       endif
       enddo
       enddo
-      msq(3,-1)=msq(3,-1)+tempw(2,3)
-      msq(4,-2)=msq(4,-2)+tempw(1,4)
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.4) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-2)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-2) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.4)
+     & )
+     & ) then
+         msq(3,-1)=msq(3,-1)+tempw(2,3)
+      endif
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.3) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-1)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-1) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.3)
+     & )
+     & ) then
+         msq(4,-2)=msq(4,-2)+tempw(1,4)
+      endif
 
 c--- q-qbar
       elseif (j.eq.8) then
@@ -577,8 +754,32 @@ c--- q-qbar
       endif
       enddo
       enddo
-      msq(1,-3)=msq(1,-3)+tempw(1,4)
-      msq(2,-4)=msq(2,-4)+tempw(2,3)
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-4) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.2)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.2) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-4)
+     & )
+     & ) then
+         msq(1,-3)=msq(1,-3)+tempw(1,4)
+      endif
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-3) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.1)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.1) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-3)
+     & )
+     & ) then
+         msq(2,-4)=msq(2,-4)+tempw(2,3)
+      endif
 
 c--- q-qbar extra pieces
       elseif (j.eq.9) then
@@ -589,10 +790,60 @@ c--- q-qbar extra pieces
       endif
       enddo
       enddo
-      msq(1,-2)=msq(1,-2)+tempw(1,4) ! d u~ -> c~ s
       msq(3,-4)=msq(1,-2)
-      msq(2,-1)=msq(2,-1)+tempw(2,3)
       msq(4,-3)=msq(2,-1)
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-4) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.3)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.3) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-4)
+     & )
+     & ) then
+         msq(1,-2)=msq(1,-2)+tempw(1,4) ! d u~ -> c~ s
+      endif
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-2) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.1)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.1) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-2)
+     & )
+     & ) then
+         msq(3,-4)=msq(3,-4)+tempw(1,4) ! s c~ -> u~ d
+      endif
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.4) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-3)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-3) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.4)
+     & )
+     & ) then
+         msq(2,-1)=msq(2,-1)+tempw(2,3) ! u d~ -> s~ c
+      endif
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.2) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-1)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-1) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.2)
+     & )
+     & ) then
+         msq(4,-3)=msq(4,-3)+tempw(2,3) ! c s~ -> d~ u
+      endif
 
 c--- q-qbar extra pieces
       elseif (j.eq.10) then
@@ -613,10 +864,60 @@ c--- qbar-q extra pieces
       endif
       enddo
       enddo
-      msq(-2,1)=msq(-2,1)+tempw(1,4) ! u~ d -> c~ s
       msq(-4,3)=msq(-2,1)
-      msq(-1,2)=msq(-1,2)+tempw(2,3) ! d~ u -> s~ c
       msq(-3,4)=msq(-1,2)
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-4) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.3)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.3) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-4)
+     & )
+     & ) then
+         msq(-2,1)=msq(-2,1)+tempw(1,4) ! u~ d -> c~ s
+      endif
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-2) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.1)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.1) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-2)
+     & )
+     & ) then
+         msq(-4,3)=msq(-4,3)+tempw(1,4) ! c~ s -> u~ d
+      endif
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.4) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-3)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-3) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.4)
+     & )
+     & ) then
+         msq(-1,2)=msq(-1,2)+tempw(2,3) ! d~ u -> s~ c
+      endif
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.2) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-1)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-1) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.2)
+     & )
+     & ) then
+         msq(-3,4)=msq(-3,4)+tempw(2,3) ! s~ c -> d~ u
+      endif
 
 c--- qbar-q extra pieces
       elseif (j.eq.12) then
