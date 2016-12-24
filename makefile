@@ -817,6 +817,7 @@ count_parts.o \
 coupling.o \
 coupling2.o \
 couplz.o \
+couplza_1728.o \
 dclaus.o \
 determinefilenames.o \
 dipoles.o \
