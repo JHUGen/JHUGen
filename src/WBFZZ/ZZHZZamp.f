@@ -7,6 +7,7 @@
       include 'masses.f'
       include 'sprods_com.f'
       include 'zprods_decl.f'
+      include 'zacouplejk.f'
 !      include 'first.f'
       include 'spinzerohiggs_anomcoupl.f'
       double precision t4,s3456,s1734,s1756,htheta,
@@ -38,19 +39,19 @@ C---end statement functions
       ZZ3456(2,1)=2d0*r1*l2
       ZZ3456(2,2)=2d0*r1*r2
       do jdu1=1,2
-      ZZ1734(jdu1,1,1)=2d0*L(jdu1)*l1
-      ZZ1734(jdu1,1,2)=2d0*L(jdu1)*r1
-      ZZ1734(jdu1,2,1)=2d0*R(jdu1)*l1
-      ZZ1734(jdu1,2,2)=2d0*R(jdu1)*r1
-      ZZ2856(jdu1,1,1)=2d0*L(jdu1)*l2
-      ZZ2856(jdu1,1,2)=2d0*L(jdu1)*r2
-      ZZ2856(jdu1,2,1)=2d0*R(jdu1)*l2
-      ZZ2856(jdu1,2,2)=2d0*R(jdu1)*r2
+      ZZ1734(jdu1,1,1)=2d0*L_jk(n1,n7,jdu1)*l1
+      ZZ1734(jdu1,1,2)=2d0*L_jk(n1,n7,jdu1)*r1
+      ZZ1734(jdu1,2,1)=2d0*R_jk(n1,n7,jdu1)*l1
+      ZZ1734(jdu1,2,2)=2d0*R_jk(n1,n7,jdu1)*r1
+      ZZ2856(jdu1,1,1)=2d0*L_jk(n2,n8,jdu1)*l2
+      ZZ2856(jdu1,1,2)=2d0*L_jk(n2,n8,jdu1)*r2
+      ZZ2856(jdu1,2,1)=2d0*R_jk(n2,n8,jdu1)*l2
+      ZZ2856(jdu1,2,2)=2d0*R_jk(n2,n8,jdu1)*r2
       do jdu2=1,2
-      ZZ1728(jdu1,jdu2,1,1)=2d0*L(jdu1)*L(jdu2)
-      ZZ1728(jdu1,jdu2,1,2)=2d0*L(jdu1)*R(jdu2)
-      ZZ1728(jdu1,jdu2,2,1)=2d0*R(jdu1)*L(jdu2)
-      ZZ1728(jdu1,jdu2,2,2)=2d0*R(jdu1)*R(jdu2)
+      ZZ1728(jdu1,jdu2,1,1)=2d0*L_jk(n1,n7,jdu1)*L_jk(n2,n8,jdu2)
+      ZZ1728(jdu1,jdu2,1,2)=2d0*L_jk(n1,n7,jdu1)*R_jk(n2,n8,jdu2)
+      ZZ1728(jdu1,jdu2,2,1)=2d0*R_jk(n1,n7,jdu1)*L_jk(n2,n8,jdu2)
+      ZZ1728(jdu1,jdu2,2,2)=2d0*R_jk(n1,n7,jdu1)*R_jk(n2,n8,jdu2)
       enddo
       enddo
 

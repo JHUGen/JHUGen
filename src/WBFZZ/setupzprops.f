@@ -16,6 +16,7 @@ c      include 'ewcouple.f'
 c      include 'runstring.f'
       include 'masses.f'
       include 'sprods_com.f'
+      include 'zacouplejk.f'
       integer i1,i2,i3,i4,i5,i6,i7,i8,jdu1,jdu2
       double precision t4,bit,s7341,s7561,s7342,s7562,
      & s34,s56,s17,s27,s18,s28
@@ -89,76 +90,108 @@ C----setup couplings and propagators
       do jdu1=1,2
       do jdu2=1,2
       gmZ7341(jdu1,jdu2,1,1)=
-     & dcmplx(Q(jdu1)*Q(jdu2)/s7341)+dcmplx(L(jdu1)*L(jdu2))/prop7341
+     & dcmplx(Q_jk(i1,i7,jdu1)*Q_jk(i2,i8,jdu2)/s7341)
+     & +dcmplx(L_jk(i1,i7,jdu1)*L_jk(i2,i8,jdu2))/prop7341
       gmZ7341(jdu1,jdu2,1,2)=
-     & dcmplx(Q(jdu1)*Q(jdu2)/s7341)+dcmplx(L(jdu1)*R(jdu2))/prop7341
+     & dcmplx(Q_jk(i1,i7,jdu1)*Q_jk(i2,i8,jdu2)/s7341)
+     & +dcmplx(L_jk(i1,i7,jdu1)*R_jk(i2,i8,jdu2))/prop7341
       gmZ7341(jdu1,jdu2,2,1)=
-     & dcmplx(Q(jdu1)*Q(jdu2)/s7341)+dcmplx(R(jdu1)*L(jdu2))/prop7341
+     & dcmplx(Q_jk(i1,i7,jdu1)*Q_jk(i2,i8,jdu2)/s7341)
+     & +dcmplx(R_jk(i1,i7,jdu1)*L_jk(i2,i8,jdu2))/prop7341
       gmZ7341(jdu1,jdu2,2,2)=
-     & dcmplx(Q(jdu1)*Q(jdu2)/s7341)+dcmplx(R(jdu1)*R(jdu2))/prop7341
+     & dcmplx(Q_jk(i1,i7,jdu1)*Q_jk(i2,i8,jdu2)/s7341)
+     & +dcmplx(R_jk(i1,i7,jdu1)*R_jk(i2,i8,jdu2))/prop7341
 
       gmZ7561(jdu1,jdu2,1,1)=
-     & dcmplx(Q(jdu1)*Q(jdu2)/s7561)+dcmplx(L(jdu1)*L(jdu2))/prop7561
+     & dcmplx(Q_jk(i1,i7,jdu1)*Q_jk(i2,i8,jdu2)/s7561)
+     & +dcmplx(L_jk(i1,i7,jdu1)*L_jk(i2,i8,jdu2))/prop7561
       gmZ7561(jdu1,jdu2,1,2)=
-     & dcmplx(Q(jdu1)*Q(jdu2)/s7561)+dcmplx(L(jdu1)*R(jdu2))/prop7561
+     & dcmplx(Q_jk(i1,i7,jdu1)*Q_jk(i2,i8,jdu2)/s7561)
+     & +dcmplx(L_jk(i1,i7,jdu1)*R_jk(i2,i8,jdu2))/prop7561
       gmZ7561(jdu1,jdu2,2,1)=
-     & dcmplx(Q(jdu1)*Q(jdu2)/s7561)+dcmplx(R(jdu1)*L(jdu2))/prop7561
+     & dcmplx(Q_jk(i1,i7,jdu1)*Q_jk(i2,i8,jdu2)/s7561)
+     & +dcmplx(R_jk(i1,i7,jdu1)*L_jk(i2,i8,jdu2))/prop7561
       gmZ7561(jdu1,jdu2,2,2)=
-     & dcmplx(Q(jdu1)*Q(jdu2)/s7561)+dcmplx(R(jdu1)*R(jdu2))/prop7561
+     & dcmplx(Q_jk(i1,i7,jdu1)*Q_jk(i2,i8,jdu2)/s7561)
+     & +dcmplx(R_jk(i1,i7,jdu1)*R_jk(i2,i8,jdu2))/prop7561
 
       gmZ7342(jdu1,jdu2,1,1)=
-     & dcmplx(Q(jdu1)*Q(jdu2)/s7342)+dcmplx(L(jdu1)*L(jdu2))/prop7342
+     & dcmplx(Q_jk(i2,i7,jdu1)*Q_jk(i1,i8,jdu2)/s7342)
+     & +dcmplx(L_jk(i2,i7,jdu1)*L_jk(i1,i8,jdu2))/prop7342
       gmZ7342(jdu1,jdu2,1,2)=
-     & dcmplx(Q(jdu1)*Q(jdu2)/s7342)+dcmplx(L(jdu1)*R(jdu2))/prop7342
+     & dcmplx(Q_jk(i2,i7,jdu1)*Q_jk(i1,i8,jdu2)/s7342)
+     & +dcmplx(L_jk(i2,i7,jdu1)*R_jk(i1,i8,jdu2))/prop7342
       gmZ7342(jdu1,jdu2,2,1)=
-     & dcmplx(Q(jdu1)*Q(jdu2)/s7342)+dcmplx(R(jdu1)*L(jdu2))/prop7342
+     & dcmplx(Q_jk(i2,i7,jdu1)*Q_jk(i1,i8,jdu2)/s7342)
+     & +dcmplx(R_jk(i2,i7,jdu1)*L_jk(i1,i8,jdu2))/prop7342
       gmZ7342(jdu1,jdu2,2,2)=
-     & dcmplx(Q(jdu1)*Q(jdu2)/s7342)+dcmplx(R(jdu1)*R(jdu2))/prop7342
+     & dcmplx(Q_jk(i2,i7,jdu1)*Q_jk(i1,i8,jdu2)/s7342)
+     & +dcmplx(R_jk(i2,i7,jdu1)*R_jk(i1,i8,jdu2))/prop7342
 
       gmZ7562(jdu1,jdu2,1,1)=
-     & dcmplx(Q(jdu1)*Q(jdu2)/s7562)+dcmplx(L(jdu1)*L(jdu2))/prop7562
+     & dcmplx(Q_jk(i2,i7,jdu1)*Q_jk(i1,i8,jdu2)/s7562)
+     & +dcmplx(L_jk(i2,i7,jdu1)*L_jk(i1,i8,jdu2))/prop7562
       gmZ7562(jdu1,jdu2,1,2)=
-     & dcmplx(Q(jdu1)*Q(jdu2)/s7562)+dcmplx(L(jdu1)*R(jdu2))/prop7562
+     & dcmplx(Q_jk(i2,i7,jdu1)*Q_jk(i1,i8,jdu2)/s7562)
+     & +dcmplx(L_jk(i2,i7,jdu1)*R_jk(i1,i8,jdu2))/prop7562
       gmZ7562(jdu1,jdu2,2,1)=
-     & dcmplx(Q(jdu1)*Q(jdu2)/s7562)+dcmplx(R(jdu1)*L(jdu2))/prop7562
+     & dcmplx(Q_jk(i2,i7,jdu1)*Q_jk(i1,i8,jdu2)/s7562)
+     & +dcmplx(R_jk(i2,i7,jdu1)*L_jk(i1,i8,jdu2))/prop7562
       gmZ7562(jdu1,jdu2,2,2)=
-     & dcmplx(Q(jdu1)*Q(jdu2)/s7562)+dcmplx(R(jdu1)*R(jdu2))/prop7562
+     & dcmplx(Q_jk(i2,i7,jdu1)*Q_jk(i1,i8,jdu2)/s7562)
+     & +dcmplx(R_jk(i2,i7,jdu1)*R_jk(i1,i8,jdu2))/prop7562
 
       gmZ17(jdu1,jdu2,1,1)=
-     & dcmplx(Q(jdu1)*Q(jdu2)/s17)+dcmplx(L(jdu1)*L(jdu2))/prop17
+     & dcmplx(Q_jk(i1,i7,jdu1)*Q_jk(i2,i8,jdu2)/s17)
+     & +dcmplx(L_jk(i1,i7,jdu1)*L_jk(i2,i8,jdu2))/prop17
       gmZ17(jdu1,jdu2,1,2)=
-     & dcmplx(Q(jdu1)*Q(jdu2)/s17)+dcmplx(L(jdu1)*R(jdu2))/prop17
+     & dcmplx(Q_jk(i1,i7,jdu1)*Q_jk(i2,i8,jdu2)/s17)
+     & +dcmplx(L_jk(i1,i7,jdu1)*R_jk(i2,i8,jdu2))/prop17
       gmZ17(jdu1,jdu2,2,1)=
-     & dcmplx(Q(jdu1)*Q(jdu2)/s17)+dcmplx(R(jdu1)*L(jdu2))/prop17
+     & dcmplx(Q_jk(i1,i7,jdu1)*Q_jk(i2,i8,jdu2)/s17)
+     & +dcmplx(R_jk(i1,i7,jdu1)*L_jk(i2,i8,jdu2))/prop17
       gmZ17(jdu1,jdu2,2,2)=
-     & dcmplx(Q(jdu1)*Q(jdu2)/s17)+dcmplx(R(jdu1)*R(jdu2))/prop17
+     & dcmplx(Q_jk(i1,i7,jdu1)*Q_jk(i2,i8,jdu2)/s17)
+     & +dcmplx(R_jk(i1,i7,jdu1)*R_jk(i2,i8,jdu2))/prop17
 
       gmZ27(jdu1,jdu2,1,1)=
-     & dcmplx(Q(jdu1)*Q(jdu2)/s27)+dcmplx(L(jdu1)*L(jdu2))/prop27
+     & dcmplx(Q_jk(i2,i7,jdu1)*Q_jk(i1,i8,jdu2)/s27)
+     & +dcmplx(L_jk(i2,i7,jdu1)*L_jk(i1,i8,jdu2))/prop27
       gmZ27(jdu1,jdu2,1,2)=
-     & dcmplx(Q(jdu1)*Q(jdu2)/s27)+dcmplx(L(jdu1)*R(jdu2))/prop27
+     & dcmplx(Q_jk(i2,i7,jdu1)*Q_jk(i1,i8,jdu2)/s27)
+     & +dcmplx(L_jk(i2,i7,jdu1)*R_jk(i1,i8,jdu2))/prop27
       gmZ27(jdu1,jdu2,2,1)=
-     & dcmplx(Q(jdu1)*Q(jdu2)/s27)+dcmplx(R(jdu1)*L(jdu2))/prop27
+     & dcmplx(Q_jk(i2,i7,jdu1)*Q_jk(i1,i8,jdu2)/s27)
+     & +dcmplx(R_jk(i2,i7,jdu1)*L_jk(i1,i8,jdu2))/prop27
       gmZ27(jdu1,jdu2,2,2)=
-     & dcmplx(Q(jdu1)*Q(jdu2)/s27)+dcmplx(R(jdu1)*R(jdu2))/prop27
+     & dcmplx(Q_jk(i2,i7,jdu1)*Q_jk(i1,i8,jdu2)/s27)
+     & +dcmplx(R_jk(i2,i7,jdu1)*R_jk(i1,i8,jdu2))/prop27
 
       gmZ18(jdu1,jdu2,1,1)=
-     & dcmplx(Q(jdu1)*Q(jdu2)/s18)+dcmplx(L(jdu1)*L(jdu2))/prop18
+     & dcmplx(Q_jk(i1,i8,jdu1)*Q_jk(i2,i7,jdu2)/s18)
+     & +dcmplx(L_jk(i1,i8,jdu1)*L_jk(i2,i7,jdu2))/prop18
       gmZ18(jdu1,jdu2,1,2)=
-     & dcmplx(Q(jdu1)*Q(jdu2)/s18)+dcmplx(L(jdu1)*R(jdu2))/prop18
+     & dcmplx(Q_jk(i1,i8,jdu1)*Q_jk(i2,i7,jdu2)/s18)
+     & +dcmplx(L_jk(i1,i8,jdu1)*R_jk(i2,i7,jdu2))/prop18
       gmZ18(jdu1,jdu2,2,1)=
-     & dcmplx(Q(jdu1)*Q(jdu2)/s18)+dcmplx(R(jdu1)*L(jdu2))/prop18
+     & dcmplx(Q_jk(i1,i8,jdu1)*Q_jk(i2,i7,jdu2)/s18)
+     & +dcmplx(R_jk(i1,i8,jdu1)*L_jk(i2,i7,jdu2))/prop18
       gmZ18(jdu1,jdu2,2,2)=
-     & dcmplx(Q(jdu1)*Q(jdu2)/s18)+dcmplx(R(jdu1)*R(jdu2))/prop18
+     & dcmplx(Q_jk(i1,i8,jdu1)*Q_jk(i2,i7,jdu2)/s18)
+     & +dcmplx(R_jk(i1,i8,jdu1)*R_jk(i2,i7,jdu2))/prop18
 
       gmZ28(jdu1,jdu2,1,1)=
-     & dcmplx(Q(jdu1)*Q(jdu2)/s28)+dcmplx(L(jdu1)*L(jdu2))/prop28
+     & dcmplx(Q_jk(i2,i8,jdu1)*Q_jk(i1,i7,jdu2)/s28)
+     & +dcmplx(L_jk(i2,i8,jdu1)*L_jk(i1,i7,jdu2))/prop28
       gmZ28(jdu1,jdu2,1,2)=
-     & dcmplx(Q(jdu1)*Q(jdu2)/s28)+dcmplx(L(jdu1)*R(jdu2))/prop28
+     & dcmplx(Q_jk(i2,i8,jdu1)*Q_jk(i1,i7,jdu2)/s28)
+     & +dcmplx(L_jk(i2,i8,jdu1)*R_jk(i1,i7,jdu2))/prop28
       gmZ28(jdu1,jdu2,2,1)=
-     & dcmplx(Q(jdu1)*Q(jdu2)/s28)+dcmplx(R(jdu1)*L(jdu2))/prop28
+     & dcmplx(Q_jk(i2,i8,jdu1)*Q_jk(i1,i7,jdu2)/s28)
+     & +dcmplx(R_jk(i2,i8,jdu1)*L_jk(i1,i7,jdu2))/prop28
       gmZ28(jdu1,jdu2,2,2)=
-     & dcmplx(Q(jdu1)*Q(jdu2)/s28)+dcmplx(R(jdu1)*R(jdu2))/prop28
+     & dcmplx(Q_jk(i2,i8,jdu1)*Q_jk(i1,i7,jdu2)/s28)
+     & +dcmplx(R_jk(i2,i8,jdu1)*R_jk(i1,i7,jdu2))/prop28
       enddo
       enddo
 
@@ -202,79 +235,111 @@ c--- lepton-lepton couplings
 c--- gamma/Z-lepton couplings
       do jdu1=1,2
       gmZl7341(jdu1,1,1)=
-     & dcmplx(Q(jdu1)*q1/s7341)+dcmplx(L(jdu1)*l1)/prop7341
+     & dcmplx(Q_jk(i1,i7,jdu1)*q1/s7341)
+     & +dcmplx(L_jk(i1,i7,jdu1)*l1)/prop7341
       gmZl7341(jdu1,1,2)=
-     & dcmplx(Q(jdu1)*q1/s7341)+dcmplx(L(jdu1)*r1)/prop7341
+     & dcmplx(Q_jk(i1,i7,jdu1)*q1/s7341)
+     & +dcmplx(L_jk(i1,i7,jdu1)*r1)/prop7341
       gmZl7341(jdu1,2,1)=
-     & dcmplx(Q(jdu1)*q1/s7341)+dcmplx(R(jdu1)*l1)/prop7341
+     & dcmplx(Q_jk(i1,i7,jdu1)*q1/s7341)
+     & +dcmplx(R_jk(i1,i7,jdu1)*l1)/prop7341
       gmZl7341(jdu1,2,2)=
-     & dcmplx(Q(jdu1)*q1/s7341)+dcmplx(R(jdu1)*r1)/prop7341
+     & dcmplx(Q_jk(i1,i7,jdu1)*q1/s7341)
+     & +dcmplx(R_jk(i1,i7,jdu1)*r1)/prop7341
 
       gmZl7561(jdu1,1,1)=
-     & dcmplx(Q(jdu1)*q2/s7561)+dcmplx(L(jdu1)*l2)/prop7561
+     & dcmplx(Q_jk(i1,i7,jdu1)*q2/s7561)
+     & +dcmplx(L_jk(i1,i7,jdu1)*l2)/prop7561
       gmZl7561(jdu1,1,2)=
-     & dcmplx(Q(jdu1)*q2/s7561)+dcmplx(L(jdu1)*r2)/prop7561
+     & dcmplx(Q_jk(i1,i7,jdu1)*q2/s7561)
+     & +dcmplx(L_jk(i1,i7,jdu1)*r2)/prop7561
       gmZl7561(jdu1,2,1)=
-     & dcmplx(Q(jdu1)*q2/s7561)+dcmplx(R(jdu1)*l2)/prop7561
+     & dcmplx(Q_jk(i1,i7,jdu1)*q2/s7561)
+     & +dcmplx(R_jk(i1,i7,jdu1)*l2)/prop7561
       gmZl7561(jdu1,2,2)=
-     & dcmplx(Q(jdu1)*q2/s7561)+dcmplx(R(jdu1)*r2)/prop7561
+     & dcmplx(Q_jk(i1,i7,jdu1)*q2/s7561)
+     & +dcmplx(R_jk(i1,i7,jdu1)*r2)/prop7561
 
       gmZl7342(jdu1,1,1)=
-     & dcmplx(Q(jdu1)*q1/s7342)+dcmplx(L(jdu1)*l1)/prop7342
+     & dcmplx(Q_jk(i2,i7,jdu1)*q1/s7342)
+     & +dcmplx(L_jk(i2,i7,jdu1)*l1)/prop7342
       gmZl7342(jdu1,1,2)=
-     & dcmplx(Q(jdu1)*q1/s7342)+dcmplx(L(jdu1)*r1)/prop7342
+     & dcmplx(Q_jk(i2,i7,jdu1)*q1/s7342)
+     & +dcmplx(L_jk(i2,i7,jdu1)*r1)/prop7342
       gmZl7342(jdu1,2,1)=
-     & dcmplx(Q(jdu1)*q1/s7342)+dcmplx(R(jdu1)*l1)/prop7342
+     & dcmplx(Q_jk(i2,i7,jdu1)*q1/s7342)
+     & +dcmplx(R_jk(i2,i7,jdu1)*l1)/prop7342
       gmZl7342(jdu1,2,2)=
-     & dcmplx(Q(jdu1)*q1/s7342)+dcmplx(R(jdu1)*r1)/prop7342
+     & dcmplx(Q_jk(i2,i7,jdu1)*q1/s7342)
+     & +dcmplx(R_jk(i2,i7,jdu1)*r1)/prop7342
 
       gmZl7562(jdu1,1,1)=
-     & dcmplx(Q(jdu1)*q2/s7562)+dcmplx(L(jdu1)*l2)/prop7562
+     & dcmplx(Q_jk(i2,i7,jdu1)*q2/s7562)
+     & +dcmplx(L_jk(i2,i7,jdu1)*l2)/prop7562
       gmZl7562(jdu1,1,2)=
-     & dcmplx(Q(jdu1)*q2/s7562)+dcmplx(L(jdu1)*r2)/prop7562
+     & dcmplx(Q_jk(i2,i7,jdu1)*q2/s7562)
+     & +dcmplx(L_jk(i2,i7,jdu1)*r2)/prop7562
       gmZl7562(jdu1,2,1)=
-     & dcmplx(Q(jdu1)*q2/s7562)+dcmplx(R(jdu1)*l2)/prop7562
+     & dcmplx(Q_jk(i2,i7,jdu1)*q2/s7562)
+     & +dcmplx(R_jk(i2,i7,jdu1)*l2)/prop7562
       gmZl7562(jdu1,2,2)=
-     & dcmplx(Q(jdu1)*q2/s7562)+dcmplx(R(jdu1)*r2)/prop7562
+     & dcmplx(Q_jk(i2,i7,jdu1)*q2/s7562)
+     & +dcmplx(R_jk(i2,i7,jdu1)*r2)/prop7562
       enddo
 
 c--- gamma/Z-lepton couplings
       do jdu1=1,2
       gmZl8562(jdu1,1,1)=
-     & dcmplx(Q(jdu1)*q2/s7341)+dcmplx(L(jdu1)*l2)/prop7341
+     & dcmplx(Q_jk(i2,i8,jdu1)*q2/s7341)
+     & +dcmplx(L_jk(i2,i8,jdu1)*l2)/prop7341
       gmZl8562(jdu1,1,2)=
-     & dcmplx(Q(jdu1)*q2/s7341)+dcmplx(L(jdu1)*r2)/prop7341
+     & dcmplx(Q_jk(i2,i8,jdu1)*q2/s7341)
+     & +dcmplx(L_jk(i2,i8,jdu1)*r2)/prop7341
       gmZl8562(jdu1,2,1)=
-     & dcmplx(Q(jdu1)*q2/s7341)+dcmplx(R(jdu1)*l2)/prop7341
+     & dcmplx(Q_jk(i2,i8,jdu1)*q2/s7341)
+     & +dcmplx(R_jk(i2,i8,jdu1)*l2)/prop7341
       gmZl8562(jdu1,2,2)=
-     & dcmplx(Q(jdu1)*q2/s7341)+dcmplx(R(jdu1)*r2)/prop7341
+     & dcmplx(Q_jk(i2,i8,jdu1)*q2/s7341)
+     & +dcmplx(R_jk(i2,i8,jdu1)*r2)/prop7341
 
       gmZl8342(jdu1,1,1)=
-     & dcmplx(Q(jdu1)*q1/s7561)+dcmplx(L(jdu1)*l1)/prop7561
+     & dcmplx(Q_jk(i2,i8,jdu1)*q1/s7561)
+     & +dcmplx(L_jk(i2,i8,jdu1)*l1)/prop7561
       gmZl8342(jdu1,1,2)=
-     & dcmplx(Q(jdu1)*q1/s7561)+dcmplx(L(jdu1)*r1)/prop7561
+     & dcmplx(Q_jk(i2,i8,jdu1)*q1/s7561)
+     & +dcmplx(L_jk(i2,i8,jdu1)*r1)/prop7561
       gmZl8342(jdu1,2,1)=
-     & dcmplx(Q(jdu1)*q1/s7561)+dcmplx(R(jdu1)*l1)/prop7561
+     & dcmplx(Q_jk(i2,i8,jdu1)*q1/s7561)
+     & +dcmplx(R_jk(i2,i8,jdu1)*l1)/prop7561
       gmZl8342(jdu1,2,2)=
-     & dcmplx(Q(jdu1)*q1/s7561)+dcmplx(R(jdu1)*r1)/prop7561
+     & dcmplx(Q_jk(i2,i8,jdu1)*q1/s7561)
+     & +dcmplx(R_jk(i2,i8,jdu1)*r1)/prop7561
 
       gmZl8561(jdu1,1,1)=
-     & dcmplx(Q(jdu1)*q2/s7342)+dcmplx(L(jdu1)*l2)/prop7342
+     & dcmplx(Q_jk(i1,i8,jdu1)*q2/s7342)
+     & +dcmplx(L_jk(i1,i8,jdu1)*l2)/prop7342
       gmZl8561(jdu1,1,2)=
-     & dcmplx(Q(jdu1)*q2/s7342)+dcmplx(L(jdu1)*r2)/prop7342
+     & dcmplx(Q_jk(i1,i8,jdu1)*q2/s7342)
+     & +dcmplx(L_jk(i1,i8,jdu1)*r2)/prop7342
       gmZl8561(jdu1,2,1)=
-     & dcmplx(Q(jdu1)*q2/s7342)+dcmplx(R(jdu1)*l2)/prop7342
+     & dcmplx(Q_jk(i1,i8,jdu1)*q2/s7342)
+     & +dcmplx(R_jk(i1,i8,jdu1)*l2)/prop7342
       gmZl8561(jdu1,2,2)=
-     & dcmplx(Q(jdu1)*q2/s7342)+dcmplx(R(jdu1)*r2)/prop7342
+     & dcmplx(Q_jk(i1,i8,jdu1)*q2/s7342)
+     & +dcmplx(R_jk(i1,i8,jdu1)*r2)/prop7342
 
       gmZl8341(jdu1,1,1)=
-     & dcmplx(Q(jdu1)*q1/s7562)+dcmplx(L(jdu1)*l1)/prop7562
+     & dcmplx(Q_jk(i1,i8,jdu1)*q1/s7562)
+     & +dcmplx(L_jk(i1,i8,jdu1)*l1)/prop7562
       gmZl8341(jdu1,1,2)=
-     & dcmplx(Q(jdu1)*q1/s7562)+dcmplx(L(jdu1)*r1)/prop7562
+     & dcmplx(Q_jk(i1,i8,jdu1)*q1/s7562)
+     & +dcmplx(L_jk(i1,i8,jdu1)*r1)/prop7562
       gmZl8341(jdu1,2,1)=
-     & dcmplx(Q(jdu1)*q1/s7562)+dcmplx(R(jdu1)*l1)/prop7562
+     & dcmplx(Q_jk(i1,i8,jdu1)*q1/s7562)
+     & +dcmplx(R_jk(i1,i8,jdu1)*l1)/prop7562
       gmZl8341(jdu1,2,2)=
-     & dcmplx(Q(jdu1)*q1/s7562)+dcmplx(R(jdu1)*r1)/prop7562
+     & dcmplx(Q_jk(i1,i8,jdu1)*q1/s7562)
+     & +dcmplx(R_jk(i1,i8,jdu1)*r1)/prop7562
       enddo
 
       return

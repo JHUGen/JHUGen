@@ -6,6 +6,7 @@
       include 'masses.f'
       include 'sprods_com.f'
       include 'zprods_decl.f'
+      include 'zacouplejk.f'
       integer h1,h34,h56,i1,i2,i3,i4,i5,i6,n1,n2,n3,n4,n5,n6,jdu,al,nu
 
       double precision s34,s56,s234,s156,s356,s456,s3456,
@@ -64,20 +65,32 @@ C---setting up couplings dependent on whether we are doing 34-line or 56-line
       prop3456=dcmplx(s3456-zmass**2,zmass*zwidth)
 
       do jdu=1,2
-      gmZ1(jdu,1,1)=dcmplx(Q(jdu)*xq1/s34)+dcmplx(L(jdu)*xl1)/prop34
-      gmZ1(jdu,1,2)=dcmplx(Q(jdu)*xq1/s34)+dcmplx(L(jdu)*xr1)/prop34
-      gmZ1(jdu,2,1)=dcmplx(Q(jdu)*xq1/s34)+dcmplx(R(jdu)*xl1)/prop34
-      gmZ1(jdu,2,2)=dcmplx(Q(jdu)*xq1/s34)+dcmplx(R(jdu)*xr1)/prop34
+      gmZ1(jdu,1,1)=dcmplx(Q_jk(n1,n2,jdu)*xq1/s34)
+     & +dcmplx(L_jk(n1,n2,jdu)*xl1)/prop34
+      gmZ1(jdu,1,2)=dcmplx(Q_jk(n1,n2,jdu)*xq1/s34)
+     & +dcmplx(L_jk(n1,n2,jdu)*xr1)/prop34
+      gmZ1(jdu,2,1)=dcmplx(Q_jk(n1,n2,jdu)*xq1/s34)
+     & +dcmplx(R_jk(n1,n2,jdu)*xl1)/prop34
+      gmZ1(jdu,2,2)=dcmplx(Q_jk(n1,n2,jdu)*xq1/s34)
+     & +dcmplx(R_jk(n1,n2,jdu)*xr1)/prop34
 
-      gmZ2(jdu,1,1)=dcmplx(Q(jdu)*xq2/s56)+dcmplx(L(jdu)*xl2)/prop56
-      gmZ2(jdu,1,2)=dcmplx(Q(jdu)*xq2/s56)+dcmplx(L(jdu)*xr2)/prop56
-      gmZ2(jdu,2,1)=dcmplx(Q(jdu)*xq2/s56)+dcmplx(R(jdu)*xl2)/prop56
-      gmZ2(jdu,2,2)=dcmplx(Q(jdu)*xq2/s56)+dcmplx(R(jdu)*xr2)/prop56
+      gmZ2(jdu,1,1)=dcmplx(Q_jk(n1,n2,jdu)*xq2/s56)
+     & +dcmplx(L_jk(n1,n2,jdu)*xl2)/prop56
+      gmZ2(jdu,1,2)=dcmplx(Q_jk(n1,n2,jdu)*xq2/s56)
+     & +dcmplx(L_jk(n1,n2,jdu)*xr2)/prop56
+      gmZ2(jdu,2,1)=dcmplx(Q_jk(n1,n2,jdu)*xq2/s56)
+     & +dcmplx(R_jk(n1,n2,jdu)*xl2)/prop56
+      gmZ2(jdu,2,2)=dcmplx(Q_jk(n1,n2,jdu)*xq2/s56)
+     & +dcmplx(R_jk(n1,n2,jdu)*xr2)/prop56
 
-      gmZ3(jdu,1,1)=dcmplx(Q(jdu)*xq1/s3456)+dcmplx(L(jdu)*xl1)/prop3456
-      gmZ3(jdu,1,2)=dcmplx(Q(jdu)*xq1/s3456)+dcmplx(L(jdu)*xr1)/prop3456
-      gmZ3(jdu,2,1)=dcmplx(Q(jdu)*xq1/s3456)+dcmplx(R(jdu)*xl1)/prop3456
-      gmZ3(jdu,2,2)=dcmplx(Q(jdu)*xq1/s3456)+dcmplx(R(jdu)*xr1)/prop3456
+      gmZ3(jdu,1,1)=dcmplx(Q_jk(n1,n2,jdu)*xq1/s3456)
+     & +dcmplx(L_jk(n1,n2,jdu)*xl1)/prop3456
+      gmZ3(jdu,1,2)=dcmplx(Q_jk(n1,n2,jdu)*xq1/s3456)
+     & +dcmplx(L_jk(n1,n2,jdu)*xr1)/prop3456
+      gmZ3(jdu,2,1)=dcmplx(Q_jk(n1,n2,jdu)*xq1/s3456)
+     & +dcmplx(R_jk(n1,n2,jdu)*xl1)/prop3456
+      gmZ3(jdu,2,2)=dcmplx(Q_jk(n1,n2,jdu)*xq1/s3456)
+     & +dcmplx(R_jk(n1,n2,jdu)*xr1)/prop3456
       enddo
 
       gml56(1,1)=dcmplx(xq1*xq2/s56)+dcmplx(xl1*xl2)/prop56
