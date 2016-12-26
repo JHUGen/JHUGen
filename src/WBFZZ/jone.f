@@ -7,6 +7,7 @@
       include 'zcouple.f'
       include 'sprods_com.f'
       include 'zprods_decl.f'
+      include 'zacouplejk.f'
       integer h12,h34,i1,i2,i3,i4,n1,n2,n3,n4,jdu
       double precision s12,s34,s123,s124,s134,s234,bit,
      & xl,xr,xq
@@ -72,15 +73,23 @@ C---setting up couplings dependent on whether we are doing 34-line or 56-line
 
 
       do jdu=1,2
-      gmZ(jdu,1,1)=(dcmplx(Q(jdu)*xq*bit/s34)+dcmplx(L(jdu)*xl)/propz34)
-      gmZ(jdu,1,2)=(dcmplx(Q(jdu)*xq*bit/s34)+dcmplx(L(jdu)*xr)/propz34)
-      gmZ(jdu,2,1)=(dcmplx(Q(jdu)*xq*bit/s34)+dcmplx(R(jdu)*xl)/propz34)
-      gmZ(jdu,2,2)=(dcmplx(Q(jdu)*xq*bit/s34)+dcmplx(R(jdu)*xr)/propz34)
+      gmZ(jdu,1,1)=(dcmplx(Q_jk(n1,n2,jdu)*xq*bit/s34)
+     & +dcmplx(L_jk(n1,n2,jdu)*xl)/propz34)
+      gmZ(jdu,1,2)=(dcmplx(Q_jk(n1,n2,jdu)*xq*bit/s34)
+     & +dcmplx(L_jk(n1,n2,jdu)*xr)/propz34)
+      gmZ(jdu,2,1)=(dcmplx(Q_jk(n1,n2,jdu)*xq*bit/s34)
+     & +dcmplx(R_jk(n1,n2,jdu)*xl)/propz34)
+      gmZ(jdu,2,2)=(dcmplx(Q_jk(n1,n2,jdu)*xq*bit/s34)
+     & +dcmplx(R_jk(n1,n2,jdu)*xr)/propz34)
 
-      gmZ12(jdu,1,1)=(dcmplx(Q(jdu)*xq/s12)+dcmplx(L(jdu)*xl)/propz12)
-      gmZ12(jdu,1,2)=(dcmplx(Q(jdu)*xq/s12)+dcmplx(L(jdu)*xr)/propz12)
-      gmZ12(jdu,2,1)=(dcmplx(Q(jdu)*xq/s12)+dcmplx(R(jdu)*xl)/propz12)
-      gmZ12(jdu,2,2)=(dcmplx(Q(jdu)*xq/s12)+dcmplx(R(jdu)*xr)/propz12)
+      gmZ12(jdu,1,1)=(dcmplx(Q_jk(n1,n2,jdu)*xq/s12)
+     & +dcmplx(L_jk(n1,n2,jdu)*xl)/propz12)
+      gmZ12(jdu,1,2)=(dcmplx(Q_jk(n1,n2,jdu)*xq/s12)
+     & +dcmplx(L_jk(n1,n2,jdu)*xr)/propz12)
+      gmZ12(jdu,2,1)=(dcmplx(Q_jk(n1,n2,jdu)*xq/s12)
+     & +dcmplx(R_jk(n1,n2,jdu)*xl)/propz12)
+      gmZ12(jdu,2,2)=(dcmplx(Q_jk(n1,n2,jdu)*xq/s12)
+     & +dcmplx(R_jk(n1,n2,jdu)*xr)/propz12)
 
       rxw=sqrt((cone-cxw)/cxw)
       if (jdu .eq. 1) then

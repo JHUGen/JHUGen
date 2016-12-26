@@ -479,17 +479,90 @@ C-----setup for ((dqdq_dqdq)  (1,1)-->(1,1)
       if (.not.(
      & (
      & (pid_pdg(j1(j)).eq.0)
-     & .or. (j1(j).le.2 .and. pid_pdg(j1(j)).eq.k)
-     & .or. (j1(j).ge.7 .and. pid_pdg(j1(j)).eq.-k)
+     & .or. (
+     & j1(j).le.2 .and. (
+     & pid_pdg(j1(j)).eq.k
+     & .or.
+     & (
+     & modulo(k,2).eq.0 .and.
+     & (pid_pdg(j1(j)).eq.12
+     & .or. pid_pdg(j1(j)).eq.14
+     & .or. pid_pdg(j1(j)).eq.16)
+     & )
+     & .or.
+     & (
+     & modulo(k,2).eq.1 .and.
+     & (pid_pdg(j1(j)).eq.11
+     & .or. pid_pdg(j1(j)).eq.13
+     & .or. pid_pdg(j1(j)).eq.15)
+     & )
+     & )
+     & )
+     & .or. (
+     & j1(j).ge.7 .and. (
+     & pid_pdg(j1(j)).eq.-k
+     & .or.
+     & (
+     & modulo(k,2).eq.0 .and.
+     & (pid_pdg(j1(j)).eq.-12
+     & .or. pid_pdg(j1(j)).eq.-14
+     & .or. pid_pdg(j1(j)).eq.-16)
+     & )
+     & .or.
+     & (
+     & modulo(k,2).eq.1 .and.
+     & (pid_pdg(j1(j)).eq.-11
+     & .or. pid_pdg(j1(j)).eq.-13
+     & .or. pid_pdg(j1(j)).eq.-15)
+     & )
+     & )
+     & )
      & ) .and. (
      & (pid_pdg(j2(j)).eq.0)
-     & .or. (j2(j).le.2 .and. pid_pdg(j2(j)).eq.l)
-     & .or. (j2(j).ge.7 .and. pid_pdg(j2(j)).eq.-l)
+     & .or. (
+     & j2(j).le.2 .and. (
+     & pid_pdg(j2(j)).eq.l
+     & .or.
+     & (
+     & modulo(l,2).eq.0 .and.
+     & (pid_pdg(j2(j)).eq.12
+     & .or. pid_pdg(j2(j)).eq.14
+     & .or. pid_pdg(j2(j)).eq.16)
+     & )
+     & .or.
+     & (
+     & modulo(l,2).eq.1 .and.
+     & (pid_pdg(j2(j)).eq.11
+     & .or. pid_pdg(j2(j)).eq.13
+     & .or. pid_pdg(j2(j)).eq.15)
+     & )
+     & )
+     & )
+     & .or. (
+     & j2(j).ge.7 .and. (
+     & pid_pdg(j2(j)).eq.-l
+     & .or.
+     & (
+     & modulo(l,2).eq.0 .and.
+     & (pid_pdg(j2(j)).eq.-12
+     & .or. pid_pdg(j2(j)).eq.-14
+     & .or. pid_pdg(j2(j)).eq.-16)
+     & )
+     & .or.
+     & (
+     & modulo(l,2).eq.1 .and.
+     & (pid_pdg(j2(j)).eq.-11
+     & .or. pid_pdg(j2(j)).eq.-13
+     & .or. pid_pdg(j2(j)).eq.-15)
+     & )
+     & )
+     & )
      & )
      & )) then
          temp(k,l)=zip
          tempw(k,l)=zip
       endif
+
       if (temp(k,l).ne.zip) then
          print *,"temp(",k,",",l,")=",temp(k,l),"in j=",j
       endif

@@ -7,6 +7,7 @@
       include 'zcouple.f'
       include 'sprods_com.f'
       include 'zprods_decl.f'
+      include 'zacouplejk.f'
       include 'pid_pdg.f'
 
       double precision s17,s28,s56,t3,
@@ -109,14 +110,22 @@ C---setting up couplings dependent on whether we are doing 34-line or 56-line
       propw28=dcmplx(s28)-dcmplx(wmass**2,-wmass*wwidth)
 
       do jdu1=1,2
-      ZZ17(jdu1,1,1)=dcmplx(Q(jdu1)*xq1/s17)+dcmplx(L(jdu1)*xl1)/prop17
-      ZZ17(jdu1,1,2)=dcmplx(Q(jdu1)*xq1/s17)+dcmplx(L(jdu1)*xr1)/prop17
-      ZZ17(jdu1,2,1)=dcmplx(Q(jdu1)*xq1/s17)+dcmplx(R(jdu1)*xl1)/prop17
-      ZZ17(jdu1,2,2)=dcmplx(Q(jdu1)*xq1/s17)+dcmplx(R(jdu1)*xr1)/prop17
-      ZZ28(jdu1,1,1)=dcmplx(Q(jdu1)*xq1/s28)+dcmplx(L(jdu1)*xl1)/prop28
-      ZZ28(jdu1,1,2)=dcmplx(Q(jdu1)*xq1/s28)+dcmplx(L(jdu1)*xr1)/prop28
-      ZZ28(jdu1,2,1)=dcmplx(Q(jdu1)*xq1/s28)+dcmplx(R(jdu1)*xl1)/prop28
-      ZZ28(jdu1,2,2)=dcmplx(Q(jdu1)*xq1/s28)+dcmplx(R(jdu1)*xr1)/prop28
+      ZZ17(jdu1,1,1)=dcmplx(Q_jk(n1,n7,jdu1)*xq1/s17)
+     & +dcmplx(L_jk(n1,n7,jdu1)*xl1)/prop17
+      ZZ17(jdu1,1,2)=dcmplx(Q_jk(n1,n7,jdu1)*xq1/s17)
+     & +dcmplx(L_jk(n1,n7,jdu1)*xr1)/prop17
+      ZZ17(jdu1,2,1)=dcmplx(Q_jk(n1,n7,jdu1)*xq1/s17)
+     & +dcmplx(R_jk(n1,n7,jdu1)*xl1)/prop17
+      ZZ17(jdu1,2,2)=dcmplx(Q_jk(n1,n7,jdu1)*xq1/s17)
+     & +dcmplx(R_jk(n1,n7,jdu1)*xr1)/prop17
+      ZZ28(jdu1,1,1)=dcmplx(Q_jk(n2,n8,jdu1)*xq1/s28)
+     & +dcmplx(L_jk(n2,n8,jdu1)*xl1)/prop28
+      ZZ28(jdu1,1,2)=dcmplx(Q_jk(n2,n8,jdu1)*xq1/s28)
+     & +dcmplx(L_jk(n2,n8,jdu1)*xr1)/prop28
+      ZZ28(jdu1,2,1)=dcmplx(Q_jk(n2,n8,jdu1)*xq1/s28)
+     & +dcmplx(R_jk(n2,n8,jdu1)*xl1)/prop28
+      ZZ28(jdu1,2,2)=dcmplx(Q_jk(n2,n8,jdu1)*xq1/s28)
+     & +dcmplx(R_jk(n2,n8,jdu1)*xr1)/prop28
       enddo
 
       ZZ56(1,1)=dcmplx(xq1*xq2/s56)+dcmplx(xl1*xl2)/prop56
