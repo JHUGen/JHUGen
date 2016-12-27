@@ -281,9 +281,9 @@ C-----setup for (uqsq_dqcq)
 c--- fill matrix elements
       if (j .eq. 1) then
 
-      do k=1,nfinc
+      do k=1,nf
       msq(k,k)=temp(k,k)*stat
-      do l=k+1,nfinc
+      do l=k+1,nf
       msq(k,l)=temp(k,l)
       enddo
       enddo
@@ -291,8 +291,8 @@ c--- fill matrix elements
       msq(1,4)=msq(1,4)+tempw(1,4)
 
       elseif (j.eq.2) then
-      do k=1,nfinc
-      do l=k+1,nfinc
+      do k=1,nf
+      do l=k+1,nf
       msq(l,k)=temp(k,l)
       enddo
       enddo
@@ -300,7 +300,7 @@ c--- fill matrix elements
       msq(4,1)=msq(4,1)+tempw(1,4)
 
       elseif (j.eq.3) then
-      do k=-nfinc,-1
+      do k=-nf,-1
       msq(k,k)=temp(-k,-k)*stat
       do l=k+1,-1
       msq(k,l)=temp(-l,-k)
@@ -310,7 +310,7 @@ c--- fill matrix elements
       msq(-4,-1)=msq(-4,-1)+tempw(2,3)
 
       elseif (j.eq.4) then
-      do k=-nfinc,-1
+      do k=-nf,-1
       do l=k+1,-1
       msq(l,k)=temp(-l,-k)
       enddo
@@ -320,9 +320,9 @@ c--- fill matrix elements
 
 c--- qbar-q
       elseif (j.eq.5) then
-      do k=-nfinc,-1
+      do k=-nf,-1
       msq(k,-k)=temp(-k,-k)
-      do l=1,nfinc
+      do l=1,nf
       if (abs(k) .lt. abs(l)) then
       msq(k,l)=temp(-k,l)
       endif
@@ -333,8 +333,8 @@ c--- qbar-q
 
 c--- qbar-q
       elseif (j.eq.6) then
-      do k=-nfinc,-1
-      do l=1,nfinc
+      do k=-nf,-1
+      do l=1,nf
       if (abs(k) .gt. abs(l)) then
       msq(k,l)=temp(l,-k)
       endif
@@ -345,9 +345,9 @@ c--- qbar-q
 
 c--- q-qbar
       elseif (j.eq.7) then
-      do k=-nfinc,-1
+      do k=-nf,-1
       msq(-k,k)=temp(-k,-k)
-      do l=1,nfinc
+      do l=1,nf
       if (abs(k) .lt. abs(l)) then
       msq(l,k)=temp(-k,l)
       endif
@@ -358,8 +358,8 @@ c--- q-qbar
 
 c--- q-qbar
       elseif (j.eq.8) then
-      do k=-nfinc,-1
-      do l=-nfinc,-1
+      do k=-nf,-1
+      do l=-nf,-1
       if (abs(k) .lt. abs(l)) then
       msq(-k,l)=temp(-k,-l)
       endif
@@ -370,8 +370,8 @@ c--- q-qbar
 
 c--- q-qbar extra pieces
       elseif (j.eq.9) then
-      do k=1,nfinc
-      do l=1,nfinc
+      do k=1,nf
+      do l=1,nf
       if (k .lt. l) then
       msq(k,-k)=msq(k,-k)+temp(k,l)
       endif
@@ -384,8 +384,8 @@ c--- q-qbar extra pieces
 
 c--- q-qbar extra pieces
       elseif (j.eq.10) then
-      do k=1,nfinc
-      do l=1,nfinc
+      do k=1,nf
+      do l=1,nf
       if (k .gt. l) then
       msq(k,-k)=msq(k,-k)+temp(l,k)
       endif
@@ -394,8 +394,8 @@ c--- q-qbar extra pieces
 
 c--- qbar-q extra pieces
       elseif (j.eq.11) then
-      do k=1,nfinc
-      do l=1,nfinc
+      do k=1,nf
+      do l=1,nf
       if (k .lt. l) then
       msq(-k,k)=msq(-k,k)+temp(k,l)
       endif
@@ -408,8 +408,8 @@ c--- qbar-q extra pieces
 
 c--- qbar-q extra pieces
       elseif (j.eq.12) then
-      do k=1,nfinc
-      do l=1,nfinc
+      do k=1,nf
+      do l=1,nf
       if (k .gt. l) then
       msq(-k,k)=msq(-k,k)+temp(l,k)
       endif
