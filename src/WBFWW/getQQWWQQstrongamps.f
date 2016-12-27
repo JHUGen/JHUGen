@@ -13,8 +13,7 @@
       integer k,l,
      & uqcq_uqcq,uquq_uquq,dqsq_dqsq,
      & dqdq_dqdq,uqbq_uqbq,dqcq_dqcq,
-     & dquq_dquq,dqcq_uqsq,uqsq_dqcq,
-     & nfinc
+     & dquq_dquq,dqcq_uqsq,uqsq_dqcq
       parameter(
      & uqcq_uqcq=1,uquq_uquq=2,dqsq_dqsq=3,
      & dqdq_dqdq=4,uqbq_uqbq=5,dqcq_dqcq=6,
