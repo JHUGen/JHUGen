@@ -32,6 +32,7 @@ c--- q(-p1) + q(-p2) -> e-(p3) e-(p4) nu_e(p5) nu_ebar(p6);
      & ampZZ(nmax,2,2,2,2),ampZZa(nmax,2,2,2,2),ampZZb(nmax,2,2,2,2),
      & ampWW(nmax,2,2),ampWWa(nmax,2,2),ampWWb(nmax,2,2)
       logical doHO,doBO,comb1278ok
+      logical isALepton,isANeutrino
       parameter(spinavge=0.25d0,stat=0.5d0,nfinc=4)
       integer,parameter:: j1(jmax)=(/1,2,8,8,7,2,7,1,1,7,2,7/)
       integer,parameter:: j2(jmax)=(/2,1,7,7,2,7,1,7,7,1,7,2/)
@@ -106,6 +107,14 @@ C--   MARKUS: adding switches to remove VH or VBF contributions
       ! U. Sarica: Test the combination
       call testWBFVVApartComb(j1(j),j2(j),j7(j),j8(j),comb1278ok)
       if (.not.comb1278ok) cycle
+      if( (
+     &    (isALepton(abs(pid_pdg(7))) .or. isANeutrino(abs(pid_pdg(7))))
+     &    .or.
+     &    (isALepton(abs(pid_pdg(8))) .or. isANeutrino(abs(pid_pdg(8))))
+     &    ) .and. j.lt.9
+     & ) then
+         cycle
+      endif
 
 c-----------------------------------------
 c---- SET-UP FOR WW-like AMPLITUDES ------
@@ -145,6 +154,16 @@ c-----------------------------------------
      & (vvhvvtoggle_vbfvh.eq.0) .and. (j.le.8 .and. j.ge.5)
      & )
      &  ) then
+         ampWWb(:,:,:)=czip
+         ampZZb(:,:,:,:,:)=czip
+      endif
+      if(
+     &    (isALepton(abs(pid_pdg(7))) .or. isANeutrino(abs(pid_pdg(7))))
+     &    .or.
+     &    (isALepton(abs(pid_pdg(8))) .or. isANeutrino(abs(pid_pdg(8))))
+     & ) then
+         ampWWa(:,:,:)=czip
+         ampZZa(:,:,:,:,:)=czip
          ampWWb(:,:,:)=czip
          ampZZb(:,:,:,:,:)=czip
       endif
@@ -464,30 +483,130 @@ C-----setup for (uqsq_dqcq)
       enddo
 
       do k=1,nf;do l=1,nf
-      if (.not.(
-     & (
-     & (pid_pdg(j1(j)).eq.0)
-     & .or. (j1(j).le.2 .and. pid_pdg(j1(j)).eq.k)
-     & .or. (j1(j).ge.7 .and. pid_pdg(j1(j)).eq.-k)
-     & ) .and. (
-     & (pid_pdg(j2(j)).eq.0)
-     & .or. (j2(j).le.2 .and. pid_pdg(j2(j)).eq.l)
-     & .or. (j2(j).ge.7 .and. pid_pdg(j2(j)).eq.-l)
+      if (
+     & .not.(
+     &    (
+     &    (pid_pdg(j1(j)).eq.0)
+     &    .or. (
+     &    j1(j).le.2 .and. (
+     &    pid_pdg(j1(j)).eq.k
+     &    .or.
+     &    (
+     &    modulo(k,2).eq.0 .and.
+     &    (pid_pdg(j1(j)).eq.12
+     &    .or. pid_pdg(j1(j)).eq.14
+     &    .or. pid_pdg(j1(j)).eq.16)
+     &    )
+     &    .or.
+     &    (
+     &    modulo(k,2).eq.1 .and.
+     &    (pid_pdg(j1(j)).eq.11
+     &    .or. pid_pdg(j1(j)).eq.13
+     &    .or. pid_pdg(j1(j)).eq.15)
+     &    )
+     &    )
+     &    )
+     &    .or. (
+     &    j1(j).ge.7 .and. (
+     &    pid_pdg(j1(j)).eq.-k
+     &    .or.
+     &    (
+     &    modulo(k,2).eq.0 .and.
+     &    (pid_pdg(j1(j)).eq.-12
+     &    .or. pid_pdg(j1(j)).eq.-14
+     &    .or. pid_pdg(j1(j)).eq.-16)
+     &    )
+     &    .or.
+     &    (
+     &    modulo(k,2).eq.1 .and.
+     &    (pid_pdg(j1(j)).eq.-11
+     &    .or. pid_pdg(j1(j)).eq.-13
+     &    .or. pid_pdg(j1(j)).eq.-15)
+     &    )
+     &    )
+     &    )
+     &    ) .and. (
+     &    (pid_pdg(j2(j)).eq.0)
+     &    .or. (
+     &    j2(j).le.2 .and. (
+     &    pid_pdg(j2(j)).eq.l
+     &    .or.
+     &    (
+     &    modulo(l,2).eq.0 .and.
+     &    (pid_pdg(j2(j)).eq.12
+     &    .or. pid_pdg(j2(j)).eq.14
+     &    .or. pid_pdg(j2(j)).eq.16)
+     &    )
+     &    .or.
+     &    (
+     &    modulo(l,2).eq.1 .and.
+     &    (pid_pdg(j2(j)).eq.11
+     &    .or. pid_pdg(j2(j)).eq.13
+     &    .or. pid_pdg(j2(j)).eq.15)
+     &    )
+     &    )
+     &    )
+     &    .or. (
+     &    j2(j).ge.7 .and. (
+     &    pid_pdg(j2(j)).eq.-l
+     &    .or.
+     &    (
+     &    modulo(l,2).eq.0 .and.
+     &    (pid_pdg(j2(j)).eq.-12
+     &    .or. pid_pdg(j2(j)).eq.-14
+     &    .or. pid_pdg(j2(j)).eq.-16)
+     &    )
+     &    .or.
+     &    (
+     &    modulo(l,2).eq.1 .and.
+     &    (pid_pdg(j2(j)).eq.-11
+     &    .or. pid_pdg(j2(j)).eq.-13
+     &    .or. pid_pdg(j2(j)).eq.-15)
+     &    )
+     &    )
+     &    )
+     &    )
      & )
-     & )) then
+     & ) then
          temp(k,l)=zip
          tempw(k,l)=zip
       endif
       enddo;enddo
+      if (
+     & isANeutrino(abs(pid_pdg(7))) .and.
+     & abs(pid_pdg(8)).eq.abs(pid_pdg(7))
+     & ) then
+         tempw(:,:)=zip
+         if(j.eq.10 .or. j.eq.12) then
+            temp(4,5)=zip
+         endif
+      else if (
+     & isALepton(abs(pid_pdg(7))) .and.
+     & abs(pid_pdg(8)).eq.abs(pid_pdg(7))
+     & ) then
+         tempw(:,:)=zip
+         if (j.eq.9 .or. j.eq.11) then
+            temp(1:2,3)=zip
+         else if (j.eq.10 .or. j.eq.12) then
+            temp(1,3:5)=zip
+         endif
+      else if (
+     & (isALepton(abs(pid_pdg(7))) .and.
+     & isANeutrino(abs(pid_pdg(8)))) .or.
+     & (isALepton(abs(pid_pdg(8))) .and.
+     & isANeutrino(abs(pid_pdg(7))))
+     & ) then
+         temp(:,:)=zip
+      endif
 
       temp(:,:) = temp(:,:)*colfac34_56
       tempw(:,:) = tempw(:,:)*colfac34_56
 
 c--- fill matrix elements
-      if (j .eq. 1) then
-      do k=1,nfinc
+      if (j.eq.1) then
+      do k=1,nf
       msq(k,k)=temp(k,k)*stat
-      do l=k+1,nfinc
+      do l=k+1,nf
       msq(k,l)=temp(k,l)
       enddo
       enddo
@@ -519,8 +638,8 @@ c--- fill matrix elements
       endif
 
       elseif (j.eq.2) then
-      do k=1,nfinc
-      do l=k+1,nfinc
+      do k=1,nf
+      do l=k+1,nf
       msq(l,k)=temp(k,l)
       enddo
       enddo
@@ -552,7 +671,7 @@ c--- fill matrix elements
       endif
 
       elseif (j.eq.3) then
-      do k=-nfinc,-1
+      do k=-nf,-1
       msq(k,k)=temp(-k,-k)*stat
       do l=k+1,-1
       msq(k,l)=temp(-l,-k)
@@ -586,7 +705,7 @@ c--- fill matrix elements
       endif
 
       elseif (j.eq.4) then
-      do k=-nfinc,-1
+      do k=-nf,-1
       do l=k+1,-1
       msq(l,k)=temp(-l,-k)
       enddo
@@ -620,9 +739,9 @@ c--- fill matrix elements
 
 c--- qbar-q
       elseif (j.eq.5) then
-      do k=-nfinc,-1
+      do k=-nf,-1
       msq(k,-k)=temp(-k,-k)
-      do l=1,nfinc
+      do l=1,nf
       if (abs(k) .lt. abs(l)) then
       msq(k,l)=temp(-k,l)
       endif
@@ -657,8 +776,8 @@ c--- qbar-q
 
 c--- qbar-q
       elseif (j.eq.6) then
-      do k=-nfinc,-1
-      do l=1,nfinc
+      do k=-nf,-1
+      do l=1,nf
       if (abs(k) .gt. abs(l)) then
       msq(k,l)=temp(l,-k)
       endif
@@ -693,9 +812,9 @@ c--- qbar-q
 
 c--- q-qbar
       elseif (j.eq.7) then
-      do k=-nfinc,-1
+      do k=-nf,-1
       msq(-k,k)=temp(-k,-k)
-      do l=1,nfinc
+      do l=1,nf
       if (abs(k) .lt. abs(l)) then
       msq(l,k)=temp(-k,l)
       endif
@@ -730,8 +849,8 @@ c--- q-qbar
 
 c--- q-qbar
       elseif (j.eq.8) then
-      do k=-nfinc,-1
-      do l=-nfinc,-1
+      do k=-nf,-1
+      do l=-nf,-1
       if (abs(k) .lt. abs(l)) then
       msq(-k,l)=temp(-k,-l)
       endif
@@ -766,8 +885,8 @@ c--- q-qbar
 
 c--- q-qbar extra pieces
       elseif (j.eq.9) then
-      do k=1,nfinc
-      do l=1,nfinc
+      do k=1,nf
+      do l=1,nf
       if (k .lt. l) then
       msq(k,-k)=msq(k,-k)+temp(k,l)
       endif
@@ -777,52 +896,68 @@ c--- q-qbar extra pieces
       msq(4,-3)=msq(2,-1)
       if (
      & (
-     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-4) .and.
-     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.3)
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-4
+     &                  .or. isANeutrino(-pid_pdg(7))) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.3
+     &                  .or. isALepton(pid_pdg(8)))
      & )
      & .or.
      & (
-     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.3) .and.
-     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-4)
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.3
+     &                  .or. isALepton(pid_pdg(7))) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-4
+     &                  .or. isANeutrino(-pid_pdg(8)))
      & )
      & ) then
          msq(1,-2)=msq(1,-2)+tempw(1,4) ! d u~ -> c~ s
       endif
       if (
      & (
-     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-2) .and.
-     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.1)
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-2
+     &                  .or. isANeutrino(-pid_pdg(7))) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.1
+     &                  .or. isALepton(pid_pdg(8)))
      & )
      & .or.
      & (
-     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.1) .and.
-     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-2)
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.1
+     &                  .or. isALepton(pid_pdg(7))) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-2
+     &                  .or. isANeutrino(-pid_pdg(8)))
      & )
      & ) then
          msq(3,-4)=msq(3,-4)+tempw(1,4) ! s c~ -> u~ d
       endif
       if (
      & (
-     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.4) .and.
-     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-3)
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.4
+     &                  .or. isANeutrino(pid_pdg(7))) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-3
+     &                  .or. isALepton(-pid_pdg(8)))
      & )
      & .or.
      & (
-     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-3) .and.
-     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.4)
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-3
+     &                  .or. isALepton(-pid_pdg(7))) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.4
+     &                  .or. isANeutrino(pid_pdg(8)))
      & )
      & ) then
          msq(2,-1)=msq(2,-1)+tempw(2,3) ! u d~ -> s~ c
       endif
       if (
      & (
-     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.2) .and.
-     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-1)
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.2
+     &                  .or. isANeutrino(pid_pdg(7))) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-1
+     &                  .or. isALepton(-pid_pdg(8)))
      & )
      & .or.
      & (
-     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-1) .and.
-     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.2)
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-1
+     &                  .or. isALepton(-pid_pdg(7))) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.2
+     &                  .or. isANeutrino(pid_pdg(8)))
      & )
      & ) then
          msq(4,-3)=msq(4,-3)+tempw(2,3) ! c s~ -> d~ u
@@ -830,8 +965,8 @@ c--- q-qbar extra pieces
 
 c--- q-qbar extra pieces
       elseif (j.eq.10) then
-      do k=1,nfinc
-      do l=1,nfinc
+      do k=1,nf
+      do l=1,nf
       if (k .gt. l) then
       msq(k,-k)=msq(k,-k)+temp(l,k)
       endif
@@ -840,8 +975,8 @@ c--- q-qbar extra pieces
 
 c--- qbar-q extra pieces
       elseif (j.eq.11) then
-      do k=1,nfinc
-      do l=1,nfinc
+      do k=1,nf
+      do l=1,nf
       if (k .lt. l) then
       msq(-k,k)=msq(-k,k)+temp(k,l)
       endif
@@ -851,52 +986,68 @@ c--- qbar-q extra pieces
       msq(-3,4)=msq(-1,2)
       if (
      & (
-     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-4) .and.
-     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.3)
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-4
+     &                  .or. isANeutrino(-pid_pdg(7))) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.3
+     &                  .or. isALepton(pid_pdg(8)))
      & )
      & .or.
      & (
-     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.3) .and.
-     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-4)
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.3
+     &                  .or. isALepton(pid_pdg(7))) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-4
+     &                  .or. isANeutrino(-pid_pdg(8)))
      & )
      & ) then
          msq(-2,1)=msq(-2,1)+tempw(1,4) ! u~ d -> c~ s
       endif
       if (
      & (
-     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-2) .and.
-     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.1)
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-2
+     &                  .or. isANeutrino(-pid_pdg(7))) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.1
+     &                  .or. isALepton(pid_pdg(8)))
      & )
      & .or.
      & (
-     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.1) .and.
-     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-2)
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.1
+     &                  .or. isALepton(pid_pdg(7))) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-2
+     &                  .or. isANeutrino(-pid_pdg(8)))
      & )
      & ) then
          msq(-4,3)=msq(-4,3)+tempw(1,4) ! c~ s -> u~ d
       endif
       if (
      & (
-     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.4) .and.
-     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-3)
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.4
+     &                  .or. isANeutrino(pid_pdg(7))) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-3
+     &                  .or. isALepton(-pid_pdg(8)))
      & )
      & .or.
      & (
-     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-3) .and.
-     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.4)
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-3
+     &                  .or. isALepton(-pid_pdg(7))) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.4
+     &                  .or. isANeutrino(pid_pdg(8)))
      & )
      & ) then
          msq(-1,2)=msq(-1,2)+tempw(2,3) ! d~ u -> s~ c
       endif
       if (
      & (
-     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.2) .and.
-     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-1)
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.2
+     &                  .or. isANeutrino(pid_pdg(7))) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-1
+     &                  .or. isALepton(-pid_pdg(8)))
      & )
      & .or.
      & (
-     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-1) .and.
-     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.2)
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-1
+     &                  .or. isALepton(-pid_pdg(7))) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.2
+     &                  .or. isANeutrino(pid_pdg(8)))
      & )
      & ) then
          msq(-3,4)=msq(-3,4)+tempw(2,3) ! s~ c -> d~ u
@@ -904,8 +1055,8 @@ c--- qbar-q extra pieces
 
 c--- qbar-q extra pieces
       elseif (j.eq.12) then
-      do k=1,nfinc
-      do l=1,nfinc
+      do k=1,nf
+      do l=1,nf
       if (k .gt. l) then
       msq(-k,k)=msq(-k,k)+temp(l,k)
       endif
