@@ -894,6 +894,7 @@ writeout.o \
 dips_mass.o \
 zeromsq.o \
 convertPLabelToPDGId.o \
+ParticleIdFunctions.o \
 HVVSpinZeroDynamicCouplings.o \
 anomhvvamps.o
 
