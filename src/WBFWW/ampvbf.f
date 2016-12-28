@@ -9,13 +9,15 @@
       include 'runstring.f'
       include 'ewcouple.f'
       include 'zcouple.f'
+      include 'zacouplejk.f'
       include 'WWbits.f'
       include 'spinzerohiggs_anomcoupl.f'
       integer jdu1,jdu2,h28,h17,i1,i2,i3,i4,i5,i6,i7,i8,
      & p1,p2,p3,p4,p5,p6,p7,p8
       double complex zab2,amp(2,2,2,2),sqzmass,Amp_S_PR,Amp_S_DK,
      & propw34,propw56,propz28,propz17,propH,propw1347,propw1567,
-     & gamZ17(2,2),gamz28(2,2),ZZ17(2,2),ZZ28(2,2),rxw,facHiggs,
+     & gamZ17(2,2),gamz28(2,2),ZZ17(2,2),ZZ28(2,2),AA17(2,2),AA28(2,2),
+     & rxw,facZZHWW,
      & anomhzzamp,anomhwwamp,propX
       double precision t4,s17,s28,s34,s56,s3456,s1347,s1567
 C     amp(jdu1,jdu2,h17,h28)
@@ -31,7 +33,7 @@ c--- special fix for Madgraph check
       else
         sqzmass=czmass2
       endif
-      facHiggs = 2d0*sqzmass*cxw**(-2)*(4d0*cwmass2/vevsq*cxw/esq)
+      facZZHWW = 2d0*sqzmass*cxw**(-2)*(4d0*cwmass2/vevsq*cxw/esq)
 
 
       rxw=sqrt((cone-cxw)/cxw)
@@ -53,14 +55,20 @@ c--- special fix for Madgraph check
       propX=dcmplx(s3456-h2mass**2,h2mass*h2width)
 
       do jdu1=1,2
-      gamz17(jdu1,1)=Q(jdu1)/s(i1,i7)+rxW*L(jdu1)/propz17
-      gamz17(jdu1,2)=Q(jdu1)/s(i1,i7)+rxW*R(jdu1)/propz17
-      gamz28(jdu1,1)=Q(jdu1)/s(i2,i8)+rxW*L(jdu1)/propz28
-      gamz28(jdu1,2)=Q(jdu1)/s(i2,i8)+rxW*R(jdu1)/propz28
-      ZZ17(jdu1,1)=L(jdu1)/propz17
-      ZZ17(jdu1,2)=R(jdu1)/propz17
-      ZZ28(jdu1,1)=L(jdu1)/propz28
-      ZZ28(jdu1,2)=R(jdu1)/propz28
+      gamz17(jdu1,1)=Q_jk(i1,i7,jdu1)/s(i1,i7)
+     & +rxW*L_jk(i1,i7,jdu1)/propz17
+      gamz17(jdu1,2)=Q_jk(i1,i7,jdu1)/s(i1,i7)
+     & +rxW*R_jk(i1,i7,jdu1)/propz17
+      ZZ17(jdu1,1)=L_jk(i1,i7,jdu1)/propz17
+      ZZ17(jdu1,2)=R_jk(i1,i7,jdu1)/propz17
+      AA17(jdu1,:)=Q_jk(i1,i7,jdu1)/s(i1,i7)
+      gamz28(jdu1,1)=Q_jk(i2,i8,jdu1)/s(i2,i8)
+     & +rxW*L_jk(i2,i8,jdu1)/propz28
+      gamz28(jdu1,2)=Q_jk(i2,i8,jdu1)/s(i2,i8)
+     & +rxW*R_jk(i2,i8,jdu1)/propz28
+      ZZ28(jdu1,1)=L_jk(i2,i8,jdu1)/propz28
+      ZZ28(jdu1,2)=R_jk(i2,i8,jdu1)/propz28
+      AA28(jdu1,:)=Q_jk(i2,i8,jdu1)/s(i2,i8)
       enddo
 
       p3=i3
@@ -110,7 +118,7 @@ c--- special fix for Madgraph check
       Amp_S_DK=za(i3,i5)*zb(i4,i6)
          endif
       amp(jdu1,jdu2,h17,h28)= amp(jdu1,jdu2,h17,h28)
-     &                      + propw56**(-1)*propw34**(-1)*facHiggs*
+     &                      + propw56**(-1)*propw34**(-1)*facZZHWW*
      & Hbit * ( -Amp_S_PR*Amp_S_DK
      &  *ZZ17(jdu1,h17)*ZZ28(jdu2,h28)*propH**(-1) )
       endif
@@ -132,7 +140,7 @@ c--- special fix for Madgraph check
       Amp_S_DK=za(i3,i5)*zb(i4,i6)
          endif
       amp(jdu1,jdu2,h17,h28)= amp(jdu1,jdu2,h17,h28)
-     &                      + propw56**(-1)*propw34**(-1)*facHiggs*
+     &                      + propw56**(-1)*propw34**(-1)*facZZHWW*
      & Hbit * ( -Amp_S_PR*Amp_S_DK
      &  *ZZ17(jdu1,h17)*ZZ28(jdu2,h28)*propX**(-1) )
       endif
