@@ -12,7 +12,7 @@
       include 'spinzerohiggs_anomcoupl.f'
       integer i1,i2,i3,i4,i5,i6,i7,i8,
      & p1,p2,p3,p4,p5,p6,p7,p8
-      double complex zab2,zba2,amp,game,gamn,sqwmass,rxw,facHiggs,
+      double complex zab2,zba2,amp,game,gamn,sqwmass,rxw,facWWHWW,
      & propw34,propw56,propw28,propw17,anomhwwamp,
      & Amp_S_PR,Amp_S_DK,Amp_T_PR,Amp_T_DK,propX3456,
      & propz3456,propa3456,proph3456,proph1347,propX1347
@@ -33,7 +33,7 @@ c--- special fix for Madgraph check
       else
         sqwmass=cwmass2
       endif
-      facHiggs = sqwmass*cxw**(-3)*(4d0*cwmass2/vevsq*cxw/esq)
+      facWWHWW = sqwmass*cxw**(-3)*(4d0*cwmass2/vevsq*cxw/esq)
 
       rxw=sqrt((cone-cxw)/cxw)
       s3456=t4(i3,i4,i5,i6)
@@ -226,7 +226,7 @@ c--- special fix for Madgraph check
      & + Hbit*propw17**(-1)*propw28**(-1)*propw34**(-1)*propw56**(-1)*(
      &   - Amp_S_PR*Amp_S_DK*proph3456**(-1)   ! MARKUS: this is the WW-->H-->WW contribution (s-channel Higgs)
      &   - Amp_T_PR*Amp_T_DK*proph1347**(-1)   ! MARKUS: this is the WW-->H-->WW contribution (t-channel Higgs)
-     &                 )*facHiggs
+     &                 )*facWWHWW
       endif
 !       print *, "MARKUS check: remove *00000 above when checked"
 !       print *, "MARKUS check: new WW-->H-->WW:",amp
@@ -269,7 +269,7 @@ c--- special fix for Madgraph check
      & + Hbit*propw17**(-1)*propw28**(-1)*propw34**(-1)*propw56**(-1)*(
      &   - Amp_S_PR*Amp_S_DK*propX3456**(-1)
      &   - Amp_T_PR*Amp_T_DK*propX1347**(-1)
-     &                 )*facHiggs
+     &                 )*facWWHWW
       endif
 
 

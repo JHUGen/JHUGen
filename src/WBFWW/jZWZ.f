@@ -30,6 +30,7 @@ C-----end statement functions
       s268=t3(i2,i6,i8)
 
 c--- set up lepton couplings according to call
+! U.Sarica: Need to setup complementary couplings here
       if (i3 .eq. 3) then
         q3=q1
         l3=l1
