@@ -6,6 +6,8 @@ JHUGenMELADir = ../JHUGenMELA
 MCFMDir = $(JHUGenMELADir)
 PDFDir = $(Here)/pdfs
 VegasDir = $(Here)/vegas
+FFDir  = $(Here)/ff
+QLDir  = $(Here)/ql
 
 # compiler options, Comp='ifort' or 'gfort'
 Opt  = Yes
@@ -171,7 +173,7 @@ MadGraphObj = $(ObjectDir)/gg_ttbh.o \
 
 
 
-JHUGenerator: $(CPSObj) $(PSGenObj) $(VegasObj) $(PDFObj) $(AmpObj) $(MainObj)
+JHUGenerator: ffdir qldir $(CPSObj) $(PSGenObj) $(VegasObj) $(PDFObj) $(AmpObj) $(MainObj)
 	@echo " linking"
 ifeq ($(UseLHAPDF),Yes)
 	echo " interfaced with LHAPDF"
@@ -180,7 +182,7 @@ else
 endif
 	@echo " executable file is "$(Exec) "compiled with "$(Comp)
 	@echo " "
-	$(fcomp) -o $(Exec) $(MainObj) $(AmpObj) $(PSGenObj) $(VegasObj) $(PDFObj) $(CPSObj) $(MCFM_Obj) $(LHAPDFflags)
+	$(fcomp) -o $(Exec) $(MainObj) $(AmpObj) $(PSGenObj) $(VegasObj) $(PDFObj) $(CPSObj) $(MCFM_Obj) $(LHAPDFflags) $(ObjectDir)/libff.a  $(ObjectDir)/libqcdloop.a
 
 
 
@@ -222,11 +224,25 @@ $(PSGenObj): $(PSGenDep)
 # 	$(fcomp) -O0 -c $(MadGraphDep) -I/home/schulze/lib/HELAS-3.0/
 # 	mv *.o $(ObjectDir)
 
+ffdir:
+	@echo " compiling QCDLoop directory ff"
+	(cd $(FFDir); make; ranlib libff.a; mv *.a $(ObjectDir))
+	
+
+qldir:
+	@echo " compiling QCDLoop directory ql"
+	(cd $(QLDir); make; mv *.a $(ObjectDir))
+	
 
 
 clean:
 	@echo " deleting executable, object and module files"
 	rm -f objects/*.o
+	rm -f objects/*.a
+	rm -f ff/*.o
+	rm -f ff/*.a
+	rm -f ql/*.o
+	rm -f ql/*.a
 	rm -f modules/*.mod
 	rm -f modules/*.f90
 	rm -f *.mod

@@ -121,6 +121,16 @@ logical, public :: H_DK =.false.                 ! default to false so H in V* >
 
 !leave this one as a parameter, no reason to ever turn it off
 logical, public, parameter :: importExternal_LHEinit = .true.
+
+! gg > ZH
+character(len=2), public :: VH_PC = "tr"                    ! VH partonic channel and mode selection, in development.
+                                                            ! "gg" ( = triangles + boxes of gg)
+                                                            ! "qq" ( = q qbar @LO)
+                                                            ! "lo" ( = q qbar @LO)
+                                                            ! "tr" ( = triangles of gg)
+                                                            ! "bo" ( = boxes of gg)
+                                                            ! "nl" ( = full oneloop = q qbar @LO + NLO + gg + gq)
+! gg > ZH
 !=====================================================
 
 

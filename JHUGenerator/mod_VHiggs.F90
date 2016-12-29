@@ -96,7 +96,8 @@ end subroutine EvalAmp_VHiggs
       real(8), intent(in) :: MomExt(1:4,1:9)
       real(8), intent(in) :: mass(3:5,1:2)
       real(8), intent(in) :: helicity(9)
-      integer, intent(in) :: id(9)
+!      integer, intent(in) :: id(9)
+      integer  id(9)
       logical, intent(in) :: useA(2)
 
       integer mu3,mu4
@@ -105,9 +106,150 @@ end subroutine EvalAmp_VHiggs
       complex(8) Acurrent2(4), current2(4),POL1(3,4), POL2(3,4)
       complex(8) g_mu_nu(4,4), pp(4,4), epp(4,4)
       complex(8) VVX0(4,4)
-      complex(8) PROP1, PROP2, PROP3, gVVP, gVVS1, gVVS2, gFFZ, gFFA, gFFW
+      complex(8) PROP3, PROP4, PROP5, gVVP, gVVS1, gVVS2, gFFZ, gFFA, gFFW
       complex(8) ghz1_dyn,ghz2_dyn,ghz3_dyn,ghz4_dyn
       real(8) qq,q3_q3,q4_q4,q5_q5
+
+! gg > ZH
+      !complex (8) Tri(3), Box(3), JepsZ(3), epsZ(3,4)
+      complex (8) Tria1, Tria2, Tri, Box
+      integer lambdaZ
+!      real(8) :: sprod(9,9)
+!      complex(8) :: za(9,9), zb(9,9)
+      real(8) :: sprod(9,9)
+      complex(8) :: Spaa(7,7), Spbb(7,7)
+
+      id(1)=0
+      id(2)=0
+! gg > ZH
+
+
+
+
+
+
+      gFFZ = ci*2d0*dsqrt(couplZffsq) ! = gwsq/(1.0_dp-xw)
+      gFFA = -ci*dsqrt(couplAffsq) ! = gwsq*xw
+      gFFW = ci*dsqrt(couplWffsq) ! = gwsq/2.0_dp
+
+      qq = -scr(MomExt(:,3),MomExt(:,4))
+      q3_q3 = scr(MomExt(:,3),MomExt(:,3))
+      q4_q4 = scr(MomExt(:,4),MomExt(:,4))
+      q5_q5 = scr(MomExt(:,5),MomExt(:,5))
+      PROP5 = PROPAGATOR(dsqrt(q5_q5),mass(5,1),mass(5,2))
+
+
+
+
+
+
+
+! gg > ZH
+      if(id(1).eq.0.and.id(2).eq.0)then
+
+        if(.not.useA(1) .and. .not.useA(2)) then
+          ghz1_dyn = HVVSpinZeroDynamicCoupling(1,q3_q3,q4_q4,q5_q5)
+          ghz2_dyn = HVVSpinZeroDynamicCoupling(2,q3_q3,q4_q4,q5_q5)
+          ghz3_dyn = HVVSpinZeroDynamicCoupling(3,q3_q3,q4_q4,q5_q5)
+          ghz4_dyn = HVVSpinZeroDynamicCoupling(4,q3_q3,q4_q4,q5_q5)
+        else if(useA(1) .and. useA(2)) then
+          ghz1_dyn = czero
+          ghz2_dyn = HVVSpinZeroDynamicCoupling(9,q3_q3,q4_q4,q5_q5)
+          ghz3_dyn = HVVSpinZeroDynamicCoupling(10,q3_q3,q4_q4,q5_q5)
+          ghz4_dyn = HVVSpinZeroDynamicCoupling(11,q3_q3,q4_q4,q5_q5)
+        else if(useA(1)) then
+          ghz1_dyn = HVVSpinZeroDynamicCoupling(5,0d0,q3_q3,q5_q5)
+          ghz2_dyn = HVVSpinZeroDynamicCoupling(6,0d0,q3_q3,q5_q5)
+          ghz3_dyn = HVVSpinZeroDynamicCoupling(7,0d0,q3_q3,q5_q5)
+          ghz4_dyn = HVVSpinZeroDynamicCoupling(8,0d0,q3_q3,q5_q5)
+        else !if(useA(2)) then
+          ghz1_dyn = HVVSpinZeroDynamicCoupling(5,0d0,q4_q4,q5_q5)
+          ghz2_dyn = HVVSpinZeroDynamicCoupling(6,0d0,q4_q4,q5_q5)
+          ghz3_dyn = HVVSpinZeroDynamicCoupling(7,0d0,q4_q4,q5_q5)
+          ghz4_dyn = HVVSpinZeroDynamicCoupling(8,0d0,q4_q4,q5_q5)
+        endif
+  
+        gVVS1 = ghz1_dyn*(mass(3,1)**2) + qq * ( 2d0*ghz2_dyn + ghz3_dyn*qq/Lambda**2 )
+        gVVS2 = -( 2d0*ghz2_dyn + ghz3_dyn*qq/Lambda**2 )
+
+        MATRIXELEMENT0 = 0d0
+!        call spinoru2(9,(/-MomExt(1:4,1),-MomExt(1:4,2),-MomExt(1:4,1)-MomExt(1:4,2),MomExt(1:4,6)+MomExt(1:4,7),MomExt(1:4,8)+MomExt(1:4,9),MomExt(1:4,6),MomExt(1:4,7),MomExt(1:4,8),MomExt(1:4,9)/),za,zb,sprod)
+        call spinoru2(7,(/-MomExt(1:4,1),-MomExt(1:4,2),-MomExt(1:4,1)-MomExt(1:4,2),MomExt(1:4,6)+MomExt(1:4,7),MomExt(1:4,8)+MomExt(1:4,9),MomExt(1:4,6),MomExt(1:4,7)/),Spaa,Spbb,sprod)
+        PROP3 = PROPAGATOR(dsqrt(q3_q3),mass(3,1),mass(3,2))
+        PROP4 = PROPAGATOR(dsqrt(q4_q4),mass(4,1),mass(4,2))
+!        PROP5 = PROPAGATOR(dsqrt(q5_q5),mass(5,1),mass(5,2))
+        Tria1=0d0
+        Tria2=0d0
+        Box=0d0
+        if(VH_PC.eq."tr".or.VH_PC.eq."gg")then
+          if(gVVS1.ne.0d0) call ggTria1(Spaa,Spbb,sprod,helicity,Tria1)
+          if(gVVS2.ne.0d0) call ggTria2(Spaa,Spbb,sprod,helicity,Tria2)
+          Tri = (Tria1+Tria2) * PROP3
+        elseif(VH_PC.eq."bo".or.VH_PC.eq."gg")then
+          call ggBox(Spaa,Spbb,sprod,helicity,Box)
+        endif
+        MATRIXELEMENT0 = (Box + Tri) * PROP4
+
+        !l+ l- Z vertex for final state
+        if((abs(id(6)).eq.11).or.(abs(id(6)).eq.13))then
+          if((id(6)*helicity(6)).gt.0d0)then
+            MATRIXELEMENT0 = MATRIXELEMENT0 * aR_lep
+          else
+            MATRIXELEMENT0 = MATRIXELEMENT0 * aL_lep
+          endif
+          MATRIXELEMENT0 = MATRIXELEMENT0 * dsqrt(avegg) * alphas /2d0 * gFFZ**2 * dsqrt(scale_alpha_Z_ll)
+        !tau+ tau- Z vertex for final state
+        else if((abs(id(6)).eq.15))then
+          if((id(6)*helicity(6)).gt.0d0)then
+            MATRIXELEMENT0 = MATRIXELEMENT0 * aR_lep
+          else
+            MATRIXELEMENT0 = MATRIXELEMENT0 * aL_lep
+          endif
+          MATRIXELEMENT0 = MATRIXELEMENT0 * dsqrt(avegg) * alphas /2d0 * gFFZ**2 * dsqrt(scale_alpha_Z_tt)
+        !u u~ Z vertex for final state
+        else if((abs(id(6)).eq.2).or.(abs(id(6)).eq.4))then
+          if((id(6)*helicity(6)).gt.0d0)then
+            MATRIXELEMENT0 = MATRIXELEMENT0 * aR_QUp
+          else
+            MATRIXELEMENT0 = MATRIXELEMENT0 * aL_QUp
+          endif
+          MATRIXELEMENT0 = MATRIXELEMENT0 * dsqrt(avegg) * alphas /2d0 * gFFZ**2 * dsqrt(scale_alpha_Z_uu)
+        !d d~ Z vertex for final state
+        else if((abs(id(6)).eq.1).or.(abs(id(6)).eq.3).or.(abs(id(6)).eq.5))then
+          if((id(6)*helicity(6)).gt.0d0)then
+            MATRIXELEMENT0 = MATRIXELEMENT0 * aR_QDn
+          else
+            MATRIXELEMENT0 = MATRIXELEMENT0 * aL_QDn
+          endif
+          MATRIXELEMENT0 = MATRIXELEMENT0 * dsqrt(avegg) * alphas /2d0 * gFFZ**2 * dsqrt(scale_alpha_Z_dd)
+        !nu nu~ Z vertex for final state
+        else if((abs(id(6)).eq.12).or.(abs(id(6)).eq.14).or.(abs(id(6)).eq.16))then
+          MATRIXELEMENT0 = MATRIXELEMENT0 * aL_neu
+          MATRIXELEMENT0 = MATRIXELEMENT0 * dsqrt(avegg) * alphas /2d0 * gFFZ**2 * dsqrt(scale_alpha_Z_nn)
+        else
+          MATRIXELEMENT0=0d0
+          print *, "invalid final state", id(6:7), helicity(6:7)
+          stop
+        endif
+
+        return
+      endif
+! gg > ZH
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
       if( &
          (id(1).ne.convertLHE(Pho_) .and. useA(1) .and. .not.includeGammaStar) .or. &
@@ -119,15 +261,7 @@ end subroutine EvalAmp_VHiggs
          return
       endif
 
-      gFFZ = ci*2d0*dsqrt(couplZffsq) ! = gwsq/(1.0_dp-xw)
-      gFFA = -ci*dsqrt(couplAffsq) ! = gwsq*xw
-      gFFW = ci*dsqrt(couplWffsq) ! = gwsq/2.0_dp
 
-      qq = -scr(MomExt(:,3),MomExt(:,4))
-      q3_q3 = scr(MomExt(:,3),MomExt(:,3))
-      q4_q4 = scr(MomExt(:,4),MomExt(:,4))
-      q5_q5 = scr(MomExt(:,5),MomExt(:,5))
-      PROP3 = PROPAGATOR(dsqrt(q5_q5),mass(5,1),mass(5,2))
 
       Vcurrent1 = (0d0,0d0)
       Acurrent1 = (0d0,0d0)
@@ -135,7 +269,7 @@ end subroutine EvalAmp_VHiggs
       Acurrent2 = (0d0,0d0)
 
       if(.not.useA(1)) then
-         PROP1 = PROPAGATOR(dsqrt(q3_q3),mass(3,1),mass(3,2))
+         PROP3 = PROPAGATOR(dsqrt(q3_q3),mass(3,1),mass(3,2))
          if(id(1).gt.0)then
            call FFV(id(2), MomExt(:,2), helicity(2), id(1), MomExt(:,1), helicity(1), Vcurrent1)
            call FFA(id(2), MomExt(:,2), helicity(2), id(1), MomExt(:,1), helicity(1), Acurrent1)
@@ -180,10 +314,10 @@ end subroutine EvalAmp_VHiggs
            print *, "invalid incoming state"
          endif
       else
-         PROP1 = PROPAGATOR(dsqrt(q3_q3),0d0,0d0)
+         PROP3 = PROPAGATOR(dsqrt(q3_q3),0d0,0d0)
 
          if(abs(id(1)).eq.convertLHE(Pho_)) then
-           PROP1=cone
+           PROP3=cone
            if((id(1)*helicity(1)).gt.0d0) then
              call POLARIZATION_SINGLE(MomExt(:,3),+1,Vcurrent1)
            else
@@ -229,7 +363,7 @@ end subroutine EvalAmp_VHiggs
       endif
 
       if(.not.useA(2)) then
-         PROP2 = PROPAGATOR(dsqrt(q4_q4),mass(4,1),mass(4,2))
+         PROP4 = PROPAGATOR(dsqrt(q4_q4),mass(4,1),mass(4,2))
 
          if(id(6).gt.0)then
            call FFV(id(6), MomExt(:,6), helicity(6), id(7), MomExt(:,7), helicity(7), Vcurrent2)
@@ -291,10 +425,10 @@ end subroutine EvalAmp_VHiggs
            endif
          endif
       else
-         PROP2 = PROPAGATOR(dsqrt(q4_q4),0d0,0d0)
+         PROP4 = PROPAGATOR(dsqrt(q4_q4),0d0,0d0)
 
          if(abs(id(6)).eq.convertLHE(Pho_)) then
-           PROP2=cone
+           PROP4=cone
            if((id(6)*helicity(6)).gt.0d0) then
              call POLARIZATION_SINGLE(MomExt(:,4),+1,Vcurrent2)
            else
@@ -359,8 +493,8 @@ end subroutine EvalAmp_VHiggs
       if(.not.(useA(2) .and. abs(id(6)).eq.convertLHE(Pho_))) then
          current2 = -current2 + scrc(MomExt(:,4),current2)/q4_q4
       endif
-      current1 = current1*PROP1
-      current2 = current2*PROP2
+      current1 = current1*PROP3
+      current2 = current2*PROP4
 
 !XVV vertex
       if(id(3).eq.convertLHE(Wp_))then
@@ -426,9 +560,9 @@ end subroutine EvalAmp_VHiggs
       enddo !mu3
 
       if(H_DK.eqv..false.)then
-        MATRIXELEMENT0=MATRIXELEMENT0 *PROP3
+        MATRIXELEMENT0=MATRIXELEMENT0 *PROP5
       else if(id(8).ne.Not_a_particle_) then
-        MATRIXELEMENT0=MATRIXELEMENT0 *PROP3 &
+        MATRIXELEMENT0=MATRIXELEMENT0 *PROP5 &
         *(kappa*FFS(id(8), MomExt(:,8), helicity(8), id(9), MomExt(:,9), helicity(9)) &
          +kappa_tilde*FFP(id(8), MomExt(:,8), helicity(8), id(9), MomExt(:,9), helicity(9)))&
         *(-ci/vev*getMass(convertLHEreverse(id(8))))
@@ -436,8 +570,113 @@ end subroutine EvalAmp_VHiggs
         MATRIXELEMENT0=czero
       endif
 
+
+
+
+
+
+
+
+
       return
       END function
+
+! gg > ZH
+      subroutine ggTria1(Spaa,Spbb,sprod,helicity,Tria1)
+      implicit none
+      complex(8), intent(in) :: Spaa(1:7,1:7),Spbb(1:7,1:7)
+      real(8), intent(in) :: sprod(1:9,1:9)
+      real(8), intent(in) :: helicity(9)
+      complex(8) C0, qli3
+      complex(8) Tria1
+
+      Tria1=0d0
+
+      if(helicity(1)*helicity(2).lt.0d0)then
+        Tria1=0d0
+      elseif(helicity(1).gt.0d0)then
+        if(helicity(6).gt.0d0)then
+          Tria1=Spaa(1,2)*(Spaa(7,1)*Spbb(6,1)+Spaa(7,2)*Spbb(6,2))/Spbb(1,2) !+++
+        else
+          Tria1=Spaa(1,2)*(Spaa(6,1)*Spbb(7,1)+Spaa(6,2)*Spbb(7,2))/Spbb(1,2) !++-
+        endif
+      else
+        if(helicity(6).gt.0d0)then
+          Tria1=Spbb(2,1)*(Spaa(7,1)*Spbb(6,1)+Spaa(7,2)*Spbb(6,2))/Spaa(1,2) !--+
+        else
+          Tria1=Spbb(2,1)*(Spaa(6,1)*Spbb(7,1)+Spaa(6,2)*Spbb(7,2))/Spaa(1,2) !---
+        endif
+      endif
+      
+      C0=qlI3(0d0,0d0,sprod(1,2),M_Top**2,M_Top**2,M_Top**2,Mu_Ren**2,0)
+
+      Tria1 = -8d0 * Tria1 * C0 * m_top**2
+
+      return
+      END subroutine ggTria1
+
+      subroutine ggTria2(Spaa,Spbb,sprod,helicity,Tria2)
+      implicit none
+      complex(8), intent(in) :: Spaa(1:7,1:7),Spbb(1:7,1:7)
+      real(8), intent(in) :: sprod(1:9,1:9)
+      real(8), intent(in) :: helicity(9)
+      complex(8) C0, qli3
+      complex(8) Tria2
+
+      Tria2=0d0
+
+      if(helicity(1)*helicity(2).lt.0d0)then
+        Tria2=0d0
+      elseif(helicity(1).gt.0d0)then
+        if(helicity(6).gt.0d0)then
+          Tria2=Spaa(1,2)*(m_Z**2 + Spaa(1,2)*Spbb(1,2))* &
+                (Spaa(1,7)*Spbb(1,6) + Spaa(2,7)*Spbb(2,6))* &
+                (2d0*Spaa(1,2)*Spbb(1,2) - Spaa(1,6)*Spbb(1,6) - &
+                Spaa(1,7)*Spbb(1,7) - Spaa(2,6)*Spbb(2,6) - &
+                Spaa(2,7)*Spbb(2,7))/(m_Z**2*Spbb(1,2)) !+++
+        else
+          Tria2=Spaa(1,2)*(m_Z**2 + Spaa(1,2)*Spbb(1,2))* &
+                (Spaa(1,6)*Spbb(1,7) + Spaa(2,6)*Spbb(2,7))* &
+                (2d0*Spaa(1,2)*Spbb(1,2) - Spaa(1,6)*Spbb(1,6) - &
+                Spaa(1,7)*Spbb(1,7) - Spaa(2,6)*Spbb(2,6) - &
+                Spaa(2,7)*Spbb(2,7))/(m_Z**2*Spbb(1,2)) !++-
+        endif
+      else
+        if(helicity(6).gt.0d0)then
+          Tria2=-Spbb(1,2)*(m_Z**2 + Spaa(1,2)*Spbb(1,2))* &
+                (Spaa(1,7)*Spbb(1,6) + Spaa(2,7)*Spbb(2,6))* &
+                (2d0*Spaa(1,2)*Spbb(1,2) - Spaa(1,6)*Spbb(1,6) - & 
+                Spaa(1,7)*Spbb(1,7) - Spaa(2,6)*Spbb(2,6) - &
+                Spaa(2,7)*Spbb(2,7))/(m_Z**2*Spaa(1,2)) !--+
+        else
+          Tria2=-Spbb(1,2)*(m_Z**2 + Spaa(1,2)*Spbb(1,2))* &
+                (Spaa(1,6)*Spbb(1,7) + Spaa(2,6)*Spbb(2,7))* &
+                (2d0*Spaa(1,2)*Spbb(1,2) - Spaa(1,6)*Spbb(1,6) - & 
+                Spaa(1,7)*Spbb(1,7) - Spaa(2,6)*Spbb(2,6) - &
+                Spaa(2,7)*Spbb(2,7))/(m_Z**2*Spaa(1,2)) !---
+        endif
+      endif
+      
+      C0=qlI3(0d0,0d0,sprod(1,2),M_Top**2,M_Top**2,M_Top**2,Mu_Ren**2,0)
+
+      Tria2 = 4d0 * Tria2 * C0 * m_top**2
+
+      return
+      END subroutine ggTria2
+
+      subroutine ggBox(Spaa,Spbb,sprod,helicity,Box)
+      implicit none
+      complex(8), intent(in) :: Spaa(1:7,1:7),Spbb(1:7,1:7)
+      real(8), intent(in) :: sprod(1:9,1:9)
+      real(8), intent(in) :: helicity(9)
+      !complex(8) Box(3)
+      complex(8) Box
+
+      Box = 0d0
+
+      return
+      END subroutine ggBox
+! gg > ZH
 
 !ANGLES.F
 !VERSION 20130531

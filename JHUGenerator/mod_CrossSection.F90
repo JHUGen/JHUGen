@@ -2186,6 +2186,7 @@ if( IsAZDecay(DecayMode1) ) then
 !if pp collider
     if(Collider.eq.1)then
       call PDFMapping(14,yrnd(14:15),eta1,eta2,Ehat,sHatJacobi)
+      if( Ehat .ge. 2d0*m_top ) return !without complex top mass in ZH amplitude
 
       MomExt(1,3)=EHat
       MomExt(2,3)=0d0
@@ -2208,21 +2209,30 @@ if( IsAZDecay(DecayMode1) ) then
       call SetRunningScales( (/ MomExt(1:4,5),MomExt(1:4,6),MomExt(1:4,7) /) , (/ convertLHEreverse(id(3)),convertLHEreverse(id(6)),convertLHEreverse(id(7)),convertLHEreverse(id(4)) /) )
       call setPDFs(eta1,eta2,pdf)
       FluxFac = 1d0/(2d0*EHat**2)
-      PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt *6d0 !2 for e and mu, 3 for colors of b
+      PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt! *6d0 !2 for e and mu, 3 for colors of b
       LO_Res_Unpol=0d0
       EvalWeighted_VHiggs=0d0
-      do i = -6,6
-        j = -i
-        id(1:2) = (/LHA2M_PDF(i),LHA2M_PDF(j)/)
-        if (abs(LHA2M_PDF(i)).ne.6   .and.   abs(LHA2M_PDF(j)).ne.6.  .and.  i.ne.0)then
-          call EvalAmp_VHiggs(id,helicity,MomExt,me2)
-        else
-          me2=0d0
-        endif
-          LO_Res_Unpol = me2/3d0*pdf(i,1)*pdf(j,2)* PreFac
-          EvalWeighted_VHiggs = EvalWeighted_VHiggs + LO_Res_Unpol
-          !lheweight(i,j)=LO_Res_Unpol
-      enddo
+      if(VH_PC.eq."qq".or.VH_PC.eq."lo")then
+        do i = -6,6
+          j = -i
+          id(1:2) = (/LHA2M_PDF(i),LHA2M_PDF(j)/)
+          if (abs(LHA2M_PDF(i)).ne.6   .and.   abs(LHA2M_PDF(j)).ne.6.  .and.  i.ne.0)then
+            call EvalAmp_VHiggs(id,helicity,MomExt,me2)
+          else
+            me2=0d0
+          endif
+            LO_Res_Unpol = me2/3d0*pdf(i,1)*pdf(j,2)* PreFac
+            EvalWeighted_VHiggs = EvalWeighted_VHiggs + LO_Res_Unpol
+            !lheweight(i,j)=LO_Res_Unpol
+        enddo
+      elseif(VH_PC.eq."gg".or.VH_PC.eq."bo".or.VH_PC.eq."tr")then
+        id(1)=0
+        id(2)=0
+        call EvalAmp_VHiggs(id,helicity,MomExt,me2)
+        LO_Res_Unpol = me2/3d0*pdf(i,1)*pdf(j,2)* PreFac
+!        print *, me2,pdf(i,1),pdf(j,2)
+        EvalWeighted_VHiggs = EvalWeighted_VHiggs + LO_Res_Unpol
+      endif
 
 !if e+ e- collider
     else if(Collider.eq.0)then
@@ -2717,6 +2727,7 @@ if( IsAZDecay(DecayMode1) ) then
 !if pp collider
     if(Collider.eq.1)then
       call PDFMapping(14,yrnd(14:15),eta1,eta2,Ehat,sHatJacobi)
+      if( Ehat .ge. 2d0*m_top ) return !without complex top mass in ZH amplitude
 
       MomExt(1,3)=EHat
       MomExt(2,3)=0d0
@@ -2943,21 +2954,33 @@ ELSE! NOT GENEVT
 if( IsAZDecay(DecayMode1) .or. IsAPhoton(DecayMode1) ) then
 !if pp collider
   if(Collider.eq.1)then
-  do i = -5,5
-    j = -i
-    id(1:2) = (/i,j/)
-    if (abs(i).ne.0)then
+    if(VH_PC.eq."qq".or.VH_PC.eq."lo")then
+      do i = -5,5
+        j = -i
+        id(1:2) = (/i,j/)
+        if (abs(i).ne.0)then
+          call EvalAmp_VHiggs(id,helicity,MomExt,me2)
+        else
+          me2=0d0
+        endif
+        LO_Res_Unpol = me2 *pdf(LHA2M_PDF(i),1)*pdf(LHA2M_PDF(j),2) * PreFac
+        EvalUnWeighted_VHiggs = EvalUnWeighted_VHiggs+LO_Res_Unpol
+        RES(i,j) = LO_Res_Unpol
+        if (LO_Res_Unpol.gt.csmax(i,j)) then
+          csmax(i,j) = LO_Res_Unpol
+        endif
+      enddo
+    elseif(VH_PC.eq."gg".or.VH_PC.eq."bo".or.VH_PC.eq."tr")then
+      id(1)=0
+      id(2)=0
       call EvalAmp_VHiggs(id,helicity,MomExt,me2)
-    else
-      me2=0d0
+      LO_Res_Unpol = me2 *pdf(LHA2M_PDF(i),1)*pdf(LHA2M_PDF(j),2) * PreFac
+      EvalUnWeighted_VHiggs = EvalUnWeighted_VHiggs+LO_Res_Unpol
+      RES(i,j) = LO_Res_Unpol
+      if (LO_Res_Unpol.gt.csmax(i,j)) then
+        csmax(i,j) = LO_Res_Unpol
+      endif
     endif
-    LO_Res_Unpol = me2 *pdf(LHA2M_PDF(i),1)*pdf(LHA2M_PDF(j),2) * PreFac
-    EvalUnWeighted_VHiggs = EvalUnWeighted_VHiggs+LO_Res_Unpol
-    RES(i,j) = LO_Res_Unpol
-    if (LO_Res_Unpol.gt.csmax(i,j)) then
-      csmax(i,j) = LO_Res_Unpol
-    endif
-  enddo
 !if e+ e- collider
   else if(Collider.eq.0)then
     id(2)=convertLHE(ElM_)
