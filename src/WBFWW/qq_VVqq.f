@@ -79,6 +79,9 @@ C---call plabel/pdgid conversion
 C---setup spinors and spinorvector products
       call spinorcurr(8,p,za,zb,zab,zba)
 
+c---setup Z/A couplings from PDG ids
+      call couplzajk()
+
 c---color factors for W and Z decays
       colfac34_56=1d0
       if (

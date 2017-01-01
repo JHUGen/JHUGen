@@ -7,6 +7,8 @@
       include 'sprods_com.f'
       include 'ewcharge.f'
       include 'zcouple.f'
+      include 'zacouplejk.f'
+      include 'pid_pdg.f'
       integer jdu1,jdu2,h17,h28,i1,i2,i3,i4,i5,i6,i7,i8,
      & p1,p2,p3,p4,p5,p6,p7,p8
       double complex amp(2,2,2,2),propZ17,propZ28,propW1347,
@@ -30,43 +32,104 @@ C-----end statement functions
       s268=t3(i2,i6,i8)
 
 c--- set up lepton couplings according to call
-! U.Sarica: Need to setup complementary couplings here
       if (i3 .eq. 3) then
         q3=q1
         l3=l1
-        q4=q2
-        l4=l2
         q5=q2
         l5=l2
-        q6=q1
-        l6=l1
       else
         q3=q2
         l3=l2
-        q4=q1
-        l4=l1
         q5=q1
         l5=l1
-        q6=q2
-        l6=l2
       endif
+      ! Find the complementary charges for the i3-i4 and i5-i6 lines
+      if(pid_pdg(i3).eq.0 .and. pid_pdg(i4).eq.0) then
+         l4=l3
+         q4=q3
+      else if(
+     & abs(pid_pdg(i3)).eq.11 .or.
+     & abs(pid_pdg(i3)).eq.13 .or.
+     & abs(pid_pdg(i3)).eq.15) then
+         l4=ln
+         q4=0d0
+      else if(
+     & abs(pid_pdg(i3)).eq.12 .or.
+     & abs(pid_pdg(i3)).eq.14 .or.
+     & abs(pid_pdg(i3)).eq.16) then
+         l4=le
+         q4=qe
+      else if(
+     & abs(pid_pdg(i3)).eq.1 .or.
+     & abs(pid_pdg(i3)).eq.3 .or.
+     & abs(pid_pdg(i3)).eq.5) then
+         l4=L(2)
+         q4=Q(2)
+      else if(
+     & abs(pid_pdg(i3)).eq.2 .or.
+     & abs(pid_pdg(i3)).eq.4) then
+         l4=L(1)
+         q4=Q(1)
+      else
+         l4=0d0
+         q4=0d0
+      endif
+      if(pid_pdg(i5).eq.0 .and. pid_pdg(i6).eq.0) then
+         l6=l5
+         q6=q5
+      else if(
+     & abs(pid_pdg(i5)).eq.11 .or.
+     & abs(pid_pdg(i5)).eq.13 .or.
+     & abs(pid_pdg(i5)).eq.15) then
+         l6=ln
+         q6=0d0
+      else if(
+     & abs(pid_pdg(i5)).eq.12 .or.
+     & abs(pid_pdg(i5)).eq.14 .or.
+     & abs(pid_pdg(i5)).eq.16) then
+         l6=le
+         q6=qe
+      else if(
+     & abs(pid_pdg(i5)).eq.1 .or.
+     & abs(pid_pdg(i5)).eq.3 .or.
+     & abs(pid_pdg(i5)).eq.5) then
+         l6=L(2)
+         q6=Q(2)
+      else if(
+     & abs(pid_pdg(i5)).eq.2 .or.
+     & abs(pid_pdg(i5)).eq.4) then
+         l6=L(1)
+         q6=Q(1)
+      else
+         l6=0d0
+         q6=0d0
+      endif
+
 
       propz17=s17-dcmplx(zmass**2,-zmass*zwidth)
       propz28=s28-dcmplx(zmass**2,-zmass*zwidth)
       propw1347=t4(i1,i3,i4,i7)-dcmplx(wmass**2,-wmass*wwidth)
 
       do jdu1=1,2
-      gamZ17lept3(jdu1,1)=Q(jdu1)*q3/s17+L(jdu1)*l3/propZ17
-      gamZ17lept3(jdu1,2)=Q(jdu1)*q3/s17+R(jdu1)*l3/propZ17
+      gamZ17lept3(jdu1,1)=Q_jk(i1,i7,jdu1)*q3/s17
+     & +L_jk(i1,i7,jdu1)*l3/propZ17
+      gamZ17lept3(jdu1,2)=Q_jk(i1,i7,jdu1)*q3/s17
+     & +R_jk(i1,i7,jdu1)*l3/propZ17
 
-      gamZ17anti4(jdu1,1)=Q(jdu1)*q4/s17+L(jdu1)*l4/propZ17
-      gamZ17anti4(jdu1,2)=Q(jdu1)*q4/s17+R(jdu1)*l4/propZ17
+      gamZ17anti4(jdu1,1)=Q_jk(i1,i7,jdu1)*q4/s17
+     & +L_jk(i1,i7,jdu1)*l4/propZ17
+      gamZ17anti4(jdu1,2)=Q_jk(i1,i7,jdu1)*q4/s17
+     & +R_jk(i1,i7,jdu1)*l4/propZ17
 
-      gamZ28lept5(jdu1,1)=Q(jdu1)*q5/s28+L(jdu1)*l5/propZ28
-      gamZ28lept5(jdu1,2)=Q(jdu1)*q5/s28+R(jdu1)*l5/propZ28
+      gamZ28lept5(jdu1,1)=Q_jk(i2,i8,jdu1)*q5/s28
+     & +L_jk(i2,i8,jdu1)*l5/propZ28
+      gamZ28lept5(jdu1,2)=Q_jk(i2,i8,jdu1)*q5/s28
+     & +R_jk(i2,i8,jdu1)*l5/propZ28
 
-      gamZ28anti6(jdu1,1)=Q(jdu1)*q6/s28+L(jdu1)*l6/propZ28
-      gamZ28anti6(jdu1,2)=Q(jdu1)*q6/s28+R(jdu1)*l6/propZ28
+      gamZ28anti6(jdu1,1)=Q_jk(i2,i8,jdu1)*q6/s28
+     & +L_jk(i2,i8,jdu1)*l6/propZ28
+      gamZ28anti6(jdu1,2)=Q_jk(i2,i8,jdu1)*q6/s28
+     & +R_jk(i2,i8,jdu1)*l6/propZ28
       enddo
 
       p3=i3

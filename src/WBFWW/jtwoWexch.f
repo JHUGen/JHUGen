@@ -7,6 +7,7 @@
       include 'sprods_com.f'
       include 'ewcharge.f'
       include 'zcouple.f'
+      include 'zacouplejk.f'
       integer jdu1,i1,i2,i3,i4,i5,i6,i7,i8,
      & p1,p2,p3,p4,p5,p6,p7,p8
       double complex zab2,zba2,amp(2,2),rxw,
@@ -46,18 +47,28 @@ C-----end statement functions
       propz3456=s3456-dcmplx(zmass**2,-zmass*zwidth)
 
       do jdu1=1,2
-      game3456(jdu1,1,1)=Q(jdu1)*q1/s3456+L(jdu1)*l1/propZ3456
-      game3456(jdu1,1,2)=Q(jdu1)*q1/s3456+L(jdu1)*r1/propZ3456
-      game3456(jdu1,2,1)=Q(jdu1)*q1/s3456+R(jdu1)*l1/propZ3456
-      game3456(jdu1,2,2)=Q(jdu1)*q1/s3456+R(jdu1)*r1/propZ3456
+      game3456(jdu1,1,1)=Q_jk(i1,i7,jdu1)*q1/s3456
+     & +L_jk(i1,i7,jdu1)*l1/propZ3456
+      game3456(jdu1,1,2)=Q_jk(i1,i7,jdu1)*q1/s3456
+     & +L_jk(i1,i7,jdu1)*r1/propZ3456
+      game3456(jdu1,2,1)=Q_jk(i1,i7,jdu1)*q1/s3456
+     & +R_jk(i1,i7,jdu1)*l1/propZ3456
+      game3456(jdu1,2,2)=Q_jk(i1,i7,jdu1)*q1/s3456
+     & +R_jk(i1,i7,jdu1)*r1/propZ3456
 
-      gamn3456(jdu1,1,1)=Q(jdu1)*q2/s3456+L(jdu1)*l2/propZ3456
-      gamn3456(jdu1,1,2)=Q(jdu1)*q2/s3456+L(jdu1)*r2/propZ3456
-      gamn3456(jdu1,2,1)=Q(jdu1)*q2/s3456+R(jdu1)*l2/propZ3456
-      gamn3456(jdu1,2,2)=Q(jdu1)*q2/s3456+R(jdu1)*r2/propZ3456
+      gamn3456(jdu1,1,1)=Q_jk(i1,i7,jdu1)*q2/s3456
+     & +L_jk(i1,i7,jdu1)*l2/propZ3456
+      gamn3456(jdu1,1,2)=Q_jk(i1,i7,jdu1)*q2/s3456
+     & +L_jk(i1,i7,jdu1)*r2/propZ3456
+      gamn3456(jdu1,2,1)=Q_jk(i1,i7,jdu1)*q2/s3456
+     & +R_jk(i1,i7,jdu1)*l2/propZ3456
+      gamn3456(jdu1,2,2)=Q_jk(i1,i7,jdu1)*q2/s3456
+     & +R_jk(i1,i7,jdu1)*r2/propZ3456
 
-      gamV(jdu1,1)=Q(jdu1)/s3456+L(jdu1)*rxw/propZ3456
-      gamV(jdu1,2)=Q(jdu1)/s3456+R(jdu1)*rxw/propZ3456
+      gamV(jdu1,1)=Q_jk(i1,i7,jdu1)/s3456
+     & +L_jk(i1,i7,jdu1)*rxw/propZ3456
+      gamV(jdu1,2)=Q_jk(i1,i7,jdu1)/s3456
+     & +R_jk(i1,i7,jdu1)*rxw/propZ3456
       enddo
 
       p1=i1

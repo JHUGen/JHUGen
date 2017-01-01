@@ -7,6 +7,7 @@
       include 'sprods_com.f'
       include 'ewcharge.f'
       include 'zcouple.f'
+      include 'zacouplejk.f'
       integer jdu1,jdu2,h28,i1,i2,i3,i4,i5,i6,i7,i8,
      & p1,p2,p3,p4,p5,p6,p7,p8
       double complex zab2,zba2,amp(2,2,2,2),rxw,
@@ -63,34 +64,46 @@ C-----end statement functions
       propw2568=t4(i2,i5,i6,i8)-dcmplx(wmass**2,-wmass*wwidth)
 
       do jdu1=1,2
-      game3456(jdu1,1,1)=Q(jdu1)*q1/s3456+L(jdu1)*l1/propZ3456
-      game3456(jdu1,1,2)=Q(jdu1)*q1/s3456+L(jdu1)*r1/propZ3456
-      game3456(jdu1,2,1)=Q(jdu1)*q1/s3456+R(jdu1)*l1/propZ3456
-      game3456(jdu1,2,2)=Q(jdu1)*q1/s3456+R(jdu1)*r1/propZ3456
+      game3456(jdu1,1,1)=Q_jk(i1,i7,jdu1)*q1/s3456
+     & +L_jk(i1,i7,jdu1)*l1/propZ3456
+      game3456(jdu1,1,2)=Q_jk(i1,i7,jdu1)*q1/s3456
+     & +L_jk(i1,i7,jdu1)*r1/propZ3456
+      game3456(jdu1,2,1)=Q_jk(i1,i7,jdu1)*q1/s3456
+     & +R_jk(i1,i7,jdu1)*l1/propZ3456
+      game3456(jdu1,2,2)=Q_jk(i1,i7,jdu1)*q1/s3456
+     & +R_jk(i1,i7,jdu1)*r1/propZ3456
 
-      gamV(jdu1,1)=Q(jdu1)/s3456+L(jdu1)*rxw/propZ3456
-      gamV(jdu1,2)=Q(jdu1)/s3456+R(jdu1)*rxw/propZ3456
+      gamV(jdu1,1)=Q_jk(i1,i7,jdu1)/s3456+L_jk(i1,i7,jdu1)*rxw/propZ3456
+      gamV(jdu1,2)=Q_jk(i1,i7,jdu1)/s3456+R_jk(i1,i7,jdu1)*rxw/propZ3456
 
-      gamV17(jdu1,1)=Q(jdu1)/s17+L(jdu1)*rxw/propZ17
-      gamV17(jdu1,2)=Q(jdu1)/s17+R(jdu1)*rxw/propZ17
+      gamV17(jdu1,1)=Q_jk(i1,i7,jdu1)/s17+L_jk(i1,i7,jdu1)*rxw/propZ17
+      gamV17(jdu1,2)=Q_jk(i1,i7,jdu1)/s17+R_jk(i1,i7,jdu1)*rxw/propZ17
 
-      gamV28(jdu1,1)=Q(jdu1)/s28+L(jdu1)*rxw/propZ28
-      gamV28(jdu1,2)=Q(jdu1)/s28+R(jdu1)*rxw/propZ28
+      gamV28(jdu1,1)=Q_jk(i2,i8,jdu1)/s28+L_jk(i2,i8,jdu1)*rxw/propZ28
+      gamV28(jdu1,2)=Q_jk(i2,i8,jdu1)/s28+R_jk(i2,i8,jdu1)*rxw/propZ28
 
-      gamn3456(jdu1,1,1)=Q(jdu1)*q2/s3456+L(jdu1)*l2/propZ3456
-      gamn3456(jdu1,1,2)=Q(jdu1)*q2/s3456+L(jdu1)*r2/propZ3456
-      gamn3456(jdu1,2,1)=Q(jdu1)*q2/s3456+R(jdu1)*l2/propZ3456
-      gamn3456(jdu1,2,2)=Q(jdu1)*q2/s3456+R(jdu1)*r2/propZ3456
+      gamn3456(jdu1,1,1)=Q_jk(i1,i7,jdu1)*q2/s3456
+     & +L_jk(i1,i7,jdu1)*l2/propZ3456
+      gamn3456(jdu1,1,2)=Q_jk(i1,i7,jdu1)*q2/s3456
+     & +L_jk(i1,i7,jdu1)*r2/propZ3456
+      gamn3456(jdu1,2,1)=Q_jk(i1,i7,jdu1)*q2/s3456
+     & +R_jk(i1,i7,jdu1)*l2/propZ3456
+      gamn3456(jdu1,2,2)=Q_jk(i1,i7,jdu1)*q2/s3456
+     & +R_jk(i1,i7,jdu1)*r2/propZ3456
 
-      game28(jdu1,1)=Q(jdu1)*q1/s28+L(jdu1)*l1/propZ28
-      game28(jdu1,2)=Q(jdu1)*q1/s28+R(jdu1)*l1/propZ28
-      gamn28(jdu1,1)=Q(jdu1)*q2/s28+L(jdu1)*l2/propZ28
-      gamn28(jdu1,2)=Q(jdu1)*q2/s28+R(jdu1)*l2/propZ28
+      game28(jdu1,1)=Q_jk(i2,i8,jdu1)*q1/s28+L_jk(i2,i8,jdu1)*l1/propZ28
+      game28(jdu1,2)=Q_jk(i2,i8,jdu1)*q1/s28+R_jk(i2,i8,jdu1)*l1/propZ28
+      gamn28(jdu1,1)=Q_jk(i2,i8,jdu1)*q2/s28+L_jk(i2,i8,jdu1)*l2/propZ28
+      gamn28(jdu1,2)=Q_jk(i2,i8,jdu1)*q2/s28+R_jk(i2,i8,jdu1)*l2/propZ28
       do jdu2=1,2
-      gam28(jdu1,jdu2,1,1)=Q(jdu1)*Q(jdu2)/s28+L(jdu1)*L(jdu2)/propZ28
-      gam28(jdu1,jdu2,1,2)=Q(jdu1)*Q(jdu2)/s28+L(jdu1)*R(jdu2)/propZ28
-      gam28(jdu1,jdu2,2,1)=Q(jdu1)*Q(jdu2)/s28+R(jdu1)*L(jdu2)/propZ28
-      gam28(jdu1,jdu2,2,2)=Q(jdu1)*Q(jdu2)/s28+R(jdu1)*R(jdu2)/propZ28
+      gam28(jdu1,jdu2,1,1)=Q_jk(i1,i7,jdu1)*Q_jk(i2,i8,jdu2)/s28
+     & +L_jk(i1,i7,jdu1)*L_jk(i2,i8,jdu2)/propZ28
+      gam28(jdu1,jdu2,1,2)=Q_jk(i1,i7,jdu1)*Q_jk(i2,i8,jdu2)/s28
+     & +L_jk(i1,i7,jdu1)*R_jk(i2,i8,jdu2)/propZ28
+      gam28(jdu1,jdu2,2,1)=Q_jk(i1,i7,jdu1)*Q_jk(i2,i8,jdu2)/s28
+     & +R_jk(i1,i7,jdu1)*L_jk(i2,i8,jdu2)/propZ28
+      gam28(jdu1,jdu2,2,2)=Q_jk(i1,i7,jdu1)*Q_jk(i2,i8,jdu2)/s28
+     & +R_jk(i1,i7,jdu1)*R_jk(i2,i8,jdu2)/propZ28
       enddo
       enddo
 

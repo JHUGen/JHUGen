@@ -7,6 +7,7 @@
       include 'masses.f'
       include 'ewcharge.f'
       include 'zcouple.f'
+      include 'zacouplejk.f'
       integer jdu1,jdu2,h28,h17,i1,i2,i3,i4,i5,i6,i7,i8,
      & p1,p2,p3,p4,p5,p6,p7,p8
       double complex zba2,amp(2,2,2,2),
@@ -38,14 +39,22 @@ C-----end statement functions
       propz28=s(i2,i8)-dcmplx(zmass**2,-zmass*zwidth)
 
       do jdu1=1,2
-      gam17e(jdu1,1)=Q(jdu1)*q1/s(i1,i7)+L(jdu1)*l1/propz17
-      gam17e(jdu1,2)=Q(jdu1)*q1/s(i1,i7)+R(jdu1)*l1/propz17
-      gam17n(jdu1,1)=Q(jdu1)*q2/s(i1,i7)+L(jdu1)*l2/propz17
-      gam17n(jdu1,2)=Q(jdu1)*q2/s(i1,i7)+R(jdu1)*l2/propz17
-      gam28e(jdu1,1)=Q(jdu1)*q1/s(i2,i8)+L(jdu1)*l1/propz28
-      gam28e(jdu1,2)=Q(jdu1)*q1/s(i2,i8)+R(jdu1)*l1/propz28
-      gam28n(jdu1,1)=Q(jdu1)*q2/s(i2,i8)+L(jdu1)*l2/propz28
-      gam28n(jdu1,2)=Q(jdu1)*q2/s(i2,i8)+R(jdu1)*l2/propz28
+      gam17e(jdu1,1)=Q_jk(i1,i7,jdu1)*q1/s(i1,i7)
+     & +L_jk(i1,i7,jdu1)*l1/propz17
+      gam17e(jdu1,2)=Q_jk(i1,i7,jdu1)*q1/s(i1,i7)
+     & +R_jk(i1,i7,jdu1)*l1/propz17
+      gam17n(jdu1,1)=Q_jk(i1,i7,jdu1)*q2/s(i1,i7)
+     & +L_jk(i1,i7,jdu1)*l2/propz17
+      gam17n(jdu1,2)=Q_jk(i1,i7,jdu1)*q2/s(i1,i7)
+     & +R_jk(i1,i7,jdu1)*l2/propz17
+      gam28e(jdu1,1)=Q_jk(i2,i8,jdu1)*q1/s(i2,i8)
+     & +L_jk(i2,i8,jdu1)*l1/propz28
+      gam28e(jdu1,2)=Q_jk(i2,i8,jdu1)*q1/s(i2,i8)
+     & +R_jk(i2,i8,jdu1)*l1/propz28
+      gam28n(jdu1,1)=Q_jk(i2,i8,jdu1)*q2/s(i2,i8)
+     & +L_jk(i2,i8,jdu1)*l2/propz28
+      gam28n(jdu1,2)=Q_jk(i2,i8,jdu1)*q2/s(i2,i8)
+     & +R_jk(i2,i8,jdu1)*l2/propz28
       enddo
 
       p3=i3
