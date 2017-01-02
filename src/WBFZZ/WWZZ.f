@@ -19,8 +19,11 @@
      & sqzmass,Amp_S_DK,Amp_S_PR,facHiggs
       integer h34,h56,i1,i2,i3,i4,i5,i6,i7,i8,
      & n1,n2,n3,n4,n5,n6,n7,n8
-      double complex, save:: ZZ3456(2,2)
-      double complex anomhzzamp,anomhwwamp
+      double complex ZZ3456(2,2)
+      double complex ZA3456(2,2)
+      double complex AZ3456(2,2)
+      double complex AA3456(2,2)
+      double complex anomhzzamp,anomhzaamp,anomhaaamp,anomhwwamp
 !$omp threadprivate(ZZ3456)
       t4(i1,i2,i3,i4)=
      & +s(i1,i2)+s(i1,i3)+s(i1,i4)
@@ -89,6 +92,15 @@ C---setting up couplings dependent on whether we are doing 34-line or 56-line
       ZZ3456(1,2)=xl1*xr2
       ZZ3456(2,1)=xr1*xl2
       ZZ3456(2,2)=xr1*xr2
+      ZA3456(1,1)=xl1*xq2
+      ZA3456(1,2)=xl1*xq2
+      ZA3456(2,1)=xr1*xq2
+      ZA3456(2,2)=xr1*xq2
+      AZ3456(1,1)=xq1*xl2
+      AZ3456(1,2)=xq1*xr2
+      AZ3456(2,1)=xq1*xl2
+      AZ3456(2,2)=xq1*xr2
+      AA3456(:,:)=xq1*xq2
 
       rxw=sqrt((cone-cxw)/cxw)
       s34=s(n3,n4)
@@ -183,19 +195,26 @@ C-- MARKUS: this is the old (original) MCFM code
          if( hmass.ge.zip ) then
            if( AnomalCouplPR.eq.1 ) then
       Amp_S_PR=-anomhwwamp(i7,i1,i8,i2,1,s3456,s(i7,i1),s(i8,i2),za,zb)
+     &         /(propw17*propw28)
            else
-      Amp_S_PR=za(i7,i8)*zb(i2,i1)
+      Amp_S_PR=za(i7,i8)*zb(i2,i1)/(propw17*propw28)
            endif
            if( AnomalCouplDK.eq.1 ) then
-      Amp_S_DK=-anomhzzamp(i3,i4,i5,i6,1,s3456,s(i3,i4),s(i5,i6),za,zb)
+      Amp_S_DK=
+     & -anomhzzamp(i3,i4,i5,i6,1,s3456,s(i3,i4),s(i5,i6),za,zb)
+     & /(prop34*prop56)*ZZ3456(h34,h56)
+     & +anomhzaamp(i3,i4,i5,i6,1,s3456,s(i3,i4),s(i5,i6),za,zb)
+     & /(prop34*s(i5,i6))*ZA3456(h34,h56)
+     & +anomhzaamp(i5,i6,i3,i4,1,s3456,s(i5,i6),s(i3,i4),za,zb)
+     & /(s(i3,i4)*prop56)*AZ3456(h34,h56)
+     & -anomhaaamp(i3,i4,i5,i6,1,s3456,s(i3,i4),s(i5,i6),za,zb)
+     & /(s(i3,i4)*s(i5,i6))*AA3456(h34,h56)
            else
-      Amp_S_DK=za(i3,i5)*zb(i6,i4)
+      Amp_S_DK=za(i3,i5)*zb(i6,i4)/(prop34*prop56)*ZZ3456(h34,h56)
            endif
          endif
          WWZZamp(h34,h56)=WWZZamp(h34,h56)
-     &    -facHiggs*ZZ3456(h34,h56)
-     &     *Amp_S_DK*Amp_S_PR
-     &    /(propWBF*prop3456)*Hbit
+     &    -facHiggs*Amp_S_DK*Amp_S_PR/prop3456*Hbit
 
 C----Second resonance
          Amp_S_PR=czip
@@ -203,19 +222,26 @@ C----Second resonance
          if( h2mass.ge.zip ) then
            if( AnomalCouplPR.eq.1 ) then
       Amp_S_PR=-anomhwwamp(i7,i1,i8,i2,2,s3456,s(i7,i1),s(i8,i2),za,zb)
+     &         /(propw17*propw28)
            else
-      Amp_S_PR=za(i7,i8)*zb(i2,i1)
+      Amp_S_PR=za(i7,i8)*zb(i2,i1)/(propw17*propw28)
            endif
            if( AnomalCouplDK.eq.1 ) then
-      Amp_S_DK=-anomhzzamp(i3,i4,i5,i6,2,s3456,s(i3,i4),s(i5,i6),za,zb)
+      Amp_S_DK=
+     & -anomhzzamp(i3,i4,i5,i6,2,s3456,s(i3,i4),s(i5,i6),za,zb)
+     & /(prop34*prop56)*ZZ3456(h34,h56)
+     & +anomhzaamp(i3,i4,i5,i6,2,s3456,s(i3,i4),s(i5,i6),za,zb)
+     & /(prop34*s(i5,i6))*ZA3456(h34,h56)
+     & +anomhzaamp(i5,i6,i3,i4,2,s3456,s(i5,i6),s(i3,i4),za,zb)
+     & /(s(i3,i4)*prop56)*AZ3456(h34,h56)
+     & -anomhaaamp(i3,i4,i5,i6,2,s3456,s(i3,i4),s(i5,i6),za,zb)
+     & /(s(i3,i4)*s(i5,i6))*AA3456(h34,h56)
            else
-      Amp_S_DK=za(i3,i5)*zb(i6,i4)
+      Amp_S_DK=za(i3,i5)*zb(i6,i4)/(prop34*prop56)*ZZ3456(h34,h56)
            endif
          endif
          WWZZamp(h34,h56)=WWZZamp(h34,h56)
-     &    -facHiggs*ZZ3456(h34,h56)
-     &     *Amp_S_DK*Amp_S_PR
-     &    /(propWBF*propX3456)*Hbit
+     &    -facHiggs*Amp_S_DK*Amp_S_PR/propX3456*Hbit
         enddo
       enddo
 
