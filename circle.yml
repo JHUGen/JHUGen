@@ -227,10 +227,10 @@ test:
     - ./JHUGen Seed=765543533 PDFSet=3 Process=2 PChannel=0 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/gg_spin2_Zgamma DecayMode1=9 DecayMode2=7 $REFERENCE_COUPLINGS $SPIN2_PHOTON
     - ./JHUGen Seed=765543533 PDFSet=3 Process=2 PChannel=1 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/qq_spin2_gammagamma DecayMode1=7 DecayMode2=7 $REFERENCE_COUPLINGS $SPIN2_PHOTON
 
-    - ./JHUGen Seed=765543533 PDFSet=3 Process=50 VegasNc0=100000 VegasNc2=100 HbbDK DataFile=compare_to_reference/ZH_bb DecayMode1=9 $REFERENCE_COUPLINGS
-    - ./JHUGen Seed=765543533 PDFSet=3 Process=50 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/WH DecayMode1=11 $REFERENCE_COUPLINGS
+    - ./JHUGen Seed=765543533 PDFSet=3 Process=50 VH_PC=lo VegasNc0=100000 VegasNc2=100 HbbDK DataFile=compare_to_reference/ZH_bb DecayMode1=9 $REFERENCE_COUPLINGS
+    - ./JHUGen Seed=765543533 PDFSet=3 Process=50 VH_PC=lo VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/WH DecayMode1=11 $REFERENCE_COUPLINGS
     - ./JHUGen Seed=765543533 VegasNc0=100000 ReadLHE=compare_to_reference/WH.lhe DataFile=compare_to_reference/WH_Zgamma DecayMode1=9 DecayMode2=7 $REFERENCE_COUPLINGS
-    - ./JHUGen Seed=765543533 Collider=0 Process=50 VegasNc0=100000 VegasNc2=100 HbbDK DataFile=compare_to_reference/ee_gammaH_bb DecayMode1=7 $REFERENCE_COUPLINGS
+    - ./JHUGen Seed=765543533 Collider=0 Process=50 VH_PC=lo VegasNc0=100000 VegasNc2=100 HbbDK DataFile=compare_to_reference/ee_gammaH_bb DecayMode1=7 $REFERENCE_COUPLINGS
 
     #don't use WW separate in VBF.  In any case, there is interference
     - ./JHUGen Seed=765543533 PDFSet=3 Process=60 VegasNc0=5000000 VegasNc2=100 DataFile=compare_to_reference/VBF $REFERENCE_COUPLINGS
@@ -302,13 +302,13 @@ test:
     - ./JHUGen PDFSet=3 Process=2  VegasNc0=100000 VegasNc2=100 DataFile=$CIRCLE_ARTIFACTS/other/spin2_Zgamma     DecayMode1=9  DecayMode2=7 a1=1,0 b1=1,0
     - ./JHUGen PDFSet=3 Process=2  VegasNc0=100000 VegasNc2=100 DataFile=$CIRCLE_ARTIFACTS/other/spin2_gammagamma DecayMode1=7  DecayMode2=7 a1=1,0 b1=1,0
     #WH, ZH, gammaH
-    - ./JHUGen PDFSet=3   Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/other/WH DecayMode1=11
-    - ./JHUGen PDFSet=3   Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/other/ZH DecayMode1=9 HbbDK
-    - ./JHUGen PDFSet=3   Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/other/gammaH DecayMode1=7 ghz1=0,0 ghzgs2=1,0
-    - ./JHUGen PDFSet=3   Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/other/gammaH_bb DecayMode1=7 ghz1=0,0 ghgsgs2=1,0 HbbDK
-    - ./JHUGen Collider=0 Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/other/ee_ZH DecayMode1=9
+    - ./JHUGen PDFSet=3   Process=50 VH_PC=lo VegasNc0=100000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/other/WH DecayMode1=11
+    - ./JHUGen PDFSet=3   Process=50 VH_PC=lo VegasNc0=100000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/other/ZH DecayMode1=9 HbbDK
+    - ./JHUGen PDFSet=3   Process=50 VH_PC=lo VegasNc0=100000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/other/gammaH DecayMode1=7 ghz1=0,0 ghzgs2=1,0
+    - ./JHUGen PDFSet=3   Process=50 VH_PC=lo VegasNc0=100000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/other/gammaH_bb DecayMode1=7 ghz1=0,0 ghgsgs2=1,0 HbbDK
+    - ./JHUGen Collider=0 Process=50 VH_PC=lo VegasNc0=100000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/other/ee_ZH DecayMode1=9
     - ./JHUGen VegasNc0=100000 TauDK=0 ReadLHE=$CIRCLE_ARTIFACTS/other/ee_ZH.lhe DataFile=$CIRCLE_ARTIFACTS/other/ee_ZH_tautau
-    - ./JHUGen Collider=0 Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/other/ee_gammaH_bb DecayMode1=7 HbbDK ghz1=0,0 ghgsgs2=1,0 epPolarization=100 emPolarization=-100
+    - ./JHUGen Collider=0 Process=50 VH_PC=lo VegasNc0=100000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/other/ee_gammaH_bb DecayMode1=7 HbbDK ghz1=0,0 ghgsgs2=1,0 epPolarization=100 emPolarization=-100
     #H+J
     - ./JHUGen PDFSet=3 Process=62 VegasNc0=100000 VegasNc2=10000 DataFile=$CIRCLE_ARTIFACTS/other/HJ
     #ttH, bbH, tH
@@ -380,7 +380,7 @@ test:
     - sed -i -r -e "s/(UseLHAPDF *= *)No/\1Yes/" makefile
     - make clean
     - make
-    - ./JHUGen LHAPDF=NNPDF30_lo_as_0130/NNPDF30_lo_as_0130.info Process=50 VegasNc0=100000 VegasNc2=100 DataFile=$CIRCLE_ARTIFACTS/other/ZH_LHAPDF DecayMode1=9
+    - ./JHUGen LHAPDF=NNPDF30_lo_as_0130/NNPDF30_lo_as_0130.info Process=50 VH_PC=lo VegasNc0=100000 VegasNc2=100 DataFile=$CIRCLE_ARTIFACTS/other/ZH_LHAPDF DecayMode1=9
     - ./JHUGen VegasNc0=100000 DecayMode1=11 DecayMode2=11 ReadLHE=$CIRCLE_ARTIFACTS/other/ZH_LHAPDF.lhe DataFile=$CIRCLE_ARTIFACTS/other/ZH_LHAPDF_WW
     - ./JHUGen VegasNc0=100000 TauDK=0                     ReadLHE=$CIRCLE_ARTIFACTS/other/ZH_LHAPDF.lhe DataFile=$CIRCLE_ARTIFACTS/other/ZH_LHAPDF_tautau
 

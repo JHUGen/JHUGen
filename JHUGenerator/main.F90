@@ -382,6 +382,8 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "VegasNc1", success, VegasNc1)
     call ReadCommandLineArgument(arg, "VegasNc2", success, VegasNc2)
     call ReadCommandLineArgument(arg, "PChannel", success, PChannel)
+    call ReadCommandLineArgument(arg, "VH_PC", success, VH_PC)   !undocumented, in development
+                                                                 !(could use PChannel for this once it's finalized)
     call ReadCommandLineArgument(arg, "DataFile", success, DataFile)
     call ReadCommandLineArgument(arg, "Process", success, Process)
     call ReadCommandLineArgument(arg, "DecayMode1", success, DecayMode1)
