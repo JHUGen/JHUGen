@@ -12,6 +12,8 @@ LIBRARY	      = libff.a
 
 MAKEFILE      = Makefile
 
+SHELL         = /bin/bash
+
 AAOBJS	      = aaxbx.o \
 		aaxcx.o \
 		aaxdx.o \

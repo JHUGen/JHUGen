@@ -3,6 +3,7 @@ HERE = $(PWD)
 LIBDIR = $(HERE)/../ff/
 FC = gfortran
 LIBRARY	      = libqcdloop.a
+SHELL = /bin/bash
 
 
 # -----------------------------------------------------------------------------
