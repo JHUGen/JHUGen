@@ -11,7 +11,7 @@ QLDir  = $(Here)/ql
 
 # compiler options, Comp='ifort' or 'gfort'
 Opt  = Yes
-Comp = ifort
+Comp = gfort
 
 # link pdfs via LHA library ('Yes' or 'No')
 UseLHAPDF=No
@@ -65,16 +65,6 @@ endif
 
 # never use gcc with other than O0, optimization is buggy
 ccomp = gcc -O0
-
-# make sure QCDLoop compilers are correct
-Compff = $(shell grep '^FC *=' $(FFDir)/makefile | sed 's/FC *= *//' | sed 's/ *//')
-Compql = $(shell grep '^FC *=' $(QLDir)/makefile | sed 's/FC *= *//' | sed 's/ *//')
-ifneq ($(Compff),$(CompFullName))
-  $(error QCDLoop ff directory compiler is inconsistent ($(Compff), should be $(CompFullName)))
-endif
-ifneq ($(Compql),$(CompFullName))
-  $(error QCDLoop ql directory compiler is inconsistent ($(Compql), should be $(CompFullName)))
-endif
 
 
 # executable file
@@ -240,12 +230,16 @@ $(PSGenObj): $(PSGenDep)
 
 ffdir:
 	@echo " compiling QCDLoop directory ff"
-	(cd $(FFDir); make; ranlib libff.a; mv *.a $(ObjectDir))
+#	FC=$(CompFullName) overrides FC specified in that makefile
+#	http://stackoverflow.com/questions/2826029/passing-additional-variables-from-command-line-to-make#comment51986622_2826178
+	(cd $(FFDir); $(MAKE) FC=$(CompFullName); ranlib libff.a; mv *.a $(ObjectDir))
 	
 
 qldir:
 	@echo " compiling QCDLoop directory ql"
-	(cd $(QLDir); make; mv *.a $(ObjectDir))
+#	FC=$(CompFullName) overrides FC specified in that makefile
+#	http://stackoverflow.com/questions/2826029/passing-additional-variables-from-command-line-to-make#comment51986622_2826178
+	(cd $(QLDir); $(MAKE) FC=$(CompFullName); mv *.a $(ObjectDir))
 	
 
 

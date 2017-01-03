@@ -1,4 +1,4 @@
-FC            = ifort
+FC            = gfortran
 FFLAGS        = 
 
 LFLAGS	      = $(FFLAGS)
@@ -156,13 +156,17 @@ SRCS	      = ff2dl2.f \
 		ffxli2.f \
 		ffxxyz.f
 
-all:		$(LIBRARY)
+all:		checkcompiler $(LIBRARY)
+
+checkcompiler:
+		echo $(FC) > whichcompiler.txt.new
+		cmp whichcompiler.txt.new whichcompiler.txt >& /dev/null && rm whichcompiler.txt.new || mv whichcompiler.txt.new whichcompiler.txt
 
 test:		npointes
 		npointes > npointes.out
 		diff -w npointes.out npointes.sun
 
-npointes:	npointes.o $(LIBRARY) makefile
+npointes:	npointes.o $(LIBRARY) makefile whichcompiler.txt
 		$(FC) $(LFLAGS) -o npointes npointes.o $(LIBRARY)
 
 $(LIBRARY):	$(OBJS) $(AAOBJS)
@@ -192,65 +196,65 @@ $(DEST)/$(LIBRARY): $(SRCS) $(HDRS) $(EXTHDRS)
 		@-ar xo $(DEST)/$(LIBRARY)
 		@make -f $(MAKEFILE) DEST=$(DEST) install clean
 ###
-aaxbx.o: ff.h aa.h makefile
-aaxcx.o: ff.h aa.h makefile
-aaxdx.o: ff.h aa.h makefile
-aaxex.o: ff.h aa.h makefile
-aaxinv.o: ff.h aa.h makefile
-ff2dl2.o: ff.h makefile
-ffabcd.o: ff.h makefile
-ffca0.o: ff.h makefile
-ffcb0.o: ff.h makefile
-ffcb1.o: ff.h makefile
-ffcc0.o: ff.h makefile
-ffcc0p.o: ff.h makefile
-ffcc1.o: ff.h makefile
-ffcdb0.o: ff.h makefile
-ffcel2.o: ff.h makefile
-ffcel3.o: ff.h makefile
-ffcel4.o: ff.h makefile
-ffcel5.o: ff.h makefile
-ffceta.o: ff.h makefile
-ffcli2.o: ff.h makefile
-ffcrr.o: ff.h makefile
-ffcxr.o: ff.h makefile
-ffcxs3.o: ff.h makefile
-ffcxs4.o: ff.h makefile
-ffcxyz.o: ff.h makefile
-ffdcc0.o: ff.h makefile
-ffdcxs.o: ff.h makefile
-ffdel2.o: ff.h makefile
-ffdel3.o: ff.h makefile
-ffdel4.o: ff.h makefile
-ffdel5.o: ff.h makefile
-ffdel6.o: ff.h makefile
-ffdl2i.o: ff.h makefile
-ffdl5p.o: ff.h makefile
-ffdxc0.o: ff.h makefile
-ffinit_mine.o: ff.h aa.h makefile
-ffrcvr.o: ff.h makefile
-fftran.o: ff.h makefile
-ffxb0.o: ff.h makefile
-ffxb1.o: ff.h makefile
-ffxb2p.o: ff.h makefile
-ffxc0.o: ff.h makefile
-ffxc0i.o: ff.h makefile
-ffxc0p.o: ff.h makefile
-ffxc1.o: ff.h makefile
-ffxd0.o: ff.h makefile
-ffxd0h.o: ff.h makefile
-ffxd0i.o: ff.h makefile
-ffxd0p.o: ff.h makefile
-ffxd1.o: ff.h aa.h makefile
-ffxdb0.o: ff.h makefile
-ffxdbd.o: ff.h makefile
-ffxdi.o: ff.h makefile
-ffxdpv.o: ff.h makefile
-ffxe0.o: ff.h makefile
-ffxe1.o: ff.h makefile
-ffxf0.o: ff.h makefile
-ffxf0h.o: ff.h makefile
-ffxli2.o: ff.h makefile
-ffxxyz.o: ff.h makefile
-npoin.o: ff.h aa.h makefile
-npointes.o: ff.h makefile
+aaxbx.o: ff.h aa.h makefile whichcompiler.txt
+aaxcx.o: ff.h aa.h makefile whichcompiler.txt
+aaxdx.o: ff.h aa.h makefile whichcompiler.txt
+aaxex.o: ff.h aa.h makefile whichcompiler.txt
+aaxinv.o: ff.h aa.h makefile whichcompiler.txt
+ff2dl2.o: ff.h makefile whichcompiler.txt
+ffabcd.o: ff.h makefile whichcompiler.txt
+ffca0.o: ff.h makefile whichcompiler.txt
+ffcb0.o: ff.h makefile whichcompiler.txt
+ffcb1.o: ff.h makefile whichcompiler.txt
+ffcc0.o: ff.h makefile whichcompiler.txt
+ffcc0p.o: ff.h makefile whichcompiler.txt
+ffcc1.o: ff.h makefile whichcompiler.txt
+ffcdb0.o: ff.h makefile whichcompiler.txt
+ffcel2.o: ff.h makefile whichcompiler.txt
+ffcel3.o: ff.h makefile whichcompiler.txt
+ffcel4.o: ff.h makefile whichcompiler.txt
+ffcel5.o: ff.h makefile whichcompiler.txt
+ffceta.o: ff.h makefile whichcompiler.txt
+ffcli2.o: ff.h makefile whichcompiler.txt
+ffcrr.o: ff.h makefile whichcompiler.txt
+ffcxr.o: ff.h makefile whichcompiler.txt
+ffcxs3.o: ff.h makefile whichcompiler.txt
+ffcxs4.o: ff.h makefile whichcompiler.txt
+ffcxyz.o: ff.h makefile whichcompiler.txt
+ffdcc0.o: ff.h makefile whichcompiler.txt
+ffdcxs.o: ff.h makefile whichcompiler.txt
+ffdel2.o: ff.h makefile whichcompiler.txt
+ffdel3.o: ff.h makefile whichcompiler.txt
+ffdel4.o: ff.h makefile whichcompiler.txt
+ffdel5.o: ff.h makefile whichcompiler.txt
+ffdel6.o: ff.h makefile whichcompiler.txt
+ffdl2i.o: ff.h makefile whichcompiler.txt
+ffdl5p.o: ff.h makefile whichcompiler.txt
+ffdxc0.o: ff.h makefile whichcompiler.txt
+ffinit_mine.o: ff.h aa.h makefile whichcompiler.txt
+ffrcvr.o: ff.h makefile whichcompiler.txt
+fftran.o: ff.h makefile whichcompiler.txt
+ffxb0.o: ff.h makefile whichcompiler.txt
+ffxb1.o: ff.h makefile whichcompiler.txt
+ffxb2p.o: ff.h makefile whichcompiler.txt
+ffxc0.o: ff.h makefile whichcompiler.txt
+ffxc0i.o: ff.h makefile whichcompiler.txt
+ffxc0p.o: ff.h makefile whichcompiler.txt
+ffxc1.o: ff.h makefile whichcompiler.txt
+ffxd0.o: ff.h makefile whichcompiler.txt
+ffxd0h.o: ff.h makefile whichcompiler.txt
+ffxd0i.o: ff.h makefile whichcompiler.txt
+ffxd0p.o: ff.h makefile whichcompiler.txt
+ffxd1.o: ff.h aa.h makefile whichcompiler.txt
+ffxdb0.o: ff.h makefile whichcompiler.txt
+ffxdbd.o: ff.h makefile whichcompiler.txt
+ffxdi.o: ff.h makefile whichcompiler.txt
+ffxdpv.o: ff.h makefile whichcompiler.txt
+ffxe0.o: ff.h makefile whichcompiler.txt
+ffxe1.o: ff.h makefile whichcompiler.txt
+ffxf0.o: ff.h makefile whichcompiler.txt
+ffxf0h.o: ff.h makefile whichcompiler.txt
+ffxli2.o: ff.h makefile whichcompiler.txt
+ffxxyz.o: ff.h makefile whichcompiler.txt
+npoin.o: ff.h aa.h makefile whichcompiler.txt
+npointes.o: ff.h makefile whichcompiler.txt

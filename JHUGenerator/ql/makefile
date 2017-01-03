@@ -1,7 +1,7 @@
 FFLAGS 	= -O 
 HERE = $(PWD)
 LIBDIR = $(HERE)/../ff/
-FC = ifort
+FC = gfortran
 LIBRARY	      = libqcdloop.a
 
 
@@ -71,23 +71,30 @@ OBJS = \
 ./qlxpicheck.o \
 
 
+# -----------------------------------------------------------------------------
+
+
+all:		checkcompiler $(LIBRARY)
+
+
+# -----------------------------------------------------------------------------
+
+
 $(LIBRARY):	$(OBJS) 
 		ar cru $(LIBRARY) $(OBJS) 
 		ranlib $(LIBRARY)
  
 
-%.o:		%.f makefile
+%.o:		%.f makefile whichcompiler.txt
 		$(FC) $(F77FLAGS)  -c $<
 
-
-# -----------------------------------------------------------------------------
-
-
-
-all:		$(LIBRARY)
+checkcompiler:
+		echo $(FC) > whichcompiler.txt.new
+		cmp whichcompiler.txt.new whichcompiler.txt >& /dev/null && rm whichcompiler.txt.new || mv whichcompiler.txt.new whichcompiler.txt
 
 
 # -----------------------------------------------------------------------------
+
 
 PRJS =      $(OBJS:.o=.f) 
 PRJSF =      $(OBJS:.o=.f) 
