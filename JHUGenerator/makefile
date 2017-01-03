@@ -33,6 +33,8 @@ else
    LHAPDFflags = -DuseLHAPDF=0
 endif
 
+QCDLoopflags = -L$(ObjectDir) -lqcdloop -lff
+
 ifeq ($(linkMELA),Yes)
    MELAflags = -DlinkMELA=1
 else
@@ -45,7 +47,7 @@ ifeq ($(Comp),gfort)
  else
     OptOpts  = -O0 -fcheck=all
  endif
- fcomp = gfortran $(OptOpts) -ffree-line-length-none -I$(VegasDir) -I$(ModuleDir) -J$(ModuleDir) $(LHAPDFflags) $(MELAflags) -Dcompiler=2
+ fcomp = gfortran $(OptOpts) -ffree-line-length-none -I$(VegasDir) -I$(ModuleDir) -J$(ModuleDir) $(LHAPDFflags) $(QCDLoopflags) $(MELAflags) -Dcompiler=2
 endif
 
 
@@ -55,7 +57,7 @@ ifeq ($(Comp),ifort)
  else
     OptOpts  = -O0 -implicitnone -check bounds -check pointer -warn interfaces -ftrapuv  -diag-disable remark -debug extended -g -traceback -fpe0 -check uninit
  endif
- fcomp = ifort -fpp $(OptOpts) -module $(ModuleDir) -I$(VegasDir) -Dcompiler=1 $(LHAPDFflags) $(MELAflags)
+ fcomp = ifort -fpp $(OptOpts) -module $(ModuleDir) -I$(VegasDir) -Dcompiler=1 $(LHAPDFflags) $(QCDLoopflags) $(MELAflags)
 endif
 
 
@@ -182,7 +184,7 @@ else
 endif
 	@echo " executable file is "$(Exec) "compiled with "$(Comp)
 	@echo " "
-	$(fcomp) -o $(Exec) $(MainObj) $(AmpObj) $(PSGenObj) $(VegasObj) $(PDFObj) $(CPSObj) $(MCFM_Obj) $(LHAPDFflags) $(ObjectDir)/libff.a  $(ObjectDir)/libqcdloop.a
+	$(fcomp) -o $(Exec) $(MainObj) $(AmpObj) $(PSGenObj) $(VegasObj) $(PDFObj) $(CPSObj) $(MCFM_Obj) $(LHAPDFflags) $(QCDLoopflags)
 
 
 
