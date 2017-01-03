@@ -11,7 +11,7 @@ QLDir  = $(Here)/ql
 
 # compiler options, Comp='ifort' or 'gfort'
 Opt  = Yes
-Comp = gfort
+Comp = ifort
 
 # link pdfs via LHA library ('Yes' or 'No')
 UseLHAPDF=No
@@ -42,6 +42,7 @@ else
 endif
 
 ifeq ($(Comp),gfort)
+ CompFullName = gfortran
  ifeq ($(Opt),Yes)
     OptOpts  = -O3
  else
@@ -52,6 +53,7 @@ endif
 
 
 ifeq ($(Comp),ifort)
+ CompFullName = ifort
  ifeq ($(Opt),Yes)
     OptOpts  = -O2 -vec-report0 -diag-disable remark
  else
@@ -63,6 +65,16 @@ endif
 
 # never use gcc with other than O0, optimization is buggy
 ccomp = gcc -O0
+
+# make sure QCDLoop compilers are correct
+Compff = $(shell grep '^FC *=' $(FFDir)/makefile | sed 's/FC *= *//' | sed 's/ *//')
+Compql = $(shell grep '^FC *=' $(QLDir)/makefile | sed 's/FC *= *//' | sed 's/ *//')
+ifneq ($(Compff),$(CompFullName))
+  $(error QCDLoop ff directory compiler is inconsistent ($(Compff), should be $(CompFullName)))
+endif
+ifneq ($(Compql),$(CompFullName))
+  $(error QCDLoop ql directory compiler is inconsistent ($(Compql), should be $(CompFullName)))
+endif
 
 
 # executable file

@@ -1,4 +1,4 @@
-FC            = gfortran
+FC            = ifort
 FFLAGS        = 
 
 LFLAGS	      = $(FFLAGS)
@@ -162,7 +162,7 @@ test:		npointes
 		npointes > npointes.out
 		diff -w npointes.out npointes.sun
 
-npointes:	npointes.o $(LIBRARY)
+npointes:	npointes.o $(LIBRARY) makefile
 		$(FC) $(LFLAGS) -o npointes npointes.o $(LIBRARY)
 
 $(LIBRARY):	$(OBJS) $(AAOBJS)
@@ -192,65 +192,65 @@ $(DEST)/$(LIBRARY): $(SRCS) $(HDRS) $(EXTHDRS)
 		@-ar xo $(DEST)/$(LIBRARY)
 		@make -f $(MAKEFILE) DEST=$(DEST) install clean
 ###
-aaxbx.o: ff.h aa.h
-aaxcx.o: ff.h aa.h
-aaxdx.o: ff.h aa.h
-aaxex.o: ff.h aa.h
-aaxinv.o: ff.h aa.h
-ff2dl2.o: ff.h
-ffabcd.o: ff.h
-ffca0.o: ff.h
-ffcb0.o: ff.h
-ffcb1.o: ff.h
-ffcc0.o: ff.h
-ffcc0p.o: ff.h
-ffcc1.o: ff.h
-ffcdb0.o: ff.h
-ffcel2.o: ff.h
-ffcel3.o: ff.h
-ffcel4.o: ff.h
-ffcel5.o: ff.h
-ffceta.o: ff.h
-ffcli2.o: ff.h
-ffcrr.o: ff.h
-ffcxr.o: ff.h
-ffcxs3.o: ff.h
-ffcxs4.o: ff.h
-ffcxyz.o: ff.h
-ffdcc0.o: ff.h
-ffdcxs.o: ff.h
-ffdel2.o: ff.h
-ffdel3.o: ff.h
-ffdel4.o: ff.h
-ffdel5.o: ff.h
-ffdel6.o: ff.h
-ffdl2i.o: ff.h
-ffdl5p.o: ff.h
-ffdxc0.o: ff.h
-ffinit_mine.o: ff.h aa.h
-ffrcvr.o: ff.h
-fftran.o: ff.h
-ffxb0.o: ff.h
-ffxb1.o: ff.h
-ffxb2p.o: ff.h
-ffxc0.o: ff.h
-ffxc0i.o: ff.h
-ffxc0p.o: ff.h
-ffxc1.o: ff.h
-ffxd0.o: ff.h
-ffxd0h.o: ff.h
-ffxd0i.o: ff.h
-ffxd0p.o: ff.h
-ffxd1.o: ff.h aa.h
-ffxdb0.o: ff.h
-ffxdbd.o: ff.h
-ffxdi.o: ff.h
-ffxdpv.o: ff.h
-ffxe0.o: ff.h
-ffxe1.o: ff.h
-ffxf0.o: ff.h
-ffxf0h.o: ff.h
-ffxli2.o: ff.h
-ffxxyz.o: ff.h
-npoin.o: ff.h aa.h
-npointes.o: ff.h
+aaxbx.o: ff.h aa.h makefile
+aaxcx.o: ff.h aa.h makefile
+aaxdx.o: ff.h aa.h makefile
+aaxex.o: ff.h aa.h makefile
+aaxinv.o: ff.h aa.h makefile
+ff2dl2.o: ff.h makefile
+ffabcd.o: ff.h makefile
+ffca0.o: ff.h makefile
+ffcb0.o: ff.h makefile
+ffcb1.o: ff.h makefile
+ffcc0.o: ff.h makefile
+ffcc0p.o: ff.h makefile
+ffcc1.o: ff.h makefile
+ffcdb0.o: ff.h makefile
+ffcel2.o: ff.h makefile
+ffcel3.o: ff.h makefile
+ffcel4.o: ff.h makefile
+ffcel5.o: ff.h makefile
+ffceta.o: ff.h makefile
+ffcli2.o: ff.h makefile
+ffcrr.o: ff.h makefile
+ffcxr.o: ff.h makefile
+ffcxs3.o: ff.h makefile
+ffcxs4.o: ff.h makefile
+ffcxyz.o: ff.h makefile
+ffdcc0.o: ff.h makefile
+ffdcxs.o: ff.h makefile
+ffdel2.o: ff.h makefile
+ffdel3.o: ff.h makefile
+ffdel4.o: ff.h makefile
+ffdel5.o: ff.h makefile
+ffdel6.o: ff.h makefile
+ffdl2i.o: ff.h makefile
+ffdl5p.o: ff.h makefile
+ffdxc0.o: ff.h makefile
+ffinit_mine.o: ff.h aa.h makefile
+ffrcvr.o: ff.h makefile
+fftran.o: ff.h makefile
+ffxb0.o: ff.h makefile
+ffxb1.o: ff.h makefile
+ffxb2p.o: ff.h makefile
+ffxc0.o: ff.h makefile
+ffxc0i.o: ff.h makefile
+ffxc0p.o: ff.h makefile
+ffxc1.o: ff.h makefile
+ffxd0.o: ff.h makefile
+ffxd0h.o: ff.h makefile
+ffxd0i.o: ff.h makefile
+ffxd0p.o: ff.h makefile
+ffxd1.o: ff.h aa.h makefile
+ffxdb0.o: ff.h makefile
+ffxdbd.o: ff.h makefile
+ffxdi.o: ff.h makefile
+ffxdpv.o: ff.h makefile
+ffxe0.o: ff.h makefile
+ffxe1.o: ff.h makefile
+ffxf0.o: ff.h makefile
+ffxf0h.o: ff.h makefile
+ffxli2.o: ff.h makefile
+ffxxyz.o: ff.h makefile
+npoin.o: ff.h aa.h makefile
+npointes.o: ff.h makefile

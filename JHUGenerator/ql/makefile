@@ -1,7 +1,7 @@
 FFLAGS 	= -O 
 HERE = $(PWD)
 LIBDIR = $(HERE)/../ff/
-FC = gfortran
+FC = ifort
 LIBRARY	      = libqcdloop.a
 
 
@@ -76,8 +76,8 @@ $(LIBRARY):	$(OBJS)
 		ranlib $(LIBRARY)
  
 
-.f.o:	
-		$(FC) $(F77FLAGS)  -c $*.f
+%.o:		%.f makefile
+		$(FC) $(F77FLAGS)  -c $<
 
 
 # -----------------------------------------------------------------------------
