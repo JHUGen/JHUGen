@@ -277,6 +277,12 @@ test:
         mv compare_to_reference $CIRCLE_ARTIFACTS/reference
       fi
 
+    #don't waste time making empty plots if compiling failed!
+    - |
+      if ! [ -f JHUGen ]; then
+        rm ~/reference_failed*
+      fi
+
     #============
     #syntax check
     #============
