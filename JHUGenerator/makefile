@@ -33,7 +33,7 @@ else
    LHAPDFflags = -DuseLHAPDF=0
 endif
 
-QCDLoopflags = -L$(ObjectDir) -lqcdloop -lff
+QCDLoopflags = -L$(QLDir) -lqcdloop -L$(FFDir) -lff
 
 ifeq ($(linkMELA),Yes)
    MELAflags = -DlinkMELA=1
@@ -232,14 +232,14 @@ ffdir:
 	@echo " compiling QCDLoop directory ff"
 #	FC=$(CompFullName) overrides FC specified in that makefile
 #	http://stackoverflow.com/questions/2826029/passing-additional-variables-from-command-line-to-make#comment51986622_2826178
-	(cd $(FFDir); $(MAKE) FC=$(CompFullName); ranlib libff.a; mv *.a $(ObjectDir))
+	(cd $(FFDir); $(MAKE) FC=$(CompFullName); ranlib libff.a)
 	
 
 qldir:
 	@echo " compiling QCDLoop directory ql"
 #	FC=$(CompFullName) overrides FC specified in that makefile
 #	http://stackoverflow.com/questions/2826029/passing-additional-variables-from-command-line-to-make#comment51986622_2826178
-	(cd $(QLDir); $(MAKE) FC=$(CompFullName); mv *.a $(ObjectDir))
+	(cd $(QLDir); $(MAKE) FC=$(CompFullName))
 	
 
 
