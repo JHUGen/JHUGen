@@ -40,10 +40,8 @@ c--- q(-p1)+q(-p2)->Z(p3,p4)+Z(p5,p6)+q(p7)+q(p8);
       integer,parameter:: j7(jmax)=(/7,7,2,1,1,8,2,8,2,8,1,8/)
       integer,parameter:: j8(jmax)=(/8,8,1,2,8,1,8,2,8,2,8,1/)
       save doHO,doBO,mult
-
-
-
 !$omp threadprivate(doHO,doBO,mult)
+
       msq(:,:)=0d0
       ampsqfac = esq**6*spinavge
 
@@ -121,10 +119,10 @@ C--   MARKUS: adding switches to remove VH or VBF contributions
       endif
 
 c--   Call the VVZZ amplitudes
-      call getVVZZamps(amp,ampa,ampb,p,za,zb,zab,zba,
+      call getVVZZamps(amp,ampa,ampb,za,zb,zab,zba,
      & j1(j),j2(j),3,4,5,6,j7(j),j8(j),doHO,doBO)
       if (interference) then
-        call getVVZZamps(amp_swap,ampa_swap,ampb_swap,p,za,zb,zab,zba,
+        call getVVZZamps(amp_swap,ampa_swap,ampb_swap,za,zb,zab,zba,
      &   j1(j),j2(j),3,6,5,4,j7(j),j8(j),doHO,doBO)
       endif
 

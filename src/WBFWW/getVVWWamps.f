@@ -1,4 +1,4 @@
-      subroutine getVVWWamps(amp,ampa,ampb,p,za,zb,zab,zba,
+      subroutine getVVWWamps(amp,ampa,ampb,za,zb,zab,zba,
      & j1,j2,j3,j4,j5,j6,j7,j8,doHO,doBO)
       implicit none
       include 'constants.f'
@@ -19,7 +19,6 @@
      & dqdq_dqdq=4,uqbq_uqbq=5,dqcq_dqcq=6,
      & dquq_dquq=7,dqcq_uqsq=8,uqsq_dqcq=9)
       integer h1,h2,j1,j2,j3,j4,j5,j6,j7,j8
-      double precision p(mxpart,4)
       double complex zab(mxpart,4,mxpart),zba(mxpart,4,mxpart),cdotpr,
      & amp(nmax,2,2),ampa(nmax,2,2),ampb(nmax,2,2),
      & k7341(4),k8341(4),k8342(4),

@@ -27,7 +27,7 @@ c--- q(-p1)+q(-p2)->W(p3,p4)+W(p5,p6)+q(p7)+q(p8);
       integer h1,h2
       double precision p(mxpart,4),msq(fn:nf,fn:nf),temp(fn:nf,fn:nf),
      & tempw(fn:nf,fn:nf),stat,spinavge,mult,
-     & colfac34_56
+     & colfac34_56,ampsqfac
       double complex zab(mxpart,4,mxpart),zba(mxpart,4,mxpart),
      & amp(nmax,2,2),ampa(nmax,2,2),ampb(nmax,2,2)
       logical doHO,doBO,comb1278ok
@@ -38,8 +38,10 @@ c--- q(-p1)+q(-p2)->W(p3,p4)+W(p5,p6)+q(p7)+q(p8);
       integer,parameter:: j7(jmax)=(/7,7,2,1,1,8,2,8,2,8,1,8/)
       integer,parameter:: j8(jmax)=(/8,8,1,2,8,1,8,2,8,2,8,1/)
       save doHO,doBO,mult
+!$omp threadprivate(doHO,doBO,mult)
 
       msq(:,:)=0d0
+      ampsqfac = esq**6*spinavge
 
 c--- This calculation uses the complex-mass scheme (c.f. arXiv:hep-ph/0605312)
 c--- and the following lines set up the appropriate masses and sin^2(theta_w)
@@ -119,7 +121,7 @@ C--   MARKUS: adding switches to remove VH or VBF contributions
 c---  Call the VVWW amplitudes
 c---  Note 3654, this is the special ordering to agree with Madgraph
       ! This orders the decay bosons as W-W+ as in process.DAT
-      call getVVWWamps(amp,ampa,ampb,p,za,zb,zab,zba,
+      call getVVWWamps(amp,ampa,ampb,za,zb,zab,zba,
      & j1(j),j2(j),3,6,5,4,j7(j),j8(j),doHO,doBO)
 
       ! Kill amp or ampa in j=5,6,7,8 for VH
@@ -154,21 +156,21 @@ c---  Note 3654, this is the special ordering to agree with Madgraph
 C-----setup for (dqcq_dqcq)
       do h1=1,2
       do h2=1,2
-      temp(1,4)=temp(1,4)+esq**6*spinavge
+      temp(1,4)=temp(1,4)+ampsqfac
      &   *dble(amp(dqcq_dqcq,h1,h2)
      & *dconjg(amp(dqcq_dqcq,h1,h2)))
       enddo
       enddo
 
 C-----setup for (dqcq_uqsq)
-      tempw(1,4)=tempw(1,4)+esq**6*spinavge
+      tempw(1,4)=tempw(1,4)+ampsqfac
      &   *dble(amp(dqcq_uqsq,1,1)
      & *dconjg(amp(dqcq_uqsq,1,1)))
 
 C-----setup for (uqcq_uqcq)
       do h1=1,2
       do h2=1,2
-      temp(2,4)=temp(2,4)+esq**6*spinavge
+      temp(2,4)=temp(2,4)+ampsqfac
      &   *dble(amp(uqcq_uqcq,h1,h2)
      & *dconjg(amp(uqcq_uqcq,h1,h2)))
       enddo
@@ -178,7 +180,7 @@ C-----setup for (uqcq_uqcq)
 C-----setup for (dqsq_dqsq)
       do h1=1,2
       do h2=1,2
-      temp(1,3)=temp(1,3)+esq**6*spinavge
+      temp(1,3)=temp(1,3)+ampsqfac
      &   *dble(amp(dqsq_dqsq,h1,h2)
      & *dconjg(amp(dqsq_dqsq,h1,h2)))
       enddo
@@ -189,14 +191,14 @@ C-----setup for (dqsq_dqsq)
 C-----setup for (dqdq_dqdq)
       do h1=1,2
       do h2=1,2
-      temp(1,1)=temp(1,1)+esq**6*spinavge
+      temp(1,1)=temp(1,1)+ampsqfac
      &   *dble(ampa(dqdq_dqdq,h1,h2)
      & *dconjg(ampa(dqdq_dqdq,h1,h2)))
-      temp(1,1)=temp(1,1)+esq**6*spinavge
+      temp(1,1)=temp(1,1)+ampsqfac
      &   *dble(ampb(dqdq_dqdq,h1,h2)
      & *dconjg(ampb(dqdq_dqdq,h1,h2)))
       if (h1 .eq. h2) then
-      temp(1,1)=temp(1,1)-2d0/xn*esq**6*spinavge
+      temp(1,1)=temp(1,1)-2d0/xn*ampsqfac
      &   *dble(ampa(dqdq_dqdq,h1,h2)
      & *dconjg(ampb(dqdq_dqdq,h1,h2)))
       endif
@@ -208,14 +210,14 @@ C-----setup for (dqdq_dqdq)
 C-----setup for (uquq_uquq)
       do h1=1,2
       do h2=1,2
-      temp(2,2)=temp(2,2)+esq**6*spinavge
+      temp(2,2)=temp(2,2)+ampsqfac
      &   *dble(ampa(uquq_uquq,h1,h2)
      & *dconjg(ampa(uquq_uquq,h1,h2)))
-      temp(2,2)=temp(2,2)+esq**6*spinavge
+      temp(2,2)=temp(2,2)+ampsqfac
      &   *dble(ampb(uquq_uquq,h1,h2)
      & *dconjg(ampb(uquq_uquq,h1,h2)))
       if (h1 .eq. h2) then
-      temp(2,2)=temp(2,2)-2d0/xn*esq**6*spinavge
+      temp(2,2)=temp(2,2)-2d0/xn*ampsqfac
      &   *dble(ampa(uquq_uquq,h1,h2)
      & *dconjg(ampb(uquq_uquq,h1,h2)))
       endif
@@ -225,14 +227,14 @@ C-----setup for (uquq_uquq)
 
       do h1=1,2
       do h2=1,2
-      temp(1,2)=temp(1,2)+esq**6*spinavge
+      temp(1,2)=temp(1,2)+ampsqfac
      &   *dble(ampa(dquq_dquq,h1,h2)
      & *dconjg(ampa(dquq_dquq,h1,h2)))
-      temp(1,2)=temp(1,2)+esq**6*spinavge
+      temp(1,2)=temp(1,2)+ampsqfac
      &   *dble(ampb(dquq_dquq,h1,h2)
      & *dconjg(ampb(dquq_dquq,h1,h2)))
       if ((h1 .eq. 1) .and. (h2 .eq. 1)) then
-      temp(1,2)=temp(1,2)-2d0/xn*esq**6*spinavge
+      temp(1,2)=temp(1,2)-2d0/xn*ampsqfac
      &   *dble(ampa(dquq_dquq,h1,h2)
      & *dconjg(ampb(dquq_dquq,h1,h2)))
       endif
@@ -243,7 +245,7 @@ C-----setup for (uquq_uquq)
 C-----setup for (uqbq_uqbq)
       do h1=1,2
       do h2=1,2
-      temp(2,5)=temp(2,5)+esq**6*spinavge
+      temp(2,5)=temp(2,5)+ampsqfac
      &   *dble(amp(uqbq_uqbq,h1,h2)
      & *dconjg(amp(uqbq_uqbq,h1,h2)))
       enddo
@@ -252,7 +254,7 @@ C-----setup for (uqbq_uqbq)
       temp(2,3)=temp(2,5)
 
 C-----setup for (uqsq_dqcq)
-      tempw(2,3)=tempw(2,3)+esq**6*spinavge
+      tempw(2,3)=tempw(2,3)+ampsqfac
      &   *dble(amp(uqsq_dqcq,1,1)
      & *dconjg(amp(uqsq_dqcq,1,1)))
 
