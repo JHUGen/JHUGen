@@ -16,32 +16,28 @@ c--- with the t-channel exchange of a gluon.
      & uqcq_uqcq,uquq_uquq,dqsq_dqsq,
      & dqdq_dqdq,uqbq_uqbq,dqcq_dqcq,
      & dquq_dquq,dqcq_uqsq,uqsq_dqcq,
-     & i3,i4,i5,i6,nfinc
+     & i3,i4,i5,i6
       parameter(
      & uqcq_uqcq=1,uquq_uquq=2,dqsq_dqsq=3,
      & dqdq_dqdq=4,uqbq_uqbq=5,dqcq_dqcq=6,
      & dquq_dquq=7,dqcq_uqsq=8,uqsq_dqcq=9)
       integer h1,h2
       double precision p(mxpart,4),msq(fn:nf,fn:nf),temp(fn:nf,fn:nf),
-     & tempw(fn:nf,fn:nf),stat,spinavge,Colorfac,msqgg(2)
-      double complex zab(mxpart,4,mxpart),zba(mxpart,4,mxpart),cdotpr,
-     & amp(nmax,2,2),ampa(nmax,2,2),ampb(nmax,2,2),
-     & k7341(4),k8341(4),k8342(4),
-     & s7341,s8341,s8342
-      double complex
-     & jtwo17(2,2,2,2),jtwo28(2,2,2,2),
-     & jtwo18(2,2,2,2),jtwo27(2,2,2,2),
-     & j7_34_1g(2,4),j8_56_2g(2,4),
-     & j8_34_1g(2,4),j7_56_2g(2,4),
-     & j8_34_2g(2,4),j7_56_1g(2,4)
-      logical first
-      parameter(spinavge=0.25d0,stat=0.5d0,Colorfac=V/4d0/xn**2,nfinc=4)
+     & tempw(fn:nf,fn:nf),stat,spinavge,Colorfac,colfac34_56,ampsqfac,
+     & msqgg(2)
+      double complex zab(mxpart,4,mxpart),zba(mxpart,4,mxpart),
+     & amp(nmax,2,2),ampa(nmax,2,2),ampb(nmax,2,2)
+      logical comb1278ok
+      parameter(spinavge=0.25d0,stat=0.5d0,Colorfac=V/4d0/xn**2)
+c--- note that this is the special ordering to agree with Madgraph
+      parameter(i3=3,i4=6,i5=5,i6=4)
       integer,parameter:: j1(jmax)=(/1,2,8,8,7,2,7,1,1,7,2,7/)
       integer,parameter:: j2(jmax)=(/2,1,7,7,2,7,1,7,7,1,7,2/)
       integer,parameter:: j7(jmax)=(/7,7,2,1,1,8,2,8,2,8,1,8/)
       integer,parameter:: j8(jmax)=(/8,8,1,2,8,1,8,2,8,2,8,1/)
 
       msq(:,:)=0d0
+      ampsqfac = esq**4*gsq**2*Colorfac*spinavge
 
 c--- This calculation uses the complex-mass scheme (c.f. arXiv:hep-ph/0605312)
 c--- and the following lines set up the appropriate masses and sin^2(theta_w)
@@ -49,16 +45,23 @@ c--- and the following lines set up the appropriate masses and sin^2(theta_w)
       czmass2=dcmplx(zmass**2,0d0)
       cxw=dcmplx(xw,0d0)
 
-c--- note that this is the special ordering to agree with Madgraph
-      i3=3
-      i4=6
-      i5=5
-      i6=4
-c--- this is the MCFM ordering in process.DAT
-c      i3=3
-c      i4=4
-c      i5=5
-c      i6=6
+C---call plabel/pdgid conversion
+      call convertPLabelsToPDGIds()
+
+C---setup spinors and spinorvector products
+      call spinorcurr(8,p,za,zb,zab,zba)
+
+c---setup Z/A couplings from PDG ids
+      call couplzajk()
+
+c---color factors for W decays
+      colfac34_56=1d0
+      if (abs(pid_pdg(3)).ge.0 .and. abs(pid_pdg(3)).le.5) then
+        colfac34_56=colfac34_56*xn
+      endif
+      if (abs(pid_pdg(5)).ge.0 .and. abs(pid_pdg(5)).le.5) then
+        colfac34_56=colfac34_56*xn
+      endif
 
       do j=1,jmax
       temp(:,:)=0d0
@@ -67,72 +70,34 @@ c      i6=6
       ampa(:,:,:)=czip
       ampb(:,:,:)=czip
 
-C---call plabel/pdgid conversion
-      call convertPLabelsToPDGIds()
+      ! Test combination for qq'->q''q''' states
+      call testWBFVVApartComb(j1(j),j2(j),j7(j),j8(j),comb1278ok)
+      if (.not.comb1278ok) cycle
 
-C---setup spinors and spinorvector products
-      call spinorcurr(8,p,za,zb,zab,zba)
-
-      k7341(:)=0.5d0*(zab(j1(j),:,j1(j))+zab(i3,:,i3)
-     & +zab(i4,:,i4)+zab(j7(j),:,j7(j)))
-      k8341(:)=0.5d0*(zab(j1(j),:,j1(j))+zab(i3,:,i3)
-     & +zab(i4,:,i4)+zab(j8(j),:,j8(j)))
-      k8342(:)=0.5d0*(zab(j2(j),:,j2(j))+zab(i3,:,i3)
-     & +zab(i4,:,i4)+zab(j8(j),:,j8(j)))
-      s7341=cdotpr(k7341,k7341)
-      s8341=cdotpr(k8341,k8341)
-      s8342=cdotpr(k8342,k8342)
-
-c--- contribution from jtwoWW
-      call amp2currentstrong(j1(j),j2(j),i3,i4,i5,i6,j7(j),j8(j),za,zb,
-     & jtwo17)
-      call amp2currentstrong(j2(j),j1(j),i3,i4,i5,i6,j8(j),j7(j),za,zb,
-     &jtwo28)
-      call amp2currentstrong(j1(j),j2(j),i3,i4,i5,i6,j8(j),j7(j),za,zb,
-     & jtwo18)
-      call amp2currentstrong(j2(j),j1(j),i3,i4,i5,i6,j7(j),j8(j),za,zb,
-     & jtwo27)
-
-c--- flavor-changing contributions
-      call jonewstrong(j7(j),i3,i4,j1(j),za,zb,zab,j7_34_1g)
-      call jonewstrong(j8(j),i5,i6,j2(j),za,zb,zab,j8_56_2g)
-      call jonewstrong(j8(j),i3,i4,j1(j),za,zb,zab,j8_34_1g)
-      call jonewstrong(j7(j),i5,i6,j2(j),za,zb,zab,j7_56_2g)
-      call jonewstrong(j8(j),i3,i4,j2(j),za,zb,zab,j8_34_2g)
-      call jonewstrong(j7(j),i5,i6,j1(j),za,zb,zab,j7_56_1g)
+c--   Call the VVZZ amplitudes
+      call getQQWWQQstrongamps(amp,ampa,ampb,za,zb,zab,zba,
+     & j1(j),j2(j),i3,i4,i5,i6,j7(j),j8(j))
 
 C-----setup for (dqcq_dqcq)
       do h1=1,2
       do h2=1,2
-      amp(dqcq_dqcq,h1,h2)=
-     & +jtwo17(1,2,h1,h2)+jtwo28(2,1,h2,h1)
-
-      temp(1,4)=temp(1,4)+esq**4*gsq**2*Colorfac*spinavge
+      temp(1,4)=temp(1,4)+ampsqfac
      &   *dble(amp(dqcq_dqcq,h1,h2)
      & *dconjg(amp(dqcq_dqcq,h1,h2)))
       enddo
       enddo
 
 C-----setup for (dqcq_uqsq)
-      amp(dqcq_uqsq,1,1)=
-     & +cdotpr(j7_34_1g(1,:),j8_56_2g(2,:))/s7341
-
-      tempw(1,4)=tempw(1,4)+esq**4*gsq**2*Colorfac*spinavge
+      tempw(1,4)=tempw(1,4)+ampsqfac
      &   *dble(amp(dqcq_uqsq,1,1)
      & *dconjg(amp(dqcq_uqsq,1,1)))
 
 C-----setup for (uqcq_uqcq)
       do h1=1,2
       do h2=1,2
-
-c--- contribution from jcentre
-      amp(uqcq_uqcq,h1,h2)=
-     & +jtwo17(2,2,h1,h2)+jtwo28(2,2,h2,h1)
-
-      temp(2,4)=temp(2,4)+esq**4*gsq**2*Colorfac*spinavge
+      temp(2,4)=temp(2,4)+ampsqfac
      &   *dble(amp(uqcq_uqcq,h1,h2)
      & *dconjg(amp(uqcq_uqcq,h1,h2)))
-
       enddo
       enddo
 
@@ -140,15 +105,9 @@ c--- contribution from jcentre
 C-----setup for (dqsq_dqsq)
       do h1=1,2
       do h2=1,2
-
-c--- contribution from jcentre
-      amp(dqsq_dqsq,h1,h2)=
-     & +jtwo17(1,1,h1,h2)+jtwo28(1,1,h2,h1)
-
-      temp(1,3)=temp(1,3)+esq**4*gsq**2*Colorfac*spinavge
+      temp(1,3)=temp(1,3)+ampsqfac
      &   *dble(amp(dqsq_dqsq,h1,h2)
      & *dconjg(amp(dqsq_dqsq,h1,h2)))
-
       enddo
       enddo
       temp(1,5)=temp(1,3)
@@ -157,27 +116,17 @@ c--- contribution from jcentre
 C-----setup for (dqdq_dqdq)
       do h1=1,2
       do h2=1,2
-
-c--- contribution from jcentre
-c-------- ampa
-      ampa(dqdq_dqdq,h1,h2)=amp(dqsq_dqsq,h1,h2)
-
-c-------- ampb
-      ampb(dqdq_dqdq,h1,h2)=
-     & +jtwo18(1,1,h1,h2)+jtwo27(1,1,h2,h1)
-
-      temp(1,1)=temp(1,1)+esq**4*gsq**2*Colorfac*spinavge
+      temp(1,1)=temp(1,1)+ampsqfac
      &   *dble(ampa(dqdq_dqdq,h1,h2)
      & *dconjg(ampa(dqdq_dqdq,h1,h2)))
-      temp(1,1)=temp(1,1)+esq**4*gsq**2*Colorfac*spinavge
+      temp(1,1)=temp(1,1)+ampsqfac
      &   *dble(ampb(dqdq_dqdq,h1,h2)
      & *dconjg(ampb(dqdq_dqdq,h1,h2)))
       if (h1 .eq. h2) then
-      temp(1,1)=temp(1,1)+2d0/xn*esq**4*gsq**2*Colorfac*spinavge
+      temp(1,1)=temp(1,1)-2d0/xn*ampsqfac
      &   *dble(ampa(dqdq_dqdq,h1,h2)
      & *dconjg(ampb(dqdq_dqdq,h1,h2)))
       endif
-
       enddo
       enddo
       temp(3,3)=temp(1,1)
@@ -186,53 +135,35 @@ c-------- ampb
 C-----setup for (uquq_uquq)
       do h1=1,2
       do h2=1,2
-
-c--- contribution from jcentre
-c-------- ampa
-      ampa(uquq_uquq,h1,h2)=amp(uqcq_uqcq,h1,h2)
-
-c-------- ampb
-      ampb(uquq_uquq,h1,h2)=
-     & +jtwo18(2,2,h1,h2)+jtwo27(2,2,h2,h1)
-
-      temp(2,2)=temp(2,2)+esq**4*gsq**2*Colorfac*spinavge
+      temp(2,2)=temp(2,2)+ampsqfac
      &   *dble(ampa(uquq_uquq,h1,h2)
      & *dconjg(ampa(uquq_uquq,h1,h2)))
-      temp(2,2)=temp(2,2)+esq**4*gsq**2*Colorfac*spinavge
+      temp(2,2)=temp(2,2)+ampsqfac
      &   *dble(ampb(uquq_uquq,h1,h2)
      & *dconjg(ampb(uquq_uquq,h1,h2)))
       if (h1 .eq. h2) then
-      temp(2,2)=temp(2,2)+2d0/xn*esq**4*gsq**2*Colorfac*spinavge
+      temp(2,2)=temp(2,2)-2d0/xn*ampsqfac
      &   *dble(ampa(uquq_uquq,h1,h2)
      & *dconjg(ampb(uquq_uquq,h1,h2)))
       endif
-
       enddo
       enddo
       temp(4,4)=temp(2,2)
 
 C-----setup for (dquq_dquq)
-c-------- ampb
-      ampb(dquq_dquq,1,1)=
-     & +cdotpr(j8_34_1g(1,:),j7_56_2g(2,:))/s8341
-
       do h1=1,2
       do h2=1,2
-c-------- ampa
-      ampa(dquq_dquq,h1,h2)=amp(dqcq_dqcq,h1,h2)
-
-      temp(1,2)=temp(1,2)+esq**4*gsq**2*Colorfac*spinavge
+      temp(1,2)=temp(1,2)+ampsqfac
      &   *dble(ampa(dquq_dquq,h1,h2)
      & *dconjg(ampa(dquq_dquq,h1,h2)))
-      temp(1,2)=temp(1,2)+esq**4*gsq**2*Colorfac*spinavge
+      temp(1,2)=temp(1,2)+ampsqfac
      &   *dble(ampb(dquq_dquq,h1,h2)
      & *dconjg(ampb(dquq_dquq,h1,h2)))
       if (h1 .eq. h2) then
-      temp(1,2)=temp(1,2)+2d0/xn*esq**4*gsq**2*Colorfac*spinavge
+      temp(1,2)=temp(1,2)-2d0/xn*ampsqfac
      &   *dble(ampa(dquq_dquq,h1,h2)
      & *dconjg(ampb(dquq_dquq,h1,h2)))
       endif
-
       enddo
       enddo
       temp(3,4)=temp(1,2)
@@ -240,24 +171,16 @@ c-------- ampa
 C-----setup for (uqbq_uqbq)
       do h1=1,2
       do h2=1,2
-
-      amp(uqbq_uqbq,h1,h2)=
-     & +jtwo17(2,1,h1,h2)+jtwo28(1,2,h2,h1)
-
-      temp(2,5)=temp(2,5)+esq**4*gsq**2*Colorfac*spinavge
+      temp(2,5)=temp(2,5)+ampsqfac
      &   *dble(amp(uqbq_uqbq,h1,h2)
      & *dconjg(amp(uqbq_uqbq,h1,h2)))
-
       enddo
       enddo
       temp(4,5)=temp(2,5)
       temp(2,3)=temp(2,5)
 
 C-----setup for (uqsq_dqcq)
-      amp(uqsq_dqcq,1,1)=
-     & +cdotpr(j8_34_2g(1,:),j7_56_1g(2,:))/s8342
-
-      tempw(2,3)=tempw(2,3)+esq**4*gsq**2*Colorfac*spinavge
+      tempw(2,3)=tempw(2,3)+ampsqfac
      &   *dble(amp(uqsq_dqcq,1,1)
      & *dconjg(amp(uqsq_dqcq,1,1)))
 
@@ -278,17 +201,44 @@ C-----setup for (uqsq_dqcq)
       endif
       enddo;enddo
 
-c--- fill matrix elements
-      if (j .eq. 1) then
+c---- Multiply by the decay color factor
+      temp(:,:) = temp(:,:)*colfac34_56
+      tempw(:,:) = tempw(:,:)*colfac34_56
 
+c--- fill matrix elements
+      if (j.eq.1) then
       do k=1,nf
       msq(k,k)=temp(k,k)*stat
       do l=k+1,nf
       msq(k,l)=temp(k,l)
       enddo
       enddo
-      msq(2,3)=msq(2,3)+tempw(2,3)
-      msq(1,4)=msq(1,4)+tempw(1,4)
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.4) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.1)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.1) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.4)
+     & )
+     & ) then
+         msq(2,3)=msq(2,3)+tempw(2,3)
+      endif
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.3) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.2)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.2) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.3)
+     & )
+     & ) then
+         msq(1,4)=msq(1,4)+tempw(1,4)
+      endif
 
       elseif (j.eq.2) then
       do k=1,nf
@@ -296,8 +246,32 @@ c--- fill matrix elements
       msq(l,k)=temp(k,l)
       enddo
       enddo
-      msq(3,2)=msq(3,2)+tempw(2,3)
-      msq(4,1)=msq(4,1)+tempw(1,4)
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.4) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.1)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.1) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.4)
+     & )
+     & ) then
+         msq(3,2)=msq(3,2)+tempw(2,3)
+      endif
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.3) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.2)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.2) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.3)
+     & )
+     & ) then
+         msq(4,1)=msq(4,1)+tempw(1,4)
+      endif
 
       elseif (j.eq.3) then
       do k=-nf,-1
@@ -306,8 +280,32 @@ c--- fill matrix elements
       msq(k,l)=temp(-l,-k)
       enddo
       enddo
-      msq(-3,-2)=msq(-3,-2)+tempw(1,4)
-      msq(-4,-1)=msq(-4,-1)+tempw(2,3)
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-4) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-1)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-1) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-4)
+     & )
+     & ) then
+         msq(-3,-2)=msq(-3,-2)+tempw(1,4)
+      endif
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-3) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-2)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-2) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-3)
+     & )
+     & ) then
+         msq(-4,-1)=msq(-4,-1)+tempw(2,3)
+      endif
 
       elseif (j.eq.4) then
       do k=-nf,-1
@@ -315,8 +313,32 @@ c--- fill matrix elements
       msq(l,k)=temp(-l,-k)
       enddo
       enddo
-      msq(-2,-3)=msq(-2,-3)+tempw(1,4)
-      msq(-1,-4)=msq(-1,-4)+tempw(2,3)
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-4) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-1)
+     & )
+     v .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-1) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-4)
+     & )
+     & ) then
+         msq(-2,-3)=msq(-2,-3)+tempw(1,4)
+      endif
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-3) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-2)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-2) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-3)
+     & )
+     & ) then
+         msq(-1,-4)=msq(-1,-4)+tempw(2,3)
+      endif
 
 c--- qbar-q
       elseif (j.eq.5) then
@@ -328,8 +350,32 @@ c--- qbar-q
       endif
       enddo
       enddo
-      msq(-1,3)=msq(-1,3)+tempw(2,3)
-      msq(-2,4)=msq(-2,4)+tempw(1,4)
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.4) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-2)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-2) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.4)
+     & )
+     & ) then
+         msq(-1,3)=msq(-1,3)+tempw(2,3)
+      endif
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.3) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-1)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-1) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.3)
+     & )
+     & ) then
+         msq(-2,4)=msq(-2,4)+tempw(1,4)
+      endif
 
 c--- qbar-q
       elseif (j.eq.6) then
@@ -340,8 +386,32 @@ c--- qbar-q
       endif
       enddo
       enddo
-      msq(-3,1)=msq(-3,1)+tempw(1,4)
-      msq(-4,2)=msq(-4,2)+tempw(2,3)
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-4) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.2)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.2) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-4)
+     & )
+     & ) then
+         msq(-3,1)=msq(-3,1)+tempw(1,4)
+      endif
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-3) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.1)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.1) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-3)
+     & )
+     & ) then
+         msq(-4,2)=msq(-4,2)+tempw(2,3)
+      endif
 
 c--- q-qbar
       elseif (j.eq.7) then
@@ -353,8 +423,32 @@ c--- q-qbar
       endif
       enddo
       enddo
-      msq(3,-1)=msq(3,-1)+tempw(2,3)
-      msq(4,-2)=msq(4,-2)+tempw(1,4)
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.4) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-2)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-2) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.4)
+     & )
+     & ) then
+         msq(3,-1)=msq(3,-1)+tempw(2,3)
+      endif
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.3) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-1)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-1) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.3)
+     & )
+     & ) then
+         msq(4,-2)=msq(4,-2)+tempw(1,4)
+      endif
 
 c--- q-qbar
       elseif (j.eq.8) then
@@ -365,8 +459,32 @@ c--- q-qbar
       endif
       enddo
       enddo
-      msq(1,-3)=msq(1,-3)+tempw(1,4)
-      msq(2,-4)=msq(2,-4)+tempw(2,3)
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-4) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.2)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.2) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-4)
+     & )
+     & ) then
+         msq(1,-3)=msq(1,-3)+tempw(1,4)
+      endif
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-3) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.1)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.1) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-3)
+     & )
+     & ) then
+         msq(2,-4)=msq(2,-4)+tempw(2,3)
+      endif
 
 c--- q-qbar extra pieces
       elseif (j.eq.9) then
@@ -377,10 +495,60 @@ c--- q-qbar extra pieces
       endif
       enddo
       enddo
-      msq(1,-2)=msq(1,-2)+tempw(1,4) ! d u~ -> c~ s
       msq(3,-4)=msq(1,-2)
-      msq(2,-1)=msq(2,-1)+tempw(2,3)
       msq(4,-3)=msq(2,-1)
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-4) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.3)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.3) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-4)
+     & )
+     & ) then
+         msq(1,-2)=msq(1,-2)+tempw(1,4) ! d u~ -> c~ s
+      endif
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-2) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.1)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.1) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-2)
+     & )
+     & ) then
+         msq(3,-4)=msq(3,-4)+tempw(1,4) ! s c~ -> u~ d
+      endif
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.4) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-3)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-3) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.4)
+     & )
+     & ) then
+         msq(2,-1)=msq(2,-1)+tempw(2,3) ! u d~ -> s~ c
+      endif
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.2) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-1)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-1) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.2)
+     & )
+     & ) then
+         msq(4,-3)=msq(4,-3)+tempw(2,3) ! c s~ -> d~ u
+      endif
 
 c--- q-qbar extra pieces
       elseif (j.eq.10) then
@@ -401,10 +569,60 @@ c--- qbar-q extra pieces
       endif
       enddo
       enddo
-      msq(-2,1)=msq(-2,1)+tempw(1,4) ! u~ d -> c~ s
       msq(-4,3)=msq(-2,1)
-      msq(-1,2)=msq(-1,2)+tempw(2,3) ! d~ u -> s~ c
       msq(-3,4)=msq(-1,2)
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-4) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.3)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.3) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-4)
+     & )
+     & ) then
+         msq(-2,1)=msq(-2,1)+tempw(1,4) ! u~ d -> c~ s
+      endif
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-2) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.1)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.1) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-2)
+     & )
+     & ) then
+         msq(-4,3)=msq(-4,3)+tempw(1,4) ! c~ s -> u~ d
+      endif
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.4) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-3)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-3) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.4)
+     & )
+     & ) then
+         msq(-1,2)=msq(-1,2)+tempw(2,3) ! d~ u -> s~ c
+      endif
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.2) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-1)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-1) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.2)
+     & )
+     & ) then
+         msq(-3,4)=msq(-3,4)+tempw(2,3) ! s~ c -> d~ u
+      endif
 
 c--- qbar-q extra pieces
       elseif (j.eq.12) then
@@ -421,51 +639,113 @@ c--- qbar-q extra pieces
       enddo
 
 c--- 2-gluon amplitudes
-      call qq2l2nuggamp(1,2,i3,i4,i5,i6,7,8,za,zb,msqgg)
-      msq(1,-1)=msq(1,-1)+stat*aveqq*msqgg(1)
-      msq(2,-2)=msq(2,-2)+stat*aveqq*msqgg(2)
-      msq(3,-3)=msq(1,-1)+stat*aveqq*msqgg(1)
-      msq(4,-4)=msq(2,-2)+stat*aveqq*msqgg(2)
-      msq(5,-5)=msq(1,-1)+stat*aveqq*msqgg(1)
+      if (
+     & ((pid_pdg(7).eq.0) .or. (pid_pdg(7).eq.21)) .and.
+     & ((pid_pdg(8).eq.0) .or. (pid_pdg(8).eq.21))
+     & ) then ! qqb/qbq->gg
+         call qq2l2nuggamp(1,2,i3,i4,i5,i6,7,8,za,zb,msqgg)
+         msq(1,-1)=msq(1,-1)+stat*aveqq*msqgg(1)
+         msq(2,-2)=msq(2,-2)+stat*aveqq*msqgg(2)
+         msq(3,-3)=msq(1,-1)+stat*aveqq*msqgg(1)
+         msq(4,-4)=msq(2,-2)+stat*aveqq*msqgg(2)
+         msq(5,-5)=msq(1,-1)+stat*aveqq*msqgg(1)
 
-      call qq2l2nuggamp(2,1,i3,i4,i5,i6,7,8,za,zb,msqgg)
-      msq(-1,1)=msq(-1,1)+stat*aveqq*msqgg(1)
-      msq(-2,2)=msq(-2,2)+stat*aveqq*msqgg(2)
-      msq(-3,3)=msq(-1,1)+stat*aveqq*msqgg(1)
-      msq(-4,4)=msq(-2,2)+stat*aveqq*msqgg(2)
-      msq(-5,5)=msq(-1,1)+stat*aveqq*msqgg(1)
+         call qq2l2nuggamp(2,1,i3,i4,i5,i6,7,8,za,zb,msqgg)
+         msq(-1,1)=msq(-1,1)+stat*aveqq*msqgg(1)
+         msq(-2,2)=msq(-2,2)+stat*aveqq*msqgg(2)
+         msq(-3,3)=msq(-1,1)+stat*aveqq*msqgg(1)
+         msq(-4,4)=msq(-2,2)+stat*aveqq*msqgg(2)
+         msq(-5,5)=msq(-1,1)+stat*aveqq*msqgg(1)
+      endif
 
-      call qq2l2nuggamp(7,8,i3,i4,i5,i6,1,2,za,zb,msqgg)
-      msq(0,0)=msq(0,0)+avegg*(3d0*msqgg(1)+2d0*msqgg(2))
-c      msq(0,0)=msq(0,0)+avegg*(msqgg(1)+msqgg(2)) ! DEBUG
+      if (
+     & ((pid_pdg(7).eq.0).and.(pid_pdg(8).le.5 .and. pid_pdg(8).ge.0))
+     & .or.
+     & ((pid_pdg(8).eq.0).and.(pid_pdg(7).ge.-5 .and. pid_pdg(7).le.0))
+     & .or.
+     & ((pid_pdg(8).le.5 .and. pid_pdg(8).ge.0)
+     & .and. (pid_pdg(7).eq.(-pid_pdg(8))))
+     & ) then ! gg->qbq
+         call qq2l2nuggamp(7,8,i3,i4,i5,i6,1,2,za,zb,msqgg)
+         do k=1,5,2 ! db-d,sb-s,bb-b
+            if(
+     &       ((pid_pdg(7).eq.0) .or. (abs(pid_pdg(7)).eq.k)) .and.
+     &       ((pid_pdg(8).eq.0) .or. (abs(pid_pdg(8)).eq.k))
+     &       ) then
+               msq(0,0)=msq(0,0)+avegg*msqgg(1)
+            endif
+         enddo
+         do k=2,4,2 ! ub-u,cb-c
+            if(
+     &       ((pid_pdg(7).eq.0) .or. (abs(pid_pdg(7)).eq.k)) .and.
+     &       ((pid_pdg(8).eq.0) .or. (abs(pid_pdg(8)).eq.k))
+     &       ) then
+               msq(0,0)=msq(0,0)+avegg*msqgg(2)
+            endif
+         enddo
+      endif
 
-      call qq2l2nuggamp(7,2,i3,i4,i5,i6,1,8,za,zb,msqgg)
-      msq(0,-1)=msq(0,-1)+aveqg*msqgg(1)
-      msq(0,-2)=msq(0,-2)+aveqg*msqgg(2)
-      msq(0,-3)=msq(0,-1)+aveqg*msqgg(1)
-      msq(0,-4)=msq(0,-2)+aveqg*msqgg(2)
-      msq(0,-5)=msq(0,-1)+aveqg*msqgg(1)
+      if(
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.21) .and.
+     & (pid_pdg(7).ge.-5 .and. pid_pdg(7).le.0)
+     & ) then ! gqb->qbg / qbg->qbg
+         ! gqb->qbg
+         call qq2l2nuggamp(7,2,i3,i4,i5,i6,1,8,za,zb,msqgg)
+         do k=1,5,2 ! q=d,s,b
+         if ((pid_pdg(7).eq.0) .or. (abs(pid_pdg(7)).eq.k)) then
+            msq(0,-k)=msq(0,-k)+aveqg*msqgg(1)
+         endif
+         enddo
+         do k=2,4,2 ! q=u,c
+         if ((pid_pdg(7).eq.0) .or. (abs(pid_pdg(7)).eq.k)) then
+            msq(0,-k)=msq(0,-k)+aveqg*msqgg(2)
+         endif
+         enddo
 
-      call qq2l2nuggamp(7,1,i3,i4,i5,i6,2,8,za,zb,msqgg)
-      msq(-1,0)=msq(-1,0)+aveqg*msqgg(1)
-      msq(-2,0)=msq(-2,0)+aveqg*msqgg(2)
-      msq(-3,0)=msq(-1,0)+aveqg*msqgg(1)
-      msq(-4,0)=msq(-2,0)+aveqg*msqgg(2)
-      msq(-5,0)=msq(-1,0)+aveqg*msqgg(1)
+         ! qbg->qbg
+         call qq2l2nuggamp(7,1,i3,i4,i5,i6,2,8,za,zb,msqgg)
+         do k=1,5,2 ! q=d,s,b
+         if ((pid_pdg(7).eq.0) .or. (abs(pid_pdg(7)).eq.k)) then
+            msq(-k,0)=msq(-k,0)+aveqg*msqgg(1)
+         endif
+         enddo
+         do k=2,4,2 ! q=u,c
+         if ((pid_pdg(7).eq.0) .or. (abs(pid_pdg(7)).eq.k)) then
+            msq(-k,0)=msq(-k,0)+aveqg*msqgg(2)
+         endif
+         enddo
+      endif
 
-      call qq2l2nuggamp(2,8,i3,i4,i5,i6,1,7,za,zb,msqgg)
-      msq(0,1)=msq(0,1)+aveqg*msqgg(1)
-      msq(0,2)=msq(0,2)+aveqg*msqgg(2)
-      msq(0,3)=msq(0,1)+aveqg*msqgg(1)
-      msq(0,4)=msq(0,2)+aveqg*msqgg(2)
-      msq(0,5)=msq(0,1)+aveqg*msqgg(1)
+      if(
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.21) .and.
+     & (pid_pdg(8).le.5 .and. pid_pdg(8).ge.0)
+     & ) then ! gq->gq / qg->gq
+         ! gq->gq
+         call qq2l2nuggamp(2,8,i3,i4,i5,i6,1,7,za,zb,msqgg)
+         do k=1,5,2 ! q=d,s,b
+         if ((pid_pdg(8).eq.0) .or. (abs(pid_pdg(8)).eq.k)) then
+            msq(0,k)=msq(0,k)+aveqg*msqgg(1)
+         endif
+         enddo
+         do k=2,4,2 ! q=u,c
+         if ((pid_pdg(8).eq.0) .or. (abs(pid_pdg(8)).eq.k)) then
+            msq(0,k)=msq(0,k)+aveqg*msqgg(2)
+         endif
+         enddo
 
-      call qq2l2nuggamp(1,8,i3,i4,i5,i6,2,7,za,zb,msqgg)
-      msq(1,0)=msq(1,0)+aveqg*msqgg(1)
-      msq(2,0)=msq(2,0)+aveqg*msqgg(2)
-      msq(3,0)=msq(3,0)+aveqg*msqgg(1)
-      msq(4,0)=msq(4,0)+aveqg*msqgg(2)
-      msq(5,0)=msq(5,0)+aveqg*msqgg(1)
+         ! qg->gq
+         call qq2l2nuggamp(1,8,i3,i4,i5,i6,2,7,za,zb,msqgg)
+         do k=1,5,2 ! q=d,s,b
+         if ((pid_pdg(8).eq.0) .or. (abs(pid_pdg(8)).eq.k)) then
+            msq(k,0)=msq(k,0)+aveqg*msqgg(1)
+         endif
+         enddo
+         do k=2,4,2 ! q=u,c
+         if ((pid_pdg(8).eq.0) .or. (abs(pid_pdg(8)).eq.k)) then
+            msq(k,0)=msq(k,0)+aveqg*msqgg(2)
+         endif
+         enddo
+      endif
 
       return
 
@@ -474,6 +754,3 @@ c      msq(0,0)=msq(0,0)+avegg*(msqgg(1)+msqgg(2)) ! DEBUG
    79 format(' *  sin^2(theta_w)   (',f11.5,',',f11.5,')      *')
 
       end
-
-
-C LocalWords:  nfinc

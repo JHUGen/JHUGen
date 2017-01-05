@@ -1,4 +1,4 @@
-      subroutine getQQZZQQstrongamps(amp,ampa,ampb,p,za,zb,zab,zba,
+      subroutine getQQZZQQstrongamps(amp,ampa,ampb,za,zb,zab,zba,
      & j1,j2,j3,j4,j5,j6,j7,j8)
       implicit none
       include 'constants.f'
@@ -19,8 +19,7 @@ c     & dquq_dquq,dqcq_uqsq,uqsq_dqcq
      & dqdq_dqdq=4,uqbq_uqbq=5,dqcq_dqcq=6)
 c     & dquq_dquq=7,dqcq_uqsq=8,uqsq_dqcq=9)
       integer h1,h2,h3,h5,j1,j2,j3,j4,j5,j6,j7,j8
-      double precision p(mxpart,4),
-     & t4,s17,s28,s18,s27,s7341,s7561,s7342,s7562
+      double precision t4,s17,s28,s18,s27,s7341,s7561,s7342,s7562
       double complex zab(mxpart,4,mxpart),zba(mxpart,4,mxpart),cdotpr,
      & j7_1(4,2),j7_2(4,2),j8_1(4,2),j8_2(4,2),
      & j7_34_1(4,2,2,2),j7_34_2(4,2,2,2),

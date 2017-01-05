@@ -125,7 +125,7 @@ c-----------------------------------------
 c---  Note 3654, this is the special ordering to agree with Madgraph
       ! This orders the decay bosons as W-W+ as in process.DAT
       if (index(runstring,'_zz') .le. 0) then
-      call getVVWWamps(ampWW,ampWWa,ampWWb,p,za,zb,zab,zba,
+      call getVVWWamps(ampWW,ampWWa,ampWWb,za,zb,zab,zba,
      & j1(j),j2(j),3,6,5,4,j7(j),j8(j),doHO,doBO)
       endif
 
@@ -133,7 +133,7 @@ c-----------------------------------------
 c---- SET-UP FOR ZZ-like AMPLITUDES ------
 c-----------------------------------------
       if (index(runstring,'_ww') .le. 0) then
-      call getVVZZamps(ampZZ,ampZZa,ampZZb,p,za,zb,zab,zba,
+      call getVVZZamps(ampZZ,ampZZa,ampZZb,za,zb,zab,zba,
      & j1(j),j2(j),3,4,5,6,j7(j),j8(j),doHO,doBO)
       endif
 

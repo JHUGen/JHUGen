@@ -53,6 +53,9 @@ C---call plabel/pdgid conversion
 C---setup spinors and spinorvector products
       call spinorcurr(8,p,za,zb,zab,zba)
 
+c---setup Z/A couplings from PDG ids
+      call couplzajk()
+
 c---color factors for Z decays
       colfac34_56=1d0
       if (abs(pid_pdg(3)).ge.0 .and. abs(pid_pdg(3)).le.5) then
@@ -76,11 +79,11 @@ c---color factors for Z decays
       if (.not.comb1278ok) cycle
 
 c--   Call the VVZZ amplitudes
-      call getQQZZQQstrongamps(amp,ampa,ampb,p,za,zb,zab,zba,
+      call getQQZZQQstrongamps(amp,ampa,ampb,za,zb,zab,zba,
      & j1(j),j2(j),3,4,5,6,j7(j),j8(j))
       if (interference) then
         call getQQZZQQstrongamps(amp_swap,ampa_swap,ampb_swap,
-     &   p,za,zb,zab,zba,
+     &   za,zb,zab,zba,
      &   j1(j),j2(j),3,6,5,4,j7(j),j8(j))
       endif
 
