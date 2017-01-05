@@ -10,7 +10,7 @@
       include 'WWbits.f'
       integer nmax
       parameter(nmax=10)
-      integer k,l,i1,i2,i3,i4,
+      integer k,l,
      & uqcq_uqcq,uquq_uquq,dqsq_dqsq,
      & dqdq_dqdq,uqbq_uqbq,dqcq_dqcq,
      & dquq_dquq,dqcq_uqsq,uqsq_dqcq
@@ -82,7 +82,6 @@ c--- contribution from jcentre
      & +jtwo17(2,2,h1,h2)+jtwo28(2,2,h2,h1)
       enddo
       enddo
-
 
 C-----setup for (dqsq_dqsq)
       do h1=1,2
