@@ -1,5 +1,5 @@
       subroutine qq4lggamp(i1,i2,i3,i4,i5,i6,i7,i8,
-     & b7,b8,za,zb,amp78,amp87)
+     & za,zb,amp78,amp87)
       implicit none
       include 'constants.f'
       include 'cmplxmass.f'
@@ -8,7 +8,7 @@
       include 'sprods_com.f'
       include 'ewcharge.f'
       include 'zcouple.f'
-      integer jdu,j78,h34,h56,i1,i2,i3,i4,i5,i6,i7,i8,b7,b8,
+      integer jdu,j78,h34,h56,i1,i2,i3,i4,i5,i6,i7,i8,
      & p1,p2,p3,p4,p5,p6,p7,p8
       double complex zab2,zba2,
      & amp78(2,2,2,2,2,2),amp87(2,2,2,2,2,2),
@@ -55,7 +55,7 @@ C-----end statement functions
       propz56=s56-dcmplx(zmass**2,-zmass*zwidth)
 
 C---set up couplings dependent on whether we are doing 34- or 56- line
-      if ((i3+i4 == 7) .or. (i3+i3 == 9)) then
+      if ((i3+i4 == 7) .or. (i3+i4 == 9)) then
       xl1=l1
       xr1=r1
       xq1=q1

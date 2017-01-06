@@ -419,10 +419,10 @@ C-----setup for ((uquq_uquq)  (2,2)-->(2,2)
      & *dble(ampb(uquq_uquq,h1,h2,h3,h5)
      & *dconjg(ampb_swap(uquq_uquq,h1,h2,h3,h5)))
       if (h1 .eq. h2) then
-      temp(2,2)=temp(2,2)-2d0/xn*ampsqfac/sqrt(colfac34_56)
+      temp(2,2)=temp(2,2)+2d0/xn*ampsqfac/sqrt(colfac34_56)
      & *dble(ampa(uquq_uquq,h1,h2,h3,h5)
      & *dconjg(ampb_swap(uquq_uquq,h1,h2,h3,h5)))
-      temp(2,2)=temp(2,2)-2d0/xn*ampsqfac/sqrt(colfac34_56)
+      temp(2,2)=temp(2,2)+2d0/xn*ampsqfac/sqrt(colfac34_56)
      & *dble(ampa_swap(uquq_uquq,h1,h2,h3,h5)
      & *dconjg(ampb(uquq_uquq,h1,h2,h3,h5)))
       endif
@@ -474,10 +474,10 @@ C-----setup for ((dqdq_dqdq)  (1,1)-->(1,1)
      & *dble(ampb(dqdq_dqdq,h1,h2,h3,h5)
      & *dconjg(ampb_swap(dqdq_dqdq,h1,h2,h3,h5)))
       if (h1 .eq. h2) then
-      temp(1,1)=temp(1,1)-2d0/xn*ampsqfac/sqrt(colfac34_56)
+      temp(1,1)=temp(1,1)+2d0/xn*ampsqfac/sqrt(colfac34_56)
      & *dble(ampa(dqdq_dqdq,h1,h2,h3,h5)
      & *dconjg(ampb_swap(dqdq_dqdq,h1,h2,h3,h5)))
-      temp(1,1)=temp(1,1)-2d0/xn*ampsqfac/sqrt(colfac34_56)
+      temp(1,1)=temp(1,1)+2d0/xn*ampsqfac/sqrt(colfac34_56)
      & *dble(ampa_swap(dqdq_dqdq,h1,h2,h3,h5)
      & *dconjg(ampb(dqdq_dqdq,h1,h2,h3,h5)))
       endif
@@ -614,9 +614,28 @@ C-----setup for ((dqdq_dqdq)  (1,1)-->(1,1)
 
       if (j.eq.1) then
       do k=1,nf
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.k) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.k)
+     & )
+     & ) then
       msq(k,k)=temp(k,k)*stat
+      endif
       do l=k+1,nf
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.k) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.l) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.k)
+     & )
+     & ) then
       msq(k,l)=temp(k,l)
+      endif
       enddo
       enddo
       if (
@@ -649,7 +668,19 @@ C-----setup for ((dqdq_dqdq)  (1,1)-->(1,1)
       elseif (j.eq.2) then
       do k=1,nf
       do l=k+1,nf
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.k) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.l) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.k)
+     & )
+     & ) then
       msq(l,k)=temp(k,l)
+      endif
       enddo
       enddo
       if (
@@ -681,9 +712,28 @@ C-----setup for ((dqdq_dqdq)  (1,1)-->(1,1)
 
       elseif (j.eq.3) then
       do k=-nf,-1
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.k) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.k)
+     & )
+     & ) then
       msq(k,k)=temp(-k,-k)*stat
+      endif
       do l=k+1,-1
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.k) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.l) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.k)
+     & )
+     & ) then
       msq(k,l)=temp(-l,-k)
+      endif
       enddo
       enddo
       if (
@@ -716,7 +766,19 @@ C-----setup for ((dqdq_dqdq)  (1,1)-->(1,1)
       elseif (j.eq.4) then
       do k=-nf,-1
       do l=k+1,-1
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.k) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.l) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.k)
+     & )
+     & ) then
       msq(l,k)=temp(-l,-k)
+      endif
       enddo
       enddo
       if (
@@ -901,8 +963,6 @@ c--- q-qbar extra pieces
       endif
       enddo
       enddo
-      msq(3,-4)=msq(1,-2)
-      msq(4,-3)=msq(2,-1)
       if (
      & (
      & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-4
@@ -991,8 +1051,6 @@ c--- qbar-q extra pieces
       endif
       enddo
       enddo
-      msq(-4,3)=msq(-2,1)
-      msq(-3,4)=msq(-1,2)
       if (
      & (
      & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-4
