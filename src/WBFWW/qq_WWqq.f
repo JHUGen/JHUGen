@@ -382,9 +382,28 @@ c---- Multiply by the decay color factor
 c--- fill matrix elements
       if (j.eq.1) then
       do k=1,nf
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.k) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.k)
+     & )
+     & ) then
       msq(k,k)=temp(k,k)*stat
+      endif
       do l=k+1,nf
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.k) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.l) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.k)
+     & )
+     & ) then
       msq(k,l)=temp(k,l)
+      endif
       enddo
       enddo
       if (
@@ -417,7 +436,19 @@ c--- fill matrix elements
       elseif (j.eq.2) then
       do k=1,nf
       do l=k+1,nf
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.k) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.l) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.k)
+     & )
+     & ) then
       msq(l,k)=temp(k,l)
+      endif
       enddo
       enddo
       if (
@@ -449,9 +480,28 @@ c--- fill matrix elements
 
       elseif (j.eq.3) then
       do k=-nf,-1
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.k) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.k)
+     & )
+     & ) then
       msq(k,k)=temp(-k,-k)*stat
+      endif
       do l=k+1,-1
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.k) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.l) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.k)
+     & )
+     & ) then
       msq(k,l)=temp(-l,-k)
+      endif
       enddo
       enddo
       if (
@@ -484,7 +534,19 @@ c--- fill matrix elements
       elseif (j.eq.4) then
       do k=-nf,-1
       do l=k+1,-1
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.k) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.l) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.k)
+     & )
+     & ) then
       msq(l,k)=temp(-l,-k)
+      endif
       enddo
       enddo
       if (
@@ -669,8 +731,6 @@ c--- q-qbar extra pieces
       endif
       enddo
       enddo
-      msq(3,-4)=msq(1,-2)
-      msq(4,-3)=msq(2,-1)
       if (
      & (
      & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-4
@@ -759,8 +819,6 @@ c--- qbar-q extra pieces
       endif
       enddo
       enddo
-      msq(-4,3)=msq(-2,1)
-      msq(-3,4)=msq(-1,2)
       if (
      & (
      & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-4

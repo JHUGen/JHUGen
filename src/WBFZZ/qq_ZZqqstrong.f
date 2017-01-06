@@ -240,10 +240,10 @@ C-----setup for ((uquq_uquq)  (2,2)-->(2,2)
      & *dble(ampb(uquq_uquq,h1,h2,h3,h5)
      & *dconjg(ampb_swap(uquq_uquq,h1,h2,h3,h5)))
       if (h1 .eq. h2) then
-      temp(2,2)=temp(2,2)-2d0/xn*ampsqfac/sqrt(colfac34_56)
+      temp(2,2)=temp(2,2)+2d0/xn*ampsqfac/sqrt(colfac34_56)
      & *dble(ampa(uquq_uquq,h1,h2,h3,h5)
      & *dconjg(ampb_swap(uquq_uquq,h1,h2,h3,h5)))
-      temp(2,2)=temp(2,2)-2d0/xn*ampsqfac/sqrt(colfac34_56)
+      temp(2,2)=temp(2,2)+2d0/xn*ampsqfac/sqrt(colfac34_56)
      & *dble(ampa_swap(uquq_uquq,h1,h2,h3,h5)
      & *dconjg(ampb(uquq_uquq,h1,h2,h3,h5)))
       endif
@@ -295,10 +295,10 @@ C-----setup for ((dqdq_dqdq)  (1,1)-->(1,1)
      & *dble(ampb(dqdq_dqdq,h1,h2,h3,h5)
      & *dconjg(ampb_swap(dqdq_dqdq,h1,h2,h3,h5)))
       if (h1 .eq. h2) then
-      temp(1,1)=temp(1,1)-2d0/xn*ampsqfac/sqrt(colfac34_56)
+      temp(1,1)=temp(1,1)+2d0/xn*ampsqfac/sqrt(colfac34_56)
      & *dble(ampa(dqdq_dqdq,h1,h2,h3,h5)
      & *dconjg(ampb_swap(dqdq_dqdq,h1,h2,h3,h5)))
-      temp(1,1)=temp(1,1)-2d0/xn*ampsqfac/sqrt(colfac34_56)
+      temp(1,1)=temp(1,1)+2d0/xn*ampsqfac/sqrt(colfac34_56)
      & *dble(ampa_swap(dqdq_dqdq,h1,h2,h3,h5)
      & *dconjg(ampb(dqdq_dqdq,h1,h2,h3,h5)))
       endif
@@ -333,31 +333,93 @@ C-----setup for ((dqdq_dqdq)  (1,1)-->(1,1)
 
       if (j.eq.1) then
       do k=1,nf
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.k) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.k)
+     & )
+     & ) then
       msq(k,k)=temp(k,k)*stat
+      endif
       do l=k+1,nf
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.k) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.l) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.k)
+     & )
+     & ) then
       msq(k,l)=temp(k,l)
+      endif
       enddo
       enddo
 
       elseif (j.eq.2) then
       do k=1,nf
       do l=k+1,nf
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.k) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.l) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.k)
+     & )
+     & ) then
       msq(l,k)=temp(k,l)
+      endif
       enddo
       enddo
 
       elseif (j.eq.3) then
       do k=-nf,-1
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.k) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.k)
+     & )
+     & ) then
       msq(k,k)=temp(-k,-k)*stat
+      endif
       do l=k+1,-1
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.k) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.l) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.k)
+     & )
+     & ) then
       msq(k,l)=temp(-l,-k)
+      endif
       enddo
       enddo
 
       elseif (j.eq.4) then
       do k=-nf,-1
       do l=k+1,-1
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.k) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.l) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.k)
+     & )
+     & ) then
       msq(l,k)=temp(-l,-k)
+      endif
       enddo
       enddo
 
@@ -412,8 +474,7 @@ c--- q-qbar extra pieces
       endif
       enddo
       enddo
-      msq(3,-4)=msq(1,-2)
-      msq(4,-3)=msq(2,-1)
+
 c--- q-qbar extra pieces
       elseif (j.eq.10) then
       do k=1,nf
@@ -433,8 +494,6 @@ c--- qbar-q extra pieces
       endif
       enddo
       enddo
-      msq(-4,3)=msq(-2,1)
-      msq(-3,4)=msq(-1,2)
 
 c--- qbar-q extra pieces
       elseif (j.eq.12) then
@@ -455,14 +514,14 @@ c--- 2-gluon amplitudes
      & ((pid_pdg(7).eq.0) .or. (pid_pdg(7).eq.21)) .and.
      & ((pid_pdg(8).eq.0) .or. (pid_pdg(8).eq.21))
      & ) then ! qqb/qbq->gg
-         call qq4lggampf(1,2,3,4,5,6,7,8,3,4,za,zb,msqgg)
+         call qq4lggampf(1,2,3,4,5,6,7,8,za,zb,msqgg)
          msq(1,-1)=msq(1,-1)+stat*aveqq*msqgg(1)
          msq(2,-2)=msq(2,-2)+stat*aveqq*msqgg(2)
          msq(3,-3)=msq(1,-1)+stat*aveqq*msqgg(1)
          msq(4,-4)=msq(2,-2)+stat*aveqq*msqgg(2)
          msq(5,-5)=msq(1,-1)+stat*aveqq*msqgg(1)
 
-         call qq4lggampf(2,1,3,4,5,6,7,8,3,4,za,zb,msqgg)
+         call qq4lggampf(2,1,3,4,5,6,7,8,za,zb,msqgg)
          msq(-1,1)=msq(-1,1)+stat*aveqq*msqgg(1)
          msq(-2,2)=msq(-2,2)+stat*aveqq*msqgg(2)
          msq(-3,3)=msq(-1,1)+stat*aveqq*msqgg(1)
@@ -478,7 +537,7 @@ c--- 2-gluon amplitudes
      & ((pid_pdg(8).le.5 .and. pid_pdg(8).ge.0)
      & .and. (pid_pdg(7).eq.(-pid_pdg(8))))
      & ) then ! gg->qbq
-         call qq4lggampf(7,8,3,4,5,6,1,2,3,4,za,zb,msqgg)
+         call qq4lggampf(7,8,3,4,5,6,1,2,za,zb,msqgg)
          do k=1,5,2 ! db-d,sb-s,bb-b
             if(
      &       ((pid_pdg(7).eq.0) .or. (abs(pid_pdg(7)).eq.k)) .and.
@@ -502,7 +561,7 @@ c--- 2-gluon amplitudes
      & (pid_pdg(7).ge.-5 .and. pid_pdg(7).le.0)
      & ) then ! gqb->qbg / qbg->qbg
          ! gqb->qbg
-         call qq4lggampf(7,2,3,4,5,6,1,8,3,4,za,zb,msqgg)
+         call qq4lggampf(7,2,3,4,5,6,1,8,za,zb,msqgg)
          do k=1,5,2 ! q=d,s,b
          if ((pid_pdg(7).eq.0) .or. (abs(pid_pdg(7)).eq.k)) then
             msq(0,-k)=msq(0,-k)+aveqg*msqgg(1)
@@ -515,7 +574,7 @@ c--- 2-gluon amplitudes
          enddo
 
          ! qbg->qbg
-         call qq4lggampf(7,1,3,4,5,6,2,8,3,4,za,zb,msqgg)
+         call qq4lggampf(7,1,3,4,5,6,2,8,za,zb,msqgg)
          do k=1,5,2 ! q=d,s,b
          if ((pid_pdg(7).eq.0) .or. (abs(pid_pdg(7)).eq.k)) then
             msq(-k,0)=msq(-k,0)+aveqg*msqgg(1)
@@ -526,6 +585,35 @@ c--- 2-gluon amplitudes
             msq(-k,0)=msq(-k,0)+aveqg*msqgg(2)
          endif
          enddo
+      else if(
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.21) .and.
+     & (pid_pdg(8).ge.-5 .and. pid_pdg(8).le.0)
+     & ) then ! gqb->gqb / qbg->gqb
+         ! gqb->gqb
+         call qq4lggampf(8,2,3,4,5,6,1,7,za,zb,msqgg)
+         do k=1,5,2 ! q=d,s,b
+         if ((pid_pdg(8).eq.0) .or. (abs(pid_pdg(8)).eq.k)) then
+            msq(0,-k)=msq(0,-k)+aveqg*msqgg(1)
+         endif
+         enddo
+         do k=2,4,2 ! q=u,c
+         if ((pid_pdg(8).eq.0) .or. (abs(pid_pdg(8)).eq.k)) then
+            msq(0,-k)=msq(0,-k)+aveqg*msqgg(2)
+         endif
+         enddo
+
+         ! qbg->gqb
+         call qq4lggampf(8,1,3,4,5,6,2,7,za,zb,msqgg)
+         do k=1,5,2 ! q=d,s,b
+         if ((pid_pdg(8).eq.0) .or. (abs(pid_pdg(8)).eq.k)) then
+            msq(-k,0)=msq(-k,0)+aveqg*msqgg(1)
+         endif
+         enddo
+         do k=2,4,2 ! q=u,c
+         if ((pid_pdg(8).eq.0) .or. (abs(pid_pdg(8)).eq.k)) then
+            msq(-k,0)=msq(-k,0)+aveqg*msqgg(2)
+         endif
+         enddo
       endif
 
       if(
@@ -533,7 +621,7 @@ c--- 2-gluon amplitudes
      & (pid_pdg(8).le.5 .and. pid_pdg(8).ge.0)
      & ) then ! gq->gq / qg->gq
          ! gq->gq
-         call qq4lggampf(2,8,3,4,5,6,1,7,3,4,za,zb,msqgg)
+         call qq4lggampf(2,8,3,4,5,6,1,7,za,zb,msqgg)
          do k=1,5,2 ! q=d,s,b
          if ((pid_pdg(8).eq.0) .or. (abs(pid_pdg(8)).eq.k)) then
             msq(0,k)=msq(0,k)+aveqg*msqgg(1)
@@ -546,7 +634,36 @@ c--- 2-gluon amplitudes
          enddo
 
          ! qg->gq
-         call qq4lggampf(1,8,3,4,5,6,2,7,3,4,za,zb,msqgg)
+         call qq4lggampf(1,8,3,4,5,6,2,7,za,zb,msqgg)
+         do k=1,5,2 ! q=d,s,b
+         if ((pid_pdg(8).eq.0) .or. (abs(pid_pdg(8)).eq.k)) then
+            msq(k,0)=msq(k,0)+aveqg*msqgg(1)
+         endif
+         enddo
+         do k=2,4,2 ! q=u,c
+         if ((pid_pdg(8).eq.0) .or. (abs(pid_pdg(8)).eq.k)) then
+            msq(k,0)=msq(k,0)+aveqg*msqgg(2)
+         endif
+         enddo
+      else if(
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.21) .and.
+     & (pid_pdg(7).le.5 .and. pid_pdg(7).ge.0)
+     & ) then ! gq->qg / qg->qg
+         ! gq->qg
+         call qq4lggampf(2,7,3,4,5,6,1,8,za,zb,msqgg)
+         do k=1,5,2 ! q=d,s,b
+         if ((pid_pdg(8).eq.0) .or. (abs(pid_pdg(8)).eq.k)) then
+            msq(0,k)=msq(0,k)+aveqg*msqgg(1)
+         endif
+         enddo
+         do k=2,4,2 ! q=u,c
+         if ((pid_pdg(8).eq.0) .or. (abs(pid_pdg(8)).eq.k)) then
+            msq(0,k)=msq(0,k)+aveqg*msqgg(2)
+         endif
+         enddo
+
+         ! qg->qg
+         call qq4lggampf(1,7,3,4,5,6,2,8,za,zb,msqgg)
          do k=1,5,2 ! q=d,s,b
          if ((pid_pdg(8).eq.0) .or. (abs(pid_pdg(8)).eq.k)) then
             msq(k,0)=msq(k,0)+aveqg*msqgg(1)
