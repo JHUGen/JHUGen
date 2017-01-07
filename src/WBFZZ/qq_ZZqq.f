@@ -811,10 +811,33 @@ C-----setup for ((dqdq_dqdq)  (1,1)-->(1,1)
 c--- qbar-q
       elseif (j.eq.5) then
       do k=-nf,-1
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.k) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-k)
+     & ) .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-k) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.k)
+     & )
+     & ) then
       msq(k,-k)=temp(-k,-k)
+      endif
       do l=1,nf
       if (abs(k) .lt. abs(l)) then
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.k) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.l) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.k)
+     & )
+     & ) then
       msq(k,l)=temp(-k,l)
+      endif
       endif
       enddo
       enddo
@@ -850,7 +873,19 @@ c--- qbar-q
       do k=-nf,-1
       do l=1,nf
       if (abs(k) .gt. abs(l)) then
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.k) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.l) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.k)
+     & )
+     & ) then
       msq(k,l)=temp(l,-k)
+      endif
       endif
       enddo
       enddo
@@ -884,10 +919,33 @@ c--- qbar-q
 c--- q-qbar
       elseif (j.eq.7) then
       do k=-nf,-1
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.k) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-k)
+     & ) .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-k) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.k)
+     & )
+     & ) then
       msq(-k,k)=temp(-k,-k)
+      endif
       do l=1,nf
       if (abs(k) .lt. abs(l)) then
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.k) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.l) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.k)
+     & )
+     & ) then
       msq(l,k)=temp(-k,l)
+      endif
       endif
       enddo
       enddo
@@ -923,7 +981,19 @@ c--- q-qbar
       do k=-nf,-1
       do l=-nf,-1
       if (abs(k) .lt. abs(l)) then
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-k) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.l) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-k)
+     & )
+     & ) then
       msq(-k,l)=temp(-k,-l)
+      endif
       endif
       enddo
       enddo
