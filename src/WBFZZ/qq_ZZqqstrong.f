@@ -540,7 +540,19 @@ c--- q-qbar extra pieces
       do k=1,nf
       do l=1,nf
       if (k .lt. l) then
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.l) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-l)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-l) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
+     & )
+     & ) then
       msq(k,-k)=msq(k,-k)+temp(k,l)
+      endif
       endif
       enddo
       enddo
@@ -550,7 +562,19 @@ c--- q-qbar extra pieces
       do k=1,nf
       do l=1,nf
       if (k .gt. l) then
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.l) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-l)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-l) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
+     & )
+     & ) then
       msq(k,-k)=msq(k,-k)+temp(l,k)
+      endif
       endif
       enddo
       enddo
@@ -560,7 +584,19 @@ c--- qbar-q extra pieces
       do k=1,nf
       do l=1,nf
       if (k .lt. l) then
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.l) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-l)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-l) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
+     & )
+     & ) then
       msq(-k,k)=msq(-k,k)+temp(k,l)
+      endif
       endif
       enddo
       enddo
@@ -570,7 +606,19 @@ c--- qbar-q extra pieces
       do k=1,nf
       do l=1,nf
       if (k .gt. l) then
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.l) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-l)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-l) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
+     & )
+     & ) then
       msq(-k,k)=msq(-k,k)+temp(l,k)
+      endif
       endif
       enddo
       enddo
