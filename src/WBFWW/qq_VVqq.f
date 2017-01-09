@@ -422,10 +422,10 @@ C-----setup for (dquq_dquq)
      &   *dble(ampWWb(dquq_dquq,h1,h2)
      & *dconjg(ampZZb(dquq_dquq,h1,h2,h3,h5)))
       if (h1 .eq. h2) then
-      temp(1,2)=temp(1,2)-2d0/xn*esq**6*spinavge/sqrt(colfac34_56)
+      temp(1,2)=temp(1,2)+2d0/xn*esq**6*spinavge/sqrt(colfac34_56)
      &   *dble(ampWWa(dquq_dquq,h1,h2)
      & *dconjg(ampZZb(dquq_dquq,h1,h2,h3,h5)))
-      temp(1,2)=temp(1,2)-2d0/xn*esq**6*spinavge/sqrt(colfac34_56)
+      temp(1,2)=temp(1,2)+2d0/xn*esq**6*spinavge/sqrt(colfac34_56)
      &   *dble(ampZZa(dquq_dquq,h1,h2,h3,h5)
      & *dconjg(ampWWb(dquq_dquq,h1,h2)))
       endif
@@ -572,7 +572,6 @@ C-----setup for (uqsq_dqcq)
      & )
      & ) then
          temp(k,l)=zip
-         tempw(k,l)=zip
       endif
       enddo;enddo
       if (
