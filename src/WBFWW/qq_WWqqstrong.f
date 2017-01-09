@@ -197,7 +197,6 @@ C-----setup for (uqsq_dqcq)
      & )
      & )) then
          temp(k,l)=zip
-         tempw(k,l)=zip
       endif
       enddo;enddo
 

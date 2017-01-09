@@ -334,10 +334,10 @@ C-----setup for dquq_dquq W diagrams (1,2)-->(1,2)
      &   *dble(ampb(dquq_dquq,h1,h2,h3,h5)
      & *dconjg(ampb_swap(dquq_dquq,h1,h2,h3,h5)))
       if ((h1 .eq. 1) .and. (h2.eq. 1)) then
-      temp(1,2)=temp(1,2)-2d0/xn*ampsqfac/sqrt(colfac34_56)
+      temp(1,2)=temp(1,2)+2d0/xn*ampsqfac/sqrt(colfac34_56)
      &   *dble(ampa(dquq_dquq,h1,h2,h3,h5)
      & *dconjg(ampb_swap(dquq_dquq,h1,h2,h3,h5)))
-      temp(1,2)=temp(1,2)-2d0/xn*ampsqfac/sqrt(colfac34_56)
+      temp(1,2)=temp(1,2)+2d0/xn*ampsqfac/sqrt(colfac34_56)
      &   *dble(ampa_swap(dquq_dquq,h1,h2,h3,h5)
      & *dconjg(ampb(dquq_dquq,h1,h2,h3,h5)))
       endif
@@ -578,9 +578,27 @@ C-----setup for ((dqdq_dqdq)  (1,1)-->(1,1)
      &    )
      & )
      & ) then
+c         if(temp(k,l).ne.zip) then
+c      print *,"temp(",k,",",l,")=",temp(k,l),"->0 for j=",j," ids=("
+c     & ,j1(j),",",j2(j),",",j7(j),",",j8(j),")"
+c     & ,"->(",pid_pdg(j1(j)),",",pid_pdg(j2(j)),","
+c     & ,pid_pdg(j7(j)),",",pid_pdg(j8(j)),")"
          temp(k,l)=zip
-         tempw(k,l)=zip
+c         endif
+c      else
+c         if(temp(k,l).ne.zip) then
+c      print *,"temp(",k,",",l,")=",temp(k,l)," for j=",j," ids=("
+c     & ,j1(j),",",j2(j),",",j7(j),",",j8(j),")"
+c     & ,"->(",pid_pdg(j1(j)),",",pid_pdg(j2(j)),","
+c     & ,pid_pdg(j7(j)),",",pid_pdg(j8(j)),")"
+c         endif
       endif
+c      if(tempw(k,l).ne.zip) then
+c      print *,"tempw(",k,",",l,")=",tempw(k,l)," for j=",j," ids=("
+c     & ,j1(j),",",j2(j),",",j7(j),",",j8(j),")"
+c     & ,"->(",pid_pdg(j1(j)),",",pid_pdg(j2(j)),","
+c     & ,pid_pdg(j7(j)),",",pid_pdg(j8(j)),")"
+c      endif
       enddo;enddo
       if (
      & isANeutrino(abs(pid_pdg(7))) .and.
