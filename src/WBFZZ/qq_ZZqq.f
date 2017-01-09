@@ -1047,7 +1047,27 @@ c--- q-qbar extra pieces
       do k=1,nf
       do l=1,nf
       if (k .lt. l) then
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.l) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-l)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-l) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
+     & )
+     & .or.
+     & (
+     &    abs(pid_pdg(8)).eq.abs(pid_pdg(7)) .and. (
+     &    (modulo(l,2).eq.0 .and. isANeutrino(abs(pid_pdg(7))))
+     &    .or.
+     &    (modulo(l,2).eq.1 .and. isALepton(abs(pid_pdg(7))))
+     &    )
+     & )
+     & ) then
       msq(k,-k)=msq(k,-k)+temp(k,l)
+      endif
       endif
       enddo
       enddo
@@ -1125,7 +1145,27 @@ c--- q-qbar extra pieces
       do k=1,nf
       do l=1,nf
       if (k .gt. l) then
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.l) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-l)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-l) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
+     & )
+     & .or.
+     & (
+     &    abs(pid_pdg(8)).eq.abs(pid_pdg(7)) .and. (
+     &    (modulo(l,2).eq.0 .and. isANeutrino(abs(pid_pdg(7))))
+     &    .or.
+     &    (modulo(l,2).eq.1 .and. isALepton(abs(pid_pdg(7))))
+     &    )
+     & )
+     & ) then
       msq(k,-k)=msq(k,-k)+temp(l,k)
+      endif
       endif
       enddo
       enddo
@@ -1135,7 +1175,27 @@ c--- qbar-q extra pieces
       do k=1,nf
       do l=1,nf
       if (k .lt. l) then
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.l) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-l)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-l) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
+     & )
+     & .or.
+     & (
+     &    abs(pid_pdg(8)).eq.abs(pid_pdg(7)) .and. (
+     &    (modulo(l,2).eq.0 .and. isANeutrino(abs(pid_pdg(7))))
+     &    .or.
+     &    (modulo(l,2).eq.1 .and. isALepton(abs(pid_pdg(7))))
+     &    )
+     & )
+     & ) then
       msq(-k,k)=msq(-k,k)+temp(k,l)
+      endif
       endif
       enddo
       enddo
@@ -1213,7 +1273,27 @@ c--- qbar-q extra pieces
       do k=1,nf
       do l=1,nf
       if (k .gt. l) then
+      if (
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.l) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-l)
+     & )
+     & .or.
+     & (
+     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-l) .and.
+     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
+     & )
+     & .or.
+     & (
+     &    abs(pid_pdg(8)).eq.abs(pid_pdg(7)) .and. (
+     &    (modulo(l,2).eq.0 .and. isANeutrino(abs(pid_pdg(7))))
+     &    .or.
+     &    (modulo(l,2).eq.1 .and. isALepton(abs(pid_pdg(7))))
+     &    )
+     & )
+     & ) then
       msq(-k,k)=msq(-k,k)+temp(l,k)
+      endif
       endif
       enddo
       enddo
