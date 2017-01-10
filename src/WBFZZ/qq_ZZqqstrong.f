@@ -347,11 +347,6 @@ C-----setup for ((dqdq_dqdq)  (1,1)-->(1,1)
      & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.k) .and.
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
      & )
-     & .or.
-     & (
-     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.l) .and.
-     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.k)
-     & )
      & ) then
       msq(k,l)=temp(k,l)
       endif
@@ -365,11 +360,6 @@ C-----setup for ((dqdq_dqdq)  (1,1)-->(1,1)
      & (
      & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.k) .and.
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
-     & )
-     & .or.
-     & (
-     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.l) .and.
-     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.k)
      & )
      & ) then
       msq(l,k)=temp(k,l)
@@ -393,11 +383,6 @@ C-----setup for ((dqdq_dqdq)  (1,1)-->(1,1)
      & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.k) .and.
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
      & )
-     & .or.
-     & (
-     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.l) .and.
-     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.k)
-     & )
      & ) then
       msq(k,l)=temp(-l,-k)
       endif
@@ -411,11 +396,6 @@ C-----setup for ((dqdq_dqdq)  (1,1)-->(1,1)
      & (
      & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.k) .and.
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
-     & )
-     & .or.
-     & (
-     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.l) .and.
-     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.k)
      & )
      & ) then
       msq(l,k)=temp(-l,-k)
@@ -445,11 +425,6 @@ c--- qbar-q
      & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.k) .and.
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
      & )
-     & .or.
-     & (
-     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.l) .and.
-     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.k)
-     & )
      & ) then
       msq(k,l)=temp(-k,l)
       endif
@@ -466,11 +441,6 @@ c--- qbar-q
      & (
      & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.k) .and.
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
-     & )
-     & .or.
-     & (
-     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.l) .and.
-     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.k)
      & )
      & ) then
       msq(k,l)=temp(l,-k)
@@ -501,11 +471,6 @@ c--- q-qbar
      & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.k) .and.
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
      & )
-     & .or.
-     & (
-     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.l) .and.
-     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.k)
-     & )
      & ) then
       msq(l,k)=temp(-k,l)
       endif
@@ -519,11 +484,6 @@ c--- q-qbar
       do l=-nf,-1
       if (abs(k) .lt. abs(l)) then
       if (
-     & (
-     & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.-k) .and.
-     & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
-     & )
-     & .or.
      & (
      & (pid_pdg(7).eq.0 .or. pid_pdg(7).eq.l) .and.
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-k)
