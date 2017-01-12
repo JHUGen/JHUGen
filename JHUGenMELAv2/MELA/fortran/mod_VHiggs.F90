@@ -146,7 +146,7 @@ end subroutine EvalAmp_VHiggs
          !WH
          if((id(1)+id(2)).ne.0)then
            if((id(1)*helicity(1)).le.0d0)then
-             current1=(Vcurrent1-Acurrent1)/2d0*gFFW*CKM(id(1),id(2))/dsqrt(ScaleFactor(id(1),id(2)))
+             current1=(Vcurrent1-Acurrent1)/2d0*gFFW*CKMbare(id(1),id(2))
            else
              current1=0d0
            endif

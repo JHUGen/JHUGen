@@ -2333,7 +2333,7 @@ module modHiggsJJ
           kfactor_w = 1.0_dp ! dsqrt(ScaleFactor(iSel,sSel)*ScaleFactor(jSel,rSel))
 
           !if(ZZ_fusion) then ! Special treatment for WW+ZZ interference, not included through phasespace
-          ckm_wfactor = CKM(iSel,sSel)*CKM(jSel,rSel)/dsqrt(ScaleFactor(iSel,sSel)*ScaleFactor(jSel,rSel))
+          ckm_wfactor = CKMbare(iSel,sSel)*CKMbare(jSel,rSel)
           !print *, "iSel, sSel: ",iSel," ",sSel, "; jSel, rSel: ",jSel," ",rSel, ", ckm: ",ckm_wfactor
           !endif
           !print *, "EvalAmp_WBFH_UnSymm_SA_Select_exact: isWW and is-jr"
@@ -2342,7 +2342,7 @@ module modHiggsJJ
           kw2 = 4
           kfactor_w = 1.0_dp ! dsqrt(ScaleFactor(iSel,rSel)*ScaleFactor(jSel,sSel))
 
-          ckm_wfactor = CKM(iSel,rSel)*CKM(jSel,sSel)/dsqrt(ScaleFactor(iSel,rSel)*ScaleFactor(jSel,sSel))
+          ckm_wfactor = CKMbare(iSel,rSel)*CKMbare(jSel,sSel)
           !print *, "iSel, rSel: ",iSel," ",rSel, "; jSel, sSel: ",jSel," ",sSel, ", ckm: ",ckm_wfactor
           !print *, "EvalAmp_WBFH_UnSymm_SA_Select_exact: isWW and ir-js"
        endif
