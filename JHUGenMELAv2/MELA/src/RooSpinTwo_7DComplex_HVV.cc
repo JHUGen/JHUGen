@@ -1,8 +1,4 @@
-#ifdef _def_melatools_
-#include <interface/RooSpinTwo_7DComplex_HVV.h>
-#else
-#include "../include/RooSpinTwo_7DComplex_HVV.h"
-#endif
+#include "RooSpinTwo_7DComplex_HVV.h"
 
 
 RooSpinTwo_7DComplex_HVV::RooSpinTwo_7DComplex_HVV(

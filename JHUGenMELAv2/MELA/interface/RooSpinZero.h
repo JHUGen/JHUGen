@@ -1,11 +1,8 @@
 #ifndef ROOSPINZERO
 #define ROOSPINZERO
 
-#ifdef _def_melatools_
-#include <RooSpin.h>
-#else
 #include "RooSpin.h"
-#endif
+
 
 class RooSpinZero : public RooSpin {
 public:
@@ -32,11 +29,11 @@ public:
     RooRealVar* Lambda_z4;
     RooRealVar* Lambda_Q;
 
-    RooAbsReal* Lambda_z1qsq[3];
-    RooAbsReal* Lambda_z2qsq[3];
-    RooAbsReal* Lambda_z3qsq[3];
-    RooAbsReal* Lambda_z4qsq[3];
-    RooAbsReal* cLambda_qsq[3];
+    RooAbsReal* Lambda_z1qsq[SIZE_HVV_CQSQ];
+    RooAbsReal* Lambda_z2qsq[SIZE_HVV_CQSQ];
+    RooAbsReal* Lambda_z3qsq[SIZE_HVV_CQSQ];
+    RooAbsReal* Lambda_z4qsq[SIZE_HVV_CQSQ];
+    RooAbsReal* cLambda_qsq[SIZE_HVV_CQSQ];
   };
 
   RooSpinZero(){};
@@ -52,6 +49,7 @@ public:
   virtual TObject* clone(const char* newname) const = 0;
   inline virtual ~RooSpinZero(){}
 
+  virtual Double_t evaluate() const = 0;
   virtual Int_t getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* rangeName=0) const = 0;
   virtual Double_t analyticalIntegral(Int_t code, const char* rangeName=0) const = 0;
 
@@ -164,8 +162,6 @@ protected:
   RooRealProxy cz_q1sq;
   RooRealProxy cz_q2sq;
   RooRealProxy cz_q12sq;
-
-  virtual Double_t evaluate() const = 0;
 
   virtual void evaluatePolarizationTerms(Double_t& A00term, Double_t& Appterm, Double_t& Ammterm, Double_t& A00ppterm, Double_t& A00mmterm, Double_t& Appmmterm, const Int_t code, bool isGammaV1=false, bool isGammaV2=false) const = 0;
 

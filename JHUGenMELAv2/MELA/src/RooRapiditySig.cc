@@ -6,16 +6,14 @@
 
 // Your description goes here... 
 
-#include <interface/RooRapiditySig.h>
-
-#include <math.h> 
-
-#include <Riostream.h>
-#include <RooAbsReal.h>
-#include <RooAbsCategory.h>
-//#include <RooComplex.h>
-#include <RooMath.h>
-#include <TMath.h>
+#include <cmath> 
+#include "RooRapiditySig.h"
+#include "Riostream.h"
+#include "RooAbsReal.h"
+#include "RooAbsCategory.h"
+//#include "RooComplex.h"
+#include "RooMath.h"
+#include "TMath.h"
 
 //ClassImp(RooRapiditySig) 
 

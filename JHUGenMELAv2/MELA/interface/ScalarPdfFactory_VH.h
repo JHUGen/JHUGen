@@ -1,15 +1,9 @@
 #ifndef SCALAR_PDF_FACTORY_VH
 #define SCALAR_PDF_FACTORY_VH
 
-#ifdef _def_melatools_
-#include <RooSpinZero_5D_VH.h>
-#include <RooSpinZero_3D_pp_VH.h>
-#include <ScalarPdfFactory.h>
-#else
 #include "RooSpinZero_5D_VH.h"
 #include "RooSpinZero_3D_pp_VH.h"
 #include "ScalarPdfFactory.h"
-#endif
 
 
 class ScalarPdfFactory_VH : public ScalarPdfFactory {

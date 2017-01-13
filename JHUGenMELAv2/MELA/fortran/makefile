@@ -3,14 +3,14 @@ all:
 	@echo "ROOTSYS is not set. Please set ROOT environment properly"; echo
 else
 
-CMSROOT = ./
-#MODULES=$(CMSROOT)modules/
-#OBJECTS=$(CMSROOT)objects/
-MODULES=$(CMSROOT)
-OBJECTS=$(CMSROOT)
+WORKDIR = ./
+#MODULES=$(WORKDIR)modules/
+#OBJECTS=$(WORKDIR)objects/
+MODULES=$(WORKDIR)
+OBJECTS=$(WORKDIR)
 ROOFITINCLUDE = 
 RM  = /bin/rm
-INCLUDE = -I$(CMSROOT) $(ROOFITINCLUDE)
+INCLUDE = -I$(WORKDIR) $(ROOFITINCLUDE)
 Comp = gfort
 
 # Linking LHAPDF
