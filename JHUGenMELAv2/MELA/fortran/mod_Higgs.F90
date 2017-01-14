@@ -622,12 +622,14 @@
    SUBROUTINE EvalAmp_H_FF(pin,mass_F,res)
    implicit none
    real(dp), intent(out) ::  res
+   complex(dp) :: amp2
    real(dp), intent(in) :: pin(1:4,1:2),mass_F
    real(dp)             :: s12
 
       s12=2d0*(pin(1,1)*pin(1,2)-pin(2,1)*pin(2,2)-pin(3,1)*pin(3,2)-pin(4,1)*pin(4,2)) + 2d0*mass_F**2
-      res =   2d0*s12*(kappa_tilde**2 + kappa**2) - 8d0*mass_F**2*kappa**2
-      res=res*mass_F**2/vev**2
+      amp2 =   2d0*s12*(kappa_tilde**2 + kappa**2) - 8d0*mass_F**2*kappa**2
+      amp2 = amp2*mass_F**2/vev**2
+      res = cdabs(amp2)
 
    RETURN
    END SUBROUTINE
@@ -669,7 +671,7 @@
 ! overall factors and propagators
       amp=amp/(s123-mass_F**2+ci*mass_F*ga_F)/(s456-mass_F**2+ci*mass_F*ga_F)/(s12-m_w**2+ci*m_w*Ga_W)/(s45-m_w**2+ci*m_w*Ga_W)
       amp=amp*16d0*ci*mass_F*gwsq**2
-      res = cdabs(amp)
+      res = cdabs(amp)**2
 
    RETURN
    END SUBROUTINE

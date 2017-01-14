@@ -1,8 +1,4 @@
-#ifdef _def_melatools_
-#include <interface/RooSpinZero_5D_VH.h>
-#else
-#include "../include/RooSpinZero_5D_VH.h"
-#endif
+#include "RooSpinZero_5D_VH.h"
 
 
 RooSpinZero_5D_VH::RooSpinZero_5D_VH(

@@ -1,8 +1,4 @@
-#ifdef _def_melatools_
-#include <interface/ScalarPdfFactory_VH.h>
-#else
-#include "../include/ScalarPdfFactory_VH.h"
-#endif
+#include "ScalarPdfFactory_VH.h"
 
 
 ScalarPdfFactory_VH::ScalarPdfFactory_VH(RooSpinZero::modelMeasurables measurables_, double sqrts_, RooSpin::VdecayType VHmode1_, RooSpin::VdecayType VHmode2_, Bool_t OnshellH_) :

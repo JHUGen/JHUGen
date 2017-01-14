@@ -1,8 +1,4 @@
-#ifdef _def_melatools_
-#include <interface/TensorPdfFactory.h>
-#else
-#include "../include/TensorPdfFactory.h"
-#endif
+#include "TensorPdfFactory.h"
 
 
 TensorPdfFactory::TensorPdfFactory(RooSpin::modelMeasurables measurables_, RooSpin::VdecayType V1decay_, RooSpin::VdecayType V2decay_, Bool_t OnshellH_) :
@@ -17,7 +13,7 @@ TensorPdfFactory::~TensorPdfFactory(){
 void TensorPdfFactory::initGVals(){
   couplings.Lambda = new RooRealVar("Lambda", "Lambda", 1000.);
 
-  for (int v=0; v<10; v++){
+  for (int v=0; v<(int)SIZE_GVV; v++){
     for (int im=0; im<2; im++){
       TString strcore;
       double initval = 0;
@@ -42,7 +38,7 @@ void TensorPdfFactory::initGVals(){
   }
 }
 void TensorPdfFactory::destroyGVals(){
-  for (int v=0; v<10; v++){
+  for (int v=0; v<(int)SIZE_GVV; v++){
     for (int im=0; im<2; im++){
       delete couplings.bList[v][im];
     }
@@ -54,7 +50,7 @@ void TensorPdfFactory::destroyGVals(){
 }
 
 void TensorPdfFactory::addHypothesis(int ig, double initval, double iphase){
-  if (ig>=10 || ig<0) cerr << "Invalid g" << ig << endl;
+  if (ig>=(int)SIZE_GVV || ig<0) cerr << "Invalid g" << ig << endl;
   else{
     ((RooRealVar*)couplings.bList[ig][0])->setVal(initval*cos(iphase));
     ((RooRealVar*)couplings.bList[ig][1])->setVal(initval*sin(iphase));
@@ -68,7 +64,7 @@ void TensorPdfFactory::setTensorPolarization(int ig, double initval){
   }
 }
 void TensorPdfFactory::resetHypotheses(){
-  for (int ig=0; ig<10; ig++){
+  for (int ig=0; ig<(int)SIZE_GVV; ig++){
     for (int im=0; im<2; im++) ((RooRealVar*)couplings.bList[ig][im])->setVal(0.);
   }
   ((RooRealVar*)couplings.f_spinz1)->setVal(0.);
@@ -83,7 +79,7 @@ void TensorPdfFactory::makeCouplingsConst(bool yesNo){
   couplings.f_spinz2->setConstant(yesNo);
 
   // Set the b decay couplings
-  for (int ig=0; ig<10; ig++){
+  for (int ig=0; ig<(int)SIZE_GVV; ig++){
     for (int im=0; im<2; im++){
       if (dynamic_cast<RooRealVar*>(couplings.bList[ig][im])!=0) ((RooRealVar*)couplings.bList[ig][im])->setConstant(yesNo);
     }

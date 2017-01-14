@@ -1,4 +1,4 @@
-#include <interface/MELAParticle.h>
+#include "MELAParticle.h"
 
 using namespace PDGHelpers;
 

@@ -1,8 +1,12 @@
 {
-  gSystem->Load("libgfortran.so");
-  gSystem->Load("libPhysics.so");
-  gSystem->Load("libEG.so");
+  TString LIBMCFMPATH = "../data/slc6_amd64_gcc530/";
+  TString LIBMCFM="libmcfm_703.so";
+  TString LIBJHUGENMELA="libjhugenmela.so";
+  TString LIBMELA="libMELA.so";
+
   gSystem->AddIncludePath("-I$ROOFITSYS/include/");
-  gSystem->Load("libmcfm_701.so");
-  gSystem->Load("libME.so");
+  gSystem->AddIncludePath("-I../interface/");
+  gSystem->Load(LIBMCFMPATH + LIBMCFM);
+  gSystem->Load(LIBMCFMPATH + LIBJHUGENMELA);
+  gSystem->Load(LIBMCFMPATH + LIBMELA);
 }

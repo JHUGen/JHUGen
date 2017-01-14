@@ -1,15 +1,10 @@
 #ifndef TENSOR_PDF_FACTORY
 #define TENSOR_PDF_FACTORY
 
-#ifdef _def_melatools_
-#include <RooSpinTwo.h>
-#include <SpinPdfFactory.h>
-#else
 #include "RooSpinTwo.h"
 #include "SpinPdfFactory.h"
-#endif
-#include "TString.h"
 #include "RooFormulaVar.h"
+#include "TString.h"
 
 
 class TensorPdfFactory : public SpinPdfFactory {

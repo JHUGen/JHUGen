@@ -1,11 +1,7 @@
-#ifdef _def_melatools_
-#include <interface/RooSpinZero.h>
-#else
-#include "../include/RooSpinZero.h"
-#endif
-
+#include "RooSpinZero.h"
 
 using namespace std;
+
 
 RooSpinZero::RooSpinZero(
   const char* name, const char* title,

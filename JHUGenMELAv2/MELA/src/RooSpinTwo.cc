@@ -1,11 +1,7 @@
-#ifdef _def_melatools_
-#include <interface/RooSpinTwo.h>
-#else
-#include "../include/RooSpinTwo.h"
-#endif
-
+#include "RooSpinTwo.h"
 
 using namespace std;
+
 
 RooSpinTwo::RooSpinTwo(
   const char* name, const char* title,
@@ -19,27 +15,27 @@ RooSpinTwo::RooSpinTwo(
   _Vdecay1, _Vdecay2
   ),
 
-  b1Val("b1Val", "b1Val", this, (RooAbsReal&)*(_couplings.bList[0][0])),
-  b2Val("b2Val", "b2Val", this, (RooAbsReal&)*(_couplings.bList[1][0])),
-  b3Val("b3Val", "b3Val", this, (RooAbsReal&)*(_couplings.bList[2][0])),
-  b4Val("b4Val", "b4Val", this, (RooAbsReal&)*(_couplings.bList[3][0])),
-  b5Val("b5Val", "b5Val", this, (RooAbsReal&)*(_couplings.bList[4][0])),
-  b6Val("b6Val", "b6Val", this, (RooAbsReal&)*(_couplings.bList[5][0])),
-  b7Val("b7Val", "b7Val", this, (RooAbsReal&)*(_couplings.bList[6][0])),
-  b8Val("b8Val", "b8Val", this, (RooAbsReal&)*(_couplings.bList[7][0])),
-  b9Val("b9Val", "b9Val", this, (RooAbsReal&)*(_couplings.bList[8][0])),
-  b10Val("b10Val", "b10Val", this, (RooAbsReal&)*(_couplings.bList[9][0])),
+  b1Val("b1Val", "b1Val", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_1][0])),
+  b2Val("b2Val", "b2Val", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_2][0])),
+  b3Val("b3Val", "b3Val", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_3][0])),
+  b4Val("b4Val", "b4Val", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_4][0])),
+  b5Val("b5Val", "b5Val", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_5][0])),
+  b6Val("b6Val", "b6Val", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_6][0])),
+  b7Val("b7Val", "b7Val", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_7][0])),
+  b8Val("b8Val", "b8Val", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_8][0])),
+  b9Val("b9Val", "b9Val", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_9][0])),
+  b10Val("b10Val", "b10Val", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_10][0])),
 
-  b1ValIm("b1ValIm", "b1ValIm", this, (RooAbsReal&)*(_couplings.bList[0][1])),
-  b2ValIm("b2ValIm", "b2ValIm", this, (RooAbsReal&)*(_couplings.bList[1][1])),
-  b3ValIm("b3ValIm", "b3ValIm", this, (RooAbsReal&)*(_couplings.bList[2][1])),
-  b4ValIm("b4ValIm", "b4ValIm", this, (RooAbsReal&)*(_couplings.bList[3][1])),
-  b5ValIm("b5ValIm", "b5ValIm", this, (RooAbsReal&)*(_couplings.bList[4][1])),
-  b6ValIm("b6ValIm", "b6ValIm", this, (RooAbsReal&)*(_couplings.bList[5][1])),
-  b7ValIm("b7ValIm", "b7ValIm", this, (RooAbsReal&)*(_couplings.bList[6][1])),
-  b8ValIm("b8ValIm", "b8ValIm", this, (RooAbsReal&)*(_couplings.bList[7][1])),
-  b9ValIm("b9ValIm", "b9ValIm", this, (RooAbsReal&)*(_couplings.bList[8][1])),
-  b10ValIm("b10ValIm", "b10ValIm", this, (RooAbsReal&)*(_couplings.bList[9][1])),
+  b1ValIm("b1ValIm", "b1ValIm", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_1][1])),
+  b2ValIm("b2ValIm", "b2ValIm", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_2][1])),
+  b3ValIm("b3ValIm", "b3ValIm", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_3][1])),
+  b4ValIm("b4ValIm", "b4ValIm", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_4][1])),
+  b5ValIm("b5ValIm", "b5ValIm", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_5][1])),
+  b6ValIm("b6ValIm", "b6ValIm", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_6][1])),
+  b7ValIm("b7ValIm", "b7ValIm", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_7][1])),
+  b8ValIm("b8ValIm", "b8ValIm", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_8][1])),
+  b9ValIm("b9ValIm", "b9ValIm", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_9][1])),
+  b10ValIm("b10ValIm", "b10ValIm", this, (RooAbsReal&)*(_couplings.bList[gGRAVITON_VV_10][1])),
 
   Lambda("Lambda", "Lambda", this, (RooAbsReal&)*(_couplings.Lambda)),
 
