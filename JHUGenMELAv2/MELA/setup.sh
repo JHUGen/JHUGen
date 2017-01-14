@@ -27,4 +27,5 @@ else
 		return 1 >& /dev/null || exit 1 #return only works when sourced, exit will exit your whole session if sourced
 	fi
 	tcsh data/retrieve.csh $DATA_LIB_DIR mcfm_703
+	bash downloadNNPDF.sh
 fi

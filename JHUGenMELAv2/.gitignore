@@ -6,6 +6,7 @@ MELA/data/*/libmcfm*.so
 MELA/data/*/libjhugen*.so
 MELA/data/*/libMELA.so
 MELA/data/*/*.pcm
+MELA/*/*/*.LHgrid*
 
 MELA/src/*.o
 MELA/src/*.so
