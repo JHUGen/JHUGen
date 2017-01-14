@@ -1,11 +1,7 @@
 #ifndef ROOSPINZERO_7DCOMPLEX_WITHACCEP_GGH
 #define ROOSPINZERO_7DCOMPLEX_WITHACCEP_GGH
 
-#ifdef _def_melatools_
-#include <RooSpinZero.h>
-#else
 #include "RooSpinZero.h"
-#endif
 
 
 class RooSpinZero_7DComplex_withAccep_ggH : public RooSpinZero {
@@ -61,6 +57,7 @@ public:
   virtual TObject* clone(const char* newname) const { return new RooSpinZero_7DComplex_withAccep_ggH(*this, newname); }
   inline virtual ~RooSpinZero_7DComplex_withAccep_ggH(){}
 
+  Double_t evaluate() const;
   Int_t getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* rangeName=0) const;
   Double_t analyticalIntegral(Int_t code, const char* rangeName=0) const;
 
@@ -102,9 +99,6 @@ protected:
   RooRealProxy bM2;
   RooRealProxy cM2;
   RooRealProxy dM2;
-
-
-  Double_t evaluate() const;
 
   void evaluatePolarizationTerms(Double_t& A00term, Double_t& Appterm, Double_t& Ammterm, Double_t& A00ppterm, Double_t& A00mmterm, Double_t& Appmmterm, const Int_t code, bool isGammaV1=false, bool isGammaV2=false) const;
 

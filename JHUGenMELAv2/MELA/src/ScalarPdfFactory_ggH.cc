@@ -1,8 +1,4 @@
-#ifdef _def_melatools_
-#include <interface/ScalarPdfFactory_ggH.h>
-#else
-#include "../include/ScalarPdfFactory_ggH.h"
-#endif
+#include "ScalarPdfFactory_ggH.h"
 
 
 ScalarPdfFactory_ggH::ScalarPdfFactory_ggH(RooSpinZero::modelMeasurables measurables_, bool acceptance_, RooSpin::VdecayType V1decay_, RooSpin::VdecayType V2decay_, Bool_t OnshellH_) :

@@ -2,9 +2,9 @@
 #include <cstdlib>
 #include <cmath>
 #include <fstream>
+#include "MELAHXSWidth.h"
 #include "TROOT.h"
 #include "TF1.h"
-#include <interface/MELAHXSWidth.h>
 
 using namespace std;
 
@@ -30,14 +30,17 @@ gsW(0)
   file.close();
   int indexW = (int)mass_BR.size();
   if (indexW>0){
-    double* xmhW = new double[indexW];
-    double* sigW = new double[indexW];
+    xmhW = new double[indexW];
+    sigW = new double[indexW];
     for (int ix=0; ix<indexW; ix++){
       xmhW[ix] = mass_BR.at(ix);
       sigW[ix] = BR.at(ix);
+      //cout << "mH, gH = " << xmhW[ix] << " " << sigW[ix] << endl;
     }
     double dbegin = (sigW[1]-sigW[0])/(xmhW[1]-xmhW[0]);
-    double dend = (sigW[indexW-1]-sigW[indexW-2])/(xmhW[indexW-1]-xmhW[indexW-2]);
+    double cB = (sigW[indexW-1]-sigW[indexW-2])/(pow(xmhW[indexW-1], 3)-pow(xmhW[indexW-2], 3));
+    double dend = 3.*cB*pow(xmhW[indexW-1], 2);
+    //double dend = (sigW[indexW-1]-sigW[indexW-2])/(xmhW[indexW-1]-xmhW[indexW-2]);
     graphW = new TGraph(indexW, xmhW, sigW);
     gsW = new TSpline3("gsW", graphW, "b1e1", dbegin, dend);
   }
@@ -52,7 +55,16 @@ MELAHXSWidth::~MELAHXSWidth(){
 }
 
 double MELAHXSWidth::HiggsWidth(double mH){
-  double result = (double)gsW->Eval(mH);
+  double result = 0;
+  if (gsW!=0){
+    int indexW = (int)mass_BR.size();
+    if (mH<xmhW[indexW-1]) result = (double)gsW->Eval(mH);
+    else{
+      double cB = (sigW[indexW-1]-sigW[indexW-2])/(pow(xmhW[indexW-1], 3)-pow(xmhW[indexW-2], 3));
+      double cA = sigW[indexW-1] - cB*pow(xmhW[indexW-1], 3);
+      result = cA + cB*pow(mH, 3);
+    }
+  }
   //cout << "MELAHXSWidth::HiggsWidth: mH requested = " << mH << endl;
   //cout << "MELAHXSWidth::HiggsWidth: GaH requested = " << result << endl;
   return result;

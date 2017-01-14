@@ -6,8 +6,8 @@
 
  // Your description goes here... 
 
+#include "RooSpinOne_7D.h"
 #include "Riostream.h" 
-#include <interface/RooSpinOne_7D.h>
 #include "RooAbsReal.h" 
 #include "RooAbsCategory.h" 
 #include <math.h> 

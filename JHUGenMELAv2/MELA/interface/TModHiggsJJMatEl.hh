@@ -1,4 +1,3 @@
-
 #ifndef _TMODHIGGSJJMATEL_HH_
 #define _TMODHIGGSJJMATEL_HH_
 

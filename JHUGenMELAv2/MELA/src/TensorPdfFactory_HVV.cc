@@ -1,8 +1,4 @@
-#ifdef _def_melatools_
-#include <interface/TensorPdfFactory_HVV.h>
-#else
-#include "../include/TensorPdfFactory_HVV.h"
-#endif
+#include "TensorPdfFactory_HVV.h"
 
 
 TensorPdfFactory_HVV::TensorPdfFactory_HVV(RooSpin::modelMeasurables measurables_, RooSpin::VdecayType V1decay_, RooSpin::VdecayType V2decay_, Bool_t OnshellH_) :

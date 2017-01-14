@@ -25,6 +25,12 @@
 #include <ostream>
 #include <fstream>
 #include <cassert>
+// ME related includes
+#include "TMCFM.hh"
+#include "TCouplings.hh"
+#include "TVar.hh"
+#include "TUtil.hh"
+#include "MELAHXSWidth.h"
 // ROOT includes
 #include "TObject.h"
 #include "TLorentzVector.h"
@@ -34,12 +40,6 @@
 #include "TFile.h"
 #include "TString.h"
 #include "TROOT.h"
-// ME related includes
-#include "TMCFM.hh"
-#include "TCouplings.hh"
-#include "TVar.hh"
-#include "TUtil.hh"
-#include "MELAHXSWidth.h"
 
 
 //----------------------------------------
@@ -69,6 +69,9 @@ public:
   void SetCurrentCandidate(MELACandidate* cand);
 
   void AllowSeparateWWCouplings(bool doAllow=false);
+  void ResetMass(double inmass, int ipart);
+  void ResetWidth(double inwidth, int ipart);
+  void ResetQuarkMasses();
   void ResetMCFM_EWKParameters(double ext_Gf, double ext_aemmz, double ext_mW, double ext_mZ, double ext_xW, int ext_ewscheme=3);
   void ResetCouplings();
 
@@ -153,7 +156,7 @@ protected:
   double _h2width;
   double EBEAM;
   MELAHXSWidth* myCSW_;
-  event_scales_type event_scales;
+  TVar::event_scales_type event_scales;
 
   SpinZeroCouplings selfDSpinZeroCoupl;
   SpinOneCouplings selfDSpinOneCoupl;
@@ -168,10 +171,18 @@ protected:
   // Initialization functions
   void InitializeMCFM();
   void InitializeJHUGen(const char* pathtoPDFSet, int PDFMember);
+  void CrossInitialize();
 
   // Check if at least one input candidate is present
   bool CheckInputPresent();
   void SetRcdCandPtr();
+
+  // Check if self-defined couplings are specified
+  bool CheckSelfDCouplings_Hgg();
+  bool CheckSelfDCouplings_Hqq();
+  bool CheckSelfDCouplings_Htt();
+  bool CheckSelfDCouplings_Hbb();
+  bool CheckSelfDCouplings_HVV();
 
 
   ClassDef(TEvtProb, 0);

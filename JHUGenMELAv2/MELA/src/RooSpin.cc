@@ -1,8 +1,4 @@
-#ifdef _def_melatools_
-#include <interface/RooSpin.h>
-#else
-#include "../include/RooSpin.h"
-#endif
+#include "RooSpin.h"
 
 using namespace std;
 

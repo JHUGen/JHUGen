@@ -1,11 +1,7 @@
 #ifndef ROOSPINTWO_7DCOMPLEX_HVV
 #define ROOSPINTWO_7DCOMPLEX_HVV
 
-#ifdef _def_melatools_
-#include <RooSpinTwo.h>
-#else
 #include "RooSpinTwo.h"
-#endif
 
 
 class RooSpinTwo_7DComplex_HVV : public RooSpinTwo {
@@ -23,12 +19,12 @@ public:
   virtual TObject* clone(const char* newname) const { return new RooSpinTwo_7DComplex_HVV(*this, newname); }
   inline virtual ~RooSpinTwo_7DComplex_HVV(){}
 
+  Double_t evaluate() const;
   Int_t getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* rangeName=0) const;
   Double_t analyticalIntegral(Int_t code, const char* rangeName=0) const;
 
 protected:
 
-  Double_t evaluate() const;
 
   Double_t evaluateHSFactor(Int_t di, Int_t dj, Int_t code) const;
   Double_t evaluateH1Factor(Int_t i1, Int_t j1, Int_t helicity, Int_t code) const;
