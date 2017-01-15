@@ -14,7 +14,13 @@ if [ ! -f $pdf ]; then
 pdfsinside=$(find $rootdir -name $pdf)
 npdfsinside=${#pdfsinside[@]}
 if [ $npdfsinside -gt 0 ];then
-    ln -s ${pdfsinside[0]} ./
+    for p in "${pdfsinside[@]}"
+    do
+        if [[ "$p" == *"$pdf"* ]];then
+            ln -s $p ./
+            break
+        fi
+    done
 else
     wget "http://pcteserver.mi.infn.it/~nnpdf/"$pdfdir"/"$pdf
     tar -zxvf "./"$pdf".tgz"
