@@ -13,7 +13,11 @@ machine:
     SHLIB_PATH: "$(echo $HOME/root/lib:$SHLIB_PATH | sed s/:$//)"
     LIBPATH: "$(echo $HOME/root/lib:$LIBPATH | sed s/:$//)"
     PYTHONPATH: "$(echo $HOME/root/lib:$PYTHONPATH | sed s/:$//)"
-    MANPATH: "$(echo $HOME/JHUGen/JHUGenerator/root/man:$MANPATH | sed s/:$//)"
+    MANPATH: "$(echo $HOME/root/man:$MANPATH | sed s/:$//)"
+    ROOTSYS: "/home/ubuntu/root"
+    DYLD_LIBRARY_PATH: "/home/ubuntu/root/lib"
+    CMAKE_PREFIX_PATH: "/home/ubuntu/root"
+
     LHAPDF_DATA_PATH: "/home/ubuntu/LHAPDF-6.1.6/share/LHAPDF"
 
     ROOT_VERSIONPART1: "6"
