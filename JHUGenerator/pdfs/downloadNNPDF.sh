@@ -13,18 +13,20 @@ if [ ! -f $pdf ]; then
 
 pdfsinside=$(find $rootdir -name $pdf)
 npdfsinside=${#pdfsinside[@]}
-if [ $npdfsinside -gt 0 ];then
-    for p in "${pdfsinside[@]}"
-    do
-        if [[ "$p" == *"$pdf"* ]];then
-            ln -s $p ./
-            break
-        fi
-    done
-else
-    wget "http://pcteserver.mi.infn.it/~nnpdf/"$pdfdir"/"$pdf
-    tar -zxvf "./"$pdf".tgz"
-    rm "./"$pdf".tgz"
+let found=0
+for p in "${pdfsinside[@]}"
+do
+    echo $p
+    if [[ "$p" == *"$pdf"* ]];then
+        ln -s $p ./
+        let found=1
+        break
+    fi
+done
+if [ $found -eq 0 ];then
+    wget "http://pcteserver.mi.infn.it/~nnpdf/"$pdfdir"/"$pdf".tgz"
+    tar -zxvf $pdf".tgz"
+    rm $pdf".tgz"
 fi
 
 fi
