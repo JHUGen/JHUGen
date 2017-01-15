@@ -1,24 +1,24 @@
 #!/bin/bash
 
+pdf="NNPDF30_lo_as_0130.LHgrid"
+pdfdir="nnpdf30"
+rootdir="../../"
+
 if ! [ $(pwd | sed "s|.*/||") == pdfs ]; then
-    echo "Please run downloadNNPDF from the pdfs directory!"
+    echo "Please run downloadNNPDF.sh from the pdfs directory!"
     exit 1
 fi
 
-if [ -f NNPDF30_lo_as_0130.LHgrid ]; then
-    exit 0
-fi
+if [ ! -f $pdf ]; then
 
-if [ -f ../../JHUGenMELA/pdfs/NNPDF30_lo_as_0130.LHgrid ]; then
-    ln -s ../../JHUGenMELA/pdfs/NNPDF30_lo_as_0130.LHgrid .
+pdfsinside=$(find $rootdir -name $pdf)
+npdfsinside=${#pdfsinside[@]}
+if [ $npdfsinside -gt 0 ];then
+    ln -s ${pdfsinside[0]} ./
 else
-    # wget http://nnpdf.hepforge.org/html/nnpdf23/PDFsets/NNPDF23_lo_as_0130.LHgrid.tgz
-    wget http://pcteserver.mi.infn.it/~nnpdf/nnpdf30/NNPDF30_lo_as_0130.LHgrid.tgz
-
-    # tar -zxvf ./NNPDF23_lo_as_0130.LHgrid.tgz
-    tar -zxvf ./NNPDF30_lo_as_0130.LHgrid.tgz
-
-    # rm ./NNPDF23_lo_as_0130.LHgrid.tgz
-    rm ./NNPDF30_lo_as_0130.LHgrid.tgz
+    wget "http://pcteserver.mi.infn.it/~nnpdf/"$pdfdir"/"$pdf
+    tar -zxvf "./"$pdf".tgz"
+    rm "./"$pdf".tgz"
 fi
 
+fi
