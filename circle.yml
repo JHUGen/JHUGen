@@ -148,9 +148,7 @@ test:
     - make:
          pwd:
            ../JHUGenMELA
-    - cd ../JHUGenMELAv2/MELA
-    - bash setup.sh
-    - cd ../../JHUGenerator
+    - cd ../JHUGenMELAv2/MELA && bash setup.sh
     #check sync between generator and MELA
     - sdiff -s mod_Graviton.F90 ../JHUGenMELAv2/MELA/fortran/mod_Graviton.F90
     - sdiff -s mod_Higgs.F90 ../JHUGenMELAv2/MELA/fortran/mod_Higgs.F90
