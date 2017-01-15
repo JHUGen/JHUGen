@@ -10,6 +10,7 @@ machine:
     #environment variables can only be set in this section so . bin/thisroot.sh doesn't work
     PATH: "$(echo $HOME/root/bin:$HOME/CMSJHU_AnalysisMacros/JHUSpinWidthPaper_2015/LHEAnalyzer:$PATH | sed s/:$//)"
     LD_LIBRARY_PATH: "$(echo $HOME/root/lib:$HOME/LHAPDF-6.1.6/lib:$LD_LIBRARY_PATH | sed s/:$//)"
+
     SHLIB_PATH: "$(echo $HOME/root/lib:$SHLIB_PATH | sed s/:$//)"
     LIBPATH: "$(echo $HOME/root/lib:$LIBPATH | sed s/:$//)"
     PYTHONPATH: "$(echo $HOME/root/lib:$PYTHONPATH | sed s/:$//)"
@@ -17,6 +18,8 @@ machine:
     ROOTSYS: "/home/ubuntu/root"
     DYLD_LIBRARY_PATH: "/home/ubuntu/root/lib"
     CMAKE_PREFIX_PATH: "/home/ubuntu/root"
+
+    ROOFITSYS: "/home/ubuntu/root"  #this one is not in bin/thisroot.sh, but on lxplus for example it is set to the same thing as ROOTSYS
 
     LHAPDF_DATA_PATH: "/home/ubuntu/LHAPDF-6.1.6/share/LHAPDF"
 
