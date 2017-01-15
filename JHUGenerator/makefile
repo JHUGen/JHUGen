@@ -2,8 +2,9 @@ Here = $(PWD)
 Makefile=makefile
 ModuleDir = $(Here)/modules
 ObjectDir = $(Here)/objects
-JHUGenMELADir = ../JHUGenMELA
-MCFMDir = $(JHUGenMELADir)
+MELADir = ../JHUGenMELAv2/MELA
+MCFMDir = $(MELADir)/data/slc6_amd64_gcc530
+MCFMLib = mcfm_703 # libmcfm_703.so
 PDFDir = $(Here)/pdfs
 VegasDir = $(Here)/vegas
 
@@ -22,7 +23,7 @@ UseLHAPDF=No
 MyLHADir=${LHAPDF_DATA_PATH}/../../lib/
 
 #link MCFM libraries from MELA
-linkMELA = No
+linkMELA = Yes
 
 
 ifeq ($(UseLHAPDF),Yes)
@@ -31,10 +32,11 @@ else
    LHAPDFflags = -DuseLHAPDF=0
 endif
 
+MELAflags = -DlinkMELA=0
 ifeq ($(linkMELA),Yes)
-   MELAflags = -DlinkMELA=1
-else
-   MELAflags = -DlinkMELA=0
+ ifeq ($(Comp),gfort)
+    MELAflags = -DlinkMELA=1 -L$(MCFMDir) -l$(MCFMLib)
+ endif
 endif
 
 ifeq ($(Comp),gfort)
@@ -132,28 +134,10 @@ PSGenDep = genps.c \
 PSGenObj = $(ObjectDir)/genps.o \
            $(ObjectDir)/boost.o
 
-JHUGenMELA =
-
 CPSDep = ./CPS/CALLING_cpHTO.f
 
 CPSObj = $(ObjectDir)/CALLING_cpHTO.o
 
-ifeq ($(linkMELA),Yes)
-  MCFM_Obj = $(MCFMDir)/anomamp.o \
-             $(MCFMDir)/cdotpr.o \
-             $(MCFMDir)/jtwo3456.o \
-             $(MCFMDir)/jtwo.o \
-             $(MCFMDir)/jzero.o \
-             $(MCFMDir)/qq_ZZqq.o \
-             $(MCFMDir)/setupzprops.o \
-             $(MCFMDir)/spinorcurr.o \
-             $(MCFMDir)/WWZZ.o \
-             $(MCFMDir)/ZZHZZamp.o \
-             $(MCFMDir)/ZZSingleres.o \
-             $(MCFMDir)/jone.o
-else
-  MCFM_Obj =
-endif
 
 # MadGraphDep = h_emepemep.f \
 #               h_emepemep_noint.f \
@@ -180,7 +164,7 @@ else
 endif
 	@echo " executable file is "$(Exec) "compiled with "$(Comp)
 	@echo " "
-	$(fcomp) -o $(Exec) $(MainObj) $(AmpObj) $(PSGenObj) $(VegasObj) $(PDFObj) $(CPSObj) $(MCFM_Obj) $(LHAPDFflags)
+	$(fcomp) -o $(Exec) $(MainObj) $(AmpObj) $(PSGenObj) $(VegasObj) $(PDFObj) $(CPSObj) $(LHAPDFflags)
 
 
 
