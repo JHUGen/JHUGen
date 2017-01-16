@@ -6,6 +6,9 @@ PROGRAM JHUGenerator
 #if compiler==1
 use ifport
 #endif
+#if linkMELA==1
+use ModMCFMWrapper
+#endif
 use ModCrossSection
 use ModKinematics
 use ModParameters
@@ -30,6 +33,9 @@ real(8) :: VG_Result,VG_Error
    if ( .not. ReadLHEFile .and. .not. ConvertLHEFile .and. .not.((Process.le.2 .or. Process.eq.60 .or. Process.eq.61 .or. (Process.ge.110.and.Process.le.114)) .and. unweighted) ) then
       call InitOutput(1d0, 1d14)   !for VBF/HJJ the cross section is calculated, so use that in the <init> block
    endif
+#if linkMELA==1
+   call MCFM_firsttime(Collider_Energy/GeV)
+#endif
    write(io_stdout,*) " Running"
    if( ConvertLHEFile ) then
         call StartConvertLHE(VG_Result,VG_Error)

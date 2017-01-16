@@ -2,8 +2,10 @@ Here = $(PWD)
 Makefile=makefile
 ModuleDir = $(Here)/modules
 ObjectDir = $(Here)/objects
-MELADir = ../JHUGenMELAv2/MELA
-MCFMDir = $(MELADir)/data/slc6_amd64_gcc530
+MELADir = $(Here)/../JHUGenMELAv2/MELA
+MELAFortranDir = $(MELADir)/fortran
+MELADataDir = $(MELADir)/data
+MELALibDir = $(MELADataDir)/slc6_amd64_gcc530
 MCFMLib = mcfm_703 # libmcfm_703.so
 PDFDir = $(Here)/pdfs
 VegasDir = $(Here)/vegas
@@ -35,7 +37,9 @@ endif
 MELAflags = -DlinkMELA=0
 ifeq ($(linkMELA),Yes)
  ifeq ($(Comp),gfort)
-    MELAflags = -DlinkMELA=1 -L$(MCFMDir) -l$(MCFMLib)
+    MELAflags = -DlinkMELA=1 -L$(MELALibDir) -l$(MCFMLib)
+ else
+    linkMELA = No
  endif
 endif
 
@@ -67,10 +71,21 @@ ccomp = gcc -O0
 Exec = ./JHUGen
 
 
+# kinematics dependencies
+KinDep = mod_Phasespace.F90 \
+         mod_Kinematics.F90
+
+# kinematics objects
+KinObj = $(ObjectDir)/mod_Phasespace.o \
+         $(ObjectDir)/mod_Kinematics.o
+
+ifeq ($(linkMELA),Yes)
+    KinDep += mod_MCFMWrapper.F90
+    KinObj += $(ObjectDir)/mod_MCFMWrapper.o
+endif
+
 # main dependencies
-MainDep = mod_Phasespace.F90 \
-          mod_Kinematics.F90 \
-          mod_CrossSection.F90 \
+MainDep = mod_CrossSection.F90 \
           mod_CrossSection_HJJ.F90 \
           mod_CrossSection_TTBH.F90 \
           mod_CrossSection_BBBH.F90 \
@@ -79,15 +94,14 @@ MainDep = mod_Phasespace.F90 \
           main.F90
 
 # main objects
-MainObj = $(ObjectDir)/mod_Phasespace.o \
-          $(ObjectDir)/mod_Kinematics.o \
-          $(ObjectDir)/mod_CrossSection.o \
+MainObj = $(ObjectDir)/mod_CrossSection.o \
           $(ObjectDir)/mod_CrossSection_HJJ.o \
           $(ObjectDir)/mod_CrossSection_TTBH.o \
           $(ObjectDir)/mod_CrossSection_BBBH.o \
           $(ObjectDir)/mod_CrossSection_TH.o \
           $(ObjectDir)/mod_PMZZ.o \
           $(ObjectDir)/main.o
+
 
 
 # amplitude dependencies
@@ -155,16 +169,16 @@ MadGraphObj = $(ObjectDir)/gg_ttbh.o \
 
 
 
-JHUGenerator: $(CPSObj) $(PSGenObj) $(VegasObj) $(PDFObj) $(AmpObj) $(MainObj)
+JHUGenerator: $(CPSObj) $(PSGenObj) $(VegasObj) $(PDFObj) $(AmpObj) $(KinObj) $(MainObj)
 	@echo " linking"
 ifeq ($(UseLHAPDF),Yes)
-	echo " interfaced with LHAPDF"
+	echo " -> interfaced with LHAPDF"
 else
-	echo " using internal PDF sets"
+	echo " -> using internal PDF sets"
 endif
-	@echo " executable file is "$(Exec) "compiled with "$(Comp)
+	@echo " executable file "$(Exec)" is compiled with "$(Comp)
 	@echo " "
-	$(fcomp) -o $(Exec) $(MainObj) $(AmpObj) $(PSGenObj) $(VegasObj) $(PDFObj) $(CPSObj) $(LHAPDFflags)
+	$(fcomp) -o $(Exec) $(MainObj) $(KinObj) $(AmpObj) $(PSGenObj) $(VegasObj) $(PDFObj) $(CPSObj) $(LHAPDFflags)
 
 
 
@@ -173,6 +187,22 @@ $(AmpObj): $(AmpDep) mod_Misc.F90 mod_Parameters.F90 $(Makefile)
 	$(fcomp) -c $(AmpDep)
 	mv *.o $(ObjectDir)
 
+$(KinObj): $(KinDep) $(VegasDep) $(PDFDep) $(PSGenDep) mod_Parameters.F90 $(Makefile)
+	@echo " compiling kinematics routines"
+ifeq ($(linkMELA),Yes)
+	echo " -> interfaced with JHUGenMELA and MCFM"
+	ln -sf $(MELADataDir)/input.DAT ./
+	ln -sf $(MELADataDir)/process.DAT ./
+	ln -sf $(MELADataDir)/hto_output.dat ./
+	ln -sf $(MELADataDir)/ffwarn.dat ./
+	ln -sf $(MELADataDir)/ffperm5.dat ./
+	ln -sf $(MELADataDir)/fferr.dat ./
+	ln -sf $(MELADataDir)/dm_parameters.DAT ./
+	ln -sf $(MELADataDir)/br.sm1 ./
+	ln -sf $(MELADataDir)/br.sm2 ./
+endif
+	$(fcomp) -c $(KinDep)
+	mv *.o $(ObjectDir)
 
 $(MainObj): $(MainDep) $(VegasDep) $(PDFDep) $(PSGenDep) mod_Parameters.F90 $(Makefile)
 	@echo " compiling main routines"
@@ -210,6 +240,17 @@ $(PSGenObj): $(PSGenDep)
 
 clean:
 	@echo " deleting executable, object and module files"
+ifeq ($(linkMELA),Yes)
+	rm -f input.DAT
+	rm -f process.DAT
+	rm -f hto_output.dat
+	rm -f ffwarn.dat
+	rm -f ffperm5.dat
+	rm -f fferr.dat
+	rm -f dm_parameters.DAT
+	rm -f br.sm1
+	rm -f br.sm2
+endif
 	rm -f objects/*.o
 	rm -f modules/*.mod
 	rm -f modules/*.f90
