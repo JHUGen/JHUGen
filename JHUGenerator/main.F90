@@ -34,7 +34,8 @@ real(8) :: VG_Result,VG_Error
       call InitOutput(1d0, 1d14)   !for VBF/HJJ the cross section is calculated, so use that in the <init> block
    endif
 #if linkMELA==1
-   call MCFM_firsttime(Collider_Energy/GeV)
+   call MCFM_firsttime()
+   call Init_MCFMCommon_energy(Collider_Energy/GeV)
 #endif
    write(io_stdout,*) " Running"
    if( ConvertLHEFile ) then
