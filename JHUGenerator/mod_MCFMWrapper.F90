@@ -50,7 +50,6 @@ end subroutine
 
 subroutine Init_MCFMCommon_spinzerohiggs_anomcoupl( &
   Hggcoupl, &
-  Hqqcoupl, &
   Httcoupl, &
   Hbbcoupl, &
   Hg4g4coupl, &
@@ -59,6 +58,9 @@ subroutine Init_MCFMCommon_spinzerohiggs_anomcoupl( &
 
   Hzzcoupl, &
   Hwwcoupl, &
+
+  Hb4b4_mb_4gen, &
+  Ht4t4_mt_4gen, &
 
   HLambdaBSM, &
   HLambda_Q, &
@@ -71,13 +73,9 @@ subroutine Init_MCFMCommon_spinzerohiggs_anomcoupl( &
   HzzCLambda_qsq, &
   HwwCLambda_qsq, &
 
-  Hb4b4_mb_4gen, &
-  Ht4t4_mt_4gen, &
-
   separateWWZZcouplings &
 )
   double complex Hggcoupl(1:SIZE_HGG)
-  double complex Hqqcoupl(1:SIZE_HQQ)
   double complex Httcoupl(1:SIZE_HQQ)
   double complex Hbbcoupl(1:SIZE_HQQ)
   double complex Hg4g4coupl(1:SIZE_HGG)
@@ -87,6 +85,9 @@ subroutine Init_MCFMCommon_spinzerohiggs_anomcoupl( &
   double complex Hzzcoupl(1:SIZE_HVV)
   double complex Hwwcoupl(1:SIZE_HVV)
 
+  double precision Hb4b4_mb_4gen
+  double precision Ht4t4_mt_4gen
+
   double precision HLambdaBSM
   double precision HLambda_Q
   double precision HLambda_zgs1
@@ -95,9 +96,6 @@ subroutine Init_MCFMCommon_spinzerohiggs_anomcoupl( &
 
   double precision HzzLambda_qsq(1:SIZE_HVV_LAMBDAQSQ,1:SIZE_HVV_CQSQ)
   double precision HwwLambda_qsq(1:SIZE_HVV_LAMBDAQSQ,1:SIZE_HVV_CQSQ)
-
-  double precision Hb4b4_mb_4gen
-  double precision Ht4t4_mt_4gen
 
   integer HzzCLambda_qsq(1:SIZE_HVV_CQSQ)
   integer HwwCLambda_qsq(1:SIZE_HVV_CQSQ)
