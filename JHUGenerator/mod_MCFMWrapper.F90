@@ -1,16 +1,98 @@
 MODULE ModMCFMWrapper
 implicit none
 
-integer, parameter ::gHIGGS_KAPPA=1,gHIGGS_KAPPA_TILDE=2,SIZE_HQQ=2
-integer, parameter ::gHIGGS_GG_2=1,gHIGGS_GG_3=2,gHIGGS_GG_4=3,SIZE_HGG=3
-integer, parameter ::gHIGGS_VV_1=1,gHIGGS_VV_2=2,gHIGGS_VV_3=3,gHIGGS_VV_4=4,gHIGGS_ZA_2=5,gHIGGS_ZA_3=6,gHIGGS_ZA_4=7,gHIGGS_AA_2=8,gHIGGS_AA_3=9,gHIGGS_AA_4=10,gHIGGS_VV_1_PRIME=11,gHIGGS_VV_1_PRIME2=12,gHIGGS_VV_1_PRIME3=13,gHIGGS_VV_1_PRIME4=14,gHIGGS_VV_1_PRIME5=15,gHIGGS_VV_2_PRIME=16,gHIGGS_VV_2_PRIME2=17,gHIGGS_VV_2_PRIME3=18,gHIGGS_VV_2_PRIME4=19,gHIGGS_VV_2_PRIME5=20,gHIGGS_VV_3_PRIME=21,gHIGGS_VV_3_PRIME2=22,gHIGGS_VV_3_PRIME3=23,gHIGGS_VV_3_PRIME4=24,gHIGGS_VV_3_PRIME5=25,gHIGGS_VV_4_PRIME=26,gHIGGS_VV_4_PRIME2=27,gHIGGS_VV_4_PRIME3=28,gHIGGS_VV_4_PRIME4=29,gHIGGS_VV_4_PRIME5=30,gHIGGS_ZA_1_PRIME2=31,gHIGGS_VV_1_PRIME6=32,gHIGGS_VV_1_PRIME7=33,gHIGGS_VV_2_PRIME6=34,gHIGGS_VV_2_PRIME7=35,gHIGGS_VV_3_PRIME6=36,gHIGGS_VV_3_PRIME7=37,gHIGGS_VV_4_PRIME6=38,gHIGGS_VV_4_PRIME7=39,SIZE_HVV=39
-integer, parameter ::LambdaHIGGS_QSQ_VV_1=1,LambdaHIGGS_QSQ_VV_2=2,LambdaHIGGS_QSQ_VV_3=3,LambdaHIGGS_QSQ_VV_4=4,SIZE_HVV_LAMBDAQSQ=4
-integer, parameter ::cLambdaHIGGS_VV_QSQ1=1,cLambdaHIGGS_VV_QSQ2=2,cLambdaHIGGS_VV_QSQ12=3,SIZE_HVV_CQSQ=3
-integer, parameter ::gZPRIME_QQ_LEFT=1,gZPRIME_QQ_RIGHT=2,SIZE_ZQQ=2
-integer, parameter :: gZPRIME_VV_1=1,gZPRIME_VV_2=2,SIZE_ZVV=2
-integer, parameter :: gGRAVITON_QQ_LEFT=1,gGRAVITON_QQ_RIGHT=2,SIZE_GQQ=2
-integer, parameter :: gGRAVITON_GG_1=1,gGRAVITON_GG_2=2,gGRAVITON_GG_3=3,gGRAVITON_GG_4=4,gGRAVITON_GG_5=5,SIZE_GGG=5
-integer, parameter :: gGRAVITON_VV_1=1,gGRAVITON_VV_2=2,gGRAVITON_VV_3=3,gGRAVITON_VV_4=4,gGRAVITON_VV_5=5,gGRAVITON_VV_6=6,gGRAVITON_VV_7=7,gGRAVITON_VV_8=8,gGRAVITON_VV_9=9,gGRAVITON_VV_10=10,SIZE_GVV=10
+integer, parameter :: &
+   gHIGGS_KAPPA=1, &
+   gHIGGS_KAPPA_TILDE=2, &
+   SIZE_HQQ=2
+integer, parameter :: &
+   gHIGGS_GG_2=1, &
+   gHIGGS_GG_3=2, &
+   gHIGGS_GG_4=3, &
+   SIZE_HGG=3
+integer, parameter :: &
+   gHIGGS_VV_1=1, &
+   gHIGGS_VV_2=2, &
+   gHIGGS_VV_3=3, &
+   gHIGGS_VV_4=4, &
+   gHIGGS_ZA_2=5, &
+   gHIGGS_ZA_3=6, &
+   gHIGGS_ZA_4=7, &
+   gHIGGS_AA_2=8, &
+   gHIGGS_AA_3=9, &
+   gHIGGS_AA_4=10, &
+   gHIGGS_VV_1_PRIME=11, &
+   gHIGGS_VV_1_PRIME2=12, &
+   gHIGGS_VV_1_PRIME3=13, &
+   gHIGGS_VV_1_PRIME4=14, &
+   gHIGGS_VV_1_PRIME5=15, &
+   gHIGGS_VV_2_PRIME=16, &
+   gHIGGS_VV_2_PRIME2=17, &
+   gHIGGS_VV_2_PRIME3=18, &
+   gHIGGS_VV_2_PRIME4=19, &
+   gHIGGS_VV_2_PRIME5=20, &
+   gHIGGS_VV_3_PRIME=21, &
+   gHIGGS_VV_3_PRIME2=22, &
+   gHIGGS_VV_3_PRIME3=23, &
+   gHIGGS_VV_3_PRIME4=24, &
+   gHIGGS_VV_3_PRIME5=25, &
+   gHIGGS_VV_4_PRIME=26, &
+   gHIGGS_VV_4_PRIME2=27, &
+   gHIGGS_VV_4_PRIME3=28, &
+   gHIGGS_VV_4_PRIME4=29, &
+   gHIGGS_VV_4_PRIME5=30, &
+   gHIGGS_ZA_1_PRIME2=31, &
+   gHIGGS_VV_1_PRIME6=32, &
+   gHIGGS_VV_1_PRIME7=33, &
+   gHIGGS_VV_2_PRIME6=34, &
+   gHIGGS_VV_2_PRIME7=35, &
+   gHIGGS_VV_3_PRIME6=36, &
+   gHIGGS_VV_3_PRIME7=37, &
+   gHIGGS_VV_4_PRIME6=38, &
+   gHIGGS_VV_4_PRIME7=39, &
+   SIZE_HVV=39
+integer, parameter :: &
+   LambdaHIGGS_QSQ_VV_1=1, &
+   LambdaHIGGS_QSQ_VV_2=2, &
+   LambdaHIGGS_QSQ_VV_3=3, &
+   LambdaHIGGS_QSQ_VV_4=4, &
+   SIZE_HVV_LAMBDAQSQ=4
+integer, parameter :: &
+   cLambdaHIGGS_VV_QSQ1=1, &
+   cLambdaHIGGS_VV_QSQ2=2, &
+   cLambdaHIGGS_VV_QSQ12=3, &
+   SIZE_HVV_CQSQ=3
+integer, parameter :: &
+   gZPRIME_QQ_LEFT=1, &
+   gZPRIME_QQ_RIGHT=2, &
+   SIZE_ZQQ=2
+integer, parameter :: &
+   gZPRIME_VV_1=1, &
+   gZPRIME_VV_2=2, &
+   SIZE_ZVV=2
+integer, parameter :: &
+   gGRAVITON_QQ_LEFT=1, &
+   gGRAVITON_QQ_RIGHT=2, &
+   SIZE_GQQ=2
+integer, parameter :: &
+   gGRAVITON_GG_1=1, &
+   gGRAVITON_GG_2=2, &
+   gGRAVITON_GG_3=3, &
+   gGRAVITON_GG_4=4, &
+   gGRAVITON_GG_5=5, &
+   SIZE_GGG=5
+integer, parameter :: &
+   gGRAVITON_VV_1=1, &
+   gGRAVITON_VV_2=2, &
+   gGRAVITON_VV_3=3, &
+   gGRAVITON_VV_4=4, &
+   gGRAVITON_VV_5=5, &
+   gGRAVITON_VV_6=6, &
+   gGRAVITON_VV_7=7, &
+   gGRAVITON_VV_8=8, &
+   gGRAVITON_VV_9=9, &
+   gGRAVITON_VV_10=10, &
+   SIZE_GVV=10
 
 contains
 
@@ -19,11 +101,100 @@ implicit none
 ! Cannot just pass these as arguments. Need to specify the char lengths
 ! Otherwise MCFM crashes.
 character*72 :: inputfile,workdir
+
+! For Init_MCFMCommon_energy
+double precision sqrts
+
+! For Init_MCFMCommon_masses
+double precision &
+   md_in, mu_in, ms_in, mc_in, mb_in, mt_in, &
+   mel_in, mmu_in, mtau_in, &
+   hmass_in, hwidth_in, &
+   wmass_in, wwidth_in, &
+   zmass_in, zwidth_in, &
+   twidth_in, &
+   tauwidth_in
+
+! For Init_MCFMCommon_ewinput
+double precision Gf_inp_in,aemmz_inp_in,xw_inp_in,wmass_inp_in,zmass_inp_in
+
+! For Init_MCFMCommon_spinzerohiggs_anomcoupl
+double complex Hggcoupl(1:SIZE_HGG)
+double complex Httcoupl(1:SIZE_HQQ)
+double complex Hbbcoupl(1:SIZE_HQQ)
+double complex Hg4g4coupl(1:SIZE_HGG)
+double complex Ht4t4coupl(1:SIZE_HQQ)
+double complex Hb4b4coupl(1:SIZE_HQQ)
+
+double complex Hzzcoupl(1:SIZE_HVV)
+double complex Hwwcoupl(1:SIZE_HVV)
+
+double precision Hb4b4_mb_4gen
+double precision Ht4t4_mt_4gen
+
+double precision HLambdaBSM
+double precision HLambda_Q
+double precision HLambda_zgs1
+double precision HzzLambda(1:SIZE_HVV_LAMBDAQSQ)
+double precision HwwLambda(1:SIZE_HVV_LAMBDAQSQ)
+
+double precision HzzLambda_qsq(1:SIZE_HVV_LAMBDAQSQ,1:SIZE_HVV_CQSQ)
+double precision HwwLambda_qsq(1:SIZE_HVV_LAMBDAQSQ,1:SIZE_HVV_CQSQ)
+
+integer HzzCLambda_qsq(1:SIZE_HVV_CQSQ)
+integer HwwCLambda_qsq(1:SIZE_HVV_CQSQ)
+
+integer separateWWZZcouplings
+
 inputfile='input.DAT'
 workdir='./'
 
 call mcfm_init(inputfile,workdir)
 call qlinit()
+
+! For Init_MCFMCommon_energy
+call GetColliderEnergy(sqrts)
+call Init_MCFMCommon_energy(sqrts)
+
+! For Init_MCFMCommon_masses
+call GetMassesWidths( &
+   md_in, mu_in, ms_in, mc_in, mb_in, mt_in, &
+   mel_in, mmu_in, mtau_in, &
+   hmass_in, hwidth_in, &
+   wmass_in, wwidth_in, &
+   zmass_in, zwidth_in, &
+   twidth_in, &
+   tauwidth_in &
+   )
+call Init_MCFMCommon_masses( &
+   md_in, mu_in, ms_in, mc_in, mb_in, mt_in, &
+   mel_in, mmu_in, mtau_in, &
+   hmass_in, hwidth_in, &
+   wmass_in, wwidth_in, &
+   zmass_in, zwidth_in, &
+   twidth_in, &
+   tauwidth_in &
+   )
+
+! EW parameters
+call Init_MCFMCommon_ewscheme()
+call GetEWInputs(Gf_inp_in,aemmz_inp_in,xw_inp_in,wmass_inp_in,zmass_inp_in)
+call Init_MCFMCommon_ewinput(Gf_inp_in,aemmz_inp_in,xw_inp_in,wmass_inp_in,zmass_inp_in)
+
+! For Init_MCFMCommon_spinzerohiggs_anomcoupl
+call GetLambdaBSM(HLambdaBSM)
+call GetSpinZeroGGCouplings(Hggcoupl)
+call GetSpinZeroQQCouplings(Httcoupl)
+Hbbcoupl(:)=Httcoupl(:)
+Hg4g4coupl(:)=0d0
+Ht4t4coupl(:)=0d0
+Hb4b4coupl(:)=0d0
+Ht4t4_mt_4gen=10000d0
+Hb4b4_mb_4gen=10000d0
+call GetSpinZeroVVCouplings(Hzzcoupl, HzzCLambda_qsq, HzzLambda_qsq, HzzLambda, HLambda_zgs1, HLambda_Q, .false.)
+call GetSpinZeroVVCouplings(Hwwcoupl, HwwCLambda_qsq, HwwLambda_qsq, HwwLambda, HLambda_zgs1, HLambda_Q, .true.)
+call GetDistinguishWWCouplingsFlag(separateWWZZcouplings)
+
 
 end subroutine
 
@@ -39,70 +210,137 @@ end subroutine
 ! For each common block, have one function
 ! to re-group MELA calls into the different common blocks.
 ! Somehow re-defining the common blocks is allowed, not sure why/how.
+
 subroutine Init_MCFMCommon_energy(collider_energy)
-implicit none
-real(8), intent(in) :: collider_energy
-! MCFM declarations
-double precision sqrts
-common/energy/sqrts
-sqrts = dble(collider_energy)
+   implicit none
+   real(8), intent(in) :: collider_energy
+   ! MCFM declarations
+   double precision sqrts
+   common/energy/sqrts
+   sqrts = dble(collider_energy)
+end subroutine
+
+subroutine Init_MCFMCommon_masses( &
+   md_in, mu_in, ms_in, mc_in, mb_in, mt_in, &
+   mel_in, mmu_in, mtau_in, &
+   hmass_in, hwidth_in, &
+   wmass_in, wwidth_in, &
+   zmass_in, zwidth_in, &
+   twidth_in, &
+   tauwidth_in &
+   )
+   implicit none
+   double precision &
+   md_in, mu_in, ms_in, mc_in, mb_in, mt_in, &
+   mel_in, mmu_in, mtau_in, &
+   hmass_in, hwidth_in, &
+   wmass_in, wwidth_in, &
+   zmass_in, zwidth_in, &
+   twidth_in, &
+   tauwidth_in
+   ! MCFM declarations
+   double precision &
+   md, mu, ms, mc, mb, mt, &
+   mel, mmu, mtau, &
+   hmass, hwidth, &
+   wmass, wwidth, &
+   zmass, zwidth, &
+   twidth, &
+   tauwidth, &
+   mtausq, mcsq, mbsq
+   common/masses/ &
+   md, mu, ms, mc, mb, mt, &
+   mel, mmu, mtau, &
+   hmass, hwidth, &
+   wmass, wwidth, &
+   zmass, zwidth, &
+   twidth, &
+   tauwidth, &
+   mtausq, mcsq, mbsq
+
+   md = md_in
+   mu = mu_in
+   ms = ms_in
+
+   mc = mc_in
+   mcsq = mc**2
+
+   mb = mb_in
+   mbsq = mb**2
+
+   mt = mt_in
+   twidth = twidth_in
+
+   mel = mel_in
+   mmu = mmu_in
+
+   mtau = mtau_in
+   tauwidth = tauwidth_in
+   mtausq = mtau**2
+
+   hmass = hmass_in
+   hwidth = hwidth_in
+   wmass = wmass_in
+   wwidth = wwidth_in
+   zmass = zmass_in
+   zwidth = zwidth_in
 end subroutine
 
 subroutine Init_MCFMCommon_spinzerohiggs_anomcoupl( &
-  Hggcoupl, &
-  Httcoupl, &
-  Hbbcoupl, &
-  Hg4g4coupl, &
-  Ht4t4coupl, &
-  Hb4b4coupl, &
+   Hggcoupl, &
+   Httcoupl, &
+   Hbbcoupl, &
+   Hg4g4coupl, &
+   Ht4t4coupl, &
+   Hb4b4coupl, &
 
-  Hzzcoupl, &
-  Hwwcoupl, &
+   Hzzcoupl, &
+   Hwwcoupl, &
 
-  Hb4b4_mb_4gen, &
-  Ht4t4_mt_4gen, &
+   Hb4b4_mb_4gen, &
+   Ht4t4_mt_4gen, &
 
-  HLambdaBSM, &
-  HLambda_Q, &
-  HLambda_zgs1, &
-  HzzLambda, &
-  HwwLambda, &
+   HLambdaBSM, &
+   HLambda_Q, &
+   HLambda_zgs1, &
+   HzzLambda, &
+   HwwLambda, &
 
-  HzzLambda_qsq, &
-  HwwLambda_qsq, &
-  HzzCLambda_qsq, &
-  HwwCLambda_qsq, &
+   HzzLambda_qsq, &
+   HwwLambda_qsq, &
+   HzzCLambda_qsq, &
+   HwwCLambda_qsq, &
 
-  separateWWZZcouplings &
-)
-  double complex Hggcoupl(1:SIZE_HGG)
-  double complex Httcoupl(1:SIZE_HQQ)
-  double complex Hbbcoupl(1:SIZE_HQQ)
-  double complex Hg4g4coupl(1:SIZE_HGG)
-  double complex Ht4t4coupl(1:SIZE_HQQ)
-  double complex Hb4b4coupl(1:SIZE_HQQ)
+   separateWWZZcouplings &
+   )
+   double complex Hggcoupl(1:SIZE_HGG)
+   double complex Httcoupl(1:SIZE_HQQ)
+   double complex Hbbcoupl(1:SIZE_HQQ)
+   double complex Hg4g4coupl(1:SIZE_HGG)
+   double complex Ht4t4coupl(1:SIZE_HQQ)
+   double complex Hb4b4coupl(1:SIZE_HQQ)
 
-  double complex Hzzcoupl(1:SIZE_HVV)
-  double complex Hwwcoupl(1:SIZE_HVV)
+   double complex Hzzcoupl(1:SIZE_HVV)
+   double complex Hwwcoupl(1:SIZE_HVV)
 
-  double precision Hb4b4_mb_4gen
-  double precision Ht4t4_mt_4gen
+   double precision Hb4b4_mb_4gen
+   double precision Ht4t4_mt_4gen
 
-  double precision HLambdaBSM
-  double precision HLambda_Q
-  double precision HLambda_zgs1
-  double precision HzzLambda(1:SIZE_HVV_LAMBDAQSQ)
-  double precision HwwLambda(1:SIZE_HVV_LAMBDAQSQ)
+   double precision HLambdaBSM
+   double precision HLambda_Q
+   double precision HLambda_zgs1
+   double precision HzzLambda(1:SIZE_HVV_LAMBDAQSQ)
+   double precision HwwLambda(1:SIZE_HVV_LAMBDAQSQ)
 
-  double precision HzzLambda_qsq(1:SIZE_HVV_LAMBDAQSQ,1:SIZE_HVV_CQSQ)
-  double precision HwwLambda_qsq(1:SIZE_HVV_LAMBDAQSQ,1:SIZE_HVV_CQSQ)
+   double precision HzzLambda_qsq(1:SIZE_HVV_LAMBDAQSQ,1:SIZE_HVV_CQSQ)
+   double precision HwwLambda_qsq(1:SIZE_HVV_LAMBDAQSQ,1:SIZE_HVV_CQSQ)
 
-  integer HzzCLambda_qsq(1:SIZE_HVV_CQSQ)
-  integer HwwCLambda_qsq(1:SIZE_HVV_CQSQ)
+   integer HzzCLambda_qsq(1:SIZE_HVV_CQSQ)
+   integer HwwCLambda_qsq(1:SIZE_HVV_CQSQ)
 
-  integer separateWWZZcouplings
+   integer separateWWZZcouplings
 
-! MCFM declarations
+   ! MCFM declarations
    integer AllowAnomalousCouplings
    integer distinguish_HWWcouplings
    integer AnomalCouplPR
@@ -503,25 +741,104 @@ subroutine Init_MCFMCommon_spinzerohiggs_anomcoupl( &
    return
 end subroutine
 
+subroutine Init_MCFMCommon_ewscheme()
+   implicit none
+   integer ewscheme
+   common/ewscheme/ewscheme
+   ewscheme=3
+end subroutine
+
+subroutine Init_MCFMCommon_ewinput(Gf_inp_in,aemmz_inp_in,xw_inp_in,wmass_inp_in,zmass_inp_in)
+   implicit none
+   double precision Gf_inp_in,aemmz_inp_in,xw_inp_in,wmass_inp_in,zmass_inp_in
+   double precision Gf_inp,aemmz_inp,xw_inp,wmass_inp,zmass_inp
+   common/ewinput/Gf_inp,aemmz_inp,xw_inp,wmass_inp,zmass_inp
+   Gf_inp=Gf_inp_in
+   aemmz_inp=aemmz_inp_in
+   xw_inp=xw_inp_in
+   wmass_inp=wmass_inp_in
+   zmass_inp=zmass_inp_in
+end subroutine
 
 
 
 ! Record ModParameters variables into arrays
 ! to be used by similar Set* functions to set MCFM variables.
 ! Doing it this way allows us to pass a zillion arguments (e.g. vvcoupl length)
-subroutine GetSpinZeroVVCouplings(vvcoupl, cqsq, Lambda_qsq, useWWcoupl)
+subroutine GetColliderEnergy(sqrts)
+   use ModParameters
+   implicit none
+   double precision, intent(out) :: sqrts
+   sqrts = Collider_Energy
+end subroutine
+subroutine GetMassesWidths( &
+   md_in, mu_in, ms_in, mc_in, mb_in, mt_in, &
+   mel_in, mmu_in, mtau_in, &
+   hmass_in, hwidth_in, &
+   wmass_in, wwidth_in, &
+   zmass_in, zwidth_in, &
+   twidth_in, &
+   tauwidth_in &
+   )
+   use ModParameters
+   implicit none
+   double precision, intent(out) :: &
+   md_in, mu_in, ms_in, mc_in, mb_in, mt_in, &
+   mel_in, mmu_in, mtau_in, &
+   hmass_in, hwidth_in, &
+   wmass_in, wwidth_in, &
+   zmass_in, zwidth_in, &
+   twidth_in, &
+   tauwidth_in
+
+   md_in = getMass(Dn_)
+   mu_in = getMass(Up_)
+   ms_in = getMass(Str_)
+   mc_in = getMass(Chm_)
+   mb_in = getMass(Bot_)
+   mt_in = getMass(Top_)
+   twidth_in = getDecayWidth(Top_)
+
+   mel_in = getMass(ElM_)
+   mmu_in = getMass(MuM_)
+   mtau_in = getMass(TaM_)
+   tauwidth_in = getDecayWidth(TaM_)
+
+   hmass_in = getMass(Hig_)
+   hwidth_in = getDecayWidth(Hig_)
+   wmass_in = getMass(Wp_)
+   wwidth_in = getDecayWidth(Wp_)
+   zmass_in = getMass(Z0_)
+   zwidth_in = getDecayWidth(Z0_)
+end subroutine
+subroutine GetLambdaBSM(Lambda_BSM)
+   use ModParameters
+   implicit none
+   double precision, intent(out) :: Lambda_BSM
+   Lambda_BSM = Lambda
+end subroutine
+subroutine GetSpinZeroVVCouplings(vvcoupl, cqsq, Lambda_qsq, Lambdag, Lambdag_zgs1, Lambdag_Q, useWWcoupl)
    use ModParameters
    implicit none
    complex(8), intent(out) :: vvcoupl(39)
    integer, intent(out) :: cqsq(3)
    double precision, intent(out) :: Lambda_qsq(1:3,1:4)
+   double precision, intent(out) :: Lambdag(1:4),Lambdag_zgs1,Lambdag_Q
    logical, intent(in) :: useWWcoupl
 
    vvcoupl(:)=0d0
    cqsq(:)=0d0
    Lambda_qsq(:,:)=0d0
+   Lambdag(:)=0d0
+   Lambdag_zgs1 = Lambda_zgs1
+   Lambdag_Q = Lambda_Q
 
    if(.not.useWWcoupl) then
+      Lambdag(1) = Lambda_z1
+      Lambdag(2) = Lambda_z2
+      Lambdag(3) = Lambda_z3
+      Lambdag(4) = Lambda_z4
+
       cqsq(1) = cz_q1sq
       Lambda_qsq(1,1) = Lambda_z11
       Lambda_qsq(1,2) = Lambda_z21
@@ -586,6 +903,11 @@ subroutine GetSpinZeroVVCouplings(vvcoupl, cqsq, Lambda_qsq, useWWcoupl)
       vvcoupl(39) = ghz4_prime7
 
    else
+      Lambdag(1) = Lambda_w1
+      Lambdag(2) = Lambda_w2
+      Lambdag(3) = Lambda_w3
+      Lambdag(4) = Lambda_w4
+
       cqsq(1) = cw_q1sq
       Lambda_qsq(1,1) = Lambda_w11
       Lambda_qsq(1,2) = Lambda_w21
@@ -694,9 +1016,7 @@ subroutine GetSpinZeroVVCouplings(vvcoupl, cqsq, Lambda_qsq, useWWcoupl)
       ghw4_prime6  = vvcoupl(38)
       ghw4_prime7  = vvcoupl(39)
    endif
-   return
 end subroutine
-
 subroutine GetDistinguishWWCouplingsFlag(doAllow)
    use ModParameters
    implicit none
@@ -706,9 +1026,7 @@ subroutine GetDistinguishWWCouplingsFlag(doAllow)
    else
       doAllow=0
    endif
-   return
 end subroutine
-
 subroutine GetSpinZeroGGCouplings(ggcoupl)
    use ModParameters
    implicit none
@@ -716,16 +1034,23 @@ subroutine GetSpinZeroGGCouplings(ggcoupl)
    ggcoupl(1) = dcmplx(ghg2)
    ggcoupl(2) = dcmplx(ghg3)
    ggcoupl(3) = dcmplx(ghg4)
-   return
 end subroutine
-
 subroutine GetSpinZeroQQCouplings(qqcoupl)
    use ModParameters
    implicit none
    double complex, intent(out) :: qqcoupl(1:2)
    qqcoupl(1) = dcmplx(kappa)
    qqcoupl(2) = dcmplx(kappa_tilde)
-   return
+end subroutine
+subroutine GetEWInputs(Gf_inp_in,aemmz_inp_in,xw_inp_in,wmass_inp_in,zmass_inp_in)
+   use ModParameters
+   implicit none
+   double precision, intent(out) :: Gf_inp_in,aemmz_inp_in,xw_inp_in,wmass_inp_in,zmass_inp_in
+   Gf_inp_in=Gf
+   aemmz_inp_in=alpha_QED
+   xw_inp_in=xw
+   wmass_inp_in=M_W
+   zmass_inp_in=M_Z
 end subroutine
 
 
