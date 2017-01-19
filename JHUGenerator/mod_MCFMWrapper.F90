@@ -180,6 +180,7 @@ call Init_MCFMCommon_masses( &
 call Init_MCFMCommon_ewscheme()
 call GetEWInputs(Gf_inp_in,aemmz_inp_in,xw_inp_in,wmass_inp_in,zmass_inp_in)
 call Init_MCFMCommon_ewinput(Gf_inp_in,aemmz_inp_in,xw_inp_in,wmass_inp_in,zmass_inp_in)
+call coupling() ! Let MCFM calculate couplings from ewinput as it likes
 
 ! For Init_MCFMCommon_spinzerohiggs_anomcoupl
 call GetLambdaBSM(HLambdaBSM)
