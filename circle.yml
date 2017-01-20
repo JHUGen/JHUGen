@@ -4,8 +4,7 @@ machine:
     - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.6 10
     - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.6 10
     - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.9 20
-    - sudo apt-get install dos2unix
-    - sudo apt-get install cadaver
+    - sudo apt-get install dos2unix cadaver
   environment:
     #environment variables can only be set in this section so . bin/thisroot.sh doesn't work
     PATH: "$(echo $HOME/root/bin:$HOME/CMSJHU_AnalysisMacros/JHUSpinWidthPaper_2015/LHEAnalyzer:$PATH | sed s/:$//)"
@@ -29,7 +28,7 @@ machine:
     ROOT_VERSIONSTRING: "${ROOT_VERSIONPART1}.${ROOT_VERSIONPART2}/${ROOT_VERSIONPART3}"
 
     REFERENCE_LHES_USERNAME: "hroskes"
-    REFERENCE_LHES_BUILD_NUMBER: "621"
+    REFERENCE_LHES_BUILD_NUMBER: "643"
     REFERENCE_JHUGEN_VERSION: "v7.0.2"
 
     REFERENCE_LHES_FOLDER: "$(echo https://circleci.com/api/v1/project/$REFERENCE_LHES_USERNAME/JHUGen/$REFERENCE_LHES_BUILD_NUMBER/'artifacts/0/$CIRCLE_ARTIFACTS/reference')"
