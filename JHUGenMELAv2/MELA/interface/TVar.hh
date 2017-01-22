@@ -12,8 +12,6 @@
 #include <string>
 #include <vector>
 #include <utility>
-#include "TCouplings.hh"
-#include "MelaIO.h"
 #include "TString.h"
 #include "TH1F.h"
 #include "TH2F.h"

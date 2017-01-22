@@ -8,8 +8,10 @@
 #define ZZ_COMMON
 #include <string>
 #include <vector>
-// TVar class
-#include "TVar.hh"
+// MelaIO class
+#include "MelaIO.h"
+// Couplings classes
+#include "TCouplings.hh"
 // MCFM utilities
 #include "TMCFMUtils.hh"
 // Mod_Parameters

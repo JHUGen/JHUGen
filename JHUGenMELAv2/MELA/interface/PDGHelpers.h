@@ -6,6 +6,8 @@
 #include <vector>
 // Mod_Parameters
 #include "TModParameters.hh"
+// TVar namespace
+#include "TVar.hh"
 
 namespace PDGHelpers{
   const double Wmass = 80.399;
@@ -21,6 +23,7 @@ namespace PDGHelpers{
   const double Topwidth = 2.;
 
   extern double HVVmass;
+  extern TVar::CandidateDecayMode HDecayMode;
 
   bool isALepton(const int id);
   bool isANeutrino(const int id);
@@ -57,6 +60,7 @@ namespace PDGHelpers{
 
 
   void setHVVmass(double mymass);
+  void setCandidateDecayMode(TVar::CandidateDecayMode mode);
   int getCoupledVertex(const int idfirst, const int idsecond, int* hel=0, int* useAHcoupl=0);
 
   int convertPythiaStatus(int pSt);
