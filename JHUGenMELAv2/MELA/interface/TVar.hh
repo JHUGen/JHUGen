@@ -219,6 +219,7 @@ namespace TVar{
   //---------------------------------
   TString ProcessName(TVar::Process temp);
   TString ProductionName(TVar::Production temp);
+  TString MatrixElementName(TVar::MatrixElement temp);
 
   //---------------------------------
   // Structs

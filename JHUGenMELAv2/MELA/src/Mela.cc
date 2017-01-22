@@ -188,11 +188,20 @@ Mela::~Mela(){
 }
 
 // Set-functions
-void Mela::setProcess(TVar::Process myModel, TVar::MatrixElement myME, TVar::Production myProduction)
-{
-  myModel_ = myModel;
+void Mela::setProcess(TVar::Process myModel, TVar::MatrixElement myME, TVar::Production myProduction){
   myME_ = myME;
   myProduction_ = myProduction;
+  // In case s-channel processes are passed for JHUGen ME, flip them back to JHUGen-specific productions.
+  if (myME_==TVar::JHUGen){
+    if (myProduction_==TVar::Had_ZH_S) myProduction_=TVar::Had_ZH;
+    else if (myProduction_==TVar::Had_WH_S) myProduction_=TVar::Had_WH;
+    else if (myProduction_==TVar::Lep_ZH_S) myProduction_=TVar::Lep_ZH;
+    else if (myProduction_==TVar::Lep_WH_S) myProduction_=TVar::Lep_WH;
+    else if (myProduction_==TVar::JJVBF_S) myProduction_=TVar::JJVBF;
+    else if (myProduction_==TVar::JJQCD_S) myProduction_=TVar::JJQCD;
+  }
+  myModel_ = myModel;
+  if (ZZME!=0) ZZME->set_Process(myModel_, myME_, myProduction_);
 }
 void Mela::setVerbosity(TVar::VerbosityLevel verbosity_){ myVerbosity_=verbosity_; if (ZZME!=0) ZZME->set_Verbosity(myVerbosity_); if (super!=0) super->SetVerbosity((myVerbosity_>=TVar::DEBUG)); }
 // Should be called per-event
@@ -518,10 +527,7 @@ void Mela::computeP(
           );
         else if (myModel_ == TVar::SelfDefine_spin1) ZZME->set_SpinOneCouplings(selfDZqqcoupl, selfDZvvcoupl);
         else if (myModel_ == TVar::SelfDefine_spin2) ZZME->set_SpinTwoCouplings(selfDGqqcoupl, selfDGggcoupl, selfDGvvcoupl);
-        ZZME->computeXS(
-          myModel_, myME_, myProduction_,
-          prob
-          );
+        ZZME->computeXS(prob);
       }
       else{
         computeDecayAngles(
@@ -607,10 +613,7 @@ void Mela::computeP(
             setCurrentCandidate(cand_tmp);
             if (myVerbosity_>=TVar::DEBUG && cand_tmp!=0){ cout << "Mela::computeP: ZZINDEPENDENT calculation produces candidate:" << endl; TUtil::PrintCandidateSummary(cand_tmp); }
             // calculate the ME
-            ZZME->computeXS(
-              myModel_, myME_, myProduction_,
-              temp_prob
-              );
+            ZZME->computeXS(temp_prob);
             // Delete the temporary particles
             for (unsigned int ic=0; ic<candList_tmp.size(); ic++){ if (candList_tmp.at(ic)!=0) delete candList_tmp.at(ic); } // Only one candidate should really be here
             for (unsigned int ip=0; ip<partList_tmp.size(); ip++){ if (partList_tmp.at(ip)!=0) delete partList_tmp.at(ip); }
@@ -789,10 +792,7 @@ void Mela::computeProdDecP(
       selfDHwwCLambda_qsq,
       differentiate_HWW_HZZ
       );
-    ZZME->computeProdXS_VVHVV(
-      myModel_, myME_, myProduction_,
-      prob
-      );
+    ZZME->computeProdXS_VVHVV(prob);
     if (useConstant) computeConstant(prob);
   }
 
@@ -904,10 +904,7 @@ void Mela::computeProdP(
           selfDHwwCLambda_qsq,
           differentiate_HWW_HZZ
           );
-        ZZME->computeProdXS_JJH(
-          myModel_, myME_, myProduction_,
-          prob
-          ); // Higgs + 2 jets: SBF or WBF main probability
+        ZZME->computeProdXS_JJH(prob); // Higgs + 2 jets: SBF or WBF main probability
 
         int nGrid=11;
         std::vector<double> etaArray;
@@ -947,10 +944,7 @@ void Mela::computeProdP(
               selfDHwwCLambda_qsq,
               differentiate_HWW_HZZ
               );
-            ZZME->computeProdXS_JJH(
-              myModel_, myME_, myProduction_,
-              prob_temp
-              );
+            ZZME->computeProdXS_JJH(prob_temp);
           }
           pArray.push_back((double)prob_temp);
         }
@@ -1022,10 +1016,7 @@ void Mela::computeProdP(
                 selfDHwwCLambda_qsq,
                 differentiate_HWW_HZZ
                 );
-              ZZME->computeProdXS_JJH(
-                myModel_, myME_, myProduction_,
-                prob_temp
-                );
+              ZZME->computeProdXS_JJH(prob_temp);
             }
             gridIt = pArray.begin()+iG+1;
             pArray.insert(gridIt, (double)prob_temp);
@@ -1093,17 +1084,11 @@ void Mela::computeProdP(
             selfDHwwCLambda_qsq,
             differentiate_HWW_HZZ
             );
-          ZZME->computeProdXS_JJH(
-            myModel_, myME_, myProduction_,
-            prob
-            ); // Higgs + 2 jets: SBF or WBF
+          ZZME->computeProdXS_JJH(prob); // Higgs + 2 jets: SBF or WBF
         }
         else if (myProduction_ == TVar::JQCD){
           // No anomalous couplings are implemented in HJ
-          ZZME->computeProdXS_JH(
-            myModel_, myME_, myProduction_,
-            prob
-            ); // Higgs + 1 jet; only SM is supported for now.
+          ZZME->computeProdXS_JH(prob); // Higgs + 1 jet; only SM is supported for now.
         }
       }
       if (useConstant) computeConstant(prob);
@@ -1166,13 +1151,7 @@ void Mela::computeProdP_VH(
         selfDHwwCLambda_qsq,
         differentiate_HWW_HZZ
         );
-      ZZME->computeProdXS_VH(
-        myModel_,
-        myME_,
-        myProduction_,
-        prob,
-        includeHiggsDecay
-        ); // VH
+      ZZME->computeProdXS_VH(prob, includeHiggsDecay); // VH
 
       if (useConstant) computeConstant(prob);
     }
@@ -1211,12 +1190,7 @@ void Mela::computeProdP_ttH(
       selfDHwwCLambda_qsq,
       differentiate_HWW_HZZ
       );
-    ZZME->computeProdXS_ttH(
-      myModel_, myME_, myProduction_,
-      prob,
-      topProcess, topDecay
-      );
-
+    ZZME->computeProdXS_ttH(prob,topProcess, topDecay);
     if (useConstant) computeConstant(prob);
   }
 

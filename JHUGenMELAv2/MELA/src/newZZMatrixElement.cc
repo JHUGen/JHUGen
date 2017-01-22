@@ -103,9 +103,10 @@ vector<TLorentzVector> newZZMatrixElement::Calculate4Momentum(double Mx, double 
 
 // Set-functions that set variables that belong to Xcal2 in addition to setting variables that belong to newZZMatrixElement
 void newZZMatrixElement::set_Process(TVar::Process process_, TVar::MatrixElement me_, TVar::Production production_){
-  processModel = process_; Xcal2.SetProcess(processModel);
-  processProduction = production_; Xcal2.SetProduction(processProduction);
-  processME = me_; Xcal2.SetMatrixElement(processME);
+  processModel = process_;
+  processME = me_;
+  processProduction = production_;
+  Xcal2.SetProcess(processModel, processME, processProduction);
 }
 void newZZMatrixElement::set_Verbosity(TVar::VerbosityLevel verbosity_){ processVerbosity = verbosity_; Xcal2.SetVerbosity(verbosity_); }
 void newZZMatrixElement::set_LeptonInterference(TVar::LeptonInterference lepInterf_){ processLeptonInterference = lepInterf_; Xcal2.SetLeptonInterf(processLeptonInterference); }
@@ -269,12 +270,8 @@ void newZZMatrixElement::set_SpinTwoCouplings(
 
 // Higgs + 0 jets dedicated function (with no Higgs decay)
 void newZZMatrixElement::computeXS(
-  TVar::Process process_,
-  TVar::MatrixElement me_,
-  TVar::Production production_,
   float &mevalue
   ){
-  set_Process(process_, me_, production_);
   melaCand = get_CurrentCandidate();
 
   if (melaCand!=0){
@@ -284,10 +281,7 @@ void newZZMatrixElement::computeXS(
     }
     else Xcal2.SetHiggsMass(zzmass, wHiggs[0], -1);
 
-    mevalue = Xcal2.XsecCalc_XVV(
-      processModel, processProduction,
-      processVerbosity
-      );
+    mevalue = Xcal2.XsecCalc_XVV();
   }
 
   resetPerEvent();
@@ -296,12 +290,8 @@ void newZZMatrixElement::computeXS(
 
 // VBF+VH dedicated function (production(+)decay)
 void newZZMatrixElement::computeProdXS_VVHVV(
-  TVar::Process process_,
-  TVar::MatrixElement me_,
-  TVar::Production production_,
   float& mevalue
   ){
-  set_Process(process_, me_, production_);
   melaCand = get_CurrentCandidate();
 
   if (melaCand!=0){
@@ -311,10 +301,7 @@ void newZZMatrixElement::computeProdXS_VVHVV(
     }
     else Xcal2.SetHiggsMass(zzmass, wHiggs[0], -1);
 
-    mevalue = Xcal2.XsecCalc_VVXVV(
-      processModel, processProduction,
-      processVerbosity
-      );
+    mevalue = Xcal2.XsecCalc_VVXVV();
   }
 
   resetPerEvent();
@@ -323,19 +310,12 @@ void newZZMatrixElement::computeProdXS_VVHVV(
 
 // Higgs + 2 jet dedicated function (with no Higgs decay)
 void newZZMatrixElement::computeProdXS_JJH(
-  TVar::Process process_,
-  TVar::MatrixElement me_,
-  TVar::Production production_,
   float &mevalue
   ){
-  set_Process(process_, me_, production_);
   melaCand = get_CurrentCandidate();
 
   if (melaCand!=0){
-    mevalue  = Xcal2.XsecCalcXJJ(
-      processModel, processProduction,
-      processVerbosity
-      );
+    mevalue  = Xcal2.XsecCalcXJJ();
   }
 
   resetPerEvent();
@@ -344,19 +324,12 @@ void newZZMatrixElement::computeProdXS_JJH(
 
 // Higgs + 1 jet: Only SM is supported for now.
 void newZZMatrixElement::computeProdXS_JH(
-  TVar::Process process_,
-  TVar::MatrixElement me_,
-  TVar::Production production_,
   float &mevalue
   ){
-  set_Process(process_, me_, production_);
   melaCand = get_CurrentCandidate();
 
   if (melaCand!=0){
-    mevalue  = Xcal2.XsecCalcXJ(
-      processModel, processProduction,
-      processVerbosity
-      );
+    mevalue  = Xcal2.XsecCalcXJ();
   }
 
   resetPerEvent();
@@ -365,13 +338,9 @@ void newZZMatrixElement::computeProdXS_JH(
 
 // Dedicated VH function (with no Higgs decay)
 void newZZMatrixElement::computeProdXS_VH(
-  TVar::Process process_,
-  TVar::MatrixElement me_,
-  TVar::Production production_,
   float &mevalue,
   bool includeHiggsDecay
   ){
-  set_Process(process_, me_, production_);
   melaCand = get_CurrentCandidate();
 
   if (melaCand!=0){
@@ -380,8 +349,6 @@ void newZZMatrixElement::computeProdXS_VH(
     else Xcal2.SetHiggsMass(zzmass, wHiggs[0], -1);
 
     mevalue  = Xcal2.XsecCalc_VX(
-      processModel, processProduction,
-      processVerbosity,
       includeHiggsDecay
       );
   }
@@ -394,14 +361,10 @@ void newZZMatrixElement::computeProdXS_VH(
 // topProcess=0 for gg, =1 for qqb initial states
 // topDecay=0 (default) for no top decay, =1 to include t/tb->b/bb + W+/W-(->ffb). =1 not relevant for the bbH process.
 void newZZMatrixElement::computeProdXS_ttH(
-  TVar::Process process_,
-  TVar::MatrixElement me_,
-  TVar::Production production_,
   float &mevalue,
   int topProcess,
   int topDecay
   ){
-  set_Process(process_, me_, production_);
   melaCand = get_CurrentCandidate();
 
   if (melaCand!=0){
@@ -409,10 +372,8 @@ void newZZMatrixElement::computeProdXS_ttH(
     if (processME==TVar::MCFM){ for (int jh=0; jh<(int)nSupportedHiggses; jh++) Xcal2.SetHiggsMass(mHiggs[jh], wHiggs[jh], jh+1); }
     else Xcal2.SetHiggsMass(zzmass, wHiggs[0], -1);
 
-    if (production_ == TVar::ttH || production_ ==TVar::bbH){
+    if (processProduction==TVar::ttH || processProduction==TVar::bbH){
       mevalue  = Xcal2.XsecCalc_TTX(
-        processModel, processProduction,
-        processVerbosity,
         topProcess, topDecay
         );
     }

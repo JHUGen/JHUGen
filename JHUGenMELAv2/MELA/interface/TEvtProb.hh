@@ -58,9 +58,7 @@ public:
   // Functions
   //----------------------
   void Set_LHAgrid(const char* path, int pdfmember=0);
-  void SetProcess(TVar::Process tmp);
-  void SetMatrixElement(TVar::MatrixElement tmp);
-  void SetProduction(TVar::Production tmp);
+  void SetProcess(TVar::Process proc, TVar::MatrixElement me, TVar::Production prod);
   void SetVerbosity(TVar::VerbosityLevel tmp);
   void SetLeptonInterf(TVar::LeptonInterference tmp);
 
@@ -95,35 +93,19 @@ public:
   // Reset the IO record, called at te beginning of each comoputation
   void ResetIORecord();
 
-  double XsecCalc_XVV(
-    TVar::Process process_, TVar::Production production_,
-    TVar::VerbosityLevel verbosity_
-    );
+  double XsecCalc_XVV();
 
-  double XsecCalc_VVXVV(
-    TVar::Process process_, TVar::Production production_,
-    TVar::VerbosityLevel verbosity_
-    );
+  double XsecCalc_VVXVV();
 
-  double XsecCalcXJJ(
-    TVar::Process process_, TVar::Production production_,
-    TVar::VerbosityLevel verbosity_
-    );
+  double XsecCalcXJJ();
 
-  double XsecCalcXJ(
-    TVar::Process process_, TVar::Production production_,
-    TVar::VerbosityLevel verbosity_
-    );
+  double XsecCalcXJ();
 
   double XsecCalc_VX(
-    TVar::Process process_, TVar::Production production_,
-    TVar::VerbosityLevel verbosity_,
     bool includeHiggsDecay
     );
 
   double XsecCalc_TTX(
-    TVar::Process process_, TVar::Production production_,
-    TVar::VerbosityLevel verbosity_,
     int topProcess, int topDecay
     );
 
