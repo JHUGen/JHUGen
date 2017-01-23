@@ -54,6 +54,7 @@ bool MELACandidate::testShallowCopy(){ return isShallowCopy; }
 
 void MELACandidate::sortDaughters(){
   selfDecayMode = PDGHelpers::HDecayMode;
+  if (debugVars::debugFlag) std::cout << "Starting MELACandidate::sortDaughters with self decay mode " << selfDecayMode << std::endl;
   if (debugVars::debugFlag) std::cout << "Starting MELACandidate::sortDaughtersInitial" << std::endl;
   sortDaughtersInitial();
   if (debugVars::debugFlag) std::cout << "Starting MELACandidate::sortDaughtersByBestZ1" << std::endl;

@@ -7704,7 +7704,8 @@ MELACandidate* TUtil::ConvertVectorFormat(
     cand->addDaughter(F1);
     cand->addDaughter(F2);
     TVar::CandidateDecayMode defaultHDecayMode = PDGHelpers::HDecayMode;
-    PDGHelpers::setCandidateDecayMode(TVar::CandidateDecay_ff);
+    if (PDGHelpers::isAPhoton(F1->id) && PDGHelpers::isAPhoton(F2->id)) PDGHelpers::setCandidateDecayMode(TVar::CandidateDecay_GG);
+    else PDGHelpers::setCandidateDecayMode(TVar::CandidateDecay_ff);
     cand->sortDaughters();
     PDGHelpers::setCandidateDecayMode(defaultHDecayMode);
   }
@@ -7735,14 +7736,14 @@ MELACandidate* TUtil::ConvertVectorFormat(
     cand->sortDaughters();
     PDGHelpers::setCandidateDecayMode(defaultHDecayMode);
   }
-  // ZZ / WW / ZW
+  // ZZ / WW / ZW (!)
   else/* if (daughters.size()==4)*/{
     TLorentzVector pH(0, 0, 0, 0);
     double charge = 0.;
     for (int ip=0; ip<4; ip++){ pH = pH + (daughters.at(ip))->p4; charge += (daughters.at(ip))->charge(); }
     cand = new MELACandidate(25, pH);
     for (int ip=0; ip<4; ip++) cand->addDaughter(daughters.at(ip));
-    // FIXME/REIMPLEMENT: WZ/ZW trickier than I thought: Summing over charges over all 4f is not enough, affects SSSF pairing in ZZ
+    // FIXME/REIMPLEMENT: ZW trickier than I thought: Summing over charges over all 4f is not enough, affects SSSF pairing in ZZ
     //TVar::CandidateDecayMode defaultHDecayMode = PDGHelpers::HDecayMode;
     //if (fabs(charge)>0.01) PDGHelpers::setCandidateDecayMode(TVar::CandidateDecay_ZW);
     cand->sortDaughters();
