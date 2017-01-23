@@ -22,7 +22,6 @@ namespace PDGHelpers{
   const double Zwidth = 2.4952;
   const double Topwidth = 2.;
 
-  extern double HVVmass;
   extern TVar::CandidateDecayMode HDecayMode;
 
   bool isALepton(const int id);
@@ -59,7 +58,6 @@ namespace PDGHelpers{
   bool allEquivalent(std::vector<int> ids, bool allowUnknown=false);
 
 
-  void setHVVmass(double mymass);
   void setCandidateDecayMode(TVar::CandidateDecayMode mode);
   int getCoupledVertex(const int idfirst, const int idsecond, int* hel=0, int* useAHcoupl=0);
 

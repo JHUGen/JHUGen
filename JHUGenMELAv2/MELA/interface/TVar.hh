@@ -43,9 +43,10 @@ namespace TVar{
     CandidateDecay_ff,
     CandidateDecay_WW,
     CandidateDecay_ZZ,
+    CandidateDecay_ZW, // Untested
     CandidateDecay_ZG,
-    CandidateDecay_GG,
-    CandidateDecay_ZW // Untested
+    CandidateDecay_WG,
+    CandidateDecay_GG
   };
   enum VerbosityLevel {
     SILENT = 0,

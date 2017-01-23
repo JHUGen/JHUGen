@@ -2,7 +2,6 @@
 #include "PDGHelpers.h"
 
 namespace PDGHelpers{
-  double HVVmass = Zmass;
   TVar::CandidateDecayMode HDecayMode = TVar::CandidateDecay_ZZ;
 }
 
@@ -203,8 +202,6 @@ bool PDGHelpers::allEquivalent(std::vector<int> ids, bool allowUnknown){
 }
 
 
-
-void PDGHelpers::setHVVmass(double mymass){ PDGHelpers::HVVmass=mymass; }
 void PDGHelpers::setCandidateDecayMode(TVar::CandidateDecayMode mode){ PDGHelpers::HDecayMode=mode; }
 
 // Test everything in outgoing conventions, do not pass ud or uu for example, pass outgoing u,-(incoming d) or outgoing u,-(incoming u)

@@ -7209,7 +7209,7 @@ void TUtil::GetBoostedParticleVectors(
           if (Vdau_i!=0 && Vdau_i->passSelection) daughters.push_back(SimpleParticle_t(Vdau_i->id, Vdau_i->p4));
         }
         if (idtmp!=0 || Vdau->getNDaughters()>0){ // Avoid "empty" intermediate Vs of the MELACandidate object
-          if (Vdau->getNDaughters()>=2 && PDGHelpers::isAPhoton(idtmp)) idtmp=23; // Special case to avoid V->2f with HVVmass==Zeromass setting (could happen by mistake)
+          if (Vdau->getNDaughters()>=2 && PDGHelpers::isAPhoton(idtmp)) idtmp=23; // Special case to avoid V->2f with massless decay mode (could happen by mistake)
           idVstar.push_back(idtmp);
         }
       }
@@ -7703,10 +7703,10 @@ MELACandidate* TUtil::ConvertVectorFormat(
     cand = new MELACandidate(25, pH);
     cand->addDaughter(F1);
     cand->addDaughter(F2);
-    double defaultHVVmass = PDGHelpers::HVVmass;
-    PDGHelpers::setHVVmass(PDGHelpers::Zeromass);
+    TVar::CandidateDecayMode defaultHDecayMode = PDGHelpers::HDecayMode;
+    PDGHelpers::setCandidateDecayMode(TVar::CandidateDecay_ff);
     cand->sortDaughters();
-    PDGHelpers::setHVVmass(defaultHVVmass);
+    PDGHelpers::setCandidateDecayMode(defaultHDecayMode);
   }
   // ZG / WG
   else if (daughters.size()==3){
@@ -7729,11 +7729,11 @@ MELACandidate* TUtil::ConvertVectorFormat(
     cand->addDaughter(F1);
     cand->addDaughter(F2);
     cand->addDaughter(gamma);
-    double defaultHVVmass = PDGHelpers::HVVmass;
-    if (fabs(charge)<0.01) PDGHelpers::setHVVmass(PDGHelpers::Zmass); // ZG
-    else PDGHelpers::setHVVmass(PDGHelpers::Wmass); // WG,GW (?), un-tested
+    TVar::CandidateDecayMode defaultHDecayMode = PDGHelpers::HDecayMode;
+    if (fabs(charge)<0.01) PDGHelpers::setCandidateDecayMode(TVar::CandidateDecay_ZG); // ZG
+    else PDGHelpers::setCandidateDecayMode(TVar::CandidateDecay_WG); // WG, un-tested
     cand->sortDaughters();
-    PDGHelpers::setHVVmass(defaultHVVmass);
+    PDGHelpers::setCandidateDecayMode(defaultHDecayMode);
   }
   // ZZ / WW / ZW
   else/* if (daughters.size()==4)*/{
@@ -7743,10 +7743,10 @@ MELACandidate* TUtil::ConvertVectorFormat(
     cand = new MELACandidate(25, pH);
     for (int ip=0; ip<4; ip++) cand->addDaughter(daughters.at(ip));
     // FIXME/REIMPLEMENT: WZ/ZW trickier than I thought: Summing over charges over all 4f is not enough, affects SSSF pairing in ZZ
-    //double defaultHVVmass = PDGHelpers::HVVmass;
-    //if (fabs(charge)>0.01) PDGHelpers::setHVVmass(PDGHelpers::Wmass); // WZ,ZW (?), un-tested
+    //TVar::CandidateDecayMode defaultHDecayMode = PDGHelpers::HDecayMode;
+    //if (fabs(charge)>0.01) PDGHelpers::setCandidateDecayMode(TVar::CandidateDecay_ZW);
     cand->sortDaughters();
-    //PDGHelpers::setHVVmass(defaultHVVmass);
+    //PDGHelpers::setCandidateDecayMode(defaultHDecayMode);
   }
 
   /***** Adaptation of LHEAnalyzer::Event::addVVCandidateMother *****/

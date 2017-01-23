@@ -6,7 +6,8 @@ using namespace PDGHelpers;
 MELACandidate::MELACandidate(int id_, TLorentzVector p4_, bool associatedByHighestPt_) :
 MELAParticle(id_, p4_),
 associatedByHighestPt(associatedByHighestPt_),
-isShallowCopy(false)
+isShallowCopy(false),
+selfDecayMode(TVar::CandidateDecay_Stable)
 {}
 MELACandidate::~MELACandidate(){
   if (!isShallowCopy){ // Delete owned objects, or not
@@ -52,6 +53,7 @@ bool MELACandidate::testShallowCopy(){ return isShallowCopy; }
 
 
 void MELACandidate::sortDaughters(){
+  selfDecayMode = PDGHelpers::HDecayMode;
   if (debugVars::debugFlag) std::cout << "Starting MELACandidate::sortDaughtersInitial" << std::endl;
   sortDaughtersInitial();
   if (debugVars::debugFlag) std::cout << "Starting MELACandidate::sortDaughtersByBestZ1" << std::endl;
@@ -109,6 +111,14 @@ MELATopCandidate* MELACandidate::getAssociatedTop(int index)const{
   else return 0;
 }
 void MELACandidate::sortDaughtersInitial(){
+  bool beginWithIdPair = (
+    selfDecayMode==TVar::CandidateDecay_ZZ
+    || selfDecayMode==TVar::CandidateDecay_ZW
+    || selfDecayMode==TVar::CandidateDecay_ZG
+    || selfDecayMode==TVar::CandidateDecay_GG
+    || selfDecayMode==TVar::CandidateDecay_ff
+    );
+  bool beginWithWPair = (selfDecayMode==TVar::CandidateDecay_WW || selfDecayMode==TVar::CandidateDecay_WG);
   int nDaughtersBooked=0;
   int tmpDindex[2]={ 0 };
   MELAParticle* df[2] ={ getDaughter(0), 0 };
@@ -116,10 +126,10 @@ void MELACandidate::sortDaughtersInitial(){
   for (int j=1; j<getNDaughters(); j++){
     MELAParticle* dtmp = getDaughter(j);
     if (
-      ((std::abs(dtmp->charge())-std::abs(df[0]->charge())==0 && std::abs(dtmp->id)==std::abs(df[0]->id)) && (PDGHelpers::HVVmass==PDGHelpers::Zmass || PDGHelpers::HVVmass==PDGHelpers::Zeromass))
+      (beginWithIdPair && std::abs(dtmp->charge())-std::abs(df[0]->charge())==0 && std::abs(dtmp->id)==std::abs(df[0]->id)) // First daughter in ZZ/ZW/ZG/GG/ff requires identical |Q| and |id|.
       ||
-      (
-      PDGHelpers::HVVmass==PDGHelpers::Wmass
+      ( // First daughter in WW/WG requires a pair with |sum(Q)|=1 and opposite id signs, or two unknown jets.
+      beginWithWPair
       &&
       (
       (std::abs(dtmp->charge()+df[0]->charge())==1 && TMath::Sign(1, dtmp->id)==-TMath::Sign(1, df[0]->id))
@@ -164,9 +174,9 @@ void MELACandidate::sortDaughtersInitial(){
     &&
     (
     // Order by ubar(0)v(1)
-    (df[0]->id<df[1]->id && (PDGHelpers::HVVmass==PDGHelpers::Zmass || PDGHelpers::HVVmass==PDGHelpers::Zeromass))
+    (df[0]->id<df[1]->id && beginWithIdPair)
     ||
-    (df[0]->id<df[1]->id && df[0]->id<0 && PDGHelpers::HVVmass==PDGHelpers::Wmass)
+    (df[0]->id<df[1]->id && df[0]->id<0 && beginWithWPair)
     ||
     ((df[0]->id*df[1]->id>0 || (df[0]->id==0 && df[1]->id==0)) && df[0]->phi()<df[1]->phi())
     )
@@ -181,9 +191,9 @@ void MELACandidate::sortDaughtersInitial(){
     &&
     (
     // Order by ubar(0)v(1)
-    (ds[0]->id<ds[1]->id && (PDGHelpers::HVVmass==PDGHelpers::Zmass || PDGHelpers::HVVmass==PDGHelpers::Zeromass))
+    (ds[0]->id<ds[1]->id && beginWithIdPair)
     ||
-    (ds[0]->id<ds[1]->id && ds[0]->id<0 && PDGHelpers::HVVmass==PDGHelpers::Wmass)
+    (ds[0]->id<ds[1]->id && ds[0]->id<0 && beginWithWPair)
     ||
     ((ds[0]->id*ds[1]->id>0 || (ds[0]->id==0 && ds[1]->id==0)) && ds[0]->phi()<ds[1]->phi())
     )
@@ -207,11 +217,26 @@ void MELACandidate::sortDaughtersInitial(){
   }
 }
 void MELACandidate::sortDaughtersByBestZ1(){
-  MELAParticle* orderedDs[2][2]={ { 0 } };
+  bool beginWithZPair = (
+    selfDecayMode==TVar::CandidateDecay_ZZ
+    || selfDecayMode==TVar::CandidateDecay_ZW
+    || selfDecayMode==TVar::CandidateDecay_ZG
+    );
+  bool beginWithMasslessPair = (
+    selfDecayMode==TVar::CandidateDecay_GG
+    || selfDecayMode==TVar::CandidateDecay_ff
+    );
+  bool beginWithIdPair = beginWithZPair || beginWithMasslessPair;
+  bool beginWithWPair = (selfDecayMode==TVar::CandidateDecay_WW || selfDecayMode==TVar::CandidateDecay_WG);
 
+  double HVVmass = PDGHelpers::Zeromass;
+  if (beginWithZPair) HVVmass = PDGHelpers::Zmass;
+  else if (beginWithWPair) HVVmass = PDGHelpers::Wmass;
+
+  MELAParticle* orderedDs[2][2]={ { 0 } };
   TLorentzVector pZ1(0, 0, 0, 0);
   TLorentzVector pZ2(0, 0, 0, 0);
-  if (sortedDaughters.size()>2){ // WW, ZZ, ZG
+  if (sortedDaughters.size()>2){ // WW, ZZ, ZW, WG, ZG
     bool dauDiffType = true;
     if (debugVars::debugFlag) std::cout << "Ndaughters>2" << std::endl;
 
@@ -226,8 +251,7 @@ void MELACandidate::sortDaughtersByBestZ1(){
 
     if (sortedDaughters.size()>=4){
       if (
-        (PDGHelpers::HVVmass==PDGHelpers::Zmass || PDGHelpers::HVVmass==PDGHelpers::Zeromass)
-        &&
+        beginWithIdPair &&
         (
         (isALepton(sortedDaughters.at(0)->id) && isALepton(sortedDaughters.at(1)->id) && isALepton(sortedDaughters.at(2)->id) && isALepton(sortedDaughters.at(3)->id))
         ||
@@ -247,10 +271,13 @@ void MELACandidate::sortDaughtersByBestZ1(){
     }
 
     if (
-      (dauDiffType && (PDGHelpers::HVVmass==PDGHelpers::Zmass || PDGHelpers::HVVmass==PDGHelpers::Zeromass) && sortedDaughters.size()<4)
+      (dauDiffType && beginWithIdPair && (
+      sortedDaughters.size()<4 // WG, ZG
       ||
       (
-      dauDiffType && (PDGHelpers::HVVmass==PDGHelpers::Zmass || PDGHelpers::HVVmass==PDGHelpers::Zeromass) && sortedDaughters.size()>=4 && (
+      // WW, ZZ, ZW (mostly relevant for Z1-Z2 sorting)
+      // Zll>Znn>?GG>Zdd>Zuu>?gg>Zjj. 0-2 swap may then give W+W-.
+      sortedDaughters.size()>=4 && (
       isALepton(sortedDaughters.at(0)->id) ||
       (isANeutrino(sortedDaughters.at(0)->id) && !isALepton(sortedDaughters.at(2)->id)) ||
       (isAPhoton(sortedDaughters.at(0)->id) && !isALepton(sortedDaughters.at(2)->id) && !isANeutrino(sortedDaughters.at(2)->id)) ||
@@ -260,19 +287,24 @@ void MELACandidate::sortDaughtersByBestZ1(){
       (isAnUnknownJet(sortedDaughters.at(0)->id) && !isALepton(sortedDaughters.at(2)->id) && !isANeutrino(sortedDaughters.at(2)->id) && !isAPhoton(sortedDaughters.at(2)->id) && !isDownTypeQuark(sortedDaughters.at(2)->id) && !isUpTypeQuark(sortedDaughters.at(2)->id) && !isAGluon(sortedDaughters.at(2)->id))
       )
       )
+      )
+      )
       ||
-      (std::abs(pZ1.M() - PDGHelpers::HVVmass)<std::abs(pZ2.M() - PDGHelpers::HVVmass) && !dauDiffType && (PDGHelpers::HVVmass==PDGHelpers::Zmass || PDGHelpers::HVVmass==PDGHelpers::Zeromass)) // Z1 / Z2
+      // ZZ->4f
+      (
+      !dauDiffType && beginWithIdPair && std::abs(pZ1.M() - HVVmass)<std::abs(pZ2.M() - HVVmass) // Z1 / Z2
+      )
       ||
-      ((sortedDaughters.at(0)!=0 && sortedDaughters.at(1)!=0 && PDGHelpers::HVVmass==PDGHelpers::Wmass) && sortedDaughters.at(0)->charge()+sortedDaughters.at(1)->charge()>0) // W+ / W-
+      (sortedDaughters.at(0)!=0 && sortedDaughters.at(1)!=0 && beginWithWPair && (sortedDaughters.at(0)->charge()+sortedDaughters.at(1)->charge())>0) // W+ / W-
       ){
-      if (debugVars::debugFlag) std::cout << "pZ1 is closer to HVVmass " << PDGHelpers::HVVmass << std::endl;
+      if (debugVars::debugFlag) std::cout << "pZ1 is closer to HVVmass " << HVVmass << std::endl;
       orderedDs[0][0]=sortedDaughters.at(0);
       orderedDs[0][1]=sortedDaughters.at(1);
       orderedDs[1][0]=((int)sortedDaughters.size()>2 ? sortedDaughters.at(2) : 0);
       orderedDs[1][1]=((int)sortedDaughters.size()>3 ? sortedDaughters.at(3) : 0);
     }
     else{
-      if (debugVars::debugFlag) std::cout << "pZ2 is closer to HVVmass " << PDGHelpers::HVVmass << std::endl;
+      if (debugVars::debugFlag) std::cout << "pZ2 is closer to HVVmass " << HVVmass << std::endl;
       orderedDs[0][0]=((int)sortedDaughters.size()>2 ? sortedDaughters.at(2) : 0);
       orderedDs[0][1]=((int)sortedDaughters.size()>3 ? sortedDaughters.at(3) : 0);
       orderedDs[1][0]=sortedDaughters.at(0);
@@ -318,7 +350,7 @@ void MELACandidate::sortDaughtersByBestZ1(){
       if (orderedDs[1-d][d]!=0) pZ2p = pZ2p + orderedDs[1-d][d]->p4;
     }
 
-    if (std::abs(pZ1p.M() - PDGHelpers::HVVmass)<std::abs(pZ2p.M() - PDGHelpers::HVVmass)){
+    if (std::abs(pZ1p.M() - HVVmass)<std::abs(pZ2p.M() - HVVmass)){
       orderedDps[0][0]=orderedDs[0][0];
       orderedDps[0][1]=orderedDs[1][1];
       orderedDps[1][0]=orderedDs[1][0];
@@ -333,7 +365,7 @@ void MELACandidate::sortDaughtersByBestZ1(){
       pZ1p = pZ2p;
       pZ2p = ptmp;
     }
-    if (std::abs(pZ1p.M() - PDGHelpers::HVVmass)<std::abs(pZ1.M() - PDGHelpers::HVVmass) || (std::abs(pZ1p.M() - PDGHelpers::HVVmass)==std::abs(pZ1.M() - PDGHelpers::HVVmass) && pZ2p.Pt()>pZ2.Pt())){
+    if (std::abs(pZ1p.M() - HVVmass)<std::abs(pZ1.M() - HVVmass) || (std::abs(pZ1p.M() - HVVmass)==std::abs(pZ1.M() - HVVmass) && pZ2p.Pt()>pZ2.Pt())){
       for (int i=0; i<2; i++){
         for (int j=0; j<2; j++) orderedDs[i][j] = orderedDps[i][j];
       }
@@ -348,9 +380,15 @@ void MELACandidate::sortDaughtersByBestZ1(){
   if (debugVars::debugFlag) std::cout << "Final number of daughters in sortedDaughters: " << sortedDaughters.size() << std::endl;
 }
 void MELACandidate::createSortedVs(){
-  int VID = 23;
-  if (PDGHelpers::HVVmass==PDGHelpers::Wmass) VID = 24;
-  else if (PDGHelpers::HVVmass==PDGHelpers::Zeromass) VID = 21;
+  bool beginWithZPair = (
+    selfDecayMode==TVar::CandidateDecay_ZZ
+    || selfDecayMode==TVar::CandidateDecay_ZW
+    || selfDecayMode==TVar::CandidateDecay_ZG
+    );
+  bool beginWithWPair = (selfDecayMode==TVar::CandidateDecay_WW || selfDecayMode==TVar::CandidateDecay_WG);
+  int VID = 21;
+  if (beginWithWPair) VID = 24;
+  else if (beginWithZPair) VID = 23;
 
   TLorentzVector pZ1(0, 0, 0, 0);
   TLorentzVector pZ2(0, 0, 0, 0);
@@ -383,7 +421,7 @@ void MELACandidate::createSortedVs(){
         else if ((imax-icutoff)==1) V2id=sortedDaughters.at(d)->id;
       }
     }
-    // Override HVVmass if charges indicate some other final state
+    // Override selfDecayMode if charges indicate some other final state
     if (fabs(Vcharge[0]-1.)<0.001) V1id=24;
     else if (fabs(Vcharge[0]+1.)<0.001) V1id=-24;
     if (fabs(Vcharge[1]-1.)<0.001) V2id=24;
@@ -406,12 +444,23 @@ void MELACandidate::createSortedVs(){
   addSortedV(Z2);
 }
 TLorentzVector MELACandidate::getAlternativeVMomentum(int index)const{
+  bool beginWithZPair = (
+    selfDecayMode==TVar::CandidateDecay_ZZ
+    || selfDecayMode==TVar::CandidateDecay_ZW
+    || selfDecayMode==TVar::CandidateDecay_ZG
+    );
+  bool beginWithWPair = (selfDecayMode==TVar::CandidateDecay_WW || selfDecayMode==TVar::CandidateDecay_WG);
+
+  double HVVmass = PDGHelpers::Zeromass;
+  if (beginWithZPair) HVVmass = PDGHelpers::Zmass;
+  else if (beginWithWPair) HVVmass = PDGHelpers::Wmass;
+
   TLorentzVector nullFourVector(0, 0, 0, 0);
   if (sortedDaughters.size()>=3){
     TLorentzVector pZ1 = sortedDaughters.at(0)->p4;
     if (sortedDaughters.size()>3) pZ1 = pZ1 + sortedDaughters.at(3)->p4;
     TLorentzVector pZ2 = sortedDaughters.at(2)->p4+sortedDaughters.at(1)->p4;
-    if (std::abs(pZ1.M() - PDGHelpers::HVVmass)>std::abs(pZ2.M() - PDGHelpers::HVVmass)){
+    if (std::abs(pZ1.M() - HVVmass)>std::abs(pZ2.M() - HVVmass)){
       TLorentzVector pZtmp = pZ1;
       pZ1 = pZ2;
       pZ2 = pZtmp;

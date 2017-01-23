@@ -52,6 +52,8 @@ protected:
   bool associatedByHighestPt;
   bool isShallowCopy;
 
+  TVar::CandidateDecayMode selfDecayMode;
+
   std::vector<MELAParticle*> associatedLeptons;
   std::vector<MELAParticle*> associatedNeutrinos;
   std::vector<MELAParticle*> associatedPhotons;
