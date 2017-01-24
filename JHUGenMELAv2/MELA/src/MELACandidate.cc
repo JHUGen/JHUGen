@@ -47,13 +47,14 @@ MELACandidate* MELACandidate::shallowCopy(){
 }
 
 
+void MELACandidate::setDecayMode(TVar::CandidateDecayMode flag){ selfDecayMode=flag; }
 void MELACandidate::setAddAssociatedByHighestPt(bool associatedByHighestPt_){ associatedByHighestPt=associatedByHighestPt_; }
 void MELACandidate::setShallowCopy(bool flag){ isShallowCopy=flag; }
 bool MELACandidate::testShallowCopy(){ return isShallowCopy; }
 
 
 void MELACandidate::sortDaughters(){
-  selfDecayMode = PDGHelpers::HDecayMode;
+  setDecayMode(PDGHelpers::HDecayMode);
   if (debugVars::debugFlag) std::cout << "Starting MELACandidate::sortDaughters with self decay mode " << selfDecayMode << std::endl;
   if (debugVars::debugFlag) std::cout << "Starting MELACandidate::sortDaughtersInitial" << std::endl;
   sortDaughtersInitial();
