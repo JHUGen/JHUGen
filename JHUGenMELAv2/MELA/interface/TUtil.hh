@@ -273,6 +273,7 @@ namespace TUtil{
     std::vector<MELATopCandidate*>* topCandList
     );
   void PrintCandidateSummary(MELACandidate* cand);
+  void PrintCandidateSummary(TVar::simple_event_record* cand);
 
 }
 

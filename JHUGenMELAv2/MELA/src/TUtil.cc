@@ -3456,13 +3456,21 @@ double TUtil::SumMatrixElementPDF(
     &&
     TUtil::MCFM_chooser(process, production, leptonInterf, verbosity, mela_event); // Set some of the specifics of the process through this function
   if (doProceed) doProceed = TUtil::MCFM_SetupParticleCouplings(process, production, verbosity, mela_event, &partOrder, &apartOrder); // Set the specifics of the daughter or associated particle couplings through this function
-  if (partOrder.size()!=mela_event.pDaughters.size()){
-    if (verbosity >= TVar::ERROR) cerr << "Ordering size and number of daughter particles are not the same!" << endl;
-    doProceed=false;
-  }
-  if (apartOrder.size()!=mela_event.pAssociated.size()){
-    if (verbosity >= TVar::ERROR) cerr << "Ordering size and number of associated particles are not the same!" << endl;
-    doProceed=false;
+  if (doProceed){
+    if (partOrder.size()!=mela_event.pDaughters.size()){
+      if (verbosity >= TVar::ERROR){
+        cerr << "TUtil::SumMatrixElementPDF: Ordering size " << partOrder.size() << " and number of daughter particles " << mela_event.pDaughters.size() << " are not the same!" << endl;
+        TUtil::PrintCandidateSummary(&mela_event);
+      }
+      doProceed=false;
+    }
+    if (apartOrder.size()!=mela_event.pAssociated.size()){
+      if (verbosity >= TVar::ERROR){
+        cerr << "TUtil::SumMatrixElementPDF: Ordering size " << apartOrder.size() << " and number of associated particles " << mela_event.pAssociated.size() << " are not the same!" << endl;
+        TUtil::PrintCandidateSummary(&mela_event);
+      }
+      doProceed=false;
+    }
   }
   if (doProceed){
     int NPart=npart_.npart+2; // +2 for mothers
@@ -7091,15 +7099,24 @@ bool TUtil::CheckPartonMomFraction(const TLorentzVector& p0, const TLorentzVecto
   //if(sysPt_sqr>=1.0E-10)  sysE=TMath::Sqrt(sysE*sysE-sysPt_sqr);
   xx[0]=(sysE+sysPz)/EBEAM/2.;
   xx[1]=(sysE-sysPz)/EBEAM/2.;
-  if (verbosity >= TVar::DEBUG) cout << "xx[0]: " << xx[0] << ", xx[1] = " << xx[1] << ", xmin = " << xmin_.xmin << endl;
   if (
-    xx[0] > 1.0 || xx[0]<=xmin_.xmin
+    xx[0]>1. || xx[0]<=xmin_.xmin
     ||
-    xx[1] > 1.0 || xx[1]<=xmin_.xmin
+    xx[1]>1. || xx[1]<=xmin_.xmin
     ||
     EBEAM<=0.
-    ) return false;
-  else return true;
+    ){
+    if (verbosity>=TVar::ERROR){
+      if (xx[0]>1. || xx[1]>1.) cerr << "TUtil::CheckPartonMomFraction: At least one of the parton momentum fractions is greater than 1." << endl;
+      else if (xx[0]<=xmin_.xmin || xx[1]<=xmin_.xmin) cerr << "TUtil::CheckPartonMomFraction: At least one of the parton momentum fractions is less than or equal to " << xmin_.xmin << "." << endl;
+      else cerr << "TUtil::CheckPartonMomFraction: EBEAM=" << EBEAM << "<=0." << endl;
+    }
+    return false;
+  }
+  else{
+    if (verbosity>=TVar::DEBUG) cout << "TUtil::CheckPartonMomFraction: xx[0]: " << xx[0] << ", xx[1] = " << xx[1] << ", xmin = " << xmin_.xmin << endl;
+    return true;
+  }
 }
 // ComputePDF does the PDF computation
 void TUtil::ComputePDF(const TLorentzVector& p0, const TLorentzVector& p1, double fx1[nmsq], double fx2[nmsq], const double& EBEAM, const TVar::VerbosityLevel& verbosity){
@@ -7132,9 +7149,7 @@ void TUtil::ComputePDF(const TLorentzVector& p0, const TLorentzVector& p1, doubl
   }
   if (verbosity>=TVar::DEBUG){
     cout << "End TUtil::ComputePDF:"<< endl;
-    for (int ip=-nf; ip<=nf; ip++){
-      cout << "fx1, fx2[" << ip << "] = " << fx1[ip+5] << fx2[ip+5] << endl;
-    }
+    for (int ip=-nf; ip<=nf; ip++) cout << "(fx1, fx2)[" << ip << "] = (" << fx1[ip+5] << " , " << fx2[ip+5] << ")" << endl;
   }
 }
 // SumMEPDF sums over all production parton flavors according to PDF and calls ComputePDF
@@ -7912,3 +7927,95 @@ void TUtil::PrintCandidateSummary(MELACandidate* cand){
   }
 }
 
+void TUtil::PrintCandidateSummary(simple_event_record* cand){
+  cout << "***** TUtil::PrintCandidateSummary (Simple Event Record) *****" << endl;
+  cout << "Candidate: " << cand << endl;
+  if (cand!=0){
+    cout << "\tAssociationCode: " << cand->AssociationCode << endl;
+    cout << "\tAssociationVCompatibility: " << cand->AssociationVCompatibility << endl;
+    cout << "\tnRequested_AssociatedJets: " << cand->nRequested_AssociatedJets << endl;
+    cout << "\tnRequested_AssociatedLeptons: " << cand->nRequested_AssociatedLeptons << endl;
+    cout << "\tnRequested_AssociatedPhotons: " << cand->nRequested_AssociatedPhotons << endl;
+    cout << "\tnRequested_Tops: " << cand->nRequested_Tops << endl;
+    cout << "\tnRequested_Antitops: " << cand->nRequested_Antitops << endl;
+    cout << "\tHas " << cand->pMothers.size() << " mothers" << endl;
+    for (unsigned int ip=0; ip<cand->pMothers.size(); ip++){
+      SimpleParticle_t* part = &(cand->pMothers.at(ip));
+      cout
+        << "\t\tV" << ip << " (" << part->first << ") (X,Y,Z,T)=( "
+        << part->second.X() << " , "
+        << part->second.Y() << " , "
+        << part->second.Z() << " , "
+        << part->second.T() << " )" << endl;
+    }
+    cout << "\tHas " << cand->intermediateVid.size() << " sorted daughter Vs" << endl;
+    for (unsigned int iv=0; iv<cand->intermediateVid.size(); iv++) cout << "\t\tV" << iv << " (" << cand->intermediateVid.at(iv) << ")" << endl;
+    cout << "\tHas " << cand->pDaughters.size() << " daughters" << endl;
+    for (unsigned int ip=0; ip<cand->pDaughters.size(); ip++){
+      SimpleParticle_t* part = &(cand->pDaughters.at(ip));
+      cout
+        << "\t\tDau[" << ip << "] (" << part->first << ") (X,Y,Z,T)=( "
+        << part->second.X() << " , "
+        << part->second.Y() << " , "
+        << part->second.Z() << " , "
+        << part->second.T() << " )" << endl;
+    }
+    cout << "\tHas " << cand->pAssociated.size() << " associated particles" << endl;
+    for (unsigned int ip=0; ip<cand->pAssociated.size(); ip++){
+      SimpleParticle_t* part = &(cand->pAssociated.at(ip));
+      cout
+        << "\t\tAPart[" << ip << "] (" << part->first << ") (X,Y,Z,T)=( "
+        << part->second.X() << " , "
+        << part->second.Y() << " , "
+        << part->second.Z() << " , "
+        << part->second.T() << " )" << endl;
+    }
+    cout << "\tHas " << cand->pStableTops.size() << " stable tops" << endl;
+    for (unsigned int ip=0; ip<cand->pStableTops.size(); ip++){
+      SimpleParticle_t* part = &(cand->pStableTops.at(ip));
+      cout
+        << "\t\tAPart[" << ip << "] (" << part->first << ") (X,Y,Z,T)=( "
+        << part->second.X() << " , "
+        << part->second.Y() << " , "
+        << part->second.Z() << " , "
+        << part->second.T() << " )" << endl;
+    }
+    cout << "\tHas " << cand->pStableAntitops.size() << " stable antitops" << endl;
+    for (unsigned int ip=0; ip<cand->pStableAntitops.size(); ip++){
+      SimpleParticle_t* part = &(cand->pStableAntitops.at(ip));
+      cout
+        << "\t\tAPart[" << ip << "] (" << part->first << ") (X,Y,Z,T)=( "
+        << part->second.X() << " , "
+        << part->second.Y() << " , "
+        << part->second.Z() << " , "
+        << part->second.T() << " )" << endl;
+    }
+
+    cout << "\tHas " << cand->pTopDaughters.size() << " unstable tops" << endl;
+    for (unsigned int ip=0; ip<cand->pTopDaughters.size(); ip++){
+      cout << "\t\tTop[" << ip << "] daughters:" << endl;
+      for (unsigned int jp=0; jp<cand->pTopDaughters.at(ip).size(); jp++){
+        SimpleParticle_t* part = &(cand->pTopDaughters.at(ip).at(jp));
+        cout
+          << "\t\t- Top daughter[" << ip << jp << "] (" << part->first << ") (X,Y,Z,T)=( "
+          << part->second.X() << " , "
+          << part->second.Y() << " , "
+          << part->second.Z() << " , "
+          << part->second.T() << " )" << endl;
+      }
+    }
+    cout << "\tHas " << cand->pAntitopDaughters.size() << " unstable antitops" << endl;
+    for (unsigned int ip=0; ip<cand->pAntitopDaughters.size(); ip++){
+      cout << "\t\tAntitop[" << ip << "] daughters:" << endl;
+      for (unsigned int jp=0; jp<cand->pAntitopDaughters.at(ip).size(); jp++){
+        SimpleParticle_t* part = &(cand->pAntitopDaughters.at(ip).at(jp));
+        cout
+          << "\t\t- Antitop daughter[" << ip << jp << "] (" << part->first << ") (X,Y,Z,T)=( "
+          << part->second.X() << " , "
+          << part->second.Y() << " , "
+          << part->second.Z() << " , "
+          << part->second.T() << " )" << endl;
+      }
+    }
+  }
+}
