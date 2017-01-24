@@ -7270,7 +7270,7 @@ void TUtil::GetBoostedParticleVectors(
       if (Vdau!=0){
         bool doAdd=false;
         int idV = Vdau->id;
-        if ((abs(idV)==aVhypo || idV==0) && Vdau->getNDaughters()>0){ // If the V is unknown or compatible with the requested hypothesis
+        if ((abs(idV)==aVhypo || idV==0) && Vdau->getNDaughters()>0 && Vdau->passSelection){ // If the V is unknown or compatible with the requested hypothesis
           doAdd=true;
           for (int ivd=0; ivd<Vdau->getNDaughters(); ivd++){ // Loop over the daughters of V
             MELAParticle* Vdau_i = Vdau->getDaughter(ivd);
@@ -7279,6 +7279,8 @@ void TUtil::GetBoostedParticleVectors(
               (mela_event.nRequested_AssociatedLeptons==0 && (PDGHelpers::isALepton(Vdau_i->id) || PDGHelpers::isANeutrino(Vdau_i->id)))
               ||
               (mela_event.nRequested_AssociatedJets==0 && PDGHelpers::isAJet(Vdau_i->id))
+              ||
+              !Vdau_i->passSelection // Protection against incorrect Vdau passSelection flag
               ){
               doAdd=false; break;
             }
