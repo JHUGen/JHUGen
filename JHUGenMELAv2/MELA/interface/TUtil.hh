@@ -242,7 +242,7 @@ namespace TUtil{
   double SumMEPDF(const TLorentzVector& p0, const TLorentzVector& p1, double msq[nmsq][nmsq], MelaIO* RcdME, const double& EBEAM, const TVar::VerbosityLevel& verbosity);
 
   // Propagator reweighting
-  double ResonancePropagator(double shat, TVar::ResonancePropagatorScheme scheme);
+  double ResonancePropagator(double sqrts, TVar::ResonancePropagatorScheme scheme);
 
   // Boost the particles with or without associated ones to pT=0 frame and return std::vectors filled with (id, momentum) pairs
   void GetBoostedParticleVectors(

@@ -7171,14 +7171,14 @@ double TUtil::SumMEPDF(const TLorentzVector& p0, const TLorentzVector& p1, doubl
 
 
 // Propagator reweighting
-double TUtil::ResonancePropagator(double shat, TVar::ResonancePropagatorScheme scheme){
+double TUtil::ResonancePropagator(double sqrts, TVar::ResonancePropagatorScheme scheme){
   __modjhugenmela_MOD_resetmubarhgabarh();
 
   const double GeV=1./100.; // JHUGen mom. scale factor
   int isch=(int)scheme;
-  double shat_jhu = pow(shat*GeV, 2);
+  double shat_jhu = pow(sqrts*GeV, 2);
   double prop = __modkinematics_MOD_getbwpropagator(&shat_jhu, &isch);
-  prop *= pow(GeV, 4);
+  if (scheme!=TVar::NoPropagator) prop *= pow(GeV, 4);
   return prop;
 }
 
