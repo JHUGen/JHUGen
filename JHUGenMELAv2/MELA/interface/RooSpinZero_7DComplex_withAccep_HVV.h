@@ -1,10 +1,10 @@
-#ifndef ROOSPINZERO_7DCOMPLEX_WITHACCEP_GGH
-#define ROOSPINZERO_7DCOMPLEX_WITHACCEP_GGH
+#ifndef ROOSPINZERO_7DCOMPLEX_WITHACCEP_HVV
+#define ROOSPINZERO_7DCOMPLEX_WITHACCEP_HVV
 
 #include "RooSpinZero.h"
 
 
-class RooSpinZero_7DComplex_withAccep_ggH : public RooSpinZero {
+class RooSpinZero_7DComplex_withAccep_HVV : public RooSpinZero {
 
 public:
 
@@ -44,8 +44,8 @@ public:
     RooRealVar* dM2;
   };
 
-  RooSpinZero_7DComplex_withAccep_ggH(){}
-  RooSpinZero_7DComplex_withAccep_ggH(
+  RooSpinZero_7DComplex_withAccep_HVV(){}
+  RooSpinZero_7DComplex_withAccep_HVV(
     const char *name, const char *title,
     modelMeasurables _measurables,
     modelParameters _parameters,
@@ -53,13 +53,15 @@ public:
     accepParameters _accepParams,
     RooSpin::VdecayType _Vdecay1=RooSpin::kVdecayType_Zll, RooSpin::VdecayType _Vdecay2=RooSpin::kVdecayType_Zll
     );
-  RooSpinZero_7DComplex_withAccep_ggH(const RooSpinZero_7DComplex_withAccep_ggH& other, const char* name=0);
-  virtual TObject* clone(const char* newname) const { return new RooSpinZero_7DComplex_withAccep_ggH(*this, newname); }
-  inline virtual ~RooSpinZero_7DComplex_withAccep_ggH(){}
+  RooSpinZero_7DComplex_withAccep_HVV(const RooSpinZero_7DComplex_withAccep_HVV& other, const char* name=0);
+  virtual TObject* clone(const char* newname) const { return new RooSpinZero_7DComplex_withAccep_HVV(*this, newname); }
+  inline virtual ~RooSpinZero_7DComplex_withAccep_HVV(){}
 
   Double_t evaluate() const;
   Int_t getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* rangeName=0) const;
   Double_t analyticalIntegral(Int_t code, const char* rangeName=0) const;
+
+  void setZZ4fOrdering(Bool_t flag=true);
 
 protected:
 
@@ -99,6 +101,8 @@ protected:
   RooRealProxy bM2;
   RooRealProxy cM2;
   RooRealProxy dM2;
+
+  Bool_t ZZ4fOrdering;
 
   void evaluatePolarizationTerms(Double_t& A00term, Double_t& Appterm, Double_t& Ammterm, Double_t& A00ppterm, Double_t& A00mmterm, Double_t& Appmmterm, const Int_t code, bool isGammaV1=false, bool isGammaV2=false) const;
 

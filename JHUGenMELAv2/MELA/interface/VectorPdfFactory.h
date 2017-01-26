@@ -19,7 +19,7 @@ public:
   RooRealVar* R1Val;
   RooRealVar* R2Val;
 
-  RooAbsPdf *PDF;
+  RooSpinOne_7D* PDF;
 
   RooRealVar* g1Val;
   RooRealVar* g2Val;
@@ -115,6 +115,8 @@ public:
       R2Val->setConstant(kFALSE);
     }
   };
+
+  void setZZ4fOrdering(bool flag=true){ PDF->setZZ4fOrdering(flag); }
 
 };
 

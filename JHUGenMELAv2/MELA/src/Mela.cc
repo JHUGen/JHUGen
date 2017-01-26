@@ -106,9 +106,9 @@ Mela::Mela(
   measurables_.Y = Y_rrv;
 
   if (myVerbosity_>=TVar::DEBUG) cout << "Create anaMELA PDF factories" << endl;
-  ggSpin0Model = new ScalarPdfFactory_ggH(measurables_, false, RooSpin::kVdecayType_Zll, RooSpin::kVdecayType_Zll); // RooSpin::kVdecayType_Zll,RooSpin::kVdecayType_Zll==ZZ
+  ggSpin0Model = new ScalarPdfFactory_HVV(measurables_, false, RooSpin::kVdecayType_Zll, RooSpin::kVdecayType_Zll); // RooSpin::kVdecayType_Zll,RooSpin::kVdecayType_Zll==ZZ
   spin1Model = new VectorPdfFactory(z1mass_rrv, z2mass_rrv, costhetastar_rrv, costheta1_rrv, costheta2_rrv, phi_rrv, phi1_rrv, mzz_rrv);
-  spin2Model = new TensorPdfFactory_HVV(measurables_, RooSpin::kVdecayType_Zll, RooSpin::kVdecayType_Zll);
+  spin2Model = new TensorPdfFactory_ppHVV(measurables_, RooSpin::kVdecayType_Zll, RooSpin::kVdecayType_Zll);
   qqZZmodel = new RooqqZZ_JHU_ZgammaZZ_fast("qqZZmodel", "qqZZmodel", *z1mass_rrv, *z2mass_rrv, *costheta1_rrv, *costheta2_rrv, *phi_rrv, *costhetastar_rrv, *phi1_rrv, *mzz_rrv, *upFrac_rrv);
 
   if (myVerbosity_>=TVar::DEBUG) cout << "Paths for newZZMatrixElement" << endl;

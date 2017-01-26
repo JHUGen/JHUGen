@@ -1,7 +1,7 @@
-#include "RooSpinZero_7DComplex_withAccep_ggH.h"
+#include "RooSpinZero_7DComplex_withAccep_HVV.h"
 
 
-RooSpinZero_7DComplex_withAccep_ggH::RooSpinZero_7DComplex_withAccep_ggH(
+RooSpinZero_7DComplex_withAccep_HVV::RooSpinZero_7DComplex_withAccep_HVV(
   const char *name, const char *title,
   modelMeasurables _measurables,
   modelParameters _parameters,
@@ -47,12 +47,13 @@ RooSpinZero_7DComplex_withAccep_ggH::RooSpinZero_7DComplex_withAccep_ggH(
   aM2("aM2", "aM2", this, (RooAbsReal&)*(_accepParams.aM2)),
   bM2("bM2", "bM2", this, (RooAbsReal&)*(_accepParams.bM2)),
   cM2("cM2", "cM2", this, (RooAbsReal&)*(_accepParams.cM2)),
-  dM2("dM2", "dM2", this, (RooAbsReal&)*(_accepParams.dM2))
+  dM2("dM2", "dM2", this, (RooAbsReal&)*(_accepParams.dM2)),
+  ZZ4fOrdering(true)
 {}
 
 
-RooSpinZero_7DComplex_withAccep_ggH::RooSpinZero_7DComplex_withAccep_ggH(
-  const RooSpinZero_7DComplex_withAccep_ggH& other, const char* name
+RooSpinZero_7DComplex_withAccep_HVV::RooSpinZero_7DComplex_withAccep_HVV(
+  const RooSpinZero_7DComplex_withAccep_HVV& other, const char* name
   ) : RooSpinZero(other, name),
   aPhi("aPhi", this, other.aPhi),
   bPhi("bPhi", this, other.bPhi),
@@ -86,10 +87,11 @@ RooSpinZero_7DComplex_withAccep_ggH::RooSpinZero_7DComplex_withAccep_ggH(
   aM2("aM2", this, other.aM2),
   bM2("bM2", this, other.bM2),
   cM2("cM2", this, other.cM2),
-  dM2("dM2", this, other.dM2)
+  dM2("dM2", this, other.dM2),
+  ZZ4fOrdering(other.ZZ4fOrdering)
 {}
 
-void RooSpinZero_7DComplex_withAccep_ggH::evaluatePolarizationTerms(Double_t& A00term, Double_t& Appterm, Double_t& Ammterm, Double_t& A00ppterm, Double_t& A00mmterm, Double_t& Appmmterm, const Int_t code, bool isGammaV1, bool isGammaV2) const{
+void RooSpinZero_7DComplex_withAccep_HVV::evaluatePolarizationTerms(Double_t& A00term, Double_t& Appterm, Double_t& Ammterm, Double_t& A00ppterm, Double_t& A00mmterm, Double_t& Appmmterm, const Int_t code, bool isGammaV1, bool isGammaV2) const{
   const Double_t Pi = TMath::Pi();
 
   Double_t R1Val, R2Val;
@@ -235,7 +237,7 @@ void RooSpinZero_7DComplex_withAccep_ggH::evaluatePolarizationTerms(Double_t& A0
   }
 }
 
-Double_t RooSpinZero_7DComplex_withAccep_ggH::evaluate() const{
+Double_t RooSpinZero_7DComplex_withAccep_HVV::evaluate() const{
   Double_t mV;
   getMVGamV(&mV);
   bool isZZ = (mV >= 90.);
@@ -243,7 +245,7 @@ Double_t RooSpinZero_7DComplex_withAccep_ggH::evaluate() const{
   Double_t m1_=m1; if (Vdecay1==RooSpin::kVdecayType_GammaOnshell) m1_=0;
   Double_t m2_=m2; if (Vdecay2==RooSpin::kVdecayType_GammaOnshell) m2_=0;
   if (isZZ && Vdecay1==Vdecay2){
-    if ((m1_+m2_) > m12 || (fabs(m2_-mV)<fabs(m1_-mV) && Vdecay2!=RooSpin::kVdecayType_GammaOnshell) || (m2_ <= 0. && Vdecay2!=RooSpin::kVdecayType_GammaOnshell) || (m1_ <= 0. && Vdecay1!=RooSpin::kVdecayType_GammaOnshell)) return epsilon;
+    if ((m1_+m2_) > m12 || (fabs(m2_-mV)<fabs(m1_-mV) && Vdecay2!=RooSpin::kVdecayType_GammaOnshell && ZZ4fOrdering) || (m2_ <= 0. && Vdecay2!=RooSpin::kVdecayType_GammaOnshell) || (m1_ <= 0. && Vdecay1!=RooSpin::kVdecayType_GammaOnshell)) return epsilon;
   }
   else if ((m1_+m2_) > m12 || ((m2_ <= 0. || m1_ <= 0.) && Vdecay1!=RooSpin::kVdecayType_GammaOnshell && Vdecay2!=RooSpin::kVdecayType_GammaOnshell)) return epsilon;
 
@@ -298,7 +300,7 @@ Double_t RooSpinZero_7DComplex_withAccep_ggH::evaluate() const{
   return value;
 }
 
-Int_t RooSpinZero_7DComplex_withAccep_ggH::getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* /*rangeName*/) const{
+Int_t RooSpinZero_7DComplex_withAccep_HVV::getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* /*rangeName*/) const{
   Int_t code = intCodeStart;
   if (checkFundamentalType(h1)){ if (matchArgs(allVars, analVars, h1) || Vdecay1==RooSpin::kVdecayType_GammaOnshell) code *= prime_h1; }
   if (checkFundamentalType(h2)){ if (matchArgs(allVars, analVars, h2) || Vdecay2==RooSpin::kVdecayType_GammaOnshell) code *= prime_h2; }
@@ -308,7 +310,7 @@ Int_t RooSpinZero_7DComplex_withAccep_ggH::getAnalyticalIntegral(RooArgSet& allV
   if (code==1) code=0;
   return code;
 }
-Double_t RooSpinZero_7DComplex_withAccep_ggH::analyticalIntegral(Int_t code, const char* /*rangeName*/) const{
+Double_t RooSpinZero_7DComplex_withAccep_HVV::analyticalIntegral(Int_t code, const char* /*rangeName*/) const{
   Double_t mV;
   getMVGamV(&mV);
   bool isZZ = (mV >= 90.);
@@ -316,7 +318,7 @@ Double_t RooSpinZero_7DComplex_withAccep_ggH::analyticalIntegral(Int_t code, con
   Double_t m1_=m1; if (Vdecay1==RooSpin::kVdecayType_GammaOnshell) m1_=0;
   Double_t m2_=m2; if (Vdecay2==RooSpin::kVdecayType_GammaOnshell) m2_=0;
   if (isZZ && Vdecay1==Vdecay2){
-    if ((m1_+m2_) > m12 || (fabs(m2_-mV)<fabs(m1_-mV) && Vdecay2!=RooSpin::kVdecayType_GammaOnshell) || (m2_ <= 0. && Vdecay2!=RooSpin::kVdecayType_GammaOnshell) || (m1_ <= 0. && Vdecay1!=RooSpin::kVdecayType_GammaOnshell)) return epsilon;
+    if ((m1_+m2_) > m12 || (fabs(m2_-mV)<fabs(m1_-mV) && Vdecay2!=RooSpin::kVdecayType_GammaOnshell && ZZ4fOrdering) || (m2_ <= 0. && Vdecay2!=RooSpin::kVdecayType_GammaOnshell) || (m1_ <= 0. && Vdecay1!=RooSpin::kVdecayType_GammaOnshell)) return epsilon;
   }
   else if ((m1_+m2_) > m12 || ((m2_ <= 0. || m1_ <= 0.) && Vdecay1!=RooSpin::kVdecayType_GammaOnshell && Vdecay2!=RooSpin::kVdecayType_GammaOnshell)) return epsilon;
 
@@ -363,3 +365,4 @@ Double_t RooSpinZero_7DComplex_withAccep_ggH::analyticalIntegral(Int_t code, con
   return value;
 }
 
+void RooSpinZero_7DComplex_withAccep_HVV::setZZ4fOrdering(Bool_t flag){ ZZ4fOrdering=flag; }

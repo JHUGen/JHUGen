@@ -19,7 +19,7 @@ class TH3F;
 class RooRealVar;
 class RooAbsPdf;
 class RooArgSet;
-class ScalarPdfFactory_ggH;
+class ScalarPdfFactory_HVV;
 class VectorPdfFactory;
 class TensorPdfFactory;
 class RooqqZZ_JHU_ZgammaZZ_fast;
@@ -29,9 +29,9 @@ class SuperMELA;
 #include "TVar.hh"
 #include "TEvtProb.hh"
 #include "MelaPConstant.h"
-#include "ScalarPdfFactory_ggH.h"
+#include "ScalarPdfFactory_HVV.h"
 #include "VectorPdfFactory.h"
-#include "TensorPdfFactory_HVV.h"
+#include "TensorPdfFactory_ppHVV.h"
 #include "RooqqZZ_JHU_ZgammaZZ_fast.h"
 
 class Mela{
@@ -208,9 +208,9 @@ public:
 
 
   RooAbsPdf* pdf;
-  ScalarPdfFactory_ggH* ggSpin0Model;
+  ScalarPdfFactory_HVV* ggSpin0Model;
   VectorPdfFactory* spin1Model;
-  TensorPdfFactory_HVV* spin2Model;
+  TensorPdfFactory_ppHVV* spin2Model;
   RooqqZZ_JHU_ZgammaZZ_fast* qqZZmodel;
 
   SuperMELA* super;
