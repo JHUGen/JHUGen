@@ -150,11 +150,14 @@ test:
     #same with lhapdf
     - "! grep 'UseLHAPDF *= *Yes' makefile"
     - sed -i -r -e "s/(UseLHAPDF *= *)Yes/\1No/" makefile
+    #will fail if LinkMELA is set to Yes, since MELAv2 has not been compiled yet
     - make
     - make:
          pwd:
            ../JHUGenMELA
     - cd ../JHUGenMELAv2/MELA && bash setup.sh
+    - sed -i -r -e "s/^(linkMELA *= *)No/\1Yes/" makefile
+    - make
     #check sync between generator and MELA
     - sdiff -s mod_Graviton.F90 ../JHUGenMELAv2/MELA/fortran/mod_Graviton.F90
     - sdiff -s mod_Higgs.F90 ../JHUGenMELAv2/MELA/fortran/mod_Higgs.F90
@@ -391,18 +394,7 @@ test:
     - ./JHUGen VegasNc0=100000 DecayMode1=11 DecayMode2=11 ReadLHE=$CIRCLE_ARTIFACTS/other/ZH_LHAPDF.lhe DataFile=$CIRCLE_ARTIFACTS/other/ZH_LHAPDF_WW
     - ./JHUGen VegasNc0=100000 TauDK=0                     ReadLHE=$CIRCLE_ARTIFACTS/other/ZH_LHAPDF.lhe DataFile=$CIRCLE_ARTIFACTS/other/ZH_LHAPDF_tautau
 
-    #make sure MELA compiles and runs
-    - ./testC:
-        pwd:
-          ../JHUGenMELA
-    - ./testF:
-        pwd:
-          ../JHUGenMELA
-    #should check that all the "should be" ME's are correct...
-    #make sure JHUGen compiles with linkMELA
-    - sed -i -r -e "s/(linkMELA *= *)No/\1Yes/" makefile
-    - make clean
-    - make
+    #put MELAv2 tests here
 
 
   post:
