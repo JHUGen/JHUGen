@@ -4,8 +4,7 @@ machine:
     - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.6 10
     - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.6 10
     - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.9 20
-    - sudo apt-get install dos2unix
-    - sudo apt-get install cadaver
+    - sudo apt-get install dos2unix cadaver tcsh
   environment:
     #environment variables can only be set in this section so . bin/thisroot.sh doesn't work
     PATH: "$(echo $HOME/root/bin:$HOME/CMSJHU_AnalysisMacros/JHUSpinWidthPaper_2015/LHEAnalyzer:$PATH | sed s/:$//)"
