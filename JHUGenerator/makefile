@@ -178,7 +178,7 @@ else
 endif
 	@echo " executable file "$(Exec)" is compiled with "$(Comp)
 	@echo " "
-	$(fcomp) -o $(Exec) $(MainObj) $(KinObj) $(AmpObj) $(PSGenObj) $(VegasObj) $(PDFObj) $(CPSObj) $(LHAPDFflags)
+	$(fcomp) -o $(Exec) $(MainObj) $(KinObj) $(AmpObj) $(PSGenObj) $(VegasObj) $(PDFObj) $(CPSObj) $(LHAPDFflags) $(MELAflags)
 
 
 
