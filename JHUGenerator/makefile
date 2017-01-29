@@ -25,7 +25,9 @@ UseLHAPDF=No
 MyLHADir=${LHAPDF_DATA_PATH}/../../lib/
 
 #link MCFM libraries from MELA
-linkMELA = No
+# remember to export
+#          LD_LIBRARY_PATH=/.../MELA/data/$SCRAM_ARCH/:${LD_LIBRARY_PATH}
+linkMELA = Yes
 
 
 ifeq ($(UseLHAPDF),Yes)

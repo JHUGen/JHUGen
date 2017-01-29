@@ -7,8 +7,10 @@ machine:
     - sudo apt-get install dos2unix cadaver tcsh
   environment:
     #environment variables can only be set in this section so . bin/thisroot.sh doesn't work
+    SCRAM_ARCH: "slc6_amd64_gcc530"
+
     PATH: "$(echo $HOME/root/bin:$HOME/CMSJHU_AnalysisMacros/JHUSpinWidthPaper_2015/LHEAnalyzer:$PATH | sed s/:$//)"
-    LD_LIBRARY_PATH: "$(echo $HOME/root/lib:$HOME/LHAPDF-6.1.6/lib:$LD_LIBRARY_PATH | sed s/:$//)"
+    LD_LIBRARY_PATH: "$(echo $HOME/JHUGen/JHUGenMELAv2/MELA/data/$SCRAM_ARCH:$HOME/root/lib:$HOME/LHAPDF-6.1.6/lib:$LD_LIBRARY_PATH | sed s/:$//)"
 
     SHLIB_PATH: "$(echo $HOME/root/lib:$SHLIB_PATH | sed s/:$//)"
     LIBPATH: "$(echo $HOME/root/lib:$LIBPATH | sed s/:$//)"
@@ -150,12 +152,18 @@ test:
     #same with lhapdf
     - "! grep 'UseLHAPDF *= *Yes' makefile"
     - sed -i -r -e "s/(UseLHAPDF *= *)Yes/\1No/" makefile
-    #will fail if LinkMELA is set to Yes, since MELAv2 has not been compiled yet
+
+    #want the default linkMELA to be Yes
+    - "grep 'linkMELA *= *Yes' makefile"
+    #but first test that it compiles without it
+    #(if not, the first make will fail since we haven't compiled MELA yet)
+    - sed -i -r -e "s/^(linkMELA *= *)Yes/\1No/" makefile
     - make
     - make:
          pwd:
            ../JHUGenMELA
     - cd ../JHUGenMELAv2/MELA && bash setup.sh
+    #now turn linkMELA back on
     - sed -i -r -e "s/^(linkMELA *= *)No/\1Yes/" makefile
     - make
     #check sync between generator and MELA
