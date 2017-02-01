@@ -5,7 +5,7 @@
 #include "RooSpinZero_7DComplex_withAccep_HVV.h"
 
 
-class ScalarPdfFactory_HVV : public ScalarPdfFactory {
+class ScalarPdfFactory_HVV : public ScalarPdfFactory{
 public:
   RooSpinZero_7DComplex_withAccep_HVV::accepParameters accepParams;
 
@@ -23,8 +23,9 @@ protected:
   virtual void initAcceptanceParams();
   virtual void destroyAcceptanceParams();
 
-  void initPDF();
-  void destroyPDF(){ delete PDF; }
+  virtual void initPDF();
+  virtual void destroyPDF(){ delete PDF; PDF=0; PDF_base=0; }
+
 };
 
 

@@ -302,8 +302,8 @@ Double_t RooSpinTwo_7DComplex_ppHVV::evaluate() const{
 
   Double_t term1Coeff = 1;
   Double_t term2Coeff = 1;
-  if (Vdecay1!=RooSpin::kVdecayType_GammaOnshell) term1Coeff = 2.*m1_;
-  if (Vdecay2!=RooSpin::kVdecayType_GammaOnshell) term2Coeff = 2.*m2_;
+  if (Vdecay1!=RooSpin::kVdecayType_GammaOnshell) term1Coeff = 2.*m1_*GeVunit;
+  if (Vdecay2!=RooSpin::kVdecayType_GammaOnshell) term2Coeff = 2.*m2_*GeVunit;
 
   std::vector<Double_t> Axxyyterm;
   evaluatePolarizationTerms(Axxyyterm, code);
@@ -347,8 +347,8 @@ Double_t RooSpinTwo_7DComplex_ppHVV::analyticalIntegral(Int_t code, const char* 
 
   Double_t term1Coeff = 1;
   Double_t term2Coeff = 1;
-  if (Vdecay1!=RooSpin::kVdecayType_GammaOnshell) term1Coeff = 2.*m1_;
-  if (Vdecay2!=RooSpin::kVdecayType_GammaOnshell) term2Coeff = 2.*m2_;
+  if (Vdecay1!=RooSpin::kVdecayType_GammaOnshell) term1Coeff = 2.*m1_*GeVunit;
+  if (Vdecay2!=RooSpin::kVdecayType_GammaOnshell) term2Coeff = 2.*m2_*GeVunit;
 
   std::vector<Double_t> Axxyyterm;
   evaluatePolarizationTerms(Axxyyterm, code);

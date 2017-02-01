@@ -163,8 +163,8 @@ Double_t RooSpinZero_3D_pp_VH::evaluate() const{
 
   Double_t term1Coeff = 1;
   Double_t term2Coeff = 1;
-  term1Coeff = pow(m1_, -2);
-  if (Vdecay2!=RooSpin::kVdecayType_GammaOnshell) term2Coeff = 2.*m2_;
+  term1Coeff = pow(m1_*GeVunit, -2);
+  if (Vdecay2!=RooSpin::kVdecayType_GammaOnshell) term2Coeff = 2.*m2_*GeVunit;
   Double_t plumi = partonicLuminosity(m1_, Y, sqrts);
 
   Double_t value = 0;
@@ -197,8 +197,8 @@ Double_t RooSpinZero_3D_pp_VH::analyticalIntegral(Int_t code, const char* /*rang
 
   Double_t term1Coeff = 1;
   Double_t term2Coeff = 1;
-  term1Coeff = pow(m1_, -2);
-  if (Vdecay2!=RooSpin::kVdecayType_GammaOnshell) term2Coeff = 2.*m2_;
+  term1Coeff = pow(m1_*GeVunit, -2);
+  if (Vdecay2!=RooSpin::kVdecayType_GammaOnshell) term2Coeff = 2.*m2_*GeVunit;
   Double_t plumi = partonicLuminosity(m1_, Y, sqrts);
 
   Double_t value = 0;

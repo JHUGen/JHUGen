@@ -5,7 +5,7 @@
 #include "TensorPdfFactory.h"
 
 
-class TensorPdfFactory_ppHVV : public TensorPdfFactory {
+class TensorPdfFactory_ppHVV : public TensorPdfFactory{
 public:
 
   TensorPdfFactory_ppHVV(RooSpin::modelMeasurables measurables_, RooSpin::VdecayType V1decay_=RooSpin::kVdecayType_Zll, RooSpin::VdecayType V2decay_=RooSpin::kVdecayType_Zll, Bool_t OnshellH_=true);
@@ -18,8 +18,9 @@ public:
 protected:
   RooSpinTwo_7DComplex_ppHVV* PDF;
 
-  void initPDF();
-  void destroyPDF(){ delete PDF; }
+  virtual void initPDF();
+  virtual void destroyPDF(){ delete PDF; PDF=0; PDF_base=0; }
+
 };
 
 

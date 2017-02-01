@@ -263,8 +263,8 @@ Double_t RooSpinZero_7DComplex_withAccep_HVV::evaluate() const{
 
   Double_t term1Coeff = 1;
   Double_t term2Coeff = 1;
-  if (Vdecay1!=RooSpin::kVdecayType_GammaOnshell) term1Coeff = 2.*m1_; // dm**2 = 2m dm
-  if (Vdecay2!=RooSpin::kVdecayType_GammaOnshell) term2Coeff = 2.*m2_;
+  if (Vdecay1!=RooSpin::kVdecayType_GammaOnshell) term1Coeff = 2.*m1_*GeVunit; // dm**2 = 2m dm
+  if (Vdecay2!=RooSpin::kVdecayType_GammaOnshell) term2Coeff = 2.*m2_*GeVunit;
 
   Double_t value = 0;
   Double_t val_A00=0, val_App=0, val_Amm=0, val_A0p=0, val_A0m=0, val_Amp=0;
@@ -328,8 +328,8 @@ Double_t RooSpinZero_7DComplex_withAccep_HVV::analyticalIntegral(Int_t code, con
 
   Double_t term1Coeff = 1;
   Double_t term2Coeff = 1;
-  if (Vdecay1!=RooSpin::kVdecayType_GammaOnshell) term1Coeff = 2.*m1_; // dm**2 = 2m dm
-  if (Vdecay2!=RooSpin::kVdecayType_GammaOnshell) term2Coeff = 2.*m2_;
+  if (Vdecay1!=RooSpin::kVdecayType_GammaOnshell) term1Coeff = 2.*m1_*GeVunit; // dm**2 = 2m dm
+  if (Vdecay2!=RooSpin::kVdecayType_GammaOnshell) term2Coeff = 2.*m2_*GeVunit;
 
   Double_t value = 0;
   Double_t val_A00=0, val_App=0, val_Amm=0, val_A0p=0, val_A0m=0, val_Amp=0;

@@ -71,7 +71,7 @@ public:
     RooAbsReal* vev;
   };
 
-  RooSpin(){};
+  RooSpin();
   RooSpin(
     const char* name, const char* title,
     modelMeasurables _measurables,
@@ -95,11 +95,6 @@ public:
 
 protected:
 
-  RooSpin::VdecayType Vdecay1;
-  RooSpin::VdecayType Vdecay2;
-
-  Int_t intCodeStart;
-
   RooRealProxy h1;
   RooRealProxy h2;
   RooRealProxy Phi;
@@ -118,6 +113,12 @@ protected:
   RooRealProxy gamZ;
   RooRealProxy Sin2ThetaW;
   RooRealProxy vev;
+
+  RooSpin::VdecayType Vdecay1;
+  RooSpin::VdecayType Vdecay2;
+
+  Int_t intCodeStart;
+  const Double_t GeVunit;
 
   virtual void calculatePropagator(Double_t& propRe, Double_t& propIm, Double_t mass, Int_t propType=1) const;
   virtual void calculateGVGA(Double_t& gV, Double_t& gA, RooSpin::VdecayType Vdecay, bool isGamma=false) const;

@@ -81,6 +81,7 @@ RooSpinZero* ScalarPdfFactory_VH::getPDF(){
 void ScalarPdfFactory_VH::destroyPDF(){
   if (PDF_ILC_5D!=0) delete PDF_ILC_5D;
   if (PDF_LHC_3D!=0) delete PDF_LHC_3D;
+  PDF_ILC_5D=0; PDF_LHC_3D=0; PDF_base=0;
 }
 
 
