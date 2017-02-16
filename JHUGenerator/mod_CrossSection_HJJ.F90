@@ -12,6 +12,7 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
 FUNCTION EvalWeighted_HJJ_fulldecay(yRnd,VgsWgt)
 use ModKinematics
 use ModParameters
+use ModMCFMWrapper
 use ModHiggsjj
 use ModHiggs
 use ModMisc
@@ -25,8 +26,7 @@ real(8) :: pdf(-6:6,1:2)           ,me2(-5:5,-5:5)
 real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi
 real(8) :: MomExt(1:4,1:10),PSWgt
 real(8) :: p_MCFM(mxpart,1:4),msq_MCFM(-5:5,-5:5)
-complex(8) :: HZZcoupl(1:32),HWWcoupl(1:32)
-integer :: MY_IDUP(1:10),ICOLUP(1:2,1:10),NBin(1:NumHistograms),NHisto
+integer :: id_MCFM(mxpart),MY_IDUP(1:10),ICOLUP(1:2,1:10),NBin(1:NumHistograms),NHisto
 integer :: iPartChannel,PartChannelAvg,NumPartonicChannels,ijSel(1:121,1:3),iflip,i,j
 real(8) :: LO_Res_Unpol, PreFac,VegasWeighted_HJJ_fulldecay,xRnd,me2_hdk,me2_prop,me2_tmpzz(-5:5,-5:5),me2_tmpww(-5:5,-5:5),me2_zzcontr(-5:5,-5:5),me2_wwcontr(-5:5,-5:5)
 logical :: applyPSCut
@@ -53,6 +53,12 @@ EvalWeighted_HJJ_fulldecay = 0d0
    endif
    if( (unweighted) .and. (.not. warmup) .and. (AccepCounter_part(iPart_sel,jPart_sel) .ge. RequEvents(iPart_sel,jPart_Sel))  ) return
 
+   ! FIXME: TEMPORARY ASSIGNMENT OF I J R S
+   id_MCFM(1) = iPart_sel
+   id_MCFM(2) = jPart_sel
+   id_MCFM(7) = 0
+   id_MCFM(8) = 0
+   id_MCFM(3:6) = (/ ElM_,ElP_,MuM_,MuP_ /)
 
    call PDFMapping(2,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
    call EvalPhasespace_VBF_H4f(yRnd(3),yRnd(4:17),EHat,MomExt(1:4,1:10),PSWgt)
@@ -102,18 +108,6 @@ EvalWeighted_HJJ_fulldecay = 0d0
    call convert_to_MCFM(+MomExt(1:4,outTop)*100d0,p_MCFM(7,1:4))
    call convert_to_MCFM(+MomExt(1:4,outBot)*100d0,p_MCFM(8,1:4))
 
-   HZZcoupl(1) = 1d0  !ghz1
-   HZZcoupl(2) = ghz2
-   HZZcoupl(3) = ghz3
-   HZZcoupl(4) = ghz4
-   HZZcoupl(5:) = (0d0,0d0)
-
-   HWWcoupl(1) = 1d0! HZZcoupl(1)!  ghw1  ! this is actually wrong
-   HWWcoupl(2) = ghw2
-   HWWcoupl(3) = ghw3
-   HWWcoupl(4) = ghw4
-   HWWcoupl(5:) = (0d0,0d0)
-
 !    print *, (MomExt(1:4,1)).dot.(MomExt(1:4,1))
 !    print *, (MomExt(1:4,2)).dot.(MomExt(1:4,2))
 !    print *, (MomExt(1:4,3)).dot.(MomExt(1:4,3))
@@ -138,99 +132,15 @@ EvalWeighted_HJJ_fulldecay = 0d0
 
  msq_MCFM(:,:) = 0d0
 #if linkMELA==1
- call qq_ZZqq(p_MCFM,msq_MCFM,HZZcoupl,HWWcoupl,Lambda*100d0,Lambda_Q*100d0,(/Lambda_z1,Lambda_z2,Lambda_z3,Lambda_z4/)*100d0)!  q(-p1)+q(-p2)->Z(p3,p4)+Z(p5,p6)+q(p7)+q(p8)
+   call EvalAmp_qqVVqq(id_MCFM, p_MCFM, 1, msq_MCFM) ! 1 for ZZ decay, 2 for WW decay, 3 for ZZ+WW mixture
 #else
  print *, "To use this process, please set linkMELA=Yes in the makefile and recompile."
  print *, "You will also need to have a compiled JHUGenMELA in the directory specified by JHUGenMELADir in the makefile."
  stop 1
 #endif
- ! large overhead here because MCFM computes all partonic channels and we only use msq_MCFM(iPart_sel,jPart_sel)  !
-
-
-!   CHECKS:
-   print *,"msq_MCFM:"
-   do j=-5,5
-   print *, msq_MCFM(-5,j), msq_MCFM(-4,j), msq_MCFM(-3,j), msq_MCFM(-2,j), msq_MCFM(-1,j), msq_MCFM(0,j), msq_MCFM(1,j), msq_MCFM(2,j), msq_MCFM(3,j), msq_MCFM(4,j), msq_MCFM(5,j)
-   enddo
-   print *,""
-
-   me2(:,:)=0d0
-   me2_zzcontr(:,:)=0d0
-   me2_wwcontr(:,:)=0d0
-   do i=-5,5
-   do j=i,5
-
-      me2_tmpzz(:,:)=0d0
-      me2_tmpww(:,:)=0d0
-
-      call EvalAmp_WBFH_UnSymm_SA_Select( (/MomExt(1:4,1),MomExt(1:4,2),MomExt(1:4,3),MomExt(1:4,4),MomExt(1:4,5)+MomExt(1:4,6)/),i,j,.true.,iflip,me2_tmpzz) ! calling on-shell VBF with stable Higgs
-      !if (iflip.eq.2) then
-      !   call swap(me2_tmpzz(i,j),me2_tmpzz(j,i))
-      !endif
-
-      !call EvalAmp_WBFH_UnSymm_SA_Select( (/MomExt(1:4,1),MomExt(1:4,2),MomExt(1:4,3),MomExt(1:4,4),MomExt(1:4,5)+MomExt(1:4,6)/),i,j,.true.,iflip,me2_tmpww) ! calling on-shell VBF with stable Higgs
-      !if (iflip.eq.1) then
-      !   call swap(me2_tmpww(i,j),me2_tmpww(j,i))
-      !endif
-      me2 = me2 + me2_tmpzz + me2_tmpww
-      me2_zzcontr = me2_zzcontr + me2_tmpzz
-      me2_wwcontr = me2_wwcontr + me2_tmpww
-
-   enddo
-   enddo
-!   call EvalAmp_WBFH_UnSymm_SA(MomExt(1:4,1:5),me2)
-! !   msq_MCFM(:,:) = me2(:,:)
-
-   call EvalAmp_H_VV( (/MomExt(1:4,5)+MomExt(1:4,6),(/0d0,0d0,0d0,0d0/),MomExt(1:4,7),MomExt(1:4,8),MomExt(1:4,9),MomExt(1:4,10)/),(/ElM_,ElP_,MuM_,MuP_/),me2_hdk)                     ! adding higgs decay
-   print *,"me2_hdk:",me2_hdk
-
-   me2_prop = cdabs(1d0/( ((MomExt(1:4,5)+MomExt(1:4,6)).dot.(MomExt(1:4,5)+MomExt(1:4,6))) - m_Reso**2 + (0d0,1d0)*m_Reso*Ga_Reso ))**2
-   print *,"me2_prop:",me2_prop
-
-   me2(:,:) = me2(:,:) * me2_hdk * me2_prop !  adding higgs propagator
-   me2_zzcontr(:,:) = me2_zzcontr(:,:) * me2_hdk * me2_prop !  adding higgs propagator
-   me2_wwcontr(:,:) = me2_wwcontr(:,:) * me2_hdk * me2_prop !  adding higgs propagator
-   print *,"me2:"
-   do j=-5,5
-   print *, me2(-5,j), me2(-4,j), me2(-3,j), me2(-2,j), me2(-1,j), me2(0,j), me2(1,j), me2(2,j), me2(3,j), me2(4,j), me2(5,j)
-   enddo
-   print *,""
-   print *,"me2_zzcontr:"
-   do j=-5,5
-   print *, me2_zzcontr(-5,j), me2_zzcontr(-4,j), me2_zzcontr(-3,j), me2_zzcontr(-2,j), me2_zzcontr(-1,j), me2_zzcontr(0,j), me2_zzcontr(1,j), me2_zzcontr(2,j), me2_zzcontr(3,j), me2_zzcontr(4,j), me2_zzcontr(5,j)
-   enddo
-   print *,""
-   print *,"me2_wwcontr:"
-   do j=-5,5
-   print *, me2_wwcontr(-5,j), me2_wwcontr(-4,j), me2_wwcontr(-3,j), me2_wwcontr(-2,j), me2_wwcontr(-1,j), me2_wwcontr(0,j), me2_wwcontr(1,j), me2_wwcontr(2,j), me2_wwcontr(3,j), me2_wwcontr(4,j), me2_wwcontr(5,j)
-   enddo
-   print *,""
-   !print *, "rat", msq_MCFM(j,i)/me2(i,j)
-   pause
-
 
    LO_Res_Unpol = msq_MCFM(iPart_sel,jPart_sel)  *  pdf(LHA2M_pdf(iPart_sel),1) * pdf(LHA2M_pdf(jPart_sel),2)
 
-
-
-
-
-! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
-
-call EvalAmp_WBFH_UnSymm_SA_Select( (/MomExt(1:4,1),MomExt(1:4,2),MomExt(1:4,3),MomExt(1:4,4),MomExt(1:4,5)+MomExt(1:4,6)/),2,4,.true.,iflip,me2)                ! calling on-shell VBF with stable Higgs
-
-call EvalAmp_H_VV( (/MomExt(1:4,5)+MomExt(1:4,6),(/0d0,0d0,0d0,0d0/),MomExt(1:4,7),MomExt(1:4,8),MomExt(1:4,9),MomExt(1:4,10)/),(/ElM_,ElP_,MuM_,MuP_/),me2_hdk) ! adding higgs decay
-me2 = me2 * me2_hdk !
-
-me2 = me2 * cdabs(1d0/( ((MomExt(1:4,5)+MomExt(1:4,6)).dot.(MomExt(1:4,5)+MomExt(1:4,6))) - m_Reso**2 + (0d0,1d0)*m_Reso*Ga_Reso ))**2 !  adding higgs propagator
-
-
-print *, "MCFM", msq_MCFM(2,4)
-print *, "JHUG",me2(2,4)
-print *, "ratio",msq_MCFM(2,4)/me2(2,4)
-pause
-
-! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
 
 
 
@@ -380,6 +290,7 @@ END FUNCTION
 FUNCTION EvalUnWeighted_HJJ_fulldecay(yRnd,genEvt,iPartons,RES)
 use ModKinematics
 use ModParameters
+use ModMCFMWrapper
 use ModHiggsjj
 use ModMisc
 #if compiler==1
@@ -392,8 +303,7 @@ real(8) :: pdf(-6:6,1:2)   ,me2(-5:5,-5:5),RES(-5:5,-5:5)
 real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi
 real(8) :: MomExt(1:4,1:10),PSWgt,CS_Max
 real(8) :: p_MCFM(mxpart,1:4),msq_MCFM(-5:5,-5:5)
-complex(8) :: HZZcoupl(1:32),HWWcoupl(1:32)
-integer :: i,j,MY_IDUP(1:10),ICOLUP(1:2,1:10),NBin(1:NumHistograms),NHisto,iPartons(1:2)
+integer :: id_MCFM(mxpart),i,j,MY_IDUP(1:10),ICOLUP(1:2,1:10),NBin(1:NumHistograms),NHisto,iPartons(1:2)
 real(8) :: LO_Res_Unpol,LO_Res_Pol, PreFac,BWJacobi
 logical :: applyPSCut,genEvt
 integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, Lep1M=8, Lep2P=9, Lep2M=10
@@ -418,6 +328,13 @@ EvalUnWeighted_HJJ_fulldecay = 0d0
    FluxFac = 1d0/(2d0*EHat**2)
 
 
+   ! FIXME: TEMPORARY ASSIGNMENT OF I J R S, NEEDS FIXING
+   id_MCFM(1) = 0
+   id_MCFM(2) = 0
+   id_MCFM(7) = id_MCFM(1)
+   id_MCFM(8) = id_MCFM(2)
+   id_MCFM(3:6) = (/ ElM_,ElP_,MuM_,MuP_ /)
+
    MY_IDUP(1:10) = (/Up_,Up_,Up_,Up_, Z0_,Z0_, ElM_,ElP_,MuM_,MuP_/)
    ICOLUP(1:2,1) = (/501,0/)
    ICOLUP(1:2,2) = (/0,502/)
@@ -435,34 +352,27 @@ EvalUnWeighted_HJJ_fulldecay = 0d0
    call convert_to_MCFM(+MomExt(1:4,outTop)*100d0,p_MCFM(7,1:4))
    call convert_to_MCFM(+MomExt(1:4,outBot)*100d0,p_MCFM(8,1:4))
 
-   HZZcoupl(1) = (1d0,0d0)
-   HWWcoupl(:) = HZZcoupl(:)
    msq_MCFM(:,:) = 0d0
-
-
-
 
 IF( GENEVT ) THEN
 
 #if linkMELA==1
-          call qq_ZZqq(p_MCFM,msq_MCFM,HZZcoupl,HWWcoupl,Lambda*100d0,Lambda_Q*100d0,(/Lambda_z1,Lambda_z2,Lambda_z3,Lambda_z4/)*100d0)!  q(-p1)+q(-p2)->Z(p3,p4)+Z(p5,p6)+q(p7)+q(p8)
+   call EvalAmp_qqVVqq(id_MCFM, p_MCFM, 1, msq_MCFM) ! 1 for ZZ decay, 2 for WW decay, 3 for ZZ+WW mixture
 #else
           print *, "To use this process, please set linkMELA=Yes in the makefile and recompile."
           print *, "You will also need to have a compiled JHUGenMELA in the directory specified by JHUGenMELADir in the makefile."
           stop 1
 #endif
           LO_Res_Unpol = 0d0
-!           do i = -5,5
-!               do j = -5,5
-do i = 1,1
-do j = 2,2
+          do i = 1,1
+              do j = 2,2
                 LO_Res_Unpol = LO_Res_Unpol + msq_MCFM(i,j) * pdf(LHA2M_pdf(i),1)*pdf(LHA2M_pdf(j),2)
               enddo
           enddo
           PreFac = fbGeV2 * FluxFac * PSWgt * sHatJacobi
           EvalUnWeighted_HJJ_fulldecay = LO_Res_Unpol * PreFac
 
-      CS_max = CSmax(iPartons(1),iPartons(2))
+          CS_max = CSmax(iPartons(1),iPartons(2))
 
 ! print *, "check",iPartons(1:2)
 ! print *, "check",EvalUnWeighted_HJJ_fulldecay ,yRnd(16)*CS_max,CS_max;pause
@@ -486,7 +396,7 @@ ELSE! NOT GENEVT
 
 
 #if linkMELA==1
-   call qq_ZZqq(p_MCFM,msq_MCFM,HZZcoupl,HWWcoupl,Lambda*100d0,Lambda_Q*100d0,(/Lambda_z1,Lambda_z2,Lambda_z3,Lambda_z4/)*100d0)!  q(-p1)+q(-p2)->Z(p3,p4)+Z(p5,p6)+q(p7)+q(p8)
+   call EvalAmp_qqVVqq(id_MCFM, p_MCFM, 1, msq_MCFM) ! 1 for ZZ decay, 2 for WW decay, 3 for ZZ+WW mixture
 #else
    print *, "To use this process, please set linkMELA=Yes in the makefile and recompile."
    print *, "You will also need to have a compiled JHUGenMELA in the directory specified by JHUGenMELADir in the makefile."
@@ -497,8 +407,8 @@ ELSE! NOT GENEVT
    LO_Res_Unpol = 0d0
 !    do i = -5,5
 !       do j = -5,5
-do i = 1,1
-do j = 2,2
+   do i = 1,1
+      do j = 2,2
          LO_Res_Pol = msq_MCFM(i,j) * pdf(LHA2M_pdf(i),1)*pdf(LHA2M_pdf(j),2) * PreFac
 
          RES(i,j) = LO_Res_Pol
