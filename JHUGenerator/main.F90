@@ -6,9 +6,6 @@ PROGRAM JHUGenerator
 #if compiler==1
 use ifport
 #endif
-#if linkMELA==1
-use ModMCFMWrapper
-#endif
 use ModCrossSection
 use ModKinematics
 use ModParameters
@@ -34,8 +31,7 @@ real(8) :: VG_Result,VG_Error
       call InitOutput(1d0, 1d14)   !for VBF/HJJ the cross section is calculated, so use that in the <init> block
    endif
 #if linkMELA==1
-   call MCFM_firsttime()
-   call Init_MCFMCommon_energy(Collider_Energy/GeV)
+   call SetupMCFM(Process)
 #endif
    write(io_stdout,*) " Running"
    if( ConvertLHEFile ) then
@@ -1399,6 +1395,24 @@ include "vegas_common.f"
 END SUBROUTINE
 
 
+#if linkMELA==1
+subroutine SetupMCFM(Process)
+use ModMCFMWrapper
+implicit none
+integer, intent(in) :: Process
+
+   call MCFM_firsttime()
+
+   if( &
+      Process.eq.66 .or.  &
+      Process.eq.67 .or.  &
+      Process.eq.68       &
+      ) then
+      call Setup_MCFM_qqVVqq_firsttime(Process)
+   endif
+
+end subroutine
+#endif
 
 
 
