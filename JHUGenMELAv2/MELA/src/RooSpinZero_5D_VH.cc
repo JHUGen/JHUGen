@@ -153,7 +153,7 @@ Double_t RooSpinZero_5D_VH::evaluate() const{
   if (Vdecay2==RooSpin::kVdecayType_GammaOnshell) code *= prime_h2*prime_Phi;
 
   Double_t betaValSq = (1.-(pow(m12-m2_, 2)/pow(m1_, 2)))*(1.-(pow(m12+m2_, 2)/pow(m1_, 2)));
-  if (betaValSq<0) return epsilon;
+  if (betaValSq<=0.) return epsilon;
   Double_t betaVal = sqrt(betaValSq);
 
   Double_t term1Coeff = 1;
@@ -186,7 +186,7 @@ Double_t RooSpinZero_5D_VH::analyticalIntegral(Int_t code, const char* /*rangeNa
   if ((m12+m2_) > m1_ || (m2_ <= 0. && Vdecay2!=RooSpin::kVdecayType_GammaOnshell) || m1_ <= 0.) return epsilon;
 
   Double_t betaValSq = (1.-(pow(m12-m2_, 2)/pow(m1_, 2)))*(1.-(pow(m12+m2_, 2)/pow(m1_, 2)));
-  if (betaValSq<0) return epsilon;
+  if (betaValSq<=0.) return epsilon;
   Double_t betaVal = sqrt(betaValSq);
 
   Double_t term1Coeff = 1;

@@ -244,10 +244,12 @@ Double_t RooSpinZero_7DComplex_withAccep_HVV::evaluate() const{
   Double_t epsilon=1e-15;
   Double_t m1_=m1; if (Vdecay1==RooSpin::kVdecayType_GammaOnshell) m1_=0;
   Double_t m2_=m2; if (Vdecay2==RooSpin::kVdecayType_GammaOnshell) m2_=0;
-  if (isZZ && Vdecay1==Vdecay2){
-    if ((m1_+m2_) > m12 || (fabs(m2_-mV)<fabs(m1_-mV) && Vdecay2!=RooSpin::kVdecayType_GammaOnshell && ZZ4fOrdering) || (m2_ <= 0. && Vdecay2!=RooSpin::kVdecayType_GammaOnshell) || (m1_ <= 0. && Vdecay1!=RooSpin::kVdecayType_GammaOnshell)) return epsilon;
-  }
-  else if ((m1_+m2_) > m12 || ((m2_ <= 0. || m1_ <= 0.) && Vdecay1!=RooSpin::kVdecayType_GammaOnshell && Vdecay2!=RooSpin::kVdecayType_GammaOnshell)) return epsilon;
+  if (
+    (m1_+m2_)>m12 ||
+    (isZZ && Vdecay1==Vdecay2 && ZZ4fOrdering && fabs(m2_-mV)<fabs(m1_-mV) && Vdecay2!=RooSpin::kVdecayType_GammaOnshell) ||
+    (m1_<=0. && Vdecay1!=RooSpin::kVdecayType_GammaOnshell) ||
+    (m2_<=0. && Vdecay2!=RooSpin::kVdecayType_GammaOnshell)
+    ) return epsilon;
 
   Int_t code = intCodeStart;
   if (Vdecay1==RooSpin::kVdecayType_GammaOnshell || Vdecay2==RooSpin::kVdecayType_GammaOnshell){
@@ -258,7 +260,7 @@ Double_t RooSpinZero_7DComplex_withAccep_HVV::evaluate() const{
   }
 
   Double_t betaValSq = (1.-(pow(m1_-m2_, 2)/pow(m12, 2)))*(1.-(pow(m1_+m2_, 2)/pow(m12, 2)));
-  if (betaValSq<0) return epsilon;
+  if (betaValSq<=0.) return epsilon;
   Double_t betaVal = sqrt(betaValSq);
 
   Double_t term1Coeff = 1;
@@ -317,13 +319,15 @@ Double_t RooSpinZero_7DComplex_withAccep_HVV::analyticalIntegral(Int_t code, con
   Double_t epsilon=1e-10;
   Double_t m1_=m1; if (Vdecay1==RooSpin::kVdecayType_GammaOnshell) m1_=0;
   Double_t m2_=m2; if (Vdecay2==RooSpin::kVdecayType_GammaOnshell) m2_=0;
-  if (isZZ && Vdecay1==Vdecay2){
-    if ((m1_+m2_) > m12 || (fabs(m2_-mV)<fabs(m1_-mV) && Vdecay2!=RooSpin::kVdecayType_GammaOnshell && ZZ4fOrdering) || (m2_ <= 0. && Vdecay2!=RooSpin::kVdecayType_GammaOnshell) || (m1_ <= 0. && Vdecay1!=RooSpin::kVdecayType_GammaOnshell)) return epsilon;
-  }
-  else if ((m1_+m2_) > m12 || ((m2_ <= 0. || m1_ <= 0.) && Vdecay1!=RooSpin::kVdecayType_GammaOnshell && Vdecay2!=RooSpin::kVdecayType_GammaOnshell)) return epsilon;
+  if (
+    (m1_+m2_)>m12 ||
+    (isZZ && Vdecay1==Vdecay2 && ZZ4fOrdering && fabs(m2_-mV)<fabs(m1_-mV) && Vdecay2!=RooSpin::kVdecayType_GammaOnshell) ||
+    (m1_<=0. && Vdecay1!=RooSpin::kVdecayType_GammaOnshell) ||
+    (m2_<=0. && Vdecay2!=RooSpin::kVdecayType_GammaOnshell)
+    ) return epsilon;
 
   Double_t betaValSq = (1.-(pow(m1_-m2_, 2)/pow(m12, 2)))*(1.-(pow(m1_+m2_, 2)/pow(m12, 2)));
-  if (betaValSq<0) return epsilon;
+  if (betaValSq<=0.) return epsilon;
   Double_t betaVal = sqrt(betaValSq);
 
   Double_t term1Coeff = 1;
