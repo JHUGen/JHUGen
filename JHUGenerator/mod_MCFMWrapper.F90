@@ -3,7 +3,7 @@ implicit none
 private
 
 public :: MCFM_firsttime
-public :: Setup_MCFM_qqVVqq_firsttime,Setup_MCFM_qqVVqq
+public :: Setup_MCFM_qqVVqq_firsttime,Setup_MCFM_qqVVqq,EvalAmp_qqVVqq
 
 integer, parameter :: mxpart=14
 integer, parameter :: mxdim=26
@@ -774,477 +774,6 @@ subroutine Init_MCFMCommon_ewinput(Gf_inp_in,aemmz_inp_in,xw_inp_in,wmass_inp_in
 end subroutine
 
 
-! Setup functions for specific MCFM processes
-! qqZZqq/qqWWqq/qqVVqq (or _strong versions)
-subroutine Setup_MCFM_qqVVqq_firsttime(iProc)
-implicit none
-integer, intent(in) :: iProc
-integer npart
-common/npart/npart
-integer nwz
-common/nwz/nwz
-integer ndim,ncall,itmx,nprn
-double precision xl(mxdim),xu(mxdim),acc
-common/bveg1/xl,xu,acc,ndim,ncall,itmx,nprn
-integer nqcdjets,nqcdstart
-common/nqcdjets/nqcdjets,nqcdstart
-integer n2,n3
-double precision mass2,width2,mass3,width3
-common/breit/n2,n3,mass2,width2,mass3,width3
-logical interference,bw34_56
-common/interference/interference,bw34_56
-double precision vsymfact
-common/vsymfact/vsymfact
-double precision &
-md, mu, ms, mc, mb, mt, &
-mel, mmu, mtau, &
-hmass, hwidth, &
-wmass, wwidth, &
-zmass, zwidth, &
-twidth, &
-tauwidth, &
-mtausq, mcsq, mbsq
-common/masses/ &
-md, mu, ms, mc, mb, mt, &
-mel, mmu, mtau, &
-hmass, hwidth, &
-wmass, wwidth, &
-zmass, zwidth, &
-twidth, &
-tauwidth, &
-mtausq, mcsq, mbsq
-
-   if (iProc.eq.66) then ! Signal-only
-      MCFM_runstring="wbfHO"
-   else if (iProc.eq.67) then ! Bkg-only
-      MCFM_runstring="wbfHO"
-   else if (iProc.eq.68) then  ! Signal+bkg
-      MCFM_runstring="wbfALL" ! Doesn't matter what it is
-   else
-      return ! Not qqVVqq, so skip this function
-   endif
-
-   npart=6
-   nwz=2
-   call ckmfill(nwz)
-   ndim=16
-   nqcdjets=2
-   n2=1
-   n3=1
-   mass2 =zmass
-   width2=zwidth
-   mass3 =zmass
-   width3=zwidth
-
-   ! These two flags are to be changed depending on the 4f flavor
-   vsymfact=1d0
-   interference=.false.
-
-end subroutine
-function Setup_MCFM_qqVVqq(pid_MCFM_in,p_MCFM_in,pid_MCFM,p_MCFM)
-implicit none
-logical :: Setup_MCFM_qqVVqq
-integer, intent(in) :: pid_MCFM_in(1:mxpart)
-real(8), intent(in) :: p_MCFM_in(1:mxpart,1:4)
-integer, intent(out) :: pid_MCFM(1:mxpart)
-real(8), intent(out) :: p_MCFM(1:mxpart,1:4)
-integer :: decayOrdering(1:4)
-integer :: apartOrdering(1:2)
-integer :: ip
-
-logical interference,bw34_56
-common/interference/interference,bw34_56
-double precision vsymfact
-common/vsymfact/vsymfact
-
-double precision l(nf),r(nf),le,ln,re,rn,sin2w,q1,l1,r1,q2,l2,r2
-common/zcouple/l,r,q1,l1,r1,q2,l2,r2,le,ln,re,rn,sin2w
-
-   Setup_MCFM_qqVVqq=.false.
-   pid_MCFM(:) = pid_MCFM_in(:)
-   p_MCFM(:,:) = p_MCFM_in(:,:)
-
-   ! Assign ordered daughter momenta
-   call Check_DaughterOrdering_MCFM_qqVVqq(pid_MCFM_in(3:6),decayOrdering)
-   do ip=0,3
-      p_MCFM(3+ip,:) = p_MCFM_in(3+decayOrdering(ip+1),:)
-      pid_MCFM(3+ip) = pid_MCFM_in(3+decayOrdering(ip+1))
-   enddo
-
-   ! Assign ordered associated particle momenta
-   call Check_APartHash_MCFM_qqVVqq( &
-      (/ pid_MCFM_in(1),pid_MCFM_in(2),pid_MCFM_in(7),pid_MCFM_in(8) /), &
-      apartOrdering)
-   if (apartOrdering(1).eq.-1 .or. apartOrdering(2).eq.-1) then
-      return
-   else
-      do ip=0,1
-      p_MCFM(7+ip,:) = p_MCFM_in(7+apartOrdering(ip+1),:)
-      pid_MCFM(7+ip) = pid_MCFM_in(7+apartOrdering(ip+1))
-      enddo
-   endif
-
-   ! Turn 4f interference on as needed
-   if( &
-   abs(pid_MCFM_in(3)).eq.abs(pid_MCFM_in(5)) .and. abs(pid_MCFM_in(4)).eq.abs(pid_MCFM_in(6)) &
-   .and. pid_MCFM_in(3).ne.0 .and. pid_MCFM_in(6).ne.6 &
-   ) then
-      vsymfact=0.5d0
-      interference=.true.
-   endif
-
-   ! Set l1, l2
-   l1=0d0;r1=0d0;q1=0d0
-   l2=0d0;r2=0d0;q2=0d0
-   if (pid_MCFM(3).eq.-pid_MCFM(4)) then
-      call Set_MCFMCommon_DecayZCouple_Wrapper(pid_MCFM(3),1)
-   endif
-   if (pid_MCFM(5).eq.-pid_MCFM(6)) then
-      call Set_MCFMCommon_DecayZCouple_Wrapper(pid_MCFM(5),2)
-   endif
-   Setup_MCFM_qqVVqq = .true.
-
-end function
-
-! Subroutines to check and pass the ordering for the decay particles in the "main" system (e.g. H->4f decay)
-subroutine Check_DaughterOrdering_MCFM_qqVVqq(idPart,order)
-use ModParameters
-use ModMisc
-implicit none
-integer, intent(in) :: idPart(1:4)
-integer, intent(out) :: order(1:4)
-integer :: ip, idV(1:2)
-logical :: isZZ, isWW
-
-character*30 runstring
-common/runstring/runstring
-
-   order(:)=(/ 0,1,2,3 /)
-   idV(:)=0
-
-   if( idPart(1).ne.0 .and. idPart(2).ne.0) then
-      idV(1)=CoupledVertex(idPart(1:2),-1)
-   endif
-   if( idPart(3).ne.0 .and. idPart(4).ne.0) then
-      idV(2)=CoupledVertex(idPart(3:4),-1)
-   endif
-   isZZ = (idV(1).eq.Z0_ .or. idV(1).eq.0) .and. (idV(2).eq.Z0_ .or. idV(2).eq.0)
-   isWW = (idV(1).eq.abs(Wp_) .or. idV(1).eq.0) .and. (idV(2).eq.abs(Wp_) .or. idV(2).eq.0)
-
-   if ( &
-   isZZ .and. (&
-   IsALepton(idPart(1)) .or. &
-   IsDownTypeQuark(idPart(1)) .or. &
-   IsANeutrino(idPart(3)) .or. &
-   IsUpTypeQuark(idPart(3)) &
-   )  .or. &
-   isWW .and. (&
-   idV(1).eq.Wm_ .and. idV(2).eq.Wp_ &
-   ) &
-   ) then
-      call swap(order(1),order(3))
-      call swap(order(2),order(4))
-   endif
-
-   if (isWW) then
-      call swap(order(1),order(3))
-      runstring = trim(MCFM_runstring) // '_ww' ! wbfXY_ww needed to have WW-only final state since we use qq_VVqq process. This needs to be changed somehow if we want to simulate ZZ+WW->4f
-   endif
-end subroutine
-
-! Subroutines to check and pass the ordering for the associated particles
-subroutine Check_APartHash_MCFM_qqVVqq(idAPart,order) ! idAPart is in JHU convention
-use ModParameters
-implicit none
-integer, intent(in) :: idAPart(1:4)
-integer, intent(out) :: order(1:2) ! Final state ordering; initial state remains the same
-integer, parameter :: hashSize = 204
-integer :: hash(1:4,1:hashSize),ih
-logical  :: outFound
-
-   hash(:,1) = (/ Up_ , Chm_ , Up_ , Chm_ /)
-   hash(:,2) = (/ Dn_ , Str_ , Dn_ , Str_ /)
-   hash(:,3) = (/ Dn_ , Bot_ , Dn_ , Bot_ /)
-   hash(:,4) = (/ Str_ , Bot_ , Str_ , Bot_ /)
-   hash(:,5) = (/ Up_ , Str_ , Up_ , Str_ /)
-   hash(:,6) = (/ Up_ , Bot_ , Up_ , Bot_ /)
-   hash(:,7) = (/ Chm_ , Bot_ , Chm_ , Bot_ /)
-   hash(:,8) = (/ Dn_ , Chm_ , Dn_ , Chm_ /)
-   hash(:,9) = (/ Dn_ , Up_ , Dn_ , Up_ /)
-   hash(:,10) = (/ Str_ , Chm_ , Str_ , Chm_ /)
-   hash(:,11) = (/ Dn_ , Chm_ , Up_ , Str_ /)
-   hash(:,12) = (/ Up_ , Str_ , Dn_ , Chm_ /)
-   hash(:,13) = (/ Up_ , Up_ , Up_ , Up_ /)
-   hash(:,14) = (/ Chm_ , Chm_ , Chm_ , Chm_ /)
-   hash(:,15) = (/ Dn_ , Dn_ , Dn_ , Dn_ /)
-   hash(:,16) = (/ Str_ , Str_ , Str_ , Str_ /)
-   hash(:,17) = (/ Bot_ , Bot_ , Bot_ , Bot_ /)
-   hash(:,18) = (/ Chm_ , Up_ , Up_ , Chm_ /)
-   hash(:,19) = (/ Str_ , Dn_ , Dn_ , Str_ /)
-   hash(:,20) = (/ Bot_ , Dn_ , Dn_ , Bot_ /)
-   hash(:,21) = (/ Bot_ , Str_ , Str_ , Bot_ /)
-   hash(:,22) = (/ Str_ , Up_ , Up_ , Str_ /)
-   hash(:,23) = (/ Bot_ , Up_ , Up_ , Bot_ /)
-   hash(:,24) = (/ Bot_ , Chm_ , Chm_ , Bot_ /)
-   hash(:,25) = (/ Chm_ , Dn_ , Dn_ , Chm_ /)
-   hash(:,26) = (/ Up_ , Dn_ , Dn_ , Up_ /)
-   hash(:,27) = (/ Chm_ , Str_ , Str_ , Chm_ /)
-   hash(:,28) = (/ Chm_ , Dn_ , Up_ , Str_ /)
-   hash(:,29) = (/ Str_ , Up_ , Dn_ , Chm_ /)
-   hash(:,30) = (/ Up_ , Up_ , Up_ , Up_ /)
-   hash(:,31) = (/ Chm_ , Chm_ , Chm_ , Chm_ /)
-   hash(:,32) = (/ Dn_ , Dn_ , Dn_ , Dn_ /)
-   hash(:,33) = (/ Str_ , Str_ , Str_ , Str_ /)
-   hash(:,34) = (/ Bot_ , Bot_ , Bot_ , Bot_ /)
-
-   hash(:,35) = (/ AChm_ , AUp_ , AChm_ , AUp_ /)
-   hash(:,36) = (/ AStr_ , ADn_ , AStr_ , ADn_ /)
-   hash(:,37) = (/ ABot_ , ADn_ , ABot_ , ADn_ /)
-   hash(:,38) = (/ ABot_ , AStr_ , ABot_ , AStr_ /)
-   hash(:,39) = (/ AStr_ , AUp_ , AStr_ , AUp_ /)
-   hash(:,40) = (/ ABot_ , AUp_ , ABot_ , AUp_ /)
-   hash(:,41) = (/ ABot_ , AChm_ , ABot_ , AChm_ /)
-   hash(:,42) = (/ AChm_ , ADn_ , AChm_ , ADn_ /)
-   hash(:,43) = (/ AUp_ , ADn_ , AUp_ , ADn_ /)
-   hash(:,44) = (/ AChm_ , AStr_ , AChm_ , AStr_ /)
-   hash(:,45) = (/ AStr_ , AUp_ , AChm_ , ADn_ /)
-   hash(:,46) = (/ AChm_ , ADn_ , AStr_ , AUp_ /)
-   hash(:,47) = (/ AUp_ , AUp_ , AUp_ , AUp_ /)
-   hash(:,48) = (/ AChm_ , AChm_ , AChm_ , AChm_ /)
-   hash(:,49) = (/ ADn_ , ADn_ , ADn_ , ADn_ /)
-   hash(:,50) = (/ AStr_ , AStr_ , AStr_ , AStr_ /)
-   hash(:,51) = (/ ABot_ , ABot_ , ABot_ , ABot_ /)
-   hash(:,52) = (/ AUp_ , AChm_ , AChm_ , AUp_ /)
-   hash(:,53) = (/ ADn_ , AStr_ , AStr_ , ADn_ /)
-   hash(:,54) = (/ ADn_ , ABot_ , ABot_ , ADn_ /)
-   hash(:,55) = (/ AStr_ , ABot_ , ABot_ , AStr_ /)
-   hash(:,56) = (/ AUp_ , AStr_ , AStr_ , AUp_ /)
-   hash(:,57) = (/ AUp_ , ABot_ , ABot_ , AUp_ /)
-   hash(:,58) = (/ AChm_ , ABot_ , ABot_ , AChm_ /)
-   hash(:,59) = (/ ADn_ , AChm_ , AChm_ , ADn_ /)
-   hash(:,60) = (/ ADn_ , AUp_ , AUp_ , ADn_ /)
-   hash(:,61) = (/ AStr_ , AChm_ , AChm_ , AStr_ /)
-   hash(:,62) = (/ AUp_ , AStr_ , AChm_ , ADn_ /)
-   hash(:,63) = (/ ADn_ , AChm_ , AStr_ , AUp_ /)
-   hash(:,64) = (/ AUp_ , AUp_ , AUp_ , AUp_ /)
-   hash(:,65) = (/ AChm_ , AChm_ , AChm_ , AChm_ /)
-   hash(:,66) = (/ ADn_ , ADn_ , ADn_ , ADn_ /)
-   hash(:,67) = (/ AStr_ , AStr_ , AStr_ , AStr_ /)
-   hash(:,68) = (/ ABot_ , ABot_ , ABot_ , ABot_ /)
-
-   hash(:,69) = (/ AUp_ , Chm_ , AUp_ , Chm_ /)
-   hash(:,70) = (/ ADn_ , Str_ , ADn_ , Str_ /)
-   hash(:,71) = (/ ADn_ , Bot_ , ADn_ , Bot_ /)
-   hash(:,72) = (/ AStr_ , Bot_ , AStr_ , Bot_ /)
-   hash(:,73) = (/ AUp_ , Str_ , AUp_ , Str_ /)
-   hash(:,74) = (/ AUp_ , Bot_ , AUp_ , Bot_ /)
-   hash(:,75) = (/ AChm_ , Bot_ , AChm_ , Bot_ /)
-   hash(:,76) = (/ ADn_ , Chm_ , ADn_ , Chm_ /)
-   hash(:,77) = (/ ADn_ , Up_ , ADn_ , Up_ /)
-   hash(:,78) = (/ AStr_ , Chm_ , AStr_ , Chm_ /)
-   hash(:,79) = (/ AUp_ , Chm_ , ADn_ , Str_ /)
-   hash(:,80) = (/ ADn_ , Str_ , AUp_ , Chm_ /)
-   hash(:,81) = (/ AUp_ , Up_ , AUp_ , Up_ /)
-   hash(:,82) = (/ AChm_ , Chm_ , AChm_ , Chm_ /)
-   hash(:,83) = (/ ADn_ , Dn_ , ADn_ , Dn_ /)
-   hash(:,84) = (/ AStr_ , Str_ , AStr_ , Str_ /)
-   hash(:,85) = (/ ABot_ , Bot_ , ABot_ , Bot_ /)
-   hash(:,86) = (/ AChm_ , Up_ , AChm_ , Up_ /)
-   hash(:,87) = (/ AStr_ , Dn_ , AStr_ , Dn_ /)
-   hash(:,88) = (/ ABot_ , Dn_ , ABot_ , Dn_ /)
-   hash(:,89) = (/ ABot_ , Str_ , ABot_ , Str_ /)
-   hash(:,90) = (/ AStr_ , Up_ , AStr_ , Up_ /)
-   hash(:,91) = (/ ABot_ , Up_ , ABot_ , Up_ /)
-   hash(:,92) = (/ ABot_ , Chm_ , ABot_ , Chm_ /)
-   hash(:,93) = (/ AChm_ , Dn_ , AChm_ , Dn_ /)
-   hash(:,94) = (/ AUp_ , Dn_ , AUp_ , Dn_ /)
-   hash(:,95) = (/ AChm_ , Str_ , AChm_ , Str_ /)
-   hash(:,96) = (/ AStr_ , Dn_ , AChm_ , Up_ /)
-   hash(:,97) = (/ AChm_ , Up_ , AStr_ , Dn_ /)
-   hash(:,98) = (/ AUp_ , Up_ , AUp_ , Up_ /)
-   hash(:,99) = (/ AChm_ , Chm_ , AChm_ , Chm_ /)
-   hash(:,100) = (/ ADn_ , Dn_ , ADn_ , Dn_ /)
-   hash(:,101) = (/ AStr_ , Str_ , AStr_ , Str_ /)
-   hash(:,102) = (/ ABot_ , Bot_ , ABot_ , Bot_ /)
-
-   hash(:,103) = (/ Chm_ , AUp_ , AUp_ , Chm_ /)
-   hash(:,104) = (/ Str_ , ADn_ , ADn_ , Str_ /)
-   hash(:,105) = (/ Bot_ , ADn_ , ADn_ , Bot_ /)
-   hash(:,106) = (/ Bot_ , AStr_ , AStr_ , Bot_ /)
-   hash(:,107) = (/ Str_ , AUp_ , AUp_ , Str_ /)
-   hash(:,108) = (/ Bot_ , AUp_ , AUp_ , Bot_ /)
-   hash(:,109) = (/ Bot_ , AChm_ , AChm_ , Bot_ /)
-   hash(:,110) = (/ Chm_ , ADn_ , ADn_ , Chm_ /)
-   hash(:,111) = (/ Up_ , ADn_ , ADn_ , Up_ /)
-   hash(:,112) = (/ Chm_ , AStr_ , AStr_ , Chm_ /)
-   hash(:,113) = (/ Chm_ , AUp_ , ADn_ , Str_ /)
-   hash(:,114) = (/ Str_ , ADn_ , AUp_ , Chm_ /)
-   hash(:,115) = (/ Up_ , AUp_ , AUp_ , Up_ /)
-   hash(:,116) = (/ Chm_ , AChm_ , AChm_ , Chm_ /)
-   hash(:,117) = (/ Dn_ , ADn_ , ADn_ , Dn_ /)
-   hash(:,118) = (/ Str_ , AStr_ , AStr_ , Str_ /)
-   hash(:,119) = (/ Bot_ , ABot_ , ABot_ , Bot_ /)
-   hash(:,120) = (/ Up_ , AChm_ , AChm_ , Up_ /)
-   hash(:,121) = (/ Dn_ , AStr_ , AStr_ , Dn_ /)
-   hash(:,122) = (/ Dn_ , ABot_ , ABot_ , Dn_ /)
-   hash(:,123) = (/ Str_ , ABot_ , ABot_ , Str_ /)
-   hash(:,124) = (/ Up_ , AStr_ , AStr_ , Up_ /)
-   hash(:,125) = (/ Up_ , ABot_ , ABot_ , Up_ /)
-   hash(:,126) = (/ Chm_ , ABot_ , ABot_ , Chm_ /)
-   hash(:,127) = (/ Dn_ , AChm_ , AChm_ , Dn_ /)
-   hash(:,128) = (/ Dn_ , AUp_ , AUp_ , Dn_ /)
-   hash(:,129) = (/ Str_ , AChm_ , AChm_ , Str_ /)
-   hash(:,130) = (/ Dn_ , AStr_ , AChm_ , Up_ /)
-   hash(:,131) = (/ Up_ , AChm_ , AStr_ , Dn_ /)
-   hash(:,132) = (/ Up_ , AUp_ , AUp_ , Up_ /)
-   hash(:,133) = (/ Chm_ , AChm_ , AChm_ , Chm_ /)
-   hash(:,134) = (/ Dn_ , ADn_ , ADn_ , Dn_ /)
-   hash(:,135) = (/ Str_ , AStr_ , AStr_ , Str_ /)
-   hash(:,136) = (/ Bot_ , ABot_ , ABot_ , Bot_ /)
-
-   hash(:,137) = (/ Up_ , AUp_ , AChm_ , Chm_ /)
-   hash(:,138) = (/ Dn_ , ADn_ , AStr_ , Str_ /)
-   hash(:,139) = (/ Dn_ , ADn_ , ABot_ , Bot_ /)
-   hash(:,140) = (/ Str_ , AStr_ , ABot_ , Bot_ /)
-   hash(:,141) = (/ Up_ , AUp_ , AStr_ , Str_ /)
-   hash(:,142) = (/ Up_ , AUp_ , ABot_ , Bot_ /)
-   hash(:,143) = (/ Chm_ , AChm_ , ABot_ , Bot_ /)
-   hash(:,144) = (/ Dn_ , ADn_ , AChm_ , Chm_ /)
-   hash(:,145) = (/ Dn_ , ADn_ , AUp_ , Up_ /)
-   hash(:,146) = (/ Str_ , AStr_ , AChm_ , Chm_ /)
-   hash(:,147) = (/ Dn_ , AUp_ , AChm_ , Str_ /)
-   hash(:,148) = (/ Up_ , ADn_ , AStr_ , Chm_ /)
-   hash(:,149) = (/ Up_ , AUp_ , AUp_ , Up_ /)
-   hash(:,150) = (/ Chm_ , AChm_ , AChm_ , Chm_ /)
-   hash(:,151) = (/ Dn_ , ADn_ , ADn_ , Dn_ /)
-   hash(:,152) = (/ Str_ , AStr_ , AStr_ , Str_ /)
-   hash(:,153) = (/ Bot_ , ABot_ , ABot_ , Bot_ /)
-   hash(:,154) = (/ Chm_ , AChm_ , AUp_ , Up_ /)
-   hash(:,155) = (/ Str_ , AStr_ , ADn_ , Dn_ /)
-   hash(:,156) = (/ Bot_ , ABot_ , ADn_ , Dn_ /)
-   hash(:,157) = (/ Bot_ , ABot_ , AStr_ , Str_ /)
-   hash(:,158) = (/ Str_ , AStr_ , AUp_ , Up_ /)
-   hash(:,159) = (/ Bot_ , ABot_ , AUp_ , Up_ /)
-   hash(:,160) = (/ Bot_ , ABot_ , AChm_ , Chm_ /)
-   hash(:,161) = (/ Chm_ , AChm_ , ADn_ , Dn_ /)
-   hash(:,162) = (/ Up_ , AUp_ , ADn_ , Dn_ /)
-   hash(:,163) = (/ Chm_ , AChm_ , AStr_ , Str_ /)
-   hash(:,164) = (/ Chm_ , AStr_ , ADn_ , Up_ /)
-   hash(:,165) = (/ Str_ , AChm_ , AUp_ , Dn_ /)
-   hash(:,166) = (/ Up_ , AUp_ , AUp_ , Up_ /)
-   hash(:,167) = (/ Chm_ , AChm_ , AChm_ , Chm_ /)
-   hash(:,168) = (/ Dn_ , ADn_ , ADn_ , Dn_ /)
-   hash(:,169) = (/ Str_ , AStr_ , AStr_ , Str_ /)
-   hash(:,170) = (/ Bot_ , ABot_ , ABot_ , Bot_ /)
-
-   hash(:,171) = (/ AUp_ , Up_ , AChm_ , Chm_ /)
-   hash(:,172) = (/ ADn_ , Dn_ , AStr_ , Str_ /)
-   hash(:,173) = (/ ADn_ , Dn_ , ABot_ , Bot_ /)
-   hash(:,174) = (/ AStr_ , Str_ , ABot_ , Bot_ /)
-   hash(:,175) = (/ AUp_ , Up_ , AStr_ , Str_ /)
-   hash(:,176) = (/ AUp_ , Up_ , ABot_ , Bot_ /)
-   hash(:,177) = (/ AChm_ , Chm_ , ABot_ , Bot_ /)
-   hash(:,178) = (/ ADn_ , Dn_ , AChm_ , Chm_ /)
-   hash(:,179) = (/ ADn_ , Dn_ , AUp_ , Up_ /)
-   hash(:,180) = (/ AStr_ , Str_ , AChm_ , Chm_ /)
-   hash(:,181) = (/ AUp_ , Dn_ , AChm_ , Str_ /)
-   hash(:,182) = (/ ADn_ , Up_ , AStr_ , Chm_ /)
-   hash(:,183) = (/ AUp_ , Up_ , AUp_ , Up_ /)
-   hash(:,184) = (/ AChm_ , Chm_ , AChm_ , Chm_ /)
-   hash(:,185) = (/ ADn_ , Dn_ , ADn_ , Dn_ /)
-   hash(:,186) = (/ AStr_ , Str_ , AStr_ , Str_ /)
-   hash(:,187) = (/ ABot_ , Bot_ , ABot_ , Bot_ /)
-   hash(:,188) = (/ AChm_ , Chm_ , AUp_ , Up_ /)
-   hash(:,189) = (/ AStr_ , Str_ , ADn_ , Dn_ /)
-   hash(:,190) = (/ ABot_ , Bot_ , ADn_ , Dn_ /)
-   hash(:,191) = (/ ABot_ , Bot_ , AStr_ , Str_ /)
-   hash(:,192) = (/ AStr_ , Str_ , AUp_ , Up_ /)
-   hash(:,193) = (/ ABot_ , Bot_ , AUp_ , Up_ /)
-   hash(:,194) = (/ ABot_ , Bot_ , AChm_ , Chm_ /)
-   hash(:,195) = (/ AChm_ , Chm_ , ADn_ , Dn_ /)
-   hash(:,196) = (/ AUp_ , Up_ , ADn_ , Dn_ /)
-   hash(:,197) = (/ AChm_ , Chm_ , AStr_ , Str_ /)
-   hash(:,198) = (/ AStr_ , Chm_ , ADn_ , Up_ /)
-   hash(:,199) = (/ AChm_ , Str_ , AUp_ , Dn_ /)
-   hash(:,200) = (/ AUp_ , Up_ , AUp_ , Up_ /)
-   hash(:,201) = (/ AChm_ , Chm_ , AChm_ , Chm_ /)
-   hash(:,202) = (/ ADn_ , Dn_ , ADn_ , Dn_ /)
-   hash(:,203) = (/ AStr_ , Str_ , AStr_ , Str_ /)
-   hash(:,204) = (/ ABot_ , Bot_ , ABot_ , Bot_ /)
-
-   outFound=.false.
-   order(:)=-1
-
-   do ih=1,hashSize
-      if ( &
-      .not.( &
-      (idAPart(1).eq.0 .or. idAPart(1).eq.hash(1,ih)) &
-      .and. &
-      (idAPart(2).eq.0 .or. idAPart(2).eq.hash(2,ih)) &
-      ) &
-      ) cycle
-
-      ! Final particles are q
-      if (abs(idAPart(3)).lt.6 .and. abs(idAPart(4)).lt.6) then
-         if ( &
-         (idAPart(3).eq.0 .or. idAPart(3).eq.hash(3,ih)) &
-         .and. &
-         (idAPart(4).eq.0 .or. idAPart(4).eq.hash(4,ih)) &
-         ) then
-            order(1)=0
-            order(2)=1
-            outFound=.true.
-         else if ( &
-         (idAPart(3).eq.0 .or. idAPart(3).eq.hash(4,ih)) &
-         .and. &
-         (idAPart(4).eq.0 .or. idAPart(4).eq.hash(3,ih)) &
-         ) then
-            order(1)=1
-            order(2)=0
-            outFound=.true.
-         endif
-      ! Final particles l/nu
-      else if ((IsALepton(idAPart(3)) .or. IsANeutrino(idAPart(3))) .and. (IsALepton(idAPart(4)) .or. IsANeutrino(idAPart(4)))) then
-         if (abs(hash(1,ih)).eq.abs(hash(2,ih)) .and. abs(hash(1,ih)).eq.abs(hash(3,ih)) .and. abs(hash(1,ih)).eq.abs(hash(4,ih))) cycle ! Do not consider the ordering in uquq_uquq or dqdq_dqdq
-
-         if ( &
-         ( &
-         sign(1, idAPart(3)).eq.sign(1, hash(3,ih)) .and. &
-         ((IsALepton(idAPart(3)) .and. IsDownTypeQuark(hash(3,ih))) .or. (IsANeutrino(idAPart(3)) .and. IsUpTypeQuark(hash(3,ih)))) &
-         ) &
-         .and. &
-         ( &
-         sign(1, idAPart(4)).eq.sign(1, hash(4,ih)) .and. &
-         ((IsALepton(idAPart(4)) .and. IsDownTypeQuark(hash(4,ih))) .or. (IsANeutrino(idAPart(4)) .and. IsUpTypeQuark(hash(4,ih)))) &
-         ) &
-         ) then
-            order(1)=0
-            order(2)=1
-            outFound=.true.
-         else if ( &
-         ( &
-         sign(1, idAPart(3)).eq.sign(1, hash(4,ih)) .and. &
-         ((IsALepton(idAPart(3)) .and. IsDownTypeQuark(hash(4,ih))) .or. (IsANeutrino(idAPart(3)) .and. IsUpTypeQuark(hash(4,ih)))) &
-         ) &
-         .and. &
-         ( &
-         sign(1, idAPart(4)).eq.sign(1, hash(3,ih)) .and. &
-         ((IsALepton(idAPart(4)) .and. IsDownTypeQuark(hash(3,ih))) .or. (IsANeutrino(idAPart(4)) .and. IsUpTypeQuark(hash(3,ih)))) &
-         ) &
-         ) then
-            order(1)=1
-            order(2)=0
-            outFound=.true.
-         endif
-         outFound = ( CoupledVertex(idAPart(3:4), -1).eq.CoupledVertex(hash(3:4,ih),-1) )
-      endif
-      if (outFound) then
-         exit
-      endif
-   enddo
-
-end subroutine
-
 
 function MCFMParticleLabel(pid, useQJ)
    use ModParameters
@@ -1666,5 +1195,634 @@ subroutine GetEWInputs(Gf_inp_in,aemmz_inp_in,xw_inp_in,wmass_inp_in,zmass_inp_i
    zmass_inp_in=M_Z
 end subroutine
 
+
+!!!!!!!!!!!!
+!! qqVVqq !!
+!!!!!!!!!!!!
+! Setup functions for specific MCFM processes
+! qqZZqq/qqWWqq/qqVVqq (or _strong versions)
+subroutine Setup_MCFM_qqVVqq_firsttime(iProc)
+implicit none
+integer, intent(in) :: iProc
+integer npart
+common/npart/npart
+integer nwz
+common/nwz/nwz
+integer ndim,ncall,itmx,nprn
+double precision xl(mxdim),xu(mxdim),acc
+common/bveg1/xl,xu,acc,ndim,ncall,itmx,nprn
+integer nqcdjets,nqcdstart
+common/nqcdjets/nqcdjets,nqcdstart
+integer n2,n3
+double precision mass2,width2,mass3,width3
+common/breit/n2,n3,mass2,width2,mass3,width3
+logical interference,bw34_56
+common/interference/interference,bw34_56
+double precision vsymfact
+common/vsymfact/vsymfact
+double precision &
+md, mu, ms, mc, mb, mt, &
+mel, mmu, mtau, &
+hmass, hwidth, &
+wmass, wwidth, &
+zmass, zwidth, &
+twidth, &
+tauwidth, &
+mtausq, mcsq, mbsq
+common/masses/ &
+md, mu, ms, mc, mb, mt, &
+mel, mmu, mtau, &
+hmass, hwidth, &
+wmass, wwidth, &
+zmass, zwidth, &
+twidth, &
+tauwidth, &
+mtausq, mcsq, mbsq
+
+   if (iProc.eq.66) then ! Signal-only
+      MCFM_runstring="wbfHO"
+   else if (iProc.eq.67) then ! Bkg-only
+      MCFM_runstring="wbfHO"
+   else if (iProc.eq.68) then  ! Signal+bkg
+      MCFM_runstring="wbfALL" ! Doesn't matter what it is
+   else
+      return ! Not qqVVqq, so skip this function
+   endif
+
+   npart=6
+   nwz=2
+   call ckmfill(nwz)
+   ndim=16
+   nqcdjets=2
+   n2=1
+   n3=1
+   mass2 =zmass
+   width2=zwidth
+   mass3 =zmass
+   width3=zwidth
+
+   ! These two flags are to be changed depending on the 4f flavor
+   vsymfact=1d0
+   interference=.false.
+
+end subroutine
+
+function Setup_MCFM_qqVVqq(pid_MCFM_in,p_MCFM_in,pid_MCFM,p_MCFM)
+implicit none
+logical :: Setup_MCFM_qqVVqq
+integer, intent(in) :: pid_MCFM_in(1:mxpart)
+real(8), intent(in) :: p_MCFM_in(1:mxpart,1:4)
+integer, intent(out) :: pid_MCFM(1:mxpart)
+real(8), intent(out) :: p_MCFM(1:mxpart,1:4)
+integer :: decayOrdering(1:4)
+integer :: apartOrdering(1:2)
+integer :: ip
+
+logical interference,bw34_56
+common/interference/interference,bw34_56
+double precision vsymfact
+common/vsymfact/vsymfact
+
+double precision l(nf),r(nf),le,ln,re,rn,sin2w,q1,l1,r1,q2,l2,r2
+common/zcouple/l,r,q1,l1,r1,q2,l2,r2,le,ln,re,rn,sin2w
+
+   Setup_MCFM_qqVVqq=.false.
+   pid_MCFM(:) = pid_MCFM_in(:)
+   p_MCFM(:,:) = p_MCFM_in(:,:)
+
+   ! Assign ordered daughter momenta
+   call Check_DaughterOrdering_MCFM_qqVVqq(pid_MCFM_in(3:6),decayOrdering)
+   do ip=0,3
+      p_MCFM(3+ip,:) = p_MCFM_in(3+decayOrdering(ip+1),:)
+      pid_MCFM(3+ip) = pid_MCFM_in(3+decayOrdering(ip+1))
+   enddo
+
+   ! Assign ordered associated particle momenta
+   call Check_APartHash_MCFM_qqVVqq( &
+      (/ pid_MCFM_in(1),pid_MCFM_in(2),pid_MCFM_in(7),pid_MCFM_in(8) /), &
+      apartOrdering)
+   if (apartOrdering(1).eq.-1 .or. apartOrdering(2).eq.-1) then
+      return
+   else
+      do ip=0,1
+      p_MCFM(7+ip,:) = p_MCFM_in(7+apartOrdering(ip+1),:)
+      pid_MCFM(7+ip) = pid_MCFM_in(7+apartOrdering(ip+1))
+      enddo
+   endif
+
+   ! Turn 4f interference on as needed
+   if( &
+   abs(pid_MCFM_in(3)).eq.abs(pid_MCFM_in(5)) .and. abs(pid_MCFM_in(4)).eq.abs(pid_MCFM_in(6)) &
+   .and. pid_MCFM_in(3).ne.0 .and. pid_MCFM_in(6).ne.6 &
+   ) then
+      vsymfact=0.5d0
+      interference=.true.
+   endif
+
+   ! Set l1, l2
+   l1=0d0;r1=0d0;q1=0d0
+   l2=0d0;r2=0d0;q2=0d0
+   if (pid_MCFM(3).eq.-pid_MCFM(4)) then
+      call Set_MCFMCommon_DecayZCouple_Wrapper(pid_MCFM(3),1)
+   endif
+   if (pid_MCFM(5).eq.-pid_MCFM(6)) then
+      call Set_MCFMCommon_DecayZCouple_Wrapper(pid_MCFM(5),2)
+   endif
+   Setup_MCFM_qqVVqq = .true.
+
+end function
+
+! Subroutines to check and pass the ordering for the decay particles in the "main" system (e.g. H->4f decay)
+subroutine Check_DaughterOrdering_MCFM_qqVVqq(idPart,order)
+use ModParameters
+use ModMisc
+implicit none
+integer, intent(in) :: idPart(1:4)
+integer, intent(out) :: order(1:4)
+integer :: ip, idV(1:2)
+logical :: isZZ, isWW
+
+character*30 runstring
+common/runstring/runstring
+
+   order(:)=(/ 0,1,2,3 /)
+   idV(:)=0
+
+   if( idPart(1).ne.0 .and. idPart(2).ne.0) then
+      idV(1)=CoupledVertex(idPart(1:2),-1)
+   endif
+   if( idPart(3).ne.0 .and. idPart(4).ne.0) then
+      idV(2)=CoupledVertex(idPart(3:4),-1)
+   endif
+   isZZ = (idV(1).eq.Z0_ .or. idV(1).eq.0) .and. (idV(2).eq.Z0_ .or. idV(2).eq.0)
+   isWW = (idV(1).eq.abs(Wp_) .or. idV(1).eq.0) .and. (idV(2).eq.abs(Wp_) .or. idV(2).eq.0)
+
+   if ( &
+   isZZ .and. (&
+   IsALepton(idPart(1)) .or. &
+   IsDownTypeQuark(idPart(1)) .or. &
+   IsANeutrino(idPart(3)) .or. &
+   IsUpTypeQuark(idPart(3)) &
+   )  .or. &
+   isWW .and. (&
+   idV(1).eq.Wm_ .and. idV(2).eq.Wp_ &
+   ) &
+   ) then
+      call swap(order(1),order(3))
+      call swap(order(2),order(4))
+   endif
+
+   if (isWW) then
+      call swap(order(1),order(3))
+      runstring = trim(MCFM_runstring) // '_ww' ! wbfXY_ww needed to have WW-only final state since we use qq_VVqq process. This needs to be changed somehow if we want to simulate ZZ+WW->4f
+   endif
+end subroutine
+
+! Subroutines to check and pass the ordering for the associated particles
+subroutine Check_APartHash_MCFM_qqVVqq(idAPart,order) ! idAPart is in JHU convention
+use ModParameters
+implicit none
+integer, intent(in) :: idAPart(1:4)
+integer, intent(out) :: order(1:2) ! Final state ordering; initial state remains the same
+integer, parameter :: hashSize = 204
+integer :: hash(1:4,1:hashSize),ih
+logical  :: outFound
+
+   hash(:,1) = (/ Up_ , Chm_ , Up_ , Chm_ /)
+   hash(:,2) = (/ Dn_ , Str_ , Dn_ , Str_ /)
+   hash(:,3) = (/ Dn_ , Bot_ , Dn_ , Bot_ /)
+   hash(:,4) = (/ Str_ , Bot_ , Str_ , Bot_ /)
+   hash(:,5) = (/ Up_ , Str_ , Up_ , Str_ /)
+   hash(:,6) = (/ Up_ , Bot_ , Up_ , Bot_ /)
+   hash(:,7) = (/ Chm_ , Bot_ , Chm_ , Bot_ /)
+   hash(:,8) = (/ Dn_ , Chm_ , Dn_ , Chm_ /)
+   hash(:,9) = (/ Dn_ , Up_ , Dn_ , Up_ /)
+   hash(:,10) = (/ Str_ , Chm_ , Str_ , Chm_ /)
+   hash(:,11) = (/ Dn_ , Chm_ , Up_ , Str_ /)
+   hash(:,12) = (/ Up_ , Str_ , Dn_ , Chm_ /)
+   hash(:,13) = (/ Up_ , Up_ , Up_ , Up_ /)
+   hash(:,14) = (/ Chm_ , Chm_ , Chm_ , Chm_ /)
+   hash(:,15) = (/ Dn_ , Dn_ , Dn_ , Dn_ /)
+   hash(:,16) = (/ Str_ , Str_ , Str_ , Str_ /)
+   hash(:,17) = (/ Bot_ , Bot_ , Bot_ , Bot_ /)
+   hash(:,18) = (/ Chm_ , Up_ , Up_ , Chm_ /)
+   hash(:,19) = (/ Str_ , Dn_ , Dn_ , Str_ /)
+   hash(:,20) = (/ Bot_ , Dn_ , Dn_ , Bot_ /)
+   hash(:,21) = (/ Bot_ , Str_ , Str_ , Bot_ /)
+   hash(:,22) = (/ Str_ , Up_ , Up_ , Str_ /)
+   hash(:,23) = (/ Bot_ , Up_ , Up_ , Bot_ /)
+   hash(:,24) = (/ Bot_ , Chm_ , Chm_ , Bot_ /)
+   hash(:,25) = (/ Chm_ , Dn_ , Dn_ , Chm_ /)
+   hash(:,26) = (/ Up_ , Dn_ , Dn_ , Up_ /)
+   hash(:,27) = (/ Chm_ , Str_ , Str_ , Chm_ /)
+   hash(:,28) = (/ Chm_ , Dn_ , Up_ , Str_ /)
+   hash(:,29) = (/ Str_ , Up_ , Dn_ , Chm_ /)
+   hash(:,30) = (/ Up_ , Up_ , Up_ , Up_ /)
+   hash(:,31) = (/ Chm_ , Chm_ , Chm_ , Chm_ /)
+   hash(:,32) = (/ Dn_ , Dn_ , Dn_ , Dn_ /)
+   hash(:,33) = (/ Str_ , Str_ , Str_ , Str_ /)
+   hash(:,34) = (/ Bot_ , Bot_ , Bot_ , Bot_ /)
+
+   hash(:,35) = (/ AChm_ , AUp_ , AChm_ , AUp_ /)
+   hash(:,36) = (/ AStr_ , ADn_ , AStr_ , ADn_ /)
+   hash(:,37) = (/ ABot_ , ADn_ , ABot_ , ADn_ /)
+   hash(:,38) = (/ ABot_ , AStr_ , ABot_ , AStr_ /)
+   hash(:,39) = (/ AStr_ , AUp_ , AStr_ , AUp_ /)
+   hash(:,40) = (/ ABot_ , AUp_ , ABot_ , AUp_ /)
+   hash(:,41) = (/ ABot_ , AChm_ , ABot_ , AChm_ /)
+   hash(:,42) = (/ AChm_ , ADn_ , AChm_ , ADn_ /)
+   hash(:,43) = (/ AUp_ , ADn_ , AUp_ , ADn_ /)
+   hash(:,44) = (/ AChm_ , AStr_ , AChm_ , AStr_ /)
+   hash(:,45) = (/ AStr_ , AUp_ , AChm_ , ADn_ /)
+   hash(:,46) = (/ AChm_ , ADn_ , AStr_ , AUp_ /)
+   hash(:,47) = (/ AUp_ , AUp_ , AUp_ , AUp_ /)
+   hash(:,48) = (/ AChm_ , AChm_ , AChm_ , AChm_ /)
+   hash(:,49) = (/ ADn_ , ADn_ , ADn_ , ADn_ /)
+   hash(:,50) = (/ AStr_ , AStr_ , AStr_ , AStr_ /)
+   hash(:,51) = (/ ABot_ , ABot_ , ABot_ , ABot_ /)
+   hash(:,52) = (/ AUp_ , AChm_ , AChm_ , AUp_ /)
+   hash(:,53) = (/ ADn_ , AStr_ , AStr_ , ADn_ /)
+   hash(:,54) = (/ ADn_ , ABot_ , ABot_ , ADn_ /)
+   hash(:,55) = (/ AStr_ , ABot_ , ABot_ , AStr_ /)
+   hash(:,56) = (/ AUp_ , AStr_ , AStr_ , AUp_ /)
+   hash(:,57) = (/ AUp_ , ABot_ , ABot_ , AUp_ /)
+   hash(:,58) = (/ AChm_ , ABot_ , ABot_ , AChm_ /)
+   hash(:,59) = (/ ADn_ , AChm_ , AChm_ , ADn_ /)
+   hash(:,60) = (/ ADn_ , AUp_ , AUp_ , ADn_ /)
+   hash(:,61) = (/ AStr_ , AChm_ , AChm_ , AStr_ /)
+   hash(:,62) = (/ AUp_ , AStr_ , AChm_ , ADn_ /)
+   hash(:,63) = (/ ADn_ , AChm_ , AStr_ , AUp_ /)
+   hash(:,64) = (/ AUp_ , AUp_ , AUp_ , AUp_ /)
+   hash(:,65) = (/ AChm_ , AChm_ , AChm_ , AChm_ /)
+   hash(:,66) = (/ ADn_ , ADn_ , ADn_ , ADn_ /)
+   hash(:,67) = (/ AStr_ , AStr_ , AStr_ , AStr_ /)
+   hash(:,68) = (/ ABot_ , ABot_ , ABot_ , ABot_ /)
+
+   hash(:,69) = (/ AUp_ , Chm_ , AUp_ , Chm_ /)
+   hash(:,70) = (/ ADn_ , Str_ , ADn_ , Str_ /)
+   hash(:,71) = (/ ADn_ , Bot_ , ADn_ , Bot_ /)
+   hash(:,72) = (/ AStr_ , Bot_ , AStr_ , Bot_ /)
+   hash(:,73) = (/ AUp_ , Str_ , AUp_ , Str_ /)
+   hash(:,74) = (/ AUp_ , Bot_ , AUp_ , Bot_ /)
+   hash(:,75) = (/ AChm_ , Bot_ , AChm_ , Bot_ /)
+   hash(:,76) = (/ ADn_ , Chm_ , ADn_ , Chm_ /)
+   hash(:,77) = (/ ADn_ , Up_ , ADn_ , Up_ /)
+   hash(:,78) = (/ AStr_ , Chm_ , AStr_ , Chm_ /)
+   hash(:,79) = (/ AUp_ , Chm_ , ADn_ , Str_ /)
+   hash(:,80) = (/ ADn_ , Str_ , AUp_ , Chm_ /)
+   hash(:,81) = (/ AUp_ , Up_ , AUp_ , Up_ /)
+   hash(:,82) = (/ AChm_ , Chm_ , AChm_ , Chm_ /)
+   hash(:,83) = (/ ADn_ , Dn_ , ADn_ , Dn_ /)
+   hash(:,84) = (/ AStr_ , Str_ , AStr_ , Str_ /)
+   hash(:,85) = (/ ABot_ , Bot_ , ABot_ , Bot_ /)
+   hash(:,86) = (/ AChm_ , Up_ , AChm_ , Up_ /)
+   hash(:,87) = (/ AStr_ , Dn_ , AStr_ , Dn_ /)
+   hash(:,88) = (/ ABot_ , Dn_ , ABot_ , Dn_ /)
+   hash(:,89) = (/ ABot_ , Str_ , ABot_ , Str_ /)
+   hash(:,90) = (/ AStr_ , Up_ , AStr_ , Up_ /)
+   hash(:,91) = (/ ABot_ , Up_ , ABot_ , Up_ /)
+   hash(:,92) = (/ ABot_ , Chm_ , ABot_ , Chm_ /)
+   hash(:,93) = (/ AChm_ , Dn_ , AChm_ , Dn_ /)
+   hash(:,94) = (/ AUp_ , Dn_ , AUp_ , Dn_ /)
+   hash(:,95) = (/ AChm_ , Str_ , AChm_ , Str_ /)
+   hash(:,96) = (/ AStr_ , Dn_ , AChm_ , Up_ /)
+   hash(:,97) = (/ AChm_ , Up_ , AStr_ , Dn_ /)
+   hash(:,98) = (/ AUp_ , Up_ , AUp_ , Up_ /)
+   hash(:,99) = (/ AChm_ , Chm_ , AChm_ , Chm_ /)
+   hash(:,100) = (/ ADn_ , Dn_ , ADn_ , Dn_ /)
+   hash(:,101) = (/ AStr_ , Str_ , AStr_ , Str_ /)
+   hash(:,102) = (/ ABot_ , Bot_ , ABot_ , Bot_ /)
+
+   hash(:,103) = (/ Chm_ , AUp_ , AUp_ , Chm_ /)
+   hash(:,104) = (/ Str_ , ADn_ , ADn_ , Str_ /)
+   hash(:,105) = (/ Bot_ , ADn_ , ADn_ , Bot_ /)
+   hash(:,106) = (/ Bot_ , AStr_ , AStr_ , Bot_ /)
+   hash(:,107) = (/ Str_ , AUp_ , AUp_ , Str_ /)
+   hash(:,108) = (/ Bot_ , AUp_ , AUp_ , Bot_ /)
+   hash(:,109) = (/ Bot_ , AChm_ , AChm_ , Bot_ /)
+   hash(:,110) = (/ Chm_ , ADn_ , ADn_ , Chm_ /)
+   hash(:,111) = (/ Up_ , ADn_ , ADn_ , Up_ /)
+   hash(:,112) = (/ Chm_ , AStr_ , AStr_ , Chm_ /)
+   hash(:,113) = (/ Chm_ , AUp_ , ADn_ , Str_ /)
+   hash(:,114) = (/ Str_ , ADn_ , AUp_ , Chm_ /)
+   hash(:,115) = (/ Up_ , AUp_ , AUp_ , Up_ /)
+   hash(:,116) = (/ Chm_ , AChm_ , AChm_ , Chm_ /)
+   hash(:,117) = (/ Dn_ , ADn_ , ADn_ , Dn_ /)
+   hash(:,118) = (/ Str_ , AStr_ , AStr_ , Str_ /)
+   hash(:,119) = (/ Bot_ , ABot_ , ABot_ , Bot_ /)
+   hash(:,120) = (/ Up_ , AChm_ , AChm_ , Up_ /)
+   hash(:,121) = (/ Dn_ , AStr_ , AStr_ , Dn_ /)
+   hash(:,122) = (/ Dn_ , ABot_ , ABot_ , Dn_ /)
+   hash(:,123) = (/ Str_ , ABot_ , ABot_ , Str_ /)
+   hash(:,124) = (/ Up_ , AStr_ , AStr_ , Up_ /)
+   hash(:,125) = (/ Up_ , ABot_ , ABot_ , Up_ /)
+   hash(:,126) = (/ Chm_ , ABot_ , ABot_ , Chm_ /)
+   hash(:,127) = (/ Dn_ , AChm_ , AChm_ , Dn_ /)
+   hash(:,128) = (/ Dn_ , AUp_ , AUp_ , Dn_ /)
+   hash(:,129) = (/ Str_ , AChm_ , AChm_ , Str_ /)
+   hash(:,130) = (/ Dn_ , AStr_ , AChm_ , Up_ /)
+   hash(:,131) = (/ Up_ , AChm_ , AStr_ , Dn_ /)
+   hash(:,132) = (/ Up_ , AUp_ , AUp_ , Up_ /)
+   hash(:,133) = (/ Chm_ , AChm_ , AChm_ , Chm_ /)
+   hash(:,134) = (/ Dn_ , ADn_ , ADn_ , Dn_ /)
+   hash(:,135) = (/ Str_ , AStr_ , AStr_ , Str_ /)
+   hash(:,136) = (/ Bot_ , ABot_ , ABot_ , Bot_ /)
+
+   hash(:,137) = (/ Up_ , AUp_ , AChm_ , Chm_ /)
+   hash(:,138) = (/ Dn_ , ADn_ , AStr_ , Str_ /)
+   hash(:,139) = (/ Dn_ , ADn_ , ABot_ , Bot_ /)
+   hash(:,140) = (/ Str_ , AStr_ , ABot_ , Bot_ /)
+   hash(:,141) = (/ Up_ , AUp_ , AStr_ , Str_ /)
+   hash(:,142) = (/ Up_ , AUp_ , ABot_ , Bot_ /)
+   hash(:,143) = (/ Chm_ , AChm_ , ABot_ , Bot_ /)
+   hash(:,144) = (/ Dn_ , ADn_ , AChm_ , Chm_ /)
+   hash(:,145) = (/ Dn_ , ADn_ , AUp_ , Up_ /)
+   hash(:,146) = (/ Str_ , AStr_ , AChm_ , Chm_ /)
+   hash(:,147) = (/ Dn_ , AUp_ , AChm_ , Str_ /)
+   hash(:,148) = (/ Up_ , ADn_ , AStr_ , Chm_ /)
+   hash(:,149) = (/ Up_ , AUp_ , AUp_ , Up_ /)
+   hash(:,150) = (/ Chm_ , AChm_ , AChm_ , Chm_ /)
+   hash(:,151) = (/ Dn_ , ADn_ , ADn_ , Dn_ /)
+   hash(:,152) = (/ Str_ , AStr_ , AStr_ , Str_ /)
+   hash(:,153) = (/ Bot_ , ABot_ , ABot_ , Bot_ /)
+   hash(:,154) = (/ Chm_ , AChm_ , AUp_ , Up_ /)
+   hash(:,155) = (/ Str_ , AStr_ , ADn_ , Dn_ /)
+   hash(:,156) = (/ Bot_ , ABot_ , ADn_ , Dn_ /)
+   hash(:,157) = (/ Bot_ , ABot_ , AStr_ , Str_ /)
+   hash(:,158) = (/ Str_ , AStr_ , AUp_ , Up_ /)
+   hash(:,159) = (/ Bot_ , ABot_ , AUp_ , Up_ /)
+   hash(:,160) = (/ Bot_ , ABot_ , AChm_ , Chm_ /)
+   hash(:,161) = (/ Chm_ , AChm_ , ADn_ , Dn_ /)
+   hash(:,162) = (/ Up_ , AUp_ , ADn_ , Dn_ /)
+   hash(:,163) = (/ Chm_ , AChm_ , AStr_ , Str_ /)
+   hash(:,164) = (/ Chm_ , AStr_ , ADn_ , Up_ /)
+   hash(:,165) = (/ Str_ , AChm_ , AUp_ , Dn_ /)
+   hash(:,166) = (/ Up_ , AUp_ , AUp_ , Up_ /)
+   hash(:,167) = (/ Chm_ , AChm_ , AChm_ , Chm_ /)
+   hash(:,168) = (/ Dn_ , ADn_ , ADn_ , Dn_ /)
+   hash(:,169) = (/ Str_ , AStr_ , AStr_ , Str_ /)
+   hash(:,170) = (/ Bot_ , ABot_ , ABot_ , Bot_ /)
+
+   hash(:,171) = (/ AUp_ , Up_ , AChm_ , Chm_ /)
+   hash(:,172) = (/ ADn_ , Dn_ , AStr_ , Str_ /)
+   hash(:,173) = (/ ADn_ , Dn_ , ABot_ , Bot_ /)
+   hash(:,174) = (/ AStr_ , Str_ , ABot_ , Bot_ /)
+   hash(:,175) = (/ AUp_ , Up_ , AStr_ , Str_ /)
+   hash(:,176) = (/ AUp_ , Up_ , ABot_ , Bot_ /)
+   hash(:,177) = (/ AChm_ , Chm_ , ABot_ , Bot_ /)
+   hash(:,178) = (/ ADn_ , Dn_ , AChm_ , Chm_ /)
+   hash(:,179) = (/ ADn_ , Dn_ , AUp_ , Up_ /)
+   hash(:,180) = (/ AStr_ , Str_ , AChm_ , Chm_ /)
+   hash(:,181) = (/ AUp_ , Dn_ , AChm_ , Str_ /)
+   hash(:,182) = (/ ADn_ , Up_ , AStr_ , Chm_ /)
+   hash(:,183) = (/ AUp_ , Up_ , AUp_ , Up_ /)
+   hash(:,184) = (/ AChm_ , Chm_ , AChm_ , Chm_ /)
+   hash(:,185) = (/ ADn_ , Dn_ , ADn_ , Dn_ /)
+   hash(:,186) = (/ AStr_ , Str_ , AStr_ , Str_ /)
+   hash(:,187) = (/ ABot_ , Bot_ , ABot_ , Bot_ /)
+   hash(:,188) = (/ AChm_ , Chm_ , AUp_ , Up_ /)
+   hash(:,189) = (/ AStr_ , Str_ , ADn_ , Dn_ /)
+   hash(:,190) = (/ ABot_ , Bot_ , ADn_ , Dn_ /)
+   hash(:,191) = (/ ABot_ , Bot_ , AStr_ , Str_ /)
+   hash(:,192) = (/ AStr_ , Str_ , AUp_ , Up_ /)
+   hash(:,193) = (/ ABot_ , Bot_ , AUp_ , Up_ /)
+   hash(:,194) = (/ ABot_ , Bot_ , AChm_ , Chm_ /)
+   hash(:,195) = (/ AChm_ , Chm_ , ADn_ , Dn_ /)
+   hash(:,196) = (/ AUp_ , Up_ , ADn_ , Dn_ /)
+   hash(:,197) = (/ AChm_ , Chm_ , AStr_ , Str_ /)
+   hash(:,198) = (/ AStr_ , Chm_ , ADn_ , Up_ /)
+   hash(:,199) = (/ AChm_ , Str_ , AUp_ , Dn_ /)
+   hash(:,200) = (/ AUp_ , Up_ , AUp_ , Up_ /)
+   hash(:,201) = (/ AChm_ , Chm_ , AChm_ , Chm_ /)
+   hash(:,202) = (/ ADn_ , Dn_ , ADn_ , Dn_ /)
+   hash(:,203) = (/ AStr_ , Str_ , AStr_ , Str_ /)
+   hash(:,204) = (/ ABot_ , Bot_ , ABot_ , Bot_ /)
+
+   outFound=.false.
+   order(:)=-1
+
+   do ih=1,hashSize
+      if ( &
+      .not.( &
+      (idAPart(1).eq.0 .or. idAPart(1).eq.hash(1,ih)) &
+      .and. &
+      (idAPart(2).eq.0 .or. idAPart(2).eq.hash(2,ih)) &
+      ) &
+      ) cycle
+
+      ! Final particles are q
+      if (abs(idAPart(3)).lt.6 .and. abs(idAPart(4)).lt.6) then
+         if ( &
+         (idAPart(3).eq.0 .or. idAPart(3).eq.hash(3,ih)) &
+         .and. &
+         (idAPart(4).eq.0 .or. idAPart(4).eq.hash(4,ih)) &
+         ) then
+            order(1)=0
+            order(2)=1
+            outFound=.true.
+         else if ( &
+         (idAPart(3).eq.0 .or. idAPart(3).eq.hash(4,ih)) &
+         .and. &
+         (idAPart(4).eq.0 .or. idAPart(4).eq.hash(3,ih)) &
+         ) then
+            order(1)=1
+            order(2)=0
+            outFound=.true.
+         endif
+      ! Final particles l/nu
+      else if ((IsALepton(idAPart(3)) .or. IsANeutrino(idAPart(3))) .and. (IsALepton(idAPart(4)) .or. IsANeutrino(idAPart(4)))) then
+         if (abs(hash(1,ih)).eq.abs(hash(2,ih)) .and. abs(hash(1,ih)).eq.abs(hash(3,ih)) .and. abs(hash(1,ih)).eq.abs(hash(4,ih))) cycle ! Do not consider the ordering in uquq_uquq or dqdq_dqdq
+
+         if ( &
+         ( &
+         sign(1, idAPart(3)).eq.sign(1, hash(3,ih)) .and. &
+         ((IsALepton(idAPart(3)) .and. IsDownTypeQuark(hash(3,ih))) .or. (IsANeutrino(idAPart(3)) .and. IsUpTypeQuark(hash(3,ih)))) &
+         ) &
+         .and. &
+         ( &
+         sign(1, idAPart(4)).eq.sign(1, hash(4,ih)) .and. &
+         ((IsALepton(idAPart(4)) .and. IsDownTypeQuark(hash(4,ih))) .or. (IsANeutrino(idAPart(4)) .and. IsUpTypeQuark(hash(4,ih)))) &
+         ) &
+         ) then
+            order(1)=0
+            order(2)=1
+            outFound=.true.
+         else if ( &
+         ( &
+         sign(1, idAPart(3)).eq.sign(1, hash(4,ih)) .and. &
+         ((IsALepton(idAPart(3)) .and. IsDownTypeQuark(hash(4,ih))) .or. (IsANeutrino(idAPart(3)) .and. IsUpTypeQuark(hash(4,ih)))) &
+         ) &
+         .and. &
+         ( &
+         sign(1, idAPart(4)).eq.sign(1, hash(3,ih)) .and. &
+         ((IsALepton(idAPart(4)) .and. IsDownTypeQuark(hash(3,ih))) .or. (IsANeutrino(idAPart(4)) .and. IsUpTypeQuark(hash(3,ih)))) &
+         ) &
+         ) then
+            order(1)=1
+            order(2)=0
+            outFound=.true.
+         endif
+         outFound = ( CoupledVertex(idAPart(3:4), -1).eq.CoupledVertex(hash(3:4,ih),-1) )
+      endif
+      if (outFound) then
+         exit
+      endif
+   enddo
+
+end subroutine
+
+subroutine EvalAmp_qqVVqq(idin, pin, ZWcode, msq)
+use ModParameters
+use ModMisc
+implicit none
+integer, intent(in) :: idin(1:mxpart)
+real(8), intent(in) :: pin(1:mxpart,1:4)
+integer, intent(in) :: ZWcode
+integer :: id_MCFM(1:mxpart)
+real(8) :: p_MCFM(1:mxpart,1:4)
+real(8) :: msq(-5:5,-5:5),msq_tmp(-5:5,-5:5)
+integer, parameter :: doZZ=1,doWW=2,doZZorWW=3
+logical :: doCompute
+integer :: i,j
+
+   msq(:,:)=0d0
+   msq_tmp(:,:)=0d0
+
+   doCompute = Setup_MCFM_qqVVqq(idin,pin,id_MCFM,p_MCFM)
+   if (doCompute) then
+
+      if(ZWcode.eq.doZZ) then
+         if (Process.ge.66 .and. Process.le.68) then
+            call qq_zzqq(p_MCFM,id_MCFM,msq)
+            if (id_MCFM(7).eq.0 .and. id_MCFM(8).eq.0) then ! Calculate for swapped momentum combination
+               call swap(p_MCFM(7,:),p_MCFM(8,:)) ! Swap just the momenta
+               call qq_zzqq(p_MCFM,id_MCFM,msq_tmp)
+               msq = msq + msq_tmp
+               do i=-5,5
+                  msq(i,i)=msq(i,i)*0.5d0
+               enddo
+            else if (id_MCFM(7).eq.0 .or. id_MCFM(8).eq.0) then ! Calculate for wrong combination
+               call swap(p_MCFM(7,:),p_MCFM(8,:)) ! Swap the momenta
+               call swap(id_MCFM(7),id_MCFM(8)) ! Swap the ids
+               call SetupParticleLabels(id_MCFM) ! Reassign plabels
+               call qq_zzqq(p_MCFM,id_MCFM,msq_tmp)
+               do i=-5,5
+               do j=-5,5
+                  if (msq(i,j).eq.0d0) then ! Non-zero MEs in original configuration are the correct ones, just replace 0 MEs
+                     msq(i,j)=msq_tmp(i,j)
+                  endif
+               enddo
+               enddo
+            endif
+         else if (Process.eq.69) then ! Or some other number?
+            call qq_zzqqstrong(p_MCFM,id_MCFM,msq)
+            if (id_MCFM(7).eq.0 .and. id_MCFM(8).eq.0) then ! Calculate for swapped momentum combination
+               call swap(p_MCFM(7,:),p_MCFM(8,:)) ! Swap just the momenta
+               call qq_zzqqstrong(p_MCFM,id_MCFM,msq_tmp)
+               msq = msq + msq_tmp
+               do i=-5,5
+                  if (i.eq.0) cycle ! gg->qqb+qbq does not need to be multiplied by 1/2
+                  msq(i,i)=msq(i,i)*0.5d0
+               enddo
+               ! Subtract qqb->gg, which was counted twice
+               id_MCFM(7:8)=Glu_
+               call SetupParticleLabels(id_MCFM) ! Reassign plabels
+               call qq_zzqqstrong(p_MCFM,id_MCFM,msq_tmp)
+               msq = msq - msq_tmp
+            else if (id_MCFM(7).eq.0 .or. id_MCFM(8).eq.0) then ! Calculate for wrong combination
+               call swap(p_MCFM(7,:),p_MCFM(8,:)) ! Swap the momenta
+               call swap(id_MCFM(7),id_MCFM(8)) ! Swap the ids
+               call SetupParticleLabels(id_MCFM) ! Reassign plabels
+               call qq_zzqqstrong(p_MCFM,id_MCFM,msq_tmp)
+               do i=-5,5
+               do j=-5,5
+                  if (msq(i,j).eq.0d0) then ! Non-zero MEs in original configuration are the correct ones, just replace 0 MEs
+                     msq(i,j)=msq_tmp(i,j)
+                  endif
+               enddo
+               enddo
+            endif
+         endif
+      else if(ZWcode.eq.doWW) then
+         if (Process.ge.66 .and. Process.le.68) then
+            call qq_wwqq(p_MCFM,id_MCFM,msq)
+            if (id_MCFM(7).eq.0 .and. id_MCFM(8).eq.0) then ! Calculate for swapped momentum combination
+               call swap(p_MCFM(7,:),p_MCFM(8,:)) ! Swap just the momenta
+               call qq_wwqq(p_MCFM,id_MCFM,msq_tmp)
+               msq = msq + msq_tmp
+               do i=-5,5
+                  msq(i,i)=msq(i,i)*0.5d0
+               enddo
+            else if (id_MCFM(7).eq.0 .or. id_MCFM(8).eq.0) then ! Calculate for wrong combination
+               call swap(p_MCFM(7,:),p_MCFM(8,:)) ! Swap the momenta
+               call swap(id_MCFM(7),id_MCFM(8)) ! Swap the ids
+               call SetupParticleLabels(id_MCFM) ! Reassign plabels
+               call qq_wwqq(p_MCFM,id_MCFM,msq_tmp)
+               do i=-5,5
+               do j=-5,5
+                  if (msq(i,j).eq.0d0) then ! Non-zero MEs in original configuration are the correct ones, just replace 0 MEs
+                     msq(i,j)=msq_tmp(i,j)
+                  endif
+               enddo
+               enddo
+            endif
+         else if (Process.eq.69) then ! Or some other number?
+            call qq_wwqqstrong(p_MCFM,id_MCFM,msq)
+            if (id_MCFM(7).eq.0 .and. id_MCFM(8).eq.0) then ! Calculate for swapped momentum combination
+               call swap(p_MCFM(7,:),p_MCFM(8,:)) ! Swap just the momenta
+               call qq_wwqqstrong(p_MCFM,id_MCFM,msq_tmp)
+               msq = msq + msq_tmp
+               do i=-5,5
+                  if (i.eq.0) cycle ! gg->qqb+qbq does not need to be multiplied by 1/2
+                  msq(i,i)=msq(i,i)*0.5d0
+               enddo
+               ! Subtract qqb->gg, which was counted twice
+               id_MCFM(7:8)=Glu_
+               call SetupParticleLabels(id_MCFM) ! Reassign plabels
+               call qq_wwqqstrong(p_MCFM,id_MCFM,msq_tmp)
+               msq = msq - msq_tmp
+            else if (id_MCFM(7).eq.0 .or. id_MCFM(8).eq.0) then ! Calculate for wrong combination
+               call swap(p_MCFM(7,:),p_MCFM(8,:)) ! Swap the momenta
+               call swap(id_MCFM(7),id_MCFM(8)) ! Swap the ids
+               call SetupParticleLabels(id_MCFM) ! Reassign plabels
+               call qq_wwqqstrong(p_MCFM,id_MCFM,msq_tmp)
+               do i=-5,5
+               do j=-5,5
+                  if (msq(i,j).eq.0d0) then ! Non-zero MEs in original configuration are the correct ones, just replace 0 MEs
+                     msq(i,j)=msq_tmp(i,j)
+                  endif
+               enddo
+               enddo
+            endif
+         endif
+      else if(ZWcode.eq.doZZorWW) then
+         if (Process.ge.66 .and. Process.le.68) then
+            call qq_vvqq(p_MCFM,id_MCFM,msq)
+            if (id_MCFM(7).eq.0 .and. id_MCFM(8).eq.0) then ! Calculate for swapped momentum combination
+               call swap(p_MCFM(7,:),p_MCFM(8,:)) ! Swap just the momenta
+               call qq_vvqq(p_MCFM,id_MCFM,msq_tmp)
+               msq = msq + msq_tmp
+               do i=-5,5
+                  msq(i,i)=msq(i,i)*0.5d0
+               enddo
+            else if (id_MCFM(7).eq.0 .or. id_MCFM(8).eq.0) then ! Calculate for wrong combination
+               call swap(p_MCFM(7,:),p_MCFM(8,:)) ! Swap the momenta
+               call swap(id_MCFM(7),id_MCFM(8)) ! Swap the ids
+               call SetupParticleLabels(id_MCFM) ! Reassign plabels
+               call qq_vvqq(p_MCFM,id_MCFM,msq_tmp)
+               do i=-5,5
+               do j=-5,5
+                  if (msq(i,j).eq.0d0) then ! Non-zero MEs in original configuration are the correct ones, just replace 0 MEs
+                     msq(i,j)=msq_tmp(i,j)
+                  endif
+               enddo
+               enddo
+            endif
+         endif
+      endif
+
+   endif
+
+end subroutine
 
 END MODULE
