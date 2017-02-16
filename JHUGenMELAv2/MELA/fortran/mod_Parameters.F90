@@ -1336,8 +1336,6 @@ integer :: DKMode
 END FUNCTION
 
 
-
-
 FUNCTION IsAWDecay(DKMode)
 implicit none
 logical :: IsAWDecay
@@ -1362,7 +1360,6 @@ integer :: DKMode
 END FUNCTION
 
 
-
 FUNCTION IsAPhoton(DKMode)
 implicit none
 logical :: IsAPhoton
@@ -1380,24 +1377,44 @@ END FUNCTION
 
 
 
+FUNCTION IsDownTypeQuark(PartType)
+implicit none
+logical :: IsDownTypeQuark
+integer :: PartType
+   IsDownTypeQuark = ( abs(PartType).eq.abs(Dn_) .or. abs(PartType).eq.abs(Str_) .or. abs(PartType).eq.abs(Bot_) )
+END FUNCTION
+FUNCTION IsLHEDownTypeQuark(PartType)
+implicit none
+logical :: IsLHEDownTypeQuark
+integer :: PartType
+   IsLHEDownTypeQuark = ( abs(PartType).eq.1 .or. abs(PartType).eq.3 .or. abs(PartType).eq.5 )
+END FUNCTION
 
-
+FUNCTION IsUpTypeQuark(PartType)
+implicit none
+logical :: IsUpTypeQuark
+integer :: PartType
+   IsUpTypeQuark = ( abs(PartType).eq.abs(Up_) .or. abs(PartType).eq.abs(Chm_) .or. abs(PartType).eq.abs(Top_) )
+END FUNCTION
+FUNCTION IsLHEUpTypeQuark(PartType)
+implicit none
+logical :: IsLHEUpTypeQuark
+integer :: PartType
+   IsLHEUpTypeQuark = ( abs(PartType).eq.2 .or. abs(PartType).eq.4 .or. abs(PartType).eq.6 )
+END FUNCTION
 
 FUNCTION IsAQuark(PartType)
 implicit none
 logical :: IsAQuark
 integer :: PartType
-
-
-  if( abs(PartType).ge.1 .and. abs(PartType).le.6 ) then
-     IsAQuark = .true.
-  else
-     IsAQuark=.false.
-  endif
-
+   IsAQuark=IsUpTypeQuark(PartType) .or. IsDownTypeQuark(PartType)
 END FUNCTION
-
-
+FUNCTION IsLHEAQuark(PartType)
+implicit none
+logical :: IsLHEAQuark
+integer :: PartType
+   IsLHEAQuark=IsLHEUpTypeQuark(PartType) .or. IsLHEDownTypeQuark(PartType)
+END FUNCTION
 
 
 
@@ -1405,62 +1422,42 @@ FUNCTION IsANeutrino(PartType)
 implicit none
 logical :: IsANeutrino
 integer :: PartType
-
-
-  if( abs(PartType).ge.14 .and. abs(PartType).le.16 ) then
-     IsANeutrino = .true.
-  else
-     IsANeutrino=.false.
-  endif
-
+   IsANeutrino = ( abs(PartType).eq.abs(NuE_) .or. abs(PartType).eq.abs(NuM_) .or. abs(PartType).eq.abs(NuT_) )
 END FUNCTION
-FUNCTION IsALHELepton(PartType)! note that lepton means charged lepton here
+FUNCTION IsALHENeutrino(PartType)
 implicit none
-logical :: IsALHELepton
+logical :: IsALHENeutrino
 integer :: PartType
-
-
-  if( abs(PartType).eq.11 .or. abs(PartType).eq.13 .or. abs(PartType).eq.15 ) then
-     IsALHELepton = .true.
-  else
-     IsALHELepton=.false.
-  endif
-
+   IsALHENeutrino = ( abs(PartType).eq.12 .or. abs(PartType).eq.14 .or. abs(PartType).eq.16 )
 END FUNCTION
-
-
 
 FUNCTION IsALepton(PartType)! note that lepton means charged lepton here
 implicit none
 logical :: IsALepton
 integer :: PartType
-
-
-  if( abs(PartType).eq.ElP_ .or. abs(PartType).eq.MuP_ .or. abs(PartType).eq.TaP_ ) then
-     IsALepton = .true.
-  else
-     IsALepton=.false.
-  endif
-
+  IsALepton = ( abs(PartType).eq.abs(ElP_) .or. abs(PartType).eq.abs(MuP_) .or. abs(PartType).eq.abs(TaP_) )
 END FUNCTION
-
+FUNCTION IsALHELepton(PartType)! note that lepton means charged lepton here
+implicit none
+logical :: IsALHELepton
+integer :: PartType
+  IsALHELepton = ( abs(PartType).eq.11 .or. abs(PartType).eq.13 .or. abs(PartType).eq.15 )
+END FUNCTION
 
 
 FUNCTION IsABoson(PartType)
 implicit none
 logical :: IsABoson
 integer :: PartType
-
-
-  if( abs(PartType).eq.11 .or. abs(PartType).eq.12 .or. abs(PartType).eq.13 .or. abs(PartType).eq.25 ) then
-     IsABoson = .true.
-  else
-     IsABoson=.false.
-  endif
-
-
+  IsABoson = ( abs(PartType).eq.abs(Pho_) .or. abs(PartType).eq.abs(Z0_) .or. abs(PartType).eq.abs(Wp_) .or. abs(PartType).eq.abs(Hig_) )
 END FUNCTION
 
+FUNCTION IsALHEBoson(PartType)
+implicit none
+logical :: IsALHEBoson
+integer :: PartType
+  IsALHEBoson = ( abs(PartType).ge.22 .and. abs(PartType).le.25 )
+END FUNCTION
 
 function CoupledVertex(id,hel,useAHcoupl)
    implicit none

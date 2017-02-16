@@ -4,12 +4,13 @@ machine:
     - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.6 10
     - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.6 10
     - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.9 20
-    - sudo apt-get install dos2unix
-    - sudo apt-get install cadaver
+    - sudo apt-get install dos2unix cadaver tcsh
   environment:
     #environment variables can only be set in this section so . bin/thisroot.sh doesn't work
+    SCRAM_ARCH: "slc6_amd64_gcc530"
+
     PATH: "$(echo $HOME/root/bin:$HOME/CMSJHU_AnalysisMacros/JHUSpinWidthPaper_2015/LHEAnalyzer:$PATH | sed s/:$//)"
-    LD_LIBRARY_PATH: "$(echo $HOME/root/lib:$HOME/LHAPDF-6.1.6/lib:$LD_LIBRARY_PATH | sed s/:$//)"
+    LD_LIBRARY_PATH: "$(echo $HOME/JHUGen/JHUGenMELAv2/MELA/data/$SCRAM_ARCH:$HOME/root/lib:$HOME/LHAPDF-6.1.6/lib:$LD_LIBRARY_PATH | sed s/:$//)"
 
     SHLIB_PATH: "$(echo $HOME/root/lib:$SHLIB_PATH | sed s/:$//)"
     LIBPATH: "$(echo $HOME/root/lib:$LIBPATH | sed s/:$//)"
@@ -29,7 +30,7 @@ machine:
     ROOT_VERSIONSTRING: "${ROOT_VERSIONPART1}.${ROOT_VERSIONPART2}/${ROOT_VERSIONPART3}"
 
     REFERENCE_LHES_USERNAME: "hroskes"
-    REFERENCE_LHES_BUILD_NUMBER: "621"
+    REFERENCE_LHES_BUILD_NUMBER: "643"
     REFERENCE_JHUGEN_VERSION: "v7.0.2"
 
     REFERENCE_LHES_FOLDER: "$(echo https://circleci.com/api/v1/project/$REFERENCE_LHES_USERNAME/JHUGen/$REFERENCE_LHES_BUILD_NUMBER/'artifacts/0/$CIRCLE_ARTIFACTS/reference')"
@@ -151,11 +152,20 @@ test:
     #same with lhapdf
     - "! grep 'UseLHAPDF *= *Yes' makefile"
     - sed -i -r -e "s/(UseLHAPDF *= *)Yes/\1No/" makefile
+
+    #want the default linkMELA to be Yes
+    - "grep 'linkMELA *= *Yes' makefile"
+    #but first test that it compiles without it
+    #(if not, the first make will fail since we haven't compiled MELA yet)
+    - sed -i -r -e "s/^(linkMELA *= *)Yes/\1No/" makefile
     - make
     - make:
          pwd:
            ../JHUGenMELA
     - cd ../JHUGenMELAv2/MELA && bash setup.sh
+    #now turn linkMELA back on
+    - sed -i -r -e "s/^(linkMELA *= *)No/\1Yes/" makefile
+    - make
     #check sync between generator and MELA
     - sdiff -s mod_Graviton.F90 ../JHUGenMELAv2/MELA/fortran/mod_Graviton.F90
     - sdiff -s mod_Higgs.F90 ../JHUGenMELAv2/MELA/fortran/mod_Higgs.F90
@@ -267,17 +277,17 @@ test:
         echo $filename
         echo "================"
         echo
-        sdiff -s reference/$filename compare_to_reference/$filename && echo "no change" || exitstatus=1
+        sdiff -s reference/$filename compare_to_reference/$filename && echo "no change" || (
+          exitstatus=1
+          touch ~/reference_failed
+          if [ $filename == $REFERENCE_FILENAME_GGH ]; then
+            touch ~/reference_failed_ggH
+          fi
+          if [ $filename == $REFERENCE_FILENAME_VBF ] || [ $filename == $REFERENCE_FILENAME_HJJ ]; then
+            touch ~/reference_failed_VBF
+          fi
+        )
       done
-      if [ $exitstatus -ne 0 ]; then
-        touch ~/reference_failed
-        if [ $filename == $REFERENCE_FILENAME_GGH ]; then
-          touch ~/reference_failed_ggH
-        fi
-        if [ $filename == $REFERENCE_FILENAME_VBF ] || [ $filename == $REFERENCE_FILENAME_HJJ ]; then
-          touch ~/reference_failed_VBF
-        fi
-      fi
       exit $exitstatus
 
     - |
@@ -392,18 +402,7 @@ test:
     - ./JHUGen VegasNc0=100000 DecayMode1=11 DecayMode2=11 ReadLHE=$CIRCLE_ARTIFACTS/other/ZH_LHAPDF.lhe DataFile=$CIRCLE_ARTIFACTS/other/ZH_LHAPDF_WW
     - ./JHUGen VegasNc0=100000 TauDK=0                     ReadLHE=$CIRCLE_ARTIFACTS/other/ZH_LHAPDF.lhe DataFile=$CIRCLE_ARTIFACTS/other/ZH_LHAPDF_tautau
 
-    #make sure MELA compiles and runs
-    - ./testC:
-        pwd:
-          ../JHUGenMELA
-    - ./testF:
-        pwd:
-          ../JHUGenMELA
-    #should check that all the "should be" ME's are correct...
-    #make sure JHUGen compiles with linkMELA
-    - sed -i -r -e "s/(linkMELA *= *)No/\1Yes/" makefile
-    - make clean
-    - make
+    #put MELAv2 tests here
 
 
   post:

@@ -25,6 +25,8 @@ UseLHAPDF=No
 MyLHADir=${LHAPDF_DATA_PATH}/../../lib/
 
 #link MCFM libraries from MELA
+# remember to export
+#          LD_LIBRARY_PATH=/.../MELA/data/$SCRAM_ARCH/:${LD_LIBRARY_PATH}
 linkMELA = Yes
 
 
@@ -178,7 +180,7 @@ else
 endif
 	@echo " executable file "$(Exec)" is compiled with "$(Comp)
 	@echo " "
-	$(fcomp) -o $(Exec) $(MainObj) $(KinObj) $(AmpObj) $(PSGenObj) $(VegasObj) $(PDFObj) $(CPSObj) $(LHAPDFflags)
+	$(fcomp) -o $(Exec) $(MainObj) $(KinObj) $(AmpObj) $(PSGenObj) $(VegasObj) $(PDFObj) $(CPSObj) $(LHAPDFflags) $(MELAflags)
 
 
 
