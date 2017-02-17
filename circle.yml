@@ -30,11 +30,11 @@ machine:
     ROOT_VERSIONSTRING: "${ROOT_VERSIONPART1}.${ROOT_VERSIONPART2}/${ROOT_VERSIONPART3}"
 
     REFERENCE_LHES_USERNAME: "hroskes"
-    REFERENCE_LHES_BUILD_NUMBER: "643"
-    REFERENCE_JHUGEN_VERSION: "v7.0.2"
+    REFERENCE_LHES_BUILD_NUMBER: "656"
+    REFERENCE_JHUGEN_VERSION: "v7.0.3"
 
     REFERENCE_LHES_FOLDER: "$(echo https://circleci.com/api/v1/project/$REFERENCE_LHES_USERNAME/JHUGen/$REFERENCE_LHES_BUILD_NUMBER/'artifacts/0/$CIRCLE_ARTIFACTS/reference')"
-    REFERENCE_FILENAMES: "ggH_ZZ.lhe ggH_WW.lhe ggH_Zgamma.lhe ggH_gammagamma.lhe spin1_ZZ.lhe spin1_WW.lhe gg_spin2_ZZ.lhe qq_spin2_WW.lhe gg_spin2_Zgamma.lhe qq_spin2_gammagamma.lhe ZH_bb.lhe WH_Zgamma.lhe ee_gammaH_bb.lhe VBF_ZZ.lhe HJJ_WW.lhe HJ_gammagamma.lhe ttH_tautau.lhe bbH_tautau.lhe tqH_110.lhe tqH_111.lhe tqH_112.lhe tqH_113.lhe tqH_114.lhe"
+    REFERENCE_FILENAMES: "ggH_ZZ.lhe ggH_WW.lhe ggH_Zgamma.lhe ggH_gammagamma.lhe spin1_ZZ.lhe spin1_WW.lhe gg_spin2_ZZ.lhe qq_spin2_WW.lhe gg_spin2_Zgamma.lhe qq_spin2_gammagamma.lhe ZH_bb.lhe WH_Zgamma.lhe ee_gammaH_bb.lhe VBF_ZZ.lhe HJJ_WW.lhe HJ_gammagamma.lhe ttH_tautau.lhe gg_bbH_tautau.lhe qq_bbH.lhe tqH_110.lhe tqH_111.lhe tqH_112.lhe tqH_113.lhe tqH_114.lhe"
 
     #if the ggH_ZZ comparison passes, don't make the ggH plots since they will be the same
     #and similar for VBF
@@ -260,8 +260,9 @@ test:
 
     - ./JHUGen Seed=765543533 PDFSet=3 Process=80 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/ttH TopDK=1 DecayMode1=11 DecayMode2=11 $REFERENCE_COUPLINGS
     - ./JHUGen Seed=765543533 VegasNc0=100000 ReadLHE=compare_to_reference/ttH.lhe DataFile=compare_to_reference/ttH_tautau DecayMode1=11 DecayMode2=11 TauDK=1 $REFERENCE_COUPLINGS
-    - ./JHUGen Seed=765543533 PDFSet=3 Process=90 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/bbH $REFERENCE_COUPLINGS
-    - ./JHUGen Seed=765543533 VegasNc0=100000 ReadLHE=compare_to_reference/bbH.lhe DataFile=compare_to_reference/bbH_tautau TauDK=0 $REFERENCE_COUPLINGS
+    - ./JHUGen Seed=765543533 PDFSet=3 Process=90 VegasNc0=100000 VegasNc2=10 DataFile=compare_to_reference/gg_bbH PChannel=0 $REFERENCE_COUPLINGS
+    - ./JHUGen Seed=765543533 VegasNc0=100000 ReadLHE=compare_to_reference/gg_bbH.lhe DataFile=compare_to_reference/gg_bbH_tautau TauDK=0 $REFERENCE_COUPLINGS
+    - ./JHUGen Seed=765543533 PDFSet=3 Process=90 VegasNc0=100000 VegasNc2=10 DataFile=compare_to_reference/qq_bbH PChannel=1 $REFERENCE_COUPLINGS
 
     - ./JHUGen Seed=765543533 PDFSet=3 Process=110 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/tqH_110 TopDK=1 DecayMode1=11 $REFERENCE_COUPLINGS
     - ./JHUGen Seed=765543533 PDFSet=3 Process=111 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/tqH_111 TopDK=1 DecayMode1=11 $REFERENCE_COUPLINGS
@@ -277,7 +278,9 @@ test:
         echo $filename
         echo "================"
         echo
-        sdiff -s reference/$filename compare_to_reference/$filename && echo "no change" || (
+        if sdiff -s reference/$filename compare_to_reference/$filename; then
+          echo "no change"
+        else
           exitstatus=1
           touch ~/reference_failed
           if [ $filename == $REFERENCE_FILENAME_GGH ]; then
@@ -286,7 +289,7 @@ test:
           if [ $filename == $REFERENCE_FILENAME_VBF ] || [ $filename == $REFERENCE_FILENAME_HJJ ]; then
             touch ~/reference_failed_VBF
           fi
-        )
+        fi
       done
       exit $exitstatus
 
@@ -411,10 +414,10 @@ test:
     - "! grep -q '!' checklheoutput.txt"    #all the error messages end with !
 
     #ggH analytical fits
-    - if [ -f ~/reference_failed ]; then cd ~/CMSJHU_AnalysisMacros/ZZ4lanalyticalfits && echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$CIRCLE_ARTIFACTS/ggH/SM.root", "$CIRCLE_ARTIFACTS/ggH/SM/", 1, 0, 0, 0, 0)' | root -b; fi
-    - if [ -f ~/reference_failed ]; then cd ~/CMSJHU_AnalysisMacros/ZZ4lanalyticalfits && echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$CIRCLE_ARTIFACTS/ggH/PS.root", "$CIRCLE_ARTIFACTS/ggH/PS/", 0, 0, 0, 1, 0)' | root -b; fi
-    - if [ -f ~/reference_failed ]; then cd ~/CMSJHU_AnalysisMacros/ZZ4lanalyticalfits && echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$CIRCLE_ARTIFACTS/ggH/a2.root", "$CIRCLE_ARTIFACTS/ggH/a2/", 0, 1, 0, 0, 0)' | root -b; fi
-    #- if [ -f ~/reference_failed ]; then cd ~/CMSJHU_AnalysisMacros/ZZ4lanalyticalfits && echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$CIRCLE_ARTIFACTS/ggH/fa30.5.root", "$CIRCLE_ARTIFACTS/ggH/fa30.5/", 1, 2.55052, 0, 0, 0)' | root -b; fi
-    #- if [ -f ~/reference_failed ]; then cd ~/CMSJHU_AnalysisMacros/ZZ4lanalyticalfits && echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$CIRCLE_ARTIFACTS/ggH/fa30.5i.root", "$CIRCLE_ARTIFACTS/ggH/fa30.5i/", 1, 0, 2.55052, 0, 0)' | root -b; fi
+    - if [ -f ~/reference_failed_ggH ]; then cd ~/CMSJHU_AnalysisMacros/ZZ4lanalyticalfits && echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$CIRCLE_ARTIFACTS/ggH/SM.root", "$CIRCLE_ARTIFACTS/ggH/SM/", 1, 0, 0, 0, 0)' | root -b; fi
+    - if [ -f ~/reference_failed_ggH ]; then cd ~/CMSJHU_AnalysisMacros/ZZ4lanalyticalfits && echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$CIRCLE_ARTIFACTS/ggH/PS.root", "$CIRCLE_ARTIFACTS/ggH/PS/", 0, 0, 0, 1, 0)' | root -b; fi
+    - if [ -f ~/reference_failed_ggH ]; then cd ~/CMSJHU_AnalysisMacros/ZZ4lanalyticalfits && echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$CIRCLE_ARTIFACTS/ggH/a2.root", "$CIRCLE_ARTIFACTS/ggH/a2/", 0, 1, 0, 0, 0)' | root -b; fi
+    #- if [ -f ~/reference_failed_ggH ]; then cd ~/CMSJHU_AnalysisMacros/ZZ4lanalyticalfits && echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$CIRCLE_ARTIFACTS/ggH/fa30.5.root", "$CIRCLE_ARTIFACTS/ggH/fa30.5/", 1, 2.55052, 0, 0, 0)' | root -b; fi
+    #- if [ -f ~/reference_failed_ggH ]; then cd ~/CMSJHU_AnalysisMacros/ZZ4lanalyticalfits && echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$CIRCLE_ARTIFACTS/ggH/fa30.5i.root", "$CIRCLE_ARTIFACTS/ggH/fa30.5i/", 1, 0, 2.55052, 0, 0)' | root -b; fi
     #VBF plots
-    - if [ -f ~/reference_failed ]; then cd ~/CMSJHU_AnalysisMacros/MCProductionValidation && root -b -q VBFplots.C+; fi
+    - if [ -f ~/reference_failed_VBF ]; then cd ~/CMSJHU_AnalysisMacros/MCProductionValidation && root -b -q VBFplots.C+; fi
