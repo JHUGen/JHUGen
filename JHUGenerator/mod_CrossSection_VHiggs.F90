@@ -45,7 +45,7 @@ Function EvalWeighted_VHiggs(yRnd,VgsWgt)
     !double precision beam_momentum(2,4), four_momentum(7,4),inv_mass(7),mass(7,2)
     real(8) :: helicity(9)!, beam_h(2) !helicities
     integer id(9), id2(9)!, beam_id(2)
-    logical :: PhoDecays
+    logical :: PhotonOnshell_dummy
 
 
     EvalWeighted_VHiggs=0d0
@@ -347,12 +347,12 @@ if( IsAZDecay(DecayMode1).or.IsAPhoton(DecayMode1) ) then
     MomExt(2,2)=0d0
     MomExt(3,2)=0d0
     MomExt(4,2)=-MomExt(1,2)
-    call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt,HbbDecays,PhoOnshell=(IsAPhoton(DecayMode1)),ZAinterference=includeGammaStar)
-!    do i=1,9
-!    print *, MomExt(:,i)
-!    enddo
-    call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut,HbbDecays,PhoOnshell=(IsAPhoton(DecayMode1)))
-!    print *, "!!!!!!!!!"
+
+    PhotonOnshell_dummy = IsAPhoton(DecayMode1)
+
+    call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt,HbbDecays,PhoOnshell=PhotonOnshell_dummy),ZAinterference=includeGammaStar)
+    call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut,HbbDecays,PhoOnshell=PhotonOnshell_dummy)
+
     if( applyPSCut .or. PSWgt.eq.zero ) return
     if( IsAZDecay(DecayMode1) )then
       call SetRunningScales( (/ MomExt(1:4,5),MomExt(1:4,6),MomExt(1:4,7) /) , (/ convertLHEreverse(id(3)),convertLHEreverse(id(6)),convertLHEreverse(id(7)),convertLHEreverse(id(4)) /) )
@@ -404,9 +404,11 @@ if( IsAZDecay(DecayMode1).or.IsAPhoton(DecayMode1) ) then
     MomExt(2,2)=0d0
     MomExt(3,2)=0d0
     MomExt(4,2)=-MomExt(1,2)
+
+    PhotonOnshell_dummy = IsAPhoton(DecayMode1)
   
-    call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt,HbbDecays,PhoOnshell=(IsAPhoton(DecayMode1)),ZAinterference=includeGammaStar)
-    call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut,HbbDecays,PhoOnshell=(IsAPhoton(DecayMode1)))
+    call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt,HbbDecays,PhoOnshell=PhotonOnshell_dummy,ZAinterference=includeGammaStar)
+    call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut,HbbDecays,PhoOnshell=PhotonOnshell_dummy)
   
     if( applyPSCut .or. PSWgt.eq.zero ) return
   
@@ -546,6 +548,7 @@ real(8) :: inv_mass(9),mass(9,2)
 !real(8) :: beam_momentum(2,4), four_momentum(7,4),inv_mass(7),mass(7,2)
 real(8) :: helicity(9) !helicities
 integer :: id(9), id2(9)
+logical :: PhotonOnshell_dummy
 include 'csmaxvalue.f'
 
 EvalUnWeighted_VHiggs = 0d0
@@ -845,9 +848,11 @@ if( IsAZDecay(DecayMode1) .or. IsAPhoton(DecayMode1) ) then
     MomExt(2,2)=0d0
     MomExt(3,2)=0d0
     MomExt(4,2)=-MomExt(1,2)
+
+    PhotonOnshell_dummy = IsAPhoton(DecayMode1)
     
-    call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt,HbbDecays,PhoOnshell=(IsAPhoton(DecayMode1)),ZAinterference=includeGammaStar)
-    call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut,HbbDecays,PhoOnshell=(IsAPhoton(DecayMode1)))
+    call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt,HbbDecays,PhoOnshell=PhotonOnshell_dummy,ZAinterference=includeGammaStar)
+    call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut,HbbDecays,PhoOnshell=PhotonOnshell_dummy)
 
     if( applyPSCut .or. PSWgt.eq.zero ) return
     
@@ -877,9 +882,11 @@ if( IsAZDecay(DecayMode1) .or. IsAPhoton(DecayMode1) ) then
     MomExt(2,2)=0d0
     MomExt(3,2)=0d0
     MomExt(4,2)=-MomExt(1,2)
+
+    PhotonOnshell_dummy = IsAPhoton(DecayMode1)
   
-    call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt,HbbDecays,PhoOnshell=(IsAPhoton(DecayMode1)),ZAinterference=includeGammaStar)
-    call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut,HbbDecays,PhoOnshell=(IsAPhoton(DecayMode1)))
+    call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt,HbbDecays,PhoOnshell=PhotonOnshell_dummy,ZAinterference=includeGammaStar)
+    call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut,HbbDecays,PhoOnshell=PhotonOnshell_dummy)
 
     if( applyPSCut .or. PSWgt.eq.zero ) return
 
@@ -985,7 +992,8 @@ endif
     AlertCounter = AlertCounter + 1
     Res = 0d0
   elseif( EvalUnWeighted_VHiggs .gt. yRnd(17)*CS_max ) then
-    call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut,HbbDecays,PhoOnshell=(IsAPhoton(DecayMode1)))
+    PhotonOnshell_dummy = IsAPhoton(DecayMode1)
+    call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut,HbbDecays,PhoOnshell=PhotonOnshell_dummy)
     do NHisto=1,NumHistograms
       call intoHisto(NHisto,NBin(NHisto),1d0)  ! CS_Max is the integration volume
     enddo
