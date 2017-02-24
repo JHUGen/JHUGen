@@ -2112,7 +2112,7 @@ END SUBROUTINE
 
 
 
-SUBROUTINE Kinematics_VHiggsiggs(id,MomExt,inv_mass,NBin,applyPSCut,useAonshell)
+SUBROUTINE Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut,useAonshell)
 use ModMisc
 use ModParameters
 implicit none
@@ -2281,7 +2281,7 @@ logical :: hasAonshell
      Nbin(9)  = WhichBin(9,phi)
 
 RETURN
-END SUBROUTINE Kinematics_VHiggsiggs
+END SUBROUTINE Kinematics_VHiggs
 
 
 
