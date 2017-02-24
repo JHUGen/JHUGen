@@ -45,6 +45,7 @@ Function EvalWeighted_VHiggs(yRnd,VgsWgt)
     !double precision beam_momentum(2,4), four_momentum(7,4),inv_mass(7),mass(7,2)
     real(8) :: helicity(9)!, beam_h(2) !helicities
     integer id(9), id2(9)!, beam_id(2)
+    logical :: PhoOnshell
 
     EvalWeighted_VHiggs=0d0
     EvalCounter = EvalCounter+1
@@ -542,6 +543,7 @@ real(8) :: inv_mass(9),mass(9,2)
 !real(8) :: beam_momentum(2,4), four_momentum(7,4),inv_mass(7),mass(7,2)
 real(8) :: helicity(9) !helicities
 integer :: id(9), id2(9)
+logical :: PhoOnshell
 include 'csmaxvalue.f'
 
 EvalUnWeighted_VHiggs = 0d0
