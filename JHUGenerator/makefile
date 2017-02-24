@@ -90,7 +90,7 @@ endif
 
 # main dependencies
 MainDep = mod_CrossSection.F90 \
-		  mod_CrossSection_VHiggs.F90 \
+          mod_CrossSection_VHiggs.F90 \
           mod_CrossSection_HJJ.F90 \
           mod_CrossSection_TTBH.F90 \
           mod_CrossSection_BBBH.F90 \
