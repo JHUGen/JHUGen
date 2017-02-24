@@ -350,7 +350,7 @@ if( IsAZDecay(DecayMode1).or.IsAPhoton(DecayMode1) ) then
 
     PhotonOnshell_dummy = IsAPhoton(DecayMode1)
 
-    call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt,HbbDecays,PhoOnshell=PhotonOnshell_dummy),ZAinterference=includeGammaStar)
+    call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt,HbbDecays,PhoOnshell=PhotonOnshell_dummy,ZAinterference=includeGammaStar)
     call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut,HbbDecays,PhoOnshell=PhotonOnshell_dummy)
 
     if( applyPSCut .or. PSWgt.eq.zero ) return
