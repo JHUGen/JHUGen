@@ -117,13 +117,12 @@ logical, public :: RandomizeVVdecays = .true.    ! randomize DecayMode1 and Deca
 
 logical, public :: UseUnformattedRead = .false.  !Set this to true if the regular reading fails for whatever reason
 
-logical, public :: H_DK =.false.                 ! default to false so H in V* > VH (Process = 50) does not decay to bbbar
-
+logical, public :: HbbDecays =.true.                 ! default to false so H in V* > VH (Process = 50) does not decay to bbbar
 !leave this one as a parameter, no reason to ever turn it off
 logical, public, parameter :: importExternal_LHEinit = .true.
 
 ! gg > ZH
-character(len=2), public :: VH_PC = "tr"                    ! VH partonic channel and mode selection, in development.
+character(len=2), public :: VH_PC = "qq"                    ! VH partonic channel and mode selection, in development.
                                                             ! "gg" ( = triangles + boxes of gg)
                                                             ! "qq" ( = q qbar @LO)
                                                             ! "lo" ( = q qbar @LO)
@@ -173,7 +172,7 @@ real(dp), public           :: esq ! = 4.0d0 * pi * alpha_QED  ! Fundamental char
 real(8), public            :: xw = 0.23119d0                ! sin**2(Theta_Weinberg) (PDG-2008)
 real(8), public            :: sitW ! = dsqrt(xw)            ! sin(Theta_Weinberg) (PDG-2008)
 real(8), public            :: twosc ! = sqrt(4.0_dp*xw*(1.0_dp-xw))
-real(8), public, parameter :: LHC_Energy=13000d0  *GeV      ! LHC hadronic center of mass energy
+real(8), public, parameter :: LHC_Energy=14000d0  *GeV      ! LHC hadronic center of mass energy
 real(8), public, parameter :: TEV_Energy=1960d0  *GeV       ! Tevatron hadronic center of mass energy
 real(8), public, parameter :: ILC_Energy=250d0  *GeV        ! Linear collider center of mass energy
 !command line: epPolarization, emPolarization

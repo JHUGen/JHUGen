@@ -74,22 +74,26 @@ Exec = ./JHUGen
 # main dependencies
 MainDep = mod_Phasespace.F90 \
           mod_Kinematics.F90 \
+          mod_Kinematics_VH.F90 \
           mod_CrossSection.F90 \
           mod_CrossSection_HJJ.F90 \
           mod_CrossSection_TTBH.F90 \
           mod_CrossSection_BBBH.F90 \
           mod_CrossSection_TH.F90 \
+          mod_CrossSection_VH.F90 \
           mod_PMZZ.F90 \
           main.F90
 
 # main objects
 MainObj = $(ObjectDir)/mod_Phasespace.o \
           $(ObjectDir)/mod_Kinematics.o \
+          $(ObjectDir)/mod_Kinematics_VH.o \
           $(ObjectDir)/mod_CrossSection.o \
           $(ObjectDir)/mod_CrossSection_HJJ.o \
           $(ObjectDir)/mod_CrossSection_TTBH.o \
           $(ObjectDir)/mod_CrossSection_BBBH.o \
           $(ObjectDir)/mod_CrossSection_TH.o \
+          $(ObjectDir)/mod_CrossSection_VH.o \
           $(ObjectDir)/mod_PMZZ.o \
           $(ObjectDir)/main.o
 
@@ -101,9 +105,9 @@ AmpDep = mod_Misc.F90 \
           mod_Graviton.F90 \
           mod_Higgs.F90 \
           mod_Zprime.F90 \
-          mod_HiggsJJ.F90 \
-          mod_HiggsJ.F90 \
-          mod_VHiggs.F90 \
+          mod_HJJ.F90 \
+          mod_HJ.F90 \
+          mod_VH.F90 \
           mod_TTBHiggs.F90 \
           mod_THiggs.F90
 
@@ -115,9 +119,9 @@ AmpObj =  $(ObjectDir)/mod_Misc.o \
           $(ObjectDir)/mod_Graviton.o \
           $(ObjectDir)/mod_Higgs.o \
           $(ObjectDir)/mod_Zprime.o \
-          $(ObjectDir)/mod_HiggsJJ.o \
-          $(ObjectDir)/mod_HiggsJ.o \
-          $(ObjectDir)/mod_VHiggs.o \
+          $(ObjectDir)/mod_HJJ.o \
+          $(ObjectDir)/mod_HJ.o \
+          $(ObjectDir)/mod_VH.o \
           $(ObjectDir)/mod_TTBHiggs.o \
           $(ObjectDir)/mod_THiggs.o
 

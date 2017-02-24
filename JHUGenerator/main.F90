@@ -13,6 +13,9 @@ use ModPMZZ
 implicit none
 real(8) :: VG_Result,VG_Error
 
+! ifQCDLoop is used
+   call qlinit()
+! ifQCDLoop is used
    call SetJHUGenDefaults()
    call GetCommandlineArgs()
    call InitProcessScaleSchemes()
@@ -103,7 +106,7 @@ subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to t
          Process.eq.60 .or. & !- HVBF without decays
          Process.eq.61 .or. & !- Hjj, gluon fusion
          Process.eq.62 .or. & !- Hj, gluon fusion
-         Process.eq.50 & !- VHiggs
+         Process.eq.50 & !- VH
          ) then
             FacScheme = -kRenFacScheme_mhstar
             MuFacMultiplier = 1d0
@@ -142,7 +145,7 @@ subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to t
          Process.eq.60 .or. & !- HVBF without decays
          Process.eq.61 .or. & !- Hjj, gluon fusion
          Process.eq.62 .or. & !- Hj, gluon fusion
-         Process.eq.50 & !- VHiggs
+         Process.eq.50 & !- VH
          ) then
             RenScheme = -kRenFacScheme_mhstar
             MuRenMultiplier = 1d0
@@ -253,7 +256,7 @@ SUBROUTINE SetJHUGenDefaults()
 ! !       DecayMode=11: W --> anything
    TopDecays=-1
    TauDecays=-1
-   H_DK = .false.
+   HbbDecays = .false.
    Unweighted =.true.
    MuFacMultiplier = 1d0
    MuRenMultiplier = 1d0
@@ -382,8 +385,10 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "VegasNc1", success, VegasNc1)
     call ReadCommandLineArgument(arg, "VegasNc2", success, VegasNc2)
     call ReadCommandLineArgument(arg, "PChannel", success, PChannel)
+! gg > ZH
     call ReadCommandLineArgument(arg, "VH_PC", success, VH_PC)   !undocumented, in development
                                                                  !(could use PChannel for this once it's finalized)
+! gg > ZH
     call ReadCommandLineArgument(arg, "DataFile", success, DataFile)
     call ReadCommandLineArgument(arg, "Process", success, Process)
     call ReadCommandLineArgument(arg, "DecayMode1", success, DecayMode1)
@@ -394,7 +399,7 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "MuRenMultiplier", success, MuRenMultiplier, success2=SetMuRenMultiplier)
     call ReadCommandLineArgument(arg, "TopDK", success, TopDecays)
     call ReadCommandLineArgument(arg, "TauDK", success, TauDecays)
-    call ReadCommandLineArgument(arg, "HbbDK", success, H_DK)
+    call ReadCommandLineArgument(arg, "HbbDK", success, HbbDecays)
     call ReadCommandLineArgument(arg, "ReweightDecay", success, ReweightDecay)
     call ReadCommandLineArgument(arg, "WidthScheme", success, WidthScheme)
     call ReadCommandLineArgument(arg, "WidthSchemeIn", success, WidthSchemeIn)
@@ -1295,7 +1300,7 @@ include "vegas_common.f"
          VegasNc1_default = 500000
          VegasNc2_default = 10000
       endif
-      !- VHiggs
+      !- VH
       if(Process.eq.50) then
          NDim = 17
          NDim = NDim + 2 ! sHat integration
@@ -1404,6 +1409,7 @@ use ModCrossSection_HJJ
 use ModCrossSection_TTBH
 use ModCrossSection_BBBH
 use ModCrossSection_TH
+use ModCrossSection_VH
 use ModKinematics
 use ModParameters
 implicit none
@@ -1454,7 +1460,7 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
     elseif (Process.eq.62) then
       call vegas(EvalWeighted_HJ,VG_Result,VG_Error,VG_Chi2)
     elseif (Process.eq.50) then
-      call vegas(EvalWeighted_VHiggs,VG_Result,VG_Error,VG_Chi2)
+      call vegas(EvalWeighted_VH,VG_Result,VG_Error,VG_Chi2)
     elseif (Process.eq.80) then
       call vegas(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
     elseif (Process.eq.90) then
@@ -1484,7 +1490,7 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
     elseif (process.eq.62 .or. process.eq.61) then
       call vegas1(EvalWeighted_HJ,VG_Result,VG_Error,VG_Chi2)
     elseif (Process.eq.50) then
-      call vegas1(EvalWeighted_VHiggs,VG_Result,VG_Error,VG_Chi2)
+      call vegas1(EvalWeighted_VH,VG_Result,VG_Error,VG_Chi2)
     elseif (Process.eq.80) then
       call vegas1(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
     elseif (Process.eq.90) then
@@ -1519,7 +1525,7 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
                 VG = VG + RES
             elseif (Process.eq.50) then
                 RES = 0d0
-                dum = EvalUnWeighted_VHiggs(yRnd,.false.,RES)
+                dum = EvalUnWeighted_VH(yRnd,.false.,RES)
                 VG = VG + RES
             else
                 if (PChannel_aux.eq.0.or.PChannel_aux.eq.2) then
@@ -1588,7 +1594,7 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
             elseif (Process.eq.62) then
                       dum = EvalUnWeighted_HJ(yRnd,.true.,RES)! RES is a dummy here
             elseif (Process.eq.50) then
-                      dum = EvalUnWeighted_VHiggs(yRnd,.true.,RES)! RES is a dummy here
+                      dum = EvalUnWeighted_VH(yRnd,.true.,RES)! RES is a dummy here
             else
                 dum = EvalUnWeighted(yRnd,.true.,RES)! RES is a dummy here
             endif
@@ -1604,7 +1610,7 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
               elseif (Process.eq.62) then
                 dum = EvalUnWeighted_HJ(yRnd,.true.,RES)! RES is a dummy here
               elseif (Process.eq.50) then
-                  dum = EvalUnWeighted_VHiggs(yRnd,.true.,RES)! RES is a dummy here
+                  dum = EvalUnWeighted_VH(yRnd,.true.,RES)! RES is a dummy here
               else
                   dum = EvalUnWeighted(yRnd,.true.,RES)! RES is a dummy here
               endif
@@ -1701,7 +1707,8 @@ use ModCrossSection_BBBH
 use ModCrossSection_HJJ
 use ModCrossSection_TH
 use ModCrossSection_TTBH
-use modHiggsJJ
+use ModCrossSection_VH
+use modHJJ
 use modTHiggs
 use ModKinematics
 use ModMisc
@@ -3210,7 +3217,7 @@ implicit none
   elseif( Process.eq.62) then
      call InitHisto_HJ()
   elseif (Process.eq.50) then
-     call InitHisto_VHiggs()
+     call InitHisto_VH()
   elseif (Process.eq.80) then
      call InitHisto_TTBH()
   elseif (Process.eq.90) then
@@ -3906,7 +3913,7 @@ END SUBROUTINE
 
 
 
-SUBROUTINE InitHisto_VHiggs()
+SUBROUTINE InitHisto_VH()
 use ModMisc
 use ModKinematics
 use ModParameters

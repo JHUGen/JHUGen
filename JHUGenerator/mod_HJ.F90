@@ -1,4 +1,4 @@
-module ModHiggsJ
+module ModHJ
   use modParameters
   use ModMisc
   implicit none
@@ -187,4 +187,4 @@ end subroutine me2_qbqg_tree
   end subroutine spinoru2
 
 
-end module ModHiggsJ
+end module ModHJ

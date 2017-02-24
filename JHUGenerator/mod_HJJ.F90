@@ -1,4 +1,4 @@
-module modHiggsJJ
+module modHJJ
   use modParameters
   use ModMisc
   implicit none
@@ -3313,4 +3313,4 @@ module modHiggsJJ
 
 
 
-end module modHiggsJJ
+end module modHJJ

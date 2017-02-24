@@ -12,7 +12,7 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
 FUNCTION EvalWeighted_HJJ_fulldecay(yRnd,VgsWgt)
 use ModKinematics
 use ModParameters
-use ModHiggsjj
+use ModHJJ
 use ModMisc
 #if compiler==1
 use ifport
@@ -301,7 +301,7 @@ END FUNCTION
 FUNCTION EvalUnWeighted_HJJ_fulldecay(yRnd,genEvt,iPartons,RES)
 use ModKinematics
 use ModParameters
-use ModHiggsjj
+use ModHJj
 use ModMisc
 #if compiler==1
 use ifport
@@ -449,7 +449,7 @@ END FUNCTION
 FUNCTION EvalWeighted_HJJ_test(yRnd,VgsWgt)
 use ModKinematics
 use ModParameters
-use ModHiggsjj
+use ModHJj
 use ModMisc
 #if compiler==1
 use ifport
@@ -779,7 +779,7 @@ END FUNCTION
  FUNCTION EvalWeighted_HJJ(yRnd,VgsWgt)
  use ModKinematics
  use ModParameters
- use ModHiggsjj
+ use ModHJj
  use ModMisc
 #if compiler==1
  use ifport
@@ -1088,7 +1088,7 @@ END FUNCTION
  FUNCTION EvalUnWeighted_HJJ(yRnd,genEvt,iPartons,RES)
  use ModKinematics
  use ModParameters
- use ModHiggsjj
+ use ModHJj
  use ModMisc
 #if compiler==1
  use ifport
