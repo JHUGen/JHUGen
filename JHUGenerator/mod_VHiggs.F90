@@ -548,7 +548,7 @@ complex(8) function MATRIXELEMENT0qq(MomExt,mass,helicity,id)
 ! amplitudes w/o HVV or VFF couplings to calculate
       if(id(6).ne.convertLHE(Pho_))then !Z/A decays
         call spinoru2(7,(/-MomExt(1:4,1),-MomExt(1:4,2),-MomExt(1:4,1)-MomExt(1:4,2),MomExt(1:4,6)+MomExt(1:4,7),MomExt(1:4,8)+MomExt(1:4,9),MomExt(1:4,6),MomExt(1:4,7)/),Spaa,Spbb,sprod)
-        if(VH_PC.eq."tr".or.VH_PC.eq."gg")then
+        if(VHiggs_PC.eq."tr".or.VHiggs_PC.eq."gg")then
           if(gVVS1(1).ne.0d0.or.gVVS1(3).ne.0d0)then
             call ggTriffbHa1(Spaa,Spbb,sprod,helicity,TriffbHa1)
             TriffbHa1 = TriffbHa1*PROP3
@@ -557,12 +557,12 @@ complex(8) function MATRIXELEMENT0qq(MomExt,mass,helicity,id)
             call ggTriffbHa2(Spaa,Spbb,sprod,helicity,TriffbHa2)
             TriffbHa2 = TriffbHa2*PROP3
           endif
-        elseif(VH_PC.eq."bo".or.VH_PC.eq."gg")then
+        elseif(VHiggs_PC.eq."bo".or.VHiggs_PC.eq."gg")then
           call ggBoxffbH(Spaa,Spbb,sprod,helicity,BoxffbH)
         endif
       else ! A is final state
         call spinoru2(4,(/-MomExt(1:4,1),-MomExt(1:4,2),-MomExt(1:4,1)-MomExt(1:4,2),MomExt(1:4,4)/),Spaa,Spbb,sprod)
-        if(VH_PC.eq."tr".or.VH_PC.eq."gg")then
+        if(VHiggs_PC.eq."tr".or.VHiggs_PC.eq."gg")then
           if(gVVS1(3).ne.0d0)then
             call ggTriAHa1(Spaa,Spbb,sprod,helicity,TriAHa1)
             TriAHa1 = TriAHa1*PROP3
@@ -571,7 +571,7 @@ complex(8) function MATRIXELEMENT0qq(MomExt,mass,helicity,id)
             call ggTriAHa2(Spaa,Spbb,sprod,helicity,TriAHa2)
             TriAHa2 = TriAHa2*PROP3
           endif
-        elseif(VH_PC.eq."bo".or.VH_PC.eq."gg")then
+        elseif(VHiggs_PC.eq."bo".or.VHiggs_PC.eq."gg")then
           call ggBoxAH(Spaa,Spbb,sprod,helicity,BoxAH)
         endif
       endif
