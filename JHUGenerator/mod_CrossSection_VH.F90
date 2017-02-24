@@ -45,7 +45,7 @@ Function EvalWeighted_VHiggs(yRnd,VgsWgt)
     !double precision beam_momentum(2,4), four_momentum(7,4),inv_mass(7),mass(7,2)
     real(8) :: helicity(9)!, beam_h(2) !helicities
     integer id(9), id2(9)!, beam_id(2)
-    logical :: PhoDecays
+    logical :: PhotonOnshell_dummy
 
 
     EvalWeighted_VHiggs=0d0
@@ -352,7 +352,7 @@ if( IsAZDecay(DecayMode1).or.IsAPhoton(DecayMode1) ) then
 
     call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt,HbbDecays,PhoOnshell=PhotonOnshell_dummy),ZAinterference=includeGammaStar)
     call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut,HbbDecays,PhoOnshell=PhotonOnshell_dummy)
-    
+
     if( applyPSCut .or. PSWgt.eq.zero ) return
     if( IsAZDecay(DecayMode1) )then
       call SetRunningScales( (/ MomExt(1:4,5),MomExt(1:4,6),MomExt(1:4,7) /) , (/ convertLHEreverse(id(3)),convertLHEreverse(id(6)),convertLHEreverse(id(7)),convertLHEreverse(id(4)) /) )
@@ -548,6 +548,7 @@ real(8) :: inv_mass(9),mass(9,2)
 !real(8) :: beam_momentum(2,4), four_momentum(7,4),inv_mass(7),mass(7,2)
 real(8) :: helicity(9) !helicities
 integer :: id(9), id2(9)
+logical :: PhotonOnshell_dummy
 include 'csmaxvalue.f'
 
 EvalUnWeighted_VHiggs = 0d0
