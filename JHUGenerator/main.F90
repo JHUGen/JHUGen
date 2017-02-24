@@ -1230,6 +1230,7 @@ SUBROUTINE InitProcess()
 use ModParameters
 use ModMisc
 use ModCrossSection
+use ModCrossSection_VHiggs
 use ModTTBHiggs
 implicit none
 include "vegas_common.f"
@@ -1440,6 +1441,7 @@ end subroutine
 
 SUBROUTINE StartVegas(VG_Result,VG_Error)
 use ModCrossSection
+use ModCrossSection_VHiggs
 use ModCrossSection_HJJ
 use ModCrossSection_TTBH
 use ModCrossSection_BBBH
@@ -1737,6 +1739,7 @@ END SUBROUTINE
 
 SUBROUTINE StartVegas_NEW(VG_Result,VG_Error)
 use ModCrossSection
+use ModCrossSection_VHiggs
 use ModCrossSection_BBBH
 use ModCrossSection_HJJ
 use ModCrossSection_TH
