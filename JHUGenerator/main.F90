@@ -403,7 +403,7 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "VegasNc2", success, VegasNc2)
     call ReadCommandLineArgument(arg, "PChannel", success, PChannel)
 ! gg > ZH
-    call ReadCommandLineArgument(arg, "VHiggs_PC", success, VHiggs_PC)   !undocumented, in development
+    call ReadCommandLineArgument(arg, "VHiggs_PC", success, VHiggs_PC)  !undocumented, in development
                                                                  !(could use PChannel for this once it's finalized)
 ! gg > ZH
     call ReadCommandLineArgument(arg, "DataFile", success, DataFile)
