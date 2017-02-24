@@ -26,7 +26,7 @@ MyLHADir=${LHAPDF_DATA_PATH}/../../lib/
 
 #link MCFM libraries from MELA
 # remember to export
-#          LD_LIBRARY_PATH=/.../MELA/data/$SCRAM_ARCH/:${LD_LIBRARY_PATH}
+          LD_LIBRARY_PATH=/.../MELA/data/$SCRAM_ARCH/:${LD_LIBRARY_PATH}
 linkMELA = Yes
 
 
@@ -75,11 +75,13 @@ Exec = ./JHUGen
 
 # kinematics dependencies
 KinDep = mod_Phasespace.F90 \
-         mod_Kinematics.F90
+         mod_Kinematics.F90 \
+         mod_Kinematics_VHiggs.F90 \
 
 # kinematics objects
 KinObj = $(ObjectDir)/mod_Phasespace.o \
-         $(ObjectDir)/mod_Kinematics.o
+         $(ObjectDir)/mod_Kinematics.o \
+         $(ObjectDir)/mod_Kinematics_VHiggs.o
 
 ifeq ($(linkMELA),Yes)
     KinDep += mod_MCFMWrapper.F90
@@ -88,6 +90,7 @@ endif
 
 # main dependencies
 MainDep = mod_CrossSection.F90 \
+		  mod_CrossSection_VHiggs.F90 \
           mod_CrossSection_HJJ.F90 \
           mod_CrossSection_TTBH.F90 \
           mod_CrossSection_BBBH.F90 \
@@ -97,6 +100,7 @@ MainDep = mod_CrossSection.F90 \
 
 # main objects
 MainObj = $(ObjectDir)/mod_CrossSection.o \
+          $(ObjectDir)/mod_CrossSection_VHiggs.o \
           $(ObjectDir)/mod_CrossSection_HJJ.o \
           $(ObjectDir)/mod_CrossSection_TTBH.o \
           $(ObjectDir)/mod_CrossSection_BBBH.o \

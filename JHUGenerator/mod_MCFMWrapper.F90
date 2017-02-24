@@ -860,7 +860,7 @@ integer, intent(in) :: idferm
 integer, intent(in) :: whichZ
 logical :: isZlep,isZnu,isZup,isZdn
    if(idferm.eq.0) then
-      stop("pid(3)=0 is not allowed in qqVVqq processes")
+      stop "pid(3)=0 is not allowed in qqVVqq processes"
    endif
    isZlep = IsALepton(idferm)
    isZnu = IsANeutrino(idferm)

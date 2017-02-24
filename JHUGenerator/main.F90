@@ -59,7 +59,7 @@ END PROGRAM
 
 ! !       Scheme=kRenFacScheme_default: Defaults of each process with Mu_Fact==Mu_Ren
 ! !       Scheme=+-kRenFacScheme_mhstar: Scale ~ m_Hstar (or m_VV in bkg.); + for running, - for fixed
-! !       Below, J stands for the particles immediately associated to the Higgs (e.g. ttH, VH, VBF, tqH)
+! !       Below, J stands for the particles immediately associated to the Higgs (e.g. ttH, VHiggs, VBF, tqH)
 ! !       Scheme=+-kRenFacScheme_mjjhstar: Scale ~ m_JJHstar (or m_JJVV in bkg.); + for running, - for fixed
 ! !       Scheme=+-kRenFacScheme_mjj_mhstar: Scale ~ m_JJ + m_Hstar (or m_JJ+m_VV in bkg.); + for running, - for fixed
 ! !       Scheme=+-kRenFacScheme_mj_mj_mhstar: Scale ~ m_J + m_J + m_Hstar (or m_J+m_J+m_VV in bkg.); + for running, - for fixed
@@ -116,9 +116,9 @@ subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to t
             FacScheme = -kRenFacScheme_mhstar
             MuFacMultiplier = 1d0
          elseif( &
-         Process.eq.66 .or. & !- VVHVV with decays
+         Process.eq.66 .or. & !- VVHiggsVV with decays
          Process.eq.67 .or. & !- VVVV with decays
-         Process.eq.68 .or. & !- VVVV+VVHVV with decays
+         Process.eq.68 .or. & !- VVVV+VVHiggsVV with decays
          Process.eq.69      & !- QCD JJ bkg with decays
          ) then
             FacScheme = +kRenFacScheme_mhstar
@@ -158,9 +158,9 @@ subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to t
             RenScheme = -kRenFacScheme_mhstar
             MuRenMultiplier = 1d0
          elseif( &
-         Process.eq.66 .or. & !- VVHVV with decays
+         Process.eq.66 .or. & !- VVHiggsVV with decays
          Process.eq.67 .or. & !- VVVV with decays
-         Process.eq.68 .or. & !- VVVV+VVHVV with decays
+         Process.eq.68 .or. & !- VVVV+VVHiggsVV with decays
          Process.eq.69      & !- QCD JJ bkg with decays
          ) then
             RenScheme = +kRenFacScheme_mhstar
@@ -199,7 +199,7 @@ subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to t
             (abs(FacScheme).eq.kRenFacScheme_mjhstar) .or. (abs(FacScheme).eq.kRenFacScheme_mj_mhstar) .or. (abs(FacScheme).eq.kRenFacScheme_mj) .or. &
             (abs(RenScheme).eq.kRenFacScheme_mjhstar) .or. (abs(RenScheme).eq.kRenFacScheme_mj_mhstar) .or. (abs(RenScheme).eq.kRenFacScheme_mj)      &
          )                     &
-      ) call Error("ttH, bbH, HJJ, JJQCD, VBF and VH processes cannot distinguish the outgoing partons. Choose a different renormalization or factorization scheme.")
+      ) call Error("ttH, bbH, HJJ, JJQCD, VBF and VHiggs processes cannot distinguish the outgoing partons. Choose a different renormalization or factorization scheme.")
 
       if( &
          (                     &
@@ -214,7 +214,7 @@ subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to t
             (abs(FacScheme).eq.kRenFacScheme_mj_mj_mhstar) .or. (abs(FacScheme).eq.kRenFacScheme_mj_mj) .or. &
             (abs(RenScheme).eq.kRenFacScheme_mj_mj_mhstar) .or. (abs(RenScheme).eq.kRenFacScheme_mj_mj)      &
          )                     &
-      ) call Error("HJJ, JJQCD, VBF and VH processes outgoing partons are mostly massless, and alpha_S at a scale ~0 GeV is very unstable. Choose a different renormalization or factorization scheme (e.g. kRenFacScheme_mhstar).")
+      ) call Error("HJJ, JJQCD, VBF and VHiggs processes outgoing partons are mostly massless, and alpha_S at a scale ~0 GeV is very unstable. Choose a different renormalization or factorization scheme (e.g. kRenFacScheme_mhstar).")
 
       ! H+1j Me
       if( &
@@ -273,7 +273,7 @@ SUBROUTINE SetJHUGenDefaults()
 ! !       DecayMode=11: W --> anything
    TopDecays=-1
    TauDecays=-1
-   H_DK = .false.
+   HbbDecays = .false.
    Unweighted =.true.
    MuFacMultiplier = 1d0
    MuRenMultiplier = 1d0
@@ -402,6 +402,10 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "VegasNc1", success, VegasNc1)
     call ReadCommandLineArgument(arg, "VegasNc2", success, VegasNc2)
     call ReadCommandLineArgument(arg, "PChannel", success, PChannel)
+! gg > ZH
+    call ReadCommandLineArgument(arg, "VHiggs_PC", success, VHiggs_PC)   !undocumented, in development
+                                                                 !(could use PChannel for this once it's finalized)
+! gg > ZH
     call ReadCommandLineArgument(arg, "DataFile", success, DataFile)
     call ReadCommandLineArgument(arg, "Process", success, Process)
     call ReadCommandLineArgument(arg, "DecayMode1", success, DecayMode1)
@@ -412,7 +416,7 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "MuRenMultiplier", success, MuRenMultiplier, success2=SetMuRenMultiplier)
     call ReadCommandLineArgument(arg, "TopDK", success, TopDecays)
     call ReadCommandLineArgument(arg, "TauDK", success, TauDecays)
-    call ReadCommandLineArgument(arg, "HbbDK", success, H_DK)
+    call ReadCommandLineArgument(arg, "HbbDK", success, HbbDecays)
     call ReadCommandLineArgument(arg, "ReweightDecay", success, ReweightDecay)
     call ReadCommandLineArgument(arg, "WidthScheme", success, WidthScheme)
     call ReadCommandLineArgument(arg, "WidthSchemeIn", success, WidthSchemeIn)
@@ -716,7 +720,7 @@ logical :: SetColliderEnergy
 
     if( Process.eq.50 ) then
         DecayMode2=DecayMode1
-        if( Collider.eq.2 ) call Error("Collider 2 not available for VH")
+        if( Collider.eq.2 ) call Error("Collider 2 not available for VHiggs")
         if( (IsAWDecay(DecayMode1) ) .and. (Collider.ne.1) ) call Error("WH with Collider 1 only")
     endif
 
@@ -4726,7 +4730,7 @@ implicit none
         print *, "   Collider:          1=LHC (default), 2=Tevatron, 0=e+e-"
         print *, "   ColliderEnergy:    in TeV.  default is 13 TeV for LHC, 1.96 TeV for Tevatron,"
         print *, "                      250 GeV for e+e-"
-        print *, "   Process:           0=spin-0, 1=spin-1, 2=spin-2 resonance, 50=pp/ee->VH,"
+        print *, "   Process:           0=spin-0, 1=spin-1, 2=spin-2 resonance, 50=pp/ee->VHiggs,"
         print *, "                      60=weakVBF, 61=pp->Hjj, 62=pp->Hj, 80=ttH, 90=bbH,"
         print *, "                      110=t+H t channel, 111=tbar+H t channel,"
         print *, "                      112=t+H s channel, 113=tbar+H s channel"
@@ -4762,7 +4766,7 @@ implicit none
         print *, "                      to decay H->tautau.  If it is 0, the taus are written as"
         print *, "                      stable; if it is 1, they decay to Wnu, with the W's decaying"
         print *, "                      according to DecayModes1,2."
-        print *, "   HbbDK:             For VH production, decay H->bb"
+        print *, "   HbbDK:             For VHiggs production, decay H->bb"
         print *, " Resonance parameters:"
         print *, "   MReso:             resonance mass in GeV (default=125.00)"
         print *, "   GaReso:            resonance width in GeV (default=0.00407)"
@@ -4820,7 +4824,7 @@ implicit none
         print *, "                      (note that the output could be huge)"
         print *, "   DataFile:          LHE output file"
         print *, "   ReadLHE:           LHE input file from external file (only spin-0)"
-        print *, "   ConvertLHE:        Convert decay of the V from VH production."
+        print *, "   ConvertLHE:        Convert decay of the V from VHiggs production."
         print *, "                      Use DecayMode1 to specify the decay."
         print *, "                      (should be a Z or W mode, depending on the input file)"
         print *, "   UnformattedRead:   Turn this on if the normal, faster reading fails"
