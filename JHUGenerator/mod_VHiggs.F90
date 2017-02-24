@@ -1,5 +1,5 @@
 !--YaofuZhou-----------------------------------------
-module ModVH
+module ModVHiggs
   use ModParameters
   use ModMisc
   implicit none
@@ -7,11 +7,11 @@ module ModVH
 
 
   !----- notation for subroutines
-  public :: EvalAmp_VH
+  public :: EvalAmp_VHiggs
 
 contains
 
-subroutine EvalAmp_VH(id,helicity,MomExt,me2)
+subroutine EvalAmp_VHiggs(id,helicity,MomExt,me2)
       integer, intent(in) :: id(9)
       real(8), intent(in) :: helicity(9)
       real(8), intent(in) :: MomExt(1:4,1:9)
@@ -48,7 +48,7 @@ subroutine EvalAmp_VH(id,helicity,MomExt,me2)
 
       me2=dble(amplitude*dconjg(amplitude))
       return
-end subroutine EvalAmp_VH
+end subroutine EvalAmp_VHiggs
 
 
 
@@ -1990,5 +1990,5 @@ RETURN
 END SUBROUTINE
 
 
-end module ModVH
+end module ModVHiggs
 !!--YaofuZhou-----------------------------------------
