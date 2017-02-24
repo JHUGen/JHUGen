@@ -2159,7 +2159,7 @@ logical :: hasAonshell
            applyPSCut=.true.
         endif
      endif
-     if(H_DK) then
+     if(HbbDecays) then
         if(m_jj.le.(getMass(convertLHEreverse(id(8)))+getMass(convertLHEreverse(id(9)))))then
            applyPSCut=.true.
         endif
