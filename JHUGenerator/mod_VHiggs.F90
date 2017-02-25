@@ -703,6 +703,7 @@ complex(8) function MATRIXELEMENT0qq(MomExt,mass,helicity,id)
       return
       END function MATRIXELEMENT0gg
 
+#if linkMELA==1
 ! gg > ZH
       subroutine ggTriffbHa1(Spaa,Spbb,sprod,helicity,Tri)
       implicit none
@@ -878,7 +879,7 @@ complex(8) function MATRIXELEMENT0qq(MomExt,mass,helicity,id)
       return
       END subroutine ggBoxAH
 
-
+#endif
 
 
 
