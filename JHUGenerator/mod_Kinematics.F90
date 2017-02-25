@@ -2112,12 +2112,13 @@ END SUBROUTINE
 
 
 
-SUBROUTINE Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut,useAonshell)
+SUBROUTINE Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut,HDecays,PhoOnshell)
 use ModMisc
 use ModParameters
 implicit none
 
-logical, optional :: useAonshell
+logical, intent(in) :: HDecays
+logical, intent(in), optional :: PhoOnshell
 logical :: applyPSCut
 integer :: NumPart,NBin(:),id(:)
 real(8) :: m_jj,y_j1,y_j2,dphi_jj, m_ll, pt_V, pt_H, pt1, pt2, deltaR, m_Vstar, costheta1, costheta2, phistar1, phi
@@ -2127,9 +2128,9 @@ double precision, intent(in) :: MomExt(1:4,1:9)
 logical :: hasAonshell
 
      hasAonshell = .false.
-     if(present(useAonshell)) then
-        hasAonshell=useAonshell
-     endif
+      if(present(PhoOnshell)) then
+         hasAonshell=PhoOnshell
+      endif
 
      applyPSCut = .false.
      m_jj = get_MInv(MomExt(1:4,5))
@@ -2159,7 +2160,7 @@ logical :: hasAonshell
            applyPSCut=.true.
         endif
      endif
-     if(HbbDecays) then
+     if(HDecays) then
         if(m_jj.le.(getMass(convertLHEreverse(id(8)))+getMass(convertLHEreverse(id(9)))))then
            applyPSCut=.true.
         endif

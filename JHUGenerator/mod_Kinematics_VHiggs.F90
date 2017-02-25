@@ -127,7 +127,7 @@ use ModParameters
 implicit none
 
       logical, intent(in) :: HDecays
-      logical, optional :: PhoOnshell
+      logical, intent(in), optional :: PhoOnshell
       logical, optional :: ZAinterference
       real(8), intent(in) :: yRnd(1:20),mass(9,2)
       real(8) :: phi, beta, gamma
