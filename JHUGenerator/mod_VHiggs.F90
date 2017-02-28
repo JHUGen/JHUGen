@@ -489,7 +489,7 @@ complex(8) function MATRIXELEMENT0qq(MomExt,mass,helicity,id)
 
 
 
-
+#if linkMELA==1
       complex(8) function MATRIXELEMENT0gg(MomExt,mass,helicity,id)
       implicit none
       real(8), intent(in) :: MomExt(1:4,1:9)
@@ -703,7 +703,6 @@ complex(8) function MATRIXELEMENT0qq(MomExt,mass,helicity,id)
       return
       END function MATRIXELEMENT0gg
 
-#if linkMELA==1
 ! gg > ZH
       subroutine ggTriffbHa1(Spaa,Spbb,sprod,helicity,Tri)
       implicit none
@@ -812,7 +811,7 @@ complex(8) function MATRIXELEMENT0qq(MomExt,mass,helicity,id)
           Tri=0d0 !---
         endif
       endif
-      
+
       C0=qlI3(0d0,0d0,sprod(1,2),M_Top**2,M_Top**2,M_Top**2,Mu_Ren**2,0)
 
       Tri = 0d0
