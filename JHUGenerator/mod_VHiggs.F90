@@ -42,8 +42,10 @@ subroutine EvalAmp_VHiggs(id,helicity,MomExt,me2)
 
       if(idin(1).ne.0.and.idin(2).ne.0)then ! qq
         amplitude=MATRIXELEMENT0qq(pin,mass,helin,idin)
+#if linkMELA==1
       elseif(idin(1).eq.0.and.idin(2).eq.0)then ! gg
         amplitude=MATRIXELEMENT0gg(pin,mass,helin,idin)
+#endif
       endif
 
       me2=dble(amplitude*dconjg(amplitude))
