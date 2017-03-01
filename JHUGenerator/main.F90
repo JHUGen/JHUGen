@@ -4358,7 +4358,7 @@ character :: arg*(500)
                     if( cdabs(ghgsgs3 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghgsgs3=",ghgsgs3,"i"
                     if( cdabs(ghgsgs4 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghgsgs4=",ghgsgs4,"i"
                 endif
-                if( includeGammaStar .and. .not.(Process.eq.60 .or. (Process.ge.66 .or. Process.le.69))) then
+                if( includeGammaStar .and. .not.(Process.eq.60 .or. (Process.ge.66 .and. Process.le.69))) then
                     write(TheUnit,"(6X,A,F8.2,A)") "m(gammastar) >= ", MPhotonCutoff/GeV, " GeV"
                 endif
             endif
