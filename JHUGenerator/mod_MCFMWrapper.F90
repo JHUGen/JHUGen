@@ -1693,10 +1693,10 @@ integer :: i,j
 
       if(ZWcode.eq.doZZ) then
          if (Process.ge.66 .and. Process.le.68) then
-            call qq_zzqq(p_MCFM,id_MCFM,msq)
+            call qq_zzqq(p_MCFM,msq)
             if (id_MCFM(7).eq.0 .and. id_MCFM(8).eq.0) then ! Calculate for swapped momentum combination
                call swap(p_MCFM(7,:),p_MCFM(8,:)) ! Swap just the momenta
-               call qq_zzqq(p_MCFM,id_MCFM,msq_tmp)
+               call qq_zzqq(p_MCFM,msq_tmp)
                msq = msq + msq_tmp
                do i=-5,5
                   msq(i,i)=msq(i,i)*0.5d0
@@ -1705,7 +1705,7 @@ integer :: i,j
                call swap(p_MCFM(7,:),p_MCFM(8,:)) ! Swap the momenta
                call swap(id_MCFM(7),id_MCFM(8)) ! Swap the ids
                call SetupParticleLabels(id_MCFM) ! Reassign plabels
-               call qq_zzqq(p_MCFM,id_MCFM,msq_tmp)
+               call qq_zzqq(p_MCFM,msq_tmp)
                do i=-5,5
                do j=-5,5
                   if (msq(i,j).eq.0d0) then ! Non-zero MEs in original configuration are the correct ones, just replace 0 MEs
@@ -1715,10 +1715,10 @@ integer :: i,j
                enddo
             endif
          else if (Process.eq.69) then ! Or some other number?
-            call qq_zzqqstrong(p_MCFM,id_MCFM,msq)
+            call qq_zzqqstrong(p_MCFM,msq)
             if (id_MCFM(7).eq.0 .and. id_MCFM(8).eq.0) then ! Calculate for swapped momentum combination
                call swap(p_MCFM(7,:),p_MCFM(8,:)) ! Swap just the momenta
-               call qq_zzqqstrong(p_MCFM,id_MCFM,msq_tmp)
+               call qq_zzqqstrong(p_MCFM,msq_tmp)
                msq = msq + msq_tmp
                do i=-5,5
                   if (i.eq.0) cycle ! gg->qqb+qbq does not need to be multiplied by 1/2
@@ -1727,13 +1727,13 @@ integer :: i,j
                ! Subtract qqb->gg, which was counted twice
                id_MCFM(7:8)=Glu_
                call SetupParticleLabels(id_MCFM) ! Reassign plabels
-               call qq_zzqqstrong(p_MCFM,id_MCFM,msq_tmp)
+               call qq_zzqqstrong(p_MCFM,msq_tmp)
                msq = msq - msq_tmp
             else if (id_MCFM(7).eq.0 .or. id_MCFM(8).eq.0) then ! Calculate for wrong combination
                call swap(p_MCFM(7,:),p_MCFM(8,:)) ! Swap the momenta
                call swap(id_MCFM(7),id_MCFM(8)) ! Swap the ids
                call SetupParticleLabels(id_MCFM) ! Reassign plabels
-               call qq_zzqqstrong(p_MCFM,id_MCFM,msq_tmp)
+               call qq_zzqqstrong(p_MCFM,msq_tmp)
                do i=-5,5
                do j=-5,5
                   if (msq(i,j).eq.0d0) then ! Non-zero MEs in original configuration are the correct ones, just replace 0 MEs
@@ -1745,10 +1745,10 @@ integer :: i,j
          endif
       else if(ZWcode.eq.doWW) then
          if (Process.ge.66 .and. Process.le.68) then
-            call qq_wwqq(p_MCFM,id_MCFM,msq)
+            call qq_wwqq(p_MCFM,msq)
             if (id_MCFM(7).eq.0 .and. id_MCFM(8).eq.0) then ! Calculate for swapped momentum combination
                call swap(p_MCFM(7,:),p_MCFM(8,:)) ! Swap just the momenta
-               call qq_wwqq(p_MCFM,id_MCFM,msq_tmp)
+               call qq_wwqq(p_MCFM,msq_tmp)
                msq = msq + msq_tmp
                do i=-5,5
                   msq(i,i)=msq(i,i)*0.5d0
@@ -1757,7 +1757,7 @@ integer :: i,j
                call swap(p_MCFM(7,:),p_MCFM(8,:)) ! Swap the momenta
                call swap(id_MCFM(7),id_MCFM(8)) ! Swap the ids
                call SetupParticleLabels(id_MCFM) ! Reassign plabels
-               call qq_wwqq(p_MCFM,id_MCFM,msq_tmp)
+               call qq_wwqq(p_MCFM,msq_tmp)
                do i=-5,5
                do j=-5,5
                   if (msq(i,j).eq.0d0) then ! Non-zero MEs in original configuration are the correct ones, just replace 0 MEs
@@ -1767,10 +1767,10 @@ integer :: i,j
                enddo
             endif
          else if (Process.eq.69) then ! Or some other number?
-            call qq_wwqqstrong(p_MCFM,id_MCFM,msq)
+            call qq_wwqqstrong(p_MCFM,msq)
             if (id_MCFM(7).eq.0 .and. id_MCFM(8).eq.0) then ! Calculate for swapped momentum combination
                call swap(p_MCFM(7,:),p_MCFM(8,:)) ! Swap just the momenta
-               call qq_wwqqstrong(p_MCFM,id_MCFM,msq_tmp)
+               call qq_wwqqstrong(p_MCFM,msq_tmp)
                msq = msq + msq_tmp
                do i=-5,5
                   if (i.eq.0) cycle ! gg->qqb+qbq does not need to be multiplied by 1/2
@@ -1779,13 +1779,13 @@ integer :: i,j
                ! Subtract qqb->gg, which was counted twice
                id_MCFM(7:8)=Glu_
                call SetupParticleLabels(id_MCFM) ! Reassign plabels
-               call qq_wwqqstrong(p_MCFM,id_MCFM,msq_tmp)
+               call qq_wwqqstrong(p_MCFM,msq_tmp)
                msq = msq - msq_tmp
             else if (id_MCFM(7).eq.0 .or. id_MCFM(8).eq.0) then ! Calculate for wrong combination
                call swap(p_MCFM(7,:),p_MCFM(8,:)) ! Swap the momenta
                call swap(id_MCFM(7),id_MCFM(8)) ! Swap the ids
                call SetupParticleLabels(id_MCFM) ! Reassign plabels
-               call qq_wwqqstrong(p_MCFM,id_MCFM,msq_tmp)
+               call qq_wwqqstrong(p_MCFM,msq_tmp)
                do i=-5,5
                do j=-5,5
                   if (msq(i,j).eq.0d0) then ! Non-zero MEs in original configuration are the correct ones, just replace 0 MEs
@@ -1797,10 +1797,10 @@ integer :: i,j
          endif
       else if(ZWcode.eq.doZZorWW) then
          if (Process.ge.66 .and. Process.le.68) then
-            call qq_vvqq(p_MCFM,id_MCFM,msq)
+            call qq_vvqq(p_MCFM,msq)
             if (id_MCFM(7).eq.0 .and. id_MCFM(8).eq.0) then ! Calculate for swapped momentum combination
                call swap(p_MCFM(7,:),p_MCFM(8,:)) ! Swap just the momenta
-               call qq_vvqq(p_MCFM,id_MCFM,msq_tmp)
+               call qq_vvqq(p_MCFM,msq_tmp)
                msq = msq + msq_tmp
                do i=-5,5
                   msq(i,i)=msq(i,i)*0.5d0
@@ -1809,7 +1809,7 @@ integer :: i,j
                call swap(p_MCFM(7,:),p_MCFM(8,:)) ! Swap the momenta
                call swap(id_MCFM(7),id_MCFM(8)) ! Swap the ids
                call SetupParticleLabels(id_MCFM) ! Reassign plabels
-               call qq_vvqq(p_MCFM,id_MCFM,msq_tmp)
+               call qq_vvqq(p_MCFM,msq_tmp)
                do i=-5,5
                do j=-5,5
                   if (msq(i,j).eq.0d0) then ! Non-zero MEs in original configuration are the correct ones, just replace 0 MEs
