@@ -11,6 +11,7 @@ See the manual for more details
 
 command line parameter quick reference:
   help:                Print all command line options
+  DryRun:              Check that the command line is valid, then exit
   Process configuration:
     Collider:          1=LHC (default), 2=Tevatron, 0=e+e-
     ColliderEnergy:    in TeV.  default is 13 TeV for LHC, 1.96 TeV for Tevatron,

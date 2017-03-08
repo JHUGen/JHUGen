@@ -288,7 +288,7 @@ use ModMisc
 implicit none
 character :: arg*(500)
 integer :: NumArgs,NArg
-logical :: help, success, SetLastArgument, interfSet
+logical :: help, DryRun, success, SetLastArgument, interfSet
 logical :: SetRenScheme, SetMuRenMultiplier, SetFacScheme, SetMuFacMultiplier
 logical :: SetAnomalousSpin0gg, Setghg2, SetAnomalousSpin0ZZ, Setghz1
 logical :: SetZgammacoupling, Setgammagammacoupling
@@ -300,6 +300,7 @@ logical :: SetpTcut, SetdeltaRcut
 logical :: SetColliderEnergy
 
    help = .false.
+   DryRun = .false.
 
 #if useLHAPDF==1
    LHAPDFString = ""
@@ -362,6 +363,7 @@ logical :: SetColliderEnergy
     !ReadCommandLineArgument is overloaded, it puts the value into the last argument
     ! by detecting the type.  It also sets success to .true. if the argument name (before =)
     ! is correct.
+    call ReadCommandLineArgument(arg, "DryRun", success, DryRun)
     call ReadCommandLineArgument(arg, "Collider", success, Collider)
     call ReadCommandLineArgument(arg, "ColliderEnergy", success, Collider_Energy, SetLastArgument, success2=SetColliderEnergy)
     if( SetLastArgument ) Collider_Energy = Collider_Energy * 1000*GeV
@@ -973,6 +975,11 @@ logical :: SetColliderEnergy
       call ComputeCKMElements(VCKM_ud, VCKM_us, VCKM_cd, VCKM_cs, VCKM_ts, VCKM_tb, inVCKM_cb=VCKM_cb, inVCKM_td=VCKM_td)
    else
       call ComputeCKMElements(VCKM_ud, VCKM_us, VCKM_cd, VCKM_cs, VCKM_ts, VCKM_tb, inVCKM_ub=VCKM_ub, inVCKM_cb=VCKM_cb, inVCKM_td=VCKM_td)
+   endif
+
+   if (DryRun) then
+     print *, "Running JHUGen with these options should work."
+     stop
    endif
 
 return
@@ -4683,6 +4690,7 @@ implicit none
 
         print *, ""
         print *, " help:                Print all command line options"
+        print *, " DryRun:              Check that the command line is valid, then exit"
         print *, " Process configuration:"
         print *, "   Collider:          1=LHC (default), 2=Tevatron, 0=e+e-"
         print *, "   ColliderEnergy:    in TeV.  default is 13 TeV for LHC, 1.96 TeV for Tevatron,"
