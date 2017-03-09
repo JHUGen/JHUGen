@@ -114,7 +114,7 @@ SUBROUTINE SetJHUGenDefaults()
 ! !       DecayMode=11: W --> anything
    TopDecays=-1
    TauDecays=-1
-   H_DK = .false.
+   HbbDecays = .false.
    Unweighted =.true.
    MuFacMultiplier = 1d0
    MuRenMultiplier = 1d0
