@@ -117,18 +117,28 @@ logical, public :: RandomizeVVdecays = .true.    ! randomize DecayMode1 and Deca
 
 logical, public :: UseUnformattedRead = .false.  !Set this to true if the regular reading fails for whatever reason
 
-logical, public :: H_DK =.false.                 ! default to false so H in V* > VH (Process = 50) does not decay to bbbar
+logical, public :: HbbDecays =.false.                 ! default to false so H in V* > VHiggs (Process = 50) does not decay to bbbar
 
 !leave this one as a parameter, no reason to ever turn it off
 logical, public, parameter :: importExternal_LHEinit = .true.
 !=====================================================
 
+! gg > ZH
+character(len=2), public :: VHiggs_PC = "qq"                    ! VH partonic channel and mode selection, in development.
+                                                            ! "gg" ( = triangles + boxes of gg)
+                                                            ! "qq" ( = q qbar @LO)
+                                                            ! "lo" ( = q qbar @LO)
+                                                            ! "tr" ( = triangles of gg)
+                                                            ! "bo" ( = boxes of gg)
+                                                            ! "nl" ( = full oneloop = q qbar @LO + NLO + gg + gq)
+! gg > ZH
+!=====================================================
 
 !=====================================================
 !cuts - should be set on the command line
-real(8), public :: pTjetcut = -1d0*GeV                        ! jet min pt, default is set in main (0 in VH, 15 GeV otherwise)
-real(8), public :: Rjet = -1d0                                ! jet deltaR, anti-kt algorithm, default is set in main (0 in VH, 0.3 otherwise)
-real(8), public :: mJJcut = 0d0*GeV                           ! minimum mJJ for VBF, HJJ, bbH, VH
+real(8), public :: pTjetcut = -1d0*GeV                        ! jet min pt, default is set in main (0 in VHiggs, 15 GeV otherwise)
+real(8), public :: Rjet = -1d0                                ! jet deltaR, anti-kt algorithm, default is set in main (0 in VHiggs, 0.3 otherwise)
+real(8), public :: mJJcut = 0d0*GeV                           ! minimum mJJ for VBF, HJJ, bbH, VHiggs
 real(8), public :: m4l_minmax(1:2) = (/ -1d0,-1d0 /)*GeV      ! min and max for m_4l in off-shell VBF production;   default is (-1,-1): m_4l ~ Higgs resonance (on-shell)
 logical, public :: includeGammaStar = .false.                 ! include offshell photons?
 real(8), public :: MPhotonCutoff = 4d0*GeV                    ! minimum |mass| for offshell photons when includeGammaStar = .true.
@@ -1705,7 +1715,7 @@ implicit none
    cR_QDn = -twosc*QdR
    cL_QDn = -twosc*QdL
 
-   ! Normalizations used in VH and VBF
+   ! Normalizations used in VHiggs and VBF
    couplWffsq = gwsq/2.0_dp
    couplZffsq = gwsq/4.0_dp/(1.0_dp-xw)
    couplAZff = -gwsq*sitW/2.0_dp/sqrt(1.0_dp-xw)
