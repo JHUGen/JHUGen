@@ -15,7 +15,7 @@ command line parameter quick reference:
     Collider:          1=LHC (default), 2=Tevatron, 0=e+e-
     ColliderEnergy:    in TeV.  default is 13 TeV for LHC, 1.96 TeV for Tevatron,
                        250 GeV for e+e-
-    Process:           0=spin-0, 1=spin-1, 2=spin-2 resonance, 50=pp/ee->VH,
+    Process:           0=spin-0, 1=spin-1, 2=spin-2 resonance, 50=pp/ee->VHiggs,
                        60=weakVBF, 61=pp->Hjj, 62=pp->Hj, 80=ttH, 90=bbH,
                        110=t+H t channel, 111=tbar+H t channel,
                        112=t+H s channel, 113=tbar+H s channel
@@ -51,7 +51,7 @@ command line parameter quick reference:
                        to decay H->tautau.  If it is 0, the taus are written as
                        stable; if it is 1, they decay to Wnu, with the W's decaying
                        according to DecayModes1,2.
-    HbbDK:             For VH production, decay H->bb
+    HbbDK:             For VHiggs production, decay H->bb
   Resonance parameters:
     MReso:             resonance mass in GeV (default=125.00)
     GaReso:            resonance width in GeV (default=0.00407)
@@ -109,7 +109,7 @@ command line parameter quick reference:
                        (note that the output could be huge)
     DataFile:          LHE output file
     ReadLHE:           LHE input file from external file (only spin-0)
-    ConvertLHE:        Convert decay of the V from VH production.
+    ConvertLHE:        Convert decay of the V from VHiggs production.
                        Use DecayMode1 to specify the decay.
                        (should be a Z or W mode, depending on the input file)
     UnformattedRead:   Turn this on if the normal, faster reading fails
