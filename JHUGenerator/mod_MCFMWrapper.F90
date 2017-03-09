@@ -911,7 +911,7 @@ subroutine GetColliderEnergy(sqrts)
    use ModParameters
    implicit none
    double precision, intent(out) :: sqrts
-   sqrts = Collider_Energy
+   sqrts = Collider_Energy/GeV
 end subroutine
 subroutine GetMassesWidths( &
    md_in, mu_in, ms_in, mc_in, mb_in, mt_in, &
@@ -933,31 +933,31 @@ subroutine GetMassesWidths( &
    twidth_in, &
    tauwidth_in
 
-   md_in = getMass(Dn_)
-   mu_in = getMass(Up_)
-   ms_in = getMass(Str_)
-   mc_in = getMass(Chm_)
-   mb_in = getMass(Bot_)
-   mt_in = getMass(Top_)
-   twidth_in = getDecayWidth(Top_)
+   md_in = getMass(Dn_)/GeV
+   mu_in = getMass(Up_)/GeV
+   ms_in = getMass(Str_)/GeV
+   mc_in = getMass(Chm_)/GeV
+   mb_in = getMass(Bot_)/GeV
+   mt_in = getMass(Top_)/GeV
+   twidth_in = getDecayWidth(Top_)/GeV
 
-   mel_in = getMass(ElM_)
-   mmu_in = getMass(MuM_)
-   mtau_in = getMass(TaM_)
-   tauwidth_in = getDecayWidth(TaM_)
+   mel_in = getMass(ElM_)/GeV
+   mmu_in = getMass(MuM_)/GeV
+   mtau_in = getMass(TaM_)/GeV
+   tauwidth_in = getDecayWidth(TaM_)/GeV
 
-   hmass_in = getMass(Hig_)
-   hwidth_in = getDecayWidth(Hig_)
-   wmass_in = getMass(Wp_)
-   wwidth_in = getDecayWidth(Wp_)
-   zmass_in = getMass(Z0_)
-   zwidth_in = getDecayWidth(Z0_)
+   hmass_in = getMass(Hig_)/GeV
+   hwidth_in = getDecayWidth(Hig_)/GeV
+   wmass_in = getMass(Wp_)/GeV
+   wwidth_in = getDecayWidth(Wp_)/GeV
+   zmass_in = getMass(Z0_)/GeV
+   zwidth_in = getDecayWidth(Z0_)/GeV
 end subroutine
 subroutine GetLambdaBSM(Lambda_BSM)
    use ModParameters
    implicit none
    double precision, intent(out) :: Lambda_BSM
-   Lambda_BSM = Lambda
+   Lambda_BSM = Lambda/GeV
 end subroutine
 subroutine GetSpinZeroVVCouplings(vvcoupl, cqsq, Lambda_qsq, Lambdag, Lambdag_zgs1, Lambdag_Q, useWWcoupl)
    use ModParameters
@@ -1071,6 +1071,8 @@ subroutine GetSpinZeroVVCouplings(vvcoupl, cqsq, Lambda_qsq, Lambdag, Lambdag_zg
       vvcoupl(3) = ghw3
       vvcoupl(4) = ghw4
 
+      vvcoupl(5:10) = czero
+
       vvcoupl(11) = ghw1_prime
       vvcoupl(12) = ghw1_prime2
       vvcoupl(13) = ghw1_prime3
@@ -1095,6 +1097,8 @@ subroutine GetSpinZeroVVCouplings(vvcoupl, cqsq, Lambda_qsq, Lambdag, Lambdag_zg
       vvcoupl(29) = ghw4_prime4
       vvcoupl(30) = ghw4_prime5
 
+      vvcoupl(31) = czero
+
       vvcoupl(32) = ghw1_prime6
       vvcoupl(33) = ghw1_prime7
       vvcoupl(34) = ghw2_prime6
@@ -1103,61 +1107,12 @@ subroutine GetSpinZeroVVCouplings(vvcoupl, cqsq, Lambda_qsq, Lambdag, Lambdag_zg
       vvcoupl(37) = ghw3_prime7
       vvcoupl(38) = ghw4_prime6
       vvcoupl(39) = ghw4_prime7
-
-      cw_q1sq = cqsq(1)
-      Lambda_w11 = Lambda_qsq(1,1)
-      Lambda_w21 = Lambda_qsq(1,2)
-      Lambda_w31 = Lambda_qsq(1,3)
-      Lambda_w41 = Lambda_qsq(1,4)
-      cw_q2sq = cqsq(2)
-      Lambda_w12 = Lambda_qsq(2,1)
-      Lambda_w22 = Lambda_qsq(2,2)
-      Lambda_w32 = Lambda_qsq(2,3)
-      Lambda_w42 = Lambda_qsq(2,4)
-      cw_q12sq = cqsq(3)
-      Lambda_w10 = Lambda_qsq(3,1)
-      Lambda_w20 = Lambda_qsq(3,2)
-      Lambda_w30 = Lambda_qsq(3,3)
-      Lambda_w40 = Lambda_qsq(3,4)
-
-      ghw1 =  vvcoupl(1)
-      ghw2 =  vvcoupl(2)
-      ghw3 =  vvcoupl(3)
-      ghw4 =  vvcoupl(4)
-
-      ghw1_prime = vvcoupl(11)
-      ghw1_prime2= vvcoupl(12)
-      ghw1_prime3= vvcoupl(13)
-      ghw1_prime4= vvcoupl(14)
-      ghw1_prime5= vvcoupl(15)
-
-      ghw2_prime = vvcoupl(16)
-      ghw2_prime2= vvcoupl(17)
-      ghw2_prime3= vvcoupl(18)
-      ghw2_prime4= vvcoupl(19)
-      ghw2_prime5= vvcoupl(20)
-
-      ghw3_prime = vvcoupl(21)
-      ghw3_prime2= vvcoupl(22)
-      ghw3_prime3= vvcoupl(23)
-      ghw3_prime4= vvcoupl(24)
-      ghw3_prime5= vvcoupl(25)
-
-      ghw4_prime = vvcoupl(26)
-      ghw4_prime2= vvcoupl(27)
-      ghw4_prime3= vvcoupl(28)
-      ghw4_prime4= vvcoupl(29)
-      ghw4_prime5= vvcoupl(30)
-
-      ghw1_prime6  = vvcoupl(32)
-      ghw1_prime7  = vvcoupl(33)
-      ghw2_prime6  = vvcoupl(34)
-      ghw2_prime7  = vvcoupl(35)
-      ghw3_prime6  = vvcoupl(36)
-      ghw3_prime7  = vvcoupl(37)
-      ghw4_prime6  = vvcoupl(38)
-      ghw4_prime7  = vvcoupl(39)
    endif
+
+   Lambda_qsq(:,:)=Lambda_qsq(:,:)/GeV
+   Lambdag(:)=Lambdag(:)/GeV
+   Lambdag_zgs1 = Lambdag_zgs1/GeV
+   Lambdag_Q = Lambdag_Q/GeV
 end subroutine
 subroutine GetDistinguishWWCouplingsFlag(doAllow)
    use ModParameters
@@ -1188,11 +1143,11 @@ subroutine GetEWInputs(Gf_inp_in,aemmz_inp_in,xw_inp_in,wmass_inp_in,zmass_inp_i
    use ModParameters
    implicit none
    double precision, intent(out) :: Gf_inp_in,aemmz_inp_in,xw_inp_in,wmass_inp_in,zmass_inp_in
-   Gf_inp_in=Gf
+   Gf_inp_in=Gf*GeV**2
    aemmz_inp_in=alpha_QED
    xw_inp_in=xw
-   wmass_inp_in=M_W
-   zmass_inp_in=M_Z
+   wmass_inp_in=M_W/GeV
+   zmass_inp_in=M_Z/GeV
 end subroutine
 
 
@@ -1677,6 +1632,7 @@ use ModMisc
 implicit none
 integer, intent(in) :: idin(1:mxpart)
 real(8), intent(in) :: pin(1:mxpart,1:4)
+real(8)             :: pin_MCFMconv(1:mxpart,1:4)
 integer, intent(in) :: ZWcode
 integer :: id_MCFM(1:mxpart)
 real(8) :: p_MCFM(1:mxpart,1:4)
@@ -1688,15 +1644,17 @@ integer :: i,j
    msq(:,:)=0d0
    msq_tmp(:,:)=0d0
 
-   doCompute = Setup_MCFM_qqVVqq(idin,pin,id_MCFM,p_MCFM)
+   pin_MCFMconv(:,:)=pin(:,:)/GeV
+
+   doCompute = Setup_MCFM_qqVVqq(idin,pin_MCFMconv,id_MCFM,p_MCFM)
    if (doCompute) then
 
       if(ZWcode.eq.doZZ) then
          if (Process.ge.66 .and. Process.le.68) then
-            call qq_zzqq(p_MCFM,id_MCFM,msq)
+            call qq_zzqq(p_MCFM,msq)
             if (id_MCFM(7).eq.0 .and. id_MCFM(8).eq.0) then ! Calculate for swapped momentum combination
                call swap(p_MCFM(7,:),p_MCFM(8,:)) ! Swap just the momenta
-               call qq_zzqq(p_MCFM,id_MCFM,msq_tmp)
+               call qq_zzqq(p_MCFM,msq_tmp)
                msq = msq + msq_tmp
                do i=-5,5
                   msq(i,i)=msq(i,i)*0.5d0
@@ -1705,7 +1663,7 @@ integer :: i,j
                call swap(p_MCFM(7,:),p_MCFM(8,:)) ! Swap the momenta
                call swap(id_MCFM(7),id_MCFM(8)) ! Swap the ids
                call SetupParticleLabels(id_MCFM) ! Reassign plabels
-               call qq_zzqq(p_MCFM,id_MCFM,msq_tmp)
+               call qq_zzqq(p_MCFM,msq_tmp)
                do i=-5,5
                do j=-5,5
                   if (msq(i,j).eq.0d0) then ! Non-zero MEs in original configuration are the correct ones, just replace 0 MEs
@@ -1715,10 +1673,10 @@ integer :: i,j
                enddo
             endif
          else if (Process.eq.69) then ! Or some other number?
-            call qq_zzqqstrong(p_MCFM,id_MCFM,msq)
+            call qq_zzqqstrong(p_MCFM,msq)
             if (id_MCFM(7).eq.0 .and. id_MCFM(8).eq.0) then ! Calculate for swapped momentum combination
                call swap(p_MCFM(7,:),p_MCFM(8,:)) ! Swap just the momenta
-               call qq_zzqqstrong(p_MCFM,id_MCFM,msq_tmp)
+               call qq_zzqqstrong(p_MCFM,msq_tmp)
                msq = msq + msq_tmp
                do i=-5,5
                   if (i.eq.0) cycle ! gg->qqb+qbq does not need to be multiplied by 1/2
@@ -1727,13 +1685,13 @@ integer :: i,j
                ! Subtract qqb->gg, which was counted twice
                id_MCFM(7:8)=Glu_
                call SetupParticleLabels(id_MCFM) ! Reassign plabels
-               call qq_zzqqstrong(p_MCFM,id_MCFM,msq_tmp)
+               call qq_zzqqstrong(p_MCFM,msq_tmp)
                msq = msq - msq_tmp
             else if (id_MCFM(7).eq.0 .or. id_MCFM(8).eq.0) then ! Calculate for wrong combination
                call swap(p_MCFM(7,:),p_MCFM(8,:)) ! Swap the momenta
                call swap(id_MCFM(7),id_MCFM(8)) ! Swap the ids
                call SetupParticleLabels(id_MCFM) ! Reassign plabels
-               call qq_zzqqstrong(p_MCFM,id_MCFM,msq_tmp)
+               call qq_zzqqstrong(p_MCFM,msq_tmp)
                do i=-5,5
                do j=-5,5
                   if (msq(i,j).eq.0d0) then ! Non-zero MEs in original configuration are the correct ones, just replace 0 MEs
@@ -1745,10 +1703,10 @@ integer :: i,j
          endif
       else if(ZWcode.eq.doWW) then
          if (Process.ge.66 .and. Process.le.68) then
-            call qq_wwqq(p_MCFM,id_MCFM,msq)
+            call qq_wwqq(p_MCFM,msq)
             if (id_MCFM(7).eq.0 .and. id_MCFM(8).eq.0) then ! Calculate for swapped momentum combination
                call swap(p_MCFM(7,:),p_MCFM(8,:)) ! Swap just the momenta
-               call qq_wwqq(p_MCFM,id_MCFM,msq_tmp)
+               call qq_wwqq(p_MCFM,msq_tmp)
                msq = msq + msq_tmp
                do i=-5,5
                   msq(i,i)=msq(i,i)*0.5d0
@@ -1757,7 +1715,7 @@ integer :: i,j
                call swap(p_MCFM(7,:),p_MCFM(8,:)) ! Swap the momenta
                call swap(id_MCFM(7),id_MCFM(8)) ! Swap the ids
                call SetupParticleLabels(id_MCFM) ! Reassign plabels
-               call qq_wwqq(p_MCFM,id_MCFM,msq_tmp)
+               call qq_wwqq(p_MCFM,msq_tmp)
                do i=-5,5
                do j=-5,5
                   if (msq(i,j).eq.0d0) then ! Non-zero MEs in original configuration are the correct ones, just replace 0 MEs
@@ -1767,10 +1725,10 @@ integer :: i,j
                enddo
             endif
          else if (Process.eq.69) then ! Or some other number?
-            call qq_wwqqstrong(p_MCFM,id_MCFM,msq)
+            call qq_wwqqstrong(p_MCFM,msq)
             if (id_MCFM(7).eq.0 .and. id_MCFM(8).eq.0) then ! Calculate for swapped momentum combination
                call swap(p_MCFM(7,:),p_MCFM(8,:)) ! Swap just the momenta
-               call qq_wwqqstrong(p_MCFM,id_MCFM,msq_tmp)
+               call qq_wwqqstrong(p_MCFM,msq_tmp)
                msq = msq + msq_tmp
                do i=-5,5
                   if (i.eq.0) cycle ! gg->qqb+qbq does not need to be multiplied by 1/2
@@ -1779,13 +1737,13 @@ integer :: i,j
                ! Subtract qqb->gg, which was counted twice
                id_MCFM(7:8)=Glu_
                call SetupParticleLabels(id_MCFM) ! Reassign plabels
-               call qq_wwqqstrong(p_MCFM,id_MCFM,msq_tmp)
+               call qq_wwqqstrong(p_MCFM,msq_tmp)
                msq = msq - msq_tmp
             else if (id_MCFM(7).eq.0 .or. id_MCFM(8).eq.0) then ! Calculate for wrong combination
                call swap(p_MCFM(7,:),p_MCFM(8,:)) ! Swap the momenta
                call swap(id_MCFM(7),id_MCFM(8)) ! Swap the ids
                call SetupParticleLabels(id_MCFM) ! Reassign plabels
-               call qq_wwqqstrong(p_MCFM,id_MCFM,msq_tmp)
+               call qq_wwqqstrong(p_MCFM,msq_tmp)
                do i=-5,5
                do j=-5,5
                   if (msq(i,j).eq.0d0) then ! Non-zero MEs in original configuration are the correct ones, just replace 0 MEs
@@ -1797,10 +1755,10 @@ integer :: i,j
          endif
       else if(ZWcode.eq.doZZorWW) then
          if (Process.ge.66 .and. Process.le.68) then
-            call qq_vvqq(p_MCFM,id_MCFM,msq)
+            call qq_vvqq(p_MCFM,msq)
             if (id_MCFM(7).eq.0 .and. id_MCFM(8).eq.0) then ! Calculate for swapped momentum combination
                call swap(p_MCFM(7,:),p_MCFM(8,:)) ! Swap just the momenta
-               call qq_vvqq(p_MCFM,id_MCFM,msq_tmp)
+               call qq_vvqq(p_MCFM,msq_tmp)
                msq = msq + msq_tmp
                do i=-5,5
                   msq(i,i)=msq(i,i)*0.5d0
@@ -1809,7 +1767,7 @@ integer :: i,j
                call swap(p_MCFM(7,:),p_MCFM(8,:)) ! Swap the momenta
                call swap(id_MCFM(7),id_MCFM(8)) ! Swap the ids
                call SetupParticleLabels(id_MCFM) ! Reassign plabels
-               call qq_vvqq(p_MCFM,id_MCFM,msq_tmp)
+               call qq_vvqq(p_MCFM,msq_tmp)
                do i=-5,5
                do j=-5,5
                   if (msq(i,j).eq.0d0) then ! Non-zero MEs in original configuration are the correct ones, just replace 0 MEs
