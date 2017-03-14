@@ -12,6 +12,9 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
 FUNCTION EvalWeighted_HJJ_fulldecay(yRnd,VgsWgt)
 use ModKinematics
 use ModParameters
+#if linkMELA==1
+use ModMCFMWrapper
+#endif
 use ModHiggsjj
 use ModHiggs
 use ModMisc
@@ -25,36 +28,64 @@ real(8) :: pdf(-6:6,1:2)           ,me2(-5:5,-5:5)
 real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi
 real(8) :: MomExt(1:4,1:10),PSWgt
 real(8) :: p_MCFM(mxpart,1:4),msq_MCFM(-5:5,-5:5)
-complex(8) :: HZZcoupl(1:32),HWWcoupl(1:32)
-integer :: MY_IDUP(1:10),ICOLUP(1:2,1:10),NBin(1:NumHistograms),NHisto
-integer :: iPartChannel,PartChannelAvg,NumPartonicChannels,ijSel(1:121,1:3),iflip,i,j
+integer :: id_MCFM(mxpart),MY_IDUP(1:10),ICOLUP(1:2,1:10),NBin(1:NumHistograms),NHisto
+integer :: iPartChannel,PartChannelAvg,NumPartonicChannels,iflip,i,j,k,flavor_tag  !,ijSel(1:121,1:3)
 real(8) :: LO_Res_Unpol, PreFac,VegasWeighted_HJJ_fulldecay,xRnd,me2_hdk,me2_prop,me2_tmpzz(-5:5,-5:5),me2_tmpww(-5:5,-5:5),me2_zzcontr(-5:5,-5:5),me2_wwcontr(-5:5,-5:5)
 logical :: applyPSCut
 integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, Lep1M=8, Lep2P=9, Lep2M=10
 real(8) :: s13,s14,s15,s16,s23,s24,s25,s26,s34,s35,s36,s45,s46,s56,s78,s910,s710,s89
 include 'vegas_common.f'
+include 'maxwt.f'
 EvalWeighted_HJJ_fulldecay = 0d0
 
 
 
-   NumPartonicChannels = 121
+!    NumPartonicChannels = 100
+   call get_NumberOfChannels(NumPartonicChannels)
+   PartChannelAvg = NumPartonicChannels  
+   
+!    call random_number(yRnd(18))!   flat distribution
+!  yRnd(18) = 1d-4  ! fix one channel
+!  yRnd(1) = 0.07d0; yRnd(2)=0.1d0; ! fix energy
 
-! selecting only u-d channels for checks
-! NumPartonicChannels = 2
-! after removing also repair get_GENchannelHash !!
+   iPartChannel = int(yRnd(18) * (NumPartonicChannels)) +1 ! this runs from 1..100      
+!    call get_VBFoffshchannelHash(ijSel)
+!    iPart_sel = ijSel(iPartChannel,1)
+!    jPart_sel = ijSel(iPartChannel,2)
 
-   iPartChannel = int(yRnd(18) * (NumPartonicChannels)) +1 ! this runs from 1..121
-   call get_GENchannelHash(ijSel)
-   iPart_sel = ijSel(iPartChannel,1)
-   jPart_sel = ijSel(iPartChannel,2)
-   PartChannelAvg = NumPartonicChannels
+
+! if(.not. warmup) then
+!   iPartChannel=1!iChann_sel
+!   PartChannelAvg=1
+!   NumPartonicChannels=1
+! endif
+
+   call get_VBFoffshChannel(iPartChannel,iPart_sel,jPart_sel,flavor_tag)
+
+
+   if(.not. warmup) then
+       call random_number(xRnd)!   throwing random number for accept-reject
+       if( (ThisDmax.gt.0d0) .and. (ThisDmax .lt. xRnd*CrossSecMax(iPart_sel,jPart_sel)) ) then
+         RejeCounter_part(iPart_sel,jPart_sel) = RejeCounter_part(iPart_sel,jPart_sel) + 1
+         RejeCounter=RejeCounter+1
+         return
+       endif   
+   endif   
+   
+   
    if( unweighted .and. .not.warmup .and.  sum(AccepCounter_part(:,:)) .eq. sum(RequEvents(:,:)) ) then
       stopvegas=.true.
+      print *, "NumPartonicChannels=",NumPartonicChannels
    endif
-   if( (unweighted) .and. (.not. warmup) .and. (AccepCounter_part(iPart_sel,jPart_sel) .ge. RequEvents(iPart_sel,jPart_Sel))  ) return
+   if( (unweighted) .and. (.not. warmup) .and. (AccepCounter_part(iPart_sel,jPart_sel) .ge. RequEvents(iPart_sel,jPart_Sel))  ) then
+      call remove_VBFoffshchannel(iPartChannel)
+      print *, "REMOVED CHANNEL ",iPart_sel,jPart_sel," FROM HASH: ",AccepCounter_part(iPart_sel,jPart_sel),RequEvents(iPart_sel,jPart_Sel)
+      call get_NumberOfChannels(NumPartonicChannels)      
+      print *, NumPartonicChannels," CHANNELS REMAINING"
+      return 
+   endif
 
-
-   call PDFMapping(2,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
+   call PDFMapping(2,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi,EhatMin=m4l_minmax(1)+mJJcut)
    call EvalPhasespace_VBF_H4f(yRnd(3),yRnd(4:17),EHat,MomExt(1:4,1:10),PSWgt)
 
 !       call genps(6,EHat,yRnd(3:16),(/0d0,0d0,0d0,0d0,0d0,0d0/),MomExt(1:4,3:8),PSWgt)
@@ -67,52 +98,37 @@ EvalWeighted_HJJ_fulldecay = 0d0
 !       MomExt(1:4,5) = MomExt(1:4,7)+MomExt(1:4,8)
 !       MomExt(1:4,6) = MomExt(1:4,9)+MomExt(1:4,10)
 !       PSWgt = PSWgt * (2d0*Pi)**(4-(6)*3) * (4d0*Pi)**((6)-1)
-
 !
-!       EvalWeighted_HJJ_fulldecay=PSWgt*sHatJacobi  * ( MomExt(1:4,3).dot.MomExt(1:4,7) ) * ( MomExt(1:4,4).dot.MomExt(1:4,10) ) * ( MomExt(1:4,8).dot.MomExt(1:4,9) ) * ( MomExt(1:4,7).dot.MomExt(1:4,10) ) / EHat**8
+!       EvalWeighted_HJJ_fulldecay=PSWgt !*sHatJacobi  * ( MomExt(1:4,3).dot.MomExt(1:4,7) ) * ( MomExt(1:4,4).dot.MomExt(1:4,10) ) * ( MomExt(1:4,8).dot.MomExt(1:4,9) ) * ( MomExt(1:4,7).dot.MomExt(1:4,10) ) / EHat**8
 !       return
+
 
 !    call EvalPhasespace_VBF_NEW2(yRnd(17),yRnd(3:7),EHat,MomExt(1:4,1:10),PSWgt)! stable Higgs
 !       call genps(3,EHat,yRnd(3:7),(/0d0,0d0,M_Reso/),MomExt(1:4,3:5),PSWgt)
 !       PSWgt = PSWgt * (2d0*Pi)**(4-(3)*3) * (4d0*Pi)**((3)-1)
    call boost2Lab(eta1,eta2,10,MomExt(1:4,1:10))
-   PSWgt = PSWgt * (100d0)**8 * PartChannelAvg ! adjust PSWgt for GeV units of MCFM mat.el.
+   PSWgt = PSWgt * PartChannelAvg 
 
 
    call Kinematics_HVBF_fulldecay(MomExt,applyPSCut,NBin)
-   if( applyPSCut .or. PSWgt.lt.1d-12 ) return
+   DebugCounter(9) = DebugCounter(9) + 1  
+   if( applyPSCut .or. PSWgt.lt.1d-33 ) then
+      return
+   endif
+   DebugCounter(10) = DebugCounter(10) + 1
    call setPDFs(eta1,eta2,pdf)
    FluxFac = 1d0/(2d0*EHat**2)
-   EvalCounter = EvalCounter+1
 
 
-   MY_IDUP(1:10) = (/Up_,Up_,Up_,Up_, Z0_,Z0_, ElM_,ElP_,MuM_,MuP_/)
-   ICOLUP(1:2,1) = (/501,0/)
-   ICOLUP(1:2,2) = (/0,502/)
-   ICOLUP(1:2,3) = (/501,0/)
-   ICOLUP(1:2,4) = (/0,502/)
-   ICOLUP(1:2,5:10) = 0
-
-   call convert_to_MCFM(-MomExt(1:4,inTop)*100d0, p_MCFM(1,1:4))
-   call convert_to_MCFM(-MomExt(1:4,inBot)*100d0, p_MCFM(2,1:4))
-   call convert_to_MCFM(+MomExt(1:4,Lep1P)*100d0, p_MCFM(3,1:4))! check f fbar assignment
-   call convert_to_MCFM(+MomExt(1:4,Lep1M)*100d0, p_MCFM(4,1:4))
-   call convert_to_MCFM(+MomExt(1:4,Lep2P)*100d0, p_MCFM(5,1:4))
-   call convert_to_MCFM(+MomExt(1:4,Lep2M)*100d0, p_MCFM(6,1:4))
-   call convert_to_MCFM(+MomExt(1:4,outTop)*100d0,p_MCFM(7,1:4))
-   call convert_to_MCFM(+MomExt(1:4,outBot)*100d0,p_MCFM(8,1:4))
-
-   HZZcoupl(1) = 1d0  !ghz1
-   HZZcoupl(2) = ghz2
-   HZZcoupl(3) = ghz3
-   HZZcoupl(4) = ghz4
-   HZZcoupl(5:) = (0d0,0d0)
-
-   HWWcoupl(1) = 1d0! HZZcoupl(1)!  ghw1  ! this is actually wrong
-   HWWcoupl(2) = ghw2
-   HWWcoupl(3) = ghw3
-   HWWcoupl(4) = ghw4
-   HWWcoupl(5:) = (0d0,0d0)
+   ! GeV conversion is now done inside EvalAmp_qqVVqq
+   call convert_to_MCFM(-MomExt(1:4,inTop), p_MCFM(1,1:4))
+   call convert_to_MCFM(-MomExt(1:4,inBot), p_MCFM(2,1:4))
+   call convert_to_MCFM(+MomExt(1:4,Lep1P), p_MCFM(3,1:4))! check f fbar assignment
+   call convert_to_MCFM(+MomExt(1:4,Lep1M), p_MCFM(4,1:4))
+   call convert_to_MCFM(+MomExt(1:4,Lep2P), p_MCFM(5,1:4))
+   call convert_to_MCFM(+MomExt(1:4,Lep2M), p_MCFM(6,1:4))
+   call convert_to_MCFM(+MomExt(1:4,outTop),p_MCFM(7,1:4))
+   call convert_to_MCFM(+MomExt(1:4,outBot),p_MCFM(8,1:4))
 
 !    print *, (MomExt(1:4,1)).dot.(MomExt(1:4,1))
 !    print *, (MomExt(1:4,2)).dot.(MomExt(1:4,2))
@@ -136,106 +152,125 @@ EvalWeighted_HJJ_fulldecay = 0d0
 
 
 
+
  msq_MCFM(:,:) = 0d0
 #if linkMELA==1
- call qq_ZZqq(p_MCFM,msq_MCFM,HZZcoupl,HWWcoupl,Lambda*100d0,Lambda_Q*100d0,(/Lambda_z1,Lambda_z2,Lambda_z3,Lambda_z4/)*100d0)!  q(-p1)+q(-p2)->Z(p3,p4)+Z(p5,p6)+q(p7)+q(p8)
+
+   ! FIXME: TEMPORARY ASSIGNMENT OF I J R S
+   id_MCFM(1) = iPart_sel
+   id_MCFM(2) = jPart_sel
+   id_MCFM(7) = 0
+   id_MCFM(8) = 0
+   id_MCFM(3:6) = (/ ElM_,ElP_,MuM_,MuP_ /)
+
+   call EvalAmp_qqVVqq(id_MCFM, p_MCFM, 1, msq_MCFM) ! 1 for ZZ decay, 2 for WW decay, 3 for ZZ+WW mixture   
+!    call qq_ZZqq(p_MCFM,msq_MCFM)   
+   msq_MCFM = msq_MCFM * (100d0)**8  ! adjust msq_MCFM for GeV units of MCFM mat.el.
+
+   
+!    print *, "test",ehat,get_Minv(MomExt(1:4,5)+MomExt(1:4,6))
+!    print *, "test",iPart_sel,jPart_sel,msq_MCFM(iPart_sel,jPart_sel)
+!    pause
+   
 #else
  print *, "To use this process, please set linkMELA=Yes in the makefile and recompile."
  print *, "You will also need to have a compiled JHUGenMELA in the directory specified by JHUGenMELADir in the makefile."
  stop 1
 #endif
- ! large overhead here because MCFM computes all partonic channels and we only use msq_MCFM(iPart_sel,jPart_sel)  !
 
 
-!   CHECKS:
-   print *,"msq_MCFM:"
-   do j=-5,5
-   print *, msq_MCFM(-5,j), msq_MCFM(-4,j), msq_MCFM(-3,j), msq_MCFM(-2,j), msq_MCFM(-1,j), msq_MCFM(0,j), msq_MCFM(1,j), msq_MCFM(2,j), msq_MCFM(3,j), msq_MCFM(4,j), msq_MCFM(5,j)
-   enddo
-   print *,""
 
-   me2(:,:)=0d0
-   me2_zzcontr(:,:)=0d0
-   me2_wwcontr(:,:)=0d0
-   do i=-5,5
-   do j=i,5
+ 
 
-      me2_tmpzz(:,:)=0d0
-      me2_tmpww(:,:)=0d0
-
-      call EvalAmp_WBFH_UnSymm_SA_Select( (/MomExt(1:4,1),MomExt(1:4,2),MomExt(1:4,3),MomExt(1:4,4),MomExt(1:4,5)+MomExt(1:4,6)/),i,j,.true.,iflip,me2_tmpzz) ! calling on-shell VBF with stable Higgs
-      !if (iflip.eq.2) then
-      !   call swap(me2_tmpzz(i,j),me2_tmpzz(j,i))
-      !endif
-
-      !call EvalAmp_WBFH_UnSymm_SA_Select( (/MomExt(1:4,1),MomExt(1:4,2),MomExt(1:4,3),MomExt(1:4,4),MomExt(1:4,5)+MomExt(1:4,6)/),i,j,.true.,iflip,me2_tmpww) ! calling on-shell VBF with stable Higgs
-      !if (iflip.eq.1) then
-      !   call swap(me2_tmpww(i,j),me2_tmpww(j,i))
-      !endif
-      me2 = me2 + me2_tmpzz + me2_tmpww
-      me2_zzcontr = me2_zzcontr + me2_tmpzz
-      me2_wwcontr = me2_wwcontr + me2_tmpww
-
-   enddo
-   enddo
-!   call EvalAmp_WBFH_UnSymm_SA(MomExt(1:4,1:5),me2)
-! !   msq_MCFM(:,:) = me2(:,:)
-
-   call EvalAmp_H_VV( (/MomExt(1:4,5)+MomExt(1:4,6),(/0d0,0d0,0d0,0d0/),MomExt(1:4,7),MomExt(1:4,8),MomExt(1:4,9),MomExt(1:4,10)/),(/ElM_,ElP_,MuM_,MuP_/),me2_hdk)                     ! adding higgs decay
-   print *,"me2_hdk:",me2_hdk
-
-   me2_prop = cdabs(1d0/( ((MomExt(1:4,5)+MomExt(1:4,6)).dot.(MomExt(1:4,5)+MomExt(1:4,6))) - m_Reso**2 + (0d0,1d0)*m_Reso*Ga_Reso ))**2
-   print *,"me2_prop:",me2_prop
-
-   me2(:,:) = me2(:,:) * me2_hdk * me2_prop !  adding higgs propagator
-   me2_zzcontr(:,:) = me2_zzcontr(:,:) * me2_hdk * me2_prop !  adding higgs propagator
-   me2_wwcontr(:,:) = me2_wwcontr(:,:) * me2_hdk * me2_prop !  adding higgs propagator
-   print *,"me2:"
-   do j=-5,5
-   print *, me2(-5,j), me2(-4,j), me2(-3,j), me2(-2,j), me2(-1,j), me2(0,j), me2(1,j), me2(2,j), me2(3,j), me2(4,j), me2(5,j)
-   enddo
-   print *,""
-   print *,"me2_zzcontr:"
-   do j=-5,5
-   print *, me2_zzcontr(-5,j), me2_zzcontr(-4,j), me2_zzcontr(-3,j), me2_zzcontr(-2,j), me2_zzcontr(-1,j), me2_zzcontr(0,j), me2_zzcontr(1,j), me2_zzcontr(2,j), me2_zzcontr(3,j), me2_zzcontr(4,j), me2_zzcontr(5,j)
-   enddo
-   print *,""
-   print *,"me2_wwcontr:"
-   do j=-5,5
-   print *, me2_wwcontr(-5,j), me2_wwcontr(-4,j), me2_wwcontr(-3,j), me2_wwcontr(-2,j), me2_wwcontr(-1,j), me2_wwcontr(0,j), me2_wwcontr(1,j), me2_wwcontr(2,j), me2_wwcontr(3,j), me2_wwcontr(4,j), me2_wwcontr(5,j)
-   enddo
-   print *,""
-   !print *, "rat", msq_MCFM(j,i)/me2(i,j)
-   pause
+! ! !   CHECKS:
+! !    print *,"msq_MCFM:"
+! !    do j=-5,5
+! !    print *, msq_MCFM(-5,j), msq_MCFM(-4,j), msq_MCFM(-3,j), msq_MCFM(-2,j), msq_MCFM(-1,j), msq_MCFM(0,j), msq_MCFM(1,j), msq_MCFM(2,j), msq_MCFM(3,j), msq_MCFM(4,j), msq_MCFM(5,j)
+! !    enddo
+! !    print *,""
+! ! 
+! !    me2(:,:)=0d0
+! !    me2_zzcontr(:,:)=0d0
+! !    me2_wwcontr(:,:)=0d0
+! !    do i=-5,5
+! !    do j=i,5
+! ! 
+! !       me2_tmpzz(:,:)=0d0
+! !       me2_tmpww(:,:)=0d0
+! ! 
+! !       call EvalAmp_WBFH_UnSymm_SA_Select( (/MomExt(1:4,1),MomExt(1:4,2),MomExt(1:4,3),MomExt(1:4,4),MomExt(1:4,5)+MomExt(1:4,6)/),i,j,.true.,iflip,me2_tmpzz) ! calling on-shell VBF with stable Higgs
+! !       !if (iflip.eq.2) then
+! !       !   call swap(me2_tmpzz(i,j),me2_tmpzz(j,i))
+! !       !endif
+! ! 
+! !       !call EvalAmp_WBFH_UnSymm_SA_Select( (/MomExt(1:4,1),MomExt(1:4,2),MomExt(1:4,3),MomExt(1:4,4),MomExt(1:4,5)+MomExt(1:4,6)/),i,j,.true.,iflip,me2_tmpww) ! calling on-shell VBF with stable Higgs
+! !       !if (iflip.eq.1) then
+! !       !   call swap(me2_tmpww(i,j),me2_tmpww(j,i))
+! !       !endif
+! !       me2 = me2 + me2_tmpzz + me2_tmpww
+! !       me2_zzcontr = me2_zzcontr + me2_tmpzz
+! !       me2_wwcontr = me2_wwcontr + me2_tmpww
+! ! 
+! !    enddo
+! !    enddo
+! ! !   call EvalAmp_WBFH_UnSymm_SA(MomExt(1:4,1:5),me2)
+! ! ! !   msq_MCFM(:,:) = me2(:,:)
+! ! 
+! !    call EvalAmp_H_VV( (/MomExt(1:4,5)+MomExt(1:4,6),(/0d0,0d0,0d0,0d0/),MomExt(1:4,7),MomExt(1:4,8),MomExt(1:4,9),MomExt(1:4,10)/),(/ElM_,ElP_,MuM_,MuP_/),me2_hdk)                     ! adding higgs decay
+! !    print *,"me2_hdk:",me2_hdk
+! ! 
+! !    me2_prop = cdabs(1d0/( ((MomExt(1:4,5)+MomExt(1:4,6)).dot.(MomExt(1:4,5)+MomExt(1:4,6))) - m_Reso**2 + (0d0,1d0)*m_Reso*Ga_Reso ))**2
+! !    print *,"me2_prop:",me2_prop
+! ! 
+! !    me2(:,:) = me2(:,:) * me2_hdk * me2_prop !  adding higgs propagator
+! !    me2_zzcontr(:,:) = me2_zzcontr(:,:) * me2_hdk * me2_prop !  adding higgs propagator
+! !    me2_wwcontr(:,:) = me2_wwcontr(:,:) * me2_hdk * me2_prop !  adding higgs propagator
+! !    print *,"me2:"
+! !    do j=-5,5
+! !    print *, me2(-5,j), me2(-4,j), me2(-3,j), me2(-2,j), me2(-1,j), me2(0,j), me2(1,j), me2(2,j), me2(3,j), me2(4,j), me2(5,j)
+! !    enddo
+! !    print *,""
+! !    print *,"me2_zzcontr:"
+! !    do j=-5,5
+! !    print *, me2_zzcontr(-5,j), me2_zzcontr(-4,j), me2_zzcontr(-3,j), me2_zzcontr(-2,j), me2_zzcontr(-1,j), me2_zzcontr(0,j), me2_zzcontr(1,j), me2_zzcontr(2,j), me2_zzcontr(3,j), me2_zzcontr(4,j), me2_zzcontr(5,j)
+! !    enddo
+! !    print *,""
+! !    print *,"me2_wwcontr:"
+! !    do j=-5,5
+! !    print *, me2_wwcontr(-5,j), me2_wwcontr(-4,j), me2_wwcontr(-3,j), me2_wwcontr(-2,j), me2_wwcontr(-1,j), me2_wwcontr(0,j), me2_wwcontr(1,j), me2_wwcontr(2,j), me2_wwcontr(3,j), me2_wwcontr(4,j), me2_wwcontr(5,j)
+! !    enddo
+! !    print *,""
+! !    !print *, "rat", msq_MCFM(j,i)/me2(i,j)
+! !    pause
+! ! 
+! ! 
+! !    LO_Res_Unpol = msq_MCFM(iPart_sel,jPart_sel)  *  pdf(LHA2M_pdf(iPart_sel),1) * pdf(LHA2M_pdf(jPart_sel),2)
+! ! 
+! ! 
+! ! 
+! ! 
+! ! 
+! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
+! ! 
+! ! call EvalAmp_WBFH_UnSymm_SA_Select( (/MomExt(1:4,1),MomExt(1:4,2),MomExt(1:4,3),MomExt(1:4,4),MomExt(1:4,5)+MomExt(1:4,6)/),2,4,.true.,iflip,me2)                ! calling on-shell VBF with stable Higgs
+! ! 
+! ! call EvalAmp_H_VV( (/MomExt(1:4,5)+MomExt(1:4,6),(/0d0,0d0,0d0,0d0/),MomExt(1:4,7),MomExt(1:4,8),MomExt(1:4,9),MomExt(1:4,10)/),(/ElM_,ElP_,MuM_,MuP_/),me2_hdk) ! adding higgs decay
+! ! me2 = me2 * me2_hdk !
+! ! 
+! ! me2 = me2 * cdabs(1d0/( ((MomExt(1:4,5)+MomExt(1:4,6)).dot.(MomExt(1:4,5)+MomExt(1:4,6))) - m_Reso**2 + (0d0,1d0)*m_Reso*Ga_Reso ))**2 !  adding higgs propagator
+! ! 
+! ! 
+! ! print *, "MCFM", msq_MCFM(2,4)
+! ! print *, "JHUG",me2(2,4)
+! ! print *, "ratio",msq_MCFM(2,4)/me2(2,4)
+! ! pause
+! ! 
+! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
 
 
    LO_Res_Unpol = msq_MCFM(iPart_sel,jPart_sel)  *  pdf(LHA2M_pdf(iPart_sel),1) * pdf(LHA2M_pdf(jPart_sel),2)
 
-
-
-
-
-! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
-
-call EvalAmp_WBFH_UnSymm_SA_Select( (/MomExt(1:4,1),MomExt(1:4,2),MomExt(1:4,3),MomExt(1:4,4),MomExt(1:4,5)+MomExt(1:4,6)/),2,4,.true.,iflip,me2)                ! calling on-shell VBF with stable Higgs
-
-call EvalAmp_H_VV( (/MomExt(1:4,5)+MomExt(1:4,6),(/0d0,0d0,0d0,0d0/),MomExt(1:4,7),MomExt(1:4,8),MomExt(1:4,9),MomExt(1:4,10)/),(/ElM_,ElP_,MuM_,MuP_/),me2_hdk) ! adding higgs decay
-me2 = me2 * me2_hdk !
-
-me2 = me2 * cdabs(1d0/( ((MomExt(1:4,5)+MomExt(1:4,6)).dot.(MomExt(1:4,5)+MomExt(1:4,6))) - m_Reso**2 + (0d0,1d0)*m_Reso*Ga_Reso ))**2 !  adding higgs propagator
-
-
-print *, "MCFM", msq_MCFM(2,4)
-print *, "JHUG",me2(2,4)
-print *, "ratio",msq_MCFM(2,4)/me2(2,4)
-pause
-
-! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
-
-
-
-
-
+   
    PreFac = fbGeV2 * FluxFac * PSWgt * sHatJacobi
    EvalWeighted_HJJ_fulldecay = LO_Res_Unpol * PreFac
    VegasWeighted_HJJ_fulldecay = EvalWeighted_HJJ_fulldecay*VgsWgt
@@ -246,12 +281,27 @@ pause
 
      if( warmup ) then
 
-       CrossSec(iPart_sel,jPart_sel) = CrossSec(iPart_sel,jPart_sel) + VegasWeighted_HJJ_fulldecay
+       if( VegasWeighted_HJJ_fulldecay.gt.CrossSecMax(iPart_sel,jPart_sel) ) then
+           print *, "New max",iPart_sel,jPart_sel,VegasWeighted_HJJ_fulldecay
+       endif     
+       
+
+       if( VegasWeighted_HJJ_fulldecay.gt.1000d0 ) then
+           print *, "New super max",iPart_sel,jPart_sel,ehat,yrnd(:)
+       endif            
+     
+       CrossSec(iPart_sel,jPart_sel) = CrossSec(iPart_sel,jPart_sel) + VegasWeighted_HJJ_fulldecay     
        CrossSecMax(iPart_sel,jPart_sel) = max(CrossSecMax(iPart_sel,jPart_sel),VegasWeighted_HJJ_fulldecay)
 
      else! not warmup
 
-       call random_number(xRnd)
+       EvalCounter = EvalCounter+1
+       
+       if( VegasWeighted_HJJ_fulldecay .gt. xRnd*CrossSecMax(iPart_sel,jPart_sel) ) then
+         RejeCounter_part(iPart_sel,jPart_sel) = RejeCounter_part(iPart_sel,jPart_sel) + 1
+         RejeCounter=RejeCounter+1       
+       endif
+       
        if( VegasWeighted_HJJ_fulldecay.gt.CrossSecMax(iPart_sel,jPart_sel) ) then
          write(io_LogFile,"(2X,A,1PE13.6,1PE13.6)") "CrossSecMax is too small.",VegasWeighted_HJJ_fulldecay, CrossSecMax(iPart_sel,jPart_sel)
          write(io_stdout, "(2X,A,1PE13.6,1PE13.6,1PE13.6,I3,I3)") "CrossSecMax is too small.",VegasWeighted_HJJ_fulldecay, CrossSecMax(iPart_sel,jPart_sel),VegasWeighted_HJJ_fulldecay/CrossSecMax(iPart_sel,jPart_sel),iPart_sel,jPart_sel
@@ -259,11 +309,15 @@ pause
        elseif( VegasWeighted_HJJ_fulldecay .gt. xRnd*CrossSecMax(iPart_sel,jPart_sel) ) then
          AccepCounter = AccepCounter + 1
          AccepCounter_part(iPart_sel,jPart_sel) = AccepCounter_part(iPart_sel,jPart_sel) + 1
-!         call WriteOutEvent_HVBF((/MomExt(1:4,1),MomExt(1:4,2),MomExt(1:4,3),MomExt(1:4,4),MomExt(1:4,5)/),MY_IDUP(1:5),ICOLUP(1:2,1:5),EventWeight=1d0)
+
+         MY_IDUP(1:2)= (/LHA2M_ID(iPart_sel),LHA2M_ID(jPart_sel)/)
          call WriteOutEvent_HJJ_fulldecay(MomExt,MY_IDUP,ICOLUP)
          do NHisto=1,NumHistograms
            call intoHisto(NHisto,NBin(NHisto),1d0)
          enddo
+       else 
+         RejeCounter_part(iPart_sel,jPart_sel) = RejeCounter_part(iPart_sel,jPart_sel) + 1
+         RejeCounter=RejeCounter+1
        endif
 
      endif! warmup
@@ -279,92 +333,6 @@ pause
           call intoHisto(NHisto,NBin(NHisto),VegasWeighted_HJJ_fulldecay)
         enddo
 
-
-
-! compute all invariants to check PS performance
-
- s13=get_MInv(MomExt(1:4,1)-MomExt(1:4,3))
- s14=get_MInv(MomExt(1:4,1)-MomExt(1:4,4))
- s15=get_MInv(MomExt(1:4,1)-MomExt(1:4,5))
- s16=get_MInv(MomExt(1:4,1)-MomExt(1:4,6))
-
- s23=get_MInv(MomExt(1:4,2)-MomExt(1:4,3))
- s24=get_MInv(MomExt(1:4,2)-MomExt(1:4,4))
- s25=get_MInv(MomExt(1:4,2)-MomExt(1:4,5))
- s26=get_MInv(MomExt(1:4,2)-MomExt(1:4,6))
-
- s34=get_MInv(MomExt(1:4,3)+MomExt(1:4,4))
- s35=get_MInv(MomExt(1:4,3)+MomExt(1:4,5))
- s36=get_MInv(MomExt(1:4,3)+MomExt(1:4,6))
-
- s45=get_MInv(MomExt(1:4,4)+MomExt(1:4,5))
- s46=get_MInv(MomExt(1:4,4)+MomExt(1:4,6))
-
- s56=get_MInv(MomExt(1:4,5)+MomExt(1:4,6))
-
- s78=get_MInv(MomExt(1:4,7)+MomExt(1:4,8))
- s910=get_MInv(MomExt(1:4,9)+MomExt(1:4,10))
- s710=get_MInv(MomExt(1:4,7)+MomExt(1:4,10))
- s89=get_MInv(MomExt(1:4,8)+MomExt(1:4,9))
-
- LO_Res_Unpol = LO_Res_Unpol * VgsWgt
-
- call intoHisto(10,WhichBin(NHisto,dsqrt(s13)),LO_Res_Unpol)
- call intoHisto(11,WhichBin(NHisto,dsqrt(s13)),1d0/PSWgt)
-
- call intoHisto(12,WhichBin(NHisto,dsqrt(s14)),LO_Res_Unpol)
- call intoHisto(13,WhichBin(NHisto,dsqrt(s14)),1d0/PSWgt)
-
- call intoHisto(14,WhichBin(NHisto,dsqrt(s15)),LO_Res_Unpol)
- call intoHisto(15,WhichBin(NHisto,dsqrt(s15)),1d0/PSWgt)
-
- call intoHisto(16,WhichBin(NHisto,dsqrt(s16)),LO_Res_Unpol)
- call intoHisto(17,WhichBin(NHisto,dsqrt(s16)),1d0/PSWgt)
-
- call intoHisto(18,WhichBin(NHisto,dsqrt(s23)),LO_Res_Unpol)
- call intoHisto(19,WhichBin(NHisto,dsqrt(s23)),1d0/PSWgt)
-
- call intoHisto(20,WhichBin(NHisto,dsqrt(s24)),LO_Res_Unpol)
- call intoHisto(21,WhichBin(NHisto,dsqrt(s24)),1d0/PSWgt)
-
- call intoHisto(22,WhichBin(NHisto,dsqrt(s25)),LO_Res_Unpol)
- call intoHisto(23,WhichBin(NHisto,dsqrt(s25)),1d0/PSWgt)
-
- call intoHisto(24,WhichBin(NHisto,dsqrt(s26)),LO_Res_Unpol)
- call intoHisto(25,WhichBin(NHisto,dsqrt(s26)),1d0/PSWgt)
-
- call intoHisto(26,WhichBin(NHisto,dsqrt(s34)),LO_Res_Unpol)
- call intoHisto(27,WhichBin(NHisto,dsqrt(s34)),1d0/PSWgt)
-
- call intoHisto(28,WhichBin(NHisto,dsqrt(s35)),LO_Res_Unpol)
- call intoHisto(29,WhichBin(NHisto,dsqrt(s35)),1d0/PSWgt)
-
- call intoHisto(30,WhichBin(NHisto,dsqrt(s36)),LO_Res_Unpol)
- call intoHisto(31,WhichBin(NHisto,dsqrt(s36)),1d0/PSWgt)
-
- call intoHisto(32,WhichBin(NHisto,dsqrt(s45)),LO_Res_Unpol)
- call intoHisto(33,WhichBin(NHisto,dsqrt(s45)),1d0/PSWgt)
-
- call intoHisto(34,WhichBin(NHisto,dsqrt(s46)),LO_Res_Unpol)
- call intoHisto(35,WhichBin(NHisto,dsqrt(s46)),1d0/PSWgt)
-
- call intoHisto(36,WhichBin(NHisto,dsqrt(s56)),LO_Res_Unpol)
- call intoHisto(37,WhichBin(NHisto,dsqrt(s56)),1d0/PSWgt)
-
- call intoHisto(38,WhichBin(NHisto,dsqrt(s78)),LO_Res_Unpol)
- call intoHisto(39,WhichBin(NHisto,dsqrt(s78)),1d0/PSWgt)
-
- call intoHisto(40,WhichBin(NHisto,dsqrt(s910)),LO_Res_Unpol)
- call intoHisto(41,WhichBin(NHisto,dsqrt(s910)),1d0/PSWgt)
-
- call intoHisto(42,WhichBin(NHisto,dsqrt(s710)),LO_Res_Unpol)
- call intoHisto(43,WhichBin(NHisto,dsqrt(s710)),1d0/PSWgt)
-
- call intoHisto(44,WhichBin(NHisto,dsqrt(s89)),LO_Res_Unpol)
- call intoHisto(45,WhichBin(NHisto,dsqrt(s89)),1d0/PSWgt)
-
-
-
       endif
 
    endif! unweighted
@@ -377,148 +345,19 @@ END FUNCTION
 
 
 
+
 FUNCTION EvalUnWeighted_HJJ_fulldecay(yRnd,genEvt,iPartons,RES)
-use ModKinematics
-use ModParameters
-use ModHiggsjj
-use ModMisc
-#if compiler==1
-use ifport
-#endif
 implicit none
-integer,parameter :: mxpart=14 ! this has to match the MCFM parameter
-real(8) :: yRnd(1:17),VgsWgt, EvalUnWeighted_HJJ_fulldecay
-real(8) :: pdf(-6:6,1:2)   ,me2(-5:5,-5:5),RES(-5:5,-5:5)
-real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi
-real(8) :: MomExt(1:4,1:10),PSWgt,CS_Max
-real(8) :: p_MCFM(mxpart,1:4),msq_MCFM(-5:5,-5:5)
-complex(8) :: HZZcoupl(1:32),HWWcoupl(1:32)
-integer :: i,j,MY_IDUP(1:10),ICOLUP(1:2,1:10),NBin(1:NumHistograms),NHisto,iPartons(1:2)
-real(8) :: LO_Res_Unpol,LO_Res_Pol, PreFac,BWJacobi
-logical :: applyPSCut,genEvt
-integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, Lep1M=8, Lep2P=9, Lep2M=10
-include 'csmaxvalue.f'
+real(8) :: yRnd(1:17),EvalUnWeighted_HJJ_fulldecay,RES(-5:5,-5:5)
+integer :: iPartons(1:2)
+logical :: genEvt
 EvalUnWeighted_HJJ_fulldecay = 0d0
-
-
-   call PDFMapping(2,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
-!    if( ehat.lt. max(m_reso+2*pTjetcut,VBF_4ml_minmax(1)) ) return ! 30GeV = pTcut on fwd jets
-   if( ehat.lt. m_reso+2*pTjetcut ) return ! 30GeV = pTcut on fwd jets
-!   if( ehat.lt.300d0*GeV+30d0*GeV ) return ! 30GeV = pTcut on fwd jets
-
-   call EvalPhasespace_VBF_H4f(yRnd(17),yRnd(3:16),EHat,MomExt(1:4,1:10),PSWgt)
-   call boost2Lab(eta1,eta2,11,MomExt(1:4,1:10))
-   PSWgt = PSWgt * (100d0)**8
-
-   call Kinematics_HVBF_fulldecay(MomExt,applyPSCut,NBin)
-   if( applyPSCut .or. PSWgt.lt.1d-12 ) return
-
-   call SetRunningScales( (/ (MomExt(1:4,Lep1P)+MomExt(1:4,Lep1M)+MomExt(1:4,Lep2P)+MomExt(1:4,Lep2M)),MomExt(1:4,outTop),MomExt(1:4,outBot) /) , (/ Not_a_particle_,Up_,AUp_,Not_a_particle_ /) ) ! Implement like this for now, has to change with deterministic flavors!
-   call setPDFs(eta1,eta2,pdf)
-   FluxFac = 1d0/(2d0*EHat**2)
-
-
-   MY_IDUP(1:10) = (/Up_,Up_,Up_,Up_, Z0_,Z0_, ElM_,ElP_,MuM_,MuP_/)
-   ICOLUP(1:2,1) = (/501,0/)
-   ICOLUP(1:2,2) = (/0,502/)
-   ICOLUP(1:2,3) = (/501,0/)
-   ICOLUP(1:2,4) = (/0,502/)
-   ICOLUP(1:2,5:10) = 0
-
-
-   call convert_to_MCFM(-MomExt(1:4,inTop)*100d0, p_MCFM(1,1:4))
-   call convert_to_MCFM(-MomExt(1:4,inBot)*100d0, p_MCFM(2,1:4))
-   call convert_to_MCFM(+MomExt(1:4,Lep1P)*100d0, p_MCFM(3,1:4))! check f fbar assignment
-   call convert_to_MCFM(+MomExt(1:4,Lep1M)*100d0, p_MCFM(4,1:4))
-   call convert_to_MCFM(+MomExt(1:4,Lep2P)*100d0, p_MCFM(5,1:4))
-   call convert_to_MCFM(+MomExt(1:4,Lep2M)*100d0, p_MCFM(6,1:4))
-   call convert_to_MCFM(+MomExt(1:4,outTop)*100d0,p_MCFM(7,1:4))
-   call convert_to_MCFM(+MomExt(1:4,outBot)*100d0,p_MCFM(8,1:4))
-
-   HZZcoupl(1) = (1d0,0d0)
-   HWWcoupl(:) = HZZcoupl(:)
-   msq_MCFM(:,:) = 0d0
-
-
-
-
-IF( GENEVT ) THEN
-
-#if linkMELA==1
-          call qq_ZZqq(p_MCFM,msq_MCFM,HZZcoupl,HWWcoupl,Lambda*100d0,Lambda_Q*100d0,(/Lambda_z1,Lambda_z2,Lambda_z3,Lambda_z4/)*100d0)!  q(-p1)+q(-p2)->Z(p3,p4)+Z(p5,p6)+q(p7)+q(p8)
-#else
-          print *, "To use this process, please set linkMELA=Yes in the makefile and recompile."
-          print *, "You will also need to have a compiled JHUGenMELA in the directory specified by JHUGenMELADir in the makefile."
-          stop 1
-#endif
-          LO_Res_Unpol = 0d0
-!           do i = -5,5
-!               do j = -5,5
-do i = 1,1
-do j = 2,2
-                LO_Res_Unpol = LO_Res_Unpol + msq_MCFM(i,j) * pdf(LHA2M_pdf(i),1)*pdf(LHA2M_pdf(j),2)
-              enddo
-          enddo
-          PreFac = fbGeV2 * FluxFac * PSWgt * sHatJacobi
-          EvalUnWeighted_HJJ_fulldecay = LO_Res_Unpol * PreFac
-
-      CS_max = CSmax(iPartons(1),iPartons(2))
-
-! print *, "check",iPartons(1:2)
-! print *, "check",EvalUnWeighted_HJJ_fulldecay ,yRnd(16)*CS_max,CS_max;pause
-
-      if( EvalUnWeighted_HJJ_fulldecay .gt. CS_max) then
-         write(*,"(2X,A,1PE13.6,1PE13.6)") "CS_max is too small.",EvalUnWeighted_HJJ_fulldecay, CS_max
-         write(io_LogFile,"(2X,A,1PE13.6,1PE13.6)") "CS_max is too small.",EvalUnWeighted_HJJ_fulldecay, CS_max
-         AlertCounter = AlertCounter + 1
-      elseif( EvalUnWeighted_HJJ_fulldecay .gt. yRnd(16)*CS_max ) then
-         AccepCounter = AccepCounter + 1
-         AccepCounter_part(iPartons(1),iPartons(2)) = AccepCounter_part(iPartons(1),iPartons(2))+1
-         call WriteOutEvent_HJJ_fulldecay(MomExt,MY_IDUP,ICOLUP)
-         do NHisto=1,NumHistograms
-               call intoHisto(NHisto,NBin(NHisto),1d0)
-         enddo
-      endif
-      EvalCounter = EvalCounter + 1
-
-
-ELSE! NOT GENEVT
-
-
-#if linkMELA==1
-   call qq_ZZqq(p_MCFM,msq_MCFM,HZZcoupl,HWWcoupl,Lambda*100d0,Lambda_Q*100d0,(/Lambda_z1,Lambda_z2,Lambda_z3,Lambda_z4/)*100d0)!  q(-p1)+q(-p2)->Z(p3,p4)+Z(p5,p6)+q(p7)+q(p8)
-#else
-   print *, "To use this process, please set linkMELA=Yes in the makefile and recompile."
-   print *, "You will also need to have a compiled JHUGenMELA in the directory specified by JHUGenMELADir in the makefile."
-   stop 1
-#endif
-   PreFac = fbGeV2 * FluxFac * PSWgt * sHatJacobi
-
-   LO_Res_Unpol = 0d0
-!    do i = -5,5
-!       do j = -5,5
-do i = 1,1
-do j = 2,2
-         LO_Res_Pol = msq_MCFM(i,j) * pdf(LHA2M_pdf(i),1)*pdf(LHA2M_pdf(j),2) * PreFac
-
-         RES(i,j) = LO_Res_Pol
-         if( RES(i,j).gt.CSmax(i,j) ) then
-           CSmax(i,j) = RES(i,j)
-         endif
-
-         LO_Res_Unpol = LO_Res_Unpol + LO_Res_Pol
-
-      enddo
-   enddo
-   EvalUnWeighted_HJJ_fulldecay = LO_Res_Unpol
-
-
-
-ENDIF! GENEVT
 
 
 RETURN
 END FUNCTION
+
+
 
 
 

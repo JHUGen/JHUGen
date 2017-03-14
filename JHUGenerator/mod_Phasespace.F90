@@ -75,6 +75,7 @@ MODULE ModPhasespace
 !         procedure :: generate => generate_t_channel_phasespace
 !   end type
 
+  real(8), private, parameter :: mreg_sq = 1d-5
 
   real(8), private, parameter :: pi = 3.1415926535897932384626433d0
 
@@ -244,7 +245,7 @@ MODULE ModPhasespace
 
       if( Width.lt.1d-15 ) then
            InvMass_sq = h(xRnd, PropMass_sq, Power, sMin, sMax)
-           s_channel_propagator = 1d0/g_s(InvMass_sq, PropMass_sq, Power, sMin, sMax)
+!            s_channel_propagator = 1d0/g_s(InvMass_sq, PropMass_sq, Power, sMin, sMax)
            ! print *, "check old",InvMass_sq,s_channel_propagator
            s_channel_propagator = k_s(xRnd, PropMass_sq, Power, sMin, sMax,InvMass_sq)
            ! print *, "check new",InvMass_sq,s_channel_propagator
@@ -300,8 +301,10 @@ MODULE ModPhasespace
         E1 = ( Mandelstam_S + Mass1_sq - Mass2_sq )/2d0/dsqrt(Mandelstam_S)
         p1z= sqrt_lambda(Mandelstam_S,Mass1_sq,Mass2_sq)/2d0/dsqrt(Mandelstam_S)
 
-        if(E1.lt.p1z) then
-          print *,"s_channel_decay: E1<p1z! E,p:",E1,p1z
+        if( E1-p1z .lt. -1d-12 ) then
+!           print *,"s_channel_decay: E1<p1z! E,p,E-p:",E1,p1z,E1-p1z   
+!           print *, "masses sq",Mandelstam_S,Mass1_sq,Mass2_sq
+!           print *, "weight",1d0/g_d(Mandelstam_S,Mass1_sq,Mass2_sq)
           Mom1(1:4) = 0d0 
           Mom2(1:4) = 0d0
           s_channel_decay = 0d0
@@ -475,7 +478,7 @@ MODULE ModPhasespace
         if( m_sq_in.gt.1d-10 ) then
            m_sq = m_sq_in
         else
-           m_sq = -1d-9
+           m_sq = - mreg_sq
         endif
   
         if( nu.ne.1d0 ) then
@@ -522,10 +525,16 @@ MODULE ModPhasespace
 ! the k functions below are equal to the h functions above, only they return the invariant as argument and the g-jacobian as function return value
 
 ! this is h(RandomVar,m_sq,nu,smin,smax), i.e. h(..) for s-channel
-  FUNCTION k_s(RandomVar,m_sq,nu,smin,smax,InvMass_sq)
+  FUNCTION k_s(RandomVar,m_sq_in,nu,smin,smax,InvMass_sq)
   implicit none
-  real(8) :: k_s,RandomVar,m_sq,nu,smin,smax,InvMass_sq
+  real(8) :: k_s,RandomVar,m_sq_in,m_sq,nu,smin,smax,InvMass_sq
   
+  
+        if( dabs(smin-m_sq_in).gt.1d-10 ) then! for massless propagators introduce small negative regulator mass to avoid problems with smin=0
+           m_sq = m_sq_in
+        else
+           m_sq = -mreg_sq
+        endif  
   
         if( nu.ne.1d0 ) then
            InvMass_sq =   ( RandomVar*(smax-m_sq)**(1d0-nu) + (1d0-RandomVar)*(smin-m_sq)**(1d0-nu) )**(1d0/(1d0-nu))  +  m_sq
@@ -538,6 +547,8 @@ MODULE ModPhasespace
 
   RETURN
   END FUNCTION
+
+  
 
 ! this is -h(RandomVar,-m_sq,nu,-smin,-smax), i.e. h(..) for t-channel
   FUNCTION k_t(RandomVar,sab,pa_sq,pb_sq,m_sq,nu,smin,smax,InvMass_sq)

@@ -30,6 +30,9 @@ real(8) :: VG_Result,VG_Error
    if ( .not. ReadLHEFile .and. .not. ConvertLHEFile .and. .not.((Process.le.2 .or. Process.eq.60 .or. Process.eq.61 .or. (Process.ge.110.and.Process.le.114)) .and. unweighted) ) then
       call InitOutput(1d0, 1d14)   !for VBF/HJJ the cross section is calculated, so use that in the <init> block
    endif
+#if linkMELA==1
+   call SetupMCFM(Process)
+#endif
    write(io_stdout,*) " Running"
    if( ConvertLHEFile ) then
         call StartConvertLHE(VG_Result,VG_Error)
@@ -987,6 +990,8 @@ SUBROUTINE InitVegas()
 use ModKinematics
 implicit none
 include "vegas_common.f"
+include 'maxwt.f'
+
 
   xl(1:mxdim) = 0d0
   xu(1:mxdim) = 1d0
@@ -995,6 +1000,7 @@ include "vegas_common.f"
   readin=.false.
   writeout=.false.
   stopvegas=.false.
+  evtgen=.false.
 
 return
 END SUBROUTINE
@@ -1392,6 +1398,22 @@ include "vegas_common.f"
 END SUBROUTINE
 
 
+#if linkMELA==1
+subroutine SetupMCFM(Process)
+use ModMCFMWrapper
+implicit none
+integer, intent(in) :: Process
+
+   call MCFM_firsttime()
+
+   if( &
+      (Process.ge.66 .and. Process.le.69) &
+      ) then
+      call Setup_MCFM_qqVVqq_firsttime(Process)
+   endif
+
+end subroutine
+#endif
 
 
 
@@ -1706,13 +1728,14 @@ use ModMisc
 use ModParameters
 implicit none
 include "vegas_common.f"
+include 'maxwt.f'
 real(8) :: VG_Result,VG_Error,VG_Chi2
 real(8) :: yRnd(1:22),calls1,calls2,calls_rescale
 real(8) :: dum, RES(-5:5,-5:5),ResFrac(-5:5,-5:5),TotalXSec
 integer :: i, i1, j1,PChannel_aux, PChannel_aux1,NHisto,ijSel(1:121,1:3)
 include 'csmaxvalue.f'
 integer :: flav1,flav2,StatusPercent,MissingEvents,MaxEvts,imax
-integer :: VegasSeed
+integer :: VegasSeed,PreviousSum
 character :: ProcessStr*(3)
 logical :: UseBetaVersion=.false.
 
@@ -1749,7 +1772,11 @@ logical :: UseBetaVersion=.false.
     PChannel_aux = PChannel
 
 
+    outgridfile=trim(DataFile)//'.grid'
+    ingridfile=trim(outgridfile)
 
+
+    if( Process.eq.66 ) call init_VBFoffshChannelHash()
 
 if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !----------------------- weighted events
 
@@ -1761,8 +1788,7 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
         return
     endif
 
-    outgridfile=trim(DataFile)//'.grid'
-    ingridfile=trim(outgridfile)
+
 
     ! WARM-UP RUN
     if( .not. ReadCSmax ) then
@@ -1840,15 +1866,13 @@ if( UseBetaVersion ) then
 ! !-------------------new stuff -------------------
     write(io_stdout,"(2X,A)")  "Scanning the integrand"
     warmup = .true.
-    itmx = 5
+    itmx = 10
     ncall= VegasNc0
-    outgridfile="vegas_"//trim(ProcessStr)//".grid"
-    ingridfile=trim(outgridfile)
+
 
     if( ReadCSmax ) then
         readin=.true.
         writeout=.false.
-        itmx = 3
     else
         readin=.false.
         writeout=.true.
@@ -1861,13 +1885,12 @@ if( UseBetaVersion ) then
         if( Process.eq.112) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
         if( Process.eq.113) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
         if( Process.eq.114) call vegas(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
-        itmx = 3
     endif
 
 
-    CrossSecMax(:,:) = 0d0
-    CrossSec(:,:) = 0d0
-
+    itmx = 2
+    writeout=.true.
+    outgridfile=trim(DataFile)//'_temp.grid'    
     if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) call vegas1(EvalWeighted,VG_Result,VG_Error,VG_Chi2)
 !     if( Process.eq.80 ) call vegas(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2) ! adjust to LHE format
 !     if( Process.eq.90 ) call vegas(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
@@ -1879,6 +1902,25 @@ if( UseBetaVersion ) then
     if( Process.eq.112) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.113) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.114) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+
+
+    CrossSecMax(:,:) = 0d0
+    CrossSec(:,:) = 0d0
+    print *, "resetting CrossSecMax(:,:)"
+    itmx = 1
+    if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) call vegas1(EvalWeighted,VG_Result,VG_Error,VG_Chi2)
+!     if( Process.eq.80 ) call vegas(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2) ! adjust to LHE format
+!     if( Process.eq.90 ) call vegas(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
+    if( Process.eq.60 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
+    if( Process.eq.66 ) call vegas1(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
+    if( Process.eq.61 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
+    if( Process.eq.110) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+    if( Process.eq.111) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+    if( Process.eq.112) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+    if( Process.eq.113) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+    if( Process.eq.114) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+    writeout=.false.
+    ingridfile=trim(outgridfile)    
 
 
     call vegas_get_calls(calls1)
@@ -1928,11 +1970,15 @@ if( UseBetaVersion ) then
 
 
 
+    
+    
+
     write(io_stdout,"(A)")  ""
     write(io_stdout,"(2X,A)")  "Event generation"
 
     call ClearHisto()
     warmup = .false.
+    evtgen = .true.
     itmx = 1
 !     nprn = 0
     EvalCounter = 0
@@ -1946,14 +1992,29 @@ if( UseBetaVersion ) then
     call cpu_time(time_start)
 
 
-    itmx=200000
-    ncall= VegasNc0/10
+
+    itmx=1
+    ncall= VegasNc0    !/10     dmax inside vegas needs to be adapted for this. or at least thisdmax inside mod_Crosssection
+    nprn =-1 !0
+    writeout=.false.
+
     call vegas_get_calls(calls2)
     calls_rescale = calls1/calls2
     CrossSecMax(:,:) = CrossSecMax(:,:) * calls_rescale
+    print *, "Rescale CrossSecMax by ",calls_rescale
+
+! do iChann_sel=1,100
+! call get_VBFoffshChannel(iChann_sel,iPart_sel,jPart_sel,PreviousSum)
+! print *, "iChann_sel=====",iChann_sel, "ij=",iPart_sel,jPart_sel
+! stopvegas=.false.
 
 
-!     do while( StatusPercent.lt.100d0  )
+    PreviousSum = 0
+    do while( StatusPercent.lt.100d0  )
+!     do while( AccepCounter_part(iPart_sel,jPart_sel).lt.RequEvents(iPart_sel,jPart_sel) )
+        call cpu_time(time_start)
+        readin=.true.  ! this prevents adapting the grid during this while-loop
+              
         if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) call vegas1(EvalWeighted,VG_Result,VG_Error,VG_Chi2)
 !         if( Process.eq.80 ) call vegas1(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)! adjust to LHE format
     !     if( Process.eq.90 ) call vegas1(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
@@ -1965,19 +2026,34 @@ if( UseBetaVersion ) then
         if( Process.eq.112) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
         if( Process.eq.113) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
         if( Process.eq.114) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
+        
+        
 !         call system('clear')
-!         write(io_stdout,*) ""
-!         do i1=-5,5
-!         do j1=-5,5
-!             if( RequEvents(i1,j1).gt.0 ) then
-! !                write(io_stdout,"(1X,A,I4,I4,2X,I7,2X,I7,2X,F8.3,1X,A)") "Generated events ", i1,j1,(AccepCounter_part(i1,j1)),(RequEvents(i1,j1)),dble(AccepCounter_part(i1,j1))/dble(RequEvents(i1,j1))*100d0,"%"
+        write(io_stdout,*) ""
+        do i1=-5,5
+        do j1=-5,5
+            if( RequEvents(i1,j1).gt.0 .and. AccepCounter_part(i1,j1).lt.RequEvents(i1,j1)  ) then
+!                write(io_stdout,"(1X,A,I4,I4,2X,I7,2X,I7,2X,F8.3,1X,A)") "Generated events ", i1,j1,(AccepCounter_part(i1,j1)),(RequEvents(i1,j1)),dble(AccepCounter_part(i1,j1))/dble(RequEvents(i1,j1))*100d0,"%"
 !                call PrintStatusBar2(int(dble(AccepCounter_part(i1,j1))/(dble(RequEvents(i1,j1)))*100),"channel "//getLHEParticle(i1)//" "//getLHEParticle(j1)//" ")
-!             endif
-!         enddo
-!         enddo
-!         StatusPercent = int(100d0*dble(sum(AccepCounter_part(:,:)))/dble(sum(RequEvents(:,:)))  )
-!     enddo
-    call cpu_time(time_end)
+               write(*,"(I3,I3,I7,I7,F16.6,E16.3)") i1,j1, &
+               AccepCounter_part(i1,j1), RequEvents(i1,j1), &
+               dble(AccepCounter_part(i1,j1))/dble(RejeCounter_part(i1,j1))*100d0, &
+               CrossSecMax(i1,j1)               
+            endif
+        enddo
+        enddo
+        write(*,"(A,I10,I10,F16.6)") "PS gen eff. ",DebugCounter(10),DebugCounter(9),dble(DebugCounter(10))/dble(DebugCounter(9))*100d0
+        DebugCounter(9:10)=0          
+        StatusPercent = int(100d0*dble(sum(AccepCounter_part(:,:)))/dble(sum(RequEvents(:,:)))  )
+        print *, "StatusPercent=",StatusPercent, "  Events=",sum(AccepCounter_part(:,:))
+        call cpu_time(time_end)
+        write(io_stdout,*)  "Event generation rate (events,events/sec)",sum(AccepCounter_part(:,:))-PreviousSum,dble(sum(AccepCounter_part(:,:))-PreviousSum)/(time_end-time_start+1d-10)
+        PreviousSum = sum(AccepCounter_part(:,:))        
+    enddo
+     
+! enddo     
+
+
 
     print *, " Alert  Counter: ",AlertCounter
     if( dble(AlertCounter)/dble(AccepCounter+1d-10) .gt. 1d0*percent ) then
@@ -1989,30 +2065,35 @@ if( UseBetaVersion ) then
     write(io_stdout,*)  " event generation rate (events/sec)",dble(sum(AccepCounter_part(:,:)))/(time_end-time_start+1d-10)
 
 
+    
+    
+    
+    
+    
 
 
-    if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) then
-          write(*,*) ""
-          write(*,"(A)") "                 el              mu             tau             neu              jet"
-          write(*,"(A,5F16.4)") " el ",dble(Br_counter(1,1:5))/dble(AccepCounter)
-          write(*,"(A,5F16.4)") " mu ",dble(Br_counter(2,1:5))/dble(AccepCounter)
-          write(*,"(A,5F16.4)") " tau",dble(Br_counter(3,1:5))/dble(AccepCounter)
-          write(*,"(A,5F16.4)") " neu",dble(Br_counter(4,1:5))/dble(AccepCounter)
-          write(*,"(A,5F16.4)") " jet",dble(Br_counter(5,1:5))/dble(AccepCounter)
-          write(*,*) ""
-          write(*,"(A,5F16.3)") "llll: ",(dble(Br_counter(1,1))+dble(Br_counter(2,2))+dble(Br_counter(3,3)))/dble(AccepCounter)
-          write(*,"(A,5F16.3)") "llLL: ",(dble(Br_counter(1,2))+dble(Br_counter(1,3))+  &
-                                          dble(Br_counter(2,1))+dble(Br_counter(2,3))+  &
-                                          dble(Br_counter(3,1))+dble(Br_counter(3,2)))/dble(AccepCounter)
-          write(*,"(A,5F16.3)") "2l2q: ",(dble(Br_counter(1,5))+dble(Br_counter(2,5))+dble(Br_counter(3,5))+  &
-                                          dble(Br_counter(5,1))+dble(Br_counter(5,2))+dble(Br_counter(5,3)) )/dble(AccepCounter)
-
-          write(*,"(A,5F16.3)") "4l/2q2l: ",(dble(Br_counter(1,2))+dble(Br_counter(1,3))+ dble(Br_counter(1,1))+dble(Br_counter(2,2))+dble(Br_counter(3,3)) &
-                                        + dble(Br_counter(2,1))+dble(Br_counter(2,3))+   &
-                                          dble(Br_counter(3,1))+dble(Br_counter(3,2)))/  &
-                                          (dble(Br_counter(1,5))+dble(Br_counter(2,5))+dble(Br_counter(3,5))+  &
-                                          dble(Br_counter(5,1))+dble(Br_counter(5,2))+dble(Br_counter(5,3)) )
-    endif
+!     if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) then
+!           write(*,*) ""
+!           write(*,"(A)") "                 el              mu             tau             neu              jet"
+!           write(*,"(A,5F16.4)") " el ",dble(Br_counter(1,1:5))/dble(AccepCounter)
+!           write(*,"(A,5F16.4)") " mu ",dble(Br_counter(2,1:5))/dble(AccepCounter)
+!           write(*,"(A,5F16.4)") " tau",dble(Br_counter(3,1:5))/dble(AccepCounter)
+!           write(*,"(A,5F16.4)") " neu",dble(Br_counter(4,1:5))/dble(AccepCounter)
+!           write(*,"(A,5F16.4)") " jet",dble(Br_counter(5,1:5))/dble(AccepCounter)
+!           write(*,*) ""
+!           write(*,"(A,5F16.3)") "llll: ",(dble(Br_counter(1,1))+dble(Br_counter(2,2))+dble(Br_counter(3,3)))/dble(AccepCounter)
+!           write(*,"(A,5F16.3)") "llLL: ",(dble(Br_counter(1,2))+dble(Br_counter(1,3))+  &
+!                                           dble(Br_counter(2,1))+dble(Br_counter(2,3))+  &
+!                                           dble(Br_counter(3,1))+dble(Br_counter(3,2)))/dble(AccepCounter)
+!           write(*,"(A,5F16.3)") "2l2q: ",(dble(Br_counter(1,5))+dble(Br_counter(2,5))+dble(Br_counter(3,5))+  &
+!                                           dble(Br_counter(5,1))+dble(Br_counter(5,2))+dble(Br_counter(5,3)) )/dble(AccepCounter)
+! 
+!           write(*,"(A,5F16.3)") "4l/2q2l: ",(dble(Br_counter(1,2))+dble(Br_counter(1,3))+ dble(Br_counter(1,1))+dble(Br_counter(2,2))+dble(Br_counter(3,3)) &
+!                                         + dble(Br_counter(2,1))+dble(Br_counter(2,3))+   &
+!                                           dble(Br_counter(3,1))+dble(Br_counter(3,2)))/  &
+!                                           (dble(Br_counter(1,5))+dble(Br_counter(2,5))+dble(Br_counter(3,5))+  &
+!                                           dble(Br_counter(5,1))+dble(Br_counter(5,2))+dble(Br_counter(5,3)) )
+!     endif
 
 
 
@@ -3864,9 +3945,9 @@ print *, "extending no. of histograms for vbf tests"
           Histo(7)%SetScale= 1d0/GeV
 
           Histo(8)%Info   = "m_4l"
-          Histo(8)%NBins  = 50
+          Histo(8)%NBins  = 100
           Histo(8)%BinSize= 10d0*GeV
-          Histo(8)%LowVal = 120d0*GeV
+          Histo(8)%LowVal = 100d0*GeV
           Histo(8)%SetScale= 1d0/GeV
 
           Histo(9)%Info   = "Phi1"  ! angle between plane of beam-scatterin axis and the lepton plane of Z1 in the resonance rest frame
@@ -3876,12 +3957,20 @@ print *, "extending no. of histograms for vbf tests"
           Histo(9)%SetScale= 1d0
 
 do NHisto=10,45
-          Histo(NHisto)%Info   = "sij"
-          Histo(NHisto)%NBins  = 200
-          Histo(NHisto)%BinSize= 2d0*GeV
-          Histo(NHisto)%LowVal = 0d0*GeV
-          Histo(NHisto)%SetScale= 1d0/GeV
+          Histo(NHisto)%Info   = "x"
+          Histo(NHisto)%NBins  = 50
+          Histo(NHisto)%BinSize= 1d0/50d0
+          Histo(NHisto)%LowVal = 0d0
+          Histo(NHisto)%SetScale= 1d0
 enddo
+          
+! do NHisto=10,45
+!           Histo(NHisto)%Info   = "sij"
+!           Histo(NHisto)%NBins  = 200
+!           Histo(NHisto)%BinSize= 2d0*GeV
+!           Histo(NHisto)%LowVal = 0d0*GeV
+!           Histo(NHisto)%SetScale= 1d0/GeV
+! enddo
 !
 !           Histo(7)%Info   = "weights"
 !           Histo(7)%NBins  = 50
