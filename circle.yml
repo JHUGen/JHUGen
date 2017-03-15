@@ -56,7 +56,11 @@ general:
 
 dependencies:
   override:
-    - ! [ "$CIRCLE_BRANCH" == master ] || (echo "Uncomment remaining tests and remove this line in master"; exit 1)
+    - |
+      if [ "$CIRCLE_BRANCH" == master ]; then
+        echo "Uncomment remaining tests and remove this line in master"
+        exit 1
+      fi
     - |
       if [ -d ~/root ]; then
         set -o pipefail &&  #exit status will be nonzero if any of echo, root, grep, sed fails
