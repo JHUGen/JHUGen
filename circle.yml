@@ -393,6 +393,11 @@ test:
     - if [ -f ~/reference_failed_VBF ]; then ./JHUGen PDFSet=3 VegasNc0=100000 DecayMode1=8 DecayMode2=8 Interf=0 ReadLHE=$CIRCLE_ARTIFACTS/VBF/a2.lhe DataFile=$CIRCLE_ARTIFACTS/VBF/a2_decayed ghz1=0,0 ghz2=1,0; fi
     - if [ -f ~/reference_failed_VBF ]; then analyzer fileLevel=0 outdir=$CIRCLE_ARTIFACTS/VBF/ outfile=a2.root indir=$CIRCLE_ARTIFACTS/VBF/ computeVBFProdAngles=1 computeVHProdAngles=1 a2_decayed.lhe; fi
 
+    #==========
+    #ggZH Yaofu
+    #==========
+    - ./JHUGen Collider=1 PChannel=0 Process=50 DecayMode1=0 Unweighted=0 VegasNc0=100000 DataFile=$CIRCLE_ARTIFACTS/other/ggZH.lhe
+
     #=============
     #miscellaneous
     #=============
