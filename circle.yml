@@ -395,7 +395,7 @@ test:
     #==========
     #ggZH Yaofu
     #==========
-    - ./JHUGen Collider=1 PChannel=0 Process=50 DecayMode1=0 Unweighted=0 VegasNc0=100000 DataFile=$CIRCLE_ARTIFACTS/other/ggZH.lhe
+    - ./JHUGen Collider=1 PChannel=0 Process=50 DecayMode1=0 Unweighted=0 VegasNc0=100000 WriteWeightedLHE=1 DataFile=$CIRCLE_ARTIFACTS/other/ggZH.lhe
 
     #=============
     #miscellaneous
