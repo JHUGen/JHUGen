@@ -45,8 +45,6 @@ subroutine EvalAmp_VHiggs(id,helicity,MomExt,me2)
 #if linkMELA==1
       elseif(idin(1).eq.0.and.idin(2).eq.0)then ! gg
         amplitude=MATRIXELEMENT0gg(pin,mass,helin,idin)
-        print *,"ggggggggggggggggggg"
-        print *, amplitude
 #endif
       endif
 
@@ -555,6 +553,7 @@ complex(8) function MATRIXELEMENT0qq(MomExt,mass,helicity,id)
         if(VHiggs_PC.eq."tr".or.VHiggs_PC.eq."gg")then
           if(gVVS1(1).ne.0d0.or.gVVS1(3).ne.0d0)then
             call ggTriffbHa1(Spaa,Spbb,sprod,helicity,TriffbHa1)
+            print *, TriffbHa1
             TriffbHa1 = TriffbHa1*PROP3
           endif
           if(gVVS2(1).ne.0d0.or.gVVS2(3).ne.0d0)then
