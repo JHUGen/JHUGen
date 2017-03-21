@@ -46,6 +46,8 @@ Function EvalWeighted_VHiggs(yRnd,VgsWgt)
     real(8) :: helicity(9)!, beam_h(2) !helicities
     integer id(9), id2(9)!, beam_id(2)
 
+    print*,"VHVHVHVHVHVHVHVHVHVHVHVHVHVHVHVHVH"
+
     EvalWeighted_VHiggs=0d0
     EvalCounter = EvalCounter+1
 
