@@ -46,8 +46,6 @@ Function EvalWeighted_VHiggs(yRnd,VgsWgt)
     real(8) :: helicity(9)!, beam_h(2) !helicities
     integer id(9), id2(9)!, beam_id(2)
 
-    print*,"VHVHVHVHVHVHVHVHVHVHVHVHVHVHVHVHVH"
-
     EvalWeighted_VHiggs=0d0
     EvalCounter = EvalCounter+1
 
@@ -376,6 +374,7 @@ if( IsAZDecay(DecayMode1).or.IsAPhoton(DecayMode1) ) then
           EvalWeighted_VHiggs = EvalWeighted_VHiggs + LO_Res_Unpol
       enddo
     elseif((VHiggs_PC.eq."gg".or.VHiggs_PC.eq."bo".and.VHiggs_PC.eq."tr").or.PChannel.eq.0)then
+    print*,"VHVHVHVHVHVHVHVHVHVHVHVHVHVHVHVHVH"
       if( Ehat .ge. 2d0*m_top ) return !without complex top mass in ZH amplitude
       id(1)=0
       id(2)=0
