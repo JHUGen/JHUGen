@@ -55,16 +55,26 @@ Spin = 0.1d0
 if(COLLIDER.eq.0)then
   ICOLUP=0
 else
-  if(id(1).gt.0)then
-    ICOLUP(1,1)=503
-    ICOLUP(1,2)=0
-    ICOLUP(2,1)=0
-    ICOLUP(2,2)=503
-  else
-    ICOLUP(1,1)=0
-    ICOLUP(1,2)=503
-    ICOLUP(2,1)=503
-    ICOLUP(2,2)=0
+  if(id(1).ne.0.and.id(2).ne.0)then
+    if(id(1).gt.0)then
+      ICOLUP(1,1)=503
+      ICOLUP(1,2)=0
+      ICOLUP(2,1)=0
+      ICOLUP(2,2)=503
+    else
+      ICOLUP(1,1)=0
+      ICOLUP(1,2)=503
+      ICOLUP(2,1)=503
+      ICOLUP(2,2)=0
+    endif
+  elseif(id(1).eq.0.and.id(2).eq.0)then
+    id(1:2) = 21
+    ICOLUP(1,1)=501
+    ICOLUP(1,2)=502
+    ICOLUP(2,1)=502
+    ICOLUP(2,2)=501
+  else!gq cases
+    ICOLUP(1:2,:)=0!to be configured when gq is developed
   endif
 endif
 
