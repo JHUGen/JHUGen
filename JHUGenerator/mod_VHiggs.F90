@@ -695,7 +695,7 @@ print *, MATRIXELEMENT0gg
 ! assemble everything and get iM
       if(id(8).ne.Not_a_particle_) then
         PROP5 = -PROPAGATOR(dsqrt(q5_q5),mass(5,1),mass(5,2))
-print *, PROP5, getMass(convertLHEreverse(id(8))
+print *, PROP5, getMass(convertLHEreverse(id(8)))
   print *, FFS(id(8), MomExt(:,8), helicity(8), id(9), MomExt(:,9), helicity(9))
         MATRIXELEMENT0gg=MATRIXELEMENT0gg *PROP5 &
         *(kappa*FFS(id(8), MomExt(:,8), helicity(8), id(9), MomExt(:,9), helicity(9)) &
