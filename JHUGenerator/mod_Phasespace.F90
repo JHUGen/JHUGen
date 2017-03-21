@@ -257,14 +257,14 @@ MODULE ModPhasespace
               
            else ! this is the normal s-channel mapping
            
-!               if( dabs(sMax-PropMass_sq).gt.5d0*Width**2 ) then!   MARKUS NOTE: this if-condition is not smooth --> maybe needs improvement
+!               if( dabs(sMax-PropMass_sq).gt.5d0*Width**2 ) then!   MARKUS NOTE: this if-condition is not smooth --> needs improvement  ! !
 !               if( sMax.gt.(dsqrt(PropMass_sq+1d-10)-3d0*Width)**2 ) then!   MARKUS NOTE: this if-condition is not smooth --> maybe needs improvement
-                  InvMass_sq = h_BreitWigner(xRnd, PropMass_sq, Width, Power, sMin, sMax)
-                  s_channel_propagator = 1d0/g_s_BreitWigner(InvMass_sq, PropMass_sq, Width, Power, sMin, sMax)
+! !                   InvMass_sq = h_BreitWigner(xRnd, PropMass_sq, Width, Power, sMin, sMax)
+! !                   s_channel_propagator = 1d0/g_s_BreitWigner(InvMass_sq, PropMass_sq, Width, Power, sMin, sMax)
                   s_channel_propagator = k_BreitWigner(xRnd, PropMass_sq, Width, sMin, sMax,InvMass_sq)
 !               else
-!                   InvMass_sq = sMin + (sMax-sMin) * xRnd
-!                   s_channel_propagator = sMax-sMin
+! !                   InvMass_sq = sMin + (sMax-sMin) * xRnd
+! !                   s_channel_propagator = sMax-sMin
 !                   s_channel_propagator = k_l(xRnd,sMin,sMax,InvMass_sq)
 !               endif
            endif

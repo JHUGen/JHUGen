@@ -5073,9 +5073,9 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
 ! DebugCounter(iChannel) = DebugCounter(iChannel) + 1
 
 ! if( xchannel.gt.0.5d0 ) then
-if( m4l_minmax(1).ge.300d0*GeV ) then
+! if( m4l_minmax(1).ge.300d0*GeV ) then
   iChannel = 5
-endif
+! endif
 ! else
 ! iChannel =6
 ! endif
