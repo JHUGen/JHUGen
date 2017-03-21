@@ -691,19 +691,19 @@ complex(8) function MATRIXELEMENT0qq(MomExt,mass,helicity,id)
 ! gg > triangle/box couplings
       MATRIXELEMENT0gg = MATRIXELEMENT0gg * (-1d0) * gs**2 * GluonColAvg**2 * dsqrt(2d0) !-1 = i^2 from g_s each
       !dsqrt(2d0) = sqrt[(delta_ab/2)*(delta^ab/2)] = sqrt[Tr(T_a*T_b)^2]
-print *, MATRIXELEMENT0gg
+!print *, MATRIXELEMENT0gg
 ! assemble everything and get iM
       if(id(8).ne.Not_a_particle_) then
         PROP5 = -PROPAGATOR(dsqrt(q5_q5),mass(5,1),mass(5,2))
-print *, id(8), MomExt(:,8), helicity(8), id(9), MomExt(:,9), helicity(9)
-  print *, FFS(id(8), MomExt(:,8), helicity(8), id(9), MomExt(:,9), helicity(9))
+!print *, id(8), MomExt(:,8), helicity(8), id(9), MomExt(:,9), helicity(9)
+!  print *, FFS(id(8), MomExt(:,8), helicity(8), id(9), MomExt(:,9), helicity(9))
         MATRIXELEMENT0gg=MATRIXELEMENT0gg *PROP5 &
         *(kappa*FFS(id(8), MomExt(:,8), helicity(8), id(9), MomExt(:,9), helicity(9)) &
          +kappa_tilde*FFP(id(8), MomExt(:,8), helicity(8), id(9), MomExt(:,9), helicity(9)))&
         *(-ci/vev*getMass(convertLHEreverse(id(8))))
       endif ! else H does not decay
-print *, MATRIXELEMENT0gg
-print *, "=================="
+!print *, MATRIXELEMENT0gg
+!print *, "=================="
       return
       END function MATRIXELEMENT0gg
 
