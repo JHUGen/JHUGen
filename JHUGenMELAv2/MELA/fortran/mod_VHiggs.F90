@@ -687,7 +687,6 @@ complex(8) function MATRIXELEMENT0qq(MomExt,mass,helicity,id)
         endif
         MATRIXELEMENT0gg = Affb + Zffb
       endif
-      print *, MATRIXELEMENT0gg
 
 ! gg > triangle/box couplings
       MATRIXELEMENT0gg = MATRIXELEMENT0gg * (-1d0) * gs**2 * GluonColAvg**2 * dsqrt(2d0) !-1 = i^2 from g_s each
@@ -702,7 +701,7 @@ complex(8) function MATRIXELEMENT0qq(MomExt,mass,helicity,id)
          +kappa_tilde*FFP(id(8), MomExt(:,8), helicity(8), id(9), MomExt(:,9), helicity(9)))&
         *(-ci/vev*getMass(convertLHEreverse(id(8))))
       endif ! else H does not decay
-
+print *, MATRIXELEMENT0gg
       return
       END function MATRIXELEMENT0gg
 
