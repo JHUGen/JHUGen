@@ -687,6 +687,7 @@ complex(8) function MATRIXELEMENT0qq(MomExt,mass,helicity,id)
         endif
         MATRIXELEMENT0gg = Affb + Zffb
       endif
+      print *, MATRIXELEMENT0gg
 
 ! gg > triangle/box couplings
       MATRIXELEMENT0gg = MATRIXELEMENT0gg * (-1d0) * gs**2 * GluonColAvg**2 * dsqrt(2d0) !-1 = i^2 from g_s each
