@@ -374,7 +374,6 @@ if( IsAZDecay(DecayMode1).or.IsAPhoton(DecayMode1) ) then
           EvalWeighted_VHiggs = EvalWeighted_VHiggs + LO_Res_Unpol
       enddo
     elseif((VHiggs_PC.eq."gg".or.VHiggs_PC.eq."bo".and.VHiggs_PC.eq."tr").or.PChannel.eq.0)then
-    print*,"VHVHVHVHVHVHVHVHVHVHVHVHVHVHVHVHVH"
       if( Ehat .ge. 2d0*m_top ) return !without complex top mass in ZH amplitude
       id(1)=0
       id(2)=0
@@ -494,7 +493,11 @@ endif
    if( writeWeightedLHE ) then
       if( IsAZDecay(DecayMode1) .or. IsAPhoton(DecayMode1) ) then
          if(Collider.eq.1)then
+          if((VHiggs_PC.eq."qq".or.VHiggs_PC.eq."lo").and.PChannel.eq.1)then
             id(1:2) = (/convertLHE(Up_),convertLHE(AUp_)/)
+          elseif((VHiggs_PC.eq."gg".or.VHiggs_PC.eq."bo".and.VHiggs_PC.eq."tr").or.PChannel.eq.0)then
+            id(1:2) = (/convertLHE(Glu_),convertLHE(Glu_)/)
+          endif
 !if e+ e- collider
          else if(Collider.eq.0)then
             id(1:2) = (/convertLHE(ElP_),convertLHE(ElM_)/)
