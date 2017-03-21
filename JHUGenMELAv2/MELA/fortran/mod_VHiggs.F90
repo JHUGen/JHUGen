@@ -732,7 +732,7 @@ complex(8) function MATRIXELEMENT0qq(MomExt,mass,helicity,id)
         endif
       endif
       
-      C0=qlI3(0d0,0d0,sprod(1,2),M_Top**2,M_Top**2,M_Top**2,Mu_Ren**2,0)
+      C0=qlI3(0d0,0d0,sprod(1,2),M_Top**2,M_Top**2,M_Top**2,Mu_Ren**2,0) / ci / pisq / gamma_0
 
       Tri = ci * 8d0 * Tri * C0 * m_top**2 ! i = -1 (fermion loop) i^3 (3 fermion propagators)
 
@@ -781,7 +781,7 @@ complex(8) function MATRIXELEMENT0qq(MomExt,mass,helicity,id)
         endif
       endif
       
-      C0=qlI3(0d0,0d0,sprod(1,2),M_Top**2,M_Top**2,M_Top**2,Mu_Ren**2,0)
+      C0=qlI3(0d0,0d0,sprod(1,2),M_Top**2,M_Top**2,M_Top**2,Mu_Ren**2,0) / ci / pisq / gamma_0
 
       Tri = ci * 4d0 * Tri * C0 * m_top**2 ! i = -1 (fermion loop) i^3 (3 fermion propagators)
 
@@ -814,7 +814,7 @@ complex(8) function MATRIXELEMENT0qq(MomExt,mass,helicity,id)
         endif
       endif
 
-      C0=qlI3(0d0,0d0,sprod(1,2),M_Top**2,M_Top**2,M_Top**2,Mu_Ren**2,0)
+      C0=qlI3(0d0,0d0,sprod(1,2),M_Top**2,M_Top**2,M_Top**2,Mu_Ren**2,0) / ci / pisq / gamma_0
 
       Tri = 0d0
 
@@ -847,7 +847,7 @@ complex(8) function MATRIXELEMENT0qq(MomExt,mass,helicity,id)
         endif
       endif
       
-      C0=qlI3(0d0,0d0,sprod(1,2),M_Top**2,M_Top**2,M_Top**2,Mu_Ren**2,0)
+      C0=qlI3(0d0,0d0,sprod(1,2),M_Top**2,M_Top**2,M_Top**2,Mu_Ren**2,0) / ci / pisq / gamma_0
 
       Tri = 0d0
 

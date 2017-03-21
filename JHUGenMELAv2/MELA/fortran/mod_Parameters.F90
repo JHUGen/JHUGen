@@ -607,6 +607,7 @@ integer, public, parameter :: pdfATop_ = -6 ! Dummy
 real(dp), public, parameter :: pi =3.141592653589793238462643383279502884197_dp
 real(dp), public, parameter :: sqrt2 = 1.4142135623730950488016887242096980786_dp
 real(dp), public, parameter :: pisq = pi**2
+real(dp), public, parameter :: gamma_0 = 0.5772156649015328606065120900824024310421_dp  !Euler–Mascheroni constant
 real(8), public, parameter :: one = 1.0d0, mone = -1.0d0
 real(8), public, parameter :: half  = 0.5d0,two = 2.0d0
 real(8), public, parameter :: zero  = 0.0d0
