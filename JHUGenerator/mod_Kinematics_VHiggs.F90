@@ -262,7 +262,7 @@ implicit none
       MomExt(1:4,7)=MomExt(1:4,4)-MomExt(1:4,6)
 
 !8888888888888888888888
-print *, HDecays"----------------"
+print *, HDecays,"----------------"
       if(HDecays)then
       print *, HDecays
 !invariant mass of 8
