@@ -695,15 +695,15 @@ complex(8) function MATRIXELEMENT0qq(MomExt,mass,helicity,id)
 ! assemble everything and get iM
       if(id(8).ne.Not_a_particle_) then
         PROP5 = -PROPAGATOR(dsqrt(q5_q5),mass(5,1),mass(5,2))
-print *, id(8), MomExt(:,8), helicity(8), id(9), MomExt(:,9), helicity(9)
-  print *, FFS(id(8), MomExt(:,8), helicity(8), id(9), MomExt(:,9), helicity(9))
+!print *, id(8), MomExt(:,8), helicity(8), id(9), MomExt(:,9), helicity(9)
+!  print *, FFS(id(8), MomExt(:,8), helicity(8), id(9), MomExt(:,9), helicity(9))
         MATRIXELEMENT0gg=MATRIXELEMENT0gg *PROP5 &
         *(kappa*FFS(id(8), MomExt(:,8), helicity(8), id(9), MomExt(:,9), helicity(9)) &
          +kappa_tilde*FFP(id(8), MomExt(:,8), helicity(8), id(9), MomExt(:,9), helicity(9)))&
         *(-ci/vev*getMass(convertLHEreverse(id(8))))
       endif ! else H does not decay
 !print *, MATRIXELEMENT0gg
-print *, "=================="
+!print *, "=================="
       return
       END function MATRIXELEMENT0gg
 
