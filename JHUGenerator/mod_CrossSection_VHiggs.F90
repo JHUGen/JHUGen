@@ -322,7 +322,6 @@ endif
 
 if(HbbDecays) PostFac=PostFac*6 !of which 2 is for summing H > bb~ helicities and 3 for summing bb~ colors
 
-
 if( IsAZDecay(DecayMode1).or.IsAPhoton(DecayMode1) ) then
 !if pp collider
   if(Collider.eq.1.or.Collider.eq.2)then
@@ -367,6 +366,7 @@ if( IsAZDecay(DecayMode1).or.IsAPhoton(DecayMode1) ) then
         id(1:2) = (/LHA2M_PDF(i),LHA2M_PDF(j)/)
         if (abs(LHA2M_PDF(i)).ne.6   .and.   abs(LHA2M_PDF(j)).ne.6.  .and.  i.ne.0)then
           call EvalAmp_VHiggs(id,helicity,MomExt,me2)
+          print*,"qqqqqqqqqqqqqqq"
         else
           me2=0d0
         endif
@@ -380,6 +380,7 @@ if( IsAZDecay(DecayMode1).or.IsAPhoton(DecayMode1) ) then
       i=0
       j=0
       call EvalAmp_VHiggs(id,helicity,MomExt,me2)
+      print*,"ggggggggggggggggg"
       LO_Res_Unpol = me2*pdf(i,1)*pdf(j,2)* PreFac *PostFac
     !  print *, me2,pdf(i,1),pdf(j,2)
       EvalWeighted_VHiggs = EvalWeighted_VHiggs + LO_Res_Unpol
