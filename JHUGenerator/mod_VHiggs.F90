@@ -531,6 +531,8 @@ complex(8) function MATRIXELEMENT0qq(MomExt,mass,helicity,id)
       ghz4_dyn = HVVSpinZeroDynamicCoupling(4,q3_q3,q4_q4,q5_q5)
       gVVS1(1) = ghz1_dyn*(mass(3,1)**2) + q3_q4 * ( 2d0*ghz2_dyn + ghz3_dyn*q3_q4/Lambda**2 )
       gVVS2(1) = -( 2d0*ghz2_dyn + ghz3_dyn*q3_q4/Lambda**2 )
+print *,"gVVS1",gVVS1(1),gVVS1(3)
+print *,"gVVS2",gVVS2(1),gVVS2(3)
 
       ghz1_dyn = HVVSpinZeroDynamicCoupling(5,0d0,q4_q4,q5_q5)
       ghz2_dyn = HVVSpinZeroDynamicCoupling(6,0d0,q4_q4,q5_q5)
@@ -554,7 +556,6 @@ complex(8) function MATRIXELEMENT0qq(MomExt,mass,helicity,id)
           if(gVVS1(1).ne.0d0.or.gVVS1(3).ne.0d0)then
             call ggTriffbHa1(Spaa,Spbb,sprod,helicity,TriffbHa1)
             TriffbHa1 = TriffbHa1*PROP3
-print *,"amplitude"
           endif
           if(gVVS2(1).ne.0d0.or.gVVS2(3).ne.0d0)then
             call ggTriffbHa2(Spaa,Spbb,sprod,helicity,TriffbHa2)
@@ -589,8 +590,6 @@ print *,"amplitude"
         TriZA = TriffbHa1*gVVS1(3) + TriffbHa2*gVVS2(3)
         BoxZZ = BoxffbH
         BoxZA = BoxffbH
-print *, "gVVS1",gVVS1(1)
-print *, "gVVS2",gVVS2(1)
       else !A is final state
         MATRIXELEMENT0gg = TriAHa1*gVVS1(3) + TriAHa2*gVVS2(3)
       endif
@@ -603,7 +602,6 @@ print *, "gVVS2",gVVS2(1)
           PROP4 = PROPAGATOR(dsqrt(q4_q4),mass(4,1),mass(4,2))
           !Z > l+ l- vertex for final state
           if((abs(id(6)).eq.11).or.(abs(id(6)).eq.13))then
-print*,"ll"
             if((id(6)*helicity(6)).gt.0d0)then
               Zffb = (TriZZ+BoxZZ) * aR_lep
             else
