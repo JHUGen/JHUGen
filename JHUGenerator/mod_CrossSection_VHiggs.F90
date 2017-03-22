@@ -1000,6 +1000,8 @@ endif
     do i=6,7
       inv_mass(i)=dsqrt(dabs(MomExt(1:4,i).dot.MomExt(1:4,i)))
     enddo
+    if(id(1).eq.0))id(1)=convertLHE(Glu_)
+    if(id(2).eq.0))id(2)=convertLHE(Glu_)
     call WriteOutEvent_VHiggs(id,helicity,MomExt,inv_mass,EventWeight=1d0)
   else
     RejeCounter = RejeCounter + 1
