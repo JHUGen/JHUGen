@@ -104,8 +104,6 @@ Function EvalWeighted_VHiggs(yRnd,VgsWgt)
         helicity(7)=-helicity(6)
 
 if(DecayMode1.eq.0)then
-print *,"DecayMode1", DecayMode1
-print *,"HbbDecays", HbbDecays
   id(3)=convertLHE(Z0_)
   id(4)=convertLHE(Z0_)
   if(yRnd(5).lt.0.5d0)then

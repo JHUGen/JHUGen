@@ -262,7 +262,9 @@ implicit none
       MomExt(1:4,7)=MomExt(1:4,4)-MomExt(1:4,6)
 
 !8888888888888888888888
-      if(.not.HDecays)then
+print *, HDecays"----------------"
+      if(HDecays)then
+      print *, HDecays
 !invariant mass of 8
         inv_mass(8)=0d0
 !energy of 8 in the CM frame of 5
@@ -291,6 +293,8 @@ implicit none
 !9999999999999999999999
 !4-momentum of 9 (lab frame) by energy-momentum conservation
         MomExt(1:4,9)=MomExt(1:4,5)-MomExt(1:4,8)
+        print *,MomExt(1:4,8)
+        print *,MomExt(1:4,9)
       endif
 
       PSWgt = jacobian4*jacobian5 * cm_abs3p(4)/(4d0*pi)/inv_mass(3)
