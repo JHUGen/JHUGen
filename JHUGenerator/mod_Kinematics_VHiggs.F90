@@ -69,10 +69,10 @@ else
     endif
   elseif(id(1).eq.convertLHE(Glu_).and.id(2).eq.convertLHE(Glu_))then
     id(1:2) = 21
-    ICOLUP(1,1)=501
-    ICOLUP(1,2)=502
-    ICOLUP(2,1)=502
-    ICOLUP(2,2)=501
+    ICOLUP(1,1)=503
+    ICOLUP(1,2)=504
+    ICOLUP(2,1)=504
+    ICOLUP(2,2)=503
   else!gq cases
     ICOLUP(1:2,:)=0!to be configured when gq is developed
   endif
