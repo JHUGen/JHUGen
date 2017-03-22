@@ -588,8 +588,8 @@ complex(8) function MATRIXELEMENT0qq(MomExt,mass,helicity,id)
         TriZA = TriffbHa1*gVVS1(3) + TriffbHa2*gVVS2(3)
         BoxZZ = BoxffbH
         BoxZA = BoxffbH
-print *,"gVVS1",gVVS1(1),gVVS1(3)
-print *,"gVVS2",gVVS2(1),gVVS2(3)
+print *,"gVVS1",TriffbHa1
+print *,"gVVS2",TriffbHa2
       else !A is final state
         MATRIXELEMENT0gg = TriAHa1*gVVS1(3) + TriAHa2*gVVS2(3)
       endif
