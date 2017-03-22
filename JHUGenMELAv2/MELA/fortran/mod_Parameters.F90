@@ -291,9 +291,9 @@ real(8), public, parameter :: Lambda  = 1000d0    *GeV      ! Lambda coupling en
 
 !-- HVV' couplings to ZZ/ZA/AA and WW
    complex(8), public :: ghz1 = (0.0d0,0d0)   ! SM=2
-   complex(8), public :: ghz2 = (0.0d0,0d0)
+   complex(8), public :: ghz2 = (1.0d0,0d0)
    complex(8), public :: ghz3 = (0.0d0,0d0)
-   complex(8), public :: ghz4 = (1.0d0,0d0)   ! pseudoscalar
+   complex(8), public :: ghz4 = (0.0d0,0d0)   ! pseudoscalar
 
    complex(8), public :: ghzgs2  = (0.00d0,0d0)
    complex(8), public :: ghzgs3  = (0.00d0,0d0)
