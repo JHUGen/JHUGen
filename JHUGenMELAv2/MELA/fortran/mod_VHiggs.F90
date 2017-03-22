@@ -554,6 +554,7 @@ complex(8) function MATRIXELEMENT0qq(MomExt,mass,helicity,id)
           if(gVVS1(1).ne.0d0.or.gVVS1(3).ne.0d0)then
             call ggTriffbHa1(Spaa,Spbb,sprod,helicity,TriffbHa1)
             TriffbHa1 = TriffbHa1*PROP3
+print *,"amplitude"
           endif
           if(gVVS2(1).ne.0d0.or.gVVS2(3).ne.0d0)then
             call ggTriffbHa2(Spaa,Spbb,sprod,helicity,TriffbHa2)
@@ -588,6 +589,8 @@ complex(8) function MATRIXELEMENT0qq(MomExt,mass,helicity,id)
         TriZA = TriffbHa1*gVVS1(3) + TriffbHa2*gVVS2(3)
         BoxZZ = BoxffbH
         BoxZA = BoxffbH
+print *, "gVVS1",gVVS1(1)
+print *, "gVVS2",gVVS2(1)
       else !A is final state
         MATRIXELEMENT0gg = TriAHa1*gVVS1(3) + TriAHa2*gVVS2(3)
       endif
@@ -600,6 +603,7 @@ complex(8) function MATRIXELEMENT0qq(MomExt,mass,helicity,id)
           PROP4 = PROPAGATOR(dsqrt(q4_q4),mass(4,1),mass(4,2))
           !Z > l+ l- vertex for final state
           if((abs(id(6)).eq.11).or.(abs(id(6)).eq.13))then
+print*,"ll"
             if((id(6)*helicity(6)).gt.0d0)then
               Zffb = (TriZZ+BoxZZ) * aR_lep
             else
@@ -691,7 +695,7 @@ complex(8) function MATRIXELEMENT0qq(MomExt,mass,helicity,id)
 ! gg > triangle/box couplings
       MATRIXELEMENT0gg = MATRIXELEMENT0gg * (-1d0) * gs**2 * GluonColAvg**2 * dsqrt(2d0) !-1 = i^2 from g_s each
       !dsqrt(2d0) = sqrt[(delta_ab/2)*(delta^ab/2)] = sqrt[Tr(T_a*T_b)^2]
-      
+
 ! assemble everything and get iM
       if(id(8).ne.Not_a_particle_) then
         PROP5 = -PROPAGATOR(dsqrt(q5_q5),mass(5,1),mass(5,2))
