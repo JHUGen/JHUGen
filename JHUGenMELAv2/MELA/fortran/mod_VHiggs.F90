@@ -531,8 +531,6 @@ complex(8) function MATRIXELEMENT0qq(MomExt,mass,helicity,id)
       ghz4_dyn = HVVSpinZeroDynamicCoupling(4,q3_q3,q4_q4,q5_q5)
       gVVS1(1) = ghz1_dyn*(mass(3,1)**2) + q3_q4 * ( 2d0*ghz2_dyn + ghz3_dyn*q3_q4/Lambda**2 )
       gVVS2(1) = -( 2d0*ghz2_dyn + ghz3_dyn*q3_q4/Lambda**2 )
-print *,"gVVS1",gVVS1(1),gVVS1(3)
-print *,"gVVS2",gVVS2(1),gVVS2(3)
 
       ghz1_dyn = HVVSpinZeroDynamicCoupling(5,0d0,q4_q4,q5_q5)
       ghz2_dyn = HVVSpinZeroDynamicCoupling(6,0d0,q4_q4,q5_q5)
@@ -590,6 +588,8 @@ print *,"gVVS2",gVVS2(1),gVVS2(3)
         TriZA = TriffbHa1*gVVS1(3) + TriffbHa2*gVVS2(3)
         BoxZZ = BoxffbH
         BoxZA = BoxffbH
+print *,"gVVS1",gVVS1(1),gVVS1(3)
+print *,"gVVS2",gVVS2(1),gVVS2(3)
       else !A is final state
         MATRIXELEMENT0gg = TriAHa1*gVVS1(3) + TriAHa2*gVVS2(3)
       endif
