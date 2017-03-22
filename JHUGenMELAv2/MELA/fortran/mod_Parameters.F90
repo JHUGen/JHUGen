@@ -124,7 +124,7 @@ logical, public, parameter :: importExternal_LHEinit = .true.
 !=====================================================
 
 ! gg > ZH
-character(len=2), public :: VHiggs_PC = "gg"                    ! VH partonic channel and mode selection, in development.
+character(len=2), public :: VHiggs_PC = "tri"                    ! VH partonic channel and mode selection, in development.
                                                             ! "gg" ( = triangles + boxes of gg)
                                                             ! "qq" ( = q qbar @LO)
                                                             ! "lo" ( = q qbar @LO)
