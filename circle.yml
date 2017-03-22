@@ -398,8 +398,8 @@ test:
     #- ./JHUGen Collider=1 PChannel=0 VHiggs_PC=gg Process=50 HbbDK=1 DecayMode1=0 Unweighted=0 VegasNc0=50000 VegasNc1=50000 VegasNc2=50000 WriteWeightedLHE=1 DataFile=$CIRCLE_ARTIFACTS/other/ggZH_SM_weighted.lhe
     #- ./JHUGen Collider=1 PChannel=0 VHiggs_PC=gg Process=50 HbbDK=1 DecayMode1=0 Unweighted=0 VegasNc0=50000 VegasNc1=50000 VegasNc2=50000 WriteWeightedLHE=1 DataFile=$CIRCLE_ARTIFACTS/other/ggZH_a2_weighted.lhe ghz1=0,0 ghz2=1,0
 
-    #- ./JHUGen Collider=1 PChannel=0 VHiggs_PC=gg Process=50 HbbDK=1 DecayMode1=0 Unweighted=1 VegasNc0=100000 VegasNc2=500000 DataFile=$CIRCLE_ARTIFACTS/other/ggZH_SM_unweighted.lhe
-    - ./JHUGen Collider=1 PChannel=0 VHiggs_PC=gg Process=50 HbbDK=1 DecayMode1=0 Unweighted=1 VegasNc0=100000 VegasNc2=500000 DataFile=$CIRCLE_ARTIFACTS/other/ggZH_a2_unweighted.lhe ghz1=0,0 ghz2=1,0
+    - ./JHUGen Collider=1 PChannel=0 VHiggs_PC=gg Process=50 HbbDK=1 DecayMode1=0 Unweighted=1 VegasNc0=100000 VegasNc2=500000 DataFile=$CIRCLE_ARTIFACTS/other/ggZH_SM_unweighted.lhe
+    #- ./JHUGen Collider=1 PChannel=0 VHiggs_PC=gg Process=50 HbbDK=1 DecayMode1=0 Unweighted=1 VegasNc0=100000 VegasNc2=500000 DataFile=$CIRCLE_ARTIFACTS/other/ggZH_a2_unweighted.lhe ghz1=0,0 ghz2=1,0
 
     #=============
     #miscellaneous
