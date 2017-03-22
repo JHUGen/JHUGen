@@ -104,6 +104,8 @@ Function EvalWeighted_VHiggs(yRnd,VgsWgt)
         helicity(7)=-helicity(6)
 
 if(DecayMode1.eq.0)then
+print *,"DecayMode1", DecayMode1
+print *,"HbbDecays", HbbDecays
   id(3)=convertLHE(Z0_)
   id(4)=convertLHE(Z0_)
   if(yRnd(5).lt.0.5d0)then
@@ -366,7 +368,6 @@ if( IsAZDecay(DecayMode1).or.IsAPhoton(DecayMode1) ) then
         id(1:2) = (/LHA2M_PDF(i),LHA2M_PDF(j)/)
         if (abs(LHA2M_PDF(i)).ne.6   .and.   abs(LHA2M_PDF(j)).ne.6.  .and.  i.ne.0)then
           call EvalAmp_VHiggs(id,helicity,MomExt,me2)
-          print*,"qqqqqqqqqqqqqqq"
         else
           me2=0d0
         endif
@@ -380,7 +381,6 @@ if( IsAZDecay(DecayMode1).or.IsAPhoton(DecayMode1) ) then
       i=0
       j=0
       call EvalAmp_VHiggs(id,helicity,MomExt,me2)
-      print*,"ggggggggggggggggg"
       LO_Res_Unpol = me2*pdf(i,1)*pdf(j,2)* PreFac *PostFac
     !  print *, me2,pdf(i,1),pdf(j,2)
       EvalWeighted_VHiggs = EvalWeighted_VHiggs + LO_Res_Unpol
