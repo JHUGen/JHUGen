@@ -40,7 +40,7 @@ MELAflags = -DlinkMELA=0
 ifeq ($(linkMELA),Yes)
  ifeq ($(Comp),gfort)
     MELAflags = -DlinkMELA=1 -L$(MELALibDir) -l$(MCFMLib)
-else
+ else
     linkMELA = No
  endif
 endif
