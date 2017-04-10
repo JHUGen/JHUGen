@@ -7,7 +7,11 @@ module modHiggsJJ
   public :: EvalAmp_WBFH_UnSymm_SA,EvalAmp_WBFH_UnSymm_SA_Select,EvalAmp_WBFH_UnSymm_SA_Select_exact
   public :: EvalAmp_SBFH_UnSymm_SA,EvalAmp_SBFH_UnSymm_SA_Select,EvalAmp_SBFH_UnSymm_SA_Select_exact
   !public :: wrapHVV
-  public :: get_VBFchannelHash,get_VBFchannelHash_nosplit,get_HJJchannelHash,get_HJJchannelHash_nosplit,get_GENchannelHash
+  public :: get_VBFchannelHash,get_VBFchannelHash_nosplit,get_HJJchannelHash,get_HJJchannelHash_nosplit,get_GENchannelHash,get_VBFoffshchannelHash
+  public :: init_VBFoffshChannelHash,get_NumberOfChannels,get_VBFoffshChannel,remove_VBFoffshChannel
+  
+  integer,private :: ij_channelHash(1:121,1:3)=-99
+  integer,private :: NumberOfChannels=-1
 
   !-- general definitions, to be merged with Markus final structure
    real(dp), public, parameter :: tag1 = 1.0_dp
@@ -399,6 +403,8 @@ module modHiggsJJ
   implicit none
   integer, intent(out) :: ijSel(1:121,1:3)
 
+
+
       ijSel(  1,1:3) = (/-5,-5, 1/)
       ijSel(  2,1:3) = (/-5,-4, 1/)
       ijSel(  3,1:3) = (/-5,-3, 1/)
@@ -523,6 +529,274 @@ module modHiggsJJ
 
   return
   end subroutine
+
+
+
+
+  
+  subroutine init_VBFoffshChannelHash()
+  implicit none
+  
+      ij_ChannelHash(  1,1:3) = (/ 2, 1, 1/)
+      ij_ChannelHash(  2,1:3) = (/ 1, 2, 1/)
+      ij_ChannelHash(  3,1:3) = (/ 2,-2, 1/)
+      ij_ChannelHash(  4,1:3) = (/-2, 2, 1/)
+      ij_ChannelHash(  5,1:3) = (/ 2, 3, 1/)
+      ij_ChannelHash(  6,1:3) = (/ 3, 2, 1/)
+      ij_ChannelHash(  7,1:3) = (/ 1,-1, 1/)
+      ij_ChannelHash(  8,1:3) = (/-1, 1, 1/)
+      ij_ChannelHash(  9,1:3) = (/ 1, 3, 1/)
+      ij_ChannelHash( 10,1:3) = (/ 3, 1, 1/)
+      ij_ChannelHash( 11,1:3) = (/ 2,-4, 1/)
+      ij_ChannelHash( 12,1:3) = (/-4, 2, 1/)
+      ij_ChannelHash( 13,1:3) = (/ 1, 4, 1/)
+      ij_ChannelHash( 14,1:3) = (/ 4, 1, 1/)
+      ij_ChannelHash( 15,1:3) = (/-5,-5, 1/)
+      ij_ChannelHash( 16,1:3) = (/-5,-4, 1/)
+      ij_ChannelHash( 17,1:3) = (/-5,-3, 1/)
+      ij_ChannelHash( 18,1:3) = (/-5,-2, 1/)
+      ij_ChannelHash( 19,1:3) = (/-5,-1, 1/)
+      ij_ChannelHash( 20,1:3) = (/-5, 1, 1/)
+      ij_ChannelHash( 21,1:3) = (/-5, 2, 1/)
+      ij_ChannelHash( 22,1:3) = (/-5, 3, 1/)
+      ij_ChannelHash( 23,1:3) = (/-5, 4, 1/)
+      ij_ChannelHash( 24,1:3) = (/-5, 5, 1/)
+      ij_ChannelHash( 25,1:3) = (/-4,-5, 1/)
+      ij_ChannelHash( 26,1:3) = (/-4,-4, 1/)
+      ij_ChannelHash( 27,1:3) = (/-4,-3, 1/)
+      ij_ChannelHash( 28,1:3) = (/-4,-2, 1/)
+      ij_ChannelHash( 29,1:3) = (/-4,-1, 1/)
+      ij_ChannelHash( 30,1:3) = (/-4, 1, 1/)
+      ij_ChannelHash( 31,1:3) = (/-4, 3, 1/)
+      ij_ChannelHash( 32,1:3) = (/-4, 4, 1/)
+      ij_ChannelHash( 33,1:3) = (/-4, 5, 1/)
+      ij_ChannelHash( 34,1:3) = (/-3,-5, 1/)
+      ij_ChannelHash( 35,1:3) = (/-3,-4, 1/)
+      ij_ChannelHash( 36,1:3) = (/-3,-3, 1/)
+      ij_ChannelHash( 37,1:3) = (/-3,-2, 1/)
+      ij_ChannelHash( 38,1:3) = (/-3,-1, 1/)
+      ij_ChannelHash( 39,1:3) = (/-3, 1, 1/)
+      ij_ChannelHash( 40,1:3) = (/-3, 2, 1/)
+      ij_ChannelHash( 41,1:3) = (/-3, 3, 1/)
+      ij_ChannelHash( 42,1:3) = (/-3, 4, 1/)
+      ij_ChannelHash( 43,1:3) = (/-3, 5, 1/)
+      ij_ChannelHash( 44,1:3) = (/-2,-5, 1/)
+      ij_ChannelHash( 45,1:3) = (/-2,-4, 1/)
+      ij_ChannelHash( 46,1:3) = (/-2,-3, 1/)
+      ij_ChannelHash( 47,1:3) = (/-2,-2, 1/)
+      ij_ChannelHash( 48,1:3) = (/-2,-1, 1/)
+      ij_ChannelHash( 49,1:3) = (/-2, 1, 1/)
+      ij_ChannelHash( 50,1:3) = (/-2, 3, 1/)
+      ij_ChannelHash( 51,1:3) = (/-2, 4, 1/)
+      ij_ChannelHash( 52,1:3) = (/-2, 5, 1/)
+      ij_ChannelHash( 53,1:3) = (/-1,-5, 1/)
+      ij_ChannelHash( 54,1:3) = (/-1,-4, 1/)
+      ij_ChannelHash( 55,1:3) = (/-1,-3, 1/)
+      ij_ChannelHash( 56,1:3) = (/-1,-2, 1/)
+      ij_ChannelHash( 57,1:3) = (/-1,-1, 1/)
+      ij_ChannelHash( 58,1:3) = (/-1, 2, 1/)
+      ij_ChannelHash( 59,1:3) = (/-1, 3, 1/)
+      ij_ChannelHash( 60,1:3) = (/-1, 4, 1/)
+      ij_ChannelHash( 61,1:3) = (/-1, 5, 1/)
+      ij_ChannelHash( 62,1:3) = (/ 1,-5, 1/)
+      ij_ChannelHash( 63,1:3) = (/ 1,-4, 1/)
+      ij_ChannelHash( 64,1:3) = (/ 1,-3, 1/)
+      ij_ChannelHash( 65,1:3) = (/ 1,-2, 1/)
+      ij_ChannelHash( 66,1:3) = (/ 1, 1, 1/)
+      ij_ChannelHash( 67,1:3) = (/ 1, 5, 1/)
+      ij_ChannelHash( 68,1:3) = (/ 2,-5, 1/)
+      ij_ChannelHash( 69,1:3) = (/ 2,-3, 1/)
+      ij_ChannelHash( 70,1:3) = (/ 2,-1, 1/)
+      ij_ChannelHash( 71,1:3) = (/ 2, 2, 1/)
+      ij_ChannelHash( 72,1:3) = (/ 2, 4, 1/)
+      ij_ChannelHash( 73,1:3) = (/ 2, 5, 1/)
+      ij_ChannelHash( 74,1:3) = (/ 3,-5, 1/)
+      ij_ChannelHash( 75,1:3) = (/ 3,-4, 1/)
+      ij_ChannelHash( 76,1:3) = (/ 3,-3, 1/)
+      ij_ChannelHash( 77,1:3) = (/ 3,-2, 1/)
+      ij_ChannelHash( 78,1:3) = (/ 3,-1, 1/)
+      ij_ChannelHash( 79,1:3) = (/ 3, 3, 1/)
+      ij_ChannelHash( 80,1:3) = (/ 3, 4, 1/)
+      ij_ChannelHash( 81,1:3) = (/ 3, 5, 1/)
+      ij_ChannelHash( 82,1:3) = (/ 4,-5, 1/)
+      ij_ChannelHash( 83,1:3) = (/ 4,-4, 1/)
+      ij_ChannelHash( 84,1:3) = (/ 4,-3, 1/)
+      ij_ChannelHash( 85,1:3) = (/ 4,-2, 1/)
+      ij_ChannelHash( 86,1:3) = (/ 4,-1, 1/)
+      ij_ChannelHash( 87,1:3) = (/ 4, 2, 1/)
+      ij_ChannelHash( 88,1:3) = (/ 4, 3, 1/)
+      ij_ChannelHash( 89,1:3) = (/ 4, 4, 1/)
+      ij_ChannelHash( 90,1:3) = (/ 4, 5, 1/)
+      ij_ChannelHash( 91,1:3) = (/ 5,-5, 1/)
+      ij_ChannelHash( 92,1:3) = (/ 5,-4, 1/)
+      ij_ChannelHash( 93,1:3) = (/ 5,-3, 1/)
+      ij_ChannelHash( 94,1:3) = (/ 5,-2, 1/)
+      ij_ChannelHash( 95,1:3) = (/ 5,-1, 1/)
+      ij_ChannelHash( 96,1:3) = (/ 5, 1, 1/)
+      ij_ChannelHash( 97,1:3) = (/ 5, 2, 1/)
+      ij_ChannelHash( 98,1:3) = (/ 5, 3, 1/)
+      ij_ChannelHash( 99,1:3) = (/ 5, 4, 1/)
+      ij_ChannelHash(100,1:3) = (/ 5, 5, 1/)
+
+      NumberOfChannels = 100
+ 
+  return
+  end subroutine
+  
+
+  subroutine get_NumberOfChannels(NumOfCh)
+  implicit none
+  integer, intent(out) :: NumOfCh
+ 
+    NumOfCh = NumberOfChannels
+ 
+  return
+  end subroutine
+  
+
+
+  subroutine get_VBFoffshChannel(channel,i1,i2,i3)
+  implicit none
+  integer, intent(in) :: channel
+  integer, intent(out) :: i1,i2,i3
+ 
+    i1= ij_ChannelHash(channel,1)
+    i2= ij_ChannelHash(channel,2)
+    i3= ij_ChannelHash(channel,3)
+ 
+  return
+  end subroutine
+  
+
+
+  subroutine remove_VBFoffshChannel(channel)
+  implicit none
+  integer, intent(in) :: channel
+  integer :: i
+ 
+    do i =channel,NumberOfChannels-1
+         ij_ChannelHash(i,1:3) = ij_ChannelHash(i+1,1:3)
+    enddo
+    NumberOfChannels = NumberOfChannels -1 
+     
+  return
+  end subroutine
+    
+  
+
+
+  subroutine get_VBFoffshchannelHash(ijSel)
+  implicit none
+  integer, intent(out) :: ijSel(1:121,1:3)
+
+
+      ijSel(  1,1:3) = (/ 2, 1, 1/)
+      ijSel(  2,1:3) = (/ 1, 2, 1/)
+      ijSel(  3,1:3) = (/ 2,-2, 1/)
+      ijSel(  4,1:3) = (/-2, 2, 1/)
+      ijSel(  5,1:3) = (/ 2, 3, 1/)
+      ijSel(  6,1:3) = (/ 3, 2, 1/)
+      ijSel(  7,1:3) = (/ 1,-1, 1/)
+      ijSel(  8,1:3) = (/-1, 1, 1/)
+      ijSel(  9,1:3) = (/ 1, 3, 1/)
+      ijSel( 10,1:3) = (/ 3, 1, 1/)
+      ijSel( 11,1:3) = (/ 2,-4, 1/)
+      ijSel( 12,1:3) = (/-4, 2, 1/)
+      ijSel( 13,1:3) = (/ 1, 4, 1/)
+      ijSel( 14,1:3) = (/ 4, 1, 1/)
+  
+      ijSel( 15,1:3) = (/-5,-5, 1/)
+      ijSel( 16,1:3) = (/-5,-4, 1/)
+      ijSel( 17,1:3) = (/-5,-3, 1/)
+      ijSel( 18,1:3) = (/-5,-2, 1/)
+      ijSel( 19,1:3) = (/-5,-1, 1/)
+      ijSel( 20,1:3) = (/-5, 1, 1/)
+      ijSel( 21,1:3) = (/-5, 2, 1/)
+      ijSel( 22,1:3) = (/-5, 3, 1/)
+      ijSel( 23,1:3) = (/-5, 4, 1/)
+      ijSel( 24,1:3) = (/-5, 5, 1/)
+      ijSel( 25,1:3) = (/-4,-5, 1/)
+      ijSel( 26,1:3) = (/-4,-4, 1/)
+      ijSel( 27,1:3) = (/-4,-3, 1/)
+      ijSel( 28,1:3) = (/-4,-2, 1/)
+      ijSel( 29,1:3) = (/-4,-1, 1/)
+      ijSel( 30,1:3) = (/-4, 1, 1/)
+      ijSel( 31,1:3) = (/-4, 3, 1/)
+      ijSel( 32,1:3) = (/-4, 4, 1/)
+      ijSel( 33,1:3) = (/-4, 5, 1/)
+      ijSel( 34,1:3) = (/-3,-5, 1/)
+      ijSel( 35,1:3) = (/-3,-4, 1/)
+      ijSel( 36,1:3) = (/-3,-3, 1/)
+      ijSel( 37,1:3) = (/-3,-2, 1/)
+      ijSel( 38,1:3) = (/-3,-1, 1/)
+      ijSel( 39,1:3) = (/-3, 1, 1/)
+      ijSel( 40,1:3) = (/-3, 2, 1/)
+      ijSel( 41,1:3) = (/-3, 3, 1/)
+      ijSel( 42,1:3) = (/-3, 4, 1/)
+      ijSel( 43,1:3) = (/-3, 5, 1/)
+      ijSel( 44,1:3) = (/-2,-5, 1/)
+      ijSel( 45,1:3) = (/-2,-4, 1/)
+      ijSel( 46,1:3) = (/-2,-3, 1/)
+      ijSel( 47,1:3) = (/-2,-2, 1/)
+      ijSel( 48,1:3) = (/-2,-1, 1/)
+      ijSel( 49,1:3) = (/-2, 1, 1/)
+      ijSel( 50,1:3) = (/-2, 3, 1/)
+      ijSel( 51,1:3) = (/-2, 4, 1/)
+      ijSel( 52,1:3) = (/-2, 5, 1/)
+      ijSel( 53,1:3) = (/-1,-5, 1/)
+      ijSel( 54,1:3) = (/-1,-4, 1/)
+      ijSel( 55,1:3) = (/-1,-3, 1/)
+      ijSel( 56,1:3) = (/-1,-2, 1/)
+      ijSel( 57,1:3) = (/-1,-1, 1/)
+      ijSel( 58,1:3) = (/-1, 2, 1/)
+      ijSel( 59,1:3) = (/-1, 3, 1/)
+      ijSel( 60,1:3) = (/-1, 4, 1/)
+      ijSel( 61,1:3) = (/-1, 5, 1/)
+      ijSel( 62,1:3) = (/ 1,-5, 1/)
+      ijSel( 63,1:3) = (/ 1,-4, 1/)
+      ijSel( 64,1:3) = (/ 1,-3, 1/)
+      ijSel( 65,1:3) = (/ 1,-2, 1/)
+      ijSel( 66,1:3) = (/ 1, 1, 1/)
+      ijSel( 67,1:3) = (/ 1, 5, 1/)
+      ijSel( 68,1:3) = (/ 2,-5, 1/)
+      ijSel( 69,1:3) = (/ 2,-3, 1/)
+      ijSel( 70,1:3) = (/ 2,-1, 1/)
+      ijSel( 71,1:3) = (/ 2, 2, 1/)
+      ijSel( 72,1:3) = (/ 2, 4, 1/)
+      ijSel( 73,1:3) = (/ 2, 5, 1/)
+      ijSel( 74,1:3) = (/ 3,-5, 1/)
+      ijSel( 75,1:3) = (/ 3,-4, 1/)
+      ijSel( 76,1:3) = (/ 3,-3, 1/)
+      ijSel( 77,1:3) = (/ 3,-2, 1/)
+      ijSel( 78,1:3) = (/ 3,-1, 1/)
+      ijSel( 79,1:3) = (/ 3, 3, 1/)
+      ijSel( 80,1:3) = (/ 3, 4, 1/)
+      ijSel( 81,1:3) = (/ 3, 5, 1/)
+      ijSel( 82,1:3) = (/ 4,-5, 1/)
+      ijSel( 83,1:3) = (/ 4,-4, 1/)
+      ijSel( 84,1:3) = (/ 4,-3, 1/)
+      ijSel( 85,1:3) = (/ 4,-2, 1/)
+      ijSel( 86,1:3) = (/ 4,-1, 1/)
+      ijSel( 87,1:3) = (/ 4, 2, 1/)
+      ijSel( 88,1:3) = (/ 4, 3, 1/)
+      ijSel( 89,1:3) = (/ 4, 4, 1/)
+      ijSel( 90,1:3) = (/ 4, 5, 1/)
+      ijSel( 91,1:3) = (/ 5,-5, 1/)
+      ijSel( 92,1:3) = (/ 5,-4, 1/)
+      ijSel( 93,1:3) = (/ 5,-3, 1/)
+      ijSel( 94,1:3) = (/ 5,-2, 1/)
+      ijSel( 95,1:3) = (/ 5,-1, 1/)
+      ijSel( 96,1:3) = (/ 5, 1, 1/)
+      ijSel( 97,1:3) = (/ 5, 2, 1/)
+      ijSel( 98,1:3) = (/ 5, 3, 1/)
+      ijSel( 99,1:3) = (/ 5, 4, 1/)
+      ijSel(100,1:3) = (/ 5, 5, 1/)
+
+      ijSel(101:121,1:3) = 0
+
+  return
+  end subroutine
+  
 
 
 

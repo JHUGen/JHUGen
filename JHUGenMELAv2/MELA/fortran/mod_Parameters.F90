@@ -41,9 +41,9 @@ integer(8), public :: EvalCounter=0
 integer(8), public :: RejeCounter=0
 integer(8), public :: AccepCounter=0
 integer(8), public :: AlertCounter=0
-integer(8), public :: AccepCounter_part(-6:6,-6:6)=0,RequEvents(-6:+6,-6:+6)
+integer(8), public :: AccepCounter_part(-6:6,-6:6)=0,RejeCounter_part(-6:6,-6:6)=0,RequEvents(-6:+6,-6:+6)
 real(8), public :: CrossSecMax(-6:+6,-6:+6),CrossSec(-6:+6,-6:+6)
-integer, public :: iPart_sel, jPart_sel
+integer, public :: iPart_sel, jPart_sel, iChann_sel
 real(8) :: time_start,time_end,time_int
 logical, public :: warmup
 character(len=500) :: DataFile
