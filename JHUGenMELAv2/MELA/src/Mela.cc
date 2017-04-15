@@ -290,6 +290,10 @@ void Mela::resetQuarkMasses(){ ZZME->reset_QuarkMasses(); }
 void Mela::resetMCFM_EWKParameters(double ext_Gf, double ext_aemmz, double ext_mW, double ext_mZ, double ext_xW, int ext_ewscheme){
   ZZME->reset_MCFM_EWKParameters(ext_Gf, ext_aemmz, ext_mW, ext_mZ, ext_xW, ext_ewscheme);
 }
+
+double Mela::getPrimaryMass(int ipart){ return ZZME->get_PrimaryMass(ipart); }
+double Mela::getPrimaryWidth(int ipart){ return ZZME->get_PrimaryWidth(ipart); }
+
 void Mela::setRemoveLeptonMasses(bool MasslessLeptonSwitch){ TUtil::applyLeptonMassCorrection(MasslessLeptonSwitch); }
 void Mela::setRemoveJetMasses(bool MasslessLeptonSwitch){ TUtil::applyJetMassCorrection(MasslessLeptonSwitch); }
 void Mela::setRenFacScaleMode(TVar::EventScaleScheme renormalizationSch, TVar::EventScaleScheme factorizationSch, double ren_sf, double fac_sf){

@@ -1175,6 +1175,56 @@ void TUtil::SetCKMElements(double* invckm_ud, double* invckm_us, double* invckm_
   // Do not call ckmfill_(), it is called by MCFM_chooser!
 }
 
+double TUtil::GetMass(int ipart){
+  if (abs(ipart)==8) return spinzerohiggs_anomcoupl_.mt_4gen;
+  else if (abs(ipart)==7) return spinzerohiggs_anomcoupl_.mb_4gen;
+  else if (abs(ipart)==6) return masses_mcfm_.mt;
+  else if (abs(ipart)==5) return masses_mcfm_.mb;
+  else if (abs(ipart)==4) return masses_mcfm_.mc;
+  else if (abs(ipart)==3) return masses_mcfm_.ms;
+  else if (abs(ipart)==2) return masses_mcfm_.mu;
+  else if (abs(ipart)==1) return masses_mcfm_.md;
+  else if (abs(ipart)==11) return masses_mcfm_.mel;
+  else if (abs(ipart)==13) return masses_mcfm_.mmu;
+  else if (abs(ipart)==15) return masses_mcfm_.mtau;
+  else if (abs(ipart)==23) return masses_mcfm_.zmass;
+  else if (abs(ipart)==24) return masses_mcfm_.wmass;
+  else if (abs(ipart)==25) return masses_mcfm_.hmass;
+  else{
+    // JHUGen masses
+    if (
+      abs(ipart)<=6
+      ||
+      (abs(ipart)>=11 && abs(ipart)<=16)
+      ||
+      abs(ipart)==23 || abs(ipart)==24 || abs(ipart)==25
+      ){
+      const double GeV=1./100.;
+      int jpart = convertLHEreverse(&ipart);
+      double joutmass = __modparameters_MOD_getmass(&jpart);
+      double outmass = joutmass/GeV;
+      return outmass;
+    }
+    else return 0;
+  }
+}
+double TUtil::GetDecayWidth(int ipart){
+  // MCFM masses
+  if (abs(ipart)==6) return masses_mcfm_.twidth;
+  else if (abs(ipart)==15) return masses_mcfm_.tauwidth;
+  else if (abs(ipart)==23) return masses_mcfm_.zwidth;
+  else if (abs(ipart)==24) return masses_mcfm_.wwidth;
+  else if (abs(ipart)==25) return masses_mcfm_.hwidth;
+  else{
+    // JHUGen masses
+    const double GeV=1./100.;
+    int jpart = convertLHEreverse(&ipart);
+    double joutwidth = __modparameters_MOD_getdecaywidth(&jpart);
+    double outwidth = joutwidth/GeV;
+    return outwidth;
+  }
+}
+
 double TUtil::InterpretScaleScheme(const TVar::Production& production, const TVar::MatrixElement& matrixElement, const TVar::EventScaleScheme& scheme, TLorentzVector p[mxpart]){
   double Q=0;
   TLorentzVector nullFourVector(0, 0, 0, 0);

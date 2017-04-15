@@ -343,6 +343,14 @@ SpinZeroCouplings* TEvtProb::GetSelfDSpinZeroCouplings(){ return selfDSpinZeroCo
 SpinOneCouplings* TEvtProb::GetSelfDSpinOneCouplings(){ return selfDSpinOneCoupl.getRef(); }
 SpinTwoCouplings* TEvtProb::GetSelfDSpinTwoCouplings(){ return selfDSpinTwoCoupl.getRef(); }
 double TEvtProb::GetPrimaryHiggsMass(){ return PrimaryHMass; }
+double TEvtProb::GetPrimaryMass(int ipart){
+  if (PDGHelpers::isAHiggs(ipart)) return GetPrimaryHiggsMass();
+  else return TUtil::GetMass(ipart);
+}
+double TEvtProb::GetPrimaryWidth(int ipart){
+  if (PDGHelpers::isAHiggs(ipart)) return myCSW_->HiggsWidth(GetPrimaryHiggsMass());
+  else return TUtil::GetDecayWidth(ipart);
+}
 MelaIO* TEvtProb::GetIORecord(){ return RcdME.getRef(); }
 MELACandidate* TEvtProb::GetCurrentCandidate(){ return melaCand; }
 int TEvtProb::GetCurrentCandidateIndex(){
