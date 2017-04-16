@@ -90,6 +90,10 @@ public:
   void getConstant(float& prob); // <ME> constants
   void getPAux(float& prob); // SuperProb
 
+
+  RooSpin::modelMeasurables getMeasurablesRRV();
+
+
   void computeDecayAngles(
     float& qH,
     float& m1,
