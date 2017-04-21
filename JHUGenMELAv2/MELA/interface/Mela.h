@@ -78,6 +78,7 @@ public:
   // Function to get current primary EW/QCD parameters from MCFM/JHUGen (notice Higgs mass/width used in the ME could be different)
   double getPrimaryMass(int ipart);
   double getPrimaryWidth(int ipart);
+  double getHiggsWidthAtPoleMass(double mass);
 
 
   MelaIO* getIORecord(); // Full parton-by-parton ME record

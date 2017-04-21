@@ -205,6 +205,7 @@ void newZZMatrixElement::reset_InputEvent(){ Xcal2.ResetInputEvent(); }
 MelaIO* newZZMatrixElement::get_IORecord(){ return Xcal2.GetIORecord(); }
 double newZZMatrixElement::get_PrimaryMass(int ipart){ return Xcal2.GetPrimaryMass(ipart); }
 double newZZMatrixElement::get_PrimaryWidth(int ipart){ return Xcal2.GetPrimaryWidth(ipart); }
+double newZZMatrixElement::get_HiggsWidthAtPoleMass(double mass){ return Xcal2.GetHiggsWidthAtPoleMass(mass); }
 MELACandidate* newZZMatrixElement::get_CurrentCandidate(){ return Xcal2.GetCurrentCandidate(); }
 int newZZMatrixElement::get_CurrentCandidateIndex(){ return Xcal2.GetCurrentCandidateIndex(); }
 int newZZMatrixElement::get_NCandidates(){ return Xcal2.GetNCandidates(); }

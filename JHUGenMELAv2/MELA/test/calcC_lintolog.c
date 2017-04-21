@@ -9,6 +9,7 @@
 #include <vector>
 #include <fstream>
 #include <cstdlib>
+#include <unordered_map>
 #include "TROOT.h"
 #include "TMath.h"
 #include "TLorentzVector.h"
@@ -40,18 +41,6 @@ TString inputdir_8TeV = "/work-zfs/lhc/ianderso/hep/CJLST/140519b/PRODFSR_8TeV";
 TString inputdir_13TeV = "/work-zfs/lhc/usarica/CMS-related/CJLSTProduction/170410";
 
 
-template<typename T> void addByLowest(std::vector<std::pair<T, int>>& valArray, T val, int index){
-  bool inserted = false;
-  for (typename std::vector<std::pair<T, int>>::iterator it = valArray.begin(); it<valArray.end(); it++){
-    if ((*it).first>=val){
-      inserted=true;
-      if ((*it).second!=index) valArray.insert(it, std::pair<T, int>(val, index));
-      break;
-    }
-  }
-  if (!inserted) valArray.push_back(std::pair<T, int>(val, index));
-}
-
 template<typename T> void addByLowest(std::vector<T>& valArray, T val, bool unique){
   bool inserted = false;
   for (typename std::vector<T>::iterator it = valArray.begin(); it<valArray.end(); it++){
@@ -64,8 +53,49 @@ template<typename T> void addByLowest(std::vector<T>& valArray, T val, bool uniq
   if (!inserted) valArray.push_back(val);
 }
 
+template<typename T, typename U> void addByLowest(std::vector<std::pair<T, U>>& valArray, T val, U index){
+  bool inserted = false;
+  for (typename std::vector<std::pair<T, U>>::iterator it = valArray.begin(); it<valArray.end(); it++){
+    if ((*it).first>=val){
+      inserted=true;
+      if ((*it).second!=index) valArray.insert(it, std::pair<T, U>(val, index));
+      break;
+    }
+  }
+  if (!inserted) valArray.push_back(std::pair<T, U>(val, index));
+}
+
 template<typename T> void appendVector(std::vector<T>& a, std::vector<T>& b){ a.insert(a.end(), b.begin(), b.end()); }
 
+template<typename T> bool checkListVariable(const vector<T>& list, const T& var){
+  for (unsigned int v=0; v<list.size(); v++){
+    if (list.at(v)==var) return true; // Look for exact match
+  }
+  return false;
+}
+
+void splitOption(const string rawoption, string& wish, string& value, char delimiter){
+  size_t posEq = rawoption.find(delimiter);
+  if (posEq!=string::npos){
+    wish=rawoption;
+    value=rawoption.substr(posEq+1);
+    wish.erase(wish.begin()+posEq, wish.end());
+  }
+  else{
+    wish="";
+    value=rawoption;
+  }
+}
+void splitOptionRecursive(const string rawoption, vector<string>& splitoptions, char delimiter){
+  string suboption=rawoption, result=rawoption;
+  string remnant;
+  while (result!=""){
+    splitOption(suboption, result, remnant, delimiter);
+    if (result!="" && !checkListVariable(splitoptions, result)) splitoptions.push_back(result);
+    suboption = remnant;
+  }
+  if (remnant!="") splitoptions.push_back(remnant);
+}
 
 struct ExtBin{
   double binlow;
@@ -74,26 +104,31 @@ struct ExtBin{
   vector<float> masses;
   vector<float> mevals;
   vector<float> me2vals;
+  vector<float> weights;
 
-  void addEvent(float mass, float me, float me2){
+  void addEvent(float mass, float me, float me2, float weight=1){
     masses.push_back(mass);
     mevals.push_back(me);
     me2vals.push_back(me2);
+    weights.push_back(weight);
   }
   void sift(){
+    if (masses.size()==0) return;
+
     vector<int> take_out;
     vector<pair<float, int>> me_entry[2];
     for (unsigned int ev=0; ev<masses.size(); ev++){
-      addByLowest(me_entry[0], mevals.at(ev), ev);
-      addByLowest(me_entry[1], me2vals.at(ev), ev);
+      addByLowest<float, int>(me_entry[0], mevals.at(ev), ev);
+      addByLowest<float, int>(me_entry[1], me2vals.at(ev), ev);
     }
     for (unsigned int im=0; im<2; im++){
       int at99p8ev = (float(me_entry[im].size()))*0.998;
+      if (at99p8ev==(int)me_entry[im].size()) at99p8ev--;
       int bin=me_entry[im].size()-1;
       while (bin>at99p8ev){
         if (
           me_entry[im].at(at99p8ev).first*2.<me_entry[im].at(bin).first
-          ) addByLowest(take_out, me_entry[im].at(bin).second, true);
+          ) addByLowest<int>(take_out, me_entry[im].at(bin).second, true);
         bin--;
       }
     }
@@ -106,20 +141,100 @@ struct ExtBin{
       it=masses.begin()+t_ev; masses.erase(it);
       it=mevals.begin()+t_ev; mevals.erase(it);
       it=me2vals.begin()+t_ev; me2vals.erase(it);
+      it=weights.begin()+t_ev; weights.erase(it);
+    }
+  }
+  void adjustWeights(float refth=3.){
+    if (masses.size()==0) return;
+
+    vector<pair<float, int>> weight_entry;
+    for (unsigned int ev=0; ev<masses.size(); ev++) addByLowest<float, int>(weight_entry, weights.at(ev), ev);
+    int bin=weight_entry.size()-1;
+
+    int at99p0ev = (float(weight_entry.size()))*0.99;
+    if (at99p0ev==(int)weight_entry.size()) at99p0ev--;
+    float threshold = weight_entry.at(at99p0ev).first;
+    while (bin>at99p0ev){
+      if (
+        threshold*2.<weight_entry.at(bin).first
+        ){
+        weights.at(weight_entry.at(bin).second) = pow(threshold, 2)/weight_entry.at(bin).first;
+        cout << "Adjusting weight for event " << bin << endl;
+      }
+      bin--;
+    }
+    float sum[2]={ 0 };
+    for (unsigned int ev=0; ev<weights.size(); ev++){
+      sum[0] += weights.at(ev);
+      sum[1] += 1;
+    }
+    for (unsigned int ev=0; ev<weights.size(); ev++) weights.at(ev) *= sum[1]/sum[0];
+    if (refth>0.){
+      for (unsigned int ev=0; ev<weights.size(); ev++){
+        if (weights.at(ev)<=refth) continue;
+        weights.at(ev) = pow(refth, 2)/weights.at(ev);
+      }
+    }
+  }
+  void mergeBin(const ExtBin& other){
+    if (
+      other.events.size()!=other.masses.size()
+      ||
+      other.events.size()!=other.mevals.size()
+      ||
+      other.events.size()!=other.me2vals.size()
+      ||
+      other.events.size()!=other.weights.size()
+      ){
+      cerr << "Size of the following elements are not the same:" << endl;
+      cerr << "\t- Events: " << other.events.size() << endl;
+      cerr << "\t- Masses: " << other.masses.size() << endl;
+      cerr << "\t- MEs: " << other.mevals.size() << endl;
+      cerr << "\t- MEs (2): " << other.me2vals.size() << endl;
+      cerr << "\t- Weights: " << other.weights.size() << endl;
+    }
+    for (unsigned int ev=0; ev<other.events.size(); ev++){
+      events.push_back(other.events.at(ev));
+      addEvent(other.masses.at(ev), other.mevals.at(ev), other.me2vals.at(ev), other.weights.at(ev));
     }
   }
 };
 
-
+float findPoleMass(TString samplename){
+  float mass = -1;
+  string strtmp = samplename.Data();
+  std::size_t extpos = strtmp.find(".root");
+  if (extpos!=string::npos) strtmp.erase(extpos, 5);
+  vector<string> strsplit;
+  splitOptionRecursive(strtmp, strsplit, 'H');
+  if (strsplit.size()>1){
+    string strmass = strsplit.at(1);
+    strsplit.clear();
+    splitOptionRecursive(strmass, strsplit, '_');
+    strmass = strsplit.at(0);
+    mass = std::stod(strmass);
+  }
+  return mass;
+}
+TTree* findTree(vector<TTree*> treeList, int evid){
+  int ev = evid;
+  for (unsigned int t=0; t<treeList.size(); t++){
+    TTree* tree = treeList.at(t);
+    int nevts = tree->GetEntries();
+    if (ev<nevts) return tree;
+    else ev -= nevts;
+    if (ev<0) cerr << "findTree::ERROR: Could not find the event " << evid << endl;
+  }
+  return 0;
+}
 void getEntry(vector<TTree*> treeList, int evid){
   int ev = evid;
   for (unsigned int t=0; t<treeList.size(); t++){
-    if (ev<treeList.at(t)->GetEntries()){
-      treeList.at(t)->GetEntry(ev);
-      break;
-    }
-    else ev -= treeList.at(t)->GetEntries();
-    if (ev<0) cerr << "getEntry::ERROR: Could not find the event " << evid << endl;
+    TTree* tree = treeList.at(t);
+    int nevts = tree->GetEntries();
+    if (ev<nevts){ tree->GetEntry(ev); break; }
+    else ev -= nevts;
+    if (ev<0) cerr << "findTree::ERROR: Could not find the event " << evid << endl;
   }
 }
 
@@ -205,6 +320,100 @@ vector<TString> constructSamplesList(TString strsample, float sqrts){
       samples.push_back("VBFH2000");
       samples.push_back("VBFH2500");
       samples.push_back("VBFH3000");
+    }
+  }
+  else if (strsample=="WH"){
+    if (sqrts<10.){
+      samples.push_back("HZZ4lTree_WH110.root");
+      samples.push_back("HZZ4lTree_WH115.root");
+      samples.push_back("HZZ4lTree_WH120.root");
+      samples.push_back("HZZ4lTree_WH125.root");
+      samples.push_back("HZZ4lTree_WH126.root");
+      samples.push_back("HZZ4lTree_WH130.root");
+      samples.push_back("HZZ4lTree_WH140.root");
+      samples.push_back("HZZ4lTree_WH150.root");
+      samples.push_back("HZZ4lTree_WH160.root");
+      samples.push_back("HZZ4lTree_WH180.root");
+      samples.push_back("HZZ4lTree_WH200.root");
+    }
+    else{
+      samples.push_back("WminusH115");
+      samples.push_back("WminusH120");
+      samples.push_back("WminusH124");
+      samples.push_back("WminusH125");
+      samples.push_back("WminusH126");
+      samples.push_back("WminusH130");
+      samples.push_back("WminusH135");
+      samples.push_back("WminusH140");
+      samples.push_back("WminusH145");
+      samples.push_back("WminusH150");
+      samples.push_back("WminusH155");
+      samples.push_back("WminusH160");
+      samples.push_back("WminusH165");
+      samples.push_back("WminusH170");
+      samples.push_back("WminusH175");
+      samples.push_back("WminusH180");
+      samples.push_back("WminusH190");
+      samples.push_back("WminusH200");
+      samples.push_back("WminusH210");
+      samples.push_back("WminusH230");
+      samples.push_back("WplusH115");
+      samples.push_back("WplusH120");
+      samples.push_back("WplusH124");
+      samples.push_back("WplusH125");
+      samples.push_back("WplusH126");
+      samples.push_back("WplusH130");
+      samples.push_back("WplusH135");
+      samples.push_back("WplusH140");
+      samples.push_back("WplusH145");
+      samples.push_back("WplusH150");
+      samples.push_back("WplusH155");
+      samples.push_back("WplusH160");
+      samples.push_back("WplusH165");
+      samples.push_back("WplusH170");
+      samples.push_back("WplusH175");
+      samples.push_back("WplusH180");
+      samples.push_back("WplusH190");
+      samples.push_back("WplusH200");
+      samples.push_back("WplusH210");
+      samples.push_back("WplusH230");
+    }
+  }
+  else if (strsample=="ZH"){
+    if (sqrts<10.){
+      samples.push_back("HZZ4lTree_ZH110.root");
+      samples.push_back("HZZ4lTree_ZH115.root");
+      samples.push_back("HZZ4lTree_ZH120.root");
+      samples.push_back("HZZ4lTree_ZH125.root");
+      samples.push_back("HZZ4lTree_ZH126.root");
+      samples.push_back("HZZ4lTree_ZH130.root");
+      samples.push_back("HZZ4lTree_ZH140.root");
+      samples.push_back("HZZ4lTree_ZH150.root");
+      samples.push_back("HZZ4lTree_ZH160.root");
+      samples.push_back("HZZ4lTree_ZH180.root");
+      samples.push_back("HZZ4lTree_ZH200.root");
+    }
+    else{
+      samples.push_back("ZH115");
+      samples.push_back("ZH120");
+      samples.push_back("ZH124");
+      samples.push_back("ZH125");
+      samples.push_back("ZH126");
+      samples.push_back("ZH130");
+      samples.push_back("ZH135");
+      samples.push_back("ZH140");
+      samples.push_back("ZH145");
+      samples.push_back("ZH150");
+      samples.push_back("ZH155");
+      samples.push_back("ZH160");
+      samples.push_back("ZH165");
+      samples.push_back("ZH170");
+      samples.push_back("ZH175");
+      samples.push_back("ZH180");
+      samples.push_back("ZH190");
+      samples.push_back("ZH200");
+      samples.push_back("ZH210");
+      samples.push_back("ZH230");
     }
   }
   else if (strsample=="JJQCD"){
@@ -302,12 +511,12 @@ vector<TString> constructSamplesList(TString strsample, float sqrts){
       samples.push_back("HZZ4lTree_ggTo2e2mu_SMH-MCFM67_H125.6.root");
     }
     else{
+      samples.push_back("ggTo4mu_0PMH125_MCFM701");
+      samples.push_back("ggTo4e_0PMH125_MCFM701");
       samples.push_back("ggTo2e2mu_0PMH125_MCFM701");
       samples.push_back("ggTo2e2tau_0PMH125_MCFM701");
       samples.push_back("ggTo2mu2tau_0PMH125_MCFM701");
-      samples.push_back("ggTo4e_0PMH125_MCFM701");
       samples.push_back("ggTo4tau_0PMH125_MCFM701");
-      samples.push_back("ggTo4mu_0PMH125_MCFM701");
     }
   }
   else if (strsample=="gg_Bkg_MCFM"){
@@ -317,11 +526,11 @@ vector<TString> constructSamplesList(TString strsample, float sqrts){
       samples.push_back("HZZ4lTree_ggTo4e_Contin-MCFM67.root");
     }
     else{
+      samples.push_back("ggTo4mu_Contin_MCFM701");
+      samples.push_back("ggTo4e_Contin_MCFM701");
       samples.push_back("ggTo2e2mu_Contin_MCFM701");
       samples.push_back("ggTo2e2tau_Contin_MCFM701");
       samples.push_back("ggTo2mu2tau_Contin_MCFM701");
-      samples.push_back("ggTo4mu_Contin_MCFM701");
-      samples.push_back("ggTo4e_Contin_MCFM701");
       samples.push_back("ggTo4tau_Contin_MCFM701");
     }
   }
@@ -335,10 +544,10 @@ vector<TString> constructSamplesList(TString strsample, float sqrts){
   }
   else if (strsample=="gg_Bkg_ggVV"){
     if (sqrts<10.){
-      samples.push_back("HZZ4lTree_ggTo2l2l_Continuum.root");
       samples.push_back("HZZ4lTree_ggTo4l_Continuum.root");
-      samples.push_back("HZZ4lTree_ggZZ2l2l.root");
       samples.push_back("HZZ4lTree_ggZZ4l.root");
+      samples.push_back("HZZ4lTree_ggTo2l2l_Continuum.root");
+      samples.push_back("HZZ4lTree_ggZZ2l2l.root");
     }
     else{
     }
@@ -390,13 +599,13 @@ GENERAL COMMENTS
 */
 
 /* SPECIFIC COMMENT: NONE */
-void get_PAvgProfile_JHUGen_JJVBF_HSMHiggs_7or8TeV(int sqrts=8, bool debug=false){
+void get_PAvgProfile_JHUGen_JJVBF_HSMHiggs_7or8TeV(int sqrts=8){
   int erg_tev=sqrts;
   float mPOLE=125.;
   TString TREE_NAME = "SelectedTree";
-  bool writeFinalTree=false;
+  bool writeFinalTree=true;
 
-  TVar::VerbosityLevel verbosity = (debug ? TVar::DEBUG : TVar::ERROR);
+  TVar::VerbosityLevel verbosity = TVar::ERROR;
   Mela mela(erg_tev, mPOLE, verbosity);
 
   TVar::Process proc = TVar::HSMHiggs;
@@ -434,6 +643,7 @@ void get_PAvgProfile_JHUGen_JJVBF_HSMHiggs_7or8TeV(int sqrts=8, bool debug=false
   float phi1 = 1.8828257;
   float ZZPt, ZZPhi, ZZEta;
   int LepID[4]={ 13, -13, 11, -11 };
+  short Z1Flav, Z2Flav;
 
   TString strchannel[3]={ "4mu", "4e", "2mu2e" };
   TString cinput_main;
@@ -442,125 +652,115 @@ void get_PAvgProfile_JHUGen_JJVBF_HSMHiggs_7or8TeV(int sqrts=8, bool debug=false
   else return;
 
   vector<TString> strSamples = constructSamplesList("JJVBF", sqrts);
-  const int nSamples = strSamples.size();
 
-  TChain* tree = new TChain(TREE_NAME, "");
-  for (int ic=0; ic<3; ic++){
-    for (int is=0; is<nSamples; is++) tree->Add(Form("%s/%s/%s", cinput_main.Data(), (strchannel[ic]).Data(), (strSamples[is]).Data()));
-  }
-  tree->SetBranchAddress("NJets30", &NJets30);
-  tree->SetBranchAddress("JetPt", &JetPt, &bJetPt);
-  tree->SetBranchAddress("JetEta", &JetEta, &bJetEta);
-  tree->SetBranchAddress("JetPhi", &JetPhi, &bJetPhi);
-  tree->SetBranchAddress("JetMass", &JetMass, &bJetMass);
-  tree->SetBranchAddress("ZZMass", &mzz);
-  tree->SetBranchAddress("ZZPt", &ZZPt);
-  tree->SetBranchAddress("ZZEta", &ZZEta);
-  tree->SetBranchAddress("ZZPhi", &ZZPhi);
-  tree->SetBranchAddress("Z1Mass", &m1);
-  tree->SetBranchAddress("Z2Mass", &m2);
-  tree->SetBranchAddress("helcosthetaZ1", &h1);
-  tree->SetBranchAddress("helcosthetaZ2", &h2);
-  tree->SetBranchAddress("helphi", &phi);
-  tree->SetBranchAddress("costhetastar", &hs);
-  tree->SetBranchAddress("phistarZ1", &phi1);
+  vector<TFile*> finputList;
+  vector<TTree*> treeList;
+  int nEntries=0;
 
-  const int nTotalEntries = tree->GetEntries();
-  cout << "Ntotalentries = " << nTotalEntries << endl;
+  for (int is=0; is<(int)strSamples.size(); is++){
+    for (int ic=0; ic<3; ic++){
+      TString cinput = Form("%s/%s/%s", cinput_main.Data(), strchannel[ic].Data(), (strSamples[is]).Data());
+      TFile* finput = TFile::Open(cinput, "read");
+      cout << "Opening file " << cinput << "..." << endl;
+      TTree* tree=0;
+      if (finput!=0){
+        if (finput->IsOpen() && !finput->IsZombie()){
+          cout << cinput << " opened. Extracting tree " << TREE_NAME << "..." << endl;
+          tree = (TTree*)finput->Get(TREE_NAME);
+          if (tree!=0){
+            cout << TREE_NAME << " is found." << endl;
+            tree->SetBranchStatus("*", 0);
+            tree->SetBranchStatus("ZZMass", 1); tree->SetBranchAddress("ZZMass", &mzz);
+            tree->SetBranchStatus("ZZPt", 1); tree->SetBranchAddress("ZZPt", &ZZPt);
+            tree->SetBranchStatus("ZZEta", 1); tree->SetBranchAddress("ZZEta", &ZZEta);
+            tree->SetBranchStatus("ZZPhi", 1); tree->SetBranchAddress("ZZPhi", &ZZPhi);
+            tree->SetBranchStatus("Z1Mass", 1); tree->SetBranchAddress("Z1Mass", &m1);
+            tree->SetBranchStatus("Z2Mass", 1); tree->SetBranchAddress("Z2Mass", &m2);
+            tree->SetBranchStatus("helcosthetaZ1", 1); tree->SetBranchAddress("helcosthetaZ1", &h1);
+            tree->SetBranchStatus("helcosthetaZ2", 1); tree->SetBranchAddress("helcosthetaZ2", &h2);
+            tree->SetBranchStatus("helphi", 1); tree->SetBranchAddress("helphi", &phi);
+            tree->SetBranchStatus("costhetastar", 1); tree->SetBranchAddress("costhetastar", &hs);
+            tree->SetBranchStatus("phistarZ1", 1); tree->SetBranchAddress("phistarZ1", &phi1);
+            tree->SetBranchStatus("NJets30", 1); tree->SetBranchAddress("NJets30", &NJets30);
+            tree->SetBranchStatus("JetPt", 1); tree->SetBranchAddress("JetPt", &JetPt);
+            tree->SetBranchStatus("JetEta", 1); tree->SetBranchAddress("JetEta", &JetEta);
+            tree->SetBranchStatus("JetPhi", 1); tree->SetBranchAddress("JetPhi", &JetPhi);
+            tree->SetBranchStatus("JetMass", 1); tree->SetBranchAddress("JetMass", &JetMass);
 
-  TTree* tmptree = new TTree("IntermediateTree", "");
-  tmptree->Branch("ZZMass", &mzz);
-  tmptree->Branch("ZZPt", &ZZPt);
-  tmptree->Branch("ZZEta", &ZZEta);
-  tmptree->Branch("ZZPhi", &ZZPhi);
-  tmptree->Branch("Z1Mass", &m1);
-  tmptree->Branch("Z2Mass", &m2);
-  tmptree->Branch("helcosthetaZ1", &h1);
-  tmptree->Branch("helcosthetaZ2", &h2);
-  tmptree->Branch("helphi", &phi);
-  tmptree->Branch("costhetastar", &hs);
-  tmptree->Branch("phistarZ1", &phi1);
-  tmptree->Branch("NJets30", &NJets30);
-  tmptree->Branch("jet1pt", &(jetptetaphimass[0][0]));
-  tmptree->Branch("jet2pt", &(jetptetaphimass[1][0]));
-  tmptree->Branch("jet1eta", &(jetptetaphimass[0][1]));
-  tmptree->Branch("jet2eta", &(jetptetaphimass[1][1]));
-  tmptree->Branch("jet1phi", &(jetptetaphimass[0][2]));
-  tmptree->Branch("jet2phi", &(jetptetaphimass[1][2]));
-  tmptree->Branch("jet1mass", &(jetptetaphimass[0][3]));
-  tmptree->Branch("jet2mass", &(jetptetaphimass[1][3]));
-
-  TRandom3 randomthrow(1234567);
-  double portion_to_keep = 1;
-  if (nTotalEntries>1000000) portion_to_keep = 9.95e5/tree->GetEntries("NJets30>=2");
-  for (int ev = 0; ev < nTotalEntries; ev++){
-    tree->GetEntry(ev);
-    if (NJets30>=2){
-      for (int ij=0; ij<2; ij++){
-        jetptetaphimass[ij][0]=JetPt->at(ij);
-        jetptetaphimass[ij][1]=JetEta->at(ij);
-        jetptetaphimass[ij][2]=JetPhi->at(ij);
-        jetptetaphimass[ij][3]=JetMass->at(ij);
+            nEntries += tree->GetEntries();
+            treeList.push_back(tree);
+            finputList.push_back(finput);
+          }
+          else finput->Close();
+        }
+        else if (finput->IsOpen()) finput->Close();
       }
-      double rndnum = randomthrow.Uniform();
-      if (rndnum<=portion_to_keep) tmptree->Fill();
     }
   }
 
-  const int nEntries = tmptree->GetEntries();
-  if (nEntries>=1000000){
-    cerr << "TMath::Sort will experience problems. Aborting!" << endl;
-    delete tmptree;
-    delete tree;
-    assert(0);
-  }
-  int* index = new int[nEntries];
-  tmptree->Draw("ZZMass", "", "goff");
-  TMath::Sort(nEntries, tmptree->GetV1(), index, false);
+  const int nSamples = treeList.size();
 
-  tmptree->GetEntry(index[0]);
-  float firstVal=mzz;
-  tmptree->GetEntry(index[nEntries-1]);
-  float lastVal=mzz;
+  cout << "NEntries = " << nEntries << " over " << treeList.size() << " trees." << endl;
+
+  vector<pair<float, int>> index;
+  unsigned ev_acc=0;
+  for (int ev=0; ev<nEntries; ev++){
+    getEntry(treeList, ev);
+    if (NJets30<2) continue;
+    if (ev_acc%10000==0) cout << "Pre-processing event " << ev << endl;
+    addByLowest(index, mzz, ev);
+    ev_acc++;
+  }
+
+  float firstVal=index.at(0).first;
+  float lastVal=index.at(index.size()-1).first;
   float infimum = (float)((int)firstVal); infimum -= (float)(((int)infimum)%10);
   float supremum = (float)((int)(lastVal+0.5)); supremum += (float)(10-((int)supremum)%10);
   cout << "Nentries = " << nEntries << " | mzz = " << firstVal << " - " << lastVal << "(" << infimum << ", " << supremum << ")" << endl;
 
-  int nbins=0;
-  int divisor=21000;
-  const int nbins_th=25/*50*/;
+  float divisor=85000;
+  int nbins = index.size()/divisor;
+  const int nbins_th=10/*50*/;
   while (nbins<nbins_th){
     if (divisor>1000) divisor -= 1000;
     else if (divisor>100) divisor -= 100;
     else break;
-    nbins=nEntries/divisor+1;
+    nbins=index.size()/divisor;
   }
   cout << "nbins=" << nbins << endl;
   if (nbins<3) cerr << "Not enough bins!" << endl;
+  vector<ExtBin> binList;
   float* binning = new float[nbins+1];
   binning[0]=infimum;
   binning[nbins]=supremum;
-  int ev_stepsize = nEntries/nbins;
+  int ev_stepsize = index.size()/nbins;
   cout << "Event step size: " << ev_stepsize << endl;
   cout << "Boundary (" << 0 << ") = " << binning[0] << endl;
   for (int ix=1; ix<nbins; ix++){
-    int ev = index[ix*ev_stepsize];
-    tmptree->GetEntry(ev);
-    float bhigh = mzz;
-    ev = index[ix*ev_stepsize-1];
-    float blow = mzz;
-    binning[ix]=(bhigh+blow)*0.5;
-    cout << "Boundary (" << ix << ")= " << binning[ix] << " [event " << ev << ", step " << ix*ev_stepsize << "]" << endl;
+    binning[ix]=(index[ix*ev_stepsize-1].first+index[ix*ev_stepsize].first)*0.5;
+    ExtBin tmpbin;
+    tmpbin.binlow = binning[ix-1];
+    tmpbin.binhigh = binning[ix];
+    for (int bin=0; bin<ev_stepsize; bin++) tmpbin.events.push_back(index[(ix-1)*ev_stepsize+bin].second);
+    binList.push_back(tmpbin);
+    cout << "Boundary (" << ix << ")= " << binning[ix] << " [event " << index[ix*ev_stepsize].second << ", step " << ix*ev_stepsize << "]" << endl;
   }
+  ExtBin tmpbin;
+  tmpbin.binlow = binning[nbins-1];
+  tmpbin.binhigh = binning[nbins];
+  for (unsigned int bin=(nbins-1)*ev_stepsize; bin<index.size(); bin++) tmpbin.events.push_back(index[bin].second);
+  binList.push_back(tmpbin);
   cout << "Boundary (" << nbins << ") = " << binning[nbins] << endl;
-  delete[] index;
+  cout << "Bin list has the following bins:" << endl;
+  for (unsigned int ib=0; ib<binList.size(); ib++){
+    cout << ib << " / " << binList.size() << ": [" << binList.at(ib).binlow << "," << binList.at(ib).binhigh << "]" << endl;
+  }
 
   TFile* foutput = TFile::Open(Form("pAvgLinToLog_%s_%s_%s_%iTeV.root", strme.Data(), strprod.Data(), strproc.Data(), sqrts), "recreate");
 
   TProfile* hvar = new TProfile("candMass", "", nbins, binning); hvar->Sumw2();
   TProfile* hmesq_conserveDifermMass = new TProfile("P_ConserveDifermionMass", "", nbins, binning); hmesq_conserveDifermMass->Sumw2();
   TProfile* hmesq_jetPtoEScale = new TProfile("P_MomentumToEnergy", "", nbins, binning); hmesq_jetPtoEScale->Sumw2();
-
   
   TTree* newtree=0;
   if (writeFinalTree){
@@ -568,58 +768,66 @@ void get_PAvgProfile_JHUGen_JJVBF_HSMHiggs_7or8TeV(int sqrts=8, bool debug=false
     newtree->Branch("mesq_conserveDifermMass", &mesq_conserveDifermMass);
     newtree->Branch("mesq_jetPtoEScale", &mesq_jetPtoEScale);
     newtree->Branch("ZZMass", &mzz);
-  }  
+  }
 
   mela.setCandidateDecayMode(TVar::CandidateDecay_ZZ);
 
-  for (int ev = (debug ? nEntries/2 : 0); ev < nEntries; ev++){
-    tmptree->GetEntry(ev); // No need for ordering anymore
-    if (ev%10000==0) cout << "Doing event " << ev << endl;
+  for (unsigned int bin=0; bin<binList.size(); bin++){
+    cout << "Bin " << bin << " is now being scrutinized..." << endl;
+    for (unsigned int ev = 0; ev < binList.at(bin).events.size(); ev++){
+      int getEv = binList.at(bin).events.at(ev);
+      getEntry(treeList, getEv);
+      if (ev%1000==0) cout << "Doing event " << getEv << endl;
+      if (JetPt->size()<2 || JetEta->size()<2 || JetPhi->size()<2 || JetMass->size()<2){
+        cerr << "Jet array sizes are less than Njets!" << endl;
+        continue;
+      }
 
-    TLorentzVector jet[2], higgs;
-    for (int ij=0; ij<2; ij++) jet[ij].SetPtEtaPhiM(jetptetaphimass[ij][0], jetptetaphimass[ij][1], jetptetaphimass[ij][2], jetptetaphimass[ij][3]);
-    higgs.SetPtEtaPhiM(ZZPt, ZZEta, ZZPhi, mzz);
-    TVector3 boostH = higgs.BoostVector();
+      TLorentzVector jet[2], higgs;
+      for (int ij=0; ij<2; ij++) jet[ij].SetPtEtaPhiM(jetptetaphimass[ij][0], jetptetaphimass[ij][1], jetptetaphimass[ij][2], jetptetaphimass[ij][3]);
+      higgs.SetPtEtaPhiM(ZZPt, ZZEta, ZZPhi, mzz);
+      TVector3 boostH = higgs.BoostVector();
 
-    SimpleParticleCollection_t associated;
-    associated.push_back(SimpleParticle_t(0, jet[0]));
-    associated.push_back(SimpleParticle_t(0, jet[1]));
+      SimpleParticleCollection_t associated;
+      associated.push_back(SimpleParticle_t(0, jet[0]));
+      associated.push_back(SimpleParticle_t(0, jet[1]));
 
-    TLorentzVector pDaughters[4];
-    std::vector<TLorentzVector> daus = mela.calculate4Momentum(mzz, m1, m2, acos(hs), acos(h1), acos(h2), phi1, phi);
-    for (int ip=0; ip<min(4, (int)daus.size()); ip++){ pDaughters[ip]=daus.at(ip); pDaughters[ip].Boost(boostH); }
-    SimpleParticleCollection_t daughters;
-    for (unsigned int idau=0; idau<4; idau++) daughters.push_back(SimpleParticle_t(LepID[idau], pDaughters[idau]));
-    mela.setInputEvent(&daughters, &associated, (SimpleParticleCollection_t*)0, false);
+      TLorentzVector pDaughters[4];
+      std::vector<TLorentzVector> daus = mela.calculate4Momentum(mzz, m1, m2, acos(hs), acos(h1), acos(h2), phi1, phi);
+      for (int ip=0; ip<min(4, (int)daus.size()); ip++){ pDaughters[ip]=daus.at(ip); pDaughters[ip].Boost(boostH); }
+      SimpleParticleCollection_t daughters;
+      for (unsigned int idau=0; idau<4; idau++) daughters.push_back(SimpleParticle_t(LepID[idau], pDaughters[idau]));
+      mela.setInputEvent(&daughters, &associated, (SimpleParticleCollection_t*)0, false);
 
-    bool doFill=true;
-    mela.setProcess(proc, me, prod);
-    TUtil::setJetMassScheme(TVar::ConserveDifermionMass);
+      mela.setProcess(proc, me, prod);
 
-    mela.computeProdP(mesq_conserveDifermMass, false);
-    //mesq_conserveDifermMass = log10(mesq_conserveDifermMass);
-    if (isnan(mesq_conserveDifermMass) || isinf(mesq_conserveDifermMass)) doFill=false;
-    if (debug){
-      float mesqtmp;
-      mela.computeProdP(mesqtmp, true);
-      cout << mesqtmp << " @ " << mzz << endl;
+      TUtil::setJetMassScheme(TVar::ConserveDifermionMass);
+      mela.computeProdP(mesq_conserveDifermMass, false);
+      TUtil::setJetMassScheme(TVar::MomentumToEnergy);
+      mela.computeProdP(mesq_jetPtoEScale, false);
+
+      bool doFill = !(
+        isnan(mesq_conserveDifermMass) || isinf(mesq_conserveDifermMass)
+        ||
+        isnan(mesq_jetPtoEScale) || isinf(mesq_jetPtoEScale)
+        );
+
+      if (doFill) binList.at(bin).addEvent(mzz, mesq_conserveDifermMass, mesq_jetPtoEScale);
+
       mela.resetInputEvent();
-      break;
     }
 
-    TUtil::setJetMassScheme(TVar::MomentumToEnergy);
-    mela.computeProdP(mesq_jetPtoEScale, false);
-    //mesq_jetPtoEScale = log10(mesq_jetPtoEScale);
-    if (isnan(mesq_jetPtoEScale) || isinf(mesq_jetPtoEScale)) doFill=false;
+    binList.at(bin).sift(); binList.at(bin).adjustWeights();
 
-    if (doFill){
+    for (unsigned int ev=0; ev<binList.at(bin).masses.size(); ev++){
+      mzz = binList.at(bin).masses.at(ev);
+      mesq_conserveDifermMass = binList.at(bin).mevals.at(ev);
+      mesq_jetPtoEScale = binList.at(bin).me2vals.at(ev);
       hmesq_conserveDifermMass->Fill(mzz, mesq_conserveDifermMass);
       hmesq_jetPtoEScale->Fill(mzz, mesq_jetPtoEScale);
       hvar->Fill(mzz, mzz);
+      if (writeFinalTree) newtree->Fill();
     }
-
-    if (writeFinalTree) newtree->Fill();
-    mela.resetInputEvent();
   }
 
   double* xexyey[2][4];
@@ -665,8 +873,7 @@ void get_PAvgProfile_JHUGen_JJVBF_HSMHiggs_7or8TeV(int sqrts=8, bool debug=false
   delete hvar;
   foutput->Close();
   delete[] binning;
-  delete tmptree;
-  delete tree;
+  for (unsigned int f=0; f<finputList.size(); f++) finputList.at(f)->Close();
 }
 /*
 Function
@@ -684,13 +891,13 @@ fits well.
 SPECIFIC COMMENT: OUTPUT ME DIVIDED BY 
 - ALPHAS(MZ)**4 TO REMAIN INDEPENDENT OF PDF CHOICE TO FIRST APPROXIMATION
 */
-void get_PAvgProfile_JHUGen_JJQCD_HSMHiggs_7or8TeV(int sqrts=8, bool debug=false){
+void get_PAvgProfile_JHUGen_JJQCD_HSMHiggs_7or8TeV(int sqrts=8){
   int erg_tev=sqrts;
   float mPOLE=125.;
   TString TREE_NAME = "SelectedTree";
-  bool writeFinalTree=false;
+  bool writeFinalTree=true;
 
-  TVar::VerbosityLevel verbosity = (debug ? TVar::DEBUG : TVar::ERROR);
+  TVar::VerbosityLevel verbosity = TVar::ERROR;
   Mela mela(erg_tev, mPOLE, verbosity);
 
   TVar::Process proc = TVar::HSMHiggs;
@@ -728,6 +935,7 @@ void get_PAvgProfile_JHUGen_JJQCD_HSMHiggs_7or8TeV(int sqrts=8, bool debug=false
   float phi1 = 1.8828257;
   float ZZPt, ZZPhi, ZZEta;
   int LepID[4]={ 13, -13, 11, -11 };
+  short Z1Flav, Z2Flav;
 
   TString strchannel[3]={ "4mu", "4e", "2mu2e" };
   TString cinput_main;
@@ -736,118 +944,109 @@ void get_PAvgProfile_JHUGen_JJQCD_HSMHiggs_7or8TeV(int sqrts=8, bool debug=false
   else return;
 
   vector<TString> strSamples = constructSamplesList("JJQCD", sqrts);
-  const int nSamples = strSamples.size();
 
-  TChain* tree = new TChain(TREE_NAME, "");
-  for (int ic=0; ic<3; ic++){
-    for (int is=0; is<nSamples; is++) tree->Add(Form("%s/%s/%s", cinput_main.Data(), (strchannel[ic]).Data(), (strSamples[is]).Data()));
-  }
-  tree->SetBranchAddress("NJets30", &NJets30);
-  tree->SetBranchAddress("JetPt", &JetPt, &bJetPt);
-  tree->SetBranchAddress("JetEta", &JetEta, &bJetEta);
-  tree->SetBranchAddress("JetPhi", &JetPhi, &bJetPhi);
-  tree->SetBranchAddress("JetMass", &JetMass, &bJetMass);
-  tree->SetBranchAddress("ZZMass", &mzz);
-  tree->SetBranchAddress("ZZPt", &ZZPt);
-  tree->SetBranchAddress("ZZEta", &ZZEta);
-  tree->SetBranchAddress("ZZPhi", &ZZPhi);
-  tree->SetBranchAddress("Z1Mass", &m1);
-  tree->SetBranchAddress("Z2Mass", &m2);
-  tree->SetBranchAddress("helcosthetaZ1", &h1);
-  tree->SetBranchAddress("helcosthetaZ2", &h2);
-  tree->SetBranchAddress("helphi", &phi);
-  tree->SetBranchAddress("costhetastar", &hs);
-  tree->SetBranchAddress("phistarZ1", &phi1);
+  vector<TFile*> finputList;
+  vector<TTree*> treeList;
+  int nEntries=0;
 
-  const int nTotalEntries = tree->GetEntries();
-  cout << "Ntotalentries = " << nTotalEntries << endl;
+  for (int is=0; is<(int)strSamples.size(); is++){
+    for (int ic=0; ic<3; ic++){
+      TString cinput = Form("%s/%s/%s", cinput_main.Data(), strchannel[ic].Data(), (strSamples[is]).Data());
+      TFile* finput = TFile::Open(cinput, "read");
+      cout << "Opening file " << cinput << "..." << endl;
+      TTree* tree=0;
+      if (finput!=0){
+        if (finput->IsOpen() && !finput->IsZombie()){
+          cout << cinput << " opened. Extracting tree " << TREE_NAME << "..." << endl;
+          tree = (TTree*)finput->Get(TREE_NAME);
+          if (tree!=0){
+            cout << TREE_NAME << " is found." << endl;
+            tree->SetBranchStatus("*", 0);
+            tree->SetBranchStatus("ZZMass", 1); tree->SetBranchAddress("ZZMass", &mzz);
+            tree->SetBranchStatus("ZZPt", 1); tree->SetBranchAddress("ZZPt", &ZZPt);
+            tree->SetBranchStatus("ZZEta", 1); tree->SetBranchAddress("ZZEta", &ZZEta);
+            tree->SetBranchStatus("ZZPhi", 1); tree->SetBranchAddress("ZZPhi", &ZZPhi);
+            tree->SetBranchStatus("Z1Mass", 1); tree->SetBranchAddress("Z1Mass", &m1);
+            tree->SetBranchStatus("Z2Mass", 1); tree->SetBranchAddress("Z2Mass", &m2);
+            tree->SetBranchStatus("helcosthetaZ1", 1); tree->SetBranchAddress("helcosthetaZ1", &h1);
+            tree->SetBranchStatus("helcosthetaZ2", 1); tree->SetBranchAddress("helcosthetaZ2", &h2);
+            tree->SetBranchStatus("helphi", 1); tree->SetBranchAddress("helphi", &phi);
+            tree->SetBranchStatus("costhetastar", 1); tree->SetBranchAddress("costhetastar", &hs);
+            tree->SetBranchStatus("phistarZ1", 1); tree->SetBranchAddress("phistarZ1", &phi1);
+            tree->SetBranchStatus("NJets30", 1); tree->SetBranchAddress("NJets30", &NJets30);
+            tree->SetBranchStatus("JetPt", 1); tree->SetBranchAddress("JetPt", &JetPt);
+            tree->SetBranchStatus("JetEta", 1); tree->SetBranchAddress("JetEta", &JetEta);
+            tree->SetBranchStatus("JetPhi", 1); tree->SetBranchAddress("JetPhi", &JetPhi);
+            tree->SetBranchStatus("JetMass", 1); tree->SetBranchAddress("JetMass", &JetMass);
 
-  TTree* tmptree = new TTree("IntermediateTree", "");
-  tmptree->Branch("ZZMass", &mzz);
-  tmptree->Branch("ZZPt", &ZZPt);
-  tmptree->Branch("ZZEta", &ZZEta);
-  tmptree->Branch("ZZPhi", &ZZPhi);
-  tmptree->Branch("Z1Mass", &m1);
-  tmptree->Branch("Z2Mass", &m2);
-  tmptree->Branch("helcosthetaZ1", &h1);
-  tmptree->Branch("helcosthetaZ2", &h2);
-  tmptree->Branch("helphi", &phi);
-  tmptree->Branch("costhetastar", &hs);
-  tmptree->Branch("phistarZ1", &phi1);
-  tmptree->Branch("NJets30", &NJets30);
-  tmptree->Branch("jet1pt", &(jetptetaphimass[0][0]));
-  tmptree->Branch("jet2pt", &(jetptetaphimass[1][0]));
-  tmptree->Branch("jet1eta", &(jetptetaphimass[0][1]));
-  tmptree->Branch("jet2eta", &(jetptetaphimass[1][1]));
-  tmptree->Branch("jet1phi", &(jetptetaphimass[0][2]));
-  tmptree->Branch("jet2phi", &(jetptetaphimass[1][2]));
-  tmptree->Branch("jet1mass", &(jetptetaphimass[0][3]));
-  tmptree->Branch("jet2mass", &(jetptetaphimass[1][3]));
-
-  TRandom3 randomthrow(1234567);
-  double portion_to_keep = 1;
-  if (nTotalEntries>1000000) portion_to_keep = 9.95e5/tree->GetEntries("NJets30>=2");
-  for (int ev = 0; ev < nTotalEntries; ev++){
-    tree->GetEntry(ev);
-    if (NJets30>=2){
-      for (int ij=0; ij<2; ij++){
-        jetptetaphimass[ij][0]=JetPt->at(ij);
-        jetptetaphimass[ij][1]=JetEta->at(ij);
-        jetptetaphimass[ij][2]=JetPhi->at(ij);
-        jetptetaphimass[ij][3]=JetMass->at(ij);
+            nEntries += tree->GetEntries();
+            treeList.push_back(tree);
+            finputList.push_back(finput);
+          }
+          else finput->Close();
+        }
+        else if (finput->IsOpen()) finput->Close();
       }
-      double rndnum = randomthrow.Uniform();
-      if (rndnum<=portion_to_keep) tmptree->Fill();
     }
   }
 
-  const int nEntries = tmptree->GetEntries();
-  if (nEntries>=1000000){
-    cerr << "TMath::Sort will experience problems. Aborting!" << endl;
-    delete tmptree;
-    delete tree;
-    assert(0);
-  }
-  int* index = new int[nEntries];
-  tmptree->Draw("ZZMass", "", "goff");
-  TMath::Sort(nEntries, tmptree->GetV1(), index, false);
+  const int nSamples = treeList.size();
 
-  tmptree->GetEntry(index[0]);
-  float firstVal=mzz;
-  tmptree->GetEntry(index[nEntries-1]);
-  float lastVal=mzz;
+  cout << "NEntries = " << nEntries << " over " << treeList.size() << " trees." << endl;
+
+  vector<pair<float, int>> index;
+  unsigned ev_acc=0;
+  for (int ev=0; ev<nEntries; ev++){
+    getEntry(treeList, ev);
+    if (NJets30<2) continue;
+    if (ev_acc%10000==0) cout << "Pre-processing event " << ev << endl;
+    addByLowest(index, mzz, ev);
+    ev_acc++;
+  }
+
+  float firstVal=index.at(0).first;
+  float lastVal=index.at(index.size()-1).first;
   float infimum = (float)((int)firstVal); infimum -= (float)(((int)infimum)%10);
   float supremum = (float)((int)(lastVal+0.5)); supremum += (float)(10-((int)supremum)%10);
   cout << "Nentries = " << nEntries << " | mzz = " << firstVal << " - " << lastVal << "(" << infimum << ", " << supremum << ")" << endl;
 
-  int nbins=0;
-  int divisor=21000;
-  const int nbins_th=25/*50*/;
+  float divisor=85000;
+  int nbins = index.size()/divisor;
+  const int nbins_th=10/*50*/;
   while (nbins<nbins_th){
     if (divisor>1000) divisor -= 1000;
     else if (divisor>100) divisor -= 100;
     else break;
-    nbins=nEntries/divisor+1;
+    nbins=index.size()/divisor;
   }
   cout << "nbins=" << nbins << endl;
   if (nbins<3) cerr << "Not enough bins!" << endl;
+  vector<ExtBin> binList;
   float* binning = new float[nbins+1];
   binning[0]=infimum;
   binning[nbins]=supremum;
-  int ev_stepsize = nEntries/nbins;
+  int ev_stepsize = index.size()/nbins;
   cout << "Event step size: " << ev_stepsize << endl;
   cout << "Boundary (" << 0 << ") = " << binning[0] << endl;
   for (int ix=1; ix<nbins; ix++){
-    int ev = index[ix*ev_stepsize];
-    tmptree->GetEntry(ev);
-    float bhigh = mzz;
-    ev = index[ix*ev_stepsize-1];
-    float blow = mzz;
-    binning[ix]=(bhigh+blow)*0.5;
-    cout << "Boundary (" << ix << ")= " << binning[ix] << " [event " << ev << ", step " << ix*ev_stepsize << "]" << endl;
+    binning[ix]=(index[ix*ev_stepsize-1].first+index[ix*ev_stepsize].first)*0.5;
+    ExtBin tmpbin;
+    tmpbin.binlow = binning[ix-1];
+    tmpbin.binhigh = binning[ix];
+    for (int bin=0; bin<ev_stepsize; bin++) tmpbin.events.push_back(index[(ix-1)*ev_stepsize+bin].second);
+    binList.push_back(tmpbin);
+    cout << "Boundary (" << ix << ")= " << binning[ix] << " [event " << index[ix*ev_stepsize].second << ", step " << ix*ev_stepsize << "]" << endl;
   }
+  ExtBin tmpbin;
+  tmpbin.binlow = binning[nbins-1];
+  tmpbin.binhigh = binning[nbins];
+  for (unsigned int bin=(nbins-1)*ev_stepsize; bin<index.size(); bin++) tmpbin.events.push_back(index[bin].second);
+  binList.push_back(tmpbin);
   cout << "Boundary (" << nbins << ") = " << binning[nbins] << endl;
-  delete[] index;
+  cout << "Bin list has the following bins:" << endl;
+  for (unsigned int ib=0; ib<binList.size(); ib++){
+    cout << ib << " / " << binList.size() << ": [" << binList.at(ib).binlow << "," << binList.at(ib).binhigh << "]" << endl;
+  }
 
   TFile* foutput = TFile::Open(Form("pAvgLinToLog_%s_%s_%s_%iTeV.root", strme.Data(), strprod.Data(), strproc.Data(), sqrts), "recreate");
 
@@ -865,59 +1064,69 @@ void get_PAvgProfile_JHUGen_JJQCD_HSMHiggs_7or8TeV(int sqrts=8, bool debug=false
 
   mela.setCandidateDecayMode(TVar::CandidateDecay_ZZ);
 
-  for (int ev = (debug ? nEntries/2 : 0); ev < nEntries; ev++){
-    tmptree->GetEntry(ev); // No need for ordering anymore
-    if (ev%10000==0) cout << "Doing event " << ev << endl;
+  for (unsigned int bin=0; bin<binList.size(); bin++){
+    cout << "Bin " << bin << " is now being scrutinized..." << endl;
+    for (unsigned int ev = 0; ev < binList.at(bin).events.size(); ev++){
+      int getEv = binList.at(bin).events.at(ev);
+      getEntry(treeList, getEv);
+      if (ev%1000==0) cout << "Doing event " << getEv << endl;
+      if (JetPt->size()<2 || JetEta->size()<2 || JetPhi->size()<2 || JetMass->size()<2){
+        cerr << "Jet array sizes are less than Njets!" << endl;
+        continue;
+      }
 
-    TLorentzVector jet[2], higgs;
-    for (int ij=0; ij<2; ij++) jet[ij].SetPtEtaPhiM(jetptetaphimass[ij][0], jetptetaphimass[ij][1], jetptetaphimass[ij][2], jetptetaphimass[ij][3]);
-    higgs.SetPtEtaPhiM(ZZPt, ZZEta, ZZPhi, mzz);
-    TVector3 boostH = higgs.BoostVector();
+      TLorentzVector jet[2], higgs;
+      for (int ij=0; ij<2; ij++) jet[ij].SetPtEtaPhiM(jetptetaphimass[ij][0], jetptetaphimass[ij][1], jetptetaphimass[ij][2], jetptetaphimass[ij][3]);
+      higgs.SetPtEtaPhiM(ZZPt, ZZEta, ZZPhi, mzz);
+      TVector3 boostH = higgs.BoostVector();
 
-    SimpleParticleCollection_t associated;
-    associated.push_back(SimpleParticle_t(0, jet[0]));
-    associated.push_back(SimpleParticle_t(0, jet[1]));
+      SimpleParticleCollection_t associated;
+      associated.push_back(SimpleParticle_t(0, jet[0]));
+      associated.push_back(SimpleParticle_t(0, jet[1]));
 
-    TLorentzVector pDaughters[4];
-    std::vector<TLorentzVector> daus = mela.calculate4Momentum(mzz, m1, m2, acos(hs), acos(h1), acos(h2), phi1, phi);
-    for (int ip=0; ip<min(4, (int)daus.size()); ip++){ pDaughters[ip]=daus.at(ip); pDaughters[ip].Boost(boostH); }
-    SimpleParticleCollection_t daughters;
-    for (unsigned int idau=0; idau<4; idau++) daughters.push_back(SimpleParticle_t(LepID[idau], pDaughters[idau]));
-    mela.setInputEvent(&daughters, &associated, (SimpleParticleCollection_t*)0, false);
+      TLorentzVector pDaughters[4];
+      std::vector<TLorentzVector> daus = mela.calculate4Momentum(mzz, m1, m2, acos(hs), acos(h1), acos(h2), phi1, phi);
+      for (int ip=0; ip<min(4, (int)daus.size()); ip++){ pDaughters[ip]=daus.at(ip); pDaughters[ip].Boost(boostH); }
+      SimpleParticleCollection_t daughters;
+      for (unsigned int idau=0; idau<4; idau++) daughters.push_back(SimpleParticle_t(LepID[idau], pDaughters[idau]));
+      mela.setInputEvent(&daughters, &associated, (SimpleParticleCollection_t*)0, false);
 
-    double alphasVal;
-    bool doFill=true;
-    mela.setProcess(proc, me, prod);
+      mela.setProcess(proc, me, prod);
 
-    TUtil::setJetMassScheme(TVar::ConserveDifermionMass);
-    mela.computeProdP(mesq_conserveDifermMass, false);
-    alphasVal = mela.getIORecord()->getAlphaSatMZ();
-    mesq_conserveDifermMass /= pow(alphasVal, 4);
-    //mesq_conserveDifermMass = log10(mesq_conserveDifermMass);
-    if (isnan(mesq_conserveDifermMass) || isinf(mesq_conserveDifermMass)) doFill=false;
-    if (debug){
-      float mesqtmp;
-      mela.computeProdP(mesqtmp, true);
-      cout << mesqtmp << " @ " << mzz << endl;
+      double alphasVal;
+
+      TUtil::setJetMassScheme(TVar::ConserveDifermionMass);
+      mela.computeProdP(mesq_conserveDifermMass, false);
+      alphasVal = mela.getIORecord()->getAlphaSatMZ();
+      mesq_conserveDifermMass /= pow(alphasVal, 4);
+
+      TUtil::setJetMassScheme(TVar::MomentumToEnergy);
+      mela.computeProdP(mesq_jetPtoEScale, false);
+      alphasVal = mela.getIORecord()->getAlphaSatMZ();
+      mesq_jetPtoEScale /= pow(alphasVal, 4);
+
+      bool doFill = !(
+        isnan(mesq_conserveDifermMass) || isinf(mesq_conserveDifermMass)
+        ||
+        isnan(mesq_jetPtoEScale) || isinf(mesq_jetPtoEScale)
+        );
+
+      if (doFill) binList.at(bin).addEvent(mzz, mesq_conserveDifermMass, mesq_jetPtoEScale);
+
       mela.resetInputEvent();
-      break;
     }
 
-    TUtil::setJetMassScheme(TVar::MomentumToEnergy);
-    mela.computeProdP(mesq_jetPtoEScale, false);
-    alphasVal = mela.getIORecord()->getAlphaSatMZ();
-    mesq_jetPtoEScale /= pow(alphasVal, 4);
-    //mesq_jetPtoEScale = log10(mesq_jetPtoEScale);
-    if (isnan(mesq_jetPtoEScale) || isinf(mesq_jetPtoEScale)) doFill=false;
+    binList.at(bin).sift(); binList.at(bin).adjustWeights();
 
-    if (doFill){
+    for (unsigned int ev=0; ev<binList.at(bin).masses.size(); ev++){
+      mzz = binList.at(bin).masses.at(ev);
+      mesq_conserveDifermMass = binList.at(bin).mevals.at(ev);
+      mesq_jetPtoEScale = binList.at(bin).me2vals.at(ev);
       hmesq_conserveDifermMass->Fill(mzz, mesq_conserveDifermMass);
       hmesq_jetPtoEScale->Fill(mzz, mesq_jetPtoEScale);
       hvar->Fill(mzz, mzz);
+      if (writeFinalTree) newtree->Fill();
     }
-
-    if (writeFinalTree) newtree->Fill();
-    mela.resetInputEvent();
   }
 
   double* xexyey[2][4];
@@ -963,8 +1172,7 @@ void get_PAvgProfile_JHUGen_JJQCD_HSMHiggs_7or8TeV(int sqrts=8, bool debug=false
   delete hvar;
   foutput->Close();
   delete[] binning;
-  delete tmptree;
-  delete tree;
+  for (unsigned int f=0; f<finputList.size(); f++) finputList.at(f)->Close();
 }
 /*
 Function
@@ -980,13 +1188,13 @@ fits well.
 */
 
 /* SPECIFIC COMMENT: OUTPUT ME DIVIDED BY ALPHAS(MZ)**3 TO REMAIN INDEPENDENT OF PDF CHOICE TO FIRST APPROXIMATION */
-void get_PAvgProfile_JHUGen_JQCD_HSMHiggs_7or8TeV(int sqrts=8, bool debug=false){
+void get_PAvgProfile_JHUGen_JQCD_HSMHiggs_7or8TeV(int sqrts=8){
   int erg_tev=sqrts;
   float mPOLE=125.;
   TString TREE_NAME = "SelectedTree";
-  bool writeFinalTree=false;
+  bool writeFinalTree=true;
 
-  TVar::VerbosityLevel verbosity = (debug ? TVar::DEBUG : TVar::ERROR);
+  TVar::VerbosityLevel verbosity = TVar::ERROR;
   Mela mela(erg_tev, mPOLE, verbosity);
 
   TVar::Process proc = TVar::HSMHiggs;
@@ -1010,7 +1218,7 @@ void get_PAvgProfile_JHUGen_JQCD_HSMHiggs_7or8TeV(int sqrts=8, bool debug=false)
   TBranch* bJetEta=0;
   TBranch* bJetPhi=0;
   TBranch* bJetMass=0;
-  float jetptetaphimass[1][4];
+  float jetptetaphimass[2][4];
 
   float mesq_conserveDifermMass=0;
   float mesq_jetPtoEScale=0;
@@ -1024,6 +1232,7 @@ void get_PAvgProfile_JHUGen_JQCD_HSMHiggs_7or8TeV(int sqrts=8, bool debug=false)
   float phi1 = 1.8828257;
   float ZZPt, ZZPhi, ZZEta;
   int LepID[4]={ 13, -13, 11, -11 };
+  short Z1Flav, Z2Flav;
 
   TString strchannel[3]={ "4mu", "4e", "2mu2e" };
   TString cinput_main;
@@ -1032,114 +1241,109 @@ void get_PAvgProfile_JHUGen_JQCD_HSMHiggs_7or8TeV(int sqrts=8, bool debug=false)
   else return;
 
   vector<TString> strSamples = constructSamplesList("JJQCD", sqrts);
-  const int nSamples = strSamples.size();
 
-  TChain* tree = new TChain(TREE_NAME, "");
-  for (int ic=0; ic<3; ic++){
-    for (int is=0; is<nSamples; is++) tree->Add(Form("%s/%s/%s", cinput_main.Data(), (strchannel[ic]).Data(), (strSamples[is]).Data()));
-  }
-  tree->SetBranchAddress("NJets30", &NJets30);
-  tree->SetBranchAddress("JetPt", &JetPt, &bJetPt);
-  tree->SetBranchAddress("JetEta", &JetEta, &bJetEta);
-  tree->SetBranchAddress("JetPhi", &JetPhi, &bJetPhi);
-  tree->SetBranchAddress("JetMass", &JetMass, &bJetMass);
-  tree->SetBranchAddress("ZZMass", &mzz);
-  tree->SetBranchAddress("ZZPt", &ZZPt);
-  tree->SetBranchAddress("ZZEta", &ZZEta);
-  tree->SetBranchAddress("ZZPhi", &ZZPhi);
-  tree->SetBranchAddress("Z1Mass", &m1);
-  tree->SetBranchAddress("Z2Mass", &m2);
-  tree->SetBranchAddress("helcosthetaZ1", &h1);
-  tree->SetBranchAddress("helcosthetaZ2", &h2);
-  tree->SetBranchAddress("helphi", &phi);
-  tree->SetBranchAddress("costhetastar", &hs);
-  tree->SetBranchAddress("phistarZ1", &phi1);
+  vector<TFile*> finputList;
+  vector<TTree*> treeList;
+  int nEntries=0;
 
-  const int nTotalEntries = tree->GetEntries();
-  cout << "Ntotalentries = " << nTotalEntries << endl;
+  for (int is=0; is<(int)strSamples.size(); is++){
+    for (int ic=0; ic<3; ic++){
+      TString cinput = Form("%s/%s/%s", cinput_main.Data(), strchannel[ic].Data(), (strSamples[is]).Data());
+      TFile* finput = TFile::Open(cinput, "read");
+      cout << "Opening file " << cinput << "..." << endl;
+      TTree* tree=0;
+      if (finput!=0){
+        if (finput->IsOpen() && !finput->IsZombie()){
+          cout << cinput << " opened. Extracting tree " << TREE_NAME << "..." << endl;
+          tree = (TTree*)finput->Get(TREE_NAME);
+          if (tree!=0){
+            cout << TREE_NAME << " is found." << endl;
+            tree->SetBranchStatus("*", 0);
+            tree->SetBranchStatus("ZZMass", 1); tree->SetBranchAddress("ZZMass", &mzz);
+            tree->SetBranchStatus("ZZPt", 1); tree->SetBranchAddress("ZZPt", &ZZPt);
+            tree->SetBranchStatus("ZZEta", 1); tree->SetBranchAddress("ZZEta", &ZZEta);
+            tree->SetBranchStatus("ZZPhi", 1); tree->SetBranchAddress("ZZPhi", &ZZPhi);
+            tree->SetBranchStatus("Z1Mass", 1); tree->SetBranchAddress("Z1Mass", &m1);
+            tree->SetBranchStatus("Z2Mass", 1); tree->SetBranchAddress("Z2Mass", &m2);
+            tree->SetBranchStatus("helcosthetaZ1", 1); tree->SetBranchAddress("helcosthetaZ1", &h1);
+            tree->SetBranchStatus("helcosthetaZ2", 1); tree->SetBranchAddress("helcosthetaZ2", &h2);
+            tree->SetBranchStatus("helphi", 1); tree->SetBranchAddress("helphi", &phi);
+            tree->SetBranchStatus("costhetastar", 1); tree->SetBranchAddress("costhetastar", &hs);
+            tree->SetBranchStatus("phistarZ1", 1); tree->SetBranchAddress("phistarZ1", &phi1);
+            tree->SetBranchStatus("NJets30", 1); tree->SetBranchAddress("NJets30", &NJets30);
+            tree->SetBranchStatus("JetPt", 1); tree->SetBranchAddress("JetPt", &JetPt);
+            tree->SetBranchStatus("JetEta", 1); tree->SetBranchAddress("JetEta", &JetEta);
+            tree->SetBranchStatus("JetPhi", 1); tree->SetBranchAddress("JetPhi", &JetPhi);
+            tree->SetBranchStatus("JetMass", 1); tree->SetBranchAddress("JetMass", &JetMass);
 
-  TTree* tmptree = new TTree("IntermediateTree", "");
-  tmptree->Branch("ZZMass", &mzz);
-  tmptree->Branch("ZZPt", &ZZPt);
-  tmptree->Branch("ZZEta", &ZZEta);
-  tmptree->Branch("ZZPhi", &ZZPhi);
-  tmptree->Branch("Z1Mass", &m1);
-  tmptree->Branch("Z2Mass", &m2);
-  tmptree->Branch("helcosthetaZ1", &h1);
-  tmptree->Branch("helcosthetaZ2", &h2);
-  tmptree->Branch("helphi", &phi);
-  tmptree->Branch("costhetastar", &hs);
-  tmptree->Branch("phistarZ1", &phi1);
-  tmptree->Branch("NJets30", &NJets30);
-  tmptree->Branch("jet1pt", &(jetptetaphimass[0][0]));
-  tmptree->Branch("jet1eta", &(jetptetaphimass[0][1]));
-  tmptree->Branch("jet1phi", &(jetptetaphimass[0][2]));
-  tmptree->Branch("jet1mass", &(jetptetaphimass[0][3]));
-
-  TRandom3 randomthrow(1234567);
-  double portion_to_keep = 1;
-  if (nTotalEntries>1000000) portion_to_keep = 9.95e5/tree->GetEntries("NJets30>=2");
-  for (int ev = 0; ev < nTotalEntries; ev++){
-    tree->GetEntry(ev);
-    if (NJets30==1){
-      for (int ij=0; ij<1; ij++){
-        jetptetaphimass[ij][0]=JetPt->at(ij);
-        jetptetaphimass[ij][1]=JetEta->at(ij);
-        jetptetaphimass[ij][2]=JetPhi->at(ij);
-        jetptetaphimass[ij][3]=JetMass->at(ij);
+            nEntries += tree->GetEntries();
+            treeList.push_back(tree);
+            finputList.push_back(finput);
+          }
+          else finput->Close();
+        }
+        else if (finput->IsOpen()) finput->Close();
       }
-      double rndnum = randomthrow.Uniform();
-      if (rndnum<=portion_to_keep) tmptree->Fill();
     }
   }
 
-  const int nEntries = tmptree->GetEntries();
-  if (nEntries>=1000000){
-    cerr << "TMath::Sort will experience problems. Aborting!" << endl;
-    delete tmptree;
-    delete tree;
-    assert(0);
-  }
-  int* index = new int[nEntries];
-  tmptree->Draw("ZZMass", "", "goff");
-  TMath::Sort(nEntries, tmptree->GetV1(), index, false);
+  const int nSamples = treeList.size();
 
-  tmptree->GetEntry(index[0]);
-  float firstVal=mzz;
-  tmptree->GetEntry(index[nEntries-1]);
-  float lastVal=mzz;
+  cout << "NEntries = " << nEntries << " over " << treeList.size() << " trees." << endl;
+
+  vector<pair<float, int>> index;
+  unsigned ev_acc=0;
+  for (int ev=0; ev<nEntries; ev++){
+    getEntry(treeList, ev);
+    if (NJets30!=1) continue;
+    if (ev_acc%10000==0) cout << "Pre-processing event " << ev << endl;
+    addByLowest(index, mzz, ev);
+    ev_acc++;
+  }
+
+  float firstVal=index.at(0).first;
+  float lastVal=index.at(index.size()-1).first;
   float infimum = (float)((int)firstVal); infimum -= (float)(((int)infimum)%10);
   float supremum = (float)((int)(lastVal+0.5)); supremum += (float)(10-((int)supremum)%10);
   cout << "Nentries = " << nEntries << " | mzz = " << firstVal << " - " << lastVal << "(" << infimum << ", " << supremum << ")" << endl;
 
-  int nbins=0;
-  int divisor=21000;
-  const int nbins_th=25/*50*/;
+  float divisor=85000;
+  int nbins = index.size()/divisor;
+  const int nbins_th=10/*50*/;
   while (nbins<nbins_th){
     if (divisor>1000) divisor -= 1000;
     else if (divisor>100) divisor -= 100;
     else break;
-    nbins=nEntries/divisor+1;
+    nbins=index.size()/divisor;
   }
   cout << "nbins=" << nbins << endl;
   if (nbins<3) cerr << "Not enough bins!" << endl;
+  vector<ExtBin> binList;
   float* binning = new float[nbins+1];
   binning[0]=infimum;
   binning[nbins]=supremum;
-  int ev_stepsize = nEntries/nbins;
+  int ev_stepsize = index.size()/nbins;
   cout << "Event step size: " << ev_stepsize << endl;
   cout << "Boundary (" << 0 << ") = " << binning[0] << endl;
   for (int ix=1; ix<nbins; ix++){
-    int ev = index[ix*ev_stepsize];
-    tmptree->GetEntry(ev);
-    float bhigh = mzz;
-    ev = index[ix*ev_stepsize-1];
-    float blow = mzz;
-    binning[ix]=(bhigh+blow)*0.5;
-    cout << "Boundary (" << ix << ")= " << binning[ix] << " [event " << ev << ", step " << ix*ev_stepsize << "]" << endl;
+    binning[ix]=(index[ix*ev_stepsize-1].first+index[ix*ev_stepsize].first)*0.5;
+    ExtBin tmpbin;
+    tmpbin.binlow = binning[ix-1];
+    tmpbin.binhigh = binning[ix];
+    for (int bin=0; bin<ev_stepsize; bin++) tmpbin.events.push_back(index[(ix-1)*ev_stepsize+bin].second);
+    binList.push_back(tmpbin);
+    cout << "Boundary (" << ix << ")= " << binning[ix] << " [event " << index[ix*ev_stepsize].second << ", step " << ix*ev_stepsize << "]" << endl;
   }
+  ExtBin tmpbin;
+  tmpbin.binlow = binning[nbins-1];
+  tmpbin.binhigh = binning[nbins];
+  for (unsigned int bin=(nbins-1)*ev_stepsize; bin<index.size(); bin++) tmpbin.events.push_back(index[bin].second);
+  binList.push_back(tmpbin);
   cout << "Boundary (" << nbins << ") = " << binning[nbins] << endl;
-  delete[] index;
+  cout << "Bin list has the following bins:" << endl;
+  for (unsigned int ib=0; ib<binList.size(); ib++){
+    cout << ib << " / " << binList.size() << ": [" << binList.at(ib).binlow << "," << binList.at(ib).binhigh << "]" << endl;
+  }
 
   TFile* foutput = TFile::Open(Form("pAvgLinToLog_%s_%s_%s_%iTeV.root", strme.Data(), strprod.Data(), strproc.Data(), sqrts), "recreate");
 
@@ -1157,56 +1361,68 @@ void get_PAvgProfile_JHUGen_JQCD_HSMHiggs_7or8TeV(int sqrts=8, bool debug=false)
 
   mela.setCandidateDecayMode(TVar::CandidateDecay_ZZ);
 
-  for (int ev = (debug ? nEntries/2 : 0); ev < nEntries; ev++){
-    tmptree->GetEntry(ev); // No need for ordering anymore
-    if (ev%10000==0) cout << "Doing event " << ev << endl;
+  for (unsigned int bin=0; bin<binList.size(); bin++){
+    cout << "Bin " << bin << " is now being scrutinized..." << endl;
+    for (unsigned int ev = 0; ev < binList.at(bin).events.size(); ev++){
+      int getEv = binList.at(bin).events.at(ev);
+      getEntry(treeList, getEv);
+      if (ev%1000==0) cout << "Doing event " << getEv << endl;
+      if (JetPt->size()<1 || JetEta->size()<1 || JetPhi->size()<1 || JetMass->size()<1){
+        cerr << "Jet array sizes are less than Njets!" << endl;
+        continue;
+      }
 
-    TLorentzVector jet[1], higgs;
-    for (int ij=0; ij<1; ij++) jet[ij].SetPtEtaPhiM(jetptetaphimass[ij][0], jetptetaphimass[ij][1], jetptetaphimass[ij][2], jetptetaphimass[ij][3]);
-    higgs.SetPtEtaPhiM(ZZPt, ZZEta, ZZPhi, mzz);
-    TVector3 boostH = higgs.BoostVector();
+      TLorentzVector jet, higgs;
+      jet.SetPtEtaPhiM(JetPt->at(0), JetEta->at(0), JetPhi->at(0), JetMass->at(0));
+      higgs.SetPtEtaPhiM(ZZPt, ZZEta, ZZPhi, mzz);
+      TVector3 boostH = higgs.BoostVector();
 
-    SimpleParticleCollection_t associated;
-    associated.push_back(SimpleParticle_t(0, jet[0]));
+      SimpleParticleCollection_t associated;
+      associated.push_back(SimpleParticle_t(0, jet));
 
-    TLorentzVector pDaughters[4];
-    std::vector<TLorentzVector> daus = mela.calculate4Momentum(mzz, m1, m2, acos(hs), acos(h1), acos(h2), phi1, phi);
-    for (int ip=0; ip<min(4, (int)daus.size()); ip++){ pDaughters[ip]=daus.at(ip); pDaughters[ip].Boost(boostH); }
-    SimpleParticleCollection_t daughters;
-    for (unsigned int idau=0; idau<4; idau++) daughters.push_back(SimpleParticle_t(LepID[idau], pDaughters[idau]));
-    mela.setInputEvent(&daughters, &associated, (SimpleParticleCollection_t*)0, false);
+      TLorentzVector pDaughters[4];
+      std::vector<TLorentzVector> daus = mela.calculate4Momentum(mzz, m1, m2, acos(hs), acos(h1), acos(h2), phi1, phi);
+      for (int ip=0; ip<min(4, (int)daus.size()); ip++){ pDaughters[ip]=daus.at(ip); pDaughters[ip].Boost(boostH); }
+      SimpleParticleCollection_t daughters;
+      for (unsigned int idau=0; idau<4; idau++) daughters.push_back(SimpleParticle_t(LepID[idau], pDaughters[idau]));
+      mela.setInputEvent(&daughters, &associated, (SimpleParticleCollection_t*)0, false);
 
-    double alphasVal;
-    bool doFill=true;
-    mela.setProcess(proc, me, prod);
+      mela.setProcess(proc, me, prod);
 
-    TUtil::setJetMassScheme(TVar::ConserveDifermionMass);
-    mela.computeProdP(mesq_conserveDifermMass, false);
-    alphasVal = mela.getIORecord()->getAlphaSatMZ();
-    mesq_conserveDifermMass /= pow(alphasVal, 3);
-    if (isnan(mesq_conserveDifermMass) || isinf(mesq_conserveDifermMass)) doFill=false;
-    if (debug){
-      float mesqtmp;
-      mela.computeProdP(mesqtmp, true);
-      cout << mesqtmp << " @ " << mzz << endl;
+      double alphasVal;
+
+      TUtil::setJetMassScheme(TVar::ConserveDifermionMass);
+      mela.computeProdP(mesq_conserveDifermMass, false);
+      alphasVal = mela.getIORecord()->getAlphaSatMZ();
+      mesq_conserveDifermMass /= pow(alphasVal, 3);
+
+      TUtil::setJetMassScheme(TVar::MomentumToEnergy);
+      mela.computeProdP(mesq_jetPtoEScale, false);
+      alphasVal = mela.getIORecord()->getAlphaSatMZ();
+      mesq_jetPtoEScale /= pow(alphasVal, 3);
+
+      bool doFill = !(
+        isnan(mesq_conserveDifermMass) || isinf(mesq_conserveDifermMass)
+        ||
+        isnan(mesq_jetPtoEScale) || isinf(mesq_jetPtoEScale)
+        );
+
+      if (doFill) binList.at(bin).addEvent(mzz, mesq_conserveDifermMass, mesq_jetPtoEScale);
+
       mela.resetInputEvent();
-      break;
     }
 
-    TUtil::setJetMassScheme(TVar::MomentumToEnergy);
-    mela.computeProdP(mesq_jetPtoEScale, false);
-    alphasVal = mela.getIORecord()->getAlphaSatMZ();
-    mesq_jetPtoEScale /= pow(alphasVal, 3);
-    if (isnan(mesq_jetPtoEScale) || isinf(mesq_jetPtoEScale)) doFill=false;
+    binList.at(bin).sift(); binList.at(bin).adjustWeights();
 
-    if (doFill){
+    for (unsigned int ev=0; ev<binList.at(bin).masses.size(); ev++){
+      mzz = binList.at(bin).masses.at(ev);
+      mesq_conserveDifermMass = binList.at(bin).mevals.at(ev);
+      mesq_jetPtoEScale = binList.at(bin).me2vals.at(ev);
       hmesq_conserveDifermMass->Fill(mzz, mesq_conserveDifermMass);
       hmesq_jetPtoEScale->Fill(mzz, mesq_jetPtoEScale);
       hvar->Fill(mzz, mzz);
+      if (writeFinalTree) newtree->Fill();
     }
-
-    if (writeFinalTree) newtree->Fill();
-    mela.resetInputEvent();
   }
 
   double* xexyey[2][4];
@@ -1252,8 +1468,7 @@ void get_PAvgProfile_JHUGen_JQCD_HSMHiggs_7or8TeV(int sqrts=8, bool debug=false)
   delete hvar;
   foutput->Close();
   delete[] binning;
-  delete tmptree;
-  delete tree;
+  for (unsigned int f=0; f<finputList.size(); f++) finputList.at(f)->Close();
 }
 /*
 Function
@@ -1281,6 +1496,7 @@ void get_PAvgProfile_JHUGen_JJVBF_HSMHiggs_13TeV(int sqrts=13, bool recalculate 
   int erg_tev=sqrts;
   float mPOLE=125.;
   TString TREE_NAME = "ZZTree/candTree";
+  TString COUNTERS_NAME = "ZZTree/Counters";
   bool writeFinalTree=true;
 
   TVar::Process proc = TVar::HSMHiggs;
@@ -1321,18 +1537,20 @@ void get_PAvgProfile_JHUGen_JJVBF_HSMHiggs_13TeV(int sqrts=13, bool recalculate 
   float hs = -0.727181;
   float phi1 = 1.8828257;
   float ZZPt, ZZPhi, ZZEta;
+  float genHEPMCweight;
+  float wgt=1;
 
   TString cinput_main;
   if (sqrts==13) cinput_main = inputdir_13TeV;
   else return;
 
   vector<TString> strSamples = constructSamplesList("JJVBF", sqrts);
-  const int nSamples = strSamples.size();
 
+  unordered_map<TTree*, pair<float, float>> nGenMap;
   vector<TFile*> finputList;
   vector<TTree*> treeList;
   int nEntries=0;
-  for (int is=0; is<nSamples; is++){
+  for (unsigned int is=0; is<strSamples.size(); is++){
     TString cinput = Form("%s/%s/ZZ4lAnalysis.root", cinput_main.Data(), (strSamples[is]).Data());
     TFile* finput = TFile::Open(cinput, "read");
     cout << "Opening file " << cinput << "..." << endl;
@@ -1345,6 +1563,7 @@ void get_PAvgProfile_JHUGen_JJVBF_HSMHiggs_13TeV(int sqrts=13, bool recalculate 
           cout << TREE_NAME << " is found." << endl;
           if (!recalculate && tree->GetBranchStatus("pConst_JJVBF_SIG_ghv1_1_JHUGen_JECNominal")==0) recalculate=true;
           tree->SetBranchStatus("*", 0);
+          tree->SetBranchStatus("genHEPMCweight", 1); tree->SetBranchAddress("genHEPMCweight", &genHEPMCweight);
           tree->SetBranchStatus("nCleanedJetsPt30", 1); tree->SetBranchAddress("nCleanedJetsPt30", &NJets30);
           tree->SetBranchStatus("JetPt", 1); tree->SetBranchAddress("JetPt", &JetPt);
           tree->SetBranchStatus("JetEta", 1); tree->SetBranchAddress("JetEta", &JetEta);
@@ -1371,6 +1590,11 @@ void get_PAvgProfile_JHUGen_JJVBF_HSMHiggs_13TeV(int sqrts=13, bool recalculate 
             tree->SetBranchStatus("pConst_JJVBF_SIG_ghv1_1_JHUGen_JECNominal", 1);
             tree->SetBranchAddress("pConst_JJVBF_SIG_ghv1_1_JHUGen_JECNominal", &cconst_calc);
           }
+
+          TH1F* htmp = (TH1F*)finput->Get(COUNTERS_NAME);
+          pair<float, float> nsum(htmp->GetBinContent(1), htmp->GetBinContent(41)); // No PU reweighting
+          nGenMap[tree]=nsum;
+
           nEntries += tree->GetEntries();
           treeList.push_back(tree);
           finputList.push_back(finput);
@@ -1468,6 +1692,8 @@ void get_PAvgProfile_JHUGen_JJVBF_HSMHiggs_13TeV(int sqrts=13, bool recalculate 
         cerr << "Jet array sizes are less than Njets!" << endl;
         continue;
       }
+      TTree* tree = findTree(treeList, getEv);
+      wgt = fabs(genHEPMCweight*nGenMap[tree].first/nGenMap[tree].second);
 
       TLorentzVector jet[2], higgs;
       for (int ij=0; ij<2; ij++) jet[ij].SetPtEtaPhiM(JetPt->at(ij), JetEta->at(ij), JetPhi->at(ij), JetMass->at(ij));
@@ -1508,21 +1734,22 @@ void get_PAvgProfile_JHUGen_JJVBF_HSMHiggs_13TeV(int sqrts=13, bool recalculate 
         isnan(mesq_jetPtoEScale) || isinf(mesq_jetPtoEScale)
         );
 
-      if (doFill) binList.at(bin).addEvent(mzz, mesq_conserveDifermMass, mesq_jetPtoEScale);
+      if (doFill) binList.at(bin).addEvent(mzz, mesq_conserveDifermMass, mesq_jetPtoEScale, wgt);
 
-      if (writeFinalTree) newtree->Fill();
       mela.resetInputEvent();
     }
 
-    binList.at(bin).sift();
+    binList.at(bin).sift(); binList.at(bin).adjustWeights();
 
     for (unsigned int ev=0; ev<binList.at(bin).masses.size(); ev++){
       mzz = binList.at(bin).masses.at(ev);
       mesq_conserveDifermMass = binList.at(bin).mevals.at(ev);
       mesq_jetPtoEScale = binList.at(bin).me2vals.at(ev);
-      hmesq_conserveDifermMass->Fill(mzz, mesq_conserveDifermMass);
-      hmesq_jetPtoEScale->Fill(mzz, mesq_jetPtoEScale);
-      hvar->Fill(mzz, mzz);
+      wgt = binList.at(bin).weights.at(ev);
+      hmesq_conserveDifermMass->Fill(mzz, mesq_conserveDifermMass, wgt);
+      hmesq_jetPtoEScale->Fill(mzz, mesq_jetPtoEScale, wgt);
+      hvar->Fill(mzz, mzz, wgt);
+      if (writeFinalTree) newtree->Fill();
     }
   }
 
@@ -1578,6 +1805,7 @@ void get_PAvgProfile_JHUGen_JJQCD_HSMHiggs_13TeV(int sqrts=13, bool recalculate 
   int erg_tev=sqrts;
   float mPOLE=125.;
   TString TREE_NAME = "ZZTree/candTree";
+  TString COUNTERS_NAME = "ZZTree/Counters";
   bool writeFinalTree=true;
 
   TVar::Process proc = TVar::HSMHiggs;
@@ -1618,18 +1846,20 @@ void get_PAvgProfile_JHUGen_JJQCD_HSMHiggs_13TeV(int sqrts=13, bool recalculate 
   float hs = -0.727181;
   float phi1 = 1.8828257;
   float ZZPt, ZZPhi, ZZEta;
+  float genHEPMCweight;
+  float wgt=1;
 
   TString cinput_main;
   if (sqrts==13) cinput_main = inputdir_13TeV;
   else return;
 
   vector<TString> strSamples = constructSamplesList("JJQCD", sqrts);
-  const int nSamples = strSamples.size();
 
+  unordered_map<TTree*, pair<float, float>> nGenMap;
   vector<TFile*> finputList;
   vector<TTree*> treeList;
   int nEntries=0;
-  for (int is=0; is<nSamples; is++){
+  for (unsigned int is=0; is<strSamples.size(); is++){
     TString cinput = Form("%s/%s/ZZ4lAnalysis.root", cinput_main.Data(), (strSamples[is]).Data());
     TFile* finput = TFile::Open(cinput, "read");
     cout << "Opening file " << cinput << "..." << endl;
@@ -1642,6 +1872,7 @@ void get_PAvgProfile_JHUGen_JJQCD_HSMHiggs_13TeV(int sqrts=13, bool recalculate 
           cout << TREE_NAME << " is found." << endl;
           if (!recalculate && tree->GetBranchStatus("pConst_JJQCD_SIG_ghg2_1_JHUGen_JECNominal")==0) recalculate=true;
           tree->SetBranchStatus("*", 0);
+          tree->SetBranchStatus("genHEPMCweight", 1); tree->SetBranchAddress("genHEPMCweight", &genHEPMCweight);
           tree->SetBranchStatus("nCleanedJetsPt30", 1); tree->SetBranchAddress("nCleanedJetsPt30", &NJets30);
           tree->SetBranchStatus("JetPt", 1); tree->SetBranchAddress("JetPt", &JetPt);
           tree->SetBranchStatus("JetEta", 1); tree->SetBranchAddress("JetEta", &JetEta);
@@ -1668,6 +1899,11 @@ void get_PAvgProfile_JHUGen_JJQCD_HSMHiggs_13TeV(int sqrts=13, bool recalculate 
             tree->SetBranchStatus("pConst_JJQCD_SIG_ghg2_1_JHUGen_JECNominal", 1);
             tree->SetBranchAddress("pConst_JJQCD_SIG_ghg2_1_JHUGen_JECNominal", &cconst_calc);
           }
+
+          TH1F* htmp = (TH1F*)finput->Get(COUNTERS_NAME);
+          pair<float, float> nsum(htmp->GetBinContent(1), htmp->GetBinContent(41)); // No PU reweighting
+          nGenMap[tree]=nsum;
+
           nEntries += tree->GetEntries();
           treeList.push_back(tree);
           finputList.push_back(finput);
@@ -1765,6 +2001,8 @@ void get_PAvgProfile_JHUGen_JJQCD_HSMHiggs_13TeV(int sqrts=13, bool recalculate 
         cerr << "Jet array sizes are less than Njets!" << endl;
         continue;
       }
+      TTree* tree = findTree(treeList, getEv);
+      wgt = fabs(genHEPMCweight*nGenMap[tree].first/nGenMap[tree].second);
 
       TLorentzVector jet[2], higgs;
       for (int ij=0; ij<2; ij++) jet[ij].SetPtEtaPhiM(JetPt->at(ij), JetEta->at(ij), JetPhi->at(ij), JetMass->at(ij));
@@ -1810,21 +2048,22 @@ void get_PAvgProfile_JHUGen_JJQCD_HSMHiggs_13TeV(int sqrts=13, bool recalculate 
         isnan(mesq_jetPtoEScale) || isinf(mesq_jetPtoEScale)
         );
 
-      if (doFill) binList.at(bin).addEvent(mzz, mesq_conserveDifermMass, mesq_jetPtoEScale);
+      if (doFill) binList.at(bin).addEvent(mzz, mesq_conserveDifermMass, mesq_jetPtoEScale, wgt);
 
-      if (writeFinalTree) newtree->Fill();
       mela.resetInputEvent();
     }
 
-    binList.at(bin).sift();
+    binList.at(bin).sift(); binList.at(bin).adjustWeights();
 
     for (unsigned int ev=0; ev<binList.at(bin).masses.size(); ev++){
       mzz = binList.at(bin).masses.at(ev);
       mesq_conserveDifermMass = binList.at(bin).mevals.at(ev);
       mesq_jetPtoEScale = binList.at(bin).me2vals.at(ev);
-      hmesq_conserveDifermMass->Fill(mzz, mesq_conserveDifermMass);
-      hmesq_jetPtoEScale->Fill(mzz, mesq_jetPtoEScale);
-      hvar->Fill(mzz, mzz);
+      wgt = binList.at(bin).weights.at(ev);
+      hmesq_conserveDifermMass->Fill(mzz, mesq_conserveDifermMass, wgt);
+      hmesq_jetPtoEScale->Fill(mzz, mesq_jetPtoEScale, wgt);
+      hvar->Fill(mzz, mzz, wgt);
+      if (writeFinalTree) newtree->Fill();
     }
   }
 
@@ -1880,6 +2119,7 @@ void get_PAvgProfile_JHUGen_JQCD_HSMHiggs_13TeV(int sqrts=13, bool recalculate =
   int erg_tev=sqrts;
   float mPOLE=125.;
   TString TREE_NAME = "ZZTree/candTree";
+  TString COUNTERS_NAME = "ZZTree/Counters";
   bool writeFinalTree=true;
 
   TVar::Process proc = TVar::HSMHiggs;
@@ -1920,18 +2160,20 @@ void get_PAvgProfile_JHUGen_JQCD_HSMHiggs_13TeV(int sqrts=13, bool recalculate =
   float hs = -0.727181;
   float phi1 = 1.8828257;
   float ZZPt, ZZPhi, ZZEta;
+  float genHEPMCweight;
+  float wgt=1;
 
   TString cinput_main;
   if (sqrts==13) cinput_main = inputdir_13TeV;
   else return;
 
   vector<TString> strSamples = constructSamplesList("JJQCD", sqrts);
-  const int nSamples = strSamples.size();
 
+  unordered_map<TTree*, pair<float, float>> nGenMap;
   vector<TFile*> finputList;
   vector<TTree*> treeList;
   int nEntries=0;
-  for (int is=0; is<nSamples; is++){
+  for (unsigned int is=0; is<strSamples.size(); is++){
     TString cinput = Form("%s/%s/ZZ4lAnalysis.root", cinput_main.Data(), (strSamples[is]).Data());
     TFile* finput = TFile::Open(cinput, "read");
     cout << "Opening file " << cinput << "..." << endl;
@@ -1944,6 +2186,7 @@ void get_PAvgProfile_JHUGen_JQCD_HSMHiggs_13TeV(int sqrts=13, bool recalculate =
           cout << TREE_NAME << " is found." << endl;
           if (!recalculate && tree->GetBranchStatus("pConst_JQCD_SIG_ghg2_1_JHUGen_JECNominal")==0) recalculate=true;
           tree->SetBranchStatus("*", 0);
+          tree->SetBranchStatus("genHEPMCweight", 1); tree->SetBranchAddress("genHEPMCweight", &genHEPMCweight);
           tree->SetBranchStatus("nCleanedJetsPt30", 1); tree->SetBranchAddress("nCleanedJetsPt30", &NJets30);
           tree->SetBranchStatus("JetPt", 1); tree->SetBranchAddress("JetPt", &JetPt);
           tree->SetBranchStatus("JetEta", 1); tree->SetBranchAddress("JetEta", &JetEta);
@@ -1970,6 +2213,11 @@ void get_PAvgProfile_JHUGen_JQCD_HSMHiggs_13TeV(int sqrts=13, bool recalculate =
             tree->SetBranchStatus("pConst_JQCD_SIG_ghg2_1_JHUGen_JECNominal", 1);
             tree->SetBranchAddress("pConst_JQCD_SIG_ghg2_1_JHUGen_JECNominal", &cconst_calc);
           }
+
+          TH1F* htmp = (TH1F*)finput->Get(COUNTERS_NAME);
+          pair<float, float> nsum(htmp->GetBinContent(1), htmp->GetBinContent(41)); // No PU reweighting
+          nGenMap[tree]=nsum;
+
           nEntries += tree->GetEntries();
           treeList.push_back(tree);
           finputList.push_back(finput);
@@ -2060,6 +2308,8 @@ void get_PAvgProfile_JHUGen_JQCD_HSMHiggs_13TeV(int sqrts=13, bool recalculate =
         cerr << "Jet array sizes are less than Njets!" << endl;
         continue;
       }
+      TTree* tree = findTree(treeList, getEv);
+      wgt = fabs(genHEPMCweight*nGenMap[tree].first/nGenMap[tree].second);
 
       TLorentzVector jet, higgs;
       jet.SetPtEtaPhiM(JetPt->at(0), JetEta->at(0), JetPhi->at(0), JetMass->at(0));
@@ -2104,21 +2354,22 @@ void get_PAvgProfile_JHUGen_JQCD_HSMHiggs_13TeV(int sqrts=13, bool recalculate =
         isnan(mesq_jetPtoEScale) || isinf(mesq_jetPtoEScale)
         );
 
-      if (doFill) binList.at(bin).addEvent(mzz, mesq_conserveDifermMass, mesq_jetPtoEScale);
+      if (doFill) binList.at(bin).addEvent(mzz, mesq_conserveDifermMass, mesq_jetPtoEScale, wgt);
 
-      if (writeFinalTree) newtree->Fill();
       mela.resetInputEvent();
     }
 
-    binList.at(bin).sift();
+    binList.at(bin).sift(); binList.at(bin).adjustWeights();
 
     for (unsigned int ev=0; ev<binList.at(bin).masses.size(); ev++){
       mzz = binList.at(bin).masses.at(ev);
       mesq_conserveDifermMass = binList.at(bin).mevals.at(ev);
       mesq_jetPtoEScale = binList.at(bin).me2vals.at(ev);
-      hmesq_conserveDifermMass->Fill(mzz, mesq_conserveDifermMass);
-      hmesq_jetPtoEScale->Fill(mzz, mesq_jetPtoEScale);
-      hvar->Fill(mzz, mzz);
+      wgt = binList.at(bin).weights.at(ev);
+      hmesq_conserveDifermMass->Fill(mzz, mesq_conserveDifermMass, wgt);
+      hmesq_jetPtoEScale->Fill(mzz, mesq_jetPtoEScale, wgt);
+      hvar->Fill(mzz, mzz, wgt);
+      if (writeFinalTree) newtree->Fill();
     }
   }
 
@@ -2169,7 +2420,1088 @@ void get_PAvgProfile_JHUGen_JQCD_HSMHiggs_13TeV(int sqrts=13, bool recalculate =
 }
 
 
+/*
+SPECIFIC COMMENT: OUTPUT ME DIVIDED BY
+- H(1) PROPAGATOR
+- (aL1**2+aR1**2)*(aL2**2+aR2**2) TO REMAIN INDEPENDENT OF CHANNEL
+*/
+void get_PAvgProfile_MCFM_JJEW_HSMHiggs_13TeV(int sqrts=13, bool recalculate = true){
+  int erg_tev=sqrts;
+  float mPOLE=125.;
+  TString TREE_NAME = "ZZTree/candTree";
+  TString COUNTERS_NAME = "ZZTree/Counters";
+  bool writeFinalTree=true;
 
+  TVar::Process proc = TVar::HSMHiggs;
+  TVar::MatrixElement me = TVar::MCFM;
+  TVar::Production prod = TVar::JJEW;
+
+  TString strproc = ProcessName(proc);
+  TString strme = MatrixElementName(me);
+  TString strprod = ProductionName(prod);
+
+  TVar::VerbosityLevel verbosity = TVar::ERROR;
+  Mela mela(erg_tev, mPOLE, verbosity);
+
+  std::vector<short>* LepLepId=0;
+  std::vector<float>* LepPt=0;
+  std::vector<float>* LepEta=0;
+  std::vector<float>* LepPhi=0;
+
+  short NJets30;
+  std::vector<float>* JetPt=0;
+  std::vector<float>* JetEta=0;
+  std::vector<float>* JetPhi=0;
+  std::vector<float>* JetMass=0;
+  std::vector<float> myJetPt;
+  std::vector<float> myJetEta;
+  std::vector<float> myJetPhi;
+  std::vector<float> myJetMass;
+
+  float mesq_calc=0., cconst_calc=1.;
+  float mesq_conserveDifermMass=0;
+  float mzz = 126.;
+  float m1 = 91.471450;
+  float m2 = 12.139782;
+  float h1 = 0.2682896;
+  float h2 = 0.1679779;
+  float phi = 1.5969792;
+  float hs = -0.727181;
+  float phi1 = 1.8828257;
+  float ZZPt, ZZPhi, ZZEta;
+  short Z1Flav, Z2Flav;
+  float xsec, ngen, genHEPMCweight, rewgt;
+  float wgt=1;
+
+  TString cinput_main;
+  if (sqrts==13) cinput_main = inputdir_13TeV;
+  else return;
+
+  TString strchannel[3]={ "4mu", "4e", "2mu2e" };
+
+  vector<TString> strSamples_VBF = constructSamplesList("JJVBF", sqrts);
+  vector<TString> strSamples_WH = constructSamplesList("WH", sqrts);
+  vector<TString> strSamples_ZH = constructSamplesList("ZH", sqrts);
+  vector<TString> strSamples;
+  appendVector(strSamples, strSamples_VBF);
+  appendVector(strSamples, strSamples_WH);
+  appendVector(strSamples, strSamples_ZH);
+
+  unordered_map<TTree*, pair<float,float>> nGenMap;
+  unordered_map<TTree*, float> mass_map;
+  unordered_map<float, vector<TTree*>> mass_sample_map;
+
+  vector<TFile*> finputList;
+  vector<TTree*> treeList;
+  int nEntries=0;
+  for (unsigned int is=0; is<strSamples.size(); is++){
+    TString cinput = Form("%s/%s/ZZ4lAnalysis.root", cinput_main.Data(), (strSamples[is]).Data());
+    TFile* finput = TFile::Open(cinput, "read");
+    cout << "Opening file " << cinput << "..." << endl;
+    TTree* tree=0;
+    if (finput!=0){
+      if (finput->IsOpen() && !finput->IsZombie()){
+        cout << cinput << " opened. Extracting tree " << TREE_NAME << "..." << endl;
+        tree = (TTree*)finput->Get(TREE_NAME);
+        if (tree!=0){
+          cout << TREE_NAME << " is found." << endl;
+          //if (!recalculate && tree->GetBranchStatus("pConst_JJEW_SIG_ghv1_1_MCFM_JECNominal")==0) recalculate=true;
+          tree->SetBranchStatus("*", 0);
+          tree->SetBranchStatus("xsec", 1); tree->SetBranchAddress("xsec", &xsec);
+          tree->SetBranchStatus("genHEPMCweight", 1); tree->SetBranchAddress("genHEPMCweight", &genHEPMCweight);
+          tree->SetBranchStatus("nCleanedJetsPt30", 1); tree->SetBranchAddress("nCleanedJetsPt30", &NJets30);
+          tree->SetBranchStatus("JetPt", 1); tree->SetBranchAddress("JetPt", &JetPt);
+          tree->SetBranchStatus("JetEta", 1); tree->SetBranchAddress("JetEta", &JetEta);
+          tree->SetBranchStatus("JetPhi", 1); tree->SetBranchAddress("JetPhi", &JetPhi);
+          tree->SetBranchStatus("JetMass", 1); tree->SetBranchAddress("JetMass", &JetMass);
+          tree->SetBranchStatus("ZZMass", 1); tree->SetBranchAddress("ZZMass", &mzz);
+          tree->SetBranchStatus("ZZPt", 1); tree->SetBranchAddress("ZZPt", &ZZPt);
+          tree->SetBranchStatus("ZZEta", 1); tree->SetBranchAddress("ZZEta", &ZZEta);
+          tree->SetBranchStatus("ZZPhi", 1); tree->SetBranchAddress("ZZPhi", &ZZPhi);
+          tree->SetBranchStatus("Z1Mass", 1); tree->SetBranchAddress("Z1Mass", &m1);
+          tree->SetBranchStatus("Z2Mass", 1); tree->SetBranchAddress("Z2Mass", &m2);
+          tree->SetBranchStatus("helcosthetaZ1", 1); tree->SetBranchAddress("helcosthetaZ1", &h1);
+          tree->SetBranchStatus("helcosthetaZ2", 1); tree->SetBranchAddress("helcosthetaZ2", &h2);
+          tree->SetBranchStatus("helphi", 1); tree->SetBranchAddress("helphi", &phi);
+          tree->SetBranchStatus("costhetastar", 1); tree->SetBranchAddress("costhetastar", &hs);
+          tree->SetBranchStatus("phistarZ1", 1); tree->SetBranchAddress("phistarZ1", &phi1);
+          tree->SetBranchStatus("LepLepId", 1); tree->SetBranchAddress("LepLepId", &LepLepId);
+          tree->SetBranchStatus("LepPt", 1); tree->SetBranchAddress("LepPt", &LepPt);
+          tree->SetBranchStatus("LepEta", 1); tree->SetBranchAddress("LepEta", &LepEta);
+          tree->SetBranchStatus("LepPhi", 1); tree->SetBranchAddress("LepPhi", &LepPhi);
+          tree->SetBranchStatus("Z1Flav", 1); tree->SetBranchAddress("Z1Flav", &Z1Flav);
+          tree->SetBranchStatus("Z2Flav", 1); tree->SetBranchAddress("Z2Flav", &Z2Flav);
+          tree->SetBranchStatus("p_Gen_JJEW_SIG_ghv1_1_MCFM", 1); tree->SetBranchAddress("p_Gen_JJEW_SIG_ghv1_1_MCFM", &rewgt);
+          if (!recalculate){
+            tree->SetBranchStatus("p_JJEW_SIG_ghv1_1_MCFM_JECNominal", 1);
+            tree->SetBranchAddress("p_JJEW_SIG_ghv1_1_MCFM_JECNominal", &mesq_calc);
+            tree->SetBranchStatus("pConst_JJEW_SIG_ghv1_1_MCFM_JECNominal", 1);
+            tree->SetBranchAddress("pConst_JJEW_SIG_ghv1_1_MCFM_JECNominal", &cconst_calc);
+          }
+          tree->GetEntry(0);
+          cout << "Cross section = " << xsec << endl;
+
+          TH1F* htmp = (TH1F*)finput->Get(COUNTERS_NAME);
+          pair<float, float> nsum(htmp->GetBinContent(1), htmp->GetBinContent(41)); // No PU reweighting
+          nGenMap[tree]=nsum;
+
+          nEntries += tree->GetEntries();
+          treeList.push_back(tree);
+          finputList.push_back(finput);
+
+          float polemass = findPoleMass(strSamples[is]);
+          cout << "Pole mass = " << polemass << endl;
+          mass_map[tree]=polemass;
+          if (mass_sample_map.find(polemass)==mass_sample_map.end()){
+            cout << "Inserting new pole mass sample array" << endl;
+            vector<TTree*> dumarr;
+            mass_sample_map[polemass] = dumarr;
+          }
+          mass_sample_map[polemass].push_back(tree);
+        }
+        else if (finput->IsOpen()) finput->Close();
+      }
+    }
+  }
+  cout << "NEntries = " << nEntries << endl;
+
+  for (auto it = mass_sample_map.begin(); it != mass_sample_map.end(); ++it){
+    float sum_ngen=0;
+    float sum_xsec=0;
+    for (unsigned int ix=0; ix<it->second.size(); ix++){
+      it->second.at(ix)->GetEntry(0);
+      sum_ngen += nGenMap[it->second.at(ix)].first;
+      sum_xsec += xsec;
+    }
+    float overallWeight = sum_ngen/sum_xsec;
+    for (unsigned int ix=0; ix<it->second.size(); ix++){
+      cout << "Sum Hep MC weights in tree " << ix << " / " << it->second.size() << " was " << nGenMap[it->second.at(ix)].second << " over " << nGenMap[it->second.at(ix)].first << " total gen. events." << endl;
+      nGenMap[it->second.at(ix)].first = overallWeight/nGenMap[it->second.at(ix)].second;
+      cout << "Event scale for tree " << ix << " / " << it->second.size() << " at pole mass " << it->first << " = " << nGenMap[it->second.at(ix)].first << endl;
+    }
+  }
+
+  TFile* foutput = TFile::Open(Form("pAvgLinToLog_%s_%s_%s_%iTeV.root", strme.Data(), strprod.Data(), strproc.Data(), sqrts), "recreate");
+
+  vector<pair<float, int>> index[3];
+  unsigned ev_acc=0;
+  for (int ev=0; ev<nEntries; ev++){
+    getEntry(treeList, ev);
+    bool doProcess=
+      NJets30>=2 && (
+      Z1Flav*Z2Flav==pow(13, 4)
+      ||
+      Z1Flav*Z2Flav==pow(11, 4)
+      ||
+      Z1Flav*Z2Flav==pow(11*13, 2)
+      )
+      ;
+    if (!doProcess) continue;
+    if (ev_acc%10000==0) cout << "Pre-processing event " << ev << endl;
+    unsigned int ic = (Z1Flav*Z2Flav==pow(13, 4))*0 + (Z1Flav*Z2Flav==pow(11, 4))*1 + (Z1Flav*Z2Flav==pow(11*13, 2))*2;
+    addByLowest(index[ic], mzz, ev);
+    ev_acc++;
+  }
+
+  for (unsigned int ic=0; ic<3; ic++){
+    float firstVal=index[ic].at(0).first;
+    float lastVal=index[ic].at(index[ic].size()-1).first;
+    float infimum = (float)((int)firstVal); infimum -= (float)(((int)infimum)%10);
+    float supremum = (float)((int)(lastVal+0.5)); supremum += (float)(10-((int)supremum)%10);
+    cout << "Nentries = " << nEntries << " | mzz = " << firstVal << " - " << lastVal << "(" << infimum << ", " << supremum << ")" << endl;
+
+    float divisor=40000;
+    if (ic<2) divisor = 20000;
+    int nbins = index[ic].size()/divisor;
+    const int nbins_th=10/*50*/;
+    while (nbins<nbins_th){
+      if (divisor>1000) divisor -= 1000;
+      else if (divisor>100) divisor -= 100;
+      else break;
+      nbins=index[ic].size()/divisor;
+    }
+    cout << "nbins=" << nbins << endl;
+    if (nbins<3) cerr << "Not enough bins!" << endl;
+    vector<ExtBin> binList;
+    float* binning = new float[nbins+1];
+    binning[0]=infimum;
+    binning[nbins]=supremum;
+    int ev_stepsize = index[ic].size()/nbins;
+    cout << "Event step size: " << ev_stepsize << endl;
+    cout << "Boundary (" << 0 << ") = " << binning[0] << endl;
+    for (int ix=1; ix<nbins; ix++){
+      binning[ix]=(index[ic][ix*ev_stepsize-1].first+index[ic][ix*ev_stepsize].first)*0.5;
+      ExtBin tmpbin;
+      tmpbin.binlow = binning[ix-1];
+      tmpbin.binhigh = binning[ix];
+      for (int bin=0; bin<ev_stepsize; bin++) tmpbin.events.push_back(index[ic][(ix-1)*ev_stepsize+bin].second);
+      binList.push_back(tmpbin);
+      cout << "Boundary (" << ix << ")= " << binning[ix] << " [event " << index[ic][ix*ev_stepsize].second << ", step " << ix*ev_stepsize << "]" << endl;
+    }
+    ExtBin tmpbin;
+    tmpbin.binlow = binning[nbins-1];
+    tmpbin.binhigh = binning[nbins];
+    for (unsigned int bin=(nbins-1)*ev_stepsize; bin<index[ic].size(); bin++) tmpbin.events.push_back(index[ic][bin].second);
+    binList.push_back(tmpbin);
+    cout << "Boundary (" << nbins << ") = " << binning[nbins] << endl;
+    cout << "Bin list has the following bins:" << endl;
+    for (unsigned int ib=0; ib<binList.size(); ib++){
+      cout << ib << " / " << binList.size() << ": [" << binList.at(ib).binlow << "," << binList.at(ib).binhigh << "]" << endl;
+    }
+
+    TProfile* hvar = new TProfile(Form("candMass_%s", strchannel[ic].Data()), "", nbins, binning); hvar->Sumw2();
+    TProfile* hmesq_conserveDifermMass = new TProfile(Form("P_ConserveDifermionMass_%s", strchannel[ic].Data()), "", nbins, binning); hmesq_conserveDifermMass->Sumw2();
+
+    TTree* newtree=0;
+    if (writeFinalTree){
+      newtree = new TTree(Form("FinalTree_%s", strchannel[ic].Data()), "");
+      newtree->Branch("mesq_conserveDifermMass", &mesq_conserveDifermMass);
+      newtree->Branch("ZZMass", &mzz);
+      newtree->Branch("weight", &wgt);
+    }
+
+    mela.setCandidateDecayMode(TVar::CandidateDecay_ZZ);
+
+    double aL1=0, aR1=0, aL2=0, aR2=0;
+    unsigned int ev_acc=0;
+    for (unsigned int bin=0; bin<binList.size(); bin++){
+      cout << "Bin " << bin << " is now being scrutinized..." << endl;
+      for (unsigned int ev = 0; ev < binList.at(bin).events.size(); ev++){
+        int getEv = binList.at(bin).events.at(ev);
+        getEntry(treeList, getEv);
+        if (ev%1000==0) cout << "Doing event " << getEv << endl;
+        if (JetPt->size()<2 || JetEta->size()<2 || JetPhi->size()<2 || JetMass->size()<2){
+          cerr << "Jet array sizes are less than Njets!" << endl;
+          continue;
+        }
+        TTree* tree = findTree(treeList, getEv);
+        wgt = fabs(xsec*genHEPMCweight*nGenMap[tree].first*rewgt);
+
+        TLorentzVector jet[2], higgs;
+        for (int ij=0; ij<2; ij++) jet[ij].SetPtEtaPhiM(JetPt->at(ij), JetEta->at(ij), JetPhi->at(ij), JetMass->at(ij));
+        higgs.SetPtEtaPhiM(ZZPt, ZZEta, ZZPhi, mzz);
+        TVector3 boostH = higgs.BoostVector();
+
+        SimpleParticleCollection_t associated;
+        associated.push_back(SimpleParticle_t(0, jet[0]));
+        associated.push_back(SimpleParticle_t(0, jet[1]));
+
+        SimpleParticleCollection_t daughters;
+        for (int id=0; id<4; id++){
+          double mass=0;
+          if (abs(LepLepId->at(id))==13) mass = 0.105658;
+          else if (abs(LepLepId->at(id))==11) mass = 0.000511;
+          TLorentzVector pDaughter;
+          pDaughter.SetPtEtaPhiM(LepPt->at(id), LepEta->at(id), LepPhi->at(id), mass);
+          daughters.push_back(SimpleParticle_t(LepLepId->at(id), pDaughter));
+        }
+        mela.setInputEvent(&daughters, &associated, (SimpleParticleCollection_t*)0, false);
+
+        mela.setProcess(proc, me, prod);
+
+        double mh=0, gah=0, propagator=0;
+        if (recalculate || ev_acc==0){
+          TUtil::setJetMassScheme(TVar::ConserveDifermionMass);
+          mela.computeProdP(mesq_conserveDifermMass, false);
+          if (!recalculate){
+            mesq_calc /= cconst_calc;
+            mesq_conserveDifermMass=mesq_calc;
+
+            mh = mass_map[tree];
+            gah = mela.getHiggsWidthAtPoleMass(mh);
+          }
+          else{
+            mela.getIORecord()->getHiggsMassWidth(mh, gah, 0);
+          }
+          mela.getIORecord()->getVDaughterCouplings(aL1, aR1, 0);
+          mela.getIORecord()->getVDaughterCouplings(aL2, aR2, 1);
+        }
+        else{
+          mesq_calc /= cconst_calc;
+          mesq_conserveDifermMass=mesq_calc;
+        }
+        propagator = 1./(pow(pow(mzz, 2)-pow(mh, 2), 2) + pow(mh*gah, 2));
+        mesq_conserveDifermMass /= propagator;
+        if (fabs(aL1)>0. || fabs(aR1)>0.) mesq_conserveDifermMass /= pow(aL1, 2)+pow(aR1, 2);
+        if (fabs(aL2)>0. || fabs(aR2)>0.) mesq_conserveDifermMass /= pow(aL2, 2)+pow(aR2, 2);
+
+        bool doFill = !(
+          isnan(mesq_conserveDifermMass) || isinf(mesq_conserveDifermMass)
+          );
+
+        if (doFill) binList.at(bin).addEvent(mzz, mesq_conserveDifermMass, 0, wgt);
+
+        mela.resetInputEvent();
+        ev_acc++;
+      }
+
+      binList.at(bin).sift(); binList.at(bin).adjustWeights(10);
+
+      for (unsigned int ev=0; ev<binList.at(bin).masses.size(); ev++){
+        mzz = binList.at(bin).masses.at(ev);
+        mesq_conserveDifermMass = binList.at(bin).mevals.at(ev);
+        wgt = binList.at(bin).weights.at(ev);
+        hmesq_conserveDifermMass->Fill(mzz, mesq_conserveDifermMass);
+        hvar->Fill(mzz, mzz);
+        if (writeFinalTree) newtree->Fill();
+      }
+    }
+    cout << "Total events accumulated: " << ev_acc << endl;
+
+    double* xexyey[4];
+    for (int ix=0; ix<4; ix++) xexyey[ix] = new double[nbins];
+    for (int bin=0; bin<nbins; bin++){
+      xexyey[0][bin] = hvar->GetBinContent(bin+1);
+      xexyey[1][bin] = hvar->GetBinError(bin+1);
+
+      cout << "Bin " << bin << " x-center: " << xexyey[0][bin] << " +- " << xexyey[1][bin] << endl;
+
+      xexyey[2][bin] = hmesq_conserveDifermMass->GetBinContent(bin+1);
+      xexyey[3][bin] = hmesq_conserveDifermMass->GetBinError(bin+1);
+      xexyey[3][bin] = log10(xexyey[3][bin])/xexyey[2][bin];
+      xexyey[2][bin] = log10(xexyey[2][bin]);
+    }
+
+    TGraphErrors* tg = new TGraphErrors(nbins, xexyey[0], xexyey[2], xexyey[1], xexyey[3]);
+    tg->SetName(Form("tg_%s", hmesq_conserveDifermMass->GetName()));
+    foutput->WriteTObject(tg);
+    delete tg;
+
+    for (int ix=0; ix<4; ix++) delete[] xexyey[ix];
+
+    foutput->WriteTObject(hmesq_conserveDifermMass);
+    foutput->WriteTObject(hvar);
+    if (writeFinalTree) foutput->WriteTObject(newtree);
+    if (writeFinalTree) delete newtree;
+    delete hmesq_conserveDifermMass;
+    delete hvar;
+    delete[] binning;
+  }
+  foutput->Close();
+  for (unsigned int f=0; f<finputList.size(); f++) finputList.at(f)->Close();
+}
+
+/* SPECIFIC COMMENT: OUTPUT ME DIVIDED BY (aL1**2+aR1**2)*(aL2**2+aR2**2) TO REMAIN INDEPENDENT OF CHANNEL */
+void get_PAvgProfile_MCFM_JJEW_bkgZZ_13TeV(int sqrts=13, bool recalculate = true){
+  int erg_tev=sqrts;
+  float mPOLE=125.;
+  TString TREE_NAME = "ZZTree/candTree";
+  TString COUNTERS_NAME = "ZZTree/Counters";
+  bool writeFinalTree=true;
+
+  TVar::Process proc = TVar::bkgZZ;
+  TVar::MatrixElement me = TVar::MCFM;
+  TVar::Production prod = TVar::JJEW;
+
+  TString strproc = ProcessName(proc);
+  TString strme = MatrixElementName(me);
+  TString strprod = ProductionName(prod);
+
+  TVar::VerbosityLevel verbosity = TVar::ERROR;
+  Mela mela(erg_tev, mPOLE, verbosity);
+
+  std::vector<short>* LepLepId=0;
+  std::vector<float>* LepPt=0;
+  std::vector<float>* LepEta=0;
+  std::vector<float>* LepPhi=0;
+
+  short NJets30;
+  std::vector<float>* JetPt=0;
+  std::vector<float>* JetEta=0;
+  std::vector<float>* JetPhi=0;
+  std::vector<float>* JetMass=0;
+  std::vector<float> myJetPt;
+  std::vector<float> myJetEta;
+  std::vector<float> myJetPhi;
+  std::vector<float> myJetMass;
+
+  float mesq_calc=0., cconst_calc=1.;
+  float mesq_conserveDifermMass=0;
+  float mzz = 126.;
+  float m1 = 91.471450;
+  float m2 = 12.139782;
+  float h1 = 0.2682896;
+  float h2 = 0.1679779;
+  float phi = 1.5969792;
+  float hs = -0.727181;
+  float phi1 = 1.8828257;
+  float ZZPt, ZZPhi, ZZEta;
+  short Z1Flav, Z2Flav;
+  float GenHMass;
+  float xsec, ngen, genHEPMCweight, rewgt;
+  float wgt=1;
+
+  TString cinput_main;
+  if (sqrts==13) cinput_main = inputdir_13TeV;
+  else return;
+
+  TString strchannel[3]={ "4mu", "4e", "2mu2e" };
+
+  vector<TString> strSamples_VBF = constructSamplesList("JJVBF", sqrts);
+  vector<TString> strSamples_WH = constructSamplesList("WH", sqrts);
+  vector<TString> strSamples_ZH = constructSamplesList("ZH", sqrts);
+  vector<TString> strSamples;
+  appendVector(strSamples, strSamples_VBF);
+  appendVector(strSamples, strSamples_WH);
+  appendVector(strSamples, strSamples_ZH);
+
+  unordered_map<TTree*, pair<float, float>> nGenMap;
+  unordered_map<float, vector<TTree*>> mass_sample_map;
+  unordered_map<TTree*, pair<float, float>> samplePoleMasses;
+
+  vector<TFile*> finputList;
+  vector<TTree*> treeList;
+  int nEntries=0;
+  for (unsigned int is=0; is<strSamples.size(); is++){
+    TString cinput = Form("%s/%s/ZZ4lAnalysis.root", cinput_main.Data(), (strSamples[is]).Data());
+    TFile* finput = TFile::Open(cinput, "read");
+    cout << "Opening file " << cinput << "..." << endl;
+    TTree* tree=0;
+    if (finput!=0){
+      if (finput->IsOpen() && !finput->IsZombie()){
+        cout << cinput << " opened. Extracting tree " << TREE_NAME << "..." << endl;
+        tree = (TTree*)finput->Get(TREE_NAME);
+        if (tree!=0){
+          cout << TREE_NAME << " is found." << endl;
+          //if (!recalculate && tree->GetBranchStatus("pConst_JJEW_BKG_MCFM_JECNominal")==0) recalculate=true;
+          tree->SetBranchStatus("*", 0);
+          tree->SetBranchStatus("xsec", 1); tree->SetBranchAddress("xsec", &xsec);
+          tree->SetBranchStatus("genHEPMCweight", 1); tree->SetBranchAddress("genHEPMCweight", &genHEPMCweight);
+          tree->SetBranchStatus("nCleanedJetsPt30", 1); tree->SetBranchAddress("nCleanedJetsPt30", &NJets30);
+          tree->SetBranchStatus("JetPt", 1); tree->SetBranchAddress("JetPt", &JetPt);
+          tree->SetBranchStatus("JetEta", 1); tree->SetBranchAddress("JetEta", &JetEta);
+          tree->SetBranchStatus("JetPhi", 1); tree->SetBranchAddress("JetPhi", &JetPhi);
+          tree->SetBranchStatus("JetMass", 1); tree->SetBranchAddress("JetMass", &JetMass);
+          tree->SetBranchStatus("ZZMass", 1); tree->SetBranchAddress("ZZMass", &mzz);
+          tree->SetBranchStatus("ZZPt", 1); tree->SetBranchAddress("ZZPt", &ZZPt);
+          tree->SetBranchStatus("ZZEta", 1); tree->SetBranchAddress("ZZEta", &ZZEta);
+          tree->SetBranchStatus("ZZPhi", 1); tree->SetBranchAddress("ZZPhi", &ZZPhi);
+          tree->SetBranchStatus("Z1Mass", 1); tree->SetBranchAddress("Z1Mass", &m1);
+          tree->SetBranchStatus("Z2Mass", 1); tree->SetBranchAddress("Z2Mass", &m2);
+          tree->SetBranchStatus("helcosthetaZ1", 1); tree->SetBranchAddress("helcosthetaZ1", &h1);
+          tree->SetBranchStatus("helcosthetaZ2", 1); tree->SetBranchAddress("helcosthetaZ2", &h2);
+          tree->SetBranchStatus("helphi", 1); tree->SetBranchAddress("helphi", &phi);
+          tree->SetBranchStatus("costhetastar", 1); tree->SetBranchAddress("costhetastar", &hs);
+          tree->SetBranchStatus("phistarZ1", 1); tree->SetBranchAddress("phistarZ1", &phi1);
+          tree->SetBranchStatus("LepLepId", 1); tree->SetBranchAddress("LepLepId", &LepLepId);
+          tree->SetBranchStatus("LepPt", 1); tree->SetBranchAddress("LepPt", &LepPt);
+          tree->SetBranchStatus("LepEta", 1); tree->SetBranchAddress("LepEta", &LepEta);
+          tree->SetBranchStatus("LepPhi", 1); tree->SetBranchAddress("LepPhi", &LepPhi);
+          tree->SetBranchStatus("Z1Flav", 1); tree->SetBranchAddress("Z1Flav", &Z1Flav);
+          tree->SetBranchStatus("Z2Flav", 1); tree->SetBranchAddress("Z2Flav", &Z2Flav);
+          tree->SetBranchStatus("GenHMass", 1); tree->SetBranchAddress("GenHMass", &GenHMass);
+          tree->SetBranchStatus("p_Gen_JJEW_BKG_MCFM", 1); tree->SetBranchAddress("p_Gen_JJEW_BKG_MCFM", &rewgt);
+          if (!recalculate){
+            tree->SetBranchStatus("p_JJEW_BKG_MCFM_JECNominal", 1);
+            tree->SetBranchAddress("p_JJEW_BKG_MCFM_JECNominal", &mesq_calc);
+            tree->SetBranchStatus("pConst_JJEW_BKG_MCFM_JECNominal", 1);
+            tree->SetBranchAddress("pConst_JJEW_BKG_MCFM_JECNominal", &cconst_calc);
+          }
+          tree->GetEntry(0);
+          cout << "Cross section = " << xsec << endl;
+
+          TH1F* htmp = (TH1F*)finput->Get(COUNTERS_NAME);
+          pair<float, float> nsum(htmp->GetBinContent(1), htmp->GetBinContent(41)); // No PU reweighting
+          nGenMap[tree]=nsum;
+
+          nEntries += tree->GetEntries();
+          treeList.push_back(tree);
+          finputList.push_back(finput);
+
+          float polemass = findPoleMass(strSamples[is]);
+          float polewidth = mela.getHiggsWidthAtPoleMass(polemass);
+          cout << "Pole mass = " << polemass << ", pole width = " << polewidth << endl;
+          if (mass_sample_map.find(polemass)==mass_sample_map.end()){
+            cout << "Inserting new pole mass sample array" << endl;
+            vector<TTree*> dumarr;
+            mass_sample_map[polemass] = dumarr;
+          }
+          mass_sample_map[polemass].push_back(tree);
+          samplePoleMasses[tree] = pair<float, float>(polemass, polewidth);
+        }
+        else if (finput->IsOpen()) finput->Close();
+      }
+    }
+  }
+  cout << "NEntries = " << nEntries << endl;
+
+  for (auto it = mass_sample_map.begin(); it != mass_sample_map.end(); ++it){
+    float sum_ngen=0;
+    float sum_xsec=0;
+    for (unsigned int ix=0; ix<it->second.size(); ix++){
+      it->second.at(ix)->GetEntry(0);
+      sum_ngen += nGenMap[it->second.at(ix)].first;
+      sum_xsec += xsec;
+    }
+    float overallWeight = sum_ngen/sum_xsec;
+    for (unsigned int ix=0; ix<it->second.size(); ix++){
+      cout << "Sum Hep MC weights in tree " << ix << " / " << it->second.size() << " was " << nGenMap[it->second.at(ix)].second << " over " << nGenMap[it->second.at(ix)].first << " total gen. events." << endl;
+      nGenMap[it->second.at(ix)].first = overallWeight/nGenMap[it->second.at(ix)].second;
+      cout << "Event scale for tree " << ix << " / " << it->second.size() << " at pole mass " << it->first << " = " << nGenMap[it->second.at(ix)].first << endl;
+    }
+  }
+
+  TFile* foutput = TFile::Open(Form("pAvgLinToLog_%s_%s_%s_%iTeV.root", strme.Data(), strprod.Data(), strproc.Data(), sqrts), "recreate");
+
+  vector<pair<float, int>> index[3];
+  unsigned ev_acc=0;
+  for (int ev=0; ev<nEntries; ev++){
+    getEntry(treeList, ev);
+    bool doProcess=
+      NJets30>=2 && (
+      Z1Flav*Z2Flav==pow(13, 4)
+      ||
+      Z1Flav*Z2Flav==pow(11, 4)
+      ||
+      Z1Flav*Z2Flav==pow(11*13, 2)
+      )
+      ;
+    if (!doProcess) continue;
+    if (ev_acc%10000==0) cout << "Pre-processing event " << ev << endl;
+    unsigned int ic = (Z1Flav*Z2Flav==pow(13, 4))*0 + (Z1Flav*Z2Flav==pow(11, 4))*1 + (Z1Flav*Z2Flav==pow(11*13, 2))*2;
+    addByLowest(index[ic], mzz, ev);
+    ev_acc++;
+  }
+
+  for (unsigned int ic=0; ic<3; ic++){
+    float firstVal=index[ic].at(0).first;
+    float lastVal=index[ic].at(index[ic].size()-1).first;
+    float infimum = (float)((int)firstVal); infimum -= (float)(((int)infimum)%10);
+    float supremum = (float)((int)(lastVal+0.5)); supremum += (float)(10-((int)supremum)%10);
+    cout << "Nentries = " << nEntries << " | mzz = " << firstVal << " - " << lastVal << "(" << infimum << ", " << supremum << ")" << endl;
+
+    float divisor=40000;
+    if (ic<2) divisor = 20000;
+    int nbins = index[ic].size()/divisor;
+    const int nbins_th=10/*50*/;
+    while (nbins<nbins_th){
+      if (divisor>1000) divisor -= 1000;
+      else if (divisor>100) divisor -= 100;
+      else break;
+      nbins=index[ic].size()/divisor;
+    }
+    cout << "nbins=" << nbins << endl;
+    if (nbins<3) cerr << "Not enough bins!" << endl;
+    vector<ExtBin> binList;
+    float* binning = new float[nbins+1];
+    binning[0]=infimum;
+    binning[nbins]=supremum;
+    int ev_stepsize = index[ic].size()/nbins;
+    cout << "Event step size: " << ev_stepsize << endl;
+    cout << "Boundary (" << 0 << ") = " << binning[0] << endl;
+    for (int ix=1; ix<nbins; ix++){
+      binning[ix]=(index[ic][ix*ev_stepsize-1].first+index[ic][ix*ev_stepsize].first)*0.5;
+      ExtBin tmpbin;
+      tmpbin.binlow = binning[ix-1];
+      tmpbin.binhigh = binning[ix];
+      for (int bin=0; bin<ev_stepsize; bin++) tmpbin.events.push_back(index[ic][(ix-1)*ev_stepsize+bin].second);
+      binList.push_back(tmpbin);
+      cout << "Boundary (" << ix << ")= " << binning[ix] << " [event " << index[ic][ix*ev_stepsize].second << ", step " << ix*ev_stepsize << "]" << endl;
+    }
+    ExtBin tmpbin;
+    tmpbin.binlow = binning[nbins-1];
+    tmpbin.binhigh = binning[nbins];
+    for (unsigned int bin=(nbins-1)*ev_stepsize; bin<index[ic].size(); bin++) tmpbin.events.push_back(index[ic][bin].second);
+    binList.push_back(tmpbin);
+    cout << "Boundary (" << nbins << ") = " << binning[nbins] << endl;
+    cout << "Bin list has the following bins:" << endl;
+    for (unsigned int ib=0; ib<binList.size(); ib++){
+      cout << ib << " / " << binList.size() << ": [" << binList.at(ib).binlow << "," << binList.at(ib).binhigh << "]" << endl;
+    }
+
+    TProfile* hvar = new TProfile(Form("candMass_%s", strchannel[ic].Data()), "", nbins, binning); hvar->Sumw2();
+    TProfile* hmesq_conserveDifermMass = new TProfile(Form("P_ConserveDifermionMass_%s", strchannel[ic].Data()), "", nbins, binning); hmesq_conserveDifermMass->Sumw2();
+
+    TTree* newtree=0;
+    if (writeFinalTree){
+      newtree = new TTree(Form("FinalTree_%s", strchannel[ic].Data()), "");
+      newtree->Branch("mesq_conserveDifermMass", &mesq_conserveDifermMass);
+      newtree->Branch("ZZMass", &mzz);
+      newtree->Branch("weight", &wgt);
+    }
+
+    mela.setCandidateDecayMode(TVar::CandidateDecay_ZZ);
+
+    double aL1=0, aR1=0, aL2=0, aR2=0;
+    unsigned int ev_acc=0;
+    for (unsigned int bin=0; bin<binList.size(); bin++){
+      cout << "Bin " << bin << " is now being scrutinized..." << endl;
+      for (unsigned int ev = 0; ev < binList.at(bin).events.size(); ev++){
+        int getEv = binList.at(bin).events.at(ev);
+        getEntry(treeList, getEv);
+        if (ev%1000==0) cout << "Doing event " << getEv << endl;
+        if (JetPt->size()<2 || JetEta->size()<2 || JetPhi->size()<2 || JetMass->size()<2){
+          cerr << "Jet array sizes are less than Njets!" << endl;
+          continue;
+        }
+        TTree* tree = findTree(treeList, getEv);
+        wgt = fabs(xsec*genHEPMCweight*nGenMap[tree].first*rewgt);
+
+        TLorentzVector jet[2], higgs;
+        for (int ij=0; ij<2; ij++) jet[ij].SetPtEtaPhiM(JetPt->at(ij), JetEta->at(ij), JetPhi->at(ij), JetMass->at(ij));
+        higgs.SetPtEtaPhiM(ZZPt, ZZEta, ZZPhi, mzz);
+        TVector3 boostH = higgs.BoostVector();
+
+        SimpleParticleCollection_t associated;
+        associated.push_back(SimpleParticle_t(0, jet[0]));
+        associated.push_back(SimpleParticle_t(0, jet[1]));
+
+        SimpleParticleCollection_t daughters;
+        for (int id=0; id<4; id++){
+          double mass=0;
+          if (abs(LepLepId->at(id))==13) mass = 0.105658;
+          else if (abs(LepLepId->at(id))==11) mass = 0.000511;
+          TLorentzVector pDaughter;
+          pDaughter.SetPtEtaPhiM(LepPt->at(id), LepEta->at(id), LepPhi->at(id), mass);
+          daughters.push_back(SimpleParticle_t(LepLepId->at(id), pDaughter));
+        }
+        mela.setInputEvent(&daughters, &associated, (SimpleParticleCollection_t*)0, false);
+
+        mela.setProcess(proc, me, prod);
+
+        if (recalculate || ev_acc==0){
+          TUtil::setJetMassScheme(TVar::ConserveDifermionMass);
+          mela.computeProdP(mesq_conserveDifermMass, false);
+          if (!recalculate){
+            mesq_calc /= cconst_calc;
+            mesq_conserveDifermMass=mesq_calc;
+          }
+          mela.getIORecord()->getVDaughterCouplings(aL1, aR1, 0);
+          mela.getIORecord()->getVDaughterCouplings(aL2, aR2, 1);
+        }
+        else{
+          mesq_calc /= cconst_calc;
+          mesq_conserveDifermMass=mesq_calc;
+        }
+        if (fabs(aL1)>0. || fabs(aR1)>0.) mesq_conserveDifermMass /= pow(aL1, 2)+pow(aR1, 2);
+        if (fabs(aL2)>0. || fabs(aR2)>0.) mesq_conserveDifermMass /= pow(aL2, 2)+pow(aR2, 2);
+
+        bool doFill = !(
+          isnan(mesq_conserveDifermMass) || isinf(mesq_conserveDifermMass)
+          );
+
+        if (doFill){
+          float mh = samplePoleMasses[tree].first;
+          float gh = samplePoleMasses[tree].second;
+          float prop = 1./(pow(pow(GenHMass, 2) - pow(mh, 2), 2) + pow(mh*gh, 2));
+          wgt *= prop;
+
+          binList.at(bin).addEvent(mzz, mesq_conserveDifermMass, 0, wgt);
+        }
+
+        mela.resetInputEvent();
+        ev_acc++;
+      }
+
+      binList.at(bin).sift(); binList.at(bin).adjustWeights(10);
+
+      for (unsigned int ev=0; ev<binList.at(bin).masses.size(); ev++){
+        mzz = binList.at(bin).masses.at(ev);
+        mesq_conserveDifermMass = binList.at(bin).mevals.at(ev);
+        wgt = binList.at(bin).weights.at(ev);
+        hmesq_conserveDifermMass->Fill(mzz, mesq_conserveDifermMass);
+        hvar->Fill(mzz, mzz);
+        if (writeFinalTree) newtree->Fill();
+      }
+    }
+
+    double* xexyey[4];
+    for (int ix=0; ix<4; ix++) xexyey[ix] = new double[nbins];
+    for (int bin=0; bin<nbins; bin++){
+      xexyey[0][bin] = hvar->GetBinContent(bin+1);
+      xexyey[1][bin] = hvar->GetBinError(bin+1);
+
+      cout << "Bin " << bin << " x-center: " << xexyey[0][bin] << " +- " << xexyey[1][bin] << endl;
+
+      xexyey[2][bin] = hmesq_conserveDifermMass->GetBinContent(bin+1);
+      xexyey[3][bin] = hmesq_conserveDifermMass->GetBinError(bin+1);
+      xexyey[3][bin] = log10(xexyey[3][bin])/xexyey[2][bin];
+      xexyey[2][bin] = log10(xexyey[2][bin]);
+    }
+
+    TGraphErrors* tg = new TGraphErrors(nbins, xexyey[0], xexyey[2], xexyey[1], xexyey[3]);
+    tg->SetName(Form("tg_%s", hmesq_conserveDifermMass->GetName()));
+    foutput->WriteTObject(tg);
+    delete tg;
+
+    for (int ix=0; ix<4; ix++) delete[] xexyey[ix];
+
+    foutput->WriteTObject(hmesq_conserveDifermMass);
+    foutput->WriteTObject(hvar);
+    if (writeFinalTree) foutput->WriteTObject(newtree);
+    if (writeFinalTree) delete newtree;
+    delete hmesq_conserveDifermMass;
+    delete hvar;
+    delete[] binning;
+  }
+  foutput->Close();
+  for (unsigned int f=0; f<finputList.size(); f++) finputList.at(f)->Close();
+}
+
+/*
+SPECIFIC COMMENT: OUTPUT ME DIVIDED BY
+- ALPHAS(MZ)**2 TO REMAIN INDEPENDENT OF PDF CHOICE TO FIRST APPROXIMATION
+- (aL1**2+aR1**2)*(aL2**2+aR2**2) TO REMAIN INDEPENDENT OF CHANNEL
+*/
+void get_PAvgProfile_MCFM_JJQCD_bkgZZ_13TeV(int sqrts=13, bool recalculate = true){
+  int erg_tev=sqrts;
+  float mPOLE=125.;
+  TString TREE_NAME = "ZZTree/candTree";
+  TString COUNTERS_NAME = "ZZTree/Counters";
+  bool writeFinalTree=true;
+
+  TVar::Process proc = TVar::bkgZZ;
+  TVar::MatrixElement me = TVar::MCFM;
+  TVar::Production prod = TVar::JJQCD;
+
+  TString strproc = ProcessName(proc);
+  TString strme = MatrixElementName(me);
+  TString strprod = ProductionName(prod);
+
+  TVar::VerbosityLevel verbosity = TVar::ERROR;
+  Mela mela(erg_tev, mPOLE, verbosity);
+
+  std::vector<short>* LepLepId=0;
+  std::vector<float>* LepPt=0;
+  std::vector<float>* LepEta=0;
+  std::vector<float>* LepPhi=0;
+
+  short NJets30;
+  std::vector<float>* JetPt=0;
+  std::vector<float>* JetEta=0;
+  std::vector<float>* JetPhi=0;
+  std::vector<float>* JetMass=0;
+  std::vector<float> myJetPt;
+  std::vector<float> myJetEta;
+  std::vector<float> myJetPhi;
+  std::vector<float> myJetMass;
+
+  float mesq_calc=0., cconst_calc=1.;
+  float mesq_conserveDifermMass=0;
+  float mzz = 126.;
+  float m1 = 91.471450;
+  float m2 = 12.139782;
+  float h1 = 0.2682896;
+  float h2 = 0.1679779;
+  float phi = 1.5969792;
+  float hs = -0.727181;
+  float phi1 = 1.8828257;
+  float ZZPt, ZZPhi, ZZEta;
+  short Z1Flav, Z2Flav;
+  float xsec, ngen, genHEPMCweight;
+  float wgt=1;
+
+  TString cinput_main;
+  if (sqrts==13) cinput_main = inputdir_13TeV;
+  else return;
+
+  TString strchannel[3]={ "4mu", "4e", "2mu2e" };
+
+  vector<TString> strSamples = constructSamplesList("qq_Bkg", sqrts);
+
+  unordered_map<TTree*, pair<float, float>> nGenMap;
+  unordered_map<float, vector<TTree*>> mass_sample_map;
+
+  vector<TFile*> finputList;
+  vector<TTree*> treeList;
+  int nEntries=0;
+  for (unsigned int is=0; is<strSamples.size(); is++){
+    TString cinput = Form("%s/%s/ZZ4lAnalysis.root", cinput_main.Data(), (strSamples[is]).Data());
+    TFile* finput = TFile::Open(cinput, "read");
+    cout << "Opening file " << cinput << "..." << endl;
+    TTree* tree=0;
+    if (finput!=0){
+      if (finput->IsOpen() && !finput->IsZombie()){
+        cout << cinput << " opened. Extracting tree " << TREE_NAME << "..." << endl;
+        tree = (TTree*)finput->Get(TREE_NAME);
+        if (tree!=0){
+          cout << TREE_NAME << " is found." << endl;
+          //if (!recalculate && tree->GetBranchStatus("pConst_JJQCD_BKG_MCFM_JECNominal")==0) recalculate=true;
+          tree->SetBranchStatus("*", 0);
+          tree->SetBranchStatus("xsec", 1); tree->SetBranchAddress("xsec", &xsec);
+          tree->SetBranchStatus("genHEPMCweight", 1); tree->SetBranchAddress("genHEPMCweight", &genHEPMCweight);
+          tree->SetBranchStatus("nCleanedJetsPt30", 1); tree->SetBranchAddress("nCleanedJetsPt30", &NJets30);
+          tree->SetBranchStatus("JetPt", 1); tree->SetBranchAddress("JetPt", &JetPt);
+          tree->SetBranchStatus("JetEta", 1); tree->SetBranchAddress("JetEta", &JetEta);
+          tree->SetBranchStatus("JetPhi", 1); tree->SetBranchAddress("JetPhi", &JetPhi);
+          tree->SetBranchStatus("JetMass", 1); tree->SetBranchAddress("JetMass", &JetMass);
+          tree->SetBranchStatus("ZZMass", 1); tree->SetBranchAddress("ZZMass", &mzz);
+          tree->SetBranchStatus("ZZPt", 1); tree->SetBranchAddress("ZZPt", &ZZPt);
+          tree->SetBranchStatus("ZZEta", 1); tree->SetBranchAddress("ZZEta", &ZZEta);
+          tree->SetBranchStatus("ZZPhi", 1); tree->SetBranchAddress("ZZPhi", &ZZPhi);
+          tree->SetBranchStatus("Z1Mass", 1); tree->SetBranchAddress("Z1Mass", &m1);
+          tree->SetBranchStatus("Z2Mass", 1); tree->SetBranchAddress("Z2Mass", &m2);
+          tree->SetBranchStatus("helcosthetaZ1", 1); tree->SetBranchAddress("helcosthetaZ1", &h1);
+          tree->SetBranchStatus("helcosthetaZ2", 1); tree->SetBranchAddress("helcosthetaZ2", &h2);
+          tree->SetBranchStatus("helphi", 1); tree->SetBranchAddress("helphi", &phi);
+          tree->SetBranchStatus("costhetastar", 1); tree->SetBranchAddress("costhetastar", &hs);
+          tree->SetBranchStatus("phistarZ1", 1); tree->SetBranchAddress("phistarZ1", &phi1);
+          tree->SetBranchStatus("LepLepId", 1); tree->SetBranchAddress("LepLepId", &LepLepId);
+          tree->SetBranchStatus("LepPt", 1); tree->SetBranchAddress("LepPt", &LepPt);
+          tree->SetBranchStatus("LepEta", 1); tree->SetBranchAddress("LepEta", &LepEta);
+          tree->SetBranchStatus("LepPhi", 1); tree->SetBranchAddress("LepPhi", &LepPhi);
+          tree->SetBranchStatus("Z1Flav", 1); tree->SetBranchAddress("Z1Flav", &Z1Flav);
+          tree->SetBranchStatus("Z2Flav", 1); tree->SetBranchAddress("Z2Flav", &Z2Flav);
+          if (!recalculate){
+            tree->SetBranchStatus("p_JJQCD_BKG_MCFM_JECNominal", 1);
+            tree->SetBranchAddress("p_JJQCD_BKG_MCFM_JECNominal", &mesq_calc);
+            tree->SetBranchStatus("pConst_JJQCD_BKG_MCFM_JECNominal", 1);
+            tree->SetBranchAddress("pConst_JJQCD_BKG_MCFM_JECNominal", &cconst_calc);
+          }
+          tree->GetEntry(0);
+          cout << "Cross section = " << xsec << endl;
+
+          TH1F* htmp = (TH1F*)finput->Get(COUNTERS_NAME);
+          pair<float, float> nsum(htmp->GetBinContent(1), htmp->GetBinContent(41)); // No PU reweighting
+          nGenMap[tree]=nsum;
+
+          nEntries += tree->GetEntries();
+          treeList.push_back(tree);
+          finputList.push_back(finput);
+
+          float polemass = findPoleMass(strSamples[is]);
+          cout << "Pole mass = " << polemass << endl;
+          if (mass_sample_map.find(polemass)==mass_sample_map.end()){
+            cout << "Inserting new pole mass sample array" << endl;
+            vector<TTree*> dumarr;
+            mass_sample_map[polemass] = dumarr;
+          }
+          mass_sample_map[polemass].push_back(tree);
+        }
+        else if (finput->IsOpen()) finput->Close();
+      }
+    }
+  }
+  cout << "NEntries = " << nEntries << endl;
+
+  for (auto it = mass_sample_map.begin(); it != mass_sample_map.end(); ++it){
+    float sum_ngen=0;
+    float sum_xsec=0;
+    for (unsigned int ix=0; ix<it->second.size(); ix++){
+      it->second.at(ix)->GetEntry(0);
+      sum_ngen += nGenMap[it->second.at(ix)].first;
+      sum_xsec += xsec;
+    }
+    float overallWeight = sum_ngen/sum_xsec;
+    for (unsigned int ix=0; ix<it->second.size(); ix++){
+      cout << "Sum Hep MC weights in tree " << ix << " / " << it->second.size() << " was " << nGenMap[it->second.at(ix)].second << " over " << nGenMap[it->second.at(ix)].first << " total gen. events." << endl;
+      nGenMap[it->second.at(ix)].first = overallWeight/nGenMap[it->second.at(ix)].second;
+      cout << "Event scale for tree " << ix << " / " << it->second.size() << " at pole mass " << it->first << " = " << nGenMap[it->second.at(ix)].first << endl;
+    }
+  }
+
+  TFile* foutput = TFile::Open(Form("pAvgLinToLog_%s_%s_%s_%iTeV.root", strme.Data(), strprod.Data(), strproc.Data(), sqrts), "recreate");
+
+  vector<pair<float, int>> index[3];
+  unsigned ev_acc=0;
+  for (int ev=0; ev<nEntries; ev++){
+    getEntry(treeList, ev);
+    bool doProcess=
+      NJets30>=2 && (
+      Z1Flav*Z2Flav==pow(13, 4)
+      ||
+      Z1Flav*Z2Flav==pow(11, 4)
+      ||
+      Z1Flav*Z2Flav==pow(11*13, 2)
+      )
+      ;
+    if (!doProcess) continue;
+    if (ev_acc%10000==0) cout << "Pre-processing event " << ev << endl;
+    unsigned int ic = (Z1Flav*Z2Flav==pow(13, 4))*0 + (Z1Flav*Z2Flav==pow(11, 4))*1 + (Z1Flav*Z2Flav==pow(11*13, 2))*2;
+    addByLowest(index[ic], mzz, ev);
+    ev_acc++;
+  }
+
+  for (unsigned int ic=0; ic<3; ic++){
+    float firstVal=index[ic].at(0).first;
+    float lastVal=index[ic].at(index[ic].size()-1).first;
+    float infimum = (float)((int)firstVal); infimum -= (float)(((int)infimum)%10);
+    float supremum = (float)((int)(lastVal+0.5)); supremum += (float)(10-((int)supremum)%10);
+    cout << "Nentries = " << nEntries << " | mzz = " << firstVal << " - " << lastVal << "(" << infimum << ", " << supremum << ")" << endl;
+
+    float divisor=7500;
+    if (ic<2) divisor = 7500;
+    int nbins = index[ic].size()/divisor;
+    const int nbins_th=10/*50*/;
+    while (nbins<nbins_th){
+      if (divisor>1000) divisor -= 1000;
+      else if (divisor>100) divisor -= 100;
+      else break;
+      nbins=index[ic].size()/divisor;
+    }
+    cout << "nbins=" << nbins << endl;
+    if (nbins<3) cerr << "Not enough bins!" << endl;
+    vector<ExtBin> binList;
+    float* binning = new float[nbins+1];
+    binning[0]=infimum;
+    binning[nbins]=supremum;
+    int ev_stepsize = index[ic].size()/nbins;
+    cout << "Event step size: " << ev_stepsize << endl;
+    cout << "Boundary (" << 0 << ") = " << binning[0] << endl;
+    for (int ix=1; ix<nbins; ix++){
+      binning[ix]=(index[ic][ix*ev_stepsize-1].first+index[ic][ix*ev_stepsize].first)*0.5;
+      ExtBin tmpbin;
+      tmpbin.binlow = binning[ix-1];
+      tmpbin.binhigh = binning[ix];
+      for (int bin=0; bin<ev_stepsize; bin++) tmpbin.events.push_back(index[ic][(ix-1)*ev_stepsize+bin].second);
+      binList.push_back(tmpbin);
+      cout << "Boundary (" << ix << ")= " << binning[ix] << " [event " << index[ic][ix*ev_stepsize].second << ", step " << ix*ev_stepsize << "]" << endl;
+    }
+    ExtBin tmpbin;
+    tmpbin.binlow = binning[nbins-1];
+    tmpbin.binhigh = binning[nbins];
+    for (unsigned int bin=(nbins-1)*ev_stepsize; bin<index[ic].size(); bin++) tmpbin.events.push_back(index[ic][bin].second);
+    binList.push_back(tmpbin);
+    cout << "Boundary (" << nbins << ") = " << binning[nbins] << endl;
+    cout << "Bin list has the following bins:" << endl;
+    for (unsigned int ib=0; ib<binList.size(); ib++){
+      cout << ib << " / " << binList.size() << ": [" << binList.at(ib).binlow << "," << binList.at(ib).binhigh << "]" << endl;
+    }
+
+    TProfile* hvar = new TProfile(Form("candMass_%s", strchannel[ic].Data()), "", nbins, binning); hvar->Sumw2();
+    TProfile* hmesq_conserveDifermMass = new TProfile(Form("P_ConserveDifermionMass_%s", strchannel[ic].Data()), "", nbins, binning); hmesq_conserveDifermMass->Sumw2();
+
+    TTree* newtree=0;
+    if (writeFinalTree){
+      newtree = new TTree(Form("FinalTree_%s", strchannel[ic].Data()), "");
+      newtree->Branch("mesq_conserveDifermMass", &mesq_conserveDifermMass);
+      newtree->Branch("ZZMass", &mzz);
+      newtree->Branch("weight", &wgt);
+    }
+
+    mela.setCandidateDecayMode(TVar::CandidateDecay_ZZ);
+
+    double aL1=0, aR1=0, aL2=0, aR2=0;
+    double alphasVal=0;
+    unsigned int ev_acc=0;
+    for (unsigned int bin=0; bin<binList.size(); bin++){
+      cout << "Bin " << bin << " is now being scrutinized..." << endl;
+      for (unsigned int ev = 0; ev < binList.at(bin).events.size(); ev++){
+        int getEv = binList.at(bin).events.at(ev);
+        getEntry(treeList, getEv);
+        if (ev%1000==0) cout << "Doing event " << getEv << endl;
+        if (JetPt->size()<2 || JetEta->size()<2 || JetPhi->size()<2 || JetMass->size()<2){
+          cerr << "Jet array sizes are less than Njets!" << endl;
+          continue;
+        }
+        TTree* tree = findTree(treeList, getEv);
+        wgt = fabs(xsec*genHEPMCweight*nGenMap[tree].first);
+
+        TLorentzVector jet[2], higgs;
+        for (int ij=0; ij<2; ij++) jet[ij].SetPtEtaPhiM(JetPt->at(ij), JetEta->at(ij), JetPhi->at(ij), JetMass->at(ij));
+        higgs.SetPtEtaPhiM(ZZPt, ZZEta, ZZPhi, mzz);
+        TVector3 boostH = higgs.BoostVector();
+
+        SimpleParticleCollection_t associated;
+        associated.push_back(SimpleParticle_t(0, jet[0]));
+        associated.push_back(SimpleParticle_t(0, jet[1]));
+
+        SimpleParticleCollection_t daughters;
+        for (int id=0; id<4; id++){
+          double mass=0;
+          if (abs(LepLepId->at(id))==13) mass = 0.105658;
+          else if (abs(LepLepId->at(id))==11) mass = 0.000511;
+          TLorentzVector pDaughter;
+          pDaughter.SetPtEtaPhiM(LepPt->at(id), LepEta->at(id), LepPhi->at(id), mass);
+          daughters.push_back(SimpleParticle_t(LepLepId->at(id), pDaughter));
+        }
+        mela.setInputEvent(&daughters, &associated, (SimpleParticleCollection_t*)0, false);
+
+        mela.setProcess(proc, me, prod);
+
+        if (recalculate || ev_acc==0){
+          TUtil::setJetMassScheme(TVar::ConserveDifermionMass);
+          mela.computeProdP(mesq_conserveDifermMass, false);
+          if (!recalculate){
+            mesq_calc /= cconst_calc;
+            mesq_conserveDifermMass=mesq_calc;
+          }
+          mela.getIORecord()->getVDaughterCouplings(aL1, aR1, 0);
+          mela.getIORecord()->getVDaughterCouplings(aL2, aR2, 1);
+          alphasVal = mela.getIORecord()->getAlphaSatMZ();
+          if (ev_acc==0 && !recalculate){
+            cout << "\taL1, aR1, aL2, aR2 = " << aL1 << " , " << aR1 << " , " << aL2 << " , " << aR2 << endl;
+            cout << "\talphaS(mZ) = " << alphasVal << endl;
+          }
+        }
+        else{
+          mesq_calc /= cconst_calc;
+          mesq_conserveDifermMass=mesq_calc;
+        }
+        if (fabs(aL1)>0. || fabs(aR1)>0.) mesq_conserveDifermMass /= pow(aL1, 2)+pow(aR1, 2);
+        if (fabs(aL2)>0. || fabs(aR2)>0.) mesq_conserveDifermMass /= pow(aL2, 2)+pow(aR2, 2);
+        mesq_conserveDifermMass /= pow(alphasVal, 2);
+
+        double mz, gaz, propagator;
+        mz = mela.getPrimaryMass(23);
+        gaz = mela.getPrimaryWidth(23);
+        if (fabs(mzz-mz)<=4.*gaz){
+          double sh = pow(mzz, 2);
+          double shdn = pow(mz-4.*gaz, 2);
+          double shup = pow(mz+4.*gaz, 2);
+          double prop_sh = 1./(pow(sh-pow(mz, 2), 2) + pow(mz*gaz, 2));
+          double prop_shdn = 1./(pow(shdn-pow(mz, 2), 2) + pow(mz*gaz, 2));
+          double prop_shup = 1./(pow(shup-pow(mz, 2), 2) + pow(mz*gaz, 2));
+          double fsh = (sh-shdn)/(shup-shdn);
+          propagator = prop_sh / (prop_shdn*(1.-fsh) + prop_shup*fsh);
+        }
+        else propagator=1.;
+        mesq_conserveDifermMass /= propagator;
+
+        bool doFill = !(
+          isnan(mesq_conserveDifermMass) || isinf(mesq_conserveDifermMass)
+          );
+
+        if (doFill) binList.at(bin).addEvent(mzz, mesq_conserveDifermMass, 0, wgt);
+
+        mela.resetInputEvent();
+        ev_acc++;
+      }
+
+      binList.at(bin).sift(); binList.at(bin).adjustWeights(-1);
+
+      for (unsigned int ev=0; ev<binList.at(bin).masses.size(); ev++){
+        mzz = binList.at(bin).masses.at(ev);
+        mesq_conserveDifermMass = binList.at(bin).mevals.at(ev);
+        wgt = binList.at(bin).weights.at(ev);
+        hmesq_conserveDifermMass->Fill(mzz, mesq_conserveDifermMass);
+        hvar->Fill(mzz, mzz);
+        if (writeFinalTree) newtree->Fill();
+      }
+    }
+
+    double* xexyey[4];
+    for (int ix=0; ix<4; ix++) xexyey[ix] = new double[nbins];
+    for (int bin=0; bin<nbins; bin++){
+      xexyey[0][bin] = hvar->GetBinContent(bin+1);
+      xexyey[1][bin] = hvar->GetBinError(bin+1);
+
+      cout << "Bin " << bin << " x-center: " << xexyey[0][bin] << " +- " << xexyey[1][bin] << endl;
+
+      xexyey[2][bin] = hmesq_conserveDifermMass->GetBinContent(bin+1);
+      xexyey[3][bin] = hmesq_conserveDifermMass->GetBinError(bin+1);
+      xexyey[3][bin] = log10(xexyey[3][bin])/xexyey[2][bin];
+      xexyey[2][bin] = log10(xexyey[2][bin]);
+    }
+
+    TGraphErrors* tg = new TGraphErrors(nbins, xexyey[0], xexyey[2], xexyey[1], xexyey[3]);
+    tg->SetName(Form("tg_%s", hmesq_conserveDifermMass->GetName()));
+    foutput->WriteTObject(tg);
+    delete tg;
+
+    for (int ix=0; ix<4; ix++) delete[] xexyey[ix];
+
+    foutput->WriteTObject(hmesq_conserveDifermMass);
+    foutput->WriteTObject(hvar);
+    if (writeFinalTree) foutput->WriteTObject(newtree);
+    if (writeFinalTree) delete newtree;
+    delete hmesq_conserveDifermMass;
+    delete hvar;
+    delete[] binning;
+  }
+  foutput->Close();
+  for (unsigned int f=0; f<finputList.size(); f++) finputList.at(f)->Close();
+}
 
 
 /*
@@ -2220,6 +3552,8 @@ void get_PAvgProfile_JHUGen_ZZGG_HSMHiggs(){
     vector<TString> dumappend;
 
     vector<TString> strSamples_13TeV = constructSamplesList("JJQCD", 13.);
+    dumappend = constructSamplesList("JJVBF", 13.);
+    appendVector<TString>(strSamples_13TeV, dumappend);
     dumappend = constructSamplesList("gg_Sig_JHUGen", 13.);
     appendVector<TString>(strSamples_13TeV, dumappend);
     dumappend = constructSamplesList("gg_Sig_MCFM", 13.);
@@ -2228,6 +3562,8 @@ void get_PAvgProfile_JHUGen_ZZGG_HSMHiggs(){
     appendVector<TString>(strSamples_13TeV, dumappend);
 
     vector<TString> strSamples_8TeV = constructSamplesList("JJQCD", 8.);
+    dumappend = constructSamplesList("JJVBF", 8.);
+    appendVector<TString>(strSamples_8TeV, dumappend);
     dumappend = constructSamplesList("gg_Sig_JHUGen", 8.);
     appendVector<TString>(strSamples_8TeV, dumappend);
     dumappend = constructSamplesList("gg_Sig_MCFM", 8.);
@@ -2236,6 +3572,8 @@ void get_PAvgProfile_JHUGen_ZZGG_HSMHiggs(){
     appendVector<TString>(strSamples_8TeV, dumappend);
 
     vector<TString> strSamples_7TeV = constructSamplesList("JJQCD", 7.);
+    dumappend = constructSamplesList("JJVBF", 7.);
+    appendVector<TString>(strSamples_7TeV, dumappend);
     dumappend = constructSamplesList("gg_Sig_JHUGen", 7.);
     appendVector<TString>(strSamples_7TeV, dumappend);
     dumappend = constructSamplesList("gg_Sig_MCFM", 7.);
@@ -2460,8 +3798,6 @@ void get_PAvgProfile_JHUGen_ZZGG_HSMHiggs(){
         for (unsigned int idau=0; idau<4; idau++) daughters.push_back(SimpleParticle_t(LepID[idau], pDaughters[idau]));
         mela.setInputEvent(&daughters, (SimpleParticleCollection_t*)0, (SimpleParticleCollection_t*)0, false);
 
-        hvar->Fill(mzz, mzz);
-
         double alphasVal, propagator, mh, gah;
 
         mela.setProcess(proc, me, prod);
@@ -2489,7 +3825,7 @@ void get_PAvgProfile_JHUGen_ZZGG_HSMHiggs(){
         mela.resetInputEvent();
       }
 
-      binList.at(bin).sift();
+      binList.at(bin).sift(); binList.at(bin).adjustWeights();
 
       for (unsigned int ev=0; ev<binList.at(bin).masses.size(); ev++){
         mzz = binList.at(bin).masses.at(ev);
@@ -2580,6 +3916,8 @@ void get_PAvgProfile_MCFM_ZZGG_HSMHiggs(){
     vector<TString> dumappend;
 
     vector<TString> strSamples_13TeV = constructSamplesList("JJQCD", 13.);
+    dumappend = constructSamplesList("JJVBF", 13.);
+    appendVector<TString>(strSamples_13TeV, dumappend);
     dumappend = constructSamplesList("gg_Sig_JHUGen", 13.);
     appendVector<TString>(strSamples_13TeV, dumappend);
     dumappend = constructSamplesList("gg_Sig_MCFM", 13.);
@@ -2588,6 +3926,8 @@ void get_PAvgProfile_MCFM_ZZGG_HSMHiggs(){
     appendVector<TString>(strSamples_13TeV, dumappend);
 
     vector<TString> strSamples_8TeV = constructSamplesList("JJQCD", 8.);
+    dumappend = constructSamplesList("JJVBF", 8.);
+    appendVector<TString>(strSamples_8TeV, dumappend);
     dumappend = constructSamplesList("gg_Sig_JHUGen", 8.);
     appendVector<TString>(strSamples_8TeV, dumappend);
     dumappend = constructSamplesList("gg_Sig_MCFM", 8.);
@@ -2596,6 +3936,8 @@ void get_PAvgProfile_MCFM_ZZGG_HSMHiggs(){
     appendVector<TString>(strSamples_8TeV, dumappend);
 
     vector<TString> strSamples_7TeV = constructSamplesList("JJQCD", 7.);
+    dumappend = constructSamplesList("JJVBF", 7.);
+    appendVector<TString>(strSamples_7TeV, dumappend);
     dumappend = constructSamplesList("gg_Sig_JHUGen", 7.);
     appendVector<TString>(strSamples_7TeV, dumappend);
     dumappend = constructSamplesList("gg_Sig_MCFM", 7.);
@@ -2820,8 +4162,6 @@ void get_PAvgProfile_MCFM_ZZGG_HSMHiggs(){
         for (unsigned int idau=0; idau<4; idau++) daughters.push_back(SimpleParticle_t(LepID[idau], pDaughters[idau]));
         mela.setInputEvent(&daughters, (SimpleParticleCollection_t*)0, (SimpleParticleCollection_t*)0, false);
 
-        hvar->Fill(mzz, mzz);
-
         double alphasVal, propagator, mh, gah;
 
         mela.setProcess(proc, me, prod);
@@ -2849,7 +4189,7 @@ void get_PAvgProfile_MCFM_ZZGG_HSMHiggs(){
         mela.resetInputEvent();
       }
 
-      binList.at(bin).sift();
+      binList.at(bin).sift(); binList.at(bin).adjustWeights();
 
       for (unsigned int ev=0; ev<binList.at(bin).masses.size(); ev++){
         mzz = binList.at(bin).masses.at(ev);
@@ -2902,7 +4242,7 @@ void get_PAvgProfile_MCFM_ZZGG_bkgZZ(){
   int erg_tev=8;
   float mPOLE=125.;
   TString TREE_NAME;
-  const bool writeFinalTree=false;
+  const bool writeFinalTree=true;
 
   TVar::VerbosityLevel verbosity = TVar::ERROR;
   Mela mela(erg_tev, mPOLE, verbosity);
@@ -2931,8 +4271,11 @@ void get_PAvgProfile_MCFM_ZZGG_bkgZZ(){
   float hs = -0.727181;
   float phi1 = 1.8828257;
   float ZZPt, ZZPhi, ZZEta;
+  float wgt=1.;
+  float GenHMass;
   short Z1Flav, Z2Flav;
   int LepID[4];
+  short useWeighted;
 
   TString strchannel[3]={ "4mu", "4e", "2mu2e" };
   TFile* foutput = TFile::Open(Form("pAvgLinToLog_%s_%s_%s.root", strme.Data(), strprod.Data(), strproc.Data()), "recreate");
@@ -2951,7 +4294,16 @@ void get_PAvgProfile_MCFM_ZZGG_bkgZZ(){
     dumappend = constructSamplesList("gg_Bkg_ggVV", 7.);
     appendVector<TString>(strSamples_7TeV, dumappend);
 
-    const int nSamples = strSamples_13TeV.size() + strSamples_8TeV.size() + strSamples_7TeV.size();
+    // Consider if weights exist
+    unordered_map<TTree*, pair<float, float>> samplePoleMasses;
+
+    vector<TString> strSamples_weighted_13TeV = constructSamplesList("JJQCD", 13.);
+    dumappend = constructSamplesList("gg_Sig_JHUGen", 13.);
+    appendVector<TString>(strSamples_weighted_13TeV, dumappend);
+    dumappend = constructSamplesList("gg_Sig_MCFM", 13.);
+    appendVector<TString>(strSamples_weighted_13TeV, dumappend);
+    dumappend = constructSamplesList("gg_Sig_ggVV", 13.);
+    appendVector<TString>(strSamples_weighted_13TeV, dumappend);
 
     vector<TFile*> finputList;
     vector<TTree*> treeList;
@@ -2960,7 +4312,55 @@ void get_PAvgProfile_MCFM_ZZGG_bkgZZ(){
 
     TREE_NAME = "ZZTree/candTree";
     cinput_main = inputdir_13TeV;
-    //for (int is=0; is<2; is++){
+    //for (int is=0; is<1; is++){
+    for (int is=0; is<(int)strSamples_weighted_13TeV.size(); is++){
+      TString cinput = Form("%s/%s/ZZ4lAnalysis.root", cinput_main.Data(), (strSamples_weighted_13TeV[is]).Data());
+      TFile* finput = TFile::Open(cinput, "read");
+      cout << "Opening file " << cinput << "..." << endl;
+      TTree* tree=0;
+      if (finput!=0){
+        if (finput->IsOpen() && !finput->IsZombie()){
+          cout << cinput << " opened. Extracting tree " << TREE_NAME << "..." << endl;
+          tree = (TTree*)finput->Get(TREE_NAME);
+          if (tree!=0){
+            cout << TREE_NAME << " is found." << endl;
+            if (tree->GetBranchStatus("p_Gen_GG_BKG_MCFM")==1){
+              tree->SetBranchStatus("*", 0);
+              tree->SetBranchStatus("ZZMass", 1); tree->SetBranchAddress("ZZMass", &mzz);
+              tree->SetBranchStatus("Z1Mass", 1); tree->SetBranchAddress("Z1Mass", &m1);
+              tree->SetBranchStatus("Z2Mass", 1); tree->SetBranchAddress("Z2Mass", &m2);
+              tree->SetBranchStatus("helcosthetaZ1", 1); tree->SetBranchAddress("helcosthetaZ1", &h1);
+              tree->SetBranchStatus("helcosthetaZ2", 1); tree->SetBranchAddress("helcosthetaZ2", &h2);
+              tree->SetBranchStatus("helphi", 1); tree->SetBranchAddress("helphi", &phi);
+              tree->SetBranchStatus("costhetastar", 1); tree->SetBranchAddress("costhetastar", &hs);
+              tree->SetBranchStatus("phistarZ1", 1); tree->SetBranchAddress("phistarZ1", &phi1);
+              tree->SetBranchStatus("Z1Flav", 1); tree->SetBranchAddress("Z1Flav", &Z1Flav);
+              tree->SetBranchStatus("Z2Flav", 1); tree->SetBranchAddress("Z2Flav", &Z2Flav);
+              tree->SetBranchStatus("p_Gen_GG_BKG_MCFM", 1); tree->SetBranchAddress("p_Gen_GG_BKG_MCFM", &wgt);
+              tree->SetBranchStatus("GenHMass", 1); tree->SetBranchAddress("GenHMass", &GenHMass);
+              nEntries += tree->GetEntries();
+              treeList.push_back(tree);
+              finputList.push_back(finput);
+              
+              float polemass = findPoleMass(strSamples_weighted_13TeV[is]);
+              float polewidth = mela.getHiggsWidthAtPoleMass(polemass);
+              cout << strSamples_weighted_13TeV[is] << " pole mass = " << polemass << ", pole width = " << polewidth << endl;
+              samplePoleMasses[tree] = pair<float, float>(polemass, polewidth);
+            }
+            else{
+              cerr << TREE_NAME << " in " << cinput << " does not have weight p_Gen_GG_BKG_MCFM." << endl;
+              finput->Close();
+            }
+          }
+          else finput->Close();
+        }
+        else if (finput->IsOpen()) finput->Close();
+      }
+    }
+
+    TREE_NAME = "ZZTree/candTree";
+    cinput_main = inputdir_13TeV;
+    //for (int is=0; is<1; is++){
     for (int is=0; is<(int)strSamples_13TeV.size(); is++){
       TString cinput = Form("%s/%s/ZZ4lAnalysis.root", cinput_main.Data(), (strSamples_13TeV[is]).Data());
       TFile* finput = TFile::Open(cinput, "read");
@@ -2983,6 +4383,7 @@ void get_PAvgProfile_MCFM_ZZGG_bkgZZ(){
             tree->SetBranchStatus("phistarZ1", 1); tree->SetBranchAddress("phistarZ1", &phi1);
             tree->SetBranchStatus("Z1Flav", 1); tree->SetBranchAddress("Z1Flav", &Z1Flav);
             tree->SetBranchStatus("Z2Flav", 1); tree->SetBranchAddress("Z2Flav", &Z2Flav);
+            if (tree->GetBranchStatus("p_Gen_GG_BKG_MCFM")==1) cerr << "p_Gen_GG_BKG_MCFM status==1 should not happen!" << endl;
             nEntries += tree->GetEntries();
             treeList.push_back(tree);
             finputList.push_back(finput);
@@ -2994,7 +4395,7 @@ void get_PAvgProfile_MCFM_ZZGG_bkgZZ(){
     }
     TREE_NAME = "SelectedTree";
     cinput_main = inputdir_8TeV;
-    //for (int is=0; is<2; is++){
+    //for (int is=0; is<0; is++){
     for (int is=0; is<(int)strSamples_8TeV.size(); is++){
       TString cinput = Form("%s/%s/%s", cinput_main.Data(), strchannel[ic].Data(), (strSamples_8TeV[is]).Data());
       TFile* finput = TFile::Open(cinput, "read");
@@ -3027,7 +4428,7 @@ void get_PAvgProfile_MCFM_ZZGG_bkgZZ(){
       }
     }
     cinput_main = inputdir_7TeV;
-    //for (int is=0; is<2; is++){
+    //for (int is=0; is<0; is++){
     for (int is=0; is<(int)strSamples_7TeV.size(); is++){
       TString cinput = Form("%s/%s/%s", cinput_main.Data(), strchannel[ic].Data(), (strSamples_7TeV[is]).Data());
       TFile* finput = TFile::Open(cinput, "read");
@@ -3086,7 +4487,7 @@ void get_PAvgProfile_MCFM_ZZGG_bkgZZ(){
     float supremum = (float)((int)(lastVal+0.5)); supremum += (float)(10-((int)supremum)%10);
     cout << "Nentries = " << nEntries << " | mzz = " << firstVal << " - " << lastVal << "(" << infimum << ", " << supremum << ")" << endl;
 
-    float divisor=50000;
+    float divisor=85000;
     int nbins = index.size()/divisor;
     const int nbins_th=10/*50*/;
     while (nbins<nbins_th){
@@ -3098,6 +4499,7 @@ void get_PAvgProfile_MCFM_ZZGG_bkgZZ(){
     cout << "nbins=" << nbins << endl;
     if (nbins<3) cerr << "Not enough bins!" << endl;
     vector<ExtBin> binList;
+    vector<ExtBin> weightedBinList;
     float* binning = new float[nbins+1];
     binning[0]=infimum;
     binning[nbins]=supremum;
@@ -3106,24 +4508,38 @@ void get_PAvgProfile_MCFM_ZZGG_bkgZZ(){
     cout << "Boundary (" << 0 << ") = " << binning[0] << endl;
     for (int ix=1; ix<nbins; ix++){
       binning[ix]=(index[ix*ev_stepsize-1].first+index[ix*ev_stepsize].first)*0.5;
-      ExtBin tmpbin;
-      tmpbin.binlow = binning[ix-1];
-      tmpbin.binhigh = binning[ix];
-      for (int bin=0; bin<ev_stepsize; bin++) tmpbin.events.push_back(index[(ix-1)*ev_stepsize+bin].second);
+      ExtBin tmpbin, tmpbin_weighted;
+      tmpbin.binlow = binning[ix-1]; tmpbin.binhigh = binning[ix];
+      tmpbin_weighted.binlow = binning[ix-1]; tmpbin_weighted.binhigh = binning[ix];
+      for (int bin=0; bin<ev_stepsize; bin++){
+        int evid = index[(ix-1)*ev_stepsize+bin].second;
+        TTree* tree = findTree(treeList, evid);
+        if (tree->GetBranchStatus("p_Gen_GG_BKG_MCFM")==1) tmpbin_weighted.events.push_back(evid);
+        else tmpbin.events.push_back(evid);
+      }
       binList.push_back(tmpbin);
+      weightedBinList.push_back(tmpbin_weighted);
       cout << "Boundary (" << ix << ")= " << binning[ix] << " [event " << index[ix*ev_stepsize].second << ", step " << ix*ev_stepsize << "]" << endl;
     }
-    ExtBin tmpbin;
-    tmpbin.binlow = binning[nbins-1];
-    tmpbin.binhigh = binning[nbins];
-    for (unsigned int bin=(nbins-1)*ev_stepsize; bin<index.size(); bin++) tmpbin.events.push_back(index[bin].second);
+
+    ExtBin tmpbin, tmpbin_weighted;
+    tmpbin.binlow = binning[nbins-1]; tmpbin.binhigh = binning[nbins];
+    tmpbin_weighted.binlow = binning[nbins-1]; tmpbin_weighted.binhigh = binning[nbins];
+    for (unsigned int bin=(nbins-1)*ev_stepsize; bin<index.size(); bin++){
+      int evid = index[bin].second;
+      TTree* tree = findTree(treeList, evid);
+      if (tree->GetBranchStatus("p_Gen_GG_BKG_MCFM")==1) tmpbin_weighted.events.push_back(evid);
+      else tmpbin.events.push_back(evid);
+    }
     binList.push_back(tmpbin);
+    weightedBinList.push_back(tmpbin_weighted);
     cout << "Boundary (" << nbins << ") = " << binning[nbins] << endl;
     cout << "Bin list has the following bins:" << endl;
     for (unsigned int ib=0; ib<binList.size(); ib++){
       cout << ib << " / " << binList.size() << ": [" << binList.at(ib).binlow << "," << binList.at(ib).binhigh << "]" << endl;
     }
 
+    foutput->cd();
     TProfile* hvar = new TProfile(Form("candMass_%s", strchannel[ic].Data()), "", nbins, binning); hvar->Sumw2();
     TProfile* hmesq_conserveDifermMass = new TProfile(Form("P_ConserveDifermionMass_%s", strchannel[ic].Data()), "", nbins, binning); hmesq_conserveDifermMass->Sumw2();
 
@@ -3132,10 +4548,11 @@ void get_PAvgProfile_MCFM_ZZGG_bkgZZ(){
       newtree = new TTree(Form("FinalTree_%s", strchannel[ic].Data()), "");
       newtree->Branch("mesq_conserveDifermMass", &mesq_conserveDifermMass);
       newtree->Branch("ZZMass", &mzz);
+      newtree->Branch("weight", &wgt);
+      newtree->Branch("isWeighted", &useWeighted);
     }
 
     mela.setCandidateDecayMode(TVar::CandidateDecay_ZZ);
-
 
     if (ic==1){
       LepID[0]=11;
@@ -3156,9 +4573,17 @@ void get_PAvgProfile_MCFM_ZZGG_bkgZZ(){
 
     for (unsigned int bin=0; bin<binList.size(); bin++){
       cout << "Bin " << bin << " is now being scrutinized..." << endl;
-      for (unsigned int ev = 0; ev < binList.at(bin).events.size(); ev++){
-        int getEv = binList.at(bin).events.at(ev);
+      unsigned int nweighted = weightedBinList.at(bin).events.size();
+      unsigned int nunweighted = binList.at(bin).events.size();
+      unsigned int ntotal = nweighted + nunweighted;
+      for (unsigned int ev = 0; ev < ntotal; ev++){
+        int getEv;
+        bool isweighted = (ev<nweighted);
+        if (isweighted) getEv = weightedBinList.at(bin).events.at(ev);
+        else getEv = binList.at(bin).events.at(ev-nweighted);
+        wgt=1;
         getEntry(treeList, getEv);
+
         if (ev%1000==0) cout << "Doing event " << getEv << endl;
 
         TLorentzVector pDaughters[4];
@@ -3167,8 +4592,6 @@ void get_PAvgProfile_MCFM_ZZGG_bkgZZ(){
         SimpleParticleCollection_t daughters;
         for (unsigned int idau=0; idau<4; idau++) daughters.push_back(SimpleParticle_t(LepID[idau], pDaughters[idau]));
         mela.setInputEvent(&daughters, (SimpleParticleCollection_t*)0, (SimpleParticleCollection_t*)0, false);
-
-        hvar->Fill(mzz, mzz);
 
         double alphasVal;
 
@@ -3188,19 +4611,37 @@ void get_PAvgProfile_MCFM_ZZGG_bkgZZ(){
           isnan(mesq_conserveDifermMass) || isinf(mesq_conserveDifermMass)
           );
 
-        if (doFill) binList.at(bin).addEvent(mzz, mesq_conserveDifermMass, 0);
+        if (doFill){
+          if (isweighted){
+            TTree* tree = findTree(treeList, getEv);
 
-        if (writeFinalTree) newtree->Fill();
+            float mh = samplePoleMasses[tree].first;
+            float gh = samplePoleMasses[tree].second;
+            float prop = 1./(pow(pow(GenHMass, 2) - pow(mh, 2), 2) + pow(mh*gh, 2));
+            wgt *= prop;
+            weightedBinList.at(bin).addEvent(mzz, mesq_conserveDifermMass, 0, wgt);
+          }
+          else binList.at(bin).addEvent(mzz, mesq_conserveDifermMass, 0, 1.);
+        }
+
         mela.resetInputEvent();
       }
 
+      cout << "Adjusting weights in weighted samples" << endl;
+      weightedBinList.at(bin).adjustWeights();
+      cout << "Merging event info. from weighted samples" << endl;
+      binList.at(bin).mergeBin(weightedBinList.at(bin));
+      cout << "Sifting" << endl;
       binList.at(bin).sift();
 
       for (unsigned int ev=0; ev<binList.at(bin).masses.size(); ev++){
         mzz = binList.at(bin).masses.at(ev);
         mesq_conserveDifermMass = binList.at(bin).mevals.at(ev);
-        hmesq_conserveDifermMass->Fill(mzz, mesq_conserveDifermMass);
-        hvar->Fill(mzz, mzz);
+        wgt = binList.at(bin).weights.at(ev);
+        useWeighted = (wgt!=1.);
+        hmesq_conserveDifermMass->Fill(mzz, mesq_conserveDifermMass, wgt);
+        hvar->Fill(mzz, mzz, wgt);
+        if (writeFinalTree) newtree->Fill();
       }
     }
 
@@ -3500,8 +4941,6 @@ void get_PAvgProfile_MCFM_ZZQQB_bkgZZ(){
         for (unsigned int idau=0; idau<4; idau++) daughters.push_back(SimpleParticle_t(LepID[idau], pDaughters[idau]));
         mela.setInputEvent(&daughters, (SimpleParticleCollection_t*)0, (SimpleParticleCollection_t*)0, false);
 
-        hvar->Fill(mzz, mzz);
-
         double propagator, mz, gaz;
 
         mela.setProcess(proc, me, prod);
@@ -3518,8 +4957,8 @@ void get_PAvgProfile_MCFM_ZZQQB_bkgZZ(){
         gaz = mela.getPrimaryWidth(23);
         if (fabs(mzz-mz)<=4.*gaz){
           double sh = pow(mzz, 2);
-          double shdn = pow(mzz-4.*gaz, 2);
-          double shup = pow(mzz+4.*gaz, 2);
+          double shdn = pow(mz-4.*gaz, 2);
+          double shup = pow(mz+4.*gaz, 2);
           double prop_sh = 1./(pow(sh-pow(mz, 2), 2) + pow(mz*gaz, 2));
           double prop_shdn = 1./(pow(shdn-pow(mz, 2), 2) + pow(mz*gaz, 2));
           double prop_shup = 1./(pow(shup-pow(mz, 2), 2) + pow(mz*gaz, 2));
@@ -3539,7 +4978,7 @@ void get_PAvgProfile_MCFM_ZZQQB_bkgZZ(){
         mela.resetInputEvent();
       }
 
-      binList.at(bin).sift();
+      binList.at(bin).sift(); binList.at(bin).adjustWeights();
 
       for (unsigned int ev=0; ev<binList.at(bin).masses.size(); ev++){
         mzz = binList.at(bin).masses.at(ev);
@@ -3596,19 +5035,23 @@ void get_PAvgProfile_ANALYTICAL_ZZQQB_bkgZZ(){
   TString strme = MatrixElementName(me);
   TString strprod = ProductionName(prod);
 
+  double m1_low=40;
+  double m2_low=12;
+
   TFile* foutput = TFile::Open(Form("pAvgLinToLog_%s_%s_%s.root", strme.Data(), strprod.Data(), strproc.Data()), "recreate");
 
   cout << "Acquiring Mela measurables and pdf..." << endl;
   RooSpin::modelMeasurables measurables = mela.getMeasurablesRRV();
-  const double xrange[2]={ 70., 15000. };
-  //const double xrange[2]={ 250, 600. };
+  const double xrange[2]={ max(57., (double)((int)(m1_low+m2_low+0.5))), 15000. };
   vector<double> masses;
   double massmin=xrange[0];
   double mass=massmin;
   while (mass<=xrange[1]){
     masses.push_back(mass);
     double massinc;
-    if (mass<194.) massinc=2;
+    if (mass<90.) massinc=1;
+    else if (mass<122.) massinc=4;
+    else if (mass<194.) massinc=2;
     else if (mass<200.) massinc=3;
     else if (mass<600.) massinc=20.;
     else if (mass<1500.) massinc=100.;
@@ -3619,8 +5062,8 @@ void get_PAvgProfile_ANALYTICAL_ZZQQB_bkgZZ(){
   }
   const unsigned int npoints=masses.size();
   ((RooRealVar*)measurables.m12)->setRange(xrange[0], xrange[1]);
-  ((RooRealVar*)measurables.m1)->setRange(40, 120); ((RooRealVar*)measurables.m1)->setVal(40);
-  ((RooRealVar*)measurables.m2)->setRange(12, 120); ((RooRealVar*)measurables.m2)->setVal(12);
+  ((RooRealVar*)measurables.m1)->setRange(m1_low, 120); ((RooRealVar*)measurables.m1)->setVal(m1_low);
+  ((RooRealVar*)measurables.m2)->setRange(m2_low, 120); ((RooRealVar*)measurables.m2)->setVal(m2_low);
   double* xy[2];
   for (int i=0; i<2; i++) xy[i] = new double[npoints];
 
@@ -3682,20 +5125,22 @@ void get_PAvgProfile_ANALYTICAL_ZZGG_HSMHiggs(){
   TString strme = MatrixElementName(me);
   TString strprod = ProductionName(prod);
 
+  double m1_low=40;
+  double m2_low=12;
+
   TFile* foutput = TFile::Open(Form("pAvgLinToLog_%s_%s_%s.root", strme.Data(), strprod.Data(), strproc.Data()), "recreate");
 
   cout << "Acquiring Mela measurables and pdf..." << endl;
   RooSpin::modelMeasurables measurables = mela.getMeasurablesRRV();
-  const double xrange[2]={ 70., 15000. };
-  //const double xrange[2]={ 250, 600. };
+  const double xrange[2]={ max(57., (double)((int)(m1_low+m2_low+0.5))), 15000. };
   vector<double> masses;
   double massmin=xrange[0];
   double mass=massmin;
   while (mass<=xrange[1]){
     masses.push_back(mass);
     double massinc;
-    if (mass<105.) massinc=1;
-    else if (mass<197.) massinc=2;
+    if (mass<90.) massinc=1;
+    else if (mass<194.) massinc=2;
     else if (mass<200.) massinc=3;
     else if (mass<600.) massinc=20.;
     else if (mass<1500.) massinc=100.;
@@ -3706,8 +5151,8 @@ void get_PAvgProfile_ANALYTICAL_ZZGG_HSMHiggs(){
   }
   const unsigned int npoints=masses.size();
   ((RooRealVar*)measurables.m12)->setRange(xrange[0], xrange[1]);
-  ((RooRealVar*)measurables.m1)->setRange(40, 120); ((RooRealVar*)measurables.m1)->setVal(40);
-  ((RooRealVar*)measurables.m2)->setRange(12, 120); ((RooRealVar*)measurables.m2)->setVal(12);
+  ((RooRealVar*)measurables.m1)->setRange(m1_low, 120); ((RooRealVar*)measurables.m1)->setVal(m1_low);
+  ((RooRealVar*)measurables.m2)->setRange(m2_low, 120); ((RooRealVar*)measurables.m2)->setVal(m2_low);
   double* xy[2];
   for (int i=0; i<2; i++) xy[i] = new double[npoints];
 
@@ -4006,12 +5451,15 @@ TSpline3* convertGraphToSpline3(TGraph* tg, double* dfirst=0, double* dlast=0){
     tg->GetX(),
     tg->GetY()
   };
-  double derivative_first = (xy[1][1]-xy[1][0])/(xy[0][1]-xy[0][0]);
-  double derivative_last = (xy[1][nbins-1]-xy[1][nbins-2])/(xy[0][nbins-1]-xy[0][nbins-2]);
-  TSpline3* spline = new TSpline3("spline", tg, "b1e1", derivative_first, derivative_last);
+  //double derivative_first = (xy[1][1]-xy[1][0])/(xy[0][1]-xy[0][0]);
+  //double derivative_last = (xy[1][nbins-1]-xy[1][nbins-2])/(xy[0][nbins-1]-xy[0][nbins-2]);
+  //TSpline3* spline = new TSpline3("spline", tg, "b1e1", derivative_first, derivative_last);
+  TSpline3* spline = new TSpline3("spline", tg, "b2e2", 0, 0);
   spline->SetName(Form("sp_%s", tg->GetName()));
-  if (dfirst!=0) *dfirst=derivative_first;
-  if (dlast!=0) *dlast=derivative_last;
+  //if (dfirst!=0) *dfirst=derivative_first;
+  //if (dlast!=0) *dlast=derivative_last;
+  if (dfirst!=0) *dfirst = spline->Derivative(xy[0][0]);
+  if (dlast!=0) *dlast = spline->Derivative(xy[0][nbins-1]);
   return spline;
 }
 
@@ -4159,6 +5607,218 @@ TF1* getFcn_a0plusa1timesX(TSpline3* sp, double xmin, double xmax, bool useLowBo
   fcn->SetParameter(0, a0);
   fcn->SetParameter(1, a1);
 
+  return fcn;
+}
+
+/* SPECIFIC COMMENT: Get a1 and a2 as well as a TF1 object for the formula a0+a1*x+a2*x**2 */
+TF1* getFcn_a0plusa1timesXplusa2overX2(TSpline3* sp, double xmin, double xmax, bool useLowBound){
+  double x, y, s, d;
+  double xh, sh;
+  if (useLowBound){
+    x = sp->GetXmin();
+    xh = x+0.001;
+  }
+  else{
+    x = sp->GetXmax();
+    xh = x-0.001;
+  }
+  y = sp->Eval(x);
+  s = sp->Derivative(x);
+  sh = sp->Derivative(xh);
+  d = (sh-s)/(xh-x);
+
+  double a0, a1, a2;
+  a2 = d*pow(x, 4)/6.;
+  a1 = s+2.*a2/pow(x, 3);
+  a0 = y-a1*x-a2/pow(x, 2);
+
+  TString fcnName;
+  if (useLowBound) fcnName = Form("lowFcn_%s", sp->GetName());
+  else fcnName = Form("highFcn_%s", sp->GetName());
+  TF1* fcn = new TF1(fcnName, "[0]+[1]*x+[2]/pow(x, 2)", xmin, xmax);
+  fcn->SetParameter(0, a0);
+  fcn->SetParameter(1, a1);
+  fcn->SetParameter(2, a2);
+
+  return fcn;
+}
+
+/* SPECIFIC COMMENT: Get a1 and a2 as well as a TF1 object for the formula a0+a1*x+a2/x**2 */
+TF1* getFcn_a0plusa1timesXplusa2timesX2(TSpline3* sp, double xmin, double xmax, bool useLowBound){
+  double x, y, s, d;
+  double xh, sh;
+  if (useLowBound){
+    x = sp->GetXmin();
+    xh = x+0.001;
+  }
+  else{
+    x = sp->GetXmax();
+    xh = x-0.001;
+  }
+  y = sp->Eval(x);
+  s = sp->Derivative(x);
+  sh = sp->Derivative(xh);
+  d = (sh-s)/(xh-x);
+
+  double a0, a1, a2;
+  a2 = d/2.;
+  a1 = s-2.*a2*x;
+  a0 = y-a1*x-a2*pow(x, 2);
+
+  TString fcnName;
+  if (useLowBound) fcnName = Form("lowFcn_%s", sp->GetName());
+  else fcnName = Form("highFcn_%s", sp->GetName());
+  TF1* fcn = new TF1(fcnName, "[0]+[1]*x+[2]*pow(x, 2)", xmin, xmax);
+  fcn->SetParameter(0, a0);
+  fcn->SetParameter(1, a1);
+  fcn->SetParameter(2, a2);
+
+  return fcn;
+}
+
+/* SPECIFIC COMMENT: Get external input added by a0 and multiplied by a1 */
+TGraph* getPatch_a0a1(TSpline3* sp, TSpline3* sppatch, double xmin, double xmax, bool useLowBound){
+  double x, y, s;
+  double y_patch, s_patch;
+  if (useLowBound) x = sp->GetXmin();
+  else x = sp->GetXmax();
+  y = sp->Eval(x);
+  s = sp->Derivative(x);
+  y_patch = sppatch->Eval(x);
+  s_patch = sppatch->Derivative(x);
+
+  double a0, a1;
+  a1 = s/s_patch;
+  a0 = y-a1*y_patch;
+
+  int n = (xmax-xmin+0.5);
+  cout << "Patcher n: " << n << endl;
+  double xwidth = (xmax-xmin)/n;
+  double* xy[2];
+  for (unsigned int i=0; i<2; i++) xy[i]=new double[n+1];
+  for (int ip=0; ip<=n; ip++){
+    double xval = xmin+xwidth*ip;
+    double yval = sppatch->Eval(xval);
+    yval = a0+a1*yval;
+    xy[0][ip]=xval;
+    xy[1][ip]=yval;
+  }
+  TString fcnName;
+  if (useLowBound) fcnName = Form("lowFcn_%s", sp->GetName());
+  else fcnName = Form("highFcn_%s", sp->GetName());
+  TGraph* fcn = new TGraph(n+1, xy[0], xy[1]);
+  fcn->SetName(fcnName);
+
+  for (unsigned int i=0; i<2; i++) delete[] xy[i];
+  return fcn;
+}
+
+/* SPECIFIC COMMENT: Get external input added by a0+a1/x */
+TGraph* getPatch_a0plusa1overX(TSpline3* sp, TSpline3* sppatch, double xmin, double xmax, bool useLowBound){
+  double x, y, s;
+  if (useLowBound) x = sp->GetXmin();
+  else x = sp->GetXmax();
+  y = sp->Eval(x);
+  s = sp->Derivative(x);
+  y -= sppatch->Eval(x);
+  s -= sppatch->Derivative(x);
+
+  double a0, a1;
+  a0 = y+s*x;
+  a1 = -s*pow(x, 2);
+
+  int n = (xmax-xmin+0.5);
+  cout << "Patcher n: " << n << endl;
+  double xwidth = (xmax-xmin)/n;
+  double* xy[2];
+  for (unsigned int i=0; i<2; i++) xy[i]=new double[n+1];
+  for (int ip=0; ip<=n; ip++){
+    double xval = xmin+xwidth*ip;
+    if (xval==0.) xval += xwidth*0.5;
+    double yval = sppatch->Eval(xval);
+    yval += (a0+a1/xval);
+    xy[0][ip]=xval;
+    xy[1][ip]=yval;
+  }
+  TString fcnName;
+  if (useLowBound) fcnName = Form("lowFcn_%s", sp->GetName());
+  else fcnName = Form("highFcn_%s", sp->GetName());
+  TGraph* fcn = new TGraph(n+1, xy[0], xy[1]);
+  fcn->SetName(fcnName);
+
+  for (unsigned int i=0; i<2; i++) delete[] xy[i];
+  return fcn;
+}
+
+/* SPECIFIC COMMENT: Get external input added by a0+a1*x */
+TGraph* getPatch_a0plusa1timesX(TSpline3* sp, TSpline3* sppatch, double xmin, double xmax, bool useLowBound){
+  double x, y, s;
+  if (useLowBound) x = sp->GetXmin();
+  else x = sp->GetXmax();
+  y = sp->Eval(x);
+  s = sp->Derivative(x);
+  y -= sppatch->Eval(x);
+  s -= sppatch->Derivative(x);
+
+  double a0, a1;
+  a1 = s;
+  a0 = y-a1*x;
+
+  int n = (xmax-xmin+0.5);
+  cout << "Patcher n: " << n << endl;
+  double xwidth = (xmax-xmin)/n;
+  double* xy[2];
+  for (unsigned int i=0; i<2; i++) xy[i]=new double[n+1];
+  for (int ip=0; ip<=n; ip++){
+    double xval = xmin+xwidth*ip;
+    double yval = sppatch->Eval(xval);
+    yval += (a0+a1*xval);
+    xy[0][ip]=xval;
+    xy[1][ip]=yval;
+  }
+  TString fcnName;
+  if (useLowBound) fcnName = Form("lowFcn_%s", sp->GetName());
+  else fcnName = Form("highFcn_%s", sp->GetName());
+  TGraph* fcn = new TGraph(n+1, xy[0], xy[1]);
+  fcn->SetName(fcnName);
+
+  for (unsigned int i=0; i<2; i++) delete[] xy[i];
+  return fcn;
+}
+
+/* SPECIFIC COMMENT: Get external input added by a0*exp(a1*x) */
+TGraph* getPatch_a0expa1timesX(TSpline3* sp, TSpline3* sppatch, double xmin, double xmax, bool useLowBound){
+  double x, y, s;
+  if (useLowBound) x = sp->GetXmin();
+  else x = sp->GetXmax();
+  y = sp->Eval(x);
+  s = sp->Derivative(x);
+  y -= sppatch->Eval(x);
+  s -= sppatch->Derivative(x);
+
+  double a0, a1;
+  a1 = s/y;
+  a0 = y/exp(a1*x);
+
+  int n = (xmax-xmin+0.5);
+  cout << "Patcher n: " << n << endl;
+  double xwidth = (xmax-xmin)/n;
+  double* xy[2];
+  for (unsigned int i=0; i<2; i++) xy[i]=new double[n+1];
+  for (int ip=0; ip<=n; ip++){
+    double xval = xmin+xwidth*ip;
+    double yval = sppatch->Eval(xval);
+    yval += (a0*exp(a1*xval));
+    xy[0][ip]=xval;
+    xy[1][ip]=yval;
+  }
+  TString fcnName;
+  if (useLowBound) fcnName = Form("lowFcn_%s", sp->GetName());
+  else fcnName = Form("highFcn_%s", sp->GetName());
+  TGraph* fcn = new TGraph(n+1, xy[0], xy[1]);
+  fcn->SetName(fcnName);
+
+  for (unsigned int i=0; i<2; i++) delete[] xy[i];
   return fcn;
 }
 
@@ -4415,6 +6075,449 @@ TGraphErrors* addPointAfterBin(TGraphErrors* tgSlice, int abin){
   return tgSlice_new;
 }
 
+
+/* SPECIFIC COMMENT: NONE */
+void generic_PAvgSmoothProducer(
+  TVar::MatrixElement me, TVar::Production prod, TVar::Process proc,
+  TF1* (*lowf)(TSpline3*, double, double, bool),
+  TF1* (*highf)(TSpline3*, double, double, bool),
+  int sqrts=-1
+  ){
+  TString strme = MatrixElementName(me);
+  TString strprod = ProductionName(prod);
+  TString strproc = ProcessName(proc);
+  TString strsqrts="";
+  if (sqrts>0) strsqrts = Form("_%iTeV", sqrts);
+
+  TString strappend = Form("%s_%s_%s%s", strme.Data(), strprod.Data(), strproc.Data(), strsqrts.Data());
+
+  TFile* finput = TFile::Open(Form("pAvgLinToLog_%s%s", strappend.Data(), ".root"), "read");
+  TFile* foutput = TFile::Open(Form("pAvgSmooth_%s%s", strappend.Data(), ".root"), "recreate");
+  const unsigned int ngraphs=2;
+  TString strtg[ngraphs]={
+    "tg_P_ConserveDifermionMass",
+    "tg_P_MomentumToEnergy"
+  };
+  const double xmin=0;
+  const double xmax=(sqrts>0 ? (double)sqrts*1000. : 15000.);
+
+  for (unsigned int ig=0; ig<ngraphs; ig++){
+    finput->cd();
+    TGraphErrors* tg = 0;
+    tg = (TGraphErrors*)finput->Get(strtg[ig]);
+    if (tg==0){ cerr << strtg[ig] << " does not exist." << endl; continue; }
+    foutput->cd();
+    foutput->WriteTObject(tg);
+
+    int n = tg->GetN();
+    double* xx = tg->GetX();
+    double* ex = tg->GetEX();
+    double* yy = tg->GetY();
+    double* ey = tg->GetEY();
+
+    TSpline3* sp = convertGraphToSpline3(tg);
+    double tglow = xx[0];
+    double tghigh = xx[tg->GetN()-1];
+    TF1* lowFcn = lowf(sp, xmin, tglow, true);
+    TF1* highFcn = highf(sp, tghigh, xmax, false);
+    lowFcn->SetNpx((int)(tglow-xmin)*5);
+    highFcn->SetNpx((int)(xmax-tghigh)*5);
+
+    vector<pair<double, double>> points;
+    for (double xval=xmin; xval<tglow; xval+=1){
+      double yval = lowFcn->Eval(xval);
+      addByLowest<double, double>(points, xval, yval);
+    }
+    for (int ix=0; ix<n; ix++){
+      addByLowest<double, double>(points, xx[ix], yy[ix]);
+    }
+    int tghigh_int = ((int)((tghigh+1.)/100.+0.5))*100;
+    if (tghigh>=(double)tghigh_int) tghigh_int+=100;
+    for (double xval=tghigh_int; xval<=xmax; xval+=100){
+      double yval = highFcn->Eval(xval);
+      addByLowest<double, double>(points, xval, yval);
+    }
+
+    int nn_new = points.size();
+    cout << "Number of new points: " << nn_new-n << endl;
+    double* xy_new[2];
+    for (unsigned int i=0; i<2; i++) xy_new[i] = new double[nn_new];
+    for (int ix=0; ix<nn_new; ix++){
+      xy_new[0][ix] = points.at(ix).first;
+      xy_new[1][ix] = points.at(ix).second;
+    }
+
+    delete highFcn;
+    delete lowFcn;
+    delete sp;
+
+    TGraph* tg_updated = new TGraph(nn_new, xy_new[0], xy_new[1]);
+    tg_updated->SetName(Form("%s_Smooth", tg->GetName()));
+    foutput->WriteTObject(tg_updated);
+
+    sp = convertGraphToSpline3(tg_updated);
+    foutput->WriteTObject(sp);
+
+    TCanvas* ctest = new TCanvas(Form("test_%s", strtg[ig].Data()), "", 8, 30, 800, 800);
+    ctest->cd();
+    tg->GetXaxis()->SetRangeUser(xmin, xmax);
+    tg->Draw("ae1p");
+    sp->Draw("csame");
+    ctest->RedrawAxis();
+    ctest->Modified();
+    ctest->Update();
+    foutput->WriteTObject(ctest);
+    ctest->SaveAs(Form("%s%s", ctest->GetName(), ".pdf"));
+    ctest->Close();
+
+    delete sp;
+    delete tg_updated;
+    for (unsigned int i=0; i<2; i++) delete[] xy_new[i];
+  }
+  foutput->Close();
+  finput->Close();
+}
+
+/* SPECIFIC COMMENT: NONE */
+void generic_PAvgSmoothProducer_withDecay(
+  TVar::MatrixElement me, TVar::Production prod, TVar::Process proc,
+  TF1* (*lowf)(TSpline3*, double, double, bool),
+  TF1* (*highf)(TSpline3*, double, double, bool),
+  int sqrts=-1
+  ){
+  TString strme = MatrixElementName(me);
+  TString strprod = ProductionName(prod);
+  TString strproc = ProcessName(proc);
+  TString strsqrts="";
+  if (sqrts>0) strsqrts = Form("_%iTeV", sqrts);
+
+  TString strappend = Form("%s_%s_%s%s", strme.Data(), strprod.Data(), strproc.Data(), strsqrts.Data());
+
+  TFile* finput = TFile::Open(Form("pAvgLinToLog_%s%s", strappend.Data(), ".root"), "read");
+  TFile* foutput = TFile::Open(Form("pAvgSmooth_%s%s", strappend.Data(), ".root"), "recreate");
+  const unsigned int ngraphs=3;
+  TString strtg[ngraphs]={
+    "tg_P_ConserveDifermionMass_4mu",
+    "tg_P_ConserveDifermionMass_4e",
+    "tg_P_ConserveDifermionMass_2mu2e"
+  };
+  const double xmin=0;
+  const double xmax=(sqrts>0 ? (double)sqrts*1000. : 15000.);
+
+  for (unsigned int ig=0; ig<ngraphs; ig++){
+    finput->cd();
+    TGraphErrors* tg = 0;
+    tg = (TGraphErrors*)finput->Get(strtg[ig]);
+    if (tg==0){ cerr << strtg[ig] << " does not exist." << endl; continue; }
+    foutput->cd();
+    foutput->WriteTObject(tg);
+
+    int n = tg->GetN();
+    double* xx = tg->GetX();
+    double* ex = tg->GetEX();
+    double* yy = tg->GetY();
+    double* ey = tg->GetEY();
+
+    TSpline3* sp = convertGraphToSpline3(tg);
+    double tglow = xx[0];
+    double tghigh = xx[tg->GetN()-1];
+    TF1* lowFcn = lowf(sp, xmin, tglow, true);
+    TF1* highFcn = highf(sp, tghigh, xmax, false);
+    lowFcn->SetNpx((int)(tglow-xmin)*5);
+    highFcn->SetNpx((int)(xmax-tghigh)*5);
+
+    vector<pair<double, double>> points;
+    for (double xval=xmin; xval<tglow; xval+=1){
+      double yval = lowFcn->Eval(xval);
+      addByLowest<double, double>(points, xval, yval);
+    }
+    for (int ix=0; ix<n; ix++){
+      addByLowest<double, double>(points, xx[ix], yy[ix]);
+    }
+    int tghigh_int = ((int)((tghigh+1.)/100.+0.5))*100;
+    if (tghigh>=(double)tghigh_int) tghigh_int+=100;
+    for (double xval=tghigh_int; xval<=xmax; xval+=100){
+      double yval = highFcn->Eval(xval);
+      addByLowest<double, double>(points, xval, yval);
+    }
+
+    int nn_new = points.size();
+    cout << "Number of new points: " << nn_new-n << endl;
+    double* xy_new[2];
+    for (unsigned int i=0; i<2; i++) xy_new[i] = new double[nn_new];
+    for (int ix=0; ix<nn_new; ix++){
+      xy_new[0][ix] = points.at(ix).first;
+      xy_new[1][ix] = points.at(ix).second;
+    }
+
+    delete highFcn;
+    delete lowFcn;
+    delete sp;
+
+    TGraph* tg_updated = new TGraph(nn_new, xy_new[0], xy_new[1]);
+    tg_updated->SetName(Form("%s_Smooth", tg->GetName()));
+    foutput->WriteTObject(tg_updated);
+
+    sp = convertGraphToSpline3(tg_updated);
+    foutput->WriteTObject(sp);
+
+    TCanvas* ctest = new TCanvas(Form("test_%s", strtg[ig].Data()), "", 8, 30, 800, 800);
+    ctest->cd();
+    tg->GetXaxis()->SetRangeUser(xmin, xmax);
+    tg->Draw("ae1p");
+    sp->Draw("csame");
+    ctest->RedrawAxis();
+    ctest->Modified();
+    ctest->Update();
+    foutput->WriteTObject(ctest);
+    ctest->SaveAs(Form("%s%s", ctest->GetName(), ".pdf"));
+    ctest->Close();
+
+    delete sp;
+    delete tg_updated;
+    for (unsigned int i=0; i<2; i++) delete[] xy_new[i];
+  }
+  foutput->Close();
+  finput->Close();
+}
+
+  /* SPECIFIC COMMENT: NONE */
+void generic_PAvgSmoothProducer_withDecay(
+  TVar::MatrixElement me, TVar::Production prod, TVar::Process proc,
+  TString strpatchpath, TString strpatchname,
+  TGraph* (*lowpatcher)(TSpline3*, TSpline3*, double, double, bool),
+  TGraph* (*highpatcher)(TSpline3*, TSpline3*, double, double, bool),
+  int sqrts=-1
+  ){
+  TString strme = MatrixElementName(me);
+  TString strprod = ProductionName(prod);
+  TString strproc = ProcessName(proc);
+  TString strsqrts="";
+  if (sqrts>0) strsqrts = Form("_%iTeV", sqrts);
+
+  TString strappend = Form("%s_%s_%s%s", strme.Data(), strprod.Data(), strproc.Data(), strsqrts.Data());
+
+  TFile* finput = TFile::Open(Form("pAvgLinToLog_%s%s", strappend.Data(), ".root"), "read");
+  TFile* finput_patch = TFile::Open(strpatchpath, "read");
+  TFile* foutput = TFile::Open(Form("pAvgSmooth_%s%s", strappend.Data(), ".root"), "recreate");
+  const unsigned int ngraphs=3;
+  TString strtg[ngraphs]={
+    "tg_P_ConserveDifermionMass_4mu",
+    "tg_P_ConserveDifermionMass_4e",
+    "tg_P_ConserveDifermionMass_2mu2e"
+  };
+
+  TGraph* tgpatch = (TGraph*)finput_patch->Get(strpatchname);
+  TSpline3* sppatch = convertGraphToSpline3(tgpatch);
+
+  const double xmin=max(0., (tgpatch->GetX())[0]);
+  const double xmax=min((sqrts>0 ? (double)sqrts*1000. : 15000.), (tgpatch->GetX())[tgpatch->GetN()-1]);
+
+  for (unsigned int ig=0; ig<ngraphs; ig++){
+    finput->cd();
+    TGraphErrors* tg = 0;
+    tg = (TGraphErrors*)finput->Get(strtg[ig]);
+    if (tg==0){ cerr << strtg[ig] << " does not exist." << endl; continue; }
+    foutput->cd();
+    foutput->WriteTObject(tg);
+
+    int n = tg->GetN();
+    double* xx = tg->GetX();
+    double* ex = tg->GetEX();
+    double* yy = tg->GetY();
+    double* ey = tg->GetEY();
+
+    TSpline3* sp = convertGraphToSpline3(tg);
+    sp->SetName(Form("%s_initial", sp->GetName()));
+    foutput->WriteTObject(sp);
+    double tglow = xx[0];
+    double tghigh = xx[tg->GetN()-1];
+    cout << "Extracting low patch..." << endl;
+    TGraph* lowGraph = lowpatcher(sp, sppatch, xmin, tglow, true);
+    cout << "Extracting low patch..." << endl;
+    TGraph* highGraph = highpatcher(sp, sppatch, tghigh, xmax, false);
+    cout << "Converting patches to splines..." << endl;
+    TSpline3* lowFcn = convertGraphToSpline3(lowGraph);
+    TSpline3* highFcn = convertGraphToSpline3(highGraph);
+
+    vector<pair<double, double>> points;
+    for (double xval=xmin; xval<tglow; xval+=1){
+      double yval = lowFcn->Eval(xval);
+      addByLowest<double, double>(points, xval, yval);
+    }
+    for (int ix=0; ix<n; ix++){
+      addByLowest<double, double>(points, xx[ix], yy[ix]);
+    }
+    int tghigh_int = ((int)((tghigh+1.)/100.+0.5))*100;
+    if (tghigh>=(double)tghigh_int) tghigh_int+=100;
+    for (double xval=tghigh_int; xval<=xmax; xval+=100){
+      double yval = highFcn->Eval(xval);
+      addByLowest<double, double>(points, xval, yval);
+    }
+
+    int nn_new = points.size();
+    cout << "Number of new points: " << nn_new-n << endl;
+    double* xy_new[2];
+    for (unsigned int i=0; i<2; i++) xy_new[i] = new double[nn_new];
+    for (int ix=0; ix<nn_new; ix++){
+      xy_new[0][ix] = points.at(ix).first;
+      xy_new[1][ix] = points.at(ix).second;
+    }
+
+    delete highFcn;
+    delete lowFcn;
+    delete highGraph;
+    delete lowGraph;
+    delete sp;
+
+    TGraph* tg_updated = new TGraph(nn_new, xy_new[0], xy_new[1]);
+    tg_updated->SetName(Form("%s_Smooth", tg->GetName()));
+    foutput->WriteTObject(tg_updated);
+
+    sp = convertGraphToSpline3(tg_updated);
+    foutput->WriteTObject(sp);
+
+    TCanvas* ctest = new TCanvas(Form("test_%s", strtg[ig].Data()), "", 8, 30, 800, 800);
+    ctest->cd();
+    tg->GetXaxis()->SetRangeUser(xmin, xmax);
+    tg->Draw("ae1p");
+    sp->Draw("csame");
+    ctest->RedrawAxis();
+    ctest->Modified();
+    ctest->Update();
+    foutput->WriteTObject(ctest);
+    ctest->SaveAs(Form("%s%s", ctest->GetName(), ".pdf"));
+    ctest->Close();
+
+    delete sp;
+    delete tg_updated;
+    for (unsigned int i=0; i<2; i++) delete[] xy_new[i];
+  }
+
+  delete sppatch;
+  foutput->Close();
+  finput_patch->Close();
+  finput->Close();
+}
+
+/* SPECIFIC COMMENT: NONE */
+void generic_PAvgSmoothProducer_withDecay(
+  TVar::MatrixElement me, TVar::Production prod, TVar::Process proc,
+  TString strpatchpath, TString strpatchname,
+  TF1* (*lowf)(TSpline3*, double, double, bool),
+  TGraph* (*highpatcher)(TSpline3*, TSpline3*, double, double, bool),
+  int sqrts=-1
+  ){
+  TString strme = MatrixElementName(me);
+  TString strprod = ProductionName(prod);
+  TString strproc = ProcessName(proc);
+  TString strsqrts="";
+  if (sqrts>0) strsqrts = Form("_%iTeV", sqrts);
+
+  TString strappend = Form("%s_%s_%s%s", strme.Data(), strprod.Data(), strproc.Data(), strsqrts.Data());
+
+  TFile* finput = TFile::Open(Form("pAvgLinToLog_%s%s", strappend.Data(), ".root"), "read");
+  TFile* finput_patch = TFile::Open(strpatchpath, "read");
+  TFile* foutput = TFile::Open(Form("pAvgSmooth_%s%s", strappend.Data(), ".root"), "recreate");
+  const unsigned int ngraphs=3;
+  TString strtg[ngraphs]={
+    "tg_P_ConserveDifermionMass_4mu",
+    "tg_P_ConserveDifermionMass_4e",
+    "tg_P_ConserveDifermionMass_2mu2e"
+  };
+
+  TGraph* tgpatch = (TGraph*)finput_patch->Get(strpatchname);
+  TSpline3* sppatch = convertGraphToSpline3(tgpatch);
+
+  const double xmin=max(0., (tgpatch->GetX())[0]);
+  const double xmax=min((sqrts>0 ? (double)sqrts*1000. : 15000.), (tgpatch->GetX())[tgpatch->GetN()-1]);
+
+  for (unsigned int ig=0; ig<ngraphs; ig++){
+    finput->cd();
+    TGraphErrors* tg = 0;
+    tg = (TGraphErrors*)finput->Get(strtg[ig]);
+    if (tg==0){ cerr << strtg[ig] << " does not exist." << endl; continue; }
+    foutput->cd();
+    foutput->WriteTObject(tg);
+
+    int n = tg->GetN();
+    double* xx = tg->GetX();
+    double* ex = tg->GetEX();
+    double* yy = tg->GetY();
+    double* ey = tg->GetEY();
+
+    TSpline3* sp = convertGraphToSpline3(tg);
+    sp->SetName(Form("%s_initial", sp->GetName()));
+    foutput->WriteTObject(sp);
+    double tglow = xx[0];
+    double tghigh = xx[tg->GetN()-1];
+    cout << "Extracting high patch..." << endl;
+    TGraph* highGraph = highpatcher(sp, sppatch, tghigh, xmax, false);
+    cout << "Converting patches to splines..." << endl;
+    TSpline3* highFcn = convertGraphToSpline3(highGraph);
+
+    TF1* lowFcn = lowf(sp, xmin, tglow, true);
+    lowFcn->SetNpx((int)(tglow-xmin)*5);
+
+    vector<pair<double, double>> points;
+    for (double xval=xmin; xval<tglow; xval+=1){
+      double yval = lowFcn->Eval(xval);
+      addByLowest<double, double>(points, xval, yval);
+    }
+    for (int ix=0; ix<n; ix++){
+      addByLowest<double, double>(points, xx[ix], yy[ix]);
+    }
+    int tghigh_int = ((int)((tghigh+1.)/100.+0.5))*100;
+    if (tghigh>=(double)tghigh_int) tghigh_int+=100;
+    for (double xval=tghigh_int; xval<=xmax; xval+=100){
+      double yval = highFcn->Eval(xval);
+      addByLowest<double, double>(points, xval, yval);
+    }
+
+    int nn_new = points.size();
+    cout << "Number of new points: " << nn_new-n << endl;
+    double* xy_new[2];
+    for (unsigned int i=0; i<2; i++) xy_new[i] = new double[nn_new];
+    for (int ix=0; ix<nn_new; ix++){
+      xy_new[0][ix] = points.at(ix).first;
+      xy_new[1][ix] = points.at(ix).second;
+    }
+
+    delete lowFcn;
+    delete highFcn;
+    delete highGraph;
+    delete sp;
+
+    TGraph* tg_updated = new TGraph(nn_new, xy_new[0], xy_new[1]);
+    tg_updated->SetName(Form("%s_Smooth", tg->GetName()));
+    foutput->WriteTObject(tg_updated);
+
+    sp = convertGraphToSpline3(tg_updated);
+    foutput->WriteTObject(sp);
+
+    TCanvas* ctest = new TCanvas(Form("test_%s", strtg[ig].Data()), "", 8, 30, 800, 800);
+    ctest->cd();
+    tg->GetXaxis()->SetRangeUser(xmin, xmax);
+    tg->Draw("ae1p");
+    sp->Draw("csame");
+    ctest->RedrawAxis();
+    ctest->Modified();
+    ctest->Update();
+    foutput->WriteTObject(ctest);
+    ctest->SaveAs(Form("%s%s", ctest->GetName(), ".pdf"));
+    ctest->Close();
+
+    delete sp;
+    delete tg_updated;
+    for (unsigned int i=0; i<2; i++) delete[] xy_new[i];
+  }
+
+  delete sppatch;
+  foutput->Close();
+  finput_patch->Close();
+  finput->Close();
+}
+
 /* SPECIFIC COMMENT: NONE */
 void produce_PAvgSmooth_MCFM_JJQCD_bkgZJets_2l2q(int sqrts=13){
   TFile* finput = new TFile(Form("pAvgLinToLog_MCFM_JJQCD_bkgZJets_%iTeV_2l2q.root", sqrts), "read");
@@ -4475,645 +6578,140 @@ void produce_PAvgSmooth_MCFM_JJQCD_bkgZJets_2l2q(int sqrts=13){
 
 /* SPECIFIC COMMENT: NONE */
 void produce_PAvgSmooth_JHUGen_JJVBF_HSMHiggs(int sqrts=8){
-  TFile* finput = new TFile(Form("pAvgLinToLog_JHUGen_JJVBF_HSMHiggs_%iTeV.root", sqrts), "read");
-  TFile* foutput = new TFile(Form("pAvgSmooth_JHUGen_JJVBF_HSMHiggs_%iTeV.root", sqrts), "recreate");
-  const unsigned int ngraphs=2;
-  TString strtg[ngraphs]={
-    "tg_P_ConserveDifermionMass",
-    "tg_P_MomentumToEnergy"
-  };
-
-  for (unsigned int ig=0; ig<ngraphs; ig++){
-    finput->cd();
-    TGraphErrors* tg = 0;
-    tg = (TGraphErrors*)finput->Get(strtg[ig]);
-    if (tg==0){ cerr << strtg[ig] << " does not exist." << endl; continue; }
-    foutput->cd();
-    foutput->WriteTObject(tg);
-    tg->SetName(Form("%s_Smooth", tg->GetName()));
-
-    TGraphErrors* tg_new=0;
-    if (sqrts==13){
-      tg_new = replacePointsBetween(tg, 123, 132); tg=tg_new;
-    }
-    regularizeSlice(tg);
-    foutput->WriteTObject(tg);
-
-    TSpline3* sp = convertGraphToSpline3(tg);
-    TF1* lowFcn = getFcn_a0plusa1timesX(sp, 0, (tg->GetX())[0], true);
-    TF1* highFcn = getFcn_a0plusa1timesX(sp, (tg->GetX())[tg->GetN()-1], 20000., false);
-    lowFcn->SetNpx(1000);
-    highFcn->SetNpx(10000);
-
-    foutput->WriteTObject(sp);
-    foutput->WriteTObject(lowFcn);
-    foutput->WriteTObject(highFcn);
-
-    TCanvas* ctest = new TCanvas("test", "", 8, 30, 800, 800);
-    ctest->cd();
-    tg->GetXaxis()->SetRangeUser(0, 20000);
-    tg->Draw("ae1p");
-    sp->Draw("csame");
-    lowFcn->Draw("csame");
-    highFcn->Draw("csame");
-    ctest->RedrawAxis();
-    ctest->Modified();
-    ctest->Update();
-    foutput->WriteTObject(ctest);
-    ctest->Close();
-
-    delete highFcn;
-    delete lowFcn;
-    delete sp;
-    if (tg_new!=0) delete tg_new;
-  }
-  foutput->Close();
-  finput->Close();
+  TVar::MatrixElement me = TVar::JHUGen;
+  TVar::Production prod = TVar::JJVBF;
+  TVar::Process proc = TVar::HSMHiggs;
+  generic_PAvgSmoothProducer(
+    me, prod, proc,
+    &getFcn_a0plusa1timesX,
+    &getFcn_a0plusa1timesX,
+    sqrts
+    );
 }
 
 /* SPECIFIC COMMENT: NONE */
 void produce_PAvgSmooth_JHUGen_JJQCD_HSMHiggs(int sqrts=8){
-  TFile* finput = new TFile(Form("pAvgLinToLog_JHUGen_JJQCD_HSMHiggs_%iTeV.root", sqrts), "read");
-  TFile* foutput = new TFile(Form("pAvgSmooth_JHUGen_JJQCD_HSMHiggs_%iTeV.root", sqrts), "recreate");
-  const unsigned int ngraphs=2;
-  TString strtg[ngraphs]={
-    "tg_P_ConserveDifermionMass",
-    "tg_P_MomentumToEnergy"
-  };
-
-  for (unsigned int ig=0; ig<ngraphs; ig++){
-    finput->cd();
-    TGraphErrors* tg = 0;
-    tg = (TGraphErrors*)finput->Get(strtg[ig]);
-    if (tg==0){ cerr << strtg[ig] << " does not exist." << endl; continue; }
-    foutput->cd();
-    foutput->WriteTObject(tg);
-    tg->SetName(Form("%s_Smooth", tg->GetName()));
-
-    TGraphErrors* tg_new = 0;
-    if (sqrts==7){
-      if (ig==0){
-        tg_new = replacePointsBetween(tg, 520., 540.); tg=tg_new;
-      }
-      else{
-        tg_new = replacePointsBetween(tg, 520., 540.); tg=tg_new;
-      }
-    }
-    else if (sqrts==8){
-      if (ig==0){
-        tg_new = replacePointsBetween(tg, 190., 210.); tg=tg_new;
-        tg_new = replacePointsBetween(tg, 360., 400.); delete tg; tg=tg_new;
-        tg_new = replacePointsBetween(tg, 440., 460.); delete tg; tg=tg_new;
-        tg_new = replacePointsBetween(tg, 640., 720.); delete tg; tg=tg_new;
-      }
-      else{
-        tg_new = replacePointsBetween(tg, 120., 130.); tg=tg_new;
-        tg_new = replacePointsBetween(tg, 190., 210.); delete tg; tg=tg_new;
-        tg_new = replacePointsBetween(tg, 360., 400.); delete tg; tg=tg_new;
-        tg_new = replacePointsBetween(tg, 440., 460.); delete tg; tg=tg_new;
-        tg_new = replacePointsBetween(tg, 630., 720.); delete tg; tg=tg_new;
-      }
-    }
-    else if (sqrts==13){
-      if (ig==0){
-        tg_new = replacePointsBetween(tg, 123., 126.); tg=tg_new;
-        tg_new = replacePointsBetween(tg, 155., 175.); delete tg; tg=tg_new;
-        tg_new = replacePointsBetween(tg, 185., 230.); delete tg; tg=tg_new;
-        tg_new = replacePointsBetween(tg, 340., 380.); delete tg; tg=tg_new;
-        tg_new = replacePointsBetween(tg, 900., 940.); delete tg; tg=tg_new;
-      }
-      else{
-        tg_new = replacePointsBetween(tg, 123., 126.); tg=tg_new;
-        tg_new = replacePointsBetween(tg, 160., 165.); delete tg; tg=tg_new;
-        tg_new = replacePointsBetween(tg, 174., 230.); delete tg; tg=tg_new;
-        tg_new = replacePointsBetween(tg, 340., 380.); delete tg; tg=tg_new;
-        tg_new = replacePointsBetween(tg, 900., 940.); delete tg; tg=tg_new;
-      }
-    }
-    /*
-    std::vector<double> fixedX;
-
-    if (sqrts==7){
-
-    }
-    else if (sqrts==8){
-      fixedX.push_back(170.);
-      fixedX.push_back(250.);
-      fixedX.push_back(350.);
-      fixedX.push_back(420.);
-      fixedX.push_back(500.);
-      if (ig==0) fixedX.push_back(640.);
-      else fixedX.push_back(600.);
-      fixedX.push_back(750.);
-      fixedX.push_back(800.);
-    }
-    else if (sqrts==13){
-
-    }
-    */
-    //regularizeSlice(tg, &fixedX);
-
-    regularizeSlice(tg);
-    foutput->WriteTObject(tg);
-
-    TSpline3* sp = convertGraphToSpline3(tg);
-    TF1* lowFcn = getFcn_a0plusa1overX(sp, 0, (tg->GetX())[0], true);
-    TF1* highFcn = getFcn_a0plusa1timesX(sp, (tg->GetX())[tg->GetN()-1], 20000., false);
-    lowFcn->SetNpx(1000);
-    highFcn->SetNpx(10000);
-
-    foutput->WriteTObject(sp);
-    foutput->WriteTObject(lowFcn);
-    foutput->WriteTObject(highFcn);
-
-    TCanvas* ctest = new TCanvas("test", "", 8, 30, 800, 800);
-    ctest->cd();
-    tg->GetXaxis()->SetRangeUser(0, 20000);
-    tg->Draw("ae1p");
-    sp->Draw("csame");
-    lowFcn->Draw("csame");
-    highFcn->Draw("csame");
-    ctest->RedrawAxis();
-    ctest->Modified();
-    ctest->Update();
-    foutput->WriteTObject(ctest);
-    ctest->Close();
-
-    delete highFcn;
-    delete lowFcn;
-    delete sp;
-    if (tg_new!=0) delete tg_new;
-  }
-  foutput->Close();
-  finput->Close();
+  TVar::MatrixElement me = TVar::JHUGen;
+  TVar::Production prod = TVar::JJQCD;
+  TVar::Process proc = TVar::HSMHiggs;
+  generic_PAvgSmoothProducer(
+    me, prod, proc,
+    &getFcn_a0plusa1timesX,
+    &getFcn_a0plusa1overX,
+    sqrts
+    );
 }
 
 /* SPECIFIC COMMENT: NONE */
 void produce_PAvgSmooth_JHUGen_JQCD_HSMHiggs(int sqrts=8){
-  TFile* finput = new TFile(Form("pAvgLinToLog_JHUGen_JQCD_HSMHiggs_%iTeV.root", sqrts), "read");
-  TFile* foutput = new TFile(Form("pAvgSmooth_JHUGen_JQCD_HSMHiggs_%iTeV.root", sqrts), "recreate");
-  const unsigned int ngraphs=2;
-  TString strtg[ngraphs]={
-    "tg_P_ConserveDifermionMass",
-    "tg_P_MomentumToEnergy"
-  };
-
-  for (unsigned int ig=0; ig<ngraphs; ig++){
-    finput->cd();
-    TGraphErrors* tg = 0;
-    tg = (TGraphErrors*)finput->Get(strtg[ig]);
-    if (tg==0){ cerr << strtg[ig] << " does not exist." << endl; continue; }
-    foutput->cd();
-    foutput->WriteTObject(tg);
-    tg->SetName(Form("%s_Smooth", tg->GetName()));
-
-    double precision = 0.001;
-    std::vector<double> fixedX;
-    TGraphErrors* tg_new = 0;
-    if (sqrts==7){
-      tg_new = replacePointsBetween(tg, 191., 205.); tg=tg_new;
-      tg_new = replacePointsBetween(tg, 335., 385.); delete tg; tg=tg_new;
-      tg_new = replacePointsBetween(tg, 780., 800.); delete tg; tg=tg_new;
-
-      fixedX.push_back(150.);
-      fixedX.push_back(248.);
-      fixedX.push_back(260.);
-      fixedX.push_back(445.);
-      fixedX.push_back(480.);
-      fixedX.push_back(525.);
-
-      precision = 0.001;
-    }
-    else if (sqrts==8){
-      tg_new = replacePointsBetween(tg, 117., 165.); tg=tg_new;
-      tg_new = replacePointsBetween(tg, 292, 305.); delete tg; tg=tg_new;
-      tg_new = replacePointsBetween(tg, 560., 610.); delete tg; tg=tg_new;
-
-      fixedX.push_back(460.);
-      fixedX.push_back(490.);
-
-      precision = 0.001;
-    }
-    else if (sqrts==13){
-      tg_new = replacePointsBetween(tg, 120., 138.); tg=tg_new;
-      tg_new = replacePointsBetween(tg, 145., 152.); delete tg; tg=tg_new;
-      tg_new = replacePointsBetween(tg, 180., 190.); delete tg; tg=tg_new;
-      tg_new = replacePointsBetween(tg, 310., 530.); delete tg; tg=tg_new;
-
-      fixedX.push_back(300.);
-      fixedX.push_back(550.);
-
-      precision = 0.0008;
-    }
-    regularizeSlice(tg, &fixedX, 0., 50000, precision);
-    foutput->WriteTObject(tg);
-
-    TSpline3* sp = convertGraphToSpline3(tg);
-    TF1* lowFcn = getFcn_a0plusa1overX(sp, 0, (tg->GetX())[0], true);
-    TF1* highFcn = getFcn_a0plusa1timesX(sp, (tg->GetX())[tg->GetN()-1], 20000., false);
-    lowFcn->SetNpx(1000);
-    highFcn->SetNpx(10000);
-
-    foutput->WriteTObject(sp);
-    foutput->WriteTObject(lowFcn);
-    foutput->WriteTObject(highFcn);
-
-    TCanvas* ctest = new TCanvas("test", "", 8, 30, 800, 800);
-    ctest->cd();
-    tg->GetXaxis()->SetRangeUser(0, 20000);
-    tg->Draw("ae1p");
-    sp->Draw("csame");
-    lowFcn->Draw("csame");
-    highFcn->Draw("csame");
-    ctest->RedrawAxis();
-    ctest->Modified();
-    ctest->Update();
-    foutput->WriteTObject(ctest);
-    ctest->Close();
-
-    delete highFcn;
-    delete lowFcn;
-    delete sp;
-    if (tg_new!=0) delete tg_new;
-  }
-  foutput->Close();
-  finput->Close();
+  TVar::MatrixElement me = TVar::JHUGen;
+  TVar::Production prod = TVar::JQCD;
+  TVar::Process proc = TVar::HSMHiggs;
+  generic_PAvgSmoothProducer(
+    me, prod, proc,
+    &getFcn_a0plusa1timesX,
+    &getFcn_a0plusa1overX,
+    sqrts
+    );
 }
 
-/* SPECIFIC COMMENT: SOME BINS ARE FIXED TO GET A MORE REPRESENTATIVE SMOOTHING */
+/* SPECIFIC COMMENT: PATCHING DONE USING ANALYTICAL ggH PDF */
 void produce_get_PAvgSmooth_JHUGen_ZZGG_HSMHiggs(){
-  TFile* finput = new TFile("pAvgLinToLog_JHUGen_ZZGG_HSMHiggs.root", "read");
-  TFile* foutput = new TFile("pAvgSmooth_JHUGen_ZZGG_HSMHiggs.root", "recreate");
-  const unsigned int ngraphs=3;
-  TString strtg[ngraphs]={
-    "tg_P_ConserveDifermionMass_4mu",
-    "tg_P_ConserveDifermionMass_4e",
-    "tg_P_ConserveDifermionMass_2mu2e"
-  };
-
-  for (unsigned int ig=0; ig<ngraphs; ig++){
-    finput->cd();
-    TGraphErrors* tg = 0;
-    tg = (TGraphErrors*)finput->Get(strtg[ig]);
-    if (tg==0){ cerr << strtg[ig] << " does not exist." << endl; continue; }
-    foutput->cd();
-    foutput->WriteTObject(tg);
-    tg->SetName(Form("%s_Smooth", tg->GetName()));
-    std::vector<double> fixedX;
-    if (ig==0){
-      fixedX.push_back(106.);
-      fixedX.push_back(123.);
-    }
-    else if (ig==1){
-      fixedX.push_back(108.);
-      fixedX.push_back(128.);
-    }
-    else if (ig==2){
-      fixedX.push_back(106.);
-      fixedX.push_back(128.);
-    }
-    regularizeSlice(tg, &fixedX);
-    foutput->WriteTObject(tg);
-
-    TSpline3* sp = convertGraphToSpline3(tg);
-    TF1* lowFcn = getFcn_a0plusa1overX(sp, 0, (tg->GetX())[0], true);
-    TF1* highFcn = getFcn_a0plusa1overX(sp, (tg->GetX())[tg->GetN()-1], 20000., false);
-    lowFcn->SetNpx(1000);
-    highFcn->SetNpx(10000);
-
-    foutput->WriteTObject(sp);
-    foutput->WriteTObject(lowFcn);
-    foutput->WriteTObject(highFcn);
-
-    TCanvas* ctest = new TCanvas("test", "", 8, 30, 800, 800);
-    ctest->cd();
-    tg->GetXaxis()->SetRangeUser(0, 20000);
-    tg->Draw("ae1p");
-    sp->Draw("csame");
-    lowFcn->Draw("csame");
-    highFcn->Draw("csame");
-    ctest->RedrawAxis();
-    ctest->Modified();
-    ctest->Update();
-    foutput->WriteTObject(ctest);
-    ctest->Close();
-
-    delete highFcn;
-    delete lowFcn;
-    delete sp;
-  }
-  foutput->Close();
-  finput->Close();
+  TVar::MatrixElement me = TVar::JHUGen;
+  TVar::Production prod = TVar::ZZGG;
+  TVar::Process proc = TVar::HSMHiggs;
+  generic_PAvgSmoothProducer_withDecay(
+    me, prod, proc,
+    "../data/pAvgLinToLog_ANALYTICAL_ZZGG_HSMHiggs.root", "tg_anaPdfInt",
+    &getPatch_a0plusa1timesX,
+    &getPatch_a0plusa1overX,
+    -1
+    );
 }
 
-/* SPECIFIC COMMENT: SOME BINS ARE FIXED TO GET A MORE REPRESENTATIVE SMOOTHING */
+/* SPECIFIC COMMENT: PATCHING DONE USING ANALYTICAL ggH PDF */
 void produce_get_PAvgSmooth_MCFM_ZZGG_HSMHiggs(){
-  TFile* finput = new TFile("pAvgLinToLog_MCFM_ZZGG_HSMHiggs.root", "read");
-  TFile* foutput = new TFile("pAvgSmooth_MCFM_ZZGG_HSMHiggs.root", "recreate");
-  const unsigned int ngraphs=3;
-  TString strtg[ngraphs]={
-    "tg_P_ConserveDifermionMass_4mu",
-    "tg_P_ConserveDifermionMass_4e",
-    "tg_P_ConserveDifermionMass_2mu2e"
-  };
-
-  for (unsigned int ig=0; ig<ngraphs; ig++){
-    finput->cd();
-    TGraphErrors* tg = 0;
-    tg = (TGraphErrors*)finput->Get(strtg[ig]);
-    if (tg==0){ cerr << strtg[ig] << " does not exist." << endl; continue; }
-    foutput->cd();
-    foutput->WriteTObject(tg);
-    tg->SetName(Form("%s_Smooth", tg->GetName()));
-    std::vector<double> fixedX;
-    if (ig==0){
-      fixedX.push_back(106.);
-      fixedX.push_back(123.);
-      fixedX.push_back(170.);
-      fixedX.push_back(187.);
-      fixedX.push_back(198.);
-      fixedX.push_back(250.);
-      fixedX.push_back(305.);
-    }
-    else if (ig==1){
-      fixedX.push_back(108.);
-      fixedX.push_back(128.);
-      fixedX.push_back(165.);
-      fixedX.push_back(185.);
-      fixedX.push_back(195.);
-      fixedX.push_back(250.);
-      fixedX.push_back(300.);
-    }
-    else if (ig==2){
-      fixedX.push_back(106.);
-      fixedX.push_back(128.);
-      fixedX.push_back(170.);
-      fixedX.push_back(183.);
-      //fixedX.push_back(188.);
-      fixedX.push_back(198.);
-      //fixedX.push_back(252.);
-    }
-    regularizeSlice(tg, &fixedX);
-    foutput->WriteTObject(tg);
-
-    TSpline3* sp = convertGraphToSpline3(tg);
-    TF1* lowFcn = getFcn_a0plusa1overX(sp, 0, (tg->GetX())[0], true);
-    TF1* highFcn = getFcn_a0plusa1overX(sp, (tg->GetX())[tg->GetN()-1], 20000., false);
-    lowFcn->SetNpx(1000);
-    highFcn->SetNpx(10000);
-
-    foutput->WriteTObject(sp);
-    foutput->WriteTObject(lowFcn);
-    foutput->WriteTObject(highFcn);
-
-    TCanvas* ctest = new TCanvas("test", "", 8, 30, 800, 800);
-    ctest->cd();
-    tg->GetXaxis()->SetRangeUser(0, 20000);
-    tg->Draw("ae1p");
-    sp->Draw("csame");
-    lowFcn->Draw("csame");
-    highFcn->Draw("csame");
-    ctest->RedrawAxis();
-    ctest->Modified();
-    ctest->Update();
-    foutput->WriteTObject(ctest);
-    ctest->Close();
-
-    delete highFcn;
-    delete lowFcn;
-    delete sp;
-  }
-  foutput->Close();
-  finput->Close();
+  TVar::MatrixElement me = TVar::MCFM;
+  TVar::Production prod = TVar::ZZGG;
+  TVar::Process proc = TVar::HSMHiggs;
+  generic_PAvgSmoothProducer_withDecay(
+    me, prod, proc,
+    "../data/pAvgLinToLog_ANALYTICAL_ZZGG_HSMHiggs.root", "tg_anaPdfInt",
+    &getPatch_a0plusa1timesX,
+    &getPatch_a0plusa1overX,
+    -1
+    );
 }
 
-/* SPECIFIC COMMENT: SOME BINS ARE FIXED TO GET A MORE REPRESENTATIVE SMOOTHING */
+/* SPECIFIC COMMENT: PATCHING DONE USING ANALYTICAL QQZZ PDF */
 void produce_get_PAvgSmooth_MCFM_ZZGG_bkgZZ(){
-  TFile* finput = new TFile("pAvgLinToLog_MCFM_ZZGG_bkgZZ.root", "read");
-  TFile* foutput = new TFile("pAvgSmooth_MCFM_ZZGG_bkgZZ.root", "recreate");
-  const unsigned int ngraphs=3;
-  TString strtg[ngraphs]={
-    "tg_P_ConserveDifermionMass_4mu",
-    "tg_P_ConserveDifermionMass_4e",
-    "tg_P_ConserveDifermionMass_2mu2e"
-  };
-
-  for (unsigned int ig=0; ig<ngraphs; ig++){
-    finput->cd();
-    TGraphErrors* tg = 0;
-    tg = (TGraphErrors*)finput->Get(strtg[ig]);
-    if (tg==0){ cerr << strtg[ig] << " does not exist." << endl; continue; }
-    foutput->cd();
-    foutput->WriteTObject(tg);
-    tg->SetName(Form("%s_Smooth", tg->GetName()));
-    std::vector<double> fixedX;
-    if (ig==0){
-      fixedX.push_back(130.);
-      fixedX.push_back(140.);
-      fixedX.push_back(156.);
-      fixedX.push_back(170.);
-      fixedX.push_back(175.);
-      fixedX.push_back(183.);
-      fixedX.push_back(186.);
-      fixedX.push_back(191.);
-      fixedX.push_back(195.);
-      fixedX.push_back(197.);
-      fixedX.push_back(204.);
-    }
-    else if (ig==1){
-      fixedX.push_back(140.);
-      fixedX.push_back(160.);
-      fixedX.push_back(175.);
-      fixedX.push_back(183.);
-      fixedX.push_back(186.);
-      fixedX.push_back(193.);
-      fixedX.push_back(199.);
-      fixedX.push_back(206.);
-      fixedX.push_back(217.);
-    }
-    else if (ig==2){
-      fixedX.push_back(150.);
-      fixedX.push_back(160.);
-      fixedX.push_back(170.);
-      fixedX.push_back(175.);
-      fixedX.push_back(183.);
-      fixedX.push_back(185.);
-      fixedX.push_back(187.5);
-      fixedX.push_back(193.);
-      fixedX.push_back(199.);
-    }
-    regularizeSlice(tg, &fixedX);
-    foutput->WriteTObject(tg);
-
-    TSpline3* sp = convertGraphToSpline3(tg);
-    TF1* lowFcn = getFcn_a0plusa1expX(sp, 0, (tg->GetX())[0], true);
-    TF1* highFcn = getFcn_a0plusXPinvminusXpsqinv(sp, (tg->GetX())[tg->GetN()-1], 20000., false);
-    lowFcn->SetNpx(1000);
-    highFcn->SetNpx(10000);
-
-    foutput->WriteTObject(sp);
-    foutput->WriteTObject(lowFcn);
-    foutput->WriteTObject(highFcn);
-
-    TCanvas* ctest = new TCanvas("test", "", 8, 30, 800, 800);
-    ctest->cd();
-    tg->GetXaxis()->SetRangeUser(0, 20000);
-    tg->Draw("ae1p");
-    sp->Draw("csame");
-    lowFcn->Draw("csame");
-    highFcn->Draw("csame");
-    ctest->RedrawAxis();
-    ctest->Modified();
-    ctest->Update();
-    foutput->WriteTObject(ctest);
-    ctest->Close();
-
-    delete highFcn;
-    delete lowFcn;
-    delete sp;
-  }
-  foutput->Close();
-  finput->Close();
+  TVar::MatrixElement me = TVar::MCFM;
+  TVar::Production prod = TVar::ZZGG;
+  TVar::Process proc = TVar::bkgZZ;
+  generic_PAvgSmoothProducer_withDecay(
+    me, prod, proc,
+    "../data/pAvgLinToLog_ANALYTICAL_ZZQQB_bkgZZ.root", "tg_anaPdfInt",
+    &getPatch_a0plusa1timesX,
+    &getPatch_a0plusa1overX,
+    -1
+    );
 }
 
-/* SPECIFIC COMMENT: SOME BINS ARE FIXED TO GET A MORE REPRESENTATIVE SMOOTHING */
+/* SPECIFIC COMMENT: PATCHING DONE USING ANALYTICAL QQZZ PDF */
 void produce_get_PAvgSmooth_MCFM_ZZQQB_bkgZZ(){
-  TFile* finput = new TFile("pAvgLinToLog_MCFM_ZZQQB_bkgZZ.root", "read");
-  TFile* foutput = new TFile("pAvgSmooth_MCFM_ZZQQB_bkgZZ.root", "recreate");
-  const unsigned int ngraphs=3;
-  TString strtg[ngraphs]={
-    "tg_P_ConserveDifermionMass_4mu",
-    "tg_P_ConserveDifermionMass_4e",
-    "tg_P_ConserveDifermionMass_2mu2e"
-  };
-
-  for (unsigned int ig=0; ig<ngraphs; ig++){
-    finput->cd();
-    TGraphErrors* tg = 0;
-    tg = (TGraphErrors*)finput->Get(strtg[ig]);
-    if (tg==0){ cerr << strtg[ig] << " does not exist." << endl; continue; }
-    foutput->cd();
-    foutput->WriteTObject(tg);
-    tg->SetName(Form("%s_Smooth", tg->GetName()));
-    std::vector<double> fixedX;
-
-    if (ig==0){
-      fixedX.push_back(196.);
-      fixedX.push_back(209.);
-      fixedX.push_back(230.);
-      fixedX.push_back(300.);
-      fixedX.push_back(360.);
-      fixedX.push_back(450.);
-    }
-    else if (ig==1){
-      fixedX.push_back(195.);
-      fixedX.push_back(204.);
-      fixedX.push_back(213.);
-      fixedX.push_back(430.);
-    }
-    else if (ig==2){
-      fixedX.push_back(201.);
-      fixedX.push_back(212.);
-      fixedX.push_back(230.);
-      fixedX.push_back(420.);
-    }
-
-    double omitbelow;
-    if (ig==0){
-      omitbelow=192.;
-    }
-    else if (ig==1){
-      omitbelow=189.;
-    }
-    else if (ig==2){
-      omitbelow=192.;
-    }
-    regularizeSlice(tg, &fixedX, omitbelow);
-    // How to kill an artificial peak
-    TGraphErrors* tg_new = 0;
-    if (ig==0){
-      tg = replacePointsBetween(tg, 102., 160.);
-      (tg->GetY())[11] *= 0.99;
-      (tg->GetEY())[11] *= 0.99;
-      (tg->GetY())[18] *= 0.99;
-      (tg->GetEY())[18] *= 0.99;
-      tg_new = addPointAfterBin(tg, 11); delete tg; tg=tg_new;
-      (tg->GetY())[12] *= 1.004;
-      (tg->GetEY())[12] *= 1.004;
-      tg_new = addPointAfterBin(tg, 17+1); delete tg; tg=tg_new;
-      (tg->GetY())[19] *= 1.004;
-      (tg->GetEY())[19] *= 1.004;
-      tg_new = addPointAfterBin(tg, 19); delete tg; tg=tg_new;
-      (tg->GetY())[21] *= 0.996;
-      (tg->GetEY())[21] *= 0.996;
-    }
-    else if (ig==1){
-      tg = replacePointsBetween(tg, 110., 160.);
-      (tg->GetY())[8] *= 0.993;
-      (tg->GetEY())[8] *= 0.993;
-      (tg->GetY())[15] *= 0.993;
-      (tg->GetEY())[15] *= 0.993;
-      tg_new = addPointAfterBin(tg, 8); delete tg; tg=tg_new;
-      (tg->GetY())[9] *= 1.004;
-      (tg->GetEY())[9] *= 1.004;
-      tg_new = addPointAfterBin(tg, 14+1); delete tg; tg=tg_new;
-      (tg->GetY())[16] *= 1.004;
-      (tg->GetEY())[16] *= 1.004;
-      tg_new = addPointAfterBin(tg, 16); delete tg; tg=tg_new;
-      (tg->GetY())[18] *= 0.996;
-      (tg->GetEY())[18] *= 0.996;
-    }
-    else if (ig==2){
-      tg = replacePointsBetween(tg, 110., 160.);
-      (tg->GetY())[5] *= 1.;
-      (tg->GetEY())[5] *= 1.;
-      (tg->GetY())[11] *= 0.977;
-      (tg->GetEY())[11] *= 0.977;
-      tg_new = addPointAfterBin(tg, 5); delete tg; tg=tg_new;
-      (tg->GetY())[6] *= 1.002;
-      (tg->GetEY())[6] *= 1.002;
-      tg_new = addPointAfterBin(tg, 6); delete tg; tg=tg_new;
-      tg_new = addPointAfterBin(tg, 10+2); delete tg; tg=tg_new;
-      (tg->GetY())[12+1] *= 1.004;
-      (tg->GetEY())[12+1] *= 1.004;
-      tg_new = addPointAfterBin(tg, 11+2); delete tg; tg=tg_new;
-      (tg->GetY())[14+1] *= 0.996;
-      (tg->GetEY())[14+1] *= 0.996;
-    }
-    foutput->WriteTObject(tg);
-
-    TSpline3* sp = convertGraphToSpline3(tg);
-    TF1* lowFcn = getFcn_a0plusa1overX(sp, 0, (tg->GetX())[0], true);
-    TF1* highFcn = getFcn_a0plusXPinvminusXpsqinv(sp, (tg->GetX())[tg->GetN()-1], 20000., false);
-    lowFcn->SetNpx(1000);
-    highFcn->SetNpx(10000);
-
-    foutput->WriteTObject(sp);
-    foutput->WriteTObject(lowFcn);
-    foutput->WriteTObject(highFcn);
-
-    TCanvas* ctest = new TCanvas("test", "", 8, 30, 800, 800);
-    ctest->cd();
-    tg->GetXaxis()->SetRangeUser(0, 20000);
-    tg->Draw("ae1p");
-    sp->Draw("csame");
-    lowFcn->Draw("csame");
-    highFcn->Draw("csame");
-    ctest->RedrawAxis();
-    ctest->Modified();
-    ctest->Update();
-    foutput->WriteTObject(ctest);
-    ctest->Close();
-
-    delete highFcn;
-    delete lowFcn;
-    delete sp;
-    delete tg;
-  }
-  foutput->Close();
-  finput->Close();
+  TVar::MatrixElement me = TVar::MCFM;
+  TVar::Production prod = TVar::ZZQQB;
+  TVar::Process proc = TVar::bkgZZ;
+  generic_PAvgSmoothProducer_withDecay(
+    me, prod, proc,
+    "../data/pAvgLinToLog_ANALYTICAL_ZZQQB_bkgZZ.root","tg_anaPdfInt",
+    &getPatch_a0plusa1timesX,
+    &getPatch_a0plusa1overX,
+    -1
+    );
 }
 
+/* SPECIFIC COMMENT: PATCHING DONE USING ANALYTICAL ggH PDF */
+void produce_get_PAvgSmooth_MCFM_JJEW_HSMHiggs(int sqrts=13){
+  TVar::MatrixElement me = TVar::MCFM;
+  TVar::Production prod = TVar::JJEW;
+  TVar::Process proc = TVar::HSMHiggs;
+  generic_PAvgSmoothProducer_withDecay(
+    me, prod, proc,
+    "../data/pAvgLinToLog_ANALYTICAL_ZZGG_HSMHiggs.root", "tg_anaPdfInt",
+    &getPatch_a0plusa1timesX,
+    &getPatch_a0plusa1overX,
+    sqrts
+    );
+}
+
+/* SPECIFIC COMMENT: PATCHING DONE USING ANALYTICAL QQZZ PDF */
+void produce_get_PAvgSmooth_MCFM_JJEW_bkgZZ(int sqrts=13){
+  TVar::MatrixElement me = TVar::MCFM;
+  TVar::Production prod = TVar::JJEW;
+  TVar::Process proc = TVar::bkgZZ;
+  generic_PAvgSmoothProducer_withDecay(
+    me, prod, proc,
+    "../data/pAvgLinToLog_ANALYTICAL_ZZQQB_bkgZZ.root", "tg_anaPdfInt",
+    &getFcn_a0plusa1expX,
+    &getPatch_a0plusa1overX,
+    sqrts
+    );
+}
+
+/* SPECIFIC COMMENT: PATCHING DONE USING ANALYTICAL QQZZ PDF */
+void produce_get_PAvgSmooth_MCFM_JJQCD_bkgZZ(int sqrts=13){
+  TVar::MatrixElement me = TVar::MCFM;
+  TVar::Production prod = TVar::JJQCD;
+  TVar::Process proc = TVar::bkgZZ;
+  generic_PAvgSmoothProducer_withDecay(
+    me, prod, proc,
+    "../data/pAvgLinToLog_ANALYTICAL_ZZQQB_bkgZZ.root", "tg_anaPdfInt",
+    &getPatch_a0plusa1timesX,
+    &getPatch_a0plusa1overX,
+    sqrts
+    );
+}
 
 
 void check_JJVBF_vs_JJQCD_7or8TeV(int sqrts=8){

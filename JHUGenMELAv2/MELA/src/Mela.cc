@@ -293,6 +293,7 @@ void Mela::resetMCFM_EWKParameters(double ext_Gf, double ext_aemmz, double ext_m
 
 double Mela::getPrimaryMass(int ipart){ return ZZME->get_PrimaryMass(ipart); }
 double Mela::getPrimaryWidth(int ipart){ return ZZME->get_PrimaryWidth(ipart); }
+double Mela::getHiggsWidthAtPoleMass(double mass){ return ZZME->get_HiggsWidthAtPoleMass(mass); }
 
 void Mela::setRemoveLeptonMasses(bool MasslessLeptonSwitch){ TUtil::applyLeptonMassCorrection(MasslessLeptonSwitch); }
 void Mela::setRemoveJetMasses(bool MasslessLeptonSwitch){ TUtil::applyJetMassCorrection(MasslessLeptonSwitch); }

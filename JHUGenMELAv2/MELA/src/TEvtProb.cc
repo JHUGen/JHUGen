@@ -351,6 +351,10 @@ double TEvtProb::GetPrimaryWidth(int ipart){
   if (PDGHelpers::isAHiggs(ipart)) return myCSW_->HiggsWidth(GetPrimaryHiggsMass());
   else return TUtil::GetDecayWidth(ipart);
 }
+double TEvtProb::GetHiggsWidthAtPoleMass(double mass){
+  if (mass>0.) return myCSW_->HiggsWidth(mass);
+  else return -1.;
+}
 MelaIO* TEvtProb::GetIORecord(){ return RcdME.getRef(); }
 MELACandidate* TEvtProb::GetCurrentCandidate(){ return melaCand; }
 int TEvtProb::GetCurrentCandidateIndex(){
