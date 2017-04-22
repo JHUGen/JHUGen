@@ -3504,17 +3504,399 @@ void get_PAvgProfile_MCFM_JJQCD_bkgZZ_13TeV(int sqrts=13, bool recalculate = tru
 }
 
 
+/* SPECIFIC COMMENT: OUTPUT ME DIVIDED BY (aL1**2+aR1**2)*(aL2**2+aR2**2) TO REMAIN INDEPENDENT OF CHANNEL */
+void get_PAvgProfile_JHUGen_ZZINDEPENDENT_HSMHiggs(bool recalculate=false){
+  int erg_tev=8;
+  float mPOLE=125.;
+  TString TREE_NAME;
+  const bool writeFinalTree=false;
+  const TString strMEBranchname = "p_ZZINDEPENDENT_SIG_ghz1_1_JHUGen";
+  const TString strConstBranchname = "pConst_ZZINDEPENDENT_SIG_ghz1_1_JHUGen";
+
+  TVar::VerbosityLevel verbosity = TVar::ERROR;
+  Mela mela(erg_tev, mPOLE, verbosity);
+
+  TVar::Process proc = TVar::HSMHiggs;
+  TVar::MatrixElement me = TVar::JHUGen;
+  TVar::Production prod = TVar::ZZINDEPENDENT;
+
+  TString strproc = ProcessName(proc);
+  TString strme = MatrixElementName(me);
+  TString strprod = ProductionName(prod);
+
+  std::vector<short>* LepLepId=0;
+  std::vector<float>* LepPt=0;
+  std::vector<float>* LepEta=0;
+  std::vector<float>* LepPhi=0;
+
+  float mesq_calc=0., cconst_calc=1.;
+  float mesq_conserveDifermMass=0;
+  float mzz = 126.;
+  float m1 = 91.471450;
+  float m2 = 12.139782;
+  float h1 = 0.2682896;
+  float h2 = 0.1679779;
+  float phi = 1.5969792;
+  float hs = -0.727181;
+  float phi1 = 1.8828257;
+  float ZZPt, ZZPhi, ZZEta;
+  short Z1Flav, Z2Flav;
+  int LepID[4];
+
+  vector<pair<float, int>> index[3];
+  TString strchannel[3]={ "4mu", "4e", "2mu2e" };
+  TFile* foutput = TFile::Open(Form("pAvgLinToLog_%s_%s_%s.root", strme.Data(), strprod.Data(), strproc.Data()), "recreate");
+
+  vector<TString> dumappend;
+  vector<TString> strSamples_13TeV = constructSamplesList("JJQCD", 13.);
+  dumappend = constructSamplesList("JJVBF", 13.);
+  appendVector<TString>(strSamples_13TeV, dumappend);
+  dumappend = constructSamplesList("gg_Sig_JHUGen", 13.);
+  appendVector<TString>(strSamples_13TeV, dumappend);
+  dumappend = constructSamplesList("gg_Sig_MCFM", 13.);
+  appendVector<TString>(strSamples_13TeV, dumappend);
+  dumappend = constructSamplesList("gg_Sig_ggVV", 13.);
+  appendVector<TString>(strSamples_13TeV, dumappend);
+
+  vector<TString> strSamples_8TeV = constructSamplesList("JJQCD", 8.);
+  dumappend = constructSamplesList("JJVBF", 8.);
+  appendVector<TString>(strSamples_8TeV, dumappend);
+  dumappend = constructSamplesList("gg_Sig_JHUGen", 8.);
+  appendVector<TString>(strSamples_8TeV, dumappend);
+  dumappend = constructSamplesList("gg_Sig_MCFM", 8.);
+  appendVector<TString>(strSamples_8TeV, dumappend);
+  dumappend = constructSamplesList("gg_Sig_ggVV", 8.);
+  appendVector<TString>(strSamples_8TeV, dumappend);
+
+  vector<TString> strSamples_7TeV = constructSamplesList("JJQCD", 7.);
+  dumappend = constructSamplesList("JJVBF", 7.);
+  appendVector<TString>(strSamples_7TeV, dumappend);
+  dumappend = constructSamplesList("gg_Sig_JHUGen", 7.);
+  appendVector<TString>(strSamples_7TeV, dumappend);
+  dumappend = constructSamplesList("gg_Sig_MCFM", 7.);
+  appendVector<TString>(strSamples_7TeV, dumappend);
+  dumappend = constructSamplesList("gg_Sig_ggVV", 7.);
+  appendVector<TString>(strSamples_7TeV, dumappend);
+
+  vector<TFile*> finputList;
+  vector<TTree*> treeList;
+  int nEntries=0;
+  TString cinput_main;
+
+  TREE_NAME = "ZZTree/candTree";
+  cinput_main = inputdir_13TeV;
+  //for (int is=0; is<2; is++){
+  for (int is=0; is<(int)strSamples_13TeV.size(); is++){
+    TString cinput = Form("%s/%s/ZZ4lAnalysis.root", cinput_main.Data(), (strSamples_13TeV[is]).Data());
+    TFile* finput = TFile::Open(cinput, "read");
+    cout << "Opening file " << cinput << "..." << endl;
+    TTree* tree=0;
+    if (finput!=0){
+      if (finput->IsOpen() && !finput->IsZombie()){
+        cout << cinput << " opened. Extracting tree " << TREE_NAME << "..." << endl;
+        tree = (TTree*)finput->Get(TREE_NAME);
+        if (tree!=0){
+          cout << TREE_NAME << " is found." << endl;
+
+          bool doRecalculate = recalculate;
+          if (!doRecalculate && tree->GetBranchStatus(strConstBranchname)==0) doRecalculate = true;
+          tree->SetBranchStatus("*", 0);
+          tree->SetBranchStatus("ZZMass", 1); tree->SetBranchAddress("ZZMass", &mzz);
+          tree->SetBranchStatus("Z1Mass", 1); tree->SetBranchAddress("Z1Mass", &m1);
+          tree->SetBranchStatus("Z2Mass", 1); tree->SetBranchAddress("Z2Mass", &m2);
+          tree->SetBranchStatus("helcosthetaZ1", 1); tree->SetBranchAddress("helcosthetaZ1", &h1);
+          tree->SetBranchStatus("helcosthetaZ2", 1); tree->SetBranchAddress("helcosthetaZ2", &h2);
+          tree->SetBranchStatus("helphi", 1); tree->SetBranchAddress("helphi", &phi);
+          tree->SetBranchStatus("costhetastar", 1); tree->SetBranchAddress("costhetastar", &hs);
+          tree->SetBranchStatus("phistarZ1", 1); tree->SetBranchAddress("phistarZ1", &phi1);
+          tree->SetBranchStatus("Z1Flav", 1); tree->SetBranchAddress("Z1Flav", &Z1Flav);
+          tree->SetBranchStatus("Z2Flav", 1); tree->SetBranchAddress("Z2Flav", &Z2Flav);
+          if (!doRecalculate && tree->GetBranchStatus(strConstBranchname)==0){
+            tree->SetBranchStatus(strMEBranchname, 1); tree->SetBranchAddress(strMEBranchname, &mesq_calc);
+            tree->SetBranchStatus(strConstBranchname, 1); tree->SetBranchAddress(strConstBranchname, &cconst_calc);
+          }
+          nEntries += tree->GetEntries();
+          treeList.push_back(tree);
+          finputList.push_back(finput);
+        }
+        else finput->Close();
+      }
+      else if (finput->IsOpen()) finput->Close();
+    }
+  }
+
+  for (int ic=0; ic<3; ic++){
+    TREE_NAME = "SelectedTree";
+    cinput_main = inputdir_8TeV;
+    //for (int is=0; is<2; is++){
+    for (int is=0; is<(int)strSamples_8TeV.size(); is++){
+      TString cinput = Form("%s/%s/%s", cinput_main.Data(), strchannel[ic].Data(), (strSamples_8TeV[is]).Data());
+      TFile* finput = TFile::Open(cinput, "read");
+      cout << "Opening file " << cinput << "..." << endl;
+      TTree* tree=0;
+      if (finput!=0){
+        if (finput->IsOpen() && !finput->IsZombie()){
+          cout << cinput << " opened. Extracting tree " << TREE_NAME << "..." << endl;
+          tree = (TTree*)finput->Get(TREE_NAME);
+          if (tree!=0){
+            cout << TREE_NAME << " is found." << endl;
+            tree->SetBranchStatus("*", 0);
+            tree->SetBranchStatus("ZZMass", 1); tree->SetBranchAddress("ZZMass", &mzz);
+            tree->SetBranchStatus("Z1Mass", 1); tree->SetBranchAddress("Z1Mass", &m1);
+            tree->SetBranchStatus("Z2Mass", 1); tree->SetBranchAddress("Z2Mass", &m2);
+            tree->SetBranchStatus("helcosthetaZ1", 1); tree->SetBranchAddress("helcosthetaZ1", &h1);
+            tree->SetBranchStatus("helcosthetaZ2", 1); tree->SetBranchAddress("helcosthetaZ2", &h2);
+            tree->SetBranchStatus("helphi", 1); tree->SetBranchAddress("helphi", &phi);
+            tree->SetBranchStatus("costhetastar", 1); tree->SetBranchAddress("costhetastar", &hs);
+            tree->SetBranchStatus("phistarZ1", 1); tree->SetBranchAddress("phistarZ1", &phi1);
+            tree->SetBranchStatus("Z1ids", 1); tree->SetBranchAddress("Z1ids", &Z1Flav);
+            tree->SetBranchStatus("Z2ids", 1); tree->SetBranchAddress("Z2ids", &Z2Flav);
+            nEntries += tree->GetEntries();
+            treeList.push_back(tree);
+            finputList.push_back(finput);
+          }
+          else finput->Close();
+        }
+        else if (finput->IsOpen()) finput->Close();
+      }
+    }
+    cinput_main = inputdir_7TeV;
+    //for (int is=0; is<2; is++){
+    for (int is=0; is<(int)strSamples_7TeV.size(); is++){
+      TString cinput = Form("%s/%s/%s", cinput_main.Data(), strchannel[ic].Data(), (strSamples_7TeV[is]).Data());
+      TFile* finput = TFile::Open(cinput, "read");
+      cout << "Opening file " << cinput << "..." << endl;
+      TTree* tree=0;
+      if (finput!=0){
+        if (finput->IsOpen() && !finput->IsZombie()){
+          cout << cinput << " opened. Extracting tree " << TREE_NAME << "..." << endl;
+          tree = (TTree*)finput->Get(TREE_NAME);
+          if (tree!=0){
+            cout << TREE_NAME << " is found." << endl;
+            tree->SetBranchStatus("*", 0);
+            tree->SetBranchStatus("ZZMass", 1); tree->SetBranchAddress("ZZMass", &mzz);
+            tree->SetBranchStatus("Z1Mass", 1); tree->SetBranchAddress("Z1Mass", &m1);
+            tree->SetBranchStatus("Z2Mass", 1); tree->SetBranchAddress("Z2Mass", &m2);
+            tree->SetBranchStatus("helcosthetaZ1", 1); tree->SetBranchAddress("helcosthetaZ1", &h1);
+            tree->SetBranchStatus("helcosthetaZ2", 1); tree->SetBranchAddress("helcosthetaZ2", &h2);
+            tree->SetBranchStatus("helphi", 1); tree->SetBranchAddress("helphi", &phi);
+            tree->SetBranchStatus("costhetastar", 1); tree->SetBranchAddress("costhetastar", &hs);
+            tree->SetBranchStatus("phistarZ1", 1); tree->SetBranchAddress("phistarZ1", &phi1);
+            tree->SetBranchStatus("Z1ids", 1); tree->SetBranchAddress("Z1ids", &Z1Flav);
+            tree->SetBranchStatus("Z2ids", 1); tree->SetBranchAddress("Z2ids", &Z2Flav);
+            nEntries += tree->GetEntries();
+            treeList.push_back(tree);
+            finputList.push_back(finput);
+          }
+          else finput->Close();
+        }
+        else if (finput->IsOpen()) finput->Close();
+      }
+    }
+  }
+
+  cout << "NEntries = " << nEntries << " over " << treeList.size() << " trees." << endl;
+
+  unsigned ev_acc=0;
+  for (int ev=0; ev<nEntries; ev++){
+    getEntry(treeList, ev);
+    bool doProcess=
+      (
+      Z1Flav*Z2Flav==pow(13, 4)
+      ||
+      Z1Flav*Z2Flav==pow(11, 4)
+      ||
+      Z1Flav*Z2Flav==pow(11*13, 2)
+      )
+      ;
+    if (!doProcess) continue;
+    if (ev_acc%10000==0) cout << "Pre-processing event " << ev << endl;
+    unsigned int ic = (Z1Flav*Z2Flav==pow(13, 4))*0 + (Z1Flav*Z2Flav==pow(11, 4))*1 + (Z1Flav*Z2Flav==pow(11*13, 2))*2;
+    addByLowest(index[ic], mzz, ev);
+    ev_acc++;
+  }
+  cout << "Number of valid entries: " << ev_acc << endl;
+
+  for (unsigned int ic=0; ic<3; ic++){
+    float firstVal=index[ic].at(0).first;
+    float lastVal=index[ic].at(index[ic].size()-1).first;
+    float infimum = (float)((int)firstVal); infimum -= (float)(((int)infimum)%10);
+    float supremum = (float)((int)(lastVal+0.5)); supremum += (float)(10-((int)supremum)%10);
+    cout << "Nentries = " << nEntries << " | mzz = " << firstVal << " - " << lastVal << "(" << infimum << ", " << supremum << ")" << endl;
+
+    float divisor=95000;
+    int nbins = index[ic].size()/divisor;
+    const int nbins_th=10/*50*/;
+    while (nbins<nbins_th){
+      if (divisor>1000) divisor -= 1000;
+      else if (divisor>100) divisor -= 100;
+      else break;
+      nbins=index[ic].size()/divisor;
+    }
+    cout << "nbins=" << nbins << endl;
+    if (nbins<3) cerr << "Not enough bins!" << endl;
+    vector<ExtBin> binList;
+    float* binning = new float[nbins+1];
+    binning[0]=infimum;
+    binning[nbins]=supremum;
+    int ev_stepsize = index[ic].size()/nbins;
+    cout << "Event step size: " << ev_stepsize << endl;
+    cout << "Boundary (" << 0 << ") = " << binning[0] << endl;
+    for (int ix=1; ix<nbins; ix++){
+      binning[ix]=(index[ic][ix*ev_stepsize-1].first+index[ic][ix*ev_stepsize].first)*0.5;
+      ExtBin tmpbin;
+      tmpbin.binlow = binning[ix-1]; tmpbin.binhigh = binning[ix];
+      for (int bin=0; bin<ev_stepsize; bin++){
+        int evid = index[ic][(ix-1)*ev_stepsize+bin].second;
+        tmpbin.events.push_back(evid);
+      }
+      binList.push_back(tmpbin);
+      cout << "Boundary (" << ix << ")= " << binning[ix] << " [event " << index[ic][ix*ev_stepsize].second << ", step " << ix*ev_stepsize << "]" << endl;
+    }
+    ExtBin tmpbin;
+    tmpbin.binlow = binning[nbins-1]; tmpbin.binhigh = binning[nbins];
+    for (unsigned int bin=(nbins-1)*ev_stepsize; bin<index[ic].size(); bin++){
+      int evid = index[ic][bin].second;
+      tmpbin.events.push_back(evid);
+    }
+    binList.push_back(tmpbin);
+    cout << "Boundary (" << nbins << ") = " << binning[nbins] << endl;
+    cout << "Bin list has the following bins:" << endl;
+    for (unsigned int ib=0; ib<binList.size(); ib++){
+      cout << ib << " / " << binList.size() << ": [" << binList.at(ib).binlow << "," << binList.at(ib).binhigh << "]" << endl;
+    }
+
+    foutput->cd();
+
+    TProfile* hvar = new TProfile(Form("candMass_%s", strchannel[ic].Data()), "", nbins, binning); hvar->Sumw2();
+    TProfile* hmesq_conserveDifermMass = new TProfile(Form("P_ConserveDifermionMass_%s", strchannel[ic].Data()), "", nbins, binning); hmesq_conserveDifermMass->Sumw2();
+
+    TTree* newtree=0;
+    if (writeFinalTree){
+      newtree = new TTree(Form("FinalTree_%s", strchannel[ic].Data()), "");
+      newtree->Branch("mesq_conserveDifermMass", &mesq_conserveDifermMass);
+      newtree->Branch("ZZMass", &mzz);
+    }
+
+    mela.setCandidateDecayMode(TVar::CandidateDecay_ZZ);
+
+    if (ic==1){
+      LepID[0]=11;
+      LepID[1]=-11;
+    }
+    else{
+      LepID[0]=13;
+      LepID[1]=-13;
+    }
+    if (ic==0){
+      LepID[2]=13;
+      LepID[3]=-13;
+    }
+    else{
+      LepID[2]=11;
+      LepID[3]=-11;
+    }
+
+    double aL1=0, aR1=0, aL2=0, aR2=0;
+    unsigned int ctr=0;
+    for (unsigned int bin=0; bin<binList.size(); bin++){
+      cout << "Bin " << bin << " is now being scrutinized..." << endl;
+      for (unsigned int ev = 0; ev < binList.at(bin).events.size(); ev++){
+        int getEv = binList.at(bin).events.at(ev);
+        getEntry(treeList, getEv);
+        TTree* tree = findTree(treeList, getEv);
+
+        if (ev%1000==0) cout << "Doing event " << getEv << endl;
+
+        TLorentzVector pDaughters[4];
+        std::vector<TLorentzVector> daus = mela.calculate4Momentum(mzz, m1, m2, acos(hs), acos(h1), acos(h2), phi1, phi);
+        for (int ip=0; ip<min(4, (int)daus.size()); ip++){ pDaughters[ip]=daus.at(ip); }
+        SimpleParticleCollection_t daughters;
+        for (unsigned int idau=0; idau<4; idau++) daughters.push_back(SimpleParticle_t(LepID[idau], pDaughters[idau]));
+        mela.setInputEvent(&daughters, (SimpleParticleCollection_t*)0, (SimpleParticleCollection_t*)0, false);
+
+        mela.setProcess(proc, me, prod);
+        TUtil::setLeptonMassScheme(TVar::ConserveDifermionMass);
+
+        bool hasConst = (tree->GetBranchStatus(strConstBranchname)==1);
+        bool doCalc=(!hasConst || ctr==0);
+        if (doCalc){
+          mela.computeP(mesq_conserveDifermMass, false);
+          if (hasConst) mesq_conserveDifermMass = mesq_calc / cconst_calc;
+
+          mela.getIORecord()->getVDaughterCouplings(aL1, aR1, 0);
+          mela.getIORecord()->getVDaughterCouplings(aL2, aR2, 1);
+        }
+        else mesq_conserveDifermMass = mesq_calc / cconst_calc;
+
+        if (fabs(aL1)>0. || fabs(aR1)>0.) mesq_conserveDifermMass /= pow(aL1, 2)+pow(aR1, 2);
+        if (fabs(aL2)>0. || fabs(aR2)>0.) mesq_conserveDifermMass /= pow(aL2, 2)+pow(aR2, 2);
+
+        bool doFill = !(
+          isnan(mesq_conserveDifermMass) || isinf(mesq_conserveDifermMass)
+          );
+
+        if (doFill) binList.at(bin).addEvent(mzz, mesq_conserveDifermMass, 0);
+
+        mela.resetInputEvent();
+        ctr++;
+      }
+
+      binList.at(bin).sift(); binList.at(bin).adjustWeights();
+
+      for (unsigned int ev=0; ev<binList.at(bin).masses.size(); ev++){
+        mzz = binList.at(bin).masses.at(ev);
+        mesq_conserveDifermMass = binList.at(bin).mevals.at(ev);
+        hmesq_conserveDifermMass->Fill(mzz, mesq_conserveDifermMass);
+        hvar->Fill(mzz, mzz);
+        if (writeFinalTree) newtree->Fill();
+      }
+    }
+
+    double* xexyey[4];
+    for (int ix=0; ix<4; ix++) xexyey[ix] = new double[nbins];
+    for (int bin=0; bin<nbins; bin++){
+      xexyey[0][bin] = hvar->GetBinContent(bin+1);
+      xexyey[1][bin] = hvar->GetBinError(bin+1);
+
+      cout << "Bin " << bin << " x-center: " << xexyey[0][bin] << " +- " << xexyey[1][bin] << endl;
+      xexyey[2][bin] = hmesq_conserveDifermMass->GetBinContent(bin+1);
+      xexyey[3][bin] = hmesq_conserveDifermMass->GetBinError(bin+1);
+      xexyey[3][bin] = log10(xexyey[3][bin])/xexyey[2][bin];
+      xexyey[2][bin] = log10(xexyey[2][bin]);
+    }
+
+    TGraphErrors* tg = new TGraphErrors(nbins, xexyey[0], xexyey[2], xexyey[1], xexyey[3]);
+    tg->SetName(Form("tg_%s", hmesq_conserveDifermMass->GetName()));
+    foutput->WriteTObject(tg);
+    delete tg;
+
+    for (int ix=0; ix<4; ix++) delete[] xexyey[ix];
+    foutput->WriteTObject(hmesq_conserveDifermMass);
+    foutput->WriteTObject(hvar);
+    if (writeFinalTree) foutput->WriteTObject(newtree);
+    if (writeFinalTree) delete newtree;
+    delete hmesq_conserveDifermMass;
+    delete hvar;
+    delete[] binning;
+    for (unsigned int f=0; f<finputList.size(); f++) finputList.at(f)->Close();
+  }
+  foutput->Close();
+}
+
 /*
 SPECIFIC COMMENT: OUTPUT ME DIVIDED BY
 - ALPHAS(MZ)**2 TO REMAIN INDEPENDENT OF PDF CHOICE TO FIRST APPROXIMATION
 - H(1) PROPAGATOR
 - (aL1**2+aR1**2)*(aL2**2+aR2**2) TO REMAIN INDEPENDENT OF CHANNEL
 */
-void get_PAvgProfile_JHUGen_ZZGG_HSMHiggs(){
+void get_PAvgProfile_JHUGen_ZZGG_HSMHiggs(bool recalculate=false){
   int erg_tev=8;
   float mPOLE=125.;
   TString TREE_NAME;
   const bool writeFinalTree=false;
+  const TString strMEBranchname = "p_GG_SIG_ghg2_1_ghz1_1_JHUGen";
+  const TString strConstBranchname = "pConst_GG_SIG_ghg2_1_ghz1_1_JHUGen";
 
   TVar::VerbosityLevel verbosity = TVar::ERROR;
   Mela mela(erg_tev, mPOLE, verbosity);
@@ -3546,82 +3928,89 @@ void get_PAvgProfile_JHUGen_ZZGG_HSMHiggs(){
   short Z1Flav, Z2Flav;
   int LepID[4];
 
+  vector<pair<float, int>> index[3];
   TString strchannel[3]={ "4mu", "4e", "2mu2e" };
   TFile* foutput = TFile::Open(Form("pAvgLinToLog_%s_%s_%s.root", strme.Data(), strprod.Data(), strproc.Data()), "recreate");
-  for (int ic=0; ic<3; ic++){
-    vector<TString> dumappend;
 
-    vector<TString> strSamples_13TeV = constructSamplesList("JJQCD", 13.);
-    dumappend = constructSamplesList("JJVBF", 13.);
-    appendVector<TString>(strSamples_13TeV, dumappend);
-    dumappend = constructSamplesList("gg_Sig_JHUGen", 13.);
-    appendVector<TString>(strSamples_13TeV, dumappend);
-    dumappend = constructSamplesList("gg_Sig_MCFM", 13.);
-    appendVector<TString>(strSamples_13TeV, dumappend);
-    dumappend = constructSamplesList("gg_Sig_ggVV", 13.);
-    appendVector<TString>(strSamples_13TeV, dumappend);
+  vector<TString> dumappend;
+  vector<TString> strSamples_13TeV = constructSamplesList("JJQCD", 13.);
+  dumappend = constructSamplesList("JJVBF", 13.);
+  appendVector<TString>(strSamples_13TeV, dumappend);
+  dumappend = constructSamplesList("gg_Sig_JHUGen", 13.);
+  appendVector<TString>(strSamples_13TeV, dumappend);
+  dumappend = constructSamplesList("gg_Sig_MCFM", 13.);
+  appendVector<TString>(strSamples_13TeV, dumappend);
+  dumappend = constructSamplesList("gg_Sig_ggVV", 13.);
+  appendVector<TString>(strSamples_13TeV, dumappend);
 
-    vector<TString> strSamples_8TeV = constructSamplesList("JJQCD", 8.);
-    dumappend = constructSamplesList("JJVBF", 8.);
-    appendVector<TString>(strSamples_8TeV, dumappend);
-    dumappend = constructSamplesList("gg_Sig_JHUGen", 8.);
-    appendVector<TString>(strSamples_8TeV, dumappend);
-    dumappend = constructSamplesList("gg_Sig_MCFM", 8.);
-    appendVector<TString>(strSamples_8TeV, dumappend);
-    dumappend = constructSamplesList("gg_Sig_ggVV", 8.);
-    appendVector<TString>(strSamples_8TeV, dumappend);
+  vector<TString> strSamples_8TeV = constructSamplesList("JJQCD", 8.);
+  dumappend = constructSamplesList("JJVBF", 8.);
+  appendVector<TString>(strSamples_8TeV, dumappend);
+  dumappend = constructSamplesList("gg_Sig_JHUGen", 8.);
+  appendVector<TString>(strSamples_8TeV, dumappend);
+  dumappend = constructSamplesList("gg_Sig_MCFM", 8.);
+  appendVector<TString>(strSamples_8TeV, dumappend);
+  dumappend = constructSamplesList("gg_Sig_ggVV", 8.);
+  appendVector<TString>(strSamples_8TeV, dumappend);
 
-    vector<TString> strSamples_7TeV = constructSamplesList("JJQCD", 7.);
-    dumappend = constructSamplesList("JJVBF", 7.);
-    appendVector<TString>(strSamples_7TeV, dumappend);
-    dumappend = constructSamplesList("gg_Sig_JHUGen", 7.);
-    appendVector<TString>(strSamples_7TeV, dumappend);
-    dumappend = constructSamplesList("gg_Sig_MCFM", 7.);
-    appendVector<TString>(strSamples_7TeV, dumappend);
-    dumappend = constructSamplesList("gg_Sig_ggVV", 7.);
-    appendVector<TString>(strSamples_7TeV, dumappend);
+  vector<TString> strSamples_7TeV = constructSamplesList("JJQCD", 7.);
+  dumappend = constructSamplesList("JJVBF", 7.);
+  appendVector<TString>(strSamples_7TeV, dumappend);
+  dumappend = constructSamplesList("gg_Sig_JHUGen", 7.);
+  appendVector<TString>(strSamples_7TeV, dumappend);
+  dumappend = constructSamplesList("gg_Sig_MCFM", 7.);
+  appendVector<TString>(strSamples_7TeV, dumappend);
+  dumappend = constructSamplesList("gg_Sig_ggVV", 7.);
+  appendVector<TString>(strSamples_7TeV, dumappend);
 
-    const int nSamples = strSamples_13TeV.size() + strSamples_8TeV.size() + strSamples_7TeV.size();
+  vector<TFile*> finputList;
+  vector<TTree*> treeList;
+  int nEntries=0;
+  TString cinput_main;
 
-    vector<TFile*> finputList;
-    vector<TTree*> treeList;
-    int nEntries=0;
-    TString cinput_main;
+  TREE_NAME = "ZZTree/candTree";
+  cinput_main = inputdir_13TeV;
+  //for (int is=0; is<2; is++){
+  for (int is=0; is<(int)strSamples_13TeV.size(); is++){
+    TString cinput = Form("%s/%s/ZZ4lAnalysis.root", cinput_main.Data(), (strSamples_13TeV[is]).Data());
+    TFile* finput = TFile::Open(cinput, "read");
+    cout << "Opening file " << cinput << "..." << endl;
+    TTree* tree=0;
+    if (finput!=0){
+      if (finput->IsOpen() && !finput->IsZombie()){
+        cout << cinput << " opened. Extracting tree " << TREE_NAME << "..." << endl;
+        tree = (TTree*)finput->Get(TREE_NAME);
+        if (tree!=0){
+          cout << TREE_NAME << " is found." << endl;
 
-    TREE_NAME = "ZZTree/candTree";
-    cinput_main = inputdir_13TeV;
-    //for (int is=0; is<2; is++){
-    for (int is=0; is<(int)strSamples_13TeV.size(); is++){
-      TString cinput = Form("%s/%s/ZZ4lAnalysis.root", cinput_main.Data(), (strSamples_13TeV[is]).Data());
-      TFile* finput = TFile::Open(cinput, "read");
-      cout << "Opening file " << cinput << "..." << endl;
-      TTree* tree=0;
-      if (finput!=0){
-        if (finput->IsOpen() && !finput->IsZombie()){
-          cout << cinput << " opened. Extracting tree " << TREE_NAME << "..." << endl;
-          tree = (TTree*)finput->Get(TREE_NAME);
-          if (tree!=0){
-            cout << TREE_NAME << " is found." << endl;
-            tree->SetBranchStatus("*", 0);
-            tree->SetBranchStatus("ZZMass", 1); tree->SetBranchAddress("ZZMass", &mzz);
-            tree->SetBranchStatus("Z1Mass", 1); tree->SetBranchAddress("Z1Mass", &m1);
-            tree->SetBranchStatus("Z2Mass", 1); tree->SetBranchAddress("Z2Mass", &m2);
-            tree->SetBranchStatus("helcosthetaZ1", 1); tree->SetBranchAddress("helcosthetaZ1", &h1);
-            tree->SetBranchStatus("helcosthetaZ2", 1); tree->SetBranchAddress("helcosthetaZ2", &h2);
-            tree->SetBranchStatus("helphi", 1); tree->SetBranchAddress("helphi", &phi);
-            tree->SetBranchStatus("costhetastar", 1); tree->SetBranchAddress("costhetastar", &hs);
-            tree->SetBranchStatus("phistarZ1", 1); tree->SetBranchAddress("phistarZ1", &phi1);
-            tree->SetBranchStatus("Z1Flav", 1); tree->SetBranchAddress("Z1Flav", &Z1Flav);
-            tree->SetBranchStatus("Z2Flav", 1); tree->SetBranchAddress("Z2Flav", &Z2Flav);
-            nEntries += tree->GetEntries();
-            treeList.push_back(tree);
-            finputList.push_back(finput);
+          bool doRecalculate = recalculate;
+          if (!doRecalculate && tree->GetBranchStatus(strConstBranchname)==0) doRecalculate = true;
+          tree->SetBranchStatus("*", 0);
+          tree->SetBranchStatus("ZZMass", 1); tree->SetBranchAddress("ZZMass", &mzz);
+          tree->SetBranchStatus("Z1Mass", 1); tree->SetBranchAddress("Z1Mass", &m1);
+          tree->SetBranchStatus("Z2Mass", 1); tree->SetBranchAddress("Z2Mass", &m2);
+          tree->SetBranchStatus("helcosthetaZ1", 1); tree->SetBranchAddress("helcosthetaZ1", &h1);
+          tree->SetBranchStatus("helcosthetaZ2", 1); tree->SetBranchAddress("helcosthetaZ2", &h2);
+          tree->SetBranchStatus("helphi", 1); tree->SetBranchAddress("helphi", &phi);
+          tree->SetBranchStatus("costhetastar", 1); tree->SetBranchAddress("costhetastar", &hs);
+          tree->SetBranchStatus("phistarZ1", 1); tree->SetBranchAddress("phistarZ1", &phi1);
+          tree->SetBranchStatus("Z1Flav", 1); tree->SetBranchAddress("Z1Flav", &Z1Flav);
+          tree->SetBranchStatus("Z2Flav", 1); tree->SetBranchAddress("Z2Flav", &Z2Flav);
+          if (!doRecalculate && tree->GetBranchStatus(strConstBranchname)==0){
+            tree->SetBranchStatus(strMEBranchname, 1); tree->SetBranchAddress(strMEBranchname, &mesq_calc);
+            tree->SetBranchStatus(strConstBranchname, 1); tree->SetBranchAddress(strConstBranchname, &cconst_calc);
           }
-          else finput->Close();
+          nEntries += tree->GetEntries();
+          treeList.push_back(tree);
+          finputList.push_back(finput);
         }
-        else if (finput->IsOpen()) finput->Close();
+        else finput->Close();
       }
+      else if (finput->IsOpen()) finput->Close();
     }
+  }
+
+  for (int ic=0; ic<3; ic++){
     TREE_NAME = "SelectedTree";
     cinput_main = inputdir_8TeV;
     //for (int is=0; is<2; is++){
@@ -3689,41 +4078,45 @@ void get_PAvgProfile_JHUGen_ZZGG_HSMHiggs(){
         else if (finput->IsOpen()) finput->Close();
       }
     }
+  }
 
-    cout << "NEntries = " << nEntries << " over " << treeList.size() << " trees." << endl;
+  cout << "NEntries = " << nEntries << " over " << treeList.size() << " trees." << endl;
 
-    vector<pair<float, int>> index;
-    unsigned ev_acc=0;
-    for (int ev=0; ev<nEntries; ev++){
-      getEntry(treeList, ev);
+  unsigned ev_acc=0;
+  for (int ev=0; ev<nEntries; ev++){
+    getEntry(treeList, ev);
+    bool doProcess=
+      (
+      Z1Flav*Z2Flav==pow(13, 4)
+      ||
+      Z1Flav*Z2Flav==pow(11, 4)
+      ||
+      Z1Flav*Z2Flav==pow(11*13, 2)
+      )
+      ;
+    if (!doProcess) continue;
+    if (ev_acc%10000==0) cout << "Pre-processing event " << ev << endl;
+    unsigned int ic = (Z1Flav*Z2Flav==pow(13, 4))*0 + (Z1Flav*Z2Flav==pow(11, 4))*1 + (Z1Flav*Z2Flav==pow(11*13, 2))*2;
+    addByLowest(index[ic], mzz, ev);
+    ev_acc++;
+  }
+  cout << "Number of valid entries: " << ev_acc << endl;
 
-      bool doProcess=
-        (strchannel[ic]=="4mu" && Z1Flav*Z2Flav==pow(13, 4))
-        ||
-        (strchannel[ic]=="4e" && Z1Flav*Z2Flav==pow(11, 4))
-        ||
-        (strchannel[ic]=="2mu2e" && Z1Flav*Z2Flav==pow(11*13, 2))
-        ;
-      if (!doProcess) continue;
-      if (ev_acc%10000==0) cout << "Pre-processing event " << ev << endl;
-      addByLowest(index, mzz, ev);
-      ev_acc++;
-    }
-
-    float firstVal=index.at(0).first;
-    float lastVal=index.at(index.size()-1).first;
+  for (unsigned int ic=0; ic<3; ic++){
+    float firstVal=index[ic].at(0).first;
+    float lastVal=index[ic].at(index[ic].size()-1).first;
     float infimum = (float)((int)firstVal); infimum -= (float)(((int)infimum)%10);
     float supremum = (float)((int)(lastVal+0.5)); supremum += (float)(10-((int)supremum)%10);
     cout << "Nentries = " << nEntries << " | mzz = " << firstVal << " - " << lastVal << "(" << infimum << ", " << supremum << ")" << endl;
 
-    float divisor=85000;
-    int nbins = index.size()/divisor;
+    float divisor=95000;
+    int nbins = index[ic].size()/divisor;
     const int nbins_th=10/*50*/;
     while (nbins<nbins_th){
       if (divisor>1000) divisor -= 1000;
       else if (divisor>100) divisor -= 100;
       else break;
-      nbins=index.size()/divisor;
+      nbins=index[ic].size()/divisor;
     }
     cout << "nbins=" << nbins << endl;
     if (nbins<3) cerr << "Not enough bins!" << endl;
@@ -3731,28 +4124,34 @@ void get_PAvgProfile_JHUGen_ZZGG_HSMHiggs(){
     float* binning = new float[nbins+1];
     binning[0]=infimum;
     binning[nbins]=supremum;
-    int ev_stepsize = index.size()/nbins;
+    int ev_stepsize = index[ic].size()/nbins;
     cout << "Event step size: " << ev_stepsize << endl;
     cout << "Boundary (" << 0 << ") = " << binning[0] << endl;
     for (int ix=1; ix<nbins; ix++){
-      binning[ix]=(index[ix*ev_stepsize-1].first+index[ix*ev_stepsize].first)*0.5;
+      binning[ix]=(index[ic][ix*ev_stepsize-1].first+index[ic][ix*ev_stepsize].first)*0.5;
       ExtBin tmpbin;
-      tmpbin.binlow = binning[ix-1];
-      tmpbin.binhigh = binning[ix];
-      for (int bin=0; bin<ev_stepsize; bin++) tmpbin.events.push_back(index[(ix-1)*ev_stepsize+bin].second);
+      tmpbin.binlow = binning[ix-1]; tmpbin.binhigh = binning[ix];
+      for (int bin=0; bin<ev_stepsize; bin++){
+        int evid = index[ic][(ix-1)*ev_stepsize+bin].second;
+        tmpbin.events.push_back(evid);
+      }
       binList.push_back(tmpbin);
-      cout << "Boundary (" << ix << ")= " << binning[ix] << " [event " << index[ix*ev_stepsize].second << ", step " << ix*ev_stepsize << "]" << endl;
+      cout << "Boundary (" << ix << ")= " << binning[ix] << " [event " << index[ic][ix*ev_stepsize].second << ", step " << ix*ev_stepsize << "]" << endl;
     }
     ExtBin tmpbin;
-    tmpbin.binlow = binning[nbins-1];
-    tmpbin.binhigh = binning[nbins];
-    for (unsigned int bin=(nbins-1)*ev_stepsize; bin<index.size(); bin++) tmpbin.events.push_back(index[bin].second);
+    tmpbin.binlow = binning[nbins-1]; tmpbin.binhigh = binning[nbins];
+    for (unsigned int bin=(nbins-1)*ev_stepsize; bin<index[ic].size(); bin++){
+      int evid = index[ic][bin].second;
+      tmpbin.events.push_back(evid);
+    }
     binList.push_back(tmpbin);
     cout << "Boundary (" << nbins << ") = " << binning[nbins] << endl;
     cout << "Bin list has the following bins:" << endl;
     for (unsigned int ib=0; ib<binList.size(); ib++){
       cout << ib << " / " << binList.size() << ": [" << binList.at(ib).binlow << "," << binList.at(ib).binhigh << "]" << endl;
     }
+
+    foutput->cd();
 
     TProfile* hvar = new TProfile(Form("candMass_%s", strchannel[ic].Data()), "", nbins, binning); hvar->Sumw2();
     TProfile* hmesq_conserveDifermMass = new TProfile(Form("P_ConserveDifermionMass_%s", strchannel[ic].Data()), "", nbins, binning); hmesq_conserveDifermMass->Sumw2();
@@ -3765,7 +4164,6 @@ void get_PAvgProfile_JHUGen_ZZGG_HSMHiggs(){
     }
 
     mela.setCandidateDecayMode(TVar::CandidateDecay_ZZ);
-
 
     if (ic==1){
       LepID[0]=11;
@@ -3784,11 +4182,15 @@ void get_PAvgProfile_JHUGen_ZZGG_HSMHiggs(){
       LepID[3]=-11;
     }
 
+    double alphasVal=0, mh=0, gah=0, aL1=0, aR1=0, aL2=0, aR2=0;
+    unsigned int ctr=0;
     for (unsigned int bin=0; bin<binList.size(); bin++){
       cout << "Bin " << bin << " is now being scrutinized..." << endl;
       for (unsigned int ev = 0; ev < binList.at(bin).events.size(); ev++){
         int getEv = binList.at(bin).events.at(ev);
         getEntry(treeList, getEv);
+        TTree* tree = findTree(treeList, getEv);
+
         if (ev%1000==0) cout << "Doing event " << getEv << endl;
 
         TLorentzVector pDaughters[4];
@@ -3798,20 +4200,29 @@ void get_PAvgProfile_JHUGen_ZZGG_HSMHiggs(){
         for (unsigned int idau=0; idau<4; idau++) daughters.push_back(SimpleParticle_t(LepID[idau], pDaughters[idau]));
         mela.setInputEvent(&daughters, (SimpleParticleCollection_t*)0, (SimpleParticleCollection_t*)0, false);
 
-        double alphasVal, propagator, mh, gah;
-
         mela.setProcess(proc, me, prod);
-
         TUtil::setLeptonMassScheme(TVar::ConserveDifermionMass);
-        mela.computeP(mesq_conserveDifermMass, false);
-        alphasVal = mela.getIORecord()->getAlphaSatMZ();
-        mela.getIORecord()->getHiggsMassWidth(mh, gah, 0);
-        propagator = 1./(pow(pow(mzz, 2)-pow(mh, 2), 2) + pow(mh*gah, 2));
-        mesq_conserveDifermMass /= pow(alphasVal, 2);
+
+        bool hasConst = (tree->GetBranchStatus(strConstBranchname)==1);
+        bool doCalc=(!hasConst || ctr==0);
+        if (doCalc){
+          mela.computeP(mesq_conserveDifermMass, false);
+          if (hasConst) mesq_conserveDifermMass = mesq_calc / cconst_calc;
+
+          alphasVal = mela.getIORecord()->getAlphaSatMZ();
+          mela.getIORecord()->getVDaughterCouplings(aL1, aR1, 0);
+          mela.getIORecord()->getVDaughterCouplings(aL2, aR2, 1);
+          mela.getIORecord()->getHiggsMassWidth(mh, gah, 0);
+        }
+        else{
+          mesq_conserveDifermMass = mesq_calc / cconst_calc;
+          mh=mzz;
+          gah = mela.getHiggsWidthAtPoleMass(mh);
+        }
+
+        double propagator = 1./(pow(pow(mzz, 2)-pow(mh, 2), 2) + pow(mh*gah, 2));
         mesq_conserveDifermMass /= propagator;
-        double aL1, aR1, aL2, aR2;
-        mela.getIORecord()->getVDaughterCouplings(aL1, aR1, 0);
-        mela.getIORecord()->getVDaughterCouplings(aL2, aR2, 1);
+        mesq_conserveDifermMass /= pow(alphasVal, 2);
         if (fabs(aL1)>0. || fabs(aR1)>0.) mesq_conserveDifermMass /= pow(aL1, 2)+pow(aR1, 2);
         if (fabs(aL2)>0. || fabs(aR2)>0.) mesq_conserveDifermMass /= pow(aL2, 2)+pow(aR2, 2);
 
@@ -3821,8 +4232,8 @@ void get_PAvgProfile_JHUGen_ZZGG_HSMHiggs(){
 
         if (doFill) binList.at(bin).addEvent(mzz, mesq_conserveDifermMass, 0);
 
-        if (writeFinalTree) newtree->Fill();
         mela.resetInputEvent();
+        ctr++;
       }
 
       binList.at(bin).sift(); binList.at(bin).adjustWeights();
@@ -3832,6 +4243,7 @@ void get_PAvgProfile_JHUGen_ZZGG_HSMHiggs(){
         mesq_conserveDifermMass = binList.at(bin).mevals.at(ev);
         hmesq_conserveDifermMass->Fill(mzz, mesq_conserveDifermMass);
         hvar->Fill(mzz, mzz);
+        if (writeFinalTree) newtree->Fill();
       }
     }
 
@@ -3867,18 +4279,19 @@ void get_PAvgProfile_JHUGen_ZZGG_HSMHiggs(){
   foutput->Close();
 }
 
-
 /*
 SPECIFIC COMMENT: OUTPUT ME DIVIDED BY
 - ALPHAS(MZ)**2 TO REMAIN INDEPENDENT OF PDF CHOICE TO FIRST APPROXIMATION
 - H(1) PROPAGATOR
 - (aL1**2+aR1**2)*(aL2**2+aR2**2) TO REMAIN INDEPENDENT OF CHANNEL
 */
-void get_PAvgProfile_MCFM_ZZGG_HSMHiggs(){
+void get_PAvgProfile_MCFM_ZZGG_HSMHiggs(bool recalculate=false){
   int erg_tev=8;
   float mPOLE=125.;
   TString TREE_NAME;
   const bool writeFinalTree=false;
+  const TString strMEBranchname = "p_GG_SIG_kappaTopBot_1_ghz1_1_MCFM";
+  const TString strConstBranchname = "pConst_GG_SIG_kappaTopBot_1_ghz1_1_MCFM";
 
   TVar::VerbosityLevel verbosity = TVar::ERROR;
   Mela mela(erg_tev, mPOLE, verbosity);
@@ -3910,82 +4323,89 @@ void get_PAvgProfile_MCFM_ZZGG_HSMHiggs(){
   short Z1Flav, Z2Flav;
   int LepID[4];
 
+  vector<pair<float, int>> index[3];
   TString strchannel[3]={ "4mu", "4e", "2mu2e" };
   TFile* foutput = TFile::Open(Form("pAvgLinToLog_%s_%s_%s.root", strme.Data(), strprod.Data(), strproc.Data()), "recreate");
-  for (int ic=0; ic<3; ic++){
-    vector<TString> dumappend;
 
-    vector<TString> strSamples_13TeV = constructSamplesList("JJQCD", 13.);
-    dumappend = constructSamplesList("JJVBF", 13.);
-    appendVector<TString>(strSamples_13TeV, dumappend);
-    dumappend = constructSamplesList("gg_Sig_JHUGen", 13.);
-    appendVector<TString>(strSamples_13TeV, dumappend);
-    dumappend = constructSamplesList("gg_Sig_MCFM", 13.);
-    appendVector<TString>(strSamples_13TeV, dumappend);
-    dumappend = constructSamplesList("gg_Sig_ggVV", 13.);
-    appendVector<TString>(strSamples_13TeV, dumappend);
+  vector<TString> dumappend;
+  vector<TString> strSamples_13TeV = constructSamplesList("JJQCD", 13.);
+  dumappend = constructSamplesList("JJVBF", 13.);
+  appendVector<TString>(strSamples_13TeV, dumappend);
+  dumappend = constructSamplesList("gg_Sig_JHUGen", 13.);
+  appendVector<TString>(strSamples_13TeV, dumappend);
+  dumappend = constructSamplesList("gg_Sig_MCFM", 13.);
+  appendVector<TString>(strSamples_13TeV, dumappend);
+  dumappend = constructSamplesList("gg_Sig_ggVV", 13.);
+  appendVector<TString>(strSamples_13TeV, dumappend);
 
-    vector<TString> strSamples_8TeV = constructSamplesList("JJQCD", 8.);
-    dumappend = constructSamplesList("JJVBF", 8.);
-    appendVector<TString>(strSamples_8TeV, dumappend);
-    dumappend = constructSamplesList("gg_Sig_JHUGen", 8.);
-    appendVector<TString>(strSamples_8TeV, dumappend);
-    dumappend = constructSamplesList("gg_Sig_MCFM", 8.);
-    appendVector<TString>(strSamples_8TeV, dumappend);
-    dumappend = constructSamplesList("gg_Sig_ggVV", 8.);
-    appendVector<TString>(strSamples_8TeV, dumappend);
+  vector<TString> strSamples_8TeV = constructSamplesList("JJQCD", 8.);
+  dumappend = constructSamplesList("JJVBF", 8.);
+  appendVector<TString>(strSamples_8TeV, dumappend);
+  dumappend = constructSamplesList("gg_Sig_JHUGen", 8.);
+  appendVector<TString>(strSamples_8TeV, dumappend);
+  dumappend = constructSamplesList("gg_Sig_MCFM", 8.);
+  appendVector<TString>(strSamples_8TeV, dumappend);
+  dumappend = constructSamplesList("gg_Sig_ggVV", 8.);
+  appendVector<TString>(strSamples_8TeV, dumappend);
 
-    vector<TString> strSamples_7TeV = constructSamplesList("JJQCD", 7.);
-    dumappend = constructSamplesList("JJVBF", 7.);
-    appendVector<TString>(strSamples_7TeV, dumappend);
-    dumappend = constructSamplesList("gg_Sig_JHUGen", 7.);
-    appendVector<TString>(strSamples_7TeV, dumappend);
-    dumappend = constructSamplesList("gg_Sig_MCFM", 7.);
-    appendVector<TString>(strSamples_7TeV, dumappend);
-    dumappend = constructSamplesList("gg_Sig_ggVV", 7.);
-    appendVector<TString>(strSamples_7TeV, dumappend);
+  vector<TString> strSamples_7TeV = constructSamplesList("JJQCD", 7.);
+  dumappend = constructSamplesList("JJVBF", 7.);
+  appendVector<TString>(strSamples_7TeV, dumappend);
+  dumappend = constructSamplesList("gg_Sig_JHUGen", 7.);
+  appendVector<TString>(strSamples_7TeV, dumappend);
+  dumappend = constructSamplesList("gg_Sig_MCFM", 7.);
+  appendVector<TString>(strSamples_7TeV, dumappend);
+  dumappend = constructSamplesList("gg_Sig_ggVV", 7.);
+  appendVector<TString>(strSamples_7TeV, dumappend);
 
-    const int nSamples = strSamples_13TeV.size() + strSamples_8TeV.size() + strSamples_7TeV.size();
+  vector<TFile*> finputList;
+  vector<TTree*> treeList;
+  int nEntries=0;
+  TString cinput_main;
 
-    vector<TFile*> finputList;
-    vector<TTree*> treeList;
-    int nEntries=0;
-    TString cinput_main;
+  TREE_NAME = "ZZTree/candTree";
+  cinput_main = inputdir_13TeV;
+  //for (int is=0; is<2; is++){
+  for (int is=0; is<(int)strSamples_13TeV.size(); is++){
+    TString cinput = Form("%s/%s/ZZ4lAnalysis.root", cinput_main.Data(), (strSamples_13TeV[is]).Data());
+    TFile* finput = TFile::Open(cinput, "read");
+    cout << "Opening file " << cinput << "..." << endl;
+    TTree* tree=0;
+    if (finput!=0){
+      if (finput->IsOpen() && !finput->IsZombie()){
+        cout << cinput << " opened. Extracting tree " << TREE_NAME << "..." << endl;
+        tree = (TTree*)finput->Get(TREE_NAME);
+        if (tree!=0){
+          cout << TREE_NAME << " is found." << endl;
 
-    TREE_NAME = "ZZTree/candTree";
-    cinput_main = inputdir_13TeV;
-    //for (int is=0; is<2; is++){
-    for (int is=0; is<(int)strSamples_13TeV.size(); is++){
-      TString cinput = Form("%s/%s/ZZ4lAnalysis.root", cinput_main.Data(), (strSamples_13TeV[is]).Data());
-      TFile* finput = TFile::Open(cinput, "read");
-      cout << "Opening file " << cinput << "..." << endl;
-      TTree* tree=0;
-      if (finput!=0){
-        if (finput->IsOpen() && !finput->IsZombie()){
-          cout << cinput << " opened. Extracting tree " << TREE_NAME << "..." << endl;
-          tree = (TTree*)finput->Get(TREE_NAME);
-          if (tree!=0){
-            cout << TREE_NAME << " is found." << endl;
-            tree->SetBranchStatus("*", 0);
-            tree->SetBranchStatus("ZZMass", 1); tree->SetBranchAddress("ZZMass", &mzz);
-            tree->SetBranchStatus("Z1Mass", 1); tree->SetBranchAddress("Z1Mass", &m1);
-            tree->SetBranchStatus("Z2Mass", 1); tree->SetBranchAddress("Z2Mass", &m2);
-            tree->SetBranchStatus("helcosthetaZ1", 1); tree->SetBranchAddress("helcosthetaZ1", &h1);
-            tree->SetBranchStatus("helcosthetaZ2", 1); tree->SetBranchAddress("helcosthetaZ2", &h2);
-            tree->SetBranchStatus("helphi", 1); tree->SetBranchAddress("helphi", &phi);
-            tree->SetBranchStatus("costhetastar", 1); tree->SetBranchAddress("costhetastar", &hs);
-            tree->SetBranchStatus("phistarZ1", 1); tree->SetBranchAddress("phistarZ1", &phi1);
-            tree->SetBranchStatus("Z1Flav", 1); tree->SetBranchAddress("Z1Flav", &Z1Flav);
-            tree->SetBranchStatus("Z2Flav", 1); tree->SetBranchAddress("Z2Flav", &Z2Flav);
-            nEntries += tree->GetEntries();
-            treeList.push_back(tree);
-            finputList.push_back(finput);
+          bool doRecalculate = recalculate;
+          if (!doRecalculate && tree->GetBranchStatus(strConstBranchname)==0) doRecalculate = true;
+          tree->SetBranchStatus("*", 0);
+          tree->SetBranchStatus("ZZMass", 1); tree->SetBranchAddress("ZZMass", &mzz);
+          tree->SetBranchStatus("Z1Mass", 1); tree->SetBranchAddress("Z1Mass", &m1);
+          tree->SetBranchStatus("Z2Mass", 1); tree->SetBranchAddress("Z2Mass", &m2);
+          tree->SetBranchStatus("helcosthetaZ1", 1); tree->SetBranchAddress("helcosthetaZ1", &h1);
+          tree->SetBranchStatus("helcosthetaZ2", 1); tree->SetBranchAddress("helcosthetaZ2", &h2);
+          tree->SetBranchStatus("helphi", 1); tree->SetBranchAddress("helphi", &phi);
+          tree->SetBranchStatus("costhetastar", 1); tree->SetBranchAddress("costhetastar", &hs);
+          tree->SetBranchStatus("phistarZ1", 1); tree->SetBranchAddress("phistarZ1", &phi1);
+          tree->SetBranchStatus("Z1Flav", 1); tree->SetBranchAddress("Z1Flav", &Z1Flav);
+          tree->SetBranchStatus("Z2Flav", 1); tree->SetBranchAddress("Z2Flav", &Z2Flav);
+          if (!doRecalculate && tree->GetBranchStatus(strConstBranchname)==0){
+            tree->SetBranchStatus(strMEBranchname, 1); tree->SetBranchAddress(strMEBranchname, &mesq_calc);
+            tree->SetBranchStatus(strConstBranchname, 1); tree->SetBranchAddress(strConstBranchname, &cconst_calc);
           }
-          else finput->Close();
+          nEntries += tree->GetEntries();
+          treeList.push_back(tree);
+          finputList.push_back(finput);
         }
-        else if (finput->IsOpen()) finput->Close();
+        else finput->Close();
       }
+      else if (finput->IsOpen()) finput->Close();
     }
+  }
+
+  for (int ic=0; ic<3; ic++){
     TREE_NAME = "SelectedTree";
     cinput_main = inputdir_8TeV;
     //for (int is=0; is<2; is++){
@@ -4053,41 +4473,45 @@ void get_PAvgProfile_MCFM_ZZGG_HSMHiggs(){
         else if (finput->IsOpen()) finput->Close();
       }
     }
+  }
 
-    cout << "NEntries = " << nEntries << " over " << treeList.size() << " trees." << endl;
+  cout << "NEntries = " << nEntries << " over " << treeList.size() << " trees." << endl;
 
-    vector<pair<float, int>> index;
-    unsigned ev_acc=0;
-    for (int ev=0; ev<nEntries; ev++){
-      getEntry(treeList, ev);
+  unsigned ev_acc=0;
+  for (int ev=0; ev<nEntries; ev++){
+    getEntry(treeList, ev);
+    bool doProcess=
+      (
+      Z1Flav*Z2Flav==pow(13, 4)
+      ||
+      Z1Flav*Z2Flav==pow(11, 4)
+      ||
+      Z1Flav*Z2Flav==pow(11*13, 2)
+      )
+      ;
+    if (!doProcess) continue;
+    if (ev_acc%10000==0) cout << "Pre-processing event " << ev << endl;
+    unsigned int ic = (Z1Flav*Z2Flav==pow(13, 4))*0 + (Z1Flav*Z2Flav==pow(11, 4))*1 + (Z1Flav*Z2Flav==pow(11*13, 2))*2;
+    addByLowest(index[ic], mzz, ev);
+    ev_acc++;
+  }
+  cout << "Number of valid entries: " << ev_acc << endl;
 
-      bool doProcess=
-        (strchannel[ic]=="4mu" && Z1Flav*Z2Flav==pow(13, 4))
-        ||
-        (strchannel[ic]=="4e" && Z1Flav*Z2Flav==pow(11, 4))
-        ||
-        (strchannel[ic]=="2mu2e" && Z1Flav*Z2Flav==pow(11*13, 2))
-        ;
-      if (!doProcess) continue;
-      if (ev_acc%10000==0) cout << "Pre-processing event " << ev << endl;
-      addByLowest(index, mzz, ev);
-      ev_acc++;
-    }
-
-    float firstVal=index.at(0).first;
-    float lastVal=index.at(index.size()-1).first;
+  for (unsigned int ic=0; ic<3; ic++){
+    float firstVal=index[ic].at(0).first;
+    float lastVal=index[ic].at(index[ic].size()-1).first;
     float infimum = (float)((int)firstVal); infimum -= (float)(((int)infimum)%10);
     float supremum = (float)((int)(lastVal+0.5)); supremum += (float)(10-((int)supremum)%10);
     cout << "Nentries = " << nEntries << " | mzz = " << firstVal << " - " << lastVal << "(" << infimum << ", " << supremum << ")" << endl;
 
-    float divisor=85000;
-    int nbins = index.size()/divisor;
+    float divisor=95000;
+    int nbins = index[ic].size()/divisor;
     const int nbins_th=10/*50*/;
     while (nbins<nbins_th){
       if (divisor>1000) divisor -= 1000;
       else if (divisor>100) divisor -= 100;
       else break;
-      nbins=index.size()/divisor;
+      nbins=index[ic].size()/divisor;
     }
     cout << "nbins=" << nbins << endl;
     if (nbins<3) cerr << "Not enough bins!" << endl;
@@ -4095,28 +4519,34 @@ void get_PAvgProfile_MCFM_ZZGG_HSMHiggs(){
     float* binning = new float[nbins+1];
     binning[0]=infimum;
     binning[nbins]=supremum;
-    int ev_stepsize = index.size()/nbins;
+    int ev_stepsize = index[ic].size()/nbins;
     cout << "Event step size: " << ev_stepsize << endl;
     cout << "Boundary (" << 0 << ") = " << binning[0] << endl;
     for (int ix=1; ix<nbins; ix++){
-      binning[ix]=(index[ix*ev_stepsize-1].first+index[ix*ev_stepsize].first)*0.5;
+      binning[ix]=(index[ic][ix*ev_stepsize-1].first+index[ic][ix*ev_stepsize].first)*0.5;
       ExtBin tmpbin;
-      tmpbin.binlow = binning[ix-1];
-      tmpbin.binhigh = binning[ix];
-      for (int bin=0; bin<ev_stepsize; bin++) tmpbin.events.push_back(index[(ix-1)*ev_stepsize+bin].second);
+      tmpbin.binlow = binning[ix-1]; tmpbin.binhigh = binning[ix];
+      for (int bin=0; bin<ev_stepsize; bin++){
+        int evid = index[ic][(ix-1)*ev_stepsize+bin].second;
+        tmpbin.events.push_back(evid);
+      }
       binList.push_back(tmpbin);
-      cout << "Boundary (" << ix << ")= " << binning[ix] << " [event " << index[ix*ev_stepsize].second << ", step " << ix*ev_stepsize << "]" << endl;
+      cout << "Boundary (" << ix << ")= " << binning[ix] << " [event " << index[ic][ix*ev_stepsize].second << ", step " << ix*ev_stepsize << "]" << endl;
     }
     ExtBin tmpbin;
-    tmpbin.binlow = binning[nbins-1];
-    tmpbin.binhigh = binning[nbins];
-    for (unsigned int bin=(nbins-1)*ev_stepsize; bin<index.size(); bin++) tmpbin.events.push_back(index[bin].second);
+    tmpbin.binlow = binning[nbins-1]; tmpbin.binhigh = binning[nbins];
+    for (unsigned int bin=(nbins-1)*ev_stepsize; bin<index[ic].size(); bin++){
+      int evid = index[ic][bin].second;
+      tmpbin.events.push_back(evid);
+    }
     binList.push_back(tmpbin);
     cout << "Boundary (" << nbins << ") = " << binning[nbins] << endl;
     cout << "Bin list has the following bins:" << endl;
     for (unsigned int ib=0; ib<binList.size(); ib++){
       cout << ib << " / " << binList.size() << ": [" << binList.at(ib).binlow << "," << binList.at(ib).binhigh << "]" << endl;
     }
+
+    foutput->cd();
 
     TProfile* hvar = new TProfile(Form("candMass_%s", strchannel[ic].Data()), "", nbins, binning); hvar->Sumw2();
     TProfile* hmesq_conserveDifermMass = new TProfile(Form("P_ConserveDifermionMass_%s", strchannel[ic].Data()), "", nbins, binning); hmesq_conserveDifermMass->Sumw2();
@@ -4129,7 +4559,6 @@ void get_PAvgProfile_MCFM_ZZGG_HSMHiggs(){
     }
 
     mela.setCandidateDecayMode(TVar::CandidateDecay_ZZ);
-
 
     if (ic==1){
       LepID[0]=11;
@@ -4148,11 +4577,15 @@ void get_PAvgProfile_MCFM_ZZGG_HSMHiggs(){
       LepID[3]=-11;
     }
 
+    double alphasVal=0, mh=0, gah=0, aL1=0, aR1=0, aL2=0, aR2=0;
+    unsigned int ctr=0;
     for (unsigned int bin=0; bin<binList.size(); bin++){
       cout << "Bin " << bin << " is now being scrutinized..." << endl;
       for (unsigned int ev = 0; ev < binList.at(bin).events.size(); ev++){
         int getEv = binList.at(bin).events.at(ev);
         getEntry(treeList, getEv);
+        TTree* tree = findTree(treeList, getEv);
+
         if (ev%1000==0) cout << "Doing event " << getEv << endl;
 
         TLorentzVector pDaughters[4];
@@ -4162,20 +4595,25 @@ void get_PAvgProfile_MCFM_ZZGG_HSMHiggs(){
         for (unsigned int idau=0; idau<4; idau++) daughters.push_back(SimpleParticle_t(LepID[idau], pDaughters[idau]));
         mela.setInputEvent(&daughters, (SimpleParticleCollection_t*)0, (SimpleParticleCollection_t*)0, false);
 
-        double alphasVal, propagator, mh, gah;
-
         mela.setProcess(proc, me, prod);
-
         TUtil::setLeptonMassScheme(TVar::ConserveDifermionMass);
-        mela.computeP(mesq_conserveDifermMass, false);
-        alphasVal = mela.getIORecord()->getAlphaSatMZ();
-        mela.getIORecord()->getHiggsMassWidth(mh, gah, 0);
-        propagator = 1./(pow(pow(mzz, 2)-pow(mh, 2), 2) + pow(mh*gah, 2));
-        mesq_conserveDifermMass /= pow(alphasVal, 2);
+
+        bool hasConst = (tree->GetBranchStatus(strConstBranchname)==1);
+        bool doCalc=(!hasConst || ctr==0);
+        if (doCalc){
+          mela.computeP(mesq_conserveDifermMass, false);
+          if (hasConst) mesq_conserveDifermMass = mesq_calc / cconst_calc;
+
+          alphasVal = mela.getIORecord()->getAlphaSatMZ();
+          mela.getIORecord()->getVDaughterCouplings(aL1, aR1, 0);
+          mela.getIORecord()->getVDaughterCouplings(aL2, aR2, 1);
+          mela.getIORecord()->getHiggsMassWidth(mh, gah, 0);
+        }
+        else mesq_conserveDifermMass = mesq_calc / cconst_calc;
+
+        double propagator = 1./(pow(pow(mzz, 2)-pow(mh, 2), 2) + pow(mh*gah, 2));
         mesq_conserveDifermMass /= propagator;
-        double aL1, aR1, aL2, aR2;
-        mela.getIORecord()->getVDaughterCouplings(aL1, aR1, 0);
-        mela.getIORecord()->getVDaughterCouplings(aL2, aR2, 1);
+        mesq_conserveDifermMass /= pow(alphasVal, 2);
         if (fabs(aL1)>0. || fabs(aR1)>0.) mesq_conserveDifermMass /= pow(aL1, 2)+pow(aR1, 2);
         if (fabs(aL2)>0. || fabs(aR2)>0.) mesq_conserveDifermMass /= pow(aL2, 2)+pow(aR2, 2);
 
@@ -4185,8 +4623,8 @@ void get_PAvgProfile_MCFM_ZZGG_HSMHiggs(){
 
         if (doFill) binList.at(bin).addEvent(mzz, mesq_conserveDifermMass, 0);
 
-        if (writeFinalTree) newtree->Fill();
         mela.resetInputEvent();
+        ctr++;
       }
 
       binList.at(bin).sift(); binList.at(bin).adjustWeights();
@@ -4196,6 +4634,7 @@ void get_PAvgProfile_MCFM_ZZGG_HSMHiggs(){
         mesq_conserveDifermMass = binList.at(bin).mevals.at(ev);
         hmesq_conserveDifermMass->Fill(mzz, mesq_conserveDifermMass);
         hvar->Fill(mzz, mzz);
+        if (writeFinalTree) newtree->Fill();
       }
     }
 
@@ -4231,18 +4670,18 @@ void get_PAvgProfile_MCFM_ZZGG_HSMHiggs(){
   foutput->Close();
 }
 
-
-
 /*
 SPECIFIC COMMENT: OUTPUT ME DIVIDED BY
 - ALPHAS(MZ)**2 TO REMAIN INDEPENDENT OF PDF CHOICE TO FIRST APPROXIMATION
 - (aL1**2+aR1**2)*(aL2**2+aR2**2) TO REMAIN INDEPENDENT OF CHANNEL
 */
-void get_PAvgProfile_MCFM_ZZGG_bkgZZ(){
+void get_PAvgProfile_MCFM_ZZGG_bkgZZ(bool recalculate=false){
   int erg_tev=8;
   float mPOLE=125.;
   TString TREE_NAME;
   const bool writeFinalTree=true;
+  const TString strMEBranchname = "p_GG_BKG_MCFM";
+  const TString strConstBranchname = "pConst_GG_BKG_MCFM";
 
   TVar::VerbosityLevel verbosity = TVar::ERROR;
   Mela mela(erg_tev, mPOLE, verbosity);
@@ -4277,101 +4716,56 @@ void get_PAvgProfile_MCFM_ZZGG_bkgZZ(){
   int LepID[4];
   short useWeighted;
 
+  vector<pair<float, int>> index[3];
   TString strchannel[3]={ "4mu", "4e", "2mu2e" };
   TFile* foutput = TFile::Open(Form("pAvgLinToLog_%s_%s_%s.root", strme.Data(), strprod.Data(), strproc.Data()), "recreate");
-  for (int ic=0; ic<3; ic++){
-    vector<TString> dumappend;
 
-    vector<TString> strSamples_13TeV = constructSamplesList("gg_Bkg_MCFM", 13.);
-    dumappend = constructSamplesList("gg_Bkg_ggVV", 13.);
-    appendVector<TString>(strSamples_13TeV, dumappend);
+  vector<TString> dumappend;
+  vector<TString> strSamples_13TeV = constructSamplesList("gg_Bkg_MCFM", 13.);
+  dumappend = constructSamplesList("gg_Bkg_ggVV", 13.);
+  appendVector<TString>(strSamples_13TeV, dumappend);
 
-    vector<TString> strSamples_8TeV = constructSamplesList("gg_Bkg_MCFM", 8.);
-    dumappend = constructSamplesList("gg_Bkg_ggVV", 8.);
-    appendVector<TString>(strSamples_8TeV, dumappend);
+  vector<TString> strSamples_8TeV = constructSamplesList("gg_Bkg_MCFM", 8.);
+  dumappend = constructSamplesList("gg_Bkg_ggVV", 8.);
+  appendVector<TString>(strSamples_8TeV, dumappend);
 
-    vector<TString> strSamples_7TeV = constructSamplesList("gg_Bkg_MCFM", 7.);
-    dumappend = constructSamplesList("gg_Bkg_ggVV", 7.);
-    appendVector<TString>(strSamples_7TeV, dumappend);
+  vector<TString> strSamples_7TeV = constructSamplesList("gg_Bkg_MCFM", 7.);
+  dumappend = constructSamplesList("gg_Bkg_ggVV", 7.);
+  appendVector<TString>(strSamples_7TeV, dumappend);
 
-    // Consider if weights exist
-    unordered_map<TTree*, pair<float, float>> samplePoleMasses;
+  // Consider if weights exist
+  unordered_map<TTree*, pair<float, float>> samplePoleMasses;
 
-    vector<TString> strSamples_weighted_13TeV = constructSamplesList("JJQCD", 13.);
-    dumappend = constructSamplesList("gg_Sig_JHUGen", 13.);
-    appendVector<TString>(strSamples_weighted_13TeV, dumappend);
-    dumappend = constructSamplesList("gg_Sig_MCFM", 13.);
-    appendVector<TString>(strSamples_weighted_13TeV, dumappend);
-    dumappend = constructSamplesList("gg_Sig_ggVV", 13.);
-    appendVector<TString>(strSamples_weighted_13TeV, dumappend);
+  vector<TString> strSamples_weighted_13TeV = constructSamplesList("JJQCD", 13.);
+  dumappend = constructSamplesList("gg_Sig_JHUGen", 13.);
+  appendVector<TString>(strSamples_weighted_13TeV, dumappend);
+  dumappend = constructSamplesList("gg_Sig_MCFM", 13.);
+  appendVector<TString>(strSamples_weighted_13TeV, dumappend);
+  dumappend = constructSamplesList("gg_Sig_ggVV", 13.);
+  appendVector<TString>(strSamples_weighted_13TeV, dumappend);
 
-    vector<TFile*> finputList;
-    vector<TTree*> treeList;
-    int nEntries=0;
-    TString cinput_main;
+  vector<TFile*> finputList;
+  vector<TTree*> treeList;
+  int nEntries=0;
+  TString cinput_main;
 
-    TREE_NAME = "ZZTree/candTree";
-    cinput_main = inputdir_13TeV;
-    //for (int is=0; is<1; is++){
-    for (int is=0; is<(int)strSamples_weighted_13TeV.size(); is++){
-      TString cinput = Form("%s/%s/ZZ4lAnalysis.root", cinput_main.Data(), (strSamples_weighted_13TeV[is]).Data());
-      TFile* finput = TFile::Open(cinput, "read");
-      cout << "Opening file " << cinput << "..." << endl;
-      TTree* tree=0;
-      if (finput!=0){
-        if (finput->IsOpen() && !finput->IsZombie()){
-          cout << cinput << " opened. Extracting tree " << TREE_NAME << "..." << endl;
-          tree = (TTree*)finput->Get(TREE_NAME);
-          if (tree!=0){
-            cout << TREE_NAME << " is found." << endl;
-            if (tree->GetBranchStatus("p_Gen_GG_BKG_MCFM")==1){
-              tree->SetBranchStatus("*", 0);
-              tree->SetBranchStatus("ZZMass", 1); tree->SetBranchAddress("ZZMass", &mzz);
-              tree->SetBranchStatus("Z1Mass", 1); tree->SetBranchAddress("Z1Mass", &m1);
-              tree->SetBranchStatus("Z2Mass", 1); tree->SetBranchAddress("Z2Mass", &m2);
-              tree->SetBranchStatus("helcosthetaZ1", 1); tree->SetBranchAddress("helcosthetaZ1", &h1);
-              tree->SetBranchStatus("helcosthetaZ2", 1); tree->SetBranchAddress("helcosthetaZ2", &h2);
-              tree->SetBranchStatus("helphi", 1); tree->SetBranchAddress("helphi", &phi);
-              tree->SetBranchStatus("costhetastar", 1); tree->SetBranchAddress("costhetastar", &hs);
-              tree->SetBranchStatus("phistarZ1", 1); tree->SetBranchAddress("phistarZ1", &phi1);
-              tree->SetBranchStatus("Z1Flav", 1); tree->SetBranchAddress("Z1Flav", &Z1Flav);
-              tree->SetBranchStatus("Z2Flav", 1); tree->SetBranchAddress("Z2Flav", &Z2Flav);
-              tree->SetBranchStatus("p_Gen_GG_BKG_MCFM", 1); tree->SetBranchAddress("p_Gen_GG_BKG_MCFM", &wgt);
-              tree->SetBranchStatus("GenHMass", 1); tree->SetBranchAddress("GenHMass", &GenHMass);
-              nEntries += tree->GetEntries();
-              treeList.push_back(tree);
-              finputList.push_back(finput);
-              
-              float polemass = findPoleMass(strSamples_weighted_13TeV[is]);
-              float polewidth = mela.getHiggsWidthAtPoleMass(polemass);
-              cout << strSamples_weighted_13TeV[is] << " pole mass = " << polemass << ", pole width = " << polewidth << endl;
-              samplePoleMasses[tree] = pair<float, float>(polemass, polewidth);
-            }
-            else{
-              cerr << TREE_NAME << " in " << cinput << " does not have weight p_Gen_GG_BKG_MCFM." << endl;
-              finput->Close();
-            }
-          }
-          else finput->Close();
-        }
-        else if (finput->IsOpen()) finput->Close();
-      }
-    }
-
-    TREE_NAME = "ZZTree/candTree";
-    cinput_main = inputdir_13TeV;
-    //for (int is=0; is<1; is++){
-    for (int is=0; is<(int)strSamples_13TeV.size(); is++){
-      TString cinput = Form("%s/%s/ZZ4lAnalysis.root", cinput_main.Data(), (strSamples_13TeV[is]).Data());
-      TFile* finput = TFile::Open(cinput, "read");
-      cout << "Opening file " << cinput << "..." << endl;
-      TTree* tree=0;
-      if (finput!=0){
-        if (finput->IsOpen() && !finput->IsZombie()){
-          cout << cinput << " opened. Extracting tree " << TREE_NAME << "..." << endl;
-          tree = (TTree*)finput->Get(TREE_NAME);
-          if (tree!=0){
-            cout << TREE_NAME << " is found." << endl;
+  TREE_NAME = "ZZTree/candTree";
+  cinput_main = inputdir_13TeV;
+  //for (int is=0; is<1; is++){
+  for (int is=0; is<(int)strSamples_weighted_13TeV.size(); is++){
+    TString cinput = Form("%s/%s/ZZ4lAnalysis.root", cinput_main.Data(), (strSamples_weighted_13TeV[is]).Data());
+    TFile* finput = TFile::Open(cinput, "read");
+    cout << "Opening file " << cinput << "..." << endl;
+    TTree* tree=0;
+    if (finput!=0){
+      if (finput->IsOpen() && !finput->IsZombie()){
+        cout << cinput << " opened. Extracting tree " << TREE_NAME << "..." << endl;
+        tree = (TTree*)finput->Get(TREE_NAME);
+        if (tree!=0){
+          cout << TREE_NAME << " is found." << endl;
+          if (tree->GetBranchStatus("p_Gen_GG_BKG_MCFM")==1){
+            bool doRecalculate = recalculate;
+            if (!doRecalculate && tree->GetBranchStatus(strConstBranchname)==0) doRecalculate = true;
             tree->SetBranchStatus("*", 0);
             tree->SetBranchStatus("ZZMass", 1); tree->SetBranchAddress("ZZMass", &mzz);
             tree->SetBranchStatus("Z1Mass", 1); tree->SetBranchAddress("Z1Mass", &m1);
@@ -4383,17 +4777,75 @@ void get_PAvgProfile_MCFM_ZZGG_bkgZZ(){
             tree->SetBranchStatus("phistarZ1", 1); tree->SetBranchAddress("phistarZ1", &phi1);
             tree->SetBranchStatus("Z1Flav", 1); tree->SetBranchAddress("Z1Flav", &Z1Flav);
             tree->SetBranchStatus("Z2Flav", 1); tree->SetBranchAddress("Z2Flav", &Z2Flav);
-            if (tree->GetBranchStatus("p_Gen_GG_BKG_MCFM")==1) cerr << "p_Gen_GG_BKG_MCFM status==1 should not happen!" << endl;
+            tree->SetBranchStatus("p_Gen_GG_BKG_MCFM", 1); tree->SetBranchAddress("p_Gen_GG_BKG_MCFM", &wgt);
+            tree->SetBranchStatus("GenHMass", 1); tree->SetBranchAddress("GenHMass", &GenHMass);
+            if (!doRecalculate && tree->GetBranchStatus(strConstBranchname)==0){
+              tree->SetBranchStatus(strMEBranchname, 1); tree->SetBranchAddress(strMEBranchname, &mesq_calc);
+              tree->SetBranchStatus(strConstBranchname, 1); tree->SetBranchAddress(strConstBranchname, &cconst_calc);
+            }
             nEntries += tree->GetEntries();
             treeList.push_back(tree);
             finputList.push_back(finput);
+
+            float polemass = findPoleMass(strSamples_weighted_13TeV[is]);
+            float polewidth = mela.getHiggsWidthAtPoleMass(polemass);
+            cout << strSamples_weighted_13TeV[is] << " pole mass = " << polemass << ", pole width = " << polewidth << endl;
+            samplePoleMasses[tree] = pair<float, float>(polemass, polewidth);
           }
-          else finput->Close();
+          else{
+            cerr << TREE_NAME << " in " << cinput << " does not have weight p_Gen_GG_BKG_MCFM." << endl;
+            finput->Close();
+          }
         }
-        else if (finput->IsOpen()) finput->Close();
+        else finput->Close();
       }
+      else if (finput->IsOpen()) finput->Close();
     }
-    TREE_NAME = "SelectedTree";
+  }
+
+  TREE_NAME = "ZZTree/candTree";
+  cinput_main = inputdir_13TeV;
+  //for (int is=0; is<1; is++){
+  for (int is=0; is<(int)strSamples_13TeV.size(); is++){
+    TString cinput = Form("%s/%s/ZZ4lAnalysis.root", cinput_main.Data(), (strSamples_13TeV[is]).Data());
+    TFile* finput = TFile::Open(cinput, "read");
+    cout << "Opening file " << cinput << "..." << endl;
+    TTree* tree=0;
+    if (finput!=0){
+      if (finput->IsOpen() && !finput->IsZombie()){
+        cout << cinput << " opened. Extracting tree " << TREE_NAME << "..." << endl;
+        tree = (TTree*)finput->Get(TREE_NAME);
+        if (tree!=0){
+          cout << TREE_NAME << " is found." << endl;
+          bool doRecalculate = recalculate;
+          if (!doRecalculate && tree->GetBranchStatus(strConstBranchname)==0) doRecalculate = true;
+          tree->SetBranchStatus("*", 0);
+          tree->SetBranchStatus("ZZMass", 1); tree->SetBranchAddress("ZZMass", &mzz);
+          tree->SetBranchStatus("Z1Mass", 1); tree->SetBranchAddress("Z1Mass", &m1);
+          tree->SetBranchStatus("Z2Mass", 1); tree->SetBranchAddress("Z2Mass", &m2);
+          tree->SetBranchStatus("helcosthetaZ1", 1); tree->SetBranchAddress("helcosthetaZ1", &h1);
+          tree->SetBranchStatus("helcosthetaZ2", 1); tree->SetBranchAddress("helcosthetaZ2", &h2);
+          tree->SetBranchStatus("helphi", 1); tree->SetBranchAddress("helphi", &phi);
+          tree->SetBranchStatus("costhetastar", 1); tree->SetBranchAddress("costhetastar", &hs);
+          tree->SetBranchStatus("phistarZ1", 1); tree->SetBranchAddress("phistarZ1", &phi1);
+          tree->SetBranchStatus("Z1Flav", 1); tree->SetBranchAddress("Z1Flav", &Z1Flav);
+          tree->SetBranchStatus("Z2Flav", 1); tree->SetBranchAddress("Z2Flav", &Z2Flav);
+          if (!doRecalculate && tree->GetBranchStatus(strConstBranchname)==0){
+            tree->SetBranchStatus(strMEBranchname, 1); tree->SetBranchAddress(strMEBranchname, &mesq_calc);
+            tree->SetBranchStatus(strConstBranchname, 1); tree->SetBranchAddress(strConstBranchname, &cconst_calc);
+          }
+          nEntries += tree->GetEntries();
+          treeList.push_back(tree);
+          finputList.push_back(finput);
+        }
+        else finput->Close();
+      }
+      else if (finput->IsOpen()) finput->Close();
+    }
+  }
+
+  TREE_NAME = "SelectedTree";
+  for (int ic=0; ic<3; ic++){
     cinput_main = inputdir_8TeV;
     //for (int is=0; is<0; is++){
     for (int is=0; is<(int)strSamples_8TeV.size(); is++){
@@ -4460,41 +4912,45 @@ void get_PAvgProfile_MCFM_ZZGG_bkgZZ(){
         else if (finput->IsOpen()) finput->Close();
       }
     }
+  }
 
-    cout << "NEntries = " << nEntries << " over " << treeList.size() << " trees." << endl;
+  cout << "NEntries = " << nEntries << " over " << treeList.size() << " trees." << endl;
 
-    vector<pair<float, int>> index;
-    unsigned ev_acc=0;
-    for (int ev=0; ev<nEntries; ev++){
-      getEntry(treeList, ev);
+  unsigned ev_acc=0;
+  for (int ev=0; ev<nEntries; ev++){
+    getEntry(treeList, ev);
+    bool doProcess=
+      (
+      Z1Flav*Z2Flav==pow(13, 4)
+      ||
+      Z1Flav*Z2Flav==pow(11, 4)
+      ||
+      Z1Flav*Z2Flav==pow(11*13, 2)
+      )
+      ;
+    if (!doProcess) continue;
+    if (ev_acc%10000==0) cout << "Pre-processing event " << ev << endl;
+    unsigned int ic = (Z1Flav*Z2Flav==pow(13, 4))*0 + (Z1Flav*Z2Flav==pow(11, 4))*1 + (Z1Flav*Z2Flav==pow(11*13, 2))*2;
+    addByLowest(index[ic], mzz, ev);
+    ev_acc++;
+  }
+  cout << "Number of valid entries: " << ev_acc << endl;
 
-      bool doProcess=
-        (strchannel[ic]=="4mu" && Z1Flav*Z2Flav==pow(13, 4))
-        ||
-        (strchannel[ic]=="4e" && Z1Flav*Z2Flav==pow(11, 4))
-        ||
-        (strchannel[ic]=="2mu2e" && Z1Flav*Z2Flav==pow(11*13, 2))
-        ;
-      if (!doProcess) continue;
-      if (ev_acc%10000==0) cout << "Pre-processing event " << ev << endl;
-      addByLowest(index, mzz, ev);
-      ev_acc++;
-    }
-
-    float firstVal=index.at(0).first;
-    float lastVal=index.at(index.size()-1).first;
+  for (unsigned int ic=0; ic<3; ic++){
+    float firstVal=index[ic].at(0).first;
+    float lastVal=index[ic].at(index[ic].size()-1).first;
     float infimum = (float)((int)firstVal); infimum -= (float)(((int)infimum)%10);
     float supremum = (float)((int)(lastVal+0.5)); supremum += (float)(10-((int)supremum)%10);
     cout << "Nentries = " << nEntries << " | mzz = " << firstVal << " - " << lastVal << "(" << infimum << ", " << supremum << ")" << endl;
 
-    float divisor=85000;
-    int nbins = index.size()/divisor;
+    float divisor=120000;
+    int nbins = index[ic].size()/divisor;
     const int nbins_th=10/*50*/;
     while (nbins<nbins_th){
       if (divisor>1000) divisor -= 1000;
       else if (divisor>100) divisor -= 100;
       else break;
-      nbins=index.size()/divisor;
+      nbins=index[ic].size()/divisor;
     }
     cout << "nbins=" << nbins << endl;
     if (nbins<3) cerr << "Not enough bins!" << endl;
@@ -4503,30 +4959,29 @@ void get_PAvgProfile_MCFM_ZZGG_bkgZZ(){
     float* binning = new float[nbins+1];
     binning[0]=infimum;
     binning[nbins]=supremum;
-    int ev_stepsize = index.size()/nbins;
+    int ev_stepsize = index[ic].size()/nbins;
     cout << "Event step size: " << ev_stepsize << endl;
     cout << "Boundary (" << 0 << ") = " << binning[0] << endl;
     for (int ix=1; ix<nbins; ix++){
-      binning[ix]=(index[ix*ev_stepsize-1].first+index[ix*ev_stepsize].first)*0.5;
+      binning[ix]=(index[ic][ix*ev_stepsize-1].first+index[ic][ix*ev_stepsize].first)*0.5;
       ExtBin tmpbin, tmpbin_weighted;
       tmpbin.binlow = binning[ix-1]; tmpbin.binhigh = binning[ix];
       tmpbin_weighted.binlow = binning[ix-1]; tmpbin_weighted.binhigh = binning[ix];
       for (int bin=0; bin<ev_stepsize; bin++){
-        int evid = index[(ix-1)*ev_stepsize+bin].second;
+        int evid = index[ic][(ix-1)*ev_stepsize+bin].second;
         TTree* tree = findTree(treeList, evid);
         if (tree->GetBranchStatus("p_Gen_GG_BKG_MCFM")==1) tmpbin_weighted.events.push_back(evid);
         else tmpbin.events.push_back(evid);
       }
       binList.push_back(tmpbin);
       weightedBinList.push_back(tmpbin_weighted);
-      cout << "Boundary (" << ix << ")= " << binning[ix] << " [event " << index[ix*ev_stepsize].second << ", step " << ix*ev_stepsize << "]" << endl;
+      cout << "Boundary (" << ix << ")= " << binning[ix] << " [event " << index[ic][ix*ev_stepsize].second << ", step " << ix*ev_stepsize << "]" << endl;
     }
-
     ExtBin tmpbin, tmpbin_weighted;
     tmpbin.binlow = binning[nbins-1]; tmpbin.binhigh = binning[nbins];
     tmpbin_weighted.binlow = binning[nbins-1]; tmpbin_weighted.binhigh = binning[nbins];
-    for (unsigned int bin=(nbins-1)*ev_stepsize; bin<index.size(); bin++){
-      int evid = index[bin].second;
+    for (unsigned int bin=(nbins-1)*ev_stepsize; bin<index[ic].size(); bin++){
+      int evid = index[ic][bin].second;
       TTree* tree = findTree(treeList, evid);
       if (tree->GetBranchStatus("p_Gen_GG_BKG_MCFM")==1) tmpbin_weighted.events.push_back(evid);
       else tmpbin.events.push_back(evid);
@@ -4571,6 +5026,8 @@ void get_PAvgProfile_MCFM_ZZGG_bkgZZ(){
       LepID[3]=-11;
     }
 
+    double alphasVal=0, aL1=0, aR1=0, aL2=0, aR2=0;
+    unsigned int ctr=0;
     for (unsigned int bin=0; bin<binList.size(); bin++){
       cout << "Bin " << bin << " is now being scrutinized..." << endl;
       unsigned int nweighted = weightedBinList.at(bin).events.size();
@@ -4583,6 +5040,7 @@ void get_PAvgProfile_MCFM_ZZGG_bkgZZ(){
         else getEv = binList.at(bin).events.at(ev-nweighted);
         wgt=1;
         getEntry(treeList, getEv);
+        TTree* tree = findTree(treeList, getEv);
 
         if (ev%1000==0) cout << "Doing event " << getEv << endl;
 
@@ -4593,17 +5051,22 @@ void get_PAvgProfile_MCFM_ZZGG_bkgZZ(){
         for (unsigned int idau=0; idau<4; idau++) daughters.push_back(SimpleParticle_t(LepID[idau], pDaughters[idau]));
         mela.setInputEvent(&daughters, (SimpleParticleCollection_t*)0, (SimpleParticleCollection_t*)0, false);
 
-        double alphasVal;
-
         mela.setProcess(proc, me, prod);
-
         TUtil::setLeptonMassScheme(TVar::ConserveDifermionMass);
-        mela.computeP(mesq_conserveDifermMass, false);
-        alphasVal = mela.getIORecord()->getAlphaSatMZ();
+
+        bool hasConst = (tree->GetBranchStatus(strConstBranchname)==1);
+        bool doCalc=(!hasConst || ctr==0);
+        if (doCalc){
+          mela.computeP(mesq_conserveDifermMass, false);
+          if (hasConst) mesq_conserveDifermMass = mesq_calc / cconst_calc;
+
+          alphasVal = mela.getIORecord()->getAlphaSatMZ();
+          mela.getIORecord()->getVDaughterCouplings(aL1, aR1, 0);
+          mela.getIORecord()->getVDaughterCouplings(aL2, aR2, 1);
+        }
+        else mesq_conserveDifermMass = mesq_calc / cconst_calc;
+
         mesq_conserveDifermMass /= pow(alphasVal, 2);
-        double aL1, aR1, aL2, aR2;
-        mela.getIORecord()->getVDaughterCouplings(aL1, aR1, 0);
-        mela.getIORecord()->getVDaughterCouplings(aL2, aR2, 1);
         if (fabs(aL1)>0. || fabs(aR1)>0.) mesq_conserveDifermMass /= pow(aL1, 2)+pow(aR1, 2);
         if (fabs(aL2)>0. || fabs(aR2)>0.) mesq_conserveDifermMass /= pow(aL2, 2)+pow(aR2, 2);
 
@@ -4613,8 +5076,6 @@ void get_PAvgProfile_MCFM_ZZGG_bkgZZ(){
 
         if (doFill){
           if (isweighted){
-            TTree* tree = findTree(treeList, getEv);
-
             float mh = samplePoleMasses[tree].first;
             float gh = samplePoleMasses[tree].second;
             float prop = 1./(pow(pow(GenHMass, 2) - pow(mh, 2), 2) + pow(mh*gh, 2));
@@ -4625,6 +5086,7 @@ void get_PAvgProfile_MCFM_ZZGG_bkgZZ(){
         }
 
         mela.resetInputEvent();
+        ctr++;
       }
 
       cout << "Adjusting weights in weighted samples" << endl;
@@ -4681,11 +5143,13 @@ void get_PAvgProfile_MCFM_ZZGG_bkgZZ(){
 SPECIFIC COMMENT: OUTPUT ME DIVIDED BY
 - (aL1**2+aR1**2)*(aL2**2+aR2**2) TO REMAIN INDEPENDENT OF CHANNEL
 */
-void get_PAvgProfile_MCFM_ZZQQB_bkgZZ(){
+void get_PAvgProfile_MCFM_ZZQQB_bkgZZ(bool recalculate=false){
   int erg_tev=8;
   float mPOLE=125.;
   TString TREE_NAME;
   const bool writeFinalTree=true;
+  const TString strMEBranchname = "p_QQB_BKG_MCFM";
+  const TString strConstBranchname = "pConst_QQB_BKG_MCFM";
 
   TVar::VerbosityLevel verbosity = TVar::ERROR;
   Mela mela(erg_tev, mPOLE, verbosity);
@@ -4717,54 +5181,61 @@ void get_PAvgProfile_MCFM_ZZQQB_bkgZZ(){
   short Z1Flav, Z2Flav;
   int LepID[4];
 
+  vector<pair<float, int>> index[3];
   TString strchannel[3]={ "4mu", "4e", "2mu2e" };
   TFile* foutput = TFile::Open(Form("pAvgLinToLog_%s_%s_%s.root", strme.Data(), strprod.Data(), strproc.Data()), "recreate");
-  for (int ic=0; ic<3; ic++){
-    vector<TString> strSamples_13TeV = constructSamplesList("qq_Bkg", 13.);
-    vector<TString> strSamples_8TeV = constructSamplesList("qq_Bkg", 8.);
-    vector<TString> strSamples_7TeV = constructSamplesList("qq_Bkg", 7.);
 
-    const int nSamples = strSamples_13TeV.size() + strSamples_8TeV.size() + strSamples_7TeV.size();
+  vector<TString> strSamples_13TeV = constructSamplesList("qq_Bkg", 13.);
+  vector<TString> strSamples_8TeV = constructSamplesList("qq_Bkg", 8.);
+  vector<TString> strSamples_7TeV = constructSamplesList("qq_Bkg", 7.);
 
-    vector<TFile*> finputList;
-    vector<TTree*> treeList;
-    int nEntries=0;
-    TString cinput_main;
+  vector<TFile*> finputList;
+  vector<TTree*> treeList;
+  int nEntries=0;
+  TString cinput_main;
 
-    TREE_NAME = "ZZTree/candTree";
-    cinput_main = inputdir_13TeV;
-    //for (int is=0; is<2; is++){
-    for (int is=0; is<(int)strSamples_13TeV.size(); is++){
-      TString cinput = Form("%s/%s/ZZ4lAnalysis.root", cinput_main.Data(), (strSamples_13TeV[is]).Data());
-      TFile* finput = TFile::Open(cinput, "read");
-      cout << "Opening file " << cinput << "..." << endl;
-      TTree* tree=0;
-      if (finput!=0){
-        if (finput->IsOpen() && !finput->IsZombie()){
-          cout << cinput << " opened. Extracting tree " << TREE_NAME << "..." << endl;
-          tree = (TTree*)finput->Get(TREE_NAME);
-          if (tree!=0){
-            cout << TREE_NAME << " is found." << endl;
-            tree->SetBranchStatus("*", 0);
-            tree->SetBranchStatus("ZZMass", 1); tree->SetBranchAddress("ZZMass", &mzz);
-            tree->SetBranchStatus("Z1Mass", 1); tree->SetBranchAddress("Z1Mass", &m1);
-            tree->SetBranchStatus("Z2Mass", 1); tree->SetBranchAddress("Z2Mass", &m2);
-            tree->SetBranchStatus("helcosthetaZ1", 1); tree->SetBranchAddress("helcosthetaZ1", &h1);
-            tree->SetBranchStatus("helcosthetaZ2", 1); tree->SetBranchAddress("helcosthetaZ2", &h2);
-            tree->SetBranchStatus("helphi", 1); tree->SetBranchAddress("helphi", &phi);
-            tree->SetBranchStatus("costhetastar", 1); tree->SetBranchAddress("costhetastar", &hs);
-            tree->SetBranchStatus("phistarZ1", 1); tree->SetBranchAddress("phistarZ1", &phi1);
-            tree->SetBranchStatus("Z1Flav", 1); tree->SetBranchAddress("Z1Flav", &Z1Flav);
-            tree->SetBranchStatus("Z2Flav", 1); tree->SetBranchAddress("Z2Flav", &Z2Flav);
-            nEntries += tree->GetEntries();
-            treeList.push_back(tree);
-            finputList.push_back(finput);
+  TREE_NAME = "ZZTree/candTree";
+  cinput_main = inputdir_13TeV;
+  //for (int is=0; is<2; is++){
+  for (int is=0; is<(int)strSamples_13TeV.size(); is++){
+    TString cinput = Form("%s/%s/ZZ4lAnalysis.root", cinput_main.Data(), (strSamples_13TeV[is]).Data());
+    TFile* finput = TFile::Open(cinput, "read");
+    cout << "Opening file " << cinput << "..." << endl;
+    TTree* tree=0;
+    if (finput!=0){
+      if (finput->IsOpen() && !finput->IsZombie()){
+        cout << cinput << " opened. Extracting tree " << TREE_NAME << "..." << endl;
+        tree = (TTree*)finput->Get(TREE_NAME);
+        if (tree!=0){
+          cout << TREE_NAME << " is found." << endl;
+          bool doRecalculate = recalculate;
+          if (!doRecalculate && tree->GetBranchStatus(strConstBranchname)==0) doRecalculate = true;
+          tree->SetBranchStatus("*", 0);
+          tree->SetBranchStatus("ZZMass", 1); tree->SetBranchAddress("ZZMass", &mzz);
+          tree->SetBranchStatus("Z1Mass", 1); tree->SetBranchAddress("Z1Mass", &m1);
+          tree->SetBranchStatus("Z2Mass", 1); tree->SetBranchAddress("Z2Mass", &m2);
+          tree->SetBranchStatus("helcosthetaZ1", 1); tree->SetBranchAddress("helcosthetaZ1", &h1);
+          tree->SetBranchStatus("helcosthetaZ2", 1); tree->SetBranchAddress("helcosthetaZ2", &h2);
+          tree->SetBranchStatus("helphi", 1); tree->SetBranchAddress("helphi", &phi);
+          tree->SetBranchStatus("costhetastar", 1); tree->SetBranchAddress("costhetastar", &hs);
+          tree->SetBranchStatus("phistarZ1", 1); tree->SetBranchAddress("phistarZ1", &phi1);
+          tree->SetBranchStatus("Z1Flav", 1); tree->SetBranchAddress("Z1Flav", &Z1Flav);
+          tree->SetBranchStatus("Z2Flav", 1); tree->SetBranchAddress("Z2Flav", &Z2Flav);
+          if (!doRecalculate && tree->GetBranchStatus(strConstBranchname)==0){
+            tree->SetBranchStatus(strMEBranchname, 1); tree->SetBranchAddress(strMEBranchname, &mesq_calc);
+            tree->SetBranchStatus(strConstBranchname, 1); tree->SetBranchAddress(strConstBranchname, &cconst_calc);
           }
-          else finput->Close();
+          nEntries += tree->GetEntries();
+          treeList.push_back(tree);
+          finputList.push_back(finput);
         }
-        else if (finput->IsOpen()) finput->Close();
+        else finput->Close();
       }
+      else if (finput->IsOpen()) finput->Close();
     }
+  }
+
+  for (int ic=0; ic<3; ic++){
     TREE_NAME = "SelectedTree";
     cinput_main = inputdir_8TeV;
     //for (int is=0; is<2; is++){
@@ -4832,41 +5303,45 @@ void get_PAvgProfile_MCFM_ZZQQB_bkgZZ(){
         else if (finput->IsOpen()) finput->Close();
       }
     }
+  }
 
-    cout << "NEntries = " << nEntries << " over " << treeList.size() << " trees." << endl;
+  cout << "NEntries = " << nEntries << " over " << treeList.size() << " trees." << endl;
 
-    vector<pair<float, int>> index;
-    unsigned ev_acc=0;
-    for (int ev=0; ev<nEntries; ev++){
-      getEntry(treeList, ev);
+  unsigned ev_acc=0;
+  for (int ev=0; ev<nEntries; ev++){
+    getEntry(treeList, ev);
+    bool doProcess=
+      (
+      Z1Flav*Z2Flav==pow(13, 4)
+      ||
+      Z1Flav*Z2Flav==pow(11, 4)
+      ||
+      Z1Flav*Z2Flav==pow(11*13, 2)
+      )
+      ;
+    if (!doProcess) continue;
+    if (ev_acc%10000==0) cout << "Pre-processing event " << ev << endl;
+    unsigned int ic = (Z1Flav*Z2Flav==pow(13, 4))*0 + (Z1Flav*Z2Flav==pow(11, 4))*1 + (Z1Flav*Z2Flav==pow(11*13, 2))*2;
+    addByLowest(index[ic], mzz, ev);
+    ev_acc++;
+  }
+  cout << "Number of valid entries: " << ev_acc << endl;
 
-      bool doProcess=
-        (strchannel[ic]=="4mu" && Z1Flav*Z2Flav==pow(13, 4))
-        ||
-        (strchannel[ic]=="4e" && Z1Flav*Z2Flav==pow(11, 4))
-        ||
-        (strchannel[ic]=="2mu2e" && Z1Flav*Z2Flav==pow(11*13, 2))
-        ;
-      if (!doProcess) continue;
-      if (ev_acc%10000==0) cout << "Pre-processing event " << ev << endl;
-      addByLowest(index, mzz, ev);
-      ev_acc++;
-    }
-
-    float firstVal=index.at(0).first;
-    float lastVal=index.at(index.size()-1).first;
+  for (unsigned int ic=0; ic<3; ic++){
+    float firstVal=index[ic].at(0).first;
+    float lastVal=index[ic].at(index[ic].size()-1).first;
     float infimum = (float)((int)firstVal); infimum -= (float)(((int)infimum)%10);
     float supremum = (float)((int)(lastVal+0.5)); supremum += (float)(10-((int)supremum)%10);
     cout << "Nentries = " << nEntries << " | mzz = " << firstVal << " - " << lastVal << "(" << infimum << ", " << supremum << ")" << endl;
 
     float divisor=45000;
-    int nbins = index.size()/divisor;
+    int nbins = index[ic].size()/divisor;
     const int nbins_th=10/*50*/;
     while (nbins<nbins_th){
       if (divisor>1000) divisor -= 1000;
       else if (divisor>100) divisor -= 100;
       else break;
-      nbins=index.size()/divisor;
+      nbins=index[ic].size()/divisor;
     }
     cout << "nbins=" << nbins << endl;
     if (nbins<3) cerr << "Not enough bins!" << endl;
@@ -4874,28 +5349,34 @@ void get_PAvgProfile_MCFM_ZZQQB_bkgZZ(){
     float* binning = new float[nbins+1];
     binning[0]=infimum;
     binning[nbins]=supremum;
-    int ev_stepsize = index.size()/nbins;
+    int ev_stepsize = index[ic].size()/nbins;
     cout << "Event step size: " << ev_stepsize << endl;
     cout << "Boundary (" << 0 << ") = " << binning[0] << endl;
     for (int ix=1; ix<nbins; ix++){
-      binning[ix]=(index[ix*ev_stepsize-1].first+index[ix*ev_stepsize].first)*0.5;
+      binning[ix]=(index[ic][ix*ev_stepsize-1].first+index[ic][ix*ev_stepsize].first)*0.5;
       ExtBin tmpbin;
-      tmpbin.binlow = binning[ix-1];
-      tmpbin.binhigh = binning[ix];
-      for (int bin=0; bin<ev_stepsize; bin++) tmpbin.events.push_back(index[(ix-1)*ev_stepsize+bin].second);
+      tmpbin.binlow = binning[ix-1]; tmpbin.binhigh = binning[ix];
+      for (int bin=0; bin<ev_stepsize; bin++){
+        int evid = index[ic][(ix-1)*ev_stepsize+bin].second;
+        tmpbin.events.push_back(evid);
+      }
       binList.push_back(tmpbin);
-      cout << "Boundary (" << ix << ")= " << binning[ix] << " [event " << index[ix*ev_stepsize].second << ", step " << ix*ev_stepsize << "]" << endl;
+      cout << "Boundary (" << ix << ")= " << binning[ix] << " [event " << index[ic][ix*ev_stepsize].second << ", step " << ix*ev_stepsize << "]" << endl;
     }
     ExtBin tmpbin;
-    tmpbin.binlow = binning[nbins-1];
-    tmpbin.binhigh = binning[nbins];
-    for (unsigned int bin=(nbins-1)*ev_stepsize; bin<index.size(); bin++) tmpbin.events.push_back(index[bin].second);
+    tmpbin.binlow = binning[nbins-1]; tmpbin.binhigh = binning[nbins];
+    for (unsigned int bin=(nbins-1)*ev_stepsize; bin<index[ic].size(); bin++){
+      int evid = index[ic][bin].second;
+      tmpbin.events.push_back(evid);
+    }
     binList.push_back(tmpbin);
     cout << "Boundary (" << nbins << ") = " << binning[nbins] << endl;
     cout << "Bin list has the following bins:" << endl;
     for (unsigned int ib=0; ib<binList.size(); ib++){
       cout << ib << " / " << binList.size() << ": [" << binList.at(ib).binlow << "," << binList.at(ib).binhigh << "]" << endl;
     }
+
+    foutput->cd();
 
     TProfile* hvar = new TProfile(Form("candMass_%s", strchannel[ic].Data()), "", nbins, binning); hvar->Sumw2();
     TProfile* hmesq_conserveDifermMass = new TProfile(Form("P_ConserveDifermionMass_%s", strchannel[ic].Data()), "", nbins, binning); hmesq_conserveDifermMass->Sumw2();
@@ -4908,7 +5389,6 @@ void get_PAvgProfile_MCFM_ZZQQB_bkgZZ(){
     }
 
     mela.setCandidateDecayMode(TVar::CandidateDecay_ZZ);
-
 
     if (ic==1){
       LepID[0]=11;
@@ -4927,11 +5407,15 @@ void get_PAvgProfile_MCFM_ZZQQB_bkgZZ(){
       LepID[3]=-11;
     }
 
+    double aL1=0, aR1=0, aL2=0, aR2=0, mz=0, gaz=0;
+    unsigned int ctr=0;
     for (unsigned int bin=0; bin<binList.size(); bin++){
       cout << "Bin " << bin << " is now being scrutinized..." << endl;
       for (unsigned int ev = 0; ev < binList.at(bin).events.size(); ev++){
         int getEv = binList.at(bin).events.at(ev);
         getEntry(treeList, getEv);
+        TTree* tree = findTree(treeList, getEv);
+
         if (ev%1000==0) cout << "Doing event " << getEv << endl;
 
         TLorentzVector pDaughters[4];
@@ -4941,20 +5425,25 @@ void get_PAvgProfile_MCFM_ZZQQB_bkgZZ(){
         for (unsigned int idau=0; idau<4; idau++) daughters.push_back(SimpleParticle_t(LepID[idau], pDaughters[idau]));
         mela.setInputEvent(&daughters, (SimpleParticleCollection_t*)0, (SimpleParticleCollection_t*)0, false);
 
-        double propagator, mz, gaz;
-
         mela.setProcess(proc, me, prod);
-
         TUtil::setLeptonMassScheme(TVar::ConserveDifermionMass);
-        mela.computeP(mesq_conserveDifermMass, false);
-        double aL1, aR1, aL2, aR2;
-        mela.getIORecord()->getVDaughterCouplings(aL1, aR1, 0);
-        mela.getIORecord()->getVDaughterCouplings(aL2, aR2, 1);
+
+        bool hasConst = (tree->GetBranchStatus(strConstBranchname)==1);
+        bool doCalc=(!hasConst || ctr==0);
+        if (doCalc){
+          mela.computeP(mesq_conserveDifermMass, false);
+          if (hasConst) mesq_conserveDifermMass = mesq_calc / cconst_calc;
+
+          mela.getIORecord()->getVDaughterCouplings(aL1, aR1, 0);
+          mela.getIORecord()->getVDaughterCouplings(aL2, aR2, 1);
+          mz = mela.getPrimaryMass(23);
+          gaz = mela.getPrimaryWidth(23);
+        }
+        else mesq_conserveDifermMass = mesq_calc / cconst_calc;
+
+        double propagator;
         if (fabs(aL1)>0. || fabs(aR1)>0.) mesq_conserveDifermMass /= pow(aL1, 2)+pow(aR1, 2);
         if (fabs(aL2)>0. || fabs(aR2)>0.) mesq_conserveDifermMass /= pow(aL2, 2)+pow(aR2, 2);
-
-        mz = mela.getPrimaryMass(23);
-        gaz = mela.getPrimaryWidth(23);
         if (fabs(mzz-mz)<=4.*gaz){
           double sh = pow(mzz, 2);
           double shdn = pow(mz-4.*gaz, 2);
@@ -4974,8 +5463,8 @@ void get_PAvgProfile_MCFM_ZZQQB_bkgZZ(){
 
         if (doFill) binList.at(bin).addEvent(mzz, mesq_conserveDifermMass, 0);
 
-        if (writeFinalTree) newtree->Fill();
         mela.resetInputEvent();
+        ctr++;
       }
 
       binList.at(bin).sift(); binList.at(bin).adjustWeights();
@@ -4985,6 +5474,7 @@ void get_PAvgProfile_MCFM_ZZQQB_bkgZZ(){
         mesq_conserveDifermMass = binList.at(bin).mevals.at(ev);
         hmesq_conserveDifermMass->Fill(mzz, mesq_conserveDifermMass);
         hvar->Fill(mzz, mzz);
+        if (writeFinalTree) newtree->Fill();
       }
     }
 
@@ -6616,7 +7106,7 @@ void produce_PAvgSmooth_JHUGen_JQCD_HSMHiggs(int sqrts=8){
 }
 
 /* SPECIFIC COMMENT: PATCHING DONE USING ANALYTICAL ggH PDF */
-void produce_get_PAvgSmooth_JHUGen_ZZGG_HSMHiggs(){
+void produce_PAvgSmooth_JHUGen_ZZGG_HSMHiggs(){
   TVar::MatrixElement me = TVar::JHUGen;
   TVar::Production prod = TVar::ZZGG;
   TVar::Process proc = TVar::HSMHiggs;
@@ -6630,7 +7120,7 @@ void produce_get_PAvgSmooth_JHUGen_ZZGG_HSMHiggs(){
 }
 
 /* SPECIFIC COMMENT: PATCHING DONE USING ANALYTICAL ggH PDF */
-void produce_get_PAvgSmooth_MCFM_ZZGG_HSMHiggs(){
+void produce_PAvgSmooth_MCFM_ZZGG_HSMHiggs(){
   TVar::MatrixElement me = TVar::MCFM;
   TVar::Production prod = TVar::ZZGG;
   TVar::Process proc = TVar::HSMHiggs;
@@ -6644,7 +7134,7 @@ void produce_get_PAvgSmooth_MCFM_ZZGG_HSMHiggs(){
 }
 
 /* SPECIFIC COMMENT: PATCHING DONE USING ANALYTICAL QQZZ PDF */
-void produce_get_PAvgSmooth_MCFM_ZZGG_bkgZZ(){
+void produce_PAvgSmooth_MCFM_ZZGG_bkgZZ(){
   TVar::MatrixElement me = TVar::MCFM;
   TVar::Production prod = TVar::ZZGG;
   TVar::Process proc = TVar::bkgZZ;
@@ -6658,7 +7148,7 @@ void produce_get_PAvgSmooth_MCFM_ZZGG_bkgZZ(){
 }
 
 /* SPECIFIC COMMENT: PATCHING DONE USING ANALYTICAL QQZZ PDF */
-void produce_get_PAvgSmooth_MCFM_ZZQQB_bkgZZ(){
+void produce_PAvgSmooth_MCFM_ZZQQB_bkgZZ(){
   TVar::MatrixElement me = TVar::MCFM;
   TVar::Production prod = TVar::ZZQQB;
   TVar::Process proc = TVar::bkgZZ;
@@ -6672,7 +7162,7 @@ void produce_get_PAvgSmooth_MCFM_ZZQQB_bkgZZ(){
 }
 
 /* SPECIFIC COMMENT: PATCHING DONE USING ANALYTICAL ggH PDF */
-void produce_get_PAvgSmooth_MCFM_JJEW_HSMHiggs(int sqrts=13){
+void produce_PAvgSmooth_MCFM_JJEW_HSMHiggs(int sqrts=13){
   TVar::MatrixElement me = TVar::MCFM;
   TVar::Production prod = TVar::JJEW;
   TVar::Process proc = TVar::HSMHiggs;
@@ -6686,7 +7176,7 @@ void produce_get_PAvgSmooth_MCFM_JJEW_HSMHiggs(int sqrts=13){
 }
 
 /* SPECIFIC COMMENT: PATCHING DONE USING ANALYTICAL QQZZ PDF */
-void produce_get_PAvgSmooth_MCFM_JJEW_bkgZZ(int sqrts=13){
+void produce_PAvgSmooth_MCFM_JJEW_bkgZZ(int sqrts=13){
   TVar::MatrixElement me = TVar::MCFM;
   TVar::Production prod = TVar::JJEW;
   TVar::Process proc = TVar::bkgZZ;
@@ -6700,7 +7190,7 @@ void produce_get_PAvgSmooth_MCFM_JJEW_bkgZZ(int sqrts=13){
 }
 
 /* SPECIFIC COMMENT: PATCHING DONE USING ANALYTICAL QQZZ PDF */
-void produce_get_PAvgSmooth_MCFM_JJQCD_bkgZZ(int sqrts=13){
+void produce_PAvgSmooth_MCFM_JJQCD_bkgZZ(int sqrts=13){
   TVar::MatrixElement me = TVar::MCFM;
   TVar::Production prod = TVar::JJQCD;
   TVar::Process proc = TVar::bkgZZ;
