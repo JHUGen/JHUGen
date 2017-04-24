@@ -29,8 +29,8 @@ p4(particle_.p4),
 passSelection(particle_.passSelection),
 genStatus(particle_.genStatus),
 lifetime(particle_.lifetime),
-mothers(particle.mothers),
-daughters(particle.daughters)
+mothers(particle_.mothers),
+daughters(particle_.daughters)
 {}
 MELAParticle& MELAParticle::operator=(const MELAParticle& particle_){
   MELAParticle tmp(particle_);
@@ -38,7 +38,7 @@ MELAParticle& MELAParticle::operator=(const MELAParticle& particle_){
   return *this;
 }
 
-void swap(MELAParticle& particle_){
+void MELAParticle::swap(MELAParticle& particle_){
   std::swap(id, particle_.id);
   std::swap(p4, particle_.p4);
   std::swap(passSelection, particle_.passSelection);

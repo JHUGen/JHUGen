@@ -3,7 +3,7 @@
 
 using namespace PDGHelpers;
 
-MELACandidate() :
+MELACandidate::MELACandidate() :
 MELAParticle(),
 associatedByHighestPt(false),
 isShallowCopy(false),
@@ -15,7 +15,7 @@ associatedByHighestPt(associatedByHighestPt_),
 isShallowCopy(false),
 selfDecayMode(TVar::CandidateDecay_Stable)
 {}
-MELACandidate(const MELACandidate& particle_) :
+MELACandidate::MELACandidate(const MELACandidate& particle_) :
 MELAParticle(particle_),
 associatedByHighestPt(particle_.associatedByHighestPt),
 isShallowCopy(false),
