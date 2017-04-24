@@ -23,6 +23,23 @@ public:
   MELAParticle* getAssociatedPhoton(int index)const;
   MELAParticle* getAssociatedJet(int index)const;
   MELATopCandidate* getAssociatedTop(int index)const;
+
+  std::vector<MELAParticle*>& getSortedDaughters();
+  std::vector<MELAParticle*>& getSortedVs();
+  std::vector<MELAParticle*>& getAssociatedLeptons();
+  std::vector<MELAParticle*>& getAssociatedNeutrinos();
+  std::vector<MELAParticle*>& getAssociatedPhotons();
+  std::vector<MELAParticle*>& getAssociatedJets();
+  std::vector<MELATopCandidate*>& getAssociatedTops();
+  
+  const std::vector<MELAParticle*>& getSortedDaughters()const;
+  const std::vector<MELAParticle*>& getSortedVs()const;
+  const std::vector<MELAParticle*>& getAssociatedLeptons()const;
+  const std::vector<MELAParticle*>& getAssociatedNeutrinos()const;
+  const std::vector<MELAParticle*>& getAssociatedPhotons()const;
+  const std::vector<MELAParticle*>& getAssociatedJets()const;
+  const std::vector<MELATopCandidate*>& getAssociatedTops()const;
+
   TLorentzVector getAlternativeVMomentum(int index)const;
 
   virtual std::vector<int> getDaughterIds()const;

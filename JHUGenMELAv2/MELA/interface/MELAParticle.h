@@ -20,7 +20,6 @@ public:
   MELAParticle(const MELAParticle& particle_);
   MELAParticle& operator=(const MELAParticle& particle_);
   virtual ~MELAParticle(){};
-  void swap(MELAParticle& particle_);
 
   // Data
 
@@ -31,6 +30,8 @@ public:
   double lifetime;
 
   // Member functions
+  void swap(MELAParticle& particle_);
+
   void setSelected(bool isSelected=true){ passSelection = isSelected; }
   void setGenStatus(int status_){ genStatus=status_; }
   void setLifetime(int life_){ lifetime=life_; }
