@@ -39,12 +39,6 @@ MELATopCandidate::MELATopCandidate(
     ) id = -6;
   else id=0;
 }
-MELATopCandidate::MELATopCandidate(const MELATopCandidate& particle_) :
-MELAParticle(particle_),
-lightQuark(particle_.lightQuark),
-Wferm(particle_.Wferm),
-Wfermbar(particle_.Wfermbar)
-{}
 MELATopCandidate& MELATopCandidate::operator=(const MELATopCandidate& particle_){
   MELATopCandidate tmp(particle_);
   swap(tmp);
