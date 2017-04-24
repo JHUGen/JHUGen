@@ -6,7 +6,9 @@
 
 class MELACandidate : public MELAParticle{
 public:
+  MELACandidate();
   MELACandidate(int id_, TLorentzVector p4_, bool associatedByHighestPt_=false);
+  MELACandidate(const MELACandidate& particle_);
   ~MELACandidate();
   MELACandidate* shallowCopy();
 

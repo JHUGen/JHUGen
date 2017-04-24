@@ -20,6 +20,7 @@ public:
   MELAParticle(const MELAParticle& particle_);
   MELAParticle& operator=(const MELAParticle& particle_);
   virtual ~MELAParticle(){};
+  void swap(MELAParticle& particle_);
 
   // Data
 

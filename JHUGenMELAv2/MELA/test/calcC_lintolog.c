@@ -231,6 +231,7 @@ void getEntry(vector<TTree*> treeList, int evid){
   int ev = evid;
   for (unsigned int t=0; t<treeList.size(); t++){
     TTree* tree = treeList.at(t);
+    if (tree==0) cerr << "Something went wrong in getEntry. Tree = " << tree << endl;
     int nevts = tree->GetEntries();
     if (ev<nevts){ tree->GetEntry(ev); break; }
     else ev -= nevts;
@@ -3879,8 +3880,8 @@ void get_PAvgProfile_JHUGen_ZZINDEPENDENT_HSMHiggs(bool recalculate=false){
     delete hmesq_conserveDifermMass;
     delete hvar;
     delete[] binning;
-    for (unsigned int f=0; f<finputList.size(); f++) finputList.at(f)->Close();
   }
+  for (unsigned int f=0; f<finputList.size(); f++) finputList.at(f)->Close();
   foutput->Close();
 }
 
@@ -4274,8 +4275,8 @@ void get_PAvgProfile_JHUGen_ZZGG_HSMHiggs(bool recalculate=false){
     delete hmesq_conserveDifermMass;
     delete hvar;
     delete[] binning;
-    for (unsigned int f=0; f<finputList.size(); f++) finputList.at(f)->Close();
   }
+  for (unsigned int f=0; f<finputList.size(); f++) finputList.at(f)->Close();
   foutput->Close();
 }
 
@@ -4665,8 +4666,8 @@ void get_PAvgProfile_MCFM_ZZGG_HSMHiggs(bool recalculate=false){
     delete hmesq_conserveDifermMass;
     delete hvar;
     delete[] binning;
-    for (unsigned int f=0; f<finputList.size(); f++) finputList.at(f)->Close();
   }
+  for (unsigned int f=0; f<finputList.size(); f++) finputList.at(f)->Close();
   foutput->Close();
 }
 
@@ -5134,8 +5135,8 @@ void get_PAvgProfile_MCFM_ZZGG_bkgZZ(bool recalculate=false){
     delete hmesq_conserveDifermMass;
     delete hvar;
     delete[] binning;
-    for (unsigned int f=0; f<finputList.size(); f++) finputList.at(f)->Close();
   }
+  for (unsigned int f=0; f<finputList.size(); f++) finputList.at(f)->Close();
   foutput->Close();
 }
 
@@ -5196,7 +5197,7 @@ void get_PAvgProfile_MCFM_ZZQQB_bkgZZ(bool recalculate=false){
 
   TREE_NAME = "ZZTree/candTree";
   cinput_main = inputdir_13TeV;
-  //for (int is=0; is<2; is++){
+  //for (int is=0; is<1; is++){
   for (int is=0; is<(int)strSamples_13TeV.size(); is++){
     TString cinput = Form("%s/%s/ZZ4lAnalysis.root", cinput_main.Data(), (strSamples_13TeV[is]).Data());
     TFile* finput = TFile::Open(cinput, "read");
@@ -5207,7 +5208,7 @@ void get_PAvgProfile_MCFM_ZZQQB_bkgZZ(bool recalculate=false){
         cout << cinput << " opened. Extracting tree " << TREE_NAME << "..." << endl;
         tree = (TTree*)finput->Get(TREE_NAME);
         if (tree!=0){
-          cout << TREE_NAME << " is found." << endl;
+          cout << TREE_NAME << " is found with " << tree->GetEntries() << " events." << endl;
           bool doRecalculate = recalculate;
           if (!doRecalculate && tree->GetBranchStatus(strConstBranchname)==0) doRecalculate = true;
           tree->SetBranchStatus("*", 0);
@@ -5249,7 +5250,7 @@ void get_PAvgProfile_MCFM_ZZQQB_bkgZZ(bool recalculate=false){
           cout << cinput << " opened. Extracting tree " << TREE_NAME << "..." << endl;
           tree = (TTree*)finput->Get(TREE_NAME);
           if (tree!=0){
-            cout << TREE_NAME << " is found." << endl;
+            cout << TREE_NAME << " is found with " << tree->GetEntries() << " events." << endl;
             tree->SetBranchStatus("*", 0);
             tree->SetBranchStatus("ZZMass", 1); tree->SetBranchAddress("ZZMass", &mzz);
             tree->SetBranchStatus("Z1Mass", 1); tree->SetBranchAddress("Z1Mass", &m1);
@@ -5271,7 +5272,7 @@ void get_PAvgProfile_MCFM_ZZQQB_bkgZZ(bool recalculate=false){
       }
     }
     cinput_main = inputdir_7TeV;
-    //for (int is=0; is<2; is++){
+    //for (int is=0; is<0; is++){
     for (int is=0; is<(int)strSamples_7TeV.size(); is++){
       TString cinput = Form("%s/%s/%s", cinput_main.Data(), strchannel[ic].Data(), (strSamples_7TeV[is]).Data());
       TFile* finput = TFile::Open(cinput, "read");
@@ -5282,7 +5283,7 @@ void get_PAvgProfile_MCFM_ZZQQB_bkgZZ(bool recalculate=false){
           cout << cinput << " opened. Extracting tree " << TREE_NAME << "..." << endl;
           tree = (TTree*)finput->Get(TREE_NAME);
           if (tree!=0){
-            cout << TREE_NAME << " is found." << endl;
+            cout << TREE_NAME << " is found with " << tree->GetEntries() << " events." << endl;
             tree->SetBranchStatus("*", 0);
             tree->SetBranchStatus("ZZMass", 1); tree->SetBranchAddress("ZZMass", &mzz);
             tree->SetBranchStatus("Z1Mass", 1); tree->SetBranchAddress("Z1Mass", &m1);
@@ -5505,8 +5506,8 @@ void get_PAvgProfile_MCFM_ZZQQB_bkgZZ(bool recalculate=false){
     delete hmesq_conserveDifermMass;
     delete hvar;
     delete[] binning;
-    for (unsigned int f=0; f<finputList.size(); f++) finputList.at(f)->Close();
   }
+  for (unsigned int f=0; f<finputList.size(); f++) finputList.at(f)->Close();
   foutput->Close();
 }
 

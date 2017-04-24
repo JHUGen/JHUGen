@@ -1,3 +1,5 @@
+#include <algorithm>
+#include <utility>
 #include "MELAParticle.h"
 
 using namespace PDGHelpers;
@@ -9,41 +11,42 @@ namespace debugVars{
 
 MELAParticle::MELAParticle():
 id(0),
+p4(0, 0, 0, 0),
 passSelection(true),
 genStatus(-2),
 lifetime(0)
-{
-  p4.SetXYZT(0, 0, 0, 0);
-}
-
+{}
 MELAParticle::MELAParticle(int id_, TLorentzVector p4_) :
 id(id_),
+p4(p4_),
 passSelection(true),
 genStatus(-2),
 lifetime(0)
-{
-  p4.SetXYZT(p4_.X(), p4_.Y(), p4_.Z(), p4_.T());
-}
+{}
 MELAParticle::MELAParticle(const MELAParticle& particle_) :
 id(particle_.id),
+p4(particle_.p4),
 passSelection(particle_.passSelection),
 genStatus(particle_.genStatus),
-lifetime(particle_.lifetime)
-{
-  p4.SetXYZT(particle_.p4.X(), particle_.p4.Y(), particle_.p4.Z(), particle_.p4.T());
-  for (int index=0; index<particle_.getNMothers(); index++) addMother(particle_.getMother(index));
-  for (int index=0; index<particle_.getNDaughters(); index++) addDaughter(particle_.getDaughter(index));
-}
+lifetime(particle_.lifetime),
+mothers(particle.mothers),
+daughters(particle.daughters)
+{}
 MELAParticle& MELAParticle::operator=(const MELAParticle& particle_){
-  id=particle_.id;
-  passSelection=particle_.passSelection;
-  genStatus=particle_.genStatus;
-  lifetime=particle_.lifetime;
-  for (int index=0; index<particle_.getNMothers(); index++) addMother(particle_.getMother(index));
-  for (int index=0; index<particle_.getNDaughters(); index++) addDaughter(particle_.getDaughter(index));
+  MELAParticle tmp(particle_);
+  swap(tmp);
   return *this;
 }
 
+void swap(MELAParticle& particle_){
+  std::swap(id, particle_.id);
+  std::swap(p4, particle_.p4);
+  std::swap(passSelection, particle_.passSelection);
+  std::swap(genStatus, particle_.genStatus);
+  std::swap(lifetime, particle_.lifetime);
+  std::swap(mothers, particle_.mothers);
+  std::swap(daughters, particle_.daughters);
+}
 
 bool MELAParticle::checkParticleExists(MELAParticle* myParticle, std::vector<MELAParticle*>& particleArray){
   for (std::vector<MELAParticle*>::iterator it = particleArray.begin(); it<particleArray.end(); it++){

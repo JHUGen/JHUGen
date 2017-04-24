@@ -3,14 +3,37 @@
 
 using namespace PDGHelpers;
 
+MELACandidate() :
+MELAParticle(),
+associatedByHighestPt(false),
+isShallowCopy(false),
+selfDecayMode(TVar::CandidateDecay_Stable)
+{}
 MELACandidate::MELACandidate(int id_, TLorentzVector p4_, bool associatedByHighestPt_) :
 MELAParticle(id_, p4_),
 associatedByHighestPt(associatedByHighestPt_),
 isShallowCopy(false),
 selfDecayMode(TVar::CandidateDecay_Stable)
 {}
+MELACandidate(const MELACandidate& particle_) :
+MELAParticle(particle_),
+associatedByHighestPt(particle_.associatedByHighestPt),
+isShallowCopy(false),
+selfDecayMode(particle_.selfDecayMode),
+associatedLeptons(particle_.associatedLeptons),
+associatedNeutrinos(particle_.associatedNeutrinos),
+associatedPhotons(particle_.associatedPhotons),
+associatedJets(particle_.associatedJets),
+associatedTops(particle_.associatedTops),
+sortedDaughters(particle_.sortedDaughters)
+{
+  for (unsigned int ip=0; ip<particle_.sortedVs.size(); ip++){
+    MELAParticle* tmp = new MELAParticle(*(particle_.sortedVs.at(ip)));
+    sortedVs.push_back(tmp);
+  }
+}
 MELACandidate::~MELACandidate(){
-  if (!isShallowCopy){ // Delete owned objects, or not
+  if (!isShallowCopy){ // Delete owned objects if not a shallow copy
     for (unsigned int i=0; i<sortedVs.size(); i++) delete sortedVs.at(i);
   }
   sortedVs.clear();
@@ -35,12 +58,12 @@ MELACandidate* MELACandidate::shallowCopy(){
 
   // Copy candidate content
   cand->setShallowCopy(true);
-  for (unsigned int ip=0; ip<sortedDaughters.size(); ip++) (cand->sortedDaughters).push_back(sortedDaughters.at(ip));
-  for (unsigned int ip=0; ip<associatedJets.size(); ip++) (cand->associatedJets).push_back(associatedJets.at(ip));
-  for (unsigned int ip=0; ip<associatedNeutrinos.size(); ip++) (cand->associatedNeutrinos).push_back(associatedNeutrinos.at(ip));
   for (unsigned int ip=0; ip<associatedLeptons.size(); ip++) (cand->associatedLeptons).push_back(associatedLeptons.at(ip));
+  for (unsigned int ip=0; ip<associatedNeutrinos.size(); ip++) (cand->associatedNeutrinos).push_back(associatedNeutrinos.at(ip));
   for (unsigned int ip=0; ip<associatedPhotons.size(); ip++) (cand->associatedPhotons).push_back(associatedPhotons.at(ip));
+  for (unsigned int ip=0; ip<associatedJets.size(); ip++) (cand->associatedJets).push_back(associatedJets.at(ip));
   for (unsigned int ip=0; ip<associatedTops.size(); ip++) (cand->associatedTops).push_back(associatedTops.at(ip));
+  for (unsigned int ip=0; ip<sortedDaughters.size(); ip++) (cand->sortedDaughters).push_back(sortedDaughters.at(ip));
   for (unsigned int ip=0; ip<sortedVs.size(); ip++) (cand->sortedVs).push_back(sortedVs.at(ip));
 
   return cand;
