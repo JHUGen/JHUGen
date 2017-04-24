@@ -1,3 +1,5 @@
+#include <algorithm>
+#include <utility>
 #include "MELACandidate.h"
 #include "TMath.h"
 
@@ -31,6 +33,11 @@ sortedDaughters(particle_.sortedDaughters)
     MELAParticle* tmp = new MELAParticle(*(particle_.sortedVs.at(ip)));
     sortedVs.push_back(tmp);
   }
+}
+MELACandidate& MELACandidate::operator=(const MELACandidate& particle_){
+  MELACandidate tmp(particle_);
+  swap(tmp);
+  return *this;
 }
 MELACandidate::~MELACandidate(){
   if (!isShallowCopy){ // Delete owned objects if not a shallow copy
@@ -68,6 +75,18 @@ MELACandidate* MELACandidate::shallowCopy(){
 
   return cand;
 }
+void MELACandidate::swap(MELACandidate& particle_){
+  MELAParticle::swap(particle_);
+  std::swap(isShallowCopy, particle_.isShallowCopy);
+  std::swap(associatedLeptons, particle_.associatedLeptons);
+  std::swap(associatedNeutrinos, particle_.associatedNeutrinos);
+  std::swap(associatedPhotons, particle_.associatedPhotons);
+  std::swap(associatedJets, particle_.associatedJets);
+  std::swap(associatedTops, particle_.associatedTops);
+  std::swap(sortedDaughters, particle_.sortedDaughters);
+  std::swap(sortedVs, particle_.sortedVs);
+}
+
 
 
 void MELACandidate::setDecayMode(TVar::CandidateDecayMode flag){ selfDecayMode=flag; }

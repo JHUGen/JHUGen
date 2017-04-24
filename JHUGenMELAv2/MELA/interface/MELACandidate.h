@@ -9,8 +9,10 @@ public:
   MELACandidate();
   MELACandidate(int id_, TLorentzVector p4_, bool associatedByHighestPt_=false);
   MELACandidate(const MELACandidate& particle_);
+  MELACandidate& operator=(const MELACandidate& particle_);
   ~MELACandidate();
   MELACandidate* shallowCopy();
+  void swap(MELACandidate& particle_);
 
   // Member functions
 
