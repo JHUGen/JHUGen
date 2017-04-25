@@ -1,5 +1,7 @@
+#include "MELANCSplinePdf_1D_fast.h"
+#include "MELANCSplinePdf_2D_fast.h"
+#include "MELANCSplinePdf_3D_fast.h"
 #include "Mela.h"
-#include "newZZMatrixElement.h"
 
 #ifdef __CINT__
 
@@ -17,6 +19,11 @@
 #pragma link C++ class MELACandidate;
 #pragma link C++ class MelaIO;
 #pragma link C++ namespace TVar;
+
+#pragma link C++ class MELANCSplinePdfCore;
+#pragma link C++ class MELANCSplinePdfFactory_1D;
+#pragma link C++ class MELANCSplinePdfFactory_2D;
+#pragma link C++ class MELANCSplinePdfFactory_3D;
 
 #pragma link C++ namespace TUtil;
 #pragma link C++ function TUtil::computeAngles;
