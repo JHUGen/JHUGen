@@ -16,7 +16,7 @@ void MELANCSplinePdfFactory_2D::addUnique(std::vector<MELANCSplinePdfCore::T>& l
   for (unsigned int ip=0; ip<list.size(); ip++){ if (list.at(ip)==val) return; }
   list.push_back(val);
 }
-const std::vector<doubleTriplet_t> MELANCSplinePdfFactory_2D::getPoints(
+const std::vector<splineTriplet_t> MELANCSplinePdfFactory_2D::getPoints(
   const std::vector<MELANCSplinePdfCore::T>& XList,
   const std::vector<MELANCSplinePdfCore::T>& YList,
   const std::vector<MELANCSplinePdfCore::T>& FcnList
@@ -29,20 +29,20 @@ const std::vector<doubleTriplet_t> MELANCSplinePdfFactory_2D::getPoints(
     assert(0);
   }
 
-  std::vector<doubleTriplet_t> pList; pList.reserve(n);
+  std::vector<splineTriplet_t> pList; pList.reserve(n);
   for (unsigned int ix=0; ix<nX; ix++){
     MELANCSplinePdfCore::T xval = XList.at(ix);
     for (unsigned int iy=0; iy<nY; iy++){
       unsigned int ip = nY*ix + iy;
       MELANCSplinePdfCore::T yval = YList.at(iy);
-      pList.push_back(doubleTriplet_t(xval, yval, FcnList.at(ip)));
+      pList.push_back(splineTriplet_t(xval, yval, FcnList.at(ip)));
     }
   }
   return pList;
 }
 
 void MELANCSplinePdfFactory_2D::destroyPDF(){ delete PDF; PDF=0; }
-void MELANCSplinePdfFactory_2D::initPDF(const std::vector<doubleTriplet_t>& pList){
+void MELANCSplinePdfFactory_2D::initPDF(const std::vector<splineTriplet_t>& pList){
   destroyPDF();
 
   unsigned int n = pList.size();

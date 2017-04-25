@@ -16,7 +16,7 @@ void MELANCSplinePdfFactory_3D::addUnique(std::vector<MELANCSplinePdfCore::T>& l
   for (unsigned int ip=0; ip<list.size(); ip++){ if (list.at(ip)==val) return; }
   list.push_back(val);
 }
-const std::vector<doubleQuadruplet_t> MELANCSplinePdfFactory_3D::getPoints(
+const std::vector<splineQuadruplet_t> MELANCSplinePdfFactory_3D::getPoints(
   const std::vector<MELANCSplinePdfCore::T>& XList,
   const std::vector<MELANCSplinePdfCore::T>& YList,
   const std::vector<MELANCSplinePdfCore::T>& ZList,
@@ -31,7 +31,7 @@ const std::vector<doubleQuadruplet_t> MELANCSplinePdfFactory_3D::getPoints(
     assert(0);
   }
 
-  std::vector<doubleQuadruplet_t> pList; pList.reserve(n);
+  std::vector<splineQuadruplet_t> pList; pList.reserve(n);
   for (unsigned int ix=0; ix<nX; ix++){
     MELANCSplinePdfCore::T xval = XList.at(ix);
     for (unsigned int iy=0; iy<nY; iy++){
@@ -39,7 +39,7 @@ const std::vector<doubleQuadruplet_t> MELANCSplinePdfFactory_3D::getPoints(
       for (unsigned int iz=0; iz<nZ; iz++){
         MELANCSplinePdfCore::T zval = ZList.at(iz);
         unsigned int ip = nZ*(nY*ix + iy) + iz;
-        pList.push_back(doubleQuadruplet_t(xval, yval, zval, FcnList.at(ip)));
+        pList.push_back(splineQuadruplet_t(xval, yval, zval, FcnList.at(ip)));
       }
     }
   }
@@ -47,7 +47,7 @@ const std::vector<doubleQuadruplet_t> MELANCSplinePdfFactory_3D::getPoints(
 }
 
 void MELANCSplinePdfFactory_3D::destroyPDF(){ delete PDF; PDF=0; }
-void MELANCSplinePdfFactory_3D::initPDF(const std::vector<doubleQuadruplet_t>& pList){
+void MELANCSplinePdfFactory_3D::initPDF(const std::vector<splineQuadruplet_t>& pList){
   destroyPDF();
 
   unsigned int n = pList.size();

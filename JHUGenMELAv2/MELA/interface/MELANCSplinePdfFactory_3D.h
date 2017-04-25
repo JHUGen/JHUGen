@@ -4,23 +4,11 @@
 #include <vector>
 #include <utility>
 #include <algorithm>
+#include "TMCFMUtils.hh"
 #include "RooConstVar.h"
 #include "MELANCSplinePdf_3D_fast.h"
 
-template<typename T> struct quadruplet{
-  T value[4];
-  quadruplet(T i1, T i2, T i3, T i4){
-    value[0]=i1;
-    value[1]=i2;
-    value[2]=i3;
-    value[3]=i4;
-  }
-  quadruplet(T i1){ for (unsigned int idim=0; idim<4; idim++) value[idim] = i1; }
-  quadruplet(){}
-  T& operator[](std::size_t ipos){ return value[ipos]; } // Return by reference
-  const T& operator[](std::size_t ipos)const{ return value[ipos]; } // Return by const reference
-};
-typedef quadruplet<MELANCSplinePdfCore::T> doubleQuadruplet_t;
+typedef TMCFMUtils::quadruplet<MELANCSplinePdfCore::T> splineQuadruplet_t;
 
 class MELANCSplinePdfFactory_3D{
 protected:
@@ -31,10 +19,10 @@ protected:
   RooAbsReal* ZVar;
   MELANCSplinePdf_3D_fast* PDF;
 
-  const std::vector<doubleQuadruplet_t> getPoints(const std::vector<MELANCSplinePdfCore::T>& XList, const std::vector<MELANCSplinePdfCore::T>& YList, const std::vector<MELANCSplinePdfCore::T>& ZList, const std::vector<MELANCSplinePdfCore::T>& FcnList);
+  const std::vector<splineQuadruplet_t> getPoints(const std::vector<MELANCSplinePdfCore::T>& XList, const std::vector<MELANCSplinePdfCore::T>& YList, const std::vector<MELANCSplinePdfCore::T>& ZList, const std::vector<MELANCSplinePdfCore::T>& FcnList);
 
   void destroyPDF();
-  void initPDF(const std::vector<doubleQuadruplet_t>& pList);
+  void initPDF(const std::vector<splineQuadruplet_t>& pList);
 
   void addUnique(std::vector<MELANCSplinePdfCore::T>& list, MELANCSplinePdfCore::T val);
 
@@ -44,7 +32,7 @@ public:
 
   MELANCSplinePdf_3D_fast* getPDF();
 
-  void setPoints(const std::vector<doubleQuadruplet_t>& pList){ initPDF(pList); }
+  void setPoints(const std::vector<splineQuadruplet_t>& pList){ initPDF(pList); }
   template<typename inType> void setPoints(const std::vector<inType>& XList, const std::vector<inType>& YList, const std::vector<inType>& ZList, const std::vector<inType>& FcnList){
     std::vector<MELANCSplinePdfCore::T> transXList;
     std::vector<MELANCSplinePdfCore::T> transYList;
@@ -54,7 +42,7 @@ public:
     for (unsigned int ip=0; ip<YList.size(); ip++) transYList.push_back((MELANCSplinePdfCore::T)YList.at(ip));
     for (unsigned int ip=0; ip<ZList.size(); ip++) transZList.push_back((MELANCSplinePdfCore::T)ZList.at(ip));
     for (unsigned int ip=0; ip<FcnList.size(); ip++) transFcnList.push_back((MELANCSplinePdfCore::T)FcnList.at(ip));
-    const std::vector<doubleQuadruplet_t> pList = getPoints(transXList, transYList, transZList, transFcnList);
+    const std::vector<splineQuadruplet_t> pList = getPoints(transXList, transYList, transZList, transFcnList);
     setPoints(pList);
   }
 

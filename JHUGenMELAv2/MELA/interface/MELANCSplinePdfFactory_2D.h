@@ -4,26 +4,11 @@
 #include <vector>
 #include <utility>
 #include <algorithm>
+#include "TMCFMUtils.hh"
 #include "RooConstVar.h"
 #include "MELANCSplinePdf_2D_fast.h"
 
-template<typename T> struct triplet{
-  T value[3];
-  triplet(T i1, T i2, T i3){
-    value[0]=i1;
-    value[1]=i2;
-    value[2]=i3;
-  }
-  triplet(T i1){
-    value[0]=i1;
-    value[1]=i1;
-    value[2]=i1;
-  }
-  triplet(){}
-  T& operator[](std::size_t ipos){ return value[ipos]; } // Return by reference
-  const T& operator[](std::size_t ipos)const{ return value[ipos]; } // Return by const reference
-};
-typedef triplet<MELANCSplinePdfCore::T> doubleTriplet_t;
+typedef TMCFMUtils::triplet<MELANCSplinePdfCore::T> splineTriplet_t;
 
 class MELANCSplinePdfFactory_2D{
 protected:
@@ -33,10 +18,10 @@ protected:
   RooAbsReal* YVar;
   MELANCSplinePdf_2D_fast* PDF;
 
-  const std::vector<doubleTriplet_t> getPoints(const std::vector<MELANCSplinePdfCore::T>& XList, const std::vector<MELANCSplinePdfCore::T>& YList, const std::vector<MELANCSplinePdfCore::T>& FcnList);
+  const std::vector<splineTriplet_t> getPoints(const std::vector<MELANCSplinePdfCore::T>& XList, const std::vector<MELANCSplinePdfCore::T>& YList, const std::vector<MELANCSplinePdfCore::T>& FcnList);
 
   void destroyPDF();
-  void initPDF(const std::vector<doubleTriplet_t>& pList);
+  void initPDF(const std::vector<splineTriplet_t>& pList);
 
   void addUnique(std::vector<MELANCSplinePdfCore::T>& list, MELANCSplinePdfCore::T val);
 
@@ -46,7 +31,7 @@ public:
 
   MELANCSplinePdf_2D_fast* getPDF();
 
-  void setPoints(const std::vector<doubleTriplet_t>& pList){ initPDF(pList); }
+  void setPoints(const std::vector<splineTriplet_t>& pList){ initPDF(pList); }
   template<typename inType> void setPoints(const std::vector<inType>& XList, const std::vector<inType>& YList, const std::vector<inType>& FcnList){
     std::vector<MELANCSplinePdfCore::T> transXList;
     std::vector<MELANCSplinePdfCore::T> transYList;
@@ -54,7 +39,7 @@ public:
     for (unsigned int ip=0; ip<XList.size(); ip++) transXList.push_back((MELANCSplinePdfCore::T)XList.at(ip));
     for (unsigned int ip=0; ip<YList.size(); ip++) transYList.push_back((MELANCSplinePdfCore::T)YList.at(ip));
     for (unsigned int ip=0; ip<FcnList.size(); ip++) transFcnList.push_back((MELANCSplinePdfCore::T)FcnList.at(ip));
-    const std::vector<doubleTriplet_t> pList = getPoints(transXList, transYList, transFcnList);
+    const std::vector<splineTriplet_t> pList = getPoints(transXList, transYList, transFcnList);
     setPoints(pList);
   }
 
