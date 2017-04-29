@@ -52,11 +52,18 @@ public:
   double y()const{ return p4.Y(); }
   double z()const{ return p4.Z(); }
   double t()const{ return p4.T(); }
+  double p()const{ return p4.P(); }
   double pt()const{ return p4.Pt(); }
   double eta()const{ return p4.Eta(); }
   double phi()const{ return p4.Phi(); }
   double rapidity()const{ return p4.Rapidity(); }
+  double dot(const TLorentzVector& v)const{ return p4.Dot(v); }
+  double dot(const MELAParticle& part)const{ return dot(part.p4); }
+  double dot(const MELAParticle* part)const{ if (part!=0) return dot(*part); else return 0; }
   double deltaR(const TLorentzVector& v)const{ return p4.DeltaR(v); }
+  double deltaR(const MELAParticle& part)const{ return deltaR(part.p4); }
+  double deltaR(const MELAParticle* part)const{ if (part!=0) return deltaR(*part); else return -1; }
+  TVector3 vect()const{ return p4.Vect(); }
 
 
 protected:

@@ -56,7 +56,7 @@ MELANCSplinePdf_1D_fast::MELANCSplinePdf_1D_fast(
 {}
 
 MELANCSplinePdfCore::T MELANCSplinePdf_1D_fast::interpolateFcn(Int_t code, const char* rangeName)const{
-  DefaultAccumulator<MELANCSplinePdfCore::T> res=MELANCSplinePdfCore::T(0);
+  DefaultAccumulator<MELANCSplinePdfCore::T> res;
 
   // Get bins
   Int_t xbin=-1, xbinmin=-1, xbinmax=-1;
@@ -91,7 +91,7 @@ MELANCSplinePdfCore::T MELANCSplinePdf_1D_fast::interpolateFcn(Int_t code, const
     res += evalSplineSegment(coefficients.at(ix), kappaX.at(ix), txhigh, txlow, (code>0 && code%2==0));
   }
 
-  return res.sum();
+  return res;
 }
 
 void MELANCSplinePdf_1D_fast::getKappas(vector<MELANCSplinePdfCore::T>& kappas, const Int_t /*whichDirection*/)const{

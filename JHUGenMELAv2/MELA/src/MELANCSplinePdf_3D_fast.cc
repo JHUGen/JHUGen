@@ -202,7 +202,7 @@ MELANCSplinePdf_3D_fast::MELANCSplinePdf_3D_fast(
 {}
 
 MELANCSplinePdfCore::T MELANCSplinePdf_3D_fast::interpolateFcn(Int_t code, const char* rangeName)const{
-  DefaultAccumulator<MELANCSplinePdfCore::T> res=MELANCSplinePdfCore::T(0);
+  DefaultAccumulator<MELANCSplinePdfCore::T> res;
 
   if (verbosity==MELANCSplinePdfCore::kVerbose) cout << "MELANCSplinePdf_3D_fast(" << GetName() << ")::interpolateFcn begin with code: " << code << endl;
 
@@ -257,7 +257,7 @@ MELANCSplinePdfCore::T MELANCSplinePdf_3D_fast::interpolateFcn(Int_t code, const
     // Get the x coefficients interpolated across y
     vector<MELANCSplinePdfCore::T> xCoefs;
     for (int icx=0; icx<(int)coefficients.at(ix).size(); icx++){
-      DefaultAccumulator<MELANCSplinePdfCore::T> theXCoef=MELANCSplinePdfCore::T(0);
+      DefaultAccumulator<MELANCSplinePdfCore::T> theXCoef;
       for (int iy=0; iy<(int)coefficients.at(ix).at(icx).size(); iy++){
         if (
           (varbin[1]>=0 && iy!=varbin[1])
@@ -273,7 +273,7 @@ MELANCSplinePdfCore::T MELANCSplinePdf_3D_fast::interpolateFcn(Int_t code, const
         // Get the y coefficients interpolated across z
         vector<MELANCSplinePdfCore::T> yCoefs;
         for (int icy=0; icy<(int)coefficients.at(ix).at(icx).at(iy).size(); icy++){
-          DefaultAccumulator<MELANCSplinePdfCore::T> theYCoef=MELANCSplinePdfCore::T(0);
+          DefaultAccumulator<MELANCSplinePdfCore::T> theYCoef;
           for (int iz=0; iz<(int)coefficients.at(ix).at(icx).at(iy).at(icy).size(); iz++){
             if (
               (varbin[2]>=0 && iz!=varbin[2])
@@ -290,18 +290,18 @@ MELANCSplinePdfCore::T MELANCSplinePdf_3D_fast::interpolateFcn(Int_t code, const
 
             theYCoef += evalSplineSegment(coefficients.at(ix).at(icx).at(iy).at(icy).at(iz), varkappa[2]->at(iz), tzhigh, tzlow, (code>0 && code%varprime[2]==0));
           }
-          yCoefs.push_back(theYCoef.sum());
+          yCoefs.push_back(theYCoef);
         }
         theXCoef += evalSplineSegment(yCoefs, varkappa[1]->at(iy), tyhigh, tylow, (code>0 && code%varprime[1]==0));
       }
-      xCoefs.push_back(theXCoef.sum());
+      xCoefs.push_back(theXCoef);
     }
     // Evaluate value of spline at x with coefficients evaluated at y
     res += evalSplineSegment(xCoefs, varkappa[0]->at(ix), txhigh, txlow, (code>0 && code%varprime[0]==0));
 
   }
 
-  return res.sum();
+  return res;
 }
 
 void MELANCSplinePdf_3D_fast::getKappas(vector<MELANCSplinePdfCore::T>& kappas, const Int_t whichDirection)const{

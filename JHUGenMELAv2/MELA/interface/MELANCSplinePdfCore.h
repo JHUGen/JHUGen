@@ -64,7 +64,7 @@ protected:
   virtual std::vector<std::vector<T>> getCoefficientsAlongDirection(const std::vector<T>& kappas, const TMatrix_t& Ainv, const std::vector<T>& fcnList, const Int_t pickBin)const;
   virtual std::vector<T> getCoefficients(const TVector_t& S, const std::vector<T>& kappas, const std::vector<T>& fcnList, const Int_t& bin)const;
 
-  virtual T evalSplineSegment(const std::vector<T>& coefs, const T kappa, T tup, T tdn=0, Bool_t doIntegrate=false)const;
+  virtual T evalSplineSegment(const std::vector<T>& coefs, const T& kappa, const T& tup, const T& tdn, Bool_t doIntegrate=false)const;
 
 };
  

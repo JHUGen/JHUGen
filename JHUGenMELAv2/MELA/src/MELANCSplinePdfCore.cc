@@ -95,7 +95,7 @@ void MELANCSplinePdfCore::getAArray(const vector<MELANCSplinePdfCore::T>& kappas
 }
 
 vector<MELANCSplinePdfCore::T> MELANCSplinePdfCore::getCoefficients(const TVector_t& S, const vector<MELANCSplinePdfCore::T>& kappas, const vector<MELANCSplinePdfCore::T>& fcnList, const Int_t& bin)const{
-  MELANCSplinePdfCore::T A=0, B=0, C=0, D=0;
+  DefaultAccumulator<MELANCSplinePdfCore::T> A, B, C, D;
   vector<MELANCSplinePdfCore::T> res;
 
   const int fcnsize = fcnList.size();
@@ -103,15 +103,16 @@ vector<MELANCSplinePdfCore::T> MELANCSplinePdfCore::getCoefficients(const TVecto
     A=fcnList.at(bin);
     B=S[bin];
     if (fcnsize>(bin+1)){
-      DefaultAccumulator<MELANCSplinePdfCore::T> dFcn = fcnList.at(bin+1); dFcn -= A;
+      DefaultAccumulator<MELANCSplinePdfCore::T> dFcn = fcnList.at(bin+1);
+      dFcn -= A;
 
-      DefaultAccumulator<MELANCSplinePdfCore::T> Cacc = MELANCSplinePdfCore::T(3.)*dFcn.sum();
-      Cacc -= 2.*B; Cacc -= S[bin+1]*kappas.at(bin+1)/kappas.at(bin);
-      C = Cacc.sum();
+      C += MELANCSplinePdfCore::T(3.)*dFcn;
+      C -= 2.*B;
+      C -= S[bin+1]*kappas.at(bin+1)/kappas.at(bin);
 
-      DefaultAccumulator<MELANCSplinePdfCore::T> Dacc = MELANCSplinePdfCore::T(-2.)*dFcn.sum();
-      Dacc += B; Dacc += S[bin+1]*kappas.at(bin+1)/kappas.at(bin);
-      D = Dacc.sum();
+      D += MELANCSplinePdfCore::T(-2.)*dFcn;
+      D += B;
+      D += S[bin+1]*kappas.at(bin+1)/kappas.at(bin);
     }
   }
 
@@ -139,11 +140,11 @@ vector<vector<MELANCSplinePdfCore::T>> MELANCSplinePdfCore::getCoefficientsAlong
   return coefs;
 }
 
-MELANCSplinePdfCore::T MELANCSplinePdfCore::evalSplineSegment(const std::vector<MELANCSplinePdfCore::T>& coefs, const MELANCSplinePdfCore::T kappa, MELANCSplinePdfCore::T tup, MELANCSplinePdfCore::T tdn, Bool_t doIntegrate)const{
-  DefaultAccumulator<MELANCSplinePdfCore::T> res=MELANCSplinePdfCore::T(0);
+MELANCSplinePdfCore::T MELANCSplinePdfCore::evalSplineSegment(const std::vector<MELANCSplinePdfCore::T>& coefs, const MELANCSplinePdfCore::T& kappa, const MELANCSplinePdfCore::T& tup, const MELANCSplinePdfCore::T& tdn, Bool_t doIntegrate)const{
+  DefaultAccumulator<MELANCSplinePdfCore::T> res;
   for (unsigned int ic=0; ic<coefs.size(); ic++){
     if (doIntegrate) res += coefs.at(ic)*(pow(tup, (int)(ic+1))-pow(tdn, (int)(ic+1)))/((MELANCSplinePdfCore::T)(ic+1))/kappa;
     else res += coefs.at(ic)*pow(tup, (int)ic);
   }
-  return res.sum();
+  return res;
 }

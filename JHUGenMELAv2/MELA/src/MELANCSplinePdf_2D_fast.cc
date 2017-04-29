@@ -113,7 +113,7 @@ MELANCSplinePdf_2D_fast::MELANCSplinePdf_2D_fast(
 
 
 MELANCSplinePdfCore::T MELANCSplinePdf_2D_fast::interpolateFcn(Int_t code, const char* rangeName)const{
-  DefaultAccumulator<MELANCSplinePdfCore::T> res=MELANCSplinePdfCore::T(0);
+  DefaultAccumulator<MELANCSplinePdfCore::T> res;
 
   if (verbosity==MELANCSplinePdfCore::kVerbose){ cout << "MELANCSplinePdf_2D_fast(" << GetName() << ")::interpolateFcn begin with code: " << code << endl; }
 
@@ -167,7 +167,7 @@ MELANCSplinePdfCore::T MELANCSplinePdf_2D_fast::interpolateFcn(Int_t code, const
 
       if (verbosity==MELANCSplinePdfCore::kVerbose) cout << "\tCoefficient " << ic << ":\n";
 
-      DefaultAccumulator<MELANCSplinePdfCore::T> theCoef=MELANCSplinePdfCore::T(0);
+      DefaultAccumulator<MELANCSplinePdfCore::T> theCoef;
       for (int iy=0; iy<(int)yCoefs.size(); iy++){
         if (
           (ybin>=0 && iy!=ybin)
@@ -192,14 +192,14 @@ MELANCSplinePdfCore::T MELANCSplinePdf_2D_fast::interpolateFcn(Int_t code, const
 
       //if (code==0) cout << "\tCoefficient is " << theCoef << endl;
 
-      xCoefs.push_back(theCoef.sum());
+      xCoefs.push_back(theCoef);
     }
 
     // Evaluate value of spline at x with coefficients evaluated at y
     res += evalSplineSegment(xCoefs, kappaX.at(ix), txhigh, txlow, (code>0 && code%2==0));
   }
 
-  return res.sum();
+  return res;
 }
 
 
