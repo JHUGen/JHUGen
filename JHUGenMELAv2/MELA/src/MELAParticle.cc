@@ -71,6 +71,11 @@ std::vector<int> MELAParticle::getDaughterIds()const{
   }
   return result;
 }
+void MELAParticle::getRelatedParticles(std::vector<MELAParticle*>& particles){
+  for (std::vector<MELAParticle*>::iterator it = mothers.begin(); it<mothers.end(); it++) (*it)->getRelatedParticles(particles);
+  for (std::vector<MELAParticle*>::iterator it = daughters.begin(); it<daughters.end(); it++) (*it)->getRelatedParticles(particles);
+  if (!checkParticleExists(this, particles)) particles.push_back(this);
+}
 
 double MELAParticle::charge()const{
   double cpos=0;
@@ -82,4 +87,19 @@ double MELAParticle::charge()const{
   return cpos;
 }
 
+void MELAParticle::boost(const TVector3& vec, bool boostAll){
+  if (vec.Mag2()<1.){
+    if (boostAll){
+      std::vector<MELAParticle*> particles;
+      this->getRelatedParticles(particles);
+      for (std::vector<MELAParticle*>::iterator it = particles.begin(); it<particles.end(); it++) (*it)->boost(vec, false);
+    }
+    else p4.Boost(vec);
+  }
+  else std::cerr
+    << "MELAParticle::boost: "
+    << "|v|**2 = " << vec.Mag2() << " >=1 cannot be used to boost. "
+    << "v = ( " << vec.X() << " , " << vec.Y() << " , " << vec.Z() << " )"
+    << std::endl;
+}
 

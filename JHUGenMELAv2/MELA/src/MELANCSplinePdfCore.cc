@@ -21,6 +21,9 @@ MELANCSplinePdfCore::MELANCSplinePdfCore(
   ) :
   RooAbsPdf(name, title),
   verbosity(MELANCSplinePdfCore::kSilent),
+  useFloor(true),
+  floorEval(0),
+  floorInt(0),
   theXVar("theXVar", "theXVar", this)
 {}
 
@@ -28,10 +31,16 @@ MELANCSplinePdfCore::MELANCSplinePdfCore(
   const char* name,
   const char* title,
   RooAbsReal& inXVar,
-  std::vector<T>& inXList
+  const std::vector<T>& inXList,
+  Bool_t inUseFloor,
+  T inFloorEval,
+  T inFloorInt
   ) :
   RooAbsPdf(name, title),
   verbosity(MELANCSplinePdfCore::kSilent),
+  useFloor(inUseFloor),
+  floorEval(inFloorEval),
+  floorInt(inFloorInt),
   theXVar("theXVar", "theXVar", this, inXVar),
   XList(inXList)
 {}
@@ -42,12 +51,17 @@ MELANCSplinePdfCore::MELANCSplinePdfCore(
   ) :
   RooAbsPdf(other, name),
   verbosity(other.verbosity),
+  useFloor(other.useFloor),
+  floorEval(other.floorEval),
+  floorInt(other.floorInt),
   theXVar("theXVar", this, other.theXVar),
   XList(other.XList)
 {}
 
-void MELANCSplinePdfCore::setVerbosity(VerbosityLevel flag){ verbosity=flag; }
-
+void MELANCSplinePdfCore::setVerbosity(VerbosityLevel flag){ verbosity = flag; }
+void MELANCSplinePdfCore::setEvalFloor(MELANCSplinePdfCore::T val){ floorEval = val; }
+void MELANCSplinePdfCore::setIntFloor(MELANCSplinePdfCore::T val){ floorInt = val; }
+void MELANCSplinePdfCore::doFloor(Bool_t flag){ useFloor = flag; }
 
 void MELANCSplinePdfCore::getBArray(const std::vector<MELANCSplinePdfCore::T>& kappas, const vector<MELANCSplinePdfCore::T>& fcnList, std::vector<MELANCSplinePdfCore::T>& BArray)const{
   BArray.clear();
@@ -143,8 +157,9 @@ vector<vector<MELANCSplinePdfCore::T>> MELANCSplinePdfCore::getCoefficientsAlong
 MELANCSplinePdfCore::T MELANCSplinePdfCore::evalSplineSegment(const std::vector<MELANCSplinePdfCore::T>& coefs, const MELANCSplinePdfCore::T& kappa, const MELANCSplinePdfCore::T& tup, const MELANCSplinePdfCore::T& tdn, Bool_t doIntegrate)const{
   DefaultAccumulator<MELANCSplinePdfCore::T> res;
   for (unsigned int ic=0; ic<coefs.size(); ic++){
-    if (doIntegrate) res += coefs.at(ic)*(pow(tup, (int)(ic+1))-pow(tdn, (int)(ic+1)))/((MELANCSplinePdfCore::T)(ic+1))/kappa;
+    if (doIntegrate) res += coefs.at(ic)*(pow(tup, (int)(ic+1))-pow(tdn, (int)(ic+1)))/((MELANCSplinePdfCore::T)(ic+1));
     else res += coefs.at(ic)*pow(tup, (int)ic);
   }
+  if (doIntegrate) res /= kappa;
   return res;
 }

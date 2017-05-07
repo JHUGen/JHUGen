@@ -21,9 +21,9 @@ const std::vector<splineTriplet_t> MELANCSplinePdfFactory_2D::getPoints(
   const std::vector<MELANCSplinePdfCore::T>& YList,
   const std::vector<MELANCSplinePdfCore::T>& FcnList
   ){
-  unsigned int nX = XList.size();
-  unsigned int nY = YList.size();
-  unsigned int n = FcnList.size();
+  const unsigned int nX = XList.size();
+  const unsigned int nY = YList.size();
+  const unsigned int n = FcnList.size();
   if (nX*nY!=n){
     cerr << "MELANCSplinePdfFactory_2D::getPoints: nX=" << nX << " x nY=" << nY << " != nFcn=" << n << endl;
     assert(0);
@@ -45,7 +45,7 @@ void MELANCSplinePdfFactory_2D::destroyPDF(){ delete PDF; PDF=0; }
 void MELANCSplinePdfFactory_2D::initPDF(const std::vector<splineTriplet_t>& pList){
   destroyPDF();
 
-  unsigned int n = pList.size();
+  const unsigned int n = pList.size();
   vector<MELANCSplinePdfCore::T> XList;
   vector<MELANCSplinePdfCore::T> YList;
   vector<vector<MELANCSplinePdfCore::T>> FcnList;

@@ -15,14 +15,17 @@ MELANCSplinePdfCore()
 {}
 
 MELANCSplinePdf_1D_fast::MELANCSplinePdf_1D_fast(
-const char* name,
-const char* title,
-RooAbsReal& inXVar,
-std::vector<T>& inXList,
-std::vector<T>& inFcnList
-) :
-MELANCSplinePdfCore(name, title, inXVar, inXList),
-FcnList(inFcnList)
+  const char* name,
+  const char* title,
+  RooAbsReal& inXVar,
+  const std::vector<T>& inXList,
+  const std::vector<T>& inFcnList,
+  Bool_t inUseFloor,
+  T inFloorEval,
+  T inFloorInt
+  ) :
+  MELANCSplinePdfCore(name, title, inXVar, inXList, inUseFloor, inFloorEval, inFloorInt),
+  FcnList(inFcnList)
 {
   if (npointsX()>1){
     int npoints;
@@ -57,6 +60,8 @@ MELANCSplinePdf_1D_fast::MELANCSplinePdf_1D_fast(
 
 MELANCSplinePdfCore::T MELANCSplinePdf_1D_fast::interpolateFcn(Int_t code, const char* rangeName)const{
   DefaultAccumulator<MELANCSplinePdfCore::T> res;
+
+  if (verbosity==MELANCSplinePdfCore::kVerbose) cout << "MELANCSplinePdf_1D_fast(" << GetName() << ")::interpolateFcn begin with code: " << code << endl;
 
   // Get bins
   Int_t xbin=-1, xbinmin=-1, xbinmax=-1;
@@ -94,7 +99,7 @@ MELANCSplinePdfCore::T MELANCSplinePdf_1D_fast::interpolateFcn(Int_t code, const
   return res;
 }
 
-void MELANCSplinePdf_1D_fast::getKappas(vector<MELANCSplinePdfCore::T>& kappas, const Int_t /*whichDirection*/)const{
+void MELANCSplinePdf_1D_fast::getKappas(vector<MELANCSplinePdfCore::T>& kappas, const Int_t /*whichDirection*/){
   kappas.clear();
   MELANCSplinePdfCore::T kappa=1;
 
@@ -134,17 +139,21 @@ Int_t MELANCSplinePdf_1D_fast::getWhichBin(const MELANCSplinePdfCore::T& val, co
   return bin;
 }
 MELANCSplinePdfCore::T MELANCSplinePdf_1D_fast::getTVar(const vector<MELANCSplinePdfCore::T>& kappas, const MELANCSplinePdfCore::T& val, const Int_t& bin, const Int_t /*whichDirection*/)const{
-  MELANCSplinePdfCore::T K;
-  K=kappas.at(bin);
+  const MELANCSplinePdfCore::T& K=kappas.at(bin);
   return (val-XList.at(bin))*K;
 }
 
 Double_t MELANCSplinePdf_1D_fast::evaluate() const{
   Double_t value = interpolateFcn(0);
-  if (value<=0.) return 1e-15;
+  if (useFloor && value<floorEval){
+    if (verbosity>=MELANCSplinePdfCore::kError) coutE(Eval) << "MELANCSplinePdf_1D_fast ERROR::MELANCSplinePdf_1D_fast(" << GetName() << ") evaluation returned " << value << " at x = " << theXVar << endl;
+    value = floorEval;
+  }
+  if (verbosity==MELANCSplinePdfCore::kVerbose){ cout << "MELANCSplinePdf_1D_fast(" << GetName() << ")::evaluate = " << value << " at x = " << theXVar << endl; }
   return value;
 }
 Int_t MELANCSplinePdf_1D_fast::getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* /*rangeName*/) const{
+  if (_forceNumInt) return 0;
   Int_t code=0;
   if (dynamic_cast<RooRealVar*>(theXVar.absArg())!=0){
     if (matchArgs(allVars, analVars, theXVar)) code=2;
@@ -153,6 +162,10 @@ Int_t MELANCSplinePdf_1D_fast::getAnalyticalIntegral(RooArgSet& allVars, RooArgS
 }
 Double_t MELANCSplinePdf_1D_fast::analyticalIntegral(Int_t code, const char* rangeName) const{
   Double_t value = interpolateFcn(code, rangeName);
-  if (value<=0.) value = 1e-10;
+  if (useFloor && value<floorInt){
+    if (verbosity>=MELANCSplinePdfCore::kError) coutE(Integration) << "MELANCSplinePdf_1D_fast ERROR::MELANCSplinePdf_3D_fast(" << GetName() << ") integration returned " << value << " for code = " << code << endl;
+    value = floorInt;
+  }
+  if (verbosity==MELANCSplinePdfCore::kVerbose){ cout << "MELANCSplinePdf_1D_fast(" << GetName() << ")::analyticalIntegral = " << value << " for code = " << code << endl; }
   return value;
 }

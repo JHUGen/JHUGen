@@ -22,12 +22,15 @@ MELANCSplinePdf_3D_fast::MELANCSplinePdf_3D_fast(
   RooAbsReal& inXVar,
   RooAbsReal& inYVar,
   RooAbsReal& inZVar,
-  std::vector<T>& inXList,
-  std::vector<T>& inYList,
-  std::vector<T>& inZList,
-  std::vector<std::vector<std::vector<T>>>& inFcnList
+  const std::vector<T>& inXList,
+  const std::vector<T>& inYList,
+  const std::vector<T>& inZList,
+  const std::vector<std::vector<std::vector<T>>>& inFcnList,
+  Bool_t inUseFloor,
+  T inFloorEval,
+  T inFloorInt
   ) :
-  MELANCSplinePdfCore(name, title, inXVar, inXList),
+  MELANCSplinePdfCore(name, title, inXVar, inXList, inUseFloor, inFloorEval, inFloorInt),
   theYVar("theYVar", "theYVar", this, inYVar),
   theZVar("theZVar", "theZVar", this, inZVar),
   YList(inYList),
@@ -298,13 +301,12 @@ MELANCSplinePdfCore::T MELANCSplinePdf_3D_fast::interpolateFcn(Int_t code, const
     }
     // Evaluate value of spline at x with coefficients evaluated at y
     res += evalSplineSegment(xCoefs, varkappa[0]->at(ix), txhigh, txlow, (code>0 && code%varprime[0]==0));
-
   }
 
   return res;
 }
 
-void MELANCSplinePdf_3D_fast::getKappas(vector<MELANCSplinePdfCore::T>& kappas, const Int_t whichDirection)const{
+void MELANCSplinePdf_3D_fast::getKappas(vector<MELANCSplinePdfCore::T>& kappas, const Int_t whichDirection){
   kappas.clear();
   MELANCSplinePdfCore::T kappa=1;
 
@@ -364,8 +366,7 @@ Int_t MELANCSplinePdf_3D_fast::getWhichBin(const MELANCSplinePdfCore::T& val, co
   return bin;
 }
 MELANCSplinePdfCore::T MELANCSplinePdf_3D_fast::getTVar(const vector<MELANCSplinePdfCore::T>& kappas, const MELANCSplinePdfCore::T& val, const Int_t& bin, const Int_t whichDirection)const{
-  MELANCSplinePdfCore::T K;
-  K=kappas.at(bin);
+  const MELANCSplinePdfCore::T& K=kappas.at(bin);
   vector<MELANCSplinePdfCore::T> const* coord;
   if (whichDirection==0) coord=&XList;
   else if (whichDirection==1) coord=&YList;
@@ -386,32 +387,62 @@ vector<vector<MELANCSplinePdfCore::T>> MELANCSplinePdf_3D_fast::getCoefficientsP
 
 Double_t MELANCSplinePdf_3D_fast::evaluate() const{
   Double_t value = interpolateFcn(0);
-  if (value<=0.){
-    coutE(Eval) << "MELANCSplinePdf_3D_fast ERROR::MELANCSplinePdf_3D_fast(" << GetName() << ") evaluation returned " << value << " at (x, y, z) = (" << theXVar << ", " << theYVar << ", " << theZVar << ")" << endl;
-    value = 1e-15;
+  if (useFloor && value<floorEval){
+    if (verbosity>=MELANCSplinePdfCore::kError) coutE(Eval) << "MELANCSplinePdf_3D_fast ERROR::MELANCSplinePdf_3D_fast(" << GetName() << ") evaluation returned " << value << " at (x, y, z) = (" << theXVar << ", " << theYVar << ", " << theZVar << ")" << endl;
+    value = floorEval;
   }
   if (verbosity==MELANCSplinePdfCore::kVerbose){ cout << "MELANCSplinePdf_3D_fast(" << GetName() << ")::evaluate = " << value << " at (x, y, z) = (" << theXVar << ", " << theYVar << ", " << theZVar << ")" << endl; }
   return value;
 }
 Int_t MELANCSplinePdf_3D_fast::getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* /*rangeName*/) const{
+  if (_forceNumInt) return 0;
+
   Int_t code=1;
-  if (dynamic_cast<RooRealVar*>(theXVar.absArg())!=0){
-    if (matchArgs(allVars, analVars, theXVar)) code*=2;
+
+  RooArgSet Xdeps, Ydeps, Zdeps;
+  RooRealVar* rrv_x = dynamic_cast<RooRealVar*>(theXVar.absArg());
+  RooRealVar* rrv_y = dynamic_cast<RooRealVar*>(theYVar.absArg());
+  RooRealVar* rrv_z = dynamic_cast<RooRealVar*>(theZVar.absArg());
+  if (rrv_x==0) theXVar.absArg()->leafNodeServerList(&Xdeps, 0, true);
+  if (rrv_y==0) theYVar.absArg()->leafNodeServerList(&Ydeps, 0, true);
+  if (rrv_z==0) theZVar.absArg()->leafNodeServerList(&Zdeps, 0, true);
+
+  if (rrv_x!=0){
+    if (
+      (Ydeps.find(*rrv_x)==0 || rrv_y!=0)
+      &&
+      (Zdeps.find(*rrv_x)==0 || rrv_z!=0)
+      ){
+      if (matchArgs(allVars, analVars, theXVar)) code*=2;
+    }
   }
-  if (dynamic_cast<RooRealVar*>(theYVar.absArg())!=0){
-    if (matchArgs(allVars, analVars, theYVar)) code*=3;
+  if (rrv_y!=0){
+    if (
+      (Xdeps.find(*rrv_y)==0 || rrv_x!=0)
+      &&
+      (Zdeps.find(*rrv_y)==0 || rrv_z!=0)
+      ){
+      if (matchArgs(allVars, analVars, theYVar)) code*=3;
+    }
   }
-  if (dynamic_cast<RooRealVar*>(theZVar.absArg())!=0){
-    if (matchArgs(allVars, analVars, theZVar)) code*=5;
+  if (rrv_z!=0){
+    if (
+      (Xdeps.find(*rrv_z)==0 || rrv_x!=0)
+      &&
+      (Ydeps.find(*rrv_z)==0 || rrv_y!=0)
+      ){
+      if (matchArgs(allVars, analVars, theZVar)) code*=5;
+    }
   }
+
   if (code==1) code=0;
   return code;
 }
 Double_t MELANCSplinePdf_3D_fast::analyticalIntegral(Int_t code, const char* rangeName) const{
   Double_t value = interpolateFcn(code, rangeName);
-  if (value<=0.){
-    coutE(Integration) << "MELANCSplinePdf_3D_fast ERROR::MELANCSplinePdf_3D_fast(" << GetName() << ") integration returned " << value << " for code = " << code << endl;
-    value = 1e-10;
+  if (useFloor && value<floorInt){
+    if (verbosity>=MELANCSplinePdfCore::kError) coutE(Integration) << "MELANCSplinePdf_3D_fast ERROR::MELANCSplinePdf_3D_fast(" << GetName() << ") integration returned " << value << " for code = " << code << endl;
+    value = floorInt;
   }
   if (verbosity==MELANCSplinePdfCore::kVerbose){ cout << "MELANCSplinePdf_3D_fast(" << GetName() << ")::analyticalIntegral = " << value << " for code = " << code << endl; }
   return value;

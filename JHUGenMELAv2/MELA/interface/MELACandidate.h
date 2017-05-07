@@ -40,6 +40,8 @@ public:
   const std::vector<MELAParticle*>& getAssociatedJets()const;
   const std::vector<MELATopCandidate*>& getAssociatedTops()const;
 
+  void getRelatedParticles(std::vector<MELAParticle*>& particles);
+
   TLorentzVector getAlternativeVMomentum(int index)const;
 
   virtual std::vector<int> getDaughterIds()const;
@@ -96,6 +98,7 @@ protected:
   void addByHighestPt(MELATopCandidate* myParticle, std::vector<MELATopCandidate*>& particleArray);
 
   bool checkTopCandidateExists(MELATopCandidate* myParticle, std::vector<MELATopCandidate*>& particleArray)const;
+
 };
 
 

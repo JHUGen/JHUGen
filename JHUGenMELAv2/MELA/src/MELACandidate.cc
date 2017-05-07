@@ -562,7 +562,7 @@ void MELACandidate::addAssociatedJets(MELAParticle* myParticle){
   if (!checkDaughtership(myParticle)) addByHighestPt(myParticle, associatedJets);
 }
 void MELACandidate::addAssociatedTops(MELATopCandidate* myParticle){
-  addByHighestPt(myParticle, associatedTops);
+  if (!checkDaughtership(myParticle)) addByHighestPt(myParticle, associatedTops);
 }
 void MELACandidate::addByHighestPt(MELAParticle* myParticle, std::vector<MELAParticle*>& particleArray){
   bool inserted = checkParticleExists(myParticle, particleArray); // Test if the particle is already in the vector
@@ -660,5 +660,15 @@ bool MELACandidate::checkTopCandidateExists(MELATopCandidate* myParticle, std::v
     if ((*it)==myParticle) return true;
   }
   return false;
+}
+
+void MELACandidate::getRelatedParticles(std::vector<MELAParticle*>& particles){
+  MELAParticle::getRelatedParticles(particles);
+  for (std::vector<MELAParticle*>::iterator it = sortedDaughters.begin(); it<sortedDaughters.end(); it++) (*it)->getRelatedParticles(particles); // Hopefully no particle gets added from here
+  for (std::vector<MELATopCandidate*>::iterator it = associatedTops.begin(); it<associatedTops.end(); it++) (*it)->getRelatedParticles(particles);
+  for (std::vector<MELAParticle*>::iterator it = sortedVs.begin(); it<sortedVs.end(); it++) (*it)->getRelatedParticles(particles);
+  for (std::vector<MELAParticle*>::iterator it = associatedLeptons.begin(); it<associatedLeptons.end(); it++) (*it)->getRelatedParticles(particles);
+  for (std::vector<MELAParticle*>::iterator it = associatedPhotons.begin(); it<associatedPhotons.end(); it++) (*it)->getRelatedParticles(particles);
+  for (std::vector<MELAParticle*>::iterator it = associatedJets.begin(); it<associatedJets.end(); it++) (*it)->getRelatedParticles(particles);
 }
 

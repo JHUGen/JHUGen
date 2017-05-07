@@ -13,16 +13,16 @@ MELANCSplinePdfFactory_1D::~MELANCSplinePdfFactory_1D(){
   destroyPDF();
 }
 void MELANCSplinePdfFactory_1D::setPoints(TGraph* tg){
-  vector<Double_t> XList, FcnList;
+  vector<pair<MELANCSplinePdfCore::T, MELANCSplinePdfCore::T>> pList;
   double* xx = tg->GetX();
   double* yy = tg->GetY();
   int n = tg->GetN();
-  for (int ip=0; ip<n; ip++){ XList.push_back(xx[ip]); FcnList.push_back(yy[ip]); }
-  setPoints(XList, FcnList);
+  for (int ip=0; ip<n; ip++) pList.push_back(pair<MELANCSplinePdfCore::T, MELANCSplinePdfCore::T>(xx[ip], yy[ip]));
+  setPoints(pList);
 }
 const std::vector<std::pair<MELANCSplinePdfCore::T, MELANCSplinePdfCore::T>> MELANCSplinePdfFactory_1D::getPoints(const std::vector<MELANCSplinePdfCore::T>& XList, const std::vector<MELANCSplinePdfCore::T>& FcnList){
-  unsigned int nX = XList.size();
-  unsigned int n = FcnList.size();
+  const unsigned int nX = XList.size();
+  const unsigned int n = FcnList.size();
   if (nX!=n){
     cerr << "MELANCSplinePdfFactory_1D::getPoints: nX=" << nX << " != nFcn=" << n << endl;
     assert(0);
@@ -36,9 +36,10 @@ void MELANCSplinePdfFactory_1D::destroyPDF(){ delete PDF; PDF=0; }
 void MELANCSplinePdfFactory_1D::initPDF(const std::vector<std::pair<MELANCSplinePdfCore::T, MELANCSplinePdfCore::T>>& pList){
   destroyPDF();
 
+  const unsigned int n = pList.size();
   std::vector<MELANCSplinePdfCore::T> XList;
   std::vector<MELANCSplinePdfCore::T> FcnList;
-  for (unsigned int ip=0; ip<pList.size(); ip++){
+  for (unsigned int ip=0; ip<n; ip++){
     XList.push_back(pList.at(ip).first);
     FcnList.push_back(pList.at(ip).second);
   }
