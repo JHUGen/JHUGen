@@ -74,3 +74,14 @@ void MELANCSplinePdfFactory_2D::initPDF(const std::vector<splineTriplet_t>& pLis
     );
 }
 MELANCSplinePdf_2D_fast* MELANCSplinePdfFactory_2D::getPDF(){ return PDF; }
+
+void MELANCSplinePdfFactory_2D::setPoints(TTree* tree){
+  vector<splineTriplet_t> pList;
+  MELANCSplinePdfCore::T x, y, fcn;
+  tree->SetBranchAddress("X", &x);
+  tree->SetBranchAddress("Y", &y);
+  tree->SetBranchAddress("Fcn", &fcn);
+  int n = tree->GetEntries();
+  for (int ip=0; ip<n; ip++){ tree->GetEntry(ip); pList.push_back(splineTriplet_t(x, y, fcn)); }
+  setPoints(pList);
+}

@@ -12,6 +12,8 @@ using namespace TNumericUtil;
 
 MELANCSplinePdf_3D_fast::MELANCSplinePdf_3D_fast() :
 MELANCSplinePdfCore(),
+rangeYmin(1), rangeYmax(-1),
+rangeZmin(1), rangeZmax(-1),
 theYVar("theYVar", "theYVar", this),
 theZVar("theZVar", "theZVar", this)
 {}
@@ -31,6 +33,8 @@ MELANCSplinePdf_3D_fast::MELANCSplinePdf_3D_fast(
   T inFloorInt
   ) :
   MELANCSplinePdfCore(name, title, inXVar, inXList, inUseFloor, inFloorEval, inFloorInt),
+  rangeYmin(1), rangeYmax(-1),
+  rangeZmin(1), rangeZmax(-1),
   theYVar("theYVar", "theYVar", this, inYVar),
   theZVar("theZVar", "theZVar", this, inZVar),
   YList(inYList),
@@ -185,6 +189,12 @@ MELANCSplinePdf_3D_fast::MELANCSplinePdf_3D_fast(
   }
   else assert(0);
 
+  RooArgSet leafset;
+  getLeafDependents(theXVar, leafset);
+  getLeafDependents(theYVar, leafset);
+  getLeafDependents(theZVar, leafset);
+  addLeafDependents(leafset);
+
   emptyFcnList();
 }
 
@@ -193,6 +203,8 @@ MELANCSplinePdf_3D_fast::MELANCSplinePdf_3D_fast(
   const char* name
   ) :
   MELANCSplinePdfCore(other, name),
+  rangeYmin(other.rangeYmin), rangeYmax(other.rangeYmax),
+  rangeZmin(other.rangeZmin), rangeZmax(other.rangeZmax),
   theYVar("theYVar", this, other.theYVar),
   theZVar("theZVar", this, other.theZVar),
   YList(other.YList),
@@ -215,27 +227,31 @@ MELANCSplinePdfCore::T MELANCSplinePdf_3D_fast::interpolateFcn(Int_t code, const
   vector<Int_t> varbin;
   vector<Int_t> varbinmin;
   vector<Int_t> varbinmax;
-  vector<Float_t> tvar;
-  vector<Float_t> tvarmin;
-  vector<Float_t> tvarmax;
+  vector<MELANCSplinePdfCore::T> tvar;
+  vector<MELANCSplinePdfCore::T> tvarmin;
+  vector<MELANCSplinePdfCore::T> tvarmax;
   vector<const vector<MELANCSplinePdfCore::T>*> varkappa; varkappa.push_back(&kappaX); varkappa.push_back(&kappaY); varkappa.push_back(&kappaZ);
   vector<const RooRealProxy*> varcoord; varcoord.push_back(&theXVar); varcoord.push_back(&theYVar); varcoord.push_back(&theZVar);
   for (Int_t idim=0; idim<ndims; idim++){
     Int_t binval=-1;
     Int_t binmin=-1;
     Int_t binmax=-1;
-    Float_t tval=0;
-    Float_t tmin=0;
-    Float_t tmax=0;
+    MELANCSplinePdfCore::T tval=0;
+    MELANCSplinePdfCore::T tmin=0;
+    MELANCSplinePdfCore::T tmax=0;
     if (code==0 || code%varprime.at(idim)!=0){
+      if (!testRangeValidity(*(varcoord.at(idim)), idim)) return 0;
       binval = getWhichBin(*(varcoord.at(idim)), idim);
       tval = getTVar(*(varkappa.at(idim)), *(varcoord.at(idim)), binval, idim);
     }
     else{
-      binmin = getWhichBin(varcoord.at(idim)->min(rangeName), idim);
-      tmin = getTVar(*(varkappa.at(idim)), varcoord.at(idim)->min(rangeName), binmin, idim);
-      binmax = getWhichBin(varcoord.at(idim)->max(rangeName), idim);
-      tmax = getTVar(*(varkappa.at(idim)), varcoord.at(idim)->max(rangeName), binmax, idim);
+      MELANCSplinePdfCore::T coordmin = varcoord.at(idim)->min(rangeName); cropValueForRange(coordmin, idim);
+      MELANCSplinePdfCore::T coordmax = varcoord.at(idim)->max(rangeName); cropValueForRange(coordmax, idim);
+      const std::vector<MELANCSplinePdfCore::T>& kappadim = *(varkappa.at(idim));
+      binmin = getWhichBin(coordmin, idim);
+      tmin = getTVar(kappadim, coordmin, binmin, idim);
+      binmax = getWhichBin(coordmax, idim);
+      tmax = getTVar(kappadim, coordmax, binmax, idim);
     }
     varbin.push_back(binval);
     varbinmin.push_back(binmin);
@@ -328,7 +344,9 @@ void MELANCSplinePdf_3D_fast::getKappas(vector<MELANCSplinePdfCore::T>& kappas, 
   for (Int_t j=0; j<npoints-1; j++){
     MELANCSplinePdfCore::T val_j = coord->at(j);
     MELANCSplinePdfCore::T val_jpo = coord->at(j+1);
-    kappa = 1./(val_jpo-val_j);
+    MELANCSplinePdfCore::T val_diff = (val_jpo-val_j);
+    if (fabs(val_diff)>MELANCSplinePdfCore::T(0)) kappa = 1./val_diff;
+    else kappa = 0;
     kappas.push_back(kappa);
   }
   kappas.push_back(kappa); // Push the same kappa_(N-1)=kappa_(N-2) at the end point
@@ -446,4 +464,56 @@ Double_t MELANCSplinePdf_3D_fast::analyticalIntegral(Int_t code, const char* ran
   }
   if (verbosity==MELANCSplinePdfCore::kVerbose){ cout << "MELANCSplinePdf_3D_fast(" << GetName() << ")::analyticalIntegral = " << value << " for code = " << code << endl; }
   return value;
+}
+
+Bool_t MELANCSplinePdf_3D_fast::testRangeValidity(const T& val, const Int_t whichDirection) const{
+  const T* range[2];
+  if (whichDirection==0){
+    range[0] = &rangeXmin;
+    range[1] = &rangeXmax;
+  }
+  else if (whichDirection==1){
+    range[0] = &rangeYmin;
+    range[1] = &rangeYmax;
+  }
+  else{
+    range[0] = &rangeZmin;
+    range[1] = &rangeZmax;
+  }
+  return (*(range[0])>*(range[1]) || (val>=*(range[0]) && val<=*(range[1])));
+}
+void MELANCSplinePdf_3D_fast::setRangeValidity(const T valmin, const T valmax, const Int_t whichDirection){
+  T* range[2];
+  if (whichDirection==0){
+    range[0] = &rangeXmin;
+    range[1] = &rangeXmax;
+  }
+  else if (whichDirection==1){
+    range[0] = &rangeYmin;
+    range[1] = &rangeYmax;
+  }
+  else{
+    range[0] = &rangeZmin;
+    range[1] = &rangeZmax;
+  }
+  *(range[0])=valmin;
+  *(range[1])=valmax;
+}
+void MELANCSplinePdf_3D_fast::cropValueForRange(T& val, const Int_t whichDirection)const{
+  if (testRangeValidity(val, whichDirection)) return;
+  const T* range[2];
+  if (whichDirection==0){
+    range[0] = &rangeXmin;
+    range[1] = &rangeXmax;
+  }
+  else if (whichDirection==1){
+    range[0] = &rangeYmin;
+    range[1] = &rangeYmax;
+  }
+  else{
+    range[0] = &rangeZmin;
+    range[1] = &rangeZmax;
+  }
+  if (val<*(range[0])) val = *(range[0]);
+  if (val>*(range[1])) val = *(range[1]);
 }

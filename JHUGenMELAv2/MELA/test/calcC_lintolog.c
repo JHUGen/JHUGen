@@ -2560,8 +2560,9 @@ void get_PAvgProfile_MCFM_JJEW_HSMHiggs_13TeV(int sqrts=13, bool recalculate = t
           }
           mass_sample_map[polemass].push_back(tree);
         }
-        else if (finput->IsOpen()) finput->Close();
+        else finput->Close();
       }
+      else if (finput->IsOpen()) finput->Close();
     }
   }
   cout << "NEntries = " << nEntries << endl;

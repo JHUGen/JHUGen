@@ -47,6 +47,8 @@ public:
   void setIntFloor(T val);
   void doFloor(Bool_t flag);
 
+  virtual void setRangeValidity(const T valmin, const T valmax, const Int_t whichDirection) = 0;
+
   virtual Int_t getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* rangeName=0)const = 0;
   virtual Double_t analyticalIntegral(Int_t code, const char* rangeName=0)const = 0;
 
@@ -56,16 +58,26 @@ protected:
   T floorEval;
   T floorInt;
 
+  T rangeXmin;
+  T rangeXmax;
+
   RooRealProxy theXVar;
+  RooListProxy leafDepsList;
   std::vector<T> XList;
 
   virtual void emptyFcnList() = 0;
+
+  void getLeafDependents(RooRealProxy& proxy, RooArgSet& set);
+  void addLeafDependents(RooArgSet& set);
 
   unsigned int npointsX()const{ return XList.size(); }
 
   virtual Int_t getWhichBin(const T& val, const Int_t whichDirection)const = 0;
   virtual void getKappas(std::vector<T>& kappas, const Int_t whichDirection) = 0;
   virtual T getTVar(const std::vector<T>& kappas, const T& val, const Int_t& bin, const Int_t whichDirection)const = 0;
+
+  virtual Bool_t testRangeValidity(const T& val, const Int_t whichDirection)const = 0;
+  virtual void cropValueForRange(T& val, const Int_t whichDirection)const = 0;
 
   virtual T interpolateFcn(Int_t code, const char* rangeName=0)const = 0;
   virtual Double_t evaluate()const = 0;

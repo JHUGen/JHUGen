@@ -87,3 +87,15 @@ void MELANCSplinePdfFactory_3D::initPDF(const std::vector<splineQuadruplet_t>& p
     );
 }
 MELANCSplinePdf_3D_fast* MELANCSplinePdfFactory_3D::getPDF(){ return PDF; }
+
+void MELANCSplinePdfFactory_3D::setPoints(TTree* tree){
+  vector<splineQuadruplet_t> pList;
+  MELANCSplinePdfCore::T x, y, z, fcn;
+  tree->SetBranchAddress("X", &x);
+  tree->SetBranchAddress("Y", &y);
+  tree->SetBranchAddress("Z", &z);
+  tree->SetBranchAddress("Fcn", &fcn);
+  int n = tree->GetEntries();
+  for (int ip=0; ip<n; ip++){ tree->GetEntry(ip); pList.push_back(splineQuadruplet_t(x, y, z, fcn)); }
+  setPoints(pList);
+}

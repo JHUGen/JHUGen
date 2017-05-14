@@ -10,6 +10,11 @@
 
 class MELANCSplinePdf_3D_fast : public MELANCSplinePdfCore{
 protected:
+  T rangeYmin;
+  T rangeYmax;
+  T rangeZmin;
+  T rangeZmax;
+
   RooRealProxy theYVar;
   RooRealProxy theZVar;
   std::vector<T> YList;
@@ -46,6 +51,8 @@ public:
 	virtual TObject* clone(const char* newname)const { return new MELANCSplinePdf_3D_fast(*this, newname); }
 	inline virtual ~MELANCSplinePdf_3D_fast(){}
 
+  void setRangeValidity(const T valmin, const T valmax, const Int_t whichDirection);
+
   virtual Int_t getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* rangeName=0) const;
   virtual Double_t analyticalIntegral(Int_t code, const char* rangeName=0)const;
 
@@ -58,6 +65,9 @@ protected:
   virtual Int_t getWhichBin(const T& val, const Int_t whichDirection)const;
   virtual T getTVar(const std::vector<T>& kappas, const T& val, const Int_t& bin, const Int_t whichDirection)const;
   virtual void getKappas(std::vector<T>& kappas, const Int_t whichDirection);
+
+  Bool_t testRangeValidity(const T& val, const Int_t whichDirection)const;
+  void cropValueForRange(T& val, const Int_t whichDirection)const;
 
   virtual std::vector<std::vector<T>> getCoefficientsPerYPerZ(
     const std::vector<T>& kappaX, const TMatrix_t& xAinv,

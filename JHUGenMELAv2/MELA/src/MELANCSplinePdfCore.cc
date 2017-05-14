@@ -1,7 +1,8 @@
 #include "MELANCSplinePdfCore.h" 
 #include <cmath>
-#include "Riostream.h" 
 #include "TMath.h"
+#include "TIterator.h"
+#include "Riostream.h"
 
 using namespace TMath;
 using namespace RooFit;
@@ -12,7 +13,10 @@ using namespace TNumericUtil;
 MELANCSplinePdfCore::MELANCSplinePdfCore() :
 RooAbsPdf(),
 verbosity(MELANCSplinePdfCore::kSilent),
-theXVar("theXVar", "theXVar", this)
+useFloor(true), floorEval(0), floorInt(0),
+rangeXmin(1), rangeXmax(-1),
+theXVar("theXVar", "theXVar", this),
+leafDepsList("leafDepsList", "leafDepsList", this)
 {}
 
 MELANCSplinePdfCore::MELANCSplinePdfCore(
@@ -21,10 +25,10 @@ MELANCSplinePdfCore::MELANCSplinePdfCore(
   ) :
   RooAbsPdf(name, title),
   verbosity(MELANCSplinePdfCore::kSilent),
-  useFloor(true),
-  floorEval(0),
-  floorInt(0),
-  theXVar("theXVar", "theXVar", this)
+  useFloor(true), floorEval(0), floorInt(0),
+  rangeXmin(1), rangeXmax(-1),
+  theXVar("theXVar", "theXVar", this),
+  leafDepsList("leafDepsList", "leafDepsList", this)
 {}
 
 MELANCSplinePdfCore::MELANCSplinePdfCore(
@@ -38,10 +42,10 @@ MELANCSplinePdfCore::MELANCSplinePdfCore(
   ) :
   RooAbsPdf(name, title),
   verbosity(MELANCSplinePdfCore::kSilent),
-  useFloor(inUseFloor),
-  floorEval(inFloorEval),
-  floorInt(inFloorInt),
+  useFloor(inUseFloor), floorEval(inFloorEval), floorInt(inFloorInt),
+  rangeXmin(1), rangeXmax(-1),
   theXVar("theXVar", "theXVar", this, inXVar),
+  leafDepsList("leafDepsList", "leafDepsList", this),
   XList(inXList)
 {}
 
@@ -51,10 +55,10 @@ MELANCSplinePdfCore::MELANCSplinePdfCore(
   ) :
   RooAbsPdf(other, name),
   verbosity(other.verbosity),
-  useFloor(other.useFloor),
-  floorEval(other.floorEval),
-  floorInt(other.floorInt),
+  useFloor(other.useFloor), floorEval(other.floorEval), floorInt(other.floorInt),
+  rangeXmin(other.rangeXmin), rangeXmax(other.rangeXmax),
   theXVar("theXVar", this, other.theXVar),
+  leafDepsList("leafDepsList", this, other.leafDepsList),
   XList(other.XList)
 {}
 
@@ -162,4 +166,16 @@ MELANCSplinePdfCore::T MELANCSplinePdfCore::evalSplineSegment(const std::vector<
   }
   if (doIntegrate) res /= kappa;
   return res;
+}
+
+void MELANCSplinePdfCore::getLeafDependents(RooRealProxy& proxy, RooArgSet& set){
+  RooArgSet deps;
+  proxy.absArg()->leafNodeServerList(&deps, 0, true);
+  set.add(deps);
+}
+void MELANCSplinePdfCore::addLeafDependents(RooArgSet& set){
+  TIterator* iter = set.createIterator();
+  RooAbsArg* absarg;
+  while ((absarg = (RooAbsArg*)iter->Next())){ if (dynamic_cast<RooRealVar*>(absarg)) leafDepsList.add(*absarg); }
+  delete iter;
 }

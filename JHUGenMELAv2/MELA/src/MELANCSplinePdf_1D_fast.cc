@@ -45,6 +45,10 @@ MELANCSplinePdf_1D_fast::MELANCSplinePdf_1D_fast(
   }
   else assert(0);
 
+  RooArgSet leafset;
+  getLeafDependents(theXVar, leafset);
+  addLeafDependents(leafset);
+
   emptyFcnList();
 }
 
@@ -67,14 +71,17 @@ MELANCSplinePdfCore::T MELANCSplinePdf_1D_fast::interpolateFcn(Int_t code, const
   Int_t xbin=-1, xbinmin=-1, xbinmax=-1;
   MELANCSplinePdfCore::T tx=0, txmin=0, txmax=0;
   if (code==0 || code%2!=0){ // Case to just compute the value at x
+    if (!testRangeValidity(theXVar)) return 0;
     xbin = getWhichBin(theXVar, 0);
     tx = getTVar(kappaX, theXVar, xbin, 0);
   }
   else{ // Case to integrate along x
-    xbinmin = getWhichBin(theXVar.min(rangeName), 0);
-    txmin = getTVar(kappaX, theXVar.min(rangeName), xbinmin, 0);
-    xbinmax = getWhichBin(theXVar.max(rangeName), 0);
-    txmax = getTVar(kappaX, theXVar.max(rangeName), xbinmax, 0);
+    MELANCSplinePdfCore::T coordmin = theXVar.min(rangeName); cropValueForRange(coordmin);
+    MELANCSplinePdfCore::T coordmax = theXVar.max(rangeName); cropValueForRange(coordmax);
+    xbinmin = getWhichBin(coordmin, 0);
+    txmin = getTVar(kappaX, coordmin, xbinmin, 0);
+    xbinmax = getWhichBin(coordmax, 0);
+    txmax = getTVar(kappaX, coordmax, xbinmax, 0);
   }
 
   int nxbins = (int)coefficients.size();
@@ -111,7 +118,9 @@ void MELANCSplinePdf_1D_fast::getKappas(vector<MELANCSplinePdfCore::T>& kappas, 
   for (Int_t j=0; j<npoints-1; j++){
     MELANCSplinePdfCore::T val_j = coord->at(j);
     MELANCSplinePdfCore::T val_jpo = coord->at(j+1);
-    kappa = 1./(val_jpo-val_j);
+    MELANCSplinePdfCore::T val_diff = (val_jpo-val_j);
+    if (fabs(val_diff)>MELANCSplinePdfCore::T(0)) kappa = 1./val_diff;
+    else kappa = 0;
     kappas.push_back(kappa);
   }
   kappas.push_back(kappa); // Push the same kappa_(N-1)=kappa_(N-2) at the end point
@@ -149,7 +158,17 @@ Double_t MELANCSplinePdf_1D_fast::evaluate() const{
     if (verbosity>=MELANCSplinePdfCore::kError) coutE(Eval) << "MELANCSplinePdf_1D_fast ERROR::MELANCSplinePdf_1D_fast(" << GetName() << ") evaluation returned " << value << " at x = " << theXVar << endl;
     value = floorEval;
   }
-  if (verbosity==MELANCSplinePdfCore::kVerbose){ cout << "MELANCSplinePdf_1D_fast(" << GetName() << ")::evaluate = " << value << " at x = " << theXVar << endl; }
+  if (verbosity==MELANCSplinePdfCore::kVerbose){
+    cout << "MELANCSplinePdf_1D_fast(" << GetName() << ")::evaluate = " << value << " at x = " << theXVar << endl;
+    RooArgSet Xdeps; theXVar.absArg()->leafNodeServerList(&Xdeps, 0, true);
+    TIterator* iter = Xdeps.createIterator();
+    RooAbsArg* var;
+    while ((var = (RooAbsArg*)iter->Next())){
+      cout << var->GetName() << " value = " << dynamic_cast<RooAbsReal*>(var)->getVal() << endl;
+    }
+    delete iter;
+    cout << endl;
+  }
   return value;
 }
 Int_t MELANCSplinePdf_1D_fast::getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* /*rangeName*/) const{
@@ -163,9 +182,31 @@ Int_t MELANCSplinePdf_1D_fast::getAnalyticalIntegral(RooArgSet& allVars, RooArgS
 Double_t MELANCSplinePdf_1D_fast::analyticalIntegral(Int_t code, const char* rangeName) const{
   Double_t value = interpolateFcn(code, rangeName);
   if (useFloor && value<floorInt){
-    if (verbosity>=MELANCSplinePdfCore::kError) coutE(Integration) << "MELANCSplinePdf_1D_fast ERROR::MELANCSplinePdf_3D_fast(" << GetName() << ") integration returned " << value << " for code = " << code << endl;
+    if (verbosity>=MELANCSplinePdfCore::kError) coutE(Integration) << "MELANCSplinePdf_1D_fast ERROR::MELANCSplinePdf_1D_fast(" << GetName() << ") integration returned " << value << " for code = " << code << endl;
     value = floorInt;
   }
   if (verbosity==MELANCSplinePdfCore::kVerbose){ cout << "MELANCSplinePdf_1D_fast(" << GetName() << ")::analyticalIntegral = " << value << " for code = " << code << endl; }
   return value;
+}
+
+Bool_t MELANCSplinePdf_1D_fast::testRangeValidity(const T& val, const Int_t /*whichDirection*/) const{
+  const T* range[2];
+  range[0] = &rangeXmin;
+  range[1] = &rangeXmax;
+  return (*(range[0])>*(range[1]) || (val>=*(range[0]) && val<=*(range[1])));
+}
+void MELANCSplinePdf_1D_fast::setRangeValidity(const T valmin, const T valmax, const Int_t /*whichDirection*/){
+  T* range[2];
+  range[0] = &rangeXmin;
+  range[1] = &rangeXmax;
+  *(range[0])=valmin;
+  *(range[1])=valmax;
+}
+void MELANCSplinePdf_1D_fast::cropValueForRange(T& val, const Int_t /*whichDirection*/)const{
+  if (testRangeValidity(val)) return;
+  const T* range[2];
+  range[0] = &rangeXmin;
+  range[1] = &rangeXmax;
+  if (val<*(range[0])) val = *(range[0]);
+  if (val>*(range[1])) val = *(range[1]);
 }

@@ -6,6 +6,7 @@
 #include <algorithm>
 #include "MELANCSplinePdf_1D_fast.h"
 #include "TGraph.h"
+#include "TTree.h"
 
 class MELANCSplinePdfFactory_1D{
 protected:
@@ -24,6 +25,7 @@ public:
   ~MELANCSplinePdfFactory_1D();
 
   MELANCSplinePdf_1D_fast* getPDF();
+  void setPoints(TTree* tree);
   void setPoints(TGraph* tg);
   void setPoints(const std::vector<std::pair<MELANCSplinePdfCore::T, MELANCSplinePdfCore::T>>& pList){ initPDF(pList); }
   template<typename inType> void setPoints(const std::vector<inType>& XList, const std::vector<inType>& FcnList){

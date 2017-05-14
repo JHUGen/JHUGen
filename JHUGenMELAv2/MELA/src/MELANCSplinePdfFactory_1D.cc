@@ -12,6 +12,15 @@ PDF(0)
 MELANCSplinePdfFactory_1D::~MELANCSplinePdfFactory_1D(){
   destroyPDF();
 }
+void MELANCSplinePdfFactory_1D::setPoints(TTree* tree){
+  vector<pair<MELANCSplinePdfCore::T, MELANCSplinePdfCore::T>> pList;
+  MELANCSplinePdfCore::T x, fcn;
+  tree->SetBranchAddress("X", &x);
+  tree->SetBranchAddress("Fcn", &fcn);
+  int n = tree->GetEntries();
+  for (int ip=0; ip<n; ip++){ tree->GetEntry(ip); pList.push_back(pair<MELANCSplinePdfCore::T, MELANCSplinePdfCore::T>(x, fcn)); }
+  setPoints(pList);
+}
 void MELANCSplinePdfFactory_1D::setPoints(TGraph* tg){
   vector<pair<MELANCSplinePdfCore::T, MELANCSplinePdfCore::T>> pList;
   double* xx = tg->GetX();

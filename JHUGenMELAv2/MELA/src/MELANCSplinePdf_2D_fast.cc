@@ -12,6 +12,7 @@ using namespace TNumericUtil;
 
 MELANCSplinePdf_2D_fast::MELANCSplinePdf_2D_fast() :
 MELANCSplinePdfCore(),
+rangeYmin(1), rangeYmax(-1),
 theYVar("theYVar", "theYVar", this)
 {}
 
@@ -28,6 +29,7 @@ MELANCSplinePdf_2D_fast::MELANCSplinePdf_2D_fast(
   T inFloorInt
   ) :
   MELANCSplinePdfCore(name, title, inXVar, inXList, inUseFloor, inFloorEval, inFloorInt),
+  rangeYmin(1), rangeYmax(-1),
   theYVar("theYVar", "theYVar", this, inYVar),
   YList(inYList),
   FcnList(inFcnList)
@@ -98,6 +100,11 @@ MELANCSplinePdf_2D_fast::MELANCSplinePdf_2D_fast(
   }
   else assert(0);
 
+  RooArgSet leafset;
+  getLeafDependents(theXVar, leafset);
+  getLeafDependents(theYVar, leafset);
+  addLeafDependents(leafset);
+
   emptyFcnList();
 }
 
@@ -106,6 +113,7 @@ MELANCSplinePdf_2D_fast::MELANCSplinePdf_2D_fast(
   const char* name
   ) :
   MELANCSplinePdfCore(other, name),
+  rangeYmin(other.rangeYmin), rangeYmax(other.rangeYmax),
   theYVar("theYVar", this, other.theYVar),
   YList(other.YList),
   FcnList(other.FcnList),
@@ -124,24 +132,30 @@ MELANCSplinePdfCore::T MELANCSplinePdf_2D_fast::interpolateFcn(Int_t code, const
   Int_t xbin=-1, xbinmin=-1, xbinmax=-1, ybin=-1, ybinmin=-1, ybinmax=-1;
   MELANCSplinePdfCore::T tx=0, txmin=0, txmax=0, ty=0, tymin=0, tymax=0;
   if (code==0 || code%2!=0){ // Case to just compute the value at x
+    if (!testRangeValidity(theXVar, 0)) return 0;
     xbin = getWhichBin(theXVar, 0);
     tx = getTVar(kappaX, theXVar, xbin, 0);
   }
   else{ // Case to integrate along x
-    xbinmin = getWhichBin(theXVar.min(rangeName), 0);
-    txmin = getTVar(kappaX, theXVar.min(rangeName), xbinmin, 0);
-    xbinmax = getWhichBin(theXVar.max(rangeName), 0);
-    txmax = getTVar(kappaX, theXVar.max(rangeName), xbinmax, 0);
+    MELANCSplinePdfCore::T coordmin = theXVar.min(rangeName); cropValueForRange(coordmin, 0);
+    MELANCSplinePdfCore::T coordmax = theXVar.max(rangeName); cropValueForRange(coordmax, 0);
+    xbinmin = getWhichBin(coordmin, 0);
+    txmin = getTVar(kappaX, coordmin, xbinmin, 0);
+    xbinmax = getWhichBin(coordmax, 0);
+    txmax = getTVar(kappaX, coordmax, xbinmax, 0);
   }
   if (code==0 || code%3!=0){ // Case to just compute the value at y
+    if (!testRangeValidity(theYVar, 1)) return 0;
     ybin = getWhichBin(theYVar, 1);
     ty = getTVar(kappaY, theYVar, ybin, 1);
   }
   else{ // Case to integrate along y
-    ybinmin = getWhichBin(theYVar.min(rangeName), 1);
-    tymin = getTVar(kappaY, theYVar.min(rangeName), ybinmin, 1);
-    ybinmax = getWhichBin(theYVar.max(rangeName), 1);
-    tymax = getTVar(kappaY, theYVar.max(rangeName), ybinmax, 1);
+    MELANCSplinePdfCore::T coordmin = theYVar.min(rangeName); cropValueForRange(coordmin, 1);
+    MELANCSplinePdfCore::T coordmax = theYVar.max(rangeName); cropValueForRange(coordmax, 1);
+    ybinmin = getWhichBin(coordmin, 1);
+    tymin = getTVar(kappaY, coordmin, ybinmin, 1);
+    ybinmax = getWhichBin(coordmax, 1);
+    tymax = getTVar(kappaY, coordmax, ybinmax, 1);
   }
 
   for (int ix=0; ix<(int)coefficients.size(); ix++){
@@ -223,7 +237,9 @@ void MELANCSplinePdf_2D_fast::getKappas(vector<MELANCSplinePdfCore::T>& kappas, 
   for (Int_t j=0; j<npoints-1; j++){
     MELANCSplinePdfCore::T val_j = coord->at(j);
     MELANCSplinePdfCore::T val_jpo = coord->at(j+1);
-    kappa = 1./(val_jpo-val_j);
+    MELANCSplinePdfCore::T val_diff = (val_jpo-val_j);
+    if (fabs(val_diff)>MELANCSplinePdfCore::T(0)) kappa = 1./val_diff;
+    else kappa = 0;
     kappas.push_back(kappa);
   }
   kappas.push_back(kappa); // Push the same kappa_(N-1)=kappa_(N-2) at the end point
@@ -313,4 +329,44 @@ Double_t MELANCSplinePdf_2D_fast::analyticalIntegral(Int_t code, const char* ran
   }
   if (verbosity==MELANCSplinePdfCore::kVerbose){ cout << "MELANCSplinePdf_2D_fast(" << GetName() << ")::analyticalIntegral = " << value << " for code = " << code << endl; }
   return value;
+}
+
+Bool_t MELANCSplinePdf_2D_fast::testRangeValidity(const T& val, const Int_t whichDirection) const{
+  const T* range[2];
+  if (whichDirection==0){
+    range[0] = &rangeXmin;
+    range[1] = &rangeXmax;
+  }
+  else{
+    range[0] = &rangeYmin;
+    range[1] = &rangeYmax;
+  }
+  return (*(range[0])>*(range[1]) || (val>=*(range[0]) && val<=*(range[1])));
+}
+void MELANCSplinePdf_2D_fast::setRangeValidity(const T valmin, const T valmax, const Int_t whichDirection){
+  T* range[2];
+  if (whichDirection==0){
+    range[0] = &rangeXmin;
+    range[1] = &rangeXmax;
+  }
+  else{
+    range[0] = &rangeYmin;
+    range[1] = &rangeYmax;
+  }
+  *(range[0])=valmin;
+  *(range[1])=valmax;
+}
+void MELANCSplinePdf_2D_fast::cropValueForRange(T& val, const Int_t whichDirection)const{
+  if (testRangeValidity(val, whichDirection)) return;
+  const T* range[2];
+  if (whichDirection==0){
+    range[0] = &rangeXmin;
+    range[1] = &rangeXmax;
+  }
+  else{
+    range[0] = &rangeYmin;
+    range[1] = &rangeYmax;
+  }
+  if (val<*(range[0])) val = *(range[0]);
+  if (val>*(range[1])) val = *(range[1]);
 }

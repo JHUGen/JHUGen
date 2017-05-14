@@ -1430,6 +1430,10 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_Comparison_Ping(int motherflavor=0, int 
       proddecme=0;
       for (int ii=0; ii<nmsq; ii++){ for (int jj=0; jj<nmsq; jj++) mearray[ii][jj]=0; }
     }
+    void add(const mcfmme& other){
+      proddecme+=other.proddecme;
+      for (int ii=0; ii<nmsq; ii++){ for (int jj=0; jj<nmsq; jj++) mearray[ii][jj]+=(other.mearray)[ii][jj]; }
+    }
     void multiplyarray(const float val){
       for (int ii=0; ii<nmsq; ii++){ for (int jj=0; jj<nmsq; jj++) mearray[ii][jj]*=val; }
     }
@@ -1752,7 +1756,7 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_Comparison_Ping(int motherflavor=0, int 
     jhume p_prod_0minusAA_dec_0minusAA_VAJHU;
     jhume p_prod_fa3AA_dec_fa3AA_VAJHU;
 
-    mcfmme p_bkg_VAMCFM;
+    mcfmme p_bkg_VAMCFM, p_bkg_VAMCFM_rssum;
     mcfmme p_prod_0mplus_dec_0mplus_VAMCFM;
     mcfmme p_prod_0minus_dec_0minus_VAMCFM;
     mcfmme p_prod_fa3_dec_fa3_VAMCFM;
@@ -2450,6 +2454,26 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_Comparison_Ping(int motherflavor=0, int 
     else mela.setProcess(TVar::bkgWW, TVar::MCFM, prod);
     mela.computeProdDecP(p_bkg_VAMCFM.proddecme, false);
     mela.getIORecord()->getUnweightedMEArray(p_bkg_VAMCFM.mearray);
+    if (motherflavor==0 && vbfvhchannel<2){
+      for (int r=-5; r<=5; r++){
+        for (int s=-5; s<=5; s++){
+          MELACandidate* cand = mela.getCurrentCandidate();
+          int idj[2] ={
+            cand->getAssociatedJet(0)->id,
+            cand->getAssociatedJet(1)->id
+          };
+
+          cand->getAssociatedJet(0)->id=r;
+          cand->getAssociatedJet(1)->id=s;
+          mcfmme p_bkg_VAMCFM_rsindiv;
+          mela.computeProdDecP(p_bkg_VAMCFM_rsindiv.proddecme, false);
+          mela.getIORecord()->getUnweightedMEArray(p_bkg_VAMCFM_rsindiv.mearray);
+          p_bkg_VAMCFM_rssum.add(p_bkg_VAMCFM_rsindiv);
+          cand->getAssociatedJet(0)->id=idj[0];
+          cand->getAssociatedJet(1)->id=idj[1];
+        }
+      }
+    }
 
     cout << "Production variables:\n";
     cout << "\tmJJ = " << mjj << endl;
@@ -2604,6 +2628,20 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_Comparison_Ping(int motherflavor=0, int 
         else cout << 0;
       }
       cout << endl;
+    }
+    if (motherflavor==0 && vbfvhchannel<2){
+      cout << "Bkg manual sum" << endl;
+      cout << "\tMCFM" << endl;
+      p_bkg_VAMCFM_rssum.printarray();
+      cout << "\tMCFM Bkg (re-sum)/Bkg Ratio" << endl;
+      for (int ii=0; ii<nmsq; ii++){
+        for (int jj=0; jj<nmsq; jj++){
+          cout << '\t';
+          if (p_bkg_VAMCFM_rssum.mearray[ii][jj]!=0.) cout << p_bkg_VAMCFM_rssum.mearray[ii][jj]/p_bkg_VAMCFM.mearray[ii][jj];
+          else cout << 0;
+        }
+        cout << endl;
+      }
     }
 
     TUtil::PrintCandidateSummary(mela.getCurrentCandidate());

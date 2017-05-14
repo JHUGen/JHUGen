@@ -4,6 +4,7 @@
 #include <vector>
 #include <utility>
 #include <algorithm>
+#include "TTree.h"
 #include "TMCFMUtils.hh"
 #include "RooConstVar.h"
 #include "MELANCSplinePdf_3D_fast.h"
@@ -32,6 +33,7 @@ public:
 
   MELANCSplinePdf_3D_fast* getPDF();
 
+  void setPoints(TTree* tree);
   void setPoints(const std::vector<splineQuadruplet_t>& pList){ initPDF(pList); }
   template<typename inType> void setPoints(const std::vector<inType>& XList, const std::vector<inType>& YList, const std::vector<inType>& ZList, const std::vector<inType>& FcnList){
     std::vector<MELANCSplinePdfCore::T> transXList;
