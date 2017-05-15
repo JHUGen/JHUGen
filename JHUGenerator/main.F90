@@ -72,7 +72,11 @@ END PROGRAM
 subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to the appropriate numbers
    use ModParameters
    use ModMisc
+#if useCollier==1      
+   use COLLIER
+#endif   
    implicit none
+   integer :: Nmax,rmax
 
       if( .not.                 &
          (                      &
@@ -238,6 +242,17 @@ subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to t
             (abs(FacScheme).ne.kRenFacScheme_mhstar) .or. (abs(RenScheme).ne.kRenFacScheme_mhstar)      &
          )                     &
       ) call Error("Invalid scheme for the H+0J processes. Choose a different renormalization or factorization scheme.")
+
+
+   if( Process.eq.50 ) then
+#if useCollier==1   
+     Nmax = 4
+     rmax = 4
+     call Init_cll(Nmax,rmax,"output_collier") 
+     call InitCacheSystem_cll(1,Nmax)
+     call InitEvent_cll
+#endif   
+   endif
 
 
    return
@@ -677,7 +692,8 @@ logical :: SetColliderEnergy
     !PChannel
 
     if (Process.eq.0) PChannel = 0   !only gluons
-    if (Process.eq.1 .or. Process.eq.50 .or. Process.eq.60 .or. Process.eq.66 .or. Process.eq.67 .or. Process.eq.68) PChannel = 1   !only quarks
+    if (Process.eq.1 .or. Process.eq.60 .or. Process.eq.66) PChannel = 1   !only quarks
+
 
     !LHAPDF
 
@@ -1493,7 +1509,11 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
     elseif (Process.eq.62) then
       call vegas(EvalWeighted_HJ,VG_Result,VG_Error,VG_Chi2)
     elseif (Process.eq.50) then
-      call vegas(EvalWeighted_VHiggs,VG_Result,VG_Error,VG_Chi2)
+      if( PChannel.eq.0 ) then
+            call vegas(EvalWeighted_ggVH,VG_Result,VG_Error,VG_Chi2)
+      else
+            call vegas(EvalWeighted_VHiggs,VG_Result,VG_Error,VG_Chi2)
+      endif
     elseif (Process.eq.80) then
       call vegas(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
     elseif (Process.eq.90) then
@@ -1523,7 +1543,11 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
     elseif (process.eq.62 .or. process.eq.61) then
       call vegas1(EvalWeighted_HJ,VG_Result,VG_Error,VG_Chi2)
     elseif (Process.eq.50) then
-      call vegas1(EvalWeighted_VHiggs,VG_Result,VG_Error,VG_Chi2)
+      if( PChannel.eq.0 ) then
+           call vegas1(EvalWeighted_ggVH,VG_Result,VG_Error,VG_Chi2)
+      else
+           call vegas1(EvalWeighted_VHiggs,VG_Result,VG_Error,VG_Chi2)
+      endif
     elseif (Process.eq.80) then
       call vegas1(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
     elseif (Process.eq.90) then
@@ -3914,15 +3938,14 @@ implicit none
 integer :: AllocStatus,NHisto
 
           it_sav = 1
-          NumHistograms =  45!   9;
-print *, "extending no. of histograms for vbf tests"
+          NumHistograms =  10
           if( .not.allocated(Histo) ) then
                 allocate( Histo(1:NumHistograms), stat=AllocStatus  )
                 if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
           endif
 
           Histo(1)%Info   = "m_jj"
-          Histo(1)%NBins  = 40
+          Histo(1)%NBins  = 100
           Histo(1)%BinSize= 50d0*GeV
           Histo(1)%LowVal = 0d0
           Histo(1)%SetScale= 1d0/GeV
@@ -3965,23 +3988,29 @@ print *, "extending no. of histograms for vbf tests"
 
           Histo(8)%Info   = "m_4l"
           Histo(8)%NBins  = 100
-          Histo(8)%BinSize= 10d0*GeV
+          Histo(8)%BinSize= 40d0*GeV
           Histo(8)%LowVal = 100d0*GeV
           Histo(8)%SetScale= 1d0/GeV
 
-          Histo(9)%Info   = "Phi1"  ! angle between plane of beam-scatterin axis and the lepton plane of Z1 in the resonance rest frame
-          Histo(9)%NBins  = 40
-          Histo(9)%BinSize= 0.078539d0 *2d0
-          Histo(9)%LowVal =-3.14159d0
-          Histo(9)%SetScale= 1d0
+          Histo(9)%Info   = "m_4l"
+          Histo(9)%NBins  = 50
+          Histo(9)%BinSize= 1d0*GeV
+          Histo(9)%LowVal = 100d0*GeV
+          Histo(9)%SetScale= 1d0/GeV
 
-do NHisto=10,45
-          Histo(NHisto)%Info   = "x"
-          Histo(NHisto)%NBins  = 50
-          Histo(NHisto)%BinSize= 1d0/50d0
-          Histo(NHisto)%LowVal = 0d0
-          Histo(NHisto)%SetScale= 1d0
-enddo
+          Histo(10)%Info   = "Phi1"  ! angle between plane of beam-scatterin axis and the lepton plane of Z1 in the resonance rest frame
+          Histo(10)%NBins  = 40
+          Histo(10)%BinSize= 0.078539d0 *2d0
+          Histo(10)%LowVal =-3.14159d0
+          Histo(10)%SetScale= 1d0
+
+! do NHisto=10,45
+!           Histo(NHisto)%Info   = "x"
+!           Histo(NHisto)%NBins  = 50
+!           Histo(NHisto)%BinSize= 1d0/50d0
+!           Histo(NHisto)%LowVal = 0d0
+!           Histo(NHisto)%SetScale= 1d0
+! enddo
           
 ! do NHisto=10,45
 !           Histo(NHisto)%Info   = "sij"
@@ -4020,7 +4049,7 @@ implicit none
 integer :: AllocStatus,NHisto
 
           it_sav = 1
-          NumHistograms = 9
+          NumHistograms = 10
           if( .not.allocated(Histo) ) then
                 allocate( Histo(1:NumHistograms), stat=AllocStatus  )
                 if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
@@ -4045,8 +4074,8 @@ integer :: AllocStatus,NHisto
           Histo(3)%SetScale= 1d0/GeV
 
           Histo(4)%Info   = "pt(H)"
-          Histo(4)%NBins  = 80
-          Histo(4)%BinSize= 300d0*GeV/80d0
+          Histo(4)%NBins  = 100
+          Histo(4)%BinSize= 5d0*GeV
           Histo(4)%LowVal = 0d0*GeV
           Histo(4)%SetScale= 1d0/GeV
 
@@ -4079,6 +4108,12 @@ integer :: AllocStatus,NHisto
           Histo(9)%BinSize= 6.4d0/80d0
           Histo(9)%LowVal = -3.2d0
           Histo(9)%SetScale= 1d0
+
+          Histo(10)%Info   = "EHat"
+          Histo(10)%NBins  = 80
+          Histo(10)%BinSize= 10d0*GeV
+          Histo(10)%LowVal = 200d0*GeV
+          Histo(10)%SetScale= 1d0/GeV
 
   do NHisto=1,NumHistograms
       Histo(NHisto)%Value(:) = 0d0

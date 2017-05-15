@@ -3014,6 +3014,160 @@ ENDIF! GENEVT
  RETURN
  end Function EvalUnWeighted_VHiggs
 
+ 
+ 
+ 
+ 
+ 
+ 
+
+ FUNCTION EvalWeighted_ggVH(yRnd,VgsWgt)
+ use ModKinematics
+ use ModParameters
+ use ModVHiggs
+ use ModMisc
+#if compiler==1
+ use ifport
+#endif
+ implicit none
+ real(8) :: EvalWeighted_ggVH,LO_Res_Unpol,yRnd(1:10),VgsWgt
+ real(8) :: eta1,eta2,tau,x1,x2,sHatJacobi,PreFac,FluxFac,PDFFac
+ real(8) :: pdf(-6:6,1:2)
+ integer :: NBin(1:NumHistograms),NHisto,i,MY_IDUP(1:9), ICOLUP(1:2,1:9),xBin(1:4)
+ integer :: NumPartonicChannels,iPartChannel,ijSel(1:121,1:3),PartChannelAvg,flav1,flav2
+ real(8) :: EHat,PSWgt,PSWgt2,PSWgt3,ML1,ML2,ML3,ML4,MZ1,MZ2
+ real(8) :: MomExt(1:4,1:6),MomDK(1:4,1:4),xRnd
+ logical :: applyPSCut
+ include 'vegas_common.f'
+
+
+    MomExt(:,:)=0d0
+    MomDK(:,:)=0d0
+    LO_Res_Unpol = 0d0
+    EvalWeighted_ggVH = 0d0
+
+    call PDFMapping(2,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi,EhatMin=M_Reso+M_V)
+    EvalCounter = EvalCounter+1
+
+    NumPartonicChannels = 1
+    iPart_sel = 0
+    jPart_sel = 0
+    MY_IDUP(1:2)=(/Glu_,Glu_/)
+    ICOLUP(1:2,1) = (/501,502/)
+    ICOLUP(1:2,2) = (/502,501/)
+    PartChannelAvg = NumPartonicChannels
+
+
+   if( unweighted .and. .not.warmup .and.  sum(AccepCounter_part(:,:)) .eq. sum(RequEvents(:,:)) ) then
+      stopvegas=.true.
+   endif
+   if( unweighted .and. .not. warmup .and. AccepCounter_part(iPart_sel,jPart_sel) .ge. RequEvents(iPart_sel,jPart_Sel)  ) return
+
+
+   if( EHat.lt.M_Reso+M_V ) return
+
+   call EvalPhaseSpace_VH2(yRnd(3:10),EHat,MomExt(1:4,1:6),PSWgt)!  g1 g2 f(Z) fbar(Z) H Null        [f(H) fbar(H)]
+!    call boost2Lab(eta1,eta2,6,MomExt(1:4,1:6))
+
+     
+      call genps(2,EHat,yRnd(3:4),(/M_Z,M_Reso/),MomExt(1:4,3:4),PSWgt)
+      MomExt(1:4,5) = MomExt(1:4,4); MomExt(1:4,4)=0d0; MomExt(1:4,6)=0d0
+      PSWgt = PSWgt * (2d0*Pi)**(4-(2)*3) * (4d0*Pi)**((2)-1)
+
+
+! if( get_MInv(MomExt(1:4,3)+MomExt(1:4,4)) .lt. 20d0*GeV ) return
+! if( get_pT(MomExt(1:4,3)+MomExt(1:4,4)) .lt. 10d0*GeV ) return
+! if( get_pT(MomExt(1:4,5)+MomExt(1:4,6)) .lt. 10d0*GeV ) return
+
+! 1:in 2:in 3:V* 4:V 5:H 6,7: q(Z)q(Z) 8,9: q(h)q(H)
+   call Kinematics_VHiggs(  &
+      (/convertLHE(Glu_),convertLHE(Glu_),convertLHE(Z0_),convertLHE(Z0_),convertLHE(Hig_),convertLHE(ElM_),convertLHE(ElP_),convertLHE(Bot_),convertLHE(ABot_)/),&
+      (/MomExt(1:4,1),MomExt(1:4,2),MomExt(1:4,3)+MomExt(1:4,4)+MomExt(1:4,5),MomExt(1:4,3)+MomExt(1:4,4),&
+        MomExt(1:4,5),MomExt(1:4,3),MomExt(1:4,4),MomExt(1:4,5),MomExt(1:4,6)/),&
+        (/1d0,1d0,1d0,1d0,1d0,1d0,1d0,1d0,1d0/),NBin,applyPSCut)
+   applyPSCut=.false.
+   if( applyPSCut .or. PSWgt.eq.zero ) return
+
+   Mu_Fact = EHat !M_Reso
+   Mu_Ren  = EHat !M_Reso
+   
+   call EvalAlphaS()
+   call setPDFs(eta1,eta2,pdf)
+
+   FluxFac = 1d0/(2d0*EHat**2)
+   PDFFac = pdf(0,1)  *  pdf(0,2)
+   PreFac = fbGeV2 * FluxFac * sHatJacobi * PSWgt * PDFFac * VgsWgt
+
+   call EvalUnpolAmpSq_gg_VH( (/MomExt(1:4,1),MomExt(1:4,2),MomExt(1:4,3),MomExt(1:4,4)/),LO_Res_Unpol)
+
+   LO_Res_Unpol = LO_Res_Unpol * SpinAvg * GluonColAvg**2
+   EvalWeighted_ggVH = LO_Res_Unpol * PreFac
+!    print *, PSWgt,LO_Res_Unpol;pause
+
+!    print *, "full",EvalWeighted_ggVH
+!    print *, LO_Res_Unpol, FluxFac , sHatJacobi , PSWgt , PDFFac 
+!    pause
+
+
+   if( unweighted ) then
+     if( warmup ) then
+
+       CrossSec(iPart_sel,jPart_sel) = CrossSec(iPart_sel,jPart_sel) + EvalWeighted_ggVH
+       CrossSecMax(iPart_sel,jPart_sel) = max(CrossSecMax(iPart_sel,jPart_sel),EvalWeighted_ggVH)
+
+     else! not warmup
+
+       call random_number(xRnd)
+       if( EvalWeighted_ggVH.gt.CrossSecMax(iPart_sel,jPart_sel) ) then
+         write(io_LogFile,"(2X,A,1PE13.6,1PE13.6)") "CrossSecMax is too small.",EvalWeighted_ggVH, CrossSecMax(iPart_sel,jPart_sel)
+         write(io_stdout, "(2X,A,1PE13.6,1PE13.6,1PE13.6,I3,I3)") "CrossSecMax is too small.",EvalWeighted_ggVH, CrossSecMax(iPart_sel,jPart_sel),EvalWeighted_ggVH/CrossSecMax(iPart_sel,jPart_sel),iPart_sel,jPart_sel
+         AlertCounter = AlertCounter + 1
+
+         CrossSecMax(iPart_sel,jPart_sel)=CrossSecMax(iPart_sel,jPart_sel) * 1.1d0
+
+       elseif( EvalWeighted_ggVH .gt. xRnd*CrossSecMax(iPart_sel,jPart_sel) ) then
+
+         AccepCounter = AccepCounter + 1
+         AccepCounter_part(iPart_sel,jPart_sel) = AccepCounter_part(iPart_sel,jPart_sel) + 1
+         do NHisto=1,NumHistograms
+           call intoHisto(NHisto,NBin(NHisto),1d0)
+         enddo
+
+!          call WriteOutEvent_VHiggs(id,helicity,MomExt,inv_mass)
+
+       endif
+
+     endif! warmup
+
+   else! weighted
+
+
+      if( EvalWeighted_ggVH.ne.0d0 ) then
+        AccepCounter=AccepCounter+1
+        if( writeWeightedLHE .and. (.not. warmup) ) then
+!             call WriteOutEvent_VHiggs(id,helicity,MomExt,inv_mass,EventWeight=1d0)
+        endif
+        do NHisto=1,NumHistograms
+            call intoHisto(NHisto,NBin(NHisto),EvalWeighted_ggVH)
+        enddo
+      endif
+   endif! unweighted
+
+
+
+   EvalWeighted_ggVH = EvalWeighted_ggVH/VgsWgt
+   RETURN
+
+
+END FUNCTION
+
+
+ 
+ 
+ 
+ 
+ 
+ 
 
  FUNCTION EvalWeighted_tautau(yRnd,VgsWgt)
  use ModKinematics

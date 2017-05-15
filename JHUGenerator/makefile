@@ -3,12 +3,15 @@ Makefile=makefile
 ModuleDir = $(Here)/modules
 ObjectDir = $(Here)/objects
 MELADir = $(Here)/../JHUGenMELAv2/MELA
+#MELADir = $(Here)/../../Ulascan/JHUGen/JHUGenMELAv2/MELA
 MELAFortranDir = $(MELADir)/fortran
 MELADataDir = $(MELADir)/data
 MELALibDir = $(MELADataDir)/slc6_amd64_gcc530
 MCFMLib = mcfm_703 # libmcfm_703.so
 PDFDir = $(Here)/pdfs
 VegasDir = $(Here)/vegas
+QCDLibDir = $(Here)/../lib/QCD-Loop2/lib64
+CollierDir = $(Here)/../lib/COLLIER-1.1/
 
 # compiler options, Comp='ifort' or 'gfort'
 Opt  = Yes
@@ -36,6 +39,27 @@ else
    LHAPDFflags = -DuseLHAPDF=0
 endif
 
+
+#include QCD Loop Integral Library
+linkQCDLoopLib = No
+
+ifeq ($(linkQCDLoopLib),Yes)
+   QCDLoopLibflags = -DuseQCDLoopLib=1
+else
+   QCDLoopLibflags = -DuseQCDLoopLib=0
+endif
+
+
+#include Collier Loop Integral Library
+linkCollierLib = No
+
+ifeq ($(linkCollierLib),Yes)
+   CollierLibflags = -DuseCollier=1 -L$(CollierDir) -lcollier
+else
+   CollierLibflags = -DuseCollier=0
+endif
+
+
 MELAflags = -DlinkMELA=0
 ifeq ($(linkMELA),Yes)
  ifeq ($(Comp),gfort)
@@ -51,7 +75,7 @@ ifeq ($(Comp),gfort)
  else
     OptOpts  = -O0 -fcheck=all
  endif
- fcomp = gfortran $(OptOpts) -ffree-line-length-none -I$(VegasDir) -I$(ModuleDir) -J$(ModuleDir) $(LHAPDFflags) $(MELAflags) -Dcompiler=2
+ fcomp = gfortran $(OptOpts) -ffree-line-length-none -I$(VegasDir) -I$(ModuleDir) -J$(ModuleDir) $(LHAPDFflags) $(MELAflags) $(QCDLoopLibflags) $(CollierLibflags) -Dcompiler=2
 endif
 
 
@@ -61,7 +85,7 @@ ifeq ($(Comp),ifort)
  else
     OptOpts  = -O0 -implicitnone -check bounds -check pointer -warn interfaces -ftrapuv  -diag-disable remark -debug extended -g -traceback -fpe0 -check uninit
  endif
- fcomp = ifort -fpp $(OptOpts) -module $(ModuleDir) -I$(VegasDir) -Dcompiler=1 $(LHAPDFflags) $(MELAflags)
+ fcomp = ifort -fpp $(OptOpts) -module $(ModuleDir) -I$(VegasDir) -Dcompiler=1 $(LHAPDFflags) $(MELAflags) $(QCDLoopLibflags)  $(CollierLibflags)
 endif
 
 
@@ -133,6 +157,10 @@ AmpObj =  $(ObjectDir)/mod_Misc.o \
           $(ObjectDir)/mod_TTBHiggs.o \
           $(ObjectDir)/mod_THiggs.o
 
+ggVHAmpObj = $(ObjectDir)/ampBox_ggVH.o
+ggVHAmpDep = ampBox_ggVH.F90
+          
+
 VegasDep = $(VegasDir)/vegas.f
 VegasObj = $(ObjectDir)/vegas.o
 
@@ -155,6 +183,20 @@ CPSDep = ./CPS/CALLING_cpHTO.f
 CPSObj = $(ObjectDir)/CALLING_cpHTO.o
 
 
+# #uncommented this because the library is already included in MCFMLib
+# ifeq ($(linkQCDLoopLib),Yes)
+# #   QCDLib_Obj = $(QCDLibDir)/ql/libqcdloop.a\
+# #                $(QCDLibDir)/ff/libff.a
+# #    QCDLib_Flags=
+# 
+#    QCDLib_Obj = $(QCDLibDir)/libqcdloop.a
+#    QCDLib_Flags= -Wl,-rpath,/mnt/pep/mschulze/lib/QCD-Loop2/lib64 -L/mnt/pep/mschulze/lib/QCD-Loop2/lib64 -lqcdloop -lquadmath
+# else
+#    QCDLib_Obj = 
+#    QCDLib_Flags=
+# endif
+
+
 # MadGraphDep = h_emepemep.f \
 #               h_emepemep_noint.f \
 #               h_tamtaptamtap.f \
@@ -171,7 +213,7 @@ MadGraphObj = $(ObjectDir)/gg_ttbh.o \
 
 
 
-JHUGenerator: $(CPSObj) $(PSGenObj) $(VegasObj) $(PDFObj) $(AmpObj) $(KinObj) $(MainObj)
+JHUGenerator: $(CPSObj) $(PSGenObj) $(VegasObj) $(PDFObj) $(AmpObj) $(ggVHAmpObj) $(KinObj) $(MainObj)
 	@echo " linking"
 ifeq ($(UseLHAPDF),Yes)
 	echo " -> interfaced with LHAPDF"
@@ -180,13 +222,18 @@ else
 endif
 	@echo " executable file "$(Exec)" is compiled with "$(Comp)
 	@echo " "
-	$(fcomp) -o $(Exec) $(MainObj) $(KinObj) $(AmpObj) $(PSGenObj) $(VegasObj) $(PDFObj) $(CPSObj) $(LHAPDFflags) $(MELAflags)
+	$(fcomp) -o $(Exec) $(MainObj) $(KinObj) $(AmpObj) $(ggVHAmpObj) $(PSGenObj) $(VegasObj) $(PDFObj) $(CPSObj) $(LHAPDFflags) $(MELAflags) $(CollierLibflags)
 
 
 
 $(AmpObj): $(AmpDep) mod_Misc.F90 mod_Parameters.F90 $(Makefile)
 	@echo " compiling amplitude routines"
 	$(fcomp) -c $(AmpDep)
+	mv *.o $(ObjectDir)
+
+$(ggVHAmpObj): $(ggVHAmpDep) $(Makefile)
+	@echo " compiling ggVH box amplitude"
+	$(fcomp) -c $(ggVHAmpDep)
 	mv *.o $(ObjectDir)
 
 $(KinObj): $(KinDep) $(VegasDep) $(PDFDep) $(PSGenDep) mod_Parameters.F90 $(Makefile)

@@ -254,7 +254,6 @@ MODULE ModPhasespace
            if( dabs(sMin + sMax -2d0*PropMass_sq).lt.1d-10 .and.PropMass_sq.gt.1d-14 ) then! this is the narrow-width mapping (i.e. no integration)
               InvMass_sq = PropMass_sq
               s_channel_propagator = pi/(dsqrt(PropMass_sq)*Width)
-              
            else ! this is the normal s-channel mapping
            
 !               if( dabs(sMax-PropMass_sq).gt.5d0*Width**2 ) then!   MARKUS NOTE: this if-condition is not smooth --> needs improvement  ! !

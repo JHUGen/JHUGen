@@ -377,6 +377,184 @@ END SUBROUTINE
 
 
 
+
+FUNCTION LeviCiv(e1,e2,e3,e4)
+implicit none
+complex(8), intent(in)  :: e1(4), e2(4), e3(4), e4(4)
+complex(8)  ::LeviCiv
+
+LeviCiv =  e1(1)*e2(2)*e3(3)*e4(4)-e1(1)*e2(2)*e3(4)*e4(3) &
+          -e1(1)*e2(3)*e3(2)*e4(4)+e1(1)*e2(3)*e3(4)*e4(2) &
+          +e1(1)*e2(4)*e3(2)*e4(3)-e1(1)*e2(4)*e3(3)*e4(2) &
+          -e1(2)*e2(1)*e3(3)*e4(4)+e1(2)*e2(1)*e3(4)*e4(3) &
+          +e1(2)*e2(3)*e3(1)*e4(4)-e1(2)*e2(3)*e3(4)*e4(1) &
+          -e1(2)*e2(4)*e3(1)*e4(3)+e1(2)*e2(4)*e3(3)*e4(1) &
+          +e1(3)*e2(1)*e3(2)*e4(4)-e1(3)*e2(1)*e3(4)*e4(2) &
+          -e1(3)*e2(2)*e3(1)*e4(4)+e1(3)*e2(2)*e3(4)*e4(1) &
+          +e1(3)*e2(4)*e3(1)*e4(2)-e1(3)*e2(4)*e3(2)*e4(1) &
+          -e1(4)*e2(1)*e3(2)*e4(3)+e1(4)*e2(1)*e3(3)*e4(2) &
+          +e1(4)*e2(2)*e3(1)*e4(3)-e1(4)*e2(2)*e3(3)*e4(1) &
+          -e1(4)*e2(3)*e3(1)*e4(2)+e1(4)*e2(3)*e3(2)*e4(1)
+
+END FUNCTION
+
+
+
+
+FUNCTION pol_gluon_incoming(p,hel)
+implicit none
+complex(8) :: pol_gluon_incoming(1:4)
+real(8) :: p(1:4)
+integer :: hel
+real(8) :: pv,ct,st,cphi,sphi
+
+
+    pv=dsqrt(dabs(p(1)**2))
+    ct=p(4)/pv
+    st=dsqrt(abs(1.0d0-ct**2))
+
+    if( st.le.1d-9 ) then
+       cphi=1.0d0
+       sphi=0.0d0
+    else
+       cphi= p(2)/pv/st
+       sphi= p(3)/pv/st
+    endif
+
+
+    ! -- distinguish between positive and negative energies
+!     if ( p(1) .gt. 0.0_dp) then
+!        hel=hel
+!     else
+!        hel=-hel
+!     endif
+
+!     if (present(outgoing)) then
+!        if (outgoing) pol = -pol
+!     endif
+
+    pol_gluon_incoming(1) = 0d0
+    pol_gluon_incoming(2) = ct*cphi - (0d0,1d0)*hel*sphi
+    pol_gluon_incoming(3) = ct*sphi + (0d0,1d0)*hel*cphi
+    pol_gluon_incoming(4) = -st
+    
+    pol_gluon_incoming(2:4) = pol_gluon_incoming(2:4)/dsqrt(2.0d0)
+
+END FUNCTION 
+
+
+
+
+
+
+FUNCTION pol_Zff_outgoing(pf,pfbar,hel) !  does not contain the division by 1/q^2 as in pol_dk2mom
+implicit none
+complex(8) :: pol_Zff_outgoing(4)
+integer :: hel
+real(8):: pf(1:4),pfbar(1:4)
+complex(8) :: Ub(1:4),V(1:4)
+
+
+    Ub(1:4) = ubar_spinor(pf,hel)
+    V(1:4)  = v_spinor(pfbar,-hel)
+
+    !   This is an expression for (-i)* (-i) Ub(+/-)) Gamma^\mu V(-/+)
+    pol_Zff_outgoing(1)=-(Ub(2)*V(4)+V(2)*Ub(4)+Ub(1)*V(3)+V(1)*Ub(3))
+    pol_Zff_outgoing(2)=-(-Ub(1)*V(4)+V(1)*Ub(4)-Ub(2)*V(3)+V(2)*Ub(3))
+    pol_Zff_outgoing(3)=-(0d0,1d0)*(Ub(1)*V(4)+V(1)*Ub(4)-Ub(2)*V(3)-V(2)*Ub(3))
+    pol_Zff_outgoing(4)=-(Ub(2)*V(4)-V(2)*Ub(4)-Ub(1)*V(3)+V(1)*Ub(3))
+
+RETURN
+END FUNCTION 
+
+
+! ubar spinor, massless
+FUNCTION ubar_spinor(p,hel)
+implicit none
+real(8) :: p(1:4)
+integer :: hel
+complex(8) :: ubar_spinor(1:4)
+complex(8) :: fc, fc2
+
+
+    fc2 = p(1) + p(4)
+    fc=sqrt(fc2)
+
+    if( abs(fc2).gt.1d-9 ) then
+       if(hel.eq.1) then
+          ubar_spinor(1)=0d0
+          ubar_spinor(2)=0d0
+          ubar_spinor(3)=fc
+          ubar_spinor(4)=(p(2)-(0d0,1d0)*p(3))/fc
+       elseif (hel.eq.-1) then
+          ubar_spinor(1)=(p(2)+(0d0,1d0)*p(3))/fc
+          ubar_spinor(2)=-fc
+          ubar_spinor(3)=0d0
+          ubar_spinor(4)=0d0
+       endif
+    else
+       if(hel.eq.1) then
+          ubar_spinor(1) = 0d0
+          ubar_spinor(2) = 0d0
+          ubar_spinor(3) = 0d0
+          ubar_spinor(4) = dsqrt(2*p(1))
+       elseif (hel.eq.-1) then
+          ubar_spinor(1) = dsqrt((2*p(1)))
+          ubar_spinor(2) = 0d0
+          ubar_spinor(3) = 0d0
+          ubar_spinor(4) = 0d0
+       endif
+    endif
+
+RETURN
+END FUNCTION
+
+
+
+! -- v0  spinor, massless
+FUNCTION v_spinor(p,hel)
+implicit none
+real(8) :: p(1:4)
+integer :: hel
+complex(8) :: v_spinor(1:4)
+complex(8) :: fc2, fc
+
+
+    fc2 = p(1) + p(4)
+    fc=sqrt(fc2)
+
+    if( abs(fc2).gt.1d-9 ) then
+       if(hel.eq.1) then
+          v_spinor(1)=0d0
+          v_spinor(2)=0d0
+          v_spinor(3)=(p(2)-(0d0,1d0)*p(3))/fc
+          v_spinor(4)=-fc
+       elseif (hel.eq.-1) then
+          v_spinor(1)=fc
+          v_spinor(2)=(p(2)+(0d0,1d0)*p(3))/fc
+          v_spinor(3)=0d0
+          v_spinor(4)=0d0
+       endif
+    else
+       if(hel.eq.1) then
+          v_spinor(1)=0d0
+          v_spinor(2)=0d0
+          v_spinor(3)=dsqrt(2*p(1))
+          v_spinor(4)=0d0
+       elseif (hel.eq.-1) then
+          v_spinor(1)=0d0
+          v_spinor(2)=dsqrt(2*p(1))
+          v_spinor(3)=0d0
+          v_spinor(4)=0d0
+       endif
+    endif
+
+RETURN
+END FUNCTION
+
+
+
+
 function FindInputFmt0(EventInfoLine)
 implicit none
 character(len=*) :: EventInfoLine
