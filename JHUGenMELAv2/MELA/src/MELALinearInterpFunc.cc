@@ -1,4 +1,4 @@
-#include "MELALinearInterpPdf.h" 
+#include "MELALinearInterpFunc.h" 
 #include <cmath>
 #include "Riostream.h" 
 #include "TMath.h"
@@ -9,9 +9,11 @@ using namespace std;
 using namespace TNumericUtil;
 
 
-MELALinearInterpPdf::MELALinearInterpPdf() :
-RooAbsPdf(),
-verbosity(MELALinearInterpPdf::kSilent),
+ClassImp(MELALinearInterpFunc)
+
+MELALinearInterpFunc::MELALinearInterpFunc() :
+RooAbsReal(),
+verbosity(MELALinearInterpFunc::kSilent),
 useFloor(true), floorEval(0), floorInt(0),
 rangeXmin(1), rangeXmax(-1),
 theXVar("theXVar", "theXVar", this),
@@ -19,12 +21,12 @@ FcnList("FcnList", "FcnList", this),
 leafDepsList("leafDepsList", "leafDepsList", this)
 {}
 
-MELALinearInterpPdf::MELALinearInterpPdf(
+MELALinearInterpFunc::MELALinearInterpFunc(
   const char* name,
   const char* title
   ) :
-  RooAbsPdf(name, title),
-  verbosity(MELALinearInterpPdf::kSilent),
+  RooAbsReal(name, title),
+  verbosity(MELALinearInterpFunc::kSilent),
   useFloor(true), floorEval(0), floorInt(0),
   rangeXmin(1), rangeXmax(-1),
   theXVar("theXVar", "theXVar", this),
@@ -32,18 +34,18 @@ MELALinearInterpPdf::MELALinearInterpPdf(
   leafDepsList("leafDepsList", "leafDepsList", this)
 {}
 
-MELALinearInterpPdf::MELALinearInterpPdf(
+MELALinearInterpFunc::MELALinearInterpFunc(
   const char* name,
   const char* title,
   RooAbsReal& inXVar,
-  const std::vector<MELALinearInterpPdf::T>& inXList,
+  const std::vector<MELALinearInterpFunc::T>& inXList,
   const RooArgList& inFcnList,
   Bool_t inUseFloor,
   T inFloorEval,
   T inFloorInt
   ) :
-  RooAbsPdf(name, title),
-  verbosity(MELALinearInterpPdf::kSilent),
+  RooAbsReal(name, title),
+  verbosity(MELALinearInterpFunc::kSilent),
   useFloor(inUseFloor), floorEval(inFloorEval), floorInt(inFloorInt),
   rangeXmin(1), rangeXmax(-1),
   XList(inXList),
@@ -62,7 +64,7 @@ MELALinearInterpPdf::MELALinearInterpPdf(
   RooAbsArg* absarg;
   while ((absarg = (RooAbsArg*)iter->Next())){
     if (!dynamic_cast<RooAbsReal*>(absarg)){
-      coutE(InputArguments) << "ERROR::MELALinearInterpPdf(" << GetName() << ") function " << absarg->GetName() << " is not of type RooAbsReal" << endl;
+      coutE(InputArguments) << "ERROR::MELALinearInterpFunc(" << GetName() << ") function " << absarg->GetName() << " is not of type RooAbsReal" << endl;
       assert(0);
     }
     FcnList.add(*absarg);
@@ -80,16 +82,16 @@ MELALinearInterpPdf::MELALinearInterpPdf(
   delete iter;
 
   if (FcnList.getSize()!=(int)XList.size()){
-    coutE(InputArguments) << "MELALinearInterpPdf ERROR::MELALinearInterpPdf(" << GetName() << ") input XList size not the same as FcnList size!" << endl;
+    coutE(InputArguments) << "MELALinearInterpFunc ERROR::MELALinearInterpFunc(" << GetName() << ") input XList size not the same as FcnList size!" << endl;
     assert(0);
   }
 }
 
-MELALinearInterpPdf::MELALinearInterpPdf(
-  const MELALinearInterpPdf& other,
+MELALinearInterpFunc::MELALinearInterpFunc(
+  const MELALinearInterpFunc& other,
   const char* name
   ) :
-  RooAbsPdf(other, name),
+  RooAbsReal(other, name),
   verbosity(other.verbosity),
   useFloor(other.useFloor), floorEval(other.floorEval), floorInt(other.floorInt),
   rangeXmin(other.rangeXmin), rangeXmax(other.rangeXmax),
@@ -99,16 +101,16 @@ MELALinearInterpPdf::MELALinearInterpPdf(
   leafDepsList("leafDepsList", this, other.leafDepsList)
 {}
 
-void MELALinearInterpPdf::setVerbosity(VerbosityLevel flag){ verbosity = flag; }
-void MELALinearInterpPdf::setEvalFloor(MELALinearInterpPdf::T val){ floorEval = val; }
-void MELALinearInterpPdf::setIntFloor(MELALinearInterpPdf::T val){ floorInt = val; }
-void MELALinearInterpPdf::doFloor(Bool_t flag){ useFloor = flag; }
+void MELALinearInterpFunc::setVerbosity(VerbosityLevel flag){ verbosity = flag; }
+void MELALinearInterpFunc::setEvalFloor(MELALinearInterpFunc::T val){ floorEval = val; }
+void MELALinearInterpFunc::setIntFloor(MELALinearInterpFunc::T val){ floorInt = val; }
+void MELALinearInterpFunc::doFloor(Bool_t flag){ useFloor = flag; }
 
-Int_t MELALinearInterpPdf::getWhichBin(const MELALinearInterpPdf::T& val)const{
+Int_t MELALinearInterpFunc::getWhichBin(const MELALinearInterpFunc::T& val)const{
   Int_t bin=-1;
-  MELALinearInterpPdf::T valj, valjpo;
+  MELALinearInterpFunc::T valj, valjpo;
   Int_t np;
-  vector<MELALinearInterpPdf::T> const* coord=&XList;
+  vector<MELALinearInterpFunc::T> const* coord=&XList;
   np=npoints();
 
   if (np<=1) bin=0;
@@ -125,47 +127,47 @@ Int_t MELALinearInterpPdf::getWhichBin(const MELALinearInterpPdf::T& val)const{
 
   return bin;
 }
-MELALinearInterpPdf::T MELALinearInterpPdf::getKappa(const Int_t& bin)const{
+MELALinearInterpFunc::T MELALinearInterpFunc::getKappa(const Int_t& bin)const{
   if (bin>=0){
-    vector<MELALinearInterpPdf::T> const* coord=&XList;
-    MELALinearInterpPdf::T diff = 1;
+    vector<MELALinearInterpFunc::T> const* coord=&XList;
+    MELALinearInterpFunc::T diff = 1;
     if (Int_t(coord->size())>(bin+1)) diff = coord->at(bin+1)-coord->at(bin);
-    if (fabs(diff)>MELALinearInterpPdf::T(0)) return MELALinearInterpPdf::T(1)/diff;
+    if (fabs(diff)>MELALinearInterpFunc::T(0)) return MELALinearInterpFunc::T(1)/diff;
     else return 0;
   }
   else return 1;
 }
-MELALinearInterpPdf::T MELALinearInterpPdf::getTVar(const MELALinearInterpPdf::T& val)const{
+MELALinearInterpFunc::T MELALinearInterpFunc::getTVar(const MELALinearInterpFunc::T& val)const{
   const Int_t bin = getWhichBin(val);
-  vector<MELALinearInterpPdf::T> const* coord=&XList;
-  const MELALinearInterpPdf::T kappa = getKappa(bin);
+  vector<MELALinearInterpFunc::T> const* coord=&XList;
+  const MELALinearInterpFunc::T kappa = getKappa(bin);
   return (val - coord->at(bin))*kappa;
 }
 
-MELALinearInterpPdf::T MELALinearInterpPdf::interpolateFcn(Int_t code, const char* rangeName)const{
+MELALinearInterpFunc::T MELALinearInterpFunc::interpolateFcn(Int_t code, const char* rangeName)const{
   const Int_t xprime = 101;
   const bool intAlongX=(code>0 && code%xprime==0);
 
-  DefaultAccumulator<MELALinearInterpPdf::T> res;
+  DefaultAccumulator<MELALinearInterpFunc::T> res;
   Int_t coderem = (intAlongX ? code/xprime : code);
   if (coderem==1) coderem=0;
 
-  if (verbosity==MELALinearInterpPdf::kVerbose){
-    if (intAlongX) cout << "MELALinearInterpPdf(" << GetName() << ")::interpolateFcn integrates using code = " << code << ", coderem = " << coderem << endl;
-    else cout << "MELALinearInterpPdf(" << GetName() << ")::interpolateFcn evaluates using code = " << code << ", coderem = " << coderem << endl;
+  if (verbosity==MELALinearInterpFunc::kVerbose){
+    if (intAlongX) cout << "MELALinearInterpFunc(" << GetName() << ")::interpolateFcn integrates using code = " << code << ", coderem = " << coderem << endl;
+    else cout << "MELALinearInterpFunc(" << GetName() << ")::interpolateFcn evaluates using code = " << code << ", coderem = " << coderem << endl;
   }
 
   // Get bins
   Int_t xbin=-1, xbinmin=-1, xbinmax=-1;
-  MELALinearInterpPdf::T tx=0, txmin=0, txmax=0;
+  MELALinearInterpFunc::T tx=0, txmin=0, txmax=0;
   if (!intAlongX){ // Case to just compute the value at x
     if (!testRangeValidity(theXVar)) return 0;
     xbin = getWhichBin(theXVar);
     tx = getTVar(theXVar);
   }
   else{ // Case to integrate along x
-    MELALinearInterpPdf::T coordmin = theXVar.min(rangeName); cropValueForRange(coordmin);
-    MELALinearInterpPdf::T coordmax = theXVar.max(rangeName); cropValueForRange(coordmax);
+    MELALinearInterpFunc::T coordmin = theXVar.min(rangeName); cropValueForRange(coordmin);
+    MELALinearInterpFunc::T coordmax = theXVar.max(rangeName); cropValueForRange(coordmax);
     xbinmin = getWhichBin(coordmin);
     txmin = getTVar(coordmin);
     xbinmax = getWhichBin(coordmax);
@@ -174,7 +176,7 @@ MELALinearInterpPdf::T MELALinearInterpPdf::interpolateFcn(Int_t code, const cha
 
   int nxbins = npoints()-1;
   if (nxbins==0){
-    MELALinearInterpPdf::T fcnval;
+    MELALinearInterpFunc::T fcnval;
     if (coderem==0) fcnval = dynamic_cast<const RooAbsReal*>(FcnList.at(0))->getVal();
     else fcnval = dynamic_cast<const RooAbsReal*>(FcnList.at(0))->analyticalIntegral(coderem, rangeName);
     res = fcnval;
@@ -188,14 +190,14 @@ MELALinearInterpPdf::T MELALinearInterpPdf::interpolateFcn(Int_t code, const cha
         (xbinmin>=0 && xbinmax>=xbinmin && !(xbinmin<=ix && ix<=xbinmax))
         ) continue;
 
-      MELALinearInterpPdf::T txlow=0, txhigh=1;
+      MELALinearInterpFunc::T txlow=0, txhigh=1;
       if (intAlongX){
         if (ix==xbinmin) txlow=txmin;
         if (ix==xbinmax) txhigh=txmax;
       }
       else txhigh=tx;
 
-      MELALinearInterpPdf::T fcnval[2]={ 0 };
+      MELALinearInterpFunc::T fcnval[2]={ 0 };
       if (coderem==0){
         for (unsigned int j=0; j<2; j++) fcnval[j] = dynamic_cast<const RooAbsReal*>(FcnList.at(ix+j))->getVal();
       }
@@ -203,13 +205,13 @@ MELALinearInterpPdf::T MELALinearInterpPdf::interpolateFcn(Int_t code, const cha
         for (unsigned int j=0; j<2; j++) fcnval[j] = dynamic_cast<const RooAbsReal*>(FcnList.at(ix+j))->analyticalIntegral(coderem, rangeName);
       }
 
-      DefaultAccumulator<MELALinearInterpPdf::T> segval = fcnval[0];
+      DefaultAccumulator<MELALinearInterpFunc::T> segval = fcnval[0];
       if (intAlongX) segval += (fcnval[1] - fcnval[0])*(pow(txhigh, 2)-pow(txlow, 2))/2.;
       else segval += (fcnval[1] - fcnval[0])*txhigh;
       res += segval;
 
-      if (verbosity==MELALinearInterpPdf::kVerbose) cout
-        << "MELALinearInterpPdf(" << GetName() << ")::interpolateFcn evaluated bin " << ix
+      if (verbosity==MELALinearInterpFunc::kVerbose) cout
+        << "MELALinearInterpFunc(" << GetName() << ")::interpolateFcn evaluated bin " << ix
         << " with txlow = " << txlow << ", txhigh = " << txhigh << ", fcnval[0] = " << fcnval[0] << ", fcnval[1] = " << fcnval[1]
         << endl;
     }
@@ -217,16 +219,16 @@ MELALinearInterpPdf::T MELALinearInterpPdf::interpolateFcn(Int_t code, const cha
 
   return res;
 }
-Double_t MELALinearInterpPdf::evaluate()const{
+Double_t MELALinearInterpFunc::evaluate()const{
   Double_t value = interpolateFcn(0);
   if (useFloor && value<floorEval){
-    if (verbosity>=MELALinearInterpPdf::kError) coutE(Eval) << "MELALinearInterpPdf ERROR::MELALinearInterpPdf(" << GetName() << ") evaluation returned " << value << " at x = " << theXVar << endl;
+    if (verbosity>=MELALinearInterpFunc::kError) coutE(Eval) << "MELALinearInterpFunc ERROR::MELALinearInterpFunc(" << GetName() << ") evaluation returned " << value << " at x = " << theXVar << endl;
     value = floorEval;
   }
-  if (verbosity==MELALinearInterpPdf::kVerbose){ cout << "MELALinearInterpPdf(" << GetName() << ")::evaluate = " << value << " at x = " << theXVar << endl; }
+  if (verbosity==MELALinearInterpFunc::kVerbose){ cout << "MELALinearInterpFunc(" << GetName() << ")::evaluate = " << value << " at x = " << theXVar << endl; }
   return value;
 }
-Int_t MELALinearInterpPdf::getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* rangeName)const{
+Int_t MELALinearInterpFunc::getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* rangeName)const{
   if (_forceNumInt) return 0;
 
   const Int_t xprime = 101;
@@ -278,37 +280,37 @@ Int_t MELALinearInterpPdf::getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& 
   }
 
   if (code==1) code=0;
-  if (verbosity==MELALinearInterpPdf::kVerbose){
-    cout << "MELALinearInterpPdf(" << GetName() << ")::getAnalyticalIntegral code = " << code << endl;
+  if (verbosity==MELALinearInterpFunc::kVerbose){
+    cout << "MELALinearInterpFunc(" << GetName() << ")::getAnalyticalIntegral code = " << code << endl;
     allVars.Print("v");
     analVars.Print("v");
   }
   return code;
 }
-Double_t MELALinearInterpPdf::analyticalIntegral(Int_t code, const char* rangeName)const{
+Double_t MELALinearInterpFunc::analyticalIntegral(Int_t code, const char* rangeName)const{
   Double_t value = interpolateFcn(code, rangeName);
   if (useFloor && value<floorInt){
-    if (verbosity>=MELALinearInterpPdf::kError) coutE(Integration) << "MELALinearInterpPdf ERROR::MELALinearInterpPdf(" << GetName() << ") integration returned " << value << " for code = " << code << endl;
+    if (verbosity>=MELALinearInterpFunc::kError) coutE(Integration) << "MELALinearInterpFunc ERROR::MELALinearInterpFunc(" << GetName() << ") integration returned " << value << " for code = " << code << endl;
     value = floorInt;
   }
-  if (verbosity==MELALinearInterpPdf::kVerbose){ cout << "MELALinearInterpPdf(" << GetName() << ")::analyticalIntegral = " << value << " for code = " << code << endl; }
+  if (verbosity==MELALinearInterpFunc::kVerbose){ cout << "MELALinearInterpFunc(" << GetName() << ")::analyticalIntegral = " << value << " for code = " << code << endl; }
   return value;
 }
 
-Bool_t MELALinearInterpPdf::testRangeValidity(const T& val) const{
+Bool_t MELALinearInterpFunc::testRangeValidity(const T& val) const{
   const T* range[2];
   range[0] = &rangeXmin;
   range[1] = &rangeXmax;
   return (*(range[0])>*(range[1]) || (val>=*(range[0]) && val<=*(range[1])));
 }
-void MELALinearInterpPdf::setRangeValidity(const T valmin, const T valmax){
+void MELALinearInterpFunc::setRangeValidity(const T valmin, const T valmax){
   T* range[2];
   range[0] = &rangeXmin;
   range[1] = &rangeXmax;
   *(range[0])=valmin;
   *(range[1])=valmax;
 }
-void MELALinearInterpPdf::cropValueForRange(T& val)const{
+void MELALinearInterpFunc::cropValueForRange(T& val)const{
   if (testRangeValidity(val)) return;
   const T* range[2];
   range[0] = &rangeXmin;

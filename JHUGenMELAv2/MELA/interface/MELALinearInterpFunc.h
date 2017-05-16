@@ -1,18 +1,16 @@
-#ifndef MELALINEARINTERPPDF
-#define MELALINEARINTERPPDF
+#ifndef MELALINEARINTERPFUNC
+#define MELALINEARINTERPFUNC
 
 #include <vector>
 #include "MELAAccumulators.h"
-#include "TMatrixD.h"
-#include "TVectorD.h"
-#include "RooAbsPdf.h"
-#include "RooAbsReal.h"
 #include "RooRealVar.h"
+#include "RooListProxy.h"
 #include "RooRealProxy.h"
-#include "RooConstVar.h"
 #include "RooArgList.h"
+#include "RooMsgService.h"
 
-class MELALinearInterpPdf : public RooAbsPdf{
+
+class MELALinearInterpFunc : public RooAbsReal{
 public:
   typedef Float_t T;
 
@@ -23,12 +21,12 @@ public:
   };
 
 public:
-  MELALinearInterpPdf();
-  MELALinearInterpPdf(
+  MELALinearInterpFunc();
+  MELALinearInterpFunc(
     const char* name,
     const char* title
     );
-  MELALinearInterpPdf(
+  MELALinearInterpFunc(
     const char* name,
     const char* title,
     RooAbsReal& inXVar,
@@ -38,9 +36,9 @@ public:
     T inFloorEval=1e-15,
     T inFloorInt=1e-10
     );
-  MELALinearInterpPdf(const MELALinearInterpPdf& other, const char* name=0);
-  virtual TObject* clone(const char* newname)const { return new MELALinearInterpPdf(*this, newname); }
-  inline virtual ~MELALinearInterpPdf(){}
+  MELALinearInterpFunc(const MELALinearInterpFunc& other, const char* name=0);
+  virtual TObject* clone(const char* newname)const { return new MELALinearInterpFunc(*this, newname); }
+  inline virtual ~MELALinearInterpFunc(){}
 
   void setVerbosity(VerbosityLevel flag);
   void setEvalFloor(T val);
@@ -77,6 +75,9 @@ protected:
 
   T interpolateFcn(Int_t code, const char* rangeName=0)const;
   Double_t evaluate()const;
+
+
+  ClassDef(MELALinearInterpFunc, 0)
 
 };
  

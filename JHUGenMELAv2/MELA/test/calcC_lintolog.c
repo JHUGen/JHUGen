@@ -29,7 +29,7 @@
 #include "TRandom.h"
 #include "RooNumIntConfig.h"
 #include "RooRealIntegral.h"
-#include <ZZMatrixElement/MELA/interface/Mela.h>
+#include "Mela.h"
 
 
 using namespace std;

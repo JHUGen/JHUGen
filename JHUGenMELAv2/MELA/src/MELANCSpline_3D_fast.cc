@@ -1,4 +1,4 @@
-#include "MELANCSplinePdf_3D_fast.h" 
+#include "MELANCSpline_3D_fast.h" 
 #include <cmath>
 #include "TMath.h"
 #include "Riostream.h" 
@@ -10,15 +10,17 @@ using namespace std;
 using namespace TNumericUtil;
 
 
-MELANCSplinePdf_3D_fast::MELANCSplinePdf_3D_fast() :
-MELANCSplinePdfCore(),
+ClassImp(MELANCSpline_3D_fast)
+
+MELANCSpline_3D_fast::MELANCSpline_3D_fast() :
+MELANCSplineCore(),
 rangeYmin(1), rangeYmax(-1),
 rangeZmin(1), rangeZmax(-1),
 theYVar("theYVar", "theYVar", this),
 theZVar("theZVar", "theZVar", this)
 {}
 
-MELANCSplinePdf_3D_fast::MELANCSplinePdf_3D_fast(
+MELANCSpline_3D_fast::MELANCSpline_3D_fast(
   const char* name,
   const char* title,
   RooAbsReal& inXVar,
@@ -32,7 +34,7 @@ MELANCSplinePdf_3D_fast::MELANCSplinePdf_3D_fast(
   T inFloorEval,
   T inFloorInt
   ) :
-  MELANCSplinePdfCore(name, title, inXVar, inXList, inUseFloor, inFloorEval, inFloorInt),
+  MELANCSplineCore(name, title, inXVar, inXList, inUseFloor, inFloorEval, inFloorInt),
   rangeYmin(1), rangeYmax(-1),
   rangeZmin(1), rangeZmax(-1),
   theYVar("theYVar", "theYVar", this, inYVar),
@@ -46,40 +48,40 @@ MELANCSplinePdf_3D_fast::MELANCSplinePdf_3D_fast(
     int npoints;
     Double_t det;
 
-    vector<vector<MELANCSplinePdfCore::T>> xA; getKappas(kappaX, 0); getAArray(kappaX, xA);
+    vector<vector<MELANCSplineCore::T>> xA; getKappas(kappaX, 0); getAArray(kappaX, xA);
     npoints=kappaX.size();
     TMatrix_t xAtrans(npoints, npoints);
     for (int i=0; i<npoints; i++){ for (int j=0; j<npoints; j++){ xAtrans[i][j]=xA.at(i).at(j); } }
     det=0;
     TMatrix_t xAinv = xAtrans.Invert(&det);
     if (det==0.){
-      coutE(InputArguments) << "MELANCSplinePdf_3D_fast::interpolateFcn: Matrix xA could not be inverted. Something is wrong with the x coordinates of points!" << endl;
+      coutE(InputArguments) << "MELANCSpline_3D_fast::interpolateFcn: Matrix xA could not be inverted. Something is wrong with the x coordinates of points!" << endl;
       assert(0);
     }
 
-    vector<vector<MELANCSplinePdfCore::T>> yA; getKappas(kappaY, 1); getAArray(kappaY, yA);
+    vector<vector<MELANCSplineCore::T>> yA; getKappas(kappaY, 1); getAArray(kappaY, yA);
     npoints=kappaY.size();
     TMatrix_t yAtrans(npoints, npoints);
     for (int i=0; i<npoints; i++){ for (int j=0; j<npoints; j++){ yAtrans[i][j]=yA.at(i).at(j); } }
     det=0;
     TMatrix_t yAinv = yAtrans.Invert(&det);
     if (det==0.){
-      coutE(InputArguments) << "MELANCSplinePdf_3D_fast::interpolateFcn: Matrix yA could not be inverted. Something is wrong with the y coordinates of points!" << endl;
+      coutE(InputArguments) << "MELANCSpline_3D_fast::interpolateFcn: Matrix yA could not be inverted. Something is wrong with the y coordinates of points!" << endl;
       assert(0);
     }
 
-    vector<vector<MELANCSplinePdfCore::T>> zA; getKappas(kappaZ, 2); getAArray(kappaZ, zA);
+    vector<vector<MELANCSplineCore::T>> zA; getKappas(kappaZ, 2); getAArray(kappaZ, zA);
     npoints=kappaZ.size();
     TMatrix_t zAtrans(npoints, npoints);
     for (int i=0; i<npoints; i++){ for (int j=0; j<npoints; j++){ zAtrans[i][j]=zA.at(i).at(j); } }
     det=0;
     TMatrix_t zAinv = zAtrans.Invert(&det);
     if (det==0.){
-      coutE(InputArguments) << "MELANCSplinePdf_3D_fast::interpolateFcn: Matrix zA could not be inverted. Something is wrong with the z coordinates of points!" << endl;
+      coutE(InputArguments) << "MELANCSpline_3D_fast::interpolateFcn: Matrix zA could not be inverted. Something is wrong with the z coordinates of points!" << endl;
       assert(0);
     }
 
-    //cout << "MELANCSplinePdf_3D_fast::MELANCSplinePdf_3D_fast: Initial kappa arrays are set up" << endl;
+    //cout << "MELANCSpline_3D_fast::MELANCSpline_3D_fast: Initial kappa arrays are set up" << endl;
 
     // Get the grid of coefficients
     int nxpoldim=0;
@@ -88,19 +90,19 @@ MELANCSplinePdf_3D_fast::MELANCSplinePdf_3D_fast(
     int nypoldim=0;
     std::vector<
       std::vector<std::vector<
-      std::vector<std::vector<MELANCSplinePdfCore::T>>
+      std::vector<std::vector<MELANCSplineCore::T>>
       >>
       > coefsAlongZ; // [ix][A_x,B_x,C_x,D_x][iy][A_x_y,B_x_y,C_x_y,D_x_y][z_k] at each z_k
     for (unsigned int k=0; k<npointsZ(); k++){
       //cout << "Finding coefficients along z line " << k << endl;
 
       std::vector<std::vector<
-        std::vector<std::vector<MELANCSplinePdfCore::T>>
+        std::vector<std::vector<MELANCSplineCore::T>>
         >> coefficients_perZ; // [ix][A_x,B_x,C_x,D_x][iy][A_x_y,B_x_y,C_x_y,D_x_y] at each z_k
 
-      vector<vector<vector<MELANCSplinePdfCore::T>>> coefsAlongY; // [xbin][Ax(y),Bx(y),Cx(y),Dx(y)][ybin] in each z
+      vector<vector<vector<MELANCSplineCore::T>>> coefsAlongY; // [xbin][Ax(y),Bx(y),Cx(y),Dx(y)][ybin] in each z
       for (unsigned int j=0; j<npointsY(); j++){
-        vector<vector<MELANCSplinePdfCore::T>> xcoefsAtYjZk = getCoefficientsPerYPerZ(kappaX, xAinv, j, k, -1); // [ix][Ax,Bx,Cx,Dx] at each y_j z_k
+        vector<vector<MELANCSplineCore::T>> xcoefsAtYjZk = getCoefficientsPerYPerZ(kappaX, xAinv, j, k, -1); // [ix][Ax,Bx,Cx,Dx] at each y_j z_k
         //cout << "\tCoefficients in y line " << j << " are found" << endl;
         if (j==0){
           if (k==0){
@@ -108,16 +110,16 @@ MELANCSplinePdf_3D_fast::MELANCSplinePdf_3D_fast(
             nxpoldim=xcoefsAtYjZk.at(0).size();
           }
           for (int ix=0; ix<nxbins; ix++){
-            vector<vector<MELANCSplinePdfCore::T>> dum_xycoefarray;
+            vector<vector<MELANCSplineCore::T>> dum_xycoefarray;
             for (int icx=0; icx<nxpoldim; icx++){
-              vector<MELANCSplinePdfCore::T> dum_ycoefarray;
+              vector<MELANCSplineCore::T> dum_ycoefarray;
               dum_xycoefarray.push_back(dum_ycoefarray);
             }
             coefsAlongY.push_back(dum_xycoefarray);
           }
         }
         if (nxbins!=(int)xcoefsAtYjZk.size() || nxpoldim!=(int)xcoefsAtYjZk.at(0).size()){
-          coutE(InputArguments) << "MELANCSplinePdf_3D_fast::interpolateFcn: nxbins!=(int)xcoefsAtYjZk.size() || nxpoldim!=(int)xcoefsAtYjZk.at(0).size()!" << endl;
+          coutE(InputArguments) << "MELANCSpline_3D_fast::interpolateFcn: nxbins!=(int)xcoefsAtYjZk.size() || nxpoldim!=(int)xcoefsAtYjZk.at(0).size()!" << endl;
           assert(0);
         }
         for (int ix=0; ix<nxbins; ix++){
@@ -129,9 +131,9 @@ MELANCSplinePdf_3D_fast::MELANCSplinePdf_3D_fast(
 
       for (int ix=0; ix<nxbins; ix++){
         // Get the x coefficients interpolated across y
-        vector<vector<vector<MELANCSplinePdfCore::T>>> xCoefs;
+        vector<vector<vector<MELANCSplineCore::T>>> xCoefs;
         for (int icx=0; icx<nxpoldim; icx++){
-          vector<vector<MELANCSplinePdfCore::T>> yCoefs = getCoefficientsAlongDirection(kappaY, yAinv, coefsAlongY.at(ix).at(icx), -1); // [iy][A,B,C,D]
+          vector<vector<MELANCSplineCore::T>> yCoefs = getCoefficientsAlongDirection(kappaY, yAinv, coefsAlongY.at(ix).at(icx), -1); // [iy][A,B,C,D]
           xCoefs.push_back(yCoefs);
         }
         coefficients_perZ.push_back(xCoefs);
@@ -141,13 +143,13 @@ MELANCSplinePdf_3D_fast::MELANCSplinePdf_3D_fast(
         nybins = coefficients_perZ.at(0).at(0).size();
         nypoldim = coefficients_perZ.at(0).at(0).at(0).size();
         for (int ix=0; ix<nxbins; ix++){
-          vector<vector<vector<vector<MELANCSplinePdfCore::T>>>> xCoefs;
+          vector<vector<vector<vector<MELANCSplineCore::T>>>> xCoefs;
           for (int icx=0; icx<nxpoldim; icx++){
-            vector<vector<vector<MELANCSplinePdfCore::T>>> xCoefsAlongY;
+            vector<vector<vector<MELANCSplineCore::T>>> xCoefsAlongY;
             for (int iy=0; iy<nybins; iy++){
-              vector<vector<MELANCSplinePdfCore::T>> yCoefs;
+              vector<vector<MELANCSplineCore::T>> yCoefs;
               for (int icy=0; icy<nypoldim; icy++){
-                vector<MELANCSplinePdfCore::T> yCoefAtZj;
+                vector<MELANCSplineCore::T> yCoefAtZj;
                 yCoefs.push_back(yCoefAtZj);
               }
               xCoefsAlongY.push_back(yCoefs);
@@ -170,13 +172,13 @@ MELANCSplinePdf_3D_fast::MELANCSplinePdf_3D_fast(
 
     //cout << "Finding the final coefficients" << endl;
     for (int ix=0; ix<nxbins; ix++){
-      vector<vector<vector<vector<vector<MELANCSplinePdfCore::T>>>>> xCoefs;
+      vector<vector<vector<vector<vector<MELANCSplineCore::T>>>>> xCoefs;
       for (int icx=0; icx<nxpoldim; icx++){
-        vector<vector<vector<vector<MELANCSplinePdfCore::T>>>> xCoefsAlongY;
+        vector<vector<vector<vector<MELANCSplineCore::T>>>> xCoefsAlongY;
         for (int iy=0; iy<nybins; iy++){
-          vector<vector<vector<MELANCSplinePdfCore::T>>> yCoefs;
+          vector<vector<vector<MELANCSplineCore::T>>> yCoefs;
           for (int icy=0; icy<nypoldim; icy++){
-            vector<vector<MELANCSplinePdfCore::T>> yCoefsAlongZ = getCoefficientsAlongDirection(kappaZ, zAinv, coefsAlongZ.at(ix).at(icx).at(iy).at(icy), -1); // [iz][A,B,C,D]
+            vector<vector<MELANCSplineCore::T>> yCoefsAlongZ = getCoefficientsAlongDirection(kappaZ, zAinv, coefsAlongZ.at(ix).at(icx).at(iy).at(icy), -1); // [iz][A,B,C,D]
             yCoefs.push_back(yCoefsAlongZ);
           }
           xCoefsAlongY.push_back(yCoefs);
@@ -198,11 +200,11 @@ MELANCSplinePdf_3D_fast::MELANCSplinePdf_3D_fast(
   emptyFcnList();
 }
 
-MELANCSplinePdf_3D_fast::MELANCSplinePdf_3D_fast(
-  const MELANCSplinePdf_3D_fast& other,
+MELANCSpline_3D_fast::MELANCSpline_3D_fast(
+  const MELANCSpline_3D_fast& other,
   const char* name
   ) :
-  MELANCSplinePdfCore(other, name),
+  MELANCSplineCore(other, name),
   rangeYmin(other.rangeYmin), rangeYmax(other.rangeYmax),
   rangeZmin(other.rangeZmin), rangeZmax(other.rangeZmax),
   theYVar("theYVar", this, other.theYVar),
@@ -216,10 +218,10 @@ MELANCSplinePdf_3D_fast::MELANCSplinePdf_3D_fast(
   coefficients(other.coefficients)
 {}
 
-MELANCSplinePdfCore::T MELANCSplinePdf_3D_fast::interpolateFcn(Int_t code, const char* rangeName)const{
-  DefaultAccumulator<MELANCSplinePdfCore::T> res;
+MELANCSplineCore::T MELANCSpline_3D_fast::interpolateFcn(Int_t code, const char* rangeName)const{
+  DefaultAccumulator<MELANCSplineCore::T> res;
 
-  if (verbosity==MELANCSplinePdfCore::kVerbose) cout << "MELANCSplinePdf_3D_fast(" << GetName() << ")::interpolateFcn begin with code: " << code << endl;
+  if (verbosity==MELANCSplineCore::kVerbose) cout << "MELANCSpline_3D_fast(" << GetName() << ")::interpolateFcn begin with code: " << code << endl;
 
   // Get bins
   vector<Int_t> varprime; varprime.push_back(2); varprime.push_back(3); varprime.push_back(5);
@@ -227,27 +229,27 @@ MELANCSplinePdfCore::T MELANCSplinePdf_3D_fast::interpolateFcn(Int_t code, const
   vector<Int_t> varbin;
   vector<Int_t> varbinmin;
   vector<Int_t> varbinmax;
-  vector<MELANCSplinePdfCore::T> tvar;
-  vector<MELANCSplinePdfCore::T> tvarmin;
-  vector<MELANCSplinePdfCore::T> tvarmax;
-  vector<const vector<MELANCSplinePdfCore::T>*> varkappa; varkappa.push_back(&kappaX); varkappa.push_back(&kappaY); varkappa.push_back(&kappaZ);
+  vector<MELANCSplineCore::T> tvar;
+  vector<MELANCSplineCore::T> tvarmin;
+  vector<MELANCSplineCore::T> tvarmax;
+  vector<const vector<MELANCSplineCore::T>*> varkappa; varkappa.push_back(&kappaX); varkappa.push_back(&kappaY); varkappa.push_back(&kappaZ);
   vector<const RooRealProxy*> varcoord; varcoord.push_back(&theXVar); varcoord.push_back(&theYVar); varcoord.push_back(&theZVar);
   for (Int_t idim=0; idim<ndims; idim++){
     Int_t binval=-1;
     Int_t binmin=-1;
     Int_t binmax=-1;
-    MELANCSplinePdfCore::T tval=0;
-    MELANCSplinePdfCore::T tmin=0;
-    MELANCSplinePdfCore::T tmax=0;
+    MELANCSplineCore::T tval=0;
+    MELANCSplineCore::T tmin=0;
+    MELANCSplineCore::T tmax=0;
     if (code==0 || code%varprime.at(idim)!=0){
       if (!testRangeValidity(*(varcoord.at(idim)), idim)) return 0;
       binval = getWhichBin(*(varcoord.at(idim)), idim);
       tval = getTVar(*(varkappa.at(idim)), *(varcoord.at(idim)), binval, idim);
     }
     else{
-      MELANCSplinePdfCore::T coordmin = varcoord.at(idim)->min(rangeName); cropValueForRange(coordmin, idim);
-      MELANCSplinePdfCore::T coordmax = varcoord.at(idim)->max(rangeName); cropValueForRange(coordmax, idim);
-      const std::vector<MELANCSplinePdfCore::T>& kappadim = *(varkappa.at(idim));
+      MELANCSplineCore::T coordmin = varcoord.at(idim)->min(rangeName); cropValueForRange(coordmin, idim);
+      MELANCSplineCore::T coordmax = varcoord.at(idim)->max(rangeName); cropValueForRange(coordmax, idim);
+      const std::vector<MELANCSplineCore::T>& kappadim = *(varkappa.at(idim));
       binmin = getWhichBin(coordmin, idim);
       tmin = getTVar(kappadim, coordmin, binmin, idim);
       binmax = getWhichBin(coordmax, idim);
@@ -267,32 +269,32 @@ MELANCSplinePdfCore::T MELANCSplinePdf_3D_fast::interpolateFcn(Int_t code, const
       ||
       (varbinmin[0]>=0 && varbinmax[0]>=varbinmin[0] && !(varbinmin[0]<=ix && ix<=varbinmax[0]))
       ) continue;
-    MELANCSplinePdfCore::T txlow=0, txhigh=1;
+    MELANCSplineCore::T txlow=0, txhigh=1;
     if (code>0 && code%varprime[0]==0){
       if (ix==varbinmin[0]) txlow=tvarmin[0];
       if (ix==varbinmax[0]) txhigh=tvarmax[0];
     }
     else txhigh=tvar[0];
     // Get the x coefficients interpolated across y
-    vector<MELANCSplinePdfCore::T> xCoefs;
+    vector<MELANCSplineCore::T> xCoefs;
     for (int icx=0; icx<(int)coefficients.at(ix).size(); icx++){
-      DefaultAccumulator<MELANCSplinePdfCore::T> theXCoef;
+      DefaultAccumulator<MELANCSplineCore::T> theXCoef;
       for (int iy=0; iy<(int)coefficients.at(ix).at(icx).size(); iy++){
         if (
           (varbin[1]>=0 && iy!=varbin[1])
           ||
           (varbinmin[1]>=0 && varbinmax[1]>=varbinmin[1] && !(varbinmin[1]<=iy && iy<=varbinmax[1]))
           ) continue;
-        MELANCSplinePdfCore::T tylow=0, tyhigh=1;
+        MELANCSplineCore::T tylow=0, tyhigh=1;
         if (code>0 && code%varprime[1]==0){
           if (iy==varbinmin[1]) tylow=tvarmin[1];
           if (iy==varbinmax[1]) tyhigh=tvarmax[1];
         }
         else tyhigh=tvar[1];
         // Get the y coefficients interpolated across z
-        vector<MELANCSplinePdfCore::T> yCoefs;
+        vector<MELANCSplineCore::T> yCoefs;
         for (int icy=0; icy<(int)coefficients.at(ix).at(icx).at(iy).size(); icy++){
-          DefaultAccumulator<MELANCSplinePdfCore::T> theYCoef;
+          DefaultAccumulator<MELANCSplineCore::T> theYCoef;
           for (int iz=0; iz<(int)coefficients.at(ix).at(icx).at(iy).at(icy).size(); iz++){
             if (
               (varbin[2]>=0 && iz!=varbin[2])
@@ -300,7 +302,7 @@ MELANCSplinePdfCore::T MELANCSplinePdf_3D_fast::interpolateFcn(Int_t code, const
               (varbinmin[2]>=0 && varbinmax[2]>=varbinmin[2] && !(varbinmin[2]<=iz && iz<=varbinmax[2]))
               ) continue;
 
-            MELANCSplinePdfCore::T tzlow=0, tzhigh=1;
+            MELANCSplineCore::T tzlow=0, tzhigh=1;
             if (code>0 && code%varprime[2]==0){
               if (iz==varbinmin[2]) tzlow=tvarmin[2];
               if (iz==varbinmax[2]) tzhigh=tvarmax[2];
@@ -322,12 +324,12 @@ MELANCSplinePdfCore::T MELANCSplinePdf_3D_fast::interpolateFcn(Int_t code, const
   return res;
 }
 
-void MELANCSplinePdf_3D_fast::getKappas(vector<MELANCSplinePdfCore::T>& kappas, const Int_t whichDirection){
+void MELANCSpline_3D_fast::getKappas(vector<MELANCSplineCore::T>& kappas, const Int_t whichDirection){
   kappas.clear();
-  MELANCSplinePdfCore::T kappa=1;
+  MELANCSplineCore::T kappa=1;
 
   Int_t npoints;
-  vector<MELANCSplinePdfCore::T> const* coord;
+  vector<MELANCSplineCore::T> const* coord;
   if (whichDirection==0){
     npoints=npointsX();
     coord=&XList;
@@ -342,20 +344,20 @@ void MELANCSplinePdf_3D_fast::getKappas(vector<MELANCSplinePdfCore::T>& kappas, 
   }
 
   for (Int_t j=0; j<npoints-1; j++){
-    MELANCSplinePdfCore::T val_j = coord->at(j);
-    MELANCSplinePdfCore::T val_jpo = coord->at(j+1);
-    MELANCSplinePdfCore::T val_diff = (val_jpo-val_j);
-    if (fabs(val_diff)>MELANCSplinePdfCore::T(0)) kappa = 1./val_diff;
+    MELANCSplineCore::T val_j = coord->at(j);
+    MELANCSplineCore::T val_jpo = coord->at(j+1);
+    MELANCSplineCore::T val_diff = (val_jpo-val_j);
+    if (fabs(val_diff)>MELANCSplineCore::T(0)) kappa = 1./val_diff;
     else kappa = 0;
     kappas.push_back(kappa);
   }
   kappas.push_back(kappa); // Push the same kappa_(N-1)=kappa_(N-2) at the end point
 }
-Int_t MELANCSplinePdf_3D_fast::getWhichBin(const MELANCSplinePdfCore::T& val, const Int_t whichDirection)const{
+Int_t MELANCSpline_3D_fast::getWhichBin(const MELANCSplineCore::T& val, const Int_t whichDirection)const{
   Int_t bin=-1;
-  MELANCSplinePdfCore::T valj, valjpo;
+  MELANCSplineCore::T valj, valjpo;
   Int_t npoints;
-  vector<MELANCSplinePdfCore::T> const* coord;
+  vector<MELANCSplineCore::T> const* coord;
   if (whichDirection==0){
     npoints=npointsX();
     coord=&XList;
@@ -383,36 +385,36 @@ Int_t MELANCSplinePdf_3D_fast::getWhichBin(const MELANCSplinePdfCore::T& val, co
 
   return bin;
 }
-MELANCSplinePdfCore::T MELANCSplinePdf_3D_fast::getTVar(const vector<MELANCSplinePdfCore::T>& kappas, const MELANCSplinePdfCore::T& val, const Int_t& bin, const Int_t whichDirection)const{
-  const MELANCSplinePdfCore::T& K=kappas.at(bin);
-  vector<MELANCSplinePdfCore::T> const* coord;
+MELANCSplineCore::T MELANCSpline_3D_fast::getTVar(const vector<MELANCSplineCore::T>& kappas, const MELANCSplineCore::T& val, const Int_t& bin, const Int_t whichDirection)const{
+  const MELANCSplineCore::T& K=kappas.at(bin);
+  vector<MELANCSplineCore::T> const* coord;
   if (whichDirection==0) coord=&XList;
   else if (whichDirection==1) coord=&YList;
   else coord=&ZList;
   return (val-coord->at(bin))*K;
 }
 
-vector<vector<MELANCSplinePdfCore::T>> MELANCSplinePdf_3D_fast::getCoefficientsPerYPerZ(
-  const std::vector<MELANCSplinePdfCore::T>& kappaX, const TMatrix_t& xAinv,
+vector<vector<MELANCSplineCore::T>> MELANCSpline_3D_fast::getCoefficientsPerYPerZ(
+  const std::vector<MELANCSplineCore::T>& kappaX, const TMatrix_t& xAinv,
   const Int_t& ybin, const Int_t& zbin,
   const Int_t xbin
   )const{
-  vector<MELANCSplinePdfCore::T> fcnList;
+  vector<MELANCSplineCore::T> fcnList;
   for (unsigned int bin=0; bin<npointsX(); bin++){ fcnList.push_back(FcnList.at(zbin).at(ybin).at(bin)); }
-  vector<vector<MELANCSplinePdfCore::T>> coefs = getCoefficientsAlongDirection(kappaX, xAinv, fcnList, xbin);
+  vector<vector<MELANCSplineCore::T>> coefs = getCoefficientsAlongDirection(kappaX, xAinv, fcnList, xbin);
   return coefs;
 }
 
-Double_t MELANCSplinePdf_3D_fast::evaluate() const{
+Double_t MELANCSpline_3D_fast::evaluate() const{
   Double_t value = interpolateFcn(0);
   if (useFloor && value<floorEval){
-    if (verbosity>=MELANCSplinePdfCore::kError) coutE(Eval) << "MELANCSplinePdf_3D_fast ERROR::MELANCSplinePdf_3D_fast(" << GetName() << ") evaluation returned " << value << " at (x, y, z) = (" << theXVar << ", " << theYVar << ", " << theZVar << ")" << endl;
+    if (verbosity>=MELANCSplineCore::kError) coutE(Eval) << "MELANCSpline_3D_fast ERROR::MELANCSpline_3D_fast(" << GetName() << ") evaluation returned " << value << " at (x, y, z) = (" << theXVar << ", " << theYVar << ", " << theZVar << ")" << endl;
     value = floorEval;
   }
-  if (verbosity==MELANCSplinePdfCore::kVerbose){ cout << "MELANCSplinePdf_3D_fast(" << GetName() << ")::evaluate = " << value << " at (x, y, z) = (" << theXVar << ", " << theYVar << ", " << theZVar << ")" << endl; }
+  if (verbosity==MELANCSplineCore::kVerbose){ cout << "MELANCSpline_3D_fast(" << GetName() << ")::evaluate = " << value << " at (x, y, z) = (" << theXVar << ", " << theYVar << ", " << theZVar << ")" << endl; }
   return value;
 }
-Int_t MELANCSplinePdf_3D_fast::getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* /*rangeName*/) const{
+Int_t MELANCSpline_3D_fast::getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* /*rangeName*/) const{
   if (_forceNumInt) return 0;
 
   Int_t code=1;
@@ -456,17 +458,17 @@ Int_t MELANCSplinePdf_3D_fast::getAnalyticalIntegral(RooArgSet& allVars, RooArgS
   if (code==1) code=0;
   return code;
 }
-Double_t MELANCSplinePdf_3D_fast::analyticalIntegral(Int_t code, const char* rangeName) const{
+Double_t MELANCSpline_3D_fast::analyticalIntegral(Int_t code, const char* rangeName) const{
   Double_t value = interpolateFcn(code, rangeName);
   if (useFloor && value<floorInt){
-    if (verbosity>=MELANCSplinePdfCore::kError) coutE(Integration) << "MELANCSplinePdf_3D_fast ERROR::MELANCSplinePdf_3D_fast(" << GetName() << ") integration returned " << value << " for code = " << code << endl;
+    if (verbosity>=MELANCSplineCore::kError) coutE(Integration) << "MELANCSpline_3D_fast ERROR::MELANCSpline_3D_fast(" << GetName() << ") integration returned " << value << " for code = " << code << endl;
     value = floorInt;
   }
-  if (verbosity==MELANCSplinePdfCore::kVerbose){ cout << "MELANCSplinePdf_3D_fast(" << GetName() << ")::analyticalIntegral = " << value << " for code = " << code << endl; }
+  if (verbosity==MELANCSplineCore::kVerbose){ cout << "MELANCSpline_3D_fast(" << GetName() << ")::analyticalIntegral = " << value << " for code = " << code << endl; }
   return value;
 }
 
-Bool_t MELANCSplinePdf_3D_fast::testRangeValidity(const T& val, const Int_t whichDirection) const{
+Bool_t MELANCSpline_3D_fast::testRangeValidity(const T& val, const Int_t whichDirection) const{
   const T* range[2];
   if (whichDirection==0){
     range[0] = &rangeXmin;
@@ -482,7 +484,7 @@ Bool_t MELANCSplinePdf_3D_fast::testRangeValidity(const T& val, const Int_t whic
   }
   return (*(range[0])>*(range[1]) || (val>=*(range[0]) && val<=*(range[1])));
 }
-void MELANCSplinePdf_3D_fast::setRangeValidity(const T valmin, const T valmax, const Int_t whichDirection){
+void MELANCSpline_3D_fast::setRangeValidity(const T valmin, const T valmax, const Int_t whichDirection){
   T* range[2];
   if (whichDirection==0){
     range[0] = &rangeXmin;
@@ -499,7 +501,7 @@ void MELANCSplinePdf_3D_fast::setRangeValidity(const T valmin, const T valmax, c
   *(range[0])=valmin;
   *(range[1])=valmax;
 }
-void MELANCSplinePdf_3D_fast::cropValueForRange(T& val, const Int_t whichDirection)const{
+void MELANCSpline_3D_fast::cropValueForRange(T& val, const Int_t whichDirection)const{
   if (testRangeValidity(val, whichDirection)) return;
   const T* range[2];
   if (whichDirection==0){

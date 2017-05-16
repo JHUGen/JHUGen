@@ -1,15 +1,15 @@
-#ifndef MELANCSPLINEPDF_FAST
-#define MELANCSPLINEPDF_FAST
+#ifndef MELANCSPLINE_1D_FAST
+#define MELANCSPLINE_1D_FAST
 
 #include <vector>
 #include "RooAbsPdf.h"
 #include "RooRealProxy.h"
 #include "RooRealVar.h"
 #include "RooAbsReal.h"
-#include "MELANCSplinePdfCore.h"
+#include "MELANCSplineCore.h"
 
 
-class MELANCSplinePdf_1D_fast : public MELANCSplinePdfCore{
+class MELANCSpline_1D_fast : public MELANCSplineCore{
 protected:
   std::vector<T> FcnList; // List of function values
 
@@ -17,8 +17,8 @@ protected:
   std::vector<std::vector<T>> coefficients;
 
 public:
-  MELANCSplinePdf_1D_fast();
-  MELANCSplinePdf_1D_fast(
+  MELANCSpline_1D_fast();
+  MELANCSpline_1D_fast(
     const char* name,
     const char* title,
     RooAbsReal& inXVar,
@@ -28,9 +28,9 @@ public:
     T inFloorEval=0,
     T inFloorInt=0
     );
-  MELANCSplinePdf_1D_fast(const MELANCSplinePdf_1D_fast& other, const char* name=0);
-	virtual TObject* clone(const char* newname)const { return new MELANCSplinePdf_1D_fast(*this, newname); }
-	inline virtual ~MELANCSplinePdf_1D_fast(){}
+  MELANCSpline_1D_fast(const MELANCSpline_1D_fast& other, const char* name=0);
+	virtual TObject* clone(const char* newname)const { return new MELANCSpline_1D_fast(*this, newname); }
+	inline virtual ~MELANCSpline_1D_fast(){}
 
   void setRangeValidity(const T valmin, const T valmax, const Int_t whichDirection=0);
 
@@ -50,6 +50,9 @@ protected:
   virtual T interpolateFcn(Int_t code, const char* rangeName=0)const;
 
   virtual Double_t evaluate()const;
+
+
+  ClassDef(MELANCSpline_1D_fast, 0)
 
 };
  

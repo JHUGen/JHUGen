@@ -1,18 +1,18 @@
-#ifndef MELANCSPLINEPDFCORE
-#define MELANCSPLINEPDFCORE  
+#ifndef MELANCSPLINECORE
+#define MELANCSPLINECORE  
 
 #include <vector>
 #include "MELAAccumulators.h"
 #include "TMatrixD.h"
 #include "TVectorD.h"
-#include "RooAbsPdf.h"
 #include "RooAbsReal.h"
 #include "RooRealVar.h"
 #include "RooRealProxy.h"
 #include "RooConstVar.h"
 #include "RooArgList.h"
+#include "RooMsgService.h"
 
-class MELANCSplinePdfCore : public RooAbsPdf{
+class MELANCSplineCore : public RooAbsReal{
 public:
   typedef Float_t T;
   typedef TMatrixT<T> TMatrix_t;
@@ -24,12 +24,12 @@ public:
     kVerbose
   };
 
-  MELANCSplinePdfCore();
-  MELANCSplinePdfCore(
+  MELANCSplineCore();
+  MELANCSplineCore(
     const char* name,
     const char* title
     );
-  MELANCSplinePdfCore(
+  MELANCSplineCore(
     const char* name,
     const char* title,
     RooAbsReal& inXVar,
@@ -38,9 +38,9 @@ public:
     T inFloorEval=1e-15,
     T inFloorInt=1e-10
     );
-  MELANCSplinePdfCore(const MELANCSplinePdfCore& other, const char* name=0);
+  MELANCSplineCore(const MELANCSplineCore& other, const char* name=0);
   virtual TObject* clone(const char* newname)const = 0;
-  inline virtual ~MELANCSplinePdfCore(){}
+  inline virtual ~MELANCSplineCore(){}
 
   virtual void setVerbosity(VerbosityLevel flag);
   void setEvalFloor(T val);
@@ -88,6 +88,9 @@ protected:
   virtual std::vector<T> getCoefficients(const TVector_t& S, const std::vector<T>& kappas, const std::vector<T>& fcnList, const Int_t& bin)const;
 
   virtual T evalSplineSegment(const std::vector<T>& coefs, const T& kappa, const T& tup, const T& tdn, Bool_t doIntegrate=false)const;
+
+
+  ClassDef(MELANCSplineCore, 0)
 
 };
  
