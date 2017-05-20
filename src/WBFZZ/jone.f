@@ -73,6 +73,11 @@ C---setting up couplings dependent on whether we are doing 34-line or 56-line
 
 
       do jdu=1,2
+
+      !write(6,*) "Using Q_jk(",n1,n2,jdu,")=",Q_jk(n1,n2,jdu)
+      !write(6,*) "Using L_jk(",n1,n2,jdu,")=",L_jk(n1,n2,jdu)
+      !write(6,*) "Using R_jk(",n1,n2,jdu,")=",R_jk(n1,n2,jdu)
+
       gmZ(jdu,1,1)=(dcmplx(Q_jk(n1,n2,jdu)*xq*bit/s34)
      & +dcmplx(L_jk(n1,n2,jdu)*xl)/propz34)
       gmZ(jdu,1,2)=(dcmplx(Q_jk(n1,n2,jdu)*xq*bit/s34)
@@ -184,6 +189,10 @@ c--- to get opposite helicity, 3<->4 swap needs additional minus sign
 
       enddo
       enddo
+
+      !write(6,*) "Final j1 = ",j1
+      !write(6,*) "Final jw = ",jw
+      !write(6,*) "Final jl1 = ",j1l
 
       return
       end

@@ -61,15 +61,9 @@
       function isAJet(idpart)
       implicit none
       logical isAJet
-      logical isUpTypeQuark,isDnTypeQuark,isAnUnknownJet,isAGluon
+      logical isAGluon
       integer idpart
-      isAJet =
-     & isAnUnknownJet(idpart) .or.
-     & isUpTypeQuark(idpart) .or.
-     & isDnTypeQuark(idpart) .or.
-     & isUpTypeQuark(-idpart) .or.
-     & isDnTypeQuark(-idpart) .or.
-     & isAGluon(idpart)
+      isAJet = abs(idpart).le.6 .or. isAGluon(idpart)
       return
       end
 
