@@ -198,8 +198,8 @@ c--- Plots of m(3456) in specific regions
      & m3456,wt,wt2,70d0,140d0,1d0,'log')
       n=n+1
 
-      call bookplot(n,tag,'140 < m(3456) < 3000',
-     & m3456,wt,wt2,140d0,3000d0,5d0,'log')
+      call bookplot(n,tag,'140 < m(3456) < 1140',
+     & m3456,wt,wt2,140d0,1140d0,10d0,'log')
       n=n+1
 
       call bookplot(n,tag,'300 < m(3456) < 2020',

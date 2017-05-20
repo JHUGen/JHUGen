@@ -1,13 +1,13 @@
 **********************************************************************
 C    SIMPLE HISTOGRAMMING PACKAGE --  SIMPLIFIED VERSION OF HBOOK
 C    BY Michelangelo Mangano    NOVEMBER 1988
-C    LAST REVISED NOVEMBER 9, 1988  
+C    LAST REVISED NOVEMBER 9, 1988
 c     (minor modifications by I Hinchliffe   1 May, 89)
 C**********************************************************************
 C
-C Fills up to 100 histograms with up to 100 bins. 
-C Gives a data file (to be specified in the calling program by assigning 
-C a file name to unit 98) and a topdrawer file (to be specified in the 
+C Fills up to 100 histograms with up to 100 bins.
+C Gives a data file (to be specified in the calling program by assigning
+C a file name to unit 98) and a topdrawer file (to be specified in the
 C calling program by assigning a file name to unit 99).
 C
 C INITIALIZATION:
@@ -25,12 +25,12 @@ C The bin size will be 1. (possibly GeV, if that's what you want), the
 C first bin being  10.<x<11. and the last one being 69.<x<70.
 C
 C FILLING:
-C When it's time, call MFILL(N,X,Y); this will add Y (real*8) to the bin 
-C in which X (real*8) happens to be, within histogram N. 
+C When it's time, call MFILL(N,X,Y); this will add Y (real*8) to the bin
+C in which X (real*8) happens to be, within histogram N.
 C
 C PLAYING AROUND:
 C At the end of the day you may want to sum, divide, cancel, etc.etc.
-C various histograms (bin by bin). Then you call MOPERA(I,'O',J,K,X,Y). 
+C various histograms (bin by bin). Then you call MOPERA(I,'O',J,K,X,Y).
 C The 1-character string O can take the following values:
 C +  : sums       X*(hist I) with Y*(hist J) and puts the result in hist K;
 C -  : subtracts  X*(hist I) with Y*(hist J) and puts the result in hist K;
@@ -45,7 +45,7 @@ C      value at a given bin is less than or equal to 0., puts 0. in K
 C M  : statistical analysis; if I contains the weights (let's say WGT),
 C      J contains variable times weight (F*WGT) and K contains the
 C      variable squared times the weight (F**2*WGT), then, after using 'M',
-C      J will contain the average value of the variable <F> and K will 
+C      J will contain the average value of the variable <F> and K will
 C      contain the sigma of the average: sigma=sqrt(<F**2>-<F>**2).
 C      If WGT=1. for all the entries, then it is enough to put I=J, and
 C      it is not necessary to book a hist with the weights.
@@ -53,8 +53,8 @@ C V  : estimates errors for vegas evaluation of differential distributions.
 C      Fill I with the values of
 C      the functions do integrate times the Vegas weight (fun*wgt); fill
 C      J with fun**2*wgt; then K will contain an estimate of the error
-C      of the integration. Putting X=1/(#of iterations) performs the 
-C      average over the iterations, and gives the right normalization to 
+C      of the integration. Putting X=1/(#of iterations) performs the
+C      average over the iterations, and gives the right normalization to
 C      the differential distribution, I, and to the errors, K. J stays the same.
 C U  : same as V, but I also remains the same (i.e. only K is filled)
 C
@@ -71,7 +71,7 @@ C some information (like integral, mean values, etc.etc.) call MPRINT(N),
 C for each hist N that you want in the .dat file. Before the call to MPRINT
 C you want to open unit 98 and give it a name:
 C     OPEN(UNIT=98,NAME='NAME.DAT',STATUS='NEW')
-C If you want a topdrawer file with a plot of the hist values, call 
+C If you want a topdrawer file with a plot of the hist values, call
 C MTOP(N,M,'X','Y','SCALE'). The points of the plot will be taken from histogram
 C N, the error bars from histogram M. 'SCALE', character*(*), determines
 C the scale for y, logarithmic or linear (SCALE=LOG,LIN).
@@ -80,7 +80,7 @@ C a histogram of zeros, or just call a hist that had not been booked.
 C X will appear as a 'bottom title', and Y will appear as a 'left title'.
 C The top title is by default the name of the histogram itself.
 C A little box below the plot will contain some information on the plot
-C itself. Before calling MTOP,                     
+C itself. Before calling MTOP,
 C     OPEN(UNIT=99,NAME='NAME.TOP',STATUS='NEW')
 c Empty histograms are not put out by MTOP.
 C--------------------------------------------------------------------------
@@ -91,16 +91,16 @@ C--------------------------------------------------------------------------
       CHARACTER*(*) TIT
       include 'histo.f'
       NHIST=MAX(N,NHIST)
-      TITLE(N)=TIT                     
+      TITLE(N)=TIT
       BOOK(N)='YES'
       HDEL(N)=DEL
       HMIN(N)=XMIN
       HMAX(N)=XMAX+1d-8
       NNBIN=INT((XMAX+1d-8-XMIN)/DEL)
-      IF (NNBIN .GT. 100) THEN
+      IF (NNBIN .GT. MAXNBIN) THEN
       WRITE(6,*) XMAX,XMIN,DEL,NNBIN,' BIN SIZE TOO LARGE'
-      DEL=(XMAX-XMIN)/99.d0
-      NNBIN=INT((XMAX-XMIN)/DEL)
+      NNBIN=MAXNBIN
+      DEL=(XMAX-XMIN)/NNBIN
       ENDIF
       NBIN(N)=NNBIN
       IENT(N)=0
@@ -179,12 +179,12 @@ c     we are renormalising the weights by the bin width
         IF(XNORM.NE.0.d0) THEN
         XAVG=HIST(J,L)/XNORM
         HIST(K,L)=DSQRT(ABS(-XAVG**2+HIST(K,L)/XNORM)/DFLOAT(IHIS(I,L)))
-        HIST(J,L)=XAVG 
+        HIST(J,L)=XAVG
         ELSE
         HIST(K,L)=0.d0
-        HIST(J,L)=0.d0                           
+        HIST(J,L)=0.d0
         ENDIF
-      ELSEIF(OPER.EQ.'V') THEN                 
+      ELSEIF(OPER.EQ.'V') THEN
         XAVG=HIST(I,L)*X
         XSQAVG=HIST(J,L)*X
 c--- need extra factor to account for renormalization by bin width
@@ -196,7 +196,7 @@ c--- need extra factor to account for renormalization by bin width
         ELSE
         HIST(K,L)=0.d0
         ENDIF
-      ELSEIF(OPER.EQ.'U') THEN ! same as 'V', but write errors only   
+      ELSEIF(OPER.EQ.'U') THEN ! same as 'V', but write errors only
         XAVG=HIST(I,L)*X
         XSQAVG=HIST(J,L)*X
 c--- need extra factor to account for renormalization by bin width
@@ -219,7 +219,7 @@ c        HIST(I,L)=XAVG ! removed from 'V'
   20  FORMAT(' ****** INCOMPATIBLE OPERATION HIST ',I3,' &',I3,
      &                                                   '*******'/)
       END
-     
+
       SUBROUTINE MZERO(N)
       IMPLICIT REAL*8 (A-H,O-Z)
       IMPLICIT INTEGER (I-N)
@@ -248,7 +248,7 @@ c        HIST(I,L)=XAVG ! removed from 'V'
       include 'histo.f'
       IF(BOOK(N).NE.'YES') RETURN
       AVG=0.d0
-      XIN=0.d0                                
+      XIN=0.d0
 c      SIG=0.d0
       DO 1, J=1,NBIN(N)
       AVG=AVG+HIST(N,J)*XHIS(N,J)
@@ -261,7 +261,7 @@ c      IF(SIG.GE.0.)HSIG(N)=SQRT(SIG/XIN)
       HINT(N)=XIN*hdel(n)
       RETURN
   10  BOOK(N)=' NO'
-      END               
+      END
 
       SUBROUTINE MNORM(N,X)
       IMPLICIT REAL*8 (A-H,O-Z)
@@ -277,7 +277,7 @@ c      IF(SIG.GE.0.)HSIG(N)=SQRT(SIG/XIN)
       IMPLICIT REAL*8 (A-H,O-Z)
       IMPLICIT INTEGER (I-N)
       include 'histo.f'
-      logical scaleplots                  
+      logical scaleplots
       double precision scalefac
       common/scaleplots/scalefac,scaleplots
 c      DATA INI/0/
@@ -316,7 +316,7 @@ c    7 FORMAT(4X,'HIST = ',I3,'   19',I2,'-',I2,'-',I2,1X,A5/)
       CHARACTER*(*) LTIT,BTIT,SCALE
       include 'histo.f'
 c--- added these variables to scale plots at intermediate steps
-      logical scaleplots                  
+      logical scaleplots
       double precision scalefac
       common/scaleplots/scalefac,scaleplots
 c      DATA INI/0/
@@ -325,11 +325,11 @@ c      CALL IDATE(IMON,IDAY,IYEAR)
 c      CALL TIME(CTIME)
 c      INI=1
 c      ENDIF
-      
+
       IF(BOOK(N).NE.'YES') RETURN
 c      WRITE(99,100) TITLE(N),BTIT,LTIT,SCALE,HMIN(N),HMAX(N)
       WRITE(99,101) TITLE(N),TITLE(N),TITLE(N),SCALE,HMIN(N),HMAX(N)
-c  100 FORMAT( /1x,                               
+c  100 FORMAT( /1x,
 c     &' SET WINDOW Y 2.5 TO 7.'/,1X,
 c     &' SET WINDOW X 2.5 TO 10.'/,1X,
 c     &' SET FONT DUPLEX '/1X,
@@ -338,10 +338,10 @@ c     &' TITLE TOP ','"',A50,'"',/1X,
 c     &' TITLE BOTTOM ','"',A50,'"',/1X,
 c     &' TITLE LEFT ','"',A50,'"',/1X,
 c     &' SET SCALE Y ',A5,/1X,
-c     &' (SET TICKS TOP OFF)   '/1x,     
+c     &' (SET TICKS TOP OFF)   '/1x,
 c     &' SET LIMITS X ',F10.5,' ',F10.5,/1X,
 c     &' SET ORDER X Y DY ')
-  100 FORMAT( /1x,                               
+  100 FORMAT( /1x,
      &' SET WINDOW Y 2.5 TO 7.'/,1X,
      &' SET WINDOW X 2.5 TO 10.'/,1X,
      &' SET SYMBOL 5O SIZE 1.8'/,1X,
@@ -349,10 +349,10 @@ c     &' SET ORDER X Y DY ')
      &' TITLE BOTTOM ','"',A50,'"',/1X,
      &' TITLE LEFT ','"',A50,'"',/1X,
      &' SET SCALE Y ',A5,/1X,
-     &' (SET TICKS TOP OFF)   '/1x,     
+     &' (SET TICKS TOP OFF)   '/1x,
      &' SET LIMITS X ',F10.5,' ',F10.5,/1X,
      &' SET ORDER X Y DY')
-  101 FORMAT( /1x,                               
+  101 FORMAT( /1x,
      &' SET WINDOW Y 2.5 TO 7.'/,1X,
      &' SET WINDOW X 2.5 TO 10.'/,1X,
      &' SET SYMBOL 5O SIZE 1.8'/,1X,
@@ -361,16 +361,16 @@ c     &' SET ORDER X Y DY ')
      &' TITLE LEFT ','"dS/d',A,' [fb]"',/1X,
      &' CASE       ','" G"',/1X,
      &' SET SCALE Y ',A5,/1X,
-     &' (SET TICKS TOP OFF)   '/1x,     
+     &' (SET TICKS TOP OFF)   '/1x,
      &' SET LIMITS X ',F10.5,' ',F10.5,/1X,
      &' SET ORDER X Y DY')
       DO 1 J=1,NBIN(N)
 c      IF(HIST(N,J).EQ.0.) GO TO 1
       if (scaleplots) then
-      WRITE(99,'(3X,G13.6,2(2X,G13.4))')  
+      WRITE(99,'(3X,G13.6,2(2X,G13.4))')
      & XHIS(N,J),scalefac*HIST(N,J),HIST(M,J)
       else
-      WRITE(99,'(3X,G13.6,2(2X,G13.4))')  
+      WRITE(99,'(3X,G13.6,2(2X,G13.4))')
      &                            XHIS(N,J),HIST(N,J),HIST(M,J)
       endif
     1 CONTINUE
@@ -383,7 +383,7 @@ c      IF(HIST(N,J).EQ.0.) GO TO 1
       WRITE(99,300) HINT(N),HAVG(N),HSIG(N),IENT(N),IUSCORE(N)
      &   ,IOSCORE(N)
       endif
-c  300 FORMAT( /1x,                               
+c  300 FORMAT( /1x,
 c     &' BOX 7. 0.75 SIZE 9. 1.5'/,1X,
 c     &' SET WINDOW Y 0. TO 2.'/,1X,
 c     &' SET TITLE SIZE -1.5'/1X,
@@ -393,7 +393,7 @@ c     &             '   RMS =',E10.3,'"',/1X,
 c     &' TITLE 2.8 0.8 "Entries =',I10,4x,'Underflow =',I10,4X
 c     &                                 ,'Overflow =',I10,'"',/1X,
 c     &' SET TITLE SIZE -2')
-  300 FORMAT( /1x,                               
+  300 FORMAT( /1x,
      &' BOX 7. 0.75 SIZE 9. 1.5'/,1X,
      &' SET WINDOW Y 0. TO 2.'/,1X,
      &' SET TITLE SIZE -1.5'/1X,
@@ -413,14 +413,14 @@ C*******************************************************************
 
 
 c--F  Add gnuplot output
-      
+
       SUBROUTINE MGNUPLOT(N,M,BTIT,LTIT,SCALE)
       IMPLICIT REAL*8 (A-H,O-Z)
       IMPLICIT INTEGER (I-N)
       CHARACTER*(*) LTIT,BTIT,SCALE
       include 'histo.f'
 c--- added these variables to scale plots at intermediate steps
-      logical scaleplots                  
+      logical scaleplots
       double precision scalefac
       common/scaleplots/scalefac,scaleplots
 
@@ -429,7 +429,7 @@ c--- added these variables to scale plots at intermediate steps
       IF(BOOK(N).NE.'YES') RETURN
       WRITE(97,101) TITLE(N)(1:istring), TITLE(N)(1:istring),
      & TITLE(N)(1:istring), HMIN(N),HMAX(N)
-  101 FORMAT( /1x,                               
+  101 FORMAT( /1x,
      &' set title ','"',A,' distribution" font "Helvetica, 20"',/1X,
      &' set xlabel ','"',A,'" font "Helvetica, 20"',/1X,
      &' set ylabel ','"d{/Symbol s}/d',A,
@@ -443,10 +443,10 @@ c--- added these variables to scale plots at intermediate steps
       DO 1 J=1,NBIN(N)
       IF(HIST(N,J).EQ.0.) GO TO 1
       if (scaleplots) then
-      WRITE(97,'(3(2X,G13.6))')  
+      WRITE(97,'(3(2X,G13.6))')
      & XHIS(N,J),scalefac*HIST(N,J),HIST(M,J)
       else
-      WRITE(97,'(3X,G13.6,2(2X,G13.6))')  
+      WRITE(97,'(3X,G13.6,2(2X,G13.6))')
      &                            XHIS(N,J),HIST(N,J),HIST(M,J)
       endif
     1 CONTINUE
@@ -457,7 +457,6 @@ c--- added these variables to scale plots at intermediate steps
 
 
 c--F  Add root output
-      
       SUBROUTINE MROOTPLOT5(N,M,BTIT,LTIT)
       IMPLICIT REAL*8 (A-H,O-Z)
       IMPLICIT INTEGER (I-N)
@@ -465,7 +464,7 @@ c--F  Add root output
       CHARACTER*5 histoid
       include 'histo.f'
 c--- added these variables to scale plots at intermediate steps
-      logical scaleplots                  
+      logical scaleplots
       double precision scalefac
       common/scaleplots/scalefac,scaleplots
 
@@ -483,7 +482,7 @@ c--- added these variables to scale plots at intermediate steps
 
       IF(BOOK(N).NE.'YES') RETURN
 
-      WRITE(96,131) histoid(1:idlength), TITLE(N)(1:istring), NBIN(N), 
+      WRITE(96,131) histoid(1:idlength), TITLE(N)(1:istring), NBIN(N),
      & HMIN(N), HMAX(N)
  131  FORMAT ( /1X,
      & ' mcfmhisto -> cd();', /1X,
@@ -492,9 +491,9 @@ c--- added these variables to scale plots at intermediate steps
 
       WRITE(96, 132) histoid(1:idlength), TITLE(N)(1:istring),
      & histoid(1:idlength), TITLE(N)(1:istring)
- 132  FORMAT ( /1X, 
+ 132  FORMAT ( /1X,
      & ' ', A, ' -> GetXaxis() -> SetTitle("', A, '");', /1X,
-     & ' ', A, ' -> GetYaxis() -> SetTitle(" d#sigma/d', A, 
+     & ' ', A, ' -> GetYaxis() -> SetTitle(" d#sigma/d', A,
      & ' [fb]");', /1X)
 
       WRITE (96,*) ' ', histoid(1:idlength), ' -> GetYaxis() -> ',
@@ -505,16 +504,16 @@ c--- added these variables to scale plots at intermediate steps
       DO 1 J=1,NBIN(N)
       IF(HIST(N,J).EQ.0.) GO TO 1
       if (scaleplots) then
-      WRITE(96,'(3(2X,G13.6))')  
+      WRITE(96,'(3(2X,G13.6))')
      & XHIS(N,J),scalefac*HIST(N,J),HIST(M,J)
       else
-C         write(96,*) ' ', histoid(1:idlength), ' -> Fill(', 
+C         write(96,*) ' ', histoid(1:idlength), ' -> Fill(',
 C     &        XHIS(N,J), ', ', HIST(N,J), ');'
          write(96,*) '  int xbin = ', histoid(1:idlength),'->FindBin(',
-     & XHIS(n,j),');' 
-         write(96,*) ' ', histoid(1:idlength), ' -> SetBinContent(', 
+     & XHIS(n,j),');'
+         write(96,*) ' ', histoid(1:idlength), ' -> SetBinContent(',
      &       ' xbin', ', ', HIST(N,J), ');'
-         write(96,*) ' ', histoid(1:idlength), ' -> SetBinError(', 
+         write(96,*) ' ', histoid(1:idlength), ' -> SetBinError(',
      &       ' xbin', ', ', HIST(M,J), ');'
       endif
     1 CONTINUE
@@ -534,7 +533,7 @@ c-- Root output (works in versions >=5)
       CHARACTER*5 histoid
       include 'histo.f'
 c--- added these variables to scale plots at intermediate steps
-      logical scaleplots                  
+      logical scaleplots
       double precision scalefac
       common/scaleplots/scalefac,scaleplots
 
@@ -561,9 +560,9 @@ c--- added these variables to scale plots at intermediate steps
 
       WRITE(96, 142) histoid(1:idlength), TITLE(N)(1:istring),
      & histoid(1:idlength), TITLE(N)(1:istring)
- 142  FORMAT ( /1X, 
+ 142  FORMAT ( /1X,
      & ' ', A, ' -> GetXaxis() -> SetTitle("', A, '");', /1X,
-     & ' ', A, ' -> GetYaxis() -> SetTitle(" d#sigma/d', A, 
+     & ' ', A, ' -> GetYaxis() -> SetTitle(" d#sigma/d', A,
      & ' [fb]");', /1X)
 
       WRITE (96,*) ' ', histoid(1:idlength), ' -> GetYaxis() -> ',
@@ -574,16 +573,16 @@ c--- added these variables to scale plots at intermediate steps
       DO 1 J=1,NBIN(N)
       IF(HIST(N,J).EQ.0.) GO TO 1
       if (scaleplots) then
-      WRITE(96,'(3(2X,G13.6))')  
+      WRITE(96,'(3(2X,G13.6))')
      & XHIS(N,J),scalefac*HIST(N,J),HIST(M,J)
       else
-C         write(96,*) ' ', histoid(1:idlength), ' -> Fill(', 
+C         write(96,*) ' ', histoid(1:idlength), ' -> Fill(',
 C     &        XHIS(N,J), ', ', HIST(N,J), ');'
          write(96,*) '  xbin = ', histoid(1:idlength),'->FindBin(',
-     & XHIS(n,j),');' 
-         write(96,*) ' ', histoid(1:idlength), ' -> SetBinContent(', 
+     & XHIS(n,j),');'
+         write(96,*) ' ', histoid(1:idlength), ' -> SetBinContent(',
      &       ' xbin', ', ', HIST(N,J), ');'
-         write(96,*) ' ', histoid(1:idlength), ' -> SetBinError(', 
+         write(96,*) ' ', histoid(1:idlength), ' -> SetBinError(',
      &       ' xbin', ', ', HIST(M,J), ');'
       endif
     1 CONTINUE
