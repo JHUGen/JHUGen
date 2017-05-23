@@ -293,7 +293,7 @@ real(8), public, parameter :: Lambda  = 1000d0    *GeV      ! Lambda coupling en
    complex(8), public :: ghgsgs4 = (0.00d0,0d0)
 
 !-- HVV contact terms
-   logical, public :: ContactInteraction=.true.  ! true: contact interaction,  false: heavy Zprime propagator
+   logical, public :: UseVprime=.false.  ! false: contact interaction,  true: heavy Zprime propagator
    complex(8), public :: ehz_L_E  = (0.00d0,0d0)
    complex(8), public :: ehz_R_E  = (0.00d0,0d0)
    complex(8), public :: ehz_L_M  = (0.00d0,0d0)

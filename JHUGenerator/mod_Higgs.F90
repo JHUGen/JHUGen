@@ -767,9 +767,9 @@ real(dp) :: pProp(:)
     
     
     
-    if( ContactInteraction .and.  abs(Intera).eq.abs(Z0_) ) then
+    if( .not.UseVprime .and.  abs(Intera).eq.abs(Z0_) ) then
        get_ContactTerms = get_ContactTerms/M_Z**2
-    elseif( ContactInteraction .and.  abs(Intera).eq.abs(Wp_) ) then
+    elseif( .not.UseVprime .and.  abs(Intera).eq.abs(Wp_) ) then
        get_ContactTerms = get_ContactTerms/M_W**2
     else
        get_ContactTerms = get_ContactTerms/(scr(pProp,pProp) - M_Vprime**2 + (0d0,1d0)*M_Vprime*Ga_Vprime)
