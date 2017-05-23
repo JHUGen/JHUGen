@@ -1648,6 +1648,7 @@ integer :: i,j
 
    doCompute = Setup_MCFM_qqVVqq(idin,pin_MCFMconv,id_MCFM,p_MCFM)
    if (doCompute) then
+      call SetupParticleLabels(id_MCFM) ! Assign plabels
 
       if(ZWcode.eq.doZZ) then
          if (Process.ge.66 .and. Process.le.68) then
