@@ -292,6 +292,39 @@ real(8), public, parameter :: Lambda  = 1000d0    *GeV      ! Lambda coupling en
    complex(8), public :: ghgsgs3 = (0.00d0,0d0)
    complex(8), public :: ghgsgs4 = (0.00d0,0d0)
 
+!-- HVV contact terms
+   logical, public :: ContactInteraction=.true.  ! true: contact interaction,  false: heavy Zprime propagator
+   complex(8), public :: ehz_L_E  = (0.00d0,0d0)
+   complex(8), public :: ehz_R_E  = (0.00d0,0d0)
+   complex(8), public :: ehz_L_M  = (0.00d0,0d0)
+   complex(8), public :: ehz_R_M  = (0.00d0,0d0)
+   complex(8), public :: ehz_L_T  = (0.00d0,0d0)
+   complex(8), public :: ehz_R_T  = (0.00d0,0d0)
+   complex(8), public :: ehz_L_U  = (0.00d0,0d0)
+   complex(8), public :: ehz_R_U  = (0.00d0,0d0)
+   complex(8), public :: ehz_L_D  = (0.00d0,0d0)
+   complex(8), public :: ehz_R_D  = (0.00d0,0d0)
+   complex(8), public :: ehz_L_N  = (0.00d0,0d0)
+   complex(8), public :: ehz_R_N  = (0.00d0,0d0)
+!--
+!-- HWW couplings are only used if distinguish_HWWcouplings=.true.
+   complex(8), public :: ehw_L_E  = (0.00d0,0d0)
+   complex(8), public :: ehw_R_E  = (0.00d0,0d0)
+   complex(8), public :: ehw_L_M  = (0.00d0,0d0)
+   complex(8), public :: ehw_R_M  = (0.00d0,0d0)
+   complex(8), public :: ehw_L_T  = (0.00d0,0d0)
+   complex(8), public :: ehw_R_T  = (0.00d0,0d0)
+   complex(8), public :: ehw_L_U  = (0.00d0,0d0)
+   complex(8), public :: ehw_R_U  = (0.00d0,0d0)
+   complex(8), public :: ehw_L_D  = (0.00d0,0d0)
+   complex(8), public :: ehw_R_D  = (0.00d0,0d0)
+   complex(8), public :: ehw_L_N  = (0.00d0,0d0)
+   complex(8), public :: ehw_R_N  = (0.00d0,0d0)   
+!--   
+   real(8), public :: M_Vprime  = 10000d0*GeV
+   real(8), public :: Ga_Vprime = 100d0*GeV
+
+
 !-- parameters that define q^2 dependent form factors
    complex(8), public :: ghz1_prime = (0.0d0,0d0)
    complex(8), public :: ghz1_prime2= (0.0d0,0d0)
