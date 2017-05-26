@@ -294,6 +294,7 @@ real(8), public, parameter :: Lambda  = 1000d0    *GeV      ! Lambda coupling en
 
 !-- HVV contact terms
    logical, public :: UseVprime=.false.  ! false: contact interaction,  true: heavy Zprime propagator
+   integer, public :: OnlyVVpr = 0       ! +1=only contact term for decay1, -1=only contact term for decay2, 0=all terms
    complex(8), public :: ehz_L_E  = (0.00d0,0d0)
    complex(8), public :: ehz_R_E  = (0.00d0,0d0)
    complex(8), public :: ehz_L_M  = (0.00d0,0d0)
@@ -302,8 +303,14 @@ real(8), public, parameter :: Lambda  = 1000d0    *GeV      ! Lambda coupling en
    complex(8), public :: ehz_R_T  = (0.00d0,0d0)
    complex(8), public :: ehz_L_U  = (0.00d0,0d0)
    complex(8), public :: ehz_R_U  = (0.00d0,0d0)
+   complex(8), public :: ehz_L_C  = (0.00d0,0d0)
+   complex(8), public :: ehz_R_C  = (0.00d0,0d0)
    complex(8), public :: ehz_L_D  = (0.00d0,0d0)
    complex(8), public :: ehz_R_D  = (0.00d0,0d0)
+   complex(8), public :: ehz_L_S  = (0.00d0,0d0)
+   complex(8), public :: ehz_R_S  = (0.00d0,0d0)
+   complex(8), public :: ehz_L_B  = (0.00d0,0d0)
+   complex(8), public :: ehz_R_B  = (0.00d0,0d0)
    complex(8), public :: ehz_L_N  = (0.00d0,0d0)
    complex(8), public :: ehz_R_N  = (0.00d0,0d0)
 !--
@@ -316,10 +323,8 @@ real(8), public, parameter :: Lambda  = 1000d0    *GeV      ! Lambda coupling en
    complex(8), public :: ehw_R_T  = (0.00d0,0d0)
    complex(8), public :: ehw_L_U  = (0.00d0,0d0)
    complex(8), public :: ehw_R_U  = (0.00d0,0d0)
-   complex(8), public :: ehw_L_D  = (0.00d0,0d0)
-   complex(8), public :: ehw_R_D  = (0.00d0,0d0)
-   complex(8), public :: ehw_L_N  = (0.00d0,0d0)
-   complex(8), public :: ehw_R_N  = (0.00d0,0d0)   
+   complex(8), public :: ehw_L_C  = (0.00d0,0d0)
+   complex(8), public :: ehw_R_C  = (0.00d0,0d0)
 !--   
    real(8), public :: M_Vprime  = 10000d0*GeV
    real(8), public :: Ga_Vprime = 100d0*GeV

@@ -668,8 +668,14 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "ehz_R_T", success, ehz_R_T, success2=SetAnomalousSpin0ZZ)
     call ReadCommandLineArgument(arg, "ehz_L_U", success, ehz_L_U, success2=SetAnomalousSpin0ZZ)
     call ReadCommandLineArgument(arg, "ehz_R_U", success, ehz_R_U, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ehz_L_C", success, ehz_L_U, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ehz_R_C", success, ehz_R_U, success2=SetAnomalousSpin0ZZ)
     call ReadCommandLineArgument(arg, "ehz_L_D", success, ehz_L_D, success2=SetAnomalousSpin0ZZ)
     call ReadCommandLineArgument(arg, "ehz_R_D", success, ehz_R_D, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ehz_L_S", success, ehz_L_S, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ehz_R_S", success, ehz_R_S, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ehz_L_B", success, ehz_L_B, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ehz_R_B", success, ehz_R_B, success2=SetAnomalousSpin0ZZ)
     call ReadCommandLineArgument(arg, "ehz_L_N", success, ehz_L_N, success2=SetAnomalousSpin0ZZ)
     call ReadCommandLineArgument(arg, "ehz_R_N", success, ehz_R_N, success2=SetAnomalousSpin0ZZ)
 
@@ -681,15 +687,15 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "ehw_R_T", success, ehw_R_T, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
     call ReadCommandLineArgument(arg, "ehw_L_U", success, ehw_L_U, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
     call ReadCommandLineArgument(arg, "ehw_R_U", success, ehw_R_U, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ehw_L_D", success, ehw_L_D, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ehw_R_D", success, ehw_R_D, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ehw_L_N", success, ehw_L_N, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ehw_R_N", success, ehw_R_N, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ehw_L_C", success, ehw_L_C, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ehw_R_C", success, ehw_R_C, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
 
     call ReadCommandLineArgument(arg, "M_Vprime", success, M_Vprime, SetLastArgument, success2=UseVprime, success3=SetMVprime)
     if (SetLastArgument)  M_Vprime = M_Vprime*GeV
     call ReadCommandLineArgument(arg, "Ga_Vprime", success, Ga_Vprime, SetLastArgument, success2=UseVprime, success3=SetGaVprime)
     if (SetLastArgument)  Ga_Vprime = Ga_Vprime*GeV
+    call ReadCommandLineArgument(arg, "OnlyVVpr", success, OnlyVVpr)
+
 
     ! CKM elements
     call ReadCommandLineArgument(arg, "Vud", success, VCKM_ud, success2=SetCKM)

@@ -1561,19 +1561,60 @@ module modHiggsJJ
     amp_z = A0_VV_4f(4,1,3,2,za,zb,sprod,m_z,ga_z)
     amp_z_b = -A0_VV_4f(3,1,4,2,za,zb,sprod,m_z,ga_z)
 
+! !     adding contract terms
+!     iprop12 = sprod(4,1) - mv**2 + ci * mv * ga_v
+!     iprop34 = sprod(3,2) - mv**2 + ci * mv * ga_v
+! 
+!     amp_z(-1,-1) = amp_z(-1,-1) + amp_z(-1,-1)*iprop12/(aL_QUp*couplz)*ehz_L_U  &
+!                                 + amp_z(-1,-1)*iprop34/(aL_QUp*couplz)*ehz_L_U  &
+!                                 + amp_z(-1,-1)*iprop12/(aL_QUp*couplz)*ehz_L_U  &
+!                                               *iprop34/(aL_QUp*couplz)*ehz_L_U 
+!                                                                
+!     amp_z(+1,-1) = amp_z(+1,-1) + amp_z(+1,-1)*iprop12/(aR_QUp*couplz)*ehz_R_U  &
+!                                 + amp_z(+1,-1)*iprop34/(aL_QUp*couplz)*ehz_L_U  &
+!                                 + amp_z(+1,-1)*iprop12/(aR_QUp*couplz)*ehz_R_U  &
+!                                               *iprop34/(aL_QUp*couplz)*ehz_L_U   
+!     
+!     amp_z(-1,+1) = amp_z(-1,+1) + amp_z(-1,+1)*iprop12/(aL_QUp*couplz)*ehz_L_U  &
+!                                 + amp_z(-1,+1)*iprop34/(aR_QUp*couplz)*ehz_R_U  &
+!                                 + amp_z(-1,+1)*iprop12/(aL_QUp*couplz)*ehz_L_U  &
+!                                               *iprop34/(aR_QUp*couplz)*ehz_R_U  
+!                                               
+!     amp_z(+1,+1) = amp_z(+1,+1) + amp_z(+1,+1)*iprop12/(aR_QUp*couplz)*ehz_R_U  &
+!                                 + amp_z(+1,+1)*iprop34/(aR_QUp*couplz)*ehz_R_U  &
+!                                 + amp_z(+1,+1)*iprop12/(aR_QUp*couplz)*ehz_R_U  &
+!                                               *iprop34/(aR_QUp*couplz)*ehz_R_U 
+    
+    
+!     Lu = aL_QUp + iprop12/couplz*ehz_L_U
+!     Ru = aR_QUp + iprop12/couplz*ehz_R_U
+!     amp_z(-1,-1) = amp_z(-1,-1)*Lu*Lu
+!     amp_z(-1,+1) = amp_z(-1,+1)*Lu*Ru
+!     amp_z(+1,-1) = amp_z(+1,-1)*Ru*Lu
+!     amp_z(+1,+1) = amp_z(+1,+1)*Ru*Ru
+!     
+!     amp_z_b(-1,-1) = amp_z_b(-1,-1)*Lu*Lu
+!     amp_z_b(-1,+1) = amp_z_b(-1,+1)*Lu*Ru
+!     amp_z_b(+1,-1) = amp_z_b(+1,-1)*Ru*Lu
+!     amp_z_b(+1,+1) = amp_z_b(+1,+1)*Ru*Ru
+    
     restmp = ((abs(amp_z(-1,-1))**2+abs(amp_z_b(-1,-1))**2) * Lu**2 + &
          (abs(amp_z(-1,+1))**2+abs(amp_z_b(-1,+1))**2) * Lu * Ru + &
          (abs(amp_z(+1,-1))**2+abs(amp_z_b(+1,-1))**2) * Lu * Ru + &
          (abs(amp_z(+1,+1))**2+abs(amp_z_b(+1,+1))**2) * Ru**2) * xn**2
 
     restmp = restmp + (two * real(amp_z(-1,-1)*conjg(amp_z_b(-1,-1)),kind=dp) * Lu**2 + &
-            two * real(amp_z(+1,+1)*conjg(amp_z_b(+1,+1)),kind=dp) * Ru**2) * xn
+                       two * real(amp_z(+1,+1)*conjg(amp_z_b(+1,+1)),kind=dp) * Ru**2) * xn
 
     restmp = restmp * SymmFac * aveqq * couplz**2
 
     res(pdfUp_,pdfUp_) = restmp
     res(pdfChm_,pdfChm_) = restmp
 
+    
+    
+    
+    
     !-- qq->qq, down
     restmp = ((abs(amp_z(-1,-1))**2+abs(amp_z_b(-1,-1))**2) * Ld**2 + &
          (abs(amp_z(-1,+1))**2+abs(amp_z_b(-1,+1))**2) * Ld * Rd + &
@@ -1626,13 +1667,13 @@ module modHiggsJJ
     j2 = 2
     do iflip = 1, 2
        !-- ud -> ud
-       amp_z = A0_VV_4f(4,j2,3,j1,za,zb,sprod,m_z,ga_z)
+       amp_z =  A0_VV_4f(4,j2,3,j1,za,zb,sprod,m_z,ga_z)
        amp_w = -A0_VV_4f(4,j1,3,j2,za,zb,sprod,m_w,ga_w,useWWcoupl=.true.)
 
        restmp = ((abs(amp_z(-1,-1))**2) * Ld * Lu + &
-            (abs(amp_z(-1,+1))**2) * Ld * Ru + &
-            (abs(amp_z(+1,-1))**2) * Rd * Lu + &
-            (abs(amp_z(+1,+1))**2) * Rd * Ru) * couplz**2 * xn**2
+                 (abs(amp_z(-1,+1))**2) * Ld * Ru + &
+                 (abs(amp_z(+1,-1))**2) * Rd * Lu + &
+                 (abs(amp_z(+1,+1))**2) * Rd * Ru) * couplz**2 * xn**2
 
        restmp = restmp + abs(amp_w(-1,-1))**2 * couplw**2 * xn**2
 
@@ -3246,7 +3287,7 @@ module modHiggsJJ
     real(dp), dimension(2) :: Rz
     real(dp), parameter, dimension(2) :: La = (/QuL,QdL/)
     real(dp), parameter, dimension(2) :: Ra = (/QuR,QdR/)
-    complex(dp) :: A0_ZZ_4f(-1:1,-1:1)
+    complex(dp) :: A0_ZZ_4f(-1:1,-1:1),LCT(1:2),RCT(1:2)
     integer :: j1,j2,j3,j4,line1,line2
     complex(dp) :: za(4,4),zb(4,4)
     real(dp) :: sprod(4,4)
@@ -3266,6 +3307,9 @@ module modHiggsJJ
 
     Lz = (/aL_Qup,aL_Qdn/)
     Rz = (/aR_Qup,aR_Qdn/)
+    
+    LCT = (/ehz_L_U,ehz_L_D/)
+    RCT = (/ehz_R_U,ehz_R_D/)
 
 
     A0_ZZ_4f = czero
@@ -3355,14 +3399,56 @@ module modHiggsJJ
                             struc_az(1:3) * Ra(line1) * Rz(line2)/q12sq  /iprop34 + &
                             struc_za(1:3) * Rz(line1) * Ra(line2)/iprop12/q34sq
 
+
+!      adding contact terms
+!        helcoup(1:3,-1,-1) = helcoup(1:3,-1,-1) + struc_zz(1:3) * LCT(line1) * Lz(line2)/iprop34 + &
+!                                                  struc_za(1:3) * LCT(line1) * La(line2)/q34sq   + &       
+!                                                  struc_zz(1:3) *  Lz(line1) *LCT(line2)/iprop12 + &  
+!                                                  struc_az(1:3) *  Lz(line1) *LCT(line2)/q12sq   + &
+!                                                  struc_zz(1:3) * LCT(line1) *LCT(line2)
+!                                                  
+!        helcoup(1:3,-1,+1) = helcoup(1:3,-1,+1) + struc_zz(1:3) * LCT(line1) * Rz(line2)/iprop34 + &
+!                                                  struc_za(1:3) * LCT(line1) * Ra(line2)/q34sq   + &       
+!                                                  struc_zz(1:3) *  Lz(line1) *RCT(line2)/iprop12 + &
+!                                                  struc_az(1:3) *  Lz(line1) *RCT(line2)/q12sq   + &
+!                                                  struc_zz(1:3) * LCT(line1) *RCT(line2)
+!                                                  
+!        helcoup(1:3,+1,-1) = helcoup(1:3,+1,-1) + struc_zz(1:3) * RCT(line1) * Lz(line2)/iprop34 + &
+!                                                  struc_za(1:3) * RCT(line1) * La(line2)/q34sq   + &   
+!                                                  struc_zz(1:3) *  Rz(line1) *LCT(line2)/iprop12 + &
+!                                                  struc_az(1:3) *  Rz(line1) *LCT(line2)/q12sq   + &
+!                                                  struc_zz(1:3) * RCT(line1) *LCT(line2)
+!                                                  
+!        helcoup(1:3,+1,+1) = helcoup(1:3,+1,+1) + struc_zz(1:3) * RCT(line1) * Rz(line2)/iprop34 + &
+!                                                  struc_za(1:3) * RCT(line1) * Ra(line2)/q34sq   + &     
+!                                                  struc_zz(1:3) *  Rz(line1) *RCT(line2)/iprop12 + &
+!                                                  struc_az(1:3) *  Rz(line1) *RCT(line2)/q12sq   + &
+!                                                  struc_zz(1:3) * RCT(line1) *RCT(line2)
+                                   
     else
 
-       helcoup(1:3,-1,-1) = struc_zz(1:3) * Lz(line1) * Lz(line2)/iprop12/iprop34
+       helcoup(1:3,-1,-1) = struc_zz(1:3) * Lz(line1) * Lz(line2)/iprop12/iprop34 
        helcoup(1:3,-1,+1) = struc_zz(1:3) * Lz(line1) * Rz(line2)/iprop12/iprop34
        helcoup(1:3,+1,-1) = struc_zz(1:3) * Rz(line1) * Lz(line2)/iprop12/iprop34
        helcoup(1:3,+1,+1) = struc_zz(1:3) * Rz(line1) * Rz(line2)/iprop12/iprop34
 
+! !      adding contact terms
+!        helcoup(1:3,-1,-1) = helcoup(1:3,-1,-1) + struc_zz(1:3) * LCT(line1) * Lz(line2)/iprop34 + &
+!                                                  struc_zz(1:3) *  Lz(line1) *LCT(line2)/iprop12 + &
+!                                                  struc_zz(1:3) * LCT(line1) *LCT(line2)
+!        helcoup(1:3,-1,+1) = helcoup(1:3,-1,+1) + struc_zz(1:3) * LCT(line1) * Rz(line2)/iprop34 + &
+!                                                  struc_zz(1:3) *  Lz(line1) *RCT(line2)/iprop12 + &
+!                                                  struc_zz(1:3) * LCT(line1) *RCT(line2)
+!        helcoup(1:3,+1,-1) = helcoup(1:3,+1,-1) + struc_zz(1:3) * RCT(line1) * Lz(line2)/iprop34 + &
+!                                                  struc_zz(1:3) *  Rz(line1) *LCT(line2)/iprop12 + &
+!                                                  struc_zz(1:3) * RCT(line1) *LCT(line2)
+!        helcoup(1:3,+1,+1) = helcoup(1:3,+1,+1) + struc_zz(1:3) * RCT(line1) * Rz(line2)/iprop34 + &
+!                                                  struc_zz(1:3) *  Rz(line1) *RCT(line2)/iprop12 + &
+!                                                  struc_zz(1:3) * RCT(line1) *RCT(line2)
+       
     endif
+    
+    
 
     A0_ZZ_4f(-1,-1) = za(j1,j3)*zb(j4,j2) * helcoup(1,-1,-1) + &
          zab2(j1,j3,j4,j2)*zab2(j3,j1,j2,j4) * helcoup(2,-1,-1) + &
