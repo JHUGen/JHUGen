@@ -55,13 +55,13 @@ for ref in os.listdir("reference"):
 
     with open(newfile) as f:
         content = f.read()
-        content = re.sub("Candidate: 0x[0-9a-f]*", "Candidate: 0x0000000", content)
+        content = re.sub("0x[0-9a-f]*", "0xPOINTER", content)
     with open(newfile, 'w') as f:
         f.write(content)
 
     with open("reference/"+ref) as f:
         refcontent = f.read()
-        refcontent = re.sub("Candidate: 0x[0-9a-f]*", "Candidate: 0x0000000", refcontent)
+        refcontent = re.sub("0x[0-9a-f]*", "0xPOINTER", refcontent)
 
     if refcontent != content:
         different.add(newfile)

@@ -145,6 +145,7 @@ test:
         echo 'There is a big file committed to the repository.  Check filesizes.txt in the artifacts.'; exit 1
       fi
     - mkdir -p $CIRCLE_ARTIFACTS/{ggH,VBF,HJJ,other}/{SM,PS,fa30.5,fa30.5i,a2}
+    - mkdir -p $CIRCLE_ARTIFACTS/MELA
     #make sure the default compiler is set to gfortran
     - "! grep 'Comp *= *ifort' makefile"
     #but continue the other tests even if it is
@@ -405,8 +406,9 @@ test:
     - ./JHUGen VegasNc0=100000 DecayMode1=11 DecayMode2=11 ReadLHE=$CIRCLE_ARTIFACTS/other/ZH_LHAPDF.lhe DataFile=$CIRCLE_ARTIFACTS/other/ZH_LHAPDF_WW
     - ./JHUGen VegasNc0=100000 TauDK=0                     ReadLHE=$CIRCLE_ARTIFACTS/other/ZH_LHAPDF.lhe DataFile=$CIRCLE_ARTIFACTS/other/ZH_LHAPDF_tautau
 
-    #put MELAv2 tests here
-
+    #now test MELA
+    - cd ../JHUGenMELAv2/MELA/test && ./testME_all.py
+    - cd ../JHUGenMELAv2/MELA/test && mv *.out $CIRCLE_ARTIFACTS/MELA/
 
   post:
     - unbuffer python ~/checklhe/checklhe.py $(find $CIRCLE_ARTIFACTS -name *.lhe) | tee checklheoutput.txt
