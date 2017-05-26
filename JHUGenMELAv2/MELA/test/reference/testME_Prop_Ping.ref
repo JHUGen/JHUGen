@@ -1,13 +1,13 @@
 Start Mela constructor
 Create symlinks to the required files if these are not already present:
-	- MELA package path: /afs/cern.ch/work/u/usarica/scratch-ZZdevelopment/CJLST_4l/CMSSW_8_0_8/src/ZZMatrixElement/MELA/
+	- MELA package path: /home/ubuntu/JHUGen/JHUGenMELAv2/MELA/
 	- MCFM symlinks are done
 	- PDF symlinks are done
 Create variables used in anaMELA
 Create anaMELA PDF factories
 Paths for newZZMatrixElement
-	- Cross section/width file: /afs/cern.ch/work/u/usarica/scratch-ZZdevelopment/CJLST_4l/CMSSW_8_0_8/src/ZZMatrixElement/MELA/data/HiggsTotalWidth_YR3.txt
-	- Linking NNPDF path /afs/cern.ch/work/u/usarica/scratch-ZZdevelopment/CJLST_4l/CMSSW_8_0_8/src/ZZMatrixElement/MELA/data/Pdfdata/NNPDF30_lo_as_0130.LHgrid -> Pdfdata/NNPDF30_lo_as_0130.LHgrid
+	- Cross section/width file: /home/ubuntu/JHUGen/JHUGenMELAv2/MELA/data/HiggsTotalWidth_YR3.txt
+	- Linking NNPDF path /home/ubuntu/JHUGen/JHUGenMELAv2/MELA/data/Pdfdata/NNPDF30_lo_as_0130.LHgrid -> Pdfdata/NNPDF30_lo_as_0130.LHgrid
 Start newZZMatrixElement
 Begin TEvtProb constructor
 TEvtProb::TEvtProb: HXS successful
@@ -41,138 +41,138 @@ TEvtProb::SetHiggsMass(125, -1, -1):
 Begin Mela::getPConstantHandles
 Begin Mela::getPConstantHandle
 Mela::getPConstantHandle: relpath and spline name: pAvgSmooth_JHUGen_JJQCD_HSMHiggs_13TeV, P_ConserveDifermionMass
-Mela::getPConstantHandle: path and spline name: /afs/cern.ch/work/u/usarica/scratch-ZZdevelopment/CJLST_4l/CMSSW_8_0_8/src/ZZMatrixElement/MELA/data/, P_ConserveDifermionMass
-Mela::getPConstantHandle: Full path and spline name: /afs/cern.ch/work/u/usarica/scratch-ZZdevelopment/CJLST_4l/CMSSW_8_0_8/src/ZZMatrixElement/MELA/data/pAvgSmooth_JHUGen_JJQCD_HSMHiggs_13TeV.root, P_ConserveDifermionMass
+Mela::getPConstantHandle: path and spline name: /home/ubuntu/JHUGen/JHUGenMELAv2/MELA/data/, P_ConserveDifermionMass
+Mela::getPConstantHandle: Full path and spline name: /home/ubuntu/JHUGen/JHUGenMELAv2/MELA/data/pAvgSmooth_JHUGen_JJQCD_HSMHiggs_13TeV.root, P_ConserveDifermionMass
 End Mela::getPConstantHandle
 Begin Mela::getPConstantHandle
 Mela::getPConstantHandle: relpath and spline name: pAvgSmooth_JHUGen_JJQCD_HSMHiggs_13TeV, P_MomentumToEnergy
-Mela::getPConstantHandle: path and spline name: /afs/cern.ch/work/u/usarica/scratch-ZZdevelopment/CJLST_4l/CMSSW_8_0_8/src/ZZMatrixElement/MELA/data/, P_MomentumToEnergy
-Mela::getPConstantHandle: Full path and spline name: /afs/cern.ch/work/u/usarica/scratch-ZZdevelopment/CJLST_4l/CMSSW_8_0_8/src/ZZMatrixElement/MELA/data/pAvgSmooth_JHUGen_JJQCD_HSMHiggs_13TeV.root, P_MomentumToEnergy
+Mela::getPConstantHandle: path and spline name: /home/ubuntu/JHUGen/JHUGenMELAv2/MELA/data/, P_MomentumToEnergy
+Mela::getPConstantHandle: Full path and spline name: /home/ubuntu/JHUGen/JHUGenMELAv2/MELA/data/pAvgSmooth_JHUGen_JJQCD_HSMHiggs_13TeV.root, P_MomentumToEnergy
 End Mela::getPConstantHandle
 Begin Mela::getPConstantHandle
 Mela::getPConstantHandle: relpath and spline name: pAvgSmooth_JHUGen_JJVBF_HSMHiggs_13TeV, P_ConserveDifermionMass
-Mela::getPConstantHandle: path and spline name: /afs/cern.ch/work/u/usarica/scratch-ZZdevelopment/CJLST_4l/CMSSW_8_0_8/src/ZZMatrixElement/MELA/data/, P_ConserveDifermionMass
-Mela::getPConstantHandle: Full path and spline name: /afs/cern.ch/work/u/usarica/scratch-ZZdevelopment/CJLST_4l/CMSSW_8_0_8/src/ZZMatrixElement/MELA/data/pAvgSmooth_JHUGen_JJVBF_HSMHiggs_13TeV.root, P_ConserveDifermionMass
+Mela::getPConstantHandle: path and spline name: /home/ubuntu/JHUGen/JHUGenMELAv2/MELA/data/, P_ConserveDifermionMass
+Mela::getPConstantHandle: Full path and spline name: /home/ubuntu/JHUGen/JHUGenMELAv2/MELA/data/pAvgSmooth_JHUGen_JJVBF_HSMHiggs_13TeV.root, P_ConserveDifermionMass
 End Mela::getPConstantHandle
 Begin Mela::getPConstantHandle
 Mela::getPConstantHandle: relpath and spline name: pAvgSmooth_JHUGen_JJVBF_HSMHiggs_13TeV, P_MomentumToEnergy
-Mela::getPConstantHandle: path and spline name: /afs/cern.ch/work/u/usarica/scratch-ZZdevelopment/CJLST_4l/CMSSW_8_0_8/src/ZZMatrixElement/MELA/data/, P_MomentumToEnergy
-Mela::getPConstantHandle: Full path and spline name: /afs/cern.ch/work/u/usarica/scratch-ZZdevelopment/CJLST_4l/CMSSW_8_0_8/src/ZZMatrixElement/MELA/data/pAvgSmooth_JHUGen_JJVBF_HSMHiggs_13TeV.root, P_MomentumToEnergy
+Mela::getPConstantHandle: path and spline name: /home/ubuntu/JHUGen/JHUGenMELAv2/MELA/data/, P_MomentumToEnergy
+Mela::getPConstantHandle: Full path and spline name: /home/ubuntu/JHUGen/JHUGenMELAv2/MELA/data/pAvgSmooth_JHUGen_JJVBF_HSMHiggs_13TeV.root, P_MomentumToEnergy
 End Mela::getPConstantHandle
 Begin Mela::getPConstantHandle
 Mela::getPConstantHandle: relpath and spline name: pAvgSmooth_JHUGen_JQCD_HSMHiggs_13TeV, P_ConserveDifermionMass
-Mela::getPConstantHandle: path and spline name: /afs/cern.ch/work/u/usarica/scratch-ZZdevelopment/CJLST_4l/CMSSW_8_0_8/src/ZZMatrixElement/MELA/data/, P_ConserveDifermionMass
-Mela::getPConstantHandle: Full path and spline name: /afs/cern.ch/work/u/usarica/scratch-ZZdevelopment/CJLST_4l/CMSSW_8_0_8/src/ZZMatrixElement/MELA/data/pAvgSmooth_JHUGen_JQCD_HSMHiggs_13TeV.root, P_ConserveDifermionMass
+Mela::getPConstantHandle: path and spline name: /home/ubuntu/JHUGen/JHUGenMELAv2/MELA/data/, P_ConserveDifermionMass
+Mela::getPConstantHandle: Full path and spline name: /home/ubuntu/JHUGen/JHUGenMELAv2/MELA/data/pAvgSmooth_JHUGen_JQCD_HSMHiggs_13TeV.root, P_ConserveDifermionMass
 End Mela::getPConstantHandle
 Begin Mela::getPConstantHandle
 Mela::getPConstantHandle: relpath and spline name: pAvgSmooth_JHUGen_JQCD_HSMHiggs_13TeV, P_MomentumToEnergy
-Mela::getPConstantHandle: path and spline name: /afs/cern.ch/work/u/usarica/scratch-ZZdevelopment/CJLST_4l/CMSSW_8_0_8/src/ZZMatrixElement/MELA/data/, P_MomentumToEnergy
-Mela::getPConstantHandle: Full path and spline name: /afs/cern.ch/work/u/usarica/scratch-ZZdevelopment/CJLST_4l/CMSSW_8_0_8/src/ZZMatrixElement/MELA/data/pAvgSmooth_JHUGen_JQCD_HSMHiggs_13TeV.root, P_MomentumToEnergy
+Mela::getPConstantHandle: path and spline name: /home/ubuntu/JHUGen/JHUGenMELAv2/MELA/data/, P_MomentumToEnergy
+Mela::getPConstantHandle: Full path and spline name: /home/ubuntu/JHUGen/JHUGenMELAv2/MELA/data/pAvgSmooth_JHUGen_JQCD_HSMHiggs_13TeV.root, P_MomentumToEnergy
 End Mela::getPConstantHandle
 Begin Mela::getPConstantHandle
 Mela::getPConstantHandle: relpath and spline name: pAvgSmooth_JHUGen_JJQCD_HSMHiggs_13TeV, P_ConserveDifermionMass
-Mela::getPConstantHandle: path and spline name: /afs/cern.ch/work/u/usarica/scratch-ZZdevelopment/CJLST_4l/CMSSW_8_0_8/src/ZZMatrixElement/MELA/data/, P_ConserveDifermionMass
-Mela::getPConstantHandle: Full path and spline name: /afs/cern.ch/work/u/usarica/scratch-ZZdevelopment/CJLST_4l/CMSSW_8_0_8/src/ZZMatrixElement/MELA/data/pAvgSmooth_JHUGen_JJQCD_HSMHiggs_13TeV.root, P_ConserveDifermionMass
+Mela::getPConstantHandle: path and spline name: /home/ubuntu/JHUGen/JHUGenMELAv2/MELA/data/, P_ConserveDifermionMass
+Mela::getPConstantHandle: Full path and spline name: /home/ubuntu/JHUGen/JHUGenMELAv2/MELA/data/pAvgSmooth_JHUGen_JJQCD_HSMHiggs_13TeV.root, P_ConserveDifermionMass
 End Mela::getPConstantHandle
 Begin Mela::getPConstantHandle
 Mela::getPConstantHandle: relpath and spline name: pAvgSmooth_JHUGen_JJQCD_HSMHiggs_13TeV, P_MomentumToEnergy
-Mela::getPConstantHandle: path and spline name: /afs/cern.ch/work/u/usarica/scratch-ZZdevelopment/CJLST_4l/CMSSW_8_0_8/src/ZZMatrixElement/MELA/data/, P_MomentumToEnergy
-Mela::getPConstantHandle: Full path and spline name: /afs/cern.ch/work/u/usarica/scratch-ZZdevelopment/CJLST_4l/CMSSW_8_0_8/src/ZZMatrixElement/MELA/data/pAvgSmooth_JHUGen_JJQCD_HSMHiggs_13TeV.root, P_MomentumToEnergy
+Mela::getPConstantHandle: path and spline name: /home/ubuntu/JHUGen/JHUGenMELAv2/MELA/data/, P_MomentumToEnergy
+Mela::getPConstantHandle: Full path and spline name: /home/ubuntu/JHUGen/JHUGenMELAv2/MELA/data/pAvgSmooth_JHUGen_JJQCD_HSMHiggs_13TeV.root, P_MomentumToEnergy
 End Mela::getPConstantHandle
 Begin Mela::getPConstantHandle
 Mela::getPConstantHandle: relpath and spline name: pAvgSmooth_JHUGen_JJVBF_HSMHiggs_13TeV, P_ConserveDifermionMass
-Mela::getPConstantHandle: path and spline name: /afs/cern.ch/work/u/usarica/scratch-ZZdevelopment/CJLST_4l/CMSSW_8_0_8/src/ZZMatrixElement/MELA/data/, P_ConserveDifermionMass
-Mela::getPConstantHandle: Full path and spline name: /afs/cern.ch/work/u/usarica/scratch-ZZdevelopment/CJLST_4l/CMSSW_8_0_8/src/ZZMatrixElement/MELA/data/pAvgSmooth_JHUGen_JJVBF_HSMHiggs_13TeV.root, P_ConserveDifermionMass
+Mela::getPConstantHandle: path and spline name: /home/ubuntu/JHUGen/JHUGenMELAv2/MELA/data/, P_ConserveDifermionMass
+Mela::getPConstantHandle: Full path and spline name: /home/ubuntu/JHUGen/JHUGenMELAv2/MELA/data/pAvgSmooth_JHUGen_JJVBF_HSMHiggs_13TeV.root, P_ConserveDifermionMass
 End Mela::getPConstantHandle
 Begin Mela::getPConstantHandle
 Mela::getPConstantHandle: relpath and spline name: pAvgSmooth_JHUGen_JJVBF_HSMHiggs_13TeV, P_MomentumToEnergy
-Mela::getPConstantHandle: path and spline name: /afs/cern.ch/work/u/usarica/scratch-ZZdevelopment/CJLST_4l/CMSSW_8_0_8/src/ZZMatrixElement/MELA/data/, P_MomentumToEnergy
-Mela::getPConstantHandle: Full path and spline name: /afs/cern.ch/work/u/usarica/scratch-ZZdevelopment/CJLST_4l/CMSSW_8_0_8/src/ZZMatrixElement/MELA/data/pAvgSmooth_JHUGen_JJVBF_HSMHiggs_13TeV.root, P_MomentumToEnergy
+Mela::getPConstantHandle: path and spline name: /home/ubuntu/JHUGen/JHUGenMELAv2/MELA/data/, P_MomentumToEnergy
+Mela::getPConstantHandle: Full path and spline name: /home/ubuntu/JHUGen/JHUGenMELAv2/MELA/data/pAvgSmooth_JHUGen_JJVBF_HSMHiggs_13TeV.root, P_MomentumToEnergy
 End Mela::getPConstantHandle
 Begin Mela::getPConstantHandle
 Mela::getPConstantHandle: relpath and spline name: pAvgSmooth_JHUGen_JQCD_HSMHiggs_13TeV, P_ConserveDifermionMass
-Mela::getPConstantHandle: path and spline name: /afs/cern.ch/work/u/usarica/scratch-ZZdevelopment/CJLST_4l/CMSSW_8_0_8/src/ZZMatrixElement/MELA/data/, P_ConserveDifermionMass
-Mela::getPConstantHandle: Full path and spline name: /afs/cern.ch/work/u/usarica/scratch-ZZdevelopment/CJLST_4l/CMSSW_8_0_8/src/ZZMatrixElement/MELA/data/pAvgSmooth_JHUGen_JQCD_HSMHiggs_13TeV.root, P_ConserveDifermionMass
+Mela::getPConstantHandle: path and spline name: /home/ubuntu/JHUGen/JHUGenMELAv2/MELA/data/, P_ConserveDifermionMass
+Mela::getPConstantHandle: Full path and spline name: /home/ubuntu/JHUGen/JHUGenMELAv2/MELA/data/pAvgSmooth_JHUGen_JQCD_HSMHiggs_13TeV.root, P_ConserveDifermionMass
 End Mela::getPConstantHandle
 Begin Mela::getPConstantHandle
 Mela::getPConstantHandle: relpath and spline name: pAvgSmooth_JHUGen_JQCD_HSMHiggs_13TeV, P_MomentumToEnergy
-Mela::getPConstantHandle: path and spline name: /afs/cern.ch/work/u/usarica/scratch-ZZdevelopment/CJLST_4l/CMSSW_8_0_8/src/ZZMatrixElement/MELA/data/, P_MomentumToEnergy
-Mela::getPConstantHandle: Full path and spline name: /afs/cern.ch/work/u/usarica/scratch-ZZdevelopment/CJLST_4l/CMSSW_8_0_8/src/ZZMatrixElement/MELA/data/pAvgSmooth_JHUGen_JQCD_HSMHiggs_13TeV.root, P_MomentumToEnergy
+Mela::getPConstantHandle: path and spline name: /home/ubuntu/JHUGen/JHUGenMELAv2/MELA/data/, P_MomentumToEnergy
+Mela::getPConstantHandle: Full path and spline name: /home/ubuntu/JHUGen/JHUGenMELAv2/MELA/data/pAvgSmooth_JHUGen_JQCD_HSMHiggs_13TeV.root, P_MomentumToEnergy
 End Mela::getPConstantHandle
 Begin Mela::getPConstantHandle
 Mela::getPConstantHandle: relpath and spline name: pAvgSmooth_MCFM_JJQCD_bkgZJets_13TeV_2l2q, P_ConserveDifermionMass
-Mela::getPConstantHandle: path and spline name: /afs/cern.ch/work/u/usarica/scratch-ZZdevelopment/CJLST_4l/CMSSW_8_0_8/src/ZZMatrixElement/MELA/data/, P_ConserveDifermionMass
-Mela::getPConstantHandle: Full path and spline name: /afs/cern.ch/work/u/usarica/scratch-ZZdevelopment/CJLST_4l/CMSSW_8_0_8/src/ZZMatrixElement/MELA/data/pAvgSmooth_MCFM_JJQCD_bkgZJets_13TeV_2l2q.root, P_ConserveDifermionMass
+Mela::getPConstantHandle: path and spline name: /home/ubuntu/JHUGen/JHUGenMELAv2/MELA/data/, P_ConserveDifermionMass
+Mela::getPConstantHandle: Full path and spline name: /home/ubuntu/JHUGen/JHUGenMELAv2/MELA/data/pAvgSmooth_MCFM_JJQCD_bkgZJets_13TeV_2l2q.root, P_ConserveDifermionMass
 End Mela::getPConstantHandle
 Begin Mela::getPConstantHandle
 Mela::getPConstantHandle: relpath and spline name: pAvgSmooth_JHUGen_ZZGG_HSMHiggs, P_ConserveDifermionMass_4mu
-Mela::getPConstantHandle: path and spline name: /afs/cern.ch/work/u/usarica/scratch-ZZdevelopment/CJLST_4l/CMSSW_8_0_8/src/ZZMatrixElement/MELA/data/, P_ConserveDifermionMass_4mu
-Mela::getPConstantHandle: Full path and spline name: /afs/cern.ch/work/u/usarica/scratch-ZZdevelopment/CJLST_4l/CMSSW_8_0_8/src/ZZMatrixElement/MELA/data/pAvgSmooth_JHUGen_ZZGG_HSMHiggs.root, P_ConserveDifermionMass_4mu
+Mela::getPConstantHandle: path and spline name: /home/ubuntu/JHUGen/JHUGenMELAv2/MELA/data/, P_ConserveDifermionMass_4mu
+Mela::getPConstantHandle: Full path and spline name: /home/ubuntu/JHUGen/JHUGenMELAv2/MELA/data/pAvgSmooth_JHUGen_ZZGG_HSMHiggs.root, P_ConserveDifermionMass_4mu
 End Mela::getPConstantHandle
 Begin Mela::getPConstantHandle
 Mela::getPConstantHandle: relpath and spline name: pAvgSmooth_JHUGen_ZZGG_HSMHiggs, P_ConserveDifermionMass_4e
-Mela::getPConstantHandle: path and spline name: /afs/cern.ch/work/u/usarica/scratch-ZZdevelopment/CJLST_4l/CMSSW_8_0_8/src/ZZMatrixElement/MELA/data/, P_ConserveDifermionMass_4e
-Mela::getPConstantHandle: Full path and spline name: /afs/cern.ch/work/u/usarica/scratch-ZZdevelopment/CJLST_4l/CMSSW_8_0_8/src/ZZMatrixElement/MELA/data/pAvgSmooth_JHUGen_ZZGG_HSMHiggs.root, P_ConserveDifermionMass_4e
+Mela::getPConstantHandle: path and spline name: /home/ubuntu/JHUGen/JHUGenMELAv2/MELA/data/, P_ConserveDifermionMass_4e
+Mela::getPConstantHandle: Full path and spline name: /home/ubuntu/JHUGen/JHUGenMELAv2/MELA/data/pAvgSmooth_JHUGen_ZZGG_HSMHiggs.root, P_ConserveDifermionMass_4e
 End Mela::getPConstantHandle
 Begin Mela::getPConstantHandle
 Mela::getPConstantHandle: relpath and spline name: pAvgSmooth_JHUGen_ZZGG_HSMHiggs, P_ConserveDifermionMass_2mu2e
-Mela::getPConstantHandle: path and spline name: /afs/cern.ch/work/u/usarica/scratch-ZZdevelopment/CJLST_4l/CMSSW_8_0_8/src/ZZMatrixElement/MELA/data/, P_ConserveDifermionMass_2mu2e
-Mela::getPConstantHandle: Full path and spline name: /afs/cern.ch/work/u/usarica/scratch-ZZdevelopment/CJLST_4l/CMSSW_8_0_8/src/ZZMatrixElement/MELA/data/pAvgSmooth_JHUGen_ZZGG_HSMHiggs.root, P_ConserveDifermionMass_2mu2e
+Mela::getPConstantHandle: path and spline name: /home/ubuntu/JHUGen/JHUGenMELAv2/MELA/data/, P_ConserveDifermionMass_2mu2e
+Mela::getPConstantHandle: Full path and spline name: /home/ubuntu/JHUGen/JHUGenMELAv2/MELA/data/pAvgSmooth_JHUGen_ZZGG_HSMHiggs.root, P_ConserveDifermionMass_2mu2e
 End Mela::getPConstantHandle
 Begin Mela::getPConstantHandle
 Mela::getPConstantHandle: relpath and spline name: pAvgSmooth_MCFM_ZZGG_HSMHiggs, P_ConserveDifermionMass_4mu
-Mela::getPConstantHandle: path and spline name: /afs/cern.ch/work/u/usarica/scratch-ZZdevelopment/CJLST_4l/CMSSW_8_0_8/src/ZZMatrixElement/MELA/data/, P_ConserveDifermionMass_4mu
-Mela::getPConstantHandle: Full path and spline name: /afs/cern.ch/work/u/usarica/scratch-ZZdevelopment/CJLST_4l/CMSSW_8_0_8/src/ZZMatrixElement/MELA/data/pAvgSmooth_MCFM_ZZGG_HSMHiggs.root, P_ConserveDifermionMass_4mu
+Mela::getPConstantHandle: path and spline name: /home/ubuntu/JHUGen/JHUGenMELAv2/MELA/data/, P_ConserveDifermionMass_4mu
+Mela::getPConstantHandle: Full path and spline name: /home/ubuntu/JHUGen/JHUGenMELAv2/MELA/data/pAvgSmooth_MCFM_ZZGG_HSMHiggs.root, P_ConserveDifermionMass_4mu
 End Mela::getPConstantHandle
 Begin Mela::getPConstantHandle
 Mela::getPConstantHandle: relpath and spline name: pAvgSmooth_MCFM_ZZGG_HSMHiggs, P_ConserveDifermionMass_4e
-Mela::getPConstantHandle: path and spline name: /afs/cern.ch/work/u/usarica/scratch-ZZdevelopment/CJLST_4l/CMSSW_8_0_8/src/ZZMatrixElement/MELA/data/, P_ConserveDifermionMass_4e
-Mela::getPConstantHandle: Full path and spline name: /afs/cern.ch/work/u/usarica/scratch-ZZdevelopment/CJLST_4l/CMSSW_8_0_8/src/ZZMatrixElement/MELA/data/pAvgSmooth_MCFM_ZZGG_HSMHiggs.root, P_ConserveDifermionMass_4e
+Mela::getPConstantHandle: path and spline name: /home/ubuntu/JHUGen/JHUGenMELAv2/MELA/data/, P_ConserveDifermionMass_4e
+Mela::getPConstantHandle: Full path and spline name: /home/ubuntu/JHUGen/JHUGenMELAv2/MELA/data/pAvgSmooth_MCFM_ZZGG_HSMHiggs.root, P_ConserveDifermionMass_4e
 End Mela::getPConstantHandle
 Begin Mela::getPConstantHandle
 Mela::getPConstantHandle: relpath and spline name: pAvgSmooth_MCFM_ZZGG_HSMHiggs, P_ConserveDifermionMass_2mu2e
-Mela::getPConstantHandle: path and spline name: /afs/cern.ch/work/u/usarica/scratch-ZZdevelopment/CJLST_4l/CMSSW_8_0_8/src/ZZMatrixElement/MELA/data/, P_ConserveDifermionMass_2mu2e
-Mela::getPConstantHandle: Full path and spline name: /afs/cern.ch/work/u/usarica/scratch-ZZdevelopment/CJLST_4l/CMSSW_8_0_8/src/ZZMatrixElement/MELA/data/pAvgSmooth_MCFM_ZZGG_HSMHiggs.root, P_ConserveDifermionMass_2mu2e
+Mela::getPConstantHandle: path and spline name: /home/ubuntu/JHUGen/JHUGenMELAv2/MELA/data/, P_ConserveDifermionMass_2mu2e
+Mela::getPConstantHandle: Full path and spline name: /home/ubuntu/JHUGen/JHUGenMELAv2/MELA/data/pAvgSmooth_MCFM_ZZGG_HSMHiggs.root, P_ConserveDifermionMass_2mu2e
 End Mela::getPConstantHandle
 Begin Mela::getPConstantHandle
 Mela::getPConstantHandle: relpath and spline name: pAvgSmooth_MCFM_ZZGG_bkgZZ, P_ConserveDifermionMass_4mu
-Mela::getPConstantHandle: path and spline name: /afs/cern.ch/work/u/usarica/scratch-ZZdevelopment/CJLST_4l/CMSSW_8_0_8/src/ZZMatrixElement/MELA/data/, P_ConserveDifermionMass_4mu
-Mela::getPConstantHandle: Full path and spline name: /afs/cern.ch/work/u/usarica/scratch-ZZdevelopment/CJLST_4l/CMSSW_8_0_8/src/ZZMatrixElement/MELA/data/pAvgSmooth_MCFM_ZZGG_bkgZZ.root, P_ConserveDifermionMass_4mu
+Mela::getPConstantHandle: path and spline name: /home/ubuntu/JHUGen/JHUGenMELAv2/MELA/data/, P_ConserveDifermionMass_4mu
+Mela::getPConstantHandle: Full path and spline name: /home/ubuntu/JHUGen/JHUGenMELAv2/MELA/data/pAvgSmooth_MCFM_ZZGG_bkgZZ.root, P_ConserveDifermionMass_4mu
 End Mela::getPConstantHandle
 Begin Mela::getPConstantHandle
 Mela::getPConstantHandle: relpath and spline name: pAvgSmooth_MCFM_ZZGG_bkgZZ, P_ConserveDifermionMass_4e
-Mela::getPConstantHandle: path and spline name: /afs/cern.ch/work/u/usarica/scratch-ZZdevelopment/CJLST_4l/CMSSW_8_0_8/src/ZZMatrixElement/MELA/data/, P_ConserveDifermionMass_4e
-Mela::getPConstantHandle: Full path and spline name: /afs/cern.ch/work/u/usarica/scratch-ZZdevelopment/CJLST_4l/CMSSW_8_0_8/src/ZZMatrixElement/MELA/data/pAvgSmooth_MCFM_ZZGG_bkgZZ.root, P_ConserveDifermionMass_4e
+Mela::getPConstantHandle: path and spline name: /home/ubuntu/JHUGen/JHUGenMELAv2/MELA/data/, P_ConserveDifermionMass_4e
+Mela::getPConstantHandle: Full path and spline name: /home/ubuntu/JHUGen/JHUGenMELAv2/MELA/data/pAvgSmooth_MCFM_ZZGG_bkgZZ.root, P_ConserveDifermionMass_4e
 End Mela::getPConstantHandle
 Begin Mela::getPConstantHandle
 Mela::getPConstantHandle: relpath and spline name: pAvgSmooth_MCFM_ZZGG_bkgZZ, P_ConserveDifermionMass_2mu2e
-Mela::getPConstantHandle: path and spline name: /afs/cern.ch/work/u/usarica/scratch-ZZdevelopment/CJLST_4l/CMSSW_8_0_8/src/ZZMatrixElement/MELA/data/, P_ConserveDifermionMass_2mu2e
-Mela::getPConstantHandle: Full path and spline name: /afs/cern.ch/work/u/usarica/scratch-ZZdevelopment/CJLST_4l/CMSSW_8_0_8/src/ZZMatrixElement/MELA/data/pAvgSmooth_MCFM_ZZGG_bkgZZ.root, P_ConserveDifermionMass_2mu2e
+Mela::getPConstantHandle: path and spline name: /home/ubuntu/JHUGen/JHUGenMELAv2/MELA/data/, P_ConserveDifermionMass_2mu2e
+Mela::getPConstantHandle: Full path and spline name: /home/ubuntu/JHUGen/JHUGenMELAv2/MELA/data/pAvgSmooth_MCFM_ZZGG_bkgZZ.root, P_ConserveDifermionMass_2mu2e
 End Mela::getPConstantHandle
 Begin Mela::getPConstantHandle
 Mela::getPConstantHandle: relpath and spline name: pAvgSmooth_MCFM_ZZQQB_bkgZZ, P_ConserveDifermionMass_4mu
-Mela::getPConstantHandle: path and spline name: /afs/cern.ch/work/u/usarica/scratch-ZZdevelopment/CJLST_4l/CMSSW_8_0_8/src/ZZMatrixElement/MELA/data/, P_ConserveDifermionMass_4mu
-Mela::getPConstantHandle: Full path and spline name: /afs/cern.ch/work/u/usarica/scratch-ZZdevelopment/CJLST_4l/CMSSW_8_0_8/src/ZZMatrixElement/MELA/data/pAvgSmooth_MCFM_ZZQQB_bkgZZ.root, P_ConserveDifermionMass_4mu
+Mela::getPConstantHandle: path and spline name: /home/ubuntu/JHUGen/JHUGenMELAv2/MELA/data/, P_ConserveDifermionMass_4mu
+Mela::getPConstantHandle: Full path and spline name: /home/ubuntu/JHUGen/JHUGenMELAv2/MELA/data/pAvgSmooth_MCFM_ZZQQB_bkgZZ.root, P_ConserveDifermionMass_4mu
 End Mela::getPConstantHandle
 Begin Mela::getPConstantHandle
 Mela::getPConstantHandle: relpath and spline name: pAvgSmooth_MCFM_ZZQQB_bkgZZ, P_ConserveDifermionMass_4e
-Mela::getPConstantHandle: path and spline name: /afs/cern.ch/work/u/usarica/scratch-ZZdevelopment/CJLST_4l/CMSSW_8_0_8/src/ZZMatrixElement/MELA/data/, P_ConserveDifermionMass_4e
-Mela::getPConstantHandle: Full path and spline name: /afs/cern.ch/work/u/usarica/scratch-ZZdevelopment/CJLST_4l/CMSSW_8_0_8/src/ZZMatrixElement/MELA/data/pAvgSmooth_MCFM_ZZQQB_bkgZZ.root, P_ConserveDifermionMass_4e
+Mela::getPConstantHandle: path and spline name: /home/ubuntu/JHUGen/JHUGenMELAv2/MELA/data/, P_ConserveDifermionMass_4e
+Mela::getPConstantHandle: Full path and spline name: /home/ubuntu/JHUGen/JHUGenMELAv2/MELA/data/pAvgSmooth_MCFM_ZZQQB_bkgZZ.root, P_ConserveDifermionMass_4e
 End Mela::getPConstantHandle
 Begin Mela::getPConstantHandle
 Mela::getPConstantHandle: relpath and spline name: pAvgSmooth_MCFM_ZZQQB_bkgZZ, P_ConserveDifermionMass_2mu2e
-Mela::getPConstantHandle: path and spline name: /afs/cern.ch/work/u/usarica/scratch-ZZdevelopment/CJLST_4l/CMSSW_8_0_8/src/ZZMatrixElement/MELA/data/, P_ConserveDifermionMass_2mu2e
-Mela::getPConstantHandle: Full path and spline name: /afs/cern.ch/work/u/usarica/scratch-ZZdevelopment/CJLST_4l/CMSSW_8_0_8/src/ZZMatrixElement/MELA/data/pAvgSmooth_MCFM_ZZQQB_bkgZZ.root, P_ConserveDifermionMass_2mu2e
+Mela::getPConstantHandle: path and spline name: /home/ubuntu/JHUGen/JHUGenMELAv2/MELA/data/, P_ConserveDifermionMass_2mu2e
+Mela::getPConstantHandle: Full path and spline name: /home/ubuntu/JHUGen/JHUGenMELAv2/MELA/data/pAvgSmooth_MCFM_ZZQQB_bkgZZ.root, P_ConserveDifermionMass_2mu2e
 End Mela::getPConstantHandle
 End Mela::getPConstantHandles
 Start superMELA
 Begin SuperMELA::init...
 Range width=35
-SuperMELA::readSigSystFromFile: Parsing signal shape systematics from input card /afs/cern.ch/work/u/usarica/scratch-ZZdevelopment/CJLST_4l/CMSSW_8_0_8/src/ZZMatrixElement/MELA/data/CombinationInputs/SM_inputs_8TeV/inputs_4mu.txt
-mean_CB systematics (ele and mu): 5.37799e-316 / 0.001
-sigma_CB systematics (ele and mu): 5.38748e-316 / 0.2
+SuperMELA::readSigSystFromFile: Parsing signal shape systematics from input card /home/ubuntu/JHUGen/JHUGenMELAv2/MELA/data/CombinationInputs/SM_inputs_8TeV/inputs_4mu.txt
+mean_CB systematics (ele and mu): 6.95336e-310 / 0.001
+sigma_CB systematics (ele and mu): 1.30764e-315 / 0.2
 Reading signal shape formulas
-Parsing input card /afs/cern.ch/work/u/usarica/scratch-ZZdevelopment/CJLST_4l/CMSSW_8_0_8/src/ZZMatrixElement/MELA/data/CombinationInputs/SM_inputs_8TeV/inputs_4mu.txt
+Parsing input card /home/ubuntu/JHUGen/JHUGenMELAv2/MELA/data/CombinationInputs/SM_inputs_8TeV/inputs_4mu.txt
 alpha_CB == (-6.83599)+(0.196814*@0)+(-0.00179054*@0*@0)+(7.59602e-06*@0*@0*@0)+(-1.48893e-08*@0*@0*@0*@0)+(1.07477e-11*@0*@0*@0*@0*@0)
 alpha2_CB == (-26.1111)+(0.767139*@0)+(-0.00830412*@0*@0)+(4.35986e-05*@0*@0*@0)+(-1.10717e-07*@0*@0*@0*@0)+(1.09256e-10*@0*@0*@0*@0*@0)
 n_CB == TMath::Max((24.2026)+(-0.5443*@0)+(0.00517101*@0*@0)+(-2.3485e-05*@0*@0*@0)+(5.07143e-08*@0*@0*@0*@0)+(-4.18694e-11*@0*@0*@0*@0*@0),1)
@@ -202,17 +202,17 @@ Value of signal m4l BW shape is 0.0531392
   Value State: DIRTY
   Shape State: DIRTY
   Attributes: 
-  Address: 0x6757860
+  Address: 0xPOINTER
   Clients: 
   Servers: 
-    (0x671d7d0,V-) RooRealVar::CMS_zz4l_mass "CMS_zz4l_mass"
-    (0x6751890,--) RooAbsPdf::signalBW_ggH "signalBW_ggH"
-    (0x6750740,--) RooAbsPdf::signalCB_ggH "signalCB_ggH"
-    (0x410dc60,V-) RooRealVar::CMS_zz4l_mean_BW_sig_4mu_8 "CMS_zz4l_mean_BW"
-    (0x410e430,V-) RooRealVar::CMS_zz4l_width_BW_sig_4mu_8 "CMS_zz4l_width_BW"
-    (0x7ffe3df44db0,V-) RooRealVar::CMS_zz4l_mean_sig_corrMH "CMS_zz4l_mean_sig_corrMH"
-    (0x7ffe3df451d0,V-) RooRealVar::CMS_zz4l_sigma_sig_corrMH "CMS_zz4l_sigma_sig_corrMH"
-    (0x671d1a0,V-) RooRealVar::mH "mH"
+    (0xPOINTER,V-) RooRealVar::CMS_zz4l_mass "CMS_zz4l_mass"
+    (0xPOINTER,--) RooAbsPdf::signalBW_ggH "signalBW_ggH"
+    (0xPOINTER,--) RooAbsPdf::signalCB_ggH "signalCB_ggH"
+    (0xPOINTER,V-) RooRealVar::CMS_zz4l_mean_BW_sig_4mu_8 "CMS_zz4l_mean_BW"
+    (0xPOINTER,V-) RooRealVar::CMS_zz4l_width_BW_sig_4mu_8 "CMS_zz4l_width_BW"
+    (0xPOINTER,V-) RooRealVar::CMS_zz4l_mean_sig_corrMH "CMS_zz4l_mean_sig_corrMH"
+    (0xPOINTER,V-) RooRealVar::CMS_zz4l_sigma_sig_corrMH "CMS_zz4l_sigma_sig_corrMH"
+    (0xPOINTER,V-) RooRealVar::mH "mH"
   Proxies: 
     !x -> CMS_zz4l_mass
     !xprime ->  (empty)
@@ -239,7 +239,7 @@ Normalization of signal m4l BW shape is 7.05127e-06
 ---> Integrating full signal:
 Normalization of signal m4l shape is 827.81
 Reading background shape parameters
-Parsing input card /afs/cern.ch/work/u/usarica/scratch-ZZdevelopment/CJLST_4l/CMSSW_8_0_8/src/ZZMatrixElement/MELA/data/CombinationInputs/SM_inputs_8TeV/inputs_4mu.txt
+Parsing input card /home/ubuntu/JHUGen/JHUGenMELAv2/MELA/data/CombinationInputs/SM_inputs_8TeV/inputs_4mu.txt
 Size of vector with bkg shape pars is 14
 Param [0]=104.225 [13]=0.0803183
 End Mela constructor
@@ -295,7 +295,7 @@ Removing Mela candidates
 Summary:
 Candidate 0
 ***** TUtil::PrintCandidateSummary *****
-Candidate: 0x6063320
+Candidate: 0xPOINTER
 	Has 0 mothers
 	Has 2 sorted Vs
 		V0 (23) (X,Y,Z,T)=( -10.1385 , -24.3049 , -2365.68 , 2367.48 )
