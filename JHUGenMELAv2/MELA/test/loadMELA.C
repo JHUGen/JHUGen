@@ -4,8 +4,8 @@
   TString LIBJHUGENMELA="libjhugenmela.so";
   TString LIBMELA="libMELA.so";
 
-  gSystem->AddIncludePath("-I$ROOFITSYS/include/");
-  gSystem->AddIncludePath("-I../interface/");
+  gInterpreter->AddIncludePath("$ROOFITSYS/include/");
+  gInterpreter->AddIncludePath("../interface/");
   gSystem->Load(LIBMCFMPATH + LIBMCFM);
   gSystem->Load(LIBMCFMPATH + LIBJHUGENMELA);
   gSystem->Load(LIBMCFMPATH + LIBMELA);
