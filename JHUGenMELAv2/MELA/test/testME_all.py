@@ -37,3 +37,10 @@ for ref in os.listdir("reference"):
 
     function = getattr(ROOT, functionname)
     function(*arguments)
+
+    with open(ref.replace(".ref", ".out")) as f:
+        content = f.read()
+    newcontent = re.sub("Candidate: 0x[0-9a-f]*", "Candidate: 0x0000000", content)
+    assert newcontent != content
+    with open(ref.replace(".ref", ".out"), 'w') as f:
+        f.write(newcontent)

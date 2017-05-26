@@ -23,7 +23,7 @@ MELALIBDIR = $(MELADATADIR)/slc6_amd64_gcc530
 ROOTCFLAGS = $(shell root-config --cflags)
 ROOTGLIBS = $(shell root-config --evelibs) -Lrootlib
 NLIBS = $(ROOTGLIBS)
-NLIBS += -L$(ROOFITSYS)/lib -lMinuit -lRooFitCore -lRooFit -lboost_regex -lboost_filesystem
+NLIBS += -L$(ROOFITSYS)/lib -lMinuit -lRooFitCore -lRooFit -lboost_regex -lboost_filesystem -lgfortran
 LIBS = $(filter-out -lNew, $(NLIBS))
 
 ROOFITINC = -I$(ROOFITSYS)/include
