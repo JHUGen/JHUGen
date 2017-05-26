@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from collections import defaultdict
 import os
 import re
 
@@ -7,6 +8,18 @@ import ROOT
 
 ROOT.gROOT.Macro("loadMELA.C")
 ROOT.gROOT.LoadMacro("testME_v2.c+")
+
+def defaultdictset():
+    return defaultdict(set)
+
+ratiosMCFMJHUGenVBF = defaultdict(set)
+ratiosMCFMJHUGenLepZH = defaultdict(set)
+ratiosMCFMJHUGenLepWH = defaultdict(set)
+ratiosMCFMJHUGenHadZH = defaultdict(set)
+ratiosMCFMJHUGenHadWH = defaultdict(set)
+
+badbkgratios = set()
+different = set()
 
 for ref in os.listdir("reference"):
     match = re.match("(testME_.*_Ping)_?(.*).ref", ref)
@@ -38,9 +51,77 @@ for ref in os.listdir("reference"):
     function = getattr(ROOT, functionname)
     function(*arguments)
 
-    with open(ref.replace(".ref", ".out")) as f:
+    newfile = ref.replace(".ref", ".out")
+
+    with open(newfile) as f:
         content = f.read()
-    newcontent = re.sub("Candidate: 0x[0-9a-f]*", "Candidate: 0x0000000", content)
-    assert newcontent != content
-    with open(ref.replace(".ref", ".out"), 'w') as f:
-        f.write(newcontent)
+        content = re.sub("Candidate: 0x[0-9a-f]*", "Candidate: 0x0000000", content)
+    with open(newfile, 'w') as f:
+        f.write(content)
+
+    with open("reference/"+ref) as f:
+        refcontent = f.read()
+        refcontent = re.sub("Candidate: 0x[0-9a-f]*", "Candidate: 0x0000000", refcontent)
+
+    if refcontent != content:
+        different.add(newfile)
+
+    if "JHUGen/MCFM Ratio" in content:
+        production = content.split("\n")[0].split()[3]
+        if production == "JJVBF":
+            ratios = ratiosMCFMJHUGenVBF
+        elif production == "Had_ZH":
+            ratios = ratiosMCFMJHUGenHadZH
+        elif production in "Had_WH":
+            ratios = ratiosMCFMJHUGenHadWH
+        elif production == "Lep_ZH":
+            ratios = ratiosMCFMJHUGenLepZH
+        elif production in "Lep_WH":
+            ratios = ratiosMCFMJHUGenLepWH
+        else:
+            assert False, production
+
+        assert "Arrays:" in content
+        sections = content.split("JHUGen/MCFM Ratio")
+        for section in sections[1:]:
+            sectioncontent = section.split()
+            for i, number in enumerate(sectioncontent):
+                #go until we find something that's not a number
+                try:
+                    ratio = float(number)
+                except ValueError:
+                    break
+                if ratio != 0:
+                    ratios[ratio].add(newfile)
+        assert i > 1
+
+    if "MCFM Bkg (re-sum)/Bkg Ratio" in content:
+        ratiopart = content.split("MCFM Bkg (re-sum)/Bkg Ratio")[1]
+        for i, number in enumerate(ratiopart.split()):
+            #go until we find something that's not a number
+            try:
+                ratio = float(number)
+            except ValueError:
+                break
+            if ratio != 0 and ratio != 1:
+                badbkgratios.add(newfile)
+        assert i > 1
+
+errors = []
+if different:
+    errors.append("The following files are not the same as the reference files:\n    "+"\n    ".join(sorted(different)))
+if len(ratiosMCFMJHUGenVBF)>1:
+    errors.append("There are multiple different ratios between MCFM and JHUGen for VBF:\n" + ", ".join(str(_) for _ in ratiosMCFMJHUGenVBF))
+if len(ratiosMCFMJHUGenHadZH)>1:
+    errors.append("There are multiple different ratios between MCFM and JHUGen for hadronic ZH:\n" + ", ".join(str(_) for _ in ratiosMCFMJHUGenHadZH))
+if len(ratiosMCFMJHUGenHadWH)>1:
+    errors.append("There are multiple different ratios between MCFM and JHUGen for hadronic WH:\n" + ", ".join(str(_) for _ in ratiosMCFMJHUGenHadWH))
+if len(ratiosMCFMJHUGenLepZH)>1:
+    errors.append("There are multiple different ratios between MCFM and JHUGen for leptonic ZH:\n" + ", ".join(str(_) for _ in ratiosMCFMJHUGenLepZH))
+if len(ratiosMCFMJHUGenLepWH)>1:
+    errors.append("There are multiple different ratios between MCFM and JHUGen for leptonic WH:\n" + ", ".join(str(_) for _ in ratiosMCFMJHUGenLepWH))
+if badbkgratios:
+    errors.append("The following files have bad ratios between manual and automatic background:\n    "+"\n    ".join(sorted(badbkgratios)))
+
+if errors:
+    raise RuntimeError("\n\n\n".join(errors))
