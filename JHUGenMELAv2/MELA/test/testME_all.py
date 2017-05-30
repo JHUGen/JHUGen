@@ -21,7 +21,9 @@ ratiosMCFMJHUGenHadWH = defaultdict(set)
 badbkgratios = set()
 different = set()
 
-for ref in os.listdir("reference"):
+referencefiles = os.listdir("reference")
+
+for j, ref in enumerate(referencefiles):
     match = re.match("(testME_.*_Ping)_?(.*).ref", ref)
     if not match:
         raise RuntimeError("Unknown filename {}".format(ref))
@@ -106,6 +108,8 @@ for ref in os.listdir("reference"):
             if ratio != 0 and ratio != 1:
                 badbkgratios.add(newfile)
         assert i > 1
+
+    print j, "/", len(referencefiles)
 
 errors = []
 if different:
