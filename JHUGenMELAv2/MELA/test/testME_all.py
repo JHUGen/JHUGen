@@ -57,13 +57,13 @@ for j, ref in enumerate(referencefiles):
 
     with open(newfile) as f:
         content = f.read()
-        content = re.sub("0x[0-9a-f]*", "0xPOINTER", content)
+        content = re.sub("0x[0-9a-f]+", "0xPOINTER", content)
     with open(newfile, 'w') as f:
         f.write(content)
 
     with open("reference/"+ref) as f:
         refcontent = f.read()
-        refcontent = re.sub("0x[0-9a-f]*", "0xPOINTER", refcontent)
+        refcontent = re.sub("0x[0-9a-f]+", "0xPOINTER", refcontent)
 
     if refcontent != content:
         different.add(newfile)

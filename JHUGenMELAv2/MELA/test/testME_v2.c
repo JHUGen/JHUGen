@@ -22,6 +22,14 @@
 using namespace RooFit;
 using namespace std;
 
+std::map<tuple<int,float,TVar::VerbosityLevel>,Mela*> stored_melas;
+Mela& getmela(int erg_tev, float mPOLE, TVar::VerbosityLevel verbosity){
+  auto key = make_tuple(erg_tev, mPOLE, verbosity);
+  auto it = stored_melas.find(key);
+  if (it == stored_melas.end())
+    stored_melas[key] = new Mela(erg_tev, mPOLE, verbosity);
+  return *stored_melas[key];
+}
 
 void testME_Dec_MCFM_Ping(int flavor=2, int useMothers=0, bool useConstants=false){
   ofstream tout("testME_Dec_MCFM_Ping.out");
@@ -33,7 +41,7 @@ void testME_Dec_MCFM_Ping(int flavor=2, int useMothers=0, bool useConstants=fals
   float wPOLE=4.07e-3;
 
   TVar::VerbosityLevel verbosity = TVar::DEBUG;
-  Mela mela(erg_tev, mPOLE, verbosity);
+  Mela& mela = getmela(erg_tev, mPOLE, verbosity);
   if (verbosity>=TVar::DEBUG) cout << "Mela is initialized" << endl;
   //mela.resetMCFM_EWKParameters(1.16639E-05, 1./128., 79.9549392, 91.1876, 0.23119);
   if (verbosity>=TVar::DEBUG) cout << "Mela candidate decay mode initializing" << endl;
@@ -1080,7 +1088,7 @@ void testME_VH_JHUGen_Ping(){
 
   TVar::VerbosityLevel verbosity = TVar::ERROR;
   if (verbosity>=TVar::DEBUG) cout << "Initializing Mela..." << endl;
-  Mela mela(erg_tev, mPOLE, verbosity);
+  Mela& mela = getmela(erg_tev, mPOLE, verbosity);
   if (verbosity>=TVar::DEBUG) cout << "Mela is initialized" << endl;
   //mela.resetMCFM_EWKParameters(1.16639E-05, 1./128., 79.9549392, 91.1876, 0.23119);
 
@@ -1286,7 +1294,7 @@ void testME_Prop_Ping(int useMothers=0){
   float wPOLE=4.07e-3;
 
   TVar::VerbosityLevel verbosity = TVar::DEBUG;
-  Mela mela(erg_tev, mPOLE, verbosity);
+  Mela& mela = getmela(erg_tev, mPOLE, verbosity);
   if (verbosity>=TVar::DEBUG) cout << "Mela is initialized" << endl;
   //mela.resetMCFM_EWKParameters(1.16639E-05, 1./128., 79.9549392, 91.1876, 0.23119);
   if (verbosity>=TVar::DEBUG) cout << "Mela candidate decay mode initializing" << endl;
@@ -1746,7 +1754,7 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_Comparison_Ping(int motherflavor=0, int 
     streambuf* coutbuf = cout.rdbuf();
     cout.rdbuf(tout.rdbuf());
 
-    Mela mela(erg_tev, mPOLE, verbosity);
+    Mela& mela = getmela(erg_tev, mPOLE, verbosity);
 
     jhume p_prod_0mplus_dec_0mplus_VAJHU;
     jhume p_prod_0minus_dec_0minus_VAJHU;
@@ -2735,7 +2743,7 @@ void testME_ProdDec_MCFM_JHUGen_JJQCDZZWW_Comparison_Ping(int motherflavor=0, in
     TVar::VerbosityLevel verbosity = TVar::ERROR;
     TVar::Production prod = TVar::JJQCD;
 
-    Mela mela(erg_tev, mPOLE, verbosity);
+    Mela& mela = getmela(erg_tev, mPOLE, verbosity);
 
     mcfmme p_prod_JJQCD_VAMCFM;
 
@@ -2844,7 +2852,7 @@ void testME_ProdDec_MCFM_Ping(int flavor=2){
   float wPOLE=4.07e-3;
 
   TVar::VerbosityLevel verbosity = TVar::DEBUG;
-  Mela mela(erg_tev, mPOLE, verbosity);
+  Mela& mela = getmela(erg_tev, mPOLE, verbosity);
   if (verbosity>=TVar::DEBUG) cout << "Mela is initialized" << endl;
   //mela.resetMCFM_EWKParameters(1.16639E-05, 1./128., 79.9549392, 91.1876, 0.23119);
   if (verbosity>=TVar::DEBUG) cout << "Mela candidate decay mode initializing" << endl;
@@ -3084,7 +3092,7 @@ void testME_ProdDec_MCFM_JHUGen_Comparison(int flavor=2, bool useBkgSample=false
   if (idMother[0]!=0 || idMother[1]!=0) coutput.Append(Form("_MotherId_%i_%i", idMother[0], idMother[1]));
   coutput.Append(".root");
 
-  Mela mela(erg_tev, mPOLE, verbosity);
+  Mela& mela = getmela(erg_tev, mPOLE, verbosity);
 
   TFile* finput;
   TFile* foutput;
@@ -3582,7 +3590,7 @@ void testME_Dec_JHUGenMCFM_Ping(int flavor=2){
   float wPOLE=4.07e-3;
 
   TVar::VerbosityLevel verbosity = TVar::DEBUG;
-  Mela mela(erg_tev, mPOLE, verbosity);
+  Mela& mela = getmela(erg_tev, mPOLE, verbosity);
   if (verbosity>=TVar::DEBUG) cout << "Mela is initialized" << endl;
   mela.resetMCFM_EWKParameters(1.16639E-05, 1./128., 80.399, 91.1876, 0.23119);
 
@@ -3992,7 +4000,7 @@ void testME_Dec_FullSim(int flavor=2, bool useConstants=false, bool useBkgSample
   TString TREE_NAME = "SelectedTree";
 
   TVar::VerbosityLevel verbosity = TVar::ERROR;
-  Mela mela(erg_tev, mPOLE, verbosity);
+  Mela& mela = getmela(erg_tev, mPOLE, verbosity);
   if (verbosity>=TVar::DEBUG) cout << "Mela is initialized" << endl;
   mela.resetMCFM_EWKParameters(1.16639E-05, 1./128., 80.399, 91.1876, 0.23119);
 
@@ -4386,7 +4394,7 @@ void testME_ProdP_VBFHJJ_FullSim(int flavor=2, bool useConstants=false, bool use
   TString TREE_NAME = "SelectedTree";
 
   TVar::VerbosityLevel verbosity = TVar::ERROR;
-  Mela mela(erg_tev, mPOLE, verbosity);
+  Mela& mela = getmela(erg_tev, mPOLE, verbosity);
 
   TString cinput_main = "/scratch0/hep/ianderso/CJLST/140519/PRODFSR_8TeV";
   TFile* finput;
@@ -4587,7 +4595,7 @@ void testME_ProdP_VH_FullSim(){
   TString TREE_NAME = "SelectedTree";
 
   TVar::VerbosityLevel verbosity = TVar::DEBUG;
-  Mela mela(erg_tev, mPOLE, verbosity);
+  Mela& mela = getmela(erg_tev, mPOLE, verbosity);
 
   TString cinput_main = "/scratch0/hep/ianderso/CJLST/140519/PRODFSR_8TeV";
   TFile* finput = new TFile(Form("%s/%s/HZZ4lTree_ZZTo%s.root", cinput_main.Data(), "2mu2e", "2e2mu"), "read");
@@ -4799,7 +4807,7 @@ void testME_ProdP_TTHBBH_FullSim(){
   TString TREE_NAME = "SelectedTree";
 
   TVar::VerbosityLevel verbosity = TVar::ERROR;
-  Mela mela(erg_tev, mPOLE, verbosity);
+  Mela& mela = getmela(erg_tev, mPOLE, verbosity);
 
   TString cinput_main = "/scratch0/hep/ianderso/CJLST/140519/PRODFSR_8TeV";
   TFile* finput = new TFile(Form("%s/%s/HZZ4lTree_ZZTo%s.root", cinput_main.Data(), "2mu2e", "2e2mu"), "read");
@@ -4969,7 +4977,7 @@ void testME_Dec_ZZWWComparison_FullSim(){
   TString TREE_NAME = "SelectedTree";
 
   TVar::VerbosityLevel verbosity = TVar::ERROR;
-  Mela mela(erg_tev, mPOLE, verbosity);
+  Mela& mela = getmela(erg_tev, mPOLE, verbosity);
   if (verbosity>=TVar::DEBUG) cout << "Mela is initialized" << endl;
   mela.resetMCFM_EWKParameters(1.16639E-05, 1./128., 80.399, 91.1876, 0.23119);
 
@@ -5536,7 +5544,7 @@ void testME_SuperMela_FullSim(int flavor=2, bool useBkgSample=false, bool debug=
   TString TREE_NAME = "SelectedTree";
 
   TVar::VerbosityLevel verbosity = (debug ? TVar::DEBUG : TVar::ERROR);
-  Mela mela(erg_tev, mPOLE, verbosity);
+  Mela& mela = getmela(erg_tev, mPOLE, verbosity);
   if (verbosity>=TVar::DEBUG) cout << "Mela is initialized" << endl;
 
   TString cinput_main = "/scratch0/hep/ianderso/CJLST/140519/PRODFSR_8TeV";
