@@ -2,7 +2,7 @@
 #define MELAPARTICLE_H
 
 #include <vector>
-#include <PDGHelpers.h>
+#include "PDGHelpers.h"
 #include "TVector3.h"
 #include "TLorentzVector.h"
 

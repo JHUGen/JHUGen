@@ -3,14 +3,14 @@ all:
 	@echo "ROOTSYS is not set. Please set ROOT environment properly"; echo
 else
 
-CMSROOT = ./
-#MODULES=$(CMSROOT)modules/
-#OBJECTS=$(CMSROOT)objects/
-MODULES=$(CMSROOT)
-OBJECTS=$(CMSROOT)
+WORKDIR = ./
+#MODULES=$(WORKDIR)modules/
+#OBJECTS=$(WORKDIR)objects/
+MODULES=$(WORKDIR)
+OBJECTS=$(WORKDIR)
 ROOFITINCLUDE = 
 RM  = /bin/rm
-INCLUDE = -I$(CMSROOT) $(ROOFITINCLUDE)
+INCLUDE = -I$(WORKDIR) $(ROOFITINCLUDE)
 Comp = gfort
 
 # Linking LHAPDF
@@ -29,17 +29,17 @@ endif
 
 
 ifeq ($(Comp),ifort)
-	fcomp = ifort -fpp -O2 -vec-report0 -Dcompiler=1 -D_def_melatools_ -lifcore -fPIC
+	fcomp = ifort -fpp -O2 -vec-report0 -Dcompiler=1 -lifcore -fPIC
 endif
 ifeq ($(Comp),gfort)
-	fcomp = gfortran -O0 -ffree-line-length-none -Dcompiler=2 -D_def_melatools_ $(LHAPDFflags) -fno-automatic -fno-f2c  -fPIC -g 
+	fcomp = gfortran -O0 -ffree-line-length-none -Dcompiler=2 $(LHAPDFflags) -fno-automatic -fno-f2c  -fPIC -g 
 endif
 
 ifeq ($(Comp),gfort)
-	ccomp = gcc -D_def_melatools_
+	ccomp = gcc
 endif
 ifeq ($(Comp),ifort)
-	ccomp = icc -D_def_melatools_
+	ccomp = icc
 endif
 
 ifeq ($(Comp),gfort)
@@ -54,6 +54,13 @@ LIB = libjhugenmela.so
 
 all:    libs
 	g++ -Wl,-soname,$(LIB) -shared -o $(LIB) *.o
+	@echo " "
+	@echo " WARNING: if you updated the fortran code,"
+	@echo "          you need to move libjhugenmela.so"
+	@echo '          to the appropriate folder in data/'
+	@echo "          and then scram b.  Otherwise your changes"
+	@echo "          will not apply to any code you run."
+	@echo "          If you are running setup.sh this is done automatically."
 #	mv *.o $(OBJECTS)
 #	mv *.mod $(MODULES)
 

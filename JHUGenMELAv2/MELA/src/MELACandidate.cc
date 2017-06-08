@@ -1,4 +1,4 @@
-#include <interface/MELACandidate.h>
+#include "MELACandidate.h"
 #include "TMath.h"
 
 using namespace PDGHelpers;
@@ -9,7 +9,7 @@ associatedByHighestPt(associatedByHighestPt_),
 isShallowCopy(false)
 {}
 MELACandidate::~MELACandidate(){
-  if (!isShallowCopy){ // Delete owned objjects, or not
+  if (!isShallowCopy){ // Delete owned objects, or not
     for (unsigned int i=0; i<sortedVs.size(); i++) delete sortedVs.at(i);
   }
   sortedVs.clear();
@@ -109,12 +109,14 @@ MELATopCandidate* MELACandidate::getAssociatedTop(int index)const{
   else return 0;
 }
 void MELACandidate::sortDaughtersInitial(){
+  int nDaughtersBooked=0;
   int tmpDindex[2]={ 0 };
-  MELAParticle* df[2] = { getDaughter(0), 0 };
+  MELAParticle* df[2] ={ getDaughter(0), 0 };
+  if (df[0]!=0) nDaughtersBooked++;
   for (int j=1; j<getNDaughters(); j++){
     MELAParticle* dtmp = getDaughter(j);
     if (
-      (dtmp->charge()+df[0]->charge()==0 && (PDGHelpers::HVVmass==PDGHelpers::Zmass || PDGHelpers::HVVmass==PDGHelpers::Zeromass))
+      ((std::abs(dtmp->charge())-std::abs(df[0]->charge())==0 && std::abs(dtmp->id)==std::abs(df[0]->id)) && (PDGHelpers::HVVmass==PDGHelpers::Zmass || PDGHelpers::HVVmass==PDGHelpers::Zeromass))
       ||
       (
       PDGHelpers::HVVmass==PDGHelpers::Wmass
@@ -128,6 +130,7 @@ void MELACandidate::sortDaughtersInitial(){
       ){
       df[1] = dtmp;
       tmpDindex[1] = j;
+      nDaughtersBooked++;
       break;
     }
   }
@@ -137,8 +140,25 @@ void MELACandidate::sortDaughtersInitial(){
     if (j==tmpDindex[1]) continue;
     MELAParticle* dtmp = getDaughter(j);
     ds[sindex] = dtmp;
+    nDaughtersBooked++;
     sindex++;
+    if (sindex==2) break;
   }
+
+  if (nDaughtersBooked!=getNDaughters()){
+    if (getNDaughters()>4) std::cout << "MELACandidate::sortDaughtersInitial: Number of daughters passed " << getNDaughters() << ">4 is currently not supported." << std::endl;
+    std::cout << "MELACandidate::sortDaughtersInitial: Number of daughters passed (" << getNDaughters() << ") is not the same as number of daughters booked (" << nDaughtersBooked << ")! Aborting, no daughters can be recorded." << std::endl;
+    for (int idau=0; idau<getNDaughters(); idau++){
+      MELAParticle* part = getDaughter(idau);
+      if (part!=0) std::cout << "\t- Passed daughter " << idau << " (X, Y, Z, T, M, Id) = "
+        << part->x() << " " << part->y() << " " << part->z() << " " << part->t() << " " << part->m() << " " << part->id << std::endl;
+      else std::cout << "\t- Passed daughter " << idau << " = 0!" << std::endl;
+    }
+    for (unsigned int j=0; j<2; j++){ if (df[j]!=0) std::cout << "\t- df[" << j << "] (X, Y, Z, T, M, Id) = " << df[j]->x() << " " << df[j]->y() << " " << df[j]->z() << " " << df[j]->t() << " " << df[j]->m() << " " << df[j]->id << std::endl; }
+    for (unsigned int j=0; j<2; j++){ if (ds[j]!=0) std::cout << "\t- ds[" << j << "] (X, Y, Z, T, M, Id) = " << ds[j]->x() << " " << ds[j]->y() << " " << ds[j]->z() << " " << ds[j]->t() << " " << ds[j]->m() << " " << ds[j]->id << std::endl; }
+    return;
+  }
+
   if (
     (df[0]!=0 && df[1]!=0)
     &&
@@ -477,15 +497,15 @@ void MELACandidate::createAssociatedVs(std::vector<MELAParticle*>& particleArray
     double Qi = particleArray.at(i)->charge();
     int id_i = particleArray.at(i)->id;
 
-    for (unsigned int j = 1; j<particleArray.size(); j++){
-      if (j<=i) continue;
+    for (unsigned int j = i+1; j<particleArray.size(); j++){
       double Qj = particleArray.at(j)->charge();
       int id_j = particleArray.at(j)->id;
 
       int bosonId=-1;
-      if ((Qi+Qj)==0 && (id_i+id_j)==0) bosonId = (id_i==0 ? 0 : 23);
-      else if (
-        abs(Qi+Qj)==1 // W boson
+      if ((Qi+Qj)==0 && (id_i+id_j)==0) bosonId = (id_i==0 ? 0 : 23); // Z->(f,fb) or 0->(0,0)
+      else if (PDGHelpers::isAnUnknownJet(id_i) || PDGHelpers::isAnUnknownJet(id_j)) bosonId = 0; // 0->(q,0)/(0,qb)
+      else if ( // W->f fb'
+        abs(Qi+Qj)==1
         &&
         (
         ((PDGHelpers::isALepton(id_i) || PDGHelpers::isALepton(id_j)) && std::abs(id_i+id_j)==1) // Require SF lnu particle-antiparticle pairs
@@ -499,12 +519,16 @@ void MELACandidate::createAssociatedVs(std::vector<MELAParticle*>& particleArray
       if (bosonId!=-1){
         TLorentzVector pV = particleArray.at(i)->p4+particleArray.at(j)->p4;
         MELAParticle* boson = new MELAParticle(bosonId, pV);
+        // Order by f-f'b
         int firstdaughter = i, seconddaughter = j;
         if (
-          (particleArray.at(firstdaughter)->id<particleArray.at(seconddaughter)->id && !PDGHelpers::isAWBoson(bosonId))
+          (particleArray.at(firstdaughter)->id<particleArray.at(seconddaughter)->id)
+          &&
+          (
+          !PDGHelpers::isAWBoson(bosonId)
           ||
-          //(std::abs(particleArray.at(firstdaughter)->id)<std::abs(particleArray.at(seconddaughter)->id) && PDGHelpers::isAWBoson(bosonId)) // Order by nu-l / u-d
-          (particleArray.at(firstdaughter)->id<particleArray.at(seconddaughter)->id && particleArray.at(firstdaughter)->id<0 && PDGHelpers::isAWBoson(bosonId)) // Order by f-f'b
+          (particleArray.at(firstdaughter)->id<0 && PDGHelpers::isAWBoson(bosonId))
+          )
           ){
           firstdaughter = j; seconddaughter = i;
         }
@@ -526,7 +550,7 @@ void MELACandidate::testPreSelectedDaughters(){
 }
 
 
-bool MELACandidate::checkTopCandidateExists(MELATopCandidate* myParticle, std::vector<MELATopCandidate*>& particleArray){
+bool MELACandidate::checkTopCandidateExists(MELATopCandidate* myParticle, std::vector<MELATopCandidate*>& particleArray)const{
   for (std::vector<MELATopCandidate*>::iterator it = particleArray.begin(); it<particleArray.end(); it++){
     if ((*it)==myParticle) return true;
   }

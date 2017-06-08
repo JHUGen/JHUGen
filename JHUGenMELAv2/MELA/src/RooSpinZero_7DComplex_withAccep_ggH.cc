@@ -1,8 +1,4 @@
-#ifdef _def_melatools_
-#include <interface/RooSpinZero_7DComplex_withAccep_ggH.h>
-#else
-#include "../include/RooSpinZero_7DComplex_withAccep_ggH.h"
-#endif
+#include "RooSpinZero_7DComplex_withAccep_ggH.h"
 
 
 RooSpinZero_7DComplex_withAccep_ggH::RooSpinZero_7DComplex_withAccep_ggH(

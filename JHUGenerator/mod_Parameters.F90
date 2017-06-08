@@ -3,7 +3,7 @@ implicit none
 save
 !
 !
-character(len=6),parameter :: JHUGen_Version="v7.0.2"
+character(len=6),parameter :: JHUGen_Version="v7.0.3"
 !
 !
 !=====================================================
@@ -117,18 +117,28 @@ logical, public :: RandomizeVVdecays = .true.    ! randomize DecayMode1 and Deca
 
 logical, public :: UseUnformattedRead = .false.  !Set this to true if the regular reading fails for whatever reason
 
-logical, public :: H_DK =.false.                 ! default to false so H in V* > VH (Process = 50) does not decay to bbbar
+logical, public :: HbbDecays =.false.                 ! default to false so H in V* > VHiggs (Process = 50) does not decay to bbbar
 
 !leave this one as a parameter, no reason to ever turn it off
 logical, public, parameter :: importExternal_LHEinit = .true.
 !=====================================================
 
+! gg > ZH
+character(len=2), public :: VHiggs_PC = "tri"                    ! VH partonic channel and mode selection, in development.
+                                                            ! "gg" ( = triangles + boxes of gg)
+                                                            ! "qq" ( = q qbar @LO)
+                                                            ! "lo" ( = q qbar @LO)
+                                                            ! "tr" ( = triangles of gg)
+                                                            ! "bo" ( = boxes of gg)
+                                                            ! "nl" ( = full oneloop = q qbar @LO + NLO + gg + gq)
+! gg > ZH
+!=====================================================
 
 !=====================================================
 !cuts - should be set on the command line
-real(8), public :: pTjetcut = -1d0*GeV                        ! jet min pt, default is set in main (0 in VH, 15 GeV otherwise)
-real(8), public :: Rjet = -1d0                                ! jet deltaR, anti-kt algorithm, default is set in main (0 in VH, 0.3 otherwise)
-real(8), public :: mJJcut = 0d0*GeV                           ! minimum mJJ for VBF, HJJ, bbH, VH
+real(8), public :: pTjetcut = -1d0*GeV                        ! jet min pt, default is set in main (0 in VHiggs, 15 GeV otherwise)
+real(8), public :: Rjet = -1d0                                ! jet deltaR, anti-kt algorithm, default is set in main (0 in VHiggs, 0.3 otherwise)
+real(8), public :: mJJcut = 0d0*GeV                           ! minimum mJJ for VBF, HJJ, bbH, VHiggs
 real(8), public :: m4l_minmax(1:2) = (/ -1d0,-1d0 /)*GeV      ! min and max for m_4l in off-shell VBF production;   default is (-1,-1): m_4l ~ Higgs resonance (on-shell)
 logical, public :: includeGammaStar = .false.                 ! include offshell photons?
 real(8), public :: MPhotonCutoff = 4d0*GeV                    ! minimum |mass| for offshell photons when includeGammaStar = .true.
@@ -596,6 +606,7 @@ integer, public, parameter :: pdfATop_ = -6 ! Dummy
 
 real(dp), public, parameter :: pi =3.141592653589793238462643383279502884197_dp
 real(dp), public, parameter :: sqrt2 = 1.4142135623730950488016887242096980786_dp
+real(dp), public, parameter :: gamma_0 = 0.5772156649015328606065120900824024310421_dp  !Euler–Mascheroni constant
 real(dp), public, parameter :: pisq = pi**2
 real(8), public, parameter :: one = 1.0d0, mone = -1.0d0
 real(8), public, parameter :: half  = 0.5d0,two = 2.0d0
@@ -1336,8 +1347,6 @@ integer :: DKMode
 END FUNCTION
 
 
-
-
 FUNCTION IsAWDecay(DKMode)
 implicit none
 logical :: IsAWDecay
@@ -1362,7 +1371,6 @@ integer :: DKMode
 END FUNCTION
 
 
-
 FUNCTION IsAPhoton(DKMode)
 implicit none
 logical :: IsAPhoton
@@ -1380,24 +1388,44 @@ END FUNCTION
 
 
 
+FUNCTION IsDownTypeQuark(PartType)
+implicit none
+logical :: IsDownTypeQuark
+integer :: PartType
+   IsDownTypeQuark = ( abs(PartType).eq.abs(Dn_) .or. abs(PartType).eq.abs(Str_) .or. abs(PartType).eq.abs(Bot_) )
+END FUNCTION
+FUNCTION IsLHEDownTypeQuark(PartType)
+implicit none
+logical :: IsLHEDownTypeQuark
+integer :: PartType
+   IsLHEDownTypeQuark = ( abs(PartType).eq.1 .or. abs(PartType).eq.3 .or. abs(PartType).eq.5 )
+END FUNCTION
 
-
+FUNCTION IsUpTypeQuark(PartType)
+implicit none
+logical :: IsUpTypeQuark
+integer :: PartType
+   IsUpTypeQuark = ( abs(PartType).eq.abs(Up_) .or. abs(PartType).eq.abs(Chm_) .or. abs(PartType).eq.abs(Top_) )
+END FUNCTION
+FUNCTION IsLHEUpTypeQuark(PartType)
+implicit none
+logical :: IsLHEUpTypeQuark
+integer :: PartType
+   IsLHEUpTypeQuark = ( abs(PartType).eq.2 .or. abs(PartType).eq.4 .or. abs(PartType).eq.6 )
+END FUNCTION
 
 FUNCTION IsAQuark(PartType)
 implicit none
 logical :: IsAQuark
 integer :: PartType
-
-
-  if( abs(PartType).ge.1 .and. abs(PartType).le.6 ) then
-     IsAQuark = .true.
-  else
-     IsAQuark=.false.
-  endif
-
+   IsAQuark=IsUpTypeQuark(PartType) .or. IsDownTypeQuark(PartType)
 END FUNCTION
-
-
+FUNCTION IsLHEAQuark(PartType)
+implicit none
+logical :: IsLHEAQuark
+integer :: PartType
+   IsLHEAQuark=IsLHEUpTypeQuark(PartType) .or. IsLHEDownTypeQuark(PartType)
+END FUNCTION
 
 
 
@@ -1405,62 +1433,42 @@ FUNCTION IsANeutrino(PartType)
 implicit none
 logical :: IsANeutrino
 integer :: PartType
-
-
-  if( abs(PartType).ge.14 .and. abs(PartType).le.16 ) then
-     IsANeutrino = .true.
-  else
-     IsANeutrino=.false.
-  endif
-
+   IsANeutrino = ( abs(PartType).eq.abs(NuE_) .or. abs(PartType).eq.abs(NuM_) .or. abs(PartType).eq.abs(NuT_) )
 END FUNCTION
-FUNCTION IsALHELepton(PartType)! note that lepton means charged lepton here
+FUNCTION IsALHENeutrino(PartType)
 implicit none
-logical :: IsALHELepton
+logical :: IsALHENeutrino
 integer :: PartType
-
-
-  if( abs(PartType).eq.11 .or. abs(PartType).eq.13 .or. abs(PartType).eq.15 ) then
-     IsALHELepton = .true.
-  else
-     IsALHELepton=.false.
-  endif
-
+   IsALHENeutrino = ( abs(PartType).eq.12 .or. abs(PartType).eq.14 .or. abs(PartType).eq.16 )
 END FUNCTION
-
-
 
 FUNCTION IsALepton(PartType)! note that lepton means charged lepton here
 implicit none
 logical :: IsALepton
 integer :: PartType
-
-
-  if( abs(PartType).eq.ElP_ .or. abs(PartType).eq.MuP_ .or. abs(PartType).eq.TaP_ ) then
-     IsALepton = .true.
-  else
-     IsALepton=.false.
-  endif
-
+  IsALepton = ( abs(PartType).eq.abs(ElP_) .or. abs(PartType).eq.abs(MuP_) .or. abs(PartType).eq.abs(TaP_) )
 END FUNCTION
-
+FUNCTION IsALHELepton(PartType)! note that lepton means charged lepton here
+implicit none
+logical :: IsALHELepton
+integer :: PartType
+  IsALHELepton = ( abs(PartType).eq.11 .or. abs(PartType).eq.13 .or. abs(PartType).eq.15 )
+END FUNCTION
 
 
 FUNCTION IsABoson(PartType)
 implicit none
 logical :: IsABoson
 integer :: PartType
-
-
-  if( abs(PartType).eq.11 .or. abs(PartType).eq.12 .or. abs(PartType).eq.13 .or. abs(PartType).eq.25 ) then
-     IsABoson = .true.
-  else
-     IsABoson=.false.
-  endif
-
-
+  IsABoson = ( abs(PartType).eq.abs(Pho_) .or. abs(PartType).eq.abs(Z0_) .or. abs(PartType).eq.abs(Wp_) .or. abs(PartType).eq.abs(Hig_) )
 END FUNCTION
 
+FUNCTION IsALHEBoson(PartType)
+implicit none
+logical :: IsALHEBoson
+integer :: PartType
+  IsALHEBoson = ( abs(PartType).ge.22 .and. abs(PartType).le.25 )
+END FUNCTION
 
 function CoupledVertex(id,hel,useAHcoupl)
    implicit none
@@ -1708,7 +1716,7 @@ implicit none
    cR_QDn = -twosc*QdR
    cL_QDn = -twosc*QdL
 
-   ! Normalizations used in VH and VBF
+   ! Normalizations used in VHiggs and VBF
    couplWffsq = gwsq/2.0_dp
    couplZffsq = gwsq/4.0_dp/(1.0_dp-xw)
    couplAZff = -gwsq*sitW/2.0_dp/sqrt(1.0_dp-xw)

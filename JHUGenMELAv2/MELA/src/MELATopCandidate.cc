@@ -1,4 +1,4 @@
-#include <interface/MELATopCandidate.h>
+#include "MELATopCandidate.h"
 
 using namespace std;
 

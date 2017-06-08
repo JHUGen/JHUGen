@@ -95,7 +95,7 @@ end subroutine
 subroutine SetHDK(flag)
 implicit none
 logical, intent(in) :: flag
-   H_DK=flag
+   HbbDecays=flag
 end subroutine
 
 subroutine SetMuRenFac(muren,mufac)

@@ -3,18 +3,16 @@
 
 #include "TMCFM.hh"
 #include "MELACandidate.h"
-#include <iostream>
-#include <vector>
-#include <cmath>
 
 
 class MelaIO{
-private:
+protected:
 
   double partonWeight[2][nmsq];
   double MEsq[nmsq][nmsq];
   double weightedMEsq[nmsq][nmsq];
   double sumME;
+  double MEConst;
 
   double Qren;
   double Qfac;
@@ -32,6 +30,7 @@ public:
 
   void reset(){
     sumME=0;
+    MEConst=1;
     for (int ix=0; ix<nmsq; ix++){
       for (int pp=0; pp<2; pp++) partonWeight[pp][ix]=0;
       for (int iy=0; iy<nmsq; iy++){
@@ -106,6 +105,9 @@ public:
   virtual ~MelaIO(){};
 
   double getSumME()const{ return sumME; }
+  void setMEConst(const double& val){ MEConst=val; }
+  void setMEConst(const float& val){ MEConst=(double)val; }
+  double getMEConst()const{ return MEConst; }
   void getWeightedMEArray(double MEsq_[nmsq][nmsq]){
     for (int ix=0; ix<nmsq; ix++){
       for (int iy=0; iy<nmsq; iy++) MEsq_[ix][iy] = weightedMEsq[ix][iy];

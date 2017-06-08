@@ -1,18 +1,14 @@
 #ifndef ROOSPINTWO
 #define ROOSPINTWO
 
-#ifdef _def_melatools_
-#include <RooSpin.h>
-#else
 #include "RooSpin.h"
-#endif
 
 
 class RooSpinTwo : public RooSpin {
 public:
 
   struct modelCouplings{
-    RooAbsReal* bList[10][2];
+    RooAbsReal* bList[SIZE_GVV][2];
     RooRealVar* Lambda;
     RooRealVar* f_spinz1; // Set to 1 for qqb production
     RooRealVar* f_spinz2; // Set to 0 for qqb production
@@ -32,6 +28,7 @@ public:
   virtual TObject* clone(const char* newname) const = 0;
   inline virtual ~RooSpinTwo(){}
 
+  virtual Double_t evaluate() const = 0;
   virtual Int_t getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* rangeName=0) const = 0;
   virtual Double_t analyticalIntegral(Int_t code, const char* rangeName=0) const = 0;
 
@@ -63,8 +60,6 @@ protected:
 
   RooRealProxy f_spinz1;
   RooRealProxy f_spinz2;
-
-  virtual Double_t evaluate() const = 0;
 
   virtual void evaluatePolarizationTerms(std::vector<Double_t>& Axxyyterm, const Int_t code, bool isGammaV1=false, bool isGammaV2=false) const = 0;
   

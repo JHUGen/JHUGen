@@ -1,8 +1,4 @@
-#ifdef _def_melatools_
-#include <interface/SpinPdfFactory.h>
-#else
-#include "../include/SpinPdfFactory.h"
-#endif
+#include "SpinPdfFactory.h"
 
 
 SpinPdfFactory::SpinPdfFactory(RooSpin::modelMeasurables measurables_, RooSpin::VdecayType V1decay_, RooSpin::VdecayType V2decay_, Bool_t OnshellH_) :
