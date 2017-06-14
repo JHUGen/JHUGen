@@ -28,7 +28,7 @@ class MelaMaker {
     ~MelaMaker() {
       for (auto it : stored_melas) {
         it.second->setCandidateDecayMode(TVar::CandidateDecay_WW);
-        delete it.second;
+//        delete it.second;   //gives glibc error in deleting sig_FFT_ in SuperMela destructor.   (???!!!)
       }
     }
     Mela& getmela(int erg_tev, float mPOLE, TVar::VerbosityLevel verbosity){
