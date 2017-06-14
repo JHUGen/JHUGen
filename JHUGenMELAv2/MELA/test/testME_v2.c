@@ -52,7 +52,7 @@ class MelaMaker {
 MelaMaker melamaker;
 
 void testME_Dec_MCFM_Ping(int flavor=2, int useMothers=0, bool useConstants=false){
-  ofstream tout("testME_Dec_MCFM_Ping.out");
+  ofstream tout(TString("testME_Dec_MCFM_Ping_")+long(flavor)+"_"+long(useMothers)+"_"+long(useConstants)+".out");
   streambuf* coutbuf = cout.rdbuf();
   cout.rdbuf(tout.rdbuf());
 
@@ -2863,7 +2863,7 @@ void testME_ProdDec_MCFM_JHUGen_JJQCDZZWW_Comparison_Ping(int motherflavor=0, in
 
 
 void testME_ProdDec_MCFM_Ping(int flavor=2){
-  ofstream tout("testME_ProdDec_MCFM_Ping.out");
+  ofstream tout(TString("testME_ProdDec_MCFM_Ping_")+long(flavor)+".out");
   streambuf* coutbuf = cout.rdbuf();
   cout.rdbuf(tout.rdbuf());
 
