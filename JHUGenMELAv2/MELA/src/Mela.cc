@@ -48,6 +48,7 @@ Mela::Mela(
   double mh_,
   TVar::VerbosityLevel verbosity_
   ) :
+  melaRandomNumber(35797),
   LHCsqrts(LHCsqrts_),
   myVerbosity_(verbosity_),
   ZZME(0),
@@ -132,13 +133,13 @@ Mela::Mela(
   /***** CONSTANTS FOR MATRIX ELEMENTS *****/
   getPConstantHandles();
 
+  
   /***** SuperMELA *****/
   // Deactivate generation messages
   RooMsgService::instance().getStream(1).removeTopic(NumIntegration);
   RooMsgService::instance().setStreamStatus(1, kFALSE);
   RooMsgService::instance().setStreamStatus(0, kFALSE);// silence also the error messages, but should really be looked at.
 
-  myRandomNumber=new TRandom3(35797);
   if (myVerbosity_>=TVar::DEBUG) cout << "Start superMELA" << endl;
   int superMELA_LHCsqrts = LHCsqrts;
   if (superMELA_LHCsqrts > maxSqrts) superMELA_LHCsqrts = maxSqrts;
@@ -150,6 +151,13 @@ Mela::Mela(
   super->SetVerbosity((myVerbosity_>=TVar::DEBUG));
   super->init();
 
+
+  /***** SuperDijetMela *****/
+  float superDijetSqrts = LHCsqrts;
+  if (superDijetSqrts<13.) superDijetSqrts=13.; // Dijet resolution does not exist for 7 or 8 TeV
+  superDijet = new SuperDijetMela(superDijetSqrts, myVerbosity_);
+
+  // Initialize the couplings to 0 and end Mela constructor
   reset_SelfDCouplings();
   if (myVerbosity_>=TVar::DEBUG) cout << "End Mela constructor" << endl;
 }
@@ -177,9 +185,9 @@ Mela::~Mela(){
   delete Y_rrv;
   delete upFrac_rrv;
 
-  delete ZZME;
+  delete superDijet;
   delete super;
-  delete myRandomNumber;
+  delete ZZME;
 
   // Delete ME constant handles
   deletePConstantHandles();
@@ -203,7 +211,12 @@ void Mela::setProcess(TVar::Process myModel, TVar::MatrixElement myME, TVar::Pro
   myModel_ = myModel;
   if (ZZME!=0) ZZME->set_Process(myModel_, myME_, myProduction_);
 }
-void Mela::setVerbosity(TVar::VerbosityLevel verbosity_){ myVerbosity_=verbosity_; if (ZZME!=0) ZZME->set_Verbosity(myVerbosity_); if (super!=0) super->SetVerbosity((myVerbosity_>=TVar::DEBUG)); }
+void Mela::setVerbosity(TVar::VerbosityLevel verbosity_){
+  myVerbosity_=verbosity_;
+  if (ZZME!=0) ZZME->set_Verbosity(myVerbosity_);
+  if (super!=0) super->SetVerbosity((myVerbosity_>=TVar::DEBUG));
+  if (superDijet!=0) superDijet->SetVerbosity(myVerbosity_);
+}
 // Should be called per-event
 void Mela::setMelaPrimaryHiggsMass(double myHiggsMass){ ZZME->set_PrimaryHiggsMass(myHiggsMass); }
 void Mela::setMelaHiggsMass(double myHiggsMass, int index){ ZZME->set_mHiggs(myHiggsMass, index); }
@@ -1324,7 +1337,7 @@ void Mela::computePM4l(TVar::SuperMelaSyst syst, float& prob){
         float sigmaCB=float(super->GetSigShapeParameter("sigmaCB"));
         if (syst == TVar::SMSyst_ScaleUp) mZZtmp = mZZ*(1.0+meanErr);
         else if (syst == TVar::SMSyst_ScaleDown) mZZtmp = mZZ*(1.0-meanErr);
-        else if (syst == TVar::SMSyst_ResUp || syst ==  TVar::SMSyst_ResDown) mZZtmp= myRandomNumber->Gaus(mZZ, sigmaErr*sigmaCB);
+        else if (syst == TVar::SMSyst_ResUp || syst ==  TVar::SMSyst_ResDown) mZZtmp=melaRandomNumber.Gaus(mZZ, sigmaErr*sigmaCB);
 
         std::pair<double, double> m4lP = super->M4lProb(mZZtmp);
         if (myModel_ == TVar::HSMHiggs) prob = m4lP.first;
@@ -1392,10 +1405,11 @@ bool Mela::configureAnalyticalPDFs(){
   // Configure the analytical calculations 
   // 
   bool noPass=false;
+  pdf=0;
 
-  if (myModel_==TVar::bkgZZ)  pdf = qqZZmodel;
+  if (myModel_==TVar::bkgZZ) pdf = qqZZmodel;
   else if (myProduction_ == TVar::JJQCD || myProduction_ == TVar::JJVBF);
-  else if (myProduction_ == TVar::Lep_ZH || myProduction_ == TVar::Lep_WH || myProduction_ == TVar::Had_ZH || myProduction_ == TVar::Had_WH || myProduction_ == TVar::GammaH);
+  else if (myProduction_ == TVar::Lep_ZH || myProduction_ == TVar::Lep_WH || myProduction_ == TVar::Had_ZH || myProduction_ == TVar::Had_WH || myProduction_ == TVar::GammaH); // To be implemented
   else if (
     myModel_ == TVar::HSMHiggs
     || myModel_ == TVar::H0minus || myModel_ == TVar::D_g1g4 || myModel_ == TVar::D_g1g4_pi_2
@@ -1573,11 +1587,12 @@ bool Mela::configureAnalyticalPDFs(){
       spin2Model->makeParamsConst(true);
     }
   }
-  else if (myME_ == TVar::ANALYTICAL){
+  else{
     cout << "Mela::configureAnalyticalPDFs -> ERROR TVar::Process not applicable!!! ME: " << myME_ << ", model: " << myModel_ << endl;
     noPass=true;
   }
 
+  if (pdf==0) noPass=true;
   return (!noPass);
 }
 
@@ -2062,5 +2077,11 @@ void Mela::deletePConstantHandles(){
   if (pAvgSmooth_MCFM_ZZQQB_bkgZZ_4e!=0) delete pAvgSmooth_MCFM_ZZQQB_bkgZZ_4e;
   if (pAvgSmooth_MCFM_ZZQQB_bkgZZ_2mu2e!=0) delete pAvgSmooth_MCFM_ZZQQB_bkgZZ_2mu2e;
   //
+}
+
+void Mela::computeDijetConvBW(float& prob){
+  melaCand = getCurrentCandidate();
+  prob = superDijet->GetConvBW(myProduction_, melaCand);
+  reset_CandRef();
 }
 
