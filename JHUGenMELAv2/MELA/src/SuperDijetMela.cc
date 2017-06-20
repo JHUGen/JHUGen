@@ -1,19 +1,3 @@
-/************** MELA interface to MCFM/JHUGen-MELA *************
-
-Notes:
-1) Each specific type of computeP* function comes with its wrapper for common use.
-   Removing these wrappers from Mela will not introduce any bugs, but
-   it might affect packages that depend on it (eg. MEMCalculators).
-2) ...
-
-Please adhere to the following coding conventions:
-1) Never put return statements in the middle of the computeP* functions unless it is a wrapper.
-   Functions calling the Mela::ZZME member have to reset the couplings, so an abrupt termination
-   does not reset the couplings properly.
-2) ...
-
-***************************************************************/
-
 #include <iostream>
 #include <cassert>
 #include "MELACandidate.h"

@@ -1098,38 +1098,39 @@ void TUtil::SetEwkCouplingParameters(double ext_Gf, double ext_aemmz, double ext
   */
 }
 void TUtil::SetMass(double inmass, int ipart){
+  const int ipartabs = abs(ipart);
   bool runcoupling_mcfm=false;
   bool runcoupling_jhugen=false;
 
   // MCFM masses
   // Tprime and bprime masses are not defined in masses.f
-  if (abs(ipart)==8) spinzerohiggs_anomcoupl_.mt_4gen = inmass;
-  else if (abs(ipart)==7) spinzerohiggs_anomcoupl_.mb_4gen = inmass;
-  else if (abs(ipart)==6){ masses_mcfm_.mt=inmass; runcoupling_mcfm=true; }
-  else if (abs(ipart)==5){ masses_mcfm_.mb=inmass; masses_mcfm_.mbsq = pow(masses_mcfm_.mb, 2); runcoupling_mcfm=true; }
-  else if (abs(ipart)==4){ masses_mcfm_.mc=inmass; masses_mcfm_.mcsq = pow(masses_mcfm_.mc, 2); runcoupling_mcfm=true; }
-  else if (abs(ipart)==3) masses_mcfm_.ms=inmass;
-  else if (abs(ipart)==2) masses_mcfm_.mu=inmass;
-  else if (abs(ipart)==1) masses_mcfm_.md=inmass;
-  else if (abs(ipart)==11) masses_mcfm_.mel=inmass;
-  else if (abs(ipart)==13) masses_mcfm_.mmu=inmass;
-  else if (abs(ipart)==15){ masses_mcfm_.mtau=inmass; masses_mcfm_.mtausq = pow(masses_mcfm_.mtau, 2); }
-  else if (abs(ipart)==23){ masses_mcfm_.zmass=inmass; ewinput_.zmass_inp = inmass; runcoupling_mcfm=true; }
-  else if (abs(ipart)==24){ masses_mcfm_.wmass=inmass; ewinput_.wmass_inp = inmass; runcoupling_mcfm=true; }
-  else if (abs(ipart)==25) masses_mcfm_.hmass=inmass;
+  if (ipartabs==8) spinzerohiggs_anomcoupl_.mt_4gen = inmass;
+  else if (ipartabs==7) spinzerohiggs_anomcoupl_.mb_4gen = inmass;
+  else if (ipartabs==6){ masses_mcfm_.mt=inmass; runcoupling_mcfm=true; }
+  else if (ipartabs==5){ masses_mcfm_.mb=inmass; masses_mcfm_.mbsq = pow(masses_mcfm_.mb, 2); runcoupling_mcfm=true; }
+  else if (ipartabs==4){ masses_mcfm_.mc=inmass; masses_mcfm_.mcsq = pow(masses_mcfm_.mc, 2); runcoupling_mcfm=true; }
+  else if (ipartabs==3) masses_mcfm_.ms=inmass;
+  else if (ipartabs==2) masses_mcfm_.mu=inmass;
+  else if (ipartabs==1) masses_mcfm_.md=inmass;
+  else if (ipartabs==11) masses_mcfm_.mel=inmass;
+  else if (ipartabs==13) masses_mcfm_.mmu=inmass;
+  else if (ipartabs==15){ masses_mcfm_.mtau=inmass; masses_mcfm_.mtausq = pow(masses_mcfm_.mtau, 2); }
+  else if (ipartabs==23){ masses_mcfm_.zmass=inmass; ewinput_.zmass_inp = inmass; runcoupling_mcfm=true; }
+  else if (ipartabs==24){ masses_mcfm_.wmass=inmass; ewinput_.wmass_inp = inmass; runcoupling_mcfm=true; }
+  else if (ipartabs==25) masses_mcfm_.hmass=inmass;
 
   // JHUGen masses
   if (
-    abs(ipart)<=6
+    ipartabs<=6
     ||
-    (abs(ipart)>=11 && abs(ipart)<=16)
+    (ipartabs>=11 && ipartabs<=16)
     ||
-    abs(ipart)==23 || abs(ipart)==24 || abs(ipart)==25
+    ipartabs==23 || ipartabs==24 || ipartabs==25
     ){
     runcoupling_jhugen=(
-      abs(ipart)==23
+      ipartabs==23
       ||
-      abs(ipart)==24
+      ipartabs==24
       );
     const double GeV=1./100.;
     double jinmass = inmass*GeV;
@@ -1141,14 +1142,14 @@ void TUtil::SetMass(double inmass, int ipart){
   if (runcoupling_mcfm || runcoupling_jhugen) SetEwkCouplingParameters(ewcouple_.Gf, em_.aemmz, masses_mcfm_.wmass, masses_mcfm_.zmass, ewcouple_.xw, ewscheme_.ewscheme);
 }
 void TUtil::SetDecayWidth(double inwidth, int ipart){
+  const int ipartabs = abs(ipart);
   // No need to recalculate couplings
-
   // MCFM masses
-  if (abs(ipart)==6) masses_mcfm_.twidth=inwidth;
-  else if (abs(ipart)==15) masses_mcfm_.tauwidth=inwidth;
-  else if (abs(ipart)==23) masses_mcfm_.zwidth=inwidth;
-  else if (abs(ipart)==24) masses_mcfm_.wwidth=inwidth;
-  else if (abs(ipart)==25) masses_mcfm_.hwidth=inwidth;
+  if (ipartabs==6) masses_mcfm_.twidth=inwidth;
+  else if (ipartabs==15) masses_mcfm_.tauwidth=inwidth;
+  else if (ipartabs==23) masses_mcfm_.zwidth=inwidth;
+  else if (ipartabs==24) masses_mcfm_.wwidth=inwidth;
+  else if (ipartabs==25) masses_mcfm_.hwidth=inwidth;
 
   // JHUGen masses
   const double GeV=1./100.;
@@ -1176,28 +1177,30 @@ void TUtil::SetCKMElements(double* invckm_ud, double* invckm_us, double* invckm_
 }
 
 double TUtil::GetMass(int ipart){
-  if (abs(ipart)==8) return spinzerohiggs_anomcoupl_.mt_4gen;
-  else if (abs(ipart)==7) return spinzerohiggs_anomcoupl_.mb_4gen;
-  else if (abs(ipart)==6) return masses_mcfm_.mt;
-  else if (abs(ipart)==5) return masses_mcfm_.mb;
-  else if (abs(ipart)==4) return masses_mcfm_.mc;
-  else if (abs(ipart)==3) return masses_mcfm_.ms;
-  else if (abs(ipart)==2) return masses_mcfm_.mu;
-  else if (abs(ipart)==1) return masses_mcfm_.md;
-  else if (abs(ipart)==11) return masses_mcfm_.mel;
-  else if (abs(ipart)==13) return masses_mcfm_.mmu;
-  else if (abs(ipart)==15) return masses_mcfm_.mtau;
-  else if (abs(ipart)==23) return masses_mcfm_.zmass;
-  else if (abs(ipart)==24) return masses_mcfm_.wmass;
-  else if (abs(ipart)==25) return masses_mcfm_.hmass;
+  const int ipartabs = abs(ipart);
+
+  if (ipartabs==8) return spinzerohiggs_anomcoupl_.mt_4gen;
+  else if (ipartabs==7) return spinzerohiggs_anomcoupl_.mb_4gen;
+  else if (ipartabs==6) return masses_mcfm_.mt;
+  else if (ipartabs==5) return masses_mcfm_.mb;
+  else if (ipartabs==4) return masses_mcfm_.mc;
+  else if (ipartabs==3) return masses_mcfm_.ms;
+  else if (ipartabs==2) return masses_mcfm_.mu;
+  else if (ipartabs==1) return masses_mcfm_.md;
+  else if (ipartabs==11) return masses_mcfm_.mel;
+  else if (ipartabs==13) return masses_mcfm_.mmu;
+  else if (ipartabs==15) return masses_mcfm_.mtau;
+  else if (ipartabs==23) return masses_mcfm_.zmass;
+  else if (ipartabs==24) return masses_mcfm_.wmass;
+  else if (ipartabs==25) return masses_mcfm_.hmass;
   else{
     // JHUGen masses
     if (
-      abs(ipart)<=6
+      ipartabs<=6
       ||
-      (abs(ipart)>=11 && abs(ipart)<=16)
+      (ipartabs>=11 && ipartabs<=16)
       ||
-      abs(ipart)==23 || abs(ipart)==24 || abs(ipart)==25
+      ipartabs==23 || ipartabs==24 || ipartabs==25
       ){
       const double GeV=1./100.;
       int jpart = convertLHEreverse(&ipart);
@@ -1209,14 +1212,16 @@ double TUtil::GetMass(int ipart){
   }
 }
 double TUtil::GetDecayWidth(int ipart){
-  // MCFM masses
-  if (abs(ipart)==6) return masses_mcfm_.twidth;
-  else if (abs(ipart)==15) return masses_mcfm_.tauwidth;
-  else if (abs(ipart)==23) return masses_mcfm_.zwidth;
-  else if (abs(ipart)==24) return masses_mcfm_.wwidth;
-  else if (abs(ipart)==25) return masses_mcfm_.hwidth;
+  const int ipartabs = abs(ipart);
+
+  // MCFM widths
+  if (ipartabs==6) return masses_mcfm_.twidth;
+  else if (ipartabs==15) return masses_mcfm_.tauwidth;
+  else if (ipartabs==23) return masses_mcfm_.zwidth;
+  else if (ipartabs==24) return masses_mcfm_.wwidth;
+  else if (ipartabs==25) return masses_mcfm_.hwidth;
   else{
-    // JHUGen masses
+    // JHUGen widths
     const double GeV=1./100.;
     int jpart = convertLHEreverse(&ipart);
     double joutwidth = __modparameters_MOD_getdecaywidth(&jpart);
@@ -3716,47 +3721,60 @@ double TUtil::SumMatrixElementPDF(
           || production==TVar::JJVBF_S || production==TVar::JJEW_S
           || production==TVar::JJVBF_TU || production==TVar::JJEW_TU
           ){
-          qq_zzqq_(p4[0], msq[0]);
-          if (PDGHelpers::isAnUnknownJet(id[partOrder.size()+2]) && PDGHelpers::isAnUnknownJet(id[partOrder.size()+3])){
-            for (unsigned int ix=0; ix<4; ix++){
-              for (int ip=0; ip<mxpart; ip++) p4_tmp[ix][ip]=p4[ix][ip];
-              swap(p4_tmp[ix][partOrder.size()+2], p4_tmp[ix][partOrder.size()+3]);
-            }
-            qq_zzqq_(p4_tmp[0], msq_tmp[0]);
-            for (int iquark=-5; iquark<=5; iquark++){ for (int jquark=-5; jquark<=5; jquark++){ msq[jquark+5][iquark+5] = (msq[jquark+5][iquark+5] + msq_tmp[jquark+5][iquark+5]); if (iquark==jquark) msq[jquark+5][iquark+5]*=0.5; } }
-          }
-          else if (PDGHelpers::isAnUnknownJet(id[partOrder.size()+2]) || PDGHelpers::isAnUnknownJet(id[partOrder.size()+3])){
-            for (unsigned int ix=0; ix<4; ix++){
-              for (int ip=0; ip<mxpart; ip++) p4_tmp[ix][ip]=p4[ix][ip];
-              swap(p4_tmp[ix][partOrder.size()+2], p4_tmp[ix][partOrder.size()+3]);
-            }
-            TString strlabel[2] ={ (plabel_.plabel)[7], (plabel_.plabel)[6] }; for (unsigned int il=0; il<2; il++) strlabel[il].Resize(2);
-            for (int ip=0; ip<mxpart; ip++){
-              if (ip!=6 && ip!=7) sprintf((plabel_.plabel)[ip], (plabel_.plabel)[ip]);
-              else sprintf((plabel_.plabel)[ip], strlabel[ip-6].Data());
-            }
-            qq_zzqq_(p4_tmp[0], msq_tmp[0]);
-            if (verbosity>=TVar::DEBUG){
-              cout << "TUtil::SumMatrixElementPDF: Adding missing contributions:\n";
-              cout << "\tplabels:\n";
-              for (int ip=0; ip<mxpart; ip++) cout << "\t[" << ip << "]=" << (plabel_.plabel)[ip] << endl;
-              cout << "\tMEsq initial:" << endl;
-              for (int iquark=-5; iquark<=5; iquark++){
-                for (int jquark=-5; jquark<=5; jquark++) cout << msq[jquark+5][iquark+5] << '\t';
-                cout << endl;
+          if (process==TVar::bkgZZ){
+            qq_zzqq_bkg_(p4[0], msq[0]);
+            if (PDGHelpers::isAnUnknownJet(id[partOrder.size()+2]) && PDGHelpers::isAnUnknownJet(id[partOrder.size()+3])){
+              for (unsigned int ix=0; ix<4; ix++){
+                for (int ip=0; ip<mxpart; ip++) p4_tmp[ix][ip]=p4[ix][ip];
+                swap(p4_tmp[ix][partOrder.size()+2], p4_tmp[ix][partOrder.size()+3]);
               }
-              cout << "\tMEsq added:" << endl;
-              for (int iquark=-5; iquark<=5; iquark++){
-                for (int jquark=-5; jquark<=5; jquark++) cout << msq_tmp[jquark+5][iquark+5] << '\t';
-                cout << endl;
-              }
-            }
-            for (int iquark=-5; iquark<=5; iquark++){
-              for (int jquark=-5; jquark<=5; jquark++){
-                if (msq[jquark+5][iquark+5]==0.) msq[jquark+5][iquark+5] = msq_tmp[jquark+5][iquark+5];
-              }
+              qq_zzqq_bkg_(p4_tmp[0], msq_tmp[0]);
+              for (int iquark=-5; iquark<=5; iquark++){ for (int jquark=-5; jquark<=5; jquark++){ msq[jquark+5][iquark+5] = (msq[jquark+5][iquark+5] + msq_tmp[jquark+5][iquark+5]); if (iquark==jquark) msq[jquark+5][iquark+5]*=0.5; } }
             }
           }
+          else{//
+            qq_zzqq_(p4[0], msq[0]);
+            if (PDGHelpers::isAnUnknownJet(id[partOrder.size()+2]) && PDGHelpers::isAnUnknownJet(id[partOrder.size()+3])){
+              for (unsigned int ix=0; ix<4; ix++){
+                for (int ip=0; ip<mxpart; ip++) p4_tmp[ix][ip]=p4[ix][ip];
+                swap(p4_tmp[ix][partOrder.size()+2], p4_tmp[ix][partOrder.size()+3]);
+              }
+              qq_zzqq_(p4_tmp[0], msq_tmp[0]);
+              for (int iquark=-5; iquark<=5; iquark++){ for (int jquark=-5; jquark<=5; jquark++){ msq[jquark+5][iquark+5] = (msq[jquark+5][iquark+5] + msq_tmp[jquark+5][iquark+5]); if (iquark==jquark) msq[jquark+5][iquark+5]*=0.5; } }
+            }
+            else if (PDGHelpers::isAnUnknownJet(id[partOrder.size()+2]) || PDGHelpers::isAnUnknownJet(id[partOrder.size()+3])){
+              for (unsigned int ix=0; ix<4; ix++){
+                for (int ip=0; ip<mxpart; ip++) p4_tmp[ix][ip]=p4[ix][ip];
+                swap(p4_tmp[ix][partOrder.size()+2], p4_tmp[ix][partOrder.size()+3]);
+              }
+              TString strlabel[2] ={ (plabel_.plabel)[7], (plabel_.plabel)[6] }; for (unsigned int il=0; il<2; il++) strlabel[il].Resize(2);
+              for (int ip=0; ip<mxpart; ip++){
+                if (ip!=6 && ip!=7) sprintf((plabel_.plabel)[ip], (plabel_.plabel)[ip]);
+                else sprintf((plabel_.plabel)[ip], strlabel[ip-6].Data());
+              }
+              qq_zzqq_(p4_tmp[0], msq_tmp[0]);
+              if (verbosity>=TVar::DEBUG){
+                cout << "TUtil::SumMatrixElementPDF: Adding missing contributions:\n";
+                cout << "\tplabels:\n";
+                for (int ip=0; ip<mxpart; ip++) cout << "\t[" << ip << "]=" << (plabel_.plabel)[ip] << endl;
+                cout << "\tMEsq initial:" << endl;
+                for (int iquark=-5; iquark<=5; iquark++){
+                  for (int jquark=-5; jquark<=5; jquark++) cout << msq[jquark+5][iquark+5] << '\t';
+                  cout << endl;
+                }
+                cout << "\tMEsq added:" << endl;
+                for (int iquark=-5; iquark<=5; iquark++){
+                  for (int jquark=-5; jquark<=5; jquark++) cout << msq_tmp[jquark+5][iquark+5] << '\t';
+                  cout << endl;
+                }
+              }
+              for (int iquark=-5; iquark<=5; iquark++){
+                for (int jquark=-5; jquark<=5; jquark++){
+                  if (msq[jquark+5][iquark+5]==0.) msq[jquark+5][iquark+5] = msq_tmp[jquark+5][iquark+5];
+                }
+              }
+            }
+          }//
         }
         else if (
           production==TVar::JJQCD || production==TVar::JJQCD_S || production==TVar::JJQCD_TU

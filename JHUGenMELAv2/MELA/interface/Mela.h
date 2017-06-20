@@ -205,6 +205,9 @@ public:
     float& prob
     );
 
+  //*** SuperJJMela ***//
+  void computeDijetConvBW(float& prob);
+
   //*** Dgg10 ***//
   void computeD_gg(
     TVar::MatrixElement myME,
@@ -344,8 +347,6 @@ protected:
   float getConstant_JHUGenUndecayed();
   float getConstant_4l();
   float getConstant_2l2q();
-
-  void computeDijetConvBW(float& prob);
 
 };
 

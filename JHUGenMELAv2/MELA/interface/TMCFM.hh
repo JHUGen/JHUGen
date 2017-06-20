@@ -327,6 +327,8 @@ extern "C" {
 
 #define qq_zzqq_ qq_zzqq_ // WBF-ZZ
   void qq_zzqq_(double* p, double* msq);
+#define qq_zzqq_bkg_ qq_zzqq_bkg_ // WBF-ZZ
+  void qq_zzqq_bkg_(double* p, double* msq);
 #define qq_wwqq_ qq_wwqq_ // WBF-WW
   void qq_wwqq_(double* p, double* msq);
 #define qq_vvqq_ qq_vvqq_ // WBF-VV

@@ -1069,12 +1069,12 @@ void testME_Dec_MCFM_Ping(int flavor=2, int useMothers=0, bool useConstants=fals
   tout.close();
 }
 
-void testME_VH_JHUGen_Ping(){
-  ofstream tout("testME_VH_JHUGen_Ping.out");
+void testME_VH_JHUGen_Ping(int erg_tev=13){
+  TString strtout = Form("testME_VH_JHUGen_%iTeV_Ping.out", erg_tev);
+  ofstream tout(strtout.Data());
   streambuf* coutbuf = cout.rdbuf();
   cout.rdbuf(tout.rdbuf());
 
-  int erg_tev=13;
   float mPOLE=125.;
   float wPOLE=4.07e-3;
 
@@ -1262,6 +1262,12 @@ void testME_VH_JHUGen_Ping(){
         mela.selfDHzzcoupl[0][gHIGGS_ZA_2][0]=1;
         mela.computeProdP_VH(p0hpluszgs_selfD, false, false);
         cout << "p0hpluszgs_selfD: " << p0hpluszgs_selfD << '\n' << endl;
+
+        if (prod==TVar::Had_ZH || prod==TVar::Had_WH){
+          float recoBW=0;
+          mela.computeDijetConvBW(recoBW);
+          cout << "Reco BW: " << recoBW << '\n' << endl;
+        }
 
         cout << "*******************************************************" << endl;
       }
