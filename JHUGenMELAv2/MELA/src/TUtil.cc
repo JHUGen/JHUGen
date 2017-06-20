@@ -3721,7 +3721,8 @@ double TUtil::SumMatrixElementPDF(
           || production==TVar::JJVBF_S || production==TVar::JJEW_S
           || production==TVar::JJVBF_TU || production==TVar::JJEW_TU
           ){
-          if (process==TVar::bkgZZ){
+          /*
+          if (process==TVar::bkgZZ){//
             qq_zzqq_bkg_(p4[0], msq[0]);
             if (PDGHelpers::isAnUnknownJet(id[partOrder.size()+2]) && PDGHelpers::isAnUnknownJet(id[partOrder.size()+3])){
               for (unsigned int ix=0; ix<4; ix++){
@@ -3733,6 +3734,7 @@ double TUtil::SumMatrixElementPDF(
             }
           }
           else{//
+            */
             qq_zzqq_(p4[0], msq[0]);
             if (PDGHelpers::isAnUnknownJet(id[partOrder.size()+2]) && PDGHelpers::isAnUnknownJet(id[partOrder.size()+3])){
               for (unsigned int ix=0; ix<4; ix++){
@@ -3774,7 +3776,7 @@ double TUtil::SumMatrixElementPDF(
                 }
               }
             }
-          }//
+          //}//
         }
         else if (
           production==TVar::JJQCD || production==TVar::JJQCD_S || production==TVar::JJQCD_TU
