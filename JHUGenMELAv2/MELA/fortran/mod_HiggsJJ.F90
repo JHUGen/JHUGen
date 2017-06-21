@@ -10,8 +10,9 @@ module modHiggsJJ
   public :: get_VBFchannelHash,get_VBFchannelHash_nosplit,get_HJJchannelHash,get_HJJchannelHash_nosplit,get_GENchannelHash,get_VBFoffshchannelHash
   public :: init_VBFoffshChannelHash,get_NumberOfChannels,get_VBFoffshChannel,remove_VBFoffshChannel
   
-  integer,private :: ij_channelHash(1:121,1:3)=-99
+  integer,private :: ij_channelHash(1:204,1:4)=-99
   integer,private :: NumberOfChannels=-1
+  logical,private :: deterministicME=.false.
 
   !-- general definitions, to be merged with Markus final structure
    real(dp), public, parameter :: tag1 = 1.0_dp
@@ -536,110 +537,335 @@ module modHiggsJJ
   
   subroutine init_VBFoffshChannelHash()
   implicit none
+  integer ch,i
   
-      ij_ChannelHash(  1,1:3) = (/ 2, 1, 1/)
-      ij_ChannelHash(  2,1:3) = (/ 1, 2, 1/)
-      ij_ChannelHash(  3,1:3) = (/ 2,-2, 1/)
-      ij_ChannelHash(  4,1:3) = (/-2, 2, 1/)
-      ij_ChannelHash(  5,1:3) = (/ 2, 3, 1/)
-      ij_ChannelHash(  6,1:3) = (/ 3, 2, 1/)
-      ij_ChannelHash(  7,1:3) = (/ 1,-1, 1/)
-      ij_ChannelHash(  8,1:3) = (/-1, 1, 1/)
-      ij_ChannelHash(  9,1:3) = (/ 1, 3, 1/)
-      ij_ChannelHash( 10,1:3) = (/ 3, 1, 1/)
-      ij_ChannelHash( 11,1:3) = (/ 2,-4, 1/)
-      ij_ChannelHash( 12,1:3) = (/-4, 2, 1/)
-      ij_ChannelHash( 13,1:3) = (/ 1, 4, 1/)
-      ij_ChannelHash( 14,1:3) = (/ 4, 1, 1/)
-      ij_ChannelHash( 15,1:3) = (/-5,-5, 1/)
-      ij_ChannelHash( 16,1:3) = (/-5,-4, 1/)
-      ij_ChannelHash( 17,1:3) = (/-5,-3, 1/)
-      ij_ChannelHash( 18,1:3) = (/-5,-2, 1/)
-      ij_ChannelHash( 19,1:3) = (/-5,-1, 1/)
-      ij_ChannelHash( 20,1:3) = (/-5, 1, 1/)
-      ij_ChannelHash( 21,1:3) = (/-5, 2, 1/)
-      ij_ChannelHash( 22,1:3) = (/-5, 3, 1/)
-      ij_ChannelHash( 23,1:3) = (/-5, 4, 1/)
-      ij_ChannelHash( 24,1:3) = (/-5, 5, 1/)
-      ij_ChannelHash( 25,1:3) = (/-4,-5, 1/)
-      ij_ChannelHash( 26,1:3) = (/-4,-4, 1/)
-      ij_ChannelHash( 27,1:3) = (/-4,-3, 1/)
-      ij_ChannelHash( 28,1:3) = (/-4,-2, 1/)
-      ij_ChannelHash( 29,1:3) = (/-4,-1, 1/)
-      ij_ChannelHash( 30,1:3) = (/-4, 1, 1/)
-      ij_ChannelHash( 31,1:3) = (/-4, 3, 1/)
-      ij_ChannelHash( 32,1:3) = (/-4, 4, 1/)
-      ij_ChannelHash( 33,1:3) = (/-4, 5, 1/)
-      ij_ChannelHash( 34,1:3) = (/-3,-5, 1/)
-      ij_ChannelHash( 35,1:3) = (/-3,-4, 1/)
-      ij_ChannelHash( 36,1:3) = (/-3,-3, 1/)
-      ij_ChannelHash( 37,1:3) = (/-3,-2, 1/)
-      ij_ChannelHash( 38,1:3) = (/-3,-1, 1/)
-      ij_ChannelHash( 39,1:3) = (/-3, 1, 1/)
-      ij_ChannelHash( 40,1:3) = (/-3, 2, 1/)
-      ij_ChannelHash( 41,1:3) = (/-3, 3, 1/)
-      ij_ChannelHash( 42,1:3) = (/-3, 4, 1/)
-      ij_ChannelHash( 43,1:3) = (/-3, 5, 1/)
-      ij_ChannelHash( 44,1:3) = (/-2,-5, 1/)
-      ij_ChannelHash( 45,1:3) = (/-2,-4, 1/)
-      ij_ChannelHash( 46,1:3) = (/-2,-3, 1/)
-      ij_ChannelHash( 47,1:3) = (/-2,-2, 1/)
-      ij_ChannelHash( 48,1:3) = (/-2,-1, 1/)
-      ij_ChannelHash( 49,1:3) = (/-2, 1, 1/)
-      ij_ChannelHash( 50,1:3) = (/-2, 3, 1/)
-      ij_ChannelHash( 51,1:3) = (/-2, 4, 1/)
-      ij_ChannelHash( 52,1:3) = (/-2, 5, 1/)
-      ij_ChannelHash( 53,1:3) = (/-1,-5, 1/)
-      ij_ChannelHash( 54,1:3) = (/-1,-4, 1/)
-      ij_ChannelHash( 55,1:3) = (/-1,-3, 1/)
-      ij_ChannelHash( 56,1:3) = (/-1,-2, 1/)
-      ij_ChannelHash( 57,1:3) = (/-1,-1, 1/)
-      ij_ChannelHash( 58,1:3) = (/-1, 2, 1/)
-      ij_ChannelHash( 59,1:3) = (/-1, 3, 1/)
-      ij_ChannelHash( 60,1:3) = (/-1, 4, 1/)
-      ij_ChannelHash( 61,1:3) = (/-1, 5, 1/)
-      ij_ChannelHash( 62,1:3) = (/ 1,-5, 1/)
-      ij_ChannelHash( 63,1:3) = (/ 1,-4, 1/)
-      ij_ChannelHash( 64,1:3) = (/ 1,-3, 1/)
-      ij_ChannelHash( 65,1:3) = (/ 1,-2, 1/)
-      ij_ChannelHash( 66,1:3) = (/ 1, 1, 1/)
-      ij_ChannelHash( 67,1:3) = (/ 1, 5, 1/)
-      ij_ChannelHash( 68,1:3) = (/ 2,-5, 1/)
-      ij_ChannelHash( 69,1:3) = (/ 2,-3, 1/)
-      ij_ChannelHash( 70,1:3) = (/ 2,-1, 1/)
-      ij_ChannelHash( 71,1:3) = (/ 2, 2, 1/)
-      ij_ChannelHash( 72,1:3) = (/ 2, 4, 1/)
-      ij_ChannelHash( 73,1:3) = (/ 2, 5, 1/)
-      ij_ChannelHash( 74,1:3) = (/ 3,-5, 1/)
-      ij_ChannelHash( 75,1:3) = (/ 3,-4, 1/)
-      ij_ChannelHash( 76,1:3) = (/ 3,-3, 1/)
-      ij_ChannelHash( 77,1:3) = (/ 3,-2, 1/)
-      ij_ChannelHash( 78,1:3) = (/ 3,-1, 1/)
-      ij_ChannelHash( 79,1:3) = (/ 3, 3, 1/)
-      ij_ChannelHash( 80,1:3) = (/ 3, 4, 1/)
-      ij_ChannelHash( 81,1:3) = (/ 3, 5, 1/)
-      ij_ChannelHash( 82,1:3) = (/ 4,-5, 1/)
-      ij_ChannelHash( 83,1:3) = (/ 4,-4, 1/)
-      ij_ChannelHash( 84,1:3) = (/ 4,-3, 1/)
-      ij_ChannelHash( 85,1:3) = (/ 4,-2, 1/)
-      ij_ChannelHash( 86,1:3) = (/ 4,-1, 1/)
-      ij_ChannelHash( 87,1:3) = (/ 4, 2, 1/)
-      ij_ChannelHash( 88,1:3) = (/ 4, 3, 1/)
-      ij_ChannelHash( 89,1:3) = (/ 4, 4, 1/)
-      ij_ChannelHash( 90,1:3) = (/ 4, 5, 1/)
-      ij_ChannelHash( 91,1:3) = (/ 5,-5, 1/)
-      ij_ChannelHash( 92,1:3) = (/ 5,-4, 1/)
-      ij_ChannelHash( 93,1:3) = (/ 5,-3, 1/)
-      ij_ChannelHash( 94,1:3) = (/ 5,-2, 1/)
-      ij_ChannelHash( 95,1:3) = (/ 5,-1, 1/)
-      ij_ChannelHash( 96,1:3) = (/ 5, 1, 1/)
-      ij_ChannelHash( 97,1:3) = (/ 5, 2, 1/)
-      ij_ChannelHash( 98,1:3) = (/ 5, 3, 1/)
-      ij_ChannelHash( 99,1:3) = (/ 5, 4, 1/)
-      ij_ChannelHash(100,1:3) = (/ 5, 5, 1/)
+   if( .not. deterministicME ) then
+      ij_ChannelHash(  1,:) = (/ 2, 1, 0,0/)
+      ij_ChannelHash(  2,:) = (/ 1, 2, 0,0/)
+      ij_ChannelHash(  3,:) = (/ 2,-2, 0,0/)
+      ij_ChannelHash(  4,:) = (/-2, 2, 0,0/)
+      ij_ChannelHash(  5,:) = (/ 2, 3, 0,0/)
+      ij_ChannelHash(  6,:) = (/ 3, 2, 0,0/)
+      ij_ChannelHash(  7,:) = (/ 1,-1, 0,0/)
+      ij_ChannelHash(  8,:) = (/-1, 1, 0,0/)
+      ij_ChannelHash(  9,:) = (/ 1, 3, 0,0/)
+      ij_ChannelHash( 10,:) = (/ 3, 1, 0,0/)
+      ij_ChannelHash( 11,:) = (/ 2,-4, 0,0/)
+      ij_ChannelHash( 12,:) = (/-4, 2, 0,0/)
+      ij_ChannelHash( 13,:) = (/ 1, 4, 0,0/)
+      ij_ChannelHash( 14,:) = (/ 4, 1, 0,0/)
+      ij_ChannelHash( 15,:) = (/-5,-5, 0,0/)
+      ij_ChannelHash( 16,:) = (/-5,-4, 0,0/)
+      ij_ChannelHash( 17,:) = (/-5,-3, 0,0/)
+      ij_ChannelHash( 18,:) = (/-5,-2, 0,0/)
+      ij_ChannelHash( 19,:) = (/-5,-1, 0,0/)
+      ij_ChannelHash( 20,:) = (/-5, 1, 0,0/)
+      ij_ChannelHash( 21,:) = (/-5, 2, 0,0/)
+      ij_ChannelHash( 22,:) = (/-5, 3, 0,0/)
+      ij_ChannelHash( 23,:) = (/-5, 4, 0,0/)
+      ij_ChannelHash( 24,:) = (/-5, 5, 0,0/)
+      ij_ChannelHash( 25,:) = (/-4,-5, 0,0/)
+      ij_ChannelHash( 26,:) = (/-4,-4, 0,0/)
+      ij_ChannelHash( 27,:) = (/-4,-3, 0,0/)
+      ij_ChannelHash( 28,:) = (/-4,-2, 0,0/)
+      ij_ChannelHash( 29,:) = (/-4,-1, 0,0/)
+      ij_ChannelHash( 30,:) = (/-4, 1, 0,0/)
+      ij_ChannelHash( 31,:) = (/-4, 3, 0,0/)
+      ij_ChannelHash( 32,:) = (/-4, 4, 0,0/)
+      ij_ChannelHash( 33,:) = (/-4, 5, 0,0/)
+      ij_ChannelHash( 34,:) = (/-3,-5, 0,0/)
+      ij_ChannelHash( 35,:) = (/-3,-4, 0,0/)
+      ij_ChannelHash( 36,:) = (/-3,-3, 0,0/)
+      ij_ChannelHash( 37,:) = (/-3,-2, 0,0/)
+      ij_ChannelHash( 38,:) = (/-3,-1, 0,0/)
+      ij_ChannelHash( 39,:) = (/-3, 1, 0,0/)
+      ij_ChannelHash( 40,:) = (/-3, 2, 0,0/)
+      ij_ChannelHash( 41,:) = (/-3, 3, 0,0/)
+      ij_ChannelHash( 42,:) = (/-3, 4, 0,0/)
+      ij_ChannelHash( 43,:) = (/-3, 5, 0,0/)
+      ij_ChannelHash( 44,:) = (/-2,-5, 0,0/)
+      ij_ChannelHash( 45,:) = (/-2,-4, 0,0/)
+      ij_ChannelHash( 46,:) = (/-2,-3, 0,0/)
+      ij_ChannelHash( 47,:) = (/-2,-2, 0,0/)
+      ij_ChannelHash( 48,:) = (/-2,-1, 0,0/)
+      ij_ChannelHash( 49,:) = (/-2, 1, 0,0/)
+      ij_ChannelHash( 50,:) = (/-2, 3, 0,0/)
+      ij_ChannelHash( 51,:) = (/-2, 4, 0,0/)
+      ij_ChannelHash( 52,:) = (/-2, 5, 0,0/)
+      ij_ChannelHash( 53,:) = (/-1,-5, 0,0/)
+      ij_ChannelHash( 54,:) = (/-1,-4, 0,0/)
+      ij_ChannelHash( 55,:) = (/-1,-3, 0,0/)
+      ij_ChannelHash( 56,:) = (/-1,-2, 0,0/)
+      ij_ChannelHash( 57,:) = (/-1,-1, 0,0/)
+      ij_ChannelHash( 58,:) = (/-1, 2, 0,0/)
+      ij_ChannelHash( 59,:) = (/-1, 3, 0,0/)
+      ij_ChannelHash( 60,:) = (/-1, 4, 0,0/)
+      ij_ChannelHash( 61,:) = (/-1, 5, 0,0/)
+      ij_ChannelHash( 62,:) = (/ 1,-5, 0,0/)
+      ij_ChannelHash( 63,:) = (/ 1,-4, 0,0/)
+      ij_ChannelHash( 64,:) = (/ 1,-3, 0,0/)
+      ij_ChannelHash( 65,:) = (/ 1,-2, 0,0/)
+      ij_ChannelHash( 66,:) = (/ 1, 1, 0,0/)
+      ij_ChannelHash( 67,:) = (/ 1, 5, 0,0/)
+      ij_ChannelHash( 68,:) = (/ 2,-5, 0,0/)
+      ij_ChannelHash( 69,:) = (/ 2,-3, 0,0/)
+      ij_ChannelHash( 70,:) = (/ 2,-1, 0,0/)
+      ij_ChannelHash( 71,:) = (/ 2, 2, 0,0/)
+      ij_ChannelHash( 72,:) = (/ 2, 4, 0,0/)
+      ij_ChannelHash( 73,:) = (/ 2, 5, 0,0/)
+      ij_ChannelHash( 74,:) = (/ 3,-5, 0,0/)
+      ij_ChannelHash( 75,:) = (/ 3,-4, 0,0/)
+      ij_ChannelHash( 76,:) = (/ 3,-3, 0,0/)
+      ij_ChannelHash( 77,:) = (/ 3,-2, 0,0/)
+      ij_ChannelHash( 78,:) = (/ 3,-1, 0,0/)
+      ij_ChannelHash( 79,:) = (/ 3, 3, 0,0/)
+      ij_ChannelHash( 80,:) = (/ 3, 4, 0,0/)
+      ij_ChannelHash( 81,:) = (/ 3, 5, 0,0/)
+      ij_ChannelHash( 82,:) = (/ 4,-5, 0,0/)
+      ij_ChannelHash( 83,:) = (/ 4,-4, 0,0/)
+      ij_ChannelHash( 84,:) = (/ 4,-3, 0,0/)
+      ij_ChannelHash( 85,:) = (/ 4,-2, 0,0/)
+      ij_ChannelHash( 86,:) = (/ 4,-1, 0,0/)
+      ij_ChannelHash( 87,:) = (/ 4, 2, 0,0/)
+      ij_ChannelHash( 88,:) = (/ 4, 3, 0,0/)
+      ij_ChannelHash( 89,:) = (/ 4, 4, 0,0/)
+      ij_ChannelHash( 90,:) = (/ 4, 5, 0,0/)
+      ij_ChannelHash( 91,:) = (/ 5,-5, 0,0/)
+      ij_ChannelHash( 92,:) = (/ 5,-4, 0,0/)
+      ij_ChannelHash( 93,:) = (/ 5,-3, 0,0/)
+      ij_ChannelHash( 94,:) = (/ 5,-2, 0,0/)
+      ij_ChannelHash( 95,:) = (/ 5,-1, 0,0/)
+      ij_ChannelHash( 96,:) = (/ 5, 1, 0,0/)
+      ij_ChannelHash( 97,:) = (/ 5, 2, 0,0/)
+      ij_ChannelHash( 98,:) = (/ 5, 3, 0,0/)
+      ij_ChannelHash( 99,:) = (/ 5, 4, 0,0/)
+      ij_ChannelHash(100,:) = (/ 5, 5, 0,0/)
 
       NumberOfChannels = 100
  
+    else
+ 
+      ij_ChannelHash(1,:) = (/ Up_ , Chm_ , Up_ , Chm_ /)
+      ij_ChannelHash(2,:) = (/ Dn_ , Str_ , Dn_ , Str_ /)
+      ij_ChannelHash(3,:) = (/ Dn_ , Bot_ , Dn_ , Bot_ /)
+      ij_ChannelHash(4,:) = (/ Str_ , Bot_ , Str_ , Bot_ /)
+      ij_ChannelHash(5,:) = (/ Up_ , Str_ , Up_ , Str_ /)
+      ij_ChannelHash(6,:) = (/ Up_ , Bot_ , Up_ , Bot_ /)
+      ij_ChannelHash(7,:) = (/ Chm_ , Bot_ , Chm_ , Bot_ /)
+      ij_ChannelHash(8,:) = (/ Dn_ , Chm_ , Dn_ , Chm_ /)
+      ij_ChannelHash(9,:) = (/ Dn_ , Up_ , Dn_ , Up_ /)
+      ij_ChannelHash(10,:) = (/ Str_ , Chm_ , Str_ , Chm_ /)
+      ij_ChannelHash(11,:) = (/ Dn_ , Chm_ , Up_ , Str_ /)
+      ij_ChannelHash(12,:) = (/ Up_ , Str_ , Dn_ , Chm_ /)
+      ij_ChannelHash(13,:) = (/ Up_ , Up_ , Up_ , Up_ /)
+      ij_ChannelHash(14,:) = (/ Chm_ , Chm_ , Chm_ , Chm_ /)
+      ij_ChannelHash(15,:) = (/ Dn_ , Dn_ , Dn_ , Dn_ /)
+      ij_ChannelHash(16,:) = (/ Str_ , Str_ , Str_ , Str_ /)
+      ij_ChannelHash(17,:) = (/ Bot_ , Bot_ , Bot_ , Bot_ /)
+      ij_ChannelHash(18,:) = (/ Chm_ , Up_ , Up_ , Chm_ /)
+      ij_ChannelHash(19,:) = (/ Str_ , Dn_ , Dn_ , Str_ /)
+      ij_ChannelHash(20,:) = (/ Bot_ , Dn_ , Dn_ , Bot_ /)
+      ij_ChannelHash(21,:) = (/ Bot_ , Str_ , Str_ , Bot_ /)
+      ij_ChannelHash(22,:) = (/ Str_ , Up_ , Up_ , Str_ /)
+      ij_ChannelHash(23,:) = (/ Bot_ , Up_ , Up_ , Bot_ /)
+      ij_ChannelHash(24,:) = (/ Bot_ , Chm_ , Chm_ , Bot_ /)
+      ij_ChannelHash(25,:) = (/ Chm_ , Dn_ , Dn_ , Chm_ /)
+      ij_ChannelHash(26,:) = (/ Up_ , Dn_ , Dn_ , Up_ /)
+      ij_ChannelHash(27,:) = (/ Chm_ , Str_ , Str_ , Chm_ /)
+      ij_ChannelHash(28,:) = (/ Chm_ , Dn_ , Up_ , Str_ /)
+      ij_ChannelHash(29,:) = (/ Str_ , Up_ , Dn_ , Chm_ /)
+      ij_ChannelHash(30,:) = (/ Up_ , Up_ , Up_ , Up_ /)
+      ij_ChannelHash(31,:) = (/ Chm_ , Chm_ , Chm_ , Chm_ /)
+      ij_ChannelHash(32,:) = (/ Dn_ , Dn_ , Dn_ , Dn_ /)
+      ij_ChannelHash(33,:) = (/ Str_ , Str_ , Str_ , Str_ /)
+      ij_ChannelHash(34,:) = (/ Bot_ , Bot_ , Bot_ , Bot_ /)
+
+      ij_ChannelHash(35,:) = (/ AChm_ , AUp_ , AChm_ , AUp_ /)
+      ij_ChannelHash(36,:) = (/ AStr_ , ADn_ , AStr_ , ADn_ /)
+      ij_ChannelHash(37,:) = (/ ABot_ , ADn_ , ABot_ , ADn_ /)
+      ij_ChannelHash(38,:) = (/ ABot_ , AStr_ , ABot_ , AStr_ /)
+      ij_ChannelHash(39,:) = (/ AStr_ , AUp_ , AStr_ , AUp_ /)
+      ij_ChannelHash(40,:) = (/ ABot_ , AUp_ , ABot_ , AUp_ /)
+      ij_ChannelHash(41,:) = (/ ABot_ , AChm_ , ABot_ , AChm_ /)
+      ij_ChannelHash(42,:) = (/ AChm_ , ADn_ , AChm_ , ADn_ /)
+      ij_ChannelHash(43,:) = (/ AUp_ , ADn_ , AUp_ , ADn_ /)
+      ij_ChannelHash(44,:) = (/ AChm_ , AStr_ , AChm_ , AStr_ /)
+      ij_ChannelHash(45,:) = (/ AStr_ , AUp_ , AChm_ , ADn_ /)
+      ij_ChannelHash(46,:) = (/ AChm_ , ADn_ , AStr_ , AUp_ /)
+      ij_ChannelHash(47,:) = (/ AUp_ , AUp_ , AUp_ , AUp_ /)
+      ij_ChannelHash(48,:) = (/ AChm_ , AChm_ , AChm_ , AChm_ /)
+      ij_ChannelHash(49,:) = (/ ADn_ , ADn_ , ADn_ , ADn_ /)
+      ij_ChannelHash(50,:) = (/ AStr_ , AStr_ , AStr_ , AStr_ /)
+      ij_ChannelHash(51,:) = (/ ABot_ , ABot_ , ABot_ , ABot_ /)
+      ij_ChannelHash(52,:) = (/ AUp_ , AChm_ , AChm_ , AUp_ /)
+      ij_ChannelHash(53,:) = (/ ADn_ , AStr_ , AStr_ , ADn_ /)
+      ij_ChannelHash(54,:) = (/ ADn_ , ABot_ , ABot_ , ADn_ /)
+      ij_ChannelHash(55,:) = (/ AStr_ , ABot_ , ABot_ , AStr_ /)
+      ij_ChannelHash(56,:) = (/ AUp_ , AStr_ , AStr_ , AUp_ /)
+      ij_ChannelHash(57,:) = (/ AUp_ , ABot_ , ABot_ , AUp_ /)
+      ij_ChannelHash(58,:) = (/ AChm_ , ABot_ , ABot_ , AChm_ /)
+      ij_ChannelHash(59,:) = (/ ADn_ , AChm_ , AChm_ , ADn_ /)
+      ij_ChannelHash(60,:) = (/ ADn_ , AUp_ , AUp_ , ADn_ /)
+      ij_ChannelHash(61,:) = (/ AStr_ , AChm_ , AChm_ , AStr_ /)
+      ij_ChannelHash(62,:) = (/ AUp_ , AStr_ , AChm_ , ADn_ /)
+      ij_ChannelHash(63,:) = (/ ADn_ , AChm_ , AStr_ , AUp_ /)
+      ij_ChannelHash(64,:) = (/ AUp_ , AUp_ , AUp_ , AUp_ /)
+      ij_ChannelHash(65,:) = (/ AChm_ , AChm_ , AChm_ , AChm_ /)
+      ij_ChannelHash(66,:) = (/ ADn_ , ADn_ , ADn_ , ADn_ /)
+      ij_ChannelHash(67,:) = (/ AStr_ , AStr_ , AStr_ , AStr_ /)
+      ij_ChannelHash(68,:) = (/ ABot_ , ABot_ , ABot_ , ABot_ /)
+
+      ij_ChannelHash(69,:) = (/ AUp_ , Chm_ , AUp_ , Chm_ /)
+      ij_ChannelHash(70,:) = (/ ADn_ , Str_ , ADn_ , Str_ /)
+      ij_ChannelHash(71,:) = (/ ADn_ , Bot_ , ADn_ , Bot_ /)
+      ij_ChannelHash(72,:) = (/ AStr_ , Bot_ , AStr_ , Bot_ /)
+      ij_ChannelHash(73,:) = (/ AUp_ , Str_ , AUp_ , Str_ /)
+      ij_ChannelHash(74,:) = (/ AUp_ , Bot_ , AUp_ , Bot_ /)
+      ij_ChannelHash(75,:) = (/ AChm_ , Bot_ , AChm_ , Bot_ /)
+      ij_ChannelHash(76,:) = (/ ADn_ , Chm_ , ADn_ , Chm_ /)
+      ij_ChannelHash(77,:) = (/ ADn_ , Up_ , ADn_ , Up_ /)
+      ij_ChannelHash(78,:) = (/ AStr_ , Chm_ , AStr_ , Chm_ /)
+      ij_ChannelHash(79,:) = (/ AUp_ , Chm_ , ADn_ , Str_ /)
+      ij_ChannelHash(80,:) = (/ ADn_ , Str_ , AUp_ , Chm_ /)
+      ij_ChannelHash(81,:) = (/ AUp_ , Up_ , AUp_ , Up_ /)
+      ij_ChannelHash(82,:) = (/ AChm_ , Chm_ , AChm_ , Chm_ /)
+      ij_ChannelHash(83,:) = (/ ADn_ , Dn_ , ADn_ , Dn_ /)
+      ij_ChannelHash(84,:) = (/ AStr_ , Str_ , AStr_ , Str_ /)
+      ij_ChannelHash(85,:) = (/ ABot_ , Bot_ , ABot_ , Bot_ /)
+      ij_ChannelHash(86,:) = (/ AChm_ , Up_ , AChm_ , Up_ /)
+      ij_ChannelHash(87,:) = (/ AStr_ , Dn_ , AStr_ , Dn_ /)
+      ij_ChannelHash(88,:) = (/ ABot_ , Dn_ , ABot_ , Dn_ /)
+      ij_ChannelHash(89,:) = (/ ABot_ , Str_ , ABot_ , Str_ /)
+      ij_ChannelHash(90,:) = (/ AStr_ , Up_ , AStr_ , Up_ /)
+      ij_ChannelHash(91,:) = (/ ABot_ , Up_ , ABot_ , Up_ /)
+      ij_ChannelHash(92,:) = (/ ABot_ , Chm_ , ABot_ , Chm_ /)
+      ij_ChannelHash(93,:) = (/ AChm_ , Dn_ , AChm_ , Dn_ /)
+      ij_ChannelHash(94,:) = (/ AUp_ , Dn_ , AUp_ , Dn_ /)
+      ij_ChannelHash(95,:) = (/ AChm_ , Str_ , AChm_ , Str_ /)
+      ij_ChannelHash(96,:) = (/ AStr_ , Dn_ , AChm_ , Up_ /)
+      ij_ChannelHash(97,:) = (/ AChm_ , Up_ , AStr_ , Dn_ /)
+      ij_ChannelHash(98,:) = (/ AUp_ , Up_ , AUp_ , Up_ /)
+      ij_ChannelHash(99,:) = (/ AChm_ , Chm_ , AChm_ , Chm_ /)
+      ij_ChannelHash(100,:) = (/ ADn_ , Dn_ , ADn_ , Dn_ /)
+      ij_ChannelHash(101,:) = (/ AStr_ , Str_ , AStr_ , Str_ /)
+      ij_ChannelHash(102,:) = (/ ABot_ , Bot_ , ABot_ , Bot_ /)
+
+      ij_ChannelHash(103,:) = (/ Chm_ , AUp_ , AUp_ , Chm_ /)
+      ij_ChannelHash(104,:) = (/ Str_ , ADn_ , ADn_ , Str_ /)
+      ij_ChannelHash(105,:) = (/ Bot_ , ADn_ , ADn_ , Bot_ /)
+      ij_ChannelHash(106,:) = (/ Bot_ , AStr_ , AStr_ , Bot_ /)
+      ij_ChannelHash(107,:) = (/ Str_ , AUp_ , AUp_ , Str_ /)
+      ij_ChannelHash(108,:) = (/ Bot_ , AUp_ , AUp_ , Bot_ /)
+      ij_ChannelHash(109,:) = (/ Bot_ , AChm_ , AChm_ , Bot_ /)
+      ij_ChannelHash(110,:) = (/ Chm_ , ADn_ , ADn_ , Chm_ /)
+      ij_ChannelHash(111,:) = (/ Up_ , ADn_ , ADn_ , Up_ /)
+      ij_ChannelHash(112,:) = (/ Chm_ , AStr_ , AStr_ , Chm_ /)
+      ij_ChannelHash(113,:) = (/ Chm_ , AUp_ , ADn_ , Str_ /)
+      ij_ChannelHash(114,:) = (/ Str_ , ADn_ , AUp_ , Chm_ /)
+      ij_ChannelHash(115,:) = (/ Up_ , AUp_ , AUp_ , Up_ /)
+      ij_ChannelHash(116,:) = (/ Chm_ , AChm_ , AChm_ , Chm_ /)
+      ij_ChannelHash(117,:) = (/ Dn_ , ADn_ , ADn_ , Dn_ /)
+      ij_ChannelHash(118,:) = (/ Str_ , AStr_ , AStr_ , Str_ /)
+      ij_ChannelHash(119,:) = (/ Bot_ , ABot_ , ABot_ , Bot_ /)
+      ij_ChannelHash(120,:) = (/ Up_ , AChm_ , AChm_ , Up_ /)
+      ij_ChannelHash(121,:) = (/ Dn_ , AStr_ , AStr_ , Dn_ /)
+      ij_ChannelHash(122,:) = (/ Dn_ , ABot_ , ABot_ , Dn_ /)
+      ij_ChannelHash(123,:) = (/ Str_ , ABot_ , ABot_ , Str_ /)
+      ij_ChannelHash(124,:) = (/ Up_ , AStr_ , AStr_ , Up_ /)
+      ij_ChannelHash(125,:) = (/ Up_ , ABot_ , ABot_ , Up_ /)
+      ij_ChannelHash(126,:) = (/ Chm_ , ABot_ , ABot_ , Chm_ /)
+      ij_ChannelHash(127,:) = (/ Dn_ , AChm_ , AChm_ , Dn_ /)
+      ij_ChannelHash(128,:) = (/ Dn_ , AUp_ , AUp_ , Dn_ /)
+      ij_ChannelHash(129,:) = (/ Str_ , AChm_ , AChm_ , Str_ /)
+      ij_ChannelHash(130,:) = (/ Dn_ , AStr_ , AChm_ , Up_ /)
+      ij_ChannelHash(131,:) = (/ Up_ , AChm_ , AStr_ , Dn_ /)
+      ij_ChannelHash(132,:) = (/ Up_ , AUp_ , AUp_ , Up_ /)
+      ij_ChannelHash(133,:) = (/ Chm_ , AChm_ , AChm_ , Chm_ /)
+      ij_ChannelHash(134,:) = (/ Dn_ , ADn_ , ADn_ , Dn_ /)
+      ij_ChannelHash(135,:) = (/ Str_ , AStr_ , AStr_ , Str_ /)
+      ij_ChannelHash(136,:) = (/ Bot_ , ABot_ , ABot_ , Bot_ /)
+
+      ij_ChannelHash(137,:) = (/ Up_ , AUp_ , AChm_ , Chm_ /)
+      ij_ChannelHash(138,:) = (/ Dn_ , ADn_ , AStr_ , Str_ /)
+      ij_ChannelHash(139,:) = (/ Dn_ , ADn_ , ABot_ , Bot_ /)
+      ij_ChannelHash(140,:) = (/ Str_ , AStr_ , ABot_ , Bot_ /)
+      ij_ChannelHash(141,:) = (/ Up_ , AUp_ , AStr_ , Str_ /)
+      ij_ChannelHash(142,:) = (/ Up_ , AUp_ , ABot_ , Bot_ /)
+      ij_ChannelHash(143,:) = (/ Chm_ , AChm_ , ABot_ , Bot_ /)
+      ij_ChannelHash(144,:) = (/ Dn_ , ADn_ , AChm_ , Chm_ /)
+      ij_ChannelHash(145,:) = (/ Dn_ , ADn_ , AUp_ , Up_ /)
+      ij_ChannelHash(146,:) = (/ Str_ , AStr_ , AChm_ , Chm_ /)
+      ij_ChannelHash(147,:) = (/ Dn_ , AUp_ , AChm_ , Str_ /)
+      ij_ChannelHash(148,:) = (/ Up_ , ADn_ , AStr_ , Chm_ /)
+      ij_ChannelHash(149,:) = (/ Up_ , AUp_ , AUp_ , Up_ /)
+      ij_ChannelHash(150,:) = (/ Chm_ , AChm_ , AChm_ , Chm_ /)
+      ij_ChannelHash(151,:) = (/ Dn_ , ADn_ , ADn_ , Dn_ /)
+      ij_ChannelHash(152,:) = (/ Str_ , AStr_ , AStr_ , Str_ /)
+      ij_ChannelHash(153,:) = (/ Bot_ , ABot_ , ABot_ , Bot_ /)
+      ij_ChannelHash(154,:) = (/ Chm_ , AChm_ , AUp_ , Up_ /)
+      ij_ChannelHash(155,:) = (/ Str_ , AStr_ , ADn_ , Dn_ /)
+      ij_ChannelHash(156,:) = (/ Bot_ , ABot_ , ADn_ , Dn_ /)
+      ij_ChannelHash(157,:) = (/ Bot_ , ABot_ , AStr_ , Str_ /)
+      ij_ChannelHash(158,:) = (/ Str_ , AStr_ , AUp_ , Up_ /)
+      ij_ChannelHash(159,:) = (/ Bot_ , ABot_ , AUp_ , Up_ /)
+      ij_ChannelHash(160,:) = (/ Bot_ , ABot_ , AChm_ , Chm_ /)
+      ij_ChannelHash(161,:) = (/ Chm_ , AChm_ , ADn_ , Dn_ /)
+      ij_ChannelHash(162,:) = (/ Up_ , AUp_ , ADn_ , Dn_ /)
+      ij_ChannelHash(163,:) = (/ Chm_ , AChm_ , AStr_ , Str_ /)
+      ij_ChannelHash(164,:) = (/ Chm_ , AStr_ , ADn_ , Up_ /)
+      ij_ChannelHash(165,:) = (/ Str_ , AChm_ , AUp_ , Dn_ /)
+      ij_ChannelHash(166,:) = (/ Up_ , AUp_ , AUp_ , Up_ /)
+      ij_ChannelHash(167,:) = (/ Chm_ , AChm_ , AChm_ , Chm_ /)
+      ij_ChannelHash(168,:) = (/ Dn_ , ADn_ , ADn_ , Dn_ /)
+      ij_ChannelHash(169,:) = (/ Str_ , AStr_ , AStr_ , Str_ /)
+      ij_ChannelHash(170,:) = (/ Bot_ , ABot_ , ABot_ , Bot_ /)
+
+      ij_ChannelHash(171,:) = (/ AUp_ , Up_ , AChm_ , Chm_ /)
+      ij_ChannelHash(172,:) = (/ ADn_ , Dn_ , AStr_ , Str_ /)
+      ij_ChannelHash(173,:) = (/ ADn_ , Dn_ , ABot_ , Bot_ /)
+      ij_ChannelHash(174,:) = (/ AStr_ , Str_ , ABot_ , Bot_ /)
+      ij_ChannelHash(175,:) = (/ AUp_ , Up_ , AStr_ , Str_ /)
+      ij_ChannelHash(176,:) = (/ AUp_ , Up_ , ABot_ , Bot_ /)
+      ij_ChannelHash(177,:) = (/ AChm_ , Chm_ , ABot_ , Bot_ /)
+      ij_ChannelHash(178,:) = (/ ADn_ , Dn_ , AChm_ , Chm_ /)
+      ij_ChannelHash(179,:) = (/ ADn_ , Dn_ , AUp_ , Up_ /)
+      ij_ChannelHash(180,:) = (/ AStr_ , Str_ , AChm_ , Chm_ /)
+      ij_ChannelHash(181,:) = (/ AUp_ , Dn_ , AChm_ , Str_ /)
+      ij_ChannelHash(182,:) = (/ ADn_ , Up_ , AStr_ , Chm_ /)
+      ij_ChannelHash(183,:) = (/ AUp_ , Up_ , AUp_ , Up_ /)
+      ij_ChannelHash(184,:) = (/ AChm_ , Chm_ , AChm_ , Chm_ /)
+      ij_ChannelHash(185,:) = (/ ADn_ , Dn_ , ADn_ , Dn_ /)
+      ij_ChannelHash(186,:) = (/ AStr_ , Str_ , AStr_ , Str_ /)
+      ij_ChannelHash(187,:) = (/ ABot_ , Bot_ , ABot_ , Bot_ /)
+      ij_ChannelHash(188,:) = (/ AChm_ , Chm_ , AUp_ , Up_ /)
+      ij_ChannelHash(189,:) = (/ AStr_ , Str_ , ADn_ , Dn_ /)
+      ij_ChannelHash(190,:) = (/ ABot_ , Bot_ , ADn_ , Dn_ /)
+      ij_ChannelHash(191,:) = (/ ABot_ , Bot_ , AStr_ , Str_ /)
+      ij_ChannelHash(192,:) = (/ AStr_ , Str_ , AUp_ , Up_ /)
+      ij_ChannelHash(193,:) = (/ ABot_ , Bot_ , AUp_ , Up_ /)
+      ij_ChannelHash(194,:) = (/ ABot_ , Bot_ , AChm_ , Chm_ /)
+      ij_ChannelHash(195,:) = (/ AChm_ , Chm_ , ADn_ , Dn_ /)
+      ij_ChannelHash(196,:) = (/ AUp_ , Up_ , ADn_ , Dn_ /)
+      ij_ChannelHash(197,:) = (/ AChm_ , Chm_ , AStr_ , Str_ /)
+      ij_ChannelHash(198,:) = (/ AStr_ , Chm_ , ADn_ , Up_ /)
+      ij_ChannelHash(199,:) = (/ AChm_ , Str_ , AUp_ , Dn_ /)
+      ij_ChannelHash(200,:) = (/ AUp_ , Up_ , AUp_ , Up_ /)
+      ij_ChannelHash(201,:) = (/ AChm_ , Chm_ , AChm_ , Chm_ /)
+      ij_ChannelHash(202,:) = (/ ADn_ , Dn_ , ADn_ , Dn_ /)
+      ij_ChannelHash(203,:) = (/ AStr_ , Str_ , AStr_ , Str_ /)
+      ij_ChannelHash(204,:) = (/ ABot_ , Bot_ , ABot_ , Bot_ /)
+ 
+      NumberOfChannels = 204
+       
+      do ch=1, NumberOfChannels
+      do i=1,4
+        ij_ChannelHash(ch,i) = convertToPartIndex( ij_ChannelHash(ch,i) )
+      enddo
+      enddo
+       
+    endif
+    
+    
   return
   end subroutine
   
@@ -655,15 +881,16 @@ module modHiggsJJ
   
 
 
-  subroutine get_VBFoffshChannel(channel,i1,i2,i3)
+  subroutine get_VBFoffshChannel(channel,i1,i2,i3,i4)
   implicit none
   integer, intent(in) :: channel
-  integer, intent(out) :: i1,i2,i3
+  integer, intent(out) :: i1,i2,i3,i4
  
     i1= ij_ChannelHash(channel,1)
     i2= ij_ChannelHash(channel,2)
     i3= ij_ChannelHash(channel,3)
- 
+    i4= ij_ChannelHash(channel,4)
+    
   return
   end subroutine
   
@@ -675,7 +902,7 @@ module modHiggsJJ
   integer :: i
  
     do i =channel,NumberOfChannels-1
-         ij_ChannelHash(i,1:3) = ij_ChannelHash(i+1,1:3)
+         ij_ChannelHash(i,:) = ij_ChannelHash(i+1,:)
     enddo
     NumberOfChannels = NumberOfChannels -1 
      
@@ -1334,19 +1561,60 @@ module modHiggsJJ
     amp_z = A0_VV_4f(4,1,3,2,za,zb,sprod,m_z,ga_z)
     amp_z_b = -A0_VV_4f(3,1,4,2,za,zb,sprod,m_z,ga_z)
 
+! !     adding contract terms
+!     iprop12 = sprod(4,1) - mv**2 + ci * mv * ga_v
+!     iprop34 = sprod(3,2) - mv**2 + ci * mv * ga_v
+! 
+!     amp_z(-1,-1) = amp_z(-1,-1) + amp_z(-1,-1)*iprop12/(aL_QUp*couplz)*ehz_L_U  &
+!                                 + amp_z(-1,-1)*iprop34/(aL_QUp*couplz)*ehz_L_U  &
+!                                 + amp_z(-1,-1)*iprop12/(aL_QUp*couplz)*ehz_L_U  &
+!                                               *iprop34/(aL_QUp*couplz)*ehz_L_U 
+!                                                                
+!     amp_z(+1,-1) = amp_z(+1,-1) + amp_z(+1,-1)*iprop12/(aR_QUp*couplz)*ehz_R_U  &
+!                                 + amp_z(+1,-1)*iprop34/(aL_QUp*couplz)*ehz_L_U  &
+!                                 + amp_z(+1,-1)*iprop12/(aR_QUp*couplz)*ehz_R_U  &
+!                                               *iprop34/(aL_QUp*couplz)*ehz_L_U   
+!     
+!     amp_z(-1,+1) = amp_z(-1,+1) + amp_z(-1,+1)*iprop12/(aL_QUp*couplz)*ehz_L_U  &
+!                                 + amp_z(-1,+1)*iprop34/(aR_QUp*couplz)*ehz_R_U  &
+!                                 + amp_z(-1,+1)*iprop12/(aL_QUp*couplz)*ehz_L_U  &
+!                                               *iprop34/(aR_QUp*couplz)*ehz_R_U  
+!                                               
+!     amp_z(+1,+1) = amp_z(+1,+1) + amp_z(+1,+1)*iprop12/(aR_QUp*couplz)*ehz_R_U  &
+!                                 + amp_z(+1,+1)*iprop34/(aR_QUp*couplz)*ehz_R_U  &
+!                                 + amp_z(+1,+1)*iprop12/(aR_QUp*couplz)*ehz_R_U  &
+!                                               *iprop34/(aR_QUp*couplz)*ehz_R_U 
+    
+    
+!     Lu = aL_QUp + iprop12/couplz*ehz_L_U
+!     Ru = aR_QUp + iprop12/couplz*ehz_R_U
+!     amp_z(-1,-1) = amp_z(-1,-1)*Lu*Lu
+!     amp_z(-1,+1) = amp_z(-1,+1)*Lu*Ru
+!     amp_z(+1,-1) = amp_z(+1,-1)*Ru*Lu
+!     amp_z(+1,+1) = amp_z(+1,+1)*Ru*Ru
+!     
+!     amp_z_b(-1,-1) = amp_z_b(-1,-1)*Lu*Lu
+!     amp_z_b(-1,+1) = amp_z_b(-1,+1)*Lu*Ru
+!     amp_z_b(+1,-1) = amp_z_b(+1,-1)*Ru*Lu
+!     amp_z_b(+1,+1) = amp_z_b(+1,+1)*Ru*Ru
+    
     restmp = ((abs(amp_z(-1,-1))**2+abs(amp_z_b(-1,-1))**2) * Lu**2 + &
          (abs(amp_z(-1,+1))**2+abs(amp_z_b(-1,+1))**2) * Lu * Ru + &
          (abs(amp_z(+1,-1))**2+abs(amp_z_b(+1,-1))**2) * Lu * Ru + &
          (abs(amp_z(+1,+1))**2+abs(amp_z_b(+1,+1))**2) * Ru**2) * xn**2
 
     restmp = restmp + (two * real(amp_z(-1,-1)*conjg(amp_z_b(-1,-1)),kind=dp) * Lu**2 + &
-            two * real(amp_z(+1,+1)*conjg(amp_z_b(+1,+1)),kind=dp) * Ru**2) * xn
+                       two * real(amp_z(+1,+1)*conjg(amp_z_b(+1,+1)),kind=dp) * Ru**2) * xn
 
     restmp = restmp * SymmFac * aveqq * couplz**2
 
     res(pdfUp_,pdfUp_) = restmp
     res(pdfChm_,pdfChm_) = restmp
 
+    
+    
+    
+    
     !-- qq->qq, down
     restmp = ((abs(amp_z(-1,-1))**2+abs(amp_z_b(-1,-1))**2) * Ld**2 + &
          (abs(amp_z(-1,+1))**2+abs(amp_z_b(-1,+1))**2) * Ld * Rd + &
@@ -1399,13 +1667,13 @@ module modHiggsJJ
     j2 = 2
     do iflip = 1, 2
        !-- ud -> ud
-       amp_z = A0_VV_4f(4,j2,3,j1,za,zb,sprod,m_z,ga_z)
+       amp_z =  A0_VV_4f(4,j2,3,j1,za,zb,sprod,m_z,ga_z)
        amp_w = -A0_VV_4f(4,j1,3,j2,za,zb,sprod,m_w,ga_w,useWWcoupl=.true.)
 
        restmp = ((abs(amp_z(-1,-1))**2) * Ld * Lu + &
-            (abs(amp_z(-1,+1))**2) * Ld * Ru + &
-            (abs(amp_z(+1,-1))**2) * Rd * Lu + &
-            (abs(amp_z(+1,+1))**2) * Rd * Ru) * couplz**2 * xn**2
+                 (abs(amp_z(-1,+1))**2) * Ld * Ru + &
+                 (abs(amp_z(+1,-1))**2) * Rd * Lu + &
+                 (abs(amp_z(+1,+1))**2) * Rd * Ru) * couplz**2 * xn**2
 
        restmp = restmp + abs(amp_w(-1,-1))**2 * couplw**2 * xn**2
 
@@ -3019,7 +3287,7 @@ module modHiggsJJ
     real(dp), dimension(2) :: Rz
     real(dp), parameter, dimension(2) :: La = (/QuL,QdL/)
     real(dp), parameter, dimension(2) :: Ra = (/QuR,QdR/)
-    complex(dp) :: A0_ZZ_4f(-1:1,-1:1)
+    complex(dp) :: A0_ZZ_4f(-1:1,-1:1),LCT(1:2),RCT(1:2)
     integer :: j1,j2,j3,j4,line1,line2
     complex(dp) :: za(4,4),zb(4,4)
     real(dp) :: sprod(4,4)
@@ -3039,6 +3307,9 @@ module modHiggsJJ
 
     Lz = (/aL_Qup,aL_Qdn/)
     Rz = (/aR_Qup,aR_Qdn/)
+    
+    LCT = (/ehz_L_U,ehz_L_D/)
+    RCT = (/ehz_R_U,ehz_R_D/)
 
 
     A0_ZZ_4f = czero
@@ -3128,14 +3399,56 @@ module modHiggsJJ
                             struc_az(1:3) * Ra(line1) * Rz(line2)/q12sq  /iprop34 + &
                             struc_za(1:3) * Rz(line1) * Ra(line2)/iprop12/q34sq
 
+
+!      adding contact terms
+!        helcoup(1:3,-1,-1) = helcoup(1:3,-1,-1) + struc_zz(1:3) * LCT(line1) * Lz(line2)/iprop34 + &
+!                                                  struc_za(1:3) * LCT(line1) * La(line2)/q34sq   + &       
+!                                                  struc_zz(1:3) *  Lz(line1) *LCT(line2)/iprop12 + &  
+!                                                  struc_az(1:3) *  Lz(line1) *LCT(line2)/q12sq   + &
+!                                                  struc_zz(1:3) * LCT(line1) *LCT(line2)
+!                                                  
+!        helcoup(1:3,-1,+1) = helcoup(1:3,-1,+1) + struc_zz(1:3) * LCT(line1) * Rz(line2)/iprop34 + &
+!                                                  struc_za(1:3) * LCT(line1) * Ra(line2)/q34sq   + &       
+!                                                  struc_zz(1:3) *  Lz(line1) *RCT(line2)/iprop12 + &
+!                                                  struc_az(1:3) *  Lz(line1) *RCT(line2)/q12sq   + &
+!                                                  struc_zz(1:3) * LCT(line1) *RCT(line2)
+!                                                  
+!        helcoup(1:3,+1,-1) = helcoup(1:3,+1,-1) + struc_zz(1:3) * RCT(line1) * Lz(line2)/iprop34 + &
+!                                                  struc_za(1:3) * RCT(line1) * La(line2)/q34sq   + &   
+!                                                  struc_zz(1:3) *  Rz(line1) *LCT(line2)/iprop12 + &
+!                                                  struc_az(1:3) *  Rz(line1) *LCT(line2)/q12sq   + &
+!                                                  struc_zz(1:3) * RCT(line1) *LCT(line2)
+!                                                  
+!        helcoup(1:3,+1,+1) = helcoup(1:3,+1,+1) + struc_zz(1:3) * RCT(line1) * Rz(line2)/iprop34 + &
+!                                                  struc_za(1:3) * RCT(line1) * Ra(line2)/q34sq   + &     
+!                                                  struc_zz(1:3) *  Rz(line1) *RCT(line2)/iprop12 + &
+!                                                  struc_az(1:3) *  Rz(line1) *RCT(line2)/q12sq   + &
+!                                                  struc_zz(1:3) * RCT(line1) *RCT(line2)
+                                   
     else
 
-       helcoup(1:3,-1,-1) = struc_zz(1:3) * Lz(line1) * Lz(line2)/iprop12/iprop34
+       helcoup(1:3,-1,-1) = struc_zz(1:3) * Lz(line1) * Lz(line2)/iprop12/iprop34 
        helcoup(1:3,-1,+1) = struc_zz(1:3) * Lz(line1) * Rz(line2)/iprop12/iprop34
        helcoup(1:3,+1,-1) = struc_zz(1:3) * Rz(line1) * Lz(line2)/iprop12/iprop34
        helcoup(1:3,+1,+1) = struc_zz(1:3) * Rz(line1) * Rz(line2)/iprop12/iprop34
 
+! !      adding contact terms
+!        helcoup(1:3,-1,-1) = helcoup(1:3,-1,-1) + struc_zz(1:3) * LCT(line1) * Lz(line2)/iprop34 + &
+!                                                  struc_zz(1:3) *  Lz(line1) *LCT(line2)/iprop12 + &
+!                                                  struc_zz(1:3) * LCT(line1) *LCT(line2)
+!        helcoup(1:3,-1,+1) = helcoup(1:3,-1,+1) + struc_zz(1:3) * LCT(line1) * Rz(line2)/iprop34 + &
+!                                                  struc_zz(1:3) *  Lz(line1) *RCT(line2)/iprop12 + &
+!                                                  struc_zz(1:3) * LCT(line1) *RCT(line2)
+!        helcoup(1:3,+1,-1) = helcoup(1:3,+1,-1) + struc_zz(1:3) * RCT(line1) * Lz(line2)/iprop34 + &
+!                                                  struc_zz(1:3) *  Rz(line1) *LCT(line2)/iprop12 + &
+!                                                  struc_zz(1:3) * RCT(line1) *LCT(line2)
+!        helcoup(1:3,+1,+1) = helcoup(1:3,+1,+1) + struc_zz(1:3) * RCT(line1) * Rz(line2)/iprop34 + &
+!                                                  struc_zz(1:3) *  Rz(line1) *RCT(line2)/iprop12 + &
+!                                                  struc_zz(1:3) * RCT(line1) *RCT(line2)
+       
     endif
+    
+    
 
     A0_ZZ_4f(-1,-1) = za(j1,j3)*zb(j4,j2) * helcoup(1,-1,-1) + &
          zab2(j1,j3,j4,j2)*zab2(j3,j1,j2,j4) * helcoup(2,-1,-1) + &

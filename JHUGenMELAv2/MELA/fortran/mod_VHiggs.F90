@@ -7,7 +7,7 @@ module ModVHiggs
 
 
   !----- notation for subroutines
-  public :: EvalAmp_VHiggs
+  public :: EvalAmp_VHiggs,EvalUnpolAmpSq_gg_VH
 
 contains
 
@@ -1491,6 +1491,224 @@ integer :: FermFlav(1:6)
 
 RETURN
 END SUBROUTINE
+
+
+
+
+
+
+
+      ! p: g1, g2, Zl1, Zl2, H
+      SUBROUTINE EvalUnpolAmpSq_gg_VH(p,UnPolSqAmp)
+      use ModParameters
+      use ModMisc
+#if useCollier==1      
+      use COLLIER
+#endif
+      implicit none
+      real(8) :: p(1:4,1:4),UnPolSqAmp
+      complex(8) :: SP(1:7),SI(0:16),LC(1:15)
+      complex(8) :: qlI1,qlI2,qlI3,qlI4
+      complex(8) :: ep1(1:4),ep2(1:4),cep3(1:4),p1(1:4),p2(1:4),p3(1:4)
+      complex(8) :: MasslessTri,MassiveTri,MassiveBox
+      real(8) :: shat,that,uhat,MT2,MH2,MZ2,MV2
+      real(8) :: MuRen2,PreFac,PreFac2,IZ(3:4,9:9),smT,y,mTrans
+      integer :: eps,h1,h2,h3,i,j
+      complex(8) :: VVHg1,VVHg2,VVHg3
+      complex(8) :: calc_MassiveBox,calc_MassiveBox_QP,calc_MassiveTensorBox
+      real(8),parameter :: E=dexp(1d0), ICol_sq=8d0
+      
+!       real(8) :: sprod(1:4,1:4),p5hat(1:4),p6hat(1:4)
+!       complex(8) :: za(1:4,1:4),zb(1:4,1:4),a,b,c,d,e,f,v,w,x,y,z,o
+
+
+
+!       prefactors and kinematics
+        PreFac  = Pi**2 *      (4d0*pi*alpha_QED) * (4d0*pi*alphas) /sitW/M_W     *1d0/(16d0*pi**2)
+        PreFac2 = Pi**2 * dsqrt(4d0*pi*alpha_QED) * (4d0*pi*alphas) *m_Top**2/vev *1d0/(16d0*pi**2)
+        IZ(3,9) = 0.5d0*(aL_QUp-aR_QUp)/2d0/sitW/dsqrt(1d0-sitW**2) ! top
+        IZ(4,9) = -IZ(3,9)                                          ! bottom        
+        
+        p1(1:4) = p(1:4,1)
+        p2(1:4) = p(1:4,2)
+        p3(1:4) = p(1:4,3)+p(1:4,4)
+        MZ2 = M_Z**2
+        MH2 = M_Reso**2
+        MT2 = M_Top**2
+        MV2 = get_MInv2(dble(p3(1:4)))
+        
+        VVHg1 = 1d0
+        VVHg2 = 0d0/MH2
+        VVHg3 = 0d0/MH2
+                 
+!         call ShiftMass2(p(1:4,3),p(1:4,4),M_Z,p5hat,p6hat)! projecting Z boson on-shell (because computation assumed p3^3=MZ^2)
+!         p3(1:4) = p5hat(1:4)+p6hat(1:4)
+        shat =+2d0*(p1.dot.p2)
+        that =-2d0*(p1.dot.p3)+MV2
+        uhat =-2d0*(p2.dot.p3)+MV2
+        mTrans = dsqrt( get_pT(dble(p3(1:4)))**2 + MV2 )
+        smT  = dsqrt(shat)*mTrans
+        y    = Get_ETA(dble(p3(1:4)))
+
+        
+!         print *, "check1",that,- smT* E**(-y) + MV2
+!         print *, "check2",uhat,- smT* E**(+y) + MV2
+!         pause
+        
+    
+!         p30(1:4) = p3(1:4) - (p3(1:4).dot.p3(1:4))/(2d0*(p3(1:4).dot.p1(1:4)))*p1(1:4)       
+!         call my_spinoru(4,(/p(1:4,1),p(1:4,2),p5hat(1:4),p6hat(1:4)/),za,zb,sprod)
+!         a = za(1,2);  b = za(1,3);  c = za(1,4);  d = za(2,3);  e = za(2,4);  f = za(3,4)
+!         v = zb(1,2);  w = zb(1,3);  x = zb(1,4);  y = zb(2,3);  z = zb(2,4);  o = zb(3,4)
+
+!       evaluate scalar integrals      
+        SI(0) = 1d0
+        eps = 0
+!         ! check 1/eps^2
+!         print *, "checking 1/eps^2"
+!         eps=-2
+!         SI(0) = 0d0
+        ! check 1/eps^1
+!         print *, "checking 1/eps^1"
+!         eps=-1
+!         SI(0) = 0d0
+             
+        MuRen2 = Mu_Ren**2
+!         print *, "checks"
+!         print *, PreFac,IZ,MZ2,MH2,MT2
+!         print *, shat,that,uhat
+!         print *, p(1:4,1)
+!         print *, p(1:4,2)
+!         print *, p(1:4,3)
+!         print *, p(1:4,4)
+!         pause
+#if useCollier==1   
+         call SetMuUV2_cll(MuRen2)
+         call SetMuIR2_cll(MuRen2)
+#endif
+
+
+!         SI(1:16) = 0d0
+#if useQCDLoopLib==1
+        SI(1) = qlI1(MT2,MuRen2,eps)
+        SI(2) = qlI2(zero, MT2,MT2,MuRen2,eps)
+        SI(3) = qlI2(MH2,  MT2,MT2,MuRen2,eps)
+        SI(4) = qlI2(MV2,  MT2,MT2,MuRen2,eps)
+        SI(5) = qlI2(shat, MT2,MT2,MuRen2,eps)
+        SI(6) = qlI2(that, MT2,MT2,MuRen2,eps)
+        SI(7) = qlI2(uhat, MT2,MT2,MuRen2,eps)
+        SI(8) = qlI3(zero,zero,shat, MT2,MT2,MT2,MuRen2,eps)
+        SI(9) = qlI3(zero,MV2,that, MT2,MT2,MT2,MuRen2,eps)
+        SI(10)= qlI3(zero,MV2,uhat, MT2,MT2,MT2,MuRen2,eps)
+        SI(11)= qlI3(zero,that,MH2, MT2,MT2,MT2,MuRen2,eps)
+        SI(12)= qlI3(zero,uhat,MH2, MT2,MT2,MT2,MuRen2,eps)
+        SI(13)= qlI3(MV2,shat,MH2,  MT2,MT2,MT2,MuRen2,eps)        
+        SI(14)= qlI4(zero,zero,MV2,MH2,shat,that, MT2,MT2,MT2,MT2,MuRen2,eps)
+        SI(15)= qlI4(zero,zero,MV2,MH2,shat,uhat, MT2,MT2,MT2,MT2,MuRen2,eps)
+        SI(16)= qlI4(zero,MV2,zero,MH2,that,uhat, MT2,MT2,MT2,MT2,MuRen2,eps)
+
+#else
+
+    print *, "No loop integrals"
+#endif
+
+
+!       helicity sum
+        UnPolSqAmp = 0d0
+        do h1=-1,+1, 2
+        do h2=-1,+1, 2
+        do h3=-1,+1    !, 2
+       
+!           polarization vectors
+            ep1(1:4) = pol_gluon_incoming(p(1:4,1),h1)
+            ep2(1:4) = pol_gluon_incoming(p(1:4,2),h2)
+!             cep3(1:4)= pol_Zff_outgoing(p(1:4,3),p(1:4,4),h3)   * (-1d0)/( MV2-MZ2 + (0d0,1d0)*M_Z*Ga_Z )
+!             if( h3.lt.0 ) then!  CHECK THAT L-R ASSIGNMENTS ARE CORRECT !!!
+!                cep3(1:4) = cep3(1:4) * dsqrt(4d0*pi*alpha_QED)/2d0/sitW/dsqrt(1d0-sitW**2) * aR_lep
+!             else
+!                cep3(1:4) = cep3(1:4) * dsqrt(4d0*pi*alpha_QED)/2d0/sitW/dsqrt(1d0-sitW**2) * aL_lep
+!             endif
+            cep3(1:4) = pol_mass(p3(1:4),h3,outgoing=.true.)
+
+    
+!           scalar products
+            SP(1) = (cep3.dot.ep1)
+            SP(2) = (cep3.dot.ep2)
+            SP(3) = (cep3.dot.p1)
+            SP(4) = (cep3.dot.p2)
+            SP(5) = ( ep1.dot.ep2)
+            SP(6) = ( ep1.dot.p3)
+            SP(7) = ( ep2.dot.p3)
+            
+!           Levi-Civita tensors
+            LC(1) = LeviCiv(p1,ep1,ep2,cep3)
+            LC(2) = LeviCiv(p1,p2,ep1,cep3)
+            LC(3) = LeviCiv(p1,p2,ep1,ep2)
+            LC(4) = LeviCiv(p1,p2,ep2,cep3)
+            LC(5) = LeviCiv(p1,p2,p3,cep3)
+            LC(6) = LeviCiv(p1,p2,p3,ep1)
+            LC(7) = LeviCiv(p1,p2,p3,ep2)
+            LC(8) = LeviCiv(p1,p3,ep1,cep3)
+            LC(9) = LeviCiv(p1,p3,ep1,ep2)
+            LC(10)= LeviCiv(p1,p3,ep2,cep3)
+            LC(11)= LeviCiv(p2,ep1,ep2,cep3)
+            LC(12)= LeviCiv(p2,p3,ep1,cep3)
+            LC(13)= LeviCiv(p2,p3,ep1,ep2)
+            LC(14)= LeviCiv(p2,p3,ep2,cep3)
+            LC(15)= LeviCiv(p3,ep1,ep2,cep3)
+            
+            
+ 
+            
+!           Loop amplitudes
+            MasslessTri = (2*MZ2*SI(0)*(-4*VVHg1*LC(3)*(SP(3) + SP(4)) + 4*smT*VVHg2*Cosh(y)*LC(3)*(SP(3) + SP(4))  & 
+                            + shat*(-(VVHg1*(LC(1) + 5*LC(11))) + VVHg2*(LC(9) + 5*LC(13))*(SP(3) + SP(4)))         &
+                            + 3*shat**2*VVHg3*(SP(2)*SP(6) - SP(1)*SP(7))))/(3*shat*(-MH2 + MV2 + MZ2 - 2*smT*Cosh(y)))
+! 
+            MassiveTri = (-2*(2*smT*VVHg2*LC(3)*(MZ2*(shat*SI(0) - SI(1) + MT2*(SI(0) - 2*SI(2) + 3*SI(5))) +   &
+                           3*MT2*(MZ2 - shat)*shat*SI(8))*(SP(3) + SP(4)) + 2*E**(2*y)*smT*VVHg2*LC(3)*   &
+                           (MZ2*(shat*SI(0) - SI(1) + MT2*(SI(0) - 2*SI(2) + 3*SI(5))) + 3*MT2*(MZ2 - shat)*shat*SI(8))*(SP(3) + SP(4)) +    &
+                           E**y*(-2*MT2*(-6*shat**2*(VVHg1 + shat*VVHg2)*LC(3)*SI(8)*(SP(3) + SP(4)) + MZ2*(2*VVHg1*LC(3)*(SI(0) - 2*SI(2) + 3*SI(5))*   &
+                           (SP(3) + SP(4)) + 6*shat**2*VVHg2*LC(3)*SI(8)*(SP(3) + SP(4)) + shat*(VVHg2*(LC(9) - LC(13))*(SI(0) - 2*SI(2) + 3*SI(5))*   &
+                           (SP(3) + SP(4)) + VVHg1*(-((LC(1) - LC(11))*(SI(0) - 2*SI(2) + 3*SI(5))) +    &
+                           6*LC(3)*SI(8)*(SP(3) + SP(4)))))) +  MZ2*(4*VVHg1*LC(3)*SI(1)*(SP(3) + SP(4)) +    &
+                           shat**2*SI(0)*(-(VVHg1*(LC(1) + 5*LC(11))) +  VVHg2*(LC(9) + 5*LC(13))*(SP(3) + SP(4))) -    &
+                           2*shat*(-(VVHg2*(LC(9) - LC(13))*SI(1)*(SP(3) + SP(4))) + VVHg1*((LC(1) - LC(11))*SI(1) +    &
+                           2*LC(3)*SI(0)*(SP(3) + SP(4)))) + 3*shat**3*VVHg3*SI(0)*(SP(2)*SP(6) - SP(1)*SP(7))))))/(3*E**y*shat**2*(MH2 - MV2 - MZ2 + 2*smT*Cosh(y)))
+
+!             MassiveBox = calc_MassiveBox(MV2,MH2,MT2,shat,smT,y,LC,SP,SI,kappa,kappa_tilde)
+!             MassiveBox = calc_MassiveBox_QP(MV2,MH2,MT2,shat,smT,y,LC,SP,SI,kappa,kappa_tilde)
+            MassiveBox = calc_MassiveTensorBox(MV2,MT2,MH2,shat,that,uhat,smT,y,LC,SP,SI,kappa,kappa_tilde)
+            
+            
+            MasslessTri = MasslessTri * PreFac * IZ(4,9)
+            MassiveTri  = MassiveTri  * PreFac * IZ(3,9)
+            MassiveBox  = MassiveBox  * PreFac2* IZ(3,9)
+            
+            UnPolSqAmp = UnPolSqAmp + ICol_sq * cdabs( MasslessTri*1 + MassiveTri*1 + MassiveBox*1 )**2
+      
+                                 
+                               
+!             print *, h1,h2,h3
+!             print *, "MasslessTri",MasslessTri
+!             print *, "MassiveTri",MassiveTri
+!             print *, "MassiveBox",MassiveBox
+!             pause
+
+        enddo
+        enddo
+        enddo
+
+
+      RETURN
+      END SUBROUTINE
+
+
+
+
+
+
+
 
 
 end module ModVHiggs
