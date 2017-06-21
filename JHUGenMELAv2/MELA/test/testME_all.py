@@ -22,8 +22,19 @@ badbkgratios = set()
 different = set()
 
 referencefiles = os.listdir("reference")
+referencefiles.sort(key=lambda _: "testME_Prop" not in _)
 
-for j, ref in enumerate(referencefiles):
+def unifycontent(content):
+    """
+    removes stuff from the reference file that would make
+    it different for each run for no real reason.
+    For example 0x1234567 --> 0xPOINTER
+    """
+    content = re.sub("0x[0-9a-f]+", "0xPOINTER", content)
+#    if "Start Mela constructor" in content: content = content.split("End Mela constructor")[1].lstrip()
+    return content
+
+for j, ref in enumerate(referencefiles, start=1):
     match = re.match("(testME_.*_Ping)_?(.*).ref", ref)
     if not match:
         raise RuntimeError("Unknown filename {}".format(ref))
@@ -56,14 +67,12 @@ for j, ref in enumerate(referencefiles):
     newfile = ref.replace(".ref", ".out")
 
     with open(newfile) as f:
-        content = f.read()
-        content = re.sub("0x[0-9a-f]+", "0xPOINTER", content)
+        content = unifycontent(f.read())
     with open(newfile, 'w') as f:
         f.write(content)
 
     with open("reference/"+ref) as f:
-        refcontent = f.read()
-        refcontent = re.sub("0x[0-9a-f]+", "0xPOINTER", refcontent)
+        refcontent = unifycontent(f.read())
 
     if refcontent != content:
         different.add(newfile)
