@@ -30,6 +30,7 @@
 #include "RooNumIntConfig.h"
 #include "RooRealIntegral.h"
 #include "Mela.h"
+#include "ScalarPdfFactory_VH.h"
 
 
 using namespace std;
@@ -704,7 +705,7 @@ void get_PAvgProfile_JHUGen_JJVBF_HSMHiggs_7or8TeV(int sqrts=8){
   cout << "NEntries = " << nEntries << " over " << treeList.size() << " trees." << endl;
 
   vector<pair<float, int>> index;
-  unsigned ev_acc=0;
+  unsigned int ev_acc=0;
   for (int ev=0; ev<nEntries; ev++){
     getEntry(treeList, ev);
     if (NJets30<2) continue;
@@ -996,7 +997,7 @@ void get_PAvgProfile_JHUGen_JJQCD_HSMHiggs_7or8TeV(int sqrts=8){
   cout << "NEntries = " << nEntries << " over " << treeList.size() << " trees." << endl;
 
   vector<pair<float, int>> index;
-  unsigned ev_acc=0;
+  unsigned int ev_acc=0;
   for (int ev=0; ev<nEntries; ev++){
     getEntry(treeList, ev);
     if (NJets30<2) continue;
@@ -1293,7 +1294,7 @@ void get_PAvgProfile_JHUGen_JQCD_HSMHiggs_7or8TeV(int sqrts=8){
   cout << "NEntries = " << nEntries << " over " << treeList.size() << " trees." << endl;
 
   vector<pair<float, int>> index;
-  unsigned ev_acc=0;
+  unsigned int ev_acc=0;
   for (int ev=0; ev<nEntries; ev++){
     getEntry(treeList, ev);
     if (NJets30!=1) continue;
@@ -1607,7 +1608,7 @@ void get_PAvgProfile_JHUGen_JJVBF_HSMHiggs_13TeV(int sqrts=13, bool recalculate 
   cout << "NEntries = " << nEntries << endl;
 
   vector<pair<float, int>> index;
-  unsigned ev_acc=0;
+  unsigned int ev_acc=0;
   for (int ev=0; ev<nEntries; ev++){
     getEntry(treeList, ev);
     if (NJets30<2) continue;
@@ -1916,7 +1917,7 @@ void get_PAvgProfile_JHUGen_JJQCD_HSMHiggs_13TeV(int sqrts=13, bool recalculate 
   cout << "NEntries = " << nEntries << endl;
 
   vector<pair<float, int>> index;
-  unsigned ev_acc=0;
+  unsigned int ev_acc=0;
   for (int ev=0; ev<nEntries; ev++){
     getEntry(treeList, ev);
     if (NJets30<2) continue;
@@ -2230,7 +2231,7 @@ void get_PAvgProfile_JHUGen_JQCD_HSMHiggs_13TeV(int sqrts=13, bool recalculate =
   cout << "NEntries = " << nEntries << endl;
 
   vector<pair<float, int>> index;
-  unsigned ev_acc=0;
+  unsigned int ev_acc=0;
   for (int ev=0; ev<nEntries; ev++){
     getEntry(treeList, ev);
     if (NJets30!=1) continue;
@@ -2420,13 +2421,16 @@ void get_PAvgProfile_JHUGen_JQCD_HSMHiggs_13TeV(int sqrts=13, bool recalculate =
   for (unsigned int f=0; f<finputList.size(); f++) finputList.at(f)->Close();
 }
 
-
 /*
-SPECIFIC COMMENT: OUTPUT ME DIVIDED BY
+SPECIFIC COMMENTS:
+OUTPUT ME DIVIDED BY
 - H(1) PROPAGATOR
-- (aL1**2+aR1**2)*(aL2**2+aR2**2) TO REMAIN INDEPENDENT OF CHANNEL
+- mJJ propagator is taken out in WH or ZH
+ZH AND WH SAMPLES ARE COMBINED TOGETHER BECAUSE
+V2 PROPAGATOR IS REMOVED AND V1 PROPAGATOR DOES NOT MAKE MUCH DIFFERENCE.
 */
-void get_PAvgProfile_MCFM_JJEW_HSMHiggs_13TeV(int sqrts=13, bool recalculate = true){
+void get_PAvgProfile_JHUGen_HadVH_HSMHiggs_13TeV(TString strprod, int sqrts=13, bool recalculate = true){
+  if (!(strprod == "Had_ZH" || strprod == "Had_WH")) return;
   int erg_tev=sqrts;
   float mPOLE=125.;
   TString TREE_NAME = "ZZTree/candTree";
@@ -2434,12 +2438,20 @@ void get_PAvgProfile_MCFM_JJEW_HSMHiggs_13TeV(int sqrts=13, bool recalculate = t
   bool writeFinalTree=true;
 
   TVar::Process proc = TVar::HSMHiggs;
-  TVar::MatrixElement me = TVar::MCFM;
-  TVar::Production prod = TVar::JJEW;
+  TVar::MatrixElement me = TVar::JHUGen;
+  TVar::Production prod;
+  for (int iprod=(int)TVar::JJVBF; iprod<(int)TVar::nProductions; iprod++){
+    prod = (TVar::Production)iprod;
+    if (TVar::ProductionName(prod)==strprod) break;
+  }
+  TString strsamples="", strsamples2="";
+  if (strprod == "Had_ZH") strsamples="ZH";
+  else if (strprod == "Had_WH") strsamples="WH";
+  if (strprod == "Had_ZH") strsamples2="WH";
+  else if (strprod == "Had_WH") strsamples2="ZH";
 
   TString strproc = ProcessName(proc);
   TString strme = MatrixElementName(me);
-  TString strprod = ProductionName(prod);
 
   TVar::VerbosityLevel verbosity = TVar::ERROR;
   Mela mela(erg_tev, mPOLE, verbosity);
@@ -2471,24 +2483,23 @@ void get_PAvgProfile_MCFM_JJEW_HSMHiggs_13TeV(int sqrts=13, bool recalculate = t
   float phi1 = 1.8828257;
   float ZZPt, ZZPhi, ZZEta;
   short Z1Flav, Z2Flav;
-  float xsec, ngen, genHEPMCweight, rewgt;
+  float xsec, ngen, genHEPMCweight;
   float wgt=1;
+  float rewgt=1;
+  bool doRewgt=false;
+  TString strrewgtbranch="";
+  TString strrecalcbranch="";
+  TString strrecalcconstbranch="";
 
   TString cinput_main;
   if (sqrts==13) cinput_main = inputdir_13TeV;
   else return;
 
-  TString strchannel[3]={ "4mu", "4e", "2mu2e" };
+  vector<TString> strSamples = constructSamplesList(strsamples, sqrts);
+  vector<TString> strSamples2 = constructSamplesList(strsamples2, sqrts);
+  appendVector(strSamples, strSamples2);
 
-  vector<TString> strSamples_VBF = constructSamplesList("JJVBF", sqrts);
-  vector<TString> strSamples_WH = constructSamplesList("WH", sqrts);
-  vector<TString> strSamples_ZH = constructSamplesList("ZH", sqrts);
-  vector<TString> strSamples;
-  appendVector(strSamples, strSamples_VBF);
-  appendVector(strSamples, strSamples_WH);
-  appendVector(strSamples, strSamples_ZH);
-
-  unordered_map<TTree*, pair<float,float>> nGenMap;
+  unordered_map<TTree*, pair<float, float>> nGenMap;
   unordered_map<TTree*, float> mass_map;
   unordered_map<float, vector<TTree*>> mass_sample_map;
 
@@ -2506,7 +2517,24 @@ void get_PAvgProfile_MCFM_JJEW_HSMHiggs_13TeV(int sqrts=13, bool recalculate = t
         tree = (TTree*)finput->Get(TREE_NAME);
         if (tree!=0){
           cout << TREE_NAME << " is found." << endl;
-          //if (!recalculate && tree->GetBranchStatus("pConst_JJEW_SIG_ghv1_1_MCFM_JECNominal")==0) recalculate=true;
+          if (!recalculate){
+            if (prod==TVar::Had_ZH && tree->GetBranchStatus("pConst_HadZH_SIG_ghz1_1_JHUGen_JECNominal")!=0){
+              strrecalcbranch = "p_HadZH_SIG_ghz1_1_JHUGen_JECNominal";
+              strrecalcconstbranch = "pConst_HadZH_SIG_ghz1_1_JHUGen_JECNominal";
+            }
+            else if (prod==TVar::Had_WH && tree->GetBranchStatus("pConst_HadWH_SIG_ghv1_1_JHUGen_JECNominal")!=0){
+              strrecalcbranch = "p_HadWH_SIG_ghv1_1_JHUGen_JECNominal";
+              strrecalcconstbranch = "pConst_HadWH_SIG_ghv1_1_JHUGen_JECNominal";
+            }
+            else if (prod==TVar::JJVBF && tree->GetBranchStatus("pConst_JJVBF_SIG_ghv1_1_JHUGen_JECNominal")!=0){
+              strrecalcbranch = "p_JJVBF_SIG_ghv1_1_JHUGen_JECNominal";
+              strrecalcconstbranch = "pConst_JJVBF_SIG_ghv1_1_JHUGen_JECNominal";
+            }
+            else recalculate=true;
+          }
+          if (prod==TVar::Had_ZH && tree->GetBranchStatus("p_Gen_ZH_SIG_ghz1_1_MCFM")!=0) strrewgtbranch = "p_Gen_ZH_SIG_ghz1_1_MCFM";
+          else if (prod==TVar::Had_WH && tree->GetBranchStatus("p_Gen_WH_SIG_ghv1_1_MCFM")!=0) strrewgtbranch = "p_Gen_WH_SIG_ghv1_1_MCFM";
+          else if (prod==TVar::JJVBF && tree->GetBranchStatus("p_Gen_VBF_SIG_ghv1_1_MCFM")!=0) strrewgtbranch = "p_Gen_VBF_SIG_ghv1_1_MCFM";
           tree->SetBranchStatus("*", 0);
           tree->SetBranchStatus("xsec", 1); tree->SetBranchAddress("xsec", &xsec);
           tree->SetBranchStatus("genHEPMCweight", 1); tree->SetBranchAddress("genHEPMCweight", &genHEPMCweight);
@@ -2532,12 +2560,410 @@ void get_PAvgProfile_MCFM_JJEW_HSMHiggs_13TeV(int sqrts=13, bool recalculate = t
           tree->SetBranchStatus("LepPhi", 1); tree->SetBranchAddress("LepPhi", &LepPhi);
           tree->SetBranchStatus("Z1Flav", 1); tree->SetBranchAddress("Z1Flav", &Z1Flav);
           tree->SetBranchStatus("Z2Flav", 1); tree->SetBranchAddress("Z2Flav", &Z2Flav);
-          tree->SetBranchStatus("p_Gen_JJEW_SIG_ghv1_1_MCFM", 1); tree->SetBranchAddress("p_Gen_JJEW_SIG_ghv1_1_MCFM", &rewgt);
+          if (strrewgtbranch!=""){
+            tree->SetBranchStatus(strrewgtbranch, 1); tree->SetBranchAddress(strrewgtbranch, &rewgt);
+            cout << "Reweighting is applied from branch " << strrewgtbranch << endl;
+          }
+          //else doRewgt=true; // Do not reweight signal!!!
+          else cout << "No reweighting branch " << strrewgtbranch << " is found." << endl;
           if (!recalculate){
-            tree->SetBranchStatus("p_JJEW_SIG_ghv1_1_MCFM_JECNominal", 1);
-            tree->SetBranchAddress("p_JJEW_SIG_ghv1_1_MCFM_JECNominal", &mesq_calc);
-            tree->SetBranchStatus("pConst_JJEW_SIG_ghv1_1_MCFM_JECNominal", 1);
-            tree->SetBranchAddress("pConst_JJEW_SIG_ghv1_1_MCFM_JECNominal", &cconst_calc);
+            tree->SetBranchStatus(strrecalcbranch, 1); tree->SetBranchAddress(strrecalcbranch, &mesq_calc);
+            tree->SetBranchStatus(strrecalcconstbranch, 1); tree->SetBranchAddress(strrecalcconstbranch, &cconst_calc);
+          }
+          tree->GetEntry(0);
+          cout << "Cross section = " << xsec << endl;
+
+          TH1F* htmp = (TH1F*)finput->Get(COUNTERS_NAME);
+          pair<float, float> nsum(htmp->GetBinContent(1), htmp->GetBinContent(41)); // No PU reweighting
+          nGenMap[tree]=nsum;
+
+          nEntries += tree->GetEntries();
+          treeList.push_back(tree);
+          finputList.push_back(finput);
+
+          float polemass = findPoleMass(strSamples[is]);
+          cout << "Pole mass = " << polemass << endl;
+          mass_map[tree]=polemass;
+          if (mass_sample_map.find(polemass)==mass_sample_map.end()){
+            cout << "Inserting new pole mass sample array" << endl;
+            vector<TTree*> dumarr;
+            mass_sample_map[polemass] = dumarr;
+          }
+          mass_sample_map[polemass].push_back(tree);
+        }
+        else finput->Close();
+      }
+      else if (finput->IsOpen()) finput->Close();
+    }
+  }
+  cout << "NEntries = " << nEntries << endl;
+
+  for (auto it = mass_sample_map.begin(); it != mass_sample_map.end(); ++it){
+    float sum_ngen=0;
+    float sum_xsec=0;
+    for (unsigned int ix=0; ix<it->second.size(); ix++){
+      it->second.at(ix)->GetEntry(0);
+      sum_ngen += nGenMap[it->second.at(ix)].first;
+      sum_xsec += xsec;
+    }
+    float overallWeight = sum_ngen/sum_xsec;
+    for (unsigned int ix=0; ix<it->second.size(); ix++){
+      cout << "Sum Hep MC weights in tree " << ix << " / " << it->second.size() << " was " << nGenMap[it->second.at(ix)].second << " over " << nGenMap[it->second.at(ix)].first << " total gen. events." << endl;
+      nGenMap[it->second.at(ix)].first = overallWeight/nGenMap[it->second.at(ix)].second;
+      cout << "Event scale for tree " << ix << " / " << it->second.size() << " at pole mass " << it->first << " = " << nGenMap[it->second.at(ix)].first << endl;
+    }
+  }
+
+  TFile* foutput = TFile::Open(Form("pAvgLinToLog_%s_%s_%s_%iTeV.root", strme.Data(), strprod.Data(), strproc.Data(), sqrts), "recreate");
+
+  vector<pair<float, int>> index;
+  unsigned int ev_acc=0;
+  for (int ev=0; ev<nEntries; ev++){
+    getEntry(treeList, ev);
+    bool doProcess=NJets30>=2;
+    if (!doProcess) continue;
+    if (ev_acc%10000==0) cout << "Pre-processing event " << ev << endl;
+    unsigned int ic = (Z1Flav*Z2Flav==pow(13, 4))*0 + (Z1Flav*Z2Flav==pow(11, 4))*1 + (Z1Flav*Z2Flav==pow(11*13, 2))*2;
+    addByLowest(index, mzz, ev);
+    ev_acc++;
+  }
+
+  float firstVal=index.at(0).first;
+  float lastVal=index.at(index.size()-1).first;
+  float infimum = (float)((int)firstVal); infimum -= (float)(((int)infimum)%10);
+  float supremum = (float)((int)(lastVal+0.5)); supremum += (float)(10-((int)supremum)%10);
+  cout << "Nentries = " << nEntries << " | mzz = " << firstVal << " - " << lastVal << "(" << infimum << ", " << supremum << ")" << endl;
+
+  float divisor=60000;
+  if (prod==TVar::Had_ZH) divisor = 60000;
+  int nbins = index.size()/divisor;
+  const int nbins_th=8/*50*/;
+  while (nbins<nbins_th){
+    if (divisor>1000) divisor -= 1000;
+    else if (divisor>100) divisor -= 100;
+    else break;
+    nbins=index.size()/divisor;
+  }
+  cout << "nbins=" << nbins << endl;
+  if (nbins<3) cerr << "Not enough bins!" << endl;
+  vector<ExtBin> binList;
+  float* binning = new float[nbins+1];
+  binning[0]=infimum;
+  binning[nbins]=supremum;
+  int ev_stepsize = index.size()/nbins;
+  cout << "Event step size: " << ev_stepsize << endl;
+  cout << "Boundary (" << 0 << ") = " << binning[0] << endl;
+  for (int ix=1; ix<nbins; ix++){
+    binning[ix]=(index[ix*ev_stepsize-1].first+index[ix*ev_stepsize].first)*0.5;
+    ExtBin tmpbin;
+    tmpbin.binlow = binning[ix-1];
+    tmpbin.binhigh = binning[ix];
+    for (int bin=0; bin<ev_stepsize; bin++) tmpbin.events.push_back(index[(ix-1)*ev_stepsize+bin].second);
+    binList.push_back(tmpbin);
+    cout << "Boundary (" << ix << ")= " << binning[ix] << " [event " << index[ix*ev_stepsize].second << ", step " << ix*ev_stepsize << "]" << endl;
+  }
+  ExtBin tmpbin;
+  tmpbin.binlow = binning[nbins-1];
+  tmpbin.binhigh = binning[nbins];
+  for (unsigned int bin=(nbins-1)*ev_stepsize; bin<index.size(); bin++) tmpbin.events.push_back(index[bin].second);
+  binList.push_back(tmpbin);
+  cout << "Boundary (" << nbins << ") = " << binning[nbins] << endl;
+  cout << "Bin list has the following bins:" << endl;
+  for (unsigned int ib=0; ib<binList.size(); ib++){
+    cout << ib << " / " << binList.size() << ": [" << binList.at(ib).binlow << "," << binList.at(ib).binhigh << "]" << endl;
+  }
+
+  TProfile* hvar = new TProfile("candMass", "", nbins, binning); hvar->Sumw2();
+  TProfile* hmesq_conserveDifermMass = new TProfile("P_ConserveDifermionMass", "", nbins, binning); hmesq_conserveDifermMass->Sumw2();
+
+  TTree* newtree=0;
+  if (writeFinalTree){
+    newtree = new TTree("FinalTree", "");
+    newtree->Branch("mesq_conserveDifermMass", &mesq_conserveDifermMass);
+    newtree->Branch("ZZMass", &mzz);
+    newtree->Branch("weight", &wgt);
+  }
+
+  mela.setCandidateDecayMode(TVar::CandidateDecay_ZZ);
+
+  double aL1=0, aR1=0, aL2=0, aR2=0;
+  double mh=0, gah=0;
+  double mv=0, gav=0;
+  ev_acc=0;
+  for (unsigned int bin=0; bin<binList.size(); bin++){
+    cout << "Bin " << bin << " is now being scrutinized..." << endl;
+    for (unsigned int ev = 0; ev < binList.at(bin).events.size(); ev++){
+      int getEv = binList.at(bin).events.at(ev);
+      getEntry(treeList, getEv);
+      if (ev%1000==0) cout << "Doing event " << getEv << endl;
+      if (JetPt->size()<2 || JetEta->size()<2 || JetPhi->size()<2 || JetMass->size()<2){
+        cerr << "Jet array sizes are less than Njets!" << endl;
+        continue;
+      }
+      TTree* tree = findTree(treeList, getEv);
+      wgt = fabs(xsec*genHEPMCweight*nGenMap[tree].first*rewgt);
+
+      TLorentzVector jet[2], higgs;
+      for (int ij=0; ij<2; ij++) jet[ij].SetPtEtaPhiM(JetPt->at(ij), JetEta->at(ij), JetPhi->at(ij), JetMass->at(ij));
+      higgs.SetPtEtaPhiM(ZZPt, ZZEta, ZZPhi, mzz);
+      TVector3 boostH = higgs.BoostVector();
+
+      SimpleParticleCollection_t associated;
+      associated.push_back(SimpleParticle_t(0, jet[0]));
+      associated.push_back(SimpleParticle_t(0, jet[1]));
+
+      SimpleParticleCollection_t daughters;
+      for (int id=0; id<4; id++){
+        double mass=0;
+        if (abs(LepLepId->at(id))==13) mass = 0.105658;
+        else if (abs(LepLepId->at(id))==11) mass = 0.000511;
+        TLorentzVector pDaughter;
+        pDaughter.SetPtEtaPhiM(LepPt->at(id), LepEta->at(id), LepPhi->at(id), mass);
+        daughters.push_back(SimpleParticle_t(LepLepId->at(id), pDaughter));
+      }
+      mela.setInputEvent(&daughters, &associated, (SimpleParticleCollection_t*)0, false);
+
+      mela.setProcess(proc, me, prod);
+
+      double propagator=1;
+      double propagatorV=1;
+      if (recalculate || ev_acc==0){
+        TUtil::setJetMassScheme(TVar::ConserveDifermionMass);
+        mela.computeProdP(mesq_conserveDifermMass, false);
+        if (!recalculate){
+          mesq_calc /= cconst_calc;
+          mesq_conserveDifermMass=mesq_calc;
+
+          mh = mass_map[tree];
+          gah = mela.getHiggsWidthAtPoleMass(mh);
+        }
+        else{
+          mela.getIORecord()->getHiggsMassWidth(mh, gah, 0);
+        }
+        mela.getIORecord()->getVDaughterCouplings(aL1, aR1, 0);
+        mela.getIORecord()->getVDaughterCouplings(aL2, aR2, 1);
+        if (prod==TVar::Had_ZH){
+          mv = mela.getPrimaryMass(23);
+          gav = mela.getPrimaryWidth(23);
+        }
+        else if (prod==TVar::Had_WH){
+          mv = mela.getPrimaryMass(24);
+          gav = mela.getPrimaryWidth(24);
+        }
+      }
+      else{
+        mesq_calc /= cconst_calc;
+        mesq_conserveDifermMass=mesq_calc;
+      }
+      propagator = 1./(pow(pow(mzz, 2)-pow(mh, 2), 2) + pow(mh*gah, 2));
+      mesq_conserveDifermMass /= propagator;
+      if (prod==TVar::Had_ZH || prod==TVar::Had_WH){
+        double mjj = (jet[0] + jet[1]).M();
+        propagatorV = 1./(pow(pow(mjj, 2)-pow(mv, 2), 2) + pow(mv*gav, 2));
+        mesq_conserveDifermMass /= propagatorV;
+      }
+
+      bool doFill = !(
+        isnan(mesq_conserveDifermMass) || isinf(mesq_conserveDifermMass)
+        );
+
+      if (doFill) binList.at(bin).addEvent(mzz, mesq_conserveDifermMass, 0, wgt);
+
+      mela.resetInputEvent();
+      ev_acc++;
+    }
+
+    binList.at(bin).sift(); binList.at(bin).adjustWeights(10);
+
+    for (unsigned int ev=0; ev<binList.at(bin).masses.size(); ev++){
+      mzz = binList.at(bin).masses.at(ev);
+      mesq_conserveDifermMass = binList.at(bin).mevals.at(ev);
+      wgt = binList.at(bin).weights.at(ev);
+      hmesq_conserveDifermMass->Fill(mzz, mesq_conserveDifermMass);
+      hvar->Fill(mzz, mzz);
+      if (writeFinalTree) newtree->Fill();
+    }
+  }
+  cout << "Total events accumulated: " << ev_acc << endl;
+
+  double* xexyey[4];
+  for (int ix=0; ix<4; ix++) xexyey[ix] = new double[nbins];
+  for (int bin=0; bin<nbins; bin++){
+    xexyey[0][bin] = hvar->GetBinContent(bin+1);
+    xexyey[1][bin] = hvar->GetBinError(bin+1);
+
+    cout << "Bin " << bin << " x-center: " << xexyey[0][bin] << " +- " << xexyey[1][bin] << endl;
+
+    xexyey[2][bin] = hmesq_conserveDifermMass->GetBinContent(bin+1);
+    xexyey[3][bin] = hmesq_conserveDifermMass->GetBinError(bin+1);
+    xexyey[3][bin] = log10(xexyey[3][bin])/xexyey[2][bin];
+    xexyey[2][bin] = log10(xexyey[2][bin]);
+  }
+
+  TGraphErrors* tg = new TGraphErrors(nbins, xexyey[0], xexyey[2], xexyey[1], xexyey[3]);
+  tg->SetName(Form("tg_%s", hmesq_conserveDifermMass->GetName()));
+  foutput->WriteTObject(tg);
+  delete tg;
+
+  for (int ix=0; ix<4; ix++) delete[] xexyey[ix];
+
+  foutput->WriteTObject(hmesq_conserveDifermMass);
+  foutput->WriteTObject(hvar);
+  if (writeFinalTree) foutput->WriteTObject(newtree);
+  if (writeFinalTree) delete newtree;
+  delete hmesq_conserveDifermMass;
+  delete hvar;
+  delete[] binning;
+
+  foutput->Close();
+  for (unsigned int f=0; f<finputList.size(); f++) finputList.at(f)->Close();
+}
+
+
+/*
+SPECIFIC COMMENT: OUTPUT ME DIVIDED BY
+- H(1) PROPAGATOR
+- (aL1**2+aR1**2)*(aL2**2+aR2**2) TO REMAIN INDEPENDENT OF CHANNEL
+- mJJ propagator is taken out in WH or ZH
+*/
+void get_PAvgProfile_MCFM_JJPROD_HSMHiggs_13TeV(TString strprod, int sqrts=13, bool recalculate = true){
+  if (!(strprod == "Had_ZH" || strprod == "Had_WH" || strprod == "JJVBF")) return;
+  int erg_tev=sqrts;
+  float mPOLE=125.;
+  TString TREE_NAME = "ZZTree/candTree";
+  TString COUNTERS_NAME = "ZZTree/Counters";
+  bool writeFinalTree=true;
+
+  TVar::Process proc = TVar::HSMHiggs;
+  TVar::MatrixElement me = TVar::MCFM;
+  TVar::Production prod;
+  for (int iprod=(int)TVar::JJVBF; iprod<(int)TVar::nProductions; iprod++){
+    prod = (TVar::Production)iprod;
+    if (TVar::ProductionName(prod)==strprod) break;
+  }
+  TString strsamples;
+  if (strprod == "Had_ZH") strsamples="ZH";
+  else if (strprod == "Had_WH") strsamples="WH";
+  else if (strprod == "JJVBF") strsamples="JJVBF";
+
+  TString strproc = ProcessName(proc);
+  TString strme = MatrixElementName(me);
+
+  TVar::VerbosityLevel verbosity = TVar::ERROR;
+  Mela mela(erg_tev, mPOLE, verbosity);
+
+  std::vector<short>* LepLepId=0;
+  std::vector<float>* LepPt=0;
+  std::vector<float>* LepEta=0;
+  std::vector<float>* LepPhi=0;
+
+  short NJets30;
+  std::vector<float>* JetPt=0;
+  std::vector<float>* JetEta=0;
+  std::vector<float>* JetPhi=0;
+  std::vector<float>* JetMass=0;
+  std::vector<float> myJetPt;
+  std::vector<float> myJetEta;
+  std::vector<float> myJetPhi;
+  std::vector<float> myJetMass;
+
+  float mesq_calc=0., cconst_calc=1.;
+  float mesq_conserveDifermMass=0;
+  float mzz = 126.;
+  float m1 = 91.471450;
+  float m2 = 12.139782;
+  float h1 = 0.2682896;
+  float h2 = 0.1679779;
+  float phi = 1.5969792;
+  float hs = -0.727181;
+  float phi1 = 1.8828257;
+  float ZZPt, ZZPhi, ZZEta;
+  short Z1Flav, Z2Flav;
+  float xsec, ngen, genHEPMCweight;
+  float wgt=1;
+  float rewgt=1;
+  bool doRewgt=false;
+  TString strrewgtbranch="";
+  TString strrecalcbranch="";
+  TString strrecalcconstbranch="";
+
+  TString cinput_main;
+  if (sqrts==13) cinput_main = inputdir_13TeV;
+  else return;
+
+  TString strchannel[3]={ "4mu", "4e", "2mu2e" };
+  vector<TString> strSamples = constructSamplesList(strsamples, sqrts);
+
+  unordered_map<TTree*, pair<float, float>> nGenMap;
+  unordered_map<TTree*, float> mass_map;
+  unordered_map<float, vector<TTree*>> mass_sample_map;
+
+  vector<TFile*> finputList;
+  vector<TTree*> treeList;
+  int nEntries=0;
+  for (unsigned int is=0; is<strSamples.size(); is++){
+    TString cinput = Form("%s/%s/ZZ4lAnalysis.root", cinput_main.Data(), (strSamples[is]).Data());
+    TFile* finput = TFile::Open(cinput, "read");
+    cout << "Opening file " << cinput << "..." << endl;
+    TTree* tree=0;
+    if (finput!=0){
+      if (finput->IsOpen() && !finput->IsZombie()){
+        cout << cinput << " opened. Extracting tree " << TREE_NAME << "..." << endl;
+        tree = (TTree*)finput->Get(TREE_NAME);
+        if (tree!=0){
+          cout << TREE_NAME << " is found." << endl;
+          if (!recalculate){
+            if (prod==TVar::Had_ZH && tree->GetBranchStatus("pConst_HadZH_SIG_ghz1_1_MCFM_JECNominal")!=0){
+              strrecalcbranch = "p_HadZH_SIG_ghz1_1_MCFM_JECNominal";
+              strrecalcconstbranch = "pConst_HadZH_SIG_ghz1_1_MCFM_JECNominal";
+            }
+            else if (prod==TVar::Had_WH && tree->GetBranchStatus("pConst_HadWH_SIG_ghv1_1_MCFM_JECNominal")!=0){
+              strrecalcbranch = "p_HadWH_SIG_ghv1_1_MCFM_JECNominal";
+              strrecalcconstbranch = "pConst_HadWH_SIG_ghv1_1_MCFM_JECNominal";
+            }
+            else if (prod==TVar::JJVBF && tree->GetBranchStatus("pConst_JJVBF_SIG_ghv1_1_MCFM_JECNominal")!=0){
+              strrecalcbranch = "p_JJVBF_SIG_ghv1_1_MCFM_JECNominal";
+              strrecalcconstbranch = "pConst_JJVBF_SIG_ghv1_1_MCFM_JECNominal";
+            }
+            else recalculate=true;
+          }
+          if (prod==TVar::Had_ZH && tree->GetBranchStatus("p_Gen_ZH_SIG_ghz1_1_MCFM")!=0) strrewgtbranch = "p_Gen_ZH_SIG_ghz1_1_MCFM";
+          else if (prod==TVar::Had_WH && tree->GetBranchStatus("p_Gen_WH_SIG_ghv1_1_MCFM")!=0) strrewgtbranch = "p_Gen_WH_SIG_ghv1_1_MCFM";
+          else if (prod==TVar::JJVBF && tree->GetBranchStatus("p_Gen_VBF_SIG_ghv1_1_MCFM")!=0) strrewgtbranch = "p_Gen_VBF_SIG_ghv1_1_MCFM";
+          tree->SetBranchStatus("*", 0);
+          tree->SetBranchStatus("xsec", 1); tree->SetBranchAddress("xsec", &xsec);
+          tree->SetBranchStatus("genHEPMCweight", 1); tree->SetBranchAddress("genHEPMCweight", &genHEPMCweight);
+          tree->SetBranchStatus("nCleanedJetsPt30", 1); tree->SetBranchAddress("nCleanedJetsPt30", &NJets30);
+          tree->SetBranchStatus("JetPt", 1); tree->SetBranchAddress("JetPt", &JetPt);
+          tree->SetBranchStatus("JetEta", 1); tree->SetBranchAddress("JetEta", &JetEta);
+          tree->SetBranchStatus("JetPhi", 1); tree->SetBranchAddress("JetPhi", &JetPhi);
+          tree->SetBranchStatus("JetMass", 1); tree->SetBranchAddress("JetMass", &JetMass);
+          tree->SetBranchStatus("ZZMass", 1); tree->SetBranchAddress("ZZMass", &mzz);
+          tree->SetBranchStatus("ZZPt", 1); tree->SetBranchAddress("ZZPt", &ZZPt);
+          tree->SetBranchStatus("ZZEta", 1); tree->SetBranchAddress("ZZEta", &ZZEta);
+          tree->SetBranchStatus("ZZPhi", 1); tree->SetBranchAddress("ZZPhi", &ZZPhi);
+          tree->SetBranchStatus("Z1Mass", 1); tree->SetBranchAddress("Z1Mass", &m1);
+          tree->SetBranchStatus("Z2Mass", 1); tree->SetBranchAddress("Z2Mass", &m2);
+          tree->SetBranchStatus("helcosthetaZ1", 1); tree->SetBranchAddress("helcosthetaZ1", &h1);
+          tree->SetBranchStatus("helcosthetaZ2", 1); tree->SetBranchAddress("helcosthetaZ2", &h2);
+          tree->SetBranchStatus("helphi", 1); tree->SetBranchAddress("helphi", &phi);
+          tree->SetBranchStatus("costhetastar", 1); tree->SetBranchAddress("costhetastar", &hs);
+          tree->SetBranchStatus("phistarZ1", 1); tree->SetBranchAddress("phistarZ1", &phi1);
+          tree->SetBranchStatus("LepLepId", 1); tree->SetBranchAddress("LepLepId", &LepLepId);
+          tree->SetBranchStatus("LepPt", 1); tree->SetBranchAddress("LepPt", &LepPt);
+          tree->SetBranchStatus("LepEta", 1); tree->SetBranchAddress("LepEta", &LepEta);
+          tree->SetBranchStatus("LepPhi", 1); tree->SetBranchAddress("LepPhi", &LepPhi);
+          tree->SetBranchStatus("Z1Flav", 1); tree->SetBranchAddress("Z1Flav", &Z1Flav);
+          tree->SetBranchStatus("Z2Flav", 1); tree->SetBranchAddress("Z2Flav", &Z2Flav);
+          if (strrewgtbranch!=""){
+            tree->SetBranchStatus(strrewgtbranch, 1); tree->SetBranchAddress(strrewgtbranch, &rewgt);
+            cout << "Reweighting is applied from branch " << strrewgtbranch << endl;
+          }
+          //else doRewgt=true; // Do not reweight signal!!!
+          else cout << "No reweighting branch " << strrewgtbranch << " is found." << endl;
+          if (!recalculate){
+            tree->SetBranchStatus(strrecalcbranch, 1); tree->SetBranchAddress(strrecalcbranch, &mesq_calc);
+            tree->SetBranchStatus(strrecalcconstbranch, 1); tree->SetBranchAddress(strrecalcconstbranch, &cconst_calc);
           }
           tree->GetEntry(0);
           cout << "Cross section = " << xsec << endl;
@@ -2586,7 +3012,7 @@ void get_PAvgProfile_MCFM_JJEW_HSMHiggs_13TeV(int sqrts=13, bool recalculate = t
   TFile* foutput = TFile::Open(Form("pAvgLinToLog_%s_%s_%s_%iTeV.root", strme.Data(), strprod.Data(), strproc.Data(), sqrts), "recreate");
 
   vector<pair<float, int>> index[3];
-  unsigned ev_acc=0;
+  unsigned int ev_acc=0;
   for (int ev=0; ev<nEntries; ev++){
     getEntry(treeList, ev);
     bool doProcess=
@@ -2602,6 +3028,7 @@ void get_PAvgProfile_MCFM_JJEW_HSMHiggs_13TeV(int sqrts=13, bool recalculate = t
     if (ev_acc%10000==0) cout << "Pre-processing event " << ev << endl;
     unsigned int ic = (Z1Flav*Z2Flav==pow(13, 4))*0 + (Z1Flav*Z2Flav==pow(11, 4))*1 + (Z1Flav*Z2Flav==pow(11*13, 2))*2;
     addByLowest(index[ic], mzz, ev);
+    if (ic<2) addByLowest(index[1-ic], mzz, ev);
     ev_acc++;
   }
 
@@ -2612,8 +3039,8 @@ void get_PAvgProfile_MCFM_JJEW_HSMHiggs_13TeV(int sqrts=13, bool recalculate = t
     float supremum = (float)((int)(lastVal+0.5)); supremum += (float)(10-((int)supremum)%10);
     cout << "Nentries = " << nEntries << " | mzz = " << firstVal << " - " << lastVal << "(" << infimum << ", " << supremum << ")" << endl;
 
-    float divisor=40000;
-    if (ic<2) divisor = 20000;
+    float divisor=15000;
+    if (prod==TVar::Had_ZH || prod==TVar::Had_WH) divisor=15000;
     int nbins = index[ic].size()/divisor;
     const int nbins_th=10/*50*/;
     while (nbins<nbins_th){
@@ -2665,6 +3092,8 @@ void get_PAvgProfile_MCFM_JJEW_HSMHiggs_13TeV(int sqrts=13, bool recalculate = t
     mela.setCandidateDecayMode(TVar::CandidateDecay_ZZ);
 
     double aL1=0, aR1=0, aL2=0, aR2=0;
+    double mh=0, gah=0;
+    double mv=0, gav=0;
     unsigned int ev_acc=0;
     for (unsigned int bin=0; bin<binList.size(); bin++){
       cout << "Bin " << bin << " is now being scrutinized..." << endl;
@@ -2701,7 +3130,8 @@ void get_PAvgProfile_MCFM_JJEW_HSMHiggs_13TeV(int sqrts=13, bool recalculate = t
 
         mela.setProcess(proc, me, prod);
 
-        double mh=0, gah=0, propagator=0;
+        double propagator=1;
+        double propagatorV=1;
         if (recalculate || ev_acc==0){
           TUtil::setJetMassScheme(TVar::ConserveDifermionMass);
           mela.computeProdP(mesq_conserveDifermMass, false);
@@ -2717,6 +3147,14 @@ void get_PAvgProfile_MCFM_JJEW_HSMHiggs_13TeV(int sqrts=13, bool recalculate = t
           }
           mela.getIORecord()->getVDaughterCouplings(aL1, aR1, 0);
           mela.getIORecord()->getVDaughterCouplings(aL2, aR2, 1);
+          if (prod==TVar::Had_ZH){
+            mv = mela.getPrimaryMass(23);
+            gav = mela.getPrimaryWidth(23);
+          }
+          else if (prod==TVar::Had_WH){
+            mv = mela.getPrimaryMass(24);
+            gav = mela.getPrimaryWidth(24);
+          }
         }
         else{
           mesq_calc /= cconst_calc;
@@ -2726,6 +3164,11 @@ void get_PAvgProfile_MCFM_JJEW_HSMHiggs_13TeV(int sqrts=13, bool recalculate = t
         mesq_conserveDifermMass /= propagator;
         if (fabs(aL1)>0. || fabs(aR1)>0.) mesq_conserveDifermMass /= pow(aL1, 2)+pow(aR1, 2);
         if (fabs(aL2)>0. || fabs(aR2)>0.) mesq_conserveDifermMass /= pow(aL2, 2)+pow(aR2, 2);
+        if (prod==TVar::Had_ZH || prod==TVar::Had_WH){
+          double mjj = (jet[0] + jet[1]).M();
+          propagatorV = 1./(pow(pow(mjj, 2)-pow(mv, 2), 2) + pow(mv*gav, 2));
+          mesq_conserveDifermMass /= propagatorV;
+        }
 
         bool doFill = !(
           isnan(mesq_conserveDifermMass) || isinf(mesq_conserveDifermMass)
@@ -2783,8 +3226,14 @@ void get_PAvgProfile_MCFM_JJEW_HSMHiggs_13TeV(int sqrts=13, bool recalculate = t
   for (unsigned int f=0; f<finputList.size(); f++) finputList.at(f)->Close();
 }
 
-/* SPECIFIC COMMENT: OUTPUT ME DIVIDED BY (aL1**2+aR1**2)*(aL2**2+aR2**2) TO REMAIN INDEPENDENT OF CHANNEL */
-void get_PAvgProfile_MCFM_JJEW_bkgZZ_13TeV(int sqrts=13, bool recalculate = true){
+/*
+SPECIFIC COMMENT: OUTPUT ME DIVIDED BY
+- (aL1**2+aR1**2)*(aL2**2+aR2**2) TO REMAIN INDEPENDENT OF CHANNEL
+- PROP(Z)/LINE_PROP(Z) AROUND M4L~=MZ (FIXME: NOT IMPLEMENTED YET)
+- mJJ propagator is taken out in WH or ZH
+*/
+void get_PAvgProfile_MCFM_JJPROD_bkgZZ_13TeV(TString strprod, int sqrts=13, bool recalculate = true){
+  if (!(strprod == "Had_ZH" || strprod == "Had_WH" || strprod == "JJVBF")) return;
   int erg_tev=sqrts;
   float mPOLE=125.;
   TString TREE_NAME = "ZZTree/candTree";
@@ -2793,11 +3242,18 @@ void get_PAvgProfile_MCFM_JJEW_bkgZZ_13TeV(int sqrts=13, bool recalculate = true
 
   TVar::Process proc = TVar::bkgZZ;
   TVar::MatrixElement me = TVar::MCFM;
-  TVar::Production prod = TVar::JJEW;
+  TVar::Production prod;
+  for (int iprod=(int)TVar::JJVBF; iprod<(int)TVar::nProductions; iprod++){
+    prod = (TVar::Production)iprod;
+    if (TVar::ProductionName(prod)==strprod) break;
+  }
+  TString strsamples;
+  if (strprod == "Had_ZH") strsamples="ZH";
+  else if (strprod == "Had_WH") strsamples="WH";
+  else if (strprod == "JJVBF") strsamples="JJVBF";
 
   TString strproc = ProcessName(proc);
   TString strme = MatrixElementName(me);
-  TString strprod = ProductionName(prod);
 
   TVar::VerbosityLevel verbosity = TVar::ERROR;
   Mela mela(erg_tev, mPOLE, verbosity);
@@ -2817,6 +3273,20 @@ void get_PAvgProfile_MCFM_JJEW_bkgZZ_13TeV(int sqrts=13, bool recalculate = true
   std::vector<float> myJetPhi;
   std::vector<float> myJetMass;
 
+  std::vector<float>* LHEMotherPz=0;
+  std::vector<float>* LHEMotherE=0;
+  std::vector<short>* LHEMotherId=0;
+  std::vector<float>* LHEDaughterPt=0;
+  std::vector<float>* LHEDaughterEta=0;
+  std::vector<float>* LHEDaughterPhi=0;
+  std::vector<float>* LHEDaughterMass=0;
+  std::vector<short>* LHEDaughterId=0;
+  std::vector<float>* LHEAssociatedParticlePt=0;
+  std::vector<float>* LHEAssociatedParticleEta=0;
+  std::vector<float>* LHEAssociatedParticlePhi=0;
+  std::vector<float>* LHEAssociatedParticleMass=0;
+  std::vector<short>* LHEAssociatedParticleId=0;
+
   float mesq_calc=0., cconst_calc=1.;
   float mesq_conserveDifermMass=0;
   float mzz = 126.;
@@ -2829,27 +3299,24 @@ void get_PAvgProfile_MCFM_JJEW_bkgZZ_13TeV(int sqrts=13, bool recalculate = true
   float phi1 = 1.8828257;
   float ZZPt, ZZPhi, ZZEta;
   short Z1Flav, Z2Flav;
-  float GenHMass;
-  float xsec, ngen, genHEPMCweight, rewgt;
+  float xsec, ngen, genHEPMCweight;
   float wgt=1;
+  float rewgt=1;
+  bool doRewgt=false;
+  TString strrewgtbranch="";
+  TString strrecalcbranch="";
+  TString strrecalcconstbranch="";
 
   TString cinput_main;
   if (sqrts==13) cinput_main = inputdir_13TeV;
   else return;
 
   TString strchannel[3]={ "4mu", "4e", "2mu2e" };
-
-  vector<TString> strSamples_VBF = constructSamplesList("JJVBF", sqrts);
-  vector<TString> strSamples_WH = constructSamplesList("WH", sqrts);
-  vector<TString> strSamples_ZH = constructSamplesList("ZH", sqrts);
-  vector<TString> strSamples;
-  appendVector(strSamples, strSamples_VBF);
-  appendVector(strSamples, strSamples_WH);
-  appendVector(strSamples, strSamples_ZH);
+  vector<TString> strSamples = constructSamplesList(strsamples, sqrts);
 
   unordered_map<TTree*, pair<float, float>> nGenMap;
+  unordered_map<TTree*, float> mass_map;
   unordered_map<float, vector<TTree*>> mass_sample_map;
-  unordered_map<TTree*, pair<float, float>> samplePoleMasses;
 
   vector<TFile*> finputList;
   vector<TTree*> treeList;
@@ -2865,7 +3332,25 @@ void get_PAvgProfile_MCFM_JJEW_bkgZZ_13TeV(int sqrts=13, bool recalculate = true
         tree = (TTree*)finput->Get(TREE_NAME);
         if (tree!=0){
           cout << TREE_NAME << " is found." << endl;
-          //if (!recalculate && tree->GetBranchStatus("pConst_JJEW_BKG_MCFM_JECNominal")==0) recalculate=true;
+          if (!recalculate){
+            if (prod==TVar::Had_ZH && tree->GetBranchStatus("pConst_HadZH_SIG_ghz1_1_MCFM_JECNominal")!=0){
+              strrecalcbranch = "p_HadZH_BKG_MCFM_JECNominal";
+              strrecalcconstbranch = "pConst_HadZH_BKG_MCFM_JECNominal";
+            }
+            else if (prod==TVar::Had_WH && tree->GetBranchStatus("pConst_HadWH_SIG_ghv1_1_MCFM_JECNominal")!=0){
+              strrecalcbranch = "p_HadWH_BKG_MCFM_JECNominal";
+              strrecalcconstbranch = "pConst_HadWH_BKG_MCFM_JECNominal";
+            }
+            else if (prod==TVar::JJVBF && tree->GetBranchStatus("pConst_JJVBF_BKG_MCFM_JECNominal")!=0){
+              strrecalcbranch = "p_JJVBF_BKG_MCFM_JECNominal";
+              strrecalcconstbranch = "pConst_JJVBF_BKG_MCFM_JECNominal";
+            }
+            else recalculate=true;
+          }
+          if (tree->GetBranchStatus("p_Gen_JJEW_BKG_MCFM")!=0) strrewgtbranch = "p_Gen_JJEW_BKG_MCFM";
+          //if (prod==TVar::Had_ZH && tree->GetBranchStatus("p_Gen_ZH_BKG_MCFM")!=0) strrewgtbranch = "p_Gen_ZH_BKG_MCFM";
+          //else if (prod==TVar::Had_WH && tree->GetBranchStatus("p_Gen_WH_BKG_MCFM")!=0) strrewgtbranch = "p_Gen_WH_BKG_MCFM";
+          //else if (prod==TVar::JJVBF && tree->GetBranchStatus("p_Gen_VBF_BKG_MCFM")!=0) strrewgtbranch = "p_Gen_VBF_BKG_MCFM";
           tree->SetBranchStatus("*", 0);
           tree->SetBranchStatus("xsec", 1); tree->SetBranchAddress("xsec", &xsec);
           tree->SetBranchStatus("genHEPMCweight", 1); tree->SetBranchAddress("genHEPMCweight", &genHEPMCweight);
@@ -2891,13 +3376,37 @@ void get_PAvgProfile_MCFM_JJEW_bkgZZ_13TeV(int sqrts=13, bool recalculate = true
           tree->SetBranchStatus("LepPhi", 1); tree->SetBranchAddress("LepPhi", &LepPhi);
           tree->SetBranchStatus("Z1Flav", 1); tree->SetBranchAddress("Z1Flav", &Z1Flav);
           tree->SetBranchStatus("Z2Flav", 1); tree->SetBranchAddress("Z2Flav", &Z2Flav);
-          tree->SetBranchStatus("GenHMass", 1); tree->SetBranchAddress("GenHMass", &GenHMass);
-          tree->SetBranchStatus("p_Gen_JJEW_BKG_MCFM", 1); tree->SetBranchAddress("p_Gen_JJEW_BKG_MCFM", &rewgt);
+          // Do reweight signal to bkg.
+          if (strrewgtbranch!=""){
+            tree->SetBranchStatus(strrewgtbranch, 1); tree->SetBranchAddress(strrewgtbranch, &rewgt);
+            cout << "Reweighting is read from branch " << strrewgtbranch << endl;
+          }
+          else{
+            doRewgt=true;
+            cout << "Reweighting needs to be computed." << endl;
+            cerr << "NOT YET IMPLEMENTED!" << endl;
+            assert(0);
+          }
           if (!recalculate){
-            tree->SetBranchStatus("p_JJEW_BKG_MCFM_JECNominal", 1);
-            tree->SetBranchAddress("p_JJEW_BKG_MCFM_JECNominal", &mesq_calc);
-            tree->SetBranchStatus("pConst_JJEW_BKG_MCFM_JECNominal", 1);
-            tree->SetBranchAddress("pConst_JJEW_BKG_MCFM_JECNominal", &cconst_calc);
+            tree->SetBranchStatus(strrecalcbranch, 1); tree->SetBranchAddress(strrecalcbranch, &mesq_calc);
+            tree->SetBranchStatus(strrecalcconstbranch, 1); tree->SetBranchAddress(strrecalcconstbranch, &cconst_calc);
+          }
+          if (doRewgt){
+            tree->SetBranchStatus("LHEMotherPz", 1); tree->SetBranchAddress("LHEMotherPz", &LHEMotherPz);
+            tree->SetBranchStatus("LHEMotherE", 1); tree->SetBranchAddress("LHEMotherE", &LHEMotherE);
+            tree->SetBranchStatus("LHEMotherId", 1); tree->SetBranchAddress("LHEMotherId", &LHEMotherId);
+
+            tree->SetBranchStatus("LHEDaughterPt", 1); tree->SetBranchAddress("LHEDaughterPt", &LHEDaughterPt);
+            tree->SetBranchStatus("LHEDaughterEta", 1); tree->SetBranchAddress("LHEDaughterEta", &LHEDaughterEta);
+            tree->SetBranchStatus("LHEDaughterPhi", 1); tree->SetBranchAddress("LHEDaughterPhi", &LHEDaughterPhi);
+            tree->SetBranchStatus("LHEDaughterMass", 1); tree->SetBranchAddress("LHEDaughterMass", &LHEDaughterMass);
+            tree->SetBranchStatus("LHEDaughterId", 1); tree->SetBranchAddress("LHEDaughterId", &LHEDaughterId);
+
+            tree->SetBranchStatus("LHEAssociatedParticlePt", 1); tree->SetBranchAddress("LHEAssociatedParticlePt", &LHEAssociatedParticlePt);
+            tree->SetBranchStatus("LHEAssociatedParticleEta", 1); tree->SetBranchAddress("LHEAssociatedParticleEta", &LHEAssociatedParticleEta);
+            tree->SetBranchStatus("LHEAssociatedParticlePhi", 1); tree->SetBranchAddress("LHEAssociatedParticlePhi", &LHEAssociatedParticlePhi);
+            tree->SetBranchStatus("LHEAssociatedParticleMass", 1); tree->SetBranchAddress("LHEAssociatedParticleMass", &LHEAssociatedParticleMass);
+            tree->SetBranchStatus("LHEAssociatedParticleId", 1); tree->SetBranchAddress("LHEAssociatedParticleId", &LHEAssociatedParticleId);
           }
           tree->GetEntry(0);
           cout << "Cross section = " << xsec << endl;
@@ -2911,18 +3420,18 @@ void get_PAvgProfile_MCFM_JJEW_bkgZZ_13TeV(int sqrts=13, bool recalculate = true
           finputList.push_back(finput);
 
           float polemass = findPoleMass(strSamples[is]);
-          float polewidth = mela.getHiggsWidthAtPoleMass(polemass);
-          cout << "Pole mass = " << polemass << ", pole width = " << polewidth << endl;
+          cout << "Pole mass = " << polemass << endl;
+          mass_map[tree]=polemass;
           if (mass_sample_map.find(polemass)==mass_sample_map.end()){
             cout << "Inserting new pole mass sample array" << endl;
             vector<TTree*> dumarr;
             mass_sample_map[polemass] = dumarr;
           }
           mass_sample_map[polemass].push_back(tree);
-          samplePoleMasses[tree] = pair<float, float>(polemass, polewidth);
         }
-        else if (finput->IsOpen()) finput->Close();
+        else finput->Close();
       }
+      else if (finput->IsOpen()) finput->Close();
     }
   }
   cout << "NEntries = " << nEntries << endl;
@@ -2946,7 +3455,7 @@ void get_PAvgProfile_MCFM_JJEW_bkgZZ_13TeV(int sqrts=13, bool recalculate = true
   TFile* foutput = TFile::Open(Form("pAvgLinToLog_%s_%s_%s_%iTeV.root", strme.Data(), strprod.Data(), strproc.Data(), sqrts), "recreate");
 
   vector<pair<float, int>> index[3];
-  unsigned ev_acc=0;
+  unsigned int ev_acc=0;
   for (int ev=0; ev<nEntries; ev++){
     getEntry(treeList, ev);
     bool doProcess=
@@ -2962,6 +3471,7 @@ void get_PAvgProfile_MCFM_JJEW_bkgZZ_13TeV(int sqrts=13, bool recalculate = true
     if (ev_acc%10000==0) cout << "Pre-processing event " << ev << endl;
     unsigned int ic = (Z1Flav*Z2Flav==pow(13, 4))*0 + (Z1Flav*Z2Flav==pow(11, 4))*1 + (Z1Flav*Z2Flav==pow(11*13, 2))*2;
     addByLowest(index[ic], mzz, ev);
+    if (ic<2) addByLowest(index[1-ic], mzz, ev);
     ev_acc++;
   }
 
@@ -2972,8 +3482,8 @@ void get_PAvgProfile_MCFM_JJEW_bkgZZ_13TeV(int sqrts=13, bool recalculate = true
     float supremum = (float)((int)(lastVal+0.5)); supremum += (float)(10-((int)supremum)%10);
     cout << "Nentries = " << nEntries << " | mzz = " << firstVal << " - " << lastVal << "(" << infimum << ", " << supremum << ")" << endl;
 
-    float divisor=40000;
-    if (ic<2) divisor = 20000;
+    float divisor=25000;
+    if (prod==TVar::Had_ZH || prod==TVar::Had_WH) divisor=15000;
     int nbins = index[ic].size()/divisor;
     const int nbins_th=10/*50*/;
     while (nbins<nbins_th){
@@ -3025,6 +3535,7 @@ void get_PAvgProfile_MCFM_JJEW_bkgZZ_13TeV(int sqrts=13, bool recalculate = true
     mela.setCandidateDecayMode(TVar::CandidateDecay_ZZ);
 
     double aL1=0, aR1=0, aL2=0, aR2=0;
+    double mv=0, gav=0;
     unsigned int ev_acc=0;
     for (unsigned int bin=0; bin<binList.size(); bin++){
       cout << "Bin " << bin << " is now being scrutinized..." << endl;
@@ -3061,6 +3572,7 @@ void get_PAvgProfile_MCFM_JJEW_bkgZZ_13TeV(int sqrts=13, bool recalculate = true
 
         mela.setProcess(proc, me, prod);
 
+        double propagatorV=1;
         if (recalculate || ev_acc==0){
           TUtil::setJetMassScheme(TVar::ConserveDifermionMass);
           mela.computeProdP(mesq_conserveDifermMass, false);
@@ -3070,6 +3582,14 @@ void get_PAvgProfile_MCFM_JJEW_bkgZZ_13TeV(int sqrts=13, bool recalculate = true
           }
           mela.getIORecord()->getVDaughterCouplings(aL1, aR1, 0);
           mela.getIORecord()->getVDaughterCouplings(aL2, aR2, 1);
+          if (prod==TVar::Had_ZH){
+            mv = mela.getPrimaryMass(23);
+            gav = mela.getPrimaryWidth(23);
+          }
+          else if (prod==TVar::Had_WH){
+            mv = mela.getPrimaryMass(24);
+            gav = mela.getPrimaryWidth(24);
+          }
         }
         else{
           mesq_calc /= cconst_calc;
@@ -3077,19 +3597,21 @@ void get_PAvgProfile_MCFM_JJEW_bkgZZ_13TeV(int sqrts=13, bool recalculate = true
         }
         if (fabs(aL1)>0. || fabs(aR1)>0.) mesq_conserveDifermMass /= pow(aL1, 2)+pow(aR1, 2);
         if (fabs(aL2)>0. || fabs(aR2)>0.) mesq_conserveDifermMass /= pow(aL2, 2)+pow(aR2, 2);
+        if (prod==TVar::Had_ZH || prod==TVar::Had_WH){
+          double mjj = (jet[0] + jet[1]).M();
+          propagatorV = 1./(pow(pow(mjj, 2)-pow(mv, 2), 2) + pow(mv*gav, 2));
+          mesq_conserveDifermMass /= propagatorV;
+        }
+        mela.resetInputEvent();
+        if (doRewgt){
+          // LEFT HERE: Implement reweighting
+        }
 
         bool doFill = !(
           isnan(mesq_conserveDifermMass) || isinf(mesq_conserveDifermMass)
           );
 
-        if (doFill){
-          float mh = samplePoleMasses[tree].first;
-          float gh = samplePoleMasses[tree].second;
-          float prop = 1./(pow(pow(GenHMass, 2) - pow(mh, 2), 2) + pow(mh*gh, 2));
-          wgt *= prop;
-
-          binList.at(bin).addEvent(mzz, mesq_conserveDifermMass, 0, wgt);
-        }
+        if (doFill) binList.at(bin).addEvent(mzz, mesq_conserveDifermMass, 0, wgt);
 
         mela.resetInputEvent();
         ev_acc++;
@@ -3106,6 +3628,7 @@ void get_PAvgProfile_MCFM_JJEW_bkgZZ_13TeV(int sqrts=13, bool recalculate = true
         if (writeFinalTree) newtree->Fill();
       }
     }
+    cout << "Total events accumulated: " << ev_acc << endl;
 
     double* xexyey[4];
     for (int ix=0; ix<4; ix++) xexyey[ix] = new double[nbins];
@@ -3144,6 +3667,7 @@ void get_PAvgProfile_MCFM_JJEW_bkgZZ_13TeV(int sqrts=13, bool recalculate = true
 SPECIFIC COMMENT: OUTPUT ME DIVIDED BY
 - ALPHAS(MZ)**2 TO REMAIN INDEPENDENT OF PDF CHOICE TO FIRST APPROXIMATION
 - (aL1**2+aR1**2)*(aL2**2+aR2**2) TO REMAIN INDEPENDENT OF CHANNEL
+- PROP(Z)/LINE_PROP(Z) AROUND M4L~=MZ
 */
 void get_PAvgProfile_MCFM_JJQCD_bkgZZ_13TeV(int sqrts=13, bool recalculate = true){
   int erg_tev=sqrts;
@@ -3295,7 +3819,7 @@ void get_PAvgProfile_MCFM_JJQCD_bkgZZ_13TeV(int sqrts=13, bool recalculate = tru
   TFile* foutput = TFile::Open(Form("pAvgLinToLog_%s_%s_%s_%iTeV.root", strme.Data(), strprod.Data(), strproc.Data(), sqrts), "recreate");
 
   vector<pair<float, int>> index[3];
-  unsigned ev_acc=0;
+  unsigned int ev_acc=0;
   for (int ev=0; ev<nEntries; ev++){
     getEntry(treeList, ev);
     bool doProcess=
@@ -3311,6 +3835,7 @@ void get_PAvgProfile_MCFM_JJQCD_bkgZZ_13TeV(int sqrts=13, bool recalculate = tru
     if (ev_acc%10000==0) cout << "Pre-processing event " << ev << endl;
     unsigned int ic = (Z1Flav*Z2Flav==pow(13, 4))*0 + (Z1Flav*Z2Flav==pow(11, 4))*1 + (Z1Flav*Z2Flav==pow(11*13, 2))*2;
     addByLowest(index[ic], mzz, ev);
+    if (ic<2) addByLowest(index[1-ic], mzz, ev);
     ev_acc++;
   }
 
@@ -3321,10 +3846,9 @@ void get_PAvgProfile_MCFM_JJQCD_bkgZZ_13TeV(int sqrts=13, bool recalculate = tru
     float supremum = (float)((int)(lastVal+0.5)); supremum += (float)(10-((int)supremum)%10);
     cout << "Nentries = " << nEntries << " | mzz = " << firstVal << " - " << lastVal << "(" << infimum << ", " << supremum << ")" << endl;
 
-    float divisor=7500;
-    if (ic<2) divisor = 7500;
+    float divisor=10000;
     int nbins = index[ic].size()/divisor;
-    const int nbins_th=10/*50*/;
+    const int nbins_th=8/*50*/;
     while (nbins<nbins_th){
       if (divisor>1000) divisor -= 1000;
       else if (divisor>100) divisor -= 100;
@@ -3699,7 +4223,7 @@ void get_PAvgProfile_JHUGen_ZZINDEPENDENT_HSMHiggs(bool recalculate=false){
 
   cout << "NEntries = " << nEntries << " over " << treeList.size() << " trees." << endl;
 
-  unsigned ev_acc=0;
+  unsigned int ev_acc=0;
   for (int ev=0; ev<nEntries; ev++){
     getEntry(treeList, ev);
     bool doProcess=
@@ -4084,7 +4608,7 @@ void get_PAvgProfile_JHUGen_ZZGG_HSMHiggs(bool recalculate=false){
 
   cout << "NEntries = " << nEntries << " over " << treeList.size() << " trees." << endl;
 
-  unsigned ev_acc=0;
+  unsigned int ev_acc=0;
   for (int ev=0; ev<nEntries; ev++){
     getEntry(treeList, ev);
     bool doProcess=
@@ -4479,7 +5003,7 @@ void get_PAvgProfile_MCFM_ZZGG_HSMHiggs(bool recalculate=false){
 
   cout << "NEntries = " << nEntries << " over " << treeList.size() << " trees." << endl;
 
-  unsigned ev_acc=0;
+  unsigned int ev_acc=0;
   for (int ev=0; ev<nEntries; ev++){
     getEntry(treeList, ev);
     bool doProcess=
@@ -4918,7 +5442,7 @@ void get_PAvgProfile_MCFM_ZZGG_bkgZZ(bool recalculate=false){
 
   cout << "NEntries = " << nEntries << " over " << treeList.size() << " trees." << endl;
 
-  unsigned ev_acc=0;
+  unsigned int ev_acc=0;
   for (int ev=0; ev<nEntries; ev++){
     getEntry(treeList, ev);
     bool doProcess=
@@ -4945,7 +5469,8 @@ void get_PAvgProfile_MCFM_ZZGG_bkgZZ(bool recalculate=false){
     float supremum = (float)((int)(lastVal+0.5)); supremum += (float)(10-((int)supremum)%10);
     cout << "Nentries = " << nEntries << " | mzz = " << firstVal << " - " << lastVal << "(" << infimum << ", " << supremum << ")" << endl;
 
-    float divisor=120000;
+    float divisor=100000;
+    if (ic!=2) divisor=130000;
     int nbins = index[ic].size()/divisor;
     const int nbins_th=10/*50*/;
     while (nbins<nbins_th){
@@ -5309,7 +5834,7 @@ void get_PAvgProfile_MCFM_ZZQQB_bkgZZ(bool recalculate=false){
 
   cout << "NEntries = " << nEntries << " over " << treeList.size() << " trees." << endl;
 
-  unsigned ev_acc=0;
+  unsigned int ev_acc=0;
   for (int ev=0; ev<nEntries; ev++){
     getEntry(treeList, ev);
     bool doProcess=
@@ -5336,7 +5861,7 @@ void get_PAvgProfile_MCFM_ZZQQB_bkgZZ(bool recalculate=false){
     float supremum = (float)((int)(lastVal+0.5)); supremum += (float)(10-((int)supremum)%10);
     cout << "Nentries = " << nEntries << " | mzz = " << firstVal << " - " << lastVal << "(" << infimum << ", " << supremum << ")" << endl;
 
-    float divisor=45000;
+    float divisor=55000;
     int nbins = index[ic].size()/divisor;
     const int nbins_th=10/*50*/;
     while (nbins<nbins_th){
@@ -5690,6 +6215,164 @@ void get_PAvgProfile_ANALYTICAL_ZZGG_HSMHiggs(){
   foutput->Close();
 }
 
+void get_PAvgProfile_ANALYTICAL_HadVH_HSMHiggs(TString strprod, int sqrts){
+  if (!(strprod == "Had_ZH" || strprod == "Had_WH")) return;
+  int erg_tev=sqrts;
+  float mPOLE=125.;
+  float mVPOLE;
+
+  TVar::VerbosityLevel verbosity = TVar::ERROR;
+  Mela mela(erg_tev, mPOLE, verbosity);
+
+  TVar::Process proc = TVar::HSMHiggs;
+  TVar::MatrixElement me = TVar::ANALYTICAL;
+  TVar::Production prod;
+  for (int iprod=(int)TVar::JJVBF; iprod<(int)TVar::nProductions; iprod++){
+    prod = (TVar::Production)iprod;
+    if (TVar::ProductionName(prod)==strprod) break;
+  }
+  RooSpin::VdecayType pmode, dmode;
+  if (prod==TVar::Had_ZH){
+    pmode=RooSpin::kVdecayType_Zud;
+    dmode=pmode;
+    mVPOLE=mela.getPrimaryMass(23);
+  }
+  else{
+    pmode=RooSpin::kVdecayType_Wany;
+    dmode=pmode;
+    mVPOLE=mela.getPrimaryMass(24);
+  }
+
+  TString strproc = ProcessName(proc);
+  TString strme = MatrixElementName(me);
+
+
+  cout << "Acquiring measurables and pdf..." << endl;
+  const double xrange[2]={ 57, sqrts*1000.-1. };
+  RooRealVar* m12 = new RooRealVar("m12", "m_{H} (GeV)", mPOLE, xrange[0], xrange[1]);
+  RooRealVar* m1 = new RooRealVar("m1", "m1", 460, (mVPOLE)-10., sqrts*1000.);
+  RooRealVar* m2 = new RooRealVar("m2", "m2", mVPOLE, mVPOLE-0.05, mVPOLE+0.05);
+  RooRealVar* h1 = new RooRealVar("h1", "cos#theta_{V*}", -1, 1);
+  RooRealVar* h2 = new RooRealVar("h2", "cos#theta_{V}", -1, 1);
+  RooRealVar* Phi1 = new RooRealVar("Phi1", "#Phi_{V*}", -TMath::Pi(), TMath::Pi());
+  RooRealVar* hs = new RooRealVar("hs", "cos#theta^{*}", -1, 1);
+  RooRealVar* Phi = new RooRealVar("Phi", "#Phi", -TMath::Pi(), TMath::Pi());
+  RooRealVar* Y = new RooRealVar("Y", "Y", 0, -4, 4);
+
+  RooSpin::modelMeasurables measurables;
+  measurables.h1 = h1;
+  measurables.h2 = h2;
+  measurables.Phi = Phi;
+  measurables.m1 = m1;
+  measurables.m2 = m2;
+  measurables.m12 = m12;
+  measurables.hs = hs;
+  measurables.Phi1 = Phi1;
+  measurables.Y = Y;
+
+  ScalarPdfFactory_VH fac(measurables, sqrts, pmode, dmode, false);
+  cout << "m2 is fixed to " << measurables.m2->getVal() << endl;
+  fac.makeParamsConst(false);
+  RooRealVar* g1List[8][2];
+  RooRealVar* g2List[8][2];
+  //RooRealVar* g3List[8][2];
+  RooRealVar* g4List[8][2];
+  for (int gg=0; gg<8; gg++){
+    for (int im=0; im<2; im++){
+      g1List[gg][im] = (RooRealVar*)fac.couplings.g1List[gg][im];
+      g2List[gg][im] = (RooRealVar*)fac.couplings.g2List[gg][im];
+      //g3List[gg][im] = (RooRealVar*)fac.couplings.g3List[gg][im];
+      g4List[gg][im] = (RooRealVar*)fac.couplings.g4List[gg][im];
+    }
+  }
+  g1List[0][0]->setVal(1);
+
+  TFile* foutput = TFile::Open(Form("pAvgLinToLog_%s_%s_%s_%iTeV.root", strme.Data(), strprod.Data(), strproc.Data(), sqrts), "recreate");
+
+  m12->setConstant(false);
+  vector<double> masses;
+  double massmin=xrange[0];
+  double mass=massmin;
+  while (mass<=xrange[1]){
+    masses.push_back(mass);
+    double massinc;
+    if (mass<90.) massinc=1;
+    else if (mass<194.) massinc=2;
+    else if (mass<200.) massinc=3;
+    else if (mass<600.) massinc=20.;
+    else if (mass<1500.) massinc=100.;
+    else if (mass<3000.) massinc=250.;
+    else if (mass<10000.) massinc=500.;
+    else massinc=1000.;
+    mass += massinc;
+  }
+  const unsigned int npoints=masses.size();
+  m12->setRange(xrange[0], xrange[1]);
+
+  double* xy[2];
+  for (int i=0; i<2; i++) xy[i] = new double[npoints];
+
+  RooAbsPdf* pdf = fac.getPDF();
+  /*
+  pdf->defaultIntegratorConfig()->method1D().setLabel("RooAdaptiveGaussKronrodIntegrator1D");
+  pdf->defaultIntegratorConfig()->getConfigSection("RooAdaptiveGaussKronrodIntegrator1D").setRealValue("maxSeg", 100);;
+  pdf->defaultIntegratorConfig()->method2D().setLabel("RooAdaptiveGaussKronrodIntegrator2D");
+  pdf->defaultIntegratorConfig()->getConfigSection("RooAdaptiveGaussKronrodIntegrator2D").setRealValue("maxSeg", 100);;
+  pdf->defaultIntegratorConfig()->methodND().setLabel("RooAdaptiveGaussKronrodIntegratorND");
+  pdf->defaultIntegratorConfig()->getConfigSection("RooAdaptiveGaussKronrodIntegratorND").setRealValue("maxSeg", 100);;
+  pdf->defaultIntegratorConfig()->setEpsAbs(1e-5);
+  pdf->defaultIntegratorConfig()->setEpsRel(1e-5);
+  */
+
+  cout << "Computing pdf integral as a function of " << measurables.m12->GetName() << endl;
+  for (unsigned int ix=0; ix<npoints; ix++){
+    xy[0][ix]=masses.at(ix);
+    m12->setVal(xy[0][ix]);
+    ((RooRealVar*)fac.parameters.mX)->setVal(m12->getVal());
+    ((RooRealVar*)fac.parameters.gamX)->setVal(1./m12->getVal());
+
+    float m1_low = xy[0][ix] + measurables.m2->getVal();
+    m1->setRange(m1_low, 1000.*sqrts);
+    m1->setVal((m1->getMin()+m1->getMax())/2.);
+    cout << "m1 min, max, val = " << m1->getMin() << " " << m1->getMax() << " " << m1->getVal() << endl;
+
+    RooRealIntegral* pdfInt = new RooRealIntegral(
+      "pdfInt", "", *pdf,
+      RooArgSet(
+      *measurables.h1, *measurables.h2, *measurables.Phi,
+      *measurables.hs, *measurables.Phi1//,
+      //*measurables.m1//,
+      /**measurables.m2,*/
+      //*measurables.Y
+      )
+      );
+    if (ix==0) pdfInt->Print("v");
+    xy[1][ix]=pdfInt->getVal();
+    delete pdfInt;
+
+    cout << "pdfInt(" << xy[0][ix] << ") = " << xy[1][ix] << endl;
+    xy[1][ix] = log10(xy[1][ix]);
+  }
+  TGraph* tg = new TGraph(npoints, xy[0], xy[1]);
+  tg->SetName("tg_anaPdfInt");
+
+  foutput->WriteTObject(tg);
+  delete tg;
+  for (int i=0; i<2; i++) delete[] xy[i];
+
+  foutput->Close();
+
+  delete m12;
+  delete m1;
+  delete m2;
+  delete hs;
+  delete h1;
+  delete h2;
+  delete Phi;
+  delete Phi1;
+  delete Y;
+}
+
 
 /*
 SPECIFIC COMMENT: OUTPUT ME DIVIDED BY
@@ -5943,18 +6626,28 @@ TSpline3* convertGraphToSpline3(TGraph* tg, double* dfirst=0, double* dlast=0){
     tg->GetX(),
     tg->GetY()
   };
-  //double derivative_first = (xy[1][1]-xy[1][0])/(xy[0][1]-xy[0][0]);
-  //double derivative_last = (xy[1][nbins-1]-xy[1][nbins-2])/(xy[0][nbins-1]-xy[0][nbins-2]);
-  //TSpline3* spline = new TSpline3("spline", tg, "b1e1", derivative_first, derivative_last);
   TSpline3* spline = new TSpline3("spline", tg, "b2e2", 0, 0);
   spline->SetName(Form("sp_%s", tg->GetName()));
-  //if (dfirst!=0) *dfirst=derivative_first;
-  //if (dlast!=0) *dlast=derivative_last;
   if (dfirst!=0) *dfirst = spline->Derivative(xy[0][0]);
   if (dlast!=0) *dlast = spline->Derivative(xy[0][nbins-1]);
   return spline;
 }
 
+/* SPECIFIC COMMENT: Convert a TGraph to a TSpline3 */
+TSpline3* convertGraphToSpline3_FaithfulSlopes(TGraph* tg, double* dfirst=0, double* dlast=0){
+  unsigned int nbins = tg->GetN();
+  double* xy[2]={
+    tg->GetX(),
+    tg->GetY()
+  };
+  double derivative_first = (xy[1][1]-xy[1][0])/(xy[0][1]-xy[0][0]);
+  double derivative_last = (xy[1][nbins-1]-xy[1][nbins-2])/(xy[0][nbins-1]-xy[0][nbins-2]);
+  TSpline3* spline = new TSpline3("spline", tg, "b1e1", derivative_first, derivative_last);
+  spline->SetName(Form("sp_%s", tg->GetName()));
+  if (dfirst!=0) *dfirst = spline->Derivative(xy[0][0]);
+  if (dlast!=0) *dlast = spline->Derivative(xy[0][nbins-1]);
+  return spline;
+}
 /* SPECIFIC COMMENT: Convert a TGraph to a TSpline5 */
 TSpline5* convertGraphToSpline5(TGraph* tg, double* dfirst=0, double* dlast=0){
   unsigned int nbins = tg->GetN();
@@ -6169,7 +6862,7 @@ TF1* getFcn_a0plusa1timesXplusa2timesX2(TSpline3* sp, double xmin, double xmax, 
 }
 
 /* SPECIFIC COMMENT: Get external input added by a0 and multiplied by a1 */
-TGraph* getPatch_a0a1(TSpline3* sp, TSpline3* sppatch, double xmin, double xmax, bool useLowBound){
+TGraph* getPatch_a0a1(TSpline3* sp, TSpline3* sppatch, double xmin, double xmax, bool useLowBound, bool forceOutput=true){
   double x, y, s;
   double y_patch, s_patch;
   if (useLowBound) x = sp->GetXmin();
@@ -6206,7 +6899,7 @@ TGraph* getPatch_a0a1(TSpline3* sp, TSpline3* sppatch, double xmin, double xmax,
 }
 
 /* SPECIFIC COMMENT: Get external input added by a0+a1/x */
-TGraph* getPatch_a0plusa1overX(TSpline3* sp, TSpline3* sppatch, double xmin, double xmax, bool useLowBound){
+TGraph* getPatch_a0plusa1overX(TSpline3* sp, TSpline3* sppatch, double xmin, double xmax, bool useLowBound, bool forceOutput=true){
   double x, y, s;
   if (useLowBound) x = sp->GetXmin();
   else x = sp->GetXmax();
@@ -6218,6 +6911,16 @@ TGraph* getPatch_a0plusa1overX(TSpline3* sp, TSpline3* sppatch, double xmin, dou
   double a0, a1;
   a0 = y+s*x;
   a1 = -s*pow(x, 2);
+
+  cout << "getPatch_a0plusa1overX: Checking if patch will flip: " << endl;
+  double xext;
+  if (useLowBound) xext = x;
+  else xext = x;
+  if (1.-a1/pow(xext, 2)/sppatch->Derivative(xext)<0.){
+    cout << "Sign flips at " << xext << endl;
+    if (!forceOutput) return 0;
+  }
+  else cout << "Sign does not flip at " << xext << endl;
 
   int n = (xmax-xmin+0.5);
   cout << "Patcher n: " << n << endl;
@@ -6243,7 +6946,7 @@ TGraph* getPatch_a0plusa1overX(TSpline3* sp, TSpline3* sppatch, double xmin, dou
 }
 
 /* SPECIFIC COMMENT: Get external input added by a0+a1*x */
-TGraph* getPatch_a0plusa1timesX(TSpline3* sp, TSpline3* sppatch, double xmin, double xmax, bool useLowBound){
+TGraph* getPatch_a0plusa1timesX(TSpline3* sp, TSpline3* sppatch, double xmin, double xmax, bool useLowBound, bool forceOutput=true){
   double x, y, s;
   if (useLowBound) x = sp->GetXmin();
   else x = sp->GetXmax();
@@ -6255,6 +6958,16 @@ TGraph* getPatch_a0plusa1timesX(TSpline3* sp, TSpline3* sppatch, double xmin, do
   double a0, a1;
   a1 = s;
   a0 = y-a1*x;
+
+  cout << "getPatch_a0plusa1timesX: Checking if patch will flip: " << endl;
+  double xext;
+  if (useLowBound) xext = x;
+  else xext = x;
+  if (1.+a1/sppatch->Derivative(xext)<0.){
+    cout << "Sign flips at " << xext << endl;
+    if (!forceOutput) return 0;
+  }
+  else cout << "Sign does not flip at " << xext << endl;
 
   int n = (xmax-xmin+0.5);
   cout << "Patcher n: " << n << endl;
@@ -6573,7 +7286,8 @@ void generic_PAvgSmoothProducer(
   TVar::MatrixElement me, TVar::Production prod, TVar::Process proc,
   TF1* (*lowf)(TSpline3*, double, double, bool),
   TF1* (*highf)(TSpline3*, double, double, bool),
-  int sqrts=-1
+  int sqrts=-1,
+  bool useFaithfulSlopes=false
   ){
   TString strme = MatrixElementName(me);
   TString strprod = ProductionName(prod);
@@ -6607,7 +7321,9 @@ void generic_PAvgSmoothProducer(
     double* yy = tg->GetY();
     double* ey = tg->GetEY();
 
-    TSpline3* sp = convertGraphToSpline3(tg);
+    TSpline3* sp;
+    if (!useFaithfulSlopes) sp = convertGraphToSpline3(tg);
+    else sp = convertGraphToSpline3_FaithfulSlopes(tg);
     double tglow = xx[0];
     double tghigh = xx[tg->GetN()-1];
     TF1* lowFcn = lowf(sp, xmin, tglow, true);
@@ -6777,8 +7493,8 @@ void generic_PAvgSmoothProducer_withDecay(
 void generic_PAvgSmoothProducer_withDecay(
   TVar::MatrixElement me, TVar::Production prod, TVar::Process proc,
   TString strpatchpath, TString strpatchname,
-  TGraph* (*lowpatcher)(TSpline3*, TSpline3*, double, double, bool),
-  TGraph* (*highpatcher)(TSpline3*, TSpline3*, double, double, bool),
+  TGraph* (*lowpatcher)(TSpline3*, TSpline3*, double, double, bool, bool),
+  TGraph* (*highpatcher)(TSpline3*, TSpline3*, double, double, bool, bool),
   int sqrts=-1
   ){
   TString strme = MatrixElementName(me);
@@ -6825,9 +7541,9 @@ void generic_PAvgSmoothProducer_withDecay(
     double tglow = xx[0];
     double tghigh = xx[tg->GetN()-1];
     cout << "Extracting low patch..." << endl;
-    TGraph* lowGraph = lowpatcher(sp, sppatch, xmin, tglow, true);
-    cout << "Extracting low patch..." << endl;
-    TGraph* highGraph = highpatcher(sp, sppatch, tghigh, xmax, false);
+    TGraph* lowGraph = lowpatcher(sp, sppatch, xmin, tglow, true, true);
+    cout << "Extracting high patch..." << endl;
+    TGraph* highGraph = highpatcher(sp, sppatch, tghigh, xmax, false, true);
     cout << "Converting patches to splines..." << endl;
     TSpline3* lowFcn = convertGraphToSpline3(lowGraph);
     TSpline3* highFcn = convertGraphToSpline3(highGraph);
@@ -6892,12 +7608,139 @@ void generic_PAvgSmoothProducer_withDecay(
   finput->Close();
 }
 
+void generic_PAvgSmoothProducer_withDecay(
+  TVar::MatrixElement me, TVar::Production prod, TVar::Process proc,
+  TString strpatchpath, TString strpatchname,
+  TString strpatchpath2, TString strpatchname2,
+  TGraph* (*lowpatcher)(TSpline3*, TSpline3*, double, double, bool, bool),
+  TGraph* (*highpatcher)(TSpline3*, TSpline3*, double, double, bool, bool),
+  int sqrts=-1
+  ){
+  TString strme = MatrixElementName(me);
+  TString strprod = ProductionName(prod);
+  TString strproc = ProcessName(proc);
+  TString strsqrts="";
+  if (sqrts>0) strsqrts = Form("_%iTeV", sqrts);
+
+  TString strappend = Form("%s_%s_%s%s", strme.Data(), strprod.Data(), strproc.Data(), strsqrts.Data());
+
+  TFile* finput = TFile::Open(Form("pAvgLinToLog_%s%s", strappend.Data(), ".root"), "read");
+  TFile* finput_patch = TFile::Open(strpatchpath, "read");
+  TFile* finput_patch2 = TFile::Open(strpatchpath2, "read");
+  TFile* foutput = TFile::Open(Form("pAvgSmooth_%s%s", strappend.Data(), ".root"), "recreate");
+  const unsigned int ngraphs=3;
+  TString strtg[ngraphs]={
+    "tg_P_ConserveDifermionMass_4mu",
+    "tg_P_ConserveDifermionMass_4e",
+    "tg_P_ConserveDifermionMass_2mu2e"
+  };
+
+  TGraph* tgpatch = (TGraph*)finput_patch->Get(strpatchname);
+  TSpline3* sppatch = convertGraphToSpline3(tgpatch);
+
+  TGraph* tgpatch2 = (TGraph*)finput_patch2->Get(strpatchname2);
+  TSpline3* sppatch2 = convertGraphToSpline3(tgpatch2);
+
+  const double xmin=max(0., (tgpatch->GetX())[0]);
+  const double xmax=min((sqrts>0 ? (double)sqrts*1000. : 15000.), (tgpatch->GetX())[tgpatch->GetN()-1]);
+
+  for (unsigned int ig=0; ig<ngraphs; ig++){
+    finput->cd();
+    TGraphErrors* tg = 0;
+    tg = (TGraphErrors*)finput->Get(strtg[ig]);
+    if (tg==0){ cerr << strtg[ig] << " does not exist." << endl; continue; }
+    foutput->cd();
+    foutput->WriteTObject(tg);
+
+    int n = tg->GetN();
+    double* xx = tg->GetX();
+    double* ex = tg->GetEX();
+    double* yy = tg->GetY();
+    double* ey = tg->GetEY();
+
+    TSpline3* sp = convertGraphToSpline3(tg);
+    sp->SetName(Form("%s_initial", sp->GetName()));
+    foutput->WriteTObject(sp);
+    double tglow = xx[0];
+    double tghigh = xx[tg->GetN()-1];
+    cout << "Extracting low patch..." << endl;
+    TGraph* lowGraph = lowpatcher(sp, sppatch, xmin, tglow, true, false);
+    if (lowGraph==0) lowGraph = lowpatcher(sp, sppatch2, xmin, tglow, true, true);
+    cout << "Extracting high patch..." << endl;
+    TGraph* highGraph = highpatcher(sp, sppatch, tghigh, xmax, false, false);
+    if (highGraph==0) highGraph = highpatcher(sp, sppatch2, tghigh, xmax, false, true);
+    cout << "Converting patches to splines..." << endl;
+    TSpline3* lowFcn = convertGraphToSpline3(lowGraph);
+    TSpline3* highFcn = convertGraphToSpline3(highGraph);
+
+    vector<pair<double, double>> points;
+    for (double xval=xmin; xval<tglow; xval+=1){
+      double yval = lowFcn->Eval(xval);
+      addByLowest<double, double>(points, xval, yval);
+    }
+    for (int ix=0; ix<n; ix++){
+      addByLowest<double, double>(points, xx[ix], yy[ix]);
+    }
+    int tghigh_int = ((int)((tghigh+1.)/100.+0.5))*100;
+    if (tghigh>=(double)tghigh_int) tghigh_int+=100;
+    for (double xval=tghigh_int; xval<=xmax; xval+=100){
+      double yval = highFcn->Eval(xval);
+      addByLowest<double, double>(points, xval, yval);
+    }
+
+    int nn_new = points.size();
+    cout << "Number of new points: " << nn_new-n << endl;
+    double* xy_new[2];
+    for (unsigned int i=0; i<2; i++) xy_new[i] = new double[nn_new];
+    for (int ix=0; ix<nn_new; ix++){
+      xy_new[0][ix] = points.at(ix).first;
+      xy_new[1][ix] = points.at(ix).second;
+    }
+
+    delete highFcn;
+    delete lowFcn;
+    delete highGraph;
+    delete lowGraph;
+    delete sp;
+
+    TGraph* tg_updated = new TGraph(nn_new, xy_new[0], xy_new[1]);
+    tg_updated->SetName(Form("%s_Smooth", tg->GetName()));
+    foutput->WriteTObject(tg_updated);
+
+    sp = convertGraphToSpline3(tg_updated);
+    foutput->WriteTObject(sp);
+
+    TCanvas* ctest = new TCanvas(Form("test_%s", strtg[ig].Data()), "", 8, 30, 800, 800);
+    ctest->cd();
+    tg->GetXaxis()->SetRangeUser(xmin, xmax);
+    tg->Draw("ae1p");
+    sp->Draw("csame");
+    ctest->RedrawAxis();
+    ctest->Modified();
+    ctest->Update();
+    foutput->WriteTObject(ctest);
+    ctest->SaveAs(Form("%s%s", ctest->GetName(), ".pdf"));
+    ctest->Close();
+
+    delete sp;
+    delete tg_updated;
+    for (unsigned int i=0; i<2; i++) delete[] xy_new[i];
+  }
+
+  delete sppatch2;
+  delete sppatch;
+  foutput->Close();
+  finput_patch2->Close();
+  finput_patch->Close();
+  finput->Close();
+}
+
 /* SPECIFIC COMMENT: NONE */
 void generic_PAvgSmoothProducer_withDecay(
   TVar::MatrixElement me, TVar::Production prod, TVar::Process proc,
   TString strpatchpath, TString strpatchname,
   TF1* (*lowf)(TSpline3*, double, double, bool),
-  TGraph* (*highpatcher)(TSpline3*, TSpline3*, double, double, bool),
+  TGraph* (*highpatcher)(TSpline3*, TSpline3*, double, double, bool, bool),
   int sqrts=-1
   ){
   TString strme = MatrixElementName(me);
@@ -6944,7 +7787,7 @@ void generic_PAvgSmoothProducer_withDecay(
     double tglow = xx[0];
     double tghigh = xx[tg->GetN()-1];
     cout << "Extracting high patch..." << endl;
-    TGraph* highGraph = highpatcher(sp, sppatch, tghigh, xmax, false);
+    TGraph* highGraph = highpatcher(sp, sppatch, tghigh, xmax, false, true);
     cout << "Converting patches to splines..." << endl;
     TSpline3* highFcn = convertGraphToSpline3(highGraph);
 
@@ -6978,6 +7821,123 @@ void generic_PAvgSmoothProducer_withDecay(
     delete lowFcn;
     delete highFcn;
     delete highGraph;
+    delete sp;
+
+    TGraph* tg_updated = new TGraph(nn_new, xy_new[0], xy_new[1]);
+    tg_updated->SetName(Form("%s_Smooth", tg->GetName()));
+    foutput->WriteTObject(tg_updated);
+
+    sp = convertGraphToSpline3(tg_updated);
+    foutput->WriteTObject(sp);
+
+    TCanvas* ctest = new TCanvas(Form("test_%s", strtg[ig].Data()), "", 8, 30, 800, 800);
+    ctest->cd();
+    tg->GetXaxis()->SetRangeUser(xmin, xmax);
+    tg->Draw("ae1p");
+    sp->Draw("csame");
+    ctest->RedrawAxis();
+    ctest->Modified();
+    ctest->Update();
+    foutput->WriteTObject(ctest);
+    ctest->SaveAs(Form("%s%s", ctest->GetName(), ".pdf"));
+    ctest->Close();
+
+    delete sp;
+    delete tg_updated;
+    for (unsigned int i=0; i<2; i++) delete[] xy_new[i];
+  }
+
+  delete sppatch;
+  foutput->Close();
+  finput_patch->Close();
+  finput->Close();
+}
+
+void generic_PAvgSmoothProducer_withDecay(
+  TVar::MatrixElement me, TVar::Production prod, TVar::Process proc,
+  TString strpatchpath, TString strpatchname,
+  TGraph* (*lowpatcher)(TSpline3*, TSpline3*, double, double, bool, bool),
+  TF1* (*highf)(TSpline3*, double, double, bool),
+  int sqrts=-1
+  ){
+  TString strme = MatrixElementName(me);
+  TString strprod = ProductionName(prod);
+  TString strproc = ProcessName(proc);
+  TString strsqrts="";
+  if (sqrts>0) strsqrts = Form("_%iTeV", sqrts);
+
+  TString strappend = Form("%s_%s_%s%s", strme.Data(), strprod.Data(), strproc.Data(), strsqrts.Data());
+
+  TFile* finput = TFile::Open(Form("pAvgLinToLog_%s%s", strappend.Data(), ".root"), "read");
+  TFile* finput_patch = TFile::Open(strpatchpath, "read");
+  TFile* foutput = TFile::Open(Form("pAvgSmooth_%s%s", strappend.Data(), ".root"), "recreate");
+  const unsigned int ngraphs=3;
+  TString strtg[ngraphs]={
+    "tg_P_ConserveDifermionMass_4mu",
+    "tg_P_ConserveDifermionMass_4e",
+    "tg_P_ConserveDifermionMass_2mu2e"
+  };
+
+  TGraph* tgpatch = (TGraph*)finput_patch->Get(strpatchname);
+  TSpline3* sppatch = convertGraphToSpline3(tgpatch);
+
+  const double xmin=max(0., (tgpatch->GetX())[0]);
+  const double xmax=min((sqrts>0 ? (double)sqrts*1000. : 15000.), (tgpatch->GetX())[tgpatch->GetN()-1]);
+
+  for (unsigned int ig=0; ig<ngraphs; ig++){
+    finput->cd();
+    TGraphErrors* tg = 0;
+    tg = (TGraphErrors*)finput->Get(strtg[ig]);
+    if (tg==0){ cerr << strtg[ig] << " does not exist." << endl; continue; }
+    foutput->cd();
+    foutput->WriteTObject(tg);
+
+    int n = tg->GetN();
+    double* xx = tg->GetX();
+    double* ex = tg->GetEX();
+    double* yy = tg->GetY();
+    double* ey = tg->GetEY();
+
+    TSpline3* sp = convertGraphToSpline3(tg);
+    sp->SetName(Form("%s_initial", sp->GetName()));
+    foutput->WriteTObject(sp);
+    double tglow = xx[0];
+    double tghigh = xx[tg->GetN()-1];
+    cout << "Extracting low patch..." << endl;
+    TGraph* lowGraph = lowpatcher(sp, sppatch, tglow, xmax, true, true);
+    cout << "Converting patches to splines..." << endl;
+    TSpline3* lowFcn = convertGraphToSpline3(lowGraph);
+
+    TF1* highFcn = highf(sp, tghigh, xmax, false);
+    highFcn->SetNpx((int)(tglow-xmin)*5);
+
+    vector<pair<double, double>> points;
+    for (double xval=xmin; xval<tglow; xval+=1){
+      double yval = lowFcn->Eval(xval);
+      addByLowest<double, double>(points, xval, yval);
+    }
+    for (int ix=0; ix<n; ix++){
+      addByLowest<double, double>(points, xx[ix], yy[ix]);
+    }
+    int tghigh_int = ((int)((tghigh+1.)/100.+0.5))*100;
+    if (tghigh>=(double)tghigh_int) tghigh_int+=100;
+    for (double xval=tghigh_int; xval<=xmax; xval+=100){
+      double yval = highFcn->Eval(xval);
+      addByLowest<double, double>(points, xval, yval);
+    }
+
+    int nn_new = points.size();
+    cout << "Number of new points: " << nn_new-n << endl;
+    double* xy_new[2];
+    for (unsigned int i=0; i<2; i++) xy_new[i] = new double[nn_new];
+    for (int ix=0; ix<nn_new; ix++){
+      xy_new[0][ix] = points.at(ix).first;
+      xy_new[1][ix] = points.at(ix).second;
+    }
+
+    delete lowFcn;
+    delete highFcn;
+    delete lowGraph;
     delete sp;
 
     TGraph* tg_updated = new TGraph(nn_new, xy_new[0], xy_new[1]);
@@ -7107,6 +8067,25 @@ void produce_PAvgSmooth_JHUGen_JQCD_HSMHiggs(int sqrts=8){
     );
 }
 
+void produce_PAvgSmooth_JHUGen_HadVH_HSMHiggs(TString strprod, int sqrts=13){
+  if (!(strprod == "Had_ZH" || strprod == "Had_WH")) return;
+
+  TVar::Production prod;
+  for (int iprod=(int)TVar::JJVBF; iprod<(int)TVar::nProductions; iprod++){
+    prod = (TVar::Production)iprod;
+    if (TVar::ProductionName(prod)==strprod) break;
+  }
+  TVar::MatrixElement me = TVar::JHUGen;
+  TVar::Process proc = TVar::HSMHiggs;
+  generic_PAvgSmoothProducer(
+    me, prod, proc,
+    &getFcn_a0plusa1timesX,
+    &getFcn_a0plusa1overX,
+    sqrts,
+    false
+    );
+}
+
 /* SPECIFIC COMMENT: PATCHING DONE USING ANALYTICAL ggH PDF */
 void produce_PAvgSmooth_JHUGen_ZZGG_HSMHiggs(){
   TVar::MatrixElement me = TVar::JHUGen;
@@ -7142,6 +8121,7 @@ void produce_PAvgSmooth_MCFM_ZZGG_bkgZZ(){
   TVar::Process proc = TVar::bkgZZ;
   generic_PAvgSmoothProducer_withDecay(
     me, prod, proc,
+    "../data/pAvgLinToLog_ANALYTICAL_ZZGG_HSMHiggs.root", "tg_anaPdfInt",
     "../data/pAvgLinToLog_ANALYTICAL_ZZQQB_bkgZZ.root", "tg_anaPdfInt",
     &getPatch_a0plusa1timesX,
     &getPatch_a0plusa1overX,
@@ -7164,9 +8144,15 @@ void produce_PAvgSmooth_MCFM_ZZQQB_bkgZZ(){
 }
 
 /* SPECIFIC COMMENT: PATCHING DONE USING ANALYTICAL ggH PDF */
-void produce_PAvgSmooth_MCFM_JJEW_HSMHiggs(int sqrts=13){
+void produce_PAvgSmooth_MCFM_JJPROD_HSMHiggs(TString strprod, int sqrts=13){
+  if (!(strprod == "Had_ZH" || strprod == "Had_WH" || strprod == "JJVBF")) return;
+
+  TVar::Production prod;
+  for (int iprod=(int)TVar::JJVBF; iprod<(int)TVar::nProductions; iprod++){
+    prod = (TVar::Production)iprod;
+    if (TVar::ProductionName(prod)==strprod) break;
+  }
   TVar::MatrixElement me = TVar::MCFM;
-  TVar::Production prod = TVar::JJEW;
   TVar::Process proc = TVar::HSMHiggs;
   generic_PAvgSmoothProducer_withDecay(
     me, prod, proc,
@@ -7177,18 +8163,34 @@ void produce_PAvgSmooth_MCFM_JJEW_HSMHiggs(int sqrts=13){
     );
 }
 
-/* SPECIFIC COMMENT: PATCHING DONE USING ANALYTICAL QQZZ PDF */
-void produce_PAvgSmooth_MCFM_JJEW_bkgZZ(int sqrts=13){
+/* SPECIFIC COMMENT: PATCHING DONE USING FUNCTIONS */
+void produce_PAvgSmooth_MCFM_JJPROD_bkgZZ(TString strprod, int sqrts=13){
+  if (!(strprod == "Had_ZH" || strprod == "Had_WH" || strprod == "JJVBF")) return;
+
+  TVar::Production prod;
+  for (int iprod=(int)TVar::JJVBF; iprod<(int)TVar::nProductions; iprod++){
+    prod = (TVar::Production)iprod;
+    if (TVar::ProductionName(prod)==strprod) break;
+  }
   TVar::MatrixElement me = TVar::MCFM;
-  TVar::Production prod = TVar::JJEW;
   TVar::Process proc = TVar::bkgZZ;
-  generic_PAvgSmoothProducer_withDecay(
-    me, prod, proc,
-    "../data/pAvgLinToLog_ANALYTICAL_ZZQQB_bkgZZ.root", "tg_anaPdfInt",
-    &getFcn_a0plusa1expX,
-    &getPatch_a0plusa1overX,
-    sqrts
-    );
+  if (prod!=TVar::JJVBF){
+    generic_PAvgSmoothProducer_withDecay(
+      me, prod, proc,
+      //"../data/pAvgLinToLog_ANALYTICAL_ZZQQB_bkgZZ.root", "tg_anaPdfInt",
+      &getFcn_a0plusa1timesX,
+      &getFcn_a0plusa1overX,
+      sqrts
+      );
+  }
+  else{
+    generic_PAvgSmoothProducer_withDecay(
+      me, prod, proc,
+      &getFcn_a0plusa1timesX,
+      &getFcn_a0plusa1timesX,
+      sqrts
+      );
+  }
 }
 
 /* SPECIFIC COMMENT: PATCHING DONE USING ANALYTICAL QQZZ PDF */
@@ -7199,7 +8201,7 @@ void produce_PAvgSmooth_MCFM_JJQCD_bkgZZ(int sqrts=13){
   generic_PAvgSmoothProducer_withDecay(
     me, prod, proc,
     "../data/pAvgLinToLog_ANALYTICAL_ZZQQB_bkgZZ.root", "tg_anaPdfInt",
-    &getPatch_a0plusa1timesX,
+    &getFcn_a0plusa1overX,
     &getPatch_a0plusa1overX,
     sqrts
     );
