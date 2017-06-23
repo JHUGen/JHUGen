@@ -3229,7 +3229,7 @@ void get_PAvgProfile_MCFM_JJPROD_HSMHiggs_13TeV(TString strprod, int sqrts=13, b
 /*
 SPECIFIC COMMENT: OUTPUT ME DIVIDED BY
 - (aL1**2+aR1**2)*(aL2**2+aR2**2) TO REMAIN INDEPENDENT OF CHANNEL
-- PROP(Z)/LINE_PROP(Z) AROUND M4L~=MZ (FIXME: NOT IMPLEMENTED YET)
+- PROP(Z)/LINE_PROP(Z) AROUND M4L~=MZ
 - mJJ propagator is taken out in WH or ZH
 */
 void get_PAvgProfile_MCFM_JJPROD_bkgZZ_13TeV(TString strprod, int sqrts=13, bool recalculate = true){
@@ -3602,6 +3602,23 @@ void get_PAvgProfile_MCFM_JJPROD_bkgZZ_13TeV(TString strprod, int sqrts=13, bool
           propagatorV = 1./(pow(pow(mjj, 2)-pow(mv, 2), 2) + pow(mv*gav, 2));
           mesq_conserveDifermMass /= propagatorV;
         }
+
+        double mz, gaz, propagator;
+        mz = mela.getPrimaryMass(23);
+        gaz = mela.getPrimaryWidth(23);
+        if (fabs(mzz-mz)<=4.*gaz){
+          double sh = pow(mzz, 2);
+          double shdn = pow(mz-4.*gaz, 2);
+          double shup = pow(mz+4.*gaz, 2);
+          double prop_sh = 1./(pow(sh-pow(mz, 2), 2) + pow(mz*gaz, 2));
+          double prop_shdn = 1./(pow(shdn-pow(mz, 2), 2) + pow(mz*gaz, 2));
+          double prop_shup = 1./(pow(shup-pow(mz, 2), 2) + pow(mz*gaz, 2));
+          double fsh = (sh-shdn)/(shup-shdn);
+          propagator = prop_sh / (prop_shdn*(1.-fsh) + prop_shup*fsh);
+        }
+        else propagator=1.;
+        mesq_conserveDifermMass /= propagator;
+
         mela.resetInputEvent();
         if (doRewgt){
           // LEFT HERE: Implement reweighting

@@ -8,6 +8,7 @@
 
 
 using namespace std;
+using TVar::simple_event_record;
 
 
 MelaPConstant::MelaPConstant(
@@ -22,7 +23,8 @@ MelaPConstant::MelaPConstant(
   processProc(proc_),
   fcnLow(0),
   fcnHigh(0),
-  fcnMid(0)
+  fcnMid(0),
+  fname(path)
 {
   GetFcnFromFile(path, spname);
 }
@@ -51,9 +53,7 @@ void MelaPConstant::GetFcnFromFile(const char* path, const char* spname){
   if (fin!=0 && fin->IsOpen()) fin->Close();
 }
 
-double MelaPConstant::Eval(MelaIO* RcdME, TVar::VerbosityLevel verbosity)const{
-  using TVar::simple_event_record;
-
+double MelaPConstant::Eval(const MelaIO* RcdME, TVar::VerbosityLevel verbosity)const{
   if (verbosity>=TVar::DEBUG) cout << "Begin MelaPConstant::Eval" << endl;
 
   double result=1;
@@ -432,5 +432,108 @@ double MelaPConstant::Eval(MelaIO* RcdME, TVar::VerbosityLevel verbosity)const{
   return result;
 }
 
+double MelaPConstant::GetHPropagator(const MelaIO* RcdME, const TVar::VerbosityLevel& verbosity)const{
+  double propagator=1.;
+  double sh = pow(RcdME->melaCand->m(), 2);
+  double mh, gah;
+  RcdME->getHiggsMassWidth(mh, gah, 0);
+  propagator = 1./(pow(sh-pow(mh, 2), 2) + pow(mh*gah, 2));
+  if (verbosity>=TVar::DEBUG) cout
+    << "MelaPConstant::GetHPropagator: "
+    << "propagatorH=" << propagator << " "
+    << endl;
+  return propagator;
+}
+double MelaPConstant::GetZPropagator(const MelaIO* RcdME, const bool restricted, const TVar::VerbosityLevel& verbosity)const{
+  double propagator=1.;
+  double candMass = RcdME->melaCand->m();
+  double sh = pow(candMass, 2);
+  double mz = TUtil::GetMass(23);
+  double gaz = TUtil::GetMass(23);
+  double prop_sh = 1./(pow(sh-pow(mz, 2), 2) + pow(mz*gaz, 2));
+  if (restricted){
+    if (fabs(candMass-mz)<=4.*gaz){
+      double shdn = pow(mz-4.*gaz, 2);
+      double shup = pow(mz+4.*gaz, 2);
+      double prop_shdn = 1./(pow(shdn-pow(mz, 2), 2) + pow(mz*gaz, 2));
+      double prop_shup = 1./(pow(shup-pow(mz, 2), 2) + pow(mz*gaz, 2));
+      double fsh = (sh-shdn)/(shup-shdn);
+      propagator = prop_sh / (prop_shdn*(1.-fsh) + prop_shup*fsh);
+    }
+  }
+  else propagator = prop_sh;
+  if (verbosity>=TVar::DEBUG) cout
+    << "MelaPConstant::GetZPropagator: "
+    << "propagatorZ=" << propagator << " "
+    << endl;
+  return propagator;
+}
+double MelaPConstant::GetAssociatedVjjPropagator(const MelaIO* RcdME, const TVar::VerbosityLevel& verbosity)const{
+  double propagator=1.;
+  if (processProd==TVar::Had_WH || processProd==TVar::Had_ZH){
+    // Get a simple event record, safest way to handle jet mass corrections
+    int nRequested_AssociatedJets=2;
+    int AssociationVCompatibility=0;
+    int partIncCode=TVar::kUseAssociated_Jets;
+    double mv=0, gav=0;
+    if (processProd==TVar::Had_WH){
+      AssociationVCompatibility=24;
+      mv = TUtil::GetMass(24);
+      gav = TUtil::GetMass(24);
+    }
+    else{
+      AssociationVCompatibility=23;
+      mv = TUtil::GetMass(23);
+      gav = TUtil::GetMass(23);
+    }
+    simple_event_record mela_event;
+    mela_event.AssociationCode=partIncCode;
+    mela_event.AssociationVCompatibility=AssociationVCompatibility;
+    mela_event.nRequested_AssociatedJets=nRequested_AssociatedJets;
+    TUtil::GetBoostedParticleVectors(
+      RcdME->melaCand,
+      mela_event,
+      verbosity
+      );
+
+    float mJJval=-1;
+    vector<TLorentzVector> pJets;
+    const SimpleParticleCollection_t& pAssociated = mela_event.pAssociated;
+    for (auto& part : pAssociated){
+      if (PDGHelpers::isAJet(part.first)) pJets.push_back(part.second);
+      if (pJets.size()==2) break;
+    }
+    if (pJets.size()==2) mJJval = (pJets[0] + pJets[1]).M();
+    if (mJJval>=0.) propagator = 1./(pow(pow(mJJval, 2)-pow(mv, 2), 2) + pow(mv*gav, 2));
+  }
+  if (verbosity>=TVar::DEBUG) cout
+    << "MelaPConstant::GetAssociatedVjjPropagator: "
+    << "propagatorV=" << propagator << " "
+    << endl;
+  return propagator;
+}
+double MelaPConstant::GetVDaughterCouplings(const MelaIO* RcdME, const TVar::VerbosityLevel& verbosity)const{
+  double result=1;
+  double aL1, aR1, aL2, aR2;
+  RcdME->getVDaughterCouplings(aL1, aR1, 0);
+  RcdME->getVDaughterCouplings(aL2, aR2, 1);
+  if (verbosity>=TVar::DEBUG) cout
+    << "MelaPConstant::GetVDaughterCouplings: "
+    << "L**2+R**2 couplings=" << pow(aL1, 2)+pow(aR1, 2) << " " << pow(aL2, 2)+pow(aR2, 2) << " "
+    << endl;
+  if (fabs(aL1)>0. || fabs(aR1)>0.) result *= pow(aL1, 2)+pow(aR1, 2);
+  if (fabs(aL2)>0. || fabs(aR2)>0.) result *= pow(aL2, 2)+pow(aR2, 2);
+  return result;
+}
+double MelaPConstant::GetAlphaSatMZ(const MelaIO* RcdME, const int p, const TVar::VerbosityLevel& verbosity)const{
+  double result;
+  double alphasVal = RcdME->getAlphaSatMZ();
+  result = pow(alphasVal, p);
+  if (verbosity>=TVar::DEBUG) cout
+    << "MelaPConstant::GetAlphaSatMZ: "
+    << "alphas(MZ)=" << alphasVal << " (**" << p << ") "
+    << endl;
+  return result;
+}
 
 

@@ -1667,26 +1667,26 @@ float Mela::getConstant_JHUGenUndecayed(){
 
   MelaPConstant* pchandle=0;
   unsigned int iarray=0;
-  double correction=1;
-
+  if (TUtil::JetMassScheme == TVar::ConserveDifermionMass) iarray=0; // First element points to the case when the difermion invariant mass is conserved in mass removal scheme
+  else if (TUtil::JetMassScheme == TVar::MomentumToEnergy) iarray=1; // Second element points to the case when the 3-momentum vector magnitude is scaled to energy in mass removal scheme
   if (myProduction_ == TVar::JQCD){
-    if (TUtil::JetMassScheme == TVar::ConserveDifermionMass) iarray=0; // First element points to the case when the difermion invariant mass is conserved in mass removal scheme
-    else if (TUtil::JetMassScheme == TVar::MomentumToEnergy) iarray=1; // Second element points to the case when the 3-momentum vector magnitude is scaled to energy in mass removal scheme
     pchandle = pAvgSmooth_JHUGen_JQCD_HSMHiggs[iarray];
   }
   else if (myProduction_ == TVar::JJQCD){
-    if (TUtil::JetMassScheme == TVar::ConserveDifermionMass) iarray=0; // First element points to the case when the difermion invariant mass is conserved in mass removal scheme
-    else if (TUtil::JetMassScheme == TVar::MomentumToEnergy) iarray=1; // Second element points to the case when the 3-momentum vector magnitude is scaled to energy in mass removal scheme
     pchandle = pAvgSmooth_JHUGen_JJQCD_HSMHiggs[iarray];
   }
   else if (myProduction_ == TVar::JJVBF){
-    if (TUtil::JetMassScheme == TVar::ConserveDifermionMass) iarray=0; // First element points to the case when the difermion invariant mass is conserved in mass removal scheme
-    else if (TUtil::JetMassScheme == TVar::MomentumToEnergy) iarray=1; // Second element points to the case when the 3-momentum vector magnitude is scaled to energy in mass removal scheme
     pchandle = pAvgSmooth_JHUGen_JJVBF_HSMHiggs[iarray];
   }
+  else if (myProduction_ == TVar::Had_ZH){
+    pchandle = pAvgSmooth_JHUGen_Had_ZH_HSMHiggs[iarray];
+  }
+  else if (myProduction_ == TVar::Had_WH){
+    pchandle = pAvgSmooth_JHUGen_Had_WH_HSMHiggs[iarray];
+  }
   /*
-  else if (myProduction_ == TVar::Lep_ZH || myProduction_ == TVar::Had_ZH)
-  else if (myProduction_ == TVar::Lep_WH || myProduction_ == TVar::Had_WH)
+  else if (myProduction_ == TVar::Lep_ZH)
+  else if (myProduction_ == TVar::Lep_WH)
   else if (myProduction_ == TVar::GammaH)
   else if (myProduction_ == TVar::ttH)
   else if (myProduction_ == TVar::bbH)
@@ -1694,102 +1694,42 @@ float Mela::getConstant_JHUGenUndecayed(){
   else return constant;
 
   constant = pchandle->Eval(getIORecord(), myVerbosity_);
-  if (myProduction_==TVar::JJVBF && LHCsqrts==7.){
-    // Fitting is not good enough for region starting at ~105 GeV due to poor statistics.
-    const double a0=0.67;
-    const double a1=22.;
-    const double a2=73.;
-    double var = melaCand->m();
-    if (var>a2) correction = 1.+a0*exp(-pow((var-a2)/a1, 2));
-    else correction = 1.+a0; // Smooth by virtue of the correction function itself.
-  }
-  else if (myProduction_==TVar::JJVBF && LHCsqrts==8.){
-    // Fitting is not good enough for region starting at ~105 GeV due to poor statistics.
-    const double a0=0.53;
-    const double a1=21.;
-    const double a2=73.;
-    double var = melaCand->m();
-    if (var>a2) correction = 1.+a0*exp(-pow((var-a2)/a1, 2));
-    else correction = 1.+a0; // Smooth by virtue of the correction function itself.
-  }
-  else if (myProduction_==TVar::JJVBF && LHCsqrts==13.){
-    // Fitting is not good enough for region starting at ~105 GeV due to poor statistics.
-    const double a0=0.2;
-    const double a1=22.;
-    const double a2=73.;
-    double var = melaCand->m();
-    if (var>a2) correction = 1.+a0*exp(-pow((var-a2)/a1, 2));
-    else correction = 1.+a0; // Smooth by virtue of the correction function itself.
-  }
-  //
-  else if (myProduction_==TVar::JJQCD && LHCsqrts==8.){
-    // Fitting is not good enough for region starting at ~105 GeV due to poor statistics.
-    const double a0=-0.24;
-    const double a1=80.;
-    const double a2=9.;
-    const double a3=0.08;
-    const double a4=100.;
-    const double a5=20.;
-    double var = melaCand->m();
-    if (var>a1) correction = 1+a0*exp(-pow((var-a1)/a2, 2))+a3*exp(-pow((var-a4)/a5, 2));
-    else correction = 1.+a0+a3*exp(-pow((var-a4)/a5, 2)); // Smooth by virtue of the correction function itself.
-  }
-  //
-  else if (myProduction_==TVar::JQCD && LHCsqrts==7.){
-    const double a0=-0.5;
-    const double a1=80.;
-    const double a2=9.;
-    const double a3=-0.35352;
-    const double a4=1500.;
-    const double a5=268.;
-    double var = melaCand->m();
-    if (var>a1 && var<a4) correction = 1+a0*exp(-pow((var-a1)/a2, 2))+a3*exp(-pow((var-a4)/a5, 2));
-    else if (var>a1) correction = 1+a0*exp(-pow((var-a1)/a2, 2))+a3;
-    else correction = 1.+a0+a3*exp(-pow((var-a4)/a5, 2));
-  }
-  else if (myProduction_==TVar::JQCD && LHCsqrts==8.){
-    const double a0=-0.2;
-    const double a1=80.;
-    const double a2=9.;
-    const double a3=-0.0792;
-    const double a4=1500.;
-    const double a5=615.;
-    double var = melaCand->m();
-    if (var>a1 && var<a4) correction = 1+a0*exp(-pow((var-a1)/a2, 2))+a3*exp(-pow((var-a4)/a5, 2));
-    else if (var>a1) correction = 1+a0*exp(-pow((var-a1)/a2, 2))+a3;
-    else correction = 1.+a0+a3*exp(-pow((var-a4)/a5, 2));
-  }
-  else if (myProduction_==TVar::JQCD && LHCsqrts==13.){
-    // 1+[0]*exp(-pow((x-[1])/[2],2))+[3]*exp(-pow((x-[4])/[5],2))
-    const double a0=0.15;
-    const double a1=320.;
-    const double a2=300.;
-    const double a3=0.179;
-    const double a4=1530.;
-    const double a5=212.;
-    const double offset=0.8444;
-    double var = melaCand->m();
-    if (var<a4) correction = offset+a0*exp(-pow((var-a1)/a2, 2))+a3*exp(-pow((var-a4)/a5, 2));
-    else correction = offset+a0*exp(-pow((var-a1)/a2, 2))+a3;
-  }
-
-  constant *= correction;
   return constant;
 }
 float Mela::getConstant_4l(){
   float constant = 1;
   if (melaCand==0) return constant;
-
-  const unsigned int nPossibleHandles=2;
-  MelaPConstant* pchandle[nPossibleHandles]={ 0 };
-  const int idprod =
+  int decid =
     abs(melaCand->getSortedV(0)->getDaughter(0)->id)*
     abs(melaCand->getSortedV(0)->getDaughter(1)->id)*
     abs(melaCand->getSortedV(1)->getDaughter(0)->id)*
     abs(melaCand->getSortedV(1)->getDaughter(1)->id);
-  const bool is4mu = (idprod==28561);
-  const bool is4e = (idprod==14641 || idprod==50625); // Use 4e for 4tau as well (I don't know why you would do this, but anyway
-  const bool is2mu2e = (idprod==20449 || idprod==27225 || idprod==38025); // Use 2e2mu for 2e2tau and 2mu2tau as well
+  return getConstant_FourFermionDecay(decid);
+}
+float Mela::getConstant_2l2q(){
+  float constant = 1;
+  if (melaCand==0) return constant;
+  int decid1 =
+    abs(melaCand->getSortedV(0)->getDaughter(0)->id)*
+    abs(melaCand->getSortedV(0)->getDaughter(1)->id);
+  int decid2 =
+    abs(melaCand->getSortedV(1)->getDaughter(0)->id)*
+    abs(melaCand->getSortedV(1)->getDaughter(1)->id);
+  int decid = 1;
+  if (decid1!=0) decid*=decid1;
+  if (decid2!=0) decid*=decid2;
+  return getConstant_FourFermionDecay(decid);
+}
+
+float Mela::getConstant_FourFermionDecay(int decid){
+  float constant = 1;
+
+  const bool is4mu = (decid==28561);
+  const bool is4e = (decid==14641 || decid==50625); // Use 4e for 4tau as well (I don't know why you would do this, but anyway)
+  const bool is2mu2e = (decid==20449 || decid==27225 || decid==38025 || decid==169 || decid==121); // Use 2e2mu for 2e2tau and 2mu2tau as well
+
+  const unsigned int nPossibleHandles=6;
+  MelaPConstant* pchandle[nPossibleHandles]={ 0 };
 
   float constant_tmp=0;
   if (myME_ == TVar::JHUGen){
@@ -1822,6 +1762,7 @@ float Mela::getConstant_4l(){
     }
   }
   else if (myME_ == TVar::MCFM){
+    // ZZQQB
     if (myProduction_ == TVar::ZZQQB){
       if (myModel_ == TVar::bkgZZ){
         if (is2mu2e) pchandle[0] = pAvgSmooth_MCFM_ZZQQB_bkgZZ_2mu2e;
@@ -1829,6 +1770,7 @@ float Mela::getConstant_4l(){
         else if (is4e) pchandle[0] = pAvgSmooth_MCFM_ZZQQB_bkgZZ_4e;
       }
     }
+    // ZZGG
     else if (myProduction_ == TVar::ZZGG){
       if (myModel_ == TVar::bkgZZ){
         if (is2mu2e) pchandle[0] = pAvgSmooth_MCFM_ZZGG_bkgZZ_2mu2e;
@@ -1840,6 +1782,7 @@ float Mela::getConstant_4l(){
         else if (is4mu) pchandle[0] = pAvgSmooth_MCFM_ZZGG_HSMHiggs_4mu;
         else if (is4e) pchandle[0] = pAvgSmooth_MCFM_ZZGG_HSMHiggs_4e;
       }
+      // Sum signal and bkg
       else if (myModel_ == TVar::bkgZZ_SMHiggs){
         if (is2mu2e){
           pchandle[0] = pAvgSmooth_MCFM_ZZGG_bkgZZ_2mu2e;
@@ -1855,57 +1798,64 @@ float Mela::getConstant_4l(){
         }
       }
     }
+    // JJEW and components
+    else if (myProduction_ == TVar::JJVBF || myProduction_ == TVar::Had_WH || myProduction_ == TVar::Had_ZH || myProduction_ == TVar::JJEW){
+      MelaPConstant* hvbf=0;
+      MelaPConstant* hwh=0;
+      MelaPConstant* hzh=0;
+      MelaPConstant* hvbs=0;
+      MelaPConstant* hwzz=0;
+      MelaPConstant* hzzz=0;
+      if (is2mu2e){
+        hvbf = pAvgSmooth_MCFM_JJVBF_HSMHiggs_2mu2e;
+        hwh = pAvgSmooth_MCFM_Had_WH_HSMHiggs_2mu2e;
+        hzh = pAvgSmooth_MCFM_Had_ZH_HSMHiggs_2mu2e;
+        hvbs = pAvgSmooth_MCFM_JJVBF_bkgZZ_2mu2e;
+        hwzz = pAvgSmooth_MCFM_Had_WH_bkgZZ_2mu2e;
+        hzzz = pAvgSmooth_MCFM_Had_ZH_bkgZZ_2mu2e;
+      }
+      else if (is4mu){
+        hvbf = pAvgSmooth_MCFM_JJVBF_HSMHiggs_4mu;
+        hwh = pAvgSmooth_MCFM_Had_WH_HSMHiggs_4mu;
+        hzh = pAvgSmooth_MCFM_Had_ZH_HSMHiggs_4mu;
+        hvbs = pAvgSmooth_MCFM_JJVBF_bkgZZ_4mu;
+        hwzz = pAvgSmooth_MCFM_Had_WH_bkgZZ_4mu;
+        hzzz = pAvgSmooth_MCFM_Had_ZH_bkgZZ_4mu;
+      }
+      else if (is4e){
+        hvbf = pAvgSmooth_MCFM_JJVBF_HSMHiggs_4e;
+        hwh = pAvgSmooth_MCFM_Had_WH_HSMHiggs_4e;
+        hzh = pAvgSmooth_MCFM_Had_ZH_HSMHiggs_4e;
+        hvbs = pAvgSmooth_MCFM_JJVBF_bkgZZ_4e;
+        hwzz = pAvgSmooth_MCFM_Had_WH_bkgZZ_4e;
+        hzzz = pAvgSmooth_MCFM_Had_ZH_bkgZZ_4e;
+      }
+
+      if (myModel_ == TVar::HSMHiggs || myModel_ == TVar::bkgZZ_SMHiggs){
+        if (myProduction_ == TVar::JJEW || myProduction_ == TVar::JJVBF) pchandle[0]=hvbf;
+        if (myProduction_ == TVar::JJEW || myProduction_ == TVar::Had_ZH) pchandle[1]=hzh;
+        if (myProduction_ == TVar::JJEW || myProduction_ == TVar::Had_WH) pchandle[2]=hwh;
+      }
+      if (myModel_ == TVar::bkgZZ || myModel_ == TVar::bkgZZ_SMHiggs){
+        if (myProduction_ == TVar::JJEW || myProduction_ == TVar::JJVBF) pchandle[3]=hvbs;
+        if (myProduction_ == TVar::JJEW || myProduction_ == TVar::Had_ZH) pchandle[4]=hzzz;
+        if (myProduction_ == TVar::JJEW || myProduction_ == TVar::Had_WH) pchandle[5]=hwzz;
+      }
+    }
     else if (myProduction_ == TVar::JJQCD){
       if (myModel_ == TVar::bkgZJets){
         pchandle[0] = pAvgSmooth_MCFM_JJQCD_bkgZJets_2l2q; // Only option at the moment
       }
-    }
-  }
-
-  bool hasNullHandle=true;
-  for (unsigned int ihandle=0; ihandle<nPossibleHandles; ihandle++){ if (pchandle[ihandle]!=0){ constant_tmp += pchandle[ihandle]->Eval(getIORecord(), myVerbosity_); hasNullHandle=false; } }
-  if (hasNullHandle) return constant;
-
-  constant = constant_tmp;
-  return constant;
-}
-float Mela::getConstant_2l2q(){
-  float constant = 1;
-  if (melaCand==0) return constant;
-
-  const unsigned int nPossibleHandles=2;
-  MelaPConstant* pchandle[nPossibleHandles]={ 0 };
-
-  float constant_tmp=0;
-  // Most constants use the 2e2mu constant. MelaPConstant scales for the left/right couplings itself based on what is recorded into the MelaIO object.
-  if (myME_ == TVar::JHUGen){
-    if (myProduction_ == TVar::ZZGG){
-      if (myModel_ == TVar::HSMHiggs){
-        pchandle[0] = pAvgSmooth_JHUGen_ZZGG_HSMHiggs_2mu2e;
-      }
-    }
-  }
-  else if (myME_ == TVar::MCFM){
-    if (myProduction_ == TVar::ZZQQB){
-      if (myModel_ == TVar::bkgZZ){
-        pchandle[0] = pAvgSmooth_MCFM_ZZQQB_bkgZZ_2mu2e;
-      }
-    }
-    else if (myProduction_ == TVar::ZZGG){
-      if (myModel_ == TVar::bkgZZ){
-        pchandle[0] = pAvgSmooth_MCFM_ZZGG_bkgZZ_2mu2e;
-      }
-      else if (myModel_ == TVar::HSMHiggs){
-        pchandle[0] = pAvgSmooth_MCFM_ZZGG_HSMHiggs_2mu2e;
-      }
-      else if (myModel_ == TVar::bkgZZ_SMHiggs){
-        pchandle[0] = pAvgSmooth_MCFM_ZZGG_bkgZZ_2mu2e;
-        pchandle[1] = pAvgSmooth_MCFM_ZZGG_HSMHiggs_2mu2e;
-      }
-    }
-    else if (myProduction_ == TVar::JJQCD){
-      if (myModel_ == TVar::bkgZJets){
-        pchandle[0] = pAvgSmooth_MCFM_JJQCD_bkgZJets_2l2q;
+      else if (myModel_ == TVar::bkgZZ){
+        if (is2mu2e){
+          pchandle[0] = pAvgSmooth_MCFM_JJQCD_bkgZZ_2mu2e;
+        }
+        else if (is4mu){
+          pchandle[0] = pAvgSmooth_MCFM_JJQCD_bkgZZ_4mu;
+        }
+        else if (is4e){
+          pchandle[0] = pAvgSmooth_MCFM_JJQCD_bkgZZ_4e;
+        }
       }
     }
   }
@@ -1917,29 +1867,18 @@ float Mela::getConstant_2l2q(){
   constant = constant_tmp;
   return constant;
 }
+
+
 void Mela::getPConstantHandles(){
   if (myVerbosity_>=TVar::DEBUG) cout << "Begin Mela::getPConstantHandles" << endl;
 
-  // Find closest sqrts allowable
-  const unsigned int npossiblesqrts=3;
-  const double possible_sqrts[npossiblesqrts]={ 7, 8, 13 };
-  unsigned int sqrts_index=0;
-  double sqrtsdiff = 99.; // Some large number
-  for (unsigned isq=0; isq<npossiblesqrts; isq++){
-    double diff = fabs(LHCsqrts-possible_sqrts[isq]);
-    if (diff<sqrtsdiff){ sqrts_index=isq; sqrtsdiff=diff; }
-  }
-  const double chsqrts=possible_sqrts[sqrts_index];
-  TString strsqrts=Form("%.0f%s", chsqrts, "TeV");
-
-  // Initialize all to 0
+  // Initialize the handles to 0
   for (unsigned int isch=0; isch<(unsigned int)(TVar::nFermionMassRemovalSchemes-1); isch++){
     pAvgSmooth_JHUGen_JJQCD_HSMHiggs[isch]=0;
-    //
-    pAvgSmooth_JHUGen_JJVBF_HSMHiggs[isch]=0;
-    //
     pAvgSmooth_JHUGen_JQCD_HSMHiggs[isch]=0;
-    //
+    pAvgSmooth_JHUGen_JJVBF_HSMHiggs[isch]=0;
+    pAvgSmooth_JHUGen_Had_ZH_HSMHiggs[isch]=0;
+    pAvgSmooth_JHUGen_Had_WH_HSMHiggs[isch]=0;
   }
   //
   pAvgSmooth_MCFM_JJQCD_bkgZJets_2l2q=0;
@@ -1952,6 +1891,18 @@ void Mela::getPConstantHandles(){
   pAvgSmooth_MCFM_ZZGG_HSMHiggs_4e=0;
   pAvgSmooth_MCFM_ZZGG_HSMHiggs_2mu2e=0;
   //
+  pAvgSmooth_MCFM_JJVBF_HSMHiggs_4mu=0;
+  pAvgSmooth_MCFM_JJVBF_HSMHiggs_4e=0;
+  pAvgSmooth_MCFM_JJVBF_HSMHiggs_2mu2e=0;
+  //
+  pAvgSmooth_MCFM_Had_ZH_HSMHiggs_4mu=0;
+  pAvgSmooth_MCFM_Had_ZH_HSMHiggs_4e=0;
+  pAvgSmooth_MCFM_Had_ZH_HSMHiggs_2mu2e=0;
+  //
+  pAvgSmooth_MCFM_Had_WH_HSMHiggs_4mu=0;
+  pAvgSmooth_MCFM_Had_WH_HSMHiggs_4e=0;
+  pAvgSmooth_MCFM_Had_WH_HSMHiggs_2mu2e=0;
+  //
   pAvgSmooth_MCFM_ZZGG_bkgZZ_4mu=0;
   pAvgSmooth_MCFM_ZZGG_bkgZZ_4e=0;
   pAvgSmooth_MCFM_ZZGG_bkgZZ_2mu2e=0;
@@ -1959,65 +1910,156 @@ void Mela::getPConstantHandles(){
   pAvgSmooth_MCFM_ZZQQB_bkgZZ_4mu=0;
   pAvgSmooth_MCFM_ZZQQB_bkgZZ_4e=0;
   pAvgSmooth_MCFM_ZZQQB_bkgZZ_2mu2e=0;
-
+  //
+  pAvgSmooth_MCFM_JJVBF_bkgZZ_4mu=0;
+  pAvgSmooth_MCFM_JJVBF_bkgZZ_4e=0;
+  pAvgSmooth_MCFM_JJVBF_bkgZZ_2mu2e=0;
+  //
+  pAvgSmooth_MCFM_Had_ZH_bkgZZ_4mu=0;
+  pAvgSmooth_MCFM_Had_ZH_bkgZZ_4e=0;
+  pAvgSmooth_MCFM_Had_ZH_bkgZZ_2mu2e=0;
+  //
+  pAvgSmooth_MCFM_Had_WH_bkgZZ_4mu=0;
+  pAvgSmooth_MCFM_Had_WH_bkgZZ_4e=0;
+  pAvgSmooth_MCFM_Had_WH_bkgZZ_2mu2e=0;
+  //
+  pAvgSmooth_MCFM_JJQCD_bkgZZ_4mu=0;
+  pAvgSmooth_MCFM_JJQCD_bkgZZ_4e=0;
+  pAvgSmooth_MCFM_JJQCD_bkgZZ_2mu2e=0;
+  //
 
   TString filename, spname;
 
-  for (unsigned int isch=0; isch<(unsigned int)(TVar::nFermionMassRemovalSchemes-1); isch++){
-    filename = Form("pAvgSmooth_JHUGen_JJQCD_HSMHiggs_%s", strsqrts.Data());
-    spname = "P_ConserveDifermionMass";
-    pAvgSmooth_JHUGen_JJQCD_HSMHiggs[0] = getPConstantHandle(TVar::JHUGen, TVar::JJQCD, TVar::HSMHiggs, filename.Data(), spname.Data());
-    spname = "P_MomentumToEnergy";
-    pAvgSmooth_JHUGen_JJQCD_HSMHiggs[1] = getPConstantHandle(TVar::JHUGen, TVar::JJQCD, TVar::HSMHiggs, filename.Data(), spname.Data());
-    //
-    filename = Form("pAvgSmooth_JHUGen_JJVBF_HSMHiggs_%s", strsqrts.Data());
-    spname = "P_ConserveDifermionMass";
-    pAvgSmooth_JHUGen_JJVBF_HSMHiggs[0] = getPConstantHandle(TVar::JHUGen, TVar::JJVBF, TVar::HSMHiggs, filename.Data(), spname.Data());
-    spname = "P_MomentumToEnergy";
-    pAvgSmooth_JHUGen_JJVBF_HSMHiggs[1] = getPConstantHandle(TVar::JHUGen, TVar::JJVBF, TVar::HSMHiggs, filename.Data(), spname.Data());
-    //
-    filename = Form("pAvgSmooth_JHUGen_JQCD_HSMHiggs_%s", strsqrts.Data());
-    spname = "P_ConserveDifermionMass";
-    pAvgSmooth_JHUGen_JQCD_HSMHiggs[0] = getPConstantHandle(TVar::JHUGen, TVar::JQCD, TVar::HSMHiggs, filename.Data(), spname.Data());
-    spname = "P_MomentumToEnergy";
-    pAvgSmooth_JHUGen_JQCD_HSMHiggs[1] = getPConstantHandle(TVar::JHUGen, TVar::JQCD, TVar::HSMHiggs, filename.Data(), spname.Data());
-  }
+  // Fill versions with difermion correction, set to ConserveDifermionMass if others don't exist.
+  filename = "pAvgSmooth_JHUGen_JJQCD_HSMHiggs";
+  spname = "P_ConserveDifermionMass";
+  pAvgSmooth_JHUGen_JJQCD_HSMHiggs[0] = getPConstantHandle(TVar::JHUGen, TVar::JJQCD, TVar::HSMHiggs, filename, spname, true);
+  spname = "P_MomentumToEnergy";
+  pAvgSmooth_JHUGen_JJQCD_HSMHiggs[1] = getPConstantHandle(TVar::JHUGen, TVar::JJQCD, TVar::HSMHiggs, filename, spname, true);
+  if (pAvgSmooth_JHUGen_JJQCD_HSMHiggs[1]==0) pAvgSmooth_JHUGen_JJQCD_HSMHiggs[1]=pAvgSmooth_JHUGen_JJQCD_HSMHiggs[0];
+  //
+  filename = "pAvgSmooth_JHUGen_JQCD_HSMHiggs";
+  spname = "P_ConserveDifermionMass";
+  pAvgSmooth_JHUGen_JQCD_HSMHiggs[0] = getPConstantHandle(TVar::JHUGen, TVar::JQCD, TVar::HSMHiggs, filename, spname, true);
+  spname = "P_MomentumToEnergy";
+  pAvgSmooth_JHUGen_JQCD_HSMHiggs[1] = getPConstantHandle(TVar::JHUGen, TVar::JQCD, TVar::HSMHiggs, filename, spname, true);
+  if (pAvgSmooth_JHUGen_JQCD_HSMHiggs[1]==0) pAvgSmooth_JHUGen_JQCD_HSMHiggs[1]=pAvgSmooth_JHUGen_JQCD_HSMHiggs[0];
+  //
+  filename = "pAvgSmooth_JHUGen_JJVBF_HSMHiggs";
+  spname = "P_ConserveDifermionMass";
+  pAvgSmooth_JHUGen_JJVBF_HSMHiggs[0] = getPConstantHandle(TVar::JHUGen, TVar::JJVBF, TVar::HSMHiggs, filename, spname, true);
+  spname = "P_MomentumToEnergy";
+  pAvgSmooth_JHUGen_JJVBF_HSMHiggs[1] = getPConstantHandle(TVar::JHUGen, TVar::JJVBF, TVar::HSMHiggs, filename, spname, true);
+  if (pAvgSmooth_JHUGen_JJVBF_HSMHiggs[1]==0) pAvgSmooth_JHUGen_JJVBF_HSMHiggs[1]=pAvgSmooth_JHUGen_JJVBF_HSMHiggs[0];
+  //
+  filename = "pAvgSmooth_JHUGen_Had_ZH_HSMHiggs";
+  spname = "P_ConserveDifermionMass";
+  pAvgSmooth_JHUGen_Had_ZH_HSMHiggs[0] = getPConstantHandle(TVar::JHUGen, TVar::Had_ZH, TVar::HSMHiggs, filename, spname, true);
+  spname = "P_MomentumToEnergy";
+  //pAvgSmooth_JHUGen_Had_ZH_HSMHiggs[1] = getPConstantHandle(TVar::JHUGen, TVar::Had_ZH, TVar::HSMHiggs, filename, spname, true);
+  if (pAvgSmooth_JHUGen_Had_ZH_HSMHiggs[1]==0) pAvgSmooth_JHUGen_Had_ZH_HSMHiggs[1]=pAvgSmooth_JHUGen_Had_ZH_HSMHiggs[0];
+  //
+  filename = "pAvgSmooth_JHUGen_Had_WH_HSMHiggs";
+  spname = "P_ConserveDifermionMass";
+  pAvgSmooth_JHUGen_Had_WH_HSMHiggs[0] = getPConstantHandle(TVar::JHUGen, TVar::Had_WH, TVar::HSMHiggs, filename, spname, true);
+  spname = "P_MomentumToEnergy";
+  //pAvgSmooth_JHUGen_Had_WH_HSMHiggs[1] = getPConstantHandle(TVar::JHUGen, TVar::Had_WH, TVar::HSMHiggs, filename, spname, true);
+  if (pAvgSmooth_JHUGen_Had_WH_HSMHiggs[1]==0) pAvgSmooth_JHUGen_Had_WH_HSMHiggs[1]=pAvgSmooth_JHUGen_Had_WH_HSMHiggs[0];
+  //
   //
   filename = "pAvgSmooth_MCFM_JJQCD_bkgZJets_13TeV_2l2q"; // 13 TeV is a placeholder for all energies.
   spname = "P_ConserveDifermionMass";
-  pAvgSmooth_MCFM_JJQCD_bkgZJets_2l2q = getPConstantHandle(TVar::MCFM, TVar::JJQCD, TVar::bkgZJets, filename.Data(), spname.Data());
+  pAvgSmooth_MCFM_JJQCD_bkgZJets_2l2q = getPConstantHandle(TVar::MCFM, TVar::JJQCD, TVar::bkgZJets, filename, spname);
+  //
   //
   filename = "pAvgSmooth_JHUGen_ZZGG_HSMHiggs";
   spname = "P_ConserveDifermionMass_4mu";
-  pAvgSmooth_JHUGen_ZZGG_HSMHiggs_4mu = getPConstantHandle(TVar::JHUGen, TVar::ZZGG, TVar::HSMHiggs, filename.Data(), spname.Data());
+  pAvgSmooth_JHUGen_ZZGG_HSMHiggs_4mu = getPConstantHandle(TVar::JHUGen, TVar::ZZGG, TVar::HSMHiggs, filename, spname);
   spname = "P_ConserveDifermionMass_4e";
-  pAvgSmooth_JHUGen_ZZGG_HSMHiggs_4e = getPConstantHandle(TVar::JHUGen, TVar::ZZGG, TVar::HSMHiggs, filename.Data(), spname.Data());
+  pAvgSmooth_JHUGen_ZZGG_HSMHiggs_4e = getPConstantHandle(TVar::JHUGen, TVar::ZZGG, TVar::HSMHiggs, filename, spname);
   spname = "P_ConserveDifermionMass_2mu2e";
-  pAvgSmooth_JHUGen_ZZGG_HSMHiggs_2mu2e = getPConstantHandle(TVar::JHUGen, TVar::ZZGG, TVar::HSMHiggs, filename.Data(), spname.Data());
+  pAvgSmooth_JHUGen_ZZGG_HSMHiggs_2mu2e = getPConstantHandle(TVar::JHUGen, TVar::ZZGG, TVar::HSMHiggs, filename, spname);
   //
   filename = "pAvgSmooth_MCFM_ZZGG_HSMHiggs";
   spname = "P_ConserveDifermionMass_4mu";
-  pAvgSmooth_MCFM_ZZGG_HSMHiggs_4mu = getPConstantHandle(TVar::MCFM, TVar::ZZGG, TVar::HSMHiggs, filename.Data(), spname.Data());
+  pAvgSmooth_MCFM_ZZGG_HSMHiggs_4mu = getPConstantHandle(TVar::MCFM, TVar::ZZGG, TVar::HSMHiggs, filename, spname);
   spname = "P_ConserveDifermionMass_4e";
-  pAvgSmooth_MCFM_ZZGG_HSMHiggs_4e = getPConstantHandle(TVar::MCFM, TVar::ZZGG, TVar::HSMHiggs, filename.Data(), spname.Data());
+  pAvgSmooth_MCFM_ZZGG_HSMHiggs_4e = getPConstantHandle(TVar::MCFM, TVar::ZZGG, TVar::HSMHiggs, filename, spname);
   spname = "P_ConserveDifermionMass_2mu2e";
-  pAvgSmooth_MCFM_ZZGG_HSMHiggs_2mu2e = getPConstantHandle(TVar::MCFM, TVar::ZZGG, TVar::HSMHiggs, filename.Data(), spname.Data());
+  pAvgSmooth_MCFM_ZZGG_HSMHiggs_2mu2e = getPConstantHandle(TVar::MCFM, TVar::ZZGG, TVar::HSMHiggs, filename, spname);
+  //
+  filename = "pAvgSmooth_MCFM_JJVBF_HSMHiggs";
+  spname = "P_ConserveDifermionMass_4mu";
+  pAvgSmooth_MCFM_JJVBF_HSMHiggs_4mu = getPConstantHandle(TVar::MCFM, TVar::JJVBF, TVar::HSMHiggs, filename, spname, true);
+  spname = "P_ConserveDifermionMass_4e";
+  pAvgSmooth_MCFM_JJVBF_HSMHiggs_4e = getPConstantHandle(TVar::MCFM, TVar::JJVBF, TVar::HSMHiggs, filename, spname, true);
+  spname = "P_ConserveDifermionMass_2mu2e";
+  pAvgSmooth_MCFM_JJVBF_HSMHiggs_2mu2e = getPConstantHandle(TVar::MCFM, TVar::JJVBF, TVar::HSMHiggs, filename, spname, true);
+  //
+  filename = "pAvgSmooth_MCFM_Had_ZH_HSMHiggs";
+  spname = "P_ConserveDifermionMass_4mu";
+  pAvgSmooth_MCFM_Had_ZH_HSMHiggs_4mu = getPConstantHandle(TVar::MCFM, TVar::Had_ZH, TVar::HSMHiggs, filename, spname, true);
+  spname = "P_ConserveDifermionMass_4e";
+  pAvgSmooth_MCFM_Had_ZH_HSMHiggs_4e = getPConstantHandle(TVar::MCFM, TVar::Had_ZH, TVar::HSMHiggs, filename, spname, true);
+  spname = "P_ConserveDifermionMass_2mu2e";
+  pAvgSmooth_MCFM_Had_ZH_HSMHiggs_2mu2e = getPConstantHandle(TVar::MCFM, TVar::Had_ZH, TVar::HSMHiggs, filename, spname, true);
+  //
+  filename = "pAvgSmooth_MCFM_Had_WH_HSMHiggs";
+  spname = "P_ConserveDifermionMass_4mu";
+  pAvgSmooth_MCFM_Had_WH_HSMHiggs_4mu = getPConstantHandle(TVar::MCFM, TVar::Had_WH, TVar::HSMHiggs, filename, spname, true);
+  spname = "P_ConserveDifermionMass_4e";
+  pAvgSmooth_MCFM_Had_WH_HSMHiggs_4e = getPConstantHandle(TVar::MCFM, TVar::Had_WH, TVar::HSMHiggs, filename, spname, true);
+  spname = "P_ConserveDifermionMass_2mu2e";
+  pAvgSmooth_MCFM_Had_WH_HSMHiggs_2mu2e = getPConstantHandle(TVar::MCFM, TVar::Had_WH, TVar::HSMHiggs, filename, spname, true);
+  //
   //
   filename = "pAvgSmooth_MCFM_ZZGG_bkgZZ";
   spname = "P_ConserveDifermionMass_4mu";
-  pAvgSmooth_MCFM_ZZGG_bkgZZ_4mu = getPConstantHandle(TVar::MCFM, TVar::ZZGG, TVar::bkgZZ, filename.Data(), spname.Data());
+  pAvgSmooth_MCFM_ZZGG_bkgZZ_4mu = getPConstantHandle(TVar::MCFM, TVar::ZZGG, TVar::bkgZZ, filename, spname);
   spname = "P_ConserveDifermionMass_4e";
-  pAvgSmooth_MCFM_ZZGG_bkgZZ_4e = getPConstantHandle(TVar::MCFM, TVar::ZZGG, TVar::bkgZZ, filename.Data(), spname.Data());
+  pAvgSmooth_MCFM_ZZGG_bkgZZ_4e = getPConstantHandle(TVar::MCFM, TVar::ZZGG, TVar::bkgZZ, filename, spname);
   spname = "P_ConserveDifermionMass_2mu2e";
-  pAvgSmooth_MCFM_ZZGG_bkgZZ_2mu2e = getPConstantHandle(TVar::MCFM, TVar::ZZGG, TVar::bkgZZ, filename.Data(), spname.Data());
+  pAvgSmooth_MCFM_ZZGG_bkgZZ_2mu2e = getPConstantHandle(TVar::MCFM, TVar::ZZGG, TVar::bkgZZ, filename, spname);
   //
   filename = "pAvgSmooth_MCFM_ZZQQB_bkgZZ";
   spname = "P_ConserveDifermionMass_4mu";
-  pAvgSmooth_MCFM_ZZQQB_bkgZZ_4mu = getPConstantHandle(TVar::MCFM, TVar::ZZQQB, TVar::bkgZZ, filename.Data(), spname.Data());
+  pAvgSmooth_MCFM_ZZQQB_bkgZZ_4mu = getPConstantHandle(TVar::MCFM, TVar::ZZQQB, TVar::bkgZZ, filename, spname);
   spname = "P_ConserveDifermionMass_4e";
-  pAvgSmooth_MCFM_ZZQQB_bkgZZ_4e = getPConstantHandle(TVar::MCFM, TVar::ZZQQB, TVar::bkgZZ, filename.Data(), spname.Data());
+  pAvgSmooth_MCFM_ZZQQB_bkgZZ_4e = getPConstantHandle(TVar::MCFM, TVar::ZZQQB, TVar::bkgZZ, filename, spname);
   spname = "P_ConserveDifermionMass_2mu2e";
-  pAvgSmooth_MCFM_ZZQQB_bkgZZ_2mu2e = getPConstantHandle(TVar::MCFM, TVar::ZZQQB, TVar::bkgZZ, filename.Data(), spname.Data());
+  pAvgSmooth_MCFM_ZZQQB_bkgZZ_2mu2e = getPConstantHandle(TVar::MCFM, TVar::ZZQQB, TVar::bkgZZ, filename, spname);
+  //
+  filename = "pAvgSmooth_MCFM_JJVBF_bkgZZ";
+  spname = "P_ConserveDifermionMass_4mu";
+  pAvgSmooth_MCFM_JJVBF_bkgZZ_4mu = getPConstantHandle(TVar::MCFM, TVar::JJVBF, TVar::bkgZZ, filename, spname, true);
+  spname = "P_ConserveDifermionMass_4e";
+  pAvgSmooth_MCFM_JJVBF_bkgZZ_4e = getPConstantHandle(TVar::MCFM, TVar::JJVBF, TVar::bkgZZ, filename, spname, true);
+  spname = "P_ConserveDifermionMass_2mu2e";
+  pAvgSmooth_MCFM_JJVBF_bkgZZ_2mu2e = getPConstantHandle(TVar::MCFM, TVar::JJVBF, TVar::bkgZZ, filename, spname, true);
+  //
+  filename = "pAvgSmooth_MCFM_Had_ZH_bkgZZ";
+  spname = "P_ConserveDifermionMass_4mu";
+  pAvgSmooth_MCFM_Had_ZH_bkgZZ_4mu = getPConstantHandle(TVar::MCFM, TVar::Had_ZH, TVar::bkgZZ, filename, spname, true);
+  spname = "P_ConserveDifermionMass_4e";
+  pAvgSmooth_MCFM_Had_ZH_bkgZZ_4e = getPConstantHandle(TVar::MCFM, TVar::Had_ZH, TVar::bkgZZ, filename, spname, true);
+  spname = "P_ConserveDifermionMass_2mu2e";
+  pAvgSmooth_MCFM_Had_ZH_bkgZZ_2mu2e = getPConstantHandle(TVar::MCFM, TVar::Had_ZH, TVar::bkgZZ, filename, spname, true);
+  //
+  filename = "pAvgSmooth_MCFM_Had_WH_bkgZZ";
+  spname = "P_ConserveDifermionMass_4mu";
+  pAvgSmooth_MCFM_Had_WH_bkgZZ_4mu = getPConstantHandle(TVar::MCFM, TVar::Had_WH, TVar::bkgZZ, filename, spname, true);
+  spname = "P_ConserveDifermionMass_4e";
+  pAvgSmooth_MCFM_Had_WH_bkgZZ_4e = getPConstantHandle(TVar::MCFM, TVar::Had_WH, TVar::bkgZZ, filename, spname, true);
+  spname = "P_ConserveDifermionMass_2mu2e";
+  pAvgSmooth_MCFM_Had_WH_bkgZZ_2mu2e = getPConstantHandle(TVar::MCFM, TVar::Had_WH, TVar::bkgZZ, filename, spname, true);
+  //
+  filename = "pAvgSmooth_MCFM_JJQCD_bkgZZ";
+  spname = "P_ConserveDifermionMass_4mu";
+  pAvgSmooth_MCFM_JJQCD_bkgZZ_4mu = getPConstantHandle(TVar::MCFM, TVar::JJQCD, TVar::bkgZZ, filename, spname, true);
+  spname = "P_ConserveDifermionMass_4e";
+  pAvgSmooth_MCFM_JJQCD_bkgZZ_4e = getPConstantHandle(TVar::MCFM, TVar::JJQCD, TVar::bkgZZ, filename, spname, true);
+  spname = "P_ConserveDifermionMass_2mu2e";
+  pAvgSmooth_MCFM_JJQCD_bkgZZ_2mu2e = getPConstantHandle(TVar::MCFM, TVar::JJQCD, TVar::bkgZZ, filename, spname, true);
   //
 
   if (myVerbosity_>=TVar::DEBUG) cout << "End Mela::getPConstantHandles" << endl;
@@ -2026,11 +2068,16 @@ MelaPConstant* Mela::getPConstantHandle(
   TVar::MatrixElement me_,
   TVar::Production prod_,
   TVar::Process proc_,
-  const char* relpath,
-  const char* spname
+  TString relpath,
+  TString spname,
+  const bool useSqrts
   ){
   if (myVerbosity_>=TVar::DEBUG) cout << "Begin Mela::getPConstantHandle" << endl;
 
+  MelaPConstant* pchandle=0;
+  string cfile_fullpath;
+
+  // Get data/ path
   if (myVerbosity_>=TVar::DEBUG) cout << "Mela::getPConstantHandle: relpath and spline name: " << relpath << ", " << spname << endl;
 #ifdef _melapkgpathstr_
   const string MELAPKGPATH = _melapkgpathstr_;
@@ -2039,45 +2086,115 @@ MelaPConstant* Mela::getPConstantHandle(
   assert(0);
 #endif
   const string path = MELAPKGPATH + "data/";
-  string cfile_fullpath = path;
-  cfile_fullpath.append(relpath);
-  cfile_fullpath.append(".root");
   if (myVerbosity_>=TVar::DEBUG) cout << "Mela::getPConstantHandle: path and spline name: " << path << ", " << spname << endl;
-  if (myVerbosity_>=TVar::DEBUG) cout << "Mela::getPConstantHandle: Full path and spline name: " << cfile_fullpath << ", " << spname << endl;
-  MelaPConstant* pchandle = new MelaPConstant(me_, prod_, proc_, cfile_fullpath.c_str(), spname);
 
+  if (useSqrts){ // Loop over possible sqrts values to get the closest one
+    const unsigned int npossiblesqrts=3;
+    const double possible_sqrts[npossiblesqrts]={ 7, 8, 13 };
+    vector<double> trysqrts;
+    for (unsigned isq=0; isq<npossiblesqrts; isq++){
+      double val = possible_sqrts[isq];
+      double diff = fabs(LHCsqrts-val);
+      bool inserted=false;
+      for (std::vector<double>::iterator it = trysqrts.begin(); it<trysqrts.end(); it++){
+        if (fabs((*it)-LHCsqrts)>diff){
+          inserted=true;
+          trysqrts.insert(it, val);
+          break;
+        }
+      }
+      if (!inserted) trysqrts.push_back(val);
+    }
+    for (auto& dsqrts : trysqrts){
+      TString strsqrts = Form("%s_%.0f%s", relpath.Data(), dsqrts, "TeV");
+      cfile_fullpath = path;
+      cfile_fullpath.append(strsqrts.Data());
+      cfile_fullpath.append(".root");
+      pchandle = new MelaPConstant(me_, prod_, proc_, cfile_fullpath.c_str(), spname.Data());
+      if (pchandle->IsValid()){
+        if (myVerbosity_>=TVar::DEBUG) cout << "Mela::getPConstantHandle: Full path and spline name: " << cfile_fullpath << ", " << spname << " is valid." << endl;
+        break;
+      }
+      else{
+        if (myVerbosity_>=TVar::DEBUG) cout << "Mela::getPConstantHandle: Full path and spline name: " << cfile_fullpath << ", " << spname << " is invalid." << endl;
+        deletePConstantHandle(pchandle);
+      }
+    }
+  }
+  else{
+    cfile_fullpath = path;
+    cfile_fullpath.append(relpath.Data());
+    cfile_fullpath.append(".root");
+    pchandle = new MelaPConstant(me_, prod_, proc_, cfile_fullpath.c_str(), spname.Data());
+    if (!pchandle->IsValid()) deletePConstantHandle(pchandle);
+  }
+  if (myVerbosity_>=TVar::DEBUG) cout << "Mela::getPConstantHandle: Full path and spline name: " << cfile_fullpath << ", " << spname << endl;
+  if (myVerbosity_>=TVar::DEBUG && pchandle==0) cerr << "Mela::getPConstantHandle: Handle of " << spname << " from " << cfile_fullpath << " is invalid!" << endl;
   if (myVerbosity_>=TVar::DEBUG) cout << "End Mela::getPConstantHandle" << endl;
   return pchandle;
 }
 void Mela::deletePConstantHandles(){
-  for (unsigned int isch=0; isch<(unsigned int)(TVar::nFermionMassRemovalSchemes-1); isch++){
-    if (pAvgSmooth_JHUGen_JJQCD_HSMHiggs[isch]!=0) delete pAvgSmooth_JHUGen_JJQCD_HSMHiggs[isch];
-    //
-    if (pAvgSmooth_JHUGen_JJVBF_HSMHiggs[isch]!=0) delete pAvgSmooth_JHUGen_JJVBF_HSMHiggs[isch];
-    //
-    if (pAvgSmooth_JHUGen_JQCD_HSMHiggs[isch]!=0) delete pAvgSmooth_JHUGen_JQCD_HSMHiggs[isch];
-    //
+  for (int isch=(unsigned int)(TVar::nFermionMassRemovalSchemes-2); isch>=0; isch--){
+    if (isch==0 || pAvgSmooth_JHUGen_JJQCD_HSMHiggs[isch]!=pAvgSmooth_JHUGen_JJQCD_HSMHiggs[0]) deletePConstantHandle(pAvgSmooth_JHUGen_JJQCD_HSMHiggs[isch]);
+    if (isch==0 || pAvgSmooth_JHUGen_JQCD_HSMHiggs[isch]!=pAvgSmooth_JHUGen_JQCD_HSMHiggs[0]) deletePConstantHandle(pAvgSmooth_JHUGen_JQCD_HSMHiggs[isch]);
+    if (isch==0 || pAvgSmooth_JHUGen_JJVBF_HSMHiggs[isch]!=pAvgSmooth_JHUGen_JJVBF_HSMHiggs[0]) deletePConstantHandle(pAvgSmooth_JHUGen_JJVBF_HSMHiggs[isch]);
+    if (isch==0 || pAvgSmooth_JHUGen_Had_ZH_HSMHiggs[isch]!=pAvgSmooth_JHUGen_Had_ZH_HSMHiggs[0]) deletePConstantHandle(pAvgSmooth_JHUGen_Had_ZH_HSMHiggs[isch]);
+    if (isch==0 || pAvgSmooth_JHUGen_Had_WH_HSMHiggs[isch]!=pAvgSmooth_JHUGen_Had_WH_HSMHiggs[0]) deletePConstantHandle(pAvgSmooth_JHUGen_Had_WH_HSMHiggs[isch]);
   }
   //
-  if (pAvgSmooth_MCFM_JJQCD_bkgZJets_2l2q!=0) delete pAvgSmooth_MCFM_JJQCD_bkgZJets_2l2q;
+  deletePConstantHandle(pAvgSmooth_MCFM_JJQCD_bkgZJets_2l2q);
   //
-  if (pAvgSmooth_JHUGen_ZZGG_HSMHiggs_4mu!=0) delete pAvgSmooth_JHUGen_ZZGG_HSMHiggs_4mu;
-  if (pAvgSmooth_JHUGen_ZZGG_HSMHiggs_4e!=0) delete pAvgSmooth_JHUGen_ZZGG_HSMHiggs_4e;
-  if (pAvgSmooth_JHUGen_ZZGG_HSMHiggs_2mu2e!=0) delete pAvgSmooth_JHUGen_ZZGG_HSMHiggs_2mu2e;
+  deletePConstantHandle(pAvgSmooth_JHUGen_ZZGG_HSMHiggs_4mu);
+  deletePConstantHandle(pAvgSmooth_JHUGen_ZZGG_HSMHiggs_4e);
+  deletePConstantHandle(pAvgSmooth_JHUGen_ZZGG_HSMHiggs_2mu2e);
   //
-  if (pAvgSmooth_MCFM_ZZGG_HSMHiggs_4mu!=0) delete pAvgSmooth_MCFM_ZZGG_HSMHiggs_4mu;
-  if (pAvgSmooth_MCFM_ZZGG_HSMHiggs_4e!=0) delete pAvgSmooth_MCFM_ZZGG_HSMHiggs_4e;
-  if (pAvgSmooth_MCFM_ZZGG_HSMHiggs_2mu2e!=0) delete pAvgSmooth_MCFM_ZZGG_HSMHiggs_2mu2e;
+  deletePConstantHandle(pAvgSmooth_MCFM_ZZGG_HSMHiggs_4mu);
+  deletePConstantHandle(pAvgSmooth_MCFM_ZZGG_HSMHiggs_4e);
+  deletePConstantHandle(pAvgSmooth_MCFM_ZZGG_HSMHiggs_2mu2e);
   //
-  if (pAvgSmooth_MCFM_ZZGG_bkgZZ_4mu!=0) delete pAvgSmooth_MCFM_ZZGG_bkgZZ_4mu;
-  if (pAvgSmooth_MCFM_ZZGG_bkgZZ_4e!=0) delete pAvgSmooth_MCFM_ZZGG_bkgZZ_4e;
-  if (pAvgSmooth_MCFM_ZZGG_bkgZZ_2mu2e!=0) delete pAvgSmooth_MCFM_ZZGG_bkgZZ_2mu2e;
+  deletePConstantHandle(pAvgSmooth_MCFM_JJVBF_HSMHiggs_4mu);
+  deletePConstantHandle(pAvgSmooth_MCFM_JJVBF_HSMHiggs_4e);
+  deletePConstantHandle(pAvgSmooth_MCFM_JJVBF_HSMHiggs_2mu2e);
   //
-  if (pAvgSmooth_MCFM_ZZQQB_bkgZZ_4mu!=0) delete pAvgSmooth_MCFM_ZZQQB_bkgZZ_4mu;
-  if (pAvgSmooth_MCFM_ZZQQB_bkgZZ_4e!=0) delete pAvgSmooth_MCFM_ZZQQB_bkgZZ_4e;
-  if (pAvgSmooth_MCFM_ZZQQB_bkgZZ_2mu2e!=0) delete pAvgSmooth_MCFM_ZZQQB_bkgZZ_2mu2e;
+  deletePConstantHandle(pAvgSmooth_MCFM_Had_ZH_HSMHiggs_4mu);
+  deletePConstantHandle(pAvgSmooth_MCFM_Had_ZH_HSMHiggs_4e);
+  deletePConstantHandle(pAvgSmooth_MCFM_Had_ZH_HSMHiggs_2mu2e);
+  //
+  deletePConstantHandle(pAvgSmooth_MCFM_Had_WH_HSMHiggs_4mu);
+  deletePConstantHandle(pAvgSmooth_MCFM_Had_WH_HSMHiggs_4e);
+  deletePConstantHandle(pAvgSmooth_MCFM_Had_WH_HSMHiggs_2mu2e);
+  //
+  deletePConstantHandle(pAvgSmooth_MCFM_ZZGG_bkgZZ_4mu);
+  deletePConstantHandle(pAvgSmooth_MCFM_ZZGG_bkgZZ_4e);
+  deletePConstantHandle(pAvgSmooth_MCFM_ZZGG_bkgZZ_2mu2e);
+  //
+  deletePConstantHandle(pAvgSmooth_MCFM_ZZQQB_bkgZZ_4mu);
+  deletePConstantHandle(pAvgSmooth_MCFM_ZZQQB_bkgZZ_4e);
+  deletePConstantHandle(pAvgSmooth_MCFM_ZZQQB_bkgZZ_2mu2e);
+  //
+  deletePConstantHandle(pAvgSmooth_MCFM_JJVBF_bkgZZ_4mu);
+  deletePConstantHandle(pAvgSmooth_MCFM_JJVBF_bkgZZ_4e);
+  deletePConstantHandle(pAvgSmooth_MCFM_JJVBF_bkgZZ_2mu2e);
+  //
+  deletePConstantHandle(pAvgSmooth_MCFM_Had_ZH_bkgZZ_4mu);
+  deletePConstantHandle(pAvgSmooth_MCFM_Had_ZH_bkgZZ_4e);
+  deletePConstantHandle(pAvgSmooth_MCFM_Had_ZH_bkgZZ_2mu2e);
+  //
+  deletePConstantHandle(pAvgSmooth_MCFM_Had_WH_bkgZZ_4mu);
+  deletePConstantHandle(pAvgSmooth_MCFM_Had_WH_bkgZZ_4e);
+  deletePConstantHandle(pAvgSmooth_MCFM_Had_WH_bkgZZ_2mu2e);
+  //
+  deletePConstantHandle(pAvgSmooth_MCFM_JJQCD_bkgZZ_4mu);
+  deletePConstantHandle(pAvgSmooth_MCFM_JJQCD_bkgZZ_4e);
+  deletePConstantHandle(pAvgSmooth_MCFM_JJQCD_bkgZZ_2mu2e);
   //
 }
+void Mela::deletePConstantHandle(MelaPConstant*& handle){
+  if (myVerbosity_>=TVar::DEBUG) cout << "Mela::deletePConstantHandle: Deleting PConstant handle " << handle->GetSplineName() << " at " << handle->GetFileName() << endl;
+  delete handle; handle=0;
+  if (myVerbosity_>=TVar::DEBUG) cout << "End Mela::deletePConstantHandle." << endl;
+}
+
 
 void Mela::computeDijetConvBW(float& prob){
   melaCand = getCurrentCandidate();

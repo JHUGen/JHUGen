@@ -1069,7 +1069,7 @@ void testME_Dec_MCFM_Ping(int flavor=2, int useMothers=0, bool useConstants=fals
   tout.close();
 }
 
-void testME_VH_JHUGen_Ping(int erg_tev=13){
+void testME_VH_JHUGen_Ping(int erg_tev=13, bool useConstants=false){
   TString strtout = Form("testME_VH_JHUGen_%iTeV_Ping.out", erg_tev);
   ofstream tout(strtout.Data());
   streambuf* coutbuf = cout.rdbuf();
@@ -1198,69 +1198,69 @@ void testME_VH_JHUGen_Ping(int erg_tev=13){
 
         float p0mplus=0;
         mela.setProcess(TVar::HSMHiggs, TVar::JHUGen, prod);
-        mela.computeProdP_VH(p0mplus, false, false);
+        mela.computeProdP_VH(p0mplus, false, useConstants);
         cout << "p0mplus: " << p0mplus << '\n' << endl;
 
         float p0g1prime2=0;
         mela.setProcess(TVar::H0_g1prime2, TVar::JHUGen, prod);
-        mela.computeProdP_VH(p0g1prime2, false, false);
+        mela.computeProdP_VH(p0g1prime2, false, useConstants);
         cout << "p0g1prime2: " << p0g1prime2 << '\n' << endl;
 
         float p0hplus=0;
         mela.setProcess(TVar::H0hplus, TVar::JHUGen, prod);
-        mela.computeProdP_VH(p0hplus, false, false);
+        mela.computeProdP_VH(p0hplus, false, useConstants);
         cout << "p0hplus: " << p0hplus << '\n' << endl;
 
         float p0minus=0;
         mela.setProcess(TVar::H0minus, TVar::JHUGen, prod);
-        mela.computeProdP_VH(p0minus, false, false);
+        mela.computeProdP_VH(p0minus, false, useConstants);
         cout << "p0minus: " << p0minus << '\n' << endl;
 
         float p0gzgs1prime2=0;
         mela.setProcess(TVar::H0_Zgsg1prime2, TVar::JHUGen, prod);
-        mela.computeProdP_VH(p0gzgs1prime2, false, false);
+        mela.computeProdP_VH(p0gzgs1prime2, false, useConstants);
         cout << "p0gzgs1prime2: " << p0gzgs1prime2 << '\n' << endl;
 
         float p0hpluszgs=0;
         mela.setProcess(TVar::H0_Zgs, TVar::JHUGen, prod);
-        mela.computeProdP_VH(p0hpluszgs, false, false);
+        mela.computeProdP_VH(p0hpluszgs, false, useConstants);
         cout << "p0hpluszgs: " << p0hpluszgs << '\n' << endl;
 
         // SelfD MEs
         float p0mplus_selfD=0;
         mela.setProcess(TVar::SelfDefine_spin0, TVar::JHUGen, prod);
         mela.selfDHzzcoupl[0][gHIGGS_VV_1][0]=1;
-        mela.computeProdP_VH(p0mplus_selfD, false, false);
+        mela.computeProdP_VH(p0mplus_selfD, false, useConstants);
         cout << "p0mplus_selfD: " << p0mplus_selfD << '\n' << endl;
 
         float p0g1prime2_selfD=0;
         mela.setProcess(TVar::SelfDefine_spin0, TVar::JHUGen, prod);
         mela.selfDHzzcoupl[0][gHIGGS_VV_1_PRIME2][0]=1;
-        mela.computeProdP_VH(p0g1prime2_selfD, false, false);
+        mela.computeProdP_VH(p0g1prime2_selfD, false, useConstants);
         cout << "p0g1prime2_selfD: " << p0g1prime2_selfD << '\n' << endl;
 
         float p0hplus_selfD=0;
         mela.setProcess(TVar::SelfDefine_spin0, TVar::JHUGen, prod);
         mela.selfDHzzcoupl[0][gHIGGS_VV_2][0]=1;
-        mela.computeProdP_VH(p0hplus_selfD, false, false);
+        mela.computeProdP_VH(p0hplus_selfD, false, useConstants);
         cout << "p0hplus_selfD: " << p0hplus_selfD << '\n' << endl;
 
         float p0minus_selfD=0;
         mela.setProcess(TVar::SelfDefine_spin0, TVar::JHUGen, prod);
         mela.selfDHzzcoupl[0][gHIGGS_VV_4][0]=1;
-        mela.computeProdP_VH(p0minus_selfD, false, false);
+        mela.computeProdP_VH(p0minus_selfD, false, useConstants);
         cout << "p0minus_selfD: " << p0minus_selfD << '\n' << endl;
 
         float p0gzgs1prime2_selfD=0;
         mela.setProcess(TVar::SelfDefine_spin0, TVar::JHUGen, prod);
         mela.selfDHzzcoupl[0][gHIGGS_ZA_1_PRIME2][0]=1;
-        mela.computeProdP_VH(p0gzgs1prime2_selfD, false, false);
+        mela.computeProdP_VH(p0gzgs1prime2_selfD, false, useConstants);
         cout << "p0gzgs1prime2_selfD: " << p0gzgs1prime2_selfD << '\n' << endl;
 
         float p0hpluszgs_selfD=0;
         mela.setProcess(TVar::SelfDefine_spin0, TVar::JHUGen, prod);
         mela.selfDHzzcoupl[0][gHIGGS_ZA_2][0]=1;
-        mela.computeProdP_VH(p0hpluszgs_selfD, false, false);
+        mela.computeProdP_VH(p0hpluszgs_selfD, false, useConstants);
         cout << "p0hpluszgs_selfD: " << p0hpluszgs_selfD << '\n' << endl;
 
         if (prod==TVar::Had_ZH || prod==TVar::Had_WH){

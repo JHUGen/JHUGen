@@ -371,14 +371,17 @@ protected:
     TVar::MatrixElement me_,
     TVar::Production prod_,
     TVar::Process proc_,
-    const char* relpath,
-    const char* spname
+    TString relpath,
+    TString spname,
+    const bool useSqrts=false
     );
+  void deletePConstantHandle(MelaPConstant*& handle);
   void computeConstant(float& prob);
   void setConstant();
   float getConstant_JHUGenUndecayed();
   float getConstant_4l();
   float getConstant_2l2q();
+  float getConstant_FourFermionDecay(int decid);
 
 };
 
