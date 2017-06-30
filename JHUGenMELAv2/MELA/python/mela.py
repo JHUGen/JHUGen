@@ -44,37 +44,27 @@ def include(filename):
 
 ROOT.gROOT.Macro(os.path.join(os.path.dirname(__file__), "..", "test", "loadMELA.C+"))
 include("Mela.h")
+include("TCouplingsBase.hh")
 
+#extract all the enums from the anonymous namespace in TCouplingsBase.hh
 from ROOT import TVar
-f = tempfile.NamedTemporaryFile(suffix=".C", bufsize=0)
 contents = """
   #include <TCouplingsBase.hh>
   #include <TMCFM.hh>
-  auto size_HQQ = ::SIZE_HQQ;
-  auto size_HGG = ::SIZE_HGG;
-  auto size_HVV = ::SIZE_HVV;
-  auto size_HVV_LAMBDAQSQ = ::SIZE_HVV_LAMBDAQSQ;
-  auto size_HVV_CQSQ = ::SIZE_HVV_CQSQ;
-  auto size_ZQQ = ::SIZE_ZQQ;
-  auto size_ZVV = ::SIZE_ZVV;
-  auto size_GQQ = ::SIZE_GQQ;
-  auto size_GGG = ::SIZE_GGG;
-  auto size_GVV = ::SIZE_GVV;
 """
+with open(os.path.join(os.path.dirname(__file__), "..", "interface", "TCouplingsBase.hh")) as f:
+  tcouplingsbasecontents = f.read()
+  for enumcontents in tcouplingsbasecontents.split("enum")[1:]:
+    enumcontents = enumcontents.strip()
+    assert enumcontents.startswith("{")
+    enumcontents = enumcontents.split("{")[1].split("}")[0]
+    for enumitem in enumcontents.split(","):
+      enumitem = enumitem.split("=")[0].strip()
+      contents += "\n  auto py_"+enumitem+" = ::"+enumitem+";"
+
+f = tempfile.NamedTemporaryFile(suffix=".C", bufsize=0)
 f.write(contents)
 ROOT.gROOT.ProcessLine(".L {}+".format(f.name))
-from ROOT import (
-                  size_HQQ as SIZE_HQQ,
-                  size_HGG as SIZE_HGG,
-                  size_HVV as SIZE_HVV,
-                  size_HVV_LAMBDAQSQ as SIZE_HVV_LAMBDAQSQ,
-                  size_HVV_CQSQ as SIZE_HVV_CQSQ,
-                  size_ZQQ as SIZE_ZQQ,
-                  size_ZVV as SIZE_ZVV,
-                  size_GQQ as SIZE_GQQ,
-                  size_GGG as SIZE_GGG,
-                  size_GVV as SIZE_GVV,
-                 )
 from ROOT import nSupportedHiggses
 
 class MultiDimensionalCppArray(object):
@@ -284,24 +274,26 @@ class Mela(object):
     type(self).counter += 1
 
     arrays  = (
-               ("selfDHggcoupl", (nSupportedHiggses, SIZE_HGG, 2)),
-               ("selfDHg4g4coupl", (nSupportedHiggses, SIZE_HGG, 2)),
-               ("selfDHqqcoupl", (nSupportedHiggses, SIZE_HQQ, 2)),
-               ("selfDHbbcoupl", (nSupportedHiggses, SIZE_HQQ, 2)),
-               ("selfDHttcoupl", (nSupportedHiggses, SIZE_HQQ, 2)),
-               ("selfDHb4b4coupl", (nSupportedHiggses, SIZE_HQQ, 2)),
-               ("selfDHt4t4coupl", (nSupportedHiggses, SIZE_HQQ, 2)),
-               ("selfDHzzcoupl", (nSupportedHiggses, SIZE_HVV, 2)),
-               ("selfDHwwcoupl", (nSupportedHiggses, SIZE_HVV, 2)),
-               ("selfDHzzLambda_qsq", (nSupportedHiggses, SIZE_HVV_LAMBDAQSQ, SIZE_HVV_CQSQ)),
-               ("selfDHwwLambda_qsq", (nSupportedHiggses, SIZE_HVV_LAMBDAQSQ, SIZE_HVV_CQSQ)),
-               ("selfDHzzCLambda_qsq", (nSupportedHiggses, SIZE_HVV_CQSQ)),
-               ("selfDHwwCLambda_qsq", (nSupportedHiggses, SIZE_HVV_CQSQ)),
-               ("selfDZqqcoupl", (SIZE_ZQQ, 2)),
-               ("selfDZvvcoupl", (SIZE_ZVV, 2)),
-               ("selfDGqqcoupl", (SIZE_GQQ, 2)),
-               ("selfDGggcoupl", (SIZE_GGG, 2)),
-               ("selfDGvvcoupl", (SIZE_GVV, 2)),
+               ("selfDHggcoupl", (nSupportedHiggses, ROOT.py_SIZE_HGG, 2)),
+               ("selfDHg4g4coupl", (nSupportedHiggses, ROOT.py_SIZE_HGG, 2)),
+               ("selfDHqqcoupl", (nSupportedHiggses, ROOT.py_SIZE_HQQ, 2)),
+               ("selfDHbbcoupl", (nSupportedHiggses, ROOT.py_SIZE_HQQ, 2)),
+               ("selfDHttcoupl", (nSupportedHiggses, ROOT.py_SIZE_HQQ, 2)),
+               ("selfDHb4b4coupl", (nSupportedHiggses, ROOT.py_SIZE_HQQ, 2)),
+               ("selfDHt4t4coupl", (nSupportedHiggses, ROOT.py_SIZE_HQQ, 2)),
+               ("selfDHzzcoupl", (nSupportedHiggses, ROOT.py_SIZE_HVV, 2)),
+               ("selfDHwwcoupl", (nSupportedHiggses, ROOT.py_SIZE_HVV, 2)),
+               ("selfDHzzLambda_qsq", (nSupportedHiggses, ROOT.py_SIZE_HVV_LAMBDAQSQ, ROOT.py_SIZE_HVV_CQSQ)),
+               ("selfDHwwLambda_qsq", (nSupportedHiggses, ROOT.py_SIZE_HVV_LAMBDAQSQ, ROOT.py_SIZE_HVV_CQSQ)),
+               ("selfDHzzCLambda_qsq", (nSupportedHiggses, ROOT.py_SIZE_HVV_CQSQ)),
+               ("selfDHwwCLambda_qsq", (nSupportedHiggses, ROOT.py_SIZE_HVV_CQSQ)),
+               ("selfDHzpcontact", (ROOT.py_SIZE_Vp, 2)),
+               ("selfDHwpcontact", (ROOT.py_SIZE_Vp, 2)),
+               ("selfDZqqcoupl", (ROOT.py_SIZE_ZQQ, 2)),
+               ("selfDZvvcoupl", (ROOT.py_SIZE_ZVV, 2)),
+               ("selfDGqqcoupl", (ROOT.py_SIZE_GQQ, 2)),
+               ("selfDGggcoupl", (ROOT.py_SIZE_GGG, 2)),
+               ("selfDGvvcoupl", (ROOT.py_SIZE_GVV, 2)),
               )
 
     f = None
@@ -384,159 +376,189 @@ class Mela(object):
   def computePM4l(self, syst): return ROOT.computePM4l(self.__mela, syst)
   def computeD_gg(self, myME, myType): return ROOT.myME(self.__mela, myME, myType)
 
-  ghg2 = SelfDCoupling("selfDHggcoupl", 0, 0)
-  ghg3 = SelfDCoupling("selfDHggcoupl", 0, 1)
-  ghg4 = SelfDCoupling("selfDHggcoupl", 0, 2)
+  ghg2 = SelfDCoupling("selfDHggcoupl", 0, ROOT.py_gHIGGS_GG_2)
+  ghg3 = SelfDCoupling("selfDHggcoupl", 0, ROOT.py_gHIGGS_GG_3)
+  ghg4 = SelfDCoupling("selfDHggcoupl", 0, ROOT.py_gHIGGS_GG_4)
 
   #https://github.com/cms-analysis/HiggsAnalysis-ZZMatrixElement/blob/41232f911b4f03065ae2b83752b5bcd4daacaa2c/MELA/fortran/mod_JHUGenMELA.F90#L123-L168
-  ghz1 = SelfDCoupling("selfDHzzcoupl", 0, 0)
-  ghz2 = SelfDCoupling("selfDHzzcoupl", 0, 1)
-  ghz3 = SelfDCoupling("selfDHzzcoupl", 0, 2)
-  ghz4 = SelfDCoupling("selfDHzzcoupl", 0, 3)
+  ghz1 = SelfDCoupling("selfDHzzcoupl", 0, ROOT.py_gHIGGS_VV_1)
+  ghz2 = SelfDCoupling("selfDHzzcoupl", 0, ROOT.py_gHIGGS_VV_2)
+  ghz3 = SelfDCoupling("selfDHzzcoupl", 0, ROOT.py_gHIGGS_VV_3)
+  ghz4 = SelfDCoupling("selfDHzzcoupl", 0, ROOT.py_gHIGGS_VV_4)
 
-  ghzgs2 = SelfDCoupling("selfDHzzcoupl", 0, 4)
-  ghzgs3 = SelfDCoupling("selfDHzzcoupl", 0, 5)
-  ghzgs4 = SelfDCoupling("selfDHzzcoupl", 0, 6)
-  ghgsgs2 = SelfDCoupling("selfDHzzcoupl", 0, 7)
-  ghgsgs3 = SelfDCoupling("selfDHzzcoupl", 0, 8)
-  ghgsgs4 = SelfDCoupling("selfDHzzcoupl", 0, 9)
+  ghzgs2 = SelfDCoupling("selfDHzzcoupl", 0, ROOT.py_gHIGGS_ZA_2)
+  ghzgs3 = SelfDCoupling("selfDHzzcoupl", 0, ROOT.py_gHIGGS_ZA_3)
+  ghzgs4 = SelfDCoupling("selfDHzzcoupl", 0, ROOT.py_gHIGGS_ZA_4)
+  ghgsgs2 = SelfDCoupling("selfDHzzcoupl", 0, ROOT.py_gHIGGS_AA_2)
+  ghgsgs3 = SelfDCoupling("selfDHzzcoupl", 0, ROOT.py_gHIGGS_AA_3)
+  ghgsgs4 = SelfDCoupling("selfDHzzcoupl", 0, ROOT.py_gHIGGS_AA_4)
 
-  ghz1_prime = SelfDCoupling("selfDHzzcoupl", 0, 10)
-  ghz1_prime2 = SelfDCoupling("selfDHzzcoupl", 0, 11)
-  ghz1_prime3 = SelfDCoupling("selfDHzzcoupl", 0, 12)
-  ghz1_prime4 = SelfDCoupling("selfDHzzcoupl", 0, 13)
-  ghz1_prime5 = SelfDCoupling("selfDHzzcoupl", 0, 14)
+  ghz1_prime = SelfDCoupling("selfDHzzcoupl", 0, ROOT.py_gHIGGS_VV_1_PRIME)
+  ghz1_prime2 = SelfDCoupling("selfDHzzcoupl", 0, ROOT.py_gHIGGS_VV_1_PRIME2)
+  ghz1_prime3 = SelfDCoupling("selfDHzzcoupl", 0, ROOT.py_gHIGGS_VV_1_PRIME3)
+  ghz1_prime4 = SelfDCoupling("selfDHzzcoupl", 0, ROOT.py_gHIGGS_VV_1_PRIME4)
+  ghz1_prime5 = SelfDCoupling("selfDHzzcoupl", 0, ROOT.py_gHIGGS_VV_1_PRIME5)
 
-  ghz2_prime = SelfDCoupling("selfDHzzcoupl", 0, 15)
-  ghz2_prime2 = SelfDCoupling("selfDHzzcoupl", 0, 16)
-  ghz2_prime3 = SelfDCoupling("selfDHzzcoupl", 0, 17)
-  ghz2_prime4 = SelfDCoupling("selfDHzzcoupl", 0, 18)
-  ghz2_prime5 = SelfDCoupling("selfDHzzcoupl", 0, 19)
+  ghz2_prime = SelfDCoupling("selfDHzzcoupl", 0, ROOT.py_gHIGGS_VV_2_PRIME)
+  ghz2_prime2 = SelfDCoupling("selfDHzzcoupl", 0, ROOT.py_gHIGGS_VV_2_PRIME2)
+  ghz2_prime3 = SelfDCoupling("selfDHzzcoupl", 0, ROOT.py_gHIGGS_VV_2_PRIME3)
+  ghz2_prime4 = SelfDCoupling("selfDHzzcoupl", 0, ROOT.py_gHIGGS_VV_2_PRIME4)
+  ghz2_prime5 = SelfDCoupling("selfDHzzcoupl", 0, ROOT.py_gHIGGS_VV_2_PRIME5)
 
-  ghz3_prime = SelfDCoupling("selfDHzzcoupl", 0, 20)
-  ghz3_prime2 = SelfDCoupling("selfDHzzcoupl", 0, 21)
-  ghz3_prime3 = SelfDCoupling("selfDHzzcoupl", 0, 22)
-  ghz3_prime4 = SelfDCoupling("selfDHzzcoupl", 0, 23)
-  ghz3_prime5 = SelfDCoupling("selfDHzzcoupl", 0, 24)
+  ghz3_prime = SelfDCoupling("selfDHzzcoupl", 0, ROOT.py_gHIGGS_VV_3_PRIME)
+  ghz3_prime2 = SelfDCoupling("selfDHzzcoupl", 0, ROOT.py_gHIGGS_VV_3_PRIME2)
+  ghz3_prime3 = SelfDCoupling("selfDHzzcoupl", 0, ROOT.py_gHIGGS_VV_3_PRIME3)
+  ghz3_prime4 = SelfDCoupling("selfDHzzcoupl", 0, ROOT.py_gHIGGS_VV_3_PRIME4)
+  ghz3_prime5 = SelfDCoupling("selfDHzzcoupl", 0, ROOT.py_gHIGGS_VV_3_PRIME5)
 
-  ghz4_prime = SelfDCoupling("selfDHzzcoupl", 0, 25)
-  ghz4_prime2 = SelfDCoupling("selfDHzzcoupl", 0, 26)
-  ghz4_prime3 = SelfDCoupling("selfDHzzcoupl", 0, 27)
-  ghz4_prime4 = SelfDCoupling("selfDHzzcoupl", 0, 28)
-  ghz4_prime5 = SelfDCoupling("selfDHzzcoupl", 0, 29)
+  ghz4_prime = SelfDCoupling("selfDHzzcoupl", 0, ROOT.py_gHIGGS_VV_4_PRIME)
+  ghz4_prime2 = SelfDCoupling("selfDHzzcoupl", 0, ROOT.py_gHIGGS_VV_4_PRIME2)
+  ghz4_prime3 = SelfDCoupling("selfDHzzcoupl", 0, ROOT.py_gHIGGS_VV_4_PRIME3)
+  ghz4_prime4 = SelfDCoupling("selfDHzzcoupl", 0, ROOT.py_gHIGGS_VV_4_PRIME4)
+  ghz4_prime5 = SelfDCoupling("selfDHzzcoupl", 0, ROOT.py_gHIGGS_VV_4_PRIME5)
 
-  ghzgs1_prime2 = SelfDCoupling("selfDHzzcoupl", 0, 30)
+  ghzgs1_prime2 = SelfDCoupling("selfDHzzcoupl", 0, ROOT.py_gHIGGS_ZA_1_PRIME2)
 
-  ghz1_prime6 = SelfDCoupling("selfDHzzcoupl", 0, 31)
-  ghz1_prime7 = SelfDCoupling("selfDHzzcoupl", 0, 32)
-  ghz2_prime6 = SelfDCoupling("selfDHzzcoupl", 0, 33)
-  ghz2_prime7 = SelfDCoupling("selfDHzzcoupl", 0, 34)
-  ghz3_prime6 = SelfDCoupling("selfDHzzcoupl", 0, 35)
-  ghz3_prime7 = SelfDCoupling("selfDHzzcoupl", 0, 36)
-  ghz4_prime6 = SelfDCoupling("selfDHzzcoupl", 0, 37)
-  ghz4_prime7 = SelfDCoupling("selfDHzzcoupl", 0, 38)
+  ghz1_prime6 = SelfDCoupling("selfDHzzcoupl", 0, ROOT.py_gHIGGS_VV_1_PRIME6)
+  ghz1_prime7 = SelfDCoupling("selfDHzzcoupl", 0, ROOT.py_gHIGGS_VV_1_PRIME7)
+  ghz2_prime6 = SelfDCoupling("selfDHzzcoupl", 0, ROOT.py_gHIGGS_VV_2_PRIME6)
+  ghz2_prime7 = SelfDCoupling("selfDHzzcoupl", 0, ROOT.py_gHIGGS_VV_2_PRIME7)
+  ghz3_prime6 = SelfDCoupling("selfDHzzcoupl", 0, ROOT.py_gHIGGS_VV_3_PRIME6)
+  ghz3_prime7 = SelfDCoupling("selfDHzzcoupl", 0, ROOT.py_gHIGGS_VV_3_PRIME7)
+  ghz4_prime6 = SelfDCoupling("selfDHzzcoupl", 0, ROOT.py_gHIGGS_VV_3_PRIME6)
+  ghz4_prime7 = SelfDCoupling("selfDHzzcoupl", 0, ROOT.py_gHIGGS_VV_3_PRIME7)
 
-  cz_q1sq = SelfDParameter("selfDHzzCLambda_qsq", 0, 0)
-  Lambda_z11 = SelfDParameter("selfDHzzLambda_qsq", 0, 0)
-  Lambda_z12 = SelfDParameter("selfDHzzLambda_qsq", 0, 1)
-  Lambda_z13 = SelfDParameter("selfDHzzLambda_qsq", 0, 2)
-  Lambda_z14 = SelfDParameter("selfDHzzLambda_qsq", 0, 3)
+  cz_q1sq = SelfDParameter("selfDHzzCLambda_qsq", 0, ROOT.py_cLambdaHIGGS_VV_QSQ1)
+  Lambda_z11 = SelfDParameter("selfDHzzLambda_qsq", 0, ROOT.py_LambdaHIGGS_QSQ_VV_1, ROOT.py_cLambdaHIGGS_VV_QSQ1)
+  Lambda_z12 = SelfDParameter("selfDHzzLambda_qsq", 0, ROOT.py_LambdaHIGGS_QSQ_VV_2, ROOT.py_cLambdaHIGGS_VV_QSQ1)
+  Lambda_z13 = SelfDParameter("selfDHzzLambda_qsq", 0, ROOT.py_LambdaHIGGS_QSQ_VV_3, ROOT.py_cLambdaHIGGS_VV_QSQ1)
+  Lambda_z14 = SelfDParameter("selfDHzzLambda_qsq", 0, ROOT.py_LambdaHIGGS_QSQ_VV_4, ROOT.py_cLambdaHIGGS_VV_QSQ1)
 
-  cz_q2sq = SelfDParameter("selfDHzzCLambda_qsq", 0, 1)
-  Lambda_z21 = SelfDParameter("selfDHzzLambda_qsq", 0, 4)
-  Lambda_z22 = SelfDParameter("selfDHzzLambda_qsq", 0, 5)
-  Lambda_z23 = SelfDParameter("selfDHzzLambda_qsq", 0, 6)
-  Lambda_z24 = SelfDParameter("selfDHzzLambda_qsq", 0, 7)
+  cz_q2sq = SelfDParameter("selfDHzzCLambda_qsq", 0, ROOT.py_cLambdaHIGGS_VV_QSQ2)
+  Lambda_z21 = SelfDParameter("selfDHzzLambda_qsq", 0, ROOT.py_LambdaHIGGS_QSQ_VV_1, ROOT.py_cLambdaHIGGS_VV_QSQ2)
+  Lambda_z22 = SelfDParameter("selfDHzzLambda_qsq", 0, ROOT.py_LambdaHIGGS_QSQ_VV_2, ROOT.py_cLambdaHIGGS_VV_QSQ2)
+  Lambda_z23 = SelfDParameter("selfDHzzLambda_qsq", 0, ROOT.py_LambdaHIGGS_QSQ_VV_3, ROOT.py_cLambdaHIGGS_VV_QSQ2)
+  Lambda_z24 = SelfDParameter("selfDHzzLambda_qsq", 0, ROOT.py_LambdaHIGGS_QSQ_VV_4, ROOT.py_cLambdaHIGGS_VV_QSQ2)
 
-  cz_q12sq = SelfDParameter("selfDHzzCLambda_qsq", 0, 2)
-  Lambda_z01 = SelfDParameter("selfDHzzLambda_qsq", 0, 8)
-  Lambda_z02 = SelfDParameter("selfDHzzLambda_qsq", 0, 9)
-  Lambda_z03 = SelfDParameter("selfDHzzLambda_qsq", 0, 10)
-  Lambda_z04 = SelfDParameter("selfDHzzLambda_qsq", 0, 11)
+  cz_q12sq = SelfDParameter("selfDHzzCLambda_qsq", 0, ROOT.py_cLambdaHIGGS_VV_QSQ12)
+  Lambda_z01 = SelfDParameter("selfDHzzLambda_qsq", 0, ROOT.py_LambdaHIGGS_QSQ_VV_1, ROOT.py_cLambdaHIGGS_VV_QSQ12)
+  Lambda_z02 = SelfDParameter("selfDHzzLambda_qsq", 0, ROOT.py_LambdaHIGGS_QSQ_VV_2, ROOT.py_cLambdaHIGGS_VV_QSQ12)
+  Lambda_z03 = SelfDParameter("selfDHzzLambda_qsq", 0, ROOT.py_LambdaHIGGS_QSQ_VV_3, ROOT.py_cLambdaHIGGS_VV_QSQ12)
+  Lambda_z04 = SelfDParameter("selfDHzzLambda_qsq", 0, ROOT.py_LambdaHIGGS_QSQ_VV_4, ROOT.py_cLambdaHIGGS_VV_QSQ12)
 
-  ghw1 = SelfDCoupling("selfDHwwcoupl", 0, 0)
-  ghw2 = SelfDCoupling("selfDHwwcoupl", 0, 1)
-  ghw3 = SelfDCoupling("selfDHwwcoupl", 0, 2)
-  ghw4 = SelfDCoupling("selfDHwwcoupl", 0, 3)
+  ghw1 = SelfDCoupling("selfDHwwcoupl", 0, ROOT.py_gHIGGS_VV_1)
+  ghw2 = SelfDCoupling("selfDHwwcoupl", 0, ROOT.py_gHIGGS_VV_2)
+  ghw3 = SelfDCoupling("selfDHwwcoupl", 0, ROOT.py_gHIGGS_VV_3)
+  ghw4 = SelfDCoupling("selfDHwwcoupl", 0, ROOT.py_gHIGGS_VV_4)
 
-  ghw1_prime = SelfDCoupling("selfDHwwcoupl", 0, 10)
-  ghw1_prime2 = SelfDCoupling("selfDHwwcoupl", 0, 11)
-  ghw1_prime3 = SelfDCoupling("selfDHwwcoupl", 0, 12)
-  ghw1_prime4 = SelfDCoupling("selfDHwwcoupl", 0, 13)
-  ghw1_prime5 = SelfDCoupling("selfDHwwcoupl", 0, 14)
+  ghw1_prime = SelfDCoupling("selfDHwwcoupl", 0, ROOT.py_gHIGGS_VV_1_PRIME)
+  ghw1_prime2 = SelfDCoupling("selfDHwwcoupl", 0, ROOT.py_gHIGGS_VV_1_PRIME2)
+  ghw1_prime3 = SelfDCoupling("selfDHwwcoupl", 0, ROOT.py_gHIGGS_VV_1_PRIME3)
+  ghw1_prime4 = SelfDCoupling("selfDHwwcoupl", 0, ROOT.py_gHIGGS_VV_1_PRIME4)
+  ghw1_prime5 = SelfDCoupling("selfDHwwcoupl", 0, ROOT.py_gHIGGS_VV_1_PRIME5)
 
-  ghw2_prime = SelfDCoupling("selfDHwwcoupl", 0, 15)
-  ghw2_prime2 = SelfDCoupling("selfDHwwcoupl", 0, 16)
-  ghw2_prime3 = SelfDCoupling("selfDHwwcoupl", 0, 17)
-  ghw2_prime4 = SelfDCoupling("selfDHwwcoupl", 0, 18)
-  ghw2_prime5 = SelfDCoupling("selfDHwwcoupl", 0, 19)
+  ghw2_prime = SelfDCoupling("selfDHwwcoupl", 0, ROOT.py_gHIGGS_VV_2_PRIME)
+  ghw2_prime2 = SelfDCoupling("selfDHwwcoupl", 0, ROOT.py_gHIGGS_VV_2_PRIME2)
+  ghw2_prime3 = SelfDCoupling("selfDHwwcoupl", 0, ROOT.py_gHIGGS_VV_2_PRIME3)
+  ghw2_prime4 = SelfDCoupling("selfDHwwcoupl", 0, ROOT.py_gHIGGS_VV_2_PRIME4)
+  ghw2_prime5 = SelfDCoupling("selfDHwwcoupl", 0, ROOT.py_gHIGGS_VV_2_PRIME5)
 
-  ghw3_prime = SelfDCoupling("selfDHwwcoupl", 0, 20)
-  ghw3_prime2 = SelfDCoupling("selfDHwwcoupl", 0, 21)
-  ghw3_prime3 = SelfDCoupling("selfDHwwcoupl", 0, 22)
-  ghw3_prime4 = SelfDCoupling("selfDHwwcoupl", 0, 23)
-  ghw3_prime5 = SelfDCoupling("selfDHwwcoupl", 0, 24)
+  ghw3_prime = SelfDCoupling("selfDHwwcoupl", 0, ROOT.py_gHIGGS_VV_3_PRIME)
+  ghw3_prime2 = SelfDCoupling("selfDHwwcoupl", 0, ROOT.py_gHIGGS_VV_3_PRIME2)
+  ghw3_prime3 = SelfDCoupling("selfDHwwcoupl", 0, ROOT.py_gHIGGS_VV_3_PRIME3)
+  ghw3_prime4 = SelfDCoupling("selfDHwwcoupl", 0, ROOT.py_gHIGGS_VV_3_PRIME4)
+  ghw3_prime5 = SelfDCoupling("selfDHwwcoupl", 0, ROOT.py_gHIGGS_VV_3_PRIME5)
 
-  ghw4_prime = SelfDCoupling("selfDHwwcoupl", 0, 25)
-  ghw4_prime2 = SelfDCoupling("selfDHwwcoupl", 0, 26)
-  ghw4_prime3 = SelfDCoupling("selfDHwwcoupl", 0, 27)
-  ghw4_prime4 = SelfDCoupling("selfDHwwcoupl", 0, 28)
-  ghw4_prime5 = SelfDCoupling("selfDHwwcoupl", 0, 29)
+  ghw4_prime = SelfDCoupling("selfDHwwcoupl", 0, ROOT.py_gHIGGS_VV_4_PRIME)
+  ghw4_prime2 = SelfDCoupling("selfDHwwcoupl", 0, ROOT.py_gHIGGS_VV_4_PRIME2)
+  ghw4_prime3 = SelfDCoupling("selfDHwwcoupl", 0, ROOT.py_gHIGGS_VV_4_PRIME3)
+  ghw4_prime4 = SelfDCoupling("selfDHwwcoupl", 0, ROOT.py_gHIGGS_VV_4_PRIME4)
+  ghw4_prime5 = SelfDCoupling("selfDHwwcoupl", 0, ROOT.py_gHIGGS_VV_4_PRIME5)
 
-  ghw1_prime6 = SelfDCoupling("selfDHwwcoupl", 0, 31)
-  ghw1_prime7 = SelfDCoupling("selfDHwwcoupl", 0, 32)
-  ghw2_prime6 = SelfDCoupling("selfDHwwcoupl", 0, 33)
-  ghw2_prime7 = SelfDCoupling("selfDHwwcoupl", 0, 34)
-  ghw3_prime6 = SelfDCoupling("selfDHwwcoupl", 0, 35)
-  ghw3_prime7 = SelfDCoupling("selfDHwwcoupl", 0, 36)
-  ghw4_prime6 = SelfDCoupling("selfDHwwcoupl", 0, 37)
-  ghw4_prime7 = SelfDCoupling("selfDHwwcoupl", 0, 38)
+  ghw1_prime6 = SelfDCoupling("selfDHwwcoupl", 0, ROOT.py_gHIGGS_VV_1_PRIME6)
+  ghw1_prime7 = SelfDCoupling("selfDHwwcoupl", 0, ROOT.py_gHIGGS_VV_1_PRIME7)
+  ghw2_prime6 = SelfDCoupling("selfDHwwcoupl", 0, ROOT.py_gHIGGS_VV_2_PRIME6)
+  ghw2_prime7 = SelfDCoupling("selfDHwwcoupl", 0, ROOT.py_gHIGGS_VV_2_PRIME7)
+  ghw3_prime6 = SelfDCoupling("selfDHwwcoupl", 0, ROOT.py_gHIGGS_VV_3_PRIME6)
+  ghw3_prime7 = SelfDCoupling("selfDHwwcoupl", 0, ROOT.py_gHIGGS_VV_3_PRIME7)
+  ghw4_prime6 = SelfDCoupling("selfDHwwcoupl", 0, ROOT.py_gHIGGS_VV_3_PRIME6)
+  ghw4_prime7 = SelfDCoupling("selfDHwwcoupl", 0, ROOT.py_gHIGGS_VV_3_PRIME7)
 
-  cw_q1sq = SelfDParameter("selfDHwwCLambda_qsq", 0, 0)
-  Lambda_w11 = SelfDParameter("selfDHwwLambda_qsq", 0, 0)
-  Lambda_w12 = SelfDParameter("selfDHwwLambda_qsq", 0, 1)
-  Lambda_w13 = SelfDParameter("selfDHwwLambda_qsq", 0, 2)
-  Lambda_w14 = SelfDParameter("selfDHwwLambda_qsq", 0, 3)
+  cw_q1sq = SelfDParameter("selfDHwwCLambda_qsq", 0, ROOT.py_cLambdaHIGGS_VV_QSQ1)
+  Lambda_w11 = SelfDParameter("selfDHwwLambda_qsq", 0, ROOT.py_LambdaHIGGS_QSQ_VV_1, ROOT.py_cLambdaHIGGS_VV_QSQ1)
+  Lambda_w12 = SelfDParameter("selfDHwwLambda_qsq", 0, ROOT.py_LambdaHIGGS_QSQ_VV_2, ROOT.py_cLambdaHIGGS_VV_QSQ1)
+  Lambda_w13 = SelfDParameter("selfDHwwLambda_qsq", 0, ROOT.py_LambdaHIGGS_QSQ_VV_3, ROOT.py_cLambdaHIGGS_VV_QSQ1)
+  Lambda_w14 = SelfDParameter("selfDHwwLambda_qsq", 0, ROOT.py_LambdaHIGGS_QSQ_VV_4, ROOT.py_cLambdaHIGGS_VV_QSQ1)
 
-  cw_q2sq = SelfDParameter("selfDHwwCLambda_qsq", 0, 1)
-  Lambda_w21 = SelfDParameter("selfDHwwLambda_qsq", 0, 4)
-  Lambda_w22 = SelfDParameter("selfDHwwLambda_qsq", 0, 5)
-  Lambda_w23 = SelfDParameter("selfDHwwLambda_qsq", 0, 6)
-  Lambda_w24 = SelfDParameter("selfDHwwLambda_qsq", 0, 7)
+  cw_q2sq = SelfDParameter("selfDHwwCLambda_qsq", 0, ROOT.py_cLambdaHIGGS_VV_QSQ2)
+  Lambda_w21 = SelfDParameter("selfDHwwLambda_qsq", 0, ROOT.py_LambdaHIGGS_QSQ_VV_1, ROOT.py_cLambdaHIGGS_VV_QSQ2)
+  Lambda_w22 = SelfDParameter("selfDHwwLambda_qsq", 0, ROOT.py_LambdaHIGGS_QSQ_VV_2, ROOT.py_cLambdaHIGGS_VV_QSQ2)
+  Lambda_w23 = SelfDParameter("selfDHwwLambda_qsq", 0, ROOT.py_LambdaHIGGS_QSQ_VV_3, ROOT.py_cLambdaHIGGS_VV_QSQ2)
+  Lambda_w24 = SelfDParameter("selfDHwwLambda_qsq", 0, ROOT.py_LambdaHIGGS_QSQ_VV_4, ROOT.py_cLambdaHIGGS_VV_QSQ2)
 
-  cw_q12sq = SelfDParameter("selfDHwwCLambda_qsq", 0, 2)
-  Lambda_w01 = SelfDParameter("selfDHwwLambda_qsq", 0, 8)
-  Lambda_w02 = SelfDParameter("selfDHwwLambda_qsq", 0, 9)
-  Lambda_w03 = SelfDParameter("selfDHwwLambda_qsq", 0, 10)
-  Lambda_w04 = SelfDParameter("selfDHwwLambda_qsq", 0, 11)
+  cw_q12sq = SelfDParameter("selfDHwwCLambda_qsq", 0, ROOT.py_cLambdaHIGGS_VV_QSQ12)
+  Lambda_w01 = SelfDParameter("selfDHwwLambda_qsq", 0, ROOT.py_LambdaHIGGS_QSQ_VV_1, ROOT.py_cLambdaHIGGS_VV_QSQ12)
+  Lambda_w02 = SelfDParameter("selfDHwwLambda_qsq", 0, ROOT.py_LambdaHIGGS_QSQ_VV_2, ROOT.py_cLambdaHIGGS_VV_QSQ12)
+  Lambda_w03 = SelfDParameter("selfDHwwLambda_qsq", 0, ROOT.py_LambdaHIGGS_QSQ_VV_3, ROOT.py_cLambdaHIGGS_VV_QSQ12)
+  Lambda_w04 = SelfDParameter("selfDHwwLambda_qsq", 0, ROOT.py_LambdaHIGGS_QSQ_VV_4, ROOT.py_cLambdaHIGGS_VV_QSQ12)
 
-  kappa = SelfDCoupling("selfDHqqcoupl", 0)
-  kappa_tilde = SelfDCoupling("selfDHqqcoupl", 1)
+  kappa = SelfDCoupling("selfDHqqcoupl", 0, ROOT.py_gHIGGS_KAPPA)
+  kappa_tilde = SelfDCoupling("selfDHqqcoupl", 0, ROOT.py_gHIGGS_KAPPA_TILDE)
 
-  zprime_qq_left = SelfDCoupling("selfDZqqcoupl", 0)
-  zprime_qq_right = SelfDCoupling("selfDZqqcoupl", 1)
-  zprime_zz_1 = SelfDCoupling("selfDZvvcoupl", 0)
-  zprime_zz_2 = SelfDCoupling("selfDZvvcoupl", 1)
+  ehz_L_E = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_L_E)
+  ehz_R_E = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_R_E)
+  ehz_L_M = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_L_M)
+  ehz_R_M = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_R_M)
+  ehz_L_T = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_L_T)
+  ehz_R_T = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_R_T)
+  ehz_L_N = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_L_N)
+  ehz_R_N = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_R_N)
+  ehz_L_U = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_L_U)
+  ehz_R_U = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_R_U)
+  ehz_L_D = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_L_D)
+  ehz_R_D = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_R_D)
+  ehz_L_S = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_L_S)
+  ehz_R_S = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_R_S)
+  ehz_L_C = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_L_C)
+  ehz_R_C = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_R_C)
+  ehz_L_B = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_L_B)
+  ehz_R_B = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_R_B)
 
-  graviton_qq_left = SelfDCoupling("selfDGqqcoupl", 0)
-  graviton_qq_right = SelfDCoupling("selfDGqqcoupl", 1)
+  ehw_L_E = SelfDCoupling("selfDHwpcontact", ROOT.py_gHIGGS_Vp_L_E)
+  ehw_R_E = SelfDCoupling("selfDHwpcontact", ROOT.py_gHIGGS_Vp_R_E)
+  ehw_L_M = SelfDCoupling("selfDHwpcontact", ROOT.py_gHIGGS_Vp_L_M)
+  ehw_R_M = SelfDCoupling("selfDHwpcontact", ROOT.py_gHIGGS_Vp_R_M)
+  ehw_L_T = SelfDCoupling("selfDHwpcontact", ROOT.py_gHIGGS_Vp_L_T)
+  ehw_R_T = SelfDCoupling("selfDHwpcontact", ROOT.py_gHIGGS_Vp_R_T)
+  ehw_L_U = SelfDCoupling("selfDHwpcontact", ROOT.py_gHIGGS_Vp_L_U)
+  ehw_R_U = SelfDCoupling("selfDHwpcontact", ROOT.py_gHIGGS_Vp_R_U)
+  ehw_L_C = SelfDCoupling("selfDHwpcontact", ROOT.py_gHIGGS_Vp_L_C)
+  ehw_R_C = SelfDCoupling("selfDHwpcontact", ROOT.py_gHIGGS_Vp_R_C)
 
-  a1 = SelfDCoupling("selfDGggcoupl", 0)
-  a2 = SelfDCoupling("selfDGggcoupl", 1)
-  a3 = SelfDCoupling("selfDGggcoupl", 2)
-  a4 = SelfDCoupling("selfDGggcoupl", 3)
-  a5 = SelfDCoupling("selfDGggcoupl", 4)
+  zprime_qq_left = SelfDCoupling("selfDZqqcoupl", ROOT.py_gZPRIME_QQ_LEFT)
+  zprime_qq_right = SelfDCoupling("selfDZqqcoupl", ROOT.py_gZPRIME_QQ_RIGHT)
+  zprime_zz_1 = SelfDCoupling("selfDZvvcoupl", ROOT.py_gZPRIME_VV_1)
+  zprime_zz_2 = SelfDCoupling("selfDZvvcoupl", ROOT.py_gZPRIME_VV_2)
 
-  b1 = SelfDCoupling("selfDGvvcoupl", 0)
-  b2 = SelfDCoupling("selfDGvvcoupl", 1)
-  b3 = SelfDCoupling("selfDGvvcoupl", 2)
-  b4 = SelfDCoupling("selfDGvvcoupl", 3)
-  b5 = SelfDCoupling("selfDGvvcoupl", 4)
-  b6 = SelfDCoupling("selfDGvvcoupl", 5)
-  b7 = SelfDCoupling("selfDGvvcoupl", 6)
-  b8 = SelfDCoupling("selfDGvvcoupl", 7)
-  b9 = SelfDCoupling("selfDGvvcoupl", 8)
-  b10 = SelfDCoupling("selfDGvvcoupl", 9)
+  graviton_qq_left = SelfDCoupling("selfDGqqcoupl", ROOT.py_gGRAVITON_QQ_LEFT)
+  graviton_qq_right = SelfDCoupling("selfDGqqcoupl", ROOT.py_gGRAVITON_QQ_RIGHT)
+
+  a1 = SelfDCoupling("selfDGggcoupl", ROOT.py_gGRAVITON_GG_1)
+  a2 = SelfDCoupling("selfDGggcoupl", ROOT.py_gGRAVITON_GG_2)
+  a3 = SelfDCoupling("selfDGggcoupl", ROOT.py_gGRAVITON_GG_3)
+  a4 = SelfDCoupling("selfDGggcoupl", ROOT.py_gGRAVITON_GG_4)
+  a5 = SelfDCoupling("selfDGggcoupl", ROOT.py_gGRAVITON_GG_5)
+
+  b1 = SelfDCoupling("selfDGvvcoupl", ROOT.py_gGRAVITON_VV_1)
+  b2 = SelfDCoupling("selfDGvvcoupl", ROOT.py_gGRAVITON_VV_2)
+  b3 = SelfDCoupling("selfDGvvcoupl", ROOT.py_gGRAVITON_VV_3)
+  b4 = SelfDCoupling("selfDGvvcoupl", ROOT.py_gGRAVITON_VV_4)
+  b5 = SelfDCoupling("selfDGvvcoupl", ROOT.py_gGRAVITON_VV_5)
+  b6 = SelfDCoupling("selfDGvvcoupl", ROOT.py_gGRAVITON_VV_6)
+  b7 = SelfDCoupling("selfDGvvcoupl", ROOT.py_gGRAVITON_VV_7)
+  b8 = SelfDCoupling("selfDGvvcoupl", ROOT.py_gGRAVITON_VV_8)
+  b9 = SelfDCoupling("selfDGvvcoupl", ROOT.py_gGRAVITON_VV_9)
+  b10 = SelfDCoupling("selfDGvvcoupl", ROOT.py_gGRAVITON_VV_10)
 
 
 
