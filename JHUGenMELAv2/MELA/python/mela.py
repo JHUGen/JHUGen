@@ -174,12 +174,15 @@ class SelfDParameter(object):
     self.indices = indices
 
   def __get__(self, obj, objtype):
+    if obj is None: return self
     array = getattr(obj, self.arrayname)
+    if not self.indices: return array
     for index in self.indices[:-1]:
       array = array[index]
     return array[self.indices[-1]]
 
   def __set__(self, obj, val):
+    if not self.indices: return setattr(obj, self.arrayname, val)
     array = getattr(obj, self.arrayname)
     for index in self.indices[:-1]:
       array = array[index]
@@ -193,6 +196,7 @@ class SelfDCoupling(object):
     self.imag = SelfDParameter(arrayname, *indices+(1,))
 
   def __get__(self, obj, objtype):
+    if obj is None: return self
     #self.real does not call __get__ on real, because it's an instance variable not a class variable
     return complex(self.real.__get__(obj, objtype), self.imag.__get__(obj, objtype))
 
@@ -321,8 +325,13 @@ class Mela(object):
     return getattr(self.__mela, name)
 
   def __setattr__(self, name, value):
-    if self.doneinit and hasattr(self.__mela, name):
-      return setattr(self.__mela, name, value)
+    if self.doneinit:
+      if hasattr(self.__mela, name):
+        return setattr(self.__mela, name, value)
+      elif hasattr(type(self), name) and hasattr(getattr(type(self), name), "__set__"):
+        return getattr(type(self), name).__set__(self, value)
+      else:
+        raise ValueError("Can't set attribute '{}' for python Mela, which doesn't exist for C++ MELA".format(name))
     else:
       super(Mela, self).__setattr__(name, value)
 
@@ -534,6 +543,11 @@ class Mela(object):
   ehw_R_U = SelfDCoupling("selfDHwpcontact", ROOT.py_gHIGGS_Vp_R_U)
   ehw_L_C = SelfDCoupling("selfDHwpcontact", ROOT.py_gHIGGS_Vp_L_C)
   ehw_R_C = SelfDCoupling("selfDHwpcontact", ROOT.py_gHIGGS_Vp_R_C)
+
+  UseVprime = SelfDParameter("selfDOnlyVprime")
+  M_Vprime = SelfDParameter("selfDM_Vprime")
+  Ga_Vprime = SelfDParameter("selfDGa_Vprime")
+  OnlyVVpr = SelfDParameter("selfDOnlyVVpr")
 
   zprime_qq_left = SelfDCoupling("selfDZqqcoupl", ROOT.py_gZPRIME_QQ_LEFT)
   zprime_qq_right = SelfDCoupling("selfDZqqcoupl", ROOT.py_gZPRIME_QQ_RIGHT)
