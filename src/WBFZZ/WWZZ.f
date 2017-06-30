@@ -108,11 +108,11 @@ C---setting up couplings dependent on whether we are doing 34-line or 56-line
       s17=s(n1,n7)
       s28=s(n2,n8)
       s3456=t4(n3,n4,n5,n6)
-      prop34=dcmplx(s34)-dcmplx(zmass**2,-zmass*zwidth)
-      prop56=dcmplx(s56)-dcmplx(zmass**2,-zmass*zwidth)
-      propw17=dcmplx(s17)-dcmplx(wmass**2,-wmass*wwidth)
-      propw28=dcmplx(s28)-dcmplx(wmass**2,-wmass*wwidth)
-      propz3456=dcmplx(s3456)-dcmplx(zmass**2,-zmass*zwidth)
+      prop34=dcmplx(s34-zmass**2,zmass*zwidth)
+      prop56=dcmplx(s56-zmass**2,zmass*zwidth)
+      propw17=dcmplx(s17-wmass**2,wmass*wwidth)
+      propw28=dcmplx(s28-wmass**2,wmass*wwidth)
+      propz3456=dcmplx(s3456-zmass**2,zmass*zwidth)
       prop3456=dcmplx(s3456-hmass**2,hmass*hwidth)
       propWBF=propw17*propw28*prop34*prop56
 

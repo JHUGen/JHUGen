@@ -130,8 +130,8 @@ DIRS	=	$(MCFMHOME):\
                 $(SOURCEDIR)/DM/PS_DM:$(SOURCEDIR)/Trigam:  \
                 $(SOURCEDIR)/VV:$(SOURCEDIR)/Fourgam:  \
                 $(SOURCEDIR)/Trigam/Mad:  \
-		$(SOURCEDIR)/pwgplots:$(SOURCEDIR)/Multichan:$(SOURCEDIR)/TopH/Store/Mad\
-		$(SOURCEDIR)/UTools:$(SOURCEDIR)/WBFZZ\
+		$(SOURCEDIR)/pwgplots:$(SOURCEDIR)/Multichan:$(SOURCEDIR)/TopH/Store/Mad:\
+		$(SOURCEDIR)/UTools:$(SOURCEDIR)/WBFZZ:\
                 $(SOURCEDIR)/WBFWW:$(SOURCEDIR)/WBFWpWp:$(SOURCEDIR)/WBFWZ
 
 # -----------------------------------------------------------------------------

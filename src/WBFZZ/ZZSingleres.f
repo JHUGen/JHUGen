@@ -249,7 +249,7 @@ C---   *zab2(i8,i2,i3,i1)*za(i4,i5)*zab2(i7,i4,i5,i6)*zb(i2,i3);
       enddo
       enddo
 
-      if (xq1 < 0d0) then
+      if (xq1 .lt. 0d0) then
       if ((h17.eq.1).and.(h28.eq.1).and.(h34.eq.1)) then
       WWm(h56)=0.25d0/(cxw**2*propw17*propw28)
      & *(srmb(h17,h28,h34,h56)*lZ56(1,h34,h56)
