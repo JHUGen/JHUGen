@@ -46,7 +46,7 @@ LIB = libMELA.so
 
 .PHONY: all help compile clean
 
-all: SRCFILES LinkDefOut LinkDef $(LIB)
+all: SRCFILES LinkDefOut LinkDef $(LIB) python/__init__.py
 
 LinkDefOut: $(MELASRCDIR)/LinkDef.h
 	$(QUIET) echo "Making CINT dictionaries"; \
@@ -80,6 +80,8 @@ clean:
 	$(MELASRCDIR)/*.o $(MELASRCDIR)/*.d $(MELASRCDIR)/LinkDef_out* $(MELALIBDIR)/$(LIB) $(MELALIBDIR)/LinkDef_out_rdict.pcm; \
 	echo "Done cleaning"
 
+python/__init__.py:
+	touch python/__init__.py
 
 endif
 endif

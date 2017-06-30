@@ -1,6 +1,6 @@
 """
 Python wrapper for MELA
->>> from ZZMatrixElement.PythonWrapper.mela import Mela, SimpleParticle_t, SimpleParticleCollection_t, TVar
+>>> from mela import Mela, SimpleParticle_t, SimpleParticleCollection_t, TVar
 >>> m = Mela(13, 125)
 Then you can use m mostly like a C++ mela object.
 
@@ -42,14 +42,14 @@ import tempfile
 def include(filename):
   ROOT.gROOT.ProcessLine("#include <{}>".format(filename))
 
-ROOT.gROOT.Macro(os.path.join(os.environ["CMSSW_BASE"], "src", "ZZMatrixElement", "MELA", "test", "loadMELA.C+"))
-include("ZZMatrixElement/MELA/interface/Mela.h")
+ROOT.gROOT.Macro(os.path.join(os.path.dirname(__file__), "..", "test", "loadMELA.C+"))
+include("Mela.h")
 
 from ROOT import TVar
 f = tempfile.NamedTemporaryFile(suffix=".C", bufsize=0)
 contents = """
-  #include <ZZMatrixElement/MELA/interface/TCouplingsBase.hh>
-  #include <ZZMatrixElement/MELA/interface/TMCFM.hh>
+  #include <TCouplingsBase.hh>
+  #include <TMCFM.hh>
   auto size_HQQ = ::SIZE_HQQ;
   auto size_HGG = ::SIZE_HGG;
   auto size_HVV = ::SIZE_HVV;
@@ -214,7 +214,7 @@ class Mela(object):
   counter = 0
   doneinit = False
   computeptemplate = """
-    #include <ZZMatrixElement/MELA/interface/Mela.h>
+    #include <Mela.h>
     float getPAux(Mela& mela) {
       float result;
       mela.getPAux(result);
@@ -312,7 +312,7 @@ class Mela(object):
                 MultiDimensionalCppArray(
                                          "mela{}{}".format(self.index, name),
                                          "mela.{}".format(name),
-                                         ["ZZMatrixElement/MELA/interface/Mela.h"],
+                                         ["Mela.h"],
                                          {"Mela& mela": self.__mela},
                                          *dimensions
                                         )
