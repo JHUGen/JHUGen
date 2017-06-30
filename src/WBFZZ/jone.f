@@ -67,16 +67,12 @@ C---setting up couplings dependent on whether we are doing 34-line or 56-line
 
       s34=s(n3,n4)
       s12=s(n1,n2)
-      propz34=dcmplx(s34)-dcmplx(zmass**2,-zmass*zwidth)
-      propz12=dcmplx(s12)-dcmplx(zmass**2,-zmass*zwidth)
-      propw12=dcmplx(s12)-dcmplx(wmass**2,-wmass*wwidth)
+      propz34=dcmplx(s34-zmass**2,zmass*zwidth)
+      propz12=dcmplx(s12-zmass**2,zmass*zwidth)
+      propw12=dcmplx(s12-wmass**2,wmass*wwidth)
 
 
       do jdu=1,2
-
-      !write(6,*) "Using Q_jk(",n1,n2,jdu,")=",Q_jk(n1,n2,jdu)
-      !write(6,*) "Using L_jk(",n1,n2,jdu,")=",L_jk(n1,n2,jdu)
-      !write(6,*) "Using R_jk(",n1,n2,jdu,")=",R_jk(n1,n2,jdu)
 
       gmZ(jdu,1,1)=(dcmplx(Q_jk(n1,n2,jdu)*xq*bit/s34)
      & +dcmplx(L_jk(n1,n2,jdu)*xl)/propz34)
@@ -148,13 +144,13 @@ C----Gamma/Z attachment to exchanged W
      & *(zab(i1,:,i1)+zab(i2,:,i2)-zab(i3,:,i3)-zab(i4,:,i4)))
 C----non-resonant e-e+ production by exchanged W-line.
       if (h34 .eq. 1) then
-      if (((jdu .eq. 1) .and. (xq < 0)) .or.
-     &    ((jdu .eq. 2) .and. (xq >-1))) then
+      if (((jdu .eq. 1) .and. (xq .le. 0d0)) .or.
+     &    ((jdu .eq. 2) .and. (xq .ge. 0d0))) then
       jw(:,jdu,h34)=jw(:,jdu,h34)
      & -(zb(i1,i2)*zab(i2,:,i4)+zb(i1,i3)*zab(i3,:,i4))*za(i3,i2)*bit
      & /(2d0*cxw*propw12*s123)
-      elseif (((jdu .eq. 2) .and. (xq < 0)) .or.
-     &        ((jdu .eq. 1) .and. (xq >-1))) then
+      elseif (((jdu .eq. 2) .and. (xq .le. 0d0)) .or.
+     &        ((jdu .eq. 1) .and. (xq .ge. 0d0))) then
       jw(:,jdu,h34)=jw(:,jdu,h34)
      & +(zab(i3,:,i1)*za(i1,i2)+zab(i3,:,i4)*za(i4,i2))*zb(i1,i4)*bit
      & /(2d0*cxw*propw12*s124)
@@ -189,10 +185,6 @@ c--- to get opposite helicity, 3<->4 swap needs additional minus sign
 
       enddo
       enddo
-
-      !write(6,*) "Final j1 = ",j1
-      !write(6,*) "Final jw = ",jw
-      !write(6,*) "Final jl1 = ",j1l
 
       return
       end
