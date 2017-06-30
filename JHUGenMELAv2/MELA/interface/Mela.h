@@ -245,6 +245,12 @@ public:
   int selfDHzzCLambda_qsq[nSupportedHiggses][SIZE_HVV_CQSQ];
   int selfDHwwCLambda_qsq[nSupportedHiggses][SIZE_HVV_CQSQ];
   bool differentiate_HWW_HZZ;
+  double selfDHzpcontact[SIZE_Vp][2];
+  double selfDHwpcontact[SIZE_Vp][2];
+  bool selfDUseVprime;
+  int selfDOnlyVVpr;
+  double selfDM_Vprime;
+  double selfDGa_Vprime;
   //****Spin-1****//
   double selfDZqqcoupl[SIZE_ZQQ][2];
   double selfDZvvcoupl[SIZE_ZVV][2];

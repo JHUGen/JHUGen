@@ -86,6 +86,28 @@ namespace{
     SIZE_HVV_CQSQ = 3
   };
   enum{
+    gHIGGS_Vp_L_E,
+    gHIGGS_Vp_R_E,
+    gHIGGS_Vp_L_M,
+    gHIGGS_Vp_R_M,
+    gHIGGS_Vp_L_T,
+    gHIGGS_Vp_R_T,
+    gHIGGS_Vp_L_N,
+    gHIGGS_Vp_R_N,
+    gHIGGS_Vp_L_U,
+    gHIGGS_Vp_R_U,
+    gHIGGS_Vp_L_D,
+    gHIGGS_Vp_R_D,
+    gHIGGS_Vp_L_C,
+    gHIGGS_Vp_R_C,
+    gHIGGS_Vp_L_S,
+    gHIGGS_Vp_R_S,
+    gHIGGS_Vp_L_B,
+    gHIGGS_Vp_R_B,
+
+    SIZE_Vp
+  };
+  enum{
     gZPRIME_QQ_LEFT,
     gZPRIME_QQ_RIGHT,
 

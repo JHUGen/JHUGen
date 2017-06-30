@@ -248,6 +248,18 @@ void newZZMatrixElement::set_SpinZeroCouplings(
     }
   }
 }
+void newZZMatrixElement::set_SpinZeroContact(
+  double selfDHzpcontact[SIZE_Vp][2],
+  double selfDHwpcontact[SIZE_Vp][2],
+  bool UseVprime,
+  double M_Vprime,
+  double Ga_Vprime,
+  int OnlyVVpr
+){
+  for (int ic=0; ic < SIZE_Vp; ic++) selfD_SpinZeroCouplings->SetZpcontactTerms(ic, selfDHzpcontact[ic][0], selfDHzpcontact[ic][1]);
+  for (int ic=0; ic < SIZE_Vp; ic++) selfD_SpinZeroCouplings->SetWpcontactTerms(ic, selfDHwpcontact[ic][0], selfDHwpcontact[ic][1]);
+  selfD_SpinZeroCouplings->SetUseVprime(UseVprime, M_Vprime, Ga_Vprime, OnlyVVpr);
+}
 void newZZMatrixElement::set_SpinOneCouplings(
   double selfDZqqcoupl[SIZE_ZQQ][2],
   double selfDZvvcoupl[SIZE_ZVV][2]
