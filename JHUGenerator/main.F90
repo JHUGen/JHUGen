@@ -416,6 +416,10 @@ logical :: SetColliderEnergy
     if( SetLastArgument ) M_Reso = M_Reso*GeV
     call ReadCommandLineArgument(arg, "GaReso", success, Ga_Reso, SetLastArgument)
     if( SetLastArgument ) Ga_Reso = Ga_Reso*GeV
+    call ReadCommandLineArgument(arg, "MReso2", success, M_Reso2, SetLastArgument)
+    if( SetLastArgument ) M_Reso2 = M_Reso2*GeV
+    call ReadCommandLineArgument(arg, "GaReso2", success, Ga_Reso2, SetLastArgument)
+    if( SetLastArgument ) Ga_Reso2 = Ga_Reso2*GeV   
     call ReadCommandLineArgument(arg, "ctauReso", success, HiggsDecayLengthMM)
     call ReadCommandLineArgument(arg, "VegasNc0", success, VegasNc0)
     call ReadCommandLineArgument(arg, "VegasNc1", success, VegasNc1)
@@ -696,6 +700,65 @@ logical :: SetColliderEnergy
     if (SetLastArgument)  Ga_Vprime = Ga_Vprime*GeV
     call ReadCommandLineArgument(arg, "OnlyVVpr", success, OnlyVVpr)
 
+    
+    
+!   similar as above for the 2nd resonance in off-shell VBF
+
+    !spin 0 ZZ couplings
+    call ReadCommandLineArgument(arg, "gh2z1", success, gh2z1)
+    call ReadCommandLineArgument(arg, "gh2z2", success, gh2z2)
+    call ReadCommandLineArgument(arg, "gh2z3", success, gh2z3)
+    call ReadCommandLineArgument(arg, "gh2z4", success, gh2z4)
+
+    !spin 0 Zgamma couplings
+    call ReadCommandLineArgument(arg, "gh2zgs2", success, gh2zgs2)
+    call ReadCommandLineArgument(arg, "gh2zgs3", success, gh2zgs3)
+    call ReadCommandLineArgument(arg, "gh2zgs4", success, gh2zgs4)
+
+    !spin 0 gammagamma couplings
+    call ReadCommandLineArgument(arg, "gh2gsgs2", success, gh2gsgs2)
+    call ReadCommandLineArgument(arg, "gh2gsgs3", success, gh2gsgs3)
+    call ReadCommandLineArgument(arg, "gh2gsgs4", success, gh2gsgs4)
+
+    !spin 0 WW couplings
+    call ReadCommandLineArgument(arg, "gh2w1", success, gh2w1)
+    call ReadCommandLineArgument(arg, "gh2w2", success, gh2w2)
+    call ReadCommandLineArgument(arg, "gh2w3", success, gh2w3)
+    call ReadCommandLineArgument(arg, "gh2w4", success, gh2w4)
+    
+    !contact interactions
+    call ReadCommandLineArgument(arg, "eh2z_L_E", success, eh2z_L_E)
+    call ReadCommandLineArgument(arg, "eh2z_R_E", success, eh2z_R_E)
+    call ReadCommandLineArgument(arg, "eh2z_L_M", success, eh2z_L_M)
+    call ReadCommandLineArgument(arg, "eh2z_R_M", success, eh2z_R_M)
+    call ReadCommandLineArgument(arg, "eh2z_L_T", success, eh2z_L_T)
+    call ReadCommandLineArgument(arg, "eh2z_R_T", success, eh2z_R_T)
+    call ReadCommandLineArgument(arg, "eh2z_L_U", success, eh2z_L_U)
+    call ReadCommandLineArgument(arg, "eh2z_R_U", success, eh2z_R_U)
+    call ReadCommandLineArgument(arg, "eh2z_L_C", success, eh2z_L_U)
+    call ReadCommandLineArgument(arg, "eh2z_R_C", success, eh2z_R_U)
+    call ReadCommandLineArgument(arg, "eh2z_L_D", success, eh2z_L_D)
+    call ReadCommandLineArgument(arg, "eh2z_R_D", success, eh2z_R_D)
+    call ReadCommandLineArgument(arg, "eh2z_L_S", success, eh2z_L_S)
+    call ReadCommandLineArgument(arg, "eh2z_R_S", success, eh2z_R_S)
+    call ReadCommandLineArgument(arg, "eh2z_L_B", success, eh2z_L_B)
+    call ReadCommandLineArgument(arg, "eh2z_R_B", success, eh2z_R_B)
+    call ReadCommandLineArgument(arg, "eh2z_L_N", success, eh2z_L_N)
+    call ReadCommandLineArgument(arg, "eh2z_R_N", success, eh2z_R_N)
+
+    call ReadCommandLineArgument(arg, "eh2w_L_E", success, eh2w_L_E)
+    call ReadCommandLineArgument(arg, "eh2w_R_E", success, eh2w_R_E)
+    call ReadCommandLineArgument(arg, "eh2w_L_M", success, eh2w_L_M)
+    call ReadCommandLineArgument(arg, "eh2w_R_M", success, eh2w_R_M)
+    call ReadCommandLineArgument(arg, "eh2w_L_T", success, eh2w_L_T)
+    call ReadCommandLineArgument(arg, "eh2w_R_T", success, eh2w_R_T)
+    call ReadCommandLineArgument(arg, "eh2w_L_U", success, eh2w_L_U)
+    call ReadCommandLineArgument(arg, "eh2w_R_U", success, eh2w_R_U)
+    call ReadCommandLineArgument(arg, "eh2w_L_C", success, eh2w_L_C)
+    call ReadCommandLineArgument(arg, "eh2w_R_C", success, eh2w_R_C)
+!   end of couplings for 2nd resonance in off-shell VBF. The rest has to be set in mod_Parameters
+    
+    
 
     ! CKM elements
     call ReadCommandLineArgument(arg, "Vud", success, VCKM_ud, success2=SetCKM)
@@ -4366,6 +4429,7 @@ character :: arg*(500)
     if( Process.eq.61) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( Process.eq.62) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( Process.eq.66 .or. Process.eq.68 ) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
+    if( (Process.eq.66 .or. Process.eq.68) .and. M_Reso2.gt.0d0 ) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "2nd Resonance: spin=0, mass=",M_Reso2*100d0," width=",Ga_Reso2*100d0
     if( Process.eq.50) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( Process.eq.80) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( Process.eq.90) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
@@ -4925,6 +4989,8 @@ implicit none
         print *, "   ctauReso:          resonance decay length in mm (default=0)"
         print *, "   OffshellX:         Whether to allow resonance (X) to go offshell"
         print *, "                      in processes 0, 1 or 2"
+        print *, "   MReso2:            2nd resonance mass in GeV in off-shell VBF"
+        print *, "   GaReso2:           2nd resonance width in GeV in off-shell VBF"
         print *, " EW coupling parameters:"
         print *, "   Vud:               CKM element for W-ud couplings"
         print *, "   Vus:               CKM element for W-us couplings"
@@ -4986,7 +5052,7 @@ implicit none
 
 END SUBROUTINE
 
-
+! 
 
 
 SUBROUTINE PrintLogo(TheUnit)
