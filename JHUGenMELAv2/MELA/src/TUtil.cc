@@ -3,6 +3,7 @@
 #include <cmath>
 #include <utility>
 #include <algorithm>
+#include <cassert>
 #include "TUtil.hh"
 #include "TMath.h"
 #include "TLorentzRotation.h"
@@ -7264,11 +7265,11 @@ void TUtil::GetBoostedParticleVectors(
   simple_event_record& mela_event,
   TVar::VerbosityLevel verbosity
   ){
-  if (verbosity>=TVar::DEBUG) cout << "Begin GetBoostedParticles" << endl;
+  if (verbosity>=TVar::DEBUG) cout << "Begin GetBoostedParticleVectors" << endl;
   // This is the beginning of one long function.
 
   int code = mela_event.AssociationCode;
-  if (verbosity>=TVar::DEBUG) cout << "TUtil::GetBoostedParticles: code=" << code << endl;
+  if (verbosity>=TVar::DEBUG) cout << "TUtil::GetBoostedParticleVectors: code=" << code << endl;
   int aVhypo = mela_event.AssociationVCompatibility;
   TLorentzVector nullFourVector(0, 0, 0, 0);
 
@@ -7323,9 +7324,9 @@ void TUtil::GetBoostedParticleVectors(
 
   /***** ASSOCIATED PARTICLES *****/
   if (verbosity>=TVar::DEBUG){
-    cout << "TUtil::GetBoostedParticles: nRequestedLeps=" << mela_event.nRequested_AssociatedLeptons << endl;
-    cout << "TUtil::GetBoostedParticles: nRequestedJets=" << mela_event.nRequested_AssociatedJets << endl;
-    cout << "TUtil::GetBoostedParticles: nRequestedPhotons=" << mela_event.nRequested_AssociatedPhotons << endl;
+    cout << "TUtil::GetBoostedParticleVectors: nRequestedLeps=" << mela_event.nRequested_AssociatedLeptons << endl;
+    cout << "TUtil::GetBoostedParticleVectors: nRequestedJets=" << mela_event.nRequested_AssociatedJets << endl;
+    cout << "TUtil::GetBoostedParticleVectors: nRequestedPhotons=" << mela_event.nRequested_AssociatedPhotons << endl;
   }
   int nsatisfied_jets=0;
   int nsatisfied_lnus=0;
@@ -7333,9 +7334,10 @@ void TUtil::GetBoostedParticleVectors(
   vector<MELAParticle*> candidateVs; // Used if aVhypo!=0
   SimpleParticleCollection_t associated;
   if (aVhypo!=0){
-    if (verbosity>=TVar::DEBUG) cout << "TUtil::GetBoostedParticles: aVhypo!=0 case start" << endl;
+    if (verbosity>=TVar::DEBUG) cout << "TUtil::GetBoostedParticleVectors: aVhypo!=0 case start" << endl;
 
-    for (int iv=2; iv<melaCand->getNSortedVs(); iv++){ // Loop over associated Vs
+    int nsortedvsstart=(melaCand->getDecayMode()!=TVar::CandidateDecay_Stable ? 2 : 0);
+    for (int iv=nsortedvsstart; iv<melaCand->getNSortedVs(); iv++){ // Loop over associated Vs
       MELAParticle* Vdau = melaCand->getSortedV(iv);
       if (Vdau!=0){
         bool doAdd=false;
@@ -7414,11 +7416,11 @@ void TUtil::GetBoostedParticleVectors(
       for (unsigned int ias=0; ias<associated_tmp.size(); ias++) associated.push_back(associated_tmp.at(ias)); // Fill associated at the last step
     }
 
-    if (verbosity>=TVar::DEBUG) cout << "TUtil::GetBoostedParticles: aVhypo!=0 case associated.size=" << associated.size() << endl;
+    if (verbosity>=TVar::DEBUG) cout << "TUtil::GetBoostedParticleVectors: aVhypo!=0 case associated.size=" << associated.size() << endl;
   }
   else{ // Could be split to aVhypo==0 and aVhypo<0 if associated V+jets is needed
     // Associated leptons
-    if (verbosity>=TVar::DEBUG) cout << "TUtil::GetBoostedParticles: aVhypo==0 case begin" << endl;
+    if (verbosity>=TVar::DEBUG) cout << "TUtil::GetBoostedParticleVectors: aVhypo==0 case begin" << endl;
 
     if (code%TVar::kUseAssociated_Leptons==0){
       SimpleParticleCollection_t associated_tmp;
@@ -7430,13 +7432,13 @@ void TUtil::GetBoostedParticleVectors(
         }
       }
 
-      if (verbosity>=TVar::DEBUG) cout << "TUtil::GetBoostedParticles: aVhypo==0 lep case associated_tmp.size=" << associated_tmp.size() << endl;
+      if (verbosity>=TVar::DEBUG) cout << "TUtil::GetBoostedParticleVectors: aVhypo==0 lep case associated_tmp.size=" << associated_tmp.size() << endl;
 
       // Adjust the kinematics of associated non-V-originating particles
       if (associated_tmp.size()>=1){
         unsigned int nffs = associated_tmp.size()/2;
         for (unsigned int iv=0; iv<nffs; iv++){
-          if (verbosity>=TVar::DEBUG) cout << "TUtil::GetBoostedParticles: Removing mass from lepton pair " << 2*iv+0 << '\t' << 2*iv+1 << endl;
+          if (verbosity>=TVar::DEBUG) cout << "TUtil::GetBoostedParticleVectors: Removing mass from lepton pair " << 2*iv+0 << '\t' << 2*iv+1 << endl;
           pair<TLorentzVector, TLorentzVector> corrPair = TUtil::removeMassFromPair(
             associated_tmp.at(2*iv+0).second, associated_tmp.at(2*iv+0).first,
             associated_tmp.at(2*iv+1).second, associated_tmp.at(2*iv+1).first
@@ -7445,7 +7447,7 @@ void TUtil::GetBoostedParticleVectors(
           associated_tmp.at(2*iv+1).second = corrPair.second;
         }
         if (2*nffs<associated_tmp.size()){
-          if (verbosity>=TVar::DEBUG) cout << "TUtil::GetBoostedParticles: Removing mass from last lepton  " << associated_tmp.size()-1 << endl;
+          if (verbosity>=TVar::DEBUG) cout << "TUtil::GetBoostedParticleVectors: Removing mass from last lepton  " << associated_tmp.size()-1 << endl;
           TLorentzVector tmp = nullFourVector;
           pair<TLorentzVector, TLorentzVector> corrPair = TUtil::removeMassFromPair(
             associated_tmp.at(associated_tmp.size()-1).second, associated_tmp.at(associated_tmp.size()-1).first,
@@ -7467,13 +7469,13 @@ void TUtil::GetBoostedParticleVectors(
         }
       }
 
-      if (verbosity>=TVar::DEBUG) cout << "TUtil::GetBoostedParticles: aVhypo==0 jet case associated_tmp.size=" << associated_tmp.size() << endl;
+      if (verbosity>=TVar::DEBUG) cout << "TUtil::GetBoostedParticleVectors: aVhypo==0 jet case associated_tmp.size=" << associated_tmp.size() << endl;
 
       // Adjust the kinematics of associated non-V-originating particles
       if (associated_tmp.size()>=1){
         unsigned int nffs = associated_tmp.size()/2;
         for (unsigned int iv=0; iv<nffs; iv++){
-          if (verbosity>=TVar::DEBUG) cout << "TUtil::GetBoostedParticles: Removing mass from jet pair " << 2*iv+0 << '\t' << 2*iv+1 << endl;
+          if (verbosity>=TVar::DEBUG) cout << "TUtil::GetBoostedParticleVectors: Removing mass from jet pair " << 2*iv+0 << '\t' << 2*iv+1 << endl;
           pair<TLorentzVector, TLorentzVector> corrPair = TUtil::removeMassFromPair(
             associated_tmp.at(2*iv+0).second, associated_tmp.at(2*iv+0).first,
             associated_tmp.at(2*iv+1).second, associated_tmp.at(2*iv+1).first
@@ -7482,7 +7484,7 @@ void TUtil::GetBoostedParticleVectors(
           associated_tmp.at(2*iv+1).second = corrPair.second;
         }
         if (2*nffs<associated_tmp.size()){
-          if (verbosity>=TVar::DEBUG) cout << "TUtil::GetBoostedParticles: Removing mass from last jet  " << associated_tmp.size()-1 << endl;
+          if (verbosity>=TVar::DEBUG) cout << "TUtil::GetBoostedParticleVectors: Removing mass from last jet  " << associated_tmp.size()-1 << endl;
           TLorentzVector tmp = nullFourVector;
           pair<TLorentzVector, TLorentzVector> corrPair = TUtil::removeMassFromPair(
             associated_tmp.at(associated_tmp.size()-1).second, associated_tmp.at(associated_tmp.size()-1).first,
@@ -7507,7 +7509,7 @@ void TUtil::GetBoostedParticleVectors(
   }
   /***** END ASSOCIATED PARTICLES *****/
 
-  if (verbosity>=TVar::DEBUG) cout << "TUtil::GetBoostedParticles: associated.size=" << associated.size() << endl;
+  if (verbosity>=TVar::DEBUG) cout << "TUtil::GetBoostedParticleVectors: associated.size=" << associated.size() << endl;
 
   /***** ASSOCIATED TOP OBJECTS *****/
   int nsatisfied_tops=0;
@@ -7631,12 +7633,12 @@ void TUtil::GetBoostedParticleVectors(
   }
   /***** END ASSOCIATED TOP OBJECTS *****/
   if (verbosity>=TVar::DEBUG){
-    cout << "TUtil::GetBoostedParticles: stableTops.size=" << stableTops.size() << endl;
-    cout << "TUtil::GetBoostedParticles: stableAntitops.size=" << stableAntitops.size() << endl;
-    cout << "TUtil::GetBoostedParticles: topDaughters.size=" << topDaughters.size() << endl;
-    for (unsigned int itop=0; itop<topDaughters.size(); itop++) cout << "TUtil::GetBoostedParticles: topDaughters.at(" << itop << ").size=" << topDaughters.at(itop).size() << endl;
-    cout << "TUtil::GetBoostedParticles: antitopDaughters.size=" << antitopDaughters.size() << endl;
-    for (unsigned int itop=0; itop<antitopDaughters.size(); itop++) cout << "TUtil::GetBoostedParticles: antitopDaughters.at(" << itop << ").size=" << antitopDaughters.at(itop).size() << endl;
+    cout << "TUtil::GetBoostedParticleVectors: stableTops.size=" << stableTops.size() << endl;
+    cout << "TUtil::GetBoostedParticleVectors: stableAntitops.size=" << stableAntitops.size() << endl;
+    cout << "TUtil::GetBoostedParticleVectors: topDaughters.size=" << topDaughters.size() << endl;
+    for (unsigned int itop=0; itop<topDaughters.size(); itop++) cout << "TUtil::GetBoostedParticleVectors: topDaughters.at(" << itop << ").size=" << topDaughters.at(itop).size() << endl;
+    cout << "TUtil::GetBoostedParticleVectors: antitopDaughters.size=" << antitopDaughters.size() << endl;
+    for (unsigned int itop=0; itop<antitopDaughters.size(); itop++) cout << "TUtil::GetBoostedParticleVectors: antitopDaughters.at(" << itop << ").size=" << antitopDaughters.at(itop).size() << endl;
   }
 
   /***** BOOSTS TO THE CORRECT PT=0 FRAME *****/
@@ -7714,15 +7716,15 @@ void TUtil::GetBoostedParticleVectors(
 
   // This is the end of one long function.
   if (verbosity>=TVar::DEBUG){
-    cout << "TUtil::GetBoostedParticles mela_event.intermediateVid.size=" << mela_event.intermediateVid.size() << endl;
-    cout << "TUtil::GetBoostedParticles mela_event.pMothers.size=" << mela_event.pMothers.size() << endl;
-    cout << "TUtil::GetBoostedParticles mela_event.pDaughters.size=" << mela_event.pDaughters.size() << endl;
-    cout << "TUtil::GetBoostedParticles mela_event.pAssociated.size=" << mela_event.pAssociated.size() << endl;
-    cout << "TUtil::GetBoostedParticles mela_event.pStableTops.size=" << mela_event.pStableTops.size() << endl;
-    cout << "TUtil::GetBoostedParticles mela_event.pStableAntitops.size=" << mela_event.pStableAntitops.size() << endl;
-    cout << "TUtil::GetBoostedParticles mela_event.pTopDaughters.size=" << mela_event.pTopDaughters.size() << endl;
-    cout << "TUtil::GetBoostedParticles mela_event.pAntitopDaughters.size=" << mela_event.pAntitopDaughters.size() << endl;
-    cout << "End GetBoostedParticles" << endl;
+    cout << "TUtil::GetBoostedParticleVectors mela_event.intermediateVid.size=" << mela_event.intermediateVid.size() << endl;
+    cout << "TUtil::GetBoostedParticleVectors mela_event.pMothers.size=" << mela_event.pMothers.size() << endl;
+    cout << "TUtil::GetBoostedParticleVectors mela_event.pDaughters.size=" << mela_event.pDaughters.size() << endl;
+    cout << "TUtil::GetBoostedParticleVectors mela_event.pAssociated.size=" << mela_event.pAssociated.size() << endl;
+    cout << "TUtil::GetBoostedParticleVectors mela_event.pStableTops.size=" << mela_event.pStableTops.size() << endl;
+    cout << "TUtil::GetBoostedParticleVectors mela_event.pStableAntitops.size=" << mela_event.pStableAntitops.size() << endl;
+    cout << "TUtil::GetBoostedParticleVectors mela_event.pTopDaughters.size=" << mela_event.pTopDaughters.size() << endl;
+    cout << "TUtil::GetBoostedParticleVectors mela_event.pAntitopDaughters.size=" << mela_event.pAntitopDaughters.size() << endl;
+    cout << "End GetBoostedParticleVectors" << endl;
   }
 }
 
@@ -7781,7 +7783,10 @@ MELACandidate* TUtil::ConvertVectorFormat(
   */
 
   // Undecayed Higgs
-  if (daughters.size()==1) cand = new MELACandidate(25, (daughters.at(0))->p4); // No sorting!
+  if (daughters.size()==1){
+    cand = new MELACandidate(25, (daughters.at(0))->p4); // No sorting!
+    cand->setDecayMode(TVar::CandidateDecay_Stable); // Explicitly set the decay mode in case the default of MELACandidate changes in the future
+  }
   // GG / ff final states
   else if (daughters.size()==2){
     MELAParticle* F1 = daughters.at(0);
@@ -7833,6 +7838,15 @@ MELACandidate* TUtil::ConvertVectorFormat(
     // FIXME/REIMPLEMENT: ZW trickier than I thought: Summing over charges over all 4f is not enough, affects SSSF pairing in ZZ
     //TVar::CandidateDecayMode defaultHDecayMode = PDGHelpers::HDecayMode;
     //if (fabs(charge)>0.01) PDGHelpers::setCandidateDecayMode(TVar::CandidateDecay_ZW);
+    if (
+      PDGHelpers::HDecayMode!=TVar::CandidateDecay_WW
+      && PDGHelpers::HDecayMode!=TVar::CandidateDecay_ZZ
+      && PDGHelpers::HDecayMode!=TVar::CandidateDecay_ZW
+      ){
+      cerr << "TUtil::ConvertVectorFormat: PDGHelpers::HDecayMode = " << PDGHelpers::HDecayMode << " is set incorrectly for Ndaughters=" << daughters.size() << ". There is no automatic mechnism for this scenario. ";
+      cerr << "Suggestion: Call PDGHelpers::setCandidateDecayMode(TVar::CandidateDecay_XY) before this call." << endl;
+      assert(0);
+    }
     cand->sortDaughters();
     //PDGHelpers::setCandidateDecayMode(defaultHDecayMode);
   }
