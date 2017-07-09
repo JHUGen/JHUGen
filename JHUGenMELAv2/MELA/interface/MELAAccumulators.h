@@ -16,10 +16,10 @@ namespace TNumericUtil{
     NaiveAccumulator& operator-=(const T& inc){ sum_ -= inc; return *this; }
     NaiveAccumulator& operator*=(const T& inc){ sum_ *= inc; return *this; }
     NaiveAccumulator& operator/=(const T& inc){ sum_ /= inc; return *this; }
-    NaiveAccumulator operator+(const T& inc){ NaiveAccumulator<T> tmp(inc);  tmp += inc; return tmp; }
-    NaiveAccumulator operator-(const T& inc){ NaiveAccumulator<T> tmp(inc);  tmp -= inc; return tmp; }
-    NaiveAccumulator operator*(const T& inc){ NaiveAccumulator<T> tmp(inc);  tmp *= inc; return tmp; }
-    NaiveAccumulator operator/(const T& inc){ NaiveAccumulator<T> tmp(inc);  tmp /= inc; return tmp; }
+    NaiveAccumulator operator+(const T& inc){ NaiveAccumulator<T> tmp(*this);  tmp += inc; return tmp; }
+    NaiveAccumulator operator-(const T& inc){ NaiveAccumulator<T> tmp(*this);  tmp -= inc; return tmp; }
+    NaiveAccumulator operator*(const T& inc){ NaiveAccumulator<T> tmp(*this);  tmp *= inc; return tmp; }
+    NaiveAccumulator operator/(const T& inc){ NaiveAccumulator<T> tmp(*this);  tmp /= inc; return tmp; }
     T sum() const { return sum_; }
     operator T() const { return sum_; }
   };
@@ -42,10 +42,10 @@ namespace TNumericUtil{
     KahanAccumulator& operator-=(const T& inc){ this->operator+=(-inc); return *this; }
     KahanAccumulator& operator*=(const T& inc){ sum_ *= inc; compensation_ *= inc; return *this; }
     KahanAccumulator& operator/=(const T& inc){ sum_ /= inc; compensation_ /= inc; return *this; }
-    KahanAccumulator operator+(const T& inc){ KahanAccumulator<T> tmp(inc);  tmp += inc; return tmp; }
-    KahanAccumulator operator-(const T& inc){ KahanAccumulator<T> tmp(inc);  tmp -= inc; return tmp; }
-    KahanAccumulator operator*(const T& inc){ KahanAccumulator<T> tmp(inc);  tmp *= inc; return tmp; }
-    KahanAccumulator operator/(const T& inc){ KahanAccumulator<T> tmp(inc);  tmp /= inc; return tmp; }
+    KahanAccumulator operator+(const T& inc){ KahanAccumulator<T> tmp(*this);  tmp += inc; return tmp; }
+    KahanAccumulator operator-(const T& inc){ KahanAccumulator<T> tmp(*this);  tmp -= inc; return tmp; }
+    KahanAccumulator operator*(const T& inc){ KahanAccumulator<T> tmp(*this);  tmp *= inc; return tmp; }
+    KahanAccumulator operator/(const T& inc){ KahanAccumulator<T> tmp(*this);  tmp /= inc; return tmp; }
     T sum() const { return sum_; }
     operator T() const { return sum_; }
   };
