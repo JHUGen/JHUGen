@@ -330,7 +330,7 @@ logical :: SetZgammacoupling, Setgammagammacoupling
 logical :: SetAnomalousSpin1qq, Setspin1qqleft, Setspin1qqright
 logical :: SetAnomalousSpin2gg, SetAnomalousSpin2qq, Setspin2qqleft, Setspin2qqright
 logical :: SetAnomalousHff, Setkappa
-logical :: SetMVprime, SetGaVprime
+logical :: SetVprimeff, SetMVprime, SetGaVprime
 logical :: SetCKM,SetCKMub,SetCKMcb,SetCKMtd
 logical :: SetpTcut, SetdeltaRcut
 logical :: SetColliderEnergy
@@ -373,6 +373,7 @@ logical :: SetColliderEnergy
    SetAnomalousHff=.false.
    Setkappa=.false.
 
+   SetVprimeff=.false.
    SetMVprime=.false.
    SetGaVprime=.false.
 
@@ -660,41 +661,44 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "kappa_tilde", success, kappa_tilde, success2=SetAnomalousHff)
 
     !contact interactions
-    call ReadCommandLineArgument(arg, "ehz_L_E", success, ehz_L_E, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ehz_R_E", success, ehz_R_E, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ehz_L_M", success, ehz_L_M, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ehz_R_M", success, ehz_R_M, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ehz_L_T", success, ehz_L_T, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ehz_R_T", success, ehz_R_T, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ehz_L_U", success, ehz_L_U, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ehz_R_U", success, ehz_R_U, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ehz_L_C", success, ehz_L_U, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ehz_R_C", success, ehz_R_U, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ehz_L_D", success, ehz_L_D, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ehz_R_D", success, ehz_R_D, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ehz_L_S", success, ehz_L_S, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ehz_R_S", success, ehz_R_S, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ehz_L_B", success, ehz_L_B, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ehz_R_B", success, ehz_R_B, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ehz_L_N", success, ehz_L_N, success2=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ehz_R_N", success, ehz_R_N, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghzzp1", success, ghzzp1, success2=SetAnomalousSpin0ZZ, success3=includeVprime)
+    call ReadCommandLineArgument(arg, "ghzpzp1", success, ghzpzp1, success2=SetAnomalousSpin0ZZ, success3=includeVprime)
+    call ReadCommandLineArgument(arg, "ezp_L_E", success, ezp_L_E, success2=SetVprimeff)
+    call ReadCommandLineArgument(arg, "ezp_R_E", success, ezp_R_E, success2=SetVprimeff)
+    call ReadCommandLineArgument(arg, "ezp_L_M", success, ezp_L_M, success2=SetVprimeff)
+    call ReadCommandLineArgument(arg, "ezp_R_M", success, ezp_R_M, success2=SetVprimeff)
+    call ReadCommandLineArgument(arg, "ezp_L_T", success, ezp_L_T, success2=SetVprimeff)
+    call ReadCommandLineArgument(arg, "ezp_R_T", success, ezp_R_T, success2=SetVprimeff)
+    call ReadCommandLineArgument(arg, "ezp_L_U", success, ezp_L_U, success2=SetVprimeff)
+    call ReadCommandLineArgument(arg, "ezp_R_U", success, ezp_R_U, success2=SetVprimeff)
+    call ReadCommandLineArgument(arg, "ezp_L_C", success, ezp_L_U, success2=SetVprimeff)
+    call ReadCommandLineArgument(arg, "ezp_R_C", success, ezp_R_U, success2=SetVprimeff)
+    call ReadCommandLineArgument(arg, "ezp_L_D", success, ezp_L_D, success2=SetVprimeff)
+    call ReadCommandLineArgument(arg, "ezp_R_D", success, ezp_R_D, success2=SetVprimeff)
+    call ReadCommandLineArgument(arg, "ezp_L_S", success, ezp_L_S, success2=SetVprimeff)
+    call ReadCommandLineArgument(arg, "ezp_R_S", success, ezp_R_S, success2=SetVprimeff)
+    call ReadCommandLineArgument(arg, "ezp_L_B", success, ezp_L_B, success2=SetVprimeff)
+    call ReadCommandLineArgument(arg, "ezp_R_B", success, ezp_R_B, success2=SetVprimeff)
+    call ReadCommandLineArgument(arg, "ezp_L_N", success, ezp_L_N, success2=SetVprimeff)
+    call ReadCommandLineArgument(arg, "ezp_R_N", success, ezp_R_N, success2=SetVprimeff)
 
-    call ReadCommandLineArgument(arg, "ehw_L_E", success, ehw_L_E, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ehw_R_E", success, ehw_R_E, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ehw_L_M", success, ehw_L_M, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ehw_R_M", success, ehw_R_M, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ehw_L_T", success, ehw_L_T, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ehw_R_T", success, ehw_R_T, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ehw_L_U", success, ehw_L_U, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ehw_R_U", success, ehw_R_U, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ehw_L_C", success, ehw_L_C, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
-    call ReadCommandLineArgument(arg, "ehw_R_C", success, ehw_R_C, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghwwp1", success, ghwwp1, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime)
+    call ReadCommandLineArgument(arg, "ghwpwp1", success, ghwpwp1, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime)
+    call ReadCommandLineArgument(arg, "ewp_L_E", success, ewp_L_E, success2=distinguish_HWWcouplings, success3=SetVprimeff)
+    call ReadCommandLineArgument(arg, "ewp_R_E", success, ewp_R_E, success2=distinguish_HWWcouplings, success3=SetVprimeff)
+    call ReadCommandLineArgument(arg, "ewp_L_M", success, ewp_L_M, success2=distinguish_HWWcouplings, success3=SetVprimeff)
+    call ReadCommandLineArgument(arg, "ewp_R_M", success, ewp_R_M, success2=distinguish_HWWcouplings, success3=SetVprimeff)
+    call ReadCommandLineArgument(arg, "ewp_L_T", success, ewp_L_T, success2=distinguish_HWWcouplings, success3=SetVprimeff)
+    call ReadCommandLineArgument(arg, "ewp_R_T", success, ewp_R_T, success2=distinguish_HWWcouplings, success3=SetVprimeff)
+    call ReadCommandLineArgument(arg, "ewp_L_U", success, ewp_L_U, success2=distinguish_HWWcouplings, success3=SetVprimeff)
+    call ReadCommandLineArgument(arg, "ewp_R_U", success, ewp_R_U, success2=distinguish_HWWcouplings, success3=SetVprimeff)
+    call ReadCommandLineArgument(arg, "ewp_L_C", success, ewp_L_C, success2=distinguish_HWWcouplings, success3=SetVprimeff)
+    call ReadCommandLineArgument(arg, "ewp_R_C", success, ewp_R_C, success2=distinguish_HWWcouplings, success3=SetVprimeff)
 
     call ReadCommandLineArgument(arg, "M_Vprime", success, M_Vprime, SetLastArgument, success2=UseVprime, success3=SetMVprime)
     if (SetLastArgument)  M_Vprime = M_Vprime*GeV
     call ReadCommandLineArgument(arg, "Ga_Vprime", success, Ga_Vprime, SetLastArgument, success2=UseVprime, success3=SetGaVprime)
     if (SetLastArgument)  Ga_Vprime = Ga_Vprime*GeV
-    call ReadCommandLineArgument(arg, "OnlyVVpr", success, OnlyVVpr)
 
 
     ! CKM elements
@@ -885,6 +889,10 @@ logical :: SetColliderEnergy
     if( Process.eq.50 .and. IsAPhoton(DecayMode1) .and. .not.SetZgammacoupling .and. .not.Setgammagammacoupling ) then
         print *, "To produce gammaH, you need to set one of the HZgamma (ghzgs*) or Hgammagamma(ghgsgs*) couplings."
         stop 1
+    endif
+
+    if ((includeVprime .and. .not.SetVprimeff) .or. (.not.includeVprime .and. SetVprimeff)) then
+        call Error("To use contact terms, you have to set both HVV' and V'ff couplings")
     endif
 
     !cut checks
