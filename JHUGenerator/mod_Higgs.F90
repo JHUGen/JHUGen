@@ -945,11 +945,11 @@ subroutine getDecay_Couplings_Spinors_Props(VVMode,idordered,pordered,h3,h4, sp,
       sp(3,:) = -sp(3,:) + pV(3,:)*( sc(sp(3,:),dcmplx(pV(3,:))) )/scr(pV(3,:),pV(3,:))! full propagator numerator
       sp(4,:) = pol_dk2mom(dcmplx(pordered(:,8)),dcmplx(pordered(:,9)),h4)  ! ubar(l3), v(l4)
       sp(4,:) = -sp(4,:) + pV(4,:)*( sc(sp(4,:),dcmplx(pV(4,:))) )/scr(pV(4,:),pV(4,:))! full propagator numerator
+      s = scr(pordered(:,6)+pordered(:,7),pordered(:,6)+pordered(:,7))
       if( UseVprime ) then
-        s = scr(pordered(:,6)+pordered(:,7),pordered(:,6)+pordered(:,7))
         propV(1) = s/dcmplx(s - M_Vprime**2,M_Vprime*Ga_Vprime)
       else
-        propV(1) = s
+        propV(1) = s/M_Z**2
       endif
       s = scr(pordered(:,8)+pordered(:,9),pordered(:,8)+pordered(:,9))
       propV(2) = s/dcmplx(s - M_V**2,M_V*Ga_V)
@@ -1015,11 +1015,11 @@ subroutine getDecay_Couplings_Spinors_Props(VVMode,idordered,pordered,h3,h4, sp,
       sp(4,:) = -sp(4,:) + pV(4,:)*( sc(sp(4,:),dcmplx(pV(4,:))) )/scr(pV(4,:),pV(4,:))! full propagator numerator
       s = scr(pordered(:,6)+pordered(:,7),pordered(:,6)+pordered(:,7))
       propV(1) = s/dcmplx(s - M_V**2,M_V*Ga_V)
+      s = scr(pordered(:,8)+pordered(:,9),pordered(:,8)+pordered(:,9))
       if( UseVprime ) then
-        s = scr(pordered(:,8)+pordered(:,9),pordered(:,8)+pordered(:,9))
         propV(2) = s/dcmplx(s - M_Vprime**2,M_Vprime*Ga_Vprime)
       else
-        propV(2) = s
+        propV(2) = s/M_Z**2
       endif
 
 
@@ -1095,13 +1095,15 @@ subroutine getDecay_Couplings_Spinors_Props(VVMode,idordered,pordered,h3,h4, sp,
       sp(4,:) = -sp(4,:) + pV(4,:)*( sc(sp(4,:),dcmplx(pV(4,:))) )/scr(pV(4,:),pV(4,:))! full propagator numerator
       s = scr(pordered(:,6)+pordered(:,7),pordered(:,6)+pordered(:,7))
       if( UseVprime ) then
-        s = scr(pordered(:,6)+pordered(:,7),pordered(:,6)+pordered(:,7))
         propV(1) = s/dcmplx(s - M_Vprime**2,M_Vprime*Ga_Vprime)
-        s = scr(pordered(:,8)+pordered(:,9),pordered(:,8)+pordered(:,9))
+      else
+        propV(1) = s/M_Z**2
+      endif
+      s = scr(pordered(:,8)+pordered(:,9),pordered(:,8)+pordered(:,9))
+      if( UseVprime ) then
         propV(2) = s/dcmplx(s - M_Vprime**2,M_Vprime*Ga_Vprime)
       else
-        propV(1) = s
-        propV(2) = s
+        propV(2) = s/M_Z**2
       endif
 
 
