@@ -555,7 +555,6 @@ class Mela(object):
   UseVprime = SelfDParameter("selfDOnlyVprime")
   M_Vprime = SelfDParameter("selfDM_Vprime")
   Ga_Vprime = SelfDParameter("selfDGa_Vprime")
-  OnlyVVpr = SelfDParameter("selfDOnlyVVpr")
 
   zprime_qq_left = SelfDCoupling("selfDZqqcoupl", ROOT.py_gZPRIME_QQ_LEFT)
   zprime_qq_right = SelfDCoupling("selfDZqqcoupl", ROOT.py_gZPRIME_QQ_RIGHT)
