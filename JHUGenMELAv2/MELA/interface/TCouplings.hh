@@ -264,12 +264,12 @@ public:
     else if (whichResonance!=1) {std::cerr << "Contact terms are only for the first resonance" << std::endl;}
     else{
       if (setWpWp){
-        Hwwpcoupl[index][0] = c_real;
-        Hwwpcoupl[index][1] = c_imag;
+        Hwpwpcoupl[index][0] = c_real;
+        Hwpwpcoupl[index][1] = c_imag;
       }
       else{
-        Hzzpcoupl[index][0] = c_real;
-        Hzzpcoupl[index][1] = c_imag;
+        Hzpzpcoupl[index][0] = c_real;
+        Hzpzpcoupl[index][1] = c_imag;
       }
     }
   };

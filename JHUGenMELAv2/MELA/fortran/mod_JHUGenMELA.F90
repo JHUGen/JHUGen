@@ -366,6 +366,8 @@ end subroutine SetSpinZeroVVCouplings_NoGamma
 
 subroutine SetSpinZeroContactTerms(zzpcoupl, zpzpcoupl, zpcontact, wwpcoupl, wpwpcoupl, wpcontact, UseVp, M_Vp, Ga_Vp)
   implicit none
+  !The array sizes are (1) for now.  This is ok with the compiler because C++ and Fortran don't really talk.
+  !Can increase this when more couplings are added.
   complex(8), intent(in) :: zzpcoupl(1)
   complex(8), intent(in) :: zpzpcoupl(1)
   complex(8), intent(in) :: zpcontact(18)
@@ -378,6 +380,9 @@ subroutine SetSpinZeroContactTerms(zzpcoupl, zpzpcoupl, zpcontact, wwpcoupl, wpw
   M_Vprime = M_Vp
   Ga_Vprime = Ga_Vp
   UseVprime = UseVp
+
+  includeVprime = ((any(zzpcoupl.ne.czero) .or. any(zpzpcoupl.ne.czero)) .and. any(zpcontact.ne.czero)) &
+              .or.((any(wwpcoupl.ne.czero) .or. any(wpwpcoupl.ne.czero)) .and. any(wpcontact.ne.czero))
 
   ghzzp1 = zzpcoupl(1)
   ghzpzp1 = zpzpcoupl(1)
@@ -420,6 +425,7 @@ subroutine SetSpinZeroContactTerms(zzpcoupl, zpzpcoupl, zpcontact, wwpcoupl, wpw
   !ewp_R_S = wpcontact(16)
   !ewp_L_B = wpcontact(17)
   !ewp_R_B = wpcontact(18)
+
 end subroutine
 
 subroutine SetDistinguishWWCouplingsFlag(doAllow)

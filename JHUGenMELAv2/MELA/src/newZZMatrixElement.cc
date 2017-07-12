@@ -259,11 +259,11 @@ void newZZMatrixElement::set_SpinZeroContact(
   double M_Vprime,
   double Ga_Vprime
 ){
-  for (int ic=0; ic < SIZE_HVV; ic++) selfD_SpinZeroCouplings->SetHVVpCouplings(ic, selfDHzzpcoupl[ic][0], selfDHzzpcoupl[ic][1]); 
-  for (int ic=0; ic < SIZE_HVV; ic++) selfD_SpinZeroCouplings->SetHVpVpCouplings(ic, selfDHzpzpcoupl[ic][0], selfDHzpzpcoupl[ic][1]); 
+  for (int ic=0; ic < SIZE_HVV; ic++) selfD_SpinZeroCouplings->SetHVVpCouplings(ic, selfDHzzpcoupl[ic][0], selfDHzzpcoupl[ic][1]);
+  for (int ic=0; ic < SIZE_HVV; ic++) selfD_SpinZeroCouplings->SetHVpVpCouplings(ic, selfDHzpzpcoupl[ic][0], selfDHzpzpcoupl[ic][1]);
   for (int ic=0; ic < SIZE_Vp; ic++) selfD_SpinZeroCouplings->SetZpcontactTerms(ic, selfDHzpcontact[ic][0], selfDHzpcontact[ic][1]);
-  for (int ic=0; ic < SIZE_HVV; ic++) selfD_SpinZeroCouplings->SetHVVpCouplings(ic, selfDHwwpcoupl[ic][0], selfDHwwpcoupl[ic][1], 1); 
-  for (int ic=0; ic < SIZE_HVV; ic++) selfD_SpinZeroCouplings->SetHVpVpCouplings(ic, selfDHwpwpcoupl[ic][0], selfDHwpwpcoupl[ic][1], 1); 
+  for (int ic=0; ic < SIZE_HVV; ic++) selfD_SpinZeroCouplings->SetHVVpCouplings(ic, selfDHwwpcoupl[ic][0], selfDHwwpcoupl[ic][1], true);
+  for (int ic=0; ic < SIZE_HVV; ic++) selfD_SpinZeroCouplings->SetHVpVpCouplings(ic, selfDHwpwpcoupl[ic][0], selfDHwpwpcoupl[ic][1], true);
   for (int ic=0; ic < SIZE_Vp; ic++) selfD_SpinZeroCouplings->SetWpcontactTerms(ic, selfDHwpcontact[ic][0], selfDHwpcontact[ic][1]);
   selfD_SpinZeroCouplings->SetUseVprime(UseVprime, M_Vprime, Ga_Vprime);
 }
