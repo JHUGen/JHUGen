@@ -675,16 +675,143 @@
 
    RETURN
    END SUBROUTINE
+   
+   
+   
+   
+FUNCTION get_ContactTerms(Hel,Intera,Fermion1,pProp)
+implicit none
+complex(dp) :: get_ContactTerms
+integer :: Hel,Fermion1,Intera
+real(dp) :: pProp(:)
 
+    if( abs(Intera).eq.abs(Z0_) .or. ( .not.distinguish_HWWcouplings .and. abs(Intera).eq.abs(Wp_) )) then
+       if( abs(Fermion1).eq.abs(ElM_) ) then
+         if( Hel.lt.0d0 ) then
+           get_ContactTerms  = ehz_L_E
+         else
+           get_ContactTerms  = ehz_R_E
+         endif
+       elseif( abs(Fermion1).eq.abs(MuM_) ) then
+         if( Hel.lt.0d0 ) then
+           get_ContactTerms  = ehz_L_M
+         else
+           get_ContactTerms  = ehz_R_M
+         endif
+       elseif( abs(Fermion1).eq.abs(TaM_) ) then
+         if( Hel.lt.0d0 ) then
+           get_ContactTerms  = ehz_L_T
+         else
+           get_ContactTerms  = ehz_R_T
+         endif
+       elseif( abs(Fermion1).eq.abs(Up_)) then
+         if( Hel.lt.0d0 ) then
+           get_ContactTerms  = ehz_L_U
+         else
+           get_ContactTerms  = ehz_R_U
+         endif
+       elseif( abs(Fermion1).eq.abs(Chm_)) then
+         if( Hel.lt.0d0 ) then
+           get_ContactTerms  = ehz_L_C
+         else
+           get_ContactTerms  = ehz_R_C
+         endif
+       elseif( abs(Fermion1).eq.abs(Dn_)  ) then
+         if( Hel.lt.0d0 ) then
+           get_ContactTerms  = ehz_L_D
+         else
+           get_ContactTerms  = ehz_R_D
+         endif
+       elseif( abs(Fermion1).eq.abs(Str_)  ) then
+         if( Hel.lt.0d0 ) then
+           get_ContactTerms  = ehz_L_S
+         else
+           get_ContactTerms  = ehz_R_S
+         endif
+       elseif( abs(Fermion1).eq.abs(Bot_) ) then
+         if( Hel.lt.0d0 ) then
+           get_ContactTerms  = ehz_L_B
+         else
+           get_ContactTerms  = ehz_R_B
+         endif
+       elseif( abs(Fermion1).eq.abs(NuE_) .or. abs(Fermion1).eq.abs(NuM_) .or. abs(Fermion1).eq.abs(NuT_) ) then
+         if( Hel.lt.0d0 ) then
+           get_ContactTerms  = ehz_L_N
+         else
+           get_ContactTerms  = ehz_R_N
+         endif
+       endif
+       
+    else
+    
+       if( abs(Fermion1).eq.abs(ElM_) ) then
+         if( Hel.lt.0d0 ) then
+           get_ContactTerms  = ehw_L_E
+         else
+           get_ContactTerms  = ehw_R_E
+         endif
+       elseif( abs(Fermion1).eq.abs(MuM_) ) then
+         if( Hel.lt.0d0 ) then
+           get_ContactTerms  = ehw_L_M
+         else
+           get_ContactTerms  = ehw_R_M
+         endif
+       elseif( abs(Fermion1).eq.abs(TaM_) ) then
+         if( Hel.lt.0d0 ) then
+           get_ContactTerms  = ehw_L_T
+         else
+           get_ContactTerms  = ehw_R_T
+         endif
+       elseif( abs(Fermion1).eq.abs(Up_) ) then
+         if( Hel.lt.0d0 ) then
+           get_ContactTerms  = ehw_L_U
+         else
+           get_ContactTerms  = ehw_R_U
+         endif
+       elseif( abs(Fermion1).eq.abs(Chm_)  ) then
+         if( Hel.lt.0d0 ) then
+           get_ContactTerms  = ehz_L_C
+         else
+           get_ContactTerms  = ehz_R_C
+         endif
+       elseif( abs(Fermion1).eq.abs(Dn_) ) then
+         if( Hel.lt.0d0 ) then
+           get_ContactTerms  = ehw_L_U
+         else
+           get_ContactTerms  = ehw_R_U
+         endif
+       elseif( abs(Fermion1).eq.abs(Str_)  ) then
+         if( Hel.lt.0d0 ) then
+           get_ContactTerms  = ehz_L_C
+         else
+           get_ContactTerms  = ehz_R_C
+         endif
+       endif
+    endif
+    
+    
+    
+    if( .not.UseVprime .and.  abs(Intera).eq.abs(Z0_) ) then
+       get_ContactTerms = get_ContactTerms/M_Z**2
+    elseif( .not.UseVprime .and.  abs(Intera).eq.abs(Wp_) ) then
+       get_ContactTerms = get_ContactTerms/M_W**2
+    else
+       get_ContactTerms = get_ContactTerms/(scr(pProp,pProp) - M_Vprime**2 + (0d0,1d0)*M_Vprime*Ga_Vprime)
+    endif
 
+RETURN
+END FUNCTION
+   
+   
+   
 subroutine getDecay_Couplings_Spinors_Props(VVMode,idordered,pordered,h3,h4, sp,pV)
    implicit none
    integer, intent(in) :: VVMode,idordered(6:9),h3,h4
    real(dp), intent(in) :: pordered(1:4,6:9)
    complex(dp), intent(out) :: sp(3:4,1:4)
    real(dp), intent(out) :: pV(3:4,1:4)
-   real(dp) :: s, aL1,aR1,aL2,aR2
-   complex(dp) :: propV(1:2)
+   real(dp) :: s
+   complex(dp) :: propV(1:2), aL1,aR1,aL2,aR2
 
    !        h3/h4 helicities: -1 == left, 1 == right
    if( VVMode.eq.ZZMode ) then
@@ -738,6 +865,22 @@ subroutine getDecay_Couplings_Spinors_Props(VVMode,idordered,pordered,h3,h4, sp,
       s = scr(pordered(:,8)+pordered(:,9),pordered(:,8)+pordered(:,9))
       propV(2) = s/dcmplx(s - M_V**2,M_V*Ga_V)
 
+
+!     adding contact terms
+      if( OnlyVVpr.gt.0 ) then
+         aL1 = 1d0/propV(1)*scr(pV(3,:),pV(3,:)) * get_ContactTerms(-1,Z0_,idordered(6),pV(3,1:4))
+         aR1 = 1d0/propV(1)*scr(pV(3,:),pV(3,:)) * get_ContactTerms(+1,Z0_,idordered(6),pV(3,1:4))
+      elseif( OnlyVVpr.lt.0 ) then
+         aL2 = 1d0/propV(2)*scr(pV(4,:),pV(4,:)) * get_ContactTerms(-1,Z0_,idordered(8),pV(4,1:4))
+         aR2 = 1d0/propV(2)*scr(pV(4,:),pV(4,:)) * get_ContactTerms(+1,Z0_,idordered(8),pV(4,1:4))
+      else
+         aL1 = aL1 + 1d0/propV(1)*scr(pV(3,:),pV(3,:)) * get_ContactTerms(-1,Z0_,idordered(6),pV(3,1:4))
+         aR1 = aR1 + 1d0/propV(1)*scr(pV(3,:),pV(3,:)) * get_ContactTerms(+1,Z0_,idordered(6),pV(3,1:4))
+         aL2 = aL2 + 1d0/propV(2)*scr(pV(4,:),pV(4,:)) * get_ContactTerms(-1,Z0_,idordered(8),pV(4,1:4))
+         aR2 = aR2 + 1d0/propV(2)*scr(pV(4,:),pV(4,:)) * get_ContactTerms(+1,Z0_,idordered(8),pV(4,1:4))
+      endif
+
+
    elseif( VVMode.eq.WWMode ) then
    !        WW DECAYS
       if( IsAQuark(idordered(6)) ) then
@@ -787,6 +930,26 @@ subroutine getDecay_Couplings_Spinors_Props(VVMode,idordered,pordered,h3,h4, sp,
       s = scr(pordered(:,8)+pordered(:,9),pordered(:,8)+pordered(:,9))
       propV(2) = s/dcmplx(s - M_V**2,M_V*Ga_V)
 
+!     adding contact terms
+      if( OnlyVVpr.gt.0 ) then
+        aL1 = 1d0/propV(1)*scr(pV(3,:),pV(3,:)) * get_ContactTerms(-1,Wp_,idordered(6),pV(3,1:4))
+        aR1 = 1d0/propV(1)*scr(pV(3,:),pV(3,:)) * get_ContactTerms(+1,Wp_,idordered(6),pV(3,1:4))
+      elseif( OnlyVVpr.lt.0 ) then
+        aL2 = 1d0/propV(2)*scr(pV(4,:),pV(4,:)) * get_ContactTerms(-1,Wp_,idordered(8),pV(4,1:4))
+        aR2 = 1d0/propV(2)*scr(pV(4,:),pV(4,:)) * get_ContactTerms(+1,Wp_,idordered(8),pV(4,1:4))
+      else
+        aL1 = aL1 + 1d0/propV(1)*scr(pV(3,:),pV(3,:)) * get_ContactTerms(-1,Wp_,idordered(6),pV(3,1:4))
+        aR1 = aR1 + 1d0/propV(1)*scr(pV(3,:),pV(3,:)) * get_ContactTerms(+1,Wp_,idordered(6),pV(3,1:4))
+        aL2 = aL2 + 1d0/propV(2)*scr(pV(4,:),pV(4,:)) * get_ContactTerms(-1,Wp_,idordered(8),pV(4,1:4))
+        aR2 = aR2 + 1d0/propV(2)*scr(pV(4,:),pV(4,:)) * get_ContactTerms(+1,Wp_,idordered(8),pV(4,1:4))
+      endif
+
+
+
+
+      
+      
+      
    elseif( VVMode.eq.ZgMode ) then
    !        Zgamma DECAYS
       if( abs(idordered(6)).eq.abs(ElM_) .or. abs(idordered(6)).eq.abs(MuM_) ) then
@@ -819,6 +982,17 @@ subroutine getDecay_Couplings_Spinors_Props(VVMode,idordered,pordered,h3,h4, sp,
       s = scr(pordered(:,6)+pordered(:,7),pordered(:,6)+pordered(:,7))
       propV(1) = s/dcmplx(s - M_V**2,M_V*Ga_V)
       propV(2)=1d0
+
+!     adding contact terms      
+      if( OnlyVVpr.gt.0 ) then
+        aL1 = 1d0/propV(1)*scr(pV(3,:),pV(3,:)) * get_ContactTerms(-1,Z0_,idordered(6),pV(3,1:4))
+        aR1 = 1d0/propV(1)*scr(pV(3,:),pV(3,:)) * get_ContactTerms(+1,Z0_,idordered(6),pV(3,1:4))
+      else
+        aL1 = aL1 + 1d0/propV(1)*scr(pV(3,:),pV(3,:)) * get_ContactTerms(-1,Z0_,idordered(6),pV(3,1:4))
+        aR1 = aR1 + 1d0/propV(1)*scr(pV(3,:),pV(3,:)) * get_ContactTerms(+1,Z0_,idordered(6),pV(3,1:4))
+      endif
+      
+      
 
    elseif( VVMode.eq.ggMode ) then
    !        gamma gamma DECAYS
@@ -869,6 +1043,7 @@ subroutine getDecay_Couplings_Spinors_Props(VVMode,idordered,pordered,h3,h4, sp,
       propV(2) = 1d0
       if( s.lt.MPhotonCutoff**2 ) propV(2)=czero
 
+      
    elseif( VVMode.eq.gsZMode ) then
    !        gamma* Z DECAYS
       if( abs(idordered(6)).eq.abs(ElM_) .or. abs(idordered(6)).eq.abs(MuM_)  ) then
@@ -921,6 +1096,8 @@ subroutine getDecay_Couplings_Spinors_Props(VVMode,idordered,pordered,h3,h4, sp,
       s = scr(pordered(:,8)+pordered(:,9),pordered(:,8)+pordered(:,9))
       propV(2) = s/dcmplx(s - M_V**2,M_V*Ga_V)
 
+     
+
    elseif( VVMode.eq.ZgsMode ) then
    !        Z gamma* DECAYS
       if( abs(idordered(6)).eq.abs(ElM_) .or. abs(idordered(6)).eq.abs(MuM_) ) then
@@ -972,6 +1149,7 @@ subroutine getDecay_Couplings_Spinors_Props(VVMode,idordered,pordered,h3,h4, sp,
       s = scr(pordered(:,8)+pordered(:,9),pordered(:,8)+pordered(:,9))
       propV(2) = 1d0 ! = s/dcmplx(s)
       if( s.lt.MPhotonCutoff**2 ) propV(2)=czero
+
 
    elseif( VVMode.eq.gsgsMode ) then
    !        gamma* gamma* DECAYS
@@ -1031,7 +1209,7 @@ subroutine getDecay_Couplings_Spinors_Props(VVMode,idordered,pordered,h3,h4, sp,
    endif
 
    sp(3,:) = sp(3,:)*propV(1)
-   sp(4,:) = sp(4,:)*propV(2)
+   sp(4,:) = sp(4,:)*propV(2)   
    if (h3.eq.-1) then
       sp(3,:) = aL1 * sp(3,:)
    elseif(h3.eq.1) then
@@ -1045,6 +1223,12 @@ subroutine getDecay_Couplings_Spinors_Props(VVMode,idordered,pordered,h3,h4, sp,
 
    return
 end subroutine
+
+
+
+
+
+
 
 subroutine getDecay_VVMode_Ordering(MY_IDUP, VVMode,ordering,ordering_swap)
    implicit none

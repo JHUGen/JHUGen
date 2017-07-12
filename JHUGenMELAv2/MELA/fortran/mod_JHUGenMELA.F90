@@ -16,7 +16,7 @@ public :: SetTopDecays
 public :: SetHDK
 public :: SetMuRenFac
 public :: ResetMubarHGabarH
-public :: SetSpinZeroVVCouplings,SetSpinZeroVVCouplings_NoGamma,SetDistinguishWWCouplingsFlag
+public :: SetSpinZeroVVCouplings,SetSpinZeroVVCouplings_NoGamma,SetDistinguishWWCouplingsFlag, SetSpinZeroContactTerms
 public :: SetSpinZeroGGCouplings,SetSpinZeroQQCouplings
 public :: SetSpinOneCouplings
 public :: SetSpinTwoCouplings
@@ -363,6 +363,58 @@ subroutine SetSpinZeroVVCouplings_NoGamma(vvcoupl, cqsq, Lambda_qsq, useWWcoupl)
    endif
    return
 end subroutine SetSpinZeroVVCouplings_NoGamma
+
+subroutine SetSpinZeroContactTerms(Hzpcontact, Hwpcontact, UseVp, M_Vp, Ga_Vp, OnlyVVp)
+  implicit none
+  complex(8), intent(in) :: Hzpcontact(18)
+  complex(8), intent(in) :: Hwpcontact(18)
+  logical, intent(in) :: UseVp
+  real(8), intent(in) :: M_Vp, Ga_Vp
+  integer :: OnlyVVp
+
+  OnlyVVpr = OnlyVVp
+  M_Vprime = M_Vp
+  Ga_Vprime = Ga_Vp
+  UseVprime = UseVp
+
+  ehz_L_E = Hzpcontact(1)
+  ehz_R_E = Hzpcontact(2)
+  ehz_L_M = Hzpcontact(3)
+  ehz_R_M = Hzpcontact(4)
+  ehz_L_T = Hzpcontact(5)
+  ehz_R_T = Hzpcontact(6)
+  ehz_L_N = Hzpcontact(7)
+  ehz_R_N = Hzpcontact(8)
+  ehz_L_U = Hzpcontact(9)
+  ehz_R_U = Hzpcontact(10)
+  ehz_L_D = Hzpcontact(11)
+  ehz_R_D = Hzpcontact(12)
+  ehz_L_C = Hzpcontact(13)
+  ehz_R_C = Hzpcontact(14)
+  ehz_L_S = Hzpcontact(15)
+  ehz_R_S = Hzpcontact(16)
+  ehz_L_B = Hzpcontact(17)
+  ehz_R_B = Hzpcontact(18)
+
+  ehw_L_E = Hwpcontact(1)
+  ehw_R_E = Hwpcontact(2)
+  ehw_L_M = Hwpcontact(3)
+  ehw_R_M = Hwpcontact(4)
+  ehw_L_T = Hwpcontact(5)
+  ehw_R_T = Hwpcontact(6)
+  !ehw_L_N = Hwpcontact(7)
+  !ehw_R_N = Hwpcontact(8)
+  ehw_L_U = Hwpcontact(9)
+  ehw_R_U = Hwpcontact(10)
+  !ehw_L_D = Hwpcontact(11)
+  !ehw_R_D = Hwpcontact(12)
+  ehw_L_C = Hwpcontact(13)
+  ehw_R_C = Hwpcontact(14)
+  !ehw_L_S = Hwpcontact(15)
+  !ehw_R_S = Hwpcontact(16)
+  !ehw_L_B = Hwpcontact(17)
+  !ehw_R_B = Hwpcontact(18)
+end subroutine
 
 subroutine SetDistinguishWWCouplingsFlag(doAllow)
    implicit none

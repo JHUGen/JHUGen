@@ -406,6 +406,13 @@ double TEvtProb::XsecCalc_XVV(
     double HvvLambda_qsq[SIZE_HVV_LAMBDAQSQ][SIZE_HVV_CQSQ] ={ { 0 } };
     int HvvCLambda_qsq[SIZE_HVV_CQSQ] ={ 0 };
 
+    double Hzpcontact[SIZE_Vp][2] = { { 0 } };
+    double Hwpcontact[SIZE_Vp][2] = { { 0 } };
+    bool UseVprime = 0;
+    double M_Vprime = 10000;
+    double Ga_Vprime = 100;
+    int OnlyVVpr = 0;
+
     double Zqqcoupl[SIZE_ZQQ][2] ={ { 0 } };
     double Zvvcoupl[SIZE_ZVV][2] ={ { 0 } };
 
@@ -493,6 +500,15 @@ double TEvtProb::XsecCalc_XVV(
           cout << "HvvCLambda_qsq[" << j << "] = " << (selfDSpinZeroCoupl.HzzCLambda_qsq)[j] << endl;
         }
       }
+      for (int j=0; j<2; j++){
+        for (int i=0; i<SIZE_Vp; i++) Hzpcontact[i][j] = (selfDSpinZeroCoupl.Hzpcontact)[i][j];
+        for (int i=0; i<SIZE_Vp; i++) Hwpcontact[i][j] = (selfDSpinZeroCoupl.Hwpcontact)[i][j];
+      }
+      UseVprime = selfDSpinZeroCoupl.UseVprime;
+      M_Vprime = selfDSpinZeroCoupl.M_Vprime;
+      Ga_Vprime = selfDSpinZeroCoupl.Ga_Vprime;
+      OnlyVVpr = selfDSpinZeroCoupl.OnlyVVpr;
+      isSpinZero;
       isSpinZero = true;
     }
 
@@ -592,6 +608,7 @@ double TEvtProb::XsecCalc_XVV(
     if (isSpinZero){
       SetJHUGenSpinZeroGGCouplings(Hggcoupl);
       SetJHUGenSpinZeroVVCouplings(Hvvcoupl, HvvCLambda_qsq, HvvLambda_qsq, false);
+      SetJHUGenSpinZeroContactTerms(Hzpcontact, Hwpcontact, UseVprime, M_Vprime, Ga_Vprime, OnlyVVpr);
     }
     else if (isSpinOne) SetJHUGenSpinOneCouplings(Zqqcoupl, Zvvcoupl);
     else if (isSpinTwo) SetJHUGenSpinTwoCouplings(Gggcoupl, Gvvcoupl, Gqqcoupl);
@@ -699,6 +716,12 @@ double TEvtProb::XsecCalcXJJ(
       double HwwLambda_qsq[SIZE_HVV_LAMBDAQSQ][SIZE_HVV_CQSQ] ={ { 0 } };
       int HzzCLambda_qsq[SIZE_HVV_CQSQ] ={ 0 };
       int HwwCLambda_qsq[SIZE_HVV_CQSQ] ={ 0 };
+      double Hzpcontact[SIZE_Vp][2] = { { 0 } };
+      double Hwpcontact[SIZE_Vp][2] = { { 0 } };
+      bool UseVprime = 0;
+      double M_Vprime = 10000;
+      double Ga_Vprime = 100;
+      int OnlyVVpr = 0;
 
       for (int ic=0; ic<SIZE_HVV_LAMBDAQSQ; ic++){ for (int ik=0; ik<SIZE_HVV_CQSQ; ik++){ HzzLambda_qsq[ic][ik]=100.; HwwLambda_qsq[ic][ik]=100.; } }
       SetJHUGenDistinguishWWCouplings(false);
@@ -714,6 +737,14 @@ double TEvtProb::XsecCalcXJJ(
       else if (process == TVar::H0_gsgs_PS){ Hzzcoupl[gHIGGS_AA_4][0] = 1.; }
       else if (process == TVar::SelfDefine_spin0){
         for (int i=0; i<SIZE_HVV; i++){ for (int j=0; j<2; j++){ Hzzcoupl[i][j] = (selfDSpinZeroCoupl.Hzzcoupl)[i][j]; Hwwcoupl[i][j] = (selfDSpinZeroCoupl.Hwwcoupl)[i][j]; } }
+        for (int j=0; j<2; j++){
+          for (int i=0; i<SIZE_Vp; i++) Hzpcontact[i][j] = (selfDSpinZeroCoupl.Hzpcontact)[i][j];
+          for (int i=0; i<SIZE_Vp; i++) Hwpcontact[i][j] = (selfDSpinZeroCoupl.Hwpcontact)[i][j];
+        }
+        UseVprime = selfDSpinZeroCoupl.UseVprime;
+        M_Vprime = selfDSpinZeroCoupl.M_Vprime;
+        Ga_Vprime = selfDSpinZeroCoupl.Ga_Vprime;
+        OnlyVVpr = selfDSpinZeroCoupl.OnlyVVpr;
         for (int j=0; j<SIZE_HVV_CQSQ; j++){
           for (int i=0; i<SIZE_HVV_LAMBDAQSQ; i++){ HzzLambda_qsq[i][j] = (selfDSpinZeroCoupl.HzzLambda_qsq)[i][j]; HwwLambda_qsq[i][j] = (selfDSpinZeroCoupl.HwwLambda_qsq)[i][j]; }
           HzzCLambda_qsq[j] = (selfDSpinZeroCoupl.HzzCLambda_qsq)[j]; HwwCLambda_qsq[j] = (selfDSpinZeroCoupl.HwwCLambda_qsq)[j];
@@ -722,6 +753,7 @@ double TEvtProb::XsecCalcXJJ(
       }
       SetJHUGenSpinZeroVVCouplings(Hzzcoupl, HzzCLambda_qsq, HzzLambda_qsq, false);
       SetJHUGenSpinZeroVVCouplings(Hwwcoupl, HwwCLambda_qsq, HwwLambda_qsq, true); // Set the WW couplings regardless of SetJHUGenDistinguishWWCouplings(false/true) because of how JHUGen handles this true flag.
+      SetJHUGenSpinZeroContactTerms(Hzpcontact, Hwpcontact, UseVprime, M_Vprime, Ga_Vprime, OnlyVVpr);
     }
 
     dXsec = HJJMatEl(process, production, matrixElement, &event_scales, &RcdME, EBEAM, verbosity);
@@ -793,6 +825,12 @@ double TEvtProb::XsecCalc_VX(
     double Hvvcoupl[SIZE_HVV][2] ={ { 0 } };
     double HvvLambda_qsq[SIZE_HVV_LAMBDAQSQ][SIZE_HVV_CQSQ] ={ { 0 } };
     int HvvCLambda_qsq[SIZE_HVV_CQSQ] ={ 0 };
+    double Hzpcontact[SIZE_Vp][2] = { { 0 } };
+    double Hwpcontact[SIZE_Vp][2] = { { 0 } };
+    bool UseVprime = 0;
+    double M_Vprime = 10000;
+    double Ga_Vprime = 100;
+    int OnlyVVpr = 0;
 
     for (int ic=0; ic<SIZE_HVV_LAMBDAQSQ; ic++){ for (int ik=0; ik<SIZE_HVV_CQSQ; ik++) HvvLambda_qsq[ic][ik]=100.; }
 
@@ -807,12 +845,21 @@ double TEvtProb::XsecCalc_VX(
     else if (process == TVar::H0_gsgs_PS) Hvvcoupl[gHIGGS_AA_4][0] = 1.;
     else if (process == TVar::SelfDefine_spin0){
       for (int i=0; i<SIZE_HVV; i++){ for (int j=0; j<2; j++) Hvvcoupl[i][j] = (selfDSpinZeroCoupl.Hzzcoupl)[i][j]; }
+      for (int j=0; j<2; j++){
+        for (int i=0; i<SIZE_Vp; i++) Hzpcontact[i][j] = (selfDSpinZeroCoupl.Hzpcontact)[i][j];
+        for (int i=0; i<SIZE_Vp; i++) Hwpcontact[i][j] = (selfDSpinZeroCoupl.Hwpcontact)[i][j];
+      }
+      UseVprime = selfDSpinZeroCoupl.UseVprime;
+      M_Vprime = selfDSpinZeroCoupl.M_Vprime;
+      Ga_Vprime = selfDSpinZeroCoupl.Ga_Vprime;
+      OnlyVVpr = selfDSpinZeroCoupl.OnlyVVpr;
       for (int j=0; j<SIZE_HVV_CQSQ; j++){
         for (int i=0; i<SIZE_HVV_LAMBDAQSQ; i++) HvvLambda_qsq[i][j] = (selfDSpinZeroCoupl.HzzLambda_qsq)[i][j];
         HvvCLambda_qsq[j] = (selfDSpinZeroCoupl.HzzCLambda_qsq)[j];
       }
     }
     SetJHUGenSpinZeroVVCouplings(Hvvcoupl, HvvCLambda_qsq, HvvLambda_qsq, false);
+    SetJHUGenSpinZeroContactTerms(Hzpcontact, Hwpcontact, UseVprime, M_Vprime, Ga_Vprime, OnlyVVpr);
 
     dXsec = VHiggsMatEl(process, production, matrixElement, &event_scales, &RcdME, EBEAM, includeHiggsDecay, verbosity);
     if (verbosity >= TVar::DEBUG) std::cout << "TEVtProb::XsecCalc_VX: Process " << TVar::ProcessName(process) << " dXsec=" << dXsec << endl;
