@@ -239,10 +239,12 @@ extern "C" {
     double gh2w1_prime7[2]; double gh2w2_prime7[2]; double gh2w3_prime7[2]; double gh2w4_prime7[2]; // |q1**2| * |q2**2|
 
     //contact terms
-    double ehz_L_E[2], ehz_R_E[2], ehz_L_M[2], ehz_R_M[2], ehz_L_T[2], ehz_R_T[2], ehz_L_N[2], ehz_R_N[2];
-    double ehz_L_U[2], ehz_R_U[2], ehz_L_C[2], ehz_R_C[2], ehz_L_D[2], ehz_R_D[2], ehz_L_S[2], ehz_R_S[2], ehz_L_B[2], ehz_R_B[2];
-    double ehw_L_U[2], ehw_R_U[2], ehw_L_C[2], ehw_R_C[2], ehw_L_E[2], ehw_R_E[2], ehw_L_M[2], ehw_R_M[2], ehw_L_T[2], ehw_R_T[2];
-    int UseVprime, OnlyVVpr;
+    double ghzzp1[2], ghzpzp1[2];
+    double ghwwp1[2], ghwpwp1[2];
+    double ezp_L_E[2], ezp_R_E[2], ezp_L_M[2], ezp_R_M[2], ezp_L_T[2], ezp_R_T[2], ezp_L_N[2], ezp_R_N[2];
+    double ezp_L_U[2], ezp_R_U[2], ezp_L_C[2], ezp_R_C[2], ezp_L_D[2], ezp_R_D[2], ezp_L_S[2], ezp_R_S[2], ezp_L_B[2], ezp_R_B[2];
+    double ewp_L_U[2], ewp_R_U[2], ewp_L_C[2], ewp_R_C[2], ewp_L_E[2], ewp_R_E[2], ewp_L_M[2], ewp_R_M[2], ewp_L_T[2], ewp_R_T[2];
+    int UseVprime;
     double M_Vprime, Ga_Vprime;
 
   } spinzerohiggs_anomcoupl_;

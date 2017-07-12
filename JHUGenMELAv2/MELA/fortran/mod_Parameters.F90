@@ -10,7 +10,7 @@ character(len=6),parameter :: JHUGen_Version="v7.0.3"
 !internal
 integer, public, parameter :: dp = selected_real_kind(15)
 real(8), public, parameter :: tol = 0.0000001d0
-integer, public, parameter :: ZZMode=00,ZgsMode=01,gsZMode=02,gsgsMode=03
+integer, public, parameter :: ZZMode=00,ZgsMode=01,gsZMode=02,gsgsMode=03,ZZpMode=04,ZpZMode=05,ZpZpMode=06
 integer, public, parameter :: WWMode=10
 integer, public, parameter :: ggMode=20
 integer, public, parameter :: ZgMode=30,gsgMode=31
@@ -131,6 +131,7 @@ real(8), public :: Rjet = -1d0                                ! jet deltaR, anti
 real(8), public :: mJJcut = 0d0*GeV                           ! minimum mJJ for VBF, HJJ, bbH, VH
 real(8), public :: m4l_minmax(1:2) = (/ -1d0,-1d0 /)*GeV      ! min and max for m_4l in off-shell VBF production;   default is (-1,-1): m_4l ~ Higgs resonance (on-shell)
 logical, public :: includeGammaStar = .false.                 ! include offshell photons?
+logical, public :: includeVprime = .false.
 real(8), public :: MPhotonCutoff = 4d0*GeV                    ! minimum |mass| for offshell photons when includeGammaStar = .true.
 !=====================================================
 
@@ -294,37 +295,40 @@ real(8), public, parameter :: Lambda  = 1000d0    *GeV      ! Lambda coupling en
 
 !-- HVV contact terms
    logical, public :: UseVprime=.false.  ! false: contact interaction,  true: heavy Zprime propagator
-   integer, public :: OnlyVVpr = 0       ! +1=only contact term for decay1, -1=only contact term for decay2, 0=all terms
-   complex(8), public :: ehz_L_E  = (0.00d0,0d0)
-   complex(8), public :: ehz_R_E  = (0.00d0,0d0)
-   complex(8), public :: ehz_L_M  = (0.00d0,0d0)
-   complex(8), public :: ehz_R_M  = (0.00d0,0d0)
-   complex(8), public :: ehz_L_T  = (0.00d0,0d0)
-   complex(8), public :: ehz_R_T  = (0.00d0,0d0)
-   complex(8), public :: ehz_L_U  = (0.00d0,0d0)
-   complex(8), public :: ehz_R_U  = (0.00d0,0d0)
-   complex(8), public :: ehz_L_C  = (0.00d0,0d0)
-   complex(8), public :: ehz_R_C  = (0.00d0,0d0)
-   complex(8), public :: ehz_L_D  = (0.00d0,0d0)
-   complex(8), public :: ehz_R_D  = (0.00d0,0d0)
-   complex(8), public :: ehz_L_S  = (0.00d0,0d0)
-   complex(8), public :: ehz_R_S  = (0.00d0,0d0)
-   complex(8), public :: ehz_L_B  = (0.00d0,0d0)
-   complex(8), public :: ehz_R_B  = (0.00d0,0d0)
-   complex(8), public :: ehz_L_N  = (0.00d0,0d0)
-   complex(8), public :: ehz_R_N  = (0.00d0,0d0)
+   complex(8), public :: ghzzp1 = (0.00d0,0d0)
+   complex(8), public :: ghzpzp1 = (0.00d0,0d0)
+   complex(8), public :: ezp_L_E  = (0.00d0,0d0)
+   complex(8), public :: ezp_R_E  = (0.00d0,0d0)
+   complex(8), public :: ezp_L_M  = (0.00d0,0d0)
+   complex(8), public :: ezp_R_M  = (0.00d0,0d0)
+   complex(8), public :: ezp_L_T  = (0.00d0,0d0)
+   complex(8), public :: ezp_R_T  = (0.00d0,0d0)
+   complex(8), public :: ezp_L_U  = (0.00d0,0d0)
+   complex(8), public :: ezp_R_U  = (0.00d0,0d0)
+   complex(8), public :: ezp_L_C  = (0.00d0,0d0)
+   complex(8), public :: ezp_R_C  = (0.00d0,0d0)
+   complex(8), public :: ezp_L_D  = (0.00d0,0d0)
+   complex(8), public :: ezp_R_D  = (0.00d0,0d0)
+   complex(8), public :: ezp_L_S  = (0.00d0,0d0)
+   complex(8), public :: ezp_R_S  = (0.00d0,0d0)
+   complex(8), public :: ezp_L_B  = (0.00d0,0d0)
+   complex(8), public :: ezp_R_B  = (0.00d0,0d0)
+   complex(8), public :: ezp_L_N  = (0.00d0,0d0)
+   complex(8), public :: ezp_R_N  = (0.00d0,0d0)
 !--
 !-- HWW couplings are only used if distinguish_HWWcouplings=.true.
-   complex(8), public :: ehw_L_E  = (0.00d0,0d0)
-   complex(8), public :: ehw_R_E  = (0.00d0,0d0)
-   complex(8), public :: ehw_L_M  = (0.00d0,0d0)
-   complex(8), public :: ehw_R_M  = (0.00d0,0d0)
-   complex(8), public :: ehw_L_T  = (0.00d0,0d0)
-   complex(8), public :: ehw_R_T  = (0.00d0,0d0)
-   complex(8), public :: ehw_L_U  = (0.00d0,0d0)
-   complex(8), public :: ehw_R_U  = (0.00d0,0d0)
-   complex(8), public :: ehw_L_C  = (0.00d0,0d0)
-   complex(8), public :: ehw_R_C  = (0.00d0,0d0)
+   complex(8), public :: ghwwp1 = (0.00d0,0d0)
+   complex(8), public :: ghwpwp1 = (0.00d0,0d0)
+   complex(8), public :: ewp_L_E  = (0.00d0,0d0)
+   complex(8), public :: ewp_R_E  = (0.00d0,0d0)
+   complex(8), public :: ewp_L_M  = (0.00d0,0d0)
+   complex(8), public :: ewp_R_M  = (0.00d0,0d0)
+   complex(8), public :: ewp_L_T  = (0.00d0,0d0)
+   complex(8), public :: ewp_R_T  = (0.00d0,0d0)
+   complex(8), public :: ewp_L_U  = (0.00d0,0d0)
+   complex(8), public :: ewp_R_U  = (0.00d0,0d0)
+   complex(8), public :: ewp_L_C  = (0.00d0,0d0)
+   complex(8), public :: ewp_R_C  = (0.00d0,0d0)
 !--   
    real(8), public :: M_Vprime  = 10000d0*GeV
    real(8), public :: Ga_Vprime = 100d0*GeV
@@ -743,6 +747,38 @@ logical :: computeQsqCompundCoupl
          vvcoupl(1) = ghgsgs4
          lambda_v = 1d0 ! Not present
          lambda_v120 = (/ Lambda_z41, Lambda_z42, Lambda_z40 /)
+      elseif(index.eq.12) then
+         vvcoupl(1) = ghzzp1
+         lambda_v = 1d0 ! Not present
+         lambda_v120 = (/ Lambda_z11, Lambda_z12, Lambda_z10 /)
+      elseif(index.eq.13) then
+         !zero
+         lambda_v = 1d0 ! Not present
+         lambda_v120 = (/ Lambda_z11, Lambda_z12, Lambda_z10 /)
+      elseif(index.eq.14) then
+         !zero
+         lambda_v = 1d0 ! Not present
+         lambda_v120 = (/ Lambda_z11, Lambda_z12, Lambda_z10 /)
+      elseif(index.eq.15) then
+         !zero
+         lambda_v = 1d0 ! Not present
+         lambda_v120 = (/ Lambda_z11, Lambda_z12, Lambda_z10 /)
+      elseif(index.eq.16) then
+         vvcoupl(1) = ghzpzp1
+         lambda_v = 1d0 ! Not present
+         lambda_v120 = (/ Lambda_z11, Lambda_z12, Lambda_z10 /)
+      elseif(index.eq.17) then
+         !zero
+         lambda_v = 1d0 ! Not present
+         lambda_v120 = (/ Lambda_z11, Lambda_z12, Lambda_z10 /)
+      elseif(index.eq.18) then
+         !zero
+         lambda_v = 1d0 ! Not present
+         lambda_v120 = (/ Lambda_z11, Lambda_z12, Lambda_z10 /)
+      elseif(index.eq.19) then
+         !zero
+         lambda_v = 1d0 ! Not present
+         lambda_v120 = (/ Lambda_z11, Lambda_z12, Lambda_z10 /)
       endif
    else
       if(cw_q1sq.ne.0) sWplus_signed=abs(sWplus)*dble(sign(1,cw_q1sq))
@@ -1761,17 +1797,17 @@ end subroutine ComputeQCDVariables
 
 !ReadCommandLineArgument is overloaded.  Pass the type needed as "dest"
 !success is set to true if the argument passed matches argumentname, otherwise it's left alone
-!same for success2 and success3 (optional, can be used for other things, see main.F90)
+!same for success2, success3, and success4 (optional, can be used for other things, see main.F90)
 !SetLastArgument (optional) is set to true if the argument matches, otherwise it's set to false
 !for examples of all of them see main.F90
 
-subroutine ReadCommandLineArgument_logical(argument, argumentname, success, dest, SetLastArgument, success2, success3)
+subroutine ReadCommandLineArgument_logical(argument, argumentname, success, dest, SetLastArgument, success2, success3, success4)
 implicit none
 character(len=*) :: argument, argumentname
 logical, intent(inout) :: dest
 logical, intent(inout) :: success
 integer :: length
-logical, optional, intent(inout) :: SetLastArgument, success2, success3
+logical, optional, intent(inout) :: SetLastArgument, success2, success3, success4
 integer :: temp_int
 character(len=*), parameter :: numbers = "0123456789"
 
@@ -1785,12 +1821,14 @@ character(len=*), parameter :: numbers = "0123456789"
         if (present(SetLastArgument)) SetLastArgument=.true.
         if (present(success2)) success2=.true.
         if (present(success3)) success3=.true.
+        if (present(success4)) success4=.true.
     elseif( trim(argument).eq."No"//trim(argumentname) ) then
         dest=.false.
         success=.true.
         if (present(SetLastArgument)) SetLastArgument=.true.
         if (present(success2)) success2=.true.
         if (present(success3)) success3=.true.
+        if (present(success4)) success4=.true.
     elseif( argument(1:length+1) .eq. trim(argumentname)//"=" ) then
         if( Index(numbers, argument(length+2:length+2)) .ne. 0 ) then
             read(argument(length+2:len(argument)), *) temp_int
@@ -1799,24 +1837,26 @@ character(len=*), parameter :: numbers = "0123456789"
             if (present(SetLastArgument)) SetLastArgument=.true.
             if (present(success2)) success2=.true.
             if (present(success3)) success3=.true.
+            if (present(success4)) success4=.true.
         else
             read(argument(length+2:len(argument)), *) dest
             success=.true.
             if (present(SetLastArgument)) SetLastArgument=.true.
             if (present(success2)) success2=.true.
             if (present(success3)) success3=.true.
+            if (present(success4)) success4=.true.
         endif
     endif
 
 end subroutine ReadCommandLineArgument_logical
 
 
-subroutine ReadCommandLineArgument_integer(argument, argumentname, success, dest, SetLastArgument, success2, success3)
+subroutine ReadCommandLineArgument_integer(argument, argumentname, success, dest, SetLastArgument, success2, success3, success4)
 implicit none
 character(len=*) :: argument, argumentname
 integer, intent(inout) :: dest
 logical, intent(inout) :: success
-logical, optional, intent(inout) :: SetLastArgument, success2, success3
+logical, optional, intent(inout) :: SetLastArgument, success2, success3, success4
 integer :: length
 
     if (present(SetLastArgument)) SetLastArgument=.false.
@@ -1829,17 +1869,18 @@ integer :: length
         if (present(SetLastArgument)) SetLastArgument=.true.
         if (present(success2)) success2=.true.
         if (present(success3)) success3=.true.
+        if (present(success4)) success4=.true.
     endif
 
 end subroutine ReadCommandLineArgument_integer
 
 
-subroutine ReadCommandLineArgument_real8(argument, argumentname, success, dest, SetLastArgument, success2, success3)
+subroutine ReadCommandLineArgument_real8(argument, argumentname, success, dest, SetLastArgument, success2, success3, success4)
 implicit none
 character(len=*) :: argument, argumentname
 real(8), intent(inout) :: dest
 logical, intent(inout) :: success
-logical, optional, intent(inout) :: SetLastArgument, success2, success3
+logical, optional, intent(inout) :: SetLastArgument, success2, success3, success4
 integer :: length
 
     if (present(SetLastArgument)) SetLastArgument=.false.
@@ -1852,18 +1893,19 @@ integer :: length
         if (present(SetLastArgument)) SetLastArgument=.true.
         if (present(success2)) success2=.true.
         if (present(success3)) success3=.true.
+        if (present(success4)) success4=.true.
     endif
 
 end subroutine ReadCommandLineArgument_real8
 
 
-subroutine ReadCommandLineArgument_complex8(argument, argumentname, success, dest, SetLastArgument, success2, success3)
+subroutine ReadCommandLineArgument_complex8(argument, argumentname, success, dest, SetLastArgument, success2, success3, success4)
 implicit none
 character(len=*) :: argument, argumentname
 complex(8), intent(inout) :: dest
 real(8) :: re, im
 logical, intent(inout) :: success
-logical, optional, intent(inout) :: SetLastArgument, success2, success3
+logical, optional, intent(inout) :: SetLastArgument, success2, success3, success4
 integer :: length
 
     if (present(SetLastArgument)) SetLastArgument=.false.
@@ -1886,17 +1928,18 @@ integer :: length
         if (present(SetLastArgument)) SetLastArgument=.true.
         if (present(success2)) success2=.true.
         if (present(success3)) success3=.true.
+        if (present(success4)) success4=.true.
     endif
 
 end subroutine ReadCommandLineArgument_complex8
 
 
-subroutine ReadCommandLineArgument_string(argument, argumentname, success, dest, SetLastArgument, success2, success3)
+subroutine ReadCommandLineArgument_string(argument, argumentname, success, dest, SetLastArgument, success2, success3, success4)
 implicit none
 character(len=*) :: argument, argumentname
 character(len=*), intent(inout) :: dest
 logical, intent(inout) :: success
-logical, optional, intent(inout) :: SetLastArgument, success2, success3
+logical, optional, intent(inout) :: SetLastArgument, success2, success3, success4
 integer :: length
 
     if (present(SetLastArgument)) SetLastArgument=.false.
@@ -1913,6 +1956,7 @@ integer :: length
         if (present(SetLastArgument)) SetLastArgument=.true.
         if (present(success2)) success2=.true.
         if (present(success3)) success3=.true.
+        if (present(success4)) success4=.true.
     endif
 
 end subroutine ReadCommandLineArgument_string

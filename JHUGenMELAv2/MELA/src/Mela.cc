@@ -262,10 +262,18 @@ void Mela::reset_SelfDCouplings(){
 
   //contact terms
   for (int im=0; im<2; im++){
-    for (int ic=0; ic<SIZE_Vp; ic++) selfDHzpcontact[ic][im] = 0;
-    for (int ic=0; ic<SIZE_Vp; ic++) selfDHwpcontact[ic][im] = 0;
+    for (int ic=0; ic<SIZE_HVV; ic++){
+      selfDHzzpcoupl[ic][im] = 0;
+      selfDHzpzpcoupl[ic][im] = 0;
+      selfDHwwpcoupl[ic][im] = 0;
+      selfDHwpwpcoupl[ic][im] = 0;
+    }
+    for (int ic=0; ic<SIZE_Vp; ic++) {
+      selfDHzpcontact[ic][im] = 0;
+      selfDHwpcontact[ic][im] = 0;
+    }
   }
-  selfDUseVprime = selfDOnlyVVpr = 0;
+  selfDUseVprime = 0;
   selfDM_Vprime = 10000;
   selfDGa_Vprime = 100;
 
@@ -528,12 +536,15 @@ void Mela::computeP(
             differentiate_HWW_HZZ
             );
           ZZME->set_SpinZeroContact(
+            selfDHzzpcoupl,
+            selfDHzpzpcoupl,
             selfDHzpcontact,
+            selfDHwwpcoupl,
+            selfDHwpwpcoupl,
             selfDHwpcontact,
             selfDUseVprime,
             selfDM_Vprime,
-            selfDGa_Vprime,
-            selfDOnlyVVpr
+            selfDGa_Vprime
             );
         }
         else if (myModel_ == TVar::SelfDefine_spin1) ZZME->set_SpinOneCouplings(selfDZqqcoupl, selfDZvvcoupl);
@@ -748,7 +759,6 @@ void Mela::computeProdDecP(
   float& prob,
   bool useConstant
   ){
-  //remove this line, it's here for counting purposes.  Hzpcontact
   for (int jh=0; jh<(int)nSupportedHiggses; jh++){
     for (int im=0; im<2; im++){
       for (int ic=0; ic<SIZE_HVV; ic++){
@@ -811,12 +821,15 @@ void Mela::computeProdDecP(
       differentiate_HWW_HZZ
       );
     ZZME->set_SpinZeroContact(
+      selfDHzzpcoupl,
+      selfDHzpzpcoupl,
       selfDHzpcontact,
+      selfDHwwpcoupl,
+      selfDHwpwpcoupl,
       selfDHwpcontact,
       selfDUseVprime,
       selfDM_Vprime,
-      selfDGa_Vprime,
-      selfDOnlyVVpr
+      selfDGa_Vprime
       );
     ZZME->computeProdXS_VVHVV(
       myModel_, myME_, myProduction_,
@@ -842,7 +855,6 @@ void Mela::computeProdP(
   for (int jh=0; jh<(int)nSupportedHiggses; jh++){
     for (int im=0; im<2; im++){
       for (int ic=0; ic<SIZE_HVV; ic++){
-  //remove this line, it's here for counting purposes.  Hzpcontact
         selfDHzzcoupl[jh][ic][im] = selfDHvvcoupl_input[jh][ic][im];
         selfDHwwcoupl[jh][ic][im] = selfDHwwcoupl_input[jh][ic][im]; // Just for extra protection since differentiate_HWW_HZZ is set to false.
       }
@@ -936,12 +948,15 @@ void Mela::computeProdP(
             differentiate_HWW_HZZ
             );
           ZZME->set_SpinZeroContact(
+            selfDHzzpcoupl,
+            selfDHzpzpcoupl,
             selfDHzpcontact,
+            selfDHwwpcoupl,
+            selfDHwpwpcoupl,
             selfDHwpcontact,
             selfDUseVprime,
             selfDM_Vprime,
-            selfDGa_Vprime,
-            selfDOnlyVVpr
+            selfDGa_Vprime
             );
         }
         ZZME->computeProdXS_JJH(
@@ -988,12 +1003,15 @@ void Mela::computeProdP(
               differentiate_HWW_HZZ
               );
             ZZME->set_SpinZeroContact(
+              selfDHzzpcoupl,
+              selfDHzpzpcoupl,
               selfDHzpcontact,
+              selfDHwwpcoupl,
+              selfDHwpwpcoupl,
               selfDHwpcontact,
               selfDUseVprime,
               selfDM_Vprime,
-              selfDGa_Vprime,
-              selfDOnlyVVpr
+              selfDGa_Vprime
               );
             ZZME->computeProdXS_JJH(
               myModel_, myME_, myProduction_,
@@ -1072,12 +1090,15 @@ void Mela::computeProdP(
                   differentiate_HWW_HZZ
                   );
                 ZZME->set_SpinZeroContact(
+                  selfDHzzpcoupl,
+                  selfDHzpzpcoupl,
                   selfDHzpcontact,
+                  selfDHwwpcoupl,
+                  selfDHwpwpcoupl,
                   selfDHwpcontact,
                   selfDUseVprime,
                   selfDM_Vprime,
-                  selfDGa_Vprime,
-                  selfDOnlyVVpr
+                  selfDGa_Vprime
                   );
               }
               ZZME->computeProdXS_JJH(
@@ -1153,12 +1174,15 @@ void Mela::computeProdP(
               differentiate_HWW_HZZ
               );
             ZZME->set_SpinZeroContact(
+              selfDHzzpcoupl,
+              selfDHzpzpcoupl,
               selfDHzpcontact,
+              selfDHwwpcoupl,
+              selfDHwpwpcoupl,
               selfDHwpcontact,
               selfDUseVprime,
               selfDM_Vprime,
-              selfDGa_Vprime,
-              selfDOnlyVVpr
+              selfDGa_Vprime
               );
           }
           ZZME->computeProdXS_JJH(
@@ -1237,12 +1261,15 @@ void Mela::computeProdP_VH(
           differentiate_HWW_HZZ
           );
         ZZME->set_SpinZeroContact(
+          selfDHzzpcoupl,
+          selfDHzpzpcoupl,
           selfDHzpcontact,
+          selfDHwwpcoupl,
+          selfDHwpwpcoupl,
           selfDHwpcontact,
           selfDUseVprime,
           selfDM_Vprime,
-          selfDGa_Vprime,
-          selfDOnlyVVpr
+          selfDGa_Vprime
           );
       }
       ZZME->computeProdXS_VH(
@@ -1292,12 +1319,15 @@ void Mela::computeProdP_ttH(
         differentiate_HWW_HZZ
         );
       ZZME->set_SpinZeroContact(
+        selfDHzzpcoupl,
+        selfDHzpzpcoupl,
         selfDHzpcontact,
+        selfDHwwpcoupl,
+        selfDHwpwpcoupl,
         selfDHwpcontact,
         selfDUseVprime,
         selfDM_Vprime,
-        selfDGa_Vprime,
-        selfDOnlyVVpr
+        selfDGa_Vprime
         );
     }
     ZZME->computeProdXS_ttH(
