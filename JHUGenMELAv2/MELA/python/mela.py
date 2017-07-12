@@ -291,7 +291,11 @@ class Mela(object):
                ("selfDHwwLambda_qsq", (nSupportedHiggses, ROOT.py_SIZE_HVV_LAMBDAQSQ, ROOT.py_SIZE_HVV_CQSQ)),
                ("selfDHzzCLambda_qsq", (nSupportedHiggses, ROOT.py_SIZE_HVV_CQSQ)),
                ("selfDHwwCLambda_qsq", (nSupportedHiggses, ROOT.py_SIZE_HVV_CQSQ)),
+               ("selfDHzzpcoupl", (ROOT.py_SIZE_HVV, 2)),
+               ("selfDHzpzpcoupl", (ROOT.py_SIZE_HVV, 2)),
                ("selfDHzpcontact", (ROOT.py_SIZE_Vp, 2)),
+               ("selfDHwwpcoupl", (ROOT.py_SIZE_HVV, 2)),
+               ("selfDHwpwpcoupl", (ROOT.py_SIZE_HVV, 2)),
                ("selfDHwpcontact", (ROOT.py_SIZE_Vp, 2)),
                ("selfDZqqcoupl", (ROOT.py_SIZE_ZQQ, 2)),
                ("selfDZvvcoupl", (ROOT.py_SIZE_ZVV, 2)),
@@ -514,35 +518,39 @@ class Mela(object):
   kappa = SelfDCoupling("selfDHqqcoupl", 0, ROOT.py_gHIGGS_KAPPA)
   kappa_tilde = SelfDCoupling("selfDHqqcoupl", 0, ROOT.py_gHIGGS_KAPPA_TILDE)
 
-  ehz_L_E = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_L_E)
-  ehz_R_E = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_R_E)
-  ehz_L_M = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_L_M)
-  ehz_R_M = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_R_M)
-  ehz_L_T = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_L_T)
-  ehz_R_T = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_R_T)
-  ehz_L_N = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_L_N)
-  ehz_R_N = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_R_N)
-  ehz_L_U = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_L_U)
-  ehz_R_U = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_R_U)
-  ehz_L_D = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_L_D)
-  ehz_R_D = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_R_D)
-  ehz_L_S = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_L_S)
-  ehz_R_S = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_R_S)
-  ehz_L_C = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_L_C)
-  ehz_R_C = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_R_C)
-  ehz_L_B = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_L_B)
-  ehz_R_B = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_R_B)
+  ghzzp1 = SelfDCoupling("selfDHzzpcoupl", ROOT.py_gHIGGS_VV_1)
+  ghzpzp1 = SelfDCoupling("selfDHzpzpcoupl", ROOT.py_gHIGGS_VV_1)
+  ezp_L_E = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_L_E)
+  ezp_R_E = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_R_E)
+  ezp_L_M = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_L_M)
+  ezp_R_M = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_R_M)
+  ezp_L_T = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_L_T)
+  ezp_R_T = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_R_T)
+  ezp_L_N = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_L_N)
+  ezp_R_N = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_R_N)
+  ezp_L_U = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_L_U)
+  ezp_R_U = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_R_U)
+  ezp_L_D = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_L_D)
+  ezp_R_D = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_R_D)
+  ezp_L_S = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_L_S)
+  ezp_R_S = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_R_S)
+  ezp_L_C = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_L_C)
+  ezp_R_C = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_R_C)
+  ezp_L_B = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_L_B)
+  ezp_R_B = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_R_B)
 
-  ehw_L_E = SelfDCoupling("selfDHwpcontact", ROOT.py_gHIGGS_Vp_L_E)
-  ehw_R_E = SelfDCoupling("selfDHwpcontact", ROOT.py_gHIGGS_Vp_R_E)
-  ehw_L_M = SelfDCoupling("selfDHwpcontact", ROOT.py_gHIGGS_Vp_L_M)
-  ehw_R_M = SelfDCoupling("selfDHwpcontact", ROOT.py_gHIGGS_Vp_R_M)
-  ehw_L_T = SelfDCoupling("selfDHwpcontact", ROOT.py_gHIGGS_Vp_L_T)
-  ehw_R_T = SelfDCoupling("selfDHwpcontact", ROOT.py_gHIGGS_Vp_R_T)
-  ehw_L_U = SelfDCoupling("selfDHwpcontact", ROOT.py_gHIGGS_Vp_L_U)
-  ehw_R_U = SelfDCoupling("selfDHwpcontact", ROOT.py_gHIGGS_Vp_R_U)
-  ehw_L_C = SelfDCoupling("selfDHwpcontact", ROOT.py_gHIGGS_Vp_L_C)
-  ehw_R_C = SelfDCoupling("selfDHwpcontact", ROOT.py_gHIGGS_Vp_R_C)
+  ghwwp1 = SelfDCoupling("selfDHwwpcoupl", ROOT.py_gHIGGS_VV_1)
+  ghwpwp1 = SelfDCoupling("selfDHwpwpcoupl", ROOT.py_gHIGGS_VV_1)
+  ewp_L_E = SelfDCoupling("selfDHwpcontact", ROOT.py_gHIGGS_Vp_L_E)
+  ewp_R_E = SelfDCoupling("selfDHwpcontact", ROOT.py_gHIGGS_Vp_R_E)
+  ewp_L_M = SelfDCoupling("selfDHwpcontact", ROOT.py_gHIGGS_Vp_L_M)
+  ewp_R_M = SelfDCoupling("selfDHwpcontact", ROOT.py_gHIGGS_Vp_R_M)
+  ewp_L_T = SelfDCoupling("selfDHwpcontact", ROOT.py_gHIGGS_Vp_L_T)
+  ewp_R_T = SelfDCoupling("selfDHwpcontact", ROOT.py_gHIGGS_Vp_R_T)
+  ewp_L_U = SelfDCoupling("selfDHwpcontact", ROOT.py_gHIGGS_Vp_L_U)
+  ewp_R_U = SelfDCoupling("selfDHwpcontact", ROOT.py_gHIGGS_Vp_R_U)
+  ewp_L_C = SelfDCoupling("selfDHwpcontact", ROOT.py_gHIGGS_Vp_L_C)
+  ewp_R_C = SelfDCoupling("selfDHwpcontact", ROOT.py_gHIGGS_Vp_R_C)
 
   UseVprime = SelfDParameter("selfDOnlyVprime")
   M_Vprime = SelfDParameter("selfDM_Vprime")
