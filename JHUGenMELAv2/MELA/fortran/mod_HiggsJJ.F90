@@ -3287,7 +3287,7 @@ module modHiggsJJ
     real(dp), dimension(2) :: Rz
     real(dp), parameter, dimension(2) :: La = (/QuL,QdL/)
     real(dp), parameter, dimension(2) :: Ra = (/QuR,QdR/)
-    complex(dp) :: A0_ZZ_4f(-1:1,-1:1),LCT(1:2),RCT(1:2)
+    complex(dp) :: A0_ZZ_4f(-1:1,-1:1)!,LCT(1:2),RCT(1:2)
     integer :: j1,j2,j3,j4,line1,line2
     complex(dp) :: za(4,4),zb(4,4)
     real(dp) :: sprod(4,4)
@@ -3308,8 +3308,8 @@ module modHiggsJJ
     Lz = (/aL_Qup,aL_Qdn/)
     Rz = (/aR_Qup,aR_Qdn/)
     
-    LCT = (/ehz_L_U,ehz_L_D/)
-    RCT = (/ehz_R_U,ehz_R_D/)
+    !LCT = (/ehz_L_U,ehz_L_D/)
+    !RCT = (/ehz_R_U,ehz_R_D/)
 
 
     A0_ZZ_4f = czero
