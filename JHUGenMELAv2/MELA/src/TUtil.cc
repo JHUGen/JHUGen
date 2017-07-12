@@ -2746,7 +2746,6 @@ void TUtil::SetMCFMSpinZeroCouplings(bool useBSM, SpinZeroCouplings* Hcouplings,
     spinzerohiggs_anomcoupl_.AllowAnomalousCouplings = 0;
     spinzerohiggs_anomcoupl_.distinguish_HWWcouplings = 0;
     spinzerohiggs_anomcoupl_.UseVprime = 0;
-    spinzerohiggs_anomcoupl_.OnlyVVpr = 0;
     spinzerohiggs_anomcoupl_.M_Vprime = 10000;
     spinzerohiggs_anomcoupl_.Ga_Vprime = 100;
 
@@ -2876,22 +2875,22 @@ void TUtil::SetMCFMSpinZeroCouplings(bool useBSM, SpinZeroCouplings* Hcouplings,
       spinzerohiggs_anomcoupl_.ghw4_prime7[im] = 0;
 
       //contact terms
-      spinzerohiggs_anomcoupl_.ehz_L_E[im] = spinzerohiggs_anomcoupl_.ehz_R_E[im] = 0;
-      spinzerohiggs_anomcoupl_.ehz_L_M[im] = spinzerohiggs_anomcoupl_.ehz_R_M[im] = 0;
-      spinzerohiggs_anomcoupl_.ehz_L_T[im] = spinzerohiggs_anomcoupl_.ehz_R_T[im] = 0;
-      spinzerohiggs_anomcoupl_.ehz_L_N[im] = spinzerohiggs_anomcoupl_.ehz_R_N[im] = 0;
+      spinzerohiggs_anomcoupl_.ezp_L_E[im] = spinzerohiggs_anomcoupl_.ezp_R_E[im] = 0;
+      spinzerohiggs_anomcoupl_.ezp_L_M[im] = spinzerohiggs_anomcoupl_.ezp_R_M[im] = 0;
+      spinzerohiggs_anomcoupl_.ezp_L_T[im] = spinzerohiggs_anomcoupl_.ezp_R_T[im] = 0;
+      spinzerohiggs_anomcoupl_.ezp_L_N[im] = spinzerohiggs_anomcoupl_.ezp_R_N[im] = 0;
 
-      spinzerohiggs_anomcoupl_.ehz_L_U[im] = spinzerohiggs_anomcoupl_.ehz_R_U[im] = 0;
-      spinzerohiggs_anomcoupl_.ehz_L_D[im] = spinzerohiggs_anomcoupl_.ehz_R_D[im] = 0;
-      spinzerohiggs_anomcoupl_.ehz_L_C[im] = spinzerohiggs_anomcoupl_.ehz_R_C[im] = 0;
-      spinzerohiggs_anomcoupl_.ehz_L_S[im] = spinzerohiggs_anomcoupl_.ehz_R_S[im] = 0;
-      spinzerohiggs_anomcoupl_.ehz_L_B[im] = spinzerohiggs_anomcoupl_.ehz_R_B[im] = 0;
+      spinzerohiggs_anomcoupl_.ezp_L_U[im] = spinzerohiggs_anomcoupl_.ezp_R_U[im] = 0;
+      spinzerohiggs_anomcoupl_.ezp_L_D[im] = spinzerohiggs_anomcoupl_.ezp_R_D[im] = 0;
+      spinzerohiggs_anomcoupl_.ezp_L_C[im] = spinzerohiggs_anomcoupl_.ezp_R_C[im] = 0;
+      spinzerohiggs_anomcoupl_.ezp_L_S[im] = spinzerohiggs_anomcoupl_.ezp_R_S[im] = 0;
+      spinzerohiggs_anomcoupl_.ezp_L_B[im] = spinzerohiggs_anomcoupl_.ezp_R_B[im] = 0;
 
-      spinzerohiggs_anomcoupl_.ehw_L_E[im] = spinzerohiggs_anomcoupl_.ehw_R_E[im] = 0;
-      spinzerohiggs_anomcoupl_.ehw_L_M[im] = spinzerohiggs_anomcoupl_.ehw_R_M[im] = 0;
-      spinzerohiggs_anomcoupl_.ehw_L_T[im] = spinzerohiggs_anomcoupl_.ehw_R_T[im] = 0;
-      spinzerohiggs_anomcoupl_.ehw_L_U[im] = spinzerohiggs_anomcoupl_.ehw_R_U[im] = 0;
-      spinzerohiggs_anomcoupl_.ehw_L_C[im] = spinzerohiggs_anomcoupl_.ehw_R_C[im] = 0;
+      spinzerohiggs_anomcoupl_.ewp_L_E[im] = spinzerohiggs_anomcoupl_.ewp_R_E[im] = 0;
+      spinzerohiggs_anomcoupl_.ewp_L_M[im] = spinzerohiggs_anomcoupl_.ewp_R_M[im] = 0;
+      spinzerohiggs_anomcoupl_.ewp_L_T[im] = spinzerohiggs_anomcoupl_.ewp_R_T[im] = 0;
+      spinzerohiggs_anomcoupl_.ewp_L_U[im] = spinzerohiggs_anomcoupl_.ewp_R_U[im] = 0;
+      spinzerohiggs_anomcoupl_.ewp_L_C[im] = spinzerohiggs_anomcoupl_.ewp_R_C[im] = 0;
     }
     /***** END REGULAR RESONANCE *****/
     //
@@ -3100,24 +3099,24 @@ void TUtil::SetMCFMSpinZeroCouplings(bool useBSM, SpinZeroCouplings* Hcouplings,
       spinzerohiggs_anomcoupl_.ghgsgs3[im] = (Hcouplings->Hzzcoupl)[gHIGGS_AA_3][im];
       spinzerohiggs_anomcoupl_.ghgsgs4[im] = (Hcouplings->Hzzcoupl)[gHIGGS_AA_4][im];
 
-      spinzerohiggs_anomcoupl_.ehz_L_E[im] = (Hcouplings->Hzpcontact)[gHIGGS_Vp_L_E][im];
-      spinzerohiggs_anomcoupl_.ehz_R_E[im] = (Hcouplings->Hzpcontact)[gHIGGS_Vp_R_E][im];
-      spinzerohiggs_anomcoupl_.ehz_L_M[im] = (Hcouplings->Hzpcontact)[gHIGGS_Vp_L_M][im];
-      spinzerohiggs_anomcoupl_.ehz_R_M[im] = (Hcouplings->Hzpcontact)[gHIGGS_Vp_R_M][im];
-      spinzerohiggs_anomcoupl_.ehz_L_T[im] = (Hcouplings->Hzpcontact)[gHIGGS_Vp_L_T][im];
-      spinzerohiggs_anomcoupl_.ehz_R_T[im] = (Hcouplings->Hzpcontact)[gHIGGS_Vp_R_T][im];
-      spinzerohiggs_anomcoupl_.ehz_L_N[im] = (Hcouplings->Hzpcontact)[gHIGGS_Vp_L_N][im];
-      spinzerohiggs_anomcoupl_.ehz_R_N[im] = (Hcouplings->Hzpcontact)[gHIGGS_Vp_R_N][im];
-      spinzerohiggs_anomcoupl_.ehz_L_U[im] = (Hcouplings->Hzpcontact)[gHIGGS_Vp_L_U][im];
-      spinzerohiggs_anomcoupl_.ehz_R_U[im] = (Hcouplings->Hzpcontact)[gHIGGS_Vp_R_U][im];
-      spinzerohiggs_anomcoupl_.ehz_L_D[im] = (Hcouplings->Hzpcontact)[gHIGGS_Vp_L_D][im];
-      spinzerohiggs_anomcoupl_.ehz_R_D[im] = (Hcouplings->Hzpcontact)[gHIGGS_Vp_R_D][im];
-      spinzerohiggs_anomcoupl_.ehz_L_C[im] = (Hcouplings->Hzpcontact)[gHIGGS_Vp_L_C][im];
-      spinzerohiggs_anomcoupl_.ehz_R_C[im] = (Hcouplings->Hzpcontact)[gHIGGS_Vp_R_C][im];
-      spinzerohiggs_anomcoupl_.ehz_L_S[im] = (Hcouplings->Hzpcontact)[gHIGGS_Vp_L_S][im];
-      spinzerohiggs_anomcoupl_.ehz_R_S[im] = (Hcouplings->Hzpcontact)[gHIGGS_Vp_R_S][im];
-      spinzerohiggs_anomcoupl_.ehz_L_B[im] = (Hcouplings->Hzpcontact)[gHIGGS_Vp_L_B][im];
-      spinzerohiggs_anomcoupl_.ehz_R_B[im] = (Hcouplings->Hzpcontact)[gHIGGS_Vp_R_B][im];
+      spinzerohiggs_anomcoupl_.ezp_L_E[im] = (Hcouplings->Hzpcontact)[gHIGGS_Vp_L_E][im];
+      spinzerohiggs_anomcoupl_.ezp_R_E[im] = (Hcouplings->Hzpcontact)[gHIGGS_Vp_R_E][im];
+      spinzerohiggs_anomcoupl_.ezp_L_M[im] = (Hcouplings->Hzpcontact)[gHIGGS_Vp_L_M][im];
+      spinzerohiggs_anomcoupl_.ezp_R_M[im] = (Hcouplings->Hzpcontact)[gHIGGS_Vp_R_M][im];
+      spinzerohiggs_anomcoupl_.ezp_L_T[im] = (Hcouplings->Hzpcontact)[gHIGGS_Vp_L_T][im];
+      spinzerohiggs_anomcoupl_.ezp_R_T[im] = (Hcouplings->Hzpcontact)[gHIGGS_Vp_R_T][im];
+      spinzerohiggs_anomcoupl_.ezp_L_N[im] = (Hcouplings->Hzpcontact)[gHIGGS_Vp_L_N][im];
+      spinzerohiggs_anomcoupl_.ezp_R_N[im] = (Hcouplings->Hzpcontact)[gHIGGS_Vp_R_N][im];
+      spinzerohiggs_anomcoupl_.ezp_L_U[im] = (Hcouplings->Hzpcontact)[gHIGGS_Vp_L_U][im];
+      spinzerohiggs_anomcoupl_.ezp_R_U[im] = (Hcouplings->Hzpcontact)[gHIGGS_Vp_R_U][im];
+      spinzerohiggs_anomcoupl_.ezp_L_D[im] = (Hcouplings->Hzpcontact)[gHIGGS_Vp_L_D][im];
+      spinzerohiggs_anomcoupl_.ezp_R_D[im] = (Hcouplings->Hzpcontact)[gHIGGS_Vp_R_D][im];
+      spinzerohiggs_anomcoupl_.ezp_L_C[im] = (Hcouplings->Hzpcontact)[gHIGGS_Vp_L_C][im];
+      spinzerohiggs_anomcoupl_.ezp_R_C[im] = (Hcouplings->Hzpcontact)[gHIGGS_Vp_R_C][im];
+      spinzerohiggs_anomcoupl_.ezp_L_S[im] = (Hcouplings->Hzpcontact)[gHIGGS_Vp_L_S][im];
+      spinzerohiggs_anomcoupl_.ezp_R_S[im] = (Hcouplings->Hzpcontact)[gHIGGS_Vp_R_S][im];
+      spinzerohiggs_anomcoupl_.ezp_L_B[im] = (Hcouplings->Hzpcontact)[gHIGGS_Vp_L_B][im];
+      spinzerohiggs_anomcoupl_.ezp_R_B[im] = (Hcouplings->Hzpcontact)[gHIGGS_Vp_R_B][im];
     }
     //
     if (spinzerohiggs_anomcoupl_.distinguish_HWWcouplings==1){
@@ -3172,16 +3171,16 @@ void TUtil::SetMCFMSpinZeroCouplings(bool useBSM, SpinZeroCouplings* Hcouplings,
         spinzerohiggs_anomcoupl_.ghw4_prime6[im] = (Hcouplings->Hwwcoupl)[gHIGGS_VV_4_PRIME6][im];
         spinzerohiggs_anomcoupl_.ghw4_prime7[im] = (Hcouplings->Hwwcoupl)[gHIGGS_VV_4_PRIME7][im];
 
-        spinzerohiggs_anomcoupl_.ehw_L_E[im] = (Hcouplings->Hwpcontact)[gHIGGS_Vp_L_E][im];
-        spinzerohiggs_anomcoupl_.ehw_R_E[im] = (Hcouplings->Hwpcontact)[gHIGGS_Vp_R_E][im];
-        spinzerohiggs_anomcoupl_.ehw_L_M[im] = (Hcouplings->Hwpcontact)[gHIGGS_Vp_L_M][im];
-        spinzerohiggs_anomcoupl_.ehw_R_M[im] = (Hcouplings->Hwpcontact)[gHIGGS_Vp_R_M][im];
-        spinzerohiggs_anomcoupl_.ehw_L_T[im] = (Hcouplings->Hwpcontact)[gHIGGS_Vp_L_T][im];
-        spinzerohiggs_anomcoupl_.ehw_R_T[im] = (Hcouplings->Hwpcontact)[gHIGGS_Vp_R_T][im];
-        spinzerohiggs_anomcoupl_.ehw_L_U[im] = (Hcouplings->Hwpcontact)[gHIGGS_Vp_L_U][im];
-        spinzerohiggs_anomcoupl_.ehw_R_U[im] = (Hcouplings->Hwpcontact)[gHIGGS_Vp_R_U][im];
-        spinzerohiggs_anomcoupl_.ehw_L_C[im] = (Hcouplings->Hwpcontact)[gHIGGS_Vp_L_C][im];
-        spinzerohiggs_anomcoupl_.ehw_R_C[im] = (Hcouplings->Hwpcontact)[gHIGGS_Vp_R_C][im];
+        spinzerohiggs_anomcoupl_.ewp_L_E[im] = (Hcouplings->Hwpcontact)[gHIGGS_Vp_L_E][im];
+        spinzerohiggs_anomcoupl_.ewp_R_E[im] = (Hcouplings->Hwpcontact)[gHIGGS_Vp_R_E][im];
+        spinzerohiggs_anomcoupl_.ewp_L_M[im] = (Hcouplings->Hwpcontact)[gHIGGS_Vp_L_M][im];
+        spinzerohiggs_anomcoupl_.ewp_R_M[im] = (Hcouplings->Hwpcontact)[gHIGGS_Vp_R_M][im];
+        spinzerohiggs_anomcoupl_.ewp_L_T[im] = (Hcouplings->Hwpcontact)[gHIGGS_Vp_L_T][im];
+        spinzerohiggs_anomcoupl_.ewp_R_T[im] = (Hcouplings->Hwpcontact)[gHIGGS_Vp_R_T][im];
+        spinzerohiggs_anomcoupl_.ewp_L_U[im] = (Hcouplings->Hwpcontact)[gHIGGS_Vp_L_U][im];
+        spinzerohiggs_anomcoupl_.ewp_R_U[im] = (Hcouplings->Hwpcontact)[gHIGGS_Vp_R_U][im];
+        spinzerohiggs_anomcoupl_.ewp_L_C[im] = (Hcouplings->Hwpcontact)[gHIGGS_Vp_L_C][im];
+        spinzerohiggs_anomcoupl_.ewp_R_C[im] = (Hcouplings->Hwpcontact)[gHIGGS_Vp_R_C][im];
       }
     }
     else{
@@ -3237,16 +3236,16 @@ void TUtil::SetMCFMSpinZeroCouplings(bool useBSM, SpinZeroCouplings* Hcouplings,
         spinzerohiggs_anomcoupl_.ghw4_prime7[im] = (Hcouplings->Hzzcoupl)[gHIGGS_VV_4_PRIME7][im];
 
         //this doesn't entirely make sense
-        spinzerohiggs_anomcoupl_.ehw_L_E[im] = (Hcouplings->Hzpcontact)[gHIGGS_Vp_L_E][im];
-        spinzerohiggs_anomcoupl_.ehw_R_E[im] = (Hcouplings->Hzpcontact)[gHIGGS_Vp_R_E][im];
-        spinzerohiggs_anomcoupl_.ehw_L_M[im] = (Hcouplings->Hzpcontact)[gHIGGS_Vp_L_M][im];
-        spinzerohiggs_anomcoupl_.ehw_R_M[im] = (Hcouplings->Hzpcontact)[gHIGGS_Vp_R_M][im];
-        spinzerohiggs_anomcoupl_.ehw_L_T[im] = (Hcouplings->Hzpcontact)[gHIGGS_Vp_L_T][im];
-        spinzerohiggs_anomcoupl_.ehw_R_T[im] = (Hcouplings->Hzpcontact)[gHIGGS_Vp_R_T][im];
-        spinzerohiggs_anomcoupl_.ehw_L_U[im] = (Hcouplings->Hzpcontact)[gHIGGS_Vp_L_U][im];
-        spinzerohiggs_anomcoupl_.ehw_R_U[im] = (Hcouplings->Hzpcontact)[gHIGGS_Vp_R_U][im];
-        spinzerohiggs_anomcoupl_.ehw_L_C[im] = (Hcouplings->Hzpcontact)[gHIGGS_Vp_L_C][im];
-        spinzerohiggs_anomcoupl_.ehw_R_C[im] = (Hcouplings->Hzpcontact)[gHIGGS_Vp_R_C][im];
+        spinzerohiggs_anomcoupl_.ewp_L_E[im] = (Hcouplings->Hzpcontact)[gHIGGS_Vp_L_E][im];
+        spinzerohiggs_anomcoupl_.ewp_R_E[im] = (Hcouplings->Hzpcontact)[gHIGGS_Vp_R_E][im];
+        spinzerohiggs_anomcoupl_.ewp_L_M[im] = (Hcouplings->Hzpcontact)[gHIGGS_Vp_L_M][im];
+        spinzerohiggs_anomcoupl_.ewp_R_M[im] = (Hcouplings->Hzpcontact)[gHIGGS_Vp_R_M][im];
+        spinzerohiggs_anomcoupl_.ewp_L_T[im] = (Hcouplings->Hzpcontact)[gHIGGS_Vp_L_T][im];
+        spinzerohiggs_anomcoupl_.ewp_R_T[im] = (Hcouplings->Hzpcontact)[gHIGGS_Vp_R_T][im];
+        spinzerohiggs_anomcoupl_.ewp_L_U[im] = (Hcouplings->Hzpcontact)[gHIGGS_Vp_L_U][im];
+        spinzerohiggs_anomcoupl_.ewp_R_U[im] = (Hcouplings->Hzpcontact)[gHIGGS_Vp_R_U][im];
+        spinzerohiggs_anomcoupl_.ewp_L_C[im] = (Hcouplings->Hzpcontact)[gHIGGS_Vp_L_C][im];
+        spinzerohiggs_anomcoupl_.ewp_R_C[im] = (Hcouplings->Hzpcontact)[gHIGGS_Vp_R_C][im];
       }
     }
     /***** END REGULAR RESONANCE *****/
@@ -3442,12 +3441,12 @@ void TUtil::SetJHUGenSpinZeroVVCouplings(double Hvvcoupl[SIZE_HVV][2], int Hvvco
   for (int c=0; c<SIZE_HVV_LAMBDAQSQ; c++){ for (int k=0; k<SIZE_HVV_CQSQ; k++) HvvLambda_qsq[c][k] *= GeV; } // GeV units in JHUGen
   __modjhugenmela_MOD_setspinzerovvcouplings(Hvvcoupl, Hvvcoupl_cqsq, HvvLambda_qsq, &iWWcoupl);
 }
-void TUtil::SetJHUGenSpinZeroContactTerms(double Hzpcontact[SIZE_Vp][2], double Hwpcontact[SIZE_Vp][2], bool UseVprime, double M_Vprime, double Ga_Vprime, int OnlyVVpr){
+void TUtil::SetJHUGenSpinZeroContactTerms(double Hzzpcoupl[SIZE_HVV][2], double Hzpzpcoupl[SIZE_HVV][2], double Hzpcontact[SIZE_Vp][2], double Hwwpcoupl[SIZE_HVV][2], double Hwpwpcoupl[SIZE_HVV][2], double Hwpcontact[SIZE_Vp][2], bool UseVprime, double M_Vprime, double Ga_Vprime){
   const double GeV=1./100.;
   M_Vprime *= GeV;
   Ga_Vprime *= GeV;
   int usevp = UseVprime;
-  __modjhugenmela_MOD_setspinzerocontactterms(Hzpcontact, Hwpcontact, &usevp, &M_Vprime, &Ga_Vprime, &OnlyVVpr);
+  __modjhugenmela_MOD_setspinzerocontactterms(Hzzpcoupl, Hzpzpcoupl, Hzpcontact, Hwwpcoupl, Hwpwpcoupl, Hwpcontact, &usevp, &M_Vprime, &Ga_Vprime);
 }
 void TUtil::SetJHUGenSpinZeroGGCouplings(double Hggcoupl[SIZE_HGG][2]){ __modjhugenmela_MOD_setspinzeroggcouplings(Hggcoupl); }
 void TUtil::SetJHUGenSpinZeroQQCouplings(double Hqqcoupl[SIZE_HQQ][2]){ __modjhugenmela_MOD_setspinzeroqqcouplings(Hqqcoupl); }

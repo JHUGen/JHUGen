@@ -184,7 +184,7 @@ namespace TUtil{
   void SetJHUGenSpinZeroVVCouplings(double Hvvcoupl[SIZE_HVV][2], int Hvvcoupl_cqsq[SIZE_HVV_CQSQ], double HvvLambda_qsq[SIZE_HVV_LAMBDAQSQ][SIZE_HVV_CQSQ], bool useWWcoupl);
   void SetJHUGenSpinZeroGGCouplings(double Hggcoupl[SIZE_HGG][2]);
   void SetJHUGenSpinZeroQQCouplings(double Hqqcoupl[SIZE_HQQ][2]);
-  void SetJHUGenSpinZeroContactTerms(double Hzpcontact[SIZE_Vp][2], double Hwpcontact[SIZE_Vp][2], bool UseVprime, double M_Vprime, double Ga_Vprime, int OnlyVVpr);
+  void SetJHUGenSpinZeroContactTerms(double Hzzpcoupl[SIZE_HVV][2], double Hzpzpcoupl[SIZE_HVV][2], double Hzpcontact[SIZE_Vp][2], double Hwwpcoupl[SIZE_HVV][2], double Hwpwpcoupl[SIZE_HVV][2], double Hwpcontact[SIZE_Vp][2], bool UseVprime, double M_Vprime, double Ga_Vprime);
   // Spin-1 couplings
   void SetJHUGenSpinOneCouplings(double Zqqcoupl[SIZE_ZQQ][2], double Zvvcoupl[SIZE_ZVV][2]);
   // Spin-2 couplings
