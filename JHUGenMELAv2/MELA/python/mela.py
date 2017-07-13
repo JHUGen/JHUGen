@@ -552,7 +552,7 @@ class Mela(object):
   ewp_L_C = SelfDCoupling("selfDHwpcontact", ROOT.py_gHIGGS_Vp_L_C)
   ewp_R_C = SelfDCoupling("selfDHwpcontact", ROOT.py_gHIGGS_Vp_R_C)
 
-  UseVprime = SelfDParameter("selfDOnlyVprime")
+  UseVprime = SelfDParameter("selfDUseVprime")
   M_Vprime = SelfDParameter("selfDM_Vprime")
   Ga_Vprime = SelfDParameter("selfDGa_Vprime")
 
