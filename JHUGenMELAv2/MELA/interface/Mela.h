@@ -44,6 +44,7 @@ public:
 
   void setProcess(TVar::Process myModel, TVar::MatrixElement myME, TVar::Production myProduction);
   void setVerbosity(TVar::VerbosityLevel verbosity_=TVar::ERROR);
+  TVar::VerbosityLevel getVerbosity();
   void setMelaLeptonInterference(TVar::LeptonInterference myLepInterf=TVar::DefaultLeptonInterf);
   void setRemoveLeptonMasses(bool MasslessLeptonSwitch=true);
   void setRemoveJetMasses(bool MasslessLeptonSwitch=true);

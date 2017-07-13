@@ -34,6 +34,8 @@ def unifycontent(content):
 #    if "Start Mela constructor" in content: content = content.split("End Mela constructor")[1].lstrip()
     return content
 
+melaptr = ROOT.makemelaptr(13, 125, ROOT.TVar.ERROR)
+
 for j, ref in enumerate(referencefiles, start=1):
     match = re.match("(testME_.*_Ping)_?(.*).ref", ref)
     if not match:
@@ -43,9 +45,9 @@ for j, ref in enumerate(referencefiles, start=1):
     arguments = arguments.replace("2l2l", "0")
     arguments = arguments.replace("4l", "1")
     if arguments:
-        arguments = [int(_) for _ in arguments.split("_")]
+        arguments = [int(_) for _ in arguments.split("_")] + [melaptr]
     else:
-        arguments = []
+        arguments = [melaptr]
 
     if functionname == "testME_ProdDec_MCFM_JHUGen_WBFZZ_Comparison_Ping":
         functionname = "testME_ProdDec_MCFM_JHUGen_WBFZZWW_Comparison_Ping"
@@ -53,6 +55,7 @@ for j, ref in enumerate(referencefiles, start=1):
     if functionname == "testME_ProdDec_MCFM_JHUGen_WBFWW_Comparison_Ping":
         functionname = "testME_ProdDec_MCFM_JHUGen_WBFZZWW_Comparison_Ping"
         arguments.insert(3, 2)
+        arguments.insert(4, 0)
 
     if functionname == "testME_ProdDec_MCFM_JHUGen_JJQCDZZ_Comparison_Ping":
         functionname = "testME_ProdDec_MCFM_JHUGen_JJQCDZZWW_Comparison_Ping"
@@ -60,6 +63,9 @@ for j, ref in enumerate(referencefiles, start=1):
     if functionname == "testME_ProdDec_MCFM_JHUGen_JJQCDWW_Comparison_Ping":
         functionname = "testME_ProdDec_MCFM_JHUGen_JJQCDZZWW_Comparison_Ping"
         arguments.insert(1, 2)
+        arguments.insert(2, 0)
+
+    print arguments
 
     function = getattr(ROOT, functionname)
     function(*arguments)
