@@ -195,6 +195,7 @@ void Mela::setProcess(TVar::Process myModel, TVar::MatrixElement myME, TVar::Pro
   myProduction_ = myProduction;
 }
 void Mela::setVerbosity(TVar::VerbosityLevel verbosity_){ myVerbosity_=verbosity_; if (ZZME!=0) ZZME->set_Verbosity(myVerbosity_); if (super!=0) super->SetVerbosity((myVerbosity_>=TVar::DEBUG)); }
+TVar::VerbosityLevel Mela::getVerbosity(){ return myVerbosity_; }
 // Should be called per-event
 void Mela::setMelaPrimaryHiggsMass(double myHiggsMass){ ZZME->set_PrimaryHiggsMass(myHiggsMass); }
 void Mela::setMelaHiggsMass(double myHiggsMass, int index){ ZZME->set_mHiggs(myHiggsMass, index); }

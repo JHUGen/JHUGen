@@ -21,6 +21,11 @@ else
 		echo
 		popd
 		make
+                echo
+                echo "remember to:"
+                echo
+                echo "export LD_LIBRARY_PATH=$(readlink -f $MELADIR)/data/"'$DATA_LIB_DIR:$LD_LIBRARY_PATH'
+                echo
 	else
 		echo
 		echo "ERROR: something went wrong in mv, see ^ error message"

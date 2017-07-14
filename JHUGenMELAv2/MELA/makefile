@@ -23,7 +23,7 @@ MELALIBDIR = $(MELADATADIR)/slc6_amd64_gcc530
 ROOTCFLAGS = $(shell root-config --cflags)
 ROOTGLIBS = $(shell root-config --evelibs) -Lrootlib
 NLIBS = $(ROOTGLIBS)
-NLIBS += -L$(ROOFITSYS)/lib -lMinuit -lRooFitCore -lRooFit -lboost_regex -lboost_filesystem
+NLIBS += -L$(ROOFITSYS)/lib -lMinuit -lRooFitCore -lRooFit -lboost_regex -lboost_filesystem -lgfortran
 LIBS = $(filter-out -lNew, $(NLIBS))
 
 ROOFITINC = -I$(ROOFITSYS)/include
@@ -34,7 +34,7 @@ CPPINC = -I$(MELADIR)/interface $(ROOTINC)
 CPPLOAD = -L$(MELALIBDIR) -lmcfm_703 -ljhugenmela $(LIBS)
 CPPOPTS =  -fPIC -O2 -ftree-vectorize -fipa-pta -felide-constructors -fvisibility-inlines-hidden -fno-math-errno \
 	--param vect-max-version-for-alias-checks=50 -fmessage-length=0 -fdiagnostics-show-option \
-	 $(shell root-config --cflags)
+	 $(shell root-config --cflags) -D_melapkgpath_=$(PWD)/
 CPPFLAGS = $(CPPOPTS) $(CPPINC) $(CPPLOAD)
 
 LINKER = g++

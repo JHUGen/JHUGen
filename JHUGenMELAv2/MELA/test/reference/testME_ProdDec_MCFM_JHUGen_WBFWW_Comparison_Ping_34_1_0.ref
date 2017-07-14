@@ -329,7 +329,7 @@ Bkg
 	0	0	0	0	0	0	0	0	0.435249	0	0
 	0	0	0	0	0	0	0	0	1.98859	0	0
 ***** TUtil::PrintCandidateSummary *****
-Candidate: 0x996c980
+Candidate: 0xPOINTER
 	Has 2 mothers
 		V0 (0) (X,Y,Z,T)=( 0 , 0 , -865.379 , -865.379 )
 		V1 (0) (X,Y,Z,T)=( 0 , 0 , 624.034 , -624.034 )
