@@ -820,8 +820,8 @@
 
    RETURN
    END SUBROUTINE
-   
-   
+
+
    
    
 subroutine getDecay_Couplings_Spinors_Props(VVMode,idordered,pordered,h3,h4, sp,pV)
@@ -1412,7 +1412,7 @@ subroutine getDecay_Couplings_Spinors_Props(VVMode,idordered,pordered,h3,h4, sp,
    endif
 
    sp(3,:) = sp(3,:)*propV(1)
-   sp(4,:) = sp(4,:)*propV(2)   
+   sp(4,:) = sp(4,:)*propV(2)
    if (h3.eq.-1) then
       sp(3,:) = aL1 * sp(3,:)
    elseif(h3.eq.1) then
