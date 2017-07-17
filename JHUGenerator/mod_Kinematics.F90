@@ -2279,43 +2279,43 @@ logical :: hasAonshell
      
      EHat = MomExt(1,1)+MomExt(1,2)
 
-!      if(.not.hasAonshell) then
-!         if(m_ll.le.getMass(convertLHEreverse(id(6)))+getMass(convertLHEreverse(id(7))))then
-!            applyPSCut=.true.
-!         endif
-!         if(includeGammaStar .and. .not.IsAWDecay(DecayMode1) .and. (m_ll.lt.MPhotonCutoff .or. m_Vstar.lt.MPhotonCutoff))then
-!            applyPSCut=.true.
-!         endif
-!         if(IsAQuark(convertLHEreverse(id(6)))) then
-!            pt1 = get_PT(MomExt(1:4,6))
-!            pt2 = get_PT(MomExt(1:4,7))
-!            deltaR = get_R(MomExt(1:4,6), MomExt(1:4,7))
-!            if(m_ll.lt.mJJcut .or. pt1.lt.ptjetcut .or. pt2.lt.ptjetcut .or. deltaR.lt.Rjet) then
-!               applyPSCut=.true.
-!            endif
-!         endif
-!      else
-!         if(includeGammaStar .and. m_Vstar.lt.MPhotonCutoff)then
-!            applyPSCut=.true.
-!         endif
-!      endif
-!      if(H_DK) then
-!         if(m_jj.le.(getMass(convertLHEreverse(id(8)))+getMass(convertLHEreverse(id(9)))))then
-!            applyPSCut=.true.
-!         endif
-!         if(IsAQuark(convertLHEreverse(id(8)))) then
-!            pt1 = get_PT(MomExt(1:4,8))
-!            pt2 = get_PT(MomExt(1:4,9))
-!            deltaR = get_R(MomExt(1:4,8), MomExt(1:4,9))
-!            if(m_jj.lt.mJJcut .or. pt1.lt.ptjetcut .or. pt2.lt.ptjetcut .or. deltaR.lt.Rjet) then
-!               applyPSCut=.true.
-!            endif
-!         endif
-!      else
-!         if(dabs(m_jj-M_Reso).gt.10d0*Ga_Reso) then
-!            applyPSCut=.true.
-!         endif
-!      endif
+      if(.not.hasAonshell) then
+         if(m_ll.le.getMass(convertLHEreverse(id(6)))+getMass(convertLHEreverse(id(7))))then
+            applyPSCut=.true.
+         endif
+         if(includeGammaStar .and. .not.IsAWDecay(DecayMode1) .and. (m_ll.lt.MPhotonCutoff .or. m_Vstar.lt.MPhotonCutoff))then
+            applyPSCut=.true.
+         endif
+         if(IsAQuark(convertLHEreverse(id(6)))) then
+            pt1 = get_PT(MomExt(1:4,6))
+            pt2 = get_PT(MomExt(1:4,7))
+            deltaR = get_R(MomExt(1:4,6), MomExt(1:4,7))
+            if(m_ll.lt.mJJcut .or. pt1.lt.ptjetcut .or. pt2.lt.ptjetcut .or. deltaR.lt.Rjet) then
+               applyPSCut=.true.
+            endif
+         endif
+      else
+         if(includeGammaStar .and. m_Vstar.lt.MPhotonCutoff)then
+            applyPSCut=.true.
+         endif
+      endif
+      if(H_DK) then
+         if(m_jj.le.(getMass(convertLHEreverse(id(8)))+getMass(convertLHEreverse(id(9)))))then
+            applyPSCut=.true.
+         endif
+         if(IsAQuark(convertLHEreverse(id(8)))) then
+            pt1 = get_PT(MomExt(1:4,8))
+            pt2 = get_PT(MomExt(1:4,9))
+            deltaR = get_R(MomExt(1:4,8), MomExt(1:4,9))
+            if(m_jj.lt.mJJcut .or. pt1.lt.ptjetcut .or. pt2.lt.ptjetcut .or. deltaR.lt.Rjet) then
+               applyPSCut=.true.
+            endif
+         endif
+      else
+         if(dabs(m_jj-M_Reso).gt.10d0*Ga_Reso) then
+            applyPSCut=.true.
+         endif
+      endif
 
 !-- FIND PLOTTING BINS
 !costheta1 - production angle

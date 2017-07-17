@@ -22,9 +22,13 @@
 using namespace RooFit;
 using namespace std;
 
+shared_ptr<Mela> makemelaptr(int erg_tev, float mPOLE, TVar::VerbosityLevel verbosity) {
+  //function to make a shared_ptr in python, no idea how to do it directly
+  return shared_ptr<Mela>(new Mela(erg_tev, mPOLE, verbosity));
+}
 
-void testME_Dec_MCFM_Ping(int flavor=2, int useMothers=0, bool useConstants=false){
-  ofstream tout("testME_Dec_MCFM_Ping.out");
+void testME_Dec_MCFM_Ping(int flavor=2, int useMothers=0, bool useConstants=false, shared_ptr<Mela> melaptr=nullptr){
+  ofstream tout(TString("testME_Dec_MCFM_Ping_")+long(flavor)+"_"+long(useMothers)+"_"+long(useConstants)+".out");
   streambuf* coutbuf = cout.rdbuf();
   cout.rdbuf(tout.rdbuf());
 
@@ -33,7 +37,13 @@ void testME_Dec_MCFM_Ping(int flavor=2, int useMothers=0, bool useConstants=fals
   float wPOLE=4.07e-3;
 
   TVar::VerbosityLevel verbosity = TVar::DEBUG;
-  Mela mela(erg_tev, mPOLE, verbosity);
+  if (!melaptr) {
+    melaptr.reset(new Mela(erg_tev, mPOLE, verbosity));
+  }
+  Mela& mela = *melaptr;
+  TVar::VerbosityLevel bkpverbosity = mela.getVerbosity();
+  mela.setVerbosity(verbosity);
+
   if (verbosity>=TVar::DEBUG) cout << "Mela is initialized" << endl;
   //mela.resetMCFM_EWKParameters(1.16639E-05, 1./128., 79.9549392, 91.1876, 0.23119);
   if (verbosity>=TVar::DEBUG) cout << "Mela candidate decay mode initializing" << endl;
@@ -1067,9 +1077,10 @@ void testME_Dec_MCFM_Ping(int flavor=2, int useMothers=0, bool useConstants=fals
 
   cout.rdbuf(coutbuf);
   tout.close();
+  mela.setVerbosity(bkpverbosity);
 }
 
-void testME_VH_JHUGen_Ping(){
+void testME_VH_JHUGen_Ping(shared_ptr<Mela> melaptr=nullptr){
   ofstream tout("testME_VH_JHUGen_Ping.out");
   streambuf* coutbuf = cout.rdbuf();
   cout.rdbuf(tout.rdbuf());
@@ -1080,7 +1091,12 @@ void testME_VH_JHUGen_Ping(){
 
   TVar::VerbosityLevel verbosity = TVar::ERROR;
   if (verbosity>=TVar::DEBUG) cout << "Initializing Mela..." << endl;
-  Mela mela(erg_tev, mPOLE, verbosity);
+  if (!melaptr) {
+    melaptr.reset(new Mela(erg_tev, mPOLE, verbosity));
+  }
+  Mela& mela = *melaptr;
+  TVar::VerbosityLevel bkpverbosity = mela.getVerbosity();
+  mela.setVerbosity(verbosity);
   if (verbosity>=TVar::DEBUG) cout << "Mela is initialized" << endl;
   //mela.resetMCFM_EWKParameters(1.16639E-05, 1./128., 79.9549392, 91.1876, 0.23119);
 
@@ -1273,7 +1289,140 @@ void testME_VH_JHUGen_Ping(){
 
   cout.rdbuf(coutbuf);
   tout.close();
+  mela.setVerbosity(bkpverbosity);
 }
+
+
+void testME_Prop_Ping(int useMothers=0, shared_ptr<Mela> melaptr=nullptr){
+  ofstream tout(TString("testME_Prop_Ping_")+(long)useMothers+".out");
+  streambuf* coutbuf = cout.rdbuf();
+  cout.rdbuf(tout.rdbuf());
+
+  int erg_tev=13;
+  float mPOLE=125.;
+  float wPOLE=4.07e-3;
+
+  TVar::VerbosityLevel verbosity = TVar::DEBUG;
+  if (!melaptr) {
+    melaptr.reset(new Mela(erg_tev, mPOLE, verbosity));
+  }
+  Mela& mela = *melaptr;
+  TVar::VerbosityLevel bkpverbosity = mela.getVerbosity();
+  mela.setVerbosity(verbosity);
+  if (verbosity>=TVar::DEBUG) cout << "Mela is initialized" << endl;
+  //mela.resetMCFM_EWKParameters(1.16639E-05, 1./128., 79.9549392, 91.1876, 0.23119);
+  if (verbosity>=TVar::DEBUG) cout << "Mela candidate decay mode initializing" << endl;
+  mela.setCandidateDecayMode(TVar::CandidateDecay_ZZ);
+  if (verbosity>=TVar::DEBUG) cout << "Mela candidate decay mode initialized" << endl;
+
+  float GenLep1Id=0, GenLep2Id=0, GenLep3Id=0, GenLep4Id=0;
+  const int nEntries = 6;
+  double l1_array[nEntries][4] ={
+    { 51.374202, 25.924766, 12.290178, 42.616376 },
+    { 51.374202, 25.924766, 12.290178, 42.616376 },
+    { 1365.4973807340846, 10.289826593755228, 25.205694382277809, -1365.2259480507332 }, // Massless
+    { 1365.4973807340846, 10.289826593755228, 25.205694382277809, -1365.2259480507332 }, // Massless
+    { 1365.4973848483, 10.289826593755228, 25.205694382277809, -1365.2259480507332 }, // Muon via E
+    { 1365.4973848483, 10.289826593755228, 25.205694382277809, -1365.2259480507332 } // Muon via E
+  };
+  double l2_array[nEntries][4] ={
+    { 271.875752, 70.427173, -11.138146, 261.769598 },
+    { 21.481452, 9.489680, -9.336587, 16.858699 },
+    { 22.786181013986834, -0.15136300982222117, -0.90077551414353962, -22.767866345236371 },
+    { 471.71918486784784, -35.976267906053060, 4.5169691019519895, -470.32360615864354 },
+    { 22.7864275656, -0.15136300982222117, -0.90077551414353962, -22.767866345236371 },
+    { 471.7191967775, -35.976267906053060, 4.5169691019519895, -470.32360615864354 }
+  };
+  double l3_array[nEntries][4] ={
+    { 75.823478, -16.640412, 23.246999, 70.227220 },
+    { 75.823478, -16.640412, 23.246999, 70.227220 },
+    { 1895.7562628816693, 25.837804322120054, -28.821887970086259, -1895.3610513294620 },
+    { 1895.7562628816693, 25.837804322120054, -28.821887970086259, -1895.3610513294620 },
+    { 1895.7562658451, 25.837804322120054, -28.821887970086259, -1895.3610513294620 },
+    { 1895.7562658451, 25.837804322120054, -28.821887970086259, -1895.3610513294620 }
+  };
+  double l4_array[nEntries][4] ={
+    { 21.481452, 9.489680, -9.336587, 16.858699 },
+    { 271.875752, 70.427173, -11.138146, 261.769598 },
+    { 471.71918486784784, -35.976267906053060, 4.5169691019519895, -470.32360615864354 },
+    { 22.786181013986834, -0.15136300982222117, -0.90077551414353962, -22.767866345236371 },
+    { 471.7191967775, -35.976267906053060, 4.5169691019519895, -470.32360615864354 },
+    { 22.7864275656, -0.15136300982222117, -0.90077551414353962, -22.767866345236371 }
+  };
+
+  GenLep1Id=13;
+  GenLep2Id=-13;
+  GenLep3Id=11;
+  GenLep4Id=-11;
+
+  for (int ev = 2; ev < 3; ev++){
+    int idOrdered[4] ={ static_cast<int>(GenLep1Id), static_cast<int>(GenLep2Id), static_cast<int>(GenLep3Id), static_cast<int>(GenLep4Id) };
+    TLorentzVector pOrdered[4];
+    pOrdered[0].SetXYZT(l1_array[ev][1], l1_array[ev][2], l1_array[ev][3], l1_array[ev][0]);
+    pOrdered[1].SetXYZT(l2_array[ev][1], l2_array[ev][2], l2_array[ev][3], l2_array[ev][0]);
+    pOrdered[2].SetXYZT(l3_array[ev][1], l3_array[ev][2], l3_array[ev][3], l3_array[ev][0]);
+    pOrdered[3].SetXYZT(l4_array[ev][1], l4_array[ev][2], l4_array[ev][3], l4_array[ev][0]);
+    SimpleParticleCollection_t daughters_ZZ;
+    for (unsigned int idau=0; idau<4; idau++) daughters_ZZ.push_back(SimpleParticle_t(idOrdered[idau], pOrdered[idau]));
+
+    // Some gymnastics to get pseudo-mothers for these events
+    TLorentzVector pTotal = pOrdered[0]+pOrdered[1]+pOrdered[2]+pOrdered[3];
+    TLorentzVector pTotal_dummy=pTotal;
+    TLorentzVector pTotal_perp(pTotal.X(), pTotal.Y(), 0, pTotal.T());
+    pTotal_dummy.Boost(-pTotal_perp.BoostVector());
+    TLorentzVector pMothers[2];
+    pMothers[0].SetXYZT(0, 0, (pTotal_dummy.Z()+pTotal_dummy.T())/2., (pTotal_dummy.Z()+pTotal_dummy.T())/2.);
+    pMothers[1].SetXYZT(0, 0, (pTotal_dummy.Z()-pTotal_dummy.T())/2., (-pTotal_dummy.Z()+pTotal_dummy.T())/2.);
+    for (int im=0; im<2; im++) pMothers[im].Boost(pTotal_perp.BoostVector());
+    SimpleParticleCollection_t mothers_QQB;
+    for (unsigned int im=0; im<2; im++) mothers_QQB.push_back(SimpleParticle_t(1-2*im, pMothers[im]));
+    SimpleParticleCollection_t mothers_GG;
+    for (unsigned int im=0; im<2; im++) mothers_GG.push_back(SimpleParticle_t(21, pMothers[im]));
+    SimpleParticleCollection_t* mothersPtr=0;
+    if (useMothers==1) mothersPtr=&mothers_GG;
+    else if (useMothers==2) mothersPtr=&mothers_QQB;
+
+    mela.setCandidateDecayMode(TVar::CandidateDecay_ZZ);
+    mela.setInputEvent(&daughters_ZZ, (SimpleParticleCollection_t*)0, mothersPtr, (mothersPtr!=0));
+
+    int cindex;
+    /***** ZZ *****/
+    cindex=0;
+    mela.setCurrentCandidateFromIndex(cindex);
+
+    double mH=500.;
+    cout << "Computing Prop(500 GeV) at mass=" << mela.getCurrentCandidate()->m() << endl;
+    for (int ps=0; ps<=3; ps++){
+      /*
+      NoPropagator=0,
+      RunningWidth=1,
+      FixedWidth=2,
+      CPS=3
+      */
+      float prop;
+      mela.setMelaHiggsMassWidth(mH, -1, 0);
+      mela.getXPropagator((TVar::ResonancePropagatorScheme)ps, prop);
+      cout << "prop[" << ps << "]: " << prop << endl;
+    }
+
+    if (verbosity>=TVar::DEBUG){
+      cout << "Removing Mela candidates\nSummary:" << endl;
+      for (int ic=0; ic<mela.getNCandidates(); ic++){
+        cout << "Candidate " << ic << endl;
+        mela.setCurrentCandidateFromIndex(ic);
+        TUtil::PrintCandidateSummary(mela.getCurrentCandidate());
+      }
+      cout << endl;
+    }
+    mela.resetInputEvent();
+    cout << "Removed..." << endl;
+  }
+
+  cout.rdbuf(coutbuf);
+  tout.close();
+  mela.setVerbosity(bkpverbosity);
+}
+
 
 void testME_ProdDec_MCFM_Ordering(int iSel, int jSel, int rSel, int sSel){
   int order[2];
@@ -1283,8 +1432,7 @@ void testME_ProdDec_MCFM_Ordering(int iSel, int jSel, int rSel, int sSel){
     << order[1] << endl;
 }
 
-
-void testME_ProdDec_MCFM_JHUGen_WBFZZWW_Comparison_Ping(int motherflavor=0, int isZZWW=0 /*1==ZZ, 2==WW*/, int vbfvhchannel=0 /*0==VBF, 1==HadVH, 2==LepVH*/, int decZZWW=1 /*1==ZZ, 2==WW*/, int hasInterf=0 /*0==2l2l, 1==4l*/){
+void testME_ProdDec_MCFM_JHUGen_WBFZZWW_Comparison_Ping(int motherflavor=0, int isZZWW=0 /*1==ZZ, 2==WW*/, int vbfvhchannel=0 /*0==VBF, 1==HadVH, 2==LepVH*/, int decZZWW=1 /*1==ZZ, 2==WW*/, int hasInterf=0 /*0==2l2l, 1==4l*/, shared_ptr<Mela> melaptr=nullptr){
   TString outname;
   int ZZWWdec_onevertexflag;
   if (decZZWW==1){
@@ -1304,6 +1452,10 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_Comparison_Ping(int motherflavor=0, int 
     mcfmme(){
       proddecme=0;
       for (int ii=0; ii<nmsq; ii++){ for (int jj=0; jj<nmsq; jj++) mearray[ii][jj]=0; }
+    }
+    void add(const mcfmme& other){
+      proddecme+=other.proddecme;
+      for (int ii=0; ii<nmsq; ii++){ for (int jj=0; jj<nmsq; jj++) mearray[ii][jj]+=(other.mearray)[ii][jj]; }
     }
     void multiplyarray(const float val){
       for (int ii=0; ii<nmsq; ii++){ for (int jj=0; jj<nmsq; jj++) mearray[ii][jj]*=val; }
@@ -1617,7 +1769,12 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_Comparison_Ping(int motherflavor=0, int 
     streambuf* coutbuf = cout.rdbuf();
     cout.rdbuf(tout.rdbuf());
 
-    Mela mela(erg_tev, mPOLE, verbosity);
+    if (!melaptr) {
+      melaptr.reset(new Mela(erg_tev, mPOLE, verbosity));
+    }
+    Mela& mela = *melaptr;
+    TVar::VerbosityLevel bkpverbosity = mela.getVerbosity();
+    mela.setVerbosity(verbosity);
 
     jhume p_prod_0mplus_dec_0mplus_VAJHU;
     jhume p_prod_0minus_dec_0minus_VAJHU;
@@ -1627,7 +1784,7 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_Comparison_Ping(int motherflavor=0, int 
     jhume p_prod_0minusAA_dec_0minusAA_VAJHU;
     jhume p_prod_fa3AA_dec_fa3AA_VAJHU;
 
-    mcfmme p_bkg_VAMCFM;
+    mcfmme p_bkg_VAMCFM, p_bkg_VAMCFM_rssum;
     mcfmme p_prod_0mplus_dec_0mplus_VAMCFM;
     mcfmme p_prod_0minus_dec_0minus_VAMCFM;
     mcfmme p_prod_fa3_dec_fa3_VAMCFM;
@@ -2325,6 +2482,26 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_Comparison_Ping(int motherflavor=0, int 
     else mela.setProcess(TVar::bkgWW, TVar::MCFM, prod);
     mela.computeProdDecP(p_bkg_VAMCFM.proddecme, false);
     mela.getIORecord()->getUnweightedMEArray(p_bkg_VAMCFM.mearray);
+    if (motherflavor==0 && vbfvhchannel<2){
+      for (int r=-5; r<=5; r++){
+        for (int s=-5; s<=5; s++){
+          MELACandidate* cand = mela.getCurrentCandidate();
+          int idj[2] ={
+            cand->getAssociatedJet(0)->id,
+            cand->getAssociatedJet(1)->id
+          };
+
+          cand->getAssociatedJet(0)->id=r;
+          cand->getAssociatedJet(1)->id=s;
+          mcfmme p_bkg_VAMCFM_rsindiv;
+          mela.computeProdDecP(p_bkg_VAMCFM_rsindiv.proddecme, false);
+          mela.getIORecord()->getUnweightedMEArray(p_bkg_VAMCFM_rsindiv.mearray);
+          p_bkg_VAMCFM_rssum.add(p_bkg_VAMCFM_rsindiv);
+          cand->getAssociatedJet(0)->id=idj[0];
+          cand->getAssociatedJet(1)->id=idj[1];
+        }
+      }
+    }
 
     cout << "Production variables:\n";
     cout << "\tmJJ = " << mjj << endl;
@@ -2480,6 +2657,20 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_Comparison_Ping(int motherflavor=0, int 
       }
       cout << endl;
     }
+    if (motherflavor==0 && vbfvhchannel<2){
+      cout << "Bkg manual sum" << endl;
+      cout << "\tMCFM" << endl;
+      p_bkg_VAMCFM_rssum.printarray();
+      cout << "\tMCFM Bkg (re-sum)/Bkg Ratio" << endl;
+      for (int ii=0; ii<nmsq; ii++){
+        for (int jj=0; jj<nmsq; jj++){
+          cout << '\t';
+          if (p_bkg_VAMCFM_rssum.mearray[ii][jj]!=0.) cout << p_bkg_VAMCFM_rssum.mearray[ii][jj]/p_bkg_VAMCFM.mearray[ii][jj];
+          else cout << 0;
+        }
+        cout << endl;
+      }
+    }
 
     TUtil::PrintCandidateSummary(mela.getCurrentCandidate());
 
@@ -2488,10 +2679,11 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_Comparison_Ping(int motherflavor=0, int 
     // Reset the buffer
     cout.rdbuf(coutbuf);
     tout.close();
+    mela.setVerbosity(bkpverbosity);
   }
 }
 
-void testME_ProdDec_MCFM_JHUGen_JJQCDZZWW_Comparison_Ping(int motherflavor=0, int decZZWW=1 /*1==ZZ, 2==WW*/, int hasInterf=0 /*0==2l2l, 1==4l*/){
+void testME_ProdDec_MCFM_JHUGen_JJQCDZZWW_Comparison_Ping(int motherflavor=0, int decZZWW=1 /*1==ZZ, 2==WW*/, int hasInterf=0 /*0==2l2l, 1==4l*/, shared_ptr<Mela> melaptr=nullptr){
   if (hasInterf==1 && decZZWW==2) return;
   TString outname;
   if (decZZWW==1) outname = Form("testME_ProdDec_MCFM_JHUGen_JJQCDZZ_Comparison_Ping_%i_%s.out", motherflavor, (hasInterf ? "4l" : "2l2l"));
@@ -2572,7 +2764,12 @@ void testME_ProdDec_MCFM_JHUGen_JJQCDZZWW_Comparison_Ping(int motherflavor=0, in
     TVar::VerbosityLevel verbosity = TVar::ERROR;
     TVar::Production prod = TVar::JJQCD;
 
-    Mela mela(erg_tev, mPOLE, verbosity);
+    if (!melaptr) {
+      melaptr.reset(new Mela(erg_tev, mPOLE, verbosity));
+    }
+    Mela& mela = *melaptr;
+    TVar::VerbosityLevel bkpverbosity = mela.getVerbosity();
+    mela.setVerbosity(verbosity);
 
     mcfmme p_prod_JJQCD_VAMCFM;
 
@@ -2667,12 +2864,13 @@ void testME_ProdDec_MCFM_JHUGen_JJQCDZZWW_Comparison_Ping(int motherflavor=0, in
 
     cout.rdbuf(coutbuf);
     tout.close();
+    mela.setVerbosity(bkpverbosity);
   }
 }
 
 
-void testME_ProdDec_MCFM_Ping(int flavor=2){
-  ofstream tout("testME_ProdDec_MCFM_Ping.out");
+void testME_ProdDec_MCFM_Ping(int flavor=2, shared_ptr<Mela> melaptr=nullptr){
+  ofstream tout(TString("testME_ProdDec_MCFM_Ping_")+long(flavor)+".out");
   streambuf* coutbuf = cout.rdbuf();
   cout.rdbuf(tout.rdbuf());
 
@@ -2681,7 +2879,12 @@ void testME_ProdDec_MCFM_Ping(int flavor=2){
   float wPOLE=4.07e-3;
 
   TVar::VerbosityLevel verbosity = TVar::DEBUG;
-  Mela mela(erg_tev, mPOLE, verbosity);
+  if (!melaptr) {
+    melaptr.reset(new Mela(erg_tev, mPOLE, verbosity));
+  }
+  Mela& mela = *melaptr;
+  TVar::VerbosityLevel bkpverbosity = mela.getVerbosity();
+  mela.setVerbosity(verbosity);
   if (verbosity>=TVar::DEBUG) cout << "Mela is initialized" << endl;
   //mela.resetMCFM_EWKParameters(1.16639E-05, 1./128., 79.9549392, 91.1876, 0.23119);
   if (verbosity>=TVar::DEBUG) cout << "Mela candidate decay mode initializing" << endl;
@@ -2877,10 +3080,11 @@ void testME_ProdDec_MCFM_Ping(int flavor=2){
 
   cout.rdbuf(coutbuf);
   tout.close();
+  mela.setVerbosity(bkpverbosity);
 }
 
 
-void testME_ProdDec_MCFM_JHUGen_Comparison(int flavor=2, bool useBkgSample=false, int motherflavor=0, int isZZWW=0 /*1==ZZ, 2==WW*/, int vbfvhchannel=1 /*1==VBF, 2==VH*/){
+void testME_ProdDec_MCFM_JHUGen_Comparison(int flavor=2, bool useBkgSample=false, int motherflavor=0, int isZZWW=0 /*1==ZZ, 2==WW*/, int vbfvhchannel=1 /*1==VBF, 2==VH*/, shared_ptr<Mela> melaptr=nullptr){
   int erg_tev=8;
   float mPOLE=125.6;
   float wPOLE=4.15e-3;
@@ -2921,7 +3125,12 @@ void testME_ProdDec_MCFM_JHUGen_Comparison(int flavor=2, bool useBkgSample=false
   if (idMother[0]!=0 || idMother[1]!=0) coutput.Append(Form("_MotherId_%i_%i", idMother[0], idMother[1]));
   coutput.Append(".root");
 
-  Mela mela(erg_tev, mPOLE, verbosity);
+  if (!melaptr) {
+    melaptr.reset(new Mela(erg_tev, mPOLE, verbosity));
+  }
+  Mela& mela = *melaptr;
+  TVar::VerbosityLevel bkpverbosity = mela.getVerbosity();
+  mela.setVerbosity(verbosity);
 
   TFile* finput;
   TFile* foutput;
@@ -3411,15 +3620,21 @@ void testME_ProdDec_MCFM_JHUGen_Comparison(int flavor=2, bool useBkgSample=false
   delete newtree;
   foutput->Close();
   finput->Close();
+  mela.setVerbosity(bkpverbosity);
 }
 
-void testME_Dec_JHUGenMCFM_Ping(int flavor=2){
+void testME_Dec_JHUGenMCFM_Ping(int flavor=2, shared_ptr<Mela> melaptr=nullptr){
   int erg_tev=13;
   float mPOLE=125.;
   float wPOLE=4.07e-3;
 
   TVar::VerbosityLevel verbosity = TVar::DEBUG;
-  Mela mela(erg_tev, mPOLE, verbosity);
+  if (!melaptr) {
+    melaptr.reset(new Mela(erg_tev, mPOLE, verbosity));
+  }
+  Mela& mela = *melaptr;
+  TVar::VerbosityLevel bkpverbosity = mela.getVerbosity();
+  mela.setVerbosity(verbosity);
   if (verbosity>=TVar::DEBUG) cout << "Mela is initialized" << endl;
   mela.resetMCFM_EWKParameters(1.16639E-05, 1./128., 80.399, 91.1876, 0.23119);
 
@@ -3820,16 +4035,22 @@ void testME_Dec_JHUGenMCFM_Ping(int flavor=2){
     mela.resetInputEvent();
     cout << "Removed..." << endl;
   }
+  mela.setVerbosity(bkpverbosity);
 }
 
-void testME_Dec_FullSim(int flavor=2, bool useConstants=false, bool useBkgSample=false){
+void testME_Dec_FullSim(int flavor=2, bool useConstants=false, bool useBkgSample=false, shared_ptr<Mela> melaptr=nullptr){
   int erg_tev=8;
   float mPOLE=125.6;
   float wPOLE=4.07e-3;
   TString TREE_NAME = "SelectedTree";
 
   TVar::VerbosityLevel verbosity = TVar::ERROR;
-  Mela mela(erg_tev, mPOLE, verbosity);
+  if (!melaptr) {
+    melaptr.reset(new Mela(erg_tev, mPOLE, verbosity));
+  }
+  Mela& mela = *melaptr;
+  TVar::VerbosityLevel bkpverbosity = mela.getVerbosity();
+  mela.setVerbosity(verbosity);
   if (verbosity>=TVar::DEBUG) cout << "Mela is initialized" << endl;
   mela.resetMCFM_EWKParameters(1.16639E-05, 1./128., 80.399, 91.1876, 0.23119);
 
@@ -4214,16 +4435,22 @@ void testME_Dec_FullSim(int flavor=2, bool useConstants=false, bool useBkgSample
   foutput->WriteTObject(newtree);
   foutput->Close();
   finput->Close();
+  mela.setVerbosity(bkpverbosity);
 }
 
-void testME_ProdP_VBFHJJ_FullSim(int flavor=2, bool useConstants=false, bool useBkgSample=false){
+void testME_ProdP_VBFHJJ_FullSim(int flavor=2, bool useConstants=false, bool useBkgSample=false, shared_ptr<Mela> melaptr=nullptr){
   int erg_tev=13;
   float mPOLE=125.6;
   float wPOLE=4.07e-3;
   TString TREE_NAME = "SelectedTree";
 
   TVar::VerbosityLevel verbosity = TVar::ERROR;
-  Mela mela(erg_tev, mPOLE, verbosity);
+  if (!melaptr) {
+    melaptr.reset(new Mela(erg_tev, mPOLE, verbosity));
+  }
+  Mela& mela = *melaptr;
+  TVar::VerbosityLevel bkpverbosity = mela.getVerbosity();
+  mela.setVerbosity(verbosity);
 
   TString cinput_main = "/scratch0/hep/ianderso/CJLST/140519/PRODFSR_8TeV";
   TFile* finput;
@@ -4415,16 +4642,22 @@ void testME_ProdP_VBFHJJ_FullSim(int flavor=2, bool useConstants=false, bool use
   delete newtree;
   foutput->Close();
   finput->Close();
+  mela.setVerbosity(bkpverbosity);
 }
 
-void testME_ProdP_VH_FullSim(){
+void testME_ProdP_VH_FullSim(shared_ptr<Mela> melaptr=nullptr){
   int erg_tev=8;
   float mPOLE=125.6;
   float wPOLE=4.07e-3;
   TString TREE_NAME = "SelectedTree";
 
   TVar::VerbosityLevel verbosity = TVar::DEBUG;
-  Mela mela(erg_tev, mPOLE, verbosity);
+  if (!melaptr) {
+    melaptr.reset(new Mela(erg_tev, mPOLE, verbosity));
+  }
+  Mela& mela = *melaptr;
+  TVar::VerbosityLevel bkpverbosity = mela.getVerbosity();
+  mela.setVerbosity(verbosity);
 
   TString cinput_main = "/scratch0/hep/ianderso/CJLST/140519/PRODFSR_8TeV";
   TFile* finput = new TFile(Form("%s/%s/HZZ4lTree_ZZTo%s.root", cinput_main.Data(), "2mu2e", "2e2mu"), "read");
@@ -4627,16 +4860,22 @@ void testME_ProdP_VH_FullSim(){
   delete newtree;
   foutput->Close();
   finput->Close();
+  mela.setVerbosity(bkpverbosity);
 }
 
-void testME_ProdP_TTHBBH_FullSim(){
+void testME_ProdP_TTHBBH_FullSim(shared_ptr<Mela> melaptr=nullptr){
   int erg_tev=8;
   float mPOLE=125.6;
   float wPOLE=4.07e-3;
   TString TREE_NAME = "SelectedTree";
 
   TVar::VerbosityLevel verbosity = TVar::ERROR;
-  Mela mela(erg_tev, mPOLE, verbosity);
+  if (!melaptr) {
+    melaptr.reset(new Mela(erg_tev, mPOLE, verbosity));
+  }
+  Mela& mela = *melaptr;
+  TVar::VerbosityLevel bkpverbosity = mela.getVerbosity();
+  mela.setVerbosity(verbosity);
 
   TString cinput_main = "/scratch0/hep/ianderso/CJLST/140519/PRODFSR_8TeV";
   TFile* finput = new TFile(Form("%s/%s/HZZ4lTree_ZZTo%s.root", cinput_main.Data(), "2mu2e", "2e2mu"), "read");
@@ -4796,17 +5035,23 @@ void testME_ProdP_TTHBBH_FullSim(){
   delete newtree;
   foutput->Close();
   finput->Close();
+  mela.setVerbosity(bkpverbosity);
 }
 
 
-void testME_Dec_ZZWWComparison_FullSim(){
+void testME_Dec_ZZWWComparison_FullSim(shared_ptr<Mela> melaptr=nullptr){
   int erg_tev=8;
   float mPOLE=125.;
   float wPOLE=4.07e-3;
   TString TREE_NAME = "SelectedTree";
 
   TVar::VerbosityLevel verbosity = TVar::ERROR;
-  Mela mela(erg_tev, mPOLE, verbosity);
+  if (!melaptr) {
+    melaptr.reset(new Mela(erg_tev, mPOLE, verbosity));
+  }
+  Mela& mela = *melaptr;
+  TVar::VerbosityLevel bkpverbosity = mela.getVerbosity();
+  mela.setVerbosity(verbosity);
   if (verbosity>=TVar::DEBUG) cout << "Mela is initialized" << endl;
   mela.resetMCFM_EWKParameters(1.16639E-05, 1./128., 80.399, 91.1876, 0.23119);
 
@@ -5365,15 +5610,21 @@ void testME_Dec_ZZWWComparison_FullSim(){
   foutput->WriteTObject(newtree);
   foutput->Close();
   finput->Close();
+  mela.setVerbosity(bkpverbosity);
 }
 
-void testME_SuperMela_FullSim(int flavor=2, bool useBkgSample=false, bool debug=false){
+void testME_SuperMela_FullSim(int flavor=2, bool useBkgSample=false, bool debug=false, shared_ptr<Mela> melaptr=nullptr){
   int erg_tev=8;
   float mPOLE=125.6;
   TString TREE_NAME = "SelectedTree";
 
   TVar::VerbosityLevel verbosity = (debug ? TVar::DEBUG : TVar::ERROR);
-  Mela mela(erg_tev, mPOLE, verbosity);
+  if (!melaptr) {
+    melaptr.reset(new Mela(erg_tev, mPOLE, verbosity));
+  }
+  Mela& mela = *melaptr;
+  TVar::VerbosityLevel bkpverbosity = mela.getVerbosity();
+  mela.setVerbosity(verbosity);
   if (verbosity>=TVar::DEBUG) cout << "Mela is initialized" << endl;
 
   TString cinput_main = "/scratch0/hep/ianderso/CJLST/140519/PRODFSR_8TeV";
@@ -5529,4 +5780,5 @@ void testME_SuperMela_FullSim(int flavor=2, bool useBkgSample=false, bool debug=
   foutput->WriteTObject(newtree);
   foutput->Close();
   finput->Close();
+  mela.setVerbosity(bkpverbosity);
 }
