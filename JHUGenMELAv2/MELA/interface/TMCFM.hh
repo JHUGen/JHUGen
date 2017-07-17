@@ -238,6 +238,7 @@ extern "C" {
     double gh2w1_prime6[2]; double gh2w2_prime6[2]; double gh2w3_prime6[2]; double gh2w4_prime6[2]; // q1**4 - q2**4
     double gh2w1_prime7[2]; double gh2w2_prime7[2]; double gh2w3_prime7[2]; double gh2w4_prime7[2]; // |q1**2| * |q2**2|
 
+/*
     //contact terms
     double ghzzp1[2], ghzpzp1[2];
     double ghwwp1[2], ghwpwp1[2];
@@ -246,6 +247,7 @@ extern "C" {
     double ewp_L_U[2], ewp_R_U[2], ewp_L_C[2], ewp_R_C[2], ewp_L_E[2], ewp_R_E[2], ewp_L_M[2], ewp_R_M[2], ewp_L_T[2], ewp_R_T[2];
     int UseVprime;
     double M_Vprime, Ga_Vprime;
+*/
 
   } spinzerohiggs_anomcoupl_;
 
