@@ -520,21 +520,21 @@ void Mela::computeP(
       if (!(myME_ == TVar::MCFM  && myProduction_ == TVar::ZZINDEPENDENT &&  (myModel_ == TVar::bkgZZ || myModel_ == TVar::bkgWW || myModel_ == TVar::bkgZGamma))){
         if (myME_ == TVar::MCFM || myModel_ == TVar::SelfDefine_spin0){
           ZZME->set_SpinZeroCouplings(
-            selfDHggcoupl,
-            selfDHg4g4coupl,
-            selfDHqqcoupl,
-            selfDHbbcoupl,
-            selfDHttcoupl,
-            selfDHb4b4coupl,
-            selfDHt4t4coupl,
-            selfDHzzcoupl,
-            selfDHwwcoupl,
-            selfDHzzLambda_qsq,
-            selfDHwwLambda_qsq,
-            selfDHzzCLambda_qsq,
-            selfDHwwCLambda_qsq,
-            differentiate_HWW_HZZ
-            );
+          selfDHggcoupl,
+          selfDHg4g4coupl,
+          selfDHqqcoupl,
+          selfDHbbcoupl,
+          selfDHttcoupl,
+          selfDHb4b4coupl,
+          selfDHt4t4coupl,
+          selfDHzzcoupl,
+          selfDHwwcoupl,
+          selfDHzzLambda_qsq,
+          selfDHwwLambda_qsq,
+          selfDHzzCLambda_qsq,
+          selfDHwwCLambda_qsq,
+          differentiate_HWW_HZZ
+          );
           ZZME->set_SpinZeroContact(
             selfDHzzpcoupl,
             selfDHzpzpcoupl,
@@ -932,21 +932,21 @@ void Mela::computeProdP(
 
         if (myModel_ == TVar::SelfDefine_spin0){
           ZZME->set_SpinZeroCouplings(
-            selfDHggcoupl,
-            selfDHg4g4coupl,
-            selfDHqqcoupl,
-            selfDHbbcoupl,
-            selfDHttcoupl,
-            selfDHb4b4coupl,
-            selfDHt4t4coupl,
-            selfDHzzcoupl,
-            selfDHwwcoupl,
-            selfDHzzLambda_qsq,
-            selfDHwwLambda_qsq,
-            selfDHzzCLambda_qsq,
-            selfDHwwCLambda_qsq,
-            differentiate_HWW_HZZ
-            );
+          selfDHggcoupl,
+          selfDHg4g4coupl,
+          selfDHqqcoupl,
+          selfDHbbcoupl,
+          selfDHttcoupl,
+          selfDHb4b4coupl,
+          selfDHt4t4coupl,
+          selfDHzzcoupl,
+          selfDHwwcoupl,
+          selfDHzzLambda_qsq,
+          selfDHwwLambda_qsq,
+          selfDHzzCLambda_qsq,
+          selfDHwwCLambda_qsq,
+          differentiate_HWW_HZZ
+          );
           ZZME->set_SpinZeroContact(
             selfDHzzpcoupl,
             selfDHzpzpcoupl,
@@ -1074,21 +1074,21 @@ void Mela::computeProdP(
             if (fabs(sys)<threshold){
               if (myModel_ == TVar::SelfDefine_spin0){
                 ZZME->set_SpinZeroCouplings(
-                  selfDHggcoupl,
-                  selfDHg4g4coupl,
-                  selfDHqqcoupl,
-                  selfDHbbcoupl,
-                  selfDHttcoupl,
-                  selfDHb4b4coupl,
-                  selfDHt4t4coupl,
-                  selfDHzzcoupl,
-                  selfDHwwcoupl,
-                  selfDHzzLambda_qsq,
-                  selfDHwwLambda_qsq,
-                  selfDHzzCLambda_qsq,
-                  selfDHwwCLambda_qsq,
-                  differentiate_HWW_HZZ
-                  );
+                selfDHggcoupl,
+                selfDHg4g4coupl,
+                selfDHqqcoupl,
+                selfDHbbcoupl,
+                selfDHttcoupl,
+                selfDHb4b4coupl,
+                selfDHt4t4coupl,
+                selfDHzzcoupl,
+                selfDHwwcoupl,
+                selfDHzzLambda_qsq,
+                selfDHwwLambda_qsq,
+                selfDHzzCLambda_qsq,
+                selfDHwwCLambda_qsq,
+                differentiate_HWW_HZZ
+                );
                 ZZME->set_SpinZeroContact(
                   selfDHzzpcoupl,
                   selfDHzpzpcoupl,
@@ -1158,21 +1158,21 @@ void Mela::computeProdP(
         if (myProduction_ == TVar::JJQCD || myProduction_ == TVar::JJVBF){
           if (myModel_ == TVar::SelfDefine_spin0){
             ZZME->set_SpinZeroCouplings(
-              selfDHggcoupl,
-              selfDHg4g4coupl,
-              selfDHqqcoupl,
-              selfDHbbcoupl,
-              selfDHttcoupl,
-              selfDHb4b4coupl,
-              selfDHt4t4coupl,
-              selfDHzzcoupl,
-              selfDHwwcoupl,
-              selfDHzzLambda_qsq,
-              selfDHwwLambda_qsq,
-              selfDHzzCLambda_qsq,
-              selfDHwwCLambda_qsq,
-              differentiate_HWW_HZZ
-              );
+            selfDHggcoupl,
+            selfDHg4g4coupl,
+            selfDHqqcoupl,
+            selfDHbbcoupl,
+            selfDHttcoupl,
+            selfDHb4b4coupl,
+            selfDHt4t4coupl,
+            selfDHzzcoupl,
+            selfDHwwcoupl,
+            selfDHzzLambda_qsq,
+            selfDHwwLambda_qsq,
+            selfDHzzCLambda_qsq,
+            selfDHwwCLambda_qsq,
+            differentiate_HWW_HZZ
+            );
             ZZME->set_SpinZeroContact(
               selfDHzzpcoupl,
               selfDHzpzpcoupl,
@@ -1245,21 +1245,21 @@ void Mela::computeProdP_VH(
     if (myProduction_ == TVar::Lep_ZH || myProduction_ == TVar::Lep_WH || myProduction_ == TVar::Had_ZH || myProduction_ == TVar::Had_WH || myProduction_ == TVar::GammaH){
       if (myModel_ == TVar::SelfDefine_spin0){
         ZZME->set_SpinZeroCouplings(
-          selfDHggcoupl,
-          selfDHg4g4coupl,
-          selfDHqqcoupl,
-          selfDHbbcoupl,
-          selfDHttcoupl,
-          selfDHb4b4coupl,
-          selfDHt4t4coupl,
-          selfDHzzcoupl,
-          selfDHwwcoupl,
-          selfDHzzLambda_qsq,
-          selfDHwwLambda_qsq,
-          selfDHzzCLambda_qsq,
-          selfDHwwCLambda_qsq,
-          differentiate_HWW_HZZ
-          );
+        selfDHggcoupl,
+        selfDHg4g4coupl,
+        selfDHqqcoupl,
+        selfDHbbcoupl,
+        selfDHttcoupl,
+        selfDHb4b4coupl,
+        selfDHt4t4coupl,
+        selfDHzzcoupl,
+        selfDHwwcoupl,
+        selfDHzzLambda_qsq,
+        selfDHwwLambda_qsq,
+        selfDHzzCLambda_qsq,
+        selfDHwwCLambda_qsq,
+        differentiate_HWW_HZZ
+        );
         ZZME->set_SpinZeroContact(
           selfDHzzpcoupl,
           selfDHzpzpcoupl,
@@ -1303,21 +1303,21 @@ void Mela::computeProdP_ttH(
   if (melaCand!=0){
     if (myModel_ == TVar::SelfDefine_spin0){
       ZZME->set_SpinZeroCouplings(
-        selfDHggcoupl,
-        selfDHg4g4coupl,
-        selfDHqqcoupl,
-        selfDHbbcoupl,
-        selfDHttcoupl,
-        selfDHb4b4coupl,
-        selfDHt4t4coupl,
-        selfDHzzcoupl,
-        selfDHwwcoupl,
-        selfDHzzLambda_qsq,
-        selfDHwwLambda_qsq,
-        selfDHzzCLambda_qsq,
-        selfDHwwCLambda_qsq,
-        differentiate_HWW_HZZ
-        );
+      selfDHggcoupl,
+      selfDHg4g4coupl,
+      selfDHqqcoupl,
+      selfDHbbcoupl,
+      selfDHttcoupl,
+      selfDHb4b4coupl,
+      selfDHt4t4coupl,
+      selfDHzzcoupl,
+      selfDHwwcoupl,
+      selfDHzzLambda_qsq,
+      selfDHwwLambda_qsq,
+      selfDHzzCLambda_qsq,
+      selfDHwwCLambda_qsq,
+      differentiate_HWW_HZZ
+      );
       ZZME->set_SpinZeroContact(
         selfDHzzpcoupl,
         selfDHzpzpcoupl,
