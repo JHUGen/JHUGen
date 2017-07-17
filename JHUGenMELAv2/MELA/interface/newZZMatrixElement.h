@@ -121,6 +121,17 @@ public:
     int selfDHwwCLambda_qsq[nSupportedHiggses][SIZE_HVV_CQSQ],
     bool diffHWW = false
     );
+  void set_SpinZeroContact(
+    double selfDHzzpcoupl[SIZE_HVV][2],
+    double selfDHzpzpcoupl[SIZE_HVV][2],
+    double selfDHzpcontact[SIZE_Vp][2],
+    double selfDHwwpcoupl[SIZE_HVV][2],
+    double selfDHwpwpcoupl[SIZE_HVV][2],
+    double selfDHwpcontact[SIZE_Vp][2],
+    bool UseVprime,
+    double M_Vprime,
+    double Ga_Vprime
+    );
   void set_SpinOneCouplings(
     double selfDZqqcoupl[SIZE_ZQQ][2],
     double selfDZvvcoupl[SIZE_ZVV][2]

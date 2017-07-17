@@ -2870,6 +2870,7 @@ void TUtil::SetMCFMSpinZeroCouplings(bool useBSM, SpinZeroCouplings* Hcouplings,
       spinzerohiggs_anomcoupl_.ghw4_prime5[im] = 0;
       spinzerohiggs_anomcoupl_.ghw4_prime6[im] = 0;
       spinzerohiggs_anomcoupl_.ghw4_prime7[im] = 0;
+
     }
     /***** END REGULAR RESONANCE *****/
     //
@@ -3377,6 +3378,13 @@ void TUtil::SetJHUGenSpinZeroVVCouplings(double Hvvcoupl[SIZE_HVV][2], int Hvvco
   int iWWcoupl = (useWWcoupl ? 1 : 0);
   for (int c=0; c<SIZE_HVV_LAMBDAQSQ; c++){ for (int k=0; k<SIZE_HVV_CQSQ; k++) HvvLambda_qsq[c][k] *= GeV; } // GeV units in JHUGen
   __modjhugenmela_MOD_setspinzerovvcouplings(Hvvcoupl, Hvvcoupl_cqsq, HvvLambda_qsq, &iWWcoupl);
+}
+void TUtil::SetJHUGenSpinZeroContactTerms(double Hzzpcoupl[SIZE_HVV][2], double Hzpzpcoupl[SIZE_HVV][2], double Hzpcontact[SIZE_Vp][2], double Hwwpcoupl[SIZE_HVV][2], double Hwpwpcoupl[SIZE_HVV][2], double Hwpcontact[SIZE_Vp][2], bool UseVprime, double M_Vprime, double Ga_Vprime){
+  const double GeV=1./100.;
+  M_Vprime *= GeV;
+  Ga_Vprime *= GeV;
+  int usevp = UseVprime;
+  __modjhugenmela_MOD_setspinzerocontactterms(Hzzpcoupl, Hzpzpcoupl, Hzpcontact, Hwwpcoupl, Hwpwpcoupl, Hwpcontact, &usevp, &M_Vprime, &Ga_Vprime);
 }
 void TUtil::SetJHUGenSpinZeroGGCouplings(double Hggcoupl[SIZE_HGG][2]){ __modjhugenmela_MOD_setspinzeroggcouplings(Hggcoupl); }
 void TUtil::SetJHUGenSpinZeroQQCouplings(double Hqqcoupl[SIZE_HQQ][2]){ __modjhugenmela_MOD_setspinzeroqqcouplings(Hqqcoupl); }
