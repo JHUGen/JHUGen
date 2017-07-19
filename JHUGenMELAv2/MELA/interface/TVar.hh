@@ -3,10 +3,12 @@
 
 #define xstr_lit(s) str_lit(s)
 #define str_lit(s) #s
+#ifndef _melapkgpathstr_
 #ifndef _melapkgpath_
 #define _melapkgpath_ ./
 #endif
 #define _melapkgpathstr_ xstr_lit(_melapkgpath_)
+#endif
 
 #include <cstring>
 #include <string>
