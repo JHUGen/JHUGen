@@ -6,9 +6,13 @@
 
 class MELACandidate : public MELAParticle{
 public:
+  MELACandidate();
   MELACandidate(int id_, TLorentzVector p4_, bool associatedByHighestPt_=false);
+  MELACandidate(const MELACandidate& particle_);
+  MELACandidate& operator=(const MELACandidate& particle_);
   ~MELACandidate();
   MELACandidate* shallowCopy();
+  void swap(MELACandidate& particle_);
 
   // Member functions
 
@@ -19,10 +23,31 @@ public:
   MELAParticle* getAssociatedPhoton(int index)const;
   MELAParticle* getAssociatedJet(int index)const;
   MELATopCandidate* getAssociatedTop(int index)const;
+
+  std::vector<MELAParticle*>& getSortedDaughters();
+  std::vector<MELAParticle*>& getSortedVs();
+  std::vector<MELAParticle*>& getAssociatedLeptons();
+  std::vector<MELAParticle*>& getAssociatedNeutrinos();
+  std::vector<MELAParticle*>& getAssociatedPhotons();
+  std::vector<MELAParticle*>& getAssociatedJets();
+  std::vector<MELATopCandidate*>& getAssociatedTops();
+  
+  const std::vector<MELAParticle*>& getSortedDaughters()const;
+  const std::vector<MELAParticle*>& getSortedVs()const;
+  const std::vector<MELAParticle*>& getAssociatedLeptons()const;
+  const std::vector<MELAParticle*>& getAssociatedNeutrinos()const;
+  const std::vector<MELAParticle*>& getAssociatedPhotons()const;
+  const std::vector<MELAParticle*>& getAssociatedJets()const;
+  const std::vector<MELATopCandidate*>& getAssociatedTops()const;
+
+  void getRelatedParticles(std::vector<MELAParticle*>& particles);
+
   TLorentzVector getAlternativeVMomentum(int index)const;
 
   virtual std::vector<int> getDaughterIds()const;
   std::vector<int> getAssociatedParticleIds()const;
+
+  TVar::CandidateDecayMode getDecayMode()const{ return selfDecayMode; }
 
   int getNAssociatedLeptons()const{ return associatedLeptons.size(); }
   int getNAssociatedNeutrinos()const{ return associatedNeutrinos.size(); }
@@ -45,12 +70,15 @@ public:
   bool testShallowCopy();
 
   bool daughtersInterfere()const;
+  void setDecayMode(TVar::CandidateDecayMode flag);
   void setAddAssociatedByHighestPt(bool associatedByHighestPt_);
   void setShallowCopy(bool flag);
 
 protected:
   bool associatedByHighestPt;
   bool isShallowCopy;
+
+  TVar::CandidateDecayMode selfDecayMode;
 
   std::vector<MELAParticle*> associatedLeptons;
   std::vector<MELAParticle*> associatedNeutrinos;
@@ -70,6 +98,7 @@ protected:
   void addByHighestPt(MELATopCandidate* myParticle, std::vector<MELATopCandidate*>& particleArray);
 
   bool checkTopCandidateExists(MELATopCandidate* myParticle, std::vector<MELATopCandidate*>& particleArray)const;
+
 };
 
 

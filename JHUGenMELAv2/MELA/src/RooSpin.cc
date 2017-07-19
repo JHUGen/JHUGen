@@ -32,6 +32,9 @@ void AnaMelaHelpers::multiplyComplexNumbers(std::vector<Double_t> reals, std::ve
   }
 }
 
+RooSpin::RooSpin() : RooAbsPdf(),
+GeVunit(1e-2)
+{}
 
 RooSpin::RooSpin(
   const char* name, const char* title,
@@ -39,8 +42,6 @@ RooSpin::RooSpin(
   modelParameters _parameters,
   RooSpin::VdecayType _Vdecay1, RooSpin::VdecayType _Vdecay2
   ) : RooAbsPdf(name, title),
-
-  Vdecay1(_Vdecay1), Vdecay2(_Vdecay2), intCodeStart(1),
 
   h1("h1", "h1", this),
   h2("h2", "h2", this),
@@ -59,16 +60,18 @@ RooSpin::RooSpin(
   mZ("mZ", "mZ", this, (RooAbsReal&)*(_parameters.mZ)),
   gamZ("gamZ", "gamZ", this, (RooAbsReal&)*(_parameters.gamZ)),
   Sin2ThetaW("Sin2ThetaW", "Sin2ThetaW", this, (RooAbsReal&)*(_parameters.Sin2ThetaW)),
-  vev("vev", "vev", this, (RooAbsReal&)*(_parameters.vev))
+  vev("vev", "vev", this, (RooAbsReal&)*(_parameters.vev)),
+
+  Vdecay1(_Vdecay1), Vdecay2(_Vdecay2),
+  intCodeStart(1),
+
+  GeVunit(1e-2)
 {
   setProxies(_measurables);
 }
 
-
 RooSpin::RooSpin(const RooSpin& other, const char* name) :
 RooAbsPdf(other, name),
-
-Vdecay1(other.Vdecay1), Vdecay2(other.Vdecay2), intCodeStart(other.intCodeStart),
 
 h1("h1", this, other.h1),
 h2("h2", this, other.h2),
@@ -87,7 +90,12 @@ gamW("gamW", this, other.gamW),
 mZ("mZ", this, other.mZ),
 gamZ("gamZ", this, other.gamZ),
 Sin2ThetaW("Sin2ThetaW", this, other.Sin2ThetaW),
-vev("vev", this, other.vev)
+vev("vev", this, other.vev),
+
+Vdecay1(other.Vdecay1), Vdecay2(other.Vdecay2),
+intCodeStart(other.intCodeStart),
+
+GeVunit(other.GeVunit)
 {}
 
 void RooSpin::alwaysIntegrate(Int_t code){
@@ -108,6 +116,7 @@ void RooSpin::calculatePropagator(Double_t& propRe, Double_t& propIm, Double_t m
   if (propType==0){
     propRe = 0.;
     propIm = (mass!=0. ? -1./pow(mass, 2) : 0.);
+    propIm *= pow(GeVunit, -2);
   }
   else if (propType==1){
     Double_t mV, gamV;
@@ -116,6 +125,8 @@ void RooSpin::calculatePropagator(Double_t& propRe, Double_t& propIm, Double_t m
       Double_t denominator = pow(mV*gamV, 2)+pow(pow(mass, 2)-pow(mV, 2), 2);
       propRe = -mV*gamV/denominator;
       propIm = -(pow(mass, 2)-pow(mV, 2))/denominator;
+      propRe *= pow(GeVunit, -2);
+      propIm *= pow(GeVunit, -2);
     }
     else{
       propRe = (mass==mV ? 1. : 0.);
@@ -127,6 +138,8 @@ void RooSpin::calculatePropagator(Double_t& propRe, Double_t& propIm, Double_t m
       Double_t denominator = pow(mX*gamX, 2)+pow(pow(mass, 2)-pow(mX, 2), 2);
       propRe = mX*gamX/denominator;
       propIm = (pow(mass, 2)-pow(mX, 2))/denominator;
+      propRe *= pow(GeVunit, -2);
+      propIm *= pow(GeVunit, -2);
     }
     else{
       propRe = (mass==mX ? 1. : 0.);

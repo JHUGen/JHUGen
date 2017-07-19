@@ -1,7 +1,7 @@
-#include "RooSpinTwo_7DComplex_HVV.h"
+#include "RooSpinTwo_7DComplex_ppHVV.h"
 
 
-RooSpinTwo_7DComplex_HVV::RooSpinTwo_7DComplex_HVV(
+RooSpinTwo_7DComplex_ppHVV::RooSpinTwo_7DComplex_ppHVV(
   const char *name, const char *title,
   modelMeasurables _measurables,
   modelParameters _parameters,
@@ -13,17 +13,19 @@ RooSpinTwo_7DComplex_HVV::RooSpinTwo_7DComplex_HVV(
   _parameters,
   _couplings,
   _Vdecay1, _Vdecay2
-  )
+  ),
+  ZZ4fOrdering(true)
 {}
 
 
-RooSpinTwo_7DComplex_HVV::RooSpinTwo_7DComplex_HVV(
-  const RooSpinTwo_7DComplex_HVV& other, const char* name
-  ) : RooSpinTwo(other, name)
+RooSpinTwo_7DComplex_ppHVV::RooSpinTwo_7DComplex_ppHVV(
+  const RooSpinTwo_7DComplex_ppHVV& other, const char* name
+  ) : RooSpinTwo(other, name),
+  ZZ4fOrdering(other.ZZ4fOrdering)
 {}
 
 
-Double_t RooSpinTwo_7DComplex_HVV::evaluateH1Factor(Int_t i1, Int_t j1, Int_t helicity, Int_t code) const{
+Double_t RooSpinTwo_7DComplex_ppHVV::evaluateH1Factor(Int_t i1, Int_t j1, Int_t helicity, Int_t code) const{
   const Double_t Pi = TMath::Pi();
   Double_t dHel = (Double_t)helicity;
   Double_t result = 0;
@@ -43,7 +45,7 @@ Double_t RooSpinTwo_7DComplex_HVV::evaluateH1Factor(Int_t i1, Int_t j1, Int_t he
   }
   return result;
 }
-Double_t RooSpinTwo_7DComplex_HVV::evaluateH2Factor(Int_t i2, Int_t j2, Int_t helicity, Int_t code) const{
+Double_t RooSpinTwo_7DComplex_ppHVV::evaluateH2Factor(Int_t i2, Int_t j2, Int_t helicity, Int_t code) const{
   const Double_t Pi = TMath::Pi();
   Double_t dHel = (Double_t)helicity;
   Double_t result = 0;
@@ -63,7 +65,7 @@ Double_t RooSpinTwo_7DComplex_HVV::evaluateH2Factor(Int_t i2, Int_t j2, Int_t he
   }
   return result;
 }
-Double_t RooSpinTwo_7DComplex_HVV::evaluateHSFactor(Int_t di, Int_t dj, Int_t code) const{
+Double_t RooSpinTwo_7DComplex_ppHVV::evaluateHSFactor(Int_t di, Int_t dj, Int_t code) const{
   Double_t f_spinz0 = 1. - f_spinz1 - f_spinz2;
   if (f_spinz0<0) f_spinz0=0;
   Double_t hsneg = -hs; if (fabs(hsneg)>1.) hsneg *= 1./fabs(hsneg);
@@ -125,7 +127,7 @@ Double_t RooSpinTwo_7DComplex_HVV::evaluateHSFactor(Int_t di, Int_t dj, Int_t co
   else if ((di==-2 && dj==2) || (di==2 && dj==-2)) result = AF2m22;
   return result;
 }
-Double_t RooSpinTwo_7DComplex_HVV::evaluatePhi1PhiFactor(Int_t i1, Int_t i2, Int_t j1, Int_t j2, Int_t code, Double_t extraPhase1, Double_t extraPhase2) const{
+Double_t RooSpinTwo_7DComplex_ppHVV::evaluatePhi1PhiFactor(Int_t i1, Int_t i2, Int_t j1, Int_t j2, Int_t code, Double_t extraPhase1, Double_t extraPhase2) const{
   const Double_t Pi = TMath::Pi();
 
   Double_t result = 0;
@@ -166,7 +168,7 @@ Double_t RooSpinTwo_7DComplex_HVV::evaluatePhi1PhiFactor(Int_t i1, Int_t i2, Int
   return result;
 }
 
-void RooSpinTwo_7DComplex_HVV::evaluatePolarizationTerms(std::vector<Double_t>& Axxyyterm, const Int_t code, bool isGammaV1, bool isGammaV2) const{
+void RooSpinTwo_7DComplex_ppHVV::evaluatePolarizationTerms(std::vector<Double_t>& Axxyyterm, const Int_t code, bool isGammaV1, bool isGammaV2) const{
   Double_t R1Val, R2Val;
   calculateR1R2(R1Val, R2Val, isGammaV1, isGammaV2);
 
@@ -274,17 +276,19 @@ void RooSpinTwo_7DComplex_HVV::evaluatePolarizationTerms(std::vector<Double_t>& 
   return;
 }
 
-Double_t RooSpinTwo_7DComplex_HVV::evaluate() const{
+Double_t RooSpinTwo_7DComplex_ppHVV::evaluate() const{
   Double_t mV;
   getMVGamV(&mV);
   bool isZZ = (mV >= 90.);
   Double_t epsilon=1e-15;
   Double_t m1_=m1; if (Vdecay1==RooSpin::kVdecayType_GammaOnshell) m1_=0;
   Double_t m2_=m2; if (Vdecay2==RooSpin::kVdecayType_GammaOnshell) m2_=0;
-  if (isZZ && Vdecay1==Vdecay2){
-    if ((m1_+m2_) > m12 || (fabs(m2_-mV)<fabs(m1_-mV) && Vdecay2!=RooSpin::kVdecayType_GammaOnshell) || (m2_ <= 0. && Vdecay2!=RooSpin::kVdecayType_GammaOnshell) || (m1_ <= 0. && Vdecay1!=RooSpin::kVdecayType_GammaOnshell)) return epsilon;
-  }
-  else if ((m1_+m2_) > m12 || ((m2_ <= 0. || m1_ <= 0.) && Vdecay1!=RooSpin::kVdecayType_GammaOnshell && Vdecay2!=RooSpin::kVdecayType_GammaOnshell)) return epsilon;
+  if (
+    (m1_+m2_)>m12 ||
+    (isZZ && Vdecay1==Vdecay2 && ZZ4fOrdering && fabs(m2_-mV)<fabs(m1_-mV) && Vdecay2!=RooSpin::kVdecayType_GammaOnshell) ||
+    (m1_<=0. && Vdecay1!=RooSpin::kVdecayType_GammaOnshell) ||
+    (m2_<=0. && Vdecay2!=RooSpin::kVdecayType_GammaOnshell)
+    ) return epsilon;
 
   Int_t code = intCodeStart;
   if (Vdecay1==RooSpin::kVdecayType_GammaOnshell || Vdecay2==RooSpin::kVdecayType_GammaOnshell){
@@ -295,13 +299,13 @@ Double_t RooSpinTwo_7DComplex_HVV::evaluate() const{
   }
 
   Double_t betaValSq = (1.-(pow(m1_-m2_, 2)/pow(m12, 2)))*(1.-(pow(m1_+m2_, 2)/pow(m12, 2)));
-  if (betaValSq<0) return epsilon;
+  if (betaValSq<=0.) return epsilon;
   Double_t betaVal = sqrt(betaValSq);
 
   Double_t term1Coeff = 1;
   Double_t term2Coeff = 1;
-  if (Vdecay1!=RooSpin::kVdecayType_GammaOnshell) term1Coeff = 2.*m1_;
-  if (Vdecay2!=RooSpin::kVdecayType_GammaOnshell) term2Coeff = 2.*m2_;
+  if (Vdecay1!=RooSpin::kVdecayType_GammaOnshell) term1Coeff = 2.*m1_*GeVunit;
+  if (Vdecay2!=RooSpin::kVdecayType_GammaOnshell) term2Coeff = 2.*m2_*GeVunit;
 
   std::vector<Double_t> Axxyyterm;
   evaluatePolarizationTerms(Axxyyterm, code);
@@ -317,7 +321,7 @@ Double_t RooSpinTwo_7DComplex_HVV::evaluate() const{
   return value;
 }
 
-Int_t RooSpinTwo_7DComplex_HVV::getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* /*rangeName*/) const{
+Int_t RooSpinTwo_7DComplex_ppHVV::getAnalyticalIntegral(RooArgSet& allVars, RooArgSet& analVars, const char* /*rangeName*/) const{
   Int_t code = intCodeStart;
   if (checkFundamentalType(h1)){ if (matchArgs(allVars, analVars, h1) || Vdecay1==RooSpin::kVdecayType_GammaOnshell) code *= prime_h1; }
   if (checkFundamentalType(h2)){ if (matchArgs(allVars, analVars, h2) || Vdecay2==RooSpin::kVdecayType_GammaOnshell) code *= prime_h2; }
@@ -327,26 +331,28 @@ Int_t RooSpinTwo_7DComplex_HVV::getAnalyticalIntegral(RooArgSet& allVars, RooArg
   if (code==1) code=0;
   return code;
 }
-Double_t RooSpinTwo_7DComplex_HVV::analyticalIntegral(Int_t code, const char* /*rangeName*/) const{
+Double_t RooSpinTwo_7DComplex_ppHVV::analyticalIntegral(Int_t code, const char* /*rangeName*/) const{
   Double_t mV;
   getMVGamV(&mV);
   bool isZZ = (mV >= 90.);
   Double_t epsilon=1e-10;
   Double_t m1_=m1; if (Vdecay1==RooSpin::kVdecayType_GammaOnshell) m1_=0;
   Double_t m2_=m2; if (Vdecay2==RooSpin::kVdecayType_GammaOnshell) m2_=0;
-  if (isZZ && Vdecay1==Vdecay2){
-    if ((m1_+m2_) > m12 || (fabs(m2_-mV)<fabs(m1_-mV) && Vdecay2!=RooSpin::kVdecayType_GammaOnshell) || (m2_ <= 0. && Vdecay2!=RooSpin::kVdecayType_GammaOnshell) || (m1_ <= 0. && Vdecay1!=RooSpin::kVdecayType_GammaOnshell)) return epsilon;
-  }
-  else if ((m1_+m2_) > m12 || ((m2_ <= 0. || m1_ <= 0.) && Vdecay1!=RooSpin::kVdecayType_GammaOnshell && Vdecay2!=RooSpin::kVdecayType_GammaOnshell)) return epsilon;
+  if (
+    (m1_+m2_)>m12 ||
+    (isZZ && Vdecay1==Vdecay2 && ZZ4fOrdering && fabs(m2_-mV)<fabs(m1_-mV) && Vdecay2!=RooSpin::kVdecayType_GammaOnshell) ||
+    (m1_<=0. && Vdecay1!=RooSpin::kVdecayType_GammaOnshell) ||
+    (m2_<=0. && Vdecay2!=RooSpin::kVdecayType_GammaOnshell)
+    ) return epsilon;
 
   Double_t betaValSq = (1.-(pow(m1_-m2_, 2)/pow(m12, 2)))*(1.-(pow(m1_+m2_, 2)/pow(m12, 2)));
-  if (betaValSq<0) return epsilon;
+  if (betaValSq<=0.) return epsilon;
   Double_t betaVal = sqrt(betaValSq);
 
   Double_t term1Coeff = 1;
   Double_t term2Coeff = 1;
-  if (Vdecay1!=RooSpin::kVdecayType_GammaOnshell) term1Coeff = 2.*m1_;
-  if (Vdecay2!=RooSpin::kVdecayType_GammaOnshell) term2Coeff = 2.*m2_;
+  if (Vdecay1!=RooSpin::kVdecayType_GammaOnshell) term1Coeff = 2.*m1_*GeVunit;
+  if (Vdecay2!=RooSpin::kVdecayType_GammaOnshell) term2Coeff = 2.*m2_*GeVunit;
 
   std::vector<Double_t> Axxyyterm;
   evaluatePolarizationTerms(Axxyyterm, code);
@@ -378,3 +384,4 @@ Double_t RooSpinTwo_7DComplex_HVV::analyticalIntegral(Int_t code, const char* /*
   return value;
 }
 
+void RooSpinTwo_7DComplex_ppHVV::setZZ4fOrdering(Bool_t flag){ ZZ4fOrdering=flag; }

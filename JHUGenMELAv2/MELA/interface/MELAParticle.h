@@ -11,25 +11,38 @@ namespace debugVars{
 }
 
 class MELAParticle{
+
+  // Data members
 public:
-
-  // Constructors
-
-  MELAParticle();
-  MELAParticle(int id_, TLorentzVector p4_);
-  MELAParticle(const MELAParticle& particle_);
-  MELAParticle& operator=(const MELAParticle& particle_);
-  virtual ~MELAParticle(){};
-
-  // Data
-
   int id;
   TLorentzVector p4;
   bool passSelection;
   int genStatus;
   double lifetime;
 
+protected:
+  std::vector<MELAParticle*> mothers;
+  std::vector<MELAParticle*> daughters;
+
+
   // Member functions
+protected:
+
+  // Helper functions
+  bool checkParticleExists(MELAParticle* myParticle, std::vector<MELAParticle*>& particleArray);
+
+public:
+
+  // Constructors
+  MELAParticle();
+  MELAParticle(int id_, TLorentzVector p4_);
+  MELAParticle(const MELAParticle& particle_);
+  MELAParticle& operator=(const MELAParticle& particle_);
+  virtual ~MELAParticle(){};
+
+  // Utility functions
+  void swap(MELAParticle& particle_);
+
   void setSelected(bool isSelected=true){ passSelection = isSelected; }
   void setGenStatus(int status_){ genStatus=status_; }
   void setLifetime(int life_){ lifetime=life_; }
@@ -43,6 +56,7 @@ public:
 
   MELAParticle* getMother(int index) const;
   MELAParticle* getDaughter(int index) const;
+  virtual void getRelatedParticles(std::vector<MELAParticle*>& particles);
 
   double charge()const;
   double m()const{ return p4.M(); }
@@ -50,18 +64,24 @@ public:
   double y()const{ return p4.Y(); }
   double z()const{ return p4.Z(); }
   double t()const{ return p4.T(); }
+  double p()const{ return p4.P(); }
   double pt()const{ return p4.Pt(); }
   double eta()const{ return p4.Eta(); }
   double phi()const{ return p4.Phi(); }
   double rapidity()const{ return p4.Rapidity(); }
+  double dot(const TLorentzVector& v)const{ return p4.Dot(v); }
+  double dot(const MELAParticle& part)const{ return dot(part.p4); }
+  double dot(const MELAParticle* part)const{ if (part!=0) return dot(*part); else return 0; }
   double deltaR(const TLorentzVector& v)const{ return p4.DeltaR(v); }
+  double deltaR(const MELAParticle& part)const{ return deltaR(part.p4); }
+  double deltaR(const MELAParticle* part)const{ if (part!=0) return deltaR(*part); else return -1; }
+  void boost(const TVector3& vec, bool boostAll=false);
+  TVector3 vect()const{ return p4.Vect(); }
 
+  // Operators
+  MELAParticle& operator+=(MELAParticle* part){ if (part!=0){ p4 += part->p4; addDaughter(part); } return *this; }
+  MELAParticle& operator+=(const TLorentzVector& mom){ p4 += mom; return *this; }
 
-protected:
-  std::vector<MELAParticle*> mothers;
-  std::vector<MELAParticle*> daughters;
-
-  bool checkParticleExists(MELAParticle* myParticle, std::vector<MELAParticle*>& particleArray);
 };
 
 

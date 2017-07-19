@@ -6,7 +6,7 @@
 #include "ScalarPdfFactory.h"
 
 
-class ScalarPdfFactory_VH : public ScalarPdfFactory {
+class ScalarPdfFactory_VH : public ScalarPdfFactory{
 public:
 
   ScalarPdfFactory_VH(RooSpin::modelMeasurables measurables_, double sqrts_, RooSpin::VdecayType VHmode1_=RooSpin::kVdecayType_Zud, RooSpin::VdecayType VHmode2_=RooSpin::kVdecayType_Zud, Bool_t OnshellH_=true);
@@ -22,8 +22,9 @@ protected:
   double sqrts;
   int PDFType;
 
-  void initPDF();
-  void destroyPDF();
+  virtual void initPDF();
+  virtual void destroyPDF();
+
 };
 
 #endif

@@ -152,7 +152,7 @@ void RooSpinTwo::calculateAmplitudes(
   if (Vdecay2!=RooSpin::kVdecayType_GammaOnshell) calculatePropagator(propV2Re, propV2Im, m2_, (isGammaV2 ? 0 : 1));
   calculatePropagator(propHRe, propHIm, m12, 2);
 
-  Double_t ampScale = calculateAmplitudeScale(isGammaV1, isGammaV2);
+  Double_t ampScale = calculateAmplitudeScale(isGammaV1, isGammaV2)*pow(GeVunit/Lambda, 2);
 
   Double_t c1Re = ciRe.at(0);
   Double_t c2Re = ciRe.at(1);
@@ -421,6 +421,15 @@ void RooSpinTwo::calculateAmplitudes(
   Ap0Re_tmp *= ampScale;
   AmpRe_tmp *= ampScale;
   ApmRe_tmp *= ampScale;
+  A00Im_tmp *= ampScale;
+  AmmIm_tmp *= ampScale;
+  AppIm_tmp *= ampScale;
+  A0mIm_tmp *= ampScale;
+  A0pIm_tmp *= ampScale;
+  Am0Im_tmp *= ampScale;
+  Ap0Im_tmp *= ampScale;
+  AmpIm_tmp *= ampScale;
+  ApmIm_tmp *= ampScale;
 
   std::vector<Double_t> A00_reals, A00_imags; A00_reals.push_back(A00Re_tmp); A00_imags.push_back(A00Im_tmp); A00_reals.push_back(propV1Re); A00_imags.push_back(propV1Im); A00_reals.push_back(propV2Re); A00_imags.push_back(propV2Im); A00_reals.push_back(propHRe); A00_imags.push_back(propHIm); AnaMelaHelpers::multiplyComplexNumbers(A00_reals, A00_imags, A00Re, A00Im);
   std::vector<Double_t> Amm_reals, Amm_imags; Amm_reals.push_back(AmmRe_tmp); Amm_imags.push_back(AmmIm_tmp); Amm_reals.push_back(propV1Re); Amm_imags.push_back(propV1Im); Amm_reals.push_back(propV2Re); Amm_imags.push_back(propV2Im); Amm_reals.push_back(propHRe); Amm_imags.push_back(propHIm); AnaMelaHelpers::multiplyComplexNumbers(Amm_reals, Amm_imags, AmmRe, AmmIm);

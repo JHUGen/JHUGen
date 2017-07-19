@@ -71,7 +71,7 @@ public:
     RooAbsReal* vev;
   };
 
-  RooSpin(){};
+  RooSpin();
   RooSpin(
     const char* name, const char* title,
     modelMeasurables _measurables,
@@ -88,17 +88,13 @@ public:
   virtual Double_t analyticalIntegral(Int_t code, const char* rangeName=0) const = 0;
 
   virtual void setDecayModes(RooSpin::VdecayType Vdecay1_, RooSpin::VdecayType Vdecay2_){ Vdecay1=Vdecay1_; Vdecay2=Vdecay2_; }
+  virtual void getMVGamV(Double_t* mV=0, Double_t* gamV=0) const;
 
   virtual void defaultIntegration(){ intCodeStart=1; }
   virtual void alwaysIntegrate(Int_t code=1);
 
 
 protected:
-
-  RooSpin::VdecayType Vdecay1;
-  RooSpin::VdecayType Vdecay2;
-
-  Int_t intCodeStart;
 
   RooRealProxy h1;
   RooRealProxy h2;
@@ -119,11 +115,16 @@ protected:
   RooRealProxy Sin2ThetaW;
   RooRealProxy vev;
 
+  RooSpin::VdecayType Vdecay1;
+  RooSpin::VdecayType Vdecay2;
+
+  Int_t intCodeStart;
+  const Double_t GeVunit;
+
   virtual void calculatePropagator(Double_t& propRe, Double_t& propIm, Double_t mass, Int_t propType=1) const;
   virtual void calculateGVGA(Double_t& gV, Double_t& gA, RooSpin::VdecayType Vdecay, bool isGamma=false) const;
   virtual void calculateR1R2(Double_t& R1Val, Double_t& R2Val, bool isGammaV1=false, bool isGammaV2=false) const;
   virtual Double_t calculateAmplitudeScale(bool isGammaV1=false, bool isGammaV2=false) const;
-  virtual void getMVGamV(Double_t* mV=0, Double_t* gamV=0) const;
 
   virtual void setProxies(modelMeasurables _measurables);
   virtual void setProxy(RooRealProxy& proxy, RooAbsReal* objectPtr);
