@@ -7,6 +7,18 @@ import ROOT
 def include(filename):
   ROOT.gROOT.ProcessLine("#include <{}>".format(filename))
 
+def compile(filename, loadMELA=True):
+  ###################################
+  #this is necessary on some machines
+  command = "echo '\n"
+  if loadMELA: command += ".x " + os.path.join(os.path.dirname(__file__), "..", "test", "loadMELA.C+") + "\n"
+  if filename: command += ".L " + filename + "+\n"
+  command += "' | root -l -b "
+  os.system(command)
+  ###################################
+  ROOT.gROOT.ProcessLine(".L {}+".format(filename))
+
+
 class NamedTemporaryMacro(object):
   def __init__(self):
     self.f = tempfile.NamedTemporaryFile(suffix=".C", bufsize=0)
@@ -16,13 +28,10 @@ class NamedTemporaryMacro(object):
     self.compiled = False
   def compile(self):
     if not self.compiled:
-      ###################################
-      #this is necessary on some machines
-      os.system("echo .L {}+ | root -l -b {}".format(self.f.name, os.path.join(os.path.dirname(__file__), "..", "test", "loadMELA.C+")))
-      ###################################
-      ROOT.gROOT.ProcessLine(".L {}+".format(self.f.name))
+      compile(self.f.name)
       self.compiled = True
 
+compile("")  #compiles loadMELA
 ROOT.gROOT.Macro(os.path.join(os.path.dirname(__file__), "..", "test", "loadMELA.C+"))
 include("Mela.h")
 include("TCouplingsBase.hh")

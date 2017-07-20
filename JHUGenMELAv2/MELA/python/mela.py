@@ -37,6 +37,7 @@ See examples at the bottom.
 from collections import namedtuple
 import ROOT
 from pythonmelautils import MultiDimensionalCppArray, NamedTemporaryMacro, SelfDParameter, SelfDCoupling
+from ROOT import TVar
 
 class Mela(object):
   counter = 0
