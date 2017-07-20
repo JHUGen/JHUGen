@@ -10,15 +10,19 @@ def include(filename):
 class NamedTemporaryMacro(object):
   def __init__(self):
     self.f = tempfile.NamedTemporaryFile(suffix=".C", bufsize=0)
+    self.compiled = False
   def write(self, contents):
     self.f.write(contents)
+    self.compiled = False
   def compile(self):
-    ###################################
-    #this is necessary on some machines
-    os.system("echo .L {}+ | root -l -b".format(self.f.name))
-    ###################################
-    ROOT.gROOT.ProcessLine(".L {}+".format(self.f.name))
-    
+    if not self.compiled:
+      ###################################
+      #this is necessary on some machines
+      os.system("echo .L {}+ | root -l -b {}".format(self.f.name, os.path.join(os.path.dirname(__file__), "..", "test", "loadMELA.C+")))
+      ###################################
+      ROOT.gROOT.ProcessLine(".L {}+".format(self.f.name))
+      self.compiled = True
+
 ROOT.gROOT.Macro(os.path.join(os.path.dirname(__file__), "..", "test", "loadMELA.C+"))
 include("Mela.h")
 include("TCouplingsBase.hh")
