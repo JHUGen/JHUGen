@@ -13,6 +13,10 @@ class NamedTemporaryMacro(object):
   def write(self, contents):
     self.f.write(contents)
   def compile(self):
+    ###################################
+    #this is necessary on some machines
+    os.system("echo .L {}+ | root -l -b".format(self.f.name))
+    ###################################
     ROOT.gROOT.ProcessLine(".L {}+".format(self.f.name))
     
 ROOT.gROOT.Macro(os.path.join(os.path.dirname(__file__), "..", "test", "loadMELA.C+"))
