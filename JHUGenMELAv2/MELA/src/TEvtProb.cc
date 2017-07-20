@@ -533,7 +533,6 @@ double TEvtProb::XsecCalc_XVV(){
       UseVprime = selfDSpinZeroCoupl.UseVprime;
       M_Vprime = selfDSpinZeroCoupl.M_Vprime;
       Ga_Vprime = selfDSpinZeroCoupl.Ga_Vprime;
-      isSpinZero;
       isSpinZero = true;
     }
 
