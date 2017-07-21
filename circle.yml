@@ -1,10 +1,10 @@
 machine:
   #https://circleci.com/docs/environment, at the bottom
   pre:
-    - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.6 10
+    #- sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.6 10
     - sudo ln -s /usr/lib/gcc/x86_64-linux-gnu/4.6/libgfortran.so /usr/lib/
-    - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.6 10
-    - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.9 20
+    #- sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.6 10
+    #- sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.9 20
     - sudo apt-get install dos2unix cadaver tcsh
   environment:
     #environment variables can only be set in this section so . bin/thisroot.sh doesn't work
