@@ -5,7 +5,7 @@ jobs:
        - image: cmssw/cmssw:CMSSW_8_0_20
      steps:
        - run: cmsrel CMSSW_8_0_20
-       - run: echo "cd CMSSW_8_0_20 && eval $(scram ru -sh) && cd -" >> ~/.bashrc
+       - run: echo "cd CMSSW_8_0_20 && eval $(scram ru -sh) && cd -" >> $BASH_ENV
        - checkout
        - run: echo "hello world"
        - run: pwd
