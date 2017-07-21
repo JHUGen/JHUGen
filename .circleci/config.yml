@@ -2,7 +2,12 @@ version: 2
 jobs:
    build:
      docker:
-       - image: cmssw/cmssw:CMSSW_8_0_20
+       - image: cmssw/cmssw:CMSSW_8_0_20 kcyeu/boost:latest
      steps:
+       - run: cmsrel CMSSW_8_0_20
+       - run: echo "cd CMSSW_8_0_20 && eval $(scram ru -sh) && cd -" >> ~/.bashrc
        - checkout
        - run: echo "hello world"
+       - run: pwd
+       - run: ls
+       - run: cd JHUGenMELAv2/MELA/ && ./setup.sh
