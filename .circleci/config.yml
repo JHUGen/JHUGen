@@ -5,11 +5,14 @@ jobs:
        - image: cmssw/cmssw:CMSSW_8_0_20
      steps:
        - run:
-           name: setup cmsset_default
+           name: cmsset_default
            command: |
-             echo "source /opt/cms/common/cmsset_default.sh" >> $BASH_ENV
+             echo "source /opt/cms/cmsset_default.sh" >> $BASH_ENV
        - run: scram p CMSSW CMSSW_8_0_20
-       - run: echo "cd CMSSW_8_0_20 && eval $(scram ru -sh) && cd -" >> $BASH_ENV
+       - run:
+           name: cmsenv
+           command: |
+             echo "cd CMSSW_8_0_20 && eval $(scram ru -sh) && cd -" >> $BASH_ENV
        - checkout
        - run: echo "hello world"
        - run: pwd
