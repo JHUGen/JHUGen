@@ -15,6 +15,8 @@ jobs:
            name: cmsenv
            command: |
              echo 'cd $HOME/CMSSW_8_0_20 && eval $(scram ru -sh) && cd -' >> $BASH_ENV
+       - run: which git
+       - run: git --version
        - checkout
        - run: echo "hello world"
        - run: pwd
