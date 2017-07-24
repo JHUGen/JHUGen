@@ -14,7 +14,7 @@ jobs:
        - run:
            name: cmsenv
            command: |
-             echo "cd $HOME/CMSSW_8_0_20 && eval $(scram ru -sh) && cd -" >> $BASH_ENV
+             echo 'cd $HOME/CMSSW_8_0_20 && eval $(scram ru -sh) && cd -' >> $BASH_ENV
        - checkout
        - run: echo "hello world"
        - run: pwd
