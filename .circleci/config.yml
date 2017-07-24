@@ -5,6 +5,29 @@ jobs:
        - image: cmssw/cmssw:CMSSW_8_0_20
      steps:
        - run:
+           name: "git checkout -B hack"
+           command: |
+             mkdir $HOME/tmp &&
+             echo '#https://git-scm.com/docs/git-checkout#git-checkout-emgitcheckoutem-b-Bltnewbranchgtltstartpointgt
+                   if [ "$1" == checkout ] && [ "$2" == -q ] && [ "$3" == -B ] && [ $# == 4 ]; then
+                     git branch -f $4 &&
+                     git checkout $4
+                   else
+                     /usr/bin/git "$@"
+                   fi' > $HOME/tmp/git &&
+             chmod u+x $HOME/tmp/git &&
+             touch $BASH_ENV &&
+             cp $BASH_ENV $HOME/tmp/BASH_ENV &&
+             echo "export PATH=$HOME/tmp/:"'$PATH' >> $BASH_ENV
+       - run: which git
+       - run: git --version
+       - checkout
+       - run:
+           name: "undo git checkout -B hack"
+           command: |
+             mv $HOME/tmp/BASH_ENV $BASH_ENV &&
+             rm -r $HOME/tmp
+       - run:
            name: cmsset_default
            command: |
              echo "source /opt/cms/cmsset_default.sh" >> $BASH_ENV
@@ -14,10 +37,7 @@ jobs:
        - run:
            name: cmsenv
            command: |
-             echo 'cd $HOME/CMSSW_8_0_20 && eval $(scram ru -sh) && cd -' >> $BASH_ENV
-       - run: which git
-       - run: git --version
-       - checkout
+             echo 'cd $HOME/CMSSW_8_0_20 && eval $(scram ru -sh) && cd - > /dev/null' >> $BASH_ENV
        - run: echo "hello world"
        - run: pwd
        - run: ls
