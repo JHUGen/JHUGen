@@ -4,6 +4,7 @@ jobs:
      docker:
        - image: cmssw/cmssw:CMSSW_8_0_20
      steps:
+       - echo "source /opt/cms/common/cmsset_default.sh" >> $BASH_ENV
        - run: scram p CMSSW CMSSW_8_0_20
        - run: echo "cd CMSSW_8_0_20 && eval $(scram ru -sh) && cd -" >> $BASH_ENV
        - checkout
