@@ -47,9 +47,9 @@ jobs:
                tar -xvzf boost_1_61_0.tar.gz &&
                cd boost_1_61_0 &&
                ./bootstrap.sh &&
-               ./b2
+               (./b2 || true)
              fi
+       - run: cd JHUGenMELAv2/MELA/ && ./setup.sh
        - save_cache:
            key: v1_boost_1_61_0
            paths: ~/v1_boost_1_61_0
-       - run: cd JHUGenMELAv2/MELA/ && ./setup.sh
