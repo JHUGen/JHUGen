@@ -3,9 +3,10 @@ jobs:
    build:
      docker:
        - image: cmssw/cmssw:CMSSW_8_0_20
-         environment:
-           PATH: "$HOME/githack/:$PATH"
+       #  environment:
+       #    PATH: "$HOME/githack/:$PATH"
      steps:
+       - run: echo $PATH
        - run:
            name: "git checkout -B hack"
            command: |
