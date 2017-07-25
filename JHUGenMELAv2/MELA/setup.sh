@@ -1,10 +1,13 @@
-#!/bin/sh
+#!/bin/bash
+
+(
+set -eo pipefail
 
 MELADIR="."
 DATA_LIB_DIR="slc6_amd64_gcc530"
 
 if [[ "$1" == *"clean"* ]];then
-	make clean
+	make clean &&
 	pushd $MELADIR"/fortran/"
 	make clean
 	rm -f "../data/"$DATA_LIB_DIR"/libjhugenmela.so"
@@ -32,6 +35,7 @@ else
 		echo "ERROR: something went wrong in mv, see ^ error message"
 		echo
 		popd
-		return 1 >& /dev/null || exit 1 #return only works when sourced, exit will exit your whole session if sourced
+		exit 1
 	fi
 fi
+)
