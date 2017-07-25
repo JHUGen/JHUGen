@@ -5,6 +5,10 @@ jobs:
        - image: cmssw/cmssw:CMSSW_8_0_20
          environment:
            PATH: "/home/cmsbld/githack/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+           LIBRARY_PATH: "/home/cmsbld/boost_1_61_0/stage/lib"
+           CPATH: "/home/cmsbld/boost_1_61_0"
+           LD_LIBRARY_PATH: "/home/cmsbld/project/JHUGenMELAv2/MELA/data/slc6_amd64_gcc530"
+           PYTHONPATH: "/home/cmsbld/project/JHUGenMELAv2/MELA/python"
      steps:
        - run:
            name: "git checkout -B hack"
@@ -18,8 +22,6 @@ jobs:
                      /usr/bin/git "$@"
                    fi' > $HOME/githack/git &&
              chmod u+x $HOME/githack/git
-       - run: which git
-       - run: git --version
        - checkout
        - run:
            name: "undo git checkout -B hack"
@@ -35,7 +37,19 @@ jobs:
            name: cmsenv
            command: |
              echo 'cd $HOME/CMSSW_8_0_20 && eval $(scram ru -sh) && cd - > /dev/null' >> $BASH_ENV
-       - run: echo "hello world"
-       - run: pwd
-       - run: ls
+       - restore_cache:
+           key: v1_boost_1_61_0
+       - run:
+           name: install boost
+           command: |
+             if ! [ -d ~/boost_1_61_0 ]; then
+               wget https://sourceforge.net/projects/boost/files/boost/1.61.0/boost_1_61_0.tar.gz &&
+               tar -xvzf boost_1_61_0.tar.gz &&
+               cd boost_1_61_0 &&
+               ./bootstrap.sh &&
+               ./b2
+             fi
+       - save_cache:
+           key: v1_boost_1_61_0
+           paths: ~/v1_boost_1_61_0
        - run: cd JHUGenMELAv2/MELA/ && ./setup.sh
