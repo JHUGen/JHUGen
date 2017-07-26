@@ -2268,6 +2268,9 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_Comparison_Ping(int motherflavor=0, int 
     p_prod_fa3AA_dec_fa3AA_VAJHU.proddecme = p_prod_fa3AA_dec_fa3AA_VAJHU.prodme*p_prod_fa3AA_dec_fa3AA_VAJHU.decme; p_prod_fa3AA_dec_fa3AA_VAJHU.multiplyarray(p_prod_fa3AA_dec_fa3AA_VAJHU.decme);
 
     /***** MCFM *****/
+    // Reset these in case the function needs to be repeated
+    spinzerohiggs_anomcoupl_.AnomalCouplDK=1;
+    spinzerohiggs_anomcoupl_.AnomalCouplPR=1;
 
     if (isZZWW==ZZWWdec_onevertexflag) spinzerohiggs_anomcoupl_.AnomalCouplDK=0; // Test WW couplings in ZZ decay or ZZ couplings in WW decay
     else spinzerohiggs_anomcoupl_.AnomalCouplDK=1; // Test prod*decay couplings
@@ -2668,14 +2671,55 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_Comparison_Ping(int motherflavor=0, int 
       cout << "\tMCFM" << endl;
       p_bkg_VAMCFM_rssum.printarray();
       cout << "\tMCFM Bkg (re-sum)/Bkg Ratio" << endl;
+      bool wrongRatio=false;
       for (int ii=0; ii<nmsq; ii++){
         for (int jj=0; jj<nmsq; jj++){
           cout << '\t';
-          if (p_bkg_VAMCFM_rssum.mearray[ii][jj]!=0.) cout << p_bkg_VAMCFM_rssum.mearray[ii][jj]/p_bkg_VAMCFM.mearray[ii][jj];
-          else cout << 0;
+          float rr=0;
+          if (p_bkg_VAMCFM_rssum.mearray[ii][jj]!=0.) rr = p_bkg_VAMCFM_rssum.mearray[ii][jj]/p_bkg_VAMCFM.mearray[ii][jj];
+          cout << rr;
+          if (rr!=0. && rr!=4.) wrongRatio=true;
         }
         cout << endl;
       }
+
+      if (wrongRatio){ // Print all non-zero contributions in the manual sum
+        for (int r=-5; r<=5; r++){
+          for (int s=-5; s<=5; s++){
+            MELACandidate* cand = mela.getCurrentCandidate();
+            int idj[2] ={
+              cand->getAssociatedJet(0)->id,
+              cand->getAssociatedJet(1)->id
+            };
+
+            cand->getAssociatedJet(0)->id=r;
+            cand->getAssociatedJet(1)->id=s;
+            mcfmme p_bkg_VAMCFM_rsindiv;
+            mela.computeProdDecP(p_bkg_VAMCFM_rsindiv.proddecme, false);
+            mela.getIORecord()->getUnweightedMEArray(p_bkg_VAMCFM_rsindiv.mearray);
+            if (p_bkg_VAMCFM_rsindiv.proddecme>0.){
+              mela.setVerbosity(TVar::DEBUG_VERBOSE);
+              mela.computeProdDecP(p_bkg_VAMCFM_rsindiv.proddecme, false);
+              cout << endl;
+              cout << "Outgoing id1, id2 = " << r << " , " << s << endl;
+
+              for (int ii=0; ii<nmsq; ii++){
+                for (int jj=0; jj<nmsq; jj++){
+                  cout << '\t';
+                  cout << p_bkg_VAMCFM_rsindiv.mearray[ii][jj];
+                }
+                cout << endl;
+              }
+
+              cout << endl;
+              mela.setVerbosity(verbosity);
+            }
+            cand->getAssociatedJet(0)->id=idj[0];
+            cand->getAssociatedJet(1)->id=idj[1];
+          }
+        }
+      }
+
     }
 
     TUtil::PrintCandidateSummary(mela.getCurrentCandidate());
