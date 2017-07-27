@@ -273,6 +273,45 @@ C-----setup for dqcq_uqsq (1,4)-->(2,3)
 
       amp(dqcq_uqsq,h1,h2,h3,h5)=Bbit*amp(dqcq_uqsq,h1,h2,h3,h5)
      & +WWZZ71_82amp(h3,h5)
+
+! U. SARICA TEST
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+c      if (doHO .eqv. .false.) then
+c      write(6,*) "amp(dqcq_uqsq",h1,h2,h3,h5,")+=",
+c     & +cdotpr(jw7_3456_1(:,1,h3,h5),j8_2(:,h2))*0.5d0/propw82/cxw
+c      write(6,*) " -> jw7_3456_1(",1,h3,h5,")=",jw7_3456_1(:,1,h3,h5)
+c      write(6,*) " -> j8_2(",h2,")=",j8_2(:,h2)
+
+c      write(6,*) "amp(dqcq_uqsq",h1,h2,h3,h5,")+=",
+c     & +cdotpr(j7_1(:,h1),jw8_3456_2(:,2,h3,h5))*0.5d0/propw71/cxw
+c      write(6,*) " -> jw8_3456_2(",2,h3,h5,")=",jw8_3456_2(:,2,h3,h5)
+c      write(6,*) " -> j7_1(",h1,")=",j7_1(:,h1)
+
+c      write(6,*) "amp(dqcq_uqsq",h1,h2,h3,h5,")+=",
+c     & +(cdotpr(jw7_34_1(:,1,h3),jw8_56_2(:,2,h5))
+c     &  -cdotpr(jw7_34_1(:,1,h3),k7341(:))
+c     &  *cdotpr(k7341(:),jw8_56_2(:,2,h5))/cwmass2)/propw7341
+
+c      write(6,*) "amp(dqcq_uqsq",h1,h2,h3,h5,")+=",
+c     & +(cdotpr(jw7_56_1(:,1,h5),jw8_34_2(:,2,h3))
+c     &  -cdotpr(jw7_56_1(:,1,h5),k1567(:))
+c     &  *cdotpr(k1567(:),jw8_34_2(:,2,h3))/cwmass2)/propw7561
+
+c      if (h3 .eq. 1)
+c     & write(6,*) "amp(dqcq_uqsq",h1,h2,h3,h5,")+=",
+c     & +WWm7341(h5)
+c      if (h5 .eq. 1)
+c     & write(6,*) "amp(dqcq_uqsq",h1,h2,h3,h5,")+=",
+c     & +WWm7561(h3)
+
+c      write(6,*) "amp(dqcq_uqsq",h1,h2,h3,h5,")+=",
+c     & -srWWZZ71_82amp(h3,h5) ! note minus sign instead of exchanging 1<->7,2<->8
+c      endif
+
+c      write(6,*) "amp(dqcq_uqsq",h1,h2,h3,h5,")*=",Bbit,"+=",
+c     & +WWZZ71_82amp(h3,h5)
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
       enddo
       enddo
       enddo
