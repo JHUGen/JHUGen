@@ -87,6 +87,9 @@ protected:
   RooRealVar* mean_CB_err_;
   RooRealVar* sigma_CB_err_;
 
+  RooRealVar* corr_mean_sig;
+  RooRealVar* corr_sigma_sig;
+
   MELADoubleCB *sig_CB_;
   MELARelBWUFParam *sig_BW_;
   RooFFTConvPdf *sig_FFT_;

@@ -39,9 +39,12 @@ class Mela{
 
 public:
 
-  // Mela(){};
-  Mela(double LHCsqrts_=13., double mh_=125., TVar::VerbosityLevel verbosity_=TVar::ERROR); // higgs mass for supermela
+  Mela(double LHCsqrts_=13., double mh_=125., TVar::VerbosityLevel verbosity_=TVar::ERROR); // Higgs mass for supermela
+  Mela(const Mela& other);
   ~Mela();
+
+  // Constructor wrapper
+  void build(double mh_);
 
   void setProcess(TVar::Process myModel, TVar::MatrixElement myME, TVar::Production myProduction);
   void setVerbosity(TVar::VerbosityLevel verbosity_=TVar::ERROR);

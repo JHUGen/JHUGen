@@ -12,8 +12,12 @@ protected:
   /***** RESOLUTION HANDLES *****/
   std::unordered_map<int, MELADifermionResolutionModel*> ResolutionModelMap;
 
+  /***** Constructor wrapper *****/
+  void Build();
+
 public:
   SuperDijetMela(float sqrts_, TVar::VerbosityLevel verbosity_);
+  SuperDijetMela(const SuperDijetMela& other);
   ~SuperDijetMela();
 
   void SetVerbosity(const TVar::VerbosityLevel verbosity_){ verbosity=verbosity_; }
