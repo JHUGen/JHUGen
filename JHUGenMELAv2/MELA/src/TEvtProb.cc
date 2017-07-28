@@ -24,25 +24,41 @@ using namespace TUtil;
 // Constructors and Destructor
 //-----------------------------------------------------------------------------
 TEvtProb::TEvtProb(
-  const char* path, double ebeam, const char* pathtoPDFSet, int PDFMember, TVar::VerbosityLevel verbosity_
+  const char* pathtoXSW, double ebeam, const char* pathtoPDFSet, int PDFMember, TVar::VerbosityLevel verbosity_
   ) :
+  pathtoPDFSet_(pathtoPDFSet),
+  PDFMember_(PDFMember),
   verbosity(verbosity_),
-  EBEAM(ebeam)
+  EBEAM(ebeam),
+  myCSW_(pathtoXSW)
 {
   if (verbosity>=TVar::DEBUG) cout << "Begin TEvtProb constructor" << endl;
 
-  SetLeptonInterf(TVar::DefaultLeptonInterf);
+  /***** Build everything except MELAHXSWidth *****/
+  Build();
 
-  /***** Initialize Higgs width reader *****/
-  string path_string = path;
-  myCSW_ = new MELAHXSWidth(path_string);
-  if (verbosity>=TVar::DEBUG) cout << "TEvtProb::TEvtProb: HXS successful" << endl;
+  if (verbosity>=TVar::DEBUG) cout << "End TEvtProb constructor" << endl;
+}
+TEvtProb::TEvtProb(const TEvtProb& other) :
+pathtoPDFSet_(other.pathtoPDFSet_),
+PDFMember_(other.PDFMember_),
+verbosity(other.verbosity),
+EBEAM(other.EBEAM),
+myCSW_(other.myCSW_)
+{
+
+}
+void TEvtProb::Build(){
+  if (verbosity>=TVar::DEBUG) cout << "Begin TEvtProb::Build" << endl;
+
+  /***** Initialize lepton interference scheme *****/
+  SetLeptonInterf(TVar::DefaultLeptonInterf);
 
   /***** Initialize MCFM *****/
   InitializeMCFM();
 
   /***** Initialize JHUGen *****/
-  InitializeJHUGen(pathtoPDFSet, PDFMember);
+  InitializeJHUGen(pathtoPDFSet_, PDFMember_);
 
   /***** Cross-initializations *****/
   CrossInitialize();
@@ -51,14 +67,14 @@ TEvtProb::TEvtProb(
   ResetInputEvent();
   SetCandidateDecayMode(TVar::CandidateDecay_ZZ);
 
-  if (verbosity>=TVar::DEBUG) cout << "End TEvtProb constructor" << endl;
+  if (verbosity>=TVar::DEBUG) cout << "End TEvtProb::Build" << endl;
 }
+
 
 TEvtProb::~TEvtProb(){
   if (verbosity>=TVar::DEBUG) cout << "Begin TEvtProb destructor" << endl;
 
   ResetInputEvent();
-  if (myCSW_!=0) delete myCSW_;
 
   if (verbosity>=TVar::DEBUG) cout << "End TEvtProb destructor" << endl;
 }
@@ -207,7 +223,7 @@ void TEvtProb::SetHiggsMass(double mass, double wHiggs, int whichResonance){
     }
     else if (wHiggs<0.){
       _hmass = mass;
-      _hwidth = myCSW_->HiggsWidth(_hmass);
+      _hwidth = myCSW_.HiggsWidth(_hmass);
     }
     else{
       _hmass = mass;
@@ -228,7 +244,7 @@ void TEvtProb::SetHiggsMass(double mass, double wHiggs, int whichResonance){
     }
     else if (wHiggs<0.){
       _h2mass = mass;
-      _h2width = myCSW_->HiggsWidth(_h2mass);
+      _h2width = myCSW_.HiggsWidth(_h2mass);
     }
     else{
       _h2mass = mass;
@@ -339,6 +355,7 @@ void TEvtProb::ResetInputEvent(){
 }
 
 // Get-functions
+MELAHXSWidth const* TEvtProb::GetHXSWidthEstimator() const{ return &myCSW_; }
 SpinZeroCouplings* TEvtProb::GetSelfDSpinZeroCouplings(){ return selfDSpinZeroCoupl.getRef(); }
 SpinOneCouplings* TEvtProb::GetSelfDSpinOneCouplings(){ return selfDSpinOneCoupl.getRef(); }
 SpinTwoCouplings* TEvtProb::GetSelfDSpinTwoCouplings(){ return selfDSpinTwoCoupl.getRef(); }
@@ -348,11 +365,11 @@ double TEvtProb::GetPrimaryMass(int ipart){
   else return TUtil::GetMass(ipart);
 }
 double TEvtProb::GetPrimaryWidth(int ipart){
-  if (PDGHelpers::isAHiggs(ipart)) return myCSW_->HiggsWidth(GetPrimaryHiggsMass());
+  if (PDGHelpers::isAHiggs(ipart)) return myCSW_.HiggsWidth(GetPrimaryHiggsMass());
   else return TUtil::GetDecayWidth(ipart);
 }
 double TEvtProb::GetHiggsWidthAtPoleMass(double mass){
-  if (mass>0.) return myCSW_->HiggsWidth(mass);
+  if (mass>0.) return myCSW_.HiggsWidth(mass);
   else return -1.;
 }
 MelaIO* TEvtProb::GetIORecord(){ return RcdME.getRef(); }

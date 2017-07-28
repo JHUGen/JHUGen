@@ -15,8 +15,20 @@ sigW(0),
 graphW(0),
 gsW(0)
 {
-  ifstream file;
   fileName = fileLoc + "/HiggsTotalWidth_" + strAppend + ".txt";
+  build();
+}
+MELAHXSWidth::MELAHXSWidth(const MELAHXSWidth& other) :
+fileName(other.fileName),
+xmhW(0),
+sigW(0),
+graphW(0),
+gsW(0)
+{
+  build();
+}
+void MELAHXSWidth::build(){
+  ifstream file;
   file.open(fileName.c_str());
   while (!file.eof()){
     double mass=0, br=0;
@@ -54,7 +66,7 @@ MELAHXSWidth::~MELAHXSWidth(){
   if (sigW!=0) delete[] sigW; sigW=0;
 }
 
-double MELAHXSWidth::HiggsWidth(double mH){
+double MELAHXSWidth::HiggsWidth(double mH) const{
   double result = 0;
   if (gsW!=0){
     int indexW = (int)mass_BR.size();
