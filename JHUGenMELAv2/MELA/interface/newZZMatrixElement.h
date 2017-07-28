@@ -16,7 +16,7 @@ public:
     double ebeam,
     TVar::VerbosityLevel verbosity
     );
-
+  newZZMatrixElement(const newZZMatrixElement& other);
   ~newZZMatrixElement();
 
   void computeXS(
@@ -154,6 +154,9 @@ protected:
   // Having a temporary top candidate list does not make much sense at the moment
   //std::vector<MELATopCandidate*> tmpTopCandList; // Vector of pointers to the owned, temporary MELATopCandidates
   std::vector<MELACandidate*> tmpCandList; // Vector of pointers to the owned, temporary MELACandidates
+
+  // Constructor wrapper
+  void build();
 
 };
 #endif
