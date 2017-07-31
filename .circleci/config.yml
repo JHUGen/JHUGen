@@ -1,56 +1,495 @@
+env: &env
+  docker:
+    - image: cmssw/cmssw:CMSSW_8_0_20
+      environment:
+        PATH: "/home/cmsbld/githack/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+        LIBRARY_PATH: "/home/cmsbld/boost_1_61_0/stage/lib"
+        CPATH: "/home/cmsbld/boost_1_61_0"
+        LD_LIBRARY_PATH: "/home/cmsbld/project/JHUGenMELAv2/MELA/data/slc6_amd64_gcc530"
+        PYTHONPATH: "/home/cmsbld/project/JHUGenMELAv2/MELA/python"
+
+cmsrelcmsenv: &cmsrelcmsenv
+  name: "cmsrel, cmsenv"
+  command: |
+    echo "source /opt/cms/cmsset_default.sh" >> $BASH_ENV
+    source $BASH_ENV
+    cd $HOME
+    scram p CMSSW CMSSW_8_0_20
+    echo 'cd ~/CMSSW_8_0_20 && eval $(scram ru -sh) && cd - > /dev/null' >> $BASH_ENV
+
 version: 2
 jobs:
-   build:
-     docker:
-       - image: cmssw/cmssw:CMSSW_8_0_20
-         environment:
-           PATH: "/home/cmsbld/githack/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-           LIBRARY_PATH: "/home/cmsbld/boost_1_61_0/stage/lib"
-           CPATH: "/home/cmsbld/boost_1_61_0"
-           LD_LIBRARY_PATH: "/home/cmsbld/project/JHUGenMELAv2/MELA/data/slc6_amd64_gcc530"
-           PYTHONPATH: "/home/cmsbld/project/JHUGenMELAv2/MELA/python"
-     steps:
+  build:
+    <<: *env
+    working_directory: ~/JHUGen
+    steps:
+      - attach_workspace:
+          at: ~/JHUGen
+      - run:
+          name: "git checkout -B hack"
+          command: |
+            mkdir $HOME/githack &&
+            echo '#https://git-scm.com/docs/git-checkout#git-checkout-emgitcheckoutem-b-Bltnewbranchgtltstartpointgt
+                  if [ "$1" == checkout ] && [ "$2" == -q ] && [ "$3" == -B ] && [ $# == 4 ]; then
+                    git branch -f $4 &&
+                    git checkout $4
+                  else
+                    /usr/bin/git "$@"
+                  fi' > $HOME/githack/git &&
+            chmod u+x $HOME/githack/git
+      - checkout
+      - run:
+          name: "undo git checkout -B hack"
+          command: rm -r $HOME/githack
+      - run:
+          <<: *cmsrelcmsenv
+      - restore_cache:
+          key: v1_boost_1_61_0
+      - run:
+          name: install boost
+          command: |
+            cd ~ &&
+            if ! [ -d ~/boost_1_61_0 ]; then
+              wget https://sourceforge.net/projects/boost/files/boost/1.61.0/boost_1_61_0.tar.gz &&
+              tar -xvzf boost_1_61_0.tar.gz &&
+              cd boost_1_61_0 &&
+              ./bootstrap.sh &&
+              (./b2 || true)
+            fi
+      - run: cd JHUGenMELAv2/MELA/ && ./setup.sh
+      - save_cache:
+          key: v1_boost_1_61_0
+          paths: ~/boost_1_61_0
+      - run: cd JHUGenerator && make
+      - persist_to_workspace:
+          root: ~/JHUGen
+          paths:
+            - JHUGenerator
+            - JHUGenMELAv2
+            - Manual
+
+  generator_reference:
+    <<: *env
+    working_directory: ~/JHUGen/JHUGenerator
+    requires:
+      - build
+    steps:
+      - attach_workspace:
+          at: ~/JHUGen
+      - attach_workspace:
+          at: ~/reference_check
+      - run:
+          <<: *cmsrelcmsenv
+      - restore_cache:
+          key: v1_boost_1_61_0
+      - mkdir -p ~/reference_check/ compare_to_reference
+      - run: ./JHUGen Seed=765543533 PDFSet=3 Process=0 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/ggH_ZZ DecayMode1=9 DecayMode2=9 $REFERENCE_COUPLINGS
+      - run: ./JHUGen Seed=765543533 PDFSet=3 Process=0 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/ggH_WW DecayMode1=11 DecayMode2=11 $REFERENCE_COUPLINGS
+      - run: ./JHUGen Seed=765543533 PDFSet=3 Process=0 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/ggH_Zgamma DecayMode1=9 DecayMode2=7 $REFERENCE_COUPLINGS
+      - run: ./JHUGen Seed=765543533 PDFSet=3 Process=0 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/ggH_gammagamma DecayMode1=7 DecayMode2=7 $REFERENCE_COUPLINGS
+
+      - run: ./JHUGen Seed=765543533 PDFSet=3 Process=1 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/spin1_ZZ DecayMode1=9 DecayMode2=9 $REFERENCE_COUPLINGS
+      - run: ./JHUGen Seed=765543533 PDFSet=3 Process=1 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/spin1_WW DecayMode1=11 DecayMode2=11 $REFERENCE_COUPLINGS
+
+      - run: ./JHUGen Seed=765543533 PDFSet=3 Process=2 PChannel=0 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/gg_spin2_ZZ DecayMode1=9 DecayMode2=9 $REFERENCE_COUPLINGS
+      - run: ./JHUGen Seed=765543533 PDFSet=3 Process=2 PChannel=1 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/qq_spin2_WW DecayMode1=11 DecayMode2=11 $REFERENCE_COUPLINGS
+      - run: ./JHUGen Seed=765543533 PDFSet=3 Process=2 PChannel=0 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/gg_spin2_Zgamma DecayMode1=9 DecayMode2=7 $REFERENCE_COUPLINGS $SPIN2_PHOTON
+      - run: ./JHUGen Seed=765543533 PDFSet=3 Process=2 PChannel=1 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/qq_spin2_gammagamma DecayMode1=7 DecayMode2=7 $REFERENCE_COUPLINGS $SPIN2_PHOTON
+
+      - run: ./JHUGen Seed=765543533 PDFSet=3 Process=50 VegasNc0=100000 VegasNc2=100 HbbDK DataFile=compare_to_reference/ZH_bb DecayMode1=9 $REFERENCE_COUPLINGS
+      - run: ./JHUGen Seed=765543533 PDFSet=3 Process=50 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/WH DecayMode1=11 $REFERENCE_COUPLINGS
+      - run: ./JHUGen Seed=765543533 VegasNc0=100000 ReadLHE=compare_to_reference/WH.lhe DataFile=compare_to_reference/WH_Zgamma DecayMode1=9 DecayMode2=7 $REFERENCE_COUPLINGS
+      - run: ./JHUGen Seed=765543533 Collider=0 Process=50 VegasNc0=100000 VegasNc2=100 HbbDK DataFile=compare_to_reference/ee_gammaH_bb DecayMode1=7 $REFERENCE_COUPLINGS
+
+      #don't use WW separate in VBF.  In any case, there is interference
+      - run: ./JHUGen Seed=765543533 PDFSet=3 Process=60 VegasNc0=5000000 VegasNc2=100 DataFile=compare_to_reference/VBF $REFERENCE_COUPLINGS
+      - run: ./JHUGen Seed=765543533 VegasNc0=100000 ReadLHE=compare_to_reference/VBF.lhe DataFile=compare_to_reference/VBF_ZZ DecayMode1=9 DecayMode2=9 $REFERENCE_COUPLINGS
+      - run: ./JHUGen Seed=765543533 PDFSet=3 Process=61 VegasNc0=5000000 VegasNc2=100 DataFile=compare_to_reference/HJJ $REFERENCE_COUPLINGS
+      - run: ./JHUGen Seed=765543533 VegasNc0=100000 ReadLHE=compare_to_reference/HJJ.lhe DataFile=compare_to_reference/HJJ_WW DecayMode1=11 DecayMode2=11 $REFERENCE_COUPLINGS
+      - run: ./JHUGen Seed=765543533 PDFSet=3 Process=62 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/HJ $REFERENCE_COUPLINGS
+      - run: ./JHUGen Seed=765543533 VegasNc0=100000 ReadLHE=compare_to_reference/HJ.lhe DataFile=compare_to_reference/HJ_gammagamma DecayMode1=7 DecayMode2=7 $REFERENCE_COUPLINGS
+
+      - run: ./JHUGen Seed=765543533 PDFSet=3 Process=80 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/ttH TopDK=1 DecayMode1=11 DecayMode2=11 $REFERENCE_COUPLINGS
+      - run: ./JHUGen Seed=765543533 VegasNc0=100000 ReadLHE=compare_to_reference/ttH.lhe DataFile=compare_to_reference/ttH_tautau DecayMode1=11 DecayMode2=11 TauDK=1 $REFERENCE_COUPLINGS
+      - run: ./JHUGen Seed=765543533 PDFSet=3 Process=90 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/bbH $REFERENCE_COUPLINGS
+      - run: ./JHUGen Seed=765543533 VegasNc0=100000 ReadLHE=compare_to_reference/bbH.lhe DataFile=compare_to_reference/bbH_tautau TauDK=0 $REFERENCE_COUPLINGS
+
+      - run: ./JHUGen Seed=765543533 PDFSet=3 Process=110 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/tqH_110 TopDK=1 DecayMode1=11 $REFERENCE_COUPLINGS
+      - run: ./JHUGen Seed=765543533 PDFSet=3 Process=111 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/tqH_111 TopDK=1 DecayMode1=11 $REFERENCE_COUPLINGS
+      - run: ./JHUGen Seed=765543533 PDFSet=3 Process=112 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/tqH_112 TopDK=1 DecayMode1=11 $REFERENCE_COUPLINGS
+      - run: ./JHUGen Seed=765543533 PDFSet=3 Process=113 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/tqH_113 TopDK=1 DecayMode1=11 $REFERENCE_COUPLINGS
+      - run: ./JHUGen Seed=765543533 PDFSet=3 Process=114 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/tqH_114 TopDK=1 DecayMode1=11 $REFERENCE_COUPLINGS
+
+      #now compare to reference
+      - run:
+          name: "download reference lhes"
+          command: |
+            exitstatus=0 &&
+            mkdir reference compare_to_reference && cd reference &&
+            for filename in $REFERENCE_FILENAMES; do
+              wget $REFERENCE_LHES_FOLDER/$filename &&
+              sed -i -r "s/(Output from the JHUGenerator )$REFERENCE_JHUGEN_VERSION/\1$JHUGEN_VERSION/" $filename ||
+              exitstatus=1
+            done
+            if [ $exitstatus -ne 0 ]; then
+              touch ~/reference_check/reference_failed
+              if [ $filename == $REFERENCE_FILENAME_GGH ]; then
+                touch ~/reference_check/reference_failed_ggH
+              fi
+              if [ $filename == $REFERENCE_FILENAME_VBF ] || [ $filename == $REFERENCE_FILENAME_HJJ ]; then
+                touch ~/reference_check/reference_failed_VBF
+              fi
+            fi
+            exit $exitstatus
+      - run:
+          name: "compare to reference"
+          command: |
+            exitstatus=0
+            for filename in $REFERENCE_FILENAMES; do
+              echo "================"
+              echo $filename
+              echo "================"
+              echo
+              sdiff -s reference/$filename compare_to_reference/$filename && echo "no change" || (
+                exitstatus=1
+                touch ~/reference_check/reference_failed
+                if [ $filename == $REFERENCE_FILENAME_GGH ]; then
+                  touch ~/reference_check/reference_failed_ggH
+                fi
+                if [ $filename == $REFERENCE_FILENAME_VBF ] || [ $filename == $REFERENCE_FILENAME_HJJ ]; then
+                  touch ~/reference_check/reference_failed_VBF
+                fi
+              )
+            done
+            exit $exitstatus
+      - run:
+          name: "save reference"
+          command: |
+            mkdir -p ~/artifacts/
+            mv compare_to_reference ~/artifacts/reference_lhes
+          when: on_fail
+      - store_artifacts:
+          path: ~/artifacts/reference_lhes
+      - persist_to_workspace:
+          root: ~/reference_check
+          paths:
+            - *
+
+  generator_syntax:
+    <<: *env
+    working_directory: ~/JHUGen/JHUGenerator
+    requires:
+      - generator_reference
+    steps:
+      - attach_workspace:
+          at: ~/JHUGen
+      - run:
+          <<: *cmsrelcmsenv
+      - run: echo "export LHEDIR=$HOME/artifacts/syntax_check" >> $BASH_ENV
+      - restore_cache:
+          key: v1_boost_1_61_0
+      - run: mkdir -p $LHEDIR/
+      #gg/qqbar -> spin0/1/2
+      - run: ./JHUGen PDFSet=3 Process=0  VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/spin0_Zgamma     DecayMode1=9  DecayMode2=7 ghzgs2=1,0
+      - run: ./JHUGen PDFSet=3 Process=0  VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/spin0_gammagamma DecayMode1=7  DecayMode2=7 ghgsgs2=1,0
+      - run: ./JHUGen PDFSet=3 Process=1  VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/spin1_WW         DecayMode1=11 DecayMode2=11 zprime_zz_1=1,0
+      - run: ./JHUGen PDFSet=3 Process=2  VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/spin2_ZZ         DecayMode1=9  DecayMode2=9 a1=1,0 b1=1,0 b5=1,0
+      - run: ./JHUGen PDFSet=3 Process=2  VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/spin2_Zgamma     DecayMode1=9  DecayMode2=7 a1=1,0 b1=1,0
+      - run: ./JHUGen PDFSet=3 Process=2  VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/spin2_gammagamma DecayMode1=7  DecayMode2=7 a1=1,0 b1=1,0
+      #WH, ZH, gammaH
+      - run: ./JHUGen PDFSet=3   Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$LHEDIR/WH DecayMode1=11
+      - run: ./JHUGen PDFSet=3   Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$LHEDIR/ZH DecayMode1=9 HbbDK
+      - run: ./JHUGen PDFSet=3   Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$LHEDIR/gammaH DecayMode1=7 ghz1=0,0 ghzgs2=1,0
+      - run: ./JHUGen PDFSet=3   Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$LHEDIR/gammaH_bb DecayMode1=7 ghz1=0,0 ghgsgs2=1,0 HbbDK
+      - run: ./JHUGen Collider=0 Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$LHEDIR/ee_ZH DecayMode1=9
+      - run: ./JHUGen VegasNc0=100000 TauDK=0 ReadLHE=$LHEDIR/ee_ZH.lhe DataFile=$LHEDIR/ee_ZH_tautau
+      - run: ./JHUGen Collider=0 Process=50 VegasNc0=100000 VegasNc2=10000 DataFile=$LHEDIR/ee_gammaH_bb DecayMode1=7 HbbDK ghz1=0,0 ghgsgs2=1,0 epPolarization=100 emPolarization=-100
+      #H+J
+      - run: ./JHUGen PDFSet=3 Process=62 VegasNc0=100000 VegasNc2=10000 DataFile=$LHEDIR/HJ
+      #ttH, bbH, tH
+      - run: ./JHUGen PDFSet=3 Process=80  VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/ttH DecayMode1=11 DecayMode2=11 TopDK=1
+      - run: ./JHUGen PDFSet=3 Process=90  VegasNc0=100000 VegasNc2=10  DataFile=$LHEDIR/gg_bbH PChannel=0
+      - run: ./JHUGen PDFSet=3 Process=90  VegasNc0=100000 VegasNc2=10  DataFile=$LHEDIR/qq_bbH PChannel=1
+      - run: ./JHUGen PDFSet=3 Process=110 VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/tH_t    DecayMode1=11 TopDK=1
+      - run: ./JHUGen PDFSet=3 Process=111 VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/tbarH_t DecayMode1=11 TopDK=1 MReso=750 GaReso=247
+      - run: ./JHUGen PDFSet=3 Process=112 VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/tH_s    DecayMode1=11 TopDK=1
+      - run: ./JHUGen PDFSet=3 Process=113 VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/tbarH_s DecayMode1=11 TopDK=1
+      - run: ./JHUGen PDFSet=3 Process=114 VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/tH_all  DecayMode1=11 TopDK=1
+      #Decays for t(t)H which have complicated quarks, to check colors
+      - run: ./JHUGen PDFSet=3 VegasNc0=100000            DecayMode1=1 DecayMode2=1 ReadLHE=$LHEDIR/ttH.lhe DataFile=$LHEDIR/ttH_ZZ
+      - run: ./JHUGen PDFSet=3 VegasNc0=100000 TauDK=1    DecayMode1=5 DecayMode2=5 ReadLHE=$LHEDIR/ttH.lhe DataFile=$LHEDIR/ttH_tautau
+      - run: ./JHUGen PDFSet=3 VegasNc0=100000            DecayMode1=5 DecayMode2=5 ReadLHE=$LHEDIR/tH_t.lhe DataFile=$LHEDIR/tH_t_WW
+      - run: ./JHUGen PDFSet=3 VegasNc0=100000            DecayMode1=1 DecayMode2=1 ReadLHE=$LHEDIR/tbarH_t.lhe DataFile=$LHEDIR/tbarH_t_ZZ
+      - run: ./JHUGen PDFSet=3 VegasNc0=100000 TauDK=1    DecayMode1=5 DecayMode2=5 ReadLHE=$LHEDIR/tH_s.lhe DataFile=$LHEDIR/tH_s_tautau
+      - run: ./JHUGen PDFSet=3 VegasNc0=100000 ghzgs2=1,0 DecayMode1=0 DecayMode2=7 ReadLHE=$LHEDIR/tH_all.lhe DataFile=$LHEDIR/tH_all_Zgamma.lhe
+      #make sure that the mass was read correctly and the interference determined
+      - run: "grep -q 'Interference: T' $LHEDIR/ttH_ZZ.lhe"
+      - run: "grep -q 'Interference: F' $LHEDIR/tbarH_t_ZZ.lhe"
+      - run:
+          name: checklhe
+          command: |
+            unbuffer python ~/checklhe/checklhe.py $(find $LHEDIR -name *.lhe) | tee checklheoutput.txt
+            ! grep -q '!' checklheoutput.txt
+          when: always
+      - store_artifacts:
+          path: ~/artifacts/reference_lhes
+
+  plots_ggH:
+    <<: *env
+    working_directory: ~/JHUGen/JHUGenerator
+    requires:
+      - build
+    steps:
+      - attach_workspace:
+          at: ~/JHUGen
+      - attach_workspace:
+          at: ~/reference_check
+      - run: '! [ -f ~/reference_check/reference_failed_ggH ]'
+      - run:
+          <<: *cmsrelcmsenv
+          when: on_fail
+      - run:
+          command: echo "export LHEDIR=$HOME/artifacts/ggH" >> $BASH_ENV
+          when: on_fail
+      - restore_cache:
+          key: v1_boost_1_61_0
+      - restore_cache:
+          key: v1_analyzer
+      - run:
+          command: |
+            cd
+            if ! [ -d ~/CMSJHU_AnalysisMacros/ ]; then
+              git clone -b noMELA git@github.com:hroskes/CMSJHU_AnalysisMacros
+            fi
+            cd CMSJHU_AnalysisMacros/JHUSpinWidthPaper_2015/LHEAnalyzer
+            git pull
+            make all
+      - save_cache:
+          key: v1_analyzer
+          paths: ~/CMSJHU_AnalysisMacros/
+      - run:
+          command: mkdir -p $LHEDIR/
+          when: on_fail
+      - run:
+          name: generate
+          when: on_fail
+          command: |
+            ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$LHEDIR/SM
+            ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$LHEDIR/PS ghz1=0,0 ghz4=1,0
+            #./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$LHEDIR/fa30.5 ghz1=1,0 ghz4=2.55052,0
+            #./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$LHEDIR/fa30.5i ghz1=1,0 ghz4=0,2.55052
+            ./JHUGen PDFSet=3 VegasNc0=1000000 VegasNc2=10000 Interf=0 DataFile=$LHEDIR/a2 ghz1=0,0 ghz2=1,0
        - run:
-           name: "git checkout -B hack"
+           name: analyzer
+           when: on_fail
            command: |
-             mkdir $HOME/githack &&
-             echo '#https://git-scm.com/docs/git-checkout#git-checkout-emgitcheckoutem-b-Bltnewbranchgtltstartpointgt
-                   if [ "$1" == checkout ] && [ "$2" == -q ] && [ "$3" == -B ] && [ $# == 4 ]; then
-                     git branch -f $4 &&
-                     git checkout $4
-                   else
-                     /usr/bin/git "$@"
-                   fi' > $HOME/githack/git &&
-             chmod u+x $HOME/githack/git
-       - checkout
+            analyzer fileLevel=0 outdir=$LHEDIR/ outfile=SM.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 SM.lhe
+            analyzer fileLevel=0 outdir=$LHEDIR/ outfile=PS.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 PS.lhe
+            #analyzer fileLevel=0 outdir=$LHEDIR/ outfile=fa30.5.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 fa30.5.lhe
+            #analyzer fileLevel=0 outdir=$LHEDIR/ outfile=fa30.5i.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 fa30.5i.lhe
+            analyzer fileLevel=0 outdir=$LHEDIR/ outfile=a2.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 a2.lhe
        - run:
-           name: "undo git checkout -B hack"
-           command: rm -r $HOME/githack
-       - run:
-           name: cmsset_default
+          name: plots
+           when: on_fail
            command: |
-             echo "source /opt/cms/cmsset_default.sh" >> $BASH_ENV
+            cd ~/CMSJHU_AnalysisMacros/ZZ4lanalyticalfits && echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$LHEDIR/SM.root", "$LHEDIR/SM/", 1, 0, 0, 0, 0)' | root -b
+            cd ~/CMSJHU_AnalysisMacros/ZZ4lanalyticalfits && echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$LHEDIR/PS.root", "$LHEDIR/PS/", 0, 0, 0, 1, 0)' | root -b
+            cd ~/CMSJHU_AnalysisMacros/ZZ4lanalyticalfits && echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$LHEDIR/a2.root", "$LHEDIR/a2/", 0, 1, 0, 0, 0)' | root -b
+            #cd ~/CMSJHU_AnalysisMacros/ZZ4lanalyticalfits && echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$LHEDIR/fa30.5.root", "$LHEDIR/fa30.5/", 1, 2.55052, 0, 0, 0)' | root -b
+            #cd ~/CMSJHU_AnalysisMacros/ZZ4lanalyticalfits && echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$LHEDIR/fa30.5i.root", "$LHEDIR/fa30.5i/", 1, 0, 2.55052, 0, 0)' | root -b
+      - store_artifacts:
+          path: ~/artifacts/ggH
+
+  plots_VBF:
+    <<: *env
+    working_directory: ~/JHUGen/JHUGenerator
+    requires:
+      - build
+    steps:
+      - attach_workspace:
+          at: ~/JHUGen
+      - attach_workspace:
+          at: ~/reference_check
+      - run: '! [ -f ~/reference_check/reference_failed_VBF ]'
+      - run:
+          <<: *cmsrelcmsenv
+          when: on_fail
+      - run:
+          command: echo "export LHEDIR=$HOME/artifacts/VBF" >> $BASH_ENV
+          when: on_fail
+      - restore_cache:
+          key: v1_boost_1_61_0
+      - restore_cache:
+          key: v1_analyzer
+      - run:
+          command: |
+            cd
+            if ! [ -d ~/CMSJHU_AnalysisMacros/ ]; then
+              git clone -b noMELA git@github.com:hroskes/CMSJHU_AnalysisMacros
+            fi
+            cd CMSJHU_AnalysisMacros/JHUSpinWidthPaper_2015/LHEAnalyzer
+            git pull
+            make all
+      - save_cache:
+          key: v1_analyzer
+          paths: ~/CMSJHU_AnalysisMacros/
+      - run:
+          command: mkdir -p $LHEDIR/
+          when: on_fail
+      - run:
+          name: generate
+          when: on_fail
+          command: |
+            ./JHUGen PDFSet=3 Process=60 VegasNc0=10000000 VegasNc2=10000 DataFile=$LHEDIR/SM pTjetcut=0 deltaRcut=0
+            ./JHUGen PDFSet=3 VegasNc0=100000 DecayMode1=8 DecayMode2=8 Interf=0 ReadLHE=$LHEDIR/SM.lhe DataFile=$LHEDIR/SM_decayed
+            ./JHUGen PDFSet=3 Process=61 VegasNc0=10000000 VegasNc2=10000 DataFile=$LHEDIR/HJJ_SM
+            ./JHUGen PDFSet=3 VegasNc0=100000 DecayMode1=8 DecayMode2=8 Interf=0 ReadLHE=$LHEDIR/HJJ_SM.lhe DataFile=$LHEDIR/HJJ_SM_decayed
+            ./JHUGen PDFSet=3 Process=60 VegasNc0=10000000 VegasNc2=10000 DataFile=$LHEDIR/PS ghz1=0,0 ghz4=1,0  pTjetcut=0 deltaRcut=0
+            ./JHUGen PDFSet=3 VegasNc0=100000 DecayMode1=8 DecayMode2=8 Interf=0 ReadLHE=$LHEDIR/PS.lhe DataFile=$LHEDIR/PS_decayed ghz1=0,0 ghz4=1,0
+            ./JHUGen PDFSet=3 Process=60 VegasNc0=10000000 VegasNc2=10000 DataFile=$LHEDIR/a2 ghz1=0,0 ghz2=1,0 pTjetcut=0 deltaRcut=0
+            ./JHUGen PDFSet=3 VegasNc0=100000 DecayMode1=8 DecayMode2=8 Interf=0 ReadLHE=$LHEDIR/a2.lhe DataFile=$LHEDIR/a2_decayed ghz1=0,0 ghz2=1,0
        - run:
-           name: cmsrel
-           command: "cd $HOME && scram p CMSSW CMSSW_8_0_20"
-       - run:
-           name: cmsenv
+           name: analyzer
+           when: on_fail
            command: |
-             echo 'cd $HOME/CMSSW_8_0_20 && eval $(scram ru -sh) && cd - > /dev/null' >> $BASH_ENV
-       - restore_cache:
-           key: v1_boost_1_61_0
+            analyzer fileLevel=0 outdir=$LHEDIR/ outfile=SM.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 SM_decayed.lhe
+            analyzer fileLevel=0 outdir=$LHEDIR/ outfile=HJJ_SM.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 HJJ_SM_decayed.lhe
+            analyzer fileLevel=0 outdir=$LHEDIR/ outfile=PS.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 PS_decayed.lhe
+            analyzer fileLevel=0 outdir=$LHEDIR/ outfile=a2.root indir=$LHEDIR/ computeVBFProdAngles=1 computeVHProdAngles=1 a2_decayed.lhe
        - run:
-           name: install boost
+          name: plots
+           when: on_fail
            command: |
-             cd ~ &&
-             if ! [ -d ~/boost_1_61_0 ]; then
-               wget https://sourceforge.net/projects/boost/files/boost/1.61.0/boost_1_61_0.tar.gz &&
-               tar -xvzf boost_1_61_0.tar.gz &&
-               cd boost_1_61_0 &&
-               ./bootstrap.sh &&
-               (./b2 || true)
-             fi
-       - run: cd JHUGenMELAv2/MELA/ && ./setup.sh
-       - save_cache:
-           key: v1_boost_1_61_0
-           paths: ~/v1_boost_1_61_0
+             cd ~/CMSJHU_AnalysisMacros/MCProductionValidation && root -b -q VBFplots.C+
+      - store_artifacts:
+          path: ~/artifacts/VBF
+
+  MELA:
+    <<: *env
+    working_directory: ~/JHUGen/JHUGenMELAv2
+    requires:
+      - build
+    steps:
+      - attach_workspace:
+          at: ~/JHUGen
+      - run: ./testME_all.py
+      - run: ./testME_more.py
+      - run:
+          command: |
+            mkdir -p ~/artifacts/MELA/
+            mv *.out ~/artifacts/MELA/
+          when: on_fail
+      - store_artifacts:
+          path:
+            ~/artifacts/MELA/
+
+  misc:
+    <<: *env
+    working_directory: ~/JHUGen/
+    requires:
+      - build
+    steps:
+      - attach_workspace:
+          at: ~/JHUGen
+      - run: mkdir -p ~/artifacts/misc/
+      - run:
+          name: "big file check"
+          command: |
+            join -e ERROR -a 2 -j 1 -o 2.1,2.3,1.2 --check-order <( git rev-list --objects --all | sort -k 1 ) <( git verify-pack -v .git/objects/pack/pack-*.idx | gawk '( NF == 5 && $2 == "blob" ){print}' | sort -k1 ) | sort -k2gr > ~/artifacts/misc/filesizes.txt &&
+            if ! [ $(head -1 ~/artifacts/misc/filesizes.txt | sed -r 's/.* (.*) .*/\1/') -lt 52428800 ]; then
+              echo 'There is a big file committed to the repository.  Check misc/filesizes.txt in the artifacts.'; exit 1
+            fi
+          when: always
+      - run:
+          command: sdiff -s JHUGenerator/mod_Graviton.F90 JHUGenMELAv2/MELA/fortran/mod_Graviton.F90
+          when: always
+      - run:
+          command: sdiff -s JHUGenerator/mod_Higgs.F90 JHUGenMELAv2/MELA/fortran/mod_Higgs.F90
+          when: always
+      - run:
+          command: sdiff -s JHUGenerator/mod_HiggsJ.F90 JHUGenMELAv2/MELA/fortran/mod_HiggsJ.F90
+          when: always
+      - run:
+          command: sdiff -s JHUGenerator/mod_HiggsJJ.F90 JHUGenMELAv2/MELA/fortran/mod_HiggsJJ.F90
+          when: always
+      - run:
+          command: sdiff -s JHUGenerator/mod_Misc.F90 JHUGenMELAv2/MELA/fortran/mod_Misc.F90
+          when: always
+      - run:
+          command: sdiff -s JHUGenerator/mod_Parameters.F90 JHUGenMELAv2/MELA/fortran/mod_Parameters.F90
+          when: always
+      - run:
+          command: sdiff -s JHUGenerator/mod_THiggs.F90 JHUGenMELAv2/MELA/fortran/mod_THiggs.F90
+          when: always
+      - run:
+          command: sdiff -s JHUGenerator/mod_TTBHiggs.F90 JHUGenMELAv2/MELA/fortran/mod_TTBHiggs.F90
+          when: always
+      - run:
+          command: sdiff -s JHUGenerator/mod_TopDecay.F90 JHUGenMELAv2/MELA/fortran/mod_TopDecay.F90
+          when: always
+      - run:
+          command: sdiff -s JHUGenerator/mod_VHiggs.F90 JHUGenMELAv2/MELA/fortran/mod_VHiggs.F90
+          when: always
+      - run:
+          command: sdiff -s JHUGenerator/mod_Zprime.F90 JHUGenMELAv2/MELA/fortran/mod_Zprime.F90
+          when: always
+      - run:
+          name: "check sync between manual and README"
+          when: always
+          command: |
+            commandlineconfigstartline=$(grep -n "[{]Command line configuration[}]" Manual/manJHUGenerator.tex | head -1 | sed "s/:.*//") &&
+            startline=$(expr $(tail -n +$commandlineconfigstartline Manual/manJHUGenerator.tex | grep -n "begin[{]verbatim[}]" | head -1 | sed "s/:.*//") + $commandlineconfigstartline) &&
+            endline=$(expr $(tail -n +$commandlineconfigstartline Manual/manJHUGenerator.tex | grep -n "end[{]verbatim[}]" | head -1 | sed "s/:.*//") + $commandlineconfigstartline - 2) &&
+            sdiff -sb <(grep "^  " README) <(sed -n "${startline},${endline}p" Manual/manJHUGenerator.tex | sed "s/See below/See manual/")
+            when: always
+      - run:
+          name: "check sync between README and ./JHUGen help"
+          command: sdiff -sb <(grep "^  " JHUGenerator/README) <(cd JHUGenerator && ./JHUGen help 2> /dev/null | grep "[^ ]")
+          when: always
+      - run:
+          name: "check that all command line options are documented"
+          when: always
+          command: |
+            exitstatus=0
+            for a in $(grep -i 'call *ReadCommandLineArgument' JHUGenerator/main.F90 | grep -v '!undocumented' | sed -r 's/.*"(.*)".*/\1/'); do
+              if ! grep -q $a Manual/manJHUGenerator.tex &&
+                 ! grep -q ${a/w/z} Manual/manJHUGenerator.tex        #ghw*, etc. are mentioned collectively
+              then
+                echo "$a is undocumented!"
+                exitstatus=1
+              fi
+            done
+            exit $exitstatus
+      - run:
+          name: "check that the compiler is gfortran"
+          command: "! grep 'Comp *= *ifort' JHUGenerator/makefile"
+          when: always
+      - run:
+          name: "check that LHAPDF is turned off"
+          command: "! grep 'UseLHAPDF *= *Yes' JHUGenerator/makefile"
+          when: always
+      - run:
+          name: "check compiling and running with LHAPDF linked"
+          command: |
+            cd JHUGenerator
+            sed -i -r -e "s/^(UseLHAPDF *= *)No/\1Yes/" makefile
+            make
+            ./JHUGen Process=50 VegasNc0=10000 VegasNc2=100 LHAPDF=NNPDF30_lo_as_0130/NNPDF30_lo_as_0130.info
+            git checkout -- makefile
+          when: always
+      - run:
+          name: "check that linkMELA is turned on"
+          command: "grep 'linkMELA *= *Yes' JHUGenerator/makefile"
+          when: always
+      - run:
+          name: "check compiling and running with linkMELA off"
+          command: |
+            cd JHUGenerator
+            sed -i -r -e "s/^(linkMELA *= *)Yes/\1No/" makefile
+            make
+            ./JHUGen Process=50 VegasNc0=10000 VegasNc2=100
+            git checkout -- makefile
+          when: always
+      - store_artifacts:
+          path:
+            ~/artifacts/misc/
