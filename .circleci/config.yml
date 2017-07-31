@@ -71,8 +71,6 @@ jobs:
   generator_reference:
     <<: *env
     working_directory: ~/JHUGen/JHUGenerator
-    requires:
-      - build
     steps:
       - attach_workspace:
           at: ~/JHUGen
@@ -178,8 +176,6 @@ jobs:
   generator_syntax:
     <<: *env
     working_directory: ~/JHUGen/JHUGenerator
-    requires:
-      - generator_reference
     steps:
       - attach_workspace:
           at: ~/JHUGen
@@ -237,8 +233,6 @@ jobs:
   plots_ggH:
     <<: *env
     working_directory: ~/JHUGen/JHUGenerator
-    requires:
-      - build
     steps:
       - attach_workspace:
           at: ~/JHUGen
@@ -303,8 +297,6 @@ jobs:
   plots_VBF:
     <<: *env
     working_directory: ~/JHUGen/JHUGenerator
-    requires:
-      - build
     steps:
       - attach_workspace:
           at: ~/JHUGen
@@ -367,8 +359,6 @@ jobs:
   MELA:
     <<: *env
     working_directory: ~/JHUGen/JHUGenMELAv2
-    requires:
-      - build
     steps:
       - attach_workspace:
           at: ~/JHUGen
@@ -386,8 +376,6 @@ jobs:
   misc:
     <<: *env
     working_directory: ~/JHUGen/
-    requires:
-      - build
     steps:
       - attach_workspace:
           at: ~/JHUGen
@@ -493,3 +481,27 @@ jobs:
       - store_artifacts:
           path:
             ~/artifacts/misc/
+
+workflows:
+  version: 2
+  build-test-and-deploy:
+    jobs:
+      - build
+      - generator_reference:
+          requires:
+            - build
+      - generator_syntax:
+          requires:
+            - build
+      - plots_ggH:
+          requires:
+            - generator_reference
+      - plots_VBF:
+          requires:
+            - generator_reference
+      - MELA:
+          requires:
+            - build
+      - misc:
+          requires:
+            - build
