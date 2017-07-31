@@ -56,6 +56,60 @@ Mela::Mela(
   melaCand(0)
 {
   if (myVerbosity_>=TVar::DEBUG) cout << "Start Mela constructor" << endl;
+  build(mh_);
+  if (myVerbosity_>=TVar::DEBUG) cout << "End Mela constructor" << endl;
+}
+Mela::Mela(const Mela& other) :
+melaRandomNumber(35797),
+LHCsqrts(other.LHCsqrts),
+myVerbosity_(other.myVerbosity_),
+ZZME(0),
+auxiliaryProb(0.),
+melaCand(0)
+{
+  double mh_ = other.ZZME->get_PrimaryHiggsMass();
+  build(mh_);
+}
+Mela::~Mela(){
+  if (myVerbosity_>=TVar::DEBUG) cout << "Begin Mela destructor" << endl;
+
+  //setRemoveLeptonMasses(false); // Use Run 1 scheme for not removing lepton masses. Notice the switch itself is defined as an extern, so it has to be set to default value at the destructor!
+  setRemoveLeptonMasses(true); // Use Run 2 scheme for removing lepton masses. Notice the switch itself is defined as an extern, so it has to be set to default value at the destructor!
+
+  // Delete the derived RooFit objects first...
+  if (myVerbosity_>=TVar::DEBUG) cout << "Mela destructor: Destroying analytical PDFs" << endl;
+  delete ggSpin0Model;
+  delete spin1Model;
+  delete spin2Model;
+  delete qqZZmodel;
+  // ...then delete the observables.
+  if (myVerbosity_>=TVar::DEBUG) cout << "Mela destructor: Destroying analytical PDFs observables" << endl;
+  delete mzz_rrv;
+  delete z1mass_rrv; 
+  delete z2mass_rrv; 
+  delete costhetastar_rrv;
+  delete costheta1_rrv;
+  delete costheta2_rrv;
+  delete phi_rrv;
+  delete phi1_rrv;
+  delete Y_rrv;
+  delete upFrac_rrv;
+
+  if (myVerbosity_>=TVar::DEBUG) cout << "Mela destructor: Destroying SuperDijetMELA" << endl;
+  delete superDijet;
+  if (myVerbosity_>=TVar::DEBUG) cout << "Mela destructor: Destroying SuperMELA" << endl;
+  delete super;
+  if (myVerbosity_>=TVar::DEBUG) cout << "Mela destructor: Destroying ZZME" << endl;
+  delete ZZME;
+
+  // Delete ME constant handles
+  if (myVerbosity_>=TVar::DEBUG) cout << "Mela destructor: Destroying PConstant handles" << endl;
+  deletePConstantHandles();
+
+  if (myVerbosity_>=TVar::DEBUG) cout << "End Mela destructor" << endl;
+}
+void Mela::build(double mh_){
+  if (myVerbosity_>=TVar::DEBUG) cout << "Start Mela::build" << endl;
   //setRemoveLeptonMasses(false); // Use Run 1 scheme for not removing fermion masses
   setRemoveLeptonMasses(true); // Use Run 2 scheme for removing fermion masses to compute MEs that expect massless fermions properly
 
@@ -159,41 +213,9 @@ Mela::Mela(
 
   // Initialize the couplings to 0 and end Mela constructor
   reset_SelfDCouplings();
-  if (myVerbosity_>=TVar::DEBUG) cout << "End Mela constructor" << endl;
+  if (myVerbosity_>=TVar::DEBUG) cout << "End Mela::build" << endl;
 }
 
-Mela::~Mela(){
-  if (myVerbosity_>=TVar::DEBUG) cout << "Begin Mela destructor" << endl;
-
-  //setRemoveLeptonMasses(false); // Use Run 1 scheme for not removing lepton masses. Notice the switch itself is defined as an extern, so it has to be set to default value at the destructor!
-  setRemoveLeptonMasses(true); // Use Run 2 scheme for removing lepton masses. Notice the switch itself is defined as an extern, so it has to be set to default value at the destructor!
-
-  // Delete the derived RooFit objects first...
-  delete ggSpin0Model;
-  delete spin1Model;
-  delete spin2Model;
-  delete qqZZmodel;
-  // ...then delete the observables.
-  delete mzz_rrv;
-  delete z1mass_rrv; 
-  delete z2mass_rrv; 
-  delete costhetastar_rrv;
-  delete costheta1_rrv;
-  delete costheta2_rrv;
-  delete phi_rrv;
-  delete phi1_rrv;
-  delete Y_rrv;
-  delete upFrac_rrv;
-
-  delete superDijet;
-  delete super;
-  delete ZZME;
-
-  // Delete ME constant handles
-  deletePConstantHandles();
-
-  if (myVerbosity_>=TVar::DEBUG) cout << "End Mela destructor" << endl;
-}
 
 // Set-functions
 void Mela::setProcess(TVar::Process myModel, TVar::MatrixElement myME, TVar::Production myProduction){

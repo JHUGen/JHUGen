@@ -20,6 +20,21 @@ newZZMatrixElement::newZZMatrixElement(
   melaCand(0)
 {
   if (processVerbosity>=TVar::DEBUG) cout << "Begin newZZMatrixElement constructor" << endl;
+  build();
+  if (processVerbosity>=TVar::DEBUG) cout << "End newZZMatrixElement constructor" << endl;
+}
+newZZMatrixElement::newZZMatrixElement(const newZZMatrixElement& other) :
+processVerbosity(other.processVerbosity),
+processLeptonInterference(other.processLeptonInterference),
+EBEAM(other.EBEAM),
+Xcal2(other.Xcal2),
+melaCand(0) // 0 is correct in the copy constructor
+{
+  build();
+}
+
+void newZZMatrixElement::build(){
+  if (processVerbosity>=TVar::DEBUG) cout << "Begin newZZMatrixElement::build" << endl;
 
   // Set default parameters explicitly
   set_PrimaryHiggsMass(125.);
@@ -30,8 +45,9 @@ newZZMatrixElement::newZZMatrixElement(
   selfD_SpinOneCouplings = Xcal2.GetSelfDSpinOneCouplings();
   selfD_SpinTwoCouplings = Xcal2.GetSelfDSpinTwoCouplings();
 
-  if (processVerbosity>=TVar::DEBUG) cout << "End newZZMatrixElement constructor" << endl;
+  if (processVerbosity>=TVar::DEBUG) cout << "End newZZMatrixElement::build" << endl;
 }
+
 newZZMatrixElement::~newZZMatrixElement(){
   if (processVerbosity>=TVar::DEBUG) cout << "Begin newZZMatrixElement destructor" << endl;
   /*std::cout << "End of newZZME" << std::endl;*/

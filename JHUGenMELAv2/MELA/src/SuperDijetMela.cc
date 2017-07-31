@@ -11,12 +11,21 @@ SuperDijetMela::SuperDijetMela(float sqrts_, TVar::VerbosityLevel verbosity_) :
 sqrts(sqrts_),
 verbosity(verbosity_)
 {
-  SetupResolutionModel(TVar::Had_ZH);
-  SetupResolutionModel(TVar::Had_WH);
+  Build();
 }
-
+SuperDijetMela::SuperDijetMela(const SuperDijetMela& other) : 
+sqrts(other.sqrts),
+verbosity(other.verbosity)
+{
+  Build();
+}
 SuperDijetMela::~SuperDijetMela(){
   for (auto it=ResolutionModelMap.begin(); it!=ResolutionModelMap.end(); it++) delete it->second;
+}
+
+void SuperDijetMela::Build(){
+  SetupResolutionModel(TVar::Had_ZH);
+  SetupResolutionModel(TVar::Had_WH);
 }
 
 void SuperDijetMela::SetupResolutionModel(TVar::Production prod){
