@@ -44,7 +44,7 @@ jobs:
       - run:
           <<: *cmsrelcmsenv
       - restore_cache:
-          key: v1_boost_1_61_0
+          key: v2_boost_1_61_0
       - run:
           name: install boost
           command: |
@@ -58,7 +58,7 @@ jobs:
             fi
       - run: cd JHUGenMELAv2/MELA/ && ./setup.sh
       - save_cache:
-          key: v1_boost_1_61_0
+          key: v2_boost_1_61_0
           paths: ~/boost_1_61_0
       - run: cd JHUGenerator && make
       - persist_to_workspace:
