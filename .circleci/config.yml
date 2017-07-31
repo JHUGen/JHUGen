@@ -61,6 +61,7 @@ jobs:
           key: v2_boost_1_61_0
           paths: ~/boost_1_61_0
       - run: cd JHUGenerator && make
+      - run: cd JHUGenerator/pdfs && ./downloadNNPDF.sh
       - persist_to_workspace:
           root: ~/JHUGen
           paths:
@@ -80,7 +81,7 @@ jobs:
           <<: *cmsrelcmsenv
       - restore_cache:
           key: v1_boost_1_61_0
-      - mkdir -p ~/reference_check/ compare_to_reference
+      - run: mkdir -p ~/reference_check/ compare_to_reference
       - run: ./JHUGen Seed=765543533 PDFSet=3 Process=0 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/ggH_ZZ DecayMode1=9 DecayMode2=9 $REFERENCE_COUPLINGS
       - run: ./JHUGen Seed=765543533 PDFSet=3 Process=0 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/ggH_WW DecayMode1=11 DecayMode2=11 $REFERENCE_COUPLINGS
       - run: ./JHUGen Seed=765543533 PDFSet=3 Process=0 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/ggH_Zgamma DecayMode1=9 DecayMode2=7 $REFERENCE_COUPLINGS
@@ -224,7 +225,7 @@ jobs:
       - run:
           name: checklhe
           command: |
-            unbuffer python ~/checklhe/checklhe.py $(find $LHEDIR -name *.lhe) | tee checklheoutput.txt
+            python ~/checklhe/checklhe.py $(find $LHEDIR -name *.lhe) | tee checklheoutput.txt
             ! grep -q '!' checklheoutput.txt
           when: always
       - store_artifacts:
@@ -358,7 +359,7 @@ jobs:
 
   MELA:
     <<: *env
-    working_directory: ~/JHUGen/JHUGenMELAv2
+    working_directory: ~/JHUGen/JHUGenMELAv2/MELA/test/
     steps:
       - attach_workspace:
           at: ~/JHUGen
@@ -379,6 +380,8 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/JHUGen
+      - run:
+          <<: *cmsrelcmsenv
       - run: mkdir -p ~/artifacts/misc/
       - run:
           name: "big file check"
