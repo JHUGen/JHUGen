@@ -5,8 +5,8 @@ env: &env
         PATH: "/home/cmsbld/githack/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
         LIBRARY_PATH: "/home/cmsbld/boost_1_61_0/stage/lib"
         CPATH: "/home/cmsbld/boost_1_61_0"
-        LD_LIBRARY_PATH: "/home/cmsbld/project/JHUGenMELAv2/MELA/data/slc6_amd64_gcc530"
-        PYTHONPATH: "/home/cmsbld/project/JHUGenMELAv2/MELA/python"
+        LD_LIBRARY_PATH: "/home/cmsbld/JHUGen/JHUGenMELAv2/MELA/data/slc6_amd64_gcc530"
+        PYTHONPATH: "/home/cmsbld/JHUGen/JHUGenMELAv2/MELA/python"
 
 cmsrelcmsenv: &cmsrelcmsenv
   name: "cmsrel, cmsenv"
