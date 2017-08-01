@@ -4488,6 +4488,7 @@ character :: arg*(500)
             write(TheUnit,"(8X,A,F8.2)") "DeltaR >= ", Rjet
             write(TheUnit,"(11X,A,F8.2,A)") "mJJ >= ", mJJcut/GeV, " GeV"
         endif
+    endif
     if( Process.ge.66 .and. Process.le.69 ) then
         write(TheUnit,"(4X,A)") "4l cuts:"
         if( Process.ge.66 .and. Process.le.69 ) then
