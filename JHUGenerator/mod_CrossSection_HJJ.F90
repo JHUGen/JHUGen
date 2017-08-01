@@ -55,7 +55,7 @@ EvalWeighted_HJJ_fulldecay = 0d0
          RejeCounter_part(iPart_sel,jPart_sel) = RejeCounter_part(iPart_sel,jPart_sel) + 1
          RejeCounter=RejeCounter+1
          return
-       endif   
+       endif
    endif
    
    
@@ -97,6 +97,7 @@ EvalWeighted_HJJ_fulldecay = 0d0
       return
    endif
    DebugCounter(10) = DebugCounter(10) + 1
+   call SetRunningScales( (/MomExt(1:4,5)+MomExt(1:4,6),MomExt(1:4,3),MomExt(1:4,4) /) , (/ Not_a_particle_,Not_a_particle_,Not_a_particle_,Not_a_particle_ /) )
    call setPDFs(eta1,eta2,pdf)
    FluxFac = 1d0/(2d0*EHat**2)
 
@@ -122,11 +123,11 @@ EvalWeighted_HJJ_fulldecay = 0d0
 !    id_MCFM(8) = 0
    id_MCFM(3:6) = (/ ElM_,ElP_,MuM_,MuP_ /)
 
-   
    call EvalAmp_qqVVqq(id_MCFM, p_MCFM, 1, msq_MCFM) ! 1 for ZZ decay, 2 for WW decay, 3 for ZZ+WW mixture   
 !    call qq_ZZqq(p_MCFM,msq_MCFM)   
+   
+   
    msq_MCFM = msq_MCFM * (100d0)**8  ! adjust msq_MCFM for GeV units of MCFM mat.el.
-
 
 #else
  print *, "To use this process, please set linkMELA=Yes in the makefile and recompile."

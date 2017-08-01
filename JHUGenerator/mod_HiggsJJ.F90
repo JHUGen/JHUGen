@@ -3279,7 +3279,9 @@ module modHiggsJJ
 
   end function A0_VV_4f
 
-  !--           line = 1/2 --> up/down couplings included
+  
+  
+  !--           line = 1/2 --> up-type/down-type couplings included
   function A0_ZZ_4f(j1,j2,j3,j4,za,zb,sprod,line1,line2)
     use modMisc
     implicit none
@@ -3287,7 +3289,7 @@ module modHiggsJJ
     real(dp), dimension(2) :: Rz
     real(dp), parameter, dimension(2) :: La = (/QuL,QdL/)
     real(dp), parameter, dimension(2) :: Ra = (/QuR,QdR/)
-    complex(dp) :: A0_ZZ_4f(-1:1,-1:1)!,LCT(1:2),RCT(1:2)
+    complex(dp) :: A0_ZZ_4f(-1:1,-1:1),LCT(1:2),RCT(1:2)
     integer :: j1,j2,j3,j4,line1,line2
     complex(dp) :: za(4,4),zb(4,4)
     real(dp) :: sprod(4,4)
@@ -3308,8 +3310,9 @@ module modHiggsJJ
     Lz = (/aL_Qup,aL_Qdn/)
     Rz = (/aR_Qup,aR_Qdn/)
     
-    !LCT = (/ehz_L_U,ehz_L_D/)
-    !RCT = (/ehz_R_U,ehz_R_D/)
+!   contact term couplings 
+    LCT = (/ezp_L_U,ezp_L_D/)! for the moment we do not distinguish up/ch and dn/st couplings (because the information is not passed)
+    RCT = (/ezp_R_U,ezp_R_D/)
 
 
     A0_ZZ_4f = czero
@@ -3401,29 +3404,29 @@ module modHiggsJJ
 
 
 !      adding contact terms
-!        helcoup(1:3,-1,-1) = helcoup(1:3,-1,-1) + struc_zz(1:3) * LCT(line1) * Lz(line2)/iprop34 + &
-!                                                  struc_za(1:3) * LCT(line1) * La(line2)/q34sq   + &       
-!                                                  struc_zz(1:3) *  Lz(line1) *LCT(line2)/iprop12 + &  
-!                                                  struc_az(1:3) *  Lz(line1) *LCT(line2)/q12sq   + &
-!                                                  struc_zz(1:3) * LCT(line1) *LCT(line2)
-!                                                  
-!        helcoup(1:3,-1,+1) = helcoup(1:3,-1,+1) + struc_zz(1:3) * LCT(line1) * Rz(line2)/iprop34 + &
-!                                                  struc_za(1:3) * LCT(line1) * Ra(line2)/q34sq   + &       
-!                                                  struc_zz(1:3) *  Lz(line1) *RCT(line2)/iprop12 + &
-!                                                  struc_az(1:3) *  Lz(line1) *RCT(line2)/q12sq   + &
-!                                                  struc_zz(1:3) * LCT(line1) *RCT(line2)
-!                                                  
-!        helcoup(1:3,+1,-1) = helcoup(1:3,+1,-1) + struc_zz(1:3) * RCT(line1) * Lz(line2)/iprop34 + &
-!                                                  struc_za(1:3) * RCT(line1) * La(line2)/q34sq   + &   
-!                                                  struc_zz(1:3) *  Rz(line1) *LCT(line2)/iprop12 + &
-!                                                  struc_az(1:3) *  Rz(line1) *LCT(line2)/q12sq   + &
-!                                                  struc_zz(1:3) * RCT(line1) *LCT(line2)
-!                                                  
-!        helcoup(1:3,+1,+1) = helcoup(1:3,+1,+1) + struc_zz(1:3) * RCT(line1) * Rz(line2)/iprop34 + &
-!                                                  struc_za(1:3) * RCT(line1) * Ra(line2)/q34sq   + &     
-!                                                  struc_zz(1:3) *  Rz(line1) *RCT(line2)/iprop12 + &
-!                                                  struc_az(1:3) *  Rz(line1) *RCT(line2)/q12sq   + &
-!                                                  struc_zz(1:3) * RCT(line1) *RCT(line2)
+       helcoup(1:3,-1,-1) = helcoup(1:3,-1,-1) + struc_zz(1:3) * LCT(line1) * Lz(line2)/iprop34 + &
+                                                 struc_za(1:3) * LCT(line1) * La(line2)/q34sq   + &       
+                                                 struc_zz(1:3) *  Lz(line1) *LCT(line2)/iprop12 + &  
+                                                 struc_az(1:3) *  La(line1) *LCT(line2)/q12sq   + &
+                                                 struc_zz(1:3) * LCT(line1) *LCT(line2)
+                                                 
+       helcoup(1:3,-1,+1) = helcoup(1:3,-1,+1) + struc_zz(1:3) * LCT(line1) * Rz(line2)/iprop34 + &
+                                                 struc_za(1:3) * LCT(line1) * Ra(line2)/q34sq   + &       
+                                                 struc_zz(1:3) *  Lz(line1) *RCT(line2)/iprop12 + &
+                                                 struc_az(1:3) *  La(line1) *RCT(line2)/q12sq   + &
+                                                 struc_zz(1:3) * LCT(line1) *RCT(line2)
+                                                 
+       helcoup(1:3,+1,-1) = helcoup(1:3,+1,-1) + struc_zz(1:3) * RCT(line1) * Lz(line2)/iprop34 + &
+                                                 struc_za(1:3) * RCT(line1) * La(line2)/q34sq   + &   
+                                                 struc_zz(1:3) *  Rz(line1) *LCT(line2)/iprop12 + &
+                                                 struc_az(1:3) *  Ra(line1) *LCT(line2)/q12sq   + &
+                                                 struc_zz(1:3) * RCT(line1) *LCT(line2)
+                                                 
+       helcoup(1:3,+1,+1) = helcoup(1:3,+1,+1) + struc_zz(1:3) * RCT(line1) * Rz(line2)/iprop34 + &
+                                                 struc_za(1:3) * RCT(line1) * Ra(line2)/q34sq   + &     
+                                                 struc_zz(1:3) *  Rz(line1) *RCT(line2)/iprop12 + &
+                                                 struc_az(1:3) *  Ra(line1) *RCT(line2)/q12sq   + &
+                                                 struc_zz(1:3) * RCT(line1) *RCT(line2)
                                    
     else
 
@@ -3432,19 +3435,19 @@ module modHiggsJJ
        helcoup(1:3,+1,-1) = struc_zz(1:3) * Rz(line1) * Lz(line2)/iprop12/iprop34
        helcoup(1:3,+1,+1) = struc_zz(1:3) * Rz(line1) * Rz(line2)/iprop12/iprop34
 
-! !      adding contact terms
-!        helcoup(1:3,-1,-1) = helcoup(1:3,-1,-1) + struc_zz(1:3) * LCT(line1) * Lz(line2)/iprop34 + &
-!                                                  struc_zz(1:3) *  Lz(line1) *LCT(line2)/iprop12 + &
-!                                                  struc_zz(1:3) * LCT(line1) *LCT(line2)
-!        helcoup(1:3,-1,+1) = helcoup(1:3,-1,+1) + struc_zz(1:3) * LCT(line1) * Rz(line2)/iprop34 + &
-!                                                  struc_zz(1:3) *  Lz(line1) *RCT(line2)/iprop12 + &
-!                                                  struc_zz(1:3) * LCT(line1) *RCT(line2)
-!        helcoup(1:3,+1,-1) = helcoup(1:3,+1,-1) + struc_zz(1:3) * RCT(line1) * Lz(line2)/iprop34 + &
-!                                                  struc_zz(1:3) *  Rz(line1) *LCT(line2)/iprop12 + &
-!                                                  struc_zz(1:3) * RCT(line1) *LCT(line2)
-!        helcoup(1:3,+1,+1) = helcoup(1:3,+1,+1) + struc_zz(1:3) * RCT(line1) * Rz(line2)/iprop34 + &
-!                                                  struc_zz(1:3) *  Rz(line1) *RCT(line2)/iprop12 + &
-!                                                  struc_zz(1:3) * RCT(line1) *RCT(line2)
+!      adding contact terms
+       helcoup(1:3,-1,-1) = helcoup(1:3,-1,-1) + struc_zz(1:3) * LCT(line1) * Lz(line2)/iprop34 + &
+                                                 struc_zz(1:3) *  Lz(line1) *LCT(line2)/iprop12 + &
+                                                 struc_zz(1:3) * LCT(line1) *LCT(line2)
+       helcoup(1:3,-1,+1) = helcoup(1:3,-1,+1) + struc_zz(1:3) * LCT(line1) * Rz(line2)/iprop34 + &
+                                                 struc_zz(1:3) *  Lz(line1) *RCT(line2)/iprop12 + &
+                                                 struc_zz(1:3) * LCT(line1) *RCT(line2)
+       helcoup(1:3,+1,-1) = helcoup(1:3,+1,-1) + struc_zz(1:3) * RCT(line1) * Lz(line2)/iprop34 + &
+                                                 struc_zz(1:3) *  Rz(line1) *LCT(line2)/iprop12 + &
+                                                 struc_zz(1:3) * RCT(line1) *LCT(line2)
+       helcoup(1:3,+1,+1) = helcoup(1:3,+1,+1) + struc_zz(1:3) * RCT(line1) * Rz(line2)/iprop34 + &
+                                                 struc_zz(1:3) *  Rz(line1) *RCT(line2)/iprop12 + &
+                                                 struc_zz(1:3) * RCT(line1) *RCT(line2)
        
     endif
     
@@ -3472,17 +3475,20 @@ module modHiggsJJ
 
   end function A0_ZZ_4f
 
+  
+  
+  
   function A0_WW_4f(j1,j2,j3,j4,za,zb,sprod,useWWcoupl,Wpm_flip)
   use modMisc
   implicit none
-    complex(dp) :: A0_WW_4f(-1:1,-1:1)
+    complex(dp) :: A0_WW_4f(-1:1,-1:1),LCT(1:1),RCT(1:1)
     integer :: j1,j2,j3,j4
     complex(dp) :: za(4,4), zb(4,4)
     logical,optional :: useWWcoupl,Wpm_flip
     real(dp) :: sprod(4,4),q2Wplus,q2Wminus
     real(dp) :: mhsq, q1q2, kcoupl
-    complex(dp) :: a1, a2, a3, struc1, struc2, struc3
-    complex(dp) :: zab2
+    complex(dp) :: a1, a2, a3, struc1, struc2, struc3,struc_ww(3)
+    complex(dp) :: zab2,helcoup(1:3,-1:1,-1:1)
     complex(dp) :: iprop12, iprop34
     complex(dp) :: vvcoupl_prime(4)
     integer :: vv_it
@@ -3490,6 +3496,11 @@ module modHiggsJJ
 
     zab2(j1,j2,j3,j4) = za(j1,j2)*zb(j2,j4) + za(j1,j3)*zb(j3,j4)
 
+!   contact term couplings 
+    LCT(1) = ewp_L_U! for the moment we do not distinguish up and charm couplings (because the information is not passed)
+    RCT(1) = ewp_R_U
+    
+    
     A0_WW_4f = czero
 
     q1q2 = (sprod(j1,j3)+sprod(j1,j4)+sprod(j2,j3)+sprod(j2,j4))/two
@@ -3517,19 +3528,79 @@ module modHiggsJJ
     a2 = -two * vvcoupl_prime(2) - kcoupl * vvcoupl_prime(3)
     a3 = -two * vvcoupl_prime(4)
 
+
+
+    
+! !   comment this out for new implementation with contact terms
+! !   ~~begin
     struc1 = two * (a1 * mhsq - ci * a3 * q1q2)
     struc2 = a2 + ci * a3
     struc3 = two * ci * a3
 
-
     A0_WW_4f(-1,-1) = za(j1,j3)*zb(j4,j2) * struc1 + &
-         zab2(j1,j3,j4,j2)*zab2(j3,j1,j2,j4) * struc2 + &
-         za(j1,j2)*za(j3,j4)*zb(j4,j2)**2 * struc3
+                      zab2(j1,j3,j4,j2)*zab2(j3,j1,j2,j4) * struc2 + &
+                      za(j1,j2)*za(j3,j4)*zb(j4,j2)**2 * struc3
 
     iprop12 = sprod(j1,j2) - M_W**2 + ci * M_W * Ga_W
     iprop34 = sprod(j3,j4) - M_W**2 + ci * M_W * Ga_W
 
     A0_WW_4f = A0_WW_4f/vev /iprop12/iprop34 * couplWffsq
+!     print *, "old ww",A0_WW_4f    
+!   ~~end
+    
+    
+
+! !   comment this in for new implementation with contact terms
+! !   ~~begin
+! 
+!     struc_ww(1) = two * (a1 * mhsq - ci * a3 * q1q2)
+!     struc_ww(2) = (a2 + ci * a3)
+!     struc_ww(3) = two * ci * a3
+!     struc_ww(:) = struc_ww(:) * couplWffsq    
+! 
+! 
+!     helcoup(1:3,-1,-1) = struc_ww(1:3)/iprop12/iprop34 
+!     helcoup(1:3,-1,+1) = 0d0
+!     helcoup(1:3,+1,-1) = 0d0
+!     helcoup(1:3,+1,+1) = 0d0
+! 
+! !      adding contact terms
+!     helcoup(1:3,-1,-1) = helcoup(1:3,-1,-1) + struc_ww(1:3) * LCT(1)/iprop34 + &
+!                                               struc_ww(1:3) * LCT(1)/iprop12 + &
+!                                               struc_ww(1:3) * LCT(1) *LCT(1)
+!     helcoup(1:3,-1,+1) = helcoup(1:3,-1,+1) + struc_ww(1:3) * RCT(1)/iprop12 + &
+!                                               struc_ww(1:3) * LCT(1) *RCT(1)
+!     helcoup(1:3,+1,-1) = helcoup(1:3,+1,-1) + struc_ww(1:3) * RCT(1)/iprop34 + &
+!                                               struc_ww(1:3) * RCT(1) *LCT(1)
+!     helcoup(1:3,+1,+1) = helcoup(1:3,+1,+1) + struc_ww(1:3) * RCT(1) *RCT(1)
+! 
+! 
+! 
+!     A0_WW_4f(-1,-1) = za(j1,j3)*zb(j4,j2) * helcoup(1,-1,-1) + &
+!          zab2(j1,j3,j4,j2)*zab2(j3,j1,j2,j4) * helcoup(2,-1,-1) + &
+!          za(j1,j2)*za(j3,j4)*zb(j4,j2)**2 * helcoup(3,-1,-1)
+! 
+!     A0_WW_4f(-1,+1) = za(j1,j4)*zb(j3,j2) * helcoup(1,-1,+1) + &
+!          zab2(j1,j3,j4,j2)*zab2(j4,j1,j2,j3) * helcoup(2,-1,+1) + &
+!          za(j1,j2)*za(j4,j3)*zb(j3,j2)**2 * helcoup(3,-1,+1)
+! 
+!     A0_WW_4f(+1,-1) = za(j2,j3)*zb(j4,j1) * helcoup(1,+1,-1) + &
+!          zab2(j2,j3,j4,j1)*zab2(j3,j1,j2,j4) * helcoup(2,+1,-1) + &
+!          za(j2,j1)*za(j3,j4)*zb(j4,j1)**2 * helcoup(3,+1,-1)
+! 
+!     A0_WW_4f(+1,+1) = za(j2,j4)*zb(j3,j1) * helcoup(1,+1,+1) + &
+!          zab2(j2,j3,j4,j1)*zab2(j4,j1,j2,j3) * helcoup(2,+1,+1) + &
+!          za(j2,j1)*za(j4,j3)*zb(j3,j1)**2 * helcoup(3,+1,+1)
+! 
+!     A0_WW_4f = A0_WW_4f/vev 
+! 
+!     print *, "new ww",A0_WW_4f
+!     pause
+! 
+! 
+! !   ~~end
+
+    
 
     return
 
