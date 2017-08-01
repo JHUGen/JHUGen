@@ -4482,7 +4482,7 @@ character :: arg*(500)
         if( Process.ge.66 .and. Process.le.69 ) then
             write(TheUnit,"(9X,A,F8.2)") "|eta| <= ", etajetcut
             write(TheUnit,"(4X,A,F8.2)") "|Deltaeta| >= ", detajetcut
-            write(TheUnit,"(5X,A,F8.2)") "eta1*eta2 >= ", 0d0
+            write(TheUnit,"(5X,A,F8.2)") "eta1*eta2 <= ", 0d0
         endif
         if( Process.eq.50 .or. Process.eq.60 .or. Process.eq.61 .or. (Process.ge.66 .and. Process.le.69) .or. Process.eq.80 .or. Process.eq.90) then
             write(TheUnit,"(8X,A,F8.2)") "DeltaR >= ", Rjet
