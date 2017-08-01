@@ -1234,5 +1234,12 @@ character(len=totallength) CenterWithStars
 
 end function
 
+real function infinity()
+  implicit none
+  real :: x
+  x = 0
+  infinity=-log(x)
+end function infinity
+
 END MODULE
 

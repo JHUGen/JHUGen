@@ -2004,11 +2004,11 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
        mZ2 = get_MInv(MomExt(1:4,Lep2P)+MomExt(1:4,Lep2M))
 
 
-       if( mZ1.lt.2.5d0*GeV ) then
+       if( mZ1.lt.Mllcut ) then
           applyPSCut=.true.
           return
        endif
-       if( mZ2.lt.2.5d0*GeV ) then
+       if( mZ2.lt.Mllcut ) then
           applyPSCut=.true.
           return
        endif
@@ -2017,12 +2017,12 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
 !          return
 !       endif
 
-       if( pT_l1.lt.3d0*GeV .or. pT_l2.lt.3d0*GeV .or. pT_l3.lt.3d0*GeV .or. pT_l4.lt.3d0*GeV ) then
+       if( pT_l1.lt.pTlepcut .or. pT_l2.lt.pTlepcut .or. pT_l3.lt.pTlepcut .or. pT_l4.lt.pTlepcut ) then
           applyPSCut=.true.
           return
        endif
 
-       if( dabs(y_l1).gt.2.7d0 .or. dabs(y_l2).gt.2.7d0 .or. dabs(y_l3).gt.2.7d0 .or. dabs(y_l4).gt.2.7d0 ) then
+       if( dabs(y_l1).gt.etalepcut .or. dabs(y_l2).gt.etalepcut .or. dabs(y_l3).gt.etalepcut .or. dabs(y_l4).gt.etalepcut ) then
           applyPSCut=.true.
           return
        endif
@@ -2044,12 +2044,12 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
 !        endif
 
 
-        if( abs(y_j1).gt.4d0 .or. abs(y_j2).gt.4d0 ) then
+        if( abs(y_j1).gt.etajetcut .or. abs(y_j2).gt.etajetcut ) then
            applyPSCut=.true.
            return
         endif
 
-        if( abs(y_j1-y_j2).lt.2.0d0 .or. y_j1*y_j2.gt.0d0 ) then
+        if( abs(y_j1-y_j2).lt.detajetcut .or. y_j1*y_j2.gt.0d0 ) then
            applyPSCut=.true.
            return
         endif
@@ -2283,7 +2283,7 @@ logical :: hasAonshell
          if(m_ll.le.getMass(convertLHEreverse(id(6)))+getMass(convertLHEreverse(id(7))))then
             applyPSCut=.true.
          endif
-         if(includeGammaStar .and. .not.IsAWDecay(DecayMode1) .and. (m_ll.lt.MPhotonCutoff .or. m_Vstar.lt.MPhotonCutoff))then
+         if(includeGammaStar .and. .not.IsAWDecay(DecayMode1) .and. (m_ll.lt.mllcut .or. m_Vstar.lt.mllcut))then
             applyPSCut=.true.
          endif
          if(IsAQuark(convertLHEreverse(id(6)))) then
@@ -2295,7 +2295,7 @@ logical :: hasAonshell
             endif
          endif
       else
-         if(includeGammaStar .and. m_Vstar.lt.MPhotonCutoff)then
+         if(includeGammaStar .and. m_Vstar.lt.mllcut)then
             applyPSCut=.true.
          endif
       endif

@@ -72,7 +72,7 @@ command line parameter quick reference:
     pTjetcut:          Minimum pT for jets in GeV (default: 15)
     deltaRcut:         Minimum deltaR for jets (default: 0.3)
     mJJcut:            Minimum dijet mass in GeV (default: 0)
-    MPhotonCutoff:     Minimum mass for offshell photons in GeV, when included (default: 4)
+    mllcut:            Minimum mass for offshell photons in GeV, when included (default: 4)
   Renormalization and factorization scales:
     FacScheme:         PDF factorization scale scheme
     MuFacMultiplier:   Multiplier for the factorization scale chosen by FacScheme
