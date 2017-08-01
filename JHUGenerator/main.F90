@@ -758,7 +758,7 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "mJJcut", success, mJJcut, SetLastArgument, multiply=GeV)
     call ReadCommandLineArgument(arg, "VBF_m4l_min", success, m4l_minmax(1), SetLastArgument, multiply=GeV)   !undocumented, for internal testing
     call ReadCommandLineArgument(arg, "VBF_m4l_max", success, m4l_minmax(2), SetLastArgument, multiply=GeV)   !undocumented, for internal testing
-    call ReadCommandLineArgument(arg, "mllcut", success, mllcut, SetLastArgument, multiply=GeV)
+    call ReadCommandLineArgument(arg, "mllcut", success, mllcut, SetLastArgument, success2=Setmllcut, multiply=GeV)
     call ReadCommandLineArgument(arg, "pTlepcut", success, pTlepcut, SetLastArgument, success2=SetpTlepcut, multiply=GeV)
     call ReadCommandLineArgument(arg, "etalepcut", success, etalepcut, SetLastArgument, success2=Setetalepcut)
 
@@ -4481,8 +4481,8 @@ character :: arg*(500)
         write(TheUnit,"(12X,A,F8.2,A)") "pT >= ", pTjetcut/GeV, " GeV"
         if( Process.ge.66 .and. Process.le.69 ) then
             write(TheUnit,"(9X,A,F8.2)") "|eta| <= ", etajetcut
-            write(TheUnit,"(8X,A,F8.2)") "|deta| >= ", detajetcut
-            write(TheUnit,"(12X,A)") "eta1*eta2 >= 0"
+            write(TheUnit,"(4X,A,F8.2)") "|Deltaeta| >= ", detajetcut
+            write(TheUnit,"(5X,A,F8.2)") "eta1*eta2 >= ", 0d0
         endif
         if( Process.eq.50 .or. Process.eq.60 .or. Process.eq.61 .or. (Process.ge.66 .and. Process.le.69) .or. Process.eq.80 .or. Process.eq.90) then
             write(TheUnit,"(8X,A,F8.2)") "DeltaR >= ", Rjet
@@ -4494,9 +4494,11 @@ character :: arg*(500)
         if( Process.ge.66 .and. Process.le.69 ) then
             write(TheUnit,"(12X,A,F8.2,A)") "pT >= ", pTjetcut/GeV, " GeV"
             write(TheUnit,"(9X,A,F8.2)") "|eta| <= ", etalepcut
-            write(TheUnit,"(11X,F10.2,A,F10.2,A)") m4l_minmax(1)/GeV, " GeV <= m4l <= ", m4l_minmax(2)/GeV, " GeV"
         endif
         write(TheUnit,"(11X,A,F8.2,A)") "mll >= ", mllcut/GeV, " GeV"
+        if( Process.ge.66 .and. Process.le.69 ) then
+            write(TheUnit,"(F10.2,A,F10.2,A)") m4l_minmax(1)/GeV, " GeV <= m4l <= ", m4l_minmax(2)/GeV, " GeV"
+        endif
     endif
     if( (Process.eq.0 .or. Process.eq.2 .or. Process.eq.50) .and. includeGammaStar ) then
         write(TheUnit,"(6X,A,F8.2,A)") "m(gammastar) >= ", mllcut/GeV, " GeV"
