@@ -2445,7 +2445,7 @@ bool TUtil::MCFM_SetupParticleCouplings(
           if (jetid==6) jetid = 2;
           zcouple_.q1=ewcharge_.Q[5+jetid];
           zcouple_.l1=zcouple_.l[-1+jetid];
-          zcouple_.r1=zcouple_.r[jetid];
+          zcouple_.r1=zcouple_.r[-1+jetid];
 
           // Special Z1->qq cases
           if (useQQBZGAM){
@@ -2533,7 +2533,7 @@ bool TUtil::MCFM_SetupParticleCouplings(
           if (jetid==6) jetid = 2;
           zcouple_.q2=ewcharge_.Q[5+jetid];
           zcouple_.l2=zcouple_.l[-1+jetid];
-          zcouple_.r2=zcouple_.r[jetid];
+          zcouple_.r2=zcouple_.r[-1+jetid];
 
           // Special Z2->qq cases
           if (useQQVVQQany){
@@ -4399,6 +4399,10 @@ double TUtil::JHUGenMatEl(
   // Set aL/R 1,2 into RcdME
   RcdME->setVDaughterCouplings(aL1, aR1, 0);
   RcdME->setVDaughterCouplings(aL2, aR2, 1);
+  if (verbosity >= TVar::DEBUG_VERBOSE) cout
+    << "TUtil::JHUGenMatEl: aL1, aR1, aL2, aR2: "
+    << aL1 << ", " << aR1 << ", " << aL2 << ", " << aR2
+    << endl;
 
   // This constant is needed to account for the different units used in
   // JHUGen compared to the MCFM
