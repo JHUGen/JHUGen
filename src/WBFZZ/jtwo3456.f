@@ -57,12 +57,27 @@ C---setting up couplings dependent on whether we are doing 34-line or 56-line
       stop
       endif
 
+! U. SARICA TEST
+!      write(6,*) "******************************"
+!      write(6,*) "******************************"
+!      write(6,*) "Begin jtwo3456"
+!      write(6,*) " -> (n2,n3,n4,n5,n6,n1)=",n2,n3,n4,n5,n6,n1
+!      write(6,*) "******************************"
+
       s34=s(n3,n4)
       prop34=dcmplx(s34-zmass**2,zmass*zwidth)
       s56=s(n5,n6)
       prop56=dcmplx(s56-zmass**2,zmass*zwidth)
       s3456=t4(n3,n4,n5,n6)
       prop3456=dcmplx(s3456-zmass**2,zmass*zwidth)
+
+! U. SARICA TEST
+!      write(6,*) "s34=",s34
+!      write(6,*) "prop34=",prop34
+!      write(6,*) "s56=",s56
+!      write(6,*) "prop56=",prop56
+!      write(6,*) "s3456=",s3456
+!      write(6,*) "prop3456=",prop3456
 
       do jdu=1,2
       gmZ1(jdu,1,1)=dcmplx(Q_jk(n1,n2,jdu)*xq1/s34)
@@ -91,6 +106,11 @@ C---setting up couplings dependent on whether we are doing 34-line or 56-line
      & +dcmplx(R_jk(n1,n2,jdu)*xl1)/prop3456
       gmZ3(jdu,2,2)=dcmplx(Q_jk(n1,n2,jdu)*xq1/s3456)
      & +dcmplx(R_jk(n1,n2,jdu)*xr1)/prop3456
+
+! U. SARICA TEST
+!      write(6,*) "Q_jk(",n1,n2,jdu,")=",Q_jk(n1,n2,jdu)
+!      write(6,*) "L_jk(",n1,n2,jdu,")=",L_jk(n1,n2,jdu)
+!      write(6,*) "R_jk(",n1,n2,jdu,")=",R_jk(n1,n2,jdu)
       enddo
 
       gml56(1,1)=dcmplx(xq1*xq2/s56)+dcmplx(xl1*xl2)/prop56
@@ -107,6 +127,14 @@ C---setting up couplings dependent on whether we are doing 34-line or 56-line
       s456=t3(n4,n5,n6)
       s23456=t5(n2,n3,n4,n5,n6)
       s13456=t5(n1,n3,n4,n5,n6)
+
+! U. SARICA TEST
+!      write(6,*) "s234=",s234
+!      write(6,*) "s156=",s156
+!      write(6,*) "s356=",s356
+!      write(6,*) "s456=",s456
+!      write(6,*) "s23456=",s23456
+!      write(6,*) "s13456=",s13456
 
       do nu=1,4
       do al=1,4
@@ -239,6 +267,8 @@ C---setting up couplings dependent on whether we are doing 34-line or 56-line
      & (before(:,h1,h34,h56)+straddle(:,h1,h34,h56)+after(:,h1,h34,h56))
      & +2d0*gmZ3(jdu,h1,h34)*gml56(h34,h56)
      & *(before1(:,h1,h34,h56)+after1(:,h1,h34,h56))
+! U. SARICA TEST
+      !write(6,*) "j2(:,",jdu,h1,h34,h56,")=",j2(:,jdu,h1,h34,h56)
       enddo
       j2w(:,jdu,h34,h56)=
      & +4d0*gmZ1(jdu,1,h34)*gmZ2(jdu,1,h56)*before(:,1,h34,h56)
@@ -246,10 +276,18 @@ C---setting up couplings dependent on whether we are doing 34-line or 56-line
      & +4d0*gmZ1(3-jdu,1,h34)*gmZ2(3-jdu,1,h56)*after(:,1,h34,h56)
      & +2d0*gmZ3(jdu,1,h34)*before1(:,1,h34,h56)*gml56(h34,h56)
      & +2d0*gmZ3(3-jdu,1,h34)*after1(:,1,h34,h56)*gml56(h34,h56)
+! U. SARICA TEST
+!      write(6,*) "j2w(:,",jdu,h34,h56,")=",j2w(:,jdu,h34,h56)
       enddo
 
       enddo
       enddo
+
+! U. SARICA TEST
+!      write(6,*) "******************************"
+!      write(6,*) "End jtwo3456"
+!      write(6,*) "******************************"
+!      write(6,*) "******************************"
 
       return
       end

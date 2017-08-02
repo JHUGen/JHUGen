@@ -118,6 +118,12 @@ C--   MARKUS: adding switches to remove VH or VBF contributions
          cycle
       endif
 
+! U. SARICA TEST
+!      write(6,*) "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+!      write(6,*) "Begin j=",j
+!      write(6,*) " -> j1, j2, j7, j8=",j1(j),j2(j),j7(j),j8(j)
+!      write(6,*) "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+
 c--   Call the VVZZ amplitudes
       call getVVZZamps(amp,ampa,ampb,za,zb,zab,zba,
      & j1(j),j2(j),3,4,5,6,j7(j),j8(j),doHO,doBO)
@@ -619,7 +625,8 @@ C-----setup for ((dqdq_dqdq)  (1,1)-->(1,1)
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.k)
      & )
      & ) then
-      msq(k,k)=temp(k,k)*stat
+      call addtemptomsq(msq,temp,k,k,k,k,j,stat)
+      !msq(k,k)=temp(k,k)*stat
       endif
       do l=k+1,nf
       if (
@@ -628,7 +635,8 @@ C-----setup for ((dqdq_dqdq)  (1,1)-->(1,1)
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
      & )
      & ) then
-      msq(k,l)=temp(k,l)
+      call addtemptomsq(msq,temp,k,l,k,l,j,1d0)
+      !msq(k,l)=temp(k,l)
       endif
       enddo
       enddo
@@ -643,7 +651,8 @@ C-----setup for ((dqdq_dqdq)  (1,1)-->(1,1)
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.4)
      & )
      & ) then
-         msq(2,3)=msq(2,3)+tempw(2,3)
+         call addtempwtomsq(msq,tempw,2,3,2,3,j,1d0)
+         !msq(2,3)=msq(2,3)+tempw(2,3)
       endif
       if (
      & (
@@ -656,7 +665,8 @@ C-----setup for ((dqdq_dqdq)  (1,1)-->(1,1)
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.3)
      & )
      & ) then
-         msq(1,4)=msq(1,4)+tempw(1,4)
+         call addtempwtomsq(msq,tempw,1,4,1,4,j,1d0)
+         !msq(1,4)=msq(1,4)+tempw(1,4)
       endif
 
       elseif (j.eq.2) then
@@ -668,7 +678,8 @@ C-----setup for ((dqdq_dqdq)  (1,1)-->(1,1)
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
      & )
      & ) then
-      msq(l,k)=temp(k,l)
+      call addtemptomsq(msq,temp,l,k,k,l,j,1d0)
+      !msq(l,k)=temp(k,l)
       endif
       enddo
       enddo
@@ -683,7 +694,8 @@ C-----setup for ((dqdq_dqdq)  (1,1)-->(1,1)
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.4)
      & )
      & ) then
-         msq(3,2)=msq(3,2)+tempw(2,3)
+         call addtempwtomsq(msq,tempw,3,2,2,3,j,1d0)
+         !msq(3,2)=msq(3,2)+tempw(2,3)
       endif
       if (
      & (
@@ -696,7 +708,8 @@ C-----setup for ((dqdq_dqdq)  (1,1)-->(1,1)
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.3)
      & )
      & ) then
-         msq(4,1)=msq(4,1)+tempw(1,4)
+         call addtempwtomsq(msq,tempw,4,1,1,4,j,1d0)
+         !msq(4,1)=msq(4,1)+tempw(1,4)
       endif
 
       elseif (j.eq.3) then
@@ -707,7 +720,8 @@ C-----setup for ((dqdq_dqdq)  (1,1)-->(1,1)
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.k)
      & )
      & ) then
-      msq(k,k)=temp(-k,-k)*stat
+      call addtemptomsq(msq,temp,k,k,-k,-k,j,stat)
+      !msq(k,k)=temp(-k,-k)*stat
       endif
       do l=k+1,-1
       if (
@@ -716,7 +730,8 @@ C-----setup for ((dqdq_dqdq)  (1,1)-->(1,1)
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
      & )
      & ) then
-      msq(k,l)=temp(-l,-k)
+      call addtemptomsq(msq,temp,k,l,-l,-k,j,1d0)
+      !msq(k,l)=temp(-l,-k)
       endif
       enddo
       enddo
@@ -731,7 +746,8 @@ C-----setup for ((dqdq_dqdq)  (1,1)-->(1,1)
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-4)
      & )
      & ) then
-         msq(-3,-2)=msq(-3,-2)+tempw(1,4)
+         call addtempwtomsq(msq,tempw,-3,-2,1,4,j,1d0)
+         !msq(-3,-2)=msq(-3,-2)+tempw(1,4)
       endif
       if (
      & (
@@ -744,7 +760,8 @@ C-----setup for ((dqdq_dqdq)  (1,1)-->(1,1)
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-3)
      & )
      & ) then
-         msq(-4,-1)=msq(-4,-1)+tempw(2,3)
+         call addtempwtomsq(msq,tempw,-4,-1,2,3,j,1d0)
+         !msq(-4,-1)=msq(-4,-1)+tempw(2,3)
       endif
 
       elseif (j.eq.4) then
@@ -756,7 +773,8 @@ C-----setup for ((dqdq_dqdq)  (1,1)-->(1,1)
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
      & )
      & ) then
-      msq(l,k)=temp(-l,-k)
+      call addtemptomsq(msq,temp,l,k,-l,-k,j,1d0)
+      !msq(l,k)=temp(-l,-k)
       endif
       enddo
       enddo
@@ -771,7 +789,8 @@ C-----setup for ((dqdq_dqdq)  (1,1)-->(1,1)
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-4)
      & )
      & ) then
-         msq(-2,-3)=msq(-2,-3)+tempw(1,4)
+         call addtempwtomsq(msq,tempw,-2,-3,1,4,j,1d0)
+         !msq(-2,-3)=msq(-2,-3)+tempw(1,4)
       endif
       if (
      & (
@@ -784,7 +803,8 @@ C-----setup for ((dqdq_dqdq)  (1,1)-->(1,1)
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-3)
      & )
      & ) then
-         msq(-1,-4)=msq(-1,-4)+tempw(2,3)
+         call addtempwtomsq(msq,tempw,-1,-4,2,3,j,1d0)
+         !msq(-1,-4)=msq(-1,-4)+tempw(2,3)
       endif
 
 c--- qbar-q
@@ -800,7 +820,8 @@ c--- qbar-q
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.k)
      & )
      & ) then
-      msq(k,-k)=temp(-k,-k)
+      call addtemptomsq(msq,temp,k,-k,-k,-k,j,1d0)
+      !msq(k,-k)=temp(-k,-k)
       endif
       do l=1,nf
       if (abs(k) .lt. abs(l)) then
@@ -810,7 +831,8 @@ c--- qbar-q
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
      & )
      & ) then
-      msq(k,l)=temp(-k,l)
+      call addtemptomsq(msq,temp,k,l,-k,l,j,1d0)
+      !msq(k,l)=temp(-k,l)
       endif
       endif
       enddo
@@ -826,7 +848,8 @@ c--- qbar-q
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.4)
      & )
      & ) then
-         msq(-1,3)=msq(-1,3)+tempw(2,3)
+         call addtempwtomsq(msq,tempw,-1,3,2,3,j,1d0)
+         !msq(-1,3)=msq(-1,3)+tempw(2,3)
       endif
       if (
      & (
@@ -839,7 +862,8 @@ c--- qbar-q
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.3)
      & )
      & ) then
-         msq(-2,4)=msq(-2,4)+tempw(1,4)
+         call addtempwtomsq(msq,tempw,-2,4,1,4,j,1d0)
+         !msq(-2,4)=msq(-2,4)+tempw(1,4)
       endif
 
 c--- qbar-q
@@ -853,7 +877,8 @@ c--- qbar-q
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
      & )
      & ) then
-      msq(k,l)=temp(l,-k)
+      call addtemptomsq(msq,temp,k,l,l,-k,j,1d0)
+      !msq(k,l)=temp(l,-k)
       endif
       endif
       enddo
@@ -869,7 +894,8 @@ c--- qbar-q
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-4)
      & )
      & ) then
-         msq(-3,1)=msq(-3,1)+tempw(1,4)
+         call addtempwtomsq(msq,tempw,-3,1,1,4,j,1d0)
+         !msq(-3,1)=msq(-3,1)+tempw(1,4)
       endif
       if (
      & (
@@ -882,7 +908,8 @@ c--- qbar-q
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-3)
      & )
      & ) then
-         msq(-4,2)=msq(-4,2)+tempw(2,3)
+         call addtempwtomsq(msq,tempw,-4,2,2,3,j,1d0)
+         !msq(-4,2)=msq(-4,2)+tempw(2,3)
       endif
 
 c--- q-qbar
@@ -898,7 +925,8 @@ c--- q-qbar
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.k)
      & )
      & ) then
-      msq(-k,k)=temp(-k,-k)
+      call addtemptomsq(msq,temp,-k,k,-k,-k,j,1d0)
+      !msq(-k,k)=temp(-k,-k)
       endif
       do l=1,nf
       if (abs(k) .lt. abs(l)) then
@@ -908,7 +936,8 @@ c--- q-qbar
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
      & )
      & ) then
-      msq(l,k)=temp(-k,l)
+      call addtemptomsq(msq,temp,l,k,-k,l,j,1d0)
+      !msq(l,k)=temp(-k,l)
       endif
       endif
       enddo
@@ -924,7 +953,8 @@ c--- q-qbar
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.4)
      & )
      & ) then
-         msq(3,-1)=msq(3,-1)+tempw(2,3)
+         call addtempwtomsq(msq,tempw,3,-1,2,3,j,1d0)
+         !msq(3,-1)=msq(3,-1)+tempw(2,3)
       endif
       if (
      & (
@@ -937,7 +967,8 @@ c--- q-qbar
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.3)
      & )
      & ) then
-         msq(4,-2)=msq(4,-2)+tempw(1,4)
+         call addtempwtomsq(msq,tempw,4,-2,1,4,j,1d0)
+         !msq(4,-2)=msq(4,-2)+tempw(1,4)
       endif
 
 c--- q-qbar
@@ -951,7 +982,8 @@ c--- q-qbar
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-k)
      & )
      & ) then
-      msq(-k,l)=temp(-k,-l)
+      call addtemptomsq(msq,temp,-k,l,-k,-l,j,1d0)
+      !msq(-k,l)=temp(-k,-l)
       endif
       endif
       enddo
@@ -967,7 +999,8 @@ c--- q-qbar
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-4)
      & )
      & ) then
-         msq(1,-3)=msq(1,-3)+tempw(1,4)
+         call addtempwtomsq(msq,tempw,1,-3,1,4,j,1d0)
+         !msq(1,-3)=msq(1,-3)+tempw(1,4)
       endif
       if (
      & (
@@ -980,7 +1013,8 @@ c--- q-qbar
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-3)
      & )
      & ) then
-         msq(2,-4)=msq(2,-4)+tempw(2,3)
+         call addtempwtomsq(msq,tempw,2,-4,2,3,j,1d0)
+         !msq(2,-4)=msq(2,-4)+tempw(2,3)
       endif
 
 c--- q-qbar extra pieces
@@ -1007,7 +1041,8 @@ c--- q-qbar extra pieces
      &    )
      & )
      & ) then
-      msq(k,-k)=msq(k,-k)+temp(k,l)
+      call addtemptomsq(msq,temp,k,-k,k,l,j,1d0)
+      !msq(k,-k)=msq(k,-k)+temp(k,l)
       endif
       endif
       enddo
@@ -1027,7 +1062,8 @@ c--- q-qbar extra pieces
      &                  .or. isANeutrino(-pid_pdg(8)))
      & )
      & ) then
-         msq(1,-2)=msq(1,-2)+tempw(1,4) ! d u~ -> c~ s
+         call addtempwtomsq(msq,tempw,1,-2,1,4,j,1d0)
+         !msq(1,-2)=msq(1,-2)+tempw(1,4) ! d u~ -> c~ s
       endif
       if (
      & (
@@ -1044,7 +1080,8 @@ c--- q-qbar extra pieces
      &                  .or. isANeutrino(-pid_pdg(8)))
      & )
      & ) then
-         msq(3,-4)=msq(3,-4)+tempw(1,4) ! s c~ -> u~ d
+         call addtempwtomsq(msq,tempw,3,-4,1,4,j,1d0)
+         !msq(3,-4)=msq(3,-4)+tempw(1,4) ! s c~ -> u~ d
       endif
       if (
      & (
@@ -1061,7 +1098,8 @@ c--- q-qbar extra pieces
      &                  .or. isANeutrino(pid_pdg(8)))
      & )
      & ) then
-         msq(2,-1)=msq(2,-1)+tempw(2,3) ! u d~ -> s~ c
+         call addtempwtomsq(msq,tempw,2,-1,2,3,j,1d0)
+         !msq(2,-1)=msq(2,-1)+tempw(2,3) ! u d~ -> s~ c
       endif
       if (
      & (
@@ -1078,7 +1116,8 @@ c--- q-qbar extra pieces
      &                  .or. isANeutrino(pid_pdg(8)))
      & )
      & ) then
-         msq(4,-3)=msq(4,-3)+tempw(2,3) ! c s~ -> d~ u
+         call addtempwtomsq(msq,tempw,4,-3,2,3,j,1d0)
+         !msq(4,-3)=msq(4,-3)+tempw(2,3) ! c s~ -> d~ u
       endif
 
 c--- q-qbar extra pieces
@@ -1105,7 +1144,8 @@ c--- q-qbar extra pieces
      &    )
      & )
      & ) then
-      msq(k,-k)=msq(k,-k)+temp(l,k)
+      call addtemptomsq(msq,temp,k,-k,l,k,j,1d0)
+      !msq(k,-k)=msq(k,-k)+temp(l,k)
       endif
       endif
       enddo
@@ -1135,7 +1175,8 @@ c--- qbar-q extra pieces
      &    )
      & )
      & ) then
-      msq(-k,k)=msq(-k,k)+temp(k,l)
+      call addtemptomsq(msq,temp,-k,k,k,l,j,1d0)
+      !msq(-k,k)=msq(-k,k)+temp(k,l)
       endif
       endif
       enddo
@@ -1155,7 +1196,8 @@ c--- qbar-q extra pieces
      &                  .or. isANeutrino(-pid_pdg(8)))
      & )
      & ) then
-         msq(-2,1)=msq(-2,1)+tempw(1,4) ! u~ d -> c~ s
+         call addtempwtomsq(msq,tempw,-2,1,1,4,j,1d0)
+         !msq(-2,1)=msq(-2,1)+tempw(1,4) ! u~ d -> c~ s
       endif
       if (
      & (
@@ -1172,7 +1214,8 @@ c--- qbar-q extra pieces
      &                  .or. isANeutrino(-pid_pdg(8)))
      & )
      & ) then
-         msq(-4,3)=msq(-4,3)+tempw(1,4) ! c~ s -> u~ d
+         call addtempwtomsq(msq,tempw,-4,3,1,4,j,1d0)
+         !msq(-4,3)=msq(-4,3)+tempw(1,4) ! c~ s -> u~ d
       endif
       if (
      & (
@@ -1189,7 +1232,8 @@ c--- qbar-q extra pieces
      &                  .or. isANeutrino(pid_pdg(8)))
      & )
      & ) then
-         msq(-1,2)=msq(-1,2)+tempw(2,3) ! d~ u -> s~ c
+         call addtempwtomsq(msq,tempw,-1,2,2,3,j,1d0)
+         !msq(-1,2)=msq(-1,2)+tempw(2,3) ! d~ u -> s~ c
       endif
       if (
      & (
@@ -1206,7 +1250,8 @@ c--- qbar-q extra pieces
      &                  .or. isANeutrino(pid_pdg(8)))
      & )
      & ) then
-         msq(-3,4)=msq(-3,4)+tempw(2,3) ! s~ c -> d~ u
+         call addtempwtomsq(msq,tempw,-3,4,2,3,j,1d0)
+         !msq(-3,4)=msq(-3,4)+tempw(2,3) ! s~ c -> d~ u
       endif
 
 c--- qbar-q extra pieces
@@ -1233,7 +1278,8 @@ c--- qbar-q extra pieces
      &    )
      & )
      & ) then
-      msq(-k,k)=msq(-k,k)+temp(l,k)
+      call addtemptomsq(msq,temp,-k,k,l,k,j,1d0)
+      !msq(-k,k)=msq(-k,k)+temp(l,k)
       endif
       endif
       enddo
@@ -1251,3 +1297,27 @@ c--- qbar-q extra pieces
 
       end
 
+
+! U. SARICA TEST: REMOVE THESE AND REVISE MSQ ADDITION IN THE MSQ=TEMP CASES (THIS IS JUST WRONG)
+      subroutine addtemptomsq(msq,temp,ime,jme,it,jt,j,thescale)
+      implicit none
+      include 'constants.f'
+      integer ime,jme,it,jt,j
+      double precision msq(fn:nf,fn:nf),temp(fn:nf,fn:nf),thescale
+      msq(ime,jme)=msq(ime,jme)+temp(it,jt)*thescale
+! U. SARICA TEST
+!      if(temp(it,jt) .ne. 0d0)
+!     & write(6,*) "Adding temp(",it,jt,") = ",temp(it,jt),
+!     & " to msq(",ime,jme,") at j=",j
+      end
+      subroutine addtempwtomsq(msq,tempw,ime,jme,it,jt,j,thescale)
+      implicit none
+      include 'constants.f'
+      integer ime,jme,it,jt,j
+      double precision msq(fn:nf,fn:nf),tempw(fn:nf,fn:nf),thescale
+      msq(ime,jme)=msq(ime,jme)+tempw(it,jt)*thescale
+! U. SARICA TEST
+!      if(tempw(it,jt) .ne. 0d0)
+!     & write(6,*) "Adding tempw(",it,jt,") = ",tempw(it,jt),
+!     & " to msq(",ime,jme,") at j=",j
+      end
