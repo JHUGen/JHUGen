@@ -885,8 +885,8 @@ integer, parameter :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6,5/)
       ICOLUP(1:2,3) = ICOLUP(1:2,1)
       ICOLUP(1:2,4) = ICOLUP(1:2,2)
       ISTUP(3:10) = +1
-      MOTHUP(1:2,3)= (/1,1/)
-      MOTHUP(1:2,4)= (/2,2/)
+      MOTHUP(1:2,3)= (/1,2/)
+      MOTHUP(1:2,4)= (/1,2/)
       
       if( MY_IDUP(3).eq.10 ) then ! 10 = LHA2M_ID(0) for the case where MY_IDUP(3:4) are not set (i.e. deterministicME=.false.). 10 doesn't mean gluon here
          call random_number(xRnd)
