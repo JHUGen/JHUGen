@@ -30,12 +30,12 @@ machine:
     ROOT_VERSIONPART3: "08"
     ROOT_VERSIONSTRING: "${ROOT_VERSIONPART1}.${ROOT_VERSIONPART2}/${ROOT_VERSIONPART3}"
 
-    REFERENCE_LHES_USERNAME: "JHUGen"
-    REFERENCE_LHES_BUILD_NUMBER: "337"
+    REFERENCE_LHES_USERNAME: "hroskes"
+    REFERENCE_LHES_BUILD_NUMBER: "819"
     REFERENCE_JHUGEN_VERSION: "v7.0.3"
 
     REFERENCE_LHES_FOLDER: "$(echo https://circleci.com/api/v1/project/$REFERENCE_LHES_USERNAME/JHUGen/$REFERENCE_LHES_BUILD_NUMBER/'artifacts/0/$CIRCLE_ARTIFACTS/reference')"
-    REFERENCE_FILENAMES: "ggH_ZZ.lhe ggH_WW.lhe ggH_Zgamma.lhe ggH_gammagamma.lhe spin1_ZZ.lhe spin1_WW.lhe gg_spin2_ZZ.lhe qq_spin2_WW.lhe gg_spin2_Zgamma.lhe qq_spin2_gammagamma.lhe ZH_bb.lhe WH_Zgamma.lhe ee_gammaH_bb.lhe VBF_ZZ.lhe HJJ_WW.lhe HJ_gammagamma.lhe ttH_tautau.lhe gg_bbH_tautau.lhe qq_bbH.lhe tqH_110.lhe tqH_111.lhe tqH_112.lhe tqH_113.lhe tqH_114.lhe"
+    REFERENCE_FILENAMES: "ggH_ZZ.lhe ggH_WW.lhe ggH_Zgamma.lhe ggH_gammagamma.lhe spin1_ZZ.lhe spin1_WW.lhe gg_spin2_ZZ.lhe qq_spin2_WW.lhe gg_spin2_Zgamma.lhe qq_spin2_gammagamma.lhe ZH_bb.lhe WH_Zgamma.lhe ee_gammaH_bb.lhe VBF_ZZ.lhe HJJ_WW.lhe HJ_gammagamma.lhe VBFoffshell_66.lhe ttH_tautau.lhe gg_bbH_tautau.lhe qq_bbH.lhe tqH_110.lhe tqH_111.lhe tqH_112.lhe tqH_113.lhe tqH_114.lhe"
 
     #if the ggH_ZZ comparison passes, don't make the ggH plots since they will be the same
     #and similar for VBF
@@ -259,6 +259,8 @@ test:
     - ./JHUGen Seed=765543533 VegasNc0=100000 ReadLHE=compare_to_reference/HJJ.lhe DataFile=compare_to_reference/HJJ_WW DecayMode1=11 DecayMode2=11 $REFERENCE_COUPLINGS
     - ./JHUGen Seed=765543533 PDFSet=3 Process=62 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/HJ $REFERENCE_COUPLINGS
     - ./JHUGen Seed=765543533 VegasNc0=100000 ReadLHE=compare_to_reference/HJ.lhe DataFile=compare_to_reference/HJ_gammagamma DecayMode1=7 DecayMode2=7 $REFERENCE_COUPLINGS
+
+    - ./JHUGen Seed=765543533 PDFSet=3 Process=66 VegasNc0=10000 VegasNc2=1 VBF_m4l_min=100 VBF_m4l_max=200 DataFile=compare_to_reference/VBFoffshell_66
 
     - ./JHUGen Seed=765543533 PDFSet=3 Process=80 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/ttH TopDK=1 DecayMode1=11 DecayMode2=11 $REFERENCE_COUPLINGS
     - ./JHUGen Seed=765543533 VegasNc0=100000 ReadLHE=compare_to_reference/ttH.lhe DataFile=compare_to_reference/ttH_tautau DecayMode1=11 DecayMode2=11 TauDK=1 $REFERENCE_COUPLINGS
