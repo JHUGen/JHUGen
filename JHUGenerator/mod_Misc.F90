@@ -1241,5 +1241,30 @@ real function infinity()
   infinity=-log(x)
 end function infinity
 
+function CalculatesXsec(Process)
+  implicit none
+  integer :: Process
+  logical :: CalculatesXsec
+  if (Process.le.2) then
+    CalculatesXsec=.true.
+  elseif (Process.eq.50) then
+    CalculatesXsec=.false.
+  elseif (Process.eq.60) then
+    CalculatesXsec=.true.
+  elseif (Process.eq.61) then
+    CalculatesXsec=.true.
+  elseif (Process.eq.62) then
+    CalculatesXsec=.false.
+  elseif (Process.ge.66 .and. Process.le.69) then
+    CalculatesXsec=.true.
+  elseif (Process.eq.80 .or. Process.eq.90) then
+    CalculatesXsec=.false.
+  elseif (Process.ge.110 .and. Process.le.114) then
+    CalculatesXsec=.true.
+  else
+    print *, "Unknown process in CalculatesXsec", process
+  endif
+end function CalculatesXsec
+
 END MODULE
 

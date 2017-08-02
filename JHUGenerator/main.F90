@@ -8,6 +8,7 @@ use ifport
 #endif
 use ModCrossSection
 use ModKinematics
+use ModMisc
 use ModParameters
 use ModPMZZ
 implicit none
@@ -27,7 +28,7 @@ real(8) :: VG_Result,VG_Error
    call PrintLogo(io_LogFile)
    call WriteParameters(io_stdout)
    call WriteParameters(io_LogFile)
-   if ( .not. ReadLHEFile .and. .not. ConvertLHEFile .and. .not.((Process.le.2 .or. Process.eq.60 .or. Process.eq.61 .or. (Process.ge.110.and.Process.le.114)) .and. unweighted) ) then
+   if ( .not. ReadLHEFile .and. .not. ConvertLHEFile .and. .not.(CalculatesXsec(Process) .and. unweighted) ) then
       call InitOutput(1d0, 1d14)   !for VBF/HJJ the cross section is calculated, so use that in the <init> block
    endif
 #if linkMELA==1
@@ -890,9 +891,9 @@ logical :: SetColliderEnergy
     endif
 
     !decay mode checks
-    if( (IsAZDecay(DecayMode1) .and. IsAZDecay(DecayMode2) .and. Process.le.2) .or. (Process.eq.50 .and. IsAZDecay(DecayMode1)) .or. Process.eq.60 .or. Process.eq.66 ) then
+    if( (IsAZDecay(DecayMode1) .and. IsAZDecay(DecayMode2) .and. Process.eq.0) .or. (Process.eq.50 .and. IsAZDecay(DecayMode1)) .or. Process.eq.60 .or. Process.eq.66 ) then
         includeGammaStar = (SetZgammacoupling .or. Setgammagammacoupling)
-    elseif( (IsAZDecay(DecayMode1) .and. IsAPhoton(DecayMode2) .and. Process.le.2) .or. (Process.eq.50 .and. IsAPhoton(DecayMode1)) ) then
+    elseif( (IsAZDecay(DecayMode1) .and. IsAPhoton(DecayMode2) .and. Process.eq.0) .or. (Process.eq.50 .and. IsAPhoton(DecayMode1)) ) then
         includeGammaStar = Setgammagammacoupling
     else if (Process.eq.67 .or. Process.eq.68 .or. Process.eq.69) then
         includeGammaStar = .true. ! Not really gamma*, but rather gamma* or gluon, set to true to manipulate pahsespace generation
@@ -2025,16 +2026,7 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
 
 elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
 
-if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) UseBetaVersion=.true.
-if( Process.eq.60 ) UseBetaVersion=.true.
-if( Process.eq.61 ) UseBetaVersion=.true.
-if( Process.ge.66 .and. Process.le.69 ) UseBetaVersion=.true.
-
-if( Process.eq.110 ) UseBetaVersion=.true.
-if( Process.eq.111 ) UseBetaVersion=.true.
-if( Process.eq.112 ) UseBetaVersion=.true.
-if( Process.eq.113 ) UseBetaVersion=.true.
-if( Process.eq.114 ) UseBetaVersion=.true.
+UseBetaVersion = CalculatesXsec(Process)
 
 
 if( UseBetaVersion ) then
