@@ -781,16 +781,16 @@ c--- 2-gluon amplitudes
          call qq2l2nuggamp(1,2,i3,i4,i5,i6,7,8,za,zb,msqgg)
          msq(1,-1)=msq(1,-1)+stat*aveqq*msqgg(1)
          msq(2,-2)=msq(2,-2)+stat*aveqq*msqgg(2)
-         msq(3,-3)=msq(1,-1)+stat*aveqq*msqgg(1)
-         msq(4,-4)=msq(2,-2)+stat*aveqq*msqgg(2)
-         msq(5,-5)=msq(1,-1)+stat*aveqq*msqgg(1)
+         msq(3,-3)=msq(3,-3)+stat*aveqq*msqgg(1)
+         msq(4,-4)=msq(4,-4)+stat*aveqq*msqgg(2)
+         msq(5,-5)=msq(5,-5)+stat*aveqq*msqgg(1)
 
          call qq2l2nuggamp(2,1,i3,i4,i5,i6,7,8,za,zb,msqgg)
          msq(-1,1)=msq(-1,1)+stat*aveqq*msqgg(1)
          msq(-2,2)=msq(-2,2)+stat*aveqq*msqgg(2)
-         msq(-3,3)=msq(-1,1)+stat*aveqq*msqgg(1)
-         msq(-4,4)=msq(-2,2)+stat*aveqq*msqgg(2)
-         msq(-5,5)=msq(-1,1)+stat*aveqq*msqgg(1)
+         msq(-3,3)=msq(-3,3)+stat*aveqq*msqgg(1)
+         msq(-4,4)=msq(-4,4)+stat*aveqq*msqgg(2)
+         msq(-5,5)=msq(-5,5)+stat*aveqq*msqgg(1)
       endif
 
       if (
