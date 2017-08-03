@@ -41,8 +41,9 @@ real(8) :: VG_Result,VG_Error
    elseif( DoPrintPMZZ ) then
         call PrintMZZdistribution()
    else
-        if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 .or. Process.eq.80 .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.66 .or. Process.eq.90 .or. &
-            Process.eq.110 .or. Process.eq.111 .or. Process.eq.112 .or. Process.eq.113 .or. Process.eq.114 ) then
+        if( Process.eq.0 .or. Process.eq.1  .or. Process.eq.2 .or. Process.eq.80 &
+                         .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.66 .or. Process.eq.67 .or. Process.eq.68 .or. Process.eq.69 &
+                         .or. Process.eq.90 .or. Process.eq.110 .or. Process.eq.111 .or. Process.eq.112 .or. Process.eq.113 .or. Process.eq.114 ) then
            call StartVegas_NEW(VG_Result,VG_Error)
         else
            call StartVegas(VG_Result,VG_Error)
@@ -801,7 +802,7 @@ logical :: SetColliderEnergy
     !PChannel
 
     if (Process.eq.0) PChannel = 0   !only gluons
-    if (Process.eq.1 .or. Process.eq.60 .or. Process.eq.66) PChannel = 1   !only quarks
+    if (Process.eq.1 .or. Process.eq.60 .or. Process.eq.66 .or. Process.eq.67 .or. Process.eq.68) PChannel = 1   !only quarks
 
 
     !LHAPDF
@@ -1941,7 +1942,8 @@ logical :: UseBetaVersion=.false.
     ingridfile=trim(outgridfile)
 
 
-    if( Process.eq.66 ) call init_VBFoffshChannelHash()
+    if( Process.ge.66 .and. Process.le.68 ) call init_VBFoffshChannelHash()
+    if( Process.ge.69 ) call Error("Missing ChannelHash for Process 69")
 
 if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !----------------------- weighted events
 
@@ -2060,7 +2062,7 @@ if( UseBetaVersion ) then
 !     if( Process.eq.80 ) call vegas(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2) ! adjust to LHE format
 !     if( Process.eq.90 ) call vegas(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.60 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
-    if( Process.eq.66 ) call vegas1(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
+    if( Process.ge.66 .and. Process.le.69 ) call vegas1(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.61 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.110) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.111) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
@@ -4052,6 +4054,10 @@ integer :: AllocStatus,NHisto
 
 RETURN
 END SUBROUTINE
+
+
+
+
 SUBROUTINE InitHisto_HVBF()
 use ModMisc
 use ModKinematics
