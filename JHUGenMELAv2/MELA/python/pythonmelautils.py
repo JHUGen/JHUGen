@@ -16,7 +16,7 @@ def compile(filename, loadMELA=True):
   command += "' | root -l -b "
   os.system(command)
   ###################################
-  ROOT.gROOT.ProcessLine(".L {}+".format(filename))
+  if filename: ROOT.gROOT.ProcessLine(".L {}+".format(filename))
 
 
 class NamedTemporaryMacro(object):

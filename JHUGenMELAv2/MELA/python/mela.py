@@ -37,7 +37,7 @@ See examples at the bottom.
 from collections import namedtuple
 import ROOT
 from pythonmelautils import MultiDimensionalCppArray, NamedTemporaryMacro, SelfDParameter, SelfDCoupling
-from ROOT import TVar
+from ROOT import TUtil, TVar
 
 class Mela(object):
   counter = 0
@@ -65,9 +65,9 @@ class Mela(object):
     }
     //not implementing the computeP_selfD* functions here
     //would be easier to do in pure python but not worth it anyway
-    float computeP(Mela& mela, bool useconstant) {
+    float computeP(Mela& mela, bool useConstant) {
       float result;
-      mela.computeP(result, useconstant);
+      mela.computeP(result, useConstant);
       return result;
     }
     float computeD_CP(Mela& mela, TVar::MatrixElement myME, TVar::Process myType) {
@@ -75,17 +75,26 @@ class Mela(object):
       mela.computeD_CP(myME, myType, result);
       return result;
     }
-    float computeProdP(Mela& mela, bool useconstant) {
+    float computeProdP(Mela& mela, bool useConstant) {
       float result;
-      mela.computeProdP(result, useconstant);
+      mela.computeProdP(result, useConstant);
       return result;
     }
-    float computeProdDecP(Mela& mela, bool useconstant) {
+    float computeProdDecP(Mela& mela, bool useConstant) {
       float result;
-      mela.computeProdDecP(result, useconstant);
+      mela.computeProdDecP(result, useConstant);
       return result;
     }
-    //not implementing the separate computeProdP_VH, etc.  Just use computeProdP.
+    float computeProdP_VH(Mela& mela, bool includeHiggsDecay, bool useConstant) {
+      float result;
+      mela.computeProdP_VH(result, includeHiggsDecay, useConstant);
+      return result;
+    }
+    float computeProdP_ttH(Mela& mela, int topProcess, int topDecay, bool useConstant) {
+      float result;
+      mela.computeProdP_ttH(result, topProcess, topDecay, useConstant);
+      return result;
+    }
     float compute4FermionWeight(Mela& mela) {
       float result;
       mela.compute4FermionWeight(result);
@@ -104,6 +113,16 @@ class Mela(object):
     float computeD_gg(Mela& mela, TVar::MatrixElement myME, TVar::Process myType) {
       float result;
       mela.computeD_gg(myME, myType, result);
+      return result;
+    }
+    float getConstant(Mela& mela) {
+      float result;
+      mela.getConstant(result);
+      return result;
+    }
+    float computeDijetConvBW(Mela& mela) {
+      float result;
+      mela.computeDijetConvBW(result);
       return result;
     }
   """
@@ -215,14 +234,18 @@ class Mela(object):
   def getPAux(self): return ROOT.getPAux(self.__mela)
   DecayAngles = namedtuple("DecayAngles", "qH m1 m2 costheta1 costheta2 Phi costhetastar Phi1")
   def computeDecayAngles(self): return self.DecayAngles(*ROOT.computeDecayAngles(self.__mela))
-  def computeP(self, useconstant=True): return ROOT.computeP(self.__mela, useconstant)
+  def computeP(self, useConstant=True): return ROOT.computeP(self.__mela, useConstant)
   def computeD_CP(self, myME, myType): return ROOT.computeD_CP(self.__mela, myME, myType)
-  def computeProdP(self, useconstant=True): return ROOT.computeProdP(self.__mela, useconstant)
-  def computeProdDecP(self, useconstant=True): return ROOT.computeProdDecP(self.__mela, useconstant)
+  def computeProdP(self, useConstant=True): return ROOT.computeProdP(self.__mela, useConstant)
+  def computeProdDecP(self, useConstant=True): return ROOT.computeProdDecP(self.__mela, useConstant)
   def compute4FermionWeight(self): return ROOT.compute4FermionWeight(self.__mela)
   def getXPropagator(self, scheme): return ROOT.getXPropagator(self.__mela, scheme)
   def computePM4l(self, syst): return ROOT.computePM4l(self.__mela, syst)
-  def computeD_gg(self, myME, myType): return ROOT.myME(self.__mela, myME, myType)
+  def computeD_gg(self, myME, myType): return ROOT.computeD_gg(self.__mela, myME, myType)
+  def computeProdP_VH(self, includeHiggsDecay=False, useConstant=True): return ROOT.computeProdP_VH(self.__mela, includeHiggsDecay, useConstant)
+  def computeProdP_ttH(self, topProcess=2, topDecay=0, useConstant=True): return ROOT.computeProdP_ttH(self.__mela, topProcess, topDecay, useConstant)
+  def getConstant(self): return ROOT.getConstant(self.__mela)
+  def computeDijetConvBW(self): return ROOT.computeDijetConvBW(self.__mela)
 
   ghg2 = SelfDCoupling("selfDHggcoupl", 0, ROOT.py_gHIGGS_GG_2)
   ghg3 = SelfDCoupling("selfDHggcoupl", 0, ROOT.py_gHIGGS_GG_3)
