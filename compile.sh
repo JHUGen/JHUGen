@@ -2,7 +2,7 @@
 
 cmsswdir=../
 scramarch=$SCRAM_ARCH
-LIB=libmcfm_703.so
+LIB=libmcfm_704.so
 
 for aDir in QCDLoop/ff QCDLoop/ql QCDLoop TensorReduction/ov TensorReduction/pv TensorReduction/ov TensorReduction/recur/smallY TensorReduction/recur/smallP TensorReduction/recur/smallG TensorReduction/recur/smallF TensorReduction/recur
 do
