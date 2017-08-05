@@ -213,7 +213,7 @@ c--- fill matrix elements
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.k)
      & )
      & ) then
-      msq(k,k)=temp(k,k)*stat
+         call addtemptomsq(msq,temp,k,k,k,k,j,stat)
       endif
       do l=k+1,nf
       if (
@@ -222,7 +222,7 @@ c--- fill matrix elements
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
      & )
      & ) then
-      msq(k,l)=temp(k,l)
+         call addtemptomsq(msq,temp,k,l,k,l,j,1d0)
       endif
       enddo
       enddo
@@ -237,7 +237,7 @@ c--- fill matrix elements
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.4)
      & )
      & ) then
-         msq(2,3)=msq(2,3)+tempw(2,3)
+         call addtempwtomsq(msq,tempw,2,3,2,3,j,1d0)
       endif
       if (
      & (
@@ -250,7 +250,7 @@ c--- fill matrix elements
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.3)
      & )
      & ) then
-         msq(1,4)=msq(1,4)+tempw(1,4)
+         call addtempwtomsq(msq,tempw,1,4,1,4,j,1d0)
       endif
 
       elseif (j.eq.2) then
@@ -262,7 +262,7 @@ c--- fill matrix elements
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
      & )
      & ) then
-      msq(l,k)=temp(k,l)
+         call addtemptomsq(msq,temp,l,k,k,l,j,1d0)
       endif
       enddo
       enddo
@@ -277,7 +277,7 @@ c--- fill matrix elements
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.4)
      & )
      & ) then
-         msq(3,2)=msq(3,2)+tempw(2,3)
+         call addtempwtomsq(msq,tempw,3,2,2,3,j,1d0)
       endif
       if (
      & (
@@ -290,7 +290,7 @@ c--- fill matrix elements
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.3)
      & )
      & ) then
-         msq(4,1)=msq(4,1)+tempw(1,4)
+         call addtempwtomsq(msq,tempw,4,1,1,4,j,1d0)
       endif
 
       elseif (j.eq.3) then
@@ -301,7 +301,7 @@ c--- fill matrix elements
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.k)
      & )
      & ) then
-      msq(k,k)=temp(-k,-k)*stat
+         call addtemptomsq(msq,temp,k,k,-k,-k,j,stat)
       endif
       do l=k+1,-1
       if (
@@ -310,7 +310,7 @@ c--- fill matrix elements
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
      & )
      & ) then
-      msq(k,l)=temp(-l,-k)
+         call addtemptomsq(msq,temp,k,l,-l,-k,j,1d0)
       endif
       enddo
       enddo
@@ -325,7 +325,7 @@ c--- fill matrix elements
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-4)
      & )
      & ) then
-         msq(-3,-2)=msq(-3,-2)+tempw(1,4)
+         call addtempwtomsq(msq,tempw,-3,-2,1,4,j,1d0)
       endif
       if (
      & (
@@ -338,7 +338,7 @@ c--- fill matrix elements
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-3)
      & )
      & ) then
-         msq(-4,-1)=msq(-4,-1)+tempw(2,3)
+         call addtempwtomsq(msq,tempw,-4,-1,2,3,j,1d0)
       endif
 
       elseif (j.eq.4) then
@@ -350,7 +350,7 @@ c--- fill matrix elements
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
      & )
      & ) then
-      msq(l,k)=temp(-l,-k)
+         call addtemptomsq(msq,temp,l,k,-l,-k,j,1d0)
       endif
       enddo
       enddo
@@ -365,7 +365,7 @@ c--- fill matrix elements
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-4)
      & )
      & ) then
-         msq(-2,-3)=msq(-2,-3)+tempw(1,4)
+         call addtempwtomsq(msq,tempw,-2,-3,1,4,j,1d0)
       endif
       if (
      & (
@@ -378,7 +378,7 @@ c--- fill matrix elements
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-3)
      & )
      & ) then
-         msq(-1,-4)=msq(-1,-4)+tempw(2,3)
+         call addtempwtomsq(msq,tempw,-1,-4,2,3,j,1d0)
       endif
 
 c--- qbar-q
@@ -394,7 +394,7 @@ c--- qbar-q
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.k)
      & )
      & ) then
-      msq(k,-k)=temp(-k,-k)
+         call addtemptomsq(msq,temp,k,-k,-k,-k,j,1d0)
       endif
       do l=1,nf
       if (abs(k) .lt. abs(l)) then
@@ -404,7 +404,7 @@ c--- qbar-q
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
      & )
      & ) then
-      msq(k,l)=temp(-k,l)
+         call addtemptomsq(msq,temp,k,l,-k,l,j,1d0)
       endif
       endif
       enddo
@@ -420,7 +420,7 @@ c--- qbar-q
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.4)
      & )
      & ) then
-         msq(-1,3)=msq(-1,3)+tempw(2,3)
+         call addtempwtomsq(msq,tempw,-1,3,2,3,j,1d0)
       endif
       if (
      & (
@@ -433,7 +433,7 @@ c--- qbar-q
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.3)
      & )
      & ) then
-         msq(-2,4)=msq(-2,4)+tempw(1,4)
+         call addtempwtomsq(msq,tempw,-2,4,1,4,j,1d0)
       endif
 
 c--- qbar-q
@@ -447,7 +447,7 @@ c--- qbar-q
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
      & )
      & ) then
-      msq(k,l)=temp(l,-k)
+         call addtemptomsq(msq,temp,k,l,l,-k,j,1d0)
       endif
       endif
       enddo
@@ -463,7 +463,7 @@ c--- qbar-q
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-4)
      & )
      & ) then
-         msq(-3,1)=msq(-3,1)+tempw(1,4)
+         call addtempwtomsq(msq,tempw,-3,1,1,4,j,1d0)
       endif
       if (
      & (
@@ -476,7 +476,7 @@ c--- qbar-q
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-3)
      & )
      & ) then
-         msq(-4,2)=msq(-4,2)+tempw(2,3)
+         call addtempwtomsq(msq,tempw,-4,2,2,3,j,1d0)
       endif
 
 c--- q-qbar
@@ -492,7 +492,7 @@ c--- q-qbar
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.k)
      & )
      & ) then
-      msq(-k,k)=temp(-k,-k)
+         call addtemptomsq(msq,temp,-k,k,-k,-k,j,1d0)
       endif
       do l=1,nf
       if (abs(k) .lt. abs(l)) then
@@ -502,7 +502,7 @@ c--- q-qbar
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
      & )
      & ) then
-      msq(l,k)=temp(-k,l)
+         call addtemptomsq(msq,temp,l,k,-k,l,j,1d0)
       endif
       endif
       enddo
@@ -518,7 +518,7 @@ c--- q-qbar
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.4)
      & )
      & ) then
-         msq(3,-1)=msq(3,-1)+tempw(2,3)
+         call addtempwtomsq(msq,tempw,3,-1,2,3,j,1d0)
       endif
       if (
      & (
@@ -531,7 +531,7 @@ c--- q-qbar
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.3)
      & )
      & ) then
-         msq(4,-2)=msq(4,-2)+tempw(1,4)
+         call addtempwtomsq(msq,tempw,4,-2,1,4,j,1d0)
       endif
 
 c--- q-qbar
@@ -545,7 +545,7 @@ c--- q-qbar
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-k)
      & )
      & ) then
-      msq(-k,l)=temp(-k,-l)
+         call addtemptomsq(msq,temp,-k,l,-k,-l,j,1d0)
       endif
       endif
       enddo
@@ -561,7 +561,7 @@ c--- q-qbar
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-4)
      & )
      & ) then
-         msq(1,-3)=msq(1,-3)+tempw(1,4)
+         call addtempwtomsq(msq,tempw,1,-3,1,4,j,1d0)
       endif
       if (
      & (
@@ -574,7 +574,7 @@ c--- q-qbar
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-3)
      & )
      & ) then
-         msq(2,-4)=msq(2,-4)+tempw(2,3)
+         call addtempwtomsq(msq,tempw,2,-4,2,3,j,1d0)
       endif
 
 c--- q-qbar extra pieces
@@ -593,7 +593,7 @@ c--- q-qbar extra pieces
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
      & )
      & ) then
-      msq(k,-k)=msq(k,-k)+temp(k,l)
+         call addtemptomsq(msq,temp,k,-k,k,l,j,1d0)
       endif
       endif
       enddo
@@ -609,7 +609,7 @@ c--- q-qbar extra pieces
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-4)
      & )
      & ) then
-         msq(1,-2)=msq(1,-2)+tempw(1,4) ! d u~ -> c~ s
+         call addtempwtomsq(msq,tempw,1,-2,1,4,j,1d0)
       endif
       if (
      & (
@@ -622,7 +622,7 @@ c--- q-qbar extra pieces
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-2)
      & )
      & ) then
-         msq(3,-4)=msq(3,-4)+tempw(1,4) ! s c~ -> u~ d
+         call addtempwtomsq(msq,tempw,3,-4,1,4,j,1d0)
       endif
       if (
      & (
@@ -635,7 +635,7 @@ c--- q-qbar extra pieces
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.4)
      & )
      & ) then
-         msq(2,-1)=msq(2,-1)+tempw(2,3) ! u d~ -> s~ c
+         call addtempwtomsq(msq,tempw,2,-1,2,3,j,1d0)
       endif
       if (
      & (
@@ -648,7 +648,7 @@ c--- q-qbar extra pieces
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.2)
      & )
      & ) then
-         msq(4,-3)=msq(4,-3)+tempw(2,3) ! c s~ -> d~ u
+         call addtempwtomsq(msq,tempw,4,-3,2,3,j,1d0)
       endif
 
 c--- q-qbar extra pieces
@@ -667,7 +667,7 @@ c--- q-qbar extra pieces
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
      & )
      & ) then
-      msq(k,-k)=msq(k,-k)+temp(l,k)
+         call addtemptomsq(msq,temp,k,-k,l,k,j,1d0)
       endif
       endif
       enddo
@@ -689,7 +689,7 @@ c--- qbar-q extra pieces
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
      & )
      & ) then
-      msq(-k,k)=msq(-k,k)+temp(k,l)
+         call addtemptomsq(msq,temp,-k,k,k,l,j,1d0)
       endif
       endif
       enddo
@@ -705,7 +705,7 @@ c--- qbar-q extra pieces
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-4)
      & )
      & ) then
-         msq(-2,1)=msq(-2,1)+tempw(1,4) ! u~ d -> c~ s
+         call addtempwtomsq(msq,tempw,-2,1,1,4,j,1d0)
       endif
       if (
      & (
@@ -718,7 +718,7 @@ c--- qbar-q extra pieces
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-2)
      & )
      & ) then
-         msq(-4,3)=msq(-4,3)+tempw(1,4) ! c~ s -> u~ d
+         call addtempwtomsq(msq,tempw,-4,3,1,4,j,1d0)
       endif
       if (
      & (
@@ -731,7 +731,7 @@ c--- qbar-q extra pieces
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.4)
      & )
      & ) then
-         msq(-1,2)=msq(-1,2)+tempw(2,3) ! d~ u -> s~ c
+         call addtempwtomsq(msq,tempw,-1,2,2,3,j,1d0)
       endif
       if (
      & (
@@ -744,7 +744,7 @@ c--- qbar-q extra pieces
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.2)
      & )
      & ) then
-         msq(-3,4)=msq(-3,4)+tempw(2,3) ! s~ c -> d~ u
+         call addtempwtomsq(msq,tempw,-3,4,2,3,j,1d0)
       endif
 
 c--- qbar-q extra pieces
@@ -763,7 +763,7 @@ c--- qbar-q extra pieces
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
      & )
      & ) then
-      msq(-k,k)=msq(-k,k)+temp(l,k)
+         call addtemptomsq(msq,temp,-k,k,l,k,j,1d0)
       endif
       endif
       enddo

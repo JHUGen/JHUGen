@@ -893,6 +893,7 @@ writeinput.o \
 writeout.o \
 dips_mass.o \
 zeromsq.o \
+addtempmsqtomsq.o \
 convertPLabelToPDGId.o \
 ParticleIdFunctions.o \
 HVVSpinZeroDynamicCouplings.o \

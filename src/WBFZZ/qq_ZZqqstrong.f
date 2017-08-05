@@ -331,6 +331,7 @@ C-----setup for ((dqdq_dqdq)  (1,1)-->(1,1)
 
       temp(:,:) = temp(:,:)*colfac34_56*vsymfact
 
+c--- fill matrix elements
       if (j.eq.1) then
       do k=1,nf
       if (
@@ -339,7 +340,7 @@ C-----setup for ((dqdq_dqdq)  (1,1)-->(1,1)
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.k)
      & )
      & ) then
-      msq(k,k)=temp(k,k)*stat
+         call addtemptomsq(msq,temp,k,k,k,k,j,stat)
       endif
       do l=k+1,nf
       if (
@@ -348,7 +349,7 @@ C-----setup for ((dqdq_dqdq)  (1,1)-->(1,1)
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
      & )
      & ) then
-      msq(k,l)=temp(k,l)
+         call addtemptomsq(msq,temp,k,l,k,l,j,1d0)
       endif
       enddo
       enddo
@@ -362,7 +363,7 @@ C-----setup for ((dqdq_dqdq)  (1,1)-->(1,1)
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
      & )
      & ) then
-      msq(l,k)=temp(k,l)
+         call addtemptomsq(msq,temp,l,k,k,l,j,1d0)
       endif
       enddo
       enddo
@@ -375,7 +376,7 @@ C-----setup for ((dqdq_dqdq)  (1,1)-->(1,1)
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.k)
      & )
      & ) then
-      msq(k,k)=temp(-k,-k)*stat
+         call addtemptomsq(msq,temp,k,k,-k,-k,j,stat)
       endif
       do l=k+1,-1
       if (
@@ -384,7 +385,7 @@ C-----setup for ((dqdq_dqdq)  (1,1)-->(1,1)
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
      & )
      & ) then
-      msq(k,l)=temp(-l,-k)
+         call addtemptomsq(msq,temp,k,l,-l,-k,j,1d0)
       endif
       enddo
       enddo
@@ -398,7 +399,7 @@ C-----setup for ((dqdq_dqdq)  (1,1)-->(1,1)
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
      & )
      & ) then
-      msq(l,k)=temp(-l,-k)
+         call addtemptomsq(msq,temp,l,k,-l,-k,j,1d0)
       endif
       enddo
       enddo
@@ -416,7 +417,7 @@ c--- qbar-q
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.k)
      & )
      & ) then
-      msq(k,-k)=temp(-k,-k)
+         call addtemptomsq(msq,temp,k,-k,-k,-k,j,1d0)
       endif
       do l=1,nf
       if (abs(k) .lt. abs(l)) then
@@ -426,7 +427,7 @@ c--- qbar-q
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
      & )
      & ) then
-      msq(k,l)=temp(-k,l)
+         call addtemptomsq(msq,temp,k,l,-k,l,j,1d0)
       endif
       endif
       enddo
@@ -443,7 +444,7 @@ c--- qbar-q
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
      & )
      & ) then
-      msq(k,l)=temp(l,-k)
+         call addtemptomsq(msq,temp,k,l,l,-k,j,1d0)
       endif
       endif
       enddo
@@ -462,7 +463,7 @@ c--- q-qbar
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.k)
      & )
      & ) then
-      msq(-k,k)=temp(-k,-k)
+         call addtemptomsq(msq,temp,-k,k,-k,-k,j,1d0)
       endif
       do l=1,nf
       if (abs(k) .lt. abs(l)) then
@@ -472,7 +473,7 @@ c--- q-qbar
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
      & )
      & ) then
-      msq(l,k)=temp(-k,l)
+         call addtemptomsq(msq,temp,l,k,-k,l,j,1d0)
       endif
       endif
       enddo
@@ -489,7 +490,7 @@ c--- q-qbar
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.-k)
      & )
      & ) then
-      msq(-k,l)=temp(-k,-l)
+         call addtemptomsq(msq,temp,-k,l,-k,-l,j,1d0)
       endif
       endif
       enddo
@@ -511,7 +512,7 @@ c--- q-qbar extra pieces
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
      & )
      & ) then
-      msq(k,-k)=msq(k,-k)+temp(k,l)
+         call addtemptomsq(msq,temp,k,-k,k,l,j,1d0)
       endif
       endif
       enddo
@@ -533,7 +534,7 @@ c--- q-qbar extra pieces
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
      & )
      & ) then
-      msq(k,-k)=msq(k,-k)+temp(l,k)
+         call addtemptomsq(msq,temp,k,-k,l,k,j,1d0)
       endif
       endif
       enddo
@@ -555,7 +556,7 @@ c--- qbar-q extra pieces
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
      & )
      & ) then
-      msq(-k,k)=msq(-k,k)+temp(k,l)
+         call addtemptomsq(msq,temp,-k,k,k,l,j,1d0)
       endif
       endif
       enddo
@@ -577,7 +578,7 @@ c--- qbar-q extra pieces
      & (pid_pdg(8).eq.0 .or. pid_pdg(8).eq.l)
      & )
      & ) then
-      msq(-k,k)=msq(-k,k)+temp(l,k)
+         call addtemptomsq(msq,temp,-k,k,l,k,j,1d0)
       endif
       endif
       enddo
