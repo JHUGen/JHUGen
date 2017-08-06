@@ -183,7 +183,7 @@ subroutine SetSpinZeroVVCouplings(vvcoupl, cqsq, Lambda_qsq, useWWcoupl)
       ghz4_prime7  = vvcoupl(39)
 
       ! Set includeGammaStar based on the actual coupling values
-      if(&
+      includeGammaStar = (          &
          ghzgs1_prime2.ne.czero .or. &
          ghzgs2.ne.czero .or.        &
          ghzgs3.ne.czero .or.        &
@@ -191,11 +191,7 @@ subroutine SetSpinZeroVVCouplings(vvcoupl, cqsq, Lambda_qsq, useWWcoupl)
          ghgsgs2.ne.czero .or.       &
          ghgsgs3.ne.czero .or.       &
          ghgsgs4.ne.czero            &
-      ) then
-         includeGammaStar=.true.
-      else
-         includeGammaStar=.false.
-      endif
+      )
 
    else
       cw_q1sq = cqsq(1)
@@ -366,15 +362,12 @@ end subroutine SetSpinZeroVVCouplings_NoGamma
 
 subroutine SetSpinZeroContactTerms(zzpcoupl, zpzpcoupl, Zpffcoupl, wwpcoupl, wpwpcoupl, Wpffcoupl, UseVp, M_Vp, Ga_Vp)
   implicit none
-  !The array sizes are (1) for now.  This is ok with the compiler because C++ and Fortran don't really talk.
-  !Can increase this when more couplings are added.
-
-  complex(8), intent(in) :: zzpcoupl(1)
-  complex(8), intent(in) :: zpzpcoupl(1)
+  complex(8), intent(in) :: zzpcoupl(39)
+  complex(8), intent(in) :: zpzpcoupl(39)
   complex(8), intent(in) :: Zpffcoupl(20)
 
-  complex(8), intent(in) :: wwpcoupl(1)
-  complex(8), intent(in) :: wpwpcoupl(1)
+  complex(8), intent(in) :: wwpcoupl(39)
+  complex(8), intent(in) :: wpwpcoupl(39)
   complex(8), intent(in) :: Wpffcoupl(20)
 
   logical, intent(in) :: UseVp
@@ -420,12 +413,12 @@ subroutine SetSpinZeroContactTerms(zzpcoupl, zpzpcoupl, Zpffcoupl, wwpcoupl, wpw
   ewp_Mu_right = Wpffcoupl(4)
   ewp_Ta_left = Wpffcoupl(5)
   ewp_Ta_right = Wpffcoupl(6)
-  ewp_Up_left = Wpffcoupl(9)
-  ewp_Up_right = Wpffcoupl(10)
-  ewp_Chm_left = Wpffcoupl(13)
-  ewp_Chm_right = Wpffcoupl(14)
-  ewp_Top_left = Wpffcoupl(15)
-  ewp_Top_right = Wpffcoupl(16)
+  ewp_Up_left = Wpffcoupl(11)
+  ewp_Up_right = Wpffcoupl(12)
+  ewp_Chm_left = Wpffcoupl(15)
+  ewp_Chm_right = Wpffcoupl(16)
+  ewp_Top_left = Wpffcoupl(19)
+  ewp_Top_right = Wpffcoupl(20)
 
 end subroutine
 
