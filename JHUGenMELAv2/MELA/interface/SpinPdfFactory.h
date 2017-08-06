@@ -47,6 +47,7 @@ protected:
   virtual void destroyGVals()=0;
   virtual void initPDF()=0;
   virtual void destroyPDF()=0;
+
 };
 
 

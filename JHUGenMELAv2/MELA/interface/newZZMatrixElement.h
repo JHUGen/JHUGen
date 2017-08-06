@@ -16,49 +16,26 @@ public:
     double ebeam,
     TVar::VerbosityLevel verbosity
     );
-
+  newZZMatrixElement(const newZZMatrixElement& other);
   ~newZZMatrixElement();
 
   void computeXS(
-    TVar::Process process_,
-    TVar::MatrixElement me_,
-    TVar::Production production_,
     float &mevalue
     );
-
   void computeProdXS_VVHVV(
-    TVar::Process process_,
-    TVar::MatrixElement me_,
-    TVar::Production production_,
     float& mevalue
     );
-
   void computeProdXS_JJH(
-    TVar::Process process_,
-    TVar::MatrixElement me_,
-    TVar::Production production_,
     float &mevalue
     );
-
   void computeProdXS_JH(
-    TVar::Process process_,
-    TVar::MatrixElement me_,
-    TVar::Production production_,
     float &mevalue
     );
-
   void computeProdXS_VH(
-    TVar::Process process_,
-    TVar::MatrixElement me_,
-    TVar::Production production_,
     float &mevalue,
     bool includeHiggsDecay=false
     );
-
   void computeProdXS_ttH(
-    TVar::Process process_,
-    TVar::MatrixElement me_,
-    TVar::Production production_,
     float &mevalue,
     int topProcess,
     int topDecay=0
@@ -147,6 +124,10 @@ public:
 
   // Get-functions
   MelaIO* get_IORecord();
+  double get_PrimaryMass(int ipart);
+  double get_PrimaryHiggsMass(){ return get_PrimaryMass(25); }
+  double get_PrimaryWidth(int ipart);
+  double get_HiggsWidthAtPoleMass(double mass);
   MELACandidate* get_CurrentCandidate();
   int get_CurrentCandidateIndex();
   int get_NCandidates();
@@ -154,11 +135,11 @@ public:
 
 protected:
   
-  TVar::VerbosityLevel processVerbosity;
-  TVar::LeptonInterference processLeptonInterference;
   TVar::Process processModel;
   TVar::MatrixElement processME;
   TVar::Production processProduction;
+  TVar::VerbosityLevel processVerbosity;
+  TVar::LeptonInterference processLeptonInterference;
 
   double EBEAM;
   double mHiggs[nSupportedHiggses];
@@ -174,6 +155,9 @@ protected:
   // Having a temporary top candidate list does not make much sense at the moment
   //std::vector<MELATopCandidate*> tmpTopCandList; // Vector of pointers to the owned, temporary MELATopCandidates
   std::vector<MELACandidate*> tmpCandList; // Vector of pointers to the owned, temporary MELACandidates
+
+  // Constructor wrapper
+  void build();
 
 };
 #endif

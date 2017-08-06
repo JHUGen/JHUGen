@@ -19,7 +19,7 @@ class TH3F;
 class RooRealVar;
 class RooAbsPdf;
 class RooArgSet;
-class ScalarPdfFactory_ggH;
+class ScalarPdfFactory_HVV;
 class VectorPdfFactory;
 class TensorPdfFactory;
 class RooqqZZ_JHU_ZgammaZZ_fast;
@@ -29,18 +29,22 @@ class SuperMELA;
 #include "TVar.hh"
 #include "TEvtProb.hh"
 #include "MelaPConstant.h"
-#include "ScalarPdfFactory_ggH.h"
+#include "SuperDijetMela.h"
+#include "ScalarPdfFactory_HVV.h"
 #include "VectorPdfFactory.h"
-#include "TensorPdfFactory_HVV.h"
+#include "TensorPdfFactory_ppHVV.h"
 #include "RooqqZZ_JHU_ZgammaZZ_fast.h"
 
 class Mela{
 
 public:
 
-  // Mela(){};
-  Mela(double LHCsqrts_=13., double mh_=125., TVar::VerbosityLevel verbosity_=TVar::ERROR); // higgs mass for supermela
+  Mela(double LHCsqrts_=13., double mh_=125., TVar::VerbosityLevel verbosity_=TVar::ERROR); // Higgs mass for supermela
+  Mela(const Mela& other);
   ~Mela();
+
+  // Constructor wrapper
+  void build(double mh_);
 
   void setProcess(TVar::Process myModel, TVar::MatrixElement myME, TVar::Production myProduction);
   void setVerbosity(TVar::VerbosityLevel verbosity_=TVar::ERROR);
@@ -76,6 +80,10 @@ public:
   void resetWidth(double inwidth, int ipart);
   void resetQuarkMasses();
   void resetMCFM_EWKParameters(double ext_Gf, double ext_aemmz, double ext_mW, double ext_mZ, double ext_xW, int ext_ewscheme=3);
+  // Function to get current primary EW/QCD parameters from MCFM/JHUGen (notice Higgs mass/width used in the ME could be different)
+  double getPrimaryMass(int ipart);
+  double getPrimaryWidth(int ipart);
+  double getHiggsWidthAtPoleMass(double mass);
 
 
   MelaIO* getIORecord(); // Full parton-by-parton ME record
@@ -87,6 +95,10 @@ public:
 
   void getConstant(float& prob); // <ME> constants
   void getPAux(float& prob); // SuperProb
+
+
+  RooSpin::modelMeasurables getMeasurablesRRV();
+
 
   void computeDecayAngles(
     float& qH,
@@ -197,6 +209,9 @@ public:
     float& prob
     );
 
+  //*** SuperJJMela ***//
+  void computeDijetConvBW(float& prob);
+
   //*** Dgg10 ***//
   void computeD_gg(
     TVar::MatrixElement myME,
@@ -207,16 +222,10 @@ public:
   // Access ZZMEs Calculate4Momentum
   std::vector<TLorentzVector> calculate4Momentum(double Mx, double M1, double M2, double theta, double theta1, double theta2, double Phi1, double Phi);
 
-
-  RooAbsPdf* pdf;
-  ScalarPdfFactory_ggH* ggSpin0Model;
-  VectorPdfFactory* spin1Model;
-  TensorPdfFactory_HVV* spin2Model;
-  RooqqZZ_JHU_ZgammaZZ_fast* qqZZmodel;
-
-  SuperMELA* super;
-  TRandom3* myRandomNumber; // random number for resolution systematics
-
+  /********************/
+  /*** Data members ***/
+  /********************/
+  TRandom3 melaRandomNumber; // Used in SuperMELA smearing
   RooRealVar* mzz_rrv;
   RooRealVar* z1mass_rrv;
   RooRealVar* z2mass_rrv;
@@ -227,6 +236,14 @@ public:
   RooRealVar* phi1_rrv;
   RooRealVar* Y_rrv;
   RooRealVar* upFrac_rrv;
+
+  RooAbsPdf* pdf;
+  ScalarPdfFactory_HVV* ggSpin0Model;
+  VectorPdfFactory* spin1Model;
+  TensorPdfFactory_ppHVV* spin2Model;
+  RooqqZZ_JHU_ZgammaZZ_fast* qqZZmodel;
+
+  SuperMELA* super;
 
   // Self-define arrays are now members of MELA.
   // There are a lot of them!
@@ -265,10 +282,9 @@ public:
   // That is a lot of them!
 
 protected:
-
-  //
-  // Data memmbers
-  //
+  /********************/
+  /*** Data members ***/
+  /********************/
   double LHCsqrts;
   TVar::Process myModel_;
   TVar::MatrixElement myME_;
@@ -277,6 +293,8 @@ protected:
   TVar::VerbosityLevel myVerbosity_;
 
   newZZMatrixElement* ZZME;
+  SuperDijetMela* superDijet;
+
 
   float auxiliaryProb;
 
@@ -285,11 +303,15 @@ protected:
   /***** ME CONSTANT HANDLES *****/
   // Constants that vary with sqrts due to application of PDFs
   //
+  MelaPConstant* pAvgSmooth_JHUGen_JQCD_HSMHiggs[TVar::nFermionMassRemovalSchemes-1];
+  //
   MelaPConstant* pAvgSmooth_JHUGen_JJQCD_HSMHiggs[TVar::nFermionMassRemovalSchemes-1];
   //
   MelaPConstant* pAvgSmooth_JHUGen_JJVBF_HSMHiggs[TVar::nFermionMassRemovalSchemes-1];
   //
-  MelaPConstant* pAvgSmooth_JHUGen_JQCD_HSMHiggs[TVar::nFermionMassRemovalSchemes-1];
+  MelaPConstant* pAvgSmooth_JHUGen_Had_ZH_HSMHiggs[TVar::nFermionMassRemovalSchemes-1];
+  //
+  MelaPConstant* pAvgSmooth_JHUGen_Had_WH_HSMHiggs[TVar::nFermionMassRemovalSchemes-1];
   //
   MelaPConstant* pAvgSmooth_MCFM_JJQCD_bkgZJets_2l2q;
   // Decay ME constants that do not use PDFs
@@ -302,6 +324,18 @@ protected:
   MelaPConstant* pAvgSmooth_MCFM_ZZGG_HSMHiggs_4e;
   MelaPConstant* pAvgSmooth_MCFM_ZZGG_HSMHiggs_2mu2e;
   //
+  MelaPConstant* pAvgSmooth_MCFM_JJVBF_HSMHiggs_4mu;
+  MelaPConstant* pAvgSmooth_MCFM_JJVBF_HSMHiggs_4e;
+  MelaPConstant* pAvgSmooth_MCFM_JJVBF_HSMHiggs_2mu2e;
+  //
+  MelaPConstant* pAvgSmooth_MCFM_Had_ZH_HSMHiggs_4mu;
+  MelaPConstant* pAvgSmooth_MCFM_Had_ZH_HSMHiggs_4e;
+  MelaPConstant* pAvgSmooth_MCFM_Had_ZH_HSMHiggs_2mu2e;
+  //
+  MelaPConstant* pAvgSmooth_MCFM_Had_WH_HSMHiggs_4mu;
+  MelaPConstant* pAvgSmooth_MCFM_Had_WH_HSMHiggs_4e;
+  MelaPConstant* pAvgSmooth_MCFM_Had_WH_HSMHiggs_2mu2e;
+  //
   MelaPConstant* pAvgSmooth_MCFM_ZZGG_bkgZZ_4mu;
   MelaPConstant* pAvgSmooth_MCFM_ZZGG_bkgZZ_4e;
   MelaPConstant* pAvgSmooth_MCFM_ZZGG_bkgZZ_2mu2e;
@@ -309,10 +343,27 @@ protected:
   MelaPConstant* pAvgSmooth_MCFM_ZZQQB_bkgZZ_4mu;
   MelaPConstant* pAvgSmooth_MCFM_ZZQQB_bkgZZ_4e;
   MelaPConstant* pAvgSmooth_MCFM_ZZQQB_bkgZZ_2mu2e;
+  //
+  MelaPConstant* pAvgSmooth_MCFM_JJVBF_bkgZZ_4mu;
+  MelaPConstant* pAvgSmooth_MCFM_JJVBF_bkgZZ_4e;
+  MelaPConstant* pAvgSmooth_MCFM_JJVBF_bkgZZ_2mu2e;
+  //
+  MelaPConstant* pAvgSmooth_MCFM_Had_ZH_bkgZZ_4mu;
+  MelaPConstant* pAvgSmooth_MCFM_Had_ZH_bkgZZ_4e;
+  MelaPConstant* pAvgSmooth_MCFM_Had_ZH_bkgZZ_2mu2e;
+  //
+  MelaPConstant* pAvgSmooth_MCFM_Had_WH_bkgZZ_4mu;
+  MelaPConstant* pAvgSmooth_MCFM_Had_WH_bkgZZ_4e;
+  MelaPConstant* pAvgSmooth_MCFM_Had_WH_bkgZZ_2mu2e;
+  //
+  MelaPConstant* pAvgSmooth_MCFM_JJQCD_bkgZZ_4mu;
+  MelaPConstant* pAvgSmooth_MCFM_JJQCD_bkgZZ_4e;
+  MelaPConstant* pAvgSmooth_MCFM_JJQCD_bkgZZ_2mu2e;
 
-  //
-  // Functions
-  //
+
+  /*****************/
+  /*** Functions ***/
+  /*****************/
   bool configureAnalyticalPDFs();
   void reset_SelfDCouplings();
   void reset_PAux(); // SuperProb reset
@@ -333,14 +384,17 @@ protected:
     TVar::MatrixElement me_,
     TVar::Production prod_,
     TVar::Process proc_,
-    const char* relpath,
-    const char* spname
+    TString relpath,
+    TString spname,
+    const bool useSqrts=false
     );
+  void deletePConstantHandle(MelaPConstant*& handle);
   void computeConstant(float& prob);
   void setConstant();
   float getConstant_JHUGenUndecayed();
   float getConstant_4l();
   float getConstant_2l2q();
+  float getConstant_FourFermionDecay(int decid);
 
 };
 

@@ -446,7 +446,7 @@ void RooSpinZero::calculateAmplitudes(Double_t& A00Re, Double_t& A00Im, Double_t
   if (Vdecay2!=RooSpin::kVdecayType_GammaOnshell) calculatePropagator(propV2Re, propV2Im, m2_, (isGammaV2 ? 0 : 1));
   calculatePropagator(propHRe, propHIm, m12, 2);
 
-  Double_t ampScale = calculateAmplitudeScale(isGammaV1, isGammaV2);
+  Double_t ampScale = calculateAmplitudeScale(isGammaV1, isGammaV2)*pow(GeVunit, 2);
 
   Double_t eta1 = m1_ / m12;
   Double_t eta2 = m2_ / m12;

@@ -45,7 +45,7 @@ for j, ref in enumerate(referencefiles, start=1):
     arguments = arguments.replace("2l2l", "0")
     arguments = arguments.replace("4l", "1")
     if arguments:
-        arguments = [int(_) for _ in arguments.split("_")] + [melaptr]
+        arguments = [int(_.replace("TeV", "")) for _ in arguments.split("_")] + [melaptr]
     else:
         arguments = [melaptr]
 
@@ -65,10 +65,17 @@ for j, ref in enumerate(referencefiles, start=1):
         arguments.insert(1, 2)
         arguments.insert(2, 0)
 
-    print arguments
+    if functionname == "testME_VH_JHUGen_13TeV_Ping":
+        functionname = "testME_VH_JHUGen_Ping"
+        arguments.insert(0, 13)
+        arguments.insert(1, 0)
 
-    function = getattr(ROOT, functionname)
-    function(*arguments)
+    try:
+        function = getattr(ROOT, functionname)
+        function(*arguments)
+    except:
+        print "trying to call: {}(*{})".format(functionname, arguments)
+        raise
 
     newfile = ref.replace(".ref", ".out")
 

@@ -81,6 +81,7 @@ protected:
 
   virtual void initPDF()=0;
   virtual void destroyPDF()=0;
+
 };
 
 

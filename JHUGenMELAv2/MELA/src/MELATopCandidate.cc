@@ -1,6 +1,7 @@
+#include <algorithm>
+#include <utility>
 #include "MELATopCandidate.h"
 
-using namespace std;
 
 MELATopCandidate::MELATopCandidate(
   MELAParticle* lightQuark_,
@@ -37,6 +38,18 @@ MELATopCandidate::MELATopCandidate(
     (Wcharge<0)
     ) id = -6;
   else id=0;
+}
+MELATopCandidate& MELATopCandidate::operator=(const MELATopCandidate& particle_){
+  MELATopCandidate tmp(particle_);
+  swap(tmp);
+  return *this;
+}
+
+void MELATopCandidate::swap(MELATopCandidate& particle_){
+  MELAParticle::swap(particle_);
+  std::swap(lightQuark, particle_.lightQuark);
+  std::swap(Wferm, particle_.Wferm);
+  std::swap(Wfermbar, particle_.Wfermbar);
 }
 
 void MELATopCandidate::setLightQuark(MELAParticle* myParticle){ lightQuark=myParticle; if (lightQuark!=0) addDaughter(lightQuark); }
