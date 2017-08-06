@@ -313,9 +313,9 @@ void Mela::reset_SelfDCouplings(){
       selfDHwwpcoupl[ic][im] = 0;
       selfDHwpwpcoupl[ic][im] = 0;
     }
-    for (int ic=0; ic<SIZE_Vp; ic++) {
-      selfDHzpcontact[ic][im] = 0;
-      selfDHwpcontact[ic][im] = 0;
+    for (int ic=0; ic<SIZE_Vpff; ic++) {
+      selfDZpffcoupl[ic][im] = 0;
+      selfDWpffcoupl[ic][im] = 0;
     }
   }
   selfDUseVprime = 0;
@@ -437,7 +437,7 @@ void Mela::computeP_selfDspin0(
   float& prob,
   bool useConstant
   ){
-  //remove this line, it's here for counting purposes.  Hzpcontact
+  //remove this line, it's here for counting purposes.  Zpffcoupl
   // Don't set these, and you will get 0.
   if (myME_==TVar::JHUGen){
     for (int jh=0; jh<(int)nSupportedHiggses; jh++){
@@ -601,10 +601,10 @@ void Mela::computeP(
           ZZME->set_SpinZeroContact(
             selfDHzzpcoupl,
             selfDHzpzpcoupl,
-            selfDHzpcontact,
+            selfDZpffcoupl,
             selfDHwwpcoupl,
             selfDHwpwpcoupl,
-            selfDHwpcontact,
+            selfDWpffcoupl,
             selfDUseVprime,
             selfDM_Vprime,
             selfDGa_Vprime
@@ -880,10 +880,10 @@ void Mela::computeProdDecP(
     ZZME->set_SpinZeroContact(
       selfDHzzpcoupl,
       selfDHzpzpcoupl,
-      selfDHzpcontact,
+      selfDZpffcoupl,
       selfDHwwpcoupl,
       selfDHwpwpcoupl,
-      selfDHwpcontact,
+      selfDWpffcoupl,
       selfDUseVprime,
       selfDM_Vprime,
       selfDGa_Vprime
@@ -1004,10 +1004,10 @@ void Mela::computeProdP(
           ZZME->set_SpinZeroContact(
             selfDHzzpcoupl,
             selfDHzpzpcoupl,
-            selfDHzpcontact,
+            selfDZpffcoupl,
             selfDHwwpcoupl,
             selfDHwpwpcoupl,
-            selfDHwpcontact,
+            selfDWpffcoupl,
             selfDUseVprime,
             selfDM_Vprime,
             selfDGa_Vprime
@@ -1056,10 +1056,10 @@ void Mela::computeProdP(
             ZZME->set_SpinZeroContact(
               selfDHzzpcoupl,
               selfDHzpzpcoupl,
-              selfDHzpcontact,
+              selfDZpffcoupl,
               selfDHwwpcoupl,
               selfDHwpwpcoupl,
-              selfDHwpcontact,
+              selfDWpffcoupl,
               selfDUseVprime,
               selfDM_Vprime,
               selfDGa_Vprime
@@ -1140,10 +1140,10 @@ void Mela::computeProdP(
                 ZZME->set_SpinZeroContact(
                   selfDHzzpcoupl,
                   selfDHzpzpcoupl,
-                  selfDHzpcontact,
+                  selfDZpffcoupl,
                   selfDHwwpcoupl,
                   selfDHwpwpcoupl,
-                  selfDHwpcontact,
+                  selfDWpffcoupl,
                   selfDUseVprime,
                   selfDM_Vprime,
                   selfDGa_Vprime
@@ -1221,10 +1221,10 @@ void Mela::computeProdP(
             ZZME->set_SpinZeroContact(
               selfDHzzpcoupl,
               selfDHzpzpcoupl,
-              selfDHzpcontact,
+              selfDZpffcoupl,
               selfDHwwpcoupl,
               selfDHwpwpcoupl,
-              selfDHwpcontact,
+              selfDWpffcoupl,
               selfDUseVprime,
               selfDM_Vprime,
               selfDGa_Vprime
@@ -1258,7 +1258,7 @@ void Mela::computeProdP_VH(
   for (int jh=0; jh<(int)nSupportedHiggses; jh++){
     for (int im=0; im<2; im++){
       for (int ic=0; ic<SIZE_HVV; ic++){
-  //remove this line, it's here for counting purposes.  Hzpcontact
+  //remove this line, it's here for counting purposes.  Zpffcoupl
         selfDHzzcoupl[jh][ic][im] = selfDHvvcoupl_input[jh][ic][im];
         selfDHwwcoupl[jh][ic][im] = selfDHvvcoupl_input[jh][ic][im]; // Just for extra protection since differentiate_HWW_HZZ is set to false.
       }
@@ -1302,10 +1302,10 @@ void Mela::computeProdP_VH(
         ZZME->set_SpinZeroContact(
           selfDHzzpcoupl,
           selfDHzpzpcoupl,
-          selfDHzpcontact,
+          selfDZpffcoupl,
           selfDHwwpcoupl,
           selfDHwpwpcoupl,
-          selfDHwpcontact,
+          selfDWpffcoupl,
           selfDUseVprime,
           selfDM_Vprime,
           selfDGa_Vprime
@@ -1354,10 +1354,10 @@ void Mela::computeProdP_ttH(
       ZZME->set_SpinZeroContact(
         selfDHzzpcoupl,
         selfDHzpzpcoupl,
-        selfDHzpcontact,
+        selfDZpffcoupl,
         selfDHwwpcoupl,
         selfDHwpwpcoupl,
-        selfDHwpcontact,
+        selfDWpffcoupl,
         selfDUseVprime,
         selfDM_Vprime,
         selfDGa_Vprime

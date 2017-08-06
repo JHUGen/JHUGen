@@ -101,10 +101,10 @@ public:
   void set_SpinZeroContact(
     double selfDHzzpcoupl[SIZE_HVV][2],
     double selfDHzpzpcoupl[SIZE_HVV][2],
-    double selfDHzpcontact[SIZE_Vp][2],
+    double selfDZpffcoupl[SIZE_Vpff][2],
     double selfDHwwpcoupl[SIZE_HVV][2],
     double selfDHwpwpcoupl[SIZE_HVV][2],
-    double selfDHwpcontact[SIZE_Vp][2],
+    double selfDWpffcoupl[SIZE_Vpff][2],
     bool UseVprime,
     double M_Vprime,
     double Ga_Vprime

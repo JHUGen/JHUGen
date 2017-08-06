@@ -364,16 +364,19 @@ subroutine SetSpinZeroVVCouplings_NoGamma(vvcoupl, cqsq, Lambda_qsq, useWWcoupl)
    return
 end subroutine SetSpinZeroVVCouplings_NoGamma
 
-subroutine SetSpinZeroContactTerms(zzpcoupl, zpzpcoupl, zpcontact, wwpcoupl, wpwpcoupl, wpcontact, UseVp, M_Vp, Ga_Vp)
+subroutine SetSpinZeroContactTerms(zzpcoupl, zpzpcoupl, Zpffcoupl, wwpcoupl, wpwpcoupl, Wpffcoupl, UseVp, M_Vp, Ga_Vp)
   implicit none
   !The array sizes are (1) for now.  This is ok with the compiler because C++ and Fortran don't really talk.
   !Can increase this when more couplings are added.
+
   complex(8), intent(in) :: zzpcoupl(1)
   complex(8), intent(in) :: zpzpcoupl(1)
-  complex(8), intent(in) :: zpcontact(18)
+  complex(8), intent(in) :: Zpffcoupl(20)
+
   complex(8), intent(in) :: wwpcoupl(1)
   complex(8), intent(in) :: wpwpcoupl(1)
-  complex(8), intent(in) :: wpcontact(18)
+  complex(8), intent(in) :: Wpffcoupl(20)
+
   logical, intent(in) :: UseVp
   real(8), intent(in) :: M_Vp, Ga_Vp
 
@@ -381,50 +384,48 @@ subroutine SetSpinZeroContactTerms(zzpcoupl, zpzpcoupl, zpcontact, wwpcoupl, wpw
   Ga_Vprime = Ga_Vp
   UseVprime = UseVp
 
-  includeVprime = ((any(zzpcoupl.ne.czero) .or. any(zpzpcoupl.ne.czero)) .and. any(zpcontact.ne.czero)) &
-              .or.((any(wwpcoupl.ne.czero) .or. any(wpwpcoupl.ne.czero)) .and. any(wpcontact.ne.czero))
+  includeVprime = ((any(zzpcoupl.ne.czero) .or. any(zpzpcoupl.ne.czero)) .and. any(Zpffcoupl.ne.czero)) &
+              .or.((any(wwpcoupl.ne.czero) .or. any(wpwpcoupl.ne.czero)) .and. any(Wpffcoupl.ne.czero))
 
   ghzzp1 = zzpcoupl(1)
   ghzpzp1 = zpzpcoupl(1)
-  ezp_L_E = zpcontact(1)
-  ezp_R_E = zpcontact(2)
-  ezp_L_M = zpcontact(3)
-  ezp_R_M = zpcontact(4)
-  ezp_L_T = zpcontact(5)
-  ezp_R_T = zpcontact(6)
-  ezp_L_N = zpcontact(7)
-  ezp_R_N = zpcontact(8)
-  ezp_L_U = zpcontact(9)
-  ezp_R_U = zpcontact(10)
-  ezp_L_D = zpcontact(11)
-  ezp_R_D = zpcontact(12)
-  ezp_L_C = zpcontact(13)
-  ezp_R_C = zpcontact(14)
-  ezp_L_S = zpcontact(15)
-  ezp_R_S = zpcontact(16)
-  ezp_L_B = zpcontact(17)
-  ezp_R_B = zpcontact(18)
+
+  ezp_El_left = Zpffcoupl(1)
+  ezp_El_right = Zpffcoupl(2)
+  ezp_Mu_left = Zpffcoupl(3)
+  ezp_Mu_right = Zpffcoupl(4)
+  ezp_Ta_left = Zpffcoupl(5)
+  ezp_Ta_right = Zpffcoupl(6)
+  ezp_NuE_left = Zpffcoupl(7)
+  ezp_NuE_right = Zpffcoupl(8)
+  ezp_Dn_left = Zpffcoupl(9)
+  ezp_Dn_right = Zpffcoupl(10)
+  ezp_Up_left = Zpffcoupl(11)
+  ezp_Up_right = Zpffcoupl(12)
+  ezp_Str_left = Zpffcoupl(13)
+  ezp_Str_right = Zpffcoupl(14)
+  ezp_Chm_left = Zpffcoupl(15)
+  ezp_Chm_right = Zpffcoupl(16)
+  ezp_Bot_left = Zpffcoupl(17)
+  ezp_Bot_right = Zpffcoupl(18)
+  ezp_Top_left = Zpffcoupl(19)
+  ezp_Top_right = Zpffcoupl(20)
 
   ghwwp1 = wwpcoupl(1)
   ghwpwp1 = wpwpcoupl(1)
-  ewp_L_E = wpcontact(1)
-  ewp_R_E = wpcontact(2)
-  ewp_L_M = wpcontact(3)
-  ewp_R_M = wpcontact(4)
-  ewp_L_T = wpcontact(5)
-  ewp_R_T = wpcontact(6)
-  !ewp_L_N = wpcontact(7)
-  !ewp_R_N = wpcontact(8)
-  ewp_L_U = wpcontact(9)
-  ewp_R_U = wpcontact(10)
-  !ewp_L_D = wpcontact(11)
-  !ewp_R_D = wpcontact(12)
-  ewp_L_C = wpcontact(13)
-  ewp_R_C = wpcontact(14)
-  !ewp_L_S = wpcontact(15)
-  !ewp_R_S = wpcontact(16)
-  !ewp_L_B = wpcontact(17)
-  !ewp_R_B = wpcontact(18)
+
+  ewp_El_left = Wpffcoupl(1)
+  ewp_El_right = Wpffcoupl(2)
+  ewp_Mu_left = Wpffcoupl(3)
+  ewp_Mu_right = Wpffcoupl(4)
+  ewp_Ta_left = Wpffcoupl(5)
+  ewp_Ta_right = Wpffcoupl(6)
+  ewp_Up_left = Wpffcoupl(9)
+  ewp_Up_right = Wpffcoupl(10)
+  ewp_Chm_left = Wpffcoupl(13)
+  ewp_Chm_right = Wpffcoupl(14)
+  ewp_Top_left = Wpffcoupl(15)
+  ewp_Top_right = Wpffcoupl(16)
 
 end subroutine
 

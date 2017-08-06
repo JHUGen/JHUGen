@@ -890,32 +890,32 @@ subroutine getDecay_Couplings_Spinors_Props(VVMode,idordered,pordered,h3,h4, sp,
    elseif( VVMode.eq.ZpZMode ) then
    !        Z'Z DECAYS
       if( abs(idordered(6)).eq.abs(ElM_) ) then
-         aL1=ezp_L_E
-         aR1=ezp_R_E
+         aL1=ezp_El_left
+         aR1=ezp_El_right
       elseif( abs(idordered(6)).eq.abs(MuM_) ) then
-         aL1=ezp_L_M
-         aR1=ezp_R_M
+         aL1=ezp_Mu_left
+         aR1=ezp_Mu_right
       elseif( abs(idordered(6)).eq.abs(TaM_) ) then
-         aL1=ezp_L_T
-         aR1=ezp_R_T
+         aL1=ezp_Ta_left
+         aR1=ezp_Ta_right
       elseif( abs(idordered(6)).eq.abs(NuE_) .or. abs(idordered(6)).eq.abs(NuM_) .or. abs(idordered(6)).eq.abs(NuT_) ) then
-         aL1=ezp_L_N
-         aR1=ezp_R_N
+         aL1=ezp_NuE_left
+         aR1=ezp_NuE_right
       elseif( abs(idordered(6)).eq.abs(Up_) ) then
-         aL1=ezp_L_U
-         aR1=ezp_R_U
+         aL1=ezp_Up_left
+         aR1=ezp_Up_right
       elseif( abs(idordered(6)).eq.abs(Chm_) ) then
-         aL1=ezp_L_C
-         aR1=ezp_R_C
+         aL1=ezp_Chm_left
+         aR1=ezp_Chm_right
       elseif( abs(idordered(6)).eq.abs(Dn_) ) then
-         aL1=ezp_L_D
-         aR1=ezp_R_D
+         aL1=ezp_Dn_left
+         aR1=ezp_Dn_right
       elseif( abs(idordered(6)).eq.abs(Str_) ) then
-         aL1=ezp_L_S
-         aR1=ezp_R_S
+         aL1=ezp_Str_left
+         aR1=ezp_Str_right
       elseif( abs(idordered(6)).eq.abs(Bot_) ) then
-         aL1=ezp_L_B
-         aR1=ezp_R_B
+         aL1=ezp_Bot_left
+         aR1=ezp_Bot_right
       else
          aL1=0d0
          aR1=0d0
@@ -977,32 +977,32 @@ subroutine getDecay_Couplings_Spinors_Props(VVMode,idordered,pordered,h3,h4, sp,
          aR1=0d0
       endif
       if( abs(idordered(8)).eq.abs(ElM_) ) then
-         aL2=ezp_L_E
-         aR2=ezp_R_E
+         aL2=ezp_El_left
+         aR2=ezp_El_right
       elseif( abs(idordered(8)).eq.abs(MuM_) ) then
-         aL2=ezp_L_M
-         aR2=ezp_R_M
+         aL2=ezp_Mu_left
+         aR2=ezp_Mu_right
       elseif( abs(idordered(8)).eq.abs(TaM_) ) then
-         aL2=ezp_L_T
-         aR2=ezp_R_T
+         aL2=ezp_Ta_left
+         aR2=ezp_Ta_right
       elseif( abs(idordered(8)).eq.abs(NuE_) .or. abs(idordered(8)).eq.abs(NuM_) .or. abs(idordered(8)).eq.abs(NuT_) ) then
-         aL2=ezp_L_N
-         aR2=ezp_R_N
+         aL2=ezp_NuE_left
+         aR2=ezp_NuE_right
       elseif( abs(idordered(8)).eq.abs(Up_) ) then
-         aL2=ezp_L_U
-         aR2=ezp_R_U
+         aL2=ezp_Up_left
+         aR2=ezp_Up_right
       elseif( abs(idordered(8)).eq.abs(Chm_) ) then
-         aL2=ezp_L_C
-         aR2=ezp_R_C
+         aL2=ezp_Chm_left
+         aR2=ezp_Chm_right
       elseif( abs(idordered(8)).eq.abs(Dn_) ) then
-         aL2=ezp_L_D
-         aR2=ezp_R_D
+         aL2=ezp_Dn_left
+         aR2=ezp_Dn_right
       elseif( abs(idordered(8)).eq.abs(Str_) ) then
-         aL2=ezp_L_S
-         aR2=ezp_R_S
+         aL2=ezp_Str_left
+         aR2=ezp_Str_right
       elseif( abs(idordered(8)).eq.abs(Bot_) ) then
-         aL2=ezp_L_B
-         aR2=ezp_R_B
+         aL2=ezp_Bot_left
+         aR2=ezp_Bot_right
       else
          aL2=0d0
          aR2=0d0
@@ -1026,63 +1026,63 @@ subroutine getDecay_Couplings_Spinors_Props(VVMode,idordered,pordered,h3,h4, sp,
    elseif( VVMode.eq.ZpZpMode ) then
    !        Z'Z' DECAYS
       if( abs(idordered(6)).eq.abs(ElM_) ) then
-         aL1=ezp_L_E
-         aR1=ezp_R_E
+         aL1=ezp_El_left
+         aR1=ezp_El_right
       elseif( abs(idordered(6)).eq.abs(MuM_) ) then
-         aL1=ezp_L_M
-         aR1=ezp_R_M
+         aL1=ezp_Mu_left
+         aR1=ezp_Mu_right
       elseif( abs(idordered(6)).eq.abs(TaM_) ) then
-         aL1=ezp_L_T
-         aR1=ezp_R_T
+         aL1=ezp_Ta_left
+         aR1=ezp_Ta_right
       elseif( abs(idordered(6)).eq.abs(NuE_) .or. abs(idordered(6)).eq.abs(NuM_) .or. abs(idordered(6)).eq.abs(NuT_) ) then
-         aL1=ezp_L_N
-         aR1=ezp_R_N
+         aL1=ezp_NuE_left
+         aR1=ezp_NuE_right
       elseif( abs(idordered(6)).eq.abs(Up_) ) then
-         aL1=ezp_L_U
-         aR1=ezp_R_U
+         aL1=ezp_Up_left
+         aR1=ezp_Up_right
       elseif( abs(idordered(6)).eq.abs(Chm_) ) then
-         aL1=ezp_L_C
-         aR1=ezp_R_C
+         aL1=ezp_Chm_left
+         aR1=ezp_Chm_right
       elseif( abs(idordered(6)).eq.abs(Dn_) ) then
-         aL1=ezp_L_D
-         aR1=ezp_R_D
+         aL1=ezp_Dn_left
+         aR1=ezp_Dn_right
       elseif( abs(idordered(6)).eq.abs(Str_) ) then
-         aL1=ezp_L_S
-         aR1=ezp_R_S
+         aL1=ezp_Str_left
+         aR1=ezp_Str_right
       elseif( abs(idordered(6)).eq.abs(Bot_) ) then
-         aL1=ezp_L_B
-         aR1=ezp_R_B
+         aL1=ezp_Bot_left
+         aR1=ezp_Bot_right
       else
          aL1=0d0
          aR1=0d0
       endif
       if( abs(idordered(8)).eq.abs(ElM_) ) then
-         aL2=ezp_L_E
-         aR2=ezp_R_E
+         aL2=ezp_El_left
+         aR2=ezp_El_right
       elseif( abs(idordered(8)).eq.abs(MuM_) ) then
-         aL2=ezp_L_M
-         aR2=ezp_R_M
+         aL2=ezp_Mu_left
+         aR2=ezp_Mu_right
       elseif( abs(idordered(8)).eq.abs(TaM_) ) then
-         aL2=ezp_L_T
-         aR2=ezp_R_T
+         aL2=ezp_Ta_left
+         aR2=ezp_Ta_right
       elseif( abs(idordered(8)).eq.abs(NuE_) .or. abs(idordered(8)).eq.abs(NuM_) .or. abs(idordered(8)).eq.abs(NuT_) ) then
-         aL2=ezp_L_N
-         aR2=ezp_R_N
+         aL2=ezp_NuE_left
+         aR2=ezp_NuE_right
       elseif( abs(idordered(8)).eq.abs(Up_) ) then
-         aL2=ezp_L_U
-         aR2=ezp_R_U
+         aL2=ezp_Up_left
+         aR2=ezp_Up_right
       elseif( abs(idordered(8)).eq.abs(Chm_) ) then
-         aL2=ezp_L_C
-         aR2=ezp_R_C
+         aL2=ezp_Chm_left
+         aR2=ezp_Chm_right
       elseif( abs(idordered(8)).eq.abs(Dn_) ) then
-         aL2=ezp_L_D
-         aR2=ezp_R_D
+         aL2=ezp_Dn_left
+         aR2=ezp_Dn_right
       elseif( abs(idordered(8)).eq.abs(Str_) ) then
-         aL2=ezp_L_S
-         aR2=ezp_R_S
+         aL2=ezp_Str_left
+         aR2=ezp_Str_right
       elseif( abs(idordered(8)).eq.abs(Bot_) ) then
-         aL2=ezp_L_B
-         aR2=ezp_R_B
+         aL2=ezp_Bot_left
+         aR2=ezp_Bot_right
       else
          aL2=0d0
          aR2=0d0

@@ -86,26 +86,29 @@ namespace{
     SIZE_HVV_CQSQ = 3
   };
   enum{
-    gHIGGS_Vp_L_E,
-    gHIGGS_Vp_R_E,
-    gHIGGS_Vp_L_M,
-    gHIGGS_Vp_R_M,
-    gHIGGS_Vp_L_T,
-    gHIGGS_Vp_R_T,
-    gHIGGS_Vp_L_N,
-    gHIGGS_Vp_R_N,
-    gHIGGS_Vp_L_U,
-    gHIGGS_Vp_R_U,
-    gHIGGS_Vp_L_D,
-    gHIGGS_Vp_R_D,
-    gHIGGS_Vp_L_C,
-    gHIGGS_Vp_R_C,
-    gHIGGS_Vp_L_S,
-    gHIGGS_Vp_R_S,
-    gHIGGS_Vp_L_B,
-    gHIGGS_Vp_R_B,
+    gHIGGS_Vp_El_left,
+    gHIGGS_Vp_El_right,
+    gHIGGS_Vp_Mu_left,
+    gHIGGS_Vp_Mu_right,
+    gHIGGS_Vp_Ta_left,
+    gHIGGS_Vp_Ta_right,
+    gHIGGS_Vp_NuE_left,
+    gHIGGS_Vp_NuE_right,
 
-    SIZE_Vp
+    gHIGGS_Vp_Up_left,
+    gHIGGS_Vp_Up_right,
+    gHIGGS_Vp_Dn_left,
+    gHIGGS_Vp_Dn_right,
+    gHIGGS_Vp_Chm_left,
+    gHIGGS_Vp_Chm_right,
+    gHIGGS_Vp_Str_left,
+    gHIGGS_Vp_Str_right,
+    gHIGGS_Vp_Bot_left,
+    gHIGGS_Vp_Bot_right,
+    gHIGGS_Vp_Top_left,
+    gHIGGS_Vp_Top_right,
+
+    SIZE_Vpff
   };
   enum{
     gZPRIME_QQ_LEFT,
