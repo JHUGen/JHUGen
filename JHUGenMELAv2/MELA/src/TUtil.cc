@@ -4,6 +4,7 @@
 #include <utility>
 #include <algorithm>
 #include <cassert>
+#include "TJHUGenUtils.hh"
 #include "TUtil.hh"
 #include "TMath.h"
 #include "TLorentzRotation.h"
@@ -12,6 +13,7 @@
 using namespace std;
 using TVar::event_scales_type;
 using TVar::simple_event_record;
+using namespace TJHUGenUtils;
 
 
 namespace TUtil{
@@ -4602,9 +4604,8 @@ double TUtil::HJJMatEl(
     }
   }
   else if (production==TVar::JJQCD){
-    int ijsel[3][121];
-    int nijchannels=77;
-    __modhiggsjj_MOD_get_hjjchannelhash_nosplit(ijsel, &nijchannels);
+    const std::vector<TNumericUtil::intTriplet_t>& ijsel = JHUGenHash_OnshellHJJHash;
+    int nijchannels = ijsel.size();
     for (int ic=0; ic<nijchannels; ic++){
       // Emulate EvalWeighted_HJJ_test
       int isel = ijsel[0][ic];
@@ -5397,9 +5398,9 @@ double TUtil::HJJMatEl(
       }
     }
 
-    int ijsel[3][121];
-    int nijchannels=68;
-    __modhiggsjj_MOD_get_vbfchannelhash_nosplit(ijsel, &nijchannels);
+
+    const std::vector<TNumericUtil::intTriplet_t>& ijsel = JHUGenHash_OnshellVBFHash;
+    int nijchannels = ijsel.size();
 
     // BEGIN COMPUTATION
     for (int ic=0; ic<nijchannels; ic++){
