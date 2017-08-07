@@ -805,6 +805,38 @@ logical :: computeQsqCompundCoupl
          vvcoupl = (/ ghw4, ghw4_prime, ghw4_prime2, ghw4_prime3, ghw4_prime4, ghw4_prime5, ghw4_prime6, ghw4_prime7 /)
          lambda_v = Lambda_w4
          lambda_v120 = (/ Lambda_w41, Lambda_w42, Lambda_w40 /)
+      elseif(index.eq.12) then
+         vvcoupl(1) = ghwwp1
+         lambda_v = 1d0 ! Not present
+         lambda_v120 = (/ Lambda_w11, Lambda_w12, Lambda_w10 /)
+      elseif(index.eq.13) then
+         !zero
+         lambda_v = 1d0 ! Not present
+         lambda_v120 = (/ Lambda_w11, Lambda_w12, Lambda_w10 /)
+      elseif(index.eq.14) then
+         !zero
+         lambda_v = 1d0 ! Not present
+         lambda_v120 = (/ Lambda_w11, Lambda_w12, Lambda_w10 /)
+      elseif(index.eq.15) then
+         !zero
+         lambda_v = 1d0 ! Not present
+         lambda_v120 = (/ Lambda_w11, Lambda_w12, Lambda_w10 /)
+      elseif(index.eq.16) then
+         vvcoupl(1) = ghwpwp1
+         lambda_v = 1d0 ! Not present
+         lambda_v120 = (/ Lambda_w11, Lambda_w12, Lambda_w10 /)
+      elseif(index.eq.17) then
+         !zero
+         lambda_v = 1d0 ! Not present
+         lambda_v120 = (/ Lambda_w11, Lambda_w12, Lambda_w10 /)
+      elseif(index.eq.18) then
+         !zero
+         lambda_v = 1d0 ! Not present
+         lambda_v120 = (/ Lambda_w11, Lambda_w12, Lambda_w10 /)
+      elseif(index.eq.19) then
+         !zero
+         lambda_v = 1d0 ! Not present
+         lambda_v120 = (/ Lambda_w11, Lambda_w12, Lambda_w10 /)
       endif
    endif
 
