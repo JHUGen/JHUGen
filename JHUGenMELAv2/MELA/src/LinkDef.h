@@ -1,5 +1,9 @@
+#include "MELALinearInterpFunc.h"
+#include "MELANCSplineFactory_1D.h"
+#include "MELANCSplineFactory_2D.h"
+#include "MELANCSplineFactory_3D.h"
+#include "MELAFuncPdf.h"
 #include "Mela.h"
-#include "newZZMatrixElement.h"
 
 #ifdef __CINT__
 
@@ -17,6 +21,16 @@
 #pragma link C++ class MELACandidate;
 #pragma link C++ class MelaIO;
 #pragma link C++ namespace TVar;
+
+#pragma link C++ class MELAFuncPdf;
+#pragma link C++ class MELALinearInterpFunc;
+#pragma link C++ class MELANCSplineCore;
+#pragma link C++ class MELANCSpline_1D_fast;
+#pragma link C++ class MELANCSpline_2D_fast;
+#pragma link C++ class MELANCSpline_3D_fast;
+#pragma link C++ class MELANCSplineFactory_1D;
+#pragma link C++ class MELANCSplineFactory_2D;
+#pragma link C++ class MELANCSplineFactory_3D;
 
 #pragma link C++ namespace TUtil;
 #pragma link C++ function TUtil::computeAngles;

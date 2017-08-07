@@ -16,7 +16,7 @@ MEsq:
 	0	3.95092e-17	0	0	0	0	0	0	0	0	0
 	3.54392e-18	0	0	0	0	0	0	0	0	0	0
 ***** TUtil::PrintCandidateSummary *****
-Candidate: 0xf4b9300
+Candidate: 0xPOINTER
 	Has 2 mothers
 		V0 (0) (X,Y,Z,T)=( 0 , 0 , -865.379 , -865.379 )
 		V1 (0) (X,Y,Z,T)=( 0 , 0 , 624.034 , -624.034 )

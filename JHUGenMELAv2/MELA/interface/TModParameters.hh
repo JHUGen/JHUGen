@@ -3,8 +3,9 @@
 
 extern "C" {
 
-  // Get the mass of the particles
+  // Get the mass and width of the particles
   double __modparameters_MOD_getmass(int* part);
+  double __modparameters_MOD_getdecaywidth(int* part);
 
   // From PDG ids to JHU ids
   int __modparameters_MOD_convertlhereverse(int* part);

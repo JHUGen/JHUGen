@@ -9,8 +9,10 @@
 class MELAHXSWidth{
 public:
   MELAHXSWidth(std::string fileLoc = "../txtFiles", std::string strAppend="YR3");
+  MELAHXSWidth(const MELAHXSWidth& other);
   ~MELAHXSWidth();
-  double HiggsWidth(double mH);
+  double HiggsWidth(double mH) const;
+
 protected:
   std::string fileName;
   std::vector<double> mass_BR;
@@ -19,6 +21,9 @@ protected:
   double* sigW;
   TGraph* graphW;
   TSpline3* gsW;
+
+  void build();
+
 };
 
 #endif

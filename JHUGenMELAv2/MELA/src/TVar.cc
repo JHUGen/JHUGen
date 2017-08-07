@@ -102,4 +102,11 @@ TString TVar::ProductionName(TVar::Production temp){
   else return TString("Unknown");
 }
 
+TString TVar::MatrixElementName(TVar::MatrixElement temp){
+  if (temp==TVar::MCFM) return TString("MCFM");
+  else if (temp==TVar::JHUGen) return TString("JHUGen");
+  else if (temp==TVar::ANALYTICAL) return TString("ANALYTICAL");
+
+  else return TString("Unknown");
+}
 

@@ -41,8 +41,9 @@ real(8) :: VG_Result,VG_Error
    elseif( DoPrintPMZZ ) then
         call PrintMZZdistribution()
    else
-        if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 .or. Process.eq.80 .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.66 .or. Process.eq.90 .or. &
-            Process.eq.110 .or. Process.eq.111 .or. Process.eq.112 .or. Process.eq.113 .or. Process.eq.114 ) then
+        if( Process.eq.0 .or. Process.eq.1  .or. Process.eq.2 .or. Process.eq.80 &
+                         .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.66 .or. Process.eq.67 .or. Process.eq.68 .or. Process.eq.69 &
+                         .or. Process.eq.90 .or. Process.eq.110 .or. Process.eq.111 .or. Process.eq.112 .or. Process.eq.113 .or. Process.eq.114 ) then
            call StartVegas_NEW(VG_Result,VG_Error)
         else
            call StartVegas(VG_Result,VG_Error)
@@ -330,6 +331,7 @@ logical :: SetZgammacoupling, Setgammagammacoupling
 logical :: SetAnomalousSpin1qq, Setspin1qqleft, Setspin1qqright
 logical :: SetAnomalousSpin2gg, SetAnomalousSpin2qq, Setspin2qqleft, Setspin2qqright
 logical :: SetAnomalousHff, Setkappa
+logical :: SetVprimeff, SetMVprime, SetGaVprime
 logical :: SetCKM,SetCKMub,SetCKMcb,SetCKMtd
 logical :: SetpTcut, SetdeltaRcut
 logical :: SetColliderEnergy
@@ -372,6 +374,10 @@ logical :: SetColliderEnergy
    SetAnomalousHff=.false.
    Setkappa=.false.
 
+   SetVprimeff=.false.
+   SetMVprime=.false.
+   SetGaVprime=.false.
+
    SetpTcut=.false.
    SetdeltaRcut=.false.
 
@@ -412,6 +418,10 @@ logical :: SetColliderEnergy
     if( SetLastArgument ) M_Reso = M_Reso*GeV
     call ReadCommandLineArgument(arg, "GaReso", success, Ga_Reso, SetLastArgument)
     if( SetLastArgument ) Ga_Reso = Ga_Reso*GeV
+    call ReadCommandLineArgument(arg, "MReso2", success, M_Reso2, SetLastArgument)
+    if( SetLastArgument ) M_Reso2 = M_Reso2*GeV
+    call ReadCommandLineArgument(arg, "GaReso2", success, Ga_Reso2, SetLastArgument)
+    if( SetLastArgument ) Ga_Reso2 = Ga_Reso2*GeV   
     call ReadCommandLineArgument(arg, "ctauReso", success, HiggsDecayLengthMM)
     call ReadCommandLineArgument(arg, "VegasNc0", success, VegasNc0)
     call ReadCommandLineArgument(arg, "VegasNc1", success, VegasNc1)
@@ -559,71 +569,71 @@ logical :: SetColliderEnergy
     if (SetLastArgument)  Lambda_z40 = Lambda_z40*GeV
 
     !spin 0 WW couplings
-    call ReadCommandLineArgument(arg, "ghw1", success, ghw1, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "ghw2", success, ghw2, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "ghw3", success, ghw3, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "ghw4", success, ghw4, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "ghw1", success, ghw1, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghw2", success, ghw2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghw3", success, ghw3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghw4", success, ghw4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
 
-    call ReadCommandLineArgument(arg, "ghw1_prime", success, ghw1_prime, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "ghw1_prime2", success, ghw1_prime2, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "ghw1_prime3", success, ghw1_prime3, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "ghw1_prime4", success, ghw1_prime4, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "ghw1_prime5", success, ghw1_prime5, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "ghw1_prime6", success, ghw1_prime6, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "ghw1_prime7", success, ghw1_prime7, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "ghw1_prime", success, ghw1_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghw1_prime2", success, ghw1_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghw1_prime3", success, ghw1_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghw1_prime4", success, ghw1_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghw1_prime5", success, ghw1_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghw1_prime6", success, ghw1_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghw1_prime7", success, ghw1_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
 
-    call ReadCommandLineArgument(arg, "ghw2_prime", success, ghw2_prime, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "ghw2_prime2", success, ghw2_prime2, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "ghw2_prime3", success, ghw2_prime3, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "ghw2_prime4", success, ghw2_prime4, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "ghw2_prime5", success, ghw2_prime5, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "ghw2_prime6", success, ghw2_prime6, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "ghw2_prime7", success, ghw2_prime7, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "ghw2_prime", success, ghw2_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghw2_prime2", success, ghw2_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghw2_prime3", success, ghw2_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghw2_prime4", success, ghw2_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghw2_prime5", success, ghw2_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghw2_prime6", success, ghw2_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghw2_prime7", success, ghw2_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
 
-    call ReadCommandLineArgument(arg, "ghw3_prime", success, ghw3_prime, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "ghw3_prime2", success, ghw3_prime2, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "ghw3_prime3", success, ghw3_prime3, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "ghw3_prime4", success, ghw3_prime4, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "ghw3_prime5", success, ghw3_prime5, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "ghw3_prime6", success, ghw3_prime6, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "ghw3_prime7", success, ghw3_prime7, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "ghw3_prime", success, ghw3_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghw3_prime2", success, ghw3_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghw3_prime3", success, ghw3_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghw3_prime4", success, ghw3_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghw3_prime5", success, ghw3_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghw3_prime6", success, ghw3_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghw3_prime7", success, ghw3_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
 
-    call ReadCommandLineArgument(arg, "ghw4_prime", success, ghw4_prime, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "ghw4_prime2", success, ghw4_prime2, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "ghw4_prime3", success, ghw4_prime3, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "ghw4_prime4", success, ghw4_prime4, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "ghw4_prime5", success, ghw4_prime5, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "ghw4_prime6", success, ghw4_prime6, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "ghw4_prime7", success, ghw4_prime7, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "ghw4_prime", success, ghw4_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghw4_prime2", success, ghw4_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghw4_prime3", success, ghw4_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghw4_prime4", success, ghw4_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghw4_prime5", success, ghw4_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghw4_prime6", success, ghw4_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "ghw4_prime7", success, ghw4_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
 
     ! Sign of q1,2,12**2 for the Lambda's, set to 1 or -1 to get q**2-dependence from these form factor Lambdas
-    call ReadCommandLineArgument(arg, "cw_q1sq", success, cw_q1sq, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "cw_q2sq", success, cw_q2sq, success2=distinguish_HWWcouplings)
-    call ReadCommandLineArgument(arg, "cw_q12sq", success, cw_q12sq, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "cw_q1sq", success, cw_q1sq, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "cw_q2sq", success, cw_q2sq, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "cw_q12sq", success, cw_q12sq, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
     ! Lambda's for q1,2,12**2 for the Lambda's
-    call ReadCommandLineArgument(arg, "Lambda_w11", success, Lambda_w11, SetLastArgument, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "Lambda_w11", success, Lambda_w11, SetLastArgument, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
     if (SetLastArgument)  Lambda_w11 = Lambda_w11*GeV
-    call ReadCommandLineArgument(arg, "Lambda_w21", success, Lambda_w21, SetLastArgument, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "Lambda_w21", success, Lambda_w21, SetLastArgument, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
     if (SetLastArgument)  Lambda_w21 = Lambda_w21*GeV
-    call ReadCommandLineArgument(arg, "Lambda_w31", success, Lambda_w31, SetLastArgument, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "Lambda_w31", success, Lambda_w31, SetLastArgument, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
     if (SetLastArgument)  Lambda_w31 = Lambda_w31*GeV
-    call ReadCommandLineArgument(arg, "Lambda_w41", success, Lambda_w41, SetLastArgument, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "Lambda_w41", success, Lambda_w41, SetLastArgument, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
     if (SetLastArgument)  Lambda_w41 = Lambda_w41*GeV
-    call ReadCommandLineArgument(arg, "Lambda_w12", success, Lambda_w12, SetLastArgument, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "Lambda_w12", success, Lambda_w12, SetLastArgument, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
     if (SetLastArgument)  Lambda_w12 = Lambda_w12*GeV
-    call ReadCommandLineArgument(arg, "Lambda_w22", success, Lambda_w22, SetLastArgument, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "Lambda_w22", success, Lambda_w22, SetLastArgument, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
     if (SetLastArgument)  Lambda_w22 = Lambda_w22*GeV
-    call ReadCommandLineArgument(arg, "Lambda_w32", success, Lambda_w32, SetLastArgument, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "Lambda_w32", success, Lambda_w32, SetLastArgument, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
     if (SetLastArgument)  Lambda_w32 = Lambda_w32*GeV
-    call ReadCommandLineArgument(arg, "Lambda_w42", success, Lambda_w42, SetLastArgument, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "Lambda_w42", success, Lambda_w42, SetLastArgument, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
     if (SetLastArgument)  Lambda_w42 = Lambda_w42*GeV
-    call ReadCommandLineArgument(arg, "Lambda_w10", success, Lambda_w10, SetLastArgument, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "Lambda_w10", success, Lambda_w10, SetLastArgument, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
     if (SetLastArgument)  Lambda_w10 = Lambda_w10*GeV
-    call ReadCommandLineArgument(arg, "Lambda_w20", success, Lambda_w20, SetLastArgument, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "Lambda_w20", success, Lambda_w20, SetLastArgument, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
     if (SetLastArgument)  Lambda_w20 = Lambda_w20*GeV
-    call ReadCommandLineArgument(arg, "Lambda_w30", success, Lambda_w30, SetLastArgument, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "Lambda_w30", success, Lambda_w30, SetLastArgument, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
     if (SetLastArgument)  Lambda_w30 = Lambda_w30*GeV
-    call ReadCommandLineArgument(arg, "Lambda_w40", success, Lambda_w40, SetLastArgument, success2=distinguish_HWWcouplings)
+    call ReadCommandLineArgument(arg, "Lambda_w40", success, Lambda_w40, SetLastArgument, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
     if (SetLastArgument)  Lambda_w40 = Lambda_w40*GeV
 
     !spin 1
@@ -654,6 +664,106 @@ logical :: SetColliderEnergy
     !Hff couplings
     call ReadCommandLineArgument(arg, "kappa", success, kappa, success2=SetAnomalousHff, success3=Setkappa)
     call ReadCommandLineArgument(arg, "kappa_tilde", success, kappa_tilde, success2=SetAnomalousHff)
+
+    !contact interactions
+    call ReadCommandLineArgument(arg, "ghzzp1", success, ghzzp1, success2=SetAnomalousSpin0ZZ, success3=includeVprime)
+    call ReadCommandLineArgument(arg, "ghzpzp1", success, ghzpzp1, success2=SetAnomalousSpin0ZZ, success3=includeVprime)
+    call ReadCommandLineArgument(arg, "ezp_L_E", success, ezp_L_E, success2=SetVprimeff)
+    call ReadCommandLineArgument(arg, "ezp_R_E", success, ezp_R_E, success2=SetVprimeff)
+    call ReadCommandLineArgument(arg, "ezp_L_M", success, ezp_L_M, success2=SetVprimeff)
+    call ReadCommandLineArgument(arg, "ezp_R_M", success, ezp_R_M, success2=SetVprimeff)
+    call ReadCommandLineArgument(arg, "ezp_L_T", success, ezp_L_T, success2=SetVprimeff)
+    call ReadCommandLineArgument(arg, "ezp_R_T", success, ezp_R_T, success2=SetVprimeff)
+    call ReadCommandLineArgument(arg, "ezp_L_U", success, ezp_L_U, success2=SetVprimeff)
+    call ReadCommandLineArgument(arg, "ezp_R_U", success, ezp_R_U, success2=SetVprimeff)
+    call ReadCommandLineArgument(arg, "ezp_L_C", success, ezp_L_U, success2=SetVprimeff)
+    call ReadCommandLineArgument(arg, "ezp_R_C", success, ezp_R_U, success2=SetVprimeff)
+    call ReadCommandLineArgument(arg, "ezp_L_D", success, ezp_L_D, success2=SetVprimeff)
+    call ReadCommandLineArgument(arg, "ezp_R_D", success, ezp_R_D, success2=SetVprimeff)
+    call ReadCommandLineArgument(arg, "ezp_L_S", success, ezp_L_S, success2=SetVprimeff)
+    call ReadCommandLineArgument(arg, "ezp_R_S", success, ezp_R_S, success2=SetVprimeff)
+    call ReadCommandLineArgument(arg, "ezp_L_B", success, ezp_L_B, success2=SetVprimeff)
+    call ReadCommandLineArgument(arg, "ezp_R_B", success, ezp_R_B, success2=SetVprimeff)
+    call ReadCommandLineArgument(arg, "ezp_L_N", success, ezp_L_N, success2=SetVprimeff)
+    call ReadCommandLineArgument(arg, "ezp_R_N", success, ezp_R_N, success2=SetVprimeff)
+
+    call ReadCommandLineArgument(arg, "ghwwp1", success, ghwwp1, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime)
+    call ReadCommandLineArgument(arg, "ghwpwp1", success, ghwpwp1, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime)
+    call ReadCommandLineArgument(arg, "ewp_L_E", success, ewp_L_E, success2=distinguish_HWWcouplings, success3=SetVprimeff)
+    call ReadCommandLineArgument(arg, "ewp_R_E", success, ewp_R_E, success2=distinguish_HWWcouplings, success3=SetVprimeff)
+    call ReadCommandLineArgument(arg, "ewp_L_M", success, ewp_L_M, success2=distinguish_HWWcouplings, success3=SetVprimeff)
+    call ReadCommandLineArgument(arg, "ewp_R_M", success, ewp_R_M, success2=distinguish_HWWcouplings, success3=SetVprimeff)
+    call ReadCommandLineArgument(arg, "ewp_L_T", success, ewp_L_T, success2=distinguish_HWWcouplings, success3=SetVprimeff)
+    call ReadCommandLineArgument(arg, "ewp_R_T", success, ewp_R_T, success2=distinguish_HWWcouplings, success3=SetVprimeff)
+    call ReadCommandLineArgument(arg, "ewp_L_U", success, ewp_L_U, success2=distinguish_HWWcouplings, success3=SetVprimeff)
+    call ReadCommandLineArgument(arg, "ewp_R_U", success, ewp_R_U, success2=distinguish_HWWcouplings, success3=SetVprimeff)
+    call ReadCommandLineArgument(arg, "ewp_L_C", success, ewp_L_C, success2=distinguish_HWWcouplings, success3=SetVprimeff)
+    call ReadCommandLineArgument(arg, "ewp_R_C", success, ewp_R_C, success2=distinguish_HWWcouplings, success3=SetVprimeff)
+
+    call ReadCommandLineArgument(arg, "M_Vprime", success, M_Vprime, SetLastArgument, success2=UseVprime, success3=SetMVprime)
+    if (SetLastArgument)  M_Vprime = M_Vprime*GeV
+    call ReadCommandLineArgument(arg, "Ga_Vprime", success, Ga_Vprime, SetLastArgument, success2=UseVprime, success3=SetGaVprime)
+    if (SetLastArgument)  Ga_Vprime = Ga_Vprime*GeV
+
+    
+    
+!   similar as above for the 2nd resonance in off-shell VBF
+
+    !spin 0 ZZ couplings
+    call ReadCommandLineArgument(arg, "gh2z1", success, gh2z1)
+    call ReadCommandLineArgument(arg, "gh2z2", success, gh2z2)
+    call ReadCommandLineArgument(arg, "gh2z3", success, gh2z3)
+    call ReadCommandLineArgument(arg, "gh2z4", success, gh2z4)
+
+    !spin 0 Zgamma couplings
+    call ReadCommandLineArgument(arg, "gh2zgs2", success, gh2zgs2)
+    call ReadCommandLineArgument(arg, "gh2zgs3", success, gh2zgs3)
+    call ReadCommandLineArgument(arg, "gh2zgs4", success, gh2zgs4)
+
+    !spin 0 gammagamma couplings
+    call ReadCommandLineArgument(arg, "gh2gsgs2", success, gh2gsgs2)
+    call ReadCommandLineArgument(arg, "gh2gsgs3", success, gh2gsgs3)
+    call ReadCommandLineArgument(arg, "gh2gsgs4", success, gh2gsgs4)
+
+    !spin 0 WW couplings
+    call ReadCommandLineArgument(arg, "gh2w1", success, gh2w1)
+    call ReadCommandLineArgument(arg, "gh2w2", success, gh2w2)
+    call ReadCommandLineArgument(arg, "gh2w3", success, gh2w3)
+    call ReadCommandLineArgument(arg, "gh2w4", success, gh2w4)
+    
+    !contact interactions
+    call ReadCommandLineArgument(arg, "eh2z_L_E", success, eh2z_L_E)
+    call ReadCommandLineArgument(arg, "eh2z_R_E", success, eh2z_R_E)
+    call ReadCommandLineArgument(arg, "eh2z_L_M", success, eh2z_L_M)
+    call ReadCommandLineArgument(arg, "eh2z_R_M", success, eh2z_R_M)
+    call ReadCommandLineArgument(arg, "eh2z_L_T", success, eh2z_L_T)
+    call ReadCommandLineArgument(arg, "eh2z_R_T", success, eh2z_R_T)
+    call ReadCommandLineArgument(arg, "eh2z_L_U", success, eh2z_L_U)
+    call ReadCommandLineArgument(arg, "eh2z_R_U", success, eh2z_R_U)
+    call ReadCommandLineArgument(arg, "eh2z_L_C", success, eh2z_L_U)
+    call ReadCommandLineArgument(arg, "eh2z_R_C", success, eh2z_R_U)
+    call ReadCommandLineArgument(arg, "eh2z_L_D", success, eh2z_L_D)
+    call ReadCommandLineArgument(arg, "eh2z_R_D", success, eh2z_R_D)
+    call ReadCommandLineArgument(arg, "eh2z_L_S", success, eh2z_L_S)
+    call ReadCommandLineArgument(arg, "eh2z_R_S", success, eh2z_R_S)
+    call ReadCommandLineArgument(arg, "eh2z_L_B", success, eh2z_L_B)
+    call ReadCommandLineArgument(arg, "eh2z_R_B", success, eh2z_R_B)
+    call ReadCommandLineArgument(arg, "eh2z_L_N", success, eh2z_L_N)
+    call ReadCommandLineArgument(arg, "eh2z_R_N", success, eh2z_R_N)
+
+    call ReadCommandLineArgument(arg, "eh2w_L_E", success, eh2w_L_E)
+    call ReadCommandLineArgument(arg, "eh2w_R_E", success, eh2w_R_E)
+    call ReadCommandLineArgument(arg, "eh2w_L_M", success, eh2w_L_M)
+    call ReadCommandLineArgument(arg, "eh2w_R_M", success, eh2w_R_M)
+    call ReadCommandLineArgument(arg, "eh2w_L_T", success, eh2w_L_T)
+    call ReadCommandLineArgument(arg, "eh2w_R_T", success, eh2w_R_T)
+    call ReadCommandLineArgument(arg, "eh2w_L_U", success, eh2w_L_U)
+    call ReadCommandLineArgument(arg, "eh2w_R_U", success, eh2w_R_U)
+    call ReadCommandLineArgument(arg, "eh2w_L_C", success, eh2w_L_C)
+    call ReadCommandLineArgument(arg, "eh2w_R_C", success, eh2w_R_C)
+!   end of couplings for 2nd resonance in off-shell VBF. The rest has to be set in mod_Parameters
+    
+    
 
     ! CKM elements
     call ReadCommandLineArgument(arg, "Vud", success, VCKM_ud, success2=SetCKM)
@@ -692,7 +802,7 @@ logical :: SetColliderEnergy
     !PChannel
 
     if (Process.eq.0) PChannel = 0   !only gluons
-    if (Process.eq.1 .or. Process.eq.60 .or. Process.eq.66) PChannel = 1   !only quarks
+    if (Process.eq.1 .or. Process.eq.60 .or. Process.eq.66 .or. Process.eq.67 .or. Process.eq.68) PChannel = 1   !only quarks
 
 
     !LHAPDF
@@ -845,6 +955,10 @@ logical :: SetColliderEnergy
         stop 1
     endif
 
+    if ((includeVprime .and. .not.SetVprimeff) .or. (.not.includeVprime .and. SetVprimeff)) then
+        call Error("To use contact terms, you have to set both HVV' and V'ff couplings")
+    endif
+
     !cut checks
     if(.not.SetpTcut) then
         if(Process.eq.50) then
@@ -953,6 +1067,15 @@ logical :: SetColliderEnergy
     endif
     if( SetAnomalousHff .and. .not.Setkappa ) then
         call Error("If you set an anomalous Hff coupling, you need to explicitly set kappa as well. This coupling is initialized to a non-zero value.")
+    endif
+
+
+    ! Vprime
+    if( SetMVprime .and. .not.SetGaVprime ) then
+        call Error("If you set the mass of Vprime, you also have to set the width! Ga_Vprime=...")
+    endif
+    if( SetGaVprime .and. .not.SetMVprime ) then
+        call Error("If you set the width of Vprime, you also have to set the mass! M_Vprime=...")
     endif
 
 
@@ -1819,7 +1942,8 @@ logical :: UseBetaVersion=.false.
     ingridfile=trim(outgridfile)
 
 
-    if( Process.eq.66 ) call init_VBFoffshChannelHash()
+    if( Process.ge.66 .and. Process.le.68 ) call init_VBFoffshChannelHash()
+    if( Process.ge.69 ) call Error("Missing ChannelHash for Process 69")
 
 if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !----------------------- weighted events
 
@@ -1938,7 +2062,7 @@ if( UseBetaVersion ) then
 !     if( Process.eq.80 ) call vegas(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2) ! adjust to LHE format
 !     if( Process.eq.90 ) call vegas(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.60 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
-    if( Process.eq.66 ) call vegas1(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
+    if( Process.ge.66 .and. Process.le.69 ) call vegas1(EvalWeighted_HJJ_fulldecay,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.61 ) call vegas1(EvalWeighted_HJJ,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.110) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.111) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
@@ -3930,6 +4054,10 @@ integer :: AllocStatus,NHisto
 
 RETURN
 END SUBROUTINE
+
+
+
+
 SUBROUTINE InitHisto_HVBF()
 use ModMisc
 use ModKinematics
@@ -4315,6 +4443,7 @@ character :: arg*(500)
     if( Process.eq.61) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( Process.eq.62) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( Process.eq.66 .or. Process.eq.68 ) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
+    if( (Process.eq.66 .or. Process.eq.68) .and. M_Reso2.gt.0d0 ) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "2nd Resonance: spin=0, mass=",M_Reso2*100d0," width=",Ga_Reso2*100d0
     if( Process.eq.50) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( Process.eq.80) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( Process.eq.90) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
@@ -4874,6 +5003,8 @@ implicit none
         print *, "   ctauReso:          resonance decay length in mm (default=0)"
         print *, "   OffshellX:         Whether to allow resonance (X) to go offshell"
         print *, "                      in processes 0, 1 or 2"
+        print *, "   MReso2:            2nd resonance mass in GeV in off-shell VBF"
+        print *, "   GaReso2:           2nd resonance width in GeV in off-shell VBF"
         print *, " EW coupling parameters:"
         print *, "   Vud:               CKM element for W-ud couplings"
         print *, "   Vus:               CKM element for W-us couplings"
@@ -4935,7 +5066,7 @@ implicit none
 
 END SUBROUTINE
 
-
+! 
 
 
 SUBROUTINE PrintLogo(TheUnit)

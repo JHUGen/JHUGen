@@ -153,13 +153,13 @@ Double_t RooSpinZero_5D_VH::evaluate() const{
   if (Vdecay2==RooSpin::kVdecayType_GammaOnshell) code *= prime_h2*prime_Phi;
 
   Double_t betaValSq = (1.-(pow(m12-m2_, 2)/pow(m1_, 2)))*(1.-(pow(m12+m2_, 2)/pow(m1_, 2)));
-  if (betaValSq<0) return epsilon;
+  if (betaValSq<=0.) return epsilon;
   Double_t betaVal = sqrt(betaValSq);
 
   Double_t term1Coeff = 1;
   Double_t term2Coeff = 1;
-  term1Coeff = pow(m1_, -2);
-  if (Vdecay2!=RooSpin::kVdecayType_GammaOnshell) term2Coeff = 2.*m2_;
+  term1Coeff = pow(m1_*GeVunit, -2);
+  if (Vdecay2!=RooSpin::kVdecayType_GammaOnshell) term2Coeff = 2.*m2_*GeVunit;
 
   Double_t value = 0;
   Double_t val_A00=0, val_App=0, val_Amm=0, val_A0p=0, val_A0m=0, val_Amp=0;
@@ -186,13 +186,13 @@ Double_t RooSpinZero_5D_VH::analyticalIntegral(Int_t code, const char* /*rangeNa
   if ((m12+m2_) > m1_ || (m2_ <= 0. && Vdecay2!=RooSpin::kVdecayType_GammaOnshell) || m1_ <= 0.) return epsilon;
 
   Double_t betaValSq = (1.-(pow(m12-m2_, 2)/pow(m1_, 2)))*(1.-(pow(m12+m2_, 2)/pow(m1_, 2)));
-  if (betaValSq<0) return epsilon;
+  if (betaValSq<=0.) return epsilon;
   Double_t betaVal = sqrt(betaValSq);
 
   Double_t term1Coeff = 1;
   Double_t term2Coeff = 1;
-  term1Coeff = pow(m1_, -2);
-  if (Vdecay2!=RooSpin::kVdecayType_GammaOnshell) term2Coeff = 2.*m2_;
+  term1Coeff = pow(m1_*GeVunit, -2);
+  if (Vdecay2!=RooSpin::kVdecayType_GammaOnshell) term2Coeff = 2.*m2_*GeVunit;
 
   Double_t value = 0;
   Double_t val_A00=0, val_App=0, val_Amm=0, val_A0p=0, val_A0m=0, val_Amp=0;

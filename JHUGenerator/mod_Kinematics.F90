@@ -2279,43 +2279,43 @@ logical :: hasAonshell
      
      EHat = MomExt(1,1)+MomExt(1,2)
 
-!      if(.not.hasAonshell) then
-!         if(m_ll.le.getMass(convertLHEreverse(id(6)))+getMass(convertLHEreverse(id(7))))then
-!            applyPSCut=.true.
-!         endif
-!         if(includeGammaStar .and. .not.IsAWDecay(DecayMode1) .and. (m_ll.lt.MPhotonCutoff .or. m_Vstar.lt.MPhotonCutoff))then
-!            applyPSCut=.true.
-!         endif
-!         if(IsAQuark(convertLHEreverse(id(6)))) then
-!            pt1 = get_PT(MomExt(1:4,6))
-!            pt2 = get_PT(MomExt(1:4,7))
-!            deltaR = get_R(MomExt(1:4,6), MomExt(1:4,7))
-!            if(m_ll.lt.mJJcut .or. pt1.lt.ptjetcut .or. pt2.lt.ptjetcut .or. deltaR.lt.Rjet) then
-!               applyPSCut=.true.
-!            endif
-!         endif
-!      else
-!         if(includeGammaStar .and. m_Vstar.lt.MPhotonCutoff)then
-!            applyPSCut=.true.
-!         endif
-!      endif
-!      if(H_DK) then
-!         if(m_jj.le.(getMass(convertLHEreverse(id(8)))+getMass(convertLHEreverse(id(9)))))then
-!            applyPSCut=.true.
-!         endif
-!         if(IsAQuark(convertLHEreverse(id(8)))) then
-!            pt1 = get_PT(MomExt(1:4,8))
-!            pt2 = get_PT(MomExt(1:4,9))
-!            deltaR = get_R(MomExt(1:4,8), MomExt(1:4,9))
-!            if(m_jj.lt.mJJcut .or. pt1.lt.ptjetcut .or. pt2.lt.ptjetcut .or. deltaR.lt.Rjet) then
-!               applyPSCut=.true.
-!            endif
-!         endif
-!      else
-!         if(dabs(m_jj-M_Reso).gt.10d0*Ga_Reso) then
-!            applyPSCut=.true.
-!         endif
-!      endif
+      if(.not.hasAonshell) then
+         if(m_ll.le.getMass(convertLHEreverse(id(6)))+getMass(convertLHEreverse(id(7))))then
+            applyPSCut=.true.
+         endif
+         if(includeGammaStar .and. .not.IsAWDecay(DecayMode1) .and. (m_ll.lt.MPhotonCutoff .or. m_Vstar.lt.MPhotonCutoff))then
+            applyPSCut=.true.
+         endif
+         if(IsAQuark(convertLHEreverse(id(6)))) then
+            pt1 = get_PT(MomExt(1:4,6))
+            pt2 = get_PT(MomExt(1:4,7))
+            deltaR = get_R(MomExt(1:4,6), MomExt(1:4,7))
+            if(m_ll.lt.mJJcut .or. pt1.lt.ptjetcut .or. pt2.lt.ptjetcut .or. deltaR.lt.Rjet) then
+               applyPSCut=.true.
+            endif
+         endif
+      else
+         if(includeGammaStar .and. m_Vstar.lt.MPhotonCutoff)then
+            applyPSCut=.true.
+         endif
+      endif
+      if(H_DK) then
+         if(m_jj.le.(getMass(convertLHEreverse(id(8)))+getMass(convertLHEreverse(id(9)))))then
+            applyPSCut=.true.
+         endif
+         if(IsAQuark(convertLHEreverse(id(8)))) then
+            pt1 = get_PT(MomExt(1:4,8))
+            pt2 = get_PT(MomExt(1:4,9))
+            deltaR = get_R(MomExt(1:4,8), MomExt(1:4,9))
+            if(m_jj.lt.mJJcut .or. pt1.lt.ptjetcut .or. pt2.lt.ptjetcut .or. deltaR.lt.Rjet) then
+               applyPSCut=.true.
+            endif
+         endif
+      else
+         if(dabs(m_jj-M_Reso).gt.10d0*Ga_Reso) then
+            applyPSCut=.true.
+         endif
+      endif
 
 !-- FIND PLOTTING BINS
 !costheta1 - production angle
@@ -5062,7 +5062,7 @@ real(8) :: xchannel,xRnd(:), Energy, Mom(:,:)
 integer :: iChannel
 real(8) :: Jac,Jac1,Jac2,Jac3,Jac4,Jac5,Jac6,Jac7,Jac8,Jac9
 real(8) :: s3H,s4H,s56,s78,s910,s34,s35,s46,Mom_Dummy(1:4),Mom_Dummy2(1:4),xRndOffShellZ,Emin,Emax
-real(8), parameter :: RescaleWidth=10d0
+real(8), parameter :: RescaleWidth=1d0
 integer, parameter :: NumChannels=5   !7
 integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, Lep1M=8, Lep2P=9, Lep2M=10
 
@@ -5087,33 +5087,38 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
 ! call random_number(xchannel)
 
 
-  if( m4l_minmax(1).lt.0d0 ) then
-     if( xchannel.lt.1d0/3d0 ) then
-       Emin = 100d0*GeV
-       Emax = M_Reso-RescaleWidth*Ga_Reso
-     elseif(  xchannel.gt.2d0/3d0 ) then
-       Emin = -1d0
-       Emax = -1d0
-     else
-       Emin = M_Reso+RescaleWidth*Ga_Reso
-       Emax = Collider_Energy
-     endif
-     
-  elseif( m4l_minmax(1).gt.M_Reso+Ga_Reso ) then 
-       Emin = m4l_minmax(1)
-       Emax = dmin1( Collider_Energy,m4l_minmax(2) )
-  else
-     if( xchannel.lt.1d0/3d0 ) then
-       Emin = dmax1( 0d0,m4l_minmax(1) )
-       Emax = M_Reso-RescaleWidth*Ga_Reso
-     elseif(  xchannel.gt.2d0/3d0 ) then
-       Emin = -1d0
-       Emax = -1d0
-     else
-       Emin = M_Reso+RescaleWidth*Ga_Reso
-       Emax = dmin1( Collider_Energy,m4l_minmax(2) )
-     endif  
-  endif
+!   if( m4l_minmax(1).lt.0d0 ) then
+!      if( xchannel.lt.1d0/3d0 ) then
+!        Emin = 100d0*GeV
+!        Emax = M_Reso-Ga_Reso
+!      elseif(  xchannel.gt.2d0/3d0 ) then
+!        Emin = -1d0
+!        Emax = -1d0
+!      else
+!        Emin = M_Reso+Ga_Reso
+!        Emax = Collider_Energy
+!      endif
+!      
+!   elseif( m4l_minmax(1).gt.M_Reso+Ga_Reso ) then 
+!        Emin = m4l_minmax(1)
+!        Emax = dmin1( Collider_Energy,m4l_minmax(2) )
+!   else
+!      if( xchannel.lt.1d0/3d0 ) then
+!        Emin = dmax1( 0d0,m4l_minmax(1) )
+!        Emax = M_Reso-RescaleWidth*Ga_Reso
+!      elseif(  xchannel.gt.2d0/3d0 ) then
+!        Emin = -1d0
+!        Emax = -1d0
+!      else
+!        Emin = M_Reso+RescaleWidth*Ga_Reso
+!        Emax = dmin1( Collider_Energy,m4l_minmax(2) )
+!      endif
+!   endif
+  
+  EMin = m4l_minmax(1)
+  EMax = m4l_minmax(2)
+  
+  if( EMin.lt.0d0 .or. EMin.gt.EMax ) call Error("m4l_minmax is not set correctly")
   
   
 IF( iChannel.EQ.1 ) THEN! 34 + WW-->H-->ZZ
@@ -5255,12 +5260,13 @@ ELSEIF( iChannel.EQ.5 ) THEN
    
    
 !  masses
-   if( Emin.lt.0d0 ) then
-!       Jac1 = s_channel_propagator(M_Reso**2,Ga_Reso,0d0,Energy**2,xRnd(1),s56)   
-      Jac1 = s_channel_propagator(M_Reso**2,RescaleWidth*Ga_Reso,0d0,Energy**2,xRnd(1),s56)                                       
+   if( Emin.gt.M_Reso+2*Ga_Reso ) then
+      Jac1 = k_l(xRnd(1),Emin**2,min(Energy**2,Emax**2),s56)
    else
-      Jac1 = k_l(xRnd(1),Emin**2,min(Energy**2,Emax**2),s56)    
+      Jac1 = k_BreitWigner_Quadr(xRnd(1),M_Reso**2,Ga_Reso,Emin**2,Emax**2,s56)
    endif  
+   
+      
 !    Jac2 = s_channel_propagator(M_Z**2,Ga_Z,0d0,(Energy-dsqrt(s56))**2,xRnd(2),s34)
    Jac2 = k_l(xRnd(2),mJJcut**2,(Energy-dsqrt(s56))**2,s34)    ! s34 = mjj^2, hence the minumum is set to mJJcut                                       
    Jac3 = s_channel_propagator(M_Z**2,Ga_Z,0d0,s56,xRnd(3),s78)                                                             

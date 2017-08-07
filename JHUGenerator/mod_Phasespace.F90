@@ -14,7 +14,7 @@ MODULE ModPhasespace
   public  :: k_s
   public  :: k_t
   public  :: k_l
-  public  :: k_BreitWigner 
+  public  :: k_BreitWigner ,k_BreitWigner_Quadr
 
   public :: get_minmax_s
   public :: get_minmax_t
@@ -245,27 +245,13 @@ MODULE ModPhasespace
 
       if( Width.lt.1d-15 ) then
            InvMass_sq = h(xRnd, PropMass_sq, Power, sMin, sMax)
-!            s_channel_propagator = 1d0/g_s(InvMass_sq, PropMass_sq, Power, sMin, sMax)
-           ! print *, "check old",InvMass_sq,s_channel_propagator
            s_channel_propagator = k_s(xRnd, PropMass_sq, Power, sMin, sMax,InvMass_sq)
-           ! print *, "check new",InvMass_sq,s_channel_propagator
-           ! pause
       else
            if( dabs(sMin + sMax -2d0*PropMass_sq).lt.1d-10 .and.PropMass_sq.gt.1d-14 ) then! this is the narrow-width mapping (i.e. no integration)
               InvMass_sq = PropMass_sq
               s_channel_propagator = pi/(dsqrt(PropMass_sq)*Width)
-           else ! this is the normal s-channel mapping
-           
-!               if( dabs(sMax-PropMass_sq).gt.5d0*Width**2 ) then!   MARKUS NOTE: this if-condition is not smooth --> needs improvement  ! !
-!               if( sMax.gt.(dsqrt(PropMass_sq+1d-10)-3d0*Width)**2 ) then!   MARKUS NOTE: this if-condition is not smooth --> maybe needs improvement
-! !                   InvMass_sq = h_BreitWigner(xRnd, PropMass_sq, Width, Power, sMin, sMax)
-! !                   s_channel_propagator = 1d0/g_s_BreitWigner(InvMass_sq, PropMass_sq, Width, Power, sMin, sMax)
-                  s_channel_propagator = k_BreitWigner(xRnd, PropMass_sq, Width, sMin, sMax,InvMass_sq)
-!               else
-! !                   InvMass_sq = sMin + (sMax-sMin) * xRnd
-! !                   s_channel_propagator = sMax-sMin
-!                   s_channel_propagator = k_l(xRnd,sMin,sMax,InvMass_sq)
-!               endif
+           else ! this is the normal s-channel Breit-Wigner mapping
+              s_channel_propagator = k_BreitWigner(xRnd, PropMass_sq, Width, sMin, sMax,InvMass_sq)
            endif
       endif
 
@@ -593,17 +579,64 @@ MODULE ModPhasespace
         m  = dsqrt(m_sq)
         y1 = datan( (smin-m_sq)/m/gamma )
         y2 = datan( (smax-m_sq)/m/gamma )  
-        InvMass_sq = m*gamma * dtan(y1 + (y2-y1)*RandomVar) + m_sq
+        InvMass_sq = dabs(m*gamma * dtan(y1 + (y2-y1)*RandomVar) + m_sq)
 
         k_BreitWigner = (y2-y1)*( (InvMass_sq-m_sq)**2 + m_sq*gamma**2 )/(m*gamma)!  = 1/g_s_BreitWigner(...)
-        
-!         print *, "k_BreitWigner",1d0/((InvMass_sq-m_sq)**2 + m_sq*gamma**2 )
-!         print *, "k_BreitWigner inv.mass",InvMass_sq
-        
-        
+
   RETURN
   END FUNCTION
 
+  
+  
+
+! smooth interpolation between Breit-Wigner and a quadratic mapping: (good for integration range that includes BW and non-BW propagators(to the left and right))
+!    RandomVar range:  0.00...0.25: quadratic mapping from (smin...m-Nsw*gamma)
+!                      0.25...0.75: Breit-Wig mapping from (m-Nsw*gamma...m+Nsw*gamma)
+!                      0.75...1.00: quadratic mapping from (m+Nsw*gamma...smax)
+  FUNCTION k_BreitWigner_Quadr(RandomVar,m_sq,gamma,smin,smax,InvMass_sq)
+  implicit none
+  real(8) :: k_BreitWigner_Quadr,RandomVar,RandomVar_prime,m_sq,gamma,smin,smax,smin_prime,smax_prime,m,y1_prime,y2_prime,InvMass_sq
+  real(8) :: xSw_low,xSw_hig,a,b,c
+  integer,parameter:: Nsw=2 ! multiples of gamma when to switch between Breit-Wigner and quadratic mapping
+
+  
+    m = dsqrt(m_sq) 
+    smin_prime = (m - Nsw*Gamma)**2
+    smax_prime = (m + Nsw*Gamma)**2
+    y1_prime = datan( (smin_prime-m_sq)/m/gamma )
+    y2_prime = datan( (smax_prime-m_sq)/m/gamma ) 
+         
+    if( RandomVar.lt.0.25d0 ) then!    InvMass_sq= smin ... smin_prime; with Jac(0.25)=(1d0+Nsw**2*(2*m-Nsw*gamma)**2/m_sq)*m*gamma*(y2_prime-y1_prime)
+       a = 16d0*(smin-smin_prime)+4d0*(1d0+Nsw**2*(2*m-Nsw*gamma)**2/m_sq)*m*gamma*(y2_prime-y1_prime)
+       b = (1d0+Nsw**2*(2*m-Nsw*gamma)**2/m_sq)*m*gamma*(y2_prime-y1_prime) - a/2d0
+       c = smin
+       
+       k_BreitWigner_Quadr = 2*a*RandomVar+b
+       InvMass_sq = a*RandomVar**2 + b*RandomVar + c
+!        print *, "in 1", RandomVar,k_BreitWigner_Quadr,dsqrt(InvMass_sq)
+       
+    elseif( RandomVar.gt.0.75d0 ) then!    InvMass_sq= smax_prime ... smax; with Jac(0.75)= (1d0+Nsw**2*(2*m+Nsw*gamma)**2/m_sq)*m*gamma*(y2_prime-y1_prime)
+       a = 16d0*(smax-smax_prime)-4d0*(1d0+Nsw**2*(2*m+Nsw*gamma)**2/m_sq)*m*gamma*(y2_prime-y1_prime)
+       b = (1d0+Nsw**2*(2*m+Nsw*gamma)**2/m_sq)*m*gamma*(y2_prime-y1_prime) - 3d0/2d0*a
+       c = 9d0*smax - 8d0*smax_prime - 3d0*(1d0+Nsw**2*(2*m+Nsw*gamma)**2/m_sq)*m*gamma*(y2_prime-y1_prime)
+    
+       k_BreitWigner_Quadr = 2*a*RandomVar+b
+       InvMass_sq = a*RandomVar**2 + b*RandomVar + c
+!        print *, "in 3", RandomVar,k_BreitWigner_Quadr,dsqrt(InvMass_sq)
+       
+    else
+       RandomVar_prime = 2d0*RandomVar - 0.5d0
+       k_BreitWigner_Quadr = k_BreitWigner(RandomVar_prime,m_sq,gamma,smin_prime,smax_prime,InvMass_sq)
+!        print *, "in 2", RandomVar_prime,k_BreitWigner_Quadr,dsqrt(InvMass_sq)
+    endif
+  
+    InvMass_sq = dabs(InvMass_sq)
+  
+  RETURN
+  END FUNCTION
+
+  
+  
 
   
   SUBROUTINE get_minmax_s(shat,mass1_sq,mass2_sq,sothers_min,minmax)
