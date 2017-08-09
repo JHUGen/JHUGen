@@ -5263,7 +5263,8 @@ ELSEIF( iChannel.EQ.5 ) THEN
    if( Emin.gt.M_Reso+2*Ga_Reso ) then
       Jac1 = k_l(xRnd(1),Emin**2,min(Energy**2,Emax**2),s56)
    else
-      Jac1 = k_BreitWigner_Quadr(xRnd(1),M_Reso**2,Ga_Reso,Emin**2,Emax**2,s56)
+!       Jac1 = k_BreitWigner_Quadr(xRnd(1),M_Reso**2,Ga_Reso,Emin**2,Emax**2,s56)
+     Jac1 = k_BreitWigner(xRnd(1),M_Reso**2,Ga_Reso,Emin**2,Emax**2,s56)
    endif  
    
       
