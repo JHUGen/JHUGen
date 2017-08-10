@@ -318,9 +318,11 @@ void Mela::reset_SelfDCouplings(){
       selfDWpffcoupl[ic][im] = 0;
     }
   }
-  selfDUseVprime = 0;
-  selfDM_Vprime = 10000;
-  selfDGa_Vprime = 100;
+  selfDUseVprime = false;
+  selfDM_Zprime = -1;
+  selfDGa_Zprime = 0;
+  selfDM_Wprime = -1;
+  selfDGa_Wprime = 0;
 
   //****Spin-1****//
   for (int im=0; im<2; im++){
@@ -606,8 +608,10 @@ void Mela::computeP(
             selfDHwpwpcoupl,
             selfDWpffcoupl,
             selfDUseVprime,
-            selfDM_Vprime,
-            selfDGa_Vprime
+            selfDM_Zprime,
+            selfDGa_Zprime,
+            selfDM_Wprime,
+            selfDGa_Wprime
             );
         }
         else if (myModel_ == TVar::SelfDefine_spin1) ZZME->set_SpinOneCouplings(selfDZqqcoupl, selfDZvvcoupl);
@@ -885,8 +889,10 @@ void Mela::computeProdDecP(
       selfDHwpwpcoupl,
       selfDWpffcoupl,
       selfDUseVprime,
-      selfDM_Vprime,
-      selfDGa_Vprime
+      selfDM_Zprime,
+      selfDGa_Zprime,
+      selfDM_Wprime,
+      selfDGa_Wprime
       );
     ZZME->computeProdXS_VVHVV(prob);
     if (useConstant) computeConstant(prob);
@@ -1009,8 +1015,10 @@ void Mela::computeProdP(
             selfDHwpwpcoupl,
             selfDWpffcoupl,
             selfDUseVprime,
-            selfDM_Vprime,
-            selfDGa_Vprime
+            selfDM_Zprime,
+            selfDGa_Zprime,
+            selfDM_Wprime,
+            selfDGa_Wprime
             );
         }
         ZZME->computeProdXS_JJH(prob); // Higgs + 2 jets: SBF or WBF main probability
@@ -1061,8 +1069,10 @@ void Mela::computeProdP(
               selfDHwpwpcoupl,
               selfDWpffcoupl,
               selfDUseVprime,
-              selfDM_Vprime,
-              selfDGa_Vprime
+              selfDM_Zprime,
+              selfDGa_Zprime,
+              selfDM_Wprime,
+              selfDGa_Wprime
               );
             ZZME->computeProdXS_JJH(prob_temp);
           }
@@ -1145,8 +1155,10 @@ void Mela::computeProdP(
                   selfDHwpwpcoupl,
                   selfDWpffcoupl,
                   selfDUseVprime,
-                  selfDM_Vprime,
-                  selfDGa_Vprime
+                  selfDM_Zprime,
+                  selfDGa_Zprime,
+                  selfDM_Wprime,
+                  selfDGa_Wprime
                   );
               }
               ZZME->computeProdXS_JJH(prob_temp);
@@ -1226,8 +1238,10 @@ void Mela::computeProdP(
               selfDHwpwpcoupl,
               selfDWpffcoupl,
               selfDUseVprime,
-              selfDM_Vprime,
-              selfDGa_Vprime
+              selfDM_Zprime,
+              selfDGa_Zprime,
+              selfDM_Wprime,
+              selfDGa_Wprime
               );
           }
           ZZME->computeProdXS_JJH(prob); // Higgs + 2 jets: SBF or WBF
@@ -1307,8 +1321,10 @@ void Mela::computeProdP_VH(
           selfDHwpwpcoupl,
           selfDWpffcoupl,
           selfDUseVprime,
-          selfDM_Vprime,
-          selfDGa_Vprime
+          selfDM_Zprime,
+          selfDGa_Zprime,
+          selfDM_Wprime,
+          selfDGa_Wprime
           );
       }
       ZZME->computeProdXS_VH(prob, includeHiggsDecay); // VH
@@ -1359,8 +1375,10 @@ void Mela::computeProdP_ttH(
         selfDHwpwpcoupl,
         selfDWpffcoupl,
         selfDUseVprime,
-        selfDM_Vprime,
-        selfDGa_Vprime
+        selfDM_Zprime,
+        selfDGa_Zprime,
+        selfDM_Wprime,
+        selfDGa_Wprime
         );
     }
     ZZME->computeProdXS_ttH(prob,topProcess, topDecay);

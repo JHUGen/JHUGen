@@ -21,7 +21,7 @@ public :: SetSpinZeroGGCouplings,SetSpinZeroQQCouplings
 public :: SetSpinOneCouplings
 public :: SetSpinTwoCouplings
 
-public :: GetMVGV
+public :: GetMVGV,GetMVPrimeGVPrime
 public :: GetAlphaSAlphaSMZ
 public :: GetPDFConstants
 public :: GetDecayCouplings
@@ -360,7 +360,7 @@ subroutine SetSpinZeroVVCouplings_NoGamma(vvcoupl, cqsq, Lambda_qsq, useWWcoupl)
    return
 end subroutine SetSpinZeroVVCouplings_NoGamma
 
-subroutine SetSpinZeroContactTerms(zzpcoupl, zpzpcoupl, Zpffcoupl, wwpcoupl, wpwpcoupl, Wpffcoupl, UseVp, M_Vp, Ga_Vp)
+subroutine SetSpinZeroContactTerms(zzpcoupl, zpzpcoupl, Zpffcoupl, wwpcoupl, wpwpcoupl, Wpffcoupl, UseVp)
   implicit none
   complex(8), intent(in) :: zzpcoupl(39)
   complex(8), intent(in) :: zpzpcoupl(39)
@@ -371,11 +371,6 @@ subroutine SetSpinZeroContactTerms(zzpcoupl, zpzpcoupl, Zpffcoupl, wwpcoupl, wpw
   complex(8), intent(in) :: Wpffcoupl(20)
 
   logical, intent(in) :: UseVp
-  real(8), intent(in) :: M_Vp, Ga_Vp
-
-  M_Vprime = M_Vp
-  Ga_Vprime = Ga_Vp
-  UseVprime = UseVp
 
   includeVprime = ((any(zzpcoupl.ne.czero) .or. any(zpzpcoupl.ne.czero)) .and. any(Zpffcoupl.ne.czero)) &
               .or.((any(wwpcoupl.ne.czero) .or. any(wpwpcoupl.ne.czero)) .and. any(Wpffcoupl.ne.czero))
@@ -492,12 +487,18 @@ implicit none
   if( IsAZDecay(DecayMode1) ) then
     M_V = M_Z
     Ga_V= Ga_Z
+    M_Vprime = M_Zprime
+    Ga_Vprime= Ga_Zprime
   elseif( IsAWDecay(DecayMode1) ) then
     M_V = M_W
     Ga_V= Ga_W
+    M_Vprime = M_Wprime
+    Ga_Vprime= Ga_Wprime
   else
     M_V = 0d0
     Ga_V= 0d0
+    M_Vprime = -1d0
+    Ga_Vprime= -1d0
   endif
 end subroutine SetMVGV
 
@@ -507,12 +508,18 @@ integer idV
   if( idV.eq.Z0_ ) then
     M_V = M_Z
     Ga_V= Ga_Z
+    M_Vprime = M_Zprime
+    Ga_Vprime= Ga_Zprime
   else if( idV.eq.Wp_ .or. idV.eq.Wm_ ) then
     M_V = M_W
     Ga_V= Ga_W
+    M_Vprime = M_Wprime
+    Ga_Vprime= Ga_Wprime
   else
     M_V = 0d0
     Ga_V= 0d0
+    M_Vprime = -1d0
+    Ga_Vprime= -1d0
   endif
 end subroutine
 
@@ -522,6 +529,13 @@ subroutine GetMVGV(mv,gv)
    mv=M_V
    gv=Ga_V
 end subroutine GetMVGV
+
+subroutine GetMVPrimeGVPrime(mv,gv)
+   implicit none
+   real(8), intent(out) :: mv,gv
+   mv=M_Vprime
+   gv=Ga_Vprime
+end subroutine GetMVPrimeGVPrime
 
 subroutine GetAlphaSAlphaSMZ(val_as, val_asmz)
 implicit none

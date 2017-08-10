@@ -59,9 +59,14 @@ public:
         H2wwLambda_qsq[ic][ik] = 100.;
       }
     }
+
+    SetUseVprime(false);
+    SetZPrimeMassWidth(-1, 0);
+    SetWPrimeMassWidth(-1, 0);
   };
   void copy(SpinZeroCouplings& other){
     allow_WWZZSeparation(other.separateWWZZcouplings);
+
     for (int im=0; im<2; im++){
       for (int ic=0; ic<SIZE_HVV; ic++){
         Hzzcoupl[ic][im] = (other.Hzzcoupl)[ic][im];
@@ -102,6 +107,12 @@ public:
         HwwLambda_qsq[ic][ik] = (other.HwwLambda_qsq)[ic][ik];
       }
     }
+
+    UseVprime = other.UseVprime;
+    M_Zprime = other.M_Zprime;
+    Ga_Zprime = other.Ga_Zprime;
+    M_Wprime = other.M_Wprime;
+    Ga_Wprime = other.Ga_Wprime;
   };
   SpinZeroCouplings* getRef(){ return this; }
 
@@ -297,11 +308,9 @@ public:
       }
     }
   }
-  void SetUseVprime(bool useVp, double mass, double width){
-    UseVprime = useVp;
-    M_Vprime = mass;
-    Ga_Vprime = width;
-  }
+  void SetUseVprime(bool useVp){ UseVprime = useVp; }
+  void SetZPrimeMassWidth(double inmass, double inwidth){ M_Zprime = inmass; Ga_Zprime = inwidth; }
+  void SetWPrimeMassWidth(double inmass, double inwidth){ M_Wprime = inmass; Ga_Wprime = inwidth; }
 
   double Hggcoupl[SIZE_HGG][2];
   double Hqqcoupl[SIZE_HQQ][2];
@@ -342,7 +351,10 @@ public:
 
   bool separateWWZZcouplings;
   bool UseVprime;
-  double M_Vprime, Ga_Vprime;
+  double M_Zprime;
+  double Ga_Zprime;
+  double M_Wprime;
+  double Ga_Wprime;
 
   inline virtual ~SpinZeroCouplings(){};
 };

@@ -3440,13 +3440,10 @@ void TUtil::SetJHUGenSpinZeroVVCouplings(double Hvvcoupl[SIZE_HVV][2], int Hvvco
 void TUtil::SetJHUGenSpinZeroContactTerms(
   double Hzzpcoupl[SIZE_HVV][2], double Hzpzpcoupl[SIZE_HVV][2], double Zpffcoupl[SIZE_Vpff][2],
   double Hwwpcoupl[SIZE_HVV][2], double Hwpwpcoupl[SIZE_HVV][2], double Wpffcoupl[SIZE_Vpff][2],
-  bool UseVprime, double M_Vprime, double Ga_Vprime
+  bool UseVprime
   ){
-  const double GeV=1./100.;
-  M_Vprime *= GeV;
-  Ga_Vprime *= GeV;
   int usevp = UseVprime;
-  __modjhugenmela_MOD_setspinzerocontactterms(Hzzpcoupl, Hzpzpcoupl, Zpffcoupl, Hwwpcoupl, Hwpwpcoupl, Wpffcoupl, &usevp, &M_Vprime, &Ga_Vprime);
+  __modjhugenmela_MOD_setspinzerocontactterms(Hzzpcoupl, Hzpzpcoupl, Zpffcoupl, Hwwpcoupl, Hwpwpcoupl, Wpffcoupl, &usevp);
 }
 void TUtil::SetJHUGenSpinZeroGGCouplings(double Hggcoupl[SIZE_HGG][2]){ __modjhugenmela_MOD_setspinzeroggcouplings(Hggcoupl); }
 void TUtil::SetJHUGenSpinZeroQQCouplings(double Hqqcoupl[SIZE_HQQ][2]){ __modjhugenmela_MOD_setspinzeroqqcouplings(Hqqcoupl); }
@@ -4351,6 +4348,8 @@ double TUtil::JHUGenMatEl(
         double mv, gv;
         __modjhugenmela_MOD_getmvgv(&mv, &gv);
         cout << "TUtil::JHUGenMatEl: M_V=" << mv/GeV << ", Ga_V=" << gv/GeV << endl;
+        __modjhugenmela_MOD_getmvprimegvprime(&mv, &gv);
+        cout << "TUtil::JHUGenMatEl: M_Vprime=" << mv/GeV << ", Ga_Vprime=" << gv/GeV << endl;
       }
 
       // Sum over possible left/right couplings of the Vs

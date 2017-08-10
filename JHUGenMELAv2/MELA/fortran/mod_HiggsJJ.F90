@@ -9,7 +9,7 @@ module modHiggsJJ
   !public :: wrapHVV
   public :: get_VBFchannelHash,get_VBFchannelHash_nosplit,get_HJJchannelHash,get_HJJchannelHash_nosplit,get_GENchannelHash,get_VBFoffshchannelHash
   public :: init_VBFoffshChannelHash,get_NumberOfChannels,get_VBFoffshChannel,remove_VBFoffshChannel
-  
+
   integer,private :: ij_channelHash(1:204,1:4)=-99
   integer,private :: NumberOfChannels=-1
   logical,private :: deterministicME=.false.
@@ -534,11 +534,11 @@ module modHiggsJJ
 
 
 
-  
+
   subroutine init_VBFoffshChannelHash()
   implicit none
   integer ch,i
-  
+
    if( .not. deterministicME ) then
       ij_ChannelHash(  1,:) = (/ 2, 1, 0,0/)
       ij_ChannelHash(  2,:) = (/ 1, 2, 0,0/)
@@ -642,9 +642,9 @@ module modHiggsJJ
       ij_ChannelHash(100,:) = (/ 5, 5, 0,0/)
 
       NumberOfChannels = 100
- 
+
     else
- 
+
       ij_ChannelHash(1,:) = (/ Up_ , Chm_ , Up_ , Chm_ /)
       ij_ChannelHash(2,:) = (/ Dn_ , Str_ , Dn_ , Str_ /)
       ij_ChannelHash(3,:) = (/ Dn_ , Bot_ , Dn_ , Bot_ /)
@@ -854,62 +854,62 @@ module modHiggsJJ
       ij_ChannelHash(202,:) = (/ ADn_ , Dn_ , ADn_ , Dn_ /)
       ij_ChannelHash(203,:) = (/ AStr_ , Str_ , AStr_ , Str_ /)
       ij_ChannelHash(204,:) = (/ ABot_ , Bot_ , ABot_ , Bot_ /)
- 
+
       NumberOfChannels = 204
-       
+
       do ch=1, NumberOfChannels
       do i=1,4
         ij_ChannelHash(ch,i) = convertToPartIndex( ij_ChannelHash(ch,i) )
       enddo
       enddo
-       
+
     endif
-    
-    
+
+
   return
   end subroutine
-  
+
 
   subroutine get_NumberOfChannels(NumOfCh)
   implicit none
   integer, intent(out) :: NumOfCh
- 
+
     NumOfCh = NumberOfChannels
- 
+
   return
   end subroutine
-  
+
 
 
   subroutine get_VBFoffshChannel(channel,i1,i2,i3,i4)
   implicit none
   integer, intent(in) :: channel
   integer, intent(out) :: i1,i2,i3,i4
- 
+
     i1= ij_ChannelHash(channel,1)
     i2= ij_ChannelHash(channel,2)
     i3= ij_ChannelHash(channel,3)
     i4= ij_ChannelHash(channel,4)
- 
+
   return
   end subroutine
-  
+
 
 
   subroutine remove_VBFoffshChannel(channel)
   implicit none
   integer, intent(in) :: channel
   integer :: i
- 
+
     do i =channel,NumberOfChannels-1
          ij_ChannelHash(i,:) = ij_ChannelHash(i+1,:)
     enddo
-    NumberOfChannels = NumberOfChannels -1 
-     
+    NumberOfChannels = NumberOfChannels -1
+
   return
   end subroutine
-    
-  
+
+
 
 
   subroutine get_VBFoffshchannelHash(ijSel)
@@ -931,7 +931,7 @@ module modHiggsJJ
       ijSel( 12,1:3) = (/-4, 2, 1/)
       ijSel( 13,1:3) = (/ 1, 4, 1/)
       ijSel( 14,1:3) = (/ 4, 1, 1/)
-  
+
       ijSel( 15,1:3) = (/-5,-5, 1/)
       ijSel( 16,1:3) = (/-5,-4, 1/)
       ijSel( 17,1:3) = (/-5,-3, 1/)
@@ -1023,7 +1023,7 @@ module modHiggsJJ
 
   return
   end subroutine
-  
+
 
 
 
@@ -1564,40 +1564,40 @@ module modHiggsJJ
 ! !     adding contract terms
 !     iprop12 = sprod(4,1) - mv**2 + ci * mv * ga_v
 !     iprop34 = sprod(3,2) - mv**2 + ci * mv * ga_v
-! 
+!
 !     amp_z(-1,-1) = amp_z(-1,-1) + amp_z(-1,-1)*iprop12/(aL_QUp*couplz)*ehz_L_U  &
 !                                 + amp_z(-1,-1)*iprop34/(aL_QUp*couplz)*ehz_L_U  &
 !                                 + amp_z(-1,-1)*iprop12/(aL_QUp*couplz)*ehz_L_U  &
-!                                               *iprop34/(aL_QUp*couplz)*ehz_L_U 
-!                                                                
+!                                               *iprop34/(aL_QUp*couplz)*ehz_L_U
+!
 !     amp_z(+1,-1) = amp_z(+1,-1) + amp_z(+1,-1)*iprop12/(aR_QUp*couplz)*ehz_R_U  &
 !                                 + amp_z(+1,-1)*iprop34/(aL_QUp*couplz)*ehz_L_U  &
 !                                 + amp_z(+1,-1)*iprop12/(aR_QUp*couplz)*ehz_R_U  &
-!                                               *iprop34/(aL_QUp*couplz)*ehz_L_U   
-!     
+!                                               *iprop34/(aL_QUp*couplz)*ehz_L_U
+!
 !     amp_z(-1,+1) = amp_z(-1,+1) + amp_z(-1,+1)*iprop12/(aL_QUp*couplz)*ehz_L_U  &
 !                                 + amp_z(-1,+1)*iprop34/(aR_QUp*couplz)*ehz_R_U  &
 !                                 + amp_z(-1,+1)*iprop12/(aL_QUp*couplz)*ehz_L_U  &
-!                                               *iprop34/(aR_QUp*couplz)*ehz_R_U  
-!                                               
+!                                               *iprop34/(aR_QUp*couplz)*ehz_R_U
+!
 !     amp_z(+1,+1) = amp_z(+1,+1) + amp_z(+1,+1)*iprop12/(aR_QUp*couplz)*ehz_R_U  &
 !                                 + amp_z(+1,+1)*iprop34/(aR_QUp*couplz)*ehz_R_U  &
 !                                 + amp_z(+1,+1)*iprop12/(aR_QUp*couplz)*ehz_R_U  &
-!                                               *iprop34/(aR_QUp*couplz)*ehz_R_U 
-    
-    
+!                                               *iprop34/(aR_QUp*couplz)*ehz_R_U
+
+
 !     Lu = aL_QUp + iprop12/couplz*ehz_L_U
 !     Ru = aR_QUp + iprop12/couplz*ehz_R_U
 !     amp_z(-1,-1) = amp_z(-1,-1)*Lu*Lu
 !     amp_z(-1,+1) = amp_z(-1,+1)*Lu*Ru
 !     amp_z(+1,-1) = amp_z(+1,-1)*Ru*Lu
 !     amp_z(+1,+1) = amp_z(+1,+1)*Ru*Ru
-!     
+!
 !     amp_z_b(-1,-1) = amp_z_b(-1,-1)*Lu*Lu
 !     amp_z_b(-1,+1) = amp_z_b(-1,+1)*Lu*Ru
 !     amp_z_b(+1,-1) = amp_z_b(+1,-1)*Ru*Lu
 !     amp_z_b(+1,+1) = amp_z_b(+1,+1)*Ru*Ru
-    
+
     restmp = ((abs(amp_z(-1,-1))**2+abs(amp_z_b(-1,-1))**2) * Lu**2 + &
          (abs(amp_z(-1,+1))**2+abs(amp_z_b(-1,+1))**2) * Lu * Ru + &
          (abs(amp_z(+1,-1))**2+abs(amp_z_b(+1,-1))**2) * Lu * Ru + &
@@ -1611,10 +1611,10 @@ module modHiggsJJ
     res(pdfUp_,pdfUp_) = restmp
     res(pdfChm_,pdfChm_) = restmp
 
-    
-    
-    
-    
+
+
+
+
     !-- qq->qq, down
     restmp = ((abs(amp_z(-1,-1))**2+abs(amp_z_b(-1,-1))**2) * Ld**2 + &
          (abs(amp_z(-1,+1))**2+abs(amp_z_b(-1,+1))**2) * Ld * Rd + &
@@ -1923,8 +1923,8 @@ module modHiggsJJ
     !-- qq->qq, up
     if( (iSel.eq.pdfUp_ .and. jSel.eq.pdfUp_) .or. (iSel.eq.pdfChm_ .and. jSel.eq.pdfChm_) ) then
 
-       amp_z = A0_ZZ_4f(4,1,3,2,za,zb,sprod,1,1)
-       amp_z_b = -A0_ZZ_4f(3,1,4,2,za,zb,sprod,1,1)
+       amp_z = A0_ZZ_4f(4,1,3,2,za,zb,sprod,iSel,jSel)
+       amp_z_b = -A0_ZZ_4f(3,1,4,2,za,zb,sprod,iSel,jSel)
 
        restmp = ((abs(amp_z(-1,-1))**2+abs(amp_z_b(-1,-1))**2) + &
             (abs(amp_z(-1,+1))**2+abs(amp_z_b(-1,+1))**2) + &
@@ -1947,8 +1947,8 @@ module modHiggsJJ
 
    !-- qq->qq, down
     if( (iSel.eq.pdfDn_ .and. jSel.eq.pdfDn_) .or. (iSel.eq.pdfStr_ .and. jSel.eq.pdfStr_) .or. (iSel.eq.pdfBot_ .and. jSel.eq.pdfBot_) ) then
-       amp_z = A0_ZZ_4f(4,1,3,2,za,zb,sprod,2,2)
-       amp_z_b = -A0_ZZ_4f(3,1,4,2,za,zb,sprod,2,2)
+       amp_z = A0_ZZ_4f(4,1,3,2,za,zb,sprod,iSel,jSel)
+       amp_z_b = -A0_ZZ_4f(3,1,4,2,za,zb,sprod,iSel,jSel)
 
        restmp = ((abs(amp_z(-1,-1))**2+abs(amp_z_b(-1,-1))**2) + &
             (abs(amp_z(-1,+1))**2+abs(amp_z_b(-1,+1))**2) + &
@@ -1971,8 +1971,8 @@ module modHiggsJJ
 
     !-- qbqb->qbqb, aup
     if( (iSel.eq.pdfAUp_ .and. jSel.eq.pdfAUp_) .or. (iSel.eq.pdfAChm_ .and. jSel.eq.pdfAChm_) ) then
-       amp_z = A0_ZZ_4f(1,4,2,3,za,zb,sprod,1,1)
-       amp_z_b = -A0_ZZ_4f(1,3,2,4,za,zb,sprod,1,1)
+       amp_z = A0_ZZ_4f(1,4,2,3,za,zb,sprod,iSel,jSel)
+       amp_z_b = -A0_ZZ_4f(1,3,2,4,za,zb,sprod,iSel,jSel)
 
        restmp = ((abs(amp_z(-1,-1))**2+abs(amp_z_b(-1,-1))**2) + &
             (abs(amp_z(-1,+1))**2+abs(amp_z_b(-1,+1))**2) + &
@@ -1994,8 +1994,8 @@ module modHiggsJJ
 
     !-- qbqb->qbqb, adn
     if( (iSel.eq.pdfADn_ .and. jSel.eq.pdfADn_) .or. (iSel.eq.pdfAStr_ .and. jSel.eq.pdfAStr_) .or. (iSel.eq.pdfABot_ .and. jSel.eq.pdfABot_) ) then
-       amp_z = A0_ZZ_4f(1,4,2,3,za,zb,sprod,2,2)
-       amp_z_b = -A0_ZZ_4f(1,3,2,4,za,zb,sprod,2,2)
+       amp_z = A0_ZZ_4f(1,4,2,3,za,zb,sprod,iSel,jSel)
+       amp_z_b = -A0_ZZ_4f(1,3,2,4,za,zb,sprod,iSel,jSel)
        restmp = ((abs(amp_z(-1,-1))**2+abs(amp_z_b(-1,-1))**2) + &
             (abs(amp_z(-1,+1))**2+abs(amp_z_b(-1,+1))**2) + &
             (abs(amp_z(+1,-1))**2+abs(amp_z_b(+1,-1))**2) + &
@@ -2024,7 +2024,7 @@ module modHiggsJJ
 
     !-- ud -> ud
     if( (iSel.eq.pdfUp_ .and. jSel.eq.pdfDn_) .or. (iSel.eq.pdfChm_ .and. jSel.eq.pdfStr_) ) then
-       amp_z = A0_ZZ_4f(4,j2,3,j1,za,zb,sprod,2,1)
+       amp_z = A0_ZZ_4f(4,j2,3,j1,za,zb,sprod,jSel,iSel)
        amp_w = -A0_WW_4f(4,j1,3,j2,za,zb,sprod,useWWcoupl=.true.,Wpm_flip=.true.)
        if( zz_fusion ) then
           restmp = ((abs(amp_z(-1,-1))**2) + &
@@ -2051,7 +2051,7 @@ module modHiggsJJ
 
     !-- ubdb -> ubdb
     if( (iSel.eq.pdfAUp_ .and. jSel.eq.pdfADn_) .or. (iSel.eq.pdfAChm_ .and. jSel.eq.pdfAStr_) ) then
-       amp_z = A0_ZZ_4f(j2,4,j1,3,za,zb,sprod,2,1)
+       amp_z = A0_ZZ_4f(j2,4,j1,3,za,zb,sprod,jSel,iSel)
        amp_w = -A0_WW_4f(j1,4,j2,3,za,zb,sprod,useWWcoupl=.true.,Wpm_flip=.false.)
 
        if( zz_fusion ) then
@@ -2084,7 +2084,7 @@ module modHiggsJJ
 
     !-- ud -> ud
     if( (iSel.eq.pdfDn_ .and. jSel.eq.pdfUp_) .or. (iSel.eq.pdfStr_ .and. jSel.eq.pdfChm_) ) then
-       amp_z = A0_ZZ_4f(4,j2,3,j1,za,zb,sprod,2,1)
+       amp_z = A0_ZZ_4f(4,j2,3,j1,za,zb,sprod,iSel,jSel)
        amp_w = -A0_WW_4f(4,j1,3,j2,za,zb,sprod,useWWcoupl=.true.,Wpm_flip=.true.)
        if( zz_fusion ) then
           restmp = ((abs(amp_z(-1,-1))**2) + &
@@ -2111,7 +2111,7 @@ module modHiggsJJ
 
     !-- ubdb -> ubdb
     if( (iSel.eq.pdfADn_ .and. jSel.eq.pdfAUp_) .or. (iSel.eq.pdfAStr_ .and. jSel.eq.pdfAChm_) ) then
-       amp_z = A0_ZZ_4f(j2,4,j1,3,za,zb,sprod,2,1)
+       amp_z = A0_ZZ_4f(j2,4,j1,3,za,zb,sprod,iSel,jSel)
        amp_w = -A0_WW_4f(j1,4,j2,3,za,zb,sprod,useWWcoupl=.true.,Wpm_flip=.false.)
 
        if( zz_fusion ) then
@@ -2147,7 +2147,7 @@ module modHiggsJJ
     if( (iSel.eq.pdfUp_ .and. jSel.eq.pdfAUp_) .or. (iSel.eq.pdfChm_ .and. jSel.eq.pdfAChm_) .or. (iSel.eq.pdfUp_ .and. jSel.eq.pdfAChm_) .or. (iSel.eq.pdfChm_ .and. jSel.eq.pdfAUp_) ) then
 
        if( zz_fusion ) then
-          amp_z = A0_ZZ_4f(3,j1,j2,4,za,zb,sprod,1,1)
+          amp_z = A0_ZZ_4f(3,j1,j2,4,za,zb,sprod,iSel,jSel)
           restmp = ((abs(amp_z(-1,-1))**2) + &
                (abs(amp_z(-1,+1))**2) + &
                (abs(amp_z(+1,-1))**2) + &
@@ -2176,7 +2176,7 @@ module modHiggsJJ
     !--udb -> udb
     if( (iSel.eq.pdfUp_ .and. jSel.eq.pdfADn_) .or. (iSel.eq.pdfChm_ .and. jSel.eq.pdfAStr_) .or. (iSel.eq.pdfUp_ .and. jSel.eq.pdfAStr_) .or. &
          (iSel.eq.pdfChm_ .and. jSel.eq.pdfADn_) .or. (iSel.eq.pdfUp_ .and. jSel.eq.pdfABot_) .or. (iSel.eq.pdfChm_ .and. jSel.eq.pdfABot_) ) then
-       amp_z = A0_ZZ_4f(3,j1,j2,4,za,zb,sprod,1,2)
+       amp_z = A0_ZZ_4f(3,j1,j2,4,za,zb,sprod,iSel,jSel)
        restmp = ((abs(amp_z(-1,-1))**2) + &
             (abs(amp_z(-1,+1))**2) + &
             (abs(amp_z(+1,-1))**2) + &
@@ -2208,7 +2208,7 @@ module modHiggsJJ
     !--dub -> dub
     if( (iSel.eq.pdfDn_ .and. jSel.eq.pdfAUp_) .or. (iSel.eq.pdfStr_ .and. jSel.eq.pdfAChm_)  .or. (iSel.eq.pdfDn_ .and. jSel.eq.pdfAChm_)  .or. &
          (iSel.eq.pdfStr_ .and. jSel.eq.pdfAUp_)  .or. (iSel.eq.pdfBot_ .and. jSel.eq.pdfAUp_)  .or. (iSel.eq.pdfBot_ .and. jSel.eq.pdfAChm_) ) then
-       amp_z = A0_ZZ_4f(3,j1,j2,4,za,zb,sprod,2,1)
+       amp_z = A0_ZZ_4f(3,j1,j2,4,za,zb,sprod,iSel,jSel)
        restmp = ((abs(amp_z(-1,-1))**2) + &
             (abs(amp_z(-1,+1))**2) + &
             (abs(amp_z(+1,-1))**2) + &
@@ -2240,7 +2240,7 @@ module modHiggsJJ
     !--ddb -> uub/ddb
     if( (iSel.eq.pdfBot_ .and. jSel.eq.pdfABot_) .or. (iSel.eq.pdfDn_ .and. jSel.eq.pdfABot_) .or. (iSel.eq.pdfStr_ .and. jSel.eq.pdfABot_) .or.&
          (iSel.eq.pdfBot_ .and. jSel.eq.pdfADn_) .or. (iSel.eq.pdfBot_ .and. jSel.eq.pdfAStr_) ) then
-       amp_z = A0_ZZ_4f(3,j1,j2,4,za,zb,sprod,2,2)
+       amp_z = A0_ZZ_4f(3,j1,j2,4,za,zb,sprod,iSel,jSel)
 
        restmp = ((abs(amp_z(-1,-1))**2) + &
             (abs(amp_z(-1,+1))**2) + &
@@ -2269,7 +2269,7 @@ module modHiggsJJ
 
     if( (iSel.eq.pdfDn_ .and. jSel.eq.pdfADn_) .or. (iSel.eq.pdfStr_ .and. jSel.eq.pdfAStr_)  .or. (iSel.eq.pdfDn_ .and. jSel.eq.pdfAStr_)  .or. (iSel.eq.pdfStr_ .and. jSel.eq.pdfADn_) ) then
        if( zz_fusion ) then
-          amp_z = A0_ZZ_4f(3,j1,j2,4,za,zb,sprod,2,2)
+          amp_z = A0_ZZ_4f(3,j1,j2,4,za,zb,sprod,iSel,jSel)
           restmp = ((abs(amp_z(-1,-1))**2) + &
                (abs(amp_z(-1,+1))**2) + &
                (abs(amp_z(+1,-1))**2) + &
@@ -2298,7 +2298,7 @@ module modHiggsJJ
     if( (iSel.eq.pdfUp_ .and. jSel.eq.pdfChm_)  ) then
 
        !-- non-symmetric qq processes
-       amp_z = A0_ZZ_4f(3,j1,4,j2,za,zb,sprod,1,1)
+       amp_z = A0_ZZ_4f(3,j1,4,j2,za,zb,sprod,iSel,jSel)
        !--uc -> uc
        restmp = ((abs(amp_z(-1,-1))**2) + &
             (abs(amp_z(-1,+1))**2) + &
@@ -2317,7 +2317,7 @@ module modHiggsJJ
     !--us -> us/cd
     if( (iSel.eq.pdfUp_ .and. jSel.eq.pdfBot_) .or. (iSel.eq.pdfChm_ .and. jSel.eq.pdfBot_) ) then
 
-       amp_z = A0_ZZ_4f(3,j1,4,j2,za,zb,sprod,1,2)
+       amp_z = A0_ZZ_4f(3,j1,4,j2,za,zb,sprod,iSel,jSel)
        restmp = ((abs(amp_z(-1,-1))**2) + &
             (abs(amp_z(-1,+1))**2) + &
             (abs(amp_z(+1,-1))**2) + &
@@ -2337,7 +2337,7 @@ module modHiggsJJ
     if( (iSel.eq.pdfUp_ .and. jSel.eq.pdfStr_) .or. (iSel.eq.pdfChm_ .and. jSel.eq.pdfDn_) ) then
 
        if( zz_fusion ) then
-          amp_z = A0_ZZ_4f(3,j1,4,j2,za,zb,sprod,1,2)
+          amp_z = A0_ZZ_4f(3,j1,4,j2,za,zb,sprod,iSel,jSel)
           restmp = ((abs(amp_z(-1,-1))**2) + &
                (abs(amp_z(-1,+1))**2) + &
                (abs(amp_z(+1,-1))**2) + &
@@ -2361,7 +2361,7 @@ module modHiggsJJ
     !--ds -> ds
     if( (iSel.eq.pdfDn_ .and. jSel.eq.pdfStr_) .or. (iSel.eq.pdfDn_ .and. jSel.eq.pdfBot_) .or. (iSel.eq.pdfStr_ .and. jSel.eq.pdfBot_) ) then
 
-       amp_z = A0_ZZ_4f(3,j1,4,j2,za,zb,sprod,2,2)
+       amp_z = A0_ZZ_4f(3,j1,4,j2,za,zb,sprod,iSel,jSel)
        restmp = ((abs(amp_z(-1,-1))**2) + &
             (abs(amp_z(-1,+1))**2) + &
             (abs(amp_z(+1,-1))**2) + &
@@ -2383,7 +2383,7 @@ module modHiggsJJ
 
     !-- qbqb processes
     if( (iSel.eq.pdfAUp_ .and. jSel.eq.pdfAChm_) ) then
-       amp_z = A0_ZZ_4f(j1,3,j2,4,za,zb,sprod,1,1)
+       amp_z = A0_ZZ_4f(j1,3,j2,4,za,zb,sprod,iSel,jSel)
        !--ubcb -> ubcb
        restmp = ((abs(amp_z(-1,-1))**2) + &
             (abs(amp_z(-1,+1))**2) + &
@@ -2401,7 +2401,7 @@ module modHiggsJJ
 
     !--ubsb -> ubsb//cbdb
     if( (iSel.eq.pdfAUp_ .and. jSel.eq.pdfABot_) .or. (iSel.eq.pdfAChm_ .and. jSel.eq.pdfABot_) ) then
-       amp_z = A0_ZZ_4f(j1,3,j2,4,za,zb,sprod,1,2)
+       amp_z = A0_ZZ_4f(j1,3,j2,4,za,zb,sprod,iSel,jSel)
        restmp = ((abs(amp_z(-1,-1))**2) + &
             (abs(amp_z(-1,+1))**2) + &
             (abs(amp_z(+1,-1))**2) + &
@@ -2421,7 +2421,7 @@ module modHiggsJJ
     if( (iSel.eq.pdfAUp_ .and. jSel.eq.pdfAStr_) .or. (iSel.eq.pdfAChm_ .and. jSel.eq.pdfADn_) ) then
 
        if( zz_fusion ) then
-          amp_z = A0_ZZ_4f(j1,3,j2,4,za,zb,sprod,1,2)
+          amp_z = A0_ZZ_4f(j1,3,j2,4,za,zb,sprod,iSel,jSel)
           restmp = ((abs(amp_z(-1,-1))**2) + &
                (abs(amp_z(-1,+1))**2) + &
                (abs(amp_z(+1,-1))**2) + &
@@ -2445,7 +2445,7 @@ module modHiggsJJ
     !--dbsb -> dbsb
     if( (iSel.eq.pdfADn_ .and. jSel.eq.pdfAStr_) .or. (iSel.eq.pdfADn_ .and. jSel.eq.pdfABot_) .or. (iSel.eq.pdfAStr_ .and. jSel.eq.pdfABot_) ) then
 
-       amp_z = A0_ZZ_4f(j1,3,j2,4,za,zb,sprod,2,2)
+       amp_z = A0_ZZ_4f(j1,3,j2,4,za,zb,sprod,iSel,jSel)
        restmp = ((abs(amp_z(-1,-1))**2) + &
             (abs(amp_z(-1,+1))**2) + &
             (abs(amp_z(+1,-1))**2) + &
@@ -2476,7 +2476,7 @@ module modHiggsJJ
     if( (jSel.eq.pdfUp_ .and. iSel.eq.pdfAUp_) .or. (jSel.eq.pdfChm_ .and. iSel.eq.pdfAChm_) .or. (jSel.eq.pdfUp_ .and. iSel.eq.pdfAChm_) .or. (jSel.eq.pdfChm_ .and. iSel.eq.pdfAUp_) ) then
 
        if( zz_fusion ) then
-          amp_z = A0_ZZ_4f(3,j1,j2,4,za,zb,sprod,1,1)
+          amp_z = A0_ZZ_4f(3,j1,j2,4,za,zb,sprod,jSel,iSel)
           restmp = ((abs(amp_z(-1,-1))**2) + &
                (abs(amp_z(-1,+1))**2) + &
                (abs(amp_z(+1,-1))**2) + &
@@ -2506,7 +2506,7 @@ module modHiggsJJ
     !--udb -> udb
     if( (jSel.eq.pdfUp_ .and. iSel.eq.pdfADn_) .or. (jSel.eq.pdfChm_ .and. iSel.eq.pdfAStr_) .or. (jSel.eq.pdfUp_ .and. iSel.eq.pdfAStr_) .or. &
          (jSel.eq.pdfChm_ .and. iSel.eq.pdfADn_) .or. (jSel.eq.pdfUp_ .and. iSel.eq.pdfABot_) .or. (jSel.eq.pdfChm_ .and. iSel.eq.pdfABot_) ) then
-       amp_z = A0_ZZ_4f(3,j1,j2,4,za,zb,sprod,1,2)
+       amp_z = A0_ZZ_4f(3,j1,j2,4,za,zb,sprod,jSel,iSel)
        restmp = ((abs(amp_z(-1,-1))**2) + &
             (abs(amp_z(-1,+1))**2) + &
             (abs(amp_z(+1,-1))**2) + &
@@ -2539,7 +2539,7 @@ module modHiggsJJ
     !--dub -> dub
     if( (jSel.eq.pdfDn_ .and. iSel.eq.pdfAUp_) .or. (jSel.eq.pdfStr_ .and. iSel.eq.pdfAChm_)  .or. (jSel.eq.pdfDn_ .and. iSel.eq.pdfAChm_)  .or. &
          (jSel.eq.pdfStr_ .and. iSel.eq.pdfAUp_)  .or. (jSel.eq.pdfBot_ .and. iSel.eq.pdfAUp_)  .or. (jSel.eq.pdfBot_ .and. iSel.eq.pdfAChm_) ) then
-       amp_z = A0_ZZ_4f(3,j1,j2,4,za,zb,sprod,2,1)
+       amp_z = A0_ZZ_4f(3,j1,j2,4,za,zb,sprod,jSel,iSel)
        restmp = ((abs(amp_z(-1,-1))**2) + &
             (abs(amp_z(-1,+1))**2) + &
             (abs(amp_z(+1,-1))**2) + &
@@ -2572,7 +2572,7 @@ module modHiggsJJ
     !--ddb -> uub/ddb
     if( (jSel.eq.pdfBot_ .and. iSel.eq.pdfABot_) .or. (jSel.eq.pdfDn_ .and. iSel.eq.pdfABot_) .or. (jSel.eq.pdfStr_ .and. iSel.eq.pdfABot_) .or.&
          (jSel.eq.pdfBot_ .and. iSel.eq.pdfADn_) .or. (jSel.eq.pdfBot_ .and. iSel.eq.pdfAStr_) ) then
-       amp_z = A0_ZZ_4f(3,j1,j2,4,za,zb,sprod,2,2)
+       amp_z = A0_ZZ_4f(3,j1,j2,4,za,zb,sprod,jSel,iSel)
 
        restmp = ((abs(amp_z(-1,-1))**2) + &
             (abs(amp_z(-1,+1))**2) + &
@@ -2604,7 +2604,7 @@ module modHiggsJJ
 
     if( (jSel.eq.pdfDn_ .and. iSel.eq.pdfADn_) .or. (jSel.eq.pdfStr_ .and. iSel.eq.pdfAStr_)  .or. (jSel.eq.pdfDn_ .and. iSel.eq.pdfAStr_)  .or. (jSel.eq.pdfStr_ .and. iSel.eq.pdfADn_) ) then
        if( zz_fusion ) then
-          amp_z = A0_ZZ_4f(3,j1,j2,4,za,zb,sprod,2,2)
+          amp_z = A0_ZZ_4f(3,j1,j2,4,za,zb,sprod,jSel,iSel)
           restmp = ((abs(amp_z(-1,-1))**2) + &
                (abs(amp_z(-1,+1))**2) + &
                (abs(amp_z(+1,-1))**2) + &
@@ -2633,7 +2633,7 @@ module modHiggsJJ
     if( (jSel.eq.pdfUp_ .and. iSel.eq.pdfChm_) ) then
 
        !-- non-symmetric qq processes
-       amp_z = A0_ZZ_4f(3,j1,4,j2,za,zb,sprod,1,1)
+       amp_z = A0_ZZ_4f(3,j1,4,j2,za,zb,sprod,jSel,iSel)
        !--uc -> uc
        restmp = ((abs(amp_z(-1,-1))**2) + &
             (abs(amp_z(-1,+1))**2) + &
@@ -2651,7 +2651,7 @@ module modHiggsJJ
     !--us -> us/cd
     if( (jSel.eq.pdfUp_ .and. iSel.eq.pdfBot_) .or. (jSel.eq.pdfChm_ .and. iSel.eq.pdfBot_) ) then
 
-       amp_z = A0_ZZ_4f(3,j1,4,j2,za,zb,sprod,1,2)
+       amp_z = A0_ZZ_4f(3,j1,4,j2,za,zb,sprod,jSel,iSel)
        restmp = ((abs(amp_z(-1,-1))**2) + &
             (abs(amp_z(-1,+1))**2) + &
             (abs(amp_z(+1,-1))**2) + &
@@ -2671,7 +2671,7 @@ module modHiggsJJ
     if( (jSel.eq.pdfUp_ .and. iSel.eq.pdfStr_) .or. (jSel.eq.pdfChm_ .and. iSel.eq.pdfDn_) ) then
 
        if( zz_fusion ) then
-          amp_z = A0_ZZ_4f(3,j1,4,j2,za,zb,sprod,1,2)
+          amp_z = A0_ZZ_4f(3,j1,4,j2,za,zb,sprod,jSel,iSel)
           restmp = ((abs(amp_z(-1,-1))**2) + &
                (abs(amp_z(-1,+1))**2) + &
                (abs(amp_z(+1,-1))**2) + &
@@ -2695,7 +2695,7 @@ module modHiggsJJ
     !--ds -> ds
     if( (jSel.eq.pdfDn_ .and. iSel.eq.pdfStr_) .or. (jSel.eq.pdfDn_ .and. iSel.eq.pdfBot_) .or. (jSel.eq.pdfStr_ .and. iSel.eq.pdfBot_) ) then
 
-       amp_z = A0_ZZ_4f(3,j1,4,j2,za,zb,sprod,2,2)
+       amp_z = A0_ZZ_4f(3,j1,4,j2,za,zb,sprod,jSel,iSel)
        restmp = ((abs(amp_z(-1,-1))**2) + &
             (abs(amp_z(-1,+1))**2) + &
             (abs(amp_z(+1,-1))**2) + &
@@ -2717,7 +2717,7 @@ module modHiggsJJ
 
     !-- qbqb processes
     if( (jSel.eq.pdfAUp_ .and. iSel.eq.pdfAChm_) ) then
-       amp_z = A0_ZZ_4f(j1,3,j2,4,za,zb,sprod,1,1)
+       amp_z = A0_ZZ_4f(j1,3,j2,4,za,zb,sprod,jSel,iSel)
        !--ubcb -> ubcb
        restmp = ((abs(amp_z(-1,-1))**2)+ &
             (abs(amp_z(-1,+1))**2) + &
@@ -2735,7 +2735,7 @@ module modHiggsJJ
 
     !--ubsb -> ubsb//cbdb
     if( (jSel.eq.pdfAUp_ .and. iSel.eq.pdfABot_) .or. (jSel.eq.pdfAChm_ .and. iSel.eq.pdfABot_) ) then
-       amp_z = A0_ZZ_4f(j1,3,j2,4,za,zb,sprod,1,2)
+       amp_z = A0_ZZ_4f(j1,3,j2,4,za,zb,sprod,jSel,iSel)
        restmp = ((abs(amp_z(-1,-1))**2) + &
             (abs(amp_z(-1,+1))**2) + &
             (abs(amp_z(+1,-1))**2) + &
@@ -2755,7 +2755,7 @@ module modHiggsJJ
 
     if( (jSel.eq.pdfAUp_ .and. iSel.eq.pdfAStr_) .or. (jSel.eq.pdfAChm_ .and. iSel.eq.pdfADn_) ) then
        if( zz_fusion ) then
-          amp_z = A0_ZZ_4f(j1,3,j2,4,za,zb,sprod,1,2)
+          amp_z = A0_ZZ_4f(j1,3,j2,4,za,zb,sprod,jSel,iSel)
           restmp = ((abs(amp_z(-1,-1))**2) + &
                (abs(amp_z(-1,+1))**2) + &
                (abs(amp_z(+1,-1))**2) + &
@@ -2778,7 +2778,7 @@ module modHiggsJJ
     !--dbsb -> dbsb
     if( (jSel.eq.pdfADn_ .and. iSel.eq.pdfAStr_) .or. (jSel.eq.pdfADn_ .and. iSel.eq.pdfABot_) .or. (jSel.eq.pdfAStr_ .and. iSel.eq.pdfABot_) ) then
 
-       amp_z = A0_ZZ_4f(j1,3,j2,4,za,zb,sprod,2,2)
+       amp_z = A0_ZZ_4f(j1,3,j2,4,za,zb,sprod,jSel,iSel)
        restmp = ((abs(amp_z(-1,-1))**2) + &
             (abs(amp_z(-1,+1))**2) + &
             (abs(amp_z(+1,-1))**2) + &
@@ -2830,6 +2830,8 @@ module modHiggsJJ
     kfactor_w=1.0_dp
     restmp=0.0_dp
 
+    line_i=0
+    line_j=0
     jz1 = 1
     jz2 = 2
     jw1 = jz1
@@ -2897,16 +2899,8 @@ module modHiggsJJ
     endif
 
     if(ZZ_fusion) then
-       if (abs(iSel).eq.pdfUp_ .or. abs(iSel).eq.pdfChm_) then ! u-current couplings
-          line_i = 1
-       else ! d-current couplings
-          line_i = 2
-       endif
-       if (abs(jSel).eq.pdfUp_ .or. abs(jSel).eq.pdfChm_) then ! u-current couplings
-          line_j = 1
-       else ! d-current couplings
-          line_j = 2
-       endif
+       line_i = iSel
+       line_j = jSel
     endif
 
     if(WW_fusion) then
@@ -3279,40 +3273,47 @@ module modHiggsJJ
 
   end function A0_VV_4f
 
-  !--           line = 1/2 --> up/down couplings included
-  function A0_ZZ_4f(j1,j2,j3,j4,za,zb,sprod,line1,line2)
+  !--           line = 1/2 --> down/up couplings included
+  function A0_ZZ_4f(j1,j2,j3,j4,za,zb,sprod,iSel,jSel)
     use modMisc
     implicit none
-    real(dp), dimension(2) :: Lz
-    real(dp), dimension(2) :: Rz
-    real(dp), parameter, dimension(2) :: La = (/QuL,QdL/)
-    real(dp), parameter, dimension(2) :: Ra = (/QuR,QdR/)
-    complex(dp) :: A0_ZZ_4f(-1:1,-1:1)!,LCT(1:2),RCT(1:2)
-    integer :: j1,j2,j3,j4,line1,line2
+    real(dp), dimension(5) :: Lz,Rz,LCT,RCT
+    real(dp), parameter, dimension(5) :: La = (/QdL,QuL,QdL,QuL,QdL/)
+    real(dp), parameter, dimension(5) :: Ra = (/QdR,QuR,QdR,QuR,QdR/)
+    complex(dp) :: A0_ZZ_4f(-1:1,-1:1)
+    integer :: j1,j2,j3,j4,iSel,jSel,line1,line2
     complex(dp) :: za(4,4),zb(4,4)
     real(dp) :: sprod(4,4)
     real(dp) :: mhsq,q1q2,kcoupl,q12sq,q34sq
     complex(dp) :: a1_zz,a2_zz,a3_zz,struc_zz(3)
     complex(dp) :: a1_aa,a2_aa,a3_aa,a1_az,a2_az,a3_az,a1_za,a2_za,a3_za
+    complex(dp) :: a1_zzp,a2_zzp,a3_zzp,struc_zzp(3)
+    complex(dp) :: a1_zpz,a2_zpz,a3_zpz,struc_zpz(3)
+    complex(dp) :: a1_zpzp,a2_zpzp,a3_zpzp,struc_zpzp(3)
     complex(dp) :: struc_aa(3),struc_az(3),struc_za(3)
     complex(dp) :: helcoup(1:3,-1:1,-1:1)
     complex(dp) :: zab2
-    complex(dp) :: iprop12,iprop34
+    complex(dp) :: iprop12,iprop34, zpprop12,zpprop34
     complex(dp) :: vvcoupl_prime_zz(4),vvcoupl_prime_az(4),vvcoupl_prime_za(4),vvcoupl_prime_aa(2:4)
+    complex(dp) :: vvcoupl_prime_zzp(4),vvcoupl_prime_zpz(4),vvcoupl_prime_zpzp(4)
     integer :: vv_it
     integer :: i,j,k,l
 
     zab2(j1,j2,j3,j4) = za(j1,j2)*zb(j2,j4) + za(j1,j3)*zb(j3,j4)
 
-
-    Lz = (/aL_Qup,aL_Qdn/)
-    Rz = (/aR_Qup,aR_Qdn/)
-
-    !LCT = (/ehz_L_U,ehz_L_D/)
-    !RCT = (/ehz_R_U,ehz_R_D/)
-
-
     A0_ZZ_4f = czero
+
+    Lz = (/aL_Qdn,aL_Qup,aL_Qdn,aL_Qup,aL_Qdn/)
+    Rz = (/aR_Qdn,aR_Qup,aR_Qdn,aR_Qup,aR_Qdn/)
+
+    LCT = (/ezp_Dn_left,ezp_Up_left,ezp_Str_left,ezp_Chm_left,ezp_Bot_left/)
+    RCT = (/ezp_Dn_right,ezp_Up_right,ezp_Str_right,ezp_Chm_right,ezp_Bot_right/)
+
+    if( abs(iSel).eq.pdfTop_ .or. abs(jSel).eq.pdfTop_ ) return
+    if( abs(iSel).eq.pdfGlu_ .or. abs(jSel).eq.pdfGlu_ ) return
+
+    line1=abs(iSel)
+    line2=abs(jSel)
 
     q1q2 = (sprod(j1,j3)+sprod(j1,j4)+sprod(j2,j3)+sprod(j2,j4))/two
     mhsq = two * q1q2 + sprod(j1,j2) + sprod(j3,j4)
@@ -3345,7 +3346,6 @@ module modHiggsJJ
           vvcoupl_prime_az(vv_it) = HVVSpinZeroDynamicCoupling(vv_it+4,0d0,q12sq,mhsq)
           vvcoupl_prime_za(vv_it) = HVVSpinZeroDynamicCoupling(vv_it+4,0d0,q34sq,mhsq)
        enddo
-
        do vv_it=1,3
           vvcoupl_prime_aa(vv_it+1) = HVVSpinZeroDynamicCoupling(vv_it+8,q12sq,q34sq,mhsq)
        enddo
@@ -3377,8 +3377,6 @@ module modHiggsJJ
        struc_za(3) = two * ci * a3_za
        struc_za(:) = struc_za(:) * couplAZff
 
-       !--
-
        helcoup(1:3,-1,-1) = struc_zz(1:3) * Lz(line1) * Lz(line2)/iprop12/iprop34 + &
                             struc_aa(1:3) * La(line1) * La(line2)/q12sq  /q34sq   + &
                             struc_az(1:3) * La(line1) * Lz(line2)/q12sq  /iprop34 + &
@@ -3399,32 +3397,6 @@ module modHiggsJJ
                             struc_az(1:3) * Ra(line1) * Rz(line2)/q12sq  /iprop34 + &
                             struc_za(1:3) * Rz(line1) * Ra(line2)/iprop12/q34sq
 
-
-!      adding contact terms
-!        helcoup(1:3,-1,-1) = helcoup(1:3,-1,-1) + struc_zz(1:3) * LCT(line1) * Lz(line2)/iprop34 + &
-!                                                  struc_za(1:3) * LCT(line1) * La(line2)/q34sq   + &       
-!                                                  struc_zz(1:3) *  Lz(line1) *LCT(line2)/iprop12 + &  
-!                                                  struc_az(1:3) *  Lz(line1) *LCT(line2)/q12sq   + &
-!                                                  struc_zz(1:3) * LCT(line1) *LCT(line2)
-!                                                  
-!        helcoup(1:3,-1,+1) = helcoup(1:3,-1,+1) + struc_zz(1:3) * LCT(line1) * Rz(line2)/iprop34 + &
-!                                                  struc_za(1:3) * LCT(line1) * Ra(line2)/q34sq   + &       
-!                                                  struc_zz(1:3) *  Lz(line1) *RCT(line2)/iprop12 + &
-!                                                  struc_az(1:3) *  Lz(line1) *RCT(line2)/q12sq   + &
-!                                                  struc_zz(1:3) * LCT(line1) *RCT(line2)
-!                                                  
-!        helcoup(1:3,+1,-1) = helcoup(1:3,+1,-1) + struc_zz(1:3) * RCT(line1) * Lz(line2)/iprop34 + &
-!                                                  struc_za(1:3) * RCT(line1) * La(line2)/q34sq   + &   
-!                                                  struc_zz(1:3) *  Rz(line1) *LCT(line2)/iprop12 + &
-!                                                  struc_az(1:3) *  Rz(line1) *LCT(line2)/q12sq   + &
-!                                                  struc_zz(1:3) * RCT(line1) *LCT(line2)
-!                                                  
-!        helcoup(1:3,+1,+1) = helcoup(1:3,+1,+1) + struc_zz(1:3) * RCT(line1) * Rz(line2)/iprop34 + &
-!                                                  struc_za(1:3) * RCT(line1) * Ra(line2)/q34sq   + &     
-!                                                  struc_zz(1:3) *  Rz(line1) *RCT(line2)/iprop12 + &
-!                                                  struc_az(1:3) *  Rz(line1) *RCT(line2)/q12sq   + &
-!                                                  struc_zz(1:3) * RCT(line1) *RCT(line2)
-                                   
     else
 
        helcoup(1:3,-1,-1) = struc_zz(1:3) * Lz(line1) * Lz(line2)/iprop12/iprop34
@@ -3432,23 +3404,77 @@ module modHiggsJJ
        helcoup(1:3,+1,-1) = struc_zz(1:3) * Rz(line1) * Lz(line2)/iprop12/iprop34
        helcoup(1:3,+1,+1) = struc_zz(1:3) * Rz(line1) * Rz(line2)/iprop12/iprop34
 
-! !      adding contact terms
-!        helcoup(1:3,-1,-1) = helcoup(1:3,-1,-1) + struc_zz(1:3) * LCT(line1) * Lz(line2)/iprop34 + &
-!                                                  struc_zz(1:3) *  Lz(line1) *LCT(line2)/iprop12 + &
-!                                                  struc_zz(1:3) * LCT(line1) *LCT(line2)
-!        helcoup(1:3,-1,+1) = helcoup(1:3,-1,+1) + struc_zz(1:3) * LCT(line1) * Rz(line2)/iprop34 + &
-!                                                  struc_zz(1:3) *  Lz(line1) *RCT(line2)/iprop12 + &
-!                                                  struc_zz(1:3) * LCT(line1) *RCT(line2)
-!        helcoup(1:3,+1,-1) = helcoup(1:3,+1,-1) + struc_zz(1:3) * RCT(line1) * Lz(line2)/iprop34 + &
-!                                                  struc_zz(1:3) *  Rz(line1) *LCT(line2)/iprop12 + &
-!                                                  struc_zz(1:3) * RCT(line1) *LCT(line2)
-!        helcoup(1:3,+1,+1) = helcoup(1:3,+1,+1) + struc_zz(1:3) * RCT(line1) * Rz(line2)/iprop34 + &
-!                                                  struc_zz(1:3) *  Rz(line1) *RCT(line2)/iprop12 + &
-!                                                  struc_zz(1:3) * RCT(line1) *RCT(line2)
-       
     endif
 
-    
+    if ( includeVprime ) then
+
+       do vv_it=1,4
+          vvcoupl_prime_zzp(vv_it) = HVVSpinZeroDynamicCoupling(11+vv_it,q12sq,q34sq,mhsq)
+          vvcoupl_prime_zpz(vv_it) = HVVSpinZeroDynamicCoupling(11+vv_it,q34sq,q12sq,mhsq)
+          vvcoupl_prime_zpzp(vv_it) = HVVSpinZeroDynamicCoupling(15+vv_it,q12sq,q34sq,mhsq)
+       enddo
+
+       if( UseVprime ) then
+          if (M_Zprime.gt.0d0) then
+             zpprop12 = q12sq - M_Zprime**2 + ci * M_Zprime * Ga_Zprime
+             zpprop34 = q34sq - M_Zprime**2 + ci * M_Zprime * Ga_Zprime
+          else
+             zpprop12 = q12sq
+             zpprop34 = q34sq
+          endif
+       else
+          zpprop12 = M_Z**2
+          zpprop34 = M_Z**2
+       endif
+
+
+       a1_zzp = vvcoupl_prime_zzp(1) * M_Z**2/mhsq + vvcoupl_prime_zzp(2) * two * q1q2/mhsq + vvcoupl_prime_zzp(3) * kcoupl * q1q2/mhsq
+       a2_zzp = -two * vvcoupl_prime_zzp(2) - kcoupl * vvcoupl_prime_zzp(3)
+       a3_zzp = -two * vvcoupl_prime_zzp(4)
+       a1_zpz = vvcoupl_prime_zpz(1) * M_Z**2/mhsq + vvcoupl_prime_zpz(2) * two * q1q2/mhsq + vvcoupl_prime_zpz(3) * kcoupl * q1q2/mhsq
+       a2_zpz = -two * vvcoupl_prime_zpz(2) - kcoupl * vvcoupl_prime_zpz(3)
+       a3_zpz = -two * vvcoupl_prime_zpz(4)
+       a1_zpzp = vvcoupl_prime_zpzp(1) * M_Z**2/mhsq + vvcoupl_prime_zpzp(2) * two * q1q2/mhsq + vvcoupl_prime_zpzp(3) * kcoupl * q1q2/mhsq
+       a2_zpzp = -two * vvcoupl_prime_zpzp(2) - kcoupl * vvcoupl_prime_zpzp(3)
+       a3_zpzp = -two * vvcoupl_prime_zpzp(4)
+
+       struc_zzp(1) = two * (a1_zzp * mhsq - ci * a3_zzp * q1q2)
+       struc_zzp(2) = (a2_zzp + ci * a3_zzp)
+       struc_zzp(3) = two * ci * a3_zzp
+       struc_zpz(1) = two * (a1_zpz * mhsq - ci * a3_zpz * q1q2)
+       struc_zpz(2) = (a2_zpz + ci * a3_zpz)
+       struc_zpz(3) = two * ci * a3_zpz
+       struc_zpzp(1) = two * (a1_zpzp * mhsq - ci * a3_zpzp * q1q2)
+       struc_zpzp(2) = (a2_zpzp + ci * a3_zpzp)
+       struc_zpzp(3) = two * ci * a3_zpzp
+
+       struc_zzp(:) = struc_zzp(:) * couplZffsq
+       struc_zpz(:) = struc_zpz(:) * couplZffsq
+       struc_zpzp(:) = struc_zpzp(:) * couplZffsq
+
+       helcoup(1:3,-1,-1) = struc_zz(1:3) * Lz(line1) * Lz(line2)/iprop12/iprop34 + &
+                            struc_zpzp(1:3) * LCT(line1) * LCT(line2)/zpprop12  /zpprop34   + &
+                            struc_zpz(1:3) * LCT(line1) * Lz(line2)/zpprop12  /iprop34 + &
+                            struc_zzp(1:3) * Lz(line1) * LCT(line2)/iprop12/zpprop34
+
+       helcoup(1:3,-1,+1) = struc_zz(1:3) * Lz(line1) * Rz(line2)/iprop12/iprop34 + &
+                            struc_zpzp(1:3) * LCT(line1) * RCT(line2)/zpprop12  /zpprop34   + &
+                            struc_zpz(1:3) * LCT(line1) * Rz(line2)/zpprop12  /iprop34 + &
+                            struc_zzp(1:3) * Lz(line1) * RCT(line2)/iprop12/zpprop34
+
+       helcoup(1:3,+1,-1) = struc_zz(1:3) * Rz(line1) * Lz(line2)/iprop12/iprop34 + &
+                            struc_zpzp(1:3) * RCT(line1) * LCT(line2)/zpprop12  /zpprop34   + &
+                            struc_zpz(1:3) * RCT(line1) * Lz(line2)/zpprop12  /iprop34 + &
+                            struc_zzp(1:3) * Rz(line1) * LCT(line2)/iprop12/zpprop34
+
+       helcoup(1:3,+1,+1) = struc_zz(1:3) * Rz(line1) * Rz(line2)/iprop12/iprop34 + &
+                            struc_zpzp(1:3) * RCT(line1) * RCT(line2)/zpprop12  /zpprop34   + &
+                            struc_zpz(1:3) * RCT(line1) * Rz(line2)/zpprop12  /iprop34 + &
+                            struc_zzp(1:3) * Rz(line1) * RCT(line2)/iprop12/zpprop34
+
+    endif
+
+
 
     A0_ZZ_4f(-1,-1) = za(j1,j3)*zb(j4,j2) * helcoup(1,-1,-1) + &
          zab2(j1,j3,j4,j2)*zab2(j3,j1,j2,j4) * helcoup(2,-1,-1) + &

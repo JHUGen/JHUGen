@@ -334,8 +334,12 @@ real(8), public, parameter :: Lambda  = 1000d0    *GeV      ! Lambda coupling en
    complex(8), public :: ewp_Top_left  = (0d0,0d0)
    complex(8), public :: ewp_Top_right  = (0d0,0d0)
 !--
-   real(8), public :: M_Vprime  = 10000d0*GeV
-   real(8), public :: Ga_Vprime = 100d0*GeV
+   real(8), public :: M_Zprime = -1d0
+   real(8), public :: Ga_Zprime = -1d0
+   real(8), public :: M_Wprime = -1d0
+   real(8), public :: Ga_Wprime = -1d0
+   real(8), public :: M_Vprime
+   real(8), public :: Ga_Vprime
 
 
 !-- parameters that define q^2 dependent form factors
@@ -607,6 +611,8 @@ integer, public, target :: NuM_ = 15
 integer, public, target :: NuT_ = 16
 integer, public, target :: Hig_ = 25
 integer, public, target :: Zpr_ = 32
+integer, public, target :: Zpr2_ = 33
+integer, public, target :: Wppr_ = 34
 integer, public, target :: Gra_ = 39
 
 integer, public, target :: AUp_  = -1
@@ -622,6 +628,7 @@ integer, public, target :: Wm_   = -13
 integer, public, target :: ANuE_ = -14
 integer, public, target :: ANuM_ = -15
 integer, public, target :: ANuT_ = -16
+integer, public, target :: Wmpr_ = -34
 
 integer, public, parameter :: Not_a_particle_  = -9000
 real(8), public, parameter :: Mom_Not_a_particle(1:4) = (/0d0,0d0,0d0,0d0/)
@@ -1033,6 +1040,14 @@ integer :: Part
       convertLHEreverse = Hig_
   elseif( Part.eq.-25) then
       convertLHEreverse = Hig_
+  elseif( Part.eq.32) then
+      convertLHEreverse = Zpr_
+  elseif( Part.eq.33) then
+      convertLHEreverse = Zpr2_
+  elseif( Part.eq.34) then
+      convertLHEreverse = Wppr_
+  elseif( Part.eq.-34) then
+      convertLHEreverse = Wmpr_
   else
       print *, "MYLHE format not implemented for ",Part
       stop
@@ -1113,6 +1128,12 @@ integer :: Part
       convertLHE =25
   elseif( Part.eq.Zpr_) then
       convertLHE =32
+  elseif( Part.eq.Zpr2_) then
+      convertLHE =33
+  elseif( Part.eq.Wppr_) then
+      convertLHE =34
+  elseif( Part.eq.Wmpr_) then
+      convertLHE =-34
   elseif( Part.eq.Gra_) then
       convertLHE =39
   elseif( Part.le.Not_a_particle_) then
@@ -1222,8 +1243,12 @@ integer :: Part
       m_top = mass
   elseif( Part.eq.abs(Z0_) ) then
       M_Z = mass
+  elseif( Part.eq.abs(Zpr_) ) then
+      M_Zprime = mass
   elseif( Part.eq.abs(Wp_) ) then
       M_W = mass
+  elseif( Part.eq.abs(Wppr_) ) then
+      M_Wprime = mass
   elseif( Part.eq.abs(Hig_) ) then
       M_Reso = mass
   endif
@@ -1244,8 +1269,12 @@ integer :: Part
       Ga_Top = width
   elseif( Part.eq.abs(Z0_) ) then
       Ga_Z = width
+  elseif( Part.eq.abs(Zpr_) ) then
+      Ga_Zprime = width
   elseif( Part.eq.abs(Wp_) ) then
       Ga_W = width
+  elseif( Part.eq.abs(Wppr_) ) then
+      Ga_Wprime = width
   elseif( Part.eq.abs(Hig_) ) then
       Ga_Reso = width
   endif
@@ -1288,8 +1317,12 @@ integer :: Part
       getMass = m_top
   elseif( abs(Part).eq.abs(Z0_) ) then
       getMass = M_Z
+  elseif( abs(Part).eq.abs(Zpr_) ) then
+      getMass = M_Zprime
   elseif( abs(Part).eq.abs(Wp_) ) then
       getMass = M_W
+  elseif( abs(Part).eq.abs(Wppr_) ) then
+      getMass = M_Wprime
   elseif( abs(Part).eq.abs(Pho_) ) then
       getMass = 0d0
   elseif( abs(Part).eq.abs(Hig_) ) then
@@ -1314,8 +1347,12 @@ integer :: Part
       getDecayWidth = Ga_Top
   elseif( abs(Part).eq.abs(Z0_) ) then
       getDecayWidth = Ga_Z
+  elseif( abs(Part).eq.abs(Zpr_) ) then
+      getDecayWidth = Ga_Zprime
   elseif( abs(Part).eq.abs(Wp_) ) then
       getDecayWidth = Ga_W
+  elseif( abs(Part).eq.abs(Wppr_) ) then
+      getDecayWidth = Ga_Wprime
   elseif( abs(Part).eq.abs(Hig_) ) then
       getDecayWidth = Ga_Reso
   elseif( abs(Part).eq.abs(TaM_) ) then
@@ -1385,10 +1422,16 @@ integer :: Part
       getParticle = "Atop"
   elseif( Part.eq.Z0_ ) then
       getParticle = " Z0"
+  elseif( Part.eq.Zpr_ ) then
+      getParticle = " Zprime"
   elseif( Part.eq.Wp_ ) then
       getParticle = " W+"
   elseif( Part.eq.Wm_ ) then
       getParticle = " W-"
+  elseif( Part.eq.Wppr_ ) then
+      getParticle = " W+prime"
+  elseif( Part.eq.Wmpr_ ) then
+      getParticle = " W-prime"
   elseif( Part.eq.Pho_ ) then
       getParticle = "pho"
   elseif( Part.eq.Hig_ ) then

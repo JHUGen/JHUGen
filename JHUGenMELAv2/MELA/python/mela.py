@@ -415,8 +415,10 @@ class Mela(object):
   ewp_Top_right = SelfDCoupling("selfDWpffcoupl", ROOT.py_gHIGGS_Vp_Top_right)
 
   UseVprime = SelfDParameter("selfDUseVprime")
-  M_Vprime = SelfDParameter("selfDM_Vprime")
-  Ga_Vprime = SelfDParameter("selfDGa_Vprime")
+  M_Zprime = SelfDParameter("selfDM_Zprime")
+  Ga_Zprime = SelfDParameter("selfDGa_Zprime")
+  M_Wprime = SelfDParameter("selfDM_Wprime")
+  Ga_Wprime = SelfDParameter("selfDGa_Wprime")
 
   zprime_qq_left = SelfDCoupling("selfDZqqcoupl", ROOT.py_gZPRIME_QQ_LEFT)
   zprime_qq_right = SelfDCoupling("selfDZqqcoupl", ROOT.py_gZPRIME_QQ_RIGHT)

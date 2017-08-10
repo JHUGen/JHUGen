@@ -21,10 +21,11 @@ extern "C" {
   void __modjhugenmela_MOD_setspinzeroggcouplings(double ggcoupl[SIZE_HGG][2]);
   void __modjhugenmela_MOD_setspinzeroqqcouplings(double qqcoupl[SIZE_HQQ][2]);
   void __modjhugenmela_MOD_setspinzerovvcouplings(double vvcoupl[SIZE_HVV][2], int cqsq[SIZE_HVV_CQSQ], double Lambda_qsq[SIZE_HVV_LAMBDAQSQ][SIZE_HVV_CQSQ], int* usewwcoupl); // YES, THE LAST ARGUMENT IS AN INT!
-  void __modjhugenmela_MOD_setspinzerocontactterms(double Hzzpcoupl[SIZE_HVV][2], double Hzpzpcoupl[SIZE_HVV][2], double Zpffcoupl[SIZE_Vpff][2], double Hwwpcoupl[SIZE_HVV][2], double Hwpwpcoupl[SIZE_HVV][2], double Wpffcoupl[SIZE_Vpff][2], int* UseVp, double* M_Vp, double* Ga_Vp);
+  void __modjhugenmela_MOD_setspinzerocontactterms(double Hzzpcoupl[SIZE_HVV][2], double Hzpzpcoupl[SIZE_HVV][2], double Zpffcoupl[SIZE_Vpff][2], double Hwwpcoupl[SIZE_HVV][2], double Hwpwpcoupl[SIZE_HVV][2], double Wpffcoupl[SIZE_Vpff][2], int* UseVp);
   void __modjhugenmela_MOD_settopdecays(int* flag);
 
   void __modjhugenmela_MOD_getmvgv(double* mv, double* gv);
+  void __modjhugenmela_MOD_getmvprimegvprime(double* mv, double* gv);
   void __modjhugenmela_MOD_getalphasalphasmz(double* val_as, double* val_asmz);
   void __modjhugenmela_MOD_getpdfconstants(double* pdfzmass, int* pdfnloops, int* pdfnf);
   void __modjhugenmela_MOD_getdecaycouplings(int* VVMode, int idordered[4], double* aL1, double* aR1, double* aL2, double* aR2);
