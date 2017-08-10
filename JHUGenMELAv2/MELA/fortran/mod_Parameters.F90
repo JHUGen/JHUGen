@@ -335,9 +335,9 @@ real(8), public, parameter :: Lambda  = 1000d0    *GeV      ! Lambda coupling en
    complex(8), public :: ewp_Top_right  = (0d0,0d0)
 !--
    real(8), public :: M_Zprime = -1d0
-   real(8), public :: Ga_Zprime = -1d0
+   real(8), public :: Ga_Zprime = 0d0
    real(8), public :: M_Wprime = -1d0
-   real(8), public :: Ga_Wprime = -1d0
+   real(8), public :: Ga_Wprime = 0d0
    real(8), public :: M_Vprime
    real(8), public :: Ga_Vprime
 

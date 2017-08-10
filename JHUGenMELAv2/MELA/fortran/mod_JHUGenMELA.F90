@@ -498,7 +498,7 @@ implicit none
     M_V = 0d0
     Ga_V= 0d0
     M_Vprime = -1d0
-    Ga_Vprime= -1d0
+    Ga_Vprime= 0d0
   endif
 end subroutine SetMVGV
 
@@ -519,7 +519,7 @@ integer idV
     M_V = 0d0
     Ga_V= 0d0
     M_Vprime = -1d0
-    Ga_Vprime= -1d0
+    Ga_Vprime= 0d0
   endif
 end subroutine
 
