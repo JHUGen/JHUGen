@@ -293,55 +293,6 @@ real(8), public, parameter :: Lambda  = 1000d0    *GeV      ! Lambda coupling en
    complex(8), public :: ghgsgs3 = (0d0,0d0)
    complex(8), public :: ghgsgs4 = (0d0,0d0)
 
-!-- HVV contact terms
-   logical, public :: UseVprime=.false.  ! false: contact interaction,  true: heavy Zprime propagator
-   complex(8), public :: ghzzp1 = (0d0,0d0)
-   complex(8), public :: ghzpzp1 = (0d0,0d0)
-   complex(8), public :: ezp_El_left  = (0d0,0d0)
-   complex(8), public :: ezp_El_right  = (0d0,0d0)
-   complex(8), public :: ezp_Mu_left  = (0d0,0d0)
-   complex(8), public :: ezp_Mu_right  = (0d0,0d0)
-   complex(8), public :: ezp_Ta_left  = (0d0,0d0)
-   complex(8), public :: ezp_Ta_right  = (0d0,0d0)
-   complex(8), public :: ezp_NuE_left  = (0d0,0d0)
-   complex(8), public :: ezp_NuE_right  = (0d0,0d0)
-   complex(8), public :: ezp_Up_left  = (0d0,0d0)
-   complex(8), public :: ezp_Up_right  = (0d0,0d0)
-   complex(8), public :: ezp_Chm_left  = (0d0,0d0)
-   complex(8), public :: ezp_Chm_right  = (0d0,0d0)
-   complex(8), public :: ezp_Dn_left  = (0d0,0d0)
-   complex(8), public :: ezp_Dn_right  = (0d0,0d0)
-   complex(8), public :: ezp_Str_left  = (0d0,0d0)
-   complex(8), public :: ezp_Str_right  = (0d0,0d0)
-   complex(8), public :: ezp_Bot_left  = (0d0,0d0)
-   complex(8), public :: ezp_Bot_right  = (0d0,0d0)
-   complex(8), public :: ezp_Top_left  = (0d0,0d0)
-   complex(8), public :: ezp_Top_right  = (0d0,0d0)
-!--
-!-- HWW couplings are only used if distinguish_HWWcouplings=.true.
-   complex(8), public :: ghwwp1 = (0d0,0d0)
-   complex(8), public :: ghwpwp1 = (0d0,0d0)
-   complex(8), public :: ewp_El_left  = (0d0,0d0)
-   complex(8), public :: ewp_El_right  = (0d0,0d0)
-   complex(8), public :: ewp_Mu_left  = (0d0,0d0)
-   complex(8), public :: ewp_Mu_right  = (0d0,0d0)
-   complex(8), public :: ewp_Ta_left  = (0d0,0d0)
-   complex(8), public :: ewp_Ta_right  = (0d0,0d0)
-   complex(8), public :: ewp_Up_left  = (0d0,0d0)
-   complex(8), public :: ewp_Up_right  = (0d0,0d0)
-   complex(8), public :: ewp_Chm_left  = (0d0,0d0)
-   complex(8), public :: ewp_Chm_right  = (0d0,0d0)
-   complex(8), public :: ewp_Top_left  = (0d0,0d0)
-   complex(8), public :: ewp_Top_right  = (0d0,0d0)
-!--
-   real(8), public :: M_Zprime = -1d0
-   real(8), public :: Ga_Zprime = 0d0
-   real(8), public :: M_Wprime = -1d0
-   real(8), public :: Ga_Wprime = 0d0
-   real(8), public :: M_Vprime
-   real(8), public :: Ga_Vprime
-
-
 !-- parameters that define q^2 dependent form factors
    complex(8), public :: ghz1_prime = (0d0,0d0)
    complex(8), public :: ghz1_prime2= (0d0,0d0)
@@ -376,6 +327,9 @@ real(8), public, parameter :: Lambda  = 1000d0    *GeV      ! Lambda coupling en
    complex(8), public :: ghz4_prime7= (0d0,0d0)
 
    complex(8), public :: ghzgs1_prime2= (0d0,0d0)
+
+   complex(8), public :: ghzzp1 = (0d0,0d0)
+   complex(8), public :: ghzpzp1 = (0d0,0d0)
 
    real(8),    public, parameter :: Lambda_z1 = 10000d0*GeV
    real(8),    public, parameter :: Lambda_z2 = 10000d0*GeV
@@ -442,6 +396,9 @@ real(8), public, parameter :: Lambda  = 1000d0    *GeV      ! Lambda coupling en
    complex(8), public :: ghw4_prime6= (0d0,0d0)
    complex(8), public :: ghw4_prime7= (0d0,0d0)
 
+   complex(8), public :: ghwwp1 = (0d0,0d0)
+   complex(8), public :: ghwpwp1 = (0d0,0d0)
+
    real(8),    public, parameter :: Lambda_w1 = 10000d0*GeV
    real(8),    public, parameter :: Lambda_w2 = 10000d0*GeV
    real(8),    public, parameter :: Lambda_w3 = 10000d0*GeV
@@ -463,6 +420,49 @@ real(8), public, parameter :: Lambda  = 1000d0    *GeV      ! Lambda coupling en
    real(8),    public :: Lambda_w20 = 100d0*GeV
    real(8),    public :: Lambda_w30 = 100d0*GeV
    real(8),    public :: Lambda_w40 = 100d0*GeV
+
+!-- HVV contact terms
+   logical, public :: UseVprime=.false.  ! false: contact interaction,  true: heavy Zprime propagator
+   complex(8), public :: ezp_El_left  = (0d0,0d0)
+   complex(8), public :: ezp_El_right  = (0d0,0d0)
+   complex(8), public :: ezp_Mu_left  = (0d0,0d0)
+   complex(8), public :: ezp_Mu_right  = (0d0,0d0)
+   complex(8), public :: ezp_Ta_left  = (0d0,0d0)
+   complex(8), public :: ezp_Ta_right  = (0d0,0d0)
+   complex(8), public :: ezp_NuE_left  = (0d0,0d0)
+   complex(8), public :: ezp_NuE_right  = (0d0,0d0)
+   complex(8), public :: ezp_Up_left  = (0d0,0d0)
+   complex(8), public :: ezp_Up_right  = (0d0,0d0)
+   complex(8), public :: ezp_Chm_left  = (0d0,0d0)
+   complex(8), public :: ezp_Chm_right  = (0d0,0d0)
+   complex(8), public :: ezp_Dn_left  = (0d0,0d0)
+   complex(8), public :: ezp_Dn_right  = (0d0,0d0)
+   complex(8), public :: ezp_Str_left  = (0d0,0d0)
+   complex(8), public :: ezp_Str_right  = (0d0,0d0)
+   complex(8), public :: ezp_Bot_left  = (0d0,0d0)
+   complex(8), public :: ezp_Bot_right  = (0d0,0d0)
+   complex(8), public :: ezp_Top_left  = (0d0,0d0)
+   complex(8), public :: ezp_Top_right  = (0d0,0d0)
+!--
+   complex(8), public :: ewp_El_left  = (0d0,0d0)
+   complex(8), public :: ewp_El_right  = (0d0,0d0)
+   complex(8), public :: ewp_Mu_left  = (0d0,0d0)
+   complex(8), public :: ewp_Mu_right  = (0d0,0d0)
+   complex(8), public :: ewp_Ta_left  = (0d0,0d0)
+   complex(8), public :: ewp_Ta_right  = (0d0,0d0)
+   complex(8), public :: ewp_Up_left  = (0d0,0d0)
+   complex(8), public :: ewp_Up_right  = (0d0,0d0)
+   complex(8), public :: ewp_Chm_left  = (0d0,0d0)
+   complex(8), public :: ewp_Chm_right  = (0d0,0d0)
+   complex(8), public :: ewp_Top_left  = (0d0,0d0)
+   complex(8), public :: ewp_Top_right  = (0d0,0d0)
+!--
+   real(8), public :: M_Zprime = -1d0
+   real(8), public :: Ga_Zprime = 0d0
+   real(8), public :: M_Wprime = -1d0
+   real(8), public :: Ga_Wprime = 0d0
+   real(8), public :: M_Vprime
+   real(8), public :: Ga_Vprime
 
 !-- Hff couplings for ttbar+H and bbar+H
    complex(8), public :: kappa       = (1d0,0d0)
@@ -877,6 +877,144 @@ logical :: computeQsqCompundCoupl
 
 end function
 
+
+function VpffCoupling(jhuid, hel, useWp)
+integer, intent(in) :: jhuid
+integer, intent(in) :: hel
+logical, intent(in) :: useWp
+complex(8) :: VpffCoupling
+integer :: absid
+
+   VpffCoupling=czero
+   if (abs(hel).ne.1) then
+      return
+   endif
+   absid=abs(jhuid)
+
+   if(useWp) then
+      if (absid.eq.abs(Up_) .or. absid.eq.abs(Dn_)) then
+         if(hel.eq.-1) then
+            VpffCoupling=ewp_Up_left
+         else
+            VpffCoupling=ewp_Up_right
+         endif
+      elseif (absid.eq.abs(Chm_) .or. absid.eq.abs(Str_)) then
+         if(hel.eq.-1) then
+            VpffCoupling=ewp_Chm_left
+         else
+            VpffCoupling=ewp_Chm_right
+         endif
+      elseif (absid.eq.abs(Top_) .or. absid.eq.abs(Bot_)) then
+         if(hel.eq.-1) then
+            VpffCoupling=ewp_Top_left
+         else
+            VpffCoupling=ewp_Top_right
+         endif
+      elseif (absid.eq.abs(ElP_) .or. absid.eq.abs(NuE_)) then
+         if(hel.eq.-1) then
+            VpffCoupling=ewp_El_left
+         else
+            VpffCoupling=ewp_El_right
+         endif
+      elseif (absid.eq.abs(MuP_) .or. absid.eq.abs(NuM_)) then
+         if(hel.eq.-1) then
+            VpffCoupling=ewp_Mu_left
+         else
+            VpffCoupling=ewp_Mu_right
+         endif
+      elseif (absid.eq.abs(TaP_) .or. absid.eq.abs(NuT_)) then
+         if(hel.eq.-1) then
+            VpffCoupling=ewp_Ta_left
+         else
+            VpffCoupling=ewp_Ta_right
+         endif
+      endif
+   else
+      if (absid.eq.abs(Up_)) then
+         if(hel.eq.-1) then
+            VpffCoupling=ezp_Up_left
+         else
+            VpffCoupling=ezp_Up_right
+         endif
+      elseif (absid.eq.abs(Dn_)) then
+         if(hel.eq.-1) then
+            VpffCoupling=ezp_Dn_left
+         else
+            VpffCoupling=ezp_Dn_right
+         endif
+      elseif (absid.eq.abs(Chm_)) then
+         if(hel.eq.-1) then
+            VpffCoupling=ezp_Chm_left
+         else
+            VpffCoupling=ezp_Chm_right
+         endif
+      elseif (absid.eq.abs(Str_)) then
+         if(hel.eq.-1) then
+            VpffCoupling=ezp_Str_left
+         else
+            VpffCoupling=ezp_Str_right
+         endif
+      elseif (absid.eq.abs(Top_)) then
+         if(hel.eq.-1) then
+            VpffCoupling=ezp_Top_left
+         else
+            VpffCoupling=ezp_Top_right
+         endif
+      elseif (absid.eq.abs(Bot_)) then
+         if(hel.eq.-1) then
+            VpffCoupling=ezp_Bot_left
+         else
+            VpffCoupling=ezp_Bot_right
+         endif
+      elseif (absid.eq.abs(ElP_)) then
+         if(hel.eq.-1) then
+            VpffCoupling=ezp_El_left
+         else
+            VpffCoupling=ezp_El_right
+         endif
+      elseif (absid.eq.abs(NuE_)) then
+         if(hel.eq.-1) then
+            VpffCoupling=ezp_NuE_left
+         else
+            VpffCoupling=ezp_NuE_right
+         endif
+      elseif (absid.eq.abs(MuP_)) then
+         if(hel.eq.-1) then
+            VpffCoupling=ezp_Mu_left
+         else
+            VpffCoupling=ezp_Mu_right
+         endif
+      elseif (absid.eq.abs(NuM_)) then
+         if(hel.eq.-1) then
+            VpffCoupling=ezp_NuE_left
+         else
+            VpffCoupling=ezp_NuE_right
+         endif
+      elseif (absid.eq.abs(TaP_)) then
+         if(hel.eq.-1) then
+            VpffCoupling=ezp_Ta_left
+         else
+            VpffCoupling=ezp_Ta_right
+         endif
+      elseif (absid.eq.abs(NuT_)) then
+         if(hel.eq.-1) then
+            VpffCoupling=ezp_NuE_left
+         else
+            VpffCoupling=ezp_NuE_right
+         endif
+      endif
+   endif
+
+end function
+function VpffCoupling_PDG(pdgid, hel, useWp)
+integer, intent(in) :: pdgid
+integer, intent(in) :: hel
+logical, intent(in) :: useWp
+complex(8) :: VpffCoupling_PDG
+integer :: jhuid
+   jhuid=convertLHE(pdgid)
+   VpffCoupling_PDG=VpffCoupling(jhuid,hel,useWp)
+end function
 
 
 FUNCTION ScaleFactor(id1in,id2in)
@@ -1443,11 +1581,6 @@ integer :: Part
 
 
 END FUNCTION
-
-
-
-
-
 
 
 FUNCTION getLHEParticle(PartLHE)
