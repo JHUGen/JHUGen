@@ -4604,13 +4604,13 @@ double TUtil::HJJMatEl(
     }
   }
   else if (production==TVar::JJQCD){
-    const std::vector<TNumericUtil::intTriplet_t>& ijsel = JHUGenHash_OnshellHJJHash;
+    const std::vector<TNumericUtil::intTriplet_t>& ijsel = Get_JHUGenHash_OnshellHJJHash();
     int nijchannels = ijsel.size();
     for (int ic=0; ic<nijchannels; ic++){
       // Emulate EvalWeighted_HJJ_test
-      int isel = ijsel[0][ic];
-      int jsel = ijsel[1][ic];
-      int code = ijsel[2][ic];
+      int isel = ijsel[ic][0];
+      int jsel = ijsel[ic][1];
+      int code = ijsel[ic][2];
 
       if (verbosity >= TVar::DEBUG_VERBOSE) cout << "HJJ channel " << ic << " code " << code << endl;
 
@@ -4764,8 +4764,8 @@ double TUtil::HJJMatEl(
       } // End unswapped isel>=jsel cases
 
       if (isel==jsel) continue;
-      isel = ijsel[1][ic];
-      jsel = ijsel[0][ic];
+      isel = ijsel[ic][1];
+      jsel = ijsel[ic][0];
 
       if (verbosity >= TVar::DEBUG_VERBOSE) cout << "HJJ mother swapped case" << endl;
       // Reset to default assignments
@@ -5398,16 +5398,14 @@ double TUtil::HJJMatEl(
       }
     }
 
-
-    const std::vector<TNumericUtil::intTriplet_t>& ijsel = JHUGenHash_OnshellVBFHash;
+    const std::vector<TNumericUtil::intTriplet_t>& ijsel = Get_JHUGenHash_OnshellVBFHash();
     int nijchannels = ijsel.size();
-
     // BEGIN COMPUTATION
     for (int ic=0; ic<nijchannels; ic++){
       // Emulate EvalWeighted_HJJ_test
-      isel = ijsel[0][ic];
-      jsel = ijsel[1][ic];
-      int code = ijsel[2][ic];
+      isel = ijsel[ic][0];
+      jsel = ijsel[ic][1];
+      int code = ijsel[ic][2];
       bool ijselIsUpType[2];
       bool ijselIsDownType[2];
       bool ijselIsParticle[2];
@@ -5635,8 +5633,8 @@ double TUtil::HJJMatEl(
       } // End unswapped isel>=jsel cases
 
       if (isel==jsel) continue;
-      isel = ijsel[1][ic];
-      jsel = ijsel[0][ic];
+      isel = ijsel[ic][1];
+      jsel = ijsel[ic][0];
 
       // Reset to default assignments
       if (verbosity >= TVar::DEBUG_VERBOSE) cout << "VBF mother swapped case" << endl;

@@ -14,8 +14,8 @@ namespace TJHUGenUtils{
   std::vector<TNumericUtil::intTriplet_t> Hash_OnshellHJJHash();
   std::vector<TNumericUtil::intTriplet_t> Hash_OnshellVBFHash();
 
-  const std::vector<TNumericUtil::intTriplet_t> JHUGenHash_OnshellHJJHash = Hash_OnshellHJJHash();
-  const std::vector<TNumericUtil::intTriplet_t> JHUGenHash_OnshellVBFHash = Hash_OnshellVBFHash();
+  const std::vector<TNumericUtil::intTriplet_t>& Get_JHUGenHash_OnshellHJJHash();
+  const std::vector<TNumericUtil::intTriplet_t>& Get_JHUGenHash_OnshellVBFHash();
 }
 
 #endif
