@@ -3707,9 +3707,9 @@ module modHiggsJJ
        struc_wpwp(2) = (a2_wpwp + ci * a3_wpwp)
        struc_wpwp(3) = two * ci * a3_wpwp
 
-       struc_wwp(:) = struc_wwp(:) * couplZffsq
-       struc_wpw(:) = struc_wpw(:) * couplZffsq
-       struc_wpwp(:) = struc_wpwp(:) * couplZffsq
+       struc_wwp(:) = struc_wwp(:) * couplWffsq
+       struc_wpw(:) = struc_wpw(:) * couplWffsq
+       struc_wpwp(:) = struc_wpwp(:) * couplWffsq
 
        helcoup(1:3,-1,-1) = helcoup(1:3,-1,-1) + &
                             struc_wpwp(1:3) * LCT(line1) * LCT(line2)/wpprop12/wpprop34 + &

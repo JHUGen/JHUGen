@@ -1129,6 +1129,8 @@ void TUtil::SetMass(double inmass, int ipart){
     (ipartabs>=11 && ipartabs<=16)
     ||
     ipartabs==23 || ipartabs==24 || ipartabs==25
+    ||
+    ipartabs==32 || ipartabs==34
     ){
     runcoupling_jhugen=(
       ipartabs==23
@@ -2966,11 +2968,12 @@ void TUtil::SetMCFMSpinZeroCouplings(bool useBSM, SpinZeroCouplings* Hcouplings,
     spinzerohiggs_anomcoupl_.Lambda2_w30 = 100;
     spinzerohiggs_anomcoupl_.Lambda2_w40 = 100;
     //
+    // AllowAnomalousCouplings==0, so these are still treated as 1 when h2mass>=0
+    spinzerohiggs_anomcoupl_.kappa2_top[0] = 0; spinzerohiggs_anomcoupl_.kappa2_top[1] = 0;
+    spinzerohiggs_anomcoupl_.kappa2_bot[0] = 0; spinzerohiggs_anomcoupl_.kappa2_bot[1] = 0;
     spinzerohiggs_anomcoupl_.gh2z1[0] = 0; spinzerohiggs_anomcoupl_.gh2z1[1] = 0;
     spinzerohiggs_anomcoupl_.gh2w1[0] = 0; spinzerohiggs_anomcoupl_.gh2w1[1] = 0;
     for (int im=0; im<2; im++){
-      spinzerohiggs_anomcoupl_.kappa2_top[im] = 0;
-      spinzerohiggs_anomcoupl_.kappa2_bot[im] = 0;
       spinzerohiggs_anomcoupl_.kappa2_tilde_top[im] = 0;
       spinzerohiggs_anomcoupl_.kappa2_tilde_bot[im] = 0;
       spinzerohiggs_anomcoupl_.gh2g2[im] = 0;

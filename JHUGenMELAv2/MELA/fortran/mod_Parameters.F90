@@ -1012,7 +1012,7 @@ integer, intent(in) :: hel
 logical, intent(in) :: useWp
 complex(8) :: VpffCoupling_PDG
 integer :: jhuid
-   jhuid=convertLHE(pdgid)
+   jhuid=convertLHEreverse(pdgid)
    VpffCoupling_PDG=VpffCoupling(jhuid,hel,useWp)
 end function
 
