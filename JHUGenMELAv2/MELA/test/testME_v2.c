@@ -4008,11 +4008,11 @@ void testME_Dec_JHUGenMCFM_Ping(int flavor=2, shared_ptr<Mela> melaptr=nullptr){
     mela.getIORecord()->getVDaughterCouplings(aL2, aR2, 1);
 
     float pVAJHUGen_ggWW_0pm_CT_sig;
+    mela.setVerbosity(TVar::DEBUG_VERBOSE);
     mela.setProcess(TVar::SelfDefine_spin0, TVar::JHUGen, TVar::ZZGG);
     mela.selfDHggcoupl[0][gHIGGS_GG_2][0]=1.;
-    //mela.selfDHzzcoupl[0][gHIGGS_VV_1][0]=1.;
-    mela.selfDHzzpcoupl[gHIGGS_VV_1][0]=1.;
-    mela.selfDHwwpcoupl[gHIGGS_VV_1][0]=1.;
+    mela.selfDHzpzpcoupl[gHIGGS_VV_1][0]=1.;
+    mela.selfDHwpwpcoupl[gHIGGS_VV_1][0]=1.;
     mela.selfDWpffcoupl[gHIGGS_Vp_El_left][0]=aL1;
     mela.selfDWpffcoupl[gHIGGS_Vp_Mu_left][0]=aL1;
     mela.selfDWpffcoupl[gHIGGS_Vp_Ta_left][0]=aL1;
@@ -4032,6 +4032,7 @@ void testME_Dec_JHUGenMCFM_Ping(int flavor=2, shared_ptr<Mela> melaptr=nullptr){
     mela.selfDGa_Wprime=2.085;
     mela.computeP(pVAJHUGen_ggWW_0pm_CT_sig, true);
     cout << "pVAJHUGen_ggWW_0pm_CT_sig: " << pVAJHUGen_ggWW_0pm_CT_sig << '\n' << endl;
+    mela.setVerbosity(verbosity);
 
     float pVAJHUGen_ggWW_PS_sig;
     mela.setProcess(TVar::H0minus, TVar::JHUGen, TVar::ZZGG);
@@ -4139,8 +4140,8 @@ void testME_Dec_JHUGenMCFM_Ping(int flavor=2, shared_ptr<Mela> melaptr=nullptr){
     mela.getIORecord()->getVDaughterCouplings(aL1, aR1, 0);
     mela.getIORecord()->getVDaughterCouplings(aL2, aR2, 1);
 
-    mela.setVerbosity(TVar::DEBUG);
     float pVAJHUGen_ggZZ_0pm_CT_sig;
+    mela.setVerbosity(TVar::DEBUG_VERBOSE);
     mela.setProcess(TVar::SelfDefine_spin0, TVar::JHUGen, TVar::ZZGG);
     mela.selfDHggcoupl[0][gHIGGS_GG_2][0]=1.;
     mela.selfDHzpzpcoupl[gHIGGS_VV_1][0]=1.;

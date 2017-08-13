@@ -10,7 +10,7 @@ character(len=6),parameter :: JHUGen_Version="v7.0.4"
 !internal
 integer, public, parameter :: dp = selected_real_kind(15)
 real(8), public, parameter :: tol = 0.0000001d0
-integer, public, parameter :: ZZMode=00,ZgsMode=01,gsZMode=02,gsgsMode=03,ZZpMode=04,ZpZMode=05,ZpZpMode=06
+integer, public, parameter :: InvalidMode=-1,ZZMode=00,ZgsMode=01,gsZMode=02,gsgsMode=03,ZZpMode=04,ZpZMode=05,ZpZpMode=06
 integer, public, parameter :: WWMode=10,WWpMode=11,WpWMode=12,WpWpMode=13
 integer, public, parameter :: ggMode=20
 integer, public, parameter :: ZgMode=30,gsgMode=31

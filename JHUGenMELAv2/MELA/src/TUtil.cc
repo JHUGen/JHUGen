@@ -3445,7 +3445,7 @@ void TUtil::SetJHUGenSpinZeroContactTerms(
   double Hwwpcoupl[SIZE_HVV][2], double Hwpwpcoupl[SIZE_HVV][2], double Wpffcoupl[SIZE_Vpff][2],
   bool UseVprime
   ){
-  int usevp = UseVprime;
+  int usevp = (UseVprime ? 1 : 0);
   __modjhugenmela_MOD_setspinzerocontactterms(Hzzpcoupl, Hzpzpcoupl, Zpffcoupl, Hwwpcoupl, Hwpwpcoupl, Wpffcoupl, &usevp);
 }
 void TUtil::SetJHUGenSpinZeroGGCouplings(double Hggcoupl[SIZE_HGG][2]){ __modjhugenmela_MOD_setspinzeroggcouplings(Hggcoupl); }
