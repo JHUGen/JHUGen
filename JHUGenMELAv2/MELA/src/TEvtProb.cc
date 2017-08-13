@@ -553,25 +553,32 @@ double TEvtProb::XsecCalc_XVV(){
 
       if (verbosity>=TVar::DEBUG_VERBOSE){
         for (int j=0; j<2; j++){
-          for (int i=0; i<SIZE_HGG; i++) cout << "Hggcoupl[" << i << "][" << j << "] = " << (selfDSpinZeroCoupl.Hggcoupl)[i][j] << endl;
+          for (int i=0; i<SIZE_HGG; i++){ if ((selfDSpinZeroCoupl.Hggcoupl)[i][j]!=0.) cout << "Hggcoupl[" << i << "][" << j << "] = " << (selfDSpinZeroCoupl.Hggcoupl)[i][j] << endl; }
           for (int i=0; i<SIZE_HVV; i++){
-            cout << "Hvvcoupl[" << i << "][" << j << "] = " << (selfDSpinZeroCoupl.Hzzcoupl)[i][j] << endl;
+            if ((selfDSpinZeroCoupl.Hzzcoupl)[i][j]!=0.) cout << "Hvvcoupl[" << i << "][" << j << "] = " << (selfDSpinZeroCoupl.Hzzcoupl)[i][j] << endl;
 
-            cout << "Hzzpcoupl[" << i << "][" << j << "] = " << (selfDSpinZeroCoupl.Hzzpcoupl)[i][j] << endl;
-            cout << "Hzpzpcoupl[" << i << "][" << j << "] = " << (selfDSpinZeroCoupl.Hzpzpcoupl)[i][j] << endl;
+            if ((selfDSpinZeroCoupl.Hzzpcoupl)[i][j]!=0.) cout << "Hzzpcoupl[" << i << "][" << j << "] = " << (selfDSpinZeroCoupl.Hzzpcoupl)[i][j] << endl;
+            if ((selfDSpinZeroCoupl.Hzpzpcoupl)[i][j]!=0.) cout << "Hzpzpcoupl[" << i << "][" << j << "] = " << (selfDSpinZeroCoupl.Hzpzpcoupl)[i][j] << endl;
 
-            cout << "Hwwpcoupl[" << i << "][" << j << "] = " << (selfDSpinZeroCoupl.Hwwpcoupl)[i][j] << endl;
-            cout << "Hwpwpcoupl[" << i << "][" << j << "] = " << (selfDSpinZeroCoupl.Hwpwpcoupl)[i][j] << endl;
+            if ((selfDSpinZeroCoupl.Hwwpcoupl)[i][j]!=0.) cout << "Hwwpcoupl[" << i << "][" << j << "] = " << (selfDSpinZeroCoupl.Hwwpcoupl)[i][j] << endl;
+            if ((selfDSpinZeroCoupl.Hwpwpcoupl)[i][j]!=0.) cout << "Hwpwpcoupl[" << i << "][" << j << "] = " << (selfDSpinZeroCoupl.Hwpwpcoupl)[i][j] << endl;
           }
           for (int i=0; i<SIZE_Vpff; i++){
-            cout << "Zpffcoupl[" << i << "][" << j << "] = " << (selfDSpinZeroCoupl.Zpffcoupl)[i][j] << endl;
-            cout << "Wpffcoupl[" << i << "][" << j << "] = " << (selfDSpinZeroCoupl.Wpffcoupl)[i][j] << endl;
+            if ((selfDSpinZeroCoupl.Zpffcoupl)[i][j]!=0.) cout << "Zpffcoupl[" << i << "][" << j << "] = " << (selfDSpinZeroCoupl.Zpffcoupl)[i][j] << endl;
+            if ((selfDSpinZeroCoupl.Wpffcoupl)[i][j]!=0.) cout << "Wpffcoupl[" << i << "][" << j << "] = " << (selfDSpinZeroCoupl.Wpffcoupl)[i][j] << endl;
           }
         }
         for (int j=0; j<SIZE_HVV_CQSQ; j++){
-          for (int i=0; i<SIZE_HVV_LAMBDAQSQ; i++) cout << "HvvLambda_qsq[" << i << "][" << j << "] = " << (selfDSpinZeroCoupl.HzzLambda_qsq)[i][j] << endl;
-          cout << "HvvCLambda_qsq[" << j << "] = " << (selfDSpinZeroCoupl.HzzCLambda_qsq)[j] << endl;
+          for (int i=0; i<SIZE_HVV_LAMBDAQSQ; i++){ if ((selfDSpinZeroCoupl.HzzLambda_qsq)[i][j]!=0.) cout << "HvvLambda_qsq[" << i << "][" << j << "] = " << (selfDSpinZeroCoupl.HzzLambda_qsq)[i][j] << endl; }
+          if ((selfDSpinZeroCoupl.HzzCLambda_qsq)[j]!=0.) cout << "HvvCLambda_qsq[" << j << "] = " << (selfDSpinZeroCoupl.HzzCLambda_qsq)[j] << endl;
         }
+        if (UseVprime){
+          cout << "M_Zprime = " << selfDSpinZeroCoupl.M_Zprime << endl;
+          cout << "Ga_Zprime = " << selfDSpinZeroCoupl.Ga_Zprime << endl;
+          cout << "M_Wprime = " << selfDSpinZeroCoupl.M_Wprime << endl;
+          cout << "Ga_Wprime = " << selfDSpinZeroCoupl.Ga_Wprime << endl;
+        }
+        else cout << "UseVprime==false" << endl;
       }
 
       isSpinZero = true;

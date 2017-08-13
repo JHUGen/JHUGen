@@ -11,7 +11,7 @@ character(len=6),parameter :: JHUGen_Version="v7.0.4"
 integer, public, parameter :: dp = selected_real_kind(15)
 real(8), public, parameter :: tol = 0.0000001d0
 integer, public, parameter :: ZZMode=00,ZgsMode=01,gsZMode=02,gsgsMode=03,ZZpMode=04,ZpZMode=05,ZpZpMode=06
-integer, public, parameter :: WWMode=10
+integer, public, parameter :: WWMode=10,WWpMode=11,WpWMode=12,WpWpMode=13
 integer, public, parameter :: ggMode=20
 integer, public, parameter :: ZgMode=30,gsgMode=31
 integer, public :: Collider,PChannel,Process,DecayMode1,DecayMode2,TopDecays,TauDecays

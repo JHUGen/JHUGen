@@ -254,7 +254,6 @@ public:
   };
 
   void SetHVVpCouplings(unsigned int index, double c_real, double c_imag, bool setWWp = false, int whichResonance=1){
-    if (!separateWWZZcouplings && setWWp) return;
     if (index>=SIZE_HVV){ std::cerr << "Cannot set index " << index << ", out of range for the type requested." << std::endl; }
     else if (whichResonance!=1) {std::cerr << "Contact terms are only for the first resonance" << std::endl;}
     else{
@@ -269,9 +268,8 @@ public:
     }
   };
   void SetHVpVpCouplings(unsigned int index, double c_real, double c_imag, bool setWpWp = false, int whichResonance=1){
-    if (!separateWWZZcouplings && setWpWp) return;
-    if (index>=SIZE_HVV){ std::cerr << "Cannot set index " << index << ", out of range for the type requested." << std::endl; }
-    else if (whichResonance!=1) {std::cerr << "Contact terms are only for the first resonance" << std::endl;}
+    if (whichResonance!=1) { std::cerr << "Contact terms are only for the first resonance" << std::endl; }
+    else if (index>=SIZE_HVV){ std::cerr << "Cannot set index " << index << ", out of range for the type requested." << std::endl; }
     else{
       if (setWpWp){
         Hwpwpcoupl[index][0] = c_real;
@@ -285,9 +283,7 @@ public:
   };
   void SetVpffCouplings(unsigned int index, double c_real, double c_imag, bool setWpff = false, int whichResonance=1){
     if (whichResonance!=1){ std::cerr << "Contact terms are only for the first resonance" << std::endl; }
-    else if (index > SIZE_Vpff){
-      std::cerr << "index too big for SetZpffCouplings: " << index << std::endl;
-    }
+    else if (index>=SIZE_Vpff){ std::cerr << "Cannot set index " << index << ", out of range for the type requested." << std::endl; }
     else{
       if (!setWpff){
         Zpffcoupl[index][0] = c_real;
@@ -300,7 +296,7 @@ public:
           || index == gHIGGS_Vp_Str_left || index == gHIGGS_Vp_Str_right
           || index == gHIGGS_Vp_Bot_left || index == gHIGGS_Vp_Bot_right
           ) && (c_real!=0. || c_imag!=0.)
-          ) std::cerr << "no W' contact terms for neutrino, down, strange, or bottom (use the lepton or up-quark versions instead)" << std::endl;
+          ) std::cerr << "No W' contact terms for neutrino, down, strange, or bottom; use the lepton or up-quark versions instead!" << std::endl;
         else{
           Wpffcoupl[index][0] = c_real;
           Wpffcoupl[index][1] = c_imag;
