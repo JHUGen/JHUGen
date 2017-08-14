@@ -372,9 +372,9 @@ subroutine SetSpinZeroContactTerms(zzpcoupl, zpzpcoupl, Zpffcoupl, wwpcoupl, wpw
 
    logical, intent(in) :: UseVp
 
-   includeVprime = ((any(zzpcoupl.ne.czero) .or. any(zpzpcoupl.ne.czero)) .and. any(Zpffcoupl.ne.czero)) &
-               .or.((any(wwpcoupl.ne.czero) .or. any(wpwpcoupl.ne.czero)) .and. any(Wpffcoupl.ne.czero))
-
+   includeVprime = (any(zzpcoupl.ne.czero) .or. any(zpzpcoupl.ne.czero) .or. any(Zpffcoupl.ne.czero) &
+                    .or.                                                                             &
+                    any(wwpcoupl.ne.czero) .or. any(wpwpcoupl.ne.czero) .or. any(Wpffcoupl.ne.czero))
    UseVprime=UseVp
 
    ghzzp1 = zzpcoupl(1)

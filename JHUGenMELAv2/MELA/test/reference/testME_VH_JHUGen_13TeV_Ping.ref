@@ -14,6 +14,8 @@ p0hpluszgs: 0.00152043
 
 p0mplus_selfD: 2.84461e-06
 
+p0mplus_selfD_CT: 2.84461e-06
+
 p0g1prime2_selfD: 1.72637e-12
 
 p0hplus_selfD: 9.30717e-05
@@ -41,6 +43,8 @@ p0hpluszgs: 0
 
 p0mplus_selfD: 4.05069e-06
 
+p0mplus_selfD_CT: 4.05069e-06
+
 p0g1prime2_selfD: 2.45833e-12
 
 p0hplus_selfD: 0.000269095
@@ -67,6 +71,8 @@ p0gzgs1prime2: 1.53695e-11
 p0hpluszgs: 0.00392878
 
 p0mplus_selfD: 4.07334e-05
+
+p0mplus_selfD_CT: 3.92589e-05
 
 p0g1prime2_selfD: 2.47208e-11
 
@@ -96,6 +102,8 @@ p0gzgs1prime2: 0
 p0hpluszgs: 0
 
 p0mplus_selfD: 0.000113529
+
+p0mplus_selfD_CT: 0.000109352
 
 p0g1prime2_selfD: 6.88999e-11
 

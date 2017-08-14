@@ -3666,6 +3666,9 @@ module modHiggsJJ
 
        LCT = (/ewp_Up_left,ewp_Up_left,ewp_Chm_left,ewp_Chm_left,ewp_Top_left/)
        RCT = (/ewp_Up_right,ewp_Up_right,ewp_Chm_right,ewp_Chm_right,ewp_Top_right/)
+       ! Adjust couplings convention
+       LCT(:) = LCT(:)/bL
+       RCT(:) = RCT(:)/bL
 
        do vv_it=1,4
           vvcoupl_prime_wwp(vv_it) = HVVSpinZeroDynamicCoupling(11+vv_it,q2Wplus,q2Wminus,mhsq,tryWWcoupl=useWWcoupl)
@@ -3687,13 +3690,13 @@ module modHiggsJJ
        endif
 
 
-       a1_wwp = vvcoupl_prime_wwp(1) * M_Z**2/mhsq + vvcoupl_prime_wwp(2) * two * q1q2/mhsq + vvcoupl_prime_wwp(3) * kcoupl * q1q2/mhsq
+       a1_wwp = vvcoupl_prime_wwp(1) * M_W**2/mhsq + vvcoupl_prime_wwp(2) * two * q1q2/mhsq + vvcoupl_prime_wwp(3) * kcoupl * q1q2/mhsq
        a2_wwp = -two * vvcoupl_prime_wwp(2) - kcoupl * vvcoupl_prime_wwp(3)
        a3_wwp = -two * vvcoupl_prime_wwp(4)
-       a1_wpw = vvcoupl_prime_wpw(1) * M_Z**2/mhsq + vvcoupl_prime_wpw(2) * two * q1q2/mhsq + vvcoupl_prime_wpw(3) * kcoupl * q1q2/mhsq
+       a1_wpw = vvcoupl_prime_wpw(1) * M_W**2/mhsq + vvcoupl_prime_wpw(2) * two * q1q2/mhsq + vvcoupl_prime_wpw(3) * kcoupl * q1q2/mhsq
        a2_wpw = -two * vvcoupl_prime_wpw(2) - kcoupl * vvcoupl_prime_wpw(3)
        a3_wpw = -two * vvcoupl_prime_wpw(4)
-       a1_wpwp = vvcoupl_prime_wpwp(1) * M_Z**2/mhsq + vvcoupl_prime_wpwp(2) * two * q1q2/mhsq + vvcoupl_prime_wpwp(3) * kcoupl * q1q2/mhsq
+       a1_wpwp = vvcoupl_prime_wpwp(1) * M_W**2/mhsq + vvcoupl_prime_wpwp(2) * two * q1q2/mhsq + vvcoupl_prime_wpwp(3) * kcoupl * q1q2/mhsq
        a2_wpwp = -two * vvcoupl_prime_wpwp(2) - kcoupl * vvcoupl_prime_wpwp(3)
        a3_wpwp = -two * vvcoupl_prime_wpwp(4)
 

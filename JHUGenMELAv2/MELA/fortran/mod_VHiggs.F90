@@ -44,22 +44,31 @@ subroutine EvalAmp_VHiggs(id,helicity,MomExt,me2)
 
       A_VV(:)=czero
       if(idin(1).ne.convertLHE(Pho_) .and. idin(6).ne.convertLHE(Pho_)) then
+         !print *,"Case1:"
          A_VV(1)=MATRIXELEMENT0(pin,mass,helin,idin,(/.false., .false./))
          if(includeGammaStar) then
+            !print *,"Case2:"
             A_VV(2) = MATRIXELEMENT0(pin,mass,helin,idin,(/.false., .true./))
+            !print *,"Case3:"
             A_VV(3) = MATRIXELEMENT0(pin,mass,helin,idin,(/.true., .false./))
+            !print *,"Case4:"
             A_VV(4) = MATRIXELEMENT0(pin,mass,helin,idin,(/.true., .true./))
          endif
       else if(idin(1).eq.convertLHE(Pho_) .and. idin(6).eq.convertLHE(Pho_)) then
+         !print *,"Case5:"
          A_VV(1)=MATRIXELEMENT0(pin,mass,helin,idin,(/.true., .true./))
       else if(idin(1).eq.convertLHE(Pho_)) then
+         !print *,"Case6:"
          A_VV(1)=MATRIXELEMENT0(pin,mass,helin,idin,(/.true., .false./))
          if(includeGammaStar) then
+            !print *,"Case7:"
             A_VV(2) = MATRIXELEMENT0(pin,mass,helin,idin,(/.true., .true./))
          endif
       else !if(idin(6).eq.convertLHE(Pho_)) then
+         !print *,"Case8:"
          A_VV(1)=MATRIXELEMENT0(pin,mass,helin,idin,(/.false., .true./))
          if(includeGammaStar) then
+            !print *,"Case9:"
             A_VV(2) = MATRIXELEMENT0(pin,mass,helin,idin,(/.true., .true./))
          endif
       endif
@@ -172,12 +181,12 @@ end subroutine EvalAmp_VHiggs
 
       if (includeVprime) then
          if(.not.useA(1)) then
-            Vpffcoupl(1,1)=VpffCoupling_PDG(id(1), -1, ((id(1)+id(2)).ne.0))
-            Vpffcoupl(1,2)=VpffCoupling_PDG(id(1), +1, ((id(1)+id(2)).ne.0))
+            Vpffcoupl(1,1)=GetVpffCoupling_VH(id(1), -1, ((id(1)+id(2)).ne.0))
+            Vpffcoupl(1,2)=GetVpffCoupling_VH(id(1), +1, ((id(1)+id(2)).ne.0))
          endif
          if(.not.useA(2)) then
-            Vpffcoupl(2,1)=VpffCoupling_PDG(id(6), -1, ((id(6)+id(7)).ne.0))
-            Vpffcoupl(2,2)=VpffCoupling_PDG(id(6), +1, ((id(6)+id(7)).ne.0))
+            Vpffcoupl(2,1)=GetVpffCoupling_VH(id(6), -1, ((id(6)+id(7)).ne.0))
+            Vpffcoupl(2,2)=GetVpffCoupling_VH(id(6), +1, ((id(6)+id(7)).ne.0))
          endif
       endif
 
@@ -210,6 +219,7 @@ end subroutine EvalAmp_VHiggs
          if((id(1)+id(2)).ne.0)then
             if (includeVprime) then
                if (UseVprime) then
+                  !print *,"Compute prop for Wppr"
                   PROP_Vp1 = PROPAGATOR(dsqrt(q3_q3),getMass(Wppr_),getDecayWidth(Wppr_))
                else
                   PROP_Vp1 = PROPAGATOR(M_W,0d0,0d0)
@@ -225,6 +235,7 @@ end subroutine EvalAmp_VHiggs
          else
             if (includeVprime) then
                if (UseVprime) then
+                  !print *,"Compute prop for Zpr"
                   PROP_Vp1 = PROPAGATOR(dsqrt(q3_q3),getMass(Zpr_),getDecayWidth(Zpr_))
                else
                   PROP_Vp1 = PROPAGATOR(M_Z,0d0,0d0)
@@ -262,8 +273,6 @@ end subroutine EvalAmp_VHiggs
             endif
          endif
       else
-         PROP1 = PROPAGATOR(dsqrt(q3_q3),0d0,0d0)
-
          if(abs(id(1)).eq.convertLHE(Pho_)) then
            PROP1=cone
            if((id(1)*helicity(1)).gt.0d0) then
@@ -271,10 +280,13 @@ end subroutine EvalAmp_VHiggs
            else
              call POLARIZATION_SINGLE(MomExt(:,3),-1,Vcurrent1)
            endif
-         else if(id(1).gt.0)then
-           call FFV(id(2), MomExt(:,2), helicity(2), id(1), MomExt(:,1), helicity(1), Vcurrent1)
          else
-           call FFV(id(1), MomExt(:,1), helicity(1), id(2), MomExt(:,2), helicity(2), Vcurrent1)
+           PROP1 = PROPAGATOR(dsqrt(q3_q3),0d0,0d0)
+           if(id(1).gt.0)then
+             call FFV(id(2), MomExt(:,2), helicity(2), id(1), MomExt(:,1), helicity(1), Vcurrent1)
+           else
+             call FFV(id(1), MomExt(:,1), helicity(1), id(2), MomExt(:,2), helicity(2), Vcurrent1)
+           endif
          endif
 
          !ZH
@@ -343,7 +355,7 @@ end subroutine EvalAmp_VHiggs
              else
                PROP_Vp2 = PROPAGATOR(M_W,0d0,0d0)
              endif
-             currentVp2 = currentVp2*gFFW*CKM(id(6),id(7))
+             currentVp2 = currentVp2*gFFW*CKMbare(id(6),id(7))
            endif
            if((id(6)*helicity(6)).le.0d0)then
              current2=(Vcurrent2-Acurrent2)/2d0*gFFW*CKM(id(6),id(7))
@@ -404,8 +416,6 @@ end subroutine EvalAmp_VHiggs
            endif
          endif
       else
-         PROP2 = PROPAGATOR(dsqrt(q4_q4),0d0,0d0)
-
          if(abs(id(6)).eq.convertLHE(Pho_)) then
            PROP2=cone
            if((id(6)*helicity(6)).gt.0d0) then
@@ -414,10 +424,13 @@ end subroutine EvalAmp_VHiggs
              call POLARIZATION_SINGLE(MomExt(:,4),-1,Vcurrent2)
            endif
            Vcurrent2 = dconjg(Vcurrent2)
-         else if(id(6).gt.0)then
-           call FFV(id(6), MomExt(:,6), helicity(6), id(7), MomExt(:,7), helicity(7), Vcurrent2)
          else
-           call FFV(id(7), MomExt(:,7), helicity(7), id(6), MomExt(:,6), helicity(6), Vcurrent2)
+           PROP2 = PROPAGATOR(dsqrt(q4_q4),0d0,0d0)
+           if(id(6).gt.0)then
+             call FFV(id(6), MomExt(:,6), helicity(6), id(7), MomExt(:,7), helicity(7), Vcurrent2)
+           else
+             call FFV(id(7), MomExt(:,7), helicity(7), id(6), MomExt(:,6), helicity(6), Vcurrent2)
+           endif
          endif
 
          !ZH
@@ -478,6 +491,16 @@ end subroutine EvalAmp_VHiggs
             currentVp2 = -currentVp2 + scrc(MomExt(:,4),currentVp2)/q4_q4
          endif
       endif
+
+      !print *,"current1=",current1
+      !print *,"currentVp1=",currentVp1
+      !print *,"PROP1=",PROP1
+      !print *,"PROP_Vp1=",PROP_Vp1
+      !print *,"current2=",current2
+      !print *,"currentVp2=",currentVp2
+      !print *,"PROP2=",PROP2
+      !print *,"PROP_Vp2=",PROP_Vp2
+
       current1 = current1*PROP1
       current2 = current2*PROP2
       currentVp1 = currentVp1*PROP_Vp1
@@ -601,8 +624,26 @@ end subroutine EvalAmp_VHiggs
         MATRIXELEMENT0=czero
       endif
 
+      !print *,"MATRIXELEMENT0=",MATRIXELEMENT0
+
       return
       END function
+
+
+
+function GetVpffCoupling_VH(pdgid, hel, useWp)
+integer, intent(in) :: pdgid
+integer, intent(in) :: hel
+logical, intent(in) :: useWp
+complex(8) :: GetVpffCoupling_VH
+   GetVpffCoupling_VH=VpffCoupling_PDG(pdgid,hel,useWp)
+   if(useWp) then
+     GetVpffCoupling_VH = GetVpffCoupling_VH / bL ! Bc of the couplings formalism from decay
+   else
+     GetVpffCoupling_VH = GetVpffCoupling_VH / 2.0_dp
+   endif
+end function
+
 
 !ANGLES.F
 !VERSION 20130531
@@ -1297,6 +1338,7 @@ end subroutine EvalAmp_VHiggs
 !    &             (0d0,1d0)*dcmplx(mass,0d0)*dcmplx(width,0d0))
 
 !assuming auto-conversion. works with gfortran
+      !print *,"Called propagator with",inv_mass,mass,width
       if (mass.ge.0d0) then
          PROPAGATOR = ci / ( inv_mass**2 - mass**2 + ci*mass*width )
       else

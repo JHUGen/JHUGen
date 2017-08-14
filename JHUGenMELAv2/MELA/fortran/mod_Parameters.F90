@@ -699,7 +699,7 @@ logical :: forceZZcoupl
 logical :: computeQsqCompundCoupl
 
    if(present(tryWWcoupl)) then
-      forceZZcoupl = (.not.tryWWcoupl .or. .not.distinguish_HWWcouplings .or. index.gt.4)
+      forceZZcoupl = (.not.tryWWcoupl .or. .not.distinguish_HWWcouplings .or. (index.gt.4 .and. index.lt.12))
    else
       forceZZcoupl = .true.
    endif
