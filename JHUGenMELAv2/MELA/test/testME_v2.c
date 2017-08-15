@@ -57,6 +57,13 @@ Mela* getMela(double sqrts, double mh, TVar::VerbosityLevel verbosity=TVar::ERRO
   return res;
 }
 
+
+shared_ptr<Mela> makemelaptr(int erg_tev, float mPOLE, TVar::VerbosityLevel verbosity){
+  //function to make a shared_ptr in python, no idea how to do it directly
+  return shared_ptr<Mela>(new Mela(erg_tev, mPOLE, verbosity));
+}
+
+
 void testME_Dec_MCFM_Ping(int flavor=2, int useMothers=0, bool useConstants=false, shared_ptr<Mela> melaptr=nullptr){
   ofstream tout(TString("testME_Dec_MCFM_Ping_")+long(flavor)+"_"+long(useMothers)+"_"+long(useConstants)+".out");
   streambuf* coutbuf = cout.rdbuf();
@@ -1111,7 +1118,7 @@ void testME_Dec_MCFM_Ping(int flavor=2, int useMothers=0, bool useConstants=fals
 }
 
 void testME_VH_JHUGen_Ping(int erg_tev=13, bool useConstants=false, shared_ptr<Mela> melaptr=nullptr){
-  TString strtout = Form("testME_VH_JHUGen_%iTeV_Ping.out", erg_tev);
+  TString strtout = Form("testME_VH_JHUGen_Ping_%iTeV_%i.out", erg_tev, (int)useConstants);
   ofstream tout(strtout.Data());
   streambuf* coutbuf = cout.rdbuf();
   cout.rdbuf(tout.rdbuf());
@@ -1372,7 +1379,7 @@ void testME_VH_JHUGen_Ping(int erg_tev=13, bool useConstants=false, shared_ptr<M
 }
 
 void testME_VBF_JHUGen_Ping(int erg_tev=13, bool useConstants=false, shared_ptr<Mela> melaptr=nullptr){
-  TString strtout = Form("testME_VBF_JHUGen_%iTeV_Ping.out", erg_tev);
+  TString strtout = Form("testME_VBF_JHUGen_Ping_%iTeV_%i.out", erg_tev, (int)useConstants);
   ofstream tout(strtout.Data());
   streambuf* coutbuf = cout.rdbuf();
   cout.rdbuf(tout.rdbuf());

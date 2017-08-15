@@ -93,7 +93,7 @@
                   endif
 
                   if( doInterference ) then
-                      call calcHelAmp(ordering_swap,VVMode,MY_IDUP,p(1:4,1:6),i1,i2,i3,i4,A_VV(2))
+                      call calcHelAmp(ordering_swap,VVMode_swap,MY_IDUP,p(1:4,1:6),i1,i2,i3,i4,A_VV(2))
                       if( includeGammaStar ) then
                           call calcHelAmp(ordering_swap,ZgsMode,MY_IDUP,p(1:4,1:6),i1,i2,i3,i4,A_VV(4))
                           call calcHelAmp(ordering_swap,gsZMode,MY_IDUP,p(1:4,1:6),i1,i2,i3,i4,A_VV(6))
@@ -1321,9 +1321,9 @@ subroutine getDecay_VVMode_Ordering(MY_IDUP, VVMode,ordering,VVMode_swap,orderin
    endif
 
    VVMode_swap=InvalidMode
-   if(idV(1).eq.Z0_ .and. idV(2).eq.Z0_) then
+   if(idV_swap(1).eq.Z0_ .and. idV_swap(2).eq.Z0_) then
       VVMode_swap=ZZMode
-   elseif(idV(1).eq.Wp_ .and. idV(2).eq.Wm_) then
+   elseif(idV_swap(1).eq.Wp_ .and. idV_swap(2).eq.Wm_) then
       VVMode_swap=WWMode
    endif
    return
