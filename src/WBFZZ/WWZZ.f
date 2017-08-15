@@ -192,7 +192,7 @@ C-- MARKUS: this is the old (original) MCFM code
 
          Amp_S_PR=czip
          Amp_S_DK=czip
-         if( hmass.ge.zip ) then
+         if( hmass.ge.zip .and. channeltoggle_stu.ne.1 ) then
            if( AnomalCouplPR.eq.1 ) then
       Amp_S_PR=-anomhwwamp(i7,i1,i8,i2,1,s3456,s(i7,i1),s(i8,i2),za,zb)
      &         /(propw17*propw28)
@@ -212,14 +212,14 @@ C-- MARKUS: this is the old (original) MCFM code
            else
       Amp_S_DK=za(i3,i5)*zb(i6,i4)/(prop34*prop56)*ZZ3456(h34,h56)
            endif
+      WWZZamp(h34,h56)=WWZZamp(h34,h56)
+     & -facHiggs*Amp_S_DK*Amp_S_PR/prop3456*Hbit
          endif
-         WWZZamp(h34,h56)=WWZZamp(h34,h56)
-     &    -facHiggs*Amp_S_DK*Amp_S_PR/prop3456*Hbit
 
 C----Second resonance
          Amp_S_PR=czip
          Amp_S_DK=czip
-         if( h2mass.ge.zip ) then
+         if( h2mass.ge.zip .and. channeltoggle_stu.ne.1 ) then
            if( AnomalCouplPR.eq.1 ) then
       Amp_S_PR=-anomhwwamp(i7,i1,i8,i2,2,s3456,s(i7,i1),s(i8,i2),za,zb)
      &         /(propw17*propw28)
@@ -239,9 +239,9 @@ C----Second resonance
            else
       Amp_S_DK=za(i3,i5)*zb(i6,i4)/(prop34*prop56)*ZZ3456(h34,h56)
            endif
+      WWZZamp(h34,h56)=WWZZamp(h34,h56)
+     & -facHiggs*Amp_S_DK*Amp_S_PR/propX3456*Hbit
          endif
-         WWZZamp(h34,h56)=WWZZamp(h34,h56)
-     &    -facHiggs*Amp_S_DK*Amp_S_PR/propX3456*Hbit
         enddo
       enddo
 

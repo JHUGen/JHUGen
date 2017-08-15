@@ -103,7 +103,7 @@ c--- special fix for Madgraph check
 !       print *, "MARKUS check: old ZZ-->H-->WW:",amp(jdu1,jdu2,h17,h28)
 !     new code with anomalous couplings
       amp(jdu1,jdu2,h17,h28)=czip
-      if( hmass.ge.zip ) then
+      if( hmass.ge.zip .and. channeltoggle_stu.ne.1 ) then
          if( AnomalCouplPR.eq.1 ) then
       Amp_S_PR=
      & anomhzzamp(p7,p1,p8,p2,1,s3456,s(p7,p1),s(p8,p2),za,zb)
@@ -132,7 +132,7 @@ c--- special fix for Madgraph check
 
 
 !     adding a second resonance
-      if( h2mass.ge.zip ) then
+      if( h2mass.ge.zip .and. channeltoggle_stu.ne.1 ) then
          if( AnomalCouplPR.eq.1 ) then
       Amp_S_PR=
      & anomhzzamp(p7,p1,p8,p2,2,s3456,s(p7,p1),s(p8,p2),za,zb)
