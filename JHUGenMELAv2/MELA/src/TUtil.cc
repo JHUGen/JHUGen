@@ -2071,6 +2071,14 @@ bool TUtil::MCFM_SetupParticleCouplings(
     else if ((isWW || isZZ) && napart>=2 && (production==TVar::Lep_ZH || production==TVar::Lep_ZH_S || production==TVar::Lep_ZH_TU)){
       spinzerohiggs_anomcoupl_.channeltoggle_stu = int(production==TVar::Lep_ZH)*2 + int(production==TVar::Lep_ZH_TU)*1 + int(production==TVar::Lep_ZH_S)*0;
       spinzerohiggs_anomcoupl_.vvhvvtoggle_vbfvh = 1;
+
+      if (process==TVar::bkgWWZZ || process==TVar::HSMHiggs_WWZZ || process == TVar::bkgWWZZ_SMHiggs){
+        string strrun = runstring_.runstring;
+        if (isWW && (!hasZ1 || !hasZ2)) strrun += "_ww";
+        else if (isZZ && (!hasW1 || !hasW2)) strrun += "_zz";
+        sprintf(runstring_.runstring, strrun.c_str());
+      }
+
       bool hasZll=false;
       bool hasZnn=false;
       for (unsigned int ix=0; ix<napart; ix++){
@@ -2131,6 +2139,14 @@ bool TUtil::MCFM_SetupParticleCouplings(
     else if ((isWW || isZZ) && napart>=2 && (production==TVar::Lep_WH || production==TVar::Lep_WH_S || production==TVar::Lep_WH_TU)){
       spinzerohiggs_anomcoupl_.channeltoggle_stu = int(production==TVar::Lep_WH)*2 + int(production==TVar::Lep_WH_TU)*1 + int(production==TVar::Lep_WH_S)*0;
       spinzerohiggs_anomcoupl_.vvhvvtoggle_vbfvh = 1;
+
+      if (process==TVar::bkgWWZZ || process==TVar::HSMHiggs_WWZZ || process == TVar::bkgWWZZ_SMHiggs){
+        string strrun = runstring_.runstring;
+        if (isWW && (!hasZ1 || !hasZ2)) strrun += "_ww";
+        else if (isZZ && (!hasW1 || !hasW2)) strrun += "_zz";
+        sprintf(runstring_.runstring, strrun.c_str());
+      }
+
       bool hasWplus=false;
       bool hasWminus=false;
       for (unsigned int ix=0; ix<napart; ix++){
@@ -2207,6 +2223,14 @@ bool TUtil::MCFM_SetupParticleCouplings(
     else if ((isWW || isZZ) && napart>=2 && (production==TVar::Had_ZH || production==TVar::Had_ZH_S || production==TVar::Had_ZH_TU)){
       spinzerohiggs_anomcoupl_.channeltoggle_stu = int(production==TVar::Had_ZH)*2 + int(production==TVar::Had_ZH_TU)*1 + int(production==TVar::Had_ZH_S)*0;
       spinzerohiggs_anomcoupl_.vvhvvtoggle_vbfvh = 1;
+
+      if (process==TVar::bkgWWZZ || process==TVar::HSMHiggs_WWZZ || process == TVar::bkgWWZZ_SMHiggs){
+        string strrun = runstring_.runstring;
+        if (isWW && (!hasZ1 || !hasZ2)) strrun += "_ww";
+        else if (isZZ && (!hasW1 || !hasW2)) strrun += "_zz";
+        sprintf(runstring_.runstring, strrun.c_str());
+      }
+
       bool hasZuu=false;
       bool hasZdd=false;
       bool hasZjj=false;
@@ -2275,6 +2299,14 @@ bool TUtil::MCFM_SetupParticleCouplings(
     else if ((isWW || isZZ) && napart>=2 && (production==TVar::Had_WH || production==TVar::Had_WH_S || production==TVar::Had_WH_TU)){
       spinzerohiggs_anomcoupl_.channeltoggle_stu = int(production==TVar::Had_WH)*2 + int(production==TVar::Had_WH_TU)*1 + int(production==TVar::Had_WH_S)*0;
       spinzerohiggs_anomcoupl_.vvhvvtoggle_vbfvh = 1;
+
+      if (process==TVar::bkgWWZZ || process==TVar::HSMHiggs_WWZZ || process == TVar::bkgWWZZ_SMHiggs){
+        string strrun = runstring_.runstring;
+        if (isWW && (!hasZ1 || !hasZ2)) strrun += "_ww";
+        else if (isZZ && (!hasW1 || !hasW2)) strrun += "_zz";
+        sprintf(runstring_.runstring, strrun.c_str());
+      }
+
       bool hasWplus=false;
       bool hasWminus=false;
       bool hasWjj=false;
@@ -2363,6 +2395,14 @@ bool TUtil::MCFM_SetupParticleCouplings(
     else if ((isWW || isZZ) && napart>=2 && (production==TVar::JJQCD || production==TVar::JJQCD_S || production==TVar::JJQCD_TU)){
       spinzerohiggs_anomcoupl_.channeltoggle_stu = int(production==TVar::JJQCD)*2 + int(production==TVar::JJQCD_TU)*1 + int(production==TVar::JJQCD_S)*0;;
       spinzerohiggs_anomcoupl_.vvhvvtoggle_vbfvh = 2; // Doesn't matter, already JJQCD
+
+      if (process==TVar::bkgWWZZ/* || process==TVar::HSMHiggs_WWZZ || process == TVar::bkgWWZZ_SMHiggs*/){
+        string strrun = runstring_.runstring;
+        if (isWW && (!hasZ1 || !hasZ2)) strrun += "_ww";
+        else if (isZZ && (!hasW1 || !hasW2)) strrun += "_zz";
+        sprintf(runstring_.runstring, strrun.c_str());
+      }
+
       if (useQQVVQQany){
         int qqvvqq_apartordering[2]={ -1, -1 };
         TMCFMUtils::AssociatedParticleOrdering_QQVVQQAny(
@@ -2379,6 +2419,14 @@ bool TUtil::MCFM_SetupParticleCouplings(
     else if ((isWW || isZZ) && napart>=2 && (production==TVar::JJVBF || production==TVar::JJVBF_S || production==TVar::JJVBF_TU)){
       spinzerohiggs_anomcoupl_.channeltoggle_stu = int(production==TVar::JJVBF)*2 + int(production==TVar::JJVBF_TU)*1 + int(production==TVar::JJVBF_S)*0;;
       spinzerohiggs_anomcoupl_.vvhvvtoggle_vbfvh = 0; // VBF-only process
+
+      if (process==TVar::bkgWWZZ || process==TVar::HSMHiggs_WWZZ || process == TVar::bkgWWZZ_SMHiggs){
+        string strrun = runstring_.runstring;
+        if (isWW && (!hasZ1 || !hasZ2)) strrun += "_ww";
+        else if (isZZ && (!hasW1 || !hasW2)) strrun += "_zz";
+        sprintf(runstring_.runstring, strrun.c_str());
+      }
+
       if (useQQVVQQany){
         int qqvvqq_apartordering[2]={ -1, -1 };
         TMCFMUtils::AssociatedParticleOrdering_QQVVQQAny(
@@ -2388,12 +2436,6 @@ bool TUtil::MCFM_SetupParticleCouplings(
           );
         if (qqvvqq_apartordering[0]==-1 || qqvvqq_apartordering[1]==-1) result=false;
         else if (qqvvqq_apartordering[0]>qqvvqq_apartordering[1]) swap(pApartOrder[0], pApartOrder[1]);
-        /*
-        if (verbosity>=TVar::DEBUG){
-          cout << "AID[0]=" << pApartId[pApartOrder[0]] << "(@" << pApartOrder[0] << ")" << endl;
-          cout << "AID[1]=" << pApartId[pApartOrder[1]] << "(@" << pApartOrder[1] << ")" << endl;
-        }
-        */
       }
       strplabel[6]=TUtil::GetMCFMParticleLabel(pApartId[pApartOrder[0]], true);
       strplabel[7]=TUtil::GetMCFMParticleLabel(pApartId[pApartOrder[1]], true);
@@ -2401,6 +2443,14 @@ bool TUtil::MCFM_SetupParticleCouplings(
     else if ((isWW || isZZ) && napart>=2 && (production==TVar::JJEW || production==TVar::JJEWQCD || production==TVar::JJEW_S || production==TVar::JJEWQCD_S || production==TVar::JJEW_TU || production==TVar::JJEWQCD_TU)){
       spinzerohiggs_anomcoupl_.channeltoggle_stu = int(production==TVar::JJEWQCD || production==TVar::JJEW)*2 + int(production==TVar::JJEWQCD_TU || production==TVar::JJEW_TU)*1 + int(production==TVar::JJEWQCD_S || production==TVar::JJEW_S)*0;;
       spinzerohiggs_anomcoupl_.vvhvvtoggle_vbfvh = 2; // VBF+VH process
+
+      if (process==TVar::bkgWWZZ || process==TVar::HSMHiggs_WWZZ || process == TVar::bkgWWZZ_SMHiggs){
+        string strrun = runstring_.runstring;
+        if (isWW && (!hasZ1 || !hasZ2)) strrun += "_ww";
+        else if (isZZ && (!hasW1 || !hasW2)) strrun += "_zz";
+        sprintf(runstring_.runstring, strrun.c_str());
+      }
+
       if (useQQVVQQany){
         int qqvvqq_apartordering[2]={ -1, -1 };
         TMCFMUtils::AssociatedParticleOrdering_QQVVQQAny(
@@ -3483,7 +3533,7 @@ double TUtil::SumMatrixElementPDF(
     || production==TVar::JJVBF_S || production==TVar::JJEW_S || production==TVar::JJEWQCD_S
     || production==TVar::Had_WH_TU || production==TVar::Had_ZH_TU
     || production==TVar::JJVBF_TU || production==TVar::JJEW_TU || production==TVar::JJEWQCD_TU
-    || (process!=TVar::bkgZJets && (production==TVar::JJQCD || production==TVar::JJQCD_S || production==TVar::JJQCD_TU))
+    || ((process==TVar::bkgZZ || process==TVar::bkgWW || process==TVar::bkgWWZZ) && (production==TVar::JJQCD || production==TVar::JJQCD_S || production==TVar::JJQCD_TU))
     ){ // Use asociated jets in the pT=0 frame boost
     partIncCode=TVar::kUseAssociated_Jets;
     nRequested_AssociatedJets = 2;
@@ -7768,23 +7818,23 @@ MELACandidate* TUtil::ConvertVectorFormat(
   std::vector<MELAParticle*> daughters;
   std::vector<MELAParticle*> aparticles;
   std::vector<MELAParticle*> mothers;
-  for (unsigned int ip=0; ip<pDaughters->size(); ip++){
-    MELAParticle* onePart = new MELAParticle((pDaughters->at(ip)).first, (pDaughters->at(ip)).second);
+  for (auto& spart:(*pDaughters)){
+    MELAParticle* onePart = new MELAParticle(spart.first, spart.second);
     onePart->setGenStatus(1); // Final state status
     if (particleList!=0) particleList->push_back(onePart);
     daughters.push_back(onePart);
   }
   if (pAssociated!=0){
-    for (unsigned int ip=0; ip<pAssociated->size(); ip++){
-      MELAParticle* onePart = new MELAParticle((pAssociated->at(ip)).first, (pAssociated->at(ip)).second);
+    for (auto& spart:(*pAssociated)){
+      MELAParticle* onePart = new MELAParticle(spart.first, spart.second);
       onePart->setGenStatus(1); // Final state status
       if (particleList!=0) particleList->push_back(onePart);
       aparticles.push_back(onePart);
     }
   }
   if (pMothers!=0 && pMothers->size()==2){
-    for (unsigned int ip=0; ip<pMothers->size(); ip++){
-      MELAParticle* onePart = new MELAParticle((pMothers->at(ip)).first, (pMothers->at(ip)).second);
+    for (auto& spart:(*pMothers)){
+      MELAParticle* onePart = new MELAParticle(spart.first, spart.second);
       onePart->setGenStatus(-1); // Mother status
       if (particleList!=0) particleList->push_back(onePart);
       mothers.push_back(onePart);
@@ -7870,17 +7920,17 @@ MELACandidate* TUtil::ConvertVectorFormat(
 
   /***** Adaptation of LHEAnalyzer::Event::addVVCandidateMother *****/
   if (mothers.size()>0){ // ==2
-    for (unsigned int ip=0; ip<mothers.size(); ip++) cand->addMother(mothers.at(ip));
+    for (auto& part:mothers) cand->addMother(part);
     if (isGen) cand->setGenStatus(-1); // Candidate is a gen. particle!
   }
   /***** Adaptation of LHEAnalyzer::Event::addVVCandidateAppendages *****/
   if (aparticles.size()>0){
-    for (unsigned int ip=0; ip<aparticles.size(); ip++){
-      const int partId = (aparticles.at(ip))->id;
-      if (PDGHelpers::isALepton(partId)) cand->addAssociatedLeptons(aparticles.at(ip));
-      else if (PDGHelpers::isANeutrino(partId)) cand->addAssociatedNeutrinos(aparticles.at(ip)); // Be careful: Neutrinos are neutrinos, but also "leptons" in MELACandidate!
-      else if (PDGHelpers::isAPhoton(partId)) cand->addAssociatedPhotons(aparticles.at(ip));
-      else if (PDGHelpers::isAJet(partId)) cand->addAssociatedJets(aparticles.at(ip));
+    for (auto& part:aparticles){
+      const int& partId = part->id;
+      if (PDGHelpers::isALepton(partId)) cand->addAssociatedLeptons(part);
+      else if (PDGHelpers::isANeutrino(partId)) cand->addAssociatedNeutrinos(part); // Be careful: Neutrinos are neutrinos, but also "leptons" in MELACandidate!
+      else if (PDGHelpers::isAPhoton(partId)) cand->addAssociatedPhotons(part);
+      else if (PDGHelpers::isAJet(partId)) cand->addAssociatedJets(part);
     }
     cand->addAssociatedVs(); // For the VH topology
   }

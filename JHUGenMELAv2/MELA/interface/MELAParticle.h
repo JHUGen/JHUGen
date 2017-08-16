@@ -26,15 +26,11 @@ protected:
 
 
   // Member functions
-protected:
-
-  // Helper functions
-  bool checkParticleExists(MELAParticle* myParticle, std::vector<MELAParticle*>& particleArray);
-
 public:
 
   // Constructors
   MELAParticle();
+  MELAParticle(int id_);
   MELAParticle(int id_, TLorentzVector p4_);
   MELAParticle(const MELAParticle& particle_);
   MELAParticle& operator=(const MELAParticle& particle_);
@@ -57,6 +53,11 @@ public:
   MELAParticle* getMother(int index) const;
   MELAParticle* getDaughter(int index) const;
   virtual void getRelatedParticles(std::vector<MELAParticle*>& particles);
+
+  std::vector<MELAParticle*>& getMothers(){ return mothers; }
+  std::vector<MELAParticle*>& getDaughters(){ return daughters; }
+  const std::vector<MELAParticle*>& getMothers()const{ return mothers; }
+  const std::vector<MELAParticle*>& getDaughters()const{ return daughters; }
 
   double charge()const;
   double m()const{ return p4.M(); }
@@ -82,6 +83,8 @@ public:
   MELAParticle& operator+=(MELAParticle* part){ if (part!=0){ p4 += part->p4; addDaughter(part); } return *this; }
   MELAParticle& operator+=(const TLorentzVector& mom){ p4 += mom; return *this; }
 
+  // Helper functions
+  static bool checkParticleExists(MELAParticle* myParticle, std::vector<MELAParticle*>& particleArray);
 };
 
 
