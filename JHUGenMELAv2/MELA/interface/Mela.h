@@ -23,7 +23,7 @@ class ScalarPdfFactory_HVV;
 class VectorPdfFactory;
 class TensorPdfFactory;
 class RooqqZZ_JHU_ZgammaZZ_fast;
-class newZZMatrixElement;
+class ZZMatrixElement;
 class SuperMELA;
 
 #include "TVar.hh"
@@ -294,7 +294,7 @@ protected:
   TVar::LeptonInterference myLepInterf_;
   TVar::VerbosityLevel myVerbosity_;
 
-  newZZMatrixElement* ZZME;
+  ZZMatrixElement* ZZME;
   SuperDijetMela* superDijet;
 
 

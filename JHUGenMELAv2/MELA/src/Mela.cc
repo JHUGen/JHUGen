@@ -23,7 +23,7 @@ Please adhere to the following coding conventions:
 #include <sys/types.h>
 
 #include "Mela.h"
-#include "newZZMatrixElement.h"
+#include "ZZMatrixElement.h"
 #include "VectorPdfFactory.h"
 #include "TensorPdfFactory.h"
 #include "RooqqZZ_JHU_ZgammaZZ_fast.h"
@@ -166,7 +166,7 @@ void Mela::build(double mh_){
   spin2Model = new TensorPdfFactory_ppHVV(measurables_, RooSpin::kVdecayType_Zll, RooSpin::kVdecayType_Zll);
   qqZZmodel = new RooqqZZ_JHU_ZgammaZZ_fast("qqZZmodel", "qqZZmodel", *z1mass_rrv, *z2mass_rrv, *costheta1_rrv, *costheta2_rrv, *phi_rrv, *costhetastar_rrv, *phi1_rrv, *mzz_rrv, *upFrac_rrv);
 
-  if (myVerbosity_>=TVar::DEBUG) cout << "Paths for newZZMatrixElement" << endl;
+  if (myVerbosity_>=TVar::DEBUG) cout << "Paths for ZZMatrixElement" << endl;
   const string path_HiggsWidthFile = MELAPKGPATH + "data/HiggsTotalWidth_YR3.txt";
   if (myVerbosity_>=TVar::DEBUG) cout << "\t- Cross section/width file: " << path_HiggsWidthFile << endl;
   const string path_nnpdf = MELAPKGPATH + "data/Pdfdata/NNPDF30_lo_as_0130.LHgrid";
@@ -174,9 +174,9 @@ void Mela::build(double mh_){
   int pdfmember = 0;
   if (myVerbosity_>=TVar::DEBUG) cout << "\t- Linking NNPDF path " << path_nnpdf.c_str() << " -> " << path_nnpdf_c << endl;
   symlink(path_nnpdf.c_str(), path_nnpdf_c);
-  if (myVerbosity_>=TVar::DEBUG) cout << "Start newZZMatrixElement" << endl;
-  ZZME = new newZZMatrixElement(path_nnpdf_c, pdfmember, path_HiggsWidthFile.substr(0, path_HiggsWidthFile.length()-23).c_str(), 1000.*LHCsqrts/2., myVerbosity_);
-  if (myVerbosity_>=TVar::DEBUG) cout << "Set newZZMatrixElement masses" << endl;
+  if (myVerbosity_>=TVar::DEBUG) cout << "Start ZZMatrixElement" << endl;
+  ZZME = new ZZMatrixElement(path_nnpdf_c, pdfmember, path_HiggsWidthFile.substr(0, path_HiggsWidthFile.length()-23).c_str(), 1000.*LHCsqrts/2., myVerbosity_);
+  if (myVerbosity_>=TVar::DEBUG) cout << "Set ZZMatrixElement masses" << endl;
   setMelaPrimaryHiggsMass(mh_);
   setMelaHiggsMass(mh_, 0); setMelaHiggsMass(-1., 1);
   setMelaHiggsWidth(-1., 0); setMelaHiggsWidth(0., 1);

@@ -176,7 +176,7 @@ namespace TUtil{
     const TVar::simple_event_record& mela_event,
     std::vector<int>* partOrder, std::vector<int>* apartOrder
     );
-  TString GetMCFMParticleLabel(const int& pid, bool useQJ=false);
+  TString GetMCFMParticleLabel(const int& pid, bool useQJ, bool useCouplZAjkConventions);
 
   // JHUGen-specific wrappers
   void InitJHUGenMELA(const char* pathtoPDFSet, int PDFMember);

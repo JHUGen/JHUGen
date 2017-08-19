@@ -1,23 +1,23 @@
-#ifndef newZZMatrixElement_newZZMatrixElement_h
-#define newZZMatrixElement_newZZMatrixElement_h
+#ifndef ZZMatrixElement_ZZMatrixElement_h
+#define ZZMatrixElement_ZZMatrixElement_h
 
 #include <vector>
 #include "TVar.hh"
 #include "TEvtProb.hh"
 
 
-class  newZZMatrixElement{
+class  ZZMatrixElement{
 public:
 
-  newZZMatrixElement(
+  ZZMatrixElement(
     const char* pathtoPDFSet,
     int PDFMember,
     const char* pathtoHiggsCSandWidth, // path to the textfiles of the HiggsCSandWidth package
     double ebeam,
     TVar::VerbosityLevel verbosity
     );
-  newZZMatrixElement(const newZZMatrixElement& other);
-  ~newZZMatrixElement();
+  ZZMatrixElement(const ZZMatrixElement& other);
+  ~ZZMatrixElement();
 
   void computeXS(
     float &mevalue

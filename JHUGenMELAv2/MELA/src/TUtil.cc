@@ -1998,7 +1998,7 @@ bool TUtil::MCFM_SetupParticleCouplings(
       if (verbosity>=TVar::DEBUG) cout << "TUtil::MCFM_SetupParticleCouplings: Setting up mother labels for MCFM:";
       for (int ip=0; ip<min(2, (int)mela_event.pMothers.size()); ip++){
         const int* idmot = &(mela_event.pMothers.at(ip).first);
-        if (!PDGHelpers::isAnUnknownJet((*idmot))) strplabel[ip]=TUtil::GetMCFMParticleLabel(*idmot);
+        if (!PDGHelpers::isAnUnknownJet((*idmot))) strplabel[ip]=TUtil::GetMCFMParticleLabel(*idmot, false, useQQVVQQany);
         if (verbosity>=TVar::DEBUG) cout << " " << *idmot << "=" << strplabel[ip];
         // No need to check unknown parton case, already "pp"
       }
@@ -2287,8 +2287,8 @@ bool TUtil::MCFM_SetupParticleCouplings(
         else if (qqvvqq_apartordering[0]>qqvvqq_apartordering[1]) swap(pApartOrder[0], pApartOrder[1]);
       }
       if (hasZuu || hasZdd){
-        strplabel[6]=TUtil::GetMCFMParticleLabel(pApartId[pApartOrder[0]], true);
-        strplabel[7]=TUtil::GetMCFMParticleLabel(pApartId[pApartOrder[1]], true);
+        strplabel[6]=TUtil::GetMCFMParticleLabel(pApartId[pApartOrder[0]], true, useQQVVQQany);
+        strplabel[7]=TUtil::GetMCFMParticleLabel(pApartId[pApartOrder[1]], true, useQQVVQQany);
       }
       else if (hasZjj){
         strplabel[6]="qj";
@@ -2383,8 +2383,8 @@ bool TUtil::MCFM_SetupParticleCouplings(
         else if (qqvvqq_apartordering[0]>qqvvqq_apartordering[1]) swap(pApartOrder[0], pApartOrder[1]);
       }
       if (hasWplus || hasWminus){ // W+ or W-
-        strplabel[6]=TUtil::GetMCFMParticleLabel(pApartId[pApartOrder[0]], true);
-        strplabel[7]=TUtil::GetMCFMParticleLabel(pApartId[pApartOrder[1]], true);
+        strplabel[6]=TUtil::GetMCFMParticleLabel(pApartId[pApartOrder[0]], true, useQQVVQQany);
+        strplabel[7]=TUtil::GetMCFMParticleLabel(pApartId[pApartOrder[1]], true, useQQVVQQany);
       }
       else if (hasWjj){ // W+/-
         strplabel[6]="qj";
@@ -2413,8 +2413,8 @@ bool TUtil::MCFM_SetupParticleCouplings(
         if (qqvvqq_apartordering[0]==-1 || qqvvqq_apartordering[1]==-1) result=false;
         else if (qqvvqq_apartordering[0]>qqvvqq_apartordering[1]) swap(pApartOrder[0], pApartOrder[1]);
       }
-      strplabel[6]=TUtil::GetMCFMParticleLabel(pApartId[pApartOrder[0]]);
-      strplabel[7]=TUtil::GetMCFMParticleLabel(pApartId[pApartOrder[1]]);
+      strplabel[6]=TUtil::GetMCFMParticleLabel(pApartId[pApartOrder[0]], false, useQQVVQQany);
+      strplabel[7]=TUtil::GetMCFMParticleLabel(pApartId[pApartOrder[1]], false, useQQVVQQany);
     }
     else if ((isWW || isZZ) && napart>=2 && (production==TVar::JJVBF || production==TVar::JJVBF_S || production==TVar::JJVBF_TU)){
       spinzerohiggs_anomcoupl_.channeltoggle_stu = int(production==TVar::JJVBF)*2 + int(production==TVar::JJVBF_TU)*1 + int(production==TVar::JJVBF_S)*0;;
@@ -2437,8 +2437,8 @@ bool TUtil::MCFM_SetupParticleCouplings(
         if (qqvvqq_apartordering[0]==-1 || qqvvqq_apartordering[1]==-1) result=false;
         else if (qqvvqq_apartordering[0]>qqvvqq_apartordering[1]) swap(pApartOrder[0], pApartOrder[1]);
       }
-      strplabel[6]=TUtil::GetMCFMParticleLabel(pApartId[pApartOrder[0]], true);
-      strplabel[7]=TUtil::GetMCFMParticleLabel(pApartId[pApartOrder[1]], true);
+      strplabel[6]=TUtil::GetMCFMParticleLabel(pApartId[pApartOrder[0]], true, useQQVVQQany);
+      strplabel[7]=TUtil::GetMCFMParticleLabel(pApartId[pApartOrder[1]], true, useQQVVQQany);
     }
     else if ((isWW || isZZ) && napart>=2 && (production==TVar::JJEW || production==TVar::JJEWQCD || production==TVar::JJEW_S || production==TVar::JJEWQCD_S || production==TVar::JJEW_TU || production==TVar::JJEWQCD_TU)){
       spinzerohiggs_anomcoupl_.channeltoggle_stu = int(production==TVar::JJEWQCD || production==TVar::JJEW)*2 + int(production==TVar::JJEWQCD_TU || production==TVar::JJEW_TU)*1 + int(production==TVar::JJEWQCD_S || production==TVar::JJEW_S)*0;;
@@ -2461,8 +2461,8 @@ bool TUtil::MCFM_SetupParticleCouplings(
         if (qqvvqq_apartordering[0]==-1 || qqvvqq_apartordering[1]==-1) result=false;
         else if (qqvvqq_apartordering[0]>qqvvqq_apartordering[1]) swap(pApartOrder[0], pApartOrder[1]);
       }
-      strplabel[6]=TUtil::GetMCFMParticleLabel(pApartId[pApartOrder[0]]);
-      strplabel[7]=TUtil::GetMCFMParticleLabel(pApartId[pApartOrder[1]]);
+      strplabel[6]=TUtil::GetMCFMParticleLabel(pApartId[pApartOrder[0]], false, useQQVVQQany);
+      strplabel[7]=TUtil::GetMCFMParticleLabel(pApartId[pApartOrder[1]], false, useQQVVQQany);
     }
 
     // Couplings for Z1
@@ -2474,9 +2474,13 @@ bool TUtil::MCFM_SetupParticleCouplings(
         zcouple_.r1=zcouple_.re;
 
         // Special Z1->ll cases
-        if (useQQBZGAM || useQQVVQQany){
+        if (useQQBZGAM){
           strplabel[2]="el";
           strplabel[3]="ea";
+        }
+        else if (useQQVVQQany){
+          strplabel[2]=TUtil::GetMCFMParticleLabel(pId[pZOrder[0]], false, useQQVVQQany);
+          strplabel[3]=TUtil::GetMCFMParticleLabel(pId[pZOrder[1]], false, useQQVVQQany);
         }
         // End special Z1->ll cases
       }
@@ -2486,9 +2490,13 @@ bool TUtil::MCFM_SetupParticleCouplings(
         zcouple_.r1=zcouple_.rn;
 
         // Special Z1->nn cases
-        if (useQQBZGAM || useQQVVQQany){
+        if (useQQBZGAM){
           strplabel[2]="nl";
           strplabel[3]="na";
+        }
+        else if (useQQVVQQany){
+          strplabel[2]=TUtil::GetMCFMParticleLabel(pId[pZOrder[0]], false, useQQVVQQany);
+          strplabel[3]=TUtil::GetMCFMParticleLabel(pId[pZOrder[1]], false, useQQVVQQany);
         }
         // End special Z1->nn cases
       }
@@ -2507,8 +2515,8 @@ bool TUtil::MCFM_SetupParticleCouplings(
             strplabel[3]="ea";
           }
           else if (useQQVVQQany){
-            strplabel[2]=TUtil::GetMCFMParticleLabel(pId[pZOrder[0]]);
-            strplabel[3]=TUtil::GetMCFMParticleLabel(pId[pZOrder[1]]);
+            strplabel[2]=TUtil::GetMCFMParticleLabel(pId[pZOrder[0]], false, useQQVVQQany);
+            strplabel[3]=TUtil::GetMCFMParticleLabel(pId[pZOrder[1]], false, useQQVVQQany);
           }
         }
         else{
@@ -2549,8 +2557,8 @@ bool TUtil::MCFM_SetupParticleCouplings(
       } // End Z1 daughter id tests
     } // End ZZ/ZG/ZJJ Z1 couplings
     else if (useQQVVQQany){
-      strplabel[2]=TUtil::GetMCFMParticleLabel(pId[pZOrder[0]]);
-      strplabel[3]=TUtil::GetMCFMParticleLabel(pId[pZOrder[1]]);
+      strplabel[2]=TUtil::GetMCFMParticleLabel(pId[pZOrder[0]], false, useQQVVQQany);
+      strplabel[3]=TUtil::GetMCFMParticleLabel(pId[pZOrder[1]], false, useQQVVQQany);
     }
 
     // Couplings for Z2
@@ -2563,8 +2571,8 @@ bool TUtil::MCFM_SetupParticleCouplings(
 
         // Special Z2->ll cases
         if (useQQVVQQany){
-          strplabel[4]="el";
-          strplabel[5]="ea";
+          strplabel[4]=TUtil::GetMCFMParticleLabel(pId[pZOrder[2]], false, useQQVVQQany);
+          strplabel[5]=TUtil::GetMCFMParticleLabel(pId[pZOrder[3]], false, useQQVVQQany);
         }
         // End special Z2->ll cases
       }
@@ -2575,8 +2583,8 @@ bool TUtil::MCFM_SetupParticleCouplings(
 
         // Special Z2->nn cases
         if (useQQVVQQany){
-          strplabel[4]="nl";
-          strplabel[5]="na";
+          strplabel[4]=TUtil::GetMCFMParticleLabel(pId[pZOrder[2]], false, useQQVVQQany);
+          strplabel[5]=TUtil::GetMCFMParticleLabel(pId[pZOrder[3]], false, useQQVVQQany);
         }
         // End special Z2->nn cases
       }
@@ -2591,8 +2599,8 @@ bool TUtil::MCFM_SetupParticleCouplings(
 
           // Special Z2->qq cases
           if (useQQVVQQany){
-            strplabel[4]=TUtil::GetMCFMParticleLabel(pId[pZOrder[2]]);
-            strplabel[5]=TUtil::GetMCFMParticleLabel(pId[pZOrder[3]]);
+            strplabel[4]=TUtil::GetMCFMParticleLabel(pId[pZOrder[2]], false, useQQVVQQany);
+            strplabel[5]=TUtil::GetMCFMParticleLabel(pId[pZOrder[3]], false, useQQVVQQany);
           }
         }
         else{
@@ -2629,8 +2637,8 @@ bool TUtil::MCFM_SetupParticleCouplings(
       } // End Z2 daughter id tests
     } // End ZZ Z2 couplings
     else if (useQQVVQQany){
-      strplabel[4]=TUtil::GetMCFMParticleLabel(pId[pZOrder[2]]);
-      strplabel[5]=TUtil::GetMCFMParticleLabel(pId[pZOrder[3]]);
+      strplabel[4]=TUtil::GetMCFMParticleLabel(pId[pZOrder[2]], false, useQQVVQQany);
+      strplabel[5]=TUtil::GetMCFMParticleLabel(pId[pZOrder[3]], false, useQQVVQQany);
     }
 
   } // End check WW, ZZ, ZG etc.
@@ -2755,7 +2763,7 @@ bool TUtil::MCFM_SetupParticleCouplings(
   if (pApartId!=0) delete[] pApartId;
   return result;
 }
-TString TUtil::GetMCFMParticleLabel(const int& pid, bool useQJ){
+TString TUtil::GetMCFMParticleLabel(const int& pid, bool useQJ, bool useExtendedConventions){
   if (PDGHelpers::isAnUnknownJet(pid)){
     if (useQJ) return TString("qj");
     else return TString("pp");
@@ -2775,15 +2783,23 @@ TString TUtil::GetMCFMParticleLabel(const int& pid, bool useQJ){
   else if (pid==11) return TString("el");
   else if (pid==13) return TString("ml");
   else if (pid==15) return TString("tl");
-  else if (pid==12) return TString("nl");
-  else if (pid==14) return TString("nl");
-  else if (pid==16) return TString("nl");
   else if (pid==-11) return TString("ea");
   else if (pid==-13) return TString("ma");
   else if (pid==-15) return TString("ta");
-  else if (pid==-12) return TString("na");
-  else if (pid==-14) return TString("na");
-  else if (pid==-16) return TString("na");
+  else if (std::abs(pid)>=12 && std::abs(pid)<=16){
+    if (!useExtendedConventions){
+      if (pid>0) return TString("nl");
+      else return TString("na");
+    }
+    else{
+      if (pid==12) return TString("ne");
+      else if (pid==14) return TString("nm");
+      else if (pid==16) return TString("nt");
+      else if (pid==-12) return TString("ke");
+      else if (pid==-14) return TString("km");
+      else/* if (pid==-16)*/ return TString("kt");
+    }
+  }
   else return TString("  ");
 }
 
@@ -3855,7 +3871,7 @@ double TUtil::SumMatrixElementPDF(
             qq_zzqqstrong_(p4_tmp[0], msq_tmp[0]);
             for (int iquark=-5; iquark<=5; iquark++){ for (int jquark=-5; jquark<=5; jquark++){ msq[jquark+5][iquark+5] = (msq[jquark+5][iquark+5] + msq_tmp[jquark+5][iquark+5]); if (iquark==jquark && iquark!=0) msq[jquark+5][iquark+5]*=0.5; } }
             // Subtract qqb/qbq->gg that was counted twice.
-            TString gglabel = TUtil::GetMCFMParticleLabel(21);
+            TString gglabel = TUtil::GetMCFMParticleLabel(21, false, true);
             for (int ip=0; ip<mxpart; ip++){
               if (ip!=6 && ip!=7) sprintf((plabel_.plabel)[ip], (plabel_.plabel)[ip]);
               else sprintf((plabel_.plabel)[ip], gglabel.Data());
@@ -3973,7 +3989,7 @@ double TUtil::SumMatrixElementPDF(
             qq_wwqqstrong_(p4_tmp[0], msq_tmp[0]);
             for (int iquark=-5; iquark<=5; iquark++){ for (int jquark=-5; jquark<=5; jquark++){ msq[jquark+5][iquark+5] = (msq[jquark+5][iquark+5] + msq_tmp[jquark+5][iquark+5]); if (iquark==jquark && iquark!=0) msq[jquark+5][iquark+5]*=0.5; } }
             // Subtract qqb/qbq->gg that was counted twice.
-            TString gglabel = TUtil::GetMCFMParticleLabel(21);
+            TString gglabel = TUtil::GetMCFMParticleLabel(21, false, true);
             for (int ip=0; ip<mxpart; ip++){
               if (ip!=6 && ip!=7) sprintf((plabel_.plabel)[ip], (plabel_.plabel)[ip]);
               else sprintf((plabel_.plabel)[ip], gglabel.Data());
@@ -7260,17 +7276,17 @@ bool TUtil::CheckPartonMomFraction(const TLorentzVector& p0, const TLorentzVecto
 void TUtil::ComputePDF(const TLorentzVector& p0, const TLorentzVector& p1, double fx1[nmsq], double fx2[nmsq], const double& EBEAM, const TVar::VerbosityLevel& verbosity){
   if (verbosity>=TVar::DEBUG) cout << "Begin TUtil::ComputePDF"<< endl;
   double xx[2]={ 0 };
-  bool passPartonErgFrac=CheckPartonMomFraction(p0, p1, xx, EBEAM, verbosity);
-  if (passPartonErgFrac){
+  if (CheckPartonMomFraction(p0, p1, xx, EBEAM, verbosity)){
     ///// USE JHUGEN SUBROUTINE (Accomodates LHAPDF) /////
     double fx1x2_jhu[2][13]={ { 0 } };
-    if (verbosity>=TVar::DEBUG) cout << "TUtil::ComputePDF: Calling setpdfs"<< endl;
+    if (verbosity>=TVar::DEBUG) cout << "TUtil::ComputePDF: Calling setpdfs with xx[0]: " << xx[0] << ", xx[1] = " << xx[1] << endl;
     __modkinematics_MOD_setpdfs(&(xx[0]), &(xx[1]), fx1x2_jhu);
     if (verbosity>=TVar::DEBUG) cout << "TUtil::ComputePDF: called"<< endl;
     for (int ip=-6; ip<=6; ip++){
+      // JHUGen assignment is in JHU id coventions (up <-> down, g==g)
       int fac=0;
       if (ip!=0 && (abs(ip)%2==0)) fac=-1;
-      else if (ip!=0) fac=1;
+      else if (ip!=0) fac=+1;
       if (ip<0) fac=-fac;
       int jp=ip+fac;
       fx1[jp+5]=fx1x2_jhu[0][ip+6];
