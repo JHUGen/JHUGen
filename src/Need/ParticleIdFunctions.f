@@ -31,6 +31,16 @@
       return
       end
 
+      function isUpTypeLightQuark(idpart)
+      implicit none
+      logical isUpTypeLightQuark
+      integer idpart
+      isUpTypeLightQuark =
+     & idpart.eq.2 .or.
+     & idpart.eq.4
+      return
+      end
+
       function isDnTypeQuark(idpart)
       implicit none
       logical isDnTypeQuark

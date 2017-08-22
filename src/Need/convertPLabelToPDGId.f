@@ -39,7 +39,7 @@
          convertPLabelToPDGId=3
          elseif (plabel(j) .eq. 'bq') then
          convertPLabelToPDGId=5
-         elseif (plabel(j) .eq. 'nl') then
+         elseif (plabel(j) .eq. 'nl' .or. plabel(j) .eq. 'ne') then
          convertPLabelToPDGId=12
          elseif (plabel(j) .eq. 'nm') then
          convertPLabelToPDGId=14
@@ -62,8 +62,12 @@
          convertPLabelToPDGId=-3
          elseif (plabel(j) .eq. 'ba') then
          convertPLabelToPDGId=-5
-         elseif (plabel(j) .eq. 'na') then
+         elseif (plabel(j) .eq. 'na' .or. plabel(j) .eq. 'ke') then
          convertPLabelToPDGId=-12
+         elseif (plabel(j) .eq. 'km') then
+         convertPLabelToPDGId=-14
+         elseif (plabel(j) .eq. 'kt') then
+         convertPLabelToPDGId=-16
          elseif (plabel(j) .eq. 'ea') then
          convertPLabelToPDGId=-11
          elseif (plabel(j) .eq. 'ma') then

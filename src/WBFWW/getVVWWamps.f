@@ -29,10 +29,10 @@
      & jmid18(2,2,2,2),jvbf18(2,2,2,2),jtwodiags18(2,2,2,2),
      &jtwo18(2,2,2,2),jtwo27(2,2,2,2),jZWZa18(2,2,2,2),jZWZb18(2,2,2,2),
      & jtwoWexch17(2,2),jtwoWexch28(2,2),
-     & j7_34_1z(2,4),j7_34_1g(2,4),j8_56_2z(2,4),j8_56_2g(2,4),
      & jtwoWexch18(2,2),jtwoWexch27(2,2),
-     & j8_34_1z(2,4),j8_34_1g(2,4),j7_56_2z(2,4),j7_56_2g(2,4),
      & jmidWW17,jmidWW18,jmidWW28,
+     & j7_34_1z(2,4),j7_34_1g(2,4),j8_56_2z(2,4),j8_56_2g(2,4),
+     & j8_34_1z(2,4),j8_34_1g(2,4),j7_56_2z(2,4),j7_56_2g(2,4),
      & j8_34_2z(2,4),j8_34_2g(2,4),j7_56_1z(2,4),j7_56_1g(2,4)
       logical doHO,doBO
 
@@ -105,20 +105,25 @@ c--- W exchange diagrams for flavor-changing contributions: contribution from jt
 
       jmid17=czip
       jmid18=czip
+
       jtwo17=czip
       jtwo28=czip
       jtwo18=czip
       jtwo27=czip
+
       jZWZa17=czip
       jZWZb17=czip
       jZWZa18=czip
       jZWZb18=czip
+
       jtwodiags17=czip
       jtwodiags18=czip
+
       jtwoWexch17=czip
       jtwoWexch28=czip
       jtwoWexch18=czip
       jtwoWexch27=czip
+
       j7_34_1z=czip
       j7_34_1g=czip
       j8_56_2z=czip
@@ -254,7 +259,18 @@ C-----setup for (uqsq_dqcq)
      &  -cdotpr(j8_34_2z(1,:),k8342(:))
      &  *cdotpr(k8342(:),j7_56_1z(2,:))/czmass2)
      & /(s8342-dcmplx(zmass**2,-zmass*zwidth))
-
+! U. SARICA TEST
+      if (j1.eq.1 .and. j2.eq.7 .and. j7.eq.2) then
+      write(6,*) jtwoWexch17(2,1)
+      write(6,*) jtwoWexch28(1,2)
+      write(6,*) jmidWW28
+      write(6,*) cdotpr(j8_34_2g(1,:),j7_56_1g(2,:))/s8342
+      write(6,*) (cdotpr(j8_34_2z(1,:),j7_56_1z(2,:))
+     &  -cdotpr(j8_34_2z(1,:),k8342(:))
+     &  *cdotpr(k8342(:),j7_56_1z(2,:))/czmass2)
+      write(6,*) (s8342-dcmplx(zmass**2,-zmass*zwidth))
+      endif
+!
 
       return
 
