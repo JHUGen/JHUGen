@@ -9,6 +9,8 @@
       include 'zcouple.f'
       include 'pid_pdg.f'
       include 'zacouplejk.f'
+      logical isALepton,isANeutrino,isUpTypeLightQuark,isDnTypeQuark,
+     & isAnUnknownJet
       integer p1,p2,p3,p4,p7,ro
       double complex zab(mxpart,4,mxpart),zab2,jZ(2,4),jg(2,4),
      & rxw,propw34,propw17
@@ -38,102 +40,160 @@ c--- determine correct couplings from calling parameters
       Lup = L_jk(p1,p7,2)
       Qdn = Q_jk(p1,p7,1)
       Qup = Q_jk(p1,p7,2)
-      if (p3 .eq. 3) then
-        q3=q1
-        l3=l1
-      else
-        q3=q2
-        l3=l2
-      endif
-      ! Find the complementary charges for the n3-n4 line
-      if(pid_pdg(p3).eq.0 .and. pid_pdg(p4).eq.0) then
+      ! Find the charges for the n3-n4 line
+      if(
+     & (
+     & isDnTypeQuark(abs(pid_pdg(p3))) .or.
+     & isUpTypeLightQuark(abs(pid_pdg(p4)))
+     & ) .or. isALepton(abs(pid_pdg(p3)))
+     & ) then
+         ! p3-p4 is a d/e current with negative charge
+         l3=L_jk(p3,p4,1)
+         l4=L_jk(p3,p4,2)
+         q3=Q_jk(p3,p4,1)
+         q4=Q_jk(p3,p4,2)
+      else if(
+     & (
+     & isUpTypeLightQuark(abs(pid_pdg(p3))) .or.
+     & isDnTypeQuark(abs(pid_pdg(p4)))
+     & ) .or. isANeutrino(abs(pid_pdg(p3)))
+     & ) then
+         ! p3-p4 is a u/nu current with non-negative charge
+         l3=L_jk(p3,p4,2)
+         l4=L_jk(p3,p4,1)
+         q3=Q_jk(p3,p4,2)
+         q4=Q_jk(p3,p4,1)
+      else if(
+     & isAnUnknownJet(pid_pdg(p3)) .and.
+     & isAnUnknownJet(pid_pdg(p4))
+     & ) then
          ! Assign same couplings if both particles are unknown (jets).
+         l3=0d0
+         q3=0d0
+         if(p3.eq.3) then
+            l3=l1
+            q3=q1
+         else if(p3.eq.5) then
+            l3=l2
+            q3=q2
+         endif
          l4=l3
          q4=q3
-      else if(
-     & abs(pid_pdg(p3)).eq.11 .or.
-     & abs(pid_pdg(p3)).eq.13 .or.
-     & abs(pid_pdg(p3)).eq.15) then
-         ! p3-p4 is an e current
-         l4=ln
-         q4=0d0
-      else if(
-     & abs(pid_pdg(p3)).eq.12 .or.
-     & abs(pid_pdg(p3)).eq.14 .or.
-     & abs(pid_pdg(p3)).eq.16) then
-         ! p3-p4 is a nu current
-         l4=le
-         q4=qe
-      else if(
-     & abs(pid_pdg(p3)).eq.1 .or.
-     & abs(pid_pdg(p3)).eq.3 .or.
-     & abs(pid_pdg(p3)).eq.5) then
-         ! p3-p4 is a d quark current
-         l4=L(2)
-         q4=Q(2)
-      else if(
-     & abs(pid_pdg(p3)).eq.2 .or.
-     & abs(pid_pdg(p3)).eq.4) then
-         ! p3-p4 is a u quark current
-         l4=L(1)
-         q4=Q(1)
       else
          ! p3-p4 case is unknown, kill the relevant amplitude.
+         l3=0d0
+         q3=0d0
          l4=0d0
          q4=0d0
       endif
 
       do ro=1,4
-      jZ(1,ro)= + propw34**(-1) * ( Ldn*za(p7,p3)*zb(p7,p4)*zab(p7,ro,
-     &    p1)*s347**(-1) + Ldn*za(p7,p3)*zb(p3,p4)*zab(p3,ro,p1)*
-     &    s347**(-1) - Lup*za(p1,p3)*zb(p1,p4)*zab(p7,ro,p1)*
-     &    s134**(-1) + Lup*za(p3,p4)*zb(p1,p4)*zab(p7,ro,p4)*
-     &    s134**(-1) + za(p7,p3)*zb(p1,p4)*p17(ro)*propw17**(-1)*rxw -
-     &    za(p7,p3)*zb(p1,p4)*p34(ro)*propw17**(-1)*rxw - zab2(p7,p3,p4
-     &    ,p1)*zab(p3,ro,p4)*propw17**(-1)*rxw + zab2(p3,p1,p7,p4)*zab(
-     &    p7,ro,p1)*propw17**(-1)*rxw )
-      jZ(1,ro) = jZ(1,ro) - za(p7,p1)*zb(p1,p4)*zab(p3,ro,p1)*
-     & propw17**(-1)*l3*s147**(-1) - za(p7,p3)*zb(p7,p1)*zab(p7,ro,p4)*
-     &    propw17**(-1)*l4*s137**(-1) + za(p7,p3)*zb(p1,p3)*zab(p3,ro,
-     &    p4)*propw17**(-1)*l4*s137**(-1) - za(p7,p4)*zb(p1,p4)*zab(p3,
-     &    ro,p4)*propw17**(-1)*l3*s147**(-1)
-      jZ(2,ro)= + propw34**(-1) * (  - Ldn*za(p1,p3)*zb(p1,p4)*zab(p7,
-     &    ro,p1)*s134**(-1) + Ldn*za(p3,p4)*zb(p1,p4)*zab(p7,ro,p4)*
-     &    s134**(-1) + Lup*za(p7,p3)*zb(p7,p4)*zab(p7,ro,p1)*
-     &    s347**(-1) + Lup*za(p7,p3)*zb(p3,p4)*zab(p3,ro,p1)*
-     &    s347**(-1) - za(p7,p3)*zb(p1,p4)*p17(ro)*propw17**(-1)*rxw +
-     &    za(p7,p3)*zb(p1,p4)*p34(ro)*propw17**(-1)*rxw + zab2(p7,p3,p4
-     &    ,p1)*zab(p3,ro,p4)*propw17**(-1)*rxw - zab2(p3,p1,p7,p4)*zab(
-     &    p7,ro,p1)*propw17**(-1)*rxw )
-      jZ(2,ro) = jZ(2,ro) - za(p7,p1)*zb(p1,p4)*zab(p3,ro,p1)*
-     & propw17**(-1)*l3*s147**(-1) - za(p7,p3)*zb(p7,p1)*zab(p7,ro,p4)*
-     &    propw17**(-1)*l4*s137**(-1) + za(p7,p3)*zb(p1,p3)*zab(p3,ro,
-     &    p4)*propw17**(-1)*l4*s137**(-1) - za(p7,p4)*zb(p1,p4)*zab(p3,
-     &    ro,p4)*propw17**(-1)*l3*s147**(-1)
-      jg(1,ro)= + propw34**(-1) * ( za(p7,p3)*zb(p7,p4)*zab(p7,ro,p1)*
-     &    Qdn*s347**(-1) + za(p7,p3)*zb(p1,p4)*p17(ro)*propw17**(-1) -
-     &    za(p7,p3)*zb(p1,p4)*p34(ro)*propw17**(-1) + za(p7,p3)*zb(p3,
-     &    p4)*zab(p3,ro,p1)*Qdn*s347**(-1) - za(p1,p3)*zb(p1,p4)*zab(p7,
-     &    ro,p1)*Qup*s134**(-1) + za(p3,p4)*zb(p1,p4)*zab(p7,ro,p4)*Qup*
-     &    s134**(-1) - zab2(p7,p3,p4,p1)*zab(p3,ro,p4)*propw17**(-1) +
-     &    zab2(p3,p1,p7,p4)*zab(p7,ro,p1)*propw17**(-1) )
-      jg(1,ro) = jg(1,ro) - za(p7,p1)*zb(p1,p4)*zab(p3,ro,p1)*
-     & propw17**(-1)*q3*s147**(-1) - za(p7,p3)*zb(p7,p1)*zab(p7,ro,p4)*
-     &    propw17**(-1)*q4*s137**(-1) + za(p7,p3)*zb(p1,p3)*zab(p3,ro,
-     &    p4)*propw17**(-1)*q4*s137**(-1) - za(p7,p4)*zb(p1,p4)*zab(p3,
-     &    ro,p4)*propw17**(-1)*q3*s147**(-1)
-      jg(2,ro)= + propw34**(-1) * ( za(p7,p3)*zb(p7,p4)*zab(p7,ro,p1)*
-     &    Qup*s347**(-1) - za(p7,p3)*zb(p1,p4)*p17(ro)*propw17**(-1) +
-     &    za(p7,p3)*zb(p1,p4)*p34(ro)*propw17**(-1) + za(p7,p3)*zb(p3,
-     &    p4)*zab(p3,ro,p1)*Qup*s347**(-1) - za(p1,p3)*zb(p1,p4)*zab(p7,
-     &    ro,p1)*Qdn*s134**(-1) + za(p3,p4)*zb(p1,p4)*zab(p7,ro,p4)*Qdn*
-     &    s134**(-1) + zab2(p7,p3,p4,p1)*zab(p3,ro,p4)*propw17**(-1) -
-     &    zab2(p3,p1,p7,p4)*zab(p7,ro,p1)*propw17**(-1) )
-      jg(2,ro) = jg(2,ro) - za(p7,p1)*zb(p1,p4)*zab(p3,ro,p1)*
-     & propw17**(-1)*q3*s147**(-1) - za(p7,p3)*zb(p7,p1)*zab(p7,ro,p4)*
-     &    propw17**(-1)*q4*s137**(-1) + za(p7,p3)*zb(p1,p3)*zab(p3,ro,
-     &    p4)*propw17**(-1)*q4*s137**(-1) - za(p7,p4)*zb(p1,p4)*zab(p3,
-     &    ro,p4)*propw17**(-1)*q3*s147**(-1)
+      jZ(1,ro)= propw34**(-1) * (
+     &   + Ldn*s347**(-1)*(
+     &   + za(p7,p3)*zb(p7,p4)*zab(p7,ro,p1)
+     &   + za(p7,p3)*zb(p3,p4)*zab(p3,ro,p1)
+     &   )
+     &   + Lup*s134**(-1)*(
+     &   - za(p1,p3)*zb(p1,p4)*zab(p7,ro,p1)
+     &   + za(p3,p4)*zb(p1,p4)*zab(p7,ro,p4)
+     &   )
+     &   + propw17**(-1)*rxw*(
+     &   + za(p7,p3)*zb(p1,p4)*p17(ro)
+     &   - za(p7,p3)*zb(p1,p4)*p34(ro)
+     &   - zab2(p7,p3,p4,p1)*zab(p3,ro,p4)
+     &   + zab2(p3,p1,p7,p4)*zab(p7,ro,p1)
+     &   )
+     & )
+      jZ(1,ro) = jZ(1,ro) + propw17**(-1)*(
+     &   + l3*s147**(-1)*(
+     &   - za(p7,p1)*zb(p1,p4)*zab(p3,ro,p1)
+     &   - za(p7,p4)*zb(p1,p4)*zab(p3,ro,p4)
+     &   )
+     &   + l4*s137**(-1)*(
+     &   - za(p7,p3)*zb(p7,p1)*zab(p7,ro,p4)
+     &   + za(p7,p3)*zb(p1,p3)*zab(p3,ro,p4)
+     &   )
+     & )
+      jZ(2,ro)= + propw34**(-1) * (
+     &   + Lup*s347**(-1)*(
+     &   + za(p7,p3)*zb(p7,p4)*zab(p7,ro,p1)
+     &   + za(p7,p3)*zb(p3,p4)*zab(p3,ro,p1)
+     &   )
+     &   + Ldn*s134**(-1)*(
+     &   - za(p1,p3)*zb(p1,p4)*zab(p7,ro,p1)
+     &   + za(p3,p4)*zb(p1,p4)*zab(p7,ro,p4)
+     &   )
+     &   + propw17**(-1)*rxw*(
+     &   - za(p7,p3)*zb(p1,p4)*p17(ro)
+     &   + za(p7,p3)*zb(p1,p4)*p34(ro)
+     &   + zab2(p7,p3,p4,p1)*zab(p3,ro,p4)
+     &   - zab2(p3,p1,p7,p4)*zab(p7,ro,p1)
+     &   )
+     & )
+      jZ(2,ro) = jZ(2,ro) + propw17**(-1)*(
+     &   + l3*s147**(-1)*(
+     &   - za(p7,p1)*zb(p1,p4)*zab(p3,ro,p1)
+     &   - za(p7,p4)*zb(p1,p4)*zab(p3,ro,p4)
+     &   )
+     &   + l4*s137**(-1)*(
+     &   - za(p7,p3)*zb(p7,p1)*zab(p7,ro,p4)
+     &   + za(p7,p3)*zb(p1,p3)*zab(p3,ro,p4)
+     &   )
+     & )
+
+      jg(1,ro)= propw34**(-1) * (
+     &   + Qdn*s347**(-1)*(
+     &   + za(p7,p3)*zb(p7,p4)*zab(p7,ro,p1)
+     &   + za(p7,p3)*zb(p3,p4)*zab(p3,ro,p1)
+     &   )
+     &   + Qup*s134**(-1)*(
+     &   - za(p1,p3)*zb(p1,p4)*zab(p7,ro,p1)
+     &   + za(p3,p4)*zb(p1,p4)*zab(p7,ro,p4)
+     &   )
+     &   + propw17**(-1)*(
+     &   + za(p7,p3)*zb(p1,p4)*p17(ro)
+     &   - za(p7,p3)*zb(p1,p4)*p34(ro)
+     &   - zab2(p7,p3,p4,p1)*zab(p3,ro,p4)
+     &   + zab2(p3,p1,p7,p4)*zab(p7,ro,p1)
+     &   )
+     & )
+      jg(1,ro) = jg(1,ro) + propw17**(-1)*(
+     &   + q3*s147**(-1)*(
+     &   - za(p7,p1)*zb(p1,p4)*zab(p3,ro,p1)
+     &   - za(p7,p4)*zb(p1,p4)*zab(p3,ro,p4)
+     &   )
+     &   + q4*s137**(-1)*(
+     &   - za(p7,p3)*zb(p7,p1)*zab(p7,ro,p4)
+     &   + za(p7,p3)*zb(p1,p3)*zab(p3,ro,p4)
+     &   )
+     & )
+      jg(2,ro)= + propw34**(-1) * (
+     &   + Qup*s347**(-1)*(
+     &   + za(p7,p3)*zb(p7,p4)*zab(p7,ro,p1)
+     &   + za(p7,p3)*zb(p3,p4)*zab(p3,ro,p1)
+     &   )
+     &   + Qdn*s134**(-1)*(
+     &   - za(p1,p3)*zb(p1,p4)*zab(p7,ro,p1)
+     &   + za(p3,p4)*zb(p1,p4)*zab(p7,ro,p4)
+     &   )
+     &   + propw17**(-1)*(
+     &   - za(p7,p3)*zb(p1,p4)*p17(ro)
+     &   + za(p7,p3)*zb(p1,p4)*p34(ro)
+     &   + zab2(p7,p3,p4,p1)*zab(p3,ro,p4)
+     &   - zab2(p3,p1,p7,p4)*zab(p7,ro,p1)
+     &   )
+     & )
+      jg(2,ro) = jg(2,ro) + propw17**(-1)*(
+     &   + q3*s147**(-1)*(
+     &   - za(p7,p1)*zb(p1,p4)*zab(p3,ro,p1)
+     &   - za(p7,p4)*zb(p1,p4)*zab(p3,ro,p4)
+     &   )
+     &   + q4*s137**(-1)*(
+     &   - za(p7,p3)*zb(p7,p1)*zab(p7,ro,p4)
+     &   + za(p7,p3)*zb(p1,p3)*zab(p3,ro,p4)
+     &   )
+     & )
+
       enddo
       jZ(:,:)=jZ(:,:)/cxw
       jg(:,:)=jg(:,:)/cxw
