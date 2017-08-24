@@ -7,10 +7,16 @@
       include 'zacouplejk.f'
       integer n1,n2,j
       integer aid(mxpart)
+      logical isALepton,isANeutrino,isUpTypeQuark,isDnTypeQuark,
+     & isAnUnknownJet
 
       do j=1,mxpart
          aid(j) = abs(pid_pdg(j))
       enddo
+
+      Q_j(:,:)=0d0
+      L_j(:,:)=0d0
+      R_j(:,:)=0d0
 
       ! Find 17 and 28 couplings to Z/A
       ! The first two indices are for particle pairs,
@@ -18,6 +24,38 @@
       Q_jk(:,:,:)=0d0
       L_jk(:,:,:)=0d0
       R_jk(:,:,:)=0d0
+
+      do n1=1,mxpart
+         if(isALepton(aid(n1))) then
+            Q_j(n1,1) = qe
+            L_j(n1,1) = le
+            R_j(n1,1) = re
+            Q_j(n1,2) = 0d0
+            L_j(n1,2) = ln
+            R_j(n1,2) = rn
+         else if(isANeutrino(aid(n1))) then
+            Q_j(n1,2) = qe
+            L_j(n1,2) = le
+            R_j(n1,2) = re
+            Q_j(n1,1) = 0d0
+            L_j(n1,1) = ln
+            R_j(n1,1) = rn
+         else if(isDnTypeQuark(aid(n1))) then
+            Q_j(n1,1) = Q(1)
+            L_j(n1,1) = L(1)
+            R_j(n1,1) = R(1)
+            Q_j(n1,2) = Q(2)
+            L_j(n1,2) = L(2)
+            R_j(n1,2) = R(2)
+         else if(isUpTypeQuark(aid(n1))) then
+            Q_j(n1,2) = Q(1)
+            L_j(n1,2) = L(1)
+            R_j(n1,2) = R(1)
+            Q_j(n1,1) = Q(2)
+            L_j(n1,1) = L(2)
+            R_j(n1,1) = R(2)
+         endif
+      enddo
 
       do n1=2,mxpart
       do n2=1,n1-1
