@@ -168,149 +168,118 @@ C-----end statement functions
       p8=i8
 
       amp(:,:)=czip
-      amp(1,2)=
-     & + propw56**(-1)*propw34**(-1)*propw28**(-1)*(
-     &    + s128**(-1)*s347**(-1)*cxw**(-1) * (
-     & - za(p7,p5)*za(p7,p3)*zb(p7,p4)*zb(p1,p2)*zba2(p6,p1,p2,p8)
-     & + za(p7,p3)*za(p5,p3)*zb(p1,p2)*zb(p3,p4)*zba2(p6,p1,p2,p8)
-     &    )
-     &    + s278**(-1)*s134**(-1)*cxw**(-1) * (
-     & - za(p7,p8)*za(p1,p3)*zb(p1,p6)*zb(p1,p4)*zba2(p2,p7,p8,p5)
-     & - za(p7,p8)*za(p3,p4)*zb(p1,p4)*zb(p6,p4)*zba2(p2,p7,p8,p5)
-     &    )
-     &    + gamv(2,1)*s128**(-1) * (
-     & - za(p1,p8)*za(p5,p3)*zb(p1,p2)*zb(p6,p4)*zab2(p7,p5,p6,p1)
-     & + za(p1,p8)*za(p5,p3)*zb(p1,p2)*zb(p6,p4)*zab2(p7,p3,p4,p1)
-     & + za(p5,p3)*za(p8,p2)*zb(p1,p2)*zb(p6,p4)*zab2(p7,p5,p6,p2)
-     & - za(p5,p3)*za(p8,p2)*zb(p1,p2)*zb(p6,p4)*zab2(p7,p3,p4,p2)
-     & - 2.D0*za(p7,p5)*zb(p1,p2)*zab2(p3,p5,p6,p4)*zba2(p6,p1,p2,p8)
-     & + 2.D0*za(p7,p3)*zb(p1,p2)*zab2(p5,p3,p4,p6)*zba2(p4,p1,p2,p8)
-     &    )
-     &    + gamv(1,1)*s278**(-1) * (
-     & + za(p7,p8)*za(p5,p3)*zb(p7,p2)*zb(p6,p4)*zab2(p7,p5,p6,p1)
-     & - za(p7,p8)*za(p5,p3)*zb(p7,p2)*zb(p6,p4)*zab2(p7,p3,p4,p1)
-     & + za(p7,p8)*za(p5,p3)*zb(p6,p4)*zb(p8,p2)*zab2(p8,p5,p6,p1)
-     & - za(p7,p8)*za(p5,p3)*zb(p6,p4)*zb(p8,p2)*zab2(p8,p3,p4,p1)
-     & + 2.D0*za(p7,p8)*zb(p1,p6)*zab2(p3,p5,p6,p4)*zba2(p2,p7,p8,p5)
-     & - 2.D0*za(p7,p8)*zb(p1,p4)*zab2(p5,p3,p4,p6)*zba2(p2,p7,p8,p3)
-     &    )
-     & )
-     & + propw56**(-1)*propw28**(-1) * (
-     &    + 2.D0*s128**(-1) * (
-     &       + gam3456f3(2,1,1)*s356**(-1)*(
-     & + za(p7,p5)*za(p5,p3)*zb(p1,p2)*zb(p5,p6)*zba2(p4,p1,p2,p8)
-     & - za(p7,p3)*za(p5,p3)*zb(p1,p2)*zb(p6,p3)*zba2(p4,p1,p2,p8)
-     &       )
-     &       + gam3456f4(2,1,1)*s456**(-1)*(
-     & + za(p7,p3)*za(p5,p4)*zb(p1,p2)*zb(p6,p4)*zba2(p4,p1,p2,p8)
-     & + za(p7,p3)*za(p5,p6)*zb(p1,p2)*zb(p6,p4)*zba2(p6,p1,p2,p8)
-     &       )
-     &    )
-     &    + 2.D0*s278**(-1) * (
-     &       + gam3456f3(1,1,1)*s356**(-1)*(
-     & - za(p7,p8)*za(p5,p3)*zb(p1,p4)*zb(p5,p6)*zba2(p2,p7,p8,p5)
-     & + za(p7,p8)*za(p5,p3)*zb(p1,p4)*zb(p6,p3)*zba2(p2,p7,p8,p3)
-     &       )
-     &       + gam3456f4(1,1,1)*s456**(-1)*(
-     & - za(p7,p8)*za(p5,p6)*zb(p1,p6)*zb(p6,p4)*zba2(p2,p7,p8,p3)
-     & - za(p7,p8)*za(p5,p4)*zb(p1,p4)*zb(p6,p4)*zba2(p2,p7,p8,p3)
-     &       )
-     &    )
-     & )
-     & + propw34**(-1)*propw28**(-1)*(
-     &    + 2.D0*s128**(-1) * (
-     &       + gam3456f6(2,1,1)*s346**(-1)*(
-     & + za(p7,p5)*za(p6,p3)*zb(p1,p2)*zb(p6,p4)*zba2(p6,p1,p2,p8)
-     & - za(p7,p5)*za(p3,p4)*zb(p1,p2)*zb(p6,p4)*zba2(p4,p1,p2,p8)
-     &       )
-     &       + gam3456f5(2,1,1)*s345**(-1)*(
-     & - za(p7,p5)*za(p5,p3)*zb(p1,p2)*zb(p5,p4)*zba2(p6,p1,p2,p8)
-     & - za(p7,p3)*za(p5,p3)*zb(p1,p2)*zb(p3,p4)*zba2(p6,p1,p2,p8)
-     &       )
-     &    )
-     &    + 2.D0*s278**(-1) * (
-     &       + gam3456f6(1,1,1)*s346**(-1)*(
-     & - za(p7,p8)*za(p6,p3)*zb(p1,p6)*zb(p6,p4)*zba2(p2,p7,p8,p5)
-     & + za(p7,p8)*za(p3,p4)*zb(p1,p4)*zb(p6,p4)*zba2(p2,p7,p8,p5)
-     &       )
-     &       + gam3456f5(1,1,1)*s345**(-1)*(
-     & + za(p7,p8)*za(p5,p3)*zb(p1,p6)*zb(p5,p4)*zba2(p2,p7,p8,p5)
-     & + za(p7,p8)*za(p5,p3)*zb(p1,p6)*zb(p3,p4)*zba2(p2,p7,p8,p3)
-     &       )
-     &    )
-     & )
-
-      amp(2,1)=
-     & + propw56**(-1)*propw34**(-1)*propw28**(-1)*(
-     &    + s278**(-1)*s156**(-1)*cxw**(-1) * (
-     & - za(p7,p8)*za(p1,p5)*zb(p1,p6)*zb(p1,p4)*zba2(p2,p7,p8,p3)
-     & + za(p7,p8)*za(p5,p6)*zb(p1,p6)*zb(p6,p4)*zba2(p2,p7,p8,p3)
-     &    )
-     &    + s128**(-1)*s567**(-1)*cxw**(-1) * (
-     & - za(p7,p5)*za(p7,p3)*zb(p7,p6)*zb(p1,p2)*zba2(p4,p1,p2,p8)
-     & - za(p7,p5)*za(p5,p3)*zb(p1,p2)*zb(p5,p6)*zba2(p4,p1,p2,p8)
-     &    )
-     &    + gamv(1,1)*s128**(-1) * (
-     & - za(p1,p8)*za(p5,p3)*zb(p1,p2)*zb(p6,p4)*zab2(p7,p5,p6,p1)
-     & + za(p1,p8)*za(p5,p3)*zb(p1,p2)*zb(p6,p4)*zab2(p7,p3,p4,p1)
-     & + za(p5,p3)*za(p8,p2)*zb(p1,p2)*zb(p6,p4)*zab2(p7,p5,p6,p2)
-     & - za(p5,p3)*za(p8,p2)*zb(p1,p2)*zb(p6,p4)*zab2(p7,p3,p4,p2)
-     & - 2.D0*za(p7,p5)*zb(p1,p2)*zab2(p3,p5,p6,p4)*zba2(p6,p1,p2,p8)
-     & + 2.D0*za(p7,p3)*zb(p1,p2)*zab2(p5,p3,p4,p6)*zba2(p4,p1,p2,p8)
-     &    )
-     &    + gamv(2,1)*s278**(-1) * (
-     & + za(p7,p8)*za(p5,p3)*zb(p7,p2)*zb(p6,p4)*zab2(p7,p5,p6,p1)
-     & - za(p7,p8)*za(p5,p3)*zb(p7,p2)*zb(p6,p4)*zab2(p7,p3,p4,p1)
-     & + za(p7,p8)*za(p5,p3)*zb(p6,p4)*zb(p8,p2)*zab2(p8,p5,p6,p1)
-     & - za(p7,p8)*za(p5,p3)*zb(p6,p4)*zb(p8,p2)*zab2(p8,p3,p4,p1)
-     & + 2.D0*za(p7,p8)*zb(p1,p6)*zab2(p3,p5,p6,p4)*zba2(p2,p7,p8,p5)
-     & - 2.D0*za(p7,p8)*zb(p1,p4)*zab2(p5,p3,p4,p6)*zba2(p2,p7,p8,p3)
-     &    )
-     & )
-     & + propw56**(-1)*propw28**(-1)*(
-     &    2.D0*s128**(-1) * (
-     &       + gam3456f3(1,1,1)*s356**(-1)*(
-     & + za(p7,p5)*za(p5,p3)*zb(p1,p2)*zb(p5,p6)*zba2(p4,p1,p2,p8)
-     & - za(p7,p3)*za(p5,p3)*zb(p1,p2)*zb(p6,p3)*zba2(p4,p1,p2,p8)
-     &       )
-     &       + gam3456f4(1,1,1)*s456**(-1)*(
-     & + za(p7,p3)*za(p5,p6)*zb(p1,p2)*zb(p6,p4)*zba2(p6,p1,p2,p8)
-     & + za(p7,p3)*za(p5,p4)*zb(p1,p2)*zb(p6,p4)*zba2(p4,p1,p2,p8)
-     &       )
-     &    )
-     &    + 2.D0**s278**(-1) * (
-     &       + gam3456f3(2,1,1)*s356**(-1)*(
-     & - za(p7,p8)*za(p5,p3)*zb(p1,p4)*zb(p5,p6)*zba2(p2,p7,p8,p5)
-     & + za(p7,p8)*za(p5,p3)*zb(p1,p4)*zb(p6,p3)*zba2(p2,p7,p8,p3)
-     &       )
-     &       + gam3456f4(2,1,1)*s456**(-1)*(
-     & - za(p7,p8)*za(p5,p6)*zb(p1,p6)*zb(p6,p4)*zba2(p2,p7,p8,p3)
-     & - za(p7,p8)*za(p5,p4)*zb(p1,p4)*zb(p6,p4)*zba2(p2,p7,p8,p3)
-     &       )
-     &    )
-     & )
-     & + propw34**(-1)*propw28**(-1)*(
-     &    + 2.D0*s128**(-1) * (
-     &       + gam3456f6(1,1,1)*s346**(-1)*(
-     & + za(p7,p5)*za(p6,p3)*zb(p1,p2)*zb(p6,p4)*zba2(p6,p1,p2,p8)
-     & - za(p7,p5)*za(p3,p4)*zb(p1,p2)*zb(p6,p4)*zba2(p4,p1,p2,p8)
-     &       )
-     &       + gam3456f5(1,1,1)*s345**(-1)*(
-     & - za(p7,p5)*za(p5,p3)*zb(p1,p2)*zb(p5,p4)*zba2(p6,p1,p2,p8)
-     & - za(p7,p3)*za(p5,p3)*zb(p1,p2)*zb(p3,p4)*zba2(p6,p1,p2,p8)
-     &       )
-     &    )
-     &    + 2.D0*s278**(-1) * (
-     &       + gam3456f6(2,1,1)*s346**(-1)*(
-     & - za(p7,p8)*za(p6,p3)*zb(p1,p6)*zb(p6,p4)*zba2(p2,p7,p8,p5)
-     & + za(p7,p8)*za(p3,p4)*zb(p1,p4)*zb(p6,p4)*zba2(p2,p7,p8,p5)
-     &       )
-     &       + gam3456f5(2,1,1)*s345**(-1)*(
-     & + za(p7,p8)*za(p5,p3)*zb(p1,p6)*zb(p5,p4)*zba2(p2,p7,p8,p5)
-     & + za(p7,p8)*za(p5,p3)*zb(p1,p6)*zb(p3,p4)*zba2(p2,p7,p8,p3)
-     &       )
-     &    )
-     & )
+      amp(1,2)= + propw56**(-1)*propw34**(-1)*propw28**(-1)*cxw**(-1)*
+     & s128**(-1) * (  - za(p7,p5)*za(p7,p3)*zb(p7,p4)*zb(p1,p2)*zba2(
+     &    p6,p1,p2,p8)*s347**(-1) + za(p7,p3)*za(p5,p3)*zb(p1,p2)*zb(p3
+     &    ,p4)*zba2(p6,p1,p2,p8)*s347**(-1) )
+      amp(1,2) = amp(1,2) + propw56**(-1)*propw34**(-1)*propw28**(-1)*
+     & cxw**(-1)*s278**(-1) * (  - za(p7,p8)*za(p1,p3)*zb(p1,p6)*zb(p1,
+     &    p4)*zba2(p2,p7,p8,p5)*s134**(-1) - za(p7,p8)*za(p3,p4)*zb(p1,
+     &    p4)*zb(p6,p4)*zba2(p2,p7,p8,p5)*s134**(-1) )
+      amp(1,2) = amp(1,2) + propw56**(-1)*propw28**(-1)*s128**(-1) * (
+     &    2.D0*za(p7,p5)*za(p5,p3)*zb(p1,p2)*zb(p5,p6)*zba2(p4,p1,p2,p8
+     &    )*gam3456f3(2,1,1)*s356**(-1) + 2.D0*za(p7,p3)*za(p5,p6)*zb(p1
+     &    ,p2)*zb(p6,p4)*zba2(p6,p1,p2,p8)*gam3456f4(2,1,1)*s456**(-1)
+     &     - 2.D0*za(p7,p3)*za(p5,p3)*zb(p1,p2)*zb(p6,p3)*zba2(p4,p1,p2
+     &    ,p8)*gam3456f3(2,1,1)*s356**(-1) + 2.D0*za(p7,p3)*za(p5,p4)*
+     &    zb(p1,p2)*zb(p6,p4)*zba2(p4,p1,p2,p8)*gam3456f4(2,1,1)*
+     &    s456**(-1) )
+      amp(1,2) = amp(1,2) + propw56**(-1)*propw28**(-1)*s278**(-1) * (
+     &     - 2.D0*za(p7,p8)*za(p5,p6)*zb(p1,p6)*zb(p6,p4)*zba2(p2,p7,p8
+     &    ,p3)*gam3456f4(1,1,1)*s456**(-1) - 2.D0*za(p7,p8)*za(p5,p3)*
+     &    zb(p1,p4)*zb(p5,p6)*zba2(p2,p7,p8,p5)*gam3456f3(1,1,1)*
+     &    s356**(-1) + 2.D0*za(p7,p8)*za(p5,p3)*zb(p1,p4)*zb(p6,p3)*
+     &    zba2(p2,p7,p8,p3)*gam3456f3(1,1,1)*s356**(-1) - 2.D0*za(p7,p8)
+     &    *za(p5,p4)*zb(p1,p4)*zb(p6,p4)*zba2(p2,p7,p8,p3)*gam3456f4(1,1
+     &    ,1)*s456**(-1) )
+      amp(1,2) = amp(1,2) + propw34**(-1)*propw28**(-1)*s128**(-1) * (
+     &     - 2.D0*za(p7,p5)*za(p5,p3)*zb(p1,p2)*zb(p5,p4)*zba2(p6,p1,p2
+     &    ,p8)*gam3456f5(2,1,1)*s345**(-1) + 2.D0*za(p7,p5)*za(p6,p3)*
+     &    zb(p1,p2)*zb(p6,p4)*zba2(p6,p1,p2,p8)*gam3456f6(2,1,1)*
+     &    s346**(-1) - 2.D0*za(p7,p5)*za(p3,p4)*zb(p1,p2)*zb(p6,p4)*
+     &    zba2(p4,p1,p2,p8)*gam3456f6(2,1,1)*s346**(-1) - 2.D0*za(p7,p3)
+     &    *za(p5,p3)*zb(p1,p2)*zb(p3,p4)*zba2(p6,p1,p2,p8)*gam3456f5(2,1
+     &    ,1)*s345**(-1) )
+      amp(1,2) = amp(1,2) + propw34**(-1)*propw28**(-1)*s278**(-1) * (
+     &    2.D0*za(p7,p8)*za(p5,p3)*zb(p1,p6)*zb(p5,p4)*zba2(p2,p7,p8,p5
+     &    )*gam3456f5(1,1,1)*s345**(-1) + 2.D0*za(p7,p8)*za(p5,p3)*zb(p1
+     &    ,p6)*zb(p3,p4)*zba2(p2,p7,p8,p3)*gam3456f5(1,1,1)*s345**(-1)
+     &     - 2.D0*za(p7,p8)*za(p6,p3)*zb(p1,p6)*zb(p6,p4)*zba2(p2,p7,p8
+     &    ,p5)*gam3456f6(1,1,1)*s346**(-1) + 2.D0*za(p7,p8)*za(p3,p4)*
+     &    zb(p1,p4)*zb(p6,p4)*zba2(p2,p7,p8,p5)*gam3456f6(1,1,1)*
+     &    s346**(-1) )
+      amp(1,2) = amp(1,2) + gamv(1,1)*propw56**(-1)*propw34**(-1)*
+     & propw28**(-1)*s278**(-1) * ( za(p7,p8)*za(p5,p3)*zb(p7,p2)*zb(p6
+     &    ,p4)*zab2(p7,p5,p6,p1) - za(p7,p8)*za(p5,p3)*zb(p7,p2)*zb(p6,
+     &    p4)*zab2(p7,p3,p4,p1) + za(p7,p8)*za(p5,p3)*zb(p6,p4)*zb(p8,
+     &    p2)*zab2(p8,p5,p6,p1) - za(p7,p8)*za(p5,p3)*zb(p6,p4)*zb(p8,
+     &    p2)*zab2(p8,p3,p4,p1) + 2.D0*za(p7,p8)*zb(p1,p6)*zab2(p3,p5,
+     &    p6,p4)*zba2(p2,p7,p8,p5) - 2.D0*za(p7,p8)*zb(p1,p4)*zab2(p5,
+     &    p3,p4,p6)*zba2(p2,p7,p8,p3) )
+      amp(1,2) = amp(1,2) + gamv(2,1)*propw56**(-1)*propw34**(-1)*
+     & propw28**(-1)*s128**(-1) * (  - 2.D0*za(p7,p5)*zb(p1,p2)*zab2(p3
+     &    ,p5,p6,p4)*zba2(p6,p1,p2,p8) + 2.D0*za(p7,p3)*zb(p1,p2)*zab2(
+     &    p5,p3,p4,p6)*zba2(p4,p1,p2,p8) - za(p1,p8)*za(p5,p3)*zb(p1,p2
+     &    )*zb(p6,p4)*zab2(p7,p5,p6,p1) + za(p1,p8)*za(p5,p3)*zb(p1,p2)
+     &    *zb(p6,p4)*zab2(p7,p3,p4,p1) + za(p5,p3)*za(p8,p2)*zb(p1,p2)*
+     &    zb(p6,p4)*zab2(p7,p5,p6,p2) - za(p5,p3)*za(p8,p2)*zb(p1,p2)*
+     &    zb(p6,p4)*zab2(p7,p3,p4,p2) )
+      amp(2,1)= + propw56**(-1)*propw34**(-1)*propw28**(-1)*cxw**(-1)*
+     & s128**(-1) * (  - za(p7,p5)*za(p7,p3)*zb(p7,p6)*zb(p1,p2)*zba2(
+     &    p4,p1,p2,p8)*s567**(-1) - za(p7,p5)*za(p5,p3)*zb(p1,p2)*zb(p5
+     &    ,p6)*zba2(p4,p1,p2,p8)*s567**(-1) )
+      amp(2,1) = amp(2,1) + propw56**(-1)*propw34**(-1)*propw28**(-1)*
+     & cxw**(-1)*s278**(-1) * (  - za(p7,p8)*za(p1,p5)*zb(p1,p6)*zb(p1,
+     &    p4)*zba2(p2,p7,p8,p3)*s156**(-1) + za(p7,p8)*za(p5,p6)*zb(p1,
+     &    p6)*zb(p6,p4)*zba2(p2,p7,p8,p3)*s156**(-1) )
+      amp(2,1) = amp(2,1) + propw56**(-1)*propw28**(-1)*s128**(-1) * (
+     &    2.D0*za(p7,p5)*za(p5,p3)*zb(p1,p2)*zb(p5,p6)*zba2(p4,p1,p2,p8
+     &    )*gam3456f3(1,1,1)*s356**(-1) + 2.D0*za(p7,p3)*za(p5,p6)*zb(p1
+     &    ,p2)*zb(p6,p4)*zba2(p6,p1,p2,p8)*gam3456f4(1,1,1)*s456**(-1)
+     &     - 2.D0*za(p7,p3)*za(p5,p3)*zb(p1,p2)*zb(p6,p3)*zba2(p4,p1,p2
+     &    ,p8)*gam3456f3(1,1,1)*s356**(-1) + 2.D0*za(p7,p3)*za(p5,p4)*
+     &    zb(p1,p2)*zb(p6,p4)*zba2(p4,p1,p2,p8)*gam3456f4(1,1,1)*
+     &    s456**(-1) )
+      amp(2,1) = amp(2,1) + propw56**(-1)*propw28**(-1)*s278**(-1) * (
+     &     - 2.D0*za(p7,p8)*za(p5,p6)*zb(p1,p6)*zb(p6,p4)*zba2(p2,p7,p8
+     &    ,p3)*gam3456f4(2,1,1)*s456**(-1) - 2.D0*za(p7,p8)*za(p5,p3)*
+     &    zb(p1,p4)*zb(p5,p6)*zba2(p2,p7,p8,p5)*gam3456f3(2,1,1)*
+     &    s356**(-1) + 2.D0*za(p7,p8)*za(p5,p3)*zb(p1,p4)*zb(p6,p3)*
+     &    zba2(p2,p7,p8,p3)*gam3456f3(2,1,1)*s356**(-1) - 2.D0*za(p7,p8)
+     &    *za(p5,p4)*zb(p1,p4)*zb(p6,p4)*zba2(p2,p7,p8,p3)*gam3456f4(2,1
+     &    ,1)*s456**(-1) )
+      amp(2,1) = amp(2,1) + propw34**(-1)*propw28**(-1)*s128**(-1) * (
+     &     - 2.D0*za(p7,p5)*za(p5,p3)*zb(p1,p2)*zb(p5,p4)*zba2(p6,p1,p2
+     &    ,p8)*gam3456f5(1,1,1)*s345**(-1) + 2.D0*za(p7,p5)*za(p6,p3)*
+     &    zb(p1,p2)*zb(p6,p4)*zba2(p6,p1,p2,p8)*gam3456f6(1,1,1)*
+     &    s346**(-1) - 2.D0*za(p7,p5)*za(p3,p4)*zb(p1,p2)*zb(p6,p4)*
+     &    zba2(p4,p1,p2,p8)*gam3456f6(1,1,1)*s346**(-1) - 2.D0*za(p7,p3)
+     &    *za(p5,p3)*zb(p1,p2)*zb(p3,p4)*zba2(p6,p1,p2,p8)*gam3456f5(1,1
+     &    ,1)*s345**(-1) )
+      amp(2,1) = amp(2,1) + propw34**(-1)*propw28**(-1)*s278**(-1) * (
+     &    2.D0*za(p7,p8)*za(p5,p3)*zb(p1,p6)*zb(p5,p4)*zba2(p2,p7,p8,p5
+     &    )*gam3456f5(2,1,1)*s345**(-1) + 2.D0*za(p7,p8)*za(p5,p3)*zb(p1
+     &    ,p6)*zb(p3,p4)*zba2(p2,p7,p8,p3)*gam3456f5(2,1,1)*s345**(-1)
+     &     - 2.D0*za(p7,p8)*za(p6,p3)*zb(p1,p6)*zb(p6,p4)*zba2(p2,p7,p8
+     &    ,p5)*gam3456f6(2,1,1)*s346**(-1) + 2.D0*za(p7,p8)*za(p3,p4)*
+     &    zb(p1,p4)*zb(p6,p4)*zba2(p2,p7,p8,p5)*gam3456f6(2,1,1)*
+     &    s346**(-1) )
+      amp(2,1) = amp(2,1) + gamv(1,1)*propw56**(-1)*propw34**(-1)*
+     & propw28**(-1)*s128**(-1) * (  - 2.D0*za(p7,p5)*zb(p1,p2)*zab2(p3
+     &    ,p5,p6,p4)*zba2(p6,p1,p2,p8) + 2.D0*za(p7,p3)*zb(p1,p2)*zab2(
+     &    p5,p3,p4,p6)*zba2(p4,p1,p2,p8) - za(p1,p8)*za(p5,p3)*zb(p1,p2
+     &    )*zb(p6,p4)*zab2(p7,p5,p6,p1) + za(p1,p8)*za(p5,p3)*zb(p1,p2)
+     &    *zb(p6,p4)*zab2(p7,p3,p4,p1) + za(p5,p3)*za(p8,p2)*zb(p1,p2)*
+     &    zb(p6,p4)*zab2(p7,p5,p6,p2) - za(p5,p3)*za(p8,p2)*zb(p1,p2)*
+     &    zb(p6,p4)*zab2(p7,p3,p4,p2) )
+      amp(2,1) = amp(2,1) + gamv(2,1)*propw56**(-1)*propw34**(-1)*
+     & propw28**(-1)*s278**(-1) * ( za(p7,p8)*za(p5,p3)*zb(p7,p2)*zb(p6
+     &    ,p4)*zab2(p7,p5,p6,p1) - za(p7,p8)*za(p5,p3)*zb(p7,p2)*zb(p6,
+     &    p4)*zab2(p7,p3,p4,p1) + za(p7,p8)*za(p5,p3)*zb(p6,p4)*zb(p8,
+     &    p2)*zab2(p8,p5,p6,p1) - za(p7,p8)*za(p5,p3)*zb(p6,p4)*zb(p8,
+     &    p2)*zab2(p8,p3,p4,p1) + 2.D0*za(p7,p8)*zb(p1,p6)*zab2(p3,p5,
+     &    p6,p4)*zba2(p2,p7,p8,p5) - 2.D0*za(p7,p8)*zb(p1,p4)*zab2(p5,
+     &    p3,p4,p6)*zba2(p2,p7,p8,p3) )
 
       amp(:,:)=amp(:,:)/cxw**2
       return
