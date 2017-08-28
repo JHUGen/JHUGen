@@ -7,6 +7,7 @@
       include 'masses.f'
       include 'zprods_decl.f'
       include 'anom_higgs.f'
+!      include 'pid_pdg.f'
       include 'WWbits.f'
       integer nmax,jmax
       parameter(nmax=10)
@@ -39,6 +40,16 @@
       amp(:,:,:)=czip
       ampa(:,:,:)=czip
       ampb(:,:,:)=czip
+
+!      write (6,*),"if(j1-8)=",
+!     & pid_pdg(j1),
+!     & pid_pdg(j2),
+!     & pid_pdg(j3),
+!     & pid_pdg(j4),
+!     & pid_pdg(j5),
+!     & pid_pdg(j6),
+!     & pid_pdg(j7),
+!     & pid_pdg(j8)
 
       k7341(:)=0.5d0*(zab(j1,:,j1)+zab(j3,:,j3)
      & +zab(j4,:,j4)+zab(j7,:,j7))
@@ -260,16 +271,16 @@ C-----setup for (uqsq_dqcq)
      &  *cdotpr(k8342(:),j7_56_1z(2,:))/czmass2)
      & /(s8342-dcmplx(zmass**2,-zmass*zwidth))
 ! U. SARICA TEST
-      if (j1.eq.1 .and. j2.eq.7 .and. j7.eq.2) then
-      write(6,*) jtwoWexch17(2,1)
-      write(6,*) jtwoWexch28(1,2)
-      write(6,*) jmidWW28
-      write(6,*) cdotpr(j8_34_2g(1,:),j7_56_1g(2,:))/s8342
-      write(6,*) (cdotpr(j8_34_2z(1,:),j7_56_1z(2,:))
-     &  -cdotpr(j8_34_2z(1,:),k8342(:))
-     &  *cdotpr(k8342(:),j7_56_1z(2,:))/czmass2)
-      write(6,*) (s8342-dcmplx(zmass**2,-zmass*zwidth))
-      endif
+!      if (j1.eq.1 .and. j2.eq.7 .and. j7.eq.2) then
+!      write(6,*) jtwoWexch17(2,1)
+!      write(6,*) jtwoWexch28(1,2)
+!      write(6,*) jmidWW28
+!      write(6,*) cdotpr(j8_34_2g(1,:),j7_56_1g(2,:))/s8342
+!      write(6,*) (cdotpr(j8_34_2z(1,:),j7_56_1z(2,:))
+!     &  -cdotpr(j8_34_2z(1,:),k8342(:))
+!     &  *cdotpr(k8342(:),j7_56_1z(2,:))/czmass2)
+!      write(6,*) (s8342-dcmplx(zmass**2,-zmass*zwidth))
+!      endif
 !
 
       return
