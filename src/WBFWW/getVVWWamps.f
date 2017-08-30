@@ -41,7 +41,7 @@
       ampa(:,:,:)=czip
       ampb(:,:,:)=czip
 
-!      write (6,*),"if(j1-8)=",
+!      write (6,*),"id(j1-8)=",
 !     & pid_pdg(j1),
 !     & pid_pdg(j2),
 !     & pid_pdg(j3),

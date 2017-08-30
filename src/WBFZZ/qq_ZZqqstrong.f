@@ -329,7 +329,8 @@ C-----setup for ((dqdq_dqdq)  (1,1)-->(1,1)
       endif
       enddo;enddo
 
-      temp(:,:) = temp(:,:)*colfac34_56*vsymfact
+      !temp(:,:) = temp(:,:)*colfac34_56*vsymfact
+      temp(:,:) = temp(:,:)*vsymfact
 
 c--- fill matrix elements
       if (j.eq.1) then
