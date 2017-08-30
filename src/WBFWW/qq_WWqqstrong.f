@@ -200,10 +200,6 @@ C-----setup for (uqsq_dqcq)
       endif
       enddo;enddo
 
-c---- Multiply by the decay color factor
-      temp(:,:) = temp(:,:)*colfac34_56
-      tempw(:,:) = tempw(:,:)*colfac34_56
-
 c--- fill matrix elements
       if (j.eq.1) then
       do k=1,nf
@@ -939,6 +935,9 @@ c--- 2-gluon amplitudes
          endif
          enddo
       endif
+
+c---- Multiply by the decay color factor at the end since there are no interference effects
+      !msq(:,:) = msq(:,:)*colfac34_56
 
       return
 

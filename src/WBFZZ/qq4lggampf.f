@@ -106,7 +106,8 @@ C23456789012345678901234567890123456789012345678901234567890123456789012
       enddo
       enddo
 
-      msq(:) = msq(:)*colfac34_56*vsymfact
+      !msq(:) = msq(:)*colfac34_56*vsymfact
+      msq(:) = msq(:)*vsymfact
 
       return
       end

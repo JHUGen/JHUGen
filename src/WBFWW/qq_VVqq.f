@@ -602,8 +602,8 @@ C-----setup for (uqsq_dqcq)
       endif
 
 c---- Multiply by the decay color factor
-      temp(:,:) = temp(:,:)*colfac34_56
-      tempw(:,:) = tempw(:,:)*colfac34_56
+      !temp(:,:) = temp(:,:)*colfac34_56
+      !tempw(:,:) = tempw(:,:)*colfac34_56
 
 c--- fill matrix elements
       if (j.eq.1) then
