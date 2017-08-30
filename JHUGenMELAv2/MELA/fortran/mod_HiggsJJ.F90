@@ -3615,11 +3615,6 @@ module modHiggsJJ
 
     zab2(j1,j2,j3,j4) = za(j1,j2)*zb(j2,j4) + za(j1,j3)*zb(j3,j4)
 
-!   contact term couplings 
-    LCT(1) = ewp_L_U! for the moment we do not distinguish up and charm couplings (because the information is not passed)
-    RCT(1) = ewp_R_U
-    
-    
     A0_WW_4f = czero
     helcoup(:,:,:)=czero
 
