@@ -11,7 +11,7 @@ if [[ "$1" == *"clean"* ]];then
 	popd
 	make clean
 else
-	tcsh data/retrieve.csh $DATA_LIB_DIR mcfm_703
+	tcsh data/retrieve.csh $DATA_LIB_DIR mcfm_704
 	bash downloadNNPDF.sh
 	pushd $MELADIR"/fortran/"
 	make all
