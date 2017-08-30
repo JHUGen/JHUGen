@@ -147,6 +147,8 @@ real(8), public            :: Ga_W    = 2.085d0   *GeV      ! W boson width(PDG-
 real(8), public            :: M_Reso  = 125.0d0   *GeV      ! X resonance mass (spin 0, spin 1, spin 2)     (can be overwritten by command line argument)
 real(8), public            :: Ga_Reso = 0.00407d0 *GeV      ! X resonance width
 real(8), public            :: HiggsDecayLengthMM = 0d0      ! Higgs decay length in [mm]
+real(8), public            :: M_Reso2 = -1000.0d0 *GeV      ! second resonance mass (spin 0 in off-shell VBF)     (can be overwritten by command line argument)
+real(8), public            :: Ga_Reso2= 50.00     *GeV      ! second resonance width
 
 real(8), public            :: m_bot = 4.75d0       *GeV     ! bottom quark mass
 real(8), public            :: m_charm = 1.275d0    *GeV     ! charm quark mass
@@ -261,6 +263,7 @@ real(8), public :: scale_alpha_W_tn = 1d0        ! scaling factor of alpha (~par
 real(8), public, parameter :: Lambda  = 1000d0    *GeV      ! Lambda coupling enters in two places
                                                             ! overall scale for x-section and in power suppressed
                                                             ! operators/formfactors (former r).
+real(8), public, parameter :: Lambda2 = 1000d0    *GeV      ! same for second resonance
 
 !--------------------!
 !-----! Spin-0 !-----!
@@ -464,6 +467,190 @@ real(8), public, parameter :: Lambda  = 1000d0    *GeV      ! Lambda coupling en
    real(8), public :: M_Vprime
    real(8), public :: Ga_Vprime
 
+   
+   
+   
+   
+!-- second resonance (H2) couplings for off-shell VBF
+!-- HVV' couplings to ZZ/ZA/AA and WW
+   complex(8), public :: gh2z1 = (0.0d0,0d0) 
+   complex(8), public :: gh2z2 = (0.0d0,0d0)
+   complex(8), public :: gh2z3 = (0.0d0,0d0)
+   complex(8), public :: gh2z4 = (0.0d0,0d0)   ! pseudoscalar
+
+   complex(8), public :: gh2zgs2  = (0.00d0,0d0)
+   complex(8), public :: gh2zgs3  = (0.00d0,0d0)
+   complex(8), public :: gh2zgs4  = (0.00d0,0d0)
+   complex(8), public :: gh2gsgs2 = (0.00d0,0d0)
+   complex(8), public :: gh2gsgs3 = (0.00d0,0d0)
+   complex(8), public :: gh2gsgs4 = (0.00d0,0d0)
+
+!-- HVV contact terms
+!    logical, public :: UseVprime=.false.  ! false: contact interaction,  true: heavy Zprime propagator
+!    integer, public :: OnlyVVpr = 0       ! +1=only contact term for decay1, -1=only contact term for decay2, 0=all terms
+   complex(8), public :: eh2z_L_E  = (0.00d0,0d0)
+   complex(8), public :: eh2z_R_E  = (0.00d0,0d0)
+   complex(8), public :: eh2z_L_M  = (0.00d0,0d0)
+   complex(8), public :: eh2z_R_M  = (0.00d0,0d0)
+   complex(8), public :: eh2z_L_T  = (0.00d0,0d0)
+   complex(8), public :: eh2z_R_T  = (0.00d0,0d0)
+   complex(8), public :: eh2z_L_U  = (0.00d0,0d0)
+   complex(8), public :: eh2z_R_U  = (0.00d0,0d0)
+   complex(8), public :: eh2z_L_C  = (0.00d0,0d0)
+   complex(8), public :: eh2z_R_C  = (0.00d0,0d0)
+   complex(8), public :: eh2z_L_D  = (0.00d0,0d0)
+   complex(8), public :: eh2z_R_D  = (0.00d0,0d0)
+   complex(8), public :: eh2z_L_S  = (0.00d0,0d0)
+   complex(8), public :: eh2z_R_S  = (0.00d0,0d0)
+   complex(8), public :: eh2z_L_B  = (0.00d0,0d0)
+   complex(8), public :: eh2z_R_B  = (0.00d0,0d0)
+   complex(8), public :: eh2z_L_N  = (0.00d0,0d0)
+   complex(8), public :: eh2z_R_N  = (0.00d0,0d0)
+!--
+!-- HWW couplings are only used if distinguish_HWWcouplings=.true.
+   complex(8), public :: eh2w_L_E  = (0.00d0,0d0)
+   complex(8), public :: eh2w_R_E  = (0.00d0,0d0)
+   complex(8), public :: eh2w_L_M  = (0.00d0,0d0)
+   complex(8), public :: eh2w_R_M  = (0.00d0,0d0)
+   complex(8), public :: eh2w_L_T  = (0.00d0,0d0)
+   complex(8), public :: eh2w_R_T  = (0.00d0,0d0)
+   complex(8), public :: eh2w_L_U  = (0.00d0,0d0)
+   complex(8), public :: eh2w_R_U  = (0.00d0,0d0)
+   complex(8), public :: eh2w_L_C  = (0.00d0,0d0)
+   complex(8), public :: eh2w_R_C  = (0.00d0,0d0)
+
+
+!-- parameters that define q^2 dependent form factors
+   complex(8), public :: gh2z1_prime = (0.0d0,0d0)
+   complex(8), public :: gh2z1_prime2= (0.0d0,0d0)
+   complex(8), public :: gh2z1_prime3= (0.0d0,0d0)
+   complex(8), public :: gh2z1_prime4= (0.0d0,0d0)
+   complex(8), public :: gh2z1_prime5= (0.0d0,0d0)
+   complex(8), public :: gh2z1_prime6= (0.0d0,0d0)
+   complex(8), public :: gh2z1_prime7= (0.0d0,0d0)
+
+   complex(8), public :: gh2z2_prime = (0.0d0,0d0)
+   complex(8), public :: gh2z2_prime2= (0.0d0,0d0)
+   complex(8), public :: gh2z2_prime3= (0.0d0,0d0)
+   complex(8), public :: gh2z2_prime4= (0.0d0,0d0)
+   complex(8), public :: gh2z2_prime5= (0.0d0,0d0)
+   complex(8), public :: gh2z2_prime6= (0.0d0,0d0)
+   complex(8), public :: gh2z2_prime7= (0.0d0,0d0)
+
+   complex(8), public :: gh2z3_prime = (0.0d0,0d0)
+   complex(8), public :: gh2z3_prime2= (0.0d0,0d0)
+   complex(8), public :: gh2z3_prime3= (0.0d0,0d0)
+   complex(8), public :: gh2z3_prime4= (0.0d0,0d0)
+   complex(8), public :: gh2z3_prime5= (0.0d0,0d0)
+   complex(8), public :: gh2z3_prime6= (0.0d0,0d0)
+   complex(8), public :: gh2z3_prime7= (0.0d0,0d0)
+
+   complex(8), public :: gh2z4_prime = (0.0d0,0d0)
+   complex(8), public :: gh2z4_prime2= (0.0d0,0d0)
+   complex(8), public :: gh2z4_prime3= (0.0d0,0d0)
+   complex(8), public :: gh2z4_prime4= (0.0d0,0d0)
+   complex(8), public :: gh2z4_prime5= (0.0d0,0d0)
+   complex(8), public :: gh2z4_prime6= (0.0d0,0d0)
+   complex(8), public :: gh2z4_prime7= (0.0d0,0d0)
+
+   complex(8), public :: gh2zgs1_prime2= (0.0d0,0d0)
+
+   real(8),    public, parameter :: Lambda2_z1 = 10000d0*GeV
+   real(8),    public, parameter :: Lambda2_z2 = 10000d0*GeV
+   real(8),    public, parameter :: Lambda2_z3 = 10000d0*GeV
+   real(8),    public, parameter :: Lambda2_z4 = 10000d0*GeV
+   real(8),    public, parameter :: Lambda2_zgs1 = 10000d0*GeV
+   real(8),    public, parameter :: Lambda2_Q  = 10000d0*GeV
+
+!    integer,    public :: cz_q1sq = 0 ! Sign of q1,2,12**2 for the following Lambda2's, set to 1 or -1 to get q**2-dependence from these form factor Lambda2s
+!    integer,    public :: cz_q2sq = 0
+!    integer,    public :: cz_q12sq = 0
+
+   ! These Lambda2s all have a numerical value of 1d0
+   real(8),    public :: Lambda2_z11 = 100d0*GeV ! For Z1
+   real(8),    public :: Lambda2_z21 = 100d0*GeV
+   real(8),    public :: Lambda2_z31 = 100d0*GeV
+   real(8),    public :: Lambda2_z41 = 100d0*GeV
+   real(8),    public :: Lambda2_z12 = 100d0*GeV ! For Z2
+   real(8),    public :: Lambda2_z22 = 100d0*GeV
+   real(8),    public :: Lambda2_z32 = 100d0*GeV
+   real(8),    public :: Lambda2_z42 = 100d0*GeV
+   real(8),    public :: Lambda2_z10 = 100d0*GeV ! For the Higgs
+   real(8),    public :: Lambda2_z20 = 100d0*GeV
+   real(8),    public :: Lambda2_z30 = 100d0*GeV
+   real(8),    public :: Lambda2_z40 = 100d0*GeV
+
+!-- extra HWW couplings for weak boson fusion when WW-spin-0 couplings are required to be different from ZZ-spin-0
+!-- note: ZZ-spin-0 couplings are used in processes other than VBF, and WW is distinguished from ZZ only in case distinguish_HWWcouplings=.true.
+!    logical, public :: distinguish_HWWcouplings=.false.
+   complex(8), public :: gh2w1 = (0.0d0,0d0)
+   complex(8), public :: gh2w2 = (0.0d0,0d0)
+   complex(8), public :: gh2w3 = (0.0d0,0d0)
+   complex(8), public :: gh2w4 = (0.0d0,0d0)
+
+!-- parameters that define q^2 dependent form factors in WBF WW-spin-0 case described above
+   complex(8), public :: gh2w1_prime = (0.0d0,0d0)
+   complex(8), public :: gh2w1_prime2= (0.0d0,0d0)
+   complex(8), public :: gh2w1_prime3= (0.0d0,0d0)
+   complex(8), public :: gh2w1_prime4= (0.0d0,0d0)
+   complex(8), public :: gh2w1_prime5= (0.0d0,0d0)
+   complex(8), public :: gh2w1_prime6= (0.0d0,0d0)
+   complex(8), public :: gh2w1_prime7= (0.0d0,0d0)
+
+   complex(8), public :: gh2w2_prime = (0.0d0,0d0)
+   complex(8), public :: gh2w2_prime2= (0.0d0,0d0)
+   complex(8), public :: gh2w2_prime3= (0.0d0,0d0)
+   complex(8), public :: gh2w2_prime4= (0.0d0,0d0)
+   complex(8), public :: gh2w2_prime5= (0.0d0,0d0)
+   complex(8), public :: gh2w2_prime6= (0.0d0,0d0)
+   complex(8), public :: gh2w2_prime7= (0.0d0,0d0)
+
+   complex(8), public :: gh2w3_prime = (0.0d0,0d0)
+   complex(8), public :: gh2w3_prime2= (0.0d0,0d0)
+   complex(8), public :: gh2w3_prime3= (0.0d0,0d0)
+   complex(8), public :: gh2w3_prime4= (0.0d0,0d0)
+   complex(8), public :: gh2w3_prime5= (0.0d0,0d0)
+   complex(8), public :: gh2w3_prime6= (0.0d0,0d0)
+   complex(8), public :: gh2w3_prime7= (0.0d0,0d0)
+
+   complex(8), public :: gh2w4_prime = (0.0d0,0d0)
+   complex(8), public :: gh2w4_prime2= (0.0d0,0d0)
+   complex(8), public :: gh2w4_prime3= (0.0d0,0d0)
+   complex(8), public :: gh2w4_prime4= (0.0d0,0d0)
+   complex(8), public :: gh2w4_prime5= (0.0d0,0d0)
+   complex(8), public :: gh2w4_prime6= (0.0d0,0d0)
+   complex(8), public :: gh2w4_prime7= (0.0d0,0d0)
+
+   real(8),    public, parameter :: Lambda2_w1 = 10000d0*GeV
+   real(8),    public, parameter :: Lambda2_w2 = 10000d0*GeV
+   real(8),    public, parameter :: Lambda2_w3 = 10000d0*GeV
+   real(8),    public, parameter :: Lambda2_w4 = 10000d0*GeV
+   !real(8),    public, parameter :: Lambda2_w5 = 10000d0*GeV ! Not used
+
+!    integer,    public :: cw_q1sq = 0 ! Sign of q1,2,12**2 for the following Lambda2's, set to 1 or -1 to get q**2-dependence from these form factor Lambda2s
+!    integer,    public :: cw_q2sq = 0
+!    integer,    public :: cw_q12sq = 0
+   real(8),    public :: Lambda2_w11 = 100d0*GeV ! For W+
+   real(8),    public :: Lambda2_w21 = 100d0*GeV
+   real(8),    public :: Lambda2_w31 = 100d0*GeV
+   real(8),    public :: Lambda2_w41 = 100d0*GeV
+   real(8),    public :: Lambda2_w12 = 100d0*GeV ! For W-
+   real(8),    public :: Lambda2_w22 = 100d0*GeV
+   real(8),    public :: Lambda2_w32 = 100d0*GeV
+   real(8),    public :: Lambda2_w42 = 100d0*GeV
+   real(8),    public :: Lambda2_w10 = 100d0*GeV ! For the Higgs
+   real(8),    public :: Lambda2_w20 = 100d0*GeV
+   real(8),    public :: Lambda2_w30 = 100d0*GeV
+   real(8),    public :: Lambda2_w40 = 100d0*GeV
+
+
+
+
+
+   
+   
+   
+   
 !-- Hff couplings for ttbar+H and bbar+H
    complex(8), public :: kappa       = (1d0,0d0)
    complex(8), public :: kappa_tilde = (0d0,0d0)
@@ -610,6 +797,7 @@ integer, public, target :: NuE_ = 14
 integer, public, target :: NuM_ = 15
 integer, public, target :: NuT_ = 16
 integer, public, target :: Hig_ = 25
+integer, public, target :: Hig2_= 49
 integer, public, target :: Zpr_ = 32
 integer, public, target :: Zpr2_ = 33
 integer, public, target :: Wppr_ = 34
@@ -1186,6 +1374,10 @@ integer :: Part
       convertLHEreverse = Wppr_
   elseif( Part.eq.-34) then
       convertLHEreverse = Wmpr_
+  elseif( Part.eq.+49) then
+      convertLHEreverse = Hig2_
+  elseif( Part.eq.-49) then
+      convertLHEreverse = Hig2_
   else
       print *, "MYLHE format not implemented for ",Part
       stop
@@ -1264,6 +1456,8 @@ integer :: Part
       convertLHE =22
   elseif( Part.eq.Hig_) then
       convertLHE =25
+  elseif( Part.eq.Hig2_) then
+      convertLHE =49
   elseif( Part.eq.Zpr_) then
       convertLHE =32
   elseif( Part.eq.Zpr2_) then
@@ -1389,6 +1583,8 @@ integer :: Part
       M_Wprime = mass
   elseif( Part.eq.abs(Hig_) ) then
       M_Reso = mass
+  elseif( Part.eq.abs(Hig2_) ) then
+      M_Reso2 = mass
   endif
 
 end subroutine SetMass
@@ -1415,6 +1611,8 @@ integer :: Part
       Ga_Wprime = width
   elseif( Part.eq.abs(Hig_) ) then
       Ga_Reso = width
+  elseif( Part.eq.abs(Hig2_) ) then
+      Ga_Reso2 = width
   endif
 
 END subroutine SetDecayWidth
@@ -1465,6 +1663,8 @@ integer :: Part
       getMass = 0d0
   elseif( abs(Part).eq.abs(Hig_) ) then
       getMass = M_Reso
+  elseif( abs(Part).eq.abs(Hig2_) ) then
+      getMass = M_Reso2
   elseif( Part.eq.Not_a_particle_) then
       getMass = 0d0
   else
@@ -1493,6 +1693,8 @@ integer :: Part
       getDecayWidth = Ga_Wprime
   elseif( abs(Part).eq.abs(Hig_) ) then
       getDecayWidth = Ga_Reso
+  elseif( abs(Part).eq.abs(Hig2_) ) then
+      getDecayWidth = Ga_Reso2
   elseif( abs(Part).eq.abs(TaM_) ) then
       getDecayWidth = Ga_tau
   endif
@@ -1574,6 +1776,8 @@ integer :: Part
       getParticle = "pho"
   elseif( Part.eq.Hig_ ) then
       getParticle = "Hig"
+  elseif( Part.eq.Hig2_ ) then
+      getParticle = "Hig2"
   else
      print *, "Error in getParticle",Part
      stop
@@ -1735,7 +1939,7 @@ FUNCTION IsABoson(PartType)
 implicit none
 logical :: IsABoson
 integer :: PartType
-  IsABoson = ( abs(PartType).eq.abs(Pho_) .or. abs(PartType).eq.abs(Z0_) .or. abs(PartType).eq.abs(Wp_) .or. abs(PartType).eq.abs(Hig_) )
+  IsABoson = ( abs(PartType).eq.abs(Pho_) .or. abs(PartType).eq.abs(Z0_) .or. abs(PartType).eq.abs(Wp_) .or. abs(PartType).eq.abs(Hig_) .or. abs(PartType).eq.abs(Hig2_) )
 END FUNCTION
 
 FUNCTION IsALHEBoson(PartType)
