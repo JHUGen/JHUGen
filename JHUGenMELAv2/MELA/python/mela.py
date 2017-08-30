@@ -34,175 +34,10 @@ which is useful for quick tests.
 See examples at the bottom.
 """
 
-from collections import namedtuple, OrderedDict
-import os
+from collections import namedtuple
 import ROOT
-import tempfile
-
-def include(filename):
-  ROOT.gROOT.ProcessLine("#include <{}>".format(filename))
-
-ROOT.gROOT.Macro(os.path.join(os.path.dirname(__file__), "..", "test", "loadMELA.C+"))
-include("Mela.h")
-include("TCouplingsBase.hh")
-
-#extract all the enums from the anonymous namespace in TCouplingsBase.hh
-from ROOT import TVar
-contents = """
-  #include <TCouplingsBase.hh>
-  #include <TMCFM.hh>
-"""
-with open(os.path.join(os.path.dirname(__file__), "..", "interface", "TCouplingsBase.hh")) as f:
-  tcouplingsbasecontents = f.read()
-  for enumcontents in tcouplingsbasecontents.split("enum")[1:]:
-    enumcontents = enumcontents.strip()
-    assert enumcontents.startswith("{")
-    enumcontents = enumcontents.split("{")[1].split("}")[0]
-    for enumitem in enumcontents.split(","):
-      enumitem = enumitem.split("=")[0].strip()
-      contents += "\n  auto py_"+enumitem+" = ::"+enumitem+";"
-
-f = tempfile.NamedTemporaryFile(suffix=".C", bufsize=0)
-f.write(contents)
-ROOT.gROOT.ProcessLine(".L {}+".format(f.name))
-from ROOT import nSupportedHiggses
-
-class MultiDimensionalCppArray(object):
-  functionfiletemplate = """
-    #include <type_traits>
-    {includes}
-    auto {name}_getitem({cppargs}) -> std::remove_reference<decltype({cppvariable}[item])>::type {{return {cppvariable}[item];}}
-    void {name}_setitem({cppargs}, std::remove_reference<decltype({cppvariable}[item])>::type value) {{{cppvariable}[item] = value;}}
-  """
-
-  uniqueids = []
-  functionfiles = {}
-  getitems = {}
-  setitems = {}
-
-  def __init__(self, uniqueid, cppvariable, includes, othercppargs, *dimensions):
-
-    self.uniqueid = uniqueid
-    for i in self.uniqueids:
-      if i == uniqueid:
-        raise ValueError("Two MultiDimensionalCppArrays can't have the same id\n{}".format(i, self.uniqueid))
-    self.uniqueids.append(uniqueid)
-
-    self.cppvariable = cppvariable
-    self.dimensions = dimensions
-    self.ndim = len(self.dimensions)
-    if self.ndim == 0:
-      raise TypeError("Can't have a 0 dimensional array!")
-
-    if self.ndim > 1:
-      self.subarrays = []
-      for i in range(dimensions[0]):
-          othercppargs["int index{}".format(len(dimensions))] = i
-          self.subarrays.append(
-                                MultiDimensionalCppArray(
-                                                         "{}_{}".format(self.uniqueid, i),
-                                                         "{}[index{}]".format(cppvariable, len(dimensions)),
-                                                         includes,
-                                                         othercppargs,
-                                                         *dimensions[1:]
-                                                        )
-                               )
-    else:
-      self.othercppargs = OrderedDict(othercppargs)
-      self.functionfilecontents = self.functionfiletemplate.format(
-                                                                   name="NAME",
-                                                                   cppvariable=self.cppvariable,
-                                                                   cppargs=",".join([key for key in self.othercppargs]+["int item"]),
-                                                                   includes="\n".join("#include <{}>".format(_) for _ in includes),
-                                                                  )
-      self.includes = includes
-      self.functionfile = self.getitem = self.setitem = None
-
-  def writecpp(self, f=None):
-    if self.ndim > 1:
-      for subarray in self.subarrays:
-        f = subarray.writecpp(f)
-      return f
-
-    if self.functionfilecontents not in self.functionfiles:
-      if f is None:
-        f = tempfile.NamedTemporaryFile(suffix=".C", bufsize=0)
-      self.functionfiles[self.functionfilecontents] = f
-      f.write(self.functionfilecontents.replace("NAME", self.uniqueid))
-      return f
-    else:
-      return self.functionfiles[self.functionfilecontents]
-
-  def compilecpp(self, f):
-    if self.ndim > 1:
-      for subarray in self.subarrays:
-        subarray.compilecpp(f)
-      return
-
-    if self.functionfilecontents not in self.getitems:
-      ROOT.gROOT.ProcessLine(".L {}+".format(f.name))
-      self.functionfiles[self.functionfilecontents] = f
-      self.getitems[self.functionfilecontents] = getattr(ROOT, "{}_getitem".format(self.uniqueid))
-      self.setitems[self.functionfilecontents] = getattr(ROOT, "{}_setitem".format(self.uniqueid))
-
-    self.functionfile = self.functionfiles[self.functionfilecontents]
-    self.getitem = self.getitems[self.functionfilecontents]
-    self.setitem = self.setitems[self.functionfilecontents]
-
-
-  def __getitem__(self, item):
-    if self.ndim > 1:
-      return self.subarrays[item]
-    else:
-      if self.getitem is None: self.compilecpp(self.writecpp())
-      if item >= self.dimensions[0]:
-        raise IndexError("Index {} out of range (0-{})".format(item, self.dimensions[0]))
-      return self.getitem(*(self.othercppargs.values()+[item]))
-
-  def __setitem__(self, item, value):
-    if self.ndim > 1:
-      raise TypeError("Need to specify all indices to write to the array.")
-    else:
-      if self.setitem is None: self.compilecpp()
-      if item >= self.dimensions[0]:
-        raise IndexError("Index {} out of range (0-{})".format(item, self.dimensions[0]))
-      self.setitem(*(self.othercppargs.values()+[item, value]))
-
-class SelfDParameter(object):
-  def __init__(self, arrayname, *indices):
-    self.arrayname = arrayname
-    self.indices = indices
-
-  def __get__(self, obj, objtype):
-    if obj is None: return self
-    array = getattr(obj, self.arrayname)
-    if not self.indices: return array
-    for index in self.indices[:-1]:
-      array = array[index]
-    return array[self.indices[-1]]
-
-  def __set__(self, obj, val):
-    if not self.indices: return setattr(obj, self.arrayname, val)
-    array = getattr(obj, self.arrayname)
-    for index in self.indices[:-1]:
-      array = array[index]
-    array[self.indices[-1]] = val
-
-class SelfDCoupling(object):
-  def __init__(self, arrayname, *indices):
-    self.arrayname = arrayname
-    self.indices = indices
-    self.real = SelfDParameter(arrayname, *indices+(0,))
-    self.imag = SelfDParameter(arrayname, *indices+(1,))
-
-  def __get__(self, obj, objtype):
-    if obj is None: return self
-    #self.real does not call __get__ on real, because it's an instance variable not a class variable
-    return complex(self.real.__get__(obj, objtype), self.imag.__get__(obj, objtype))
-
-  def __set__(self, obj, val):
-    self.real.__set__(obj, val.real)
-    self.imag.__set__(obj, val.imag)
+from pythonmelautils import MultiDimensionalCppArray, NamedTemporaryMacro, SelfDParameter, SelfDCoupling
+from ROOT import TUtil, TVar
 
 class Mela(object):
   counter = 0
@@ -230,9 +65,9 @@ class Mela(object):
     }
     //not implementing the computeP_selfD* functions here
     //would be easier to do in pure python but not worth it anyway
-    float computeP(Mela& mela, bool useconstant) {
+    float computeP(Mela& mela, bool useConstant) {
       float result;
-      mela.computeP(result, useconstant);
+      mela.computeP(result, useConstant);
       return result;
     }
     float computeD_CP(Mela& mela, TVar::MatrixElement myME, TVar::Process myType) {
@@ -240,17 +75,26 @@ class Mela(object):
       mela.computeD_CP(myME, myType, result);
       return result;
     }
-    float computeProdP(Mela& mela, bool useconstant) {
+    float computeProdP(Mela& mela, bool useConstant) {
       float result;
-      mela.computeProdP(result, useconstant);
+      mela.computeProdP(result, useConstant);
       return result;
     }
-    float computeProdDecP(Mela& mela, bool useconstant) {
+    float computeProdDecP(Mela& mela, bool useConstant) {
       float result;
-      mela.computeProdDecP(result, useconstant);
+      mela.computeProdDecP(result, useConstant);
       return result;
     }
-    //not implementing the separate computeProdP_VH, etc.  Just use computeProdP.
+    float computeProdP_VH(Mela& mela, bool includeHiggsDecay, bool useConstant) {
+      float result;
+      mela.computeProdP_VH(result, includeHiggsDecay, useConstant);
+      return result;
+    }
+    float computeProdP_ttH(Mela& mela, int topProcess, int topDecay, bool useConstant) {
+      float result;
+      mela.computeProdP_ttH(result, topProcess, topDecay, useConstant);
+      return result;
+    }
     float compute4FermionWeight(Mela& mela) {
       float result;
       mela.compute4FermionWeight(result);
@@ -271,6 +115,16 @@ class Mela(object):
       mela.computeD_gg(myME, myType, result);
       return result;
     }
+    float getConstant(Mela& mela) {
+      float result;
+      mela.getConstant(result);
+      return result;
+    }
+    float computeDijetConvBW(Mela& mela) {
+      float result;
+      mela.computeDijetConvBW(result);
+      return result;
+    }
   """
   def __init__(self, *args, **kwargs):
     self.__mela = ROOT.Mela(*args, **kwargs)
@@ -278,25 +132,25 @@ class Mela(object):
     type(self).counter += 1
 
     arrays  = (
-               ("selfDHggcoupl", (nSupportedHiggses, ROOT.py_SIZE_HGG, 2)),
-               ("selfDHg4g4coupl", (nSupportedHiggses, ROOT.py_SIZE_HGG, 2)),
-               ("selfDHqqcoupl", (nSupportedHiggses, ROOT.py_SIZE_HQQ, 2)),
-               ("selfDHbbcoupl", (nSupportedHiggses, ROOT.py_SIZE_HQQ, 2)),
-               ("selfDHttcoupl", (nSupportedHiggses, ROOT.py_SIZE_HQQ, 2)),
-               ("selfDHb4b4coupl", (nSupportedHiggses, ROOT.py_SIZE_HQQ, 2)),
-               ("selfDHt4t4coupl", (nSupportedHiggses, ROOT.py_SIZE_HQQ, 2)),
-               ("selfDHzzcoupl", (nSupportedHiggses, ROOT.py_SIZE_HVV, 2)),
-               ("selfDHwwcoupl", (nSupportedHiggses, ROOT.py_SIZE_HVV, 2)),
-               ("selfDHzzLambda_qsq", (nSupportedHiggses, ROOT.py_SIZE_HVV_LAMBDAQSQ, ROOT.py_SIZE_HVV_CQSQ)),
-               ("selfDHwwLambda_qsq", (nSupportedHiggses, ROOT.py_SIZE_HVV_LAMBDAQSQ, ROOT.py_SIZE_HVV_CQSQ)),
-               ("selfDHzzCLambda_qsq", (nSupportedHiggses, ROOT.py_SIZE_HVV_CQSQ)),
-               ("selfDHwwCLambda_qsq", (nSupportedHiggses, ROOT.py_SIZE_HVV_CQSQ)),
+               ("selfDHggcoupl", (ROOT.nSupportedHiggses, ROOT.py_SIZE_HGG, 2)),
+               ("selfDHg4g4coupl", (ROOT.nSupportedHiggses, ROOT.py_SIZE_HGG, 2)),
+               ("selfDHqqcoupl", (ROOT.nSupportedHiggses, ROOT.py_SIZE_HQQ, 2)),
+               ("selfDHbbcoupl", (ROOT.nSupportedHiggses, ROOT.py_SIZE_HQQ, 2)),
+               ("selfDHttcoupl", (ROOT.nSupportedHiggses, ROOT.py_SIZE_HQQ, 2)),
+               ("selfDHb4b4coupl", (ROOT.nSupportedHiggses, ROOT.py_SIZE_HQQ, 2)),
+               ("selfDHt4t4coupl", (ROOT.nSupportedHiggses, ROOT.py_SIZE_HQQ, 2)),
+               ("selfDHzzcoupl", (ROOT.nSupportedHiggses, ROOT.py_SIZE_HVV, 2)),
+               ("selfDHwwcoupl", (ROOT.nSupportedHiggses, ROOT.py_SIZE_HVV, 2)),
+               ("selfDHzzLambda_qsq", (ROOT.nSupportedHiggses, ROOT.py_SIZE_HVV_LAMBDAQSQ, ROOT.py_SIZE_HVV_CQSQ)),
+               ("selfDHwwLambda_qsq", (ROOT.nSupportedHiggses, ROOT.py_SIZE_HVV_LAMBDAQSQ, ROOT.py_SIZE_HVV_CQSQ)),
+               ("selfDHzzCLambda_qsq", (ROOT.nSupportedHiggses, ROOT.py_SIZE_HVV_CQSQ)),
+               ("selfDHwwCLambda_qsq", (ROOT.nSupportedHiggses, ROOT.py_SIZE_HVV_CQSQ)),
                ("selfDHzzpcoupl", (ROOT.py_SIZE_HVV, 2)),
                ("selfDHzpzpcoupl", (ROOT.py_SIZE_HVV, 2)),
-               ("selfDHzpcontact", (ROOT.py_SIZE_Vp, 2)),
+               ("selfDZpffcoupl", (ROOT.py_SIZE_Vpff, 2)),
                ("selfDHwwpcoupl", (ROOT.py_SIZE_HVV, 2)),
                ("selfDHwpwpcoupl", (ROOT.py_SIZE_HVV, 2)),
-               ("selfDHwpcontact", (ROOT.py_SIZE_Vp, 2)),
+               ("selfDWpffcoupl", (ROOT.py_SIZE_Vpff, 2)),
                ("selfDZqqcoupl", (ROOT.py_SIZE_ZQQ, 2)),
                ("selfDZvvcoupl", (ROOT.py_SIZE_ZVV, 2)),
                ("selfDGqqcoupl", (ROOT.py_SIZE_GQQ, 2)),
@@ -380,14 +234,18 @@ class Mela(object):
   def getPAux(self): return ROOT.getPAux(self.__mela)
   DecayAngles = namedtuple("DecayAngles", "qH m1 m2 costheta1 costheta2 Phi costhetastar Phi1")
   def computeDecayAngles(self): return self.DecayAngles(*ROOT.computeDecayAngles(self.__mela))
-  def computeP(self, useconstant=True): return ROOT.computeP(self.__mela, useconstant)
+  def computeP(self, useConstant=True): return ROOT.computeP(self.__mela, useConstant)
   def computeD_CP(self, myME, myType): return ROOT.computeD_CP(self.__mela, myME, myType)
-  def computeProdP(self, useconstant=True): return ROOT.computeProdP(self.__mela, useconstant)
-  def computeProdDecP(self, useconstant=True): return ROOT.computeProdDecP(self.__mela, useconstant)
+  def computeProdP(self, useConstant=True): return ROOT.computeProdP(self.__mela, useConstant)
+  def computeProdDecP(self, useConstant=True): return ROOT.computeProdDecP(self.__mela, useConstant)
   def compute4FermionWeight(self): return ROOT.compute4FermionWeight(self.__mela)
   def getXPropagator(self, scheme): return ROOT.getXPropagator(self.__mela, scheme)
   def computePM4l(self, syst): return ROOT.computePM4l(self.__mela, syst)
-  def computeD_gg(self, myME, myType): return ROOT.myME(self.__mela, myME, myType)
+  def computeD_gg(self, myME, myType): return ROOT.computeD_gg(self.__mela, myME, myType)
+  def computeProdP_VH(self, includeHiggsDecay=False, useConstant=True): return ROOT.computeProdP_VH(self.__mela, includeHiggsDecay, useConstant)
+  def computeProdP_ttH(self, topProcess=2, topDecay=0, useConstant=True): return ROOT.computeProdP_ttH(self.__mela, topProcess, topDecay, useConstant)
+  def getConstant(self): return ROOT.getConstant(self.__mela)
+  def computeDijetConvBW(self): return ROOT.computeDijetConvBW(self.__mela)
 
   ghg2 = SelfDCoupling("selfDHggcoupl", 0, ROOT.py_gHIGGS_GG_2)
   ghg3 = SelfDCoupling("selfDHggcoupl", 0, ROOT.py_gHIGGS_GG_3)
@@ -520,41 +378,47 @@ class Mela(object):
 
   ghzzp1 = SelfDCoupling("selfDHzzpcoupl", ROOT.py_gHIGGS_VV_1)
   ghzpzp1 = SelfDCoupling("selfDHzpzpcoupl", ROOT.py_gHIGGS_VV_1)
-  ezp_L_E = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_L_E)
-  ezp_R_E = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_R_E)
-  ezp_L_M = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_L_M)
-  ezp_R_M = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_R_M)
-  ezp_L_T = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_L_T)
-  ezp_R_T = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_R_T)
-  ezp_L_N = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_L_N)
-  ezp_R_N = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_R_N)
-  ezp_L_U = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_L_U)
-  ezp_R_U = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_R_U)
-  ezp_L_D = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_L_D)
-  ezp_R_D = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_R_D)
-  ezp_L_S = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_L_S)
-  ezp_R_S = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_R_S)
-  ezp_L_C = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_L_C)
-  ezp_R_C = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_R_C)
-  ezp_L_B = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_L_B)
-  ezp_R_B = SelfDCoupling("selfDHzpcontact", ROOT.py_gHIGGS_Vp_R_B)
+  ezp_El_left = SelfDCoupling("selfDZpffcoupl", ROOT.py_gHIGGS_Vp_El_left)
+  ezp_El_right = SelfDCoupling("selfDZpffcoupl", ROOT.py_gHIGGS_Vp_El_right)
+  ezp_Mu_left = SelfDCoupling("selfDZpffcoupl", ROOT.py_gHIGGS_Vp_Mu_left)
+  ezp_Mu_right = SelfDCoupling("selfDZpffcoupl", ROOT.py_gHIGGS_Vp_Mu_right)
+  ezp_Ta_left = SelfDCoupling("selfDZpffcoupl", ROOT.py_gHIGGS_Vp_Ta_left)
+  ezp_Ta_right = SelfDCoupling("selfDZpffcoupl", ROOT.py_gHIGGS_Vp_Ta_right)
+  ezp_NuE_left = SelfDCoupling("selfDZpffcoupl", ROOT.py_gHIGGS_Vp_NuE_left)
+  ezp_NuE_right = SelfDCoupling("selfDZpffcoupl", ROOT.py_gHIGGS_Vp_NuE_right)
+  ezp_Dn_left = SelfDCoupling("selfDZpffcoupl", ROOT.py_gHIGGS_Vp_Dn_left)
+  ezp_Dn_right = SelfDCoupling("selfDZpffcoupl", ROOT.py_gHIGGS_Vp_Dn_right)
+  ezp_Up_left = SelfDCoupling("selfDZpffcoupl", ROOT.py_gHIGGS_Vp_Up_left)
+  ezp_Up_right = SelfDCoupling("selfDZpffcoupl", ROOT.py_gHIGGS_Vp_Up_right)
+  ezp_Str_left = SelfDCoupling("selfDZpffcoupl", ROOT.py_gHIGGS_Vp_Str_left)
+  ezp_Str_right = SelfDCoupling("selfDZpffcoupl", ROOT.py_gHIGGS_Vp_Str_right)
+  ezp_Chm_left = SelfDCoupling("selfDZpffcoupl", ROOT.py_gHIGGS_Vp_Chm_left)
+  ezp_Chm_right = SelfDCoupling("selfDZpffcoupl", ROOT.py_gHIGGS_Vp_Chm_right)
+  ezp_Bot_left = SelfDCoupling("selfDZpffcoupl", ROOT.py_gHIGGS_Vp_Bot_left)
+  ezp_Bot_right = SelfDCoupling("selfDZpffcoupl", ROOT.py_gHIGGS_Vp_Bot_right)
+  ezp_Top_left = SelfDCoupling("selfDZpffcoupl", ROOT.py_gHIGGS_Vp_Top_left)
+  ezp_Top_right = SelfDCoupling("selfDZpffcoupl", ROOT.py_gHIGGS_Vp_Top_right)
 
   ghwwp1 = SelfDCoupling("selfDHwwpcoupl", ROOT.py_gHIGGS_VV_1)
   ghwpwp1 = SelfDCoupling("selfDHwpwpcoupl", ROOT.py_gHIGGS_VV_1)
-  ewp_L_E = SelfDCoupling("selfDHwpcontact", ROOT.py_gHIGGS_Vp_L_E)
-  ewp_R_E = SelfDCoupling("selfDHwpcontact", ROOT.py_gHIGGS_Vp_R_E)
-  ewp_L_M = SelfDCoupling("selfDHwpcontact", ROOT.py_gHIGGS_Vp_L_M)
-  ewp_R_M = SelfDCoupling("selfDHwpcontact", ROOT.py_gHIGGS_Vp_R_M)
-  ewp_L_T = SelfDCoupling("selfDHwpcontact", ROOT.py_gHIGGS_Vp_L_T)
-  ewp_R_T = SelfDCoupling("selfDHwpcontact", ROOT.py_gHIGGS_Vp_R_T)
-  ewp_L_U = SelfDCoupling("selfDHwpcontact", ROOT.py_gHIGGS_Vp_L_U)
-  ewp_R_U = SelfDCoupling("selfDHwpcontact", ROOT.py_gHIGGS_Vp_R_U)
-  ewp_L_C = SelfDCoupling("selfDHwpcontact", ROOT.py_gHIGGS_Vp_L_C)
-  ewp_R_C = SelfDCoupling("selfDHwpcontact", ROOT.py_gHIGGS_Vp_R_C)
+  ewp_El_left = SelfDCoupling("selfDWpffcoupl", ROOT.py_gHIGGS_Vp_El_left)
+  ewp_El_right = SelfDCoupling("selfDWpffcoupl", ROOT.py_gHIGGS_Vp_El_right)
+  ewp_Mu_left = SelfDCoupling("selfDWpffcoupl", ROOT.py_gHIGGS_Vp_Mu_left)
+  ewp_Mu_right = SelfDCoupling("selfDWpffcoupl", ROOT.py_gHIGGS_Vp_Mu_right)
+  ewp_Ta_left = SelfDCoupling("selfDWpffcoupl", ROOT.py_gHIGGS_Vp_Ta_left)
+  ewp_Ta_right = SelfDCoupling("selfDWpffcoupl", ROOT.py_gHIGGS_Vp_Ta_right)
+  ewp_Up_left = SelfDCoupling("selfDWpffcoupl", ROOT.py_gHIGGS_Vp_Up_left)
+  ewp_Up_right = SelfDCoupling("selfDWpffcoupl", ROOT.py_gHIGGS_Vp_Up_right)
+  ewp_Chm_left = SelfDCoupling("selfDWpffcoupl", ROOT.py_gHIGGS_Vp_Chm_left)
+  ewp_Chm_right = SelfDCoupling("selfDWpffcoupl", ROOT.py_gHIGGS_Vp_Chm_right)
+  ewp_Top_left = SelfDCoupling("selfDWpffcoupl", ROOT.py_gHIGGS_Vp_Top_left)
+  ewp_Top_right = SelfDCoupling("selfDWpffcoupl", ROOT.py_gHIGGS_Vp_Top_right)
 
   UseVprime = SelfDParameter("selfDUseVprime")
-  M_Vprime = SelfDParameter("selfDM_Vprime")
-  Ga_Vprime = SelfDParameter("selfDGa_Vprime")
+  M_Zprime = SelfDParameter("selfDM_Zprime")
+  Ga_Zprime = SelfDParameter("selfDGa_Zprime")
+  M_Wprime = SelfDParameter("selfDM_Wprime")
+  Ga_Wprime = SelfDParameter("selfDGa_Wprime")
 
   zprime_qq_left = SelfDCoupling("selfDZqqcoupl", ROOT.py_gZPRIME_QQ_LEFT)
   zprime_qq_right = SelfDCoupling("selfDZqqcoupl", ROOT.py_gZPRIME_QQ_RIGHT)

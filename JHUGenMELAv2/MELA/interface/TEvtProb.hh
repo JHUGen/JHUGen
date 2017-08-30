@@ -51,16 +51,15 @@ public:
   // Constructors and Destructor
   //---------------------------------------------------------------------------
   TEvtProb() {};
-  TEvtProb(const char* path, double ebeam, const char* pathtoPDFSet, int PDFMember=0, TVar::VerbosityLevel verbosity_=TVar::ERROR);
+  TEvtProb(const char* pathtoXSW, double ebeam, const char* pathtoPDFSet, int PDFMember=0, TVar::VerbosityLevel verbosity_=TVar::ERROR);
+  TEvtProb(const TEvtProb& other);
   ~TEvtProb();
 
   //----------------------
   // Functions
   //----------------------
   void Set_LHAgrid(const char* path, int pdfmember=0);
-  void SetProcess(TVar::Process tmp);
-  void SetMatrixElement(TVar::MatrixElement tmp);
-  void SetProduction(TVar::Production tmp);
+  void SetProcess(TVar::Process proc, TVar::MatrixElement me, TVar::Production prod);
   void SetVerbosity(TVar::VerbosityLevel tmp);
   void SetLeptonInterf(TVar::LeptonInterference tmp);
 
@@ -71,6 +70,8 @@ public:
   void AllowSeparateWWCouplings(bool doAllow=false);
   void ResetMass(double inmass, int ipart);
   void ResetWidth(double inwidth, int ipart);
+  void SetZprimeMassWidth(double inmass, double inwidth);
+  void SetWprimeMassWidth(double inmass, double inwidth);
   void ResetQuarkMasses();
   void ResetMCFM_EWKParameters(double ext_Gf, double ext_aemmz, double ext_mW, double ext_mZ, double ext_xW, int ext_ewscheme=3);
   void ResetCouplings();
@@ -95,45 +96,33 @@ public:
   // Reset the IO record, called at te beginning of each comoputation
   void ResetIORecord();
 
-  double XsecCalc_XVV(
-    TVar::Process process_, TVar::Production production_,
-    TVar::VerbosityLevel verbosity_
-    );
+  double XsecCalc_XVV();
 
-  double XsecCalc_VVXVV(
-    TVar::Process process_, TVar::Production production_,
-    TVar::VerbosityLevel verbosity_
-    );
+  double XsecCalc_VVXVV();
 
-  double XsecCalcXJJ(
-    TVar::Process process_, TVar::Production production_,
-    TVar::VerbosityLevel verbosity_
-    );
+  double XsecCalcXJJ();
 
-  double XsecCalcXJ(
-    TVar::Process process_, TVar::Production production_,
-    TVar::VerbosityLevel verbosity_
-    );
+  double XsecCalcXJ();
 
   double XsecCalc_VX(
-    TVar::Process process_, TVar::Production production_,
-    TVar::VerbosityLevel verbosity_,
     bool includeHiggsDecay
     );
 
   double XsecCalc_TTX(
-    TVar::Process process_, TVar::Production production_,
-    TVar::VerbosityLevel verbosity_,
     int topProcess, int topDecay
     );
 
   double GetXPropagator(TVar::ResonancePropagatorScheme scheme);
 
   // Get-functions
+  MELAHXSWidth const* GetHXSWidthEstimator() const;
   SpinZeroCouplings* GetSelfDSpinZeroCouplings();
   SpinOneCouplings* GetSelfDSpinOneCouplings();
   SpinTwoCouplings* GetSelfDSpinTwoCouplings();
   double GetPrimaryHiggsMass();
+  double GetPrimaryMass(int ipart);
+  double GetPrimaryWidth(int ipart);
+  double GetHiggsWidthAtPoleMass(double mass);
   MelaIO* GetIORecord();
   MELACandidate* GetCurrentCandidate();
   int GetCurrentCandidateIndex(); // Return the index of current melaCand in the candList array, or -1 if it does not exist
@@ -144,6 +133,8 @@ protected:
   //--------------------
   // Variables
   //--------------------
+  const char* pathtoPDFSet_;
+  int PDFMember_;
   TVar::Process process;
   TVar::MatrixElement matrixElement;
   TVar::Production production;
@@ -155,7 +146,7 @@ protected:
   double _h2mass;
   double _h2width;
   double EBEAM;
-  MELAHXSWidth* myCSW_;
+  MELAHXSWidth myCSW_;
   TVar::event_scales_type event_scales;
 
   SpinZeroCouplings selfDSpinZeroCoupl;
@@ -184,6 +175,8 @@ protected:
   bool CheckSelfDCouplings_Hbb();
   bool CheckSelfDCouplings_HVV();
 
+  // Constructor wrapper
+  void Build();
 
   ClassDef(TEvtProb, 0);
 };

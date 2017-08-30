@@ -1,7 +1,7 @@
-#include "ScalarPdfFactory_ggH.h"
+#include "ScalarPdfFactory_HVV.h"
 
 
-ScalarPdfFactory_ggH::ScalarPdfFactory_ggH(RooSpinZero::modelMeasurables measurables_, bool acceptance_, RooSpin::VdecayType V1decay_, RooSpin::VdecayType V2decay_, Bool_t OnshellH_) :
+ScalarPdfFactory_HVV::ScalarPdfFactory_HVV(RooSpinZero::modelMeasurables measurables_, bool acceptance_, RooSpin::VdecayType V1decay_, RooSpin::VdecayType V2decay_, Bool_t OnshellH_) :
 ScalarPdfFactory(measurables_, acceptance_, V1decay_, V2decay_, OnshellH_)
 {
   measurables.Y=0;
@@ -9,7 +9,7 @@ ScalarPdfFactory(measurables_, acceptance_, V1decay_, V2decay_, OnshellH_)
   makeParamsConst(true);
   initPDF();
 }
-ScalarPdfFactory_ggH::ScalarPdfFactory_ggH(RooSpinZero::modelMeasurables measurables_, double gRatio_[4][8], double gZGsRatio_[4][1], double gGsGsRatio_[3][1], bool pmf_applied_, bool acceptance_, RooSpin::VdecayType V1decay_, RooSpin::VdecayType V2decay_, Bool_t OnshellH_) :
+ScalarPdfFactory_HVV::ScalarPdfFactory_HVV(RooSpinZero::modelMeasurables measurables_, double gRatio_[4][8], double gZGsRatio_[4][1], double gGsGsRatio_[3][1], bool pmf_applied_, bool acceptance_, RooSpin::VdecayType V1decay_, RooSpin::VdecayType V2decay_, Bool_t OnshellH_) :
 ScalarPdfFactory(measurables_, gRatio_, gZGsRatio_, gGsGsRatio_, pmf_applied_, acceptance_, V1decay_, V2decay_, OnshellH_)
 {
   measurables.Y=0;
@@ -18,12 +18,12 @@ ScalarPdfFactory(measurables_, gRatio_, gZGsRatio_, gGsGsRatio_, pmf_applied_, a
   initPDF();
 }
 
-ScalarPdfFactory_ggH::~ScalarPdfFactory_ggH(){
+ScalarPdfFactory_HVV::~ScalarPdfFactory_HVV(){
   destroyPDF();
   destroyAcceptanceParams();
 }
 
-void ScalarPdfFactory_ggH::initAcceptanceParams(){
+void ScalarPdfFactory_HVV::initAcceptanceParams(){
   if (acceptance){
     accepParams.aPhi = new RooRealVar("aPhi", "aPhi", 1.);
     accepParams.bPhi = new RooRealVar("bPhi", "bPhi", 4.88199e-03);
@@ -107,7 +107,7 @@ void ScalarPdfFactory_ggH::initAcceptanceParams(){
     accepParams.dM2 = new RooRealVar("dM2", "dM2", 0.);
   }
 }
-void ScalarPdfFactory_ggH::destroyAcceptanceParams(){
+void ScalarPdfFactory_HVV::destroyAcceptanceParams(){
   delete accepParams.aM1;
   delete accepParams.bM1;
   delete accepParams.cM1;
@@ -143,7 +143,7 @@ void ScalarPdfFactory_ggH::destroyAcceptanceParams(){
   delete accepParams.eHs;
 }
 
-void ScalarPdfFactory_ggH::makeParamsConst(bool yesNo){
+void ScalarPdfFactory_HVV::makeParamsConst(bool yesNo){
   couplings.Lambda->setConstant(true);
   couplings.Lambda_zgs1->setConstant(true);
   couplings.Lambda_z1->setConstant(true);
@@ -244,9 +244,10 @@ void ScalarPdfFactory_ggH::makeParamsConst(bool yesNo){
     accepParams.dM2->setConstant(kTRUE);
   }
 }
+void ScalarPdfFactory_HVV::setZZ4fOrdering(bool flag){ PDF->setZZ4fOrdering(flag); }
 
-void ScalarPdfFactory_ggH::initPDF(){
-  PDF = new RooSpinZero_7DComplex_withAccep_ggH(
+void ScalarPdfFactory_HVV::initPDF(){
+  PDF = new RooSpinZero_7DComplex_withAccep_HVV(
     "PDF", "PDF",
     measurables,
     parameters,

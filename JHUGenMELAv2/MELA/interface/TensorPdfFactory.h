@@ -7,7 +7,7 @@
 #include "TString.h"
 
 
-class TensorPdfFactory : public SpinPdfFactory {
+class TensorPdfFactory : public SpinPdfFactory{
 public:
   RooSpinTwo::modelCouplings couplings;
 
@@ -27,6 +27,7 @@ protected:
 
   virtual void initPDF()=0;
   virtual void destroyPDF()=0;
+
 };
 
 

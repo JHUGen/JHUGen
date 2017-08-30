@@ -1,64 +1,41 @@
-#ifndef newZZMatrixElement_newZZMatrixElement_h
-#define newZZMatrixElement_newZZMatrixElement_h
+#ifndef ZZMatrixElement_ZZMatrixElement_h
+#define ZZMatrixElement_ZZMatrixElement_h
 
 #include <vector>
 #include "TVar.hh"
 #include "TEvtProb.hh"
 
 
-class  newZZMatrixElement{
+class  ZZMatrixElement{
 public:
 
-  newZZMatrixElement(
+  ZZMatrixElement(
     const char* pathtoPDFSet,
     int PDFMember,
     const char* pathtoHiggsCSandWidth, // path to the textfiles of the HiggsCSandWidth package
     double ebeam,
     TVar::VerbosityLevel verbosity
     );
-
-  ~newZZMatrixElement();
+  ZZMatrixElement(const ZZMatrixElement& other);
+  ~ZZMatrixElement();
 
   void computeXS(
-    TVar::Process process_,
-    TVar::MatrixElement me_,
-    TVar::Production production_,
     float &mevalue
     );
-
   void computeProdXS_VVHVV(
-    TVar::Process process_,
-    TVar::MatrixElement me_,
-    TVar::Production production_,
     float& mevalue
     );
-
   void computeProdXS_JJH(
-    TVar::Process process_,
-    TVar::MatrixElement me_,
-    TVar::Production production_,
     float &mevalue
     );
-
   void computeProdXS_JH(
-    TVar::Process process_,
-    TVar::MatrixElement me_,
-    TVar::Production production_,
     float &mevalue
     );
-
   void computeProdXS_VH(
-    TVar::Process process_,
-    TVar::MatrixElement me_,
-    TVar::Production production_,
     float &mevalue,
     bool includeHiggsDecay=false
     );
-
   void computeProdXS_ttH(
-    TVar::Process process_,
-    TVar::MatrixElement me_,
-    TVar::Production production_,
     float &mevalue,
     int topProcess,
     int topDecay=0
@@ -124,13 +101,15 @@ public:
   void set_SpinZeroContact(
     double selfDHzzpcoupl[SIZE_HVV][2],
     double selfDHzpzpcoupl[SIZE_HVV][2],
-    double selfDHzpcontact[SIZE_Vp][2],
+    double selfDZpffcoupl[SIZE_Vpff][2],
     double selfDHwwpcoupl[SIZE_HVV][2],
     double selfDHwpwpcoupl[SIZE_HVV][2],
-    double selfDHwpcontact[SIZE_Vp][2],
+    double selfDWpffcoupl[SIZE_Vpff][2],
     bool UseVprime,
-    double M_Vprime,
-    double Ga_Vprime
+    double M_Zprime,
+    double Ga_Zprime,
+    double M_Wprime,
+    double Ga_Wprime
     );
   void set_SpinOneCouplings(
     double selfDZqqcoupl[SIZE_ZQQ][2],
@@ -147,6 +126,10 @@ public:
 
   // Get-functions
   MelaIO* get_IORecord();
+  double get_PrimaryMass(int ipart);
+  double get_PrimaryHiggsMass(){ return get_PrimaryMass(25); }
+  double get_PrimaryWidth(int ipart);
+  double get_HiggsWidthAtPoleMass(double mass);
   MELACandidate* get_CurrentCandidate();
   int get_CurrentCandidateIndex();
   int get_NCandidates();
@@ -154,11 +137,11 @@ public:
 
 protected:
   
-  TVar::VerbosityLevel processVerbosity;
-  TVar::LeptonInterference processLeptonInterference;
   TVar::Process processModel;
   TVar::MatrixElement processME;
   TVar::Production processProduction;
+  TVar::VerbosityLevel processVerbosity;
+  TVar::LeptonInterference processLeptonInterference;
 
   double EBEAM;
   double mHiggs[nSupportedHiggses];
@@ -174,6 +157,9 @@ protected:
   // Having a temporary top candidate list does not make much sense at the moment
   //std::vector<MELATopCandidate*> tmpTopCandList; // Vector of pointers to the owned, temporary MELATopCandidates
   std::vector<MELACandidate*> tmpCandList; // Vector of pointers to the owned, temporary MELACandidates
+
+  // Constructor wrapper
+  void build();
 
 };
 #endif

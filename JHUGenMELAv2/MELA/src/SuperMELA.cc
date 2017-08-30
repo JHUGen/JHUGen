@@ -18,45 +18,47 @@ SuperMELA::SuperMELA(
   mHVal_(mH),
   sqrts_(LHCsqrts)
 {
+  sigma_CB_=nullptr;
+  mean_CB_err_=nullptr;
+  sigma_CB_err_=nullptr;
 
-  sigma_CB_=0;
-  mean_CB_err_=0;
-  sigma_CB_err_=0;
+  n_CB_=nullptr;
+  alpha_CB_=nullptr;
+  n2_CB_=nullptr;
+  alpha2_CB_=nullptr;
+  mean_CB_=nullptr;
+  meanTOT_CB_=nullptr;
 
-  n_CB_=0;
-  alpha_CB_=0;
-  n2_CB_=0;
-  alpha2_CB_=0;
-  mean_CB_=0;
-  meanTOT_CB_=0;
+  mean_BW_=nullptr;
+  width_BW_=nullptr;
 
-  mean_BW_=0;
-  width_BW_=0;
+  corr_mean_sig=nullptr;
+  corr_sigma_sig=nullptr;
 
-  sig_CB_=0;
-  sig_BW_=0;
-  sig_FFT_=0;
+  sig_CB_=nullptr;
+  sig_BW_=nullptr;
+  sig_FFT_=nullptr;
 
-  a0_qqZZ_=0;
-  a1_qqZZ_=0;
-  a2_qqZZ_=0;
-  a3_qqZZ_=0;
-  a4_qqZZ_=0;
-  a5_qqZZ_=0;
-  a6_qqZZ_=0;
-  a7_qqZZ_=0;
-  a8_qqZZ_=0;
-  a9_qqZZ_=0;
-  a10_qqZZ_=0;
-  a11_qqZZ_=0;
-  a12_qqZZ_=0;
-  a13_qqZZ_=0;
+  a0_qqZZ_=nullptr;
+  a1_qqZZ_=nullptr;
+  a2_qqZZ_=nullptr;
+  a3_qqZZ_=nullptr;
+  a4_qqZZ_=nullptr;
+  a5_qqZZ_=nullptr;
+  a6_qqZZ_=nullptr;
+  a7_qqZZ_=nullptr;
+  a8_qqZZ_=nullptr;
+  a9_qqZZ_=nullptr;
+  a10_qqZZ_=nullptr;
+  a11_qqZZ_=nullptr;
+  a12_qqZZ_=nullptr;
+  a13_qqZZ_=nullptr;
 
-  qqZZ_pdf_=0;
+  qqZZ_pdf_=nullptr;
 
   verbose_=false;
   mH_rrv_=new RooRealVar("mH", "mH", mHVal_, 0., sqrts_*1000.);
-  m4l_rrv_=0;
+  m4l_rrv_=nullptr;
   strChan_=channel;
 
   //pathToCards_="../../../HiggsAnalysis/HZZ4L_CombinationPy/CreateDatacards/SM_inputs_8TeV/";
@@ -65,33 +67,42 @@ SuperMELA::SuperMELA(
 }
 
 SuperMELA::~SuperMELA(){
-  delete sig_CB_;
-  delete sig_BW_;
-  delete sig_FFT_;
-  delete qqZZ_pdf_;
-
-  delete n_CB_;
-  delete alpha_CB_;
-  delete n2_CB_;
-  delete alpha2_CB_;
-
-  delete mean_CB_;
-  delete sigma_CB_;
-  delete meanTOT_CB_;
-
-  delete mean_CB_err_;
-  delete sigma_CB_err_;
-
-  delete mean_BW_;
-  delete width_BW_;
+  // Delete in reverse order wrt SuperMELA::init()
+  delete qqZZ_pdf_; qqZZ_pdf_=nullptr;
 
   delete a0_qqZZ_; delete a1_qqZZ_; delete a2_qqZZ_; delete a3_qqZZ_;
   delete a4_qqZZ_; delete a5_qqZZ_; delete a6_qqZZ_; delete a7_qqZZ_;
   delete a8_qqZZ_; delete a9_qqZZ_; delete a10_qqZZ_; delete a11_qqZZ_;
   delete a12_qqZZ_; delete a13_qqZZ_;
+  a0_qqZZ_=nullptr; a1_qqZZ_=nullptr; a2_qqZZ_=nullptr; a3_qqZZ_=nullptr;
+  a4_qqZZ_=nullptr; a5_qqZZ_=nullptr; a6_qqZZ_=nullptr; a7_qqZZ_=nullptr;
+  a8_qqZZ_=nullptr; a9_qqZZ_=nullptr; a10_qqZZ_=nullptr; a11_qqZZ_=nullptr;
+  a12_qqZZ_=nullptr; a13_qqZZ_=nullptr;
 
-  delete mH_rrv_;
-  if (m4l_rrv_!=0) delete m4l_rrv_;
+  delete sig_FFT_; sig_FFT_=nullptr;
+  delete sig_BW_; sig_BW_=nullptr;
+  delete sig_CB_; sig_CB_=nullptr;
+
+  delete width_BW_; width_BW_=nullptr;
+  delete mean_BW_; mean_BW_=nullptr;
+
+  delete sigma_CB_; sigma_CB_=nullptr;
+  delete meanTOT_CB_; meanTOT_CB_=nullptr;
+  delete mean_CB_; mean_CB_=nullptr;
+
+  delete corr_sigma_sig; corr_sigma_sig=nullptr;
+  delete corr_mean_sig; corr_mean_sig=nullptr;
+
+  delete alpha2_CB_; alpha2_CB_=nullptr;
+  delete n2_CB_; n2_CB_=nullptr;
+  delete alpha_CB_; alpha_CB_=nullptr;
+  delete n_CB_; n_CB_=nullptr;
+
+  delete sigma_CB_err_; sigma_CB_err_=nullptr;
+  delete mean_CB_err_; mean_CB_err_=nullptr;
+
+  delete m4l_rrv_; m4l_rrv_=nullptr;
+  delete mH_rrv_; mH_rrv_=nullptr;
 }
 
 void SuperMELA::SetDecayChannel(string myChan){
@@ -145,7 +156,7 @@ void SuperMELA::init(){
   // Calculate m4l ranges for the given mH, set range of rrv
   calc_mZZ_range(mHVal_, lowMH_, highMH_);
   if (verbose_)cout << "Range width=" << highMH_ - lowMH_ << endl;
-  m4l_rrv_=new RooRealVar("CMS_zz4l_mass", "CMS_zz4l_mass", mHVal_, lowMH_, highMH_);
+  delete m4l_rrv_; m4l_rrv_=new RooRealVar("CMS_zz4l_mass", "CMS_zz4l_mass", mHVal_, lowMH_, highMH_);
   m4l_rrv_->setBins(2000, "fft");
   m4l_rrv_->setRange("shape", lowMH_, highMH_);
 
@@ -161,8 +172,8 @@ void SuperMELA::init(){
   }
 
   //delete old stuff before reinitialization
-  if (mean_CB_err_) delete mean_CB_err_;
-  if (sigma_CB_err_) delete sigma_CB_err_;
+  delete mean_CB_err_;
+  delete sigma_CB_err_;
   if (strChan_=="4mu"){
     mean_CB_err_=new RooRealVar("mean_CB_err", "mean_CB_err", str_mean_CB_err_m);
     sigma_CB_err_=new RooRealVar("sigma_CB_err", "sigma_CB_err", str_sigma_CB_err_m);
@@ -194,10 +205,10 @@ void SuperMELA::init(){
     std::cout << "Sigma RooFormula (string): " << str_sigma_CB.c_str() << std::endl;
   }
 
-  if (n_CB_) delete n_CB_;
-  if (alpha_CB_) delete alpha_CB_;
-  if (n2_CB_) delete n2_CB_;
-  if (alpha2_CB_) delete alpha2_CB_;
+  delete n_CB_;
+  delete alpha_CB_;
+  delete n2_CB_;
+  delete alpha2_CB_;
   char rrvName[96];
   sprintf(rrvName, "CMS_zz4l_n_sig_%s_%d", strChan_.c_str(), int(sqrts_));
   if (verbose_) cout << "SuperMELA::init: Constructing n_CB_ from formula " << str_n_CB.c_str() << endl;
@@ -212,20 +223,22 @@ void SuperMELA::init(){
   if (verbose_) cout << "SuperMELA::init: Constructing alpha2_CB_ from formula " << str_alpha2_CB.c_str() << endl;
   alpha2_CB_=new RooFormulaVar(rrvName, str_alpha2_CB.c_str(), RooArgList(*mH_rrv_));
 
-  RooRealVar corr_mean_sig("CMS_zz4l_mean_sig_corrMH", "CMS_zz4l_mean_sig_corrMH", 0., -10., 10.);
-  RooRealVar corr_sigma_sig("CMS_zz4l_sigma_sig_corrMH", "CMS_zz4l_sigma_sig_corrMH", 0., -10., 10.);
+  corr_mean_sig = new RooRealVar("CMS_zz4l_mean_sig_corrMH", "CMS_zz4l_mean_sig_corrMH", 0., -10., 10.);
+  corr_sigma_sig = new RooRealVar("CMS_zz4l_sigma_sig_corrMH", "CMS_zz4l_sigma_sig_corrMH", 0., -10., 10.);
+  corr_mean_sig->setConstant(true);
+  corr_sigma_sig->setConstant(true);
 
-  if (mean_CB_) delete mean_CB_;
-  if (meanTOT_CB_) delete meanTOT_CB_;
-  if (sigma_CB_) delete sigma_CB_;
-  mean_CB_=new RooFormulaVar("CMS_zz4l_mean_m_sig", Form("(%s)+@0*@1", str_mean_CB.c_str()), RooArgList(*mH_rrv_, corr_mean_sig));//this is normalized by mHVal_
+  delete mean_CB_;
+  delete meanTOT_CB_;
+  delete sigma_CB_;
+  mean_CB_=new RooFormulaVar("CMS_zz4l_mean_m_sig", Form("(%s)+@0*@1", str_mean_CB.c_str()), RooArgList(*mH_rrv_, *corr_mean_sig));//this is normalized by mHVal_
   meanTOT_CB_=new RooFormulaVar("CMS_zz4l_mean_sig", "(@0+@1)", RooArgList(*mH_rrv_, *mean_CB_));
-  if (verbose_){ std::cout << "Signal Mean vals -> Correction: " << corr_mean_sig.getVal() << "  Mean: " << mean_CB_->getVal() << "  Total: " << meanTOT_CB_->getVal() << std::endl; }
-  sigma_CB_=new RooFormulaVar("CMS_zz4l_sigma_m_sig", Form("(%s)*(1+@1)", str_sigma_CB.c_str()), RooArgList(*mH_rrv_, corr_sigma_sig));
+  if (verbose_){ std::cout << "Signal Mean vals -> Correction: " << corr_mean_sig->getVal() << "  Mean: " << mean_CB_->getVal() << "  Total: " << meanTOT_CB_->getVal() << std::endl; }
+  sigma_CB_=new RooFormulaVar("CMS_zz4l_sigma_m_sig", Form("(%s)*(1+@0*@1)", str_sigma_CB.c_str()), RooArgList(*mH_rrv_, *corr_sigma_sig));
 
   //for high-mass one also needs a gamma RooFormulaVar, 
-  if (mean_BW_) delete mean_BW_;
-  if (width_BW_) delete width_BW_;
+  delete mean_BW_;
+  delete width_BW_;
   sprintf(rrvName, "CMS_zz4l_mean_BW_sig_%s_%d", strChan_.c_str(), int(sqrts_));
   mean_BW_=new RooRealVar(rrvName, "CMS_zz4l_mean_BW", mHVal_, 100., 1000.);
   sprintf(rrvName, "CMS_zz4l_width_BW_sig_%s_%d", strChan_.c_str(), int(sqrts_));
@@ -246,30 +259,33 @@ void SuperMELA::init(){
     std::cout << "Width BW (realvar value) = " << width_BW_->getVal() << std::endl;
   }
 
-  if (sig_CB_) delete sig_CB_;
-  if (sig_BW_) delete sig_BW_;
-  if (sig_FFT_) delete sig_FFT_;
+  delete sig_FFT_;
+  delete sig_CB_;
+  delete sig_BW_;
   sig_CB_ =new MELADoubleCB("signalCB_ggH", "signalCB_ggH", *m4l_rrv_, *meanTOT_CB_, *sigma_CB_, *alpha_CB_, *n_CB_, *alpha2_CB_, *n2_CB_);
   sig_BW_ =new MELARelBWUFParam("signalBW_ggH", "signalBW_ggH", *m4l_rrv_, *mean_BW_, *width_BW_);
   sig_FFT_=new RooFFTConvPdf("signal_ggH", "BW (X) CB", *m4l_rrv_, *sig_BW_, *sig_CB_, 2);
   sig_FFT_->setBufferFraction(0.2);
   if (verbose_){
-    m4l_rrv_->setVal(125.);
     std::cout << "Value of signal m4l CB shape is " << sig_CB_->getVal() << std::endl;
     std::cout << "Value of signal m4l BW shape is " << sig_BW_->getVal() << std::endl;
     sig_FFT_->Print("v");
     std::cout << "Value of signal m4l FFT shape is " << sig_FFT_->getVal() << std::endl;
   }
+
   RooAbsReal* tmpint;
+
   tmpint = sig_CB_->createIntegral(RooArgSet(*m4l_rrv_), RooFit::Range("shape"));
   norm_sig_CB_ =tmpint->getVal();
   delete tmpint;
   if (verbose_)std::cout << "Normalization of signal m4l CB shape is " << norm_sig_CB_ << std::endl;
+
   if (verbose_)std::cout << "\n---> Integrating Breit-Wigner:" << std::endl;
   tmpint = sig_BW_->createIntegral(RooArgSet(*m4l_rrv_), RooFit::Range("shape"));
   double norm_sig_BW_ =tmpint->getVal();
   delete tmpint;
   if (verbose_)std::cout << "Normalization of signal m4l BW shape is " << norm_sig_BW_ << std::endl;
+
   if (verbose_)std::cout << "\n---> Integrating full signal:" << std::endl;
   tmpint = sig_FFT_->createIntegral(RooArgSet(*m4l_rrv_), RooFit::Range("shape"));
   norm_sig_FFT_=tmpint->getVal();
@@ -285,34 +301,20 @@ void SuperMELA::init(){
     std::cout << "Param [0]=" << v_apars.at(0) << " [13]=" << v_apars.at(13) << std::endl;
   }
 
-  if (a0_qqZZ_) delete a0_qqZZ_;
-  a0_qqZZ_=new RooRealVar("CMS_zz4l_a0_qqZZ", "CMS_zz4l_a0_qqZZ", v_apars.at(0), 0., 200.);
-  if (a1_qqZZ_) delete a1_qqZZ_;
-  a1_qqZZ_=new RooRealVar("CMS_zz4l_a1_qqZZ", "CMS_zz4l_a1_qqZZ", v_apars.at(1), 0., 200.);
-  if (a2_qqZZ_) delete a2_qqZZ_;
-  a2_qqZZ_=new RooRealVar("CMS_zz4l_a2_qqZZ", "CMS_zz4l_a2_qqZZ", v_apars.at(2), 0., 200.);
-  if (a3_qqZZ_) delete a3_qqZZ_;
-  a3_qqZZ_=new RooRealVar("CMS_zz4l_a3_qqZZ", "CMS_zz4l_a3_qqZZ", v_apars.at(3), 0., 1.);
-  if (a4_qqZZ_) delete a4_qqZZ_;
-  a4_qqZZ_=new RooRealVar("CMS_zz4l_a4_qqZZ", "CMS_zz4l_a4_qqZZ", v_apars.at(4), 0., 200.);
-  if (a5_qqZZ_) delete a5_qqZZ_;
-  a5_qqZZ_=new RooRealVar("CMS_zz4l_a5_qqZZ", "CMS_zz4l_a5_qqZZ", v_apars.at(5), 0., 200.);
-  if (a6_qqZZ_) delete a6_qqZZ_;
-  a6_qqZZ_=new RooRealVar("CMS_zz4l_a6_qqZZ", "CMS_zz4l_a6_qqZZ", v_apars.at(6), 0., 100.);
-  if (a7_qqZZ_) delete a7_qqZZ_;
-  a7_qqZZ_=new RooRealVar("CMS_zz4l_a7_qqZZ", "CMS_zz4l_a7_qqZZ", v_apars.at(7), 0., 1.);
-  if (a8_qqZZ_) delete a8_qqZZ_;
-  a8_qqZZ_=new RooRealVar("CMS_zz4l_a8_qqZZ", "CMS_zz4l_a8_qqZZ", v_apars.at(8), 0., 200.);
-  if (a9_qqZZ_) delete a9_qqZZ_;
-  a9_qqZZ_=new RooRealVar("CMS_zz4l_a9_qqZZ", "CMS_zz4l_a9_qqZZ", v_apars.at(9), 0., 1.);
-  if (a10_qqZZ_) delete a10_qqZZ_;
-  a10_qqZZ_=new RooRealVar("CMS_zz4l_a10_qqZZ", "CMS_zz4l_a10_qqZZ", v_apars.at(10), 0., 200.);
-  if (a11_qqZZ_) delete a11_qqZZ_;
-  a11_qqZZ_=new RooRealVar("CMS_zz4l_a11_qqZZ", "CMS_zz4l_a11_qqZZ", v_apars.at(11), -100., 100.);
-  if (a12_qqZZ_) delete a12_qqZZ_;
-  a12_qqZZ_=new RooRealVar("CMS_zz4l_a12_qqZZ", "CMS_zz4l_a12_qqZZ", v_apars.at(12), 0., 10000.);
-  if (a13_qqZZ_) delete a13_qqZZ_;
-  a13_qqZZ_=new RooRealVar("CMS_zz4l_a13_qqZZ", "CMS_zz4l_a13_qqZZ", v_apars.at(13), 0., 1.);
+  delete a0_qqZZ_; a0_qqZZ_=new RooRealVar("CMS_zz4l_a0_qqZZ", "CMS_zz4l_a0_qqZZ", v_apars.at(0), 0., 200.);
+  delete a1_qqZZ_; a1_qqZZ_=new RooRealVar("CMS_zz4l_a1_qqZZ", "CMS_zz4l_a1_qqZZ", v_apars.at(1), 0., 200.);
+  delete a2_qqZZ_; a2_qqZZ_=new RooRealVar("CMS_zz4l_a2_qqZZ", "CMS_zz4l_a2_qqZZ", v_apars.at(2), 0., 200.);
+  delete a3_qqZZ_; a3_qqZZ_=new RooRealVar("CMS_zz4l_a3_qqZZ", "CMS_zz4l_a3_qqZZ", v_apars.at(3), 0., 1.);
+  delete a4_qqZZ_; a4_qqZZ_=new RooRealVar("CMS_zz4l_a4_qqZZ", "CMS_zz4l_a4_qqZZ", v_apars.at(4), 0., 200.);
+  delete a5_qqZZ_; a5_qqZZ_=new RooRealVar("CMS_zz4l_a5_qqZZ", "CMS_zz4l_a5_qqZZ", v_apars.at(5), 0., 200.);
+  delete a6_qqZZ_; a6_qqZZ_=new RooRealVar("CMS_zz4l_a6_qqZZ", "CMS_zz4l_a6_qqZZ", v_apars.at(6), 0., 100.);
+  delete a7_qqZZ_; a7_qqZZ_=new RooRealVar("CMS_zz4l_a7_qqZZ", "CMS_zz4l_a7_qqZZ", v_apars.at(7), 0., 1.);
+  delete a8_qqZZ_; a8_qqZZ_=new RooRealVar("CMS_zz4l_a8_qqZZ", "CMS_zz4l_a8_qqZZ", v_apars.at(8), 0., 200.);
+  delete a9_qqZZ_; a9_qqZZ_=new RooRealVar("CMS_zz4l_a9_qqZZ", "CMS_zz4l_a9_qqZZ", v_apars.at(9), 0., 1.);
+  delete a10_qqZZ_; a10_qqZZ_=new RooRealVar("CMS_zz4l_a10_qqZZ", "CMS_zz4l_a10_qqZZ", v_apars.at(10), 0., 200.);
+  delete a11_qqZZ_; a11_qqZZ_=new RooRealVar("CMS_zz4l_a11_qqZZ", "CMS_zz4l_a11_qqZZ", v_apars.at(11), -100., 100.);
+  delete a12_qqZZ_; a12_qqZZ_=new RooRealVar("CMS_zz4l_a12_qqZZ", "CMS_zz4l_a12_qqZZ", v_apars.at(12), 0., 10000.);
+  delete a13_qqZZ_; a13_qqZZ_=new RooRealVar("CMS_zz4l_a13_qqZZ", "CMS_zz4l_a13_qqZZ", v_apars.at(13), 0., 1.);
   a0_qqZZ_->setConstant(kTRUE);
   a1_qqZZ_->setConstant(kTRUE);
   a2_qqZZ_->setConstant(kTRUE);
@@ -329,8 +331,7 @@ void SuperMELA::init(){
   a13_qqZZ_->setConstant(kTRUE);
 
 
-  if (qqZZ_pdf_) delete qqZZ_pdf_;
-  qqZZ_pdf_ = new MELAqqZZPdf_v2("bkg_qqzz", "bkg_qqzz", *m4l_rrv_, *a0_qqZZ_, *a1_qqZZ_, *a2_qqZZ_, *a3_qqZZ_,
+  delete qqZZ_pdf_; qqZZ_pdf_ = new MELAqqZZPdf_v2("bkg_qqzz", "bkg_qqzz", *m4l_rrv_, *a0_qqZZ_, *a1_qqZZ_, *a2_qqZZ_, *a3_qqZZ_,
     *a4_qqZZ_, *a5_qqZZ_, *a6_qqZZ_, *a7_qqZZ_,
     *a8_qqZZ_, *a9_qqZZ_, *a10_qqZZ_, *a11_qqZZ_,
     *a12_qqZZ_, *a13_qqZZ_);
@@ -504,9 +505,8 @@ void SuperMELA::calc_mZZ_range(const double mHVal, double& low_M, double& high_M
   string path = MELAPKGPATH + "data/HiggsTotalWidth_YR3.txt";
 
   path.erase((std::find(path.rbegin(), path.rend(), '/').base()), path.end());
-  MELAHXSWidth* myCSW = new MELAHXSWidth(path.c_str());
-
-  double widthHVal =  myCSW->HiggsWidth(mHVal);
+  MELAHXSWidth myCSW(path.c_str());
+  double widthHVal =  myCSW.HiggsWidth(mHVal);
   double windowVal = max(widthHVal, 1.);
   double lowside = 100.;
   if (mHVal >= 275){ lowside = 180.; }
@@ -514,57 +514,51 @@ void SuperMELA::calc_mZZ_range(const double mHVal, double& low_M, double& high_M
   // Apply rounding
   low_M = int(max((mHVal - 20.*windowVal), lowside)+0.5);
   high_M = int(min((mHVal + 15.*windowVal), sqrts_*1000.)+0.5);
-
-  delete myCSW;
 }
 
 std::pair<double, double> SuperMELA::M4lProb(double m4l){
-  if (m4l<lowMH_ || m4l>highMH_){
-    if (verbose_) std::cout << "WARNING from void SuperMELA::computeKD ! m4l outside range [" << lowMH_ << ", " << highMH_ << "]: " << m4l << " . Setting SuperMELA to dummy values." << std::endl;
     double Psig =-1.;
     double Pbkg =-1.;
-    return make_pair(Psig, Pbkg);
+  if (m4l<lowMH_ || m4l>highMH_){
+    if (verbose_) std::cerr << "SuperMELA::M4lProb: m4l = " << m4l << " outside range [" << lowMH_ << ", " << highMH_ << "]. Setting SuperMELA to dummy values." << std::endl;
   }
-
+  else{
   m4l_rrv_->setVal(m4l);
-  if (verbose_) std::cout << "In SuperMELA::superMelaLikelihoodDiscriminant,  m4l=" << m4l << std::endl;
-  //calculate value of signal m4l pdf (normalize pdf to 1) 
-  double m4lPsig=sig_CB_->getVal() / norm_sig_CB_;
-  if (verbose_) std::cout << "  m4lPsig=" << m4lPsig << std::flush;
-  //calculate value of background m4l pdf  (normalize pdf to 1) 
-  double m4lPbkg=qqZZ_pdf_->getVal() / norm_bkg_qqZZ_;
-  if (verbose_) std::cout << "  m4lPbkg=" << m4lPbkg << std::endl;
-
-  //the angular probs given back by the Mela producer are already normalized to 1
-  double Psig=m4lPsig;
-  double Pbkg=m4lPbkg;
-
+    Psig=sig_CB_->getVal() / norm_sig_CB_;
+    Pbkg=qqZZ_pdf_->getVal() / norm_bkg_qqZZ_;
+    if (verbose_){
+      std::cout << "SuperMELA::M4lProb: m4l = " << m4l
+        << ", m4lPsig = " << Psig
+        << ", m4lPbkg = " << Pbkg
+        << std::endl;
+    }
+  }
   return make_pair(Psig, Pbkg);
 }
 
 
 std::pair<double, double> SuperMELA::M4lProb(std::pair<double, double> m4lPair){
-  if ((m4lPair.first<lowMH_  || m4lPair.first>highMH_) ||(m4lPair.second<lowMH_  || m4lPair.second>highMH_)) {
-    if (verbose_)    std::cout << "WARNING from void SuperMELA::computeKD ! m4l outside range [" << lowMH_ << ", " << highMH_ << "]: " << m4lPair.first << " - " << m4lPair.second << " . Setting SuperMELA to dummy values." << std::endl;
     double Psig =-1.;
     double Pbkg =-1.;
-    return make_pair(Psig, Pbkg);
+  if (
+    (m4lPair.first<lowMH_ || m4lPair.first>highMH_)
+    ||
+    (m4lPair.second<lowMH_ || m4lPair.second>highMH_)
+    ){
+    if (verbose_) std::cerr << "SuperMELA::M4lProb: m4l pairs " << m4lPair.first << " - " << m4lPair.second << " outside range [" << lowMH_ << ", " << highMH_ << "]. Setting SuperMELA to dummy values." << std::endl;
   }
-
+  else{
   m4l_rrv_->setVal(m4lPair.first);
-  if (verbose_)std::cout << "In SuperMELA::superMelaLikelihoodDiscriminant,  m4lPSig=" << m4lPair.first << "  m4lPBkg=" << m4lPair.second << std::endl;
-  //calculate value of signal m4l pdf (normalize pdf to 1) 
-  double m4lPsig=sig_CB_->getVal() / norm_sig_CB_;
-  if (verbose_)std::cout << "  m4lPsig=" << m4lPsig << std::flush;
-  //calculate value of background m4l pdf  (normalize pdf to 1) 
+    Psig=sig_CB_->getVal() / norm_sig_CB_;
   m4l_rrv_->setVal(m4lPair.second);
-  double m4lPbkg=qqZZ_pdf_->getVal() / norm_bkg_qqZZ_;
-  if (verbose_)std::cout << "  m4lPbkg=" << m4lPbkg << std::endl;
-
-  //the angular probs given back by the Mela producer are already normalized to 1
-  double Psig=m4lPsig;
-  double Pbkg=m4lPbkg;
-
+    Pbkg=qqZZ_pdf_->getVal() / norm_bkg_qqZZ_;
+    if (verbose_){
+      std::cout << "SuperMELA::M4lProb: "
+        << "m4lPsig(" << m4lPair.first << ") = " << Psig
+        << ", m4lPbkg(" << m4lPair.second << ") = " << Pbkg
+        << std::endl;
+    }
+  }
   return make_pair(Psig, Pbkg);
 }
 

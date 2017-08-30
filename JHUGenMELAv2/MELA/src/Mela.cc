@@ -23,7 +23,7 @@ Please adhere to the following coding conventions:
 #include <sys/types.h>
 
 #include "Mela.h"
-#include "newZZMatrixElement.h"
+#include "ZZMatrixElement.h"
 #include "VectorPdfFactory.h"
 #include "TensorPdfFactory.h"
 #include "RooqqZZ_JHU_ZgammaZZ_fast.h"
@@ -48,6 +48,7 @@ Mela::Mela(
   double mh_,
   TVar::VerbosityLevel verbosity_
   ) :
+  melaRandomNumber(35797),
   LHCsqrts(LHCsqrts_),
   myVerbosity_(verbosity_),
   ZZME(0),
@@ -55,6 +56,60 @@ Mela::Mela(
   melaCand(0)
 {
   if (myVerbosity_>=TVar::DEBUG) cout << "Start Mela constructor" << endl;
+  build(mh_);
+  if (myVerbosity_>=TVar::DEBUG) cout << "End Mela constructor" << endl;
+}
+Mela::Mela(const Mela& other) :
+melaRandomNumber(35797),
+LHCsqrts(other.LHCsqrts),
+myVerbosity_(other.myVerbosity_),
+ZZME(0),
+auxiliaryProb(0.),
+melaCand(0)
+{
+  double mh_ = other.ZZME->get_PrimaryHiggsMass();
+  build(mh_);
+}
+Mela::~Mela(){
+  if (myVerbosity_>=TVar::DEBUG) cout << "Begin Mela destructor" << endl;
+
+  //setRemoveLeptonMasses(false); // Use Run 1 scheme for not removing lepton masses. Notice the switch itself is defined as an extern, so it has to be set to default value at the destructor!
+  setRemoveLeptonMasses(true); // Use Run 2 scheme for removing lepton masses. Notice the switch itself is defined as an extern, so it has to be set to default value at the destructor!
+
+  // Delete the derived RooFit objects first...
+  if (myVerbosity_>=TVar::DEBUG) cout << "Mela destructor: Destroying analytical PDFs" << endl;
+  delete ggSpin0Model;
+  delete spin1Model;
+  delete spin2Model;
+  delete qqZZmodel;
+  // ...then delete the observables.
+  if (myVerbosity_>=TVar::DEBUG) cout << "Mela destructor: Destroying analytical PDFs observables" << endl;
+  delete mzz_rrv;
+  delete z1mass_rrv; 
+  delete z2mass_rrv; 
+  delete costhetastar_rrv;
+  delete costheta1_rrv;
+  delete costheta2_rrv;
+  delete phi_rrv;
+  delete phi1_rrv;
+  delete Y_rrv;
+  delete upFrac_rrv;
+
+  if (myVerbosity_>=TVar::DEBUG) cout << "Mela destructor: Destroying SuperDijetMELA" << endl;
+  delete superDijet;
+  if (myVerbosity_>=TVar::DEBUG) cout << "Mela destructor: Destroying SuperMELA" << endl;
+  delete super;
+  if (myVerbosity_>=TVar::DEBUG) cout << "Mela destructor: Destroying ZZME" << endl;
+  delete ZZME;
+
+  // Delete ME constant handles
+  if (myVerbosity_>=TVar::DEBUG) cout << "Mela destructor: Destroying PConstant handles" << endl;
+  deletePConstantHandles();
+
+  if (myVerbosity_>=TVar::DEBUG) cout << "End Mela destructor" << endl;
+}
+void Mela::build(double mh_){
+  if (myVerbosity_>=TVar::DEBUG) cout << "Start Mela::build" << endl;
   //setRemoveLeptonMasses(false); // Use Run 1 scheme for not removing fermion masses
   setRemoveLeptonMasses(true); // Use Run 2 scheme for removing fermion masses to compute MEs that expect massless fermions properly
 
@@ -94,7 +149,7 @@ Mela::Mela(
   Y_rrv = new RooRealVar("Yzz", "#Y_{ZZ}", 0, -4, 4);
   upFrac_rrv = new RooRealVar("upFrac", "fraction up-quarks", .5, 0., 1.);
 
-  RooSpinZero::modelMeasurables measurables_;
+  RooSpin::modelMeasurables measurables_;
   measurables_.h1 = costheta1_rrv;
   measurables_.h2 = costheta2_rrv;
   measurables_.Phi = phi_rrv;
@@ -106,12 +161,12 @@ Mela::Mela(
   measurables_.Y = Y_rrv;
 
   if (myVerbosity_>=TVar::DEBUG) cout << "Create anaMELA PDF factories" << endl;
-  ggSpin0Model = new ScalarPdfFactory_ggH(measurables_, false, RooSpin::kVdecayType_Zll, RooSpin::kVdecayType_Zll); // RooSpin::kVdecayType_Zll,RooSpin::kVdecayType_Zll==ZZ
+  ggSpin0Model = new ScalarPdfFactory_HVV(measurables_, false, RooSpin::kVdecayType_Zll, RooSpin::kVdecayType_Zll); // RooSpin::kVdecayType_Zll,RooSpin::kVdecayType_Zll==ZZ4l
   spin1Model = new VectorPdfFactory(z1mass_rrv, z2mass_rrv, costhetastar_rrv, costheta1_rrv, costheta2_rrv, phi_rrv, phi1_rrv, mzz_rrv);
-  spin2Model = new TensorPdfFactory_HVV(measurables_, RooSpin::kVdecayType_Zll, RooSpin::kVdecayType_Zll);
+  spin2Model = new TensorPdfFactory_ppHVV(measurables_, RooSpin::kVdecayType_Zll, RooSpin::kVdecayType_Zll);
   qqZZmodel = new RooqqZZ_JHU_ZgammaZZ_fast("qqZZmodel", "qqZZmodel", *z1mass_rrv, *z2mass_rrv, *costheta1_rrv, *costheta2_rrv, *phi_rrv, *costhetastar_rrv, *phi1_rrv, *mzz_rrv, *upFrac_rrv);
 
-  if (myVerbosity_>=TVar::DEBUG) cout << "Paths for newZZMatrixElement" << endl;
+  if (myVerbosity_>=TVar::DEBUG) cout << "Paths for ZZMatrixElement" << endl;
   const string path_HiggsWidthFile = MELAPKGPATH + "data/HiggsTotalWidth_YR3.txt";
   if (myVerbosity_>=TVar::DEBUG) cout << "\t- Cross section/width file: " << path_HiggsWidthFile << endl;
   const string path_nnpdf = MELAPKGPATH + "data/Pdfdata/NNPDF30_lo_as_0130.LHgrid";
@@ -119,9 +174,9 @@ Mela::Mela(
   int pdfmember = 0;
   if (myVerbosity_>=TVar::DEBUG) cout << "\t- Linking NNPDF path " << path_nnpdf.c_str() << " -> " << path_nnpdf_c << endl;
   symlink(path_nnpdf.c_str(), path_nnpdf_c);
-  if (myVerbosity_>=TVar::DEBUG) cout << "Start newZZMatrixElement" << endl;
-  ZZME = new newZZMatrixElement(path_nnpdf_c, pdfmember, path_HiggsWidthFile.substr(0, path_HiggsWidthFile.length()-23).c_str(), 1000.*LHCsqrts/2., myVerbosity_);
-  if (myVerbosity_>=TVar::DEBUG) cout << "Set newZZMatrixElement masses" << endl;
+  if (myVerbosity_>=TVar::DEBUG) cout << "Start ZZMatrixElement" << endl;
+  ZZME = new ZZMatrixElement(path_nnpdf_c, pdfmember, path_HiggsWidthFile.substr(0, path_HiggsWidthFile.length()-23).c_str(), 1000.*LHCsqrts/2., myVerbosity_);
+  if (myVerbosity_>=TVar::DEBUG) cout << "Set ZZMatrixElement masses" << endl;
   setMelaPrimaryHiggsMass(mh_);
   setMelaHiggsMass(mh_, 0); setMelaHiggsMass(-1., 1);
   setMelaHiggsWidth(-1., 0); setMelaHiggsWidth(0., 1);
@@ -132,13 +187,13 @@ Mela::Mela(
   /***** CONSTANTS FOR MATRIX ELEMENTS *****/
   getPConstantHandles();
 
+  
   /***** SuperMELA *****/
   // Deactivate generation messages
   RooMsgService::instance().getStream(1).removeTopic(NumIntegration);
   RooMsgService::instance().setStreamStatus(1, kFALSE);
   RooMsgService::instance().setStreamStatus(0, kFALSE);// silence also the error messages, but should really be looked at.
 
-  myRandomNumber=new TRandom3(35797);
   if (myVerbosity_>=TVar::DEBUG) cout << "Start superMELA" << endl;
   int superMELA_LHCsqrts = LHCsqrts;
   if (superMELA_LHCsqrts > maxSqrts) superMELA_LHCsqrts = maxSqrts;
@@ -150,51 +205,40 @@ Mela::Mela(
   super->SetVerbosity((myVerbosity_>=TVar::DEBUG));
   super->init();
 
+
+  /***** SuperDijetMela *****/
+  float superDijetSqrts = LHCsqrts;
+  if (superDijetSqrts<13.) superDijetSqrts=13.; // Dijet resolution does not exist for 7 or 8 TeV
+  superDijet = new SuperDijetMela(superDijetSqrts, myVerbosity_);
+
+  // Initialize the couplings to 0 and end Mela constructor
   reset_SelfDCouplings();
-  if (myVerbosity_>=TVar::DEBUG) cout << "End Mela constructor" << endl;
+  if (myVerbosity_>=TVar::DEBUG) cout << "End Mela::build" << endl;
 }
 
-Mela::~Mela(){
-  if (myVerbosity_>=TVar::DEBUG) cout << "Begin Mela destructor" << endl;
-
-  //setRemoveLeptonMasses(false); // Use Run 1 scheme for not removing lepton masses. Notice the switch itself is defined as an extern, so it has to be set to default value at the destructor!
-  setRemoveLeptonMasses(true); // Use Run 2 scheme for removing lepton masses. Notice the switch itself is defined as an extern, so it has to be set to default value at the destructor!
-
-  // Delete the derived RooFit objects first...
-  delete ggSpin0Model;
-  delete spin1Model;
-  delete spin2Model;
-  delete qqZZmodel;
-  // ...then delete the observables.
-  delete mzz_rrv;
-  delete z1mass_rrv; 
-  delete z2mass_rrv; 
-  delete costhetastar_rrv;
-  delete costheta1_rrv;
-  delete costheta2_rrv;
-  delete phi_rrv;
-  delete phi1_rrv;
-  delete Y_rrv;
-  delete upFrac_rrv;
-
-  delete ZZME;
-  delete super;
-  delete myRandomNumber;
-
-  // Delete ME constant handles
-  deletePConstantHandles();
-
-  if (myVerbosity_>=TVar::DEBUG) cout << "End Mela destructor" << endl;
-}
 
 // Set-functions
-void Mela::setProcess(TVar::Process myModel, TVar::MatrixElement myME, TVar::Production myProduction)
-{
-  myModel_ = myModel;
+void Mela::setProcess(TVar::Process myModel, TVar::MatrixElement myME, TVar::Production myProduction){
   myME_ = myME;
   myProduction_ = myProduction;
+  // In case s-channel processes are passed for JHUGen ME, flip them back to JHUGen-specific productions.
+  if (myME_==TVar::JHUGen){
+    if (myProduction_==TVar::Had_ZH_S) myProduction_=TVar::Had_ZH;
+    else if (myProduction_==TVar::Had_WH_S) myProduction_=TVar::Had_WH;
+    else if (myProduction_==TVar::Lep_ZH_S) myProduction_=TVar::Lep_ZH;
+    else if (myProduction_==TVar::Lep_WH_S) myProduction_=TVar::Lep_WH;
+    else if (myProduction_==TVar::JJVBF_S) myProduction_=TVar::JJVBF;
+    else if (myProduction_==TVar::JJQCD_S) myProduction_=TVar::JJQCD;
+  }
+  myModel_ = myModel;
+  if (ZZME!=0) ZZME->set_Process(myModel_, myME_, myProduction_);
 }
-void Mela::setVerbosity(TVar::VerbosityLevel verbosity_){ myVerbosity_=verbosity_; if (ZZME!=0) ZZME->set_Verbosity(myVerbosity_); if (super!=0) super->SetVerbosity((myVerbosity_>=TVar::DEBUG)); }
+void Mela::setVerbosity(TVar::VerbosityLevel verbosity_){
+  myVerbosity_=verbosity_;
+  if (ZZME!=0) ZZME->set_Verbosity(myVerbosity_);
+  if (super!=0) super->SetVerbosity((myVerbosity_>=TVar::DEBUG));
+  if (superDijet!=0) superDijet->SetVerbosity(myVerbosity_);
+}
 TVar::VerbosityLevel Mela::getVerbosity(){ return myVerbosity_; }
 // Should be called per-event
 void Mela::setMelaPrimaryHiggsMass(double myHiggsMass){ ZZME->set_PrimaryHiggsMass(myHiggsMass); }
@@ -269,14 +313,16 @@ void Mela::reset_SelfDCouplings(){
       selfDHwwpcoupl[ic][im] = 0;
       selfDHwpwpcoupl[ic][im] = 0;
     }
-    for (int ic=0; ic<SIZE_Vp; ic++) {
-      selfDHzpcontact[ic][im] = 0;
-      selfDHwpcontact[ic][im] = 0;
+    for (int ic=0; ic<SIZE_Vpff; ic++) {
+      selfDZpffcoupl[ic][im] = 0;
+      selfDWpffcoupl[ic][im] = 0;
     }
   }
-  selfDUseVprime = 0;
-  selfDM_Vprime = 10000;
-  selfDGa_Vprime = 100;
+  selfDUseVprime = false;
+  selfDM_Zprime = -1;
+  selfDGa_Zprime = 0;
+  selfDM_Wprime = -1;
+  selfDGa_Wprime = 0;
 
   //****Spin-1****//
   for (int im=0; im<2; im++){
@@ -299,6 +345,11 @@ void Mela::resetQuarkMasses(){ ZZME->reset_QuarkMasses(); }
 void Mela::resetMCFM_EWKParameters(double ext_Gf, double ext_aemmz, double ext_mW, double ext_mZ, double ext_xW, int ext_ewscheme){
   ZZME->reset_MCFM_EWKParameters(ext_Gf, ext_aemmz, ext_mW, ext_mZ, ext_xW, ext_ewscheme);
 }
+
+double Mela::getPrimaryMass(int ipart){ return ZZME->get_PrimaryMass(ipart); }
+double Mela::getPrimaryWidth(int ipart){ return ZZME->get_PrimaryWidth(ipart); }
+double Mela::getHiggsWidthAtPoleMass(double mass){ return ZZME->get_HiggsWidthAtPoleMass(mass); }
+
 void Mela::setRemoveLeptonMasses(bool MasslessLeptonSwitch){ TUtil::applyLeptonMassCorrection(MasslessLeptonSwitch); }
 void Mela::setRemoveJetMasses(bool MasslessLeptonSwitch){ TUtil::applyJetMassCorrection(MasslessLeptonSwitch); }
 void Mela::setRenFacScaleMode(TVar::EventScaleScheme renormalizationSch, TVar::EventScaleScheme factorizationSch, double ren_sf, double fac_sf){
@@ -308,6 +359,19 @@ std::vector<TLorentzVector> Mela::calculate4Momentum(double Mx, double M1, doubl
 	return ZZME->Calculate4Momentum(Mx, M1, M2, theta, theta1, theta2, Phi1, Phi);
 }
 
+RooSpin::modelMeasurables Mela::getMeasurablesRRV(){
+  RooSpin::modelMeasurables measurables;
+  measurables.h1 = costheta1_rrv;
+  measurables.h2 = costheta2_rrv;
+  measurables.Phi = phi_rrv;
+  measurables.m1 = z1mass_rrv;
+  measurables.m2 = z2mass_rrv;
+  measurables.m12 = mzz_rrv;
+  measurables.hs = costhetastar_rrv;
+  measurables.Phi1 = phi1_rrv;
+  measurables.Y = Y_rrv;
+  return measurables;
+}
 
 
 // Full parton-by-parton ME record
@@ -375,7 +439,7 @@ void Mela::computeP_selfDspin0(
   float& prob,
   bool useConstant
   ){
-  //remove this line, it's here for counting purposes.  Hzpcontact
+  //remove this line, it's here for counting purposes.  Zpffcoupl
   // Don't set these, and you will get 0.
   if (myME_==TVar::JHUGen){
     for (int jh=0; jh<(int)nSupportedHiggses; jh++){
@@ -521,39 +585,38 @@ void Mela::computeP(
       if (!(myME_ == TVar::MCFM  && myProduction_ == TVar::ZZINDEPENDENT &&  (myModel_ == TVar::bkgZZ || myModel_ == TVar::bkgWW || myModel_ == TVar::bkgZGamma))){
         if (myME_ == TVar::MCFM || myModel_ == TVar::SelfDefine_spin0){
           ZZME->set_SpinZeroCouplings(
-          selfDHggcoupl,
-          selfDHg4g4coupl,
-          selfDHqqcoupl,
-          selfDHbbcoupl,
-          selfDHttcoupl,
-          selfDHb4b4coupl,
-          selfDHt4t4coupl,
-          selfDHzzcoupl,
-          selfDHwwcoupl,
-          selfDHzzLambda_qsq,
-          selfDHwwLambda_qsq,
-          selfDHzzCLambda_qsq,
-          selfDHwwCLambda_qsq,
-          differentiate_HWW_HZZ
-          );
+            selfDHggcoupl,
+            selfDHg4g4coupl,
+            selfDHqqcoupl,
+            selfDHbbcoupl,
+            selfDHttcoupl,
+            selfDHb4b4coupl,
+            selfDHt4t4coupl,
+            selfDHzzcoupl,
+            selfDHwwcoupl,
+            selfDHzzLambda_qsq,
+            selfDHwwLambda_qsq,
+            selfDHzzCLambda_qsq,
+            selfDHwwCLambda_qsq,
+            differentiate_HWW_HZZ
+            );
           ZZME->set_SpinZeroContact(
             selfDHzzpcoupl,
             selfDHzpzpcoupl,
-            selfDHzpcontact,
+            selfDZpffcoupl,
             selfDHwwpcoupl,
             selfDHwpwpcoupl,
-            selfDHwpcontact,
+            selfDWpffcoupl,
             selfDUseVprime,
-            selfDM_Vprime,
-            selfDGa_Vprime
+            selfDM_Zprime,
+            selfDGa_Zprime,
+            selfDM_Wprime,
+            selfDGa_Wprime
             );
         }
         else if (myModel_ == TVar::SelfDefine_spin1) ZZME->set_SpinOneCouplings(selfDZqqcoupl, selfDZvvcoupl);
         else if (myModel_ == TVar::SelfDefine_spin2) ZZME->set_SpinTwoCouplings(selfDGqqcoupl, selfDGggcoupl, selfDGvvcoupl);
-        ZZME->computeXS(
-          myModel_, myME_, myProduction_,
-          prob
-          );
+        ZZME->computeXS(prob);
       }
       else{
         computeDecayAngles(
@@ -639,10 +702,7 @@ void Mela::computeP(
             setCurrentCandidate(cand_tmp);
             if (myVerbosity_>=TVar::DEBUG && cand_tmp!=0){ cout << "Mela::computeP: ZZINDEPENDENT calculation produces candidate:" << endl; TUtil::PrintCandidateSummary(cand_tmp); }
             // calculate the ME
-            ZZME->computeXS(
-              myModel_, myME_, myProduction_,
-              temp_prob
-              );
+            ZZME->computeXS(temp_prob);
             // Delete the temporary particles
             for (unsigned int ic=0; ic<candList_tmp.size(); ic++){ if (candList_tmp.at(ic)!=0) delete candList_tmp.at(ic); } // Only one candidate should really be here
             for (unsigned int ip=0; ip<partList_tmp.size(); ip++){ if (partList_tmp.at(ip)!=0) delete partList_tmp.at(ip); }
@@ -824,18 +884,17 @@ void Mela::computeProdDecP(
     ZZME->set_SpinZeroContact(
       selfDHzzpcoupl,
       selfDHzpzpcoupl,
-      selfDHzpcontact,
+      selfDZpffcoupl,
       selfDHwwpcoupl,
       selfDHwpwpcoupl,
-      selfDHwpcontact,
+      selfDWpffcoupl,
       selfDUseVprime,
-      selfDM_Vprime,
-      selfDGa_Vprime
+      selfDM_Zprime,
+      selfDGa_Zprime,
+      selfDM_Wprime,
+      selfDGa_Wprime
       );
-    ZZME->computeProdXS_VVHVV(
-      myModel_, myME_, myProduction_,
-      prob
-      );
+    ZZME->computeProdXS_VVHVV(prob);
     if (useConstant) computeConstant(prob);
   }
 
@@ -933,37 +992,36 @@ void Mela::computeProdP(
 
         if (myModel_ == TVar::SelfDefine_spin0){
           ZZME->set_SpinZeroCouplings(
-          selfDHggcoupl,
-          selfDHg4g4coupl,
-          selfDHqqcoupl,
-          selfDHbbcoupl,
-          selfDHttcoupl,
-          selfDHb4b4coupl,
-          selfDHt4t4coupl,
-          selfDHzzcoupl,
-          selfDHwwcoupl,
-          selfDHzzLambda_qsq,
-          selfDHwwLambda_qsq,
-          selfDHzzCLambda_qsq,
-          selfDHwwCLambda_qsq,
-          differentiate_HWW_HZZ
-          );
+            selfDHggcoupl,
+            selfDHg4g4coupl,
+            selfDHqqcoupl,
+            selfDHbbcoupl,
+            selfDHttcoupl,
+            selfDHb4b4coupl,
+            selfDHt4t4coupl,
+            selfDHzzcoupl,
+            selfDHwwcoupl,
+            selfDHzzLambda_qsq,
+            selfDHwwLambda_qsq,
+            selfDHzzCLambda_qsq,
+            selfDHwwCLambda_qsq,
+            differentiate_HWW_HZZ
+            );
           ZZME->set_SpinZeroContact(
             selfDHzzpcoupl,
             selfDHzpzpcoupl,
-            selfDHzpcontact,
+            selfDZpffcoupl,
             selfDHwwpcoupl,
             selfDHwpwpcoupl,
-            selfDHwpcontact,
+            selfDWpffcoupl,
             selfDUseVprime,
-            selfDM_Vprime,
-            selfDGa_Vprime
+            selfDM_Zprime,
+            selfDGa_Zprime,
+            selfDM_Wprime,
+            selfDGa_Wprime
             );
         }
-        ZZME->computeProdXS_JJH(
-          myModel_, myME_, myProduction_,
-          prob
-          ); // Higgs + 2 jets: SBF or WBF main probability
+        ZZME->computeProdXS_JJH(prob); // Higgs + 2 jets: SBF or WBF main probability
 
         int nGrid=11;
         std::vector<double> etaArray;
@@ -1006,18 +1064,17 @@ void Mela::computeProdP(
             ZZME->set_SpinZeroContact(
               selfDHzzpcoupl,
               selfDHzpzpcoupl,
-              selfDHzpcontact,
+              selfDZpffcoupl,
               selfDHwwpcoupl,
               selfDHwpwpcoupl,
-              selfDHwpcontact,
+              selfDWpffcoupl,
               selfDUseVprime,
-              selfDM_Vprime,
-              selfDGa_Vprime
+              selfDM_Zprime,
+              selfDGa_Zprime,
+              selfDM_Wprime,
+              selfDGa_Wprime
               );
-            ZZME->computeProdXS_JJH(
-              myModel_, myME_, myProduction_,
-              prob_temp
-              );
+            ZZME->computeProdXS_JJH(prob_temp);
           }
           pArray.push_back((double)prob_temp);
         }
@@ -1075,37 +1132,36 @@ void Mela::computeProdP(
             if (fabs(sys)<threshold){
               if (myModel_ == TVar::SelfDefine_spin0){
                 ZZME->set_SpinZeroCouplings(
-                selfDHggcoupl,
-                selfDHg4g4coupl,
-                selfDHqqcoupl,
-                selfDHbbcoupl,
-                selfDHttcoupl,
-                selfDHb4b4coupl,
-                selfDHt4t4coupl,
-                selfDHzzcoupl,
-                selfDHwwcoupl,
-                selfDHzzLambda_qsq,
-                selfDHwwLambda_qsq,
-                selfDHzzCLambda_qsq,
-                selfDHwwCLambda_qsq,
-                differentiate_HWW_HZZ
-                );
+                  selfDHggcoupl,
+                  selfDHg4g4coupl,
+                  selfDHqqcoupl,
+                  selfDHbbcoupl,
+                  selfDHttcoupl,
+                  selfDHb4b4coupl,
+                  selfDHt4t4coupl,
+                  selfDHzzcoupl,
+                  selfDHwwcoupl,
+                  selfDHzzLambda_qsq,
+                  selfDHwwLambda_qsq,
+                  selfDHzzCLambda_qsq,
+                  selfDHwwCLambda_qsq,
+                  differentiate_HWW_HZZ
+                  );
                 ZZME->set_SpinZeroContact(
                   selfDHzzpcoupl,
                   selfDHzpzpcoupl,
-                  selfDHzpcontact,
+                  selfDZpffcoupl,
                   selfDHwwpcoupl,
                   selfDHwpwpcoupl,
-                  selfDHwpcontact,
+                  selfDWpffcoupl,
                   selfDUseVprime,
-                  selfDM_Vprime,
-                  selfDGa_Vprime
+                  selfDM_Zprime,
+                  selfDGa_Zprime,
+                  selfDM_Wprime,
+                  selfDGa_Wprime
                   );
               }
-              ZZME->computeProdXS_JJH(
-                myModel_, myME_, myProduction_,
-                prob_temp
-                );
+              ZZME->computeProdXS_JJH(prob_temp);
             }
             gridIt = pArray.begin()+iG+1;
             pArray.insert(gridIt, (double)prob_temp);
@@ -1159,44 +1215,40 @@ void Mela::computeProdP(
         if (myProduction_ == TVar::JJQCD || myProduction_ == TVar::JJVBF){
           if (myModel_ == TVar::SelfDefine_spin0){
             ZZME->set_SpinZeroCouplings(
-            selfDHggcoupl,
-            selfDHg4g4coupl,
-            selfDHqqcoupl,
-            selfDHbbcoupl,
-            selfDHttcoupl,
-            selfDHb4b4coupl,
-            selfDHt4t4coupl,
-            selfDHzzcoupl,
-            selfDHwwcoupl,
-            selfDHzzLambda_qsq,
-            selfDHwwLambda_qsq,
-            selfDHzzCLambda_qsq,
-            selfDHwwCLambda_qsq,
-            differentiate_HWW_HZZ
-            );
+              selfDHggcoupl,
+              selfDHg4g4coupl,
+              selfDHqqcoupl,
+              selfDHbbcoupl,
+              selfDHttcoupl,
+              selfDHb4b4coupl,
+              selfDHt4t4coupl,
+              selfDHzzcoupl,
+              selfDHwwcoupl,
+              selfDHzzLambda_qsq,
+              selfDHwwLambda_qsq,
+              selfDHzzCLambda_qsq,
+              selfDHwwCLambda_qsq,
+              differentiate_HWW_HZZ
+              );
             ZZME->set_SpinZeroContact(
               selfDHzzpcoupl,
               selfDHzpzpcoupl,
-              selfDHzpcontact,
+              selfDZpffcoupl,
               selfDHwwpcoupl,
               selfDHwpwpcoupl,
-              selfDHwpcontact,
+              selfDWpffcoupl,
               selfDUseVprime,
-              selfDM_Vprime,
-              selfDGa_Vprime
+              selfDM_Zprime,
+              selfDGa_Zprime,
+              selfDM_Wprime,
+              selfDGa_Wprime
               );
           }
-          ZZME->computeProdXS_JJH(
-            myModel_, myME_, myProduction_,
-            prob
-            ); // Higgs + 2 jets: SBF or WBF
+          ZZME->computeProdXS_JJH(prob); // Higgs + 2 jets: SBF or WBF
         }
         else if (myProduction_ == TVar::JQCD){
           // No anomalous couplings are implemented in HJ
-          ZZME->computeProdXS_JH(
-            myModel_, myME_, myProduction_,
-            prob
-            ); // Higgs + 1 jet; only SM is supported for now.
+          ZZME->computeProdXS_JH(prob); // Higgs + 1 jet; only SM is supported for now.
         }
       }
       if (useConstant) computeConstant(prob);
@@ -1220,7 +1272,7 @@ void Mela::computeProdP_VH(
   for (int jh=0; jh<(int)nSupportedHiggses; jh++){
     for (int im=0; im<2; im++){
       for (int ic=0; ic<SIZE_HVV; ic++){
-  //remove this line, it's here for counting purposes.  Hzpcontact
+  //remove this line, it's here for counting purposes.  Zpffcoupl
         selfDHzzcoupl[jh][ic][im] = selfDHvvcoupl_input[jh][ic][im];
         selfDHwwcoupl[jh][ic][im] = selfDHvvcoupl_input[jh][ic][im]; // Just for extra protection since differentiate_HWW_HZZ is set to false.
       }
@@ -1246,40 +1298,36 @@ void Mela::computeProdP_VH(
     if (myProduction_ == TVar::Lep_ZH || myProduction_ == TVar::Lep_WH || myProduction_ == TVar::Had_ZH || myProduction_ == TVar::Had_WH || myProduction_ == TVar::GammaH){
       if (myModel_ == TVar::SelfDefine_spin0){
         ZZME->set_SpinZeroCouplings(
-        selfDHggcoupl,
-        selfDHg4g4coupl,
-        selfDHqqcoupl,
-        selfDHbbcoupl,
-        selfDHttcoupl,
-        selfDHb4b4coupl,
-        selfDHt4t4coupl,
-        selfDHzzcoupl,
-        selfDHwwcoupl,
-        selfDHzzLambda_qsq,
-        selfDHwwLambda_qsq,
-        selfDHzzCLambda_qsq,
-        selfDHwwCLambda_qsq,
-        differentiate_HWW_HZZ
-        );
+          selfDHggcoupl,
+          selfDHg4g4coupl,
+          selfDHqqcoupl,
+          selfDHbbcoupl,
+          selfDHttcoupl,
+          selfDHb4b4coupl,
+          selfDHt4t4coupl,
+          selfDHzzcoupl,
+          selfDHwwcoupl,
+          selfDHzzLambda_qsq,
+          selfDHwwLambda_qsq,
+          selfDHzzCLambda_qsq,
+          selfDHwwCLambda_qsq,
+          differentiate_HWW_HZZ
+          );
         ZZME->set_SpinZeroContact(
           selfDHzzpcoupl,
           selfDHzpzpcoupl,
-          selfDHzpcontact,
+          selfDZpffcoupl,
           selfDHwwpcoupl,
           selfDHwpwpcoupl,
-          selfDHwpcontact,
+          selfDWpffcoupl,
           selfDUseVprime,
-          selfDM_Vprime,
-          selfDGa_Vprime
+          selfDM_Zprime,
+          selfDGa_Zprime,
+          selfDM_Wprime,
+          selfDGa_Wprime
           );
       }
-      ZZME->computeProdXS_VH(
-        myModel_,
-        myME_,
-        myProduction_,
-        prob,
-        includeHiggsDecay
-        ); // VH
+      ZZME->computeProdXS_VH(prob, includeHiggsDecay); // VH
 
       if (useConstant) computeConstant(prob);
     }
@@ -1304,39 +1352,36 @@ void Mela::computeProdP_ttH(
   if (melaCand!=0){
     if (myModel_ == TVar::SelfDefine_spin0){
       ZZME->set_SpinZeroCouplings(
-      selfDHggcoupl,
-      selfDHg4g4coupl,
-      selfDHqqcoupl,
-      selfDHbbcoupl,
-      selfDHttcoupl,
-      selfDHb4b4coupl,
-      selfDHt4t4coupl,
-      selfDHzzcoupl,
-      selfDHwwcoupl,
-      selfDHzzLambda_qsq,
-      selfDHwwLambda_qsq,
-      selfDHzzCLambda_qsq,
-      selfDHwwCLambda_qsq,
-      differentiate_HWW_HZZ
-      );
+        selfDHggcoupl,
+        selfDHg4g4coupl,
+        selfDHqqcoupl,
+        selfDHbbcoupl,
+        selfDHttcoupl,
+        selfDHb4b4coupl,
+        selfDHt4t4coupl,
+        selfDHzzcoupl,
+        selfDHwwcoupl,
+        selfDHzzLambda_qsq,
+        selfDHwwLambda_qsq,
+        selfDHzzCLambda_qsq,
+        selfDHwwCLambda_qsq,
+        differentiate_HWW_HZZ
+        );
       ZZME->set_SpinZeroContact(
         selfDHzzpcoupl,
         selfDHzpzpcoupl,
-        selfDHzpcontact,
+        selfDZpffcoupl,
         selfDHwwpcoupl,
         selfDHwpwpcoupl,
-        selfDHwpcontact,
+        selfDWpffcoupl,
         selfDUseVprime,
-        selfDM_Vprime,
-        selfDGa_Vprime
+        selfDM_Zprime,
+        selfDGa_Zprime,
+        selfDM_Wprime,
+        selfDGa_Wprime
         );
     }
-    ZZME->computeProdXS_ttH(
-      myModel_, myME_, myProduction_,
-      prob,
-      topProcess, topDecay
-      );
-
+    ZZME->computeProdXS_ttH(prob,topProcess, topDecay);
     if (useConstant) computeConstant(prob);
   }
 
@@ -1452,7 +1497,7 @@ void Mela::computePM4l(TVar::SuperMelaSyst syst, float& prob){
         float sigmaCB=float(super->GetSigShapeParameter("sigmaCB"));
         if (syst == TVar::SMSyst_ScaleUp) mZZtmp = mZZ*(1.0+meanErr);
         else if (syst == TVar::SMSyst_ScaleDown) mZZtmp = mZZ*(1.0-meanErr);
-        else if (syst == TVar::SMSyst_ResUp || syst ==  TVar::SMSyst_ResDown) mZZtmp= myRandomNumber->Gaus(mZZ, sigmaErr*sigmaCB);
+        else if (syst == TVar::SMSyst_ResUp || syst ==  TVar::SMSyst_ResDown) mZZtmp=melaRandomNumber.Gaus(mZZ, sigmaErr*sigmaCB);
 
         std::pair<double, double> m4lP = super->M4lProb(mZZtmp);
         if (myModel_ == TVar::HSMHiggs) prob = m4lP.first;
@@ -1520,10 +1565,11 @@ bool Mela::configureAnalyticalPDFs(){
   // Configure the analytical calculations 
   // 
   bool noPass=false;
+  pdf=0;
 
   if (myModel_==TVar::bkgZZ)  pdf = qqZZmodel;
   else if (myProduction_ == TVar::JJQCD || myProduction_ == TVar::JJVBF);
-  else if (myProduction_ == TVar::Lep_ZH || myProduction_ == TVar::Lep_WH || myProduction_ == TVar::Had_ZH || myProduction_ == TVar::Had_WH || myProduction_ == TVar::GammaH);
+  else if (myProduction_ == TVar::Lep_ZH || myProduction_ == TVar::Lep_WH || myProduction_ == TVar::Had_ZH || myProduction_ == TVar::Had_WH || myProduction_ == TVar::GammaH); // To be implemented
   else if (
     myModel_ == TVar::HSMHiggs
     || myModel_ == TVar::H0minus || myModel_ == TVar::D_g1g4 || myModel_ == TVar::D_g1g4_pi_2
@@ -1701,11 +1747,12 @@ bool Mela::configureAnalyticalPDFs(){
       spin2Model->makeParamsConst(true);
     }
   }
-  else if (myME_ == TVar::ANALYTICAL){
+  else{
     cout << "Mela::configureAnalyticalPDFs -> ERROR TVar::Process not applicable!!! ME: " << myME_ << ", model: " << myModel_ << endl;
     noPass=true;
   }
 
+  if (pdf==0) noPass=true;
   return (!noPass);
 }
 
@@ -1780,26 +1827,26 @@ float Mela::getConstant_JHUGenUndecayed(){
 
   MelaPConstant* pchandle=0;
   unsigned int iarray=0;
-  double correction=1;
-
-  if (myProduction_ == TVar::JQCD){
     if (TUtil::JetMassScheme == TVar::ConserveDifermionMass) iarray=0; // First element points to the case when the difermion invariant mass is conserved in mass removal scheme
     else if (TUtil::JetMassScheme == TVar::MomentumToEnergy) iarray=1; // Second element points to the case when the 3-momentum vector magnitude is scaled to energy in mass removal scheme
+  if (myProduction_ == TVar::JQCD){
     pchandle = pAvgSmooth_JHUGen_JQCD_HSMHiggs[iarray];
   }
   else if (myProduction_ == TVar::JJQCD){
-    if (TUtil::JetMassScheme == TVar::ConserveDifermionMass) iarray=0; // First element points to the case when the difermion invariant mass is conserved in mass removal scheme
-    else if (TUtil::JetMassScheme == TVar::MomentumToEnergy) iarray=1; // Second element points to the case when the 3-momentum vector magnitude is scaled to energy in mass removal scheme
     pchandle = pAvgSmooth_JHUGen_JJQCD_HSMHiggs[iarray];
   }
   else if (myProduction_ == TVar::JJVBF){
-    if (TUtil::JetMassScheme == TVar::ConserveDifermionMass) iarray=0; // First element points to the case when the difermion invariant mass is conserved in mass removal scheme
-    else if (TUtil::JetMassScheme == TVar::MomentumToEnergy) iarray=1; // Second element points to the case when the 3-momentum vector magnitude is scaled to energy in mass removal scheme
     pchandle = pAvgSmooth_JHUGen_JJVBF_HSMHiggs[iarray];
   }
+  else if (myProduction_ == TVar::Had_ZH){
+    pchandle = pAvgSmooth_JHUGen_Had_ZH_HSMHiggs[iarray];
+  }
+  else if (myProduction_ == TVar::Had_WH){
+    pchandle = pAvgSmooth_JHUGen_Had_WH_HSMHiggs[iarray];
+  }
   /*
-  else if (myProduction_ == TVar::Lep_ZH || myProduction_ == TVar::Had_ZH)
-  else if (myProduction_ == TVar::Lep_WH || myProduction_ == TVar::Had_WH)
+  else if (myProduction_ == TVar::Lep_ZH)
+  else if (myProduction_ == TVar::Lep_WH)
   else if (myProduction_ == TVar::GammaH)
   else if (myProduction_ == TVar::ttH)
   else if (myProduction_ == TVar::bbH)
@@ -1807,102 +1854,42 @@ float Mela::getConstant_JHUGenUndecayed(){
   else return constant;
 
   constant = pchandle->Eval(getIORecord(), myVerbosity_);
-  if (myProduction_==TVar::JJVBF && LHCsqrts==7.){
-    // Fitting is not good enough for region starting at ~105 GeV due to poor statistics.
-    const double a0=0.67;
-    const double a1=22.;
-    const double a2=73.;
-    double var = melaCand->m();
-    if (var>a2) correction = 1.+a0*exp(-pow((var-a2)/a1, 2));
-    else correction = 1.+a0; // Smooth by virtue of the correction function itself.
-  }
-  else if (myProduction_==TVar::JJVBF && LHCsqrts==8.){
-    // Fitting is not good enough for region starting at ~105 GeV due to poor statistics.
-    const double a0=0.53;
-    const double a1=21.;
-    const double a2=73.;
-    double var = melaCand->m();
-    if (var>a2) correction = 1.+a0*exp(-pow((var-a2)/a1, 2));
-    else correction = 1.+a0; // Smooth by virtue of the correction function itself.
-  }
-  else if (myProduction_==TVar::JJVBF && LHCsqrts==13.){
-    // Fitting is not good enough for region starting at ~105 GeV due to poor statistics.
-    const double a0=0.2;
-    const double a1=22.;
-    const double a2=73.;
-    double var = melaCand->m();
-    if (var>a2) correction = 1.+a0*exp(-pow((var-a2)/a1, 2));
-    else correction = 1.+a0; // Smooth by virtue of the correction function itself.
-  }
-  //
-  else if (myProduction_==TVar::JJQCD && LHCsqrts==8.){
-    // Fitting is not good enough for region starting at ~105 GeV due to poor statistics.
-    const double a0=-0.24;
-    const double a1=80.;
-    const double a2=9.;
-    const double a3=0.08;
-    const double a4=100.;
-    const double a5=20.;
-    double var = melaCand->m();
-    if (var>a1) correction = 1+a0*exp(-pow((var-a1)/a2, 2))+a3*exp(-pow((var-a4)/a5, 2));
-    else correction = 1.+a0+a3*exp(-pow((var-a4)/a5, 2)); // Smooth by virtue of the correction function itself.
-  }
-  //
-  else if (myProduction_==TVar::JQCD && LHCsqrts==7.){
-    const double a0=-0.5;
-    const double a1=80.;
-    const double a2=9.;
-    const double a3=-0.35352;
-    const double a4=1500.;
-    const double a5=268.;
-    double var = melaCand->m();
-    if (var>a1 && var<a4) correction = 1+a0*exp(-pow((var-a1)/a2, 2))+a3*exp(-pow((var-a4)/a5, 2));
-    else if (var>a1) correction = 1+a0*exp(-pow((var-a1)/a2, 2))+a3;
-    else correction = 1.+a0+a3*exp(-pow((var-a4)/a5, 2));
-  }
-  else if (myProduction_==TVar::JQCD && LHCsqrts==8.){
-    const double a0=-0.2;
-    const double a1=80.;
-    const double a2=9.;
-    const double a3=-0.0792;
-    const double a4=1500.;
-    const double a5=615.;
-    double var = melaCand->m();
-    if (var>a1 && var<a4) correction = 1+a0*exp(-pow((var-a1)/a2, 2))+a3*exp(-pow((var-a4)/a5, 2));
-    else if (var>a1) correction = 1+a0*exp(-pow((var-a1)/a2, 2))+a3;
-    else correction = 1.+a0+a3*exp(-pow((var-a4)/a5, 2));
-  }
-  else if (myProduction_==TVar::JQCD && LHCsqrts==13.){
-    // 1+[0]*exp(-pow((x-[1])/[2],2))+[3]*exp(-pow((x-[4])/[5],2))
-    const double a0=0.15;
-    const double a1=320.;
-    const double a2=300.;
-    const double a3=0.179;
-    const double a4=1530.;
-    const double a5=212.;
-    const double offset=0.8444;
-    double var = melaCand->m();
-    if (var<a4) correction = offset+a0*exp(-pow((var-a1)/a2, 2))+a3*exp(-pow((var-a4)/a5, 2));
-    else correction = offset+a0*exp(-pow((var-a1)/a2, 2))+a3;
-  }
-
-  constant *= correction;
   return constant;
 }
 float Mela::getConstant_4l(){
   float constant = 1;
   if (melaCand==0) return constant;
-
-  const unsigned int nPossibleHandles=2;
-  MelaPConstant* pchandle[nPossibleHandles]={ 0 };
-  const int idprod =
+  int decid =
     abs(melaCand->getSortedV(0)->getDaughter(0)->id)*
     abs(melaCand->getSortedV(0)->getDaughter(1)->id)*
     abs(melaCand->getSortedV(1)->getDaughter(0)->id)*
     abs(melaCand->getSortedV(1)->getDaughter(1)->id);
-  const bool is4mu = (idprod==28561);
-  const bool is4e = (idprod==14641 || idprod==50625); // Use 4e for 4tau as well (I don't know why you would do this, but anyway
-  const bool is2mu2e = (idprod==20449 || idprod==27225 || idprod==38025); // Use 2e2mu for 2e2tau and 2mu2tau as well
+  return getConstant_FourFermionDecay(decid);
+}
+float Mela::getConstant_2l2q(){
+  float constant = 1;
+  if (melaCand==0) return constant;
+  int decid1 =
+    abs(melaCand->getSortedV(0)->getDaughter(0)->id)*
+    abs(melaCand->getSortedV(0)->getDaughter(1)->id);
+  int decid2 =
+    abs(melaCand->getSortedV(1)->getDaughter(0)->id)*
+    abs(melaCand->getSortedV(1)->getDaughter(1)->id);
+  int decid = 1;
+  if (decid1!=0) decid*=decid1;
+  if (decid2!=0) decid*=decid2;
+  return getConstant_FourFermionDecay(decid);
+}
+
+float Mela::getConstant_FourFermionDecay(int decid){
+  float constant = 1;
+
+  const bool is4mu = (decid==28561);
+  const bool is4e = (decid==14641 || decid==50625); // Use 4e for 4tau as well (I don't know why you would do this, but anyway)
+  const bool is2mu2e = (decid==20449 || decid==27225 || decid==38025 || decid==169 || decid==121); // Use 2e2mu for 2e2tau and 2mu2tau as well
+
+  const unsigned int nPossibleHandles=6;
+  MelaPConstant* pchandle[nPossibleHandles]={ 0 };
 
   float constant_tmp=0;
   if (myME_ == TVar::JHUGen){
@@ -1935,6 +1922,7 @@ float Mela::getConstant_4l(){
     }
   }
   else if (myME_ == TVar::MCFM){
+    // ZZQQB
     if (myProduction_ == TVar::ZZQQB){
       if (myModel_ == TVar::bkgZZ){
         if (is2mu2e) pchandle[0] = pAvgSmooth_MCFM_ZZQQB_bkgZZ_2mu2e;
@@ -1942,6 +1930,7 @@ float Mela::getConstant_4l(){
         else if (is4e) pchandle[0] = pAvgSmooth_MCFM_ZZQQB_bkgZZ_4e;
       }
     }
+    // ZZGG
     else if (myProduction_ == TVar::ZZGG){
       if (myModel_ == TVar::bkgZZ){
         if (is2mu2e) pchandle[0] = pAvgSmooth_MCFM_ZZGG_bkgZZ_2mu2e;
@@ -1953,6 +1942,7 @@ float Mela::getConstant_4l(){
         else if (is4mu) pchandle[0] = pAvgSmooth_MCFM_ZZGG_HSMHiggs_4mu;
         else if (is4e) pchandle[0] = pAvgSmooth_MCFM_ZZGG_HSMHiggs_4e;
       }
+      // Sum signal and bkg
       else if (myModel_ == TVar::bkgZZ_SMHiggs){
         if (is2mu2e){
           pchandle[0] = pAvgSmooth_MCFM_ZZGG_bkgZZ_2mu2e;
@@ -1968,57 +1958,64 @@ float Mela::getConstant_4l(){
         }
       }
     }
+    // JJEW and components
+    else if (myProduction_ == TVar::JJVBF || myProduction_ == TVar::Had_WH || myProduction_ == TVar::Had_ZH || myProduction_ == TVar::JJEW){
+      MelaPConstant* hvbf=0;
+      MelaPConstant* hwh=0;
+      MelaPConstant* hzh=0;
+      MelaPConstant* hvbs=0;
+      MelaPConstant* hwzz=0;
+      MelaPConstant* hzzz=0;
+      if (is2mu2e){
+        hvbf = pAvgSmooth_MCFM_JJVBF_HSMHiggs_2mu2e;
+        hwh = pAvgSmooth_MCFM_Had_WH_HSMHiggs_2mu2e;
+        hzh = pAvgSmooth_MCFM_Had_ZH_HSMHiggs_2mu2e;
+        hvbs = pAvgSmooth_MCFM_JJVBF_bkgZZ_2mu2e;
+        hwzz = pAvgSmooth_MCFM_Had_WH_bkgZZ_2mu2e;
+        hzzz = pAvgSmooth_MCFM_Had_ZH_bkgZZ_2mu2e;
+      }
+      else if (is4mu){
+        hvbf = pAvgSmooth_MCFM_JJVBF_HSMHiggs_4mu;
+        hwh = pAvgSmooth_MCFM_Had_WH_HSMHiggs_4mu;
+        hzh = pAvgSmooth_MCFM_Had_ZH_HSMHiggs_4mu;
+        hvbs = pAvgSmooth_MCFM_JJVBF_bkgZZ_4mu;
+        hwzz = pAvgSmooth_MCFM_Had_WH_bkgZZ_4mu;
+        hzzz = pAvgSmooth_MCFM_Had_ZH_bkgZZ_4mu;
+    }
+      else if (is4e){
+        hvbf = pAvgSmooth_MCFM_JJVBF_HSMHiggs_4e;
+        hwh = pAvgSmooth_MCFM_Had_WH_HSMHiggs_4e;
+        hzh = pAvgSmooth_MCFM_Had_ZH_HSMHiggs_4e;
+        hvbs = pAvgSmooth_MCFM_JJVBF_bkgZZ_4e;
+        hwzz = pAvgSmooth_MCFM_Had_WH_bkgZZ_4e;
+        hzzz = pAvgSmooth_MCFM_Had_ZH_bkgZZ_4e;
+  }
+
+      if (myModel_ == TVar::HSMHiggs || myModel_ == TVar::bkgZZ_SMHiggs){
+        if (myProduction_ == TVar::JJEW || myProduction_ == TVar::JJVBF) pchandle[0]=hvbf;
+        if (myProduction_ == TVar::JJEW || myProduction_ == TVar::Had_ZH) pchandle[1]=hzh;
+        if (myProduction_ == TVar::JJEW || myProduction_ == TVar::Had_WH) pchandle[2]=hwh;
+}
+      if (myModel_ == TVar::bkgZZ || myModel_ == TVar::bkgZZ_SMHiggs){
+        if (myProduction_ == TVar::JJEW || myProduction_ == TVar::JJVBF) pchandle[3]=hvbs;
+        if (myProduction_ == TVar::JJEW || myProduction_ == TVar::Had_ZH) pchandle[4]=hzzz;
+        if (myProduction_ == TVar::JJEW || myProduction_ == TVar::Had_WH) pchandle[5]=hwzz;
+      }
+    }
     else if (myProduction_ == TVar::JJQCD){
       if (myModel_ == TVar::bkgZJets){
         pchandle[0] = pAvgSmooth_MCFM_JJQCD_bkgZJets_2l2q; // Only option at the moment
       }
+      else if (myModel_ == TVar::bkgZZ){
+        if (is2mu2e){
+          pchandle[0] = pAvgSmooth_MCFM_JJQCD_bkgZZ_2mu2e;
+      }
+        else if (is4mu){
+          pchandle[0] = pAvgSmooth_MCFM_JJQCD_bkgZZ_4mu;
+      }
+        else if (is4e){
+          pchandle[0] = pAvgSmooth_MCFM_JJQCD_bkgZZ_4e;
     }
-  }
-
-  bool hasNullHandle=true;
-  for (unsigned int ihandle=0; ihandle<nPossibleHandles; ihandle++){ if (pchandle[ihandle]!=0){ constant_tmp += pchandle[ihandle]->Eval(getIORecord(), myVerbosity_); hasNullHandle=false; } }
-  if (hasNullHandle) return constant;
-
-  constant = constant_tmp;
-  return constant;
-}
-float Mela::getConstant_2l2q(){
-  float constant = 1;
-  if (melaCand==0) return constant;
-
-  const unsigned int nPossibleHandles=2;
-  MelaPConstant* pchandle[nPossibleHandles]={ 0 };
-
-  float constant_tmp=0;
-  // Most constants use the 2e2mu constant. MelaPConstant scales for the left/right couplings itself based on what is recorded into the MelaIO object.
-  if (myME_ == TVar::JHUGen){
-    if (myProduction_ == TVar::ZZGG){
-      if (myModel_ == TVar::HSMHiggs){
-        pchandle[0] = pAvgSmooth_JHUGen_ZZGG_HSMHiggs_2mu2e;
-      }
-    }
-  }
-  else if (myME_ == TVar::MCFM){
-    if (myProduction_ == TVar::ZZQQB){
-      if (myModel_ == TVar::bkgZZ){
-        pchandle[0] = pAvgSmooth_MCFM_ZZQQB_bkgZZ_2mu2e;
-      }
-    }
-    else if (myProduction_ == TVar::ZZGG){
-      if (myModel_ == TVar::bkgZZ){
-        pchandle[0] = pAvgSmooth_MCFM_ZZGG_bkgZZ_2mu2e;
-      }
-      else if (myModel_ == TVar::HSMHiggs){
-        pchandle[0] = pAvgSmooth_MCFM_ZZGG_HSMHiggs_2mu2e;
-      }
-      else if (myModel_ == TVar::bkgZZ_SMHiggs){
-        pchandle[0] = pAvgSmooth_MCFM_ZZGG_bkgZZ_2mu2e;
-        pchandle[1] = pAvgSmooth_MCFM_ZZGG_HSMHiggs_2mu2e;
-      }
-    }
-    else if (myProduction_ == TVar::JJQCD){
-      if (myModel_ == TVar::bkgZJets){
-        pchandle[0] = pAvgSmooth_MCFM_JJQCD_bkgZJets_2l2q;
       }
     }
   }
@@ -2030,29 +2027,18 @@ float Mela::getConstant_2l2q(){
   constant = constant_tmp;
   return constant;
 }
+
+
 void Mela::getPConstantHandles(){
   if (myVerbosity_>=TVar::DEBUG) cout << "Begin Mela::getPConstantHandles" << endl;
 
-  // Find closest sqrts allowable
-  const unsigned int npossiblesqrts=3;
-  const double possible_sqrts[npossiblesqrts]={ 7, 8, 13 };
-  unsigned int sqrts_index=0;
-  double sqrtsdiff = 99.; // Some large number
-  for (unsigned isq=0; isq<npossiblesqrts; isq++){
-    double diff = fabs(LHCsqrts-possible_sqrts[isq]);
-    if (diff<sqrtsdiff){ sqrts_index=isq; sqrtsdiff=diff; }
-  }
-  const double chsqrts=possible_sqrts[sqrts_index];
-  TString strsqrts=Form("%.0f%s", chsqrts, "TeV");
-
-  // Initialize all to 0
+  // Initialize the handles to 0
   for (unsigned int isch=0; isch<(unsigned int)(TVar::nFermionMassRemovalSchemes-1); isch++){
     pAvgSmooth_JHUGen_JJQCD_HSMHiggs[isch]=0;
-    //
-    pAvgSmooth_JHUGen_JJVBF_HSMHiggs[isch]=0;
-    //
     pAvgSmooth_JHUGen_JQCD_HSMHiggs[isch]=0;
-    //
+    pAvgSmooth_JHUGen_JJVBF_HSMHiggs[isch]=0;
+    pAvgSmooth_JHUGen_Had_ZH_HSMHiggs[isch]=0;
+    pAvgSmooth_JHUGen_Had_WH_HSMHiggs[isch]=0;
   }
   //
   pAvgSmooth_MCFM_JJQCD_bkgZJets_2l2q=0;
@@ -2065,6 +2051,18 @@ void Mela::getPConstantHandles(){
   pAvgSmooth_MCFM_ZZGG_HSMHiggs_4e=0;
   pAvgSmooth_MCFM_ZZGG_HSMHiggs_2mu2e=0;
   //
+  pAvgSmooth_MCFM_JJVBF_HSMHiggs_4mu=0;
+  pAvgSmooth_MCFM_JJVBF_HSMHiggs_4e=0;
+  pAvgSmooth_MCFM_JJVBF_HSMHiggs_2mu2e=0;
+  //
+  pAvgSmooth_MCFM_Had_ZH_HSMHiggs_4mu=0;
+  pAvgSmooth_MCFM_Had_ZH_HSMHiggs_4e=0;
+  pAvgSmooth_MCFM_Had_ZH_HSMHiggs_2mu2e=0;
+  //
+  pAvgSmooth_MCFM_Had_WH_HSMHiggs_4mu=0;
+  pAvgSmooth_MCFM_Had_WH_HSMHiggs_4e=0;
+  pAvgSmooth_MCFM_Had_WH_HSMHiggs_2mu2e=0;
+  //
   pAvgSmooth_MCFM_ZZGG_bkgZZ_4mu=0;
   pAvgSmooth_MCFM_ZZGG_bkgZZ_4e=0;
   pAvgSmooth_MCFM_ZZGG_bkgZZ_2mu2e=0;
@@ -2072,65 +2070,156 @@ void Mela::getPConstantHandles(){
   pAvgSmooth_MCFM_ZZQQB_bkgZZ_4mu=0;
   pAvgSmooth_MCFM_ZZQQB_bkgZZ_4e=0;
   pAvgSmooth_MCFM_ZZQQB_bkgZZ_2mu2e=0;
-
+  //
+  pAvgSmooth_MCFM_JJVBF_bkgZZ_4mu=0;
+  pAvgSmooth_MCFM_JJVBF_bkgZZ_4e=0;
+  pAvgSmooth_MCFM_JJVBF_bkgZZ_2mu2e=0;
+  //
+  pAvgSmooth_MCFM_Had_ZH_bkgZZ_4mu=0;
+  pAvgSmooth_MCFM_Had_ZH_bkgZZ_4e=0;
+  pAvgSmooth_MCFM_Had_ZH_bkgZZ_2mu2e=0;
+  //
+  pAvgSmooth_MCFM_Had_WH_bkgZZ_4mu=0;
+  pAvgSmooth_MCFM_Had_WH_bkgZZ_4e=0;
+  pAvgSmooth_MCFM_Had_WH_bkgZZ_2mu2e=0;
+  //
+  pAvgSmooth_MCFM_JJQCD_bkgZZ_4mu=0;
+  pAvgSmooth_MCFM_JJQCD_bkgZZ_4e=0;
+  pAvgSmooth_MCFM_JJQCD_bkgZZ_2mu2e=0;
+  //
 
   TString filename, spname;
 
-  for (unsigned int isch=0; isch<(unsigned int)(TVar::nFermionMassRemovalSchemes-1); isch++){
-    filename = Form("pAvgSmooth_JHUGen_JJQCD_HSMHiggs_%s", strsqrts.Data());
+  // Fill versions with difermion correction, set to ConserveDifermionMass if others don't exist.
+  filename = "pAvgSmooth_JHUGen_JJQCD_HSMHiggs";
     spname = "P_ConserveDifermionMass";
-    pAvgSmooth_JHUGen_JJQCD_HSMHiggs[0] = getPConstantHandle(TVar::JHUGen, TVar::JJQCD, TVar::HSMHiggs, filename.Data(), spname.Data());
+  pAvgSmooth_JHUGen_JJQCD_HSMHiggs[0] = getPConstantHandle(TVar::JHUGen, TVar::JJQCD, TVar::HSMHiggs, filename, spname, true);
     spname = "P_MomentumToEnergy";
-    pAvgSmooth_JHUGen_JJQCD_HSMHiggs[1] = getPConstantHandle(TVar::JHUGen, TVar::JJQCD, TVar::HSMHiggs, filename.Data(), spname.Data());
+  pAvgSmooth_JHUGen_JJQCD_HSMHiggs[1] = getPConstantHandle(TVar::JHUGen, TVar::JJQCD, TVar::HSMHiggs, filename, spname, true);
+  if (pAvgSmooth_JHUGen_JJQCD_HSMHiggs[1]==0) pAvgSmooth_JHUGen_JJQCD_HSMHiggs[1]=pAvgSmooth_JHUGen_JJQCD_HSMHiggs[0];
     //
-    filename = Form("pAvgSmooth_JHUGen_JJVBF_HSMHiggs_%s", strsqrts.Data());
+  filename = "pAvgSmooth_JHUGen_JQCD_HSMHiggs";
     spname = "P_ConserveDifermionMass";
-    pAvgSmooth_JHUGen_JJVBF_HSMHiggs[0] = getPConstantHandle(TVar::JHUGen, TVar::JJVBF, TVar::HSMHiggs, filename.Data(), spname.Data());
+  pAvgSmooth_JHUGen_JQCD_HSMHiggs[0] = getPConstantHandle(TVar::JHUGen, TVar::JQCD, TVar::HSMHiggs, filename, spname, true);
     spname = "P_MomentumToEnergy";
-    pAvgSmooth_JHUGen_JJVBF_HSMHiggs[1] = getPConstantHandle(TVar::JHUGen, TVar::JJVBF, TVar::HSMHiggs, filename.Data(), spname.Data());
+  pAvgSmooth_JHUGen_JQCD_HSMHiggs[1] = getPConstantHandle(TVar::JHUGen, TVar::JQCD, TVar::HSMHiggs, filename, spname, true);
+  if (pAvgSmooth_JHUGen_JQCD_HSMHiggs[1]==0) pAvgSmooth_JHUGen_JQCD_HSMHiggs[1]=pAvgSmooth_JHUGen_JQCD_HSMHiggs[0];
     //
-    filename = Form("pAvgSmooth_JHUGen_JQCD_HSMHiggs_%s", strsqrts.Data());
+  filename = "pAvgSmooth_JHUGen_JJVBF_HSMHiggs";
     spname = "P_ConserveDifermionMass";
-    pAvgSmooth_JHUGen_JQCD_HSMHiggs[0] = getPConstantHandle(TVar::JHUGen, TVar::JQCD, TVar::HSMHiggs, filename.Data(), spname.Data());
+  pAvgSmooth_JHUGen_JJVBF_HSMHiggs[0] = getPConstantHandle(TVar::JHUGen, TVar::JJVBF, TVar::HSMHiggs, filename, spname, true);
     spname = "P_MomentumToEnergy";
-    pAvgSmooth_JHUGen_JQCD_HSMHiggs[1] = getPConstantHandle(TVar::JHUGen, TVar::JQCD, TVar::HSMHiggs, filename.Data(), spname.Data());
-  }
+  pAvgSmooth_JHUGen_JJVBF_HSMHiggs[1] = getPConstantHandle(TVar::JHUGen, TVar::JJVBF, TVar::HSMHiggs, filename, spname, true);
+  if (pAvgSmooth_JHUGen_JJVBF_HSMHiggs[1]==0) pAvgSmooth_JHUGen_JJVBF_HSMHiggs[1]=pAvgSmooth_JHUGen_JJVBF_HSMHiggs[0];
+  //
+  filename = "pAvgSmooth_JHUGen_Had_ZH_HSMHiggs";
+  spname = "P_ConserveDifermionMass";
+  pAvgSmooth_JHUGen_Had_ZH_HSMHiggs[0] = getPConstantHandle(TVar::JHUGen, TVar::Had_ZH, TVar::HSMHiggs, filename, spname, true);
+  spname = "P_MomentumToEnergy";
+  //pAvgSmooth_JHUGen_Had_ZH_HSMHiggs[1] = getPConstantHandle(TVar::JHUGen, TVar::Had_ZH, TVar::HSMHiggs, filename, spname, true);
+  if (pAvgSmooth_JHUGen_Had_ZH_HSMHiggs[1]==0) pAvgSmooth_JHUGen_Had_ZH_HSMHiggs[1]=pAvgSmooth_JHUGen_Had_ZH_HSMHiggs[0];
+  //
+  filename = "pAvgSmooth_JHUGen_Had_WH_HSMHiggs";
+  spname = "P_ConserveDifermionMass";
+  pAvgSmooth_JHUGen_Had_WH_HSMHiggs[0] = getPConstantHandle(TVar::JHUGen, TVar::Had_WH, TVar::HSMHiggs, filename, spname, true);
+  spname = "P_MomentumToEnergy";
+  //pAvgSmooth_JHUGen_Had_WH_HSMHiggs[1] = getPConstantHandle(TVar::JHUGen, TVar::Had_WH, TVar::HSMHiggs, filename, spname, true);
+  if (pAvgSmooth_JHUGen_Had_WH_HSMHiggs[1]==0) pAvgSmooth_JHUGen_Had_WH_HSMHiggs[1]=pAvgSmooth_JHUGen_Had_WH_HSMHiggs[0];
+  //
   //
   filename = "pAvgSmooth_MCFM_JJQCD_bkgZJets_13TeV_2l2q"; // 13 TeV is a placeholder for all energies.
   spname = "P_ConserveDifermionMass";
-  pAvgSmooth_MCFM_JJQCD_bkgZJets_2l2q = getPConstantHandle(TVar::MCFM, TVar::JJQCD, TVar::bkgZJets, filename.Data(), spname.Data());
+  pAvgSmooth_MCFM_JJQCD_bkgZJets_2l2q = getPConstantHandle(TVar::MCFM, TVar::JJQCD, TVar::bkgZJets, filename, spname);
+  //
   //
   filename = "pAvgSmooth_JHUGen_ZZGG_HSMHiggs";
   spname = "P_ConserveDifermionMass_4mu";
-  pAvgSmooth_JHUGen_ZZGG_HSMHiggs_4mu = getPConstantHandle(TVar::JHUGen, TVar::ZZGG, TVar::HSMHiggs, filename.Data(), spname.Data());
+  pAvgSmooth_JHUGen_ZZGG_HSMHiggs_4mu = getPConstantHandle(TVar::JHUGen, TVar::ZZGG, TVar::HSMHiggs, filename, spname);
   spname = "P_ConserveDifermionMass_4e";
-  pAvgSmooth_JHUGen_ZZGG_HSMHiggs_4e = getPConstantHandle(TVar::JHUGen, TVar::ZZGG, TVar::HSMHiggs, filename.Data(), spname.Data());
+  pAvgSmooth_JHUGen_ZZGG_HSMHiggs_4e = getPConstantHandle(TVar::JHUGen, TVar::ZZGG, TVar::HSMHiggs, filename, spname);
   spname = "P_ConserveDifermionMass_2mu2e";
-  pAvgSmooth_JHUGen_ZZGG_HSMHiggs_2mu2e = getPConstantHandle(TVar::JHUGen, TVar::ZZGG, TVar::HSMHiggs, filename.Data(), spname.Data());
+  pAvgSmooth_JHUGen_ZZGG_HSMHiggs_2mu2e = getPConstantHandle(TVar::JHUGen, TVar::ZZGG, TVar::HSMHiggs, filename, spname);
   //
   filename = "pAvgSmooth_MCFM_ZZGG_HSMHiggs";
   spname = "P_ConserveDifermionMass_4mu";
-  pAvgSmooth_MCFM_ZZGG_HSMHiggs_4mu = getPConstantHandle(TVar::MCFM, TVar::ZZGG, TVar::HSMHiggs, filename.Data(), spname.Data());
+  pAvgSmooth_MCFM_ZZGG_HSMHiggs_4mu = getPConstantHandle(TVar::MCFM, TVar::ZZGG, TVar::HSMHiggs, filename, spname);
   spname = "P_ConserveDifermionMass_4e";
-  pAvgSmooth_MCFM_ZZGG_HSMHiggs_4e = getPConstantHandle(TVar::MCFM, TVar::ZZGG, TVar::HSMHiggs, filename.Data(), spname.Data());
+  pAvgSmooth_MCFM_ZZGG_HSMHiggs_4e = getPConstantHandle(TVar::MCFM, TVar::ZZGG, TVar::HSMHiggs, filename, spname);
   spname = "P_ConserveDifermionMass_2mu2e";
-  pAvgSmooth_MCFM_ZZGG_HSMHiggs_2mu2e = getPConstantHandle(TVar::MCFM, TVar::ZZGG, TVar::HSMHiggs, filename.Data(), spname.Data());
+  pAvgSmooth_MCFM_ZZGG_HSMHiggs_2mu2e = getPConstantHandle(TVar::MCFM, TVar::ZZGG, TVar::HSMHiggs, filename, spname);
+  //
+  filename = "pAvgSmooth_MCFM_JJVBF_HSMHiggs";
+  spname = "P_ConserveDifermionMass_4mu";
+  pAvgSmooth_MCFM_JJVBF_HSMHiggs_4mu = getPConstantHandle(TVar::MCFM, TVar::JJVBF, TVar::HSMHiggs, filename, spname, true);
+  spname = "P_ConserveDifermionMass_4e";
+  pAvgSmooth_MCFM_JJVBF_HSMHiggs_4e = getPConstantHandle(TVar::MCFM, TVar::JJVBF, TVar::HSMHiggs, filename, spname, true);
+  spname = "P_ConserveDifermionMass_2mu2e";
+  pAvgSmooth_MCFM_JJVBF_HSMHiggs_2mu2e = getPConstantHandle(TVar::MCFM, TVar::JJVBF, TVar::HSMHiggs, filename, spname, true);
+  //
+  filename = "pAvgSmooth_MCFM_Had_ZH_HSMHiggs";
+  spname = "P_ConserveDifermionMass_4mu";
+  pAvgSmooth_MCFM_Had_ZH_HSMHiggs_4mu = getPConstantHandle(TVar::MCFM, TVar::Had_ZH, TVar::HSMHiggs, filename, spname, true);
+  spname = "P_ConserveDifermionMass_4e";
+  pAvgSmooth_MCFM_Had_ZH_HSMHiggs_4e = getPConstantHandle(TVar::MCFM, TVar::Had_ZH, TVar::HSMHiggs, filename, spname, true);
+  spname = "P_ConserveDifermionMass_2mu2e";
+  pAvgSmooth_MCFM_Had_ZH_HSMHiggs_2mu2e = getPConstantHandle(TVar::MCFM, TVar::Had_ZH, TVar::HSMHiggs, filename, spname, true);
+  //
+  filename = "pAvgSmooth_MCFM_Had_WH_HSMHiggs";
+  spname = "P_ConserveDifermionMass_4mu";
+  pAvgSmooth_MCFM_Had_WH_HSMHiggs_4mu = getPConstantHandle(TVar::MCFM, TVar::Had_WH, TVar::HSMHiggs, filename, spname, true);
+  spname = "P_ConserveDifermionMass_4e";
+  pAvgSmooth_MCFM_Had_WH_HSMHiggs_4e = getPConstantHandle(TVar::MCFM, TVar::Had_WH, TVar::HSMHiggs, filename, spname, true);
+  spname = "P_ConserveDifermionMass_2mu2e";
+  pAvgSmooth_MCFM_Had_WH_HSMHiggs_2mu2e = getPConstantHandle(TVar::MCFM, TVar::Had_WH, TVar::HSMHiggs, filename, spname, true);
+  //
   //
   filename = "pAvgSmooth_MCFM_ZZGG_bkgZZ";
   spname = "P_ConserveDifermionMass_4mu";
-  pAvgSmooth_MCFM_ZZGG_bkgZZ_4mu = getPConstantHandle(TVar::MCFM, TVar::ZZGG, TVar::bkgZZ, filename.Data(), spname.Data());
+  pAvgSmooth_MCFM_ZZGG_bkgZZ_4mu = getPConstantHandle(TVar::MCFM, TVar::ZZGG, TVar::bkgZZ, filename, spname);
   spname = "P_ConserveDifermionMass_4e";
-  pAvgSmooth_MCFM_ZZGG_bkgZZ_4e = getPConstantHandle(TVar::MCFM, TVar::ZZGG, TVar::bkgZZ, filename.Data(), spname.Data());
+  pAvgSmooth_MCFM_ZZGG_bkgZZ_4e = getPConstantHandle(TVar::MCFM, TVar::ZZGG, TVar::bkgZZ, filename, spname);
   spname = "P_ConserveDifermionMass_2mu2e";
-  pAvgSmooth_MCFM_ZZGG_bkgZZ_2mu2e = getPConstantHandle(TVar::MCFM, TVar::ZZGG, TVar::bkgZZ, filename.Data(), spname.Data());
+  pAvgSmooth_MCFM_ZZGG_bkgZZ_2mu2e = getPConstantHandle(TVar::MCFM, TVar::ZZGG, TVar::bkgZZ, filename, spname);
   //
   filename = "pAvgSmooth_MCFM_ZZQQB_bkgZZ";
   spname = "P_ConserveDifermionMass_4mu";
-  pAvgSmooth_MCFM_ZZQQB_bkgZZ_4mu = getPConstantHandle(TVar::MCFM, TVar::ZZQQB, TVar::bkgZZ, filename.Data(), spname.Data());
+  pAvgSmooth_MCFM_ZZQQB_bkgZZ_4mu = getPConstantHandle(TVar::MCFM, TVar::ZZQQB, TVar::bkgZZ, filename, spname);
   spname = "P_ConserveDifermionMass_4e";
-  pAvgSmooth_MCFM_ZZQQB_bkgZZ_4e = getPConstantHandle(TVar::MCFM, TVar::ZZQQB, TVar::bkgZZ, filename.Data(), spname.Data());
+  pAvgSmooth_MCFM_ZZQQB_bkgZZ_4e = getPConstantHandle(TVar::MCFM, TVar::ZZQQB, TVar::bkgZZ, filename, spname);
   spname = "P_ConserveDifermionMass_2mu2e";
-  pAvgSmooth_MCFM_ZZQQB_bkgZZ_2mu2e = getPConstantHandle(TVar::MCFM, TVar::ZZQQB, TVar::bkgZZ, filename.Data(), spname.Data());
+  pAvgSmooth_MCFM_ZZQQB_bkgZZ_2mu2e = getPConstantHandle(TVar::MCFM, TVar::ZZQQB, TVar::bkgZZ, filename, spname);
+  //
+  filename = "pAvgSmooth_MCFM_JJVBF_bkgZZ";
+  spname = "P_ConserveDifermionMass_4mu";
+  pAvgSmooth_MCFM_JJVBF_bkgZZ_4mu = getPConstantHandle(TVar::MCFM, TVar::JJVBF, TVar::bkgZZ, filename, spname, true);
+  spname = "P_ConserveDifermionMass_4e";
+  pAvgSmooth_MCFM_JJVBF_bkgZZ_4e = getPConstantHandle(TVar::MCFM, TVar::JJVBF, TVar::bkgZZ, filename, spname, true);
+  spname = "P_ConserveDifermionMass_2mu2e";
+  pAvgSmooth_MCFM_JJVBF_bkgZZ_2mu2e = getPConstantHandle(TVar::MCFM, TVar::JJVBF, TVar::bkgZZ, filename, spname, true);
+  //
+  filename = "pAvgSmooth_MCFM_Had_ZH_bkgZZ";
+  spname = "P_ConserveDifermionMass_4mu";
+  pAvgSmooth_MCFM_Had_ZH_bkgZZ_4mu = getPConstantHandle(TVar::MCFM, TVar::Had_ZH, TVar::bkgZZ, filename, spname, true);
+  spname = "P_ConserveDifermionMass_4e";
+  pAvgSmooth_MCFM_Had_ZH_bkgZZ_4e = getPConstantHandle(TVar::MCFM, TVar::Had_ZH, TVar::bkgZZ, filename, spname, true);
+  spname = "P_ConserveDifermionMass_2mu2e";
+  pAvgSmooth_MCFM_Had_ZH_bkgZZ_2mu2e = getPConstantHandle(TVar::MCFM, TVar::Had_ZH, TVar::bkgZZ, filename, spname, true);
+  //
+  filename = "pAvgSmooth_MCFM_Had_WH_bkgZZ";
+  spname = "P_ConserveDifermionMass_4mu";
+  pAvgSmooth_MCFM_Had_WH_bkgZZ_4mu = getPConstantHandle(TVar::MCFM, TVar::Had_WH, TVar::bkgZZ, filename, spname, true);
+  spname = "P_ConserveDifermionMass_4e";
+  pAvgSmooth_MCFM_Had_WH_bkgZZ_4e = getPConstantHandle(TVar::MCFM, TVar::Had_WH, TVar::bkgZZ, filename, spname, true);
+  spname = "P_ConserveDifermionMass_2mu2e";
+  pAvgSmooth_MCFM_Had_WH_bkgZZ_2mu2e = getPConstantHandle(TVar::MCFM, TVar::Had_WH, TVar::bkgZZ, filename, spname, true);
+  //
+  filename = "pAvgSmooth_MCFM_JJQCD_bkgZZ";
+  spname = "P_ConserveDifermionMass_4mu";
+  pAvgSmooth_MCFM_JJQCD_bkgZZ_4mu = getPConstantHandle(TVar::MCFM, TVar::JJQCD, TVar::bkgZZ, filename, spname, true);
+  spname = "P_ConserveDifermionMass_4e";
+  pAvgSmooth_MCFM_JJQCD_bkgZZ_4e = getPConstantHandle(TVar::MCFM, TVar::JJQCD, TVar::bkgZZ, filename, spname, true);
+  spname = "P_ConserveDifermionMass_2mu2e";
+  pAvgSmooth_MCFM_JJQCD_bkgZZ_2mu2e = getPConstantHandle(TVar::MCFM, TVar::JJQCD, TVar::bkgZZ, filename, spname, true);
   //
 
   if (myVerbosity_>=TVar::DEBUG) cout << "End Mela::getPConstantHandles" << endl;
@@ -2139,11 +2228,16 @@ MelaPConstant* Mela::getPConstantHandle(
   TVar::MatrixElement me_,
   TVar::Production prod_,
   TVar::Process proc_,
-  const char* relpath,
-  const char* spname
+  TString relpath,
+  TString spname,
+  const bool useSqrts
   ){
   if (myVerbosity_>=TVar::DEBUG) cout << "Begin Mela::getPConstantHandle" << endl;
 
+  MelaPConstant* pchandle=0;
+  string cfile_fullpath;
+
+  // Get data/ path
   if (myVerbosity_>=TVar::DEBUG) cout << "Mela::getPConstantHandle: relpath and spline name: " << relpath << ", " << spname << endl;
 #ifdef _melapkgpathstr_
   const string MELAPKGPATH = _melapkgpathstr_;
@@ -2152,43 +2246,119 @@ MelaPConstant* Mela::getPConstantHandle(
   assert(0);
 #endif
   const string path = MELAPKGPATH + "data/";
-  string cfile_fullpath = path;
-  cfile_fullpath.append(relpath);
-  cfile_fullpath.append(".root");
   if (myVerbosity_>=TVar::DEBUG) cout << "Mela::getPConstantHandle: path and spline name: " << path << ", " << spname << endl;
-  if (myVerbosity_>=TVar::DEBUG) cout << "Mela::getPConstantHandle: Full path and spline name: " << cfile_fullpath << ", " << spname << endl;
-  MelaPConstant* pchandle = new MelaPConstant(me_, prod_, proc_, cfile_fullpath.c_str(), spname);
 
+  if (useSqrts){ // Loop over possible sqrts values to get the closest one
+    const unsigned int npossiblesqrts=3;
+    const double possible_sqrts[npossiblesqrts]={ 7, 8, 13 };
+    vector<double> trysqrts;
+    for (unsigned isq=0; isq<npossiblesqrts; isq++){
+      double val = possible_sqrts[isq];
+      double diff = fabs(LHCsqrts-val);
+      bool inserted=false;
+      for (std::vector<double>::iterator it = trysqrts.begin(); it<trysqrts.end(); it++){
+        if (fabs((*it)-LHCsqrts)>diff){
+          inserted=true;
+          trysqrts.insert(it, val);
+          break;
+        }
+      }
+      if (!inserted) trysqrts.push_back(val);
+    }
+    for (auto& dsqrts : trysqrts){
+      TString strsqrts = Form("%s_%.0f%s", relpath.Data(), dsqrts, "TeV");
+      cfile_fullpath = path;
+      cfile_fullpath.append(strsqrts.Data());
+      cfile_fullpath.append(".root");
+      pchandle = new MelaPConstant(me_, prod_, proc_, cfile_fullpath.c_str(), spname.Data());
+      if (pchandle->IsValid()){
+        if (myVerbosity_>=TVar::DEBUG) cout << "Mela::getPConstantHandle: Full path and spline name: " << cfile_fullpath << ", " << spname << " is valid." << endl;
+        break;
+      }
+      else{
+        if (myVerbosity_>=TVar::DEBUG) cout << "Mela::getPConstantHandle: Full path and spline name: " << cfile_fullpath << ", " << spname << " is invalid." << endl;
+        deletePConstantHandle(pchandle);
+      }
+    }
+  }
+  else{
+    cfile_fullpath = path;
+    cfile_fullpath.append(relpath.Data());
+    cfile_fullpath.append(".root");
+    pchandle = new MelaPConstant(me_, prod_, proc_, cfile_fullpath.c_str(), spname.Data());
+    if (!pchandle->IsValid()) deletePConstantHandle(pchandle);
+  }
+  if (myVerbosity_>=TVar::DEBUG) cout << "Mela::getPConstantHandle: Full path and spline name: " << cfile_fullpath << ", " << spname << endl;
+  if (myVerbosity_>=TVar::DEBUG && pchandle==0) cerr << "Mela::getPConstantHandle: Handle of " << spname << " from " << cfile_fullpath << " is invalid!" << endl;
   if (myVerbosity_>=TVar::DEBUG) cout << "End Mela::getPConstantHandle" << endl;
   return pchandle;
 }
 void Mela::deletePConstantHandles(){
-  for (unsigned int isch=0; isch<(unsigned int)(TVar::nFermionMassRemovalSchemes-1); isch++){
-    if (pAvgSmooth_JHUGen_JJQCD_HSMHiggs[isch]!=0) delete pAvgSmooth_JHUGen_JJQCD_HSMHiggs[isch];
-    //
-    if (pAvgSmooth_JHUGen_JJVBF_HSMHiggs[isch]!=0) delete pAvgSmooth_JHUGen_JJVBF_HSMHiggs[isch];
-    //
-    if (pAvgSmooth_JHUGen_JQCD_HSMHiggs[isch]!=0) delete pAvgSmooth_JHUGen_JQCD_HSMHiggs[isch];
-    //
+  for (int isch=(unsigned int)(TVar::nFermionMassRemovalSchemes-2); isch>=0; isch--){
+    if (isch==0 || pAvgSmooth_JHUGen_JJQCD_HSMHiggs[isch]!=pAvgSmooth_JHUGen_JJQCD_HSMHiggs[0]) deletePConstantHandle(pAvgSmooth_JHUGen_JJQCD_HSMHiggs[isch]);
+    if (isch==0 || pAvgSmooth_JHUGen_JQCD_HSMHiggs[isch]!=pAvgSmooth_JHUGen_JQCD_HSMHiggs[0]) deletePConstantHandle(pAvgSmooth_JHUGen_JQCD_HSMHiggs[isch]);
+    if (isch==0 || pAvgSmooth_JHUGen_JJVBF_HSMHiggs[isch]!=pAvgSmooth_JHUGen_JJVBF_HSMHiggs[0]) deletePConstantHandle(pAvgSmooth_JHUGen_JJVBF_HSMHiggs[isch]);
+    if (isch==0 || pAvgSmooth_JHUGen_Had_ZH_HSMHiggs[isch]!=pAvgSmooth_JHUGen_Had_ZH_HSMHiggs[0]) deletePConstantHandle(pAvgSmooth_JHUGen_Had_ZH_HSMHiggs[isch]);
+    if (isch==0 || pAvgSmooth_JHUGen_Had_WH_HSMHiggs[isch]!=pAvgSmooth_JHUGen_Had_WH_HSMHiggs[0]) deletePConstantHandle(pAvgSmooth_JHUGen_Had_WH_HSMHiggs[isch]);
   }
+    //
+  deletePConstantHandle(pAvgSmooth_MCFM_JJQCD_bkgZJets_2l2q);
+    //
+  deletePConstantHandle(pAvgSmooth_JHUGen_ZZGG_HSMHiggs_4mu);
+  deletePConstantHandle(pAvgSmooth_JHUGen_ZZGG_HSMHiggs_4e);
+  deletePConstantHandle(pAvgSmooth_JHUGen_ZZGG_HSMHiggs_2mu2e);
+    //
+  deletePConstantHandle(pAvgSmooth_MCFM_ZZGG_HSMHiggs_4mu);
+  deletePConstantHandle(pAvgSmooth_MCFM_ZZGG_HSMHiggs_4e);
+  deletePConstantHandle(pAvgSmooth_MCFM_ZZGG_HSMHiggs_2mu2e);
   //
-  if (pAvgSmooth_MCFM_JJQCD_bkgZJets_2l2q!=0) delete pAvgSmooth_MCFM_JJQCD_bkgZJets_2l2q;
+  deletePConstantHandle(pAvgSmooth_MCFM_JJVBF_HSMHiggs_4mu);
+  deletePConstantHandle(pAvgSmooth_MCFM_JJVBF_HSMHiggs_4e);
+  deletePConstantHandle(pAvgSmooth_MCFM_JJVBF_HSMHiggs_2mu2e);
   //
-  if (pAvgSmooth_JHUGen_ZZGG_HSMHiggs_4mu!=0) delete pAvgSmooth_JHUGen_ZZGG_HSMHiggs_4mu;
-  if (pAvgSmooth_JHUGen_ZZGG_HSMHiggs_4e!=0) delete pAvgSmooth_JHUGen_ZZGG_HSMHiggs_4e;
-  if (pAvgSmooth_JHUGen_ZZGG_HSMHiggs_2mu2e!=0) delete pAvgSmooth_JHUGen_ZZGG_HSMHiggs_2mu2e;
+  deletePConstantHandle(pAvgSmooth_MCFM_Had_ZH_HSMHiggs_4mu);
+  deletePConstantHandle(pAvgSmooth_MCFM_Had_ZH_HSMHiggs_4e);
+  deletePConstantHandle(pAvgSmooth_MCFM_Had_ZH_HSMHiggs_2mu2e);
   //
-  if (pAvgSmooth_MCFM_ZZGG_HSMHiggs_4mu!=0) delete pAvgSmooth_MCFM_ZZGG_HSMHiggs_4mu;
-  if (pAvgSmooth_MCFM_ZZGG_HSMHiggs_4e!=0) delete pAvgSmooth_MCFM_ZZGG_HSMHiggs_4e;
-  if (pAvgSmooth_MCFM_ZZGG_HSMHiggs_2mu2e!=0) delete pAvgSmooth_MCFM_ZZGG_HSMHiggs_2mu2e;
+  deletePConstantHandle(pAvgSmooth_MCFM_Had_WH_HSMHiggs_4mu);
+  deletePConstantHandle(pAvgSmooth_MCFM_Had_WH_HSMHiggs_4e);
+  deletePConstantHandle(pAvgSmooth_MCFM_Had_WH_HSMHiggs_2mu2e);
   //
-  if (pAvgSmooth_MCFM_ZZGG_bkgZZ_4mu!=0) delete pAvgSmooth_MCFM_ZZGG_bkgZZ_4mu;
-  if (pAvgSmooth_MCFM_ZZGG_bkgZZ_4e!=0) delete pAvgSmooth_MCFM_ZZGG_bkgZZ_4e;
-  if (pAvgSmooth_MCFM_ZZGG_bkgZZ_2mu2e!=0) delete pAvgSmooth_MCFM_ZZGG_bkgZZ_2mu2e;
+  deletePConstantHandle(pAvgSmooth_MCFM_ZZGG_bkgZZ_4mu);
+  deletePConstantHandle(pAvgSmooth_MCFM_ZZGG_bkgZZ_4e);
+  deletePConstantHandle(pAvgSmooth_MCFM_ZZGG_bkgZZ_2mu2e);
   //
-  if (pAvgSmooth_MCFM_ZZQQB_bkgZZ_4mu!=0) delete pAvgSmooth_MCFM_ZZQQB_bkgZZ_4mu;
-  if (pAvgSmooth_MCFM_ZZQQB_bkgZZ_4e!=0) delete pAvgSmooth_MCFM_ZZQQB_bkgZZ_4e;
-  if (pAvgSmooth_MCFM_ZZQQB_bkgZZ_2mu2e!=0) delete pAvgSmooth_MCFM_ZZQQB_bkgZZ_2mu2e;
+  deletePConstantHandle(pAvgSmooth_MCFM_ZZQQB_bkgZZ_4mu);
+  deletePConstantHandle(pAvgSmooth_MCFM_ZZQQB_bkgZZ_4e);
+  deletePConstantHandle(pAvgSmooth_MCFM_ZZQQB_bkgZZ_2mu2e);
   //
+  deletePConstantHandle(pAvgSmooth_MCFM_JJVBF_bkgZZ_4mu);
+  deletePConstantHandle(pAvgSmooth_MCFM_JJVBF_bkgZZ_4e);
+  deletePConstantHandle(pAvgSmooth_MCFM_JJVBF_bkgZZ_2mu2e);
+  //
+  deletePConstantHandle(pAvgSmooth_MCFM_Had_ZH_bkgZZ_4mu);
+  deletePConstantHandle(pAvgSmooth_MCFM_Had_ZH_bkgZZ_4e);
+  deletePConstantHandle(pAvgSmooth_MCFM_Had_ZH_bkgZZ_2mu2e);
+  //
+  deletePConstantHandle(pAvgSmooth_MCFM_Had_WH_bkgZZ_4mu);
+  deletePConstantHandle(pAvgSmooth_MCFM_Had_WH_bkgZZ_4e);
+  deletePConstantHandle(pAvgSmooth_MCFM_Had_WH_bkgZZ_2mu2e);
+  //
+  deletePConstantHandle(pAvgSmooth_MCFM_JJQCD_bkgZZ_4mu);
+  deletePConstantHandle(pAvgSmooth_MCFM_JJQCD_bkgZZ_4e);
+  deletePConstantHandle(pAvgSmooth_MCFM_JJQCD_bkgZZ_2mu2e);
+  //
+}
+void Mela::deletePConstantHandle(MelaPConstant*& handle){
+  if (myVerbosity_>=TVar::DEBUG) cout << "Mela::deletePConstantHandle: Deleting PConstant handle " << handle->GetSplineName() << " at " << handle->GetFileName() << endl;
+  delete handle; handle=0;
+  if (myVerbosity_>=TVar::DEBUG) cout << "End Mela::deletePConstantHandle." << endl;
+}
+
+
+void Mela::computeDijetConvBW(float& prob){
+  melaCand = getCurrentCandidate();
+  prob = superDijet->GetConvBW(myProduction_, melaCand);
+  reset_CandRef();
 }
 

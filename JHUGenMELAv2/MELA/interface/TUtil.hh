@@ -8,8 +8,10 @@
 #define ZZ_COMMON
 #include <string>
 #include <vector>
-// TVar class
-#include "TVar.hh"
+// MelaIO class
+#include "MelaIO.h"
+// Couplings classes
+#include "TCouplings.hh"
 // MCFM utilities
 #include "TMCFMUtils.hh"
 // Mod_Parameters
@@ -155,6 +157,8 @@ namespace TUtil{
   void SetEwkCouplingParameters(double ext_Gf, double ext_aemmz, double ext_mW, double ext_mZ, double ext_xW, int ext_ewscheme);
   void SetMass(double inmass, int ipart);
   void SetDecayWidth(double inwidth, int ipart);
+  double GetMass(int ipart);
+  double GetDecayWidth(int ipart);
   void SetCKMElements(double* invckm_ud, double* invckm_us, double* invckm_cd, double* invckm_cs, double* invckm_ts, double* invckm_tb, double* invckm_ub=0, double* invckm_cb=0, double* invckm_td=0);
   double InterpretScaleScheme(const TVar::Production& production, const TVar::MatrixElement& matrixElement, const TVar::EventScaleScheme& scheme, TLorentzVector p[mxpart]);
   void SetAlphaS(double& Q_ren, double& Q_fac, double multiplier_ren, double multiplier_fac, int mynloop, int mynflav, std::string mypartons); // Q_ren/fac -> Q_ren/fac * multiplier_ren/fac
@@ -172,7 +176,7 @@ namespace TUtil{
     const TVar::simple_event_record& mela_event,
     std::vector<int>* partOrder, std::vector<int>* apartOrder
     );
-  TString GetMCFMParticleLabel(const int& pid, bool useQJ=false);
+  TString GetMCFMParticleLabel(const int& pid, bool useQJ, bool useCouplZAjkConventions);
 
   // JHUGen-specific wrappers
   void InitJHUGenMELA(const char* pathtoPDFSet, int PDFMember);
@@ -184,7 +188,11 @@ namespace TUtil{
   void SetJHUGenSpinZeroVVCouplings(double Hvvcoupl[SIZE_HVV][2], int Hvvcoupl_cqsq[SIZE_HVV_CQSQ], double HvvLambda_qsq[SIZE_HVV_LAMBDAQSQ][SIZE_HVV_CQSQ], bool useWWcoupl);
   void SetJHUGenSpinZeroGGCouplings(double Hggcoupl[SIZE_HGG][2]);
   void SetJHUGenSpinZeroQQCouplings(double Hqqcoupl[SIZE_HQQ][2]);
-  void SetJHUGenSpinZeroContactTerms(double Hzzpcoupl[SIZE_HVV][2], double Hzpzpcoupl[SIZE_HVV][2], double Hzpcontact[SIZE_Vp][2], double Hwwpcoupl[SIZE_HVV][2], double Hwpwpcoupl[SIZE_HVV][2], double Hwpcontact[SIZE_Vp][2], bool UseVprime, double M_Vprime, double Ga_Vprime);
+  void SetJHUGenSpinZeroContactTerms(
+    double Hzzpcoupl[SIZE_HVV][2], double Hzpzpcoupl[SIZE_HVV][2], double Zpffcoupl[SIZE_Vpff][2],
+    double Hwwpcoupl[SIZE_HVV][2], double Hwpwpcoupl[SIZE_HVV][2], double Wpffcoupl[SIZE_Vpff][2],
+    bool UseVprime
+    );
   // Spin-1 couplings
   void SetJHUGenSpinOneCouplings(double Zqqcoupl[SIZE_ZQQ][2], double Zvvcoupl[SIZE_ZVV][2]);
   // Spin-2 couplings
@@ -241,7 +249,7 @@ namespace TUtil{
   double SumMEPDF(const TLorentzVector& p0, const TLorentzVector& p1, double msq[nmsq][nmsq], MelaIO* RcdME, const double& EBEAM, const TVar::VerbosityLevel& verbosity);
 
   // Propagator reweighting
-  double ResonancePropagator(double shat, TVar::ResonancePropagatorScheme scheme);
+  double ResonancePropagator(double sqrts, TVar::ResonancePropagatorScheme scheme);
 
   // Boost the particles with or without associated ones to pT=0 frame and return std::vectors filled with (id, momentum) pairs
   void GetBoostedParticleVectors(
@@ -272,6 +280,7 @@ namespace TUtil{
     std::vector<MELATopCandidate*>* topCandList
     );
   void PrintCandidateSummary(MELACandidate* cand);
+  void PrintCandidateSummary(TVar::simple_event_record* cand);
 
 }
 

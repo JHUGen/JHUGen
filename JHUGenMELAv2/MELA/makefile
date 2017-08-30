@@ -31,9 +31,10 @@ ROOTINC = $(ROOFITINC)
 
 CC = g++
 CPPINC = -I$(MELADIR)/interface $(ROOTINC)
-CPPLOAD = -L$(MELALIBDIR) -lmcfm_703 -ljhugenmela $(LIBS)
+CPPLOAD = -L$(MELALIBDIR) -lmcfm_704 -ljhugenmela $(LIBS)
 CPPOPTS =  -fPIC -O2 -ftree-vectorize -fipa-pta -felide-constructors -fvisibility-inlines-hidden -fno-math-errno \
 	--param vect-max-version-for-alias-checks=50 -fmessage-length=0 -fdiagnostics-show-option \
+	-Werror=unused-value \
 	 $(shell root-config --cflags) -D_melapkgpath_=$(PWD)/
 CPPFLAGS = $(CPPOPTS) $(CPPINC) $(CPPLOAD)
 
