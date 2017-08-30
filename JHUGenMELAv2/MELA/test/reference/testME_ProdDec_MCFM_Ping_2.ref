@@ -55,12 +55,12 @@ TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	(r1, r2) = (0.548372, 0)
 	(q1, q2) = (-1, 0)
 	plabels:
-	[0]=ppppeleanlnadadq            
-	[1]=ppeleanlnadadq            
-	[2]=eleanlnadadq            
-	[3]=eanlnadadq            
-	[4]=nlnadadq            
-	[5]=nadadq            
+	[0]=ppppeleanekedadq            
+	[1]=ppeleanekedadq            
+	[2]=eleanekedadq            
+	[3]=eanekedadq            
+	[4]=nekedadq            
+	[5]=kedadq            
 	[6]=dadq            
 	[7]=dq            
 	[8]=            
@@ -93,18 +93,18 @@ TUtil::WipeMEArray: Initial MEsq:
 0	0	0	0	0	0	0	0	0	0	0	
 0	0	0	0	0	0	0	0	0	0	0	
 0	0	0	0	0	0	0	0	0	0	0	
-0	0	0	0	0	0	0	2.66646e-17	0	0	0	
+0	0	0	0	0	0	0	7.03353e-17	0	0	0	
 0	0	0	0	0	0	1.1335e-18	0	0	0	0	
 0	0	0	0	0	0	0	0	0	0	0	
 0	0	0	0	7.99007e-19	0	0	0	0	0	0	
-0	0	0	9.48275e-19	0	0	0	0	0	0	0	
+0	0	0	4.99677e-20	0	0	0	0	0	0	0	
 0	0	0	0	0	0	0	0	0	0	0	
 0	0	0	0	0	0	0	0	0	0	0	
 0	0	0	0	0	0	0	0	0	0	0	
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.0623494, xx[1] = 0.503752, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.0623494, xx[1] = 0.503752
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (0.579359 , 9.20045e-05)
@@ -124,11 +124,11 @@ TUtil::SumMatrixElementPDF: The number of ME instances: 4. MEsq[ip][jp] =
 0	0	0	0	0	0	0	0	0	0	0	
 0	0	0	0	0	0	0	0	0	0	0	
 0	0	0	0	0	0	0	0	0	0	0	
-0	0	0	0	0	0	0	2.66646e-17	0	0	0	
+0	0	0	0	0	0	0	7.03353e-17	0	0	0	
 0	0	0	0	0	0	1.1335e-18	0	0	0	0	
 0	0	0	0	0	0	0	0	0	0	0	
 0	0	0	0	7.99007e-19	0	0	0	0	0	0	
-0	0	0	9.48275e-19	0	0	0	0	0	0	0	
+0	0	0	4.99677e-20	0	0	0	0	0	0	0	
 0	0	0	0	0	0	0	0	0	0	0	
 0	0	0	0	0	0	0	0	0	0	0	
 0	0	0	0	0	0	0	0	0	0	0	
@@ -136,8 +136,8 @@ TUtil::SumMatrixElementPDF: Reset AlphaS:
 	Before reset, alphas scale: 62.1137, PDF scale: 62.1137
 TUtil::SumMatrixElementPDF: Reset AlphaS result:
 	After reset, alphas scale: 91.2, PDF scale: 91.2
-End TUtil::SumMatrixElementPDF(1.78062e-17)
-Process bkgWWZZ_SMHiggs TEvtProb::XsecCalc_VVXVV: dXsec=1.78062e-17
+End TUtil::SumMatrixElementPDF(4.6524e-17)
+Process bkgWWZZ_SMHiggs TEvtProb::XsecCalc_VVXVV: dXsec=4.6524e-17
 End XsecCalc_VVXVV
 TEvtProb::SetHiggsMass(125, -1, -1):
 	hmass: 125, 0.00407
@@ -146,7 +146,7 @@ TEvtProb::SetHiggsMass(125, -1, -1):
 	MCFM h2mass: -1, 0
 Mela::getConstant: Constant is 1
 Mela: End computeProdDecP
-pVAMCFM_wbfVV_total: 1.78062e-17
+pVAMCFM_wbfVV_total: 4.6524e-17
 
 Mela: Begin computeProdDecP
 TEvtProb::SetHiggsMass(125, -1, 1):
@@ -202,12 +202,12 @@ TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	(r1, r2) = (0.548372, 0)
 	(q1, q2) = (-1, 0)
 	plabels:
-	[0]=ppppeleanlnadadq            
-	[1]=ppeleanlnadadq            
-	[2]=eleanlnadadq            
-	[3]=eanlnadadq            
-	[4]=nlnadadq            
-	[5]=nadadq            
+	[0]=ppppeleanekedadq            
+	[1]=ppeleanekedadq            
+	[2]=eleanekedadq            
+	[3]=eanekedadq            
+	[4]=nekedadq            
+	[5]=kedadq            
 	[6]=dadq            
 	[7]=dq            
 	[8]=            
@@ -240,18 +240,18 @@ TUtil::WipeMEArray: Initial MEsq:
 0	0	0	0	0	0	0	0	0	0	0	
 0	0	0	0	0	0	0	0	0	0	0	
 0	0	0	0	0	0	0	0	0	0	0	
-0	0	0	0	0	0	0	2.40616e-17	0	0	0	
+0	0	0	0	0	0	0	6.51574e-17	0	0	0	
 0	0	0	0	0	0	1.06863e-18	0	0	0	0	
 0	0	0	0	0	0	0	0	0	0	0	
 0	0	0	0	1.0264e-18	0	0	0	0	0	0	
-0	0	0	1.94756e-18	0	0	0	0	0	0	0	
+0	0	0	3.62989e-19	0	0	0	0	0	0	0	
 0	0	0	0	0	0	0	0	0	0	0	
 0	0	0	0	0	0	0	0	0	0	0	
 0	0	0	0	0	0	0	0	0	0	0	
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.0623494, xx[1] = 0.503752, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.0623494, xx[1] = 0.503752
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (0.579359 , 9.20045e-05)
@@ -271,11 +271,11 @@ TUtil::SumMatrixElementPDF: The number of ME instances: 4. MEsq[ip][jp] =
 0	0	0	0	0	0	0	0	0	0	0	
 0	0	0	0	0	0	0	0	0	0	0	
 0	0	0	0	0	0	0	0	0	0	0	
-0	0	0	0	0	0	0	2.40616e-17	0	0	0	
+0	0	0	0	0	0	0	6.51574e-17	0	0	0	
 0	0	0	0	0	0	1.06863e-18	0	0	0	0	
 0	0	0	0	0	0	0	0	0	0	0	
 0	0	0	0	1.0264e-18	0	0	0	0	0	0	
-0	0	0	1.94756e-18	0	0	0	0	0	0	0	
+0	0	0	3.62989e-19	0	0	0	0	0	0	0	
 0	0	0	0	0	0	0	0	0	0	0	
 0	0	0	0	0	0	0	0	0	0	0	
 0	0	0	0	0	0	0	0	0	0	0	
@@ -283,8 +283,8 @@ TUtil::SumMatrixElementPDF: Reset AlphaS:
 	Before reset, alphas scale: 62.1137, PDF scale: 62.1137
 TUtil::SumMatrixElementPDF: Reset AlphaS result:
 	After reset, alphas scale: 91.2, PDF scale: 91.2
-End TUtil::SumMatrixElementPDF(1.61159e-17)
-Process bkgWWZZ TEvtProb::XsecCalc_VVXVV: dXsec=1.61159e-17
+End TUtil::SumMatrixElementPDF(4.31162e-17)
+Process bkgWWZZ TEvtProb::XsecCalc_VVXVV: dXsec=4.31162e-17
 End XsecCalc_VVXVV
 TEvtProb::SetHiggsMass(125, -1, -1):
 	hmass: 125, 0.00407
@@ -293,7 +293,7 @@ TEvtProb::SetHiggsMass(125, -1, -1):
 	MCFM h2mass: -1, 0
 Mela::getConstant: Constant is 1
 Mela: End computeProdDecP
-pVAMCFM_wbfVV_bkg: 1.61159e-17
+pVAMCFM_wbfVV_bkg: 4.31162e-17
 
 Mela: Begin computeProdDecP
 TEvtProb::SetHiggsMass(125, -1, 1):
@@ -349,12 +349,12 @@ TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	(r1, r2) = (0.548372, 0)
 	(q1, q2) = (-1, 0)
 	plabels:
-	[0]=ppppeleanlnadadq            
-	[1]=ppeleanlnadadq            
-	[2]=eleanlnadadq            
-	[3]=eanlnadadq            
-	[4]=nlnadadq            
-	[5]=nadadq            
+	[0]=ppppeleanekedadq            
+	[1]=ppeleanekedadq            
+	[2]=eleanekedadq            
+	[3]=eanekedadq            
+	[4]=nekedadq            
+	[5]=kedadq            
 	[6]=dadq            
 	[7]=dq            
 	[8]=            
@@ -398,7 +398,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.0623494, xx[1] = 0.503752, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.0623494, xx[1] = 0.503752
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (0.579359 , 9.20045e-05)
@@ -496,12 +496,12 @@ TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	(r1, r2) = (0.548372, 0)
 	(q1, q2) = (-1, 0)
 	plabels:
-	[0]=ppppeleanlnadadq            
-	[1]=ppeleanlnadadq            
-	[2]=eleanlnadadq            
-	[3]=eanlnadadq            
-	[4]=nlnadadq            
-	[5]=nadadq            
+	[0]=ppppeleanekedadq            
+	[1]=ppeleanekedadq            
+	[2]=eleanekedadq            
+	[3]=eanekedadq            
+	[4]=nekedadq            
+	[5]=kedadq            
 	[6]=dadq            
 	[7]=dq            
 	[8]=            
@@ -534,18 +534,18 @@ TUtil::WipeMEArray: Initial MEsq:
 0	0	0	0	0	0	0	0	0	0	0	
 0	0	0	0	0	0	0	0	0	0	0	
 0	0	0	0	0	0	0	0	0	0	0	
-0	0	0	0	0	0	0	2.59461e-17	0	0	0	
+0	0	0	0	0	0	0	6.65332e-17	0	0	0	
 0	0	0	0	0	0	7.69265e-19	0	0	0	0	
 0	0	0	0	0	0	0	0	0	0	0	
 0	0	0	0	7.16111e-19	0	0	0	0	0	0	
-0	0	0	7.81481e-19	0	0	0	0	0	0	0	
+0	0	0	1.9293e-21	0	0	0	0	0	0	0	
 0	0	0	0	0	0	0	0	0	0	0	
 0	0	0	0	0	0	0	0	0	0	0	
 0	0	0	0	0	0	0	0	0	0	0	
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.0623494, xx[1] = 0.503752, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.0623494, xx[1] = 0.503752
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (0.579359 , 9.20045e-05)
@@ -565,11 +565,11 @@ TUtil::SumMatrixElementPDF: The number of ME instances: 4. MEsq[ip][jp] =
 0	0	0	0	0	0	0	0	0	0	0	
 0	0	0	0	0	0	0	0	0	0	0	
 0	0	0	0	0	0	0	0	0	0	0	
-0	0	0	0	0	0	0	2.59461e-17	0	0	0	
+0	0	0	0	0	0	0	6.65332e-17	0	0	0	
 0	0	0	0	0	0	7.69265e-19	0	0	0	0	
 0	0	0	0	0	0	0	0	0	0	0	
 0	0	0	0	7.16111e-19	0	0	0	0	0	0	
-0	0	0	7.81481e-19	0	0	0	0	0	0	0	
+0	0	0	1.9293e-21	0	0	0	0	0	0	0	
 0	0	0	0	0	0	0	0	0	0	0	
 0	0	0	0	0	0	0	0	0	0	0	
 0	0	0	0	0	0	0	0	0	0	0	
@@ -577,8 +577,8 @@ TUtil::SumMatrixElementPDF: Reset AlphaS:
 	Before reset, alphas scale: 62.1137, PDF scale: 62.1137
 TUtil::SumMatrixElementPDF: Reset AlphaS result:
 	After reset, alphas scale: 91.2, PDF scale: 91.2
-End TUtil::SumMatrixElementPDF(1.72583e-17)
-Process bkgWW_SMHiggs TEvtProb::XsecCalc_VVXVV: dXsec=1.72583e-17
+End TUtil::SumMatrixElementPDF(4.39501e-17)
+Process bkgWW_SMHiggs TEvtProb::XsecCalc_VVXVV: dXsec=4.39501e-17
 End XsecCalc_VVXVV
 TEvtProb::SetHiggsMass(125, -1, -1):
 	hmass: 125, 0.00407
@@ -587,7 +587,7 @@ TEvtProb::SetHiggsMass(125, -1, -1):
 	MCFM h2mass: -1, 0
 Mela::getConstant: Constant is 1
 Mela: End computeProdDecP
-pVAMCFM_wbfWW_total: 1.72583e-17
+pVAMCFM_wbfWW_total: 4.39501e-17
 
 Mela: Begin computeProdDecP
 TEvtProb::SetHiggsMass(125, -1, 1):
@@ -643,12 +643,12 @@ TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	(r1, r2) = (0.548372, 0)
 	(q1, q2) = (-1, 0)
 	plabels:
-	[0]=ppppeleanlnadadq            
-	[1]=ppeleanlnadadq            
-	[2]=eleanlnadadq            
-	[3]=eanlnadadq            
-	[4]=nlnadadq            
-	[5]=nadadq            
+	[0]=ppppeleanekedadq            
+	[1]=ppeleanekedadq            
+	[2]=eleanekedadq            
+	[3]=eanekedadq            
+	[4]=nekedadq            
+	[5]=kedadq            
 	[6]=dadq            
 	[7]=dq            
 	[8]=            
@@ -681,18 +681,18 @@ TUtil::WipeMEArray: Initial MEsq:
 0	0	0	0	0	0	0	0	0	0	0	
 0	0	0	0	0	0	0	0	0	0	0	
 0	0	0	0	0	0	0	0	0	0	0	
-0	0	0	0	0	0	0	2.27043e-17	0	0	0	
+0	0	0	0	0	0	0	6.00574e-17	0	0	0	
 0	0	0	0	0	0	5.8559e-19	0	0	0	0	
 0	0	0	0	0	0	0	0	0	0	0	
 0	0	0	0	9.04245e-19	0	0	0	0	0	0	
-0	0	0	2.09217e-18	0	0	0	0	0	0	0	
+0	0	0	4.49632e-19	0	0	0	0	0	0	0	
 0	0	0	0	0	0	0	0	0	0	0	
 0	0	0	0	0	0	0	0	0	0	0	
 0	0	0	0	0	0	0	0	0	0	0	
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.0623494, xx[1] = 0.503752, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.0623494, xx[1] = 0.503752
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (0.579359 , 9.20045e-05)
@@ -712,11 +712,11 @@ TUtil::SumMatrixElementPDF: The number of ME instances: 4. MEsq[ip][jp] =
 0	0	0	0	0	0	0	0	0	0	0	
 0	0	0	0	0	0	0	0	0	0	0	
 0	0	0	0	0	0	0	0	0	0	0	
-0	0	0	0	0	0	0	2.27043e-17	0	0	0	
+0	0	0	0	0	0	0	6.00574e-17	0	0	0	
 0	0	0	0	0	0	5.8559e-19	0	0	0	0	
 0	0	0	0	0	0	0	0	0	0	0	
 0	0	0	0	9.04245e-19	0	0	0	0	0	0	
-0	0	0	2.09217e-18	0	0	0	0	0	0	0	
+0	0	0	4.49632e-19	0	0	0	0	0	0	0	
 0	0	0	0	0	0	0	0	0	0	0	
 0	0	0	0	0	0	0	0	0	0	0	
 0	0	0	0	0	0	0	0	0	0	0	
@@ -724,8 +724,8 @@ TUtil::SumMatrixElementPDF: Reset AlphaS:
 	Before reset, alphas scale: 62.1137, PDF scale: 62.1137
 TUtil::SumMatrixElementPDF: Reset AlphaS result:
 	After reset, alphas scale: 91.2, PDF scale: 91.2
-End TUtil::SumMatrixElementPDF(1.51349e-17)
-Process bkgWW TEvtProb::XsecCalc_VVXVV: dXsec=1.51349e-17
+End TUtil::SumMatrixElementPDF(3.96696e-17)
+Process bkgWW TEvtProb::XsecCalc_VVXVV: dXsec=3.96696e-17
 End XsecCalc_VVXVV
 TEvtProb::SetHiggsMass(125, -1, -1):
 	hmass: 125, 0.00407
@@ -734,7 +734,7 @@ TEvtProb::SetHiggsMass(125, -1, -1):
 	MCFM h2mass: -1, 0
 Mela::getConstant: Constant is 1
 Mela: End computeProdDecP
-pVAMCFM_wbfWW_bkg: 1.51349e-17
+pVAMCFM_wbfWW_bkg: 3.96696e-17
 
 Mela: Begin computeProdDecP
 TEvtProb::SetHiggsMass(125, -1, 1):
@@ -790,12 +790,12 @@ TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	(r1, r2) = (0.548372, 0)
 	(q1, q2) = (-1, 0)
 	plabels:
-	[0]=ppppeleanlnadadq            
-	[1]=ppeleanlnadadq            
-	[2]=eleanlnadadq            
-	[3]=eanlnadadq            
-	[4]=nlnadadq            
-	[5]=nadadq            
+	[0]=ppppeleanekedadq            
+	[1]=ppeleanekedadq            
+	[2]=eleanekedadq            
+	[3]=eanekedadq            
+	[4]=nekedadq            
+	[5]=kedadq            
 	[6]=dadq            
 	[7]=dq            
 	[8]=            
@@ -839,7 +839,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.0623494, xx[1] = 0.503752, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.0623494, xx[1] = 0.503752
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (0.579359 , 9.20045e-05)
@@ -937,12 +937,12 @@ TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	(r1, r2) = (0.548372, 0)
 	(q1, q2) = (-1, 0)
 	plabels:
-	[0]=ppppeleanlnadadq            
-	[1]=ppeleanlnadadq            
-	[2]=eleanlnadadq            
-	[3]=eanlnadadq            
-	[4]=nlnadadq            
-	[5]=nadadq            
+	[0]=ppppeleanekedadq            
+	[1]=ppeleanekedadq            
+	[2]=eleanekedadq            
+	[3]=eanekedadq            
+	[4]=nekedadq            
+	[5]=kedadq            
 	[6]=dadq            
 	[7]=dq            
 	[8]=            
@@ -986,7 +986,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.0623494, xx[1] = 0.503752, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.0623494, xx[1] = 0.503752
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (0.579359 , 9.20045e-05)
@@ -1084,12 +1084,12 @@ TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	(r1, r2) = (0.548372, 0)
 	(q1, q2) = (-1, 0)
 	plabels:
-	[0]=ppppeleanlnadadq            
-	[1]=ppeleanlnadadq            
-	[2]=eleanlnadadq            
-	[3]=eanlnadadq            
-	[4]=nlnadadq            
-	[5]=nadadq            
+	[0]=ppppeleanekedadq            
+	[1]=ppeleanekedadq            
+	[2]=eleanekedadq            
+	[3]=eanekedadq            
+	[4]=nekedadq            
+	[5]=kedadq            
 	[6]=dadq            
 	[7]=dq            
 	[8]=            
@@ -1133,7 +1133,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.0623494, xx[1] = 0.503752, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.0623494, xx[1] = 0.503752
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (0.579359 , 9.20045e-05)
@@ -1231,12 +1231,12 @@ TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	(r1, r2) = (0.548372, 0)
 	(q1, q2) = (-1, 0)
 	plabels:
-	[0]=ppppeleanlnadadq            
-	[1]=ppeleanlnadadq            
-	[2]=eleanlnadadq            
-	[3]=eanlnadadq            
-	[4]=nlnadadq            
-	[5]=nadadq            
+	[0]=ppppeleanekedadq            
+	[1]=ppeleanekedadq            
+	[2]=eleanekedadq            
+	[3]=eanekedadq            
+	[4]=nekedadq            
+	[5]=kedadq            
 	[6]=dadq            
 	[7]=dq            
 	[8]=            
@@ -1280,7 +1280,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.0623494, xx[1] = 0.503752, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.0623494, xx[1] = 0.503752
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (0.579359 , 9.20045e-05)
@@ -1375,10 +1375,10 @@ TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	(r1, r2) = (0.548372, 0.548372)
 	(q1, q2) = (-1, -1)
 	plabels:
-	[0]=ppppeleaeleadadq            
-	[1]=ppeleaeleadadq            
-	[2]=eleaeleadadq            
-	[3]=eaeleadadq            
+	[0]=ppppmlmaeleadadq            
+	[1]=ppmlmaeleadadq            
+	[2]=mlmaeleadadq            
+	[3]=maeleadadq            
 	[4]=eleadadq            
 	[5]=eadadq            
 	[6]=dadq            
@@ -1424,7 +1424,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.0623494, xx[1] = 0.503752, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.0623494, xx[1] = 0.503752
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (0.579359 , 9.20045e-05)

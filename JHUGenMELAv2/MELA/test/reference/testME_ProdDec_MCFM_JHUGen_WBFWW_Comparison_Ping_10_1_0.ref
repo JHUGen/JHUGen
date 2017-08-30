@@ -7,7 +7,7 @@ Production variables:
 	JHUGen (mass, width): (125, 0.00407)
 	JHUGen propagator: 4.39991e-07
 Bkg
-	MCFM ME: 2.72848e-17
+	MCFM ME: 7.03567e-17
 0mplus
 	JHUGen decay-alone: 6.64386e-06
 	JHUGen prod.-alone: 6.53493e-15
@@ -312,8 +312,8 @@ Bkg
 	0	0	0	0	0	0	0	0	0	0	0
 	0	0	0	0	0	0	0	0	0	0	0
 	0	0	0	0	0	0	0	0	0	1.09326e-20	0
-	0	0	0	0	0	0	0	0	2.89987e-21	0	0
-	0	0	0	0	0	0	0	1.48267e-17	0	0	0
+	0	0	0	0	0	0	0	0	3.16218e-21	0	0
+	0	0	0	0	0	0	0	3.83691e-17	0	0	0
 	0	0	0	0	0	0	2.40776e-19	0	0	0	0
 	0	0	0	0	0	0	0	0	0	0	0
 	MCFM 0mplus/Bkg Ratio

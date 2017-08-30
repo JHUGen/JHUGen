@@ -95,7 +95,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -240,7 +240,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -385,7 +385,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -530,7 +530,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -675,7 +675,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -820,7 +820,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -965,7 +965,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -1110,7 +1110,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -1255,7 +1255,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -1400,7 +1400,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -1545,7 +1545,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -1690,7 +1690,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -1835,7 +1835,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -1980,7 +1980,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -2125,7 +2125,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -2270,7 +2270,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -2415,7 +2415,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -2560,7 +2560,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -2705,7 +2705,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -2850,7 +2850,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -2945,7 +2945,7 @@ TUtil::JHUGenMatEl: MatElSq after division = 11229.5
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -3028,7 +3028,7 @@ TUtil::JHUGenMatEl: MatElSq after division = 24972.7
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -3111,7 +3111,7 @@ TUtil::JHUGenMatEl: MatElSq after division = 24056.8
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -3194,7 +3194,7 @@ TUtil::JHUGenMatEl: MatElSq after division = 69589.5
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -3277,7 +3277,7 @@ TUtil::JHUGenMatEl: MatElSq after division = 32589
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -3360,7 +3360,7 @@ TUtil::JHUGenMatEl: MatElSq after division = 33555.4
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -3443,7 +3443,7 @@ TUtil::JHUGenMatEl: MatElSq after division = 2524.93
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -3526,7 +3526,7 @@ TUtil::JHUGenMatEl: MatElSq after division = 11229.5
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -3609,7 +3609,7 @@ TUtil::JHUGenMatEl: MatElSq after division = 22459
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -3692,7 +3692,7 @@ TUtil::JHUGenMatEl: MatElSq after division = 22459
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -3839,7 +3839,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -3984,7 +3984,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -4129,7 +4129,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -4274,7 +4274,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -4419,7 +4419,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -4564,7 +4564,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -4709,7 +4709,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -4854,7 +4854,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -4999,7 +4999,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -5144,7 +5144,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -5289,7 +5289,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -5434,7 +5434,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -5579,7 +5579,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -5724,7 +5724,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -5869,7 +5869,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -6014,7 +6014,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -6159,7 +6159,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -6304,7 +6304,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -6449,7 +6449,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -6594,7 +6594,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -6739,7 +6739,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -6884,7 +6884,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -7029,7 +7029,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -7174,7 +7174,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -7319,7 +7319,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -7464,7 +7464,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -7609,7 +7609,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -7754,7 +7754,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -7899,7 +7899,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -8044,7 +8044,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -8189,7 +8189,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -8284,7 +8284,7 @@ TUtil::JHUGenMatEl: MatElSq after division = 359.696
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -8367,7 +8367,7 @@ TUtil::JHUGenMatEl: MatElSq after division = 99.1342
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -8450,7 +8450,7 @@ TUtil::JHUGenMatEl: MatElSq after division = 94.3085
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -8533,7 +8533,7 @@ TUtil::JHUGenMatEl: MatElSq after division = 922.555
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -8616,7 +8616,7 @@ TUtil::JHUGenMatEl: MatElSq after division = 876.547
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -8699,7 +8699,7 @@ TUtil::JHUGenMatEl: MatElSq after division = 0
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -8782,7 +8782,7 @@ TUtil::JHUGenMatEl: MatElSq after division = 0
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -8865,7 +8865,7 @@ TUtil::JHUGenMatEl: MatElSq after division = 628.509
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -8948,7 +8948,7 @@ TUtil::JHUGenMatEl: MatElSq after division = 449.815
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -9031,7 +9031,7 @@ TUtil::JHUGenMatEl: MatElSq after division = 132.424
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -9114,7 +9114,7 @@ TUtil::JHUGenMatEl: MatElSq after division = 1295.8
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -9197,7 +9197,7 @@ TUtil::JHUGenMatEl: MatElSq after division = 359.696
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -9280,7 +9280,7 @@ TUtil::JHUGenMatEl: MatElSq after division = 359.696
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -9363,7 +9363,7 @@ TUtil::JHUGenMatEl: MatElSq after division = 454.907
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -9446,7 +9446,7 @@ TUtil::JHUGenMatEl: MatElSq after division = 290.05
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -9529,7 +9529,7 @@ TUtil::JHUGenMatEl: MatElSq after division = 1337.92
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -9612,7 +9612,7 @@ TUtil::JHUGenMatEl: MatElSq after division = 2356.62
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -9695,7 +9695,7 @@ TUtil::JHUGenMatEl: MatElSq after division = 359.696
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -9778,7 +9778,7 @@ TUtil::JHUGenMatEl: MatElSq after division = 359.696
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -9861,7 +9861,7 @@ TUtil::JHUGenMatEl: MatElSq after division = 359.696
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -9944,7 +9944,7 @@ TUtil::JHUGenMatEl: MatElSq after division = 719.391
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -10027,7 +10027,7 @@ TUtil::JHUGenMatEl: MatElSq after division = 719.391
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -10181,7 +10181,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -10319,7 +10319,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -10464,7 +10464,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -10609,7 +10609,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -10754,7 +10754,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -10899,7 +10899,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)
@@ -11032,7 +11032,7 @@ TUtil::WipeMEArray: Initial MEsq:
 Begin TUtil::SumMEPDF
 Begin TUtil::ComputePDF
 TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-08
-TUtil::ComputePDF: Calling setpdfs
+TUtil::ComputePDF: Calling setpdfs with xx[0]: 0.000160041, xx[1] = 0.577649
 TUtil::ComputePDF: called
 End TUtil::ComputePDF:
 (fx1, fx2)[-5] = (11709.9 , 2.18497e-05)

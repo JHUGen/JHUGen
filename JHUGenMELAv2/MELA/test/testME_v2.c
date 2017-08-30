@@ -3528,7 +3528,7 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_TU_Comparison_Ping(int motherflavor=0, i
     }
   }
 
-  TVar::Production prod, prod_tu;
+  TVar::Production prod, prod_tu, prod_stu;
   if (vbfvhchannel==1){
     if (
       (idMother[0]==-idMother[1] && idMother[0]!=0)
@@ -3545,10 +3545,23 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_TU_Comparison_Ping(int motherflavor=0, i
   }
   else doEval=false;
 
-  if (prod==TVar::Had_ZH_S) prod_tu=TVar::Had_ZH_TU;
-  else if (prod==TVar::Had_WH_S) prod_tu=TVar::Had_WH_TU;
-  else if (prod==TVar::Lep_ZH_S) prod_tu=TVar::Lep_ZH_TU;
-  else if (prod==TVar::Lep_WH_S) prod_tu=TVar::Lep_WH_TU;
+  if (prod==TVar::Had_ZH_S){
+    prod_tu=TVar::Had_ZH_TU;
+    prod_stu=TVar::Had_ZH;
+  }
+  else if (prod==TVar::Had_WH_S){
+    prod_tu=TVar::Had_WH_TU;
+    prod_stu=TVar::Had_WH;
+  }
+  else if (prod==TVar::Lep_ZH_S){
+    prod_tu=TVar::Lep_ZH_TU;
+    prod_stu=TVar::Lep_ZH;
+  }
+  else if (prod==TVar::Lep_WH_S){
+    prod_tu=TVar::Lep_WH_TU;
+    prod_stu=TVar::Lep_WH;
+  }
+  else doEval=false;
 
   if (doEval){
     ofstream tout(outname.Data());
@@ -3579,6 +3592,15 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_TU_Comparison_Ping(int motherflavor=0, i
     mcfmme p_prod_tu_fa3ZA_dec_fa3ZA_VAMCFM;
     mcfmme p_prod_tu_0minusAA_dec_0minusAA_VAMCFM;
     mcfmme p_prod_tu_fa3AA_dec_fa3AA_VAMCFM;
+
+    mcfmme p_bkg_stu_VAMCFM;
+    mcfmme p_prod_stu_0mplus_dec_0mplus_VAMCFM;
+    mcfmme p_prod_stu_0minus_dec_0minus_VAMCFM;
+    mcfmme p_prod_stu_fa3_dec_fa3_VAMCFM;
+    mcfmme p_prod_stu_0minusZA_dec_0minusZA_VAMCFM;
+    mcfmme p_prod_stu_fa3ZA_dec_fa3ZA_VAMCFM;
+    mcfmme p_prod_stu_0minusAA_dec_0minusAA_VAMCFM;
+    mcfmme p_prod_stu_fa3AA_dec_fa3AA_VAMCFM;
 
     float mzz = 0;
     float mjj = 0;
@@ -3808,20 +3830,24 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_TU_Comparison_Ping(int motherflavor=0, i
 
     //spinzerohiggs_anomcoupl_.AnomalCouplDK=1; // Test prod*decay couplings
 
-    mela.setProcess(TVar::HSMHiggs, TVar::MCFM, prod);
     cout << "MCFM production chosen: " << TVar::ProductionName(prod) << endl;
     cout << "spinzerohiggs_anomcoupl_.AnomalCouplDK=" << spinzerohiggs_anomcoupl_.AnomalCouplDK << endl;
-
+    cerr << "S 1" << endl;
+    
+    mela.setProcess(TVar::HSMHiggs, TVar::MCFM, prod);
+    mela.setRenFacScaleMode(TVar::Fixed_mH, TVar::Fixed_mH, 1, 1);
     if (isZZWW!=2){ mela.selfDHzzcoupl[0][gHIGGS_VV_1][0]=1; if (isZZWW==1) mela.differentiate_HWW_HZZ=true; }
     else{ mela.selfDHwwcoupl[0][gHIGGS_VV_1][0]=1; mela.differentiate_HWW_HZZ=true; }
     mela.computeProdDecP(p_prod_0mplus_dec_0mplus_VAMCFM.proddecme, false);
     mela.getIORecord()->getUnweightedMEArray(p_prod_0mplus_dec_0mplus_VAMCFM.mearray);
-
+    /*
+    mela.setRenFacScaleMode(TVar::Fixed_mH, TVar::Fixed_mH, 1, 1);
     if (isZZWW!=2){ mela.selfDHzzcoupl[0][gHIGGS_VV_4][0]=1; if (isZZWW==1) mela.differentiate_HWW_HZZ=true; }
     else{ mela.selfDHwwcoupl[0][gHIGGS_VV_4][0]=1; mela.differentiate_HWW_HZZ=true; }
     mela.computeProdDecP(p_prod_0minus_dec_0minus_VAMCFM.proddecme, false);
     mela.getIORecord()->getUnweightedMEArray(p_prod_0minus_dec_0minus_VAMCFM.mearray);
 
+    mela.setRenFacScaleMode(TVar::Fixed_mH, TVar::Fixed_mH, 1, 1);
     if (isZZWW!=2){ mela.selfDHzzcoupl[0][gHIGGS_VV_1][0]=1; mela.selfDHzzcoupl[0][gHIGGS_VV_4][0]=1; if (isZZWW==1) mela.differentiate_HWW_HZZ=true; }
     else{ mela.selfDHwwcoupl[0][gHIGGS_VV_1][0]=1; mela.selfDHwwcoupl[0][gHIGGS_VV_4][0]=1; mela.differentiate_HWW_HZZ=true; }
     mela.computeProdDecP(p_prod_fa3_dec_fa3_VAMCFM.proddecme, false);
@@ -3838,22 +3864,26 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_TU_Comparison_Ping(int motherflavor=0, i
     }
 
     if (testZAcoupl){
+      mela.setRenFacScaleMode(TVar::Fixed_mH, TVar::Fixed_mH, 1, 1);
       mela.selfDHzzcoupl[0][gHIGGS_ZA_4][0]=1;
       mela.differentiate_HWW_HZZ=true;
       mela.computeProdDecP(p_prod_0minusZA_dec_0minusZA_VAMCFM.proddecme, false);
       mela.getIORecord()->getUnweightedMEArray(p_prod_0minusZA_dec_0minusZA_VAMCFM.mearray);
 
+      mela.setRenFacScaleMode(TVar::Fixed_mH, TVar::Fixed_mH, 1, 1);
       mela.selfDHzzcoupl[0][gHIGGS_AA_4][0]=1;
       mela.differentiate_HWW_HZZ=true;
       mela.computeProdDecP(p_prod_0minusAA_dec_0minusAA_VAMCFM.proddecme, false);
       mela.getIORecord()->getUnweightedMEArray(p_prod_0minusAA_dec_0minusAA_VAMCFM.mearray);
 
+      mela.setRenFacScaleMode(TVar::Fixed_mH, TVar::Fixed_mH, 1, 1);
       mela.selfDHzzcoupl[0][gHIGGS_VV_1][0]=1;
       mela.selfDHzzcoupl[0][gHIGGS_ZA_4][0]=1;
       mela.differentiate_HWW_HZZ=true;
       mela.computeProdDecP(p_prod_fa3ZA_dec_fa3ZA_VAMCFM.proddecme, false);
       mela.getIORecord()->getUnweightedMEArray(p_prod_fa3ZA_dec_fa3ZA_VAMCFM.mearray);
 
+      mela.setRenFacScaleMode(TVar::Fixed_mH, TVar::Fixed_mH, 1, 1);
       mela.selfDHzzcoupl[0][gHIGGS_VV_1][0]=1;
       mela.selfDHzzcoupl[0][gHIGGS_AA_4][0]=1;
       mela.differentiate_HWW_HZZ=true;
@@ -3861,11 +3891,14 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_TU_Comparison_Ping(int motherflavor=0, i
       mela.getIORecord()->getUnweightedMEArray(p_prod_fa3AA_dec_fa3AA_VAMCFM.mearray);
     }
 
+    //mela.setVerbosity(TVar::DEBUG_VERBOSE);
+    mela.setRenFacScaleMode(TVar::Fixed_mH, TVar::Fixed_mH, 1, 1);
     if (isZZWW==1) mela.setProcess(TVar::bkgZZ, TVar::MCFM, prod);
     else mela.setProcess(TVar::bkgWW, TVar::MCFM, prod);
     mela.computeProdDecP(p_bkg_VAMCFM.proddecme, false);
     mela.getIORecord()->getUnweightedMEArray(p_bkg_VAMCFM.mearray);
-
+    //mela.setVerbosity(verbosity);
+    */
 
     mela.setCurrentCandidateFromIndex(0);
     cand = mela.getCurrentCandidate();
@@ -3885,20 +3918,23 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_TU_Comparison_Ping(int motherflavor=0, i
 
     //spinzerohiggs_anomcoupl_.AnomalCouplDK=1; // Test prod*decay couplings
 
-    mela.setProcess(TVar::HSMHiggs, TVar::MCFM, prod_tu);
     cout << "MCFM production chosen: " << TVar::ProductionName(prod_tu) << endl;
     cout << "spinzerohiggs_anomcoupl_.AnomalCouplDK=" << spinzerohiggs_anomcoupl_.AnomalCouplDK << endl;
-
+    
+    mela.setProcess(TVar::HSMHiggs, TVar::MCFM, prod_tu);
+    mela.setRenFacScaleMode(TVar::Fixed_mH, TVar::Fixed_mH, 1, 1);
     if (isZZWW!=2){ mela.selfDHzzcoupl[0][gHIGGS_VV_1][0]=1; if (isZZWW==1) mela.differentiate_HWW_HZZ=true; }
     else{ mela.selfDHwwcoupl[0][gHIGGS_VV_1][0]=1; mela.differentiate_HWW_HZZ=true; }
     mela.computeProdDecP(p_prod_tu_0mplus_dec_0mplus_VAMCFM.proddecme, false);
     mela.getIORecord()->getUnweightedMEArray(p_prod_tu_0mplus_dec_0mplus_VAMCFM.mearray);
-
+    /*
+    mela.setRenFacScaleMode(TVar::Fixed_mH, TVar::Fixed_mH, 1, 1);
     if (isZZWW!=2){ mela.selfDHzzcoupl[0][gHIGGS_VV_4][0]=1; if (isZZWW==1) mela.differentiate_HWW_HZZ=true; }
     else{ mela.selfDHwwcoupl[0][gHIGGS_VV_4][0]=1; mela.differentiate_HWW_HZZ=true; }
     mela.computeProdDecP(p_prod_tu_0minus_dec_0minus_VAMCFM.proddecme, false);
     mela.getIORecord()->getUnweightedMEArray(p_prod_tu_0minus_dec_0minus_VAMCFM.mearray);
 
+    mela.setRenFacScaleMode(TVar::Fixed_mH, TVar::Fixed_mH, 1, 1);
     if (isZZWW!=2){ mela.selfDHzzcoupl[0][gHIGGS_VV_1][0]=1; mela.selfDHzzcoupl[0][gHIGGS_VV_4][0]=1; if (isZZWW==1) mela.differentiate_HWW_HZZ=true; }
     else{ mela.selfDHwwcoupl[0][gHIGGS_VV_1][0]=1; mela.selfDHwwcoupl[0][gHIGGS_VV_4][0]=1; mela.differentiate_HWW_HZZ=true; }
     mela.computeProdDecP(p_prod_tu_fa3_dec_fa3_VAMCFM.proddecme, false);
@@ -3915,22 +3951,26 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_TU_Comparison_Ping(int motherflavor=0, i
     }
 
     if (testZAcoupl){
+      mela.setRenFacScaleMode(TVar::Fixed_mH, TVar::Fixed_mH, 1, 1);
       mela.selfDHzzcoupl[0][gHIGGS_ZA_4][0]=1;
       mela.differentiate_HWW_HZZ=true;
       mela.computeProdDecP(p_prod_tu_0minusZA_dec_0minusZA_VAMCFM.proddecme, false);
       mela.getIORecord()->getUnweightedMEArray(p_prod_tu_0minusZA_dec_0minusZA_VAMCFM.mearray);
 
+      mela.setRenFacScaleMode(TVar::Fixed_mH, TVar::Fixed_mH, 1, 1);
       mela.selfDHzzcoupl[0][gHIGGS_AA_4][0]=1;
       mela.differentiate_HWW_HZZ=true;
       mela.computeProdDecP(p_prod_tu_0minusAA_dec_0minusAA_VAMCFM.proddecme, false);
       mela.getIORecord()->getUnweightedMEArray(p_prod_tu_0minusAA_dec_0minusAA_VAMCFM.mearray);
 
+      mela.setRenFacScaleMode(TVar::Fixed_mH, TVar::Fixed_mH, 1, 1);
       mela.selfDHzzcoupl[0][gHIGGS_VV_1][0]=1;
       mela.selfDHzzcoupl[0][gHIGGS_ZA_4][0]=1;
       mela.differentiate_HWW_HZZ=true;
       mela.computeProdDecP(p_prod_tu_fa3ZA_dec_fa3ZA_VAMCFM.proddecme, false);
       mela.getIORecord()->getUnweightedMEArray(p_prod_tu_fa3ZA_dec_fa3ZA_VAMCFM.mearray);
 
+      mela.setRenFacScaleMode(TVar::Fixed_mH, TVar::Fixed_mH, 1, 1);
       mela.selfDHzzcoupl[0][gHIGGS_VV_1][0]=1;
       mela.selfDHzzcoupl[0][gHIGGS_AA_4][0]=1;
       mela.differentiate_HWW_HZZ=true;
@@ -3938,12 +3978,18 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_TU_Comparison_Ping(int motherflavor=0, i
       mela.getIORecord()->getUnweightedMEArray(p_prod_tu_fa3AA_dec_fa3AA_VAMCFM.mearray);
     }
 
-    mela.setVerbosity(TVar::DEBUG_VERBOSE);
+    //mela.setVerbosity(TVar::DEBUG_VERBOSE);
+    mela.setRenFacScaleMode(TVar::Fixed_mH, TVar::Fixed_mH, 1, 1);
     if (isZZWW==1) mela.setProcess(TVar::bkgZZ, TVar::MCFM, prod_tu);
     else mela.setProcess(TVar::bkgWW, TVar::MCFM, prod_tu);
     mela.computeProdDecP(p_bkg_tu_VAMCFM.proddecme, false);
     mela.getIORecord()->getUnweightedMEArray(p_bkg_tu_VAMCFM.mearray);
-    mela.setVerbosity(verbosity);
+    //mela.setVerbosity(verbosity);
+    */
+
+    // Reset these in case the function needs to be repeated
+    spinzerohiggs_anomcoupl_.AnomalCouplDK=1;
+    spinzerohiggs_anomcoupl_.AnomalCouplPR=1;
 
     cout << "Production variables:\n";
     cout << "\tmJJ = " << mjj << endl;
@@ -3972,6 +4018,18 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_TU_Comparison_Ping(int motherflavor=0, i
     cout << "fa3AA" << endl;
     cout << "\tMCFM s ME: " << p_prod_fa3AA_dec_fa3AA_VAMCFM.proddecme << endl;
     cout << "\tMCFM tu ME: " << p_prod_tu_fa3AA_dec_fa3AA_VAMCFM.proddecme << endl;
+
+    cout << "Arrays:" << endl;
+    cout << "0mplus" << endl;
+    cout << "\tMCFM s" << endl;
+    p_prod_0mplus_dec_0mplus_VAMCFM.printarray();
+    cout << "\tMCFM tu" << endl;
+    p_prod_tu_0mplus_dec_0mplus_VAMCFM.printarray();
+    cout << "Bkg" << endl;
+    cout << "\tMCFM s" << endl;
+    p_bkg_VAMCFM.printarray();
+    cout << "\tMCFM tu" << endl;
+    p_bkg_tu_VAMCFM.printarray();
 
     mela.resetInputEvent();
 
