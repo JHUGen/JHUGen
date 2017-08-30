@@ -3521,20 +3521,20 @@ double TUtil::SumMatrixElementPDF(
     TUtil::MCFM_chooser(process, production, leptonInterf, verbosity, mela_event); // Set some of the specifics of the process through this function
   if (doProceed) doProceed = TUtil::MCFM_SetupParticleCouplings(process, production, verbosity, mela_event, &partOrder, &apartOrder); // Set the specifics of the daughter or associated particle couplings through this function
   if (doProceed){
-  if (partOrder.size()!=mela_event.pDaughters.size()){
+    if (partOrder.size()!=mela_event.pDaughters.size()){
       if (verbosity >= TVar::ERROR){
         cerr << "TUtil::SumMatrixElementPDF: Ordering size " << partOrder.size() << " and number of daughter particles " << mela_event.pDaughters.size() << " are not the same!" << endl;
         TUtil::PrintCandidateSummary(&mela_event);
       }
-    doProceed=false;
-  }
-  if (apartOrder.size()!=mela_event.pAssociated.size()){
+      doProceed=false;
+    }
+    if (apartOrder.size()!=mela_event.pAssociated.size()){
       if (verbosity >= TVar::ERROR){
         cerr << "TUtil::SumMatrixElementPDF: Ordering size " << apartOrder.size() << " and number of associated particles " << mela_event.pAssociated.size() << " are not the same!" << endl;
         TUtil::PrintCandidateSummary(&mela_event);
       }
-    doProceed=false;
-  }
+      doProceed=false;
+    }
   }
   if (doProceed){
     int NPart=npart_.npart+2; // +2 for mothers
@@ -3744,47 +3744,47 @@ double TUtil::SumMatrixElementPDF(
           }
           else{//
             */
-          qq_zzqq_(p4[0], msq[0]);
-          if (PDGHelpers::isAnUnknownJet(id[partOrder.size()+2]) && PDGHelpers::isAnUnknownJet(id[partOrder.size()+3])){
-            for (unsigned int ix=0; ix<4; ix++){
-              for (int ip=0; ip<mxpart; ip++) p4_tmp[ix][ip]=p4[ix][ip];
-              swap(p4_tmp[ix][partOrder.size()+2], p4_tmp[ix][partOrder.size()+3]);
+            qq_zzqq_(p4[0], msq[0]);
+            if (PDGHelpers::isAnUnknownJet(id[partOrder.size()+2]) && PDGHelpers::isAnUnknownJet(id[partOrder.size()+3])){
+              for (unsigned int ix=0; ix<4; ix++){
+                for (int ip=0; ip<mxpart; ip++) p4_tmp[ix][ip]=p4[ix][ip];
+                swap(p4_tmp[ix][partOrder.size()+2], p4_tmp[ix][partOrder.size()+3]);
+              }
+              qq_zzqq_(p4_tmp[0], msq_tmp[0]);
+              for (int iquark=-5; iquark<=5; iquark++){ for (int jquark=-5; jquark<=5; jquark++){ msq[jquark+5][iquark+5] = (msq[jquark+5][iquark+5] + msq_tmp[jquark+5][iquark+5]); if (iquark==jquark) msq[jquark+5][iquark+5]*=0.5; } }
             }
-            qq_zzqq_(p4_tmp[0], msq_tmp[0]);
-            for (int iquark=-5; iquark<=5; iquark++){ for (int jquark=-5; jquark<=5; jquark++){ msq[jquark+5][iquark+5] = (msq[jquark+5][iquark+5] + msq_tmp[jquark+5][iquark+5]); if (iquark==jquark) msq[jquark+5][iquark+5]*=0.5; } }
-          }
-          else if (PDGHelpers::isAnUnknownJet(id[partOrder.size()+2]) || PDGHelpers::isAnUnknownJet(id[partOrder.size()+3])){
-            for (unsigned int ix=0; ix<4; ix++){
-              for (int ip=0; ip<mxpart; ip++) p4_tmp[ix][ip]=p4[ix][ip];
-              swap(p4_tmp[ix][partOrder.size()+2], p4_tmp[ix][partOrder.size()+3]);
-            }
-            TString strlabel[2] ={ (plabel_.plabel)[7], (plabel_.plabel)[6] }; for (unsigned int il=0; il<2; il++) strlabel[il].Resize(2);
-            for (int ip=0; ip<mxpart; ip++){
-              if (ip!=6 && ip!=7) sprintf((plabel_.plabel)[ip], (plabel_.plabel)[ip]);
-              else sprintf((plabel_.plabel)[ip], strlabel[ip-6].Data());
-            }
-            qq_zzqq_(p4_tmp[0], msq_tmp[0]);
-            if (verbosity>=TVar::DEBUG){
-              cout << "TUtil::SumMatrixElementPDF: Adding missing contributions:\n";
-              cout << "\tplabels:\n";
-              for (int ip=0; ip<mxpart; ip++) cout << "\t[" << ip << "]=" << (plabel_.plabel)[ip] << endl;
-              cout << "\tMEsq initial:" << endl;
+            else if (PDGHelpers::isAnUnknownJet(id[partOrder.size()+2]) || PDGHelpers::isAnUnknownJet(id[partOrder.size()+3])){
+              for (unsigned int ix=0; ix<4; ix++){
+                for (int ip=0; ip<mxpart; ip++) p4_tmp[ix][ip]=p4[ix][ip];
+                swap(p4_tmp[ix][partOrder.size()+2], p4_tmp[ix][partOrder.size()+3]);
+              }
+              TString strlabel[2] ={ (plabel_.plabel)[7], (plabel_.plabel)[6] }; for (unsigned int il=0; il<2; il++) strlabel[il].Resize(2);
+              for (int ip=0; ip<mxpart; ip++){
+                if (ip!=6 && ip!=7) sprintf((plabel_.plabel)[ip], (plabel_.plabel)[ip]);
+                else sprintf((plabel_.plabel)[ip], strlabel[ip-6].Data());
+              }
+              qq_zzqq_(p4_tmp[0], msq_tmp[0]);
+              if (verbosity>=TVar::DEBUG){
+                cout << "TUtil::SumMatrixElementPDF: Adding missing contributions:\n";
+                cout << "\tplabels:\n";
+                for (int ip=0; ip<mxpart; ip++) cout << "\t[" << ip << "]=" << (plabel_.plabel)[ip] << endl;
+                cout << "\tMEsq initial:" << endl;
+                for (int iquark=-5; iquark<=5; iquark++){
+                  for (int jquark=-5; jquark<=5; jquark++) cout << msq[jquark+5][iquark+5] << '\t';
+                  cout << endl;
+                }
+                cout << "\tMEsq added:" << endl;
+                for (int iquark=-5; iquark<=5; iquark++){
+                  for (int jquark=-5; jquark<=5; jquark++) cout << msq_tmp[jquark+5][iquark+5] << '\t';
+                  cout << endl;
+                }
+              }
               for (int iquark=-5; iquark<=5; iquark++){
-                for (int jquark=-5; jquark<=5; jquark++) cout << msq[jquark+5][iquark+5] << '\t';
-                cout << endl;
-              }
-              cout << "\tMEsq added:" << endl;
-              for (int iquark=-5; iquark<=5; iquark++){
-                for (int jquark=-5; jquark<=5; jquark++) cout << msq_tmp[jquark+5][iquark+5] << '\t';
-                cout << endl;
+                for (int jquark=-5; jquark<=5; jquark++){
+                  if (msq[jquark+5][iquark+5]==0.) msq[jquark+5][iquark+5] = msq_tmp[jquark+5][iquark+5];
+                }
               }
             }
-            for (int iquark=-5; iquark<=5; iquark++){
-              for (int jquark=-5; jquark<=5; jquark++){
-                if (msq[jquark+5][iquark+5]==0.) msq[jquark+5][iquark+5] = msq_tmp[jquark+5][iquark+5];
-              }
-            }
-          }
           //}//
         }
         else if (
