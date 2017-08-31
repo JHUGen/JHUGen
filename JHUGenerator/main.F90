@@ -1972,7 +1972,7 @@ logical :: UseBetaVersion=.false.
 
 
     if( Process.ge.66 .and. Process.le.68 ) call init_VBFoffshChannelHash()
-    if( Process.ge.69 ) call Error("Missing ChannelHash for Process 69")
+    if( Process.ge.69 .and. Process.le.79 ) call Error("Missing ChannelHash for Process 69") !can change 79 if we add more processes in between
 
 if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !----------------------- weighted events
 
