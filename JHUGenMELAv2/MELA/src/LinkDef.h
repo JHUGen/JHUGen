@@ -64,7 +64,7 @@
 #pragma link C++ class SpinTwoCouplings;
 #pragma link C++ class TEvtProb;
 #pragma link C++ class Mela;
-#pragma link C++ class newZZMatrixElement;
+#pragma link C++ class ZZMatrixElement;
 
 
 #endif

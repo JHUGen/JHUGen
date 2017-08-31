@@ -70,6 +70,8 @@ public:
   void AllowSeparateWWCouplings(bool doAllow=false);
   void ResetMass(double inmass, int ipart);
   void ResetWidth(double inwidth, int ipart);
+  void SetZprimeMassWidth(double inmass, double inwidth);
+  void SetWprimeMassWidth(double inmass, double inwidth);
   void ResetQuarkMasses();
   void ResetMCFM_EWKParameters(double ext_Gf, double ext_aemmz, double ext_mW, double ext_mZ, double ext_xW, int ext_ewscheme=3);
   void ResetCouplings();

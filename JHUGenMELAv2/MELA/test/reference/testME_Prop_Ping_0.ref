@@ -12,7 +12,7 @@ TEvtProb::SetHiggsMass(125, -1, -1):
 	h2mass: -1, 0
 	MCFM hmass: 125, 0.00407
 	MCFM h2mass: -1, 0
-prop[0]: 1e-08
+prop[0]: 1
 TEvtProb::SetHiggsMass(500, -1, -1):
 	hmass: 500, 68
 	h2mass: -1, 0

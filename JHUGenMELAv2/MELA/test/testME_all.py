@@ -127,7 +127,7 @@ for j, ref in enumerate(referencefiles, start=1):
                 ratio = float(number)
             except ValueError:
                 break
-            if ratio != 0 and ratio != 1:
+            if ratio != 0 and ratio != 4:
                 badbkgratios.add(newfile)
         assert i > 1
 

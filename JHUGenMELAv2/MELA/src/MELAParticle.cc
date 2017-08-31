@@ -10,7 +10,14 @@ namespace debugVars{
 
 
 MELAParticle::MELAParticle():
-id(0),
+id(-9000),
+p4(0, 0, 0, 0),
+passSelection(true),
+genStatus(-2),
+lifetime(0)
+{}
+MELAParticle::MELAParticle(int id_) :
+id(id_),
 p4(0, 0, 0, 0),
 passSelection(true),
 genStatus(-2),
@@ -48,12 +55,6 @@ void MELAParticle::swap(MELAParticle& particle_){
   std::swap(daughters, particle_.daughters);
 }
 
-bool MELAParticle::checkParticleExists(MELAParticle* myParticle, std::vector<MELAParticle*>& particleArray){
-  for (std::vector<MELAParticle*>::iterator it = particleArray.begin(); it<particleArray.end(); it++){
-    if ((*it)==myParticle) return true;
-  }
-  return false;
-}
 void MELAParticle::addMother(MELAParticle* myParticle){ if (!checkParticleExists(myParticle, mothers)) mothers.push_back(myParticle); }
 void MELAParticle::addDaughter(MELAParticle* myParticle){ if (!checkParticleExists(myParticle, daughters)) daughters.push_back(myParticle); }
 MELAParticle* MELAParticle::getMother(int index)const{
@@ -66,9 +67,7 @@ MELAParticle* MELAParticle::getDaughter(int index)const{
 }
 std::vector<int> MELAParticle::getDaughterIds()const{
   std::vector<int> result;
-  for (unsigned int idau=0; idau<daughters.size(); idau++){
-    if (daughters.at(idau)!=0) result.push_back(daughters.at(idau)->id);
-  }
+  for (auto& dau:daughters){ if (dau!=0) result.push_back(dau->id); }
   return result;
 }
 void MELAParticle::getRelatedParticles(std::vector<MELAParticle*>& particles){
@@ -103,3 +102,7 @@ void MELAParticle::boost(const TVector3& vec, bool boostAll){
     << std::endl;
 }
 
+bool MELAParticle::checkParticleExists(MELAParticle* myParticle, std::vector<MELAParticle*>& particleArray){
+  for (auto& part : particleArray){ if (part==myParticle) return true; }
+  return false;
+}

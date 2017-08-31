@@ -42,9 +42,9 @@ public:
         H2t4t4coupl[ic][im]=0;
         H2b4b4coupl[ic][im]=0;
       }
-      for (int ic = 0; ic < SIZE_Vp; ic++){
-        Hzpcontact[ic][im]=0;
-        Hwpcontact[ic][im]=0;
+      for (int ic = 0; ic < SIZE_Vpff; ic++){
+        Zpffcoupl[ic][im]=0;
+        Wpffcoupl[ic][im]=0;
       }
     }
     for (int ik=0; ik<SIZE_HVV_CQSQ; ik++){
@@ -59,9 +59,14 @@ public:
         H2wwLambda_qsq[ic][ik] = 100.;
       }
     }
+
+    SetUseVprime(false);
+    SetZPrimeMassWidth(-1, 0);
+    SetWPrimeMassWidth(-1, 0);
   };
   void copy(SpinZeroCouplings& other){
     allow_WWZZSeparation(other.separateWWZZcouplings);
+
     for (int im=0; im<2; im++){
       for (int ic=0; ic<SIZE_HVV; ic++){
         Hzzcoupl[ic][im] = (other.Hzzcoupl)[ic][im];
@@ -89,9 +94,9 @@ public:
         H2t4t4coupl[ic][im]=(other.H2t4t4coupl)[ic][im];
         H2b4b4coupl[ic][im]=(other.H2b4b4coupl)[ic][im];
       }
-      for (int ic=0; ic<SIZE_Vp; ic++){
-        Hzpcontact[ic][im] = (other.Hzpcontact)[ic][im];
-        Hwpcontact[ic][im] = (other.Hwpcontact)[ic][im];
+      for (int ic=0; ic<SIZE_Vpff; ic++){
+        Zpffcoupl[ic][im] = (other.Zpffcoupl)[ic][im];
+        Wpffcoupl[ic][im] = (other.Wpffcoupl)[ic][im];
       }
     }
     for (int ik=0; ik<SIZE_HVV_CQSQ; ik++){
@@ -102,6 +107,12 @@ public:
         HwwLambda_qsq[ic][ik] = (other.HwwLambda_qsq)[ic][ik];
       }
     }
+
+    UseVprime = other.UseVprime;
+    M_Zprime = other.M_Zprime;
+    Ga_Zprime = other.Ga_Zprime;
+    M_Wprime = other.M_Wprime;
+    Ga_Wprime = other.Ga_Wprime;
   };
   SpinZeroCouplings* getRef(){ return this; }
 
@@ -243,7 +254,6 @@ public:
   };
 
   void SetHVVpCouplings(unsigned int index, double c_real, double c_imag, bool setWWp = false, int whichResonance=1){
-    if (!separateWWZZcouplings && setWWp) return;
     if (index>=SIZE_HVV){ std::cerr << "Cannot set index " << index << ", out of range for the type requested." << std::endl; }
     else if (whichResonance!=1) {std::cerr << "Contact terms are only for the first resonance" << std::endl;}
     else{
@@ -257,11 +267,9 @@ public:
       }
     }
   };
-
   void SetHVpVpCouplings(unsigned int index, double c_real, double c_imag, bool setWpWp = false, int whichResonance=1){
-    if (!separateWWZZcouplings && setWpWp) return;
-    if (index>=SIZE_HVV){ std::cerr << "Cannot set index " << index << ", out of range for the type requested." << std::endl; }
-    else if (whichResonance!=1) {std::cerr << "Contact terms are only for the first resonance" << std::endl;}
+    if (whichResonance!=1) { std::cerr << "Contact terms are only for the first resonance" << std::endl; }
+    else if (index>=SIZE_HVV){ std::cerr << "Cannot set index " << index << ", out of range for the type requested." << std::endl; }
     else{
       if (setWpWp){
         Hwpwpcoupl[index][0] = c_real;
@@ -273,43 +281,32 @@ public:
       }
     }
   };
-
-  void SetZpcontactTerms(unsigned int index, double c_real, double c_imag, int whichResonance=1){
-    if (whichResonance!=1) {std::cerr << "Contact terms are only for the first resonance" << std::endl;}
-    else if (index > SIZE_Vp) {
-      std::cerr << "index too big for SetZpcontactTerms: " << index << std::endl;
-    }
-    else {
-      Hzpcontact[index][0] = c_real;
-      Hzpcontact[index][1] = c_imag;
-    }
-  }
-
-  void SetWpcontactTerms(unsigned int index, double c_real, double c_imag, int whichResonance=1){
-    if (whichResonance!=1) {std::cerr << "Contact terms are only for the first resonance" << std::endl;}
-    else if (index > SIZE_Vp) {
-      std::cerr << "index too big for SetWpcontactTerms: " << index << std::endl;
-    }
-    else if (
-             (   index == gHIGGS_Vp_L_N || index == gHIGGS_Vp_R_N
-              || index == gHIGGS_Vp_L_D || index == gHIGGS_Vp_R_D
-              || index == gHIGGS_Vp_L_S || index == gHIGGS_Vp_R_S
-              || index == gHIGGS_Vp_L_B || index == gHIGGS_Vp_R_B
-             ) && (c_real || c_imag)
-            ) {
-      std::cerr << "no W' contact terms for neutrino, down, strange, or bottom (use the lepton or up instead)" << std::endl;
-    }
-    else {
-      Hwpcontact[index][0] = c_real;
-      Hwpcontact[index][1] = c_imag;
+  void SetVpffCouplings(unsigned int index, double c_real, double c_imag, bool setWpff = false, int whichResonance=1){
+    if (whichResonance!=1){ std::cerr << "Contact terms are only for the first resonance" << std::endl; }
+    else if (index>=SIZE_Vpff){ std::cerr << "Cannot set index " << index << ", out of range for the type requested." << std::endl; }
+    else{
+      if (!setWpff){
+        Zpffcoupl[index][0] = c_real;
+        Zpffcoupl[index][1] = c_imag;
+      }
+      else{
+        if (
+          (index == gHIGGS_Vp_NuE_left || index == gHIGGS_Vp_NuE_right
+          || index == gHIGGS_Vp_Dn_left || index == gHIGGS_Vp_Dn_right
+          || index == gHIGGS_Vp_Str_left || index == gHIGGS_Vp_Str_right
+          || index == gHIGGS_Vp_Bot_left || index == gHIGGS_Vp_Bot_right
+          ) && (c_real!=0. || c_imag!=0.)
+          ) std::cerr << "No W' contact terms for neutrino, down, strange, or bottom; use the lepton or up-quark versions instead!" << std::endl;
+        else{
+          Wpffcoupl[index][0] = c_real;
+          Wpffcoupl[index][1] = c_imag;
+        }
+      }
     }
   }
-
-  void SetUseVprime(bool useVp, double mass, double width) {
-    UseVprime = useVp;
-    M_Vprime = mass;
-    Ga_Vprime = width;
-  }
+  void SetUseVprime(bool useVp){ UseVprime = useVp; }
+  void SetZPrimeMassWidth(double inmass, double inwidth){ M_Zprime = inmass; Ga_Zprime = inwidth; }
+  void SetWPrimeMassWidth(double inmass, double inwidth){ M_Wprime = inmass; Ga_Wprime = inwidth; }
 
   double Hggcoupl[SIZE_HGG][2];
   double Hqqcoupl[SIZE_HQQ][2];
@@ -343,14 +340,17 @@ public:
 
   double Hzzpcoupl[SIZE_HVV][2];
   double Hzpzpcoupl[SIZE_HVV][2];
-  double Hzpcontact[SIZE_Vp][2];
+  double Zpffcoupl[SIZE_Vpff][2];
   double Hwwpcoupl[SIZE_HVV][2];
   double Hwpwpcoupl[SIZE_HVV][2];
-  double Hwpcontact[SIZE_Vp][2];
+  double Wpffcoupl[SIZE_Vpff][2];
 
   bool separateWWZZcouplings;
   bool UseVprime;
-  double M_Vprime, Ga_Vprime;
+  double M_Zprime;
+  double Ga_Zprime;
+  double M_Wprime;
+  double Ga_Wprime;
 
   inline virtual ~SpinZeroCouplings(){};
 };
