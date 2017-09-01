@@ -1678,7 +1678,7 @@ mtausq, mcsq, mbsq
    if (iProc.eq.66) then ! Signal-only
       MCFM_runstring="wbfHO"
    else if (iProc.eq.67) then ! Bkg-only
-      MCFM_runstring="wbfHO"
+      MCFM_runstring="wbfBO"
    else if (iProc.eq.68) then  ! Signal+bkg
       MCFM_runstring="wbfALL" ! Doesn't matter what it is
    else
@@ -1815,6 +1815,8 @@ common/runstring/runstring
    if (isWW) then
       call swap(order(1),order(3))
       runstring = trim(MCFM_runstring) // '_ww' ! wbfXY_ww needed to have WW-only final state since we use qq_VVqq process. This needs to be changed somehow if we want to simulate ZZ+WW->4f
+   else
+      runstring = trim(MCFM_runstring) // '_zz' ! wbfXY_ww needed to have WW-only final state since we use qq_VVqq process. This needs to be changed somehow if we want to simulate ZZ+WW->4f
    endif
 end subroutine
 

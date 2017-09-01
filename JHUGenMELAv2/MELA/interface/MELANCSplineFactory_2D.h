@@ -5,11 +5,11 @@
 #include <utility>
 #include <algorithm>
 #include "TTree.h"
-#include "TMCFMUtils.hh"
+#include "TNumericUtil.hh"
 #include "MELANCSpline_2D_fast.h"
 #include "MELAFuncPdf.h"
 
-typedef TMCFMUtils::triplet<MELANCSplineCore::T> splineTriplet_t;
+typedef TNumericUtil::triplet<MELANCSplineCore::T> splineTriplet_t;
 
 class MELANCSplineFactory_2D{
 protected:

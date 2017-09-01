@@ -23,7 +23,7 @@ class ScalarPdfFactory_HVV;
 class VectorPdfFactory;
 class TensorPdfFactory;
 class RooqqZZ_JHU_ZgammaZZ_fast;
-class newZZMatrixElement;
+class ZZMatrixElement;
 class SuperMELA;
 
 #include "TVar.hh"
@@ -265,13 +265,15 @@ public:
   bool differentiate_HWW_HZZ;
   double selfDHzzpcoupl[SIZE_HVV][2];
   double selfDHzpzpcoupl[SIZE_HVV][2];
-  double selfDHzpcontact[SIZE_Vp][2];
+  double selfDZpffcoupl[SIZE_Vpff][2];
   double selfDHwwpcoupl[SIZE_HVV][2];
   double selfDHwpwpcoupl[SIZE_HVV][2];
-  double selfDHwpcontact[SIZE_Vp][2];
+  double selfDWpffcoupl[SIZE_Vpff][2];
   bool selfDUseVprime;
-  double selfDM_Vprime;
-  double selfDGa_Vprime;
+  double selfDM_Zprime;
+  double selfDGa_Zprime;
+  double selfDM_Wprime;
+  double selfDGa_Wprime;
   //****Spin-1****//
   double selfDZqqcoupl[SIZE_ZQQ][2];
   double selfDZvvcoupl[SIZE_ZVV][2];
@@ -292,7 +294,7 @@ protected:
   TVar::LeptonInterference myLepInterf_;
   TVar::VerbosityLevel myVerbosity_;
 
-  newZZMatrixElement* ZZME;
+  ZZMatrixElement* ZZME;
   SuperDijetMela* superDijet;
 
 

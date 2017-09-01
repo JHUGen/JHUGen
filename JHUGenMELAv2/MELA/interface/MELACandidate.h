@@ -7,6 +7,7 @@
 class MELACandidate : public MELAParticle{
 public:
   MELACandidate();
+  MELACandidate(int id_, bool associatedByHighestPt_=false);
   MELACandidate(int id_, TLorentzVector p4_, bool associatedByHighestPt_=false);
   MELACandidate(const MELACandidate& particle_);
   MELACandidate& operator=(const MELACandidate& particle_);
@@ -65,6 +66,9 @@ public:
   void addSortedV(MELAParticle* myParticle){ sortedVs.push_back(myParticle); }
   void addAssociatedVs();
 
+  void resetVs();
+  void recreateVs();
+
   void sortDaughters();
   void testPreSelectedDaughters();
   bool testShallowCopy();
@@ -74,10 +78,15 @@ public:
   void setAddAssociatedByHighestPt(bool associatedByHighestPt_);
   void setShallowCopy(bool flag);
 
+  static bool checkTopCandidateExists(MELATopCandidate* myParticle, std::vector<MELATopCandidate*>& particleArray);
+  static void addUnordered(MELAParticle* myParticle, std::vector<MELAParticle*>& particleArray);
+  static void addUnordered(MELATopCandidate* myParticle, std::vector<MELATopCandidate*>& particleArray);
+  static void addByHighestPt(MELAParticle* myParticle, std::vector<MELAParticle*>& particleArray);
+  static void addByHighestPt(MELATopCandidate* myParticle, std::vector<MELATopCandidate*>& particleArray);
+
 protected:
   bool associatedByHighestPt;
   bool isShallowCopy;
-
   TVar::CandidateDecayMode selfDecayMode;
 
   std::vector<MELAParticle*> associatedLeptons;
@@ -94,10 +103,9 @@ protected:
   void createSortedVs();
   bool checkDaughtership(MELAParticle* myParticle)const;
   void createAssociatedVs(std::vector<MELAParticle*>& particleArray);
-  void addByHighestPt(MELAParticle* myParticle, std::vector<MELAParticle*>& particleArray);
-  void addByHighestPt(MELATopCandidate* myParticle, std::vector<MELATopCandidate*>& particleArray);
 
-  bool checkTopCandidateExists(MELATopCandidate* myParticle, std::vector<MELATopCandidate*>& particleArray)const;
+  void addAssociatedParticleToArray(MELAParticle* myParticle, std::vector<MELAParticle*>& particleArray);
+  void addAssociatedParticleToArray(MELATopCandidate* myParticle, std::vector<MELATopCandidate*>& particleArray);
 
 };
 
