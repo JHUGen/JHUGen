@@ -1604,7 +1604,7 @@ module modHiggsJJ
          (abs(amp_z(+1,+1))**2+abs(amp_z_b(+1,+1))**2) * Ru**2) * xn**2
 
     restmp = restmp + (two * real(amp_z(-1,-1)*conjg(amp_z_b(-1,-1)),kind=dp) * Lu**2 + &
-            two * real(amp_z(+1,+1)*conjg(amp_z_b(+1,+1)),kind=dp) * Ru**2) * xn
+                       two * real(amp_z(+1,+1)*conjg(amp_z_b(+1,+1)),kind=dp) * Ru**2) * xn
 
     restmp = restmp * SymmFac * aveqq * couplz**2
 
@@ -1667,13 +1667,13 @@ module modHiggsJJ
     j2 = 2
     do iflip = 1, 2
        !-- ud -> ud
-       amp_z = A0_VV_4f(4,j2,3,j1,za,zb,sprod,m_z,ga_z)
+       amp_z =  A0_VV_4f(4,j2,3,j1,za,zb,sprod,m_z,ga_z)
        amp_w = -A0_VV_4f(4,j1,3,j2,za,zb,sprod,m_w,ga_w,useWWcoupl=.true.)
 
        restmp = ((abs(amp_z(-1,-1))**2) * Ld * Lu + &
-            (abs(amp_z(-1,+1))**2) * Ld * Ru + &
-            (abs(amp_z(+1,-1))**2) * Rd * Lu + &
-            (abs(amp_z(+1,+1))**2) * Rd * Ru) * couplz**2 * xn**2
+                 (abs(amp_z(-1,+1))**2) * Ld * Ru + &
+                 (abs(amp_z(+1,-1))**2) * Rd * Lu + &
+                 (abs(amp_z(+1,+1))**2) * Rd * Ru) * couplz**2 * xn**2
 
        restmp = restmp + abs(amp_w(-1,-1))**2 * couplw**2 * xn**2
 
@@ -3487,7 +3487,7 @@ module modHiggsJJ
 
     else
 
-       helcoup(1:3,-1,-1) = struc_zz(1:3) * Lz(line1) * Lz(line2)/iprop12/iprop34
+       helcoup(1:3,-1,-1) = struc_zz(1:3) * Lz(line1) * Lz(line2)/iprop12/iprop34 
        helcoup(1:3,-1,+1) = struc_zz(1:3) * Lz(line1) * Rz(line2)/iprop12/iprop34
        helcoup(1:3,+1,-1) = struc_zz(1:3) * Rz(line1) * Lz(line2)/iprop12/iprop34
        helcoup(1:3,+1,+1) = struc_zz(1:3) * Rz(line1) * Rz(line2)/iprop12/iprop34

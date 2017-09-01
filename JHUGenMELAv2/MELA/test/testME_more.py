@@ -60,8 +60,8 @@ class TestMela(unittest.TestCase):
     m.setProcess(TVar.SelfDefine_spin0, TVar.JHUGen, TVar.ZZINDEPENDENT)
     m.ghz1 = ghz1 + 2 * ghz1_prime2 * (M_Z**2 - 1j*M_Z*Ga_Z)/L1**2
     m.ghzzp1 = M_Z**2/L1**2
-    m.ezp_L_E = m.ezp_L_M = aL * ghz1_prime2 + e * ghzgs1_prime2
-    m.ezp_R_E = m.ezp_R_M = aR * ghz1_prime2 + e * ghzgs1_prime2
+    m.ezp_El_left = m.ezp_Mu_left = aL * ghz1_prime2 + e * ghzgs1_prime2
+    m.ezp_El_right = m.ezp_Mu_right = aR * ghz1_prime2 + e * ghzgs1_prime2
     me2 = m.computeP()
 
     self.assertEquals(me1, me2)
@@ -80,8 +80,8 @@ def ME(processname, ghz1, ghz1_prime2, ghzgs1_prime2):
   m.setProcess(TVar.SelfDefine_spin0, TVar.JHUGen, TVar.ZZINDEPENDENT)
   m.ghz1 = ghz1 + 2 * ghz1_prime2 * (M_Z**2 - 1j*M_Z*Ga_Z)/L1**2
   m.ghzzp1 = M_Z**2/L1**2
-  m.ezp_L_E = m.ezp_L_M = aL * ghz1_prime2 + e * ghzgs1_prime2
-  m.ezp_R_E = m.ezp_R_M = aR * ghz1_prime2 + e * ghzgs1_prime2
+  m.ezp_El_left = m.ezp_Mu_left = aL * ghz1_prime2 + e * ghzgs1_prime2
+  m.ezp_El_right = m.ezp_Mu_right = aR * ghz1_prime2 + e * ghzgs1_prime2
   me2 = m.computeP()
 
   return me1, me2
