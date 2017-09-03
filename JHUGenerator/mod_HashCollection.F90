@@ -915,21 +915,15 @@ implicit none
 end subroutine
 
 ! Copy functions
-subroutine get_MCFM_qqVVqq_GenHash(ijSel,nijchannels)
+subroutine get_MCFM_qqVVqq_GenHash(ijSel)
 implicit none
-integer, intent(out) :: ijSel(1:Hash_MCFM_qqVVqq_Gen_Size,1:4),nijchannels
-   if( .not. deterministic_MCFM_qqVVqq_Gen ) then
-      nijchannels=100
-   else
-      nijchannels=Hash_MCFM_qqVVqq_Gen_Size
-   endif
+integer, intent(out) :: ijSel(1:Hash_MCFM_qqVVqq_Gen_Size,1:4)
    if (.not. hashcoll_hashes_initialized) then
       call SetupHashes()
    endif
    ijSel=Hash_MCFM_qqVVqq_Gen
 return
 end subroutine
-
 
 subroutine get_VBFchannelHash(ijSel)
 implicit none
@@ -1007,19 +1001,13 @@ END SUBROUTINE
 
 
 ! Reference functions
-subroutine getRef_MCFM_qqVVqq_GenHash(ijSel,nijchannels)
+subroutine getRef_MCFM_qqVVqq_GenHash(ijSel)
 implicit none
 integer, pointer, intent(out) :: ijSel(:,:)
-integer, intent(out) :: nijchannels
-   if( .not. deterministic_MCFM_qqVVqq_Gen ) then
-      nijchannels=100
-   else
-      nijchannels=Hash_MCFM_qqVVqq_Gen_Size
-   endif
    if (.not. hashcoll_hashes_initialized) then
       call SetupHashes()
    endif
-   ijSel=Hash_MCFM_qqVVqq_Gen
+   ijSel => Hash_MCFM_qqVVqq_Gen
 return
 end subroutine
 

@@ -891,9 +891,9 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "deltaRcut", success, Rjet, success2=SetdeltaRcut)
     call ReadCommandLineArgument(arg, "mJJcut", success, mJJcut, SetLastArgument)
     if( SetLastArgument ) mJJcut = mJJcut*GeV
-    call ReadCommandLineArgument(arg, "VBF_m4l_min", success, m4l_minmax(1), SetLastArgument)   !undocumented, for internal testing
+    call ReadCommandLineArgument(arg, "m4l_min", success, m4l_minmax(1), SetLastArgument)   !undocumented, for internal testing
     if( SetLastArgument ) m4l_minmax(1) = m4l_minmax(1)*GeV
-    call ReadCommandLineArgument(arg, "VBF_m4l_max", success, m4l_minmax(2), SetLastArgument)   !undocumented, for internal testing
+    call ReadCommandLineArgument(arg, "m4l_max", success, m4l_minmax(2), SetLastArgument)   !undocumented, for internal testing
     if( SetLastArgument ) m4l_minmax(2) = m4l_minmax(2)*GeV
     call ReadCommandLineArgument(arg, "MPhotonCutoff", success, MPhotonCutoff, SetLastArgument)
     if( SetLastArgument ) MPhotonCutoff = MPhotonCutoff*GeV
@@ -4596,7 +4596,7 @@ character :: arg*(500)
             write(TheUnit,"(11X,A,F8.2,A)") "mJJ >= ", mJJcut/GeV, " GeV"
         endif
         if( Process.ge.66 .and. Process.le.69 ) then
-            write(TheUnit,"(11X,A,F10.2,F10.2,A)") "m4l_min/max ", m4l_minmax(1)/GeV,m4l_minmax(2)/GeV, " GeV"
+            write(TheUnit,"(11X,A,F10.2,F10.2,A)") "m4l min/max ", m4l_minmax(1)/GeV,m4l_minmax(2)/GeV, " GeV"
         endif
     endif
     if( (ReadLHEFile) .and. (RequestNLeptons.gt.0) ) then

@@ -29,7 +29,7 @@ real(8) :: pdf(-6:6,1:2)           ,me2(-5:5,-5:5)
 real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi
 real(8) :: MomExt(1:4,1:10),PSWgt
 real(8) :: p_MCFM(mxpart,1:4),msq_MCFM(-5:5,-5:5)
-integer :: id_MCFM(mxpart),MY_IDUP(1:10),ICOLUP(1:2,1:10),NBin(1:NumHistograms),NHisto
+integer :: id_MCFM(mxpart),MY_IDUP(1:10),ICOLUP(1:2,1:10),NBin(1:NumHistograms),NHisto,jpart,ichan
 integer, pointer :: ijSel(:,:)
 integer :: iPartChannel,PartChannelAvg,NumPartonicChannels,iflip,i,j,k,flavor_tag  !,ijSel(1:121,1:3)
 real(8) :: LO_Res_Unpol, PreFac,VegasWeighted_HJJ_fulldecay,xRnd,me2_hdk,me2_prop,me2_tmpzz(-5:5,-5:5),me2_tmpww(-5:5,-5:5),me2_zzcontr(-5:5,-5:5),me2_wwcontr(-5:5,-5:5)
@@ -40,14 +40,19 @@ include 'vegas_common.f'
 include 'maxwt.f'
 EvalWeighted_HJJ_fulldecay = 0d0
 
-   call getRef_MCFM_qqVVqq_GenHash(ijSel,NumPartonicChannels)
+   call getRef_MCFM_qqVVqq_GenHash(ijSel)
+   NumPartonicChannels=Hash_MCFM_qqVVqq_Gen_Size
+   do ichan=1,Hash_MCFM_qqVVqq_Gen_Size
+      if(ijSel(ichan,1).eq.Not_a_particle_ .or. ijSel(ichan,2).eq.Not_a_particle_ .or. ijSel(ichan,3).eq.Not_a_particle_ .or. ijSel(ichan,4).eq.Not_a_particle_) then
+         NumPartonicChannels=NumPartonicChannels-1
+      endif
+   enddo
+   if (NumPartonicChannels.eq.0) return
    PartChannelAvg = NumPartonicChannels
 
    iPartChannel = int(yRnd(18) * (NumPartonicChannels)) +1 ! this runs from 1..100
    iPart_sel = ijSel(iPartChannel,1)
    jPart_sel = ijSel(iPartChannel,2)
-   id_MCFM(7) = ijSel(iPartChannel,3)
-   id_MCFM(8) = ijSel(iPartChannel,4)
 
    if(.not. warmup) then
        call random_number(xRnd)!   throwing random number for accept-reject
@@ -57,7 +62,6 @@ EvalWeighted_HJJ_fulldecay = 0d0
          return
        endif
    endif
-
 
    if( unweighted .and. .not.warmup .and.  sum(AccepCounter_part(:,:)) .eq. sum(RequEvents(:,:)) ) then
       stopvegas=.true.
@@ -117,10 +121,14 @@ EvalWeighted_HJJ_fulldecay = 0d0
 #if linkMELA==1
 
    ! FIXME: TEMPORARY ASSIGNMENT OF I J R S
-   id_MCFM(1) = iPart_sel
-   id_MCFM(2) = jPart_sel
-!    id_MCFM(7) = 0
-!    id_MCFM(8) = 0
+   do jpart=1,2
+      id_MCFM(jpart) = ijSel(iPartChannel,jpart)
+      if(id_MCFM(jpart) .ne. 0) id_MCFM(jpart)=convertLHE(id_MCFM(jpart))
+   enddo
+   do jpart=3,4
+      id_MCFM(jpart+4) = ijSel(iPartChannel,jpart)
+      if(id_MCFM(jpart+4) .ne. 0) id_MCFM(jpart+4)=convertLHE(id_MCFM(jpart+4))
+   enddo
    id_MCFM(3:6) = (/ ElM_,ElP_,MuM_,MuP_ /)
 
    call EvalAmp_qqVVqq(id_MCFM, p_MCFM, 1, msq_MCFM) ! 1 for ZZ decay, 2 for WW decay, 3 for ZZ+WW mixture

@@ -1261,7 +1261,7 @@ END FUNCTION
 
 
 
-FUNCTION convertLHEreverse(Part)
+FUNCTION convertLHEreverse(Part) ! PDG/PDF->JHU
 implicit none
 integer :: convertLHEreverse
 integer :: Part
@@ -1348,7 +1348,7 @@ END FUNCTION
 
 
 
-FUNCTION convertLHE(Part)
+FUNCTION convertLHE(Part) ! JHU->PDG/PDF
 implicit none
 integer :: convertLHE
 integer :: Part
@@ -1436,7 +1436,7 @@ integer :: Part
 END FUNCTION
 
 
-FUNCTION convertToPartIndex(Part)
+FUNCTION convertToPartIndex(Part) ! JHU->PDF
 implicit none
 integer :: convertToPartIndex
 integer :: Part
@@ -1472,7 +1472,7 @@ integer :: Part
 END FUNCTION
 
 
-FUNCTION convertFromPartIndex(Part)
+FUNCTION convertFromPartIndex(Part) ! PDF->JHU
 implicit none
 integer :: convertFromPartIndex
 integer :: Part
@@ -1885,6 +1885,19 @@ integer :: PartType
    IsLHEUpTypeQuark = ( abs(PartType).eq.2 .or. abs(PartType).eq.4 .or. abs(PartType).eq.6 )
 END FUNCTION
 
+FUNCTION IsUpTypeLightQuark(PartType)
+implicit none
+logical :: IsUpTypeLightQuark
+integer :: PartType
+   IsUpTypeLightQuark = ( abs(PartType).eq.abs(Up_) .or. abs(PartType).eq.abs(Chm_))
+END FUNCTION
+FUNCTION IsLHEUpTypeLightQuark(PartType)
+implicit none
+logical :: IsLHEUpTypeLightQuark
+integer :: PartType
+   IsLHEUpTypeLightQuark = ( abs(PartType).eq.2 .or. abs(PartType).eq.4 )
+END FUNCTION
+
 FUNCTION IsAQuark(PartType)
 implicit none
 logical :: IsAQuark
@@ -1898,6 +1911,18 @@ integer :: PartType
    IsLHEAQuark=IsLHEUpTypeQuark(PartType) .or. IsLHEDownTypeQuark(PartType)
 END FUNCTION
 
+FUNCTION IsALightQuark(PartType)
+implicit none
+logical :: IsALightQuark
+integer :: PartType
+   IsALightQuark=IsUpTypeLightQuark(PartType) .or. IsDownTypeQuark(PartType)
+END FUNCTION
+FUNCTION IsLHEALightQuark(PartType)
+implicit none
+logical :: IsLHEALightQuark
+integer :: PartType
+   IsLHEALightQuark=IsLHEUpTypeLightQuark(PartType) .or. IsLHEDownTypeQuark(PartType)
+END FUNCTION
 
 
 FUNCTION IsANeutrino(PartType)

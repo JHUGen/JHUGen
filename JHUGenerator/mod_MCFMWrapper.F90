@@ -1732,6 +1732,9 @@ common/zcouple/l,r,q1,l1,r1,q2,l2,r2,le,ln,re,rn,sin2w
 
    ! Assign ordered daughter momenta
    call Check_DaughterOrdering_MCFM_qqVVqq(pid_MCFM_in(3:6),decayOrdering)
+   if (any(decayOrdering .lt. 0)) then
+      return
+   endif
    do ip=0,3
       p_MCFM(3+ip,:) = p_MCFM_in(3+decayOrdering(ip+1),:)
       pid_MCFM(3+ip) = pid_MCFM_in(3+decayOrdering(ip+1))
@@ -1753,7 +1756,7 @@ common/zcouple/l,r,q1,l1,r1,q2,l2,r2,le,ln,re,rn,sin2w
    ! Turn 4f interference on as needed
    if( &
    abs(pid_MCFM_in(3)).eq.abs(pid_MCFM_in(5)) .and. abs(pid_MCFM_in(4)).eq.abs(pid_MCFM_in(6)) &
-   .and. pid_MCFM_in(3).ne.0 .and. pid_MCFM_in(6).ne.6 &
+   .and. pid_MCFM_in(3).ne.0 &
    ) then
       vsymfact=0.5d0
       interference=.true.
@@ -1788,6 +1791,12 @@ common/runstring/runstring
    order(:)=(/ 0,1,2,3 /)
    idV(:)=0
 
+   do ip=1,4
+      if(abs(idPart(ip)) .eq. abs(Top_)) then
+         order(:)=-1
+         exit
+      endif
+   enddo
    if( idPart(1).ne.0 .and. idPart(2).ne.0) then
       idV(1)=CoupledVertex(idPart(1:2),-1)
    endif
@@ -1846,7 +1855,7 @@ logical  :: outFound
       ) cycle
 
       ! Final particles are q
-      if (abs(idAPart(3)).lt.6 .and. abs(idAPart(4)).lt.6) then
+      if ((IsALightQuark(idAPart(3)) .or. idAPart(3).eq.0) .and. (IsALightQuark(idAPart(4)) .or. idAPart(4).eq.0)) then
          if ( &
          (idAPart(3).eq.0 .or. idAPart(3).eq.hash(3,ih)) &
          .and. &
@@ -1919,7 +1928,7 @@ real(8) :: p_MCFM(1:mxpart,1:4)
 real(8) :: msq(-5:5,-5:5),msq_tmp(-5:5,-5:5)
 integer, parameter :: doZZ=1,doWW=2,doZZorWW=3
 logical :: doCompute
-integer :: i,j
+integer :: i,j,ip
 
    msq(:,:)=0d0
    msq_tmp(:,:)=0d0
@@ -1927,6 +1936,13 @@ integer :: i,j
    pin_MCFMconv(:,:)=pin(:,:)/GeV
 
    doCompute = Setup_MCFM_qqVVqq(idin,pin_MCFMconv,id_MCFM,p_MCFM)
+   ! Up to now, ids were in JHU conventions
+   ! Switch to PDG conventions from now on
+   do ip = 1,mxpart
+      if (id_MCFM(ip) .ne. 0) then
+         id_MCFM(ip) = convertLHE(id_MCFM(ip))
+      endif
+   enddo
    if (doCompute) then
       call SetupParticleLabels(id_MCFM) ! Assign plabels
       if(ZWcode.eq.doZZ) then
