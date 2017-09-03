@@ -25,14 +25,14 @@ use ifport
 implicit none
 integer,parameter :: mxpart=14 ! this has to match the MCFM parameter
 real(8) :: yRnd(1:18),VgsWgt, EvalWeighted_HJJ_fulldecay
-real(8) :: pdf(-6:6,1:2)           ,me2(-5:5,-5:5)
+real(8) :: pdf(-6:6,1:2),me2(-5:5,-5:5)
 real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi
 real(8) :: MomExt(1:4,1:10),PSWgt
-real(8) :: p_MCFM(mxpart,1:4),msq_MCFM(-5:5,-5:5)
-integer :: id_MCFM(mxpart),MY_IDUP(1:10),ICOLUP(1:2,1:10),NBin(1:NumHistograms),NHisto,jpart,ichan
+real(8) :: p_MCFM(mxpart,1:4),msq_MCFM(-5:5,-5:5),msq_VgsWgt(-5:5,-5:5)
+integer :: id_MCFM(mxpart),MY_IDUP(1:10),ICOLUP(1:2,1:10),NBin(1:NumHistograms),NHisto,ipart,jpart,ichan
 integer, pointer :: ijSel(:,:)
 integer :: iPartChannel,PartChannelAvg,NumPartonicChannels,iflip,i,j,k,flavor_tag  !,ijSel(1:121,1:3)
-real(8) :: LO_Res_Unpol, PreFac,VegasWeighted_HJJ_fulldecay,xRnd,me2_hdk,me2_prop,me2_tmpzz(-5:5,-5:5),me2_tmpww(-5:5,-5:5),me2_zzcontr(-5:5,-5:5),me2_wwcontr(-5:5,-5:5)
+real(8) :: PreFac,VegasWeighted_HJJ_fulldecay,xRnd,me2_hdk,me2_prop,me2_tmpzz(-5:5,-5:5),me2_tmpww(-5:5,-5:5),me2_zzcontr(-5:5,-5:5),me2_wwcontr(-5:5,-5:5)
 logical :: applyPSCut
 integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, Lep1M=8, Lep2P=9, Lep2M=10
 real(8) :: s13,s14,s15,s16,s23,s24,s25,s26,s34,s35,s36,s45,s46,s56,s78,s910,s710,s89
@@ -132,10 +132,27 @@ EvalWeighted_HJJ_fulldecay = 0d0
    id_MCFM(3:6) = (/ ElM_,ElP_,MuM_,MuP_ /)
 
    call EvalAmp_qqVVqq(id_MCFM, p_MCFM, 1, msq_MCFM) ! 1 for ZZ decay, 2 for WW decay, 3 for ZZ+WW mixture
-!    call qq_ZZqq(p_MCFM,msq_MCFM)
+!   print *,"msq for id combination ",id_MCFM
+!   print *,msq_MCFM(-5,:)
+!   print *,msq_MCFM(-4,:)
+!   print *,msq_MCFM(-3,:)
+!   print *,msq_MCFM(-2,:)
+!   print *,msq_MCFM(-1,:)
+!   print *,msq_MCFM(0,:)
+!   print *,msq_MCFM(1,:)
+!   print *,msq_MCFM(2,:)
+!   print *,msq_MCFM(3,:)
+!   print *,msq_MCFM(4,:)
+!   print *,msq_MCFM(5,:)
+!   call qq_ZZqq(p_MCFM,msq_MCFM)
 
 
-   msq_MCFM = msq_MCFM * (100d0)**8  ! adjust msq_MCFM for GeV units of MCFM mat.el.
+   PreFac = fbGeV2 * FluxFac * PSWgt * sHatJacobi
+   msq_MCFM = msq_MCFM * PreFac / (GeV**8)  ! adjust msq_MCFM for GeV units of MCFM mat.el.
+   do ipart=-5,5; do jpart=-5,5
+      msq_MCFM(ipart,jpart)=msq_MCFM(ipart,jpart) * pdf(LHA2M_pdf(ipart),1)*pdf(LHA2M_pdf(jpart),2)
+      msq_VgsWgt(ipart,jpart)=msq_MCFM(ipart,jpart)*VgsWgt
+   enddo; enddo
 
 #else
  print *, "To use this process, please set linkMELA=Yes in the makefile and recompile."
@@ -144,10 +161,8 @@ EvalWeighted_HJJ_fulldecay = 0d0
 #endif
 
 
-   LO_Res_Unpol = msq_MCFM(iPart_sel,jPart_sel)  *  pdf(LHA2M_pdf(iPart_sel),1) * pdf(LHA2M_pdf(jPart_sel),2)
-   PreFac = fbGeV2 * FluxFac * PSWgt * sHatJacobi
-   EvalWeighted_HJJ_fulldecay = LO_Res_Unpol * PreFac
-   VegasWeighted_HJJ_fulldecay = EvalWeighted_HJJ_fulldecay*VgsWgt
+   EvalWeighted_HJJ_fulldecay = msq_MCFM(iPart_sel,jPart_sel)
+   VegasWeighted_HJJ_fulldecay = msq_VgsWgt(iPart_sel,jPart_sel)
 
    if( unweighted ) then
 
@@ -157,8 +172,10 @@ EvalWeighted_HJJ_fulldecay = 0d0
 !            print *, "New max",iPart_sel,jPart_sel,VegasWeighted_HJJ_fulldecay
 !        endif
 
-       CrossSec(iPart_sel,jPart_sel) = CrossSec(iPart_sel,jPart_sel) + VegasWeighted_HJJ_fulldecay
-       CrossSecMax(iPart_sel,jPart_sel) = max(CrossSecMax(iPart_sel,jPart_sel),VegasWeighted_HJJ_fulldecay)
+       CrossSec(-5:5,-5:5) = CrossSec(-5:5,-5:5) + msq_VgsWgt(-5:5,-5:5)
+       do ipart=-5,5; do jpart=-5,5
+         CrossSecMax(ipart,jpart) = max(CrossSecMax(ipart,jpart),msq_VgsWgt(ipart,jpart))
+       enddo; enddo
 
      else! not warmup
 
@@ -183,8 +200,8 @@ EvalWeighted_HJJ_fulldecay = 0d0
          AccepCounter = AccepCounter + 1
          AccepCounter_part(iPart_sel,jPart_sel) = AccepCounter_part(iPart_sel,jPart_sel) + 1
 
-         MY_IDUP(1:2)= (/LHA2M_ID(iPart_sel),LHA2M_ID(jPart_sel)/)
-         MY_IDUP(3:4)= (/LHA2M_ID(id_MCFM(7)),LHA2M_ID(id_MCFM(8))/)
+         MY_IDUP(1:2)= id_MCFM(1:2)
+         MY_IDUP(3:4)= id_MCFM(7:8)
          call WriteOutEvent_HJJ_fulldecay(MomExt,MY_IDUP,ICOLUP)
 
          do NHisto=1,NumHistograms

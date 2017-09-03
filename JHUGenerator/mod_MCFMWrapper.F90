@@ -1073,18 +1073,16 @@ end subroutine
 
 
 
-function MCFMParticleLabel(pid, useQJ)
+function MCFMParticleLabel(pid, useQJ, useExtendedConventions)
    use ModParameters
    implicit none
    character*2 MCFMParticleLabel
    integer, intent(in) :: pid
-   logical, optional :: useQJ
+   logical :: useQJ, useExtendedConventions
    if (pid.eq.0) then
       MCFMParticleLabel='pp'
-      if (present(useQJ)) then
-         if (useQJ) then
-            MCFMParticleLabel='qj'
-         endif
+      if (useQJ) then
+         MCFMParticleLabel='qj'
       endif
    else if (pid.eq.Glu_) then
       MCFMParticleLabel='ig'
@@ -1116,37 +1114,51 @@ function MCFMParticleLabel(pid, useQJ)
       MCFMParticleLabel='ml'
    else if (pid.eq.TaM_) then
       MCFMParticleLabel='tl'
-   else if (pid.eq.NuE_) then
-      MCFMParticleLabel='nl'
-   else if (pid.eq.NuM_) then
-      MCFMParticleLabel='nl'
-   else if (pid.eq.NuT_) then
-      MCFMParticleLabel='nl'
    else if (pid.eq.ElP_) then
       MCFMParticleLabel='ea'
    else if (pid.eq.MuP_) then
       MCFMParticleLabel='ma'
    else if (pid.eq.TaP_) then
       MCFMParticleLabel='ta'
-   else if (pid.eq.ANuE_) then
-      MCFMParticleLabel='na'
-   else if (pid.eq.ANuM_) then
-      MCFMParticleLabel='na'
-   else if (pid.eq.ANuT_) then
-      MCFMParticleLabel='na'
+   else if (isANeutrino(pid)) then
+      if (.not.useExtendedConventions) then
+         if (pid.eq.NuE_ .or. pid.eq.NuM_ .or. pid.eq.NuT_) then
+            MCFMParticleLabel='nl'
+         else
+            MCFMParticleLabel='na'
+         endif
+      else
+         if (pid.eq.NuE_) then
+            MCFMParticleLabel='ne'
+         else if (pid.eq.NuM_) then
+            MCFMParticleLabel='nm'
+         else if (pid.eq.NuT_) then
+            MCFMParticleLabel='nt'
+         else if (pid.eq.ANuE_) then
+            MCFMParticleLabel='ke'
+         else if (pid.eq.ANuM_) then
+            MCFMParticleLabel='km'
+         else if (pid.eq.ANuT_) then
+            MCFMParticleLabel='kt'
+         endif
+      endif
    else
       MCFMParticleLabel='  '
    endif
 end function
-subroutine SetupParticleLabels(pid_MCFM)
+subroutine SetupParticleLabels(pid_MCFM,imin,imax, useQJ, useExtendedConventions)
    implicit none
    integer, intent(in) :: pid_MCFM(1:mxpart)
-   integer :: i
+   integer :: i,imin,imax
+   logical :: useQJ, useExtendedConventions
    ! MCFM declarations
    character*2 plabel(mxpart)
    common/plabel/plabel
-   do i=1,mxpart
-      plabel(i)=MCFMParticleLabel(pid_MCFM(i))
+
+   if (imin .lt. 1) imin=1
+   if (imax .gt. mxpart) imax=mxpart
+   do i=imin,imax
+      plabel(i)=MCFMParticleLabel(pid_MCFM(i), useQJ, useExtendedConventions)
    enddo
 end subroutine
 
@@ -1923,11 +1935,11 @@ integer, intent(in) :: idin(1:mxpart)
 real(8), intent(in) :: pin(1:mxpart,1:4)
 real(8)             :: pin_MCFMconv(1:mxpart,1:4)
 integer, intent(in) :: ZWcode
-integer :: id_MCFM(1:mxpart)
+integer :: id_MCFM(1:mxpart),id_MCFM_78swap(1:mxpart),idDummy(1:mxpart)
 real(8) :: p_MCFM(1:mxpart,1:4)
 real(8) :: msq(-5:5,-5:5),msq_tmp(-5:5,-5:5)
 integer, parameter :: doZZ=1,doWW=2,doZZorWW=3
-logical :: doCompute
+logical :: doCompute,doNotWipe
 integer :: i,j,ip
 
    msq(:,:)=0d0
@@ -1935,18 +1947,15 @@ integer :: i,j,ip
 
    pin_MCFMconv(:,:)=pin(:,:)/GeV
 
+   idDummy=idin
+
    doCompute = Setup_MCFM_qqVVqq(idin,pin_MCFMconv,id_MCFM,p_MCFM)
-   ! Up to now, ids were in JHU conventions
-   ! Switch to PDG conventions from now on
-   do ip = 1,mxpart
-      if (id_MCFM(ip) .ne. 0) then
-         id_MCFM(ip) = convertLHE(id_MCFM(ip))
-      endif
-   enddo
+   id_MCFM_78swap=id_MCFM
+   call swap(id_MCFM_78swap(7),id_MCFM_78swap(8))
    if (doCompute) then
-      call SetupParticleLabels(id_MCFM) ! Assign plabels
       if(ZWcode.eq.doZZ) then
          if (Process.ge.66 .and. Process.le.68) then
+            call SetupParticleLabels(id_MCFM,1,8,.true.,.true.) ! Assign plabels
             call qq_zzqq(p_MCFM,msq)
             if (id_MCFM(7).eq.0 .and. id_MCFM(8).eq.0) then ! Calculate for swapped momentum combination
                call swap(p_MCFM(7,:),p_MCFM(8,:)) ! Swap just the momenta
@@ -1957,8 +1966,7 @@ integer :: i,j,ip
                enddo
             else if (id_MCFM(7).eq.0 .or. id_MCFM(8).eq.0) then ! Calculate for wrong combination
                call swap(p_MCFM(7,:),p_MCFM(8,:)) ! Swap the momenta
-               call swap(id_MCFM(7),id_MCFM(8)) ! Swap the ids
-               call SetupParticleLabels(id_MCFM) ! Reassign plabels
+               call SetupParticleLabels(id_MCFM_78swap,7,8,.true.,.true.) ! Assign plabels
                call qq_zzqq(p_MCFM,msq_tmp)
                do i=-5,5
                do j=-5,5
@@ -1969,6 +1977,7 @@ integer :: i,j,ip
                enddo
             endif
          else if (Process.eq.69) then ! Or some other number?
+            call SetupParticleLabels(id_MCFM,1,8,.false.,.true.) ! Assign plabels
             call qq_zzqqstrong(p_MCFM,msq)
             if (id_MCFM(7).eq.0 .and. id_MCFM(8).eq.0) then ! Calculate for swapped momentum combination
                call swap(p_MCFM(7,:),p_MCFM(8,:)) ! Swap just the momenta
@@ -1980,13 +1989,13 @@ integer :: i,j,ip
                enddo
                ! Subtract qqb->gg, which was counted twice
                id_MCFM(7:8)=Glu_
-               call SetupParticleLabels(id_MCFM) ! Reassign plabels
+               call SetupParticleLabels(id_MCFM,7,8,.false.,.true.) ! Assign plabels
+               id_MCFM(7:8)=0
                call qq_zzqqstrong(p_MCFM,msq_tmp)
                msq = msq - msq_tmp
             else if (id_MCFM(7).eq.0 .or. id_MCFM(8).eq.0) then ! Calculate for wrong combination
                call swap(p_MCFM(7,:),p_MCFM(8,:)) ! Swap the momenta
-               call swap(id_MCFM(7),id_MCFM(8)) ! Swap the ids
-               call SetupParticleLabels(id_MCFM) ! Reassign plabels
+               call SetupParticleLabels(id_MCFM_78swap,7,8,.false.,.true.) ! Assign plabels
                call qq_zzqqstrong(p_MCFM,msq_tmp)
                do i=-5,5
                do j=-5,5
@@ -1999,6 +2008,7 @@ integer :: i,j,ip
          endif
       else if(ZWcode.eq.doWW) then
          if (Process.ge.66 .and. Process.le.68) then
+            call SetupParticleLabels(id_MCFM,1,8,.true.,.true.) ! Assign plabels
             call qq_wwqq(p_MCFM,msq)
             if (id_MCFM(7).eq.0 .and. id_MCFM(8).eq.0) then ! Calculate for swapped momentum combination
                call swap(p_MCFM(7,:),p_MCFM(8,:)) ! Swap just the momenta
@@ -2009,8 +2019,7 @@ integer :: i,j,ip
                enddo
             else if (id_MCFM(7).eq.0 .or. id_MCFM(8).eq.0) then ! Calculate for wrong combination
                call swap(p_MCFM(7,:),p_MCFM(8,:)) ! Swap the momenta
-               call swap(id_MCFM(7),id_MCFM(8)) ! Swap the ids
-               call SetupParticleLabels(id_MCFM) ! Reassign plabels
+               call SetupParticleLabels(id_MCFM_78swap,7,8,.true.,.true.) ! Assign plabels
                call qq_wwqq(p_MCFM,msq_tmp)
                do i=-5,5
                do j=-5,5
@@ -2020,7 +2029,8 @@ integer :: i,j,ip
                enddo
                enddo
             endif
-         else if (Process.eq.69) then ! Or some other number?
+         else if (Process.eq.69) then
+            call SetupParticleLabels(id_MCFM,1,8,.false.,.true.) ! Assign plabels
             call qq_wwqqstrong(p_MCFM,msq)
             if (id_MCFM(7).eq.0 .and. id_MCFM(8).eq.0) then ! Calculate for swapped momentum combination
                call swap(p_MCFM(7,:),p_MCFM(8,:)) ! Swap just the momenta
@@ -2032,13 +2042,13 @@ integer :: i,j,ip
                enddo
                ! Subtract qqb->gg, which was counted twice
                id_MCFM(7:8)=Glu_
-               call SetupParticleLabels(id_MCFM) ! Reassign plabels
+               call SetupParticleLabels(id_MCFM,7,8,.false.,.true.) ! Assign plabels
+               id_MCFM(7:8)=0
                call qq_wwqqstrong(p_MCFM,msq_tmp)
                msq = msq - msq_tmp
             else if (id_MCFM(7).eq.0 .or. id_MCFM(8).eq.0) then ! Calculate for wrong combination
                call swap(p_MCFM(7,:),p_MCFM(8,:)) ! Swap the momenta
-               call swap(id_MCFM(7),id_MCFM(8)) ! Swap the ids
-               call SetupParticleLabels(id_MCFM) ! Reassign plabels
+               call SetupParticleLabels(id_MCFM_78swap,7,8,.false.,.true.) ! Assign plabels
                call qq_wwqqstrong(p_MCFM,msq_tmp)
                do i=-5,5
                do j=-5,5
@@ -2051,6 +2061,7 @@ integer :: i,j,ip
          endif
       else if(ZWcode.eq.doZZorWW) then
          if (Process.ge.66 .and. Process.le.68) then
+            call SetupParticleLabels(id_MCFM,1,8,.true.,.true.) ! Assign plabels
             call qq_vvqq(p_MCFM,msq)
             if (id_MCFM(7).eq.0 .and. id_MCFM(8).eq.0) then ! Calculate for swapped momentum combination
                call swap(p_MCFM(7,:),p_MCFM(8,:)) ! Swap just the momenta
@@ -2061,8 +2072,7 @@ integer :: i,j,ip
                enddo
             else if (id_MCFM(7).eq.0 .or. id_MCFM(8).eq.0) then ! Calculate for wrong combination
                call swap(p_MCFM(7,:),p_MCFM(8,:)) ! Swap the momenta
-               call swap(id_MCFM(7),id_MCFM(8)) ! Swap the ids
-               call SetupParticleLabels(id_MCFM) ! Reassign plabels
+               call SetupParticleLabels(id_MCFM_78swap,7,8,.true.,.true.) ! Assign plabels
                call qq_vvqq(p_MCFM,msq_tmp)
                do i=-5,5
                do j=-5,5
@@ -2074,6 +2084,22 @@ integer :: i,j,ip
             endif
          endif
       endif
+
+      ! Wipe the MEs that are not supposed to exist
+      do i=-5,5;do j=-5,5
+         if ( &
+         ( id_MCFM(1).eq.0 .or. id_MCFM(1).eq.convertFromPartIndex(i) ) .and. &
+         ( id_MCFM(2).eq.0 .or. id_MCFM(2).eq.convertFromPartIndex(j) ) &
+         ) then
+            idDummy(1)=convertFromPartIndex(i); idDummy(2)=convertFromPartIndex(j)
+            doNotWipe = Setup_MCFM_qqVVqq(idDummy,pin_MCFMconv,id_MCFM,p_MCFM)
+            if (.not. doNotWipe) then
+               msq(i,j)=0d0
+            endif
+         else
+            msq(i,j)=0d0
+         endif
+      enddo;enddo
 
    endif
 
