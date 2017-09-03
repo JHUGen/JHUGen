@@ -177,7 +177,6 @@ subroutine MCFM_firsttime()
    integer H2wwCLambda_qsq(1:SIZE_HVV_CQSQ)
 
 
-
    inputfile='input.DAT'
    workdir='./'
 
@@ -227,13 +226,13 @@ subroutine MCFM_firsttime()
    Hb4b4coupl(:)=0d0
    Ht4t4_mt_4gen=10000d0
    Hb4b4_mb_4gen=10000d0
-   call GetSpinZeroVVCouplings(1,Hzzcoupl, HzzCLambda_qsq, HzzLambda_qsq, HzzLambda, HLambda_zgs1, HLambda_Q, .false.)
-   call GetSpinZeroVVCouplings(1,Hwwcoupl, HwwCLambda_qsq, HwwLambda_qsq, HwwLambda, HLambda_zgs1, HLambda_Q, .true.)
+   call GetSpinZeroVVCouplings(1, .false., Hzzcoupl, HzzCLambda_qsq, HzzLambda_qsq, HzzLambda, HLambda_zgs1, HLambda_Q)
+   call GetSpinZeroVVCouplings(1, .true., Hwwcoupl, HwwCLambda_qsq, HwwLambda_qsq, HwwLambda, HLambda_zgs1, HLambda_Q)
    call GetDistinguishWWCouplingsFlag(separateWWZZcouplings)
 
 !  second resonance
-   call GetSpinZeroVVCouplings(2,H2zzcoupl, H2zzCLambda_qsq, H2zzLambda_qsq, H2zzLambda, H2Lambda_zgs1, H2Lambda_Q, .false.)
-   call GetSpinZeroVVCouplings(2,H2wwcoupl, H2wwCLambda_qsq, H2wwLambda_qsq, H2wwLambda, H2Lambda_zgs1, H2Lambda_Q, .true.)
+   call GetSpinZeroVVCouplings(2, .false., H2zzcoupl, H2zzCLambda_qsq, H2zzLambda_qsq, H2zzLambda, H2Lambda_zgs1, H2Lambda_Q)
+   call GetSpinZeroVVCouplings(2, .true.,  H2wwcoupl, H2wwCLambda_qsq, H2wwLambda_qsq, H2wwLambda, H2Lambda_zgs1, H2Lambda_Q)
 
    call qlinit()
 
@@ -1256,14 +1255,15 @@ subroutine GetMassesWidths( &
    mtau_in = getMass(TaM_)/GeV
    tauwidth_in = getDecayWidth(TaM_)/GeV
 
-   hmass_in = getMass(Hig_)/GeV
-   hwidth_in = getDecayWidth(Hig_)/GeV
-   h2mass_in = getMass(Hig2_)/GeV
-   h2width_in = getDecayWidth(Hig2_)/GeV
    wmass_in = getMass(Wp_)/GeV
    wwidth_in = getDecayWidth(Wp_)/GeV
    zmass_in = getMass(Z0_)/GeV
    zwidth_in = getDecayWidth(Z0_)/GeV
+
+   hmass_in = getHiggsMass(1)/GeV
+   hwidth_in = getHiggsDecayWidth(1)/GeV
+   h2mass_in = getHiggsMass(2)/GeV
+   h2width_in = getHiggsDecayWidth(2)/GeV
 end subroutine
 
 
@@ -1279,7 +1279,7 @@ end subroutine
 
 
 
-subroutine GetSpinZeroVVCouplings(NReso,vvcoupl, cqsq, Lambda_qsq, Lambdag, Lambdag_zgs1, Lambdag_Q, useWWcoupl)
+subroutine GetSpinZeroVVCouplings(NReso, useWWcoupl, vvcoupl, cqsq, Lambda_qsq, Lambdag, Lambdag_zgs1, Lambdag_Q)
    use ModParameters
    implicit none
    integer, intent(in) :: NReso
@@ -1449,17 +1449,17 @@ else! second resonance
       Lambdag(3) = Lambda2_z3
       Lambdag(4) = Lambda2_z4
 
-      cqsq(1) = cz_q1sq
+      cqsq(1) = c2z_q1sq
       Lambda_qsq(1,1) = Lambda2_z11
       Lambda_qsq(1,2) = Lambda2_z21
       Lambda_qsq(1,3) = Lambda2_z31
       Lambda_qsq(1,4) = Lambda2_z41
-      cqsq(2) = cz_q2sq
+      cqsq(2) = c2z_q2sq
       Lambda_qsq(2,1) = Lambda2_z12
       Lambda_qsq(2,2) = Lambda2_z22
       Lambda_qsq(2,3) = Lambda2_z32
       Lambda_qsq(2,4) = Lambda2_z42
-      cqsq(3) = cz_q12sq
+      cqsq(3) = c2z_q12sq
       Lambda_qsq(3,1) = Lambda2_z10
       Lambda_qsq(3,2) = Lambda2_z20
       Lambda_qsq(3,3) = Lambda2_z30
@@ -1518,17 +1518,17 @@ else! second resonance
       Lambdag(3) = Lambda2_w3
       Lambdag(4) = Lambda2_w4
 
-      cqsq(1) = cw_q1sq
+      cqsq(1) = c2w_q1sq
       Lambda_qsq(1,1) = Lambda2_w11
       Lambda_qsq(1,2) = Lambda2_w21
       Lambda_qsq(1,3) = Lambda2_w31
       Lambda_qsq(1,4) = Lambda2_w41
-      cqsq(2) = cw_q2sq
+      cqsq(2) = c2w_q2sq
       Lambda_qsq(2,1) = Lambda2_w12
       Lambda_qsq(2,2) = Lambda2_w22
       Lambda_qsq(2,3) = Lambda2_w32
       Lambda_qsq(2,4) = Lambda2_w42
-      cqsq(3) = cw_q12sq
+      cqsq(3) = c2w_q12sq
       Lambda_qsq(3,1) = Lambda2_w10
       Lambda_qsq(3,2) = Lambda2_w20
       Lambda_qsq(3,3) = Lambda2_w30
@@ -1822,223 +1822,16 @@ end subroutine
 
 ! Subroutines to check and pass the ordering for the associated particles
 subroutine Check_APartHash_MCFM_qqVVqq(idAPart,order) ! idAPart is in JHU convention
-use ModParameters
+use ModHashCollection
 implicit none
 integer, intent(in) :: idAPart(1:4)
 integer, intent(out) :: order(1:2) ! Final state ordering; initial state remains the same
-integer, parameter :: hashSize = 204
-integer :: hash(1:4,1:hashSize),ih
+integer, parameter :: hashSize = Hash_MCFM_qqVVqq_Size
+integer, pointer :: hash(:,:)
+integer :: ih
 logical  :: outFound
 
-   hash(:,1) = (/ Up_ , Chm_ , Up_ , Chm_ /)
-   hash(:,2) = (/ Dn_ , Str_ , Dn_ , Str_ /)
-   hash(:,3) = (/ Dn_ , Bot_ , Dn_ , Bot_ /)
-   hash(:,4) = (/ Str_ , Bot_ , Str_ , Bot_ /)
-   hash(:,5) = (/ Up_ , Str_ , Up_ , Str_ /)
-   hash(:,6) = (/ Up_ , Bot_ , Up_ , Bot_ /)
-   hash(:,7) = (/ Chm_ , Bot_ , Chm_ , Bot_ /)
-   hash(:,8) = (/ Dn_ , Chm_ , Dn_ , Chm_ /)
-   hash(:,9) = (/ Dn_ , Up_ , Dn_ , Up_ /)
-   hash(:,10) = (/ Str_ , Chm_ , Str_ , Chm_ /)
-   hash(:,11) = (/ Dn_ , Chm_ , Up_ , Str_ /)
-   hash(:,12) = (/ Up_ , Str_ , Dn_ , Chm_ /)
-   hash(:,13) = (/ Up_ , Up_ , Up_ , Up_ /)
-   hash(:,14) = (/ Chm_ , Chm_ , Chm_ , Chm_ /)
-   hash(:,15) = (/ Dn_ , Dn_ , Dn_ , Dn_ /)
-   hash(:,16) = (/ Str_ , Str_ , Str_ , Str_ /)
-   hash(:,17) = (/ Bot_ , Bot_ , Bot_ , Bot_ /)
-   hash(:,18) = (/ Chm_ , Up_ , Up_ , Chm_ /)
-   hash(:,19) = (/ Str_ , Dn_ , Dn_ , Str_ /)
-   hash(:,20) = (/ Bot_ , Dn_ , Dn_ , Bot_ /)
-   hash(:,21) = (/ Bot_ , Str_ , Str_ , Bot_ /)
-   hash(:,22) = (/ Str_ , Up_ , Up_ , Str_ /)
-   hash(:,23) = (/ Bot_ , Up_ , Up_ , Bot_ /)
-   hash(:,24) = (/ Bot_ , Chm_ , Chm_ , Bot_ /)
-   hash(:,25) = (/ Chm_ , Dn_ , Dn_ , Chm_ /)
-   hash(:,26) = (/ Up_ , Dn_ , Dn_ , Up_ /)
-   hash(:,27) = (/ Chm_ , Str_ , Str_ , Chm_ /)
-   hash(:,28) = (/ Chm_ , Dn_ , Up_ , Str_ /)
-   hash(:,29) = (/ Str_ , Up_ , Dn_ , Chm_ /)
-   hash(:,30) = (/ Up_ , Up_ , Up_ , Up_ /)
-   hash(:,31) = (/ Chm_ , Chm_ , Chm_ , Chm_ /)
-   hash(:,32) = (/ Dn_ , Dn_ , Dn_ , Dn_ /)
-   hash(:,33) = (/ Str_ , Str_ , Str_ , Str_ /)
-   hash(:,34) = (/ Bot_ , Bot_ , Bot_ , Bot_ /)
-
-   hash(:,35) = (/ AChm_ , AUp_ , AChm_ , AUp_ /)
-   hash(:,36) = (/ AStr_ , ADn_ , AStr_ , ADn_ /)
-   hash(:,37) = (/ ABot_ , ADn_ , ABot_ , ADn_ /)
-   hash(:,38) = (/ ABot_ , AStr_ , ABot_ , AStr_ /)
-   hash(:,39) = (/ AStr_ , AUp_ , AStr_ , AUp_ /)
-   hash(:,40) = (/ ABot_ , AUp_ , ABot_ , AUp_ /)
-   hash(:,41) = (/ ABot_ , AChm_ , ABot_ , AChm_ /)
-   hash(:,42) = (/ AChm_ , ADn_ , AChm_ , ADn_ /)
-   hash(:,43) = (/ AUp_ , ADn_ , AUp_ , ADn_ /)
-   hash(:,44) = (/ AChm_ , AStr_ , AChm_ , AStr_ /)
-   hash(:,45) = (/ AStr_ , AUp_ , AChm_ , ADn_ /)
-   hash(:,46) = (/ AChm_ , ADn_ , AStr_ , AUp_ /)
-   hash(:,47) = (/ AUp_ , AUp_ , AUp_ , AUp_ /)
-   hash(:,48) = (/ AChm_ , AChm_ , AChm_ , AChm_ /)
-   hash(:,49) = (/ ADn_ , ADn_ , ADn_ , ADn_ /)
-   hash(:,50) = (/ AStr_ , AStr_ , AStr_ , AStr_ /)
-   hash(:,51) = (/ ABot_ , ABot_ , ABot_ , ABot_ /)
-   hash(:,52) = (/ AUp_ , AChm_ , AChm_ , AUp_ /)
-   hash(:,53) = (/ ADn_ , AStr_ , AStr_ , ADn_ /)
-   hash(:,54) = (/ ADn_ , ABot_ , ABot_ , ADn_ /)
-   hash(:,55) = (/ AStr_ , ABot_ , ABot_ , AStr_ /)
-   hash(:,56) = (/ AUp_ , AStr_ , AStr_ , AUp_ /)
-   hash(:,57) = (/ AUp_ , ABot_ , ABot_ , AUp_ /)
-   hash(:,58) = (/ AChm_ , ABot_ , ABot_ , AChm_ /)
-   hash(:,59) = (/ ADn_ , AChm_ , AChm_ , ADn_ /)
-   hash(:,60) = (/ ADn_ , AUp_ , AUp_ , ADn_ /)
-   hash(:,61) = (/ AStr_ , AChm_ , AChm_ , AStr_ /)
-   hash(:,62) = (/ AUp_ , AStr_ , AChm_ , ADn_ /)
-   hash(:,63) = (/ ADn_ , AChm_ , AStr_ , AUp_ /)
-   hash(:,64) = (/ AUp_ , AUp_ , AUp_ , AUp_ /)
-   hash(:,65) = (/ AChm_ , AChm_ , AChm_ , AChm_ /)
-   hash(:,66) = (/ ADn_ , ADn_ , ADn_ , ADn_ /)
-   hash(:,67) = (/ AStr_ , AStr_ , AStr_ , AStr_ /)
-   hash(:,68) = (/ ABot_ , ABot_ , ABot_ , ABot_ /)
-
-   hash(:,69) = (/ AUp_ , Chm_ , AUp_ , Chm_ /)
-   hash(:,70) = (/ ADn_ , Str_ , ADn_ , Str_ /)
-   hash(:,71) = (/ ADn_ , Bot_ , ADn_ , Bot_ /)
-   hash(:,72) = (/ AStr_ , Bot_ , AStr_ , Bot_ /)
-   hash(:,73) = (/ AUp_ , Str_ , AUp_ , Str_ /)
-   hash(:,74) = (/ AUp_ , Bot_ , AUp_ , Bot_ /)
-   hash(:,75) = (/ AChm_ , Bot_ , AChm_ , Bot_ /)
-   hash(:,76) = (/ ADn_ , Chm_ , ADn_ , Chm_ /)
-   hash(:,77) = (/ ADn_ , Up_ , ADn_ , Up_ /)
-   hash(:,78) = (/ AStr_ , Chm_ , AStr_ , Chm_ /)
-   hash(:,79) = (/ AUp_ , Chm_ , ADn_ , Str_ /)
-   hash(:,80) = (/ ADn_ , Str_ , AUp_ , Chm_ /)
-   hash(:,81) = (/ AUp_ , Up_ , AUp_ , Up_ /)
-   hash(:,82) = (/ AChm_ , Chm_ , AChm_ , Chm_ /)
-   hash(:,83) = (/ ADn_ , Dn_ , ADn_ , Dn_ /)
-   hash(:,84) = (/ AStr_ , Str_ , AStr_ , Str_ /)
-   hash(:,85) = (/ ABot_ , Bot_ , ABot_ , Bot_ /)
-   hash(:,86) = (/ AChm_ , Up_ , AChm_ , Up_ /)
-   hash(:,87) = (/ AStr_ , Dn_ , AStr_ , Dn_ /)
-   hash(:,88) = (/ ABot_ , Dn_ , ABot_ , Dn_ /)
-   hash(:,89) = (/ ABot_ , Str_ , ABot_ , Str_ /)
-   hash(:,90) = (/ AStr_ , Up_ , AStr_ , Up_ /)
-   hash(:,91) = (/ ABot_ , Up_ , ABot_ , Up_ /)
-   hash(:,92) = (/ ABot_ , Chm_ , ABot_ , Chm_ /)
-   hash(:,93) = (/ AChm_ , Dn_ , AChm_ , Dn_ /)
-   hash(:,94) = (/ AUp_ , Dn_ , AUp_ , Dn_ /)
-   hash(:,95) = (/ AChm_ , Str_ , AChm_ , Str_ /)
-   hash(:,96) = (/ AStr_ , Dn_ , AChm_ , Up_ /)
-   hash(:,97) = (/ AChm_ , Up_ , AStr_ , Dn_ /)
-   hash(:,98) = (/ AUp_ , Up_ , AUp_ , Up_ /)
-   hash(:,99) = (/ AChm_ , Chm_ , AChm_ , Chm_ /)
-   hash(:,100) = (/ ADn_ , Dn_ , ADn_ , Dn_ /)
-   hash(:,101) = (/ AStr_ , Str_ , AStr_ , Str_ /)
-   hash(:,102) = (/ ABot_ , Bot_ , ABot_ , Bot_ /)
-
-   hash(:,103) = (/ Chm_ , AUp_ , AUp_ , Chm_ /)
-   hash(:,104) = (/ Str_ , ADn_ , ADn_ , Str_ /)
-   hash(:,105) = (/ Bot_ , ADn_ , ADn_ , Bot_ /)
-   hash(:,106) = (/ Bot_ , AStr_ , AStr_ , Bot_ /)
-   hash(:,107) = (/ Str_ , AUp_ , AUp_ , Str_ /)
-   hash(:,108) = (/ Bot_ , AUp_ , AUp_ , Bot_ /)
-   hash(:,109) = (/ Bot_ , AChm_ , AChm_ , Bot_ /)
-   hash(:,110) = (/ Chm_ , ADn_ , ADn_ , Chm_ /)
-   hash(:,111) = (/ Up_ , ADn_ , ADn_ , Up_ /)
-   hash(:,112) = (/ Chm_ , AStr_ , AStr_ , Chm_ /)
-   hash(:,113) = (/ Chm_ , AUp_ , ADn_ , Str_ /)
-   hash(:,114) = (/ Str_ , ADn_ , AUp_ , Chm_ /)
-   hash(:,115) = (/ Up_ , AUp_ , AUp_ , Up_ /)
-   hash(:,116) = (/ Chm_ , AChm_ , AChm_ , Chm_ /)
-   hash(:,117) = (/ Dn_ , ADn_ , ADn_ , Dn_ /)
-   hash(:,118) = (/ Str_ , AStr_ , AStr_ , Str_ /)
-   hash(:,119) = (/ Bot_ , ABot_ , ABot_ , Bot_ /)
-   hash(:,120) = (/ Up_ , AChm_ , AChm_ , Up_ /)
-   hash(:,121) = (/ Dn_ , AStr_ , AStr_ , Dn_ /)
-   hash(:,122) = (/ Dn_ , ABot_ , ABot_ , Dn_ /)
-   hash(:,123) = (/ Str_ , ABot_ , ABot_ , Str_ /)
-   hash(:,124) = (/ Up_ , AStr_ , AStr_ , Up_ /)
-   hash(:,125) = (/ Up_ , ABot_ , ABot_ , Up_ /)
-   hash(:,126) = (/ Chm_ , ABot_ , ABot_ , Chm_ /)
-   hash(:,127) = (/ Dn_ , AChm_ , AChm_ , Dn_ /)
-   hash(:,128) = (/ Dn_ , AUp_ , AUp_ , Dn_ /)
-   hash(:,129) = (/ Str_ , AChm_ , AChm_ , Str_ /)
-   hash(:,130) = (/ Dn_ , AStr_ , AChm_ , Up_ /)
-   hash(:,131) = (/ Up_ , AChm_ , AStr_ , Dn_ /)
-   hash(:,132) = (/ Up_ , AUp_ , AUp_ , Up_ /)
-   hash(:,133) = (/ Chm_ , AChm_ , AChm_ , Chm_ /)
-   hash(:,134) = (/ Dn_ , ADn_ , ADn_ , Dn_ /)
-   hash(:,135) = (/ Str_ , AStr_ , AStr_ , Str_ /)
-   hash(:,136) = (/ Bot_ , ABot_ , ABot_ , Bot_ /)
-
-   hash(:,137) = (/ Up_ , AUp_ , AChm_ , Chm_ /)
-   hash(:,138) = (/ Dn_ , ADn_ , AStr_ , Str_ /)
-   hash(:,139) = (/ Dn_ , ADn_ , ABot_ , Bot_ /)
-   hash(:,140) = (/ Str_ , AStr_ , ABot_ , Bot_ /)
-   hash(:,141) = (/ Up_ , AUp_ , AStr_ , Str_ /)
-   hash(:,142) = (/ Up_ , AUp_ , ABot_ , Bot_ /)
-   hash(:,143) = (/ Chm_ , AChm_ , ABot_ , Bot_ /)
-   hash(:,144) = (/ Dn_ , ADn_ , AChm_ , Chm_ /)
-   hash(:,145) = (/ Dn_ , ADn_ , AUp_ , Up_ /)
-   hash(:,146) = (/ Str_ , AStr_ , AChm_ , Chm_ /)
-   hash(:,147) = (/ Dn_ , AUp_ , AChm_ , Str_ /)
-   hash(:,148) = (/ Up_ , ADn_ , AStr_ , Chm_ /)
-   hash(:,149) = (/ Up_ , AUp_ , AUp_ , Up_ /)
-   hash(:,150) = (/ Chm_ , AChm_ , AChm_ , Chm_ /)
-   hash(:,151) = (/ Dn_ , ADn_ , ADn_ , Dn_ /)
-   hash(:,152) = (/ Str_ , AStr_ , AStr_ , Str_ /)
-   hash(:,153) = (/ Bot_ , ABot_ , ABot_ , Bot_ /)
-   hash(:,154) = (/ Chm_ , AChm_ , AUp_ , Up_ /)
-   hash(:,155) = (/ Str_ , AStr_ , ADn_ , Dn_ /)
-   hash(:,156) = (/ Bot_ , ABot_ , ADn_ , Dn_ /)
-   hash(:,157) = (/ Bot_ , ABot_ , AStr_ , Str_ /)
-   hash(:,158) = (/ Str_ , AStr_ , AUp_ , Up_ /)
-   hash(:,159) = (/ Bot_ , ABot_ , AUp_ , Up_ /)
-   hash(:,160) = (/ Bot_ , ABot_ , AChm_ , Chm_ /)
-   hash(:,161) = (/ Chm_ , AChm_ , ADn_ , Dn_ /)
-   hash(:,162) = (/ Up_ , AUp_ , ADn_ , Dn_ /)
-   hash(:,163) = (/ Chm_ , AChm_ , AStr_ , Str_ /)
-   hash(:,164) = (/ Chm_ , AStr_ , ADn_ , Up_ /)
-   hash(:,165) = (/ Str_ , AChm_ , AUp_ , Dn_ /)
-   hash(:,166) = (/ Up_ , AUp_ , AUp_ , Up_ /)
-   hash(:,167) = (/ Chm_ , AChm_ , AChm_ , Chm_ /)
-   hash(:,168) = (/ Dn_ , ADn_ , ADn_ , Dn_ /)
-   hash(:,169) = (/ Str_ , AStr_ , AStr_ , Str_ /)
-   hash(:,170) = (/ Bot_ , ABot_ , ABot_ , Bot_ /)
-
-   hash(:,171) = (/ AUp_ , Up_ , AChm_ , Chm_ /)
-   hash(:,172) = (/ ADn_ , Dn_ , AStr_ , Str_ /)
-   hash(:,173) = (/ ADn_ , Dn_ , ABot_ , Bot_ /)
-   hash(:,174) = (/ AStr_ , Str_ , ABot_ , Bot_ /)
-   hash(:,175) = (/ AUp_ , Up_ , AStr_ , Str_ /)
-   hash(:,176) = (/ AUp_ , Up_ , ABot_ , Bot_ /)
-   hash(:,177) = (/ AChm_ , Chm_ , ABot_ , Bot_ /)
-   hash(:,178) = (/ ADn_ , Dn_ , AChm_ , Chm_ /)
-   hash(:,179) = (/ ADn_ , Dn_ , AUp_ , Up_ /)
-   hash(:,180) = (/ AStr_ , Str_ , AChm_ , Chm_ /)
-   hash(:,181) = (/ AUp_ , Dn_ , AChm_ , Str_ /)
-   hash(:,182) = (/ ADn_ , Up_ , AStr_ , Chm_ /)
-   hash(:,183) = (/ AUp_ , Up_ , AUp_ , Up_ /)
-   hash(:,184) = (/ AChm_ , Chm_ , AChm_ , Chm_ /)
-   hash(:,185) = (/ ADn_ , Dn_ , ADn_ , Dn_ /)
-   hash(:,186) = (/ AStr_ , Str_ , AStr_ , Str_ /)
-   hash(:,187) = (/ ABot_ , Bot_ , ABot_ , Bot_ /)
-   hash(:,188) = (/ AChm_ , Chm_ , AUp_ , Up_ /)
-   hash(:,189) = (/ AStr_ , Str_ , ADn_ , Dn_ /)
-   hash(:,190) = (/ ABot_ , Bot_ , ADn_ , Dn_ /)
-   hash(:,191) = (/ ABot_ , Bot_ , AStr_ , Str_ /)
-   hash(:,192) = (/ AStr_ , Str_ , AUp_ , Up_ /)
-   hash(:,193) = (/ ABot_ , Bot_ , AUp_ , Up_ /)
-   hash(:,194) = (/ ABot_ , Bot_ , AChm_ , Chm_ /)
-   hash(:,195) = (/ AChm_ , Chm_ , ADn_ , Dn_ /)
-   hash(:,196) = (/ AUp_ , Up_ , ADn_ , Dn_ /)
-   hash(:,197) = (/ AChm_ , Chm_ , AStr_ , Str_ /)
-   hash(:,198) = (/ AStr_ , Chm_ , ADn_ , Up_ /)
-   hash(:,199) = (/ AChm_ , Str_ , AUp_ , Dn_ /)
-   hash(:,200) = (/ AUp_ , Up_ , AUp_ , Up_ /)
-   hash(:,201) = (/ AChm_ , Chm_ , AChm_ , Chm_ /)
-   hash(:,202) = (/ ADn_ , Dn_ , ADn_ , Dn_ /)
-   hash(:,203) = (/ AStr_ , Str_ , AStr_ , Str_ /)
-   hash(:,204) = (/ ABot_ , Bot_ , ABot_ , Bot_ /)
+   hash => Hash_MCFM_qqVVqq
 
    outFound=.false.
    order(:)=-1

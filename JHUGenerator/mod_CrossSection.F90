@@ -1,4 +1,5 @@
 MODULE ModCrossSection
+use ModHashCollection
 implicit none
 integer, parameter,private :: LHA2M_pdf(-6:6) = (/-5,-6,-3,-4,-1,-2,0 ,2,1,4,3,6,5/)
 integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6,5/)
@@ -26,7 +27,8 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
  real(8) :: eta1,eta2,tau,x1,x2,sHatJacobi,PreFac,FluxFac,PDFFac,m1ffwgt,m2ffwgt
  real(8) :: pdf(-6:6,1:2)
  integer :: NBin(1:NumHistograms),NHisto,i,MY_IDUP(1:9),ICOLUP(1:2,1:9),xBin(1:4)
- integer :: NumPartonicChannels,iPartChannel,ijSel(1:121,1:3),PartChannelAvg,flav1,flav2,ID_DK(6:9)
+ integer, pointer :: ijSel(:,:)
+ integer :: NumPartonicChannels,iPartChannel,PartChannelAvg,flav1,flav2,ID_DK(6:9)
  real(8) :: EHat,PSWgt,PSWgt2,PSWgt3,ML1,ML2,ML3,ML4,MZ1,MZ2
  real(8) :: MomExt(1:4,1:8),MomDK(1:4,1:4),xRnd
  logical :: applyPSCut
@@ -55,13 +57,13 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
    elseif( Process.eq.1 .or. PChannel.eq.1 ) then
       NumPartonicChannels = 10
       iPartChannel = int(yRnd(12) * (NumPartonicChannels)) +2 ! this runs from 2..11
-      call get_PPXchannelHash(ijSel)
+      call getRef_PPXchannelHash(ijSel)
       iPart_sel = ijSel(iPartChannel,1)
       jPart_sel = ijSel(iPartChannel,2)
    elseif( Process.eq.2 .or. PChannel.eq.2 ) then
       NumPartonicChannels = 11
       iPartChannel = int(yRnd(12) * (NumPartonicChannels)) +1 ! this runs from 1..11
-      call get_PPXchannelHash(ijSel)
+      call getRef_PPXchannelHash(ijSel)
       iPart_sel = ijSel(iPartChannel,1)
       jPart_sel = ijSel(iPartChannel,2)
    endif
@@ -3014,12 +3016,12 @@ ENDIF! GENEVT
  RETURN
  end Function EvalUnWeighted_VHiggs
 
- 
- 
- 
- 
- 
- 
+
+
+
+
+
+
 
  FUNCTION EvalWeighted_ggVH(yRnd,VgsWgt)
  use ModKinematics
@@ -3034,7 +3036,7 @@ ENDIF! GENEVT
  real(8) :: eta1,eta2,tau,x1,x2,sHatJacobi,PreFac,FluxFac,PDFFac
  real(8) :: pdf(-6:6,1:2)
  integer :: NBin(1:NumHistograms),NHisto,i,MY_IDUP(1:9), ICOLUP(1:2,1:9),xBin(1:4)
- integer :: NumPartonicChannels,iPartChannel,ijSel(1:121,1:3),PartChannelAvg,flav1,flav2
+ integer :: NumPartonicChannels,iPartChannel,PartChannelAvg,flav1,flav2
  real(8) :: EHat,PSWgt,PSWgt2,PSWgt3,ML1,ML2,ML3,ML4,MZ1,MZ2
  real(8) :: MomExt(1:4,1:6),MomDK(1:4,1:4),xRnd
  logical :: applyPSCut
@@ -3069,7 +3071,7 @@ ENDIF! GENEVT
    call EvalPhaseSpace_VH2(yRnd(3:10),EHat,MomExt(1:4,1:6),PSWgt)!  g1 g2 f(Z) fbar(Z) H Null        [f(H) fbar(H)]
 !    call boost2Lab(eta1,eta2,6,MomExt(1:4,1:6))
 
-     
+
       call genps(2,EHat,yRnd(3:4),(/M_Z,M_Reso/),MomExt(1:4,3:4),PSWgt)
       MomExt(1:4,5) = MomExt(1:4,4); MomExt(1:4,4)=0d0; MomExt(1:4,6)=0d0
       PSWgt = PSWgt * (2d0*Pi)**(4-(2)*3) * (4d0*Pi)**((2)-1)
@@ -3090,7 +3092,7 @@ ENDIF! GENEVT
 
    Mu_Fact = EHat !M_Reso
    Mu_Ren  = EHat !M_Reso
-   
+
    call EvalAlphaS()
    call setPDFs(eta1,eta2,pdf)
 
@@ -3105,7 +3107,7 @@ ENDIF! GENEVT
 !    print *, PSWgt,LO_Res_Unpol;pause
 
 !    print *, "full",EvalWeighted_ggVH
-!    print *, LO_Res_Unpol, FluxFac , sHatJacobi , PSWgt , PDFFac 
+!    print *, LO_Res_Unpol, FluxFac , sHatJacobi , PSWgt , PDFFac
 !    pause
 
 
@@ -3162,12 +3164,12 @@ ENDIF! GENEVT
 END FUNCTION
 
 
- 
- 
- 
- 
- 
- 
+
+
+
+
+
+
 
  FUNCTION EvalWeighted_tautau(yRnd,VgsWgt)
  use ModKinematics
@@ -3531,34 +3533,6 @@ END FUNCTION
 
 RETURN
 END FUNCTION
-
-
-  SUBROUTINE get_PPXchannelHash(ijSel)
-  implicit none
-  integer, intent(out) :: ijSel(:,:)
-
-
-      ijSel(:,:) = 0
-      ijSel(:,3) = -1
-
-      ijSel( 1,1:3) = (/ 0, 0, 1/)
-      ijSel( 2,1:3) = (/-1,+1, 1/)
-      ijSel( 3,1:3) = (/+1,-1, 1/)
-      ijSel( 4,1:3) = (/-2,+2, 1/)
-      ijSel( 5,1:3) = (/+2,-2, 1/)
-      ijSel( 6,1:3) = (/-3,+3, 1/)
-      ijSel( 7,1:3) = (/+3,-3, 1/)
-      ijSel( 8,1:3) = (/-4,+4, 1/)
-      ijSel( 9,1:3) = (/+4,-4, 1/)
-      ijSel(10,1:3) = (/-5,+5, 1/)
-      ijSel(11,1:3) = (/+5,-5, 1/)
-
-  RETURN
-  END SUBROUTINE
-
-
-
-
 
 
 

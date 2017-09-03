@@ -98,11 +98,13 @@ Exec = ./JHUGen
 
 
 # kinematics dependencies
-KinDep = mod_Phasespace.F90 \
+KinDep = mod_HashCollection.F90 \
+         mod_Phasespace.F90 \
          mod_Kinematics.F90
 
 # kinematics objects
-KinObj = $(ObjectDir)/mod_Phasespace.o \
+KinObj = $(ObjectDir)/mod_HashCollection.o \
+         $(ObjectDir)/mod_Phasespace.o \
          $(ObjectDir)/mod_Kinematics.o
 
 ifeq ($(linkMELA),Yes)
@@ -131,7 +133,7 @@ MainObj = $(ObjectDir)/mod_CrossSection.o \
 
 
 # amplitude dependencies
-AmpDep = mod_Misc.F90 \
+AmpDep =  mod_Misc.F90 \
           mod_Parameters.F90 \
           mod_TopDecay.F90 \
           mod_Graviton.F90 \
