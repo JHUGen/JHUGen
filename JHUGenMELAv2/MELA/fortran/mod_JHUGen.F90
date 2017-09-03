@@ -87,6 +87,7 @@ END SUBROUTINE
 
 SUBROUTINE SetJHUGenDefaults()
    use ModParameters
+   use ModHashCollection
    implicit none
 
    call SetDefaultCKM()
@@ -139,6 +140,8 @@ SUBROUTINE SetJHUGenDefaults()
    RequestOSSF=-1
    CountTauAsAny = .true.
    WriteFailedEvents=0
+
+   call SetupHashes()
 
 END SUBROUTINE SetJHUGenDefaults
 
