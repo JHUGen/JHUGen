@@ -906,8 +906,9 @@ implicit none
       call Init_Hash_OnshellVBF_nosplit()
       call Init_Hash_OnshellHJJ()
       call Init_Hash_OnshellHJJ_nosplit()
-      call Init_Hash_THchannel()
       call Init_Hash_GENchannel()
+      call Init_Hash_THchannel()
+      call Init_Hash_PPXchannel()
 
       hashcoll_hashes_initialized = .true.
    endif

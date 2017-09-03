@@ -34,7 +34,6 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
  logical :: applyPSCut
  include 'vegas_common.f'
 
-
     MomExt(:,:)=0d0
     MomDK(:,:)=0d0
     LO_Res_Unpol = 0d0
@@ -48,7 +47,6 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
       call PDFMapping(12,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi)
     endif
     EvalCounter = EvalCounter+1
-
 
    if( Process.eq.0 .or. PChannel.eq.0) then
       NumPartonicChannels = 1
@@ -69,12 +67,10 @@ integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6
    endif
    PartChannelAvg = NumPartonicChannels
 
-
    if( unweighted .and. .not.warmup .and.  sum(AccepCounter_part(:,:)) .eq. sum(RequEvents(:,:)) ) then
       stopvegas=.true.
    endif
    if( unweighted .and. .not. warmup .and. AccepCounter_part(iPart_sel,jPart_sel) .ge. RequEvents(iPart_sel,jPart_Sel)  ) return
-
 
 !    particle associations:
 !

@@ -2022,7 +2022,8 @@ include 'maxwt.f'
 real(8) :: VG_Result,VG_Error,VG_Chi2
 real(8) :: yRnd(1:22),calls1,calls2,calls_rescale
 real(8) :: dum, RES(-5:5,-5:5),ResFrac(-5:5,-5:5),TotalXSec
-integer :: i, i1, j1,PChannel_aux, PChannel_aux1,NHisto,ijSel(1:121,1:3)
+integer :: i, i1, j1,PChannel_aux, PChannel_aux1,NHisto
+integer, pointer :: ijSel(:,:)
 include 'csmaxvalue.f'
 integer :: flav1,flav2,StatusPercent,MissingEvents,MaxEvts,imax
 integer :: VegasSeed,PreviousSum
@@ -2225,23 +2226,15 @@ if( UseBetaVersion ) then
     endif
 
     if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2) then
-       call get_PPXchannelHash(ijSel)
+       call getRef_PPXchannelHash(ijSel)
     elseif( Process.eq.60 ) then
-       call get_VBFchannelHash(ijSel)
+       call getRef_VBFchannelHash(ijSel)
     elseif( Process.eq.61 ) then
-       call get_HJJchannelHash(ijSel)
-    elseif( Process.eq.110 ) then
-       call get_THchannelHash(ijSel)
-    elseif( Process.eq.111 ) then
-       call get_THchannelHash(ijSel)
-    elseif( Process.eq.112 ) then
-       call get_THchannelHash(ijSel)
-    elseif( Process.eq.113 ) then
-       call get_THchannelHash(ijSel)
-    elseif( Process.eq.114 ) then
-       call get_THchannelHash(ijSel)
+       call getRef_HJJchannelHash(ijSel)
+    elseif( Process.ge.110 .and. Process .le.114 ) then
+       call getRef_THchannelHash(ijSel)
     else
-       call get_GENchannelHash(ijSel)
+       call getRef_GENchannelHash(ijSel)
     endif
 ! do i=1,121
 !          i1 = ijSel(i,1)
