@@ -1862,26 +1862,26 @@ logical  :: outFound
    do ih=1,hashSize
       if ( &
       .not.( &
-      (idAPart(1).eq.0 .or. idAPart(1).eq.hash(1,ih)) &
+      (idAPart(1).eq.0 .or. idAPart(1).eq.hash(ih,1)) &
       .and. &
-      (idAPart(2).eq.0 .or. idAPart(2).eq.hash(2,ih)) &
+      (idAPart(2).eq.0 .or. idAPart(2).eq.hash(ih,2)) &
       ) &
       ) cycle
 
       ! Final particles are q
       if ((IsALightQuark(idAPart(3)) .or. idAPart(3).eq.0) .and. (IsALightQuark(idAPart(4)) .or. idAPart(4).eq.0)) then
          if ( &
-         (idAPart(3).eq.0 .or. idAPart(3).eq.hash(3,ih)) &
+         (idAPart(3).eq.0 .or. idAPart(3).eq.hash(ih,3)) &
          .and. &
-         (idAPart(4).eq.0 .or. idAPart(4).eq.hash(4,ih)) &
+         (idAPart(4).eq.0 .or. idAPart(4).eq.hash(ih,4)) &
          ) then
             order(1)=0
             order(2)=1
             outFound=.true.
          else if ( &
-         (idAPart(3).eq.0 .or. idAPart(3).eq.hash(4,ih)) &
+         (idAPart(3).eq.0 .or. idAPart(3).eq.hash(ih,4)) &
          .and. &
-         (idAPart(4).eq.0 .or. idAPart(4).eq.hash(3,ih)) &
+         (idAPart(4).eq.0 .or. idAPart(4).eq.hash(ih,3)) &
          ) then
             order(1)=1
             order(2)=0
@@ -1889,17 +1889,17 @@ logical  :: outFound
          endif
       ! Final particles l/nu
       else if ((IsALepton(idAPart(3)) .or. IsANeutrino(idAPart(3))) .and. (IsALepton(idAPart(4)) .or. IsANeutrino(idAPart(4)))) then
-         if (abs(hash(1,ih)).eq.abs(hash(2,ih)) .and. abs(hash(1,ih)).eq.abs(hash(3,ih)) .and. abs(hash(1,ih)).eq.abs(hash(4,ih))) cycle ! Do not consider the ordering in uquq_uquq or dqdq_dqdq
+         if (abs(hash(ih,1)).eq.abs(hash(ih,2)) .and. abs(hash(ih,1)).eq.abs(hash(ih,3)) .and. abs(hash(ih,1)).eq.abs(hash(ih,4))) cycle ! Do not consider the ordering in uquq_uquq or dqdq_dqdq
 
          if ( &
          ( &
-         sign(1, idAPart(3)).eq.sign(1, hash(3,ih)) .and. &
-         ((IsALepton(idAPart(3)) .and. IsDownTypeQuark(hash(3,ih))) .or. (IsANeutrino(idAPart(3)) .and. IsUpTypeQuark(hash(3,ih)))) &
+         sign(1, idAPart(3)).eq.sign(1, hash(ih,3)) .and. &
+         ((IsALepton(idAPart(3)) .and. IsDownTypeQuark(hash(ih,3))) .or. (IsANeutrino(idAPart(3)) .and. IsUpTypeQuark(hash(ih,3)))) &
          ) &
          .and. &
          ( &
-         sign(1, idAPart(4)).eq.sign(1, hash(4,ih)) .and. &
-         ((IsALepton(idAPart(4)) .and. IsDownTypeQuark(hash(4,ih))) .or. (IsANeutrino(idAPart(4)) .and. IsUpTypeQuark(hash(4,ih)))) &
+         sign(1, idAPart(4)).eq.sign(1, hash(ih,4)) .and. &
+         ((IsALepton(idAPart(4)) .and. IsDownTypeQuark(hash(ih,4))) .or. (IsANeutrino(idAPart(4)) .and. IsUpTypeQuark(hash(ih,4)))) &
          ) &
          ) then
             order(1)=0
@@ -1907,20 +1907,20 @@ logical  :: outFound
             outFound=.true.
          else if ( &
          ( &
-         sign(1, idAPart(3)).eq.sign(1, hash(4,ih)) .and. &
-         ((IsALepton(idAPart(3)) .and. IsDownTypeQuark(hash(4,ih))) .or. (IsANeutrino(idAPart(3)) .and. IsUpTypeQuark(hash(4,ih)))) &
+         sign(1, idAPart(3)).eq.sign(1, hash(ih,4)) .and. &
+         ((IsALepton(idAPart(3)) .and. IsDownTypeQuark(hash(ih,4))) .or. (IsANeutrino(idAPart(3)) .and. IsUpTypeQuark(hash(ih,4)))) &
          ) &
          .and. &
          ( &
-         sign(1, idAPart(4)).eq.sign(1, hash(3,ih)) .and. &
-         ((IsALepton(idAPart(4)) .and. IsDownTypeQuark(hash(3,ih))) .or. (IsANeutrino(idAPart(4)) .and. IsUpTypeQuark(hash(3,ih)))) &
+         sign(1, idAPart(4)).eq.sign(1, hash(ih,3)) .and. &
+         ((IsALepton(idAPart(4)) .and. IsDownTypeQuark(hash(ih,3))) .or. (IsANeutrino(idAPart(4)) .and. IsUpTypeQuark(hash(ih,3)))) &
          ) &
          ) then
             order(1)=1
             order(2)=0
             outFound=.true.
          endif
-         outFound = ( CoupledVertex(idAPart(3:4), -1).eq.CoupledVertex(hash(3:4,ih),-1) )
+         outFound = ( CoupledVertex(idAPart(3:4), -1).eq.CoupledVertex(hash(ih,3:4),-1) )
       endif
       if (outFound) then
          exit
