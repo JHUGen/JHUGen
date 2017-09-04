@@ -68,7 +68,7 @@ EvalWeighted_HJJ_fulldecay = 0d0
       print *, "NumPartonicChannels=",NumPartonicChannels
    endif
    if( (unweighted) .and. (.not. warmup) .and. (AccepCounter_part(iPart_sel,jPart_sel) .ge. RequEvents(iPart_sel,jPart_Sel))  ) then
-      call removeOffshellChannelFromHashRef(ijSel,iPartChannel,NumPartonicChannels,4)
+      call removeOffshellChannelFromGenHashRef(ijSel,iPartChannel,NumPartonicChannels,4)
       print *, "REMOVED CHANNEL ",iPart_sel,jPart_sel," FROM HASH: ",AccepCounter_part(iPart_sel,jPart_sel),RequEvents(iPart_sel,jPart_Sel)
       NumPartonicChannels = NumPartonicChannels-1
       print *, NumPartonicChannels," CHANNELS REMAINING"
