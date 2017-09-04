@@ -9,8 +9,7 @@ integer, parameter :: Hash_MCFM_qqVVqq_Size = 204
 integer, target :: Hash_MCFM_qqVVqq(1:4,1:Hash_MCFM_qqVVqq_Size)
 
 ! MCFM qq_VVqq hash (generation) - PDF/PDG conventions
-logical, parameter :: deterministic_MCFM_qqVVqq_Gen=.false.
-integer, parameter :: Hash_MCFM_qqVVqq_Gen_Size = 204 ! Maximum size
+integer, parameter :: Hash_MCFM_qqVVqq_Gen_Size = 121 ! Maximum size
 integer, target :: Hash_MCFM_qqVVqq_Gen(1:Hash_MCFM_qqVVqq_Gen_Size,1:4)
 
 ! JHUGen onshell 0-jet hash - PDF conventions
@@ -261,114 +260,14 @@ end subroutine
 
 subroutine Init_Hash_MCFM_qqVVqq_Generation()
 implicit none
-integer :: ch,i
-   if( .not. deterministic_MCFM_qqVVqq_Gen ) then
-      Hash_MCFM_qqVVqq_Gen(  1,:) = (/ 2, 1, 0,0/)
-      Hash_MCFM_qqVVqq_Gen(  2,:) = (/ 1, 2, 0,0/)
-      Hash_MCFM_qqVVqq_Gen(  3,:) = (/ 2,-2, 0,0/)
-      Hash_MCFM_qqVVqq_Gen(  4,:) = (/-2, 2, 0,0/)
-      Hash_MCFM_qqVVqq_Gen(  5,:) = (/ 2, 3, 0,0/)
-      Hash_MCFM_qqVVqq_Gen(  6,:) = (/ 3, 2, 0,0/)
-      Hash_MCFM_qqVVqq_Gen(  7,:) = (/ 1,-1, 0,0/)
-      Hash_MCFM_qqVVqq_Gen(  8,:) = (/-1, 1, 0,0/)
-      Hash_MCFM_qqVVqq_Gen(  9,:) = (/ 1, 3, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 10,:) = (/ 3, 1, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 11,:) = (/ 2,-4, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 12,:) = (/-4, 2, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 13,:) = (/ 1, 4, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 14,:) = (/ 4, 1, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 15,:) = (/-5,-5, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 16,:) = (/-5,-4, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 17,:) = (/-5,-3, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 18,:) = (/-5,-2, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 19,:) = (/-5,-1, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 20,:) = (/-5, 1, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 21,:) = (/-5, 2, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 22,:) = (/-5, 3, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 23,:) = (/-5, 4, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 24,:) = (/-5, 5, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 25,:) = (/-4,-5, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 26,:) = (/-4,-4, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 27,:) = (/-4,-3, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 28,:) = (/-4,-2, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 29,:) = (/-4,-1, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 30,:) = (/-4, 1, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 31,:) = (/-4, 3, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 32,:) = (/-4, 4, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 33,:) = (/-4, 5, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 34,:) = (/-3,-5, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 35,:) = (/-3,-4, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 36,:) = (/-3,-3, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 37,:) = (/-3,-2, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 38,:) = (/-3,-1, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 39,:) = (/-3, 1, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 40,:) = (/-3, 2, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 41,:) = (/-3, 3, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 42,:) = (/-3, 4, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 43,:) = (/-3, 5, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 44,:) = (/-2,-5, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 45,:) = (/-2,-4, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 46,:) = (/-2,-3, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 47,:) = (/-2,-2, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 48,:) = (/-2,-1, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 49,:) = (/-2, 1, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 50,:) = (/-2, 3, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 51,:) = (/-2, 4, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 52,:) = (/-2, 5, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 53,:) = (/-1,-5, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 54,:) = (/-1,-4, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 55,:) = (/-1,-3, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 56,:) = (/-1,-2, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 57,:) = (/-1,-1, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 58,:) = (/-1, 2, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 59,:) = (/-1, 3, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 60,:) = (/-1, 4, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 61,:) = (/-1, 5, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 62,:) = (/ 1,-5, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 63,:) = (/ 1,-4, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 64,:) = (/ 1,-3, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 65,:) = (/ 1,-2, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 66,:) = (/ 1, 1, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 67,:) = (/ 1, 5, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 68,:) = (/ 2,-5, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 69,:) = (/ 2,-3, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 70,:) = (/ 2,-1, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 71,:) = (/ 2, 2, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 72,:) = (/ 2, 4, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 73,:) = (/ 2, 5, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 74,:) = (/ 3,-5, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 75,:) = (/ 3,-4, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 76,:) = (/ 3,-3, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 77,:) = (/ 3,-2, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 78,:) = (/ 3,-1, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 79,:) = (/ 3, 3, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 80,:) = (/ 3, 4, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 81,:) = (/ 3, 5, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 82,:) = (/ 4,-5, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 83,:) = (/ 4,-4, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 84,:) = (/ 4,-3, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 85,:) = (/ 4,-2, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 86,:) = (/ 4,-1, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 87,:) = (/ 4, 2, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 88,:) = (/ 4, 3, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 89,:) = (/ 4, 4, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 90,:) = (/ 4, 5, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 91,:) = (/ 5,-5, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 92,:) = (/ 5,-4, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 93,:) = (/ 5,-3, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 94,:) = (/ 5,-2, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 95,:) = (/ 5,-1, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 96,:) = (/ 5, 1, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 97,:) = (/ 5, 2, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 98,:) = (/ 5, 3, 0,0/)
-      Hash_MCFM_qqVVqq_Gen( 99,:) = (/ 5, 4, 0,0/)
-      Hash_MCFM_qqVVqq_Gen(100,:) = (/ 5, 5, 0,0/)
-      Hash_MCFM_qqVVqq_Gen(101:,:) = Not_a_particle_
-   else
-      do ch=1, Hash_MCFM_qqVVqq_Gen_Size; do i=1,4
-        Hash_MCFM_qqVVqq_Gen(ch,i) = convertToPartIndex( Hash_MCFM_qqVVqq(i,ch) )
-      enddo; enddo
-   endif
+integer :: ch,i,j
+   Hash_MCFM_qqVVqq_Gen=Not_a_particle_
+   do i=1,5; do j=1,5
+      Hash_MCFM_qqVVqq_Gen(20*i+4*j-23,:)=(/-i,-j,0,0/)
+      Hash_MCFM_qqVVqq_Gen(20*i+4*j-22,:)=(/-i,j,0,0/)
+      Hash_MCFM_qqVVqq_Gen(20*i+4*j-21,:)=(/i,-j,0,0/)
+      Hash_MCFM_qqVVqq_Gen(20*i+4*j-20,:)=(/i,j,0,0/)
+   enddo; enddo
    return
 end subroutine
 
@@ -915,6 +814,16 @@ implicit none
 end subroutine
 
 ! Copy functions
+subroutine get_MCFM_qqVVqq_Hash(ijSel)
+implicit none
+integer, pointer, intent(out) :: ijSel(:,:)
+   if (.not. hashcoll_hashes_initialized) then
+      call SetupHashes()
+   endif
+   ijSel=Hash_MCFM_qqVVqq
+return
+end subroutine
+
 subroutine get_MCFM_qqVVqq_GenHash(ijSel)
 implicit none
 integer, intent(out) :: ijSel(1:Hash_MCFM_qqVVqq_Gen_Size,1:4)
@@ -1001,6 +910,16 @@ END SUBROUTINE
 
 
 ! Reference functions
+subroutine getRef_MCFM_qqVVqq_Hash(ijSel)
+implicit none
+integer, pointer, intent(out) :: ijSel(:,:)
+   if (.not. hashcoll_hashes_initialized) then
+      call SetupHashes()
+   endif
+   ijSel => Hash_MCFM_qqVVqq
+return
+end subroutine
+
 subroutine getRef_MCFM_qqVVqq_GenHash(ijSel)
 implicit none
 integer, pointer, intent(out) :: ijSel(:,:)
@@ -1086,7 +1005,7 @@ RETURN
 END SUBROUTINE
 
 
-subroutine removeOffshellChannelFromHash(ijSel,iremove,imax,jmax)
+subroutine removeOffshellChannelFromGenHash(ijSel,iremove,imax,jmax)
 implicit none
 integer, intent(in) :: imax,jmax,iremove
 integer :: ijSel(:,:),k
@@ -1100,7 +1019,7 @@ integer :: ijSel(:,:),k
    endif
 end subroutine
 
-subroutine removeOffshellChannelFromHashRef(ijSel,iremove,imax,jmax)
+subroutine removeOffshellChannelFromGenHashRef(ijSel,iremove,imax,jmax)
 implicit none
 integer, intent(in) :: imax,jmax,iremove
 integer, pointer :: ijSel(:,:)
@@ -1112,6 +1031,35 @@ integer :: k
       ijSel(imax,:)=Not_a_particle_
    elseif (iremove .eq. imax) then
       ijSel(imax,:)=Not_a_particle_
+   endif
+end subroutine
+
+subroutine removeOffshellChannelFromHash(ijSel,iremove,imax,jmax)
+implicit none
+integer, intent(in) :: imax,jmax,iremove
+integer :: ijSel(:,:),k
+   if (iremove.gt.0 .and. iremove .lt. imax) then
+      do k=iremove+1,imax
+         ijSel(1:jmax,k-1) = ijSel(1:jmax,k)
+      enddo
+      ijSel(:,imax)=Not_a_particle_
+   elseif (iremove .eq. imax) then
+      ijSel(:,imax)=Not_a_particle_
+   endif
+end subroutine
+
+subroutine removeOffshellChannelFromHashRef(ijSel,iremove,imax,jmax)
+implicit none
+integer, intent(in) :: imax,jmax,iremove
+integer, pointer :: ijSel(:,:)
+integer :: k
+   if (iremove.gt.0 .and. iremove .lt. imax) then
+      do k=iremove+1,imax
+         ijSel(1:jmax,k-1) = ijSel(1:jmax,k)
+      enddo
+      ijSel(:,imax)=Not_a_particle_
+   elseif (iremove .eq. imax) then
+      ijSel(:,imax)=Not_a_particle_
    endif
 end subroutine
 

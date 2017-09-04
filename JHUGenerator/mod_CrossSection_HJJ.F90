@@ -131,7 +131,7 @@ EvalWeighted_HJJ_fulldecay = 0d0
    enddo
    id_MCFM(3:6) = (/ ElM_,ElP_,MuM_,MuP_ /)
 
-   call EvalAmp_qqVVqq(id_MCFM, p_MCFM, 1, msq_MCFM) ! 1 for ZZ decay, 2 for WW decay, 3 for ZZ+WW mixture
+   call EvalAmp_qqVVqq(id_MCFM, p_MCFM, msq_MCFM) ! 1 for ZZ decay, 2 for WW decay, 3 for ZZ+WW mixture
 !   print *,"msq for id combination ",id_MCFM
 !   print *,msq_MCFM(-5,:)
 !   print *,msq_MCFM(-4,:)
