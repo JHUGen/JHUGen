@@ -673,7 +673,7 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "kappa", success, kappa, success2=SetAnomalousHff, success3=Setkappa)
     call ReadCommandLineArgument(arg, "kappa_tilde", success, kappa_tilde, success2=SetAnomalousHff)
 
-!   similar as above for the 2nd resonance in off-shell VBF
+!   similar as above for the 2nd resonance in offshell VBF
     !spin 0 ZZ couplings
     call ReadCommandLineArgument(arg, "gh2z1", success, gh2z1, success2=SetAnomalousSpin0ZZ)
     call ReadCommandLineArgument(arg, "gh2z2", success, gh2z2, success2=SetAnomalousSpin0ZZ)
@@ -1085,7 +1085,7 @@ logical :: SetColliderEnergy
         endif
     endif
     if((Process.eq.60 .or. Process.eq.66 .or. Process.eq.67 .or. Process.eq.68 .or. Process.eq.69) .and. includeGammaStar .and. pTjetcut.le.0d0) then
-       print *, " Process=",Process," with off-shell photons requires a non-zero pT cut instead of photon mass cutoff. Current setting cut ",pTjetcut/GeV," GeV is not allowed."
+       print *, " Process=",Process," with offshell photons requires a non-zero pT cut instead of photon mass cutoff. Current setting cut ",pTjetcut/GeV," GeV is not allowed."
        stop 1
     endif
     if((Process.eq.61 .or. Process.eq.62) .and. pTjetcut.le.0d0) then
@@ -1097,7 +1097,7 @@ logical :: SetColliderEnergy
     !           Set OffShellV1/V2           !
     !---------------------------------------!
     if( IsAPhoton(DecayMode2) .and. IsAZDecay(DecayMode1) ) then
-       print *,"Z is off-shell and photon is on-shell in Z+photon production."
+       print *,"Z is offshell and photon is on-shell in Z+photon production."
        print *,"Randomization of the order of writing of the decay products to the LHE file is disabled."
        RandomizeVVdecays = .false.
     elseif( IsAPhoton(DecayMode2) .and. IsAPhoton(DecayMode1) .and. Process.le.2 ) then
@@ -5166,8 +5166,8 @@ implicit none
         print *, "   ctauReso:          resonance decay length in mm (default=0)"
         print *, "   OffshellX:         Whether to allow resonance (X) to go offshell"
         print *, "                      in processes 0, 1 or 2"
-        print *, "   MReso2:            2nd resonance mass in GeV in off-shell VBF"
-        print *, "   GaReso2:           2nd resonance width in GeV in off-shell VBF"
+        print *, "   MReso2:            2nd resonance mass in GeV in offshell VBF"
+        print *, "   GaReso2:           2nd resonance width in GeV in offshell VBF"
         print *, " EW coupling parameters:"
         print *, "   Vud:               CKM element for W-ud couplings"
         print *, "   Vus:               CKM element for W-us couplings"
