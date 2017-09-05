@@ -210,7 +210,7 @@ public:
     );
 
   //*** SuperJJMela ***//
-  void computeDijetConvBW(float& prob);
+  void computeDijetConvBW(float& prob, bool useTrueBW=false);
 
   //*** Dgg10 ***//
   void computeD_gg(
