@@ -848,9 +848,9 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "ezp_Bot_right", success, ezp_Bot_right, success2=SetZprimeff)
     call ReadCommandLineArgument(arg, "ezp_NuE_left", success, ezp_NuE_left, success2=SetZprimeff)
     call ReadCommandLineArgument(arg, "ezp_NuE_right", success, ezp_NuE_right, success2=SetZprimeff)
-    call ReadCommandLineArgument(arg, "M_Zprime", success, M_Zprime, SetLastArgument, success2=UseZprime, success3=SetMZprime)
+    call ReadCommandLineArgument(arg, "MZprime", success, M_Zprime, SetLastArgument, success2=UseZprime, success3=SetMZprime)
     if (SetLastArgument)  M_Zprime = M_Zprime*GeV
-    call ReadCommandLineArgument(arg, "Ga_Zprime", success, Ga_Zprime, SetLastArgument, success2=UseZprime, success3=SetGaZprime)
+    call ReadCommandLineArgument(arg, "GaZprime", success, Ga_Zprime, SetLastArgument, success2=UseZprime, success3=SetGaZprime)
     if (SetLastArgument)  Ga_Zprime = Ga_Zprime*GeV
 
     call ReadCommandLineArgument(arg, "ghwwp1", success, ghwwp1, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
@@ -867,9 +867,9 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "ewp_Chm_right", success, ewp_Chm_right, success2=SetWprimeff)
     call ReadCommandLineArgument(arg, "ewp_Top_left", success, ewp_Top_left, success2=SetWprimeff)    !undocumented because it's useless (until contact terms are included in tH)
     call ReadCommandLineArgument(arg, "ewp_Top_right", success, ewp_Top_right, success2=SetWprimeff)  !undocumented because it's useless (until contact terms are included in tH)
-    call ReadCommandLineArgument(arg, "M_Wprime", success, M_Wprime, SetLastArgument, success2=UseWprime, success3=SetMWprime)
+    call ReadCommandLineArgument(arg, "MWprime", success, M_Wprime, SetLastArgument, success2=UseWprime, success3=SetMWprime)
     if (SetLastArgument)  M_Wprime = M_Wprime*GeV
-    call ReadCommandLineArgument(arg, "Ga_Wprime", success, Ga_Wprime, SetLastArgument, success2=UseWprime, success3=SetGaWprime)
+    call ReadCommandLineArgument(arg, "GaWprime", success, Ga_Wprime, SetLastArgument, success2=UseWprime, success3=SetGaWprime)
     if (SetLastArgument)  Ga_Wprime = Ga_Wprime*GeV
 
 
@@ -1237,16 +1237,16 @@ logical :: SetColliderEnergy
 
 
     if( SetMZprime .and. .not.SetGaZprime ) then
-        call Error("If you set the mass of Zprime, you also have to set the width! Ga_Zprime=...")
+        call Error("If you set the mass of Zprime, you also have to set the width! GaZprime=...")
     endif
     if( SetGaZprime .and. .not.SetMZprime ) then
-        call Error("If you set the width of Zprime, you also have to set the mass! M_Zprime=...")
+        call Error("If you set the width of Zprime, you also have to set the mass! MZprime=...")
     endif
     if( SetMWprime .and. .not.SetGaWprime ) then
-        call Error("If you set the mass of Wprime, you also have to set the width! Ga_Wprime=...")
+        call Error("If you set the mass of Wprime, you also have to set the width! GaWprime=...")
     endif
     if( SetGaWprime .and. .not.SetMWprime ) then
-        call Error("If you set the width of Wprime, you also have to set the mass! M_Wprime=...")
+        call Error("If you set the width of Wprime, you also have to set the mass! MWprime=...")
     endif
 
 
