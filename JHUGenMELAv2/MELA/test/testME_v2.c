@@ -2700,23 +2700,6 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_Comparison_Ping(int motherflavor=0, int 
     // Test L2 asymmetric coupling in WW as well
     bool computeL2WWproddec=(isZZWW==2 || decZZWW==2);
     if (computeL2WWproddec){
-      cerr << "Computing L2 couplings" << endl;
-      /*
-      if (isZZWW==2 && decZZWW!=2){
-        spinzerohiggs_anomcoupl_.AnomalCouplDK=0;
-        spinzerohiggs_anomcoupl_.AnomalCouplPR=1;
-        cerr << "Disable anom. dk" << endl;
-      }
-      else if (isZZWW!=2 && decZZWW==2){
-        spinzerohiggs_anomcoupl_.AnomalCouplDK=1;
-        spinzerohiggs_anomcoupl_.AnomalCouplPR=0;
-        cerr << "Disable anom. prod" << endl;
-      }
-      else{
-        spinzerohiggs_anomcoupl_.AnomalCouplDK=1;
-        spinzerohiggs_anomcoupl_.AnomalCouplPR=1;
-      }
-      */
       mela.differentiate_HWW_HZZ=true;
       if (isZZWW==2 && decZZWW!=2){
         if (vbfvhchannel==0){ // If WW fusion and ZZ decay, turn off ZZ couplings, and AC in DK
@@ -3701,9 +3684,9 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_TU_Comparison_Ping(int motherflavor=0, i
         (isZZWW==1 && vbfvhchannel>=1);
     }
   }
-  else if (vbfvhchannel==1){
+  else if (vbfvhchannel==2){
     // VBF ZZ-only(+)WH
-    if (motherflavor==3){
+    if (motherflavor==1){
       idMother[0]=14; idMother[1]=-13;
       doEval =
         (isZZWW==2 && vbfvhchannel>=1);
@@ -4035,12 +4018,6 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_TU_Comparison_Ping(int motherflavor=0, i
     // Reset these in case the function needs to be repeated
     spinzerohiggs_anomcoupl_.AnomalCouplDK=1;
     spinzerohiggs_anomcoupl_.AnomalCouplPR=1;
-
-    //spinzerohiggs_anomcoupl_.AnomalCouplDK=1; // Test prod*decay couplings
-
-    cout << "MCFM production chosen: " << TVar::ProductionName(prod) << endl;
-    cout << "spinzerohiggs_anomcoupl_.AnomalCouplDK=" << spinzerohiggs_anomcoupl_.AnomalCouplDK << endl;
-    cerr << "S 1" << endl;
     
     mela.setProcess(TVar::HSMHiggs, TVar::MCFM, prod);
     mela.setRenFacScaleMode(TVar::Fixed_mH, TVar::Fixed_mH, 1, 1);
@@ -4048,7 +4025,7 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_TU_Comparison_Ping(int motherflavor=0, i
     else{ mela.selfDHwwcoupl[0][gHIGGS_VV_1][0]=1; mela.differentiate_HWW_HZZ=true; }
     mela.computeProdDecP(p_prod_0mplus_dec_0mplus_VAMCFM.proddecme, false);
     mela.getIORecord()->getUnweightedMEArray(p_prod_0mplus_dec_0mplus_VAMCFM.mearray);
-    /*
+    
     mela.setRenFacScaleMode(TVar::Fixed_mH, TVar::Fixed_mH, 1, 1);
     if (isZZWW!=2){ mela.selfDHzzcoupl[0][gHIGGS_VV_4][0]=1; if (isZZWW==1) mela.differentiate_HWW_HZZ=true; }
     else{ mela.selfDHwwcoupl[0][gHIGGS_VV_4][0]=1; mela.differentiate_HWW_HZZ=true; }
@@ -4106,7 +4083,7 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_TU_Comparison_Ping(int motherflavor=0, i
     mela.computeProdDecP(p_bkg_VAMCFM.proddecme, false);
     mela.getIORecord()->getUnweightedMEArray(p_bkg_VAMCFM.mearray);
     //mela.setVerbosity(verbosity);
-    */
+
 
     mela.setCurrentCandidateFromIndex(0);
     cand = mela.getCurrentCandidate();
@@ -4124,8 +4101,6 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_TU_Comparison_Ping(int motherflavor=0, i
     spinzerohiggs_anomcoupl_.AnomalCouplDK=1;
     spinzerohiggs_anomcoupl_.AnomalCouplPR=1;
 
-    //spinzerohiggs_anomcoupl_.AnomalCouplDK=1; // Test prod*decay couplings
-
     cout << "MCFM production chosen: " << TVar::ProductionName(prod_tu) << endl;
     cout << "spinzerohiggs_anomcoupl_.AnomalCouplDK=" << spinzerohiggs_anomcoupl_.AnomalCouplDK << endl;
     
@@ -4135,7 +4110,7 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_TU_Comparison_Ping(int motherflavor=0, i
     else{ mela.selfDHwwcoupl[0][gHIGGS_VV_1][0]=1; mela.differentiate_HWW_HZZ=true; }
     mela.computeProdDecP(p_prod_tu_0mplus_dec_0mplus_VAMCFM.proddecme, false);
     mela.getIORecord()->getUnweightedMEArray(p_prod_tu_0mplus_dec_0mplus_VAMCFM.mearray);
-    /*
+    
     mela.setRenFacScaleMode(TVar::Fixed_mH, TVar::Fixed_mH, 1, 1);
     if (isZZWW!=2){ mela.selfDHzzcoupl[0][gHIGGS_VV_4][0]=1; if (isZZWW==1) mela.differentiate_HWW_HZZ=true; }
     else{ mela.selfDHwwcoupl[0][gHIGGS_VV_4][0]=1; mela.differentiate_HWW_HZZ=true; }
@@ -4193,7 +4168,6 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_TU_Comparison_Ping(int motherflavor=0, i
     mela.computeProdDecP(p_bkg_tu_VAMCFM.proddecme, false);
     mela.getIORecord()->getUnweightedMEArray(p_bkg_tu_VAMCFM.mearray);
     //mela.setVerbosity(verbosity);
-    */
 
     // Reset these in case the function needs to be repeated
     spinzerohiggs_anomcoupl_.AnomalCouplDK=1;
@@ -4233,6 +4207,36 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_TU_Comparison_Ping(int motherflavor=0, i
     p_prod_0mplus_dec_0mplus_VAMCFM.printarray();
     cout << "\tMCFM tu" << endl;
     p_prod_tu_0mplus_dec_0mplus_VAMCFM.printarray();
+    cout << "0minus" << endl;
+    cout << "\tMCFM s" << endl;
+    p_prod_0minus_dec_0minus_VAMCFM.printarray();
+    cout << "\tMCFM tu" << endl;
+    p_prod_tu_0minus_dec_0minus_VAMCFM.printarray();
+    cout << "fa3" << endl;
+    cout << "\tMCFM s" << endl;
+    p_prod_fa3_dec_fa3_VAMCFM.printarray();
+    cout << "\tMCFM tu" << endl;
+    p_prod_tu_fa3_dec_fa3_VAMCFM.printarray();
+    cout << "0minusZA" << endl;
+    cout << "\tMCFM s" << endl;
+    p_prod_0minusZA_dec_0minusZA_VAMCFM.printarray();
+    cout << "\tMCFM tu" << endl;
+    p_prod_tu_0minusZA_dec_0minusZA_VAMCFM.printarray();
+    cout << "fa3ZA" << endl;
+    cout << "\tMCFM s" << endl;
+    p_prod_fa3ZA_dec_fa3ZA_VAMCFM.printarray();
+    cout << "\tMCFM tu" << endl;
+    p_prod_tu_fa3ZA_dec_fa3ZA_VAMCFM.printarray();
+    cout << "0minusAA" << endl;
+    cout << "\tMCFM s" << endl;
+    p_prod_0minusAA_dec_0minusAA_VAMCFM.printarray();
+    cout << "\tMCFM tu" << endl;
+    p_prod_tu_0minusAA_dec_0minusAA_VAMCFM.printarray();
+    cout << "fa3AA" << endl;
+    cout << "\tMCFM s" << endl;
+    p_prod_fa3AA_dec_fa3AA_VAMCFM.printarray();
+    cout << "\tMCFM tu" << endl;
+    p_prod_tu_fa3AA_dec_fa3AA_VAMCFM.printarray();
     cout << "Bkg" << endl;
     cout << "\tMCFM s" << endl;
     p_bkg_VAMCFM.printarray();
