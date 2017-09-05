@@ -87,6 +87,8 @@ real(8), public :: PMZZdistribution(1:PMZZsize,1:2)  !huge array, in normal case
 integer, public :: PMZZminindex=-1, PMZZmaxindex=-1  !store the largest and smallest values currently used
 complex(8), public :: PrintPMZZ   !real part is the minimum, imaginary part is the maximum
 integer, public :: PrintPMZZIntervals
+logical :: UseVprime
+real(8), public :: M_Vprime, Ga_Vprime
 !=====================================================
 
 
@@ -428,8 +430,8 @@ real(8), public, parameter :: Lambda2 = 1000d0    *GeV      ! for second resonan
    complex(8), public :: ezp_Mu_right  = (0d0,0d0)
    complex(8), public :: ezp_Ta_left  = (0d0,0d0)
    complex(8), public :: ezp_Ta_right  = (0d0,0d0)
-   complex(8), public :: ezp_NuE_left  = (0d0,0d0)
-   complex(8), public :: ezp_NuE_right  = (0d0,0d0)
+   complex(8), public :: ezp_NuE_left  = (0d0,0d0)   !same for NuMu and NuTau
+   complex(8), public :: ezp_NuE_right  = (0d0,0d0)  !same for NuMu and NuTau
    complex(8), public :: ezp_Up_left  = (0d0,0d0)
    complex(8), public :: ezp_Up_right  = (0d0,0d0)
    complex(8), public :: ezp_Chm_left  = (0d0,0d0)
@@ -445,6 +447,8 @@ real(8), public, parameter :: Lambda2 = 1000d0    *GeV      ! for second resonan
 
    real(8), public :: M_Zprime = -1d0
    real(8), public :: Ga_Zprime = 0d0
+!--
+   logical, public :: UseZprime=.false.  ! false: contact interaction,  true: heavy Zprime propagator
 !--
    complex(8), public :: ghwwp1 = (0d0,0d0)
    complex(8), public :: ghwpwp1 = (0d0,0d0)
@@ -465,9 +469,7 @@ real(8), public, parameter :: Lambda2 = 1000d0    *GeV      ! for second resonan
    real(8), public :: M_Wprime = -1d0
    real(8), public :: Ga_Wprime = 0d0
 !--
-   logical, public :: UseVprime=.false.  ! false: contact interaction,  true: heavy Zprime propagator
-   real(8), public :: M_Vprime
-   real(8), public :: Ga_Vprime
+   logical, public :: UseWprime=.false.  ! false: contact interaction,  true: heavy Wprime propagator
 
 
 
