@@ -2356,9 +2356,9 @@ void Mela::deletePConstantHandle(MelaPConstant*& handle){
 }
 
 
-void Mela::computeDijetConvBW(float& prob){
+void Mela::computeDijetConvBW(float& prob, bool useTrueBW){
   melaCand = getCurrentCandidate();
-  prob = superDijet->GetConvBW(myProduction_, melaCand);
+  prob = superDijet->GetConvBW(myProduction_, melaCand, useTrueBW);
   reset_CandRef();
 }
 

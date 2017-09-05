@@ -1128,9 +1128,7 @@ void testME_VH_JHUGen_Ping(int erg_tev=13, bool useConstants=false, shared_ptr<M
 
   TVar::VerbosityLevel verbosity = TVar::ERROR;
   if (verbosity>=TVar::DEBUG) cout << "Initializing Mela..." << endl;
-  if (!melaptr) {
-    melaptr.reset(new Mela(erg_tev, mPOLE, verbosity));
-  }
+  if (!melaptr) melaptr.reset(new Mela(erg_tev, mPOLE, verbosity));
   Mela& mela = *melaptr;
   TVar::VerbosityLevel bkpverbosity = mela.getVerbosity();
   mela.setVerbosity(verbosity);
@@ -1216,17 +1214,15 @@ void testME_VH_JHUGen_Ping(int erg_tev=13, bool useConstants=false, shared_ptr<M
     mela.setCandidateDecayMode(TVar::CandidateDecay_ZZ);
     mela.setInputEvent(&daughters, &aparticles, (SimpleParticleCollection_t*)0, false);
 
-    if (verbosity>=TVar::DEBUG){
+    cout << "*******************************************************" << endl;
+    for (int ic=0; ic<mela.getNCandidates(); ic++){
+      cout << "Summary of candidate " << ic << ":" << endl;
+      mela.setCurrentCandidateFromIndex(ic);
+      TUtil::PrintCandidateSummary(mela.getCurrentCandidate());
       cout << "*******************************************************" << endl;
-      for (int ic=0; ic<mela.getNCandidates(); ic++){
-        cout << "Summary of candidate " << ic << ":" << endl;
-        mela.setCurrentCandidateFromIndex(ic);
-        TUtil::PrintCandidateSummary(mela.getCurrentCandidate());
-        cout << "*******************************************************" << endl;
-      }
-      cout << "*******************************************************" << endl;
-      cout << endl;
     }
+    cout << "*******************************************************" << endl;
+    cout << endl;
 
     int cindex;
     cindex=0;
@@ -1359,18 +1355,19 @@ void testME_VH_JHUGen_Ping(int erg_tev=13, bool useConstants=false, shared_ptr<M
         mela.computeProdP_VH(p0hpluszgs_selfD, false, useConstants);
         cout << "p0hpluszgs_selfD: " << p0hpluszgs_selfD << '\n' << endl;
 
-        if (prod==TVar::Had_ZH || prod==TVar::Had_WH){
-          float recoBW=0;
-          mela.computeDijetConvBW(recoBW);
-          cout << "Reco BW: " << recoBW << '\n' << endl;
-        }
+        float recoBW=-99;
+        mela.computeDijetConvBW(recoBW);
+        cout << "Reco BW: " << recoBW << '\n' << endl;
+
+        float idealBW=-99;
+        mela.computeDijetConvBW(idealBW, true);
+        cout << "Ideal BW: " << idealBW << '\n' << endl;
 
         cout << "*******************************************************" << endl;
       }
     }
 
     mela.resetInputEvent();
-    cout << "Removed..." << endl;
   }
 
   cout.rdbuf(coutbuf);
