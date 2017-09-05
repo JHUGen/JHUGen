@@ -58,6 +58,8 @@ command line parameter quick reference:
     ctauReso:          resonance decay length in mm (default=0)
     OffshellX:         Whether to allow resonance (X) to go offshell
                        in processes 0, 1 or 2
+    MReso2:            2nd resonance mass in GeV in off-shell VBF
+    GaReso2:           2nd resonance width in GeV in off-shell VBF
   EW coupling parameters:
     Vud:               CKM element for W-ud couplings
     Vus:               CKM element for W-us couplings

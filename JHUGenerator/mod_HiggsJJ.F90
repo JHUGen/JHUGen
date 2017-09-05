@@ -2495,7 +2495,7 @@ module modHiggsJJ
           vvcoupl_prime_zpzp(vv_it) = HVVSpinZeroDynamicCoupling(15+vv_it,q12sq,q34sq,mhsq)
        enddo
 
-       if( UseVprime ) then
+       if( UseZprime ) then
           if (M_Zprime.gt.0d0) then
              zpprop12 = q12sq - M_Zprime**2 + ci * M_Zprime * Ga_Zprime
              zpprop34 = q34sq - M_Zprime**2 + ci * M_Zprime * Ga_Zprime
@@ -2666,7 +2666,7 @@ module modHiggsJJ
           vvcoupl_prime_wpwp(vv_it) = HVVSpinZeroDynamicCoupling(15+vv_it,q2Wplus,q2Wminus,mhsq,tryWWcoupl=useWWcoupl)
        enddo
 
-       if( UseVprime ) then
+       if( UseWprime ) then
           if (M_Wprime.gt.0d0) then
              wpprop12 = q2Wplus - M_Wprime**2 + ci * M_Wprime * Ga_Wprime
              wpprop34 = q2Wminus - M_Wprime**2 + ci * M_Wprime * Ga_Wprime
