@@ -24,7 +24,7 @@ extern "C" {
   void __modjhugenmela_MOD_setspinzerocontactterms(
     double Hzzpcoupl[SIZE_HVV][2], double Hzpzpcoupl[SIZE_HVV][2], double Zpffcoupl[SIZE_Vpff][2],
     double Hwwpcoupl[SIZE_HVV][2], double Hwpwpcoupl[SIZE_HVV][2], double Wpffcoupl[SIZE_Vpff][2],
-    int* UseVp // YES, THE ARGUMENT IS AN INT, NOT A BOOL!
+    int* UseZp, int* UseWp // YES, THE ARGUMENTS ARE INTS, NOT BOOLS!
     );
   void __modjhugenmela_MOD_settopdecays(int* flag);
 
