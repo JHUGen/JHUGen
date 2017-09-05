@@ -105,9 +105,10 @@ public:
     double selfDHwwpcoupl[SIZE_HVV][2],
     double selfDHwpwpcoupl[SIZE_HVV][2],
     double selfDWpffcoupl[SIZE_Vpff][2],
-    bool UseVprime,
+    bool UseZprime,
     double M_Zprime,
     double Ga_Zprime,
+    bool UseWprime,
     double M_Wprime,
     double Ga_Wprime
     );

@@ -360,7 +360,7 @@ subroutine SetSpinZeroVVCouplings_NoGamma(vvcoupl, cqsq, Lambda_qsq, useWWcoupl)
    return
 end subroutine SetSpinZeroVVCouplings_NoGamma
 
-subroutine SetSpinZeroContactTerms(zzpcoupl, zpzpcoupl, Zpffcoupl, wwpcoupl, wpwpcoupl, Wpffcoupl, UseVp)
+subroutine SetSpinZeroContactTerms(zzpcoupl, zpzpcoupl, Zpffcoupl, wwpcoupl, wpwpcoupl, Wpffcoupl, UseZp, UseWp)
    implicit none
    complex(8), intent(in) :: zzpcoupl(39)
    complex(8), intent(in) :: zpzpcoupl(39)
@@ -370,12 +370,13 @@ subroutine SetSpinZeroContactTerms(zzpcoupl, zpzpcoupl, Zpffcoupl, wwpcoupl, wpw
    complex(8), intent(in) :: wpwpcoupl(39)
    complex(8), intent(in) :: Wpffcoupl(20)
 
-   logical, intent(in) :: UseVp
+   logical, intent(in) :: UseZp, UseWp
 
    includeVprime = (any(zzpcoupl.ne.czero) .or. any(zpzpcoupl.ne.czero) .or. any(Zpffcoupl.ne.czero) &
                     .or.                                                                             &
                     any(wwpcoupl.ne.czero) .or. any(wpwpcoupl.ne.czero) .or. any(Wpffcoupl.ne.czero))
-   UseVprime=UseVp
+   UseZprime=UseZp
+   UseWprime=UseWp
 
    ghzzp1 = zzpcoupl(1)
    ghzpzp1 = zpzpcoupl(1)
@@ -489,16 +490,19 @@ implicit none
   if( IsAZDecay(DecayMode1) ) then
     M_V = M_Z
     Ga_V= Ga_Z
+    UseVprime = UseZprime
     M_Vprime = M_Zprime
     Ga_Vprime= Ga_Zprime
   elseif( IsAWDecay(DecayMode1) ) then
     M_V = M_W
     Ga_V= Ga_W
+    UseVprime = UseWprime
     M_Vprime = M_Wprime
     Ga_Vprime= Ga_Wprime
   else
     M_V = 0d0
     Ga_V= 0d0
+    UseVprime = .false.
     M_Vprime = -1d0
     Ga_Vprime= 0d0
   endif
