@@ -194,7 +194,12 @@ test:
       exitstatus=0
       for a in $(grep -i 'call *ReadCommandLineArgument' main.F90 | grep -v '!undocumented' | sed -r 's/.*"(.*)".*/\1/'); do
         if ! grep -q $a ../Manual/manJHUGenerator.tex &&
-           ! grep -q ${a/w/z} ../Manual/manJHUGenerator.tex        #ghw*, etc. are mentioned collectively
+           ! grep -q ${a/w/z} ../Manual/manJHUGenerator.tex &&      #ghw*, etc. are mentioned collectively
+           ! grep -q ${a/2z/z} ../Manual/manJHUGenerator.tex &&     #second resonance couplings are too
+           ! grep -q ${a/2gsgs/gsgs} ../Manual/manJHUGenerator.tex &&
+           ! grep -q ${a/Lambda2/Lambda} ../Manual/manJHUGenerator.tex &&
+           ! grep -q ${a/2w/z} ../Manual/manJHUGenerator.tex &&
+           ! grep -q ${a/Lambda2_w/Lambda_z} ../Manual/manJHUGenerator.tex
         then
           echo "$a is undocumented!"
           exitstatus=1
