@@ -10,6 +10,7 @@ use ModCrossSection
 use ModKinematics
 use ModParameters
 use ModPMZZ
+use ModHashCollection
 implicit none
 real(8) :: VG_Result,VG_Error
 
@@ -30,6 +31,7 @@ real(8) :: VG_Result,VG_Error
    if ( .not. ReadLHEFile .and. .not. ConvertLHEFile .and. .not.((Process.le.2 .or. Process.eq.60 .or. Process.eq.61 .or. (Process.ge.110.and.Process.le.114)) .and. unweighted) ) then
       call InitOutput(1d0, 1d14)   !for VBF/HJJ the cross section is calculated, so use that in the <init> block
    endif
+   call SetupHashes()
 #if linkMELA==1
    call SetupMCFM(Process)
 #endif
@@ -73,9 +75,9 @@ END PROGRAM
 subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to the appropriate numbers
    use ModParameters
    use ModMisc
-#if useCollier==1      
+#if useCollier==1
    use COLLIER
-#endif   
+#endif
    implicit none
    integer :: Nmax,rmax
 
@@ -246,13 +248,13 @@ subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to t
 
 
    if( Process.eq.50 ) then
-#if useCollier==1   
+#if useCollier==1
      Nmax = 4
      rmax = 4
-     call Init_cll(Nmax,rmax,"output_collier") 
+     call Init_cll(Nmax,rmax,"output_collier")
      call InitCacheSystem_cll(1,Nmax)
      call InitEvent_cll
-#endif   
+#endif
    endif
 
 
@@ -427,7 +429,7 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "MReso2", success, M_Reso2, SetLastArgument)
     if( SetLastArgument ) M_Reso2 = M_Reso2*GeV
     call ReadCommandLineArgument(arg, "GaReso2", success, Ga_Reso2, SetLastArgument)
-    if( SetLastArgument ) Ga_Reso2 = Ga_Reso2*GeV   
+    if( SetLastArgument ) Ga_Reso2 = Ga_Reso2*GeV
     call ReadCommandLineArgument(arg, "ctauReso", success, HiggsDecayLengthMM)
     call ReadCommandLineArgument(arg, "VegasNc0", success, VegasNc0)
     call ReadCommandLineArgument(arg, "VegasNc1", success, VegasNc1)
@@ -671,6 +673,158 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "kappa", success, kappa, success2=SetAnomalousHff, success3=Setkappa)
     call ReadCommandLineArgument(arg, "kappa_tilde", success, kappa_tilde, success2=SetAnomalousHff)
 
+!   similar as above for the 2nd resonance in off-shell VBF
+    !spin 0 ZZ couplings
+    call ReadCommandLineArgument(arg, "gh2z1", success, gh2z1, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "gh2z2", success, gh2z2, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "gh2z3", success, gh2z3, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "gh2z4", success, gh2z4, success2=SetAnomalousSpin0ZZ)
+
+    !spin 0 Zgamma couplings
+    call ReadCommandLineArgument(arg, "gh2zgs2", success, gh2zgs2, success2=SetZgammacoupling)
+    call ReadCommandLineArgument(arg, "gh2zgs3", success, gh2zgs3, success2=SetZgammacoupling)
+    call ReadCommandLineArgument(arg, "gh2zgs4", success, gh2zgs4, success2=SetZgammacoupling)
+
+    !spin 0 gammagamma couplings
+    call ReadCommandLineArgument(arg, "gh2gsgs2", success, gh2gsgs2, success2=Setgammagammacoupling)
+    call ReadCommandLineArgument(arg, "gh2gsgs3", success, gh2gsgs3, success2=Setgammagammacoupling)
+    call ReadCommandLineArgument(arg, "gh2gsgs4", success, gh2gsgs4, success2=Setgammagammacoupling)
+
+    !spin 0 ZZ momentum dependent couplings
+    call ReadCommandLineArgument(arg, "gh2z1_prime", success, gh2z1_prime, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "gh2z1_prime2", success, gh2z1_prime2, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "gh2z1_prime3", success, gh2z1_prime3, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "gh2z1_prime4", success, gh2z1_prime4, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "gh2z1_prime5", success, gh2z1_prime5, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "gh2z1_prime6", success, gh2z1_prime6, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "gh2z1_prime7", success, gh2z1_prime7, success2=SetAnomalousSpin0ZZ)
+
+    call ReadCommandLineArgument(arg, "gh2z2_prime", success, gh2z2_prime, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "gh2z2_prime2", success, gh2z2_prime2, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "gh2z2_prime3", success, gh2z2_prime3, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "gh2z2_prime4", success, gh2z2_prime4, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "gh2z2_prime5", success, gh2z2_prime5, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "gh2z2_prime6", success, gh2z2_prime6, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "gh2z2_prime7", success, gh2z2_prime7, success2=SetAnomalousSpin0ZZ)
+
+    call ReadCommandLineArgument(arg, "gh2z3_prime", success, gh2z3_prime, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "gh2z3_prime2", success, gh2z3_prime2, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "gh2z3_prime3", success, gh2z3_prime3, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "gh2z3_prime4", success, gh2z3_prime4, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "gh2z3_prime5", success, gh2z3_prime5, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "gh2z3_prime6", success, gh2z3_prime6, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "gh2z3_prime7", success, gh2z3_prime7, success2=SetAnomalousSpin0ZZ)
+
+    call ReadCommandLineArgument(arg, "gh2z4_prime", success, gh2z4_prime, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "gh2z4_prime2", success, gh2z4_prime2, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "gh2z4_prime3", success, gh2z4_prime3, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "gh2z4_prime4", success, gh2z4_prime4, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "gh2z4_prime5", success, gh2z4_prime5, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "gh2z4_prime6", success, gh2z4_prime6, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "gh2z4_prime7", success, gh2z4_prime7, success2=SetAnomalousSpin0ZZ)
+
+    !spin 0 Zgamma momentum dependent coupling
+    call ReadCommandLineArgument(arg, "gh2zgs1_prime2", success, gh2zgs1_prime2, success2=SetZgammacoupling)
+
+    ! Sign of q1,2,12**2 for the Lambda's, set to 1 or -1 to get q**2-dependence from these form factor Lambdas
+    call ReadCommandLineArgument(arg, "c2z_q1sq", success, c2z_q1sq, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "c2z_q2sq", success, c2z_q2sq, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "c2z_q12sq", success, c2z_q12sq, success2=SetAnomalousSpin0ZZ)
+    ! Lambda's for q1,2,12**2 for the Lambda's
+    call ReadCommandLineArgument(arg, "Lambda2_z11", success, Lambda2_z11, SetLastArgument, success2=SetAnomalousSpin0ZZ)
+    if (SetLastArgument)  Lambda2_z11 = Lambda2_z11*GeV
+    call ReadCommandLineArgument(arg, "Lambda2_z21", success, Lambda2_z21, SetLastArgument, success2=SetAnomalousSpin0ZZ)
+    if (SetLastArgument)  Lambda2_z21 = Lambda2_z21*GeV
+    call ReadCommandLineArgument(arg, "Lambda2_z31", success, Lambda2_z31, SetLastArgument, success2=SetAnomalousSpin0ZZ)
+    if (SetLastArgument)  Lambda2_z31 = Lambda2_z31*GeV
+    call ReadCommandLineArgument(arg, "Lambda2_z41", success, Lambda2_z41, SetLastArgument, success2=SetAnomalousSpin0ZZ)
+    if (SetLastArgument)  Lambda2_z41 = Lambda2_z41*GeV
+    call ReadCommandLineArgument(arg, "Lambda2_z12", success, Lambda2_z12, SetLastArgument, success2=SetAnomalousSpin0ZZ)
+    if (SetLastArgument)  Lambda2_z12 = Lambda2_z12*GeV
+    call ReadCommandLineArgument(arg, "Lambda2_z22", success, Lambda2_z22, SetLastArgument, success2=SetAnomalousSpin0ZZ)
+    if (SetLastArgument)  Lambda2_z22 = Lambda2_z22*GeV
+    call ReadCommandLineArgument(arg, "Lambda2_z32", success, Lambda2_z32, SetLastArgument, success2=SetAnomalousSpin0ZZ)
+    if (SetLastArgument)  Lambda2_z32 = Lambda2_z32*GeV
+    call ReadCommandLineArgument(arg, "Lambda2_z42", success, Lambda2_z42, SetLastArgument, success2=SetAnomalousSpin0ZZ)
+    if (SetLastArgument)  Lambda2_z42 = Lambda2_z42*GeV
+    call ReadCommandLineArgument(arg, "Lambda2_z10", success, Lambda2_z10, SetLastArgument, success2=SetAnomalousSpin0ZZ)
+    if (SetLastArgument)  Lambda2_z10 = Lambda2_z10*GeV
+    call ReadCommandLineArgument(arg, "Lambda2_z20", success, Lambda2_z20, SetLastArgument, success2=SetAnomalousSpin0ZZ)
+    if (SetLastArgument)  Lambda2_z20 = Lambda2_z20*GeV
+    call ReadCommandLineArgument(arg, "Lambda2_z30", success, Lambda2_z30, SetLastArgument, success2=SetAnomalousSpin0ZZ)
+    if (SetLastArgument)  Lambda2_z30 = Lambda2_z30*GeV
+    call ReadCommandLineArgument(arg, "Lambda2_z40", success, Lambda2_z40, SetLastArgument, success2=SetAnomalousSpin0ZZ)
+    if (SetLastArgument)  Lambda2_z40 = Lambda2_z40*GeV
+
+    !spin 0 WW couplings
+    call ReadCommandLineArgument(arg, "gh2w1", success, gh2w1, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "gh2w2", success, gh2w2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "gh2w3", success, gh2w3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "gh2w4", success, gh2w4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+
+    call ReadCommandLineArgument(arg, "gh2w1_prime", success, gh2w1_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "gh2w1_prime2", success, gh2w1_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "gh2w1_prime3", success, gh2w1_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "gh2w1_prime4", success, gh2w1_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "gh2w1_prime5", success, gh2w1_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "gh2w1_prime6", success, gh2w1_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "gh2w1_prime7", success, gh2w1_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+
+    call ReadCommandLineArgument(arg, "gh2w2_prime", success, gh2w2_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "gh2w2_prime2", success, gh2w2_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "gh2w2_prime3", success, gh2w2_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "gh2w2_prime4", success, gh2w2_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "gh2w2_prime5", success, gh2w2_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "gh2w2_prime6", success, gh2w2_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "gh2w2_prime7", success, gh2w2_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+
+    call ReadCommandLineArgument(arg, "gh2w3_prime", success, gh2w3_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "gh2w3_prime2", success, gh2w3_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "gh2w3_prime3", success, gh2w3_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "gh2w3_prime4", success, gh2w3_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "gh2w3_prime5", success, gh2w3_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "gh2w3_prime6", success, gh2w3_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "gh2w3_prime7", success, gh2w3_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+
+    call ReadCommandLineArgument(arg, "gh2w4_prime", success, gh2w4_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "gh2w4_prime2", success, gh2w4_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "gh2w4_prime3", success, gh2w4_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "gh2w4_prime4", success, gh2w4_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "gh2w4_prime5", success, gh2w4_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "gh2w4_prime6", success, gh2w4_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "gh2w4_prime7", success, gh2w4_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+
+    ! Sign of q1,2,12**2 for the Lambda's, set to 1 or -1 to get q**2-dependence from these form factor Lambdas
+    call ReadCommandLineArgument(arg, "c2w_q1sq", success, c2w_q1sq, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "c2w_q2sq", success, c2w_q2sq, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "c2w_q12sq", success, c2w_q12sq, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    ! Lambda's for q1,2,12**2 for the Lambda's
+    call ReadCommandLineArgument(arg, "Lambda2_w11", success, Lambda2_w11, SetLastArgument, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    if (SetLastArgument)  Lambda2_w11 = Lambda2_w11*GeV
+    call ReadCommandLineArgument(arg, "Lambda2_w21", success, Lambda2_w21, SetLastArgument, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    if (SetLastArgument)  Lambda2_w21 = Lambda2_w21*GeV
+    call ReadCommandLineArgument(arg, "Lambda2_w31", success, Lambda2_w31, SetLastArgument, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    if (SetLastArgument)  Lambda2_w31 = Lambda2_w31*GeV
+    call ReadCommandLineArgument(arg, "Lambda2_w41", success, Lambda2_w41, SetLastArgument, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    if (SetLastArgument)  Lambda2_w41 = Lambda2_w41*GeV
+    call ReadCommandLineArgument(arg, "Lambda2_w12", success, Lambda2_w12, SetLastArgument, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    if (SetLastArgument)  Lambda2_w12 = Lambda2_w12*GeV
+    call ReadCommandLineArgument(arg, "Lambda2_w22", success, Lambda2_w22, SetLastArgument, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    if (SetLastArgument)  Lambda2_w22 = Lambda2_w22*GeV
+    call ReadCommandLineArgument(arg, "Lambda2_w32", success, Lambda2_w32, SetLastArgument, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    if (SetLastArgument)  Lambda2_w32 = Lambda2_w32*GeV
+    call ReadCommandLineArgument(arg, "Lambda2_w42", success, Lambda2_w42, SetLastArgument, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    if (SetLastArgument)  Lambda2_w42 = Lambda2_w42*GeV
+    call ReadCommandLineArgument(arg, "Lambda2_w10", success, Lambda2_w10, SetLastArgument, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    if (SetLastArgument)  Lambda2_w10 = Lambda2_w10*GeV
+    call ReadCommandLineArgument(arg, "Lambda2_w20", success, Lambda2_w20, SetLastArgument, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    if (SetLastArgument)  Lambda2_w20 = Lambda2_w20*GeV
+    call ReadCommandLineArgument(arg, "Lambda2_w30", success, Lambda2_w30, SetLastArgument, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    if (SetLastArgument)  Lambda2_w30 = Lambda2_w30*GeV
+    call ReadCommandLineArgument(arg, "Lambda2_w40", success, Lambda2_w40, SetLastArgument, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    if (SetLastArgument)  Lambda2_w40 = Lambda2_w40*GeV
+
+
     !contact interactions
     call ReadCommandLineArgument(arg, "ghzzp1", success, ghzzp1, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
     call ReadCommandLineArgument(arg, "ghzpzp1", success, ghzpzp1, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
@@ -694,7 +848,6 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "ezp_Bot_right", success, ezp_Bot_right, success2=SetZprimeff)
     call ReadCommandLineArgument(arg, "ezp_NuE_left", success, ezp_NuE_left, success2=SetZprimeff)
     call ReadCommandLineArgument(arg, "ezp_NuE_right", success, ezp_NuE_right, success2=SetZprimeff)
-
     call ReadCommandLineArgument(arg, "M_Zprime", success, M_Zprime, SetLastArgument, success2=UseVprime, success3=SetMZprime)
     if (SetLastArgument)  M_Zprime = M_Zprime*GeV
     call ReadCommandLineArgument(arg, "Ga_Zprime", success, Ga_Zprime, SetLastArgument, success2=UseVprime, success3=SetGaZprime)
@@ -714,69 +867,11 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "ewp_Chm_right", success, ewp_Chm_right, success2=distinguish_HWWcouplings, success3=SetWprimeff)
     call ReadCommandLineArgument(arg, "ewp_Top_left", success, ewp_Top_left, success2=distinguish_HWWcouplings, success3=SetWprimeff)
     call ReadCommandLineArgument(arg, "ewp_Top_right", success, ewp_Top_right, success2=distinguish_HWWcouplings, success3=SetWprimeff)
-
     call ReadCommandLineArgument(arg, "M_Wprime", success, M_Wprime, SetLastArgument, success2=UseVprime, success3=SetMWprime)
     if (SetLastArgument)  M_Wprime = M_Wprime*GeV
     call ReadCommandLineArgument(arg, "Ga_Wprime", success, Ga_Wprime, SetLastArgument, success2=distinguish_HWWcouplings, success3=UseVprime, success4=SetGaWprime)
     if (SetLastArgument)  Ga_Wprime = Ga_Wprime*GeV
 
-!   similar as above for the 2nd resonance in off-shell VBF
-
-    !spin 0 ZZ couplings
-    call ReadCommandLineArgument(arg, "gh2z1", success, gh2z1)
-    call ReadCommandLineArgument(arg, "gh2z2", success, gh2z2)
-    call ReadCommandLineArgument(arg, "gh2z3", success, gh2z3)
-    call ReadCommandLineArgument(arg, "gh2z4", success, gh2z4)
-
-    !spin 0 Zgamma couplings
-    call ReadCommandLineArgument(arg, "gh2zgs2", success, gh2zgs2)
-    call ReadCommandLineArgument(arg, "gh2zgs3", success, gh2zgs3)
-    call ReadCommandLineArgument(arg, "gh2zgs4", success, gh2zgs4)
-
-    !spin 0 gammagamma couplings
-    call ReadCommandLineArgument(arg, "gh2gsgs2", success, gh2gsgs2)
-    call ReadCommandLineArgument(arg, "gh2gsgs3", success, gh2gsgs3)
-    call ReadCommandLineArgument(arg, "gh2gsgs4", success, gh2gsgs4)
-
-    !spin 0 WW couplings
-    call ReadCommandLineArgument(arg, "gh2w1", success, gh2w1)
-    call ReadCommandLineArgument(arg, "gh2w2", success, gh2w2)
-    call ReadCommandLineArgument(arg, "gh2w3", success, gh2w3)
-    call ReadCommandLineArgument(arg, "gh2w4", success, gh2w4)
-    
-    !contact interactions
-    call ReadCommandLineArgument(arg, "eh2z_L_E", success, eh2z_L_E)
-    call ReadCommandLineArgument(arg, "eh2z_R_E", success, eh2z_R_E)
-    call ReadCommandLineArgument(arg, "eh2z_L_M", success, eh2z_L_M)
-    call ReadCommandLineArgument(arg, "eh2z_R_M", success, eh2z_R_M)
-    call ReadCommandLineArgument(arg, "eh2z_L_T", success, eh2z_L_T)
-    call ReadCommandLineArgument(arg, "eh2z_R_T", success, eh2z_R_T)
-    call ReadCommandLineArgument(arg, "eh2z_L_U", success, eh2z_L_U)
-    call ReadCommandLineArgument(arg, "eh2z_R_U", success, eh2z_R_U)
-    call ReadCommandLineArgument(arg, "eh2z_L_C", success, eh2z_L_U)
-    call ReadCommandLineArgument(arg, "eh2z_R_C", success, eh2z_R_U)
-    call ReadCommandLineArgument(arg, "eh2z_L_D", success, eh2z_L_D)
-    call ReadCommandLineArgument(arg, "eh2z_R_D", success, eh2z_R_D)
-    call ReadCommandLineArgument(arg, "eh2z_L_S", success, eh2z_L_S)
-    call ReadCommandLineArgument(arg, "eh2z_R_S", success, eh2z_R_S)
-    call ReadCommandLineArgument(arg, "eh2z_L_B", success, eh2z_L_B)
-    call ReadCommandLineArgument(arg, "eh2z_R_B", success, eh2z_R_B)
-    call ReadCommandLineArgument(arg, "eh2z_L_N", success, eh2z_L_N)
-    call ReadCommandLineArgument(arg, "eh2z_R_N", success, eh2z_R_N)
-
-    call ReadCommandLineArgument(arg, "eh2w_L_E", success, eh2w_L_E)
-    call ReadCommandLineArgument(arg, "eh2w_R_E", success, eh2w_R_E)
-    call ReadCommandLineArgument(arg, "eh2w_L_M", success, eh2w_L_M)
-    call ReadCommandLineArgument(arg, "eh2w_R_M", success, eh2w_R_M)
-    call ReadCommandLineArgument(arg, "eh2w_L_T", success, eh2w_L_T)
-    call ReadCommandLineArgument(arg, "eh2w_R_T", success, eh2w_R_T)
-    call ReadCommandLineArgument(arg, "eh2w_L_U", success, eh2w_L_U)
-    call ReadCommandLineArgument(arg, "eh2w_R_U", success, eh2w_R_U)
-    call ReadCommandLineArgument(arg, "eh2w_L_C", success, eh2w_L_C)
-    call ReadCommandLineArgument(arg, "eh2w_R_C", success, eh2w_R_C)
-!   end of couplings for 2nd resonance in off-shell VBF. The rest has to be set in mod_Parameters
-    
-    
 
     ! CKM elements
     call ReadCommandLineArgument(arg, "Vud", success, VCKM_ud, success2=SetCKM)
@@ -796,9 +891,9 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "deltaRcut", success, Rjet, success2=SetdeltaRcut)
     call ReadCommandLineArgument(arg, "mJJcut", success, mJJcut, SetLastArgument)
     if( SetLastArgument ) mJJcut = mJJcut*GeV
-    call ReadCommandLineArgument(arg, "VBF_m4l_min", success, m4l_minmax(1), SetLastArgument)   !undocumented, for internal testing
+    call ReadCommandLineArgument(arg, "m4l_min", success, m4l_minmax(1), SetLastArgument)   !undocumented, for internal testing
     if( SetLastArgument ) m4l_minmax(1) = m4l_minmax(1)*GeV
-    call ReadCommandLineArgument(arg, "VBF_m4l_max", success, m4l_minmax(2), SetLastArgument)   !undocumented, for internal testing
+    call ReadCommandLineArgument(arg, "m4l_max", success, m4l_minmax(2), SetLastArgument)   !undocumented, for internal testing
     if( SetLastArgument ) m4l_minmax(2) = m4l_minmax(2)*GeV
     call ReadCommandLineArgument(arg, "MPhotonCutoff", success, MPhotonCutoff, SetLastArgument)
     if( SetLastArgument ) MPhotonCutoff = MPhotonCutoff*GeV
@@ -1927,7 +2022,8 @@ include 'maxwt.f'
 real(8) :: VG_Result,VG_Error,VG_Chi2
 real(8) :: yRnd(1:22),calls1,calls2,calls_rescale
 real(8) :: dum, RES(-5:5,-5:5),ResFrac(-5:5,-5:5),TotalXSec
-integer :: i, i1, j1,PChannel_aux, PChannel_aux1,NHisto,ijSel(1:121,1:3)
+integer :: i, i1, j1,PChannel_aux, PChannel_aux1,NHisto
+integer, pointer :: ijSel(:,:)
 include 'csmaxvalue.f'
 integer :: flav1,flav2,StatusPercent,MissingEvents,MaxEvts,imax
 integer :: VegasSeed,PreviousSum
@@ -1971,7 +2067,6 @@ logical :: UseBetaVersion=.false.
     ingridfile=trim(outgridfile)
 
 
-    if( Process.ge.66 .and. Process.le.68 ) call init_VBFoffshChannelHash()
     if( Process.ge.69 .and. Process.le.79 ) call Error("Missing ChannelHash for Process 69") !can change 79 if we add more processes in between
 
 if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !----------------------- weighted events
@@ -2086,7 +2181,7 @@ if( UseBetaVersion ) then
 
     itmx = 2
     writeout=.true.
-    outgridfile=trim(DataFile)//'_temp.grid'    
+    outgridfile=trim(DataFile)//'_temp.grid'
     if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) call vegas1(EvalWeighted,VG_Result,VG_Error,VG_Chi2)
 !     if( Process.eq.80 ) call vegas(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2) ! adjust to LHE format
 !     if( Process.eq.90 ) call vegas(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
@@ -2116,7 +2211,7 @@ if( UseBetaVersion ) then
     if( Process.eq.113) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
     if( Process.eq.114) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
     writeout=.false.
-    ingridfile=trim(outgridfile)    
+    ingridfile=trim(outgridfile)
 
 
     call vegas_get_calls(calls1)
@@ -2131,23 +2226,15 @@ if( UseBetaVersion ) then
     endif
 
     if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2) then
-       call get_PPXchannelHash(ijSel)
+       call getRef_PPXchannelHash(ijSel)
     elseif( Process.eq.60 ) then
-       call get_VBFchannelHash(ijSel)
+       call getRef_VBFchannelHash(ijSel)
     elseif( Process.eq.61 ) then
-       call get_HJJchannelHash(ijSel)
-    elseif( Process.eq.110 ) then
-       call get_THchannelHash(ijSel)
-    elseif( Process.eq.111 ) then
-       call get_THchannelHash(ijSel)
-    elseif( Process.eq.112 ) then
-       call get_THchannelHash(ijSel)
-    elseif( Process.eq.113 ) then
-       call get_THchannelHash(ijSel)
-    elseif( Process.eq.114 ) then
-       call get_THchannelHash(ijSel)
+       call getRef_HJJchannelHash(ijSel)
+    elseif( Process.ge.110 .and. Process .le.114 ) then
+       call getRef_THchannelHash(ijSel)
     else
-       call get_GENchannelHash(ijSel)
+       call getRef_GENchannelHash(ijSel)
     endif
 ! do i=1,121
 !          i1 = ijSel(i,1)
@@ -2166,8 +2253,8 @@ if( UseBetaVersion ) then
 
 
 
-    
-    
+
+
 
     write(io_stdout,"(A)")  ""
     write(io_stdout,"(2X,A)")  "Event generation"
@@ -2210,7 +2297,7 @@ if( UseBetaVersion ) then
 !     do while( AccepCounter_part(iPart_sel,jPart_sel).lt.RequEvents(iPart_sel,jPart_sel) )
         call cpu_time(time_start)
         readin=.true.  ! this prevents adapting the grid during this while-loop
-              
+
         if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) call vegas1(EvalWeighted,VG_Result,VG_Error,VG_Chi2)
 !         if( Process.eq.80 ) call vegas1(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)! adjust to LHE format
     !     if( Process.eq.90 ) call vegas1(EvalWeighted_BBBH,VG_Result,VG_Error,VG_Chi2)
@@ -2222,8 +2309,8 @@ if( UseBetaVersion ) then
         if( Process.eq.112) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
         if( Process.eq.113) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
         if( Process.eq.114) call vegas1(EvalWeighted2_TH,VG_Result,VG_Error,VG_Chi2)
-        
-        
+
+
 !         call system('clear')
         write(io_stdout,*) ""
         do i1=-5,5
@@ -2234,20 +2321,20 @@ if( UseBetaVersion ) then
                write(*,"(I3,I3,I7,I7,F16.6,E16.3)") i1,j1, &
                AccepCounter_part(i1,j1), RequEvents(i1,j1), &
                dble(AccepCounter_part(i1,j1))/dble(RejeCounter_part(i1,j1))*100d0, &
-               CrossSecMax(i1,j1)               
+               CrossSecMax(i1,j1)
             endif
         enddo
         enddo
         write(*,"(A,I10,I10,F16.6)") "PS gen eff. ",DebugCounter(10),DebugCounter(9),dble(DebugCounter(10))/dble(DebugCounter(9))*100d0
-        DebugCounter(9:10)=0          
+        DebugCounter(9:10)=0
         StatusPercent = int(100d0*dble(sum(AccepCounter_part(:,:)))/dble(sum(RequEvents(:,:)))  )
         print *, "StatusPercent=",StatusPercent, "  Events=",sum(AccepCounter_part(:,:))
         call cpu_time(time_end)
         write(io_stdout,*)  "Event generation rate (events,events/sec)",sum(AccepCounter_part(:,:))-PreviousSum,dble(sum(AccepCounter_part(:,:))-PreviousSum)/(time_end-time_start+1d-10)
-        PreviousSum = sum(AccepCounter_part(:,:))        
+        PreviousSum = sum(AccepCounter_part(:,:))
     enddo
-     
-! enddo     
+
+! enddo
 
 
 
@@ -2261,11 +2348,11 @@ if( UseBetaVersion ) then
     write(io_stdout,*)  " event generation rate (events/sec)",dble(sum(AccepCounter_part(:,:)))/(time_end-time_start+1d-10)
 
 
-    
-    
-    
-    
-    
+
+
+
+
+
 
 
 !     if( Process.eq.0 .or. Process.eq.1 .or. Process.eq.2 ) then
@@ -2283,7 +2370,7 @@ if( UseBetaVersion ) then
 !                                           dble(Br_counter(3,1))+dble(Br_counter(3,2)))/dble(AccepCounter)
 !           write(*,"(A,5F16.3)") "2l2q: ",(dble(Br_counter(1,5))+dble(Br_counter(2,5))+dble(Br_counter(3,5))+  &
 !                                           dble(Br_counter(5,1))+dble(Br_counter(5,2))+dble(Br_counter(5,3)) )/dble(AccepCounter)
-! 
+!
 !           write(*,"(A,5F16.3)") "4l/2q2l: ",(dble(Br_counter(1,2))+dble(Br_counter(1,3))+ dble(Br_counter(1,1))+dble(Br_counter(2,2))+dble(Br_counter(3,3)) &
 !                                         + dble(Br_counter(2,1))+dble(Br_counter(2,3))+   &
 !                                           dble(Br_counter(3,1))+dble(Br_counter(3,2)))/  &
@@ -4168,7 +4255,7 @@ integer :: AllocStatus,NHisto
 !           Histo(NHisto)%LowVal = 0d0
 !           Histo(NHisto)%SetScale= 1d0
 ! enddo
-          
+
 ! do NHisto=10,45
 !           Histo(NHisto)%Info   = "sij"
 !           Histo(NHisto)%NBins  = 200
@@ -4471,8 +4558,8 @@ character :: arg*(500)
     if( Process.eq.60) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( Process.eq.61) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( Process.eq.62) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
-    if( Process.eq.66 .or. Process.eq.68 ) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
-    if( (Process.eq.66 .or. Process.eq.68) .and. M_Reso2.gt.0d0 ) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "2nd Resonance: spin=0, mass=",M_Reso2*100d0," width=",Ga_Reso2*100d0
+    if( (Process.eq.66 .or. Process.eq.68) .and. M_Reso.ge.0d0  ) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "1st Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
+    if( (Process.eq.66 .or. Process.eq.68) .and. M_Reso2.ge.0d0 ) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "2nd Resonance: spin=0, mass=",M_Reso2*100d0," width=",Ga_Reso2*100d0
     if( Process.eq.50) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( Process.eq.80) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( Process.eq.90) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
@@ -4509,7 +4596,7 @@ character :: arg*(500)
             write(TheUnit,"(11X,A,F8.2,A)") "mJJ >= ", mJJcut/GeV, " GeV"
         endif
         if( Process.ge.66 .and. Process.le.69 ) then
-            write(TheUnit,"(11X,A,F10.2,F10.2,A)") "m4l_min/max ", m4l_minmax(1)/GeV,m4l_minmax(2)/GeV, " GeV"
+            write(TheUnit,"(11X,A,F10.2,F10.2,A)") "m4l min/max ", m4l_minmax(1)/GeV,m4l_minmax(2)/GeV, " GeV"
         endif
     endif
     if( (ReadLHEFile) .and. (RequestNLeptons.gt.0) ) then
@@ -5095,7 +5182,7 @@ implicit none
 
 END SUBROUTINE
 
-! 
+!
 
 
 SUBROUTINE PrintLogo(TheUnit)

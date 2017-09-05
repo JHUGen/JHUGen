@@ -1,4 +1,5 @@
 MODULE ModCrossSection_HJJ
+use ModHashCollection
 implicit none
 integer, parameter,private :: LHA2M_pdf(-6:6) = (/-5,-6,-3,-4,-1,-2,0 ,2,1,4,3,6,5/)
 integer, parameter,private :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6,5/)
@@ -24,13 +25,14 @@ use ifport
 implicit none
 integer,parameter :: mxpart=14 ! this has to match the MCFM parameter
 real(8) :: yRnd(1:18),VgsWgt, EvalWeighted_HJJ_fulldecay
-real(8) :: pdf(-6:6,1:2)           ,me2(-5:5,-5:5)
+real(8) :: pdf(-6:6,1:2),me2(-5:5,-5:5)
 real(8) :: eta1, eta2, FluxFac, Ehat, sHatJacobi
 real(8) :: MomExt(1:4,1:10),PSWgt
-real(8) :: p_MCFM(mxpart,1:4),msq_MCFM(-5:5,-5:5)
-integer :: id_MCFM(mxpart),MY_IDUP(1:10),ICOLUP(1:2,1:10),NBin(1:NumHistograms),NHisto
+real(8) :: p_MCFM(mxpart,1:4),msq_MCFM(-5:5,-5:5),msq_VgsWgt(-5:5,-5:5)
+integer :: id_MCFM(mxpart),MY_IDUP(1:10),ICOLUP(1:2,1:10),NBin(1:NumHistograms),NHisto,ipart,jpart,ichan
+integer, pointer :: ijSel(:,:)
 integer :: iPartChannel,PartChannelAvg,NumPartonicChannels,iflip,i,j,k,flavor_tag  !,ijSel(1:121,1:3)
-real(8) :: LO_Res_Unpol, PreFac,VegasWeighted_HJJ_fulldecay,xRnd,me2_hdk,me2_prop,me2_tmpzz(-5:5,-5:5),me2_tmpww(-5:5,-5:5),me2_zzcontr(-5:5,-5:5),me2_wwcontr(-5:5,-5:5)
+real(8) :: PreFac,VegasWeighted_HJJ_fulldecay,xRnd,me2_hdk,me2_prop,me2_tmpzz(-5:5,-5:5),me2_tmpww(-5:5,-5:5),me2_zzcontr(-5:5,-5:5),me2_wwcontr(-5:5,-5:5)
 logical :: applyPSCut
 integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, Lep1M=8, Lep2P=9, Lep2M=10
 real(8) :: s13,s14,s15,s16,s23,s24,s25,s26,s34,s35,s36,s45,s46,s56,s78,s910,s710,s89
@@ -38,16 +40,19 @@ include 'vegas_common.f'
 include 'maxwt.f'
 EvalWeighted_HJJ_fulldecay = 0d0
 
+   call getRef_MCFM_qqVVqq_GenHash(ijSel)
+   NumPartonicChannels=Hash_MCFM_qqVVqq_Gen_Size
+   do ichan=1,Hash_MCFM_qqVVqq_Gen_Size
+      if(ijSel(ichan,1).eq.Not_a_particle_ .or. ijSel(ichan,2).eq.Not_a_particle_ .or. ijSel(ichan,3).eq.Not_a_particle_ .or. ijSel(ichan,4).eq.Not_a_particle_) then
+         NumPartonicChannels=NumPartonicChannels-1
+      endif
+   enddo
+   if (NumPartonicChannels.eq.0) return
+   PartChannelAvg = NumPartonicChannels
 
-
-!    NumPartonicChannels = 100
-   call get_NumberOfChannels(NumPartonicChannels)
-   PartChannelAvg = NumPartonicChannels  
-   
-
-   iPartChannel = int(yRnd(18) * (NumPartonicChannels)) +1 ! this runs from 1..100      
-   call get_VBFoffshChannel(iPartChannel,iPart_sel,jPart_sel,id_MCFM(7),id_MCFM(8))
-
+   iPartChannel = int(yRnd(18) * (NumPartonicChannels)) +1 ! this runs from 1..100
+   iPart_sel = ijSel(iPartChannel,1)
+   jPart_sel = ijSel(iPartChannel,2)
 
    if(.not. warmup) then
        call random_number(xRnd)!   throwing random number for accept-reject
@@ -57,18 +62,17 @@ EvalWeighted_HJJ_fulldecay = 0d0
          return
        endif
    endif
-   
-   
+
    if( unweighted .and. .not.warmup .and.  sum(AccepCounter_part(:,:)) .eq. sum(RequEvents(:,:)) ) then
       stopvegas=.true.
       print *, "NumPartonicChannels=",NumPartonicChannels
    endif
    if( (unweighted) .and. (.not. warmup) .and. (AccepCounter_part(iPart_sel,jPart_sel) .ge. RequEvents(iPart_sel,jPart_Sel))  ) then
-      call remove_VBFoffshchannel(iPartChannel)
+      call removeOffshellChannelFromHashRef(ijSel,iPartChannel,NumPartonicChannels,4)
       print *, "REMOVED CHANNEL ",iPart_sel,jPart_sel," FROM HASH: ",AccepCounter_part(iPart_sel,jPart_sel),RequEvents(iPart_sel,jPart_Sel)
-      call get_NumberOfChannels(NumPartonicChannels)      
+      NumPartonicChannels = NumPartonicChannels-1
       print *, NumPartonicChannels," CHANNELS REMAINING"
-      return 
+      return
    endif
 
    call PDFMapping(2,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi,EhatMin=dmax1(m4l_minmax(1),0d0)+mJJcut)
@@ -88,11 +92,11 @@ EvalWeighted_HJJ_fulldecay = 0d0
 !       return
 
    call boost2Lab(eta1,eta2,10,MomExt(1:4,1:10))
-   PSWgt = PSWgt * PartChannelAvg 
+   PSWgt = PSWgt * PartChannelAvg
 
 
    call Kinematics_HVBF_fulldecay(MomExt,applyPSCut,NBin)
-   DebugCounter(9) = DebugCounter(9) + 1  
+   DebugCounter(9) = DebugCounter(9) + 1
    if( applyPSCut .or. PSWgt.lt.1d-33 ) then
       return
    endif
@@ -117,17 +121,38 @@ EvalWeighted_HJJ_fulldecay = 0d0
 #if linkMELA==1
 
    ! FIXME: TEMPORARY ASSIGNMENT OF I J R S
-   id_MCFM(1) = iPart_sel
-   id_MCFM(2) = jPart_sel
-!    id_MCFM(7) = 0
-!    id_MCFM(8) = 0
+   do jpart=1,2
+      id_MCFM(jpart) = ijSel(iPartChannel,jpart)
+      if(id_MCFM(jpart) .ne. 0) id_MCFM(jpart)=convertLHE(id_MCFM(jpart))
+   enddo
+   do jpart=3,4
+      id_MCFM(jpart+4) = ijSel(iPartChannel,jpart)
+      if(id_MCFM(jpart+4) .ne. 0) id_MCFM(jpart+4)=convertLHE(id_MCFM(jpart+4))
+   enddo
    id_MCFM(3:6) = (/ ElM_,ElP_,MuM_,MuP_ /)
 
-   call EvalAmp_qqVVqq(id_MCFM, p_MCFM, 1, msq_MCFM) ! 1 for ZZ decay, 2 for WW decay, 3 for ZZ+WW mixture   
-!    call qq_ZZqq(p_MCFM,msq_MCFM)   
-   
-   
-   msq_MCFM = msq_MCFM * (100d0)**8  ! adjust msq_MCFM for GeV units of MCFM mat.el.
+   call EvalAmp_qqVVqq(id_MCFM, p_MCFM, msq_MCFM) ! 1 for ZZ decay, 2 for WW decay, 3 for ZZ+WW mixture
+!   print *,"msq for id combination ",id_MCFM
+!   print *,msq_MCFM(-5,:)
+!   print *,msq_MCFM(-4,:)
+!   print *,msq_MCFM(-3,:)
+!   print *,msq_MCFM(-2,:)
+!   print *,msq_MCFM(-1,:)
+!   print *,msq_MCFM(0,:)
+!   print *,msq_MCFM(1,:)
+!   print *,msq_MCFM(2,:)
+!   print *,msq_MCFM(3,:)
+!   print *,msq_MCFM(4,:)
+!   print *,msq_MCFM(5,:)
+!   call qq_ZZqq(p_MCFM,msq_MCFM)
+
+
+   PreFac = fbGeV2 * FluxFac * PSWgt * sHatJacobi
+   msq_MCFM = msq_MCFM * PreFac / (GeV**8)  ! adjust msq_MCFM for GeV units of MCFM mat.el.
+   do ipart=-5,5; do jpart=-5,5
+      msq_MCFM(ipart,jpart)=msq_MCFM(ipart,jpart) * pdf(LHA2M_pdf(ipart),1)*pdf(LHA2M_pdf(jpart),2)
+      msq_VgsWgt(ipart,jpart)=msq_MCFM(ipart,jpart)*VgsWgt
+   enddo; enddo
 
 #else
  print *, "To use this process, please set linkMELA=Yes in the makefile and recompile."
@@ -136,10 +161,8 @@ EvalWeighted_HJJ_fulldecay = 0d0
 #endif
 
 
-   LO_Res_Unpol = msq_MCFM(iPart_sel,jPart_sel)  *  pdf(LHA2M_pdf(iPart_sel),1) * pdf(LHA2M_pdf(jPart_sel),2)  
-   PreFac = fbGeV2 * FluxFac * PSWgt * sHatJacobi
-   EvalWeighted_HJJ_fulldecay = LO_Res_Unpol * PreFac
-   VegasWeighted_HJJ_fulldecay = EvalWeighted_HJJ_fulldecay*VgsWgt
+   EvalWeighted_HJJ_fulldecay = msq_MCFM(iPart_sel,jPart_sel)
+   VegasWeighted_HJJ_fulldecay = msq_VgsWgt(iPart_sel,jPart_sel)
 
    if( unweighted ) then
 
@@ -147,42 +170,44 @@ EvalWeighted_HJJ_fulldecay = 0d0
 
 !        if( VegasWeighted_HJJ_fulldecay.gt.CrossSecMax(iPart_sel,jPart_sel) ) then
 !            print *, "New max",iPart_sel,jPart_sel,VegasWeighted_HJJ_fulldecay
-!        endif     
-       
-       CrossSec(iPart_sel,jPart_sel) = CrossSec(iPart_sel,jPart_sel) + VegasWeighted_HJJ_fulldecay     
-       CrossSecMax(iPart_sel,jPart_sel) = max(CrossSecMax(iPart_sel,jPart_sel),VegasWeighted_HJJ_fulldecay)
+!        endif
+
+       CrossSec(-5:5,-5:5) = CrossSec(-5:5,-5:5) + msq_VgsWgt(-5:5,-5:5)
+       do ipart=-5,5; do jpart=-5,5
+         CrossSecMax(ipart,jpart) = max(CrossSecMax(ipart,jpart),msq_VgsWgt(ipart,jpart))
+       enddo; enddo
 
      else! not warmup
 
        EvalCounter = EvalCounter+1
-       
+
        if( VegasWeighted_HJJ_fulldecay .gt. xRnd*CrossSecMax(iPart_sel,jPart_sel) ) then
          RejeCounter_part(iPart_sel,jPart_sel) = RejeCounter_part(iPart_sel,jPart_sel) + 1
-         RejeCounter=RejeCounter+1       
+         RejeCounter=RejeCounter+1
        endif
-       
+
        if( VegasWeighted_HJJ_fulldecay.gt.CrossSecMax(iPart_sel,jPart_sel) ) then
          write(io_LogFile,"(2X,A,1PE13.6,1PE13.6)") "CrossSecMax is too small.",VegasWeighted_HJJ_fulldecay, CrossSecMax(iPart_sel,jPart_sel)
          write(io_stdout, "(2X,A,1PE13.6,1PE13.6,1PE13.6,I3,I3)") "CrossSecMax is too small.",VegasWeighted_HJJ_fulldecay, CrossSecMax(iPart_sel,jPart_sel),VegasWeighted_HJJ_fulldecay/CrossSecMax(iPart_sel,jPart_sel),iPart_sel,jPart_sel
          AlertCounter = AlertCounter + 1
-         
+
 !          This dynamically increases the maximum in case it is exceeded
 !          CrossSecMax(iPart_sel,jPart_sel) = VegasWeighted_HJJ_fulldecay
 !          write(io_LogFile,"(2X,A,1PE13.6)") "Increasing CrossSecMax to ",VegasWeighted_HJJ_fulldecay
 !          write(io_stdout, "(2X,A,1PE13.6)") "Increasing CrossSecMax to ",VegasWeighted_HJJ_fulldecay
-         
+
        elseif( VegasWeighted_HJJ_fulldecay .gt. xRnd*CrossSecMax(iPart_sel,jPart_sel) ) then
          AccepCounter = AccepCounter + 1
          AccepCounter_part(iPart_sel,jPart_sel) = AccepCounter_part(iPart_sel,jPart_sel) + 1
 
-         MY_IDUP(1:2)= (/LHA2M_ID(iPart_sel),LHA2M_ID(jPart_sel)/)
-         MY_IDUP(3:4)= (/LHA2M_ID(id_MCFM(7)),LHA2M_ID(id_MCFM(8))/)
+         MY_IDUP(1:2)= id_MCFM(1:2)
+         MY_IDUP(3:4)= id_MCFM(7:8)
          call WriteOutEvent_HJJ_fulldecay(MomExt,MY_IDUP,ICOLUP)
-         
+
          do NHisto=1,NumHistograms
            call intoHisto(NHisto,NBin(NHisto),1d0)
          enddo
-       else 
+       else
          RejeCounter_part(iPart_sel,jPart_sel) = RejeCounter_part(iPart_sel,jPart_sel) + 1
          RejeCounter=RejeCounter+1
        endif
@@ -248,7 +273,8 @@ use ifport
    real(8) :: me2(-5:5,-5:5)
    real(8) :: me2_testhvv
    integer :: i,j,MY_IDUP(1:5),ICOLUP(1:2,1:5),NBin(1:NumHistograms),NHisto
-   integer :: iPartChannel,PartChannelAvg,NumPartonicChannels,ijSel(1:121,1:3),flavor_tag
+   integer, pointer :: ijSel(:,:)
+   integer :: iPartChannel,PartChannelAvg,NumPartonicChannels,flavor_tag
    real(8) :: LO_Res_Unpol, PreFac,xRnd,partonic_flip,outgoing_flip
    integer :: partbound(0:121), part_multiplicity, part_tracker
    real(8) :: part_detect
@@ -268,7 +294,7 @@ use ifport
 
    ! Determine which partonic channel to generate
    if( Process.eq.60 ) then!  assuming everywhere that i>j  (apart from the LHE writeout)
-      call get_VBFchannelHash_nosplit(ijSel,NumPartonicChannels)
+      call getRef_VBFchannelHash_nosplit(ijSel,NumPartonicChannels)
 
       part_tracker=0; partbound(part_tracker)=0 ! These are here to make sure WW:ZZ ratio in the id phase space is (3*3):1 due to subdivision into each CKM partner
       do part_tracker = 1,NumPartonicChannels
@@ -290,8 +316,7 @@ use ifport
 !     print *, "partbound: ",partbound
       PartChannelAvg = partbound(NumPartonicChannels)
    elseif( Process.eq.61 ) then
-      call get_HJJchannelHash(ijSel)
-      NumPartonicChannels = 77
+      call getRef_HJJchannelHash_nosplit(ijSel,NumPartonicChannels)
       iPartChannel = int(yRnd(8) * (NumPartonicChannels)) +1 ! this runs from 1..77
       PartChannelAvg = NumPartonicChannels
    endif
@@ -577,7 +602,8 @@ END FUNCTION
    real(8) :: MomExt(1:4,1:5), PSWgt
    real(8) :: me2(-5:5,-5:5)
    integer :: i,j,MY_IDUP(1:5),ICOLUP(1:2,1:5),NBin(1:NumHistograms),NHisto,iflip
-   integer :: iPartChannel,PartChannelAvg,NumPartonicChannels,ijSel(1:121,1:3),flavor_tag
+   integer, pointer :: ijSel(:,:)
+   integer :: iPartChannel,PartChannelAvg,NumPartonicChannels,flavor_tag
    real(8) :: LO_Res_Unpol, PreFac,xRnd,partonic_flip
    logical :: applyPSCut,ZZ_Fusion
    include 'vegas_common.f'
@@ -588,7 +614,7 @@ END FUNCTION
    if( Process.eq.60 ) then!  assuming everywhere that i>j  (apart from the LHE writeout)
       NumPartonicChannels = 71
       iPartChannel = int(yRnd(8) * (NumPartonicChannels)) +1 ! this runs from 1..71
-      call get_VBFchannelHash(ijSel)
+      call getRef_VBFchannelHash(ijSel)
       iPart_sel = ijSel(iPartChannel,1)
       jPart_sel = ijSel(iPartChannel,2)
       ZZ_Fusion = .false.
@@ -596,7 +622,7 @@ END FUNCTION
    elseif( Process.eq.61 ) then
       NumPartonicChannels = 77
       iPartChannel = int(yRnd(8) * (NumPartonicChannels)) +1 ! this runs from 1..77
-      call get_HJJchannelHash(ijSel)
+      call getRef_HJJchannelHash(ijSel)
       iPart_sel = ijSel(iPartChannel,1)
       jPart_sel = ijSel(iPartChannel,2)
       flavor_tag= ijSel(iPartChannel,3)

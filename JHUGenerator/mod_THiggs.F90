@@ -3,51 +3,12 @@ use ModParameters
 implicit none
 
 
-public :: EvalXsec_pp_TH,get_THchannelHash
+public :: EvalXsec_pp_TH
 public :: EvalAmp_QB_TH, EvalAmp_QbarBbar_TH     ! t-channel
 public :: EvalAmp_QQB_THBBAR,EvalAmp_QQB_TBARHB  ! s-channel
 private
 
  CONTAINS
-
-
-
-
-  subroutine get_THchannelHash(ijSel)
-  implicit none
-  integer, intent(out) :: ijSel(1:121,1:3)
-
-      ijSel(  1,1:3) = (/-5,-4,111/)
-      ijSel(  2,1:3) = (/-5,-2,111/)
-      ijSel(  3,1:3) = (/-5, 1,111/)
-      ijSel(  4,1:3) = (/-5, 3,111/)
-      ijSel(  5,1:3) = (/-4,-5,111/)
-      ijSel(  6,1:3) = (/-4, 3,113/)
-      ijSel(  7,1:3) = (/-3, 4,112/)
-      ijSel(  8,1:3) = (/-3, 5,110/)
-      ijSel(  9,1:3) = (/-2,-5,111/)
-      ijSel( 10,1:3) = (/-2, 1,113/)
-      ijSel( 11,1:3) = (/-1, 2,112/)
-      ijSel( 12,1:3) = (/-1, 5,110/)
-      ijSel( 13,1:3) = (/ 1,-5,111/)
-      ijSel( 14,1:3) = (/ 1,-2,113/)
-      ijSel( 15,1:3) = (/ 2,-1,112/)
-      ijSel( 16,1:3) = (/ 2, 5,110/)
-      ijSel( 17,1:3) = (/ 3,-5,111/)
-      ijSel( 18,1:3) = (/ 3,-4,113/)
-      ijSel( 19,1:3) = (/ 4,-3,112/)
-      ijSel( 20,1:3) = (/ 4, 5,110/)
-      ijSel( 21,1:3) = (/ 5,-3,110/)
-      ijSel( 22,1:3) = (/ 5,-1,110/)
-      ijSel( 23,1:3) = (/ 5, 2,110/)
-      ijSel( 24,1:3) = (/ 5, 4,110/)
-
-
-      ijSel( 25:121,:) = 0
-      ijSel( 25:121,3) = -1
-
-  return
-  end subroutine
 
 
 subroutine EvalXsec_pp_TH(Mom,Channel,Res)

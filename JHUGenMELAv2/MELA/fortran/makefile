@@ -66,7 +66,7 @@ all:    libs
 
 libs: CALLING_cpHTO.o \
 	Cteq61Pdf.o mstwpdf.o NNPDFDriver.o \
-	mod_Parameters.o mod_Misc.o mod_Kinematics.o \
+	mod_Parameters.o mod_Misc.o mod_HashCollection.o mod_Kinematics.o \
 	mod_JHUGenMELA.o mod_JHUGen.o \
 	mod_Higgs.o mod_Graviton.o mod_Zprime.o \
 	mod_HiggsJJ.o mod_HiggsJ.o mod_VHiggs.o \
@@ -106,6 +106,11 @@ mod_Parameters.o: mod_Parameters.F90
 	@echo " "
 	@echo " compiling mod_Parameters.F90 with "$(Comp)
 	$(fcomp) -c mod_Parameters.F90
+
+mod_HashCollection.o: mod_HashCollection.F90
+	@echo " "
+	@echo " compiling mod_HashCollection.F90 with "$(Comp)
+	$(fcomp) -c mod_HashCollection.F90
 
 mod_JHUGenMELA.o: mod_JHUGenMELA.F90
 	@echo " "
