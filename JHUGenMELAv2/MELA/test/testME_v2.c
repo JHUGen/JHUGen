@@ -1287,7 +1287,6 @@ void testME_VH_JHUGen_Ping(int erg_tev=13, bool useConstants=false, shared_ptr<M
           mela.setProcess(TVar::SelfDefine_spin0, TVar::JHUGen, prod);
           double xw = 0.23119;
           if (izwa==0){
-            mela.selfDUseZprime=true;
             mela.selfDHzpzpcoupl[gHIGGS_VV_1][0]=1;
             mela.selfDZpffcoupl[gHIGGS_Vp_NuE_left][0]=0.5*2.;
             mela.selfDZpffcoupl[gHIGGS_Vp_El_left][0]=(-xw*(-1.)-0.5)*2.;
@@ -1310,7 +1309,6 @@ void testME_VH_JHUGen_Ping(int erg_tev=13, bool useConstants=false, shared_ptr<M
             mela.selfDGa_Zprime=2.4952;
           }
           else{
-            mela.selfDUseWprime=true;
             mela.selfDHzpzpcoupl[gHIGGS_VV_1][0]=1;
             //mela.selfDHwpwpcoupl[gHIGGS_VV_1][0]=1;
             mela.selfDWpffcoupl[gHIGGS_Vp_El_left][0]=sqrt(2.*(1.-xw));
@@ -1546,8 +1544,6 @@ void testME_VBF_JHUGen_Ping(int erg_tev=13, bool useConstants=false, shared_ptr<
 
         float p0mplus_selfD_CT=0;
         mela.setProcess(TVar::SelfDefine_spin0, TVar::JHUGen, prod);
-        mela.selfDUseZprime=true;
-        mela.selfDUseWprime=true;
         double xw = 0.23119;
         if (izwa==1 || izwa==0){
           mela.selfDHzpzpcoupl[gHIGGS_VV_1][0]=1;
@@ -5198,7 +5194,6 @@ void testME_Dec_JHUGenMCFM_Ping(int flavor=2, shared_ptr<Mela> melaptr=nullptr){
     mela.selfDWpffcoupl[gHIGGS_Vp_Up_right][0]=aR1;
     mela.selfDWpffcoupl[gHIGGS_Vp_Chm_right][0]=aR1;
     mela.selfDWpffcoupl[gHIGGS_Vp_Top_right][0]=aR1;
-    mela.selfDUseWprime=true;
     mela.selfDM_Wprime=80.399;
     mela.selfDGa_Wprime=2.085;
     mela.computeP(pVAJHUGen_ggWW_0pm_CT_sig, true);
@@ -5336,7 +5331,6 @@ void testME_Dec_JHUGenMCFM_Ping(int flavor=2, shared_ptr<Mela> melaptr=nullptr){
     mela.selfDZpffcoupl[gHIGGS_Vp_Dn_right][0]=aR1;
     mela.selfDZpffcoupl[gHIGGS_Vp_Str_right][0]=aR1;
     mela.selfDZpffcoupl[gHIGGS_Vp_Bot_right][0]=aR1;
-    mela.selfDUseZprime=true;
     mela.selfDM_Zprime=91.1876;
     mela.selfDGa_Zprime=2.4952;
     mela.computeP(pVAJHUGen_ggZZ_0pm_CT_sig, true);

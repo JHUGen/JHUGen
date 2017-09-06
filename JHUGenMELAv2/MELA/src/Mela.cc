@@ -318,10 +318,8 @@ void Mela::reset_SelfDCouplings(){
       selfDWpffcoupl[ic][im] = 0;
     }
   }
-  selfDUseZprime = false;
   selfDM_Zprime = -1;
   selfDGa_Zprime = 0;
-  selfDUseWprime = false;
   selfDM_Wprime = -1;
   selfDGa_Wprime = 0;
 
@@ -608,10 +606,8 @@ void Mela::computeP(
             selfDHwwpcoupl,
             selfDHwpwpcoupl,
             selfDWpffcoupl,
-            selfDUseZprime,
             selfDM_Zprime,
             selfDGa_Zprime,
-            selfDUseWprime,
             selfDM_Wprime,
             selfDGa_Wprime
             );
@@ -890,10 +886,8 @@ void Mela::computeProdDecP(
       selfDHwwpcoupl,
       selfDHwpwpcoupl,
       selfDWpffcoupl,
-      selfDUseZprime,
       selfDM_Zprime,
       selfDGa_Zprime,
-      selfDUseWprime,
       selfDM_Wprime,
       selfDGa_Wprime
       );
@@ -1017,10 +1011,8 @@ void Mela::computeProdP(
             selfDHwwpcoupl,
             selfDHwpwpcoupl,
             selfDWpffcoupl,
-            selfDUseZprime,
             selfDM_Zprime,
             selfDGa_Zprime,
-            selfDUseWprime,
             selfDM_Wprime,
             selfDGa_Wprime
             );
@@ -1072,10 +1064,8 @@ void Mela::computeProdP(
               selfDHwwpcoupl,
               selfDHwpwpcoupl,
               selfDWpffcoupl,
-              selfDUseZprime,
               selfDM_Zprime,
               selfDGa_Zprime,
-              selfDUseWprime,
               selfDM_Wprime,
               selfDGa_Wprime
               );
@@ -1159,10 +1149,8 @@ void Mela::computeProdP(
                   selfDHwwpcoupl,
                   selfDHwpwpcoupl,
                   selfDWpffcoupl,
-                  selfDUseZprime,
                   selfDM_Zprime,
                   selfDGa_Zprime,
-                  selfDUseWprime,
                   selfDM_Wprime,
                   selfDGa_Wprime
                   );
@@ -1243,10 +1231,8 @@ void Mela::computeProdP(
               selfDHwwpcoupl,
               selfDHwpwpcoupl,
               selfDWpffcoupl,
-              selfDUseZprime,
               selfDM_Zprime,
               selfDGa_Zprime,
-              selfDUseWprime,
               selfDM_Wprime,
               selfDGa_Wprime
               );
@@ -1327,10 +1313,8 @@ void Mela::computeProdP_VH(
           selfDHwwpcoupl,
           selfDHwpwpcoupl,
           selfDWpffcoupl,
-          selfDUseZprime,
           selfDM_Zprime,
           selfDGa_Zprime,
-          selfDUseWprime,
           selfDM_Wprime,
           selfDGa_Wprime
           );
@@ -1382,10 +1366,8 @@ void Mela::computeProdP_ttH(
         selfDHwwpcoupl,
         selfDHwpwpcoupl,
         selfDWpffcoupl,
-        selfDUseZprime,
         selfDM_Zprime,
         selfDGa_Zprime,
-        selfDUseWprime,
         selfDM_Wprime,
         selfDGa_Wprime
         );

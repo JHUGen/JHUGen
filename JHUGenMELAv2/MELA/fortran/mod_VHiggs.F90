@@ -218,7 +218,7 @@ end subroutine EvalAmp_VHiggs
          !WH
          if((id(1)+id(2)).ne.0)then
             if (includeVprime) then
-               if (UseWprime) then
+               if (getMass(Wppr_).ge.0d0) then
                   !print *,"Compute prop for Wppr"
                   PROP_Vp1 = PROPAGATOR(dsqrt(q3_q3),getMass(Wppr_),getDecayWidth(Wppr_))
                else
@@ -234,7 +234,7 @@ end subroutine EvalAmp_VHiggs
          !ZH
          else
             if (includeVprime) then
-               if (UseZprime) then
+               if (getMass(Zpr_).ge.0d0) then
                   !print *,"Compute prop for Zpr"
                   PROP_Vp1 = PROPAGATOR(dsqrt(q3_q3),getMass(Zpr_),getDecayWidth(Zpr_))
                else
@@ -350,7 +350,7 @@ end subroutine EvalAmp_VHiggs
          !WH
          if((id(6)+id(7)).ne.0)then
            if (includeVprime) then
-             if (UseWprime) then
+             if (getMass(Wppr_).ge.0d0) then
                PROP_Vp2 = PROPAGATOR(dsqrt(q4_q4),getMass(Wppr_),getDecayWidth(Wppr_))
              else
                PROP_Vp2 = PROPAGATOR(M_W,0d0,0d0)
@@ -365,7 +365,7 @@ end subroutine EvalAmp_VHiggs
          !ZH
          else
            if (includeVprime) then
-             if (UseZprime) then
+             if (getMass(Zpr_).ge.0d0) then
                PROP_Vp2 = PROPAGATOR(dsqrt(q4_q4),getMass(Zpr_),getDecayWidth(Zpr_))
              else
                PROP_Vp2 = PROPAGATOR(M_Z,0d0,0d0)
@@ -481,13 +481,13 @@ end subroutine EvalAmp_VHiggs
 
       if(.not.(useA(1) .and. abs(id(1)).eq.convertLHE(Pho_))) then
          current1 = -current1 + scrc(MomExt(:,3),current1)/q3_q3
-         if(UseWprime .or. UseZprime) then
+         if(getMass(Wppr_).ge.0d0 .or. getMass(Zpr_).ge.0d0) then
             currentVp1 = -currentVp1 + scrc(MomExt(:,3),currentVp1)/q3_q3
          endif
       endif
       if(.not.(useA(2) .and. abs(id(6)).eq.convertLHE(Pho_))) then
          current2 = -current2 + scrc(MomExt(:,4),current2)/q4_q4
-         if(UseWprime .or. UseZprime) then
+         if(getMass(Wppr_).ge.0d0 .or. getMass(Zpr_).ge.0d0) then
             currentVp2 = -currentVp2 + scrc(MomExt(:,4),currentVp2)/q4_q4
          endif
       endif

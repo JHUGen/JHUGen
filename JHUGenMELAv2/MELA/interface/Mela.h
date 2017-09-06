@@ -269,10 +269,8 @@ public:
   double selfDHwwpcoupl[SIZE_HVV][2];
   double selfDHwpwpcoupl[SIZE_HVV][2];
   double selfDWpffcoupl[SIZE_Vpff][2];
-  bool selfDUseZprime;
   double selfDM_Zprime;
   double selfDGa_Zprime;
-  bool selfDUseWprime;
   double selfDM_Wprime;
   double selfDGa_Wprime;
   //****Spin-1****//
