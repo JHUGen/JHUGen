@@ -1,8 +1,23 @@
 {
-  gSystem->Load("libgfortran.so");
-  gSystem->Load("libPhysics.so");
-  gSystem->Load("libEG.so");
-  gSystem->AddIncludePath("-I$ROOFITSYS/include/");
-  gSystem->Load("libmcfm_701.so");
-  gSystem->Load("libME.so");
+  TString loadMELA = __FILE__;
+  TString testdir = loadMELA(0, loadMELA.Last('/'));
+  TString LIBMCFMPATH = testdir+"/../data/slc6_amd64_gcc530/";
+  TString LIBMCFM="libmcfm_704.so";
+  TString LIBJHUGENMELA="libjhugenmela.so";
+  TString LIBMELA="libMELA.so";
+
+  gInterpreter->AddIncludePath("$ROOFITSYS/include/");
+  gInterpreter->AddIncludePath(testdir+"/../interface/");
+  //////////////////////////////////////
+  //these explicit loads are required on
+  //some machines but not others
+  //not entirely sure why
+  //either way, they shouldn't hurt
+  gSystem->Load("libRooFit");
+  gSystem->Load("libPhysics");
+  gSystem->Load("libgfortran");
+  //////////////////////////////////////
+  gSystem->Load(LIBMCFMPATH + LIBMCFM);
+  gSystem->Load(LIBMCFMPATH + LIBJHUGENMELA);
+  gSystem->Load(LIBMCFMPATH + LIBMELA);
 }

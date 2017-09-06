@@ -1,18 +1,12 @@
 #ifndef SCALAR_PDF_FACTORY_VH
 #define SCALAR_PDF_FACTORY_VH
 
-#ifdef _def_melatools_
-#include <RooSpinZero_5D_VH.h>
-#include <RooSpinZero_3D_pp_VH.h>
-#include <ScalarPdfFactory.h>
-#else
 #include "RooSpinZero_5D_VH.h"
 #include "RooSpinZero_3D_pp_VH.h"
 #include "ScalarPdfFactory.h"
-#endif
 
 
-class ScalarPdfFactory_VH : public ScalarPdfFactory {
+class ScalarPdfFactory_VH : public ScalarPdfFactory{
 public:
 
   ScalarPdfFactory_VH(RooSpin::modelMeasurables measurables_, double sqrts_, RooSpin::VdecayType VHmode1_=RooSpin::kVdecayType_Zud, RooSpin::VdecayType VHmode2_=RooSpin::kVdecayType_Zud, Bool_t OnshellH_=true);
@@ -28,8 +22,9 @@ protected:
   double sqrts;
   int PDFType;
 
-  void initPDF();
-  void destroyPDF();
+  virtual void initPDF();
+  virtual void destroyPDF();
+
 };
 
 #endif

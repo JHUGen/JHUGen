@@ -1,13 +1,9 @@
 #ifndef SPIN_PDF_FACTORY
 #define SPIN_PDF_FACTORY
 
-#ifdef _def_melatools_
-#include <RooSpin.h>
-#else
 #include "RooSpin.h"
-#endif
-#include "TString.h"
 #include "RooFormulaVar.h"
+#include "TString.h"
 
 
 class SpinPdfFactory{
@@ -51,6 +47,7 @@ protected:
   virtual void destroyGVals()=0;
   virtual void initPDF()=0;
   virtual void destroyPDF()=0;
+
 };
 
 

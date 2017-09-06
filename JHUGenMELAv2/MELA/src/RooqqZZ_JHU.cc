@@ -9,12 +9,11 @@
 
 // Your description goes here... 
 
+#include <math.h> 
+#include "RooqqZZ_JHU.h"
 #include "Riostream.h" 
-
-#include <interface/RooqqZZ_JHU.h>
 #include "RooAbsReal.h" 
 #include "RooAbsCategory.h" 
-#include <math.h> 
 #include "TMath.h" 
 
 //ClassImp(RooqqZZ_JHU) 

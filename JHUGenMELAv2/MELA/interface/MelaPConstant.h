@@ -7,6 +7,25 @@
 
 
 class MelaPConstant{
+protected:
+
+  TVar::MatrixElement processME;
+  TVar::Production processProd;
+  TVar::Process processProc;
+
+  TF1* fcnLow;
+  TF1* fcnHigh;
+  TSpline3* fcnMid;
+  TString fname;
+
+  void GetFcnFromFile(const char* path, const char* spname);
+
+  double GetHPropagator(const MelaIO* RcdME, const TVar::VerbosityLevel& verbosity)const;
+  double GetZPropagator(const MelaIO* RcdME, const bool restricted, const TVar::VerbosityLevel& verbosity)const;
+  double GetAssociatedVjjPropagator(const MelaIO* RcdME, const TVar::VerbosityLevel& verbosity)const;
+  double GetVDaughterCouplings(const MelaIO* RcdME, const TVar::VerbosityLevel& verbosity)const;
+  double GetAlphaSatMZ(const MelaIO* RcdME, const int p, const TVar::VerbosityLevel& verbosity)const;
+
 public:
 
   MelaPConstant(
@@ -19,19 +38,12 @@ public:
 
   virtual ~MelaPConstant();
 
-  double Eval(MelaIO* RcdME, TVar::VerbosityLevel verbosity)const;
+  double Eval(const MelaIO* RcdME, TVar::VerbosityLevel verbosity)const;
 
-private:
+  bool IsValid(){ return bool(fcnMid!=0); }
 
-  TVar::MatrixElement processME;
-  TVar::Production processProd;
-  TVar::Process processProc;
-
-  TF1* fcnLow;
-  TF1* fcnHigh;
-  TSpline3* fcnMid;
-
-  void GetFcnFromFile(const char* path, const char* spname);
+  TString GetFileName(){ return fname; }
+  TString GetSplineName(){ TString sname=""; if (IsValid()) sname=fcnMid->GetName(); return sname; }
 
 };
 

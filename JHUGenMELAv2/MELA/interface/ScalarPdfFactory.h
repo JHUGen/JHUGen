@@ -1,15 +1,10 @@
 #ifndef SCALAR_PDF_FACTORY
 #define SCALAR_PDF_FACTORY
 
-#ifdef _def_melatools_
-#include <RooSpinZero.h>
-#include <SpinPdfFactory.h>
-#else
 #include "RooSpinZero.h"
 #include "SpinPdfFactory.h"
-#endif
-#include "TString.h"
 #include "RooFormulaVar.h"
+#include "TString.h"
 
 
 class ScalarPdfFactory : public SpinPdfFactory{
@@ -86,6 +81,7 @@ protected:
 
   virtual void initPDF()=0;
   virtual void destroyPDF()=0;
+
 };
 
 

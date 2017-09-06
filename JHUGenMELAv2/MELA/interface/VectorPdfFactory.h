@@ -1,13 +1,13 @@
 #ifndef VECTOR_PDF_FACTORY
 #define VECTOR_PDF_FACTORY
 
-#include <TVar.hh>
+#include <cmath>
+#include "TVar.hh"
 #include "RooSpinOne_7D.h"
 #include "RooRealVar.h"
 #include "RooAbsPdf.h"
-#include <cmath>
-
 #include "TF1.h"
+
 
 class VectorPdfFactory{
 
@@ -19,7 +19,7 @@ public:
   RooRealVar* R1Val;
   RooRealVar* R2Val;
 
-  RooAbsPdf *PDF;
+  RooSpinOne_7D* PDF;
 
   RooRealVar* g1Val;
   RooRealVar* g2Val;
@@ -115,6 +115,8 @@ public:
       R2Val->setConstant(kFALSE);
     }
   };
+
+  void setZZ4fOrdering(bool flag=true){ PDF->setZZ4fOrdering(flag); }
 
 };
 

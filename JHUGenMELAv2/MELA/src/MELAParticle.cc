@@ -1,4 +1,6 @@
-#include <interface/MELAParticle.h>
+#include <algorithm>
+#include <utility>
+#include "MELAParticle.h"
 
 using namespace PDGHelpers;
 
@@ -8,49 +10,51 @@ namespace debugVars{
 
 
 MELAParticle::MELAParticle():
-id(0),
+id(-9000),
+p4(0, 0, 0, 0),
 passSelection(true),
 genStatus(-2),
 lifetime(0)
-{
-  p4.SetXYZT(0, 0, 0, 0);
-}
-
+{}
+MELAParticle::MELAParticle(int id_) :
+id(id_),
+p4(0, 0, 0, 0),
+passSelection(true),
+genStatus(-2),
+lifetime(0)
+{}
 MELAParticle::MELAParticle(int id_, TLorentzVector p4_) :
 id(id_),
+p4(p4_),
 passSelection(true),
 genStatus(-2),
 lifetime(0)
-{
-  p4.SetXYZT(p4_.X(), p4_.Y(), p4_.Z(), p4_.T());
-}
+{}
 MELAParticle::MELAParticle(const MELAParticle& particle_) :
 id(particle_.id),
+p4(particle_.p4),
 passSelection(particle_.passSelection),
 genStatus(particle_.genStatus),
-lifetime(particle_.lifetime)
-{
-  p4.SetXYZT(particle_.p4.X(), particle_.p4.Y(), particle_.p4.Z(), particle_.p4.T());
-  for (int index=0; index<particle_.getNMothers(); index++) addMother(particle_.getMother(index));
-  for (int index=0; index<particle_.getNDaughters(); index++) addDaughter(particle_.getDaughter(index));
-}
+lifetime(particle_.lifetime),
+mothers(particle_.mothers),
+daughters(particle_.daughters)
+{}
 MELAParticle& MELAParticle::operator=(const MELAParticle& particle_){
-  id=particle_.id;
-  passSelection=particle_.passSelection;
-  genStatus=particle_.genStatus;
-  lifetime=particle_.lifetime;
-  for (int index=0; index<particle_.getNMothers(); index++) addMother(particle_.getMother(index));
-  for (int index=0; index<particle_.getNDaughters(); index++) addDaughter(particle_.getDaughter(index));
+  MELAParticle tmp(particle_);
+  swap(tmp);
   return *this;
 }
 
-
-bool MELAParticle::checkParticleExists(MELAParticle* myParticle, std::vector<MELAParticle*>& particleArray){
-  for (std::vector<MELAParticle*>::iterator it = particleArray.begin(); it<particleArray.end(); it++){
-    if ((*it)==myParticle) return true;
-  }
-  return false;
+void MELAParticle::swap(MELAParticle& particle_){
+  std::swap(id, particle_.id);
+  std::swap(p4, particle_.p4);
+  std::swap(passSelection, particle_.passSelection);
+  std::swap(genStatus, particle_.genStatus);
+  std::swap(lifetime, particle_.lifetime);
+  std::swap(mothers, particle_.mothers);
+  std::swap(daughters, particle_.daughters);
 }
+
 void MELAParticle::addMother(MELAParticle* myParticle){ if (!checkParticleExists(myParticle, mothers)) mothers.push_back(myParticle); }
 void MELAParticle::addDaughter(MELAParticle* myParticle){ if (!checkParticleExists(myParticle, daughters)) daughters.push_back(myParticle); }
 MELAParticle* MELAParticle::getMother(int index)const{
@@ -63,10 +67,13 @@ MELAParticle* MELAParticle::getDaughter(int index)const{
 }
 std::vector<int> MELAParticle::getDaughterIds()const{
   std::vector<int> result;
-  for (unsigned int idau=0; idau<daughters.size(); idau++){
-    if (daughters.at(idau)!=0) result.push_back(daughters.at(idau)->id);
-  }
+  for (auto& dau:daughters){ if (dau!=0) result.push_back(dau->id); }
   return result;
+}
+void MELAParticle::getRelatedParticles(std::vector<MELAParticle*>& particles){
+  for (std::vector<MELAParticle*>::iterator it = mothers.begin(); it<mothers.end(); it++) (*it)->getRelatedParticles(particles);
+  for (std::vector<MELAParticle*>::iterator it = daughters.begin(); it<daughters.end(); it++) (*it)->getRelatedParticles(particles);
+  if (!checkParticleExists(this, particles)) particles.push_back(this);
 }
 
 double MELAParticle::charge()const{
@@ -79,4 +86,23 @@ double MELAParticle::charge()const{
   return cpos;
 }
 
+void MELAParticle::boost(const TVector3& vec, bool boostAll){
+  if (vec.Mag2()<1.){
+    if (boostAll){
+      std::vector<MELAParticle*> particles;
+      this->getRelatedParticles(particles);
+      for (std::vector<MELAParticle*>::iterator it = particles.begin(); it<particles.end(); it++) (*it)->boost(vec, false);
+    }
+    else p4.Boost(vec);
+  }
+  else std::cerr
+    << "MELAParticle::boost: "
+    << "|v|**2 = " << vec.Mag2() << " >=1 cannot be used to boost. "
+    << "v = ( " << vec.X() << " , " << vec.Y() << " , " << vec.Z() << " )"
+    << std::endl;
+}
 
+bool MELAParticle::checkParticleExists(MELAParticle* myParticle, std::vector<MELAParticle*>& particleArray){
+  for (auto& part : particleArray){ if (part==myParticle) return true; }
+  return false;
+}
