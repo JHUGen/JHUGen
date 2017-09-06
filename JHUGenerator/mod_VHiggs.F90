@@ -481,13 +481,13 @@ end subroutine EvalAmp_VHiggs
 
       if(.not.(useA(1) .and. abs(id(1)).eq.convertLHE(Pho_))) then
          current1 = -current1 + scrc(MomExt(:,3),current1)/q3_q3
-         if(includeVprime) then
+         if(UseWprime .or. UseZprime) then
             currentVp1 = -currentVp1 + scrc(MomExt(:,3),currentVp1)/q3_q3
          endif
       endif
       if(.not.(useA(2) .and. abs(id(6)).eq.convertLHE(Pho_))) then
          current2 = -current2 + scrc(MomExt(:,4),current2)/q4_q4
-         if(includeVprime) then
+         if(UseWprime .or. UseZprime) then
             currentVp2 = -currentVp2 + scrc(MomExt(:,4),currentVp2)/q4_q4
          endif
       endif
