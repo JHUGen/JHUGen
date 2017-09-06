@@ -673,7 +673,7 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "kappa", success, kappa, success2=SetAnomalousHff, success3=Setkappa)
     call ReadCommandLineArgument(arg, "kappa_tilde", success, kappa_tilde, success2=SetAnomalousHff)
 
-!   similar as above for the 2nd resonance in off-shell VBF
+!   similar as above for the 2nd resonance in offshell VBF
     !spin 0 ZZ couplings
     call ReadCommandLineArgument(arg, "gh2z1", success, gh2z1, success2=SetAnomalousSpin0ZZ)
     call ReadCommandLineArgument(arg, "gh2z2", success, gh2z2, success2=SetAnomalousSpin0ZZ)
@@ -838,8 +838,8 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "ezp_Up_right", success, ezp_Up_right, success2=SetZprimeff)
     call ReadCommandLineArgument(arg, "ezp_Chm_left", success, ezp_Chm_left, success2=SetZprimeff)
     call ReadCommandLineArgument(arg, "ezp_Chm_right", success, ezp_Chm_right, success2=SetZprimeff)
-    call ReadCommandLineArgument(arg, "ezp_Top_left", success, ezp_Top_left, success2=SetZprimeff)
-    call ReadCommandLineArgument(arg, "ezp_Top_right", success, ezp_Top_right, success2=SetZprimeff)
+    call ReadCommandLineArgument(arg, "ezp_Top_left", success, ezp_Top_left, success2=SetZprimeff)    !undocumented because it's useless
+    call ReadCommandLineArgument(arg, "ezp_Top_right", success, ezp_Top_right, success2=SetZprimeff)  !undocumented because it's useless
     call ReadCommandLineArgument(arg, "ezp_Dn_left", success, ezp_Dn_left, success2=SetZprimeff)
     call ReadCommandLineArgument(arg, "ezp_Dn_right", success, ezp_Dn_right, success2=SetZprimeff)
     call ReadCommandLineArgument(arg, "ezp_Str_left", success, ezp_Str_left, success2=SetZprimeff)
@@ -848,28 +848,28 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "ezp_Bot_right", success, ezp_Bot_right, success2=SetZprimeff)
     call ReadCommandLineArgument(arg, "ezp_NuE_left", success, ezp_NuE_left, success2=SetZprimeff)
     call ReadCommandLineArgument(arg, "ezp_NuE_right", success, ezp_NuE_right, success2=SetZprimeff)
-    call ReadCommandLineArgument(arg, "M_Zprime", success, M_Zprime, SetLastArgument, success2=UseVprime, success3=SetMZprime)
+    call ReadCommandLineArgument(arg, "MZprime", success, M_Zprime, SetLastArgument, success2=SetMZprime)
     if (SetLastArgument)  M_Zprime = M_Zprime*GeV
-    call ReadCommandLineArgument(arg, "Ga_Zprime", success, Ga_Zprime, SetLastArgument, success2=UseVprime, success3=SetGaZprime)
+    call ReadCommandLineArgument(arg, "GaZprime", success, Ga_Zprime, SetLastArgument, success2=SetGaZprime)
     if (SetLastArgument)  Ga_Zprime = Ga_Zprime*GeV
 
     call ReadCommandLineArgument(arg, "ghwwp1", success, ghwwp1, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
     call ReadCommandLineArgument(arg, "ghwpwp1", success, ghwpwp1, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
-    call ReadCommandLineArgument(arg, "ewp_El_left", success, ewp_El_left, success2=distinguish_HWWcouplings, success3=SetWprimeff)
-    call ReadCommandLineArgument(arg, "ewp_El_right", success, ewp_El_right, success2=distinguish_HWWcouplings, success3=SetWprimeff)
-    call ReadCommandLineArgument(arg, "ewp_Mu_left", success, ewp_Mu_left, success2=distinguish_HWWcouplings, success3=SetWprimeff)
-    call ReadCommandLineArgument(arg, "ewp_Mu_right", success, ewp_Mu_right, success2=distinguish_HWWcouplings, success3=SetWprimeff)
-    call ReadCommandLineArgument(arg, "ewp_Ta_left", success, ewp_Ta_left, success2=distinguish_HWWcouplings, success3=SetWprimeff)
-    call ReadCommandLineArgument(arg, "ewp_Ta_right", success, ewp_Ta_right, success2=distinguish_HWWcouplings, success3=SetWprimeff)
-    call ReadCommandLineArgument(arg, "ewp_Up_left", success, ewp_Up_left, success2=distinguish_HWWcouplings, success3=SetWprimeff)
-    call ReadCommandLineArgument(arg, "ewp_Up_right", success, ewp_Up_right, success2=distinguish_HWWcouplings, success3=SetWprimeff)
-    call ReadCommandLineArgument(arg, "ewp_Chm_left", success, ewp_Chm_left, success2=distinguish_HWWcouplings, success3=SetWprimeff)
-    call ReadCommandLineArgument(arg, "ewp_Chm_right", success, ewp_Chm_right, success2=distinguish_HWWcouplings, success3=SetWprimeff)
-    call ReadCommandLineArgument(arg, "ewp_Top_left", success, ewp_Top_left, success2=distinguish_HWWcouplings, success3=SetWprimeff)
-    call ReadCommandLineArgument(arg, "ewp_Top_right", success, ewp_Top_right, success2=distinguish_HWWcouplings, success3=SetWprimeff)
-    call ReadCommandLineArgument(arg, "M_Wprime", success, M_Wprime, SetLastArgument, success2=UseVprime, success3=SetMWprime)
+    call ReadCommandLineArgument(arg, "ewp_El_left", success, ewp_El_left, success2=SetWprimeff)
+    call ReadCommandLineArgument(arg, "ewp_El_right", success, ewp_El_right, success2=SetWprimeff)
+    call ReadCommandLineArgument(arg, "ewp_Mu_left", success, ewp_Mu_left, success2=SetWprimeff)
+    call ReadCommandLineArgument(arg, "ewp_Mu_right", success, ewp_Mu_right, success2=SetWprimeff)
+    call ReadCommandLineArgument(arg, "ewp_Ta_left", success, ewp_Ta_left, success2=SetWprimeff)
+    call ReadCommandLineArgument(arg, "ewp_Ta_right", success, ewp_Ta_right, success2=SetWprimeff)
+    call ReadCommandLineArgument(arg, "ewp_Up_left", success, ewp_Up_left, success2=SetWprimeff)
+    call ReadCommandLineArgument(arg, "ewp_Up_right", success, ewp_Up_right, success2=SetWprimeff)
+    call ReadCommandLineArgument(arg, "ewp_Chm_left", success, ewp_Chm_left, success2=SetWprimeff)
+    call ReadCommandLineArgument(arg, "ewp_Chm_right", success, ewp_Chm_right, success2=SetWprimeff)
+    call ReadCommandLineArgument(arg, "ewp_Top_left", success, ewp_Top_left, success2=SetWprimeff)    !undocumented because it's useless (until contact terms are included in tH)
+    call ReadCommandLineArgument(arg, "ewp_Top_right", success, ewp_Top_right, success2=SetWprimeff)  !undocumented because it's useless (until contact terms are included in tH)
+    call ReadCommandLineArgument(arg, "MWprime", success, M_Wprime, SetLastArgument, success2=SetMWprime)
     if (SetLastArgument)  M_Wprime = M_Wprime*GeV
-    call ReadCommandLineArgument(arg, "Ga_Wprime", success, Ga_Wprime, SetLastArgument, success2=distinguish_HWWcouplings, success3=UseVprime, success4=SetGaWprime)
+    call ReadCommandLineArgument(arg, "GaWprime", success, Ga_Wprime, SetLastArgument, success2=SetGaWprime)
     if (SetLastArgument)  Ga_Wprime = Ga_Wprime*GeV
 
 
@@ -985,6 +985,8 @@ logical :: SetColliderEnergy
     elseif( IsAPhoton(DecayMode1) ) then
        M_V = 0d0
        Ga_V= 0d0
+       M_Vprime = -1d0
+       Ga_Vprime = 0d0
     endif
 
     !ReadLHE and ConvertLHE
@@ -1067,16 +1069,6 @@ logical :: SetColliderEnergy
         stop 1
     endif
 
-    if ((SetHZprime .and. .not.SetZprimeff) .or. (.not.SetHZprime .and. SetZprimeff)) then
-        call Error("To use Z' contact terms, you have to set both HVZ' and Z'ff couplings")
-    endif
-    if ((SetHWprime .and. .not.SetWprimeff) .or. (.not.SetHWprime .and. SetWprimeff)) then
-        call Error("To use W' contact terms, you have to set both HVW' and W'ff couplings")
-    endif
-    if (SetHZprime .and. SetHWprime .and. (SetMZprime .neqv. SetMWprime)) then
-        call Error("If you want to use contact terms and distinguish HZZ from HWW, you have to set either both MZprime and MWprime or neither")
-    endif
-
     !cut checks
     if(.not.SetpTcut) then
         if(Process.eq.50) then
@@ -1093,7 +1085,7 @@ logical :: SetColliderEnergy
         endif
     endif
     if((Process.eq.60 .or. Process.eq.66 .or. Process.eq.67 .or. Process.eq.68 .or. Process.eq.69) .and. includeGammaStar .and. pTjetcut.le.0d0) then
-       print *, " Process=",Process," with off-shell photons requires a non-zero pT cut instead of photon mass cutoff. Current setting cut ",pTjetcut/GeV," GeV is not allowed."
+       print *, " Process=",Process," with offshell photons requires a non-zero pT cut instead of photon mass cutoff. Current setting cut ",pTjetcut/GeV," GeV is not allowed."
        stop 1
     endif
     if((Process.eq.61 .or. Process.eq.62) .and. pTjetcut.le.0d0) then
@@ -1105,7 +1097,7 @@ logical :: SetColliderEnergy
     !           Set OffShellV1/V2           !
     !---------------------------------------!
     if( IsAPhoton(DecayMode2) .and. IsAZDecay(DecayMode1) ) then
-       print *,"Z is off-shell and photon is on-shell in Z+photon production."
+       print *,"Z is offshell and photon is on-shell in Z+photon production."
        print *,"Randomization of the order of writing of the decay products to the LHE file is disabled."
        RandomizeVVdecays = .false.
     elseif( IsAPhoton(DecayMode2) .and. IsAPhoton(DecayMode1) .and. Process.le.2 ) then
@@ -1188,18 +1180,55 @@ logical :: SetColliderEnergy
     endif
 
 
-    ! Vprime
+    ! Contact terms
+    if (Process.le.2 .or. Process.eq.50) then
+        if (IsAZDecay(DecayMode1)) then
+            if ((SetHZprime .and. .not.SetZprimeff) .or. (.not.SetHZprime .and. SetZprimeff)) then
+                call Error("To use Z' contact terms, you have to set both HVZ' and Z'ff couplings")
+            endif
+            if (SetMWprime .or. SetGaWprime) then
+                call Error("Don't set the W' mass and width in ZZ decay")
+            endif
+        elseif (IsAWDecay(DecayMode1)) then
+            if ((SetHZprime .and. .not.SetWprimeff) .or. (.not.SetHZprime .and. SetWprimeff)) then
+                call Error("To use W' contact terms, you have to set both HZZ'/HZ'Z' (which are used for HWW'/HW'W') and W'ff couplings")
+            endif
+            if (SetMZprime .or. SetGaZprime) then
+                call Error("Don't set the Z' mass and width in WW decay")
+            endif
+        endif
+    endif
+    if (Process.eq.60 .or. (Process.ge.66 .and. Process.le.69)) then
+        if ((SetHZprime .and. .not.SetZprimeff) .or. (.not.SetHZprime .and. SetZprimeff)) then
+            call Error("To use Z' contact terms, you have to set both HVZ' and Z'ff couplings")
+        endif
+
+        if (distinguish_HWWcouplings) then
+            if ((SetHWprime .and. .not.SetWprimeff) .or. (.not.SetHWprime .and. SetWprimeff)) then
+                call Error("To use W' contact terms, you have to set both HVW' and W'ff couplings")
+            endif
+        else
+            if (SetHZprime .and. .not.SetWprimeff) then
+                call Error("HZZ'/HZ'Z' couplings are also used for HWW'/HW'W', so if you set them you also need to set W'ff couplings (possibly to 0).")
+            endif
+            if (SetWprimeff .and. .not.SetHZprime) then
+                call Error("If you set W'ff couplings, and you don't distinguish HZZ and HWW couplings, then you also have to set HZZ'/HZ'Z' couplings, which are also used for HWW'/HW'W'")
+            endif
+        endif
+    endif
+
+
     if( SetMZprime .and. .not.SetGaZprime ) then
-        call Error("If you set the mass of Zprime, you also have to set the width! Ga_Zprime=...")
+        call Error("If you set the mass of Zprime, you also have to set the width! GaZprime=...")
     endif
     if( SetGaZprime .and. .not.SetMZprime ) then
-        call Error("If you set the width of Zprime, you also have to set the mass! M_Zprime=...")
+        call Error("If you set the width of Zprime, you also have to set the mass! MZprime=...")
     endif
     if( SetMWprime .and. .not.SetGaWprime ) then
-        call Error("If you set the mass of Wprime, you also have to set the width! Ga_Wprime=...")
+        call Error("If you set the mass of Wprime, you also have to set the width! GaWprime=...")
     endif
     if( SetGaWprime .and. .not.SetMWprime ) then
-        call Error("If you set the width of Wprime, you also have to set the mass! M_Wprime=...")
+        call Error("If you set the width of Wprime, you also have to set the mass! MWprime=...")
     endif
 
 
@@ -5077,7 +5106,9 @@ implicit none
         print *, "   ColliderEnergy:    in TeV.  default is 13 TeV for LHC, 1.96 TeV for Tevatron,"
         print *, "                      250 GeV for e+e-"
         print *, "   Process:           0=spin-0, 1=spin-1, 2=spin-2 resonance, 50=pp/ee->VH,"
-        print *, "                      60=weakVBF, 61=pp->Hjj, 62=pp->Hj, 80=ttH, 90=bbH,"
+        print *, "                      60=weakVBF, 61=pp->Hjj, 62=pp->Hj,"
+        print *, "                      66=VVHVV offshell, 67=VVVVbkg, 68=VVHVV+VVVV,"
+        print *, "                      69=QCD JJVV bkg, 80=ttH, 90=bbH,"
         print *, "                      110=t+H t channel, 111=tbar+H t channel,"
         print *, "                      112=t+H s channel, 113=tbar+H s channel"
         print *, "                      114=t/tbar+H t/s channels"
@@ -5119,8 +5150,8 @@ implicit none
         print *, "   ctauReso:          resonance decay length in mm (default=0)"
         print *, "   OffshellX:         Whether to allow resonance (X) to go offshell"
         print *, "                      in processes 0, 1 or 2"
-        print *, "   MReso2:            2nd resonance mass in GeV in off-shell VBF"
-        print *, "   GaReso2:           2nd resonance width in GeV in off-shell VBF"
+        print *, "   MReso2:            2nd resonance mass in GeV in offshell VBF"
+        print *, "   GaReso2:           2nd resonance width in GeV in offshell VBF"
         print *, " EW coupling parameters:"
         print *, "   Vud:               CKM element for W-ud couplings"
         print *, "   Vus:               CKM element for W-us couplings"

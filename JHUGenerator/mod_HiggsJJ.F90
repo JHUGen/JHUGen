@@ -2495,14 +2495,12 @@ module modHiggsJJ
           vvcoupl_prime_zpzp(vv_it) = HVVSpinZeroDynamicCoupling(15+vv_it,q12sq,q34sq,mhsq)
        enddo
 
-       if( UseVprime ) then
-          if (M_Zprime.gt.0d0) then
-             zpprop12 = q12sq - M_Zprime**2 + ci * M_Zprime * Ga_Zprime
-             zpprop34 = q34sq - M_Zprime**2 + ci * M_Zprime * Ga_Zprime
-          else
-             zpprop12 = q12sq
-             zpprop34 = q34sq
-          endif
+       if (M_Zprime.gt.0d0) then
+          zpprop12 = q12sq - M_Zprime**2 + ci * M_Zprime * Ga_Zprime
+          zpprop34 = q34sq - M_Zprime**2 + ci * M_Zprime * Ga_Zprime
+       elseif (M_Zprime.eq.0d0) then
+          zpprop12 = q12sq
+          zpprop34 = q34sq
        else
           zpprop12 = M_Z**2
           zpprop34 = M_Z**2
@@ -2666,14 +2664,13 @@ module modHiggsJJ
           vvcoupl_prime_wpwp(vv_it) = HVVSpinZeroDynamicCoupling(15+vv_it,q2Wplus,q2Wminus,mhsq,tryWWcoupl=useWWcoupl)
        enddo
 
-       if( UseVprime ) then
-          if (M_Wprime.gt.0d0) then
-             wpprop12 = q2Wplus - M_Wprime**2 + ci * M_Wprime * Ga_Wprime
-             wpprop34 = q2Wminus - M_Wprime**2 + ci * M_Wprime * Ga_Wprime
-          else
-             wpprop12 = q2Wplus
-             wpprop34 = q2Wminus
-          endif
+
+       if (M_Wprime.gt.0d0) then
+          wpprop12 = q2Wplus - M_Wprime**2 + ci * M_Wprime * Ga_Wprime
+          wpprop34 = q2Wminus - M_Wprime**2 + ci * M_Wprime * Ga_Wprime
+       elseif (M_Wprime.eq.0d0) then
+          wpprop12 = q2Wplus
+          wpprop34 = q2Wminus
        else
           wpprop12 = M_W**2
           wpprop34 = M_W**2

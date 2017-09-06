@@ -23,8 +23,7 @@ extern "C" {
   void __modjhugenmela_MOD_setspinzerovvcouplings(double vvcoupl[SIZE_HVV][2], int cqsq[SIZE_HVV_CQSQ], double Lambda_qsq[SIZE_HVV_LAMBDAQSQ][SIZE_HVV_CQSQ], int* usewwcoupl); // YES, THE LAST ARGUMENT IS AN INT!
   void __modjhugenmela_MOD_setspinzerocontactterms(
     double Hzzpcoupl[SIZE_HVV][2], double Hzpzpcoupl[SIZE_HVV][2], double Zpffcoupl[SIZE_Vpff][2],
-    double Hwwpcoupl[SIZE_HVV][2], double Hwpwpcoupl[SIZE_HVV][2], double Wpffcoupl[SIZE_Vpff][2],
-    int* UseVp // YES, THE ARGUMENT IS AN INT, NOT A BOOL!
+    double Hwwpcoupl[SIZE_HVV][2], double Hwpwpcoupl[SIZE_HVV][2], double Wpffcoupl[SIZE_Vpff][2]
     );
   void __modjhugenmela_MOD_settopdecays(int* flag);
 

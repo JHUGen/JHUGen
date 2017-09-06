@@ -360,7 +360,7 @@ subroutine SetSpinZeroVVCouplings_NoGamma(vvcoupl, cqsq, Lambda_qsq, useWWcoupl)
    return
 end subroutine SetSpinZeroVVCouplings_NoGamma
 
-subroutine SetSpinZeroContactTerms(zzpcoupl, zpzpcoupl, Zpffcoupl, wwpcoupl, wpwpcoupl, Wpffcoupl, UseVp)
+subroutine SetSpinZeroContactTerms(zzpcoupl, zpzpcoupl, Zpffcoupl, wwpcoupl, wpwpcoupl, Wpffcoupl)
    implicit none
    complex(8), intent(in) :: zzpcoupl(39)
    complex(8), intent(in) :: zpzpcoupl(39)
@@ -370,12 +370,9 @@ subroutine SetSpinZeroContactTerms(zzpcoupl, zpzpcoupl, Zpffcoupl, wwpcoupl, wpw
    complex(8), intent(in) :: wpwpcoupl(39)
    complex(8), intent(in) :: Wpffcoupl(20)
 
-   logical, intent(in) :: UseVp
-
    includeVprime = (any(zzpcoupl.ne.czero) .or. any(zpzpcoupl.ne.czero) .or. any(Zpffcoupl.ne.czero) &
                     .or.                                                                             &
                     any(wwpcoupl.ne.czero) .or. any(wpwpcoupl.ne.czero) .or. any(Wpffcoupl.ne.czero))
-   UseVprime=UseVp
 
    ghzzp1 = zzpcoupl(1)
    ghzpzp1 = zpzpcoupl(1)

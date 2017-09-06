@@ -56,7 +56,7 @@ integer, public :: LHAPDFMember, lenLHAPDFString ! lenLHAPDFString is needed in 
 integer, public :: PDFSet
 ! End PDFset variables
 logical, public :: includeInterference, writegit
-real(8), public :: M_V,Ga_V
+real(8), public :: M_V,Ga_V, M_Vprime,Ga_Vprime
 real(8), public, parameter :: GeV=1d0/100d0 ! we are using units of 100GeV, i.e. Lambda=10 is 1TeV
 real(8), public, parameter :: percent=1d0/100d0
 ! real(8),public :: GlobalMax=-1d99
@@ -428,8 +428,8 @@ real(8), public, parameter :: Lambda2 = 1000d0    *GeV      ! for second resonan
    complex(8), public :: ezp_Mu_right  = (0d0,0d0)
    complex(8), public :: ezp_Ta_left  = (0d0,0d0)
    complex(8), public :: ezp_Ta_right  = (0d0,0d0)
-   complex(8), public :: ezp_NuE_left  = (0d0,0d0)
-   complex(8), public :: ezp_NuE_right  = (0d0,0d0)
+   complex(8), public :: ezp_NuE_left  = (0d0,0d0)   !same for NuMu and NuTau
+   complex(8), public :: ezp_NuE_right  = (0d0,0d0)  !same for NuMu and NuTau
    complex(8), public :: ezp_Up_left  = (0d0,0d0)
    complex(8), public :: ezp_Up_right  = (0d0,0d0)
    complex(8), public :: ezp_Chm_left  = (0d0,0d0)
@@ -443,7 +443,7 @@ real(8), public, parameter :: Lambda2 = 1000d0    *GeV      ! for second resonan
    complex(8), public :: ezp_Top_left  = (0d0,0d0)
    complex(8), public :: ezp_Top_right  = (0d0,0d0)
 
-   real(8), public :: M_Zprime = -1d0
+   real(8), public :: M_Zprime = -1d0 ! <0: CT interaction, >=0: Heavy Zprime propagator
    real(8), public :: Ga_Zprime = 0d0
 !--
    complex(8), public :: ghwwp1 = (0d0,0d0)
@@ -462,13 +462,9 @@ real(8), public, parameter :: Lambda2 = 1000d0    *GeV      ! for second resonan
    complex(8), public :: ewp_Top_left  = (0d0,0d0)
    complex(8), public :: ewp_Top_right  = (0d0,0d0)
 
-   real(8), public :: M_Wprime = -1d0
+   real(8), public :: M_Wprime = -1d0 ! <0: CT interaction, >=0: Heavy Zprime propagator
    real(8), public :: Ga_Wprime = 0d0
 !--
-   logical, public :: UseVprime=.false.  ! false: contact interaction,  true: heavy Zprime propagator
-   real(8), public :: M_Vprime
-   real(8), public :: Ga_Vprime
-
 
 
 

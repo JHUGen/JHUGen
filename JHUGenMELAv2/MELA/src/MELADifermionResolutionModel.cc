@@ -36,7 +36,8 @@ MELADifermionResolutionModel::~MELADifermionResolutionModel(){
 float MELADifermionResolutionModel::getVal(float val){
   float result = -1;
   if (recoBW!=0){
-    if (val<0.1) result=0;
+    if (val<0.){ /*result=-1;*/ }
+    else if (val<0.1) result=0;
     else{
       varReco->setVal(val);
       result = recoBW->getVal();

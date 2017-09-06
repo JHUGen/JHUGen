@@ -39,8 +39,7 @@ Only relative values of cross sections are supposed to produce meaningful result
 
 Additionally, the package includes code for computing the matrix elements standalone which can be used in a numerical matrix element analysis.
 Please reference the above papers and refer to "MELA" when using the matrix element likelihood analysis technique.
-The latter was also introduced in Ref.~\cite{Chatrchyan:2012ufa}. The matrix element package (MELA) also depends
-on MCFM libraries for background parameterization which should be referenced~\cite{Campbell:2010ff} when used.
+The latter was also introduced in Ref.~\cite{Chatrchyan:2012ufa}. The matrix element package (MELA) and offshell VBF generation also depend on MCFM libraries for background parameterization which should be referenced~\cite{Campbell:2010ff} when used.
 
 \vspace{0.5cm}
 \begin{center}
@@ -164,7 +163,9 @@ This is the list of command line configurables (also defined in the \verb|README
     ColliderEnergy:    in TeV.  default is 13 TeV for LHC, 1.96 TeV for Tevatron,
                        250 GeV for e+e-
     Process:           0=spin-0, 1=spin-1, 2=spin-2 resonance, 50=pp/ee->VH,
-                       60=weakVBF, 61=pp->Hjj, 62=pp->Hj, 80=ttH, 90=bbH,
+                       60=weakVBF, 61=pp->Hjj, 62=pp->Hj,
+                       66=VVHVV offshell, 67=VVVVbkg, 68=VVHVV+VVVV,
+                       69=QCD JJVV bkg, 80=ttH, 90=bbH,
                        110=t+H t channel, 111=tbar+H t channel,
                        112=t+H s channel, 113=tbar+H s channel
                        114=t/tbar+H t/s channels
@@ -206,6 +207,8 @@ This is the list of command line configurables (also defined in the \verb|README
     ctauReso:          resonance decay length in mm (default=0)
     OffshellX:         Whether to allow resonance (X) to go offshell
                        in processes 0, 1 or 2
+    MReso2:            2nd resonance mass in GeV in offshell VBF
+    GaReso2:           2nd resonance width in GeV in offshell VBF
   EW coupling parameters:
     Vud:               CKM element for W-ud couplings
     Vus:               CKM element for W-us couplings
@@ -281,6 +284,8 @@ This is the list of command line configurables (also defined in the \verb|README
 \item \verb|ChannelRatio|: In the case when \verb|PChannel=2| for a spin-2 resonance, this parameter determines an approximate fraction of the events that should come from $q\bar{q}$.  This is equivalent to appropriately scaling the $Xq\bar{q}$ couplings with respect to the $Xgg$ ones, but can be done without advance knowledge of the relative cross sections.
 \item \verb|PDFSet|, \verb|LHAPDF|, \verb|LHAPDFMem|: To use LHAPDF, this functionality must be enabled in the makefile and the relevant environment variables must be set.  See the instructions in Sec.~\ref{sec:LHAPDF}.  Otherwise \verb|PDFSet| gives the choice between a more limited number of PDF sets.
 \end{itemize}
+\paragraph{Offshell VBF}
+Processes 66--69 provide an interface to a modified version of MCFM~\cite{Campbell:2010ff} to produce offshell VBF production $VV\to VV$, including all anomalous couplings.  For these processes, a second spin-zero resonance can be activated by setting \verb|MReso2| and \verb|GaReso2| to nonzero values.  The second resonance's couplings can be set to arbitrary values, similar to the first resonance's.
 \subsubsection{Resonance parameters}
 \begin{itemize}
 \item {\verb|OffshellX|}: The flag specifies whether the events for processes 0, 1 or 2 feature a delta-function resonance mass (when set to 0) at or a finite-width distribution around the resonance mass (when set to 1). This option replaces the \verb|OffXVV| numerical flag in previous versions.
@@ -384,7 +389,7 @@ where the term multiplying $g_i^\prime$ corresponds to the full functional form 
 The names and default values of these parameters are found in \verb|mod_Parameters.F90|.  To set them on the command line, use, for example, \verb|ghz1=1,0|, where 1 represents the real part and 0 represents the imaginary part.
 \begin{verbatim}
 
-!-- parameters that define off-shell spin 0 coupling to SM fields, see note
+!-- parameters that define offshell spin 0 coupling to SM fields, see note
 complex(8), public :: ghg2 = (1.0d0,0d0)
 complex(8), public :: ghg3 = (0.0d0,0d0)
 complex(8), public :: ghg4 = (0.0d0,0d0)   ! pseudoscalar
@@ -450,7 +455,7 @@ real(8),    public :: Lambda_z30 = 100d0*GeV
 real(8),    public :: Lambda_z40 = 100d0*GeV
 \end{verbatim}
 
-Intermediate off-shell photons can be included along with the $Z$ boson for $Z$ boson final states, $ZH$ production, and VBF production.
+Intermediate offshell photons can be included along with the $Z$ boson for $Z$ boson final states, $ZH$ production, and VBF production.
 Their couplings to the spin-0 resonance are controlled by separate parameters,
 \begin{verbatim}
 complex(8), public :: ghzgs2  = (0.00d0,0d0)
@@ -462,7 +467,7 @@ complex(8), public :: ghgsgs4 = (0.00d0,0d0)
 \end{verbatim}
 where the first three correspond to $Z\gamma^*$ couplings and the latter three corresponds to $\gamma^* \gamma^*$ interactions.
 These two sets of parameters also control the coupling strength in final states with on-shell photons, i.e. $H\to Z\gamma$ or $H\to \gamma\gamma$ decays and $Z^*/\gamma^*\to\gamma H$ production.
-The anomalous coupling involving the off-shell photon momentum (in $\gamma^* Z$ interactions)
+The anomalous coupling involving the offshell photon momentum (in $\gamma^* Z$ interactions)
 \[
 g_1' \frac{ q^2_\gamma }{ \Lambda_1^{Z\gamma} } m_Z^2 \epsilon^*_1 \epsilon^*_2
 \]
@@ -473,6 +478,57 @@ real(8),    public, parameter :: Lambda_zgs1 = 10000d0*GeV.
 \end{verbatim}
 
 Each \verb|ghzX|, \verb|ghzX_primeY|, \verb|Lambda_zXY|, and \verb|cz_qXsq| parameter has a \verb|ghwX|, \verb|ghzwX_primeY|, \verb|Lambda_wXY|, and \verb|cw_qXsq| counterpart, which are used for the $WWH$ coupling in VBF if at least one of them is set on the command line.
+
+In addition, \verb|gh2zX|, \verb|gh2zX_primeY|, \verb|Lambda2_zXY|, \verb|c2z_qXsq|, \verb|gh2wX|, \verb|gh2wX_primeY|, \verb|Lambda2_wXY|, and \verb|c2w_qXsq| can be used to set the couplings of the second resonance in offshell VBF production.
+
+\subparagraph{Contact terms}
+\label{contactterms}
+
+JHUGen also supports a spin zero resonance coupling to a new spin-1 boson, $Z^\prime$ or $W^\prime$, in VBF and VH production and in decay.
+These couplings are set by
+\begin{verbatim}
+complex(8), public :: ghzzp1 = (0d0,0d0)
+complex(8), public :: ghzpzp1 = (0d0,0d0)
+\end{verbatim}
+where \verb|ghzzp1| controls the $HZZ^\prime$ coupling and \verb|ghzpzp1| controls the $HZ^\prime Z^\prime$ coupling.
+
+As in the $WW$ case, by default the $HWW^\prime$ and $HW^\prime W^\prime$ couplings are assumed to be the same as $HZZ^\prime$ and $HZ^\prime Z^\prime$.  In VBF production, the equivalent couplings \verb|ghwwp1| and \verb|ghwpwp1| can be set.  If any of the $HWW$, $HWW^\prime$, or $HW^\prime W^\prime$ couplings are set explicitly, $HW({}^\prime)W(^{\prime})$ is completely separated from $HZ({}^\prime)Z(^{\prime})$, and the specified couplings are used instead.
+
+The couplings between $V^\prime$ and fermions are set by
+\begin{verbatim}
+   complex(8), public :: ezp_El_left  = (0d0,0d0)
+   complex(8), public :: ezp_El_right  = (0d0,0d0)
+   complex(8), public :: ezp_Mu_left  = (0d0,0d0)
+   complex(8), public :: ezp_Mu_right  = (0d0,0d0)
+   complex(8), public :: ezp_Ta_left  = (0d0,0d0)
+   complex(8), public :: ezp_Ta_right  = (0d0,0d0)
+   complex(8), public :: ezp_NuE_left  = (0d0,0d0)   !same for NuMu and NuTau
+   complex(8), public :: ezp_NuE_right  = (0d0,0d0)  !same for NuMu and NuTau
+   complex(8), public :: ezp_Up_left  = (0d0,0d0)
+   complex(8), public :: ezp_Up_right  = (0d0,0d0)
+   complex(8), public :: ezp_Chm_left  = (0d0,0d0)
+   complex(8), public :: ezp_Chm_right  = (0d0,0d0)
+   complex(8), public :: ezp_Dn_left  = (0d0,0d0)
+   complex(8), public :: ezp_Dn_right  = (0d0,0d0)
+   complex(8), public :: ezp_Str_left  = (0d0,0d0)
+   complex(8), public :: ezp_Str_right  = (0d0,0d0)
+   complex(8), public :: ezp_Bot_left  = (0d0,0d0)
+   complex(8), public :: ezp_Bot_right  = (0d0,0d0)
+
+   complex(8), public :: ewp_El_left  = (0d0,0d0)
+   complex(8), public :: ewp_El_right  = (0d0,0d0)
+   complex(8), public :: ewp_Mu_left  = (0d0,0d0)
+   complex(8), public :: ewp_Mu_right  = (0d0,0d0)
+   complex(8), public :: ewp_Ta_left  = (0d0,0d0)
+   complex(8), public :: ewp_Ta_right  = (0d0,0d0)
+   complex(8), public :: ewp_Up_left  = (0d0,0d0)
+   complex(8), public :: ewp_Up_right  = (0d0,0d0)
+   complex(8), public :: ewp_Chm_left  = (0d0,0d0)
+   complex(8), public :: ewp_Chm_right  = (0d0,0d0)
+\end{verbatim}
+The $W^\prime$ equivalent of the CKM matrix is assumed to be diagonal.
+
+By default, $V^\prime$ is assumed to have infinite mass.  Under these conditions, setting \verb|ghzzp| and  some of the $V^\prime ff$ couplings to nonzero values is equivalent to the contact terms described in \cite{Gonzalez-Alonso:2014eva}.  $Z^\prime$ ($W^\prime$) can also be given finite mass by setting its mass \verb|MZprime| (\verb|MWprime|) and width \verb|GaZprime| (\verb|GaWprime|) on the command line.
 
 
 
@@ -792,7 +848,7 @@ In going from \verb|v4.5.2| to \verb|v4.8.1| (October 31, 2014), the updates are
 \item Separate couplings for ZZH and WWH in weak boson fusion
 \item Add new process: $pp\to H$+jet (Process=62)
 \item Extended LHE output format to allow for more digits
-\item MCFM plug-in for anomalous couplings in off-shell Higgs boson production in gg->ZZ
+\item MCFM plug-in for anomalous couplings in offshell Higgs boson production in gg->ZZ
 \item Synchronize JHUGenMELA with MCFM library v6.8
 \item JHUGenMELA: extended MCFM ggHZZ matrix elements by anomalous couplings
 \item JHUGenMELA: add matrix elements for H+jet and V+H
@@ -891,7 +947,7 @@ In going from \verb|v2.0.2| to \verb|v2.1.x|, (August 20, 2012) the updates are 
 \item Histograms are written in file (default: ./data/output.dat) and no longer on the screen.  How to understand the histogram data and how to plot is briefly described in the output.dat file.
 \item Added tau masses
 \item Added lepton interference in the ZZ4l final state
-\item Added switch \verb|generate_as| to choose couplings in spin-0 case (works for on- and off-shell resonance). The default is ".false.".
+\item Added switch \verb|generate_as| to choose couplings in spin-0 case (works for on- and offshell resonance). The default is ".false.".
 \item Added the possibility to change graviton-quark couplings. The new parameters are \verb|graviton_qq_left|, \verb|graviton_qq_right| and correspond to $0.5*(1-\gamma^5)$ and $0.5*(1+\gamma^5)$ helicity projectors, respectively. Up to now the coupling was always vector-like. This is also the new default, \verb|graviton_qq_left = graviton_qq_right =1|.
 \item The random seed is now fixed with gfortran.
 \item The call "./JHUGen help" prints out all available command line options
@@ -962,13 +1018,13 @@ If an exclusive production mode is desired (e.g. $q\bar{q}$ or $gg$), this is ha
 
 \begin{thebibliography}{99}
 \bibitem{Gao:2010qx}
-Y.Y. Gao, A. V. Gritsan, Z.J. Guo, K. Melnikov, M. Schulze and N. V. Tran, "Spin-Determination of Single-Produced Resonances at Hadron Colliders". Phys. Rev. D \textbf{81}, 075022 (2010). arXiv:1001.3396 [hep-ph].
+Y.Y. Gao, A. V. Gritsan, Z.J. Guo, K. Melnikov, M. Schulze and N. V. Tran, ``Spin-Determination of Single-Produced Resonances at Hadron Colliders''. Phys. Rev. D \textbf{81}, 075022 (2010). arXiv:1001.3396 [hep-ph].
 \bibitem{Bolognesi:2012}
-S. Bolognesi, Y.Y. Gao, A. V. Gritsan, K. Melnikov, M. Schulze, N. V. Tran and A. Whitbeck, "On the Spin and Parity of Single-Produced Resonance at the LHC". Phys. Rev. D \textbf{86}, 095031 (2012). arXiv:1208.4018 [hep-ph].
+S. Bolognesi, Y.Y. Gao, A. V. Gritsan, K. Melnikov, M. Schulze, N. V. Tran and A. Whitbeck, ``On the Spin and Parity of Single-Produced Resonance at the LHC''. Phys. Rev. D \textbf{86}, 095031 (2012). arXiv:1208.4018 [hep-ph].
 \bibitem{Anderson:2013}
-I. Anderson, S. Bolognesi, F. Caola, Y.Y. Gao, A. V. Gritsan, C. B. Martin, K. Melnikov, M. Schulze, N. V. Tran, A. Whitbeck, Y. Zhou, "Constraining anomalous HVV interactions at proton and lepton colliders". Phys. Rev. D \textbf{89}, 035007 (2014). arXiv:1309.4819 [hep-ph].
+I. Anderson, S. Bolognesi, F. Caola, Y.Y. Gao, A. V. Gritsan, C. B. Martin, K. Melnikov, M. Schulze, N. V. Tran, A. Whitbeck, Y. Zhou, ``Constraining anomalous HVV interactions at proton and lepton colliders''. Phys. Rev. D \textbf{89}, 035007 (2014). arXiv:1309.4819 [hep-ph].
 \bibitem{Gritsan:2016}
-A. V. Gritsan, R. R\"ontsch, M. Schulze, M. Xiao, "Constraining anomalous Higgs boson couplings to the heavy flavor fermions using matrix element techniques". Phys. Rev. D \textbf{94} (2016) 055023. arXiv:1606.03107 [hep-ph].
+A. V. Gritsan, R. R\"ontsch, M. Schulze, M. Xiao, ``Constraining anomalous Higgs boson couplings to the heavy flavor fermions using matrix element techniques''. Phys. Rev. D \textbf{94} (2016) 055023. arXiv:1606.03107 [hep-ph].
 \bibitem{thesite}
 See webpage: \url{spin.pha.jhu.edu}
 \bibitem{Chatrchyan:2012ufa}
@@ -992,6 +1048,10 @@ See webpage: \url{spin.pha.jhu.edu}
   ``Higgs pseudo-observables, second riemann sheet and all that,''
   Nucl.\ Phys.\ B {\bf 834} (2010)
   [arXiv:1001.3360 [hep-ph]].
+\bibitem{Gonzalez-Alonso:2014eva}
+  M. Gonzalez-Alonso, A. Greljo, G. Isidori, and D. Marzocca, ``Pseudo-observables in
+  Higgs decays,'' Eur.\ Phys.\ J.\ C {\bf 75} (2015) 128,
+  doi:10.1140/epjc/s10052-015-3345-5, arXiv:1412.6038 [hep-ph].
 
 \end{thebibliography}
 

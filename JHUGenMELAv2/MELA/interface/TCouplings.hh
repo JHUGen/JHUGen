@@ -60,7 +60,6 @@ public:
       }
     }
 
-    SetUseVprime(false);
     SetZPrimeMassWidth(-1, 0);
     SetWPrimeMassWidth(-1, 0);
   };
@@ -108,7 +107,6 @@ public:
       }
     }
 
-    UseVprime = other.UseVprime;
     M_Zprime = other.M_Zprime;
     Ga_Zprime = other.Ga_Zprime;
     M_Wprime = other.M_Wprime;
@@ -304,7 +302,6 @@ public:
       }
     }
   }
-  void SetUseVprime(bool useVp){ UseVprime = useVp; }
   void SetZPrimeMassWidth(double inmass, double inwidth){ M_Zprime = inmass; Ga_Zprime = inwidth; }
   void SetWPrimeMassWidth(double inmass, double inwidth){ M_Wprime = inmass; Ga_Wprime = inwidth; }
 
@@ -346,7 +343,6 @@ public:
   double Wpffcoupl[SIZE_Vpff][2];
 
   bool separateWWZZcouplings;
-  bool UseVprime;
   double M_Zprime;
   double Ga_Zprime;
   double M_Wprime;

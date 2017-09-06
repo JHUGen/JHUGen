@@ -274,13 +274,11 @@ void ZZMatrixElement::set_SpinZeroContact(
   double selfDHwwpcoupl[SIZE_HVV][2],
   double selfDHwpwpcoupl[SIZE_HVV][2],
   double selfDWpffcoupl[SIZE_Vpff][2],
-  bool UseVprime,
   double M_Zprime,
   double Ga_Zprime,
   double M_Wprime,
   double Ga_Wprime
   ){
-  selfD_SpinZeroCouplings->SetUseVprime(UseVprime);
   for (int ic=0; ic<SIZE_HVV; ic++){
     selfD_SpinZeroCouplings->SetHVVpCouplings(ic, selfDHzzpcoupl[ic][0], selfDHzzpcoupl[ic][1]);
     selfD_SpinZeroCouplings->SetHVpVpCouplings(ic, selfDHzpzpcoupl[ic][0], selfDHzpzpcoupl[ic][1]);

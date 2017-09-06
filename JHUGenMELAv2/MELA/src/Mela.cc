@@ -318,7 +318,6 @@ void Mela::reset_SelfDCouplings(){
       selfDWpffcoupl[ic][im] = 0;
     }
   }
-  selfDUseVprime = false;
   selfDM_Zprime = -1;
   selfDGa_Zprime = 0;
   selfDM_Wprime = -1;
@@ -607,7 +606,6 @@ void Mela::computeP(
             selfDHwwpcoupl,
             selfDHwpwpcoupl,
             selfDWpffcoupl,
-            selfDUseVprime,
             selfDM_Zprime,
             selfDGa_Zprime,
             selfDM_Wprime,
@@ -888,7 +886,6 @@ void Mela::computeProdDecP(
       selfDHwwpcoupl,
       selfDHwpwpcoupl,
       selfDWpffcoupl,
-      selfDUseVprime,
       selfDM_Zprime,
       selfDGa_Zprime,
       selfDM_Wprime,
@@ -1014,7 +1011,6 @@ void Mela::computeProdP(
             selfDHwwpcoupl,
             selfDHwpwpcoupl,
             selfDWpffcoupl,
-            selfDUseVprime,
             selfDM_Zprime,
             selfDGa_Zprime,
             selfDM_Wprime,
@@ -1068,7 +1064,6 @@ void Mela::computeProdP(
               selfDHwwpcoupl,
               selfDHwpwpcoupl,
               selfDWpffcoupl,
-              selfDUseVprime,
               selfDM_Zprime,
               selfDGa_Zprime,
               selfDM_Wprime,
@@ -1154,7 +1149,6 @@ void Mela::computeProdP(
                   selfDHwwpcoupl,
                   selfDHwpwpcoupl,
                   selfDWpffcoupl,
-                  selfDUseVprime,
                   selfDM_Zprime,
                   selfDGa_Zprime,
                   selfDM_Wprime,
@@ -1237,7 +1231,6 @@ void Mela::computeProdP(
               selfDHwwpcoupl,
               selfDHwpwpcoupl,
               selfDWpffcoupl,
-              selfDUseVprime,
               selfDM_Zprime,
               selfDGa_Zprime,
               selfDM_Wprime,
@@ -1320,7 +1313,6 @@ void Mela::computeProdP_VH(
           selfDHwwpcoupl,
           selfDHwpwpcoupl,
           selfDWpffcoupl,
-          selfDUseVprime,
           selfDM_Zprime,
           selfDGa_Zprime,
           selfDM_Wprime,
@@ -1374,7 +1366,6 @@ void Mela::computeProdP_ttH(
         selfDHwwpcoupl,
         selfDHwpwpcoupl,
         selfDWpffcoupl,
-        selfDUseVprime,
         selfDM_Zprime,
         selfDGa_Zprime,
         selfDM_Wprime,
@@ -2356,9 +2347,9 @@ void Mela::deletePConstantHandle(MelaPConstant*& handle){
 }
 
 
-void Mela::computeDijetConvBW(float& prob){
+void Mela::computeDijetConvBW(float& prob, bool useTrueBW){
   melaCand = getCurrentCandidate();
-  prob = superDijet->GetConvBW(myProduction_, melaCand);
+  prob = superDijet->GetConvBW(myProduction_, melaCand, useTrueBW);
   reset_CandRef();
 }
 
