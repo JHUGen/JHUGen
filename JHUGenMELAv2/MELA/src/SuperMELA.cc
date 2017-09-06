@@ -1,4 +1,3 @@
-#include <boost/algorithm/string.hpp>
 #include <sstream>
 #include <cmath>
 #include <cassert>
@@ -155,7 +154,7 @@ void SuperMELA::init(){
 
   // Calculate m4l ranges for the given mH, set range of rrv
   calc_mZZ_range(mHVal_, lowMH_, highMH_);
-  if (verbose_)cout << "Range width=" << highMH_ - lowMH_ << endl;
+  if (verbose_) cout << "Range width=" << highMH_ - lowMH_ << endl;
   delete m4l_rrv_; m4l_rrv_=new RooRealVar("CMS_zz4l_mass", "CMS_zz4l_mass", mHVal_, lowMH_, highMH_);
   m4l_rrv_->setBins(2000, "fft");
   m4l_rrv_->setRange("shape", lowMH_, highMH_);
@@ -342,7 +341,25 @@ void SuperMELA::init(){
 }
 
 
-
+void SuperMELA::splitLine(const string rawoption, vector<string>& splitoptions, char delimiter){
+  string suboption=rawoption, result=rawoption;
+  string remnant;
+  while (result!=""){
+    size_t posEq = suboption.find(delimiter);
+    if (posEq!=string::npos){
+      result=suboption;
+      remnant=suboption.substr(posEq+1);
+      result.erase(result.begin()+posEq, result.end());
+    }
+    else{
+      result="";
+      remnant=suboption;
+    }
+    if (result!="") splitoptions.push_back(result);
+    suboption = remnant;
+  }
+  if (remnant!="") splitoptions.push_back(remnant);
+}
 
 void SuperMELA::readSigSystFromFile(
   double& str_mean_CB_err_e,
@@ -361,16 +378,18 @@ void SuperMELA::readSigSystFromFile(
     std::cerr << "SuperMELA::readSigSystFromFile: Input card " << fCardName << " is not good!" << std::endl;
     assert(0);
   }
+  else if (verbose_) std::cout << "SuperMELA::readSigSystFromFile: Input card " << fCardName << " can be read!" << std::endl;
+
   string line;
   while (card.good()){
     getline(card, line);
     std::vector<string> fields;
-    split(fields, line, boost::is_any_of(" "), boost::token_compress_on);
+    splitLine(line, fields, ' ');
 
     if (fields.size()<2 || !(fields[0]=="systematic"&&fields[1]=="param")) continue;
 
     if (fields.size()!=4){
-      std::cout << "Error in SuperMELA::readSigSystFromFile! Incorrect format of line " << line.c_str() << std::endl;
+      std::cerr << "Error in SuperMELA::readSigSystFromFile! Incorrect format of line " << line.c_str() << std::endl;
       break;
     }
 
@@ -395,12 +414,12 @@ void SuperMELA::readSigSystFromFile(
   }
 
   try{
-    if ((!(mean_e_OK&&sigma_e_OK))&&(!(mean_m_OK&&sigma_m_OK))){
-      throw 20;
-    }
+    if ((!(mean_e_OK&&sigma_e_OK))&&(!(mean_m_OK&&sigma_m_OK))) throw 20;
   }
   catch (int e){
-    std::cout << "Exception " << e << " in SuperMELA::readSigSystFromFile! Not all signal shape formulas were read " << mean_e_OK << "  " << sigma_e_OK << "  " << mean_m_OK << "  " << sigma_m_OK << std::endl;
+    std::cout
+      << "Exception " << e << " in SuperMELA::readSigSystFromFile! Not all signal shape formulas were read " << mean_e_OK << "  " << sigma_e_OK << "  " << mean_m_OK << "  " << sigma_m_OK
+      << std::endl;
   }
 
   card.close();
@@ -423,7 +442,7 @@ void SuperMELA::readSigParsFromFile(
   while (card.good()){
     getline(card, line);
     std::vector<string> fields;
-    split(fields, line, boost::is_any_of(" "), boost::token_compress_on);
+    splitLine(line, fields, ' ');
     if (fields.size()==0 || fields[0]!="signalShape")continue;
     //ok, we found somethign interesting
     if (fields.size()<3){
@@ -461,7 +480,7 @@ void SuperMELA::readBkgParsFromFile(std::vector<double>& apars){
   while (card.good()){
     getline(card, line);
     std::vector<string> fields;
-    split(fields, line, boost::is_any_of(" "), boost::token_compress_on);
+    splitLine(line, fields, ' ');
     if (fields.size()==0 || fields[0]!="qqZZshape")continue;
 
     if (fields.size()<3){

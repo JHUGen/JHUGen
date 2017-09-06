@@ -1386,9 +1386,7 @@ void testME_VBF_JHUGen_Ping(int erg_tev=13, bool useConstants=false, shared_ptr<
 
   TVar::VerbosityLevel verbosity = TVar::ERROR;
   if (verbosity>=TVar::DEBUG) cout << "Initializing Mela..." << endl;
-  if (!melaptr) {
-    melaptr.reset(new Mela(erg_tev, mPOLE, verbosity));
-  }
+  if (!melaptr) melaptr.reset(new Mela(erg_tev, mPOLE, verbosity));
   Mela& mela = *melaptr;
   TVar::VerbosityLevel bkpverbosity = mela.getVerbosity();
   mela.setVerbosity(verbosity);
