@@ -6,7 +6,7 @@ set -euo pipefail
 MELADIR="."
 DATA_LIB_DIR="slc6_amd64_gcc530"
 
-if [[ "$1" == *"clean"* ]];then
+if [[ "$#" -ge 1 ]] && [[ "$1" == *"clean"* ]];then
 	make clean
 	pushd $MELADIR"/fortran/"
 	make clean
