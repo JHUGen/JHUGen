@@ -848,9 +848,9 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "ezp_Bot_right", success, ezp_Bot_right, success2=SetZprimeff)
     call ReadCommandLineArgument(arg, "ezp_NuE_left", success, ezp_NuE_left, success2=SetZprimeff)
     call ReadCommandLineArgument(arg, "ezp_NuE_right", success, ezp_NuE_right, success2=SetZprimeff)
-    call ReadCommandLineArgument(arg, "MZprime", success, M_Zprime, SetLastArgument, success2=UseZprime, success3=SetMZprime)
+    call ReadCommandLineArgument(arg, "MZprime", success, M_Zprime, SetLastArgument, success2=SetMZprime)
     if (SetLastArgument)  M_Zprime = M_Zprime*GeV
-    call ReadCommandLineArgument(arg, "GaZprime", success, Ga_Zprime, SetLastArgument, success2=UseZprime, success3=SetGaZprime)
+    call ReadCommandLineArgument(arg, "GaZprime", success, Ga_Zprime, SetLastArgument, success2=SetGaZprime)
     if (SetLastArgument)  Ga_Zprime = Ga_Zprime*GeV
 
     call ReadCommandLineArgument(arg, "ghwwp1", success, ghwwp1, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
@@ -867,9 +867,9 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "ewp_Chm_right", success, ewp_Chm_right, success2=SetWprimeff)
     call ReadCommandLineArgument(arg, "ewp_Top_left", success, ewp_Top_left, success2=SetWprimeff)    !undocumented because it's useless (until contact terms are included in tH)
     call ReadCommandLineArgument(arg, "ewp_Top_right", success, ewp_Top_right, success2=SetWprimeff)  !undocumented because it's useless (until contact terms are included in tH)
-    call ReadCommandLineArgument(arg, "MWprime", success, M_Wprime, SetLastArgument, success2=UseWprime, success3=SetMWprime)
+    call ReadCommandLineArgument(arg, "MWprime", success, M_Wprime, SetLastArgument, success2=SetMWprime)
     if (SetLastArgument)  M_Wprime = M_Wprime*GeV
-    call ReadCommandLineArgument(arg, "GaWprime", success, Ga_Wprime, SetLastArgument, success2=UseWprime, success3=SetGaWprime)
+    call ReadCommandLineArgument(arg, "GaWprime", success, Ga_Wprime, SetLastArgument, success2=SetGaWprime)
     if (SetLastArgument)  Ga_Wprime = Ga_Wprime*GeV
 
 
@@ -977,16 +977,16 @@ logical :: SetColliderEnergy
        Ga_V= Ga_Z
        M_Vprime = M_Zprime
        Ga_Vprime = Ga_Zprime
-       UseVprime = UseZprime
     elseif( IsAWDecay(DecayMode1) ) then
        M_V = M_W
        Ga_V= Ga_W
        M_Vprime = M_Wprime
        Ga_Vprime = Ga_Wprime
-       UseVprime = UseWprime
     elseif( IsAPhoton(DecayMode1) ) then
        M_V = 0d0
        Ga_V= 0d0
+       M_Vprime = -1d0
+       Ga_Vprime = 0d0
     endif
 
     !ReadLHE and ConvertLHE
@@ -1186,20 +1186,14 @@ logical :: SetColliderEnergy
             if ((SetHZprime .and. .not.SetZprimeff) .or. (.not.SetHZprime .and. SetZprimeff)) then
                 call Error("To use Z' contact terms, you have to set both HVZ' and Z'ff couplings")
             endif
-            if (UseZprime .and. .not.SetHZprime) then
-                call Error("Setting the mass and width of Z' is pointless if you don't set HVZ' couplings")
-            endif
-            if (UseWprime) then
+            if (SetMWprime .or. SetGaWprime) then
                 call Error("Don't set the W' mass and width in ZZ decay")
             endif
         elseif (IsAWDecay(DecayMode1)) then
             if ((SetHZprime .and. .not.SetWprimeff) .or. (.not.SetHZprime .and. SetWprimeff)) then
                 call Error("To use W' contact terms, you have to set both HZZ'/HZ'Z' (which are used for HWW'/HW'W') and W'ff couplings")
             endif
-            if (UseWprime .and. .not.SetHZprime) then
-                call Error("Setting the mass and width of W' is pointless if you don't set HZZ'/HZ'Z' couplings (which are used for HWW'/HW'W')")
-            endif
-            if (UseZprime) then
+            if (SetMZprime .or. SetGaZprime) then
                 call Error("Don't set the Z' mass and width in WW decay")
             endif
         endif
@@ -1213,24 +1207,12 @@ logical :: SetColliderEnergy
             if ((SetHWprime .and. .not.SetWprimeff) .or. (.not.SetHWprime .and. SetWprimeff)) then
                 call Error("To use W' contact terms, you have to set both HVW' and W'ff couplings")
             endif
-            if (UseZprime .and. .not.SetHZprime) then
-                call Error("Setting the mass and width of Z' is pointless if you don't set HVZ' couplings")
-            endif
-            if (UseWprime .and. .not.SetHWprime) then
-                call Error("Setting the mass and width of W' is pointless if you don't set HVW' couplings")
-            endif
         else
             if (SetHZprime .and. .not.SetWprimeff) then
                 call Error("HZZ'/HZ'Z' couplings are also used for HWW'/HW'W', so if you set them you also need to set W'ff couplings (possibly to 0).")
             endif
             if (SetWprimeff .and. .not.SetHZprime) then
                 call Error("If you set W'ff couplings, and you don't distinguish HZZ and HWW couplings, then you also have to set HZZ'/HZ'Z' couplings, which are also used for HWW'/HW'W'")
-            endif
-            if (UseZprime .and. .not.SetHZprime) then
-                call Error("Setting the mass and width of Z' is pointless if you don't set HVZ' couplings")
-            endif
-            if (UseWprime .and. .not.SetHZprime) then
-                call Error("Setting the mass and width of W' is pointless if you don't set HZZ'/HZ'Z' couplings (which are used for HWW'/HW'W')")
             endif
         endif
     endif

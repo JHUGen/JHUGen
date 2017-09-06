@@ -190,8 +190,7 @@ namespace TUtil{
   void SetJHUGenSpinZeroQQCouplings(double Hqqcoupl[SIZE_HQQ][2]);
   void SetJHUGenSpinZeroContactTerms(
     double Hzzpcoupl[SIZE_HVV][2], double Hzpzpcoupl[SIZE_HVV][2], double Zpffcoupl[SIZE_Vpff][2],
-    double Hwwpcoupl[SIZE_HVV][2], double Hwpwpcoupl[SIZE_HVV][2], double Wpffcoupl[SIZE_Vpff][2],
-    bool UseZprime, bool UseWprime
+    double Hwwpcoupl[SIZE_HVV][2], double Hwpwpcoupl[SIZE_HVV][2], double Wpffcoupl[SIZE_Vpff][2]
     );
   // Spin-1 couplings
   void SetJHUGenSpinOneCouplings(double Zqqcoupl[SIZE_ZQQ][2], double Zvvcoupl[SIZE_ZVV][2]);
