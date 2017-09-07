@@ -2292,6 +2292,16 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_Comparison_Ping(int motherflavor=0, int 
         );
     }
 
+    // Back-up CKM
+    double bkpvckm_ud=TUtil::GetCKMElement(2, 1);
+    double bkpvckm_us=TUtil::GetCKMElement(2, 3);
+    double bkpvckm_ub=TUtil::GetCKMElement(2, 5);
+    double bkpvckm_cd=TUtil::GetCKMElement(4, 1);
+    double bkpvckm_cs=TUtil::GetCKMElement(4, 3);
+    double bkpvckm_cb=TUtil::GetCKMElement(4, 5);
+    double bkpvckm_ts=TUtil::GetCKMElement(6, 1);
+    double bkpvckm_tb=TUtil::GetCKMElement(6, 3);
+    double bkpvckm_td=TUtil::GetCKMElement(6, 5);
     // Set CKM to be diagonal for this test
     double invckm_ud=1, invckm_us=0, invckm_cd=0, invckm_cs=1, invckm_ts=0, invckm_tb=1, invckm_ub=0, invckm_cb=0, invckm_td=0;
     TUtil::SetCKMElements(&invckm_ud, &invckm_us, &invckm_cd, &invckm_cs, &invckm_ts, &invckm_tb, &invckm_ub, &invckm_cb, &invckm_td);
@@ -3253,6 +3263,9 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_Comparison_Ping(int motherflavor=0, int 
 
     mela.resetInputEvent();
 
+    // Reset the CKM elements so that they don't transfer to the next function call
+    TUtil::SetCKMElements(&bkpvckm_ud, &bkpvckm_us, &bkpvckm_cd, &bkpvckm_cs, &bkpvckm_ts, &bkpvckm_tb, &bkpvckm_ub, &bkpvckm_cb, &bkpvckm_td);
+
     // Reset the buffer
     cout.rdbuf(coutbuf);
     tout.close();
@@ -3990,6 +4003,16 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_TU_Comparison_Ping(int motherflavor=0, i
         );
     }
 
+    // Back-up CKM
+    double bkpvckm_ud=TUtil::GetCKMElement(2, 1);
+    double bkpvckm_us=TUtil::GetCKMElement(2, 3);
+    double bkpvckm_ub=TUtil::GetCKMElement(2, 5);
+    double bkpvckm_cd=TUtil::GetCKMElement(4, 1);
+    double bkpvckm_cs=TUtil::GetCKMElement(4, 3);
+    double bkpvckm_cb=TUtil::GetCKMElement(4, 5);
+    double bkpvckm_ts=TUtil::GetCKMElement(6, 1);
+    double bkpvckm_tb=TUtil::GetCKMElement(6, 3);
+    double bkpvckm_td=TUtil::GetCKMElement(6, 5);
     // Set CKM to be diagonal for this test
     double invckm_ud=1, invckm_us=0, invckm_cd=0, invckm_cs=1, invckm_ts=0, invckm_tb=1, invckm_ub=0, invckm_cb=0, invckm_td=0;
     TUtil::SetCKMElements(&invckm_ud, &invckm_us, &invckm_cd, &invckm_cs, &invckm_ts, &invckm_tb, &invckm_ub, &invckm_cb, &invckm_td);
@@ -4237,6 +4260,9 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_TU_Comparison_Ping(int motherflavor=0, i
     p_bkg_tu_VAMCFM.printarray();
 
     mela.resetInputEvent();
+
+    // Reset the CKM elements so that they don't transfer to the next function call
+    TUtil::SetCKMElements(&bkpvckm_ud, &bkpvckm_us, &bkpvckm_cd, &bkpvckm_cs, &bkpvckm_ts, &bkpvckm_tb, &bkpvckm_ub, &bkpvckm_cb, &bkpvckm_td);
 
     // Reset the buffer
     cout.rdbuf(coutbuf);
