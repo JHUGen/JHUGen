@@ -131,9 +131,6 @@ dependencies:
          join -e ERROR -a 2 -j 1 -o 2.1,2.3,1.2 --check-order <( git rev-list --objects --all | sort -k 1 ) <( git verify-pack -v .git/objects/pack/pack-*.idx | gawk '( NF == 5 && $2 == "blob" ){print}' | sort -k1 ) | sort -k2gr > $CIRCLE_ARTIFACTS/filesizes.txt
       fi
     - cd pdfs && ./downloadNNPDF.sh
-    - cd pdfs && ./downloadNNPDF.sh:
-        pwd:
-          ../JHUGenMELA
   cache_directories:
     - ~/root
     - ~/CMSJHU_AnalysisMacros
@@ -170,9 +167,6 @@ test:
     #(if not, the first make will fail since we haven't compiled MELA yet)
     - sed -i -r -e "s/^(linkMELA *= *)Yes/\1No/" makefile
     - make
-    - make:
-         pwd:
-           ../JHUGenMELA
     - cd ../JHUGenMELAv2/MELA && bash setup.sh
     #now turn linkMELA back on
     - sed -i -r -e "s/^(linkMELA *= *)No/\1Yes/" makefile
