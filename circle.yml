@@ -152,7 +152,7 @@ test:
       git diff --exit-code
       exitstatus=$?
       git checkout -- . &&
-      exit exitstatus
+      exit $exitstatus
     #make sure the default compiler is set to gfortran
     - "! grep 'Comp *= *ifort' makefile"
     #but continue the other tests even if it is
