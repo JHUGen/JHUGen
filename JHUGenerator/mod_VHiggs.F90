@@ -128,13 +128,13 @@ end subroutine EvalAmp_VHiggs
       complex(8) gVpVpP, gVpVpS1, gVpVpS2
       complex(8) ghzpzp1_dyn,ghzpzp2_dyn,ghzpzp3_dyn,ghzpzp4_dyn
 
+      MATRIXELEMENT0=czero
       if( &
          (id(1).ne.convertLHE(Pho_) .and. useA(1) .and. .not.includeGammaStar) .or. &
          (id(6).ne.convertLHE(Pho_) .and. useA(2) .and. .not.includeGammaStar) .or. &
          ((id(1)+id(2)).ne.0 .and. id(1).ne.convertLHE(Pho_) .and. useA(1)) .or. &
          ((id(6)+id(7)).ne.0 .and. id(6).ne.convertLHE(Pho_) .and. useA(2))      &
         ) then
-         MATRIXELEMENT0=czero
          return
       endif
 
@@ -174,8 +174,16 @@ end subroutine EvalAmp_VHiggs
       gFFW = ci*dsqrt(couplWffsq) ! = sqrt(gwsq/2.0_dp)
 
       qq = -scr(MomExt(:,3),MomExt(:,4))
-      q3_q3 = scr(MomExt(:,3),MomExt(:,3))
-      q4_q4 = scr(MomExt(:,4),MomExt(:,4))
+      if (id(1).eq.convertLHE(Pho_) .and. useA(1)) then
+         q3_q3 = 0d0
+      else
+         q3_q3 = scr(MomExt(:,3),MomExt(:,3))
+      endif
+      if (id(6).eq.convertLHE(Pho_) .and. useA(2)) then
+         q4_q4 = 0d0
+      else
+         q4_q4 = scr(MomExt(:,4),MomExt(:,4))
+      endif
       q5_q5 = scr(MomExt(:,5),MomExt(:,5))
       PROP3 = PROPAGATOR(dsqrt(q5_q5),mass(5,1),mass(5,2))
 
@@ -481,13 +489,21 @@ end subroutine EvalAmp_VHiggs
 
       if(.not.(useA(1) .and. abs(id(1)).eq.convertLHE(Pho_))) then
          current1 = -current1 + scrc(MomExt(:,3),current1)/q3_q3
-         if(getMass(Wppr_).ge.0d0 .or. getMass(Zpr_).ge.0d0) then
+         if(                                                                 &
+            (abs(id(3)).eq.convertLHE(abs(Wp_)) .and. getMass(Wppr_).ge.0d0) &
+            .or.                                                             &
+            (abs(id(3)).eq.convertLHE(abs(Z0_)) .and. getMass(Zpr_).ge.0d0)  &
+            ) then
             currentVp1 = -currentVp1 + scrc(MomExt(:,3),currentVp1)/q3_q3
          endif
       endif
       if(.not.(useA(2) .and. abs(id(6)).eq.convertLHE(Pho_))) then
          current2 = -current2 + scrc(MomExt(:,4),current2)/q4_q4
-         if(getMass(Wppr_).ge.0d0 .or. getMass(Zpr_).ge.0d0) then
+         if(                                                                 &
+            (abs(id(4)).eq.convertLHE(abs(Wp_)) .and. getMass(Wppr_).ge.0d0) &
+            .or.                                                             &
+            (abs(id(4)).eq.convertLHE(abs(Z0_)) .and. getMass(Zpr_).ge.0d0)  &
+            ) then
             currentVp2 = -currentVp2 + scrc(MomExt(:,4),currentVp2)/q4_q4
          endif
       endif
