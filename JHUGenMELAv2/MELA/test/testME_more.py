@@ -41,8 +41,12 @@ class TestMela(unittest.TestCase):
 
     M_Z = 91.1876
     Ga_Z = 2.4952
-    aL = -0.53762
-    aR = 0.46238
+    aL_lep = -0.53762
+    aR_lep = 0.46238
+    aL_up = -2 * 0.23119 * 2./3
+    aR_up = -2 * 0.23119 * 2./3 + 1
+    aL_dn = -2 * 0.23119 * -1./3
+    aR_dn = -2 * 0.23119 * -1./3 - 1
     e = 0.8431872482432357  # = cL_lep = cR_lep from mod_Parameters
     L1 = 10000.
 
@@ -60,32 +64,15 @@ class TestMela(unittest.TestCase):
     m.setProcess(TVar.SelfDefine_spin0, TVar.JHUGen, TVar.ZZINDEPENDENT)
     m.ghz1 = ghz1 + 2 * ghz1_prime2 * (M_Z**2 - 1j*M_Z*Ga_Z)/L1**2
     m.ghzzp1 = M_Z**2/L1**2
-    m.ezp_El_left = m.ezp_Mu_left = aL * ghz1_prime2 + e * ghzgs1_prime2
-    m.ezp_El_right = m.ezp_Mu_right = aR * ghz1_prime2 + e * ghzgs1_prime2
+    m.ezp_El_left = m.ezp_Mu_left = m.ezp_Ta_left = aL_lep * ghz1_prime2 + e * ghzgs1_prime2
+    m.ezp_El_right = m.ezp_Mu_right = m.ezp_Ta_right = aR_lep * ghz1_prime2 + e * ghzgs1_prime2
+    m.ezp_Up_left = m.ezp_Chm_left = m.ezp_Top_left = aL_up * ghz1_prime2 + e*2/3 * ghzgs1_prime2
+    m.ezp_Up_right = m.ezp_Chm_right = m.ezp_Top_right = aR_up * ghz1_prime2 + e*2/3 * ghzgs1_prime2
+    m.ezp_Dn_left = m.ezp_Str_left = m.ezp_Bot_left = aL_dn * ghz1_prime2 + e*-1/3 * ghzgs1_prime2
+    m.ezp_Dn_right = m.ezp_Str_right = m.ezp_Bot_right = aR_dn * ghz1_prime2 + e*-1/3 * ghzgs1_prime2
     me2 = m.computeP()
 
     self.assertEquals(me1, me2)
-
-def ME(processname, ghz1, ghz1_prime2, ghzgs1_prime2):
-  m.setProcess(TVar.SelfDefine_spin0, TVar.JHUGen, TVar.ZZINDEPENDENT)
-  m.ghz1 = ghz1
-  m.ghz1_prime2 = ghz1_prime2
-  m.ghzgs1_prime2 = ghzgs1_prime2
-  me1 = m.computeP()
-
-  #note we only use the imaginary mZ^2 in ghz1
-  #the one in ghzzp1 is to cancel this mZ^2
-  #https://github.com/JHUGen/JHUGen/blob/4b0ae4d846846d90e2d8aad1dbb2279bbac9e416/JHUGenerator/mod_Higgs.F90#L952
-  #so it's still real
-  m.setProcess(TVar.SelfDefine_spin0, TVar.JHUGen, TVar.ZZINDEPENDENT)
-  m.ghz1 = ghz1 + 2 * ghz1_prime2 * (M_Z**2 - 1j*M_Z*Ga_Z)/L1**2
-  m.ghzzp1 = M_Z**2/L1**2
-  m.ezp_El_left = m.ezp_Mu_left = aL * ghz1_prime2 + e * ghzgs1_prime2
-  m.ezp_El_right = m.ezp_Mu_right = aR * ghz1_prime2 + e * ghzgs1_prime2
-  me2 = m.computeP()
-
-  return me1, me2
-
 
 if __name__ == "__main__":
   unittest.main()
