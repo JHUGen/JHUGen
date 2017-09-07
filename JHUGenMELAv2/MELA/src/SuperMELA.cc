@@ -536,13 +536,13 @@ void SuperMELA::calc_mZZ_range(const double mHVal, double& low_M, double& high_M
 }
 
 std::pair<double, double> SuperMELA::M4lProb(double m4l){
-    double Psig =-1.;
-    double Pbkg =-1.;
+  double Psig =-1.;
+  double Pbkg =-1.;
   if (m4l<lowMH_ || m4l>highMH_){
     if (verbose_) std::cerr << "SuperMELA::M4lProb: m4l = " << m4l << " outside range [" << lowMH_ << ", " << highMH_ << "]. Setting SuperMELA to dummy values." << std::endl;
   }
   else{
-  m4l_rrv_->setVal(m4l);
+    m4l_rrv_->setVal(m4l);
     Psig=sig_CB_->getVal() / norm_sig_CB_;
     Pbkg=qqZZ_pdf_->getVal() / norm_bkg_qqZZ_;
     if (verbose_){
@@ -557,8 +557,8 @@ std::pair<double, double> SuperMELA::M4lProb(double m4l){
 
 
 std::pair<double, double> SuperMELA::M4lProb(std::pair<double, double> m4lPair){
-    double Psig =-1.;
-    double Pbkg =-1.;
+  double Psig =-1.;
+  double Pbkg =-1.;
   if (
     (m4lPair.first<lowMH_ || m4lPair.first>highMH_)
     ||
@@ -567,9 +567,9 @@ std::pair<double, double> SuperMELA::M4lProb(std::pair<double, double> m4lPair){
     if (verbose_) std::cerr << "SuperMELA::M4lProb: m4l pairs " << m4lPair.first << " - " << m4lPair.second << " outside range [" << lowMH_ << ", " << highMH_ << "]. Setting SuperMELA to dummy values." << std::endl;
   }
   else{
-  m4l_rrv_->setVal(m4lPair.first);
+    m4l_rrv_->setVal(m4lPair.first);
     Psig=sig_CB_->getVal() / norm_sig_CB_;
-  m4l_rrv_->setVal(m4lPair.second);
+    m4l_rrv_->setVal(m4lPair.second);
     Pbkg=qqZZ_pdf_->getVal() / norm_bkg_qqZZ_;
     if (verbose_){
       std::cout << "SuperMELA::M4lProb: "
