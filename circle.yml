@@ -149,6 +149,13 @@ test:
       fi
     - mkdir -p $CIRCLE_ARTIFACTS/{ggH,VBF,HJJ,other}/{SM,PS,fa30.5,fa30.5i,a2}
     - mkdir -p $CIRCLE_ARTIFACTS/MELA
+    - |
+      cd ../ &&
+      dos2unix $(git ls-files) &&
+      git diff --exit-code
+      exitstatus=$?
+      git checkout -- . &&
+      exit exitstatus
     #make sure the default compiler is set to gfortran
     - "! grep 'Comp *= *ifort' makefile"
     #but continue the other tests even if it is
