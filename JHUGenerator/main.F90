@@ -326,7 +326,7 @@ use ModMisc
 implicit none
 character :: arg*(500)
 integer :: NumArgs,NArg
-logical :: help, success, SetLastArgument, interfSet
+logical :: help, DryRun, success, SetLastArgument, interfSet
 logical :: SetRenScheme, SetMuRenMultiplier, SetFacScheme, SetMuFacMultiplier
 logical :: SetAnomalousSpin0gg, Setghg2, SetAnomalousSpin0ZZ, Setghz1
 logical :: SetZgammacoupling, Setgammagammacoupling
@@ -340,6 +340,7 @@ logical :: SetpTcut, SetdeltaRcut
 logical :: SetColliderEnergy
 
    help = .false.
+   DryRun = .false.
 
 #if useLHAPDF==1
    LHAPDFString = ""
@@ -411,6 +412,7 @@ logical :: SetColliderEnergy
     !ReadCommandLineArgument is overloaded, it puts the value into the last argument
     ! by detecting the type.  It also sets success to .true. if the argument name (before =)
     ! is correct.
+    call ReadCommandLineArgument(arg, "DryRun", success, DryRun)
     call ReadCommandLineArgument(arg, "Collider", success, Collider)
     call ReadCommandLineArgument(arg, "ColliderEnergy", success, Collider_Energy, SetLastArgument, success2=SetColliderEnergy)
     if( SetLastArgument ) Collider_Energy = Collider_Energy * 1000*GeV
@@ -1182,9 +1184,12 @@ logical :: SetColliderEnergy
 
     ! Contact terms
     if (Process.le.2 .or. Process.eq.50) then
-        if (IsAZDecay(DecayMode1)) then
+        if (IsAZDecay(DecayMode1) .or. (Process.eq.50 .and. IsAPhoton(DecayMode1))) then
             if ((SetHZprime .and. .not.SetZprimeff) .or. (.not.SetHZprime .and. SetZprimeff)) then
                 call Error("To use Z' contact terms, you have to set both HVZ' and Z'ff couplings")
+            endif
+            if ((SetMZprime.or.SetGaZprime) .and. .not.SetHZprime) then
+                call Error("Setting the mass and width of Z' doesn't do anything if you don't set HVZ' couplings")
             endif
             if (SetMWprime .or. SetGaWprime) then
                 call Error("Don't set the W' mass and width in ZZ decay")
@@ -1192,6 +1197,9 @@ logical :: SetColliderEnergy
         elseif (IsAWDecay(DecayMode1)) then
             if ((SetHZprime .and. .not.SetWprimeff) .or. (.not.SetHZprime .and. SetWprimeff)) then
                 call Error("To use W' contact terms, you have to set both HZZ'/HZ'Z' (which are used for HWW'/HW'W') and W'ff couplings")
+            endif
+            if ((SetMWprime.or.SetGaWprime) .and. .not.SetHZprime) then
+                call Error("Setting the mass and width of W' doesn't do anything if you don't set HZZ'/HZ'Z' couplings (which are used for HWW'/HW'W')")
             endif
             if (SetMZprime .or. SetGaZprime) then
                 call Error("Don't set the Z' mass and width in WW decay")
@@ -1207,12 +1215,24 @@ logical :: SetColliderEnergy
             if ((SetHWprime .and. .not.SetWprimeff) .or. (.not.SetHWprime .and. SetWprimeff)) then
                 call Error("To use W' contact terms, you have to set both HVW' and W'ff couplings")
             endif
+            if ((SetMZprime.or.SetGaZprime) .and. .not.SetHZprime) then
+                call Error("Setting the mass and width of Z' doesn't do anything if you don't set HVZ' couplings")
+            endif
+            if ((SetMWprime.or.SetGaWprime) .and. .not.SetHWprime) then
+                call Error("Setting the mass and width of W' doesn't do anything if you don't set HVW' couplings")
+            endif
         else
             if (SetHZprime .and. .not.SetWprimeff) then
                 call Error("HZZ'/HZ'Z' couplings are also used for HWW'/HW'W', so if you set them you also need to set W'ff couplings (possibly to 0).")
             endif
             if (SetWprimeff .and. .not.SetHZprime) then
                 call Error("If you set W'ff couplings, and you don't distinguish HZZ and HWW couplings, then you also have to set HZZ'/HZ'Z' couplings, which are also used for HWW'/HW'W'")
+            endif
+            if ((SetMZprime.or.SetGaZprime) .and. .not.SetHZprime) then
+                call Error("Setting the mass and width of Z' doesn't do anything if you don't set HVZ' couplings")
+            endif
+            if ((SetMWprime.or.SetGaWprime) .and. .not.SetHZprime) then
+                call Error("Setting the mass and width of W' doesn't do anything if you don't set HZZ'/HZ'Z' couplings (which are used for HWW'/HW'W')")
             endif
         endif
     endif
@@ -1287,6 +1307,11 @@ logical :: SetColliderEnergy
       call ComputeCKMElements(VCKM_ud, VCKM_us, VCKM_cd, VCKM_cs, VCKM_ts, VCKM_tb, inVCKM_cb=VCKM_cb, inVCKM_td=VCKM_td)
    else
       call ComputeCKMElements(VCKM_ud, VCKM_us, VCKM_cd, VCKM_cs, VCKM_ts, VCKM_tb, inVCKM_ub=VCKM_ub, inVCKM_cb=VCKM_cb, inVCKM_td=VCKM_td)
+   endif
+
+   if (DryRun) then
+     print *, "Running JHUGen with these options should work."
+     stop
    endif
 
 return
@@ -5101,6 +5126,7 @@ implicit none
 
         print *, ""
         print *, " help:                Print all command line options"
+        print *, " DryRun:              Check that the command line is valid, then exit"
         print *, " Process configuration:"
         print *, "   Collider:          1=LHC (default), 2=Tevatron, 0=e+e-"
         print *, "   ColliderEnergy:    in TeV.  default is 13 TeV for LHC, 1.96 TeV for Tevatron,"
