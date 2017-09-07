@@ -74,27 +74,27 @@ Ideal BW: -1
 *******************************************************
 *******************************************************
 Computing MEs for leptonic WH
-p0mplus: 4.08334e-06
+p0mplus: 4.05069e-06
 
-p0g1prime2: 2.47814e-12
+p0g1prime2: 2.45833e-12
 
-p0hplus: 0.000271281
+p0hplus: 0.000269095
 
-p0minus: 0.000264654
+p0minus: 0.000262514
 
 p0gzgs1prime2: 0
 
 p0hpluszgs: 0
 
-p0mplus_selfD: 4.08334e-06
+p0mplus_selfD: 4.05069e-06
 
-p0mplus_selfD_CT: 4.08334e-06
+p0mplus_selfD_CT: 4.05069e-06
 
-p0g1prime2_selfD: 2.47814e-12
+p0g1prime2_selfD: 2.45833e-12
 
-p0hplus_selfD: 0.000271281
+p0hplus_selfD: 0.000269095
 
-p0minus_selfD: 0.000264654
+p0minus_selfD: 0.000262514
 
 p0gzgs1prime2_selfD: 0
 
@@ -140,27 +140,27 @@ Ideal BW: 2.96527e-08
 *******************************************************
 *******************************************************
 Computing MEs for hadronic WH
-p0mplus: 0.000114178
+p0mplus: 0.000113529
 
-p0g1prime2: 6.92935e-11
+p0g1prime2: 6.88999e-11
 
-p0hplus: 0.00605829
+p0hplus: 0.00602388
 
-p0minus: 0.00534829
+p0minus: 0.00531791
 
 p0gzgs1prime2: 0
 
 p0hpluszgs: 0
 
-p0mplus_selfD: 0.000114178
+p0mplus_selfD: 0.000113529
 
-p0mplus_selfD_CT: 0.000109977
+p0mplus_selfD_CT: 0.000109352
 
-p0g1prime2_selfD: 6.92935e-11
+p0g1prime2_selfD: 6.88999e-11
 
-p0hplus_selfD: 0.00605829
+p0hplus_selfD: 0.00602388
 
-p0minus_selfD: 0.00534829
+p0minus_selfD: 0.00531791
 
 p0gzgs1prime2_selfD: 0
 

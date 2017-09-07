@@ -1180,6 +1180,9 @@ void TUtil::SetCKMElements(double* invckm_ud, double* invckm_us, double* invckm_
   cabib_.Vcb = __modparameters_MOD_ckmbare(&i, &j);
   // Do not call ckmfill_(), it is called by MCFM_chooser!
 }
+double TUtil::GetCKMElement(int iquark, int jquark){
+  return __modparameters_MOD_ckmbare(&iquark, &jquark);
+}
 
 double TUtil::GetMass(int ipart){
   const int ipartabs = abs(ipart);

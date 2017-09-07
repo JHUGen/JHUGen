@@ -46,6 +46,7 @@ public:
 
 protected:
 
+  void splitLine(const string rawoption, vector<string>& splitoptions, char delimiter);
   void readSigParsFromFile(
     string& str_mean_CB,
     string& str_sigma_CB,
