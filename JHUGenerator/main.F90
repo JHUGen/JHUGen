@@ -422,7 +422,7 @@ logical :: SetColliderEnergy
     ! is correct.
     call ReadCommandLineArgument(arg, "DryRun", success, DryRun)
     call ReadCommandLineArgument(arg, "Collider", success, Collider)
-    call ReadCommandLineArgument(arg, "ColliderEnergy", success, Collider_Energy, SetLastArgument, success2=SetColliderEnergy, multiply=1000*GeV)
+    call ReadCommandLineArgument(arg, "ColliderEnergy", success, Collider_Energy, multiply=1000*GeV, success2=SetColliderEnergy)
     call ReadCommandLineArgument(arg, "epPolarization", success, POL_A)
     call ReadCommandLineArgument(arg, "emPolarization", success, POL_B)
 #if useLHAPDF==1
@@ -431,10 +431,10 @@ logical :: SetColliderEnergy
 #else
     call ReadCommandLineArgument(arg, "PDFSet", success, PDFSet)
 #endif
-    call ReadCommandLineArgument(arg, "MReso", success, M_Reso, SetLastArgument, multiply=GeV)
-    call ReadCommandLineArgument(arg, "GaReso", success, Ga_Reso, SetLastArgument, multiply=GeV)
-    call ReadCommandLineArgument(arg, "MReso2", success, M_Reso2, SetLastArgument, multiply=GeV)
-    call ReadCommandLineArgument(arg, "GaReso2", success, Ga_Reso2, SetLastArgument, multiply=GeV)
+    call ReadCommandLineArgument(arg, "MReso", success, M_Reso, multiply=GeV)
+    call ReadCommandLineArgument(arg, "GaReso", success, Ga_Reso, multiply=GeV)
+    call ReadCommandLineArgument(arg, "MReso2", success, M_Reso2, multiply=GeV)
+    call ReadCommandLineArgument(arg, "GaReso2", success, Ga_Reso2, multiply=GeV)
     call ReadCommandLineArgument(arg, "ctauReso", success, HiggsDecayLengthMM)
     call ReadCommandLineArgument(arg, "VegasNc0", success, VegasNc0)
     call ReadCommandLineArgument(arg, "VegasNc1", success, VegasNc1)
@@ -445,7 +445,7 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "DecayMode1", success, DecayMode1)
     call ReadCommandLineArgument(arg, "DecayMode2", success, DecayMode2)
     call ReadCommandLineArgument(arg, "FacScheme", success, FacScheme, success2=SetFacScheme)
-    call ReadCommandLineArgument(arg, "RenScheme", success, RenScheme, SetLastArgument, success2=SetRenScheme)
+    call ReadCommandLineArgument(arg, "RenScheme", success, RenScheme, success2=SetRenScheme)
     call ReadCommandLineArgument(arg, "MuFacMultiplier", success, MuFacMultiplier, success2=SetMuFacMultiplier)
     call ReadCommandLineArgument(arg, "MuRenMultiplier", success, MuRenMultiplier, success2=SetMuRenMultiplier)
     call ReadCommandLineArgument(arg, "TopDK", success, TopDecays)
@@ -457,14 +457,14 @@ logical :: SetColliderEnergy
 
     call ReadCommandLineArgument(arg, "ReadPmHstar", success, ReadPMZZ)
     call ReadCommandLineArgument(arg, "PmHstarFile", success, PMZZfile)
-    call ReadCommandLineArgument(arg, "PrintPmHstar", success, PrintPMZZ, SetLastArgument, success2=DoPrintPMZZ, multiplyreal=GeV) !undocumented, for internal testing.  PrintPMZZ is a complex(8), the real and imaginary parts are the minimum and maximum values to print
+    call ReadCommandLineArgument(arg, "PrintPmHstar", success, PrintPMZZ, multiplyreal=GeV, success2=DoPrintPMZZ) !undocumented, for internal testing.  PrintPMZZ is a complex(8), the real and imaginary parts are the minimum and maximum values to print
     call ReadCommandLineArgument(arg, "PrintPmHstarIntervals", success, PrintPMZZIntervals)                      !undocumented, for internal testing
     call ReadCommandLineArgument(arg, "PmHstarEvals", success, PMZZEvals)
 
     !same thing again for compatibility
     call ReadCommandLineArgument(arg, "ReadPMZZ", success, ReadPMZZ)   !undocumented, for compatibility
     call ReadCommandLineArgument(arg, "PMZZFile", success, PMZZfile)   !undocumented, for compatibility
-    call ReadCommandLineArgument(arg, "PrintPMZZ", success, PrintPMZZ, SetLastArgument, success2=DoPrintPMZZ, multiplyreal=GeV)   !undocumented, for compatibility
+    call ReadCommandLineArgument(arg, "PrintPMZZ", success, PrintPMZZ, multiplyreal=GeV, success2=DoPrintPMZZ)   !undocumented, for compatibility
     call ReadCommandLineArgument(arg, "PrintPMZZIntervals", success, PrintPMZZIntervals)                        !undocumented, for compatibility
     call ReadCommandLineArgument(arg, "PMZZEvals", success, PMZZEvals)   !undocumented, for compatibility
 
@@ -554,18 +554,18 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "cz_q2sq", success, cz_q2sq, success2=SetAnomalousSpin0ZZ)
     call ReadCommandLineArgument(arg, "cz_q12sq", success, cz_q12sq, success2=SetAnomalousSpin0ZZ)
     ! Lambda's for q1,2,12**2 for the Lambda's
-    call ReadCommandLineArgument(arg, "Lambda_z11", success, Lambda_z11, SetLastArgument, success2=SetAnomalousSpin0ZZ, multiply=GeV)
-    call ReadCommandLineArgument(arg, "Lambda_z21", success, Lambda_z21, SetLastArgument, success2=SetAnomalousSpin0ZZ, multiply=GeV)
-    call ReadCommandLineArgument(arg, "Lambda_z31", success, Lambda_z31, SetLastArgument, success2=SetAnomalousSpin0ZZ, multiply=GeV)
-    call ReadCommandLineArgument(arg, "Lambda_z41", success, Lambda_z41, SetLastArgument, success2=SetAnomalousSpin0ZZ, multiply=GeV)
-    call ReadCommandLineArgument(arg, "Lambda_z12", success, Lambda_z12, SetLastArgument, success2=SetAnomalousSpin0ZZ, multiply=GeV)
-    call ReadCommandLineArgument(arg, "Lambda_z22", success, Lambda_z22, SetLastArgument, success2=SetAnomalousSpin0ZZ, multiply=GeV)
-    call ReadCommandLineArgument(arg, "Lambda_z32", success, Lambda_z32, SetLastArgument, success2=SetAnomalousSpin0ZZ, multiply=GeV)
-    call ReadCommandLineArgument(arg, "Lambda_z42", success, Lambda_z42, SetLastArgument, success2=SetAnomalousSpin0ZZ, multiply=GeV)
-    call ReadCommandLineArgument(arg, "Lambda_z10", success, Lambda_z10, SetLastArgument, success2=SetAnomalousSpin0ZZ, multiply=GeV)
-    call ReadCommandLineArgument(arg, "Lambda_z20", success, Lambda_z20, SetLastArgument, success2=SetAnomalousSpin0ZZ, multiply=GeV)
-    call ReadCommandLineArgument(arg, "Lambda_z30", success, Lambda_z30, SetLastArgument, success2=SetAnomalousSpin0ZZ, multiply=GeV)
-    call ReadCommandLineArgument(arg, "Lambda_z40", success, Lambda_z40, SetLastArgument, success2=SetAnomalousSpin0ZZ, multiply=GeV)
+    call ReadCommandLineArgument(arg, "Lambda_z11", success, Lambda_z11, multiply=GeV, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "Lambda_z21", success, Lambda_z21, multiply=GeV, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "Lambda_z31", success, Lambda_z31, multiply=GeV, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "Lambda_z41", success, Lambda_z41, multiply=GeV, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "Lambda_z12", success, Lambda_z12, multiply=GeV, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "Lambda_z22", success, Lambda_z22, multiply=GeV, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "Lambda_z32", success, Lambda_z32, multiply=GeV, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "Lambda_z42", success, Lambda_z42, multiply=GeV, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "Lambda_z10", success, Lambda_z10, multiply=GeV, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "Lambda_z20", success, Lambda_z20, multiply=GeV, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "Lambda_z30", success, Lambda_z30, multiply=GeV, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "Lambda_z40", success, Lambda_z40, multiply=GeV, success2=SetAnomalousSpin0ZZ)
 
     !spin 0 WW couplings
     call ReadCommandLineArgument(arg, "ghw1", success, ghw1, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
@@ -610,18 +610,18 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "cw_q2sq", success, cw_q2sq, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
     call ReadCommandLineArgument(arg, "cw_q12sq", success, cw_q12sq, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
     ! Lambda's for q1,2,12**2 for the Lambda's
-    call ReadCommandLineArgument(arg, "Lambda_w11", success, Lambda_w11, SetLastArgument, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, multiply=GeV)
-    call ReadCommandLineArgument(arg, "Lambda_w21", success, Lambda_w21, SetLastArgument, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, multiply=GeV)
-    call ReadCommandLineArgument(arg, "Lambda_w31", success, Lambda_w31, SetLastArgument, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, multiply=GeV)
-    call ReadCommandLineArgument(arg, "Lambda_w41", success, Lambda_w41, SetLastArgument, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, multiply=GeV)
-    call ReadCommandLineArgument(arg, "Lambda_w12", success, Lambda_w12, SetLastArgument, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, multiply=GeV)
-    call ReadCommandLineArgument(arg, "Lambda_w22", success, Lambda_w22, SetLastArgument, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, multiply=GeV)
-    call ReadCommandLineArgument(arg, "Lambda_w32", success, Lambda_w32, SetLastArgument, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, multiply=GeV)
-    call ReadCommandLineArgument(arg, "Lambda_w42", success, Lambda_w42, SetLastArgument, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, multiply=GeV)
-    call ReadCommandLineArgument(arg, "Lambda_w10", success, Lambda_w10, SetLastArgument, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, multiply=GeV)
-    call ReadCommandLineArgument(arg, "Lambda_w20", success, Lambda_w20, SetLastArgument, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, multiply=GeV)
-    call ReadCommandLineArgument(arg, "Lambda_w30", success, Lambda_w30, SetLastArgument, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, multiply=GeV)
-    call ReadCommandLineArgument(arg, "Lambda_w40", success, Lambda_w40, SetLastArgument, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, multiply=GeV)
+    call ReadCommandLineArgument(arg, "Lambda_w11", success, Lambda_w11, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "Lambda_w21", success, Lambda_w21, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "Lambda_w31", success, Lambda_w31, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "Lambda_w41", success, Lambda_w41, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "Lambda_w12", success, Lambda_w12, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "Lambda_w22", success, Lambda_w22, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "Lambda_w32", success, Lambda_w32, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "Lambda_w42", success, Lambda_w42, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "Lambda_w10", success, Lambda_w10, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "Lambda_w20", success, Lambda_w20, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "Lambda_w30", success, Lambda_w30, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "Lambda_w40", success, Lambda_w40, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
 
     !spin 1
     call ReadCommandLineArgument(arg, "zprime_qq_left", success, zprime_qq_left, success2=SetAnomalousSpin1qq, success3=Setspin1qqleft)
@@ -710,30 +710,18 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "c2z_q2sq", success, c2z_q2sq, success2=SetAnomalousSpin0ZZ)
     call ReadCommandLineArgument(arg, "c2z_q12sq", success, c2z_q12sq, success2=SetAnomalousSpin0ZZ)
     ! Lambda's for q1,2,12**2 for the Lambda's
-    call ReadCommandLineArgument(arg, "Lambda2_z11", success, Lambda2_z11, SetLastArgument, success2=SetAnomalousSpin0ZZ)
-    if (SetLastArgument)  Lambda2_z11 = Lambda2_z11*GeV
-    call ReadCommandLineArgument(arg, "Lambda2_z21", success, Lambda2_z21, SetLastArgument, success2=SetAnomalousSpin0ZZ)
-    if (SetLastArgument)  Lambda2_z21 = Lambda2_z21*GeV
-    call ReadCommandLineArgument(arg, "Lambda2_z31", success, Lambda2_z31, SetLastArgument, success2=SetAnomalousSpin0ZZ)
-    if (SetLastArgument)  Lambda2_z31 = Lambda2_z31*GeV
-    call ReadCommandLineArgument(arg, "Lambda2_z41", success, Lambda2_z41, SetLastArgument, success2=SetAnomalousSpin0ZZ)
-    if (SetLastArgument)  Lambda2_z41 = Lambda2_z41*GeV
-    call ReadCommandLineArgument(arg, "Lambda2_z12", success, Lambda2_z12, SetLastArgument, success2=SetAnomalousSpin0ZZ)
-    if (SetLastArgument)  Lambda2_z12 = Lambda2_z12*GeV
-    call ReadCommandLineArgument(arg, "Lambda2_z22", success, Lambda2_z22, SetLastArgument, success2=SetAnomalousSpin0ZZ)
-    if (SetLastArgument)  Lambda2_z22 = Lambda2_z22*GeV
-    call ReadCommandLineArgument(arg, "Lambda2_z32", success, Lambda2_z32, SetLastArgument, success2=SetAnomalousSpin0ZZ)
-    if (SetLastArgument)  Lambda2_z32 = Lambda2_z32*GeV
-    call ReadCommandLineArgument(arg, "Lambda2_z42", success, Lambda2_z42, SetLastArgument, success2=SetAnomalousSpin0ZZ)
-    if (SetLastArgument)  Lambda2_z42 = Lambda2_z42*GeV
-    call ReadCommandLineArgument(arg, "Lambda2_z10", success, Lambda2_z10, SetLastArgument, success2=SetAnomalousSpin0ZZ)
-    if (SetLastArgument)  Lambda2_z10 = Lambda2_z10*GeV
-    call ReadCommandLineArgument(arg, "Lambda2_z20", success, Lambda2_z20, SetLastArgument, success2=SetAnomalousSpin0ZZ)
-    if (SetLastArgument)  Lambda2_z20 = Lambda2_z20*GeV
-    call ReadCommandLineArgument(arg, "Lambda2_z30", success, Lambda2_z30, SetLastArgument, success2=SetAnomalousSpin0ZZ)
-    if (SetLastArgument)  Lambda2_z30 = Lambda2_z30*GeV
-    call ReadCommandLineArgument(arg, "Lambda2_z40", success, Lambda2_z40, SetLastArgument, success2=SetAnomalousSpin0ZZ)
-    if (SetLastArgument)  Lambda2_z40 = Lambda2_z40*GeV
+    call ReadCommandLineArgument(arg, "Lambda2_z11", success, Lambda2_z11, multiply=GeV, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "Lambda2_z21", success, Lambda2_z21, multiply=GeV, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "Lambda2_z31", success, Lambda2_z31, multiply=GeV, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "Lambda2_z41", success, Lambda2_z41, multiply=GeV, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "Lambda2_z12", success, Lambda2_z12, multiply=GeV, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "Lambda2_z22", success, Lambda2_z22, multiply=GeV, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "Lambda2_z32", success, Lambda2_z32, multiply=GeV, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "Lambda2_z42", success, Lambda2_z42, multiply=GeV, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "Lambda2_z10", success, Lambda2_z10, multiply=GeV, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "Lambda2_z20", success, Lambda2_z20, multiply=GeV, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "Lambda2_z30", success, Lambda2_z30, multiply=GeV, success2=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "Lambda2_z40", success, Lambda2_z40, multiply=GeV, success2=SetAnomalousSpin0ZZ)
 
     !spin 0 WW couplings
     call ReadCommandLineArgument(arg, "gh2w1", success, gh2w1, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
@@ -778,30 +766,18 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "c2w_q2sq", success, c2w_q2sq, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
     call ReadCommandLineArgument(arg, "c2w_q12sq", success, c2w_q12sq, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
     ! Lambda's for q1,2,12**2 for the Lambda's
-    call ReadCommandLineArgument(arg, "Lambda2_w11", success, Lambda2_w11, SetLastArgument, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
-    if (SetLastArgument)  Lambda2_w11 = Lambda2_w11*GeV
-    call ReadCommandLineArgument(arg, "Lambda2_w21", success, Lambda2_w21, SetLastArgument, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
-    if (SetLastArgument)  Lambda2_w21 = Lambda2_w21*GeV
-    call ReadCommandLineArgument(arg, "Lambda2_w31", success, Lambda2_w31, SetLastArgument, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
-    if (SetLastArgument)  Lambda2_w31 = Lambda2_w31*GeV
-    call ReadCommandLineArgument(arg, "Lambda2_w41", success, Lambda2_w41, SetLastArgument, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
-    if (SetLastArgument)  Lambda2_w41 = Lambda2_w41*GeV
-    call ReadCommandLineArgument(arg, "Lambda2_w12", success, Lambda2_w12, SetLastArgument, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
-    if (SetLastArgument)  Lambda2_w12 = Lambda2_w12*GeV
-    call ReadCommandLineArgument(arg, "Lambda2_w22", success, Lambda2_w22, SetLastArgument, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
-    if (SetLastArgument)  Lambda2_w22 = Lambda2_w22*GeV
-    call ReadCommandLineArgument(arg, "Lambda2_w32", success, Lambda2_w32, SetLastArgument, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
-    if (SetLastArgument)  Lambda2_w32 = Lambda2_w32*GeV
-    call ReadCommandLineArgument(arg, "Lambda2_w42", success, Lambda2_w42, SetLastArgument, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
-    if (SetLastArgument)  Lambda2_w42 = Lambda2_w42*GeV
-    call ReadCommandLineArgument(arg, "Lambda2_w10", success, Lambda2_w10, SetLastArgument, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
-    if (SetLastArgument)  Lambda2_w10 = Lambda2_w10*GeV
-    call ReadCommandLineArgument(arg, "Lambda2_w20", success, Lambda2_w20, SetLastArgument, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
-    if (SetLastArgument)  Lambda2_w20 = Lambda2_w20*GeV
-    call ReadCommandLineArgument(arg, "Lambda2_w30", success, Lambda2_w30, SetLastArgument, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
-    if (SetLastArgument)  Lambda2_w30 = Lambda2_w30*GeV
-    call ReadCommandLineArgument(arg, "Lambda2_w40", success, Lambda2_w40, SetLastArgument, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
-    if (SetLastArgument)  Lambda2_w40 = Lambda2_w40*GeV
+    call ReadCommandLineArgument(arg, "Lambda2_w11", success, Lambda2_w11, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "Lambda2_w21", success, Lambda2_w21, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "Lambda2_w31", success, Lambda2_w31, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "Lambda2_w41", success, Lambda2_w41, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "Lambda2_w12", success, Lambda2_w12, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "Lambda2_w22", success, Lambda2_w22, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "Lambda2_w32", success, Lambda2_w32, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "Lambda2_w42", success, Lambda2_w42, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "Lambda2_w10", success, Lambda2_w10, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "Lambda2_w20", success, Lambda2_w20, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "Lambda2_w30", success, Lambda2_w30, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
+    call ReadCommandLineArgument(arg, "Lambda2_w40", success, Lambda2_w40, multiply=GeV, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ)
 
 
     !contact interactions
@@ -827,8 +803,8 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "ezp_Bot_right", success, ezp_Bot_right, success2=SetZprimeff)
     call ReadCommandLineArgument(arg, "ezp_NuE_left", success, ezp_NuE_left, success2=SetZprimeff)
     call ReadCommandLineArgument(arg, "ezp_NuE_right", success, ezp_NuE_right, success2=SetZprimeff)
-    call ReadCommandLineArgument(arg, "MZprime", success, M_Zprime, SetLastArgument, success2=SetMZprime, multiply=GeV)
-    call ReadCommandLineArgument(arg, "GaZprime", success, Ga_Zprime, SetLastArgument, success2=SetGaZprime, multiply=GeV)
+    call ReadCommandLineArgument(arg, "MZprime", success, M_Zprime, multiply=GeV, success2=SetMZprime)
+    call ReadCommandLineArgument(arg, "GaZprime", success, Ga_Zprime, multiply=GeV, success2=SetGaZprime)
 
     call ReadCommandLineArgument(arg, "ghwwp1", success, ghwwp1, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
     call ReadCommandLineArgument(arg, "ghwpwp1", success, ghwpwp1, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
@@ -844,8 +820,8 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "ewp_Chm_right", success, ewp_Chm_right, success2=SetWprimeff)
     call ReadCommandLineArgument(arg, "ewp_Top_left", success, ewp_Top_left, success2=SetWprimeff)    !undocumented because it's useless (until contact terms are included in tH)
     call ReadCommandLineArgument(arg, "ewp_Top_right", success, ewp_Top_right, success2=SetWprimeff)  !undocumented because it's useless (until contact terms are included in tH)
-    call ReadCommandLineArgument(arg, "MWprime", success, M_Wprime, SetLastArgument, success2=SetMWprime, multiply=GeV)
-    call ReadCommandLineArgument(arg, "GaWprime", success, Ga_Wprime, SetLastArgument, success2=SetGaWprime, multiply=GeV)
+    call ReadCommandLineArgument(arg, "MWprime", success, M_Wprime, multiply=GeV, success2=SetMWprime)
+    call ReadCommandLineArgument(arg, "GaWprime", success, Ga_Wprime, multiply=GeV, success2=SetGaWprime)
 
 
     ! CKM elements
@@ -861,19 +837,19 @@ logical :: SetColliderEnergy
 
 
     !cuts
-    call ReadCommandLineArgument(arg, "pTjetcut", success, pTjetcut, SetLastArgument, success2=SetpTjetcut, multiply=GeV)
-    call ReadCommandLineArgument(arg, "etajetcut", success, etajetcut, SetLastArgument, success2=Setetajetcut)
-    call ReadCommandLineArgument(arg, "detajetcut", success, detajetcut, SetLastArgument, success2=Setdetajetcut)
+    call ReadCommandLineArgument(arg, "pTjetcut", success, pTjetcut, multiply=GeV, success2=SetpTjetcut)
+    call ReadCommandLineArgument(arg, "etajetcut", success, etajetcut, success2=Setetajetcut)
+    call ReadCommandLineArgument(arg, "detajetcut", success, detajetcut, success2=Setdetajetcut)
     call ReadCommandLineArgument(arg, "deltaRcut", success, Rjet, success2=SetdeltaRcut)
-    call ReadCommandLineArgument(arg, "mJJcut", success, mJJcut, SetLastArgument, multiply=GeV)
-    call ReadCommandLineArgument(arg, "m4l_min", success, m4l_minmax(1), SetLastArgument, multiply=GeV)   !undocumented, for internal testing
-    call ReadCommandLineArgument(arg, "m4l_max", success, m4l_minmax(2), SetLastArgument, multiply=GeV)   !undocumented, for internal testing
-    call ReadCommandLineArgument(arg, "mllcut", success, mllcut, SetLastArgument, success2=Setmllcut, multiply=GeV)
-    call ReadCommandLineArgument(arg, "pTlepcut", success, pTlepcut, SetLastArgument, success2=SetpTlepcut, multiply=GeV)
-    call ReadCommandLineArgument(arg, "etalepcut", success, etalepcut, SetLastArgument, success2=Setetalepcut)
+    call ReadCommandLineArgument(arg, "mJJcut", success, mJJcut, multiply=GeV)
+    call ReadCommandLineArgument(arg, "m4l_min", success, m4l_minmax(1), multiply=GeV)   !undocumented, for internal testing
+    call ReadCommandLineArgument(arg, "m4l_max", success, m4l_minmax(2), multiply=GeV)   !undocumented, for internal testing
+    call ReadCommandLineArgument(arg, "mllcut", success, mllcut, multiply=GeV, success2=Setmllcut)
+    call ReadCommandLineArgument(arg, "pTlepcut", success, pTlepcut, multiply=GeV, success2=SetpTlepcut)
+    call ReadCommandLineArgument(arg, "etalepcut", success, etalepcut, success2=Setetalepcut)
 
     !compatibility
-    call ReadCommandLineArgument(arg, "MPhotonCutoff", success, mllcut, SetLastArgument, success2=Setmllcut, multiply=GeV)  !undocumented, for compatibility
+    call ReadCommandLineArgument(arg, "MPhotonCutoff", success, mllcut, multiply=GeV, success2=Setmllcut)  !undocumented, for compatibility
 
     if( .not.success ) then
         call Error("Unknown command line argument: " // trim(arg))
