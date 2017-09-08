@@ -65,8 +65,11 @@ class TestMela(unittest.TestCase):
   def setUpClass(cls):
     cls.m = Mela()
   def setUp(self):
-    """the seed will be different every time, but reproducible"""
-    random.seed(os.environ["SEED"] + os.environ["CIRCLE_BUILD_NUM"])
+    if ("SEED" in os.environ.keys()) and ("CIRCLE_BUILD_NUM" in os.environ.keys()):
+      """the seed will be different every time, but reproducible"""
+      random.seed(os.environ["SEED"] + os.environ["CIRCLE_BUILD_NUM"])
+    else:
+      random.seed(34567)
   def tearDown(self):
     self.m.resetInputEvent()
   def testcontact_decay(self):
