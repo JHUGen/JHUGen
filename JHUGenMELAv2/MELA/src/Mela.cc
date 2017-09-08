@@ -187,7 +187,7 @@ void Mela::build(double mh_){
   /***** CONSTANTS FOR MATRIX ELEMENTS *****/
   getPConstantHandles();
 
-  
+
   /***** SuperMELA *****/
   // Deactivate generation messages
   RooMsgService::instance().getStream(1).removeTopic(NumIntegration);
@@ -1558,7 +1558,7 @@ bool Mela::configureAnalyticalPDFs(){
   bool noPass=false;
   pdf=0;
 
-  if (myModel_==TVar::bkgZZ)  pdf = qqZZmodel;
+  if (myModel_==TVar::bkgZZ) pdf = qqZZmodel;
   else if (myProduction_ == TVar::JJQCD || myProduction_ == TVar::JJVBF);
   else if (myProduction_ == TVar::Lep_ZH || myProduction_ == TVar::Lep_WH || myProduction_ == TVar::Had_ZH || myProduction_ == TVar::Had_WH || myProduction_ == TVar::GammaH); // To be implemented
   else if (
@@ -1818,8 +1818,8 @@ float Mela::getConstant_JHUGenUndecayed(){
 
   MelaPConstant* pchandle=0;
   unsigned int iarray=0;
-    if (TUtil::JetMassScheme == TVar::ConserveDifermionMass) iarray=0; // First element points to the case when the difermion invariant mass is conserved in mass removal scheme
-    else if (TUtil::JetMassScheme == TVar::MomentumToEnergy) iarray=1; // Second element points to the case when the 3-momentum vector magnitude is scaled to energy in mass removal scheme
+  if (TUtil::JetMassScheme == TVar::ConserveDifermionMass) iarray=0; // First element points to the case when the difermion invariant mass is conserved in mass removal scheme
+  else if (TUtil::JetMassScheme == TVar::MomentumToEnergy) iarray=1; // Second element points to the case when the 3-momentum vector magnitude is scaled to energy in mass removal scheme
   if (myProduction_ == TVar::JQCD){
     pchandle = pAvgSmooth_JHUGen_JQCD_HSMHiggs[iarray];
   }
@@ -1972,7 +1972,7 @@ float Mela::getConstant_FourFermionDecay(int decid){
         hvbs = pAvgSmooth_MCFM_JJVBF_bkgZZ_4mu;
         hwzz = pAvgSmooth_MCFM_Had_WH_bkgZZ_4mu;
         hzzz = pAvgSmooth_MCFM_Had_ZH_bkgZZ_4mu;
-    }
+      }
       else if (is4e){
         hvbf = pAvgSmooth_MCFM_JJVBF_HSMHiggs_4e;
         hwh = pAvgSmooth_MCFM_Had_WH_HSMHiggs_4e;
@@ -1980,13 +1980,13 @@ float Mela::getConstant_FourFermionDecay(int decid){
         hvbs = pAvgSmooth_MCFM_JJVBF_bkgZZ_4e;
         hwzz = pAvgSmooth_MCFM_Had_WH_bkgZZ_4e;
         hzzz = pAvgSmooth_MCFM_Had_ZH_bkgZZ_4e;
-  }
+      }
 
       if (myModel_ == TVar::HSMHiggs || myModel_ == TVar::bkgZZ_SMHiggs){
         if (myProduction_ == TVar::JJEW || myProduction_ == TVar::JJVBF) pchandle[0]=hvbf;
         if (myProduction_ == TVar::JJEW || myProduction_ == TVar::Had_ZH) pchandle[1]=hzh;
         if (myProduction_ == TVar::JJEW || myProduction_ == TVar::Had_WH) pchandle[2]=hwh;
-}
+      }
       if (myModel_ == TVar::bkgZZ || myModel_ == TVar::bkgZZ_SMHiggs){
         if (myProduction_ == TVar::JJEW || myProduction_ == TVar::JJVBF) pchandle[3]=hvbs;
         if (myProduction_ == TVar::JJEW || myProduction_ == TVar::Had_ZH) pchandle[4]=hzzz;
@@ -2000,13 +2000,13 @@ float Mela::getConstant_FourFermionDecay(int decid){
       else if (myModel_ == TVar::bkgZZ){
         if (is2mu2e){
           pchandle[0] = pAvgSmooth_MCFM_JJQCD_bkgZZ_2mu2e;
-      }
+        }
         else if (is4mu){
           pchandle[0] = pAvgSmooth_MCFM_JJQCD_bkgZZ_4mu;
-      }
+        }
         else if (is4e){
           pchandle[0] = pAvgSmooth_MCFM_JJQCD_bkgZZ_4e;
-    }
+        }
       }
     }
   }
@@ -2083,23 +2083,23 @@ void Mela::getPConstantHandles(){
 
   // Fill versions with difermion correction, set to ConserveDifermionMass if others don't exist.
   filename = "pAvgSmooth_JHUGen_JJQCD_HSMHiggs";
-    spname = "P_ConserveDifermionMass";
+  spname = "P_ConserveDifermionMass";
   pAvgSmooth_JHUGen_JJQCD_HSMHiggs[0] = getPConstantHandle(TVar::JHUGen, TVar::JJQCD, TVar::HSMHiggs, filename, spname, true);
-    spname = "P_MomentumToEnergy";
+  spname = "P_MomentumToEnergy";
   pAvgSmooth_JHUGen_JJQCD_HSMHiggs[1] = getPConstantHandle(TVar::JHUGen, TVar::JJQCD, TVar::HSMHiggs, filename, spname, true);
   if (pAvgSmooth_JHUGen_JJQCD_HSMHiggs[1]==0) pAvgSmooth_JHUGen_JJQCD_HSMHiggs[1]=pAvgSmooth_JHUGen_JJQCD_HSMHiggs[0];
-    //
+  //
   filename = "pAvgSmooth_JHUGen_JQCD_HSMHiggs";
-    spname = "P_ConserveDifermionMass";
+  spname = "P_ConserveDifermionMass";
   pAvgSmooth_JHUGen_JQCD_HSMHiggs[0] = getPConstantHandle(TVar::JHUGen, TVar::JQCD, TVar::HSMHiggs, filename, spname, true);
-    spname = "P_MomentumToEnergy";
+  spname = "P_MomentumToEnergy";
   pAvgSmooth_JHUGen_JQCD_HSMHiggs[1] = getPConstantHandle(TVar::JHUGen, TVar::JQCD, TVar::HSMHiggs, filename, spname, true);
   if (pAvgSmooth_JHUGen_JQCD_HSMHiggs[1]==0) pAvgSmooth_JHUGen_JQCD_HSMHiggs[1]=pAvgSmooth_JHUGen_JQCD_HSMHiggs[0];
-    //
+  //
   filename = "pAvgSmooth_JHUGen_JJVBF_HSMHiggs";
-    spname = "P_ConserveDifermionMass";
+  spname = "P_ConserveDifermionMass";
   pAvgSmooth_JHUGen_JJVBF_HSMHiggs[0] = getPConstantHandle(TVar::JHUGen, TVar::JJVBF, TVar::HSMHiggs, filename, spname, true);
-    spname = "P_MomentumToEnergy";
+  spname = "P_MomentumToEnergy";
   pAvgSmooth_JHUGen_JJVBF_HSMHiggs[1] = getPConstantHandle(TVar::JHUGen, TVar::JJVBF, TVar::HSMHiggs, filename, spname, true);
   if (pAvgSmooth_JHUGen_JJVBF_HSMHiggs[1]==0) pAvgSmooth_JHUGen_JJVBF_HSMHiggs[1]=pAvgSmooth_JHUGen_JJVBF_HSMHiggs[0];
   //
@@ -2292,13 +2292,13 @@ void Mela::deletePConstantHandles(){
     if (isch==0 || pAvgSmooth_JHUGen_Had_ZH_HSMHiggs[isch]!=pAvgSmooth_JHUGen_Had_ZH_HSMHiggs[0]) deletePConstantHandle(pAvgSmooth_JHUGen_Had_ZH_HSMHiggs[isch]);
     if (isch==0 || pAvgSmooth_JHUGen_Had_WH_HSMHiggs[isch]!=pAvgSmooth_JHUGen_Had_WH_HSMHiggs[0]) deletePConstantHandle(pAvgSmooth_JHUGen_Had_WH_HSMHiggs[isch]);
   }
-    //
+  //
   deletePConstantHandle(pAvgSmooth_MCFM_JJQCD_bkgZJets_2l2q);
-    //
+  //
   deletePConstantHandle(pAvgSmooth_JHUGen_ZZGG_HSMHiggs_4mu);
   deletePConstantHandle(pAvgSmooth_JHUGen_ZZGG_HSMHiggs_4e);
   deletePConstantHandle(pAvgSmooth_JHUGen_ZZGG_HSMHiggs_2mu2e);
-    //
+  //
   deletePConstantHandle(pAvgSmooth_MCFM_ZZGG_HSMHiggs_4mu);
   deletePConstantHandle(pAvgSmooth_MCFM_ZZGG_HSMHiggs_4e);
   deletePConstantHandle(pAvgSmooth_MCFM_ZZGG_HSMHiggs_2mu2e);

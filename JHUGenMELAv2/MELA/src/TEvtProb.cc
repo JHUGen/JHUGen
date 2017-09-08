@@ -838,7 +838,7 @@ double TEvtProb::XsecCalcXJJ(){
 // Cross-section calculations for H + 1 jet (only SM for the moment)
 double TEvtProb::XsecCalcXJ(){
   if (verbosity>=TVar::DEBUG) cout << "Begin XsecCalc_XJ" << endl;
-   double dXsec = 0;
+  double dXsec = 0;
   ResetIORecord();
   if (!CheckInputPresent()) return dXsec;
 

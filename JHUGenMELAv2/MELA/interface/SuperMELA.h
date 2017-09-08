@@ -16,7 +16,7 @@
 
 
 
-class SuperMELA {
+class SuperMELA{
 
 public:
 
