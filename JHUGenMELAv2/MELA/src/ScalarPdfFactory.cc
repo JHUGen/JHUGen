@@ -1,8 +1,4 @@
-#ifdef _def_melatools_
-#include <interface/ScalarPdfFactory.h>
-#else
-#include "../include/ScalarPdfFactory.h"
-#endif
+#include "ScalarPdfFactory.h"
 
 
 ScalarPdfFactory::ScalarPdfFactory(RooSpin::modelMeasurables measurables_, bool acceptance_, RooSpin::VdecayType V1decay_, RooSpin::VdecayType V2decay_, Bool_t OnshellH_) :
@@ -411,7 +407,7 @@ void ScalarPdfFactory::initGVals(){
   couplings.Lambda_Q = new RooRealVar("Lambda_Q", "Lambda_Q", 10000.);
   couplings.Lambda_zgs1 = new RooRealVar("Lambda_zgs1", "Lambda_zgs1", 10000.);
 
-  for (int v=0; v<3; v++){
+  for (int v=0; v<SIZE_HVV_CQSQ; v++){
     TString strcore;
     double initval = 100.;
 
@@ -616,7 +612,7 @@ void ScalarPdfFactory::destroyGVals(){
     }
   }
   if (parameterization!=0) destroyFractionsPhases();
-  for (int v=0; v<3; v++){
+  for (int v=0; v<SIZE_HVV_CQSQ; v++){
     delete couplings.Lambda_z1qsq[v];
     delete couplings.Lambda_z2qsq[v];
     delete couplings.Lambda_z3qsq[v];
@@ -858,7 +854,7 @@ void ScalarPdfFactory::makeCouplingsConst(bool yesNo){
         }
       }
     }
-    for (int iV=0; iV<3; iV++){
+    for (int iV=0; iV<SIZE_HVV_CQSQ; iV++){
       ((RooRealVar*)couplings.Lambda_z1qsq[iV])->setConstant(yesNo);
       ((RooRealVar*)couplings.Lambda_z2qsq[iV])->setConstant(yesNo);
       ((RooRealVar*)couplings.Lambda_z3qsq[iV])->setConstant(yesNo);

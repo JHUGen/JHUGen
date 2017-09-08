@@ -36,6 +36,8 @@ c
          include 'maxwt.f'
          parameter(mprod=50*mxdim)
          integer jj
+         character*(200) gridline
+         double precision dmax(50,mxdim)! MARKUS array that saves maximum of the function fxn for each division            
          dimension d(50,mxdim),di(50,mxdim),xin(50),r(50),
      1   dx(mxdim),dt(mxdim),x(mxdim),kg(mxdim),ia(mxdim)
          data ndmx/50/,alph/1.5d0/,one/1d0/,mds/0/
@@ -139,6 +141,7 @@ c         main integration loop
          do 10 j=1,ndim
          kg(j)=1
          do 10 i=1,nd
+         if(.not. evtgen) dmax(i,j) = 0d0! MARKUS: init in each iteration
          d(i,j)=ti
  10      di(i,j)=ti
 c
@@ -160,22 +163,29 @@ c        MARKUS: main loop starts here
          rc=xi(ia(j)-1,j)+(xn-dble(ia(j)))*xo
  14      x(j)=xl(j)+rc*dx(j)
  15      wgt=wgt*xo*xnd
-c
-c         write(6,FMT='(a20,2F20.16)') 'xo,xnd in dvegas: ',xo,xnd
+         ThisDMax=0d0
+         do j=1,ndim
+            ThisDMax=max(dmax(ia(j),j),ThisDMax)
+         enddo
          f=fxn(x,wgt)
          if( stopvegas ) then
            return
          endif
          f=f*wgt         
          if( abs(f).gt.wtmax ) wtmax=f
-         if( abs(f).lt.wtmin ) wtmin=f
+         if( abs(f).lt.wtmin .and. f.ne.0d0 ) wtmin=f
          f2=f*f
          fb=fb+f
          f2b=f2b+f2
          do 16 j=1,ndim
+         if( .not.evtgen .and. abs(f).gt.dmax(ia(j),j) ) then
+          dmax(ia(j),j)=f! MARKUS: setting max in this division        
+          if(nprn.lt.0) print *,"New maximum in division ",ia(j),j,f
+         endif
          di(ia(j),j)=di(ia(j),j)+f
- 16      if(mds.ge.0)d(ia(j),J)=d(ia(j),J)+f2
+ 16      if(mds.ge.0) d(ia(j),J)=d(ia(j),J)+f2
          if(k.lt.npg) go to 12
+c        MARKUS: main loop ends here         
 c
 888    FORMAT(1X,'F',G14.6,'F2',G14.6,'FB',G14.6,'F2B',G14.6)
          f2b= sqrt(f2b*      NPG)
@@ -223,13 +233,32 @@ c        write(6,201)it,ti,tsi,avgi,sd,chi2a
 c        do 20 j=1,ndim
 c 20     write(6,202) j,(xi(i,j),di(i,j),d(i,j),i=1,nd)
 
-        do  j=1,ndim
-        write(6,*) ""
-        write(6,*) "axis",j
- 20     do i=1,nd
-        write(6,*) xi(i,j),di(i,j),d(i,j)
-        enddo
-        enddo
+!         do  j=1,ndim
+! !         if(j.ne.3.and.j.ne.18) cycle! select to print only axis 3 and 18
+! !         if(j.ne.3) cycle! select to print only axis 3 and 18
+!         write(6,*) ""
+!         write(6,*) "axis",j
+!  20     do i=1,nd
+!         write(6,*) xi(i,j),di(i,j),d(i,j),dmax(i,j)
+!         enddo
+!         enddo
+        
+!---------------------------------------------------------------        
+! ! !       graphical output of xi divisions
+!         do j=1,ndim
+!         do i=1,200
+!           gridline(i:i)=' '
+!         enddo 
+!         do i=1,nd
+!             kk = int(xi(i,j)*150d0)
+!             gridline(kk:kk)="|"
+!         enddo
+!         write(*,'(I3,A,A)') j,":  |",gridline(1:150)
+!         enddo
+!---------------------------------------------------------------        
+        
+        
+        
 c
 c      refine grid
 c
@@ -342,7 +371,7 @@ c
 !          include 'gridinfo.f'
          include 'maxwt.f'
          parameter(mprod=50*mxdim)
-         integer jj
+         integer jj,kk
          dimension d(50,mxdim),di(50,mxdim),xin(50),r(50),
      1   dx(mxdim),dt(mxdim),x(mxdim),kg(mxdim),ia(mxdim)
          data ndmx/50/,alph/1.5d0/,one/1d0/,mds/0/
