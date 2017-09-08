@@ -414,7 +414,6 @@ class Mela(object):
   ewp_Top_left = SelfDCoupling("selfDWpffcoupl", ROOT.py_gHIGGS_Vp_Top_left)
   ewp_Top_right = SelfDCoupling("selfDWpffcoupl", ROOT.py_gHIGGS_Vp_Top_right)
 
-  UseVprime = SelfDParameter("selfDUseVprime")
   M_Zprime = SelfDParameter("selfDM_Zprime")
   Ga_Zprime = SelfDParameter("selfDGa_Zprime")
   M_Wprime = SelfDParameter("selfDM_Wprime")

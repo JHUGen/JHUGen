@@ -30,9 +30,9 @@ machine:
     ROOT_VERSIONPART3: "08"
     ROOT_VERSIONSTRING: "${ROOT_VERSIONPART1}.${ROOT_VERSIONPART2}/${ROOT_VERSIONPART3}"
 
-    REFERENCE_LHES_USERNAME: "hroskes"
-    REFERENCE_LHES_BUILD_NUMBER: "826"
-    REFERENCE_JHUGEN_VERSION: "v7.0.3"
+    REFERENCE_LHES_USERNAME: "JHUGen"
+    REFERENCE_LHES_BUILD_NUMBER: "359"
+    REFERENCE_JHUGEN_VERSION: "v7.0.4"
 
     REFERENCE_LHES_FOLDER: "$(echo https://circleci.com/api/v1/project/$REFERENCE_LHES_USERNAME/JHUGen/$REFERENCE_LHES_BUILD_NUMBER/'artifacts/0/$CIRCLE_ARTIFACTS/reference')"
     REFERENCE_FILENAMES: "ggH_ZZ.lhe ggH_WW.lhe ggH_Zgamma.lhe ggH_gammagamma.lhe spin1_ZZ.lhe spin1_WW.lhe gg_spin2_ZZ.lhe qq_spin2_WW.lhe gg_spin2_Zgamma.lhe qq_spin2_gammagamma.lhe ZH_bb.lhe WH_Zgamma.lhe ee_gammaH_bb.lhe VBF_ZZ.lhe HJJ_WW.lhe HJ_gammagamma.lhe VBFoffshell_66.lhe ttH_tautau.lhe gg_bbH_tautau.lhe qq_bbH.lhe tqH_110.lhe tqH_111.lhe tqH_112.lhe tqH_113.lhe tqH_114.lhe"
@@ -131,9 +131,6 @@ dependencies:
          join -e ERROR -a 2 -j 1 -o 2.1,2.3,1.2 --check-order <( git rev-list --objects --all | sort -k 1 ) <( git verify-pack -v .git/objects/pack/pack-*.idx | gawk '( NF == 5 && $2 == "blob" ){print}' | sort -k1 ) | sort -k2gr > $CIRCLE_ARTIFACTS/filesizes.txt
       fi
     - cd pdfs && ./downloadNNPDF.sh
-    - cd pdfs && ./downloadNNPDF.sh:
-        pwd:
-          ../JHUGenMELA
   cache_directories:
     - ~/root
     - ~/CMSJHU_AnalysisMacros
@@ -149,6 +146,13 @@ test:
       fi
     - mkdir -p $CIRCLE_ARTIFACTS/{ggH,VBF,HJJ,other}/{SM,PS,fa30.5,fa30.5i,a2}
     - mkdir -p $CIRCLE_ARTIFACTS/MELA
+    - |
+      cd ../ &&
+      dos2unix $(git ls-files) &&
+      git diff --exit-code
+      exitstatus=$?
+      git checkout -- . &&
+      exit $exitstatus
     #make sure the default compiler is set to gfortran
     - "! grep 'Comp *= *ifort' makefile"
     #but continue the other tests even if it is
@@ -163,9 +167,6 @@ test:
     #(if not, the first make will fail since we haven't compiled MELA yet)
     - sed -i -r -e "s/^(linkMELA *= *)Yes/\1No/" makefile
     - make
-    - make:
-         pwd:
-           ../JHUGenMELA
     - cd ../JHUGenMELAv2/MELA && bash setup.sh
     #now turn linkMELA back on
     - sed -i -r -e "s/^(linkMELA *= *)No/\1Yes/" makefile
@@ -194,7 +195,12 @@ test:
       exitstatus=0
       for a in $(grep -i 'call *ReadCommandLineArgument' main.F90 | grep -v '!undocumented' | sed -r 's/.*"(.*)".*/\1/'); do
         if ! grep -q $a ../Manual/manJHUGenerator.tex &&
-           ! grep -q ${a/w/z} ../Manual/manJHUGenerator.tex        #ghw*, etc. are mentioned collectively
+           ! grep -q ${a/w/z} ../Manual/manJHUGenerator.tex &&      #ghw*, etc. are mentioned collectively
+           ! grep -q ${a/2z/z} ../Manual/manJHUGenerator.tex &&     #second resonance couplings are too
+           ! grep -q ${a/2gsgs/gsgs} ../Manual/manJHUGenerator.tex &&
+           ! grep -q ${a/Lambda2/Lambda} ../Manual/manJHUGenerator.tex &&
+           ! grep -q ${a/2w/z} ../Manual/manJHUGenerator.tex &&
+           ! grep -q ${a/Lambda2_w/Lambda_z} ../Manual/manJHUGenerator.tex
         then
           echo "$a is undocumented!"
           exitstatus=1

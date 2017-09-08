@@ -1595,7 +1595,7 @@ subroutine getDecay_Couplings_Spinors_Props(VVMode,idordered,pordered,h3,h4, sp,
       s = scr(pordered(:,6)+pordered(:,7),pordered(:,6)+pordered(:,7))
       propV(1) = 1d0
       propV(2) = 1d0
-      if( s.lt.MPhotonCutoff**2 ) propV(2)=czero
+      if( s.lt.MPhotonCutoff**2 ) propV(1)=czero
 
    elseif( VVMode.eq.gsZMode ) then
    !        gamma* Z DECAYS
@@ -1645,7 +1645,7 @@ subroutine getDecay_Couplings_Spinors_Props(VVMode,idordered,pordered,h3,h4, sp,
       sp(4,:) = -sp(4,:) + pV(4,:)*( sc(sp(4,:),dcmplx(pV(4,:))) )/scr(pV(4,:),pV(4,:))! full propagator numerator
       s = scr(pordered(:,6)+pordered(:,7),pordered(:,6)+pordered(:,7))
       propV(1) = 1d0! = s/dcmplx(s)
-      if( s.lt.MPhotonCutoff**2 ) propV(1)=0d0
+      if( s.lt.MPhotonCutoff**2 ) propV(1)=czero
       s = scr(pordered(:,8)+pordered(:,9),pordered(:,8)+pordered(:,9))
       propV(2) = s/dcmplx(s - M_V**2,M_V*Ga_V)
 

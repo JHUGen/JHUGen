@@ -160,6 +160,7 @@ namespace TUtil{
   double GetMass(int ipart);
   double GetDecayWidth(int ipart);
   void SetCKMElements(double* invckm_ud, double* invckm_us, double* invckm_cd, double* invckm_cs, double* invckm_ts, double* invckm_tb, double* invckm_ub=0, double* invckm_cb=0, double* invckm_td=0);
+  double GetCKMElement(int iquark, int jquark);
   double InterpretScaleScheme(const TVar::Production& production, const TVar::MatrixElement& matrixElement, const TVar::EventScaleScheme& scheme, TLorentzVector p[mxpart]);
   void SetAlphaS(double& Q_ren, double& Q_fac, double multiplier_ren, double multiplier_fac, int mynloop, int mynflav, std::string mypartons); // Q_ren/fac -> Q_ren/fac * multiplier_ren/fac
   void GetAlphaS(double* alphas_, double* alphasmz_); // Get last alpha_s value set
@@ -176,7 +177,7 @@ namespace TUtil{
     const TVar::simple_event_record& mela_event,
     std::vector<int>* partOrder, std::vector<int>* apartOrder
     );
-  TString GetMCFMParticleLabel(const int& pid, bool useQJ, bool useCouplZAjkConventions);
+  TString GetMCFMParticleLabel(const int& pid, bool useQJ, bool useExtendedConventions);
 
   // JHUGen-specific wrappers
   void InitJHUGenMELA(const char* pathtoPDFSet, int PDFMember);
@@ -190,8 +191,7 @@ namespace TUtil{
   void SetJHUGenSpinZeroQQCouplings(double Hqqcoupl[SIZE_HQQ][2]);
   void SetJHUGenSpinZeroContactTerms(
     double Hzzpcoupl[SIZE_HVV][2], double Hzpzpcoupl[SIZE_HVV][2], double Zpffcoupl[SIZE_Vpff][2],
-    double Hwwpcoupl[SIZE_HVV][2], double Hwpwpcoupl[SIZE_HVV][2], double Wpffcoupl[SIZE_Vpff][2],
-    bool UseVprime
+    double Hwwpcoupl[SIZE_HVV][2], double Hwpwpcoupl[SIZE_HVV][2], double Wpffcoupl[SIZE_Vpff][2]
     );
   // Spin-1 couplings
   void SetJHUGenSpinOneCouplings(double Zqqcoupl[SIZE_ZQQ][2], double Zvvcoupl[SIZE_ZVV][2]);

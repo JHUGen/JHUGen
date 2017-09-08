@@ -57,6 +57,11 @@ for j, ref in enumerate(referencefiles, start=1):
         arguments.insert(3, 2)
         arguments.insert(4, 0)
 
+    if functionname == "testME_ProdDec_MCFM_JHUGen_WBFZZ_TU_Comparison_Ping":
+        functionname = "testME_ProdDec_MCFM_JHUGen_WBFZZWW_TU_Comparison_Ping"
+    if functionname == "testME_ProdDec_MCFM_JHUGen_WBFWW_TU_Comparison_Ping":
+        functionname = "testME_ProdDec_MCFM_JHUGen_WBFZZWW_TU_Comparison_Ping"
+
     if functionname == "testME_ProdDec_MCFM_JHUGen_JJQCDZZ_Comparison_Ping":
         functionname = "testME_ProdDec_MCFM_JHUGen_JJQCDZZWW_Comparison_Ping"
         arguments.insert(1, 1)

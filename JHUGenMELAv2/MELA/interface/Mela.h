@@ -210,7 +210,7 @@ public:
     );
 
   //*** SuperJJMela ***//
-  void computeDijetConvBW(float& prob);
+  void computeDijetConvBW(float& prob, bool useTrueBW=false);
 
   //*** Dgg10 ***//
   void computeD_gg(
@@ -269,7 +269,6 @@ public:
   double selfDHwwpcoupl[SIZE_HVV][2];
   double selfDHwpwpcoupl[SIZE_HVV][2];
   double selfDWpffcoupl[SIZE_Vpff][2];
-  bool selfDUseVprime;
   double selfDM_Zprime;
   double selfDGa_Zprime;
   double selfDM_Wprime;

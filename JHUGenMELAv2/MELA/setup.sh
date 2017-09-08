@@ -1,9 +1,12 @@
 #!/bin/sh
 
+(
+set -euo pipefail
+
 MELADIR="."
 DATA_LIB_DIR="slc6_amd64_gcc530"
 
-if [[ "$1" == *"clean"* ]];then
+if [[ "$#" -ge 1 ]] && [[ "$1" == *"clean"* ]];then
 	make clean
 	pushd $MELADIR"/fortran/"
 	make clean
@@ -32,6 +35,7 @@ else
 		echo "ERROR: something went wrong in mv, see ^ error message"
 		echo
 		popd
-		return 1 >& /dev/null || exit 1 #return only works when sourced, exit will exit your whole session if sourced
+		exit 1 #return only works when sourced, exit will exit your whole session if sourced
 	fi
 fi
+)

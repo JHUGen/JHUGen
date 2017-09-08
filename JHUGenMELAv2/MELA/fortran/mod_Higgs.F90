@@ -869,7 +869,7 @@ subroutine getDecay_Couplings_Spinors_Props(VVMode,idordered,pordered,h3,h4, sp,
       s = scr(pordered(:,6)+pordered(:,7),pordered(:,6)+pordered(:,7))
       propV(1) = 1d0
       propV(2) = 1d0
-      if( s.lt.MPhotonCutoff**2 ) propV(2)=czero
+      if( s.lt.MPhotonCutoff**2 ) propV(1)=czero
 
 
    elseif( VVMode.eq.gsZMode ) then
@@ -920,7 +920,7 @@ subroutine getDecay_Couplings_Spinors_Props(VVMode,idordered,pordered,h3,h4, sp,
       sp(4,:) = -sp(4,:) + pV(4,:)*( sc(sp(4,:),dcmplx(pV(4,:))) )/scr(pV(4,:),pV(4,:))! full propagator numerator
       s = scr(pordered(:,6)+pordered(:,7),pordered(:,6)+pordered(:,7))
       propV(1) = 1d0! = s/dcmplx(s)
-      if( s.lt.MPhotonCutoff**2 ) propV(1)=0d0
+      if( s.lt.MPhotonCutoff**2 ) propV(1)=czero
       s = scr(pordered(:,8)+pordered(:,9),pordered(:,8)+pordered(:,9))
       propV(2) = s/dcmplx(s - M_V**2,M_V*Ga_V)
 
@@ -1063,8 +1063,10 @@ subroutine getDecay_Couplings_Spinors_Props(VVMode,idordered,pordered,h3,h4, sp,
       sp(4,:) = pol_dk2mom(dcmplx(pordered(:,8)),dcmplx(pordered(:,9)),h4)  ! ubar(l3), v(l4)
       sp(4,:) = -sp(4,:) + pV(4,:)*( sc(sp(4,:),dcmplx(pV(4,:))) )/scr(pV(4,:),pV(4,:))! full propagator numerator
       s = scr(pordered(:,6)+pordered(:,7),pordered(:,6)+pordered(:,7))
-      if( UseVprime ) then
+      if( M_Vprime .gt. 0d0 ) then
         propV(1) = s/dcmplx(s - M_Vprime**2,M_Vprime*Ga_Vprime)
+      elseif( M_Vprime .eq. 0d0 ) then
+        propV(1) = 1d0
       else
         propV(1) = s/M_Z**2
       endif
@@ -1105,8 +1107,10 @@ subroutine getDecay_Couplings_Spinors_Props(VVMode,idordered,pordered,h3,h4, sp,
       s = scr(pordered(:,6)+pordered(:,7),pordered(:,6)+pordered(:,7))
       propV(1) = s/dcmplx(s - M_V**2,M_V*Ga_V)
       s = scr(pordered(:,8)+pordered(:,9),pordered(:,8)+pordered(:,9))
-      if( UseVprime ) then
+      if( M_Vprime .gt. 0d0 ) then
         propV(2) = s/dcmplx(s - M_Vprime**2,M_Vprime*Ga_Vprime)
+      elseif( M_Vprime .eq. 0d0 ) then
+        propV(2) = 1d0
       else
         propV(2) = s/M_Z**2
       endif
@@ -1126,14 +1130,18 @@ subroutine getDecay_Couplings_Spinors_Props(VVMode,idordered,pordered,h3,h4, sp,
       sp(4,:) = pol_dk2mom(dcmplx(pordered(:,8)),dcmplx(pordered(:,9)),h4)  ! ubar(l3), v(l4)
       sp(4,:) = -sp(4,:) + pV(4,:)*( sc(sp(4,:),dcmplx(pV(4,:))) )/scr(pV(4,:),pV(4,:))! full propagator numerator
       s = scr(pordered(:,6)+pordered(:,7),pordered(:,6)+pordered(:,7))
-      if( UseVprime ) then
+      if( M_Vprime .gt. 0d0 ) then
         propV(1) = s/dcmplx(s - M_Vprime**2,M_Vprime*Ga_Vprime)
+      elseif( M_Vprime .eq. 0d0 ) then
+        propV(1) = 1d0
       else
         propV(1) = s/M_Z**2
       endif
       s = scr(pordered(:,8)+pordered(:,9),pordered(:,8)+pordered(:,9))
-      if( UseVprime ) then
+      if( M_Vprime .gt. 0d0 ) then
         propV(2) = s/dcmplx(s - M_Vprime**2,M_Vprime*Ga_Vprime)
+      elseif( M_Vprime .eq. 0d0 ) then
+        propV(2) = 1d0
       else
         propV(2) = s/M_Z**2
       endif
@@ -1168,8 +1176,10 @@ subroutine getDecay_Couplings_Spinors_Props(VVMode,idordered,pordered,h3,h4, sp,
       sp(4,:) = pol_dk2mom(dcmplx(pordered(:,8)),dcmplx(pordered(:,9)),h4)  ! ubar(l3), v(l4)
       sp(4,:) = -sp(4,:) + pV(4,:)*( sc(sp(4,:),dcmplx(pV(4,:))) )/scr(pV(4,:),pV(4,:))! full propagator numerator
       s = scr(pV(3,:),pV(3,:))
-      if( UseVprime ) then
+      if( M_Vprime .gt. 0d0 ) then
         propV(1) = s/dcmplx(s - M_Vprime**2,M_Vprime*Ga_Vprime)
+      elseif( M_Vprime .eq. 0d0 ) then
+        propV(1) = 1d0
       else
         propV(1) = s/M_W**2
       endif
@@ -1209,8 +1219,10 @@ subroutine getDecay_Couplings_Spinors_Props(VVMode,idordered,pordered,h3,h4, sp,
       s = scr(pV(3,:),pV(3,:))
       propV(1) = s/dcmplx(s - M_V**2,M_V*Ga_V)
       s = scr(pV(4,:),pV(4,:))
-      if( UseVprime ) then
+      if( M_Vprime .gt. 0d0 ) then
         propV(2) = s/dcmplx(s - M_Vprime**2,M_Vprime*Ga_Vprime)
+      elseif( M_Vprime .eq. 0d0 ) then
+        propV(2) = 1d0
       else
         propV(2) = s/M_W**2
       endif
@@ -1230,14 +1242,18 @@ subroutine getDecay_Couplings_Spinors_Props(VVMode,idordered,pordered,h3,h4, sp,
       sp(4,:) = pol_dk2mom(dcmplx(pordered(:,8)),dcmplx(pordered(:,9)),h4)  ! ubar(l3), v(l4)
       sp(4,:) = -sp(4,:) + pV(4,:)*( sc(sp(4,:),dcmplx(pV(4,:))) )/scr(pV(4,:),pV(4,:))! full propagator numerator
       s = scr(pV(3,:),pV(3,:))
-      if( UseVprime ) then
+      if( M_Vprime .gt. 0d0 ) then
         propV(1) = s/dcmplx(s - M_Vprime**2,M_Vprime*Ga_Vprime)
+      elseif( M_Vprime .eq. 0d0 ) then
+        propV(1) = 1d0
       else
         propV(1) = s/M_W**2
       endif
       s = scr(pV(4,:),pV(4,:))
-      if( UseVprime ) then
+      if( M_Vprime .gt. 0d0 ) then
         propV(2) = s/dcmplx(s - M_Vprime**2,M_Vprime*Ga_Vprime)
+      elseif( M_Vprime .eq. 0d0 ) then
+        propV(2) = 1d0
       else
         propV(2) = s/M_W**2
       endif
@@ -1247,7 +1263,6 @@ subroutine getDecay_Couplings_Spinors_Props(VVMode,idordered,pordered,h3,h4, sp,
       call Error("Unsupported decay modes")
    endif
 
-   !print *,"UseVprime?",UseVprime
    !print *,"sp(3)=",sp(3,:)
    !print *,"propV(1)=",propV(1)
    !print *,"aL1,aR1=",aL1,aR1
@@ -1256,7 +1271,7 @@ subroutine getDecay_Couplings_Spinors_Props(VVMode,idordered,pordered,h3,h4, sp,
    !print *,"aL2,aR2=",aL2,aR2
 
    sp(3,:) = sp(3,:)*propV(1)
-   sp(4,:) = sp(4,:)*propV(2)   
+   sp(4,:) = sp(4,:)*propV(2)
    if (h3.eq.-1) then
       sp(3,:) = aL1 * sp(3,:)
    elseif(h3.eq.1) then

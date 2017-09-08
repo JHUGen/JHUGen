@@ -1180,6 +1180,9 @@ void TUtil::SetCKMElements(double* invckm_ud, double* invckm_us, double* invckm_
   cabib_.Vcb = __modparameters_MOD_ckmbare(&i, &j);
   // Do not call ckmfill_(), it is called by MCFM_chooser!
 }
+double TUtil::GetCKMElement(int iquark, int jquark){
+  return __modparameters_MOD_ckmbare(&iquark, &jquark);
+}
 
 double TUtil::GetMass(int ipart){
   const int ipartabs = abs(ipart);
@@ -3508,11 +3511,9 @@ void TUtil::SetJHUGenSpinZeroVVCouplings(double Hvvcoupl[SIZE_HVV][2], int Hvvco
 }
 void TUtil::SetJHUGenSpinZeroContactTerms(
   double Hzzpcoupl[SIZE_HVV][2], double Hzpzpcoupl[SIZE_HVV][2], double Zpffcoupl[SIZE_Vpff][2],
-  double Hwwpcoupl[SIZE_HVV][2], double Hwpwpcoupl[SIZE_HVV][2], double Wpffcoupl[SIZE_Vpff][2],
-  bool UseVprime
+  double Hwwpcoupl[SIZE_HVV][2], double Hwpwpcoupl[SIZE_HVV][2], double Wpffcoupl[SIZE_Vpff][2]
   ){
-  int usevp = (UseVprime ? 1 : 0);
-  __modjhugenmela_MOD_setspinzerocontactterms(Hzzpcoupl, Hzpzpcoupl, Zpffcoupl, Hwwpcoupl, Hwpwpcoupl, Wpffcoupl, &usevp);
+  __modjhugenmela_MOD_setspinzerocontactterms(Hzzpcoupl, Hzpzpcoupl, Zpffcoupl, Hwwpcoupl, Hwpwpcoupl, Wpffcoupl);
 }
 void TUtil::SetJHUGenSpinZeroGGCouplings(double Hggcoupl[SIZE_HGG][2]){ __modjhugenmela_MOD_setspinzeroggcouplings(Hggcoupl); }
 void TUtil::SetJHUGenSpinZeroQQCouplings(double Hqqcoupl[SIZE_HQQ][2]){ __modjhugenmela_MOD_setspinzeroqqcouplings(Hqqcoupl); }
@@ -6456,7 +6457,7 @@ double TUtil::VHiggsMatEl(
 
     // Setup outgoing partons
     vector<pair<int, int>> outgoingPartons;
-    if ((partonIsKnown[2] && partonIsKnown[3]) || production==TVar::GammaH) outgoingPartons.push_back(pair<int, int>(MYIDUP_prod[2], MYIDUP_prod[3])); // Parton 0 and 1 are both known or Lep_WH
+    if ((partonIsKnown[2] && partonIsKnown[3]) || production==TVar::GammaH) outgoingPartons.push_back(pair<int, int>(MYIDUP_prod[2], MYIDUP_prod[3])); // Parton 0 and 1 are both known or Lep_ZH
     else if (!partonIsKnown[2] && !partonIsKnown[3]){ // Parton 0 and 1 are unknown
       // Consider all 4 outgoing cases: d au, au d, u ad, ad u
       outgoingPartons.push_back(pair<int, int>(1, -1)); // Z -> dd~

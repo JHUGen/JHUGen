@@ -23,7 +23,7 @@ public:
   void SetVerbosity(const TVar::VerbosityLevel verbosity_){ verbosity=verbosity_; }
 
   void SetupResolutionModel(TVar::Production prod);
-  float GetConvBW(TVar::Production prod, MELACandidate* cand);
+  float GetConvBW(TVar::Production prod, MELACandidate* cand, bool useTrueBW);
 
 };
 
