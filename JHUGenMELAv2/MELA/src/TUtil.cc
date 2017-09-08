@@ -6457,7 +6457,7 @@ double TUtil::VHiggsMatEl(
 
     // Setup outgoing partons
     vector<pair<int, int>> outgoingPartons;
-    if ((partonIsKnown[2] && partonIsKnown[3]) || production==TVar::GammaH) outgoingPartons.push_back(pair<int, int>(MYIDUP_prod[2], MYIDUP_prod[3])); // Parton 0 and 1 are both known or Lep_WH
+    if ((partonIsKnown[2] && partonIsKnown[3]) || production==TVar::GammaH) outgoingPartons.push_back(pair<int, int>(MYIDUP_prod[2], MYIDUP_prod[3])); // Parton 0 and 1 are both known or Lep_ZH
     else if (!partonIsKnown[2] && !partonIsKnown[3]){ // Parton 0 and 1 are unknown
       // Consider all 4 outgoing cases: d au, au d, u ad, ad u
       outgoingPartons.push_back(pair<int, int>(1, -1)); // Z -> dd~
