@@ -127,12 +127,16 @@ logical, public, parameter :: importExternal_LHEinit = .true.
 !=====================================================
 !cuts - should be set on the command line
 real(8), public :: pTjetcut = -1d0*GeV                        ! jet min pt, default is set in main (0 in VH, 15 GeV otherwise)
+real(8), public :: etajetcut = -1d0                           ! jet max |eta|, default is set in main (4 in offshell VBF, infinity elsewhere)
+real(8), public :: detajetcut = -1d0                          ! min difference in eta between jets (default 2 in VBF offshell, 0 elsewhere)
 real(8), public :: Rjet = -1d0                                ! jet deltaR, anti-kt algorithm, default is set in main (0 in VH, 0.3 otherwise)
 real(8), public :: mJJcut = 0d0*GeV                           ! minimum mJJ for VBF, HJJ, bbH, VH
 real(8), public :: m4l_minmax(1:2) = (/ -1d0,-1d0 /)*GeV      ! min and max for m_4l in off-shell VBF production;   default is (-1,-1): m_4l ~ Higgs resonance (on-shell)
 logical, public :: includeGammaStar = .false.                 ! include offshell photons?
 logical, public :: includeVprime = .false.
-real(8), public :: MPhotonCutoff = 4d0*GeV                    ! minimum |mass| for offshell photons when includeGammaStar = .true.
+real(8), public :: Mllcut = -1d0*GeV                          ! minimum |mass_ll| for offshell photons when includeGammaStar = .true. or in VBF bkg
+real(8), public :: pTlepcut = -1d0*GeV
+real(8), public :: etalepcut = -1d0
 !=====================================================
 
 
@@ -2284,12 +2288,13 @@ character(len=*), parameter :: numbers = "0123456789"
 end subroutine ReadCommandLineArgument_logical
 
 
-subroutine ReadCommandLineArgument_integer(argument, argumentname, success, dest, SetLastArgument, success2, success3, success4, success5)
+subroutine ReadCommandLineArgument_integer(argument, argumentname, success, dest, SetLastArgument, success2, success3, success4, success5, multiply)
 implicit none
 character(len=*) :: argument, argumentname
 integer, intent(inout) :: dest
 logical, intent(inout) :: success
 logical, optional, intent(inout) :: SetLastArgument, success2, success3, success4, success5
+integer, optional, intent(in) :: multiply
 integer :: length
 
     if (present(SetLastArgument)) SetLastArgument=.false.
@@ -2298,6 +2303,7 @@ integer :: length
 
     if( argument(1:length+1) .eq. trim(argumentname)//"=" ) then
         read(argument(length+2:len(argument)), *) dest
+        if (present(multiply)) dest = dest*multiply
         success=.true.
         if (present(SetLastArgument)) SetLastArgument=.true.
         if (present(success2)) success2=.true.
@@ -2309,12 +2315,13 @@ integer :: length
 end subroutine ReadCommandLineArgument_integer
 
 
-subroutine ReadCommandLineArgument_real8(argument, argumentname, success, dest, SetLastArgument, success2, success3, success4, success5)
+subroutine ReadCommandLineArgument_real8(argument, argumentname, success, dest, SetLastArgument, success2, success3, success4, success5, multiply)
 implicit none
 character(len=*) :: argument, argumentname
 real(8), intent(inout) :: dest
 logical, intent(inout) :: success
 logical, optional, intent(inout) :: SetLastArgument, success2, success3, success4, success5
+real(8), optional, intent(in) :: multiply
 integer :: length
 
     if (present(SetLastArgument)) SetLastArgument=.false.
@@ -2323,6 +2330,7 @@ integer :: length
 
     if( argument(1:length+1) .eq. trim(argumentname)//"=" ) then
         read(argument(length+2:len(argument)), *) dest
+        if (present(multiply)) dest = dest*multiply
         success=.true.
         if (present(SetLastArgument)) SetLastArgument=.true.
         if (present(success2)) success2=.true.
@@ -2334,13 +2342,15 @@ integer :: length
 end subroutine ReadCommandLineArgument_real8
 
 
-subroutine ReadCommandLineArgument_complex8(argument, argumentname, success, dest, SetLastArgument, success2, success3, success4, success5)
+subroutine ReadCommandLineArgument_complex8(argument, argumentname, success, dest, SetLastArgument, success2, success3, success4, success5, multiply, multiplyreal)
 implicit none
 character(len=*) :: argument, argumentname
 complex(8), intent(inout) :: dest
 real(8) :: re, im
 logical, intent(inout) :: success
 logical, optional, intent(inout) :: SetLastArgument, success2, success3, success4, success5
+complex(8), optional, intent(in) :: multiply
+real(8), optional, intent(in) :: multiplyreal
 integer :: length
 
     if (present(SetLastArgument)) SetLastArgument=.false.
@@ -2359,6 +2369,8 @@ integer :: length
         endif
         read(argument(length+2:len(argument)), *) re, im
         dest = dcmplx(re, im)
+        if (present(multiply)) dest = dest*multiply
+        if (present(multiplyreal)) dest = dest*multiplyreal
         success=.true.
         if (present(SetLastArgument)) SetLastArgument=.true.
         if (present(success2)) success2=.true.
