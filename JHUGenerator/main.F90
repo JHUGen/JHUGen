@@ -990,7 +990,7 @@ logical :: SetColliderEnergy
     elseif( (IsAZDecay(DecayMode1) .and. IsAPhoton(DecayMode2) .and. Process.eq.0) .or. (Process.eq.50 .and. IsAPhoton(DecayMode1)) ) then
         includeGammaStar = Setgammagammacoupling
     else if (Process.eq.67 .or. Process.eq.68 .or. Process.eq.69) then
-        includeGammaStar = .true. ! Not really gamma*, but rather gamma* or gluon, set to true to manipulate pahsespace generation
+        includeGammaStar = .true. ! Not really gamma*, but rather gamma* or gluon, set to true to manipulate phasespace generation
     endif
 
     if( (DecayMode1.ge.12) .or. (DecayMode2.ge.12) .or. (DecayMode1.lt..0) .or. (DecayMode2.lt.0) ) then
@@ -5185,6 +5185,11 @@ implicit none
         print *, "   deltaRcut:         Minimum deltaR for jets (default: 0.3)"
         print *, "   mJJcut:            Minimum dijet mass in GeV (default: 0)"
         print *, "   mllcut:            Minimum mass for offshell photons in GeV, when included (default: 4)"
+        print *, "   etajetcut:         Maximum |eta| for jets in offshell VBF (default: 4)"
+        print *, "   detajetcut:        Minimum deltaeta between jets in offshell VBF (default: 2)"
+        print *, "   pTlepcut:          Minimum pT for leptons in offshell VBF, in GeV (default: 3)"
+        print *, "   etalepcut:         Maximum |eta| for leptons in offshell VBF (default: 2.7)"
+        print *, "   m4l_min, m4l_max:  Minimum and maximum four-lepton mass in offshell VBF"
         print *, " Renormalization and factorization scales:"
         print *, "   FacScheme:         PDF factorization scale scheme"
         print *, "   MuFacMultiplier:   Multiplier for the factorization scale chosen by FacScheme"

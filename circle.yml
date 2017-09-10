@@ -268,7 +268,7 @@ test:
     - ./JHUGen Seed=$SEED PDFSet=3 Process=62 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/HJ $REFERENCE_COUPLINGS
     - ./JHUGen Seed=$SEED VegasNc0=100000 ReadLHE=compare_to_reference/HJ.lhe DataFile=compare_to_reference/HJ_gammagamma DecayMode1=7 DecayMode2=7 $REFERENCE_COUPLINGS
 
-    - ./JHUGen Seed=$SEED PDFSet=3 Process=66 VegasNc0=10000 VegasNc2=1 VBF_m4l_min=100 VBF_m4l_max=200 DataFile=compare_to_reference/VBFoffshell_66
+    - ./JHUGen Seed=$SEED PDFSet=3 Process=66 VegasNc0=10000 VegasNc2=1 m4l_min=100 m4l_max=200 DataFile=compare_to_reference/VBFoffshell_66
 
     - ./JHUGen Seed=$SEED PDFSet=3 Process=80 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/ttH TopDK=1 DecayMode1=11 DecayMode2=11 $REFERENCE_COUPLINGS
     - ./JHUGen Seed=$SEED VegasNc0=100000 ReadLHE=compare_to_reference/ttH.lhe DataFile=compare_to_reference/ttH_tautau DecayMode1=11 DecayMode2=11 TauDK=1 $REFERENCE_COUPLINGS
