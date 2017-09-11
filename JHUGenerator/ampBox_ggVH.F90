@@ -1,56 +1,16 @@
-function calc_MassiveTensorBox(MV2,MT2,MH2,shat,that,uhat,smT,y,LC,SP,SI,kap,kapPr)
+function calc_MassiveTensorBox(MV2,MT2,MH2,shat,that,uhat,smT,y,LC,SP,DD0,DD1,DD2,DD3,kap,kapPr)
 #if useCollier==1      
    use COLLIER
 #endif
 implicit none
 real(8),parameter :: E=dexp(1d0)
 real(8) :: shat,that,uhat,smT,y,MV2,MT2,MH2
-complex(8) :: calc_MassiveTensorBox, LC(1:15),SI(0:16),SP(1:7),kap,kapPr
+complex(8) :: calc_MassiveTensorBox, LC(1:15),DD0(2:4),SP(1:7),kap,kapPr
 integer,parameter :: rank=3
 double complex :: DD1(0:rank/2,0:rank,0:rank,0:rank),DD1uv(0:rank/2,0:rank,0:rank,0:rank)
 double complex :: DD2(0:rank/2,0:rank,0:rank,0:rank),DD2uv(0:rank/2,0:rank,0:rank,0:rank)
 double complex :: DD3(0:rank/2,0:rank,0:rank,0:rank),DD3uv(0:rank/2,0:rank,0:rank,0:rank)
-double complex :: D0
-double precision :: Derr(0:rank)
 
-! {0, MH^2, MV^2, 0, that, shat, MT^2, MT^2, MT^2, MT^2} -> arg3, 
-! {0,   MV^2, MH^2, 0, uhat, shat, MT^2, MT^2, MT^2, MT^2} -> arg4, 
-! {MV^2,   0, MH^2, 0, uhat, that, MT^2, MT^2, MT^2, MT^2} -> arg5
-! 
-! SI[3, 0, 0, shat, MT^2, MT^2, MT^2], 
-! SI[4, 0, 0, MV^2, MH^2, shat, that, MT^2, MT^2, MT^2, MT^2], 
-! SI[4, 0, 0, MV^2, MH^2, shat, uhat, MT^2, MT^2, MT^2, MT^2], 
-! SI[4, 0, MV^2, 0, MH^2, that, uhat, MT^2, MT^2, MT^2, MT^2]
-
-#if useCollier==1      
-      DD1(:,:,:,:) = 0d0
-
-      call D_cll(DD1,DD1uv,dcmplx((/0d0,MH2,MV2,0d0,that,shat/)),dcmplx((/MT2,MT2,MT2,MT2/)),rank,Derr)  
-      call D_cll(DD2,DD2uv,dcmplx((/0d0,MV2,MH2,0d0,uhat,shat/)),dcmplx((/MT2,MT2,MT2,MT2/)),rank,Derr)  
-      call D_cll(DD3,DD3uv,dcmplx((/MV2,0d0,MH2,0d0,uhat,that/)),dcmplx((/MT2,MT2,MT2,MT2/)),rank,Derr)      
-
-      call D0_cll(D0,dcmplx((/0d0,0d0,MV2,MH2,shat,that/)),dcmplx((/MT2,MT2,MT2,MT2/)))  
-      SI(2) = D0
-
-      call D0_cll(D0,dcmplx((/0d0,0d0,MV2,MH2,shat,uhat/)),dcmplx((/MT2,MT2,MT2,MT2/)))  
-      SI(3) = D0
-
-      call D0_cll(D0,dcmplx((/0d0,MV2,0d0,MH2,that,uhat/)),dcmplx((/MT2,MT2,MT2,MT2/)))  
-      SI(4) = D0
-#else
-      print *, "Not evaluating ggVH box diagrams"
-      calc_MassiveTensorBox = 0d0
-      return
-#endif
-
-
-! print *, ">>>",cdabs((/DD1(0,0,0,1),DD1(0,0,0,2),DD1(0,0,1,0),DD1(0,0,1,1),DD1(0,0,1,2),DD1(0,0,2,0),DD1(0,0,2,1),DD1(0,0,3,0),DD1(0,1,0,0),DD1(0,1,0,1),DD1(0,1,0,2),DD1(0,1,1,0),DD1(0,1,1,1),DD1(0,1,2,0),DD1(0,2,0,0),DD1(0,2,0,1),DD1(0,2,1,0),DD1(1,0,0,0),DD1(1,0,0,1),DD1(1,0,1,0),DD1(1,1,0,0) /))
-! 
-! print *, ">>>",cdabs((/DD2(0,0,0,1),DD2(0,0,0,2),DD2(0,0,1,0),DD2(0,0,1,1),DD2(0,0,1,2),DD2(0,0,2,0),DD2(0,0,2,1),DD2(0,0,3,0),DD2(0,1,0,0),DD2(0,1,0,1),DD2(0,1,0,2),DD2(0,1,1,0),DD2(0,1,1,1),DD2(0,1,2,0),DD2(0,2,0,0),DD2(0,2,0,1),DD2(0,2,1,0),DD2(1,0,0,0),DD2(1,0,0,1),DD2(1,0,1,0),DD2(1,1,0,0) /))
-! 
-! print *, ">>>",cdabs((/DD3(0,0,0,1),DD3(0,0,0,2),DD3(0,0,1,0),DD3(0,0,1,1),DD3(0,0,1,2),DD3(0,0,2,0),DD3(0,0,2,1),DD3(0,0,3,0),DD3(0,1,0,0),DD3(0,1,0,1),DD3(0,1,0,2),DD3(0,1,1,0),DD3(0,1,1,1),DD3(0,1,2,0),DD3(0,2,0,0),DD3(0,2,0,1),DD3(0,2,1,0),DD3(0,3,0,0),DD3(1,0,0,0),DD3(1,0,1,0),DD3(1,1,0,0) /))
-
-! pause
 
 
   calc_MassiveTensorBox = kap*(-48*DD1(1,0,0,1)*LC(1) - 48*DD2(1,0,0,1)*LC(1) + &
@@ -77,10 +37,10 @@ double precision :: Derr(0:rank)
            DD1(0,2,0,0)*(-4*E**y*smT*LC(11) + 8*LC(13)*SP(4)) + &
            DD2(0,1,0,0)*(4*(-2*MT2 + E**y*smT)*LC(11) - &
               8*(LC(3) + LC(13))*SP(4)) + &
-           SI(3)*((-2*smT*LC(11))/E**y + &
+           DD0(3)*((-2*smT*LC(11))/E**y + &
               4*MT2*(LC(1) - 2*LC(11) + LC(15)) + 4*LC(13)*SP(3) - &
               8*LC(3)*SP(4) - 4*LC(5)*SP(5)) + &
-           SI(2)*(2*E**y*smT*LC(1) + &
+           DD0(2)*(2*E**y*smT*LC(1) + &
               MT2*(8*LC(1) - 4*(LC(11) + LC(15))) - 8*LC(3)*SP(3) - &
               4*LC(9)*SP(4) + 4*LC(5)*SP(5)) + &
            4*DD2(0,0,0,1)*((2*MT2 - shat + smT/E**y)*LC(1) + &
@@ -107,7 +67,7 @@ double precision :: Derr(0:rank)
               2*(LC(2) - LC(8))*SP(7)) + &
            DD3(0,1,0,0)*(-8*MV2*LC(1) + 4*shat*LC(15) + 8*LC(7)*SP(1) + &
               8*LC(4)*SP(6) - 8*LC(14)*SP(6) - 24*LC(8)*SP(7)) + &
-           SI(4)*(4*(MT2 - MV2)*LC(1) - 4*MT2*LC(11) + 2*shat*LC(15) + &
+           DD0(4)*(4*(MT2 - MV2)*LC(1) - 4*MT2*LC(11) + 2*shat*LC(15) + &
               4*LC(7)*SP(1) + 4*LC(4)*SP(6) - 8*LC(8)*SP(7)) + &
            8*DD1(0,0,3,0)*(-3*MV2*LC(1) + MV2*LC(15) + 2*LC(9)*SP(3) + &
               2*LC(10)*SP(6) - 2*LC(8)*SP(7)) + &
@@ -252,7 +212,7 @@ double precision :: Derr(0:rank)
             (SP(3)*SP(5) - SP(2)*SP(6) + SP(1)*SP(7)) + &
            (4*(E**y*shat - smT)*DD3(0,0,1,1)* &
               ((SP(3) + SP(4))*SP(5) - 2*SP(2)*SP(6) + 2*SP(1)*SP(7)))/ &
-            E**y + SI(2)*(2*E**y*smT*SP(3)*SP(5) - &
+            E**y + DD0(2)*(2*E**y*smT*SP(3)*SP(5) - &
               (2*smT*SP(4)*SP(5))/E**y - &
               2*shat*(2*SP(3)*SP(5) + SP(2)*SP(6) - SP(1)*SP(7)) + &
               4*MT2*(SP(4)*SP(5) + SP(2)*SP(6) - SP(1)*SP(7))) + &
@@ -260,7 +220,7 @@ double precision :: Derr(0:rank)
               (4*smT*(SP(4)*SP(5) + SP(2)*SP(6) - SP(1)*SP(7)))/E**y) + &
            DD2(0,1,1,0)*(8*shat*SP(1)*SP(7) + &
               4*E**y*smT*(SP(3)*SP(5) - SP(2)*SP(6) + SP(1)*SP(7))) + &
-           SI(3)*(-2*E**y*smT*SP(3)*SP(5) + (2*smT*SP(4)*SP(5))/E**y + &
+           DD0(3)*(-2*E**y*smT*SP(3)*SP(5) + (2*smT*SP(4)*SP(5))/E**y + &
               4*MT2*(SP(3)*SP(5) - SP(2)*SP(6) + SP(1)*SP(7)) - &
               2*shat*(2*SP(4)*SP(5) - SP(2)*SP(6) + SP(1)*SP(7))) + &
            (DD3(0,1,0,1)*(-8*E**y*shat*SP(2)*SP(6) - &
@@ -272,7 +232,7 @@ double precision :: Derr(0:rank)
               MV2*(-2*SP(3)*SP(5) + 2*SP(2)*SP(6)) + &
               ((2*MT2 + 3*shat)*SP(1) + 2*(3*SP(3) + SP(4))*SP(6))* &
                SP(7) - (smT*(SP(4)*SP(5) + 3*SP(1)*SP(7)))/E**y) + &
-           (SI(4)*(2*E**(2*y)*smT*SP(3)*SP(5) - &
+           (DD0(4)*(2*E**(2*y)*smT*SP(3)*SP(5) - &
                 2*smT*(SP(4)*SP(5) + 2*SP(1)*SP(7)) + &
                 2*E**y*(2*(-(MV2*SP(3)) + MT2*(SP(3) + SP(4)))*SP(5) - &
                    shat*SP(2)*SP(6) + &
@@ -335,6 +295,8 @@ end function
 
 
 
+
+#if 0==1 
 
 
 
@@ -3929,6 +3891,7 @@ end function
 
 
 
+#endif 
 
 
 
