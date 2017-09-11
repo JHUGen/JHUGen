@@ -847,7 +847,7 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "mllcut", success, mllcut, multiply=GeV, success2=Setmllcut)
     call ReadCommandLineArgument(arg, "pTlepcut", success, pTlepcut, multiply=GeV, success2=SetpTlepcut)
     call ReadCommandLineArgument(arg, "etalepcut", success, etalepcut, success2=Setetalepcut)
-    call ReadCommandLineArgument(arg, "JetsInOppositeHemispheres", success, JetsInOppositeHemispheres)
+    call ReadCommandLineArgument(arg, "JetsOppositeEta", success, JetsOppositeEta)
 
     !compatibility
     call ReadCommandLineArgument(arg, "MPhotonCutoff", success, mllcut, multiply=GeV, success2=Setmllcut)  !undocumented, for compatibility
@@ -4628,7 +4628,7 @@ character :: arg*(500)
         if( Process.ge.66 .and. Process.le.69 ) then
             write(TheUnit,"(9X,A,F8.2)") "|eta| <= ", etajetcut
             write(TheUnit,"(4X,A,F8.2)") "|Deltaeta| >= ", detajetcut
-            if (JetsInOppositeHemispheres) write(TheUnit,"(5X,A,F8.2)") "eta1*eta2 <= ", 0d0
+            if (JetsOppositeEta) write(TheUnit,"(5X,A,F8.2)") "eta1*eta2 <= ", 0d0
         endif
         if( Process.eq.50 .or. Process.eq.60 .or. Process.eq.61 .or. (Process.ge.66 .and. Process.le.69) .or. Process.eq.80 .or. Process.eq.90) then
             write(TheUnit,"(8X,A,F8.2)") "DeltaR >= ", Rjet

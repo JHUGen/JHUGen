@@ -137,7 +137,7 @@ logical, public :: includeVprime = .false.
 real(8), public :: Mllcut = -1d0*GeV                          ! minimum |mass_ll| for offshell photons when includeGammaStar = .true. or in VBF bkg
 real(8), public :: pTlepcut = -1d0*GeV
 real(8), public :: etalepcut = -1d0
-logical, public :: JetsInOppositeHemispheres = .true.
+logical, public :: JetsOppositeEta = .true.
 !=====================================================
 
 
