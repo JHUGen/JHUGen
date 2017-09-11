@@ -2050,7 +2050,7 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
            return
         endif
 
-        if( abs(y_j1-y_j2).lt.detajetcut .or. y_j1*y_j2.gt.0d0 ) then
+        if( abs(y_j1-y_j2).lt.detajetcut .or. (JetsInOppositeHemispheres .and. y_j1*y_j2.gt.0d0) ) then
            applyPSCut=.true.
            return
         endif

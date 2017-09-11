@@ -847,6 +847,7 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "mllcut", success, mllcut, multiply=GeV, success2=Setmllcut)
     call ReadCommandLineArgument(arg, "pTlepcut", success, pTlepcut, multiply=GeV, success2=SetpTlepcut)
     call ReadCommandLineArgument(arg, "etalepcut", success, etalepcut, success2=Setetalepcut)
+    call ReadCommandLineArgument(arg, "JetsInOppositeHemispheres", success, JetsInOppositeHemispheres)
 
     !compatibility
     call ReadCommandLineArgument(arg, "MPhotonCutoff", success, mllcut, multiply=GeV, success2=Setmllcut)  !undocumented, for compatibility
@@ -985,9 +986,9 @@ logical :: SetColliderEnergy
     endif
 
     !decay mode checks
-    if( (IsAZDecay(DecayMode1) .and. IsAZDecay(DecayMode2) .and. Process.eq.0) .or. (Process.eq.50 .and. IsAZDecay(DecayMode1)) .or. Process.eq.60 .or. Process.eq.66 ) then
+    if( (IsAZDecay(DecayMode1) .and. IsAZDecay(DecayMode2) .and. Process.eq.0 .and. TauDecays.lt.0) .or. (Process.eq.50 .and. IsAZDecay(DecayMode1)) .or. Process.eq.60 .or. Process.eq.66 ) then
         includeGammaStar = (SetZgammacoupling .or. Setgammagammacoupling)
-    elseif( (IsAZDecay(DecayMode1) .and. IsAPhoton(DecayMode2) .and. Process.eq.0) .or. (Process.eq.50 .and. IsAPhoton(DecayMode1)) ) then
+    elseif( (IsAZDecay(DecayMode1) .and. IsAPhoton(DecayMode2) .and. Process.eq.0 .and. TauDecays.lt.0) .or. (Process.eq.50 .and. IsAPhoton(DecayMode1)) ) then
         includeGammaStar = Setgammagammacoupling
     else if (Process.eq.67 .or. Process.eq.68 .or. Process.eq.69) then
         includeGammaStar = .true. ! Not really gamma*, but rather gamma* or gluon, set to true to manipulate phasespace generation
@@ -4627,7 +4628,7 @@ character :: arg*(500)
         if( Process.ge.66 .and. Process.le.69 ) then
             write(TheUnit,"(9X,A,F8.2)") "|eta| <= ", etajetcut
             write(TheUnit,"(4X,A,F8.2)") "|Deltaeta| >= ", detajetcut
-            write(TheUnit,"(5X,A,F8.2)") "eta1*eta2 <= ", 0d0
+            if (JetsInOppositeHemispheres) write(TheUnit,"(5X,A,F8.2)") "eta1*eta2 <= ", 0d0
         endif
         if( Process.eq.50 .or. Process.eq.60 .or. Process.eq.61 .or. (Process.ge.66 .and. Process.le.69) .or. Process.eq.80 .or. Process.eq.90) then
             write(TheUnit,"(8X,A,F8.2)") "DeltaR >= ", Rjet
@@ -5187,6 +5188,8 @@ implicit none
         print *, "   mllcut:            Minimum mass for offshell photons in GeV, when included (default: 4)"
         print *, "   etajetcut:         Maximum |eta| for jets in offshell VBF (default: 4)"
         print *, "   detajetcut:        Minimum deltaeta between jets in offshell VBF (default: 2)"
+        print *, "   JetsOppositeEta:   Require sgn(eta) to be opposite for the two jets in offshell VBF"
+        print *, "                      (default: true)"
         print *, "   pTlepcut:          Minimum pT for leptons in offshell VBF, in GeV (default: 3)"
         print *, "   etalepcut:         Maximum |eta| for leptons in offshell VBF (default: 2.7)"
         print *, "   m4l_min, m4l_max:  Minimum and maximum four-lepton mass in offshell VBF"
