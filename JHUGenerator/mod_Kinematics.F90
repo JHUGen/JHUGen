@@ -1976,7 +1976,7 @@ logical :: applyPSCut
 integer :: NBin(:)
 real(8) :: m_jj,y_j1,y_j2,dphi_jj,dy_j1j2,pT_jl,pT_j1,pT_j2,pT_H,m_4l
 real(8) :: pT_l1,pT_l2,pT_l3,pT_l4,y_l1,y_l2,y_l3,y_l4
-real(8) :: Phi1,signPhi1,MomReso(1:4)
+real(8) :: Phi1,signPhi1,MomReso(1:4),dRjj
 integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, Lep1M=8, Lep2P=9, Lep2M=10
 
 
@@ -1997,6 +1997,7 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
        y_l2= get_eta(MomExt(1:4,Lep1M))
        y_l3= get_eta(MomExt(1:4,Lep2P))
        y_l4= get_eta(MomExt(1:4,Lep2M))
+       dRjj = get_R(MomExt(1:4,outTop), MomExt(1:4,outBot))
        pT_jl = max(pT_j1,pT_j2)
        dy_j1j2 = y_j1 - y_j2
 
@@ -2026,6 +2027,7 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
           applyPSCut=.true.
           return
        endif
+
 
 
 !      VERY loose VBF cuts
@@ -2059,6 +2061,10 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
            return
         endif
 
+       if( dRjj.lt.Rjet ) then
+          applyPSCut=.true.
+          return
+       endif
 
        dphi_jj = abs( Get_PHI(MomExt(1:4,3)) - Get_PHI(MomExt(1:4,4)) )
        if( dphi_jj.gt.Pi ) dphi_jj=2d0*Pi-dphi_jj
@@ -4561,6 +4567,64 @@ END SUBROUTINE
 
 
 
+
+
+
+SUBROUTINE EvalPhasespace_VHglu(xRnd,Energy,Mom,Jac)! ordering 1,2:in  3,4:Higgs  56:Z  7:glu
+use ModParameters
+use ModPhasespace
+use ModMisc
+implicit none
+real(8) :: xchannel,xRnd(1:8), Energy, Mom(1:4,1:7)
+real(8) :: Jac,Jac1,Jac2,Jac3,Jac4,Jac5
+real(8) :: s45,s345,Mom_DummyX(1:4),Mom_DummyZ(1:4),Mom_DummyZ2(1:4)
+real(8) :: SingDepth
+integer :: Pcol1,Pcol2,Steps
+
+   Mom(1:4,1) = 0.5d0*Energy * (/+1d0,0d0,0d0,+1d0/)
+   Mom(1:4,2) = 0.5d0*Energy * (/+1d0,0d0,0d0,-1d0/)
+
+!  stable Higgs,  decay not yet implemented but momenta 3+4 are allocated 
+   ! masses
+   Jac1 = s_channel_propagator(M_V**2,0d0,M_Reso**2,Energy**2,xRnd(1),s345)     ! Z*+H
+   Jac2 = s_channel_propagator(M_V**2,Ga_V,0d0,(dsqrt(s345)-m_Reso)**2,xRnd(2),s45)  ! Z-->56
+
+
+!  splittings
+   Mom_DummyX(1:4) = (/Energy,0d0,0d0,0d0/)   
+   Jac3 = s_channel_decay(Mom_DummyX(1:4),s345,0d0,xRnd(3:4),Mom_DummyZ(:),Mom(:,7)) ! Z* + glu
+   Jac4 = s_channel_decay(Mom_DummyZ(1:4),s45,M_Reso**2,xRnd(5:6),Mom_DummyZ2(:),Mom(:,3)) ! Z + H
+   Mom(1:4,4) = 0d0
+   Jac5 = s_channel_decay(Mom_DummyZ2(:),0d0,0d0,xRnd(7:8),Mom(:,5),Mom(:,6)) !  Z --> 56
+   Jac = Jac1*Jac2*Jac3*Jac4*Jac5* PSNorm4
+
+   
+!    this is for the soft/collinear limit checks only!!
+!         Pcol1= 6 -1
+!         Pcol2= 6 -1
+!         SingDepth = 1e-13
+!         Steps = 10
+!         call gensing(4,Energy,(/M_Reso,0d0,0d0,0d0/),Mom(1:4,4:7),Pcol1,Pcol2,SingDepth,Steps)
+!         Mom(1:4,3) = Mom(1:4,4)
+!         Mom(1:4,4) = 0d0
+! !       call genps(4,Energy,xRnd(1:8),(/M_Reso,0d0,0d0,0d0/),(/Mom(1:4,3),Mom(1:4,5),Mom(1:4,6),Mom(1:4,7)/),Jac)
+!         print *, "generating singular phase space"
+!         Jac=1d0        
+        
+!    end check
+   
+
+   if( isNan(jac) ) then
+      print *, "EvalPhasespace_VHglu NaN"
+      print *, Energy
+      print *, s345,s45
+      print *, Jac1,Jac2,Jac3,Jac4,Jac5
+      print *, xRnd  
+      Jac = 0d0
+   endif   
+   
+RETURN
+END SUBROUTINE
 
 
 
