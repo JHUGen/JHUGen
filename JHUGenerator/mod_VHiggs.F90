@@ -1797,7 +1797,7 @@ END SUBROUTINE
 
 
 !         SI(1:16) = 0d0
-#if useQCDLoopLib==1
+#if useQCDLoopLib==1 || linkMELA==1
         SI(1) = qlI1(MT2,MuRen2,eps)
         SI(2) = qlI2(zero, MT2,MT2,MuRen2,eps)
         SI(3) = qlI2(MH2,  MT2,MT2,MuRen2,eps)
@@ -1814,14 +1814,12 @@ END SUBROUTINE
         SI(14)= qlI4(zero,zero,MV2,MH2,shat,that, MT2,MT2,MT2,MT2,MuRen2,eps)
         SI(15)= qlI4(zero,zero,MV2,MH2,shat,uhat, MT2,MT2,MT2,MT2,MuRen2,eps)
         SI(16)= qlI4(zero,MV2,zero,MH2,that,uhat, MT2,MT2,MT2,MT2,MuRen2,eps)
-
 #else
-
-    print *, "No loop integrals"
+    call Error("This process requires linkQCDLoop or linkMELA enabled in the makefile")
 #endif
 
 
-#if useCollier==1      
+#if useCollier==1
       call D_cll(DD1,DD1uv,dcmplx((/0d0,MH2,MV2,0d0,that,shat/)),dcmplx((/MT2,MT2,MT2,MT2/)),rank,Derr)  
       call D_cll(DD2,DD2uv,dcmplx((/0d0,MV2,MH2,0d0,uhat,shat/)),dcmplx((/MT2,MT2,MT2,MT2/)),rank,Derr)  
       call D_cll(DD3,DD3uv,dcmplx((/MV2,0d0,MH2,0d0,uhat,that/)),dcmplx((/MT2,MT2,MT2,MT2/)),rank,Derr)      
@@ -1830,7 +1828,7 @@ END SUBROUTINE
       call D0_cll(DD0(2),dcmplx((/0d0,0d0,MV2,MH2,shat,uhat/)),dcmplx((/MT2,MT2,MT2,MT2/)))  
       call D0_cll(DD0(3),dcmplx((/0d0,MV2,0d0,MH2,that,uhat/)),dcmplx((/MT2,MT2,MT2,MT2/)))
 #else
-      print *, "Not evaluating tensor integrals"
+      call Error("This process requires linkCollier enabled in the makefile")
 #endif
 
 
@@ -2336,9 +2334,13 @@ complex(8) :: qlI2,qlI3,SI(2:3),C(1:1)
     C(1) = (-2d0,0d0)
     if( xe.ne.0 ) C(1)=(0d0,0d0)
 
+#if useQCDLoopLib==1 || linkMELA==1
     SI(2) = qlI2(shat,0d0,0d0,Mu_Ren**2,xe)
     SI(3) = qlI3(shat,0d0,0d0,0d0,0d0,0d0,Mu_Ren**2,xe)
     FF1 = C(1) -3d0*SI(2) -2d0*sHat*SI(3)
+#else
+    call Error("This process requires linkQCDLoop or linkMELA enabled in the makefile")
+#endif
 
 END SUBROUTINE
 
@@ -2566,6 +2568,7 @@ END SUBROUTINE
       di(:)=(0d0,0d0)
       cii(:)=(0d0,0d0)
 !
+#if useQCDLoopLib==1 || linkMELA==1
      D0(d25_12)=qlI4(mZsq,0d0,0d0,mHsq,s25,s12,mt2,mt2,mt2,mt2,Mu_Ren**2,0) 
      D0(d15_12)=qlI4(mZsq,0d0,0d0,mHsq,s15,s12,mt2,mt2,mt2,mt2,Mu_Ren**2,0) 
      D0(d15_25)=qlI4(mHsq,0d0,mZsq,0d0,s15,s25,mt2,mt2,mt2,mt2,Mu_Ren**2,0) 
@@ -2574,7 +2577,9 @@ END SUBROUTINE
      C0(c12)=qlI3(s12,0d0,0d0,mt2,mt2,mt2,Mu_Ren**2,0) 
      C0(c15_H)=qlI3(s15,0d0,mHsq,mt2,mt2,mt2,Mu_Ren**2,0) 
      C0(cZ_15)=qlI3(mZsq,0d0,s15,mt2,mt2,mt2,Mu_Ren**2,0) 
-      
+#else
+    call Error("This process requires linkQCDLoop or linkMELA enabled in the makefile")
+#endif
 
 !------- coefficiients of integrals 
 
@@ -2871,6 +2876,7 @@ END SUBROUTINE
 
 !----- fill integrals from QCD loop : boxes
 
+#if useQCDLoopLib==1 || linkMELA==1
      D0(d25_12)=qlI4(mZsq,0d0,0d0,mHsq,s25,s12,mt2,mt2,mt2,mt2,Mu_Ren**2,0)
      D0(d15_12)=qlI4(mZsq,0d0,0d0,mHsq,s15,s12,mt2,mt2,mt2,mt2,Mu_Ren**2,0)
      D0(d15_25)=qlI4(mHsq,0d0,mZsq,0d0,s15,s25,mt2,mt2,mt2,mt2,Mu_Ren**2,0)
@@ -2882,6 +2888,9 @@ END SUBROUTINE
      C0(c15_H)=qlI3(s15,0d0,mHsq,mt2,mt2,mt2,Mu_Ren**2,0)
      C0(cZ_15)=qlI3(mZsq,0d0,s15,mt2,mt2,mt2,Mu_Ren**2,0)
      C0(c12_Z_H)=qlI3(s12,mZsq,mHsq,mt2,mt2,mt2,Mu_Ren**2,0)
+#else
+    call Error("This process requires linkQCDLoop or linkMELA enabled in the makefile")
+#endif
 
 !------ box coefficiients
       di(d25_12)= ggHZ_mp_2mh_b1(i1,i2,i3,i4,za,zb,s,mt2)

@@ -54,7 +54,7 @@ endif
 linkCollierLib = No
 
 ifeq ($(linkCollierLib),Yes)
-   CollierLibflags = -DuseCollier=1 -L$(CollierDir) -lcollier
+   CollierLibflags = -DuseCollier=1 -L$(CollierDir) -I$(CollierDir)/modules -lcollier
 else
    CollierLibflags = -DuseCollier=0
 endif
