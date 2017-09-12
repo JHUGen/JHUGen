@@ -853,10 +853,10 @@ use ModParameters
 use ModMisc
 implicit none
 integer,parameter :: NUP=10
-real(8) :: Mom(1:4,1:NUP),xRnd
+real(8) :: Mom(1:4,1:NUP),xRnd,s34,s36,s45,s56
 real(8),optional :: EventWeight
 integer :: MY_IDUP(1:NUP),ICOLUP(1:2,1:NUP),LHE_IDUP(1:NUP),ISTUP(1:NUP),MOTHUP(1:2,1:NUP)
-integer :: IDPRUP,i
+integer :: IDPRUP,i,smallestInv
 real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP,Lifetime,Spin,MomDummy(1:4,1:NUP),TheMass
 character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0)"
 integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, Lep1M=8, Lep2P=9, Lep2M=10
@@ -900,27 +900,35 @@ integer, parameter :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6,5/)
          endif
       endif
       
-
-      call random_number(xRnd)
-      MY_IDUP(5:6) = (/Z0_,Z0_/)
       ISTUP(5:6) = 2
-      ICOLUP(1:2,5:10) = 0
+      ICOLUP(1:2,5:6) = 0
       MOTHUP(1:2,5)=(/1,2/)
-      MOTHUP(1:2,6)=(/1,2/)
-      if( xRnd.lt.0.5d0 ) then
-         MY_IDUP(7:8) = (/ElM_,ElP_/)
-      else 
-         MY_IDUP(7:8) = (/MuM_,MuP_/)
-      endif
-      if( xRnd.gt.0.25d0 .and. xRnd.lt.0.75d0) then
-         MY_IDUP(9:10) = (/MuM_,MuP_/)
-      else 
-         MY_IDUP(9:10) = (/ElM_,ElP_/)
-      endif
+      MOTHUP(1:2,6)=(/1,2/) 
+
       MOTHUP(1:2,7 )= (/5,5/)
       MOTHUP(1:2,8 )= (/5,5/)
       MOTHUP(1:2,9 )= (/6,6/)
       MOTHUP(1:2,10)= (/6,6/)
+            
+!  associte lepton pairs to MOTHUP
+      if( MY_IDUP(7).eq.MY_IDUP(9) ) then
+          s34 = Get_MInv( Mom(1:4,7)+Mom(1:4,8) )
+          s56 = Get_MInv( Mom(1:4,9)+Mom(1:4,10) )
+          s36 = Get_MInv( Mom(1:4,7)+Mom(1:4,10) )
+          s45 = Get_MInv( Mom(1:4,8)+Mom(1:4,9) )
+          smallestInv = minloc((/dabs(s34-M_V),dabs(s56-M_V),dabs(s36-M_V),dabs(s45-M_V)/),1)
+          if( smallestInv.eq.3 .or. smallestInv.eq.4 ) then
+              call swapi(MOTHUP(1,7),MOTHUP(1,9))
+              call swapi(MOTHUP(2,7),MOTHUP(2,9))
+!               call swapi(ICOLUP(1,7),ICOLUP(1,9))
+!               call swapi(ICOLUP(2,7),ICOLUP(2,9))
+!               Z1FV(1:4) = MomDummy(1:4,3)+MomDummy(1:4,6)
+!               Z2FV(1:4) = MomDummy(1:4,5)+MomDummy(1:4,4)
+          endif
+      endif
+      
+      
+      
       
 
       if( present(EventWeight) ) then
@@ -5117,15 +5125,16 @@ END SUBROUTINE
 
 
 
-SUBROUTINE EvalPhasespace_VBF_H4f(xchannel,xRnd,Energy,Mom,Jac)
+SUBROUTINE EvalPhasespace_VBF_H4f(xchannel,xRnd,Energy,Mom,Jac,EqualLeptons)
 use ModParameters
 use ModPhasespace
 use ModMisc
 implicit none
 real(8) :: xchannel,xRnd(:), Energy, Mom(:,:)
+integer :: EqualLeptons
 integer :: iChannel
 real(8) :: Jac,Jac1,Jac2,Jac3,Jac4,Jac5,Jac6,Jac7,Jac8,Jac9
-real(8) :: s3H,s4H,s56,s78,s910,s34,s35,s46,Mom_Dummy(1:4),Mom_Dummy2(1:4),xRndOffShellZ,Emin,Emax
+real(8) :: s3H,s4H,s56,s78,s910,s34,s35,s46,Mom_Dummy(1:4),Mom_Dummy2(1:4),xRndLeptInterf,Emin,Emax
 real(8), parameter :: RescaleWidth=1d0
 integer, parameter :: NumChannels=5   !7
 integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, Lep1M=8, Lep2P=9, Lep2M=10
@@ -5340,10 +5349,22 @@ ELSEIF( iChannel.EQ.5 ) THEN
 !  splittings
    Jac5 = s_channel_decay((/Energy,0d0,0d0,0d0/),s34,s56,xRnd(5:6),Mom_Dummy(:),Mom_Dummy2(:)) !   Z* --> Z+H
    Jac6 = s_channel_decay(Mom_Dummy(:),0d0,0d0,xRnd(7:8),Mom(:,3),Mom(:,4)) !  Z --> 34
-   Jac7 = s_channel_decay(Mom_Dummy2(:),s78,s910,xRnd(9:10),Mom(:,5),Mom(:,6))  !   H --> ZZ                                            
-   Jac8 = s_channel_decay(Mom(:,5),0d0,0d0,xRnd(11:12),Mom(:,7),Mom(:,8))       !   Z --> ffbar                                    
-   Jac9 = s_channel_decay(Mom(:,6),0d0,0d0,xRnd(13:14),Mom(:,9),Mom(:,10))      !   Z --> ffbar  
+   Jac7 = s_channel_decay(Mom_Dummy2(:),s78,s910,xRnd(9:10),Mom(:,5),Mom(:,6))  !   H --> ZZ
    
+   if( includeInterference .and. EqualLeptons.eq.0 ) then!   EqualLeptons=0 means equal leptons
+      call random_number(xRndLeptInterf)
+      if( xRndLeptInterf.gt.0.5d0 ) then
+          Jac8 = s_channel_decay(Mom(:,5),0d0,0d0,xRnd(11:12),Mom(:,9),Mom(:,8))       !   Z --> ffbar                                    
+          Jac9 = s_channel_decay(Mom(:,6),0d0,0d0,xRnd(13:14),Mom(:,7),Mom(:,10))      !   Z --> ffbar  
+      else
+          Jac8 = s_channel_decay(Mom(:,5),0d0,0d0,xRnd(11:12),Mom(:,7),Mom(:,8))       !   Z --> ffbar                                    
+          Jac9 = s_channel_decay(Mom(:,6),0d0,0d0,xRnd(13:14),Mom(:,9),Mom(:,10))      !   Z --> ffbar  
+      endif
+      Jac8 = Jac8 * 2d0
+   else
+      Jac8 = s_channel_decay(Mom(:,5),0d0,0d0,xRnd(11:12),Mom(:,7),Mom(:,8))       !   Z --> ffbar                                    
+      Jac9 = s_channel_decay(Mom(:,6),0d0,0d0,xRnd(13:14),Mom(:,9),Mom(:,10))      !   Z --> ffbar  
+   endif
 
    
 ELSEIF( iChannel.EQ.6 ) THEN
@@ -5420,12 +5441,6 @@ ELSE
 ENDIF
 
 
-!    call random_number(xRndOffShellZ)   ! switching this off for test purposes
-!    if( xRndOffShellZ.gt.0.5d0 ) then
-!         call swap_mom(Mom(:,5),Mom(:,6))
-!         call swap_mom(Mom(:,7),Mom(:,9))
-!         call swap_mom(Mom(:,8),Mom(:,10))
-!    endif
    Jac = Jac1*Jac2*Jac3*Jac4*Jac5*Jac6*Jac7*Jac8*Jac9 * PSNorm6
 
 

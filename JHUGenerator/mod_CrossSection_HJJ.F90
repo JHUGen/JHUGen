@@ -75,8 +75,15 @@ EvalWeighted_HJJ_fulldecay = 0d0
       return
    endif
 
+   DecayMode1=0
+   DecayMode2=0
+   call VVBranchings(MY_IDUP(5:10),ICOLUP(1:2,7:10),700)
+   call swap(MY_IDUP(7),MY_IDUP(8))!   switch ordering ElP_,ElM_,MuP_,MuM_ --> ElM_,ElP_,MuM_,MuP_
+   call swap(MY_IDUP(9),MY_IDUP(10))
+   id_MCFM(3:6) = MY_IDUP(7:10)
+
    call PDFMapping(2,yRnd(1:2),eta1,eta2,Ehat,sHatJacobi,EhatMin=dmax1(m4l_minmax(1),0d0)+mJJcut)
-   call EvalPhasespace_VBF_H4f(yRnd(3),yRnd(4:17),EHat,MomExt(1:4,1:10),PSWgt)
+   call EvalPhasespace_VBF_H4f(yRnd(3),yRnd(4:17),EHat,MomExt(1:4,1:10),PSWgt,MY_IDUP(7)-MY_IDUP(9))
 
 !       call genps(6,EHat,yRnd(3:16),(/0d0,0d0,0d0,0d0,0d0,0d0/),MomExt(1:4,3:8),PSWgt)
 !       MomExt(1:4,1)=(/Ehat,0d0,0d0,+Ehat/)/2d0
@@ -129,8 +136,8 @@ EvalWeighted_HJJ_fulldecay = 0d0
       id_MCFM(jpart+4) = ijSel(iPartChannel,jpart)
       if(id_MCFM(jpart+4) .ne. 0) id_MCFM(jpart+4)=convertLHE(id_MCFM(jpart+4))
    enddo
-   id_MCFM(3:6) = (/ ElM_,ElP_,MuM_,MuP_ /)
 
+   
    call EvalAmp_qqVVqq(id_MCFM, p_MCFM, msq_MCFM) ! 1 for ZZ decay, 2 for WW decay, 3 for ZZ+WW mixture
 !   print *,"msq for id combination ",id_MCFM
 !   print *,msq_MCFM(-5,:)
