@@ -1,0 +1,6 @@
+This folder contains optional libraries that can be linked with JHUGen to enable certain processes.
+To download one, just run `./download[whatever].sh`.
+Then set `link[whatever] = Yes` in the JHUGenerator makefile.
+
+You can also link an installation from somewhere else.
+In that case, just set `link[whatever] = Yes`, and set `[whatever]Dir` to the correct directory.

@@ -154,15 +154,21 @@ test:
       git checkout -- . &&
       exit $exitstatus
     #make sure the default compiler is set to gfortran
-    - "! grep 'Comp *= *ifort' makefile"
+    - grep 'Comp *= *gfort' makefile
     #but continue the other tests even if it is
     - sed -i -r -e "s/(Comp *= *)ifort/\1gfort/" makefile
     #same with lhapdf
-    - "! grep 'UseLHAPDF *= *Yes' makefile"
+    - grep 'UseLHAPDF *= *No' makefile
     - sed -i -r -e "s/(UseLHAPDF *= *)Yes/\1No/" makefile
+    #QCDLoop
+    - grep 'linkQCDLoopLib *= *No' makefile
+    - sed -i -r -e "s/(linkQCDLoopLib *= *)Yes/\1No/" makefile
+    #Collier
+    - grep 'linkCollierLib *= *No' makefile
+    - sed -i -r -e "s/(linkCollierLib *= *)Yes/\1No/" makefile
 
     #want the default linkMELA to be Yes
-    - "grep 'linkMELA *= *Yes' makefile"
+    - grep 'linkMELA *= *Yes' makefile
     #but first test that it compiles without it
     #(if not, the first make will fail since we haven't compiled MELA yet)
     - sed -i -r -e "s/^(linkMELA *= *)Yes/\1No/" makefile
