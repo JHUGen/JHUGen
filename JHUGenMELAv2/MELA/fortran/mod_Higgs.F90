@@ -975,7 +975,7 @@ subroutine getDecay_Couplings_Spinors_Props(VVMode,idordered,pordered,h3,h4, sp,
       propV(1) = s/dcmplx(s - M_V**2,M_V*Ga_V)
       s = scr(pordered(:,8)+pordered(:,9),pordered(:,8)+pordered(:,9))
       propV(2) = 1d0 ! = s/dcmplx(s)
-      if( s.lt.MPhotonCutoff**2 ) propV(1)=czero
+      if( s.lt.MPhotonCutoff**2 ) propV(2)=czero
 
 
    elseif( VVMode.eq.gsgsMode ) then
