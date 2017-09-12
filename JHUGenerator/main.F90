@@ -842,8 +842,8 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "detajetcut", success, detajetcut, success2=Setdetajetcut)
     call ReadCommandLineArgument(arg, "deltaRcut", success, Rjet, success2=SetdeltaRcut)
     call ReadCommandLineArgument(arg, "mJJcut", success, mJJcut, multiply=GeV)
-    call ReadCommandLineArgument(arg, "m4l_min", success, m4l_minmax(1), multiply=GeV)   !undocumented, for internal testing
-    call ReadCommandLineArgument(arg, "m4l_max", success, m4l_minmax(2), multiply=GeV)   !undocumented, for internal testing
+    call ReadCommandLineArgument(arg, "m4l_min", success, m4l_minmax(1), multiply=GeV)
+    call ReadCommandLineArgument(arg, "m4l_max", success, m4l_minmax(2), multiply=GeV)
     call ReadCommandLineArgument(arg, "MPhotonCutoff", success, MPhotonCutoff, multiply=GeV, success2=SetMPhotonCutoff)
     call ReadCommandLineArgument(arg, "pTlepcut", success, pTlepcut, multiply=GeV, success2=SetpTlepcut)
     call ReadCommandLineArgument(arg, "etalepcut", success, etalepcut, success2=Setetalepcut)
