@@ -338,7 +338,7 @@ logical :: SetZprimeff, SetWprimeff, SetHZprime, SetHWprime
 logical :: SetMZprime, SetGaZprime, SetMWprime, SetGaWprime
 logical :: SetCKM,SetCKMub,SetCKMcb,SetCKMtd
 logical :: SetpTjetcut, Setetajetcut, Setdetajetcut, SetdeltaRcut
-logical :: SetpTlepcut, Setetalepcut, Setmllcut
+logical :: SetpTlepcut, Setetalepcut, SetMPhotonCutoff
 logical :: SetColliderEnergy
 
    help = .false.
@@ -396,7 +396,7 @@ logical :: SetColliderEnergy
 
    SetpTlepcut=.false.
    Setetalepcut=.false.
-   Setmllcut=.false.
+   SetMPhotonCutoff=.false.
 
    SetColliderEnergy=.false.
 
@@ -844,13 +844,10 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "mJJcut", success, mJJcut, multiply=GeV)
     call ReadCommandLineArgument(arg, "m4l_min", success, m4l_minmax(1), multiply=GeV)   !undocumented, for internal testing
     call ReadCommandLineArgument(arg, "m4l_max", success, m4l_minmax(2), multiply=GeV)   !undocumented, for internal testing
-    call ReadCommandLineArgument(arg, "mllcut", success, mllcut, multiply=GeV, success2=Setmllcut)
+    call ReadCommandLineArgument(arg, "MPhotonCutoff", success, MPhotonCutoff, multiply=GeV, success2=SetMPhotonCutoff)
     call ReadCommandLineArgument(arg, "pTlepcut", success, pTlepcut, multiply=GeV, success2=SetpTlepcut)
     call ReadCommandLineArgument(arg, "etalepcut", success, etalepcut, success2=Setetalepcut)
     call ReadCommandLineArgument(arg, "JetsOppositeEta", success, JetsOppositeEta)
-
-    !compatibility
-    call ReadCommandLineArgument(arg, "MPhotonCutoff", success, mllcut, multiply=GeV, success2=Setmllcut)  !undocumented, for compatibility
 
     if( .not.success ) then
         call Error("Unknown command line argument: " // trim(arg))
@@ -1066,13 +1063,13 @@ logical :: SetColliderEnergy
             etalepcut = infinity()
         endif
     endif
-    if(.not.Setmllcut) then
+    if(.not.SetMPhotonCutoff) then
         if(includeGammaStar) then
-            mllcut = 4d0*GeV
+            MPhotonCutoff = 4d0*GeV
         elseif(Process.ge.66.and.Process.le.69) then
-            mllcut = 2.5d0*GeV
+            MPhotonCutoff = 2.5d0*GeV
         else
-            mllcut = 0d0
+            MPhotonCutoff = 0d0
         endif
     endif
     if((Process.eq.60 .or. Process.eq.66 .or. Process.eq.67 .or. Process.eq.68 .or. Process.eq.69) .and. includeGammaStar .and. pTjetcut.le.0d0) then
@@ -4641,13 +4638,13 @@ character :: arg*(500)
             write(TheUnit,"(12X,A,F8.2,A)") "pT >= ", pTjetcut/GeV, " GeV"
             write(TheUnit,"(9X,A,F8.2)") "|eta| <= ", etalepcut
         endif
-        write(TheUnit,"(11X,A,F8.2,A)") "mll >= ", mllcut/GeV, " GeV"
+        write(TheUnit,"(11X,A,F8.2,A)") "mll >= ", MPhotonCutoff/GeV, " GeV"
         if( Process.ge.66 .and. Process.le.69 ) then
             write(TheUnit,"(F10.2,A,F10.2,A)") m4l_minmax(1)/GeV, " GeV <= m4l <= ", m4l_minmax(2)/GeV, " GeV"
         endif
     endif
     if( (Process.eq.0 .or. Process.eq.2 .or. Process.eq.50) .and. includeGammaStar ) then
-        write(TheUnit,"(6X,A,F8.2,A)") "m(gammastar) >= ", mllcut/GeV, " GeV"
+        write(TheUnit,"(6X,A,F8.2,A)") "m(gammastar) >= ", MPhotonCutoff/GeV, " GeV"
     endif
     if( (ReadLHEFile) .and. (RequestNLeptons.gt.0) ) then
         if ( RequestOS .le. 0 ) then
@@ -5185,7 +5182,7 @@ implicit none
         print *, "   pTjetcut:          Minimum pT for jets in GeV (default: 15)"
         print *, "   deltaRcut:         Minimum deltaR for jets (default: 0.3)"
         print *, "   mJJcut:            Minimum dijet mass in GeV (default: 0)"
-        print *, "   mllcut:            Minimum mass for offshell photons in GeV, when included (default: 4)"
+        print *, "   MPhotonCutoff:     Minimum mass for offshell photons in GeV, when included (default: 4)"
         print *, "   etajetcut:         Maximum |eta| for jets in offshell VBF (default: 4)"
         print *, "   detajetcut:        Minimum deltaeta between jets in offshell VBF (default: 2)"
         print *, "   JetsOppositeEta:   Require sgn(eta) to be opposite for the two jets in offshell VBF"

@@ -134,7 +134,7 @@ real(8), public :: mJJcut = 0d0*GeV                           ! minimum mJJ for 
 real(8), public :: m4l_minmax(1:2) = (/ -1d0,-1d0 /)*GeV      ! min and max for m_4l in off-shell VBF production;   default is (-1,-1): m_4l ~ Higgs resonance (on-shell)
 logical, public :: includeGammaStar = .false.                 ! include offshell photons?
 logical, public :: includeVprime = .false.
-real(8), public :: Mllcut = -1d0*GeV                          ! minimum |mass_ll| for offshell photons when includeGammaStar = .true. or in VBF bkg
+real(8), public :: MPhotonCutoff = -1d0*GeV                          ! minimum |mass_ll| for offshell photons when includeGammaStar = .true. or in VBF bkg
 real(8), public :: pTlepcut = -1d0*GeV
 real(8), public :: etalepcut = -1d0
 logical, public :: JetsOppositeEta = .true.

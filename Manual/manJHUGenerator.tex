@@ -224,7 +224,7 @@ This is the list of command line configurables (also defined in the \verb|README
     pTjetcut:          Minimum pT for jets in GeV (default: 15)
     deltaRcut:         Minimum deltaR for jets (default: 0.3)
     mJJcut:            Minimum dijet mass in GeV (default: 0)
-    mllcut:            Minimum mass for offshell photons in GeV, when included (default: 4)
+    MPhotonCutoff:     Minimum mass for offshell photons in GeV, when included (default: 4)
     etajetcut:         Maximum |eta| for jets in offshell VBF (default: 4)
     detajetcut:        Minimum deltaeta between jets in offshell VBF (default: 2)
     JetsOppositeEta:   Require sgn(eta) to be opposite for the two jets in offshell VBF
@@ -301,7 +301,7 @@ Processes 66--69 provide an interface to a modified version of MCFM~\cite{Campbe
 \subsubsection{Cuts}
 \begin{itemize}
 \item \verb|pTjetcut|, \verb|deltaRcut|, \verb|mJJcut| All three cuts are used in processes 60 (VBF), 61 ($H+jj$), 90 ($bbH$), and also 80 ($ttH$) if \verb|m_Top| is set to be light ($<10 \text{GeV}$).  In addition, \verb|pTjetcut| is used in process 62 ($H+j$) and also processes 110--113 ($t/\bar{t}+H$) if \verb|m_Top| is light.
-\item \verb|mllcut| If the decay is to $ZZ$ and any of the couplings to photons (\verb|ghzgsX| or \verb|ghgsgsX|) is set, the $\gamma^*$ contribution will be included along with the $Z$'s.  Similarly, if the decay is to $Z\gamma$ and any of the \verb|ghgsgsX| couplings are set, the $\gamma\gamma^*$ contribution will be included as well.  In this case, a lower cut on the photon invariant mass has to be placed in order to avoid the collinear singularity.  This can be set using mllcut.
+\item \verb|MPhotonCutoff| If the decay is to $ZZ$ and any of the couplings to photons (\verb|ghzgsX| or \verb|ghgsgsX|) is set, the $\gamma^*$ contribution will be included along with the $Z$'s.  Similarly, if the decay is to $Z\gamma$ and any of the \verb|ghgsgsX| couplings are set, the $\gamma\gamma^*$ contribution will be included as well.  In this case, a lower cut on the photon invariant mass has to be placed in order to avoid the collinear singularity.  This can be set using MPhotonCutoff.
 \end{itemize}
 \subsubsection{Renormalization and factorization scales}
 \begin{itemize}

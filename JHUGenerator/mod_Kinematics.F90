@@ -2005,11 +2005,11 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
        mZ2 = get_MInv(MomExt(1:4,Lep2P)+MomExt(1:4,Lep2M))
 
 
-       if( mZ1.lt.Mllcut ) then
+       if( mZ1.lt.MPhotonCutoff ) then
           applyPSCut=.true.
           return
        endif
-       if( mZ2.lt.Mllcut ) then
+       if( mZ2.lt.MPhotonCutoff ) then
           applyPSCut=.true.
           return
        endif
@@ -2284,7 +2284,7 @@ logical :: hasAonshell
          if(m_ll.le.getMass(convertLHEreverse(id(6)))+getMass(convertLHEreverse(id(7))))then
             applyPSCut=.true.
          endif
-         if(includeGammaStar .and. .not.IsAWDecay(DecayMode1) .and. (m_ll.lt.mllcut .or. m_Vstar.lt.mllcut))then
+         if(includeGammaStar .and. .not.IsAWDecay(DecayMode1) .and. (m_ll.lt.MPhotonCutoff .or. m_Vstar.lt.MPhotonCutoff))then
             applyPSCut=.true.
          endif
          if(IsAQuark(convertLHEreverse(id(6)))) then
@@ -2296,7 +2296,7 @@ logical :: hasAonshell
             endif
          endif
       else
-         if(includeGammaStar .and. m_Vstar.lt.mllcut)then
+         if(includeGammaStar .and. m_Vstar.lt.MPhotonCutoff)then
             applyPSCut=.true.
          endif
       endif
