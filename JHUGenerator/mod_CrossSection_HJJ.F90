@@ -40,9 +40,9 @@ include 'vegas_common.f'
 include 'maxwt.f'
 EvalWeighted_HJJ_fulldecay = 0d0
 
-   call getRef_MCFM_qqVVqq_GenHash(ijSel)
-   NumPartonicChannels=Hash_MCFM_qqVVqq_Gen_Size
-   do ichan=1,Hash_MCFM_qqVVqq_Gen_Size
+   call getRef_MCFM_qqVVqq_Hash(ijSel)
+   NumPartonicChannels=Hash_MCFM_qqVVqq_Size
+   do ichan=1,Hash_MCFM_qqVVqq_Size
       if(ijSel(ichan,1).eq.Not_a_particle_ .or. ijSel(ichan,2).eq.Not_a_particle_ .or. ijSel(ichan,3).eq.Not_a_particle_ .or. ijSel(ichan,4).eq.Not_a_particle_) then
          NumPartonicChannels=NumPartonicChannels-1
       endif
@@ -127,7 +127,6 @@ EvalWeighted_HJJ_fulldecay = 0d0
  msq_MCFM(:,:) = 0d0
 #if linkMELA==1
 
-   ! FIXME: TEMPORARY ASSIGNMENT OF I J R S
    do jpart=1,2
       id_MCFM(jpart) = ijSel(iPartChannel,jpart)
       if(id_MCFM(jpart) .ne. 0) id_MCFM(jpart)=convertLHE(id_MCFM(jpart))
@@ -137,7 +136,7 @@ EvalWeighted_HJJ_fulldecay = 0d0
       if(id_MCFM(jpart+4) .ne. 0) id_MCFM(jpart+4)=convertLHE(id_MCFM(jpart+4))
    enddo
 
-   
+
    call EvalAmp_qqVVqq(id_MCFM, p_MCFM, msq_MCFM) ! 1 for ZZ decay, 2 for WW decay, 3 for ZZ+WW mixture
 !   print *,"msq for id combination ",id_MCFM
 !   print *,msq_MCFM(-5,:)
@@ -151,7 +150,6 @@ EvalWeighted_HJJ_fulldecay = 0d0
 !   print *,msq_MCFM(3,:)
 !   print *,msq_MCFM(4,:)
 !   print *,msq_MCFM(5,:)
-!   call qq_ZZqq(p_MCFM,msq_MCFM)
 
 
    PreFac = fbGeV2 * FluxFac * PSWgt * sHatJacobi
