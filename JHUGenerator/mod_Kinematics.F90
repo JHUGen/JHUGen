@@ -885,8 +885,8 @@ integer, parameter :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6,5/)
       ICOLUP(1:2,3) = ICOLUP(1:2,1)
       ICOLUP(1:2,4) = ICOLUP(1:2,2)
       ISTUP(3:10) = +1
-      MOTHUP(1:2,3)= (/1,1/)
-      MOTHUP(1:2,4)= (/2,2/)
+      MOTHUP(1:2,3)= (/1,2/)
+      MOTHUP(1:2,4)= (/1,2/)
       
       if( MY_IDUP(3).eq.10 ) then ! 10 = LHA2M_ID(0) for the case where MY_IDUP(3:4) are not set (i.e. deterministicME=.false.). 10 doesn't mean gluon here
          call random_number(xRnd)
@@ -1974,7 +1974,7 @@ real(8) :: MomLepP(1:4),MomLepM(1:4),MomBoost(1:4),BeamAxis(1:4),ScatteringAxis(
 real(8) :: MomLept(1:4,1:4),MomLeptX(1:4,1:4),MomLeptPlane1(2:4),MomLeptPlane2(2:4),MomBeamScatterPlane(2:4)
 logical :: applyPSCut
 integer :: NBin(:)
-real(8) :: m_jj,y_j1,y_j2,dphi_jj,dy_j1j2,pT_jl,pT_j1,pT_j2,pT_H,m_4l
+real(8) :: m_jj,y_j1,y_j2,dphi_jj,dy_j1j2,pT_jl,pT_j1,pT_j2,pT_H,m_4l,dR_j1j2
 real(8) :: pT_l1,pT_l2,pT_l3,pT_l4,y_l1,y_l2,y_l3,y_l4
 real(8) :: Phi1,signPhi1,MomReso(1:4)
 integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, Lep1M=8, Lep2P=9, Lep2M=10
@@ -1999,16 +1999,17 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
        y_l4= get_eta(MomExt(1:4,Lep2M))
        pT_jl = max(pT_j1,pT_j2)
        dy_j1j2 = y_j1 - y_j2
+       dR_j1j2 = get_R(MomExt(1:4,outTop), MomExt(1:4,outBot))
 
        mZ1 = get_MInv(MomExt(1:4,Lep1P)+MomExt(1:4,Lep1M))
        mZ2 = get_MInv(MomExt(1:4,Lep2P)+MomExt(1:4,Lep2M))
 
 
-       if( mZ1.lt.2.5d0*GeV ) then
+       if( mZ1.lt.MPhotonCutoff ) then
           applyPSCut=.true.
           return
        endif
-       if( mZ2.lt.2.5d0*GeV ) then
+       if( mZ2.lt.MPhotonCutoff ) then
           applyPSCut=.true.
           return
        endif
@@ -2017,12 +2018,12 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
 !          return
 !       endif
 
-       if( pT_l1.lt.3d0*GeV .or. pT_l2.lt.3d0*GeV .or. pT_l3.lt.3d0*GeV .or. pT_l4.lt.3d0*GeV ) then
+       if( pT_l1.lt.pTlepcut .or. pT_l2.lt.pTlepcut .or. pT_l3.lt.pTlepcut .or. pT_l4.lt.pTlepcut ) then
           applyPSCut=.true.
           return
        endif
 
-       if( dabs(y_l1).gt.2.7d0 .or. dabs(y_l2).gt.2.7d0 .or. dabs(y_l3).gt.2.7d0 .or. dabs(y_l4).gt.2.7d0 ) then
+       if( dabs(y_l1).gt.etalepcut .or. dabs(y_l2).gt.etalepcut .or. dabs(y_l3).gt.etalepcut .or. dabs(y_l4).gt.etalepcut ) then
           applyPSCut=.true.
           return
        endif
@@ -2044,17 +2045,17 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
 !        endif
 
 
-        if( abs(y_j1).gt.4d0 .or. abs(y_j2).gt.4d0 ) then
+        if( abs(y_j1).gt.etajetcut .or. abs(y_j2).gt.etajetcut ) then
            applyPSCut=.true.
            return
         endif
 
-        if( abs(y_j1-y_j2).lt.2.0d0 .or. y_j1*y_j2.gt.0d0 ) then
+        if( abs(y_j1-y_j2).lt.detajetcut .or. (JetsOppositeEta .and. y_j1*y_j2.gt.0d0) ) then
            applyPSCut=.true.
            return
         endif
 
-        if(  pT_j1.lt.pTjetcut .or. pT_j2.lt.pTjetcut .or. m_jj.lt.mJJcut )  then
+        if(  pT_j1.lt.pTjetcut .or. pT_j2.lt.pTjetcut .or. m_jj.lt.mJJcut .or. dR_j1j2.lt.Rjet)  then
            applyPSCut=.true.
            return
         endif
