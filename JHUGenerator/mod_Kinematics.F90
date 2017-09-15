@@ -882,8 +882,16 @@ integer, parameter :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6,5/)
       else! anti-quark
           ICOLUP(1:2,2) = (/000,502/)
       endif
-      ICOLUP(1:2,3) = ICOLUP(1:2,1)
-      ICOLUP(1:2,4) = ICOLUP(1:2,2)
+      if( MY_IDUP(3).gt.0 ) then ! quark
+          ICOLUP(1:2,3) = (/501,000/)
+      else! anti-quark
+          ICOLUP(1:2,3) = (/000,501/)
+      endif
+      if( MY_IDUP(4).gt.0 ) then ! quark
+          ICOLUP(1:2,4) = (/502,000/)
+      else! anti-quark
+          ICOLUP(1:2,4) = (/000,502/)
+      endif
       ISTUP(3:10) = +1
       MOTHUP(1:2,3)= (/1,2/)
       MOTHUP(1:2,4)= (/1,2/)
@@ -898,6 +906,7 @@ integer, parameter :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6,5/)
                 if( abs(MY_IDUP(3)).eq.Top_ ) MY_IDUP(3) = MY_IDUP(1)
                 if( abs(MY_IDUP(4)).eq.Top_ ) MY_IDUP(4) = MY_IDUP(2)
          endif
+         call Error("This shouldn't be able to happen anymore, assert false")
       endif
       
       ISTUP(5:6) = 2
