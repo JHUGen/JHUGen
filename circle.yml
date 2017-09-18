@@ -457,7 +457,7 @@ test:
   post:
     - |
       unbuffer python ~/checklhe/checklhe.py $(find $CIRCLE_ARTIFACTS -name *.lhe) | tee checklheoutput.txt &&
-    #if there are any errors this command will exit 1 and so the test will fail
+      #if there are any errors this command will exit 1 and so the test will fail
       ! grep -q '!' checklheoutput.txt    #all the error messages end with !
 
     #ggH analytical fits
