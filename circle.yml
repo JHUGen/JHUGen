@@ -448,12 +448,17 @@ test:
     - |
       cd ../JHUGenMELAv2/MELA/test &&
       ./testME_more.py
-    - mv ../JHUGenMELAv2/MELA/test/*.out $CIRCLE_ARTIFACTS/MELA/
+      exitstatus=$?
+      if [ exitstatus -ne 0 ]; then
+        mv ../JHUGenMELAv2/MELA/test/*.out $CIRCLE_ARTIFACTS/MELA/
+      fi
+      exit $exitstatus
 
   post:
-    - unbuffer python ~/checklhe/checklhe.py $(find $CIRCLE_ARTIFACTS -name *.lhe) | tee checklheoutput.txt
+    - |
+      unbuffer python ~/checklhe/checklhe.py $(find $CIRCLE_ARTIFACTS -name *.lhe) | tee checklheoutput.txt &&
     #if there are any errors this command will exit 1 and so the test will fail
-    - "! grep -q '!' checklheoutput.txt"    #all the error messages end with !
+      ! grep -q '!' checklheoutput.txt    #all the error messages end with !
 
     #ggH analytical fits
     - if [ -f ~/reference_failed_ggH ]; then cd ~/CMSJHU_AnalysisMacros/ZZ4lanalyticalfits && echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$CIRCLE_ARTIFACTS/ggH/SM.root", "$CIRCLE_ARTIFACTS/ggH/SM/", 1, 0, 0, 0, 0)' | root -b; fi
