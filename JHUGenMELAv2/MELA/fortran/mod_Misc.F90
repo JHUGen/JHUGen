@@ -14,6 +14,7 @@ INTERFACE OPERATOR (.dot.)
    MODULE PROCEDURE MinkowskyProduct
    MODULE PROCEDURE MinkowskyProductC
    MODULE PROCEDURE MinkowskyProductRC
+   MODULE PROCEDURE MinkowskyProductCR
 END INTERFACE OPERATOR (.dot.)
 
 INTERFACE OPERATOR (.cross.)
@@ -71,6 +72,18 @@ complex(8)             :: MinkowskyProductRC
                       - p1(4)*p2(4)
 END FUNCTION MinkowskyProductRC
 
+
+FUNCTION MinkowskyProductCR(p1,p2)
+implicit none
+real(8),    intent(in) :: p2(1:4)
+complex(8), intent(in) :: p1(1:4)
+complex(8)             :: MinkowskyProductCR
+
+   MinkowskyProductCR = p1(1)*p2(1)  &
+                      - p1(2)*p2(2)  &
+                      - p1(3)*p2(3)  &
+                      - p1(4)*p2(4)
+END FUNCTION MinkowskyProductCR
 
 double complex function et1(e1,e2,e3,e4)
 implicit none
@@ -551,6 +564,190 @@ complex(8) :: fc2, fc
 
 RETURN
 END FUNCTION
+
+
+
+
+
+      function Chir_Weyl(sign,sp)   ! Chir = sp.omega_sign = omega_sign.sp
+      implicit none
+      integer :: sign
+      double complex :: sp(1:4)
+      double complex :: Chir_Weyl(1:4)
+
+        if(sign.eq.+1) then !omega_+
+          Chir_Weyl(1) = sp(1)
+          Chir_Weyl(2) = sp(2)
+          Chir_Weyl(3) = 0d0
+          Chir_Weyl(4) = 0d0
+        else !omega_-
+          Chir_Weyl(1) = 0d0
+          Chir_Weyl(2) = 0d0
+          Chir_Weyl(3) = sp(3)
+          Chir_Weyl(4) = sp(4)
+        endif
+      return
+      end function
+
+
+
+
+
+        FUNCTION vbqq_Weyl(sp1,sp2)
+        implicit none
+        complex(8), intent(in) :: sp1(:), sp2(:)
+        integer, parameter ::  Dv=4
+        integer :: i
+        complex(8) :: vbqq_Weyl(Dv)
+        complex(8) :: rr, va(Dv),sp1a(4)
+
+            va=(0d0,0d0)
+            vbqq_Weyl=(0d0,0d0)
+
+            do i=1,Dv
+              if (i.eq.1) then
+                va(1)=(1d0,0d0)
+              else
+                va(i)=(-1d0,0d0)
+              endif
+              sp1a=spb2_Weyl(sp1,va)
+              
+              
+              rr=sum(sp1a(1:4)*sp2(1:4))
+              if (i.eq.1) then
+                    vbqq_Weyl = vbqq_Weyl + rr*va
+                else
+                    vbqq_Weyl = vbqq_Weyl - rr*va
+              endif
+              va(i)=(0d0,0d0)
+            enddo
+
+        END FUNCTION
+
+
+
+      function spb2_Weyl(sp,v)
+      implicit none
+      complex(8), intent(in) :: sp(:),v(:)
+      complex(8) :: spb2_Weyl(4)
+      complex(8) :: x0(4,4),xx(4,4),xy(4,4)
+      complex(8) :: xz(4,4),x5(4,4)
+      complex(8) :: y1,y2,y3,y4,bp,bm,cp,cm
+      integer :: i,i1,i2,i3,Dv,Ds,imax
+
+      Ds = 4
+      Dv = 4
+      imax = Ds/4
+
+           do i=1,imax
+           i1= 1+4*(i-1)
+           i2=i1+3
+
+           y1=sp(i1)
+           y2=sp(i1+1)
+           y3=sp(i1+2)
+           y4=sp(i1+3)
+
+           x0(1,i)=y3
+           x0(2,i)=y4
+           x0(3,i)=y1
+           x0(4,i)=y2
+
+           xx(1,i) = y4
+           xx(2,i) = y3
+           xx(3,i) = -y2
+           xx(4,i) = -y1
+
+           xy(1,i)=(0d0,1d0)*y4
+           xy(2,i)=-(0d0,1d0)*y3
+           xy(3,i)=-(0d0,1d0)*y2
+           xy(4,i)=(0d0,1d0)*y1
+
+           xz(1,i)=y3
+           xz(2,i)=-y4
+           xz(3,i)=-y1
+           xz(4,i)=y2
+
+           x5(1,i)=y1
+           x5(2,i)=y2
+           x5(3,i)=-y3
+           x5(4,i)=-y4
+
+           enddo
+
+
+           do i=1,4
+
+           spb2_Weyl(i)=v(1)*x0(i,1)-v(2)*xx(i,1)-v(3)*xy(i,1)-v(4)*xz(i,1)
+
+           enddo
+           end function
+
+
+
+           
+
+
+         function spi2_Weyl(v,sp)
+         implicit none
+         complex(8), intent(in) :: sp(:),v(:)
+         complex(8) :: spi2_Weyl(4)
+         complex(8) :: x0(4,4),xx(4,4),xy(4,4)
+         complex(8) :: xz(4,4),x5(4,4)
+         complex(8) ::  y1,y2,y3,y4,bp,bm,cp,cm
+         integer :: i,i1,i2,i3,imax,Dv,Ds
+
+         Ds = 4
+         Dv = 4
+
+         imax = Ds/4
+
+           do i=1,imax
+           i1= 1+4*(i-1)
+           i2=i1+3
+
+           y1=sp(i1)
+           y2=sp(i1+1)
+           y3=sp(i1+2)
+           y4=sp(i1+3)
+
+           x0(1,i)=y3
+           x0(2,i)=y4
+           x0(3,i)=y1
+           x0(4,i)=y2
+
+
+           xx(1,i) = -y4
+           xx(2,i) = -y3
+           xx(3,i) = y2
+           xx(4,i) = y1
+
+
+           xy(1,i)=(0d0,1d0)*y4
+           xy(2,i)=-(0d0,1d0)*y3
+           xy(3,i)=-(0d0,1d0)*y2
+           xy(4,i)=(0d0,1d0)*y1
+
+           xz(1,i)=-y3
+           xz(2,i)=y4
+           xz(3,i)=y1
+           xz(4,i)=-y2
+
+           x5(1,i)=y1
+           x5(2,i)=y2
+           x5(3,i)=-y3
+           x5(4,i)=-y4
+
+           enddo
+
+
+           do i=1,4
+
+           spi2_Weyl(i)=v(1)*x0(i,1)-v(2)*xx(i,1) -v(3)*xy(i,1)-v(4)*xz(i,1)
+           enddo
+
+
+           end function           
 
 
 
