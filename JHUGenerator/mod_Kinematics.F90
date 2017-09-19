@@ -949,23 +949,6 @@ logical :: isVHlike
       MOTHUP(1:2,9 )= (/6,6/)
       MOTHUP(1:2,10)= (/6,6/)
             
-!  associte lepton pairs to MOTHUP
-      if( MY_IDUP(7).eq.MY_IDUP(9) ) then
-          s34 = Get_MInv( Mom(1:4,7)+Mom(1:4,8) )
-          s56 = Get_MInv( Mom(1:4,9)+Mom(1:4,10) )
-          s36 = Get_MInv( Mom(1:4,7)+Mom(1:4,10) )
-          s45 = Get_MInv( Mom(1:4,8)+Mom(1:4,9) )
-          smallestInv = minloc((/dabs(s34-M_V),dabs(s56-M_V),dabs(s36-M_V),dabs(s45-M_V)/),1)
-          if( smallestInv.eq.3 .or. smallestInv.eq.4 ) then
-              call swapi(MOTHUP(1,7),MOTHUP(1,9))
-              call swapi(MOTHUP(2,7),MOTHUP(2,9))
-!               call swapi(ICOLUP(1,7),ICOLUP(1,9))
-!               call swapi(ICOLUP(2,7),ICOLUP(2,9))
-!               Z1FV(1:4) = MomDummy(1:4,3)+MomDummy(1:4,6)
-!               Z2FV(1:4) = MomDummy(1:4,5)+MomDummy(1:4,4)
-          endif
-      endif
-      
       
       
       
@@ -987,6 +970,23 @@ logical :: isVHlike
           MomDummy(4,i) = 100.0d0*Mom(4,i)
       enddo
 
+
+!  associte lepton pairs to MOTHUP
+      if( MY_IDUP(7).eq.MY_IDUP(9) ) then
+          s34 = Get_MInv( Mom(1:4,7)+Mom(1:4,8) )
+          s56 = Get_MInv( Mom(1:4,9)+Mom(1:4,10) )
+          s36 = Get_MInv( Mom(1:4,7)+Mom(1:4,10) )
+          s45 = Get_MInv( Mom(1:4,8)+Mom(1:4,9) )
+          smallestInv = minloc((/dabs(s34-M_V),dabs(s56-M_V),dabs(s36-M_V),dabs(s45-M_V)/),1)
+          if( smallestInv.eq.3 .or. smallestInv.eq.4 ) then
+              call swapi(MOTHUP(1,7),MOTHUP(1,9))
+              call swapi(MOTHUP(2,7),MOTHUP(2,9))
+              call swapi(ICOLUP(1,7),ICOLUP(1,9))
+              call swapi(ICOLUP(2,7),ICOLUP(2,9))
+              MomDummy(1:4,5) = MomDummy(1:4,9)+MomDummy(1:4,8)
+              MomDummy(1:4,6) = MomDummy(1:4,7)+MomDummy(1:4,10)
+          endif
+      endif
 
 
 write(io_LHEOutFile,"(A)") "<event>"
