@@ -925,7 +925,11 @@ logical :: canbeVBF, canbeVH, isVHlike
 
       if( canbeVH .and. canbeVBF ) then
         mjj = Get_MInv( Mom(1:4,3)+Mom(1:4,4) )
-        isVHlike = (( mjj .gt. M_W-2d0*Ga_W .and. mjj .lt. M_W+2d0*Ga_W ) .or. ( mjj .gt. M_Z-2d0*Ga_Z .and. mjj .lt. M_Z+2d0*Ga_Z ))
+        if( abs(CoupledVertex(MY_IDUP(1:2), -1)).eq.Wp_ ) then
+          isVHlike = ( mjj .gt. M_W-2d0*Ga_W .and. mjj .lt. M_W+2d0*Ga_W )
+        else
+          isVHlike = ( mjj .gt. M_Z-2d0*Ga_Z .and. mjj .lt. M_Z+2d0*Ga_Z )
+        endif
       elseif( canbeVH ) then
         isVHlike = .true.
       endif
@@ -1010,6 +1014,10 @@ logical :: canbeVBF, canbeVH, isVHlike
               call swapi(ICOLUP(2,7),ICOLUP(2,9))
               MomDummy(1:4,5) = MomDummy(1:4,9)+MomDummy(1:4,8)
               MomDummy(1:4,6) = MomDummy(1:4,7)+MomDummy(1:4,10)
+          else
+              !The Z's are not always lined up this way already, for reasons I don't understand.
+              MomDummy(1:4,5) = MomDummy(1:4,7)+MomDummy(1:4,8)
+              MomDummy(1:4,6) = MomDummy(1:4,9)+MomDummy(1:4,10)
           endif
       endif
 
