@@ -382,7 +382,7 @@ test:
       sed -i "${line}imsq(:,0)=0d0" mod_MCFMWrapper.F90 &&
       sed -i "${line}imsq(:,:)=1d0" mod_MCFMWrapper.F90 &&
       make &&
-      ./JHUGen PDFSet=3 VegasNc0=100000 VegasNc2=1000 Process=66 DataFile=$CIRCLE_ARTIFACTS/other/VBFoffshell_66_DONOTUSE.lhe m4l_min=100 m4l_max=200
+      ./JHUGen PDFSet=3 VegasNc0=100000 VegasNc2=100 Process=66 DataFile=$CIRCLE_ARTIFACTS/other/VBFoffshell_66_DONOTUSE.lhe m4l_min=100 m4l_max=200
 
     - git checkout -- mod_MCFMWrapper.F90
     - make

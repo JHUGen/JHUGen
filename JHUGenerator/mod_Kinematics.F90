@@ -857,10 +857,11 @@ real(8) :: Mom(1:4,1:NUP),xRnd,s34,s36,s45,s56
 real(8),optional :: EventWeight
 integer :: MY_IDUP(1:NUP),ICOLUP(1:2,1:NUP),LHE_IDUP(1:NUP),ISTUP(1:NUP),MOTHUP(1:2,1:NUP)
 integer :: IDPRUP,i,smallestInv
-real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP,Lifetime,Spin,MomDummy(1:4,1:NUP),TheMass
+real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP,Lifetime,Spin,MomDummy(1:4,1:NUP),TheMass,mjj
 character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0)"
 integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, Lep1M=8, Lep2P=9, Lep2M=10
 integer, parameter :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6,5/)
+logical :: isVHlike
 ! For description of the LHE format see http://arxiv.org/abs/hep-ph/0109068 and http://arxiv.org/abs/hep-ph/0609017
 ! The LHE numbering scheme can be found here: http://pdg.lbl.gov/mc_particle_id_contents.html and http://lhapdf.hepforge.org/manual#tth_sEcA
 
@@ -872,25 +873,54 @@ integer, parameter :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6,5/)
 
       ISTUP(1:2) = -1
       MOTHUP(1:2,1:2) = 0
-      if( MY_IDUP(1).gt.0 ) then ! quark
+
+      isVHlike = .false.
+      if( CoupledVertex(MY_IDUP(1:2), -1) .ne. Not_a_particle_ .and. CoupledVertex(MY_IDUP(3:4), -1) .ne. Not_a_particle_) then
+        mjj = Get_MInv( Mom(1:4,3)+Mom(1:4,4) )
+        isVHlike = ( mjj .gt. M_W-2d0*Ga_W .and. mjj .lt. M_W+2d0*Ga_W ) .or. ( mjj .gt. M_Z-2d0*Ga_Z .and. mjj .lt. M_Z+2d0*Ga_Z )
+      endif
+
+      if( isVHlike ) then
+        if( MY_IDUP(1).gt.0 ) then ! quark
           ICOLUP(1:2,1) = (/501,000/)
-      else! anti-quark
+          ICOLUP(1:2,2) = (/000,501/)
+        else! anti-quark
           ICOLUP(1:2,1) = (/000,501/)
-      endif
-      if( MY_IDUP(2).gt.0 ) then! quark
-          ICOLUP(1:2,2) = (/502,000/)
-      else! anti-quark
-          ICOLUP(1:2,2) = (/000,502/)
-      endif
-      if( MY_IDUP(3).gt.0 ) then ! quark
-          ICOLUP(1:2,3) = (/501,000/)
-      else! anti-quark
-          ICOLUP(1:2,3) = (/000,501/)
-      endif
-      if( MY_IDUP(4).gt.0 ) then ! quark
-          ICOLUP(1:2,4) = (/502,000/)
-      else! anti-quark
+          ICOLUP(1:2,2) = (/501,000/)
+        endif
+        if( MY_IDUP(3).gt.0 ) then ! quark
+          ICOLUP(1:2,3) = (/502,000/)
           ICOLUP(1:2,4) = (/000,502/)
+        else! anti-quark
+          ICOLUP(1:2,3) = (/000,502/)
+          ICOLUP(1:2,4) = (/502,000/)
+        endif
+      else
+        if( MY_IDUP(1).gt.0 ) then ! quark
+          ICOLUP(1:2,1) = (/501,000/)
+        else! anti-quark
+          ICOLUP(1:2,1) = (/000,501/)
+        endif
+        if( MY_IDUP(2).gt.0 ) then! quark
+          ICOLUP(1:2,2) = (/502,000/)
+        else! anti-quark
+          ICOLUP(1:2,2) = (/000,502/)
+        endif
+
+        !WW is typically larger xsec, so choose that if possible, then ZZ
+        if(       abs(CoupledVertex((/MY_IDUP(1),-MY_IDUP(3)/), -1)) .eq. abs(Wp_) &
+            .and. abs(CoupledVertex((/MY_IDUP(2),-MY_IDUP(4)/), -1)) .eq. abs(Wp_)) then
+          ICOLUP(1:2,3) = ICOLUP(1:2,1)
+          ICOLUP(1:2,4) = ICOLUP(1:2,2)
+        elseif(       abs(CoupledVertex((/MY_IDUP(1),-MY_IDUP(3)/), -1)) .eq. abs(Z0_) &
+                .and. abs(CoupledVertex((/MY_IDUP(2),-MY_IDUP(4)/), -1)) .eq. abs(Z0_)) then
+          ICOLUP(1:2,3) = ICOLUP(1:2,1)
+          ICOLUP(1:2,4) = ICOLUP(1:2,2)
+        else
+          print *, "Event doesn't make sense"
+          print *, MY_IDUP(1:4)
+          stop 1
+        endif
       endif
       ISTUP(3:10) = +1
       MOTHUP(1:2,3)= (/1,2/)
