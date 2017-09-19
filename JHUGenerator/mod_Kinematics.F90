@@ -912,10 +912,18 @@ logical :: isVHlike
             .and. abs(CoupledVertex((/MY_IDUP(2),-MY_IDUP(4)/), -1)) .eq. abs(Wp_)) then
           ICOLUP(1:2,3) = ICOLUP(1:2,1)
           ICOLUP(1:2,4) = ICOLUP(1:2,2)
+        elseif(       abs(CoupledVertex((/MY_IDUP(1),-MY_IDUP(4)/), -1)) .eq. abs(Wp_) &
+                .and. abs(CoupledVertex((/MY_IDUP(2),-MY_IDUP(3)/), -1)) .eq. abs(Wp_)) then
+          ICOLUP(1:2,3) = ICOLUP(1:2,2)
+          ICOLUP(1:2,4) = ICOLUP(1:2,1)
         elseif(       abs(CoupledVertex((/MY_IDUP(1),-MY_IDUP(3)/), -1)) .eq. abs(Z0_) &
                 .and. abs(CoupledVertex((/MY_IDUP(2),-MY_IDUP(4)/), -1)) .eq. abs(Z0_)) then
           ICOLUP(1:2,3) = ICOLUP(1:2,1)
           ICOLUP(1:2,4) = ICOLUP(1:2,2)
+        elseif(       abs(CoupledVertex((/MY_IDUP(1),-MY_IDUP(4)/), -1)) .eq. abs(Z0_) &
+                .and. abs(CoupledVertex((/MY_IDUP(2),-MY_IDUP(3)/), -1)) .eq. abs(Z0_)) then
+          ICOLUP(1:2,3) = ICOLUP(1:2,2)
+          ICOLUP(1:2,4) = ICOLUP(1:2,1)
         else
           print *, "Event doesn't make sense"
           print *, MY_IDUP(1:4)
