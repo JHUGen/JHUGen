@@ -4635,7 +4635,7 @@ character :: arg*(500)
     if( Process.ge.66 .and. Process.le.69 ) then
         write(TheUnit,"(4X,A)") "4l cuts:"
         if( Process.ge.66 .and. Process.le.69 ) then
-            write(TheUnit,"(12X,A,F8.2,A)") "pT >= ", pTjetcut/GeV, " GeV"
+            write(TheUnit,"(12X,A,F8.2,A)") "pT >= ", pTlepcut/GeV, " GeV"
             write(TheUnit,"(9X,A,F8.2)") "|eta| <= ", etalepcut
         endif
         write(TheUnit,"(11X,A,F8.2,A)") "mll >= ", MPhotonCutoff/GeV, " GeV"
