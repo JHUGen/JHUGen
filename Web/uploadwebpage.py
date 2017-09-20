@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 #Inputs are down at the bottom.  No need to change anything above that unless there's a bug
 
 import argparse
@@ -14,12 +15,14 @@ WebGeneratordir = os.path.join(Webdir, "Generator")
 if not os.path.isdir(WebGeneratordir):
      raise OSerror("You should run this from the Web directory")
 
-def uploadwebpage(dryrun=False):
+def uploadwebpage(dryrun=False, no_mcfm=False):
     if dryrun:
         JHED = password = ""
     else:
         JHED = raw_input("Enter your JHED ID: ")
         password = getpass("Enter your JHED password: ")
+    if no_mcfm:
+        dontupload.append("MCFM-precompiled")
     with cd("Generator"):
         create_Download(*versions)
     repmap = {
@@ -154,9 +157,10 @@ def create_Download(mostrecentversion, *olderversions):
         f.write(Download)
 
     #download MCFM libraries
-    libmcfmfilename = os.path.join(WebGeneratordir, "libmcfm_7p0.so")
-    if not os.path.exists(libmcfmfilename):
-        check_call(["wget", "-O", libmcfmfilename, "https://github.com/JHUGen/JHUGen-backup/raw/081536e660a6712d73721eb2f7dfaded1333525f/JHUGenMELA/ggZZ_MCFM/libmcfm_7p0.so"])
+    if not os.path.exists("MCFM-precompiled"):
+        check_call(["git", "clone", "git@github.com:JHUGen/MCFM-precompiled"])
+    with cd("MCFM-precompiled"):
+        check_call(["git", "pull"])
 
 @contextmanager
 def cd(newdir):
@@ -183,7 +187,7 @@ Download_template = """
     Download:<br>
     Latest version: {latest}
     <br>
-    Compiled MCFM libraries to interface with MELA that work for a good variety of software releases: <a href="libmcfm_7p0.so">libmcfm_7p0.so</a><br>
+    Compiled MCFM libraries to interface with MELA that work for a good variety of software releases: <a href="MCFM-precompiled/slc5_amd64_gcc462/libmcfm_7p0.so">libmcfm_7p0.so</a><br>
     (See JHUGenMELA/ggZZ_MCFM/README for further information)
     <br>
     <br>
@@ -250,6 +254,7 @@ storefolders = ["JHUGenerator", "JHUGenMELA", "AnalyticMELA", "graviton", "gravi
 dontupload = [
               "uploadwebpage.py",
               ".gitignore",
+              ".git",
              ]
 #end of inputs
 ########################################################################################
@@ -257,5 +262,6 @@ dontupload = [
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-n", "--dry-run", help="create all the tarballs but don't actually upload", action="store_true", dest="dryrun")
+    parser.add_argument("--no-mcfm", help="don't re-upload MCFM libraries", action="store_true")
     args = parser.parse_args()
-    uploadwebpage(dryrun=args.dryrun)
+    uploadwebpage(dryrun=args.dryrun, no_mcfm=args.no_mcfm)

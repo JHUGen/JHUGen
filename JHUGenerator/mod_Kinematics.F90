@@ -857,10 +857,11 @@ real(8) :: Mom(1:4,1:NUP),xRnd,s34,s36,s45,s56
 real(8),optional :: EventWeight
 integer :: MY_IDUP(1:NUP),ICOLUP(1:2,1:NUP),LHE_IDUP(1:NUP),ISTUP(1:NUP),MOTHUP(1:2,1:NUP)
 integer :: IDPRUP,i,smallestInv
-real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP,Lifetime,Spin,MomDummy(1:4,1:NUP),TheMass
+real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP,Lifetime,Spin,MomDummy(1:4,1:NUP),TheMass,mjj
 character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0)"
 integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, Lep1M=8, Lep2P=9, Lep2M=10
 integer, parameter :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6,5/)
+logical :: canbeVBF, canbeVH, isVHlike
 ! For description of the LHE format see http://arxiv.org/abs/hep-ph/0109068 and http://arxiv.org/abs/hep-ph/0609017
 ! The LHE numbering scheme can be found here: http://pdg.lbl.gov/mc_particle_id_contents.html and http://lhapdf.hepforge.org/manual#tth_sEcA
 
@@ -872,18 +873,84 @@ integer, parameter :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6,5/)
 
       ISTUP(1:2) = -1
       MOTHUP(1:2,1:2) = 0
+
+      canbeVH = .false.
+      canbeVBF = .false.
+
+      !try VBF first because there are more options there, but overwrite with VH if that's better
+
       if( MY_IDUP(1).gt.0 ) then ! quark
-          ICOLUP(1:2,1) = (/501,000/)
+        ICOLUP(1:2,1) = (/501,000/)
       else! anti-quark
-          ICOLUP(1:2,1) = (/000,501/)
+        ICOLUP(1:2,1) = (/000,501/)
       endif
       if( MY_IDUP(2).gt.0 ) then! quark
-          ICOLUP(1:2,2) = (/502,000/)
+        ICOLUP(1:2,2) = (/502,000/)
       else! anti-quark
-          ICOLUP(1:2,2) = (/000,502/)
+        ICOLUP(1:2,2) = (/000,502/)
       endif
-      ICOLUP(1:2,3) = ICOLUP(1:2,1)
-      ICOLUP(1:2,4) = ICOLUP(1:2,2)
+
+      !WW is typically larger xsec, so choose that if possible, then ZZ
+      if(       abs(CoupledVertex((/MY_IDUP(1),-MY_IDUP(3)/), -1)) .eq. abs(Wp_) &
+          .and. abs(CoupledVertex((/MY_IDUP(2),-MY_IDUP(4)/), -1)) .eq. abs(Wp_)) then
+        ICOLUP(1:2,3) = ICOLUP(1:2,1)
+        ICOLUP(1:2,4) = ICOLUP(1:2,2)
+        canbeVBF = .true.
+      elseif(       abs(CoupledVertex((/MY_IDUP(1),-MY_IDUP(4)/), -1)) .eq. abs(Wp_) &
+              .and. abs(CoupledVertex((/MY_IDUP(2),-MY_IDUP(3)/), -1)) .eq. abs(Wp_)) then
+        ICOLUP(1:2,3) = ICOLUP(1:2,2)
+        ICOLUP(1:2,4) = ICOLUP(1:2,1)
+        canbeVBF = .true.
+      elseif(       abs(CoupledVertex((/MY_IDUP(1),-MY_IDUP(3)/), -1)) .eq. abs(Z0_) &
+              .and. abs(CoupledVertex((/MY_IDUP(2),-MY_IDUP(4)/), -1)) .eq. abs(Z0_)) then
+        ICOLUP(1:2,3) = ICOLUP(1:2,1)
+        ICOLUP(1:2,4) = ICOLUP(1:2,2)
+        canbeVBF = .true.
+      elseif(       abs(CoupledVertex((/MY_IDUP(1),-MY_IDUP(4)/), -1)) .eq. abs(Z0_) &
+              .and. abs(CoupledVertex((/MY_IDUP(2),-MY_IDUP(3)/), -1)) .eq. abs(Z0_)) then
+        ICOLUP(1:2,3) = ICOLUP(1:2,2)
+        ICOLUP(1:2,4) = ICOLUP(1:2,1)
+        canbeVBF = .true.
+      endif
+
+      if( CoupledVertex(MY_IDUP(1:2), -1) .ne. Not_a_particle_ .and. CoupledVertex(MY_IDUP(3:4), -1) .ne. Not_a_particle_) then
+        canbeVH = .true.
+      endif
+
+      if( .not. canbeVH .and. .not. canbeVBF) then
+        print *, "Event doesn't make sense"
+        print *, MY_IDUP(1:4)
+        stop 1
+      endif
+
+      if( canbeVH .and. canbeVBF ) then
+        mjj = Get_MInv( Mom(1:4,3)+Mom(1:4,4) )
+        if( abs(CoupledVertex(MY_IDUP(1:2), -1)).eq.Wp_ ) then
+          isVHlike = ( mjj .gt. M_W-2d0*Ga_W .and. mjj .lt. M_W+2d0*Ga_W )
+        else
+          isVHlike = ( mjj .gt. M_Z-2d0*Ga_Z .and. mjj .lt. M_Z+2d0*Ga_Z )
+        endif
+      elseif( canbeVH ) then
+        isVHlike = .true.
+      endif
+
+      if( isVHlike ) then
+        if( MY_IDUP(1).gt.0 ) then ! quark
+          ICOLUP(1:2,1) = (/501,000/)
+          ICOLUP(1:2,2) = (/000,501/)
+        else! anti-quark
+          ICOLUP(1:2,1) = (/000,501/)
+          ICOLUP(1:2,2) = (/501,000/)
+        endif
+        if( MY_IDUP(3).gt.0 ) then ! quark
+          ICOLUP(1:2,3) = (/502,000/)
+          ICOLUP(1:2,4) = (/000,502/)
+        else! anti-quark
+          ICOLUP(1:2,3) = (/000,502/)
+          ICOLUP(1:2,4) = (/502,000/)
+        endif
+      endif
+
       ISTUP(3:10) = +1
       MOTHUP(1:2,3)= (/1,2/)
       MOTHUP(1:2,4)= (/1,2/)
@@ -898,6 +965,7 @@ integer, parameter :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6,5/)
                 if( abs(MY_IDUP(3)).eq.Top_ ) MY_IDUP(3) = MY_IDUP(1)
                 if( abs(MY_IDUP(4)).eq.Top_ ) MY_IDUP(4) = MY_IDUP(2)
          endif
+         call Error("This shouldn't be able to happen anymore, assert false")
       endif
       
       ISTUP(5:6) = 2
@@ -910,23 +978,6 @@ integer, parameter :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6,5/)
       MOTHUP(1:2,9 )= (/6,6/)
       MOTHUP(1:2,10)= (/6,6/)
             
-!  associte lepton pairs to MOTHUP
-      if( MY_IDUP(7).eq.MY_IDUP(9) ) then
-          s34 = Get_MInv( Mom(1:4,7)+Mom(1:4,8) )
-          s56 = Get_MInv( Mom(1:4,9)+Mom(1:4,10) )
-          s36 = Get_MInv( Mom(1:4,7)+Mom(1:4,10) )
-          s45 = Get_MInv( Mom(1:4,8)+Mom(1:4,9) )
-          smallestInv = minloc((/dabs(s34-M_V),dabs(s56-M_V),dabs(s36-M_V),dabs(s45-M_V)/),1)
-          if( smallestInv.eq.3 .or. smallestInv.eq.4 ) then
-              call swapi(MOTHUP(1,7),MOTHUP(1,9))
-              call swapi(MOTHUP(2,7),MOTHUP(2,9))
-!               call swapi(ICOLUP(1,7),ICOLUP(1,9))
-!               call swapi(ICOLUP(2,7),ICOLUP(2,9))
-!               Z1FV(1:4) = MomDummy(1:4,3)+MomDummy(1:4,6)
-!               Z2FV(1:4) = MomDummy(1:4,5)+MomDummy(1:4,4)
-          endif
-      endif
-      
       
       
       
@@ -948,6 +999,27 @@ integer, parameter :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6,5/)
           MomDummy(4,i) = 100.0d0*Mom(4,i)
       enddo
 
+
+!  associte lepton pairs to MOTHUP
+      if( MY_IDUP(7).eq.MY_IDUP(9) ) then
+          s34 = Get_MInv( Mom(1:4,7)+Mom(1:4,8) )
+          s56 = Get_MInv( Mom(1:4,9)+Mom(1:4,10) )
+          s36 = Get_MInv( Mom(1:4,7)+Mom(1:4,10) )
+          s45 = Get_MInv( Mom(1:4,8)+Mom(1:4,9) )
+          smallestInv = minloc((/dabs(s34-M_V),dabs(s56-M_V),dabs(s36-M_V),dabs(s45-M_V)/),1)
+          if( smallestInv.eq.3 .or. smallestInv.eq.4 ) then
+              call swapi(MOTHUP(1,7),MOTHUP(1,9))
+              call swapi(MOTHUP(2,7),MOTHUP(2,9))
+              call swapi(ICOLUP(1,7),ICOLUP(1,9))
+              call swapi(ICOLUP(2,7),ICOLUP(2,9))
+              MomDummy(1:4,5) = MomDummy(1:4,9)+MomDummy(1:4,8)
+              MomDummy(1:4,6) = MomDummy(1:4,7)+MomDummy(1:4,10)
+          else
+              !The Z's are not always lined up this way already, for reasons I don't understand.
+              MomDummy(1:4,5) = MomDummy(1:4,7)+MomDummy(1:4,8)
+              MomDummy(1:4,6) = MomDummy(1:4,9)+MomDummy(1:4,10)
+          endif
+      endif
 
 
 write(io_LHEOutFile,"(A)") "<event>"

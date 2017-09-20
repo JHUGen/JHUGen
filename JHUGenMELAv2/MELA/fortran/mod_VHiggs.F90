@@ -7,7 +7,9 @@ module ModVHiggs
 
 
   !----- notation for subroutines
-  public :: EvalAmp_VHiggs,EvalUnpolAmpSq_gg_VH
+  public :: EvalAmp_VHiggs,EvalUnpolAmpSq_gg_VH,TreeAmp_qqb_ZH,TreeAmp_qqbg_ZH
+  public :: Dipoles_qqb_VH,CalcFormFactor1
+  real,parameter,public :: alpha_ii=1d0
 
 contains
 
@@ -1723,24 +1725,28 @@ END SUBROUTINE
       implicit none
       real(8) :: p(1:4,1:4),UnPolSqAmp
       complex(8) :: SP(1:7),SI(0:16),LC(1:15)
-      complex(8) :: qlI1,qlI2,qlI3,qlI4
+      complex(8) :: qlI1,qlI2,qlI3,qlI4,testYA,testMA
       complex(8) :: ep1(1:4),ep2(1:4),cep3(1:4),p1(1:4),p2(1:4),p3(1:4)
       complex(8) :: MasslessTri,MassiveTri,MassiveBox
       real(8) :: shat,that,uhat,MT2,MH2,MZ2,MV2
       real(8) :: MuRen2,PreFac,PreFac2,IZ(3:4,9:9),smT,y,mTrans
       integer :: eps,h1,h2,h3,i,j
       complex(8) :: VVHg1,VVHg2,VVHg3
-      complex(8) :: calc_MassiveBox,calc_MassiveBox_QP,calc_MassiveTensorBox
+      complex(8) :: cmzsq, rat,cix,newsum_MCFM
+      complex(8) :: calc_MassiveBox,calc_MassiveBox_QP,calc_MassiveTensorBox,newsum
       real(8),parameter :: E=dexp(1d0), ICol_sq=8d0
-
-!       real(8) :: sprod(1:4,1:4),p5hat(1:4),p6hat(1:4)
-!       complex(8) :: za(1:4,1:4),zb(1:4,1:4),a,b,c,d,e,f,v,w,x,y,z,o
-
-
+      integer,parameter :: rank=3
+      double complex :: DD1(0:rank/2,0:rank,0:rank,0:rank),DD1uv(0:rank/2,0:rank,0:rank,0:rank)
+      double complex :: DD2(0:rank/2,0:rank,0:rank,0:rank),DD2uv(0:rank/2,0:rank,0:rank,0:rank)
+      double complex :: DD3(0:rank/2,0:rank,0:rank,0:rank),DD3uv(0:rank/2,0:rank,0:rank,0:rank)
+      double complex :: DD0(1:3)
+      double precision :: Derr(0:rank)
+      real(8) :: sprod(1:4,1:4),p5hat(1:4),p6hat(1:4)
+      complex(8) :: za(1:4,1:4),zb(1:4,1:4),a,b,c,d,ee,f,v,w,x,yy,z,o,ampMCFM(-1:1,-1:1,-1:1)
 
 !       prefactors and kinematics
-        PreFac  = Pi**2 *      (4d0*pi*alpha_QED) * (4d0*pi*alphas) /sitW/M_W     *1d0/(16d0*pi**2)
-        PreFac2 = Pi**2 * dsqrt(4d0*pi*alpha_QED) * (4d0*pi*alphas) *m_Top**2/vev *1d0/(16d0*pi**2)
+        PreFac  = Pi**2 *      (4d0*pi*alpha_QED) * (4d0*pi*alphas) /sitW/M_W     *1d0/(2d0*pi)**4
+        PreFac2 = Pi**2 * dsqrt(4d0*pi*alpha_QED) * (4d0*pi*alphas) *m_Top**2/vev *1d0/(2d0*pi)**4
         IZ(3,9) = 0.5d0*(aL_QUp-aR_QUp)/2d0/sitW/dsqrt(1d0-sitW**2) ! top
         IZ(4,9) = -IZ(3,9)                                          ! bottom
 
@@ -1751,13 +1757,6 @@ END SUBROUTINE
         MH2 = M_Reso**2
         MT2 = M_Top**2
         MV2 = get_MInv2(dble(p3(1:4)))
-
-        VVHg1 = 1d0
-        VVHg2 = 0d0/MH2
-        VVHg3 = 0d0/MH2
-
-!         call ShiftMass2(p(1:4,3),p(1:4,4),M_Z,p5hat,p6hat)! projecting Z boson on-shell (because computation assumed p3^3=MZ^2)
-!         p3(1:4) = p5hat(1:4)+p6hat(1:4)
         shat =+2d0*(p1.dot.p2)
         that =-2d0*(p1.dot.p3)+MV2
         uhat =-2d0*(p2.dot.p3)+MV2
@@ -1765,16 +1764,10 @@ END SUBROUTINE
         smT  = dsqrt(shat)*mTrans
         y    = Get_ETA(dble(p3(1:4)))
 
+        call spinoru2(4,(/p(1:4,1),p(1:4,2),p(1:4,3),p(1:4,4)/),za,zb,sprod)
+        a = za(1,2);  b = za(1,3);  c = za(1,4);  d = za(2,3);  ee = za(2,4);  f = za(3,4)
+        v = zb(1,2);  w = zb(1,3);  x = zb(1,4);  yy = zb(2,3);  z = zb(2,4);  o = zb(3,4)
 
-!         print *, "check1",that,- smT* E**(-y) + MV2
-!         print *, "check2",uhat,- smT* E**(+y) + MV2
-!         pause
-
-
-!         p30(1:4) = p3(1:4) - (p3(1:4).dot.p3(1:4))/(2d0*(p3(1:4).dot.p1(1:4)))*p1(1:4)
-!         call my_spinoru(4,(/p(1:4,1),p(1:4,2),p5hat(1:4),p6hat(1:4)/),za,zb,sprod)
-!         a = za(1,2);  b = za(1,3);  c = za(1,4);  d = za(2,3);  e = za(2,4);  f = za(3,4)
-!         v = zb(1,2);  w = zb(1,3);  x = zb(1,4);  y = zb(2,3);  z = zb(2,4);  o = zb(3,4)
 
 !       evaluate scalar integrals
         SI(0) = 1d0
@@ -1804,7 +1797,7 @@ END SUBROUTINE
 
 
 !         SI(1:16) = 0d0
-#if useQCDLoopLib==1
+#if useQCDLoopLib==1 || linkMELA==1
         SI(1) = qlI1(MT2,MuRen2,eps)
         SI(2) = qlI2(zero, MT2,MT2,MuRen2,eps)
         SI(3) = qlI2(MH2,  MT2,MT2,MuRen2,eps)
@@ -1821,29 +1814,109 @@ END SUBROUTINE
         SI(14)= qlI4(zero,zero,MV2,MH2,shat,that, MT2,MT2,MT2,MT2,MuRen2,eps)
         SI(15)= qlI4(zero,zero,MV2,MH2,shat,uhat, MT2,MT2,MT2,MT2,MuRen2,eps)
         SI(16)= qlI4(zero,MV2,zero,MH2,that,uhat, MT2,MT2,MT2,MT2,MuRen2,eps)
-
 #else
-
-    print *, "No loop integrals"
+    call Error("This process requires linkQCDLoop or linkMELA enabled in the makefile")
 #endif
+
+
+#if useCollier==1
+      call D_cll(DD1,DD1uv,dcmplx((/0d0,MH2,MV2,0d0,that,shat/)),dcmplx((/MT2,MT2,MT2,MT2/)),rank,Derr)  
+      call D_cll(DD2,DD2uv,dcmplx((/0d0,MV2,MH2,0d0,uhat,shat/)),dcmplx((/MT2,MT2,MT2,MT2/)),rank,Derr)  
+      call D_cll(DD3,DD3uv,dcmplx((/MV2,0d0,MH2,0d0,uhat,that/)),dcmplx((/MT2,MT2,MT2,MT2/)),rank,Derr)      
+
+      call D0_cll(DD0(1),dcmplx((/0d0,0d0,MV2,MH2,shat,that/)),dcmplx((/MT2,MT2,MT2,MT2/)))  
+      call D0_cll(DD0(2),dcmplx((/0d0,0d0,MV2,MH2,shat,uhat/)),dcmplx((/MT2,MT2,MT2,MT2/)))  
+      call D0_cll(DD0(3),dcmplx((/0d0,MV2,0d0,MH2,that,uhat/)),dcmplx((/MT2,MT2,MT2,MT2/)))
+#else
+      call Error("This process requires linkCollier enabled in the makefile")
+#endif
+
+
+             
+ VVHg1 = 0.5d0*ghz1 + ghz2 * ( p3(1:4).dot.(p1(1:4)+p2(1:4)) )/MZ2
+ VVHg2 = -ghz2/MZ2
+ 
+
+! !      triangles in spinor helicity (for one helicity configuration)
+!        newsum = (-4*a*(0d0,1d0)*MT2*VVHg1*(c*w + ee*yy)*SI(8))/v       
+!        newsum = newsum  &
+!               + (-2*a*(0d0,1d0)*MT2*VVHg2/MH2*(b**2*w*x + b*(d*o*v - 2*a*v*x + c*x**2 + 2*d*x*yy) + z*(a*(-2*d*v + f*x) + d*(2*c*x + d*yy + ee*z))))*SI(8)/v
+!        newsum = newsum /( MV2-MZ2 + (0d0,1d0)*M_Z*Ga_Z )   ! * exp((0d0,1d0)*Pi*(+1d0))
+
+       
+       
+!        print *, "TESTER",(MZ2 + a*v)/(-MH2 + MV2 + MZ2 + b*w + c*x + d*yy + ee*z)
+
+
+
+! ! ! ! ! ! ! MCFM triangle  (remember to set alpha_s=constant)
+! !------ right lepton amplitudes
+!       amp(2,2,2)=ggHZ_pp_tri(1,2,4,3,za,zb,mt2)
+
+!       call spinoru2(4,(/-p(1:4,1),-p(1:4,2),p(1:4,4),p(1:4,3)/),za,zb,sprod)
+!       cmzsq=M_Z**2-(0d0,1d0)*M_Z*Ga_Z
+! ! top tri
+!       cix=  (2*(-((mt2*za(1,3)*zb(2,1)*zb(4,1))/za(1,2)) -  (mt2*za(2,3)*zb(2,1)*zb(4,2))/za(1,2)))/ (za(1,2)*za(3,4)*zb(2,1)*zb(4,3))
+!       cix=cix+ (2*mt2*zb(2,1)**2*(za(1,3)*zb(4,1) + za(2,3)*zb(4,2)))/  (cmzsq*sprod(1,2)*sprod(3,4))
+!       rat= (-2*(-((za(1,3)*zb(2,1)*zb(4,1))/za(1,2)) -   (za(2,3)*zb(2,1)*zb(4,2))/za(1,2)))/(za(1,2)*za(3,4)*zb(2,1)*zb(4,3))
+!       rat=rat+ (-2*zb(2,1)**2* (za(1,3)*zb(4,1) + za(2,3)*zb(4,2)))/ (cmzsq*sprod(1,2)*sprod(3,4))
+!       newsum_MCFM=( SI(8)*cix-rat/2d0 ) *sprod(3,4)/dcmplx(sprod(3,4)-M_Z**2,M_Z*Ga_Z) * sprod(1,2)/dcmplx(sprod(1,2)-M_Z**2,0d0) 
+! 
+! ! bot tri
+! mt2=0d0
+! SI(8) = qlI3(zero,zero,shat, MT2,MT2,MT2,MuRen2,eps)
+!       cix=  (2*(-((mt2*za(1,3)*zb(2,1)*zb(4,1))/za(1,2)) -  (mt2*za(2,3)*zb(2,1)*zb(4,2))/za(1,2)))/ (za(1,2)*za(3,4)*zb(2,1)*zb(4,3))
+!       cix=cix+ (2*mt2*zb(2,1)**2*(za(1,3)*zb(4,1) + za(2,3)*zb(4,2)))/  (cmzsq*sprod(1,2)*sprod(3,4))
+!       rat= (-2*(-((za(1,3)*zb(2,1)*zb(4,1))/za(1,2)) -   (za(2,3)*zb(2,1)*zb(4,2))/za(1,2)))/(za(1,2)*za(3,4)*zb(2,1)*zb(4,3))
+!       rat=rat+ (-2*zb(2,1)**2* (za(1,3)*zb(4,1) + za(2,3)*zb(4,2)))/ (cmzsq*sprod(1,2)*sprod(3,4))
+!       newsum_MCFM=newsum_MCFM - ( SI(8)*cix-rat/2d0 ) *sprod(3,4)/dcmplx(sprod(3,4)-M_Z**2,M_Z*Ga_Z) * sprod(1,2)/dcmplx(sprod(1,2)-M_Z**2,0d0) 
+
+! restoring       
+! mt2 = m_top**2     
+! SI(8) = qlI3(zero,zero,shat, MT2,MT2,MT2,MuRen2,eps)
+! 
+! 
+! 
+! 
+! ! the boxes 
+!       call spinoru2(4,(/-p(1:4,1),-p(1:4,2),p(1:4,4),p(1:4,3)/),za,zb,sprod)
+! 
+! !------ left handed lepton coupling (- sign from line reversal)
+!       ampMCFM(-1,-1,+1)= ggHZ_pp_box(1,2,3,4,za,zb,sprod,mt2) *sprod(3,4)/dcmplx(sprod(3,4)-M_Z**2,M_Z*Ga_Z)  * aL_lep
+!       ampMCFM(+1,-1,+1)= ggHZ_mp_box(1,2,3,4,za,zb,sprod,mt2) *sprod(3,4)/dcmplx(sprod(3,4)-M_Z**2,M_Z*Ga_Z)  * aL_lep
+!       ampMCFM(-1,+1,+1)=-ggHZ_mp_box(1,2,4,3,zb,za,sprod,mt2) *sprod(3,4)/dcmplx(sprod(3,4)-M_Z**2,M_Z*Ga_Z)  * aL_lep
+!       ampMCFM(+1,+1,+1)=-ggHZ_pp_box(1,2,4,3,zb,za,sprod,mt2) *sprod(3,4)/dcmplx(sprod(3,4)-M_Z**2,M_Z*Ga_Z)  * aL_lep
+!       
+! !------- right handed lepton coupling 
+!       ampMCFM(-1,-1,-1)= ggHZ_pp_box(1,2,4,3,za,zb,sprod,mt2) *sprod(3,4)/dcmplx(sprod(3,4)-M_Z**2,M_Z*Ga_Z)  * aR_lep
+!       ampMCFM(+1,-1,-1)= ggHZ_mp_box(1,2,4,3,za,zb,sprod,mt2) *sprod(3,4)/dcmplx(sprod(3,4)-M_Z**2,M_Z*Ga_Z)  * aR_lep
+!       ampMCFM(-1,+1,-1)=-ggHZ_mp_box(1,2,3,4,zb,za,sprod,mt2) *sprod(3,4)/dcmplx(sprod(3,4)-M_Z**2,M_Z*Ga_Z)  * aR_lep
+!       ampMCFM(+1,+1,-1)=-ggHZ_pp_box(1,2,3,4,zb,za,sprod,mt2) *sprod(3,4)/dcmplx(sprod(3,4)-M_Z**2,M_Z*Ga_Z)  * aR_lep
+!       
+! ! ! ! ! ! END MCMF
+            
 
 
 !       helicity sum
         UnPolSqAmp = 0d0
         do h1=-1,+1, 2
         do h2=-1,+1, 2
-        do h3=-1,+1    !, 2
+        do h3=-1,+1, 2
 
 !           polarization vectors
             ep1(1:4) = pol_gluon_incoming(p(1:4,1),h1)
             ep2(1:4) = pol_gluon_incoming(p(1:4,2),h2)
-!             cep3(1:4)= pol_Zff_outgoing(p(1:4,3),p(1:4,4),h3)   * (-1d0)/( MV2-MZ2 + (0d0,1d0)*M_Z*Ga_Z )
-!             if( h3.lt.0 ) then!  CHECK THAT L-R ASSIGNMENTS ARE CORRECT !!!
-!                cep3(1:4) = cep3(1:4) * dsqrt(4d0*pi*alpha_QED)/2d0/sitW/dsqrt(1d0-sitW**2) * aR_lep
-!             else
-!                cep3(1:4) = cep3(1:4) * dsqrt(4d0*pi*alpha_QED)/2d0/sitW/dsqrt(1d0-sitW**2) * aL_lep
-!             endif
-            cep3(1:4) = pol_mass(p3(1:4),h3,outgoing=.true.)
+
+!             cep3(1:4) = pol_mass(p3(1:4),h3,outgoing=.true.)
+
+            
+            cep3(1:4)= pol_Zff_outgoing(p(1:4,3),p(1:4,4),h3)   * (-1d0)/( MV2-MZ2 + (0d0,1d0)*M_Z*Ga_Z )
+            if( h3.lt.0 ) then
+               cep3(1:4) = cep3(1:4) * dsqrt(couplZffsq) * aR_lep
+            else
+               cep3(1:4) = cep3(1:4) * dsqrt(couplZffsq) * aL_lep
+            endif
+
 
 
 !           scalar products
@@ -1872,33 +1945,35 @@ END SUBROUTINE
             LC(14)= LeviCiv(p2,p3,ep2,cep3)
             LC(15)= LeviCiv(p3,ep1,ep2,cep3)
 
+!             shat*(LC(1) - LC(11)) - 2*LC(3)*(SP(3) + SP(4))  == 00 
 
-
+print *, "CHECK: for some reasone the original VVHg2,VVHg3 couplings were not divided by MH2"
+print *, "CHECK in comparison with Yaofu/Mathematica because VVHg2 is already divided above."
 
 !           Loop amplitudes
-            MasslessTri = (2*MZ2*SI(0)*(-4*VVHg1*LC(3)*(SP(3) + SP(4)) + 4*smT*VVHg2*Cosh(y)*LC(3)*(SP(3) + SP(4))  &
-                            + shat*(-(VVHg1*(LC(1) + 5*LC(11))) + VVHg2*(LC(9) + 5*LC(13))*(SP(3) + SP(4)))         &
-                            + 3*shat**2*VVHg3*(SP(2)*SP(6) - SP(1)*SP(7))))/(3*shat*(-MH2 + MV2 + MZ2 - 2*smT*Cosh(y)))
+            MasslessTri = (2*MZ2*SI(0)*(-4*VVHg1*LC(3)*(SP(3) + SP(4)) + 4*smT*VVHg2/MH2*Cosh(y)*LC(3)*(SP(3) + SP(4))  & 
+                            + shat*(-(VVHg1*(LC(1) + 5*LC(11))) + VVHg2/MH2*(LC(9) + 5*LC(13))*(SP(3) + SP(4)))         &
+                            + 3*shat**2*VVHg3/MH2*(SP(2)*SP(6) - SP(1)*SP(7))))/(3*shat*(-MH2 + MV2 + MZ2 - 2*smT*Cosh(y)))
 !
-            MassiveTri = (-2*(2*smT*VVHg2*LC(3)*(MZ2*(shat*SI(0) - SI(1) + MT2*(SI(0) - 2*SI(2) + 3*SI(5))) +   &
-                           3*MT2*(MZ2 - shat)*shat*SI(8))*(SP(3) + SP(4)) + 2*E**(2*y)*smT*VVHg2*LC(3)*   &
+            MassiveTri = (-2*(2*smT*VVHg2/MH2*LC(3)*(MZ2*(shat*SI(0) - SI(1) + MT2*(SI(0) - 2*SI(2) + 3*SI(5))) +   &
+                           3*MT2*(MZ2 - shat)*shat*SI(8))*(SP(3) + SP(4)) + 2*E**(2*y)*smT*VVHg2/MH2*LC(3)*   &
                            (MZ2*(shat*SI(0) - SI(1) + MT2*(SI(0) - 2*SI(2) + 3*SI(5))) + 3*MT2*(MZ2 - shat)*shat*SI(8))*(SP(3) + SP(4)) +    &
-                           E**y*(-2*MT2*(-6*shat**2*(VVHg1 + shat*VVHg2)*LC(3)*SI(8)*(SP(3) + SP(4)) + MZ2*(2*VVHg1*LC(3)*(SI(0) - 2*SI(2) + 3*SI(5))*   &
-                           (SP(3) + SP(4)) + 6*shat**2*VVHg2*LC(3)*SI(8)*(SP(3) + SP(4)) + shat*(VVHg2*(LC(9) - LC(13))*(SI(0) - 2*SI(2) + 3*SI(5))*   &
+                           E**y*(-2*MT2*(-6*shat**2*(VVHg1 + shat*VVHg2/MH2)*LC(3)*SI(8)*(SP(3) + SP(4)) + MZ2*(2*VVHg1*LC(3)*(SI(0) - 2*SI(2) + 3*SI(5))*   &
+                           (SP(3) + SP(4)) + 6*shat**2*VVHg2/MH2*LC(3)*SI(8)*(SP(3) + SP(4)) + shat*(VVHg2/MH2*(LC(9) - LC(13))*(SI(0) - 2*SI(2) + 3*SI(5))*   &
                            (SP(3) + SP(4)) + VVHg1*(-((LC(1) - LC(11))*(SI(0) - 2*SI(2) + 3*SI(5))) +    &
                            6*LC(3)*SI(8)*(SP(3) + SP(4)))))) +  MZ2*(4*VVHg1*LC(3)*SI(1)*(SP(3) + SP(4)) +    &
-                           shat**2*SI(0)*(-(VVHg1*(LC(1) + 5*LC(11))) +  VVHg2*(LC(9) + 5*LC(13))*(SP(3) + SP(4))) -    &
-                           2*shat*(-(VVHg2*(LC(9) - LC(13))*SI(1)*(SP(3) + SP(4))) + VVHg1*((LC(1) - LC(11))*SI(1) +    &
-                           2*LC(3)*SI(0)*(SP(3) + SP(4)))) + 3*shat**3*VVHg3*SI(0)*(SP(2)*SP(6) - SP(1)*SP(7))))))/(3*E**y*shat**2*(MH2 - MV2 - MZ2 + 2*smT*Cosh(y)))
+                           shat**2*SI(0)*(-(VVHg1*(LC(1) + 5*LC(11))) +  VVHg2/MH2*(LC(9) + 5*LC(13))*(SP(3) + SP(4))) -    &
+                           2*shat*(-(VVHg2/MH2*(LC(9) - LC(13))*SI(1)*(SP(3) + SP(4))) + VVHg1*((LC(1) - LC(11))*SI(1) +    &
+                           2*LC(3)*SI(0)*(SP(3) + SP(4)))) + 3*shat**3*VVHg3/MH2*SI(0)*(SP(2)*SP(6) - SP(1)*SP(7))))))/(3*E**y*shat**2*(MH2 - MV2 - MZ2 + 2*smT*Cosh(y)))
+
 
 !             MassiveBox = calc_MassiveBox(MV2,MH2,MT2,shat,smT,y,LC,SP,SI,kappa,kappa_tilde)
 !             MassiveBox = calc_MassiveBox_QP(MV2,MH2,MT2,shat,smT,y,LC,SP,SI,kappa,kappa_tilde)
-            MassiveBox = calc_MassiveTensorBox(MV2,MT2,MH2,shat,that,uhat,smT,y,LC,SP,SI,kappa,kappa_tilde)
+            MassiveBox = calc_MassiveTensorBox(MV2,MT2,MH2,shat,that,uhat,smT,y,LC,SP,DD0,DD1,DD2,DD3,kappa,kappa_tilde)
 
-
-            MasslessTri = MasslessTri * PreFac * IZ(4,9)
-            MassiveTri  = MassiveTri  * PreFac * IZ(3,9)
-            MassiveBox  = MassiveBox  * PreFac2* IZ(3,9)
+            MasslessTri = MasslessTri * IZ(4,9)* PreFac 
+            MassiveTri  = MassiveTri  * IZ(3,9)* PreFac 
+            MassiveBox  = MassiveBox  * IZ(3,9)* PreFac2
 
             UnPolSqAmp = UnPolSqAmp + ICol_sq * cdabs( MasslessTri*1 + MassiveTri*1 + MassiveBox*1 )**2
 
@@ -1920,6 +1995,2816 @@ END SUBROUTINE
 
 
 
+
+
+
+FUNCTION TreeAmp_qqb_ZH(MomExt,Heli)! ordering: 1:in 2:in 3:H 4:l1 5:l2
+use ModParameters
+use ModMisc
+implicit none
+integer,parameter:: minus=0, plus=1, dummy=0
+real(8) :: MomExt(1:4,1:6),MomZst1(1:4),MomZst2(1:4),PreFac,MomH(1:4)
+integer :: Heli(1:4)
+complex(8) ::TreeAmp_qqb_ZH(1:6),TreeAmp(minus:plus),VVHg1,VVHg2,VVHg3
+complex(8) :: Spi(1:4),BarSpi(1:4,minus:plus),ZPol1(1:4,minus:plus),ZPol2(1:4),cep3(1:4),ZProp1,ZProp2
+TreeAmp_qqb_ZH(1:6) = (0d0,0d0)
+
+
+    Spi(1:4) = v_spinor(MomExt(1:4,1),-Heli(1))             !  incomming quark= u(p,lambda) = v(p,-lambda)
+    BarSpi(1:4,dummy) = ubar_spinor(MomExt(1:4,2),-Heli(2)) !  incomming anti-quark= vbar(p,lambda) = ubar(p,-lambda)
+    BarSpi(1:4,plus)  = Chir_Weyl(plus,BarSpi(1:4,dummy))
+    BarSpi(1:4,minus) = Chir_Weyl(minus,BarSpi(1:4,dummy))
+    ZPol1(1:4,plus)  = vbqq_Weyl(BarSpi(1:4,plus),Spi(1:4))  
+    ZPol1(1:4,minus) = vbqq_Weyl(BarSpi(1:4,minus),Spi(1:4)) 
+
+
+
+    MomZst1(1:4) = MomExt(1:4,1)+MomExt(1:4,2)
+    MomZst2(1:4) = MomExt(1:4,5)+MomExt(1:4,6)
+    MomH(1:4)    = MomExt(1:4,3)+MomExt(1:4,4)    
+    ZProp1 = -(0d0,1d0)/((MomZst1(1:4).dot.MomZst1(1:4))-M_Z**2 +(0d0,1d0)*Ga_Z*M_Z)
+    ZProp2 = -(0d0,1d0)/((MomZst2(1:4).dot.MomZst2(1:4))-M_Z**2 +(0d0,1d0)*Ga_Z*M_Z)
+    
+
+    cep3(1:4)= pol_Zff_outgoing(MomExt(1:4,5),MomExt(1:4,6),Heli(3)) * ZProp2
+    if( Heli(3).lt.0 ) then
+       cep3(1:4) = cep3(1:4) * dsqrt(couplZffsq) * aR_lep
+    else
+       cep3(1:4) = cep3(1:4) * dsqrt(couplZffsq) * aL_lep
+    endif    
+
+    PreFac = 2d0*m_v**2/vev 
+    VVHg1 = PreFac*( 0.5d0*ghz1 + ghz2 * ( MomZst2.dot.MomZst1 )/M_Z**2 )
+    VVHg2 = PreFac*( -ghz2/M_Z**2 )
+    VVHG3 = PreFac*( -ghz3/M_Z**2 )
+    
+    
+    TreeAmp(plus)  =  VVHg1 * (cep3.dot.ZPol1(:,plus))  + VVHg2*(MomH(1:4).dot.cep3) * (ZPol1(:,plus).dot.MomH(1:4))  + VVHg3 * LeviCiv(ZPol1(:,plus), cep3,dcmplx(MomZst2),dcmplx(MomH(1:4)))
+    TreeAmp(minus) =  VVHg1 * (cep3.dot.ZPol1(:,minus)) + VVHg2*(MomH(1:4).dot.cep3) * (ZPol1(:,minus).dot.MomH(1:4)) + VVHg3 * LeviCiv(ZPol1(:,minus),cep3,dcmplx(MomZst2),dcmplx(MomH(1:4)))
+    
+    TreeAmp_qqb_ZH(up_)  = (TreeAmp(plus)*aR_QUp + TreeAmp(minus)*aL_QUp) * dsqrt(couplZffsq) * ZProp1
+    TreeAmp_qqb_ZH(dn_)  = (TreeAmp(plus)*aR_QDn + TreeAmp(minus)*aL_QDn) * dsqrt(couplZffsq) * ZProp1
+    TreeAmp_qqb_ZH(chm_) = (TreeAmp(plus)*aR_QUp + TreeAmp(minus)*aL_QUp) * dsqrt(couplZffsq) * ZProp1
+    TreeAmp_qqb_ZH(str_) = (TreeAmp(plus)*aR_QDn + TreeAmp(minus)*aL_QDn) * dsqrt(couplZffsq) * ZProp1
+    TreeAmp_qqb_ZH(bot_) = (TreeAmp(plus)*aR_QDn + TreeAmp(minus)*aL_QDn) * dsqrt(couplZffsq) * ZProp1
+
+RETURN
+END FUNCTION
+
+
+
+
+
+
+      
+
+FUNCTION TreeAmp_qqbg_ZH(MomExt,Heli)! gluon emission from initial state ! ordering: 1:in 2:in 3:H 4:l1 5:l2 6: gluon
+use ModParameters
+use ModMisc
+implicit none
+integer,parameter:: minus=-1, plus=1, dummy=0
+real(8) :: MomExt(1:4,1:7)
+integer :: Heli(1:5)
+complex(8) ::TreeAmp_qqbg_ZH(1:6),TreeAmp(minus:plus),VVHg1,VVHg2,VVHg3,cep3(1:4)
+complex(8) :: Spi(1:4),SpiAux(1:4,minus:plus),PolGlu(1:4),BarSpi(1:4),ZPol1(1:4,minus:plus),ZPol2(1:4),ZProp1,ZProp2,PropMom(1:4)
+real(8) :: MomZst1(1:4),MomZst2(1:4),MomH(1:4),PreFac
+TreeAmp_qqbg_ZH(:) = (0d0,0d0)
+
+
+    Spi(1:4) = v_spinor(MomExt(1:4,1),-Heli(1))             !  incomming quark= u(p,lambda) = v(p,-lambda)
+    BarSpi(1:4) = ubar_spinor(MomExt(1:4,2),-Heli(2))       !  incomming anti-quark= vbar(p,lambda) = ubar(p,-lambda)
+    PolGlu(1:4) = pol_mless(dcmplx(MomExt(1:4,7)),Heli(5),outgoing=.true.)
+! PolGlu(1:4) = MomExt(1:4,7) ; print *, "gauge invariance check"
+    
+    MomZst1(1:4) = MomExt(1:4,1)+MomExt(1:4,2)-MomExt(1:4,7) 
+    MomZst2(1:4) = MomExt(1:4,5)+MomExt(1:4,6)
+    MomH(1:4)    = MomExt(1:4,3)+MomExt(1:4,4)
+
+!   diagram 1: gluon emission from quark
+    SpiAux(1:4,dummy) = spi2_Weyl(PolGlu(1:4),Spi(1:4))* cI * dsqrt(4d0*Pi*alphas)
+    PropMom(1:4) = MomExt(1:4,1)-MomExt(1:4,7)
+    SpiAux(1:4,dummy) = spi2_Weyl(PropMom(1:4),SpiAux(1:4,dummy)) * cI/(PropMom(1:4).dot.PropMom(1:4))
+    SpiAux(1:4,plus)  = Chir_Weyl(plus, BarSpi(1:4))
+    SpiAux(1:4,minus) = Chir_Weyl(minus,BarSpi(1:4))
+    ZPol1(1:4,plus)   = vbqq_Weyl(SpiAux(1:4,plus), SpiAux(1:4,dummy))  
+    ZPol1(1:4,minus)  = vbqq_Weyl(SpiAux(1:4,minus),SpiAux(1:4,dummy)) 
+
+!   diagram 2: gluon emisson from anti-quark
+    SpiAux(1:4,dummy) = spb2_Weyl(BarSpi(1:4),PolGlu(1:4))* cI * dsqrt(4d0*Pi*alphas)
+    PropMom(1:4)=-(MomExt(1:4,2)-MomExt(1:4,7))
+    SpiAux(1:4,dummy) = spb2_Weyl(SpiAux(1:4,dummy),PropMom(1:4)) * cI/(PropMom(1:4).dot.PropMom(1:4))
+    SpiAux(1:4,plus)  = Chir_Weyl(plus, SpiAux(1:4,dummy))
+    SpiAux(1:4,minus) = Chir_Weyl(minus,SpiAux(1:4,dummy))
+    ZPol1(1:4,plus)   = ZPol1(1:4,plus)  + vbqq_Weyl(SpiAux(1:4,plus), Spi(1:4)) 
+    ZPol1(1:4,minus)  = ZPol1(1:4,minus) + vbqq_Weyl(SpiAux(1:4,minus),Spi(1:4)) 
+    
+    ZProp1 = -(0d0,1d0)/((MomZst1(1:4).dot.MomZst1(1:4))-M_Z**2 +(0d0,1d0)*Ga_Z*M_Z)
+    ZProp2 = -(0d0,1d0)/((MomZst2(1:4).dot.MomZst2(1:4))-M_Z**2 +(0d0,1d0)*Ga_Z*M_Z)
+    
+    cep3(1:4)= pol_Zff_outgoing(MomExt(1:4,5),MomExt(1:4,6),Heli(3)) * ZProp2
+    if( Heli(3).lt.0 ) then
+       cep3(1:4) = cep3(1:4) * dsqrt(couplZffsq) * aR_lep
+    else
+       cep3(1:4) = cep3(1:4) * dsqrt(couplZffsq) * aL_lep
+    endif    
+     
+             
+    PreFac = 2d0*m_v**2/vev 
+    VVHg1 = PreFac*( 0.5d0*ghz1 + ghz2 * ( MomZst2.dot.MomZst1 )/M_Z**2 )
+    VVHg2 = PreFac*( -ghz2/M_Z**2 )
+    VVHG3 = PreFac*( -ghz3/M_Z**2 )
+     
+    
+    TreeAmp(plus)  =  VVHg1 * (cep3.dot.ZPol1(:,plus))  + VVHg2*(MomH(1:4).dot.cep3) * (ZPol1(:,plus).dot.MomH(1:4))  + VVHg3 * LeviCiv(ZPol1(:,plus), cep3,dcmplx(MomZst2),dcmplx(MomH(1:4)))
+    TreeAmp(minus) =  VVHg1 * (cep3.dot.ZPol1(:,minus)) + VVHg2*(MomH(1:4).dot.cep3) * (ZPol1(:,minus).dot.MomH(1:4)) + VVHg3 * LeviCiv(ZPol1(:,minus),cep3,dcmplx(MomZst2),dcmplx(MomH(1:4)))
+    
+
+    TreeAmp_qqbg_ZH(up_)  = (TreeAmp(plus)*aR_QUp + TreeAmp(minus)*aL_QUp) * dsqrt(couplZffsq) * ZProp1
+    TreeAmp_qqbg_ZH(dn_)  = (TreeAmp(plus)*aR_QDn + TreeAmp(minus)*aL_QDn) * dsqrt(couplZffsq) * ZProp1
+    TreeAmp_qqbg_ZH(chm_) = (TreeAmp(plus)*aR_QUp + TreeAmp(minus)*aL_QUp) * dsqrt(couplZffsq) * ZProp1
+    TreeAmp_qqbg_ZH(str_) = (TreeAmp(plus)*aR_QDn + TreeAmp(minus)*aL_QDn) * dsqrt(couplZffsq) * ZProp1
+    TreeAmp_qqbg_ZH(bot_) = (TreeAmp(plus)*aR_QDn + TreeAmp(minus)*aL_QDn) * dsqrt(couplZffsq) * ZProp1
+
+
+RETURN
+END FUNCTION
+
+      
+      
+
+
+
+
+
+! 
+! 
+! SUBROUTINE IntDip_qqb_Z_ttb(z,sHat,IDip)
+! use ModParameters
+! use ModKinematics
+! use ModMisc
+! implicit none
+! real(8) :: IDip(1:3),APsoft,APfini,APplus,z,sij,sHat
+! real(8) :: dipsoft,dipfini,dipplus,epcorr
+! integer :: n,emi
+! 
+! 
+! epinv2=0d0
+! epinv =0d0
+! 
+!    sij = sHat
+! 
+!    IDip(1:3) = 0d0
+! do n=1,4
+!       if(n.eq.1) then
+!         dipsoft =ii_qq(sij,z,1) * CF
+!         dipfini =ii_qq(sij,z,2) * CF
+!         dipplus =ii_qq(sij,z,3) * CF
+!         emi = 1
+!       elseif(n.eq.2) then
+!         dipsoft =ii_qq(sij,z,1) * CF
+!         dipfini =ii_qq(sij,z,2) * CF
+!         dipplus =ii_qq(sij,z,3) * CF
+!         emi = 2
+!       endif
+! 
+!       if(emi.eq.1) then
+!         IDip(1) = IDip(1) + (dipsoft-dipplus)
+!         IDip(2) = IDip(2) + (dipfini+dipplus)
+!       elseif(emi.eq.2) then
+!         IDip(1) = IDip(1) + (dipsoft-dipplus)
+!         IDip(3) = IDip(3) + (dipfini+dipplus)
+!       endif
+!    enddo
+! 
+! 
+! ! print *, epinv
+! ! print *, "IntDip",IDip(2:3)
+! 
+! 
+! ! !        epcorr=epinv+2d0*dlog(renscale/facscale)
+!        epcorr=epinv
+! 
+! !      this is for qqb-->Z-->ttb+g process
+!        APsoft= 3d0/2d0*CF     * epcorr
+!        APfini= (-1d0-z)*CF    * epcorr
+!        APplus= 2d0*CF/(1d0-z) * epcorr
+!        IDip(1) = IDip(1) + (APsoft - APplus)*2d0
+!        IDip(2) = IDip(2) + (APfini + APplus)
+!        IDip(3) = IDip(3) + (APfini + APplus)
+! 
+! ! print *, "AP",(APsoft - APplus),(APfini + APplus)
+! ! print *, "sum",IDip(2:3)
+! ! pause
+! 
+! END SUBROUTINE
+! 
+
+! 
+! 
+! 
+! SUBROUTINE IntDip_gqb_Z_ttb(z,sHat,IDip)
+! use ModParameters
+! use ModKinematics
+! use ModMisc
+! implicit none
+! real(8) :: IDip(1:3),APsoft,APfini,APplus,z,sij,sHat
+! real(8) :: dipsoft,dipfini,dipplus,epcorr
+! integer :: n,emi
+! 
+! 
+! epinv2=0d0
+! epinv =0d0
+! 
+!    sij = sHat
+! 
+!    IDip(1:3) = 0d0
+! 
+!    dipsoft =ii_gq(sij,z,1) * TR
+!    dipfini =ii_gq(sij,z,2) * TR
+!    dipplus =ii_gq(sij,z,3) * TR
+!    emi = 1
+! 
+! 
+!       if(emi.eq.1) then
+!         IDip(1) = IDip(1) + (dipsoft-dipplus)
+!         IDip(2) = IDip(2) + (dipfini+dipplus)
+!       elseif(emi.eq.2) then
+!         IDip(1) = IDip(1) + (dipsoft-dipplus)
+!         IDip(3) = IDip(3) + (dipfini+dipplus)
+!       elseif(emi.eq.3) then
+!         IDip(1) = IDip(1) + (dipsoft-dipplus)
+! !         IDip(2) = IDip(2) + (dipfini+dipplus)*0.5d0
+! !         IDip(3) = IDip(3) + (dipfini+dipplus)*0.5d0
+!       endif
+! 
+! 
+! ! print *, epinv
+! ! print *, "IntDip",IDip(2:3)
+! 
+! ! !        epcorr=epinv+2d0*dlog(renscale/facscale)
+!        epcorr=epinv
+! 
+! !      this is for gqb-->Z-->ttb+qb process
+!        APsoft= 0d0
+!        APfini= TR*(z**2+(1d0-z)**2) * epcorr
+!        APplus= 0d0
+!        IDip(1) = IDip(1) + (APsoft - APplus)
+!        IDip(2) = IDip(2) + (APfini + APplus)
+! 
+! ! print *, "AP",(APsoft - APplus),(APfini + APplus)
+! ! print *, "sum",IDip(2:3)
+! ! pause
+! 
+! END SUBROUTINE
+! 
+! 
+! 
+! 
+! SUBROUTINE IntDip_qg_Z_ttb(z,sHat,IDip)
+! use ModParameters
+! use ModKinematics
+! use ModMisc
+! implicit none
+! real(8) :: IDip(1:3),APsoft,APfini,APplus,z,sij,sHat
+! real(8) :: dipsoft,dipfini,dipplus,epcorr
+! integer :: n,emi
+! 
+! 
+! epinv2=0d0
+! epinv =0d0
+! 
+!    sij = sHat
+! 
+!    IDip(1:3) = 0d0
+! 
+!    dipsoft =ii_gq(sij,z,1) * TR
+!    dipfini =ii_gq(sij,z,2) * TR
+!    dipplus =ii_gq(sij,z,3) * TR
+!    emi = 2
+! 
+! 
+!       if(emi.eq.1) then
+!         IDip(1) = IDip(1) + (dipsoft-dipplus)
+!         IDip(2) = IDip(2) + (dipfini+dipplus)
+!       elseif(emi.eq.2) then
+!         IDip(1) = IDip(1) + (dipsoft-dipplus)
+!         IDip(3) = IDip(3) + (dipfini+dipplus)
+!       elseif(emi.eq.3) then
+!         IDip(1) = IDip(1) + (dipsoft-dipplus)
+! !         IDip(2) = IDip(2) + (dipfini+dipplus)*0.5d0
+! !         IDip(3) = IDip(3) + (dipfini+dipplus)*0.5d0
+!       endif
+! 
+! 
+! ! print *, epinv
+! ! print *, "IntDip",IDip(2:3)
+! 
+! ! !        epcorr=epinv+2d0*dlog(renscale/facscale)
+!        epcorr=epinv
+! 
+! !      this is for gqb-->Z-->ttb+qb process
+!        APsoft= 0d0
+!        APfini= TR*(z**2+(1d0-z)**2) * epcorr
+!        APplus= 0d0
+!        IDip(1) = IDip(1) + (APsoft - APplus)
+!        IDip(3) = IDip(3) + (APfini + APplus)
+! 
+! ! print *, "AP",(APsoft - APplus),(APfini + APplus)
+! ! print *, "sum",IDip(2:3)
+! ! pause
+! 
+! END SUBROUTINE
+! 
+! 
+! 
+
+
+
+
+SUBROUTINE CalcFormFactor1(xe,sHat,FF1)
+use ModParameters
+use ModMisc
+implicit none
+complex(8) :: FF1
+integer :: xe
+real(8) :: sHat
+complex(8) :: qlI2,qlI3,SI(2:3),C(1:1)
+
+
+    C(1) = (-2d0,0d0)
+    if( xe.ne.0 ) C(1)=(0d0,0d0)
+
+#if useQCDLoopLib==1 || linkMELA==1
+    SI(2) = qlI2(shat,0d0,0d0,Mu_Ren**2,xe)
+    SI(3) = qlI3(shat,0d0,0d0,0d0,0d0,0d0,Mu_Ren**2,xe)
+    FF1 = C(1) -3d0*SI(2) -2d0*sHat*SI(3)
+#else
+    call Error("This process requires linkQCDLoop or linkMELA enabled in the makefile")
+#endif
+
+END SUBROUTINE
+
+
+
+SUBROUTINE Dipoles_qqb_VH(nDipole,MomExt,MomExtTd,Dipole)! global norm:   4d0*Pi*alpha_s
+use ModParameters
+use ModMisc
+implicit none
+integer :: nDipole,a,i,b,j
+real(8) :: MomExt(1:4,1:7),MomExtTd(1:4,1:6),Q(1:4),QTd(1:4),KSum(1:4)
+real(8) :: sab,sai,sbi,sij,sik,skj,x,v,y,yp,z,Q2,mu2,mu,MomFac1,MomFac2,MomFac3
+real(8) :: Dipole
+
+  if(nDipole.eq.1) then
+      a=1; i=7; b=2!   initial-initial
+
+      sab = 2d0*(MomExt(1:4,a).dot.MomExt(1:4,b))
+      sai = 2d0*(MomExt(1:4,a).dot.MomExt(1:4,i))
+      sbi = 2d0*(MomExt(1:4,b).dot.MomExt(1:4,i))
+      x = 1d0 - (sai+sbi)/sab
+      v = sai/sab
+      if( alpha_ii.lt.v ) then
+         Dipole = 0d0
+         return
+      endif
+
+      MomExtTd(1:4,a) = x*MomExt(1:4,a)
+      MomExtTd(1:4,b) = MomExt(1:4,b)
+
+      Q(1:4)   = MomExt(1:4,a)+MomExt(1:4,b)-MomExt(1:4,i)
+      QTd(1:4) = MomExtTd(1:4,a)+MomExtTd(1:4,b)
+      KSum(1:4) = Q(1:4)+QTd(1:4)
+      
+      do j=3,6
+         MomExtTd(1:4,j) = MomExt(1:4,j) - 2d0*(MomExt(1:4,j).dot.KSum(1:4))/(KSum(1:4).dot.KSum(1:4))*KSum(1:4) + 2d0*(MomExt(1:4,j).dot.Q(1:4))/(Q(1:4).dot.Q(1:4))*QTd(1:4)
+      enddo
+      Dipole = -1d0/sai/x * 2d0*CF * (2d0/(1d0-x)-1d0-x)
+
+  elseif(nDipole.eq.2) then
+      a=2; i=7; b=1!   initial-initial
+
+      sab = 2d0*(MomExt(1:4,a).dot.MomExt(1:4,b))
+      sai = 2d0*(MomExt(1:4,a).dot.MomExt(1:4,i))
+      sbi = 2d0*(MomExt(1:4,b).dot.MomExt(1:4,i))
+      x = 1d0 - (sai+sbi)/sab
+      v = sai/sab
+      if( alpha_ii.lt.v ) then
+         Dipole = 0d0
+         return
+      endif
+
+      MomExtTd(1:4,a) = x*MomExt(1:4,a)
+      MomExtTd(1:4,b) = MomExt(1:4,b)
+
+      Q(1:4)   = MomExt(1:4,a)+MomExt(1:4,b)-MomExt(1:4,i)
+      QTd(1:4) = MomExtTd(1:4,a)+MomExtTd(1:4,b)
+      KSum(1:4) = Q(1:4)+QTd(1:4)
+      
+      do j=3,6
+        MomExtTd(1:4,j) = MomExt(1:4,j) - 2d0*(MomExt(1:4,j).dot.KSum(1:4))/(KSum(1:4).dot.KSum(1:4))*KSum(1:4) + 2d0*(MomExt(1:4,j).dot.Q(1:4))/(Q(1:4).dot.Q(1:4))*QTd(1:4)
+      enddo
+      Dipole = -1d0/sai/x * 2d0*CF * (2d0/(1d0-x)-1d0-x)
+
+  endif
+
+END SUBROUTINE
+
+
+
+
+! SUBROUTINE Dipoles_gqb_Z_ttbqb(nDipole,MomExt,MomExtTd,Dipole)! global norm:   4d0*Pi*alpha_s
+! use ModParameters
+! use ModKinematics
+! use ModMisc
+! implicit none
+! integer :: nDipole,a,i,b,j,k
+! real(8) :: MomExt(1:4,1:11),MomExtTd(1:4,1:10),Q(1:4),QTd(1:4),KSum(1:4)
+! real(8) :: sab,sai,sbi,sij,sik,skj,x,v,y,yp,z,Q2,mu2,mu,MomFac1,MomFac2,MomFac3
+! complex(8) :: Dipole
+! 
+! 
+!       a=1; i=5; b=2!   initial-initial
+! 
+!       sab = 2d0*(MomExt(1:4,a).dot.MomExt(1:4,b))
+!       sai = 2d0*(MomExt(1:4,a).dot.MomExt(1:4,i))
+!       sbi = 2d0*(MomExt(1:4,b).dot.MomExt(1:4,i))
+!       x = 1d0 - (sai+sbi)/sab
+!       v = sai/sab
+!       if( alpha_ii.lt.v ) then
+!          Dipole = (0d0,0d0)
+!          return
+!       endif
+! 
+!       MomExtTd(1:4,a) = x*MomExt(1:4,a)
+!       MomExtTd(1:4,b) = MomExt(1:4,b)
+! 
+!       Q(1:4)   = MomExt(1:4,a)+MomExt(1:4,b)-MomExt(1:4,i)
+!       QTd(1:4) = MomExtTd(1:4,a)+MomExtTd(1:4,b)
+!       KSum(1:4) = Q(1:4)+QTd(1:4)
+!       MomExtTd(1:4,3) = MomExt(1:4,3) - 2d0*(MomExt(1:4,3).dot.KSum(1:4))/(KSum(1:4).dot.KSum(1:4))*KSum(1:4) + 2d0*(MomExt(1:4,3).dot.Q(1:4))/(Q(1:4).dot.Q(1:4))*QTd(1:4)
+!       MomExtTd(1:4,4) = MomExt(1:4,4) - 2d0*(MomExt(1:4,4).dot.KSum(1:4))/(KSum(1:4).dot.KSum(1:4))*KSum(1:4) + 2d0*(MomExt(1:4,4).dot.Q(1:4))/(Q(1:4).dot.Q(1:4))*QTd(1:4)
+! 
+!       Dipole = -1d0/sai/x * 2d0*TR * (1d0-2d0*x*(1d0-x))
+! 
+! 
+! END SUBROUTINE
+! 
+! 
+! 
+! 
+! 
+! SUBROUTINE Dipoles_qg_Z_ttbq(nDipole,MomExt,MomExtTd,Dipole)! global norm:   4d0*Pi*alpha_s
+! use ModParameters
+! use ModKinematics
+! use ModMisc
+! implicit none
+! integer :: nDipole,a,i,b,j,k
+! real(8) :: MomExt(1:4,1:11),MomExtTd(1:4,1:10),Q(1:4),QTd(1:4),KSum(1:4)
+! real(8) :: sab,sai,sbi,sij,sik,skj,x,v,y,yp,z,Q2,mu2,mu,MomFac1,MomFac2,MomFac3
+! complex(8) :: Dipole
+! 
+!       a=2; i=5; b=1!   initial-initial
+! 
+!       sab = 2d0*(MomExt(1:4,a).dot.MomExt(1:4,b))
+!       sai = 2d0*(MomExt(1:4,a).dot.MomExt(1:4,i))
+!       sbi = 2d0*(MomExt(1:4,b).dot.MomExt(1:4,i))
+!       x = 1d0 - (sai+sbi)/sab
+!       v = sai/sab
+!       if( alpha_ii.lt.v ) then
+!          Dipole = (0d0,0d0)
+!          return
+!       endif
+! 
+!       MomExtTd(1:4,a) = x*MomExt(1:4,a)
+!       MomExtTd(1:4,b) = MomExt(1:4,b)
+! 
+!       Q(1:4)   = MomExt(1:4,a)+MomExt(1:4,b)-MomExt(1:4,i)
+!       QTd(1:4) = MomExtTd(1:4,a)+MomExtTd(1:4,b)
+!       KSum(1:4) = Q(1:4)+QTd(1:4)
+!       MomExtTd(1:4,3) = MomExt(1:4,3) - 2d0*(MomExt(1:4,3).dot.KSum(1:4))/(KSum(1:4).dot.KSum(1:4))*KSum(1:4) + 2d0*(MomExt(1:4,3).dot.Q(1:4))/(Q(1:4).dot.Q(1:4))*QTd(1:4)
+!       MomExtTd(1:4,4) = MomExt(1:4,4) - 2d0*(MomExt(1:4,4).dot.KSum(1:4))/(KSum(1:4).dot.KSum(1:4))*KSum(1:4) + 2d0*(MomExt(1:4,4).dot.Q(1:4))/(Q(1:4).dot.Q(1:4))*QTd(1:4)
+! 
+!       Dipole = -1d0/sai/x * 2d0*TR * (1d0-2d0*x*(1d0-x))
+! 
+! END SUBROUTINE
+! 
+
+
+
+
+
+
+
+
+
+!     FUNCTION ii_qq(sij,x,s)
+!     use ModMisc
+!     use ModParameters
+!     implicit none
+!     real(8), intent(in)  :: x,sij
+!     integer, intent(in) :: s
+!     real(8) :: ii_qq
+!     real(8) :: L,lx, Pqqreg
+! 
+! 
+!         L = dlog(sij/MuRen**2)
+!         lx = dlog(x)
+! 
+!         Pqqreg = -1d0-x
+!         if (s.eq.1) then
+!               ii_qq = epinv*(epinv2-L) +L**2/2d0 - Pi**2/6.0      ! CET eq.(A.4)
+! !               if (scheme.eq.'fdh') ii_qq = ii_qq - 1d0/2d0
+!         elseif (s.eq.2) then
+!               ii_qq = -(epinv-L+lx)*Pqqreg+2d0*Pqqreg*dlog(1d0-x) - 2d0*dlog(x)/(1d0-x)+1d0-x      ! CET eq.(A.4)
+!               if (alpha_ii/(1d0-x) .lt. 1d0) ii_qq=ii_qq + (2d0/(1d0-x)+Pqqreg)*dlog(alpha_ii/(1d0-x))   ! NEW
+!         elseif (s.eq.3) then
+!               ii_qq = 4d0*dlog(1d0-x)/(1d0-x) -(epinv-L)*2d0/(1d0-x) ! CET eq.(A.4)
+!         endif
+! 
+! 
+!     RETURN
+!     END FUNCTION
+
+
+
+
+! ------------------ BEGIN MCFM SM check  ------------      
+
+
+
+      function ggHZ_pp_box(i1,i2,i3,i4,za,zb,s,mt2)
+      use ModParameters
+      implicit none
+      complex(8)::  ggHZ_pp_box
+      integer:: i1,i2,i3,i4 
+      real(8):: mt2,s(1:4,1:4)
+      real(8):: mZsq,mHsq,s15,s25,s12,t
+      integer:: Nbox,Ntri,i
+      parameter(Nbox=3,Ntri=5)
+      complex(8):: qlI4,qlI3,qlI2
+      integer:: d25_12,d15_12,d15_25
+      parameter(d25_12=1,d15_12=2,d15_25=3)
+      integer:: c25_Z,cH_25,c12,c15_H,cZ_15
+      parameter(c25_Z=1,cH_25=2,c12=3,c15_H=4,cZ_15=5)
+      complex(8):: D0(Nbox),C0(Ntri)
+      complex(8):: di(Nbox),cii(Ntri)
+      complex(8):: za(1:4,1:4),zb(1:4,1:4)
+     
+
+      t(i1,i2,i3)=s(i1,i2)+s(i1,i3)+s(i2,i3)
+
+      ggHZ_pp_box=(0d0,0d0)
+      
+      
+!======= kinematic configurations
+      s12=s(i1,i2)
+      mZsq=s(i3,i4) 
+      s25=t(i1,i3,i4)
+      s15=t(i2,i3,i4) 
+      mHsq=s(i1,i2)+s(i1,i3)+s(i1,i4)+s(i2,i3)+s(i2,i4)+s(i3,i4)
+      
+    
+
+      di(:)=(0d0,0d0)
+      cii(:)=(0d0,0d0)
+!
+#if useQCDLoopLib==1 || linkMELA==1
+     D0(d25_12)=qlI4(mZsq,0d0,0d0,mHsq,s25,s12,mt2,mt2,mt2,mt2,Mu_Ren**2,0) 
+     D0(d15_12)=qlI4(mZsq,0d0,0d0,mHsq,s15,s12,mt2,mt2,mt2,mt2,Mu_Ren**2,0) 
+     D0(d15_25)=qlI4(mHsq,0d0,mZsq,0d0,s15,s25,mt2,mt2,mt2,mt2,Mu_Ren**2,0) 
+     C0(c25_Z)=qlI3(s25,0d0,mZsq,mt2,mt2,mt2,Mu_Ren**2,0) 
+     C0(cH_25)=qlI3(mHsq,0d0,s25,mt2,mt2,mt2,Mu_Ren**2,0) 
+     C0(c12)=qlI3(s12,0d0,0d0,mt2,mt2,mt2,Mu_Ren**2,0) 
+     C0(c15_H)=qlI3(s15,0d0,mHsq,mt2,mt2,mt2,Mu_Ren**2,0) 
+     C0(cZ_15)=qlI3(mZsq,0d0,s15,mt2,mt2,mt2,Mu_Ren**2,0) 
+#else
+    call Error("This process requires linkQCDLoop or linkMELA enabled in the makefile")
+#endif
+
+!------- coefficiients of integrals 
+
+      di(d25_12)= &
+      (zb(i2,i1)*(2*(za(i2,i3)*zb(i3,i1) + za(i2,i4)*zb(i4,i1))* &
+             (-2*mt2*za(i2,i3) + za(i1,i2)*za(i3,i4)*zb(i4,i1))* &
+             zb(i4,i2)*(za(i1,i3)*zb(i3,i2) + za(i1,i4)*zb(i4,i2)) &
+             - za(i1,i3)*(za(i2,i3)*zb(i3,i1) + &
+               za(i2,i4)*zb(i4,i1))* &
+             (t(i1,i3,i4)*za(i1,i2)*zb(i2,i1)*zb(i4,i2) + &
+               2*(2*mt2 - za(i1,i2)*zb(i2,i1))*zb(i4,i1)* &
+                (za(i1,i3)*zb(i3,i2) + za(i1,i4)*zb(i4,i2))) - &
+            t(i1,i3,i4)*za(i1,i2)* &
+             (za(i2,i3)*zb(i2,i1)*zb(i4,i1)* &
+                (za(i1,i3)*zb(i3,i2) + za(i1,i4)*zb(i4,i2)) + &
+               za(i3,i4)*((za(i2,i3)*zb(i3,i1) + &
+                     za(i2,i4)*zb(i4,i1))*zb(i4,i2)**2 - &
+                  zb(i4,i1)**2* &
+                   (za(i1,i3)*zb(i3,i2) + za(i1,i4)*zb(i4,i2))))))/ &
+        (2*s(i3,i4)*za(i1,i2)* &
+          (za(i2,i3)*zb(i3,i1) + za(i2,i4)*zb(i4,i1))* &
+          (za(i1,i3)*zb(i3,i2) + za(i1,i4)*zb(i4,i2)))
+
+      di(d15_12)= (zb(i2,i1)*(2*zb(i4,i1)* &
+             (za(i2,i3)*zb(i3,i1) + za(i2,i4)*zb(i4,i1))* &
+             (za(i1,i3)*zb(i3,i2) + za(i1,i4)*zb(i4,i2))* &
+             (-2*mt2*za(i1,i3) - za(i1,i2)*za(i3,i4)*zb(i4,i2)) - &
+            za(i2,i3)*(za(i1,i3)*zb(i3,i2) + za(i1,i4)*zb(i4,i2))* &
+             (t(i2,i3,i4)*za(i1,i2)*zb(i2,i1)*zb(i4,i1) + &
+               2*(2*mt2 - za(i1,i2)*zb(i2,i1))* &
+                (za(i2,i3)*zb(i3,i1) + za(i2,i4)*zb(i4,i1))* &
+                zb(i4,i2)) + &
+            t(i2,i3,i4)*za(i1,i2)* &
+             (-(za(i1,i3)*zb(i2,i1)* &
+                  (za(i2,i3)*zb(i3,i1) + za(i2,i4)*zb(i4,i1))* &
+                  zb(i4,i2)) + &
+               za(i3,i4)*(-((za(i2,i3)*zb(i3,i1) + &
+                       za(i2,i4)*zb(i4,i1))*zb(i4,i2)**2) + &
+                  zb(i4,i1)**2* &
+                   (za(i1,i3)*zb(i3,i2) + za(i1,i4)*zb(i4,i2))))))/ &
+        (2*s(i3,i4)*za(i1,i2)* &
+          (za(i2,i3)*zb(i3,i1) + za(i2,i4)*zb(i4,i1))* &
+          (za(i1,i3)*zb(i3,i2) + za(i1,i4)*zb(i4,i2)))
+
+
+      di(d15_25)= -((4*mt2*zb(i2,i1)*(za(i1,i3)**2*zb(i3,i2)*zb(i4,i1)* &
+                 (za(i2,i3)*zb(i3,i1) + za(i2,i4)*zb(i4,i1)) - &
+                za(i1,i2)*za(i3,i4)* &
+                 (za(i2,i3)*zb(i3,i1) + za(i2,i4)*zb(i4,i1))* &
+                 zb(i4,i2)**2 + &
+                za(i1,i3)*zb(i4,i2)* &
+                 (za(i2,i3)**2*zb(i3,i1)*zb(i3,i2) + &
+                   za(i2,i4)*zb(i4,i1)* &
+                    (za(i1,i4)*zb(i4,i1) + za(i2,i4)*zb(i4,i2)) + &
+                   za(i2,i3)* &
+                    (za(i1,i4)*zb(i3,i1)*zb(i4,i1) + &
+                      za(i2,i4)* &
+                       (2*zb(i3,i2)*zb(i4,i1) + zb(i2,i1)*zb(i4,i3)) &
+                      ))))/ &
+            (za(i1,i2)*(za(i2,i3)*zb(i3,i1) + za(i2,i4)*zb(i4,i1))* &
+              (za(i1,i3)*zb(i3,i2) + za(i1,i4)*zb(i4,i2))) + &
+           (2*za(i1,i3)*(za(i1,i3)**2*zb(i3,i1)*zb(i3,i2)*zb(i4,i1)* &
+                  (za(i2,i3)*zb(i3,i1) + za(i2,i4)*zb(i4,i1))* &
+                  (za(i2,i3)*zb(i3,i2) + za(i2,i4)*zb(i4,i2)) + &
+                 za(i1,i3)*(za(i2,i3)**3*zb(i3,i1)*zb(i3,i2)**2* &
+                     (zb(i3,i2)*zb(i4,i1) + zb(i2,i1)*zb(i4,i3)) + &
+                    za(i2,i3)**2*zb(i3,i1)*zb(i3,i2)* &
+                     (za(i1,i4)*zb(i4,i1) + za(i2,i4)*zb(i4,i2))* &
+                     (2*zb(i3,i2)*zb(i4,i1) + zb(i2,i1)*zb(i4,i3)) &
+                     + za(i2,i4)**2*zb(i4,i1)**2*zb(i4,i2)* &
+                     (za(i3,i4)*zb(i3,i2)*zb(i4,i3) + &
+                       za(i1,i4)* &
+                        (2*zb(i3,i2)*zb(i4,i1) + &
+                          zb(i2,i1)*zb(i4,i3))) + &
+                    za(i2,i3)*za(i2,i4)* &
+                     (za(i2,i4)*zb(i3,i2)*zb(i4,i1)*zb(i4,i2)* &
+                        (zb(i3,i2)*zb(i4,i1) + zb(i2,i1)*zb(i4,i3)) &
+                        + za(i1,i4)*zb(i4,i1)* &
+                        (2*zb(i3,i2)*zb(i4,i1) + &
+                           zb(i2,i1)*zb(i4,i3))**2 - &
+                       za(i3,i4)*zb(i4,i3)* &
+                        (-(zb(i3,i2)**2*zb(i4,i1)**2) + &
+                          zb(i2,i1)*zb(i3,i2)*zb(i4,i1)*zb(i4,i3) + &
+                          zb(i2,i1)**2*zb(i4,i3)**2))) + &
+                 za(i1,i4)*(za(i2,i4)**2*zb(i4,i1)**2*zb(i4,i2)**2* &
+                     (za(i1,i4)*zb(i4,i1) + za(i2,i4)*zb(i4,i2)) + &
+                    za(i2,i3)**3*zb(i3,i2)* &
+                     (2*zb(i3,i2)**2*zb(i4,i1)**2 + &
+                       3*zb(i2,i1)*zb(i3,i2)*zb(i4,i1)*zb(i4,i3) + &
+                       zb(i2,i1)**2*zb(i4,i3)**2) + &
+                    za(i2,i3)*za(i2,i4)*zb(i4,i1)*zb(i4,i2)* &
+                     (-(za(i3,i4)*zb(i3,i2)*zb(i4,i1)*zb(i4,i3)) + &
+                       za(i1,i4)*zb(i4,i1)* &
+                        (2*zb(i3,i2)*zb(i4,i1) + &
+                          zb(i2,i1)*zb(i4,i3)) + &
+                       2*za(i2,i4)*zb(i4,i2)* &
+                        (2*zb(i3,i2)*zb(i4,i1) + &
+                          zb(i2,i1)*zb(i4,i3))) + &
+                    za(i2,i3)**2* &
+                     (za(i1,i4)*zb(i3,i2)*zb(i4,i1)**2* &
+                        (zb(i3,i2)*zb(i4,i1) + zb(i2,i1)*zb(i4,i3)) &
+                        + za(i3,i4)*zb(i4,i3)* &
+                        (-(zb(i3,i2)**2*zb(i4,i1)**2) + &
+                          zb(i2,i1)*zb(i3,i2)*zb(i4,i1)*zb(i4,i3) + &
+                          zb(i2,i1)**2*zb(i4,i3)**2) + &
+                       za(i2,i4)*zb(i4,i2)* &
+                        (5*zb(i3,i2)**2*zb(i4,i1)**2 + &
+                          5*zb(i2,i1)*zb(i3,i2)*zb(i4,i1)* &
+                           zb(i4,i3) + zb(i2,i1)**2*zb(i4,i3)**2)))) &
+                + za(i1,i2)* &
+               (za(i1,i4)*zb(i4,i2)* &
+                  (-(za(i2,i4)*za(i3,i4)*zb(i4,i1)**2*zb(i4,i2)* &
+                       (za(i1,i4)*zb(i4,i1) + za(i2,i4)*zb(i4,i2))) &
+                     + za(i2,i3)*zb(i4,i1)*zb(i4,i2)* &
+                     (za(i1,i4)* &
+                        (za(i2,i4)*zb(i2,i1) - za(i3,i4)*zb(i3,i1))* &
+                        zb(i4,i1) - &
+                       2*za(i2,i4)*za(i3,i4)* &
+                        (zb(i3,i2)*zb(i4,i1) + zb(i2,i1)*zb(i4,i3))) &
+                      - za(i2,i3)**2* &
+                     (-(za(i1,i4)*zb(i2,i1)*zb(i3,i1)*zb(i4,i1)* &
+                          zb(i4,i2)) + &
+                       za(i3,i4)* &
+                        (zb(i3,i2)*zb(i4,i1) + &
+                           zb(i2,i1)*zb(i4,i3))**2)) + &
+                 za(i1,i3)**2*zb(i3,i2)* &
+                  (za(i2,i3)*zb(i3,i1) + za(i2,i4)*zb(i4,i1))* &
+                  (za(i2,i3)*zb(i2,i1)* &
+                     (2*zb(i3,i2)*zb(i4,i1) + zb(i2,i1)*zb(i4,i3)) &
+                     + zb(i4,i1)* &
+                     (za(i2,i4)*zb(i2,i1)*zb(i4,i2) - &
+                       za(i3,i4)* &
+                        (zb(i3,i2)*zb(i4,i1) + &
+                          2*zb(i2,i1)*zb(i4,i3)))) + &
+                 za(i1,i3)*(za(i2,i4)*zb(i4,i1)**2*zb(i4,i2)* &
+                     (za(i1,i4)* &
+                        (za(i2,i4)*zb(i2,i1) - &
+                          2*za(i3,i4)*zb(i3,i1))*zb(i4,i2) + &
+                       za(i3,i4)*zb(i3,i2)* &
+                        (za(i2,i4)*zb(i4,i2) - &
+                          2*za(i3,i4)*zb(i4,i3))) + &
+                    za(i2,i3)**2* &
+                     (za(i1,i4)*zb(i2,i1)*zb(i3,i1)*zb(i4,i2)* &
+                        (3*zb(i3,i2)*zb(i4,i1) + &
+                          zb(i2,i1)*zb(i4,i3)) + &
+                       za(i3,i4)* &
+                        (zb(i3,i2)**3*zb(i4,i1)**2 - &
+                          zb(i2,i1)**2*zb(i3,i2)*zb(i4,i3)**2)) + &
+                    za(i2,i3)* &
+                     (za(i1,i4)*zb(i4,i1)*zb(i4,i2)* &
+                        (-2*za(i3,i4)*zb(i3,i1)**2*zb(i4,i2) + &
+                          za(i2,i4)*zb(i2,i1)* &
+                           (3*zb(i3,i2)*zb(i4,i1) + &
+                             zb(i3,i1)*zb(i4,i2) + &
+                             zb(i2,i1)*zb(i4,i3))) + &
+                       2*za(i3,i4)* &
+                        (za(i2,i4)*zb(i3,i2)**2*zb(i4,i1)**2* &
+                           zb(i4,i2) + &
+                          za(i3,i4)*zb(i4,i3)* &
+                           (-(zb(i3,i2)**2*zb(i4,i1)**2) + &
+                             zb(i2,i1)*zb(i3,i2)*zb(i4,i1)* &
+                             zb(i4,i3) + zb(i2,i1)**2*zb(i4,i3)**2)) &
+                       ))))/ &
+            (za(i1,i2)**2*(za(i2,i3)*zb(i3,i1) + &
+                za(i2,i4)*zb(i4,i1))* &
+              (za(i1,i3)*zb(i3,i2) + za(i1,i4)*zb(i4,i2))))/ &
+        (2*s(i3,i4))
+
+
+!---- triangle coefficiients
+      cii(c25_Z)=(za(i1,i3)*(za(i1,i3)*zb(i3,i1) + za(i1,i4)*zb(i4,i1))* &
+          (za(i1,i3)*zb(i3,i2)*zb(i4,i1)* &
+             (za(i2,i3)*zb(i3,i1) + za(i2,i4)*zb(i4,i1)) + &
+            zb(i4,i2)*(za(i2,i3)**2*zb(i3,i1)*zb(i3,i2) + &
+               za(i1,i2)*zb(i2,i1)* &
+                (za(i2,i3)*zb(i3,i1) + za(i2,i4)*zb(i4,i1)) + &
+               za(i2,i4)*zb(i4,i1)* &
+                (za(i1,i4)*zb(i4,i1) + za(i2,i4)*zb(i4,i2)) + &
+               za(i2,i3)*(za(i1,i4)*zb(i3,i1)*zb(i4,i1) + &
+                  za(i2,i4)* &
+                   (2*zb(i3,i2)*zb(i4,i1) + zb(i2,i1)*zb(i4,i3)))))) &
+         /(za(i1,i2)**2*za(i3,i4)* &
+          (za(i2,i3)*zb(i3,i1) + za(i2,i4)*zb(i4,i1))* &
+          (za(i1,i3)*zb(i3,i2) + za(i1,i4)*zb(i4,i2))*zb(i4,i3))
+
+      cii(cZ_15)= (za(i2,i3)*(za(i2,i3)*zb(i3,i2) + za(i2,i4)*zb(i4,i2))* &
+          (za(i2,i3)*zb(i3,i1)*zb(i4,i2)* &
+             (za(i1,i3)*zb(i3,i2) + za(i1,i4)*zb(i4,i2)) + &
+            zb(i4,i1)*(za(i1,i3)**2*zb(i3,i1)*zb(i3,i2) + &
+               za(i1,i2)*zb(i2,i1)* &
+                (za(i1,i3)*zb(i3,i2) + za(i1,i4)*zb(i4,i2)) + &
+               za(i1,i4)*zb(i4,i2)* &
+                (za(i1,i4)*zb(i4,i1) + za(i2,i4)*zb(i4,i2)) + &
+               za(i1,i3)*(za(i2,i4)*zb(i3,i2)*zb(i4,i2) + &
+                  za(i1,i4)* &
+                   (2*zb(i3,i1)*zb(i4,i2) - zb(i2,i1)*zb(i4,i3)))))) &
+         /(za(i1,i2)**2*za(i3,i4)* &
+          (za(i2,i3)*zb(i3,i1) + za(i2,i4)*zb(i4,i1))* &
+          (za(i1,i3)*zb(i3,i2) + za(i1,i4)*zb(i4,i2))*zb(i4,i3))
+
+      cii(cH_25)=-((za(i2,i3)*(za(i1,i2)**2*zb(i2,i1)**2*zb(i4,i1) + &
+              (za(i2,i3)*zb(i3,i2) + za(i2,i4)*zb(i4,i2))* &
+               (za(i1,i3)*zb(i3,i1)*zb(i4,i1) + &
+                 za(i1,i4)*zb(i4,i1)**2 + &
+                 (za(i2,i3)*zb(i3,i1) + za(i2,i4)*zb(i4,i1))* &
+                  zb(i4,i2)) + &
+              za(i1,i2)*zb(i2,i1)* &
+               (za(i1,i3)*zb(i3,i1)*zb(i4,i1) + &
+                 za(i1,i4)*zb(i4,i1)**2 + &
+                 2*za(i2,i3)*zb(i3,i1)*zb(i4,i2) + &
+                 2*za(i2,i4)*zb(i4,i1)*zb(i4,i2) - &
+                 za(i2,i3)*zb(i2,i1)*zb(i4,i3))))/ &
+          (s(i3,i4)*za(i1,i2)**2* &
+            (za(i2,i3)*zb(i3,i1) + za(i2,i4)*zb(i4,i1))))
+
+      cii(c15_H)= -((za(i1,i3)*(za(i1,i2)**2*zb(i2,i1)**2*zb(i4,i2) + &
+              (za(i1,i3)*zb(i3,i1) + za(i1,i4)*zb(i4,i1))* &
+               (za(i2,i3)*zb(i3,i2)*zb(i4,i2) + &
+                 za(i2,i4)*zb(i4,i2)**2 + &
+                 zb(i4,i1)*(za(i1,i3)*zb(i3,i2) + &
+                    za(i1,i4)*zb(i4,i2))) + &
+              za(i1,i2)*zb(i2,i1)* &
+               (2*za(i1,i3)*zb(i3,i2)*zb(i4,i1) + &
+                 za(i2,i3)*zb(i3,i2)*zb(i4,i2) + &
+                 2*za(i1,i4)*zb(i4,i1)*zb(i4,i2) + &
+                 za(i2,i4)*zb(i4,i2)**2 + &
+                 za(i1,i3)*zb(i2,i1)*zb(i4,i3))))/ &
+          (s(i3,i4)*za(i1,i2)**2* &
+            (za(i1,i3)*zb(i3,i2) + za(i1,i4)*zb(i4,i2))))
+
+      cii(c12)=  -((zb(i2,i1)*((zb(i4,i1)* &
+                 (-(za(i2,i3)*zb(i2,i1)) + za(i3,i4)*zb(i4,i1)))/ &
+               (za(i2,i3)*zb(i3,i1) + za(i2,i4)*zb(i4,i1)) - &
+              (zb(i4,i2)*(za(i1,i3)*zb(i2,i1) + &
+                   za(i3,i4)*zb(i4,i2)))/ &
+               (za(i1,i3)*zb(i3,i2) + za(i1,i4)*zb(i4,i2))))/ &
+          s(i3,i4))
+
+
+
+      ggHZ_pp_box=(0d0,0d0)
+        do i=1,Nbox
+           ggHZ_pp_box=ggHZ_pp_box+D0(i)*di(i)
+        enddo
+        do i=1,Ntri
+           ggHZ_pp_box=ggHZ_pp_box+C0(i)*cii(i)
+        enddo
+
+      return
+      end
+
+
+
+      
+      function ggHZ_mp_box(i1,i2,i3,i4,za,zb,s,mt2)
+      implicit none
+      complex(8)::  ggHZ_mp_box,za(1:4,1:4),zb(1:4,1:4)
+      integer:: i1,i2,i3,i4
+      real(8):: mt2,s(1:4,1:4)
+      real(8):: mZsq,mHsq,s15,s25,s12,t
+      integer:: Nbox,Ntri,i
+      parameter(Nbox=3,Ntri=6)
+
+      complex(8):: qlI4,qlI3,qlI2
+      integer:: d25_12,d15_12,d15_25
+      parameter(d25_12=1,d15_12=2,d15_25=3)
+      integer:: c25_Z,cH_25,c12,c15_H,cZ_15,c12_Z_H
+      parameter(c25_Z=1,cH_25=2,c12=3,c15_H=4,cZ_15=5,c12_Z_H=6)
+!--- nb I swapped the notation wrt to KC for 3m triangle, so that I
+!---- can unify two rotuines and save calls to QCDLoop.
+      complex(8):: D0(Nbox),C0(Ntri)
+      complex(8):: di(Nbox),cii(Ntri)
+
+!       complex(8)::  ggHZ_mp_2me_b1,ggHZ_mp_2mh_b1
+!       complex(8)::  ggHZ_mp_tri1,ggHZ_mp_tri2,ggHZ_mp_3mtri
+
+
+      t(i1,i2,i3)=s(i1,i2)+s(i1,i3)+s(i2,i3)
+
+      ggHZ_mp_box=(0d0,0d0)
+
+
+!======= kinematic configurations
+      s12=s(i1,i2)
+      mZsq=s(i3,i4)
+      s25=t(i1,i3,i4)
+      s25=t(i1,i3,i4)
+      s15=t(i2,i3,i4)
+      mHsq=s(i1,i2)+s(i1,i3)+s(i1,i4)+s(i2,i3)+s(i2,i4)+s(i3,i4)
+
+      di(:)=(0d0,0d0)
+      cii(:)=(0d0,0d0)
+
+
+!----- fill integrals from QCD loop : boxes
+
+#if useQCDLoopLib==1 || linkMELA==1
+     D0(d25_12)=qlI4(mZsq,0d0,0d0,mHsq,s25,s12,mt2,mt2,mt2,mt2,Mu_Ren**2,0)
+     D0(d15_12)=qlI4(mZsq,0d0,0d0,mHsq,s15,s12,mt2,mt2,mt2,mt2,Mu_Ren**2,0)
+     D0(d15_25)=qlI4(mHsq,0d0,mZsq,0d0,s15,s25,mt2,mt2,mt2,mt2,Mu_Ren**2,0)
+
+! ----- fill integrals from QCD loop : triangles
+     C0(c25_Z)=qlI3(s25,0d0,mZsq,mt2,mt2,mt2,Mu_Ren**2,0)
+     C0(cH_25)=qlI3(mHsq,0d0,s25,mt2,mt2,mt2,Mu_Ren**2,0)
+     C0(c12)=qlI3(s12,0d0,0d0,mt2,mt2,mt2,Mu_Ren**2,0)
+     C0(c15_H)=qlI3(s15,0d0,mHsq,mt2,mt2,mt2,Mu_Ren**2,0)
+     C0(cZ_15)=qlI3(mZsq,0d0,s15,mt2,mt2,mt2,Mu_Ren**2,0)
+     C0(c12_Z_H)=qlI3(s12,mZsq,mHsq,mt2,mt2,mt2,Mu_Ren**2,0)
+#else
+    call Error("This process requires linkQCDLoop or linkMELA enabled in the makefile")
+#endif
+
+!------ box coefficiients
+      di(d25_12)= ggHZ_mp_2mh_b1(i1,i2,i3,i4,za,zb,s,mt2)
+      di(d15_12)= -ggHZ_mp_2mh_b1(i2,i1,i4,i3,zb,za,s,mt2)
+      di(d15_25)= ggHZ_mp_2me_b1(i1,i2,i3,i4,za,zb,s,mt2)
+
+
+!==== triangle coefficiients
+
+      cii(c25_Z)=ggHZ_mp_tri2(i1,i2,i3,i4,za,zb,s,mt2)
+      cii(cZ_15)=-ggHZ_mp_tri2(i2,i1,i4,i3,zb,za,s,mt2)
+      cii(cH_25)=-ggHZ_mp_tri1(i1,i2,i3,i4,za,zb,s,mt2)
+      cii(c15_H)=ggHZ_mp_tri1(i2,i1,i4,i3,zb,za,s,mt2)
+      cii(c12_Z_H)=ggHZ_mp_3mtri(i1,i2,i3,i4,za,zb,s)
+      cii(c12)= (-(za(i1,i3)*(za(i1,i4)*za(i2,i3) + &
+               za(i1,i3)*za(i2,i4))*zb(i2,i1)* &
+             (za(i2,i3)*zb(i3,i1) + za(i2,i4)*zb(i4,i1))* &
+             zb(i4,i3)) + &
+          za(i1,i2)**2*za(i3,i4)*zb(i2,i1)* &
+           (-(za(i2,i3)*zb(i2,i1)) + za(i3,i4)*zb(i4,i1))* &
+           zb(i4,i3) + za(i1,i2)* &
+           (2*za(i1,i3)**2*za(i2,i4)*zb(i2,i1)*zb(i3,i1)* &
+              zb(i4,i1) + &
+             2*za(i2,i4)**2*za(i3,i4)*zb(i4,i1)* &
+              zb(i4,i2)**2 - &
+             za(i2,i3)**2*zb(i2,i1)* &
+              (2*za(i2,i4)*zb(i3,i2)*zb(i4,i2) + &
+                za(i1,i4)*zb(i2,i1)*zb(i4,i3)) + &
+             za(i1,i3)*zb(i2,i1)* &
+              (2*za(i1,i4)*za(i2,i4)*zb(i4,i1)**2 + &
+                2*za(i2,i4)**2*zb(i4,i1)*zb(i4,i2) - &
+                za(i2,i3)*za(i3,i4)*zb(i3,i1)*zb(i4,i3) + &
+                za(i2,i4)* &
+                 (-(za(i2,i3)*zb(i2,i1)) + &
+                   2*za(i3,i4)*zb(i4,i1))*zb(i4,i3)) + &
+             za(i2,i3)*(za(i1,i4)*zb(i2,i1)*zb(i4,i1)* &
+                 (-2*za(i2,i4)*zb(i4,i2) + &
+                   za(i3,i4)*zb(i4,i3)) - &
+                2*za(i2,i4)*zb(i4,i2)* &
+                 (za(i2,i4)*zb(i2,i1)*zb(i4,i2) + &
+                   za(i3,i4)* &
+                    (-(zb(i3,i1)*zb(i4,i2)) + &
+                      2*zb(i2,i1)*zb(i4,i3))))))/ &
+        (2.*za(i2,i4)*za(i3,i4)* &
+          (za(i2,i3)*zb(i3,i1) + za(i2,i4)*zb(i4,i1))**2* &
+          zb(i4,i3))
+
+
+      ggHZ_mp_box=(0d0,0d0)
+!===== make amplitude
+        do i=1,Nbox
+           ggHZ_mp_box=ggHZ_mp_box+D0(i)*di(i)
+        enddo
+        do i=1,Ntri
+           ggHZ_mp_box=ggHZ_mp_box+C0(i)*cii(i)
+        enddo
+
+      return
+      end
+
+
+      function ggHZ_mp_2mh_b1(i1,i2,i3,i4,za,zb,s,mt2)
+      implicit none
+      complex(8):: ggHZ_mp_2mh_b1,za(1:4,1:4),zb(1:4,1:4)
+!---- coefficiient of 2mh box
+      integer:: i1,i2,i3,i4
+      real(8):: mt2,t,s(1:4,1:4)
+      t(i1,i2,i3)=s(i1,i2)+s(i1,i3)+s(i2,i3)
+
+        ggHZ_mp_2mh_b1=(-2*za(i1,i3)*(2*mt2*zb(i4,i1)* &
+              (za(i2,i3)*zb(i3,i1) + za(i2,i4)*zb(i4,i1))* &
+              (za(i1,i3)*zb(i3,i2) + za(i1,i4)*zb(i4,i2)) + &
+             t(i1,i3,i4)*za(i1,i2)*zb(i2,i1)* &
+              (t(i1,i3,i4)*zb(i4,i1) + &
+                (za(i2,i3)*zb(i3,i1) + za(i2,i4)*zb(i4,i1))*zb(i4,i2))) + &
+          zb(i4,i2)*(-(t(i1,i3,i4)*za(i1,i2)*za(i3,i4)* &
+                (za(i2,i3)*zb(i3,i1) + za(i2,i4)*zb(i4,i1))*zb(i4,i2)) + &
+             2*za(i2,i3)*(t(i1,i3,i4)**2*za(i1,i2)*zb(i2,i1) + &
+                2*mt2*(za(i2,i3)*zb(i3,i1) + za(i2,i4)*zb(i4,i1))* &
+                 (za(i1,i3)*zb(i3,i2) + za(i1,i4)*zb(i4,i2)))) + &
+          t(i1,i3,i4)*za(i1,i3)**2*zb(i2,i1)* &
+           (za(i2,i3)*zb(i3,i1) + za(i2,i4)*zb(i4,i1))*zb(i4,i3))/ &
+        (2.*s(i3,i4)*(za(i2,i3)*zb(i3,i1) + za(i2,i4)*zb(i4,i1))**2)
+
+        return
+        end
+
+      function ggHZ_mp_2me_b1(i1,i2,i3,i4,za,zb,s,mt2)
+      implicit none
+      complex(8):: ggHZ_mp_2me_b1,za(1:4,1:4),zb(1:4,1:4)
+!---- coefficiient of 2mh box
+      integer:: i1,i2,i3,i4
+      real(8):: mt2,s(1:4,1:4)
+
+      ggHZ_mp_2me_b1= &
+      (-(za(i1,i2)**3*za(i3,i4)**2*zb(i2,i1)**2*zb(i4,i3)* &
+             (za(i2,i3)**2*zb(i3,i1)**2*zb(i3,i2)*zb(i4,i1)* &
+                zb(i4,i2) + &
+               2*za(i2,i3)*zb(i3,i1)*zb(i4,i1)* &
+                (za(i2,i4)*zb(i3,i1)*zb(i4,i2)**2 + &
+                  zb(i4,i3)* &
+                   (za(i1,i3)*zb(i2,i1)*zb(i3,i1) + &
+                     za(i3,i4)* &
+                      (-(zb(i3,i1)*zb(i4,i2)) + &
+                        zb(i2,i1)*zb(i4,i3)))) + &
+               za(i2,i4)*zb(i4,i1)**2* &
+                (za(i2,i4)*zb(i4,i2)* &
+                   (zb(i3,i1)*zb(i4,i2) + zb(i2,i1)*zb(i4,i3)) &
+                    - 2*zb(i4,i3)* &
+                   (-(za(i1,i3)*zb(i2,i1)*zb(i3,i1)) + &
+                     za(i3,i4)* &
+                      (zb(i3,i1)*zb(i4,i2) + &
+                        zb(i2,i1)*zb(i4,i3)))))) - &
+          (za(i1,i3)*zb(i3,i1) + za(i1,i4)*zb(i4,i1))* &
+           (za(i2,i3)*zb(i3,i2) + za(i2,i4)*zb(i4,i2))* &
+           (-2*za(i1,i4)**2*za(i2,i3)*zb(i4,i1)**2* &
+              (za(i2,i3)**2*zb(i3,i1)*zb(i3,i2)**2* &
+                 zb(i4,i1) + &
+                za(i2,i4)**2*zb(i3,i1)*zb(i4,i1)* &
+                 zb(i4,i2)**2 - &
+                za(i2,i3)*za(i2,i4)* &
+                 (zb(i3,i2)**2*zb(i4,i1)**2 - &
+                   4*zb(i3,i1)*zb(i3,i2)*zb(i4,i1)* &
+                    zb(i4,i2) + zb(i3,i1)**2*zb(i4,i2)**2)) + &
+             za(i1,i3)**2*za(i2,i4)*zb(i3,i1)* &
+              (-2*za(i2,i4)**2*zb(i4,i1)**2*zb(i4,i2)* &
+                 (zb(i3,i2)*zb(i4,i1) - 2*zb(i3,i1)*zb(i4,i2)) &
+                  + za(i2,i3)**2*zb(i3,i1)* &
+                 (zb(i3,i2)**2*zb(i4,i1)**2 + &
+                   zb(i3,i1)*zb(i3,i2)*zb(i4,i1)*zb(i4,i2) + &
+                   zb(i2,i1)*zb(i3,i2)*zb(i4,i1)*zb(i4,i3)) + &
+                za(i2,i3)*za(i2,i4)*zb(i4,i1)* &
+                 (-3*zb(i3,i2)**2*zb(i4,i1)**2 + &
+                   zb(i3,i1)*zb(i3,i2)*zb(i4,i1)*zb(i4,i2) + &
+                   zb(i3,i2)*zb(i4,i1)* &
+                    (6*zb(i3,i1)*zb(i4,i2) + &
+                      zb(i2,i1)*zb(i4,i3)))) + &
+             za(i1,i3)*za(i1,i4)*zb(i4,i1)* &
+              (-2*za(i2,i3)**3*zb(i3,i1)**3*zb(i3,i2)* &
+                 zb(i4,i2) + &
+                2*za(i2,i4)**3*zb(i3,i1)*zb(i4,i1)**2* &
+                 zb(i4,i2)**2 + &
+                za(i2,i3)**2*za(i2,i4)*zb(i3,i1)* &
+                 (7*zb(i3,i2)**2*zb(i4,i1)**2 + &
+                   zb(i3,i1)*zb(i3,i2)*zb(i4,i1)*zb(i4,i2) + &
+                   zb(i3,i2)*zb(i4,i1)* &
+                    (-10*zb(i3,i1)*zb(i4,i2) + &
+                      zb(i2,i1)*zb(i4,i3))) - &
+                za(i2,i3)*za(i2,i4)**2*zb(i4,i1)* &
+                 (zb(i3,i2)**2*zb(i4,i1)**2 + &
+                   zb(i3,i1)*zb(i4,i2)* &
+                    (5*zb(i3,i1)*zb(i4,i2) + &
+                      zb(i2,i1)*zb(i4,i3)) - &
+                   zb(i3,i2)*zb(i4,i1)* &
+                    (8*zb(i3,i1)*zb(i4,i2) + &
+                      zb(i2,i1)*zb(i4,i3))))) + &
+          za(i1,i2)*(za(i1,i3)**3*zb(i2,i1)*zb(i3,i1)**2* &
+              (za(i2,i3)**2*zb(i3,i1)**2 - &
+                za(i2,i4)**2*zb(i4,i1)**2)* &
+              (za(i2,i3)*zb(i3,i2) + za(i2,i4)*zb(i4,i2))* &
+              (-(zb(i3,i2)*zb(i4,i1)) + zb(i3,i1)*zb(i4,i2)) &
+              - za(i1,i3)**2* &
+              (za(i2,i3)**3*zb(i3,i1)**3*zb(i3,i2)* &
+                 (3*za(i1,i4)*zb(i2,i1)*zb(i4,i1)* &
+                    (zb(i3,i2)*zb(i4,i1) - &
+                      zb(i3,i1)*zb(i4,i2)) + &
+                   zb(i4,i2)* &
+                    (-2*za(i3,i4)*zb(i3,i1)*zb(i3,i2)* &
+                       zb(i4,i1) + &
+                      za(i2,i4)*zb(i2,i1)* &
+                       (zb(i3,i2)*zb(i4,i1) + &
+                         zb(i3,i1)*zb(i4,i2)))) + &
+                za(i2,i3)*za(i2,i4)**2*zb(i3,i1)*zb(i4,i1)* &
+                 (za(i3,i4)*zb(i3,i1)*zb(i4,i2)* &
+                    (zb(i3,i2)**2*zb(i4,i1)**2 - &
+                      3*zb(i3,i1)*zb(i3,i2)*zb(i4,i1)* &
+                       zb(i4,i2) - 4*zb(i3,i1)**2*zb(i4,i2)**2 &
+                      ) - &
+                   2*zb(i2,i1)**2*zb(i3,i2)*zb(i4,i1)* &
+                    zb(i4,i3)*(-2*mt2 + za(i3,i4)*zb(i4,i3)) &
+                    + zb(i2,i1)* &
+                    (zb(i3,i1)*zb(i3,i2)*zb(i4,i1)*zb(i4,i2)* &
+                       (-8*mt2 + 3*za(i1,i4)*zb(i4,i1) + &
+                         7*za(i2,i4)*zb(i4,i2) - &
+                         17*za(i3,i4)*zb(i4,i3)) - &
+                      zb(i3,i2)**2*zb(i4,i1)**2* &
+                       (-8*mt2 + za(i1,i4)*zb(i4,i1) + &
+                         za(i2,i4)*zb(i4,i2) - &
+                         4*za(i3,i4)*zb(i4,i3)) + &
+                      2*zb(i3,i1)**2*zb(i4,i2)**2* &
+                       (4*mt2 - za(i1,i4)*zb(i4,i1) + &
+                         2*za(i3,i4)*zb(i4,i3)))) + &
+                za(i2,i4)**3*zb(i4,i1)**2* &
+                 (za(i3,i4)*zb(i3,i1)**2*zb(i4,i2)**2* &
+                    (zb(i3,i2)*zb(i4,i1) - &
+                      3*zb(i3,i1)*zb(i4,i2)) + &
+                   zb(i2,i1)**2*zb(i4,i3)* &
+                    (2*mt2*zb(i3,i2)*zb(i4,i1) - &
+                      za(i3,i4)*zb(i3,i1)*zb(i4,i2)*zb(i4,i3)) &
+                     + zb(i2,i1)* &
+                    (-2*mt2*zb(i3,i2)**2*zb(i4,i1)**2 + &
+                      zb(i3,i1)**2*zb(i4,i2)**2* &
+                       (4*mt2 + za(i1,i4)*zb(i4,i1) + &
+                         za(i2,i4)*zb(i4,i2) - &
+                         8*za(i3,i4)*zb(i4,i3)) + &
+                      zb(i3,i1)*zb(i3,i2)*zb(i4,i1)*zb(i4,i2)* &
+                       (2*mt2 - za(i1,i4)*zb(i4,i1) + &
+                         za(i2,i4)*zb(i4,i2) + &
+                         3*za(i3,i4)*zb(i4,i3)))) + &
+                za(i2,i3)**2*za(i2,i4)*zb(i3,i1)**2* &
+                 (-(za(i3,i4)*zb(i3,i1)**2*zb(i4,i2)**2* &
+                      (5*zb(i3,i2)*zb(i4,i1) + &
+                        zb(i3,i1)*zb(i4,i2))) + &
+                   zb(i2,i1)**2*zb(i4,i3)* &
+                    (za(i3,i4)*zb(i3,i1)*zb(i4,i2)* &
+                       zb(i4,i3) + &
+                      2*zb(i3,i2)*zb(i4,i1)* &
+                       (mt2 - za(i3,i4)*zb(i4,i3))) + &
+                   zb(i2,i1)* &
+                    (-(zb(i3,i1)**2*zb(i4,i2)**2* &
+                         (-4*mt2 + 3*za(i1,i4)*zb(i4,i1) + &
+                           za(i2,i4)*zb(i4,i2))) + &
+                      2*zb(i3,i2)**2*zb(i4,i1)**2* &
+                       (5*mt2 + za(i1,i4)*zb(i4,i1) - &
+                         4*za(i3,i4)*zb(i4,i3)) + &
+                      zb(i3,i1)*zb(i3,i2)*zb(i4,i1)*zb(i4,i2)* &
+                       (-10*mt2 + za(i1,i4)*zb(i4,i1) + &
+                         7*za(i2,i4)*zb(i4,i2) + &
+                         5*za(i3,i4)*zb(i4,i3))))) + &
+             za(i1,i4)**2*zb(i4,i1)* &
+              (2*za(i2,i4)**3*za(i3,i4)*zb(i3,i1)* &
+                 zb(i4,i1)**3*zb(i4,i2)**3 + &
+                za(i2,i3)**4*zb(i2,i1)*zb(i3,i1)**2*zb(i3,i2)* &
+                 zb(i4,i2)* &
+                 (zb(i3,i2)*zb(i4,i1) + zb(i3,i1)*zb(i4,i2)) &
+                 + za(i2,i3)**3*zb(i3,i1)* &
+                 (2*za(i3,i4)*zb(i3,i1)*zb(i3,i2)**2* &
+                    zb(i4,i1)**2*zb(i4,i2) - &
+                   zb(i2,i1)* &
+                    (zb(i3,i1)**2*zb(i4,i2)**2* &
+                       (4*mt2 + za(i2,i4)*zb(i4,i2)) - &
+                      zb(i3,i1)*zb(i3,i2)*zb(i4,i1)*zb(i4,i2)* &
+                       (8*mt2 + 7*za(i2,i4)*zb(i4,i2)) + &
+                      6*za(i3,i4)*zb(i3,i2)**2*zb(i4,i1)**2* &
+                       zb(i4,i3))) + &
+                za(i2,i3)*za(i2,i4)**2*zb(i4,i1)**2*zb(i4,i2)* &
+                 (2*za(i3,i4)*zb(i3,i1)*zb(i4,i2)* &
+                    (2*zb(i3,i2)*zb(i4,i1) + &
+                      zb(i3,i1)*zb(i4,i2)) + &
+                   zb(i2,i1)* &
+                    (zb(i3,i1)*zb(i4,i2)* &
+                       (8*mt2 + za(i2,i4)*zb(i4,i2) - &
+                         10*za(i3,i4)*zb(i4,i3)) + &
+                      zb(i3,i2)*zb(i4,i1)* &
+                       (-4*mt2 + za(i2,i4)*zb(i4,i2) + &
+                         4*za(i3,i4)*zb(i4,i3)))) + &
+                za(i2,i3)**2*za(i2,i4)*zb(i4,i1)* &
+                 (2*za(i3,i4)*zb(i3,i1)*zb(i3,i2)*zb(i4,i1)* &
+                    zb(i4,i2)* &
+                    (zb(i3,i2)*zb(i4,i1) + &
+                      2*zb(i3,i1)*zb(i4,i2)) + &
+                   zb(i2,i1)* &
+                    (zb(i3,i1)*zb(i3,i2)*zb(i4,i1)*zb(i4,i2)* &
+                       (4*mt2 + 7*za(i2,i4)*zb(i4,i2) - &
+                         20*za(i3,i4)*zb(i4,i3)) + &
+                      2*zb(i3,i1)**2*zb(i4,i2)**2* &
+                       (2*mt2 + za(i3,i4)*zb(i4,i3)) + &
+                      zb(i3,i2)**2*zb(i4,i1)**2* &
+                       (-(za(i2,i4)*zb(i4,i2)) + &
+                         6*za(i3,i4)*zb(i4,i3))))) + &
+             za(i1,i3)*za(i1,i4)* &
+              (za(i2,i3)**4*zb(i2,i1)*zb(i3,i1)**3*zb(i3,i2)* &
+                 zb(i4,i2)* &
+                 (zb(i3,i2)*zb(i4,i1) + zb(i3,i1)*zb(i4,i2)) &
+                 - za(i2,i4)**3*zb(i4,i1)**3*zb(i4,i2)* &
+                 (za(i3,i4)*zb(i3,i1)*zb(i4,i2)* &
+                    (zb(i3,i2)*zb(i4,i1) - &
+                      5*zb(i3,i1)*zb(i4,i2)) - &
+                   za(i3,i4)*zb(i2,i1)**2*zb(i4,i3)**2 + &
+                   zb(i2,i1)* &
+                    (zb(i3,i1)*zb(i4,i2)* &
+                       (8*mt2 + za(i2,i4)*zb(i4,i2) - &
+                         6*za(i3,i4)*zb(i4,i3)) + &
+                      zb(i3,i2)*zb(i4,i1)* &
+                       (-4*mt2 + za(i2,i4)*zb(i4,i2) + &
+                         za(i3,i4)*zb(i4,i3)))) + &
+                za(i2,i3)**3*zb(i3,i1)**2* &
+                 (za(i3,i4)*zb(i3,i1)*zb(i3,i2)*zb(i4,i1)* &
+                    zb(i4,i2)* &
+                    (3*zb(i3,i2)*zb(i4,i1) + &
+                      zb(i3,i1)*zb(i4,i2)) + &
+                   2*mt2*zb(i2,i1)**2*zb(i3,i1)*zb(i4,i2)* &
+                    zb(i4,i3) + &
+                   zb(i2,i1)* &
+                    (zb(i3,i1)**2*zb(i4,i2)**2* &
+                       (2*mt2 - za(i2,i4)*zb(i4,i2)) + &
+                      zb(i3,i1)*zb(i3,i2)*zb(i4,i1)*zb(i4,i2)* &
+                       (-6*mt2 + 2*za(i1,i4)*zb(i4,i1) + &
+                         6*za(i2,i4)*zb(i4,i2) - &
+                         3*za(i3,i4)*zb(i4,i3)) - &
+                      zb(i3,i2)**2*zb(i4,i1)**2* &
+                       (-8*mt2 + 2*za(i1,i4)*zb(i4,i1) + &
+                         za(i2,i4)*zb(i4,i2) + &
+                         4*za(i3,i4)*zb(i4,i3)))) + &
+                za(i2,i3)**2*za(i2,i4)*zb(i3,i1)*zb(i4,i1)* &
+                 (za(i3,i4)*zb(i3,i1)*zb(i4,i2)* &
+                    (2*zb(i3,i2)**2*zb(i4,i1)**2 + &
+                      9*zb(i3,i1)*zb(i3,i2)*zb(i4,i1)* &
+                       zb(i4,i2) + zb(i3,i1)**2*zb(i4,i2)**2) &
+                    + zb(i2,i1)**2*zb(i4,i3)* &
+                    (2*za(i3,i4)*zb(i3,i2)*zb(i4,i1)* &
+                       zb(i4,i3) + &
+                      zb(i3,i1)*zb(i4,i2)* &
+                       (4*mt2 - za(i3,i4)*zb(i4,i3))) + &
+                   zb(i2,i1)* &
+                    (zb(i3,i1)**2*zb(i4,i2)**2* &
+                       (8*mt2 + 2*za(i1,i4)*zb(i4,i1) + &
+                         za(i2,i4)*zb(i4,i2)) + &
+                      zb(i3,i2)**2*zb(i4,i1)**2* &
+                       (4*mt2 - 2*za(i1,i4)*zb(i4,i1) - &
+                         za(i2,i4)*zb(i4,i2) + &
+                         18*za(i3,i4)*zb(i4,i3)) - &
+                      zb(i3,i1)*zb(i3,i2)*zb(i4,i1)*zb(i4,i2)* &
+                       (8*mt2 + 27*za(i3,i4)*zb(i4,i3)))) + &
+                za(i2,i3)*za(i2,i4)**2*zb(i4,i1)**2* &
+                 (za(i3,i4)*zb(i3,i1)*zb(i4,i2)* &
+                    (-(zb(i3,i2)**2*zb(i4,i1)**2) + &
+                      7*zb(i3,i1)*zb(i3,i2)*zb(i4,i1)* &
+                       zb(i4,i2) + 6*zb(i3,i1)**2*zb(i4,i2)**2 &
+                      ) + &
+                   2*zb(i2,i1)**2*zb(i4,i3)* &
+                    (mt2*zb(i3,i1)*zb(i4,i2) + &
+                      za(i3,i4)*zb(i3,i2)*zb(i4,i1)*zb(i4,i3)) &
+                     + zb(i2,i1)* &
+                    (zb(i3,i2)**2*zb(i4,i1)**2* &
+                       (-4*mt2 + za(i2,i4)*zb(i4,i2) - &
+                         2*za(i3,i4)*zb(i4,i3)) + &
+                      zb(i3,i1)*zb(i3,i2)*zb(i4,i1)*zb(i4,i2)* &
+                       (2*mt2 - 2*za(i1,i4)*zb(i4,i1) - &
+                         6*za(i2,i4)*zb(i4,i2) + &
+                         23*za(i3,i4)*zb(i4,i3)) + &
+                      zb(i3,i1)**2*zb(i4,i2)**2* &
+                       (2*za(i1,i4)*zb(i4,i1) + &
+                         za(i2,i4)*zb(i4,i2) - &
+                         2*(mt2 + 9*za(i3,i4)*zb(i4,i3))))))) &
+           + za(i1,i2)**2*zb(i2,i1)* &
+           (-(za(i1,i3)**2*zb(i2,i1)*zb(i3,i1)* &
+                (za(i2,i3)*zb(i3,i1) + za(i2,i4)*zb(i4,i1))* &
+                (za(i2,i3)*zb(i3,i1)* &
+                   (za(i3,i4)*zb(i3,i1)*zb(i4,i2)*zb(i4,i3) + &
+                     zb(i3,i2)*zb(i4,i1)* &
+                      (4*mt2 - 3*za(i3,i4)*zb(i4,i3))) + &
+                  za(i2,i4)*zb(i4,i1)* &
+                   (-3*za(i3,i4)*zb(i3,i1)*zb(i4,i2)* &
+                      zb(i4,i3) + &
+                     zb(i3,i2)*zb(i4,i1)* &
+                      (4*mt2 + za(i3,i4)*zb(i4,i3))))) + &
+             za(i1,i4)*(za(i2,i4)**2*za(i3,i4)*zb(i4,i1)**3* &
+                 zb(i4,i2)* &
+                 (zb(i3,i1)*zb(i4,i2)* &
+                    (4*mt2 + za(i2,i4)*zb(i4,i2) - &
+                      4*za(i3,i4)*zb(i4,i3)) - &
+                   zb(i2,i1)*zb(i4,i3)* &
+                    (-4*mt2 + za(i2,i4)*zb(i4,i2) + &
+                      2*za(i3,i4)*zb(i4,i3))) + &
+                za(i2,i3)**2*zb(i3,i1)*zb(i4,i1)* &
+                 (2*za(i3,i4)* &
+                    (2*mt2*zb(i3,i1)**2*zb(i4,i2)**2 - &
+                      2*zb(i3,i1)* &
+                       (2*mt2*zb(i2,i1) + &
+                         za(i3,i4)*zb(i3,i2)*zb(i4,i1))* &
+                       zb(i4,i2)*zb(i4,i3) + &
+                      3*za(i3,i4)*zb(i2,i1)*zb(i3,i2)* &
+                       zb(i4,i1)*zb(i4,i3)**2) + &
+                   za(i2,i4)*zb(i3,i1)*zb(i4,i2)**2* &
+                    (za(i3,i4)* &
+                       (2*zb(i3,i2)*zb(i4,i1) + &
+                         zb(i3,i1)*zb(i4,i2)) + &
+                      zb(i2,i1)* &
+                       (8*mt2 - 7*za(i3,i4)*zb(i4,i3)))) + &
+                za(i2,i3)**3*zb(i3,i1)**2*zb(i4,i2)* &
+                 (za(i3,i4)*zb(i3,i1)*zb(i3,i2)*zb(i4,i1)* &
+                    zb(i4,i2) + &
+                   zb(i2,i1)* &
+                    (-2*za(i3,i4)*zb(i3,i2)*zb(i4,i1)* &
+                       zb(i4,i3) + &
+                      zb(i3,i1)*zb(i4,i2)* &
+                       (4*mt2 - za(i3,i4)*zb(i4,i3)))) + &
+                za(i2,i3)*za(i2,i4)*zb(i4,i1)**2* &
+                 (za(i2,i4)*zb(i4,i2)* &
+                    (za(i3,i4)*zb(i3,i1)*zb(i4,i2)* &
+                       (zb(i3,i2)*zb(i4,i1) + &
+                         2*zb(i3,i1)*zb(i4,i2)) + &
+                      zb(i2,i1)* &
+                       (2*za(i3,i4)*zb(i3,i2)*zb(i4,i1)* &
+                          zb(i4,i3) + &
+                         zb(i3,i1)*zb(i4,i2)* &
+                          (4*mt2 - 7*za(i3,i4)*zb(i4,i3)))) - &
+                   2*za(i3,i4)* &
+                    (3*za(i3,i4)*zb(i2,i1)*zb(i3,i2)* &
+                       zb(i4,i1)*zb(i4,i3)**2 + &
+                      2*zb(i3,i1)**2*zb(i4,i2)**2* &
+                       (-2*mt2 + za(i3,i4)*zb(i4,i3)) + &
+                      zb(i3,i1)*zb(i4,i2)*zb(i4,i3)* &
+                       (2*za(i3,i4)*zb(i3,i2)*zb(i4,i1) + &
+                         zb(i2,i1)* &
+                          (2*mt2 - 5*za(i3,i4)*zb(i4,i3)))))) &
+              + za(i1,i3)* &
+              (za(i2,i3)**3*zb(i3,i1)**3*zb(i3,i2)*zb(i4,i2)* &
+                 (za(i3,i4)*zb(i3,i1)*zb(i4,i2) + &
+                   zb(i2,i1)*(4*mt2 - za(i3,i4)*zb(i4,i3))) + &
+                za(i2,i3)**2*zb(i3,i1)**2* &
+                 (-2*za(i1,i4)*zb(i2,i1)*zb(i4,i1)* &
+                    (-2*za(i3,i4)*zb(i3,i2)*zb(i4,i1)* &
+                       zb(i4,i3) + &
+                      zb(i3,i1)*zb(i4,i2)* &
+                       (2*mt2 + za(i3,i4)*zb(i4,i3))) + &
+                   za(i3,i4)* &
+                    (-(za(i3,i4)*zb(i3,i1)**2*zb(i4,i2)**2* &
+                         zb(i4,i3)) + &
+                      2*zb(i2,i1)*zb(i3,i2)*zb(i4,i1)* &
+                       zb(i4,i3)* &
+                       (-4*mt2 + za(i3,i4)*zb(i4,i3)) + &
+                      zb(i3,i1)*zb(i4,i2)* &
+                       (zb(i3,i2)*zb(i4,i1)* &
+                          (4*mt2 - 3*za(i3,i4)*zb(i4,i3)) + &
+                         zb(i2,i1)*zb(i4,i3)* &
+                          (4*mt2 + za(i3,i4)*zb(i4,i3)))) + &
+                   za(i2,i4)*zb(i4,i2)* &
+                    (za(i3,i4)*zb(i3,i1)*zb(i4,i2)* &
+                       (2*zb(i3,i2)*zb(i4,i1) + &
+                         zb(i3,i1)*zb(i4,i2)) + &
+                      zb(i2,i1)* &
+                       (-2*za(i3,i4)*zb(i3,i1)*zb(i4,i2)* &
+                          zb(i4,i3) + &
+                         zb(i3,i2)*zb(i4,i1)* &
+                          (8*mt2 + za(i3,i4)*zb(i4,i3))))) + &
+                za(i2,i4)**2*zb(i4,i1)**2* &
+                 (2*za(i1,i4)*zb(i2,i1)*zb(i3,i1)*zb(i4,i1)* &
+                    zb(i4,i2)*(-2*mt2 + za(i3,i4)*zb(i4,i3)) &
+                    + za(i3,i4)* &
+                    (zb(i3,i1)**2*zb(i4,i2)**2* &
+                       (za(i2,i4)*zb(i4,i2) - &
+                         5*za(i3,i4)*zb(i4,i3)) + &
+                      zb(i3,i1)*zb(i4,i2)* &
+                       (2*zb(i2,i1)*zb(i4,i3)* &
+                          (2*mt2 + za(i2,i4)*zb(i4,i2) - &
+                           3*za(i3,i4)*zb(i4,i3)) + &
+                         zb(i3,i2)*zb(i4,i1)* &
+                          (4*mt2 + za(i3,i4)*zb(i4,i3))) + &
+                      zb(i2,i1)*zb(i4,i3)* &
+                       (-(za(i3,i4)*zb(i2,i1)*zb(i4,i3)**2) + &
+                         zb(i3,i2)*zb(i4,i1)* &
+                          (4*mt2 - za(i2,i4)*zb(i4,i2) + &
+                           za(i3,i4)*zb(i4,i3))))) + &
+                za(i2,i3)*za(i2,i4)*zb(i3,i1)*zb(i4,i1)* &
+                 (4*za(i1,i4)*zb(i2,i1)*zb(i4,i1)* &
+                    (-2*mt2*zb(i3,i1)*zb(i4,i2) + &
+                      za(i3,i4)*zb(i3,i2)*zb(i4,i1)*zb(i4,i3)) &
+                     + za(i2,i4)*zb(i4,i2)* &
+                    (za(i3,i4)*zb(i3,i1)*zb(i4,i2)* &
+                       (zb(i3,i2)*zb(i4,i1) + &
+                         2*zb(i3,i1)*zb(i4,i2)) + &
+                      zb(i2,i1)*zb(i3,i2)*zb(i4,i1)* &
+                       (4*mt2 + za(i3,i4)*zb(i4,i3))) - &
+                   za(i3,i4)* &
+                    (6*za(i3,i4)*zb(i3,i1)**2*zb(i4,i2)**2* &
+                       zb(i4,i3) - &
+                      zb(i3,i1)*zb(i4,i2)* &
+                       (2*zb(i3,i2)*zb(i4,i1)* &
+                          (4*mt2 - za(i3,i4)*zb(i4,i3)) + &
+                         zb(i2,i1)*zb(i4,i3)* &
+                          (8*mt2 + 7*za(i3,i4)*zb(i4,i3))) + &
+                      zb(i2,i1)*zb(i4,i3)* &
+                       (za(i3,i4)*zb(i2,i1)*zb(i4,i3)**2 + &
+                         zb(i3,i2)*zb(i4,i1)* &
+                          (4*mt2 + 9*za(i3,i4)*zb(i4,i3))))))) &
+          )/(2.*za(i1,i2)**2*za(i3,i4)*zb(i2,i1)**2*zb(i3,i1)* &
+          (za(i2,i3)*zb(i3,i1) + za(i2,i4)*zb(i4,i1))**3* &
+          zb(i4,i3))
+
+      return
+      end
+
+      function ggHZ_mp_tri1(i1,i2,i3,i4,za,zb,s,mt2)
+      implicit none
+      complex(8)::ggHZ_mp_tri1,za(1:4,1:4),zb(1:4,1:4)
+!---- coefficiient of 2mh box
+      integer:: i1,i2,i3,i4
+      real(8):: mt2,t,s(1:4,1:4)
+      t(i1,i2,i3)=s(i1,i2)+s(i1,i3)+s(i2,i3)
+
+      ggHZ_mp_tri1=(-(za(i1,i2)**3*za(i3,i4)*zb(i2,i1)**2*zb(i4,i1)* &
+             zb(i4,i2)) + &
+          za(i1,i2)**2*zb(i2,i1)*zb(i4,i1)* &
+           (2*za(i1,i3)**2*zb(i2,i1)*zb(i3,i1) + &
+             za(i1,i3)*(2*za(i1,i4)*zb(i2,i1)*zb(i4,i1) + &
+                (3*za(i2,i4)*zb(i2,i1) - &
+                   za(i3,i4)*zb(i3,i1))*zb(i4,i2)) - &
+             zb(i4,i2)*(3*za(i1,i4)*za(i2,i3)*zb(i2,i1) + &
+                2*za(i3,i4)* &
+                 (za(i2,i3)*zb(i3,i2) + za(i2,i4)*zb(i4,i2))) &
+             ) - za(i1,i4)*za(i2,i3)*za(i3,i4)*zb(i4,i1)* &
+           zb(i4,i2)*(za(i2,i3)*zb(i3,i2) + &
+             za(i2,i4)*zb(i4,i2))*zb(i4,i3) + &
+          za(i1,i3)**2*zb(i3,i1)* &
+           (za(i2,i4)**2*zb(i4,i1)*zb(i4,i2)**2 - &
+             2*za(i2,i3)**2*zb(i2,i1)*zb(i3,i2)*zb(i4,i3) + &
+             za(i2,i3)*za(i2,i4)*zb(i4,i2)* &
+              (zb(i3,i2)*zb(i4,i1) - 3*zb(i2,i1)*zb(i4,i3))) &
+           + za(i1,i3)*(za(i2,i4)*za(i3,i4)*zb(i4,i1)* &
+              zb(i4,i2)*(za(i2,i3)*zb(i3,i2) + &
+                za(i2,i4)*zb(i4,i2))*zb(i4,i3) - &
+             za(i1,i4)*za(i2,i3)* &
+              (za(i2,i4)*zb(i4,i1)*zb(i4,i2)* &
+                 (zb(i3,i2)*zb(i4,i1) + &
+                   3*zb(i2,i1)*zb(i4,i3)) + &
+                za(i2,i3)* &
+                 (zb(i3,i2)**2*zb(i4,i1)**2 + &
+                   2*zb(i2,i1)*zb(i3,i2)*zb(i4,i1)* &
+                    zb(i4,i3) - zb(i2,i1)**2*zb(i4,i3)**2))) &
+           - za(i1,i2)*(za(i1,i3)**2*zb(i2,i1)*zb(i3,i1)* &
+              (-3*za(i2,i4)*zb(i4,i1)*zb(i4,i2) + &
+                za(i2,i3)* &
+                 (-2*zb(i3,i2)*zb(i4,i1) + &
+                   2*zb(i2,i1)*zb(i4,i3))) + &
+             zb(i4,i2)*(za(i3,i4)* &
+                 (2*za(i2,i3)*zb(i2,i1) + &
+                   za(i3,i4)*zb(i4,i1))* &
+                 (za(i2,i3)*zb(i3,i2) + za(i2,i4)*zb(i4,i2))* &
+                 zb(i4,i3) + &
+                2*za(i1,i4)*za(i2,i3)*zb(i2,i1)* &
+                 (2*za(i2,i4)*zb(i4,i1)*zb(i4,i2) + &
+                   za(i2,i3)* &
+                    (2*zb(i3,i2)*zb(i4,i1) - &
+                      zb(i2,i1)*zb(i4,i3)))) + &
+             za(i1,i3)*(za(i1,i4)*zb(i2,i1)*zb(i4,i1)* &
+                 (-2*za(i2,i4)*zb(i4,i1)*zb(i4,i2) + &
+                   za(i2,i3)* &
+                    (-(zb(i3,i2)*zb(i4,i1)) + &
+                      3*zb(i2,i1)*zb(i4,i3))) + &
+                zb(i4,i2)* &
+                 (za(i2,i4)* &
+                    (-4*za(i2,i4)*zb(i2,i1) + &
+                      za(i3,i4)*zb(i3,i1))*zb(i4,i1)* &
+                    zb(i4,i2) + &
+                   za(i2,i3)* &
+                    (za(i3,i4)*zb(i3,i1)* &
+                       (zb(i3,i2)*zb(i4,i1) - &
+                         zb(i2,i1)*zb(i4,i3)) + &
+                      2*za(i2,i4)*zb(i2,i1)* &
+                       (-2*zb(i3,i2)*zb(i4,i1) + &
+                         zb(i2,i1)*zb(i4,i3)))))))/ &
+        (2.*s(i3,i4)*za(i1,i2)*zb(i2,i1)* &
+          (za(i2,i3)*zb(i3,i1) + za(i2,i4)*zb(i4,i1))**2)
+      return
+      end
+
+      function ggHZ_mp_tri2(i1,i2,i3,i4,za,zb,s,mt2)
+      implicit none
+      complex(8):: ggHZ_mp_tri2,za(1:4,1:4),zb(1:4,1:4)
+!---- coefficiient of 2mh box
+      integer:: i1,i2,i3,i4
+      real(8):: mt2,t,s(1:4,1:4)
+      t(i1,i2,i3)=s(i1,i2)+s(i1,i3)+s(i2,i3)
+
+      ggHZ_mp_tri2= (zb(i4,i1)*(2*za(i1,i3)**3*zb(i2,i1)*zb(i3,i1)* &
+             (za(i2,i3)*zb(i3,i1) + za(i2,i4)*zb(i4,i1)) + &
+            2*za(i1,i4)*za(i2,i3)*za(i3,i4)*zb(i4,i1)* &
+             zb(i4,i2)*(za(i1,i2)*zb(i2,i1) + &
+               za(i2,i3)*zb(i3,i2) + za(i2,i4)*zb(i4,i2)) + &
+            2*za(i1,i3)*za(i3,i4)* &
+             (za(i1,i2)*zb(i2,i1)* &
+                (-(za(i1,i4)*zb(i4,i1)**2) + &
+                  za(i2,i3)*zb(i3,i1)*zb(i4,i2)) + &
+               za(i2,i3)* &
+                (zb(i3,i1)*zb(i4,i2)* &
+                   (za(i2,i3)*zb(i3,i2) + &
+                     za(i2,i4)*zb(i4,i2)) + &
+                  za(i1,i4)*zb(i4,i1)* &
+                   (-(zb(i3,i2)*zb(i4,i1)) + &
+                     zb(i3,i1)*zb(i4,i2)))) + &
+            za(i1,i3)**2* &
+             (2*za(i1,i4)*zb(i2,i1)*zb(i4,i1)* &
+                (za(i2,i3)*zb(i3,i1) + za(i2,i4)*zb(i4,i1)) &
+                + za(i3,i4)* &
+                (-2*za(i1,i2)*zb(i2,i1)*zb(i3,i1)* &
+                   zb(i4,i1) + &
+                  za(i2,i4)*zb(i4,i1)* &
+                   (zb(i3,i2)*zb(i4,i1) - &
+                     zb(i3,i1)*zb(i4,i2) + &
+                     zb(i2,i1)*zb(i4,i3)) + &
+                  za(i2,i3)*zb(i3,i1)* &
+                   (-(zb(i3,i2)*zb(i4,i1)) + &
+                     zb(i3,i1)*zb(i4,i2) + &
+                     zb(i2,i1)*zb(i4,i3))))))/ &
+        (2.*za(i2,i3)*za(i3,i4)*zb(i2,i1)* &
+          (za(i2,i3)*zb(i3,i1) + za(i2,i4)*zb(i4,i1))**2* &
+          zb(i4,i3))
+
+      return
+      end
+
+
+       function ggHZ_mp_3mtri(i1,i2,i3,i4,za,zb,s)
+      implicit none
+      complex(8):: ggHZ_mp_3mtri,za(1:4,1:4),zb(1:4,1:4)
+      integer:: i1,i2,i3,i4
+      real(8):: mt2,t,gam
+      real(8):: P12(4),P34(4),s(1:4,1:4)
+      integer:: nu
+
+
+      t(i1,i2,i3)=s(i1,i2)+s(i1,i3)+s(i2,i3)
+
+!==== part 1
+      ggHZ_mp_3mtri=  (-2*((za(i1,i3)*zb(i3,i1))/2. + &
+             (za(i2,i3)*zb(i3,i2))/2. + &
+             (za(i1,i4)*zb(i4,i1))/2. + &
+             (za(i2,i4)*zb(i4,i2))/2. + &
+             Sqrt(((za(i1,i3)*zb(i3,i1))/2. + &
+                  (za(i2,i3)*zb(i3,i2))/2. + &
+                  (za(i1,i4)*zb(i4,i1))/2. + &
+                  (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+               za(i1,i2)*za(i3,i4)*zb(i2,i1)*zb(i4,i3))) &
+            **2*(1 - (za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                zb(i4,i3))/ &
+              ((za(i1,i3)*zb(i3,i1))/2. + &
+                 (za(i2,i3)*zb(i3,i2))/2. + &
+                 (za(i1,i4)*zb(i4,i1))/2. + &
+                 (za(i2,i4)*zb(i4,i2))/2. + &
+                 Sqrt(((za(i1,i3)*zb(i3,i1))/2. + &
+                      (za(i2,i3)*zb(i3,i2))/2. + &
+                      (za(i1,i4)*zb(i4,i1))/2. + &
+                      (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                   za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                    zb(i4,i3)))**2)**8* &
+          ((((za(i1,i3)*zb(i3,i1))/2. + &
+                 (za(i2,i3)*zb(i3,i2))/2. + &
+                 (za(i1,i4)*zb(i4,i1))/2. + &
+                 (za(i2,i4)*zb(i4,i2))/2. + &
+                 Sqrt(((za(i1,i3)*zb(i3,i1))/2. + &
+                      (za(i2,i3)*zb(i3,i2))/2. + &
+                      (za(i1,i4)*zb(i4,i1))/2. + &
+                      (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                   za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                    zb(i4,i3)))* &
+               (za(i1,i2)*zb(i2,i1) - &
+                 (za(i1,i2)*zb(i2,i1)* &
+                    (za(i1,i3)*zb(i3,i1) + &
+                      za(i1,i4)*zb(i4,i1)))/ &
+                  ((za(i1,i3)*zb(i3,i1))/2. + &
+                    (za(i2,i3)*zb(i3,i2))/2. + &
+                    (za(i1,i4)*zb(i4,i1))/2. + &
+                    (za(i2,i4)*zb(i4,i2))/2. + &
+                    Sqrt(((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                      za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                       zb(i4,i3))))* &
+               (za(i1,i2)*zb(i2,i1)* &
+                  (((za(i2,i3)*zb(i3,i1) + &
+                         za(i2,i4)*zb(i4,i1))* &
+                       (za(i1,i3)*zb(i3,i2) + &
+                         za(i1,i4)*zb(i4,i2)))/ &
+                     (1 - &
+                        (za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))/ &
+                         ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3)))**2)**2 - &
+                    ((za(i1,i3)*zb(i3,i1) + &
+                         za(i1,i4)*zb(i4,i1) - &
+                         (za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))/ &
+                         ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))))* &
+                       (za(i2,i3)*zb(i3,i2) + &
+                         za(i2,i4)*zb(i4,i2) - &
+                         (za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))/ &
+                         ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3)))))/ &
+                     (1 - &
+                        (za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))/ &
+                         ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3)))**2)**2)* &
+                  ((za(i1,i2)**2*zb(i2,i1)**2* &
+                       (za(i2,i3)*zb(i3,i1) + &
+                         za(i2,i4)*zb(i4,i1))**2* &
+                       (-(za(i1,i2)*zb(i4,i2)) + &
+                         (za(i1,i2)*za(i1,i3)*zb(i2,i1)* &
+                         zb(i4,i3))/ &
+                         ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))))* &
+                       (za(i1,i3)*zb(i3,i1) + &
+                         za(i1,i4)*zb(i4,i1) - &
+                         (za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))/ &
+                         ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))))**2* &
+                       (za(i3,i4)*zb(i4,i1) + &
+                         (za(i2,i3)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))/ &
+                         ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3)))))/ &
+                     (((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3)))**2* &
+                       (1 - &
+                         (za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))/ &
+                         ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3)))**2)**6) + &
+                    ((za(i2,i3)*zb(i3,i1) + &
+                         za(i2,i4)*zb(i4,i1))**2* &
+                       (-(za(i2,i3)*zb(i2,i1)) - &
+                         (za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i1))/ &
+                         ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))))* &
+                       (za(i1,i2)*zb(i2,i1) - &
+                         (za(i1,i2)*zb(i2,i1)* &
+                         (za(i1,i3)*zb(i3,i1) + &
+                         za(i1,i4)*zb(i4,i1)))/ &
+                         ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))))**2* &
+                       (-(za(i1,i3)*zb(i4,i3)) + &
+                         (za(i1,i2)*za(i3,i4)*zb(i4,i2)* &
+                         zb(i4,i3))/ &
+                         ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3)))))/ &
+                     (1 - &
+                        (za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))/ &
+                         ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3)))**2)**6) - &
+                 (za(i1,i2)*zb(i2,i1)* &
+                    (za(i2,i3)*zb(i3,i1) + &
+                       za(i2,i4)*zb(i4,i1))**2* &
+                    (za(i1,i3)*zb(i3,i1) + &
+                      za(i1,i4)*zb(i4,i1) - &
+                      (za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))/ &
+                       ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))))* &
+                    (za(i1,i2)*zb(i4,i2)* &
+                       (((za(i2,i3)*zb(i3,i1) + &
+                         za(i2,i4)*zb(i4,i1))* &
+                         (za(i1,i3)*zb(i3,i2) + &
+                         za(i1,i4)*zb(i4,i2))* &
+                         (-(za(i2,i3)*zb(i2,i1)) - &
+                         (za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i1))/ &
+                         ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))))* &
+                         (za(i1,i2)*zb(i2,i1) - &
+                         (za(i1,i2)*zb(i2,i1)* &
+                         (za(i1,i3)*zb(i3,i1) + &
+                         za(i1,i4)*zb(i4,i1)))/ &
+                         ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3)))))/ &
+                         (1 - &
+                         (za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))/ &
+                         ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3)))**2)**4 + &
+                         (za(i1,i2)**2*zb(i2,i1)**2* &
+                         (za(i2,i3)*zb(i3,i1) + &
+                         za(i2,i4)*zb(i4,i1))* &
+                         (za(i1,i3)*zb(i3,i2) + &
+                         za(i1,i4)*zb(i4,i2))* &
+                         (za(i1,i3)*zb(i3,i1) + &
+                         za(i1,i4)*zb(i4,i1) - &
+                         (za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))/ &
+                         ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))))* &
+                         (za(i3,i4)*zb(i4,i1) + &
+                         (za(i2,i3)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))/ &
+                         ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3)))))/ &
+                         (((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3)))**2* &
+                         (1 - &
+                         (za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))/ &
+                         ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3)))**2)**4)) + &
+                      za(i1,i3)*zb(i2,i1)* &
+                       (-((za(i1,i2)*zb(i2,i1)* &
+                         (za(i2,i3)*zb(i3,i1) + &
+                         za(i2,i4)*zb(i4,i1))* &
+                         (-(za(i1,i2)*zb(i4,i2)) + &
+                         (za(i1,i2)*za(i1,i3)*zb(i2,i1)* &
+                         zb(i4,i3))/ &
+                         ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))))* &
+                         (za(i1,i3)*zb(i3,i1) + &
+                         za(i1,i4)*zb(i4,i1) - &
+                         (za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))/ &
+                         ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))))**2)/ &
+                         (((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3)))* &
+                         (1 - &
+                         (za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))/ &
+                         ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3)))**2)**4)) + &
+                         ((za(i2,i3)*zb(i3,i1) + &
+                         za(i2,i4)*zb(i4,i1))* &
+                         (za(i1,i2)*zb(i2,i1) - &
+                         (za(i1,i2)*zb(i2,i1)* &
+                         (za(i1,i3)*zb(i3,i1) + &
+                         za(i1,i4)*zb(i4,i1)))/ &
+                         ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))))**2* &
+                         (-(za(i1,i3)*zb(i4,i3)) + &
+                         (za(i1,i2)*za(i3,i4)*zb(i4,i2)* &
+                         zb(i4,i3))/ &
+                         ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3)))))/ &
+                         (1 - &
+                         (za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))/ &
+                         ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3)))**2)**4)))/ &
+                  (1 - &
+                     (za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                        zb(i4,i3))/ &
+                      ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3)))**2)**3))/ &
+             (1 - (za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                  zb(i4,i3))/ &
+                ((za(i1,i3)*zb(i3,i1))/2. + &
+                   (za(i2,i3)*zb(i3,i2))/2. + &
+                   (za(i1,i4)*zb(i4,i1))/2. + &
+                   (za(i2,i4)*zb(i4,i2))/2. + &
+                   Sqrt(((za(i1,i3)*zb(i3,i1))/2. + &
+                        (za(i2,i3)*zb(i3,i2))/2. + &
+                        (za(i1,i4)*zb(i4,i1))/2. + &
+                        (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                     za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                      zb(i4,i3)))**2) + &
+            za(i3,i4)*zb(i4,i3)* &
+             (-((za(i1,i2)**4*zb(i2,i1)**4* &
+                    (za(i2,i3)*zb(i3,i1) + &
+                       za(i2,i4)*zb(i4,i1))**3* &
+                    (za(i1,i3)*zb(i3,i2) + &
+                      za(i1,i4)*zb(i4,i2))* &
+                    (za(i1,i2)*zb(i2,i1) + &
+                      (za(i1,i3)*zb(i3,i1))/2. + &
+                      (za(i2,i3)*zb(i3,i2))/2. + &
+                      (za(i1,i4)*zb(i4,i1))/2. + &
+                      (za(i2,i4)*zb(i4,i2))/2. + &
+                      Sqrt(((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                        za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3)))* &
+                    (-(za(i1,i2)*zb(i4,i2)) + &
+                      (za(i1,i2)*za(i1,i3)*zb(i2,i1)* &
+                         zb(i4,i3))/ &
+                       ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))))* &
+                    (za(i1,i3)*zb(i3,i1) + &
+                       za(i1,i4)*zb(i4,i1) - &
+                       (za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))/ &
+                        ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))))**3* &
+                    (za(i3,i4)*zb(i4,i1) + &
+                      (za(i2,i3)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))/ &
+                       ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3)))))/ &
+                  (((za(i1,i3)*zb(i3,i1))/2. + &
+                       (za(i2,i3)*zb(i3,i2))/2. + &
+                       (za(i1,i4)*zb(i4,i1))/2. + &
+                       (za(i2,i4)*zb(i4,i2))/2. + &
+                       Sqrt(((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3)))**4* &
+                    (1 - &
+                       (za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))/ &
+                        ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3)))**2)**9)) + &
+               (za(i1,i2)*zb(i2,i1)* &
+                  (za(i2,i3)*zb(i3,i1) + &
+                     za(i2,i4)*zb(i4,i1))**3* &
+                  (-(za(i2,i3)*zb(i2,i1)) - &
+                    (za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                       zb(i4,i1))/ &
+                     ((za(i1,i3)*zb(i3,i1))/2. + &
+                       (za(i2,i3)*zb(i3,i2))/2. + &
+                       (za(i1,i4)*zb(i4,i1))/2. + &
+                       (za(i2,i4)*zb(i4,i2))/2. + &
+                       Sqrt(((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))))* &
+                  (za(i1,i2)*zb(i2,i1) - &
+                     (za(i1,i2)*zb(i2,i1)* &
+                        (za(i1,i3)*zb(i3,i1) + &
+                         za(i1,i4)*zb(i4,i1)))/ &
+                      ((za(i1,i3)*zb(i3,i1))/2. + &
+                        (za(i2,i3)*zb(i3,i2))/2. + &
+                        (za(i1,i4)*zb(i4,i1))/2. + &
+                        (za(i2,i4)*zb(i4,i2))/2. + &
+                        Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                        2. + (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))))**2* &
+                  (za(i1,i3)*zb(i3,i1) + &
+                    za(i1,i4)*zb(i4,i1) - &
+                    (za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                       zb(i4,i3))/ &
+                     ((za(i1,i3)*zb(i3,i1))/2. + &
+                       (za(i2,i3)*zb(i3,i2))/2. + &
+                       (za(i1,i4)*zb(i4,i1))/2. + &
+                       (za(i2,i4)*zb(i4,i2))/2. + &
+                       Sqrt(((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))))* &
+                  ((za(i1,i2)**2*zb(i2,i1)*zb(i4,i2)* &
+                       (za(i1,i3)*zb(i3,i2) + &
+                         za(i1,i4)*zb(i4,i2)))/ &
+                     (1 - &
+                       (za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))/ &
+                        ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3)))**2) - &
+                    (za(i1,i2)*zb(i2,i1)* &
+                       (za(i1,i3)*zb(i3,i2) + &
+                         za(i1,i4)*zb(i4,i2))* &
+                       (za(i1,i2)*zb(i2,i1) + &
+                         (za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3)))* &
+                       (-(za(i1,i3)*zb(i4,i3)) + &
+                         (za(i1,i2)*za(i3,i4)*zb(i4,i2)* &
+                         zb(i4,i3))/ &
+                         ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3)))))/ &
+                     (((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3)))* &
+                       (1 - &
+                         (za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))/ &
+                         ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3)))**2)**2)))/ &
+                (((za(i1,i3)*zb(i3,i1))/2. + &
+                    (za(i2,i3)*zb(i3,i2))/2. + &
+                    (za(i1,i4)*zb(i4,i1))/2. + &
+                    (za(i2,i4)*zb(i4,i2))/2. + &
+                    Sqrt(((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                      za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                       zb(i4,i3)))* &
+                  (1 - &
+                     (za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                        zb(i4,i3))/ &
+                      ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3)))**2)**7) + &
+               ((za(i2,i3)*zb(i3,i1) + &
+                     za(i2,i4)*zb(i4,i1))**2* &
+                  (za(i1,i2)*zb(i2,i1) - &
+                     (za(i1,i2)*zb(i2,i1)* &
+                        (za(i1,i3)*zb(i3,i1) + &
+                         za(i1,i4)*zb(i4,i1)))/ &
+                      ((za(i1,i3)*zb(i3,i1))/2. + &
+                        (za(i2,i3)*zb(i3,i2))/2. + &
+                        (za(i1,i4)*zb(i4,i1))/2. + &
+                        (za(i2,i4)*zb(i4,i2))/2. + &
+                        Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                        2. + (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))))**3* &
+                  (-(za(i1,i3)*zb(i4,i3)) + &
+                    (za(i1,i2)*za(i3,i4)*zb(i4,i2)* &
+                       zb(i4,i3))/ &
+                     ((za(i1,i3)*zb(i3,i1))/2. + &
+                       (za(i2,i3)*zb(i3,i2))/2. + &
+                       (za(i1,i4)*zb(i4,i1))/2. + &
+                       (za(i2,i4)*zb(i4,i2))/2. + &
+                       Sqrt(((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))))* &
+                  ((za(i1,i2)*zb(i2,i1)* &
+                       (za(i2,i3)*zb(i3,i1) + &
+                         za(i2,i4)*zb(i4,i1))* &
+                       (za(i1,i3)*zb(i3,i2) + &
+                         za(i1,i4)*zb(i4,i2))* &
+                       (-(za(i2,i3)*zb(i2,i1)) - &
+                         (za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i1))/ &
+                         ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3)))))/ &
+                     (1 - &
+                        (za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))/ &
+                         ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3)))**2)**3 + &
+                    ((za(i1,i3)*zb(i3,i1) + &
+                         za(i1,i4)*zb(i4,i1) - &
+                         (za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))/ &
+                         ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))))* &
+                       (((za(i1,i2)*zb(i2,i1) + &
+                         (za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3)))* &
+                         (-(za(i2,i3)*zb(i2,i1)) - &
+                         (za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i1))/ &
+                         ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))))* &
+                         (za(i1,i2)*zb(i2,i1) - &
+                         (za(i1,i2)*zb(i2,i1)* &
+                         (za(i2,i3)*zb(i3,i2) + &
+                         za(i2,i4)*zb(i4,i2)))/ &
+                         ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3)))))/ &
+                         (1 - &
+                         (za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))/ &
+                         ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3)))**2)**2 - &
+                         za(i1,i2)*zb(i2,i1)* &
+                         (-((za(i1,i2)*za(i1,i3)* &
+                         zb(i2,i1)**2* &
+                         (za(i2,i3)*zb(i3,i1) + &
+                         za(i2,i4)*zb(i4,i1)))/ &
+                         (((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3)))* &
+                         (1 - &
+                         (za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))/ &
+                         ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3)))**2))) + &
+                         ((-(za(i2,i3)*zb(i2,i1)) - &
+                         (za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i1))/ &
+                         ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))))* &
+                         (za(i2,i3)*zb(i3,i2) + &
+                         za(i2,i4)*zb(i4,i2) - &
+                         (za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))/ &
+                         ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3)))))/ &
+                         (1 - &
+                         (za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))/ &
+                         ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3)))**2)**2)))/ &
+                     (1 - &
+                       (za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))/ &
+                        ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3)))**2)))/ &
+                (1 - (za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                      zb(i4,i3))/ &
+                    ((za(i1,i3)*zb(i3,i1))/2. + &
+                       (za(i2,i3)*zb(i3,i2))/2. + &
+                       (za(i1,i4)*zb(i4,i1))/2. + &
+                       (za(i2,i4)*zb(i4,i2))/2. + &
+                       Sqrt(((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3)))**2)**6 + &
+               (za(i1,i2)**2*zb(i2,i1)**2* &
+                  (za(i2,i3)*zb(i3,i1) + &
+                     za(i2,i4)*zb(i4,i1))**2* &
+                  (za(i1,i2)*zb(i2,i1) - &
+                    (za(i1,i2)*zb(i2,i1)* &
+                       (za(i1,i3)*zb(i3,i1) + &
+                         za(i1,i4)*zb(i4,i1)))/ &
+                     ((za(i1,i3)*zb(i3,i1))/2. + &
+                       (za(i2,i3)*zb(i3,i2))/2. + &
+                       (za(i1,i4)*zb(i4,i1))/2. + &
+                       (za(i2,i4)*zb(i4,i2))/2. + &
+                       Sqrt(((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))))* &
+                  (za(i1,i3)*zb(i3,i1) + &
+                     za(i1,i4)*zb(i4,i1) - &
+                     (za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                        zb(i4,i3))/ &
+                      ((za(i1,i3)*zb(i3,i1))/2. + &
+                        (za(i2,i3)*zb(i3,i2))/2. + &
+                        (za(i1,i4)*zb(i4,i1))/2. + &
+                        (za(i2,i4)*zb(i4,i2))/2. + &
+                        Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                        2. + (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))))**2* &
+                  ((za(i1,i2)**3*zb(i2,i1)**2* &
+                       (za(i2,i3)*zb(i3,i1) + &
+                         za(i2,i4)*zb(i4,i1))*zb(i4,i2)* &
+                       (za(i1,i3)*zb(i3,i2) + &
+                         za(i1,i4)*zb(i4,i2))* &
+                       (za(i3,i4)*zb(i4,i1) + &
+                         (za(i2,i3)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))/ &
+                         ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3)))))/ &
+                     (((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3)))* &
+                       (1 - &
+                         (za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))/ &
+                         ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3)))**2)**3) + &
+                    ((-(za(i1,i2)*zb(i4,i2)) + &
+                         (za(i1,i2)*za(i1,i3)*zb(i2,i1)* &
+                         zb(i4,i3))/ &
+                         ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))))* &
+                       ((za(i1,i2)*zb(i2,i1)* &
+                         (za(i2,i3)*zb(i3,i1) + &
+                         za(i2,i4)*zb(i4,i1))* &
+                         (za(i1,i3)*zb(i3,i2) + &
+                         za(i1,i4)*zb(i4,i2))* &
+                         (za(i3,i4)*zb(i4,i1) + &
+                         (za(i2,i3)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))/ &
+                         ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3)))))/ &
+                         (1 - &
+                         (za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))/ &
+                         ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3)))**2)**3 + &
+                         ((za(i1,i3)*zb(i3,i1) + &
+                         za(i1,i4)*zb(i4,i1) - &
+                         (za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))/ &
+                         ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))))* &
+                         (((za(i1,i2)*zb(i2,i1) + &
+                         (za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3)))* &
+                         (za(i1,i2)*zb(i2,i1) - &
+                         (za(i1,i2)*zb(i2,i1)* &
+                         (za(i2,i3)*zb(i3,i2) + &
+                         za(i2,i4)*zb(i4,i2)))/ &
+                         ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))))* &
+                         (za(i3,i4)*zb(i4,i1) + &
+                         (za(i2,i3)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))/ &
+                         ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3)))))/ &
+                         (1 - &
+                         (za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))/ &
+                         ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3)))**2)**2 - &
+                         za(i1,i2)*zb(i2,i1)* &
+                         ((za(i1,i3)*zb(i2,i1)* &
+                         (za(i2,i3)*zb(i3,i1) + &
+                         za(i2,i4)*zb(i4,i1)))/ &
+                         (1 - &
+                         (za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))/ &
+                         ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3)))**2) + &
+                         ((za(i2,i3)*zb(i3,i2) + &
+                         za(i2,i4)*zb(i4,i2) - &
+                         (za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))/ &
+                         ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))))* &
+                         (za(i3,i4)*zb(i4,i1) + &
+                         (za(i2,i3)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))/ &
+                         ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3)))))/ &
+                         (1 - &
+                         (za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))/ &
+                         ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3)))**2)**2)))/ &
+                         (1 - &
+                         (za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))/ &
+                         ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3)))**2)))/ &
+                     (1 - &
+                       (za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3))/ &
+                        ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3)))**2)))/ &
+                (((za(i1,i3)*zb(i3,i1))/2. + &
+                     (za(i2,i3)*zb(i3,i2))/2. + &
+                     (za(i1,i4)*zb(i4,i1))/2. + &
+                     (za(i2,i4)*zb(i4,i2))/2. + &
+                     Sqrt(((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                       za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                        zb(i4,i3)))**2* &
+                  (1 - &
+                     (za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                        zb(i4,i3))/ &
+                      ((za(i1,i3)*zb(i3,i1))/2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2. + &
+                         Sqrt(((za(i1,i3)*zb(i3,i1))/ &
+                         2. + &
+                         (za(i2,i3)*zb(i3,i2))/2. + &
+                         (za(i1,i4)*zb(i4,i1))/2. + &
+                         (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                         za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                         zb(i4,i3)))**2)**5))))/ &
+        (za(i1,i2)**2*zb(i2,i1)**2* &
+          (za(i2,i3)*zb(i3,i1) + za(i2,i4)*zb(i4,i1))** &
+           4*(za(i1,i2)*zb(i2,i1) - &
+             (za(i1,i2)*zb(i2,i1)* &
+                (za(i1,i3)*zb(i3,i1) + &
+                  za(i1,i4)*zb(i4,i1)))/ &
+              ((za(i1,i3)*zb(i3,i1))/2. + &
+                (za(i2,i3)*zb(i3,i2))/2. + &
+                (za(i1,i4)*zb(i4,i1))/2. + &
+                (za(i2,i4)*zb(i4,i2))/2. + &
+                Sqrt(((za(i1,i3)*zb(i3,i1))/2. + &
+                     (za(i2,i3)*zb(i3,i2))/2. + &
+                     (za(i1,i4)*zb(i4,i1))/2. + &
+                     (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                  za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                   zb(i4,i3))))**2* &
+          (za(i1,i3)*zb(i3,i1) + za(i1,i4)*zb(i4,i1) - &
+             (za(i1,i2)*za(i3,i4)*zb(i2,i1)*zb(i4,i3))/ &
+              ((za(i1,i3)*zb(i3,i1))/2. + &
+                (za(i2,i3)*zb(i3,i2))/2. + &
+                (za(i1,i4)*zb(i4,i1))/2. + &
+                (za(i2,i4)*zb(i4,i2))/2. + &
+                Sqrt(((za(i1,i3)*zb(i3,i1))/2. + &
+                     (za(i2,i3)*zb(i3,i2))/2. + &
+                     (za(i1,i4)*zb(i4,i1))/2. + &
+                     (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                  za(i1,i2)*za(i3,i4)*zb(i2,i1)* &
+                   zb(i4,i3))))**2* &
+          (-(za(i1,i2)*za(i3,i4)*zb(i2,i1)*zb(i4,i3)) + &
+            ((za(i1,i3)*zb(i3,i1))/2. + &
+               (za(i2,i3)*zb(i3,i2))/2. + &
+               (za(i1,i4)*zb(i4,i1))/2. + &
+               (za(i2,i4)*zb(i4,i2))/2. + &
+               Sqrt(((za(i1,i3)*zb(i3,i1))/2. + &
+                    (za(i2,i3)*zb(i3,i2))/2. + &
+                    (za(i1,i4)*zb(i4,i1))/2. + &
+                    (za(i2,i4)*zb(i4,i2))/2.)**2 - &
+                 za(i1,i2)*za(i3,i4)*zb(i2,i1)*zb(i4,i3) &
+                 ))**2))
+
+!+==== part 2
+!=====normalization
+      ggHZ_mp_3mtri=-ggHZ_mp_3mtri/(two*s(i3,i4))
+
+      return
+      end
+! ------------------ END MCFM SM check  ------------      
 
 
 

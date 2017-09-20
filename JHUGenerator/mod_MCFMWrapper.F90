@@ -1700,7 +1700,7 @@ end subroutine
 
 
 function Setup_MCFM_qqVVqq(pid_MCFM_in,p_MCFM_in,pid_MCFM,p_MCFM,ZWcode)
-use ModParameters, only : Z0_
+use ModParameters, only : Z0_, includeInterference
 implicit none
 logical :: Setup_MCFM_qqVVqq
 integer, intent(in) :: pid_MCFM_in(1:mxpart)
@@ -1747,9 +1747,12 @@ common/zcouple/l,r,q1,l1,r1,q2,l2,r2,le,ln,re,rn,sin2w
    endif
 
    ! Turn 4f interference on as needed
-   if( idV(1).eq.idV(2) .and. idVswap(1).eq.idVswap(2) .and. idVswap(1).eq.idV(1) .and. idV(1).eq.Z0_ ) then
+   if( includeInterference .and. idV(1).eq.idV(2) .and. idVswap(1).eq.idVswap(2) .and. idVswap(1).eq.idV(1) .and. idV(1).eq.Z0_ ) then
       vsymfact=0.5d0
       interference=.true.
+   else
+      vsymfact=1d0
+      interference=.false.
    endif
 
    ! Set l1, l2
