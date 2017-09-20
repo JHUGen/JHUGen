@@ -313,6 +313,7 @@ SUBROUTINE SetJHUGenDefaults()
    PrintPMZZIntervals = 20
    GenerateEvents=.false.
    RequestNLeptons = -1
+   RequestNJets = -1
    RequestOS=-1
    RequestOSSF=-1
    CountTauAsAny = .true.
@@ -473,6 +474,7 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "FilterOSPairs", success, RequestOS)
     call ReadCommandLineArgument(arg, "FilterOSSFPairs", success, RequestOSSF)
     call ReadCommandLineArgument(arg, "CountTauAsAny", success, CountTauAsAny)
+    call ReadCommandLineArgument(arg, "FilterNJets", success, RequestNJets)
     call ReadCommandLineArgument(arg, "Unweighted", success, Unweighted)
     call ReadCommandLineArgument(arg, "Interf", success, includeInterference, success2=interfSet)
     call ReadCommandLineArgument(arg, "ReadLHE", success, LHEProdFile, success2=ReadLHEFile)
@@ -2932,6 +2934,7 @@ call InitReadLHE(BeginEventLine)
      do while ( .true. )
          NEvent=NEvent + 1
          LeptInEvent(:) = 0
+         JetsInEvent(:) = 0
          read(io_LHEInFile,"(A)") EventLine(0)
          if (UseUnformattedRead) then
              read(EventLine(0),*) EventNumPart, EventProcessId, WeightScaleAqedAqcd
@@ -2964,9 +2967,13 @@ call InitReadLHE(BeginEventLine)
                   pH2sq = dsqrt(abs(MomHiggs(1:4).dot.MomHiggs(1:4)))
                   iHiggs = nline
             endif
-            if( IsALHELepton(LHE_IDUP(nline)) ) then
+            if( IsALHELepton(LHE_IDUP(nline)) .and. LHE_IntExt(nline).eq.1 ) then
                   LeptInEvent(0) = LeptInEvent(0) + 1
                   LeptInEvent( LeptInEvent(0) ) = LHE_IDUP(nline)
+            endif
+            if( IsALHEJet(LHE_IDUP(nline)) .and. LHE_IntExt(nline).eq.1 ) then
+                  JetsInEvent(0) = JetsInEvent(0) + 1
+                  JetsInEvent( JetsInEvent(0) ) = LHE_IDUP(nline)
             endif
          enddo
 
@@ -3073,8 +3080,8 @@ call InitReadLHE(BeginEventLine)
               tries = tries +1
               read(io_LHEInFile,fmt="(A160)",IOSTAT=stat,END=99) OtherLines(1:160)
               if(OtherLines(1:30).eq."</LesHouchesEvents>") then
-                  if( RequestNLeptons.gt.0 ) then
-                    write(io_LHEOutFile,"(A)") "<!-- Lepton filter information:"
+                  if( RequestNLeptons.gt.0 .or. RequestNJets.gt.0 ) then
+                    write(io_LHEOutFile,"(A)") "<!-- Filter information:"
                     write(io_LHEOutFile,"(A,I8)") "     events processed:  ", NEvent
                     write(io_LHEOutFile,"(A,I8)") "     events accepted:   ", AccepCounter
                     write(io_LHEOutFile,"(A,1F6.2,A)") "     filter efficiency: ", dble(AccepCounter)/dble(NEvent)*100d0,"% -->"
@@ -3111,7 +3118,7 @@ call InitReadLHE(BeginEventLine)
         write(io_stdout,*) "       Increase CSMAX in main.F90 or VegasNc1."
     endif
    write(io_stdout,*)  "Event generation rate (events/sec)",dble(AccepCounter)/(time_end-time_start)
-   if( RequestNLeptons.gt.0 ) write(io_stdout,"(A,1F6.2,A)") " Lepton filter efficiency:",dble(AccepCounter)/dble(NEvent)*100d0," %"
+   if( RequestNLeptons.gt.0 .or. RequestNJets.gt.0 ) write(io_stdout,"(A,1F6.2,A)") " Filter efficiency:",dble(AccepCounter)/dble(NEvent)*100d0," %"
 
 
     write(io_LogFile,*) ""
@@ -3124,7 +3131,7 @@ call InitReadLHE(BeginEventLine)
         write(io_LogFile,*) "       Increase CSMAX in main.F90 or VegasNc1."
     endif
    write(io_LogFile,*)  "Event generation rate (events/sec)",dble(AccepCounter)/(time_end-time_start)
-   if( RequestNLeptons.gt.0 ) write(io_LogFile,"(A,1F6.2,A)") " Lepton filter efficiency:",dble(AccepCounter)/dble(NEvent)*100d0," %"
+   if( RequestNLeptons.gt.0 .or. RequestNJets.gt.0 ) write(io_LogFile,"(A,1F6.2,A)") " Filter efficiency:",dble(AccepCounter)/dble(NEvent)*100d0," %"
 
 
 
@@ -4688,6 +4695,13 @@ character :: arg*(500)
     if( CountTauAsAny .and. RequestOSSF.gt.0 ) then
         write(TheUnit,"(8X,A)") "(counting tau in place of e or mu of the same sign, if necessary)"
     endif
+    if( (ReadLHEFile) .and. (RequestNJets.gt.0) ) then
+        if ( RequestNJets .eq. 1 ) then
+            write(TheUnit,"(4X,A,I2,A)") "Jet filter activated. Requesting ",RequestNJets," quark/gluon."
+        else
+            write(TheUnit,"(4X,A,I2,A)") "Jet filter activated. Requesting ",RequestNJets," quarks/gluons."
+        endif
+    endif
     write(TheUnit,"(4X,A,20I11)") "Random seed: ",UserSeed
     write(TheUnit,"(4X,A)") "To reproduce results using this seed, JHUGen should be compiled with the same compiler:"
 #if compiler==1
@@ -5195,7 +5209,7 @@ implicit none
         print *, "   MuFacMultiplier:   Multiplier for the factorization scale chosen by FacScheme"
         print *, "   RenScheme:         QCD renormalization scale scheme"
         print *, "   MuRenMultiplier:   Multiplier for the renormalization scale chosen by RenScheme"
-        print *, " Lepton filter:"
+        print *, " Lepton and jet filter:"
         print *, "   FilterNLept:       For decay mode, reject events that have less than FilterNLept leptons"
         print *, "   FilterOSPairs:     For decay mode, reject events that have less than FilterOSPairs pairs of"
         print *, "                      sign leptons of any flavor."
@@ -5203,6 +5217,8 @@ implicit none
         print *, "                      opposite-sign-same-flavor leptons."
         print *, "   CountTauAsAny:     For FilterOSSFPairs, taus can stand in place of electrons or muons"
         print *, "                      of the same charge."
+        print *, "   FilterNJets:       For decay mode, reject events that have less than FilterNJets quarks"
+        print *, "                      and/or gluons"
         print *, "   WriteFailedEvents: Write events that fail in the LHE file, but with a weight of 0"
         print *, "                      (off by default)"
         print *, " Higgs propagator and decay width:"

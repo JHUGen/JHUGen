@@ -90,7 +90,7 @@ command line parameter quick reference:
     MuFacMultiplier:   Multiplier for the factorization scale chosen by FacScheme
     RenScheme:         QCD renormalization scale scheme
     MuRenMultiplier:   Multiplier for the renormalization scale chosen by RenScheme
-  Lepton filter:
+  Lepton and jet filter:
     FilterNLept:       For decay mode, reject events that have less than FilterNLept leptons
     FilterOSPairs:     For decay mode, reject events that have less than FilterOSPairs pairs of
                        sign leptons of any flavor.
@@ -98,6 +98,8 @@ command line parameter quick reference:
                        opposite-sign-same-flavor leptons.
     CountTauAsAny:     For FilterOSSFPairs, taus can stand in place of electrons or muons
                        of the same charge.
+    FilterNJets:       For decay mode, reject events that have less than FilterNJets quarks
+                       and/or gluons
     WriteFailedEvents: Write events that fail in the LHE file, but with a weight of 0
                        (off by default)
   Higgs propagator and decay width:
