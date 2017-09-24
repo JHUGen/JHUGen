@@ -5,6 +5,7 @@
   TString LIBMCFM="libmcfm_704.so";
   TString LIBJHUGENMELA="libjhugenmela.so";
   TString LIBMELA="libMELA.so";
+  TString LIBCOLLIER="libcollier.so";
 
   gInterpreter->AddIncludePath("$ROOFITSYS/include/");
   gInterpreter->AddIncludePath(testdir+"/../interface/");
@@ -20,4 +21,5 @@
   gSystem->Load(LIBMCFMPATH + LIBMCFM);
   gSystem->Load(LIBMCFMPATH + LIBJHUGENMELA);
   gSystem->Load(LIBMCFMPATH + LIBMELA);
+  gSystem->Load(LIBMCFMPATH + LIBCOLLIER);
 }
