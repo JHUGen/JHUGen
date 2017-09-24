@@ -6,6 +6,8 @@ set -euo pipefail
 MELADIR="."
 DATA_LIB_DIR="slc6_amd64_gcc530"
 
+bash COLLIER/setup.sh "$@"
+
 if [[ "$#" -ge 1 ]] && [[ "$1" == *"clean"* ]];then
 	make clean
 	pushd $MELADIR"/fortran/"
@@ -35,7 +37,7 @@ else
 		echo "ERROR: something went wrong in mv, see ^ error message"
 		echo
 		popd
-		exit 1 #return only works when sourced, exit will exit your whole session if sourced
+		exit 1
 	fi
 fi
 )
