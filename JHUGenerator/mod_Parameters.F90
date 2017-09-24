@@ -55,6 +55,12 @@ character(len=500) :: LHAPDF_DATA_PATH
 integer, public :: LHAPDFMember, lenLHAPDFString ! lenLHAPDFString is needed in MELA
 integer, public :: PDFSet
 ! End PDFset variables
+#if useCollier==1
+! COLLIER initialization variables
+integer, public :: Collier_maxNLoopProps = -1
+integer, public :: Collier_maxRank = -1
+! End COLLIER initialization variables
+#endif
 logical, public :: includeInterference, writegit
 real(8), public :: M_V,Ga_V, M_Vprime,Ga_Vprime
 real(8), public, parameter :: GeV=1d0/100d0 ! we are using units of 100GeV, i.e. Lambda=10 is 1TeV
@@ -2838,6 +2844,28 @@ subroutine spinoru(p,za,zb,s)
 
     end subroutine spinoru
 !========================================================================
+
+!========================================================================
+! Common initialization functions that may be called multiple times if needed
+! Check arXiv:1604.06792 for the parameters
+subroutine InitCOLLIER(Nmax, Rmax)
+#if useCollier==1
+use COLLIER
+implicit none
+integer, intent(in) :: Nmax, Rmax
+integer :: supNmax, supRmax
+   supNmax = max(Nmax, Collier_maxNLoopProps)
+   supRmax = max(Rmax, Collier_maxRank)
+   if ((supNmax .gt. Collier_maxNLoopProps) .or. (supRmax .gt. Collier_maxRank)) then
+      call Init_cll(supNmax,supRmax,'')
+      call setMode_cll(1)
+   endif
+#else
+implicit none
+integer, intent(in) :: Nmax, Rmax
+   return
+#endif
+end subroutine
 
 
 

@@ -159,6 +159,10 @@ namespace TUtil{
   void SetDecayWidth(double inwidth, int ipart);
   double GetMass(int ipart);
   double GetDecayWidth(int ipart);
+  double GetMass(const MELAParticle* part);
+  double GetDecayWidth(const MELAParticle* part);
+  void GetMassWidth(int ipart, double& m, double& ga);
+  void GetMassWidth(const MELAParticle* part, double& m, double& ga);
   void SetCKMElements(double* invckm_ud, double* invckm_us, double* invckm_cd, double* invckm_cs, double* invckm_ts, double* invckm_tb, double* invckm_ub=0, double* invckm_cb=0, double* invckm_td=0);
   double GetCKMElement(int iquark, int jquark);
   double InterpretScaleScheme(const TVar::Production& production, const TVar::MatrixElement& matrixElement, const TVar::EventScaleScheme& scheme, TLorentzVector p[mxpart]);
