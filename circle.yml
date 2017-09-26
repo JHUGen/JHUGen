@@ -10,8 +10,10 @@ machine:
     #environment variables can only be set in this section so . bin/thisroot.sh doesn't work
     SCRAM_ARCH: "slc6_amd64_gcc530"
 
+    LHAPDF_VERSION: "6.1.6"
+
     PATH: "$(echo $HOME/root/bin:$HOME/CMSJHU_AnalysisMacros/JHUSpinWidthPaper_2015/LHEAnalyzer:$PATH | sed s/:$//)"
-    LD_LIBRARY_PATH: "$(echo $HOME/JHUGen/JHUGenMELAv2/MELA/data/$SCRAM_ARCH:$HOME/root/lib:$HOME/LHAPDF-6.1.6/lib:$LD_LIBRARY_PATH | sed s/:$//)"
+    LD_LIBRARY_PATH: "$(echo $HOME/JHUGen/JHUGenMELAv2/MELA/data/$SCRAM_ARCH:$HOME/root/lib:$HOME/LHAPDF/LHAPDF-${LHAPDF_VERSION}/lib:$LD_LIBRARY_PATH | sed s/:$//)"
 
     SHLIB_PATH: "$(echo $HOME/root/lib:$SHLIB_PATH | sed s/:$//)"
     LIBPATH: "$(echo $HOME/root/lib:$LIBPATH | sed s/:$//)"
@@ -23,7 +25,7 @@ machine:
 
     ROOFITSYS: "/home/ubuntu/root"  #this one is not in bin/thisroot.sh, but on lxplus for example it is set to the same thing as ROOTSYS
 
-    LHAPDF_DATA_PATH: "/home/ubuntu/LHAPDF-6.1.6/share/LHAPDF"
+    LHAPDF_DATA_PATH: "/home/ubuntu/LHAPDF/LHAPDF-${LHAPDF_VERSION}/share/LHAPDF"
 
     ROOT_VERSIONPART1: "6"
     ROOT_VERSIONPART2: "06"
@@ -97,16 +99,18 @@ dependencies:
         git pull
       fi
     - |
-      if ! [ -d ~/LHAPDF-6.1.6 ]; then
-        cd $(mktemp -d) &&
-        wget http://www.hepforge.org/archive/lhapdf/LHAPDF-6.1.6.tar.gz &&
-        tar xvzf LHAPDF-6.1.6.tar.gz &&
-        cd LHAPDF-6.1.6 &&
-        ./configure --prefix=$HOME/LHAPDF-6.1.6 &&
-        make &&
+      set -euo pipefail
+      if ! [ -d ~/LHAPDF/LHAPDF-${LHAPDF_VERSION} ]; then
+        rm -rf ~/LHAPDF/  #delete older version
+        cd $(mktemp -d)
+        wget http://www.hepforge.org/archive/lhapdf/LHAPDF-${LHAPDF_VERSION}.tar.gz
+        tar xvzf LHAPDF-${LHAPDF_VERSION}.tar.gz
+        cd LHAPDF-${LHAPDF_VERSION}
+        ./configure --prefix=$HOME/LHAPDF/LHAPDF-${LHAPDF_VERSION}
+        make
         make install
-      fi &&
-      cd ~/LHAPDF-6.1.6/bin &&
+      fi
+      cd ~/LHAPDF/LHAPDF-${LHAPDF_VERSION}/bin
       ./lhapdf install NNPDF30_lo_as_0130
     #make sure no big files are accidentally committed (>50 MB)
     #can change this if we need a bigger file in the repository, but at least get a warning
@@ -135,7 +139,7 @@ dependencies:
     - ~/root
     - ~/CMSJHU_AnalysisMacros
     - ~/checklhe
-    - ~/LHAPDF-6.1.6
+    - ~/LHAPDF
 
 test:
 
