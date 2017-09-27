@@ -5,27 +5,29 @@ machine:
     - sudo ln -s /usr/lib/gcc/x86_64-linux-gnu/4.6/libgfortran.so /usr/lib/
     - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.6 10
     - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.9 20
-    - sudo apt-get install dos2unix cadaver tcsh
+    - sudo apt-get install dos2unix cadaver tcsh cython
   environment:
     #environment variables can only be set in this section so . bin/thisroot.sh doesn't work
     SCRAM_ARCH: "slc6_amd64_gcc530"
 
-    LHAPDF_VERSION: "6.1.6"
+    LHAPDF_VERSION: "6.2.1"
+
+    LHAPDF_HOME: "$HOME/LHAPDF/LHAPDF-${LHAPDF_VERSION}/"
 
     PATH: "$(echo $HOME/root/bin:$HOME/CMSJHU_AnalysisMacros/JHUSpinWidthPaper_2015/LHEAnalyzer:$PATH | sed s/:$//)"
-    LD_LIBRARY_PATH: "$(echo $HOME/JHUGen/JHUGenMELAv2/MELA/data/$SCRAM_ARCH:$HOME/root/lib:$HOME/LHAPDF/LHAPDF-${LHAPDF_VERSION}/lib:$LD_LIBRARY_PATH | sed s/:$//)"
+    LD_LIBRARY_PATH: "$(echo $HOME/JHUGen/JHUGenMELAv2/MELA/data/$SCRAM_ARCH:$HOME/root/lib:$LHAPDF_HOME/lib:$LD_LIBRARY_PATH | sed s/:$//)"
 
     SHLIB_PATH: "$(echo $HOME/root/lib:$SHLIB_PATH | sed s/:$//)"
     LIBPATH: "$(echo $HOME/root/lib:$LIBPATH | sed s/:$//)"
-    PYTHONPATH: "$(echo $HOME/JHUGen/JHUGenMELAv2/MELA/python:$HOME/root/lib:$PYTHONPATH | sed s/:$//)"
+    PYTHONPATH: "$(echo $HOME/JHUGen/JHUGenMELAv2/MELA/python:$LHAPDF_HOME/lib/python2.7/site-packages:$HOME/root/lib:$PYTHONPATH | sed s/:$//)"
     MANPATH: "$(echo $HOME/root/man:$MANPATH | sed s/:$//)"
-    ROOTSYS: "/home/ubuntu/root"
-    DYLD_LIBRARY_PATH: "/home/ubuntu/root/lib"
-    CMAKE_PREFIX_PATH: "/home/ubuntu/root"
+    ROOTSYS: "$HOME/root"
+    DYLD_LIBRARY_PATH: "$HOME/root/lib"
+    CMAKE_PREFIX_PATH: "$HOME/root"
 
-    ROOFITSYS: "/home/ubuntu/root"  #this one is not in bin/thisroot.sh, but on lxplus for example it is set to the same thing as ROOTSYS
+    ROOFITSYS: "$HOME/root"  #this one is not in bin/thisroot.sh, but on lxplus for example it is set to the same thing as ROOTSYS
 
-    LHAPDF_DATA_PATH: "/home/ubuntu/LHAPDF/LHAPDF-${LHAPDF_VERSION}/share/LHAPDF"
+    LHAPDF_DATA_PATH: "$HOME/LHAPDF/LHAPDF-${LHAPDF_VERSION}/share/LHAPDF"
 
     ROOT_VERSIONPART1: "6"
     ROOT_VERSIONPART2: "06"
@@ -106,7 +108,7 @@ dependencies:
         wget http://www.hepforge.org/archive/lhapdf/LHAPDF-${LHAPDF_VERSION}.tar.gz
         tar xvzf LHAPDF-${LHAPDF_VERSION}.tar.gz
         cd LHAPDF-${LHAPDF_VERSION}
-        ./configure --prefix=$HOME/LHAPDF/LHAPDF-${LHAPDF_VERSION}
+        ./configure --prefix=$LHAPDF_HOME
         make
         make install
       fi
