@@ -1358,9 +1358,15 @@ SUBROUTINE InitPDFs()
    use ModParameters
    implicit none
    DOUBLE PRECISION alphasPDF
+   character(len=5) :: LHAPDFversionnumber
 
    if (.not.ReadLHEFile .and. .not.ConvertLHEFile) then
-     call InitPDFSetByName(trim(LHAPDFString)) ! Let LHAPDF handle everything
+     call LHAPDFversion(LHAPDFversionnumber)
+     if (LHAPDFversionnumber .ge. "6.2.1") then
+       call InitPDFSetByName(trim(LHAPDFString)) ! Let LHAPDF handle everything
+     else
+       call InitPDFSet(trim(LHAPDFString)) ! Let LHAPDF handle everything
+     endif
      call InitPDF(LHAPDFMember)
 
      alphas_mz=alphasPDF(zmass_pdf)
