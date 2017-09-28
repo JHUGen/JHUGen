@@ -183,7 +183,7 @@ SUBROUTINE InitPDFs()
    implicit none
    DOUBLE PRECISION alphasPDF
 
-     call InitPDFset(trim(LHAPDFString,lenLHAPDFString)) ! Let LHAPDF handle everything
+     call InitPDFSetByName(trim(LHAPDFString,lenLHAPDFString)) ! Let LHAPDF handle everything
      call InitPDF(LHAPDFMember)
 
      alphas_mz=alphasPDF(zmass_pdf)

@@ -1360,7 +1360,7 @@ SUBROUTINE InitPDFs()
    DOUBLE PRECISION alphasPDF
 
    if (.not.ReadLHEFile .and. .not.ConvertLHEFile) then
-     call InitPDFset(trim(LHAPDFString)) ! Let LHAPDF handle everything
+     call InitPDFSetByName(trim(LHAPDFString)) ! Let LHAPDF handle everything
      call InitPDF(LHAPDFMember)
 
      alphas_mz=alphasPDF(zmass_pdf)

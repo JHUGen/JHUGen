@@ -113,7 +113,7 @@ dependencies:
         make install
       fi
       cd ~/LHAPDF/LHAPDF-${LHAPDF_VERSION}/bin
-      ./lhapdf install NNPDF30_lo_as_0130
+      ./lhapdf install NNPDF31_lo_as_0130
     #make sure no big files are accidentally committed (>50 MB)
     #can change this if we need a bigger file in the repository, but at least get a warning
     #http://stackoverflow.com/questions/10622179/how-to-find-identify-large-files-commits-in-git-history#comment46022100_20460121
@@ -442,7 +442,7 @@ test:
     - sed -i -r -e "s/(UseLHAPDF *= *)No/\1Yes/" makefile
     - make clean
     - make
-    - ./JHUGen LHAPDF=NNPDF30_lo_as_0130/NNPDF30_lo_as_0130.info Process=50 VegasNc0=100000 VegasNc2=100 DataFile=$CIRCLE_ARTIFACTS/other/ZH_LHAPDF DecayMode1=9
+    - ./JHUGen LHAPDF=NNPDF31_lo_as_0130/NNPDF31_lo_as_0130.info Process=50 VegasNc0=100000 VegasNc2=100 DataFile=$CIRCLE_ARTIFACTS/other/ZH_LHAPDF DecayMode1=9
     - ./JHUGen VegasNc0=100000 DecayMode1=11 DecayMode2=11 ReadLHE=$CIRCLE_ARTIFACTS/other/ZH_LHAPDF.lhe DataFile=$CIRCLE_ARTIFACTS/other/ZH_LHAPDF_WW
     - ./JHUGen VegasNc0=100000 TauDK=0                     ReadLHE=$CIRCLE_ARTIFACTS/other/ZH_LHAPDF.lhe DataFile=$CIRCLE_ARTIFACTS/other/ZH_LHAPDF_tautau
 
