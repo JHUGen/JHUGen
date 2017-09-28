@@ -1967,9 +1967,11 @@ print *, "CHECK in comparison with Yaofu/Mathematica because VVHg2 is already di
                            2*LC(3)*SI(0)*(SP(3) + SP(4)))) + 3*shat**3*VVHg3/MH2*SI(0)*(SP(2)*SP(6) - SP(1)*SP(7))))))/(3*E**y*shat**2*(MH2 - MV2 - MZ2 + 2*smT*Cosh(y)))
 
 
+#if useCollier==1
 !             MassiveBox = calc_MassiveBox(MV2,MH2,MT2,shat,smT,y,LC,SP,SI,kappa,kappa_tilde)
 !             MassiveBox = calc_MassiveBox_QP(MV2,MH2,MT2,shat,smT,y,LC,SP,SI,kappa,kappa_tilde)
             MassiveBox = calc_MassiveTensorBox(MV2,MT2,MH2,shat,that,uhat,smT,y,LC,SP,DD0,DD1,DD2,DD3,kappa,kappa_tilde)
+#endif
 
             MasslessTri = MasslessTri * IZ(4,9)* PreFac 
             MassiveTri  = MassiveTri  * IZ(3,9)* PreFac 
