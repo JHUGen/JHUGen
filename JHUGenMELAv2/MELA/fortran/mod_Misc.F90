@@ -14,6 +14,7 @@ INTERFACE OPERATOR (.dot.)
    MODULE PROCEDURE MinkowskyProduct
    MODULE PROCEDURE MinkowskyProductC
    MODULE PROCEDURE MinkowskyProductRC
+   MODULE PROCEDURE MinkowskyProductCR
 END INTERFACE OPERATOR (.dot.)
 
 INTERFACE OPERATOR (.cross.)
@@ -71,6 +72,18 @@ complex(8)             :: MinkowskyProductRC
                       - p1(4)*p2(4)
 END FUNCTION MinkowskyProductRC
 
+
+FUNCTION MinkowskyProductCR(p1,p2)
+implicit none
+real(8),    intent(in) :: p2(1:4)
+complex(8), intent(in) :: p1(1:4)
+complex(8)             :: MinkowskyProductCR
+
+   MinkowskyProductCR = p1(1)*p2(1)  &
+                      - p1(2)*p2(2)  &
+                      - p1(3)*p2(3)  &
+                      - p1(4)*p2(4)
+END FUNCTION MinkowskyProductCR
 
 double complex function et1(e1,e2,e3,e4)
 implicit none
@@ -399,8 +412,6 @@ LeviCiv =  e1(1)*e2(2)*e3(3)*e4(4)-e1(1)*e2(2)*e3(4)*e4(3) &
 END FUNCTION
 
 
-
-
 FUNCTION pol_gluon_incoming(p,hel)
 implicit none
 complex(8) :: pol_gluon_incoming(1:4)
@@ -420,8 +431,6 @@ real(8) :: pv,ct,st,cphi,sphi
        cphi= p(2)/pv/st
        sphi= p(3)/pv/st
     endif
-
-
     ! -- distinguish between positive and negative energies
 !     if ( p(1) .gt. 0.0_dp) then
 !        hel=hel
@@ -437,15 +446,9 @@ real(8) :: pv,ct,st,cphi,sphi
     pol_gluon_incoming(2) = ct*cphi - (0d0,1d0)*hel*sphi
     pol_gluon_incoming(3) = ct*sphi + (0d0,1d0)*hel*cphi
     pol_gluon_incoming(4) = -st
-    
+
     pol_gluon_incoming(2:4) = pol_gluon_incoming(2:4)/dsqrt(2.0d0)
-
-END FUNCTION 
-
-
-
-
-
+END FUNCTION
 
 FUNCTION pol_Zff_outgoing(pf,pfbar,hel) !  does not contain the division by 1/q^2 as in pol_dk2mom
 implicit none
@@ -453,8 +456,6 @@ complex(8) :: pol_Zff_outgoing(4)
 integer :: hel
 real(8):: pf(1:4),pfbar(1:4)
 complex(8) :: Ub(1:4),V(1:4)
-
-
     Ub(1:4) = ubar_spinor(pf,hel)
     V(1:4)  = v_spinor(pfbar,-hel)
 
@@ -463,9 +464,8 @@ complex(8) :: Ub(1:4),V(1:4)
     pol_Zff_outgoing(2)=-(-Ub(1)*V(4)+V(1)*Ub(4)-Ub(2)*V(3)+V(2)*Ub(3))
     pol_Zff_outgoing(3)=-(0d0,1d0)*(Ub(1)*V(4)+V(1)*Ub(4)-Ub(2)*V(3)-V(2)*Ub(3))
     pol_Zff_outgoing(4)=-(Ub(2)*V(4)-V(2)*Ub(4)-Ub(1)*V(3)+V(1)*Ub(3))
-
 RETURN
-END FUNCTION 
+END FUNCTION
 
 
 ! ubar spinor, massless
@@ -509,8 +509,6 @@ complex(8) :: fc, fc2
 RETURN
 END FUNCTION
 
-
-
 ! -- v0  spinor, massless
 FUNCTION v_spinor(p,hel)
 implicit none
@@ -551,6 +549,165 @@ complex(8) :: fc2, fc
 
 RETURN
 END FUNCTION
+
+function Chir_Weyl(sign,sp)   ! Chir = sp.omega_sign = omega_sign.sp
+implicit none
+integer :: sign
+double complex :: sp(1:4)
+double complex :: Chir_Weyl(1:4)
+   if(sign.eq.+1) then !omega_+
+      Chir_Weyl(1) = sp(1)
+      Chir_Weyl(2) = sp(2)
+      Chir_Weyl(3) = 0d0
+      Chir_Weyl(4) = 0d0
+   else !omega_-
+      Chir_Weyl(1) = 0d0
+      Chir_Weyl(2) = 0d0
+      Chir_Weyl(3) = sp(3)
+      Chir_Weyl(4) = sp(4)
+   endif
+   return
+end function
+
+FUNCTION vbqq_Weyl(sp1,sp2)
+implicit none
+complex(8), intent(in) :: sp1(:), sp2(:)
+integer, parameter ::  Dv=4
+integer :: i
+complex(8) :: vbqq_Weyl(Dv)
+complex(8) :: rr, va(Dv),sp1a(4)
+
+   va=(0d0,0d0)
+   vbqq_Weyl=(0d0,0d0)
+
+   do i=1,Dv
+      if (i.eq.1) then
+         va(1)=(1d0,0d0)
+      else
+         va(i)=(-1d0,0d0)
+      endif
+      sp1a=spb2_Weyl(sp1,va)
+
+
+      rr=sum(sp1a(1:4)*sp2(1:4))
+      if (i.eq.1) then
+         vbqq_Weyl = vbqq_Weyl + rr*va
+      else
+         vbqq_Weyl = vbqq_Weyl - rr*va
+      endif
+      va(i)=(0d0,0d0)
+   enddo
+
+END FUNCTION
+
+function spb2_Weyl(sp,v)
+implicit none
+complex(8), intent(in) :: sp(:),v(:)
+complex(8) :: spb2_Weyl(4)
+complex(8) :: x0(4,4),xx(4,4),xy(4,4)
+complex(8) :: xz(4,4),x5(4,4)
+complex(8) :: y1,y2,y3,y4,bp,bm,cp,cm
+integer :: i,i1,i2,i3,Dv,Ds,imax
+
+   Ds = 4
+   Dv = 4
+   imax = Ds/4
+
+   do i=1,imax
+      i1= 1+4*(i-1)
+      i2=i1+3
+
+      y1=sp(i1)
+      y2=sp(i1+1)
+      y3=sp(i1+2)
+      y4=sp(i1+3)
+
+      x0(1,i)=y3
+      x0(2,i)=y4
+      x0(3,i)=y1
+      x0(4,i)=y2
+
+      xx(1,i) = y4
+      xx(2,i) = y3
+      xx(3,i) = -y2
+      xx(4,i) = -y1
+
+      xy(1,i)=(0d0,1d0)*y4
+      xy(2,i)=-(0d0,1d0)*y3
+      xy(3,i)=-(0d0,1d0)*y2
+      xy(4,i)=(0d0,1d0)*y1
+
+      xz(1,i)=y3
+      xz(2,i)=-y4
+      xz(3,i)=-y1
+      xz(4,i)=y2
+
+      x5(1,i)=y1
+      x5(2,i)=y2
+      x5(3,i)=-y3
+      x5(4,i)=-y4
+   enddo
+
+
+   do i=1,4
+      spb2_Weyl(i)=v(1)*x0(i,1)-v(2)*xx(i,1)-v(3)*xy(i,1)-v(4)*xz(i,1)
+   enddo
+end function
+
+function spi2_Weyl(v,sp)
+implicit none
+complex(8), intent(in) :: sp(:),v(:)
+complex(8) :: spi2_Weyl(4)
+complex(8) :: x0(4,4),xx(4,4),xy(4,4)
+complex(8) :: xz(4,4),x5(4,4)
+complex(8) ::  y1,y2,y3,y4,bp,bm,cp,cm
+integer :: i,i1,i2,i3,imax,Dv,Ds
+
+   Ds = 4
+   Dv = 4
+
+   imax = Ds/4
+
+   do i=1,imax
+      i1= 1+4*(i-1)
+      i2=i1+3
+
+      y1=sp(i1)
+      y2=sp(i1+1)
+      y3=sp(i1+2)
+      y4=sp(i1+3)
+
+      x0(1,i)=y3
+      x0(2,i)=y4
+      x0(3,i)=y1
+      x0(4,i)=y2
+
+
+      xx(1,i) = -y4
+      xx(2,i) = -y3
+      xx(3,i) = y2
+      xx(4,i) = y1
+
+
+      xy(1,i)=(0d0,1d0)*y4
+      xy(2,i)=-(0d0,1d0)*y3
+      xy(3,i)=-(0d0,1d0)*y2
+      xy(4,i)=(0d0,1d0)*y1
+
+      xz(1,i)=-y3
+      xz(2,i)=y4
+      xz(3,i)=y1
+      xz(4,i)=-y2
+
+      x5(1,i)=y1
+      x5(2,i)=y2
+      x5(3,i)=-y3
+      x5(4,i)=-y4
+   enddo
+   do i=1,4
+      spi2_Weyl(i)=v(1)*x0(i,1)-v(2)*xx(i,1) -v(3)*xy(i,1)-v(4)*xz(i,1)
+   enddo
+end function
 
 
 
@@ -1034,187 +1191,187 @@ end subroutine
 !might not be correct in this context
 !========================================================================
 
-    SUBROUTINE EvaluateSpline(EvalPoint, SplineData, SplineDataLength, TheResult)
-    !SplineData: SplineDataLength by 2 array
-    !    SplineData(1:SplineDataLength,1) are the x values
-    !    SplineData(1:SplineDataLength,2) are the corresponding y values
+SUBROUTINE EvaluateSpline(EvalPoint, SplineData, SplineDataLength, TheResult)
+!SplineData: SplineDataLength by 2 array
+!    SplineData(1:SplineDataLength,1) are the x values
+!    SplineData(1:SplineDataLength,2) are the corresponding y values
 
-    IMPLICIT NONE
+IMPLICIT NONE
 
-    INTEGER i,top,gdim,SplineDataLength
-    REAL(8) u,value,EvalPoint
-    REAL(8), intent(out) :: TheResult
-    REAL(8), dimension(SplineDataLength) :: bc,cc,dc
-    REAL(8) :: SplineData(1:SplineDataLength, 1:2)
+INTEGER i,top,gdim,SplineDataLength
+REAL(8) u,value,EvalPoint
+REAL(8), intent(out) :: TheResult
+REAL(8), dimension(SplineDataLength) :: bc,cc,dc
+REAL(8) :: SplineData(1:SplineDataLength, 1:2)
 
 ! u value of M_H at which the spline is to be evaluated
 
-    gdim= SplineDataLength
+gdim= SplineDataLength
 
-    CALL HTO_FMMsplineSingleHt(bc,cc,dc,top,gdim,SplineData(1:SplineDataLength,1),SplineData(1:SplineDataLength,2))
+CALL HTO_FMMsplineSingleHt(bc,cc,dc,top,gdim,SplineData(1:SplineDataLength,1),SplineData(1:SplineDataLength,2))
 
-    u= EvalPoint
-    CALL HTO_Seval3SingleHt(u,bc,cc,dc,top,gdim,value,xc=SplineData(1:SplineDataLength,1),yc=SplineData(1:SplineDataLength,2))
+u= EvalPoint
+CALL HTO_Seval3SingleHt(u,bc,cc,dc,top,gdim,value,xc=SplineData(1:SplineDataLength,1),yc=SplineData(1:SplineDataLength,2))
 
-    TheResult= value
+TheResult= value
 
-    RETURN
+RETURN
 
 !-----------------------------------------------------------------------
 
-    CONTAINS
+CONTAINS
 
-    SUBROUTINE HTO_FMMsplineSingleHt(b,c,d,top,gdim,xc,yc)
+SUBROUTINE HTO_FMMsplineSingleHt(b,c,d,top,gdim,xc,yc)
 
 !---------------------------------------------------------------------------
 
-    INTEGER k,n,i,top,gdim,l
+INTEGER k,n,i,top,gdim,l
 
-    REAL(8), dimension(gdim) :: xc,yc
-    REAL(8), dimension(gdim) :: x,y
+REAL(8), dimension(gdim) :: xc,yc
+REAL(8), dimension(gdim) :: x,y
 
-    REAL(8), DIMENSION(gdim) :: b
+REAL(8), DIMENSION(gdim) :: b
 ! linear coeff
 
-    REAL(8), DIMENSION(gdim) :: c
+REAL(8), DIMENSION(gdim) :: c
 ! quadratic coeff.
 
-    REAL(8), DIMENSION(gdim) :: d
+REAL(8), DIMENSION(gdim) :: d
 ! cubic coeff.
 
-    REAL(8) :: t
-    REAL(8),PARAMETER:: ZERO=0.0, TWO=2.0, THREE=3.0
+REAL(8) :: t
+REAL(8),PARAMETER:: ZERO=0.0, TWO=2.0, THREE=3.0
 
 ! The grid
 
 
-    n= gdim
-    FORALL(l=1:gdim)
-     x(l)= xc(l)
-     y(l)= yc(l)
-    ENDFORALL
+n= gdim
+FORALL(l=1:gdim)
+x(l)= xc(l)
+y(l)= yc(l)
+ENDFORALL
 
 !.....Set up tridiagonal system.........................................
 !     b=diagonal, d=offdiagonal, c=right-hand side
 
-    d(1)= x(2)-x(1)
-    c(2)= (y(2)-y(1))/d(1)
-    DO k= 2,n-1
-     d(k)= x(k+1)-x(k)
-     b(k)= TWO*(d(k-1)+d(k))
-     c(k+1)= (y(k+1)-y(k))/d(k)
-     c(k)= c(k+1)-c(k)
-    END DO
+d(1)= x(2)-x(1)
+c(2)= (y(2)-y(1))/d(1)
+DO k= 2,n-1
+d(k)= x(k+1)-x(k)
+b(k)= TWO*(d(k-1)+d(k))
+c(k+1)= (y(k+1)-y(k))/d(k)
+c(k)= c(k+1)-c(k)
+END DO
 
 !.....End conditions.  third derivatives at x(1) and x(n) obtained
 !     from divided differences.......................................
 
-    b(1)= -d(1)
-    b(n)= -d(n-1)
-    c(1)= ZERO
-    c(n)= ZERO
-    IF (n > 3) THEN
-     c(1)= c(3)/(x(4)-x(2))-c(2)/(x(3)-x(1))
-     c(n)= c(n-1)/(x(n)-x(n-2))-c(n-2)/(x(n-1)-x(n-3))
-     c(1)= c(1)*d(1)*d(1)/(x(4)-x(1))
-     c(n)= -c(n)*d(n-1)*d(n-1)/(x(n)-x(n-3))
-    END IF
+b(1)= -d(1)
+b(n)= -d(n-1)
+c(1)= ZERO
+c(n)= ZERO
+IF (n > 3) THEN
+c(1)= c(3)/(x(4)-x(2))-c(2)/(x(3)-x(1))
+c(n)= c(n-1)/(x(n)-x(n-2))-c(n-2)/(x(n-1)-x(n-3))
+c(1)= c(1)*d(1)*d(1)/(x(4)-x(1))
+c(n)= -c(n)*d(n-1)*d(n-1)/(x(n)-x(n-3))
+END IF
 
-    DO k=2,n    ! forward elimination
-     t= d(k-1)/b(k-1)
-     b(k)= b(k)-t*d(k-1)
-     c(k)= c(k)-t*c(k-1)
-    END DO
+DO k=2,n    ! forward elimination
+t= d(k-1)/b(k-1)
+b(k)= b(k)-t*d(k-1)
+c(k)= c(k)-t*c(k-1)
+END DO
 
-    c(n)= c(n)/b(n)
+c(n)= c(n)/b(n)
 
 ! back substitution ( makes c the sigma of text)
 
-    DO k=n-1,1,-1
-     c(k)= (c(k)-d(k)*c(k+1))/b(k)
-    END DO
+DO k=n-1,1,-1
+c(k)= (c(k)-d(k)*c(k+1))/b(k)
+END DO
 
 !.....Compute polynomial coefficients...................................
 
-    b(n)= (y(n)-y(n-1))/d(n-1)+d(n-1)*(c(n-1)+c(n)+c(n))
-    DO k=1,n-1
-     b(k)= (y(k+1)-y(k))/d(k)-d(k)*(c(k+1)+c(k)+c(k))
-     d(k)= (c(k+1)-c(k))/d(k)
-     c(k)= THREE*c(k)
-    END DO
-    c(n)= THREE*c(n)
-    d(n)= d(n-1)
+b(n)= (y(n)-y(n-1))/d(n-1)+d(n-1)*(c(n-1)+c(n)+c(n))
+DO k=1,n-1
+b(k)= (y(k+1)-y(k))/d(k)-d(k)*(c(k+1)+c(k)+c(k))
+d(k)= (c(k+1)-c(k))/d(k)
+c(k)= THREE*c(k)
+END DO
+c(n)= THREE*c(n)
+d(n)= d(n-1)
 
-    RETURN
+RETURN
 
-    END SUBROUTINE HTO_FMMsplineSingleHt
+END SUBROUTINE HTO_FMMsplineSingleHt
 
 !------------------------------------------------------------------------
 
-    SUBROUTINE HTO_Seval3SingleHt(u,b,c,d,top,gdim,f,fp,fpp,fppp,xc,yc)
+SUBROUTINE HTO_Seval3SingleHt(u,b,c,d,top,gdim,f,fp,fpp,fppp,xc,yc)
 
 ! ---------------------------------------------------------------------------
 
-    REAL(8),INTENT(IN) :: u
+REAL(8),INTENT(IN) :: u
 ! abscissa at which the spline is to be evaluated
 
-    INTEGER j,k,n,l,top,gdim
+INTEGER j,k,n,l,top,gdim
 
-    REAL(8), dimension(gdim) :: xc,yc
-    REAL(8), dimension(gdim) :: x,y
-    REAL(8), DIMENSION(gdim) :: b,c,d
+REAL(8), dimension(gdim) :: xc,yc
+REAL(8), dimension(gdim) :: x,y
+REAL(8), DIMENSION(gdim) :: b,c,d
 ! linear,quadratic,cubic coeff
 
-    REAL(8),INTENT(OUT),OPTIONAL:: f,fp,fpp,fppp
+REAL(8),INTENT(OUT),OPTIONAL:: f,fp,fpp,fppp
 ! function, 1st,2nd,3rd deriv
 
-    INTEGER, SAVE :: i=1
-    REAL(8)    :: dx
-    REAL(8),PARAMETER:: TWO=2.0, THREE=3.0, SIX=6.0
+INTEGER, SAVE :: i=1
+REAL(8)    :: dx
+REAL(8),PARAMETER:: TWO=2.0, THREE=3.0, SIX=6.0
 
 ! The grid
 
-    n= gdim
-    FORALL(l=1:gdim)
-     x(l)= xc(l)
-     y(l)= yc(l)
-    ENDFORALL
+n= gdim
+FORALL(l=1:gdim)
+x(l)= xc(l)
+y(l)= yc(l)
+ENDFORALL
 
 !.....First check if u is in the same interval found on the
 !     last call to Seval.............................................
 
-    IF (  (i<1) .OR. (i >= n) ) i=1
-    IF ( (u < x(i))  .OR.  (u >= x(i+1)) ) THEN
-     i=1
+IF (  (i<1) .OR. (i >= n) ) i=1
+IF ( (u < x(i))  .OR.  (u >= x(i+1)) ) THEN
+i=1
 
 ! binary search
 
-     j= n+1
-     DO
-      k= (i+j)/2
-      IF (u < x(k)) THEN
-       j= k
-      ELSE
-       i= k
-      ENDIF
-      IF (j <= i+1) EXIT
-     ENDDO
-    ENDIF
+j= n+1
+DO
+k= (i+j)/2
+IF (u < x(k)) THEN
+j= k
+ELSE
+i= k
+ENDIF
+IF (j <= i+1) EXIT
+ENDDO
+ENDIF
 
-    dx= u-x(i)
+dx= u-x(i)
 
 ! evaluate the spline
 
-    IF (Present(f))    f= y(i)+dx*(b(i)+dx*(c(i)+dx*d(i)))
-    IF (Present(fp))   fp= b(i)+dx*(TWO*c(i) + dx*THREE*d(i))
-    IF (Present(fpp))  fpp= TWO*c(i) + dx*SIX*d(i)
-    IF (Present(fppp)) fppp= SIX*d(i)
+IF (Present(f))    f= y(i)+dx*(b(i)+dx*(c(i)+dx*d(i)))
+IF (Present(fp))   fp= b(i)+dx*(TWO*c(i) + dx*THREE*d(i))
+IF (Present(fpp))  fpp= TWO*c(i) + dx*SIX*d(i)
+IF (Present(fppp)) fppp= SIX*d(i)
 
-    RETURN
+RETURN
 
-    END SUBROUTINE HTO_Seval3SingleHt
+END SUBROUTINE HTO_Seval3SingleHt
 
-    END SUBROUTINE EvaluateSpline
+END SUBROUTINE EvaluateSpline
 
 function CenterWithStars(string, totallength)
 implicit none
@@ -1233,6 +1390,38 @@ character(len=totallength) CenterWithStars
     CenterWithStars = "*" // repeat(" ", nleftspaces) // string // repeat(" ", nrightspaces) // "*"
 
 end function
+
+real function infinity()
+  implicit none
+  real :: x
+  x = 0
+  infinity=-log(x)
+end function infinity
+
+function CalculatesXsec(Process)
+  implicit none
+  integer :: Process
+  logical :: CalculatesXsec
+  if (Process.le.2) then
+    CalculatesXsec=.true.
+  elseif (Process.eq.50) then
+    CalculatesXsec=.false.
+  elseif (Process.eq.60) then
+    CalculatesXsec=.true.
+  elseif (Process.eq.61) then
+    CalculatesXsec=.true.
+  elseif (Process.eq.62) then
+    CalculatesXsec=.false.
+  elseif (Process.ge.66 .and. Process.le.69) then
+    CalculatesXsec=.true.
+  elseif (Process.eq.80 .or. Process.eq.90) then
+    CalculatesXsec=.false.
+  elseif (Process.ge.110 .and. Process.le.114) then
+    CalculatesXsec=.true.
+  else
+    print *, "Unknown process in CalculatesXsec", process
+  endif
+end function CalculatesXsec
 
 END MODULE
 

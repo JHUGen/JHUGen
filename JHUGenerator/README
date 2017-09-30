@@ -78,12 +78,19 @@ command line parameter quick reference:
     deltaRcut:         Minimum deltaR for jets (default: 0.3)
     mJJcut:            Minimum dijet mass in GeV (default: 0)
     MPhotonCutoff:     Minimum mass for offshell photons in GeV, when included (default: 4)
+    etajetcut:         Maximum |eta| for jets in offshell VBF (default: 4)
+    detajetcut:        Minimum deltaeta between jets in offshell VBF (default: 2)
+    JetsOppositeEta:   Require sgn(eta) to be opposite for the two jets in offshell VBF
+                       (default: true)
+    pTlepcut:          Minimum pT for leptons in offshell VBF, in GeV (default: 3)
+    etalepcut:         Maximum |eta| for leptons in offshell VBF (default: 2.7)
+    m4l_min, m4l_max:  Minimum and maximum four-lepton mass in offshell VBF
   Renormalization and factorization scales:
     FacScheme:         PDF factorization scale scheme
     MuFacMultiplier:   Multiplier for the factorization scale chosen by FacScheme
     RenScheme:         QCD renormalization scale scheme
     MuRenMultiplier:   Multiplier for the renormalization scale chosen by RenScheme
-  Lepton filter:
+  Lepton and jet filter:
     FilterNLept:       For decay mode, reject events that have less than FilterNLept leptons
     FilterOSPairs:     For decay mode, reject events that have less than FilterOSPairs pairs of
                        sign leptons of any flavor.
@@ -91,6 +98,8 @@ command line parameter quick reference:
                        opposite-sign-same-flavor leptons.
     CountTauAsAny:     For FilterOSSFPairs, taus can stand in place of electrons or muons
                        of the same charge.
+    FilterNJets:       For decay mode, reject events that have less than FilterNJets quarks
+                       and/or gluons
     WriteFailedEvents: Write events that fail in the LHE file, but with a weight of 0
                        (off by default)
   Higgs propagator and decay width:

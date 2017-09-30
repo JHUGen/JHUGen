@@ -5,33 +5,37 @@ machine:
     - sudo ln -s /usr/lib/gcc/x86_64-linux-gnu/4.6/libgfortran.so /usr/lib/
     - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.6 10
     - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.9 20
-    - sudo apt-get install dos2unix cadaver tcsh
+    - sudo apt-get install dos2unix cadaver tcsh cython
   environment:
     #environment variables can only be set in this section so . bin/thisroot.sh doesn't work
     SCRAM_ARCH: "slc6_amd64_gcc530"
 
+    LHAPDF_VERSION: "6.2.1"
+
+    LHAPDF_HOME: "$HOME/LHAPDF/LHAPDF-${LHAPDF_VERSION}/"
+
     PATH: "$(echo $HOME/root/bin:$HOME/CMSJHU_AnalysisMacros/JHUSpinWidthPaper_2015/LHEAnalyzer:$PATH | sed s/:$//)"
-    LD_LIBRARY_PATH: "$(echo $HOME/JHUGen/JHUGenMELAv2/MELA/data/$SCRAM_ARCH:$HOME/root/lib:$HOME/LHAPDF-6.1.6/lib:$LD_LIBRARY_PATH | sed s/:$//)"
+    LD_LIBRARY_PATH: "$(echo $HOME/JHUGen/JHUGenMELAv2/MELA/data/$SCRAM_ARCH:$HOME/root/lib:$LHAPDF_HOME/lib:$LD_LIBRARY_PATH | sed s/:$//)"
 
     SHLIB_PATH: "$(echo $HOME/root/lib:$SHLIB_PATH | sed s/:$//)"
     LIBPATH: "$(echo $HOME/root/lib:$LIBPATH | sed s/:$//)"
-    PYTHONPATH: "$(echo $HOME/JHUGen/JHUGenMELAv2/MELA/python:$HOME/root/lib:$PYTHONPATH | sed s/:$//)"
+    PYTHONPATH: "$(echo $HOME/JHUGen/JHUGenMELAv2/MELA/python:$LHAPDF_HOME/lib/python2.7/site-packages:$HOME/root/lib:$PYTHONPATH | sed s/:$//)"
     MANPATH: "$(echo $HOME/root/man:$MANPATH | sed s/:$//)"
-    ROOTSYS: "/home/ubuntu/root"
-    DYLD_LIBRARY_PATH: "/home/ubuntu/root/lib"
-    CMAKE_PREFIX_PATH: "/home/ubuntu/root"
+    ROOTSYS: "$HOME/root"
+    DYLD_LIBRARY_PATH: "$HOME/root/lib"
+    CMAKE_PREFIX_PATH: "$HOME/root"
 
-    ROOFITSYS: "/home/ubuntu/root"  #this one is not in bin/thisroot.sh, but on lxplus for example it is set to the same thing as ROOTSYS
+    ROOFITSYS: "$HOME/root"  #this one is not in bin/thisroot.sh, but on lxplus for example it is set to the same thing as ROOTSYS
 
-    LHAPDF_DATA_PATH: "/home/ubuntu/LHAPDF-6.1.6/share/LHAPDF"
+    LHAPDF_DATA_PATH: "$HOME/LHAPDF/LHAPDF-${LHAPDF_VERSION}/share/LHAPDF"
 
     ROOT_VERSIONPART1: "6"
     ROOT_VERSIONPART2: "06"
     ROOT_VERSIONPART3: "08"
     ROOT_VERSIONSTRING: "${ROOT_VERSIONPART1}.${ROOT_VERSIONPART2}/${ROOT_VERSIONPART3}"
 
-    REFERENCE_LHES_USERNAME: "JHUGen"
-    REFERENCE_LHES_BUILD_NUMBER: "359"
+    REFERENCE_LHES_USERNAME: "hroskes"
+    REFERENCE_LHES_BUILD_NUMBER: "879"
     REFERENCE_JHUGEN_VERSION: "v7.0.4"
 
     REFERENCE_LHES_FOLDER: "$(echo https://circleci.com/api/v1/project/$REFERENCE_LHES_USERNAME/JHUGen/$REFERENCE_LHES_BUILD_NUMBER/'artifacts/0/$CIRCLE_ARTIFACTS/reference')"
@@ -97,17 +101,19 @@ dependencies:
         git pull
       fi
     - |
-      if ! [ -d ~/LHAPDF-6.1.6 ]; then
-        cd $(mktemp -d) &&
-        wget http://www.hepforge.org/archive/lhapdf/LHAPDF-6.1.6.tar.gz &&
-        tar xvzf LHAPDF-6.1.6.tar.gz &&
-        cd LHAPDF-6.1.6 &&
-        ./configure --prefix=$HOME/LHAPDF-6.1.6 &&
-        make &&
+      set -euo pipefail
+      if ! [ -d ~/LHAPDF/LHAPDF-${LHAPDF_VERSION} ]; then
+        rm -rf ~/LHAPDF/  #delete older version
+        cd $(mktemp -d)
+        wget http://www.hepforge.org/archive/lhapdf/LHAPDF-${LHAPDF_VERSION}.tar.gz
+        tar xvzf LHAPDF-${LHAPDF_VERSION}.tar.gz
+        cd LHAPDF-${LHAPDF_VERSION}
+        ./configure --prefix=$LHAPDF_HOME
+        make
         make install
-      fi &&
-      cd ~/LHAPDF-6.1.6/bin &&
-      ./lhapdf install NNPDF30_lo_as_0130
+      fi
+      cd ~/LHAPDF/LHAPDF-${LHAPDF_VERSION}/bin
+      ./lhapdf install NNPDF31_lo_as_0130
     #make sure no big files are accidentally committed (>50 MB)
     #can change this if we need a bigger file in the repository, but at least get a warning
     #http://stackoverflow.com/questions/10622179/how-to-find-identify-large-files-commits-in-git-history#comment46022100_20460121
@@ -135,7 +141,7 @@ dependencies:
     - ~/root
     - ~/CMSJHU_AnalysisMacros
     - ~/checklhe
-    - ~/LHAPDF-6.1.6
+    - ~/LHAPDF
 
 test:
 
@@ -154,15 +160,21 @@ test:
       git checkout -- . &&
       exit $exitstatus
     #make sure the default compiler is set to gfortran
-    - "! grep 'Comp *= *ifort' makefile"
+    - grep 'Comp *= *gfort' makefile
     #but continue the other tests even if it is
     - sed -i -r -e "s/(Comp *= *)ifort/\1gfort/" makefile
     #same with lhapdf
-    - "! grep 'UseLHAPDF *= *Yes' makefile"
+    - grep 'UseLHAPDF *= *No' makefile
     - sed -i -r -e "s/(UseLHAPDF *= *)Yes/\1No/" makefile
+    #QCDLoop
+    - grep 'linkQCDLoopLib *= *No' makefile
+    - sed -i -r -e "s/(linkQCDLoopLib *= *)Yes/\1No/" makefile
+    #Collier
+    - grep 'linkCollierLib *= *No' makefile
+    - sed -i -r -e "s/(linkCollierLib *= *)Yes/\1No/" makefile
 
     #want the default linkMELA to be Yes
-    - "grep 'linkMELA *= *Yes' makefile"
+    - grep 'linkMELA *= *Yes' makefile
     #but first test that it compiles without it
     #(if not, the first make will fail since we haven't compiled MELA yet)
     - sed -i -r -e "s/^(linkMELA *= *)Yes/\1No/" makefile
@@ -268,6 +280,8 @@ test:
     - ./JHUGen Seed=$SEED PDFSet=3 Process=62 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/HJ $REFERENCE_COUPLINGS
     - ./JHUGen Seed=$SEED VegasNc0=100000 ReadLHE=compare_to_reference/HJ.lhe DataFile=compare_to_reference/HJ_gammagamma DecayMode1=7 DecayMode2=7 $REFERENCE_COUPLINGS
 
+    #- ./JHUGen Seed=$SEED PDFSet=3 Process=66 VegasNc0=10000 VegasNc2=1 m4l_min=100 m4l_max=200 DataFile=compare_to_reference/VBFoffshell_66
+
     - ./JHUGen Seed=$SEED PDFSet=3 Process=80 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/ttH TopDK=1 DecayMode1=11 DecayMode2=11 $REFERENCE_COUPLINGS
     - ./JHUGen Seed=$SEED VegasNc0=100000 ReadLHE=compare_to_reference/ttH.lhe DataFile=compare_to_reference/ttH_tautau DecayMode1=11 DecayMode2=11 TauDK=1 $REFERENCE_COUPLINGS
     - ./JHUGen Seed=$SEED PDFSet=3 Process=90 VegasNc0=100000 VegasNc2=10 DataFile=compare_to_reference/gg_bbH PChannel=0 $REFERENCE_COUPLINGS
@@ -362,6 +376,23 @@ test:
     - "grep -q 'Interference: T' $CIRCLE_ARTIFACTS/other/ttH_ZZ.lhe"
     - "grep -q 'Interference: F' $CIRCLE_ARTIFACTS/other/tbarH_t_ZZ.lhe"
 
+    #test syntax for VBF offshell, use a trick to make it faster and physically nonsense
+    - |
+      line=$(grep -in "subroutine EvalAmp_qqVVqq(" mod_MCFMWrapper.F90 | head -1 | sed "s/:.*//") &&
+      while sed -n ${line}p mod_MCFMWrapper.F90 | grep -iE '(subroutine|::|use|implicit)'; do
+        line=$(expr $line + 1) &&
+        if [ $line -gt $(wc -l < mod_MCFMWrapper.F90) ]; then exit 1; fi
+      done &&
+      sed -i "${line}ireturn" mod_MCFMWrapper.F90 &&
+      sed -i "${line}imsq(0,:)=0d0" mod_MCFMWrapper.F90 &&
+      sed -i "${line}imsq(:,0)=0d0" mod_MCFMWrapper.F90 &&
+      sed -i "${line}imsq(:,:)=1d0" mod_MCFMWrapper.F90 &&
+      make &&
+      ./JHUGen PDFSet=3 VegasNc0=100000 VegasNc2=100 Process=66 DataFile=$CIRCLE_ARTIFACTS/other/VBFoffshell_66_DONOTUSE.lhe m4l_min=100 m4l_max=200
+
+    - git checkout -- mod_MCFMWrapper.F90
+    - make
+
     #=====
     #plots
     #=====
@@ -411,7 +442,7 @@ test:
     - sed -i -r -e "s/(UseLHAPDF *= *)No/\1Yes/" makefile
     - make clean
     - make
-    - ./JHUGen LHAPDF=NNPDF30_lo_as_0130/NNPDF30_lo_as_0130.info Process=50 VegasNc0=100000 VegasNc2=100 DataFile=$CIRCLE_ARTIFACTS/other/ZH_LHAPDF DecayMode1=9
+    - ./JHUGen LHAPDF=NNPDF31_lo_as_0130/NNPDF31_lo_as_0130.info Process=50 VegasNc0=100000 VegasNc2=100 DataFile=$CIRCLE_ARTIFACTS/other/ZH_LHAPDF DecayMode1=9
     - ./JHUGen VegasNc0=100000 DecayMode1=11 DecayMode2=11 ReadLHE=$CIRCLE_ARTIFACTS/other/ZH_LHAPDF.lhe DataFile=$CIRCLE_ARTIFACTS/other/ZH_LHAPDF_WW
     - ./JHUGen VegasNc0=100000 TauDK=0                     ReadLHE=$CIRCLE_ARTIFACTS/other/ZH_LHAPDF.lhe DataFile=$CIRCLE_ARTIFACTS/other/ZH_LHAPDF_tautau
 
@@ -423,12 +454,17 @@ test:
     - |
       cd ../JHUGenMELAv2/MELA/test &&
       ./testME_more.py
-    - mv ../JHUGenMELAv2/MELA/test/*.out $CIRCLE_ARTIFACTS/MELA/
+      exitstatus=$?
+      if [ exitstatus -ne 0 ]; then
+        mv ../JHUGenMELAv2/MELA/test/*.out $CIRCLE_ARTIFACTS/MELA/
+      fi
+      exit $exitstatus
 
   post:
-    - unbuffer python ~/checklhe/checklhe.py $(find $CIRCLE_ARTIFACTS -name *.lhe) | tee checklheoutput.txt
-    #if there are any errors this command will exit 1 and so the test will fail
-    - "! grep -q '!' checklheoutput.txt"    #all the error messages end with !
+    - |
+      unbuffer python ~/checklhe/checklhe.py $(find $CIRCLE_ARTIFACTS -name *.lhe) | tee checklheoutput.txt &&
+      #if there are any errors this command will exit 1 and so the test will fail
+      ! grep -q '!' checklheoutput.txt    #all the error messages end with !
 
     #ggH analytical fits
     - if [ -f ~/reference_failed_ggH ]; then cd ~/CMSJHU_AnalysisMacros/ZZ4lanalyticalfits && echo -e '.x loadLib.C\n.x angularDistributions_spin0.C+("$CIRCLE_ARTIFACTS/ggH/SM.root", "$CIRCLE_ARTIFACTS/ggH/SM/", 1, 0, 0, 0, 0)' | root -b; fi

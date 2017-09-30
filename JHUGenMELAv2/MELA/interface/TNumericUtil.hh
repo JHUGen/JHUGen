@@ -44,6 +44,9 @@ namespace TNumericUtil{
   typedef quadruplet<float> floatQuad_t;
   typedef quadruplet<double> doubleQuad_t;
 
+  void PermutationGenerator(int n, int k, std::vector<std::vector<int>>& perms, int valbegin=1, int increment=1); // n!/(n-k)! different permutations of {i_1,...,i_k}, i+j in {valbegin,...,valbegin+increment*(n-1)}
+  void CombinationGenerator(int n, int k, std::vector<std::vector<int>>& perms, int valbegin=1, int increment=1); // n!/(k!(n-k)!) different combinations (unordered permutations) of {i_1,...,i_k}, i+j in {valbegin,...,valbegin+increment*(n-1)}
+
 }
 
 #endif

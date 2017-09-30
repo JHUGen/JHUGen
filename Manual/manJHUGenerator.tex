@@ -225,12 +225,19 @@ This is the list of command line configurables (also defined in the \verb|README
     deltaRcut:         Minimum deltaR for jets (default: 0.3)
     mJJcut:            Minimum dijet mass in GeV (default: 0)
     MPhotonCutoff:     Minimum mass for offshell photons in GeV, when included (default: 4)
+    etajetcut:         Maximum |eta| for jets in offshell VBF (default: 4)
+    detajetcut:        Minimum deltaeta between jets in offshell VBF (default: 2)
+    JetsOppositeEta:   Require sgn(eta) to be opposite for the two jets in offshell VBF
+                       (default: true)
+    pTlepcut:          Minimum pT for leptons in offshell VBF, in GeV (default: 3)
+    etalepcut:         Maximum |eta| for leptons in offshell VBF (default: 2.7)
+    m4l_min, m4l_max:  Minimum and maximum four-lepton mass in offshell VBF
   Renormalization and factorization scales:
     FacScheme:         PDF factorization scale scheme
     MuFacMultiplier:   Multiplier for the factorization scale chosen by FacScheme
     RenScheme:         QCD renormalization scale scheme
     MuRenMultiplier:   Multiplier for the renormalization scale chosen by RenScheme
-  Lepton filter:
+  Lepton and jet filter:
     FilterNLept:       For decay mode, reject events that have less than FilterNLept leptons
     FilterOSPairs:     For decay mode, reject events that have less than FilterOSPairs pairs of
                        sign leptons of any flavor.
@@ -238,6 +245,8 @@ This is the list of command line configurables (also defined in the \verb|README
                        opposite-sign-same-flavor leptons.
     CountTauAsAny:     For FilterOSSFPairs, taus can stand in place of electrons or muons
                        of the same charge.
+    FilterNJets:       For decay mode, reject events that have less than FilterNJets quarks
+                       and/or gluons
     WriteFailedEvents: Write events that fail in the LHE file, but with a weight of 0
                        (off by default)
   Higgs propagator and decay width:
@@ -294,7 +303,7 @@ Processes 66--69 provide an interface to a modified version of MCFM~\cite{Campbe
 \subsubsection{Cuts}
 \begin{itemize}
 \item \verb|pTjetcut|, \verb|deltaRcut|, \verb|mJJcut| All three cuts are used in processes 60 (VBF), 61 ($H+jj$), 90 ($bbH$), and also 80 ($ttH$) if \verb|m_Top| is set to be light ($<10 \text{GeV}$).  In addition, \verb|pTjetcut| is used in process 62 ($H+j$) and also processes 110--113 ($t/\bar{t}+H$) if \verb|m_Top| is light.
-\item \verb|MPhotoncutoff| If the decay is to $ZZ$ and any of the couplings to photons (\verb|ghzgsX| or \verb|ghgsgsX|) is set, the $\gamma^*$ contribution will be included along with the $Z$'s.  Similarly, if the decay is to $Z\gamma$ and any of the \verb|ghgsgsX| couplings are set, the $\gamma\gamma^*$ contribution will be included as well.  In this case, a lower cut on the photon invariant mass has to be placed in order to avoid the collinear singularity.  This can be set using MPhotonCutoff.
+\item \verb|MPhotonCutoff| If the decay is to $ZZ$ and any of the couplings to photons (\verb|ghzgsX| or \verb|ghgsgsX|) is set, the $\gamma^*$ contribution will be included along with the $Z$'s.  Similarly, if the decay is to $Z\gamma$ and any of the \verb|ghgsgsX| couplings are set, the $\gamma\gamma^*$ contribution will be included as well.  In this case, a lower cut on the photon invariant mass has to be placed in order to avoid the collinear singularity.  This can be set using MPhotonCutoff.
 \end{itemize}
 \subsubsection{Renormalization and factorization scales}
 \begin{itemize}
@@ -312,9 +321,10 @@ Processes 66--69 provide an interface to a modified version of MCFM~\cite{Campbe
 		\item $\pm9$: If the scheme number is positive, $\mu_{F,\,R} \propto \sqrt{q^2_{J}}$, where $J$ is the more massive associated particle. If the scheme number is negative and the matrix element treats an associated particle as massive (\eg $t$ in $t+H$), $\mu_{F,\,R} \propto m_{J}$.
 	\end{itemize}
 \end{itemize}
-\subsubsection{Lepton filter}
+\subsubsection{Lepton and jet filter}
 \begin{itemize}
 \item Any combination of \verb|FilterNLept|, \verb|FilterOSPairs|, \verb|FilterOSSFPairs| can be used in ReadLHE mode to filter the events.  \verb|CountTauAsAny|, off by default, counts each tau as an electron or muon of the same sign towards an OSSF pair.
+\item \verb|FilterNJets| can be used alone or in conjunction with the lepton filter (e.g. request two leptons and a jet).  It counts each final state quark or gluon as a jet.
 \item \verb|WriteFailedEvents|: By default, events that fail the lepton filter are not written to the LHE file.  If this option is set to 1, they are written, but their weight is set to 0.  If it is set to 2, they are written with a weight of zero and with no particles in the event (this saves disk space with  and is accepted by Pythia, but some parsers may not like it).  This option is useful if the same number of events are required to be in the input and the output.
 \end{itemize}
 \subsubsection{Higgs propagator and decay width}

@@ -853,14 +853,15 @@ use ModParameters
 use ModMisc
 implicit none
 integer,parameter :: NUP=10
-real(8) :: Mom(1:4,1:NUP),xRnd
+real(8) :: Mom(1:4,1:NUP),xRnd,s34,s36,s45,s56
 real(8),optional :: EventWeight
 integer :: MY_IDUP(1:NUP),ICOLUP(1:2,1:NUP),LHE_IDUP(1:NUP),ISTUP(1:NUP),MOTHUP(1:2,1:NUP)
-integer :: IDPRUP,i
-real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP,Lifetime,Spin,MomDummy(1:4,1:NUP),TheMass
+integer :: IDPRUP,i,smallestInv
+real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP,Lifetime,Spin,MomDummy(1:4,1:NUP),TheMass,mjj
 character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0)"
 integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, Lep1M=8, Lep2P=9, Lep2M=10
 integer, parameter :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6,5/)
+logical :: canbeVBF, canbeVH, isVHlike
 ! For description of the LHE format see http://arxiv.org/abs/hep-ph/0109068 and http://arxiv.org/abs/hep-ph/0609017
 ! The LHE numbering scheme can be found here: http://pdg.lbl.gov/mc_particle_id_contents.html and http://lhapdf.hepforge.org/manual#tth_sEcA
 
@@ -872,21 +873,87 @@ integer, parameter :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6,5/)
 
       ISTUP(1:2) = -1
       MOTHUP(1:2,1:2) = 0
+
+      canbeVH = .false.
+      canbeVBF = .false.
+
+      !try VBF first because there are more options there, but overwrite with VH if that's better
+
       if( MY_IDUP(1).gt.0 ) then ! quark
-          ICOLUP(1:2,1) = (/501,000/)
+        ICOLUP(1:2,1) = (/501,000/)
       else! anti-quark
-          ICOLUP(1:2,1) = (/000,501/)
+        ICOLUP(1:2,1) = (/000,501/)
       endif
       if( MY_IDUP(2).gt.0 ) then! quark
-          ICOLUP(1:2,2) = (/502,000/)
+        ICOLUP(1:2,2) = (/502,000/)
       else! anti-quark
-          ICOLUP(1:2,2) = (/000,502/)
+        ICOLUP(1:2,2) = (/000,502/)
       endif
-      ICOLUP(1:2,3) = ICOLUP(1:2,1)
-      ICOLUP(1:2,4) = ICOLUP(1:2,2)
+
+      !WW is typically larger xsec, so choose that if possible, then ZZ
+      if(       abs(CoupledVertex((/MY_IDUP(1),-MY_IDUP(3)/), -1)) .eq. abs(Wp_) &
+          .and. abs(CoupledVertex((/MY_IDUP(2),-MY_IDUP(4)/), -1)) .eq. abs(Wp_)) then
+        ICOLUP(1:2,3) = ICOLUP(1:2,1)
+        ICOLUP(1:2,4) = ICOLUP(1:2,2)
+        canbeVBF = .true.
+      elseif(       abs(CoupledVertex((/MY_IDUP(1),-MY_IDUP(4)/), -1)) .eq. abs(Wp_) &
+              .and. abs(CoupledVertex((/MY_IDUP(2),-MY_IDUP(3)/), -1)) .eq. abs(Wp_)) then
+        ICOLUP(1:2,3) = ICOLUP(1:2,2)
+        ICOLUP(1:2,4) = ICOLUP(1:2,1)
+        canbeVBF = .true.
+      elseif(       abs(CoupledVertex((/MY_IDUP(1),-MY_IDUP(3)/), -1)) .eq. abs(Z0_) &
+              .and. abs(CoupledVertex((/MY_IDUP(2),-MY_IDUP(4)/), -1)) .eq. abs(Z0_)) then
+        ICOLUP(1:2,3) = ICOLUP(1:2,1)
+        ICOLUP(1:2,4) = ICOLUP(1:2,2)
+        canbeVBF = .true.
+      elseif(       abs(CoupledVertex((/MY_IDUP(1),-MY_IDUP(4)/), -1)) .eq. abs(Z0_) &
+              .and. abs(CoupledVertex((/MY_IDUP(2),-MY_IDUP(3)/), -1)) .eq. abs(Z0_)) then
+        ICOLUP(1:2,3) = ICOLUP(1:2,2)
+        ICOLUP(1:2,4) = ICOLUP(1:2,1)
+        canbeVBF = .true.
+      endif
+
+      if( CoupledVertex(MY_IDUP(1:2), -1) .ne. Not_a_particle_ .and. CoupledVertex(MY_IDUP(3:4), -1) .ne. Not_a_particle_) then
+        canbeVH = .true.
+      endif
+
+      if( .not. canbeVH .and. .not. canbeVBF) then
+        print *, "Event doesn't make sense"
+        print *, MY_IDUP(1:4)
+        stop 1
+      endif
+
+      if( canbeVH .and. canbeVBF ) then
+        mjj = Get_MInv( Mom(1:4,3)+Mom(1:4,4) )
+        if( abs(CoupledVertex(MY_IDUP(1:2), -1)).eq.Wp_ ) then
+          isVHlike = ( mjj .gt. M_W-2d0*Ga_W .and. mjj .lt. M_W+2d0*Ga_W )
+        else
+          isVHlike = ( mjj .gt. M_Z-2d0*Ga_Z .and. mjj .lt. M_Z+2d0*Ga_Z )
+        endif
+      elseif( canbeVH ) then
+        isVHlike = .true.
+      endif
+
+      if( isVHlike ) then
+        if( MY_IDUP(1).gt.0 ) then ! quark
+          ICOLUP(1:2,1) = (/501,000/)
+          ICOLUP(1:2,2) = (/000,501/)
+        else! anti-quark
+          ICOLUP(1:2,1) = (/000,501/)
+          ICOLUP(1:2,2) = (/501,000/)
+        endif
+        if( MY_IDUP(3).gt.0 ) then ! quark
+          ICOLUP(1:2,3) = (/502,000/)
+          ICOLUP(1:2,4) = (/000,502/)
+        else! anti-quark
+          ICOLUP(1:2,3) = (/000,502/)
+          ICOLUP(1:2,4) = (/502,000/)
+        endif
+      endif
+
       ISTUP(3:10) = +1
-      MOTHUP(1:2,3)= (/1,1/)
-      MOTHUP(1:2,4)= (/2,2/)
+      MOTHUP(1:2,3)= (/1,2/)
+      MOTHUP(1:2,4)= (/1,2/)
       
       if( MY_IDUP(3).eq.10 ) then ! 10 = LHA2M_ID(0) for the case where MY_IDUP(3:4) are not set (i.e. deterministicME=.false.). 10 doesn't mean gluon here
          call random_number(xRnd)
@@ -898,29 +965,21 @@ integer, parameter :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6,5/)
                 if( abs(MY_IDUP(3)).eq.Top_ ) MY_IDUP(3) = MY_IDUP(1)
                 if( abs(MY_IDUP(4)).eq.Top_ ) MY_IDUP(4) = MY_IDUP(2)
          endif
+         call Error("This shouldn't be able to happen anymore, assert false")
       endif
       
-
-      call random_number(xRnd)
-      MY_IDUP(5:6) = (/Z0_,Z0_/)
       ISTUP(5:6) = 2
-      ICOLUP(1:2,5:10) = 0
+      ICOLUP(1:2,5:6) = 0
       MOTHUP(1:2,5)=(/1,2/)
-      MOTHUP(1:2,6)=(/1,2/)
-      if( xRnd.lt.0.5d0 ) then
-         MY_IDUP(7:8) = (/ElM_,ElP_/)
-      else 
-         MY_IDUP(7:8) = (/MuM_,MuP_/)
-      endif
-      if( xRnd.gt.0.25d0 .and. xRnd.lt.0.75d0) then
-         MY_IDUP(9:10) = (/MuM_,MuP_/)
-      else 
-         MY_IDUP(9:10) = (/ElM_,ElP_/)
-      endif
+      MOTHUP(1:2,6)=(/1,2/) 
+
       MOTHUP(1:2,7 )= (/5,5/)
       MOTHUP(1:2,8 )= (/5,5/)
       MOTHUP(1:2,9 )= (/6,6/)
       MOTHUP(1:2,10)= (/6,6/)
+            
+      
+      
       
 
       if( present(EventWeight) ) then
@@ -940,6 +999,27 @@ integer, parameter :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6,5/)
           MomDummy(4,i) = 100.0d0*Mom(4,i)
       enddo
 
+
+!  associte lepton pairs to MOTHUP
+      if( MY_IDUP(7).eq.MY_IDUP(9) ) then
+          s34 = Get_MInv( Mom(1:4,7)+Mom(1:4,8) )
+          s56 = Get_MInv( Mom(1:4,9)+Mom(1:4,10) )
+          s36 = Get_MInv( Mom(1:4,7)+Mom(1:4,10) )
+          s45 = Get_MInv( Mom(1:4,8)+Mom(1:4,9) )
+          smallestInv = minloc((/dabs(s34-M_V),dabs(s56-M_V),dabs(s36-M_V),dabs(s45-M_V)/),1)
+          if( smallestInv.eq.3 .or. smallestInv.eq.4 ) then
+              call swapi(MOTHUP(1,7),MOTHUP(1,9))
+              call swapi(MOTHUP(2,7),MOTHUP(2,9))
+              call swapi(ICOLUP(1,7),ICOLUP(1,9))
+              call swapi(ICOLUP(2,7),ICOLUP(2,9))
+              MomDummy(1:4,5) = MomDummy(1:4,9)+MomDummy(1:4,8)
+              MomDummy(1:4,6) = MomDummy(1:4,7)+MomDummy(1:4,10)
+          else
+              !The Z's are not always lined up this way already, for reasons I don't understand.
+              MomDummy(1:4,5) = MomDummy(1:4,7)+MomDummy(1:4,8)
+              MomDummy(1:4,6) = MomDummy(1:4,9)+MomDummy(1:4,10)
+          endif
+      endif
 
 
 write(io_LHEOutFile,"(A)") "<event>"
@@ -1974,9 +2054,9 @@ real(8) :: MomLepP(1:4),MomLepM(1:4),MomBoost(1:4),BeamAxis(1:4),ScatteringAxis(
 real(8) :: MomLept(1:4,1:4),MomLeptX(1:4,1:4),MomLeptPlane1(2:4),MomLeptPlane2(2:4),MomBeamScatterPlane(2:4)
 logical :: applyPSCut
 integer :: NBin(:)
-real(8) :: m_jj,y_j1,y_j2,dphi_jj,dy_j1j2,pT_jl,pT_j1,pT_j2,pT_H,m_4l
+real(8) :: m_jj,y_j1,y_j2,dphi_jj,dy_j1j2,pT_jl,pT_j1,pT_j2,pT_H,m_4l,dR_j1j2
 real(8) :: pT_l1,pT_l2,pT_l3,pT_l4,y_l1,y_l2,y_l3,y_l4
-real(8) :: Phi1,signPhi1,MomReso(1:4)
+real(8) :: Phi1,signPhi1,MomReso(1:4),dRjj
 integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, Lep1M=8, Lep2P=9, Lep2M=10
 
 
@@ -1997,18 +2077,20 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
        y_l2= get_eta(MomExt(1:4,Lep1M))
        y_l3= get_eta(MomExt(1:4,Lep2P))
        y_l4= get_eta(MomExt(1:4,Lep2M))
+       dRjj = get_R(MomExt(1:4,outTop), MomExt(1:4,outBot))
        pT_jl = max(pT_j1,pT_j2)
        dy_j1j2 = y_j1 - y_j2
+       dR_j1j2 = get_R(MomExt(1:4,outTop), MomExt(1:4,outBot))
 
        mZ1 = get_MInv(MomExt(1:4,Lep1P)+MomExt(1:4,Lep1M))
        mZ2 = get_MInv(MomExt(1:4,Lep2P)+MomExt(1:4,Lep2M))
 
 
-       if( mZ1.lt.2.5d0*GeV ) then
+       if( mZ1.lt.MPhotonCutoff ) then
           applyPSCut=.true.
           return
        endif
-       if( mZ2.lt.2.5d0*GeV ) then
+       if( mZ2.lt.MPhotonCutoff ) then
           applyPSCut=.true.
           return
        endif
@@ -2017,15 +2099,16 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
 !          return
 !       endif
 
-       if( pT_l1.lt.3d0*GeV .or. pT_l2.lt.3d0*GeV .or. pT_l3.lt.3d0*GeV .or. pT_l4.lt.3d0*GeV ) then
+       if( pT_l1.lt.pTlepcut .or. pT_l2.lt.pTlepcut .or. pT_l3.lt.pTlepcut .or. pT_l4.lt.pTlepcut ) then
           applyPSCut=.true.
           return
        endif
 
-       if( dabs(y_l1).gt.2.7d0 .or. dabs(y_l2).gt.2.7d0 .or. dabs(y_l3).gt.2.7d0 .or. dabs(y_l4).gt.2.7d0 ) then
+       if( dabs(y_l1).gt.etalepcut .or. dabs(y_l2).gt.etalepcut .or. dabs(y_l3).gt.etalepcut .or. dabs(y_l4).gt.etalepcut ) then
           applyPSCut=.true.
           return
        endif
+
 
 
 !      VERY loose VBF cuts
@@ -2044,21 +2127,25 @@ integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, 
 !        endif
 
 
-        if( abs(y_j1).gt.4d0 .or. abs(y_j2).gt.4d0 ) then
+        if( abs(y_j1).gt.etajetcut .or. abs(y_j2).gt.etajetcut ) then
            applyPSCut=.true.
            return
         endif
 
-        if( abs(y_j1-y_j2).lt.2.0d0 .or. y_j1*y_j2.gt.0d0 ) then
+        if( abs(y_j1-y_j2).lt.detajetcut .or. (JetsOppositeEta .and. y_j1*y_j2.gt.0d0) ) then
            applyPSCut=.true.
            return
         endif
 
-        if(  pT_j1.lt.pTjetcut .or. pT_j2.lt.pTjetcut .or. m_jj.lt.mJJcut )  then
+        if(  pT_j1.lt.pTjetcut .or. pT_j2.lt.pTjetcut .or. m_jj.lt.mJJcut .or. dR_j1j2.lt.Rjet)  then
            applyPSCut=.true.
            return
         endif
 
+       if( dRjj.lt.Rjet ) then
+          applyPSCut=.true.
+          return
+       endif
 
        dphi_jj = abs( Get_PHI(MomExt(1:4,3)) - Get_PHI(MomExt(1:4,4)) )
        if( dphi_jj.gt.Pi ) dphi_jj=2d0*Pi-dphi_jj
@@ -4564,6 +4651,64 @@ END SUBROUTINE
 
 
 
+SUBROUTINE EvalPhasespace_VHglu(xRnd,Energy,Mom,Jac)! ordering 1,2:in  3,4:Higgs  56:Z  7:glu
+use ModParameters
+use ModPhasespace
+use ModMisc
+implicit none
+real(8) :: xchannel,xRnd(1:8), Energy, Mom(1:4,1:7)
+real(8) :: Jac,Jac1,Jac2,Jac3,Jac4,Jac5
+real(8) :: s45,s345,Mom_DummyX(1:4),Mom_DummyZ(1:4),Mom_DummyZ2(1:4)
+real(8) :: SingDepth
+integer :: Pcol1,Pcol2,Steps
+
+   Mom(1:4,1) = 0.5d0*Energy * (/+1d0,0d0,0d0,+1d0/)
+   Mom(1:4,2) = 0.5d0*Energy * (/+1d0,0d0,0d0,-1d0/)
+
+!  stable Higgs,  decay not yet implemented but momenta 3+4 are allocated 
+   ! masses
+   Jac1 = s_channel_propagator(M_V**2,0d0,M_Reso**2,Energy**2,xRnd(1),s345)     ! Z*+H
+   Jac2 = s_channel_propagator(M_V**2,Ga_V,0d0,(dsqrt(s345)-m_Reso)**2,xRnd(2),s45)  ! Z-->56
+
+
+!  splittings
+   Mom_DummyX(1:4) = (/Energy,0d0,0d0,0d0/)   
+   Jac3 = s_channel_decay(Mom_DummyX(1:4),s345,0d0,xRnd(3:4),Mom_DummyZ(:),Mom(:,7)) ! Z* + glu
+   Jac4 = s_channel_decay(Mom_DummyZ(1:4),s45,M_Reso**2,xRnd(5:6),Mom_DummyZ2(:),Mom(:,3)) ! Z + H
+   Mom(1:4,4) = 0d0
+   Jac5 = s_channel_decay(Mom_DummyZ2(:),0d0,0d0,xRnd(7:8),Mom(:,5),Mom(:,6)) !  Z --> 56
+   Jac = Jac1*Jac2*Jac3*Jac4*Jac5* PSNorm4
+
+   
+!    this is for the soft/collinear limit checks only!!
+!         Pcol1= 6 -1
+!         Pcol2= 6 -1
+!         SingDepth = 1e-13
+!         Steps = 10
+!         call gensing(4,Energy,(/M_Reso,0d0,0d0,0d0/),Mom(1:4,4:7),Pcol1,Pcol2,SingDepth,Steps)
+!         Mom(1:4,3) = Mom(1:4,4)
+!         Mom(1:4,4) = 0d0
+! !       call genps(4,Energy,xRnd(1:8),(/M_Reso,0d0,0d0,0d0/),(/Mom(1:4,3),Mom(1:4,5),Mom(1:4,6),Mom(1:4,7)/),Jac)
+!         print *, "generating singular phase space"
+!         Jac=1d0        
+        
+!    end check
+   
+
+   if( isNan(jac) ) then
+      print *, "EvalPhasespace_VHglu NaN"
+      print *, Energy
+      print *, s345,s45
+      print *, Jac1,Jac2,Jac3,Jac4,Jac5
+      print *, xRnd  
+      Jac = 0d0
+   endif   
+   
+RETURN
+END SUBROUTINE
+
+
+
 
 
 SUBROUTINE EvalPhasespace_2to2(EHat,Masses,xRndPS,Mom,PSWgt)
@@ -5053,15 +5198,16 @@ END SUBROUTINE
 
 
 
-SUBROUTINE EvalPhasespace_VBF_H4f(xchannel,xRnd,Energy,Mom,Jac)
+SUBROUTINE EvalPhasespace_VBF_H4f(xchannel,xRnd,Energy,Mom,Jac,EqualLeptons)
 use ModParameters
 use ModPhasespace
 use ModMisc
 implicit none
 real(8) :: xchannel,xRnd(:), Energy, Mom(:,:)
+integer :: EqualLeptons
 integer :: iChannel
 real(8) :: Jac,Jac1,Jac2,Jac3,Jac4,Jac5,Jac6,Jac7,Jac8,Jac9
-real(8) :: s3H,s4H,s56,s78,s910,s34,s35,s46,Mom_Dummy(1:4),Mom_Dummy2(1:4),xRndOffShellZ,Emin,Emax
+real(8) :: s3H,s4H,s56,s78,s910,s34,s35,s46,Mom_Dummy(1:4),Mom_Dummy2(1:4),xRndLeptInterf,Emin,Emax
 real(8), parameter :: RescaleWidth=1d0
 integer, parameter :: NumChannels=5   !7
 integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, Lep1M=8, Lep2P=9, Lep2M=10
@@ -5276,10 +5422,22 @@ ELSEIF( iChannel.EQ.5 ) THEN
 !  splittings
    Jac5 = s_channel_decay((/Energy,0d0,0d0,0d0/),s34,s56,xRnd(5:6),Mom_Dummy(:),Mom_Dummy2(:)) !   Z* --> Z+H
    Jac6 = s_channel_decay(Mom_Dummy(:),0d0,0d0,xRnd(7:8),Mom(:,3),Mom(:,4)) !  Z --> 34
-   Jac7 = s_channel_decay(Mom_Dummy2(:),s78,s910,xRnd(9:10),Mom(:,5),Mom(:,6))  !   H --> ZZ                                            
-   Jac8 = s_channel_decay(Mom(:,5),0d0,0d0,xRnd(11:12),Mom(:,7),Mom(:,8))       !   Z --> ffbar                                    
-   Jac9 = s_channel_decay(Mom(:,6),0d0,0d0,xRnd(13:14),Mom(:,9),Mom(:,10))      !   Z --> ffbar  
+   Jac7 = s_channel_decay(Mom_Dummy2(:),s78,s910,xRnd(9:10),Mom(:,5),Mom(:,6))  !   H --> ZZ
    
+   if( includeInterference .and. EqualLeptons.eq.0 ) then!   EqualLeptons=0 means equal leptons
+      call random_number(xRndLeptInterf)
+      if( xRndLeptInterf.gt.0.5d0 ) then
+          Jac8 = s_channel_decay(Mom(:,5),0d0,0d0,xRnd(11:12),Mom(:,9),Mom(:,8))       !   Z --> ffbar                                    
+          Jac9 = s_channel_decay(Mom(:,6),0d0,0d0,xRnd(13:14),Mom(:,7),Mom(:,10))      !   Z --> ffbar  
+      else
+          Jac8 = s_channel_decay(Mom(:,5),0d0,0d0,xRnd(11:12),Mom(:,7),Mom(:,8))       !   Z --> ffbar                                    
+          Jac9 = s_channel_decay(Mom(:,6),0d0,0d0,xRnd(13:14),Mom(:,9),Mom(:,10))      !   Z --> ffbar  
+      endif
+      Jac8 = Jac8 * 2d0
+   else
+      Jac8 = s_channel_decay(Mom(:,5),0d0,0d0,xRnd(11:12),Mom(:,7),Mom(:,8))       !   Z --> ffbar                                    
+      Jac9 = s_channel_decay(Mom(:,6),0d0,0d0,xRnd(13:14),Mom(:,9),Mom(:,10))      !   Z --> ffbar  
+   endif
 
    
 ELSEIF( iChannel.EQ.6 ) THEN
@@ -5356,12 +5514,6 @@ ELSE
 ENDIF
 
 
-!    call random_number(xRndOffShellZ)   ! switching this off for test purposes
-!    if( xRndOffShellZ.gt.0.5d0 ) then
-!         call swap_mom(Mom(:,5),Mom(:,6))
-!         call swap_mom(Mom(:,7),Mom(:,9))
-!         call swap_mom(Mom(:,8),Mom(:,10))
-!    endif
    Jac = Jac1*Jac2*Jac3*Jac4*Jac5*Jac6*Jac7*Jac8*Jac9 * PSNorm6
 
 
