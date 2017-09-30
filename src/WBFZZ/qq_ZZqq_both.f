@@ -9,7 +9,9 @@ c--- q(-p1)+q(-p2)->Z(p3,p4)+Z(p5,p6)+q(p7)+q(p8);
       include 'runstring.f'
       include 'sprods_com.f'
       include 'zprods_decl.f'
-      include 'first.f'
+      include 'anom_higgs.f'
+!      include 'first.f'
+      include 'WWbits.f'
       integer nmax,jmax
       parameter(jmax=12,nmax=10)
       integer j,k,l,i1,i2,i3,i4,
@@ -22,7 +24,7 @@ c--- q(-p1)+q(-p2)->Z(p3,p4)+Z(p5,p6)+q(p7)+q(p8);
      & dquq_dquq=7,dqcq_uqsq=8,uqsq_dqcq=9)
       integer h1,h2,h3,h5
       double precision p(mxpart,4),msq(fn:nf,fn:nf),temp(fn:nf,fn:nf),
-     & tempw(fn:nf,fn:nf),stat,spinavge,Hbit,Bbit,t4,
+     & tempw(fn:nf,fn:nf),stat,spinavge,mult,t4,
      & s17,s28,s18,s27,s7341,s7561,s7342,s7562
       double complex zab(mxpart,4,mxpart),zba(mxpart,4,mxpart),cdotpr,
      & propw71,propw81,propw72,propw82,
@@ -78,45 +80,34 @@ c--- End statement functions
 
 c--- This calculation uses the complex-mass scheme (c.f. arXiv:hep-ph/0605312)
 c--- and the following lines set up the appropriate masses and sin^2(theta_w)
-      if (first) then
-       cwmass2=dcmplx(wmass**2,-wmass*wwidth)
-       czmass2=dcmplx(zmass**2,-zmass*zwidth)
-       cxw=cone-cwmass2/czmass2
-c       cxw=dcmplx(xw,0d0) ! DEBUG: Madgraph comparison
-       write(6,*)
-       write(6,*) '**************** Complex-mass scheme ***************'
-       write(6,*) '*                                                  *'
-       write(6,77) cwmass2
-       write(6,78) czmass2
-       write(6,79) cxw
-       write(6,*) '*                                                  *'
-       write(6,*) '****************************************************'
-       write(6,*)
-       doHO=.false.
-       doBO=.false.
-       if     (runstring(4:5) .eq. 'HO') then
-         doHO=.true.
-       write(6,*) '>>>>>>>>>>>>>> Higgs contribution only <<<<<<<<<<<<<'
-       write(6,*)
-       elseif (runstring(4:5) .eq. 'BO') then
-         doBO=.true.
-       write(6,*)
-       write(6,*) '>>>>>>>>>>> Background contribution only <<<<<<<<<<<'
-       write(6,*)
-       endif
-       first=.false.
-      endif
+      cwmass2=dcmplx(wmass**2,-wmass*wwidth)
+      czmass2=dcmplx(zmass**2,-zmass*zwidth)
+      cxw=cone-cwmass2/czmass2
       
-      if (doHO) then
-        Hbit=1d0
-        Bbit=0d0
-      elseif (doBO) then
-        Hbit=0d0
-        Bbit=1d0
-      else
-        Hbit=1d0
-        Bbit=1d0
+      doHO=.false.
+      doBO=.false.
+      if     (runstring(4:5) .eq. 'HO') then
+        doHO=.true.
+      elseif (runstring(4:5) .eq. 'BO') then
+        doBO=.true.
       endif
+      if (doHO) then
+        Hbit=cone
+        Bbit=czip
+      elseif (doBO) then
+        Hbit=czip
+        Bbit=cone
+      else
+        Hbit=cone
+        Bbit=cone
+      endif
+
+c--- rescaling factor for Higgs amplitudes, if anomalous Higgs width
+       mult=1d0
+       if (anom_Higgs) then
+         mult=chi_higgs**2
+       endif
+       Hbit=mult*Hbit
 
 C---setup spinors and spinorvector products
       call spinorcurr(8,p,za,zb,zab,zba)

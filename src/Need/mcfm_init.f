@@ -60,48 +60,6 @@ c      include 'APPLinclude.f'
 * Set up mbook initial settings
       book(:)='NO'
 
-************************************************************************
-*     Masses, widths and initial-state flavour information             *
-************************************************************************
-c--- if true, nores removes all of the gg contribution
-      nores=.false.
-c--- Masses: note that "mtausq" is typically used throughout the
-c--- program to calculate couplings that depend on the mass, while
-c--- "mtau" is the mass that appears in the rest of the matrix
-c--- elements and phase space (and may be set to zero in the program,
-c--- depending on the process number)
-
-      mtau=1.777d0
-      mtausq=3.157729d0
-c----   Note: after v5.6, the masses for top, bottom and charm quarks
-c----         are set in the input file
-
-c---  Widths: note that the top width is calculated in the program
-c---  The W width of 2.1054 is derived using the measured BR of
-c---    10.80 +/- 0.09 % (PDG) and the LO partial width calculation
-c---    for Mw=80.398 GeV
-      wwidth=2.1054d0
-      zwidth=2.4952d0
-      tauwidth=2.269d-12
-c--- Number of active flavours in the initial state: this parameter
-c--- may be changed in the program for some processes
-      nflav=5
-c--- Masses below here are currently unused
-      md=5d-3
-      mu=5d-3
-      ms=1d-1
-      mel=0.510997d-3
-      mmu=0.105658389d0
-*
-************************************************************************
-*     Dim. Reg. parameter epsilon, used for checking the proper        *
-*      operation of the NLO code in the program                        *
-************************************************************************
-*
-      epinv=1d3
-      epinv2=1d3
-
-
       call reader_input(inputfile,workdir)
 
       first_time = .true.

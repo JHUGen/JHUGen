@@ -6,7 +6,8 @@ CERNLIB     =
 LHAPDFLIB   = 
 
 # Flag for compiling with OpenMP (YES) or not (anything else)
-USEOMP = YES
+#USEOMP = YES
+USEOMP = NO
 ifeq ($(USEOMP),YES)
   OBJNAME=obj_omp
   OMPFLAG=-fopenmp
@@ -56,8 +57,22 @@ FC = gfortran
 F90 = gfortran
 
 # Flags for compilation
-FFLAGS 	=  -fno-f2c $(OMPFLAG) -O2 -I$(INCPATH) -I$(TENSORREDDIR)/Include -I$(OBJNAME)
-F90FLAGS = -fno-f2c $(OMPFLAG) -I$(INCPATH) -I$(OBJNAME) -J$(OBJNAME)
+
+# Define CompileForMELA to compile for MELA libraries
+DoCompileForMELA = YES
+ifeq ($(DoCompileForMELA),YES)
+  FFLAGS 	= -fno-automatic -fno-f2c $(OMPFLAG) -O0 -fPIC -g -I$(INCPATH) -I$(TENSORREDDIR)/Include -I$(OBJNAME)
+  #FFLAGS 	= -fno-automatic -fno-f2c -cpp -DCompileForMELA $(OMPFLAG) -O0 -fPIC -g -I$(INCPATH) -I$(TENSORREDDIR)/Include -I$(OBJNAME)
+  #FFLAGS 	=  -fno-f2c $(OMPFLAG) -O2 -I$(INCPATH) -I$(TENSORREDDIR)/Include -I$(OBJNAME)
+  F90FLAGS = -fno-automatic -fno-f2c -DCompileForMELA $(OMPFLAG) -O2 -fPIC -g -I$(INCPATH) -I$(OBJNAME) -J$(OBJNAME)
+  #F90FLAGS = -fno-f2c $(OMPFLAG) -I$(INCPATH) -I$(OBJNAME) -J$(OBJNAME)
+else
+  FFLAGS 	= -fno-automatic -fno-f2c $(OMPFLAG) -O0 -fPIC -g -I$(INCPATH) -I$(TENSORREDDIR)/Include -I$(OBJNAME)
+  #FFLAGS 	= -fno-automatic -fno-f2c -cpp $(OMPFLAG) -O0 -fPIC -g -I$(INCPATH) -I$(TENSORREDDIR)/Include -I$(OBJNAME)
+  #FFLAGS 	=  -fno-f2c $(OMPFLAG) -O2 -I$(INCPATH) -I$(TENSORREDDIR)/Include -I$(OBJNAME)
+  F90FLAGS = -fno-automatic -fno-f2c $(OMPFLAG) -O2 -fPIC -g -I$(INCPATH) -I$(OBJNAME) -J$(OBJNAME)
+  #F90FLAGS = -fno-f2c $(OMPFLAG) -I$(INCPATH) -I$(OBJNAME) -J$(OBJNAME)
+endif
 
 # If using FROOT package for ROOT ntuples, first specify C++ compiler:
 CXX = g++
@@ -871,7 +886,9 @@ writeinfo.o \
 writeinput.o \
 writeout.o \
 dips_mass.o \
-zeromsq.o
+zeromsq.o \
+HVVSpinZeroDynamicCouplings.o \
+anomhvvamps.o
 
 PARTONFILES = \
 checkpath.o \
@@ -1868,6 +1885,7 @@ ggZZcapture.o \
 gg_ZZ.o \
 gg_ZZ_Hpi.o \
 gg_ZZ_int.o \
+gg_ZZ_int_freenorm.o \
 ggZZmassamp.o \
 ggZZmassamp_new.o \
 ggZZparsecheck.o \
@@ -1878,6 +1896,7 @@ qg_Cont_ZZj_amp.o \
 qg_Hint_ZZ.o \
 qg_HZZjet_amp.o \
 qqb_zz.o \
+qqb_zz_stu.o \
 qqb_zz_g.o \
 qqb_zz_gs.o \
 qqb_zz_v.o \

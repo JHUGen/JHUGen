@@ -4,7 +4,11 @@ C  interpolating the Spira tables br.sm1 br.sm2
 C  Other branching ratios could be added.
       implicit none
       include 'masses.f'
-      include 'first.f'
+      !include 'first.f'
+      logical first_higgsp
+      data first_higgsp/.true./
+      save first_higgsp
+!$omp threadprivate(first_higgsp)
       integer npt
       parameter(npt=1000)
       integer j,nlo
@@ -15,8 +19,8 @@ C  Other branching ratios could be added.
      . ,brtt,brgg,brgamgam(npt),brzgam(npt),brww(npt),brzz(npt)
       save brbb,brww,brzz,width
 
-      if (first) then
-      first=.false.
+      if (first_higgsp) then
+      first_higgsp=.false.
       open(unit=47,file='br.sm1',status='old',err=44)
       read(47,*,err=75) string
  75   read(47,*,err=76) string

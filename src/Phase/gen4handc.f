@@ -12,15 +12,16 @@ c--- better map the continuum contribution
       include 'interference.f'
       include 'x1x2.f'
       include 'first.f'
-      integer nu
-C      integer,save::icount=1
-C!$omp threadprivate(icount)
+      integer nu,icount
       double precision r(mxdim)
       double precision wt4,p1(4),p2(4),p3(4),p4(4),p5(4),p6(4)
       double precision p(mxpart,4),rtshat
       double precision pswt,xjac,pswidth
       double precision s3456,wt3456,ymax,yave,lntaum,tau
       include 'energy.f'
+      data icount/1/
+      save icount
+!$omp threadprivate(icount)
       save pswidth
 !$omp threadprivate(pswidth)
 
@@ -78,17 +79,17 @@ c      write(6,*) 'problems with xx(1),xx(2) in gen4h',xx(1),xx(2)
       enddo 
 
       if (interference) then
-!        if (icount .eq. 1) then
+        if (icount .eq. 1) then
           bw34_56=.true.
-!          icount=icount-1
-!        else
-!          bw34_56=.false.
-!          do nu=1,4
-!            p(4,nu)=p6(nu)
-!            p(6,nu)=p4(nu)
-!          enddo 
-!          icount=icount+1
-!        endif
+          icount=icount-1
+        else
+          bw34_56=.false.
+          do nu=1,4
+            p(4,nu)=p6(nu)
+            p(6,nu)=p4(nu)
+          enddo 
+          icount=icount+1
+        endif
       endif
       
       wt4=xjac*pswt/sqrts**2

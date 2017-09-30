@@ -24,6 +24,8 @@ c--- (default: included)
      & Mamp,faczz,facww
       double complex ggHZZ_bquark(2,2,2,2),ggHZZ_tquark(2,2,2,2),
      & ggHWW_bquark(2,2,2,2),ggHWW_tquark(2,2,2,2)
+      double complex ggH2ZZ_bquark(2,2,2,2),ggH2ZZ_tquark(2,2,2,2),
+     & ggH2WW_bquark(2,2,2,2),ggH2WW_tquark(2,2,2,2)
 
 c--- set this to true to include generations 1 and 2 of (light) quarks
       includegens1and2=.true.      
@@ -37,9 +39,6 @@ c--- set this to true to include 3rd generation of quarks (t,b)
 c--- if set, performs check against numerical results at specific PS point
       docheck=.false.
       
-      ggHWW_bquark(:,:,:,:)=czip
-      ggHWW_tquark(:,:,:,:)=czip
-
 c--- this is the swap to get to the right configuration for the WW call
       pswap(1:2,:)=p(1:2,:)
       pswap(3,:)=p(5,:)
@@ -67,6 +66,9 @@ c--- compute all gg->H->WW and gg->H->ZZ amplitudes
       call getggHWWamps(pswap,
      & ggHWW_bquark(:,:,1,1),ggHWW_tquark(:,:,1,1))
       call getggHZZamps(p,ggHZZ_bquark,ggHZZ_tquark)
+      call getggH2WWamps(pswap,
+     & ggH2WW_bquark(:,:,1,1),ggH2WW_tquark(:,:,1,1))
+      call getggH2ZZamps(p,ggH2ZZ_bquark,ggH2ZZ_tquark)
 
 c--- pt cut to reproduce Kauer paper
       if (pttwo(3,4,p) .lt. 1d0) then
@@ -97,6 +99,8 @@ c--- compute total amplitude: note relative sign in interference
      &  +2d0*Mloop_dntype(h1,h2,h34,h56)
      &      +Mloop_bquark(h1,h2,h34,h56)
      &      +Mloop_tquark(h1,h2,h34,h56)
+     &      +ggH2ZZ_bquark(h1,h2,h34,h56)
+     &      +ggH2ZZ_tquark(h1,h2,h34,h56)
      &      +ggHZZ_bquark(h1,h2,h34,h56)
      &      +ggHZZ_tquark(h1,h2,h34,h56))*faczz
 
@@ -108,6 +112,8 @@ c--- add contribution from vmu,vtau if necessary
       Mamp=Mamp
      & -(2d0*Mlight(h1,h2,h34,h56)
      &      +Mgen3(h1,h2,h34,h56)
+     &      +ggH2WW_bquark(h1,h2,h34,h56)
+     &      +ggH2WW_tquark(h1,h2,h34,h56)
      &      +ggHWW_bquark(h1,h2,h34,h56)
      &      +ggHWW_tquark(h1,h2,h34,h56))*facww
           

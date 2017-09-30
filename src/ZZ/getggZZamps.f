@@ -32,7 +32,6 @@ c--- expected to be unreliable, namely pt(Z)<ptZsafetycut set below
       include 'scale.f'
       include 'docheck.f'
       include 'qlfirst.f'
-      include 'first.f'
       logical dolight,dobottom,dotop,ggZZuse6d
       integer h1,h2,h34,h56,up,dn,om,nu
       double precision p(mxpart,4),cvec(2),cax(2),cl1(2),cl2(2),
@@ -57,35 +56,9 @@ c--- omit u,d,s,c loops for pt(Z) < "ptZsafetycut_massless" (for num. stability)
 c--- omit t,b quark loops for pt(Z) < "ptZsafetycut_massive"  (for num. stability)
       ptZsafetycut_massive=0.1d0
 
-      if (first) then
-        write(6,*)'****************************************************'
-        write(6,*)'*                                                  *'
-        if (dolight) then
-        write(6,*)'*  gg->ZZ box loop includes gens. 1 and 2          *'
-        else
-        write(6,*)'*  gg->ZZ box loop does not include gens. 1 and 2  *'
-        endif
-        if (dobottom) then
-        write(6,*)'*  gg->ZZ box loop includes bottom quark           *'
-        else
-        write(6,*)'*  gg->ZZ box loop does not include bottom quark   *'
-        endif
-        if (dotop) then
-        write(6,*)'*  gg->ZZ box loop includes top quark              *'
-        else
-        write(6,*)'*  gg->ZZ box loop does not include top quark      *'
-        endif
-        write(6,*)'*                                                  *'
-        write(6,54) ptZsafetycut_massless,'(gens. 1,2)'
-        write(6,54) ptZsafetycut_massive, '(b,t loops)'
-        write(6,*)'*                                                  *'
-        write(6,*)'****************************************************'
-        first=.false. 
-        if (qlfirst) then
-          qlfirst=.false.
-          call qlinit
-        endif
-   54   format(' *  Numer. stability: pt(Z) >',f6.3,' GeV ',a11,' *')
+      if (qlfirst) then
+         call qlinit
+         qlfirst=.false.
       endif
 
 c--- set up spinor products      

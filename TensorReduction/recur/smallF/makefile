@@ -5,7 +5,7 @@ INCPATH2 = $(PWD)/../../Include/
 OUTPUT_OPTION	= -o $(PWD)/obj/$@ 
 
 FC = gfortran 
-FFLAGS 	= -O2 -fno-f2c -g -I$(INCPATH1) -I$(INCPATH2) -Iobj -Jobj
+FFLAGS 	= -O2 -fno-f2c -fPIC -g -I$(INCPATH1) -I$(INCPATH2) -Iobj -Jobj
 
 LIBRARY	      = libsmallF.a
 

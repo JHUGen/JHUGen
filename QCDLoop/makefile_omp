@@ -34,7 +34,7 @@ qptest: qpdir qfdir qldir ffdir		\
 test: qldir ffdir 		\
 	$(TEST)
 	$(FC) $(FFLAGS) -L$(QLDIR) -L$(FFDIR) -o $@ \
-            $(TEST) -lqcdloop_omp -lff 
+            $(TEST) -lqcdloop -lff 
 
 ffdir:
 	(cd $(FFDIR); make -f makefile_omp; ranlib libff_omp.a) 

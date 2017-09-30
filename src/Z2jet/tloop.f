@@ -1,13 +1,13 @@
       double complex function tloop(s23,mtsq)
       implicit none
       include 'scale.f'
-      include 'first.f'
+      include 'qlfirst.f'
       double precision s23,mtsq
       double complex qlI3,Bdiff
 
-      if (first) then
+      if (qlfirst) then
       call qlinit
-      first=.false.
+      qlfirst=.false.
       endif
 
       tloop=-1d0-2d0*mtsq/s23*(

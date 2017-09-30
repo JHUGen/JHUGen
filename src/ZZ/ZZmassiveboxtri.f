@@ -10,7 +10,7 @@ c--- (-,+) and (+,-) helicities of gluons only
       include 'ggZZintegrals.f'
       include 'ZZdlabels.f'
       include 'ZZclabels.f'
-      include 'first.f'
+      !include 'first.f'
       integer j1,j2,j3,j4,j5,j6,h1,h2,h3,h4,j,itot,irat
       double precision mt,mtsq
       double complex Xpp(2,2),Xmp(2,2),Xpm(2,2),Xmm(2,2),
@@ -20,15 +20,6 @@ c--- (-,+) and (+,-) helicities of gluons only
       parameter(itot=1,irat=2)
       
       mtsq=mt**2
-      
-      if (first) then
-c      write(6,*) 'mtsq',mtsq
-c      write(6,*) 'musq',musq
-c        first=.false. 
-c        call qlinit
-c      pause
-      endif
-
 
 c--- Box 1: note that coefficient of this box is unchanged
       call ZZbox1LL(j1,j2,j3,j4,j5,j6,za,zb,mt,Xpp,Xmp,Xpm,Xmm,Xrat)

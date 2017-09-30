@@ -195,22 +195,12 @@ c---    2nd pass --> fill msq
           else
             oprat=1d0
           endif
-          if (bw34_56) then
-            msq(j,k)=msq(j,k)
-     &              +ave*2d0*abs(Uncrossed(j,k,polq,pol1,pol2))**2*oprat
-          else
-            msq(j,k)=msq(j,k)+ave*2d0*abs(q_qb)**2*oprat
-          endif
+
+          msq(j,k)=msq(j,k)
+     &              +ave*abs(Uncrossed(j,k,polq,pol1,pol2))**2*oprat
+     &              +ave*abs(q_qb)**2*oprat
         endif
       endif
-c         msq(j,k)=msq(j,k)-ave*abs(q_qb)**2
-c         if (pol1.eq.pol2) then
-c         msq(j,k)=msq(j,k)
-c     &   -2d0*ave*dble(dconjg(q_qb)*Uncrossed(j,k,polq,pol1,pol2))
-c     &   -ave*dble(dconjg(q_qb)*Uncrossed(j,k,polq,pol1,pol2))
-c         endif
-c      endif
-
 
       enddo
       enddo
@@ -263,28 +253,11 @@ c---    2nd pass --> fill msq
           else
             oprat=1d0
           endif
-          if (bw34_56) then
-            msq(j,k)=msq(j,k)
-     &              +ave*2d0*abs(Uncrossed(j,k,polq,pol1,pol2))**2*oprat
-          else
-            msq(j,k)=msq(j,k)+ave*2d0*abs(qb_q)**2*oprat
-          endif
+          msq(j,k)=msq(j,k)
+     &              +ave*abs(Uncrossed(j,k,polq,pol1,pol2))**2*oprat
+     &              +ave*abs(qb_q)**2*oprat
         endif
       endif
-
-c      msq(j,k)=msq(j,k)+ave*abs(qb_q)**2
-
-c      !set-up interference terms
-c      if ((interference).and.(ii.eq.1)) then
-c         Uncrossed(j,k,polq,pol1,pol2)=qb_q
-c      elseif (ii.eq.2) then
-c         msq(j,k)=msq(j,k)-ave*abs(qb_q)**2
-c         if (pol1.eq.pol2) then
-c         msq(j,k)=msq(j,k)
-cc     &    -2d0*ave*dble(dconjg(qb_q)*Uncrossed(j,k,polq,pol1,pol2))
-c     &    -ave*dble(dconjg(qb_q)*Uncrossed(j,k,polq,pol1,pol2))
-c         endif
-c      endif
 
 
 

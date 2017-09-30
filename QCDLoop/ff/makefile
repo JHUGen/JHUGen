@@ -4,7 +4,9 @@ INCPATH = $(PWD)/../Include/
 OUTPUT_OPTION	= -o $(PWD)/obj/$@ 
 
 FC = gfortran 
-FFLAGS 	= -O2 -fno-f2c -g -I$(INCPATH) -Iobj -Jobj
+FFLAGS 	= -g -fPIC -I$(INCPATH) -Iobj -Jobj
+#FFLAGS 	= -O2 -fno-f2c -g -I$(INCPATH) -Iobj -Jobj
+
 
 LIBRARY	      = libff.a
 

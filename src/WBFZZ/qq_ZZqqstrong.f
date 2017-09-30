@@ -10,7 +10,7 @@ c--- with the t-channel exchange of a gluon.
       include 'qcdcouple.f'
       include 'sprods_com.f'
       include 'zprods_decl.f'
-      include 'first.f'
+!      include 'first.f'
       integer nmax,jmax
       parameter(jmax=12,nmax=10)
       integer j,k,l,i1,i2,i3,i4,
@@ -60,23 +60,9 @@ c--- End statement functions
 
 c--- This calculation uses the complex-mass scheme (c.f. arXiv:hep-ph/0605312)
 c--- and the following lines set up the appropriate masses and sin^2(theta_w)
-      if (first) then
-       cwmass2=dcmplx(wmass**2,-wmass*wwidth)
-       czmass2=dcmplx(zmass**2,-zmass*zwidth)
-       cxw=cone-cwmass2/czmass2
-c       cxw=dcmplx(xw,0d0) ! DEBUG: Madgraph comparison
-c       gsq=(-1.2177157847767197d0)**2 ! DEBUG: Madgraph comparison
-       write(6,*)
-       write(6,*) '**************** Complex-mass scheme ***************'
-       write(6,*) '*                                                  *'
-       write(6,77) cwmass2
-       write(6,78) czmass2
-       write(6,79) cxw
-       write(6,*) '*                                                  *'
-       write(6,*) '****************************************************'
-       write(6,*)
-       first=.false.
-      endif
+      cwmass2=dcmplx(wmass**2,-wmass*wwidth)
+      czmass2=dcmplx(zmass**2,-zmass*zwidth)
+      cxw=cone-cwmass2/czmass2
       
 C---setup spinors and spinorvector products
       call spinorcurr(8,p,za,zb,zab,zba)

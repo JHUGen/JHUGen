@@ -16,9 +16,9 @@
       double precision tau,x1mx2,surd
       double precision lntaum
       include 'energy.f'
-!      data icount/1/
-!      save icount
-!!$omp threadprivate(icount)
+      data icount/1/
+      save icount
+!$omp threadprivate(icount)
       wt4=0d0
 
 
@@ -85,17 +85,17 @@ c      endif
       enddo
 
       if (interference) then
-!        if (icount .eq. 1) then
+        if (icount .eq. 1) then
           bw34_56=.true.
-!          icount=icount-1
-!        else
-!          bw34_56=.false.
-!          do nu=1,4
-!            p(4,nu)=p6(nu)
-!            p(6,nu)=p4(nu)
-!          enddo
-!          icount=icount+1
-!        endif
+          icount=icount-1
+        else
+          bw34_56=.false.
+          do nu=1,4
+            p(4,nu)=p6(nu)
+            p(6,nu)=p4(nu)
+          enddo
+          icount=icount+1
+        endif
       endif
 
       wt4=xjac*pswt

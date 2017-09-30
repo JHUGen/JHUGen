@@ -44,6 +44,7 @@ ovEcheck.o \
 ovIpiksrt.o \
 ovdot.o \
 ovdsvdcmp.o \
+ovindex.o \
 ovdpythag.o \
 ovswitch.o \
 ovw2.o \

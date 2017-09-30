@@ -15,15 +15,6 @@
 
       mtsq=mt**2
 
-c--- QCDLoop already initialized from call to massivebox
-c      if (first) then
-c      first=.false. 
-c      write(6,*) 'mtsq',mtsq
-c      write(6,*) 'musq',musq
-c      call qlinit
-cc      pause
-c      endif
-
       s134=s(k1,k3)+s(k1,k4)+s(k3,k4)
       s156=s(k2,k3)+s(k2,k4)+s(k3,k4)
       s12=s(k1,k2)

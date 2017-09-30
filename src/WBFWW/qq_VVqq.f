@@ -8,7 +8,8 @@ c--- q(-p1) + q(-p2) -> e-(p3) e-(p4) nu_e(p5) nu_ebar(p6);
       include 'masses.f'
       include 'runstring.f'
       include 'zprods_decl.f'
-      include 'first.f'
+      include 'anom_higgs.f'
+      !include 'first.f'
       include 'WWbits.f'
       integer nmax,jmax
       parameter(jmax=12,nmax=10)
@@ -23,7 +24,7 @@ c--- q(-p1) + q(-p2) -> e-(p3) e-(p4) nu_e(p5) nu_ebar(p6);
      & dquq_dquq=7,dqcq_uqsq=8,uqsq_dqcq=9)
       integer h1,h2,h3,h5
       double precision p(mxpart,4),msq(fn:nf,fn:nf),temp(fn:nf,fn:nf),
-     & tempw(fn:nf,fn:nf),stat,spinavge
+     & tempw(fn:nf,fn:nf),stat,spinavge,mult
       double complex zab(mxpart,4,mxpart),zba(mxpart,4,mxpart),cdotpr,
      & propw71,propw81,propw72,propw82,
      & propw7341,propw7561,propw7342,propw7562,
@@ -76,42 +77,23 @@ c--- q(-p1) + q(-p2) -> e-(p3) e-(p4) nu_e(p5) nu_ebar(p6);
       integer,parameter:: j2(jmax)=(/2,1,7,7,2,7,1,7,7,1,7,2/)
       integer,parameter:: j7(jmax)=(/7,7,2,1,1,8,2,8,2,8,1,8/)
       integer,parameter:: j8(jmax)=(/8,8,1,2,8,1,8,2,8,2,8,1/)
-      save doHO,doBO
+      save doHO,doBO,mult
 
       msq(:,:)=0d0
 
 c--- This calculation uses the complex-mass scheme (c.f. arXiv:hep-ph/0605312)
 c--- and the following lines set up the appropriate masses and sin^2(theta_w)
-      if (first) then
-       cwmass2=dcmplx(wmass**2,-wmass*wwidth)
-       czmass2=dcmplx(zmass**2,-zmass*zwidth)
-       cxw=cone-cwmass2/czmass2
-c       cxw=dcmplx(xw,0d0) ! DEBUG: Madgraph comparison
-       write(6,*)
-       write(6,*) '**************** Complex-mass scheme ***************'
-       write(6,*) '*                                                  *'
-       write(6,77) cwmass2
-       write(6,78) czmass2
-       write(6,79) cxw
-       write(6,*) '*                                                  *'
-       write(6,*) '****************************************************'
-       write(6,*)
-       doHO=.false.
-       doBO=.false.
-       if     (runstring(4:5) .eq. 'HO') then
-         doHO=.true.
-       write(6,*) '>>>>>>>>>>>>>> Higgs contribution only <<<<<<<<<<<<<'
-       write(6,*)
-       elseif (runstring(4:5) .eq. 'BO') then
-         doBO=.true.
-       write(6,*)
-       write(6,*) '>>>>>>>>>>> Background contribution only <<<<<<<<<<<'
-       write(6,*)
-       endif
-       call flush(6)
-       first=.false.
-      endif
+      cwmass2=dcmplx(wmass**2,-wmass*wwidth)
+      czmass2=dcmplx(zmass**2,-zmass*zwidth)
+      cxw=cone-cwmass2/czmass2
 
+      doHO=.false.
+      doBO=.false.
+      if     (runstring(4:5) .eq. 'HO') then
+        doHO=.true.
+      elseif (runstring(4:5) .eq. 'BO') then
+        doBO=.true.
+      endif
       if (doHO) then
         Hbit=cone
         Bbit=czip
@@ -122,6 +104,13 @@ c       cxw=dcmplx(xw,0d0) ! DEBUG: Madgraph comparison
         Hbit=cone
         Bbit=cone
       endif
+
+c--- rescaling factor for Higgs amplitudes, if anomalous Higgs width
+       mult=1d0
+       if (anom_Higgs) then
+         mult=chi_higgs**2
+       endif
+       Hbit=mult*Hbit
 
 c--- note that this is the ordering in process.DAT and in Madgraph
       i3=3

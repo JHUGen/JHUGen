@@ -37,23 +37,9 @@ c--- with the t-channel exchange of a gluon.
 
 c--- This calculation uses the complex-mass scheme (c.f. arXiv:hep-ph/0605312)
 c--- and the following lines set up the appropriate masses and sin^2(theta_w)
-      if (first) then
-       cwmass2=dcmplx(wmass**2,-wmass*wwidth)
-       czmass2=dcmplx(zmass**2,-zmass*zwidth)
-       cxw=cone-cwmass2/czmass2
-c       cxw=dcmplx(xw,0d0) ! DEBUG: Madgraph comparison
-       write(6,*)
-       write(6,*) '**************** Complex-mass scheme ***************'
-       write(6,*) '*                                                  *'
-       write(6,77) cwmass2
-       write(6,78) czmass2
-       write(6,79) cxw
-       write(6,*) '*                                                  *'
-       write(6,*) '****************************************************'
-       write(6,*)
-       first=.false.
-       call flush(6)
-      endif
+      cwmass2=dcmplx(wmass**2,-wmass*wwidth)
+      czmass2=dcmplx(zmass**2,-zmass*zwidth)
+      cxw=cone-cwmass2/czmass2
       
 c--- this is the MCFM ordering in process.DAT
       i3=3

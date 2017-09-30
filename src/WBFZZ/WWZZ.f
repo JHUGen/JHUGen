@@ -7,17 +7,19 @@
       include 'masses.f'
       include 'sprods_com.f'
       include 'zprods_decl.f'
-      include 'first.f'
+!      include 'first.f'
       include 'WWbits.f'
+      include 'spinzerohiggs_anomcoupl.f'
       double precision s34,s56,s17,s28,s3456,t3,t4,
      & xl1,xr1,xq1,xl2,xr2,xq2
-      double complex WWZZamp(2,2),ggWW(2,2),
+      double complex WWZZamp(2,2),ggWW(2,2),propX3456,
      & prop34,prop56,propw17,propw28,propWBF,prop3456,propz3456,
      & zab2,zba2,srWW(2,2),srL,srR,srggWW34(2,2),srggWW56(2,2),rxw,
-     & sqzmass
+     & sqzmass,Amp_S_DK,Amp_S_PR
       integer h34,h56,i1,i2,i3,i4,i5,i6,i7,i8,
      & n1,n2,n3,n4,n5,n6,n7,n8
       double complex, save:: ZZ3456(2,2)
+      double complex anomhzzamp,anomhwwamp
 !$omp threadprivate(ZZ3456)
       t4(i1,i2,i3,i4)=
      & +s(i1,i2)+s(i1,i3)+s(i1,i4)
@@ -52,11 +54,11 @@
 C---end statement functions
 
 c--- special fix for Madgraph check
-      if (index(runstring,'mad') .gt. 0) then
-        sqzmass=dcmplx(zmass**2,0d0)
-      else
-        sqzmass=czmass2
-      endif
+!      if (index(runstring,'mad') .gt. 0) then
+!       sqzmass=dcmplx(zmass**2,0d0)
+!      else
+         sqzmass=czmass2
+!      endif
 
 C---setting up couplings dependent on whether we are doing 34-line or 56-line
       if (n3+n4 == 7) then
@@ -79,13 +81,10 @@ C---setting up couplings dependent on whether we are doing 34-line or 56-line
       endif
 
       srWW(:,:)=czip
-      if (first) then
-        first=.false.
-        ZZ3456(1,1)=xl1*xl2
-        ZZ3456(1,2)=xl1*xr2
-        ZZ3456(2,1)=xr1*xl2
-        ZZ3456(2,2)=xr1*xr2
-      endif
+      ZZ3456(1,1)=xl1*xl2
+      ZZ3456(1,2)=xl1*xr2
+      ZZ3456(2,1)=xr1*xl2
+      ZZ3456(2,2)=xr1*xr2
 
       rxw=sqrt((cone-cxw)/cxw)
       s34=s(n3,n4)
@@ -101,6 +100,7 @@ C---setting up couplings dependent on whether we are doing 34-line or 56-line
       prop3456=dcmplx(s3456-hmass**2,hmass*hwidth)
       propWBF=propw17*propw28*prop34*prop56
 
+      propX3456=dcmplx(s3456-h2mass**2,h2mass*h2width)
 C----setup couplings and propagators
 c      ggWW(1,1)=dcmplx(q1**2/(s34*s56))+dcmplx(rxw*l1**2)/prop34/prop56
 c      ggWW(1,2)=dcmplx(q1**2/(s34*s56))+dcmplx(rxw*l1*r1)/prop34/prop56
@@ -164,12 +164,59 @@ c--- Make sure WWZA vertices included
      &    *ggWW(h34,h56)/(propw17*propw28)*Bbit
 
 C----Higgs contribution
+C----First resonance
+C-- MARKUS: this is the old (original) MCFM code
+!
+!          WWZZamp(h34,h56)=WWZZamp(h34,h56)
+!      &    -2d0*sqzmass/cxw**2*ZZ3456(h34,h56)
+!      &    *za(i7,i8)*zb(i2,i1)*za(i3,i5)*zb(i6,i4)
+!      &    /(propWBF*prop3456)*Hbit
+!
+
+         WWZZamp(h34,h56)=czip
+         Amp_S_PR=czip
+         Amp_S_DK=czip
+         if( hmass.ge.zip ) then
+           if( AnomalCouplPR.eq.1 ) then
+      Amp_S_PR=-anomhwwamp(i7,i1,i8,i2,1,s3456,s(i7,i1),s(i8,i2),za,zb)
+           else
+      Amp_S_PR=za(i7,i8)*zb(i2,i1)
+          endif
+           if( AnomalCouplDK.eq.1 ) then
+      Amp_S_DK=-anomhzzamp(i3,i4,i5,i6,1,s3456,s(i3,i4),s(i5,i6),za,zb)
+           else
+      Amp_S_DK=za(i3,i5)*zb(i6,i4)
+           endif
+         endif
          WWZZamp(h34,h56)=WWZZamp(h34,h56)
      &    -2d0*sqzmass/cxw**2*ZZ3456(h34,h56)
-     &    *za(i7,i8)*zb(i2,i1)*za(i3,i5)*zb(i6,i4)
+     &     *Amp_S_DK*Amp_S_PR
      &    /(propWBF*prop3456)*Hbit
+
+C----Second resonance
+         Amp_S_PR=czip
+         Amp_S_DK=czip
+         if( h2mass.ge.zip ) then
+           if( AnomalCouplPR.eq.1 ) then
+      Amp_S_PR=-anomhwwamp(i7,i1,i8,i2,2,s3456,s(i7,i1),s(i8,i2),za,zb)
+           else
+      Amp_S_PR=za(i7,i8)*zb(i2,i1)
+          endif
+           if( AnomalCouplDK.eq.1 ) then
+      Amp_S_DK=-anomhzzamp(i3,i4,i5,i6,2,s3456,s(i7,i1),s(i8,i2),za,zb)
+           else
+      Amp_S_DK=za(i3,i5)*zb(i6,i4)
+           endif
+         endif
+         WWZZamp(h34,h56)=WWZZamp(h34,h56)
+     &    -2d0*sqzmass/cxw**2*ZZ3456(h34,h56)
+     &     *Amp_S_DK*Amp_S_PR
+     &    /(propWBF*propX3456)*Hbit
         enddo
       enddo
+
+
+C----Background contribution
 
       do h56=1,2
       if (h56.eq.1) then

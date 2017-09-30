@@ -15,7 +15,7 @@ c--- Triangle (axial) pieces cancel for massless isodoublets
       include 'Higgsint.f'
       include 'noglue.f'
       include 'plabel.f'
-      include 'first.f'
+      include 'qlfirst.f'
       integer j,h1,h2,nu,del1,del2,k12h,k34h,k56h11,k34h11,e
       double precision p(mxpart,4),pin(mxpart,4),msqgg,fac
       double complex Avec(2,2),Agen3(2,2),sum(2,2,-2:0),
@@ -65,23 +65,9 @@ c--- omit massive loops for pt(W) < "ptWsafetycut_massive" (for num. stability)
 c--- omit massless loops for pt(W) < "ptWsafetycut_massless" (for num. stability)
       ptWsafetycut_massless=0.05d0
 
-      if (first) then
-        write(6,*)'****************************************************'
-        write(6,*)'*                                                  *'
-        if (includegens1and2) then
-        write(6,*)'*  gg->WW box loop includes gens. 1 and 2          *'
-        else
-        write(6,*)'*  gg->WW box loop does not include gens. 1 and 2  *'
-        endif
-        if (includegen3) then
-        write(6,*)'*  gg->WW box loop includes 3rd generation         *'
-        else
-        write(6,*)'*  gg->WW box loop does not include 3rd gen.       *'
-        endif
-        write(6,*)'*                                                  *'
-        write(6,*)'****************************************************'
-        first=.false.
-      if (includegen3) call qlinit
+      if (qlfirst .and. includegen3) then
+         call qlinit
+         qlfirst=.false.
       endif
 
 c--- if neither contribution is included, set to zero and return

@@ -17,14 +17,13 @@ c      include 'interference.f'
       double complex ggHZZ_bquark(2,2,2,2),ggHZZ_tquark(2,2,2,2),
      & ggHWW_bquark(2,2,2,2),ggHWW_tquark(2,2,2,2),Ahiggs,
      & faczz,facww
+      double complex ggH2ZZ_bquark(2,2,2,2),ggH2ZZ_tquark(2,2,2,2),
+     & ggH2WW_bquark(2,2,2,2),ggH2WW_tquark(2,2,2,2)
 
       if (qlfirst) then
         qlfirst=.false.
         call qlinit
       endif
-
-      ggHWW_bquark(:,:,:,:)=czip
-      ggHWW_tquark(:,:,:,:)=czip
 
 c--- debug to check phase: checked by JC 4/1/14 (really)
 c      call getggHZZamps(p,ggHZZ_bquark,ggHZZ_tquark)
@@ -49,6 +48,9 @@ c--- this is the swap to get to the right configuration for the WW call
       call getggHWWamps(pswap,
      & ggHWW_bquark(:,:,1,1),ggHWW_tquark(:,:,1,1))
       call getggHZZamps(p,ggHZZ_bquark,ggHZZ_tquark)
+      call getggH2WWamps(pswap,
+     & ggH2WW_bquark(:,:,1,1),ggH2WW_tquark(:,:,1,1))
+      call getggH2ZZamps(p,ggH2ZZ_bquark,ggH2ZZ_tquark)
 
 c--- overall factor from getggHZZamps.f that is not common
       faczz=4d0*esq**2
@@ -77,6 +79,8 @@ c--- compute total Higgs amplitude: note relative sign in interference
       AHiggs=
      &  +ggHZZ_bquark(h1,h2,h34,h56)*faczz
      &  +ggHZZ_tquark(h1,h2,h34,h56)*faczz
+     &  +ggH2ZZ_bquark(h1,h2,h34,h56)*faczz
+     &  +ggH2ZZ_tquark(h1,h2,h34,h56)*faczz
 
 c--- add contribution from vmu,vtau if necessary
       if (nuflav .gt. 1) then
@@ -86,6 +90,8 @@ c--- add contribution from vmu,vtau if necessary
       AHiggs=AHiggs
      &  -ggHWW_bquark(h1,h2,h34,h56)*facww
      &  -ggHWW_tquark(h1,h2,h34,h56)*facww
+     &  -ggH2WW_bquark(h1,h2,h34,h56)*facww
+     &  -ggH2WW_tquark(h1,h2,h34,h56)*facww
 
       msqgg=msqgg+cdabs(AHiggs)**2
       enddo

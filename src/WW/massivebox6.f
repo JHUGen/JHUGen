@@ -6,7 +6,7 @@
       include 'sprods_com.f'
       include 'zprods_decl.f'
       include 'docheck.f'
-      include 'first.f'
+      include 'qlfirst.f'
       double complex d(2,2,6),box(2,2,-2:0),
      & qlI4,Dint(6),D1six,D2six,D3six,D4six
       double precision s12,s34,s56,s134,s156,mtsq
@@ -15,8 +15,8 @@
 !$omp threadprivate(/transferbox/)
 
       mtsq=mt**2
-      if (first) then
-      first=.false. 
+      if (qlfirst) then
+      qlfirst=.false. 
 c      write(6,*) 'mtsq',mtsq
 c      write(6,*) 'musq',musq
       call qlinit

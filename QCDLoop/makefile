@@ -1,7 +1,8 @@
 FC = gfortran
 HERE   = $(PWD)
 INCDIR  = $(HERE)/Include/
-FFLAGS =  -fno-f2c -fopenmp -O2 -g -I $(INCDIR)
+FFLAGS =  -g -I $(INCDIR)
+#FFLAGS =  -fno-f2c -fopenmp -O2 -g -I $(INCDIR)
 QLDIR  = $(HERE)/ql
 FFDIR  = $(HERE)/ff
 QPDIR  = $(HERE)/ql/qp/

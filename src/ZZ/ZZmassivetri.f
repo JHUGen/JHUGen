@@ -6,7 +6,6 @@
       include 'ggZZintegrals.f'
       include 'ZZclabels.f'
       include 'docheck.f'
-C      include 'first.f'
 C---Indices of coefficients are CLL(integral,h1,h2,h3,h5)
       double complex CLL(6,2,2,2,2)
 c      double complex CLR(6,2,2,2,2),CRL(6,2,2,2,2),CRR(6,2,2,2,2)
@@ -17,14 +16,6 @@ C---Indices of xpp etc are xpp(h3,h5)
       double precision mt
       integer k1,k2,k3,k4,k5,k6,h1,h2,h3,h5,j
 
-c--- QCDLoop already initialized from call to massivebox
-c      if (first) then
-c      first=.false. 
-c      write(6,*) 'mt',mt
-c      write(6,*) 'musq',musq
-c      call qlinit
-c      pause
-c      endif
 
 c--- Initialize all triangle coefficients to zero
       CLL(:,:,:,:,:)=czip

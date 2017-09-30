@@ -73,11 +73,10 @@ c--- with interference
         else
           oprat=1d0
         endif
-        if (bw34_56) then
-          msqgg=msqgg+2d0*cdabs(Mamp)**2*oprat
-        else
-          msqgg=msqgg+2d0*cdabs(Samp)**2*oprat
-        endif
+
+        msqgg=msqgg+cdabs(Mamp)**2*oprat
+     &  +cdabs(Samp)**2*oprat
+
       endif
 
       enddo

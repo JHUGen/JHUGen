@@ -39,30 +39,14 @@ c--- with the t-channel exchange of a gluon.
       integer,parameter:: j2(jmax)=(/2,1,7,7,2,7,1,7,7,1,7,2/)
       integer,parameter:: j7(jmax)=(/7,7,2,1,1,8,2,8,2,8,1,8/)
       integer,parameter:: j8(jmax)=(/8,8,1,2,8,1,8,2,8,2,8,1/)
-      data first/.true./
-      save first
 
       msq(:,:)=0d0
 
 c--- This calculation uses the complex-mass scheme (c.f. arXiv:hep-ph/0605312)
 c--- and the following lines set up the appropriate masses and sin^2(theta_w)
-      if (first) then
-       cwmass2=dcmplx(wmass**2,-wmass*wwidth)
-       czmass2=dcmplx(zmass**2,-zmass*zwidth)
-       cxw=cone-cwmass2/czmass2
-c       cxw=dcmplx(xw,0d0) ! DEBUG: Madgraph comparison
-       write(6,*)
-       write(6,*) '**************** Complex-mass scheme ***************'
-       write(6,*) '*                                                  *'
-       write(6,77) cwmass2
-       write(6,78) czmass2
-       write(6,79) cxw
-       write(6,*) '*                                                  *'
-       write(6,*) '****************************************************'
-       write(6,*)
-       first=.false.
-       call flush(6)
-      endif
+      cwmass2=dcmplx(wmass**2,-wmass*wwidth)
+      czmass2=dcmplx(zmass**2,-zmass*zwidth)
+      cxw=cone-cwmass2/czmass2
       
 c--- note that this is the special ordering to agree with Madgraph
       i3=3
