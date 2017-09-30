@@ -1,6 +1,7 @@
 #!/bin/sh
 
 function stripws(){
+  dos2unix $1
   sed -Ei 's/[ \t]+$//' "$1"
 }
 

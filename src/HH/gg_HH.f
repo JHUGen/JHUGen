@@ -1,5 +1,5 @@
       subroutine gg_HH(p,msq)
-C-----Matrix element squared for double Higgs production 
+C-----Matrix element squared for double Higgs production
 C-----g(-p1)+g(-p2) --> H(p3,p4)+H(p5,p6)
       implicit none
       include 'constants.f'
