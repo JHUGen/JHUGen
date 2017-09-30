@@ -16,18 +16,18 @@ c--- Weak Bosion Fusion : sums up WW and VV contributions
       double precision p(mxpart,4),msqc(maxd,-nf:nf,-nf:nf),
      . msqc_ww(maxd,-nf:nf,-nf:nf),msqc_zz(maxd,-nf:nf,-nf:nf)
       integer j,k,nd
- 
+
       call WW_Hqq_gs(p,msqc_ww)
       call ZZ_Hqq_gs(p,msqc_zz)
-      
+
       do nd=1,ndmax
       do j=-nf,nf
       do k=-nf,nf
         msqc(nd,j,k)=msqc_ww(nd,j,k)+msqc_zz(nd,j,k)
       enddo
-      enddo      
       enddo
-      
+      enddo
+
       return
       end
-      
+

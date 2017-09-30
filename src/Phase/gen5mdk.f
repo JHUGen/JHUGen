@@ -1,7 +1,7 @@
       subroutine gen5mdk(r,p,pswt,*)
 c--- this routine is an extension of gen4 to include the decay
 c--- of one of the heavy particles
-      
+
       implicit none
       include 'constants.f'
       include 'mxdim.f'
@@ -36,11 +36,11 @@ c--- set up minimum invariant mass for the W in the top decay
       else
         smin=bbsqmin
       endif
-      
-c--- decay top -> b W      
+
+c--- decay top -> b W
       call phi1_2m_bw(mb,r(14),r(15),r(16),smin,p567,p7,p56,
      & wmass,wwidth,wt567,*99)
-c--- decay W -> e n      
+c--- decay W -> e n
       call phi3m0(r(17),r(18),p56,p5,p6,wt56,*99)
 
 c--- compute new weight
@@ -50,7 +50,7 @@ c--- compute new weight
 
       write(6,*) 'Case not foreseen in gen5mdk.f'
       stop
-      
+
       endif
 
       do nu=1,4
@@ -63,12 +63,12 @@ c--- compute new weight
       p(7,nu)=p7(nu)
       p(8,nu)=p8(nu)
       p(9,nu)=p9(nu)
-      enddo 
+      enddo
 
       return
-      
+
    99 continue
-      return 1    
-      
+      return 1
+
       end
-      
+

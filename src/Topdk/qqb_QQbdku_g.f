@@ -8,7 +8,7 @@ C***********************************************************************
 *----My notation                                                       *
 *     q(-p1) +qbar(-p2)=t(nu(p3)+e^+(p4)+b(p5))                        *
 *                      +t~(b~(p6)+e^-(p7)+nu~(p8))+g(p9)               *
-*                                                                      * 
+*                                                                      *
 *     2 on-shell top quarks                                            *
 *     uncorrelated decays                                              *
 ************************************************************************
@@ -50,7 +50,7 @@ C----set all elements to zero
       pb2Dpn2=p(6,4)*p(8,4)-p(6,1)*p(8,1)-p(6,2)*p(8,2)-p(6,3)*p(8,3)
       decay=4d0*gwsq**4*pt1Dpe1*pb1Dpn1*pt2Dpe2*pb2Dpn2/abs(prop)**2
 
-      call qqb_QQb_g(q,msq) 
+      call qqb_QQb_g(q,msq)
 
       do j=-nf,nf
       do k=-nf,nf

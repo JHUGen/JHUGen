@@ -17,8 +17,8 @@ c--- By R. Frederix, July 17, 2008.
       integer u,q1,q2,d,t,b,b1,t1,proj
 
 c color matrix:
-c      DATA (CF(i,1  ),i=1  ,2  ) /     6,   2    /                
-c      DATA (CF(i,2  ),i=1  ,2  ) /     2,   6    /                
+c      DATA (CF(i,1  ),i=1  ,2  ) /     6,   2    /
+c      DATA (CF(i,2  ),i=1  ,2  ) /     2,   6    /
 
       t1=7
       b1=8
@@ -63,7 +63,7 @@ c W propagator and common factors:
       bDg=(s(q1,d)+s(b,q1)+s(b,d))/2d0
       tDg=(s(q1,d)+s(t,q1)+s(t,d))/2d0
       wprop_b = bDg*tDg*(wmass**2-2d0*ud)
-    
+
 c Only one structure
       call reals_qq(u,q1,q2,t1,b1,d,proj,mq,ma,za,zb,gs_b)
 

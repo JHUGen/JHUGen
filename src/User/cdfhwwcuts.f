@@ -32,15 +32,15 @@ c--- fractional pt threshold for lepton isolation
 
 c--- default behaviour is that the cuts have been passed
       passed=.true.
-                
-c--- initialize all variables  
+
+c--- initialize all variables
       etvec(1)=0d0
       etvec(2)=0d0
 
 ************************** START BASIC CUTS ****************************
 
       ile=0
-      inu=0      
+      inu=0
 c--- identify the two leptons and neutrinos
       do j=3,maxparts
         if (     (plabel(j).eq.'el') .or. (plabel(j).eq.'ea')
@@ -53,18 +53,18 @@ c--- identify the two leptons and neutrinos
         endif
       enddo
 
-c--- print warning if there are not 2 leptons     
+c--- print warning if there are not 2 leptons
       if (ile .ne. 2) then
         write(6,*) 'WARNING: cdfhwwcuts.f must be upgraded, <2 leptons'
       stop
-      endif     
-      
-      
+      endif
+
+
 c--- compute lepton pt and rapidity
-      pt1=pt(ilept(1),p)      
-      pt2=pt(ilept(2),p)      
-      eta1=abs(etarap(ilept(1),p))     
-      eta2=abs(etarap(ilept(2),p))    
+      pt1=pt(ilept(1),p)
+      pt2=pt(ilept(2),p)
+      eta1=abs(etarap(ilept(1),p))
+      eta2=abs(etarap(ilept(2),p))
 
 c--- CUT on basic acceptance cuts for the leptons
       if ((  (pt1 .gt. trigpt) .and. (eta1 .lt. trigeta)
@@ -88,7 +88,7 @@ c--- CUT on dilepton invariant mass
         passed=.false.
       return
       endif
-          
+
 c--- CUT on the isolation of the leptons
       do i=1,2
       do j=7,maxparts ! jets correspond to indices 7,...,maxparts
@@ -100,19 +100,19 @@ c--- CUT on the isolation of the leptons
       endif
       enddo
       enddo
-      
-c--- print warning if there are not 2 neutrinos     
+
+c--- print warning if there are not 2 neutrinos
       if (inu .ne. 2) then
         write(6,*) 'WARNING: cdfhwwcuts.f must be upgraded, <2 neuts'
       stop
-      endif     
-      
-c--- form the missing et vector 
+      endif
+
+c--- form the missing et vector
       do j=1,2
         etvec(j)=etvec(j)+p(ineut(1),j)+p(ineut(2),j)
       enddo
       missinget=dsqrt(etvec(1)**2+etvec(2)**2)
-      
+
 c--- find the object (charged lepton or jet) that is closest in
 c--- azimuthal angle to missing Et vector
       phimin=10d0
@@ -132,40 +132,40 @@ c--- convert missing Et into missing Et "star" (or "spec")
         missinget=missinget*dsin(phi)
       endif
 
-c--- CUT on missing Et 
+c--- CUT on missing Et
       if (missinget .lt. missingetcut) then
         passed=.false.
       return
       endif
 
-! OPTIONAL mt cut 
+! OPTIONAL mt cut
       m45=0d0
       do i=1,4
-         if(i.ne.4) then 
+         if(i.ne.4) then
             m45=m45-(p(4,i)+p(5,i))**2
          else
-            m45=m45+(p(4,i)+p(5,i))**2 
+            m45=m45+(p(4,i)+p(5,i))**2
          endif
       enddo
 
 
       mtmin=0d0*hmass
-      mtmax=hmass 
-      mt45=0d0 
+      mtmax=hmass
+      mt45=0d0
       mt45=(dsqrt(dsqrt(pttwo(4,5,p)**2+m45)+etmiss(p,et_vec))**2)
 !      write(6,*) mt45
- !     mt45=dsqrt(max(0d0,dsqrt(mt45-ptsq))) 
- !     write(6,*) mt45 
- !     pause 
+ !     mt45=dsqrt(max(0d0,dsqrt(mt45-ptsq)))
+ !     write(6,*) mt45
+ !     pause
 !------ Mt cuts
-      if((mt45.lt.mtmin).or.(mt45.gt.mtmax)) then 
-         passed=.false. 
-         return 
+      if((mt45.lt.mtmin).or.(mt45.gt.mtmax)) then
+         passed=.false.
+         return
       endif
 
 
 
-      return      
+      return
       end
-      
-     
+
+

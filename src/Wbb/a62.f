@@ -1,4 +1,4 @@
-      double complex function a62(st,j1,j2,j3,j4,j5,j6,za,zb) 
+      double complex function a62(st,j1,j2,j3,j4,j5,j6,za,zb)
       implicit none
 ************************************************************************
 *     Author: R.K. Ellis                                               *
@@ -16,7 +16,7 @@
 
 c----Includes ultraviolet subtraction aa6uv (with +ve sign since
 c--- it appears in interference terms,e.g. 1234 x 3214)
-      call a6routine(st,j1,j2,j3,j4,j5,j6,za,zb,aa6sf,aa6tp,aa6uv) 
+      call a6routine(st,j1,j2,j3,j4,j5,j6,za,zb,aa6sf,aa6tp,aa6uv)
       a62=a6(st,j1,j2,j3,j4,j5,j6,za,zb)/xnsq
      & +(aa6sf*dble(nf)-aa6tp)/xn+aa6uv
 
@@ -27,7 +27,7 @@ c--- it appears in interference terms,e.g. 1234 x 3214)
       a62=a62+a6('pp',j1,j3,j2,j4,j5,j6,za,zb)*(one+one/xnsq)
      &       +a6('sl',j3,j2,j1,j4,j5,j6,za,zb)/xnsq
       else
-      write(6,*) 'Unimplemented st in a62',st 
+      write(6,*) 'Unimplemented st in a62',st
       stop
       endif
       return

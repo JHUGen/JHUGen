@@ -1,4 +1,4 @@
-      double complex function Fcc(st,j1,j2,j3,j4,j5,j6,za,zb) 
+      double complex function Fcc(st,j1,j2,j3,j4,j5,j6,za,zb)
       implicit none
       integer j1,j2,j3,j4,j5,j6
       include 'constants.f'
@@ -9,7 +9,7 @@
 
       if     (st.eq.'q+g-g+qb-') then
         Fcc=Fcc_qpgmgpqm(j1,j2,j3,j4,j5,j6,za,zb)
-      elseif (st.eq.'q+g+g-qb-') then 
+      elseif (st.eq.'q+g+g-qb-') then
         Fcc=Fcc_qpgpgmqm(j1,j2,j3,j4,j5,j6,za,zb)
       elseif (st.eq.'q+g+g+qb-') then
         Fcc=Fcc_qpgpgpqm(j1,j2,j3,j4,j5,j6,za,zb)
@@ -30,4 +30,4 @@
 
       return
       end
-      
+

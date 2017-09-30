@@ -1,9 +1,9 @@
       subroutine ZZ_HZZ1(p,msq)
-      implicit none 
+      implicit none
 c--- Weak Bosion Fusion by Z-Z exchange only
 c---Matrix element squared averaged over initial colors and spins
 c
-c     q(-p1)+q(-p2) -->  H(p3,p4)+q(p7)+q(p8) 
+c     q(-p1)+q(-p2) -->  H(p3,p4)+q(p7)+q(p8)
 c                           |
 c                           |
 c                           |
@@ -23,7 +23,7 @@ c                           ---> Z(e-(p3)+e+(p4))+Z(mu-(p5)+mu+(p6))
       msq(j,k)=0d0
       enddo
       enddo
-      
+
       call dotem(8,p,s)
 
       s3456=s(3,4)+s(3,5)+s(3,6)+s(4,5)+s(4,6)+s(5,6)
@@ -34,7 +34,7 @@ c      hdecay=hdecay/((s(3,4)-zmass**2)**2+(zmass*zwidth)**2)
 c      hdecay=hdecay/((s(5,6)-zmass**2)**2+(zmass*zwidth)**2)
       hdecay=gwsq*zmass**2/(one-xw)/4d0
      & *(8d0+(s3456-2d0*zmass**2)**2/zmass**4)
-      hdecay=hdecay/((s3456-hmass**2)**2+(hmass*hwidth)**2)                                                                          
+      hdecay=hdecay/((s3456-hmass**2)**2+(hmass*hwidth)**2)
 
       fac=0.25d0*gwsq**3*hdecay*statfac
 C Color cancels, 0.25d0 is spin average
@@ -67,7 +67,7 @@ c--- ub(1)+d(2) -> ub(7)+d(8)
           msq(j,k)=fac*(
      .     +ud_ud_LL*((L(-j)*L(-k))**2+(R(-j)*R(-k))**2)
      .     +ud_ud_LR*((L(-j)*R(-k))**2+(R(-j)*L(-k))**2))
-        endif 
+        endif
       enddo
       enddo
 

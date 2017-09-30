@@ -55,7 +55,7 @@ c--- APPLgrid - end
       integer ih1,ih2,itmx1,itmx2,ncall1,ncall2,origij
       integer NPTYPE,NGROUP,NSET
       double precision rtsmin,Rcut
- 
+
       common/spira/spira
       common/nmin/nmin
       common/nmax/nmax
@@ -64,40 +64,40 @@ c--- APPLgrid - end
       common/density/ih1,ih2
       common/iterat/itmx1,ncall1,itmx2,ncall2
       common/dryrun/dryrun
-      
+
       common/pdflib/NPTYPE,NGROUP,NSET
-      
+
       common/Rcut/Rcut
       common/makecuts/makecuts
 
       common/origij/origij
-      
-c--- f94 integer.XXYY format      
+
+c--- f94 integer.XXYY format
       f94='('''//lstring//''',11x,i4,''.'',2a2,12x,''['',a,'']'','''
-     & //rstring//''')' 
+     & //rstring//''')'
 c--- f95 2xfloating point format
       f95='('''//lstring//''',f8.3,'','',f8.3,16x,''['',a,'']'','''
-     & //rstring//''')' 
-c--- f96 character format            
-      f96='('''//lstring//''',a20,12x,''['',a,'']'','''//rstring//''')' 
-c--- f97 integer format      
-      f97='('''//lstring//''',i20,12x,''['',a,'']'','''//rstring//''')' 
-c--- f98 logical format      
-      f98='('''//lstring//''',L20,12x,''['',a,'']'','''//rstring//''')' 
+     & //rstring//''')'
+c--- f96 character format
+      f96='('''//lstring//''',a20,12x,''['',a,'']'','''//rstring//''')'
+c--- f97 integer format
+      f97='('''//lstring//''',i20,12x,''['',a,'']'','''//rstring//''')'
+c--- f98 logical format
+      f98='('''//lstring//''',L20,12x,''['',a,'']'','''//rstring//''')'
 c--- f99 floating point format
       f99='('''//lstring//''',f20.4,12x,''['',a,'']'','''
-     & //rstring//''')' 
-    
+     & //rstring//''')'
+
       writeall=.false.
       if (tag .eq. 'WRITEALL') writeall=.true.
-      
+
       if (writeall) then
       write(unitno,*) lstring//' Run corresponds to this input file)'
       write(unitno,*)
       write(unitno,*)
      . lstring//' [Flags to specify the mode in which MCFM is run] )'
       endif
-      
+
       if ((tag .eq. 'nevtrequested') .or. (writeall)) then
       write(unitno,fmt=f97) nevtrequested,'nevtrequested'
       endif
@@ -219,10 +219,10 @@ c--- catch special scale choices for stop+b process
       if ((tag .eq. 'Gflag') .or. (writeall)) then
       write(unitno,fmt=f98) Gflag,'Gflag'
       endif
-      
+
       if (writeall) then
       write(unitno,*)
-      write(unitno,*) 
+      write(unitno,*)
      . lstring//' [Heavy quark masses] )'
       endif
       if ((tag .eq. 'top mass') .or. (writeall)) then
@@ -237,7 +237,7 @@ c--- catch special scale choices for stop+b process
 
       if (writeall) then
       write(unitno,*)
-      write(unitno,*) 
+      write(unitno,*)
      . lstring//' [Pdf selection] )'
       endif
       if ((tag .eq. 'pdlabel') .or. (writeall)) then
@@ -444,11 +444,11 @@ c--- catch special scale choices for stop+b process
       if ((tag .eq. 'hwidth_ratio') .or. (writeall)) then
       write(unitno,fmt=f99) hwidth_ratio,'Gamma_H/Gamma_H(SM)'
       endif
-      
+
 
       if (writeall) then
       write(unitno,*)
-      write(unitno,*) 
+      write(unitno,*)
      . lstring//' [How to resume/save a run] )'
       endif
       if ((tag .eq. 'readin') .or. (writeall)) then
@@ -541,21 +541,21 @@ c--- catch special scale choices for stop+b process
       if ((tag .eq. 'bff') .or. (writeall)) then
       write(unitno,fmt=f99) bff,'bff'
       endif
-      
+
       if (writeall) then
       write(unitno,*)
       endif
-      
+
       return
 
-c--- 96 character format      
-c   96 format(' (',a20,12x,'[',a,']',' )')  
-c--- 97 integer format      
-c   97 format(' (',i20,12x,'[',a,']',' )')  
-c--- 98 logical format      
-c   98 format(' (',L20,12x,'[',a,']',' )')  
+c--- 96 character format
+c   96 format(' (',a20,12x,'[',a,']',' )')
+c--- 97 integer format
+c   97 format(' (',i20,12x,'[',a,']',' )')
+c--- 98 logical format
+c   98 format(' (',L20,12x,'[',a,']',' )')
 c--- 99 floating point format
-c   99 format(' (',f20.4,12x,'[',a,']',' )')  
-      
+c   99 format(' (',f20.4,12x,'[',a,']',' )')
+
       end
-      
+

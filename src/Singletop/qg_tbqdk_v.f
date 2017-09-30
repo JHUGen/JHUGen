@@ -2,7 +2,7 @@
 ************************************************************************
 *     Virtual t-channel single top, with explicit b-quark              *
 *                                                                      *
-*     q(p1) + g(p2) -> t(p3) + b(p4) + q'(p5)                          *      
+*     q(p1) + g(p2) -> t(p3) + b(p4) + q'(p5)                          *
 *                                                                      *
 *     Originally: R. Frederix and F. Tramontano, February 2008         *
 *        Adapted: J. Campbell, February 27, 2008                       *
@@ -24,7 +24,7 @@ c--- needed for pole check
 c     . ,xs,xsn,xsd
       double precision msq(-nf:nf,-nf:nf),msq_qg,msq_gq,msq_qbarg,
      . msq_gqbar,dot,Wprop15,Wprop25,xsqV,xsqR,mq,ma,gsq_H
-      double complex 
+      double complex
      . LOamps_qg(2,2),Virtamps_qg(2,2),
      . LOamps_qbarg(2,2),Virtamps_qbarg(2,2),
      . LOamps_gq(2,2),Virtamps_gq(2,2),
@@ -44,7 +44,7 @@ c---initialize
       enddo
       enddo
 
-c--- DEBUG: to check alpha-dependence      
+c--- DEBUG: to check alpha-dependence
 c      return
 
 c--- set mass of quark and antiquark according to nwz
@@ -143,7 +143,7 @@ c---  momenta to be permuted according to i1,i2,i5
 c--- factors of ason2pi now included in this routine
       ason2pi_H=as_H/twopi
       ason2pi_L=as_L/twopi
-            
+
       do j=1,4
         q(1,j)=p(i1,j)
         q(2,j)=p(i2,j) ! eta
@@ -153,7 +153,7 @@ c--- factors of ason2pi now included in this routine
         q(5,j)=p(i5,j)
         q(6,j)=p(i4,j) ! e
       enddo
-      
+
 c--- set up spinor products
       call spinoru(6,q,za,zb)
 
@@ -164,7 +164,7 @@ c--- set up spinor products
       ren=(-b0*epinv
      .     -cf*(3d0/2d0*epinv + (4d0+1d0-eta)/2d0 + 3d0*log(scale/mh))
      .     -cf*(1d0/2d0*epinv +
-     .             sck*(epinv + (4d0+1d0-eta)/2d0 + 3d0*log(scale/ml)))) 
+     .             sck*(epinv + (4d0+1d0-eta)/2d0 + 3d0*log(scale/ml))))
 
 c--- include finite counterterm to go from DR to MSbar scheme
 c--- alphas(DR) = alphas(MSbar) * (1+ (Nc / 6) * alphas(MSbar) / (2*pi))
@@ -202,7 +202,7 @@ c---- calling amps(hg,hc,hs)
       call Bamp_mpm(q,mh,ml,Bmpm)
       call Bamp_mmp(q,mh,ml,Bmmp)
       call Bamp_mmm(q,mh,ml,Bmmm)
- 
+
       xl15=lnrat(-2d0*dot(p,i1,i5),renscale_L**2)
 c--- correction to the massless line (cf. cv0 in qqb_tbb_v.f)
       virt_massless=-2d0*epinv*(epinv-dble(xl15))-dble(xl15**2)
@@ -214,7 +214,7 @@ c--- apply factors of ason2pi now
       colB=colB*ason2pi_H    ! corrections on heavy line
       virt_massless=virt_massless*ason2pi_L ! on light line
       ren=ren*ason2pi_H ! renormalization is like LO
- 
+
       Virtamps(2,2,2)=Appp*colA+Bppp*colB
      .               +(ren+virt_massless)*LOamps(2,2,2)
       Virtamps(2,2,1)=Appm*colA+Bppm*colB
@@ -236,12 +236,12 @@ c--- apply factors of ason2pi now
      &    -(p(3,1)+p(4,1)+p(5,1))**2
      &    -(p(3,2)+p(4,2)+p(5,2))**2
      &    -(p(3,3)+p(4,3)+p(5,3))**2
-     
+
 c--- now dress up with appropriate factors to include the top quark decay
       fac=gwsq*dsqrt(2d0*dot(p,i3,5))
      &    /dsqrt((2d0*dot(p,3,4)-wmass**2)**2+(wmass*wwidth)**2)
      &    /dsqrt((s345-mt**2)**2+(mt*twidth)**2)
-     
+
       do hg=1,2
       do hs=1,2
       if     (nwz .eq. +1) then
@@ -264,7 +264,7 @@ c--- now dress up with appropriate factors to include the top quark decay
       endif
       enddo
       enddo
-      
+
       return
 
 
@@ -335,7 +335,7 @@ c     .  (ml*(-1d0 + xs**2))/mh)
 
 c      pause
 c      return
-      
+
       end
-      
-      
+
+

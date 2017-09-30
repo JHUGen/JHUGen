@@ -57,7 +57,7 @@ c--- (g,g)
       Q1(a,g,g,is)=Q1(q,g,g,is)
       Q2(q,g,g,is)=Q1(q,g,g,is)
       Q2(a,g,g,is)=Q1(q,g,g,is)
-      
+
       enddo
 c      endif
 
@@ -74,6 +74,6 @@ c      if (Qflag) then
 
       enddo
 c      endif
-      
+
       return
       end

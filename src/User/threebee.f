@@ -3,8 +3,8 @@
       include 'constants.f'
       include 'jetlabel.f'
       integer i,nbq
-      
-c--- note: this function returns true if there are three or more 
+
+c--- note: this function returns true if there are three or more
 c--- b-jets in the event
 
       nbq=0
@@ -14,4 +14,4 @@ c--- b-jets in the event
       threebee=(nbq .ge. 3)
       return
       end
-       
+

@@ -13,7 +13,7 @@ c                           |    --> e^-(p3)+nubar(p4)
 c                           |
 c                           ---> W^+(nu(p5),e^+(p6))W^-(e^-(p7),nub(p8))
 c   for the moment --- radiation only from initial line
-      implicit none 
+      implicit none
       include 'constants.f'
       include 'ckm.f'
       include 'sprods_com.f'
@@ -70,12 +70,12 @@ c      write(6,*) 'gqWHq',gqWHq
       enddo
       enddo
       return
-      
+
       end
 
 
       double precision function radi_ww(j1,j2,j3,j4,j5,j6,j7,j8,j9)
-      implicit none 
+      implicit none
       include 'constants.f'
       include 'qcdcouple.f'
       include 'ewcouple.f'
@@ -94,7 +94,7 @@ c---calculate the 2 W propagators
       prop=       ((s123-wmass**2)**2+(wmass*wwidth)**2)
       prop=prop*((s(j8,j9)-wmass**2)**2+(wmass*wwidth)**2)
       prop=prop*((s4567-hmass**2)**2+(hmass*hwidth)**2)
-      
+
       fac=2d0*cf*xn*gsq*gwsq**3*wmass**2/prop
 
 C---old

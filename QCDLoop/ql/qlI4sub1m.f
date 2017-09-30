@@ -39,7 +39,7 @@ C Calculates the general box with qlzero masses
       enddo
 
       do j=1,Npt
-      xpi(j)=xpiout(j) 
+      xpi(j)=xpiout(j)
       enddo
 
       call qlYcalc(xpiout,Y,Yalt)

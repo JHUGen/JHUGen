@@ -43,7 +43,7 @@ C----set all elements to zero
       call schantoponshellv(1,2,p,m12,m12v)
       call schantoponshellv(2,1,p,m21,m21v)
       call tdecay(p,3,4,5,mtop)
-      
+
       do hb=1,2
       do hc=1,2
       mtot12(hb,hc)=czip
@@ -64,7 +64,7 @@ C----set all elements to zero
       call schanatoponshellv(1,2,p,m12,m12v)
       call schanatoponshellv(2,1,p,m21,m21v)
       call adecay(p,3,4,5,manti)
-      
+
       do hb=1,2
       do hc=1,2
       mtot12(hb,hc)=czip
@@ -84,9 +84,9 @@ C----set all elements to zero
 
       prop=dcmplx(zip,mt*twidth)
       fac=xn**2*aveqq*gw**8/abs(prop)**2
-C  Factor of two for interference effectively included by multiplying only 
+C  Factor of two for interference effectively included by multiplying only
 C  by ason2pi
-      facho=fac*ason2pi*cf      
+      facho=fac*ason2pi*cf
       qqb=0d0
       qbq=0d0
       do hb=1,2
@@ -101,9 +101,9 @@ C  by ason2pi
       do k=-nf,nf
       msqv(j,k)=0d0
       if     ((j .gt. 0) .and. (k .lt. 0)) then
-      msqv(j,k)=Vsq(j,k)*qqb 
+      msqv(j,k)=Vsq(j,k)*qqb
       elseif ((j .lt. 0) .and. (k .gt. 0)) then
-      msqv(j,k)=Vsq(j,k)*qbq 
+      msqv(j,k)=Vsq(j,k)*qbq
       endif
       enddo
       enddo

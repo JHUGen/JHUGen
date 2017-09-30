@@ -2,7 +2,7 @@
       implicit none
 C     Taken from Kauffman,Desai,Risal
 C     PRD 55 1997 (4009)
-C     and checked with hep-ph/9903330 
+C     and checked with hep-ph/9903330
       include 'constants.f'
       include 'zprods_com.f'
       include 'sprods_com.f'
@@ -41,14 +41,14 @@ C--Eq 27
       bappm(p1,p2,p3,p4)=
      . -zb(p1,p3)**2*zb(p2,p3)/(zb(p1,p2)*zb(p2,p4)*zb(p3,p4))
      . +za(p1,p4)*za(p2,p4)**2/(za(p1,p2)*za(p1,p3)*za(p3,p4))
-      
+
 c      bammp(p1,p2,p3,p4)=
 c     . -za(p1,p3)**2*za(p2,p3)/(za(p1,p2)*za(p2,p4)*za(p3,p4))
 c     . +zb(p1,p4)*zb(p2,p4)**2/(zb(p1,p2)*zb(p1,p3)*zb(p3,p4))
 C====end statement functions
-      
+
 C====It has been checked that taking the complex conjugate
-C====only gets the answer different by an overall (and hence irrelevant) 
+C====only gets the answer different by an overall (and hence irrelevant)
 C====phase (in some crossings).
 
 
@@ -126,7 +126,7 @@ c--- in the ordering of the two gluons
 C         write(*,*) 'j1,j2,j3',j1,j2,j3
 C         write(*,*) cf*xn**2/2d0*cdabs(ab(j1,j2,j3))**2,
 C     .      cf*xn**2/2d0*cdabs(ba(j1,j2,j3))**2,
-C     .        -cf/2d0*cdabs(ab(j1,j2,j3)+ba(j1,j2,j3))**2 
+C     .        -cf/2d0*cdabs(ab(j1,j2,j3)+ba(j1,j2,j3))**2
       ampsq_ab=ampsq_ab
      .  +cf*xn**2/2d0*cdabs(ab(j1,j2,j3))**2
       ampsq_ba=ampsq_ba

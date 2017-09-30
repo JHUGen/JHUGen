@@ -7,7 +7,7 @@
       double precision virtgg,virtqa,virtaq,virtqg,virtgq,
      . logg,loqa,loaq,loqg,logq,ddilog,Li2s,Li2t,Li2u,
      . lnm,lns,lnt,lnu,ln2t,ln2u,mhsq,s,t,u,xlf,subuv,Delta
-      
+
       mhsq=s+t+u
 
       xlf=dfloat(nf)
@@ -27,15 +27,15 @@
       logq=-xn*cf/u*(s**2+t**2)
       loqg=-xn*cf/t*(s**2+u**2)
 
-c--- UV counterterm in MS bar scheme. 
+c--- UV counterterm in MS bar scheme.
       subuv=-epinv*b0
       Delta=11d0
 c--- See C.R.Schmidt, PLB (413) 391, eq. (16),(17)
 c--- Factor of ason2pi included in gg_hg_v.f
-C--- Three powers of as in Born --> 3      
+C--- Three powers of as in Born --> 3
       subuv=3d0*subuv+Delta
-  
-      virtgg=-3d0*epinv**2*xn*logg 
+
+      virtgg=-3d0*epinv**2*xn*logg
      . +epinv*xn*logg*(lns+lnt+lnu-3d0*lnm )
      . +xn*logg
      . *(2d0*(Li2t+Li2u+Li2s)
@@ -44,7 +44,7 @@ C--- Three powers of as in Born --> 3
      . +2d0*(lnu*ln2u+lnt*ln2t)+4d0/3d0*pisq)
      . +V*xn*(xn-xlf)/3d0*mhsq*(1d0+mhsq/s+mhsq/t+mhsq/u)
      . +subuv*logg
- 
+
       virtqa=+(-2d0*xn+1d0/xn)*loqa*epinv**2
      . -2d0/3d0*xlf*epinv*loqa
      . +epinv*xn*loqa*(13d0/6d0-2d0*lnm+lnt+lnu)
@@ -74,7 +74,7 @@ C--- Three powers of as in Born --> 3
      . -4d0/3d0*pi**2/xn*loaq
      . -0.25d0*(xn**3-1d0/xn)*(u+t)
      . +subuv*loaq
- 
+
 
       virtgq=(-2d0*xn+1d0/xn)*epinv**2*logq
      . -2d0/3d0*xlf*epinv*logq

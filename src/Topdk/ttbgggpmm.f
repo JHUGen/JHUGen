@@ -29,7 +29,7 @@
      &    za(i2,i7)*zb(i1,i4) + 1/(za(i1,i5))/(zb(i1,i2))/(zb(i2,i3))*
      &    za(i5,i3)*za(i7,i3)*zb(i1,i3)*zb(i1,i4) + 1/(za(i1,i5))/(zb(
      &    i1,i3))/(zb(i2,i3))*za(i2,i5)*za(i2,i7)*zb(i1,i2)*zb(i1,i4)
-     &     - 1/(za(i1,i5))/(zb(i2,i3))*za(i2,i5)*za(i7,i3)*zb(i1,i4) - 
+     &     - 1/(za(i1,i5))/(zb(i2,i3))*za(i2,i5)*za(i7,i3)*zb(i1,i4) -
      &    1/(za(i1,i5))/(zb(i2,i3))*za(i2,i7)*za(i5,i3)*zb(i1,i4) )
       ttbgggpmm = ttbgggpmm + mtsq*s1345**(-1)*s6789**(-1) * (  - 1/(
      &    za(i1,i5))/(zb(i1,i2))*za(i2,i3)*za(i4,i5)*za(i7,i3)*zb(i1,i4

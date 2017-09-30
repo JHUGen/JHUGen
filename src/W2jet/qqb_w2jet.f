@@ -26,7 +26,7 @@ c--- all momenta are incoming
       double precision qqbWgg2_cs(0:2),qbqWgg2_cs(0:2),qgWqg2_cs(0:2),
      .                 qbgWqbg2_cs(0:2),gqbWqbg2_cs(0:2),
      .                 gqWqg2_cs(0:2),ggWqbq2_cs(0:2)
-      double precision 
+      double precision
      . qqb_ijkk(0:2),qqb_ijii(0:2),qqb_ijjj(0:2),qqb_ijkj(0:2),
      . qqb_ijik(0:2),qqb_ijkl(0:2),qqb_iiij(0:2),qqb_iiji(0:2),
      . qbq_ijkk(0:2),qbq_ijii(0:2),qbq_ijjj(0:2),qbq_ijkj(0:2),
@@ -81,7 +81,7 @@ c--- the actual value of colourchoice
       if ((part .eq. 'real') .or. (part .eq. 'virt')) then
         rcolourchoice=colourchoice
         colourchoice=0
-      endif     
+      endif
 
 c--- initialize matrix elements
       do j=-nf,nf
@@ -95,7 +95,7 @@ c--- set up spinors
       prop=s(3,4)**2/((s(3,4)-wmass**2)**2+wmass**2*wwidth**2)
       facqq=4d0*V*gsq**2*(gwsq/2d0)**2*aveqq*prop
       facgg=V*xn/four*(gwsq/2d0)**2*gsq**2*prop
-      
+
 
 c--- calculate 2-quark, 2-gluon amplitudes
       if (Gflag) then
@@ -112,8 +112,8 @@ c--- calculate 2-quark, 2-gluon amplitudes
         call w2jetsq(5,2,3,4,1,6,za,zb,gqbWqbg2)
         call storecs(gqbWqbg2_cs)
         call w2jetsq(5,6,3,4,1,2,za,zb,ggWqbq2)
-        call storecs(ggWqbq2_cs)        
-        do i=0,2        
+        call storecs(ggWqbq2_cs)
+        do i=0,2
           qqbWgg2_cs(i) = half*aveqq*facgg*qqbWgg2_cs(i)
           qbqWgg2_cs(i) = half*aveqq*facgg*qbqWgg2_cs(i)
           gqWqg2_cs(i)  = aveqg*facgg*gqWqg2_cs(i)
@@ -122,49 +122,49 @@ c--- calculate 2-quark, 2-gluon amplitudes
           qbgWqbg2_cs(i)= aveqg*facgg*qbgWqbg2_cs(i)
           ggWqbq2_cs(i) = avegg*facgg*ggWqbq2_cs(i)
         enddo
-        qqbWgg2 = qqbWgg2_cs(1) +qqbWgg2_cs(2) +qqbWgg2_cs(0) 
-        qbqWgg2 = qbqWgg2_cs(1) +qbqWgg2_cs(2) +qbqWgg2_cs(0) 
-        gqWqg2  = gqWqg2_cs(1)  +gqWqg2_cs(2)  +gqWqg2_cs(0)  
-        qgWqg2  = qgWqg2_cs(1)  +qgWqg2_cs(2)  +qgWqg2_cs(0)  
+        qqbWgg2 = qqbWgg2_cs(1) +qqbWgg2_cs(2) +qqbWgg2_cs(0)
+        qbqWgg2 = qbqWgg2_cs(1) +qbqWgg2_cs(2) +qbqWgg2_cs(0)
+        gqWqg2  = gqWqg2_cs(1)  +gqWqg2_cs(2)  +gqWqg2_cs(0)
+        qgWqg2  = qgWqg2_cs(1)  +qgWqg2_cs(2)  +qgWqg2_cs(0)
         gqbWqbg2= gqbWqbg2_cs(1)+gqbWqbg2_cs(2)+gqbWqbg2_cs(0)
         qbgWqbg2= qbgWqbg2_cs(1)+qbgWqbg2_cs(2)+qbgWqbg2_cs(0)
-        ggWqbq2 = ggWqbq2_cs(1) +ggWqbq2_cs(2) +ggWqbq2_cs(0) 
+        ggWqbq2 = ggWqbq2_cs(1) +ggWqbq2_cs(2) +ggWqbq2_cs(0)
       endif
 
 c--- calculate four-quark amplitudes
       if (Qflag) then
 c--- basic amplitudes - q qb --> W + g* (--> q qb) (amps 1 and 3)
-c---                and q qb --> g* --> q (--> W q) qb (amps 2 and 4)           
-        call amp_q_QbQ_qb(1,2,5,6,qqb1(1),qqb2(1),qqb3(1),qqb4(1))         
+c---                and q qb --> g* --> q (--> W q) qb (amps 2 and 4)
+        call amp_q_QbQ_qb(1,2,5,6,qqb1(1),qqb2(1),qqb3(1),qqb4(1))
 c--- crossed - q qb --> q qb ( --> W qb)
-        call amp_q_QbQ_qb(1,5,2,6,qqb1(2),qqb2(2),qqb3(2),qqb4(2))         
-c--- crossed - q qb --> q ( --> W q) qb 
-        call amp_q_QbQ_qb(6,2,5,1,qqb1(3),qqb2(3),qqb3(3),qqb4(3))   
+        call amp_q_QbQ_qb(1,5,2,6,qqb1(2),qqb2(2),qqb3(2),qqb4(2))
+c--- crossed - q qb --> q ( --> W q) qb
+        call amp_q_QbQ_qb(6,2,5,1,qqb1(3),qqb2(3),qqb3(3),qqb4(3))
 
 c--- now the qb q amplitudes
-        call amp_q_QbQ_qb(2,1,5,6,qbq1(1),qbq2(1),qbq3(1),qbq4(1))         
+        call amp_q_QbQ_qb(2,1,5,6,qbq1(1),qbq2(1),qbq3(1),qbq4(1))
 c--- crossed - qb q --> qb q ( --> W q)
-        call amp_q_QbQ_qb(2,5,1,6,qbq1(2),qbq2(2),qbq3(2),qbq4(2))         
-c--- crossed - qb q --> qb ( --> W qb) q 
-        call amp_q_QbQ_qb(6,1,5,2,qbq1(3),qbq2(3),qbq3(3),qbq4(3))   
+        call amp_q_QbQ_qb(2,5,1,6,qbq1(2),qbq2(2),qbq3(2),qbq4(2))
+c--- crossed - qb q --> qb ( --> W qb) q
+        call amp_q_QbQ_qb(6,1,5,2,qbq1(3),qbq2(3),qbq3(3),qbq4(3))
 
 c--- crossed q q --> q ( --> W q) q
-        call amp_q_QbQ_qb(1,5,6,2,qq1(1),qq2(1),qq3(1),qq4(1))   
+        call amp_q_QbQ_qb(1,5,6,2,qq1(1),qq2(1),qq3(1),qq4(1))
 c--- crossed q q --> q q ( --> W q)
-        call amp_q_QbQ_qb(2,5,6,1,qq1(2),qq2(2),qq3(2),qq4(2))   
+        call amp_q_QbQ_qb(2,5,6,1,qq1(2),qq2(2),qq3(2),qq4(2))
 c--- crossed q q --> q q ( --> W q)
-        call amp_q_QbQ_qb(2,6,5,1,qq1(3),qq2(3),qq3(3),qq4(3))   
+        call amp_q_QbQ_qb(2,6,5,1,qq1(3),qq2(3),qq3(3),qq4(3))
 c--- crossed q q --> q ( --> W q) q
-        call amp_q_QbQ_qb(1,6,5,2,qq1(4),qq2(4),qq3(4),qq4(4))   
+        call amp_q_QbQ_qb(1,6,5,2,qq1(4),qq2(4),qq3(4),qq4(4))
 
 c--- crossed qb qb --> qb ( --> W qb) qb
-        call amp_q_QbQ_qb(5,1,2,6,qbqb1(1),qbqb2(1),qbqb3(1),qbqb4(1))   
+        call amp_q_QbQ_qb(5,1,2,6,qbqb1(1),qbqb2(1),qbqb3(1),qbqb4(1))
 c--- crossed qb qb --> qb qb ( --> W qb)
-        call amp_q_QbQ_qb(5,2,1,6,qbqb1(2),qbqb2(2),qbqb3(2),qbqb4(2))   
+        call amp_q_QbQ_qb(5,2,1,6,qbqb1(2),qbqb2(2),qbqb3(2),qbqb4(2))
 c--- crossed qb qb --> qb ( --> W qb) qb
-        call amp_q_QbQ_qb(6,2,1,5,qbqb1(3),qbqb2(3),qbqb3(3),qbqb4(3))   
+        call amp_q_QbQ_qb(6,2,1,5,qbqb1(3),qbqb2(3),qbqb3(3),qbqb4(3))
 c--- crossed qb qb --> qb qb ( --> W qb)
-        call amp_q_QbQ_qb(6,1,2,5,qbqb1(4),qbqb2(4),qbqb3(4),qbqb4(4))   
+        call amp_q_QbQ_qb(6,1,2,5,qbqb1(4),qbqb2(4),qbqb3(4),qbqb4(4))
 
 c--- now square these amplitudes separating into color structures
 c   1) Amplitude
@@ -172,11 +172,11 @@ c   2) Amplitude with (5<-->6)
 c   0) Interference between above
 c
 c--- q(i) qb(j) --> W + g* (--> q(k) qb(k)) with k != i,j
-        qqb_ijkk(1)=abs(qqb1(1))**2+abs(qqb3(1))**2 
+        qqb_ijkk(1)=abs(qqb1(1))**2+abs(qqb3(1))**2
         qqb_ijkk(2)=zip
         qqb_ijkk(0)=zip
 
-        qbq_ijkk(1)=abs(qbq1(1))**2+abs(qbq3(1))**2 
+        qbq_ijkk(1)=abs(qbq1(1))**2+abs(qbq3(1))**2
         qbq_ijkk(2)=zip
         qbq_ijkk(0)=zip
 c--- q(i) qb(j) --> W + g* (--> q(i) qb(i)) i.e. k = i
@@ -197,18 +197,18 @@ c--- q(i) qb(j) --> W + g* (--> q(j) qb(j)) i.e. k = j
         qbq_ijjj(0)=2d0/xn*dble(qbq1(1)*Dconjg(qbq2(3)))
 c--- q (i) qb(j) --> q(i) qb(j) ( --> W qb(k)) with k != i,j
         qqb_ijik(1)=zip
-        qqb_ijik(2)=abs(qqb2(2))**2+abs(qqb4(2))**2 
+        qqb_ijik(2)=abs(qqb2(2))**2+abs(qqb4(2))**2
         qqb_ijik(0)=zip
 
-        qbq_ijik(2)=abs(qbq2(2))**2+abs(qbq4(2))**2 
+        qbq_ijik(2)=abs(qbq2(2))**2+abs(qbq4(2))**2
         qbq_ijik(1)=zip
         qbq_ijik(0)=zip
 c--- q (i) qb(j) --> q(i) ( --> W q(k)) qb(j) with k != i,j
         qqb_ijkj(1)=zip
-        qqb_ijkj(2)=abs(qqb2(3))**2+abs(qqb4(3))**2 
+        qqb_ijkj(2)=abs(qqb2(3))**2+abs(qqb4(3))**2
         qqb_ijkj(0)=zip
 
-        qbq_ijkj(2)=abs(qbq2(3))**2+abs(qbq4(3))**2 
+        qbq_ijkj(2)=abs(qbq2(3))**2+abs(qbq4(3))**2
         qbq_ijkj(1)=zip
         qbq_ijkj(0)=zip
 c--- q(i) qb(j) --> g* --> q(l) (--> W q(k)) qb(l)
@@ -220,22 +220,22 @@ c--- q(i) qb(j) --> g* --> q(l) (--> W q(k)) qb(l)
         qbq_ijkl(2)=zip
         qbq_ijkl(0)=zip
 c--- q(i) qb(i) --> g* --> q(j) (--> W q(i)) qb(j)
-        qqb_iiij(1)=abs(qqb2(1))**2+abs(qqb4(1))**2            
-        qqb_iiij(2)=abs(qqb1(3))**2+abs(qqb3(3))**2 
-        qqb_iiij(0)=2d0/xn*dble(qqb2(1)*Dconjg(qqb1(3)))          
+        qqb_iiij(1)=abs(qqb2(1))**2+abs(qqb4(1))**2
+        qqb_iiij(2)=abs(qqb1(3))**2+abs(qqb3(3))**2
+        qqb_iiij(0)=2d0/xn*dble(qqb2(1)*Dconjg(qqb1(3)))
 
-        qbq_iiij(1)=abs(qbq2(1))**2+abs(qbq4(1))**2            
-        qbq_iiij(2)=abs(qbq1(3))**2+abs(qbq3(3))**2 
-        qbq_iiij(0)=2d0/xn*dble(qbq2(1)*Dconjg(qbq1(3)))  
+        qbq_iiij(1)=abs(qbq2(1))**2+abs(qbq4(1))**2
+        qbq_iiij(2)=abs(qbq1(3))**2+abs(qbq3(3))**2
+        qbq_iiij(0)=2d0/xn*dble(qbq2(1)*Dconjg(qbq1(3)))
 c--- q(i) qb(i) --> g* --> q(j) qb(j) (--> W qb(i))
-        qqb_iiji(1)=abs(qqb2(1))**2+abs(qqb4(1))**2            
-        qqb_iiji(2)=abs(qqb1(2))**2+abs(qqb3(2))**2 
-        qqb_iiji(0)=2d0/xn*dble(qqb2(1)*Dconjg(qqb1(2))) 
+        qqb_iiji(1)=abs(qqb2(1))**2+abs(qqb4(1))**2
+        qqb_iiji(2)=abs(qqb1(2))**2+abs(qqb3(2))**2
+        qqb_iiji(0)=2d0/xn*dble(qqb2(1)*Dconjg(qqb1(2)))
 
-        qbq_iiji(1)=abs(qbq2(1))**2+abs(qbq4(1))**2            
-        qbq_iiji(2)=abs(qbq1(2))**2+abs(qbq3(2))**2 
-        qbq_iiji(0)=2d0/xn*dble(qbq2(1)*Dconjg(qbq1(2)))  
-     
+        qbq_iiji(1)=abs(qbq2(1))**2+abs(qbq4(1))**2
+        qbq_iiji(2)=abs(qbq1(2))**2+abs(qbq3(2))**2
+        qbq_iiji(0)=2d0/xn*dble(qbq2(1)*Dconjg(qbq1(2)))
+
 c--- q(i) q(i) --> q(i) ( --> W q(j) ) q(i)
         qq_iiji(1)=abs(qq1(1))**2+abs(qq3(1))**2
         qq_iiji(2)=abs(qq1(2))**2+abs(qq3(2))**2
@@ -251,11 +251,11 @@ c--- q(i) q(j) --> q(i) q(j) ( --> W q(k) )
 c--- q(i) q(j) --> q(i) ( --> W q(j) ) q(j)
         qq_ijjj(1)=abs(qq1(1))**2+abs(qq3(1))**2
         qq_ijjj(2)=abs(qq1(4))**2+abs(qq3(4))**2
-        qq_ijjj(0)=2d0/xn*dble(qq1(1)*Dconjg(qq1(4)))  
-c--- q(i) q(j) --> q(i) q(j) ( --> W q(i) ) 
+        qq_ijjj(0)=2d0/xn*dble(qq1(1)*Dconjg(qq1(4)))
+c--- q(i) q(j) --> q(i) q(j) ( --> W q(i) )
         qq_ijii(1)=abs(qq1(3))**2+abs(qq3(3))**2
         qq_ijii(2)=abs(qq1(2))**2+abs(qq3(2))**2
-        qq_ijii(0)=2d0/xn*dble(qq1(3)*Dconjg(qq1(2)))  
+        qq_ijii(0)=2d0/xn*dble(qq1(3)*Dconjg(qq1(2)))
 
 c--- qb(i) qb(i) --> qb(i) ( --> W qb(j) ) qb(i)
         qbqb_iiji(1)=abs(qbqb1(1))**2+abs(qbqb3(1))**2
@@ -272,17 +272,17 @@ c--- qb(i) qb(j) --> qb(i) qb(j) ( --> W qb(k) )
 c--- qb(i) qb(j) --> qb(i) ( --> W qb(j) ) qb(j)
         qbqb_ijjj(1)=abs(qbqb1(1))**2+abs(qbqb3(1))**2
         qbqb_ijjj(2)=abs(qbqb1(4))**2+abs(qbqb3(4))**2
-        qbqb_ijjj(0)=2d0/xn*dble(qbqb1(1)*Dconjg(qbqb1(4)))  
-c--- qb(i) qb(j) --> qb(i) qb(j) ( --> W qb(i) ) 
+        qbqb_ijjj(0)=2d0/xn*dble(qbqb1(1)*Dconjg(qbqb1(4)))
+c--- qb(i) qb(j) --> qb(i) qb(j) ( --> W qb(i) )
         qbqb_ijii(2)=abs(qbqb1(2))**2+abs(qbqb3(2))**2
         qbqb_ijii(1)=abs(qbqb1(3))**2+abs(qbqb3(3))**2
-        qbqb_ijii(0)=2d0/xn*dble(qbqb1(2)*Dconjg(qbqb1(3)))  
+        qbqb_ijii(0)=2d0/xn*dble(qbqb1(2)*Dconjg(qbqb1(3)))
       endif
 
-      
-c--- 4-quark contribution to matrix elements      
+
+c--- 4-quark contribution to matrix elements
       if (Qflag) then
-      
+
       do j=-nf,nf
       do k=-nf,nf
       mqq(0,j,k)=0d0
@@ -399,12 +399,12 @@ c--- QBAR QBAR - same flavours
       msq(j,k)=mqq(0,j,k)+mqq(1,j,k)+mqq(2,j,k)
       enddo
       enddo
-      
+
       endif
-      
-c--- 2-quark, 2-gluon contribution to matrix elements      
+
+c--- 2-quark, 2-gluon contribution to matrix elements
       if (Gflag) then
-      
+
       do j=-nf,nf
       do k=-nf,nf
 
@@ -462,10 +462,10 @@ c--- 2-quark, 2-gluon contribution to matrix elements
             msq_cs(i,j,k)=Vfac*ggWqbq2_cs(i)
           enddo
       endif
-      
+
       enddo
       enddo
-      
+
       endif
 
 c--- restore proper colourchoice if necessary
@@ -475,8 +475,8 @@ c--- restore proper colourchoice if necessary
 
       return
       end
-     
-      subroutine amp_q_QbQ_qb(i1,i2,i5,i6,amp1,amp2,amp3,amp4) 
+
+      subroutine amp_q_QbQ_qb(i1,i2,i5,i6,amp1,amp2,amp3,amp4)
       implicit none
       integer i1,i2,i5,i6
       double complex aqqb_zbb_new,amp1,amp2,amp3,amp4
@@ -490,14 +490,14 @@ c--- where the W couples to both quark lines
 c--- quark i5 is left-handed
       amp1=+aqqb_zbb_new(i1,i6,i5,i2,3,4)
       amp2=-Dconjg(aqqb_zbb_new(i5,i2,i1,i6,4,3))
-      
+
 c--- quark i5 is right-handed
       amp3=-aqqb_zbb_new(i1,i5,i6,i2,3,4)
-      amp4=-Dconjg(aqqb_zbb_new(i5,i1,i2,i6,4,3))     
+      amp4=-Dconjg(aqqb_zbb_new(i5,i1,i2,i6,4,3))
 
       return
       end
-      
+
       subroutine storecs(mcs)
 c-- this routine transfers the information on the colour structure
 c-- for the W2jet matrix elements into separate arrays for each
@@ -506,12 +506,12 @@ c-- incoming parton case
       include 'mmsq_cs.f'
       integer i
       double precision mcs(0:2)
-      
+
       do i=0,2
         mcs(i)=mmsq_cs(i,+1,+1)
       enddo
-      
+
       return
       end
-      
-     
+
+

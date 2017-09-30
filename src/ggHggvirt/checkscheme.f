@@ -27,9 +27,9 @@ c--- dimensional reduction scheme
       deltar=0d0
       call Ampvirt_gggg(j1,j2,j3,j4,AvirtDR)
       renDR=H4prenorm()
-          
+
 c--- 't Hooft-Veltman scheme
-      scheme='tH-V'     
+      scheme='tH-V'
       deltar=1d0
       call Ampvirt_gggg(j1,j2,j3,j4,AvirtHV)
       renHV=H4prenorm()
@@ -59,9 +59,9 @@ c--- dimensional reduction scheme
       deltar=0d0
       call Ampvirt_AQgg(j1,j2,j3,j4,A41abDR,A41baDR,A43abDR,A43baDR)
       renDR=H4prenorm()
-          
+
 c--- 't Hooft-Veltman scheme
-      scheme='tH-V'     
+      scheme='tH-V'
       deltar=1d0
       call Ampvirt_AQgg(j1,j2,j3,j4,A41abHV,A41baHV,A43abHV,A43baHV)
       renHV=H4prenorm()
@@ -98,9 +98,9 @@ c--- dimensional reduction scheme
       ampvqarbDR(1,2) =A41Hqarbmppm(j1,j2,j3,j4,za,zb)
       ampvqarbDR(1,1) =A41Hqarbmpmp(j1,j2,j3,j4,za,zb)
       renDR=H4prenorm()
-          
+
 c--- 't Hooft-Veltman scheme
-      scheme='tH-V'     
+      scheme='tH-V'
       deltar=1d0
       ampvqarbHV(1,2) =A41Hqarbmppm(j1,j2,j3,j4,za,zb)
       ampvqarbHV(1,1) =A41Hqarbmpmp(j1,j2,j3,j4,za,zb)
@@ -127,9 +127,9 @@ c--- dimensional reduction scheme
       ampvqaqaDR(1,2) =A42Hqarbmppm(j1,j2,j3,j4,za,zb)
       ampvqaqaDR(1,1) =A42Hqarbmpmp(j1,j2,j3,j4,za,zb)
       renDR=H4prenorm()
-          
+
 c--- 't Hooft-Veltman scheme
-      scheme='tH-V'     
+      scheme='tH-V'
       deltar=1d0
       ampvqaqaHV(1,2) =A42Hqarbmppm(j1,j2,j3,j4,za,zb)
       ampvqaqaHV(1,1) =A42Hqarbmpmp(j1,j2,j3,j4,za,zb)
@@ -156,7 +156,7 @@ c--- so that A42(EGZ)=A42(DS)+A41
 
 
 c      pause
-      
+
       return
       end
-      
+

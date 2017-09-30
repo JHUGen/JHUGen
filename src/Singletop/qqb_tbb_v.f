@@ -26,8 +26,8 @@ C-----Using our standard practice that virtuals are in units as/4/pi
 C-----and by multiplying only by ason2pi we effectively include the
 C-----factor of 2 for interference.
       fac=ason2pi*cf
-      fac=aveqq*xn**2*gw**8*fac 
-              
+      fac=aveqq*xn**2*gw**8*fac
+
       if     (nwz .eq. +1) then
         qqb=fac*virttop(1,6,3,4,5,2,za,zb)
         qbq=fac*virttop(2,6,3,4,5,1,za,zb)
@@ -44,9 +44,9 @@ c        qbq=fac*virtqqb(1,6,4,3,5,2)
       do k=-nf,nf
       msqv(j,k)=0d0
       if     ((j .gt. 0) .and. (k .lt. 0)) then
-      msqv(j,k)=Vsq(j,k)*qqb 
+      msqv(j,k)=Vsq(j,k)*qqb
       elseif ((j .lt. 0) .and. (k .gt. 0)) then
-      msqv(j,k)=Vsq(j,k)*qbq 
+      msqv(j,k)=Vsq(j,k)*qbq
       endif
       enddo
       enddo
@@ -124,11 +124,11 @@ C   G.~Altarelli, R.~K.~Ellis and G.~Martinelli,
 C   %``Large Perturbative Corrections To The Drell-Yan Process In QCD,''
 C   Nucl.\ Phys.\ B {\bf 157}, 461 (1979).
 C   %%CITATION = NUPHA,B157,461;%%
-C   Using Eqn(58) with normalization changed to 
-C   as/2/pi*cf*(4*pi)^ep/Gamma(1-ep) 
+C   Using Eqn(58) with normalization changed to
+C   as/2/pi*cf*(4*pi)^ep/Gamma(1-ep)
 C   Taking account that Gamma(1-ep)^2/Gamma(1-2*ep)=1-ep^2*pi^2/6
 C**********************************************************************
-      xl12=lnrat(-s12,musq) 
+      xl12=lnrat(-s12,musq)
 
 C-----2/22/2012
 c-----This appears to be the correction to the vertex in units of as/4/pi*cf
@@ -138,7 +138,7 @@ c-----despite the above comment
 
 
 
-C---- this routine has been constructed following closely 
+C---- this routine has been constructed following closely
 C---- the notation of
 C---- %\cite{Gottschalk:1980rv}
 C---- \bibitem{Gottschalk:1980rv}

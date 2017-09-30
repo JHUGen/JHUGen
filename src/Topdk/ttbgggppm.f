@@ -11,7 +11,7 @@
       s6789=s(i3,i6)+s(i3,i7)
       mtsq=mt**2
       ttbgggppm =  + s129**(-1) * (  - 1/(za(i1,i2))/(za(i1,i3))/(zb(i6
-     &    ,i3))*za(i2,i3)*za(i5,i3)*za(i6,i7)*zb(i2,i6)**2*zb(i4,i5) - 
+     &    ,i3))*za(i2,i3)*za(i5,i3)*za(i6,i7)*zb(i2,i6)**2*zb(i4,i5) -
      &    1/(za(i1,i2))/(za(i2,i3))/(zb(i6,i3))*za(i1,i3)*za(i5,i3)*za(
      &    i6,i7)*zb(i1,i6)**2*zb(i4,i5) - 2.D0/(za(i1,i2))/(zb(i6,i3))*
      &    za(i5,i3)*za(i6,i7)*zb(i1,i6)*zb(i2,i6)*zb(i4,i5) - 1/(za(i1,
@@ -25,7 +25,7 @@
      &    ,i3))/(zb(i6,i3))*za(i5,i3)**2*za(i6,i7)*zb(i1,i5)*zb(i2,i6)
      &    **2*zb(i4,i5) )
       ttbgggppm = ttbgggppm + mtsq*s129**(-1) * ( 1/(za(i1,i2))/(za(i1,
-     &    i3))/(zb(i6,i3))*za(i2,i3)*za(i7,i3)*zb(i2,i4)*zb(i2,i6) + 
+     &    i3))/(zb(i6,i3))*za(i2,i3)*za(i7,i3)*zb(i2,i4)*zb(i2,i6) +
      &    1/(za(i1,i2))/(za(i2,i3))/(zb(i6,i3))*za(i1,i3)*za(i7,i3)*zb(
      &    i1,i4)*zb(i1,i6) + 1/(za(i1,i2))/(zb(i6,i3))*za(i7,i3)*zb(i1,
      &    i4)*zb(i2,i6) + 1/(za(i1,i2))/(zb(i6,i3))*za(i7,i3)*zb(i1,i6)
@@ -51,7 +51,7 @@
      &    /(zb(i2,i3))/(zb(i6,i3))*za(i7,i3)*zb(i1,i2)*zb(i1,i4)*zb(i2,
      &    i6) )
       ttbgggppm = ttbgggppm + mtsq*s6789**(-1) * ( 1/(za(i1,i2))/(za(i1
-     &    ,i3))/(zb(i6,i3))*za(i5,i3)*za(i7,i3)*zb(i2,i6)*zb(i4,i5) + 
+     &    ,i3))/(zb(i6,i3))*za(i5,i3)*za(i7,i3)*zb(i2,i6)*zb(i4,i5) +
      &    1/(za(i1,i2))/(za(i1,i3))/(zb(i6,i3))*za(i7,i3)**2*zb(i2,i4)*
      &    zb(i6,i7) + 1/(za(i1,i2))/(za(i2,i3))/(zb(i6,i3))*za(i5,i3)*
      &    za(i7,i3)*zb(i1,i6)*zb(i4,i5) + 1/(za(i1,i2))/(za(i2,i3))/(

@@ -5,7 +5,7 @@ C----averaged over initial colours and spins
 C for nwz=+1
 c     u(-p1)+dbar(-p2)--> W^+(n(p3)+e^+(p4))   + g(p5)
 C For nwz=-1
-c     d(-p1)+ubar(-p2)--> W^-(e^-(p3)+nbar(p4))+ g(p5) 
+c     d(-p1)+ubar(-p2)--> W^-(e^-(p3)+nbar(p4))+ g(p5)
 c---
       include 'constants.f'
       include 'ckm.f'
@@ -15,7 +15,7 @@ c---
       integer j,k
       double precision msq(-nf:nf,-nf:nf),p(mxpart,4),fac
       double precision qqbWg,qbqWg,qgWq,qbgWqb,gqbWqb,gqWq,w1jet
-     
+
 
       do j=-nf,nf
       do k=-nf,nf
@@ -30,7 +30,7 @@ c---calculate the propagator
       qqbWg= +aveqq*fac*w1jet(1,2,3,4,5)
       gqbWqb=-aveqg*fac*w1jet(5,2,3,4,1)
       qgWq=  -aveqg*fac*w1jet(1,5,3,4,2)
-      
+
       qbqWg= +aveqq*fac*w1jet(2,1,3,4,5)
       qbgWqb=-aveqg*fac*w1jet(5,1,3,4,2)
       gqWq=  -aveqg*fac*w1jet(2,5,3,4,1)
@@ -59,9 +59,9 @@ c---calculate the propagator
       enddo
       return
       end
- 
+
       double precision function w1jet(j1,j2,j3,j4,j5)
-      implicit none 
+      implicit none
       include 'constants.f'
       include 'masses.f'
       include 'sprods_com.f'

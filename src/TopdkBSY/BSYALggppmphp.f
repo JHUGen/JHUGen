@@ -70,17 +70,17 @@ c---- SB see changes in BSYALggppmp.f
      &    )*zb(p3,p2)*zab(p3,q1,p2)*mt3 - 1/(zab(p2,q1,p2))/(zab(p2,q1,
      &    p3))*za(e4,e1)*zab(p2,q1,p2)**2*zab(p3,q1,p2)*mt + 1/(zab(p2,
      &    q1,p2))/(zab(p2,q1,p3))*za(e4,e1)*zab(p2,q1,p3)*zab(p3,q1,p2)
-     &    **2*mt - 2.D0/(zab(p2,q1,p3))*za(e4,e1)*zab(p3,q1,p2)*mt3 + 
+     &    **2*mt - 2.D0/(zab(p2,q1,p3))*za(e4,e1)*zab(p3,q1,p2)*mt3 +
      &    1/(zab(p2,q1,p3))/(zab(p2,q1,p3))/(za(p3,p2))*za(e1,p2)*za(e4
      &    ,p2)*zab(p2,q1,p2)*zab(p3,q1,p2)*s23*mt + 1/(zab(p2,q1,p3))/(
      &    zab(p2,q1,p3))/(za(p3,p2))*za(e1,p2)*za(e4,p2)*zab(p2,q1,p3)*
      &    zab(p3,q1,p2)**2*mt )
       tmp = tmp + I2h23 * (  - 12.D0/(za(p3,p2))*za(e1,
-     &    p2)*za(e4,p3)*zab(p3,q1,p2)**2*s23**(-3)*xbeta2**(-2)*mt3 - 
+     &    p2)*za(e4,p3)*zab(p3,q1,p2)**2*s23**(-3)*xbeta2**(-2)*mt3 -
      &    1/(za(p3,p2))*za(e1,p2)*za(e4,p3)*zab(p3,q1,p2)**2*s23**(-2)*
      &    mt*xbeta2**(-1) - 12.D0/(za(p3,p2))*za(e1,p3)*za(e4,p2)*zab(
      &    p3,q1,p2)**2*s23**(-3)*xbeta2**(-2)*mt3 - 1/(za(p3,p2))*za(e1
-     &    ,p3)*za(e4,p2)*zab(p3,q1,p2)**2*s23**(-2)*mt*xbeta2**(-1) - 
+     &    ,p3)*za(e4,p2)*zab(p3,q1,p2)**2*s23**(-2)*mt*xbeta2**(-1) -
      &    1/(zab(p2,q1,p3))*za(e1,p2)*za(e4,p3)*zb(p3,p2)*zab(p3,q1,p2)
      &    *s23**(-1)*mt + 1/(zab(p2,q1,p3))*za(e4,e1)*zab(p2,q1,p2)*
      &    zab(p3,q1,p2)*s23**(-1)*mt - 12.D0/(zab(p2,q1,p3))/(za(p3,p2)
@@ -94,7 +94,7 @@ c---- SB see changes in BSYALggppmp.f
       tmp = tmp + I2h23 * ( 1/(zab(p2,q1,p3))/(za(p3,p2
      &    ))*za(e1,p2)*za(e4,p3)*zab(p3,q1,p2)*mt*xbeta2**(-1) + 12.D0
      &    /(zab(p2,q1,p3))/(za(p3,p2))*za(e1,p3)*za(e4,p3)*zab(p2,q1,p2
-     &    )*zab(p2,q1,p3)*zab(p3,q1,p2)*s23**(-3)*xbeta2**(-2)*mt3 + 
+     &    )*zab(p2,q1,p3)*zab(p3,q1,p2)*s23**(-3)*xbeta2**(-2)*mt3 +
      &    1/(zab(p2,q1,p3))/(za(p3,p2))*za(e1,p3)*za(e4,p3)*zab(p2,q1,
      &    p2)*zab(p2,q1,p3)*zab(p3,q1,p2)*s23**(-2)*mt*xbeta2**(-1) + 3.
      &    D0/2.D0/(zab(p2,q1,p3))/(za(p3,p2))*za(e1,p3)*za(e4,p3)*zab(

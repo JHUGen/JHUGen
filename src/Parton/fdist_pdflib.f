@@ -5,8 +5,8 @@
      . b_sea,t_sea,gluon
       double precision Ctq3df,Ctq4Fn,Ctq5Pdf,Ctq6Pdf,Ctq5L
       integer mode,Iprtn,ih,Irt
-c---  ih1=+1 proton 
-c---  ih1=-1 pbar 
+c---  ih1=+1 proton
+c---  ih1=-1 pbar
 
 C---set to zero if x out of range
       if (x .ge. 1d0) then
@@ -15,7 +15,7 @@ C---set to zero if x out of range
           enddo
           return
       endif
- 
+
       call structm(x,xmu,u_val,d_val,u_sea,d_sea,
      &                   s_sea,c_sea,b_sea,t_sea,gluon)
       fx(-5)=b_sea/x
@@ -36,18 +36,18 @@ C---set to zero if x out of range
          fx(+1)=d_sea/x
          fx(+2)=u_sea/x
       endif
-                     
+
       return
 
       end
 
-  
+
       subroutine InitPDF(dummy)
       integer dummy
 
 c--- this is a dummy routine that exists in LHAPDF only
-      
+
       return
       end
-      
+
 

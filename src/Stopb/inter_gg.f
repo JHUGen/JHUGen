@@ -1,6 +1,6 @@
       subroutine inter_gg(pp,me12,me21,intf)
 c--- Wrapper for the gluon-gluon initiated reals for t-channel
-c--- single top with massive b-quark. Includes both gluon 
+c--- single top with massive b-quark. Includes both gluon
 c--- permutations.
 c--- By R. Frederix, July 16, 2008.
 
@@ -20,8 +20,8 @@ c--- By R. Frederix, July 16, 2008.
 
 c color matrix:
 c      integer CF(2,2)
-c      DATA (CF(i,1  ),i=1  ,2  ) /     16,    2/    
-c      DATA (CF(i,2  ),i=1  ,2  ) /      2,   16/    
+c      DATA (CF(i,1  ),i=1  ,2  ) /     16,    2/
+c      DATA (CF(i,2  ),i=1  ,2  ) /      2,   16/
 
 
 

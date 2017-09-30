@@ -3,18 +3,18 @@ C
 C		 	eks98r.f
 C
 C An interface for calculating the SCALE DEPENDENT NUCLEAR RATIOS
-C 		R_f^A(x,Q) = f_A(x,Q)/f_p(x,Q) 
-C where f_A is the distribution of parton flavour f in a proton of a 
-C nucleus A, and f_p is the corresponding parton distribution in the 
+C 		R_f^A(x,Q) = f_A(x,Q)/f_p(x,Q)
+C where f_A is the distribution of parton flavour f in a proton of a
+C nucleus A, and f_p is the corresponding parton distribution in the
 C free proton.
-C  
+C
 C When you are using this interface, please REFER TO:
-C K.J. Eskola, V.J. Kolhinen and C.A. Salgado, 
-C "The scale dependent nuclear effects in parton distributions for 
+C K.J. Eskola, V.J. Kolhinen and C.A. Salgado,
+C "The scale dependent nuclear effects in parton distributions for
 C practical applications", Eur. Phys. J. C9 (1999) 61,
 C JYFL-8/98, US-FT/14-98, hep-ph/9807297.
 C
-C The detailed formulation of our approach is given in 
+C The detailed formulation of our approach is given in
 C K.J. Eskola, V.J. Kolhinen and P.V. Ruuskanen,
 C "Scale evolution of nuclear parton distributions"
 C Nucl. Phys. B535 (1998) 351, CERN-TH/97-345, JYFL-2/98, hep-ph/9802350,
@@ -22,19 +22,19 @@ C so please refer also to this paper.
 C
 C The ratios R_f^A are to a good approximation independent of the choice
 C of the parton distribution set for the free proton, so the absolute
-C distributions of parton flavour f in a proton of an isoscalar nucleus 
+C distributions of parton flavour f in a proton of an isoscalar nucleus
 C A can be obtained simply by:
-C f_A(x,Q) = R_f^A(x,Q) * f_p(x,Q), 
+C f_A(x,Q) = R_f^A(x,Q) * f_p(x,Q),
 C where f_p is from any modern (lowest order) set of parton distributions.
-C The corresponding distributions in a neutron of the nucleus can be 
-C obtained through the isospin symmetry (=an approximation for 
+C The corresponding distributions in a neutron of the nucleus can be
+C obtained through the isospin symmetry (=an approximation for
 C non-isoscalar nuclei)
 C
 C Questions & comments to:
 C   salgado@fpaxp1.usc.es
 C   vesa.kolhinen@phys.jyu.fi
 C   kari.eskola@phys.jyu.fi
-C 
+C
 C August 4, 1998 / April 10, 2000 (new references added)
 C-------------------------------------------------------------------
 C
@@ -42,7 +42,7 @@ C INSTRUCTIONS:
 C
 C eks98r(x,Q,A,kp)
 C
-C Returns the nuclear corrections R_f^A(x,Q) in double precision for 
+C Returns the nuclear corrections R_f^A(x,Q) in double precision for
 C
 C       u_valence:      kp=1
 C       d_valence:      kp=2
@@ -58,7 +58,7 @@ C       Q (in GeV) and atomic number A
 C
 C x, Q and A ARE DOUBLE PRECISION.
 C kp IS INTEGER.
-C 
+C
 C No initialization is needed.
 C
 C This program needs data files par0.all and parxQA.all.

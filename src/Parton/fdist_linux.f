@@ -12,13 +12,13 @@ c--- extra variables for MSTW08 implementation
       double precision str,sbar,chm,cbar,bot,bbar,photon
       data first/.true./
       save first
-c---  ih1=+1 proton 
-c---  ih1=-1 pbar 
+c---  ih1=+1 proton
+c---  ih1=-1 pbar
 
 c---  Extended 5/24/05 to calculate nucleon parton distributions
 c---  for a nucleus of atomic number Z and mass A via:
-C---   K.J. Eskola, V.J. Kolhinen and C.A. Salgado, 
-C---   "The scale dependent nuclear effects in parton distributions for 
+C---   K.J. Eskola, V.J. Kolhinen and C.A. Salgado,
+C---   "The scale dependent nuclear effects in parton distributions for
 C---   practical applications", Eur. Phys. J. C9 (1999) 61,
 C---   JYFL-8/98, US-FT/14-98, hep-ph/9807297.
 
@@ -45,9 +45,9 @@ c--- error
         stop
       else
 c--- parton distribution functions
-        ih=ih_call  
+        ih=ih_call
       endif
-          
+
 C---set to zero if x out of range
       if ((x .le. 0d0) .or. (x .ge. 1d0)) then
           do Iprtn=-5,5
@@ -55,7 +55,7 @@ C---set to zero if x out of range
           enddo
           return
       endif
- 
+
       if      (pdlabel(1:5) .eq. 'mstw8') then
             if         (pdlabel .eq. 'mstw8lo') then
             prefix = checkpath('Pdfdata/mstw2008lo') ! LO grid
@@ -68,7 +68,7 @@ C---set to zero if x out of range
      .                      str,sbar,chm,cbar,bot,bbar,gluon,photon)
 c-----assign MSTW to standard grid
             fx(0)=gluon/x
-            if (ih.eq.1) then      
+            if (ih.eq.1) then
                fx(1)=(d_val+d_sea)/x
                fx(2)=(u_val+u_sea)/x
                fx(-1)=d_sea/x
@@ -78,8 +78,8 @@ c-----assign MSTW to standard grid
                fx(+5)=bot/x
                fx(-3)=sbar/x
                fx(-4)=cbar/x
-               fx(-5)=bbar/x	     
-            elseif(ih.eq.-1) then      
+               fx(-5)=bbar/x
+            elseif(ih.eq.-1) then
                fx(-1)=(d_val+d_sea)/x
                fx(-2)=(u_val+u_sea)/x
                fx(+1)=d_sea/x
@@ -91,7 +91,7 @@ c-----assign MSTW to standard grid
                fx(+4)=cbar/x
                fx(+5)=bbar/x
             endif
-     
+
       elseif ((pdlabel(1:3) .eq. 'mrs')
      .   .or. (pdlabel(2:4) .eq. 'mrs')) then
 
@@ -201,7 +201,7 @@ c             write(6,*) 'here'
              call mrs98(x,xmu,mode,u_val,d_val,u_sea,d_sea,
      &                          s_sea,c_sea,b_sea,gluon)
              elseif (pdlabel .eq. 'mrs98z2') then
-             mode=2 
+             mode=2
              call mrs98(x,xmu,mode,u_val,d_val,u_sea,d_sea,
      &                          s_sea,c_sea,b_sea,gluon)
              elseif (pdlabel .eq. 'mrs98z3') then
@@ -221,7 +221,7 @@ c             write(6,*) 'here'
              call mrs98lo(x,xmu,mode,u_val,d_val,u_sea,d_sea,
      &                          s_sea,c_sea,b_sea,gluon)
              elseif (pdlabel .eq. 'mrs98l2') then
-             mode=2 
+             mode=2
              call mrs98lo(x,xmu,mode,u_val,d_val,u_sea,d_sea,
      &                          s_sea,c_sea,b_sea,gluon)
              elseif (pdlabel .eq. 'mrs98l3') then
@@ -245,7 +245,7 @@ c             write(6,*) 'here'
              call mrs96(x,xmu,mode,u_val,d_val,u_sea,d_sea,
      &                          s_sea,c_sea,b_sea,gluon)
              elseif (pdlabel .eq. 'mrs96r2') then
-             mode=2 
+             mode=2
              call mrs96(x,xmu,mode,u_val,d_val,u_sea,d_sea,
      &                          s_sea,c_sea,b_sea,gluon)
              elseif (pdlabel .eq. 'mrs96r3') then
@@ -283,12 +283,12 @@ c-----assign mrs to standard grid
             fx(+3)=fx(-3)
             fx(+4)=fx(-4)
             fx(+5)=fx(-5)
-            if (ih.eq.1) then      
+            if (ih.eq.1) then
                fx(1)=(d_val+d_sea)/x
                fx(2)=(u_val+u_sea)/x
                fx(-1)=d_sea/x
                fx(-2)=u_sea/x
-            elseif(ih.eq.-1) then      
+            elseif(ih.eq.-1) then
                fx(-1)=(d_val+d_sea)/x
                fx(-2)=(u_val+u_sea)/x
                fx(+1)=d_sea/x
@@ -314,12 +314,12 @@ C   2      CTEQ3D   Standard DIS scheme     0.116
              fx(+3)=fx(-3)
              fx(+4)=fx(-4)
              fx(+5)=fx(-5)
-             if (ih.eq.1) then      
+             if (ih.eq.1) then
                fx(-1)=Ctq3df(mode,-2,x,xmu,Irt)/x
                fx(-2)=Ctq3df(mode,-1,x,xmu,Irt)/x
                fx(1)=Ctq3df(mode,+2,x,xmu,Irt)/x+fx(-1)
                fx(2)=Ctq3df(mode,+1,x,xmu,Irt)/x+fx(-2)
-             elseif(ih.eq.-1) then      
+             elseif(ih.eq.-1) then
                fx(1)=Ctq3df(mode,-2,x,xmu,Irt)/x
                fx(2)=Ctq3df(mode,-1,x,xmu,Irt)/x
                fx(-1)=Ctq3df(mode,+2,x,xmu,Irt)/x+fx(1)
@@ -369,12 +369,12 @@ C   10     CTEQ4LQ  Low Q0                  0.114        0.7      cteq4lq.tbl
              fx(+3)=Ctq4Fn(mode,+3,x,xmu)
              fx(+4)=Ctq4Fn(mode,+4,x,xmu)
              fx(+5)=Ctq4Fn(mode,+5,x,xmu)
-             if (ih.eq.1) then      
+             if (ih.eq.1) then
                fx(1)=Ctq4Fn(mode,+2,x,xmu)
                fx(2)=Ctq4Fn(mode,+1,x,xmu)
                fx(-1)=Ctq4Fn(mode,-2,x,xmu)
                fx(-2)=Ctq4Fn(mode,-1,x,xmu)
-             elseif(ih.eq.-1) then      
+             elseif(ih.eq.-1) then
                fx(1)=Ctq4Fn(mode,-2,x,xmu)
                fx(2)=Ctq4Fn(mode,-1,x,xmu)
                fx(-1)=Ctq4Fn(mode,+2,x,xmu)
@@ -404,25 +404,25 @@ C   10     CTEQ4LQ  Low Q0                  0.114        0.7      cteq4lq.tbl
                fx(-2)=Ctq5L(+1,x,xmu)
              endif
 
-      elseif ((pdlabel(1:5) .eq. 'cteq5') .or. 
+      elseif ((pdlabel(1:5) .eq. 'cteq5') .or.
      .        (pdlabel(1:4) .eq. 'ctq5')) then
- 
+
              fx(-5)=Ctq5Pdf(-5,x,xmu)
              fx(-4)=Ctq5Pdf(-4,x,xmu)
              fx(-3)=Ctq5Pdf(-3,x,xmu)
- 
+
              fx(0)=Ctq5Pdf(0,x,xmu)
 
              fx(+3)=Ctq5Pdf(+3,x,xmu)
              fx(+4)=Ctq5Pdf(+4,x,xmu)
              fx(+5)=Ctq5Pdf(+5,x,xmu)
 
-             if (ih.eq.1) then      
+             if (ih.eq.1) then
                fx(1)=Ctq5Pdf(+2,x,xmu)
                fx(2)=Ctq5Pdf(+1,x,xmu)
                fx(-1)=Ctq5Pdf(-2,x,xmu)
                fx(-2)=Ctq5Pdf(-1,x,xmu)
-             elseif(ih.eq.-1) then      
+             elseif(ih.eq.-1) then
                fx(1)=Ctq5Pdf(-2,x,xmu)
                fx(2)=Ctq5Pdf(-1,x,xmu)
                fx(-1)=Ctq5Pdf(+2,x,xmu)
@@ -434,19 +434,19 @@ C   10     CTEQ4LQ  Low Q0                  0.114        0.7      cteq4lq.tbl
              fx(-5)=Ctq6Pdf(-5,x,xmu)
              fx(-4)=Ctq6Pdf(-4,x,xmu)
              fx(-3)=Ctq6Pdf(-3,x,xmu)
- 
+
              fx(0)=Ctq6Pdf(0,x,xmu)
 
              fx(+3)=Ctq6Pdf(+3,x,xmu)
              fx(+4)=Ctq6Pdf(+4,x,xmu)
              fx(+5)=Ctq6Pdf(+5,x,xmu)
 
-             if (ih.eq.1) then      
+             if (ih.eq.1) then
                fx(1)=Ctq6Pdf(+2,x,xmu)
                fx(2)=Ctq6Pdf(+1,x,xmu)
                fx(-1)=Ctq6Pdf(-2,x,xmu)
                fx(-2)=Ctq6Pdf(-1,x,xmu)
-             elseif(ih.eq.-1) then      
+             elseif(ih.eq.-1) then
                fx(1)=Ctq6Pdf(-2,x,xmu)
                fx(2)=Ctq6Pdf(-1,x,xmu)
                fx(-1)=Ctq6Pdf(+2,x,xmu)
@@ -465,12 +465,12 @@ C   10     CTEQ4LQ  Low Q0                  0.114        0.7      cteq4lq.tbl
              fx(+4)=CT10Pdf(+4,x,xmu)
              fx(+5)=CT10Pdf(+5,x,xmu)
 
-             if (ih.eq.1) then      
+             if (ih.eq.1) then
                fx(1)=CT10Pdf(+2,x,xmu)
                fx(2)=CT10Pdf(+1,x,xmu)
                fx(-1)=CT10Pdf(-2,x,xmu)
                fx(-2)=CT10Pdf(-1,x,xmu)
-             elseif(ih.eq.-1) then      
+             elseif(ih.eq.-1) then
                fx(1)=CT10Pdf(-2,x,xmu)
                fx(2)=CT10Pdf(-1,x,xmu)
                fx(-1)=CT10Pdf(+2,x,xmu)
@@ -491,7 +491,7 @@ c--- NEW ATTEMPT
               mode=5
             endif
             call mt(x,xmu,mode,u_val,d_val,
-     .               u_sea,s_sea,c_sea,b_sea,gluon) 
+     .               u_sea,s_sea,c_sea,b_sea,gluon)
             d_sea=u_sea
 c-----assign to standard grid
             fx(-5)=b_sea/x
@@ -501,20 +501,20 @@ c-----assign to standard grid
             fx(+3)=fx(-3)
             fx(+4)=fx(-4)
             fx(+5)=fx(-5)
-            if (ih.eq.1) then      
+            if (ih.eq.1) then
                fx(1)=(d_val+d_sea)/x
                fx(2)=(u_val+u_sea)/x
                fx(-1)=d_sea/x
                fx(-2)=u_sea/x
-            elseif(ih.eq.-1) then      
+            elseif(ih.eq.-1) then
                fx(-1)=(d_val+d_sea)/x
                fx(-2)=(u_val+u_sea)/x
                fx(+1)=d_sea/x
                fx(+2)=u_sea/x
             endif
- 
+
       else
-          write(6,*) 'Unimplemented pdf distribution' 
+          write(6,*) 'Unimplemented pdf distribution'
           write(6,*) 'pdlabel= ',pdlabel
           write(6,*) 'Implemented are: ',
      . 'mrs4nf3,mrs4lf3,mrs4nf4,mrs4lf4,',
@@ -556,8 +556,8 @@ c-----assign to standard grid
      . 'mtungn1'
 
          stop
-      endif  
-      
+      endif
+
 c--- now perform the corrections for a nucleon beam, if necessary
       if (nucleon) then
 c        write(6,*) 'x,Q',x,xmu
@@ -589,8 +589,8 @@ c--- apply scale factors from eks98r, with a maximum scale of 100 GeV
         b_sea=fx(5)*eks98r(x,xmu_safe,xA,7)
         gluon=fx(0)*eks98r(x,xmu_safe,xA,8)
 c--- write new nucleon distributions
-        fx(1)=(xZ*(d_val+d_sea)+(xA-xZ)*(u_val+u_sea))/xA       
-        fx(2)=(xZ*(u_val+u_sea)+(xA-xZ)*(d_val+d_sea))/xA       
+        fx(1)=(xZ*(d_val+d_sea)+(xA-xZ)*(u_val+u_sea))/xA
+        fx(2)=(xZ*(u_val+u_sea)+(xA-xZ)*(d_val+d_sea))/xA
         fx(-1)=(xZ*d_sea+(xA-xZ)*u_sea)/xA
         fx(-2)=(xZ*u_sea+(xA-xZ)*d_sea)/xA
         fx(-3)=s_sea
@@ -600,21 +600,21 @@ c--- write new nucleon distributions
         fx(+4)=c_sea
         fx(+5)=b_sea
         fx(0)=gluon
-      endif      
-          
+      endif
+
       return
-      
+
    76 format(' *    (Atomic number, mass) = (Z,A) = (',
-     . i4,',',i4,')   *')   
-      
+     . i4,',',i4,')   *')
+
       end
 
-  
+
       subroutine InitPDF(dummy)
       integer dummy
 
 c--- this is a dummy routine that exists in LHAPDF only
-      
+
       return
       end
-      
+

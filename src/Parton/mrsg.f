@@ -5,7 +5,7 @@ C     This is a package for the new MRS(A',G) parton            C
 C     distributions. The minimum Q^2  value is 5 GeV^2 and the  C
 C     x range is, as before 10^-5 < x < 1. MSbar factorization  C
 C     is used. The package reads 2 grids, which are in separate C
-C     files (A'=for020.dat/ftn20, G=for021.dat/ftn21).          C  
+C     files (A'=for020.dat/ftn20, G=for021.dat/ftn21).          C
 C     Note that x times the parton distribution is returned,    C
 C     Q is the scale in GeV,                                    C
 C     and Lambda(MSbar,nf=4) = 231/255 MeV for A'/G.            C
@@ -29,9 +29,9 @@ C***************************************************************C
       Q2=SCALE**2
       IF(Q2.LT.5D0.OR.Q2.GT.1310720.D0)    PRINT 99
       IF(X.LT.1D-5.OR.X.GT.1D0)            PRINT 98
-      IF(MODE.EQ.20) 
+      IF(MODE.EQ.20)
      .   CALL STRC20(X,SCALE,UPV,DNV,USEA,DSEA,STR,CHM,BOT,GLU)
-      IF(MODE.EQ.21) 
+      IF(MODE.EQ.21)
      .   CALL STRC21(X,SCALE,UPV,DNV,USEA,DSEA,STR,CHM,BOT,GLU)
   99  FORMAT('  WARNING:  Q^2 VALUE IS OUT OF RANGE   ')
   98  FORMAT('  WARNING:   X  VALUE IS OUT OF RANGE   ')
@@ -59,10 +59,10 @@ C     THIS IS THE NEW  "Aprime" FIT -- Feb 1995 -- standard Q^2 range
       DATA INIT/0/
       save XX,F,XMIN,XMAX,QSQMIN,QSQMAX,N0,INIT
 !$omp threadprivate(XX,F,XMIN,XMAX,QSQMIN,QSQMAX,N0,INIT)
- 
- 
+
+
       xsave=x
- 
+
       IF(INIT.NE.0) GOTO 10
       INIT=1
       filename=checkpath('Pdfdata/mrs95ap.dat')
@@ -120,9 +120,9 @@ C 1=UV 2=DV 3=GLUE 4=UBAR 5=CBAR 7=BBAR 6=SBAR 8=DBAR
       CHM=G(5)
       GLU=G(3)
       BOT=G(7)
- 
+
       x=xsave
- 
+
       RETURN
       END
 C
@@ -148,10 +148,10 @@ C     THIS IS THE NEW  "G" FIT -- Feb 1995 -- standard Q^2 range
       DATA INIT/0/
       save XX,F,XMIN,XMAX,QSQMIN,QSQMAX,N0,INIT
 !$omp threadprivate(XX,F,XMIN,XMAX,QSQMIN,QSQMAX,N0,INIT)
- 
- 
+
+
       xsave=x
- 
+
       IF(INIT.NE.0) GOTO 10
       INIT=1
       filename=checkpath('Pdfdata/mrs95_g.dat')
@@ -209,9 +209,9 @@ C 1=UV 2=DV 3=GLUE 4=UBAR 5=CBAR 7=BBAR 6=SBAR 8=DBAR
       CHM=G(5)
       GLU=G(3)
       BOT=G(7)
- 
+
       x=xsave
- 
+
       RETURN
       END
 C

@@ -28,7 +28,7 @@ c---     the most central one (ptoreta=2)
         stop
       endif
 
-c--- now we know that we have 2 jets      
+c--- now we know that we have 2 jets
       ptQ1=-1d0
       ptQ2=-1d0
       etaQ1=99d0
@@ -42,7 +42,7 @@ c--- now we know that we have 2 jets
         ptQ2=pt6
         etaQ2=eta6
       endif
-      
+
       if     (ptoreta .eq. 1) then
         ptQ1=max(ptQ1,ptQ2)
       elseif (ptoreta .eq. 2) then
@@ -54,7 +54,7 @@ c--- now we know that we have 2 jets
         write(6,*) 'The value of ptoreta in getptQ1.f is incorrect'
         stop
       endif
-      
+
       if (ptQ1 .lt. 0d0) then
         write(6,*) 'Error in getptQ1: 2 jets, but no heavy quarks!'
         stop

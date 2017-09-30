@@ -3,7 +3,7 @@
 c--- Author: R. K. Ellis, May 2011
 c--- For now, work in the approximation of two massless isodoublets
 c--- Box contributions are then complete
-c--- Triangle (vector) pieces always vanish 
+c--- Triangle (vector) pieces always vanish
 c--- Triangle (axial) pieces cancel for massless isodoublets
 
       include 'constants.f'
@@ -15,7 +15,7 @@ c--- Triangle (axial) pieces cancel for massless isodoublets
       include 'Higgsint.f'
       include 'scale.f'
       include 'noglue.f'
-      include 'anom_higgs.f' 
+      include 'anom_higgs.f'
       include 'process.f'
       include 'docheck.f'
       include 'first.f'
@@ -41,16 +41,16 @@ c--- Triangle (axial) pieces cancel for massless isodoublets
 !$omp threadprivate(caseggWW4l,caseHWWHpI,caseHWWint)
 
 c--- set this to true to include generations 1 and 2 of (light) quarks
-      includegens1and2=.true.      
+      includegens1and2=.true.
 c--- set this to true to include 3rd generation of quarks (t,b)
       includegen3=.true.
 
 c--- omit massive loops for pt(W) < "ptWsafetycut_massive" (for num. stability)
       ptWsafetycut_massive=2d0
-      
+
 c--- omit massless loops for pt(W) < "ptWsafetycut_massless" (for num. stability)
       ptWsafetycut_massless=0.05d0
-      
+
       if (first) then
         write(6,*)'****************************************************'
         write(6,*)'*                                                  *'
@@ -66,7 +66,7 @@ c--- omit massless loops for pt(W) < "ptWsafetycut_massless" (for num. stability
         endif
         write(6,*)'*                                                  *'
         write(6,*)'****************************************************'
-        first=.false. 
+        first=.false.
         if (includegen3) call qlinit
         caseggWW4l=.false.
         caseHWWHpI=.false.
@@ -93,7 +93,7 @@ c--- logical variable "docheck"
 c---   .true .  --> print out coefficients of integrals at special point
 c---   .false.  --> run as normal
       docheck=.false.
-      
+
 c--- set flag to signal calculation of Higgs related contributions only,
 c---  e.g. entering interference
       if     (caseggWW4l) then
@@ -104,14 +104,14 @@ c---  e.g. entering interference
         write(6,*) 'Unexpected case in gg_WW_int: ',case
         stop
       endif
-      
+
       do j=-nf,nf
       do k=-nf,nf
       msq(j,k)=0d0
       enddo
       enddo
 
-c--- rescale      
+c--- rescale
       pmax=abs(p(1,4))
       do i=2,6
       if (abs(p(i,4)) .gt. pmax) pmax=abs(p(i,4))
@@ -146,9 +146,9 @@ c--- These lines set up the point for the numerical check
          p(6,om)=p6true(nu)
          enddo
       endif
-      
-c--- if computing 3rd generation, set up extra flattened vectors 
-      if (includegen3) then     
+
+c--- if computing 3rd generation, set up extra flattened vectors
+      if (includegen3) then
 C--- define flattened vectors (k12 and k56)
       s12=2d0*dot(p,1,2)
       s56=2d0*dot(p,5,6)
@@ -165,7 +165,7 @@ C--- define flattened vectors (k12 and k56)
       p(del1,nu)=one/(one-afac*bfac)
      & *(p(5,nu)+p(6,nu)-bfac*(p(1,nu)+p(2,nu)))
       enddo
-      
+
 C--- define flattened vectors (k12 and k34)
       dot1234=0.5d0*(s56-s12-s34)
       delta=dot1234**2-s12*s34
@@ -179,7 +179,7 @@ C--- define flattened vectors (k12 and k34)
       p(k34h,nu)=one/(one-afac*bfac)
      & *(p(3,nu)+p(4,nu)-bfac*(p(1,nu)+p(2,nu)))
       enddo
-      
+
 C--- define flattened vectors (k56 and k34)
       dot3456=0.5d0*(s12-s56-s34)
       delta=dot3456**2-s56*s34
@@ -193,16 +193,16 @@ C--- define flattened vectors (k56 and k34)
       p(k34h11,nu)=one/(one-afac*bfac)
      & *(p(3,nu)+p(4,nu)-bfac*(p(5,nu)+p(6,nu)))
       enddo
-      
-      endif      
+
+      endif
 c--- end of 3rd generation initialization
 
-      
+
 c--- set up spinor products (including for flat vectors, for 3rd gen)
       if (docheck) then
         call spinorz(12,p,za,zb)        ! Use spinorz for numerical check
       else
-        if (includegen3) then 
+        if (includegen3) then
           call spinoru(12,p,za,zb)
         else
           call spinoru(6,p,za,zb)
@@ -211,7 +211,7 @@ c--- set up spinor products (including for flat vectors, for 3rd gen)
 
 c--- fill amplitudes with contributions of continuum W pairs
 c--- note: 1 = minus, 2=plus
-      
+
 c      Avec(2,2)=a64v(mm,3,4,1,2,6,5,zb,za)*(-half*im)
 c      Avec(2,1)=a64v(mp,3,4,1,2,6,5,zb,za)*(-half*im)
 c      Avec(1,2)=a64v(pm,3,4,1,2,6,5,zb,za)*(-half*im)
@@ -238,7 +238,7 @@ c--- fill amplitudes used for generations 1 and 2
         enddo
         enddo
       endif
-      
+
 c      write(6,*) 'Avec(2,1)',Avec(1,1)
 c      write(6,*) 'Avec(2,2)',Avec(1,2)
 c      write(6,*) 'Avec(2,1)',Avec(2,1)
@@ -271,7 +271,7 @@ c--- compute integrals and their coefficients
         endif
 
 c--- This contribution is finite so we only retain "0" piece
-        e=0 
+        e=0
         do h1=1,2
         do h2=1,2
           sum(h1,h2,e)=box(h1,h2,e)+triang(h1,h2,e)+bub(h1,h2,e)
@@ -286,7 +286,7 @@ c--- This contribution is finite so we only retain "0" piece
         enddo
       endif
 
-c--- rescale back      
+c--- rescale back
       do i=1,6
       do j=1,4
       p(i,j)=p(i,j)*pmax
@@ -303,9 +303,9 @@ c--- fill amplitudes with contributions of Higgs: top loop
 c--- shat-dependent width
 c      fachiggs=cone/dcmplx(s(1,2)-hmass**2,hwidth*s(1,2)/hmass)
 c--- piece proportional to hmass*hwidth
-c      fachiggs=im*imag(fachiggs)    
+c      fachiggs=im*imag(fachiggs)
 c--- piece proportional to (s(1,2)-hmass**2)
-c      fachiggs=real(fachiggs)      
+c      fachiggs=real(fachiggs)
 
       if (tau .le. 1d0) then
          f=dcmplx(dasin(sqrt(tau))**2)
@@ -355,7 +355,7 @@ c--- numerical check includes top loops only
         enddo
 c        pause
       endif
-      
+
 c--- ensure numerical stability: set massive loops to zero
 c--- for pt(W) < "ptWsafetycut_massive" GeV
       if (pttwo(3,4,p) .lt. ptWsafetycut_massive) then
@@ -377,8 +377,8 @@ c--- for pt(W) < "ptWsafetycut_massless" GeV
       endif
 
 c--- Rescale for width study
-      if((keep_smhiggs_norm).and.(anom_higgs)) then 
-         rescale=chi_higgs**2 
+      if((keep_smhiggs_norm).and.(anom_higgs)) then
+         rescale=chi_higgs**2
          Ahiggs(:,:)=Ahiggs(:,:)*rescale
       endif
 
@@ -404,7 +404,7 @@ c--- This only accumulates the interference
         write(6,*) 'Unexpected case in gg_WW_int: ',case
         stop
       endif
-      
+
       enddo
       enddo
 
@@ -413,9 +413,9 @@ c--- overall factor from diagrams
      & *s(3,4)**2/((s(3,4)-wmass**2)**2+(wwidth*wmass)**2)
      & *s(5,6)**2/((s(5,6)-wmass**2)**2+(wwidth*wmass)**2)
       fac=fac/pmax**4
-      
+
       msq(0,0)=msqgg*fac
       return
       end
-      
-      
+
+

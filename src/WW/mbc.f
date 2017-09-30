@@ -1,7 +1,7 @@
       subroutine mbc(st,j1,j2,j3,j4,j5,j6,za,zb,bcoeff)
       implicit none
 c----Bubble coefficients extracted from BDK 11.5, 11.8
-c----after performing the transformation 
+c----after performing the transformation
 c    (1-->4)
 c    (2-->3)
 c    (3-->1)
@@ -47,7 +47,7 @@ c    (6-->6)
       do j=1,8
       bcoeff(j)=czip
       enddo
-      
+
       if     (st.eq.'q+qb-g+g+') then
 
       bcoeff(b34)= + t134ms34**(-2) * (  - za(j4,j3)*za(j1,j5)**2*zb(j4
@@ -180,7 +180,7 @@ c    (6-->6)
      &    j4,j2)*zb(j4,j6)*izab2(j1,j3,j4,j2)**3*t(j3,j4,j1)*t(j3,j4,j2
      &    ) )
       bcoeff(b34) = bcoeff(b34) + IDelta * (  - 2.D0*za(j4,j3)*za(j1,j5
-     &    )*zb(j4,j2)*zb(j4,j6)*izab2(j1,j3,j4,j2)**3*t(j3,j4,j2)**2 - 
+     &    )*zb(j4,j2)*zb(j4,j6)*izab2(j1,j3,j4,j2)**3*t(j3,j4,j2)**2 -
      &    2.D0*za(j4,j3)*za(j2,j5)*zb(j4,j2)*zb(j4,j6)*izab2(j1,j3,j4,
      &    j2)**2*t(j3,j4,j1) + 2.D0*za(j4,j3)*za(j2,j5)*zb(j4,j2)*zb(j4
      &    ,j6)*izab2(j1,j3,j4,j2)**2*t(j3,j4,j2) + 1.D0/2.D0*za(j4,j3)*
@@ -192,7 +192,7 @@ c    (6-->6)
      &     + za(j4,j3)*zb(j4,j6)**2*izb(j5,j6)*izab2(j1,j3,j4,j2)**2*s(
      &    j5,j6)*t(j3,j4,j2) - 2.D0*za(j3,j1)*za(j3,j5)*zb(j4,j3)*zb(j1
      &    ,j6)*izab2(j1,j4,j3,j2)**2*t(j4,j3,j1) + 2.D0*za(j3,j1)*za(j3
-     &    ,j5)*zb(j4,j3)*zb(j1,j6)*izab2(j1,j4,j3,j2)**2*t(j4,j3,j2) + 
+     &    ,j5)*zb(j4,j3)*zb(j1,j6)*izab2(j1,j4,j3,j2)**2*t(j4,j3,j2) +
      &    2.D0*za(j3,j1)*za(j3,j5)*zb(j4,j3)*zb(j2,j6)*izab2(j1,j4,j3,
      &    j2)**3*t(j4,j3,j1)**2 )
       bcoeff(b34) = bcoeff(b34) + IDelta * (  - 2.D0*za(j3,j1)*za(j3,j5
@@ -237,7 +237,7 @@ c    (6-->6)
      &    ,j2)**3*t(j3,j4,j2) + za(j4,j3)*za(j3,j5)*zb(j4,j3)*zb(j4,j6)
      &    *izab2(j1,j4,j3,j2)**2*s(j4,j3) - za(j4,j3)*za(j3,j5)*zb(j4,
      &    j3)*zb(j4,j6)*izab2(j1,j4,j3,j2)**2*s(j1,j2) - za(j4,j3)*za(
-     &    j3,j5)*zb(j4,j3)*zb(j4,j6)*izab2(j1,j4,j3,j2)**2*s(j5,j6) + 
+     &    j3,j5)*zb(j4,j3)*zb(j4,j6)*izab2(j1,j4,j3,j2)**2*s(j5,j6) +
      &    za(j4,j3)*za(j3,j5)*zb(j4,j3)*zb(j4,j6)*izab2(j1,j3,j4,j2)**2
      &    *s(j4,j3) - za(j4,j3)*za(j3,j5)*zb(j4,j3)*zb(j4,j6)*izab2(j1,
      &    j3,j4,j2)**2*s(j1,j2) - za(j4,j3)*za(j3,j5)*zb(j4,j3)*zb(j4,
@@ -255,7 +255,7 @@ c    (6-->6)
      &    2.D0*za(j4,j3)*zb(j4,j6)**2*izb(j5,j6)*zab2(j2,j4,j3,j1)*
      &    izab2(j1,j4,j3,j2) - 1.D0/2.D0*za(j4,j3)*zb(j4,j6)**2*izb(j5,
      &    j6)*zab2(j2,j3,j4,j1)*izab2(j1,j3,j4,j2) + za(j4,j3)*zb(j4,j6
-     &    )**2*izb(j5,j6)*izab2(j1,j3,j4,j2)**2*s(j4,j3)*t(j3,j4,j2) - 
+     &    )**2*izb(j5,j6)*izab2(j1,j3,j4,j2)**2*s(j4,j3)*t(j3,j4,j2) -
      &    za(j4,j3)*zb(j4,j6)**2*izb(j5,j6)*izab2(j1,j3,j4,j2)**2*s(j1,
      &    j2)*t(j3,j4,j2) - za(j4,j3)*zb(j4,j6)**2*izb(j5,j6)*izab2(j1,
      &    j3,j4,j2)**2*s(j5,j6)*t(j3,j4,j2) - 2.D0*za(j3,j1)*za(j3,j5)*
@@ -312,7 +312,7 @@ c    (6-->6)
      &    )*zb(j4,j6)**2*izb(j4,j3)*zab2(j2,j6,j5,j1)*izab2(j1,j6,j5,j2
      &    ) )
       bcoeff(b12zm) = bcoeff(b12zm) + IDelta * (  - za(j5,j6)*zb(j4,j6)
-     &    **2*izb(j4,j3)*izab2(j1,j5,j6,j2)**2*s(j4,j3)*t(j5,j6,j2) - 
+     &    **2*izb(j4,j3)*izab2(j1,j5,j6,j2)**2*s(j4,j3)*t(j5,j6,j2) -
      &    za(j5,j6)*zb(j4,j6)**2*izb(j4,j3)*izab2(j1,j5,j6,j2)**2*s(j1,
      &    j2)*t(j5,j6,j2) + za(j5,j6)*zb(j4,j6)**2*izb(j4,j3)*izab2(j1,
      &    j5,j6,j2)**2*s(j5,j6)*t(j5,j6,j2) )
@@ -440,7 +440,7 @@ c    (6-->6)
       bcoeff(rat) = bcoeff(rat) + t134ms56**(-1) * (  - za(j3,j2)**2*
      &    za(j5,j6)*zb(j2,j6)**2*iza(j4,j3)*izab2(j1,j5,j6,j2)**2 )
       bcoeff(rat) = bcoeff(rat) + IDelta * (  - za(j3,j5)**2*iza(j4,j3)
-     &    *iza(j5,j6)*zab2(j2,j3,j4,j1)*izab2(j1,j3,j4,j2)*s(j4,j3) + 
+     &    *iza(j5,j6)*zab2(j2,j3,j4,j1)*izab2(j1,j3,j4,j2)*s(j4,j3) +
      &    za(j3,j5)**2*iza(j4,j3)*iza(j5,j6)*zab2(j2,j3,j4,j1)*izab2(j1
      &    ,j3,j4,j2)*s(j1,j2) - za(j3,j5)**2*iza(j4,j3)*iza(j5,j6)*
      &    zab2(j2,j3,j4,j1)*izab2(j1,j3,j4,j2)*s(j5,j6) - 2.D0*za(j3,j5
@@ -473,7 +473,7 @@ c    (6-->6)
       endif
 
       endif
-      
+
       do j=1,8
       bcoeff(j)=im*bcoeff(j)
       enddo

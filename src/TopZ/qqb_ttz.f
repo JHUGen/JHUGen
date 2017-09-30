@@ -17,7 +17,7 @@
       include 'masses.f'
       include 'topzlabels.f'
       include 'process.f'
-      
+
       integer j,k,nu
       double precision msq(-nf:nf,-nf:nf),pin(mxpart,4),p(mxpart,4)
       double precision pw1(4),pw2(4),q(4),a(4),u(4),b(4),z(4),
@@ -30,7 +30,7 @@
       double precision p1Du,p2Du,p1Db,p2Db,p4Dq,p7Da,denz1,denz2
       double complex propz
       integer,parameter::jj(-nf:nf)=(/-1,-2,-1,-2,-1,0,1,2,1,2,1/)
-      
+
 c      write(6,*) 'mt',mt,twidth,wmass,wwidth,zmass,zwidth
 c      write(6,*) 'Enter scalefac**2'
 c      read(5,*)  scalefac
@@ -42,12 +42,12 @@ c      wmass=scalefac*wmass
 c      wwidth=scalefac*wwidth
 c      zmass=scalefac*zmass
 c      zwidth=scalefac*zwidth
-      
+
       do nu=1,4
       do j=1,mxpart
 c      p(j,nu)=scalefac*pin(j,nu)
       p(j,nu)=pin(j,nu)
-      enddo      
+      enddo
 
       z(nu)=p(9,nu)+p(10,nu)
       pw1(nu)=p(3,nu)+p(4,nu)
@@ -64,7 +64,7 @@ c      p(j,nu)=scalefac*pin(j,nu)
       a2(nu)=a(nu)-p(2,nu)
       z1(nu)=z(nu)+p(1,nu)
       z2(nu)=-z(nu)-p(2,nu)
-      enddo      
+      enddo
 
 
       sz=(z(4)**2-z(1)**2-z(2)**2-z(3)**2)
@@ -110,7 +110,7 @@ c      p(j,nu)=scalefac*pin(j,nu)
       p4Dq=p(4,4)*q(4)-p(4,1)*q(1)-p(4,2)*q(2)-p(4,3)*q(3)
       p7Da=p(7,4)*a(4)-p(7,1)*a(1)-p(7,2)*a(2)-p(7,3)*a(3)
 
-      p1Du=p(1,4)*u(4)-p(1,1)*u(1)-p(1,2)*u(2)-p(1,3)*u(3) 
+      p1Du=p(1,4)*u(4)-p(1,1)*u(1)-p(1,2)*u(2)-p(1,3)*u(3)
       p2Du=p(2,4)*u(4)-p(2,1)*u(1)-p(2,2)*u(2)-p(2,3)*u(3)
 
       p1Db=p(1,4)*b(4)-p(1,1)*b(1)-p(1,2)*b(2)-p(1,3)*b(3)
@@ -125,7 +125,7 @@ c      p(j,nu)=scalefac*pin(j,nu)
       gamu2=uDu/(2d0*p2Du)
 
 C     now the momenta 3,5,6,8 are no longer needed
-C     so set       
+C     so set
       do nu=1,4
       p(q4,nu)=q(nu)-gamq4*p(4,nu)
       p(a7,nu)=a(nu)-gama7*p(7,nu)
@@ -133,13 +133,13 @@ C     so set
       p(u2,nu)=u(nu)-gamu2*p(2,nu)
       p(b1,nu)=b(nu)-gamb1*p(1,nu)
       p(b2,nu)=b(nu)-gamb2*p(2,nu)
-      enddo      
-      
+      enddo
+
       call spinoru(12,p,za,zb)
 
       call qqbttz(denu,denb,denz1,denz2,propz,wtqqb,wtqbq)
       call ggttz(denu,denb,denq1,denq2,dena1,dena2,propz,wtgg)
-      
+
 C----set all elements to zero
       do j=-nf,nf
       do k=-nf,nf
@@ -157,6 +157,6 @@ C---fill qb-q, gg and q-qb elements
           msq(j,-j)=aveqq*facqqb*wtqqb(jj(j))
       endif
       enddo
-       
+
       return
       end

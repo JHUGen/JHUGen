@@ -110,7 +110,7 @@
 
       subroutine jeppe2(x,y,nx,my,xx,yy,cc,z)
       implicit real*8(a-h,o-z)
-      dimension xx(nx),yy(my),cc(nx,my,4,4)      
+      dimension xx(nx),yy(my),cc(nx,my,4,4)
 
       n=locx(xx,nx,x)
       m=locx(yy,my,y)
@@ -133,8 +133,8 @@
       locx=1
       return
       endif
-      if(x.ge.xx(nx)) then 
-      locx=nx-1  
+      if(x.ge.xx(nx)) then
+      locx=nx-1
       return
       endif
       ju=nx+1

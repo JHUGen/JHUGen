@@ -10,7 +10,7 @@ c--- ttbqqbg amplitudes
      . ttbqqbqqpp,ttbqqbqqpm,ttbqqbqqmp,ttbqqbqqmm,
      . ttbqqbrqpp,ttbqqbrqpm,ttbqqbrqmp,ttbqqbrqmm
       double precision appsq,apmsq,ampsq,ammsq
-      
+
 c-- for q-qb , there are four colour amplitudes:
 c---    sq        proportional to Ta(it,i1)*delta(i2,ib)
 c---    tq        proportional to Ta(i2,ib)*delta(it,i1)
@@ -24,7 +24,7 @@ c---    rq        proportional to Ta(it,ib)*delta(i2,i1)
      . +xn*cdabs(sq)**2+xn*cdabs(tq)**2
      . +xn*cdabs(qq)**2+xn*cdabs(rq)**2
      . +2d0*Dble((sq+tq)*dconjg(rq+qq)))
-      
+
       sq=ttbqqbsqpm(i1,i2,i9,i5,i3,i6,i8)
       tq=ttbqqbtqpm(i1,i2,i9,i5,i3,i6,i8)
       qq=ttbqqbqqpm(i1,i2,i9,i5,i3,i6,i8)
@@ -33,7 +33,7 @@ c---    rq        proportional to Ta(it,ib)*delta(i2,i1)
      . +xn*cdabs(sq)**2+xn*cdabs(tq)**2
      . +xn*cdabs(qq)**2+xn*cdabs(rq)**2
      . +2d0*Dble((sq+tq)*dconjg(rq+qq)))
-      
+
       sq=ttbqqbsqmp(i1,i2,i9,i5,i3,i6,i8)
       tq=ttbqqbtqmp(i1,i2,i9,i5,i3,i6,i8)
       qq=ttbqqbqqmp(i1,i2,i9,i5,i3,i6,i8)
@@ -42,7 +42,7 @@ c---    rq        proportional to Ta(it,ib)*delta(i2,i1)
      . +xn*cdabs(sq)**2+xn*cdabs(tq)**2
      . +xn*cdabs(qq)**2+xn*cdabs(rq)**2
      . +2d0*Dble((sq+tq)*dconjg(rq+qq)))
-      
+
       sq=ttbqqbsqmm(i1,i2,i9,i5,i3,i6,i8)
       tq=ttbqqbtqmm(i1,i2,i9,i5,i3,i6,i8)
       qq=ttbqqbqqmm(i1,i2,i9,i5,i3,i6,i8)
@@ -51,9 +51,9 @@ c---    rq        proportional to Ta(it,ib)*delta(i2,i1)
      . +xn*cdabs(sq)**2+xn*cdabs(tq)**2
      . +xn*cdabs(qq)**2+xn*cdabs(rq)**2
      . +2d0*Dble((sq+tq)*dconjg(rq+qq)))
-      
+
       ttbqqbg_sq=appsq+apmsq+ampsq+ammsq
 
       return
       end
-      
+

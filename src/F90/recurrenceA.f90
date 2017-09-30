@@ -2,7 +2,7 @@
   ! Authors: Giulia Zanderighi...	                                   !
   !------------------------------------------------------------------------!
 
-!! File generated automatically by autogen.pl from 
+!! File generated automatically by autogen.pl from
 !! general precision template PRECfiles/genPREC/PRECrecurrenceGbitsone.f90.
 
 module recurrenceA
@@ -10,15 +10,15 @@ module recurrenceA
   use spinfns
   implicit none
 
-  public :: vggg, vgggg,vqg,vgq,vbqg,vgbq,vbqq,vbqW,vWq!,g 
+  public :: vggg, vgggg,vqg,vgq,vbqg,vgbq,vbqq,vbqW,vWq!,g
   public :: vgluon,f,bf
 
-  logical :: verbose = .false. 
-  
+  logical :: verbose = .false.
+
   private
-  
-  contains 
-  
+
+  contains
+
   function vggg(e1,k1,e2,k2)
     double complex, intent(in) :: e1(:), e2(:)
     double complex, intent(in) :: k1(:), k2(:)
@@ -29,15 +29,15 @@ module recurrenceA
     sk1e2=sc(k1,e2)
     sk2e1=sc(k2,e1)
     se1e2=sc(e1,e2)
-    
+
     xx=ci*sqrt2
-    
+
     vggg = xx*(-sk1e2*e1+sk2e1*e2+se1e2/two*(k1-k2))
 
   end function vggg
 
 
-  function  vgggg(e1,e2,e3)              
+  function  vgggg(e1,e2,e3)
     double complex, intent(in) :: e1(:),e2(:),e3(:)
     double complex             :: vgggg(size(e1))
     ! -----------------------------------------
@@ -46,7 +46,7 @@ module recurrenceA
     se1e3=sc(e1,e3)
     se2e3=sc(e2,e3)
     se1e2=sc(e1,e2)
-    
+
     vgggg = ci*(e2*se1e3-chalf*(e1*se2e3+ e3*se1e2))
 
   end function vgggg
@@ -94,7 +94,7 @@ module recurrenceA
   function vbqq(Dv,sp1,sp2)
     double complex, intent(in) :: sp1(:), sp2(:)
     integer, intent(in) ::  Dv
-    ! -------------------------------------------       
+    ! -------------------------------------------
     double complex :: vbqq(Dv)
     double complex :: rr, va(Dv),sp1a(size(sp1))
     integer :: i
@@ -105,7 +105,7 @@ module recurrenceA
 
     do i=1,Dv
 
-       if (i.eq.1) then 
+       if (i.eq.1) then
           va(1)=cone
        else
           va(i)=-cone
@@ -116,13 +116,13 @@ module recurrenceA
        rr=psp1(sp1a,sp2)
        !       rr=-ci/sqrt2*psp1(sp1a,sp2)
 
-       if (i.eq.1) then 
+       if (i.eq.1) then
           vbqq = vbqq + rr*va
        else
           vbqq = vbqq - rr*va
        endif
 
-       va(i)=czero 
+       va(i)=czero
     enddo
     vbqq = -ci/sqrt2*vbqq
 
@@ -133,11 +133,11 @@ module recurrenceA
     double complex, intent(in) :: sp(:)
     double complex :: vbqW(size(sp)),sp5(size(sp))
 
-!    if (v_coupling == v_vector) then 
+!    if (v_coupling == v_vector) then
        vbqW = -ci*spb2(sp,e1)
 !    else
 !       sp5 = -ci*spb2(sp,e1)
-!       vbqW = spb5(sp5) 
+!       vbqW = spb5(sp5)
 !    endif
 
   end function vbqW
@@ -148,7 +148,7 @@ module recurrenceA
     double complex, intent(in) :: sp(:)
     double complex :: vWq(size(sp)),sp5(size(sp))
 
-!    if (v_coupling == v_vector) then 
+!    if (v_coupling == v_vector) then
        vWq = -ci*spi2(e1,sp)
 !    else
 !       sp5 = spi5(sp)
@@ -159,7 +159,7 @@ module recurrenceA
 
   function g(e,k,giarray,pol_int) result(res)
     double complex, intent(in) :: e(:,:),k(:,:)
-    integer, intent(in),optional       :: giarray(:),pol_int 
+    integer, intent(in),optional       :: giarray(:),pol_int
     double complex             :: res(size(e,dim=1))
     res = vgluon(e,k,giarray,pol_int)
   end function g
@@ -167,7 +167,7 @@ module recurrenceA
   !  ---  recurrence for gluon currents
   recursive function vgluon(e,k,giarray,pol_int) result(res)
     double complex, intent(in) :: e(:,:),k(:,:)
-    integer, intent(in),optional       :: giarray(:),pol_int 
+    integer, intent(in),optional       :: giarray(:),pol_int
     double complex             :: res(size(e,dim=1))
     ! -----------------------------------------------------
     double complex :: k1(size(e,dim=1)),k2(size(e,dim=1)),k3(size(e,dim=1))
@@ -175,38 +175,38 @@ module recurrenceA
     double complex :: tmp(size(e,dim=1))
     double complex :: k1sq, k2sq, k3sq
     integer       :: npart, m, m1
-    logical :: done 
+    logical :: done
 
     npart = size(e,dim=2)
 
-    if (npart == 0) then 
-       res = czero 
-       return 
+    if (npart == 0) then
+       res = czero
+       return
     endif
-    if (npart == 1) then 
+    if (npart == 1) then
        res = e(:,1)
-       return 
+       return
     endif
 
     !if (verbose) write(*,*) 'entering vgluon:npart',npart
     !if (verbose .and. present(giarray)) write(*,*) 'entering vgluon:gi',giarray
-    done = .false. 
-!    if (present(giarray)) then 
-!       if (npart /= size(giarray)) stop 'vgluon: npart/= size(giarray)' 
+    done = .false.
+!    if (present(giarray)) then
+!       if (npart /= size(giarray)) stop 'vgluon: npart/= size(giarray)'
 !       call memory_check(pol_int,res,done,giarray)
-!       if (done) return 
+!       if (done) return
 !    else
-!       if (i_warn < max_warn) then 
-!          write(*,*) 'vgluon: giarray missing', i_warn 
+!       if (i_warn < max_warn) then
+!          write(*,*) 'vgluon: giarray missing', i_warn
 !          i_warn = i_warn+1
 !       endif
 !    endif
 
 
-    if (npart == 1) then 
+    if (npart == 1) then
        res = e(:,1)
 
-    elseif (npart == 2) then 
+    elseif (npart == 2) then
        res = vggg(e(:,1),k(:,1),e(:,2),k(:,2))
 
     else
@@ -224,27 +224,27 @@ module recurrenceA
 
           tmp = vggg(e1,k1,e2,k2)
 
-          if (m > 1) then 
+          if (m > 1) then
              k1sq = sc(k1,k1)
-             if (abs(k1sq) > propcut) then 
+             if (abs(k1sq) > propcut) then
                 tmp = -ci*tmp/k1sq
              else
                 tmp = czero
              endif
           endif
 
-          if (m + 1 < npart) then 
+          if (m + 1 < npart) then
              k2sq = sc(k2,k2)
-             if (abs(k2sq) > propcut) then 
+             if (abs(k2sq) > propcut) then
                 tmp = -ci*tmp/k2sq
              else
-                tmp = czero 
+                tmp = czero
              endif
           endif
 
           res = res + tmp
 
-          if (m <= npart-2) then 
+          if (m <= npart-2) then
 
              do m1=m+1,npart-1
                 e2=vgluon(e(:,m+1:m1),k(:,m+1:m1),giarray(m+1:m1),pol_int)
@@ -253,25 +253,25 @@ module recurrenceA
                 k2 = sum(k(:,m+1:m1),dim=2)
                 k3 = sum(k(:,m1+1:npart),dim=2)
                 tmp = vgggg(e1,e2,e3)
-                if (m > 1) then  
+                if (m > 1) then
                    k1sq = sc(k1,k1)
-                   if(abs(k1sq) > propcut) then 
+                   if(abs(k1sq) > propcut) then
                       tmp = -ci*tmp/k1sq
-                   else 
+                   else
                       tmp = czero
                    endif
                 endif
-                if (m+1 < m1) then 
+                if (m+1 < m1) then
                    k2sq = sc(k2,k2)
-                   if(abs(k2sq) > propcut) then 
+                   if(abs(k2sq) > propcut) then
                       tmp = -ci*tmp/k2sq
                    else
                       tmp = czero
                    endif
                 endif
-                if (m1+1 < npart) then 
+                if (m1+1 < npart) then
                    k3sq = sc(k3,k3)
-                   if(abs(k3sq) > propcut) then 
+                   if(abs(k3sq) > propcut) then
                       tmp = -ci*tmp/k3sq
                    else
                       tmp = czero
@@ -286,7 +286,7 @@ module recurrenceA
 
     endif
 
-    ! -- store current 
+    ! -- store current
 !    if (present(giarray))   call store_result(pol_int,res,giarray)
 
 
@@ -294,14 +294,14 @@ module recurrenceA
 
 
 
-  ! ---- fermion current 
+  ! ---- fermion current
   recursive function f(e,k,sp,p,flout,flin,ms,giarray,qiarray,pol_int) &
        &result(res)
     double complex, intent(in) :: e(:,:), k(:,:), sp(:), p(:)
     character(len=3),  intent(in)  :: flin    ! flavor of off-shell f-line
     character(len=3),  intent(in)  :: flout   ! flavor of on-shell f-line
     integer, intent(in) ::  ms
-    integer, intent(in), optional       :: giarray(:),qiarray(:),pol_int 
+    integer, intent(in), optional       :: giarray(:),qiarray(:),pol_int
     ! -----------------------------------------------------------------------
     double complex :: res(size(sp))
     double complex :: tmp(size(sp))
@@ -312,16 +312,16 @@ module recurrenceA
     double complex :: k1sq,k2sq
 !    real(dp)    :: mass,mass2
     integer       :: ms1,m,ng1, ng2, ngluon
-    logical       :: done 
+    logical       :: done
 
-    ! NB: this is must not cached, because caching does not have info about 
-    !     flavour 
-    if (flout.ne.flin) then 
-       res = czero 
+    ! NB: this is must not cached, because caching does not have info about
+    !     flavour
+    if (flout.ne.flin) then
+       res = czero
        return
     endif
 
-    if (size(e,dim=2) == 0) then 
+    if (size(e,dim=2) == 0) then
        res = sp
        return
     endif
@@ -330,32 +330,32 @@ module recurrenceA
     !     &size(e,dim=2),ms,size(e,dim=2)-ms
     !if (verbose .and. present(giarray)) write(*,*) 'entering f:giarray',giarray
     !if (verbose) write(*,*) 'entering f:qiarray',qiarray
-    
-    done = .false. 
-!    if (present(giarray)) then 
+
+    done = .false.
+!    if (present(giarray)) then
 !       !if (size(qiarray) /= 1) stop 'f: wrong size qiarray'
-!       !if (size(e,dim=2) /= size(giarray)) stop 'f: ng= size(giarray)' 
+!       !if (size(e,dim=2) /= size(giarray)) stop 'f: ng= size(giarray)'
 !       call memory_check(pol_int,res,done,giarray,qiarray)
-!       if (done) return ! XXX 
+!       if (done) return ! XXX
 !    else
-!       if (i_warn < max_warn) then 
+!       if (i_warn < max_warn) then
 !          write(*,*) 'f: giarray missing'
 !          i_warn = i_warn+1
 !       endif
-!!       stop 
+!!       stop
 !    endif
 
     !mass = mt
     !mass2 = mass**2
 
     ngluon = size(e,dim=2)
-    ng1 = ms           ! #gluons to the left of the f-line 
+    ng1 = ms           ! #gluons to the left of the f-line
     ng2 = ngluon - ms  ! #gluons to the right of the f-line
 
 
     if ((ng1 < 0) .or. (ng2 < 0)) write(*,*) 'WRONG DEFINITION OF CURRENT f'
 
-    if (ngluon == 0) then 
+    if (ngluon == 0) then
        res = sp
 
     else
@@ -363,10 +363,10 @@ module recurrenceA
        res = czero
 
        do m=0,ng2-1
-          if (ng1+1+m<=ngluon) then 
+          if (ng1+1+m<=ngluon) then
              k1 = sum(k(:,ng1+1+m:ngluon),dim=2)
           else
-             k1 = czero 
+             k1 = czero
           endif
 
           e1=vgluon(e(:,ng1+1+m:ngluon),k(:,ng1+1+m:ngluon), &
@@ -374,7 +374,7 @@ module recurrenceA
 
           k1sq=sc(k1,k1)
 
-          if (1<=ng1+m) then 
+          if (1<=ng1+m) then
              k2 = sum(k(:,1:ng1+m),dim=2)
           else
              k2 = czero
@@ -389,19 +389,19 @@ module recurrenceA
 
           tmp = vqg(sp2,e1)
 
-          if (m < ng2-1)  then      
-             if(abs(k1sq) > propcut) then 
+          if (m < ng2-1)  then
+             if(abs(k1sq) > propcut) then
                 tmp = -ci/k1sq*tmp
              else
                 tmp = czero
              endif
           endif
 
-          if (ng1>0.or.m>0) then 
-             if (abs(k2sq) > propcut) then 
+          if (ng1>0.or.m>0) then
+             if (abs(k2sq) > propcut) then
                 tmp =  ci/k2sq*tmp
              else
-                tmp = czero 
+                tmp = czero
              endif
           endif
 
@@ -418,10 +418,10 @@ module recurrenceA
 
           k1sq = sc(k1,k1)
 
-          if (m+1<=ngluon) then 
+          if (m+1<=ngluon) then
              k2 = sum(k(:,m+1:ngluon),dim=2)
           else
-             k2 = czero 
+             k2 = czero
           endif
 
           k2 = k2 + p
@@ -434,19 +434,19 @@ module recurrenceA
 
           tmp = vgq(e1,sp2)
 
-          if (m > 1) then  
-             if (abs(k1sq) > propcut) then 
+          if (m > 1) then
+             if (abs(k1sq) > propcut) then
                 tmp=-ci/k1sq*tmp
              else
-                tmp = czero 
+                tmp = czero
              endif
           endif
 
-          if (ng2 > 0.or. m < ng1) then 
-             if (abs(k2sq) > propcut) then 
+          if (ng2 > 0.or. m < ng1) then
+             if (abs(k2sq) > propcut) then
                 tmp=ci/k2sq*tmp
              else
-                tmp = czero 
+                tmp = czero
              endif
           endif
 
@@ -456,8 +456,8 @@ module recurrenceA
 
     endif
 
-    ! -- store current 
-!    if (present(giarray)) then 
+    ! -- store current
+!    if (present(giarray)) then
 !       call store_result(pol_int,res,giarray,qiarray)
 !       !if (verbose) write(*,*) 'f: storing',ngluon,ng1,ng2,res
 !    endif
@@ -474,7 +474,7 @@ module recurrenceA
     integer, intent(in) ::  ms
     character, intent(in) :: flout*3  ! flavor of on-shell f-line
     character, intent(in) :: flin*3   ! flavor of off-shell f-line
-    integer, intent(in), optional       :: giarray(:),qiarray(:),pol_int 
+    integer, intent(in), optional       :: giarray(:),qiarray(:),pol_int
     ! -----------------------------------------------------------------------
     double complex             :: res(size(sp))
     double complex             :: tmp(size(sp))
@@ -485,53 +485,53 @@ module recurrenceA
     double complex             :: k1sq,k2sq
 !    real(dp)                :: mass,mass2
     integer                   :: ms1,m,ng1, ng2, ngluon
-    logical                   :: done 
+    logical                   :: done
 
     !if (verbose) write(*,*) 'entering bf:ngluon,ng1,ng2',&
     !     &size(e,dim=2),ms,size(e,dim=2)-ms
     !if (verbose .and. present(giarray)) write(*,*) 'entering bf:giarray',giarray
     !if (verbose) write(*,*) 'entering bf:qiarray',qiarray
 
-    if (flout.ne.flin) then 
-       res = czero 
-       return 
+    if (flout.ne.flin) then
+       res = czero
+       return
     endif
 
-    if (size(e,dim=2) == 0) then 
+    if (size(e,dim=2) == 0) then
        res = sp
        return
     endif
 
 
-    done = .false. 
-!    if (present(giarray)) then 
+    done = .false.
+!    if (present(giarray)) then
 !       !if (size(qiarray) /= 1) stop 'bf: wrong size qiarray'
-!       !if (size(e,dim=2) /= size(giarray)) then 
+!       !if (size(e,dim=2) /= size(giarray)) then
 !       !   write(*,*) size(giarray), size(e,dim=2)
-!       !   stop 'bf: ng= size(giarray)' 
+!       !   stop 'bf: ng= size(giarray)'
 !       !endif
 !       call memory_check(pol_int,res,done,giarray,qiarray)
-!       if (done) return 
+!       if (done) return
 !    else
-!       if (i_warn < max_warn) then 
+!       if (i_warn < max_warn) then
 !          write(*,*) 'bf: giarray missing'
 !          i_warn = i_warn+1
 !       endif
-!!       stop 
+!!       stop
 !    endif
 
 !    mass = mt
 !    mass2 = mt**2
 
     ngluon = size(e,dim=2)
-    ng1 = ms   !#gluons to the left of a f-line 
+    ng1 = ms   !#gluons to the left of a f-line
     ng2 = ngluon - ms  !#gluons to the right of the f-line
 
     !if (verbose) write(*,*) 'in function bf', ng1, ngluon
 
     if ((ng1 < 0) .and. (ng2 < 0)) write(*,*) 'bf: WRONG DEFINITION OF CURRENT'
 
-    if (ngluon == 0) then 
+    if (ngluon == 0) then
        res = sp
 
     else
@@ -539,20 +539,20 @@ module recurrenceA
        res = czero
 
        do m=0,ng2-1
-          if (ng1+1+m<=ngluon) then 
+          if (ng1+1+m<=ngluon) then
              k1 = sum(k(:,ng1+1+m:ngluon),dim=2)
           else
-             k1 = czero 
+             k1 = czero
           endif
           e1=vgluon(e(:,ng1+1+m:ngluon),k(:,ng1+1+m:ngluon),&
                &giarray(ng1+1+m:ngluon),pol_int)
 
           k1sq=sc(k1,k1)
 
-          if (1<=ng1+m) then 
+          if (1<=ng1+m) then
              k2 = sum(k(:,1:ng1+m),dim=2)
           else
-             k2 = czero 
+             k2 = czero
           endif
           k2 = -k2 - p
           k2sq = sc(k2,k2)!-mass2
@@ -563,15 +563,15 @@ module recurrenceA
 
           tmp = vbqg(sp2,e1)
 
-          if (m < ng2-1) then       
-             if (abs(k1sq) > propcut) then 
+          if (m < ng2-1) then
+             if (abs(k1sq) > propcut) then
                 tmp = -ci/k1sq*tmp
              else
-                tmp = czero 
+                tmp = czero
              endif
           endif
-          if (ng1>0.or.m>0) then 
-             if (abs(k2sq) > propcut) then 
+          if (ng1>0.or.m>0) then
+             if (abs(k2sq) > propcut) then
                 tmp =  ci/k2sq*tmp
              else
                 tmp = czero
@@ -591,10 +591,10 @@ module recurrenceA
                &giarray(1:m),pol_int)
           k1sq = sc(k1,k1)
 
-          if (m+1<=ngluon) then 
+          if (m+1<=ngluon) then
              k2 = sum(k(:,m+1:ngluon),dim=2)
           else
-             k2 = czero 
+             k2 = czero
           endif
           k2 = -k2 - p
           k2sq = sc(k2,k2) !- mass2
@@ -606,19 +606,19 @@ module recurrenceA
 
           tmp = vgbq(e1,sp2)
 
-          if (m > 1) then 
-             if (abs(k1sq) > propcut) then 
+          if (m > 1) then
+             if (abs(k1sq) > propcut) then
                 tmp=-ci/k1sq*tmp
-             else 
-                tmp = czero 
+             else
+                tmp = czero
              endif
           endif
 
-          if (ng2 > 0.or. m < ng1) then 
-             if (abs(k2sq) > propcut) then 
+          if (ng2 > 0.or. m < ng1) then
+             if (abs(k2sq) > propcut) then
                 tmp=ci/k2sq*tmp
              else
-                tmp = czero 
+                tmp = czero
              endif
           endif
 
@@ -629,7 +629,7 @@ module recurrenceA
     endif
 
 
-!    ! -- store current 
+!    ! -- store current
 !    if (present(giarray)) then
 !       call store_result(pol_int,res,giarray,qiarray)
 !       !if (verbose) write(*,*) 'bf: storing',ngluon,ng1,ng2,res

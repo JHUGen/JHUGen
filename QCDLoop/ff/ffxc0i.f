@@ -343,7 +343,7 @@ c
 	    endif
 	    hulp = zm*zm1*4*del2/delta**2
 *
-*	    14-jan-1994: do not count when this is small, this was 
+*	    14-jan-1994: do not count when this is small, this was
 *	    meant to be so by the user carefully adjusting delta
 *
 	    ier0 = ier
@@ -782,9 +782,9 @@ c
 		endif
 		cs(14) = +clog2**2/2
 		ipi12 = ipi12 + 2
-*		
+*
 *		and ghe dilog
-*		
+*
 		chulp = cdyzm/cdyzp
 		hulp = DBLE(dyzm)/DBLE(dyzp)
 		if ( DBLE(cdyzm) .lt. 0 ) then

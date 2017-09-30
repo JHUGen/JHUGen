@@ -14,7 +14,7 @@
 *									*
 *	Output:	del4		(real)	det(si.sj)			*
 *									*
-***#]*comment:*********************************************************** 
+***#]*comment:***********************************************************
 *  #[ declarations:
 	implicit none
 *
@@ -35,7 +35,7 @@
 *	common blocks:
 *
 	include 'ff.h'
-*  #] declarations: 
+*  #] declarations:
 *  #[ data:
 	data memind /0/
 	data memarr /mem*0,mem*0,mem*1,mem*1/
@@ -65,14 +65,14 @@
      +	3,7,10,9,3,8,9,10,4,5,6,7,4,5,8,6,4,5,6,10,4,5,7,8,4,5,7,9,4,5,1
      +	0,7,4,5,9,8,4,5,10,9,4,6,8,7,4,6,9,7,4,6,8,9,4,6,8,10,4,6,9,10,4
      +	,7,10,8,4,7,10,9,4,8,9,10/
-*  #] data: 
+*  #] data:
 !$omp threadprivate(iperm,memind,memarr,inow,jnow)
 *  #[ check input:
 	if ( ltest .and. ns .ne. 10 ) then
 	    print *,'ffdel4: error: only for ns = 10, not ',ns
 	    stop
 	endif
-*  #] check input: 
+*  #] check input:
 *  #[ get starting point from memory:
 *
 *	see if we know were to start, if not: go on as last time
@@ -87,7 +87,7 @@
 	    endif
     5	continue
     6	continue
-*  #] get starting point from memory: 
+*  #] get starting point from memory:
 *  #[ calculations:
 	imem = inow
 	jmem = jnow
@@ -192,7 +192,7 @@
 	endif
 	del4 = del4p
 	xmax = xmaxp
-*  #] calculations: 
+*  #] calculations:
 *  #[ into memory:
 	if ( lwrite ) print *,'ffcel4: into memory: ',id,idsub,inow,jnow
 	memind = memind + 1
@@ -202,7 +202,7 @@
 	memarr(memind,3) = inow
 	memarr(memind,4) = jnow
   800	continue
-*  #] into memory: 
+*  #] into memory:
 *  #[ check output:
 	if ( ltest ) then
 *
@@ -246,8 +246,8 @@
 		print *,'diff.:  ',del4-del4p,ier
 	    endif
 	endif
-*  #] check output: 
-*###] ffdel4: 
+*  #] check output:
+*###] ffdel4:
 	end
 *###[ ffdl3p:
 	subroutine ffdl3p(dl3p,piDpj,ns,ii,jj,ier)

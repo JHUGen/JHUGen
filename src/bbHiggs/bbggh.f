@@ -6,15 +6,15 @@
 
       DOUBLE PRECISION FUNCTION  BBGGH(I1,I2,I3,I4)
 * ---------------------------------------------------------------------
-* returns the matrix element squared for the process                   
-*                                                                      
-*          0 -> bbar1 b2 g3 g4 h                                       
-*                                                                      
-* All momenta outgoing.                                                
-* No averaging is performed for initial spins or colors.               
-* No Bose symmetry factors are included.                               
-* No STRONG coupling is included.                                      
-* No Bottom-Higgs coupling is included.                                
+* returns the matrix element squared for the process
+*
+*          0 -> bbar1 b2 g3 g4 h
+*
+* All momenta outgoing.
+* No averaging is performed for initial spins or colors.
+* No Bose symmetry factors are included.
+* No STRONG coupling is included.
+* No Bottom-Higgs coupling is included.
 * ---------------------------------------------------------------------
 
       IMPLICIT NONE
@@ -22,10 +22,10 @@
       include 'sprods_com.f'
       include 'zprods_com.f'
 
-*     ARGUMENTS 
+*     ARGUMENTS
       INTEGER I1,I2,I3,I4
 
-*     LOCAL 
+*     LOCAL
       DOUBLE PRECISION  T123,T124,T134,T234,MH2
       DOUBLE COMPLEX AMP(2,4)
       INTEGER L
@@ -50,16 +50,16 @@
      .(-2d0*zb(i2,i1)**3)/(zb(i3,i1)*zb(i3,i2)*zb(i4,i1)*zb(i4,i2))
 
       amp(2,2)=
-     .  (2d0*zb(i2,i1)**2*(zb(i3,i2)*zb(i4,i1) + 
+     .  (2d0*zb(i2,i1)**2*(zb(i3,i2)*zb(i4,i1) +
      -   zb(i3,i1)*zb(i4,i2)))/
      -  (zb(i3,i1)*zb(i3,i2)*zb(i4,i1)*zb(i4,i2)*zb(i4,i3))
 
 
       amp(1,3)=
      .  (-2d0*zb(i3,i1)*(za(i1,i4)*zb(i2,i1) - za(i3,i4)*zb(i3,i2)))/
-     -  (T134*za(i1,i3)*zb(i4,i1)) - 
+     -  (T134*za(i1,i3)*zb(i4,i1)) -
      -  (2d0*(za(i2,i4)*zb(i2,i1) + za(i3,i4)*zb(i3,i1))*zb(i3,i2))/
-     -  (T234*za(i2,i3)*zb(i4,i2)) - 
+     -  (T234*za(i2,i3)*zb(i4,i2)) -
      -  (2d0*T123*zb(i2,i1))/(za(i1,i3)*za(i2,i3)*zb(i4,i1)*zb(i4,i2))
 
       amp(2,3)=
@@ -67,16 +67,16 @@
      -  (((-s(i1,i3) + s(i1,i4))*zb(i3,i1))/
      -  (T134*zb(i4,i1)) - zb(i3,i2)/zb(i4,i2)))/za(i1,i3)
      - +((za(i2,i4)*zb(i2,i1) + za(i3,i4)*zb(i3,i1))*
-     -  (zb(i3,i1)/zb(i4,i1) + 
+     -  (zb(i3,i1)/zb(i4,i1) +
      -  ((s(i2,i3) - s(i2,i4))*zb(i3,i2))/(T234*zb(i4,i2)))
      -  )/za(i2,i3)))/s(i3,i4)
 
 
       amp(1,4)=
      . (-2d0*T124*zb(i2,i1))/
-     - (za(i1,i4)*za(i2,i4)*zb(i3,i1)*zb(i3,i2)) - 
+     - (za(i1,i4)*za(i2,i4)*zb(i3,i1)*zb(i3,i2)) -
      -  (2d0*(za(i2,i3)*zb(i2,i1) + za(i4,i3)*zb(i4,i1))*zb(i4,i2))/
-     - (T234*za(i2,i4)*zb(i3,i2)) - 
+     - (T234*za(i2,i4)*zb(i3,i2)) -
      -  (2d0*zb(i4,i1)*(za(i1,i3)*zb(i2,i1) - za(i4,i3)*zb(i4,i2)))/
      - (T134*za(i1,i4)*zb(i3,i1))
 
@@ -85,19 +85,19 @@
      -  (((s(i1,i3) - s(i1,i4))*zb(i4,i1))/
      -  (T134*zb(i3,i1)) - zb(i4,i2)/zb(i3,i2)))/za(i1,i4)
      - +((za(i2,i3)*zb(i2,i1) + za(i4,i3)*zb(i4,i1))*
-     -  (zb(i4,i1)/zb(i3,i1) + 
+     -  (zb(i4,i1)/zb(i3,i1) +
      -  ((-s(i2,i3) + s(i2,i4))*zb(i4,i2))/(T234*zb(i3,i2))
      -  ))/za(i2,i4)))/s(i3,i4)
 
-       
 
-      BBGGH=0d0                                        
-      do l=1,4                                         
-         BBGGH=BBGGH                                   
-     .         +(xn**2-2d0)/xn*cdabs(amp(1,l))**2      
-     .         + xn*cdabs(amp(2,l))**2                 
-      enddo                                            
 
-      BBGGH=2D0*BBGGH*V/8d0                            
+      BBGGH=0d0
+      do l=1,4
+         BBGGH=BBGGH
+     .         +(xn**2-2d0)/xn*cdabs(amp(1,l))**2
+     .         + xn*cdabs(amp(2,l))**2
+      enddo
+
+      BBGGH=2D0*BBGGH*V/8d0
 
       END

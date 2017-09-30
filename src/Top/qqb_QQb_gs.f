@@ -10,15 +10,15 @@ c--- all momenta are incoming
 c
 c--- The value of COLOURCHOICE determines which colour structures
 c--- are included in the subtraction terms for the QQGG piece
-      implicit none 
+      implicit none
       include 'constants.f'
       include 'ptilde.f'
       include 'qqgg.f'
-     
+
       integer j,k
 c --- remember: nd will count the dipoles
       integer nd
-c--- slightly obtuse notation, to simplify declaration lines      
+c--- slightly obtuse notation, to simplify declaration lines
       double precision p(mxpart,4),msqc(maxd,fn:nf,fn:nf)
       double precision
      & msq15_2(fn:nf,fn:nf),msq25_1(fn:nf,fn:nf),
@@ -69,7 +69,7 @@ c--- slightly obtuse notation, to simplify declaration lines
 
       external qqb_QQb,qqb_QQb_gvec,donothing_gvec
 
-      
+
       qqproc=.true.
       qgproc=.false.
       gqproc=.false.
@@ -79,13 +79,13 @@ c--- slightly obtuse notation, to simplify declaration lines
 
 c-- initialize the matrix elements to zero
       do j=-nf,nf
-      do k=-nf,nf      
+      do k=-nf,nf
       do nd=1,ndmax
         msqc(nd,j,k)=0d0
       enddo
       enddo
       enddo
-      
+
 
 c--initial-initial
       call dips_mass(1,p,1,5,2,sub15_2,sub15_2v,msq15_2,msq15_2v,
@@ -109,7 +109,7 @@ c--initial final
      . qqb_QQb,qqb_QQb_gvec)
       call storedip_mass(m25_4,m25_4v)
 
-c--final-initial 
+c--final-initial
       call dips_mass(7,p,3,5,1,sub35_1,sub35_1v,msq35_1,msq35_1v,
      . qqb_QQb,donothing_gvec)
       call storedip_mass(m35_1,m35_1v)
@@ -236,5 +236,5 @@ c     . +msqc(9,j,k)+msqc(10,j,k)+msqc(11,j,k)+msqc(12,j,k)
       enddo
 
       return
-      end            
-      
+      end
+

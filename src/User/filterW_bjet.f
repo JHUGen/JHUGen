@@ -1,7 +1,7 @@
       logical function filterW_bjet()
 c--- this routine is specific to the "W_bjet" (and related)
 c--- processes 411 and 416; it inspects the jets to check whether an
-c--- event should be included 
+c--- event should be included
 c--- routine returns FALSE if event does not pass the process-specific cuts
       implicit none
       include 'constants.f'
@@ -14,9 +14,9 @@ c--- routine returns FALSE if event does not pass the process-specific cuts
       common/jetmerge/jetmerge
 !$omp threadprivate(/jetmerge/)
 
-c--- setting this to true vetoes 3-jet events (c.f. CDF analysis)   
+c--- setting this to true vetoes 3-jet events (c.f. CDF analysis)
       veto3jets=.true.
-              
+
 c--- IMPORTANT: generically, we don't want this cut. Here it can be applied
 c---            for comparison with analysis of C. Neu et al. (CDF)
       if (veto3jets .and. (jets .eq. 3)) then
@@ -33,7 +33,7 @@ c--- first check the number of jets (just as in includedipole)
         filterW_bjet=.false.
       return
       endif
-      
+
 ************************************************************************
 c--- W(QQ) for inclusive Wb
 ************************************************************************
@@ -44,7 +44,7 @@ c--- In this category, there should be just one jet, formed by merging
         endif
         return
       endif
-      
+
 ************************************************************************
 c--- WQ(+Q) for inclusive Wb
 ************************************************************************
@@ -56,7 +56,7 @@ c--- the acceptance (i.e. failing pt or rapidity requirements)
         endif
         return
       endif
-      
+
 ************************************************************************
 c--- WQQ/ZQQ + extra jet in real
 ************************************************************************
@@ -77,7 +77,7 @@ c--- only need to check jet identities if there are just 2 jets
         endif
         return
       endif
-      
+
 ************************************************************************
 c--- WQQj/ZQjj/ZQQj
 ************************************************************************
@@ -90,7 +90,7 @@ c--- In this category, there should be three jets
         endif
         return
       endif
-      
+
 ************************************************************************
 c--- WQj/ZQj - basic LO process + extra jet in real
 ************************************************************************
@@ -123,7 +123,7 @@ c--- only need to check jet identities if there are just 2 jets
         endif
         return
       endif
-            
+
 ************************************************************************
 c--- WQj/ZQj - basic LO process + extra Q in real
 ************************************************************************
@@ -153,7 +153,7 @@ c--- only need to check jet identities if there are just 2 jets
         endif
         return
       endif
-            
+
 ************************************************************************
 c--- WQj/ZQj - basic LO process + extra Q in real
 ************************************************************************
@@ -181,8 +181,8 @@ c--- check jet identities if there are just 2 jets
         endif
         return
       endif
-      
-          
+
+
 ************************************************************************
 c--- WQj/ZQj - basic LO process + extra Q in real
 ************************************************************************
@@ -210,7 +210,7 @@ c--- check jet identities if there are just 2 jets
         endif
         return
       endif
-            
+
 ************************************************************************
 c--- To check the ALPGEN approach to producing WQj
 ************************************************************************
@@ -254,8 +254,8 @@ c--- In this category, there should be three jets
         endif
         return
       endif
-      
-      
+
+
       return
       end
-      
+

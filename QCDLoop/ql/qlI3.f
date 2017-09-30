@@ -11,11 +11,11 @@ C     ep=-2,-1,0 chooses the coefficient in the Laurent series.
       double precision p1o,p2o,p3o,m1o,m2o,m3o,mu2o,scalefac,newmu2
       double complex Ival(-2:0)
       integer epdum
-      logical qlzero 
+      logical qlzero
       data p1o,p2o,p3o,m1o,m2o,m3o,mu2o/7*-1d0/
       save Ival,p1o,p2o,p3o,m1o,m2o,m3o,mu2o
 !$omp threadprivate(Ival,p1o,p2o,p3o,m1o,m2o,m3o,mu2o)
-      
+
 
 C--If we have already calculated, use the saved value
 C--else setup the arrays

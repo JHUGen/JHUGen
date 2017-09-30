@@ -1,7 +1,7 @@
       subroutine gen4mdk(r,p,pswt,*)
 c--- this routine is an extension of gen4 to include the decay
 c--- of one of the heavy particles
-      
+
       implicit none
       include 'constants.f'
       include 'mxdim.f'
@@ -42,33 +42,33 @@ c--- set up minimum invariant mass for the W in the top decay
       else
         smin=bbsqmin
       endif
-      
-c--- decay top -> b W      
+
+c--- decay top -> b W
       call phi1_2m_bw(mb,r(11),r(12),r(13),smin,p567,p7,p56,
      & wmass,wwidth,wt567,*99)
-c--- decay W -> e n      
+c--- decay W -> e n
       call phi3m0(r(14),r(15),p56,p5,p6,wt56,*99)
       pswt=pswt/twopi**2*wt567*wt56*pi*mt*twidth
 
       else
       mtbsq=(mt+mb)**2
       tmin=mtbsq/sqrts**2
- 
+
 c--- this part is taken from gen4
       lntaum=dlog(tmin)
       tau=dexp(lntaum*(one-r(14)))
       xjac=-lntaum*tau
 
       x1mx2=two*r(15)-one
-      surd=dsqrt(x1mx2**2+four*tau) 
-           
+      surd=dsqrt(x1mx2**2+four*tau)
+
       xx(1)=half*(+x1mx2+surd)
       xx(2)=half*(-x1mx2+surd)
 
       pswt=xjac*two/surd
 
       if   ((xx(1) .gt. 1d0)  .or. (xx(2) .gt. 1d0)
-     & .or. (xx(1) .lt. xmin) .or. (xx(2) .lt. xmin)) return 1 
+     & .or. (xx(1) .lt. xmin) .or. (xx(2) .lt. xmin)) return 1
 
       do nu=1,4
       p1(nu)=xx(1)*p1ext(nu)
@@ -81,7 +81,7 @@ c--- these must be set this way for this part
       n3=0
 
 c--- taken from phase4
-cc      r(1)=1d0-r(1)/1d2 ! soft p8 
+cc      r(1)=1d0-r(1)/1d2 ! soft p8
       call phi1_2m(0d0,r(1),r(2),r(3),mtbsq,p12,p8,p34567,wt12,*99)
 cc      p8(4)=10d0+1d-3/abs(p1(4))
 cc      p8(3)=-10d0
@@ -110,15 +110,15 @@ c--- set up minimum invariant mass for the W in the top decay
       else
         smin=wsqmin
       endif
-      
-c--- decay top -> b W      
+
+c--- decay top -> b W
       call phi1_2m(mb,r(9),r(10),r(11),smin,p345,p5,p34,wt345,*99)
-c--- decay W -> e n      
+c--- decay W -> e n
       call phi3m0(r(12),r(13),p34,p3,p4,wt34,*99)
-      
+
 c--- compute new weight
       pswt=pswt/twopi**2*wt345*wt34*pi*mt*twidth
-      
+
       endif
 
       do nu=1,4
@@ -130,12 +130,12 @@ c--- compute new weight
       p(6,nu)=p6(nu)
       p(7,nu)=p7(nu)
       p(8,nu)=p8(nu)
-      enddo 
+      enddo
 
       return
-      
+
    99 continue
-      return 1    
-      
+      return 1
+
       end
-      
+

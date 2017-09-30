@@ -8,7 +8,7 @@ C     (nwz=-1)
 c      ubar(-p1)+d(-p2)-->t~(=> e^-(p3)+n(p4)+bbar(p5)+g(p7))+F(p6)
 C     averaged(summed) over initial(final) colours and spins
 
-c--- g(p7) represents a gluon 
+c--- g(p7) represents a gluon
 
 
       include 'constants.f'
@@ -23,7 +23,7 @@ c--- g(p7) represents a gluon
 
       call spinoru(7,p,za,zb)
       fac=2d0*gsq*cf*gw**8*xn**2
-      
+
 
       if (nwz .eq. +1) then
 c--- t production
@@ -39,9 +39,9 @@ c--- tbar production
       do k=-nf,nf
       msq(j,k)=0d0
       if     ((j .gt. 0) .and. (k .lt. 0)) then
-      msq(j,k)=Vsq(j,k)*qqb 
+      msq(j,k)=Vsq(j,k)*qqb
       elseif ((j .lt. 0) .and. (k .gt. 0)) then
-      msq(j,k)=Vsq(j,k)*qbq 
+      msq(j,k)=Vsq(j,k)*qbq
       endif
       enddo
       enddo
@@ -51,11 +51,11 @@ c--- tbar production
 
 
       double precision function qqbtbbargd(ju,jb,jn,je,jc,jd,jg,p)
-C     Matrix element squared for single top production with gluon 
+C     Matrix element squared for single top production with gluon
 C     radiation in decay (radiation from final line)
 C      u(ju) b(jb) -> t(n~(jn)+e+(je)+c(jc)+g(jg))+d(jd)
 C     masses of b quarks c.c=b.b=0
-      implicit none 
+      implicit none
       include 'constants.f'
       include 'masses.f'
       include 'zprods_com.f'
@@ -81,7 +81,7 @@ C     masses of b quarks c.c=b.b=0
       endif
       prop=((sne-wmass**2)**2+(wmass*wwidth)**2)
      .    *((ptDpt-mt**2)**2+(mt*twidth)**2)*prop
-      
+
 C  -Lefthanded gluon tb-line
 c      ampf(1)=(zb(je,jc)*za(jc,jg)+zb(je,jn)*za(jn,jg))
 c     . *(+zb(jc,je)*za(je,jd)+zb(jc,jn)*za(jn,jd)+zb(jc,jg)*za(jg,jd))
@@ -99,7 +99,7 @@ c---eikonal form
      . *(za(jg,je)*zb(je,jc)+za(jg,jn)*zb(jn,jc))/zb(jg,jc)/twoptg
       ampf(1)=ampf(1)-za(jg,jn)*zb(ju,jb)/zb(jg,jc)
      . *(zb(je,jc)*za(jc,jd)+zb(je,jn)*za(jn,jd)+zb(je,jg)*za(jg,jd))
- 
+
 C  -Righthanded gluon tb-line
 c      ampf(2)=-(zb(je,jn)*za(jn,jc)
 c     . *(+zb(jg,jc)*za(jc,jd)+zb(jg,je)*za(je,jd)+zb(jg,jn)*za(jn,jd))

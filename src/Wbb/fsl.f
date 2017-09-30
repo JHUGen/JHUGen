@@ -241,6 +241,6 @@
      #s(j1,j2)+s(j3,j4)-s(j5,j6))*zb(j1,j6)+2*za(j2,j5)*zb(j1,j2)*zb(j5,
      #j6))*(t(j3,j5,j6)-t(j4,j5,j6))/4
 
-      fsl=t0      
+      fsl=t0
       return
       end

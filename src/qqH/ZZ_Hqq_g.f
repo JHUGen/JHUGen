@@ -1,9 +1,9 @@
       subroutine ZZ_Hqq_g(p,msq)
-      implicit none 
+      implicit none
 c--- Weak Boson Fusion by Z-Z exchange only
 c---Matrix element squared averaged over initial colors and spins
 c
-c     q(-p1)+q(-p2) -->  H(p3,p4)+q(p5)+q(p6)+g(p7) 
+c     q(-p1)+q(-p2) -->  H(p3,p4)+q(p5)+q(p6)+g(p7)
 c                           |
 c                           |
 c                           |
@@ -21,7 +21,7 @@ c                           ---> b(p3)+bbar(p4)
      . ud_udg_LL,udb_udbg_LL,ud_udg_LR,udb_udbg_LR,
      . ug_uddb_LL,ug_uddb_LR,gu_ddbu_LL,gu_ddbu_LR,
      & msqgamgam
-      
+
       parameter (nup=2,ndo=3)
 
       do j=-nf,nf
@@ -29,7 +29,7 @@ c                           ---> b(p3)+bbar(p4)
       msq(j,k)=0d0
       enddo
       enddo
-      
+
       call dotem(7,p,s)
 
       s34=(p(3,4)+p(4,4))**2
@@ -140,7 +140,7 @@ c--- Calculate some invariants
       msqlr_a=msq_gopphel(i1,i2,i5,i6,i7)
       msqlr_b=msq_gopphel(i2,i1,i6,i5,i7)
 
-c--- catch the unwanted diagrams for the gluon-quark processes     
+c--- catch the unwanted diagrams for the gluon-quark processes
       if (i7 .eq. 1) then
         msqll_b=0d0
         msqlr_b=0d0

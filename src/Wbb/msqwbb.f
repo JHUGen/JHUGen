@@ -3,7 +3,7 @@
       include 'constants.f'
       include 'qcdcouple.f'
       include 'ewcouple.f'
-C---This is the matrix element squared for 
+C---This is the matrix element squared for
 c    |q_L(p1)+q_L(p5) --> q_L(p2)+q_L(pfive)+W(l(p6)+antilepton(p7))|^2
 c   +|q_L(p1)+q_R(p5) --> q_L(p2)+q_R(pfive)+W(l(p6)+antilepton(p7))|^2
 c---with couplings for W included
@@ -14,5 +14,5 @@ c---with couplings for W included
       msqwbb=faclo
      &*(cdabs(aqqb_wbb(i1,i2,i5,i6,3,4))**2
      & +cdabs(aqqb_wbb(i1,i2,i6,i5,3,4))**2)
-      return 
+      return
       end

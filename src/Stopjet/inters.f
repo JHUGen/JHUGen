@@ -21,9 +21,9 @@ c---     average is fixed for "qqbar" rather than "qg"
 
 c color matrix:
 c      integer CF(3,3)
-c      DATA (CF(i,1  ),i=1  ,3  ) /     16,    0,    0/    
-c      DATA (CF(i,2  ),i=1  ,3  ) /      0,   16,   -2/    
-c      DATA (CF(i,3  ),i=1  ,3  ) /      0,   -2,   16/    
+c      DATA (CF(i,1  ),i=1  ,3  ) /     16,    0,    0/
+c      DATA (CF(i,2  ),i=1  ,3  ) /      0,   16,   -2/
+c      DATA (CF(i,3  ),i=1  ,3  ) /      0,   -2,   16/
 
 c particle identifiers:-  NB: changed by JC
       u=1
@@ -81,7 +81,7 @@ c color structure 2
       call reals3(u,g1,d,t1,b1,g2,mq,ma,za,zb,gs3)
 
 c--- note that gs1 corresponds to corrections to the W current and thus
-c--- should receive a factor of gsq_L, all others should be gsq_H      
+c--- should receive a factor of gsq_L, all others should be gsq_H
       gsq_L=fourpi*as_L
       gsq_H=fourpi*as_H
 
@@ -105,20 +105,20 @@ c---                  and "-2d0" by (xn^2*Cf)*(2d0*Cf-Ca)/2d0
 
                 me_slc=me_slc
      &       +gsq_H*gs2(i,j,k,l)*dconjg(gs2(i,j,k,l))
-     &                     *(xn**2*cf)*(2d0*cf-ca)/2d0        
+     &                     *(xn**2*cf)*(2d0*cf-ca)/2d0
      &       /(g1g2b*g1g2t*g1t*g2b*(wmass**2 - 2d0*ud))**2
                 me_slc=me_slc
      &       +gsq_H*gs3(i,j,k,l)*dconjg(gs3(i,j,k,l))
-     &                     *(xn**2*cf)*(2d0*cf-ca)/2d0        
+     &                     *(xn**2*cf)*(2d0*cf-ca)/2d0
      &       /(g1g2b*g1g2t*g1b*g2t*(wmass**2 - 2d0*ud))**2
 c color suppressed terms:
                 me_slc=me_slc
      &       +gsq_H*gs2(i,j,k,l)*dconjg(gs3(i,j,k,l))
-     &                     *(xn**2*cf)*(2d0*cf-ca)/2d0                            
+     &                     *(xn**2*cf)*(2d0*cf-ca)/2d0
      &       /(g1g2b**2*g1g2t**2*g1t*g2b*g1b*g2t*(wmass**2 - 2d0*ud)**2)
                 me_slc=me_slc
      &       +gsq_H*gs3(i,j,k,l)*dconjg(gs2(i,j,k,l))
-     &                     *(xn**2*cf)*(2d0*cf-ca)/2d0                            
+     &                     *(xn**2*cf)*(2d0*cf-ca)/2d0
      &       /(g1g2b**2*g1g2t**2*g1t*g2b*g1b*g2t*(wmass**2 - 2d0*ud)**2)
 
 c--- LC and SLC explicit

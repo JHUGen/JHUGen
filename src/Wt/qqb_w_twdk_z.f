@@ -64,7 +64,7 @@ c--- included only if we are calculating with mb=0
       Q2(q,g,g,is)=Q1(q,g,g,is)
       Q2(a,g,g,is)=Q1(q,g,g,is)
       endif
-      
+
 c--- these are terms coming from the diagrams which are
 c--- a 4-quark contribution, with (q,q~)->g in the initial state
       Q2(g,q,a,is)=ason4pi*2d0*cf*ii_mgq(z,xl12,mbar12,is)
@@ -76,8 +76,8 @@ c--- a 4-quark contribution, with (q,q~)->g in the initial state
       Q1(g,a,q,is)=Q2(g,q,a,is)
       Q1(g,a,a,is)=Q2(g,q,a,is)
       Q1(g,q,q,is)=Q2(g,q,a,is)
-      
+
       enddo
-      
+
       return
       end

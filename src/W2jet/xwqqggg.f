@@ -22,7 +22,7 @@
       double precision mqqb,m1,m2,m0,fac
       double complex tempm0,m(6),amp_qqggg
       mqqb=0d0
-      
+
       fac=avegg*gsq**3*esq**2*xn**3*cf*8d0
 c--- extra factor of 8 due to colour matrix normalization (rt2**6)
 
@@ -45,7 +45,7 @@ c--- extra factor of 8 due to colour matrix normalization (rt2**6)
       i3(6)=j3
       i4(6)=j2
 
-c--- left-left helicity configuration only for fermions 
+c--- left-left helicity configuration only for fermions
       hq=1
       lh=1
 
@@ -81,15 +81,15 @@ c--- (plus perms)
      .      +cdabs(m(2)+m(1)+m(5))**2
      .      +cdabs(m(6)+m(3)+m(2))**2
           mqqb=mqqb+fac*(-m1/xnsq)
-        endif       
+        endif
         if ((colourchoice .eq. 3) .or. (colourchoice .eq. 0)) then
           m0=cdabs(tempm0)**2
-          mqqb=mqqb+fac*m0*(xnsq+1d0)/xnsq**2        
+          mqqb=mqqb+fac*m0*(xnsq+1d0)/xnsq**2
         endif
 
       enddo
       enddo
       enddo
-      
+
       return
       end

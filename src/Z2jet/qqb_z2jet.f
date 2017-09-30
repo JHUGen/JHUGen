@@ -4,7 +4,7 @@ c---Matrix element squared averaged over initial colors and spins
 c     q(-p1)+qbar(-p2) --> Z +g(p5) +g(p6)
 c                          |
 c                          --> l(p3)+a(p4)
-c                            
+c
 c--all momenta incoming
       include 'constants.f'
       include 'masses.f'
@@ -46,7 +46,7 @@ c    .   qbqZgg2(2,2),qbgZqbg2(2,2),gqbZqbg2(2,2),
       double precision mqq(0:2,fn:nf,fn:nf)
       common/mqq/mqq
 !$omp threadprivate(/mqq/)
-      
+
 
 
       do j=-nf,nf
@@ -88,38 +88,38 @@ c        call z2jetsq(5,1,3,4,2,6,za,zb,qbgZqbg2)
 c        call storecsz(qbgZqbg2_cs)
 c        call z2jetsq(5,2,3,4,1,6,za,zb,gqbZqbg2)
 c        call storecsz(gqbZqbg2_cs)
-        
+
 C --NB this is the matrix element for gg->Z qb(5) q(6)
         call z2jetsq(5,6,3,4,1,2,za,zb,ggZqbq2)
-        call storecsz(ggZqbq2_cs)        
+        call storecsz(ggZqbq2_cs)
 
         fac=v*xn/four*(esq*gsq)**2
         do pq=1,2
         do pl=1,2
-        do i=0,2        
+        do i=0,2
           qqbZgg2_cs(i,pq,pl) = half*aveqq*fac*qqbZgg2_cs(i,pq,pl)
           qbqZgg2_cs(i,pq,pl) = half*aveqq*fac*qbqZgg2_cs(i,pq,pl)
           gqZqg2_cs(i,pq,pl)  = aveqg*fac*gqZqg2_cs(i,pq,pl)
           qgZqg2_cs(i,pq,pl)  = aveqg*fac*qgZqg2_cs(i,pq,pl)
           gqbZqbg2_cs(i,pq,pl)= aveqg*fac*gqbZqbg2_cs(i,pq,pl)
           qbgZqbg2_cs(i,pq,pl)= aveqg*fac*qbgZqbg2_cs(i,pq,pl)
-          ggZqbq2_cs(i,pq,pl) = avegg*fac*ggZqbq2_cs(i,pq,pl) 
+          ggZqbq2_cs(i,pq,pl) = avegg*fac*ggZqbq2_cs(i,pq,pl)
        enddo
 
         qqbZgg2(pq,pl) = qqbZgg2_cs(1,pq,pl)+qqbZgg2_cs(2,pq,pl)
-     .                  +qqbZgg2_cs(0,pq,pl) 
+     .                  +qqbZgg2_cs(0,pq,pl)
         gqZqg2(pq,pl)  = gqZqg2_cs(1,pq,pl) +gqZqg2_cs(2,pq,pl)
-     .                  +gqZqg2_cs(0,pq,pl)  
+     .                  +gqZqg2_cs(0,pq,pl)
         qgZqg2(pq,pl)  = qgZqg2_cs(1,pq,pl)  +qgZqg2_cs(2,pq,pl)
-     .                  +qgZqg2_cs(0,pq,pl)  
+     .                  +qgZqg2_cs(0,pq,pl)
 c        qbqZgg2(pq,pl) = qbqZgg2_cs(1,pq,pl)+qbqZgg2_cs(2,pq,pl)
-c     .                  +qbqZgg2_cs(0,pq,pl) 
+c     .                  +qbqZgg2_cs(0,pq,pl)
 c        gqbZqbg2(pq,pl)= gqbZqbg2_cs(1,pq,pl)+gqbZqbg2_cs(2,pq,pl)
 c     .                  +gqbZqbg2_cs(0,pq,pl)
 c        qbgZqbg2(pq,pl)= qbgZqbg2_cs(1,pq,pl)+qbgZqbg2_cs(2,pq,pl)
 c     .                  +qbgZqbg2_cs(0,pq,pl)
         ggZqbq2(pq,pl) = ggZqbq2_cs(1,pq,pl) +ggZqbq2_cs(2,pq,pl)
-     .                  +ggZqbq2_cs(0,pq,pl) 
+     .                  +ggZqbq2_cs(0,pq,pl)
         enddo
         enddo
       endif
@@ -180,7 +180,7 @@ c instead of calling ampqqb_qqb(6,1,2,5,qbqb_a,qbqb_b)
       enddo
       enddo
 
-      faclo=4d0*V*gsq**2*esq**2*aveqq 
+      faclo=4d0*V*gsq**2*esq**2*aveqq
       endif
 
 
@@ -192,7 +192,7 @@ c instead of calling ampqqb_qqb(6,1,2,5,qbqb_a,qbqb_b)
       do icol=0,2
       msq_cs(icol,j,k)=zip
       enddo
-      
+
       if( j .ne. 0 .and. k .ne. 0 .and. j .ne. -k) goto 19
 
       if     ((j .eq. 0) .and. (k .eq. 0)) then
@@ -269,11 +269,11 @@ c---Statistical factor already included above
 
       do j=-nf,nf
       do k=-nf,nf
-      
+
       do icol=0,2
       mqq(icol,j,k)=zip
       enddo
-      
+
           if ((j .gt. 0) .and. (k .gt. 0)) then
 c----QQ case
             if (j .ne. k) then
@@ -405,7 +405,7 @@ c----QbQb case
             endif
 C---q-qb case
          elseif ((j .gt. 0) .and. (k .lt. 0)) then
-             if (j .ne. -k) then 
+             if (j .ne. -k) then
             a111=(Q(+j)*q1+L(+j)*l1*prop)*qRb_a(1,1,1)
      .          +(Q(-k)*q1+L(-k)*l1*prop)*qRb_b(1,1,1)
             a112=(Q(+j)*q1+L(+j)*r1*prop)*qRb_a(1,1,2)
@@ -496,7 +496,7 @@ c--case where final state from annihilation diagrams is the same quark
      .          +(Q(+1)*q1+L(+1)*l1*prop)*qqb_b(2,1,1)
             b212=(Q(+j)*q1+R(+j)*r1*prop)*qqb_a(2,1,2)
      .          +(Q(+1)*q1+L(+1)*r1*prop)*qqb_b(2,1,2)
-            
+
       tdo=faclo*(abs(b111)**2+abs(b112)**2+abs(b221)**2+abs(b222)**2
      .             +abs(b122)**2+abs(b212)**2+abs(b121)**2+abs(b211)**2)
 
@@ -516,7 +516,7 @@ c--case where final state from annihilation diagrams is the same quark
      .          +(Q(+2)*q1+L(+2)*l1*prop)*qqb_b(2,1,1)
             b212=(Q(+j)*q1+R(+j)*r1*prop)*qqb_a(2,1,2)
      .          +(Q(+2)*q1+L(+2)*r1*prop)*qqb_b(2,1,2)
-            
+
       tup=faclo*(abs(b111)**2+abs(b112)**2+abs(b221)**2+abs(b222)**2
      .          +abs(b122)**2+abs(b212)**2+abs(b121)**2+abs(b211)**2)
 
@@ -645,8 +645,8 @@ c  unequal to initial annihilating quarks
       endif
       return
       end
-          
-    
 
-      
-     
+
+
+
+

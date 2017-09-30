@@ -40,7 +40,7 @@ C     end statement functions
      &    za(p3,p5)*za(p7,p8)*zb(p1,p4)*zb(p4,p6)*izb(p1,p8)*zba3(p1,p2
      &    ,p7,p8,p4) - za(p2,p7)*za(p3,p5)*za(p7,p8)*zb(p1,p6)*zb(p4,p5
      &    )*izb(p1,p8)*zba3(p1,p2,p7,p8,p5) - za(p2,p7)*za(p3,p6)*za(p7
-     &    ,p8)*zb(p1,p6)*zb(p4,p6)*izb(p1,p8)*zba3(p1,p2,p7,p8,p5) + 
+     &    ,p8)*zb(p1,p6)*zb(p4,p6)*izb(p1,p8)*zba3(p1,p2,p7,p8,p5) +
      &    za(p2,p7)*za(p4,p5)*za(p7,p8)*zb(p1,p4)*zb(p4,p6)*izb(p1,p8)*
      &    zba3(p1,p2,p7,p8,p3) - za(p2,p8)*za(p3,p5)*za(p7,p8)*zb(p1,p3
      &    )*zb(p4,p6)*izb(p1,p7)*zba3(p1,p2,p7,p8,p3) + za(p2,p8)*za(p3
@@ -65,7 +65,7 @@ C     end statement functions
      &    p1,p7)*izb(p1,p8)*izb(p2,p7)*zba3(p1,p2,p7,p8,p5) - za(p2,p8)
      &    *za(p4,p5)*zb(p1,p2)*zb(p1,p4)*zb(p4,p6)*izb(p1,p7)*izb(p1,p8
      &    )*izb(p2,p7)*zba3(p1,p2,p7,p8,p3) + za(p3,p5)*za(p7,p8)*zb(p1
-     &    ,p3)*zb(p4,p6)*izb(p1,p8)*izb(p2,p7)*zba3(p1,p2,p7,p8,p3) - 
+     &    ,p3)*zb(p4,p6)*izb(p1,p8)*izb(p2,p7)*zba3(p1,p2,p7,p8,p3) -
      &    za(p3,p5)*za(p7,p8)*zb(p1,p4)*zb(p3,p6)*izb(p1,p8)*izb(p2,p7)
      &    *zba3(p1,p2,p7,p8,p3) + za(p3,p5)*za(p7,p8)*zb(p1,p4)*zb(p4,
      &    p6)*izb(p1,p8)*izb(p2,p7)*zba3(p1,p2,p7,p8,p4) )
@@ -83,7 +83,7 @@ C     end statement functions
      &    za(p3,p5)*zb(p1,p8)*zb(p3,p6)*zb(p7,p8)*iza(p2,p7)*zba3(p4,p1
      &    ,p7,p8,p2) + za(p2,p3)*za(p3,p5)*zb(p1,p8)*zb(p4,p6)*zb(p7,p8
      &    )*iza(p2,p7)*zba3(p3,p1,p7,p8,p2) - za(p2,p3)*za(p4,p5)*zb(p1
-     &    ,p7)*zb(p4,p6)*zb(p7,p8)*iza(p2,p8)*zba3(p4,p1,p7,p8,p2) - 
+     &    ,p7)*zb(p4,p6)*zb(p7,p8)*iza(p2,p8)*zba3(p4,p1,p7,p8,p2) -
      &    za(p2,p3)*za(p4,p5)*zb(p1,p8)*zb(p4,p6)*zb(p7,p8)*iza(p2,p7)*
      &    zba3(p4,p1,p7,p8,p2) + za(p2,p4)*za(p3,p5)*zb(p1,p7)*zb(p4,p6
      &    )*zb(p7,p8)*iza(p2,p8)*zba3(p4,p1,p7,p8,p2) + za(p2,p4)*za(p3
@@ -108,7 +108,7 @@ C     end statement functions
      &    p1,p8)*iza(p2,p7)*iza(p2,p8)*zba3(p6,p1,p7,p8,p2) - za(p1,p2)
      &    *za(p2,p5)*za(p3,p6)*zb(p1,p7)*zb(p4,p6)*iza(p1,p8)*iza(p2,p7
      &    )*iza(p2,p8)*zba3(p6,p1,p7,p8,p2) + za(p2,p3)*za(p3,p5)*zb(p3
-     &    ,p6)*zb(p7,p8)*iza(p1,p8)*iza(p2,p7)*zba3(p4,p1,p7,p8,p2) - 
+     &    ,p6)*zb(p7,p8)*iza(p1,p8)*iza(p2,p7)*zba3(p4,p1,p7,p8,p2) -
      &    za(p2,p3)*za(p3,p5)*zb(p4,p6)*zb(p7,p8)*iza(p1,p8)*iza(p2,p7)
      &    *zba3(p3,p1,p7,p8,p2) + za(p2,p3)*za(p4,p5)*zb(p4,p6)*zb(p7,
      &    p8)*iza(p1,p8)*iza(p2,p7)*zba3(p4,p1,p7,p8,p2) )
@@ -168,7 +168,7 @@ C     end statement functions
      &    p1,p8)*izb(p2,p7)*izb(p7,p8) + za(p2,p5)*za(p3,p6)*zb(p2,p8)*
      &    zb(p4,p6)*zb(p6,p8)*iza(p1,p8)*izb(p2,p7)*izb(p7,p8) + za(p3,
      &    p5)*za(p3,p7)*zb(p3,p6)*zb(p4,p8)*iza(p1,p8)*izb(p2,p7) - za(
-     &    p3,p5)*za(p5,p7)*zb(p4,p5)*zb(p6,p8)*iza(p1,p8)*izb(p2,p7) + 
+     &    p3,p5)*za(p5,p7)*zb(p4,p5)*zb(p6,p8)*iza(p1,p8)*izb(p2,p7) +
      &    za(p3,p5)*zb(p2,p8)*zb(p4,p6)*iza(p1,p8)*izb(p2,p7)*izb(p7,p8
      &    )*zab2(p2,p3,p4,p8) + za(p3,p5)*zb(p4,p6)*iza(p1,p8)*izb(p2,
      &    p7)*zab2(p7,p3,p4,p8) - za(p3,p6)*za(p5,p7)*zb(p4,p6)*zb(p6,

@@ -8,7 +8,7 @@
 C----now setup pout
       pout(:,:)=p(:,:)
 
- 
+
       p3out(4)=0.5d0*zmass
       p4out(4)=0.5d0*zmass
 
@@ -22,7 +22,7 @@ C----now setup pout
              pout(i4,:)=p4out(:)
              if (jcount .eq. 2) p(i3,:)=p4out(:)
              if (jcount .eq. 2) p(i4,:)=p3out(:)
-       
+
       elseif ((jcount .eq. 3) .or. (jcount .eq. 4)) then
              p3out(1:3)=0d0
              p4out(1:3)=0d0

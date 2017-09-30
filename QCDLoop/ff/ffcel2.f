@@ -181,7 +181,7 @@
 	    s3 = +xpi(ip1)*piDpj(ip2,ip3)/2
 	    delps1 = s1+s2+s3
 	    if ( lwrite ) print *,'  delps1+9 = ',delps1,s1,s2,s3
-	    if ( absc(delps1) .ge. xloss*max(absc(s1),absc(s2)) ) 
+	    if ( absc(delps1) .ge. xloss*max(absc(s1),absc(s2)) )
      +	    	goto 100
 	    if ( max(absc(s1),absc(s2)) .lt. xmax ) then
 		som = delps1
@@ -597,9 +597,9 @@
 		    else
 			jsgn1 = +1
 		    endif
-		    if ( absc(dpipj(ipn,isi)) .lt. 
+		    if ( absc(dpipj(ipn,isi)) .lt.
      +		    	xloss*absc(piDpj(ip1,isi)) .and.
-     +			 absc(piDpj(ipn,ip2)) .lt. 
+     +			 absc(piDpj(ipn,ip2)) .lt.
      +			xloss*absc(piDpj(ip2,isi)) ) then
 *		same:	s(1) = xpi(ip2)*piDpj(ip1,isi)**2
 			s(2) = jsgnn*piDpj(isi,ip2)*piDpj(ipn,ip2)*
@@ -681,9 +681,9 @@
 		    else
 			jsgn1 = +1
 		    endif
-		    if ( absc(dpipj(ipn,isi)) .lt. 
+		    if ( absc(dpipj(ipn,isi)) .lt.
      +		    	xloss*absc(piDpj(ip2,isi)) .and.
-     +			 absc(piDpj(ipn,ip1)) .lt. 
+     +			 absc(piDpj(ipn,ip1)) .lt.
      +			xloss*absc(piDpj(ip1,isi)) ) then
 			s(1) = jsgnn*piDpj(isi,ip1)*piDpj(ipn,ip1)*
      +								xpi(ip2)

@@ -4,24 +4,24 @@
 *     November, 2008.                                                  *
 ************************************************************************
 c--- simple modification of qqb_w1jet_gs.f: permuted 1 and 4, 2 and 3
-c--- to switch leptons with quarks and added a factor of Nc      
-      
+c--- to switch leptons with quarks and added a factor of Nc
+
 c---Matrix element SUBTRACTION squared averaged over initial colors and spins
 c     q(-p1)+qbar(-p2) -->  W + parton(p5) + parton(p6)
 c                           |
 c                            -->l(p3)+a(p4)
 c   positively charged W only
 
-      implicit none 
+      implicit none
       include 'constants.f'
       include 'ptilde.f'
       include 'qqgg.f'
       include 'nflav.f'
       integer j,k,nd
 c --- remember: nd will count the dipoles
-      
+
       double precision p(mxpart,4),msq(maxd,-nf:nf,-nf:nf)
-      double precision 
+      double precision
      & msq45_3(-nf:nf,-nf:nf),msq35_4(-nf:nf,-nf:nf),
      & msq46_3(-nf:nf,-nf:nf),msq36_4(-nf:nf,-nf:nf),
      & msq45_6(-nf:nf,-nf:nf),msq46_5(-nf:nf,-nf:nf),
@@ -67,7 +67,7 @@ c--- calculate all the dipoles
      . epem3j,epem3j_gvec)
 
       do j=-nf,nf
-      do k=-nf,nf      
+      do k=-nf,nf
       do nd=1,ndmax
         msq(nd,j,k)=0d0
       enddo
@@ -98,7 +98,7 @@ c--- note statistical factor of one half for two gluons in the final state
         msq(nd,0,0)=half*msq(nd,0,0)
         msq(nd,0,1)=half*msq(nd,0,1)
         msq(nd,1,0)=half*msq(nd,1,0)
-      enddo      
+      enddo
 
       return
       end

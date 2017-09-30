@@ -8,7 +8,7 @@
 *     q(-p1) +qbar(-p2)=                                               *
 *                       +t(nu(p3)+e+(p4)+b(p5))                        *
 *                       +t~(b~(p6)+e^-(p7)+nu~(p8))                    *
-*                       +nu(p9) + e^+(p10)                             *  
+*                       +nu(p9) + e^+(p10)                             *
 *                                                                      *
 *                                                                      *
 ************************************************************************
@@ -33,7 +33,7 @@
       logical numcheck
       common/numcheck/numcheck
 !$omp threadprivate(/numcheck/)
-      
+
       scheme='dred'
 
       do j=-nf,nf
@@ -63,7 +63,7 @@ c--- perform the usual business to rotate away from the z-direction
         enddo
         enddo
       endif
-      
+
       do nu=1,4
       q(1,nu)=p(1,nu)
       q(2,nu)=p(2,nu)
@@ -121,7 +121,7 @@ c--- QBQ: compute 1-loop and tree amplitudes
       a6(1,2)=a6treemp
       a6(2,1)=a6treepm
       a6(2,2)=a6treepp
-      
+
       qbq=0d0
       do hb=1,2
       do hc=1,2

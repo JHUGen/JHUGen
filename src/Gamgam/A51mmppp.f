@@ -28,7 +28,7 @@ C--- to give (16*pi^2)*(-i)*A^{[1/2]}_{5;1}
      & +za(j1,j2)*zb(j3,j4)*za(j4,j1)*za(j2,j4)*zb(j4,j5)
      & /(6d0*s(j2,j3)*za(j3,j4)*za(j4,j5)*s(j5,j1))
       A51mmppp=-(Vf+Vs)*miA5tree-(Ff+Fs)
-      
+
 c      write(6,*) 'j1,j2,j3,j4,j5,miA5tree',j1,j2,j3,j4,j5,miA5tree
       return
-      end 
+      end

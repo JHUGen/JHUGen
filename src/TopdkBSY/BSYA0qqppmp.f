@@ -11,9 +11,9 @@ C---- (These are twiddle functions, c.f.arXiv:1101.5947[hep-ph],Eq.(91))
       include 'qdef.f'
       integer e1,p2,p3,e4
       double complex zabe4q4p2
-      
+
       zabe4q4p2=-zab(e4,q1,p2)-za(e4,p3)*zb(p3,p2)
-      
+
       BSYA0qqppmp=mt*(za(e1,p3)*zabe4q4p2+za(e4,p3)*zab(e1,q1,p2))
      & /(s(p2,p3))
 

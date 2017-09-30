@@ -2,7 +2,7 @@
 ************************************************************************
 *     Virtual ct's for s-channel single top + jet                      *
 *                                                                      *
-*     q(p1) + g(p2) -> t(p3) + b(p4) + q'(p5)                          *      
+*     q(p1) + g(p2) -> t(p3) + b(p4) + q'(p5)                          *
 *                                                                      *
 *     Author: J. Campbell, June 20, 2008                               *
 *                                                                      *
@@ -27,7 +27,7 @@
      . ff_2mqq,ff_mqq0,ff_mgg,
      . ason4pi_H
       integer is,nu
-          
+
       Q34sq=0d0
       Q35sq=0d0
       Q45sq=0d0
@@ -44,7 +44,7 @@ CDST (5.5)
       mbar34b=mass3/dSqrt(Q34sq)
       mbar35 =mass2/dSqrt(Q35sq)
       mbar45 =mass3/dSqrt(Q45sq)
-      
+
       xl34=dlog(Q34sq/renscale_H**2)
       xl35=dlog(Q35sq/renscale_H**2)
       xl45=dlog(Q45sq/renscale_H**2)
@@ -82,7 +82,7 @@ c--- Tr terms go in (1,0)
      .          (ff_2mqq(z,xl34,mbar34a,mbar34b,is)
      .          +ff_2mqq(z,xl34,mbar34b,mbar34a,is))
      .                       )
-      
+
       caonly=.false.
       nfonly=.true.
       Q1(q,q,g,is)=ason4pi_H*(
@@ -90,7 +90,7 @@ c--- Tr terms go in (1,0)
      .      +ca*(ff_mgg(z,xl45,mbar45,is)/2d0)
      .                       )
       enddo
-      
+
       return
       end
 

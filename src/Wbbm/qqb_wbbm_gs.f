@@ -9,9 +9,9 @@
 *     q(-p1)+qbar(-p2) --> b(p5) + b~(p6) + W +g(p7)                   *
 *                                           |                          *
 *                                           --> nu(p3)+e^+(p4)         *
-*                                                                      *                            
+*                                                                      *
 *     (positively charged W only)                                      *
-*                                                                      *                            
+*                                                                      *
 ************************************************************************
       implicit none
       include 'constants.f'
@@ -22,9 +22,9 @@
       include 'breit.f'
       integer j,k,nd
 c --- remember: nd will count the dipoles
-      
+
       double precision p(mxpart,4),msq(maxd,-nf:nf,-nf:nf),mq
-      double precision 
+      double precision
      & msq17_2(-nf:nf,-nf:nf),msq27_1(-nf:nf,-nf:nf),
      & msq57_6(-nf:nf,-nf:nf),msq67_5(-nf:nf,-nf:nf),
      & msq17_5(-nf:nf,-nf:nf),msq57_1(-nf:nf,-nf:nf),
@@ -71,7 +71,7 @@ c--- calculate all the initial-initial dipoles
      . qqb_wbbm,donothing_gvec)
 
 c--- final-final
-      mass2=mq  
+      mass2=mq
       call dips_mass( 3,p,5,7,6,sub57_6,dsubv,msq57_6,dummyv,
      . qqb_wbbm,donothing_gvec)
       call dips_mass( 4,p,6,7,5,sub67_5,dsubv,msq67_5,dummyv,
@@ -111,7 +111,7 @@ c--- reset mass2 to original value
 
       do j=-(flav-1),(flav-1)
       do k=-(flav-1),(flav-1)
-      
+
       if     ((j.gt.0) .and. (k.lt.0)) then
 c--- quark-antiquark
         msq( 1,j,k)=-sub17_2(qq)*msq17_2(j,k)/xn
@@ -154,7 +154,7 @@ c--- gluon-antiquark
           msq(1,j,k)=sub17_2(qg)
      &    *(msq17_2(+1,k)+msq17_2(+2,k)+msq17_2(+3,k)+msq17_2(+4,k)
      .    +msq17_2(+5,k))
-        endif 
+        endif
 
       elseif (k.eq.0) then
         if (j.gt.0) then
@@ -168,7 +168,7 @@ c--- antiquark-gluon
           msq(2,j,k)=sub27_1(qg)
      &    *(msq27_1(j,+1)+msq27_1(j,+2)+msq27_1(j,+3)+msq27_1(j,+4)
      .     +msq27_1(j,+5))
-        endif 
+        endif
       endif
 
       enddo

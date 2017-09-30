@@ -10,7 +10,7 @@ c---- hg=+1  with s(mu) as gauge vector
 c for nwz=+1
 c     f(-p1)+f(-p2)--> W^+(n(p3)+e^+(p4)) + Qbar(p5)
 c For nwz=-1
-c     f(-p1)+f(-p2)--> W^-(e^-(p3)+nbar(p4))+ Q(p5) 
+c     f(-p1)+f(-p2)--> W^-(e^-(p3)+nbar(p4))+ Q(p5)
 c----
       include 'constants.f'
       include 'epinv.f'
@@ -76,19 +76,19 @@ c----
      &    *xn**(-1)*amp2*fL6m2 + taucg**(-1)*taugs*mQ**2*xn*amp2*ffcg3
      &     + taucg**(-1)*taugs*mQ**2*xn*amp2*fL6m3 - taucg**(-1)*taugs*
      &    mQ**2*xn*amp3*fL6m3 - taucg**(-1)*taugs**2*tcs*xn**(-1)*amp1*
-     &    ffcs1 - taucg**(-1)*taugs**2*qsq**(-1)*mQ**2*cf*amp2*ffcg1 - 
+     &    ffcs1 - taucg**(-1)*taugs**2*qsq**(-1)*mQ**2*cf*amp2*ffcg1 -
      &    taucg**(-1)*taugs**2*cf*amp2*ffcg2 - 2.D0*taucg**(-1)*
      &    taugs**2*xn**(-1)*amp1*ffcs2 + taucg*cf*amp2 + taucg*xn**(-1)
      &    *amp2
       smp = smp - 1.D0/2.D0*taucg*xn**(-1)*amp3*fL6m1 + 1.D0/2.D0*taucg
-     &    *xn*amp3*fL6m3 - 3.D0*taugs*tcg*qsq**(-1)*cf*amp3*ffcg3 - 
+     &    *xn*amp3*fL6m3 - 3.D0*taugs*tcg*qsq**(-1)*cf*amp3*ffcg3 -
      &    taugs*tcg*qsq**(-1)*xn**(-1)*amp2*ffcg3 + 2.D0*taugs*tcg*
      &    qsq**(-1)*xn*amp2*ffcg3 + 2.D0*taugs*cf*amp2 + taugs*xn**(-1)
-     &    *amp2 + taugs*xn**(-1)*amp3*ffcs2 + taugs*xn**(-1)*amp3 - 
+     &    *amp2 + taugs*xn**(-1)*amp3*ffcs2 + taugs*xn**(-1)*amp3 -
      &    taugs**2*qsq**(-1)*cf*amp2*ffcg3 + 1.D0/2.D0*tcs*xn**(-1)*
      &    amp3*fL6m2 + xlog*b0*amp4 - 3.D0/2.D0*epin*cf*amp4 - epin*b0*
      &    amp4 + 1.D0/2.D0*epin*xn**(-1)*amp4 - 1.D0/2.D0*epin*xn*amp4
-     &     + 1.D0/2.D0*epin2*xn**(-1)*amp4 - 3.D0/2.D0*epin2*xn*amp4 - 
+     &     + 1.D0/2.D0*epin2*xn**(-1)*amp4 - 3.D0/2.D0*epin2*xn*amp4 -
      &    qsqhat*cf*amp2 + 1.D0/2.D0*qsqhat*xn**(-1)*amp2*fL6m1 - 1.D0/
      &    2.D0*qsqhat*xn*amp2*fL6m3 + cf*cgs1*amp3 - 5.D0/2.D0*cf*amp4
      &     - xn**(-1)*qcs*amp3 - xn**(-1)*cgs1*amp3*fL6m2 + 1.D0/2.D0*
@@ -112,15 +112,15 @@ c----
      &    tcs**(-1)*mQ**2*xn**(-1)*amp3 - lnrat( - taucs,msq)*epin*
      &    xn**(-1)*amp4 + lnrat( - taucs,msq)**2*xn**(-1)*amp4 + 2.D0*
      &    lnrat(
-     &  - taucg,msq)*taucg**(-1)*taugs*mQ**2*cf*amp1 + 2.D0*lnrat( - 
+     &  - taucg,msq)*taucg**(-1)*taugs*mQ**2*cf*amp1 + 2.D0*lnrat( -
      &    taucg,msq)*taucg**(-1)*taugs*cf*qcs*amp2 + lnrat( - taucg,msq
      &    )*taucg*taugs*tcg**(-1)*xn*amp2 - lnrat( - taucg,msq)*taucg*
      &    xn**(-1)*amp3 + 2.D0*lnrat( - taucg,msq)*taugs*tcg**(-1)*
      &    mQ**2*cf*amp3 + 3.D0*lnrat( - taucg,msq)*taugs*cf*amp1 - 2.D0
-     &    *lnrat( - taucg,msq)*taugs**2*tcg**(-1)*cf*amp2 + lnrat( - 
+     &    *lnrat( - taucg,msq)*taugs**2*tcg**(-1)*cf*amp2 + lnrat( -
      &    taucg,msq)*epin*xn*amp4 + lnrat( - taucg,msq)*xn**(-1)*qcg*
      &    amp1 - lnrat( - taucg,msq)**2*xn*amp4 + lnrat( - taugs,msq)*
-     &    epin*xn*amp4 - 1.D0/2.D0*lnrat( - taugs,msq)**2*xn*amp4 - 
+     &    epin*xn*amp4 - 1.D0/2.D0*lnrat( - taugs,msq)**2*xn*amp4 -
      &    lnrat( - qsqhat,msq)*taucg**(-2)*tcg*qsq**(-1)*qsqhat*cf*
      &    qcs**2*amp2 + lnrat( - qsqhat,msq)*taucg**(-1)*taugs**2*
      &    qsq**(-1)*qsqhat*cf*amp2 + lnrat( - qsqhat,msq)*taucg**(-1)*
@@ -131,8 +131,8 @@ c----
       smp = smp + lnrat( - qsqhat,msq)*taucg*qsq**(-1)*qsqhat*xn**(-1)*
      & amp3 - lnrat( - qsqhat,msq)*taugs*qsq**(-1)*qsqhat*xn*amp2 - 2.D0
      &    *lnrat( - qsqhat,msq)*tcs*qsq**(-1)*qsqhat*cf*amp3 + lnrat(
-     &     - qsqhat,msq)*tcs*qsq**(-1)*qsqhat*xn**(-1)*amp3 - lnrat( - 
-     &    qsqhat,msq)*qsq**(-1)*qsqhat*cf*cgs1*amp3 + 3.D0*lnrat( - 
+     &     - qsqhat,msq)*tcs*qsq**(-1)*qsqhat*xn**(-1)*amp3 - lnrat( -
+     &    qsqhat,msq)*qsq**(-1)*qsqhat*cf*cgs1*amp3 + 3.D0*lnrat( -
      &    qsqhat,msq)*qsqhat*cf*amp2 + C0fb2m(tcg,msq)*taucs**(-1)*
      &    taucg*mQ**2*xn**(-1)*cgs1*amp3 - C0fb2m(tcg,msq)*taucs**(-1)*
      &    taugs*mQ**2*xn**(-1)*cgs1*amp2 + 2.D0*C0fb2m(tcg,msq)*
@@ -146,18 +146,18 @@ c----
      &    xn**(-1)*qcs*cgs1*amp1
       smp = smp + C0fa2m(tcs,qsq,msq)*taugs*mQ**2*xn**(-1)*amp3
 
-      
+
       lomp=za(ie,ic)
-     . /za(ig,is)/za(ig,ic)*(za(is,ic)*zb(is,in)+za(ig,ic)*zb(ig,in)) 
-      
+     . /za(ig,is)/za(ig,ic)*(za(is,ic)*zb(is,in)+za(ig,ic)*zb(ig,in))
+
 c--- include finite counterterm to go from DR to MSbar scheme
 c--- alphas(DR) = alphas(MSbar) * (1+ (Nc / 6) * alphas(MSbar) / (2*pi))
       smp=smp + lomp * xn/6d0
-      
+
 c--- include finite counterterm due to FDH scheme
 c--- gw = gw * ( 1 - 2*cf * alphas(MSbar) / (2*pi))
       smp=smp - lomp * cf * 2d0
-      
+
       virt_mp=smp
       return
       end

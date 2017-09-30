@@ -80,7 +80,7 @@ C   End statement functions
      &    zb(p1,p2)*zb(p2,e5)*mt**2*mw*cWWH - 1.D0/2.D0*izb(p2,p7)*izb(
      &    k5,e5)*za(p6,p7)*zb(p2,p6)*zb(p2,e5)*zab2(p6,p3,p4,p1)*mt**2*
      &    mw**(-1)*cWWH - 1.D0/2.D0*izb(p2,p7)*izb(k5,e5)*zb(p2,e5)*
-     &    zab2(p6,p3,p4,p1)*zab2(p7,p3,p4,p2)*mt**2*mw**(-1)*cWWH - 
+     &    zab2(p6,p3,p4,p1)*zab2(p7,p3,p4,p2)*mt**2*mw**(-1)*cWWH -
      &    izb(p2,p7)*za(p1,p6)*za(p7,k5)*zb(p1,p2)**2*mw*cWWH + izb(p2,
      &    p7)*za(p7,k5)*zb(p1,p2)*zba2(p2,p3,p4,p6)*mw*cWWH )
       Amp(1,t25) = Amp(1,t25) + prW(s16)*prt(s1267)*prt(s126) * (  - 1.D

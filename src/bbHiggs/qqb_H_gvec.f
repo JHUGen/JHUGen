@@ -1,12 +1,12 @@
       subroutine qqb_H_gvec(p,n,in,msq)
-C*********************************************************************** 
+C***********************************************************************
 c     Author: R.K. Ellis                                               *
 c     September, 2001.                                                 *
 c     Matrix element for H production                                  *
 c     averaged over initial colours and spins                          *
 c     contracted with the vector n(mu) (orthogonal to p5)              *
-c     f(-p1)+f(-p2)--> H(b(p3)+b~(p4))+f(p5)                           * 
-C*********************************************************************** 
+c     f(-p1)+f(-p2)--> H(b(p3)+b~(p4))+f(p5)                           *
+C***********************************************************************
       implicit none
       include 'constants.f'
       include 'masses.f'
@@ -42,7 +42,7 @@ c--- run mb to appropriate scale
         mb_eff=massfrun(mb_msbar,scale,amz,2)
       endif
 c       mb_eff=mb_msbar
-      
+
       call hbbdecay(p,3,4,hdecay)
       hdecay=hdecay*susycoup**2
       propsq=1d0/((s(3,4)-hmass**2)**2+(hmass*hwidth)**2)
@@ -63,12 +63,12 @@ c--- Higgs decay, because the Br. Ratio does not include running mb
       endif
       return
       end
- 
+
       double precision function h1jetn(j1,j2,j5,p,n)
-      implicit none 
-C---calculates the amplitude squared for the process 
+      implicit none
+C---calculates the amplitude squared for the process
 c   b(p1)+bbar(p2) --> H(b(p3)+b~(p4))+g(p5)
-c   contracted with the vector n(mu) 
+c   contracted with the vector n(mu)
 c   before spin/color average
       include 'constants.f'
       include 'sprods_com.f'
@@ -84,11 +84,11 @@ c   before spin/color average
 
       call checkndotp(p,n,j5)
 
-      h1jetn=4d0*(  
+      h1jetn=4d0*(
      . +2d0*nDp2**2*(s(j1,j2)+s(j1,j5))/s(j2,j5)**2
-     . +2d0*nDp1**2*(s(j1,j2)+s(j2,j5))/s(j1,j5)**2 
+     . +2d0*nDp1**2*(s(j1,j2)+s(j2,j5))/s(j1,j5)**2
      . +(2d0*s(j2,j5)*nDp1**2+2d0*s(j1,j5)*nDp2**2
-     .  -nDn/2d0*s(j1,j5)**2-nDn/2d0*s(j2,j5)**2 
+     .  -nDn/2d0*s(j1,j5)**2-nDn/2d0*s(j2,j5)**2
      . -4d0*nDp1*nDp2
      . *(s(j1,j2)+s(j1,j5)+s(j2,j5)))/s(j1,j5)/s(j2,j5)- nDn)
 

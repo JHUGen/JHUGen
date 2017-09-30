@@ -6,7 +6,7 @@
 *     calculate the element squared for the virtual corrections        *
 *     to the hadronic decay of the W for the process                   *
 *                                                                      *
-*     q(-p1) +qbar(-p2)=bbar(p6)+e-(p7)+nubar(p8)+nu(p3)+e+(p4)+b(p5)  * 
+*     q(-p1) +qbar(-p2)=bbar(p6)+e-(p7)+nubar(p8)+nu(p3)+e+(p4)+b(p5)  *
 *                                                                      *
 *     Top is kept strictly on-shell although all spin correlations     *
 *     are retained.                                                    *
@@ -37,7 +37,7 @@ C----set all elements to zero
       call toppaironshell(p,0,mprod,mab,mba)
       call tdecay(p,3,4,5,mtop)
       call adecay(p,7,8,6,manti)
-      
+
       do j1=1,2
       do j2=1,2
       mtopv(j1,j2)=czip
@@ -50,7 +50,7 @@ C----set all elements to zero
       if (plabel(7) .eq. 'pp') then
         call adecayW_v(p,7,8,6,mantiv)
       endif
-      
+
       do hb=1,2
       do hc=1,2
       do h12=1,2

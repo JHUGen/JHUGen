@@ -1,12 +1,12 @@
       subroutine qqb_z_gvec(p,n,in,msq)
-C*********************************************************************** 
+C***********************************************************************
 c     Author: R.K. Ellis                                               *
 c     September, 1999.                                                 *
 c     Matrix element for Z production                                  *
 c     averaged over initial colours and spins                          *
 c     contracted with the vector n(mu) (orthogonal to p5)              *
 c     u(-p1)+dbar(-p2)--> g(p5)+ Z^+(l(p3)+a(p4))                      *
-C*********************************************************************** 
+C***********************************************************************
       implicit none
       include 'constants.f'
       include 'qcdcouple.f'
@@ -42,14 +42,14 @@ c      if (s(3,4) .lt. 4d0*mbsq) return
       p1p2(j,k)=0d0
       enddo
       enddo
-       
+
       if (in .eq. 1) then
       p1p2(0,-1)=-aveqg*fac*z1jetn(5,2,1,p,n)
       p1p2(0,+1)=-aveqg*fac*z1jetn(2,5,1,p,n)
       elseif (in .eq. 2) then
       p1p2(+1,0)=-aveqg*fac*z1jetn(1,5,2,p,n)
       p1p2(-1,0)=-aveqg*fac*z1jetn(5,1,2,p,n)
-      elseif (in .eq. 5) then      
+      elseif (in .eq. 5) then
       p1p2(-1,1)=+aveqq*fac*z1jetn(2,1,5,p,n)
       p1p2(1,-1)=+aveqq*fac*z1jetn(1,2,5,p,n)
       endif
@@ -98,12 +98,12 @@ c      if (s(3,4) .lt. 4d0*mbsq) return
 
       return
       end
- 
+
       double precision function z1jetn(j1,j2,j5,p,n)
-      implicit none 
-C---calculates the amplitude squared for the process 
+      implicit none
+C---calculates the amplitude squared for the process
 c   q(p1)+qbar(p2) --> Z(l(p3)+a(p4))+g(p5)
-c   contracted with the vector n(mu) 
+c   contracted with the vector n(mu)
 c   before spin/color average
 c---overall factor of 16 gs**2*gw**4*xw**2*CF*xn removed
 c--note QED propagator included.

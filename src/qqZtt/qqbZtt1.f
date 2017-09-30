@@ -45,11 +45,11 @@ C For charge and couplings of top quark, use up-charge
      & -(Q(j)*Q(j12)+L(j)*R(j12)*propz)
      & *za(p2,q4)*za(p7,a7)*zb(p1,a7)*zb(p4,q4)
 
-      mqqb(1)=(Q(j)*Q(j12)+L(j12)*R(j)*propz)*za(p2,p7)*zb(p1,p4)*mtsq 
+      mqqb(1)=(Q(j)*Q(j12)+L(j12)*R(j)*propz)*za(p2,p7)*zb(p1,p4)*mtsq
      & -(Q(j)*Q(j12)+L(j)*L(j12)*propz)
      & *za(p2,q4)*za(p7,a7)*zb(p1,a7)*zb(p4,q4)
 
-      mqqb(2)=(Q(j)*Q(j12)+R(j)*R(j12)*propz)*za(p1,p7)*zb(p2,p4)*mtsq 
+      mqqb(2)=(Q(j)*Q(j12)+R(j)*R(j12)*propz)*za(p1,p7)*zb(p2,p4)*mtsq
      & -(Q(j)*Q(j12)+L(j)*R(j12)*propz)
      & *za(p1,q4)*za(p7,a7)*zb(p2,a7)*zb(p4,q4)
 

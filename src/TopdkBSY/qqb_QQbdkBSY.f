@@ -6,7 +6,7 @@
 *     calculate the element squared and subtraction terms              *
 *     for the process                                                  *
 *                                                                      *
-*     q(-p1) +qbar(-p2)=bbar(p6)+e-(p7)+nubar(p8)+nu(p3)+e+(p4)+b(p5)  * 
+*     q(-p1) +qbar(-p2)=bbar(p6)+e-(p7)+nubar(p8)+nu(p3)+e+(p4)+b(p5)  *
 *                                                                      *
 *     Top is kept strictly on-shell although all spin correlations     *
 *     are retained.                                                    *
@@ -59,11 +59,11 @@ C--include factor for hadronic decays
 C-----make top and topb massless wrt e+(4) and e-(7) momentum
       c1=mt**2/(s34+s45)
       c4=mt**2/(s67+s78)
-      
+
       do nu=1,4
       q(1,nu)=p(3,nu)+p(4,nu)+p(5,nu)-c1*p(4,nu)
-      q(2,nu)=p(1,nu)    
-      q(3,nu)=p(2,nu)    
+      q(2,nu)=p(1,nu)
+      q(3,nu)=p(2,nu)
       q(4,nu)=p(6,nu)+p(7,nu)+p(8,nu)-c4*p(7,nu)
       q(e1,nu)=p(4,nu)
       q(e4,nu)=p(7,nu)
@@ -78,7 +78,7 @@ C-----make top and topb massless wrt e+(4) and e-(7) momentum
       enddo
       enddo
 
-C---currently s(1,2) and s(1,3) are given as s(1f,2) and s(1f,3)      
+C---currently s(1,2) and s(1,3) are given as s(1f,2) and s(1f,3)
 C---but we want the full s(1,2) and s(1,3)
 C---hence restore them
 
@@ -120,9 +120,9 @@ C---fill qb-q, gg and q-qb elements
       if ((j .lt. 0) .or. (j .gt. 0)) then
           msq(j,-j)=qqb
 C Division of quark into color structures is arbitrary
-          msq_cs(1,j,-j)=qqb/3d0 
-          msq_cs(2,j,-j)=qqb/3d0 
-          msq_cs(0,j,-j)=qqb/3d0 
+          msq_cs(1,j,-j)=qqb/3d0
+          msq_cs(2,j,-j)=qqb/3d0
+          msq_cs(0,j,-j)=qqb/3d0
       elseif (j .eq. 0) then
           msq(0,0)=msq_cs(1,0,0)+msq_cs(2,0,0)+msq_cs(0,0,0)
       endif

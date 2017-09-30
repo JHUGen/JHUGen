@@ -19,9 +19,9 @@ C     the second for helicity of lepton line.
       character*9,parameter:: st(2,2)=
      & reshape((/'q+g-g-qb-','q+g-g+qb-','q+g+g-qb-','q+g+g+qb-'/)
      & ,(/2,2/))
-      
+
 c      compare=.false.
-      
+
 C ---final matrix element squared is needed as function of quark line helicity
 C----and lepton line helicity
 C----first argument is quark line helicity
@@ -35,12 +35,12 @@ C----second argument is lepton line helicity
 c--- extra factor of 4 due to colour matrix normalization (rt2**4)
       fac=fac*4d0
 
-c--- USED TO COMPARE ONLY      
+c--- USED TO COMPARE ONLY
 c      if (compare) then
 c      do hq=1,2
 c      do lh=1,2
 c      mqqb(hq,lh)=0d0
-      
+
 c      do h2=1,2
 c      do h3=1,2
 c        h(2)=h2
@@ -61,8 +61,8 @@ c      write(*,*) 'old mqqb(',hq,',',lh,')',mqqb(hq,lh)
 c      enddo
 c      enddo
 c      endif
-c--- USED TO COMPARE ONLY      
-      
+c--- USED TO COMPARE ONLY
+
       do hq=1,2
       do lh=1,2
       mqqb(hq,lh)=0d0
@@ -85,7 +85,7 @@ C initialize loop sum to zero
      .     i1(1),i2(j),i3(j),i4(1),i5(lh),i6(lh),za,zb)
 c  if hq=2,lh=2,h2=2,h3=2,j=1 then st='q+g+g+qb-'
 c  and we are calculating a6treeg1('q+g+g+qb-',1,2,3,4,5,6,za,zb)
-C  which corresponds to 
+C  which corresponds to
 c  q(4)+l(5) --> q_R(1)+l_R(6)+g_R(2)+g_R(3)
 c  hence, this routine thinks that particle 1 is an outgoing quark
         endif
@@ -98,11 +98,11 @@ c  hence, this routine thinks that particle 1 is an outgoing quark
       enddo
       enddo
       mqqb(hq,lh)=mmsq_cs(1,hq,lh)+mmsq_cs(2,hq,lh)+mmsq_cs(0,hq,lh)
-c      write(*,*) 'tree ',hq,lh,mqqb(hq,lh) 
+c      write(*,*) 'tree ',hq,lh,mqqb(hq,lh)
 c      if (compare) write(*,*) 'new mqqb(',hq,',',lh,')',mqqb(hq,lh)
       enddo
       enddo
-c--- USED TO COMPARE ONLY      
+c--- USED TO COMPARE ONLY
 c      if (compare) then
 c      tamp=a6treeg('q+g+g+qb-',4,3,2,1,6,5,zb,za)
 c--- This amplitude with the choice of arguments we have made
@@ -127,11 +127,11 @@ c      tamp=a6treeg('q+qb-g+g+',1,2,3,4,5,6,za,zb)
 c      write(*,*) 'q+qb-g+g+',tamp
 c      pause
 c      endif
-c--- USED TO COMPARE ONLY      
-      
+c--- USED TO COMPARE ONLY
+
       return
       end
-      
+
       double complex function a6treeg1(st,j1,j2,j3,j4,j5,j6,za,zb)
       implicit none
 c----wrapper to a6treeg that also includes config st='q+g-g-qb-'
@@ -146,7 +146,7 @@ c----wrapper to a6treeg that also includes config st='q+g-g-qb-'
       else
         a6treeg1=a6treeg(st,j1,j2,j3,j4,j5,j6,za,zb)
       endif
-      
+
       return
       end
-      
+

@@ -37,8 +37,8 @@ c---- helicities: 1=minus 2=plus
       msq=fac*msq/prop
       return
       end
- 
- 
+
+
       subroutine amps_4quark(mq,qwidth,p,ix,is,ie,in,jn,je,jb,iy,amp)
       implicit none
       include 'constants.f'
@@ -64,7 +64,7 @@ c---- helicities: 1=minus 2=plus
      &     - za(jb,jn
      &    )*za(ix,iy)*zb(in,ix)*zb(ix,is) - za(jb,jn)*za(iy,iy)*zb(in,
      &    iy)*zb(ix,is) - za(jb,jn)*za(is,iy)*zb(in,is)*zb(ix,is) )
-      amp(1) = amp(1) + zab(ie,je)*zab(iy,ix)*xDy**(-1) * ( 
+      amp(1) = amp(1) + zab(ie,je)*zab(iy,ix)*xDy**(-1) * (
      &    za(jb,jn)*zb(in,is) )
 
       amp(2)=  + zab(ix,je)*xDy**(-1) * ( za(jb,jn)*za(ix,ie
@@ -73,7 +73,7 @@ c---- helicities: 1=minus 2=plus
      &     - za(jb,jn
      &    )*za(ix,ix)*zb(in,ix)*zb(iy,is) - za(jb,jn)*za(iy,ix)*zb(in,
      &    iy)*zb(iy,is) - za(jb,jn)*za(is,ix)*zb(in,is)*zb(iy,is) )
-      amp(2) = amp(2) + zab(ie,je)*zab(ix,iy)*xDy**(-1) * ( 
+      amp(2) = amp(2) + zab(ie,je)*zab(ix,iy)*xDy**(-1) * (
      &    za(jb,jn)*zb(in,is) )
 
 c--- Use the "overall scheme" to include the top width when necessary

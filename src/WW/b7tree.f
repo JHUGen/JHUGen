@@ -16,7 +16,7 @@ c---u(2)+dbar(1)-->nu(3)+e^+(3)+b(5)+bbar(6)+g(7)
       s356=s(j3,j5)+s(j3,j6)+s(j5,j6)
       B7treea=z2(j1,j2,j7,j4)*z2(j1,j3,j6,j5)*za(j3,j6)
      . /(za(j1,j7)*za(j2,j7)*dcmplx(s(j5,j6)*s127*s356))
-      return 
+      return
       end
 
 
@@ -40,5 +40,5 @@ c---u(2)+dbar(1)-->nu(3)+e^+(3)+b(5)+bbar(6)+g(7)
       B7treeb=-za(j2,j6)*zb(j4,j5)
      . *(za(j1,j2)*z2(j3,j4,j5,j1)-za(j2,j7)*z2(j3,j4,j5,j7))
      . /(za(j1,j7)*za(j2,j7)*dcmplx(s(j3,j4)*s127*s345))
-      return 
+      return
       end

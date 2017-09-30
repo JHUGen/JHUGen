@@ -1,7 +1,7 @@
       subroutine phi3m(xth,xphi,p0,p1,p2,m1,m2,wt,*)
-c     massive particle p0 in rest frame 
+c     massive particle p0 in rest frame
 c     decaying into p1 fixed mass m1 and p2 fixed mass m2.
-c     vectors returned p1 and p2 are in the frame in which 
+c     vectors returned p1 and p2 are in the frame in which
 C     p0 is supplied
 c result is 1/8/pi * 2|p|/sqrts  * domega/(4*pi)
 c     factor of (2*pi)^4 included in definition of phase space
@@ -17,22 +17,22 @@ c     factor of (2*pi)^4 included in definition of phase space
 
       wt=0d0
 
-      s=p0(4)**2-p0(1)**2-p0(2)**2-p0(3)**2  
+      s=p0(4)**2-p0(1)**2-p0(2)**2-p0(3)**2
 
       smin=(m1+m2)**2
       if (s .lt. smin) then
-       if (case(1:4) .ne. 'vlch') then 
+       if (case(1:4) .ne. 'vlch') then
         write(6,*) 's<smin',s,smin
        endif
        return 1
       endif
 
-      if (dsqrt(s)-m1-m2 .lt. 0d0) return 1 
+      if (dsqrt(s)-m1-m2 .lt. 0d0) return 1
 
       roots=dsqrt(s)
       m1sq=m1**2
       m2sq=m2**2
-      costh=two*xth-one    
+      costh=two*xth-one
       sinth=dsqrt(one-costh**2)
       phi=twopi*xphi
 
@@ -62,9 +62,9 @@ c      pause
       p2(j)=p0(j)-p1(j)
       enddo
 
-      if (  (p0(4) .lt. 0d0) 
-     & .or. (p1(4) .lt. 0d0) 
-     & .or. (p2(4) .lt. 0d0)) then  
+      if (  (p0(4) .lt. 0d0)
+     & .or. (p1(4) .lt. 0d0)
+     & .or. (p2(4) .lt. 0d0)) then
       write(6,*) 'p0',p0(4),p0(4)**2-p0(1)**2-p0(2)**2-p0(3)**2,s
       write(6,*) 'p1',p1(4),p1(4)**2-p1(1)**2-p1(2)**2-p1(3)**2,m1sq
       write(6,*) 'p2',p2(4),p2(4)**2-p2(1)**2-p2(2)**2-p2(3)**2,m2sq

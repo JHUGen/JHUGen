@@ -278,7 +278,7 @@
 	delps1 = som
 	if ( lwarn ) call ffwarn(83,ier,delps1,smax)
    30	continue
-	if ( lwrite .and. 3*ii+jj-3.ne.1 .and. 3*ii+jj-3.ne.13 ) 
+	if ( lwrite .and. 3*ii+jj-3.ne.1 .and. 3*ii+jj-3.ne.13 )
      +		print *,'  delps1+',3*ii+jj-3,'=', delps1,s1,s2
 *  #] stupid tree:
 *###] ffdl2s:

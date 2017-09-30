@@ -13,7 +13,7 @@ c Revision 1.3  1995/10/06  09:17:20  gj
 c Found stupid typo in ffxc0p which caused the result to be off by pi^2/3 in
 c some equal-mass cases.  Added checks to ffcxs4.f ffcrr.f.
 c
-*--#] log: 
+*--#] log:
 *###[ ffcrr:
 	subroutine ffcrr(crr,ipi12,cy,cy1,cz,cz1,cdyz,ld2yzz,cd2yzz,czz,
      +					czz1,isoort,ieps,ier)

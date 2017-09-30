@@ -9,7 +9,7 @@ c-----where the photon is coming from  the quark line
       character*14 st
       integer j1,j2,j3,j4,j5,j6
       double precision t
-c-----Multiplied by (-i), factor out sqrt(2) 
+c-----Multiplied by (-i), factor out sqrt(2)
       if(st.eq.'q+qb-g+g+lb-l+') then
 c-----(+-++-+)
       a6treeQLlc=
@@ -39,17 +39,17 @@ c-----where the photon is coming from  the lepton line
       include 'sprods_com.f'
       character*14 st
       double precision t
-c-----Multiplied by (-i), factor out sqrt(2) 
+c-----Multiplied by (-i), factor out sqrt(2)
       if(st.eq.'q+qb-g+g+lb-l+') then
 c-----(+-++-+)
       a6treeQLslc=
      .-za(j2,j5)**2/(za(j1,j3)*za(j2,j3)*za(j4,j5)*za(j4,j6))
       elseif(st.eq.'q+qb-g+g-lb-l+') then
 c-----(+-+--+)
-      a6treeQLslc= 
+      a6treeQLslc=
      .-(za(j2,j4)*zb(j4,j6)+za(j2,j5)*zb(j5,j6))**2/
      . (t(j4,j5,j6)*za(j1,j3)*za(j2,j3)*zb(j4,j5)*zb(j4,j6))
-      else 
+      else
       write(6,*) 'unimplemented st',st
       stop
       endif

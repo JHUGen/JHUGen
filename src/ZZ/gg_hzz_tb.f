@@ -17,15 +17,15 @@ c--- The exact result for massive bottom and top quark loops is included
      & ggH2_bquark_swap(2,2,2,2),ggH2_tquark_swap(2,2,2,2)
 
       if (qlfirst) then
-        qlfirst=.false. 
+        qlfirst=.false.
         call qlinit
       endif
-      
+
       msq(:,:)=0d0
-      
+
       call getggHZZamps(p,ggH_bquark,ggH_tquark)
       call getggH2ZZamps(p,ggH2_bquark,ggH2_tquark)
-      
+
       if (interference) then
 c--- for interference, compute amplitudes after 4<->6 swap
        pswap(1,:)=p(1,:)
@@ -37,20 +37,20 @@ c--- for interference, compute amplitudes after 4<->6 swap
        call getggHZZamps(pswap,ggH_bquark_swap,ggH_tquark_swap)
        call getggH2ZZamps(pswap,ggH2_bquark_swap,ggH2_tquark_swap)
       endif
-      
+
       msqgg=0d0
       do h1=1,2
       h2=h1
       do h34=1,2
       do h56=1,2
-      
+
 c--- compute total Higgs amplitude
       AHiggs=
      &  +ggH_bquark(h1,h2,h34,h56)
      &  +ggH_tquark(h1,h2,h34,h56)
      &  +ggH2_bquark(h1,h2,h34,h56)
      &  +ggH2_tquark(h1,h2,h34,h56)
-     
+
       if (interference .eqv. .false.) then
 c--- normal case
         msqgg=msqgg+cdabs(AHiggs)**2
@@ -78,10 +78,10 @@ c--- with interference
 
 c--- overall factor extracted (c.f. getggHZZamps.f)
       fac=avegg*V*(4d0*esq*gsq/(16d0*pisq)*esq)**2
-      
+
       msq(0,0)=msqgg*fac*vsymfact
 
       return
       end
-      
-      
+
+

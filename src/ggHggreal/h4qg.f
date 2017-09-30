@@ -1,10 +1,10 @@
       subroutine h4qg(i1,i2,i3,i4,i5,q4ghsq,q4idghsq)
 C-----Author R.K.Ellis
 C-----November 2004
-C-----Matrix element squared for 
+C-----Matrix element squared for
 C     q(p2)+Q(p4) --> q(p1)+Q(p3)+g(p5)+h
 C-----Summed over colors and spins
-      implicit none 
+      implicit none
       include 'constants.f'
       include 'zprods_com.f'
       integer i1,i2,i3,i4,i5,hq1,hq2,hg,j
@@ -12,7 +12,7 @@ C-----Summed over colors and spins
       double complex ma(4,2,2,2),mb(4,2,2,2),
      .    q4ghppp1,q4ghppp3,q4ghpmp1,q4ghpmp3
 
-C---Amplitudes are labelled by their 
+C---Amplitudes are labelled by their
 C---1) Color structure m(1),m(2),m(2),m(3),m(4)
 C---2) Helicity of incoming line 2
 C---3) Helicity of incoming line 4
@@ -26,7 +26,7 @@ C---    +1/xn*T(C5,i1,i2)*delta(i3,i4)*m(3)
 C---    +1/xn*T(C5,i3,i4)*delta(i1,i2)*m(4))
 C---
 C---
-       
+
 
       ma(1,2,2,2)=+q4ghppp1(i1,i2,i3,i4,i5,za,zb)
       ma(3,2,2,2)=+q4ghppp3(i1,i2,i3,i4,i5,za,zb)
@@ -37,7 +37,7 @@ C---
       ma(3,1,1,2)=-q4ghppp3(i2,i1,i4,i3,i5,za,zb)
       ma(4,1,1,2)=-q4ghppp3(i4,i3,i2,i1,i5,za,zb)
       ma(2,1,1,2)=-ma(4,1,1,2)-ma(3,1,1,2)-ma(1,1,1,2)
-      
+
       ma(2,2,1,1)=-q4ghpmp1(i3,i4,i1,i2,i5,zb,za)
       ma(3,2,1,1)=+q4ghpmp3(i2,i1,i4,i3,i5,zb,za)
       ma(4,2,1,1)=-q4ghpmp3(i3,i4,i1,i2,i5,zb,za)
@@ -74,7 +74,7 @@ c--- additional sign for the crossed amplitudes with initial gluon
       else
         sign=+1d0
       endif
-      
+
 c--- fastest to obtain remaining amplitudes by symmetry
       do j=1,4
       ma(j,1,1,1)=sign*dconjg(ma(j,2,2,2))
@@ -82,7 +82,7 @@ c--- fastest to obtain remaining amplitudes by symmetry
       ma(j,1,2,2)=sign*dconjg(ma(j,2,1,1))
       ma(j,2,1,2)=sign*dconjg(ma(j,1,2,1))
       enddo
-      
+
 
 C now do same piece of work for identical quarks
 C reverse i2 <--> i4
@@ -97,7 +97,7 @@ C multiply with minus sign
       mb(3,1,1,2)=+q4ghppp3(i4,i1,i2,i3,i5,za,zb)
       mb(4,1,1,2)=+q4ghppp3(i2,i3,i4,i1,i5,za,zb)
       mb(2,1,1,2)=-mb(4,1,1,2)-mb(3,1,1,2)-mb(1,1,1,2)
-      
+
       mb(1,2,1,1)=+q4ghpmp1(i1,i4,i3,i2,i5,zb,za)
       mb(3,2,1,1)=+q4ghpmp3(i1,i4,i3,i2,i5,zb,za)
       mb(4,2,1,1)=-q4ghpmp3(i2,i3,i4,i1,i5,zb,za)
@@ -135,14 +135,14 @@ c--- fastest to obtain remaining amplitudes by symmetry
       mb(j,1,2,2)=sign*dconjg(mb(j,2,1,1))
       mb(j,2,1,2)=sign*dconjg(mb(j,1,2,1))
       enddo
-      
+
 
 c      write(6,*) i1,i2,i3,i4,i5
       q4ghsq=0d0
       q4idghsq=0d0
       do hq1=1,2
       do hq2=1,2
-      do hg=1,2 
+      do hg=1,2
 c      write(6,'(a8,3i3,2f21.12)') 'mb 1 ; ',hq1,hq2,hg,mb(1,hq1,hq2,hg)
 c     . -sign*dconjg(mb(1,3-hq1,3-hq2,3-hg))
 c      write(6,'(a8,3i3,2f21.12)') 'mb 2 ; ',hq1,hq2,hg,mb(2,hq1,hq2,hg)
@@ -192,7 +192,7 @@ c--- See the text before Eq.(B24) in DFM
       enddo
 
 c      pause
-      
+
       q4ghsq=0.5d0*Cf*q4ghsq
       q4idghsq=0.5d0*Cf*q4idghsq
 

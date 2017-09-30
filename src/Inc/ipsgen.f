@@ -1,4 +1,4 @@
       logical doipsgen
       integer ipsgen,maxipsgen
       common/ipsgen/doipsgen,ipsgen,maxipsgen
-!$omp threadprivate(/ipsgen/)      
+!$omp threadprivate(/ipsgen/)

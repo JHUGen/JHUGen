@@ -4,7 +4,7 @@ c---Matrix element squared averaged over initial colors and spins
 c     f(-p1) + f(-p2) --> H + f(p5)
 c                         |
 c                         --> b(p3)+bbar(p4)
-c                            
+c
 c--all momenta incoming
 c
 c--- Matrix elements are taken from:
@@ -43,7 +43,7 @@ C   Deal with Higgs decay
       gq=-aveqg*ehsvm4(s(2,5),s(1,5),s(1,2))*hdecay
       mbsq=origmbsq
 
-      do j=-nf,nf    
+      do j=-nf,nf
       do k=-nf,nf
       msq(j,k)=0d0
 
@@ -64,8 +64,8 @@ C   Deal with Higgs decay
 
       return
       end
-      
-      
+
+
       double precision function ehsvm3(s,t,u)
       implicit none
       include 'constants.f'
@@ -86,14 +86,14 @@ c--- approx TRUE uses the heavy fermion approximation to Msq
       else
       ehsvm3=
      . abs(ehsva2(s,t,u))**2+abs(ehsva2(u,s,t))**2+abs(ehsva2(t,u,s))**2
-     . +abs(ehsva4(s,t,u))**2 
+     . +abs(ehsva4(s,t,u))**2
       ehsvm3=gwsq/pi*as**3*xn*V*hmass**8/(s*t*u*wmass**2)*ehsvm3
       endif
-      
+
       return
       end
-      
-      
+
+
       double precision function ehsvm4(s,t,u)
       implicit none
       include 'constants.f'
@@ -115,9 +115,9 @@ c--- approx TRUE uses the heavy fermion approximation to Msq
       ehsvm4=gwsq/(4d0*pi)*as**3*V/2d0*(u**2+t**2)/(s*wmass**2)
      . *hmass**4/(u+t)**2*ehsvm4
       endif
-      
+
       return
       end
-      
-      
- 
+
+
+

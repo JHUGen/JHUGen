@@ -5,15 +5,15 @@
       integer j1,j2,j3,j4,j5
       double complex A51,A52,A5NLOm,A5LOm
 
-* As originally written, the functions A51, A52 correspond to 
+* As originally written, the functions A51, A52 correspond to
 * 0 --> q_R(1)+qb_L(3)+g_R(2)+ebar_L(4)+e_R(5)
 * with all RH couplings
-* However we want it in our 
-* standard form 
+* However we want it in our
+* standard form
 *       0--> qb_R(1)+q_L(2)++e_L(3)+ebar_R(4)+g_L(5)
-* with all LH couplings 
+* with all LH couplings
 
-* so we have made the changes 
+* so we have made the changes
 *
 *                    'q+g+qb-'   (A51)
 *                   (1 ---> 2)

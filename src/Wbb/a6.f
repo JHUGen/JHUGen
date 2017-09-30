@@ -1,4 +1,4 @@
-      double complex function a6(st,j1,j2,j3,j4,j5,j6,za,zb) 
+      double complex function a6(st,j1,j2,j3,j4,j5,j6,za,zb)
       implicit none
 ************************************************************************
 *     Author: R.K. Ellis                                               *
@@ -18,7 +18,7 @@
 
       end
 
-      double complex function switchyard(st,j1,j2,j3,j4,j5,j6,za,zb) 
+      double complex function switchyard(st,j1,j2,j3,j4,j5,j6,za,zb)
 c-----switchyard function to direct to pm,pp or st
       implicit none
       include 'constants.f'
@@ -27,11 +27,11 @@ c-----switchyard function to direct to pm,pp or st
       integer j1,j2,j3,j4,j5,j6
       double complex fpp,fpm,fsl
       if     (st .eq. 'pp') then
-           switchyard=fpp(j1,j2,j3,j4,j5,j6,za,zb) 
+           switchyard=fpp(j1,j2,j3,j4,j5,j6,za,zb)
       elseif (st .eq. 'pm') then
-           switchyard=fpm(j1,j2,j3,j4,j5,j6,za,zb) 
+           switchyard=fpm(j1,j2,j3,j4,j5,j6,za,zb)
       elseif (st .eq. 'sl') then
-           switchyard=fsl(j1,j2,j3,j4,j5,j6,za,zb) 
+           switchyard=fsl(j1,j2,j3,j4,j5,j6,za,zb)
       endif
       end
 

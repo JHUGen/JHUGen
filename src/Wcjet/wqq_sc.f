@@ -30,7 +30,7 @@ c     multiplied by (((a+l)^2-M**2)/(a+l)^2)^2*g^4/gwsq^2/2
       s134=2d0*(se+sn+en)-mch**2
       s156=2d0*(sq+sqb+qqb)
 
-C----define massless momenta      
+C----define massless momenta
       afac=0.5d0*mch**2/cs
 
       do nu=1,4
@@ -39,7 +39,7 @@ C----define massless momenta
           q(j,nu)=p(ic,nu)-p(is,nu)*afac
         else
           q(j,nu)=p(j,nu)
-        endif 
+        endif
       enddo
       enddo
 
@@ -89,8 +89,8 @@ c-- insert the gluon propagator
 
 c--- overall factor from sc_Wqq.frm
       prop=1d0/((two*en-wmass**2)**2+wmass**2*wwidth**2)
-      facqq=aveqq*xn*cf*(gsq*gwsq)**2/2d0*prop    
-            
+      facqq=aveqq*xn*cf*(gsq*gwsq)**2/2d0*prop
+
       msq=facqq*dble(ampmm*Dconjg(ampmm)+ampmp*Dconjg(ampmp)
      .              +amppm*Dconjg(amppm)+amppp*Dconjg(amppp))
 

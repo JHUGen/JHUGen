@@ -9,10 +9,10 @@ C-----Authors: John Campbell and Keith Ellis, November 2011
 C---we are calculating the amplitudes mmpp and mpmp
 C---from our base amplitudes which are ppmp
 
-c--- perform the swaps 5 <-> 7 and 6 <-> 8     
+c--- perform the swaps 5 <-> 7 and 6 <-> 8
       e1p=12-e1
       e4p=14-e4
-            
+
 c      write(6,*) 'e1',e1
 c      write(6,*) 'e4',e4
 C---mpmp
@@ -26,6 +26,6 @@ c---     (complex conjugation = (-1) * [za <-> zb])
       amp(2)=-ppmp(e1,p2,p3,e4p,zb,za,zba,zab)
 c      write(6,*) 'amp(2)',amp(2),abs(amp(2))
 c      write(6,*) 'rat',abs(amp(1))/abs(amp(2))
-c      pause    
+c      pause
       return
       end

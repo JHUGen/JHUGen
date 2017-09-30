@@ -8,7 +8,7 @@
 
       pout(:,:)=p(:,:)
       p34(:)=p(i3,:)+p(i4,:)
-       
+
       p3in(4)=+0.5d0*zmass
 
       if ((jcount .eq. 1) .or. (jcount .eq. 2)) then

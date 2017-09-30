@@ -19,38 +19,38 @@ c--- the Higgs mass
       data icount/1/
       save icount
 !$omp threadprivate(icount)
-      
+
       wt4=0d0
 
       call breitw(r(9),0d0,sqrts**2,hmass,hwidth,s3456,wt3456)
-            
+
       rtshat=dsqrt(s3456)
       ymax=dlog(sqrts/rtshat)
       yave=ymax*(two*r(10)-1d0)
       xjac=two*ymax*wt3456
-           
+
       xx(1)=rtshat/sqrts*exp(+yave)
       xx(2)=rtshat/sqrts*exp(-yave)
 
-      if   ((xx(1) .gt. 1d0) 
+      if   ((xx(1) .gt. 1d0)
      & .or. (xx(2) .gt. 1d0)
      & .or. (xx(1) .lt. xmin)
      & .or. (xx(2) .lt. xmin)) then
-c      write(6,*) 'problems with xx(1),xx(2) in gen4h',xx(1),xx(2)  
-      return 1 
+c      write(6,*) 'problems with xx(1),xx(2) in gen4h',xx(1),xx(2)
+      return 1
       endif
 
       p1(4)=-0.5d0*xx(1)*sqrts
       p1(1)=0d0
       p1(2)=0d0
       p1(3)=-0.5d0*xx(1)*sqrts
-      
+
       p2(4)=-0.5d0*xx(2)*sqrts
       p2(1)=0d0
       p2(2)=0d0
       p2(3)=+0.5d0*xx(2)*sqrts
 
-      call phase4(r,p1,p2,p3,p4,p5,p6,pswt,*999) 
+      call phase4(r,p1,p2,p3,p4,p5,p6,pswt,*999)
 
       do nu=1,4
       p(1,nu)=p1(nu)
@@ -60,7 +60,7 @@ c      write(6,*) 'problems with xx(1),xx(2) in gen4h',xx(1),xx(2)
       p(5,nu)=p5(nu)
       p(6,nu)=p6(nu)
       p(7,nu)=0d0
-      enddo 
+      enddo
 
       if (interference) then
         if (icount .eq. 1) then
@@ -71,13 +71,13 @@ c      write(6,*) 'problems with xx(1),xx(2) in gen4h',xx(1),xx(2)
           do nu=1,4
             p(4,nu)=p6(nu)
             p(6,nu)=p4(nu)
-          enddo 
+          enddo
           icount=icount+1
         endif
       endif
-      
+
       wt4=xjac*pswt/sqrts**2
-      
+
       if (debug) write(6,*) 'wt4 in gen4h',wt4
       return
 

@@ -30,13 +30,13 @@
       logical numcheck
       common/numcheck/numcheck
 !$omp threadprivate(/numcheck/)
-      
+
       scheme='dred'
 
 C----Intialize whole array to zero
       msqv(:,:)=0d0
 
-c--- ensure that QCDLoop is initialized (now done in computescalars.f) 
+c--- ensure that QCDLoop is initialized (now done in computescalars.f)
 c      if (first) then
 c        call qlinit
 c        first=.false.
@@ -63,7 +63,7 @@ c--- perform the usual business to rotate away from the z-direction
         enddo
         enddo
       endif
-      
+
 C--- set up the correct mass, according to 'flav'
       if     (flav .eq. 6) then
         mQsq=mt**2
@@ -126,7 +126,7 @@ c--- QQB: compute 1-loop and tree amplitudes
 
       qqb=fac*dble(a6treemm*dconjg(a61mm)+a6treemp*dconjg(a61mp)
      &            +a6treepm*dconjg(a61pm)+a6treepp*dconjg(a61pp))
-      
+
       do j=-(flav-1),(flav-1)
       do k=-(flav-1),(flav-1)
       if     ((j .gt. 0) .and. (k .lt. 0)) then

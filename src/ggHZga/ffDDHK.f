@@ -43,31 +43,31 @@ C-----suitably generalized to allow off-shell Z-line
       parameter(top=2)
       save mt_eff
 !$omp threadprivate(mt_eff)
-                       
-      if (first) then           
+
+      if (first) then
 c--- run mt to appropriate scale
         if (part .eq. 'lord') then
           mt_eff=massfrun(mt_msbar,hmass,amz,1)
         else
           mt_eff=massfrun(mt_msbar,hmass,amz,2)
-        endif  
+        endif
         first=.false.
       endif
-      
+
       cotw=sqrt((1d0-xw)/xw)
-      mtsq=mt**2 
-      mwsq=wmass**2 
+      mtsq=mt**2
+      mwsq=wmass**2
       f0DDHK=s34*(cotw*fWDDHK(s12,s34,mwsq)
      &+2d0*Q(top)*xn*mt_eff**2/s34*(L(top)+R(top))*ffDDHK(s12,s34,mtsq))
       return
       end
-      
+
 
       double complex function qlC2DDHK(s12,s34,msq)
       implicit none
       include 'scale.f'
       double complex qlI2,qlI3
-      double precision s12,s34,msq 
+      double precision s12,s34,msq
       qlC2DDHK=-dcmplx(0.5d0/(s12-s34))
      & +0.5d0*s34/(s12-s34)**2
      & *(qlI2(s34,msq,msq,musq,0)-qlI2(s12,msq,msq,musq,0))
@@ -84,9 +84,9 @@ c          - C0DDHK(p1,p2,mt,mt,mt)*mt^2*[s12-s34]^-1
       implicit none
       include 'scale.f'
       double complex qlI3
-      double precision s12,s34,msq 
-      
+      double precision s12,s34,msq
+
       qlC0DDHK=qlI3(s12,s34,0d0,msq,msq,msq,musq,0)
-      
+
       return
       end

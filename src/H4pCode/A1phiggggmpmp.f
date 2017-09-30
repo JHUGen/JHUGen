@@ -19,7 +19,7 @@ C     arXiv:0804.4149v3, Eq.(5.15)
       A1phiggggmpmp=C4mpmp(j1,j2,j3,j4,za,zb)
      &            +CR4mpmp(j1,j2,j3,j4,za,zb)
      &          +Rhat4mpmp(j1,j2,j3,j4,za,zb)
-     
+
       return
       end
 
@@ -33,7 +33,7 @@ C     arXiv:0804.4149v3, Eq.(5.1) (factor of C_\Gamma removed)
       integer j1,j2,j3,j4,i
       double complex C4mpmpsub,A0phiggggmpmp,F31m,F42me,F41m,sum
       integer,parameter::ii(7)=(/1,2,3,4,1,2,3/)
-      
+
 c--- set up 's-comma' products
       sc(1,1)=zip
       sc(1,2)=s(j1,j2)
@@ -51,7 +51,7 @@ c--- set up 's-comma' products
       sc(4,2)=s(j4,j1)+s(j4,j2)+s(j1,j2)
       sc(4,3)=sc(1,4) !s(j1,j2)+s(j1,j3)+s(j1,j4)+s(j2,j3)+s(j2,j4)+s(j3,j4)
       sc(4,4)=zip
-      
+
       sum=czip
       do i=1,4
       sum=sum
@@ -69,7 +69,7 @@ c--- set up 's-comma' products
       C4mpmp=sum*A0phiggggmpmp(j1,j2,j3,j4,za,zb)
       return
       end
- 
+
       double complex function C4mpmpsub(j1,j2,j3,j4,za,zb)
       implicit none
 C     arXiv:0804.4149v3, Eq.(5.1) (factor of C_\Gamma removed)
@@ -80,7 +80,7 @@ C     arXiv:0804.4149v3, Eq.(5.1) (factor of C_\Gamma removed)
       integer j1,j2,j3,j4
       double complex trm,trm3241,trm3421,BGRL3,BGRL2,BGRL1,F41mF
       double precision s234
-C     c.f. arXiv:0804.4149v3 Eq.(3.38)     
+C     c.f. arXiv:0804.4149v3 Eq.(3.38)
       trm(j1,j2,j3,j4)=za(j1,j2)*zb(j2,j3)*za(j3,j4)*zb(j4,j1)
       s234=s(j2,j3)+s(j2,j4)+s(j3,j4)
       trm3241=trm(j3,j2,j4,j1)
@@ -93,11 +93,11 @@ c--- MODIFIED: added an overall factor of (-1) here
      . *BGRL1(s(j2,j3),s234))
      . +2d0*(1d0-dfloat(nflav)/xn)
      . *(-0.5d0*(trm3241*trm3421/(s(j2,j4)*s(j1,j3))**2)**2
-     . *F41mF(s234,s(j2,j3),s(j3,j4)) 
+     . *F41mF(s234,s(j2,j3),s(j3,j4))
      . -trm3241*trm3421/s(j1,j3)**4
      . *(+trm3241**2/(3d0*s(j2,j4))*BGRL3(s(j2,j3),s234)
      . +trm3421*trm3241/(2d0*s(j2,j4)**2)*BGRL2(s(j2,j3),s234)
-     . -trm3421*trm3241/(s(j2,j4)**3)*BGRL1(s(j2,j3),s234))) 
+     . -trm3421*trm3241/(s(j2,j4)**3)*BGRL1(s(j2,j3),s234)))
 
       return
       end

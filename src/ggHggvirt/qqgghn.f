@@ -20,16 +20,16 @@ c     calculated by the program qqgghn.frm
 
 c--- appropriate scale is approx 1d-3*energy(incoming)
 c--- so of order(1) for the Tevatron
-      if (abs(nDp4).gt.1d-3*dsqrt(abs(p(1,4)*n(4)))) then 
+      if (abs(nDp4).gt.1d-3*dsqrt(abs(p(1,4)*n(4)))) then
         write(*,*) 'Error in qqgghn for :',p1,p2,p3,p4
         write(*,*) 'cutoff',1d-3*dsqrt(abs(p(1,4)*n(4)))
         write(6,*) 'nDp4',nDp4
         call flush(6)
         stop
       endif
-      
+
       qqgghn_ab=  + s123**(-2)*xn*nDn * ( 6.D0*s(p1,p4)**2 + 12.D0*s(p1
-     &    ,p4)*s(p2,p4) + 12.D0*s(p1,p4)*s(p3,p4) + 6.D0*s(p2,p4)**2 + 
+     &    ,p4)*s(p2,p4) + 12.D0*s(p1,p4)*s(p3,p4) + 6.D0*s(p2,p4)**2 +
      &    12.D0*s(p2,p4)*s(p3,p4) + 6.D0*s(p3,p4)**2 + 8.D0/(s(p1,p2))*
      &    s(p1,p3)*s(p1,p4)**2 + 16.D0/(s(p1,p2))*s(p1,p3)*s(p1,p4)*s(
      &    p2,p4) + 16.D0/(s(p1,p2))*s(p1,p3)*s(p1,p4)*s(p3,p4) + 8.D0/(
@@ -47,7 +47,7 @@ c--- so of order(1) for the Tevatron
       qqgghn_ab = qqgghn_ab + s123**(-2)*xn*nDn * ( 4.D0/(s(p1,p3))*s(
      &    p1,p2)*s(p2,p4)*s(p3,p4) + 2.D0/(s(p1,p3))*s(p1,p2)*s(p3,p4)
      &    **2 )
-      qqgghn_ab = qqgghn_ab + s123**(-1)*s124**(-1)*xn*nDp1*nDp2 * ( 
+      qqgghn_ab = qqgghn_ab + s123**(-1)*s124**(-1)*xn*nDp1*nDp2 * (
      &     - 16.D0*s(p3,p4) - 48.D0/(s(p1,p2))*s(p1,p3)*s(p3,p4) - 80.D0
      &    /(s(p1,p2))*s(p1,p4)*s(p3,p4) - 32.D0/(s(p1,p2))*s(p3,p4)**2
      &     - 32.D0/(s(p1,p2))/(s(p1,p2))*s(p1,p3)**2*s(p3,p4) - 64.D0/(
@@ -58,33 +58,33 @@ c--- so of order(1) for the Tevatron
      &    s(p3,p4) + 16.D0/(s(p1,p2))/(s(p2,p4))*s(p1,p3)*s(p3,p4)**2
      &     - 16.D0/(s(p1,p3))*s(p1,p4)*s(p3,p4) - 16.D0/(s(p1,p3))*s(p3
      &    ,p4)**2 - 16.D0/(s(p2,p4))*s(p1,p3)*s(p3,p4) )
-      qqgghn_ab = qqgghn_ab + s123**(-1)*s124**(-1)*xn*nDp1*nDp3 * ( 
+      qqgghn_ab = qqgghn_ab + s123**(-1)*s124**(-1)*xn*nDp1*nDp3 * (
      &     - 16.D0*s(p1,p2) - 32.D0*s(p1,p3) - 32.D0*s(p3,p4) - 16.D0/(
-     &    s(p1,p2))*s(p1,p3)**2 - 16.D0/(s(p1,p2))*s(p1,p3)*s(p1,p4) - 
+     &    s(p1,p2))*s(p1,p3)**2 - 16.D0/(s(p1,p2))*s(p1,p3)*s(p1,p4) -
      &    16.D0/(s(p1,p2))*s(p1,p3)*s(p3,p4) + 16.D0/(s(p1,p2))*s(p1,p4
      &    )**2 - 32.D0/(s(p1,p2))*s(p1,p4)*s(p3,p4) + 16.D0/(s(p1,p2))
      &    /(s(p1,p3))*s(p1,p4)**3 - 16.D0/(s(p1,p2))/(s(p1,p3))*s(p1,p4
      &    )**2*s(p3,p4) + 16.D0/(s(p1,p3))*s(p1,p2)*s(p1,p4) - 16.D0/(
-     &    s(p1,p3))*s(p1,p2)*s(p3,p4) + 32.D0/(s(p1,p3))*s(p1,p4)**2 - 
+     &    s(p1,p3))*s(p1,p2)*s(p3,p4) + 32.D0/(s(p1,p3))*s(p1,p4)**2 -
      &    32.D0/(s(p1,p3))*s(p1,p4)*s(p3,p4) )
-      qqgghn_ab = qqgghn_ab + s123**(-1)*s124**(-1)*xn*nDp1**2 * (  - 
+      qqgghn_ab = qqgghn_ab + s123**(-1)*s124**(-1)*xn*nDp1**2 * (  -
      &    48.D0*s(p3,p4) - 48.D0/(s(p1,p2))*s(p1,p3)*s(p3,p4) - 64.D0/(
      &    s(p1,p2))*s(p1,p4)*s(p3,p4) - 16.D0/(s(p1,p2))/(s(p1,p2))*s(
      &    p1,p3)**2*s(p3,p4) - 32.D0/(s(p1,p2))/(s(p1,p2))*s(p1,p3)*s(
      &    p1,p4)*s(p3,p4) - 16.D0/(s(p1,p2))/(s(p1,p2))*s(p1,p4)**2*s(
-     &    p3,p4) - 16.D0/(s(p1,p2))/(s(p1,p3))*s(p1,p4)**2*s(p3,p4) - 
+     &    p3,p4) - 16.D0/(s(p1,p2))/(s(p1,p3))*s(p1,p4)**2*s(p3,p4) -
      &    16.D0/(s(p1,p3))*s(p1,p2)*s(p3,p4) - 32.D0/(s(p1,p3))*s(p1,p4
      &    )*s(p3,p4) )
-      qqgghn_ab = qqgghn_ab + s123**(-1)*s124**(-1)*xn*nDp2*nDp3 * ( 
+      qqgghn_ab = qqgghn_ab + s123**(-1)*s124**(-1)*xn*nDp2*nDp3 * (
      &     - 16.D0*s(p1,p3) - 16.D0*s(p1,p4) - 16.D0/(s(p1,p2))*s(p1,p3
      &    )**2 - 16.D0/(s(p1,p2))*s(p1,p3)*s(p1,p4) + 16.D0/(s(p1,p2))*
      &    s(p1,p3)*s(p3,p4) + 16.D0/(s(p1,p2))*s(p1,p4)**2 + 32.D0/(s(
      &    p1,p2))*s(p1,p4)*s(p3,p4) + 16.D0/(s(p1,p2))/(s(p1,p3))*s(p1,
-     &    p4)**3 + 16.D0/(s(p1,p2))/(s(p1,p3))*s(p1,p4)**2*s(p3,p4) + 
+     &    p4)**3 + 16.D0/(s(p1,p2))/(s(p1,p3))*s(p1,p4)**2*s(p3,p4) +
      &    16.D0/(s(p1,p3))*s(p1,p4)**2 + 16.D0/(s(p1,p3))*s(p1,p4)*s(p3
      &    ,p4) - 16.D0/(s(p2,p4))*s(p1,p2)*s(p1,p3) - 16.D0/(s(p2,p4))*
      &    s(p1,p3)**2 + 16.D0/(s(p2,p4))*s(p1,p3)*s(p3,p4) )
-      qqgghn_ab = qqgghn_ab + s123**(-1)*s124**(-1)*xn*nDp2**2 * (  - 
+      qqgghn_ab = qqgghn_ab + s123**(-1)*s124**(-1)*xn*nDp2**2 * (  -
      &    16.D0/(s(p1,p2))*s(p1,p4)*s(p3,p4) - 16.D0/(s(p1,p2))/(s(p1,
      &    p2))*s(p1,p3)**2*s(p3,p4) - 32.D0/(s(p1,p2))/(s(p1,p2))*s(p1,
      &    p3)*s(p1,p4)*s(p3,p4) - 16.D0/(s(p1,p2))/(s(p1,p2))*s(p1,p4)
@@ -92,7 +92,7 @@ c--- so of order(1) for the Tevatron
      &    p4) )
       qqgghn_ab = qqgghn_ab + s123**(-1)*s124**(-1)*xn*nDp3**2 * ( 32.D0
      &    *s(p1,p4) + 16.D0/(s(p1,p2))*s(p1,p3)*s(p1,p4) + 32.D0/(s(p1,
-     &    p2))*s(p1,p4)**2 + 16.D0/(s(p1,p2))/(s(p1,p3))*s(p1,p4)**3 + 
+     &    p2))*s(p1,p4)**2 + 16.D0/(s(p1,p2))/(s(p1,p3))*s(p1,p4)**3 +
      &    16.D0/(s(p1,p3))*s(p1,p2)*s(p1,p4) + 32.D0/(s(p1,p3))*s(p1,p4
      &    )**2 )
       qqgghn_ab = qqgghn_ab + s123**(-1)*s124**(-1)*xn*nDn * (  - 8.D0*
@@ -122,7 +122,7 @@ c--- so of order(1) for the Tevatron
      &    s(p1,p4)*s(p3,p4) + 8.D0/(s(p1,p2))/(s(p1,p3))*s(p2,p4)*s(p3,
      &    p4) + 8.D0/(s(p1,p2))/(s(p1,p3))*s(p3,p4)**2 + 32.D0/(s(p1,p2
      &    ))/(s(p1,p3))/(s(p3,p4))*s(p1,p4)**2*s(p2,p4) - 8.D0/(s(p1,p2
-     &    ))/(s(p2,p4))*s(p1,p4)*s(p3,p4) + 8.D0/(s(p1,p3))*s(p1,p2) - 
+     &    ))/(s(p2,p4))*s(p1,p4)*s(p3,p4) + 8.D0/(s(p1,p3))*s(p1,p2) -
      &    16.D0/(s(p1,p3))*s(p1,p4) - 16.D0/(s(p1,p3))*s(p3,p4) - 8.D0
      &    /(
      & s(p1,p3))/(s(p2,p4))*s(p1,p4)*s(p3,p4) - 8.D0/(s(p1,p3))/(s(p2,
@@ -206,7 +206,7 @@ c--- so of order(1) for the Tevatron
      &    p1,p2))*s(p1,p4)**2 - 20.D0/(s(p1,p2))*s(p1,p4)*s(p2,p4) - 26.
      &    D0/(s(p1,p2))*s(p1,p4)*s(p3,p4) - 6.D0/(s(p1,p2))*s(p2,p4)**2
      &     - 10.D0/(s(p1,p2))*s(p2,p4)*s(p3,p4) - 10.D0/(s(p1,p2))*s(p3
-     &    ,p4)**2 + 16.D0/(s(p1,p2))/(s(p1,p2))*s(p1,p3)**2*s(p1,p4) + 
+     &    ,p4)**2 + 16.D0/(s(p1,p2))/(s(p1,p2))*s(p1,p3)**2*s(p1,p4) +
      &    16.D0/(s(p1,p2))/(s(p1,p2))*s(p1,p3)**2*s(p2,p4) + 8.D0/(s(p1
      &    ,p2))/(s(p1,p2))*s(p1,p3)**2*s(p3,p4) - 8.D0/(s(p1,p2))/(s(p1
      &    ,p2))*s(p1,p3)*s(p1,p4)**2 - 8.D0/(s(p1,p2))/(s(p1,p2))*s(p1,
@@ -223,7 +223,7 @@ c--- so of order(1) for the Tevatron
      &    ))/(s(p3,p4))*s(p1,p4)**3 - 6.D0/(s(p1,p2))/(s(p3,p4))*s(p1,
      &    p4)**2*s(p2,p4) - 6.D0/(s(p1,p2))/(s(p3,p4))*s(p1,p4)*s(p2,p4
      &    )**2 - 2.D0/(s(p1,p2))/(s(p3,p4))*s(p2,p4)**3 + 12.D0/(s(p1,
-     &    p3))*s(p1,p2)*s(p1,p4) + 4.D0/(s(p1,p3))*s(p1,p2)*s(p2,p4) + 
+     &    p3))*s(p1,p2)*s(p1,p4) + 4.D0/(s(p1,p3))*s(p1,p2)*s(p2,p4) +
      &    8.D0/(s(p1,p3))*s(p1,p2)*s(p3,p4) - 6.D0/(s(p1,p3))*s(p1,p4)
      &    **2 - 6.D0/(s(p1,p3))*s(p1,p4)*s(p2,p4) - 8.D0/(s(p1,p3))*s(
      &    p1,p4)*s(p3,p4) - 2.D0/(s(p1,p3))*s(p2,p4)*s(p3,p4) - 4.D0/(
@@ -242,7 +242,7 @@ c--- so of order(1) for the Tevatron
      &    /(s(p2,p4))*s(p1,p4)*s(p3,p4) - 2.D0/(s(p2,p4))*s(p3,p4)**2
      &     + 12.D0/(s(p3,p4))*s(p1,p4)**2 + 16.D0/(s(p3,p4))*s(p1,p4)*
      &    s(p2,p4) + 4.D0/(s(p3,p4))*s(p2,p4)**2 )
-      qqgghn_ab = qqgghn_ab + s124**(-2)*xn*nDn * ( 2.D0*s(p1,p3)**2 + 
+      qqgghn_ab = qqgghn_ab + s124**(-2)*xn*nDn * ( 2.D0*s(p1,p3)**2 +
      &    4.D0*s(p1,p3)*s(p2,p3) + 4.D0*s(p1,p3)*s(p3,p4) + 2.D0*s(p2,
      &    p3)**2 + 4.D0*s(p2,p3)*s(p3,p4) + 2.D0*s(p3,p4)**2 + 4.D0/(s(
      &    p1,p2))/(s(p1,p2))*s(p1,p3)**2*s(p1,p4)**2 + 8.D0/(s(p1,p2))
@@ -259,7 +259,7 @@ c--- so of order(1) for the Tevatron
      &    p1,p2))*s(p1,p3) - 48.D0/(s(p1,p2))*s(p1,p4) - 16.D0/(s(p1,p2
      &    ))*s(p2,p3) - 32.D0/(s(p1,p2))*s(p3,p4) - 32.D0/(s(p1,p2))/(
      &    s(p1,p2))*s(p1,p3)*s(p1,p4) + 32.D0/(s(p1,p2))/(s(p1,p2))*s(
-     &    p1,p3)*s(p3,p4) - 64.D0/(s(p1,p2))/(s(p1,p2))*s(p1,p4)**2 + 
+     &    p1,p3)*s(p3,p4) - 64.D0/(s(p1,p2))/(s(p1,p2))*s(p1,p4)**2 +
      &    32.D0/(s(p1,p2))/(s(p1,p2))*s(p1,p4)*s(p2,p3) + 32.D0/(s(p1,
      &    p2))/(s(p1,p2))*s(p1,p4)*s(p3,p4) - 32.D0/(s(p1,p2))/(s(p1,p2
      &    ))/(s(p3,p4))*s(p1,p3)*s(p1,p4)**2 - 32.D0/(s(p1,p2))/(s(p1,
@@ -277,7 +277,7 @@ c--- so of order(1) for the Tevatron
      &    s(p1,p4)**2*s(p2,p3) - 8.D0/(s(p1,p2))/(s(p3,p4))*s(p1,p3)**2
      &     - 48.D0/(s(p1,p2))/(s(p3,p4))*s(p1,p3)*s(p1,p4) + 16.D0/(s(
      &    p1,p2))/(s(p3,p4))*s(p1,p4)**2 - 16.D0/(s(p1,p2))/(s(p3,p4))*
-     &    s(p1,p4)*s(p2,p3) - 8.D0/(s(p1,p2))/(s(p3,p4))*s(p2,p3)**2 - 
+     &    s(p1,p4)*s(p2,p3) - 8.D0/(s(p1,p2))/(s(p3,p4))*s(p2,p3)**2 -
      &    16.D0/(s(p3,p4))*s(p1,p3) + 16.D0/(s(p3,p4))*s(p1,p4) )
       qqgghn_ab = qqgghn_ab + s124**(-1)*xn*nDp1**2 * (  - 32.D0 - 64.D0
      &    /(s(p1,p2))*s(p1,p4) + 16.D0/(s(p1,p2))*s(p2,p3) + 32.D0/(s(
@@ -287,7 +287,7 @@ c--- so of order(1) for the Tevatron
      &    ))*s(p1,p4)*s(p3,p4) - 16.D0/(s(p1,p2))/(s(p1,p2))*s(p2,p3)*
      &    s(p3,p4) - 16.D0/(s(p1,p2))/(s(p1,p2))/(s(p3,p4))*s(p1,p3)*s(
      &    p1,p4)**2 - 16.D0/(s(p1,p2))/(s(p1,p2))/(s(p3,p4))*s(p1,p4)**
-     &    2*s(p2,p3) - 32.D0/(s(p1,p2))/(s(p3,p4))*s(p1,p3)*s(p1,p4) - 
+     &    2*s(p2,p3) - 32.D0/(s(p1,p2))/(s(p3,p4))*s(p1,p3)*s(p1,p4) -
      &    16.D0/(s(p1,p2))/(s(p3,p4))*s(p1,p4)*s(p2,p3) - 16.D0/(s(p3,
      &    p4))*s(p1,p3) )
       qqgghn_ab = qqgghn_ab + s124**(-1)*xn*nDp2*nDp3 * (  - 16.D0 + 32.
@@ -296,7 +296,7 @@ c--- so of order(1) for the Tevatron
      &    p2))/(s(p1,p2))*s(p1,p3)*s(p1,p4) - 32.D0/(s(p1,p2))/(s(p1,p2
      &    ))*s(p1,p4)**2 - 32.D0/(s(p1,p2))/(s(p1,p2))/(s(p3,p4))*s(p1,
      &    p3)*s(p1,p4)**2 - 32.D0/(s(p1,p2))/(s(p1,p2))/(s(p3,p4))*s(p1
-     &    ,p4)**2*s(p2,p3) - 8.D0/(s(p1,p2))/(s(p3,p4))*s(p1,p3)**2 - 
+     &    ,p4)**2*s(p2,p3) - 8.D0/(s(p1,p2))/(s(p3,p4))*s(p1,p3)**2 -
      &    16.D0/(s(p1,p2))/(s(p3,p4))*s(p1,p3)*s(p1,p4) + 16.D0/(s(p1,
      &    p2))/(s(p3,p4))*s(p1,p4)**2 + 16.D0/(s(p1,p2))/(s(p3,p4))*s(
      &    p1,p4)*s(p2,p3) - 8.D0/(s(p1,p2))/(s(p3,p4))*s(p2,p3)**2 - 16.
@@ -313,7 +313,7 @@ c--- so of order(1) for the Tevatron
      &    s(p1,p4)**2*s(p2,p3) + 8.D0/(s(p1,p2))/(s(p2,p4))*s(p1,p3)**2
      &     + 8.D0/(s(p1,p2))/(s(p2,p4))*s(p2,p3)**2 + 16.D0/(s(p1,p2))
      &    /(s(p2,p4))*s(p2,p3)*s(p3,p4) + 8.D0/(s(p1,p2))/(s(p2,p4))*s(
-     &    p3,p4)**2 + 16.D0/(s(p1,p2))/(s(p3,p4))*s(p1,p4)*s(p2,p3) - 
+     &    p3,p4)**2 + 16.D0/(s(p1,p2))/(s(p3,p4))*s(p1,p4)*s(p2,p3) -
      &    16.D0/(s(p2,p4))*s(p1,p2) + 16.D0/(s(p2,p4))*s(p1,p3) + 8.D0
      &    /(s(p2,p4))/(s(p2,p4))*s(p1,p3)**2 + 8.D0/(s(p2,p4))/(s(p2,p4
      &    ))*s(p2,p3)**2 + 16.D0/(s(p2,p4))/(s(p2,p4))*s(p2,p3)*s(p3,p4
@@ -322,14 +322,14 @@ c--- so of order(1) for the Tevatron
       qqgghn_ab = qqgghn_ab + s124**(-1)*xn*nDp3**2 * (  - 16.D0/(s(p1,
      &    p2))*s(p1,p4) - 16.D0/(s(p1,p2))/(s(p1,p2))/(s(p3,p4))*s(p1,
      &    p3)*s(p1,p4)**2 - 16.D0/(s(p1,p2))/(s(p1,p2))/(s(p3,p4))*s(p1
-     &    ,p4)**2*s(p2,p3) + 32.D0/(s(p1,p2))/(s(p3,p4))*s(p1,p4)**2 - 
+     &    ,p4)**2*s(p2,p3) + 32.D0/(s(p1,p2))/(s(p3,p4))*s(p1,p4)**2 -
      &    16.D0/(s(p1,p2))/(s(p3,p4))*s(p1,p4)*s(p2,p3) + 16.D0/(s(p3,
      &    p4))*s(p1,p4) )
-      qqgghn_ab = qqgghn_ab + s124**(-1)*xn*nDn * (  - 6.D0*s(p1,p2) + 
+      qqgghn_ab = qqgghn_ab + s124**(-1)*xn*nDn * (  - 6.D0*s(p1,p2) +
      &    16.D0*s(p1,p3) + 8.D0*s(p1,p4) + 16.D0*s(p2,p3) + 20.D0*s(p3,
      &    p4) - 4.D0/(s(p1,p2))*s(p1,p3)**2 + 16.D0/(s(p1,p2))*s(p1,p3)
      &    *s(p1,p4) - 8.D0/(s(p1,p2))*s(p1,p3)*s(p2,p3) - 10.D0/(s(p1,
-     &    p2))*s(p1,p3)*s(p3,p4) - 8.D0/(s(p1,p2))*s(p1,p4)*s(p3,p4) - 
+     &    p2))*s(p1,p3)*s(p3,p4) - 8.D0/(s(p1,p2))*s(p1,p4)*s(p3,p4) -
      &    4.D0/(s(p1,p2))*s(p2,p3)**2 - 10.D0/(s(p1,p2))*s(p2,p3)*s(p3,
      &    p4) - 10.D0/(s(p1,p2))*s(p3,p4)**2 - 8.D0/(s(p1,p2))/(s(p1,p2
      &    ))*s(p1,p3)**2*s(p1,p4) + 16.D0/(s(p1,p2))/(s(p1,p2))*s(p1,p3
@@ -339,7 +339,7 @@ c--- so of order(1) for the Tevatron
      &    /(s(p1,p2))/(s(p1,p2))*s(p1,p4)**2*s(p3,p4) + 8.D0/(s(p1,p2))
      &    /(s(p1,p2))/(s(p3,p4))*s(p1,p3)**2*s(p1,p4)**2 + 16.D0/(s(p1,
      &    p2))/(s(p1,p2))/(s(p3,p4))*s(p1,p3)*s(p1,p4)**2*s(p2,p3) + 8.D
-     &    0/(s(p1,p2))/(s(p1,p2))/(s(p3,p4))*s(p1,p4)**2*s(p2,p3)**2 + 
+     &    0/(s(p1,p2))/(s(p1,p2))/(s(p3,p4))*s(p1,p4)**2*s(p2,p3)**2 +
      &    2.D0/(
      & s(p1,p2))/(s(p1,p3))*s(p1,p4)*s(p3,p4)**2 + 8.D0/(s(p1,p2))/(s(
      &    p3,p4))*s(p1,p3)**2*s(p1,p4) + 8.D0/(s(p1,p2))/(s(p3,p4))*s(
@@ -431,7 +431,7 @@ c--- so of order(1) for the Tevatron
      &     + 4.D0/(s(p1,p2))/(s(p1,p2))/(s(p3,p4))/(s(p3,p4))*s(p1,p4)
      &    **2*s(p2,p3)**2 )
       qqgghn_ab = qqgghn_ab + xn*nDn * (  - 2.D0/(s(p1,p2))/(s(p1,p3))*
-     &    s(p1,p4)**2 - 2.D0/(s(p1,p2))/(s(p1,p3))*s(p1,p4)*s(p2,p4) + 
+     &    s(p1,p4)**2 - 2.D0/(s(p1,p2))/(s(p1,p3))*s(p1,p4)*s(p2,p4) +
      &    2.D0/(s(p1,p2))/(s(p1,p3))*s(p1,p4)*s(p3,p4) - 2.D0/(s(p1,p2)
      &    )/(s(p1,p3))/(s(p3,p4))*s(p1,p4)**3 - 4.D0/(s(p1,p2))/(s(p1,
      &    p3))/(s(p3,p4))*s(p1,p4)**2*s(p2,p4) - 2.D0/(s(p1,p2))/(s(p1,
@@ -439,7 +439,7 @@ c--- so of order(1) for the Tevatron
      &    p4))*s(p1,p3)*s(p2,p3) - 2.D0/(s(p1,p2))/(s(p2,p4))*s(p1,p4)
      &    **2 + 4.D0/(s(p1,p2))/(s(p2,p4))*s(p1,p4)*s(p2,p3) + 4.D0/(s(
      &    p1,p2))/(s(p2,p4))*s(p2,p3)**2 + 2.D0/(s(p1,p2))/(s(p2,p4))*
-     &    s(p2,p3)*s(p3,p4) + 2.D0/(s(p1,p2))/(s(p2,p4))*s(p3,p4)**2 + 
+     &    s(p2,p3)*s(p3,p4) + 2.D0/(s(p1,p2))/(s(p2,p4))*s(p3,p4)**2 +
      &    4.D0/(s(p1,p2))/(s(p2,p4))/(s(p3,p4))*s(p1,p3)*s(p1,p4)*s(p2,
      &    p3) + 2.D0/(s(p1,p2))/(s(p2,p4))/(s(p3,p4))*s(p1,p4)**2*s(p2,
      &    p3) + 4.D0/(s(p1,p2))/(s(p2,p4))/(s(p3,p4))*s(p1,p4)*s(p2,p3)
@@ -475,7 +475,7 @@ c--- so of order(1) for the Tevatron
      &    s(p1,p4)*s(p3,p4) + 2.D0/(s(p2,p3))*s(p1,p2)*s(p2,p4)**2 + 4.D
      &    0/(s(p2,p3))*s(p1,p2)*s(p2,p4)*s(p3,p4) + 2.D0/(s(p2,p3))*s(
      &    p1,p2)*s(p3,p4)**2 )
-      qqgghn_ba = qqgghn_ba + s123**(-1)*s124**(-1)*xn*nDp1*nDp2 * ( 
+      qqgghn_ba = qqgghn_ba + s123**(-1)*s124**(-1)*xn*nDp1*nDp2 * (
      &     - 16.D0*s(p3,p4) - 80.D0/(s(p1,p2))*s(p1,p3)*s(p3,p4) - 48.D0
      &    /(s(p1,p2))*s(p1,p4)*s(p3,p4) - 32.D0/(s(p1,p2))*s(p3,p4)**2
      &     - 32.D0/(s(p1,p2))/(s(p1,p2))*s(p1,p3)**2*s(p3,p4) - 64.D0/(
@@ -497,22 +497,22 @@ c--- so of order(1) for the Tevatron
      &    p1,p3)**2 - 16.D0/(s(p1,p4))*s(p1,p3)*s(p3,p4) - 16.D0/(s(p2,
      &    p3))*s(p1,p2)*s(p1,p4) - 32.D0/(s(p2,p3))*s(p1,p4)**2 + 16.D0
      &    /(s(p2,p3))*s(p1,p4)*s(p3,p4) )
-      qqgghn_ba = qqgghn_ba + s123**(-1)*s124**(-1)*xn*nDp1**2 * (  - 
+      qqgghn_ba = qqgghn_ba + s123**(-1)*s124**(-1)*xn*nDp1**2 * (  -
      &    48.D0*s(p3,p4) - 64.D0/(s(p1,p2))*s(p1,p3)*s(p3,p4) - 48.D0/(
      &    s(p1,p2))*s(p1,p4)*s(p3,p4) - 16.D0/(s(p1,p2))/(s(p1,p2))*s(
      &    p1,p3)**2*s(p3,p4) - 32.D0/(s(p1,p2))/(s(p1,p2))*s(p1,p3)*s(
      &    p1,p4)*s(p3,p4) - 16.D0/(s(p1,p2))/(s(p1,p2))*s(p1,p4)**2*s(
-     &    p3,p4) - 16.D0/(s(p1,p2))/(s(p1,p4))*s(p1,p3)**2*s(p3,p4) - 
+     &    p3,p4) - 16.D0/(s(p1,p2))/(s(p1,p4))*s(p1,p3)**2*s(p3,p4) -
      &    16.D0/(s(p1,p4))*s(p1,p2)*s(p3,p4) - 32.D0/(s(p1,p4))*s(p1,p3
      &    )*s(p3,p4) )
-      qqgghn_ba = qqgghn_ba + s123**(-1)*s124**(-1)*xn*nDp2*nDp3 * ( 
+      qqgghn_ba = qqgghn_ba + s123**(-1)*s124**(-1)*xn*nDp2*nDp3 * (
      &     - 16.D0*s(p1,p3) + 16.D0*s(p1,p4) + 16.D0*s(p3,p4) - 16.D0/(
-     &    s(p1,p2))*s(p1,p3)**2 - 16.D0/(s(p1,p2))*s(p1,p3)*s(p1,p4) + 
+     &    s(p1,p2))*s(p1,p3)**2 - 16.D0/(s(p1,p2))*s(p1,p3)*s(p1,p4) +
      &    16.D0/(s(p1,p2))*s(p1,p3)*s(p3,p4) + 16.D0/(s(p1,p2))*s(p1,p4
      &    )**2 + 32.D0/(s(p1,p2))*s(p1,p4)*s(p3,p4) - 16.D0/(s(p1,p2))
      &    /(s(p2,p3))*s(p1,p4)**3 - 16.D0/(s(p1,p2))/(s(p2,p3))*s(p1,p4
      &    )**2*s(p3,p4) - 16.D0/(s(p2,p3))*s(p1,p4)**2 )
-      qqgghn_ba = qqgghn_ba + s123**(-1)*s124**(-1)*xn*nDp2**2 * (  - 
+      qqgghn_ba = qqgghn_ba + s123**(-1)*s124**(-1)*xn*nDp2**2 * (  -
      &    16.D0/(s(p1,p2))*s(p1,p3)*s(p3,p4) - 16.D0/(s(p1,p2))/(s(p1,
      &    p2))*s(p1,p3)**2*s(p3,p4) - 32.D0/(s(p1,p2))/(s(p1,p2))*s(p1,
      &    p3)*s(p1,p4)*s(p3,p4) - 16.D0/(s(p1,p2))/(s(p1,p2))*s(p1,p4)
@@ -585,7 +585,7 @@ c--- so of order(1) for the Tevatron
      &    /(s(p1,p2))*s(p2,p4)*s(p3,p4) - 16.D0/(s(p1,p2))/(s(p1,p2))/(
      &    s(p3,p4))*s(p1,p4)*s(p2,p4)**2 - 16.D0/(s(p1,p2))/(s(p1,p2))
      &    /(s(p3,p4))*s(p2,p4)**3 + 16.D0/(s(p1,p2))/(s(p1,p4))*s(p1,p3
-     &    )*s(p2,p4) + 32.D0/(s(p1,p2))/(s(p1,p4))*s(p1,p3)*s(p3,p4) - 
+     &    )*s(p2,p4) + 32.D0/(s(p1,p2))/(s(p1,p4))*s(p1,p3)*s(p3,p4) -
      &    8.D0/(s(p1,p2))/(s(p1,p4))*s(p2,p4)*s(p3,p4) - 16.D0/(s(p1,p2
      &    ))/(s(p2,p3))*s(p2,p4)**2 - 8.D0/(s(p1,p2))/(s(p2,p3))*s(p2,
      &    p4)*s(p3,p4) - 16.D0/(s(p1,p2))/(s(p2,p3))/(s(p3,p4))*s(p2,p4
@@ -669,7 +669,7 @@ c--- so of order(1) for the Tevatron
      &    )/(s(p3,p4))*s(p1,p4)*s(p2,p4)**2 - 2.D0/(s(p2,p3))/(s(p3,p4)
      &    )*s(p2,p4)**3 + 4.D0/(s(p3,p4))*s(p1,p4)**2 + 8.D0/(s(p3,p4))
      &    *s(p1,p4)*s(p2,p4) + 4.D0/(s(p3,p4))*s(p2,p4)**2 )
-      qqgghn_ba = qqgghn_ba + s124**(-2)*xn*nDn * ( 6.D0*s(p1,p3)**2 + 
+      qqgghn_ba = qqgghn_ba + s124**(-2)*xn*nDn * ( 6.D0*s(p1,p3)**2 +
      &    12.D0*s(p1,p3)*s(p2,p3) + 12.D0*s(p1,p3)*s(p3,p4) + 6.D0*s(p2
      &    ,p3)**2 + 12.D0*s(p2,p3)*s(p3,p4) + 6.D0*s(p3,p4)**2 + 8.D0/(
      &    s(p1,p2))*s(p1,p3)**2*s(p1,p4) + 16.D0/(s(p1,p2))*s(p1,p3)*s(
@@ -682,7 +682,7 @@ c--- so of order(1) for the Tevatron
      &    s(p1,p2))/(s(p1,p2))*s(p1,p4)**2*s(p2,p3)**2 + 8.D0/(s(p1,p2)
      &    )/(s(p1,p2))*s(p1,p4)**2*s(p2,p3)*s(p3,p4) + 4.D0/(s(p1,p2))
      &    /(s(p1,p2))*s(p1,p4)**2*s(p3,p4)**2 + 2.D0/(s(p1,p4))*s(p1,p2
-     &    )*s(p1,p3)**2 + 4.D0/(s(p1,p4))*s(p1,p2)*s(p1,p3)*s(p2,p3) + 
+     &    )*s(p1,p3)**2 + 4.D0/(s(p1,p4))*s(p1,p2)*s(p1,p3)*s(p2,p3) +
      &    4.D0/(s(p1,p4))*s(p1,p2)*s(p1,p3)*s(p3,p4) + 2.D0/(s(p1,p4))*
      &    s(p1,p2)*s(p2,p3)**2 )
       qqgghn_ba = qqgghn_ba + s124**(-2)*xn*nDn * ( 4.D0/(s(p1,p4))*s(
@@ -713,7 +713,7 @@ c--- so of order(1) for the Tevatron
      &    p1,p4)**2*s(p2,p3) - 8.D0/(s(p1,p2))/(s(p3,p4))*s(p1,p3)**2
      &     - 80.D0/(s(p1,p2))/(s(p3,p4))*s(p1,p3)*s(p1,p4) + 16.D0/(s(
      &    p1,p2))/(s(p3,p4))*s(p1,p4)**2 - 48.D0/(s(p1,p2))/(s(p3,p4))*
-     &    s(p1,p4)*s(p2,p3) - 8.D0/(s(p1,p2))/(s(p3,p4))*s(p2,p3)**2 - 
+     &    s(p1,p4)*s(p2,p3) - 8.D0/(s(p1,p2))/(s(p3,p4))*s(p2,p3)**2 -
      &    16.D0/(s(p1,p4))*s(p1,p2) - 16.D0/(s(p1,p4))*s(p1,p3) + 16.D0
      &    /(s(p1,p4))*s(p2,p3) - 8.D0/(s(p1,p4))*s(p3,p4) - 16.D0/(s(p1
      &    ,p4))/(s(p3,p4))*s(p1,p2)*s(p1,p3) - 8.D0/(s(p1,p4))/(s(p3,p4
@@ -767,13 +767,13 @@ c--- so of order(1) for the Tevatron
      &    ,p4))*s(p1,p4)**2 - 32.D0/(s(p1,p2))/(s(p3,p4))*s(p1,p4)*s(p2
      &    ,p3) + 16.D0/(s(p3,p4))*s(p1,p2) + 48.D0/(s(p3,p4))*s(p1,p4)
      &     - 16.D0/(s(p3,p4))*s(p2,p3) )
-      qqgghn_ba = qqgghn_ba + s124**(-1)*xn*nDn * (  - 6.D0*s(p1,p2) + 
+      qqgghn_ba = qqgghn_ba + s124**(-1)*xn*nDn * (  - 6.D0*s(p1,p2) +
      &    32.D0*s(p1,p3) + 16.D0*s(p2,p3) + 20.D0*s(p3,p4) - 12.D0/(s(
      &    p1,p2))*s(p1,p3)**2 + 32.D0/(s(p1,p2))*s(p1,p3)*s(p1,p4) - 16.
      &    D0/(s(p1,p2))*s(p1,p3)*s(p2,p3) - 26.D0/(s(p1,p2))*s(p1,p3)*
      &    s(p3,p4) + 16.D0/(s(p1,p2))*s(p1,p4)*s(p2,p3) + 8.D0/(s(p1,p2
      &    ))*s(p1,p4)*s(p3,p4) - 4.D0/(s(p1,p2))*s(p2,p3)**2 - 10.D0/(
-     &    s(p1,p2))*s(p2,p3)*s(p3,p4) - 10.D0/(s(p1,p2))*s(p3,p4)**2 - 
+     &    s(p1,p2))*s(p2,p3)*s(p3,p4) - 10.D0/(s(p1,p2))*s(p3,p4)**2 -
      &    8.D0/(s(p1,p2))/(s(p1,p2))*s(p1,p3)**2*s(p1,p4) + 16.D0/(s(p1
      &    ,p2))/(s(p1,p2))*s(p1,p3)*s(p1,p4)**2 - 8.D0/(s(p1,p2))/(s(p1
      &    ,p2))*s(p1,p3)*s(p1,p4)*s(p2,p3) - 16.D0/(s(p1,p2))/(s(p1,p2)
@@ -796,7 +796,7 @@ c--- so of order(1) for the Tevatron
      &    /(s(p3,p4))*s(p1,p2)**2*s(p1,p3) + 4.D0/(s(p1,p4))/(s(p3,p4))
      &    *s(p1,p2)*s(p1,p3)**2 + 4.D0/(s(p1,p4))/(s(p3,p4))*s(p1,p2)*
      &    s(p1,p3)*s(p2,p3) - 2.D0/(s(p2,p3))*s(p1,p2)**2 - 2.D0/(s(p2,
-     &    p3))*s(p1,p2)*s(p1,p4) + 4.D0/(s(p2,p3))*s(p1,p2)*s(p3,p4) + 
+     &    p3))*s(p1,p2)*s(p1,p4) + 4.D0/(s(p2,p3))*s(p1,p2)*s(p3,p4) +
      &    4.D0/(s(p2,p3))*s(p1,p4)*s(p3,p4) - 2.D0/(s(p2,p3))*s(p3,p4)
      &    **2 )
       qqgghn_ba = qqgghn_ba + s124**(-1)*xn*nDn * (  - 2.D0/(s(p3,p4))*
@@ -864,7 +864,7 @@ c--- so of order(1) for the Tevatron
      &    p2))/(s(p3,p4))*s(p2,p4) + 8.D0/(s(p1,p2))/(s(p3,p4))/(s(p3,
      &    p4))*s(p1,p3)**2 + 16.D0/(s(p1,p2))/(s(p3,p4))/(s(p3,p4))*s(
      &    p1,p3)*s(p1,p4) + 8.D0/(s(p1,p2))/(s(p3,p4))/(s(p3,p4))*s(p1,
-     &    p4)**2 + 8.D0/(s(p1,p2))/(s(p3,p4))/(s(p3,p4))*s(p2,p3)**2 + 
+     &    p4)**2 + 8.D0/(s(p1,p2))/(s(p3,p4))/(s(p3,p4))*s(p2,p3)**2 +
      &    16.D0/(s(p1,p2))/(s(p3,p4))/(s(p3,p4))*s(p2,p3)*s(p2,p4) + 8.D
      &    0/(s(p1,p2))/(s(p3,p4))/(s(p3,p4))*s(p2,p4)**2 - 8.D0/(s(p2,
      &    p3))/(s(p3,p4))*s(p2,p4) - 16.D0/(s(p3,p4)) )
@@ -916,7 +916,7 @@ c--- so of order(1) for the Tevatron
      &    D0/(s(p2,p3))/(s(p3,p4))*s(p1,p4)*s(p2,p4) - 4.D0/(s(p2,p3))
      &    /(s(p3,p4))*s(p2,p4)**2 + 2.D0/(s(p3,p4))*s(p2,p3) )
 
-      qqgghn_sym=  + s123**(-2)*xn**(-1)*nDn * (  - 4.D0*s(p1,p4)**2 - 
+      qqgghn_sym=  + s123**(-2)*xn**(-1)*nDn * (  - 4.D0*s(p1,p4)**2 -
      &    8.D0*s(p1,p4)*s(p2,p4) - 8.D0*s(p1,p4)*s(p3,p4) - 4.D0*s(p2,
      &    p4)**2 - 8.D0*s(p2,p4)*s(p3,p4) - 4.D0*s(p3,p4)**2 - 2.D0/(s(
      &    p1,p3))*s(p1,p2)*s(p1,p4)**2 - 4.D0/(s(p1,p3))*s(p1,p2)*s(p1,
@@ -931,7 +931,7 @@ c--- so of order(1) for the Tevatron
       qqgghn_sym = qqgghn_sym + s123**(-1)*s124**(-1)*xn**(-1)*nDp1*
      & nDp2 * (  - 64.D0*s(p3,p4) - 16.D0/(s(p1,p3))*s(p1,p2)*s(p3,p4)
      &     - 16.D0/(s(p1,p3))*s(p1,p4)*s(p3,p4) - 16.D0/(s(p1,p3))*s(p3
-     &    ,p4)**2 - 16.D0/(s(p1,p3))/(s(p1,p4))*s(p1,p2)*s(p3,p4)**2 - 
+     &    ,p4)**2 - 16.D0/(s(p1,p3))/(s(p1,p4))*s(p1,p2)*s(p3,p4)**2 -
      &    16.D0/(s(p1,p4))*s(p1,p2)*s(p3,p4) - 16.D0/(s(p1,p4))*s(p1,p3
      &    )*s(p3,p4) - 16.D0/(s(p1,p4))*s(p3,p4)**2 + 16.D0/(s(p2,p3))*
      &    s(p1,p4)*s(p3,p4) - 16.D0/(s(p2,p3))*s(p3,p4)**2 - 16.D0/(s(
@@ -949,7 +949,7 @@ c--- so of order(1) for the Tevatron
       qqgghn_sym = qqgghn_sym + s123**(-1)*s124**(-1)*xn**(-1)*nDp1**2
      &  * (  - 32.D0*s(p3,p4) - 32.D0/(s(p1,p3))*s(p1,p2)*s(p3,p4) - 16.
      &    D0/(s(p1,p3))*s(p1,p4)*s(p3,p4) - 16.D0/(s(p1,p3))/(s(p1,p4))
-     &    *s(p1,p2)**2*s(p3,p4) - 32.D0/(s(p1,p4))*s(p1,p2)*s(p3,p4) - 
+     &    *s(p1,p2)**2*s(p3,p4) - 32.D0/(s(p1,p4))*s(p1,p2)*s(p3,p4) -
      &    16.D0/(s(p1,p4))*s(p1,p3)*s(p3,p4) )
       qqgghn_sym = qqgghn_sym + s123**(-1)*s124**(-1)*xn**(-1)*nDp2*
      & nDp3 * (  - 16.D0*s(p1,p2) + 16.D0/(s(p1,p3))*s(p1,p2)*s(p1,p4)
@@ -962,13 +962,13 @@ c--- so of order(1) for the Tevatron
       qqgghn_sym = qqgghn_sym + s123**(-1)*s124**(-1)*xn**(-1)*nDp2**2
      &  * (  - 32.D0*s(p3,p4) - 16.D0/(s(p2,p3))*s(p1,p2)*s(p3,p4) + 16.
      &    D0/(s(p2,p3))*s(p1,p4)*s(p3,p4) - 16.D0/(s(p2,p3))/(s(p2,p4))
-     &    *s(p1,p2)**2*s(p3,p4) - 16.D0/(s(p2,p4))*s(p1,p2)*s(p3,p4) + 
+     &    *s(p1,p2)**2*s(p3,p4) - 16.D0/(s(p2,p4))*s(p1,p2)*s(p3,p4) +
      &    16.D0/(s(p2,p4))*s(p1,p3)*s(p3,p4) )
       qqgghn_sym = qqgghn_sym + s123**(-1)*s124**(-1)*xn**(-1)*nDp3**2
      &  * ( 16.D0*s(p1,p2) + 16.D0/(s(p1,p3))*s(p1,p2)**2 + 32.D0/(s(p1
      &    ,p3))*s(p1,p2)*s(p1,p4) + 16.D0/(s(p1,p3))*s(p1,p4)**2 + 16.D0
      &    /(s(p2,p3))*s(p1,p4)**2 )
-      qqgghn_sym = qqgghn_sym + s123**(-1)*s124**(-1)*xn**(-1)*nDn * ( 
+      qqgghn_sym = qqgghn_sym + s123**(-1)*s124**(-1)*xn**(-1)*nDn * (
      &     - 8.D0*s(p1,p2)**2 + 16.D0*s(p1,p2)*s(p3,p4) - 8.D0*s(p3,p4)
      &    **2 - 2.D0/(s(p1,p3))*s(p1,p2)**3 + 4.D0/(s(p1,p3))*s(p1,p2)
      &    **2*s(p3,p4) - 2.D0/(s(p1,p3))*s(p1,p2)*s(p3,p4)**2 - 2.D0/(
@@ -987,10 +987,10 @@ c--- so of order(1) for the Tevatron
      &    D0 - 16.D0/(s(p1,p3))*s(p1,p2) + 8.D0/(s(p1,p3))*s(p3,p4) - 8.
      &    D0/(s(p1,p3))/(s(p1,p4))*s(p1,p2)*s(p3,p4) + 8.D0/(s(p1,p3))
      &    /(s(p1,p4))*s(p3,p4)**2 - 32.D0/(s(p1,p3))/(s(p2,p3))*s(p1,p4
-     &    )*s(p2,p4) - 16.D0/(s(p1,p3))/(s(p2,p3))*s(p1,p4)*s(p3,p4) - 
+     &    )*s(p2,p4) - 16.D0/(s(p1,p3))/(s(p2,p3))*s(p1,p4)*s(p3,p4) -
      &    16.D0/(s(p1,p3))/(s(p2,p3))*s(p2,p4)*s(p3,p4) + 8.D0/(s(p1,p3
      &    ))/(s(p2,p4))*s(p1,p4)*s(p3,p4) + 8.D0/(s(p1,p3))/(s(p2,p4))*
-     &    s(p3,p4)**2 + 8.D0/(s(p1,p4))/(s(p2,p3))*s(p2,p4)*s(p3,p4) + 
+     &    s(p3,p4)**2 + 8.D0/(s(p1,p4))/(s(p2,p3))*s(p2,p4)*s(p3,p4) +
      &    8.D0/(s(p1,p4))/(s(p2,p3))*s(p3,p4)**2 - 16.D0/(s(p2,p3))*s(
      &    p1,p2) - 8.D0/(s(p2,p3))*s(p3,p4) - 8.D0/(s(p2,p3))/(s(p2,p4)
      &    )*s(p1,p2)*s(p3,p4) + 8.D0/(s(p2,p3))/(s(p2,p4))*s(p3,p4)**2
@@ -1086,7 +1086,7 @@ c--- so of order(1) for the Tevatron
      &    *s(p2,p3)**2 + 16.D0/(s(p1,p4))/(s(p2,p4))*s(p2,p3)*s(p3,p4)
      &     - 16.D0/(s(p2,p4))*s(p3,p4) )
       qqgghn_sym = qqgghn_sym + s124**(-1)*xn**(-1)*nDp1*nDp3 * (  - 16.
-     &    D0 + 16.D0/(s(p1,p4))*s(p1,p3) - 16.D0/(s(p1,p4))*s(p2,p3) + 
+     &    D0 + 16.D0/(s(p1,p4))*s(p1,p3) - 16.D0/(s(p1,p4))*s(p2,p3) +
      &    16.D0/(s(p1,p4))*s(p3,p4) )
       qqgghn_sym = qqgghn_sym + s124**(-1)*xn**(-1)*nDp1**2 * (  - 16.D0
      &     - 16.D0/(s(p1,p4))*s(p1,p2) + 16.D0/(s(p1,p4))*s(p3,p4) - 8.D
@@ -1094,7 +1094,7 @@ c--- so of order(1) for the Tevatron
      &    p4))*s(p1,p3)*s(p3,p4) - 8.D0/(s(p1,p4))/(s(p1,p4))*s(p2,p3)
      &    **2 - 8.D0/(s(p1,p4))/(s(p1,p4))*s(p3,p4)**2 )
       qqgghn_sym = qqgghn_sym + s124**(-1)*xn**(-1)*nDp2*nDp3 * (  - 16.
-     &    D0 - 16.D0/(s(p2,p4))*s(p1,p2) - 16.D0/(s(p2,p4))*s(p1,p3) + 
+     &    D0 - 16.D0/(s(p2,p4))*s(p1,p2) - 16.D0/(s(p2,p4))*s(p1,p3) +
      &    16.D0/(s(p2,p4))*s(p2,p3) + 16.D0/(s(p2,p4))*s(p3,p4) )
       qqgghn_sym = qqgghn_sym + s124**(-1)*xn**(-1)*nDp2**2 * (  - 16.D0
      &     - 16.D0/(s(p2,p4))*s(p1,p2) - 8.D0/(s(p2,p4))/(s(p2,p4))*s(
@@ -1118,12 +1118,12 @@ c--- so of order(1) for the Tevatron
       qqgghn_sym = qqgghn_sym + xn**(-1)*nDp1*nDp3 * ( 8.D0/(s(p1,p3))
      &     - 8.D0/(s(p1,p4))/(s(p2,p3))*s(p2,p4) )
       qqgghn_sym = qqgghn_sym + xn**(-1)*nDp1**2 * (  - 8.D0/(s(p1,p3))
-     &    /(s(p1,p4))*s(p2,p4) - 8.D0/(s(p1,p3))/(s(p1,p4))*s(p3,p4) + 
+     &    /(s(p1,p4))*s(p2,p4) - 8.D0/(s(p1,p3))/(s(p1,p4))*s(p3,p4) +
      &    16.D0/(s(p1,p4)) - 8.D0/(s(p1,p4))/(s(p2,p3))*s(p2,p4) )
       qqgghn_sym = qqgghn_sym + xn**(-1)*nDp2*nDp3 * (  - 8.D0/(s(p1,p3
      &    ))/(s(p2,p4))*s(p1,p4) + 8.D0/(s(p2,p3)) + 16.D0/(s(p2,p4)) )
       qqgghn_sym = qqgghn_sym + xn**(-1)*nDp2**2 * (  - 8.D0/(s(p1,p3))
-     &    /(s(p2,p4))*s(p1,p4) - 8.D0/(s(p2,p3))/(s(p2,p4))*s(p1,p4) - 
+     &    /(s(p2,p4))*s(p1,p4) - 8.D0/(s(p2,p3))/(s(p2,p4))*s(p1,p4) -
      &    8.D0/(s(p2,p3))/(s(p2,p4))*s(p3,p4) + 16.D0/(s(p2,p4)) )
       qqgghn_sym = qqgghn_sym + xn**(-1)*nDn * (  - 8.D0 - 2.D0/(s(p1,
      &    p3))*s(p1,p2) + 2.D0/(s(p1,p3))*s(p1,p4) + 2.D0/(s(p1,p3))*s(

@@ -103,7 +103,7 @@
 	end
 *###[ ffcc1a:
 	subroutine ffcc1a(cc1i,mc1i,cc0,mc0,cb0i,mb0i,xpi,piDpj,del2,
-     +		ier) 
+     +		ier)
 ***#[*comment:***********************************************************
 *									*
 *	calculate the C1(mu) = C11*p1(mu) + C12*p2(mu) numerically	*

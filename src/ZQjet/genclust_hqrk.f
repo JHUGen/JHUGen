@@ -20,11 +20,11 @@ c--- To reject an event, return jets=-1
       common/Rbbmin/Rbbmin
       common/jetmerge/jetmerge
 !$omp threadprivate(/jetmerge/)
-              
+
       verbalg=.false.
 
       pseudo=.true.
-      
+
       if (first) then
         if (pseudo) then
       write(6,*) 'Heavy quark clustering routine using pseudorapidity'
@@ -33,7 +33,7 @@ c--- To reject an event, return jets=-1
       endif
       write(6,*) '     (for both cuts and definition of Delta-R)'
       first=.false.
-      endif      
+      endif
 
 c--- transfer incoming and lepton momenta to the final array
       do j=1,4
@@ -88,7 +88,7 @@ c     . (pt(4,qjet) .gt. ptjetmin).and.(ayrap(4,qjet) .lt. etajetmax))
 c     . jets=2
 c      return
 ************************************************************************
-      
+
 c--- this is the number of candidate jets in the array qjet
       icandj=maxjet
 c--- skip clustering if there are less than 2 jets
@@ -107,14 +107,14 @@ c--- start another iteration
       if (verbalg) write(6,*) 'Starting iteration, # of cands =',icandj
 
 c--- find the jet pair that meets the merging requirements and has
-c--- the minimum separation in R  
+c--- the minimum separation in R
       rab=999d0
       ia=0
       ib=0
       jetmerge=.false.
       do j=1,icandj
-      do k=j+1,icandj        
-        if (pseudo) then        
+      do k=j+1,icandj
+        if (pseudo) then
           rtest=R(qjet,j,k)   ! Uses pseudorapidity
       else
           rtest=Ry(qjet,j,k)  ! Uses rapidity
@@ -147,21 +147,21 @@ c--- ...... reset minimum separation if necessary
       enddo
       enddo
 
-c--- if no jets need to be merged, we're done here      
+c--- if no jets need to be merged, we're done here
       if (jetmerge .eqv. .false.) goto 77
-      
+
 c--- check for an error
       if ((ia .eq. 0) .or. (ib .eq. 0)) then
         write(6,*) 'Error in genclust_wbjt: one of ia and ib is 0'
         stop
       endif
-      
-c--- if two b's will be merged, set the flag      
+
+c--- if two b's will be merged, set the flag
       if ( ((jetlabel(ia).eq.'bq') .and. (jetlabel(ib).eq.'ba'))
      . .or.((jetlabel(ia).eq.'ba'). and. (jetlabel(ib).eq.'bq')) ) then
             bjetmerge=.true.
       endif
-c--- do merging      
+c--- do merging
 c--- ...... set label for merged jet
       if     ((jetlabel(ia) .eq. 'bq').or.(jetlabel(ib) .eq. 'bq')) then
         jetlabel(ia)='bq'
@@ -189,19 +189,19 @@ c--- ...... remove a jet from the end
 
 c--- return to the next iteration if there is more than one jet left
       if (icandj .gt. 1) goto 66
-      
-c--- done with the clustering - just need to check pt and y now      
-   77 continue      
+
+c--- done with the clustering - just need to check pt and y now
+   77 continue
 
       if (verbalg) write(6,*) 'After merging # of jets =',icandj
 
-c--- set the "jetmerge" flag properly now      
+c--- set the "jetmerge" flag properly now
       if (icandj .lt. maxjet) then
         jetmerge=.true.
       else
         jetmerge=.false.
       endif
-      
+
 c--- now check jet pt and rapidity
       do i=1,icandj
         if (pseudo) then
@@ -231,9 +231,9 @@ c--- the final reckoning: transfer to qfinal
           enddo
         endif
       enddo
-      
+
 c--- shuffle down jetlabel
-      i=1      
+      i=1
    88 continue
       if (jetlabel(i) .eq. 'ff') then
         do j=i,icandj-1
@@ -243,8 +243,8 @@ c--- shuffle down jetlabel
       if (i .lt. jets) then
         i=i+1
         goto 88
-      endif       
-      
+      endif
+
       if (verbalg) write(6,*) 'After pt and y # of jets =',jets
 c      if (verbalg) pause
 
@@ -260,7 +260,7 @@ c--- In this category, there should be just one jet, formed by merging
         endif
         return
       endif
-      
+
 ************************************************************************
 c--- WQ(+Q) for inclusive Wb
 ************************************************************************
@@ -271,7 +271,7 @@ c--- In this category, there should be just one jet, formed by merging
         endif
         return
       endif
-      
+
 ************************************************************************
 c--- WQQ/ZQQ + extra jet in real
 ************************************************************************
@@ -292,7 +292,7 @@ c--- only need to check jet identities if there are just 2 jets
         endif
         return
       endif
-      
+
 ************************************************************************
 c--- WQQj/ZQjj/ZQQj
 ************************************************************************
@@ -305,7 +305,7 @@ c--- In this category, there should be three jets
         endif
         return
       endif
-      
+
 ************************************************************************
 c--- WQj/ZQj - basic LO process + extra jet in real
 ************************************************************************
@@ -329,7 +329,7 @@ c--- only need to check jet identities if there are just 2 jets
         endif
         return
       endif
-            
+
 ************************************************************************
 c--- WQj/ZQj - basic LO process + extra Q in real
 ************************************************************************
@@ -359,7 +359,7 @@ c--- only need to check jet identities if there are just 2 jets
         endif
         return
       endif
-            
+
 ************************************************************************
 c--- To check the ALPGEN approach to producing WQj
 ************************************************************************
@@ -403,11 +403,11 @@ c--- In this category, there should be three jets
         endif
         return
       endif
-      
+
       return
       end
-      
-      
+
+
       double precision function ry(p,i,j)
 c---- calculate the jets separation between p(i) and p(j)
 c--- Modification of "r.f" to use rapidity rather than pseudorapidity
@@ -418,7 +418,7 @@ c--- Modification of "r.f" to use rapidity rather than pseudorapidity
 
       ei=p(i,4)
       ej=p(j,4)
-      
+
       r1= (ei+p(i,3))*(ej-p(j,3))/
      .   ((ej+p(j,3))*(ei-p(i,3)))
       dely=0.5d0*dlog(r1)
@@ -428,9 +428,9 @@ c--- Modification of "r.f" to use rapidity rather than pseudorapidity
       if (r2 .gt. +0.999999999D0) r2=+1D0
       if (r2 .lt. -0.999999999D0) r2=-1D0
       delphi=dacos(r2)
-      
+
       ry=dsqrt(dely**2+delphi**2)
-      
+
       return
       end
-      
+

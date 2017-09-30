@@ -34,7 +34,7 @@ C---end statement functions
         k5=j6
         k6=j5
       endif
-      
+
       amp=
      & -zab2(k1,k3,k4,k2)/zab2(k2,k3,k4,k1)**3/zb(k3,k4)/za(k5,k6)
      & *((zab2(k2,k1,k3,k4)**2*zab2(k5,k3,k4,k1)**2)/s134

@@ -343,7 +343,7 @@ c--- u + g  ->  c + s + d  (t-channel single-charm)
 
       Bpmp = 3*tr3s001ft*(2*cDg+mc2)*(trs*(2*cDg+mc2)*cDs*gDs+mc2*ms2*(
      &   trg+trc)*gDs-ms2*trs*cDg**2)/cDg**3+Bpmp
- 
+
       Bpmp=Bpmp/zpmp
 
       return

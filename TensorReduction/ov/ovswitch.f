@@ -1,5 +1,5 @@
       subroutine ovswitch(p1,F0,F1,F2,F3,F4,F1a,F2a,F3a,F4a)
-C----from F0,F1,F2,F3,F4 calculate F1a,F2a,F3a,F4a 
+C----from F0,F1,F2,F3,F4 calculate F1a,F2a,F3a,F4a
 C----which has first denominator
 C----shifted by p1
       implicit none
@@ -31,7 +31,7 @@ C----shifted by p1
      & +p1(n1)*p1(n2)*F1(n3,ep)
      & +p1(n2)*p1(n3)*F1(n1,ep)
      & +p1(n3)*p1(n1)*F1(n2,ep)
-  
+
      & -p1(n1)*p1(n2)*p1(n3)*F0(ep)
 
       do n4=n3,4

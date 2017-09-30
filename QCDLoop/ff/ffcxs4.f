@@ -18,7 +18,7 @@ c
 *									*
 *									*
 *									*
-***#]*comment:*********************************************************** 
+***#]*comment:***********************************************************
 *  #[ declarations:
 	implicit none
 *
@@ -40,7 +40,7 @@ c
 *
 	include 'ff.h'
 *	absc(c) = abs(DBLE(c)) + abs(DIMAG(c))
-*  #] declarations: 
+*  #] declarations:
 *  #[ groundwork:
 	if ( ltest .and. ns .ne. 6 )
      +	    print *,'ffcxs4: error: only for ns=6, not ',ns
@@ -86,7 +86,7 @@ c
 		iepw(1) = -1
 	    endif
 	endif
-*  #] groundwork: 
+*  #] groundwork:
 *  #[ zm and wp:
 	if ( isoort(4) .eq. 0 ) then
 	    if (lwrite) print *,'ffcxs4: to ffcxr(zm)'
@@ -99,7 +99,7 @@ c
      +			z(2),z(4),d2yzz,w(2),w(4),w(1),w(3),d2yww,
      +			dyz(2,1),dwy(2,2),dwz(2,1),iepz(1),iepw(2),ier)
 	endif
-*  #] zm and wp: 
+*  #] zm and wp:
 *  #[ zp and wm:
 	if ( isoort(2) .eq. 0 ) then
 	    if (lwrite) print *,'ffcxs4: to ffcxr(wm)'
@@ -112,8 +112,8 @@ c
      +			z(1),z(3),d2yzz,w(1),w(3),w(2),w(4),d2yww,
      +			dyz(2,2),dwy(1,2),dwz(1,2),iepz(2),iepw(1),ier)
 	endif
-*  #] zp and wm: 
-*###] ffcxs4: 
+*  #] zp and wm:
+*###] ffcxs4:
 	end
 *###[ ffcs4:
 	subroutine ffcs4(cs3,ipi12,cw,cy,cz,cdwy,cdwz,cdyz,cd2yww,cd2yzz
@@ -124,7 +124,7 @@ c
 *									*
 *									*
 *									*
-***#]*comment:*********************************************************** 
+***#]*comment:***********************************************************
 *  #[ declarations:
 	implicit none
 *
@@ -151,7 +151,7 @@ c
 *	statement function
 *
 	absc(c) = abs(DBLE(c)) + abs(DIMAG(c))
-*  #] declarations: 
+*  #] declarations:
 *  #[ get counters:
 	if ( ltest ) then
 	    if ( ns .ne. 6 ) then
@@ -182,7 +182,7 @@ c
 	    print *,'ffcs4: error: case not implemented'
 	    ier = ier + 50
 	endif
-*  #] get counters: 
+*  #] get counters:
 *  #[ R's:
 	if ( isoort(4) .eq. 0 ) then
 	    call ffcrr(cs3(1),ipi12(1),cy(2),cy(4),cz(1),cz(3),cdyz(2,1)
@@ -204,7 +204,7 @@ c
      +		cz(3),cd2yzz,cw(1),cw(3),cw(2),cw(4),cd2yww,cdyz(2,2),
      +		cdwy(1,2),cdwz(1,2),iepz(2),isoort(2),iepw(1),ier)
 	endif
-*  #] R's: 
+*  #] R's:
 *  #[ eta's:
 	if ( DIMAG(cpi(ip)) .eq. 0 ) then
 	    call ffgeta(nz,cz,cdyz,cd2yzz,
@@ -273,7 +273,7 @@ c
 	    print *,'     =',ntot,' *( ',c2ipi*clogy,' + ',24*i2pi*pi12,
      +		')'
 	endif
-*  #] eta's: 
+*  #] eta's:
 *###] ffcs4:
 	end
 *###[ ffdcxr:
@@ -299,7 +299,7 @@ c
 *									*
 *	Calls:	ffcxr							*
 *									*
-***#]*comment:*********************************************************** 
+***#]*comment:***********************************************************
 *  #[ declarations:
 	implicit none
 *
@@ -327,7 +327,7 @@ c
 *
 *	absc(c) = abs(DBLE(c)) + abs(DIMAG(c))
 	inorm = 0
-*  #] declarations: 
+*  #] declarations:
 *  #[ groundwork:
 	if ( dwz .eq. 0 .and. iepsz .eq. iepsw ) return
 	if ( dyz .eq. 0 ) then
@@ -344,11 +344,11 @@ c
 	endif
 	again = .FALSE.
   123	continue
-*  #] groundwork: 
+*  #] groundwork:
 *  #[ trivial case:
 	if ( dw .eq. 0 ) then
 	    if ( lwrite ) print *,'  Trivial case'
-*  #] trivial case: 
+*  #] trivial case:
 *  #[ normal case:
 	elseif ( abs(dw) .gt. xloss .or. again ) then
 *	    nothing's the matter
@@ -361,7 +361,7 @@ c
 	    do 10 i=11,20
    10		cs3(i) = -cs3(i)
 	    ipi12(2) = -ipi12(2)
-*  #] normal case: 
+*  #] normal case:
 *  #[ only cancellations in w, not in y:
 	elseif ( abs(d2) .gt. xloss ) then
 *	    there are no cancellations the other way:
@@ -404,7 +404,7 @@ c
 		cs3(i) = -cs3(i)
    20	    continue
 	    ipi12(2) = -ipi12(2)
-*  #] only cancellations in w, not in y: 
+*  #] only cancellations in w, not in y:
 *  #[ Hill identity:
 	elseif (  ( 1 .gt. xloss*abs(y) .or. abs(xx1) .gt. xloss )
      +	    .and. ( 1 .gt. xloss*abs(z) .or. abs(z/dyz) .gt. xloss )
@@ -443,7 +443,7 @@ c
 		chulp = DCMPLX(DBLE(log(w1/w)),DBLE(-iepsw*pi))
 	    endif
 	    cs3(20) = -DBLE(dfflo1(dwz/dwy,ier))*chulp
-*  #] Hill identity: 
+*  #] Hill identity:
 *  #[ Taylor expansion:
 	elseif ( (w.lt.0..or.w1.lt.0) .and. (z.lt.0..or.z1.lt.0) ) then
 *	    do a Taylor expansion
@@ -549,7 +549,7 @@ c
    40		cs3(i) = -cs3(i)
 	    ipi12(2) = -ipi12(2)
 	endif
-*  #] Taylor expansion: 
+*  #] Taylor expansion:
 *  #[ debug output:
         if ( lwrite ) then
 	    csum = 0
@@ -588,8 +588,8 @@ c
 	    lwrite = .TRUE.
 	    endif
 	endif
-*  #] debug output: 
-*###] ffdcxr: 
+*  #] debug output:
+*###] ffdcxr:
 	end
 *###[ ffdcrr:
 	subroutine ffdcrr(cs3,ipi12,cy,cy1,cz,cz1,czp,czp1,cd2yzz,cw,cw1
@@ -614,7 +614,7 @@ c
 *									*
 *	Calls:	ffcrr							*
 *									*
-***#]*comment:*********************************************************** 
+***#]*comment:***********************************************************
 *  #[ declarations:
 	implicit none
 *
@@ -645,7 +645,7 @@ c
 *
 	absc(c) = abs(DBLE(c)) + abs(DIMAG(c))
 	inorm = 0
-*  #] declarations: 
+*  #] declarations:
 *  #[ check input:
 	if ( ltest ) then
 	    xlosn = xloss*DBLE(10)**(-1-mod(ier,50))
@@ -687,7 +687,7 @@ c
 *  #[ trivial case:
 	if ( absc(cdw) .eq. 0 ) then
 	    if ( lwrite ) print *,'  Trivial case'
-*  #] trivial case: 
+*  #] trivial case:
 *  #[ normal case:
 *
 *	if no cancellations are expected OR the imaginary signs differ
@@ -834,7 +834,7 @@ c
 	    else
 		cc1 = cy*cfactz
 		cc2 = cy*cfactw
-		cs3(15) = (n1*zfflog(cc1,ieps1,c0,ier) + 
+		cs3(15) = (n1*zfflog(cc1,ieps1,c0,ier) +
      +			   n4*zfflog(cc2,ieps1,c0,ier))*c2ipi
 	    endif
 	    if ( n2.eq.n5 ) then
@@ -864,14 +864,14 @@ c
 	    else
 		cc1 = -cy1*cfactz
 		cc2 = -cy1*cfactw
-		cs3(15) = (n2*zfflog(cc1,ieps2,c0,ier) + 
+		cs3(15) = (n2*zfflog(cc1,ieps2,c0,ier) +
      +			   n5*zfflog(cc2,ieps2,c0,ier))*c2ipi
 	    endif
 	    if ( lwrite ) then
 		print *,'  eta''s z are :',n1,n2,n3
 		print *,'  eta''s w are :',n4,n5,n6
 	    endif
-*  #] only cancellations in cw, not in cy: 
+*  #] only cancellations in cw, not in cy:
 *  #[ Hill identity:
 	elseif (  ( 1.gt.xloss*absc(cy) .or. absc(cc1).gt.xloss )
      +	    .and. ( 1.gt.xloss*absc(cz) .or. absc(cz/cdyz).gt.xloss )
@@ -904,7 +904,7 @@ c
 		chulp = zfflog(-cw1/cw,0,c0,ier)
 	    endif
 	    cs3(15) = -zfflo1(cdwz/cdwy,ier)*chulp
-*  #] Hill identity: 
+*  #] Hill identity:
 *  #[ Taylor expansion:
 	else
 *	    Do a Taylor expansion
@@ -975,7 +975,7 @@ c
 		return
 	    endif
 	endif
-*  #] Taylor expansion: 
+*  #] Taylor expansion:
 *  #[ debug output:
         if ( lwrite ) then
 	    csum = 0
@@ -1016,6 +1016,6 @@ c
 		lwrite = .TRUE.
 	    endif
 	endif
-*  #] debug output: 
+*  #] debug output:
 *###] ffdcrr:
 	end

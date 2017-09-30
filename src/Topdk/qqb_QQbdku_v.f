@@ -6,7 +6,7 @@
 *     Virtual matrix elements squared for the process                  *
 *                                                                      *
 *     q(-p1) +qbar(-p2)=nu(p3)+e+(p4)+b(p5)+bbar(p6)+e-(p7)+nubar(p8)  *
-*     Uncorrelated decays                                              * 
+*     Uncorrelated decays                                              *
 ************************************************************************
       include 'constants.f'
       include 'ewcouple.f'

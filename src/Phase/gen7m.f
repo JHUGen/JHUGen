@@ -21,8 +21,8 @@ c----and x1 and x2 given nineteen random numbers
       do nu=1,4
       do j=1,mxpart
       p(j,nu)=0d0
-      enddo 
-      enddo 
+      enddo
+      enddo
 
       wt3=0d0
       tau=exp(dlog(taumin)*r(18))
@@ -33,7 +33,7 @@ c----and x1 and x2 given nineteen random numbers
       xx(2)=dsqrt(tau)*exp(-y)
 
 c---if x's out of normal range alternative return
-      if   ((xx(1) .gt. 1d0) 
+      if   ((xx(1) .gt. 1d0)
      & .or. (xx(2) .gt. 1d0)
      & .or. (xx(1) .lt. xmin)
      & .or. (xx(2) .lt. xmin)) return 1
@@ -66,7 +66,7 @@ c---if x's out of normal range alternative return
       p(7,nu)=p7(nu)
       p(8,nu)=p8(nu)
       p(9,nu)=p9(nu)
-      enddo 
+      enddo
       wt3=xjac*pswt
 
       if (wt3 .eq. 0d0) return 1

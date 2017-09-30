@@ -30,7 +30,7 @@ c--- (small error induced if zerowidth false, of order (hwidth/hmass))
         s34=1d0/vs
         rtshat=dsqrt(s34)
         ymax=dlog(sqrts/rtshat)
-        yave=ymax*(two*r(10)-1d0)           
+        yave=ymax*(two*r(10)-1d0)
         xx(1)=rtshat/sqrts*exp(+yave)
         xx(2)=rtshat/sqrts*exp(-yave)
         xjac=(vsqmax-vsqmin)*s34**2/sqrts**2*two*ymax
@@ -44,7 +44,7 @@ c--- top production with radiation in decay
         s34=1/vs
         rtshat=dsqrt(s34)
         ymax=dlog(sqrts/rtshat)
-        yave=ymax*(two*r(10)-1d0)           
+        yave=ymax*(two*r(10)-1d0)
         xx(1)=rtshat/sqrts*exp(+yave)
         xx(2)=rtshat/sqrts*exp(-yave)
         xjac=(vsqmax-vsqmin)*s34**2/sqrts**2*two*ymax
@@ -55,7 +55,7 @@ c--- generic process
         xjac=dlog(taumin)*tau*dlog(tau)
         xx(1)=dsqrt(tau)*dexp(+y)
         xx(2)=dsqrt(tau)*dexp(-y)
-      endif      
+      endif
 
 c--- phase space volume only checked for x1=x2=1
       if ((case .eq. 'vlchwg') .or. (case .eq. 'vlchwh')) then
@@ -84,19 +84,19 @@ c---if x's out of normal range alternative return
      ..or. (case .eq. 'HWW2jt') .or. (case .eq. 'HZZ2jt')
      ..or. (case .eq. 'HWW3jt') .or. (case .eq. 'HZZ3jt')
      ..or. (case .eq. 'WpWp3j')) then
-        call  phase7a(r,p1,p2,p3,p4,p5,p6,p7,p8,p9,pswt,*999) 
+        call  phase7a(r,p1,p2,p3,p4,p5,p6,p7,p8,p9,pswt,*999)
       elseif ((case .eq. 'WH__WW') .or. (case .eq. 'ZH__WW')) then
-        call  phase7b(r,p1,p2,p3,p4,p5,p6,p7,p8,p9,pswt,*999) 
+        call  phase7b(r,p1,p2,p3,p4,p5,p6,p7,p8,p9,pswt,*999)
       elseif ((case .eq. 'WH__ZZ') .or. (case .eq. 'ZH__ZZ')) then
-        call  phase7b(r,p1,p2,p3,p4,p5,p6,p7,p8,p9,pswt,*999) 
+        call  phase7b(r,p1,p2,p3,p4,p5,p6,p7,p8,p9,pswt,*999)
       elseif ((case .eq. 'tt_ldk') .or. (case .eq. 'tt_hdk')
      &   .or. (case .eq. 'tt_udk') .or. (case .eq. 'tthWdk')) then
-        call  phase7dk(r,p1,p2,p3,p4,p5,p6,p7,p8,p9,pswt,*999) 
+        call  phase7dk(r,p1,p2,p3,p4,p5,p6,p7,p8,p9,pswt,*999)
       else
         write(6,*) 'Unanticipated process in gen7.f!'
         stop
       endif
-      
+
       do nu=1,4
       q(1,nu)=p1(nu)
       q(2,nu)=p2(nu)
@@ -107,12 +107,12 @@ c---if x's out of normal range alternative return
       q(7,nu)=p7(nu)
       q(8,nu)=p8(nu)
       q(9,nu)=p9(nu)
-      enddo 
-      
+      enddo
+
       wt7=xjac*pswt
-      
+
       if (debug) write(6,*) 'wt7 in gen7',wt7
-      
+
       return
 
  999  wt7=0d0

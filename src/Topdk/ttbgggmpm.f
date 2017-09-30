@@ -11,7 +11,7 @@
       s6789=s(i3,i6)+s(i3,i7)
       mtsq=mt**2
       ttbgggmpm =  + s129**(-1) * (  - 1/(za(i1,i2))/(za(i2,i3))/(zb(i1
-     &    ,i2))*za(i1,i3)**2*za(i5,i3)*za(i6,i7)*zb(i2,i6)*zb(i4,i5) - 
+     &    ,i2))*za(i1,i3)**2*za(i5,i3)*za(i6,i7)*zb(i2,i6)*zb(i4,i5) -
      &    1/(za(i1,i2))/(za(i2,i3))/(zb(i2,i3))*za(i1,i3)**2*za(i1,i5)*
      &    za(i6,i7)*zb(i2,i6)*zb(i4,i5) )
       ttbgggmpm = ttbgggmpm + s1345**(-1)*s6789**(-1) * (  - 1/(za(i1,

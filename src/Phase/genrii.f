@@ -17,10 +17,10 @@ c----i7 label of generated vector
 c      omxmin=one-xmin
       omxmin=one-xx(i1)
       r1=0.5d0
-c      write(6,*) 'Enter r1' 
-c      read(5,*) r1 
-      write(6,*) 'Enter r2' 
-      read(5,*) r2 
+c      write(6,*) 'Enter r1'
+c      read(5,*) r1
+      write(6,*) 'Enter r2'
+      read(5,*) r2
       if (impsample) then
         omx=omxmin*r1**2
         x=one-omx
@@ -83,7 +83,7 @@ C--generate the remaining vectors 3 through i7-1
       do j=1,4
       p(k,j)=p(k,j)+two*(qtDp(k)*q(j)/qtDqt-qsDp(k)*qs(j)/qsDqs)
       enddo
-      enddo      
+      enddo
 c----this completes the generation of the new momenta;
 c----we can now return
 

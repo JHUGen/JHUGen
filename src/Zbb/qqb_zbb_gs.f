@@ -7,9 +7,9 @@ c---Matrix element SUBTRACTION squared averaged over initial colors and spins
 c     q(-p1)+qbar(-p2) -->  b(p5)+bb(p6) + W +g(p7)
 c                                          |
 c                                          --> nu(p3)+e^+(p4)
-c                            
+c
 c   positively charged W only
-c--all momenta incoming so some of the signs may look odd. 
+c--all momenta incoming so some of the signs may look odd.
 c--initial state gluons coupling to b not included
       implicit none
       include 'constants.f'
@@ -21,9 +21,9 @@ c--initial state gluons coupling to b not included
       include 'first.f'
       integer j,k,nd
 c --- remember: nd will count the dipoles
-      
+
       double precision p(mxpart,4),msq(maxd,-nf:nf,-nf:nf),dot,scalesq
-      double precision 
+      double precision
      & msq17_2(-nf:nf,-nf:nf),msq27_1(-nf:nf,-nf:nf),
      & msq17_5(-nf:nf,-nf:nf),msq17_5v(-nf:nf,-nf:nf),
      & msq17_6(-nf:nf,-nf:nf),msq17_6v(-nf:nf,-nf:nf),
@@ -111,10 +111,10 @@ c--- now the basic initial final ones
       call storegg(mgg27_6,mgg27_6v)
       call dips(8,p,6,7,2,sub67_2,dsubv,dummy,dummyv,
      . qqb_zbb,donothing_gvec)
-      
+
       do j=-nflav,nflav
       do k=-nflav,nflav
-      
+
       if ((j.gt.0).and.(k.lt.0)) then
 c----------q-qb
 
@@ -181,7 +181,7 @@ c---------g-qbar
      .    +msq17_2(+5,k))
           msq(2,j,k)=msq(2,j,k)+(aveqg/avegg)*
      .    (sub27_1(gq)*msq27_1(0,0)+sub27_1v*msq27_1v(0,0))
-          endif 
+          endif
       elseif (k.eq.0) then
           if (j.gt.0) then
 c---------q-g
@@ -198,7 +198,7 @@ c---------qbar-g
           msq(2,j,k)=sub27_1(qg)
      &    *(msq27_1(j,+1)+msq27_1(j,+2)+msq27_1(j,+3)+msq27_1(j,+4)
      .     +msq27_1(j,+5))
-          endif 
+          endif
       endif
 
       enddo
@@ -207,7 +207,7 @@ c---------qbar-g
       return
       end
 
-      
+
       subroutine storegg(mgg,mggv)
 c--- this routine transfers the information on the colour
 c--- structure from a common block into separate arrays for
@@ -218,14 +218,14 @@ c--- each parton configuration
       include 'msqv_cs.f'
       integer i
       double precision mgg(0:2),mggv(0:2)
-      
+
       do i=0,2
         mgg(i)=msq_cs(i,0,0)
         mggv(i)=msqv_cs(i,0,0)
       enddo
-      
+
       return
       end
-      
 
-      
+
+

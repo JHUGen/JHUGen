@@ -4,7 +4,7 @@ c--- Et or Pt, depending on the parameter that is set in mdata.f
       implicit none
       double precision E,px,py,pz,etsq
       include 'useet.f'
-      
+
       if (useEt) then
 c--- this is the formula for Et
         etsq=px**2+py**2
@@ -13,7 +13,7 @@ c--- this is the formula for Et
 c--- this is the formula for pt
         getet=dsqrt(px**2+py**2)
       endif
-      
+
       return
       end
-      
+

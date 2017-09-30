@@ -1,5 +1,5 @@
       subroutine WW_HWW_gs(p,msq)
-      implicit none 
+      implicit none
 ************************************************************************
 *     Author: J. M. Campbell                                           *
 *     July, 2002.                                                      *
@@ -20,7 +20,7 @@
       integer j,k,nd
 
       double precision p(mxpart,4),msq(maxd,-nf:nf,-nf:nf)
-      double precision 
+      double precision
      . msq19_7(-nf:nf,-nf:nf),msq29_8(-nf:nf,-nf:nf),
      . msq18_2(-nf:nf,-nf:nf),msq29_1(-nf:nf,-nf:nf),
      . msq17_2(-nf:nf,-nf:nf),msq28_1(-nf:nf,-nf:nf),
@@ -39,7 +39,7 @@
       enddo
       enddo
       enddo
-      
+
 c---- calculate the dipoles: initial-final and final-initial
 c---- note that we do not require the gg dipoles, so the v-type
 c---- entries are left as dummies
@@ -121,7 +121,7 @@ C---gqb
       enddo
       enddo
 
-      return      
+      return
       end
 
 

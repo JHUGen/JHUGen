@@ -2,7 +2,7 @@
 ************************************************************************
 *     Virtual s-channel single top + jet                               *
 *                                                                      *
-*     q(p1) + q(p2) -> t(p3) + b(p4) + g(p5)                           *      
+*     q(p1) + q(p2) -> t(p3) + b(p4) + g(p5)                           *
 *                                                                      *
 *     Originally: R. Frederix and F. Tramontano, February 2008         *
 *        Adapted: J. Campbell, June 20, 2008                           *
@@ -29,7 +29,7 @@ c     u + g  ->  c + s + d  (t-channel single-charm)
      . msq_qqbar_lc,msq_qqbar_slc,msq_qqbar_tr
 c--- needed for pole check
 c     . ,xs,xsn,xsd
-      double complex 
+      double complex
      . LOamps_qqbar(2,2,2),
      . Virtamps_qqbar_lc(2,2,2),Virtamps_qqbar_slc(2,2,2),
      . Virtamps_qqbar_tr(2,2,2)
@@ -48,7 +48,7 @@ c---initialize
       enddo
       enddo
 
-c--- DEBUG: to check alpha-dependence      
+c--- DEBUG: to check alpha-dependence
 c      return
 
 c--- set mass of quark and antiquark according to nwz
@@ -121,7 +121,7 @@ cc        msq(j,k)=fac*Vsq(j,k)*msq_qbarq
 c      endif
 c      enddo
 c      enddo
-      
+
       return
       end
 
@@ -154,7 +154,7 @@ c---       to the massless line are set to zero
 c--- factors of ason2pi now included in this routine
       ason2pi_H=as_H/twopi
 c      ason2pi_L=as_L/twopi
-            
+
       do j=1,4
         q(1,j)=p(i1,j)
         q(2,j)=p(i2,j)
@@ -180,13 +180,13 @@ c     .             sck*(epinv + (4d0+1d0-eta)/2d0 + 3d0*log(scale/ml))))
      .              + (4d0+1d0-eta)/2d0 + 3d0*log(scale/mh))
      .     -ca/2d0*(1d0/2d0*epinv +
      .             sck*(epinv + (4d0+1d0-eta)/2d0 + 3d0*log(scale/ml))))
-      
+
       ren_slc=(
      .     -(2d0*cf-ca)/2d0*(3d0/2d0*epinv
      .              + (4d0+1d0-eta)/2d0 + 3d0*log(scale/mh))
      .     -(2d0*cf-ca)/2d0*(1d0/2d0*epinv +
      .             sck*(epinv + (4d0+1d0-eta)/2d0 + 3d0*log(scale/ml))))
-      
+
 c--- include finite counterterm to go from DR to MSbar scheme
 c--- alphas(DR) = alphas(MSbar) * (1+ (Nc / 6) * alphas(MSbar) / (2*pi))
       ren_lc=ren_lc+ca/6d0
@@ -220,7 +220,7 @@ c---- calling amps(hg,hc,hs)
       call Bamp_mpm(q,mh,ml,Bmpm)
       call Bamp_mmp(q,mh,ml,Bmmp)
       call Bamp_mmm(q,mh,ml,Bmmm)
- 
+
 c      xl15=lnrat(-2d0*dot(p,i1,i5),renscale_L**2)
 c--- correction to the massless line (cf. cv0 in qqb_tbb_v.f)
 c      virt_massless=-2d0*epinv*(epinv-dble(xl15))-dble(xl15**2)
@@ -235,7 +235,7 @@ c      virt_massless=virt_massless*ason2pi_L ! on light line
       ren_lc=ren_lc*ason2pi_H ! renormalization is like LO
       ren_slc=ren_slc*ason2pi_H ! renormalization is like LO
       ren_tr=ren_tr*ason2pi_H ! renormalization is like LO
- 
+
       Virtamps_lc(2,2,2)=Appp*colA+ren_lc*LOamps(2,2,2)
       Virtamps_lc(2,2,1)=Appm*colA+ren_lc*LOamps(2,2,1)
       Virtamps_lc(2,1,2)=Apmp*colA+ren_lc*LOamps(2,1,2)

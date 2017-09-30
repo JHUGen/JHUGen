@@ -50,30 +50,30 @@ C****************************************************************C
       if(q2.lt.qsqmin.or.q2.gt.qsqmax) print 99
       if(x.lt.xmin.or.x.gt.xmax)       print 98
           if(mode.eq.1) then
-        call mrs991(x,q2,upv,dnv,usea,dsea,str,chm,bot,glu) 
+        call mrs991(x,q2,upv,dnv,usea,dsea,str,chm,bot,glu)
       elseif(mode.eq.2) then
-        call mrs992(x,q2,upv,dnv,usea,dsea,str,chm,bot,glu) 
+        call mrs992(x,q2,upv,dnv,usea,dsea,str,chm,bot,glu)
       elseif(mode.eq.3) then
-        call mrs993(x,q2,upv,dnv,usea,dsea,str,chm,bot,glu) 
+        call mrs993(x,q2,upv,dnv,usea,dsea,str,chm,bot,glu)
       elseif(mode.eq.4) then
-        call mrs994(x,q2,upv,dnv,usea,dsea,str,chm,bot,glu) 
+        call mrs994(x,q2,upv,dnv,usea,dsea,str,chm,bot,glu)
       elseif(mode.eq.5) then
-        call mrs995(x,q2,upv,dnv,usea,dsea,str,chm,bot,glu) 
+        call mrs995(x,q2,upv,dnv,usea,dsea,str,chm,bot,glu)
       elseif(mode.eq.6) then
-        call mrs996(x,q2,upv,dnv,usea,dsea,str,chm,bot,glu) 
+        call mrs996(x,q2,upv,dnv,usea,dsea,str,chm,bot,glu)
       elseif(mode.eq.7) then
-        call mrs997(x,q2,upv,dnv,usea,dsea,str,chm,bot,glu) 
+        call mrs997(x,q2,upv,dnv,usea,dsea,str,chm,bot,glu)
       elseif(mode.eq.8) then
-        call mrs998(x,q2,upv,dnv,usea,dsea,str,chm,bot,glu) 
+        call mrs998(x,q2,upv,dnv,usea,dsea,str,chm,bot,glu)
       elseif(mode.eq.9) then
-        call mrs999(x,q2,upv,dnv,usea,dsea,str,chm,bot,glu) 
+        call mrs999(x,q2,upv,dnv,usea,dsea,str,chm,bot,glu)
       elseif(mode.eq.10) then
-        call mrs9910(x,q2,upv,dnv,usea,dsea,str,chm,bot,glu) 
+        call mrs9910(x,q2,upv,dnv,usea,dsea,str,chm,bot,glu)
       elseif(mode.eq.11) then
-        call mrs9911(x,q2,upv,dnv,usea,dsea,str,chm,bot,glu) 
+        call mrs9911(x,q2,upv,dnv,usea,dsea,str,chm,bot,glu)
       elseif(mode.eq.12) then
-        call mrs9912(x,q2,upv,dnv,usea,dsea,str,chm,bot,glu) 
-      endif 
+        call mrs9912(x,q2,upv,dnv,usea,dsea,str,chm,bot,glu)
+      endif
   99  format('  WARNING:  Q^2 VALUE IS OUT OF RANGE   ')
   98  format('  WARNING:   X  VALUE IS OUT OF RANGE   ')
       return
@@ -159,13 +159,13 @@ c notation: 1=uval 2=val 3=glue 4=usea 5=chm 6=str 7=btm 8=dsea
       dsea=g(8)
       str=g(6)
       chm=g(5)
-      glu=g(3) 
+      glu=g(3)
       bot=g(7)
         x=xsave
         qsq=q2save
       return
       end
-      
+
       subroutine mrs992(x,qsq,upv,dnv,usea,dsea,str,chm,bot,glu)
       implicit real*8(a-h,o-z)
       parameter(nx=49,nq=37,ntenth=23,np=8)
@@ -246,13 +246,13 @@ c notation: 1=uval 2=val 3=glue 4=usea 5=chm 6=str 7=btm 8=dsea
       dsea=g(8)
       str=g(6)
       chm=g(5)
-      glu=g(3) 
+      glu=g(3)
       bot=g(7)
         x=xsave
         qsq=q2save
       return
       end
-      
+
       subroutine mrs993(x,qsq,upv,dnv,usea,dsea,str,chm,bot,glu)
       implicit real*8(a-h,o-z)
       parameter(nx=49,nq=37,ntenth=23,np=8)
@@ -333,14 +333,14 @@ c notation: 1=uval 2=val 3=glue 4=usea 5=chm 6=str 7=btm 8=dsea
       dsea=g(8)
       str=g(6)
       chm=g(5)
-      glu=g(3) 
+      glu=g(3)
       bot=g(7)
         x=xsave
         qsq=q2save
       return
       end
-      
-      
+
+
       subroutine mrs994(x,qsq,upv,dnv,usea,dsea,str,chm,bot,glu)
       implicit real*8(a-h,o-z)
       parameter(nx=49,nq=37,ntenth=23,np=8)
@@ -421,13 +421,13 @@ c notation: 1=uval 2=val 3=glue 4=usea 5=chm 6=str 7=btm 8=dsea
       dsea=g(8)
       str=g(6)
       chm=g(5)
-      glu=g(3) 
+      glu=g(3)
       bot=g(7)
         x=xsave
         qsq=q2save
       return
       end
-      
+
       subroutine mrs995(x,qsq,upv,dnv,usea,dsea,str,chm,bot,glu)
       implicit real*8(a-h,o-z)
       parameter(nx=49,nq=37,ntenth=23,np=8)
@@ -508,13 +508,13 @@ c notation: 1=uval 2=val 3=glue 4=usea 5=chm 6=str 7=btm 8=dsea
       dsea=g(8)
       str=g(6)
       chm=g(5)
-      glu=g(3) 
+      glu=g(3)
       bot=g(7)
         x=xsave
         qsq=q2save
       return
       end
-      
+
 
       subroutine mrs996(x,qsq,upv,dnv,usea,dsea,str,chm,bot,glu)
       implicit real*8(a-h,o-z)
@@ -596,13 +596,13 @@ c notation: 1=uval 2=val 3=glue 4=usea 5=chm 6=str 7=btm 8=dsea
       dsea=g(8)
       str=g(6)
       chm=g(5)
-      glu=g(3) 
+      glu=g(3)
       bot=g(7)
         x=xsave
         qsq=q2save
       return
       end
-      
+
       subroutine mrs997(x,qsq,upv,dnv,usea,dsea,str,chm,bot,glu)
       implicit real*8(a-h,o-z)
       parameter(nx=49,nq=37,ntenth=23,np=8)
@@ -683,13 +683,13 @@ c notation: 1=uval 2=val 3=glue 4=usea 5=chm 6=str 7=btm 8=dsea
       dsea=g(8)
       str=g(6)
       chm=g(5)
-      glu=g(3) 
+      glu=g(3)
       bot=g(7)
         x=xsave
         qsq=q2save
       return
       end
-      
+
 
 
       subroutine mrs998(x,qsq,upv,dnv,usea,dsea,str,chm,bot,glu)
@@ -772,13 +772,13 @@ c notation: 1=uval 2=val 3=glue 4=usea 5=chm 6=str 7=btm 8=dsea
       dsea=g(8)
       str=g(6)
       chm=g(5)
-      glu=g(3) 
+      glu=g(3)
       bot=g(7)
         x=xsave
         qsq=q2save
       return
       end
-      
+
       subroutine mrs999(x,qsq,upv,dnv,usea,dsea,str,chm,bot,glu)
       implicit real*8(a-h,o-z)
       parameter(nx=49,nq=37,ntenth=23,np=8)
@@ -859,13 +859,13 @@ c notation: 1=uval 2=val 3=glue 4=usea 5=chm 6=str 7=btm 8=dsea
       dsea=g(8)
       str=g(6)
       chm=g(5)
-      glu=g(3) 
+      glu=g(3)
       bot=g(7)
         x=xsave
         qsq=q2save
       return
       end
-      
+
 
 
       subroutine mrs9910(x,qsq,upv,dnv,usea,dsea,str,chm,bot,glu)
@@ -948,13 +948,13 @@ c notation: 1=uval 2=val 3=glue 4=usea 5=chm 6=str 7=btm 8=dsea
       dsea=g(8)
       str=g(6)
       chm=g(5)
-      glu=g(3) 
+      glu=g(3)
       bot=g(7)
         x=xsave
         qsq=q2save
       return
       end
-      
+
       subroutine mrs9911(x,qsq,upv,dnv,usea,dsea,str,chm,bot,glu)
       implicit real*8(a-h,o-z)
       parameter(nx=49,nq=37,ntenth=23,np=8)
@@ -1035,14 +1035,14 @@ c notation: 1=uval 2=val 3=glue 4=usea 5=chm 6=str 7=btm 8=dsea
       dsea=g(8)
       str=g(6)
       chm=g(5)
-      glu=g(3) 
+      glu=g(3)
       bot=g(7)
         x=xsave
         qsq=q2save
       return
       end
-      
-      
+
+
       subroutine mrs9912(x,qsq,upv,dnv,usea,dsea,str,chm,bot,glu)
       implicit real*8(a-h,o-z)
       parameter(nx=49,nq=37,ntenth=23,np=8)
@@ -1123,10 +1123,10 @@ c notation: 1=uval 2=val 3=glue 4=usea 5=chm 6=str 7=btm 8=dsea
       dsea=g(8)
       str=g(6)
       chm=g(5)
-      glu=g(3) 
+      glu=g(3)
       bot=g(7)
         x=xsave
         qsq=q2save
       return
       end
-      
+

@@ -14,11 +14,11 @@ c      use avh_olo
 
       TRscalarselect=1
 
-c--- call to QCDLoop if necessary      
+c--- call to QCDLoop if necessary
       if ((TRscalarselect .eq. 1) .or.(TRscalarselect .eq. 3)) then
         resQCDLoop=qlI4(p1,p2,p3,p4,s12,s23,m1,m2,m3,m4,mu2,ep)
       endif
-      
+
       if (TRscalarselect .eq. 1) then
         trI4=resQCDLoop
         return
@@ -27,7 +27,7 @@ c--- call to QCDLoop if necessary
       call olo_d0(result,p1,p2,p3,p4,s12,s23,m1,m2,m3,m4,dsqrt(mu2))
       resOneLOop=result(abs(ep))
       trI4=resOneLOop
-      
+
       if (TRscalarselect .eq. 3) then
         if ((cdabs(resOneLOop) .gt. 1d-12) .and.
      &      (abs(resQCDLoop/resOneLOop-1d0) .gt. 1d-12)) then
@@ -37,7 +37,7 @@ c--- call to QCDLoop if necessary
           write(6,*) '->ratio:',resQCDLoop/resOneLOop
         endif
       endif
-      
+
       return
       end
-      
+

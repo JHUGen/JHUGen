@@ -1,8 +1,8 @@
       subroutine genff(nperms,p,wt,msq)
 c--- final-final subtraction.
 c--- nperms is an argument between 1 and 2
-c--- this routine calculates the jacobian associated with calculating 
-c--- a given final state, by contracting a final-final dipole 
+c--- this routine calculates the jacobian associated with calculating
+c--- a given final state, by contracting a final-final dipole
       implicit none
       include 'constants.f'
       include 'qcdcouple.f'
@@ -27,7 +27,7 @@ c---nb all incoming
       s3i4=two*dot(p,3,i4)
       y=dot(p,3,i4)/(dot(p,3,i4)+dot(p,3,i5)+dot(p,i4,i5))
       z=dot(p,3,i5)/(dot(p,3,i5)+dot(p,i4,i5))
-      omy=one-y      
+      omy=one-y
 
       do j=1,4
       q(1,j)=p(1,j)

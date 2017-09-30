@@ -17,16 +17,16 @@ C---p1+p2 --> p3+p4
       include 'energy.f'
       parameter(wt0=1d0/16d0/pi)
 
-      do j=1,mxpart     
-      do nu=1,4     
+      do j=1,mxpart
+      do nu=1,4
       p(j,nu)=0d0
-      enddo     
-      enddo   
-      
+      enddo
+      enddo
+
       wt2=0d0
-      
+
       if (n3 .eq. 1) then
-c--- generate s34 according to a Breit-Wigner, for gg->H 
+c--- generate s34 according to a Breit-Wigner, for gg->H
         call breitw(r(3),wsqmin,wsqmax,mass3,width3,s34,w3)
         xmin=0d0
       if     (hdecaymode .eq. 'bqba') then
@@ -47,19 +47,19 @@ c--- no resonance, for tt~,bb~,cc~
         s34=1/vs
         w3=(vsqmax-vsqmin)*s34**2
       endif
-      
+
       rtshat=dsqrt(s34)
       ymax=dlog(sqrts/rtshat)
-      yave=ymax*(two*r(1)-1d0)      
+      yave=ymax*(two*r(1)-1d0)
 c----udif=tanh(ydif)
       beta=dsqrt(1d0-4d0*mass**2/s34)
       udif=beta*(two*r(2)-1d0)
       ydif=half*dlog((1d0+udif)/(1d0-udif))
       xjac=four*ymax*beta
-          
+
       y3=yave+ydif
       y4=yave-ydif
-          
+
       xjac=xjac*w3
       phi=2d0*pi*r(4)
 
@@ -68,21 +68,21 @@ c----udif=tanh(ydif)
       trmass=rtshat/(2d0*dcosh(ydif))
 
 
-      if   ((xx(1) .gt. 1d0) 
+      if   ((xx(1) .gt. 1d0)
      & .or. (xx(2) .gt. 1d0)
      & .or. (xx(1) .lt. xmin)
      & .or. (xx(2) .lt. xmin)) then
-        write(6,*) 'problems with xx(1),xx(2) in gen2',xx(1),xx(2)  
-        return 1 
+        write(6,*) 'problems with xx(1),xx(2) in gen2',xx(1),xx(2)
+        return 1
       endif
 
       pt=dsqrt(trmass**2-mass**2)
-          
+
       p(1,4)=-0.5d0*xx(1)*sqrts
       p(1,1)=0d0
       p(1,2)=0d0
       p(1,3)=-0.5d0*xx(1)*sqrts
-      
+
       p(2,4)=-0.5d0*xx(2)*sqrts
       p(2,1)=0d0
       p(2,2)=0d0

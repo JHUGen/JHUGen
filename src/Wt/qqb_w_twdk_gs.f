@@ -8,7 +8,7 @@ c     q(-p1)+qbar(-p2) -->  W + t [or t~](p5) + g(p6)
 c                           |
 c                            -->l(p3)+a(p4)
 
-      implicit none 
+      implicit none
       include 'constants.f'
       include 'ptilde.f'
       include 'qqgg.f'
@@ -16,7 +16,7 @@ c                            -->l(p3)+a(p4)
       include 'nwz.f'
       integer j,k,nd,iq
       double precision p(mxpart,4),msq(maxd,-nf:nf,-nf:nf)
-      double precision 
+      double precision
      & msq16_2(-nf:nf,-nf:nf),msq26_1(-nf:nf,-nf:nf),
      & msq26_5(-nf:nf,-nf:nf),msq16_5(-nf:nf,-nf:nf),
      & msq56_1(-nf:nf,-nf:nf),msq56_2(-nf:nf,-nf:nf),
@@ -68,7 +68,7 @@ c--- now the final-initial ones
      . qqb_w_twdk,donothing_gvec)
 
       do j=-nf,nf
-      do k=-nf,nf      
+      do k=-nf,nf
       do nd=1,ndmax
         msq(nd,j,k)=0d0
       enddo
@@ -101,9 +101,9 @@ c--- g-q and g-qb cases
       msq(3,j,k)=(msq16_2(-5,k)+msq16_2(+5,k))*sub16_2(qg)*2d0*tr
       msq(4,j,k)=(msq26_1(k,-5)+msq26_1(k,+5))*sub26_1(qg)*2d0*tr
       endif
-      
-      endif     
-      
+
+      endif
+
       enddo
       enddo
 
@@ -113,7 +113,7 @@ c--- subtraction terms for 4-quark matrix elements
      .          msq16_2(0,+5*iq)*sub16_2(gq)+msq16_2v(0,+5*iq)*sub16_2v)
       msq(4,+5*iq,j)=2d0*cf*(
      .          msq26_1(+5*iq,0)*sub26_1(gq)+msq26_1v(+5*iq,0)*sub26_1v)
-      
+
       msq(3,-j,+5*iq)=msq(3,+j,+5*iq)
       msq(4,+5*iq,-j)=msq(4,+5*iq,+j)
       enddo

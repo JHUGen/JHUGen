@@ -1,4 +1,4 @@
-      double complex function a6g(st,j1,j2,j3,j4,j5,j6,za,zb) 
+      double complex function a6g(st,j1,j2,j3,j4,j5,j6,za,zb)
       implicit none
 ************************************************************************
 *     Author: R.K. Ellis                                               *

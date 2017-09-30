@@ -1,12 +1,12 @@
       subroutine qqb_gmgmjt_gvec(p,n,in,msq)
-C*********************************************************************** 
+C***********************************************************************
 *    Author: J.M. Campbell                                             *
 *    March, 2013.                                                      *
 c     Matrix element for gamma+gamma+jet production                    *
 c     averaged over initial colours and spins                          *
 c     contracted with the vector n(mu) (orthogonal to p5)              *
 c     q(-p1)+qbar(-p2) --> gamma(p3) + gamma(p4) + g(p5)               *
-C*********************************************************************** 
+C***********************************************************************
       implicit none
       include 'constants.f'
       include 'qcdcouple.f'
@@ -34,7 +34,7 @@ C--in is the label of the parton dotted with n
       fac=4d0*cf*xn*esq**2*gsq
       call spinoru(5,p,za,zb)
       call spinork(5,p,zanb,zbna,n)
-      
+
       if (in .eq. 1) then
         call checkndotp(p,n,1)
         gqb=aveqg*fac*gmgmjetn(zanb,5,2,1,3,4)
@@ -43,7 +43,7 @@ C--in is the label of the parton dotted with n
         call checkndotp(p,n,2)
         qg=aveqg*fac*gmgmjetn(zanb,1,5,2,3,4)
         qbg=aveqg*fac*gmgmjetn(zanb,5,1,2,3,4)
-      elseif (in .eq. 5) then      
+      elseif (in .eq. 5) then
         call checkndotp(p,n,5)
         qbq=+aveqq*fac*gmgmjetn(zanb,2,1,5,3,4)
         qqb=+aveqq*fac*gmgmjetn(zanb,1,2,5,3,4)
@@ -56,10 +56,10 @@ C--in is the label of the parton dotted with n
         msq(j,0)=cfac*qg
         msq(0,j)=cfac*gq
         msq(-j,0)=cfac*qbg
-        msq(0,-j)=cfac*gqb     
+        msq(0,-j)=cfac*gqb
       enddo
-      
+
 
       return
       end
- 
+

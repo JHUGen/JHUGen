@@ -80,7 +80,7 @@ c---initialize
          enddo
          enddo
       endif
-      
+
       prop=dcmplx(zip,mt*twidth)
       fac=aveqg*V*gwsq**4*gsq/abs(prop)**2*ason2pi*CF
 

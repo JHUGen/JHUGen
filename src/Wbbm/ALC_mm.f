@@ -11,27 +11,27 @@ c---  (q1, Qb2, Q3, qb4)
       include 'momwbbm.f'
       include 'zprods_com.f'
       include 'Wbbmlabels.f'
-      integer k1,k2,k3,k4,k5,k6,v1,v2,nu,j,eta,k34f,k56f 
+      integer k1,k2,k3,k4,k5,k6,v1,v2,nu,j,eta,k34f,k56f
       double complex ampALC(2,2)
       double precision p2(4),p3(4),p23(4),p123(4),p234(4),p1234(4),
      & p12(4),p34(4),p56(4),s23,s123,s234,s34,s12,s1234,msq,mb
-      double complex zab,zaba,zbab,zabab,ampLO 
+      double complex zab,zaba,zbab,zabab,ampLO
       double precision K1f(4),K2f(4),p1Dp3,p1Dp4,p2Dp3,p2Dp4
-      double precision n1(4),n2(4),p3DP,etaDp3,etaDP,al1,al2,kappa 
-      double complex S1,S2,K1DK2,gamma,den,a11,a12,a21,a22 
-      double complex gam,be,besq 
-      double complex zaP2b,zaP3b,zaP12b,zaP23b,zaP34b,zaP123b,     
-     & zaP234b,zaP1234b     
+      double precision n1(4),n2(4),p3DP,etaDp3,etaDP,al1,al2,kappa
+      double complex S1,S2,K1DK2,gamma,den,a11,a12,a21,a22
+      double complex gam,be,besq
+      double complex zaP2b,zaP3b,zaP12b,zaP23b,zaP34b,zaP123b,
+     & zaP234b,zaP1234b
       double complex zaP2bP123a,zaP123bP3a,zaP12bP3a
       double complex zbP123aP3b,zbP12aP3b,zbP23aP3b,zaP23bP3a,
      & zbP34aP2b
       double precision kappa1,kappa2,p3Dp12,p34Dp12
       parameter(k34f=7,k56f=8)
-c--- statement functions to define zab spinor strings         
+c--- statement functions to define zab spinor strings
       zaP2b(v1,v2)=bp*za(v1,k2)*zb(k2,v2)+bm*za(v1,k3)*zb(k3,v2)
       zaP3b(v1,v2)=bp*za(v1,k3)*zb(k3,v2)+bm*za(v1,k2)*zb(k2,v2)
       zaP12b(v1,v2)=bp*za(v1,k2)*zb(k2,v2)+bm*za(v1,k3)*zb(k3,v2)
-     &             +za(v1,k1)*zb(k1,v2)  
+     &             +za(v1,k1)*zb(k1,v2)
       zaP23b(v1,v2)=za(v1,k2)*zb(k2,v2)+za(v1,k3)*zb(k3,v2)
       zaP34b(v1,v2)=bp*za(v1,k3)*zb(k3,v2)+bm*za(v1,k2)*zb(k2,v2)
      &             +za(v1,k4)*zb(k4,v2)
@@ -40,43 +40,43 @@ c--- statement functions to define zab spinor strings
       zaP234b(v1,v2)=za(v1,k2)*zb(k2,v2)+za(v1,k3)*zb(k3,v2)
      &  +za(v1,k4)*zb(k4,v2)
       zaP1234b(v1,v2)=-za(v1,k5)*zb(k5,v2)-za(v1,k6)*zb(k6,v2)
-c--- statement functions to define zaba spinor strings         
+c--- statement functions to define zaba spinor strings
       zaP2bP123a(v1,v2)=bp*za(v1,k2)*zaP123b(v2,k2)
-     &                 +bm*za(v1,k3)*zaP123b(v2,k3)  
+     &                 +bm*za(v1,k3)*zaP123b(v2,k3)
       zaP123bP3a(v1,v2)=bp*zaP123b(v1,k3)*za(k3,v2)
-     &                 +bm*zaP123b(v1,k2)*za(k2,v2)  
+     &                 +bm*zaP123b(v1,k2)*za(k2,v2)
       zaP12bP3a(v1,v2)=bp*zaP12b(v1,k3)*za(k3,v2)
-     &                +bm*zaP12b(v1,k2)*za(k2,v2)  
+     &                +bm*zaP12b(v1,k2)*za(k2,v2)
       zaP23bP3a(v1,v2)=bp*zaP23b(v1,k3)*za(k3,v2)
-     &                +bm*zaP23b(v1,k2)*za(k2,v2)  
+     &                +bm*zaP23b(v1,k2)*za(k2,v2)
 c      zaP2bP34a(v1,v2)=bp*za(v1,k2)*zaP34b(v2,k2)
-c     &                +bm*za(v1,k3)*zaP34b(v2,k3)  
+c     &                +bm*za(v1,k3)*zaP34b(v2,k3)
 c      zaP234bP34a(v1,v2)=bp*zaP234b(v1,k3)*za(k3,v2)
-c     &                  +bm*zaP234b(v1,k2)*za(k2,v2)  
-c     &                  +zaP234b(v1,k4)*za(k4,v2)  
+c     &                  +bm*zaP234b(v1,k2)*za(k2,v2)
+c     &                  +zaP234b(v1,k4)*za(k4,v2)
 c      zaP34bP2a(v1,v2)=bp*zaP34b(v1,k2)*za(k2,v2)
-c     &                +bm*zaP34b(v1,k3)*za(k3,v2)  
-c--- statement functions to define zbab spinor strings         
+c     &                +bm*zaP34b(v1,k3)*za(k3,v2)
+c--- statement functions to define zbab spinor strings
 c      zbP2aP123b(v1,v2)=bp*zb(v1,k2)*zaP123b(k2,v2)
-c     &                 +bm*zb(v1,k3)*zaP123b(k3,v2)  
+c     &                 +bm*zb(v1,k3)*zaP123b(k3,v2)
       zbP123aP3b(v1,v2)=bp*zaP123b(k3,v1)*zb(k3,v2)
-     &                 +bm*zaP123b(k2,v1)*zb(k2,v2)  
+     &                 +bm*zaP123b(k2,v1)*zb(k2,v2)
       zbP12aP3b(v1,v2)=bp*zaP12b(k3,v1)*zb(k3,v2)
-     &                +bm*zaP12b(k2,v1)*zb(k2,v2)  
+     &                +bm*zaP12b(k2,v1)*zb(k2,v2)
       zbP23aP3b(v1,v2)=bp*zaP23b(k3,v1)*zb(k3,v2)
-     &                +bm*zaP23b(k2,v1)*zb(k2,v2)  
+     &                +bm*zaP23b(k2,v1)*zb(k2,v2)
 c      zbP2aP34b(v1,v2)=bp*zb(v1,k2)*zaP34b(k2,v2)
-c     &                +bm*zb(v1,k3)*zaP34b(k3,v2)  
+c     &                +bm*zb(v1,k3)*zaP34b(k3,v2)
 c      zbP234aP34b(v1,v2)=bp*zaP234b(k3,v1)*zb(k3,v2)
-c     &                  +bm*zaP234b(k2,v1)*zb(k2,v2)  
-c     &                  +zaP234b(k4,v1)*zb(k4,v2)  
+c     &                  +bm*zaP234b(k2,v1)*zb(k2,v2)
+c     &                  +zaP234b(k4,v1)*zb(k4,v2)
       zbP34aP2b(v1,v2)=bp*zaP34b(k2,v1)*zb(k2,v2)
-     &                +bm*zaP34b(k3,v1)*zb(k3,v2)  
-  
-  
-c--- zero out all integral coefficients  
+     &                +bm*zaP34b(k3,v1)*zb(k3,v2)
+
+
+c--- zero out all integral coefficients
       call clearcoeffs(coeff)
-      
+
       do nu=1,4
       p2(nu)=bp*mom(k2,nu)+bm*mom(k3,nu)
       p3(nu)=bp*mom(k3,nu)+bm*mom(k2,nu)
@@ -88,7 +88,7 @@ c--- zero out all integral coefficients
       p1234(nu)=p123(nu)+mom(k4,nu)
       p56(nu)=-p1234(nu)
       enddo
-      
+
       s23=p23(4)**2-p23(1)**2-p23(2)**2-p23(3)**2
       s123=p123(4)**2-p123(1)**2-p123(2)**2-p123(3)**2
       s234=p234(4)**2-p234(1)**2-p234(2)**2-p234(3)**2
@@ -112,11 +112,11 @@ c     &-mom(k4,2)*p3(2)-mom(k4,3)*p3(3)
       besq=1d0-4d0*bm*bp
       be=sqrt(besq)
 
-      amplo=(za(k3,k1)*zb(k4,k5)                                   
-     &     *(za(k6,k1)*zb(k1,k3)+za(k6,k2)*zb(k2,k3))/s123         
-     &      -zb(k3,k4)*za(k1,k6)                                   
-     &     *(zb(k5,k2)*za(k2,k3)+zb(k5,k4)*za(k4,k3))/s234)        
-     &      *2d0*mb/zb(k2,k3)/s23/s1234                            
+      amplo=(za(k3,k1)*zb(k4,k5)
+     &     *(za(k6,k1)*zb(k1,k3)+za(k6,k2)*zb(k2,k3))/s123
+     &      -zb(k3,k4)*za(k1,k6)
+     &     *(zb(k5,k2)*za(k2,k3)+zb(k5,k4)*za(k4,k3))/s234)
+     &      *2d0*mb/zb(k2,k3)/s23/s1234
 
 c---------------------------- BOXES -----------------------------------
 
@@ -326,9 +326,9 @@ c--- this is the (23,4) triangle
      &    k5)*be**(-2) )
       coeff(3,c23x4) = coeff(3,c23x4) + mb * (  - 1/(za(k5,k6))/(zb(k2,
      &    k3))/(zb(k5,k6))/(zaP23b(k4,k1))/(zaP23b(k4,k1))/(zaP23b(k4,
-     &    k4))*zb(k1,k4)*zaba(k4,p2,p23,k6)*zaP23b(k4,k5)*be**(-1) + 
+     &    k4))*zb(k1,k4)*zaba(k4,p2,p23,k6)*zaP23b(k4,k5)*be**(-1) +
      &    1/(za(k5,k6))/(zb(k2,k3))/(zb(k5,k6))/(zaP23b(k4,k1))/(
-     &    zaP23b(k4,k4))*za(k1,k6)*zb(k4,k5)*zaP3b(k4,k1)*be**(-1) - 
+     &    zaP23b(k4,k4))*za(k1,k6)*zb(k4,k5)*zaP3b(k4,k1)*be**(-1) -
      &    1/(za(k5,k6))/(zb(k2,k3))/(zb(k5,k6))/(zaP23b(k4,k1))/(
      &    zaP23b(k4,k4))*zb(k4,k5)*zaba(k4,p2,p23,k6)*be**(-1) - 1/(za(
      &    k5,k6))/(zb(k5,k6))/(zaP23b(k4,k1))/(zaP23b(k4,k1))/(zaP23b(
@@ -344,24 +344,24 @@ c--- this is the (23,4) triangle
      &    k2,k3))/(zb(k5,k6))/(zaP23b(k4,k1))/(zaP23b(k4,k1))/(zaP23b(
      &    k4,k4))*za(k4,k6)*zb(k4,k5)*zaP3b(k4,k1)*be**(-1) + 1/(za(k5,
      &    k6))/(zb(k2,k3))/(zb(k5,k6))/(zaP23b(k4,k1))/(zaP23b(k4,k4))
-     &    /(zaP23b(k4,k4))*za(k4,k6)*zb(k4,k5)*zaP2b(k4,k4)*be**(-1) + 
+     &    /(zaP23b(k4,k4))*za(k4,k6)*zb(k4,k5)*zaP2b(k4,k4)*be**(-1) +
      &    1/(za(k5,k6))/(zb(k5,k6))/(zaP23b(k4,k1))/(zaP23b(k4,k1))/(
      &    zaP23b(k4,k4))/(zaP23b(k4,k4))*za(k2,k4)*za(k3,k4)*za(k4,k6)*
      &    zb(k1,k4)*zb(k4,k5) )
 
 
-c--- identities that ensure the correct pole structure       
+c--- identities that ensure the correct pole structure
       coeff(3,c3x4)=-(ampLO+coeff(4,d2x3x4)+coeff(4,d12x3x4))
       coeff(3,c1x2)=-(ampLO+coeff(4,d1x2x3)+coeff(4,d1x2x34))
-                                      
-      coeff(3,c1x23)=                       
-     & -(coeff(4,d2x3x4)+coeff(4,d1x2x3)+coeff(3,c23x4)      
-     &   -2d0*coeff(4,d1x23x4))                   
-      coeff(3,c1x234)=                       
-     & -(coeff(4,d1x2x34)+coeff(4,d1x2x3)+coeff(3,c1x23))      
-      coeff(3,c123x4)=                       
-     & -(coeff(4,d1x2x34)+coeff(4,d12x3x4)+coeff(3,c1x234)   
-     &   +2d0*coeff(4,d1x23x4))                   
+
+      coeff(3,c1x23)=
+     & -(coeff(4,d2x3x4)+coeff(4,d1x2x3)+coeff(3,c23x4)
+     &   -2d0*coeff(4,d1x23x4))
+      coeff(3,c1x234)=
+     & -(coeff(4,d1x2x34)+coeff(4,d1x2x3)+coeff(3,c1x23))
+      coeff(3,c123x4)=
+     & -(coeff(4,d1x2x34)+coeff(4,d12x3x4)+coeff(3,c1x234)
+     &   +2d0*coeff(4,d1x23x4))
 
 c--- this is the (12,3) triangle
 c---  (for this triangle, K1=-(1+2+3), K2=-3)
@@ -500,7 +500,7 @@ c--- loop over two solutions for gamma
      &     - 1.D0/2.D0/(za(k5,k6))/(zb(k2,k3))/(zb(k2,k3))/(zb(k5,k6))
      &    /(zab(k1,K2f,k1))/(zab(k1,K2f,k4))/(zaba(k4,p234,K2f,k4))/(
      &    zaba(k4,p234,K2f,k4))*zab(k1,K2f,k2)*zab(k1,K2f,k3)*zab(k4,
-     &    K2f,k5)*zaba(k6,p1234,K2f,k4)*zabab(k4,p234,K1f,p3,k4)*a12 + 
+     &    K2f,k5)*zaba(k6,p1234,K2f,k4)*zabab(k4,p234,K1f,p3,k4)*a12 +
      &    1.D0/2.D0/(za(k5,k6))/(zb(k2,k3))/(zb(k2,k3))/(zb(k5,k6))/(
      &    zab(k1,K2f,k1))/(zaba(k4,p234,K2f,k4))*zb(k2,k4)*zab(k1,K2f,
      &    k3)*zab(k4,K1f,k5)*zaba(k6,p1234,K2f,k4)*a22 + 1.D0/2.D0/(za(
@@ -625,7 +625,7 @@ c--- this is the (2,3) triangle
       coeff(3,c2x3)= + mb*s234**(-1)*s1234**(-1) * ( 1/(za(k3,k4))/(zb(
      &    k2,k3))*za(k1,k6)*za(k2,k4)*zb(k2,k4)*zaP234b(k3,k5) + 1/(zb(
      &    k2,k3))*za(k1,k6)*zb(k2,k4)*zaP234b(k2,k5) )
-      coeff(3,c2x3) = coeff(3,c2x3) + mb*s234**(-1)*bp*s1234**(-1) * ( 
+      coeff(3,c2x3) = coeff(3,c2x3) + mb*s234**(-1)*bp*s1234**(-1) * (
      &     - 1.D0/2.D0/(za(k2,k4))/(zb(k2,k3))*za(k1,k6)*za(k3,k4)*zb(
      &    k3,k4)*zaP234b(k2,k5) - 1.D0/2.D0/(za(k2,k4))/(zb(k2,k3))*za(
      &    k1,k6)*za(k3,k4)*zb(k3,k4)*zaP234b(k2,k5)*be**(-1) - 1.D0/2.D0
@@ -642,14 +642,14 @@ c--- this is the (2,3) triangle
      &    )*be**(-1) + 2.D0/(zb(k2,k3))*za(k1,k6)*zb(k3,k4)*zaP234b(k3,
      &    k5)*be**(-2) + 2.D0/(zb(k2,k3))*za(k1,k6)*zb(k3,k4)*zaP234b(
      &    k3,k5)*be**(-1) )
-      coeff(3,c2x3) = coeff(3,c2x3) + mb*s123**(-1)*s1234**(-1) * (  - 
+      coeff(3,c2x3) = coeff(3,c2x3) + mb*s123**(-1)*s1234**(-1) * (  -
      &    1/(zb(k1,k2))/(zb(k2,k3))*za(k1,k3)*zb(k1,k3)*zb(k4,k5)*
      &    zaP123b(k6,k2) - 1/(zb(k2,k3))*za(k1,k3)*zb(k4,k5)*zaP123b(k6
      &    ,k3) )
       coeff(3,c2x3) = coeff(3,c2x3) + mb*s1234**(-1) * (  - 1/(za(k3,k4
-     &    ))/(zb(k1,k2))/(zb(k2,k3))*zaP123b(k6,k2)*zaP234b(k3,k5) + 
+     &    ))/(zb(k1,k2))/(zb(k2,k3))*zaP123b(k6,k2)*zaP234b(k3,k5) +
      &    1/(zb(k2,k3))*za(k1,k6)*zb(k4,k5) )
-      coeff(3,c2x3) = coeff(3,c2x3) + mb*bp*s123**(-1)*s1234**(-1) * ( 
+      coeff(3,c2x3) = coeff(3,c2x3) + mb*bp*s123**(-1)*s1234**(-1) * (
      &    1.D0/2.D0/(zb(k1,k2))/(zb(k2,k3))*za(k1,k3)*zb(k1,k3)*zb(k4,
      &    k5)*zaP123b(k6,k2) + 1.D0/2.D0/(zb(k1,k2))/(zb(k2,k3))*za(k1,
      &    k3)*zb(k1,k3)*zb(k4,k5)*zaP123b(k6,k2)*be**(-1) + 1.D0/2.D0/(
@@ -714,13 +714,13 @@ c--- this is the (123) bubble
      &    za(k5,k6))/(zb(k1,k2))/(zb(k2,k3))/(zaP23b(k1,k1))/(zaP23b(k4
      &    ,k1))*za(k1,k3)*zb(k1,k3)*zaP23b(k6,k1)*zaP123b(k6,k2) - 1/(
      &    za(k5,k6))/(zb(k1,k2))/(zb(k2,k3))/(zaP23b(k1,k1))/(zaP23b(k4
-     &    ,k1))*za(k1,k3)*zb(k1,k3)*zaP23b(k6,k1)*zaP123b(k6,k2)*be - 
+     &    ,k1))*za(k1,k3)*zb(k1,k3)*zaP23b(k6,k1)*zaP123b(k6,k2)*be -
      &    1/(za(k5,k6))/(zb(k1,k2))/(zb(k2,k3))/(zaP23b(k4,k1))*zaP23b(
      &    k6,k1)*zaP123b(k6,k2) - 1/(za(k5,k6))/(zb(k1,k2))/(zb(k2,k3))
      &    /(zaP23b(k4,k1))*zaP23b(k6,k1)*zaP123b(k6,k2)*be - 1.D0/2.D0
      &    /(za(k5,k6))/(zb(k1,k3))/(zb(k2,k3))/(zaP23b(k4,k1))*zaP23b(
      &    k6,k1)*zaP123b(k6,k3) - 1.D0/2.D0/(za(k5,k6))/(zb(k1,k3))/(
-     &    zb(k2,k3))/(zaP23b(k4,k1))*zaP23b(k6,k1)*zaP123b(k6,k3)*be - 
+     &    zb(k2,k3))/(zaP23b(k4,k1))*zaP23b(k6,k1)*zaP123b(k6,k3)*be -
      &    1.D0/2.D0/(za(k5,k6))/(zb(k1,k3))/(zaP23b(k1,k1))/(zaP23b(k1,
      &    k1))/(zaP23b(k4,k1))*za(k1,k2)**2*zb(k1,k2)*zaP23b(k6,k1)**2
      &     - 1.D0/2.D0/(za(k5,k6))/(zb(k1,k3))/(zaP23b(k1,k1))/(zaP23b(
@@ -736,7 +736,7 @@ c--- this is the (123) bubble
      &    )*za(k1,k6)**2*zaP2b(k1,k2) - 1/(za(k1,k3))/(za(k1,k4))/(za(
      &    k5,k6))/(zb(k2,k3))/(zb(k2,k3))/(zaP23b(k1,k1))/(zaP23b(k1,k1
      &    ))*za(k1,k6)**2*zb(k1,k2)*zaba(k1,p2,p23,k1) - 1/(za(k1,k4))
-     &    /(za(k5,k6))/(zb(k2,k3))/(zaP23b(k1,k1))*za(k1,k6)**2*be - 
+     &    /(za(k5,k6))/(zb(k2,k3))/(zaP23b(k1,k1))*za(k1,k6)**2*be -
      &    1/(za(k1,k4))/(za(k5,k6))/(zb(k2,k3))/(zaP23b(k1,k1))/(
      &    zaP23b(k1,k1))*za(k1,k2)*za(k1,k6)**2*zb(k1,k2)*be + 1/(za(k1
      &    ,k4))/(za(k5,k6))/(zb(k2,k3))/(zaP23b(k4,k1))/(zaP123b(k4,k2)
@@ -744,7 +744,7 @@ c--- this is the (123) bubble
      &    k2,k3))/(zaP23b(k4,k1))/(zaP123b(k4,k2))/(zaP123b(k4,k4))*za(
      &    k1,k3)*za(k4,k6)**2*zb(k2,k4)*zaP123b(k4,k3)*be + 1/(za(k1,k4
      &    ))/(za(k5,k6))/(zb(k2,k3))/(zaP23b(k4,k1))/(zaP123b(k4,k2))/(
-     &    zaP123b(k4,k4))*za(k4,k6)**2*zb(k2,k4)*zaP2bP123a(k1,k4) - 
+     &    zaP123b(k4,k4))*za(k4,k6)**2*zb(k2,k4)*zaP2bP123a(k1,k4) -
      &    1/(za(k1,k4))/(za(k5,k6))/(zaP23b(k4,k1))/(zaP123b(k4,k2))*
      &    za(k1,k3)*za(k4,k6)**2*be )
       coeff(2,b123) = coeff(2,b123) + mb*bp**(-1) * (  - 1/(za(k5,k6))
@@ -769,7 +769,7 @@ c--- this is the (123) bubble
      &    /(zbab(k2,p123,n1,k1))/(zbab(k2,p123,n2,k1))*zbab(k2,p3,p123,
      &    k2)*zaP23b(k6,k1)*zaP123b(k6,k2)*kappa - 1/(za(k5,k6))/(zb(k2
      &    ,k3))/(zb(k2,k3))/(zaP23b(k4,k1))/(zaP123b(k4,k2))/(zaP123b(
-     &    k4,k4))*za(k4,k6)*zb(k2,k4)*zaP123b(k4,k3)*zaP123b(k6,k2) - 
+     &    k4,k4))*za(k4,k6)*zb(k2,k4)*zaP123b(k4,k3)*zaP123b(k6,k2) -
      &    1/(za(k5,k6))/(zb(k2,k3))/(zb(k2,k3))/(zaP23b(k4,k1))/(
      &    zaP123b(k4,k2))/(zaP123b(k4,k4))*za(k4,k6)*zb(k2,k4)*zaP123b(
      &    k4,k3)*zaP123b(k6,k2)*be - 1/(za(k5,k6))/(zb(k2,k3))/(zb(k2,
@@ -966,7 +966,7 @@ c--- note: in the following, p3 -> p2
      &    ,n2,k5)*zabab(k4,n2,p234,p3,k4)*zaP23b(k4,k5)*kappa )
       coeff(2,b234) = coeff(2,b234) + mb*bp**(-1) * (  - 1/(zb(k1,k4))
      &    /(zb(k2,k3))/(zb(k5,k6))/(zaP234b(k1,k1))/(zaP234b(k3,k1))/(
-     &    zaP23b(k4,k1))*za(k1,k3)*zb(k1,k5)**2*zbab(k4,p3,p234,k1) + 
+     &    zaP23b(k4,k1))*za(k1,k3)*zb(k1,k5)**2*zbab(k4,p3,p234,k1) +
      &    1/(zb(k1,k4))/(zb(k2,k3))/(zb(k5,k6))/(zaP234b(k3,k1))/(
      &    zaP23b(k4,k1))*zb(k1,k5)**2*zaP3b(k3,k4) + 1/(zb(k2,k3))/(zb(
      &    k2,k3))/(zb(k5,k6))/(zaP234b(k3,k1))/(zaba(k3,p234,n1,k4))/(
@@ -1008,7 +1008,7 @@ c--- note: in the following, p3 -> p2
      &    k3))/(zb(k1,k4))/(zb(k2,k3))/(zb(k2,k3))/(zb(k5,k6))/(zaP23b(
      &    k4,k4))/(zaba(k3,p234,n1,k4))/(zaba(k4,n1,n2,k4))/(zbab(k4,p2
      &    ,p234,k4))/(zabab(k4,n1,p234,n1,k4))*zb(k3,k4)*zab(k3,n1,k4)*
-     &    zab(k4,n1,k5)*zabab(k4,n1,p234,p3,k4)*zaP234b(k3,k5)*kappa + 
+     &    zab(k4,n1,k5)*zabab(k4,n1,p234,p3,k4)*zaP234b(k3,k5)*kappa +
      &    1/(za(k2,k3))/(zb(k1,k4))/(zb(k2,k3))/(zb(k2,k3))/(zb(k5,k6))
      &    /(zaP23b(k4,k4))/(zaba(k3,p234,n1,k4))/(zaba(k4,n1,n2,k4))/(
      &    zbab(k4,p2,p234,k4))/(zabab(k4,n2,p234,n2,k4))*zb(k3,k4)*zab(
@@ -1090,7 +1090,7 @@ c--- this is the (23) bubble
      &    zb(k4,k5)*be**(-2) - 2.D0/(za(k2,k4))/(za(k5,k6))/(zb(k2,k3))
      &    /(zb(k2,k3))/(zb(k5,k6))*za(k1,k6)*za(k3,k4)*zb(k3,k4)*zb(k3,
      &    k5) - 1/(za(k2,k4))/(za(k5,k6))/(zb(k2,k3))/(zb(k2,k3))/(zb(
-     &    k5,k6))*za(k1,k6)*za(k3,k4)*zb(k3,k4)*zb(k3,k5)*be**(-1) - 
+     &    k5,k6))*za(k1,k6)*za(k3,k4)*zb(k3,k4)*zb(k3,k5)*be**(-1) -
      &    1/(za(k2,k4))/(zb(k2,k3))/(zb(k5,k6))/(zaP23b(k4,k1))/(
      &    zaP23b(k4,k4))*za(k2,k3)*zb(k3,k4)*zaP23b(k4,k5)**2 + 1/(za(
      &    k2,k4))/(zb(k2,k3))/(zb(k5,k6))/(zaP23b(k4,k1))/(zaP23b(k4,k4
@@ -1118,7 +1118,7 @@ c--- this is the (23) bubble
      &    k5,k6))*za(k1,k2)*za(k1,k6)*zb(k1,k2)*zb(k4,k5)*be**(-2) + 16.
      &    D0/3.D0/(za(k2,k3))/(za(k5,k6))/(zb(k2,k3))/(zb(k5,k6))*za(k1
      &    ,k2)*za(k3,k6)*zb(k4,k5) - 2.D0/(za(k2,k3))/(za(k5,k6))/(zb(
-     &    k2,k3))/(zb(k5,k6))*za(k1,k2)*za(k3,k6)*zb(k4,k5)*be**(-2) + 
+     &    k2,k3))/(zb(k5,k6))*za(k1,k2)*za(k3,k6)*zb(k4,k5)*be**(-2) +
      &    1/(za(k5,k6))/(zb(k1,k3))/(zaP23b(k1,k1))/(zaP23b(k1,k1))/(
      &    zaP23b(k4,k1))*za(k1,k2)**2*zb(k1,k2)*zaP23b(k6,k1)**2 + 3.D0
      &    /(za(k5,k6))/(zb(k1,k3))/(zaP23b(k1,k1))/(zaP23b(k4,k1))*za(
@@ -1161,7 +1161,7 @@ c--- this is the (1234) bubble
       coeff(2,b1234)=coeff(2,b1234) + mb*s234**(-1) * ( 1/(za(k2,k3))/(
      &    zb(k2,k3))/(zb(k2,k3))/(zaP1234b(k1,k1))*za(k1,k3)*za(k1,k6)*
      &    zb(k1,k5)*zb(k3,k4) + 1/(za(k2,k3))/(zb(k2,k3))/(zb(k2,k3))/(
-     &    zaP1234b(k1,k1))*za(k1,k6)*za(k3,k4)*zb(k3,k4)*zb(k4,k5) - 
+     &    zaP1234b(k1,k1))*za(k1,k6)*za(k3,k4)*zb(k3,k4)*zb(k4,k5) -
      &    1/(za(k2,k3))/(zb(k2,k3))/(zb(k2,k3))/(zaP1234b(k1,k1))*za(k1
      &    ,k6)*zb(k1,k5)*zaP1234b(k1,k4) + 1/(za(k2,k3))/(zb(k2,k3))/(
      &    zb(k2,k3))/(zaP1234b(k1,k1))/(zaP1234b(k1,k1))*za(k1,k3)*za(
@@ -1240,7 +1240,7 @@ c--- this is the (1234) bubble
      &    k2)*za(k5,k6)*zb(k2,k5)*zb(k4,k5) - 2.D0/(za(k2,k3))/(zb(k2,
      &    k3))/(zb(k2,k3))/(zaP1234b(k4,k4))*za(k1,k3)*za(k4,k6)*zb(k3,
      &    k4)*zb(k4,k5) + 3.D0/2.D0/(za(k2,k3))/(zb(k2,k3))/(zb(k2,k3))
-     &    /(zaP1234b(k4,k4))*za(k1,k3)*za(k5,k6)*zb(k3,k5)*zb(k4,k5) + 
+     &    /(zaP1234b(k4,k4))*za(k1,k3)*za(k5,k6)*zb(k3,k5)*zb(k4,k5) +
      &    1/(za(k2,k3))/(zb(k2,k3))/(zb(k2,k3))/(zaP1234b(k4,k4))*za(k4
      &    ,k6)*zb(k4,k5)*zaP1234b(k1,k4) - 5.D0/(za(k2,k3))/(zb(k2,k3))
      &    /(zb(k2,k3))/(zaP1234b(k4,k4))/(zaP1234b(k4,k4))*za(k1,k3)*
@@ -1285,7 +1285,7 @@ c--- this is the (1234) bubble
      &    k6)**2*zb(k1,k3)*zb(k3,k4)*zb(k5,k6) )
       coeff(2,b1234) = coeff(2,b1234) + mb * (  - 4.D0/(za(k1,k4))/(za(
      &    k2,k3))/(zb(k2,k3))/(zb(k2,k3))/(zaP1234b(k1,k1))/(zaP1234b(
-     &    k1,k4))*za(k1,k2)*za(k1,k3)*za(k1,k6)*zb(k2,k5)*zb(k3,k4) + 
+     &    k1,k4))*za(k1,k2)*za(k1,k3)*za(k1,k6)*zb(k2,k5)*zb(k3,k4) +
      &    1/(za(k1,k4))/(za(k2,k3))/(zb(k2,k3))/(zb(k2,k3))/(zaP1234b(
      &    k1,k1))/(zaP1234b(k1,k4))*za(k1,k2)*za(k1,k6)*zb(k4,k5)*
      &    zaP1234b(k1,k2) - 4.D0/(za(k1,k4))/(za(k2,k3))/(zb(k2,k3))/(
@@ -1615,7 +1615,7 @@ c--- this is p34 made flat wrt p12
      &    k1,k3)*zb(k5,k56f)*zaP12b(k34f,k2)*zbP12aP3b(k56f,k4) - 1/(
      &    za(k56f,k34f))/(zb(k1,k56f))/(zb(k2,k3))/(zb(k2,k3))/(zb(k56f
      &    ,k34f))/(zaP12b(k56f,k1))/(zaP12b(k56f,k56f))*za(k4,k56f)*za(
-     &    k6,k56f)*zb(k1,k3)*zb(k2,k4)*zb(k4,k56f)*zb(k5,k56f)*s12 - 
+     &    k6,k56f)*zb(k1,k3)*zb(k2,k4)*zb(k4,k56f)*zb(k5,k56f)*s12 -
      &    1/(za(k56f,k34f))/(zb(k1,k56f))/(zb(k2,k3))/(zb(k2,k3))/(zb(
      &    k56f,k34f))/(zaP12b(k56f,k1))/(zaP12b(k56f,k56f))*za(k6,k56f)
      &    *zb(k1,k3)*zb(k5,k56f)*zaP12b(k56f,k2)*zbP12aP3b(k56f,k4) )
@@ -1654,7 +1654,7 @@ c--- this is p34 made flat wrt p12
      &    zb(k2,k3))/(zaP12b(k1,k1))/(zaP12b(k1,k56f))/(zaP12b(k56f,
      &    k56f))*za(k1,k3)*za(k1,k56f)*zb(k3,k56f)*zb(k4,k5)*zaP12b(k6,
      &    k56f)*s12 )
-      coeff(2,b12) = coeff(2,b12) + mb*bp**(-1)*bm*s1234**(-1) * (  - 
+      coeff(2,b12) = coeff(2,b12) + mb*bp**(-1)*bm*s1234**(-1) * (  -
      &    1/(za(k1,k34f))/(za(k1,k56f))/(zb(k2,k3))/(zaP12b(k1,k1))/(
      &    zaP12b(k1,k34f))/(zaP12b(k1,k56f))*za(k1,k3)*za(k1,k6)*zaP3b(
      &    k1,k4)*zaP12b(k1,k3)*zaP12b(k1,k5) + 1/(za(k1,k34f))/(zb(k1,
@@ -1672,14 +1672,14 @@ c--- this is p34 made flat wrt p12
      &    k34f))/(zaP12b(k1,k1))/(zaP12b(k1,k56f))/(zaP12b(k34f,k34f))*
      &    za(k1,k3)*za(k1,k6)*zb(k5,k56f)*zbab(k4,p3,p12,k34f)*zaP12b(
      &    k1,k3) )
-      coeff(2,b12) = coeff(2,b12) + mb*bp**(-1)*bm*s1234**(-1) * (  - 
+      coeff(2,b12) = coeff(2,b12) + mb*bp**(-1)*bm*s1234**(-1) * (  -
      &    1/(za(k1,k56f))/(zb(k2,k3))/(zaP12b(k1,k1))/(zaP12b(k1,k34f))
      &    /(zaP12b(k1,k56f))/(zaP12b(k34f,k34f))*za(k1,k3)*za(k1,k6)*
      &    zbab(k4,p3,p12,k34f)*zaP12b(k1,k3)*zaP12b(k1,k5) )
       coeff(2,b12) = coeff(2,b12) + mb**3*bp**(-1)*s123**(-1)*
      & s1234**(-1) * ( 1/(za(k1,k56f))/(zb(k2,k3))/(zb(k2,k3))/(zaP12b(
      &    k56f,k1))/(zaP12b(k56f,k56f))/(zaP12b(k56f,k56f))*za(k6,k56f)
-     &    *zb(k4,k5)*zaP12b(k1,k56f)*zaP12b(k56f,k2)*zaP12b(k56f,k3) - 
+     &    *zb(k4,k5)*zaP12b(k1,k56f)*zaP12b(k56f,k2)*zaP12b(k56f,k3) -
      &    1/(zb(k1,k56f))/(zb(k2,k3))/(zb(k2,k3))/(zaP12b(k1,k1))/(
      &    zaP12b(k56f,k56f))*za(k1,k6)*zb(k1,k2)*zb(k3,k56f)*zb(k4,k5)*
      &    s12 - 1/(zb(k1,k56f))/(zb(k2,k3))/(zb(k2,k3))/(zaP12b(k56f,k1
@@ -1751,20 +1751,20 @@ c--- this is p12 made flat wrt p34
      &    )/(zaP34b(k56f,k56f))*za(k1,k6)*zb(k2,k4)*zb(k3,k56f)*zb(k5,
      &    k56f)*zaP34b(k56f,k4)*s34 + 1/(zb(k2,k3))/(zb(k2,k3))/(zb(k4,
      &    k56f))/(zaP34b(k56f,k56f))/(zaP34b(k56f,k56f))*za(k1,k6)*zb(
-     &    k2,k4)*zb(k3,k56f)*zb(k5,k56f)*zaP34b(k56f,k4)*kappa1*s34 + 
+     &    k2,k4)*zb(k3,k56f)*zb(k5,k56f)*zaP34b(k56f,k4)*kappa1*s34 +
      &    1/(zb(k2,k3))/(zb(k2,k3))/(zaP34b(k4,k4))/(zaP34b(k56f,k4))/(
      &    zaP34b(k56f,k56f))*za(k1,k6)*zb(k2,k4)*zb(k3,k4)*zaP34b(k56f,
      &    k5)*s34**2 + 1/(zb(k2,k3))/(zb(k2,k3))/(zaP34b(k4,k4))/(
      &    zaP34b(k56f,k4))/(zaP34b(k56f,k56f))*za(k1,k6)*zb(k2,k4)*zb(
      &    k3,k4)*zaP34b(k56f,k5)*kappa1*s34**2 - 1/(zb(k2,k3))/(zb(k2,
      &    k3))/(zaP34b(k4,k56f))/(zaP34b(k56f,k56f))/(zaP34b(k56f,k56f)
-     &    )*za(k1,k6)*zb(k2,k56f)*zb(k3,k56f)*zaP34b(k56f,k5)*s34**2 - 
+     &    )*za(k1,k6)*zb(k2,k56f)*zb(k3,k56f)*zaP34b(k56f,k5)*s34**2 -
      &    1/(zb(k2,k3))/(zb(k2,k3))/(zaP34b(k4,k56f))/(zaP34b(k56f,k56f
      &    ))/(zaP34b(k56f,k56f))*za(k1,k6)*zb(k2,k56f)*zb(k3,k56f)*
      &    zaP34b(k56f,k5)*kappa1*s34**2 )
       coeff(2,b34) = coeff(2,b34) + mb*s234**(-1)*bp**(-1)*s1234**(-1)
      &  * (  - 1/(zb(k2,k3))/(zb(k2,k3))/(zaP34b(k56f,k4))/(zaP34b(k56f
-     &    ,k56f))*za(k1,k6)*zb(k2,k4)*zb(k3,k4)*zaP34b(k56f,k5)*s34 - 
+     &    ,k56f))*za(k1,k6)*zb(k2,k4)*zb(k3,k4)*zaP34b(k56f,k5)*s34 -
      &    1/(zb(k2,k3))/(zb(k2,k3))/(zaP34b(k56f,k4))/(zaP34b(k56f,k56f
      &    ))*za(k1,k6)*zb(k2,k4)*zb(k3,k4)*zaP34b(k56f,k5)*kappa1*s34
      &     + 1/(zb(k2,k3))/(zb(k2,k3))/(zaP34b(k56f,k56f))/(zaP34b(k56f
@@ -1883,7 +1883,7 @@ c--- this is p12 made flat wrt p34
      &    k1,k34f)*s34**2 + 1/(zb(k2,k3))/(zb(k2,k3))/(zb(k4,k56f))/(
      &    zb(k56f,k34f))/(zaP34b(k4,k34f))/(zaP34b(k34f,k34f))/(zaP34b(
      &    k34f,k34f))/(zaP34b(k56f,k34f))*zb(k2,k34f)*zb(k3,k56f)*zb(k5
-     &    ,k34f)*zaP34b(k1,k34f)*zaP34b(k6,k34f)*zaP34b(k34f,k4)*s34 - 
+     &    ,k34f)*zaP34b(k1,k34f)*zaP34b(k6,k34f)*zaP34b(k34f,k4)*s34 -
      &    1/(zb(k2,k3))/(zb(k2,k3))/(zb(k4,k56f))/(zb(k56f,k34f))/(
      &    zaP34b(k4,k56f))/(zaP34b(k34f,k34f))/(zaP34b(k34f,k56f))/(
      &    zaP34b(k56f,k56f))*za(k6,k34f)*zb(k2,k56f)*zb(k3,k56f)*zb(k4,
@@ -1895,7 +1895,7 @@ c--- this is p12 made flat wrt p34
      &    k56f)*zaP34b(k6,k56f)*zaP34b(k56f,k4)*s34 - 1/(zb(k2,k3))/(
      &    zb(k2,k3))/(zb(k4,k56f))/(zb(k56f,k34f))/(zaP34b(k34f,k34f))
      &    /(zaP34b(k34f,k34f))/(zaP34b(k56f,k34f))*za(k6,k34f)*zb(k2,k4
-     &    )*zb(k3,k56f)*zb(k4,k34f)*zb(k5,k34f)*zaP34b(k1,k34f)*s34 - 
+     &    )*zb(k3,k56f)*zb(k4,k34f)*zb(k5,k34f)*zaP34b(k1,k34f)*s34 -
      &    1/(zb(k2,k3))/(zb(k2,k3))/(zb(k4,k56f))/(zb(k56f,k34f))/(
      &    zaP34b(k34f,k34f))/(zaP34b(k34f,k34f))/(zaP34b(k56f,k34f))*
      &    zb(k2,k4)*zb(k3,k56f)*zb(k5,k34f)*zaP34b(k1,k34f)*zaP34b(k6,
@@ -1927,9 +1927,9 @@ c--- definition of massive tadpole (simply related to tree amplitude)
       coeff(1,a0m)=amplo/2d0/msq
 
 c--- determine missing bubble (massive self energy) from pole structure
-      coeff(2,b2x1m)=8d0/3d0*ampLO-msq*coeff(1,a0m)            
-     & -coeff(2,b123)-coeff(2,b234)-coeff(2,b23)               
-     & -coeff(2,b1234)-coeff(2,b12)-coeff(2,b34)               
+      coeff(2,b2x1m)=8d0/3d0*ampLO-msq*coeff(1,a0m)
+     & -coeff(2,b123)-coeff(2,b234)-coeff(2,b23)
+     & -coeff(2,b1234)-coeff(2,b12)-coeff(2,b34)
 
 c---------------------------- RATIONAL TERMS --------------------------
 
@@ -1964,21 +1964,21 @@ c---------------------------- RATIONAL TERMS --------------------------
 
 
 c-- ADDITIONAL CONVERSION FOR BOXES AND TRIANGLES: 6-D TO 4-D BASIS ---
-      coeff(4,d2x3x4)=coeff(4,d2x3x4)*za(k2,k3)*zb(k3,k2)*zab(k4,p3,k4) 
-        
-      coeff(4,d1x2x3)=coeff(4,d1x2x3)*za(k2,k3)*zb(k3,k2)*zab(k1,p2,k1) 
-       
-      coeff(4,d1x23x4)=coeff(4,d1x23x4)*zab(k4,p23,k1)*zab(k1,p23,k4)   
-   
-      coeff(4,d1x2x34)=coeff(4,d1x2x34)*s234*zab(k1,p2,k1)           
-      coeff(4,d12x3x4)=coeff(4,d12x3x4)*s123*zab(k4,p3,k4)           
-                        
-      coeff(3,c23x4)=coeff(3,c23x4)*(-zab(k4,p23,k4))             
-      coeff(3,c1x23)=coeff(3,c1x23)*(-zab(k1,p23,k1))             
-      coeff(3,c3x4)=coeff(3,c3x4)*(zab(k4,p3,k4))               
-      coeff(3,c1x2)=coeff(3,c1x2)*(zab(k1,p2,k1))               
-      coeff(3,c1x234)=coeff(3,c1x234)*(-zab(k1,p234,k1))             
-      coeff(3,c123x4)=coeff(3,c123x4)*(-zab(k4,p123,k4))             
+      coeff(4,d2x3x4)=coeff(4,d2x3x4)*za(k2,k3)*zb(k3,k2)*zab(k4,p3,k4)
+
+      coeff(4,d1x2x3)=coeff(4,d1x2x3)*za(k2,k3)*zb(k3,k2)*zab(k1,p2,k1)
+
+      coeff(4,d1x23x4)=coeff(4,d1x23x4)*zab(k4,p23,k1)*zab(k1,p23,k4)
+
+      coeff(4,d1x2x34)=coeff(4,d1x2x34)*s234*zab(k1,p2,k1)
+      coeff(4,d12x3x4)=coeff(4,d12x3x4)*s123*zab(k4,p3,k4)
+
+      coeff(3,c23x4)=coeff(3,c23x4)*(-zab(k4,p23,k4))
+      coeff(3,c1x23)=coeff(3,c1x23)*(-zab(k1,p23,k1))
+      coeff(3,c3x4)=coeff(3,c3x4)*(zab(k4,p3,k4))
+      coeff(3,c1x2)=coeff(3,c1x2)*(zab(k1,p2,k1))
+      coeff(3,c1x234)=coeff(3,c1x234)*(-zab(k1,p234,k1))
+      coeff(3,c123x4)=coeff(3,c123x4)*(-zab(k4,p123,k4))
 
       return
       end

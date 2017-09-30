@@ -15,7 +15,7 @@ C a=-6-7-8
 C b=-6-7-8-h
 C since momenta 3,5,6,8,9,10 are not needed they are re-used to represent
 C the the de-massified vectors. Thus q4 = q de-massified wrt p4 etc: this
-C hase been stored in wrapper routine (qqb_tth) in p(3,mu)   
+C hase been stored in wrapper routine (qqb_tth) in p(3,mu)
 C q4(mu)=q(mu)-qsq/2/p4Dq*p4(mu)-->p(3,mu)
 C a7(mu)=a(mu)-asq/2/p7Da*p7(mu)-->p(5,mu)
 C r1(mu)=r(mu)-rsq/2/p1Dr*p1(mu)-->p(6,mu)
@@ -36,7 +36,7 @@ C--diagram 1-Polarity plus
 C--diagram 2-Polarity plus
       ampp=ampp
      . +mt/denb*(zb(4,2)*(za(1,b1)*zb(b1,a7)*za(a7,7)+mt**2*za(1,7))
-     . +zb(4,q4)*za(q4,1)*(zb(2,b2)*za(b2,7)+zb(2,a7)*za(a7,7))) 
+     . +zb(4,q4)*za(q4,1)*(zb(2,b2)*za(b2,7)+zb(2,a7)*za(a7,7)))
 
 C--diagram 1-Polarity minus
       ampm=mt/denr*((zb(4,q4)*za(q4,r1)*zb(r1,1)+mt**2*zb(4,1))*za(2,7)
@@ -44,9 +44,9 @@ C--diagram 1-Polarity minus
 C--diagram 2-Polarity minus
       ampm=ampm
      . +mt/denb*(zb(4,1)*(za(2,b2)*zb(b2,a7)*za(a7,7)+mt**2*za(2,7))
-     . +zb(4,q4)*za(q4,2)*(zb(1,b1)*za(b1,7)+zb(1,a7)*za(a7,7))) 
+     . +zb(4,q4)*za(q4,2)*(zb(1,b1)*za(b1,7)+zb(1,a7)*za(a7,7)))
 
       wtqqb=(abs(ampp)**2+abs(ampm)**2)/cdabs(za(1,2)*zb(2,1))**2
-      
+
       return
       end

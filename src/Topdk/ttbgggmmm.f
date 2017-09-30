@@ -16,7 +16,7 @@
      &    /(zb(i2,i6))*za(i1,i3)*za(i7,i3)*zb(i4,i6) + 1/(zb(i1,i2))/(
      &    zb(i2,i6))/(zb(i6,i3))*za(i1,i3)*za(i1,i7)*zb(i1,i6)*zb(i4,i6
      &    ) + 1/(zb(i1,i2))/(zb(i6,i3))*za(i1,i3)*za(i2,i7)*zb(i4,i6)
-     &     + 1/(zb(i1,i2))/(zb(i6,i3))*za(i1,i7)*za(i2,i3)*zb(i4,i6) + 
+     &     + 1/(zb(i1,i2))/(zb(i6,i3))*za(i1,i7)*za(i2,i3)*zb(i4,i6) +
      &    1/(zb(i1,i6))/(zb(i2,i3))*za(i1,i2)*za(i7,i3)*zb(i4,i6) - 1/(
      &    zb(i1,i6))/(zb(i2,i3))*za(i1,i3)*za(i2,i7)*zb(i4,i6) - 1/(zb(
      &    i1,i6))/(zb(i2,i3))/(zb(i2,i6))*za(i1,i3)*za(i7,i3)*zb(i4,i6)

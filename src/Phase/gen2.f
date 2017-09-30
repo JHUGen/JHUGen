@@ -21,11 +21,11 @@ c---- are required
       parameter(wt0=1d0/16d0/pi)
 
 
-      do j=1,mxpart     
-      do nu=1,4     
+      do j=1,mxpart
+      do nu=1,4
       p(j,nu)=0d0
-      enddo     
-      enddo     
+      enddo
+      enddo
 
       wt2=0d0
 
@@ -41,21 +41,21 @@ c--- dummy values if there's no decay
       if (n3.eq.0) then
          w3=(wsqmax-wsqmin)
          s34=(wsqmax-wsqmin)*r(1)+wsqmin
-      elseif (n3.eq.1) then 
+      elseif (n3.eq.1) then
          call breitw(r(1),wsqmin,wsqmax,mass3,width3,s34,w3)
       endif
       rtshat=dsqrt(s34)
       ymax=dlog(sqrts/rtshat)
       yave=ymax*(two*r(2)-1d0)
-      
+
 c----udif==tanh(ydif)
       udif=(two*rdk1-1d0)
       ydif=half*dlog((1d0+udif)/(1d0-udif))
       xjac=four*ymax
-          
+
       y3=yave+ydif
       y4=yave-ydif
-          
+
       xjac=xjac*w3
       phi=2d0*pi*rdk2
 
@@ -63,19 +63,19 @@ c----udif==tanh(ydif)
       xx(1)=rtshat/sqrts*dexp(+yave)
       xx(2)=rtshat/sqrts*dexp(-yave)
 
-      if   ((xx(1) .gt. 1d0) 
+      if   ((xx(1) .gt. 1d0)
      & .or. (xx(2) .gt. 1d0)
      & .or. (xx(1) .lt. xmin)
      & .or. (xx(2) .lt. xmin)) then
-        write(6,*) 'problems with xx(1),xx(2) in gen2',xx(1),xx(2)  
-      return 1 
+        write(6,*) 'problems with xx(1),xx(2) in gen2',xx(1),xx(2)
+      return 1
       endif
-          
+
       p(1,4)=-0.5d0*xx(1)*sqrts
       p(1,1)=0d0
       p(1,2)=0d0
       p(1,3)=-0.5d0*xx(1)*sqrts
-      
+
       p(2,4)=-0.5d0*xx(2)*sqrts
       p(2,1)=0d0
       p(2,2)=0d0

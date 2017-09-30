@@ -160,10 +160,10 @@
 		csom = cs(1) + cs(2) + cs(3) + cs(4) + cs(5) + cs(6)
 		xmxp = max(absc(cs(2)),absc(cs(3)),absc(cs(4)),
      +			absc(cs(5)),absc(cs(6)))
-*		
+*
 *		get rid of noise in the imaginary part
-*	
-		if ( xloss*abs(DIMAG(csom)).lt.precc*abs(DBLE(csom)) ) 
+*
+		if ( xloss*abs(DIMAG(csom)).lt.precc*abs(DBLE(csom)) )
      +			csom = DCMPLX(DBLE(csom),DBLE(0))
 		if ( lwrite ) then
 		    print *,'cb2i(1)+= ',csom,xmxp
@@ -448,7 +448,7 @@
 		cs(5) = -xm1*xlogmm/2
 		csom = cs(1) + cs(2) + cs(3) + cs(4) + cs(5)
 		xmxp = max(absc(cs(2)),absc(cs(3)),absc(cs(4)),
-     +			absc(cs(5))) 
+     +			absc(cs(5)))
 		if ( lwrite ) then
 		    print *,'cb2i(2)+= ',csom,xmxp
 		    print *,'with cs '

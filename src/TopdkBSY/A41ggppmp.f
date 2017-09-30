@@ -10,7 +10,7 @@ C---- taken from arXiv:1101.5947 [hep-ph], Eq. (4)
       integer e1,p2,p3,e4
       double precision nlf,nhf
       parameter(nlf=5d0,nhf=1d0)
- 
+
       A41ggppmp=ALggppmp(e1,p2,p3,e4,za,zb,zab,zba)
      & -Ncinv**2*ARggppmp(e1,p2,p3,e4,za,zb,zab,zba)
      & -BSYA1fggppmp(e1,p2,p3,e4,za,zb,zab,zba)*nlf/xn

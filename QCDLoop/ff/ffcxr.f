@@ -3,7 +3,7 @@
 c Revision 1.2  1995/11/10  19:04:24  gj
 c Added nicer logging header...
 c
-*--#] log: 
+*--#] log:
 *###[ ffcxr:
 	subroutine ffcxr(crr,ipi12,y,y1,z,z1,dyz,ld2yzz,d2yzz,zz,zz1,
      +		ldy2z,dy2z,ieps,ier)

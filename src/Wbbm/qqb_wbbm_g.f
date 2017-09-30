@@ -10,7 +10,7 @@ c                           |    --> nu(p3)+e^+(p4)
 c                           |
 c                           ---> b(p5)+bb(p6)
 c   with mass for the b and the bbar
-      implicit none 
+      implicit none
       include 'constants.f'
       include 'qcdcouple.f'
       include 'ewcouple.f'
@@ -59,7 +59,7 @@ C----Initialize whole array to zero
       endif
       enddo
       enddo
-     
+
       call spinoru(7,q,za,zb)
 
 c--- q-qb and qb-q
@@ -84,7 +84,7 @@ c--- g-qb and qb-g
       msq(j,k)=Vsq(j,k)*qbqWbbg
 
       elseif ((j .gt. 0) .and. (k .eq. 0)) then
-      msq(j,k)=Vsum(j)*qgWbbq 
+      msq(j,k)=Vsum(j)*qgWbbq
       elseif ((j .lt. 0) .and. (k .eq. 0)) then
       msq(j,k)=Vsum(j)*qbgWbbqb
 
@@ -115,7 +115,7 @@ c matrix element squared summed over colors and spins
 c---calculate the W propagator
       prop=((s(j6,j7)-wmass**2)**2+(wmass*wwidth)**2)
 
-C---These two calls exploit the symmetry under 1<->2,3<->4,6<->7,za<->zb 
+C---These two calls exploit the symmetry under 1<->2,3<->4,6<->7,za<->zb
 C---and overall sign change
       call Wbb(j1,j2,j3,j4,j5,j6,j7,mQ,za,zb,1,qedi,qedf,qcda,qcdb)
       call Wbb(j2,j1,j4,j3,j5,j7,j6,mQ,zb,za,2,qedi,qedf,qcda,qcdb)

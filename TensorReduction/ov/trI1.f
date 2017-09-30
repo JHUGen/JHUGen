@@ -1,4 +1,4 @@
-      double complex function trI1(m1,mu2,ep) 
+      double complex function trI1(m1,mu2,ep)
 c--- this is a switchyard routine: depending on value of
 c--- integer variable, this routine either:
 c---  TRscalarselect = 1    calls QCDLoop for scalar integral
@@ -13,11 +13,11 @@ c      use avh_olo
 
       TRscalarselect=1
 
-c--- call to QCDLoop if necessary      
+c--- call to QCDLoop if necessary
       if ((TRscalarselect .eq. 1) .or.(TRscalarselect .eq. 3)) then
         resQCDLoop=qlI1(m1,mu2,ep)
       endif
-      
+
       if (TRscalarselect .eq. 1) then
         trI1=resQCDLoop
         return
@@ -30,7 +30,7 @@ c--- initializations should be moved elsewhere and called only once
       call olo_a0(result,m1,dsqrt(mu2))
       resOneLOop=result(abs(ep))
       trI1=resOneLOop
-      
+
       if (TRscalarselect .eq. 3) then
         if ((cdabs(resOneLOop) .gt. 1d-12) .and.
      &      (abs(resQCDLoop/resOneLOop-1d0) .gt. 1d-12)) then
@@ -40,7 +40,7 @@ c--- initializations should be moved elsewhere and called only once
           write(6,*) '->ratio:',resQCDLoop/resOneLOop
         endif
       endif
-      
+
       return
       end
-      
+

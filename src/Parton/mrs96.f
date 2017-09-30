@@ -7,7 +7,7 @@ C     earlier MRS packages:                                     C
 C       -- the q**2 range is enlarged to 1.25d0 < q**2 < 1d7,   C
 C          the x range is still 1d-5 < x < 1d0                  C
 C       -- the interpolation routine has been slightly modified C
-C       -- the call is now to mrs96() rather than to MRSEB()    C 
+C       -- the call is now to mrs96() rather than to MRSEB()    C
 C     Note that the grid files which the program reads in       C
 C     (mrsr1.dat,...) are now larger and more obviously named.  C
 C                                                               C
@@ -46,14 +46,14 @@ C***************************************************************C
       write(6,*) 'x=',x
       endif
          if(mode.eq.1) then
-        call mrsr1(x,q2,upv,dnv,usea,dsea,str,chm,bot,glu) 
+        call mrsr1(x,q2,upv,dnv,usea,dsea,str,chm,bot,glu)
       elseif(mode.eq.2) then
-        call mrsr2(x,q2,upv,dnv,usea,dsea,str,chm,bot,glu) 
+        call mrsr2(x,q2,upv,dnv,usea,dsea,str,chm,bot,glu)
       elseif(mode.eq.3) then
-        call mrsr3(x,q2,upv,dnv,usea,dsea,str,chm,bot,glu) 
+        call mrsr3(x,q2,upv,dnv,usea,dsea,str,chm,bot,glu)
       elseif(mode.eq.4) then
         call mrsr4(x,q2,upv,dnv,usea,dsea,str,chm,bot,glu)
-      endif 
+      endif
   99  format('  MRS96:WARNING:  Q^2 VALUE IS OUT OF RANGE   ')
   98  format('  MRS96:WARNING:   X  VALUE IS OUT OF RANGE   ')
       return
@@ -139,13 +139,13 @@ c notation: 1=uval 2=val 3=glue 4=usea 5=chm 6=str 7=btm 8=dsea
       dsea=g(8)
       str=g(6)
       chm=g(5)
-      glu=g(3) 
+      glu=g(3)
       bot=g(7)
         x=xsave
         qsq=q2save
       return
       end
-      
+
       subroutine mrsr2(x,qsq,upv,dnv,usea,dsea,str,chm,bot,glu)
       implicit real*8(a-h,o-z)
       parameter(nx=49,nq=37,ntenth=23,np=8)
@@ -226,13 +226,13 @@ c notation: 1=uval 2=val 3=glue 4=usea 5=chm 6=str 7=btm 8=dsea
       dsea=g(8)
       str=g(6)
       chm=g(5)
-      glu=g(3) 
+      glu=g(3)
       bot=g(7)
         x=xsave
         qsq=q2save
       return
       end
-      
+
       subroutine mrsr3(x,qsq,upv,dnv,usea,dsea,str,chm,bot,glu)
       implicit real*8(a-h,o-z)
       parameter(nx=49,nq=37,ntenth=23,np=8)
@@ -313,13 +313,13 @@ c notation: 1=uval 2=val 3=glue 4=usea 5=chm 6=str 7=btm 8=dsea
       dsea=g(8)
       str=g(6)
       chm=g(5)
-      glu=g(3) 
+      glu=g(3)
       bot=g(7)
         x=xsave
         qsq=q2save
       return
       end
-      
+
       subroutine mrsr4(x,qsq,upv,dnv,usea,dsea,str,chm,bot,glu)
       implicit real*8(a-h,o-z)
       parameter(nx=49,nq=37,ntenth=23,np=8)
@@ -400,7 +400,7 @@ c notation: 1=uval 2=val 3=glue 4=usea 5=chm 6=str 7=btm 8=dsea
       dsea=g(8)
       str=g(6)
       chm=g(5)
-      glu=g(3) 
+      glu=g(3)
       bot=g(7)
         x=xsave
         qsq=q2save

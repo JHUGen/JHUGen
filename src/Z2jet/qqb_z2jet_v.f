@@ -143,12 +143,12 @@ c--- get special phase space point for MadLoop comparison
 c--- calculate the lowest order matrix element and fill the
 c--- common block twopij with s_{ij}
       call qqb_z2jetx(p,msq,mqq,msqx,msqx_cs)
-      
+
 c--- write out ug Born amplitude when checking
-      if (checkvector .or. checkaxial) then      
+      if (checkvector .or. checkaxial) then
         write(6,*) 'Madloop check: ug Born',msq(2,0)
       endif
-      
+
       do j=-nf,nf
       do k=-nf,nf
       msqv(j,k)=0d0
@@ -156,7 +156,7 @@ c--- write out ug Born amplitude when checking
       enddo
 
       prop=s(3,4)/dcmplx(s(3,4)-zmass**2,zmass*zwidth)
-      
+
       v2(1)=l1
       v2(2)=r1
 
@@ -168,7 +168,7 @@ c--- write out ug Born amplitude when checking
 c---- DEBUG: check vector piece
       if (checkvector) then
         prop=czip
-      endif      
+      endif
 
 ************************************************************************
 *     Endpoint contributions from QQGG matrix elements                 *
@@ -176,7 +176,7 @@ c---- DEBUG: check vector piece
 ************************************************************************
       if (Gflag) then
 c----UV counterterm contains the finite renormalization to arrive
-c----at MS bar scheme. 
+c----at MS bar scheme.
       if     (colourchoice .eq. 1) then
         subuv(1)=2d0*xn*(epinv*(11d0-2d0*dble(nf)/xn)-1d0)/6d0
         subuv(2)=subuv(1)
@@ -203,7 +203,7 @@ c--- NB: this breaks the routine if Qflag = Gflag = .true.
 
 c--- Now calculate the relevant lowest-order matrix elements
 c--- for each possible initial state from the QQGG contribution
-      
+
 c---  calculate the qqb terms
 c-BDKW  0--> q(p1)+g(p2)+g(p3)+qb(p4)+lbar(p5)+l(p6)
 CALL    0--> q(p2)+g(p6)+g(p5)+qb(p1)+lbar(p4)+l(p3)
@@ -225,7 +225,7 @@ c--- obtain qbq from qqb by symmetry
         mmsq_qbq_vec(polq,polz)=mmsq_qqb_vec(3-polq,polz)
         mmsq_qbq_ax(polq,polz)=-mmsq_qqb_ax(3-polq,polz)
       enddo
-      enddo     
+      enddo
 c---  calculate the qbq terms
 c-BDKW  0--> q(p1)+g(p2)+g(p3)+qb(p4)+lbar(p5)+l(p6)
 CALL    0--> q(p1)+g(p6)+g(p5)+qb(p2)+lbar(p4)+l(p3)
@@ -332,18 +332,18 @@ CALL    0--> q(p6)+g(p1)+g(p2)+qb(p5)+lbar(p4)+l(p3)
       pswap(6,nu)=p(3,nu)
       enddo
       call spinoru(6,pswap,za,zb)
-      call xzqqgg_v(mmsq_gg,mmsq_gg_vec,mmsq_gg_ax)     
-      endif      
-      
+      call xzqqgg_v(mmsq_gg,mmsq_gg_vec,mmsq_gg_ax)
+      endif
+
 ************************************************************************
 *     Endpoint contributions from QQQQ matrix elements                 *
-************************************************************************            
+************************************************************************
       if (Qflag) then
 c--- UV counter-term is already included in a6routine.f
       subuv(1)=0d0
       subuv(2)=subuv(1)
       subuv(0)=subuv(1)
-      
+
 c--- transfer lowest order matrix elements
 c--- NB: this breaks the routine if Qflag = Gflag = .true.
 
@@ -373,7 +373,7 @@ c--- compute correct vector-like coupling for diagrams with Z coupled to a loop
      & +Q(j)*q1+0.5d0*(vQ(j,1)+vQ(j,2))*v2(polz)*prop
       enddo
       enddo
-      
+
       do j=-nf,nf
       do k=-nf,nf
       do polq=1,2
@@ -381,7 +381,7 @@ c--- compute correct vector-like coupling for diagrams with Z coupled to a loop
 
 c--- quark-antiquark
       if ((j .gt. 0) .and. (k .lt. 0)) then
-        if (j .eq. -k) 
+        if (j .eq. -k)
      .  msqv(j,k)=msqv(j,k)+half*(aveqq/avegg)*(mmsq_qqb(polq,polz)*(
      .          cdabs(Q(j)*q1+vQ(j,polq)*v2(polz)*prop)**2)
      .                     +dble(mmsq_qqb_vec(polq,polz)
@@ -404,7 +404,7 @@ c--- antiquark-quark
 
 c--- quark-gluon
       elseif ((j .gt. 0) .and. (k .eq. 0)) then
-      
+
 ************************** BEGIN MADLOOP CHECKING CODE ************************
         if (checkvector) then
 c--- MadLoop check: vector couplings only - no Z coupling to leptons and quarks
@@ -430,7 +430,7 @@ c     .           (vQ(j,polq)-vQ(j,3-polq))*(v2(polz)-v2(3-polz))*prop)
 c     .         *((v2(polz)-v2(3-polz))*prop)/sin2w))/8d0
       endif
 *************************** END MADLOOP CHECKING CODE *************************
-      
+
       if ((checkvector.eqv..false.).and.(checkaxial.eqv..false.)) then
 c--- normal case
       msqv(j,k)=msqv(j,k)+(aveqg/avegg)*(mmsq_qg(polq,polz)*(
@@ -443,7 +443,7 @@ c--- normal case
 
 
         endif
-      
+
 c--- antiquark-gluon
       elseif ((j .lt. 0) .and. (k .eq. 0)) then
 
@@ -498,12 +498,12 @@ c--- gluon-gluon
       enddo
 
       endif
-      
+
 ************************************************************************
 *     Include loop contributions from QQQQ matrix elements             *
 ************************************************************************
       if (Qflag) then
-      
+
       call spinoru(6,p,za,zb)
 
       faclo=4d0*V*aveqq*esq**2*gsq**2
@@ -545,7 +545,7 @@ c--- atreez
       atreez_165243(polq,polb,polz)=
      .       atreez(polq,polb,polz,1,6,5,2,4,3,za,zb)
       atreez_612543(polq,polb,polz)=
-     .       atreez(polq,polb,polz,6,1,2,5,4,3,za,zb)  
+     .       atreez(polq,polb,polz,6,1,2,5,4,3,za,zb)
 c--- a61z
       a61z_526143(polq,polb,polz)=a61z(polq,polb,polz,5,2,6,1,4,3,za,zb)
       a61z_251643(polq,polb,polz)=a61z(polq,polb,polz,2,5,1,6,4,3,za,zb)
@@ -596,7 +596,7 @@ c--- a63z
       do j=-nf,nf
       do k=-nf,nf
 
-c---Desired formula =(Att*(A61+A61o+(A63-A63s/n+A62s+A62os)/n) 
+c---Desired formula =(Att*(A61+A61o+(A63-A63s/n+A62s+A62os)/n)
 c                     +Atts*(A61s+A61os+(A63s-A63/n +A62+A62o)/n))
 c                   =tamp*(lamp+lampx)
 c                   +tamps*(lamps+lampsx)
@@ -798,21 +798,21 @@ c--- add additional annihilation diagrams if necessary
             if (jj(j) .eq. 1) then
               if (compare) then
                 msqv(j,k)=msqv(j,k)+faclo*(
-     .          +dble(tampup*dconjg(tampup))*dfloat(nup)             
+     .          +dble(tampup*dconjg(tampup))*dfloat(nup)
      .          +dble(tampdo*dconjg(tampdo))*dfloat(ndo-1))
               else
                 msqv(j,k)=msqv(j,k)+fac*2d0*(
-     .          +dble(tampup*dconjg(lampup))*dfloat(nup)             
+     .          +dble(tampup*dconjg(lampup))*dfloat(nup)
      .          +dble(tampdo*dconjg(lampdo))*dfloat(ndo-1))
               endif
-            elseif (jj(j) .eq. 2) then             
+            elseif (jj(j) .eq. 2) then
               if (compare) then
                 msqv(j,k)=msqv(j,k)+faclo*(
-     .          +dble(tampup*dconjg(tampup))*dfloat(nup-1)             
+     .          +dble(tampup*dconjg(tampup))*dfloat(nup-1)
      .          +dble(tampdo*dconjg(tampdo))*dfloat(ndo))
               else
                 msqv(j,k)=msqv(j,k)+fac*2d0*(
-     .          +dble(tampup*dconjg(lampup))*dfloat(nup-1)             
+     .          +dble(tampup*dconjg(lampup))*dfloat(nup-1)
      .          +dble(tampdo*dconjg(lampdo))*dfloat(ndo))
               endif
             endif
@@ -894,21 +894,21 @@ c--- add additional annihilation diagrams if necessary
             if (jj(j) .eq. -1) then
               if (compare) then
                 msqv(j,k)=msqv(j,k)+faclo*(
-     .          +dble(tampup*dconjg(tampup))*dfloat(nup)             
+     .          +dble(tampup*dconjg(tampup))*dfloat(nup)
      .          +dble(tampdo*dconjg(tampdo))*dfloat(ndo-1))
               else
                 msqv(j,k)=msqv(j,k)+fac*2d0*(
-     .          +dble(tampup*dconjg(lampup))*dfloat(nup)             
+     .          +dble(tampup*dconjg(lampup))*dfloat(nup)
      .          +dble(tampdo*dconjg(lampdo))*dfloat(ndo-1))
               endif
-            elseif (jj(j) .eq. -2) then             
+            elseif (jj(j) .eq. -2) then
               if (compare) then
                 msqv(j,k)=msqv(j,k)+faclo*(
-     .          +dble(tampup*dconjg(tampup))*dfloat(nup-1)             
+     .          +dble(tampup*dconjg(tampup))*dfloat(nup-1)
      .          +dble(tampdo*dconjg(tampdo))*dfloat(ndo))
               else
                 msqv(j,k)=msqv(j,k)+fac*2d0*(
-     .          +dble(tampup*dconjg(lampup))*dfloat(nup-1)             
+     .          +dble(tampup*dconjg(lampup))*dfloat(nup-1)
      .          +dble(tampdo*dconjg(lampdo))*dfloat(ndo))
               endif
             endif
@@ -917,18 +917,18 @@ c--- add additional annihilation diagrams if necessary
       enddo
       enddo
       enddo
-      
+
       enddo
       enddo
-  
+
       endif
 
 c--- write out ug virtual amplitude when checking
-      if (checkvector .or. checkaxial) then      
+      if (checkvector .or. checkaxial) then
         write(6,*) 'Madloop check: ug Virt',msqv(2,0)
 c      pause
       endif
-      
+
 ************************************************************************
 *     UV contributions are included here                               *
 C     This is the correction to put the answer in UV renormalized      *
@@ -940,12 +940,12 @@ C     dred scheme with msbar coupling                                  *
       do cs=0,2
       msqv(j,k)=msqv(j,k)-ason2pi*subuv(cs)*msq_cs(cs,j,k)
       enddo
-      
+
       enddo
       enddo
-              
+
       return
       end
-     
-     
- 
+
+
+

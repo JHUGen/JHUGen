@@ -4,7 +4,7 @@
 c     Matrix element for t-bbar production with radiation in decay
 c      b(-p1)+u(-p2)-->t(n(p3)+e^+(p4)+b(p5)+g(p7))+d(p6)
 C     averaged(summed) over initial(final) colours and spins
-c--- g(p7) represents a gluon 
+c--- g(p7) represents a gluon
 
 
       include 'constants.f'
@@ -39,7 +39,7 @@ c--- g(p7) represents a gluon
         return
       endif
 
-      call bq_tpq(q,msq) 
+      call bq_tpq(q,msq)
       fac=gsq*cf*(1d0/pbDpg*(2d0/omz-1d0-z)-(mt/ptDpg)**2)
 
       do j=-nf,nf

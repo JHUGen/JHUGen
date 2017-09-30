@@ -4,7 +4,7 @@ C     ehsv:EqnA.8
       double precision s,t,u
       double complex ehsvb4
       ehsva4=ehsvb4(s,t,u)+ehsvb4(u,s,t)+ehsvb4(t,u,s)
-      return 
+      return
       end
 
       double complex function ehsva2(s,t,u)
@@ -13,7 +13,7 @@ C     ehsv:EqnA.9
       double precision s,t,u
       double complex ehsvb2
       ehsva2=ehsvb2(s,t,u)+ehsvb2(s,u,t)
-      return 
+      return
       end
 
       double complex function ehsvb4(s,t,u)
@@ -24,10 +24,10 @@ C     ehsv:EqnA.10
       double complex w2,w3
       hmass2=s+t+u
 c--- The Fermilab preprint has w2(s), but it makes no difference due
-c--- to symmetrization in ehsva4 above      
+c--- to symmetrization in ehsva4 above
       ehsvb4=mbsq/hmass2*(-2d0/3d0
      . +(mbsq/hmass2-0.25d0)*(w2(t)-w2(hmass2)+w3(s,t,u,hmass2)))
-      return 
+      return
       end
 
       double complex function ehsvb2(s,t,u)
@@ -44,7 +44,7 @@ C     ehsv:EqnA.11
      . +s**2*(2d0*mbsq/(s+u)**2-0.5d0/(s+u))*(w2(t)-w2(hmass2))
      . +0.5d0*u*t/s*(w2(hmass2)-2d0*w2(t))
      . +0.125d0*(s-12d0*mbsq-4d0*u*t/s)*w3(t,s,u,hmass2))
-      return 
+      return
       end
 
       double complex function ehsva5(s,t,u)
@@ -56,7 +56,7 @@ C     ehsv:EqnA.14
       hmass2=s+t+u
       ehsva5=mbsq/hmass2*(4d0+4d0*s/(u+t)*(w1(s)-w1(hmass2))
      . +(1d0-4d0*mbsq/(u+t))*(w2(s)-w2(hmass2)))
-      return 
+      return
       end
 
 
@@ -72,7 +72,7 @@ C     ehsv:EqnA.19
           w1=2d0*dsqrt(1d0-rat)*asinh(temp)
       elseif (rat .gt. 1d0) then
           w1=2d0*dsqrt(rat-1d0)*asin(temp)
-      else 
+      else
           temp=2d0*acosh(temp)
           w1=dsqrt(1d0-rat)*dcmplx(temp,-pi)
        endif
@@ -95,7 +95,7 @@ C     ehsv:EqnA.20
           tempi=-4d0*tempr*pi
           tempr=+4d0*tempr**2-pi**2
           w2=dcmplx(tempr,tempi)
-      else 
+      else
           tempr=asin(tempr)
           w2=-4d0*tempr**2
       endif
@@ -135,7 +135,7 @@ C     ehsv:EqnA.21
      .     +dlog(ga-1d0)*dlog((be-1d0)/(ga+be-1d0)))
       elseif (rat .gt. 1d0) then
            be=0.5d0*(1d0+dsqrt(1d0+4d0*t*mbsq/(u*s)))
-           al=dsqrt(rat-1d0)           
+           al=dsqrt(rat-1d0)
            r=dsqrt((al**2+1d0)/(al**2+(2d0*be-1d0)**2))
            arg=r*(al**2+2d0*be-1d0)/(1d0+al**2)
            if (arg .ge. 1d0) then
@@ -161,7 +161,7 @@ C     ehsv:EqnA.21
            arg2=(ga-1d0)/(ga+be-1d0)
            arg3=ga/(ga-be)
            arg4=(ga-1d0)/(ga-be)
-      
+
            i3=2d0/(2d0*be-1d0)
      .     *(-ddilog(arg1)+ddilog(arg2)+ddilog(arg3)-ddilog(arg4)
      .     +dlog(ga/(1d0-ga))*dlog((ga+be-1d0)/(be-ga))
@@ -173,14 +173,14 @@ C     ehsv:EqnA.21
 
       double precision function acosh(y)
       implicit none
-      double precision y      
+      double precision y
       acosh=dlog(y+dsqrt(y**2-1d0))
       return
       end
 
       double precision function asinh(y)
       implicit none
-      double precision y      
+      double precision y
       asinh=dlog(y+dsqrt(y**2+1d0))
       return
       end

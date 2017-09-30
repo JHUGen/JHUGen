@@ -14,7 +14,7 @@ c     f(-p1)+f(-p2)--> W^-(e^-(p3)+nbar(p4))+ t(p5) + f(p6)
       include 'nwz.f'
       include 'nores.f'
       include 'jetcuts.f'
-      double precision msq(-nf:nf,-nf:nf),p(mxpart,4), 
+      double precision msq(-nf:nf,-nf:nf),p(mxpart,4),
      .                 facgg,prop
       double precision qgWqg2,qbgWqbg2,gqbWqbg2,gqWqg2,ggWqqb2,ggWqbq2
       double precision qgWqg2_cs(0:2),qbgWqbg2_cs(0:2),
@@ -28,7 +28,7 @@ c--- we label the amplitudes by helicity (qqb1 ... qqb4)
 c--- and by type of contribution qqb(1) ... qqb(n)
       integer i,j,k,ia,ib,ig,it
 !$omp threadprivate(/facgg/)
-      
+
 c--- initialize matrix elements
       do j=-nf,nf
       do k=-nf,nf
@@ -54,9 +54,9 @@ c--- note that these are symmetric under interchange of q and qb
       s34=2d0*(p(3,4)*p(4,4)-p(3,1)*p(4,1)-p(3,2)*p(4,2)-p(3,3)*p(4,3))
       prop=s34**2/((s34-wmass**2)**2+wmass**2*wwidth**2)
       facgg=V*xn/four*(gwsq/2d0*gsq)**2*prop
- 
+
 c--- calculate 2-quark, 2-gluon amplitudes
-  
+
       if     (nwz .eq. +1) then
         call w2jetsq_mass(1,5,4,3,2,6,p,qbgWqbg2)
         call storecs(qbgWqbg2_cs)
@@ -86,7 +86,7 @@ c--- sum over helicities of gluons and massive quarks
           enddo
           enddo
         endif
-          
+
       elseif (nwz .eq. -1) then
         call w2jetsq_mass(2,5,3,4,1,6,p,gqWqg2)
         call storecs(gqWqg2_cs)
@@ -124,32 +124,32 @@ c-- veto b-jet contribution if doing subtraction and pt(b)>ptbjetmin GeV
       if (dsqrt(p(6,1)**2+p(6,2)**2) .gt. ptbjetmin) then
        msq_gg=0d0
       endif
-      
-      ggWqqb2=avegg*gsq**2*gwsq**2*msq_gg*(prop/s34**2)          
-      ggWqbq2=avegg*gsq**2*gwsq**2*msq_gg*(prop/s34**2)          
+
+      ggWqqb2=avegg*gsq**2*gwsq**2*msq_gg*(prop/s34**2)
+      ggWqbq2=avegg*gsq**2*gwsq**2*msq_gg*(prop/s34**2)
 
 c        call w2jetsq_mass(6,5,3,4,1,2,p,ggWqqb2)
-c        call storecs(ggWqqb2_cs)        
-      do i=0,2        
+c        call storecs(ggWqqb2_cs)
+      do i=0,2
         gqWqg2_cs(i)  = aveqg*facgg*gqWqg2_cs(i)
         qgWqg2_cs(i)  = aveqg*facgg*qgWqg2_cs(i)
         gqbWqbg2_cs(i)  = aveqg*facgg*gqbWqbg2_cs(i)
         qbgWqbg2_cs(i)  = aveqg*facgg*qbgWqbg2_cs(i)
 c        ggWqqb2_cs(i) = avegg*facgg*ggWqqb2_cs(i)
       enddo
-      gqWqg2  = gqWqg2_cs(1)  +gqWqg2_cs(2)  +gqWqg2_cs(0)  
-      qgWqg2  = qgWqg2_cs(1)  +qgWqg2_cs(2)  +qgWqg2_cs(0)  
-      gqbWqbg2  = gqbWqbg2_cs(1)  +gqbWqbg2_cs(2)  +gqbWqbg2_cs(0)  
-      qbgWqbg2  = qbgWqbg2_cs(1)  +qbgWqbg2_cs(2)  +qbgWqbg2_cs(0)  
-c      ggWqqb2 = ggWqqb2_cs(1) +ggWqqb2_cs(2) +ggWqqb2_cs(0) 
-      
+      gqWqg2  = gqWqg2_cs(1)  +gqWqg2_cs(2)  +gqWqg2_cs(0)
+      qgWqg2  = qgWqg2_cs(1)  +qgWqg2_cs(2)  +qgWqg2_cs(0)
+      gqbWqbg2  = gqbWqbg2_cs(1)  +gqbWqbg2_cs(2)  +gqbWqbg2_cs(0)
+      qbgWqbg2  = qbgWqbg2_cs(1)  +qbgWqbg2_cs(2)  +qbgWqbg2_cs(0)
+c      ggWqqb2 = ggWqqb2_cs(1) +ggWqqb2_cs(2) +ggWqqb2_cs(0)
+
       do j=-nf,nf
       do k=-nf,nf
 
-c--- skip contributions with 2 b-quarks in the initial state      
+c--- skip contributions with 2 b-quarks in the initial state
       if ((abs(j) .eq. 5) .and. (abs(k) .eq. 5)) goto 99
-      
-c--- 2-quark, 2-gluon contribution to matrix elements      
+
+c--- 2-quark, 2-gluon contribution to matrix elements
       if     ((j .eq. +5) .and. (k .eq. 0) .and. (nwz .eq. -1)) then
           msq(j,k)=qgWqg2
           do i=0,2
@@ -186,7 +186,7 @@ c            enddo
           endif
       endif
 
-c--- 4-quark contribution to matrix elements      
+c--- 4-quark contribution to matrix elements
       if     ((j .eq. +5) .and. (k .ne. 0) .and. (nwz .eq. -1)) then
         msq(j,k)=sqWcq
       elseif ((j .ne. 0) .and. (k .eq. +5) .and. (nwz .eq. -1)) then
@@ -196,7 +196,7 @@ c--- 4-quark contribution to matrix elements
       elseif ((j .ne. 0) .and. (k .eq. -5) .and. (nwz .eq. +1)) then
         msq(j,k)=qsbWcbq
       elseif ((j .ne. 0) .and. (k .ne. 0)) then
-      
+
         if     ((j .eq. -k) .and. (nwz .eq. +1)) then
 c          if (nores .eqv. .false.) msq(j,k)=qqbWcbs
         elseif ((j .eq. -k) .and. (nwz .eq. -1)) then
@@ -207,8 +207,8 @@ c          if (nores .eqv. .false.) msq(j,k)=qqbWcsb
    99 continue
 
       enddo
-      enddo      
-      
+      enddo
+
       return
       end
-     
+

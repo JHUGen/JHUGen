@@ -2,7 +2,7 @@
 C****************************************************************C
 C                                                                C
 C     This is a package for the MRS 1998 parton distributions    C
-C     including hogher twist. The format is similar to the       C 
+C     including hogher twist. The format is similar to the       C
 C     previous  (1996) MRS-R series.                             C
 C                                                                C
 C     As before, x times the parton distribution is returned,    C
@@ -34,8 +34,8 @@ C****************************************************************C
       if(q2.lt.qsqmin.or.q2.gt.qsqmax) print 99
       if(x.lt.xmin.or.x.gt.xmax)       print 98
           if(mode.eq.1) then
-        call mrs981ht(x,q2,upv,dnv,usea,dsea,str,chm,bot,glu) 
-      endif 
+        call mrs981ht(x,q2,upv,dnv,usea,dsea,str,chm,bot,glu)
+      endif
   99  format('  WARNING:  Q^2 VALUE IS OUT OF RANGE   ')
   98  format('  WARNING:   X  VALUE IS OUT OF RANGE   ')
       return
@@ -124,11 +124,11 @@ c notation: 1=uval 2=val 3=glue 4=usea 5=chm 6=str 7=btm 8=dsea
       dsea=g(8)
       str=g(6)
       chm=g(5)
-      glu=g(3) 
+      glu=g(3)
       bot=g(7)
         x=xsave
         qsq=q2save
       return
       end
-      
+
 

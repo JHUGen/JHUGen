@@ -57,8 +57,8 @@ C---end statement functions
      &                         +za(k1,k5)*za(k2,k3)*zb(k1,k6)*zb(k2,k4))
      &  +za(k2,k3)*za(k2,k5)*zb(k1,k4)*zb(k1,k6)*zab2(k1,k3,k4,k2)**2
      &   /zab2(k2,k3,k4,k1)
-     &  +za(k1,k3)*za(k1,k5)*zb(k2,k4)*zb(k2,k6)*zab2(k2,k3,k4,k1))  
-      
+     &  +za(k1,k3)*za(k1,k5)*zb(k2,k4)*zb(k2,k6)*zab2(k2,k3,k4,k1))
+
      & -za(k1,k3)*zb(k2,k6)*zab2(k5,k1,k3,k4)/s134*izab2(k2,k3,k4,k1)
      & +za(k1,k5)*zb(k2,k4)*zab2(k3,k1,k5,k6)/s234*izab2(k2,k3,k4,k1)
 
@@ -113,10 +113,10 @@ c     &    zb(k2,k6)*zb(k4,k6)*izb(k5,k6) - 1/(s(k3,k4))/(s(k5,k6))*za(
 c     &    k1,k3)*za(k1,k5)*zb(k1,k2)*zb(k4,k6) - 1/(s(k3,k4))/(s(k5,k6)
 c     &    )*za(k1,k5)*za(k3,k4)*zb(k2,k4)*zb(k4,k6) )
 c      amp2=amp2 + izab2(k2,k3,k4,k1)**2 * (  - 4.D0*za(k3,k5)*zb(
-c     &    k4,k6) - 2.D0*iza(k3,k4)*izb(k5,k6)*zab2(k3,k1,k4,k6)**2 + 
+c     &    k4,k6) - 2.D0*iza(k3,k4)*izb(k5,k6)*zab2(k3,k1,k4,k6)**2 +
 c     &    1/(s(k1,k2))/(s(k3,k4))*za(k1,k2)*za(k2,k3)*zb(k1,k6)**2*zb(
 c     &    k2,k4)*izb(k5,k6)*zab2(k1,k3,k4,k2) + 1/(s(k1,k2))/(s(k3,k4))
-c     &    *za(k1,k3)*za(k1,k5)*zb(k1,k4)*zb(k1,k6)*zab2(k2,k5,k6,k2) + 
+c     &    *za(k1,k3)*za(k1,k5)*zb(k1,k4)*zb(k1,k6)*zab2(k2,k5,k6,k2) +
 c     &    1/(s(k1,k2))/(s(k3,k4))*za(k1,k3)*zb(k1,k4)*zb(k1,k6)**2*izb(
 c     &    k1,k2)*izb(k5,k6)*zab2(k1,k3,k4,k2)*zab2(k2,k5,k6,k2) + 1/(s(
 c     &    k1,k2))/(s(k3,k4))*za(k2,k3)*za(k2,k5)*zb(k2,k4)*zb(k2,k6)*
@@ -157,7 +157,7 @@ c     &    k1,k2))/(s(k3,k4))/(s(k5,k6))*za(k2,k5)*za(k3,k4)*zb(k1,k4)**
 c     &    2*zb(k1,k6)*izb(k1,k2)*zab2(k1,k3,k4,k2)**2 + 1/(s(k1,k2))/(
 c     &    s(k3,k4))/(s(k5,k6))*za(k2,k5)*zb(k2,k6)*zab2(k1,k5,k6,k1)*
 c     &    zab2(k2,k5,k6,k4)*zab2(k3,k5,k6,k2) + 1/(s(k1,k2))/(s(k5,k6))
-c     &    *za(k1,k3)*za(k1,k5)*zb(k1,k4)*zb(k1,k6)*zab2(k2,k3,k4,k2) + 
+c     &    *za(k1,k3)*za(k1,k5)*zb(k1,k4)*zb(k1,k6)*zab2(k2,k3,k4,k2) +
 c     &    1/(s(k1,k2))/(s(k5,k6))*za(k2,k3)*za(k2,k5)*zb(k2,k4)*zb(k2,
 c     &    k6)*zab2(k1,k3,k4,k1) )
 c      amp2=amp2 + izab2(k2,k3,k4,k1)**2 * ( 1/(s(k3,k4))*za(k1,k3)
@@ -206,12 +206,12 @@ c     &    zab2(k2,k1,k3,k4)*s234 - 1/(s(k5,k6))*za(k2,k3)*za(k2,
 c     &    k5)*zb(k1,k4)*zb(k2,k6)*zab2(k1,k3,k4,k2) - 1/(s(k5,k6))*za(
 c     &    k2,k3)*za(k2,k5)*zb(k2,k6)*iza(k1,k2)*zab2(k1,k3,k4,k2)*zab2(
 c     &    k2,k1,k3,k4) )
-c      amp2=amp2 + izab2(k2,k3,k4,k1)**2*izab2(k2,k5,k6,k2) * (  - 
+c      amp2=amp2 + izab2(k2,k3,k4,k1)**2*izab2(k2,k5,k6,k2) * (  -
 c     &    2.D0/(s(k3,k4))*za(k1,k2)*za(k2,k5)*za(k3,k4)*zb(k1,k6)*zb(k2
 c     &    ,k4)**2 + 1/(s(k3,k4))*za(k2,k3)*za(k2,k5)*zb(k1,k6)*zb(k2,k4
 c     &    )*zab2(k1,k3,k4,k2) + 1/(s(k3,k4))*za(k2,k3)*za(k2,k5)*zb(k2,
 c     &    k4)*iza(k1,k2)*zab2(k1,k3,k4,k2)*zab2(k2,k1,k5,k6) - 2.D0/(s(
-c     &    k3,k4))*za(k2,k5)*za(k3,k4)*zb(k2,k4)**2*zab2(k2,k1,k5,k6) - 
+c     &    k3,k4))*za(k2,k5)*za(k3,k4)*zb(k2,k4)**2*zab2(k2,k1,k5,k6) -
 c     &    2.D0/(s(k3,k4))/(s(k5,k6))*za(k2,k3)*za(k2,k5)*zb(k1,k6)*zb(
 c     &    k2,k4)*zab2(k1,k3,k4,k2)*s134 - 2.D0/(s(k3,k4))/(s(k5,
 c     &    k6))*za(k2,k3)*za(k2,k5)*zb(k2,k4)*iza(k1,k2)*zab2(k1,k3,k4,
@@ -219,7 +219,7 @@ c     &    k2)*zab2(k2,k1,k5,k6)*s134 )
 c      amp2=amp2 + izab2(k2,k3,k4,k1)*izab2(k2,k3,k4,k2) * (  - 2.D0
 c     &    /(s(k1,k2))*za(k1,k2)*za(k2,k3)*zb(k2,k4)*zb(k2,k6)**2*izb(k5
 c     &    ,k6) - 1/(s(k1,k2))/(s(k3,k4))/(s(k5,k6))*za(k1,k2)*za(k1,k5)
-c     &    *za(k2,k3)*zb(k1,k2)*zb(k1,k4)*zb(k2,k6)*zab2(k1,k3,k4,k2) - 
+c     &    *za(k2,k3)*zb(k1,k2)*zb(k1,k4)*zb(k2,k6)*zab2(k1,k3,k4,k2) -
 c     &    1/(s(k1,k2))/(s(k3,k4))/(s(k5,k6))*za(k1,k5)*za(k2,k3)*zb(k1,
 c     &    k2)*zb(k2,k6)*zab2(k1,k3,k4,k2)*zab2(k2,k1,k3,k4) )
 c      amp2=amp2 + izab2(k2,k3,k4,k1)*izab2(k2,k5,k6,k2) * (  - 2.D0
@@ -235,7 +235,7 @@ c     &    ))*s(k3,k4)*za(k3,k4)*zb(k4,k6)**2*izb(k5,k6)*zab2(k1,k3,k4,
 c     &    k2) - 2.D0/(s(k3,k4))*s(k5,k6)*za(k3,k4)*zb(k4,k6)**2*izb(k5,
 c     &    k6)*zab2(k1,k3,k4,k2) + 2.D0/(s(k5,k6))*s(k1,k2)*za(k3,k5)**2
 c     &    *zb(k5,k6)*iza(k3,k4)*zab2(k1,k3,k4,k2) - 2.D0/(s(k5,k6))*s(
-c     &    k3,k4)*za(k3,k5)**2*zb(k5,k6)*iza(k3,k4)*zab2(k1,k3,k4,k2) - 
+c     &    k3,k4)*za(k3,k5)**2*zb(k5,k6)*iza(k3,k4)*zab2(k1,k3,k4,k2) -
 c     &    2.D0/(s(k5,k6))*s(k5,k6)*za(k3,k5)**2*zb(k5,k6)*iza(k3,k4)*
 c     &    zab2(k1,k3,k4,k2) )
 c      amp2=amp2 + izab2(k2,k3,k4,k2) * (  - 1/(s(k1,k2))/(s(k3,k4)

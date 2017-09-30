@@ -150,18 +150,18 @@ C---fill elements
 
 c--- Q-Qbar
       if     ((j .gt. 0) .and. (k .lt. 0)) then
-          msq(j,k)=Vsq(j,k)*qa 
+          msq(j,k)=Vsq(j,k)*qa
 c--- Qbar-Q
       elseif ((j .lt. 0) .and. (k .gt. 0)) then
-          msq(j,k)=Vsq(j,k)*aq 
+          msq(j,k)=Vsq(j,k)*aq
 c--- g-Q
       elseif ((j .eq. 0) .and. (k .gt. 0)) then
           msq(j,k)=(Vsq(-1,k)+Vsq(-2,k)+Vsq(-3,k)
-     &             +Vsq(-4,k)+Vsq(-5,k))*gq 
+     &             +Vsq(-4,k)+Vsq(-5,k))*gq
 c--- g-Qbar
       elseif ((j .eq. 0) .and. (k .lt. 0)) then
         msq(j,k)=(Vsq(+1,k)+Vsq(+2,k)+Vsq(+3,k)
-     &           +Vsq(+4,k)+Vsq(+5,k))*ga 
+     &           +Vsq(+4,k)+Vsq(+5,k))*ga
 c--- Q-g
       elseif ((j .gt. 0) .and. (k .eq. 0)) then
           msq(j,k)=(Vsq(j,-1)+Vsq(j,-2)+Vsq(j,-3)
@@ -169,7 +169,7 @@ c--- Q-g
 c--- Qbar-g
       elseif ((j .lt. 0) .and. (k .eq. 0)) then
         msq(j,k)=(Vsq(j,+1)+Vsq(j,+2)+Vsq(j,+3)
-     &           +Vsq(j,+4)+Vsq(j,+5))*ag 
+     &           +Vsq(j,+4)+Vsq(j,+5))*ag
       endif
 
       enddo

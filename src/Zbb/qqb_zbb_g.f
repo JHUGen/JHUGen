@@ -9,7 +9,7 @@ c                        |     |
 c                        |     --> e-(p3)+e^+(p4)
 c                        |
 c                         ---> bb(p5)+b(p6)
-      implicit none 
+      implicit none
       include 'constants.f'
       include 'masses.f'
       include 'qcdcouple.f'
@@ -65,11 +65,11 @@ C     0 ---> q(p1)+g(p2)+g(p3)+g(p4)+qbar(p5)+a(p6)+l(p7)
       else
         call xzqqggg(6,1,2,7,5,4,3,mmsq)
       endif
-      
+
       if (
-     .      (s(5,6) .lt. four*scalesq) 
-     . .or. (s(1,5)*s(2,5)/s(1,2) .lt. scalesq) 
-     . .or. (s(1,6)*s(2,6)/s(1,2) .lt. scalesq) ) return 
+     .      (s(5,6) .lt. four*scalesq)
+     . .or. (s(1,5)*s(2,5)/s(1,2) .lt. scalesq)
+     . .or. (s(1,6)*s(2,6)/s(1,2) .lt. scalesq) ) return
 
 c--- note that (2,1) and (4,3) are switched due to crossing from NT
       if (gqonly) then
@@ -78,17 +78,17 @@ c--- note that (2,1) and (4,3) are switched due to crossing from NT
         do hg=1,2
         do lh=1,2
         do j=1,4
-          msq_qqb(hq,Qh,hg,lh,j)=0d0      
+          msq_qqb(hq,Qh,hg,lh,j)=0d0
           msq_qbq(hq,Qh,hg,lh,j)=0d0
-        enddo      
         enddo
         enddo
         enddo
         enddo
-      else     
+        enddo
+      else
         call msq_qqQQg(2,1,6,5,7,4,3,msq_qqb)
         call msq_qqQQg(1,2,6,5,7,4,3,msq_qbq)
-      endif      
+      endif
       call msq_qqQQg(7,1,6,5,2,4,3,msq_qg)
       call msq_qqQQg(2,7,6,5,1,4,3,msq_gqb)
       call msq_qqQQg(7,2,6,5,1,4,3,msq_gq)
@@ -98,14 +98,14 @@ c--- note the factor of 4d0*xw**2 relative to wbb
       fac=4d0*gsq**3*esq**2
 c--- extra factor of 2**3=8 to compensate for Ta normalization
       fac=fac*8d0
-       
+
       LRb(1)=L(flav)
       LRb(2)=R(flav)
 
       do j=-nflav,nflav
       do k=-nflav,nflav
       if( j .ne. 0 .and. k .ne. 0 .and. j .ne. -k) goto 19
-      
+
       msq(j,k)=0d0
 
       if     ((j .eq. 0) .and. (k .eq. 0)) then

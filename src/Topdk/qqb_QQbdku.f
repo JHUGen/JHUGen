@@ -6,7 +6,7 @@
 *     calculate the element squared and subtraction terms              *
 *     for the process                                                  *
 *                                                                      *
-*     q(-p1) +qbar(-p2)=bbar(p6)+e-(p7)+nubar(p8)+nu(p3)+e+(p4)+b(p5)  * 
+*     q(-p1) +qbar(-p2)=bbar(p6)+e-(p7)+nubar(p8)+nu(p3)+e+(p4)+b(p5)  *
 *                                                                      *
 *     Top is kept strictly on-shell all spin correlations are dropped  *
 *                                                                      *
@@ -51,7 +51,7 @@ C----set all elements to zero
       pb1Dpn1=p(3,4)*p(5,4)-p(3,1)*p(5,1)-p(3,2)*p(5,2)-p(3,3)*p(5,3)
       pb2Dpn2=p(6,4)*p(8,4)-p(6,1)*p(8,1)-p(6,2)*p(8,2)-p(6,3)*p(8,3)
       decay=4d0*gwsq**4*pt1Dpe1*pb1Dpn1*pt2Dpe2*pb2Dpn2/abs(prop)**2
-      call qqb_QQb(q,msq) 
+      call qqb_QQb(q,msq)
 
       do j=-nf,nf
       do k=-nf,nf

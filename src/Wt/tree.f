@@ -13,7 +13,7 @@
 c---- helitities: amp(ht,hg)
 c--- labels on amplitudes represent helicities for the heavy quark
 c--- and the gluon respectively
-c---   1 = negative helitity, 2 = positive helitity    
+c---   1 = negative helitity, 2 = positive helitity
 c--- heavy quark momentum is made massless (it) with the gluon momentum ig
       amp(1,2)=za(ie,it)
      . /za(ig,is)/za(ig,it)*(za(is,it)*zb(is,in)+za(ig,it)*zb(ig,in))

@@ -18,7 +18,7 @@ C     third is gluon helicity
       s567=s(p5,p6)+s(p5,p7)+s(p6,p7)
       s12=s(p1,p2)
       f(1,1,1)= + s12**(-1)*s567**(-1) * (  - za(p1,p2)*za(p3,p5)*zb(p1
-     &    ,p4)*zb(p1,p6)*zb(p5,p6)*izb(p5,p7)*izb(p6,p7)*s124**(-1) + 
+     &    ,p4)*zb(p1,p6)*zb(p5,p6)*izb(p5,p7)*izb(p6,p7)*s124**(-1) +
      &    za(p1,p2)*za(p3,p7)*zb(p1,p4)*zb(p1,p6)*izb(p5,p7)*s124**(-1)
      &     + za(p2,p4)*za(p3,p5)*zb(p1,p4)*zb(p4,p6)*zb(p5,p6)*izb(p5,
      &    p7)*izb(p6,p7)*s124**(-1) - za(p2,p4)*za(p3,p7)*zb(p1,p4)*zb(
@@ -26,13 +26,13 @@ C     third is gluon helicity
 
       f(1,1,2)= + s12**(-1)*s567**(-1) * ( za(p1,p2)*za(p3,p5)*za(p5,p6
      &    )*zb(p1,p4)*zb(p1,p6)*iza(p5,p7)*iza(p6,p7)*s124**(-1) + za(
-     &    p1,p2)*za(p3,p5)*zb(p1,p4)*zb(p1,p7)*iza(p6,p7)*s124**(-1) - 
+     &    p1,p2)*za(p3,p5)*zb(p1,p4)*zb(p1,p7)*iza(p6,p7)*s124**(-1) -
      &    za(p2,p4)*za(p3,p5)*za(p5,p6)*zb(p1,p4)*zb(p4,p6)*iza(p5,p7)*
      &    iza(p6,p7)*s124**(-1) - za(p2,p4)*za(p3,p5)*zb(p1,p4)*zb(p4,
      &    p7)*iza(p6,p7)*s124**(-1) )
 
       f(1,2,1)= + s12**(-1)*s567**(-1) * (  - za(p1,p2)*za(p3,p6)*zb(p1
-     &    ,p4)*zb(p1,p5)*zb(p5,p6)*izb(p5,p7)*izb(p6,p7)*s124**(-1) - 
+     &    ,p4)*zb(p1,p5)*zb(p5,p6)*izb(p5,p7)*izb(p6,p7)*s124**(-1) -
      &    za(p1,p2)*za(p3,p7)*zb(p1,p4)*zb(p1,p5)*izb(p6,p7)*s124**(-1)
      &     + za(p2,p4)*za(p3,p6)*zb(p1,p4)*zb(p4,p5)*zb(p5,p6)*izb(p5,
      &    p7)*izb(p6,p7)*s124**(-1) + za(p2,p4)*za(p3,p7)*zb(p1,p4)*zb(
@@ -40,13 +40,13 @@ C     third is gluon helicity
 
       f(1,2,2)= + s12**(-1)*s567**(-1) * ( za(p1,p2)*za(p3,p6)*za(p5,p6
      &    )*zb(p1,p4)*zb(p1,p5)*iza(p5,p7)*iza(p6,p7)*s124**(-1) - za(
-     &    p1,p2)*za(p3,p6)*zb(p1,p4)*zb(p1,p7)*iza(p5,p7)*s124**(-1) - 
+     &    p1,p2)*za(p3,p6)*zb(p1,p4)*zb(p1,p7)*iza(p5,p7)*s124**(-1) -
      &    za(p2,p4)*za(p3,p6)*za(p5,p6)*zb(p1,p4)*zb(p4,p5)*iza(p5,p7)*
      &    iza(p6,p7)*s124**(-1) + za(p2,p4)*za(p3,p6)*zb(p1,p4)*zb(p4,
      &    p7)*iza(p5,p7)*s124**(-1) )
 
       f(2,1,1)= + s12**(-1)*s567**(-1) * (  - za(p2,p3)*za(p2,p5)*zb(p1
-     &    ,p2)*zb(p4,p6)*zb(p5,p6)*izb(p5,p7)*izb(p6,p7)*s123**(-1) + 
+     &    ,p2)*zb(p4,p6)*zb(p5,p6)*izb(p5,p7)*izb(p6,p7)*s123**(-1) +
      &    za(p2,p3)*za(p2,p7)*zb(p1,p2)*zb(p4,p6)*izb(p5,p7)*s123**(-1)
      &     - za(p2,p3)*za(p3,p5)*zb(p1,p3)*zb(p4,p6)*zb(p5,p6)*izb(p5,
      &    p7)*izb(p6,p7)*s123**(-1) + za(p2,p3)*za(p3,p7)*zb(p1,p3)*zb(
@@ -54,13 +54,13 @@ C     third is gluon helicity
 
       f(2,1,2)= + s12**(-1)*s567**(-1) * ( za(p2,p3)*za(p2,p5)*za(p5,p6
      &    )*zb(p1,p2)*zb(p4,p6)*iza(p5,p7)*iza(p6,p7)*s123**(-1) + za(
-     &    p2,p3)*za(p2,p5)*zb(p1,p2)*zb(p4,p7)*iza(p6,p7)*s123**(-1) + 
+     &    p2,p3)*za(p2,p5)*zb(p1,p2)*zb(p4,p7)*iza(p6,p7)*s123**(-1) +
      &    za(p2,p3)*za(p3,p5)*za(p5,p6)*zb(p1,p3)*zb(p4,p6)*iza(p5,p7)*
      &    iza(p6,p7)*s123**(-1) + za(p2,p3)*za(p3,p5)*zb(p1,p3)*zb(p4,
      &    p7)*iza(p6,p7)*s123**(-1) )
 
       f(2,2,1)= + s12**(-1)*s567**(-1) * (  - za(p2,p3)*za(p2,p6)*zb(p1
-     &    ,p2)*zb(p4,p5)*zb(p5,p6)*izb(p5,p7)*izb(p6,p7)*s123**(-1) - 
+     &    ,p2)*zb(p4,p5)*zb(p5,p6)*izb(p5,p7)*izb(p6,p7)*s123**(-1) -
      &    za(p2,p3)*za(p2,p7)*zb(p1,p2)*zb(p4,p5)*izb(p6,p7)*s123**(-1)
      &     - za(p2,p3)*za(p3,p6)*zb(p1,p3)*zb(p4,p5)*zb(p5,p6)*izb(p5,
      &    p7)*izb(p6,p7)*s123**(-1) - za(p2,p3)*za(p3,p7)*zb(p1,p3)*zb(
@@ -68,7 +68,7 @@ C     third is gluon helicity
 
       f(2,2,2)= + s12**(-1)*s567**(-1) * ( za(p2,p3)*za(p2,p6)*za(p5,p6
      &    )*zb(p1,p2)*zb(p4,p5)*iza(p5,p7)*iza(p6,p7)*s123**(-1) - za(
-     &    p2,p3)*za(p2,p6)*zb(p1,p2)*zb(p4,p7)*iza(p5,p7)*s123**(-1) + 
+     &    p2,p3)*za(p2,p6)*zb(p1,p2)*zb(p4,p7)*iza(p5,p7)*s123**(-1) +
      &    za(p2,p3)*za(p3,p6)*za(p5,p6)*zb(p1,p3)*zb(p4,p5)*iza(p5,p7)*
      &    iza(p6,p7)*s123**(-1) - za(p2,p3)*za(p3,p6)*zb(p1,p3)*zb(p4,
      &    p7)*iza(p5,p7)*s123**(-1) )

@@ -34,7 +34,7 @@ c---  arXiv:0906.0008 [hep-ph].
       s234=s3(j2,j3,j4)
       s341=s3(j3,j4,j1)
       s412=s3(j4,j1,j2)
-      mhsq=s(j1,j2)+s(j1,j3)+s(j1,j4)+s(j2,j3)+s(j2,j4)+s(j3,j4)      
+      mhsq=s(j1,j2)+s(j1,j3)+s(j1,j4)+s(j2,j3)+s(j2,j4)+s(j3,j4)
       l12=lnrat(musq,-s(j1,j2))
       l13=lnrat(musq,-s(j1,j3))
       l24=lnrat(musq,-s(j2,j4))
@@ -49,15 +49,15 @@ c--- This is the same function as in the mpmm amplitude
 
 c--- These are additional boxes
       V6L=
-     . +Lsm1_2me(s341,s123,s(j1,j3),mhsq) 
-     . +Lsm1_2me(s412,s234,s(j2,j4),mhsq) 
-     . -Lsm1_2me(s412,s123,s(j1,j2),mhsq) 
-     . -Lsm1_2me(s234,s341,s(j3,j4),mhsq) 
+     . +Lsm1_2me(s341,s123,s(j1,j3),mhsq)
+     . +Lsm1_2me(s412,s234,s(j2,j4),mhsq)
+     . -Lsm1_2me(s412,s123,s(j1,j2),mhsq)
+     . -Lsm1_2me(s234,s341,s(j3,j4),mhsq)
      . +Lsm1DS(s(j2,j4),s(j4,j1),s412)
      . +Lsm1DS(s(j1,j3),s(j3,j2),s123)
      . +Lsm1DS(s(j2,j4),s(j2,j3),s234)
      . +Lsm1DS(s(j1,j3),s(j1,j4),s341)
-      
+
       A43phiAQggmppm_unsym=
      .  A0phiAQggmppm(j1,j2,j3,j4,za,zb)
      .  *(V5L+V6L
@@ -68,6 +68,6 @@ c--- These are additional boxes
      .  +za(j1,j4)**2/(za(j2,j3)*za(j1,j3)))
      .  *(Lsm1DS(s(j1,j2),s(j2,j3),s123)
      .   +Lsm1DS(s(j3,j4),s(j4,j1),s3(j3,j4,j1)))
-     
+
       return
       end

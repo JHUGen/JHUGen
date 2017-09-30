@@ -6,7 +6,7 @@ c                           |    |
 c                           |    --> f(p5)+bar{f}(6)
 c                           |
 c                           ---> nu(p3)+e^+(p4)
-      implicit none 
+      implicit none
       include 'constants.f'
       include 'ptilde.f'
       include 'qqgg.f'
@@ -34,7 +34,7 @@ c---- entries are left as dummies
       msq(nd,j,k)=0d0
       enddo
 
-      if((j .ne. 0 .and. k .ne. 0 .and. j.ne.-k) 
+      if((j .ne. 0 .and. k .ne. 0 .and. j.ne.-k)
      .  .or. (j .eq. 0 .and. k .eq. 0)) goto 19
 
       if     (((j .gt. 0) .and. (k .lt. 0))
@@ -57,7 +57,7 @@ c---- entries are left as dummies
       enddo
       enddo
 
-      return      
+      return
       end
 
 

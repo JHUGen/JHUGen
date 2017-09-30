@@ -9,7 +9,7 @@
 *                           |                                          *
 *                           -> Z(e^-(p5),e^+(p6)) Z(mu^-(p7),mu^+(p8)) *
 ************************************************************************
-      implicit none 
+      implicit none
       include 'constants.f'
       include 'masses.f'
       include 'ewcouple.f'
@@ -66,13 +66,13 @@ c---calculate the 2 Z propagators
 
 c + L1(j)*L1(j)*L2(j)*L2(j)*gw^8*[1/4/XN]*mb^2*[s56-4*mb^2]
 c  * ( 2*zprop1^-1*zprop2^-1*hprop^-1*sinw^4*s14*s23*cos^-4 )
- 
+
 c + R1(j)*R1(j)*R2(j)*R2(j)*gw^8*[1/4/XN]*mb^2*[s56-4*mb^2]
 c  * ( 2*zprop1^-1*zprop2^-1*hprop^-1*sinw^4*s14*s23*cos^-4 )
 
 c + L1(j)*L1(j)*R2(j)*R2(j)*gw^8*[1/4/XN]*mb^2*[s56-4*mb^2]
 c  * ( 2*zprop1^-1*zprop2^-1*hprop^-1*sinw^4*s13*s24*cos^-4 )
- 
+
 c + R1(j)*R1(j)*L2(j)*L2(j)*gw^8*[1/4/XN]*mb^2*[s56-4*mb^2]
 c  * ( 2*zprop1^-1*zprop2^-1*hprop^-1*sinw^4*s13*s24*cos^-4 )
- 
+

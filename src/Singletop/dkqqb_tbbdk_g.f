@@ -41,7 +41,7 @@ C----set all elements to zero
       msq(j,k)=0d0
       enddo
       enddo
-  
+
       if (nwz .eq. +1) then
       call schantoponshell(1,2,p,1,mprodqa)
       call schantoponshell(2,1,p,1,mprodaq)
@@ -83,9 +83,9 @@ C---fill qb-q and q-qb elements
       do j=-nf,nf
       do k=-nf,nf
       if     ((j .gt. 0) .and. (k .lt. 0)) then
-      msq(j,k)=Vsq(j,k)*fac*qqb 
+      msq(j,k)=Vsq(j,k)*fac*qqb
       elseif ((j .lt. 0) .and. (k .gt. 0)) then
-      msq(j,k)=Vsq(j,k)*fac*qbq 
+      msq(j,k)=Vsq(j,k)*fac*qbq
       endif
       enddo
       enddo

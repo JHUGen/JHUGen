@@ -31,7 +31,7 @@
       common/rcut/rcut
       data icount/0/
       save icount,premsq,premsqs
-      
+
       if     (npart .eq. 3) then
         jmax=5
 c        if (case .eq. 'dirgam') then
@@ -95,10 +95,10 @@ c        if (smin. gt. 1d-1) return
         write(6,*) 'No singularity check implemented yet'
         stop
       endif
-      
+
       jmax=1
       kmax=1
-      
+
       do j=1,jmax
       do k=1,kmax
          if     (npart .eq. 3) then
@@ -142,8 +142,8 @@ c             call coll5(p,k,j)
 c             call coll5(p,k,j)
            endif
          endif
-         call real_g(p,msq)  
-         call sub_gs(p,msqc) 
+         call real_g(p,msq)
+         call sub_gs(p,msqc)
          do jj=-nf,nf
          do kk=-nf,nf
             msqs(jj,kk)=0d0
@@ -189,13 +189,13 @@ c           write(6,*) 'This point does not have enough jets'
          write(6,*) '2d0*p4.p6',s(4,6)
          write(6,*) '2d0*p5.p6',s(5,6)
          endif
-         if (npart .gt. 4) then         
+         if (npart .gt. 4) then
          write(6,*) '2d0*p1.p7',s(1,7)
          write(6,*) '2d0*p2.p7',s(2,7)
          write(6,*) '2d0*p5.p7',s(5,7)
          write(6,*) '2d0*p6.p7',s(6,7)
          endif
-         
+
 c         write(6,*) '0',jets,msq(2,0),(pjet(5,4)+pjet(6,4))**2
 c     .                      -(pjet(5,1)+pjet(6,1))**2
 c     .                      -(pjet(5,2)+pjet(6,2))**2
@@ -215,7 +215,7 @@ c            endif
             call dotem(9,q,s)
 c            call genclust2(q,rcut,pjet,1)
 c            if (jets .ge. nqcdjets) then
-        
+
             if (includedipole(nd,q)) then
                write(6,*) nd
 c            write(6,*) nd,jets,msqc(nd,5,0)
@@ -226,7 +226,7 @@ c            write(6,*) nd,jets,msqc(nd,5,0)
                enddo
             endif
 c            write(6,*) 'nd,jets,msqc(nd,2,0)',nd,jets,msqc(nd,2,0)
-   72    continue 
+   72    continue
          enddo
 
 c--- find smallest value of msq
@@ -235,29 +235,29 @@ c--- find smallest value of msq
          do jj=-nflav,nflav
          do kk=-nflav,nflav
            if ((msq(jj,kk) .lt. debugsmall)
-     .     .and. (msq(jj,kk) .gt. 0d0)) debugsmall=msq(jj,kk)        
+     .     .and. (msq(jj,kk) .gt. 0d0)) debugsmall=msq(jj,kk)
            if ((msq(jj,kk) .gt. debuglarge)
-     .     .and. (msq(jj,kk) .gt. 0d0)) debuglarge=msq(jj,kk)        
+     .     .and. (msq(jj,kk) .gt. 0d0)) debuglarge=msq(jj,kk)
          enddo
-         enddo                  
-      
+         enddo
+
          if ((debuglarge/debugsmall .lt. xtoler)
      .  .or. (debuglarge .lt. 1d-10)) then
 c           write(6,*) ' OK - no singular configurations'
 c           goto 68
          endif
-      
+
          if (debugsmall .gt. 1d-3) debugsmall=debugsmall/xtoler/2d0
-c         if (debuglarge/debugsmall .lt. xtoler*1d2) 
+c         if (debuglarge/debugsmall .lt. xtoler*1d2)
 c     .       debugsmall=debuglarge/xtoler
 
          do jj=-nflav,nflav
          do kk=-nflav,nflav
-         
+
 c         if ((gqonly) .and. (jj.ne.0) .and. (kk.ne.0)) goto 69
 c         if ((jj .gt. 0) .or. (kk .gt. 0)) goto 69 ! DEBUG: QBG & GQB ONLY
 c         if ((jj .le. 0) .or. (kk .le. 0)) goto 69 ! DEBUG: QQ only
-         
+
          if (msq(jj,kk) .eq. 0d0) then
             if (msqs(jj,kk) .eq. 0d0) then
                goto 69
@@ -293,7 +293,7 @@ c         if ((jj .le. 0) .or. (kk .le. 0)) goto 69 ! DEBUG: QQ only
              write(*,21) jj,kk,msq(jj,kk)/msqs(jj,kk),
      .                  msq(jj,kk),msqs(jj,kk),debugmsg
          endif
-      
+
    69    continue
          enddo
          enddo
@@ -301,10 +301,10 @@ c         if ((jj .le. 0) .or. (kk .le. 0)) goto 69 ! DEBUG: QQ only
    68 continue
       enddo
       pause
-      enddo 
+      enddo
 
 c---c--- This block of code is useful for checking the symmetry of
-c---c--- the real matrix elements and subtractions      
+c---c--- the real matrix elements and subtractions
 c---      icount=icount+1
 c---      if (icount .eq. 1) then
 c---c--- save contents of arrays for reals and subtractions
@@ -329,7 +329,7 @@ c---        if ((abs(msq(j,k)) .lt. 1d-15) .and. (abs(msqs(j,k)).lt.1d-15))
 c---     .                    goto 67 ! skip zero contributions
 c---        write(6,23) j,k,premsq(j,k),msq(k,j),premsqs(j,k),msqs(k,j),
 c---     .                  premsq(j,k)/msq(k,j),premsqs(j,k)/msqs(k,j)
-c---   67        continue     
+c---   67        continue
 c---        enddo
 c---        enddo
 c---        icount=0
@@ -339,9 +339,9 @@ c---      endif
 c      write(6,*) 'Singularity check completed'
 c      write(6,*) 'Do ''mcfm | grep -v OK'' to look for failures'
 c      stop
-      
+
       return
-      
+
    21 format(1x,2i3,f10.6,2e14.6,1x,a32)
    22 format(1x,2i3,a10,2e14.6,1x,a32)
    23 format(2i4,4e12.5,2f10.6)

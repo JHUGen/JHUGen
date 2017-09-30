@@ -14,7 +14,7 @@
      & s16,s25,epbit,omal
       integer epmin
       logical first
-c     
+c
 c     statement function
       prW(s16)=cone/dcmplx(s16-wmass**2,zip)
 c     end statement function
@@ -31,10 +31,10 @@ c     end statement function
       p25(:)=p(2,:)+p(5,:)
       s16=p16(4)**2-p16(1)**2-p16(2)**2-p16(3)**2
       s25=p25(4)**2-p25(1)**2-p25(2)**2-p25(3)**2
-       
+
       call doBtensor(p5,0d0,mtsq,FB0x5,FB1x5,
      &  FB2x5,FB3x5,FB4x5,FB5x5,FB6x5)
-       
+
       call doCtensor(p1,p16,0d0,0d0,0d0,FC0x1x6,FC1x1x6,
      &  FC2x1x6,FC3x1x6,FC4x1x6,FC5x1x6,FC6x1x6)
       call doCtensor(p2,p25,0d0,0d0,mtsq,FC0x2x5,FC1x2x5,
@@ -47,7 +47,7 @@ c--- only compute poles for checking on first call
          epmin=-1
       endif
 c      write(*,*) 'epmin in middleh', epmin
-     
+
       do ep=epmin,0
       epbit=0d0
       if (ep .eq. 0) epbit=1d0
@@ -83,7 +83,7 @@ c      write(*,*) 'epmin in middleh', epmin
       bit=2.D0*prW(s16)*prW(s25)*J52x0*vec(p25,nu)*vec(p34,fi)*FC1x2x5(
      & nu,ep)*omal*mt*wmass**(-1) + prW(s16)*prW(s25)*J52x1(nu)*vec(p5,
      & nu)*vec(p34,fi)*FB0x5(ep)*omal*wmass**(-1) - prW(s16)*prW(s25)*
-     & J52x1(nu)*vec(p34,fi)*FC1x2x5(nu,ep)*omal*mtsq*wmass**(-1) + 
+     & J52x1(nu)*vec(p34,fi)*FC1x2x5(nu,ep)*omal*mtsq*wmass**(-1) +
      & prW(s16)*prW(s25)*J52x1(nu)*vec(p34,fi)*FB1x5(nu,ep)*omal*
      & wmass**(-1)
 

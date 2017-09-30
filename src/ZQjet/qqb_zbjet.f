@@ -5,7 +5,7 @@ c--- Matrix element squared averaged over initial colors and spins
 c     q(-p1)+qbar(-p2) --> Z + b(p5) + g(p6)
 c                          |
 c                          --> l(p3)+a(p4)
-c                            
+c
 c--- all momenta are incoming
 c--- Extended to include charm quark production via the variable "flav"
       include 'constants.f'
@@ -33,7 +33,7 @@ c      double complex b111,b112,b121,b211,b122,b212,b221,b222
       double complex qq_a(2,2,2),qq_b(2,2,2)
       double complex qR_a(2,2,2),qR_b(2,2,2)
       double complex qbRb_a(2,2,2),qbRb_b(2,2,2)
-      double complex qbqb_a(2,2,2),qbqb_b(2,2,2)      
+      double complex qbqb_a(2,2,2),qbqb_b(2,2,2)
       integer,parameter::swap(2)=(/2,1/),swap1(0:2)=(/0,2,1/)
 
 c--- initialize the matrix element squared
@@ -63,7 +63,7 @@ c--- and 2 gluons
       fac=v*xn/four*(esq*gsq)**2
       do pq=1,2
       do pl=1,2
-        do i=0,2        
+        do i=0,2
           gqZqg2_cs(i,pq,pl)  = aveqg*fac*gqZqg2_cs(i,pq,pl)
           qgZqg2_cs(i,pq,pl)  = aveqg*fac*qgZqg2_cs(i,pq,pl)
           gqbZqbg2_cs(i,pq,pl)= aveqg*fac*gqbZqbg2_cs(i,pq,pl)
@@ -71,9 +71,9 @@ c--- and 2 gluons
         enddo
 
         gqZqg2(pq,pl)  = gqZqg2_cs(1,pq,pl) +gqZqg2_cs(2,pq,pl)
-     .                  +gqZqg2_cs(0,pq,pl)  
+     .                  +gqZqg2_cs(0,pq,pl)
         qgZqg2(pq,pl)  = qgZqg2_cs(1,pq,pl)  +qgZqg2_cs(2,pq,pl)
-     .                  +qgZqg2_cs(0,pq,pl)  
+     .                  +qgZqg2_cs(0,pq,pl)
       enddo
       enddo
 
@@ -131,13 +131,13 @@ c instead of calling ampqqb_qqb(6,1,2,5,qbqb_a,qbqb_b)
       enddo
       enddo
       enddo
-             
+
 c--- qbR->qbR
       call ampqqb_qqb(6,1,5,2,qbR_a,qbR_b)
 c--- qbq->qbq
       call ampqqb_qqb(5,1,6,2,qbq_a,qbq_b)
 
-      faclo=4d0*V*gsq**2*esq**2*aveqq 
+      faclo=4d0*V*gsq**2*esq**2*aveqq
 
 c--- add up the various contributions
       do j=-nflav,nflav
@@ -358,7 +358,7 @@ c--- Qb-Q contribution
         msq_cs(1,j,k)=zip
         msq_cs(2,j,k)=
      .  +faclo*(abs(a111)**2+abs(a112)**2+abs(a221)**2+abs(a222)**2
-     .         +abs(a122)**2+abs(a212)**2+abs(a121)**2+abs(a211)**2)        
+     .         +abs(a122)**2+abs(a212)**2+abs(a121)**2+abs(a211)**2)
       endif
 
 c--- only the colour-ordered matrix elements are calculated above, so
@@ -371,8 +371,8 @@ c--- we have to calculate the total for "msq"
 
       return
       end
-          
-    
 
-      
-     
+
+
+
+

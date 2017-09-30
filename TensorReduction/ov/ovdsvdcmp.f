@@ -1,7 +1,7 @@
 C  (C) Copr. 1986-92 Numerical Recipes Software ]2w.1,r1..
 
 c--- modified by J. Campbell, 11/14/2012 to better handle comparison
-c--- of floating points using precision given by EPS 
+c--- of floating points using precision given by EPS
 c--- extended so that original matrix a is not destroyed
       SUBROUTINE ovdsvdcmp(ain,a,m,n,w,v)
       implicit none

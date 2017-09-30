@@ -2,7 +2,7 @@
 c---Matrix element squared averaged over initial colors and spins
 c     q(-p1)+qbar(-p2) -->  q'(p4)+bar{q'}(p5) + n(p6)+ebar(p7)+ g(p3)
 c   for the moment --- radiation only from initial line
-      implicit none 
+      implicit none
       include 'constants.f'
       include 'qcdcouple.f'
       include 'masses.f'
@@ -48,18 +48,18 @@ C-set Uncrossed array to zero
       v56(2)=r2
       q56=q2
 
-C----setup factor to avoid summing over too many neutrinos 
+C----setup factor to avoid summing over too many neutrinos
 C----if coupling enters twice
       if (q34 .eq. 0d0) then
       rescale1=1d0/sqrt(3d0)
       else
       rescale1=1d0
       endif
-      if (q56 .eq. 0d0) then   
-      rescale2=1d0/sqrt(3d0)    
-      else 
-      rescale2=1d0    
-      endif          
+      if (q56 .eq. 0d0) then
+      rescale2=1d0/sqrt(3d0)
+      else
+      rescale2=1d0
+      endif
 
 c--   s returned from sprodx (common block) is 2*dot product
       call spinoru(7,p,za,zb)
@@ -111,7 +111,7 @@ c     vsymfact=symmetry factor
       endif
 
       if (jk .eq. 0) goto 19
-       
+
       do hq=1,2
       do h34=1,2
       do h56=1,2
@@ -267,16 +267,16 @@ c---case g-q
 
       amp=amp*fac
 
-c      msq(j,k)=msq(j,k)+fac1*ave*abs(amp)**2      
+c      msq(j,k)=msq(j,k)+fac1*ave*abs(amp)**2
 c      !set-up interference terms
 c      if ((interference).and.(ii.eq.1)) then
-c      Uncrossed(j,k,hq,h34,h56,hg)=amp  
-c      elseif (ii.eq.2) then    
+c      Uncrossed(j,k,hq,h34,h56,hg)=amp
+c      elseif (ii.eq.2) then
 c      if (h34.eq.h56) then
-c      msq(j,k)=msq(j,k)     
+c      msq(j,k)=msq(j,k)
 c     &    -fac1*2d0*ave*dble(dconjg(amp)*Uncrossed(j,k,hq,h34,h56,hg))
-c      endif   
-c      endif      
+c      endif
+c      endif
 
 
       if (interference .eqv. .false.) then
@@ -304,14 +304,14 @@ c---    2nd pass --> fill msq
           endif
         endif
       endif
-   
+
       enddo  ! endloop hg
       enddo  ! endloop h56
       enddo  ! endloop h34
       enddo  ! endloop hq
-      
-   
-   
+
+
+
    19 continue
       enddo  !endloop j
       enddo  !endloop k
@@ -332,8 +332,8 @@ C---extend to full flavour range
       return
       end
 
-      
-      
+
+
 
 
 

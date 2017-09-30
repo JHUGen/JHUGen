@@ -6,7 +6,7 @@ C---- taken from arXiv:1101.5947 [hep-ph], Eq. (101)
       include 'zprods_decl.f'
       include 'zabprods_decl.f'
       integer e1,p2,p3,e4
- 
+
       A1Hggppmp=czip
       return
       end

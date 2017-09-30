@@ -13,7 +13,7 @@
 *		cdb0p	(complex) cp*dB0/dxp				*
 *		ier	(integer) # of digits lost, if >=100: error	*
 *									*
-***#]*comment:*********************************************************** 
+***#]*comment:***********************************************************
 *  #[ declarations:
 	implicit none
 *
@@ -37,7 +37,7 @@
 *
 	absc(cc) = abs(DBLE(cc)) + abs(DIMAG(cc))
 *
-*  #] declarations: 
+*  #] declarations:
 *  #[ check input:
 	if ( lwrite ) then
 	    print *,'ffcdb0: input:'
@@ -65,7 +65,7 @@
 	    call ffxdb0(cdb0,cdb0p,xp,xma,xmb,ier)
 	    return
 	endif
-*  #] check input: 
+*  #] check input:
 *  #[ get differences:
 	ier0 = 0
 	cmamb = cma - cmb
@@ -79,15 +79,15 @@
 	    if ( absc(cmbp) .lt. xloss*absc(cp) .and. cp .ne. cmb )
      +		call ffwarn(96,ier0,absc(cmbp),absc(cp))
 	endif
-*  #] get differences: 
+*  #] get differences:
 *  #[ calculations:
 	call ffcdbp(cdb0,cdb0p,cp,cma,cmb,cmap,cmbp,cmamb,ier)
 	if ( lwrite ) then
 	    print *,'   B0'' = ',cdb0,ier
 	    print *,'cp*B0'' = ',cdb0p,ier
 	endif
-*  #] calculations: 
-*###] ffcdb0: 
+*  #] calculations:
+*###] ffcdb0:
 	end
 *###[ ffcdbp:
 	subroutine ffcdbp(cdb0,cdb0p,cp,cma,cmb,cmap,cmbp,cmamb,ier)
@@ -105,7 +105,7 @@
 *		cdb0p	(complex) cp*B0'				*
 *		ier	(integer) 0=ok,>0=numerical problems,>100=error	*
 *									*
-***#]*comment:*********************************************************** 
+***#]*comment:***********************************************************
 *  #[ declarations:
 	implicit none
 *
@@ -163,7 +163,7 @@
 *	statement function
 *
 	absc(cc) = abs(DBLE(cc)) + abs(DIMAG(cc))
-*  #] declarations: 
+*  #] declarations:
 *  #[ check input:
 	if (ltest) then
 	    xcheck = cma - cmb - cmamb
@@ -182,7 +182,7 @@
 		print *,'ffcdbp: input not OK, cmbp <> cmb - cp',xcheck
 	    endif
 	endif
-*  #] check input: 
+*  #] check input:
 *  #[ the real cases:
 *
 	if ( DIMAG(cma) .eq. 0 .and. DIMAG(cmb) .eq. 0 ) then
@@ -250,7 +250,7 @@
 	    return
 	endif
 *
-*  #] the real cases: 
+*  #] the real cases:
 *  #[ which case:
 *
 *	sort according to the type of masscombination encountered:
@@ -287,13 +287,13 @@
 		cdm2p = cmbp
 	endif
 	goto 400
-*  #] which case: 
+*  #] which case:
 *  #[ both masses equal to zero:
   100	continue
 	if ( cp.ne.0 ) cdb0 = -1/cp
 	cdb0p = -1
 	return
-*  #] both masses equal to zero: 
+*  #] both masses equal to zero:
 *  #[ one mass equal to zero:
   200	continue
 *
@@ -367,7 +367,7 @@
 		print *,'cdb0p = ',cdb0p
 		print *,'verg    ',-1 - cm/cp*zfflo1(cx,ier),1
 	    endif
-* 	#] Taylor expansion: 
+* 	#] Taylor expansion:
 	else
 * 	#[ short formula:
 	    s = log(cdmp/cm)
@@ -375,11 +375,11 @@
 	    if ( lwarn .and. absc(cdb0p).lt.xloss ) then
 		call ffwarn(13,ier,absc(cdb0p),x1)
 	    endif
-* 	#] short formula: 
+* 	#] short formula:
 	endif
 	cdb0 = cdb0p/cp
 	goto 990
-*  #] one mass equal to zero: 
+*  #] one mass equal to zero:
 *  #[ both masses equal:
   300	continue
 *
@@ -414,7 +414,7 @@
 		bdeq17 = ffbndc(1,17,xpneq)
 		bdeq25 = ffbndc(1,25,xpneq)
 	    endif
-*--#]	    data and bounds: 
+*--#]	    data and bounds:
 	    cx = -cp/cm
 	    ax = absc(cx)
 	    if ( lwarn .and. ax .gt. bdeq25 ) then
@@ -451,7 +451,7 @@
 		cdb0 = xpneq(1)/cm
 	    endif
 	    goto 990
-* -#]	    taylor expansion: 
+* -#]	    taylor expansion:
 	endif
 * -#[	normal case:
 *
@@ -504,9 +504,9 @@
 	if ( lwarn .and. absc(cdb0p).lt.xloss )
      +		call ffwarn(233,ier,absc(cdb0),x1)
 	goto 990
-* -#]	normal case: 
+* -#]	normal case:
 *
-*  #] both masses equal: 
+*  #] both masses equal:
 *  #[ unequal nonzero masses:
   400	continue
 * -#[	get log(cm2/cm1):
@@ -520,7 +520,7 @@
 	else
 	    xlogmm = log(cx)
 	endif
-* -#]	get log(cm2/cm1): 
+* -#]	get log(cm2/cm1):
 * -#[	cp = 0:
 *
 *	first a special case
@@ -549,7 +549,7 @@
 	    cdb0p = 0
 	    goto 990
 	endif
-* -#]	cp = 0: 
+* -#]	cp = 0:
 * -#[	normal case:
 *
 *	proceeding with the normal case
@@ -613,7 +613,7 @@
 	if (lwrite) then
 	    print *,'ffcdbp: first try, cdb0p = ',cdb0p,s1,s2,-1
 	endif
-*--#]	first try: 
+*--#]	first try:
 	if ( absc(cdb0p) .lt. xloss**2*max(absc(s1),absc(s2)) ) then
 *--#[		second try:
 *		this is unacceptable, try a better solution
@@ -656,7 +656,7 @@
 		if (lwrite) then
 		    print *,'ffcdbp: 2nd try, cdb0p  = ',cdb0p,s1,s2,-1
 		endif
-*--#]		second try: 
+*--#]		second try:
 		if ( absc(cdb0p) .lt. xloss**2*max(absc(s1),absc(s2)) )
      +			then
 *--#[		    third try:
@@ -713,7 +713,7 @@
 			print *,'     s1 - alph1 = ',s1-alph1
 			print *,'     s2 - alpha = ',s2-alpha
 		    endif
-*		#] split up 1: 
+*		#] split up 1:
 *		#[ s2:
 *
 *		    first s2:
@@ -732,7 +732,7 @@
 			    bdn515 = ffbnd(3,15,xinfac)
 			    precx = prcsav
 			endif
-* -#]			bounds: 
+* -#]			bounds:
 			cx = beta*cp
 			ax = absc(cx)
 			if ( lwarn .and. ax .gt. bdn515 ) then
@@ -768,7 +768,7 @@
 			    print *,'	     gives s2p = ',s2p
 			endif
 		    endif
-*		#] s2: 
+*		#] s2:
 *		#[ s1:
 *
 *		    next s1:
@@ -787,7 +787,7 @@
 			    bdn315 = ffbnd(3,15,xinfac)
 			    precx = prcsav
 			endif
-* -#]			bounds: 
+* -#]			bounds:
 *
 			cx = slam*(diff-slam*cm1m2)*alph1/(2*cp*cm1*cm2)
 			ax = absc(cx)
@@ -858,7 +858,7 @@
      +				*exp(cx))
 			endif
 		    endif
-*		#] s1: 
+*		#] s1:
 *
 *		    finally ...
 *
@@ -867,19 +867,19 @@
      +				then
 			call ffwarn(240,ier,absc(cdb0p),absc(s1p))
 		    endif
-*--#]		    third try: 
+*--#]		    third try:
 		endif
 	endif
 	cdb0 = cdb0p*(1/DBLE(cp))
 	goto 990
-* -#]	normal case: 
-*  #] unequal nonzero masses: 
+* -#]	normal case:
+*  #] unequal nonzero masses:
 *  #[ debug:
   990	continue
 	if (lwrite) then
 	    print *,'cdb0   = ',cdb0
 	    print *,'cdb0p  = ',cdb0p
 	endif
-*  #] debug: 
-*###] ffcdbp: 
+*  #] debug:
+*###] ffcdbp:
 	end

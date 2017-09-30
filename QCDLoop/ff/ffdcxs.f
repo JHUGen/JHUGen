@@ -777,7 +777,7 @@ c
 	    print 1000,cs1-cs2+ipitot*DBLE(pi12),max(xm1,xm2)
 	endif
 *  #] debug:
-*###] ffdcs: 
+*###] ffdcs:
 	end
 *###[ ffclg2:
 	subroutine ffclg2(cs3,ipi12,cy3,cz3,cdyz3,cy4,cz4,cdyz4,cdyyzz,
@@ -930,5 +930,5 @@ c
      +		ier
 	endif
 *  #] debug:
-*###] ffclg2: 
+*###] ffclg2:
 	end

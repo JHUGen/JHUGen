@@ -62,7 +62,7 @@
 
 *
 *	statement function
-*	
+*
 	absc(cc) = abs(DBLE(cc)) + abs(DIMAG(cc))
 *
 *  #] declarations:
@@ -219,11 +219,11 @@
 	DOUBLE COMPLEX cd0,cd1(3),cd2(7),cd3(13),cd4(22)
 *
 *	local vars
-*	
+*
 	integer i,j
 *
 *	common
-*	
+*
 	include 'ff.h'
 *
 *  #] declarations:

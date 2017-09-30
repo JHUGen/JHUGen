@@ -88,6 +88,6 @@ c---set msq=0 to initialize
       msq(-1,-3) = mqbb(2)           ! dbar sbar initial state
       msq(-3,-1) = mqbb(2)           ! sbar dbar initial state
       msq(-3,-3) = mqbb(1)*(1d0/2d0) ! sbar sbar initial state
-      
+
       return
       end

@@ -65,7 +65,7 @@ c--- q-g amplitudes
       mtotgqb(hb,hg,h2,hc)=czip
 
       if (nwz .eq. +1) then
-      
+
       do ht=1,2
       mtotqg(hb,hg,h2,hc)=mtotqg(hb,hg,h2,hc)
      & +mtop(hb,hg,ht)*mqg(ht,h2,hc)
@@ -76,9 +76,9 @@ c--- q-g amplitudes
       mtotgqb(hb,hg,h2,hc)=mtotgqb(hb,hg,h2,hc)
      & +mtop(hb,hg,ht)*mgqb(ht,h2,hc)
       enddo
-      
+
       else
-      
+
       do ha=1,2
       mtotqg(hb,hg,h2,hc)=mtotqg(hb,hg,h2,hc)
      & +mqg(hb,h2,ha)*manti(ha,hg,hc)
@@ -91,7 +91,7 @@ c--- q-g amplitudes
       enddo
 
       endif
-      
+
       enddo
       enddo
       enddo

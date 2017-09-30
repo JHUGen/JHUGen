@@ -128,12 +128,12 @@ c--- Implementation of Baur-Zeppenfeld treatment of Z width
       Amp(j,1,t16) = Amp(j,1,t16) + izb(p1,p7)*izb(p6,p7)*prWs167*
      & prWs13467*s34**(-1)*facdLl * (  - za(k5,p3)*zb(p1,p3)*zb(p2,p4)*
      &    zab2(p3,p6,p7,p1) - za(k5,p3)*zb(p1,p4)*zb(p2,p4)*zab2(p4,p6,
-     &    p7,p1) - zb(p1,p2)*zab2(k5,p6,p7,p1)*zab3(p3,p1,p6,p7,p4) + 
+     &    p7,p1) - zb(p1,p2)*zab2(k5,p6,p7,p1)*zab3(p3,p1,p6,p7,p4) +
      &    zb(p1,p4)*zab2(p3,p6,p7,p1)*zab3(k5,p1,p6,p7,p2) )
       Amp(j,1,t16) = Amp(j,1,t16) + izb(p1,p7)*izb(p6,p7)*prWs167*
      & prWs13467*s34**(-1)*facuLl * ( za(k5,p3)*zb(p1,p3)*zb(p2,p4)*
      &    zab2(p3,p6,p7,p1) + za(k5,p3)*zb(p1,p4)*zb(p2,p4)*zab2(p4,p6,
-     &    p7,p1) + zb(p1,p2)*zab2(k5,p6,p7,p1)*zab3(p3,p1,p6,p7,p4) - 
+     &    p7,p1) + zb(p1,p2)*zab2(k5,p6,p7,p1)*zab3(p3,p1,p6,p7,p4) -
      &    zb(p1,p4)*zab2(p3,p6,p7,p1)*zab3(k5,p1,p6,p7,p2) )
       Amp(j,1,t16) = Amp(j,1,t16) + izb(p1,p7)*izb(p6,p7)*izb(e5,k5)*mt
      & *mton2mwsq*prWs167*prWs13467*facdLl * ( zb(p1,p4)*zb(p2,e5)*

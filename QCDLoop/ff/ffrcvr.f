@@ -6,7 +6,7 @@
 	data nold /0/
 	data ncall /0/
 !$omp threadprivate(nold,ncall)
-	
+
 	if ( isig .ne. 8 ) then
 		print *,'ffrcvr: Somebody shot a signal ',isig,' at me'
 		stop
@@ -27,5 +27,5 @@
 	ner = ner + 100
 	ier = 0
 	call fferr(100,ier)
-*###] ffrcvr: 
+*###] ffrcvr:
 	end

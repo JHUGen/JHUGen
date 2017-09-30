@@ -6,7 +6,7 @@ C----Implementation of DD Eq. 4.11
       double complex xm1,x,cln,cone
       double precision iep
       parameter(cone=(1d0,0d0),infty=16) ! number of terms in sum
-      
+
       xm1=x-cone
       if (abs(x) .lt. 10d0) then
         if (abs(x-cone) .lt. onshellcutoff) then
@@ -23,6 +23,6 @@ C----Implementation of DD Eq. 4.11
           pvfndd=pvfndd+x**(n-j)/dfloat(j+1)
         enddo
       endif
-           
+
       return
       end

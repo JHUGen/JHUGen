@@ -39,8 +39,8 @@ c      include 'APPLinclude.f'
       call banner
       call reader_input(inputfile,workdir)
 
-      first_time = .true. 
-      
+      first_time = .true.
+
       if (verbose) then
       write(6,*)
       write(6,*) '****************************************'
@@ -51,7 +51,7 @@ c      include 'APPLinclude.f'
 
 * Counter-terms for radiation in top decay should be included
       includect=.true.
-      
+
 * Set-up incoming beams and PS integration cut-offs
 c--- Note: version 6.4 onwards, scale cutoff with c.o.m. energy
       cutoff=cutoff*(sqrts/2000d0)**2
@@ -77,21 +77,21 @@ c--- Note: version 6.4 onwards, scale cutoff with c.o.m. energy
 * Setup for histograms with irregular bins
       nirreg=0
       irregbin= (/ (.false.,j=1,maxhisto) /)
-                 
+
 * npart=9 is a dummy value, to ensure that all histograms are included
       npart=9
-      val=1d-15   
+      val=1d-15
       call nplotter(p,val,val**2,1)
-       
+
       do j=1,mxpart
       do k=1,4
       p(j,k)=0d0
       enddo
-      enddo 
+      enddo
 
 * Initialize flag for photon fragmentation dipoles
       phot_dip(:)=.false.
-      fragint_mode=.false. 
+      fragint_mode=.false.
 * Initialize integer used in TensorReduction to zero
       TRtensorcontrol=0
 
@@ -100,4 +100,4 @@ c--- Note: version 6.4 onwards, scale cutoff with c.o.m. energy
 
       return
       end
-            
+

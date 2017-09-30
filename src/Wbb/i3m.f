@@ -1,5 +1,5 @@
       double complex function I3m(s1,s2,s3)
-C     This is the function I3m, a massless triangle with all three external 
+C     This is the function I3m, a massless triangle with all three external
 C     lines offshell defined in BDK
 C     %\cite{Bern:1997sc}
 C     \bibitem{Bern:1997sc}
@@ -19,7 +19,7 @@ C     \int da_1 da_2 da_3 /(-a_1*a_2*s1-a_2*a_3*s2-a_3*a_1*s3)
       smax=max(s1,s2,s3)
       smin=min(s1,s2,s3)
       smid=s1+s2+s3-smax-smin
-      del3=s1**2+s2**2+s3**2-two*(s1*s2+s2*s3+s3*s1)      
+      del3=s1**2+s2**2+s3**2-two*(s1*s2+s2*s3+s3*s1)
 
       if (del3 .gt. 0) then
       rtdel3=sqrt(del3)
@@ -40,19 +40,19 @@ c---case two positive and one negative
              flag=-1d0
              i3m=-i3m1b(-smax,-smid,-smin,rtdel3,flag)
          endif
-      elseif (del3 .lt. 0) then 
+      elseif (del3 .lt. 0) then
       rtdel3=sqrt(-del3)
          if (smax .lt. 0) then
 c---case all negative
              i3m=+dcmplx(i3m1a(+s1,+s2,+s3,rtdel3))
          elseif (smin .gt. 0) then
 c---case all positive
-             i3m=-dcmplx(i3m1a(-s1,-s2,-s3,rtdel3))  
+             i3m=-dcmplx(i3m1a(-s1,-s2,-s3,rtdel3))
           endif
       endif
 
       return
-      end     
+      end
 
 
       double precision function I3m1a(s1,s2,s3,rtmdel)
@@ -70,7 +70,7 @@ c     SLAC-PUB-5809
       d1=s1-s2-s3
       d2=s2-s3-s1
       d3=s3-s1-s2
-      
+
       arg1=two*datan(rtmdel/d1)
       arg2=two*datan(rtmdel/d2)
       arg3=two*datan(rtmdel/d3)
@@ -78,7 +78,7 @@ c     SLAC-PUB-5809
 
       end
 
-      
+
       double complex function I3m1b(s1,s2,s3,rtdel,flag)
       implicit none
 C     form of Ussyukina and Davydychev

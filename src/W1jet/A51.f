@@ -9,7 +9,7 @@
       double complex Vcc,Fcc,Vsc,Fsc,l12,l23,L0,L1,Lsm1,A5lom
       double complex lnrat
 
-C    -i * A5tree  
+C    -i * A5tree
       A5lom =-za(j3,j4)**2/(za(j1,j2)*za(j2,j3)*za(j4,j5))
       l12=lnrat(musq,-s(j1,j2))
       l23=lnrat(musq,-s(j2,j3))
@@ -18,7 +18,7 @@ C--leading N
       Vcc=
      . -(epinv**2+epinv*l12+0.5d0*l12**2)
      . -(epinv**2+epinv*l23+0.5d0*l23**2)
-     . -2d0*(epinv+l23)-4d0      
+     . -2d0*(epinv+l23)-4d0
 
       Fcc=za(j3,j4)**2/(za(j1,j2)*za(j2,j3)*za(j4,j5))
      . *(Lsm1(-s(j1,j2),-s(j4,j5),-s(j2,j3),-s(j4,j5))
@@ -33,5 +33,5 @@ C--leading N
 
       A51=(Vcc+Vsc)*A5Lom+Fcc+Fsc
 
-      return  
+      return
       end

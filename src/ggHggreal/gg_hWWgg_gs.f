@@ -11,7 +11,7 @@
 *                     ->  W^+ (nu(p3)+e^+(p4))+W^- (e^-(p5)+nubar(p6)) *
 *                                                                      *
 ************************************************************************
-      implicit none 
+      implicit none
       include 'constants.f'
       include 'ptilde.f'
       include 'msq_struc.f'
@@ -22,12 +22,12 @@
       integer j,k,m,n,nd,i5,i6,i7
       double precision p(mxpart,4),msq(maxd,-nf:nf,-nf:nf),nfactor,
      . sub2q3g_ii,sub2q3g_iffi,sub2q3g_if,sub2q3g_fi,sub2q3g_ff,
-     . msq_ab,msq_ba,msq_sym,msqv_ab,msqv_ba,msqv_sym,subgg,subqq,subv 
+     . msq_ab,msq_ba,msq_sym,msqv_ab,msqv_ba,msqv_sym,subgg,subqq,subv
       parameter(i7=9,i6=8,i5=7)
       external gg_hWWgg,gg_hWWgg_gvec
 
 c--- statement functions for 2q3g subtraction terms, with labelling
-c--- for g(-p1)+g(-p2) -> H(p3+p4)+q(p5)+qbar(p6)+g(p7)     
+c--- for g(-p1)+g(-p2) -> H(p3+p4)+q(p5)+qbar(p6)+g(p7)
 
 c--- _ii : appropriate for initial-initial dipoles (17_2, 27_1)
       sub2q3g_ii(msq_ab,msq_ba,subgg,msqv_ab,msqv_ba,subv)=
@@ -66,37 +66,37 @@ c--- calculate all the initial-initial dipoles
       call extract(msq_struc27_1,msq_struc27_1v)
 c--- now the basic initial final ones
       call dips( 7,p,1,i7,i5,sub17_5,sub17_5v,msq17_5,msq17_5v,
-     . gg_hWWgg,gg_hWWgg_gvec)     
+     . gg_hWWgg,gg_hWWgg_gvec)
       call extract(msq_struc17_5,msq_struc17_5v)
       call dips( 8,p,2,i7,i6,sub27_6,sub27_6v,msq27_6,msq27_6v,
-     . gg_hWWgg,gg_hWWgg_gvec)     
+     . gg_hWWgg,gg_hWWgg_gvec)
       call extract(msq_struc27_6,msq_struc27_6v)
       call dips( 9,p,1,i7,i6,sub17_6,sub17_6v,msq17_6,msq17_6v,
-     . gg_hWWgg,gg_hWWgg_gvec)     
+     . gg_hWWgg,gg_hWWgg_gvec)
       call extract(msq_struc17_6,msq_struc17_6v)
       call dips(10,p,2,i7,i5,sub27_5,sub27_5v,msq27_5,msq27_5v,
-     . gg_hWWgg,gg_hWWgg_gvec)     
+     . gg_hWWgg,gg_hWWgg_gvec)
       call extract(msq_struc27_5,msq_struc27_5v)
 c--- called for final initial the routine only supplies new values for
 c--- sub... and sub...v and msqv
       call dips( 7,p,i5,i7,1,sub57_1,sub57_1v,dummy,msq57_1v,
-     . gg_hWWgg,gg_hWWgg_gvec)     
+     . gg_hWWgg,gg_hWWgg_gvec)
       call extract(msq_struc57_1,msq_struc57_1v)
       call dips( 8,p,i6,i7,2,sub67_2,sub67_2v,dummy,msq67_2v,
-     . gg_hWWgg,gg_hWWgg_gvec)     
+     . gg_hWWgg,gg_hWWgg_gvec)
       call extract(msq_struc67_2,msq_struc67_2v)
       call dips( 9,p,i6,i7,1,sub67_1,sub67_1v,dummy,msq67_1v,
-     . gg_hWWgg,gg_hWWgg_gvec)     
+     . gg_hWWgg,gg_hWWgg_gvec)
       call extract(msq_struc67_1,msq_struc67_1v)
       call dips(10,p,i5,i7,2,sub57_2,sub57_2v,dummy,msq57_2v,
-     . gg_hWWgg,gg_hWWgg_gvec)     
+     . gg_hWWgg,gg_hWWgg_gvec)
       call extract(msq_struc57_2,msq_struc57_2v)
 c--- lastly, the final final terms
       call dips(19,p,i5,i7,i6,sub57_6,sub57_6v,msq57_6,msq57_6v,
-     . gg_hWWgg,gg_hWWgg_gvec)     
+     . gg_hWWgg,gg_hWWgg_gvec)
       call extract(msq_struc57_6,msq_struc57_6v)
       call dips(20,p,i6,i7,i5,sub67_5,sub67_5v,msq67_5,msq67_5v,
-     . gg_hWWgg,gg_hWWgg_gvec)     
+     . gg_hWWgg,gg_hWWgg_gvec)
       call extract(msq_struc67_5,msq_struc67_5v)
 
 ************************************************************************
@@ -111,37 +111,37 @@ c--- calculate all the initial-initial dipoles
       call extract(msq_struc26_1,msq_struc26_1v)
 c--- now the basic initial final ones
       call dips(11,p,1,i6,i5,sub16_5,sub16_5v,msq16_5,msq16_5v,
-     . gg_hWWgg,gg_hWWgg_gvec)     
+     . gg_hWWgg,gg_hWWgg_gvec)
       call extract(msq_struc16_5,msq_struc16_5v)
       call dips(12,p,2,i6,i7,sub26_7,sub26_7v,msq26_7,msq26_7v,
-     . gg_hWWgg,gg_hWWgg_gvec)     
+     . gg_hWWgg,gg_hWWgg_gvec)
       call extract(msq_struc26_7,msq_struc26_7v)
       call dips(13,p,1,i6,i7,sub16_7,sub16_7v,msq16_7,msq16_7v,
-     . gg_hWWgg,gg_hWWgg_gvec)     
+     . gg_hWWgg,gg_hWWgg_gvec)
       call extract(msq_struc16_7,msq_struc16_7v)
       call dips(14,p,2,i6,i5,sub26_5,sub26_5v,msq26_5,msq26_5v,
-     . gg_hWWgg,gg_hWWgg_gvec)     
+     . gg_hWWgg,gg_hWWgg_gvec)
       call extract(msq_struc26_5,msq_struc26_5v)
 c--- called for final initial the routine only supplies new values for
 c--- sub... and sub...v and msqv
       call dips(11,p,i5,i6,1,sub56_1,sub56_1v,dummy,msq56_1v,
-     . gg_hWWgg,gg_hWWgg_gvec)     
+     . gg_hWWgg,gg_hWWgg_gvec)
       call extract(msq_struc56_1,msq_struc56_1v)
       call dips(12,p,i7,i6,2,sub76_2,sub76_2v,dummy,msq76_2v,
-     . gg_hWWgg,gg_hWWgg_gvec)     
+     . gg_hWWgg,gg_hWWgg_gvec)
       call extract(msq_struc76_2,msq_struc76_2v)
       call dips(13,p,i7,i6,1,sub76_1,sub76_1v,dummy,msq76_1v,
-     . gg_hWWgg,gg_hWWgg_gvec)     
+     . gg_hWWgg,gg_hWWgg_gvec)
       call extract(msq_struc76_1,msq_struc76_1v)
       call dips(14,p,i5,i6,2,sub56_2,sub56_2v,dummy,msq56_2v,
-     . gg_hWWgg,gg_hWWgg_gvec)     
+     . gg_hWWgg,gg_hWWgg_gvec)
       call extract(msq_struc56_2,msq_struc56_2v)
 c--- lastly, the final final terms
       call dips(21,p,i5,i6,i7,sub56_7,sub56_7v,msq56_7,msq56_7v,
-     . gg_hWWgg,gg_hWWgg_gvec)     
+     . gg_hWWgg,gg_hWWgg_gvec)
       call extract(msq_struc56_7,msq_struc56_7v)
       call dips(22,p,i7,i6,i5,sub76_5,sub76_5v,msq76_5,msq76_5v,
-     . gg_hWWgg,gg_hWWgg_gvec)     
+     . gg_hWWgg,gg_hWWgg_gvec)
       call extract(msq_struc76_5,msq_struc76_5v)
 
 ************************************************************************
@@ -156,42 +156,42 @@ c--- calculate all the initial-initial dipoles
       call extract(msq_struc25_1,msq_struc25_1v)
 c--- now the basic initial final ones
       call dips(15,p,1,i5,i7,sub15_7,sub15_7v,msq15_7,msq15_7v,
-     . gg_hWWgg,gg_hWWgg_gvec)     
+     . gg_hWWgg,gg_hWWgg_gvec)
       call extract(msq_struc15_7,msq_struc15_7v)
       call dips(16,p,2,i5,i6,sub25_6,sub25_6v,msq25_6,msq25_6v,
-     . gg_hWWgg,gg_hWWgg_gvec)     
+     . gg_hWWgg,gg_hWWgg_gvec)
       call extract(msq_struc25_6,msq_struc25_6v)
       call dips(17,p,1,i5,i6,sub15_6,sub15_6v,msq15_6,msq15_6v,
-     . gg_hWWgg,gg_hWWgg_gvec)     
+     . gg_hWWgg,gg_hWWgg_gvec)
       call extract(msq_struc15_6,msq_struc15_6v)
       call dips(18,p,2,i5,i7,sub25_7,sub25_7v,msq25_7,msq25_7v,
-     . gg_hWWgg,gg_hWWgg_gvec)     
+     . gg_hWWgg,gg_hWWgg_gvec)
       call extract(msq_struc25_7,msq_struc25_7v)
 c--- called for final initial the routine only supplies new values for
 c--- sub... and sub...v and msqv
       call dips(15,p,i7,i5,1,sub75_1,sub75_1v,dummy,msq75_1v,
-     . gg_hWWgg,gg_hWWgg_gvec)     
+     . gg_hWWgg,gg_hWWgg_gvec)
       call extract(msq_struc75_1,msq_struc75_1v)
       call dips(16,p,i6,i5,2,sub65_2,sub65_2v,dummy,msq65_2v,
-     . gg_hWWgg,gg_hWWgg_gvec)     
+     . gg_hWWgg,gg_hWWgg_gvec)
       call extract(msq_struc65_2,msq_struc65_2v)
       call dips(17,p,i6,i5,1,sub65_1,sub65_1v,dummy,msq65_1v,
-     . gg_hWWgg,gg_hWWgg_gvec)     
+     . gg_hWWgg,gg_hWWgg_gvec)
       call extract(msq_struc65_1,msq_struc65_1v)
       call dips(18,p,i7,i5,2,sub75_2,sub75_2v,dummy,msq75_2v,
-     . gg_hWWgg,gg_hWWgg_gvec)     
+     . gg_hWWgg,gg_hWWgg_gvec)
       call extract(msq_struc75_2,msq_struc75_2v)
 c--- lastly, the final final terms
       call dips(23,p,i7,i5,i6,sub75_6,sub75_6v,msq75_6,msq75_6v,
-     . gg_hWWgg,gg_hWWgg_gvec)     
+     . gg_hWWgg,gg_hWWgg_gvec)
       call extract(msq_struc75_6,msq_struc75_6v)
       call dips(24,p,i6,i5,i7,sub65_7,sub65_7v,msq65_7,msq65_7v,
-     . gg_hWWgg,gg_hWWgg_gvec)     
+     . gg_hWWgg,gg_hWWgg_gvec)
       call extract(msq_struc65_7,msq_struc65_7v)
 
 
       do j=-nf,nf
-      do k=-nf,nf      
+      do k=-nf,nf
       do nd=1,ndmax
         msq(nd,j,k)=0d0
       enddo
@@ -230,13 +230,13 @@ c--- non-identical quark contribution
      .+(+msq_struc26_1(igg_ab,m,0)+msq_struc26_1(igg_ba,m,0)
      .  +msq_struc26_1(igg_sym,m,0))*sub26_1(gq)
      .+(+msq_struc26_1v(igg_ab,m,0)+msq_struc26_1v(igg_ba,m,0)
-     .  +msq_struc26_1v(igg_sym,m,0))*sub26_1v)     
+     .  +msq_struc26_1v(igg_sym,m,0))*sub26_1v)
       msq(5,j,k)=msq(5,j,k)+(aveqq/aveqg)*f4q*(
      .+(+msq_struc15_2(igg_ab,0,n)+msq_struc15_2(igg_ba,0,n)
      .  +msq_struc15_2(igg_sym,0,n))*sub15_2(gq)
      .+(+msq_struc15_2v(igg_ab,0,n)+msq_struc15_2v(igg_ba,0,n)
      .  +msq_struc15_2v(igg_sym,0,n))*sub15_2v)
-     
+
 c--- identical quark contribution
       else
       m=+1
@@ -288,9 +288,9 @@ c--- identical quark contribution
      .  +msq_struc16_2(igg_sym,0,n))*sub16_2(gq)
      .+(+msq_struc16_2v(igg_ab,0,n)+msq_struc16_2v(igg_ba,0,n)
      .  +msq_struc16_2v(igg_sym,0,n))*sub16_2v)
-    
+
       endif
-      
+
 ************************************************************************
 * SUBTRACTIONS FOR Q-QB and QB-Q                                       *
 ************************************************************************
@@ -312,7 +312,7 @@ c--- if flavours are not the same, 4q scattering contribution only
       msq(8,j,k)=-f4q/xn*msq27_6(m,n)*(sub27_6(qq)+sub67_2(qq))
       msq(9,j,k)=f4q*two/xn*msq17_6(m,n)*(sub17_6(qq)+sub67_1(qq))
       msq(10,j,k)=f4q*two/xn*msq27_5(m,n)*(sub27_5(qq)+sub57_2(qq))
-      
+
       m=j/abs(j)
       n=k/abs(k)
       msq(4,j,k)=msq(4,j,k)+(aveqq/aveqg)*f4q*(
@@ -325,7 +325,7 @@ c--- if flavours are not the same, 4q scattering contribution only
      .  +msq_struc15_2(igg_sym,0,n))*sub15_2(gq)
      .+(+msq_struc15_2v(igg_ab,0,n)+msq_struc15_2v(igg_ba,0,n)
      .  +msq_struc15_2v(igg_sym,0,n))*sub15_2v)
-     
+
       else
 **********************************
 * 4-quark identical contribution *
@@ -388,7 +388,7 @@ c--- if flavours are not the same, 4q scattering contribution only
      .  +msq_struc15_2(igg_sym,0,n))*sub15_2(gq)
      .+(+msq_struc15_2v(igg_ab,0,n)+msq_struc15_2v(igg_ba,0,n)
      .  +msq_struc15_2v(igg_sym,0,n))*sub15_2v)
-     
+
       msq(21,j,k)=msq(21,j,k)+2d0*dfloat(nflav)*f4q*(
      .+(msq_struc56_7(igg_ab,m,n)+msq_struc56_7(igg_ba,m,n)
      . +msq_struc56_7(igg_sym,m,n))*sub56_7(gq)
@@ -409,7 +409,7 @@ c--- in the final state
 * of 1/2 enter for 56, 57, 67  *
 * dipoles, as they enter twice *
 ********************************
-      
+
 **********************************
 * 2-quark contributions for p7   *
 **********************************
@@ -571,7 +571,7 @@ c--- LO, also switching _ab to _ba, but the answer would be the same
 * of one half enter for 67     *
 * dipoles, as they enter twice *
 ********************************
-      
+
 **********************************
 * 2-quark contributions for p7   *
 **********************************
@@ -685,7 +685,7 @@ c--- LO, also switching _ab to _ba, but the answer would be the same
 c--- this factor accounts for all the non-identical contributions
 c--- (nflav-1) and also the identical one with symmetry factor 1/2
       nfactor=dfloat(nflav-1)+half
-      
+
       m=+1
       msq(20,j,k)=msq(20,j,k)+nfactor*f4q*(
      .+(msq_struc67_5(igg_ab,m,0)
@@ -757,7 +757,7 @@ c--- (nflav-1) and also the identical one with symmetry factor 1/2
      . +msq_struc16_2(igg_sym,0,k))*sub16_2(gq)
      .+(msq_struc16_2v(igg_ab,0,k)+msq_struc16_2v(igg_ba,0,k)
      . +msq_struc16_2v(igg_sym,0,k))*sub16_2v)
-      
+
 ************************************************************************
 * SUBTRACTIONS FOR G-Q and G-QB                                        *
 ************************************************************************
@@ -775,7 +775,7 @@ c--- LO, also switching _ab to _ba, but the answer would be the same
 * of one half enter for 67     *
 * dipoles, as they enter twice *
 ********************************
-      
+
 **********************************
 * 2-quark contributions for p7   *
 **********************************
@@ -889,7 +889,7 @@ c--- LO, also switching _ab to _ba, but the answer would be the same
 c--- this factor accounts for all the non-identical contributions
 c--- (nflav-1) and also the identical one with symmetry factor 1/2
       nfactor=dfloat(nflav-1)+half
-      
+
       n=+1
       msq(20,j,k)=msq(20,j,k)+nfactor*f4q*(
      .+(msq_struc67_5(igg_ab,0,n)
@@ -974,8 +974,8 @@ c--- is artificially stored in msq_struc(iqr,0,0)
 * of 1/2 enter for 56, 57, 67  *
 * dipoles, as they enter twice *
 ********************************
-      
-      
+
+
 **********************************
 * 0-quark contributions for p7   *
 **********************************
@@ -989,7 +989,7 @@ c--- is artificially stored in msq_struc(iqr,0,0)
      .+msq_struc27_1v(igggg_a,j,k)*sub27_1v
      .+msq_struc27_1(igggg_c,j,k)*sub27_1(gg)
      .+msq_struc27_1v(igggg_c,j,k)*sub27_1v)
-     
+
       msq(7,j,k)=two*xn*(
      .+msq_struc17_5(igggg_b,j,k)*sub17_5(gg)
      .+msq_struc17_5v(igggg_b,j,k)*sub17_5v
@@ -1026,7 +1026,7 @@ c--- is artificially stored in msq_struc(iqr,0,0)
      .+msq_struc27_6v(igggg_c,j,k)*sub27_6v
      .+msq_struc27_6(igggg_c,j,k)*sub67_2(gg)*half
      .+msq_struc67_2v(igggg_c,j,k)*sub67_2v*half)
-     
+
       msq(19,j,k)=two*xn*(
      . msq_struc57_6(igggg_a,j,k)*sub57_6(gg)
      .+msq_struc57_6v(igggg_a,j,k)*sub57_6v
@@ -1051,7 +1051,7 @@ c--- is artificially stored in msq_struc(iqr,0,0)
      .+msq_struc26_1v(igggg_a,j,k)*sub26_1v
      .+msq_struc26_1(igggg_c,j,k)*sub26_1(gg)
      .+msq_struc26_1v(igggg_c,j,k)*sub26_1v)
-     
+
       msq(11,j,k)=two*xn*(
      .+msq_struc16_5(igggg_b,j,k)*sub16_5(gg)
      .+msq_struc16_5v(igggg_b,j,k)*sub16_5v
@@ -1089,7 +1089,7 @@ c--- is artificially stored in msq_struc(iqr,0,0)
      .+msq_struc26_7v(igggg_c,j,k)*sub26_7v
      .+msq_struc26_7(igggg_c,j,k)*sub76_2(gg)*half
      .+msq_struc76_2v(igggg_c,j,k)*sub76_2v*half)
-     
+
       msq(21,j,k)=two*xn*(
      . msq_struc56_7(igggg_a,j,k)*sub56_7(gg)
      .+msq_struc56_7v(igggg_a,j,k)*sub56_7v
@@ -1114,7 +1114,7 @@ c--- is artificially stored in msq_struc(iqr,0,0)
      .+msq_struc25_1v(igggg_a,j,k)*sub25_1v
      .+msq_struc25_1(igggg_c,j,k)*sub25_1(gg)
      .+msq_struc25_1v(igggg_c,j,k)*sub25_1v)
-     
+
       msq(15,j,k)=two*xn*(
      .+msq_struc15_7(igggg_b,j,k)*sub15_7(gg)
      .+msq_struc15_7v(igggg_b,j,k)*sub15_7v
@@ -1151,7 +1151,7 @@ c--- is artificially stored in msq_struc(iqr,0,0)
      .+msq_struc25_6v(igggg_a,j,k)*sub25_6v
      .+msq_struc25_6(igggg_a,j,k)*sub65_2(gg)*half
      .+msq_struc65_2v(igggg_a,j,k)*sub65_2v*half)
-     
+
       msq(23,j,k)=two*xn*(
      . msq_struc75_6(igggg_a,j,k)*sub75_6(gg)
      .+msq_struc75_6v(igggg_a,j,k)*sub75_6v
@@ -1236,7 +1236,7 @@ c--- f0q subtractions above
      . +msq_struc15_2(igg_sym,-1,k))*sub15_2(qg)
 
       endif
-      
+
       enddo
       enddo
 

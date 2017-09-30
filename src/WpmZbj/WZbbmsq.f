@@ -20,7 +20,7 @@ C     Author:R.K.Ellis, February 2013
 C     statement functions
       s4(p1,p2,p3,p4)=s(p1,p2)+s(p1,p3)+s(p1,p4)
      &               +s(p2,p3)+s(p2,p4)+s(p3,p4)
-C     end statement functions 
+C     end statement functions
 
 C     First index of d123 etc is helicity of Z (56) decay line
 C     Second index of d123 etc is helicity of (78) bbar-line
@@ -61,7 +61,7 @@ C     Second index of d123 etc is helicity of (78) bbar-line
       d12(2,2)=TWZbbnr2(p1,p2,p3,p4,p6,p5,p8,p7)
 
 
-C     For u->dW^+ process Z is emitted after W for 123 
+C     For u->dW^+ process Z is emitted after W for 123
 C      and before W for 456
       if (nwz .eq. 1) then
       ju=2
@@ -97,7 +97,7 @@ C     Second index of d123 etc is helicity of (78) bbar-line
      &  +0.5d0/xw*d13(1,1)*prop3456)*prop34
      &  +(q4*qe+l4*le*prop56)*d11(1,1)*prop3456
      &  +(q3*qe+l3*le*prop56)*d12(1,1)*prop3456
-     &  
+     &
       amp(2,1)=
      &  ((Q(jd)*qe+L(jd)*re*prop56)*d123(2,1)
      &  +(Q(ju)*qe+L(ju)*re*prop56)*d456(2,1)

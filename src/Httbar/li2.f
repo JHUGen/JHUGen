@@ -5,7 +5,7 @@ c--complex dilogarithm (spence-function)
       double complex x,y,cli2
       double precision zeta2,zeta3
       common/const/zeta2,zeta3
-      
+
       if (first) then
       first=.false.
       call bernini
@@ -46,12 +46,12 @@ c--complex dilogarithm (spence-function)
         return
       endif
       end
- 
+
       double complex function cli2(x)
 c--taylor-expansion for complex dilogarithm (spence-function)
       implicit double precision (a-h,o-z)
       parameter(nber=18)
-      double precision b2(nber) 
+      double precision b2(nber)
       double complex x,z
       common/bernoulli/b2
 
@@ -64,7 +64,7 @@ c--taylor-expansion for complex dilogarithm (spence-function)
       cli2=z**2*cli2+z
       return
       end
- 
+
       double precision function facult(n)
 c--double precision version of faculty
       implicit double precision (a-h,o-z)
@@ -75,7 +75,7 @@ c--double precision version of faculty
 999   continue
       return
       end
- 
+
       subroutine bernini
 c--initialization of coefficients for polylogarithms
       implicit none
@@ -85,8 +85,8 @@ c--initialization of coefficients for polylogarithms
       double precision b(nber),b2(nber),zeta2,zeta3,facult
       common/bernoulli/b2
       common/const/zeta2,zeta3
- 
- 
+
+
       b(1)=-1.d0/2.d0
       b(2)=1.d0/6.d0
       b(3)=0.d0
@@ -107,11 +107,11 @@ c--initialization of coefficients for polylogarithms
       b(18)=43867.d0/798.d0
       zeta2=pi**2/6.d0
       zeta3=1.202056903159594d0
- 
+
       do 995 i=1,nber
         b2(i)=b(i)/facult(i+1)
 995   continue
- 
+
       return
       end
- 
+

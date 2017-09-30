@@ -7,9 +7,9 @@ c---Matrix element SUBTRACTION squared averaged over initial colors and spins
 c     q(-p1)+qbar(-p2) -->  b(p5)+bb(p6) + W +g(p7)
 c                                          |
 c                                          --> nu(p3)+e^+(p4)
-c                            
+c
 c   positively charged W only
-c--all momenta incoming so some of the signs may look odd. 
+c--all momenta incoming so some of the signs may look odd.
 c--initial state gluons coupling to b not included
       implicit none
       include 'constants.f'
@@ -18,9 +18,9 @@ c--initial state gluons coupling to b not included
       include 'masses.f'
       integer j,k,nd
 c --- remember: nd will count the dipoles
-      
+
       double precision p(mxpart,4),msq(maxd,-nf:nf,-nf:nf),dot
-      double precision 
+      double precision
      & msq17_2(-nf:nf,-nf:nf),msq27_1(-nf:nf,-nf:nf),
      & msq57_6(-nf:nf,-nf:nf),msq67_5(-nf:nf,-nf:nf),
      & msq17_5(-nf:nf,-nf:nf),
@@ -44,9 +44,9 @@ c --- remember: nd will count the dipoles
       enddo
 
       if (
-     .      (two*dot(p,5,6) .lt. four*mbsq) 
-     . .or. (two*dot(p,1,5)*dot(p,2,5)/dot(p,1,2) .lt. mbsq) 
-     . .or. (two*dot(p,1,6)*dot(p,2,6)/dot(p,1,2) .lt. mbsq))return 
+     .      (two*dot(p,5,6) .lt. four*mbsq)
+     . .or. (two*dot(p,1,5)*dot(p,2,5)/dot(p,1,2) .lt. mbsq)
+     . .or. (two*dot(p,1,6)*dot(p,2,6)/dot(p,1,2) .lt. mbsq))return
 
 c--- calculate all the initial-initial dipoles
       call dips(1,p,1,7,2,sub17_2,dsubv,msq17_2,dummyv,
@@ -82,7 +82,7 @@ c--- sub..
 
       do j=-(nf-1),(nf-1)
       do k=-(nf-1),(nf-1)
-      
+
       if ((j.gt.0).and.(k.lt.0)) then
 c----------q-qb
 
@@ -127,7 +127,7 @@ c---------g-qbar
           msq(1,j,k)=sub17_2(qg)
      &    *(msq17_2(+1,k)+msq17_2(+2,k)+msq17_2(+3,k)+msq17_2(+4,k)
      .    +msq17_2(+5,k))
-          endif 
+          endif
       elseif (k.eq.0) then
           if (j.gt.0) then
 c---------q-g
@@ -139,7 +139,7 @@ c---------qbar-g
           msq(2,j,k)=sub27_1(qg)
      &    *(msq27_1(j,+1)+msq27_1(j,+2)+msq27_1(j,+3)+msq27_1(j,+4)
      .     +msq27_1(j,+5))
-          endif 
+          endif
       endif
 
       enddo

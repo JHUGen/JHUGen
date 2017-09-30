@@ -12,7 +12,7 @@ c---Matrix element squared averaged over initial colors and spins
 c     parton(-p1)+parton(-p2) --> H(p)+parton(p5)+parton(p6)
 c                                  |
 c                                   --> b(p3)+bb(p4)
-c  via coupling to b                          
+c  via coupling to b
 c--all momenta incoming
       include 'constants.f'
       include 'masses.f'
@@ -31,7 +31,7 @@ c--all momenta incoming
       double precision bbggh,bbaqh,bbbbh
       common/isub/isub
 
-c--susycoup is the deviation of Higgs coupling 
+c--susycoup is the deviation of Higgs coupling
 c-- from the standard model value
 
       do j=-nf,nf
@@ -46,7 +46,7 @@ c-- from the standard model value
 c--- run mb to appropriate scale
       mb_eff=massfrun(mb_msbar,scale,amz,2)
 c      mb_eff=mb_msbar
-      
+
       call hbbdecay(p,3,4,hdecay)
       hdecay=hdecay*susycoup**2
       propsq=1d0/((s(3,4)-hmass**2)**2+(hmass*hwidth)**2)
@@ -60,12 +60,12 @@ c--- Higgs decay, because the Br. Ratio does not include running mb
 
 c     BBGGH=     0 -> bbar1 b2 g3 g4 h
 
-      if ((isub .eq. 2) .or. (isub .eq. 0)) then                
+      if ((isub .eq. 2) .or. (isub .eq. 0)) then
 c --- g + g -> b + b~
       msq(0,0)=avegg*fac*BBGGH(6,5,1,2)
-      endif      
-      
-      if ((isub .eq. 1) .or. (isub .eq. 0)) then                
+      endif
+
+      if ((isub .eq. 1) .or. (isub .eq. 0)) then
 c --- g + b -> b + g
       msq(0,+5)=aveqg*fac*BBGGH(2,5,1,6)
 c --- g + b~ -> b~ + g
@@ -74,27 +74,27 @@ c --- b + g -> b + g
       msq(+5,0)=aveqg*fac*BBGGH(1,5,2,6)
 c --- b~ + g -> b~ + g
       msq(-5,0)=aveqg*fac*BBGGH(5,1,2,6)
-      endif      
+      endif
 
-      if ((isub .eq. 1) .or. (isub .eq. 0)) then                
+      if ((isub .eq. 1) .or. (isub .eq. 0)) then
 c --- q + b-> b + q
-      msq(+1,+5)=aveqq*fac*BBAQH(2,5,1,6) 
+      msq(+1,+5)=aveqq*fac*BBAQH(2,5,1,6)
 c --- b + q-> b + q
-      msq(+5,+1)=aveqq*fac*BBAQH(1,5,2,6) 
+      msq(+5,+1)=aveqq*fac*BBAQH(1,5,2,6)
 c --- b~ + q~ -> b~ + q~
-      msq(-5,-1)=aveqq*fac*BBAQH(5,1,6,2) 
+      msq(-5,-1)=aveqq*fac*BBAQH(5,1,6,2)
 c --- q~ + b~-> b~+ q~
-      msq(-1,-5)=aveqq*fac*BBAQH(5,2,6,1) 
+      msq(-1,-5)=aveqq*fac*BBAQH(5,2,6,1)
 
 c --- q~ + b-> b + q~
-      msq(-1,+5)=aveqq*fac*BBAQH(2,5,6,1) 
+      msq(-1,+5)=aveqq*fac*BBAQH(2,5,6,1)
 c --- b + q~-> b + q~
-      msq(+5,-1)=aveqq*fac*BBAQH(1,5,6,2) 
+      msq(+5,-1)=aveqq*fac*BBAQH(1,5,6,2)
 
 c --- q + b~-> b~ + q
-      msq(+1,-5)=aveqq*fac*BBAQH(5,2,1,6) 
-c --- b~ + q -> b~ + q 
-      msq(-5,+1)=aveqq*fac*BBAQH(5,1,2,6) 
+      msq(+1,-5)=aveqq*fac*BBAQH(5,2,1,6)
+c --- b~ + q -> b~ + q
+      msq(-5,+1)=aveqq*fac*BBAQH(5,1,2,6)
 
       do j=2,4
       msq(+j,+5)=msq(+1,+5)
@@ -105,18 +105,18 @@ c --- b~ + q -> b~ + q
       msq(+5,+j)=msq(+5,+1)
       msq(+5,-j)=msq(+5,-1)
       msq(-5,+j)=msq(-5,+1)
-      msq(-5,-j)=msq(-5,-1) 
+      msq(-5,-j)=msq(-5,-1)
       enddo
       endif
-      
+
 c 0 -> bbar1 b2 bbar3 b4 h
 
-      if ((isub .eq. 2) .or. (isub .eq. 0)) then                
-c    BBAQH=     0 -> bbar1 b2 a3 q4 h                                       
+      if ((isub .eq. 2) .or. (isub .eq. 0)) then
+c    BBAQH=     0 -> bbar1 b2 a3 q4 h
 c --- q + q~-> b + b~
-      msq(+1,-1)=aveqq*fac*BBAQH(6,5,1,2)                                    
+      msq(+1,-1)=aveqq*fac*BBAQH(6,5,1,2)
 c --- q~ + q-> b + b~
-      msq(-1,+1)=aveqq*fac*BBAQH(6,5,2,1)                                    
+      msq(-1,+1)=aveqq*fac*BBAQH(6,5,2,1)
       do j=2,4
       msq(j,-j)=msq(+1,-1)
       msq(-j,j)=msq(-1,+1)
@@ -132,11 +132,11 @@ c --- b + b~ -> b + b~
 c --- b~ + b -> b + b~
       msq(-5,+5)=fac*aveqq*BBBBH(6,5,2,1)
       endif
-      
+
       return
       end
-          
-    
 
-      
-     
+
+
+
+

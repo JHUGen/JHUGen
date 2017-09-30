@@ -20,7 +20,7 @@ c--NB average over spins only -- colour factors cancel
       call spinoru(6,p,za,zb)
 
       fac=aveqq*gw**8*xn**2
-      
+
       if     (nwz .eq. +1) then
         ub=fac*qqbtbbar(1,2,3,4,5,6)
         bu=fac*qqbtbbar(2,1,3,4,5,6)
@@ -35,7 +35,7 @@ c--NB average over spins only -- colour factors cancel
 
 c--- for nwz=+1, initial state is b, for nwz=-1 it is b~
       ib=5*nwz
-      
+
       do j=-nf,nf
       do k=-nf,nf
       msq(j,k)=0d0
@@ -52,7 +52,7 @@ c--- for nwz=+1, initial state is b, for nwz=-1 it is b~
 
       enddo
       enddo
-      
+
       return
       end
 

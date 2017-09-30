@@ -1,9 +1,9 @@
       subroutine ZZ_Hqq(p,msq)
-      implicit none 
+      implicit none
 c--- Weak Bosion Fusion by Z-Z exchange only
 c---Matrix element squared averaged over initial colors and spins
 c
-c     q(-p1)+q(-p2) -->  H(p3,p4)+q(p5)+q(p6) 
+c     q(-p1)+q(-p2) -->  H(p3,p4)+q(p5)+q(p6)
 c                           |
 c                           |
 c                           |
@@ -18,13 +18,13 @@ c                           ---> b(p3)+bbar(p4)
       double precision p(mxpart,4),fac,s34
       double precision msq(-nf:nf,-nf:nf),hdecay,
      . ud_ud_LL,udb_udb_LL,ud_ud_LR,udb_udb_LR,msqgamgam
-      
+
       do j=-nf,nf
       do k=-nf,nf
       msq(j,k)=0d0
       enddo
       enddo
-      
+
       call dotem(6,p,s)
 
       s34=(p(3,4)+p(4,4))**2
@@ -73,7 +73,7 @@ c--- ub(1)+d(2) -> ub(5)+d(6)
           msq(j,k)=fac*(
      .     +ud_ud_LL*((L(-j)*L(-k))**2+(R(-j)*R(-k))**2)
      .     +ud_ud_LR*((L(-j)*R(-k))**2+(R(-j)*L(-k))**2))
-        endif 
+        endif
       enddo
       enddo
 

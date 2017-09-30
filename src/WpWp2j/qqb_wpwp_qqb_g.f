@@ -11,7 +11,7 @@ c      include 'constants.f'
       include 'masses.f'
       include 'qcdcouple.f'
       include 'ewcouple.f'
-      character(len=3) :: chn 
+      character(len=3) :: chn
       integer i,j,k
       double precision msq(-5:5,-5:5),p(12,4)
       double precision mqqb(3),mqbq(3),mqqq(3),mqbb(3)
@@ -27,9 +27,9 @@ c---set msq=0 to initialize
 
       aveqq = 1d0/9d0/4d0
       aveqg = 1d0/3d0/8d0/4d0
-      fac = (gw**8)*(gsq**2)/4d0 ! Born factor 
-      fac = fac*gsq*2d0 ! 2 dues to TA normalization 
-      fac = fac/4d0  
+      fac = (gw**8)*(gsq**2)/4d0 ! Born factor
+      fac = fac*gsq*2d0 ! 2 dues to TA normalization
+      fac = fac/4d0
 
       sw1 =2d0*(p(3,4)*p(4,4)-p(3,1)*p(4,1)-p(3,2)*p(4,2)-p(3,3)*p(4,3))
       sw2 =2d0*(p(5,4)*p(6,4)-p(5,1)*p(6,1)-p(5,2)*p(6,2)-p(5,3)*p(6,3))
@@ -68,7 +68,7 @@ c---set msq=0 to initialize
          mqgl(1) = fac*aveqg*mtot(1)
          mqgl(2) = fac*aveqg*mtot(2)
          mqgl(3) = fac*aveqg*mtot(3)
-         
+
       call mtotqqqqg(p(1:9,:),mtot,'glq')
 
          mglq(1) = fac*aveqg*mtot(1)
@@ -89,7 +89,7 @@ c---set msq=0 to initialize
 
 c      Now fill in the matrix elements
 
-      
+
          msq(2,-1) = mqqb(1) + mqqb(2)               ! u dbar initial state
          msq(2,-3) = mqqb(3)                         ! u sbar initial state
          msq(4,-3) = mqqb(1) + mqqb(2)               ! c sbar initial state
@@ -99,7 +99,7 @@ c      Now fill in the matrix elements
          msq(-3,2) = mqbq(3)                         ! sbar u initial state
          msq(-3,4) = mqbq(1) + mqbq(2)               ! sbar c intital state
          msq(-1,4) = mqbq(3)                         ! dbar c initial state
-      
+
          msq(2,2) = mqqq(1)*(1d0/2d0)                ! u u initial state
          msq(2,4) = mqqq(2)                          ! u c initial state
          msq(4,2) = mqqq(2)                          ! c u initial state

@@ -7,7 +7,7 @@
 *     Calculates the element squared for the process                   *
 *                                                                      *
 *     q(-p1)+qbar(-p2) -> Q(p3)+Qbar(p4)                               *
-*                                                                      * 
+*                                                                      *
 *     The mass of the heavy quark is passed in the common block        *
 *      via the variable mass2                                          *
 ************************************************************************
@@ -23,11 +23,11 @@
 
       xm2=mass2**2
       ro=4d0*xm2/s(1,2)
-      t1=-s(1,3)/s(1,2)                                                         
+      t1=-s(1,3)/s(1,2)
 
       call dotem(4,p,s)
-      call virteval(t1,ro,qqsym,qqasy,ggsym)  
-      
+      call virteval(t1,ro,qqsym,qqasy,ggsym)
+
       msq(:,:)=0d0
       do j=-nf,nf
       k=-j
@@ -44,7 +44,7 @@
       end
 
 
-      subroutine virteval(t1,ro,qqsym,qqasy,ggsym)  
+      subroutine virteval(t1,ro,qqsym,qqasy,ggsym)
 ************************************************************************
 *     The mass of the heavy quark is passed in the common block        *
 *      via the variable mass2                                          *
@@ -69,18 +69,18 @@
       double precision ggQQv,ggQQov,ggQQsv,qqsym,qqasy,ggsym,
      . ggQQv_0,ggQQov_0,ggQQsv_0,ggQQv_1,ggQQov_1,ggQQsv_1,
      . ggQQv_2
-      
+
 C---we arrive at the dred scheme by taking a HV result and applying
-C---a finite renormalization on the 
+C---a finite renormalization on the
 C---namely a factor of as/4/pi*cf/2 for every massles quark leg (amplitude)
 C---namely a factor of as/4/pi*xn/6 for every massles gluon leg (amplitude)
 C---namely a factor of as/2/pi*cf/2 for every massles quark leg (square)
 C---namely a factor of as/2/pi*xn/6 for every massles gluon leg (square)
       scheme='dred'
-     
+
 C Notation for logarithms and dilogarithms.
-C Integrals were in unphysical region, but contination has now 
-C been performed; 
+C Integrals were in unphysical region, but contination has now
+C been performed;
 C In unphysical region,        In physical region after continuation.
 C vltm=log(at/m^2),
 C vlpm=log(-lp/lm),            log((1+b)/(1-b))
@@ -111,18 +111,18 @@ C as/2/pi*g^4*Gamma(1-EP)/Gamma(1-2*EP)*(4*pi*mu^2/XM2)^EP
       t2=1d0-t1
       tbar=t1-0.25d0*ro
       ubar=t2-0.25d0*ro
-      b=dsqrt(1d0-ro)   
+      b=dsqrt(1d0-ro)
       xlp=0.5d0*(1d0+b)
       xlm=0.5d0*(1d0-b)
-      vlpm=dlog(xlp/xlm)     
-      vlsm=dlog(4d0/ro)      
-      vltm=dlog(4d0*t1/ro)      
-      vlwm=dlog(4d0*t2/ro)      
-      vlbl=dlog(b/xlm)       
-      vdw=ddilog(1d0-ro/(4d0*t2))-0.5d0*vlwm**2      
+      vlpm=dlog(xlp/xlm)
+      vlsm=dlog(4d0/ro)
+      vltm=dlog(4d0*t1/ro)
+      vlwm=dlog(4d0*t2/ro)
+      vlbl=dlog(b/xlm)
+      vdw=ddilog(1d0-ro/(4d0*t2))-0.5d0*vlwm**2
       vdt=ddilog(1d0-ro/(4d0*t1))-0.5d0*vltm**2
-      vdmp=ddilog(-xlm/xlp)    
-      vdmb=ddilog(-xlm/b)+0.5d0*vlbl**2  
+      vdmp=ddilog(-xlm/xlp)
+      vdmb=ddilog(-xlm/b)+0.5d0*vlbl**2
 
 c--- Q-Qbar and Qbar-Q contributions
 
@@ -133,7 +133,7 @@ c--- Q-Qbar and Qbar-Q contributions
       f4 = (vlpm**2/4d0+vdmp+pisq/12d0)/b
       f5t1 = (vltm**2+vdt+pisq/6d0)/t1**3
       f5t2 = (vlwm**2+vdw+pisq/6d0)/t2**3
-      
+
 c---  Singular parts
 c---  qqQQv is the lowest order matrix element squared without
 c---  averaging over initial colors or spins:
@@ -143,12 +143,12 @@ c---  use _0 for O(1) piece, _1 for O(eps)
       qqQQv_1=gsq**2*V*(-2d0)
       else
       qqQQv_1=0d0
-      endif      
-      
+      endif
+
 c--- These are the singular pieces, written in such a way that
 c--- the limit EPINV -> 0 is smooth
 
-c--- overall factor in the virtual terms is (fourpi*mass^2)^(epsilon)      
+c--- overall factor in the virtual terms is (fourpi*mass^2)^(epsilon)
 c--- to match with our usual definition, we should thus multiply by
 c--- (musq/mass^2)^(epsilon)
 c--- Note that the overall factor in this definition of the virtual
@@ -158,7 +158,7 @@ c--- This gives an extra (-pisqo6) compared to Gamma(1-ep)/Gamma(1-2*ep)
       epin2=epinv**2+epinv*rmuom2+half*rmuom2**2-pisqo6
 
       qqss=
-     .  gsq/V*qqQQv_0*( 
+     .  gsq/V*qqQQv_0*(
      . -2d0*V/2/xn*EPIN2-V/xn*EPIN
      . -3d0*V/2/xn*EPIN+xn*(vltm+vlwm)*EPIN
      . -(0.5d0*vlpm/b*(1d0+b**2)+vlsm)/xn*EPIN)
@@ -166,7 +166,7 @@ c--- This gives an extra (-pisqo6) compared to Gamma(1-ep)/Gamma(1-2*ep)
      . -2d0*V/2/xn*EPIN-V/xn
      . -3d0*V/2/xn+xn*(vltm+vlwm)
      . -(0.5d0*vlpm/b*(1d0+b**2)+vlsm)/xn)
-     
+
       qqas=gsq/V*qqQQv_0*(XN4/xn*(vltm-vlwm))*EPIN
      .    +gsq/V*qqQQv_1*(XN4/xn*(vltm-vlwm))
 
@@ -192,7 +192,7 @@ c--- extra finite terms in DR scheme
       if (scheme .eq. 'dred') then
         qqsv=qqsv+0.5d0*(xn-1d0/xn)*gsq*qqQQv_0/V
       endif
-        
+
 C--- Finite antisymmetric part
       qqav=gsq/V*qqQQv_0*(-XN4/2d0/xn*vlsm*(vltm-vlwm))
      . +gsq**3*XN4/xn*(-(t1-t2)*(vdt+vdw)+0.5d0*ro*(vdt-vdw)
@@ -229,7 +229,7 @@ c---  use _0 for O(1) piece, _1 for O(eps) and _2 for O(eps**2)
       ggQQv_2=0d0
       ggQQov_1=0d0
       ggQQsv_1=0d0
-      endif      
+      endif
 
 c--- These are the singular pieces, written in such a way that
 c--- the limit EPINV -> 0 is smooth
@@ -253,14 +253,14 @@ c--- below, so we subtract it later there
      . +4d0*xnsq*vlwm
      . *(-2d0*t1/t2+2d0*t1**2))
       endif
-      
+
 c--- extra finite terms in DR scheme
       if (scheme .eq. 'dred') then
         ggs=ggs+xn/3d0*ggQQv_0
       endif
-        
+
 C--- overall factor of V removed
-      ggQQv=2d0/xn*(V/t1/t2-2d0*xnsq) 
+      ggQQv=2d0/xn*(V/t1/t2-2d0*xnsq)
      & *(t1**2+t2**2+ro-ro**2/(4d0*t1*t2))
       ggQQov=2d0/xn*((xnsq-2d0)/(t1*t2)-2d0*xnsq)
      & *(t1**2+t2**2+ro-ro**2/(4d0*t1*t2))
@@ -376,6 +376,6 @@ c--- This is subtracting the extra finite piece mentioned above
 C---replace the overall factor of V which was removed
       ggsym=V*(ggs+ggv1+ggv2+ggv3+ggv4+ggv5
      &     +ggv6+ggv7+ggv8+ggv9+ggv10+ggv11)
-      return        
-      end 
+      return
+      end
 

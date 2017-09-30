@@ -44,7 +44,7 @@ c---- a) tree level sign, b) overall sign change
       BSYARggppmp = BSYARggppmp + F4m1x2x3x4(j) * (  - 2.D0/(za(p3,p2))
      &    *za(e1,p2)*za(e4,p3)*zab(p3,q1,p2)**2*mt - 3.D0/(za(p3,p2))*
      &    za(e1,p3)*za(e4,p3)*zab(p3,q1,p2)*mt3 )
-      BSYARggppmp = BSYARggppmp + I3m1x23x4 * ( 2.D0*mt2*AT0ggppmp - 
+      BSYARggppmp = BSYARggppmp + I3m1x23x4 * ( 2.D0*mt2*AT0ggppmp -
      &    s23*AT0ggppmp )
       BSYARggppmp = BSYARggppmp + I3m12x3x4(j) * ( 4.D0/(zab(p2,q1,p2))
      &    /(za(p3,p2))*za(e1,p2)*za(e4,p3)*zab(p2,q1,p2)*zab(p3,q1,p2)
@@ -194,7 +194,7 @@ c---- a) tree level sign, b) overall sign change
      &    *s23**(-2)*mt*xbeta2**(-1) + 3.D0/(zab(p2,q1,p3))/(za(p3,p2))
      &    *za(e1,p3)*za(e4,p3)*zab(p2,q1,p3)*zab(p3,q1,p2)*s23**(-1)*mt
      &    *xbeta2**(-1)
-      
+
 c---- SB sign change, see point b) above
       BSYARggppmp = -BSYARggppmp
       return

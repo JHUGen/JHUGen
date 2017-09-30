@@ -15,6 +15,6 @@ C---- These are the twiddle functions arXiv:1101.5947 [hep-ph], Eq. (91)
 
 c--- NB:flip sign to agree with BSY code
       BSYA0qedpppm=-BSYA0qedpppm
-      
+
       return
       end

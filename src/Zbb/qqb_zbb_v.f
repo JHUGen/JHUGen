@@ -62,14 +62,14 @@ c---twopij with s_{ij} (in rke notation)
       call qqb_zbb(p,msq)
 
       if (
-     .      (s(5,6) .lt. four*scalesq) 
-     . .or. (s(1,5)*s(2,5)/s(1,2) .lt. scalesq) 
-     . .or. (s(1,6)*s(2,6)/s(1,2) .lt. scalesq) ) return 
+     .      (s(5,6) .lt. four*scalesq)
+     . .or. (s(1,5)*s(2,5)/s(1,2) .lt. scalesq)
+     . .or. (s(1,6)*s(2,6)/s(1,2) .lt. scalesq) ) return
 
       prop=s(3,4)/dcmplx((s(3,4)-zmass**2),zmass*zwidth)
 
 c--- calculate the gg terms
-c ---Call the two gluon process which is defined in xzqqgg_v 
+c ---Call the two gluon process which is defined in xzqqgg_v
 C ---in the notation
 C     0 ---> q(p1)+g(p2)+g(p3)+qbar(p4)+a(p5)+  l(p6)
 C ---compared with ours which is:-
@@ -84,9 +84,9 @@ c     0 ---> b(p6)+g(p1)+g(p2)+bb(p5)+e^+(p4)+e^-(p3)
       enddo
       call spinoru(6,pswap,za,zb)
       call xzqqgg_v(mmsq,mmsq_vec,mmsq_ax)
-      
-c---  Now transform momenta into a notation 
-c---  suitable for calling the BDKW function with notation which is 
+
+c---  Now transform momenta into a notation
+c---  suitable for calling the BDKW function with notation which is
 c---    q-(-p4)+Q+(-p2)+l-(-p5) ---> q+(p1)+Q-(p3)+l+(p6)
 compared to ours which is (see above)
 c--     q (-p1)+b (-p5)+l-(-p4) ---> q+(p2)+b (p6)+e-(p3)
@@ -98,7 +98,7 @@ c--     q (-p1)+b (-p5)+l-(-p4) ---> q+(p2)+b (p6)+e-(p3)
       q_bdkw(5,nu)=p(4,nu)
       q_bdkw(2,nu)=p(5,nu)
       q_bdkw(3,nu)=p(6,nu)
-      enddo      
+      enddo
       call spinoru(6,q_bdkw,za,zb)
 
       faclo=4d0*V*aveqq*esq**2*gsq**2
@@ -121,7 +121,7 @@ c--- compute correct vector-like coupling for diagrams with Z coupled to a loop
      & +Q(j)*q1+0.5d0*(vQ(j,1)+vQ(j,2))*v2(polz)*prop
       enddo
       enddo
-      
+
 c--- set-up amplitudes first, to improve efficiency
       do polq=1,2
       do polz=1,2
@@ -183,16 +183,16 @@ c--- set-up amplitudes first, to improve efficiency
       endif
       enddo
       enddo
-      
+
       enddo
 
 c--- add in UV counter-term for gg sub-process here
 c--- (UV subtraction occurs for the other pieces in a6routine.f)
 c----UV counterterm contains the finite renormalization to arrive
-c----at MS bar scheme. 
+c----at MS bar scheme.
       subuv=2d0*(epinv*b0-xn/6d0)
       msqv(0,0)=msqv(0,0)-ason2pi*subuv*msq(0,0)
 
       return
       end
-     
+

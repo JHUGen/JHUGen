@@ -629,7 +629,7 @@
 	cel2 = DCMPLX(DBLE(del2))
 *	if ( lwrite ) print *,'ffcc0: calling ffcel3'
 	call ffcel3(cel3,cqi,cqiDqj,6,ier)
-	if ( DIMAG(cel3).ne.0 .and. 
+	if ( DIMAG(cel3).ne.0 .and.
      +		abs(DIMAG(cel3)).lt.precc*abs(DBLE(cel3)) ) then
 	    if ( lwrite ) print *,'ffcc0b: rounded cel3 from ',cel3
 	    cel3 = DBLE(cel3)

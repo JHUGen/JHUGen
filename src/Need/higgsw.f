@@ -12,7 +12,7 @@ c-----valid for low masses
       hwidth=3d0*(wff(mbsq)+wff(mcsq))+wff(mtausq)
       write(6,*) 'hmass,hwidth',hmass,hwidth
       write(6,*) 'mtausq,mcsq,mbsq',mtausq,mcsq,mbsq
-      write(6,*) 
+      write(6,*)
       br=3d0*wff(mbsq)/hwidth
       return
       end

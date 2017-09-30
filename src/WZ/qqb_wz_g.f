@@ -9,7 +9,7 @@ C For nwz=-1
 c     d(-p1)+ubar(-p2)-->mu^-(p5)+mu^+(p6)+e^-(p3)+nbar(p4)+g(p7)
 c---
 c   for the moment --- radiation only from initial line
-      implicit none 
+      implicit none
       include 'constants.f'
       include 'qcdcouple.f'
       include 'ewcouple.f'
@@ -30,7 +30,7 @@ c   for the moment --- radiation only from initial line
       double complex prop12,prop34,prop56
       double precision P(mxpart,4),qdks(mxpart,4),msq(-nf:nf,-nf:nf)
       double precision ave,cotw,s127,wwflag
-      double complex 
+      double complex
      .  qu_qb(10,2,2),qu_gg(10,2,2),gg_qb(10,2,2),
      .  qb_qu(10,2,2),qb_gg(10,2,2),gg_qu(10,2,2),
      .  props,propw,propz,cprop,A(2,2)
@@ -44,7 +44,7 @@ c   for the moment --- radiation only from initial line
       else
       write(6,*) 'nwz .ne. +1 or -1 in qqb_wz_g.f'
       stop
-      endif 
+      endif
       if     (nwz.eq.-1) then
         cl1=1d0
         cl2=0d0
@@ -62,7 +62,7 @@ c   for the moment --- radiation only from initial line
 c--- wwflag=1 for most cases, indicating presence of diagram with 2 W's
       wwflag=1d0
 c--- but for Z -> bbbar this diagram contains |V_tb|**2 which we take 0
-      if (plabel(5) .eq. 'bq') then    
+      if (plabel(5) .eq. 'bq') then
         wwflag=0d0
       endif
 
@@ -71,14 +71,14 @@ c-- if Z -> neutrinos, we need to switch c1 and c2
         cl1=1d0-cl1
         cl2=1d0-cl2
       endif
-      
+
       do jp=-nf,nf
       do kp=-nf,nf
       msq(jp,kp)=0d0
       enddo
       enddo
 
-C----Change the momenta to DKS notation 
+C----Change the momenta to DKS notation
 c   We have --- d(-p1)+ubar(-p2)-->nu(p3)+e^+(p4)+mu^-(p5)+mu^+(p6)+g(p7)
 c   DKS have--- u( q2)+dbar( q1)-->nu(q3)+e^+(q4)+mu^-(q6)+mu^+(q5)+g(p7)
 
@@ -99,11 +99,11 @@ c--   calculate propagators
       cotw=dsqrt((one-xw)/xw)
       s127=s(1,2)+s(1,7)+s(2,7)
       if     (zerowidth  .eqv. .true.) then
-      prop12=s127/dcmplx(s127-wmass**2,wmass*wwidth)  
+      prop12=s127/dcmplx(s127-wmass**2,wmass*wwidth)
       prop34=s(3,4)/dcmplx(s(3,4)-wmass**2,wmass*wwidth)
       prop56=s(5,6)/dcmplx(s(5,6)-zmass**2,zmass*zwidth)
       cprop=dcmplx(1d0)
-      elseif (zerowidth .neqv. .true.) then      
+      elseif (zerowidth .neqv. .true.) then
       prop12=dcmplx(s127/(s127-wmass**2))
       prop34=dcmplx(s(3,4)/(s(3,4)-wmass**2))
       prop56=dcmplx(s(5,6)/(s(5,6)-zmass**2))
@@ -152,10 +152,10 @@ c---set up left/right handed couplings for both Z and gamma*
 c---note that the second label corresponds to the helicity
 c---of the LEPTON coupling v2, NOT the quarks (all L)
       do j=1,nf
-        ZgLR(j,minus)=L(j)*v2(1)*prop56+Q(j)*q1           
-        ZgLR(j,mplus)=L(j)*v2(2)*prop56+Q(j)*q1           
+        ZgLR(j,minus)=L(j)*v2(1)*prop56+Q(j)*q1
+        ZgLR(j,mplus)=L(j)*v2(2)*prop56+Q(j)*q1
       enddo
-      
+
       do polz=1,2
       if(nwz.eq.1) then
         c1(polz)=ZgLR(2,polz)
@@ -165,7 +165,7 @@ c---of the LEPTON coupling v2, NOT the quarks (all L)
         c2(polz)=ZgLR(2,polz)
       endif
       enddo
-      
+
       do j=-nf,nf
       if (((j.eq.+1).or.(j.eq.+3).or.(j.eq.+5)
      . .or.(j.eq.-2).or.(j.eq.-4)) .and. (nwz .eq. +1))
@@ -180,7 +180,7 @@ c---of the LEPTON coupling v2, NOT the quarks (all L)
       if (((k.eq.-1).or.(k.eq.-3).or.(k.eq.-5)
      . .or.(k.eq.+2).or.(k.eq.+4)) .and. (nwz .eq. -1))
      . go to 19
-    
+
       if     ((j .gt. 0) .and. (k .lt. 0)) then
 
 c---case u-db
@@ -197,7 +197,7 @@ c---case u-db
      .                   *prop12*qu_qb(4,polg,polz)
      .          +wwflag*0.5d0*prop34*prop12/xw*qu_qb(6,polg,polz)*cl1
      .          +wwflag*0.5d0*prop34*prop12/xw*qu_qb(7,polg,polz)*cl2)
-     
+
 c          A(polg,polz)=((L(+j)*qu_qb(2,polg,polz)
 c     .                  +L(-k)*qu_qb(3,polg,polz))*FAC
 c     .                  +cotw*prop12*qu_qb(1,polg,polz)*FACM)
@@ -317,7 +317,7 @@ c---case g-db
      .                   *prop12*gg_qb(4,polg,polz)
      .          +wwflag*0.5d0*prop34*prop12/xw*gg_qb(6,polg,polz)*cl1
      .          +wwflag*0.5d0*prop34*prop12/xw*gg_qb(7,polg,polz)*cl2)
-     
+
 c          A(polg,polz)=((c1*gg_qb(2,polg,polz)
 c     .                  +c2*gg_qb(3,polg,polz))*FAC
 c     .                  +cotw*prop12*gg_qb(1,polg,polz)*FACM)
@@ -331,7 +331,7 @@ c     .                 *prop34*prop56*v2(polz)
       else
           ave=0d0
       endif
-      
+
       if (ave.gt.0d0) then
       msq(j,k)=FAC1*ave*cdabs(cprop)**2
      .          *(cdabs(A(mplus,minus))**2+cdabs(A(minus,minus))**2
@@ -346,8 +346,8 @@ c     .                 *prop34*prop56*v2(polz)
       return
       end
 
-      
-      
+
+
 
 
 

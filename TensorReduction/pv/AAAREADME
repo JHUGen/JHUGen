@@ -14,7 +14,7 @@ based on the work of Passarino and Veltman
       SLACcitation   = "%%CITATION = NUPHA,B160,151;%%",
 }
 
-The notation for the form factors 
+The notation for the form factors
 is however different that the notation
 of PV. In particular the tensor integrals are functions
-of the off-set momenta,q_i, not the external momenta, p_i. 
+of the off-set momenta,q_i, not the external momenta, p_i.

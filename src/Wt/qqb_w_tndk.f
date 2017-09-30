@@ -5,7 +5,7 @@ C----averaged over initial colours and spins
 C for nwz=+1
 c     f(-p1)+f(-p2)--> W^+(n(p3)+e^+(p4))   + tbar(p5)
 C For nwz=-1
-c     f(-p1)+f(-p2)--> W^-(e^-(p3)+nbar(p4))+ t(p5) 
+c     f(-p1)+f(-p2)--> W^-(e^-(p3)+nbar(p4))+ t(p5)
 c---
       include 'constants.f'
       include 'ewcouple.f'
@@ -27,18 +27,18 @@ C--setup s products through common block
       fac=gwsq**2*gsq*V
 
       if     (nwz .eq. -1) then
-c---- basic process is g+b -> W- + t      
+c---- basic process is g+b -> W- + t
         qgWq=  -aveqg*fac*w1cjet(1,5,3,4,2)
         gqWq=  -aveqg*fac*w1cjet(2,5,3,4,1)
       elseif (nwz .eq. +1) then
-c---- basic process is g+b~ -> W+ + t~      
+c---- basic process is g+b~ -> W+ + t~
         gqbWqb=-aveqg*fac*w1cjet(2,5,4,3,1)
         qbgWqb=-aveqg*fac*w1cjet(1,5,4,3,2)
       else
         write(6,*) 'Problem with nwz in qqb_w_tndk.f: nwz=',nwz
         stop
       endif
-      
+
       do j=-nf,nf,nf
       do k=-nf,nf,nf
       if     ((j .eq. +5) .and. (k .eq. 0) .and. (nwz .eq. -1)) then
@@ -55,4 +55,4 @@ c---- basic process is g+b~ -> W+ + t~
       enddo
       return
       end
- 
+

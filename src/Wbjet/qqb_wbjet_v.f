@@ -34,7 +34,7 @@
 c--- calculate the lowest order matrix element and fill the
 c--- common block twopij with s_{ij}
       call qqb_wbjet(p,msq)
-      
+
 c--- initialize matrix elements
       do j=-nf,nf
       do k=-nf,nf
@@ -43,15 +43,15 @@ c--- initialize matrix elements
       enddo
 
 c      prop=s(3,4)/(s(3,4)-wmass**2+im*wmass*wwidth)
-            
+
 ************************************************************************
 *     Contributions from QQQQ matrix elements                          *
-************************************************************************            
+************************************************************************
 
 c--- UV counter-term is already included in a6routine.f
 
-c---  Now transform momenta into a notation 
-c---  suitable for calling the BDKW function with notation which is 
+c---  Now transform momenta into a notation
+c---  suitable for calling the BDKW function with notation which is
 c---  q-(-p4)+Q+(-p2)+l-(-p5) ---> q+(p1)+Q-(p3)+l+(p6)
       do nu=1,4
       q(1,nu)=p(2,nu)
@@ -60,7 +60,7 @@ c---  q-(-p4)+Q+(-p2)+l-(-p5) ---> q+(p1)+Q-(p3)+l+(p6)
       q(4,nu)=p(1,nu)
       q(5,nu)=p(4,nu)
       q(6,nu)=p(3,nu)
-      enddo      
+      enddo
       call spinoru(6,q,za,zb)
       fac=V*xn*gw**4*gsq**2*ason2pi
 
@@ -69,12 +69,12 @@ c--- set-up matrix elements
      .                       qqb_jkji,qbq_jkji,qq_jkji,qbqb_jkji,
      .                       qqbxjkik,qbqxjkki,qq_jkki,qbqb_jkki)
 
-c--- set up auxiliary array     
+c--- set up auxiliary array
       do j=-nf,nf
         Vsm(j)=Vsum(j)
         if (abs(j) .ge. flav) Vsm(j)=0d0
 c--- make sure that elements are either one or zero
-        if (Vsm(j) .gt. 0d0) Vsm(j)=1d0         
+        if (Vsm(j) .gt. 0d0) Vsm(j)=1d0
       enddo
 
 c--- Add VIRTUAL terms
@@ -84,7 +84,7 @@ c--- Add VIRTUAL terms
       if ((abs(j) .ne. flav) .and. (abs(k) .ne. flav)) goto 99
       if ((abs(j) .eq. flav) .and. (abs(k) .eq. flav)) goto 99
 c--- so that either abs(j) or abs(k) = flav (but not both).
-      
+
       if     ((j .gt. 0) .and. (k .lt. 0)) then
           msqv(j,k)=msqv(j,k)+fac*aveqq*(
      .     +Vsm(j)*qqbxjkik
@@ -102,20 +102,20 @@ c--- so that either abs(j) or abs(k) = flav (but not both).
      .     +Vsm(j)*qbqb_jkki
      .     +Vsm(k)*qbqb_jkji)
       endif
-     
-   99 continue  
-      
+
+   99 continue
+
 c      write(6,*) '_v', j,k,msq(j,k)
 c      write(6,*) 'epinv', epinv
 c      write(6,*)
 
       enddo
       enddo
-   
+
       return
       end
-     
-     
+
+
        subroutine qqbwbj_loop(i1,i2,i3,i4,i5,i6,
      .                       qqb_jkji,qbq_jkji,qq_jkji,qbqb_jkji,
      .                       qqbxjkik,qbqxjkki,qq_jkki,qbqb_jkki)
@@ -143,45 +143,45 @@ C--- Note that a61LRL(i1,i2,i3,i4,i5,i6,za,zb) corresponds to all outgoing
 
 c--- q-qb amplitudes
       a61_1432(1)=a61LLL(i1,i4,i3,i2,i5,i6,za,zb)
-      a61_1432(2)=a61LRL(i1,i4,i3,i2,i5,i6,za,zb) 
+      a61_1432(2)=a61LRL(i1,i4,i3,i2,i5,i6,za,zb)
       a61_2314(1)=a61LLL(i2,i3,i1,i4,i5,i6,za,zb)
       a61_2314(2)=a61LRL(i2,i3,i1,i4,i5,i6,za,zb)
-  
+
       atr_1432(1)=Dconjg(atrLLL(i1,i4,i3,i2,i5,i6,za,zb))
-      atr_1432(2)=Dconjg(atrLRL(i1,i4,i3,i2,i5,i6,za,zb)) 
+      atr_1432(2)=Dconjg(atrLRL(i1,i4,i3,i2,i5,i6,za,zb))
       atr_2314(1)=Dconjg(atrLLL(i2,i3,i1,i4,i5,i6,za,zb))
       atr_2314(2)=Dconjg(atrLRL(i2,i3,i1,i4,i5,i6,za,zb))
 
 c--- qb-q amplitudes
       a61_4132(1)=a61LLL(i4,i1,i3,i2,i5,i6,za,zb)
-      a61_4132(2)=a61LRL(i4,i1,i3,i2,i5,i6,za,zb) 
+      a61_4132(2)=a61LRL(i4,i1,i3,i2,i5,i6,za,zb)
       a61_2341(1)=a61LLL(i2,i3,i4,i1,i5,i6,za,zb)
       a61_2341(2)=a61LRL(i2,i3,i4,i1,i5,i6,za,zb)
-  
+
       atr_4132(1)=Dconjg(atrLLL(i4,i1,i3,i2,i5,i6,za,zb))
-      atr_4132(2)=Dconjg(atrLRL(i4,i1,i3,i2,i5,i6,za,zb)) 
+      atr_4132(2)=Dconjg(atrLRL(i4,i1,i3,i2,i5,i6,za,zb))
       atr_2341(1)=Dconjg(atrLLL(i2,i3,i4,i1,i5,i6,za,zb))
       atr_2341(2)=Dconjg(atrLRL(i2,i3,i4,i1,i5,i6,za,zb))
 
 c--- q-q amplitudes
       a61_2431(1)=a61LLL(i2,i4,i3,i1,i5,i6,za,zb)
-      a61_2431(2)=a61LRL(i2,i4,i3,i1,i5,i6,za,zb) 
+      a61_2431(2)=a61LRL(i2,i4,i3,i1,i5,i6,za,zb)
       a61_2134(1)=a61LLL(i2,i1,i3,i4,i5,i6,za,zb)
       a61_2134(2)=a61LRL(i2,i1,i3,i4,i5,i6,za,zb)
-  
+
       atr_2431(1)=Dconjg(atrLLL(i2,i4,i3,i1,i5,i6,za,zb))
-      atr_2431(2)=Dconjg(atrLRL(i2,i4,i3,i1,i5,i6,za,zb)) 
+      atr_2431(2)=Dconjg(atrLRL(i2,i4,i3,i1,i5,i6,za,zb))
       atr_2134(1)=Dconjg(atrLLL(i2,i1,i3,i4,i5,i6,za,zb))
       atr_2134(2)=Dconjg(atrLRL(i2,i1,i3,i4,i5,i6,za,zb))
 
 c--- qb-qb amplitudes
       a61_1342(1)=a61LLL(i1,i3,i4,i2,i5,i6,za,zb)
-      a61_1342(2)=a61LRL(i1,i3,i4,i2,i5,i6,za,zb) 
+      a61_1342(2)=a61LRL(i1,i3,i4,i2,i5,i6,za,zb)
       a61_4312(1)=a61LLL(i4,i3,i1,i2,i5,i6,za,zb)
       a61_4312(2)=a61LRL(i4,i3,i1,i2,i5,i6,za,zb)
-  
+
       atr_1342(1)=Dconjg(atrLLL(i1,i3,i4,i2,i5,i6,za,zb))
-      atr_1342(2)=Dconjg(atrLRL(i1,i3,i4,i2,i5,i6,za,zb)) 
+      atr_1342(2)=Dconjg(atrLRL(i1,i3,i4,i2,i5,i6,za,zb))
       atr_4312(1)=Dconjg(atrLLL(i4,i3,i1,i2,i5,i6,za,zb))
       atr_4312(2)=Dconjg(atrLRL(i4,i3,i1,i2,i5,i6,za,zb))
 
@@ -192,25 +192,25 @@ C--transition (2-->1) (6->2 in original notation)
       qqb_jkji=dble(a61_1432(1)*atr_1432(1)+a61_1432(2)*atr_1432(2))
 C--transition (4-->2) (1->6 in original notation)
       qqbxjkik=dble(a61_2314(1)*atr_2314(1)+a61_2314(2)*atr_2314(2))
-      
+
 C--transition (2-->4) (6->1 in original notation)
       qbqxjkki=dble(a61_4132(1)*atr_4132(1)+a61_4132(2)*atr_4132(2))
 C--transition (1-->2) (2->6 in original notation)
       qbq_jkji=dble(a61_2341(1)*atr_2341(1)+a61_2341(2)*atr_2341(2))
-      
+
 C--transition (1-->2) (2->6 in original notation)
       qq_jkji=dble(a61_2431(1)*atr_2431(1)+a61_2431(2)*atr_2431(2))
 C--transition (4-->2) (1->6 in original notation)
       qq_jkki=dble(a61_2134(1)*atr_2134(1)+a61_2134(2)*atr_2134(2))
-      
+
 C--transition (2-->1) (6->2 in original notation)
       qbqb_jkji=dble(a61_1342(1)*atr_1342(1)+a61_1342(2)*atr_1342(2))
 C--transition (2-->4) (6->1 in original notation)
       qbqb_jkki=dble(a61_4312(1)*atr_4312(1)+a61_4312(2)*atr_4312(2))
-      
+
       return
       end
-      
-      
-      
+
+
+
 

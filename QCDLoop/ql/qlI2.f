@@ -1,14 +1,14 @@
-      double complex function qlI2(p1,m1,m2,mu2,ep) 
+      double complex function qlI2(p1,m1,m2,mu2,ep)
       implicit none
       include 'qlconstants.f'
       double precision p1,m1,m2,mu2
       integer ep
-C     p1=p1(1) is the squared four-momentum of the external particle i 
-C     mi=m(i)^2, i=1,2 are the squares of the mass of the propagator i 
+C     p1=p1(1) is the squared four-momentum of the external particle i
+C     mi=m(i)^2, i=1,2 are the squares of the mass of the propagator i
 C     mu2 is the square of the scale mu
 C     ep=-2,-1,0 chooses the coefficient in the Laurent series.
       double precision p1o,m1o,m2o,mu2o,pp1,mm1,mm2,newmu2,scalefac
-      logical qlzero 
+      logical qlzero
       double complex Ival(-2:0),qlI2fin
       data p1o,m1o,m2o,mu2o/-1d0,-1d0,-1d0,-1d0/
       save Ival,p1o,m1o,m2o,mu2o

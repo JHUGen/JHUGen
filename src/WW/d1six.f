@@ -1,6 +1,6 @@
       double complex function D1six(k1,k2,k3,k4,k5,k6)
       implicit none
-C----- this six dimensional box corresponding to 
+C----- this six dimensional box corresponding to
 C----- qlI4(s34,0d0,0d0,s56,s134,s12,mtsq,0d0,0d0,0d0,musq,e)
 C----- multiplied by a factor of -C(0)/2
       include 'constants.f'

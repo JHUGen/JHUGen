@@ -22,18 +22,18 @@ c      write (*,*)
 c      write (*,*) " Phase space point:"
 c      write (*,*)
 c      write (*,*) "-----------------------------------------------------------------------------"
-c      write (*,*)  "n        E             px             py              pz               m "   
+c      write (*,*)  "n        E             px             py              pz               m "
 c      do i=1,8
-c      if (i .lt. 3) 
+c      if (i .lt. 3)
 c     &    write (*,'(i2,1x,5e15.7)') i, -P(i,4),-P(i,1),-P(i,2),-P(i,3),
 c     & p(i,4)**2-p(i,1)**2-p(i,2)**2-p(i,3)**2
-c      if (i .ge. 3) 
+c      if (i .ge. 3)
 c     &    write (*,'(i2,1x,5e15.7)') i, P(i,4),P(i,1),P(i,2),P(i,3),
-cc     . dsqrt(dabs(DOT(p(0,i),p(0,i))))         
+cc     . dsqrt(dabs(DOT(p(0,i),p(0,i))))
 c     & p(i,4)**2-p(i,1)**2-p(i,2)**2-p(i,3)**2
 c      enddo
-c      write (*,*) "-----------------------------------------------------------------------------"   
-c      write (*,*) "-----------------------------------------------------------------------------"   
+c      write (*,*) "-----------------------------------------------------------------------------"
+c      write (*,*) "-----------------------------------------------------------------------------"
 
       call spinoru(8,p,za,zb)
 
@@ -168,7 +168,7 @@ c--- d~ c~ > u~ c~
       ms(da,ac,ua,ac)=WZccmsq(7,1,3,4,5,6,2,8)
 c--- s~ u~ > c~ u~
       ms(sa,ua,ac,ua)=ms(da,ac,ua,ac)
-c--- u~ s~ > c~  u~ 
+c--- u~ s~ > c~  u~
       ms(ua,sa,ac,ua)=WZccmsq(7,2,3,4,5,6,1,8)
 c--- c~ d~ > u~ c~
       ms(ac,da,ua,ac)=ms(ua,sa,ac,ua)
@@ -188,39 +188,39 @@ c--- b~ s~ > c~ b~
       ms(ba,sa,ac,ba)=ms(sa,da,ua,sa)
 C***********************************************************
 C-----Identity tables quark-quark
-c--- u  d  > d  d 
+c--- u  d  > d  d
       ms(uq,dq,dq,dq)=half*WZddidmsq(1,7,3,4,5,6,8,2)
-c--- c  s  > s  s 
+c--- c  s  > s  s
       ms(cq,sq,sq,sq)=ms(uq,dq,dq,dq)
-c--- d  u  > d  d 
+c--- d  u  > d  d
       ms(dq,uq,dq,dq)=half*WZddidmsq(2,7,3,4,5,6,8,1)
-c--- s  c  > s  s 
+c--- s  c  > s  s
       ms(sq,cq,sq,sq)=ms(dq,uq,dq,dq)
-c--- u  u  > d  u 
+c--- u  u  > d  u
       ms(uq,uq,dq,uq)=WZuuidmsq(1,7,3,4,5,6,8,2)
-c--- c  c  > s  c 
+c--- c  c  > s  c
       ms(cq,cq,sq,cq)=ms(uq,uq,dq,uq)
-c--- u  b  > d  b 
+c--- u  b  > d  b
       ms(uq,bq,dq,bq)=WZbbmsq(1,7,3,4,5,6,8,2)
-c--- u  s  > d  s 
+c--- u  s  > d  s
       ms(uq,sq,dq,sq)=ms(uq,bq,dq,bq)
-c--- c  b  > s  b 
+c--- c  b  > s  b
       ms(cq,bq,sq,bq)=ms(uq,bq,dq,bq)
 c--- c  d  > s  d
       ms(cq,dq,sq,dq)=ms(uq,bq,dq,bq)
-c--- b  u  > d  b 
+c--- b  u  > d  b
       ms(bq,uq,dq,bq)=WZbbmsq(2,7,3,4,5,6,8,1)
-c--- s  u  > d  s 
+c--- s  u  > d  s
       ms(sq,uq,dq,sq)=ms(bq,uq,dq,bq)
-c--- b  c  > s  b 
+c--- b  c  > s  b
       ms(bq,cq,sq,bq)=ms(bq,uq,dq,bq)
-c--- d  c  > s  d 
+c--- d  c  > s  d
       ms(dq,cq,sq,dq)=ms(bq,uq,dq,bq)
-c--- u  c  > d  c 
+c--- u  c  > d  c
       ms(uq,cq,dq,cq)=WZccmsq(1,7,3,4,5,6,8,2)
 c--- u  c  > u  s
       ms(uq,cq,uq,sq)=WZccmsq(2,8,3,4,5,6,7,1)
-c--- c  u  > c  d 
+c--- c  u  > c  d
       ms(cq,uq,cq,dq)=ms(uq,cq,uq,sq)
 c--- c  u  > s  u
       ms(cq,uq,sq,uq)=ms(uq,cq,dq,cq)
@@ -235,27 +235,27 @@ c--- d~  u  > g  g
 c--- s~  c  > g  g
       ms(sa,cq,gg,gg)=ms(da,uq,gg,gg)
 
-c--- g  g  > u~  d 
+c--- g  g  > u~  d
       ms(gg,gg,ua,dq)=avegg*WZggmsq(7,8,3,4,5,6,2,1)
-c--- g  g  > c~  s 
+c--- g  g  > c~  s
       ms(gg,gg,ac,sq)=ms(gg,gg,ua,dq)
 
-c--- u  g  > d g 
+c--- u  g  > d g
       ms(uq,gg,dq,gg)=aveqg*WZggmsq(1,7,3,4,5,6,2,8)
-c--- c  g  > s g 
+c--- c  g  > s g
       ms(cq,gg,sq,gg)=ms(uq,gg,dq,gg)
-c--- g  u > d g 
+c--- g  u > d g
       ms(gg,uq,dq,gg)=aveqg*WZggmsq(2,7,3,4,5,6,1,8)
-c--- g  c > s g 
+c--- g  c > s g
       ms(gg,cq,sq,gg)=ms(gg,uq,dq,gg)
 
-c--- g  d~  > u~  g 
+c--- g  d~  > u~  g
       ms(gg,da,ua,gg)=aveqg*WZggmsq(7,2,3,4,5,6,1,8)
-c--- g  s~  > c~  g 
+c--- g  s~  > c~  g
       ms(gg,sa,ac,gg)=ms(gg,da,ua,gg)
-c--- d~ g  > u~  g 
+c--- d~ g  > u~  g
       ms(da,gg,ua,gg)=aveqg*WZggmsq(7,1,3,4,5,6,2,8)
-c--- s~ g > c~  g 
+c--- s~ g > c~  g
       ms(sa,gg,ac,gg)=ms(da,gg,ua,gg)
 
 c      call madcheckp(ms)
@@ -316,7 +316,7 @@ c--- c~  b  > b  s~
 c--- c~  c > u  d~ and u~  u > c  s~ and b~  b > u  d~ and b~  b > c  s~
       ms(ua,uq,cq,sa)=WZccmsq(8,7,3,4,5,6,1,2)
       ms(ac,cq,uq,da)=ms(ua,uq,cq,sa)
-c--- u~  d > c  c~ and c~  s > u  u~ and 
+c--- u~  d > c  c~ and c~  s > u  u~ and
       ms(ua,dq,cq,ac)=WZccmsq(2,1,3,4,5,6,7,8)
       ms(ac,sq,uq,ua)=ms(ua,dq,cq,ac)
       ms(ac,sq,bq,ba)=ms(ua,dq,cq,ac)
@@ -351,7 +351,7 @@ c--- u~ b~ > d~ b~
       ms(ua,ba,da,ba)=ms(ua,sa,da,sa)
 c--- c~ d~ > s~ u~
       ms(ac,da,sa,da)=ms(ua,sa,da,sa)
-c--- d~ c~ > s~  d~ 
+c--- d~ c~ > s~  d~
       ms(da,ac,sa,da)=WZbbmsq(7,2,3,4,5,6,1,8)
 c--- b~ u~ > d~ b~
       ms(ba,ua,da,ba)=ms(da,ac,sa,da)
@@ -368,39 +368,39 @@ c--- u~ c~ > d~ c~ and u~ c~ > s~ u~
 
 C***********************************************************
 C-----Identity tablec quark-quark
-c--- d  u  > u  u 
+c--- d  u  > u  u
       ms(dq,uq,uq,uq)=half*WZuuidmsq(1,7,3,4,5,6,8,2)
-c--- s  c  > c  c 
+c--- s  c  > c  c
       ms(sq,cq,cq,cq)=ms(dq,uq,uq,uq)
-c--- u  d  > u  u 
+c--- u  d  > u  u
       ms(uq,dq,uq,uq)=half*WZuuidmsq(2,7,3,4,5,6,8,1)
-c--- c  s  > c  c 
+c--- c  s  > c  c
       ms(cq,sq,cq,cq)=ms(uq,dq,uq,uq)
-c--- d  d  > u  d 
+c--- d  d  > u  d
       ms(dq,dq,uq,dq)=WZddidmsq(1,7,3,4,5,6,8,2)
-c--- s  s  > c  s 
+c--- s  s  > c  s
       ms(sq,sq,cq,sq)=ms(dq,dq,uq,dq)
-c--- d  b  > u  b 
+c--- d  b  > u  b
       ms(dq,bq,uq,bq)=WZbbmsq(1,7,3,4,5,6,8,2)
-c--- d  c  > u  c 
+c--- d  c  > u  c
       ms(dq,cq,uq,cq)=WZccmsq(1,7,3,4,5,6,8,2)
-c--- s  b  > c  b 
+c--- s  b  > c  b
       ms(sq,bq,cq,bq)=ms(dq,bq,uq,bq)
 c--- s  u  > c  u
       ms(sq,uq,cq,uq)=ms(dq,cq,uq,cq)
-c--- b  d  > u  b 
+c--- b  d  > u  b
       ms(bq,dq,uq,bq)=WZbbmsq(2,7,3,4,5,6,8,1)
-c--- b  s  > c  b 
+c--- b  s  > c  b
       ms(bq,sq,cq,bq)=ms(bq,dq,uq,bq)
-c--- c  d  > u  c 
+c--- c  d  > u  c
       ms(cq,dq,uq,cq)=WZccmsq(2,7,3,4,5,6,8,1)
-c--- u  s  > c  u 
+c--- u  s  > c  u
       ms(uq,sq,cq,uq)=ms(cq,dq,uq,cq)
-c--- d  s  > u  s 
+c--- d  s  > u  s
       ms(dq,sq,uq,sq)=WZbbmsq(1,7,3,4,5,6,8,2)
 c--- d  s  > d  s
       ms(dq,sq,dq,cq)=WZbbmsq(2,8,3,4,5,6,7,1)
-c--- s  d  > s  u 
+c--- s  d  > s  u
       ms(sq,dq,sq,uq)=ms(dq,sq,dq,cq)
 c--- s  d  > c  u
       ms(sq,dq,cq,dq)=ms(dq,sq,uq,sq)
@@ -472,27 +472,27 @@ c--- u~  d  > g  g
 c--- c~  s  > g  g
       ms(ac,sq,gg,gg)=ms(ua,dq,gg,gg)
 
-c--- g  g  > d~  u 
+c--- g  g  > d~  u
       ms(gg,gg,da,uq)=avegg*WZggmsq(7,8,3,4,5,6,2,1)
-c--- g  g  > s~  c 
+c--- g  g  > s~  c
       ms(gg,gg,sa,cq)=ms(gg,gg,da,uq)
 
-c--- d  g  > u g 
+c--- d  g  > u g
       ms(dq,gg,uq,gg)=aveqg*WZggmsq(1,7,3,4,5,6,2,8)
-c--- s  g  > c g 
+c--- s  g  > c g
       ms(sq,gg,cq,gg)=ms(dq,gg,uq,gg)
-c--- g  d > u g 
+c--- g  d > u g
       ms(gg,dq,uq,gg)=aveqg*WZggmsq(2,7,3,4,5,6,1,8)
-c--- g  s > c g 
+c--- g  s > c g
       ms(gg,sq,cq,gg)=ms(gg,dq,uq,gg)
 
-c--- g  u~  > d~  g 
+c--- g  u~  > d~  g
       ms(gg,ua,da,gg)=aveqg*WZggmsq(7,2,3,4,5,6,1,8)
-c--- g  c~  > s~  g 
+c--- g  c~  > s~  g
       ms(gg,ac,sa,gg)=ms(gg,ua,da,gg)
-c--- u~ g  > d~  g 
+c--- u~ g  > d~  g
       ms(ua,gg,da,gg)=aveqg*WZggmsq(7,1,3,4,5,6,2,8)
-c--- c~ g > s~  g 
+c--- c~ g > s~  g
       ms(ac,gg,sa,gg)=ms(ua,gg,da,gg)
 
 C***********************************************************************

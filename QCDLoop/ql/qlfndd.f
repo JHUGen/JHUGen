@@ -15,7 +15,7 @@ C----  %%CITATION = NUPHA,B734,62;%%
       double precision iep
       logical qlzero
       parameter(infty=16) ! number of terms in sum
-      
+
       xm1=x-cone
       if (abs(x) .lt. 10d0) then
         if (qlzero(abs(x-cone))) then
@@ -32,6 +32,6 @@ C----  %%CITATION = NUPHA,B734,62;%%
           qlfndd=qlfndd+dcmplx(x**(n-j))/dfloat(j+1)
         enddo
       endif
-           
+
       return
       end

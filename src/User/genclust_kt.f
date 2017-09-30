@@ -1,12 +1,12 @@
       subroutine genclust_kt(q,Rmin,qfinal,isub,ipow)
-c--- Clusters momenta using plabel to determine which 
+c--- Clusters momenta using plabel to determine which
 c--- particles should be clustered. Forms 'jets' jets according to
 c--- the standard kT algorithm with cone size Rmin.
 c--- Furthermore, the clustered jets are only observed if
 c--- pT(jet) >= ptjetmin and etajetmin <= |eta(jet)| <= etajetmax
-c--- 
+c---
 c--- qfinal is the final vector q1,.... q(4+jets)
-c--- where non-jet four vectors are set equal to the incoming q 
+c--- where non-jet four vectors are set equal to the incoming q
 c---
 c--- Modified 23/11/09: generalized to include whole class of kt-like
 c---                    algorithms with measures raised to the power
@@ -31,7 +31,7 @@ c---                    ipow = +1 (normal kt), ipow = -1 ("anti-kt")
       jets=0
       maxjet=0
       jetmerge=.false.
-      
+
       do i=1,mxpart
         do nu=1,4
         qfinal(i,nu)=0d0
@@ -40,7 +40,7 @@ c---                    ipow = +1 (normal kt), ipow = -1 ("anti-kt")
 
 c--- pick out jets: note that we search to npart+2-isub, to get the
 c--- number of particles right. Note that isub=0 for all calls except
-c--- the dipole contributions, where isub=1.   
+c--- the dipole contributions, where isub=1.
       do i=3,npart+2-isub
       if (is_hadronic(i)) then
         maxjet=maxjet+1
@@ -63,7 +63,7 @@ c--- for no partons, just switch q into qfinal
         return
       endif
 
-c--- skip clustering if we only have one parton  
+c--- skip clustering if we only have one parton
       if (maxjet .eq. 1) goto 2
 
 c--- for W+bbj, skip if b and b-bar are too close together
@@ -74,7 +74,7 @@ c        return
 c      endif
 
       iter=0
-c--- loops through all the iterations of the algorithm      
+c--- loops through all the iterations of the algorithm
     1 iter=iter+1
 
 c      write(*,*) 'iter ',iter
@@ -83,22 +83,22 @@ c      write(*,*) 'maxjet ',maxjet
 
 c--- step1: find (i,j) pair with lowest measure of all non-jets so far
       call findmind(q,qjet,iter,maxjet,dijmin,nmin1,nmin2,ipow)
- 
+
 c--- step2: find jet K with lowest Et
       call findminet(q,qjet,iter,maxjet,dkmin,nk,ipow)
       dkmin=dkmin*Rmin
 
 c      write(*,*) 'Comparing pair (',nmin1,',',nmin2,') value of'
 c      write(*,*) 'dijmin = ',dijmin,' with ',nk,' value of dk = ',dkmin
-      
-c--- step3: compare the two ...      
+
+c--- step3: compare the two ...
       if (dijmin .lt. dkmin) then
 c---  ... if we should combine, go ahead
 c        write(*,*) 'Clustered ',nmin1,nmin2
         jetmerge=.true.
         call combine(qjet,nmin1,nmin2)
-c--- combined object goes into nmin1, now shuffle nmin2 off the end 
-        call swapjet(qjet,jetindex,nmin2,maxjet)        
+c--- combined object goes into nmin1, now shuffle nmin2 off the end
+        call swapjet(qjet,jetindex,nmin2,maxjet)
         maxjet=maxjet-1
         iter=iter-1
 c        do i=1,maxjet
@@ -117,8 +117,8 @@ c--- in the next iteration we search for jets in pjet from iter+1...maxjet
 c--- so if this condition isn't true then there's one jet left at maxjet
 
       if (iter .lt. maxjet-1) goto 1
-      
- 2    continue      
+
+ 2    continue
       jets=jets+1
 
 c--- restore incoming partons
@@ -136,12 +136,12 @@ c--- set all other momenta to zero and restore leptons
           endif
         enddo
       enddo
-      
+
 c----remove jets that are below the pT threhold or which lie outside
 c----the observable rapidity region
-     
+
 c      write(*,*) 'AFTER CLUSTERING: Obtained ',jets,' jets'
-     
+
 c--- restore jets
 
       ajet=0
@@ -155,7 +155,7 @@ c        write(*,*) 'aeta: ',aetarap(i,qjet),' vs max. ',etajetmax
 
         if ((pt(i,qjet) .ge. ptjetmin) .and.
      .      (ayrap(i,qjet) .ge. etajetmin) .and.
-     .      (ayrap(i,qjet) .le. etajetmax)) then 
+     .      (ayrap(i,qjet) .le. etajetmax)) then
         ajet=ajet+1
         do nu=1,4
           qfinal(jetindex(ajet),nu)=qjet(i,nu)
@@ -163,7 +163,7 @@ c        write(*,*) 'aeta: ',aetarap(i,qjet),' vs max. ',etajetmax
         jetlabel(ajet)=jetlabel(i)
         endif
       enddo
-      
+
 c--- if no jets are removed by eta and pt cuts, then jets=ajet
       if (ajet .lt. jets) then
         do i=ajet+1,jets
@@ -173,7 +173,7 @@ c--- if no jets are removed by eta and pt cuts, then jets=ajet
         enddo
         jets=ajet
       endif
-      
+
 c      write(*,*) '... and ',jets,' jets after pt and eta cuts'
 c      do i=1,jets
 c        write(*,*) i,jetlabel(i)

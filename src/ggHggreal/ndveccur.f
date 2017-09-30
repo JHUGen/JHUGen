@@ -2,14 +2,14 @@
       implicit none
 C-----Author R.K. Ellis
 C-----October 2005
-C     Calculate the basic vector current current 
+C     Calculate the basic vector current current
 C         <i1-|Gamma(mu)|i2->*n(mu)
 C     and <i2-|Gamma(mu)|i1->*n(mu)
-C      
+C
       include 'constants.f'
       integer i1,i2
       double precision p(mxpart,4),n(4),rtbp,rtpp
-      double complex fac,c23b,c23p,fb,fp,vc(4),vcm(mxpart,mxpart) 
+      double complex fac,c23b,c23p,fb,fp,vc(4),vcm(mxpart,mxpart)
          if (p(i1,4) .gt. 0d0) then
 C-----positive energy case
             rtbp=dsqrt(p(i1,4)+p(i1,1))
@@ -59,5 +59,5 @@ C-----negative energy case
 c      write(6,*) 'vcm(i1,i2)',vcm(i1,i2)
 c      write(6,*) 'vcm(i2,i1)',vcm(i2,i1)
       return
-      end 
+      end
 

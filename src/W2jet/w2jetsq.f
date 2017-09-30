@@ -36,8 +36,8 @@
       if ((colourchoice .eq. 2) .or. (colourchoice .eq. 0)) then
       mmsq_cs(0,+1,+1)=-ninth*msqq
       endif
-            
+
       msq=mmsq_cs(0,+1,+1)+mmsq_cs(1,+1,+1)+mmsq_cs(2,+1,+1)
-      
+
       return
       end

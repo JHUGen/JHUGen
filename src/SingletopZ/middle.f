@@ -119,7 +119,7 @@ c--- Implementation of Baur-Zeppenfeld treatment of Z width
      & facLdiff * ( za(p3,p6)*zb(p1,p4)*zb(p2,e5)*izb(k5,e5)*s16 - za(
      &    p3,p6)*zb(p1,p4)*zb(p2,e5)*izb(k5,e5)*omal*mwsq**(-1)*s16*s25
      &     )
-      ymiddle(j3,1,ep) = ymiddle(j3,1,ep) + vert25x3*mt*facLdiff * ( 
+      ymiddle(j3,1,ep) = ymiddle(j3,1,ep) + vert25x3*mt*facLdiff * (
      &     - za(p3,p6)*zb(p1,p4)*zb(p2,e5)*izb(k5,e5) + za(p3,p6)*zb(p1
      &    ,p4)*zb(p2,e5)*izb(k5,e5)*omal*mwsq**(-1)*s25 )
       ymiddle(j3,1,ep) = ymiddle(j3,1,ep) + vert16x1*s34**(-1)*facLdiff
@@ -142,7 +142,7 @@ c--- Implementation of Baur-Zeppenfeld treatment of Z width
      &    )*zb(p2,k5) + za(p3,p6)*zb(p1,p4)*zb(p2,k5)*omal*mwsq**(-1)*
      &    s16 + 2.D0*za(p3,e5)*za(p4,p6)*zb(p1,p4)*zb(p2,p4)*iza(k5,e5)
      &     )
-      ymiddle(j3,2,ep) = ymiddle(j3,2,ep) + vert25x1*mt*facLdiff * ( 
+      ymiddle(j3,2,ep) = ymiddle(j3,2,ep) + vert25x1*mt*facLdiff * (
      &     - za(p3,p6)*zb(p1,p4)*zb(p2,k5)*omal*mwsq**(-1) )
       ymiddle(j3,2,ep) = ymiddle(j3,2,ep) + vert25x2*s34**(-1)*facLdiff
      &  * ( za(p1,p3)*za(p2,p6)*zb(p1,p2)*zb(p1,p4)*zb(p2,k5) - za(p2,
@@ -172,7 +172,7 @@ c--- Implementation of Baur-Zeppenfeld treatment of Z width
      &    iza(k5,e5) + za(p3,p6)*zb(p1,p4)*zb(p2,k5) + za(p3,p6)*zb(p1,
      &    p4)*zb(p2,k5)*omal*mwsq**(-1)*s16 + 2.D0*za(p3,e5)*za(p4,p6)*
      &    zb(p1,p4)*zb(p2,p4)*iza(k5,e5) )
-      ymiddle(j3,2,ep) = ymiddle(j3,2,ep) + vert16x1*mt*facLdiff * ( 
+      ymiddle(j3,2,ep) = ymiddle(j3,2,ep) + vert16x1*mt*facLdiff * (
      &     - za(p3,p6)*zb(p1,p4)*zb(p2,k5)*omal*mwsq**(-1) )
 
 

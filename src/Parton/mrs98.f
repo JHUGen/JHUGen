@@ -39,16 +39,16 @@ C****************************************************************C
       if(q2.lt.qsqmin.or.q2.gt.qsqmax) print 99
       if(x.lt.xmin.or.x.gt.xmax)       print 98
           if(mode.eq.1) then
-        call mrs981(x,q2,upv,dnv,usea,dsea,str,chm,bot,glu) 
+        call mrs981(x,q2,upv,dnv,usea,dsea,str,chm,bot,glu)
       elseif(mode.eq.2) then
-        call mrs982(x,q2,upv,dnv,usea,dsea,str,chm,bot,glu) 
+        call mrs982(x,q2,upv,dnv,usea,dsea,str,chm,bot,glu)
       elseif(mode.eq.3) then
-        call mrs983(x,q2,upv,dnv,usea,dsea,str,chm,bot,glu) 
+        call mrs983(x,q2,upv,dnv,usea,dsea,str,chm,bot,glu)
       elseif(mode.eq.4) then
-        call mrs984(x,q2,upv,dnv,usea,dsea,str,chm,bot,glu) 
+        call mrs984(x,q2,upv,dnv,usea,dsea,str,chm,bot,glu)
       elseif(mode.eq.5) then
-        call mrs985(x,q2,upv,dnv,usea,dsea,str,chm,bot,glu) 
-      endif 
+        call mrs985(x,q2,upv,dnv,usea,dsea,str,chm,bot,glu)
+      endif
   99  format('  WARNING:  Q^2 VALUE IS OUT OF RANGE   ')
   98  format('  WARNING:   X  VALUE IS OUT OF RANGE   ')
       return
@@ -134,13 +134,13 @@ c notation: 1=uval 2=val 3=glue 4=usea 5=chm 6=str 7=btm 8=dsea
       dsea=g(8)
       str=g(6)
       chm=g(5)
-      glu=g(3) 
+      glu=g(3)
       bot=g(7)
         x=xsave
         qsq=q2save
       return
       end
-      
+
       subroutine mrs982(x,qsq,upv,dnv,usea,dsea,str,chm,bot,glu)
       implicit double precision(a-h,o-z)
       parameter(nx=49,nq=37,ntenth=23,np=8)
@@ -221,13 +221,13 @@ c notation: 1=uval 2=val 3=glue 4=usea 5=chm 6=str 7=btm 8=dsea
       dsea=g(8)
       str=g(6)
       chm=g(5)
-      glu=g(3) 
+      glu=g(3)
       bot=g(7)
         x=xsave
         qsq=q2save
       return
       end
-      
+
       subroutine mrs983(x,qsq,upv,dnv,usea,dsea,str,chm,bot,glu)
       implicit double precision(a-h,o-z)
       parameter(nx=49,nq=37,ntenth=23,np=8)
@@ -308,14 +308,14 @@ c notation: 1=uval 2=val 3=glue 4=usea 5=chm 6=str 7=btm 8=dsea
       dsea=g(8)
       str=g(6)
       chm=g(5)
-      glu=g(3) 
+      glu=g(3)
       bot=g(7)
         x=xsave
         qsq=q2save
       return
       end
-      
-      
+
+
       subroutine mrs984(x,qsq,upv,dnv,usea,dsea,str,chm,bot,glu)
       implicit double precision(a-h,o-z)
       parameter(nx=49,nq=37,ntenth=23,np=8)
@@ -396,13 +396,13 @@ c notation: 1=uval 2=val 3=glue 4=usea 5=chm 6=str 7=btm 8=dsea
       dsea=g(8)
       str=g(6)
       chm=g(5)
-      glu=g(3) 
+      glu=g(3)
       bot=g(7)
         x=xsave
         qsq=q2save
       return
       end
-      
+
       subroutine mrs985(x,qsq,upv,dnv,usea,dsea,str,chm,bot,glu)
       implicit double precision(a-h,o-z)
       parameter(nx=49,nq=37,ntenth=23,np=8)
@@ -483,11 +483,11 @@ c notation: 1=uval 2=val 3=glue 4=usea 5=chm 6=str 7=btm 8=dsea
       dsea=g(8)
       str=g(6)
       chm=g(5)
-      glu=g(3) 
+      glu=g(3)
       bot=g(7)
         x=xsave
         qsq=q2save
       return
       end
-      
+
 

@@ -21,7 +21,7 @@
 *	Output:	del2d2			see above			*
 *		del2n			it is needed in fftran anyway	*
 *									*
-***#]*comment:*********************************************************** 
+***#]*comment:***********************************************************
 *  #[ declarations:
 	implicit none
 *
@@ -53,7 +53,7 @@
 		print *,'ff2dl2: error: nm=0:m,n,id,idsub=',m,n,id,idsub
 	    endif
 	endif
-*  #] check input: 
+*  #] check input:
 *  #[ get del2n:
 *	we need this in any case !
 	ier1 = ier
@@ -222,7 +222,7 @@
      +		som,xmax,del2d2-som
 	    endif
 	endif
-*  #] check: 
+*  #] check:
 *###] ff2dl2:
 	end
 *###[ ff2d22:
@@ -255,7 +255,7 @@
 *									*
 *	Output:	dl2d22			see above			*
 *									*
-***#]*comment:*********************************************************** 
+***#]*comment:***********************************************************
 *  #[ declarations:
 	implicit none
 *
@@ -272,7 +272,7 @@
 *	common blocks:
 *
 	include 'ff.h'
-*  #] declarations: 
+*  #] declarations:
 *  #[ check input:
 	if ( ltest ) then
 	    if ( abs(iskj) .ne. 1 ) print *,'ff2d22: error: abs(iskj) ',
@@ -283,7 +283,7 @@
 	    if ( m .ne. 3 .or. n .ne. 4 ) print *,'ff2d22: error ',
      +		'only for m=3,n=4 !!'
 	endif
-*  #] check input: 
+*  #] check input:
 *  #[ special cases:
 	if ( i .eq. n .or. i .eq. m ) then
 	    call ffdl2s(del2s,xpi,piDpj, j,k,kj,iskj, m,n,nm,isnm,
@@ -292,7 +292,7 @@
 *	    if ( lwrite ) print *,'  dl2d22  = ',dl2d22
 	    return
 	endif
-*  #] special cases: 
+*  #] special cases:
 *  #[ calculations:
 *	We use the product form
 	if ( i .eq. 3 ) then
@@ -383,7 +383,7 @@
 	endif
 
   110	continue
-*  #] calculations: 
+*  #] calculations:
 *  #[ check:
 	if ( ltest ) then
 	    s(1) = +   piDpj(i,j)**2*piDpj(k,m)**2*piDpj(n,n)
@@ -411,8 +411,8 @@
      +		som,xmax
 	    endif
 	endif
-*  #] check: 
-*###] ff2d22: 
+*  #] check:
+*###] ff2d22:
 	end
 *###[ ff3dl2:
 	subroutine ff3dl2(del3d2,xpi,dpipj,piDpj, i,
@@ -438,7 +438,7 @@
 *									*
 *	Output:	del3d2			see above			*
 *									*
-***#]*comment:*********************************************************** 
+***#]*comment:***********************************************************
 *  #[ declarations:
 	implicit none
 *
@@ -457,7 +457,7 @@
 *	common blocks:
 *
 	include 'ff.h'
-*  #] declarations: 
+*  #] declarations:
 *  #[ check input:
 	if ( ltest ) then
 	    if ( abs(iskj) .ne. 1 ) print *,'ff3dl2: error: abs(iskj) ',
@@ -468,7 +468,7 @@
      +		'<> 1 but ',ispo
 	    if ( ns .ne. 10 ) print *,'ff3dl2: error: ns <> 10 !!'
 	endif
-*  #] check input: 
+*  #] check input:
 *  #[ split up l,m:
 	if ( i .eq. l ) then
 	    dl2il = 0
@@ -541,7 +541,7 @@
 	    xmax = abs(s(1))
 	endif
 
-*  #] split up l,m: 
+*  #] split up l,m:
 *  #[ split up j,k:
 	call ff2dl2(d2d2k,dum,xpi,dpipj,piDpj, k, l,m,ml,isml, n,
      +						o,p,po,ispo, 10, ier)
@@ -582,7 +582,7 @@
 	    xmax = abs(s(1))
 	endif
 
-*  #] split up j,k: 
+*  #] split up j,k:
 *  #[ split up o,p:
 	call ff2dl2(d2d2o,dum,xpi,dpipj,piDpj, i, j,k,kj,iskj, o,
      +						l,m,ml,isml, 10, ier)
@@ -623,10 +623,10 @@
 	    xmax = abs(s(1))
 	endif
 
-*  #] split up o,p: 
+*  #] split up o,p:
 *  #[ give up:
 	del3d2 = som
 	if ( lwarn ) call ffwarn(124,ier,del3d2,xmax)
-*  #] give up: 
-*###] ff3dl2: 
+*  #] give up:
+*###] ff3dl2:
 	end

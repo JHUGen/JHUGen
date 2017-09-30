@@ -15,10 +15,10 @@ c     . -  s*qlI3(0d0,0d0,s,0d0,0d0,0d0,musq,0)
 c     . -  t*qlI3(0d0,0d0,t,0d0,0d0,0d0,musq,0)
 c     . +psq*qlI3(0d0,0d0,psq,0d0,0d0,0d0,musq,0)
 c     . +qsq*qlI3(0d0,0d0,qsq,0d0,0d0,0d0,musq,0)
-      
+
 c--- NOTE: checked on 8/30/09 that Lsm1_2me == (expression above)
       F42meF=Lsm1_2me(s,t,psq,qsq)
-     
+
       return
       end
 

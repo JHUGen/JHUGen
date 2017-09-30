@@ -6,4 +6,4 @@
      &    +ovdot(p1,k3)*del2(p2,p3,k1,k2)
       return
       end
-      
+

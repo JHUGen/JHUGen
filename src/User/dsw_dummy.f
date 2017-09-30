@@ -13,7 +13,7 @@ c--- return an error message.
       write(6,*)
       stop
       end
-c      
+c
 
       subroutine dswhbook(n,titlex,dx,xmin,xmax)
       implicit none
@@ -55,7 +55,7 @@ c
 
       character tag*4
       double precision p(mxpart,4)
-      double precision wt 
+      double precision wt
 
       call dsw_error
 
@@ -77,7 +77,7 @@ c
       include 'constants.f'
 
       double precision p(mxpart,4)
-      double precision wt 
+      double precision wt
 
       call dsw_error
 
@@ -91,7 +91,7 @@ c
       include 'eventbuffer.f'
       real*4 A(buffersize)
       integer INDEX(buffersize),N,MODE,NWAY,NSORT
-      
+
       call dsw_error
 
       return

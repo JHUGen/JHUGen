@@ -33,7 +33,7 @@ c      p34(nu)=p3(nu)+mom(k4,nu)
       p234(nu)=p23(nu)+mom(k4,nu)
       p1234(nu)=p123(nu)+mom(k4,nu)
       enddo
-      
+
       s14=p14(4)**2-p14(1)**2-p14(2)**2-p14(3)**2
       s23=p23(4)**2-p23(1)**2-p23(2)**2-p23(3)**2
       s123=p123(4)**2-p123(1)**2-p123(2)**2-p123(3)**2
@@ -56,11 +56,11 @@ c      p3Dp4=mom(k4,4)*p3(4)-mom(k4,1)*p3(1)
 c     &     -mom(k4,2)*p3(2)-mom(k4,3)*p3(3)
 c      msq=p2(4)**2-p2(1)**2-p2(2)**2-p2(3)**2
 c      mb=dsqrt(msq)
- 
-c---------------------------- BOXES --------------------------------------      
 
-      
-c--- this is the subleading (23,1,4) mm box with factor mb/zb(k2,k3) removed 
+c---------------------------- BOXES --------------------------------------
+
+
+c--- this is the subleading (23,1,4) mm box with factor mb/zb(k2,k3) removed
       coeff(4,d23x1x4)=-cone/(s23*s1234*s123)
      *  *(za(k1,k2)*za(k5,k6)*za(k1,k3)
      &  *zb(k4,k5)**2*zb(k2,k3)/zab2(k1,k2,k3,k4)
@@ -68,7 +68,7 @@ c--- this is the subleading (23,1,4) mm box with factor mb/zb(k2,k3) removed
      & *zab2(k6,k2,k3,k1)**2*zab2(k4,k1,k2,k3)*zab2(k4,k1,k3,k2)
      & /zab2(k4,k2,k3,k1)**3)
 
-c--- this is the subleading (23,4,1) mm box with factor mb/zb(k2,k3) removed 
+c--- this is the subleading (23,4,1) mm box with factor mb/zb(k2,k3) removed
       coeff(4,d23x4x1)=-cone/(s23*s1234*s234)
      & *(za(k1,k6)**2*za(k2,k3)
      & *zb(k2,k4)*zb(k3,k4)*zb(k5,k6)/zab2(k1,k2,k3,k4)
@@ -76,7 +76,7 @@ c--- this is the subleading (23,4,1) mm box with factor mb/zb(k2,k3) removed
      & *zab2(k4,k2,k3,k5)**2*zab2(k3,k2,k4,k1)*zab2(k2,k3,k4,k1)
      & /zab2(k4,k2,k3,k1)**3)
 
-      
+
 C     This is a coeff(3,c14x23bis) with factor mb/zb(k2,k3) removed
       coeff(3,c14x23bis)=  + IDELTA3(k2,k3,k1,k4,k5,k6)**2 * ( 3.D0/2.D0
      &    /(zab(k4,p23,k1))*za(k2,k6)*zb(k2,k5)*zab(k2,p1234,k2)*s(k1,
@@ -183,7 +183,7 @@ C     This is a coeff(3,c14x23bis) with factor mb/zb(k2,k3) removed
      &    ,k1))*za(k1,k6)*za(k3,k4)*zb(k2,k4)*zb(k3,k5)*zab(k2,p1234,k1
      &    )*s234**(-2) + 2.D0/(zab(k4,p23,k1))*za(k1,k6)*za(k3,k4)*zb(
      &    k3,k4)*zb(k3,k5)*zab(k3,p1234,k1)*s234**(-2)-1d0/(zab(k4,p23,
-     &    k1))/(zab(k4,p23,k1))*za(k2,k4)*zb(k1,k5)*zab(k6,p234,k2) + 
+     &    k1))/(zab(k4,p23,k1))*za(k2,k4)*zb(k1,k5)*zab(k6,p234,k2) +
      &  1d0/(zab(k4,p23,k1))/(zab(k4,p23,k1))*za(k3,k4)*zb(k1,k5)*zab(
      &    k6,p234,k3)
       coeff(3,c14x23bis) = coeff(3,c14x23bis)-1d0/(zab(k4,p23,k1))/(
@@ -191,7 +191,7 @@ C     This is a coeff(3,c14x23bis) with factor mb/zb(k2,k3) removed
      &    p23,k1))/(zab(k4,p23,k1))*za(k4,k6)*zb(k1,k3)*zab(k3,p123,k5)
 
 
-c---------------------------- BUBBLES ------------------------------------      
+c---------------------------- BUBBLES ------------------------------------
 
       bubrat=  + Lnrat( - s123, - s56) * (  - 3.D0/2.D0/(za(k5,k6))/(
      &    zb(k2,k3))/(zab(k4,p23,k1))*zab(k6,p123,k2)*zab(k6,p123,k3)*

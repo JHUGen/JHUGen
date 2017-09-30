@@ -24,15 +24,15 @@ C     m1,m2,m3,m4 are the masses squared of internal lines
       logical,save:: first=.true.
       double precision q1save(4),q2save(4),q3save(4)
       double precision triq1save(4),triq2save(4)
-      common/q123save/q1save,q2save,q3save  
-      common/q12save/triq1save,triq2save  
+      common/q123save/q1save,q2save,q3save
+      common/q12save/triq1save,triq2save
 !$omp threadprivate(first,/q123save/,/q12save/)
       double precision,save:: idp2(0:2),idp1(0:2),id(0:2),idm1(0:2),
      & idm2(0:2),idm3(0:2)
 !$omp threadprivate(idp2,idp1,id,idm1,idm2,idm3)
       integer,save:: icall,irecur,irecur2,irecur3,irecur4
 !$omp threadprivate(icall,irecur,irecur2,irecur3,irecur4)
-     
+
       if (first) then
       first=.false.
 C--idp2=1/[D+2]
@@ -64,7 +64,7 @@ c--- variables for statistics reporting
       irecur2=0
       irecur3=0
       irecur4=0
-      icall=0      
+      icall=0
 c--- print out flags for recursion
 c      write(6,*) 'pvDfill recursion flags:'
 c      write(6,*) '  doGsing  ',doGsing
@@ -73,7 +73,7 @@ c      write(6,*) '  doPsing  ',doPsing
 c      write(6,*) '  doPFsing ',doPFsing
       endif
 
-c--- statistics accounting and reporting      
+c--- statistics accounting and reporting
       icall=icall+1
       if (pvverbose) then
       if (mod(icall,50000) .eq. 0) then
@@ -86,7 +86,7 @@ c--- statistics accounting and reporting
       endif
       endif
    77 format(' +++ Dfill ',i9,': ',5(f6.2,'% : '))
-      
+
       f1 = m2 - m1 - p1
       f2 = m3 - m1 - p1p2
       f3 = m4 - m1 - p4
@@ -124,7 +124,7 @@ c      Y(3,3) = dcmplx(2d0*m3)
 c      Y(3,4) = dcmplx(m3 + m4 - p3)
 c      Y(4,3) = Y(3,4)
 c      Y(4,4) = dcmplx(2d0*m4)
-      
+
 c      if (pvverbose) write(6,*) 'Check box Ysing'
 c      Ysing=pvGramsing(Y,4)
 
@@ -135,7 +135,7 @@ c      do k=j,3
 c      if (abs(G(j,k)) .gt. Gmax) Gmax=abs(G(j,k))
 c      enddo
 c      enddo
-      
+
 c      if (pvverbose) write(6,*) 'Gmax=',Gmax
 c      Psing=.false.
 c--- criterion for small momenta recursion
@@ -143,7 +143,7 @@ c      if (Gmax .lt. weenumber) Psing=.true.
 
 c-- find maximum of f1, f2 and f3
 c      fmax=max(abs(f1),abs(f2),abs(f3))
-      
+
 c      if (pvverbose) write(6,*) 'fmax=',fmax
 c      Fsing=.false.
 c--- criterion for small momenta and small f(k) recursion
@@ -158,7 +158,7 @@ c--- are computed to maximum available rank
       if (doPsing)  pvRespectmaxcindex=.false.
       if (doGYsing) pvRespectmaxcindex=.false.
       if (doGsing)  pvRespectmaxcindex=.false.
-            
+
       pvRespectmaxcindex=.true.
 
       pvforcerecalc=.false.
@@ -179,9 +179,9 @@ c--- Set up relevant triangle pinchings
 c--- Return to default behaviour
       pvRespectmaxcindex=.true.
 
-c--- Make call to alternate recursion routines if required       
+c--- Make call to alternate recursion routines if required
       exceptional=.false.
-      
+
       if     (doPFsing) then
 c--- for small momenta and small f(k)
         if (pvverbose) then
@@ -193,7 +193,7 @@ c        write(99,'(4(l2),16(f21.15))') Gsing,Ysing,Psing,Fsing,
 c     &   q1save(1),q1save(2),q1save(3),q1save(4),
 c     &   q2save(1),q2save(2),q2save(3),q2save(4),
 c     &   q3save(1),q3save(2),q3save(3),q3save(4),
-c     &   m1,m2,m3,m4      
+c     &   m1,m2,m3,m4
       return
       elseif (doPsing) then
 c--- for small momenta
@@ -206,7 +206,7 @@ c        write(99,'(4(l2),16(f21.15))') Gsing,Ysing,Psing,Fsing,
 c     &   q1save(1),q1save(2),q1save(3),q1save(4),
 c     &   q2save(1),q2save(2),q2save(3),q2save(4),
 c     &   q3save(1),q3save(2),q3save(3),q3save(4),
-c     &   m1,m2,m3,m4      
+c     &   m1,m2,m3,m4
       return
       elseif (doGYsing) then
 c--- for small Gram and small Y
@@ -220,7 +220,7 @@ c        write(99,'(4(l2),16(f21.15))') Gsing,Ysing,Psing,Fsing,
 c     &   q1save(1),q1save(2),q1save(3),q1save(4),
 c     &   q2save(1),q2save(2),q2save(3),q2save(4),
 c     &   q3save(1),q3save(2),q3save(3),q3save(4),
-c     &   m1,m2,m3,m4      
+c     &   m1,m2,m3,m4
         if (exceptional) then
 c------ for exceptional configurations, fall through to normal PV
         continue
@@ -229,7 +229,7 @@ c------ otherwise, we're done
         return
       endif
       elseif (doGsing) then
-c--- for small Gram only  
+c--- for small Gram only
         if (pvverbose) then
           write(6,*) 'USING BOX SMALL G RECURSION'
       endif
@@ -239,14 +239,14 @@ c        write(99,'(4(l2),16(f21.15))') Gsing,Ysing,Psing,Fsing,
 c     &   q1save(1),q1save(2),q1save(3),q1save(4),
 c     &   q2save(1),q2save(2),q2save(3),q2save(4),
 c     &   q3save(1),q3save(2),q3save(3),q3save(4),
-c     &   m1,m2,m3,m4      
+c     &   m1,m2,m3,m4
       return
       endif
 c--- otherwise, usual PV is fine
 
 c      if (exceptional) write(6,*) 'WARNING: EXCEPTIONAL POINT'
 
-c--- initialize integrals      
+c--- initialize integrals
       do ep=-2,0
       do j=1,Ndd
       Dv(N+j,ep)=dcmplx(1d5,-1d5)
@@ -254,7 +254,7 @@ c--- initialize integrals
       enddo
 
       call XLUDecomp(G, 3, perm)
-      
+
 c      call D0scalar(D0,p1, p2, p3, p4, p1p2, p2p3, m1, m2, m3, m4)
 
       do ep=-2,0
@@ -280,7 +280,7 @@ c      call D0scalar(D0,p1, p2, p3, p4, p1p2, p2p3, m1, m2, m3, m4)
       in(1,ep) = f1*Dv(N+dd0,ep) - Cv(cc0+C234,ep)+Cv(cc0+C134,ep)
       in(2,ep) = f2*Dv(N+dd0,ep) - Cv(cc0+C234,ep)+Cv(cc0+C124,ep)
       in(3,ep) = f3*Dv(N+dd0,ep) - Cv(cc0+C234,ep)+Cv(cc0+C123,ep)
-      enddo 
+      enddo
       call pvBackSubst(G,3,perm,in)
       do ep=-2,0
       Dv(N+dd1,ep) = in(1,ep)
@@ -293,14 +293,14 @@ c      call D0scalar(D0,p1, p2, p3, p4, p1p2, p2p3, m1, m2, m3, m4)
       do j=0,ep+2
       epmj=ep-j
       Dv(N+dd00,ep) = Dv(N+dd00,ep)+idm3(j)*(m1*Dv(N+dd0,epmj)
-     &  -half*(Dv(N+dd1,epmj)*f1 +Dv(N+dd2,epmj)*f2 +Dv(N+dd3,epmj)*f3 
+     &  -half*(Dv(N+dd1,epmj)*f1 +Dv(N+dd2,epmj)*f2 +Dv(N+dd3,epmj)*f3
      & - Cv(cc0+C234,epmj)))
       enddo
  20   continue
       in(1,ep) = f1*Dv(N+dd1,ep)+c0sum(ep) - 2d0*Dv(N+dd00,ep)
       in(2,ep) = f2*Dv(N+dd1,ep)+c0sum(ep)+Cv(cc1+C124,ep)
       in(3,ep) = f3*Dv(N+dd1,ep)+c0sum(ep)+Cv(cc1+C123,ep)
-      enddo 
+      enddo
       call pvBackSubst(G,3,perm,in)
 
       do ep=-2,0
@@ -311,7 +311,7 @@ c      call D0scalar(D0,p1, p2, p3, p4, p1p2, p2p3, m1, m2, m3, m4)
       in(1,ep) = f1*Dv(N+dd2,ep) - Cv(cc1+C234,ep)+Cv(cc1+C134,ep)
       in(2,ep) = f2*Dv(N+dd2,ep) - Cv(cc1+C234,ep) - 2d0*Dv(N+dd00,ep)
       in(3,ep) = f3*Dv(N+dd2,ep) - Cv(cc1+C234,ep)+Cv(cc2+C123,ep)
-      enddo 
+      enddo
       call pvBackSubst(G,3,perm,in)
 
       do ep=-2,0
@@ -322,7 +322,7 @@ c      call D0scalar(D0,p1, p2, p3, p4, p1p2, p2p3, m1, m2, m3, m4)
       in(1,ep) = f1*Dv(N+dd3,ep) - Cv(cc2+C234,ep)+Cv(cc2+C134,ep)
       in(2,ep) = f2*Dv(N+dd3,ep) - Cv(cc2+C234,ep)+Cv(cc2+C124,ep)
       in(3,ep) = f3*Dv(N+dd3,ep) - Cv(cc2+C234,ep) - 2d0*Dv(N+dd00,ep)
-      enddo 
+      enddo
       call pvBackSubst(G,3,perm,in)
 
       do ep=-2,0
@@ -361,7 +361,7 @@ C--- three index tensors
       in(1,ep) = f1*Dv(N+dd11,ep) - csum(ep) - 4d0*Dv(N+dd001,ep)
       in(2,ep) = f2*Dv(N+dd11,ep) - csum(ep)+Cv(cc11+C124,ep)
       in(3,ep) = f3*Dv(N+dd11,ep) - csum(ep)+Cv(cc11+C123,ep)
-      enddo 
+      enddo
 
       call pvBackSubst(G,3,perm,in)
 
@@ -373,7 +373,7 @@ C--- three index tensors
       in(2,ep) = f2*Dv(N+dd22,ep) - Cv(cc11+C234,ep)
      . - 4d0*Dv(N+dd002,ep)
       in(3,ep) = f3*Dv(N+dd22,ep) - Cv(cc11+C234,ep)+Cv(cc22+C123,ep)
-      enddo 
+      enddo
 
       call pvBackSubst(G,3,perm,in)
 
@@ -386,7 +386,7 @@ C--- three index tensors
       in(2,ep) = f2*Dv(N+dd33,ep) - Cv(cc22+C234,ep)+Cv(cc22+C124,ep)
       in(3,ep) = f3*Dv(N+dd33,ep) - Cv(cc22+C234,ep)
      . - 4d0*Dv(N+dd003,ep)
-      enddo 
+      enddo
 
       call pvBackSubst(G,3,perm,in)
 
@@ -398,7 +398,7 @@ C--- three index tensors
       in(1,ep) = f1*Dv(N+dd13,ep)+c2sum(ep) - 2d0*Dv(N+dd003,ep)
       in(2,ep) = f2*Dv(N+dd13,ep)+c2sum(ep)+Cv(cc12+C124,ep)
       in(3,ep) = f3*Dv(N+dd13,ep)+c2sum(ep) - 2d0*Dv(N+dd001,ep)
-      enddo 
+      enddo
 
       call pvBackSubst(G,3,perm,in)
 
@@ -408,7 +408,7 @@ C--- three index tensors
       Dv(N+dd133,ep) = 0.5D0*(Dv(N+dd133,ep)+in(3,ep))
       enddo
 
-c--- check the contents of box array    
+c--- check the contents of box array
 c      write(6,*) 'PV: D array'
 c      do j=1,24
 c        write(6,'(i3,2e20.12)') j,Dv(j+N,0)
@@ -464,7 +464,7 @@ C
       in(1,ep) = f1*Dv(N+dd111,ep)+csum(ep) - 6d0*Dv(N+dd0011,ep)
       in(2,ep) = f2*Dv(N+dd111,ep)+csum(ep)+Cv(cc111+C124,ep)
       in(3,ep) = f3*Dv(N+dd111,ep)+csum(ep)+Cv(cc111+C123,ep)
-      enddo 
+      enddo
 C
       call pvBackSubst(G,3,perm,in)
 
@@ -476,7 +476,7 @@ C
       in(1,ep) = f1*Dv(N+dd113,ep) - c2sum(ep) - 4d0*Dv(N+dd0013,ep)
       in(2,ep) = f2*Dv(N+dd113,ep) - c2sum(ep)+Cv(cc112+C124,ep)
       in(3,ep) = f3*Dv(N+dd113,ep) - c2sum(ep) - 2d0*Dv(N+dd0011,ep)
-      enddo 
+      enddo
 C
       call pvBackSubst(G,3,perm,in)
 
@@ -488,7 +488,7 @@ C
       in(1,ep) = f1*Dv(N+dd122,ep)+c11sum(ep) - 2d0*Dv(N+dd0022,ep)
       in(2,ep) = f2*Dv(N+dd122,ep)+c11sum(ep) - 4d0*Dv(N+dd0012,ep)
       in(3,ep) = f3*Dv(N+dd122,ep)+c11sum(ep)+Cv(cc122+C123,ep)
-      enddo 
+      enddo
 C
       call pvBackSubst(G,3,perm,in)
 
@@ -500,7 +500,7 @@ C
       in(1,ep) = f1*Dv(N+dd222,ep)-Cv(cc111+C234,ep)+Cv(cc111+C134,ep)
       in(2,ep) = f2*Dv(N+dd222,ep)-Cv(cc111+C234,ep)-6*Dv(N+dd0022,ep)
       in(3,ep) = f3*Dv(N+dd222,ep)-Cv(cc111+C234,ep)+Cv(cc222+C123,ep)
-      enddo 
+      enddo
 C
       call pvBackSubst(G,3,perm,in)
 
@@ -513,7 +513,7 @@ C
       in(1,ep) = f1*Dv(N+dd233,ep)-Cv(cc122+C234,ep)+Cv(cc122+C134,ep)
       in(2,ep) = f2*Dv(N+dd233,ep)-Cv(cc122+C234,ep)-2*Dv(N+dd0033,ep)
       in(3,ep) = f3*Dv(N+dd233,ep)-Cv(cc122+C234,ep)-4*Dv(N+dd0023,ep)
-      enddo 
+      enddo
       call pvBackSubst(G,3,perm,in)
 
 C
@@ -524,7 +524,7 @@ C
       in(1,ep) = f1*Dv(N+dd333,ep)-Cv(cc222+C234,ep)+Cv(cc222+C134,ep)
       in(2,ep) = f2*Dv(N+dd333,ep)-Cv(cc222+C234,ep)+Cv(cc222+C124,ep)
       in(3,ep) = f3*Dv(N+dd333,ep)-Cv(cc222+C234,ep)-6*Dv(N+dd0033,ep)
-      enddo 
+      enddo
 C
       call pvBackSubst(G,3,perm,in)
 
@@ -549,7 +549,7 @@ C
       c2sum(ep) = c2sum(ep)+c12sum(ep)+c22sum(ep)
       csum(ep) = csum(ep)+c1sum(ep)+c2sum(ep)
 C
-      
+
       enddo
 
       if (maxdindex .eq. 4) return
@@ -644,7 +644,7 @@ C------begin of five index tensors
       in(1,ep)=f1*Dv(N+dd1111,ep)-csum(ep)-8*Dv(N+dd00111,ep)
       in(2,ep)=f2*Dv(N+dd1111,ep)-csum(ep)+Cv(cc1111+C124,ep)
       in(3,ep)=f3*Dv(N+dd1111,ep)-csum(ep)+Cv(cc1111+C123,ep)
-      enddo 
+      enddo
 
       call pvBackSubst(G,3,perm,in)
 
@@ -657,7 +657,7 @@ C
       in(1,ep)=f1*Dv(N+dd2222,ep)-Cv(cc1111+C234,ep)+Cv(cc1111+C134,ep)
       in(2,ep)=f2*Dv(N+dd2222,ep)-Cv(cc1111+C234,ep)-8*Dv(N+dd00222,ep)
       in(3,ep)=f3*Dv(N+dd2222,ep)-Cv(cc1111+C234,ep)+Cv(cc2222+C123,ep)
-      enddo 
+      enddo
 
       call pvBackSubst(G,3,perm,in)
 
@@ -670,7 +670,7 @@ C
       in(1,ep)=f1*Dv(N+dd3333,ep)-Cv(cc2222+C234,ep)+Cv(cc2222+C134,ep)
       in(2,ep)=f2*Dv(N+dd3333,ep)-Cv(cc2222+C234,ep)+Cv(cc2222+C124,ep)
       in(3,ep)=f3*Dv(N+dd3333,ep)-Cv(cc2222+C234,ep)-8*Dv(N+dd00333,ep)
-      enddo 
+      enddo
 
       call pvBackSubst(G,3,perm,in)
 
@@ -683,7 +683,7 @@ C
       in(1,ep)=f1*Dv(N+dd1122,ep)-c11sum(ep)-4*Dv(N+dd00122,ep)
       in(2,ep)=f2*Dv(N+dd1122,ep)-c11sum(ep)-4*Dv(N+dd00112,ep)
       in(3,ep)=f3*Dv(N+dd1122,ep)-c11sum(ep)+Cv(cc1122+C123,ep)
-      enddo 
+      enddo
 
       call pvBackSubst(G,3,perm,in)
 
@@ -696,7 +696,7 @@ C
       in(1,ep)=f1*Dv(N+dd1133,ep)-c22sum(ep)-4*Dv(N+dd00133,ep)
       in(2,ep)=f2*Dv(N+dd1133,ep)-c22sum(ep)+Cv(cc1122+C124,ep)
       in(3,ep)=f3*Dv(N+dd1133,ep)-c22sum(ep)-4*Dv(N+dd00113,ep)
-      enddo 
+      enddo
 
       call pvBackSubst(G,3,perm,in)
 
@@ -709,7 +709,7 @@ C
       in(1,ep)=f1*Dv(N+dd2233,ep)-Cv(cc1122+C234,ep)+Cv(cc1122+C134,ep)
       in(2,ep)=f2*Dv(N+dd2233,ep)-Cv(cc1122+C234,ep)-4*Dv(N+dd00233,ep)
       in(3,ep)=f3*Dv(N+dd2233,ep)-Cv(cc1122+C234,ep)-4*Dv(N+dd00223,ep)
-      enddo 
+      enddo
 
       call pvBackSubst(G,3,perm,in)
 
@@ -722,7 +722,7 @@ C
       in(1,ep)=f1*Dv(N+dd1123,ep)-c12sum(ep)-4*Dv(N+dd00123,ep)
       in(2,ep)=f2*Dv(N+dd1123,ep)-c12sum(ep)-2*Dv(N+dd00113,ep)
       in(3,ep)=f3*Dv(N+dd1123,ep)-c12sum(ep)-2*Dv(N+dd00112,ep)
-      enddo  
+      enddo
 
       call pvBackSubst(G,3,perm,in)
 
@@ -735,7 +735,7 @@ C
       in(1,ep)=f1*Dv(N+dd2223,ep)-Cv(cc1112+C234,ep)+Cv(cc1112+C134,ep)
       in(2,ep)=f2*Dv(N+dd2223,ep)-Cv(cc1112+C234,ep)-6*Dv(N+dd00223,ep)
       in(3,ep)=f3*Dv(N+dd2223,ep)-Cv(cc1112+C234,ep)-2*Dv(N+dd00222,ep)
-      enddo 
+      enddo
 
       call pvBackSubst(G,3,perm,in)
 
@@ -747,8 +747,8 @@ C
       in(1,ep)=f1*Dv(N+dd2333,ep)-Cv(cc1222+C234,ep)+Cv(cc1222+C134,ep)
       in(2,ep)=f2*Dv(N+dd2333,ep)-Cv(cc1222+C234,ep)-2*Dv(N+dd00333,ep)
       in(3,ep)=f3*Dv(N+dd2333,ep)-Cv(cc1222+C234,ep)-6*Dv(N+dd00233,ep)
-      enddo 
-      
+      enddo
+
       call pvBackSubst(G,3,perm,in)
 
       do ep=-2,0
@@ -934,7 +934,7 @@ C Dv(ppppp)
       Dv(N+dd111111,ep)=in(1,ep)
       Dv(N+dd111112,ep)=in(2,ep)
       Dv(N+dd111113,ep)=in(3,ep)
-     
+
 C Dv(ppppk)
       in(1,ep) = f1*Dv(N+dd11112,ep)-8.D0*Dv(N+dd001112,ep)-Cv(
      & cc1+C234,ep)-4.D0*Cv(cc11+C234,ep)-6.D0*Cv(cc111+C234,
@@ -970,7 +970,7 @@ C Dv(ppppk)
       Dv(N+dd111112,ep)=in(1,ep)
       Dv(N+dd111122,ep)=in(2,ep)
       Dv(N+dd111123,ep)=in(3,ep)
-     
+
 C Dv(pppkl)
       in(1,ep) = f1*Dv(N+dd11123,ep)-6.D0*Dv(N+dd001123,ep)+Cv(
      & cc11112+C234,ep)+3.D0*Cv(cc1112+C234,ep)+3.D0*Cv(cc11122
@@ -1000,7 +1000,7 @@ C Dv(pppkl)
       Dv(N+dd111123,ep)=in(1,ep)
       Dv(N+dd111223,ep)=in(2,ep)
       Dv(N+dd111233,ep)=in(3,ep)
-     
+
 C Dv(pppll)
       in(1,ep) = f1*Dv(N+dd11133,ep)-6.D0*Dv(N+dd001133,ep)+Cv(
      & cc11122+C234,ep)+3.D0*Cv(cc1122+C234,ep)+3.D0*Cv(cc11222
@@ -1030,7 +1030,7 @@ C Dv(pppll)
       Dv(N+dd111133,ep)=in(1,ep)
       Dv(N+dd111233,ep)=in(2,ep)
       Dv(N+dd111333,ep)=in(3,ep)
-     
+
 C Dv(kkkpp)
       in(1,ep) = f1*Dv(N+dd11222,ep)-4.D0*Dv(N+dd001222,ep)-Cv(
      & cc111+C234,ep)-2.D0*Cv(cc1111+C234,ep)-Cv(cc11111+C234
@@ -1054,7 +1054,7 @@ C Dv(kkkpp)
       Dv(N+dd111222,ep)=in(1,ep)
       Dv(N+dd112222,ep)=in(2,ep)
       Dv(N+dd112223,ep)=in(3,ep)
-     
+
 C Dv(lllpp)
       in(1,ep) = f1*Dv(N+dd11333,ep)-4.D0*Dv(N+dd001333,ep)-Cv(
      & cc11222+C234,ep)-2.D0*Cv(cc1222+C234,ep)-2.D0*Cv(cc12222
@@ -1078,7 +1078,7 @@ C Dv(lllpp)
       Dv(N+dd111333,ep)=in(1,ep)
       Dv(N+dd112333,ep)=in(2,ep)
       Dv(N+dd113333,ep)=in(3,ep)
-     
+
 C Dv(kkllp)
       in(1,ep) = f1*Dv(N+dd12233,ep)-2.D0*Dv(N+dd002233,ep)+Cv(
      & cc11122+C234,ep)+Cv(cc1122+C234,ep)+Cv(cc11222+C234,ep
@@ -1099,7 +1099,7 @@ C Dv(kkllp)
       Dv(N+dd112233,ep)=in(1,ep)
       Dv(N+dd122233,ep)=in(2,ep)
       Dv(N+dd122333,ep)=in(3,ep)
-     
+
 C Dv(kkkkk)
       in(1,ep) = f1*Dv(N+dd22222,ep)+Cv(cc11111+C134,ep)-Cv(
      & cc11111+C234,ep)
@@ -1117,7 +1117,7 @@ C Dv(kkkkk)
       Dv(N+dd122222,ep)=in(1,ep)
       Dv(N+dd222222,ep)=in(2,ep)
       Dv(N+dd222223,ep)=in(3,ep)
-     
+
 C Dv(kkkkl)
       in(1,ep) = f1*Dv(N+dd22223,ep)+Cv(cc11112+C134,ep)-Cv(
      & cc11112+C234,ep)
@@ -1135,7 +1135,7 @@ C Dv(kkkkl)
       Dv(N+dd122223,ep)=in(1,ep)
       Dv(N+dd222223,ep)=in(2,ep)
       Dv(N+dd222233,ep)=in(3,ep)
-     
+
 C Dv(kkkll)
       in(1,ep) = f1*Dv(N+dd22233,ep)+Cv(cc11122+C134,ep)-Cv(
      & cc11122+C234,ep)
@@ -1153,7 +1153,7 @@ C Dv(kkkll)
       Dv(N+dd122233,ep)=in(1,ep)
       Dv(N+dd222233,ep)=in(2,ep)
       Dv(N+dd222333,ep)=in(3,ep)
-     
+
 C Dv(llllk)
       in(1,ep) = f1*Dv(N+dd23333,ep)+Cv(cc12222+C134,ep)-Cv(
      & cc12222+C234,ep)
@@ -1171,7 +1171,7 @@ C Dv(llllk)
       Dv(N+dd123333,ep)=in(1,ep)
       Dv(N+dd223333,ep)=in(2,ep)
       Dv(N+dd233333,ep)=in(3,ep)
-     
+
 C Dv(lllll)
       in(1,ep) = f1*Dv(N+dd33333,ep)+Cv(cc22222+C134,ep)-Cv(
      & cc22222+C234,ep)
@@ -1581,7 +1581,7 @@ c      write(66,*) 'D:zx',j,Dv(N+j,-2),Dv(N+j,-1),Dv(N+j,0)
       enddo
       include 'pvD7.f'
 
-c--- to check recursion identities      
+c--- to check recursion identities
 c      call Dfill_alt(p1,p2,p3,p4,p1p2,p2p3,m1,m2,m3,m4,N)
 
       end

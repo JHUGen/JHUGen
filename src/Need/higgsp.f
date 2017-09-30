@@ -52,7 +52,7 @@ C  Other branching ratios could be added.
       htemp=hmass
       nlo=int(htemp)
       endif
-      bbbr=brbb(nlo)+(htemp-nlo)*(brbb(nlo+1)-brbb(nlo)) 
+      bbbr=brbb(nlo)+(htemp-nlo)*(brbb(nlo+1)-brbb(nlo))
       tautaubr=brtautau(nlo)+(htemp-nlo)*(brtautau(nlo+1)-brtautau(nlo))
       gamgambr=brgamgam(nlo)+(htemp-nlo)*(brgamgam(nlo+1)-brgamgam(nlo))
       zgambr=brzgam(nlo)+(htemp-nlo)*(brzgam(nlo+1)-brzgam(nlo))

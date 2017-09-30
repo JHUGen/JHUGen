@@ -7,7 +7,7 @@ C                             December 12, 2004, v6.12
 C                             December 4, 2006, v6.5 (CTEQ6.5M series added)
 C                             March 23, 2007, v6.51 (CTEQ6.5S/C series added)
 C                             April 24, 2007, v6.52 (minor improvement)
-C                             March 30, 2008, v6.6 
+C                             March 30, 2008, v6.6
 C
 C   Ref[1]: "New Generation of Parton Distributions with Uncertainties from Global QCD Analysis"
 C       By: J. Pumplin, D.R. Stump, J.Huston, H.L. Lai, P. Nadolsky, W.K. Tung
@@ -39,7 +39,7 @@ C       Phys.Rev.D75:054029,2007, hep-ph/0701220
 
 C   Ref[8]: "Implications of CTEQ global analysis for collider observables"
 C       By : P. M. Nadolsky, H.-L. Lai, Q.-H. Cao, J. Huston, J. Pumplin, D. R. Stump, W.-K. Tung, C.-P. Yuan
-C       arXiv:0802.0007 [hep-ph], submitted to Phys. Rev. D. 
+C       arXiv:0802.0007 [hep-ph], submitted to Phys. Rev. D.
 C
 
 C   This package contains
@@ -60,7 +60,7 @@ C  Details about the calling convention are:
 C --------------------------------------------------------------------------------
 C  Iset   PDF-set     Description       Alpha_s(Mz)**Lam4  Lam5   Table_File   Ref
 C ================================================================================
-C Standard, "best-fit", sets:                 
+C Standard, "best-fit", sets:
 C --------------------------
 C   1    CTEQ6M   Standard MSbar scheme   0.118     326   226    cteq6m.tbl    [1]
 C   2    CTEQ6D   Standard DIS scheme     0.118     326   226    cteq6d.tbl    [1]
@@ -77,7 +77,7 @@ C 451    CTEQ6.6C2   BHPS model for IC    0.118     326   226    ctq66.c2.pds
 C 452    CTEQ6.6C3   Sea-like model       0.118     326   226    ctq66.c3.pds
 C 453    CTEQ6.6C4   Sea-like model       0.118     326   226    ctq66.c4.pds
 C     Momentum Fraction carried by c+cbar=2c at Q0=1.3 GeV:
-C    Iset:     451  452   453   454 
+C    Iset:     451  452   453   454
 C Mom. frac:  0.01 0.035  0.01  0.035
 
 
@@ -156,7 +156,7 @@ C        where xx = 01-40: 01/02 corresponds to +/- for the 1st eigenvector, ...
 C        e.g. 300      is CTEQ65.00 (=CTEQ6.5M),
 C             301/302 are CTEQ65.01/02, +/- sets of 1st eigenvector, ... etc.
 C        ====================================================================
-C                Version with mass effects and free strangeness, Ref[8]:  
+C                Version with mass effects and free strangeness, Ref[8]:
 C                central fit: CTEQ6.6M (=CTEQ66.00)
 C                              -----------------------
 C  4xx  CTEQ66.xx  +/- sets               0.118     326   226    ctq66.xx.pds
@@ -171,7 +171,7 @@ C   which uses the LO running \alpha_s and its value determined from the fit.
 C   For the LO fits, the evolution of the PDF and the hard cross sections are
 C   calculated at LO.  More detailed discussions are given in the references.
 C
-C   The table grids are generated for 
+C   The table grids are generated for
 C    *  10^-8 < x < 1 and 1.3 < Q < 10^5 (GeV) for CTEQ6.6 series;
 C    *  10^-7 < x < 1 and 1.3 < Q < 10^5 (GeV) for CTEQ6.5S/C series;
 C    *  10^-6 < x < 1 and 1.3 < Q < 10,000 (GeV) for CTEQ6, CTEQ6.1 series;
@@ -326,16 +326,16 @@ C                                                    (Cteq6.5)  300 - 340
           write(nn,'(I3)') Iset
           Tablefile=Flnm(7)//nn(2:3)//'.pds'
         Elseif (Iset.ge.Isetmin4 .and. Iset.le.Isetmax4) Then
-C                                                    (Cteq6.6)  400 - 444   
+C                                                    (Cteq6.6)  400 - 444
           write(nn,'(I3)') Iset
           Tablefile=Flnm(8)//nn(2:3)//'.pds'
         Elseif (Iset.ge.IsetmnC08 .and. Iset.le.IsetmxC08) Then
 C                                                   (Cteq6.6C)  450 - 453
-          write(nn,'(I3)') Iset 
+          write(nn,'(I3)') Iset
           Tablefile=Flnm(8)//'c'//nn(3:3)//'.pds'
         Elseif (Iset.ge.IsetmnAS08 .and. Iset.le.IsetmxAS08) Then
 C                                                   (Cteq6.6AS)  460 - 463
-          write(nn,'(I3)') Iset 
+          write(nn,'(I3)') Iset
           Tablefile=Flnm(8)//'a'//nn(3:3)//'.pds'
         Else
           Print *, 'Invalid Iset number in SetCtq6 :', Iset
@@ -446,7 +446,7 @@ c
       Save sy2, sy3, s23, tt, t12, t13, t23, t24, t34, ty2, ty3
       Save tmp1, tmp2, tdet
       save Isetch
-!$omp threadprivate(Isetch,X,Q,JX,JQ,JLX,JLQ)     
+!$omp threadprivate(Isetch,X,Q,JX,JQ,JLX,JLQ)
 !$omp threadprivate(ss,const1,const2,const3,const4,const5,const6)
 !$omp threadprivate(sy2,sy3,s23,tt,t12,t13,t23,t24,t34,ty2,ty3)
 !$omp threadprivate(tmp1, tmp2, tdet)

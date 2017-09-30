@@ -14,8 +14,8 @@ C---- (These are twiddle functions, c.f.arXiv:1101.5947[hep-ph],Eq.(91))
       double precision s23,mt3
       double complex ze1xK12xK23xe4
       integer e1,p2,p3,e4,j
- 
-C-----setup variable controlling integrals to be used, 
+
+C-----setup variable controlling integrals to be used,
 C-----depending on whether p2=2 or 3
       j=p2-1
       mt3=mt**3
@@ -49,17 +49,17 @@ C-----depending on whether p2=2 or 3
      & *mt3/za(p2,p3)**2/zab(p2,q1,p3)
      &  -za(p3,e1)*za(p3,e4)*zab(p2,q1,p2)*zb(p2,p3)
      & *mt3/za(p2,p3)**2/zab(p3,q1,p2) )
-  
-     & + ( 
+
+     & + (
      &    za(p2,e1)*za(p2,e4)*zb(p3,p2)*zb(p2,p3)
      & *mt3/2d0/za(p2,p3)/zab(p2,q1,p3)
      &   -za(p3,e1)*za(p3,e4)*zb(p3,p2)*zb(p2,p3)
      & *mt3/2d0/za(p2,p3)/zab(p3,q1,p2)
-     &   -za(e1,e4)*zb(p2,p3)*mt3/za(p2,p3) 
+     &   -za(e1,e4)*zb(p2,p3)*mt3/za(p2,p3)
      &   )*I3m2x3x41)
- 
+
 c---- sign required in accordance with LHS of eq. (93)
       BSYARggpppphp=-BSYARggpppphp
- 
+
       return
       end

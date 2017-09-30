@@ -6,7 +6,7 @@ c----initial-final subtraction.
       include 'xmin.f'
       include 'debug.f'
       logical justjac
-      
+
       integer i1,i2,i3,i4,i5,j,k,nperms
       double precision p(mxpart,4),u,z,dot,q(mxpart,4),
      . msq(-nf:nf,-nf:nf),omxmin
@@ -38,7 +38,7 @@ c----note momenta all incoming
       omx=one-x
       omxmin=one-xmin
 c -xx(i1)
-c---at this stage the p are momenta including radiation 
+c---at this stage the p are momenta including radiation
 
       do j=1,4
       q(i1,j)=x*p(i1,j)
@@ -57,7 +57,7 @@ c---at this stage the p are momenta including radiation
 c---calculate total weight
       wt=wt5_4*wt4
 
-      
+
 
       if (debug) then
       write(6,*) 'x in genif',x
@@ -78,7 +78,7 @@ c---calculate total weight
       call qqb_wbb(q,msq)
 
 
-c----initial wrt to final 
+c----initial wrt to final
       facq=-gsq/(x*si1i3)*(two/(one-x+u)-one-x)
      &     -gsq/(x*si3i4)*(two/(one-x+u)-one-z)
 

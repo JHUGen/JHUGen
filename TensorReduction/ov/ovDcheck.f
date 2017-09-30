@@ -9,7 +9,7 @@
       double precision q1(4),q2(4),q3(4),p2(4),p3(4),p23(4),Dacc
       double precision q1Dq1,q2Dq2,q3Dq3,q1Dq2,q2Dq3,q1Dq3,
      & m1s,m2s,m3s,m4s,sing4(-2:0),f1,f2,f3
-      double complex 
+      double complex
      & FC01(-2:0),FC11(y1max,-2:0),FC21(y2max,-2:0),FC31(y3max,-2:0),
      & FC02(-2:0),FC12(y1max,-2:0),FC22(y2max,-2:0),FC32(y3max,-2:0),
      & FC03(-2:0),FC13(y1max,-2:0),FC23(y2max,-2:0),FC33(y3max,-2:0),
@@ -21,12 +21,12 @@
       logical failed
       integer ierr
       parameter(epmin=0) ! Only check finite pieces
-      
+
       failed=.false.
       ierr=0
 
       Dacc=1d-8
-      
+
       q1Dq1=q1(4)**2-q1(1)**2-q1(2)**2-q1(3)**2
       q2Dq2=q2(4)**2-q2(1)**2-q2(2)**2-q2(3)**2
       q3Dq3=q3(4)**2-q3(1)**2-q3(2)**2-q3(3)**2
@@ -38,13 +38,13 @@ c      if (pvverbose) write(6,*)
 c      if (pvverbose) write(6,*) '(p1sq, p2sq, p3sq, m1sq, m2sq, m3sq, m4sq) = '
 c      if (pvverbose) write(6,'(a2,7(e12.5,a2))'),
 c     . '( ',q1Dq1,', ',q2Dq2+q1Dq1-2d0*q1Dq2,', ',q3Dq3+q2Dq2-2d0*q2Dq3,
-c     . ', ',m1s,', ',m2s,', ',m3s,', ',m4s,' )' 
-            
+c     . ', ',m1s,', ',m2s,', ',m3s,', ',m4s,' )'
+
       do nu=1,4
       p2(nu)=q2(nu)-q1(nu)
       p23(nu)=q3(nu)-q1(nu)
       p3(nu)=q3(nu)-q2(nu)
-      enddo  
+      enddo
 
       do ep=-2,0
       sing4(ep)=zip
@@ -78,7 +78,7 @@ c     . ', ',m1s,', ',m2s,', ',m3s,', ',m4s,' )'
      &  -q1(2)*FD1(2,ep)
      &  -q1(3)*FD1(3,ep)
       trhs=-0.5d0*(FC01(ep)-FC04(ep)+f1*FD0(ep))
-      call checkaccuracy(trhs,tq,Dacc,failed) 
+      call checkaccuracy(trhs,tq,Dacc,failed)
       if (failed) then
         ierr=11
       goto 77
@@ -96,7 +96,7 @@ c      if (pvverbose) write(6,*) -0.5d0*(+f1*FD0(ep))
      &  -q2(2)*FD1(2,ep)
      &  -q2(3)*FD1(3,ep)
       trhs=-0.5d0*(FC02(ep)-FC04(ep)+f2*FD0(ep))
-      call checkaccuracy(trhs,tq,Dacc,failed) 
+      call checkaccuracy(trhs,tq,Dacc,failed)
       if (failed) then
         ierr=12
       goto 77
@@ -110,7 +110,7 @@ c      if (pvverbose) write(6,*) -0.5d0*(+f1*FD0(ep))
      &    -q3(2)*FD1(2,ep)
      &    -q3(3)*FD1(3,ep)
       trhs=-0.5d0*(FC03(ep)-FC04(ep)+f3*FD0(ep))
-      call checkaccuracy(trhs,tq,Dacc,failed) 
+      call checkaccuracy(trhs,tq,Dacc,failed)
       if (failed) then
         ierr=13
       goto 77
@@ -127,10 +127,10 @@ c      if (pvverbose) write(6,*) -0.5d0*(+f1*FD0(ep))
       tq =q1(4)*FD2(y2(4,n2),ep)
      &   -q1(1)*FD2(y2(1,n2),ep)
      &   -q1(2)*FD2(y2(2,n2),ep)
-     &   -q1(3)*FD2(y2(3,n2),ep)   
-      trhs= 
+     &   -q1(3)*FD2(y2(3,n2),ep)
+      trhs=
      &   -0.5d0*(FC11(n2,ep)-FC14a(n2,ep)+f1*FD1(n2,ep))
-      call checkaccuracy(trhs,tq,Dacc,failed) 
+      call checkaccuracy(trhs,tq,Dacc,failed)
       if (failed) then
         ierr=21
       goto 77
@@ -147,7 +147,7 @@ c      if (pvverbose) write(6,*) -0.5d0*(+f1*FD0(ep))
      &   -q2(3)*FD2(y2(3,n2),ep)
       trhs=
      &   -0.5d0*(FC12(n2,ep)-FC14a(n2,ep)+f2*FD1(n2,ep))
-      call checkaccuracy(trhs,tq,Dacc,failed) 
+      call checkaccuracy(trhs,tq,Dacc,failed)
       if (failed) then
         ierr=22
       goto 77
@@ -164,7 +164,7 @@ c      if (pvverbose) write(6,*) -0.5d0*(+f1*FD0(ep))
      &    -q3(3)*FD2(y2(3,n2),ep)
       trhs=
      & -0.5d0*(FC13(n2,ep)-FC14a(n2,ep)+f3*FD1(n2,ep))
-      call checkaccuracy(trhs,tq,Dacc,failed) 
+      call checkaccuracy(trhs,tq,Dacc,failed)
       if (failed) then
         ierr=23
       goto 77
@@ -174,14 +174,14 @@ c      if (pvverbose) write(6,*) -0.5d0*(+f1*FD0(ep))
 
       if (pvverbose) write(6,*) 'g_(mu,nu)*FD2'
       do ep=epmin,0
-      tq = 
+      tq =
      & +FD2(y2(4,4),ep)
      & -FD2(y2(1,1),ep)
      & -FD2(y2(2,2),ep)
      & -FD2(y2(3,3),ep)
      & -m1s*FD0(ep)
       trhs=-FC04(ep)
-      call checkaccuracy(trhs,tq,Dacc,failed) 
+      call checkaccuracy(trhs,tq,Dacc,failed)
       if (failed) then
         ierr=20
       goto 77
@@ -202,7 +202,7 @@ c      if (pvverbose) write(6,*) -0.5d0*(+f1*FD0(ep))
       trhs=
      &   -0.5d0*(FC21(y2(n2,n3),ep)
      & -FC24a(y2(n2,n3),ep)+f1*FD2(y2(n2,n3),ep))
-      call checkaccuracy(trhs,tq,Dacc,failed) 
+      call checkaccuracy(trhs,tq,Dacc,failed)
       if (failed) then
         ierr=31
       goto 77
@@ -218,11 +218,11 @@ c      if (pvverbose) write(6,*) -0.5d0*(+f1*FD0(ep))
       tq =q2(4)*FD3(y3(4,n2,n3),ep)
      &   -q2(1)*FD3(y3(1,n2,n3),ep)
      &   -q2(2)*FD3(y3(2,n2,n3),ep)
-     &   -q2(3)*FD3(y3(3,n2,n3),ep)   
+     &   -q2(3)*FD3(y3(3,n2,n3),ep)
       trhs=
      & -0.5d0*(FC22(y2(n2,n3),ep)
      & -FC24a(y2(n2,n3),ep)+f2*FD2(y2(n2,n3),ep))
-      call checkaccuracy(trhs,tq,Dacc,failed) 
+      call checkaccuracy(trhs,tq,Dacc,failed)
       if (failed) then
         ierr=32
       goto 77
@@ -238,11 +238,11 @@ c      if (pvverbose) write(6,*) -0.5d0*(+f1*FD0(ep))
       tq =q3(4)*FD3(y3(4,n2,n3),ep)
      &   -q3(1)*FD3(y3(1,n2,n3),ep)
      &   -q3(2)*FD3(y3(2,n2,n3),ep)
-     &   -q3(3)*FD3(y3(3,n2,n3),ep)   
+     &   -q3(3)*FD3(y3(3,n2,n3),ep)
       trhs=
      & -0.5d0*(FC23(y2(n2,n3),ep)
      & -FC24a(y2(n2,n3),ep)+f3*FD2(y2(n2,n3),ep))
-      call checkaccuracy(trhs,tq,Dacc,failed) 
+      call checkaccuracy(trhs,tq,Dacc,failed)
       if (failed) then
         ierr=33
       goto 77
@@ -254,7 +254,7 @@ c      if (pvverbose) write(6,*) -0.5d0*(+f1*FD0(ep))
       if (pvverbose) write(6,*) 'g_(mu,nu)*FD3'
       do ep=epmin,0
       do n3=1,4
-      tq =    
+      tq =
      & +FD3(y3(4,4,n3),ep)
      & -FD3(y3(1,1,n3),ep)
      & -FD3(y3(2,2,n3),ep)
@@ -262,7 +262,7 @@ c      if (pvverbose) write(6,*) -0.5d0*(+f1*FD0(ep))
      & -m1s*FD1(n3,ep)
       trhs=
      & -FC14a(n3,ep)
-      call checkaccuracy(trhs,tq,Dacc,failed) 
+      call checkaccuracy(trhs,tq,Dacc,failed)
       if (failed) then
         ierr=30
       goto 77
@@ -283,7 +283,7 @@ c      if (pvverbose) write(6,*) -0.5d0*(+f1*FD0(ep))
       trhs=
      & -0.5d0*(FC31(y3(n2,n3,n4),ep)
      & -FC34a(y3(n2,n3,n4),ep)+f1*FD3(y3(n2,n3,n4),ep))
-      call checkaccuracy(trhs,tq,Dacc,failed) 
+      call checkaccuracy(trhs,tq,Dacc,failed)
       if (failed) then
         ierr=41
       goto 77
@@ -292,7 +292,7 @@ c      if (pvverbose) write(6,*) -0.5d0*(+f1*FD0(ep))
       enddo
       enddo
       enddo
-     
+
       if (pvverbose) write(6,*) 'q2.FD4'
       do ep=epmin,0
       do n2=1,4
@@ -305,7 +305,7 @@ c      if (pvverbose) write(6,*) -0.5d0*(+f1*FD0(ep))
       trhs=
      & -0.5d0*(FC32(y3(n2,n3,n4),ep)
      & -FC34a(y3(n2,n3,n4),ep)+f2*FD3(y3(n2,n3,n4),ep))
-      call checkaccuracy(trhs,tq,Dacc,failed) 
+      call checkaccuracy(trhs,tq,Dacc,failed)
       if (failed) then
         ierr=42
       goto 77
@@ -314,7 +314,7 @@ c      if (pvverbose) write(6,*) -0.5d0*(+f1*FD0(ep))
       enddo
       enddo
       enddo
-     
+
       if (pvverbose) write(6,*) 'q3.FD4'
       do ep=epmin,0
       do n2=1,4
@@ -327,7 +327,7 @@ c      if (pvverbose) write(6,*) -0.5d0*(+f1*FD0(ep))
       trhs=
      &   -0.5d0*(FC33(y3(n2,n3,n4),ep)
      & -FC34a(y3(n2,n3,n4),ep)+f3*FD3(y3(n2,n3,n4),ep))
-      call checkaccuracy(trhs,tq,Dacc,failed) 
+      call checkaccuracy(trhs,tq,Dacc,failed)
       if (failed) then
         ierr=43
       goto 77
@@ -336,7 +336,7 @@ c      if (pvverbose) write(6,*) -0.5d0*(+f1*FD0(ep))
       enddo
       enddo
       enddo
-    
+
       if (pvverbose) write(6,*) 'g_(mu,nu)*FD4'
       do ep=epmin,0
       do n3=1,4
@@ -350,7 +350,7 @@ c      if (pvverbose) write(6,*) -0.5d0*(+f1*FD0(ep))
       trhs=
      & -FC24a(y2(n3,n4),ep)
      & +dcmplx(sing4(ep))
-      call checkaccuracy(trhs,tq,Dacc,failed) 
+      call checkaccuracy(trhs,tq,Dacc,failed)
       if (failed) then
         ierr=40
       goto 77
@@ -368,7 +368,7 @@ c        write(6,*) 'ovDcheck: error code',ierr
 c        write(6,*) 'tq,trhs,tq+trhs',tq,trhs,
 c     &   (tq+trhs)/(tq-trhs)
       endif
-   
+
       return
       end
 

@@ -14,7 +14,7 @@ c                         --> e^-(p3)+nu~(p4)
 c
 c--- Extended to include charm quark production via the variable "flav"
 
-      implicit none 
+      implicit none
       include 'constants.f'
       include 'ckm.f'
       include 'heavyflav.f'
@@ -41,7 +41,7 @@ c--- Extended to include charm quark production via the variable "flav"
       msq(j,k)=0d0
       enddo
       enddo
- 
+
       call spinoru(7,p,za,zb)
 
 ************************************************************************
@@ -49,18 +49,18 @@ c--- Extended to include charm quark production via the variable "flav"
 ************************************************************************
 
       if (isub .eq. 1) then
-c--- basic Q-Q amplitudes 
+c--- basic Q-Q amplitudes
         call addhel_wbj(1,6,2,5,7,3,4,QQ_us_sd)
         call addhel_wbj(2,6,1,5,7,3,4,QQ_su_sd)
-c--- basic Qb-Qb amplitudes 
+c--- basic Qb-Qb amplitudes
         call addhel_wbj(6,1,5,2,7,3,4,QbQb_ds_su)
         call addhel_wbj(6,2,5,1,7,3,4,QbQb_sd_su)
 c--- basic Q-Qb amplitudes
-c--- scattering 
+c--- scattering
         call addhel_wbj(1,6,5,2,7,3,4,QQb_us_sd)
         call addhel_wbj(6,2,1,5,7,3,4,QQb_su_sd)
 c--- basic Qb-Q amplitudes
-c--- scattering 
+c--- scattering
         call addhel_wbj(2,6,5,1,7,3,4,QbQ_su_sd)
         call addhel_wbj(6,1,2,5,7,3,4,QbQ_us_sd)
 c--- basic Q-G amplitudes
@@ -72,7 +72,7 @@ c--- basic G-Q amplitudes
 c--- basic G-QB amplitudes
         call addhel_wbj(6,7,5,2,1,3,4,GQb_u_ucs)
       endif
-      
+
       if (isub .eq. 2) then
 c--- gq amplitudes
         call addhel_wbj(1,7,5,6,2,3,4,QG_u_dcc)
@@ -94,10 +94,10 @@ c      write(6,*) 'qgWbbq',gsq**3*gw**4/4d0*aveqq*qgWbbq
 c      write(6,*) 'ratio',gsq**3*gw**4/4d0*aveqq*qgWbbq/QG_u_dcc
 c      write(6,*) 'redsqm result',
 c     . gsq**3*gw**4/4d0*aveqq*redmsqm(1,7,2,5,6,3,4,zip)
-c      pause     
-      
+c      pause
+
 c--- set up auxiliary array
-     
+
       do j=-nf,nf
         Vsm(j)=Vsum(j)
         if (abs(j) .ge. flav) Vsm(j)=0d0
@@ -105,7 +105,7 @@ c--- make sure that elements are either one or zero
         if (Vsm(j) .gt. 0d0) Vsm(j)=1d0
       enddo
 c      pause
-      
+
 c--- This sum represents the number of light flavours that may be
 c--- attached to the W
 c---  for the bottom quark, this is 2
@@ -115,11 +115,11 @@ c---  for the charm quark, it is 1 (no extra charm in the final state)
       else
         nlightf=Vsm(-1)+Vsm(-2)+Vsm(-3)+Vsm(-4)
       endif
-      
+
       do j=-nf,nf
       do k=-nf,nf
       msq(j,k)=0d0
-      
+
       if ((abs(j) .ne. flav) .and. (abs(k) .ne. flav)) goto 97
       if ((abs(j) .eq. flav) .and. (abs(k) .eq. flav)) goto 97
 c--- so that either abs(j) or abs(k) = flav (but not both).
@@ -133,7 +133,7 @@ c--- e.g.  b d~ -> b u~ or u b~ -> b~ d
 c--- e.g.  d~ b -> b u~ or b~ u -> b~ d
              msq(j,k)=+(Vsm(k)*QbQ_su_sd+Vsm(j)*QbQ_us_sd)
         elseif ((j .gt. 0) .and. (k .gt. 0)) then
-c--- e.g.  b u -> b d  or u b b d 
+c--- e.g.  b u -> b d  or u b b d
              msq(j,k)=+(Vsm(k)*QQ_su_sd+Vsm(j)*QQ_us_sd)
         elseif ((j .lt. 0) .and. (k .lt. 0)) then
 c--- e.g.  b~ d~ -> b~ u~ or d~ b~ -> b~ u~
@@ -148,7 +148,7 @@ c--- e.g.  b~ d~ -> b~ u~ or d~ b~ -> b~ u~
              msq(j,k)=nlightf*(aveqg/aveqq)*QbG_u_ucs
         endif
       endif
-      
+
  97   continue
 
       if (isub .eq. 2) then

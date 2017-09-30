@@ -13,7 +13,7 @@ C---- taken form arXiv:1101.5947 [hep-ph], Eq. (5,52)
       double complex BSYALggpppphp,BSYARggpppphp,BSYALslggpppp
       double complex BSYA0ggpppp,lnrat,Vslc
       integer e1,p2,p3,e4
-              
+
       mt2=mt**2
       beta=sqrt(1d0-4d0*mt2/s(p2,p3))
       xlog=log((1d0-beta)/(1d0+beta))/beta

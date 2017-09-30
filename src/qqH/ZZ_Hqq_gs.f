@@ -1,5 +1,5 @@
       subroutine ZZ_Hqq_gs(p,msq)
-      implicit none 
+      implicit none
 ************************************************************************
 *     Author: J. M. Campbell                                           *
 *     July, 2002.                                                      *
@@ -16,7 +16,7 @@
       integer j,k,nd
 
       double precision p(mxpart,4),msq(maxd,-nf:nf,-nf:nf)
-      double precision 
+      double precision
      . msq17_5(-nf:nf,-nf:nf),msq27_6(-nf:nf,-nf:nf),
      . msq16_2(-nf:nf,-nf:nf),msq27_1(-nf:nf,-nf:nf),
      . msq15_2(-nf:nf,-nf:nf),msq26_1(-nf:nf,-nf:nf),
@@ -35,7 +35,7 @@
       enddo
       enddo
       enddo
-      
+
 c---- calculate the dipoles: initial-final and final-initial
 c---- note that we do not require the gg dipoles, so the v-type
 c---- entries are left as dummies
@@ -116,7 +116,7 @@ C---gqb
       enddo
       enddo
 
-      return      
+      return
       end
 
 

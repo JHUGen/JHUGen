@@ -1,7 +1,7 @@
       subroutine ZZmbc(st,j1,j2,j3,j4,j5,j6,za,zb,bcoeff)
       implicit none
 c----Bubble coefficients extracted from BDK 11.5, 11.8
-c----after performing a transformation 
+c----after performing a transformation
       integer j1,j2,j3,j4,j5,j6
       include 'constants.f'
       include 'zprods_decl.f'
@@ -44,7 +44,7 @@ c---end statement functions
 
       bcoeff(:)=czip
 
-      
+
       if     (st.eq.'q+qb-g+g+') then
 
       bcoeff(b34)=funcb34pp(j1,j2,j3,j4,j5,j6)
@@ -64,7 +64,7 @@ c      bcoeff(b234)=funcb134pp(j2,j1,j3,j4,j5,j6)
      & +zb(j4,j6)**2/(zb(j3,j4)*zb(j5,j6)))/za(j1,j2)**2
 
       elseif (st.eq.'q+qb-g-g+') then
-      
+
 
 c      bcoeff(b12zm)= + IDelta**2 * ( 3.D0*zba2(j4,j1,j2,j3)*zba2(j2,j3,
 C     &    j4,j1)*zba2(j6,j1,j2,j5)/zba2(j1,j3,j4,j2)*s(j3,j4) + 3.D0*
@@ -96,7 +96,7 @@ C     &    j4,j6)*zb(j1,j6)*za(j3,j4)*za(j3,j2)*za(j6,j5)/zba2(j1,j4,j3
 C     &    ,j2)**3*t(j4,j3,j2) + zb(j3,j4)*zb(j4,j6)*za(j3,j4)*za(j3,j5)
 C     &    /zba2(j1,j3,j4,j2)**2*s(j3,j4) - zb(j3,j4)*zb(j4,j6)*za(j3,
 C     &    j4)*za(j3,j5)/zba2(j1,j3,j4,j2)**2*s(j1,j2) - zb(j3,j4)*zb(
-C     &    j4,j6)*za(j3,j4)*za(j3,j5)/zba2(j1,j3,j4,j2)**2*s(j5,j6) + 
+C     &    j4,j6)*za(j3,j4)*za(j3,j5)/zba2(j1,j3,j4,j2)**2*s(j5,j6) +
 C     &    zb(j3,j4)*zb(j4,j6)*za(j3,j4)*za(j3,j5)/zab2(j2,j3,j4,j1)**2
 C     &    *s(j3,j4) - zb(j3,j4)*zb(j4,j6)*za(j3,j4)*za(j3,j5)/zba2(j1,
 C     &    j4,j3,j2)**2*s(j1,j2) - zb(j3,j4)*zb(j4,j6)*za(j3,j4)*za(j3,
@@ -114,7 +114,7 @@ C     &    za(j3,j2)*za(j3,j5)/zab2(j2,j3,j4,j1)**2*t(j4,j3,j2) - 1d0/
 C     &    2.D0*zb(j3,j4)*za(j3,j5)**2/za(j6,j5)*zba2(j2,j4,j3,j1)*
 C     &    izba2(j1,j3,j4,j2) - 1d0/2.D0*zb(j3,j4)*za(j3,j5)**2/za(j6,
 C     &    j5)*zba2(j2,j4,j3,j1)/zab2(j2,j3,j4,j1) + zb(j3,j4)*za(j3,j5
-C     &    )**2/za(j6,j5)/zab2(j2,j3,j4,j1)**2*s(j3,j4)*t(j4,j3,j2) - 
+C     &    )**2/za(j6,j5)/zab2(j2,j3,j4,j1)**2*s(j3,j4)*t(j4,j3,j2) -
 C     &    zb(j3,j4)*za(j3,j5)**2/za(j6,j5)/zab2(j2,j3,j4,j1)**2*s(j1,
 C     &    j2)*t(j4,j3,j2) - zb(j3,j4)*za(j3,j5)**2/za(j6,j5)/zba2(j1,
 C     &    j4,j3,j2)**2*s(j5,j6)*t(j4,j3,j2) - 2.D0*zb(j4,j1)*zb(j4,j6)*
@@ -171,7 +171,7 @@ C     &    j4)*zba2(j2,j6,j5,j1)/zba2(j1,j6,j5,j2) - 1d0/2.D0*zb(j6,j5
 C     &    )*za(j3,j5)**2/za(j3,j4)*zba2(j2,j5,j6,j1)/zba2(j1,j5,j6,j2
 C     &    ) )
 C     & + IDelta * (  - zb(j6,j5)*za(j3,j5)
-C     &    **2/za(j3,j4)/zba2(j1,j6,j5,j2)**2*s(j3,j4)*t(j6,j5,j2) - 
+C     &    **2/za(j3,j4)/zba2(j1,j6,j5,j2)**2*s(j3,j4)*t(j6,j5,j2) -
 C     &    zb(j6,j5)*za(j3,j5)**2/za(j3,j4)/zba2(j1,j6,j5,j2)**2*s(j1,
 C     &    j2)*t(j6,j5,j2) + zb(j6,j5)*za(j3,j5)**2/za(j3,j4)/zba2(j1,
 C     &    j6,j5,j2)**2*s(j5,j6)*t(j6,j5,j2) )
@@ -188,13 +188,13 @@ C     &    )/za(j3,j4)*zba2(j6,j4,j1,j3)**2/zab2(j2,j3,j4,j1)**2
 
 c      write(6,*) 'old:b12zm',bcoeff(b12zm)
 
-c      bcoeff(b12zm)= + IDelta**2 
-c     & * ( 3.D0*zba2(j4,j1,j2,j3)*zab2(j1,j3,j4,j2)*zba2(j6,j1,j2,j5) 
+c      bcoeff(b12zm)= + IDelta**2
+c     & * ( 3.D0*zba2(j4,j1,j2,j3)*zab2(j1,j3,j4,j2)*zba2(j6,j1,j2,j5)
 c     & /zba2(j1,j3,j4,j2)*s(j3,j4)
 c     &  + 3.D0*zba2(j4,j1,j2,j3)*zba2(j2,j4,j3,j1)*zba2(j6,j1,j2,j5)
 c     & /zba2(j1,j3,j4,j2)*s(j1,j2)
 c     &  -3.D0*zba2(j4,j1,j2,j3)*zab2(j1,j3,j4,j2)*zba2(j6,j1,j2,j5)
-c     & /zba2(j1,j3,j4,j2)*s(j5,j6) 
+c     & /zba2(j1,j3,j4,j2)*s(j5,j6)
 c     & - 3.D0*zba2(j4,j1,j2,j3)*zba2(j2,j5,j6,j1)*zba2(j6,j1,j2,j5)
 c     & /zba2(j1,j5,j6,j2)*s(j3,j4)
 c     &  + 3.D0*zba2(j4,j1,j2,j3)*zba2(j2,j5,j6,j1)*zba2(j6,j1,j2,j5)
@@ -202,21 +202,21 @@ c     & /zba2(j1,j5,j6,j2)*s(j1,j2)
 c     &  + 3.D0*zba2(j4,j1,j2,j3)*zba2(j2,j5,j6,j1)*zba2(j6,j1,j2,j5)
 c     & /zba2(j1,j5,j6,j2)*s(j5,j6)
 c     &  + 3.D0*zba2(j4,j1,j2,j3)*zba2(j2,j4,j3,j1)*zba2(j6,j1,j2,j5)
-c     & /zab2(j2,j3,j4,j1)*s(j3,j4) 
+c     & /zab2(j2,j3,j4,j1)*s(j3,j4)
 c     & + 3.D0*zba2(j4,j1,j2,j3)*zba2(j2,j4,j3,j1)*zba2(j6,j1,j2,j5)
-c     & /zab2(j2,j3,j4,j1)*s(j1,j2) 
+c     & /zab2(j2,j3,j4,j1)*s(j1,j2)
 c     & - 3.D0*zba2(j4,j1,j2,j3)*zba2(j2,j4,j3,j1)*zba2(j6,j1,j2,j5)
 c     & /zab2(j2,j3,j4,j1)*s(j5,j6)
 c     &  - 3.D0*zba2(j4,j1,j2,j3)*zba2(j2,j6,j5,j1)*zba2(j6,j1,j2,j5)
 c     & /zba2(j1,j6,j5,j2)*s(j3,j4))
 
-c     & + IDelta**2 
+c     & + IDelta**2
 c     & * ( 3.D0*zba2(j4,j2,j1,j3)*zba2(j2,j6,j5,j1)*zba2(j6,j1,j2,j5)
 c     & /zba2(j1,j6,j5,j2)*s(j1,j2)
 c     &  + 3.D0*zba2(j4,j1,j2,j3)*zba2(j2,j6,j5,j1)*zba2(j6,j2,j1,j5)
 c     & /zba2(j1,j6,j5,j2)*s(j5,j6))
 
-c     & + IDelta 
+c     & + IDelta
 c     &  * (-2.D0*zb(j3,j4)*zb(j4,j1)*zb(j6,j5)*za(j3,j4)*za(j3,j5)
 c     & *za(j2,j5)/zba2(j1,j3,j4,j2)**3*t(j3,j4,j1)
 c     &  + 2.D0*zb(j3,j4)*zb(j4,j1)*zb(j6,j5)*za(j3,j4)*za(j3,j5)
@@ -226,7 +226,7 @@ c     & *za(j6,j5)/zab2(j2,j3,j4,j1)**3*t(j4,j3,j1)
 c     &  +2.D0*zb(j3,j4)*zb(j4,j6)*zb(j1,j6)*za(j3,j4)*za(j3,j2)
 c     &  *za(j6,j5)/zab2(j2,j3,j4,j1)**3*t(j4,j3,j2)
 c     &  + zb(j3,j4)*zb(j4,j6)*za(j3,j4)*za(j3,j5)
-c     & /zba2(j1,j3,j4,j2)**2*s(j3,j4) 
+c     & /zba2(j1,j3,j4,j2)**2*s(j3,j4)
 c     & - zb(j3,j4)*zb(j4,j6)*za(j3,j4)*za(j3,j5)
 c     & /zba2(j1,j3,j4,j2)**2*s(j1,j2)
 c     &  - zb(j3,j4)*zb(j4,j6)*za(j3,j4)*za(j3,j5)
@@ -240,11 +240,11 @@ c     & /zab2(j2,j3,j4,j1)**2*s(j5,j6)
 c     &  -2.D0*zb(j3,j4)*zb(j1,j6)*zb(j6,j5)*za(j3,j2)*za(j3,j5)
 c     & *za(j6,j5)/zba2(j1,j5,j6,j2)**3*t(j5,j6,j1))
 
-c     & + IDelta * ( 
+c     & + IDelta * (
 c     &  2.D0*zb(j3,j4)*zb(j1,j6)*zb(j6,j5)*za(j3,j2)*za(j3,j5)
 c     &  *za(j6,j5)/zba2(j1,j5,j6,j2)**3*t(j5,j6,j2)
 c     &  -2.D0*zb(j3,j4)*zb(j1,j6)*za(j3,j2)*za(j3,j5)
-c     & /zab2(j2,j3,j4,j1)**3*t(j4,j3,j1)*t(j4,j3,j2) 
+c     & /zab2(j2,j3,j4,j1)**3*t(j4,j3,j1)*t(j4,j3,j2)
 c     & + 2.D0*zb(j3,j4)*zb(j1,j6)*za(j3,j2)*za(j3,j5)
 c     & /zab2(j2,j3,j4,j1)**3*t(j4,j3,j2)**2
 c     &  + 2.D0*zb(j3,j4)*zb(j2,j6)*za(j3,j2)*za(j3,j5)*
@@ -252,11 +252,11 @@ c     &    izab2(j2,j3,j4,j1)**2*t(j4,j3,j1)
 c     &  -2.D0*zb(j3,j4)*zb(j2,j6)*za(j3,j2)*za(j3,j5)
 c     & /zab2(j2,j3,j4,j1)**2*t(j4,j3,j2)
 c     &  - 1d0/2.D0*zb(j3,j4)*za(j3,j5)**2/za(j6,j5)*zba2(j2,j4,j3,j1)*
-c     &    izba2(j1,j3,j4,j2) 
+c     &    izba2(j1,j3,j4,j2)
 c     & - 1d0/2.D0*zb(j3,j4)*za(j3,j5)**2/za(j6,j5)*zba2(j2,j4,j3,j1)
-c     &  /zab2(j2,j3,j4,j1) 
+c     &  /zab2(j2,j3,j4,j1)
 c     & + zb(j3,j4)*za(j3,j5)**2/za(j6,j5)
-c     & /zab2(j2,j3,j4,j1)**2*s(j3,j4)*t(j4,j3,j2) 
+c     & /zab2(j2,j3,j4,j1)**2*s(j3,j4)*t(j4,j3,j2)
 c     & -zb(j3,j4)*za(j3,j5)**2
 c     & /za(j6,j5)/zab2(j2,j3,j4,j1)**2*s(j1,j2)*t(j4,j3,j2)
 c     &  -zb(j3,j4)*za(j3,j5)**2/za(j6,j5)/zab2(j2,j3,j4,j1)**2
@@ -264,11 +264,11 @@ c     & *s(j5,j6)*t(j4,j3,j2)
 c     &  -2.D0*zb(j4,j1)*zb(j4,j6)*zb(j6,j5)*za(j3,j4)*za(j2,j5)
 c     & *za(j6,j5)/zba2(j1,j6,j5,j2)**3*t(j6,j5,j1))
 
-c     & + IDelta 
+c     & + IDelta
 c     & * ( 2.D0*zb(j4,j1)*zb(j4,j6)*zb(j6,j5)*za(j3,j4)*za(j2,j5)
 c     &   *za(j6,j5)/zba2(j1,j6,j5,j2)**3*t(j6,j5,j2)
 c     &  + 2.D0*zb(j4,j1)*zb(j4,j6)*za(j3,j4)*za(j1,j5)
-c     &   /zba2(j1,j3,j4,j2)**2*t(j3,j4,j1) 
+c     &   /zba2(j1,j3,j4,j2)**2*t(j3,j4,j1)
 c     &  - 2.D0*zb(j4,j1)*zb(j4,j6)*za(j3,j4)*za(j1,j5)
 c     &   /zba2(j1,j3,j4,j2)**2*t(j3,j4,j2)
 c     &  - 2.D0*zb(j4,j1)*zb(j4,j6)*za(j3,j4)*za(j2,j5)
@@ -287,7 +287,7 @@ c     &  - 1d0/2.D0*zb(j4,j6)**2*za(j3,j4)/zb(j6,j5)*zba2(j2,j4,j3,j1)
 c     &  /zba2(j1,j3,j4,j2)
 c     &  - 1d0/2.D0*zb(j4,j6)**2*za(j3,j4)/zb(j6,j5)*zba2(j2,j4,j3,j1)
 c     & /zab2(j2,j3,j4,j1))
-c     & + IDelta 
+c     & + IDelta
 c     & * ( zb(j4,j6)**2*za(j3,j4)/zb(j6,j5)/zba2(j1,j3,j4,j2)**2
 c     & *s(j3,j4)*t(j3,j4,j1)
 c     &  -zb(j4,j6)**2*za(j3,j4)/zb(j6,j5)
@@ -301,24 +301,24 @@ c     & /zba2(j1,j5,j6,j2)
 c     &  - zb(j4,j6)**2*za(j6,j5)/zb(j3,j4)
 c     & /zba2(j1,j5,j6,j2)**2*s(j3,j4)*t(j5,j6,j1)
 c     &  -zb(j4,j6)**2*za(j6,j5)/zb(j3,j4)
-c     & /zba2(j1,j5,j6,j2)**2*s(j1,j2)*t(j5,j6,j1) 
+c     & /zba2(j1,j5,j6,j2)**2*s(j1,j2)*t(j5,j6,j1)
 c     & + zb(j4,j6)**2*za(j6,j5)/zb(j3,j4)
-c     & /zba2(j1,j5,j6,j2)**2*s(j5,j6)*t(j5,j6,j1) 
+c     & /zba2(j1,j5,j6,j2)**2*s(j5,j6)*t(j5,j6,j1)
 c     & + 2.D0*zb(j4,j6)*zb(j1,j6)*za(j3,j1)*za(j6,j5)
 c     &  /zba2(j1,j5,j6,j2)**2*t(j5,j6,j1)
 c     &  - 2.D0*zb(j4,j6)*zb(j1,j6)*za(j3,j1)*za(j6,j5)
-c     &  /zba2(j1,j5,j6,j2)**2*t(j5,j6,j2) 
+c     &  /zba2(j1,j5,j6,j2)**2*t(j5,j6,j2)
 c     &  - 2.D0*zb(j4,j6)*zb(j1,j6)*za(j3,j2)*za(j6,j5)
 c     & /zba2(j1,j5,j6,j2)**3*t(j5,j6,j1)**2)
-c     & + IDelta 
+c     & + IDelta
 c     &  * ( 2.D0*zb(j4,j6)*zb(j1,j6)*za(j3,j2)*za(j6,j5)
 c     &  /zba2(j1,j5,j6,j2)**3*t(j5,j6,j1)*t(j5,j6,j2)
 c     &  -zb(j4,j6)*zb(j6,j5)*za(j3,j5)*za(j6,j5)
-c     &  /zba2(j1,j6,j5,j2)**2*s(j3,j4) 
+c     &  /zba2(j1,j6,j5,j2)**2*s(j3,j4)
 c     &  - zb(j4,j6)*zb(j6,j5)*za(j3,j5)*za(j6,j5)
 c     &  /zba2(j1,j6,j5,j2)**2*s(j1,j2)
 c     &  + zb(j4,j6)*zb(j6,j5)*za(j3,j5)*za(j6,j5)
-c     &  /zba2(j1,j6,j5,j2)**2*s(j5,j6) 
+c     &  /zba2(j1,j6,j5,j2)**2*s(j5,j6)
 c     & - zb(j4,j6)*zb(j6,j5)*za(j3,j5)*za(j6,j5)
 c     & /zba2(j1,j5,j6,j2)**2*s(j3,j4)
 c     &  -zb(j4,j6)*zb(j6,j5)*za(j3,j5)*za(j6,j5)
@@ -334,9 +334,9 @@ c     & /zba2(j1,j6,j5,j2)
 c     &  - 1d0/2.D0*zb(j6,j5)*za(j3,j5)**2/za(j3,j4)*zba2(j2,j5,j6,j1)
 c     & /zba2(j1,j5,j6,j2))
 
-c     & + IDelta 
+c     & + IDelta
 c     & * (-zb(j6,j5)*za(j3,j5)**2
-c     & /za(j3,j4)/zba2(j1,j6,j5,j2)**2*s(j3,j4)*t(j6,j5,j2) 
+c     & /za(j3,j4)/zba2(j1,j6,j5,j2)**2*s(j3,j4)*t(j6,j5,j2)
 c     & -zb(j6,j5)*za(j3,j5)**2
 c     & /za(j3,j4)/zba2(j1,j6,j5,j2)**2*s(j1,j2)*t(j6,j5,j2)
 c     &  +zb(j6,j5)*za(j3,j5)**2
@@ -348,7 +348,7 @@ c     &  + 2.D0*zb(j4,j1)*za(j2,j5)
 c     & /zb(j3,j4)/za(j6,j5)*zba2(j4,j3,j2,j5)
 c     & /zba2(j1,j3,j4,j2)**3*t(j3,j4,j1)
 c     &  -2.D0*zb(j1,j6)*zb(j2,j6)*za(j3,j1)*za(j3,j2)
-c     & /zb(j6,j5)/za(j3,j4)/zab2(j2,j3,j4,j1)**2 
+c     & /zb(j6,j5)/za(j3,j4)/zab2(j2,j3,j4,j1)**2
 c     & + 2.D0*zb(j1,j6)*za(j3,j2)/zb(j6,j5)/za(j3,j4)
 c     & *zba2(j6,j4,j1,j3)/zab2(j2,j3,j4,j1)**3*t(j4,j3,j2)
 c     &  -izb(j3,j4)/za(j6,j5)*zba2(j4,j3,j2,j5)**2/zba2(j1,j3,j4,j2)**2
@@ -413,7 +413,7 @@ c      pause
 
 
       endif
-      
+
       return
       end
 
@@ -451,7 +451,7 @@ c---end statement functions
      & -za(j4,j3)*za(j1,j5)**2*zb(j1,j4)**2*s(j3,j4)
      & /sbar134**2/za(j6,j5)/zab2(j2,j3,j4,j1)**2
 
-     & -zb(j4,j3)*zb(j2,j6)**2*za(j2,j3)**2*s(j3,j4) 
+     & -zb(j4,j3)*zb(j2,j6)**2*za(j2,j3)**2*s(j3,j4)
      & /sbar234**2/zb(j6,j5)/zab2(j2,j3,j4,j1)**2
 
      & -2d0*za(j3,j2)*zb(j1,j4)*s(j3,j4)
@@ -460,12 +460,12 @@ c---end statement functions
      &            -za(j1,j5)*zb(j2,j6)*zab2(j2,j3,j4,j1))
      &  -za(j1,j5)*zb(j5,j6)*zab2(j5,j3,j4,j2)*zab2(j2,j3,j4,j1)
      &  +za(j5,j6)*zb(j2,j6)*zab2(j1,j3,j4,j6)*zab2(j2,j3,j4,j1))
-     
+
      & +6d0*IDelta**2
      & *zab2(j3,j1,j2,j4)*zab2(j5,j1,j2,j6)*del(j5,j6,j1,j2,j3,j4)
      & *zab2(j1,j3,j4,j2)/zab2(j2,j3,j4,j1)
 
-     & + IDelta *( 
+     & + IDelta *(
      & +2d0*(s134-s234)/s(j5,j6)*zab2(j1,j3,j4,j2)/zab2(j2,j3,j4,j1)*(
      &  +s234*zb(j1,j4)*zb(j1,j6)*za(j2,j3)*za(j2,j5)
      &       /zab2(j2,j3,j4,j1)**2
@@ -486,7 +486,7 @@ c---end statement functions
 
      & +2d0*za(j3,j4)*za(j1,j5)*zb(j4,j1)*zb(j4,j6)*(s234-s134)
      & /zab2(j2,j3,j4,j1)**2
-     & +2d0*za(j3,j2)*za(j3,j5)*zb(j3,j4)*zb(j2,j6)*(s234-s134) 
+     & +2d0*za(j3,j2)*za(j3,j5)*zb(j3,j4)*zb(j2,j6)*(s234-s134)
      & /zab2(j2,j3,j4,j1)**2
      & +2d0*za(j3,j5)*zb(j4,j6)*s(j3,j4)*del(j3,j4,j1,j2,j5,j6)
      & /zab2(j2,j3,j4,j1)**2
@@ -541,7 +541,7 @@ c---end statement functions
      & -za(j4,j3)*za(j1,j5)**2*zb(j1,j4)**2*s(j3,j4)
      & /sbar134**2/za(j6,j5)/zab2(j2,j3,j4,j1)**2
 
-     & -zb(j4,j3)*zb(j2,j6)**2*za(j2,j3)**2*s(j3,j4) 
+     & -zb(j4,j3)*zb(j2,j6)**2*za(j2,j3)**2*s(j3,j4)
      & /sbar234**2/zb(j6,j5)/zab2(j2,j3,j4,j1)**2
 
      & -2d0*za(j1,j5)*za(j3,j2)*zb(j4,j1)*zab2(j5,j3,j4,j1)*s(j3,j4)
@@ -560,7 +560,7 @@ c---end statement functions
      & *zab2(j3,j1,j2,j4)*zab2(j5,j1,j2,j6)*del(j5,j6,j1,j2,j3,j4)
      & *zab2(j1,j3,j4,j2)/zab2(j2,j3,j4,j1)
 
-     & + IDelta *( 
+     & + IDelta *(
      & +2d0*za(j3,j5)*za(j2,j5)*zb(j4,j1)*zb(j6,j5)*s(j3,j4)*(s234-s134)
      & /zab2(j2,j3,j4,j1)**3
      & -2d0*za(j3,j4)*za(j2,j5)*zb(j4,j1)*zb(j4,j6)*s134*(s234-s134)
@@ -572,7 +572,7 @@ c---end statement functions
 
      & +2d0*za(j3,j4)*za(j1,j5)*zb(j4,j1)*zb(j4,j6)*(s234-s134)
      & /zab2(j2,j3,j4,j1)**2
-     & +2d0*za(j3,j2)*za(j3,j5)*zb(j3,j4)*zb(j2,j6)*(s234-s134) 
+     & +2d0*za(j3,j2)*za(j3,j5)*zb(j3,j4)*zb(j2,j6)*(s234-s134)
      & /zab2(j2,j3,j4,j1)**2
      & +2d0*za(j3,j5)*zb(j4,j6)*s(j3,j4)*del(j3,j4,j1,j2,j5,j6)
      & /zab2(j2,j3,j4,j1)**2

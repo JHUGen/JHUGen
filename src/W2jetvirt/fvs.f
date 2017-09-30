@@ -1,4 +1,4 @@
-      double complex function Fvs(st,j1,j2,j3,j4,j5,j6,za,zb) 
+      double complex function Fvs(st,j1,j2,j3,j4,j5,j6,za,zb)
 C--- This function returns the result of BDK
 C--- Published in Nucl.Phys.B513:3-86,1998.
 C--- e-Print: hep-ph/9708239
@@ -52,13 +52,13 @@ c---flip2:( 1<-->2, 3<-->4, 5<-->6, za<-->zb)
 c---exch34:(3<-->4)
       Fvs=
      & +Brackpp(j1,j2,j3,j4,j5,j6)
-     & +Brackpp(j1,j2,j4,j3,j5,j6) 
+     & +Brackpp(j1,j2,j4,j3,j5,j6)
 
       endif
       return
       end
-      
-      double complex function Brackpm(j1,j2,j3,j4,j5,j6,za,zb) 
+
+      double complex function Brackpm(j1,j2,j3,j4,j5,j6,za,zb)
 C---This is the whole expression in Eq.(11.6) subject to exchange flip_2
 c---ie  flip2:( 1<-->2, 3<-->4, 5<-->6, za<-->zb)
       implicit none
@@ -121,9 +121,9 @@ c---ie  flip3:( 1<-->5, 2<-->6, 3<-->4, za<-->zb)
 
        return
        end
-       
-       
-      double complex function Brackpma(j1,j2,j3,j4,j5,j6,za,zb) 
+
+
+      double complex function Brackpma(j1,j2,j3,j4,j5,j6,za,zb)
 C---This is the curly braces expression in Eq.(11.6) subject to flip_3
 c---ie  flip3:( 1<-->5, 2<-->6, 3<-->4, za<-->zb)
       implicit none
@@ -142,7 +142,7 @@ C---statement functions
       IDelta=1d0/(s(j1,j2)**2+s(j3,j4)**2+s(j5,j6)**2
      & -2d0*(s(j1,j2)*s(j3,j4)+s(j1,j2)*s(j5,j6)+s(j5,j6)*s(j3,j4)))
 
-       Brackpma= 
+       Brackpma=
      & 2d0*zb(j1,j2)*za(j2,j3)*zb(j3,j6)
      & /zb(j5,j6)/zab2(j3,j1,j2,j4)**2
      & *(zab2(j3,j1,j2,j6)*zab2(j2,j1,j3,j4)/zab2(j3,j1,j2,j4)
@@ -164,14 +164,14 @@ C---statement functions
      & *(za(j2,j5)*t(j1,j2,j3)
      & +za(j2,j1)*zb(j1,j6)*za(j6,j5))/za(j5,j6))
      & *za(j5,j2)*zb(j2,j1)/zab2(j3,j1,j2,j4)**2*IDelta
- 
+
      & +0.5d0*(za(j1,j2)*zb(j1,j6)**2/zb(j5,j6)
      &  +zb(j1,j2)*za(j2,j5)**2/za(j5,j6)
      & -2d0*za(j2,j5)*zb(j1,j6))*zab2(j4,j1,j2,j3)
      & /zab2(j3,j1,j2,j4)*IDelta)
      & *(Lnrat(-s(j1,j2),-s(j3,j4)))
-     
+
       return
       end
-      
-      
+
+

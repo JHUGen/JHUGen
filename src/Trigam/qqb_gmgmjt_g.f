@@ -17,13 +17,13 @@ c--- J. M. Campbell, March 2013
      & ampsq_qqb(2,2),ampsqid_qqb(2,2),ampsq_qqb_anni(2,2),
      & xoppo,xsame
       integer,parameter::ii(6)=(/1,2,1,2,1,2/)
-     
-      
+
+
       call spinoru(6,p,za,zb)
 
-c--- overall coupling, color and photon identical particle factors      
+c--- overall coupling, color and photon identical particle factors
       fac=8d0*esq**2*gsq**2*cf*xn**2/2d0
-      
+
 c      qbq=aveqq*fac*ampsq_2gam2g(5,6,3,4,2,1,za,zb)
 
 c--- extra stat. factor for identical gluons in qqb case
@@ -34,8 +34,8 @@ c--- extra stat. factor for identical gluons in qqb case
       qbq=qqb
       qbg=qg
       gqb=gq
-      
-      msq(:,:)=0d0     
+
+      msq(:,:)=0d0
       do j=1,nf
         cfac=Q(j)**4
         msq(j,-j)=cfac*qqb
@@ -43,32 +43,32 @@ c--- extra stat. factor for identical gluons in qqb case
         msq(j,0)=cfac*qg
         msq(0,j)=cfac*gq
         msq(-j,0)=cfac*qbg
-        msq(0,-j)=cfac*gqb     
+        msq(0,-j)=cfac*gqb
       enddo
 c--- assume 2 up-type flavors of quark and (nf-2) down-type
       msq(0,0)=gg*(2d0*Q(2)**4+(nf-2)*Q(1)**4)
 
 
-c--- overall coupling, color and photon identical particle factors      
+c--- overall coupling, color and photon identical particle factors
       fac=aveqq*8d0*esq**2*gsq**2*cf*xn/2d0
 c--- 4-quark matrix elements
       call ampsq_2gam2q(1,5,2,6,3,4,za,zb,ampsq_qq,ampsqid_qq)
       call ampsq_2gam2q(1,5,6,2,3,4,za,zb,ampsq_qqb,ampsqid_qqb)
       call ampsq_2gam2q(1,2,6,5,3,4,za,zb,ampsq_qqb_anni,ampsqid_qqb)
-      
+
 
 c--- protection for hard-coding used below
       if (nf .ne. 5) then
         write(6,*) 'Routine qqb_gmgmjt_g.f hard-coded for nf=5!'
         stop
       endif
-      
+
       do j=1,nf
       do k=1,nf
 
       if (j .eq. k) then
 c--- q-q identical
-        msq(j,k)=fac/2d0*ampsqid_qq(ii(j),ii(k))       
+        msq(j,k)=fac/2d0*ampsqid_qq(ii(j),ii(k))
 c--- q-qb with annihilation allowed
         if (mod(j,2) .eq. 1) then ! i.e. down-type quark
            xoppo=2d0
@@ -76,35 +76,35 @@ c--- q-qb with annihilation allowed
         else                      ! i.e. up-type quark
            xoppo=3d0
            xsame=1d0
-        endif          
+        endif
         qqb_4q=fac*(
-     &    xoppo*ampsq_qqb_anni(ii(j),3-ii(j))  ! e.g. uub ->ddb   
-     &   +xsame*ampsq_qqb_anni(ii(j),ii(j))    ! e.g. uub ->ccb   
-     &   +ampsqid_qqb(ii(j),ii(j)))            ! e.g. uub ->uub   
+     &    xoppo*ampsq_qqb_anni(ii(j),3-ii(j))  ! e.g. uub ->ddb
+     &   +xsame*ampsq_qqb_anni(ii(j),ii(j))    ! e.g. uub ->ccb
+     &   +ampsqid_qqb(ii(j),ii(j)))            ! e.g. uub ->uub
       else
 c--- q-q non-identical
-        msq(j,k)=fac*ampsq_qq(ii(j),ii(k))       
+        msq(j,k)=fac*ampsq_qq(ii(j),ii(k))
 c--- q-qb with no annihilation
-        qqb_4q=fac*ampsq_qqb(ii(j),ii(k))       
+        qqb_4q=fac*ampsq_qqb(ii(j),ii(k))
       endif
       msq(j,-k)=msq(j,-k)+qqb_4q
-      
+
 c--- qb-q and qb-qb (by symmetry)
       msq(-j,k)=msq(-j,k)+qqb_4q
       msq(-j,-k)=msq(j,k)
-      
+
       enddo
       enddo
-      
+
 c      msq(2,1)=aveqq*fac*ampsq_qq(2,1)
 c      msq(1,2)=aveqq*fac*ampsq_qq(1,2)
 c      msq(2,4)=aveqq*fac*ampsq_qq(2,2)
 c      msq(1,3)=aveqq*fac*ampsq_qq(1,1)
-      
+
 c      msq(1,1)=aveqq*fac*ampsqid_qq(1,1)
 c      msq(2,2)=aveqq*fac*ampsqid_qq(2,2)
-      
+
       return
       end
-      
-      
+
+

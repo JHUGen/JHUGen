@@ -1,4 +1,4 @@
-      double complex function fmtfull(s12,s34,s56,mtsq) 
+      double complex function fmtfull(s12,s34,s56,mtsq)
       implicit none
       include 'scale.f'
       double precision mtsq,s12,s34,s56,Del12,Del34,Del56,Del3
@@ -11,7 +11,7 @@ C     dependence.
       Del34=s34-s12-s56
       Del56=s56-s12-s34
       Del3=s12*Del12+s34*Del34+s56*Del56
-       
+
       fmtfull=
      . Dcmplx((3d0*s12*s56*s34*Del34/Del3**2-(s12*s56-mtsq*del34)/Del3))
      . *(-qlI3(s12,s34,s56,mtsq,mtsq,mtsq,musq,0))

@@ -89,9 +89,9 @@ C---fill qb-q and q-qb elements
       do j=-nf,nf
       do k=-nf,nf
       if     ((j .gt. 0) .and. (k .lt. 0)) then
-      msq(j,k)=Vsq(j,k)*fac*qqb 
+      msq(j,k)=Vsq(j,k)*fac*qqb
       elseif ((j .lt. 0) .and. (k .gt. 0)) then
-      msq(j,k)=Vsq(j,k)*fac*qbq 
+      msq(j,k)=Vsq(j,k)*fac*qbq
       endif
       enddo
       enddo

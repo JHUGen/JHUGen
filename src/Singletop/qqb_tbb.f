@@ -32,9 +32,9 @@ c--NB average over spins only -- colour factors cancel
       do k=-nf,nf
       msq(j,k)=0d0
       if     ((j .gt. 0) .and. (k .lt. 0)) then
-      msq(j,k)=Vsq(j,k)*qqb 
+      msq(j,k)=Vsq(j,k)*qqb
       elseif ((j .lt. 0) .and. (k .gt. 0)) then
-      msq(j,k)=Vsq(j,k)*qbq 
+      msq(j,k)=Vsq(j,k)*qbq
       endif
       enddo
       enddo

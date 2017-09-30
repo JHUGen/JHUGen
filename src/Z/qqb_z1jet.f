@@ -27,9 +27,9 @@ c---
       msq(j,k)=0d0
       enddo
       enddo
-      
+
       call spinoru(5,p,za,zb)
-      
+
 c---protect from soft and collinear singularities
 c      if  ((-s(1,5) .lt. cutoff) .or. (-s(2,5) .lt. cutoff)) return
 
@@ -41,7 +41,7 @@ c      if (s(3,4) .lt. 4d0*mbsq) return
 
 c      qqbZg= +aveqq*s(3,4)**2*fac*z1jet(1,2,3,4,5)
 c      gqbZqb=-aveqg*s(3,4)**2*fac*z1jet(5,2,3,4,1)
-c      qgZq=  -aveqg*s(3,4)**2*fac*z1jet(1,5,3,4,2)      
+c      qgZq=  -aveqg*s(3,4)**2*fac*z1jet(1,5,3,4,2)
 c      qbqZg= +aveqq*s(3,4)**2*fac*z1jet(2,1,3,4,5)
 c      qbgZqb=-aveqg*s(3,4)**2*fac*z1jet(5,1,3,4,2)
 c      gqZq=  -aveqg*s(3,4)**2*fac*z1jet(2,5,3,4,1)
@@ -55,12 +55,12 @@ c      gqZq=  -aveqg*s(3,4)**2*fac*z1jet(2,5,3,4,1)
       AqbgZqb2(hq,hl)=AqgZq2(hq,swap(hl))
       AgqbZqb2(hq,hl)=AgqZq2(hq,swap(hl))
       enddo
-      enddo 
+      enddo
 
 c      call zgamps2(2,1,3,4,5,za,zb,AqbqZg2)
 c      call zgamps2(5,1,3,4,2,za,zb,AqbgZqb2)
 c      call zgamps2(5,2,3,4,1,za,zb,AgqbZqb2)
- 
+
       do j=-nflav,nflav
       do k=-nflav,nflav
 
@@ -111,7 +111,7 @@ c      call zgamps2(5,2,3,4,1,za,zb,AgqbZqb2)
       enddo
       return
       end
- 
+
 
       subroutine zgamps2(j1,j2,j3,j4,j5,za,zb,amps2)
       implicit none
@@ -121,32 +121,32 @@ c      call zgamps2(5,2,3,4,1,za,zb,AgqbZqb2)
       double precision amps2(2,2)
       integer hq,hl,hg,j1,j2,j3,j4,j5
 c-- amplitude helicities are amps(quark,lepton,gluon)
-      
+
       amps(1,1,1)=za(j2,j3)/za(j1,j5)/za(j2,j5)
      .             *(za(j2,j1)*zb(j4,j1)+za(j2,j5)*zb(j4,j5))
-           
+
       amps(1,1,2)=zb(j4,j1)/zb(j1,j5)/zb(j2,j5)
      .             *(za(j2,j3)*zb(j2,j1)+za(j3,j5)*zb(j1,j5))
-          
+
       amps(1,2,1)=za(j2,j4)/za(j1,j5)/za(j2,j5)
      .             *(za(j2,j1)*zb(j3,j1)+za(j2,j5)*zb(j3,j5))
-     
+
       amps(1,2,2)=zb(j3,j1)/zb(j1,j5)/zb(j2,j5)
      .             *(za(j2,j4)*zb(j2,j1)+za(j4,j5)*zb(j1,j5))
-     
+
       do hl=1,2
       do hg=1,2
         amps(2,hl,hg)=-dconjg(amps(1,3-hl,3-hg))
       enddo
       enddo
-      
+
       do hq=1,2
       do hl=1,2
         amps2(hq,hl)=cdabs(amps(hq,hl,1))**2+cdabs(amps(hq,hl,2))**2
       enddo
       enddo
-      
-            
+
+
       return
       end
-      
+

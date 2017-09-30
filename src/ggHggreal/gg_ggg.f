@@ -1,8 +1,8 @@
       DOUBLE PRECISION FUNCTION GG_GGG(IHEL)
-C  
+C
 C RETURNS AMPLITUDE SQUARED SUMMED/AVG OVER COLORS
 C FOR PROCESS : g g -> g g g (h)
-C  
+C
       IMPLICIT NONE
       include 'constants.f'
       integer ngluons
@@ -16,8 +16,8 @@ C
       INTEGER I,J
 
 c      LOGICAL CHECKS
-c      DATA CHECKS/.false./ 
-       
+c      DATA CHECKS/.false./
+
 c--   permutations
       INTEGER IP(NGLUONS,6)
 
@@ -60,7 +60,7 @@ C-----
          call iperm(IHEL,PERM,IHELX,NGLUONS)
 
 
-         Z(I)=amp_h5g(PERM,IHELX) 
+         Z(I)=amp_h5g(PERM,IHELX)
 
 c
 c    check on the properties of the amplitudes
@@ -74,20 +74,20 @@ c=============================================================
 
 c
 c   sum over color
-c         
+c
          DO J = 1, 6
             ZTEMP = (0.D0,0.D0)
             DO I = 1, 6
                ZTEMP = ZTEMP + Z(I)*CIJ(I,J)
             ENDDO
-            GG_GGG =GG_GGG+DBLE(ZTEMP*DCONJG(Z(J)))  
-         ENDDO   
+            GG_GGG =GG_GGG+DBLE(ZTEMP*DCONJG(Z(J)))
+         ENDDO
 
 
 
 c     Overall normalization of CIJ
-         GG_GGG=GG_GGG*XN**3*(XN**2-1D0)/4d0 
-         
+         GG_GGG=GG_GGG*XN**3*(XN**2-1D0)/4d0
+
       RETURN
       END
 

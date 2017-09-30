@@ -61,12 +61,12 @@
       save first,countlept,countnu,countb,leptindex,nuindex,bindex
 
       gencuts_input=.false.
-      
+
       hwwjetcuts=.false.
 
       if (first) then
       first=.false.
-c--- initialize counters and arrays that will be used to perform cuts      
+c--- initialize counters and arrays that will be used to perform cuts
       countlept=0
       countnu=0
 c--- lepton pt and rapidity cuts
@@ -92,7 +92,7 @@ c--- If these are present, we will do additional cuts
            bindex(countb)=j
          endif
       enddo
-c--- write-out the cuts we are using      
+c--- write-out the cuts we are using
       write(6,*)
       write(6,*)  '****************** Generic cuts ********************'
       write(6,*)  '*                                                  *'
@@ -126,7 +126,7 @@ c--- write-out the cuts we are using
      .                ' GeV            *'
          write(6,99) '*    |mZj-mt| <   ',mZjcut,
      .                ' GeV            *'
-         
+
       else
       write(6,99) '*  (3,4) transverse mass >   ',mtrans34cut,
      .                ' GeV            *'
@@ -138,12 +138,12 @@ c--- write-out the cuts we are using
       write(6,99) '* |eta(jet1)-eta(jet2)|  >   ',delyjjmin,
      .                '                *'
       if (jetsopphem) then
-      write(6,*) '*           eta(jet1) . eta(jet2)  <  0            *' 
+      write(6,*) '*           eta(jet1) . eta(jet2)  <  0            *'
       endif
       if     (lbjscheme .eq. 1) then
-      write(6,*) '*        eta(jet1)  <  eta(lept)  <  eta(jet2)     *' 
+      write(6,*) '*        eta(jet1)  <  eta(lept)  <  eta(jet2)     *'
       elseif (lbjscheme .ge. 2) then
-      write(6,*) '*  eta(jet1)+Rcut  <  eta(lept)  <  eta(jet2)-Rcut *' 
+      write(6,*) '*  eta(jet1)+Rcut  <  eta(lept)  <  eta(jet2)-Rcut *'
       lbjscheme=2
       endif
       if (countb .gt. 0) then
@@ -207,8 +207,8 @@ c--- loop over all the lepton possibilities for lepton 1 (j)
      &            (aetacheck .lt. leptveto2max)) then
                 passedlept=.false.
               endif
-            endif 
-          enddo         
+            endif
+          enddo
   78      continue
 c--- return to beginning if we failed and there are more leptons to try
           if ((passedlept .eqv. .false.).and.(j .lt. countlept)) goto 77
@@ -222,14 +222,14 @@ c--- missing energy cut
         gencuts_input=.true.
         return
       endif
-      
+
 c--- mtrans34cut is used for three roles:
 c---  1) Wgamma    --> mtrans34cut<0: transverse mass cut on (3,4,5) system
 c---               --> mtrans34cut<0: transverse mass cut on (e-gam,nu) system
 c---  2) Zgamma    --> invariant mass cut on (3,4,5) system
 c---  3) otherwise --> transverse mass cut on (3,4) system
 c---
-      if (case.eq.'Wgamma') then 
+      if (case.eq.'Wgamma') then
 c--- cut on transverse mass of (3,4,5) system for Wgamma
         if (mtrans34cut .lt. 0d0) then
         mtrans=0d0
@@ -237,10 +237,10 @@ c--- cut on transverse mass of (3,4,5) system for Wgamma
            mtrans=mtrans+dsqrt(pjet(j,1)**2+pjet(j,2)**2)
         enddo
         mtrans=mtrans**2
-        do j=1,2 
+        do j=1,2
            mtrans=mtrans-(pjet(3,j)+pjet(4,j)+pjet(5,j))**2
         enddo
-        mtrans=dsqrt(max(mtrans,0d0)) 
+        mtrans=dsqrt(max(mtrans,0d0))
         if (mtrans .lt. abs(mtrans34cut)) then
            gencuts_input=.true.
            return
@@ -264,22 +264,22 @@ c--- cut on (e-gam,nu) transverse mass for Wgamma
         mtrans=dsqrt(max(mtrans,0d0))
      &        +dsqrt(pjet(inu,1)**2+pjet(inu,2)**2)
         mtrans=mtrans**2
-        do j=1,2 
+        do j=1,2
            mtrans=mtrans-(pjet(3,j)+pjet(4,j)+pjet(5,j))**2
         enddo
-        mtrans=dsqrt(max(mtrans,0d0)) 
+        mtrans=dsqrt(max(mtrans,0d0))
         if (mtrans .lt. mtrans34cut) then
            gencuts_input=.true.
            return
         endif
         endif
 c--- cut on invariant mass of (3,4,5) system for Zgamma
-      elseif (case.eq.'Zgamma') then 
+      elseif (case.eq.'Zgamma') then
         mtrans=(pjet(3,4)+pjet(4,4)+pjet(5,4))**2
-        do j=1,3 
-          mtrans=mtrans-(pjet(3,j)+pjet(4,j)+pjet(5,j))**2 
+        do j=1,3
+          mtrans=mtrans-(pjet(3,j)+pjet(4,j)+pjet(5,j))**2
         enddo
-        mtrans=dsqrt(max(mtrans,0d0)) 
+        mtrans=dsqrt(max(mtrans,0d0))
         if(mtrans.lt.mtrans34cut) then
            gencuts_input=.true.
            return
@@ -298,7 +298,7 @@ c--- cut on transverse mass of (3,4) pair otherwise
         return
         endif
       endif
-        
+
 c--- lepton-lepton separation (if there are 2 or more leptons)
       if ((countlept .gt. 1)) then
         do j=1,countlept
@@ -317,7 +317,7 @@ c--- extra cut on phi(lept,lept) for H(->WW)+jet search
      .       /dsqrt((pjet(leptindex(1),1)**2+pjet(leptindex(1),2)**2)
      .             *(pjet(leptindex(2),1)**2+pjet(leptindex(2),2)**2))
           if (phill .lt. -0.999999999D0) phill=-1d0
-          phill=dacos(phill) 
+          phill=dacos(phill)
           if (phill .gt. phillcut) then
             gencuts_input=.true.
             return
@@ -360,13 +360,13 @@ c            gencuts_input=.true.
 c            return
 c         endif
       endif
-            
-c--- if there are no cuts on the jets - or no jets - we are done      
+
+c--- if there are no cuts on the jets - or no jets - we are done
       if ((Rjlmin .le. 0d0) .and. (delyjjmin .le. 0d0)) return
       if ((njets .eq. 0) .and. (countb .eq. 0)) return
-      
+
 c--- identify the jets
-      countjet=0      
+      countjet=0
       do j=3,mxpart
         if (is_hadronic(j)) then
           countjet=countjet+1
@@ -375,7 +375,7 @@ c--- identify the jets
       enddo
 
 c--- countjet will pick up the extra 'pp' needed for the real piece,
-c--- therefore we should subtract 1 from this number     
+c--- therefore we should subtract 1 from this number
       if (countjet .gt. njets) countjet=countjet-1
 
       if ((njets .ne. countjet) .and. (notag .eq. 0)) then
@@ -387,7 +387,7 @@ c--- therefore we should subtract 1 from this number
 c -- identify b-jets
       call idjet(pjet,jetindex,countljet,countbjet,
      &     pljet,pbjet)
-      
+
 c--- extra cut on eta(2nd jet) for H(->WW)+jet search
       if ((hwwjetcuts) .and. (countjet .ge. 2)) then
         if (pt(jetindex(1),pjet) .gt. pt(jetindex(2),pjet)) then
@@ -414,7 +414,7 @@ c -- applies to all jets
         enddo
         enddo
       endif
- 
+
 c -- cut on Zj mass -- use light jet only
 c -- only one light jet needs to be able to construct the top mass
       if (case .eq. 'Z_tjet' .or. case .eq. 'Z_tdkj') then
@@ -423,7 +423,7 @@ c -- only one light jet needs to be able to construct the top mass
             pZj(:)=pljet(j,:)+pjet(leptindex(1),:)
      &           +pjet(leptindex(2),:)
             mZj=dsqrt(pZj(4)**2-pZj(1)**2-pZj(2)**2-pZj(3)**2)
-            
+
             if ( abs(mZj-mt) .le. mZjcut) then
                reconstr_top=reconstr_top+1
             endif
@@ -433,11 +433,11 @@ c -- only one light jet needs to be able to construct the top mass
             return
          endif
       endif
-            
-      
+
+
 c--- WBF-style cuts (if there are 2 or more jets)
       if ((njets .gt. 1)) then
-c--- jet-jet rapidity separation 
+c--- jet-jet rapidity separation
 c--- j and k point to the two highest pt ('tagging') jets
         j=1
         k=2
@@ -475,22 +475,22 @@ c--- Cut to require lepton to be between jets
           do pntr=1,countlept
             etalept=etarap(leptindex(pntr),pjet)
             if ( (etalept .lt. min(etaj,etak)+etabuffer) .or.
-     .           (etalept .gt. max(etaj,etak)-etabuffer) ) then 
+     .           (etalept .gt. max(etaj,etak)-etabuffer) ) then
               gencuts_input=.true.
               return
             endif
-          enddo                    
+          enddo
         endif
 
       endif
-      
+
 c-- cuts on b-quarks
       if (bbproc) then
         call getbs(pjet,ib1,ib2)
         if ( (abs(etarap(ib1,pjet)) .gt. etabjetmax)
-     .  .or. (pt(ib1,pjet) .lt. ptbjetmin) ) gencuts_input=.true. 
+     .  .or. (pt(ib1,pjet) .lt. ptbjetmin) ) gencuts_input=.true.
         if ( (abs(etarap(ib2,pjet)) .gt. etabjetmax)
-     .  .or. (pt(ib2,pjet) .lt. ptbjetmin) ) gencuts_input=.true. 
+     .  .or. (pt(ib2,pjet) .lt. ptbjetmin) ) gencuts_input=.true.
       endif
 
 c--- completed basic cuts
@@ -512,14 +512,14 @@ C--- if there are jet-like particles (see above), do more cuts
           enddo
         enddo
       endif
- 
+
       return
 
    99 format(1x,a29,f6.2,a17)
-      
+
 
       end
- 
- 
- 
- 
+
+
+
+

@@ -1,7 +1,7 @@
       subroutine gg_hgg_v(p,msq)
 c--- Virtual matrix element squared averaged over initial colors and spins
 c
-c     g(-p1)+g(-p2) -->  H(p3)+g(p_iglue1=5)+g(p_iglue2=6) 
+c     g(-p1)+g(-p2) -->  H(p3)+g(p_iglue1=5)+g(p_iglue2=6)
 c
 c    Calculation is fully analytic
       implicit none
@@ -28,9 +28,9 @@ c    Calculation is fully analytic
       logical CheckEGZ
       common/CheckEGZ/CheckEGZ
 !$omp threadprivate(/CheckEGZ/)
-C*************************************************** 
+C***************************************************
       scheme='tH-V'
-C*************************************************** 
+C***************************************************
 
       if     (scheme .eq. 'dred') then
         deltar=0d0
@@ -40,11 +40,11 @@ C***************************************************
         write(6,*) 'Invalid scheme in gg_hgg_v.f'
         stop
       endif
-      
+
 c--- Set this to true to check squared matrix elements against
 c--- hep-ph/0506196 using the point specified in Eq. (51)
       CheckEGZ=.false.
-            
+
 c--- Set up spinor products
       call spinoru(6,p,za,zb)
 
@@ -73,10 +73,10 @@ c--- for checking EGZ
       if (CheckEGZ) then
         call CheckEGZres
       endif
-      
+
 c--- for checking scheme dependence of amplitudes
 c      call CheckScheme(1,2,5,6)
-      
+
 C--- Note that Hqarbvsqanal(1,2,5,6)=Hqarbvsqanal(6,5,2,1)
 C--- and the basic process is q(-k6)+r(-k2)-->q(-k5)+r(-k1)
 
@@ -85,7 +85,7 @@ c--- FOUR-QUARK PROCESSES WITH NON-IDENTICAL QUARKS
 C---quark-quark
 C     q(1)+r(2)->q(5)+r(6)
       qrqr=Hqarbvsqanal(6,2,5,1)
-      
+
 C----quark-antiquark annihilation (6-->5-->2-->6) wrt q(1)+r(2)->q(5)+r(6)
 c     q(1)+a(2)->r(5)+b(6)
       qarb=Hqarbvsqanal(5,6,2,1)
@@ -94,16 +94,16 @@ C----antiquark-quark annihilation (1<-->2, 5<-->6) wrt to the above
 c     a(1)+q(2)->b(5)+r(6)
 c      aqbr=Hqarbvsqanal(6,5,1,2)
       aqbr=qarb
-            
+
 C----quark-antiquark scattering (6<-->2) wrt q(1)+r(2)->q(5)+r(6)
 c     q(1)+b(2)->r(5)+a(6)
       qbra=Hqarbvsqanal(2,6,5,1)
 
 C----antiquark-quark scattering
 c     b(1)+q(2)->a(5)+r(6) (1<-->2, 5<-->6) wrt to the above
-c      bqar=Hqarbvsqanal(1,5,6,2) 
+c      bqar=Hqarbvsqanal(1,5,6,2)
       bqar=qbra
-      
+
 C---antiquark-antiquark scattering (1<-->5,2<-->6) wrt q(1)+r(2)->q(5)+r(6)
 C     a(1)+b(2)->a(5)+b(6)
       abab=Hqarbvsqanal(2,6,1,5)
@@ -122,7 +122,7 @@ C     q(1)+a(2)->q(5)+a(6) (2<-->6) wrt q(1)+q(2)->q(5)+q(6)
 C     a(1)+q(2)->a(5)+q(6) (1<-->2, 5<-->6) wrt the above
 C      aqqa=qbra+qarb+Hqaqavsqanal(1,5,6,2)
       aqaq=qaqa
-      
+
 c--- TWO-QUARK, TWO GLUON PROCESSES
 
 C     a(1)+q(2)->g(3)+g(4)
@@ -137,21 +137,21 @@ C     g(1)+q(2)->q(5)+g(6)
 C     a(1)+g(2)->a(5)+g(6)
 c      agag=+HAQggvsqanal(5,1,2,6)
       agag=qgqg
-      
+
 C     g(1)+a(2)->a(5)+g(6)
 c      gaag=+HAQggvsqanal(5,2,1,6)
       gaag=gqqg
-      
+
 C     g(1)+g(2)->q(5)+a(6)
       ggqa=+HAQggvsqanal(6,5,1,2)
 
 C     q(1)+a(2)->g(5)+g(6)
 c      qagg=+HAQggvsqanal(1,2,5,6)
       qagg=aqgg
-                  
+
 c--- FOUR GLUON PROCESS
       gggg=+Hggggvsqanal(1,2,5,6)
-      
+
 
 C--- DEBUGGING OUTPUT
 C      write(6,*) 'qrqr',qrqr

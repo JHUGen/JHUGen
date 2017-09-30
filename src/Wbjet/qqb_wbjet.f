@@ -30,7 +30,7 @@ c--- "flav". Note that NLO corrections are not yet extended this way.
 
 C Statement function defines the sum of the following two diagrams
 
-c     q5(L)----<----------q2            q5(L)------<--------q2          
+c     q5(L)----<----------q2            q5(L)------<--------q2
 c                 0                             0
 c                 0                             0
 c                 0                             0
@@ -57,7 +57,7 @@ c--- set up spinors (and dotproducts)
       call spinoru(6,p,za,zb)
       prop=s(3,4)**2/((s(3,4)-wmass**2)**2+wmass**2*wwidth**2)
       facqq=4d0*V*gsq**2*(gwsq/2d0)**2*aveqq*prop
-      
+
 c--- now square these amplitudes separating into color structures
 c   1) Amplitude
 c   2) Amplitude with (5<-->6)
@@ -68,7 +68,7 @@ c--- q(i) q(j) --> q(i) ( --> W q(k) ) q(j)
 c--- eg u(1)b(2)->nu(3)e^+(4)b(5)d(6)
         qQ_jkki=abs(aLLL(1,2,3,4,5,6))**2+abs(aLLL(1,5,3,4,2,6))**2
 
-c--- q(i) q(j) --> q(i) q(j) ( --> W q(k) ), eg 
+c--- q(i) q(j) --> q(i) q(j) ( --> W q(k) ), eg
 c--- eg b(1)u(2)->nu(3)e^+(4)b(5)d(6)
 c---  exchange (1<-->2) in above
         Qq_jkji=abs(aLLL(2,1,3,4,5,6))**2+abs(aLLL(2,5,3,4,1,6))**2
@@ -83,7 +83,7 @@ C--- exchange (1<-->2) in above
         qbQb_jkki=abs(aLLL(6,2,3,4,5,1))**2+abs(aLLL(6,5,3,4,2,1))**2
 
 c--- set up auxiliary array
-     
+
       do j=-nf,nf
         Vsm(j)=Vsum(j)
         if (abs(j) .ge. flav) Vsm(j)=0d0
@@ -97,7 +97,7 @@ c--- make sure that elements are either one or zero
       msq_cs(0,j,k)=0d0
       msq_cs(1,j,k)=0d0
       msq_cs(2,j,k)=0d0
-      
+
       if ((abs(j) .ne. flav) .and. (abs(k) .ne. flav)) goto 99
       if ((abs(j) .eq. flav) .and. (abs(k) .eq. flav)) goto 99
 c--- so that either abs(j) or abs(k) = flav (but not both).
@@ -108,9 +108,9 @@ c--- This is reversed for (q,q) and (qb,qb)
 C--- Note added RKE 8/17/04
 C--- Actually this comment doesn't seem to be true for (qb,q)
 C--- in order to get the poles to cancel
-C--- There is presumably some interplay with the definition 
-C--- of the various color terms in qqb_wbjet_z.f, 
-     
+C--- There is presumably some interplay with the definition
+C--- of the various color terms in qqb_wbjet_z.f,
+
       if ((j .gt. 0) .and. (k .lt. 0)) then
 c--- e.g.  b d~ -> b u~
            msq_cs(2,j,k)=facqq*Vsm(k)*Qbqb_jkji
@@ -135,13 +135,13 @@ c--- e.g.  b~ d~ -> b~ u~
 c--- e.g.  d~ b~ -> b~ u~
            msq_cs(2,j,k)=facqq*Vsm(j)*qbQb_jkki
       endif
-      
+
       msq(j,k)=msq_cs(0,j,k)+msq_cs(1,j,k)+msq_cs(2,j,k)
 
    99 continue
       enddo
       enddo
-      
+
       return
       end
-      
+

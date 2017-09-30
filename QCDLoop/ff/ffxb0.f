@@ -702,7 +702,7 @@
 			ax = abs(x)
 			if ( ax .gt. bdn515 ) then
 *			    do not do the Taylor expansion
-			    if ( lwarn ) call ffwarn(23,ier,s2p,s2) 
+			    if ( lwarn ) call ffwarn(23,ier,s2p,s2)
 			    goto 495
 			endif
 			if ( ax .gt. bdn510 ) then

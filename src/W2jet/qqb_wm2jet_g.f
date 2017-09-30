@@ -12,7 +12,7 @@ c                           |     |
 c                           |     --> nu(p3)+e^+(p4)
 c                           |
 c                           ---> f(p5)+f(p6)
-      implicit none 
+      implicit none
       include 'constants.f'
       include 'masses.f'
       include 'qcdcouple.f'
@@ -29,7 +29,7 @@ c                           ---> f(p5)+f(p6)
       double precision mmsq_gq,mmsq_gqb,mmsq_qbg
       double precision fac,Vfac
       double precision propsq
-      double precision 
+      double precision
      . QQ_ud_dd,QQ_us_ds,QQ_uu_du,QQ_du_dd,QQ_su_sd,QQ_uu_ud,
      .QbQb_ds_us,QbQb_du_uu,QbQb_dd_ud,QbQb_sd_su,QbQb_ud_uu,QbQb_dd_du,
      . RRb_dd_du,RRb_ss_du,RRb_uu_du,RRb_ud_dd,RRb_ud_ss,RRb_ud_uu,
@@ -75,7 +75,7 @@ c                           ---> f(p5)+f(p6)
       msq(j,k)=0d0
       enddo
       enddo
- 
+
       call spinoru(7,p,za,zb)
       propsq=s(3,4)**2/((s(3,4)-wmass**2)**2+(wmass*wwidth)**2)
 
@@ -92,32 +92,32 @@ c                           ---> f(p5)+f(p6)
       call xwqqggg(2,1,6,7,5,3,4,mmsq_gq)
       call xwqqggg(5,1,6,7,2,3,4,mmsq_gqb)
       call xwqqggg(5,2,6,7,1,3,4,mmsq_qbg)
-      
+
       endif
-      
+
       if (Qflag) then
 ************************************************************************
 *     Calculate contributions from the QQBQQB matrix elements          *
 ************************************************************************
 
-c--- basic Q-Q amplitudes 
+c--- basic Q-Q amplitudes
       call addhel(1,5,2,6,7,3,4,QQ_ud_dd,QQ_us_ds,QQ_uu_du)
       call addhel(2,6,1,5,7,3,4,QQ_du_dd,QQ_su_sd,QQ_uu_ud)
-c--- basic Qb-Qb amplitudes 
+c--- basic Qb-Qb amplitudes
       call addhel(5,1,6,2,7,3,4,QbQb_dd_ud,QbQb_ds_us,QbQb_du_uu)
       call addhel(6,2,5,1,7,3,4,QbQb_dd_du,QbQb_sd_su,QbQb_ud_uu)
 c--- basic Q-Qb amplitudes
-c--- annihilation 
+c--- annihilation
       call addhel(6,5,1,2,7,3,4,RRb_dd_du,RRb_ss_du,RRb_uu_du)
       call addhel(1,2,6,5,7,3,4,RRb_ud_dd,RRb_ud_ss,RRb_ud_uu)
-c--- scattering 
+c--- scattering
       call addhel(1,5,6,2,7,3,4,QQb_ud_dd,QQb_us_ds,QQb_ud_uu)
       call addhel(6,2,1,5,7,3,4,QQb_du_dd,QQb_su_sd,QQb_uu_ud)
 c--- basic Qb-Q amplitudes
-c--- annihilation 
+c--- annihilation
       call addhel(6,5,2,1,7,3,4,RbR_dd_du,RbR_ss_du,RbR_uu_du)
       call addhel(2,1,6,5,7,3,4,RbR_ud_dd,RbR_ud_ss,RbR_ud_uu)
-c--- scattering 
+c--- scattering
       call addhel(2,5,6,1,7,3,4,QbQ_ud_dd,QbQ_us_ds,QbQ_ud_uu)
       call addhel(6,1,2,5,7,3,4,QbQ_du_dd,QbQ_su_sd,QbQ_uu_ud)
 c--- basic Q-G amplitudes
@@ -148,7 +148,7 @@ c---     GQ_d_dsc corresponds to:     g + d -> c + d + sb
 c---     GQ_u_udu corresponds to:     g + d -> u + d + db
 c---     GQ_u_ddd corresponds to:     g + d -> u + u + ub
 c---     GQ_u_dcc corresponds to:     g + d -> c + u + cb
-      
+
 c--- basic G-QB amplitudes
       call addhel(5,7,6,2,1,3,4,GQb_d_udd,GQb_u_ucs,GQb_u_uud)
       call addhel(6,2,5,7,1,3,4,GQb_d_ddu,GQb_d_ucc,GQb_d_uuu)
@@ -159,17 +159,17 @@ c---     GQb_d_udd is used instead:    g + ub -> db + ub + u
 c---     GQb_d_ddu is NOT NEEDED:          g + ub -> ub + db + u
 c---     GQB_d_uuu is used instead:    g + ub -> db + db + d
 c---     GQb_d_ucc corresponds to:     g + ub -> sb + db + s
-      
+
       endif
 
 c--- note the factor of 4d0*xw**2 relative to wbb
       fac=4d0*gsq**3*(gwsq/2d0)**2
 c--- extra factor of 2**3=8 to compensate for Ta normalization
       fac=fac*8d0
-       
+
       do j=-nf,nf
       do k=-nf,nf
-      
+
       msq(j,k)=0d0
 
       if (Gflag) then
@@ -178,14 +178,14 @@ c--- extra factor of 2**3=8 to compensate for Ta normalization
 ************************************************************************
 
 c--- note the identical particle factor of 1/6 for the
-c--- q-qb initial states, due to 3 gluons in the final state     
+c--- q-qb initial states, due to 3 gluons in the final state
       if     ((j .eq. 0) .and. (k .eq. 0)) then
         Vfac=0d0
         do n1=1,nf
           do n2=-nf,-1
             Vfac=Vfac+Vsq(n1,n2)
           enddo
-        
+
         enddo
         msq(j,k)=propsq*mmsq_gg*Vfac*(gwsq**2/4d0/esq**2)
       elseif ((j .gt. 0) .and. (k .lt. 0)) then
@@ -196,23 +196,23 @@ c--- q-qb initial states, due to 3 gluons in the final state
      .            *(aveqq/avegg)*(gwsq**2/4d0/esq**2)/6d0
       elseif ((j .gt. 0) .and. (k .eq. 0)) then
         msq(j,k)=half*propsq*mmsq_qg
-     .            *(aveqg/avegg)*(gwsq**2/4d0/esq**2) 
+     .            *(aveqg/avegg)*(gwsq**2/4d0/esq**2)
      .            *(Vsq(j,-1)+Vsq(j,-2)+Vsq(j,-3)+Vsq(j,-4)+Vsq(j,-5))
       elseif ((j .lt. 0) .and. (k .eq. 0)) then
         msq(j,k)=half*propsq*mmsq_qbg
-     .            *(aveqg/avegg)*(gwsq**2/4d0/esq**2) 
+     .            *(aveqg/avegg)*(gwsq**2/4d0/esq**2)
      .            *(Vsq(j,+1)+Vsq(j,+2)+Vsq(j,+3)+Vsq(j,+4)+Vsq(j,+5))
       elseif ((j .eq. 0) .and. (k .gt. 0)) then
         msq(j,k)=half*propsq*mmsq_gq
-     .            *(aveqg/avegg)*(gwsq**2/4d0/esq**2) 
+     .            *(aveqg/avegg)*(gwsq**2/4d0/esq**2)
      .            *(Vsq(-1,k)+Vsq(-2,k)+Vsq(-3,k)+Vsq(-4,k)+Vsq(-5,k))
       elseif ((j .eq. 0) .and. (k .lt. 0)) then
         msq(j,k)=half*propsq*mmsq_gqb
-     .            *(aveqg/avegg)*(gwsq**2/4d0/esq**2) 
+     .            *(aveqg/avegg)*(gwsq**2/4d0/esq**2)
      .            *(Vsq(+1,k)+Vsq(+2,k)+Vsq(+3,k)+Vsq(+4,k)+Vsq(+5,k))
       endif
       endif
-      
+
       if (Qflag) then
 ************************************************************************
 *     Sum the contributions from the QQBQQB matrix elements            *

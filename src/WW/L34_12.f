@@ -8,7 +8,7 @@
       double complex z2,bit1,bit2
 
       double precision t,t134,t234,del3,del12,del56
-  
+
       z2(i1,i2,i3,i4)=za(i1,i2)*zb(i2,i4)+za(i1,i3)*zb(i3,i4)
 
       t134=t(j1,j3,j4)
@@ -40,7 +40,7 @@ c----second line
 c-----third line
       L34_12=L34_12+0.5d0*t134/(z2(j2,j5,j6,j1)*del3)
      . *( +za(j3,j4)*zb(j4,j5)**2/zb(j5,j6)
-     .    +zb(j3,j4)*za(j3,j6)**2/za(j5,j6)-2d0*za(j3,j6)*zb(j4,j5)) 
+     .    +zb(j3,j4)*za(j3,j6)**2/za(j5,j6)-2d0*za(j3,j6)*zb(j4,j5))
 
 c--line before penultimate line
       L34_12=L34_12
@@ -57,7 +57,7 @@ c--penultimate line
 c--last line
       L34_12=L34_12+2d0*del12/(z2(j2,j5,j6,j1)*Del3)
      . *(+zb(j4,j5)*z2(j3,j2,j4,j5)/zb(j5,j6)
-     .   -za(j3,j6)*z2(j6,j1,j3,j4)/za(j5,j6))      
+     .   -za(j3,j6)*z2(j6,j1,j3,j4)/za(j5,j6))
 
       return
       end

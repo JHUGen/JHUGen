@@ -42,7 +42,7 @@
       amp(j,2,1,2,1)=apmpm(j)
       amp(j,2,2,1,1)=appmm(j)
       enddo
-      
+
 
 c      call makepppp(p1,p2,p3,p4,zb,apppp)
 c      call makemppp(p1,p2,p3,p4,zb,za,amppp,apmpp,appmp,apppm)
@@ -132,12 +132,12 @@ C     %%CITATION = HEP-PH 9610541;%%
       double complex apppp(3)
       double precision hm2
 
-C if Higgs has non-zero width hm**2 must be recalculated 
+C if Higgs has non-zero width hm**2 must be recalculated
       hm2 = s(p1,p2)+s(p1,p3)+s(p1,p4)+s(p2,p3)+ s(p2,p4)+s(p3,p4)
 C      write(*,*) 'hm2',hm2,hmass**2
       do j=1,2
       i1(j)=p1
-            if (j.eq.1) then 
+            if (j.eq.1) then
             i2(j)=p2
             i3(j)=p3
             i4(j)=p4
@@ -197,7 +197,7 @@ C---statement function
       do k=1,4
       do j=1,2
       i1(j)=jk(k1(k))
-            if (j.eq.1) then 
+            if (j.eq.1) then
             i2(j)=jk(k2(k))
             i3(j)=jk(k3(k))
             i4(j)=jk(k4(k))
@@ -217,17 +217,17 @@ c            i4(j)=jk(k3(k))
 C---PRD55 Eq(22)
 c      amppp=
 c     . -(z2(p1,p3)*zb(p2,p4))**2
-c     . /((s(p1,p2)+s(p1,p4)+s(p2,p4))*s(p1,p2)*s(p1,p4)) 
-c     . -(z2(p1,p4)*zb(p2,p3))**2/((s(p1,p2)+s(p1,p3)+s(p2,p3))*s(p1,p2)*s(p2,p3)) 
-c     . -(z2(p1,p2)*zb(p3,p4))**2/((s(p1,p3)+s(p1,p4)+s(p3,p4))*s(p1,p4)*s(p3,p4)) 
+c     . /((s(p1,p2)+s(p1,p4)+s(p2,p4))*s(p1,p2)*s(p1,p4))
+c     . -(z2(p1,p4)*zb(p2,p3))**2/((s(p1,p2)+s(p1,p3)+s(p2,p3))*s(p1,p2)*s(p2,p3))
+c     . -(z2(p1,p2)*zb(p3,p4))**2/((s(p1,p3)+s(p1,p4)+s(p3,p4))*s(p1,p4)*s(p3,p4))
 c     . +zb(p2,p4)/(zb(p1,p2)*za(p2,p3)*za(p3,p4)*zb(p4,p1))
 c     . *(+s(p2,p3)*z2(p1,p2)/za(p4,p1)
 c     .   +s(p3,p4)*z2(p1,p4)/za(p1,p2)-zb(p2,p4)*(s(p2,p3)+s(p2,p4)+s(p3,p4)))
 C---PRD55 Eq(A8+erratum)
 c      amppp=
-c     . -(z2(p1,p3)*zb(p2,p4))**2/((s(p1,p2)+s(p1,p4)+s(p2,p4))*s(p1,p2)*s(p1,p4)) 
-c     . -(z2(p1,p4)*zb(p2,p3))**2/((s(p1,p2)+s(p1,p3)+s(p2,p3))*s(p1,p2)*s(p2,p3)) 
-c     . -(z2(p1,p2)*zb(p3,p4))**2/((s(p1,p3)+s(p1,p4)+s(p3,p4))*s(p1,p4)*s(p3,p4)) 
+c     . -(z2(p1,p3)*zb(p2,p4))**2/((s(p1,p2)+s(p1,p4)+s(p2,p4))*s(p1,p2)*s(p1,p4))
+c     . -(z2(p1,p4)*zb(p2,p3))**2/((s(p1,p2)+s(p1,p3)+s(p2,p3))*s(p1,p2)*s(p2,p3))
+c     . -(z2(p1,p2)*zb(p3,p4))**2/((s(p1,p3)+s(p1,p4)+s(p3,p4))*s(p1,p4)*s(p3,p4))
 c     . -zb(p2,p4)/(zb(p1,p2)*zb(p1,p4)*za(p1,p3))
 c     . *(z2(p1,p2)**2/(za(p1,p4)*za(p3,p4))
 c     .  +z2(p1,p4)**2/(za(p1,p2)*za(p2,p3)))
@@ -237,7 +237,7 @@ C---hep-ph/9903330 Eq(11)
      . -(z2(i1(j),i3(j))*zb(i2(j),i4(j)))**2
      . /(s124*s(i1(j),i2(j))*s(i1(j),i4(j)))
      . -(z2(i1(j),i4(j))*zb(i2(j),i3(j)))**2
-     . /(s123*s(i1(j),i2(j))*s(i2(j),i3(j))) 
+     . /(s123*s(i1(j),i2(j))*s(i2(j),i3(j)))
      . -(z2(i1(j),i2(j))*zb(i3(j),i4(j)))**2
      . /(s134*s(i1(j),i4(j))*s(i3(j),i4(j)))
      . +zb(i2(j),i4(j))/
@@ -251,22 +251,22 @@ C      if (k.eq.3) appmp(j)=temp
 C      if (k.eq.4) apppm(j)=temp
 
 
-C -- GZ 
+C -- GZ
       if (k.eq.1) amppp(j)=temp
-      if (k.eq.2 .and. j.eq.1) then 
+      if (k.eq.2 .and. j.eq.1) then
          apmpp(j)=temp
-      elseif (k.eq.2 .and. j.eq.2) then 
+      elseif (k.eq.2 .and. j.eq.2) then
          apmpp(j+1)=temp
       endif
       if (k.eq.3) appmp(j)=temp
-      if (k.eq.4 .and. j.eq.1) then 
+      if (k.eq.4 .and. j.eq.1) then
          apppm(j)=temp
       elseif (k.eq.4 .and. j.eq.2) then
          apppm(j+1)=temp
       endif
 
 C---determine axxxx(3) using sub-cyclic identity
-      if (j .eq.2) then 
+      if (j .eq.2) then
          if (k.eq.1) amppp(3)=-amppp(1)-amppp(2)
          if (k.eq.2) apmpp(2)=-apmpp(1)-apmpp(3)
          if (k.eq.3) appmp(3)=-appmp(1)-appmp(2)
@@ -316,7 +316,7 @@ C     %%CITATION = HEP-PH 9610541;%%
       jk(4)=p4
       do k=1,6
             do j=1,2
-            if (j.eq.1) then 
+            if (j.eq.1) then
             i1(j)=jk(k1(k))
             i2(j)=jk(k2(k))
             i3(j)=jk(k3(k))
@@ -344,49 +344,49 @@ C            if (k.eq.4) apmmp(j)=temp
 C            if (k.eq.5) apmpm(j)=temp
 C            if (k.eq.6) appmm(j)=temp
 
-            if (k.eq.1) then 
+            if (k.eq.1) then
                if (j.eq.1) ammpp(j)=temp
-               if (j.eq.2) then 
+               if (j.eq.2) then
                   ammpp(2)=temp
                   ammpp(3)=-ammpp(2)-ammpp(1)
                endif
             endif
 
-            if (k.eq.2) then 
+            if (k.eq.2) then
                if (j.eq.1) ampmp(3)=temp
-               if (j.eq.2) then 
+               if (j.eq.2) then
                   ampmp(2)=temp
                   ampmp(1)=-ampmp(2)-ampmp(3)
                endif
             endif
 
-            if (k.eq.3) then 
+            if (k.eq.3) then
                if (j.eq.1) amppm(3)=temp
-               if (j.eq.2) then 
+               if (j.eq.2) then
                   amppm(1)=temp
                   amppm(2)=-amppm(1)-amppm(3)
                endif
             endif
 
-            if (k.eq.4) then 
+            if (k.eq.4) then
                if (j.eq.1) apmmp(3)=temp
-               if (j.eq.2) then 
+               if (j.eq.2) then
                   apmmp(1)=temp
                   apmmp(2)=-apmmp(1)-apmmp(3)
                endif
             endif
 
-            if (k.eq.5) then 
+            if (k.eq.5) then
                if (j.eq.1) apmpm(3)=temp
-               if (j.eq.2) then 
+               if (j.eq.2) then
                   apmpm(2)=temp
                   apmpm(1)=-apmpm(2)-apmpm(3)
                endif
             endif
 
-            if (k.eq.6) then 
+            if (k.eq.6) then
                if (j.eq.1) appmm(1)=temp
-               if (j.eq.2) then 
+               if (j.eq.2) then
                   appmm(2)=temp
                   appmm(3)=-appmm(1)-appmm(2)
                endif

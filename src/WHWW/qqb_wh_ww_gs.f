@@ -12,7 +12,7 @@ c                           |    |
 c                           |    --> e^-(p3)+nubar(p4)
 c                           |
 c                           ---> W^+(nu(p5),e^+(p6))W^-(e^-(p7),nub(p8))
-      implicit none 
+      implicit none
       include 'constants.f'
       include 'ptilde.f'
       include 'qqgg.f'
@@ -65,7 +65,7 @@ c---- entries are left as dummies
       enddo
       enddo
 
-      return      
+      return
       end
 
 

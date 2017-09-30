@@ -29,7 +29,7 @@
       double precision gqbZqbLL,gqbZqbRR,gqbZqbLR,gqbZqbRL
       double precision qbgZqbLL,qbgZqbRR,qbgZqbLR,qbgZqbRL
       double complex prop
-      
+
       integer,parameter::
      & iqqbgLL(5)=(/1,2,3,4,5/),iqqbgRR(5)=(/2,1,4,3,5/),
      & iqqbgRL(5)=(/2,1,3,4,5/),iqqbgLR(5)=(/1,2,4,3,5/),
@@ -54,9 +54,9 @@ c      if ((abs(s(1,5)).lt.cutoff) .or. (abs(s(2,5)).lt.cutoff)) return
 
 c--- calculate lowest order
       call qqb_z1jet(p,msq0)
-      
+
 c----UV counterterm contains the finite renormalization to arrive
-c----at MS bar scheme.      
+c----at MS bar scheme.
       subuv=ason2pi*xn*(epinv*(11d0-2d0*dble(nflav)/xn)-1d0)/6d0
 
 c--   calculate propagator
@@ -94,7 +94,7 @@ c--   calculate propagator
       qbgZqbRR=qgZqLR
       qbgZqbLL=qgZqRL
       qbgZqbLR=qgZqRR
-      
+
       do j=-nflav,nflav
       do k=-nflav,nflav
       if( j .ne. 0 .and. k .ne. 0 .and. j .ne. -k) goto 19
@@ -138,7 +138,7 @@ c--   calculate propagator
      .             +cdabs(Q(-k)*q1+R(-k)*l1*prop)**2*gqbZqbRL
      .             -subuv*msq0(j,k)
       endif
-      
+
    19 continue
       enddo
       enddo

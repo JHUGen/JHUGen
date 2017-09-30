@@ -3,7 +3,7 @@
 *     Lowest order t-channel single top, with explicit b-quark         *
 *       (contracted with vector n)                                     *
 *                                                                      *
-*     q(p1) + g(p2) -> t(p3) + b(p4) + q'(p5)                          *      
+*     q(p1) + g(p2) -> t(p3) + b(p4) + q'(p5)                          *
 *                                                                      *
 *         Author: J. Campbell, March 19, 2008                          *
 *                                                                      *
@@ -26,7 +26,7 @@ c     u + g  ->  c + s + d  (t-channel single-charm)
       msq(j,k)=0d0
       enddo
       enddo
-      
+
       gsq_H=fourpi*as_H
       fac=aveqg*2d0*xn**2*Cf*gsq_H*gwsq**2
       call dotem(5,p,s)
@@ -75,7 +75,7 @@ c--- as it expects to be called with the W in the t-channel.
 c--- NB: it also requires an extra factor of two wrt that routine
 
       double precision function qg_tbqn(p1,p2,p3,p4,p5,p,n)
-      implicit none 
+      implicit none
 C---calculates the amplitude squared for the process
 c   q(p1)+qbar(p2) --> W(l(p3)+a(p4)+g(p5)
 c   contracted with the vector n(mu)
@@ -99,10 +99,10 @@ c---calculate the propagator
       qg_tbqn=-nDp3*nDp4+0.25d0*s(p3,p4)*nDn
      . +s(p1,p4)*nDp2**2*(s(p3,p2)+s(p3,p5))/s(p2,p5)**2
      . +s(p3,p2)*nDp1**2*(s(p1,p4)+s(p4,p5))/s(p1,p5)**2
- 
+
      . -(nDp2*(nDp3*s(p1,p4)-(s(p3,p2)+s(p3,p5))*nDp4)
      . +s(p3,p5)*0.25d0*nDn*(s(p4,p2)+s(p1,p4)))/s(p2,p5)
- 
+
      . -(nDp1*(s(p3,p2)*nDp4-(s(p1,p4)+s(p4,p5))*nDp3)
      . +s(p4,p5)*0.25d0*nDn*(s(p3,p2)+s(p3,p1)))/s(p1,p5)
 
@@ -114,7 +114,7 @@ c---calculate the propagator
 
 c--- apply extra factor of two
       qg_tbqn=qg_tbqn*2d0
-      
+
       return
       end
 

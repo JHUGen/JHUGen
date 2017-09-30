@@ -1,5 +1,5 @@
       subroutine qqb_zccm(p,msq)
-c---  Matrix elements squared 
+c---  Matrix elements squared
 c     q(-p1)+qb(-p2) --> cbar(p5)+c(p6)+e^-(p3)+e^+(p4)
 c---  averaged(summed) over initial(final) colours and spins
       implicit none
@@ -19,7 +19,7 @@ c---  averaged(summed) over initial(final) colours and spins
       double complex qqb_a(2,2,2,2,2),qqb_b(2,2,2,2,2)
       double complex qbq_a(2,2,2,2,2),qbq_b(2,2,2,2,2)
       integer,parameter::swap(4)=(/2,1,3,4/)
-      
+
 c--initialize to zero
       do j=-nf,nf
       do k=-nf,nf
@@ -52,7 +52,7 @@ C---Fill spinor products
       call dotem(6,p,s)
       prop=s(3,4)/dcmplx((s(3,4)-zmass**2),zmass*zwidth)
       facgg=4d0*V*gsq**2*esq**2*xn*avegg
-      facqq=4d0*V*gsq**2*esq**2*aveqq 
+      facqq=4d0*V*gsq**2*esq**2*aveqq
 
       call spinoru(6,p12,za,zb)
       call mamps(mc,1,2,3,4,5,6,qqb_a,qqb_b)

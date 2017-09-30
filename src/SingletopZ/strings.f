@@ -18,7 +18,7 @@
       double precision q1(4),q2(4),q3(4),q4(4),q5(4),
      & q6(4)
 c ,g(4)
-c      data g/-1,-1,-1,1/      
+c      data g/-1,-1,-1,1/
       common/gamodd/gam1,gam3,gam5
       common/gameven/gam0,gam2,gam4
       parameter(h1=-1,h2=-1,h6=-1)
@@ -33,7 +33,7 @@ c     & J61x0,J61x1,J61x3,J61x5
 
       data q2/0.0000000000000000D+00, 0.0000000000000000D+00,
      &   0.6850815232034704D+04,-0.6850815232034704D+04/
- 
+
       data q3/0.5355493692468755D+02, -0.8706764175737293D+02,
      & -0.1729151062441010D+04 ,0.1732169824887580D+04/
 
@@ -51,14 +51,14 @@ C---statement function
 c     vec(p1,ro)=p1(ro)
 C---end statement function
 
-c      p1(:)=dcmplx(q1(:))    
+c      p1(:)=dcmplx(q1(:))
 c      p2(:)=dcmplx(q2(:))
 c      p3(:)=dcmplx(q3(:))
 c      p4(:)=dcmplx(q4(:))
 c      p5(:)=dcmplx(q5(:))
 c      p6(:)=dcmplx(q6(:))
 
-      p1(:)=dcmplx(q(1,:))    
+      p1(:)=dcmplx(q(1,:))
       p2(:)=dcmplx(q(2,:))
       p3(:)=dcmplx(q(3,:))
       p4(:)=dcmplx(q(4,:))
@@ -77,15 +77,15 @@ c--- to order of array in qq_tchan_ztq_v.f
 c--- it relies on (h3,h5) = (-1,-1), (+1,-1), (-1,+1), (+1,+1)
 
       doJ61=.false.
-      doJ52=.false. 
-c--- first call, calculate everything 
+      doJ52=.false.
+c--- first call, calculate everything
       if ((h3 .eq. -1) .and. (h5 .eq. -1)) then
         doJ61=.true.
 	doJ52=.true.
-      endif        
+      endif
       if ((h3 .eq. -1) .and. (h5 .eq. +1)) then
 	doJ52=.true.
-      endif        
+      endif
 
       if (doJ61) then
       call ubarspinor0(p6,h6,f6)
@@ -97,33 +97,33 @@ c--- first call, calculate everything
       endif
       call ubarspinor0(p3,h3,f3)
       call uspinor0(p4,h4,f4)
-      
+
 c      J34x0=czip
-c      J61x0=czip      
+c      J61x0=czip
       if (doJ52) then
       J52x0=czip
       do i=1,4
       do j=1,4
 c      J34x0=J34x0+f3(i)*gam0(i,j)*f4(j)
-      if (abs(gam0(i,j)) .gt. 1d-8) then  
-      J52x0=J52x0+f5(i)*gam0(i,j)*f2(j)      
+      if (abs(gam0(i,j)) .gt. 1d-8) then
+      J52x0=J52x0+f5(i)*gam0(i,j)*f2(j)
 c      J61x0=J61x0+f6(i)*gam0(i,j)*f1(j)
       endif
       enddo
       enddo
       endif
-      
+
       do fi=1,4
       J34x1(fi)=czip
       if (doJ52) J52x1(fi)=czip
       if (doJ61) J61x1(fi)=czip
       do i=1,4
       do j=1,4
-      if (abs(gam1(fi,i,j)) .gt. 1d-8) then  
-      J34x1(fi)=J34x1(fi)+f3(i)*gam1(fi,i,j)*f4(j)  
-      if (doJ52) J52x1(fi)=J52x1(fi)+f5(i)*gam1(fi,i,j)*f2(j)       
-      if (doJ61) J61x1(fi)=J61x1(fi)+f6(i)*gam1(fi,i,j)*f1(j)    
-      endif   
+      if (abs(gam1(fi,i,j)) .gt. 1d-8) then
+      J34x1(fi)=J34x1(fi)+f3(i)*gam1(fi,i,j)*f4(j)
+      if (doJ52) J52x1(fi)=J52x1(fi)+f5(i)*gam1(fi,i,j)*f2(j)
+      if (doJ61) J61x1(fi)=J61x1(fi)+f6(i)*gam1(fi,i,j)*f1(j)
+      endif
       enddo
       enddo
       enddo
@@ -134,16 +134,16 @@ c      J61x0=J61x0+f6(i)*gam0(i,j)*f1(j)
       J52x2(fi,nu)=czip
       do i=1,4
       do j=1,4
-      if (abs(gam2(fi,nu,i,j)) .gt. 1d-8) then  
+      if (abs(gam2(fi,nu,i,j)) .gt. 1d-8) then
       J52x2(fi,nu)=J52x2(fi,nu)
-     & +f5(i)*gam2(fi,nu,i,j)*f2(j)      
+     & +f5(i)*gam2(fi,nu,i,j)*f2(j)
       endif
       enddo
       enddo
       enddo
       enddo
       endif
-      
+
 c      write(6,*) 'J34',j34
 c      write(6,*) 'J52',j52
 
@@ -156,18 +156,18 @@ c      write(6,*) 'J52',j52
       if (doJ61) J61x3(fi,nu,ro)=czip
       do i=1,4
       do j=1,4
-      if (abs(gam3(fi,nu,ro,i,j)) .gt. 1d-8) then  
+      if (abs(gam3(fi,nu,ro,i,j)) .gt. 1d-8) then
       J34x3(fi,nu,ro)=J34x3(fi,nu,ro)
-     & +f3(i)*gam3(fi,nu,ro,i,j)*f4(j)      
+     & +f3(i)*gam3(fi,nu,ro,i,j)*f4(j)
       if (doJ52) then
       J52x3(fi,nu,ro)=J52x3(fi,nu,ro)
-     & +f5(i)*gam3(fi,nu,ro,i,j)*f2(j) 
+     & +f5(i)*gam3(fi,nu,ro,i,j)*f2(j)
       endif
-      if (doJ61) then     
+      if (doJ61) then
       J61x3(fi,nu,ro)=J61x3(fi,nu,ro)
      & +f6(i)*gam3(fi,nu,ro,i,j)*f1(j)
       endif
-      endif      
+      endif
       enddo
       enddo
       enddo
@@ -183,10 +183,10 @@ c      write(6,*) 'J52',j52
       J52x4(fi,nu,ro,si)=czip
       do i=1,4
       do j=1,4
-      if (abs(gam4(fi,nu,ro,si,i,j)) .gt. 1d-8) then  
+      if (abs(gam4(fi,nu,ro,si,i,j)) .gt. 1d-8) then
       J52x4(fi,nu,ro,si)=J52x4(fi,nu,ro,si)
      & +f5(i)*gam4(fi,nu,ro,si,i,j)*f2(j)
-      endif      
+      endif
       enddo
       enddo
       enddo
@@ -204,16 +204,16 @@ c      write(6,*) 'J52',j52
       if (doJ61) J61x5(fi,nu,ro,si,om)=czip
       do i=1,4
       do j=1,4
-      if (abs(gam5(fi,nu,ro,si,om,i,j)) .gt. 1d-8) then  
+      if (abs(gam5(fi,nu,ro,si,om,i,j)) .gt. 1d-8) then
       if (doJ52) then
       J52x5(fi,nu,ro,si,om)=J52x5(fi,nu,ro,si,om)
-     & +f5(i)*gam5(fi,nu,ro,si,om,i,j)*f2(j)      
+     & +f5(i)*gam5(fi,nu,ro,si,om,i,j)*f2(j)
       endif
       if (doJ61) then
       J61x5(fi,nu,ro,si,om)=J61x5(fi,nu,ro,si,om)
-     & +f6(i)*gam5(fi,nu,ro,si,om,i,j)*f1(j)   
+     & +f6(i)*gam5(fi,nu,ro,si,om,i,j)*f1(j)
       endif
-      endif   
+      endif
       enddo
       enddo
       enddo
@@ -265,7 +265,7 @@ c            do ro=1,4
 c               J34x3(fi,nu,ro)=dconjg(J34x3(fi,nu,ro))
 c            enddo
 c         enddo
-c      enddo   
+c      enddo
       endif
 
 

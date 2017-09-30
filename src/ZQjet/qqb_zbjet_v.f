@@ -64,7 +64,7 @@
       scheme='dred'
 c--- calculate the lowest order matrix element and fill the
 c--- common block twopij with s_{ij}
-      call qqb_zbjet(p,msq)      
+      call qqb_zbjet(p,msq)
 
 c--- initialize the matrix element squared
       do j=-nf,nf
@@ -74,7 +74,7 @@ c--- initialize the matrix element squared
       enddo
 
       prop=s(3,4)/dcmplx(s(3,4)-zmass**2,zmass*zwidth)
-      
+
       v2(1)=l1
       v2(2)=r1
 
@@ -92,13 +92,13 @@ c--- compute correct vector-like coupling for diagrams with Z coupled to a loop
      & +Q(j)*q1+0.5d0*(vQ(j,1)+vQ(j,2))*v2(polz)*prop
       enddo
       enddo
-      
+
 ************************************************************************
 *     Endpoint contributions from QQGG matrix elements                 *
 *     Loop matrix elements are also initialized here                   *
 ************************************************************************
 c----UV counterterm contains the finite renormalization to arrive
-c----at the MS bar scheme. 
+c----at the MS bar scheme.
 c      subuv(1)=2d0*xn*(epinv*(11d0-2d0*dble(nf)/xn)-1d0)/6d0
 c--- This version should be more robust wrt nflav. (8/11/05, JMC)
       subuv(1)=2d0*xn*(epinv*b0/xn-1d0/6d0)
@@ -150,10 +150,10 @@ c--- obtain qbg from qg by symmetry
         mmsq_qbg_ax(polq,polz)=-mmsq_qg_ax(3-polq,polz)
       enddo
       enddo
-      
+
 ************************************************************************
 *     Endpoint contributions from QQQQ matrix elements                 *
-************************************************************************            
+************************************************************************
 c--- UV counter-term is already included in a6routine.f
 
 ************************************************************************
@@ -214,11 +214,11 @@ c--- UV counter-term is already included in a6routine.f
 
       enddo
       enddo
-              
+
 ************************************************************************
 *     Include loop contributions from QQQQ matrix elements             *
 ************************************************************************
-      
+
       call spinoru(6,p,za,zb)
 
       faclo=4d0*V*aveqq*esq**2*gsq**2
@@ -286,7 +286,7 @@ c--- a63z
       if ((abs(j) .eq. flav) .and. (abs(k) .eq. flav)) goto 99
 c--- so that either abs(j) or abs(k) = flav (but not both).
 
-c---Desired formula =(Att*(A61+A61o+(A63-A63s/n+A62s+A62os)/n) 
+c---Desired formula =(Att*(A61+A61o+(A63-A63s/n+A62s+A62os)/n)
 c                     +Atts*(A61s+A61os+(A63s-A63/n +A62+A62o)/n))
 c                   =tamp*(lamp+lampx)
 c                   +tamps*(lamps+lampsx)
@@ -299,7 +299,7 @@ c     and lamps,lampx are the pieces that have the "s"
         lamp=czip
 c--- Q-Q
         if      ((j .gt. 0) .and. (k .gt. 0)) then
-          if     (j .eq. +flav) then 
+          if     (j .eq. +flav) then
             tamp=atreez_526143(polq,polb,polz)
      .           *(Q(j)*q1+vQ(j,polq)*v2(polz)*prop)
      .          -atreez_251643(3-polb,3-polq,polz)
@@ -429,14 +429,14 @@ c--- Qbar-Q
       enddo
       enddo
       enddo
-   
-   99 continue 
-      
+
+   99 continue
+
       enddo
       enddo
-  
+
       return
       end
-     
-     
- 
+
+
+

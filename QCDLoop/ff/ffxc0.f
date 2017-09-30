@@ -718,9 +718,9 @@
 	endif
 *DEBUG	if ( iflag .eq. 3 .and. lsmug ) then
 	if ( lsmug ) then
-*	    
+*
 *	    do not forget to rotate the smuggled differences
-*	    
+*
 	    do 40 j=1,3
 	    	do 30 i=1,3
 	    	    chulp(i,j) = cmipj(i,j)
@@ -908,9 +908,9 @@
 		    ier1 = max(ier1,ier0)
 	    	endif
 	    else
-	    	piDpj(inew(ip2,irota3),inew(ip1,irota3)) = 
+	    	piDpj(inew(ip2,irota3),inew(ip1,irota3)) =
      +	    		fpij3(ip1,ip2)
-     		piDpj(inew(ip1,irota3),inew(ip2,irota3)) = 
+     		piDpj(inew(ip1,irota3),inew(ip2,irota3)) =
      +     		piDpj(inew(ip2,irota3),inew(ip1,irota3))
 	    endif
    10	continue

@@ -23,7 +23,7 @@ c--NB average over spins only -- colour factors cancel
 
       call spinoru(6,p,za,zb)
       fac=ason2pi*cf
-      fac=aveqq*xn**2*gw**8*fac         
+      fac=aveqq*xn**2*gw**8*fac
 
       if     (nwz .eq. +1) then
         qqb=fac*virtqqbdk(1,6,3,4,5,2)
@@ -37,9 +37,9 @@ c--NB average over spins only -- colour factors cancel
       do k=-nf,nf
       msqv(j,k)=0d0
       if     ((j .gt. 0) .and. (k .lt. 0)) then
-      msqv(j,k)=Vsq(j,k)*qqb 
+      msqv(j,k)=Vsq(j,k)*qqb
       elseif ((j .lt. 0) .and. (k .gt. 0)) then
-      msqv(j,k)=Vsq(j,k)*qbq 
+      msqv(j,k)=Vsq(j,k)*qbq
       endif
       enddo
       enddo

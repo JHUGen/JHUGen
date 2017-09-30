@@ -6,7 +6,7 @@ c----in the heavy quark (mt=Infinity) limit.
 C----averaged over initial colours and spins
 c----with radiation in decay of W^- quark
 c---- g(-p1)+g(-p2)-->H -->  W^+ (nu(p3)+e^+(p4))
-c----                      + W^- (q(p5)+qbar(p6)+g(p7)) 
+c----                      + W^- (q(p5)+qbar(p6)+g(p7))
       include 'constants.f'
       include 'masses.f'
       include 'qcdcouple.f'
@@ -38,8 +38,8 @@ c---calculate propagators
 C-----Add factors for decay of W for all cases in which this routine is called
       decay=2d0*xn*decay
       decay=decay*2d0*gsq*CF/(s57*s67)
-     & *(((s35+s(3,7))*(s56+s67)-s57*s(3,6))/s35     
-     &  +((s46+s(4,7))*(s56+s57)-s67*s(4,5))/s46) 
+     & *(((s35+s(3,7))*(s56+s67)-s57*s(3,6))/s35
+     &  +((s46+s(4,7))*(s56+s57)-s67*s(4,5))/s46)
 
       Asq=(as/(3d0*pi))**2/vevsq
       gg=0.5d0*V*Asq*s12**2

@@ -31,7 +31,7 @@ c--NB average over spins only -- colour factors cancel
 
 c--- for nwz=+1, initial state is b, for nwz=-1 it is b~
       ib=5*nwz
-      
+
       do j=-nf,nf
       do k=-nf,nf
       msq(j,k)=0d0

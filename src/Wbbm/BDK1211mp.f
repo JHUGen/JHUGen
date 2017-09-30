@@ -340,7 +340,7 @@ C    & -zba2(k2,k1,k3,k2)*za(k2,k5)
 C    & -zba2(k3,k1,k3,k2)*za(k3,k5)-zba2(k4,k1,k3,k2)*za(k4,k5))
 C    & /s(k5,k6)/za(k1,k2)/t(k5,k6,k4)*(-1d0/zba2(k4,k1,k2,k3))
 C    & *(Lnrat(-s(k4,k3),-s(k1,k2))+Lnrat(-t(k5,k6,k4),-s(k1,k2)))
- 
+
 C    & +(1.5d0*delta(k1,k2,k5,k6,k4,k3)*(t(k5,k6,k4)-t(k5,k6,k3))
 C    & *zba2(k6,k4,k3,k5)*zba2(k1,k4,k3,k2)
 C    & *(-1d0/zba2(k4,k1,k2,k3))/DELTA3(k5,k6,k4,k3,k1,k2)**2
@@ -388,7 +388,7 @@ C    & *(-1d0/zba2(k4,k1,k2,k3))/DELTA3(k5,k6,k4,k3,k1,k2)
      & -0.75d0*zba2(k6,k5,k4,k2)**2
      & /zb(k5,k6)/za(k1,k2)/t(k5,k6,k4)/zba2(k4,k5,k6,k3)
      & *(Lnrat(-s(k4,k3),-s(k1,k2))+Lnrat(-t(k5,k6,k4),-s(k1,k2)))
- 
+
      & +(1.5d0*delta(k1,k2,k5,k6,k4,k3)*(t(k5,k6,k4)-t(k5,k6,k3))
      & *zba2(k6,k4,k3,k5)*zba2(k1,k4,k3,k2)
      & /zba2(k4,k5,k6,k3)/DELTA3(k5,k6,k4,k3,k1,k2)**2
@@ -431,7 +431,7 @@ C    & *(-1d0/zba2(k4,k1,k2,k3))/DELTA3(k5,k6,k4,k3,k1,k2)
      & -0.75d0*zba2(k1,k2,k4,k5)**2
      & /zb(k2,k1)/za(k6,k5)/t(k2,k1,k4)/zba2(k4,k2,k1,k3)
      & *(Lnrat(-s(k4,k3),-s(k6,k5))+Lnrat(-t(k2,k1,k4),-s(k6,k5)))
- 
+
      & +(1.5d0*delta(k6,k5,k2,k1,k4,k3)*(t(k2,k1,k4)-t(k2,k1,k3))
      & *zba2(k1,k4,k3,k2)*zba2(k6,k4,k3,k5)
      & /zba2(k4,k2,k1,k3)/DELTA3(k2,k1,k4,k3,k6,k5)**2
@@ -480,7 +480,7 @@ C    & -zba2(k1,k2,k4,k2)*zb(k2,k6)
 C    & -zba2(k1,k2,k4,k3)*zb(k3,k6)-zba2(k1,k2,k4,k4)*zb(k4,k6))
 C    & /zb(k2,k1)/s(k5,k6)/t(k2,k1,k4)/zba2(k4,k2,k1,k3)
 C    & *(Lnrat(-s(k4,k3),-s(k6,k5))+Lnrat(-t(k2,k1,k4),-s(k6,k5)))
- 
+
 C    & +(1.5d0*delta(k6,k5,k2,k1,k4,k3)*(t(k2,k1,k4)-t(k2,k1,k3))
 C    & *zba2(k1,k4,k3,k2)*zba2(k6,k4,k3,k5)
 C    & /zba2(k4,k2,k1,k3)/DELTA3(k2,k1,k4,k3,k6,k5)**2

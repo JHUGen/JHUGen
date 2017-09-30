@@ -16,7 +16,7 @@ c--- returns logical 'failed'
       double precision qfinal(mxpart,4),m56,m57,m67
       logical failed
       integer countb,jetsfound,nbq,nba,isub
-      
+
       failed=.false.
 
 c--- check that particle 5 is a b for H+b, W+c, Z+Q and W+b+jet processes
@@ -47,11 +47,11 @@ c--- also check for t-channel single top when the BR is not removed
         if ((nproc .eq. 342) .and. (jetsfound .eq. 2)
      .      .and. (countb .ne. 1) .and. (isub .eq. 0)) failed=.true.
       endif
-            
+
 c--- check that 5 and 6 are b and b-bar (if appropriate)
       if (bbproc) then
         call getbs(qfinal,nbq,nba)
-        if ((nbq .eq. 0) .or. (nba .eq. 0)) failed=.true.    
+        if ((nbq .eq. 0) .or. (nba .eq. 0)) failed=.true.
       endif
 
 c--- perform m56 mass cut if there are 2 or more jets found
@@ -76,6 +76,6 @@ c--- and there are at least 6 particles in the final state
           failed=.true.
         endif
       endif
-                  
+
       return
       end

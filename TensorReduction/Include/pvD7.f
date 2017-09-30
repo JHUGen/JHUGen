@@ -128,7 +128,7 @@ c'B'Id,Csum2(P?,K?,L?,m1?,m2?,m3?)=
 c'B'    Cv(cc2+C234,ep)
 c'B'   +Cv(cc12+C234,ep)
 c'B'   +Cv(cc22+C234,ep)
-  
+
 
 C   Dv(N+dd112,Dv(N+dd122,Dv(N+dd123,pk)
 c     in(1,ep)=
@@ -167,7 +167,7 @@ c     in(3,ep)=
 c    & +f3*Dv(N+dd13,ep)
 c    & +Csum2(ep)
 c    & -2*Dv(N+dd001,ep)
- 
+
 C   Dv(N+dd123,Dv(N+dd223,Dv(N+dd233,kl)
 c     in(1,ep)=
 c    & +f1*Dv(N+dd23,ep)
@@ -1791,7 +1791,7 @@ c     in(1,ep)=
 c    & +f1*Dv(N+dd22222,ep)
 c    & +Cv(cc11111+C134,ep)
 c    & -Cv(cc11111+C234,ep)
- 
+
 c     in(2,ep)=
 c    & +f2*Dv(N+dd22222,ep)
 c    & -10* Dv(N+dd002222,ep)
@@ -2723,7 +2723,7 @@ C   Dv(N+dd0011123,Dv(N+dd0011223,Dv(N+dd0011233,zzppkl)
       Dv(N+dd0011233,ep)=in(3,ep)
 
 
- 
+
 C   Dv(N+dd0011133,Dv(N+dd0011233,Dv(N+dd0011333,zzppll)
       in(1,ep)=
      &    + f1*Dv(N+dd001133,ep)

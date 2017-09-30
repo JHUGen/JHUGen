@@ -643,7 +643,7 @@
 	    endif
 	    if ( abs(dl4r) .ge. xloss**2*smax ) goto 120
 *	    increase with something that is relative prime to 125 so that
-*	    eventually we cover all possibilities, but with a good 
+*	    eventually we cover all possibilities, but with a good
 *	    scatter.
 	    jnow = jnow + 49
 	    if ( jnow .gt. 125 ) jnow = jnow - 125

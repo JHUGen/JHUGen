@@ -25,8 +25,8 @@ c---  ('none') to perform no clustering at all
       common/mypart/mypart
       data first/.true./
       save first
-!$omp threadprivate(first)      
- 
+!$omp threadprivate(first)
+
       if ((first) .and.
      &   ((nqcdjets .gt. 0).or.(part .eq. 'real').or.(notag.gt.0))) then
         first=.false.
@@ -51,17 +51,17 @@ c---  ('none') to perform no clustering at all
       endif
       write(6,*) '*                                                  *'
       write(6,79) ' *     pt(jet)         > ',ptjetmin
-      write(6,79) ' *   |pseudo-rap(jet)| > ',etajetmin   
-      write(6,79) ' *   |pseudo-rap(jet)| < ',etajetmax   
+      write(6,79) ' *   |pseudo-rap(jet)| > ',etajetmin
+      write(6,79) ' *   |pseudo-rap(jet)| < ',etajetmax
       if (bbproc) then
         ptbjetmin=max(ptjetmin,ptbjetmin)
         etabjetmax=min(etajetmax,etabjetmax)
       write(6,79) ' *   pt(b-jet)         > ',ptbjetmin
-      write(6,79) ' * |pseudo-rap(b-jet)| < ',etabjetmax   
+      write(6,79) ' * |pseudo-rap(b-jet)| < ',etabjetmax
       endif
       if (algorithm .eq. 'hqrk') then
       write(6,79) ' *   b-bbar separation : ',Rbbmin
-      write(6,79) ' *        cone size, R : ',R      
+      write(6,79) ' *        cone size, R : ',R
       else
       write(6,79) ' * pseudo-cone size, R : ',R
       endif
@@ -115,11 +115,11 @@ c---  ('none') to perform no clustering at all
 c--- reorder jets for some special cases, to preserve identities of
 c--- particles for use in the plotting routines
       if (    (case .eq. 'qq_ttg')
-     &   .or. (case .eq. 'tt_bbl') 
+     &   .or. (case .eq. 'tt_bbl')
      &   .or. (case .eq. 'tt_bbh')
-     &   .or. (case .eq. 'tt_ldk') 
+     &   .or. (case .eq. 'tt_ldk')
      &   .or. (case .eq. 'tt_hdk')
-     &   .or. (case .eq. 'tt_udk') 
+     &   .or. (case .eq. 'tt_udk')
      &   .or. (case .eq. 'tthWdk')
      &   .or. (case .eq. 'tt_bbu')
      &   .or. (case .eq. '4ftwdk')
@@ -136,4 +136,4 @@ c--- particles for use in the plotting routines
 
       return
       end
-      
+

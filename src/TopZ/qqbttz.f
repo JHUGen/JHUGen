@@ -44,7 +44,7 @@ C For charge and couplings of top quark, use up-charge
       do j12=1,2
       wtqbq(j12)=0d0
       wtqqb(j12)=0d0
-      mqbq(1,1)= + (Q(j)*q1+propz*L(j)*l1)*s12**(-1)*denu**(-1) * (  - 
+      mqbq(1,1)= + (Q(j)*q1+propz*L(j)*l1)*s12**(-1)*denu**(-1) * (  -
      &    za(p1,p7)*za(p9,q4)*zb(p2,p10)*zb(p4,q4)*mt**2 + za(p1,u1)*
      &    za(p7,a7)*za(p9,q4)*zb(p2,a7)*zb(p4,q4)*zb(p10,u1) )
       mqbq(1,1) = mqbq(1,1) + (Q(j)*q1+propz*L(j)*l1)*s12**(-1)*
@@ -52,7 +52,7 @@ C For charge and couplings of top quark, use up-charge
      &     + za(p1,q4)*za(p7,a7)*za(p9,b2)*zb(p2,b2)*zb(p4,q4)*zb(p10,
      &    a7) )
       mqbq(1,1) = mqbq(1,1) + (Q(j)*q1+propz*R(j)*l1)*s12**(-1)*
-     & denu**(-1) * ( za(p1,p7)*za(p9,u2)*zb(p2,u2)*zb(p4,p10)*mt**2 - 
+     & denu**(-1) * ( za(p1,p7)*za(p9,u2)*zb(p2,u2)*zb(p4,p10)*mt**2 -
      &    za(p1,p9)*za(p7,a7)*zb(p2,a7)*zb(p4,p10)*mt**2 )
       mqbq(1,1) = mqbq(1,1) + (Q(j)*q1+propz*R(j)*l1)*s12**(-1)*
      & denb**(-1) * (  - za(p1,q4)*za(p7,p9)*zb(p2,p10)*zb(p4,q4)*mt**2
@@ -61,7 +61,7 @@ C For charge and couplings of top quark, use up-charge
       mqbq(1,1)=mqbq(1,1) + (Q(j12)*q1+propz*L(j12)*l1)*s12z**(-1)*
      & denz1**(-1) * (  - za(p1,p7)*za(p1,p9)*zb(p1,p10)*zb(p2,p4)*
      &    mt**2 + za(p1,p9)*za(p1,q4)*za(p7,a7)*zb(p1,p10)*zb(p2,a7)*
-     &    zb(p4,q4) + za(p1,p9)*za(p7,p9)*zb(p2,p4)*zb(p9,p10)*mt**2 + 
+     &    zb(p4,q4) + za(p1,p9)*za(p7,p9)*zb(p2,p4)*zb(p9,p10)*mt**2 +
      &    za(p1,p9)*za(p7,a7)*za(p9,q4)*zb(p2,a7)*zb(p4,q4)*zb(p9,p10)
      &     )
       mqbq(1,1) = mqbq(1,1) + (Q(j12)*q1+propz*L(j12)*l1)*s12z**(-1)*
@@ -97,7 +97,7 @@ C For charge and couplings of top quark, use up-charge
      &    *za(p2,p10)*za(p7,a7)*zb(p2,p9)*zb(p2,a7)*zb(p4,q4) - za(p1,
      &    q4)*za(p7,a7)*za(p9,p10)*zb(p2,p9)*zb(p4,q4)*zb(p9,a7) )
 
-      mqbq(1,2)= + (Q(j)*q1+propz*L(j)*l1)*s12**(-1)*denu**(-1) * (  - 
+      mqbq(1,2)= + (Q(j)*q1+propz*L(j)*l1)*s12**(-1)*denu**(-1) * (  -
      &    za(p2,p7)*za(p9,q4)*zb(p1,p10)*zb(p4,q4)*mt**2 + za(p2,u2)*
      &    za(p7,a7)*za(p9,q4)*zb(p1,a7)*zb(p4,q4)*zb(p10,u2) )
       mqbq(1,2) = mqbq(1,2) + (Q(j)*q1+propz*L(j)*l1)*s12**(-1)*
@@ -105,7 +105,7 @@ C For charge and couplings of top quark, use up-charge
      &     + za(p2,q4)*za(p7,a7)*za(p9,b1)*zb(p1,b1)*zb(p4,q4)*zb(p10,
      &    a7) )
       mqbq(1,2) = mqbq(1,2) + (Q(j)*q1+propz*R(j)*l1)*s12**(-1)*
-     & denu**(-1) * ( za(p2,p7)*za(p9,u1)*zb(p1,u1)*zb(p4,p10)*mt**2 - 
+     & denu**(-1) * ( za(p2,p7)*za(p9,u1)*zb(p1,u1)*zb(p4,p10)*mt**2 -
      &    za(p2,p9)*za(p7,a7)*zb(p1,a7)*zb(p4,p10)*mt**2 )
       mqbq(1,2) = mqbq(1,2) + (Q(j)*q1+propz*R(j)*l1)*s12**(-1)*
      & denb**(-1) * (  - za(p2,q4)*za(p7,p9)*zb(p1,p10)*zb(p4,q4)*mt**2
@@ -141,7 +141,7 @@ C For charge and couplings of top quark, use up-charge
       mqbq(2,2)=mqbq(2,2) + (Q(j12)*q1+propz*R(j12)*r1)*s12z**(-1)*
      & denz1**(-1) * (  - za(p1,p10)*za(p2,p7)*zb(p1,p4)*zb(p1,p9)*
      &    mt**2 + za(p1,p10)*za(p2,q4)*za(p7,a7)*zb(p1,p9)*zb(p1,a7)*
-     &    zb(p4,q4) + za(p2,p7)*za(p9,p10)*zb(p1,p9)*zb(p4,p9)*mt**2 + 
+     &    zb(p4,q4) + za(p2,p7)*za(p9,p10)*zb(p1,p9)*zb(p4,p9)*mt**2 +
      &    za(p2,q4)*za(p7,a7)*za(p9,p10)*zb(p1,p9)*zb(p4,q4)*zb(p9,a7)
      &     )
       mqbq(2,2) = mqbq(2,2) + (Q(j12)*q1+propz*R(j12)*r1)*s12z**(-1)*
@@ -151,7 +151,7 @@ C For charge and couplings of top quark, use up-charge
      &    p2,p10)*za(p7,a7)*za(p10,q4)*zb(p1,a7)*zb(p4,q4)*zb(p9,p10) )
 
 
-      mqqb(1,1)= + (Q(j)*q1+propz*L(j)*l1)*s12**(-1)*denu**(-1) * (  - 
+      mqqb(1,1)= + (Q(j)*q1+propz*L(j)*l1)*s12**(-1)*denu**(-1) * (  -
      &    za(p2,p7)*za(p9,q4)*zb(p1,p10)*zb(p4,q4)*mt**2 + za(p2,u2)*
      &    za(p7,a7)*za(p9,q4)*zb(p1,a7)*zb(p4,q4)*zb(p10,u2) )
       mqqb(1,1) = mqqb(1,1) + (Q(j)*q1+propz*L(j)*l1)*s12**(-1)*
@@ -159,7 +159,7 @@ C For charge and couplings of top quark, use up-charge
      &     + za(p2,q4)*za(p7,a7)*za(p9,b1)*zb(p1,b1)*zb(p4,q4)*zb(p10,
      &    a7) )
       mqqb(1,1) = mqqb(1,1) + (Q(j)*q1+propz*R(j)*l1)*s12**(-1)*
-     & denu**(-1) * ( za(p2,p7)*za(p9,u1)*zb(p1,u1)*zb(p4,p10)*mt**2 - 
+     & denu**(-1) * ( za(p2,p7)*za(p9,u1)*zb(p1,u1)*zb(p4,p10)*mt**2 -
      &    za(p2,p9)*za(p7,a7)*zb(p1,a7)*zb(p4,p10)*mt**2 )
       mqqb(1,1) = mqqb(1,1) + (Q(j)*q1+propz*R(j)*l1)*s12**(-1)*
      & denb**(-1) * (  - za(p2,q4)*za(p7,p9)*zb(p1,p10)*zb(p4,q4)*mt**2
@@ -173,7 +173,7 @@ C For charge and couplings of top quark, use up-charge
       mqqb(1,1) = mqqb(1,1) + (Q(j12)*q1+propz*L(j12)*l1)*s12z**(-1)*
      & denz2**(-1) * (  - za(p2,p7)*za(p2,p9)*zb(p1,p4)*zb(p2,p10)*
      &    mt**2 + za(p2,p9)*za(p2,q4)*za(p7,a7)*zb(p1,a7)*zb(p2,p10)*
-     &    zb(p4,q4) + za(p2,p9)*za(p7,p9)*zb(p1,p4)*zb(p9,p10)*mt**2 + 
+     &    zb(p4,q4) + za(p2,p9)*za(p7,p9)*zb(p1,p4)*zb(p9,p10)*mt**2 +
      &    za(p2,p9)*za(p7,a7)*za(p9,q4)*zb(p1,a7)*zb(p4,q4)*zb(p9,p10)
      &     )
 
@@ -204,7 +204,7 @@ C For charge and couplings of top quark, use up-charge
      &     - za(p2,p10)*za(p7,a7)*za(p10,q4)*zb(p1,a7)*zb(p4,q4)*zb(p9,
      &    p10) )
 
-      mqqb(1,2)= + (Q(j)*q1+propz*L(j)*l1)*s12**(-1)*denu**(-1) * (  - 
+      mqqb(1,2)= + (Q(j)*q1+propz*L(j)*l1)*s12**(-1)*denu**(-1) * (  -
      &    za(p1,p7)*za(p9,q4)*zb(p2,p10)*zb(p4,q4)*mt**2 + za(p1,u1)*
      &    za(p7,a7)*za(p9,q4)*zb(p2,a7)*zb(p4,q4)*zb(p10,u1) )
       mqqb(1,2) = mqqb(1,2) + (Q(j)*q1+propz*L(j)*l1)*s12**(-1)*
@@ -212,7 +212,7 @@ C For charge and couplings of top quark, use up-charge
      &     + za(p1,q4)*za(p7,a7)*za(p9,b2)*zb(p2,b2)*zb(p4,q4)*zb(p10,
      &    a7) )
       mqqb(1,2) = mqqb(1,2) + (Q(j)*q1+propz*R(j)*l1)*s12**(-1)*
-     & denu**(-1) * ( za(p1,p7)*za(p9,u2)*zb(p2,u2)*zb(p4,p10)*mt**2 - 
+     & denu**(-1) * ( za(p1,p7)*za(p9,u2)*zb(p2,u2)*zb(p4,p10)*mt**2 -
      &    za(p1,p9)*za(p7,a7)*zb(p2,a7)*zb(p4,p10)*mt**2 )
       mqqb(1,2) = mqqb(1,2) + (Q(j)*q1+propz*R(j)*l1)*s12**(-1)*
      & denb**(-1) * (  - za(p1,q4)*za(p7,p9)*zb(p2,p10)*zb(p4,q4)*mt**2
@@ -225,7 +225,7 @@ C For charge and couplings of top quark, use up-charge
      &    p9)*za(p7,a7)*za(p9,q4)*zb(p2,a7)*zb(p4,q4)*zb(p9,p10) )
       mqqb(1,2) = mqqb(1,2) + (Q(j12)*q1+propz*R(j12)*l1)*s12z**(-1)*
      & denz2**(-1) * (  - za(p1,p7)*za(p2,p9)*zb(p2,p4)*zb(p2,p10)*
-     &    mt**2 - za(p1,p7)*za(p9,p10)*zb(p2,p10)*zb(p4,p10)*mt**2 + 
+     &    mt**2 - za(p1,p7)*za(p9,p10)*zb(p2,p10)*zb(p4,p10)*mt**2 +
      &    za(p1,q4)*za(p2,p9)*za(p7,a7)*zb(p2,p10)*zb(p2,a7)*zb(p4,q4)
      &     - za(p1,q4)*za(p7,a7)*za(p9,p10)*zb(p2,p10)*zb(p4,q4)*zb(p10
      &    ,a7) )
@@ -253,7 +253,7 @@ C For charge and couplings of top quark, use up-charge
       mqqb(2,2) = mqqb(2,2) + (Q(j12)*q1+propz*R(j12)*r1)*s12z**(-1)*
      & denz2**(-1) * (  - za(p1,p7)*za(p2,p10)*zb(p2,p4)*zb(p2,p9)*
      &    mt**2 + za(p1,p7)*za(p9,p10)*zb(p2,p9)*zb(p4,p9)*mt**2 + za(
-     &    p1,q4)*za(p2,p10)*za(p7,a7)*zb(p2,p9)*zb(p2,a7)*zb(p4,q4) + 
+     &    p1,q4)*za(p2,p10)*za(p7,a7)*zb(p2,p9)*zb(p2,a7)*zb(p4,q4) +
      &    za(p1,q4)*za(p7,a7)*za(p9,p10)*zb(p2,p9)*zb(p4,q4)*zb(p9,a7)
      &     )
 

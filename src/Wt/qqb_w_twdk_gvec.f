@@ -30,14 +30,14 @@ c---in label of gluon which is contracted with n
       integer j,k,in,i3,i4,i5,i6,iq
       double precision msq(-nf:nf,-nf:nf),p(mxpart,4),n(4),
      . p1p2(-1:1,-1:1),wtgvecn
-     
+
 c--- set up lepton variables depending on whether it's t or tbar
       if     (nwz .eq. -1) then
         i3=3
         i4=4
         i5=5
         i6=6
-        iq=+1 ! quark initial state      
+        iq=+1 ! quark initial state
       elseif (nwz .eq. +1) then
         i3=4
         i4=3
@@ -48,7 +48,7 @@ c--- set up lepton variables depending on whether it's t or tbar
         write(6,*) 'Error in qqb_w_twdk_gvec, nwz is not +1 or -1 :',nwz
         stop
       endif
-      
+
       do j=-1,+1
       do k=-1,+1
       p1p2(j,k)=0d0
@@ -81,10 +81,10 @@ c--- set up lepton variables depending on whether it's t or tbar
 
       enddo
       enddo
-      
+
       return
       end
- 
+
       double precision function wtgvecn(mq,qwidth,
      .                           ig,is,ie,in,jn,je,jb,p,vec)
       implicit none
@@ -114,7 +114,7 @@ c--- set up lepton variables depending on whether it's t or tbar
      . -mq**2)**2+(mq*qwidth)**2)
 
       fac=xn*cf*gsq*gw**8
-      
+
       wtgvecn=fac*abs(amp)**2/prop
 
       return

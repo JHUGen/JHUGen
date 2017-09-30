@@ -1,6 +1,6 @@
       subroutine qqb_tbb_gsdk(p,msqc)
       implicit none
-c     Subtraction Matrix element for real corrections to decay in 
+c     Subtraction Matrix element for real corrections to decay in
 C     single top production
 C     (nwz=+1)
 c      u(-p1)+dbar(-p2)-->t(=> n(p3)+e^+(p4)+b(p5)+g(p7))+F(p6)
@@ -9,7 +9,7 @@ C     (nwz=-1)
 c      ubar(-p1)+d(-p2)-->t~(=> e^-(p3)+n(p4)+bbar(p5)+g(p7))+F(p6)
 C     averaged(summed) over initial(final) colours and spins
 
-c--- g(p7) represents a gluon 
+c--- g(p7) represents a gluon
 
 
       include 'constants.f'
@@ -44,7 +44,7 @@ c--- g(p7) represents a gluon
         return
       endif
 
-      call qqb_tbb(q,msq) 
+      call qqb_tbb(q,msq)
       fac=gsq*cf*(1d0/pbDpg*(2d0/omz-1d0-z)-(mt/ptDpg)**2)
 
       do j=-nf,nf

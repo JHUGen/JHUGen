@@ -26,7 +26,7 @@ C     p256=2*p2.p5+2*p2.p6+2*p5.p6
       aamp(2,2,2) =  + mc*four*p256**(-1) * (1./(za(i5,i1))/(za(i5,i6))
      &    *za(i1,i3)*zb(i1,i4)*zb(i6,i2) +1./(za(i5,i6))/(za(i6,i1))*
      &    za(i1,i3)*zb(i1,i4)*zb(i5,i2) )
-      aamp(2,2,2) = aamp(2,2,2) + mc*four*p256**(-1)*invtwog2Dc * (  - 
+      aamp(2,2,2) = aamp(2,2,2) + mc*four*p256**(-1)*invtwog2Dc * (  -
      &   1./(za(i5,i1))*za(i1,i3)*zb(i1,i4)*zb(i5,i6)*zb(i6,i2) +1./(
      &    za(i5,i1))/(za(i6,i1))*za(i1,i2)*za(i1,i3)*zb(i1,i4)*zb(i5,i2
      &    )*zb(i6,i2) )
@@ -34,7 +34,7 @@ C     p256=2*p2.p5+2*p2.p6+2*p5.p6
      &    /(za(i5,i1))*za(i1,i3)*zb(i5,i6)*zb(i6,i4) +1./(za(i1,i2))/(
      &    za(i5,i1))/(za(i5,i6))*za(i1,i3)*za(i6,i1)*zb(i6,i1)*zb(i6,i4
      &    ) +1./(za(i1,i2))/(za(i5,i6))*za(i1,i3)*zb(i5,i1)*zb(i6,i4)
-     &     +1./(za(i1,i2))/(za(i5,i6))*za(i1,i3)*zb(i5,i4)*zb(i6,i1) + 
+     &     +1./(za(i1,i2))/(za(i5,i6))*za(i1,i3)*zb(i5,i4)*zb(i6,i1) +
      &   1./(za(i1,i2))/(za(i5,i6))/(za(i6,i1))*za(i1,i3)*za(i5,i1)*zb(
      &    i5,i1)*zb(i5,i4) +1./(za(i1,i2))/(za(i6,i1))*za(i1,i3)*zb(i5,
      &    i4)*zb(i5,i6) )
@@ -55,7 +55,7 @@ C     p256=2*p2.p5+2*p2.p6+2*p5.p6
      &    /(zb(i5,i6))*za(i3,i2)*za(i6,i1)*za(i6,i2)*zb(i1,i4)*zb(i5,i2
      &    ) -1./(za(i5,i1))/(zb(i5,i6))*za(i3,i2)*za(i6,i2)*zb(i5,i2)*
      &    zb(i5,i4) )
-      aamp(2,1,1) = aamp(2,1,1) + mc**2*four*p256**(-1)*invtwog2Dc * ( 
+      aamp(2,1,1) = aamp(2,1,1) + mc**2*four*p256**(-1)*invtwog2Dc * (
      &     -1./(za(i1,i2))/(za(i5,i6))/(zb(i1,i2))/(zb(i5,i6))*za(i1,i3
      &    )*za(i6,i1)*za(i6,i2)*zb(i1,i4)*zb(i5,i1)**2 -1./(za(i1,i2))
      &    /(za(i5,i6))/(zb(i1,i2))/(zb(i5,i6))*za(i4,i3)*za(i6,i1)*za(
@@ -69,7 +69,7 @@ C     p256=2*p2.p5+2*p2.p6+2*p5.p6
      &    *zb(i5,i4) -1./(za(i5,i1))/(za(i5,i6))/(zb(i1,i2))/(zb(i5,i6)
      &    )*za(i6,i1)*za(i6,i3)*zb(i1,i4)*zb(i5,i1) +1./(za(i5,i1))/(
      &    zb(i1,i2))/(zb(i5,i6))*za(i6,i3)*zb(i5,i1)*zb(i5,i4) )
-      aamp(2,1,1) = aamp(2,1,1) + mc**4*four*p256**(-1)*invtwog2Dc * ( 
+      aamp(2,1,1) = aamp(2,1,1) + mc**4*four*p256**(-1)*invtwog2Dc * (
      &   1./(za(i1,i2))/(za(i5,i6))/(zb(i1,i2))/(zb(i1,i2))/(zb(i5,i6))
      &    *za(i6,i1)*za(i6,i3)*zb(i1,i4)*zb(i5,i1)**2 )
 
@@ -84,7 +84,7 @@ C     p256=2*p2.p5+2*p2.p6+2*p5.p6
       aamp(1,2,1) = aamp(1,2,1) + four*invtwog2Dc * (1./(za(i5,i6))/(
      &    zb(i5,i1))/(zb(i5,i6))*za(i3,i2)*za(i5,i2)*zb(i1,i4)*zb(i6,i1
      &    )*zb(i6,i2) )
-      aamp(1,2,1) = aamp(1,2,1) + mc**2*four*p256**(-1)*invtwog2Dc * ( 
+      aamp(1,2,1) = aamp(1,2,1) + mc**2*four*p256**(-1)*invtwog2Dc * (
      &     -1./(za(i1,i2))/(za(i5,i6))/(zb(i1,i2))/(zb(i5,i6))*za(i1,i3
      &    )*za(i5,i1)*za(i5,i2)*zb(i1,i4)*zb(i6,i1)**2 -1./(za(i1,i2))
      &    /(za(i5,i6))/(zb(i1,i2))/(zb(i5,i6))*za(i4,i3)*za(i5,i1)*za(
@@ -95,14 +95,14 @@ C     p256=2*p2.p5+2*p2.p6+2*p5.p6
      &    ))/(za(i5,i6))/(zb(i1,i2))/(zb(i5,i1))/(zb(i5,i6))*za(i1,i3)*
      &    za(i5,i2)*zb(i1,i4)*zb(i6,i1)**2 -1./(za(i5,i6))/(zb(i1,i2))
      &    /(zb(i5,i1))/(zb(i5,i6))*za(i5,i3)*zb(i1,i4)*zb(i6,i1)**2 )
-      aamp(1,2,1) = aamp(1,2,1) + mc**4*four*p256**(-1)*invtwog2Dc * ( 
+      aamp(1,2,1) = aamp(1,2,1) + mc**4*four*p256**(-1)*invtwog2Dc * (
      &   1./(za(i1,i2))/(za(i5,i6))/(zb(i1,i2))/(zb(i1,i2))/(zb(i5,i6))
      &    *za(i5,i1)*za(i5,i3)*zb(i1,i4)*zb(i6,i1)**2 )
 
       aamp(1,1,2) =  + mc*four*p256**(-1) * (  -1./(za(i1,i2))/(zb(i5,
      &    i1))/(zb(i5,i6))*za(i4,i3)*za(i6,i1)*zb(i1,i4)**2 -1./(za(i1,
      &    i2))/(zb(i5,i6))/(zb(i6,i1))*za(i4,i3)*za(i5,i1)*zb(i1,i4)**2
-     &     +1./(zb(i5,i1))/(zb(i5,i6))*za(i6,i3)*zb(i1,i2)*zb(i1,i4) + 
+     &     +1./(zb(i5,i1))/(zb(i5,i6))*za(i6,i3)*zb(i1,i2)*zb(i1,i4) +
      &   1./(zb(i5,i6))/(zb(i6,i1))*za(i5,i3)*zb(i1,i2)*zb(i1,i4) )
       aamp(1,1,2) = aamp(1,1,2) + mc*four*p256**(-1)*invtwog2Dc * (1./(
      &    za(i1,i2))/(zb(i5,i1))*za(i4,i3)*za(i5,i6)*za(i6,i1)*zb(i1,i4
@@ -125,7 +125,7 @@ C     p256=2*p2.p5+2*p2.p6+2*p5.p6
      &    /(za(i5,i6))/(zb(i5,i1))/(zb(i5,i6))*za(i3,i2)*za(i5,i1)*zb(
      &    i1,i4)*zb(i6,i1)*zb(i6,i2) -1./(za(i5,i6))/(zb(i5,i1))/(zb(i5
      &    ,i6))*za(i5,i3)*zb(i1,i4)*zb(i6,i1)*zb(i6,i2) )
-      aamp(1,2,2) = aamp(1,2,2) + mc**3*four*p256**(-1)*invtwog2Dc * ( 
+      aamp(1,2,2) = aamp(1,2,2) + mc**3*four*p256**(-1)*invtwog2Dc * (
      &     -1./(za(i1,i2))/(za(i1,i2))/(za(i5,i6))/(zb(i1,i2))/(zb(i5,
      &    i6))*za(i1,i3)*za(i5,i1)**2*zb(i1,i4)*zb(i6,i1)**2 -1./(za(i1
      &    ,i2))/(za(i1,i2))/(za(i5,i6))/(zb(i1,i2))/(zb(i5,i6))*za(i4,
@@ -155,7 +155,7 @@ C     p256=2*p2.p5+2*p2.p6+2*p5.p6
      &    ,i1))/(za(i5,i6))/(zb(i5,i6))*za(i6,i1)*za(i6,i3)*zb(i1,i4)*
      &    zb(i5,i2) +1./(za(i5,i1))/(zb(i5,i6))*za(i6,i3)*zb(i5,i2)*zb(
      &    i5,i4) )
-      aamp(2,1,2) = aamp(2,1,2) + mc**3*four*p256**(-1)*invtwog2Dc * ( 
+      aamp(2,1,2) = aamp(2,1,2) + mc**3*four*p256**(-1)*invtwog2Dc * (
      &     -1./(za(i1,i2))/(za(i1,i2))/(za(i5,i6))/(zb(i1,i2))/(zb(i5,
      &    i6))*za(i1,i3)*za(i6,i1)**2*zb(i1,i4)*zb(i5,i1)**2 -1./(za(i1
      &    ,i2))/(za(i1,i2))/(za(i5,i6))/(zb(i1,i2))/(zb(i5,i6))*za(i4,
@@ -187,10 +187,10 @@ C     p256=2*p2.p5+2*p2.p6+2*p5.p6
       aamp(2,2,1) = aamp(2,2,1) + four*invtwog2Dc * (1./(za(i5,i1))/(
      &    za(i6,i1))*za(i1,i2)*za(i3,i2)*zb(i5,i4)*zb(i6,i2) )
       aamp(2,2,1) = aamp(2,2,1) + mc**2*four*p256**(-1) * (1./(za(i5,i1
-     &    ))/(za(i5,i6))/(zb(i1,i2))*za(i1,i3)*zb(i1,i4)*zb(i6,i1) + 
+     &    ))/(za(i5,i6))/(zb(i1,i2))*za(i1,i3)*zb(i1,i4)*zb(i6,i1) +
      &   1./(za(i5,i6))/(za(i6,i1))/(zb(i1,i2))*za(i1,i3)*zb(i1,i4)*zb(
      &    i5,i1) )
-      aamp(2,2,1) = aamp(2,2,1) + mc**2*four*p256**(-1)*invtwog2Dc * ( 
+      aamp(2,2,1) = aamp(2,2,1) + mc**2*four*p256**(-1)*invtwog2Dc * (
      &   1./(za(i5,i1))/(za(i6,i1))*za(i1,i2)*za(i1,i3)*zb(i1,i4)*zb(i5
      &    ,i6) +1./(za(i5,i1))/(za(i6,i1))/(zb(i1,i2))*za(i1,i2)*za(i1,
      &    i3)*zb(i1,i4)*zb(i5,i2)*zb(i6,i1) -1./(za(i5,i1))/(zb(i1,i2))
@@ -215,7 +215,7 @@ C     p256=2*p2.p5+2*p2.p6+2*p5.p6
      &    ))/(za(i5,i1))*za(i1,i3)*zb(i5,i6)*zb(i6,i4) -1./(za(i1,i2))
      &    /(za(i5,i1))/(za(i5,i6))*za(i1,i3)*za(i6,i1)*zb(i6,i1)*zb(i6,
      &    i4) -1./(za(i1,i2))/(za(i5,i6))*za(i1,i3)*zb(i5,i1)*zb(i6,i4)
-     &     -1./(za(i1,i2))/(za(i5,i6))*za(i1,i3)*zb(i5,i4)*zb(i6,i1) - 
+     &     -1./(za(i1,i2))/(za(i5,i6))*za(i1,i3)*zb(i5,i4)*zb(i6,i1) -
      &   1./(za(i1,i2))/(za(i5,i6))/(za(i6,i1))*za(i1,i3)*za(i5,i1)*zb(
      &    i5,i1)*zb(i5,i4) -1./(za(i1,i2))/(za(i6,i1))*za(i1,i3)*zb(i5,
      &    i4)*zb(i5,i6) )
@@ -233,7 +233,7 @@ C     p256=2*p2.p5+2*p2.p6+2*p5.p6
       bamp(2,1,1) = bamp(2,1,1) + four*invtwog1Dc * (1./(za(i5,i6))/(
      &    zb(i5,i6))/(zb(i6,i1))*za(i3,i2)*za(i6,i2)*zb(i1,i4)*zb(i5,i1
      &    )*zb(i5,i2) )
-      bamp(2,1,1) = bamp(2,1,1) + mc**2*four*p256**(-1)*invtwog1Dc * ( 
+      bamp(2,1,1) = bamp(2,1,1) + mc**2*four*p256**(-1)*invtwog1Dc * (
      &     -1./(za(i1,i2))/(za(i5,i6))/(zb(i1,i2))/(zb(i5,i6))*za(i1,i3
      &    )*za(i6,i1)*za(i6,i2)*zb(i1,i4)*zb(i5,i1)**2 -1./(za(i1,i2))
      &    /(za(i5,i6))/(zb(i1,i2))/(zb(i5,i6))*za(i4,i3)*za(i6,i1)*za(
@@ -244,7 +244,7 @@ C     p256=2*p2.p5+2*p2.p6+2*p5.p6
      &    ))/(za(i5,i6))/(zb(i1,i2))/(zb(i5,i6))/(zb(i6,i1))*za(i1,i3)*
      &    za(i6,i2)*zb(i1,i4)*zb(i5,i1)**2 -1./(za(i5,i6))/(zb(i1,i2))
      &    /(zb(i5,i6))/(zb(i6,i1))*za(i6,i3)*zb(i1,i4)*zb(i5,i1)**2 )
-      bamp(2,1,1) = bamp(2,1,1) + mc**4*four*p256**(-1)*invtwog1Dc * ( 
+      bamp(2,1,1) = bamp(2,1,1) + mc**4*four*p256**(-1)*invtwog1Dc * (
      &   1./(za(i1,i2))/(za(i5,i6))/(zb(i1,i2))/(zb(i1,i2))/(zb(i5,i6))
      &    *za(i6,i1)*za(i6,i3)*zb(i1,i4)*zb(i5,i1)**2 )
 
@@ -262,7 +262,7 @@ C     p256=2*p2.p5+2*p2.p6+2*p5.p6
      &    zb(i1,i4)*zb(i6,i2) +1./(za(i6,i1))*za(i5,i2)*za(i5,i3)*zb(i6
      &    ,i4) +1./(za(i6,i1))/(zb(i5,i6))*za(i3,i2)*za(i5,i2)*zb(i6,i2
      &    )*zb(i6,i4) )
-      bamp(1,2,1) = bamp(1,2,1) + mc**2*four*p256**(-1)*invtwog1Dc * ( 
+      bamp(1,2,1) = bamp(1,2,1) + mc**2*four*p256**(-1)*invtwog1Dc * (
      &     -1./(za(i1,i2))/(za(i5,i6))/(zb(i1,i2))/(zb(i5,i6))*za(i1,i3
      &    )*za(i5,i1)*za(i5,i2)*zb(i1,i4)*zb(i6,i1)**2 -1./(za(i1,i2))
      &    /(za(i5,i6))/(zb(i1,i2))/(zb(i5,i6))*za(i4,i3)*za(i5,i1)*za(
@@ -276,16 +276,16 @@ C     p256=2*p2.p5+2*p2.p6+2*p5.p6
      &    *zb(i6,i4) -1./(za(i5,i6))/(za(i6,i1))/(zb(i1,i2))/(zb(i5,i6)
      &    )*za(i5,i1)*za(i5,i3)*zb(i1,i4)*zb(i6,i1) -1./(za(i6,i1))/(
      &    zb(i1,i2))/(zb(i5,i6))*za(i5,i3)*zb(i6,i1)*zb(i6,i4) )
-      bamp(1,2,1) = bamp(1,2,1) + mc**4*four*p256**(-1)*invtwog1Dc * ( 
+      bamp(1,2,1) = bamp(1,2,1) + mc**4*four*p256**(-1)*invtwog1Dc * (
      &   1./(za(i1,i2))/(za(i5,i6))/(zb(i1,i2))/(zb(i1,i2))/(zb(i5,i6))
      &    *za(i5,i1)*za(i5,i3)*zb(i1,i4)*zb(i6,i1)**2 )
 
       bamp(1,1,2) =  + mc*four*p256**(-1) * (1./(za(i1,i2))/(zb(i5,i1))
      &    /(zb(i5,i6))*za(i4,i3)*za(i6,i1)*zb(i1,i4)**2 +1./(za(i1,i2))
-     &    /(zb(i5,i6))/(zb(i6,i1))*za(i4,i3)*za(i5,i1)*zb(i1,i4)**2 - 
+     &    /(zb(i5,i6))/(zb(i6,i1))*za(i4,i3)*za(i5,i1)*zb(i1,i4)**2 -
      &   1./(zb(i5,i1))/(zb(i5,i6))*za(i6,i3)*zb(i1,i2)*zb(i1,i4) -1./(
      &    zb(i5,i6))/(zb(i6,i1))*za(i5,i3)*zb(i1,i2)*zb(i1,i4) )
-      bamp(1,1,2) = bamp(1,1,2) + mc*four*p256**(-1)*invtwog1Dc * (  - 
+      bamp(1,1,2) = bamp(1,1,2) + mc*four*p256**(-1)*invtwog1Dc * (  -
      &   1./(za(i1,i2))/(zb(i5,i1))/(zb(i6,i1))*za(i4,i3)*za(i5,i1)*za(
      &    i6,i2)*zb(i1,i2)*zb(i1,i4)**2 -1./(za(i1,i2))/(zb(i6,i1))*za(
      &    i4,i3)*za(i5,i1)*za(i5,i6)*zb(i1,i4)**2 +1./(zb(i5,i1))/(zb(
@@ -304,7 +304,7 @@ C     p256=2*p2.p5+2*p2.p6+2*p5.p6
      &    zb(i1,i4)*zb(i6,i1) +1./(za(i1,i2))/(za(i6,i1))/(zb(i5,i6))*
      &    za(i1,i3)*za(i5,i1)*zb(i6,i1)*zb(i6,i4) )
       bamp(1,2,2) = bamp(1,2,2) + mc*four*invtwog1Dc * (1./(za(i1,i2))
-     &    /(za(i5,i6))/(za(i6,i1))*za(i5,i1)**2*za(i5,i3)*zb(i1,i4) + 
+     &    /(za(i5,i6))/(za(i6,i1))*za(i5,i1)**2*za(i5,i3)*zb(i1,i4) +
      &   1./(za(i1,i2))/(za(i5,i6))/(za(i6,i1))/(zb(i5,i6))*za(i3,i2)*
      &    za(i5,i1)**2*zb(i1,i4)*zb(i6,i2) +1./(za(i1,i2))/(za(i6,i1))*
      &    za(i5,i1)*za(i5,i3)*zb(i6,i4) +1./(za(i1,i2))/(za(i6,i1))/(
@@ -312,7 +312,7 @@ C     p256=2*p2.p5+2*p2.p6+2*p5.p6
      &    ,i6))/(za(i6,i1))/(zb(i5,i6))*za(i5,i1)*za(i5,i3)*zb(i1,i4)*
      &    zb(i6,i2) -1./(za(i6,i1))/(zb(i5,i6))*za(i5,i3)*zb(i6,i2)*zb(
      &    i6,i4) )
-      bamp(1,2,2) = bamp(1,2,2) + mc**3*four*p256**(-1)*invtwog1Dc * ( 
+      bamp(1,2,2) = bamp(1,2,2) + mc**3*four*p256**(-1)*invtwog1Dc * (
      &     -1./(za(i1,i2))/(za(i1,i2))/(za(i5,i6))/(zb(i1,i2))/(zb(i5,
      &    i6))*za(i1,i3)*za(i5,i1)**2*zb(i1,i4)*zb(i6,i1)**2 -1./(za(i1
      &    ,i2))/(za(i1,i2))/(za(i5,i6))/(zb(i1,i2))/(zb(i5,i6))*za(i4,
@@ -339,7 +339,7 @@ C     p256=2*p2.p5+2*p2.p6+2*p5.p6
      &    /(za(i5,i6))/(zb(i5,i6))/(zb(i6,i1))*za(i3,i2)*za(i6,i1)*zb(
      &    i1,i4)*zb(i5,i1)*zb(i5,i2) -1./(za(i5,i6))/(zb(i5,i6))/(zb(i6
      &    ,i1))*za(i6,i3)*zb(i1,i4)*zb(i5,i1)*zb(i5,i2) )
-      bamp(2,1,2) = bamp(2,1,2) + mc**3*four*p256**(-1)*invtwog1Dc * ( 
+      bamp(2,1,2) = bamp(2,1,2) + mc**3*four*p256**(-1)*invtwog1Dc * (
      &     -1./(za(i1,i2))/(za(i1,i2))/(za(i5,i6))/(zb(i1,i2))/(zb(i5,
      &    i6))*za(i1,i3)*za(i6,i1)**2*zb(i1,i4)*zb(i5,i1)**2 -1./(za(i1
      &    ,i2))/(za(i1,i2))/(za(i5,i6))/(zb(i1,i2))/(zb(i5,i6))*za(i4,
@@ -372,7 +372,7 @@ C     p256=2*p2.p5+2*p2.p6+2*p5.p6
      &    ,i1))/(za(i5,i6))/(zb(i1,i2))*za(i1,i3)*zb(i1,i4)*zb(i6,i1)
      &     -1./(za(i5,i6))/(za(i6,i1))/(zb(i1,i2))*za(i1,i3)*zb(i1,i4)*
      &    zb(i5,i1) )
-      bamp(2,2,1) = bamp(2,2,1) + mc**2*four*p256**(-1)*invtwog1Dc * ( 
+      bamp(2,2,1) = bamp(2,2,1) + mc**2*four*p256**(-1)*invtwog1Dc * (
      &     -1./(za(i5,i1))/(za(i6,i1))*za(i1,i2)*za(i1,i3)*zb(i1,i4)*
      &    zb(i5,i6) +1./(za(i5,i1))/(za(i6,i1))/(zb(i1,i2))*za(i1,i2)*
      &    za(i1,i3)*zb(i1,i4)*zb(i5,i1)*zb(i6,i2) +1./(za(i6,i1))/(zb(

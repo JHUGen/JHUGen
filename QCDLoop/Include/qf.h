@@ -1,6 +1,6 @@
 *      $Id: qpff.h,v 1.1 1995/12/12 10:03:48 gj Exp $
 *      -------------------------------------------------------------
-*      INCLUDE FILE FOR THE QPFF ROUTINES.  
+*      INCLUDE FILE FOR THE QPFF ROUTINES.
 *                              Geert Jan van Oldenborgh.
 *      -------------------------------------------------------------
 *       please do not change, and recompile _everything_ when you do.
@@ -34,8 +34,8 @@
 *
 *      nwidth: number of widths within which the complex mass is used
 *      nschem: scheme to handle the complex mass (see ffinit.f)
-*      idot:      internal flags to signal that some of the dotproducts 
-*            are input: 0: none; 1: external pi.pj, 2: external + 
+*      idot:      internal flags to signal that some of the dotproducts
+*            are input: 0: none; 1: external pi.pj, 2: external +
 *            kinematical determinant, 3: all dotproducts + kindet.
 *
       integer nwidth,nschem,idot
@@ -127,7 +127,7 @@
 *      isgrot:      signs to iold
 *      isgn34:      +1 or -1: which root to choose in the transformation (D0)
 *      isgnal:      +1 or -1: which root to choose in the alpha-trick (C0)
-*      irota3:      save the number of positions the C0 configuration has been 
+*      irota3:      save the number of positions the C0 configuration has been
 *            rotated over
 *      irota4:      same for the D0
 *      irota5:      same for the E0

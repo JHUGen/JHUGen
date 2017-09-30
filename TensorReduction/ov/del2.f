@@ -4,4 +4,4 @@
       del2=ovdot(p1,p3)*ovdot(p2,p4)-ovdot(p1,p4)*ovdot(p2,p3)
       return
       end
-      
+

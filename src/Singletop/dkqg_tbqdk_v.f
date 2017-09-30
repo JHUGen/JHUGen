@@ -55,7 +55,7 @@ C----set all elements to zero
         call adecay(p,3,4,5,manti)
         call adecay_v(p,3,4,5,mantiv)
       endif
-      
+
 c--- q-g amplitudes
       do hb=1,2
       do h2=1,2
@@ -68,9 +68,9 @@ c--- q-g amplitudes
       mtotgqv(hb,h2,hc)=czip
       mtotqbgv(hb,h2,hc)=czip
       mtotgqbv(hb,h2,hc)=czip
-      
+
       if (nwz .eq. +1) then
-      
+
       do ht=1,2
       mtotqg(hb,h2,hc)=mtotqg(hb,h2,hc)
      & +mtop(hb,ht)*mqg(ht,h2,hc)
@@ -90,9 +90,9 @@ c--- q-g amplitudes
       mtotgqbv(hb,h2,hc)=mtotgqbv(hb,h2,hc)
      & +mtopv(hb,ht)*mgqb(ht,h2,hc)
       enddo
-     
+
       else
-      
+
       do ha=1,2
       mtotqg(hb,h2,hc)=mtotqg(hb,h2,hc)
      & +mqg(hb,h2,ha)*manti(ha,hc)
@@ -114,7 +114,7 @@ c--- q-g amplitudes
       enddo
 
       endif
-      
+
       enddo
       enddo
       enddo
@@ -156,6 +156,6 @@ C---fill qb-q, gg and q-qb elements
       endif
       enddo
       enddo
-      
+
       return
       end

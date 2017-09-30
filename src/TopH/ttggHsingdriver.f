@@ -22,7 +22,7 @@
       ampBA(h1,h2,h4,h3)=tmp
       enddo
       enddo
-      
+
 
       do h1=1,2
       do h2=1,2

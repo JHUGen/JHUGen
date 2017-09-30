@@ -12,7 +12,7 @@ c---  DKS Eq. 2.8 (multiplied by a factor of (-i))
       a6treea=za(j1,j3)*zb(j2,j5)*z2(j6,j2,j5,j4)
      . /(s(j3,j4)*s(j5,j6)*t(j1,j3,j4))
 
-      return 
+      return
       end
 
       double complex function a6treeb(j1,j2,j3,j4,j5,j6,za,zb)
@@ -30,7 +30,7 @@ c---  DKS Eq. 2.9 (multiplied by a factor of (-i))
      .        +zb(j2,j4)*za(j1,j6)*z2(j3,j1,j6,j5)
      . )/(s(j1,j2)*s(j3,j4)*s(j5,j6))
 
-      return 
+      return
       end
 
       double complex function a6trees(j1,j2,j3,j4,j5,j6,za,zb)
@@ -41,5 +41,5 @@ c---  DKS Eq. 2.9 (multiplied by a factor of (-i))
       double complex a6treea
       a6trees=a6treea(j1,j2,j3,j4,j5,j6,za,zb)
      .       +a6treea(j1,j2,j6,j5,j4,j3,za,zb)
-      return 
+      return
       end

@@ -14,10 +14,10 @@ c--- generated using the standard VV routine gen4.f
       logical, save::useHiggsBW
       double precision r(mxdim),p(mxpart,4),wt,threshold
 
-c--- initialization on first call      
+c--- initialization on first call
       if (first) then
-        threshold=wsqmin+bbsqmin        
-c--- generate using B.W. if Higgs mass above or close to threshold      
+        threshold=wsqmin+bbsqmin
+c--- generate using B.W. if Higgs mass above or close to threshold
         if (hmass .gt. threshold-5d0*hwidth) then
 c--- otherwise generate without B.W.
           useHiggsBW=.true.
@@ -35,11 +35,11 @@ c--- switch between gen4h and gen4
       else
         call gen4(r,p,wt,*999)
       endif
-      
+
       return
 
  999  wt=0d0
       return 1
 
       end
-      
+

@@ -26,10 +26,10 @@ c----- %%CITATION = NUPHA,B367,637;%%
       d=k(2,3)
       bsq=b**2
       fourac=4d0*a*c
-      discr=sqrt(bsq-fourac)     
- 
+      discr=sqrt(bsq-fourac)
+
       if (abs(discr) .lt. 1d-10*max(dble(bsq),dble(fourac))) then
-      z(1)=0.5d0*b/a      
+      z(1)=0.5d0*b/a
       wlog(1)=dcmplx(dreal(cln(z(1),+1d0)))
       Ival0=
      . +k(3,4)*(cln(k(3,4),-1d0)+wlog(1)-cln(k(1,3),-1d0))
@@ -61,7 +61,7 @@ C-----z(2) comes with - i*ep*d
      . -qlLi2omprod(dble(k(3,4)),dble(k(1,3)),z(j),iep)
      . -qlLi2omprod(dble(k(2,4)),dble(k(1,2)),z(j),iep))
 
-      
+
       enddo
 
       Ival0=Ival0/(musq**2*discr)

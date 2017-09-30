@@ -16,7 +16,7 @@ C     only enters through k5 and e5 in wave function
       prt(s16)=cone/dcmplx(s16-mt**2,0d0*mt*twidth)
       iza(p1,p2)=cone/za(p1,p2)
       izb(p1,p2)=cone/zb(p1,p2)
-C   
+C
       mw=wmass
 C-----since 1,2,3,4,6 are unchanged in demassification we may calculate
 C-----if we only use these vectors.

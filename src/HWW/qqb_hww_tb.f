@@ -9,7 +9,7 @@ c--- including both top and bottom quark loops
       include 'masses.f'
       include 'sprods_com.f'
       include 'zprods_decl.f'
-      include 'anom_higgs.f' 
+      include 'anom_higgs.f'
       integer h1,h2,j,k
       double precision p(mxpart,4),msq(fn:nf,fn:nf),msqgg,fac
       double precision mfsq,tau,tauinv,rt,rescale
@@ -23,15 +23,15 @@ c--- including both top and bottom quark loops
       enddo
 
       call spinoru(6,p,za,zb)
-      
+
 c--- fill amplitudes with contributions of Higgs: top loop
       mfsq=mt**2
       tau=s(1,2)/(4d0*mfsq)
       tauinv=1d0/tau
       fachiggs=cone/dcmplx(s(1,2)-hmass**2,hmass*hwidth)
 
-!====== SEYMOUR ISA APPROX 
-!      num_c=dcmplx(hmass**2/s(1,2)) 
+!====== SEYMOUR ISA APPROX
+!      num_c=dcmplx(hmass**2/s(1,2))
 !      fachiggs=num_c/dcmplx(s(1,2)-hmass**2,s(1,2)*hwidth/hmass)
 
       if (tau .le. 1d0) then
@@ -68,8 +68,8 @@ c--- fill amplitudes with contributions of Higgs: bottom loop
       Ahiggs(2,2)=Ahiggs(2,2)+fachiggs*amphiggs*zb(1,2)/za(2,1)
 
 c--- Rescale for width study
-      if((keep_smhiggs_norm).and.(anom_higgs)) then 
-         rescale=chi_higgs**2 
+      if((keep_smhiggs_norm).and.(anom_higgs)) then
+         rescale=chi_higgs**2
          Ahiggs(:,:)=Ahiggs(:,:)*rescale
       endif
 
@@ -84,10 +84,10 @@ c--- overall factor from diagrams
       fac=avegg*V*(2d0*gwsq*gsq/(16d0*pisq)*gwsq/2d0)**2
      & *s(3,4)**2/((s(3,4)-wmass**2)**2+(wwidth*wmass)**2)
      & *s(5,6)**2/((s(5,6)-wmass**2)**2+(wwidth*wmass)**2)
-      
+
       msq(0,0)=msqgg*fac
 
       return
       end
-      
-      
+
+

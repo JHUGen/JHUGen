@@ -1,10 +1,10 @@
       subroutine phi1_2bis(x1,x2,x3,x4,p1,p2,p3,wt,*)
 c     massive particle p1 decaying into p2 mass m2 and p3 mass m3.
-c     with invariant mass 
+c     with invariant mass
 c     of particle two s2 and particle three s3 integrated over.
 c     vectors returned p2 and p3 are in the same frame as p1 is supplied
-c     Expression evaluate is 
-c     ds2 ds3 d^4 p2 d^4 p3 (2 pi)^4 delta(p1-p2-p3)/(2 pi)^6 
+c     Expression evaluate is
+c     ds2 ds3 d^4 p2 d^4 p3 (2 pi)^4 delta(p1-p2-p3)/(2 pi)^6
 c     delta(p2^2-s2) delta(p3^2-s3)
       implicit none
       include 'constants.f'
@@ -35,13 +35,13 @@ c      if (n3 .eq. 1) write(6,*) 'generating phase space with bw,n3=',n3
       endif
 
       wt=0d0
-      s1=p1(4)**2-p1(1)**2-p1(2)**2-p1(3)**2  
+      s1=p1(4)**2-p1(1)**2-p1(2)**2-p1(3)**2
       if (s1 .lt. 0d0) return 1
       m1=dsqrt(s1)
 
 c--- if both particles are produced on-shell, reject if m1 too small
       if (
-     . zerowidth 
+     . zerowidth
      . .and. (m1 .lt. mass2*dfloat(n2)+mass3*dfloat(n3))
      .    ) return 1
 
@@ -84,7 +84,7 @@ c      s2max=min(s1,bbsqmax)
         s2min=(mt+mb)**2
       elseif ((case .eq. 'W_twdk') .or. (case .eq. 'Wtdkay')
      .   .or. (case .eq. 'W_cwdk') .or. (case .eq. 'Wtbwdk')
-     .   .or. (case .eq. 'qq_tth') 
+     .   .or. (case .eq. 'qq_tth')
      .   .or. (case .eq. 'qq_ttz') .or. (case .eq. 'qqtthz')
      &   .or. (case .eq. 'qq_ttw') .or. (case .eq. 'tth_ww')) then
         oldzerowidth=zerowidth
@@ -95,24 +95,24 @@ c      s2max=min(s1,bbsqmax)
          w2=s2max-s2min
          s2=s2max*x1+s2min*(1d0-x1)
       elseif (n2 .eq. 1) then
-         call breitw(x1,s2min,s2max,mass2,width2,s2,w2)       
+         call breitw(x1,s2min,s2max,mass2,width2,s2,w2)
       endif
 
       if ((case .eq. 'W_twdk') .or. (case .eq. 'Wtdkay')
      & .or.(case .eq. 'W_cwdk') .or. (case .eq. 'Wtbwdk')
-     & .or.(case .eq. 'qq_tth') 
+     & .or.(case .eq. 'qq_tth')
      & .or. (case .eq. 'qq_ttz') .or. (case .eq. 'qqtthz')
      & .or. (case .eq. 'qq_ttw').or. (case .eq. 'tth_ww'))  then
         zerowidth=oldzerowidth
       endif
-      
+
       m2=dsqrt(s2)
       s3min=1d-15
       if ((case .eq. 'qq_tbg') .or. (case .eq. 'qqtbgg')) s3min=mb**2
       if ((case .eq. 'qq_tth')
-     &  .or. (case .eq. 'qq_ttw') 
-     &  .or. (case .eq. 'tth_ww') 
-     &  .or. (case .eq. 'qq_ttz') .or. (case .eq. 'qqtthz')) 
+     &  .or. (case .eq. 'qq_ttw')
+     &  .or. (case .eq. 'tth_ww')
+     &  .or. (case .eq. 'qq_ttz') .or. (case .eq. 'qqtthz'))
      &  s3min=4d0*mb**2
 c      s3min=mb**2 ! DEBUG: hack for s36 small
 c      s3min=mt**2 ! DEBUG: hack for s46 small
@@ -123,10 +123,10 @@ c      if (s3max-s3min .lt. 1d-9) return 1
          w3=s3max-s3min
          s3=s3max*x2+s3min*(1d0-x2)
       elseif (n3 .eq. 1) then
-         call breitw(x2,s3min,s3max,mass3,width3,s3,w3)       
+         call breitw(x2,s3min,s3max,mass3,width3,s3,w3)
       endif
 
-      costh=two*x3-one      
+      costh=two*x3-one
       phi=twopi*x4
       sinth=dsqrt(one-costh**2)
       cphi=dcos(phi)
@@ -153,10 +153,10 @@ c      write(6,*) s3min,s3,s3max,m1,m2,sqrt(s1),sqrt(s2)
       do j=1,4
       p2(j)=p1(j)-p3(j)
       enddo
-      if (  (p1(4) .lt. 0d0) 
-     & .or. (p2(4) .lt. 0d0) 
-     & .or. (p3(4) .lt. 0d0)) then 
-       if (case(1:5) .ne. 'vlchk') then 
+      if (  (p1(4) .lt. 0d0)
+     & .or. (p2(4) .lt. 0d0)
+     & .or. (p3(4) .lt. 0d0)) then
+       if (case(1:5) .ne. 'vlchk') then
         write(6,*) '   m1=',m1
         write(6,*) 's2min=',s2min
         write(6,*) 's2max=',s2max

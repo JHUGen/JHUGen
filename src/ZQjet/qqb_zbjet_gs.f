@@ -14,7 +14,7 @@ c
 c--- isub=1 corresponds to p7 representing a light quark of gluon
 c--- isub=2 means that p7 is another heavy quark
 
-      implicit none 
+      implicit none
       include 'constants.f'
       include 'ptilde.f'
       include 'qqgg.f'
@@ -31,9 +31,9 @@ c     . c176,c671,c176v,c671v,
 c     . c275,c572,c275v,c572v,
 c     . c276,c672,c276v,c672v
       integer j,k,n,np6,np12,np18,np21,nd
-c--- slightly obtuse notation, fn=-nf, to simplify declaration lines      
+c--- slightly obtuse notation, fn=-nf, to simplify declaration lines
       double precision p(mxpart,4),msq(maxd,fn:nf,fn:nf)
-      double precision 
+      double precision
      & msq17_2(fn:nf,fn:nf),msq27_1(fn:nf,fn:nf),
      & msq15_2(fn:nf,fn:nf),msq25_1(fn:nf,fn:nf),
      & msq16_2(fn:nf,fn:nf),msq26_1(fn:nf,fn:nf),
@@ -55,8 +55,8 @@ c--- slightly obtuse notation, fn=-nf, to simplify declaration lines
      & m17_6(0:2,fn:nf,fn:nf),
      & m27_5(0:2,fn:nf,fn:nf),
      & m27_6(0:2,fn:nf,fn:nf)
-           
-      double precision 
+
+      double precision
      . msq1a_b(6,0:2,fn:nf,fn:nf),msqba_1(6,0:2,fn:nf,fn:nf),
      . msqab_c(6,0:2,fn:nf,fn:nf),
      . msqbc_2(6,0:2,fn:nf,fn:nf),msq2c_b(6,0:2,fn:nf,fn:nf),
@@ -71,7 +71,7 @@ c--- slightly obtuse notation, fn=-nf, to simplify declaration lines
      . sub1b_2(6,4),sub2b_1(6,4),
      . msq1b_2v(6,0:2,fn:nf,fn:nf),msq2b_1v(6,0:2,fn:nf,fn:nf),
      . sub1b_2v(6),sub2b_1v(6)
-      
+
       integer isub
       common/isub/isub
       integer, parameter :: a(6)=(/5,5,7,6,6,7/),b(6)=(/6,7,5,7,5,6/),
@@ -85,7 +85,7 @@ c--- slightly obtuse notation, fn=-nf, to simplify declaration lines
 
 c-- initialize the matrix elements to zero
       do j=-nf,nf
-      do k=-nf,nf      
+      do k=-nf,nf
       do nd=1,ndmax
         msq(nd,j,k)=0d0
       enddo
@@ -145,14 +145,14 @@ c--- initial-initial
 
 c--- skip the QQGGG contributions
 c      goto 66
-      
+
 c-- fill the matrix elements
       do j=-nflav,nflav,nflav
       do k=-nflav,nflav,nflav
 
 c--- QUARK-GLUON contributions (isub=1 only)
       if     ((isub .eq. 1) .and. (j.eq.+flav) .and. (k.eq.0)) then
-          do n=1,2  
+          do n=1,2
 c-- (a,b,c) = (5,6,7) and (5,7,6)
           msq(n,j,k)   =subab_c(n,qq)
      .                  *msqab_c(n,pntr(a(n),c(n)),j,k)*xn/2d0
@@ -189,7 +189,7 @@ c-- (a,b,c) = (7,5,6) and (6,5,7)
      .                  *msq2c_b(n,pntr(a(n),b(n)),j,k)*xn/2d0
      .                 +sub2c_bv(n)
      .                  *msq2c_bv(n,pntr(a(n),b(n)),j,k)*xn/2d0
-          enddo      
+          enddo
           do n=4,6,2
 c-- (a,b,c) = (6,7,5) and (7,6,5)
           msq(6+n,j,k) =msq(6+n,j,k)
@@ -208,8 +208,8 @@ c-- (a,b,c) = (7,5,6) and (6,5,7)
      .                  *msq2c_b(n,0,j,k)*xn/2d0
      .                 +sub2c_bv(n)
      .                  *msq2c_bv(n,0,j,k)*xn/2d0
-          enddo      
-          do n=1,2  
+          enddo
+          do n=1,2
 c-- (a,b,c) = (5,6,7) and (5,7,6)
           msq(n,j,k)   =msq(n,j,k)
      .                 +subab_c(n,qq)
@@ -222,13 +222,13 @@ c-- (a,b,c) = (5,6,7) and (5,7,6)
      .                  *msq2b_1(n,0,j,k)*xn/2d0
      .                 +sub2b_1v(n)
      .                  *msq2b_1v(n,0,j,k)*xn/2d0
-          enddo    
+          enddo
 c-- [n=4] (a,b,c) = (6,7,5)
           msq(4,j,k)  =msq(4,j,k)
      .                 +subab_c(4,gg)
-     .                  *msqab_c(4,0,j,k)*xn/2d0                
+     .                  *msqab_c(4,0,j,k)*xn/2d0
      .                 +subab_cv(4)
-     .                  *msqab_cv(4,0,j,k)*xn/2d0                
+     .                  *msqab_cv(4,0,j,k)*xn/2d0
           do n=3,5,2
 c-- (a,b,c) = (7,5,6) and (6,5,7)
           msq(6+n,j,k)=msq(6+n,j,k)
@@ -238,7 +238,7 @@ c-- (a,b,c) = (7,5,6) and (6,5,7)
 
 c--- GLUON-QUARK contributions (isub=1 only)
       elseif ((isub .eq. 1) .and. (j.eq.0) .and. (k.eq.+flav)) then
-          do n=1,2  
+          do n=1,2
 c-- (a,b,c) = (5,6,7) and (5,7,6)
           msq(n,j,k)   =subab_c(n,qq)
      .                  *msqab_c(n,pntr(a(n),c(n)),j,k)*xn/2d0
@@ -275,7 +275,7 @@ c-- (a,b,c) = (6,5,7) and (7,5,6)
      .                  *msq1a_b(n,pntr(c(n),b(n)),j,k)*xn/2d0
      .                 +sub1a_bv(n)
      .                  *msq1a_bv(n,pntr(c(n),b(n)),j,k)*xn/2d0
-          enddo              
+          enddo
           do n=1,2
 c-- (a,b,c) = (5,7,6) and (5,6,7)
           msq(12+n,j,k) =msq(12+n,j,k)
@@ -294,8 +294,8 @@ c-- (a,b,c) = (7,5,6) and (6,5,7)
      .                  *msq1a_b(n,0,j,k)*xn/2d0
      .                 +sub1a_bv(n)
      .                  *msq1a_bv(n,0,j,k)*xn/2d0
-          enddo      
-          do n=1,2  
+          enddo
+          do n=1,2
 c-- (a,b,c) = (5,6,7) and (5,7,6)
           msq(n,j,k)   =msq(n,j,k)
      .                 +subab_c(n,qq)
@@ -308,13 +308,13 @@ c-- (a,b,c) = (5,6,7) and (5,7,6)
           msq(21+n,j,k)=msq(21+n,j,k)
      .                 +sub2b_1(n,qq)
      .                  *msq2b_1(n,0,j,k)*xn/2d0
-          enddo    
+          enddo
 c-- [n=4] (a,b,c) = (6,7,5)
           msq(4,j,k)  =msq(4,j,k)
      .                 +subab_c(4,gg)
-     .                  *msqab_c(4,0,j,k)*xn/2d0                
+     .                  *msqab_c(4,0,j,k)*xn/2d0
      .                 +subab_cv(4)
-     .                  *msqab_cv(4,0,j,k)*xn/2d0                
+     .                  *msqab_cv(4,0,j,k)*xn/2d0
           do n=3,5,2
 c-- (a,b,c) = (7,5,6) and (6,5,7)
           msq(12+n,j,k)=msq(12+n,j,k)
@@ -324,7 +324,7 @@ c-- (a,b,c) = (7,5,6) and (6,5,7)
 
 c--- GLUON-ANTIQUARK contributions (isub=1 only)
       elseif ((isub .eq. 1) .and. (j.eq.0) .and. (k.eq.-flav)) then
-          do n=1,2  
+          do n=1,2
 c-- (a,b,c) = (5,6,7) and (5,7,6)
           msq(n,j,k)   =subab_c(n,qq)
      .                  *msqab_c(n,pntr(c(n),a(n)),j,k)*xn/2d0
@@ -361,7 +361,7 @@ c-- (a,b,c) = (6,5,7) and (7,5,6)
      .                  *msq1a_b(n,pntr(b(n),c(n)),j,k)*xn/2d0
      .                 +sub1a_bv(n)
      .                  *msq1a_bv(n,pntr(b(n),c(n)),j,k)*xn/2d0
-          enddo              
+          enddo
           do n=1,2
 c-- (a,b,c) = (5,7,6) and (5,6,7)
           msq(12+n,j,k) =msq(12+n,j,k)
@@ -380,8 +380,8 @@ c-- (a,b,c) = (7,5,6) and (6,5,7)
      .                  *msq1a_b(n,0,j,k)*xn/2d0
      .                 +sub1a_bv(n)
      .                  *msq1a_bv(n,0,j,k)*xn/2d0
-          enddo      
-          do n=1,2  
+          enddo
+          do n=1,2
 c-- (a,b,c) = (5,6,7) and (5,7,6)
           msq(n,j,k)   =msq(n,j,k)
      .                 +subab_c(n,qq)
@@ -394,13 +394,13 @@ c-- (a,b,c) = (5,6,7) and (5,7,6)
           msq(21+n,j,k)=msq(21+n,j,k)
      .                 +sub2b_1(n,qq)
      .                  *msq2b_1(n,0,j,k)*xn/2d0
-          enddo    
+          enddo
 c-- [n=4] (a,b,c) = (6,7,5)
           msq(4,j,k)  =msq(4,j,k)
      .                 +subab_c(4,gg)
-     .                  *msqab_c(4,0,j,k)*xn/2d0                
+     .                  *msqab_c(4,0,j,k)*xn/2d0
      .                 +subab_cv(4)
-     .                  *msqab_cv(4,0,j,k)*xn/2d0                
+     .                  *msqab_cv(4,0,j,k)*xn/2d0
           do n=3,5,2
 c-- (a,b,c) = (7,5,6) and (6,5,7)
           msq(12+n,j,k)=msq(12+n,j,k)
@@ -410,7 +410,7 @@ c-- (a,b,c) = (7,5,6) and (6,5,7)
 
 c--- ANTIQUARK-GLUON contributions (isub=1 only)
       elseif ((isub .eq. 1) .and. (j.eq.-flav) .and. (k.eq.0)) then
-          do n=1,2  
+          do n=1,2
 c-- (a,b,c) = (5,6,7) and (5,7,6)
           msq(n,j,k)   =subab_c(n,qq)
      .                  *msqab_c(n,pntr(c(n),a(n)),j,k)*xn/2d0
@@ -447,7 +447,7 @@ c-- (a,b,c) = (7,5,6) and (6,5,7)
      .                  *msq2c_b(n,pntr(b(n),a(n)),j,k)*xn/2d0
      .                 +sub2c_bv(n)
      .                  *msq2c_bv(n,pntr(b(n),a(n)),j,k)*xn/2d0
-          enddo      
+          enddo
           do n=4,6,2
 c-- (a,b,c) = (6,7,5) and (7,6,5)
           msq(6+n,j,k) =msq(6+n,j,k)
@@ -466,8 +466,8 @@ c-- (a,b,c) = (7,5,6) and (6,5,7)
      .                  *msq2c_b(n,0,j,k)*xn/2d0
      .                 +sub2c_bv(n)
      .                  *msq2c_bv(n,0,j,k)*xn/2d0
-          enddo      
-          do n=1,2  
+          enddo
+          do n=1,2
 c-- (a,b,c) = (5,6,7) and (5,7,6)
           msq(n,j,k)   =msq(n,j,k)
      .                 +subab_c(n,qq)
@@ -480,20 +480,20 @@ c-- (a,b,c) = (5,6,7) and (5,7,6)
      .                  *msq2b_1(n,0,j,k)*xn/2d0
      .                 +sub2b_1v(n)
      .                  *msq2b_1v(n,0,j,k)*xn/2d0
-          enddo    
+          enddo
 c-- [n=4] (a,b,c) = (6,7,5)
           msq(4,j,k)  =msq(4,j,k)
      .                 +subab_c(4,gg)
-     .                  *msqab_c(4,0,j,k)*xn/2d0                
+     .                  *msqab_c(4,0,j,k)*xn/2d0
      .                 +subab_cv(4)
-     .                  *msqab_cv(4,0,j,k)*xn/2d0                
+     .                  *msqab_cv(4,0,j,k)*xn/2d0
           do n=3,5,2
 c-- (a,b,c) = (7,5,6) and (6,5,7)
           msq(6+n,j,k)=msq(6+n,j,k)
      .                 -(subba_1(n,qq)+sub1a_b(n,qq))
      .                  *msq1a_b(n,0,j,k)*(xn+1d0/xn)/2d0
           enddo
-      
+
 c--- GLUON-GLUON contributions (isub=2 only)
       elseif ((isub .eq. 2) .and. (j.eq.0) .and. (k.eq.0)) then
 c--- additional (qg) collinear contributions
@@ -636,9 +636,9 @@ c
 c   66 continue
 
 
-c--- construct the aliased matrix elements      
+c--- construct the aliased matrix elements
       do j=-nf,nf
-      do k=-nf,nf      
+      do k=-nf,nf
       msq15_2(j,k)=
      . msq1b_2(3,0,j,k)+msq1b_2(3,1,j,k)+msq1b_2(3,2,j,k)
       msq25_1(j,k)=
@@ -690,8 +690,8 @@ c--- construct the aliased subtraction terms
       sub16_2v=sub1b_2v(1)
       sub26_1v=sub2b_1v(1)
       sub67_1v=subba_1v(6)
-c--- end construct     
-      
+c--- end construct
+
 
 cc--- compare the two calculations of the subtracted matrix elements
 c      c15=0d0
@@ -838,20 +838,20 @@ c      write(6,*) 'checksum 276  ',c276
 c      write(6,*) 'checksum 276v ',c276v
 c      write(6,*) 'checksum 672  ',c672
 c      write(6,*) 'checksum 672v ',c672v
-c      pause      
+c      pause
 
 
-c--- note that singularities for p7 in the GQ,... contributions 
+c--- note that singularities for p7 in the GQ,... contributions
 c--- should not be included, because the basic (LO) process would
 c--- then contain two heavy quarks. Similarly, 56 singularities are
 c--- not included because the LO process would contain no heavy quarks;
 c--- however, we must remember to apply a cut on the raw matrix
 c--- elements to eliminate this singularity
-      
+
 c--- fill the dipole contributions
       do j=-nflav,nflav
       do k=-nflav,nflav
-      
+
       if ((abs(j) .eq. flav) .and. (abs(k) .eq. flav)) goto 89
 c--- do not allow abs(j) = flav and abs(k) = flav
       if ((abs(j) .gt. 0) .and. (abs(k) .gt. 0) .and.
@@ -1201,7 +1201,7 @@ c--- qb-g contribution (isub=2 only)
           msq(21,j,k)=msq(21,j,k)+(
      .     +sub25_1(qg)*msq25_1(j,-flav))
         endif
-        
+
       elseif ((j .eq. 0) .and. (k .gt. 0)) then
 c--- g-Q contribution (isub=1 only)
         if     ((isub .eq. 1) .and. (k .eq. +flav)) then
@@ -1239,17 +1239,17 @@ c--- g-qb contribution (isub=2 only)
           msq(24,j,k)=msq(24,j,k)+(
      .     +sub15_2(qg)*msq15_2(-flav,k))
         endif
-      
+
       endif
 
    89 continue
 
       enddo
       enddo
-      
+
       return
       end
-      
+
       subroutine storedipcs(msq_dip,msq_dipv)
 c--- this routine transfers the information on the colour
 c--- structure from a common block into separate arrays for
@@ -1273,4 +1273,4 @@ c--- each parton configuration
 
       return
       end
-      
+

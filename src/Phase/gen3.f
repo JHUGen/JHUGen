@@ -21,7 +21,7 @@ c---- are required
       include 'energy.f'
 
       wt3=0d0
-            
+
 c--- dummy values if there's no decay
       if (nodecay) then
         rdk1=0.5d0
@@ -30,7 +30,7 @@ c--- dummy values if there's no decay
         rdk1=r(6)
         rdk2=r(7)
       endif
-      
+
       tau=dexp(dlog(taumin)*r(4))
       y=0.5d0*dlog(tau)*(1d0-2d0*r(5))
       xjac=dlog(taumin)*tau*dlog(tau)
@@ -53,7 +53,7 @@ c--- phase space volume only checked for x1=x2=1
       endif
 
 c---if x's out of normal range alternative return
-      if   ((xx(1) .gt. 1d0) 
+      if   ((xx(1) .gt. 1d0)
      & .or. (xx(2) .gt. 1d0)
      & .or. (xx(1) .lt. xmin)
      & .or. (xx(2) .lt. xmin)) return 1
@@ -79,13 +79,13 @@ c---if x's out of normal range alternative return
       p(5,nu)=p5(nu)
       p(6,nu)=p6(nu)
       p(7,nu)=p7(nu)
-      enddo 
+      enddo
       wt3=xjac*pswt
 
       if(wt3 .eq. 0d0) then
       p(:,:)=0d0
       return 1
-      endif 
+      endif
 
       return
       end

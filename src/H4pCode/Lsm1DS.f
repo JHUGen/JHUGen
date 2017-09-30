@@ -8,13 +8,13 @@ c--- This is an implementation of Eq. (B.2) from DS, 0906.0008
       r2=t/msq
       omr1=one-r1
       omr2=one-r2
-      if (omr1 .gt. one) then 
+      if (omr1 .gt. one) then
        dilog1=dcmplx(pisqo6-ddilog(r1))
      & -Lnrat(-s,-msq)*dcmplx(log(omr1))
       else
        dilog1=dcmplx(ddilog(omr1))
       endif
-      if (omr2 .gt. one) then 
+      if (omr2 .gt. one) then
        dilog2=dcmplx(pisqo6-ddilog(r2))
      & -Lnrat(-t,-msq)*dcmplx(log(omr2))
       else

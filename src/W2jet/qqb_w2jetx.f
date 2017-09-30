@@ -31,7 +31,7 @@ c--- and returns the result in msqx(col,i,j,k,l)
      .                 gqWqg2_cs(0:2),ggWqbq2_cs(0:2),ggWqqb2_cs(0:2),
      .                 gqWgq2_cs(0:2),gqbWgqb2_cs(0:2),
      .                 qgWgq2_cs(0:2),qbgWgqb2_cs(0:2)
-      double precision 
+      double precision
      . qqb_ijkk(0:2),qqb_ijii(0:2),qqb_ijjj(0:2),qqb_ijkj(0:2),
      . qqb_ijik(0:2),qqb_ijkl(0:2),qqb_iiij(0:2),qqb_iiji(0:2),
      . qbq_ijkk(0:2),qbq_ijii(0:2),qbq_ijjj(0:2),qbq_ijkj(0:2),
@@ -97,13 +97,13 @@ c--- 21/5/09: we only need all the information for Gflag, not Qflag
         if (Gflag) then
           colourchoice=0
         endif
-      endif     
+      endif
 c--- if we're calculating the REAL matrix elements with Qflag=TRUE,
 c    the subtraction terms involve the (Gflag=TRUE) matrix elements
       if ((part .eq. 'real') .and. (Qflag .eqv. .true.)) then
         rGflag=Gflag
         Gflag=.true.
-      endif     
+      endif
 
 c--- initialize matrix elements
       do j=-nf,nf
@@ -120,7 +120,7 @@ c--- set up spinors
       prop=s(3,4)**2/((s(3,4)-wmass**2)**2+wmass**2*wwidth**2)
       facqq=4d0*V*gsq**2*(gwsq/2d0)**2*aveqq*prop
       facgg=V*xn/four*(gwsq/2d0)**2*gsq**2*prop
-      
+
 
 c--- calculate 2-quark, 2-gluon amplitudes
       if (Gflag) then
@@ -137,9 +137,9 @@ c--- calculate 2-quark, 2-gluon amplitudes
         call w2jetsq(5,2,3,4,1,6,za,zb,gqbWqbg2)
         call storecs(gqbWqbg2_cs)
         call w2jetsq(5,6,3,4,1,2,za,zb,ggWqbq2)
-        call storecs(ggWqbq2_cs)        
+        call storecs(ggWqbq2_cs)
         call w2jetsq(6,5,3,4,1,2,za,zb,ggWqqb2)
-        call storecs(ggWqqb2_cs)        
+        call storecs(ggWqqb2_cs)
         call w2jetsq(2,6,3,4,1,5,za,zb,gqWgq2)
         call storecs(gqWgq2_cs)
         call w2jetsq(6,2,3,4,1,5,za,zb,gqbWgqb2)
@@ -148,7 +148,7 @@ c--- calculate 2-quark, 2-gluon amplitudes
         call storecs(qgWgq2_cs)
         call w2jetsq(6,1,3,4,2,5,za,zb,qbgWgqb2)
         call storecs(qbgWgqb2_cs)
-        do i=0,2        
+        do i=0,2
           qqbWgg2_cs(i) = half*aveqq*facgg*qqbWgg2_cs(i)
           qbqWgg2_cs(i) = half*aveqq*facgg*qbqWgg2_cs(i)
           gqWqg2_cs(i)  = aveqg*facgg*gqWqg2_cs(i)
@@ -162,17 +162,17 @@ c--- calculate 2-quark, 2-gluon amplitudes
           qgWgq2_cs(i)  = aveqg*facgg*qgWgq2_cs(i)
           qbgWgqb2_cs(i)= aveqg*facgg*qbgWgqb2_cs(i)
         enddo
-        qqbWgg2 = qqbWgg2_cs(1) +qqbWgg2_cs(2) +qqbWgg2_cs(0) 
-        qbqWgg2 = qbqWgg2_cs(1) +qbqWgg2_cs(2) +qbqWgg2_cs(0) 
-        gqWqg2  = gqWqg2_cs(1)  +gqWqg2_cs(2)  +gqWqg2_cs(0)  
-        qgWqg2  = qgWqg2_cs(1)  +qgWqg2_cs(2)  +qgWqg2_cs(0)  
+        qqbWgg2 = qqbWgg2_cs(1) +qqbWgg2_cs(2) +qqbWgg2_cs(0)
+        qbqWgg2 = qbqWgg2_cs(1) +qbqWgg2_cs(2) +qbqWgg2_cs(0)
+        gqWqg2  = gqWqg2_cs(1)  +gqWqg2_cs(2)  +gqWqg2_cs(0)
+        qgWqg2  = qgWqg2_cs(1)  +qgWqg2_cs(2)  +qgWqg2_cs(0)
         gqbWqbg2= gqbWqbg2_cs(1)+gqbWqbg2_cs(2)+gqbWqbg2_cs(0)
         qbgWqbg2= qbgWqbg2_cs(1)+qbgWqbg2_cs(2)+qbgWqbg2_cs(0)
-        ggWqbq2 = ggWqbq2_cs(1) +ggWqbq2_cs(2) +ggWqbq2_cs(0) 
-        ggWqqb2 = ggWqqb2_cs(1) +ggWqqb2_cs(2) +ggWqqb2_cs(0) 
-        gqWgq2  = gqWgq2_cs(1)  +gqWgq2_cs(2)  +gqWgq2_cs(0)  
-        gqbWgqb2= gqbWgqb2_cs(1)+gqbWgqb2_cs(2)+gqbWgqb2_cs(0)  
-        qgWgq2  = qgWgq2_cs(1)  +qgWgq2_cs(2)  +qgWgq2_cs(0)  
+        ggWqbq2 = ggWqbq2_cs(1) +ggWqbq2_cs(2) +ggWqbq2_cs(0)
+        ggWqqb2 = ggWqqb2_cs(1) +ggWqqb2_cs(2) +ggWqqb2_cs(0)
+        gqWgq2  = gqWgq2_cs(1)  +gqWgq2_cs(2)  +gqWgq2_cs(0)
+        gqbWgqb2= gqbWgqb2_cs(1)+gqbWgqb2_cs(2)+gqbWgqb2_cs(0)
+        qgWgq2  = qgWgq2_cs(1)  +qgWgq2_cs(2)  +qgWgq2_cs(0)
         qbgWgqb2= qbgWgqb2_cs(1)+qbgWgqb2_cs(2)+qbgWgqb2_cs(0)
       endif
 
@@ -181,45 +181,45 @@ c--- note: amplitudes that have been commented out have been
 c---       replaced by implementing symmetries
       if (Qflag) then
 c--- basic amplitudes - q qb --> W + g* (--> q qb) (amps 1 and 3)
-c---                and q qb --> g* --> q (--> W q) qb (amps 2 and 4)           
+c---                and q qb --> g* --> q (--> W q) qb (amps 2 and 4)
         call amp_q_QbQ_qb(1,2,5,6,qqb1(1),qqb2(1),qqb3(1),qqb4(1))
 c--- crossed - q qb --> q qb ( --> W qb)
-c        call amp_q_QbQ_qb(1,5,2,6,qqb1(2),qqb2(2),qqb3(2),qqb4(2))         
-c--- crossed - q qb --> q ( --> W q) qb 
-c        call amp_q_QbQ_qb(6,2,5,1,qqb1(3),qqb2(3),qqb3(3),qqb4(3))   
+c        call amp_q_QbQ_qb(1,5,2,6,qqb1(2),qqb2(2),qqb3(2),qqb4(2))
+c--- crossed - q qb --> q ( --> W q) qb
+c        call amp_q_QbQ_qb(6,2,5,1,qqb1(3),qqb2(3),qqb3(3),qqb4(3))
 c--- NEW: ADDED 7/17/01
-        call amp_q_QbQ_qb(1,2,6,5,qqb1(4),qqb2(4),qqb3(4),qqb4(4))         
-c        call amp_q_QbQ_qb(1,6,2,5,qqb1(5),qqb2(5),qqb3(5),qqb4(5))         
-c        call amp_q_QbQ_qb(5,2,6,1,qqb1(6),qqb2(6),qqb3(6),qqb4(6))   
+        call amp_q_QbQ_qb(1,2,6,5,qqb1(4),qqb2(4),qqb3(4),qqb4(4))
+c        call amp_q_QbQ_qb(1,6,2,5,qqb1(5),qqb2(5),qqb3(5),qqb4(5))
+c        call amp_q_QbQ_qb(5,2,6,1,qqb1(6),qqb2(6),qqb3(6),qqb4(6))
 
 c--- now the qb q amplitudes
-        call amp_q_QbQ_qb(2,1,5,6,qbq1(1),qbq2(1),qbq3(1),qbq4(1))         
+        call amp_q_QbQ_qb(2,1,5,6,qbq1(1),qbq2(1),qbq3(1),qbq4(1))
 c--- crossed - qb q --> qb q ( --> W q)
-        call amp_q_QbQ_qb(2,5,1,6,qbq1(2),qbq2(2),qbq3(2),qbq4(2))         
-c--- crossed - qb q --> qb ( --> W qb) q 
-c        call amp_q_QbQ_qb(6,1,5,2,qbq1(3),qbq2(3),qbq3(3),qbq4(3))   
+        call amp_q_QbQ_qb(2,5,1,6,qbq1(2),qbq2(2),qbq3(2),qbq4(2))
+c--- crossed - qb q --> qb ( --> W qb) q
+c        call amp_q_QbQ_qb(6,1,5,2,qbq1(3),qbq2(3),qbq3(3),qbq4(3))
 c--- NEW: ADDED 7/17/01
-c        call amp_q_QbQ_qb(2,1,6,5,qbq1(4),qbq2(4),qbq3(4),qbq4(4))         
-c        call amp_q_QbQ_qb(2,6,1,5,qbq1(5),qbq2(5),qbq3(5),qbq4(5))         
-c        call amp_q_QbQ_qb(5,1,6,2,qbq1(6),qbq2(6),qbq3(6),qbq4(6))   
+c        call amp_q_QbQ_qb(2,1,6,5,qbq1(4),qbq2(4),qbq3(4),qbq4(4))
+c        call amp_q_QbQ_qb(2,6,1,5,qbq1(5),qbq2(5),qbq3(5),qbq4(5))
+c        call amp_q_QbQ_qb(5,1,6,2,qbq1(6),qbq2(6),qbq3(6),qbq4(6))
 
 c--- crossed q q --> q ( --> W q) q
-        call amp_q_QbQ_qb(1,5,6,2,qq1(1),qq2(1),qq3(1),qq4(1))   
+        call amp_q_QbQ_qb(1,5,6,2,qq1(1),qq2(1),qq3(1),qq4(1))
 c--- crossed q q --> q q ( --> W q)
-        call amp_q_QbQ_qb(2,5,6,1,qq1(2),qq2(2),qq3(2),qq4(2))   
+        call amp_q_QbQ_qb(2,5,6,1,qq1(2),qq2(2),qq3(2),qq4(2))
 c--- crossed q q --> q q ( --> W q)
-c        call amp_q_QbQ_qb(2,6,5,1,qq1(3),qq2(3),qq3(3),qq4(3))   
+c        call amp_q_QbQ_qb(2,6,5,1,qq1(3),qq2(3),qq3(3),qq4(3))
 c--- crossed q q --> q ( --> W q) q
-c        call amp_q_QbQ_qb(1,6,5,2,qq1(4),qq2(4),qq3(4),qq4(4))   
+c        call amp_q_QbQ_qb(1,6,5,2,qq1(4),qq2(4),qq3(4),qq4(4))
 
 c--- crossed qb qb --> qb ( --> W qb) qb
-        call amp_q_QbQ_qb(5,1,2,6,qbqb1(1),qbqb2(1),qbqb3(1),qbqb4(1))   
+        call amp_q_QbQ_qb(5,1,2,6,qbqb1(1),qbqb2(1),qbqb3(1),qbqb4(1))
 c--- crossed qb qb --> qb qb ( --> W qb)
-        call amp_q_QbQ_qb(5,2,1,6,qbqb1(2),qbqb2(2),qbqb3(2),qbqb4(2))   
+        call amp_q_QbQ_qb(5,2,1,6,qbqb1(2),qbqb2(2),qbqb3(2),qbqb4(2))
 c--- crossed qb qb --> qb ( --> W qb) qb
-c        call amp_q_QbQ_qb(6,2,1,5,qbqb1(3),qbqb2(3),qbqb3(3),qbqb4(3))   
+c        call amp_q_QbQ_qb(6,2,1,5,qbqb1(3),qbqb2(3),qbqb3(3),qbqb4(3))
 c--- crossed qb qb --> qb qb ( --> W qb)
-c        call amp_q_QbQ_qb(6,1,2,5,qbqb1(4),qbqb2(4),qbqb3(4),qbqb4(4))   
+c        call amp_q_QbQ_qb(6,1,2,5,qbqb1(4),qbqb2(4),qbqb3(4),qbqb4(4))
 
 c--- implement symmetries
 
@@ -232,7 +232,7 @@ c--- implement symmetries
         qqb2(3)=-qq3(1)
         qqb3(3)=-qbqb2(1)
         qqb4(3)=+qq1(1)
-        
+
         qqb1(5)=+qq4(2)
         qqb2(5)=-qbqb3(2)
         qqb3(5)=-qq2(2)
@@ -242,48 +242,48 @@ c--- implement symmetries
         qqb2(6)=+qq4(2)
         qqb3(6)=-qbqb1(2)
         qqb4(6)=+qq2(2)
-        
+
         qbq1(3)=+qbq2(2)
         qbq2(3)=+qbq1(2)
         qbq3(3)=-qbqb2(2)
         qbq4(3)=+qq1(2)
-        
+
         qbq1(4)=-qbq3(1)
         qbq2(4)=+qqb4(4)
         qbq3(4)=-qbq1(1)
         qbq4(4)=+qqb2(4)
-        
+
         qbq1(5)=+qq4(1)
         qbq2(5)=-qbqb3(1)
         qbq3(5)=-qq2(1)
         qbq4(5)=+qbqb1(1)
-        
+
         qbq1(6)=-qbqb3(1)
         qbq2(6)=+qq4(1)
         qbq3(6)=-qbqb1(1)
         qbq4(6)=+qq2(1)
-          
+
         qq1(3)=+qq2(1)
         qq2(3)=+qq1(1)
         qq3(3)=-qq4(1)
         qq4(3)=-qq3(1)
-        
+
         qq1(4)=+qq2(2)
         qq2(4)=+qq1(2)
         qq3(4)=-qq4(2)
         qq4(4)=-qq3(2)
-        
+
         qbqb1(3)=+qbqb2(1)
         qbqb2(3)=+qbqb1(1)
         qbqb3(3)=-qbqb4(1)
         qbqb4(3)=-qbqb3(1)
-        
+
         qbqb1(4)=+qbqb2(2)
         qbqb2(4)=+qbqb1(2)
         qbqb3(4)=-qbqb4(2)
         qbqb4(4)=-qbqb3(2)
 
-c--- code for detecting symmetries        
+c--- code for detecting symmetries
 c        do i=1,4
 c        write(*,*) 'i=',i
 c        write(*,81) ' qqb',qqb1(i),qqb2(i),qqb3(i),qqb4(i)
@@ -306,11 +306,11 @@ c   2) Amplitude with (5<-->6)
 c   0) Interference between above
 c
 c--- q(i) qb(j) --> W + g* (--> q(k) qb(k)) with k != i,j
-        qqb_ijkk(1)=abs(qqb1(1))**2+abs(qqb3(1))**2 
+        qqb_ijkk(1)=abs(qqb1(1))**2+abs(qqb3(1))**2
         qqb_ijkk(2)=zip
         qqb_ijkk(0)=zip
 
-        qbq_ijkk(1)=abs(qbq1(1))**2+abs(qbq3(1))**2 
+        qbq_ijkk(1)=abs(qbq1(1))**2+abs(qbq3(1))**2
         qbq_ijkk(2)=zip
         qbq_ijkk(0)=zip
 c--- q(i) qb(j) --> W + g* (--> q(i) qb(i)) i.e. k = i
@@ -331,18 +331,18 @@ c--- q(i) qb(j) --> W + g* (--> q(j) qb(j)) i.e. k = j
         qbq_ijjj(0)=2d0/xn*dble(qbq1(1)*Dconjg(qbq2(3)))
 c--- q (i) qb(j) --> q(i) qb(j) ( --> W qb(k)) with k != i,j
         qqb_ijik(1)=zip
-        qqb_ijik(2)=abs(qqb2(2))**2+abs(qqb4(2))**2 
+        qqb_ijik(2)=abs(qqb2(2))**2+abs(qqb4(2))**2
         qqb_ijik(0)=zip
 
-        qbq_ijik(2)=abs(qbq2(2))**2+abs(qbq4(2))**2 
+        qbq_ijik(2)=abs(qbq2(2))**2+abs(qbq4(2))**2
         qbq_ijik(1)=zip
         qbq_ijik(0)=zip
 c--- q (i) qb(j) --> q(i) ( --> W q(k)) qb(j) with k != i,j
         qqb_ijkj(1)=zip
-        qqb_ijkj(2)=abs(qqb2(3))**2+abs(qqb4(3))**2 
+        qqb_ijkj(2)=abs(qqb2(3))**2+abs(qqb4(3))**2
         qqb_ijkj(0)=zip
 
-        qbq_ijkj(2)=abs(qbq2(3))**2+abs(qbq4(3))**2 
+        qbq_ijkj(2)=abs(qbq2(3))**2+abs(qbq4(3))**2
         qbq_ijkj(1)=zip
         qbq_ijkj(0)=zip
 c--- q(i) qb(j) --> g* --> q(l) (--> W q(k)) qb(l)
@@ -354,21 +354,21 @@ c--- q(i) qb(j) --> g* --> q(l) (--> W q(k)) qb(l)
         qbq_ijkl(2)=zip
         qbq_ijkl(0)=zip
 c--- q(i) qb(i) --> g* --> q(j) (--> W q(i)) qb(j)
-        qqb_iiij(1)=abs(qqb2(1))**2+abs(qqb4(1))**2            
-        qqb_iiij(2)=abs(qqb1(3))**2+abs(qqb3(3))**2 
-        qqb_iiij(0)=2d0/xn*dble(qqb2(1)*Dconjg(qqb1(3)))          
+        qqb_iiij(1)=abs(qqb2(1))**2+abs(qqb4(1))**2
+        qqb_iiij(2)=abs(qqb1(3))**2+abs(qqb3(3))**2
+        qqb_iiij(0)=2d0/xn*dble(qqb2(1)*Dconjg(qqb1(3)))
 
-        qbq_iiij(1)=abs(qbq2(1))**2+abs(qbq4(1))**2            
-        qbq_iiij(2)=abs(qbq1(3))**2+abs(qbq3(3))**2 
-        qbq_iiij(0)=2d0/xn*dble(qbq2(1)*Dconjg(qbq1(3)))  
+        qbq_iiij(1)=abs(qbq2(1))**2+abs(qbq4(1))**2
+        qbq_iiij(2)=abs(qbq1(3))**2+abs(qbq3(3))**2
+        qbq_iiij(0)=2d0/xn*dble(qbq2(1)*Dconjg(qbq1(3)))
 c--- q(i) qb(i) --> g* --> q(j) qb(j) (--> W qb(i))
-        qqb_iiji(1)=abs(qqb2(1))**2+abs(qqb4(1))**2            
-        qqb_iiji(2)=abs(qqb1(2))**2+abs(qqb3(2))**2 
-        qqb_iiji(0)=2d0/xn*dble(qqb2(1)*Dconjg(qqb1(2))) 
+        qqb_iiji(1)=abs(qqb2(1))**2+abs(qqb4(1))**2
+        qqb_iiji(2)=abs(qqb1(2))**2+abs(qqb3(2))**2
+        qqb_iiji(0)=2d0/xn*dble(qqb2(1)*Dconjg(qqb1(2)))
 
-        qbq_iiji(1)=abs(qbq2(1))**2+abs(qbq4(1))**2            
-        qbq_iiji(2)=abs(qbq1(2))**2+abs(qbq3(2))**2 
-        qbq_iiji(0)=2d0/xn*dble(qbq2(1)*Dconjg(qbq1(2)))  
+        qbq_iiji(1)=abs(qbq2(1))**2+abs(qbq4(1))**2
+        qbq_iiji(2)=abs(qbq1(2))**2+abs(qbq3(2))**2
+        qbq_iiji(0)=2d0/xn*dble(qbq2(1)*Dconjg(qbq1(2)))
 
 c--- NEW: ADDED 7/17/01
 c--- q(i) qb(j) --> g* --> q(l) (--> W q(k)) qb(l)
@@ -380,21 +380,21 @@ c--- q(i) qb(j) --> g* --> q(l) (--> W q(k)) qb(l)
         qbqXijkl(2)=zip
         qbqXijkl(0)=zip
 c--- q(i) qb(i) --> g* --> q(j) (--> W q(i)) qb(j)
-        qqbXiiij(1)=abs(qqb2(4))**2+abs(qqb4(4))**2            
-        qqbXiiij(2)=abs(qqb1(6))**2+abs(qqb3(6))**2 
-        qqbXiiij(0)=2d0/xn*dble(qqb2(4)*Dconjg(qqb1(6)))          
+        qqbXiiij(1)=abs(qqb2(4))**2+abs(qqb4(4))**2
+        qqbXiiij(2)=abs(qqb1(6))**2+abs(qqb3(6))**2
+        qqbXiiij(0)=2d0/xn*dble(qqb2(4)*Dconjg(qqb1(6)))
 
-        qbqXiiij(1)=abs(qbq2(4))**2+abs(qbq4(4))**2            
-        qbqXiiij(2)=abs(qbq1(6))**2+abs(qbq3(6))**2 
-        qbqXiiij(0)=2d0/xn*dble(qbq2(4)*Dconjg(qbq1(6)))  
+        qbqXiiij(1)=abs(qbq2(4))**2+abs(qbq4(4))**2
+        qbqXiiij(2)=abs(qbq1(6))**2+abs(qbq3(6))**2
+        qbqXiiij(0)=2d0/xn*dble(qbq2(4)*Dconjg(qbq1(6)))
 c--- q(i) qb(i) --> g* --> q(j) qb(j) (--> W qb(i))
-        qqbXiiji(1)=abs(qqb2(4))**2+abs(qqb4(4))**2            
-        qqbXiiji(2)=abs(qqb1(5))**2+abs(qqb3(5))**2 
-        qqbXiiji(0)=2d0/xn*dble(qqb2(4)*Dconjg(qqb1(5))) 
+        qqbXiiji(1)=abs(qqb2(4))**2+abs(qqb4(4))**2
+        qqbXiiji(2)=abs(qqb1(5))**2+abs(qqb3(5))**2
+        qqbXiiji(0)=2d0/xn*dble(qqb2(4)*Dconjg(qqb1(5)))
 
-        qbqXiiji(1)=abs(qbq2(4))**2+abs(qbq4(4))**2            
-        qbqXiiji(2)=abs(qbq1(5))**2+abs(qbq3(5))**2 
-        qbqXiiji(0)=2d0/xn*dble(qbq2(4)*Dconjg(qbq1(5)))  
+        qbqXiiji(1)=abs(qbq2(4))**2+abs(qbq4(4))**2
+        qbqXiiji(2)=abs(qbq1(5))**2+abs(qbq3(5))**2
+        qbqXiiji(0)=2d0/xn*dble(qbq2(4)*Dconjg(qbq1(5)))
 c--- q(i) qb(j) --> W + g* (--> q(i) qb(i)) i.e. k = i
         qqbxijii(1)=abs(qqb1(4))**2+abs(qqb3(4))**2
         qqbxijii(2)=abs(qqb2(5))**2+abs(qqb4(5))**2
@@ -413,21 +413,21 @@ c--- q(i) qb(j) --> W + g* (--> q(j) qb(j)) i.e. k = j
         qbqxijjj(0)=2d0/xn*dble(qbq1(4)*Dconjg(qbq2(6)))
 c--- q (i) qb(j) --> q(i) qb(j) ( --> W qb(k)) with k != i,j
         qqbxijik(1)=zip
-        qqbxijik(2)=abs(qqb2(5))**2+abs(qqb4(5))**2 
+        qqbxijik(2)=abs(qqb2(5))**2+abs(qqb4(5))**2
         qqbxijik(0)=zip
 
-        qbqxijik(2)=abs(qbq2(5))**2+abs(qbq4(5))**2 
+        qbqxijik(2)=abs(qbq2(5))**2+abs(qbq4(5))**2
         qbqxijik(1)=zip
         qbqxijik(0)=zip
 c--- q (i) qb(j) --> q(i) ( --> W q(k)) qb(j) with k != i,j
         qqbxijkj(1)=zip
-        qqbxijkj(2)=abs(qqb2(6))**2+abs(qqb4(6))**2 
+        qqbxijkj(2)=abs(qqb2(6))**2+abs(qqb4(6))**2
         qqbxijkj(0)=zip
 
-        qbqxijkj(2)=abs(qbq2(6))**2+abs(qbq4(6))**2 
+        qbqxijkj(2)=abs(qbq2(6))**2+abs(qbq4(6))**2
         qbqxijkj(1)=zip
         qbqxijkj(0)=zip
-     
+
 c--- q(i) q(i) --> q(i) ( --> W q(j) ) q(i)
         qq_iiji(1)=abs(qq1(1))**2+abs(qq3(1))**2
         qq_iiji(2)=abs(qq1(2))**2+abs(qq3(2))**2
@@ -443,11 +443,11 @@ c--- q(i) q(j) --> q(i) q(j) ( --> W q(k) )
 c--- q(i) q(j) --> q(i) ( --> W q(j) ) q(j)
         qq_ijjj(1)=abs(qq1(1))**2+abs(qq3(1))**2
         qq_ijjj(2)=abs(qq1(4))**2+abs(qq3(4))**2
-        qq_ijjj(0)=2d0/xn*dble(qq1(1)*Dconjg(qq1(4)))  
-c--- q(i) q(j) --> q(i) q(j) ( --> W q(i) ) 
+        qq_ijjj(0)=2d0/xn*dble(qq1(1)*Dconjg(qq1(4)))
+c--- q(i) q(j) --> q(i) q(j) ( --> W q(i) )
         qq_ijii(1)=abs(qq1(3))**2+abs(qq3(3))**2
         qq_ijii(2)=abs(qq1(2))**2+abs(qq3(2))**2
-        qq_ijii(0)=2d0/xn*dble(qq1(3)*Dconjg(qq1(2)))  
+        qq_ijii(0)=2d0/xn*dble(qq1(3)*Dconjg(qq1(2)))
 c--- NEW: ADDED 7/17/01
 c--- q(i) q(i) --> q(i) ( --> W q(j) ) q(i)
         qq_iiij(1)=abs(qq1(4))**2+abs(qq3(4))**2
@@ -477,11 +477,11 @@ c--- qb(i) qb(j) --> qb(i) qb(j) ( --> W qb(k) )
 c--- qb(i) qb(j) --> qb(i) ( --> W qb(j) ) qb(j)
         qbqb_ijjj(1)=abs(qbqb1(1))**2+abs(qbqb3(1))**2
         qbqb_ijjj(2)=abs(qbqb1(4))**2+abs(qbqb3(4))**2
-        qbqb_ijjj(0)=2d0/xn*dble(qbqb1(1)*Dconjg(qbqb1(4)))  
-c--- qb(i) qb(j) --> qb(i) qb(j) ( --> W qb(i) ) 
+        qbqb_ijjj(0)=2d0/xn*dble(qbqb1(1)*Dconjg(qbqb1(4)))
+c--- qb(i) qb(j) --> qb(i) qb(j) ( --> W qb(i) )
         qbqb_ijii(2)=abs(qbqb1(2))**2+abs(qbqb3(2))**2
         qbqb_ijii(1)=abs(qbqb1(3))**2+abs(qbqb3(3))**2
-        qbqb_ijii(0)=2d0/xn*dble(qbqb1(2)*Dconjg(qbqb1(3)))  
+        qbqb_ijii(0)=2d0/xn*dble(qbqb1(2)*Dconjg(qbqb1(3)))
 c--- NEW: ADDED 7/17/01
 c--- qb(i) qb(i) --> qb(i) ( --> W qb(j) ) qb(i)
         qbqb_iiij(1)=abs(qbqb1(4))**2+abs(qbqb3(4))**2
@@ -500,7 +500,7 @@ c--- qb(i) qb(j) --> qb(i) ( --> W qb(k) ) qb(j)
 c--- remove all subleading colour pieces if they are not required
       if (colourchoice .eq. 1) then
         qqb_ijkk(0)=zip
-        qqb_ijii(0)=zip 
+        qqb_ijii(0)=zip
         qqb_ijjj(0)=zip
         qqb_ijkj(0)=zip
         qqb_ijik(0)=zip
@@ -535,10 +535,10 @@ c--- remove all subleading colour pieces if they are not required
         qbqxijjj(0)=zip
       endif
 
-      
-c--- 4-quark contribution to matrix elements      
+
+c--- 4-quark contribution to matrix elements
       if (Qflag) then
-      
+
       do j=-nf,nf
       do k=-nf,nf
 
@@ -575,7 +575,7 @@ c--- Q QBAR - different flavours
              msqx(2,j,k,k,+l)=facqq*Vsq(j,-l)*qqbxijkj(2)
            endif
            enddo
-            
+
          else
 c--- Q QBAR - same flavours
           Vfac=0d0
@@ -621,7 +621,7 @@ c--- QBAR Q - different flavours
      .             +qbq_ijii(1)+qbq_ijjj(1))
           mqq(2,j,k)=facqq*Vsq(j,k)*(qbq_ijii(2)+qbq_ijjj(2))
      .             +facqq*(Vsum(k)-Vsq(j,k))*qbq_ijkj(2)
-     .             +facqq*(Vsum(j)-Vsq(j,k))*qbq_ijik(2)          
+     .             +facqq*(Vsum(j)-Vsq(j,k))*qbq_ijik(2)
            do i=0,2
            msqx(i,j,k,-j,j)=facqq*Vsq(j,k)*qbq_ijjj(i)
            msqx(i,j,k,k,-k)=facqq*Vsq(j,k)*qbq_ijii(i)
@@ -770,15 +770,15 @@ c--- QBAR QBAR - same flavours
       msq(j,k)=mqq(0,j,k)+mqq(1,j,k)+mqq(2,j,k)
       enddo
       enddo
-      
+
       endif
-      
-c--- 2-quark, 2-gluon contribution to matrix elements      
+
+c--- 2-quark, 2-gluon contribution to matrix elements
       if (Gflag) then
-      
+
       do j=-nf,nf
       do k=-nf,nf
-      
+
       do i=0,2
         msqx_cs(i,j,k)=0d0
       enddo
@@ -855,12 +855,12 @@ c--- 2-quark, 2-gluon contribution to matrix elements
             msqx_cs(i,j,k)=Vfac*ggWqbq2_cs(i)
           enddo
       endif
-      
+
       enddo
       enddo
-      
+
       endif
-      
+
 c--- restore proper colourchoice if necessary
       if ((part .eq. 'real') .or. (part .eq. 'virt')) then
         colourchoice=rcolourchoice
@@ -868,8 +868,8 @@ c--- restore proper colourchoice if necessary
 c--- restore proper parton sub-process selection, if necessary
       if ((part .eq. 'real') .and. (Qflag .eqv. .true.)) then
         Gflag=rGflag
-      endif     
+      endif
 
       return
       end
-     
+

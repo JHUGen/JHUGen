@@ -12,7 +12,7 @@ c                           |    |
 c                           |    --> e^-(p3)+nubar(p4)
 c                           |
 c                           ---> Z(e^-(p5),e^+(p6)) Z(mu^-(p7),mu^+(p8))
-      implicit none 
+      implicit none
       include 'constants.f'
       include 'masses.f'
       include 'ewcouple.f'

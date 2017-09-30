@@ -20,16 +20,16 @@ c----p(6,i) and p(7,i) are set equal to zero
       do nu=1,4
       do j=1,mxpart
       p(j,nu)=0d0
-      enddo 
-      enddo 
+      enddo
+      enddo
       wt3=0d0
-      
+
       taulowest=max(taumin,((m3+m4+m5)/sqrts)**2)
-      
+
       tau=exp(log(taulowest)*r(6))
       y=0.5d0*log(tau)*(1d0-2d0*r(7))
       xjac=log(taulowest)*tau*log(tau)
-      
+
       xx(1)=dsqrt(tau)*exp(+y)
       xx(2)=dsqrt(tau)*exp(-y)
 
@@ -41,7 +41,7 @@ c      xjac=1d0
 c      endif
 
 c---if x's out of normal range alternative return
-      if   ((xx(1) .gt. 1d0) 
+      if   ((xx(1) .gt. 1d0)
      & .or. (xx(2) .gt. 1d0)
      & .or. (xx(1) .lt. xmin)
      & .or. (xx(2) .lt. xmin)) return 1
@@ -64,7 +64,7 @@ c---if x's out of normal range alternative return
       p(3,nu)=p3(nu)
       p(4,nu)=p4(nu)
       p(5,nu)=p5(nu)
-      enddo 
+      enddo
 
       wt3=xjac*pswt
 

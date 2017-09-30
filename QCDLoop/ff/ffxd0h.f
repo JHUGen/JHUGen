@@ -16,7 +16,7 @@ c Fixed ieps error in ffdcrr (ffcxs4.f), added real case in ffcrr, debugging
 c info in ffxd0, and warned against remaining errors for del2=0 in ffrot4
 c (ffxd0h.f)
 c
-*--#] log: 
+*--#] log:
 *###[ ffrot4:
 	subroutine ffrot4(irota,del2,xqi,dqiqj,qiDqj,xpi,dpipj,piDpj,ii,
      +		itype,ier)

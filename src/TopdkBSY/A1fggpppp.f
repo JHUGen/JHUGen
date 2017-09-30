@@ -7,7 +7,7 @@ C---- taken from arXiv:1101.5947 [hep-ph], Eq. (100)
       include 'zabprods_decl.f'
       double complex BSYA1fggpppp
       integer e1,p2,p3,e4
- 
+
       A1fggpppp=BSYA1fggpppp(e1,p2,p3,e4,za,zb,zab,zba)
       return
       end

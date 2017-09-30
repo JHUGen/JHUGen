@@ -223,7 +223,7 @@
 		if ( initir.eq.0 ) then
 		    initir = 1
 		    print *,'ffxdb0: IR divergent B0'', using cutoff ',
-     +		    	delta 
+     +		    	delta
 		endif
 		if ( delta.eq.0 ) then
 		    call fferr(74,ier)

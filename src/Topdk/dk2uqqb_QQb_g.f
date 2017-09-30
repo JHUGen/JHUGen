@@ -68,7 +68,7 @@ c--- q-qbar amplitudes
       enddo
       enddo
       enddo
-      
+
 c--- gg amplitudes
       mqed(:,:,:,:)=mab(:,:,:,:)+mba(:,:,:,:)
       gg=0d0
@@ -83,7 +83,7 @@ c--- gg amplitudes
       enddo
       enddo
       enddo
-       
+
 C---fill qb-q, gg and q-qb elements
       do j=-nf,nf
       if ((j .lt. 0) .or. (j .gt. 0)) then

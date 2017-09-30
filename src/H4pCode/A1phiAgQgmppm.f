@@ -17,12 +17,12 @@ c---   i.e. complete LHS
      . Lsm1_2me,A0phiAgQgmppm
       double precision s123,s234,s412,s341,mhsq
       zab2(j1,j2,j3,j4)=+za(j1,j2)*zb(j2,j4)+za(j1,j3)*zb(j3,j4)
-      
+
       s412=s(j4,j1)+s(j4,j2)+s(j1,j2)
       s123=s(j1,j2)+s(j1,j3)+s(j2,j3)
       s234=s(j2,j3)+s(j2,j4)+s(j3,j4)
       s341=s(j3,j4)+s(j3,j1)+s(j4,j1)
-      mhsq=s(j1,j2)+s(j1,j3)+s(j1,j4)+s(j2,j3)+s(j2,j4)+s(j3,j4)      
+      mhsq=s(j1,j2)+s(j1,j3)+s(j1,j4)+s(j2,j3)+s(j2,j4)+s(j3,j4)
       l123=lnrat(musq,-s123)
       l34=lnrat(musq,-s(j3,j4))
       l41=lnrat(musq,-s(j4,j1))
@@ -51,16 +51,16 @@ c---   i.e. complete LHS
      .  /(s(j1,j2)*za(j1,j2)*za(j2,j3))
      . -0.5d0*zb(j2,j3)*za(j3,j4)*zab2(j2,j1,j4,j3)
      .  /(za(j2,j3)*zb(j3,j4)*zab2(j2,j3,j4,j1))
-            
+
       A1phiAgQgmppmL=A1phiAgQgmppmL
      . +A0phiAgQgmppm(j1,j2,j3,j4,za,zb)*(
      .   V2L
      .  -Lsm1DS(s(j4,j1),s(j1,j2),s412)
      .  -Lsm1DS(s(j2,j3),s(j3,j4),s234))
-      
+
       return
       end
-      
+
       double complex function A1phiAgQgmppmR(j1,j2,j3,j4,za,zb)
       implicit none
 C     implementation of arXiv:0906.0008v1 reflection relation (4.2.3)
@@ -68,12 +68,12 @@ C     implementation of arXiv:0906.0008v1 reflection relation (4.2.3)
       include 'zprods_decl.f'
       integer j1,j2,j3,j4
       double complex A1phiAgQgmmppL
- 
+
       A1phiAgQgmppmR=A1phiAgQgmmppL(j1,j4,j3,j2,za,zb)
-      
+
       return
       end
-      
+
       double complex function A1phiAgQgmppmf(j1,j2,j3,j4,za,zb)
       implicit none
 C     implementation of arXiv:0906.0008v1, Eq. 4.28
@@ -86,12 +86,12 @@ c---   i.e. complete LHS
       include 'sprods_com.f'
       integer j1,j2,j3,j4
       double complex A0phiAgQgmppm,lnrat,l123
-      
+
       l123=lnrat(musq,-(s(j1,j2)+s(j1,j3)+s(j2,j3)))
- 
+
       A1phiAgQgmppmf=A0phiAgQgmppm(j1,j2,j3,j4,za,zb)*(
      . -2d0/3d0*(epinv+l123)-10d0/9d0)
-      
+
       return
       end
-      
+

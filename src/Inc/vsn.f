@@ -1,2 +1,2 @@
       double precision verysmallnumber
-      parameter(verysmallnumber=1d-9) 
+      parameter(verysmallnumber=1d-9)

@@ -22,7 +22,7 @@
       integer j1,j2,j3,j4,j5,j6,j7
       double precision mqqb(2,2),m1,m2,m0,fac
       double complex tempm0,m(6),amp_qqggg
-      
+
       fac=avegg*gsq**3*esq**2*xn**3*cf*8d0
 c--- extra factor of 8 due to colour matrix normalization (rt2**6)
 
@@ -67,7 +67,7 @@ C initialize loop sums to zero
           tempm0=tempm0+m(j)
           m2=m2+abs(m(j))**2
         enddo
-        
+
         if ((colourchoice .eq. 1) .or. (colourchoice .eq. 0)) then
           mqqb(hq,lh)=mqqb(hq,lh)+fac*m2
         endif
@@ -84,10 +84,10 @@ c--- (plus perms)
      .    +cdabs(m(2)+m(1)+m(5))**2
      .    +cdabs(m(6)+m(3)+m(2))**2
           mqqb(hq,lh)=mqqb(hq,lh)+fac*(-m1/xnsq)
-        endif       
+        endif
         if ((colourchoice .eq. 3) .or. (colourchoice .eq. 0)) then
           m0=cdabs(tempm0)**2
-          mqqb(hq,lh)=mqqb(hq,lh)+fac*m0*(xnsq+1d0)/xnsq**2        
+          mqqb(hq,lh)=mqqb(hq,lh)+fac*m0*(xnsq+1d0)/xnsq**2
         endif
 
       enddo
@@ -96,9 +96,9 @@ c--- (plus perms)
 
       enddo
       enddo
- 
+
       mqqb(2,1)=mqqb(1,2)
       mqqb(2,2)=mqqb(1,1)
-      
+
       return
       end

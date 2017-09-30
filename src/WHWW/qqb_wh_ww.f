@@ -12,7 +12,7 @@ c                           |    |
 c                           |    --> e^-(p3)+nubar(p4)
 c                           |
 c                           ---> W^+(nu(p5),e^+(p6))W^-(e^-(p7),nub(p8))
-      implicit none 
+      implicit none
       include 'constants.f'
       include 'masses.f'
       include 'ewcouple.f'
@@ -35,7 +35,7 @@ c---calculate the 2 W propagators
       prop=     ((s(1,2)-wmass**2)**2+(wmass*wwidth)**2)
       prop=prop*((s(3,4)-wmass**2)**2+(wmass*wwidth)**2)
       prop=prop*((s5678-hmass**2)**2+(hmass*hwidth)**2)
-      
+
       fac=xn*gwsq**3*wmass**2/prop
       call hwwdecay(p,5,6,7,8,hdecay)
       fac=fac*hdecay

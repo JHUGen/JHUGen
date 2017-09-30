@@ -4,7 +4,7 @@
       include 'zprods_decl.f'
       include 'sprods_com.f'
 c*******************************************************************
-c     the matrix elements of the  
+c     the matrix elements of the
 C     helicity amplitudes for the QCD process
 c     q(-p1)+qbar(-p2) --> l(p3)+abar(p4)+g(p5)+g(p6)
 c     multiplied by ((a+l)^2-M**2)/(a+l)^2/g^4

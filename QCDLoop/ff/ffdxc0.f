@@ -862,7 +862,7 @@
 	endif
   410	continue
 	if ( idone(ii) .ne. 0 .and. idone(ii-3) .ne. 0 .and.
-     +	     absc(clogi(ii)-clogi(ii-3)).lt.xloss*absc(clogi(ii)) .and. 
+     +	     absc(clogi(ii)-clogi(ii-3)).lt.xloss*absc(clogi(ii)) .and.
      +	     ilogi(ii).eq.ilogi(ii-3) ) then
 *  #[	    subtract more smartly:
 	    if ( isoort(l).gt.0 .and. isoort(l+1).ge.0 ) then
@@ -890,10 +890,10 @@
 		c = csom/(cdyz(2,2,3,i)*cdyz(2,1,4,i))
 		c = zfflo1(c,ier)
 		if ( lwrite ) print *,'som is  : ',c
-*		
-*		the log is never much bigger than 1, so demand at least 
+*
+*		the log is never much bigger than 1, so demand at least
 *		accuracy to 0.1; this will catch all i*pi errors
-*		
+*
 		if ( abs(clogi(ii-3)-clogi(ii)-c).gt.0.1 ) then
 		    print *,'ffdxc0: error in smart logs: ',clogi(ii-3)-
      +		    	clogi(ii),c,' not used'

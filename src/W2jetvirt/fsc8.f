@@ -1,4 +1,4 @@
-      double complex function Fsc8(j1,j2,j3,j4,j5,j6,za,zb) 
+      double complex function Fsc8(j1,j2,j3,j4,j5,j6,za,zb)
       implicit none
       include 'constants.f'
       include 'zprods_decl.f'
@@ -6,7 +6,7 @@
       integer j1,j2,j3,j4,j5,j6
       double complex L0,L1,Lsm1,Lsm1_2me,Lnrat
       double precision t
-      Fsc8= 
+      Fsc8=
      .-((za(j1,j5)*za(j2,j5)*((Lnrat(-s(j2,j3),-s(j5,j6))*za(j1,j2))/
      .(za(j1,j4)*za(j2,j3))+Lnrat(-s(j1,j2),-s(j5,j6))/za(j3,j4)))/
      .(za(j1,j3)*za(j1,j4)*za(j5,j6)))+

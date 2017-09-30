@@ -9,9 +9,9 @@
       arg2=-p2sq/(msq-p2sq)
       omarg2=1d0-arg2
 
-      if (omarg2 .lt. 0d0) then 
+      if (omarg2 .lt. 0d0) then
       dilog2=dcmplx(pisqo6-ddilog(omarg2))-log(arg2)*wlog
-      else 
+      else
       dilog2=dcmplx(ddilog(arg2))
       endif
 

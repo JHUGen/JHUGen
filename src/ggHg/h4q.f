@@ -4,7 +4,7 @@ C     Taken from Kauffman,Desai,Risal
 C     PRD 55 1997 (4009)
 c     q(-p1)+qp(-p2)--> h --> q(p3)+qp(p4)
 C     returns overall matrix element squared
-C     summed over colors and spins with factor of g^4*A^2 removed 
+C     summed over colors and spins with factor of g^4*A^2 removed
       include 'constants.f'
       include 'sprods_com.f'
       double precision ampsq,ammsq
@@ -35,7 +35,7 @@ C     Taken from Kauffman,Desai,Risal
 C     PRD 55 1997 (4009)
 c     q(-p1)+qp(-p2)--> h --> q(p3)+qp(p4)
 C     returns overall matrix element squared
-C     summed over colors and spins with factor of g^4*A^2 removed 
+C     summed over colors and spins with factor of g^4*A^2 removed
       include 'constants.f'
       include 'sprods_com.f'
       double precision ampsqid,ammsq,ammsqi,ampsq_a,ampsq_b,ampsq_i
@@ -74,7 +74,7 @@ c--- term that is colour-suppressed
       ampsq_b=ammsq(p1,p2,p4,p3)+ammsq(p4,p2,p1,p3)
      .       +ammsq(p1,p3,p4,p2)+ammsq(p4,p3,p1,p2)
       ampsq_i=ammsqi(p1,p2,p3,p4)+ammsqi(p3,p4,p1,p2)
-      
+
       ampsqid=ampsq_a+ampsq_b+ampsq_i
 
       return

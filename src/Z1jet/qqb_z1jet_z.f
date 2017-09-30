@@ -56,7 +56,7 @@ c--- (g,g)
       Q1(a,g,g,is)=Q1(q,g,g,is)
       Q2(q,g,g,is)=Q1(q,g,g,is)
       Q2(a,g,g,is)=Q1(q,g,g,is)
-      
+
       enddo
 
       do is=1,3
@@ -70,6 +70,6 @@ c--- (g,g)
       Q2(g,q,a,is)=Q2(g,q,q,is)
 
       enddo
-      
+
       return
       end

@@ -1,7 +1,7 @@
       subroutine ZZtri12_34LL(j1,j2,j3,j4,j5,j6,za,zb,mt,Xpp,Xmp,
      & Xpm,Xmm)
 C-----Author: R.K. Ellis (September 2013)
-C-----Triangle coefficient for LL coupling 
+C-----Triangle coefficient for LL coupling
 C-----Triangle C0(p12,p34,0,0,0)
 C-----Tri3masscoeff is taken from BDK (11.6) and (11.7)
 C-----The full mt^2 dependence is calculated in ZZmassivetri
@@ -25,7 +25,7 @@ c     & ,Tri3masscoeff_new,Tri3masscoeffmtsq,
          elseif (h3 .eq.2) then
              k3=j4
              k4=j3
-         endif 
+         endif
       do h5=1,2
          if (h5 .eq.1) then
              k5=j5
@@ -33,7 +33,7 @@ c     & ,Tri3masscoeff_new,Tri3masscoeffmtsq,
          elseif (h5 .eq.2) then
              k5=j6
              k6=j5
-         endif 
+         endif
 
 C----Helicity 1^+ 2^+
       Xpp(:,:)=czip
@@ -41,7 +41,7 @@ C----Helicity 1^+ 2^+
 
       if (computemp) then
 C----Helicity 1^- 2^+
-        Xmp(h3,h5)=Tri3masscoeff(k1,k2,k3,k4,k5,k6,za,zb) 
+        Xmp(h3,h5)=Tri3masscoeff(k1,k2,k3,k4,k5,k6,za,zb)
 c        write(6,*) 'Explicit',h3,h5,
 c     &   Tri3masscoeffmtsq(k1,k2,k3,k4,k5,k6,za,zb)\
       else
@@ -49,7 +49,7 @@ c     &   Tri3masscoeffmtsq(k1,k2,k3,k4,k5,k6,za,zb)\
       endif
       enddo
       enddo
-      
+
 c--- obtain remaining coefficients by c.c.
       do h3=1,2
       do h5=1,2
@@ -58,7 +58,7 @@ c--- obtain remaining coefficients by c.c.
       enddo
       enddo
 
-      
+
       return
       end
-      
+

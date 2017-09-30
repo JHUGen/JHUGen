@@ -1,9 +1,9 @@
-      double complex function atrLLL(j1,j2,j3,j4,j5,j6,za,zb) 
+      double complex function atrLLL(j1,j2,j3,j4,j5,j6,za,zb)
       implicit none
 c---atrLLL is the amplitude for
 c---q+(-p4)+Q+(-p2)+l+(-p5) ---> q-(p1)+Q-(p3)+l-(p6)
-c---All outgoing particles are left-handed, 
-c---(obtained from atree(pm) all right-handed) 
+c---All outgoing particles are left-handed,
+c---(obtained from atree(pm) all right-handed)
       include 'constants.f'
       include 'zprods_decl.f'
       include 'sprods_com.f'

@@ -10,7 +10,7 @@ c                           |    --> nu(p3)+e^+(p4)
 c                           |
 c                           ---> b(p5)+bb(p6)
 c   positively charged W only
-      implicit none 
+      implicit none
       include 'constants.f'
       include 'qcdcouple.f'
       include 'ewcouple.f'
@@ -33,17 +33,17 @@ c   positively charged W only
       call spinoru(7,p,za,zb)
 
       if (
-     .      (s(5,6) .lt. four*mbsq) 
-     . .or. (s(1,5)*s(2,5)/s(1,2) .lt. mbsq) 
+     .      (s(5,6) .lt. four*mbsq)
+     . .or. (s(1,5)*s(2,5)/s(1,2) .lt. mbsq)
      . .or. (s(1,6)*s(2,6)/s(1,2) .lt. mbsq) ) return
 
       fac=gsq**3*gw**4/4d0
-      
+
 c--- shortcut if we're doing gqonly
       if (gqonly) then
-        qqbWbbg=0d0      
+        qqbWbbg=0d0
         qbqWbbg=0d0
-      else     
+      else
         call wbbgamp(1,2,7,5,6,3,4,5,qqbWbbg)
         call wbbgamp(2,1,7,5,6,3,4,5,qbqWbbg)
       endif
@@ -65,7 +65,7 @@ c--- shortcut if we're doing gqonly
       msq(j,k)=fac*aveqq*Vsq(j,k)*qbqWbbg
 
       elseif ((j .gt. 0) .and. (k .eq. 0)) then
-      msq(j,k)=fac*aveqg*Vsum(j)*qgWbbq 
+      msq(j,k)=fac*aveqg*Vsum(j)*qgWbbq
       elseif ((j .lt. 0) .and. (k .eq. 0)) then
       msq(j,k)=fac*aveqg*Vsum(j)*qbgWbbqb
 

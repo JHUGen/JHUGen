@@ -26,7 +26,7 @@ C     xpi(13) = +xpi(5)-xpi(6)+xpi(7)-xpi(8)+xpi(9)+xpi(10)
      .      2,3,4,1,6,7,8,5,10,9,11,13,12
      . /
 
-      save swap 
+      save swap
 !$omp threadprivate(swap)
 
       call qlxpicheck(xpi)
@@ -43,14 +43,14 @@ C     xpi(13) = +xpi(5)-xpi(6)+xpi(7)-xpi(8)+xpi(9)+xpi(10)
       Ival(-2)=czip
       Ival(-1)=czip
 
-      call qlYcalc(xpo,Y,Yalt) 
+      call qlYcalc(xpo,Y,Yalt)
 
-C---  divergent three mass box 
+C---  divergent three mass box
       if     ((qlzero(Y(1,1)))
      .   .and.(qlzero(Y(1,2)))
      .   .and.(qlzero(Y(1,4)))) then
       call qlbox16(Y,musq,Ival)
-C---  finite three mass box 
+C---  finite three mass box
       else
       xpo(11) = +xpo(5)+xpo(6)+xpo(7)+xpo(8)-xpo(9)-xpo(10)
       xpo(12) = -xpo(5)+xpo(6)-xpo(7)+xpo(8)+xpo(9)+xpo(10)

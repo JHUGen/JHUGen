@@ -2,7 +2,7 @@
       implicit none
       include 'constants.f'
       double precision qsq,msq,ddilog,r,omr,t13bar,t23bar
-      double complex lnrat,dilogt,dilogu,wlog,dilog1,dilog2,dilogq 
+      double complex lnrat,dilogt,dilogu,wlog,dilog1,dilog2,dilogq
 
 C     This function is equal to (in looptools notation)
 c      Lsm2_2m_ff(t13-msq,t23-msq,qsq,msq)=
@@ -21,22 +21,22 @@ c      D0(Pg,Pc,Ps,0,0,msq,msq)=
 C      +C0(Pg,Pc,0,0,msq)/2/Ps.Pc
 C      -C0(Pg,Pc+Ps;0,0,msq)*Pg.(Pc+Ps)/2/Pg.Pc/Ps.Pc
 C      +Lsm2_2m_ff(2*Pg.Pc,2*Ps.Pc,qsq,msq)/4/Pg.Pc/Ps.Pc
-      
-      
+
+
 
 c      dilogt ~ ddilog(t13/msq))
 c      dilogu ~ ddilog(t23/msq))
 c      dilogq ~ ddilog(qsq/msq)
 c      dilog1 ~ ddilog((t13-qsq)/(t13-msq))
 c      dilog2 ~ ddilog((t23-qsq)/(t23-msq))
- 
-C      t13=t13bar+msq 
-C      t23=t23bar+msq 
+
+C      t13=t13bar+msq
+C      t23=t23bar+msq
 
       r=-t13bar/msq
       omr=1d0-r
       wlog=lnrat(-t13bar,msq)
-      if (omr .gt. one) then 
+      if (omr .gt. one) then
          dilogt=dcmplx(pisqo6-ddilog(r))-wlog*dcmplx(log(omr))
       else
          dilogt=dcmplx(ddilog(omr))
@@ -45,7 +45,7 @@ C      t23=t23bar+msq
       r=-t23bar/msq
       omr=1d0-r
       wlog=lnrat(-t23bar,msq)
-      if (omr .gt. one) then 
+      if (omr .gt. one) then
          dilogu=dcmplx(pisqo6-ddilog(r))-wlog*dcmplx(log(omr))
       else
          dilogu=dcmplx(ddilog(omr))
@@ -54,7 +54,7 @@ C      t23=t23bar+msq
       r=-(msq-qsq)/t13bar
       omr=1d0-r
       wlog=lnrat(msq-qsq,-t13bar)
-      if (omr .gt. one) then 
+      if (omr .gt. one) then
          dilog1=dcmplx(pisqo6-ddilog(r))-wlog*dcmplx(log(omr))
       else
          dilog1=dcmplx(ddilog(omr))
@@ -63,7 +63,7 @@ C      t23=t23bar+msq
       r=-(msq-qsq)/t23bar
       omr=1d0-r
       wlog=lnrat(msq-qsq,-t23bar)
-      if (omr .gt. one) then 
+      if (omr .gt. one) then
          dilog2=dcmplx(pisqo6-ddilog(r))-wlog*dcmplx(log(omr))
       else
          dilog2=dcmplx(ddilog(omr))
@@ -72,7 +72,7 @@ C      t23=t23bar+msq
       r=(msq-qsq)/msq
       omr=1d0-r
       wlog=lnrat(msq-qsq,msq)
-      if (omr .gt. one) then 
+      if (omr .gt. one) then
          dilogq=dcmplx(pisqo6-ddilog(r))-wlog*dcmplx(log(omr))
       else
          dilogq=dcmplx(ddilog(omr))

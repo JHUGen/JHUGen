@@ -9,7 +9,7 @@
       double precision Vud,Vus,Vub,Vcd,Vcs,Vcb,rtxw
       common/cabib/Vud,Vus,Vub,
      &             Vcd,Vcs,Vcb
-      
+
 c---- initialize Vsq
       do j=-nf,nf
       do k=-nf,nf
@@ -30,7 +30,7 @@ c set all other couplings (for W+2 jets) to zero too
       grsq(j,k)=0d0
       enddo
       enddo
-      
+
 C case Z0
       if (nwz .eq. 0) then
       Vsq(1,-1)=1d0
@@ -50,12 +50,12 @@ C case Z0
         grsq(j,-j)=gr(j,-j)**2
       enddo
       flsq=fl**2
-      frsq=fr**2      
+      frsq=fr**2
       return
 
 C case W+
-      elseif (nwz .eq. 1) then 
-      
+      elseif (nwz .eq. 1) then
+
       Vsq(2,-1)=Vud**2
       Vsq(2,-3)=Vus**2
       Vsq(2,-5)=Vub**2
@@ -72,9 +72,9 @@ C case W+
       flsq=gwsq/2d0
       fl=dsqrt(flsq)
 
-  
+
 C case W-
-      elseif (nwz .eq. -1) then 
+      elseif (nwz .eq. -1) then
 
       Vsq(1,-2)=Vud**2
       Vsq(3,-2)=Vus**2
@@ -93,7 +93,7 @@ C case W-
       fl=dsqrt(flsq)
 
 C case (W+ + W-)
-      elseif (nwz .eq. 2) then 
+      elseif (nwz .eq. 2) then
 
 C case W+
       Vsq(2,-1)=Vud**2
@@ -121,11 +121,11 @@ C case W-
       glsq(1,-4)=gwsq/2d0
       glsq(3,-4)=gwsq/2d0
       glsq(5,-4)=gwsq/2d0
-      
+
       flsq=gwsq/2d0
       fl=dsqrt(flsq)
 
-      endif     
+      endif
 
       do j=-nf,nf
       do k=-nf,nf

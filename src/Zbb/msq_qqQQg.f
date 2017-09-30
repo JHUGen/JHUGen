@@ -18,12 +18,12 @@ c---   j=4 : Z couples to the (1,2) line in M and the (3,4) in M* (IM)
       double complex temp
       double precision xA(4),xD(4),xF(4),xG(4)
       double precision xy(4),xz(4),xxy(4),xsq(2,2,2,2,4)
-      
+
 c--- note that 'a' corresponds to the perm 1,2,3,4,5
       call nagyqqQQg(i1,i2,i3,i4,i5,i6,i7,a1,a2,a3,a4)
 c---           'b' corresponds to the perm 3,4,1,2,5
       call nagyqqQQg(i3,i4,i1,i2,i5,i6,i7,b1,b2,b3,b4)
-            
+
       do hq=1,2
       do Qh=1,2
       do hg=1,2
@@ -31,7 +31,7 @@ c---           'b' corresponds to the perm 3,4,1,2,5
 
 c--- eqn (B57)
 c        mbar1=a1(hq,Qh,hg,lh)+b3(Qh,hq,hg,lh)
-c        mbar2=a2(hq,Qh,hg,lh)+b4(Qh,hq,hg,lh)  
+c        mbar2=a2(hq,Qh,hg,lh)+b4(Qh,hq,hg,lh)
 c--- introduce new notation for eqn (B57) with (1<-->3, 2<-->4)
 c--- mbar3 = m1(3,4,1,2) + m3(1,2,3,4)
 c--- mbar4 = m2(3,4,1,2) + m4(1,2,3,4)

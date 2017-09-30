@@ -30,10 +30,10 @@ C***************************************************************C
       if(q2.lt.qsqmin.or.q2.gt.qsqmax) print 99,q2
 c      if(x.lt.xmin.or.x.gt.xmax)       print 98,x
           if(mode.eq.1) then
-        call mrst1_2004(x,q2,upv,dnv,usea,dsea,str,chm,bot,glu) 
+        call mrst1_2004(x,q2,upv,dnv,usea,dsea,str,chm,bot,glu)
       elseif(mode.eq.2) then
-        call mrst2_2004(x,q2,upv,dnv,usea,dsea,str,chm,bot,glu) 
-      endif 
+        call mrst2_2004(x,q2,upv,dnv,usea,dsea,str,chm,bot,glu)
+      endif
   99  format('  WARNING:  Q^2 VALUE IS OUT OF RANGE   ','q2= ',e10.5)
   98  format('  WARNING:   X  VALUE IS OUT OF RANGE   ','x= ',e10.5)
       return
@@ -128,7 +128,7 @@ c notation: 1=uval 2=val 3=glue 4=usea 5=chm 6=str 7=btm 8=dsea
 
       init=1
    10 continue
-      
+
       xlog=dlog(x)
       qsqlog=dlog(qsq)
 
@@ -140,12 +140,12 @@ c notation: 1=uval 2=val 3=glue 4=usea 5=chm 6=str 7=btm 8=dsea
       call jeppe2_2004(xlog,qsqlog,nx,nq,xxl,qql,cc8,dsea)
 
       chm=0.d0
-      if(qsq.gt.emc2) then 
+      if(qsq.gt.emc2) then
       call jeppe2_2004(xlog,qsqlog,nx,nqc,xxl,qqlc,ccc,chm)
       endif
 
       bot=0.d0
-      if(qsq.gt.emb2) then 
+      if(qsq.gt.emb2) then
       call jeppe2_2004(xlog,qsqlog,nx,nqb,xxl,qqlb,ccb,bot)
       endif
 
@@ -244,7 +244,7 @@ c notation: 1=uval 2=val 3=glue 4=usea 5=chm 6=str 7=btm 8=dsea
 
       init=1
    10 continue
-      
+
       xlog=dlog(x)
       qsqlog=dlog(qsq)
 
@@ -256,12 +256,12 @@ c notation: 1=uval 2=val 3=glue 4=usea 5=chm 6=str 7=btm 8=dsea
       call jeppe2_2004(xlog,qsqlog,nx,nq,xxl,qql,cc8,dsea)
 
       chm=0.d0
-      if(qsq.gt.emc2) then 
+      if(qsq.gt.emc2) then
       call jeppe2_2004(xlog,qsqlog,nx,nqc,xxl,qqlc,ccc,chm)
       endif
 
       bot=0.d0
-      if(qsq.gt.emb2) then 
+      if(qsq.gt.emb2) then
       call jeppe2_2004(xlog,qsqlog,nx,nqb,xxl,qqlb,ccb,bot)
       endif
 
@@ -385,11 +385,11 @@ c notation: 1=uval 2=val 3=glue 4=usea 5=chm 6=str 7=btm 8=dsea
       subroutine jeppe2_2004(x,y,nx,my,xx,yy,cc,z)
 C--   G.W. 02/07/2007 Allow extrapolation to small x and large q.
       implicit real*8(a-h,o-z)
-      dimension xx(nx),yy(my),cc(nx,my,4,4)      
-      
+      dimension xx(nx),yy(my),cc(nx,my,4,4)
+
       n=locx_2004(xx,nx,x)
       m=locx_2004(yy,my,y)
-      
+
       if (n.gt.0.and.n.lt.nx.and.m.gt.0.and.m.lt.my) then
 C--   Do usual interpolation.
          t=(x-xx(n))/(xx(n+1)-xx(n))
@@ -399,7 +399,7 @@ C--   Do usual interpolation.
             z=t*z+((cc(n,m,l,4)*u+cc(n,m,l,3))*u
      &           +cc(n,m,l,2))*u+cc(n,m,l,1)
          enddo
-         
+
       else if (n.eq.0.and.m.gt.0.and.m.lt.my) then
 C--   Extrapolate to small x.
          call jeppe3(xx(1),y,nx,my,xx,yy,cc,f0)
@@ -409,7 +409,7 @@ C--   Extrapolate to small x.
          else
             z = f0+(f1-f0)/(xx(2)-xx(1))*(x-xx(1))
          end if
-         
+
       else if (n.gt.0.and.m.eq.my) then
 C--   Extrapolate to large q.
          call jeppe3(x,yy(my),nx,my,xx,yy,cc,f0)
@@ -420,7 +420,7 @@ C--   Extrapolate to large q.
          else
             z = f0+(f0-f1)/(yy(my)-yy(my-1))*(y-yy(my))
          end if
-         
+
       else if (n.eq.0.and.m.eq.my) then
 C--   Extrapolate to small x AND large q.
          call jeppe3(xx(1),yy(my),nx,my,xx,yy,cc,f0)
@@ -450,7 +450,7 @@ C--   Set parton distribution to zero otherwise.
          z = 0.d0
 
       end if
-      
+
       return
       end
 
@@ -458,7 +458,7 @@ C--   G.W. 02/07/2007 Copy of the original jeppe2,
 C--   only used for extrapolation.
       subroutine jeppe3(x,y,nx,my,xx,yy,cc,z)
       implicit real*8(a-h,o-z)
-      dimension xx(nx),yy(my),cc(nx,my,4,4)      
+      dimension xx(nx),yy(my),cc(nx,my,4,4)
       n=locx_2004(xx,nx,x)
       m=locx_2004(yy,my,y)
       t=(x-xx(n))/(xx(n+1)-xx(n))
@@ -470,7 +470,7 @@ C--   only used for extrapolation.
       enddo
       return
       end
-      
+
       integer function locx_2004(xx,nx,x)
       implicit real*8(a-h,o-z)
       dimension xx(nx)
@@ -479,9 +479,9 @@ c$$$      if(x.le.xx(1)) then
       locx_2004=1
       return
       endif
-c$$$      if(x.ge.xx(nx)) then 
+c$$$      if(x.ge.xx(nx)) then
       if(x.eq.xx(nx)) then ! G.W. 02/07/2007
-      locx_2004=nx-1  
+      locx_2004=nx-1
       return
       endif
       ju=nx+1
