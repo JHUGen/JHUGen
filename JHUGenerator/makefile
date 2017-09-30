@@ -34,7 +34,7 @@ linkMELA = Yes
 
 
 ifeq ($(UseLHAPDF),Yes)
-   LHAPDFflags = -L$(MyLHADir) -lLHAPDF -DuseLHAPDF=1
+   LHAPDFflags = -L$(MyLHADir) -lLHAPDF -I$(MyLHADir)/../include -DuseLHAPDF=1 -lstdc++
 else
    LHAPDFflags = -DuseLHAPDF=0
 endif
@@ -174,8 +174,12 @@ PDFObj   = $(ObjectDir)/Cteq61Pdf.o \
            $(ObjectDir)/mstwpdf.o \
            $(ObjectDir)/NNPDFDriver.o
 
-PSGenDep = genps.c \
-           boost.c
+PSGenC = genps.c \
+         boost.c
+
+PSGenDep = $(PSGenC) \
+           genps.h \
+           boost.h
 
 PSGenObj = $(ObjectDir)/genps.o \
            $(ObjectDir)/boost.o
@@ -183,6 +187,17 @@ PSGenObj = $(ObjectDir)/genps.o \
 CPSDep = ./CPS/CALLING_cpHTO.f
 
 CPSObj = $(ObjectDir)/CALLING_cpHTO.o
+
+LHAPDFInterfaceC = LHAPDFversion.cc
+
+LHAPDFInterfaceDep = $(LHAPDFInterfaceC) \
+                     LHAPDFversion.h
+
+ifeq ($(UseLHAPDF),Yes)
+LHAPDFInterfaceObj = $(ObjectDir)/LHAPDFversion.o
+else
+LHAPDFInterfaceObj =
+endif
 
 
 # #uncommented this because the library is already included in MCFMLib
@@ -215,7 +230,7 @@ MadGraphObj = $(ObjectDir)/gg_ttbh.o \
 
 
 
-JHUGenerator: $(CPSObj) $(PSGenObj) $(VegasObj) $(PDFObj) $(AmpObj) $(ggVHAmpObj) $(KinObj) $(MainObj)
+JHUGenerator: $(CPSObj) $(PSGenObj) $(VegasObj) $(PDFObj) $(AmpObj) $(ggVHAmpObj) $(KinObj) $(LHAPDFInterfaceObj) $(MainObj)
 	@echo " linking"
 ifeq ($(UseLHAPDF),Yes)
 	echo " -> interfaced with LHAPDF"
@@ -224,7 +239,7 @@ else
 endif
 	@echo " executable file "$(Exec)" is compiled with "$(Comp)
 	@echo " "
-	$(fcomp) -o $(Exec) $(MainObj) $(KinObj) $(AmpObj) $(ggVHAmpObj) $(PSGenObj) $(VegasObj) $(PDFObj) $(CPSObj) $(LHAPDFflags) $(MELAflags) $(CollierLibflags)
+	$(fcomp) -o $(Exec) $(MainObj) $(KinObj) $(AmpObj) $(ggVHAmpObj) $(PSGenObj) $(VegasObj) $(PDFObj) $(CPSObj) $(LHAPDFInterfaceObj) $(LHAPDFflags) $(MELAflags) $(CollierLibflags)
 
 
 
@@ -275,12 +290,17 @@ $(CPSObj): $(CPSDep) $(Makefile)
 	$(fcomp) -c $(CPSDep)
 	mv *.o $(ObjectDir)
 
-	
-$(PSGenObj): $(PSGenDep)
+$(PSGenObj): $(PSGenDep) $(Makefile)
 	@echo " compiling phase space generator"
-	$(ccomp) -c $(PSGenDep)
+	$(ccomp) -c $(PSGenC)
 	mv *.o $(ObjectDir)
 
+ifeq ($(UseLHAPDF),Yes)
+$(LHAPDFInterfaceObj) : $(LHAPDFInterfaceDep) $(Makefile)
+	@echo " compiling LHAPDF interface"
+	$(ccomp) $(LHAPDFflags) -c $(LHAPDFInterfaceC)
+	mv *.o $(ObjectDir)
+endif
 
 # $(MadGraphObj): $(MadGraphDep)
 # 	@echo " compiling MG files"

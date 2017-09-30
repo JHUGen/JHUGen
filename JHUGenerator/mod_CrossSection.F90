@@ -339,7 +339,7 @@ real(8) :: MomExt(1:4,1:4),MomDK(1:4,1:4),MomExt_f(1:4,1:4),MomDK_f(1:4,1:4),Mom
 logical :: applyPSCut,genEvt
 real(8) :: CS_max,eta1,eta2
 real(8) :: oneovervolume, bound(1:11), sumtot,yz1,yz2,EZ_max,dr,MZ1,MZ2,ML1,ML2,ML3,ML4
-integer :: i1, i2, MY_IDUP(1:9), ICOLUP(1:2,1:9),OSPair,OSSFPair,LeptInEvent_tmp(0:8),ordered_Lept(1:8), ID_DK(6:9)
+integer :: i1, i2, MY_IDUP(1:9), ICOLUP(1:2,1:9),OSPair,OSSFPair,LeptInEvent_tmp(0:8),JetsInEvent_tmp(0:8),ordered_Lept(1:8), ID_DK(6:9)
 real(8)::  ntRnd,ZMass(1:2),AcceptedEvent(1:4,1:4)
 real(8) :: offzchannel
 include 'vegas_common.f'
@@ -578,13 +578,18 @@ IF( GENEVT ) THEN
 
       elseif( EvalUnWeighted_DecayToVV .gt. yRnd(14)*CS_max ) then
 
-         if( RequestNLeptons.gt.0 ) then! lepton filter
+         if( RequestNLeptons.gt.0 .or. RequestNJets.gt.0 ) then! lepton or jet filter
                 LeptInEvent_tmp(0:8) = LeptInEvent(0:8)
+                JetsInEvent_tmp(0:8) = JetsInEvent(0:8)
     !             print *, ""
                 do i1=6,9
                     if( IsALepton(MY_IDUP(i1)) ) then
                       LeptInEvent_tmp(0) = LeptInEvent_tmp(0)+1
                       LeptInEvent_tmp( LeptInEvent_tmp(0) ) = ConvertLHE(MY_IDUP(i1))
+                    endif
+                    if( IsAJet(MY_IDUP(i1)) ) then
+                      JetsInEvent_tmp(0) = JetsInEvent_tmp(0)+1
+                      JetsInEvent_tmp( JetsInEvent_tmp(0) ) = ConvertLHE(MY_IDUP(i1))
                     endif
                 enddo
 ! print *, "leptons in event: ",LeptInEvent_tmp(1: LeptInEvent_tmp(0))
@@ -596,6 +601,11 @@ IF( GENEVT ) THEN
 ! pause
                 if( LeptInEvent_tmp(0) .lt. RequestNLeptons ) then
     !                 print *,"not enough leptons, reject!" !,LeptInEvent_tmp(1: LeptInEvent_tmp(0))
+                    Res = -1d0
+                    return
+                endif
+                if( JetsInEvent_tmp(0) .lt. RequestNJets ) then
+    !                 print *,"not enough jets, reject!" !,JetsInEvent_tmp(1: JetsInEvent_tmp(0))
                     Res = -1d0
                     return
                 endif

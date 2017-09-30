@@ -51,8 +51,8 @@ EvalWeighted_HJJ_fulldecay = 0d0
    PartChannelAvg = NumPartonicChannels
 
    iPartChannel = int(yRnd(18) * (NumPartonicChannels)) +1 ! this runs from 1..100
-   iPart_sel = ijSel(iPartChannel,1)
-   jPart_sel = ijSel(iPartChannel,2)
+   iPart_sel = convertToPartIndex(ijSel(iPartChannel,1))
+   jPart_sel = convertToPartIndex(ijSel(iPartChannel,2))
 
    if(.not. warmup) then
        call random_number(xRnd)!   throwing random number for accept-reject
@@ -129,11 +129,11 @@ EvalWeighted_HJJ_fulldecay = 0d0
 
    do jpart=1,2
       id_MCFM(jpart) = ijSel(iPartChannel,jpart)
-      if(id_MCFM(jpart) .ne. 0) id_MCFM(jpart)=convertLHE(id_MCFM(jpart))
+!      if(id_MCFM(jpart) .ne. 0) id_MCFM(jpart)=convertLHE(id_MCFM(jpart))
    enddo
    do jpart=3,4
       id_MCFM(jpart+4) = ijSel(iPartChannel,jpart)
-      if(id_MCFM(jpart+4) .ne. 0) id_MCFM(jpart+4)=convertLHE(id_MCFM(jpart+4))
+!      if(id_MCFM(jpart+4) .ne. 0) id_MCFM(jpart+4)=convertLHE(id_MCFM(jpart+4))
    enddo
 
 

@@ -26,6 +26,7 @@ SUBROUTINE InitFirstTime(pdftable,pdfstrlength,pdfmember)
 
    includeInterference=.true.
    includeGammaStar=.true.
+   MPhotonCutoff=4d0*GeV
    WidthScheme=0
    PDFSet=3      ! 1: CTEQ6L1   2: MRSW with best fit, 2xx: MSTW with eigenvector set xx=01..40
    LHAPDFString = pdftable
@@ -81,6 +82,13 @@ SUBROUTINE InitFirstTime(pdftable,pdfstrlength,pdfmember)
       print *,"Collider not implemented."
       stop
    ENDIF
+
+#if useCollier==1
+   Collier_maxNLoopProps = -1
+   Collier_maxRank = -1
+#endif
+   call InitCOLLIER(4,3) ! Arguments for ggZH
+
    return
 
 END SUBROUTINE
@@ -175,7 +183,7 @@ SUBROUTINE InitPDFs()
    implicit none
    DOUBLE PRECISION alphasPDF
 
-     call InitPDFset(trim(LHAPDFString,lenLHAPDFString)) ! Let LHAPDF handle everything
+     call InitPDFSetByName(trim(LHAPDFString,lenLHAPDFString)) ! Let LHAPDF handle everything
      call InitPDF(LHAPDFMember)
 
      alphas_mz=alphasPDF(zmass_pdf)
