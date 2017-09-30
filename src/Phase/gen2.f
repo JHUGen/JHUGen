@@ -20,6 +20,7 @@ c---- are required
       include 'energy.f'
       parameter(wt0=1d0/16d0/pi)
 
+
       do j=1,mxpart
       do nu=1,4
       p(j,nu)=0d0
@@ -51,6 +52,7 @@ c----udif==tanh(ydif)
       udif=(two*rdk1-1d0)
       ydif=half*dlog((1d0+udif)/(1d0-udif))
       xjac=four*ymax
+
       y3=yave+ydif
       y4=yave-ydif
 
