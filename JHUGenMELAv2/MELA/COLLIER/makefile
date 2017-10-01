@@ -39,10 +39,11 @@ LIB = libcollier.so
 Deps = $(MAINDIR)/collier_global.F90 \
 	$(AUXDIR)/Combinatorics.F90 \
 	$(AUXDIR)/master.F90 \
+	$(AUXDIR)/cache.F90 \
 	$(COLIDIR)/coli_aux2.F90 \
+	$(COLIDIR)/coli_aux.F \
 	$(COLIDIR)/coli_stat.F90 \
 	$(MAINDIR)/collier_aux.F90 \
-	$(AUXDIR)/cache.F90 \
 	$(TENSORSDIR)/InitTensors.F90 \
 	$(MAINDIR)/collier_init.F90 \
 	$(COLIDIR)/reductionAB.F90 \
@@ -59,22 +60,23 @@ Deps = $(MAINDIR)/collier_global.F90 \
 	$(COLIDIR)/coli_b0.F \
 	$(COLIDIR)/coli_d0.F \
 	$(COLIDIR)/coli_d0reg.F \
-	$(COLIDIR)/coli_aux.F \
 	$(COLIDIR)/coli_c0.F \
 	$(DDLIBDIR)/DD_aux.F \
+	$(DDLIBDIR)/DD_2pt.F \
+	$(DDLIBDIR)/DD_3pt.F \
+	$(DDLIBDIR)/DD_4pt.F \
 	$(DDLIBDIR)/DD_5pt.F \
 	$(DDLIBDIR)/DD_6pt.F \
-	$(DDLIBDIR)/DD_3pt.F \
-	$(DDLIBDIR)/DD_to_COLLIER.F \
-	$(DDLIBDIR)/DD_2pt.F
+	$(DDLIBDIR)/DD_to_COLLIER.F
 
 Objs = collier_global.o \
 	Aux_Combinatorics.o \
 	Aux_master.o \
+	Aux_cache.o \
 	COLI_coli_aux2.o \
+	COLI_coli_aux.o \
 	COLI_coli_stat.o \
 	collier_aux.o \
-	Aux_cache.o \
 	tensors_InitTensors.o \
 	collier_init.o \
 	COLI_reductionAB.o \
@@ -91,14 +93,14 @@ Objs = collier_global.o \
 	COLI_coli_b0.o \
 	COLI_coli_d0.o \
 	COLI_coli_d0reg.o \
-	COLI_coli_aux.o \
 	COLI_coli_c0.o \
 	DDlib_DD_aux.o \
+	DDlib_DD_2pt.o \
+	DDlib_DD_3pt.o \
+	DDlib_DD_4pt.o \
 	DDlib_DD_5pt.o \
 	DDlib_DD_6pt.o \
-	DDlib_DD_3pt.o \
-	DDlib_DD_to_COLLIER.o \
-	DDlib_DD_2pt.o
+	DDlib_DD_to_COLLIER.o
 
 
 ${Objs}: $(Deps)
