@@ -21,10 +21,10 @@ protected:
   void GetFcnFromFile(const char* path, const char* spname);
 
   double GetHPropagator(const MelaIO* RcdME, const TVar::VerbosityLevel& verbosity)const;
-  double GetZPropagator(const MelaIO* RcdME, const bool restricted, const TVar::VerbosityLevel& verbosity)const;
+  double GetZPropagator(const MelaIO* RcdME, const int& sigmaZ4lprop, const TVar::VerbosityLevel& verbosity)const;
   double GetAssociatedVjjPropagator(const MelaIO* RcdME, const TVar::VerbosityLevel& verbosity)const;
   double GetVDaughterCouplings(const MelaIO* RcdME, const TVar::VerbosityLevel& verbosity)const;
-  double GetAlphaSatMZ(const MelaIO* RcdME, const int p, const TVar::VerbosityLevel& verbosity)const;
+  double GetAlphaSatMZ(const MelaIO* RcdME, const unsigned int& powAlphaSatMZ, const TVar::VerbosityLevel& verbosity)const;
 
 public:
 

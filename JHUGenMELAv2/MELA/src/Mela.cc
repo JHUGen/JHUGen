@@ -1888,11 +1888,11 @@ float Mela::getConstant_FourFermionDecay(int decid){
       if (
         myModel_==TVar::HSMHiggs
         ||
-        myModel_==TVar::H0minus
+        myModel_==TVar::H0_g1prime2
         ||
         myModel_==TVar::H0hplus
         ||
-        myModel_==TVar::H0_g1prime2
+        myModel_==TVar::H0minus
         ||
         myModel_==TVar::H0_Zgsg1prime2
         ||
@@ -1950,47 +1950,56 @@ float Mela::getConstant_FourFermionDecay(int decid){
       }
     }
     // JJEW and components
-    else if (myProduction_ == TVar::JJVBF || myProduction_ == TVar::Had_WH || myProduction_ == TVar::Had_ZH || myProduction_ == TVar::JJEW){
+    else if (
+      myProduction_ == TVar::JJVBF || myProduction_ == TVar::Had_WH || myProduction_ == TVar::Had_ZH || myProduction_ == TVar::JJEW
+      ||
+      myProduction_ == TVar::JJVBF_S || myProduction_ == TVar::Had_WH_S || myProduction_ == TVar::Had_ZH_S || myProduction_ == TVar::JJEW_S
+      ||
+      myProduction_ == TVar::JJVBF_TU || myProduction_ == TVar::Had_WH_TU || myProduction_ == TVar::Had_ZH_TU || myProduction_ == TVar::JJEW_TU
+      ){
       MelaPConstant* hvbf=0;
       MelaPConstant* hwh=0;
       MelaPConstant* hzh=0;
       MelaPConstant* hvbs=0;
       MelaPConstant* hwzz=0;
       MelaPConstant* hzzz=0;
+      bool isEW = (myProduction_ == TVar::JJEW || myProduction_ == TVar::JJEW_S || myProduction_ == TVar::JJEW_TU);
+      bool hasVBF = isEW || (myProduction_ == TVar::JJVBF || myProduction_ == TVar::JJVBF_S || myProduction_ == TVar::JJVBF_TU);
+      bool hasZH = isEW || (myProduction_ == TVar::Had_ZH || myProduction_ == TVar::Had_ZH_S || myProduction_ == TVar::Had_ZH_TU);
+      bool hasWH = isEW || (myProduction_ == TVar::Had_WH || myProduction_ == TVar::Had_WH_S || myProduction_ == TVar::Had_WH_TU);
       if (is2mu2e){
-        hvbf = pAvgSmooth_MCFM_JJVBF_HSMHiggs_2mu2e;
-        hwh = pAvgSmooth_MCFM_Had_WH_HSMHiggs_2mu2e;
-        hzh = pAvgSmooth_MCFM_Had_ZH_HSMHiggs_2mu2e;
+        hvbf = pAvgSmooth_MCFM_JJVBF_S_HSMHiggs_2mu2e;
+        hwh = pAvgSmooth_MCFM_Had_WH_S_HSMHiggs_2mu2e;
+        hzh = pAvgSmooth_MCFM_Had_ZH_S_HSMHiggs_2mu2e;
         hvbs = pAvgSmooth_MCFM_JJVBF_bkgZZ_2mu2e;
         hwzz = pAvgSmooth_MCFM_Had_WH_bkgZZ_2mu2e;
         hzzz = pAvgSmooth_MCFM_Had_ZH_bkgZZ_2mu2e;
       }
       else if (is4mu){
-        hvbf = pAvgSmooth_MCFM_JJVBF_HSMHiggs_4mu;
-        hwh = pAvgSmooth_MCFM_Had_WH_HSMHiggs_4mu;
-        hzh = pAvgSmooth_MCFM_Had_ZH_HSMHiggs_4mu;
+        hvbf = pAvgSmooth_MCFM_JJVBF_S_HSMHiggs_4mu;
+        hwh = pAvgSmooth_MCFM_Had_WH_S_HSMHiggs_4mu;
+        hzh = pAvgSmooth_MCFM_Had_ZH_S_HSMHiggs_4mu;
         hvbs = pAvgSmooth_MCFM_JJVBF_bkgZZ_4mu;
         hwzz = pAvgSmooth_MCFM_Had_WH_bkgZZ_4mu;
         hzzz = pAvgSmooth_MCFM_Had_ZH_bkgZZ_4mu;
       }
       else if (is4e){
-        hvbf = pAvgSmooth_MCFM_JJVBF_HSMHiggs_4e;
-        hwh = pAvgSmooth_MCFM_Had_WH_HSMHiggs_4e;
-        hzh = pAvgSmooth_MCFM_Had_ZH_HSMHiggs_4e;
+        hvbf = pAvgSmooth_MCFM_JJVBF_S_HSMHiggs_4e;
+        hwh = pAvgSmooth_MCFM_Had_WH_S_HSMHiggs_4e;
+        hzh = pAvgSmooth_MCFM_Had_ZH_S_HSMHiggs_4e;
         hvbs = pAvgSmooth_MCFM_JJVBF_bkgZZ_4e;
         hwzz = pAvgSmooth_MCFM_Had_WH_bkgZZ_4e;
         hzzz = pAvgSmooth_MCFM_Had_ZH_bkgZZ_4e;
       }
-
       if (myModel_ == TVar::HSMHiggs || myModel_ == TVar::bkgZZ_SMHiggs){
-        if (myProduction_ == TVar::JJEW || myProduction_ == TVar::JJVBF) pchandle[0]=hvbf;
-        if (myProduction_ == TVar::JJEW || myProduction_ == TVar::Had_ZH) pchandle[1]=hzh;
-        if (myProduction_ == TVar::JJEW || myProduction_ == TVar::Had_WH) pchandle[2]=hwh;
+        if (hasVBF) pchandle[0]=hvbf;
+        if (hasZH) pchandle[1]=hzh;
+        if (hasWH) pchandle[2]=hwh;
       }
       if (myModel_ == TVar::bkgZZ || myModel_ == TVar::bkgZZ_SMHiggs){
-        if (myProduction_ == TVar::JJEW || myProduction_ == TVar::JJVBF) pchandle[3]=hvbs;
-        if (myProduction_ == TVar::JJEW || myProduction_ == TVar::Had_ZH) pchandle[4]=hzzz;
-        if (myProduction_ == TVar::JJEW || myProduction_ == TVar::Had_WH) pchandle[5]=hwzz;
+        if (hasVBF) pchandle[3]=hvbs;
+        if (hasZH) pchandle[4]=hzzz;
+        if (hasWH) pchandle[5]=hwzz;
       }
     }
     else if (myProduction_ == TVar::JJQCD){
@@ -2042,17 +2051,17 @@ void Mela::getPConstantHandles(){
   pAvgSmooth_MCFM_ZZGG_HSMHiggs_4e=0;
   pAvgSmooth_MCFM_ZZGG_HSMHiggs_2mu2e=0;
   //
-  pAvgSmooth_MCFM_JJVBF_HSMHiggs_4mu=0;
-  pAvgSmooth_MCFM_JJVBF_HSMHiggs_4e=0;
-  pAvgSmooth_MCFM_JJVBF_HSMHiggs_2mu2e=0;
+  pAvgSmooth_MCFM_JJVBF_S_HSMHiggs_4mu=0;
+  pAvgSmooth_MCFM_JJVBF_S_HSMHiggs_4e=0;
+  pAvgSmooth_MCFM_JJVBF_S_HSMHiggs_2mu2e=0;
   //
-  pAvgSmooth_MCFM_Had_ZH_HSMHiggs_4mu=0;
-  pAvgSmooth_MCFM_Had_ZH_HSMHiggs_4e=0;
-  pAvgSmooth_MCFM_Had_ZH_HSMHiggs_2mu2e=0;
+  pAvgSmooth_MCFM_Had_ZH_S_HSMHiggs_4mu=0;
+  pAvgSmooth_MCFM_Had_ZH_S_HSMHiggs_4e=0;
+  pAvgSmooth_MCFM_Had_ZH_S_HSMHiggs_2mu2e=0;
   //
-  pAvgSmooth_MCFM_Had_WH_HSMHiggs_4mu=0;
-  pAvgSmooth_MCFM_Had_WH_HSMHiggs_4e=0;
-  pAvgSmooth_MCFM_Had_WH_HSMHiggs_2mu2e=0;
+  pAvgSmooth_MCFM_Had_WH_S_HSMHiggs_4mu=0;
+  pAvgSmooth_MCFM_Had_WH_S_HSMHiggs_4e=0;
+  pAvgSmooth_MCFM_Had_WH_S_HSMHiggs_2mu2e=0;
   //
   pAvgSmooth_MCFM_ZZGG_bkgZZ_4mu=0;
   pAvgSmooth_MCFM_ZZGG_bkgZZ_4e=0;
@@ -2139,29 +2148,29 @@ void Mela::getPConstantHandles(){
   spname = "P_ConserveDifermionMass_2mu2e";
   pAvgSmooth_MCFM_ZZGG_HSMHiggs_2mu2e = getPConstantHandle(TVar::MCFM, TVar::ZZGG, TVar::HSMHiggs, filename, spname);
   //
-  filename = "pAvgSmooth_MCFM_JJVBF_HSMHiggs";
+  filename = "pAvgSmooth_MCFM_JJVBF_S_HSMHiggs";
   spname = "P_ConserveDifermionMass_4mu";
-  pAvgSmooth_MCFM_JJVBF_HSMHiggs_4mu = getPConstantHandle(TVar::MCFM, TVar::JJVBF, TVar::HSMHiggs, filename, spname, true);
+  pAvgSmooth_MCFM_JJVBF_S_HSMHiggs_4mu = getPConstantHandle(TVar::MCFM, TVar::JJVBF_S, TVar::HSMHiggs, filename, spname, true);
   spname = "P_ConserveDifermionMass_4e";
-  pAvgSmooth_MCFM_JJVBF_HSMHiggs_4e = getPConstantHandle(TVar::MCFM, TVar::JJVBF, TVar::HSMHiggs, filename, spname, true);
+  pAvgSmooth_MCFM_JJVBF_S_HSMHiggs_4e = getPConstantHandle(TVar::MCFM, TVar::JJVBF_S, TVar::HSMHiggs, filename, spname, true);
   spname = "P_ConserveDifermionMass_2mu2e";
-  pAvgSmooth_MCFM_JJVBF_HSMHiggs_2mu2e = getPConstantHandle(TVar::MCFM, TVar::JJVBF, TVar::HSMHiggs, filename, spname, true);
+  pAvgSmooth_MCFM_JJVBF_S_HSMHiggs_2mu2e = getPConstantHandle(TVar::MCFM, TVar::JJVBF_S, TVar::HSMHiggs, filename, spname, true);
   //
-  filename = "pAvgSmooth_MCFM_Had_ZH_HSMHiggs";
+  filename = "pAvgSmooth_MCFM_Had_ZH_S_HSMHiggs";
   spname = "P_ConserveDifermionMass_4mu";
-  pAvgSmooth_MCFM_Had_ZH_HSMHiggs_4mu = getPConstantHandle(TVar::MCFM, TVar::Had_ZH, TVar::HSMHiggs, filename, spname, true);
+  pAvgSmooth_MCFM_Had_ZH_S_HSMHiggs_4mu = getPConstantHandle(TVar::MCFM, TVar::Had_ZH_S, TVar::HSMHiggs, filename, spname, true);
   spname = "P_ConserveDifermionMass_4e";
-  pAvgSmooth_MCFM_Had_ZH_HSMHiggs_4e = getPConstantHandle(TVar::MCFM, TVar::Had_ZH, TVar::HSMHiggs, filename, spname, true);
+  pAvgSmooth_MCFM_Had_ZH_S_HSMHiggs_4e = getPConstantHandle(TVar::MCFM, TVar::Had_ZH_S, TVar::HSMHiggs, filename, spname, true);
   spname = "P_ConserveDifermionMass_2mu2e";
-  pAvgSmooth_MCFM_Had_ZH_HSMHiggs_2mu2e = getPConstantHandle(TVar::MCFM, TVar::Had_ZH, TVar::HSMHiggs, filename, spname, true);
+  pAvgSmooth_MCFM_Had_ZH_S_HSMHiggs_2mu2e = getPConstantHandle(TVar::MCFM, TVar::Had_ZH_S, TVar::HSMHiggs, filename, spname, true);
   //
-  filename = "pAvgSmooth_MCFM_Had_WH_HSMHiggs";
+  filename = "pAvgSmooth_MCFM_Had_WH_S_HSMHiggs";
   spname = "P_ConserveDifermionMass_4mu";
-  pAvgSmooth_MCFM_Had_WH_HSMHiggs_4mu = getPConstantHandle(TVar::MCFM, TVar::Had_WH, TVar::HSMHiggs, filename, spname, true);
+  pAvgSmooth_MCFM_Had_WH_S_HSMHiggs_4mu = getPConstantHandle(TVar::MCFM, TVar::Had_WH_S, TVar::HSMHiggs, filename, spname, true);
   spname = "P_ConserveDifermionMass_4e";
-  pAvgSmooth_MCFM_Had_WH_HSMHiggs_4e = getPConstantHandle(TVar::MCFM, TVar::Had_WH, TVar::HSMHiggs, filename, spname, true);
+  pAvgSmooth_MCFM_Had_WH_S_HSMHiggs_4e = getPConstantHandle(TVar::MCFM, TVar::Had_WH_S, TVar::HSMHiggs, filename, spname, true);
   spname = "P_ConserveDifermionMass_2mu2e";
-  pAvgSmooth_MCFM_Had_WH_HSMHiggs_2mu2e = getPConstantHandle(TVar::MCFM, TVar::Had_WH, TVar::HSMHiggs, filename, spname, true);
+  pAvgSmooth_MCFM_Had_WH_S_HSMHiggs_2mu2e = getPConstantHandle(TVar::MCFM, TVar::Had_WH_S, TVar::HSMHiggs, filename, spname, true);
   //
   //
   filename = "pAvgSmooth_MCFM_ZZGG_bkgZZ";
@@ -2303,17 +2312,17 @@ void Mela::deletePConstantHandles(){
   deletePConstantHandle(pAvgSmooth_MCFM_ZZGG_HSMHiggs_4e);
   deletePConstantHandle(pAvgSmooth_MCFM_ZZGG_HSMHiggs_2mu2e);
   //
-  deletePConstantHandle(pAvgSmooth_MCFM_JJVBF_HSMHiggs_4mu);
-  deletePConstantHandle(pAvgSmooth_MCFM_JJVBF_HSMHiggs_4e);
-  deletePConstantHandle(pAvgSmooth_MCFM_JJVBF_HSMHiggs_2mu2e);
+  deletePConstantHandle(pAvgSmooth_MCFM_JJVBF_S_HSMHiggs_4mu);
+  deletePConstantHandle(pAvgSmooth_MCFM_JJVBF_S_HSMHiggs_4e);
+  deletePConstantHandle(pAvgSmooth_MCFM_JJVBF_S_HSMHiggs_2mu2e);
   //
-  deletePConstantHandle(pAvgSmooth_MCFM_Had_ZH_HSMHiggs_4mu);
-  deletePConstantHandle(pAvgSmooth_MCFM_Had_ZH_HSMHiggs_4e);
-  deletePConstantHandle(pAvgSmooth_MCFM_Had_ZH_HSMHiggs_2mu2e);
+  deletePConstantHandle(pAvgSmooth_MCFM_Had_ZH_S_HSMHiggs_4mu);
+  deletePConstantHandle(pAvgSmooth_MCFM_Had_ZH_S_HSMHiggs_4e);
+  deletePConstantHandle(pAvgSmooth_MCFM_Had_ZH_S_HSMHiggs_2mu2e);
   //
-  deletePConstantHandle(pAvgSmooth_MCFM_Had_WH_HSMHiggs_4mu);
-  deletePConstantHandle(pAvgSmooth_MCFM_Had_WH_HSMHiggs_4e);
-  deletePConstantHandle(pAvgSmooth_MCFM_Had_WH_HSMHiggs_2mu2e);
+  deletePConstantHandle(pAvgSmooth_MCFM_Had_WH_S_HSMHiggs_4mu);
+  deletePConstantHandle(pAvgSmooth_MCFM_Had_WH_S_HSMHiggs_4e);
+  deletePConstantHandle(pAvgSmooth_MCFM_Had_WH_S_HSMHiggs_2mu2e);
   //
   deletePConstantHandle(pAvgSmooth_MCFM_ZZGG_bkgZZ_4mu);
   deletePConstantHandle(pAvgSmooth_MCFM_ZZGG_bkgZZ_4e);
