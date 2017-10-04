@@ -1,5 +1,5 @@
 ***** TUtil::PrintCandidateSummary *****
-Candidate: 0x60fd4b0
+Candidate: 0xPOINTER
 	Has 2 mothers
 		V0 (0) (X,Y,Z,T)=( 0 , 0 , 865.379 , 865.379 )
 		V1 (0) (X,Y,Z,T)=( 0 , 0 , -624.034 , 624.034 )
@@ -20,7 +20,7 @@ Candidate: 0x60fd4b0
 	Has 0 jets
 	Has 0 tops
 ***** TUtil::PrintCandidateSummary *****
-Candidate: 0x56d6510
+Candidate: 0xPOINTER
 	Has 2 mothers
 		V0 (0) (X,Y,Z,T)=( 0 , 0 , 865.379 , 865.379 )
 		V1 (0) (X,Y,Z,T)=( 0 , 0 , -624.034 , 624.034 )

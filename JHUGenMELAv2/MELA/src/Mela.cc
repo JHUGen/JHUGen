@@ -1797,15 +1797,36 @@ void Mela::setConstant(){
       PDGHelpers::isALepton(melaCand->getSortedV(0)->getDaughter(0)->id) && PDGHelpers::isALepton(melaCand->getSortedV(0)->getDaughter(1)->id)
       &&
       PDGHelpers::isAJet(melaCand->getSortedV(1)->getDaughter(0)->id) && PDGHelpers::isAJet(melaCand->getSortedV(1)->getDaughter(1)->id)
+      &&
+      !PDGHelpers::isAGluon(melaCand->getSortedV(1)->getDaughter(0)->id) && !PDGHelpers::isAGluon(melaCand->getSortedV(1)->getDaughter(1)->id)
       )
       ||
       (
       PDGHelpers::isALepton(melaCand->getSortedV(1)->getDaughter(0)->id) && PDGHelpers::isALepton(melaCand->getSortedV(1)->getDaughter(1)->id)
       &&
       PDGHelpers::isAJet(melaCand->getSortedV(0)->getDaughter(0)->id) && PDGHelpers::isAJet(melaCand->getSortedV(0)->getDaughter(1)->id)
+      &&
+      !PDGHelpers::isAGluon(melaCand->getSortedV(0)->getDaughter(0)->id) && !PDGHelpers::isAGluon(melaCand->getSortedV(0)->getDaughter(1)->id)
       )
       )
       ) constant = getConstant_2l2q();
+    else if ( // H->4q
+      melaCand->getSortedV(0)->getNDaughters()==2
+      &&
+      melaCand->getSortedV(1)->getNDaughters()==2
+      &&
+      (
+      (
+      PDGHelpers::isAJet(melaCand->getSortedV(0)->getDaughter(0)->id) && PDGHelpers::isAJet(melaCand->getSortedV(0)->getDaughter(1)->id)
+      &&
+      PDGHelpers::isAJet(melaCand->getSortedV(1)->getDaughter(0)->id) && PDGHelpers::isAJet(melaCand->getSortedV(1)->getDaughter(1)->id)
+      &&
+      !PDGHelpers::isAGluon(melaCand->getSortedV(0)->getDaughter(0)->id) && !PDGHelpers::isAGluon(melaCand->getSortedV(0)->getDaughter(1)->id)
+      &&
+      !PDGHelpers::isAGluon(melaCand->getSortedV(1)->getDaughter(0)->id) && !PDGHelpers::isAGluon(melaCand->getSortedV(1)->getDaughter(1)->id)
+      )
+      )
+      ) constant = getConstant_4q();
   }
   if (std::isnan(constant) || std::isinf(constant) || constant<=0.) constant=0;
   else constant=1./constant;
@@ -1850,29 +1871,31 @@ float Mela::getConstant_JHUGenUndecayed(){
 float Mela::getConstant_4l(){
   float constant = 1;
   if (melaCand==0) return constant;
-  int decid =
-    abs(melaCand->getSortedV(0)->getDaughter(0)->id)*
-    abs(melaCand->getSortedV(0)->getDaughter(1)->id)*
-    abs(melaCand->getSortedV(1)->getDaughter(0)->id)*
-    abs(melaCand->getSortedV(1)->getDaughter(1)->id);
+  int decid = abs(
+    melaCand->getSortedV(0)->getDaughter(0)->id*
+    melaCand->getSortedV(0)->getDaughter(1)->id*
+    melaCand->getSortedV(1)->getDaughter(0)->id*
+    melaCand->getSortedV(1)->getDaughter(1)->id
+    );
   return getConstant_FourFermionDecay(decid);
 }
 float Mela::getConstant_2l2q(){
   float constant = 1;
   if (melaCand==0) return constant;
-  int decid1 =
-    abs(melaCand->getSortedV(0)->getDaughter(0)->id)*
-    abs(melaCand->getSortedV(0)->getDaughter(1)->id);
-  int decid2 =
-    abs(melaCand->getSortedV(1)->getDaughter(0)->id)*
-    abs(melaCand->getSortedV(1)->getDaughter(1)->id);
   int decid = 1;
-  if (decid1!=0) decid*=decid1;
-  if (decid2!=0) decid*=decid2;
+  if (PDGHelpers::isALepton(melaCand->getSortedV(0)->getDaughter(0)->id)) decid *= melaCand->getSortedV(0)->getDaughter(0)->id*melaCand->getSortedV(0)->getDaughter(1)->id;
+  if (PDGHelpers::isALepton(melaCand->getSortedV(1)->getDaughter(0)->id)) decid *= melaCand->getSortedV(1)->getDaughter(0)->id*melaCand->getSortedV(1)->getDaughter(1)->id;
+  decid = abs(decid);
+  return getConstant_FourFermionDecay(decid);
+}
+float Mela::getConstant_4q(){
+  float constant = 1;
+  if (melaCand==0) return constant;
+  const int decid = 121;
   return getConstant_FourFermionDecay(decid);
 }
 
-float Mela::getConstant_FourFermionDecay(int decid){
+float Mela::getConstant_FourFermionDecay(const int& decid){
   float constant = 1;
 
   const bool is4mu = (decid==28561);

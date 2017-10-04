@@ -4282,9 +4282,7 @@ void testME_ProdDec_MCFM_Ping(int flavor=2, shared_ptr<Mela> melaptr=nullptr){
   float wPOLE=4.07e-3;
 
   TVar::VerbosityLevel verbosity = TVar::DEBUG;
-  if (!melaptr) {
-    melaptr.reset(new Mela(erg_tev, mPOLE, verbosity));
-  }
+  if (!melaptr) melaptr.reset(new Mela(erg_tev, mPOLE, verbosity));
   Mela& mela = *melaptr;
   TVar::VerbosityLevel bkpverbosity = mela.getVerbosity();
   mela.setVerbosity(verbosity);
@@ -4381,6 +4379,12 @@ void testME_ProdDec_MCFM_Ping(int flavor=2, shared_ptr<Mela> melaptr=nullptr){
     GenLep3Id=2;
     GenLep4Id=-2;
   }
+  else if (flavor == 6){
+    GenLep1Id=13;
+    GenLep2Id=-13;
+    GenLep3Id=2;
+    GenLep4Id=-2;
+  }
 
   for (int ev = 0; ev < 1; ev++){
     SimpleParticleCollection_t aparticles;
@@ -4388,6 +4392,7 @@ void testME_ProdDec_MCFM_Ping(int flavor=2, shared_ptr<Mela> melaptr=nullptr){
     pAPart[0].SetXYZT(a1_array[ev][1], a1_array[ev][2], a1_array[ev][3], a1_array[ev][0]);
     pAPart[1].SetXYZT(a2_array[ev][1], a2_array[ev][2], a2_array[ev][3], a2_array[ev][0]);
     for (unsigned int iap=0; iap<2; iap++) aparticles.push_back(SimpleParticle_t(1-2*iap, pAPart[iap]));
+    for (unsigned int iap=1; iap<2; iap++) aparticles.push_back(SimpleParticle_t(-2*iap, pAPart[iap]));
     for (unsigned int iap=0; iap<2; iap++) aparticles.push_back(SimpleParticle_t((1-2*iap)*13, pAPart[iap]));
 
     int idOrdered[4] ={ static_cast<int>(GenLep1Id), static_cast<int>(GenLep2Id), static_cast<int>(GenLep3Id), static_cast<int>(GenLep4Id) };
@@ -4411,63 +4416,81 @@ void testME_ProdDec_MCFM_Ping(int flavor=2, shared_ptr<Mela> melaptr=nullptr){
     mela.setCandidateDecayMode(TVar::CandidateDecay_ZZ);
     mela.setInputEvent(&daughters_ZZ, &aparticles, (SimpleParticleCollection_t*)0, false);
 
-
+    const unsigned int nprods=12;
+    TVar::Production theProds[12]={
+      TVar::JJVBF, TVar::JJVBF_S, TVar::JJVBF_TU,
+      TVar::Had_ZH, TVar::Had_ZH_S, TVar::Had_ZH_TU,
+      TVar::Had_WH, TVar::Had_WH_S, TVar::Had_WH_TU,
+      TVar::JJEW, TVar::JJEW_S, TVar::JJEW_TU
+    };
     int cindex;
+    for (unsigned int iprod=0; iprod<nprods; iprod++){
+      /***** WW *****/
+      cindex=0;
+      mela.setCurrentCandidateFromIndex(cindex);
 
-    /***** WW *****/
-    cindex=0;
-    mela.setCurrentCandidateFromIndex(cindex);
+      TString theProdName=TVar::ProductionName(theProds[iprod]);
 
-    float pVAMCFM_wbfVV_total;
-    mela.setProcess(TVar::bkgWWZZ_SMHiggs, TVar::MCFM, TVar::JJVBF);
-    mela.computeProdDecP(pVAMCFM_wbfVV_total, true);
-    cout << "pVAMCFM_wbfVV_total: " << pVAMCFM_wbfVV_total << '\n' << endl;
-    float pVAMCFM_wbfVV_bkg;
-    mela.setProcess(TVar::bkgWWZZ, TVar::MCFM, TVar::JJVBF);
-    mela.computeProdDecP(pVAMCFM_wbfVV_bkg, true);
-    cout << "pVAMCFM_wbfVV_bkg: " << pVAMCFM_wbfVV_bkg << '\n' << endl;
-    float pVAMCFM_wbfVV_sig;
-    mela.setProcess(TVar::HSMHiggs_WWZZ, TVar::MCFM, TVar::JJVBF);
-    mela.computeProdDecP(pVAMCFM_wbfVV_sig, true);
-    cout << "pVAMCFM_wbfVV_sig: " << pVAMCFM_wbfVV_sig << '\n' << endl;
+      float pVAMCFM_wbfVV_total;
+      mela.setProcess(TVar::bkgWWZZ_SMHiggs, TVar::MCFM, theProds[iprod]);
+      mela.computeProdDecP(pVAMCFM_wbfVV_total, true);
+      cout << "pVAMCFM_wbfVV_" << theProdName << "_total: " << pVAMCFM_wbfVV_total << '\n' << endl;
+      float pVAMCFM_wbfVV_bkg;
+      mela.setProcess(TVar::bkgWWZZ, TVar::MCFM, theProds[iprod]);
+      mela.computeProdDecP(pVAMCFM_wbfVV_bkg, true);
+      cout << "pVAMCFM_wbfVV_" << theProdName << "_bkg: " << pVAMCFM_wbfVV_bkg << '\n' << endl;
+      float pVAMCFM_wbfVV_sig;
+      mela.setProcess(TVar::HSMHiggs_WWZZ, TVar::MCFM, theProds[iprod]);
+      mela.computeProdDecP(pVAMCFM_wbfVV_sig, true);
+      cout << "pVAMCFM_wbfVV_" << theProdName << "_sig: " << pVAMCFM_wbfVV_sig << '\n' << endl;
 
-    float pVAMCFM_wbfWW_total;
-    mela.setProcess(TVar::bkgWW_SMHiggs, TVar::MCFM, TVar::JJVBF);
-    mela.computeProdDecP(pVAMCFM_wbfWW_total, true);
-    cout << "pVAMCFM_wbfWW_total: " << pVAMCFM_wbfWW_total << '\n' << endl;
-    float pVAMCFM_wbfWW_bkg;
-    mela.setProcess(TVar::bkgWW, TVar::MCFM, TVar::JJVBF);
-    mela.computeProdDecP(pVAMCFM_wbfWW_bkg, true);
-    cout << "pVAMCFM_wbfWW_bkg: " << pVAMCFM_wbfWW_bkg << '\n' << endl;
-    float pVAMCFM_wbfWW_sig;
-    mela.setProcess(TVar::HSMHiggs, TVar::MCFM, TVar::JJVBF);
-    mela.computeProdDecP(pVAMCFM_wbfWW_sig, true);
-    cout << "pVAMCFM_wbfWW_sig: " << pVAMCFM_wbfWW_sig << '\n' << endl;
+      float pVAMCFM_wbfWW_total;
+      mela.setProcess(TVar::bkgWW_SMHiggs, TVar::MCFM, theProds[iprod]);
+      mela.computeProdDecP(pVAMCFM_wbfWW_total, true);
+      cout << "pVAMCFM_wbfWW_" << theProdName << "_total: " << pVAMCFM_wbfWW_total << '\n' << endl;
+      float pVAMCFM_wbfWW_bkg;
+      mela.setProcess(TVar::bkgWW, TVar::MCFM, theProds[iprod]);
+      mela.computeProdDecP(pVAMCFM_wbfWW_bkg, true);
+      cout << "pVAMCFM_wbfWW_" << theProdName << "_bkg: " << pVAMCFM_wbfWW_bkg << '\n' << endl;
+      float pVAMCFM_wbfWW_sig;
+      mela.setProcess(TVar::HSMHiggs, TVar::MCFM, theProds[iprod]);
+      mela.computeProdDecP(pVAMCFM_wbfWW_sig, true);
+      cout << "pVAMCFM_wbfWW_" << theProdName << "_sig: " << pVAMCFM_wbfWW_sig << '\n' << endl;
 
-    /***** WW (as ZZ) *****/
-    cindex=1;
-    mela.setCurrentCandidateFromIndex(cindex);
-    float pVAMCFM_wbfZZ_total;
-    mela.setProcess(TVar::bkgZZ_SMHiggs, TVar::MCFM, TVar::JJVBF);
-    mela.computeProdDecP(pVAMCFM_wbfZZ_total, true);
-    cout << "pVAMCFM_wbfZZ_total: " << pVAMCFM_wbfZZ_total << '\n' << endl;
-    float pVAMCFM_wbfZZ_bkg;
-    mela.setProcess(TVar::bkgZZ, TVar::MCFM, TVar::JJVBF);
-    mela.computeProdDecP(pVAMCFM_wbfZZ_bkg, true);
-    cout << "pVAMCFM_wbfZZ_bkg: " << pVAMCFM_wbfZZ_bkg << '\n' << endl;
-    float pVAMCFM_wbfWWasZZ_sig;
-    mela.setProcess(TVar::HSMHiggs, TVar::MCFM, TVar::JJVBF);
-    mela.computeProdDecP(pVAMCFM_wbfWWasZZ_sig, true);
-    cout << "pVAMCFM_wbfWWasZZ_sig: " << pVAMCFM_wbfWWasZZ_sig << '\n' << endl;
+      /***** WW (as ZZ) *****/
+      cindex=1;
+      mela.setCurrentCandidateFromIndex(cindex);
+      float pVAMCFM_wbfWWasZZ_total;
+      mela.setProcess(TVar::bkgZZ_SMHiggs, TVar::MCFM, theProds[iprod]);
+      mela.computeProdDecP(pVAMCFM_wbfWWasZZ_total, true);
+      cout << "pVAMCFM_wbfWWasZZ_" << theProdName << "_total: " << pVAMCFM_wbfWWasZZ_total << '\n' << endl;
+      float pVAMCFM_wbfWWasZZ_bkg;
+      mela.setProcess(TVar::bkgZZ, TVar::MCFM, theProds[iprod]);
+      mela.computeProdDecP(pVAMCFM_wbfWWasZZ_bkg, true);
+      cout << "pVAMCFM_wbfWWasZZ_" << theProdName << "_bkg: " << pVAMCFM_wbfWWasZZ_bkg << '\n' << endl;
+      float pVAMCFM_wbfWWasZZ_sig;
+      mela.setProcess(TVar::HSMHiggs, TVar::MCFM, theProds[iprod]);
+      mela.computeProdDecP(pVAMCFM_wbfWWasZZ_sig, true);
+      cout << "pVAMCFM_wbfWWasZZ_" << theProdName << "_sig: " << pVAMCFM_wbfWWasZZ_sig << '\n' << endl;
 
-    /***** ZZ *****/
-    cindex=2;
-    mela.setCurrentCandidateFromIndex(cindex);
-    float pVAMCFM_wbfZZ_sig;
-    mela.setProcess(TVar::HSMHiggs, TVar::MCFM, TVar::JJVBF);
-    mela.computeProdDecP(pVAMCFM_wbfZZ_sig, true);
-    cout << "pVAMCFM_wbfZZ_sig: " << pVAMCFM_wbfZZ_sig << '\n' << endl;
+      /***** ZZ *****/
+      cindex=2;
+      mela.setCurrentCandidateFromIndex(cindex);
+      float pVAMCFM_wbfZZ_total;
+      mela.setProcess(TVar::bkgZZ_SMHiggs, TVar::MCFM, theProds[iprod]);
+      mela.computeProdDecP(pVAMCFM_wbfZZ_total, true);
+      cout << "pVAMCFM_wbfZZ_" << theProdName << "_total: " << pVAMCFM_wbfZZ_total << '\n' << endl;
 
+      float pVAMCFM_wbfZZ_bkg;
+      mela.setProcess(TVar::bkgZZ, TVar::MCFM, theProds[iprod]);
+      mela.computeProdDecP(pVAMCFM_wbfZZ_bkg, true);
+      cout << "pVAMCFM_wbfZZ_" << theProdName << "_bkg: " << pVAMCFM_wbfZZ_bkg << '\n' << endl;
+
+      float pVAMCFM_wbfZZ_sig;
+      mela.setProcess(TVar::HSMHiggs, TVar::MCFM, theProds[iprod]);
+      mela.computeProdDecP(pVAMCFM_wbfZZ_sig, true);
+      cout << "pVAMCFM_wbfZZ_" << theProdName << "_sig: " << pVAMCFM_wbfZZ_sig << '\n' << endl;
+    }
     if (verbosity>=TVar::DEBUG){
       cout << "Removing Mela candidates\nSummary:" << endl;
       for (int ic=0; ic<mela.getNCandidates(); ic++){
@@ -4483,6 +4506,7 @@ void testME_ProdDec_MCFM_Ping(int flavor=2, shared_ptr<Mela> melaptr=nullptr){
 
   cout.rdbuf(coutbuf);
   tout.close();
+
   mela.setVerbosity(bkpverbosity);
 }
 

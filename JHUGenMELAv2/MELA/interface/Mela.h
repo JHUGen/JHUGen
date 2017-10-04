@@ -395,7 +395,8 @@ protected:
   float getConstant_JHUGenUndecayed();
   float getConstant_4l();
   float getConstant_2l2q();
-  float getConstant_FourFermionDecay(int decid);
+  float getConstant_4q();
+  float getConstant_FourFermionDecay(const int& decid);
 
 };
 

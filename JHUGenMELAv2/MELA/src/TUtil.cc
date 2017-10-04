@@ -1886,12 +1886,20 @@ bool TUtil::MCFM_SetupParticleCouplings(
   bool hasW1 = isWW;
   bool hasW2 = isWW;
   if (verbosity>=TVar::DEBUG){
-    cout << "TUtil::MCFM_SetupParticleCouplings(" << TVar::ProductionName(production) << ", " << TVar::ProcessName(process) << "):\nInitial configuration ";
-    if (isGG) cout << "is GG.";
-    else if (isZG) cout << "is ZG.";
-    else if (isZZ) cout << "is ZZ.";
-    else if (isZJJ) cout << "is ZJJ.";
-    else if (isWW) cout << "is WW.";
+    cout << "TUtil::MCFM_SetupParticleCouplings(" << TVar::ProductionName(production) << ", " << TVar::ProcessName(process) << "):\nInitial configuration is ";
+    vector<TString> strcfgs;
+    if (isGG) strcfgs.push_back(TString("GG"));
+    if (isZG) strcfgs.push_back(TString("ZG"));
+    if (isZZ) strcfgs.push_back(TString("ZZ"));
+    if (isZJJ) strcfgs.push_back(TString("ZJJ"));
+    if (isWW) strcfgs.push_back(TString("WW"));
+    if (!strcfgs.empty()){
+      for (unsigned int istr=0; istr<strcfgs.size(); istr++){
+        if (istr==0) cout << strcfgs.at(istr);
+        else cout << ", " << strcfgs.at(istr);
+      }
+      cout << ".";
+    }
     else cout << "has no valid decay!";
     cout << endl;
   }
@@ -2490,6 +2498,8 @@ bool TUtil::MCFM_SetupParticleCouplings(
     if (isWW && (production == TVar::ZZINDEPENDENT || production == TVar::ZZQQB) && process == TVar::bkgWW){} // Skip this one, already handled above
     else if (hasZ1){
       if (PDGHelpers::isALepton(pId[pZOrder[0]]) && PDGHelpers::isALepton(pId[pZOrder[1]])){
+        if (verbosity>=TVar::DEBUG) cout << "- Setting Z1->ll couplings." << endl;
+
         zcouple_.q1=-1.0;
         zcouple_.l1=zcouple_.le;
         zcouple_.r1=zcouple_.re;
@@ -2506,6 +2516,8 @@ bool TUtil::MCFM_SetupParticleCouplings(
         // End special Z1->ll cases
       }
       else if (PDGHelpers::isANeutrino(pId[pZOrder[0]]) && PDGHelpers::isANeutrino(pId[pZOrder[1]])){
+        if (verbosity>=TVar::DEBUG) cout << "- Setting Z1->nn couplings." << endl;
+
         zcouple_.q1=0;
         zcouple_.l1=zcouple_.ln;
         zcouple_.r1=zcouple_.rn;
@@ -2522,6 +2534,8 @@ bool TUtil::MCFM_SetupParticleCouplings(
         // End special Z1->nn cases
       }
       else if (PDGHelpers::isAJet(pId[pZOrder[0]]) && PDGHelpers::isAJet(pId[pZOrder[1]])){
+        if (verbosity>=TVar::DEBUG) cout << "- Setting Z1->jj couplings." << endl;
+
         nqcdjets_.nqcdjets += 2;
         int jetid=(PDGHelpers::isAnUnknownJet(pId[pZOrder[0]]) ? abs(pId[pZOrder[1]]) : abs(pId[pZOrder[0]]));
         if (!PDGHelpers::isAnUnknownJet(jetid)){
@@ -2583,9 +2597,14 @@ bool TUtil::MCFM_SetupParticleCouplings(
     }
 
     // Couplings for Z2
-    if (isWW && (production == TVar::ZZINDEPENDENT || production == TVar::ZZQQB) && process == TVar::bkgWW){} // Skip this one, already handled above
+    if (
+      (isWW && (production == TVar::ZZINDEPENDENT || production == TVar::ZZQQB) && process == TVar::bkgWW) // Skip this one, already handled above
+      ||
+      (isZJJ && production == TVar::JJQCD && process == TVar::bkgZJets) // No need to handle
+      ){}
     else if (hasZ2){
       if (PDGHelpers::isALepton(pId[pZOrder[2]]) && PDGHelpers::isALepton(pId[pZOrder[3]])){
+        if (verbosity>=TVar::DEBUG) cout << "- Setting Z2->ll couplings." << endl;
         zcouple_.q2=-1.0;
         zcouple_.l2=zcouple_.le;
         zcouple_.r2=zcouple_.re;
@@ -2598,6 +2617,7 @@ bool TUtil::MCFM_SetupParticleCouplings(
         // End special Z2->ll cases
       }
       else if (PDGHelpers::isANeutrino(pId[pZOrder[2]]) && PDGHelpers::isANeutrino(pId[pZOrder[3]])){
+        if (verbosity>=TVar::DEBUG) cout << "- Setting Z2->nn couplings." << endl;
         zcouple_.q2=0;
         zcouple_.l2=zcouple_.ln;
         zcouple_.r2=zcouple_.rn;
@@ -2610,6 +2630,8 @@ bool TUtil::MCFM_SetupParticleCouplings(
         // End special Z2->nn cases
       }
       else if (PDGHelpers::isAJet(pId[pZOrder[2]]) && PDGHelpers::isAJet(pId[pZOrder[3]])){
+        if (verbosity>=TVar::DEBUG) cout << "- Setting Z2->jj couplings." << endl;
+
         nqcdjets_.nqcdjets += 2;
         int jetid=(PDGHelpers::isAnUnknownJet(pId[pZOrder[2]]) ? abs(pId[pZOrder[3]]) : abs(pId[pZOrder[2]]));
         if (!PDGHelpers::isAnUnknownJet(jetid)){
