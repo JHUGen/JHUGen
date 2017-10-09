@@ -16,7 +16,7 @@ if [[ "$#" -ge 1 ]] && [[ "$1" == *"clean"* ]];then
 	popd
 	make clean
 else
-	tcsh data/retrieve.csh $DATA_LIB_DIR mcfm_704
+	tcsh data/retrieve.csh $DATA_LIB_DIR mcfm_705
 	bash downloadNNPDF.sh
 	pushd $MELADIR"/fortran/"
 	make all
