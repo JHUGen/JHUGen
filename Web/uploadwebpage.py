@@ -162,7 +162,8 @@ def create_Download(mostrecentversion, *olderversions):
     if not os.path.exists("MCFM-precompiled"):
         check_call(["git", "clone", "git@github.com:JHUGen/MCFM-precompiled"])
     with cd("MCFM-precompiled"):
-        check_call(["git", "pull"])
+        check_call(["git", "fetch"])
+        check_call(["git", "checkout", MCFMprecompiledcommit])
 
 @contextmanager
 def cd(newdir):
@@ -261,6 +262,7 @@ dontupload = [
               ".gitignore",
               ".git",
              ]
+MCFMprecompiledcommit = "5c2d6b85a4ec0a5c7fb58caf6116b7b084266b84"
 #end of inputs
 ########################################################################################
 
