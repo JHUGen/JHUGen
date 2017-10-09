@@ -7,7 +7,6 @@ OLODIR          = /Users/johnmc/Research/OneLOop-3.3.1
 
 FC = gfortran
 # For linking against OneLOop
-FFLAGS 	= -O2 -g -I$(INCPATH) -Iobj -Jobj -I$(OLODIR)
 #FFLAGS 	= -O2 -fno-f2c -g -I$(INCPATH) -Iobj -Jobj -I$(OLODIR)
 # no linking
 #FFLAGS 	= -O2 -g -I$(INCPATH) -Iobj -Jobj
