@@ -120,10 +120,26 @@ logical, public :: UseUnformattedRead = .false.  !Set this to true if the regula
 
 logical, public :: H_DK =.false.                 ! default to false so H in V* > VH (Process = 50) does not decay to bbbar
 
+logical, public :: HbbDecays =.false.                 ! default to false so H in V* > VHiggs (Process = 50) does not decay to bbbar
+
 !leave this one as a parameter, no reason to ever turn it off
 logical, public, parameter :: importExternal_LHEinit = .true.
 !=====================================================
 
+!=====================================================
+
+! new VH
+character(len=2), public :: VHiggs_PC = "bo"                ! VH partonic channel and mode selection, ignores PChannel, in development.
+                                                            ! "ee" ( = e+ e- @LO)
+                                                            ! "gg" ( = triangles + boxes of gg)
+                                                            ! "qq" ( = q qbar @LO)
+                                                            ! "lo" ( = q qbar @LO)
+                                                            ! "tr" ( = triangles of gg)
+                                                            ! "bo" ( = boxes of gg)
+                                                            ! "qg" or "gq" ( = qg + gq)
+                                                            ! "nl" ( = full oneloop = q qbar @LO + NLO + gg + gq)
+! new VH
+!=====================================================
 
 !=====================================================
 !cuts - should be set on the command line
@@ -2133,6 +2149,155 @@ integer :: Part
 
 END FUNCTION
 
+! new VH
+
+FUNCTION ZFFbare(id1in,id2in,h1,h2)
+implicit none
+real(8) :: ZFFbare
+integer :: id1, id2, id1in, id2in
+real(8) :: h1,h2
+
+id1 = abs(id1in)
+id2 = abs(id2in)
+
+  if(id1.ne.id2)then
+    print*,"Not a valid Z to fermion pair vertex!",id1in,id2in
+    stop
+  !Zll
+  else if(id1.eq.convertLHE(ElM_).or.id1.eq.convertLHE(MuM_).or.id1.eq.convertLHE(TaM_))then
+    if((id1in*h1).gt.0d0)then
+      ZFFbare = aR_lep
+    else
+      ZFFbare = aL_lep
+    endif
+  !Zuu
+  else if(id1.eq.convertLHE(Up_).or.id1.eq.convertLHE(Chm_).or.id1.eq.convertLHE(Top_))then
+    if((id1in*h1).gt.0d0)then
+      ZFFbare = aR_QUp
+    else
+      ZFFbare = aL_QUp
+    endif
+  !Zdd
+  else if(id1.eq.convertLHE(Dn_).or.id1.eq.convertLHE(Str_).or.id1.eq.convertLHE(Bot_))then
+    if((id1in*h1).gt.0d0)then
+      ZFFbare = aR_QDn
+    else
+      ZFFbare = aL_QDn
+    endif
+  !Z nu nu
+  else if(id1.eq.convertLHE(NuE_).or.id1.eq.convertLHE(NuM_).or.id1.eq.convertLHE(NuT_))then
+    if((id1in*h1).gt.0d0)then
+      ZFFbare = aL_neu
+    else
+      print*,"Noright-handed neutrino here!",id1in,h1
+      stop
+    endif
+  else
+    print*,"Not a valid Z to fermion pair vertex!",id1in,id2in
+    stop
+  endif
+
+return
+END FUNCTION
+
+FUNCTION ZFF(id1in,id2in,h1,h2)
+implicit none
+real(8) :: ZFF
+integer :: id1in, id2in
+real(8) :: h1,h2
+  ZFF = ZFFbare(id1in,id2in,h1,h2) * sqrt(ScaleFactor(id1in,id2in))
+return
+END FUNCTION
+
+FUNCTION AFF(id1in,id2in,h1,h2)
+implicit none
+real(8) :: AFF
+integer :: id1, id2, id1in, id2in
+real(8) :: h1,h2
+
+id1 = abs(id1in)
+id2 = abs(id2in)
+
+  if(id1.ne.id2)then
+    print*,"Not a valid Z to fermion pair vertex!",id1in,id2in
+    stop
+  !photon ll
+  else if(id1.eq.convertLHE(ElM_).or.id1.eq.convertLHE(MuM_).or.id1.eq.convertLHE(TaM_))then
+    if((id1in*h1).gt.0d0)then
+      AFF = QlR
+    else
+      AFF = QlL
+    endif
+  !photon uu
+  else if(id1.eq.convertLHE(Up_).or.id1.eq.convertLHE(Chm_).or.id1.eq.convertLHE(Top_))then
+    if((id1in*h1).gt.0d0)then
+      AFF = QuR
+    else
+      AFF = QuL
+    endif
+  !photon dd
+  else if(id1.eq.convertLHE(Dn_).or.id1.eq.convertLHE(Str_).or.id1.eq.convertLHE(Bot_))then
+    if((id1in*h1).gt.0d0)then
+      AFF = QdR
+    else
+      AFF = QdL
+    endif
+  !photon nu nu
+  else if(id1.eq.convertLHE(NuE_).or.id1.eq.convertLHE(NuM_).or.id1.eq.convertLHE(NuT_))then
+    AFF = 0d0
+    print*,"Warning, gamma > nu nu~ gives 0.",id1in,id2in
+  else
+    print*,"Not a valid photon to fermion pair vertex!",id1in,id2in
+    stop
+  endif
+
+return
+END FUNCTION
+
+Function CouplToLHEWp(Part)
+  implicit none
+  logical :: CouplToLHEWp
+  integer, intent(in) :: Part(1:2)
+
+  CouplToLHEWp = &
+     ((Part(1).eq.2 .and.Part(2).eq.-1) &
+  .or.(Part(1).eq.2 .and.Part(2).eq.-3) &
+  .or.(Part(1).eq.2 .and.Part(2).eq.-5) &
+  .or.(Part(1).eq.4 .and.Part(2).eq.-1) &
+  .or.(Part(1).eq.4 .and.Part(2).eq.-3) &
+  .or.(Part(1).eq.4 .and.Part(2).eq.-5) &
+  .or.(Part(1).eq.-1.and.Part(2).eq. 2) &
+  .or.(Part(1).eq.-3.and.Part(2).eq. 2) &
+  .or.(Part(1).eq.-5.and.Part(2).eq. 2) &
+  .or.(Part(1).eq.-1.and.Part(2).eq. 4) &
+  .or.(Part(1).eq.-3.and.Part(2).eq. 4) &
+  .or.(Part(1).eq.-5.and.Part(2).eq. 4))
+
+  return
+end function CouplToLHEWp
+
+Function CouplToLHEWm(Part)
+  implicit none
+  logical :: CouplToLHEWm
+  integer, intent(in) :: Part(1:2)
+
+  CouplToLHEWm = &
+     ((Part(1).eq.-2.and.Part(2).eq. 1) &
+  .or.(Part(1).eq.-2.and.Part(2).eq. 3) &
+  .or.(Part(1).eq.-2.and.Part(2).eq. 5) &
+  .or.(Part(1).eq.-4.and.Part(2).eq. 1) &
+  .or.(Part(1).eq.-4.and.Part(2).eq. 3) &
+  .or.(Part(1).eq.-4.and.Part(2).eq. 5) &
+  .or.(Part(1).eq. 1.and.Part(2).eq.-2) &
+  .or.(Part(1).eq. 3.and.Part(2).eq.-2) &
+  .or.(Part(1).eq. 5.and.Part(2).eq.-2) &
+  .or.(Part(1).eq. 1.and.Part(2).eq.-4) &
+  .or.(Part(1).eq. 3.and.Part(2).eq.-4) &
+  .or.(Part(1).eq. 5.and.Part(2).eq.-4))
+
+  return
+end function CouplToLHEWm
+! new VH
 
 subroutine ComputeCKMElements(inVCKM_ud, inVCKM_us, inVCKM_cd, inVCKM_cs, inVCKM_ts, inVCKM_tb, inVCKM_ub, inVCKM_cb, inVCKM_td)
 implicit none
@@ -2837,6 +3002,30 @@ subroutine spinoru(p,za,zb,s)
       enddo
 
     end subroutine spinoru
+
+!========================================================================
+! Common initialization functions that may be called multiple times if needed
+! Check arXiv:1604.06792 for the parameters
+subroutine InitCOLLIER(Nmax, Rmax)
+#if useCollier==1
+use COLLIER
+implicit none
+integer, intent(in) :: Nmax, Rmax
+integer :: supNmax, supRmax
+!   supNmax = max(Nmax, Collier_maxNLoopProps)
+!   supRmax = max(Rmax, Collier_maxRank)
+!   if ((supNmax .gt. Collier_maxNLoopProps) .or. (supRmax .gt. Collier_maxRank)) then
+!      call Init_cll(supNmax,supRmax,'')
+!      call setMode_cll(1)
+!   endif
+   call Init_cll(supNmax,supRmax,'')
+   call setMode_cll(1)
+#else
+implicit none
+integer, intent(in) :: Nmax, Rmax
+   return
+#endif
+end subroutine
 !========================================================================
 
 

@@ -76,9 +76,11 @@ END PROGRAM
 subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to the appropriate numbers
    use ModParameters
    use ModMisc
-#if useCollier==1
+!- new VH
+#if useCollier==1 || useCollier==2
    use COLLIER
 #endif
+!- new VH
    implicit none
    integer :: Nmax,rmax
 
@@ -88,6 +90,7 @@ subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to t
             Process.eq. 1 .or.  &
             Process.eq. 2 .or.  &
             Process.eq.50 .or.  &
+            Process.eq.51 .or.  &!new VH
             Process.eq.60 .or.  &
             Process.eq.61 .or.  &
             Process.eq.62 .or.  &
@@ -119,7 +122,8 @@ subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to t
          Process.eq.60 .or. & !- HVBF without decays
          Process.eq.61 .or. & !- Hjj, gluon fusion
          Process.eq.62 .or. & !- Hj, gluon fusion
-         Process.eq.50 & !- VHiggs
+         Process.eq.50 .or. & !- VHiggs
+         Process.eq.51      & ! new VH
          ) then
             FacScheme = -kRenFacScheme_mhstar
             MuFacMultiplier = 1d0
@@ -161,7 +165,8 @@ subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to t
          Process.eq.60 .or. & !- HVBF without decays
          Process.eq.61 .or. & !- Hjj, gluon fusion
          Process.eq.62 .or. & !- Hj, gluon fusion
-         Process.eq.50 & !- VHiggs
+         Process.eq.50 .or. & !- VHiggs
+         Process.eq.51 & !- new VH
          ) then
             RenScheme = -kRenFacScheme_mhstar
             MuRenMultiplier = 1d0
@@ -195,6 +200,7 @@ subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to t
       if( &
          (                     &
             Process.eq.50 .or. &
+            Process.eq.51 .or. &!new VH
             Process.eq.60 .or. &
             Process.eq.61 .or. &
             Process.eq.66 .or. &
@@ -212,6 +218,7 @@ subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to t
       if( &
          (                     &
             Process.eq.50 .or. &
+            Process.eq.51 .or. &!new VH
             Process.eq.60 .or. &
             Process.eq.61 .or. &
             Process.eq.66 .or. &
@@ -252,9 +259,15 @@ subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to t
 #if useCollier==1
      Nmax = 4
      rmax = 4
-     call Init_cll(Nmax,rmax,"output_collier")
-     call InitCacheSystem_cll(1,Nmax)
-     call InitEvent_cll
+     call InitCOLLIER(Nmax,rmax)
+#endif
+   endif
+
+   if( Process.eq.51 ) then ! new VH
+#if useCollier==1
+     Nmax = 4
+     rmax = 3
+     call InitCOLLIER(Nmax,rmax)
 #endif
    endif
 
@@ -452,6 +465,9 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "TopDK", success, TopDecays)
     call ReadCommandLineArgument(arg, "TauDK", success, TauDecays)
     call ReadCommandLineArgument(arg, "HbbDK", success, H_DK)
+    call ReadCommandLineArgument(arg, "HbbDecays", success, HbbDecays)
+    call ReadCommandLineArgument(arg, "HbbDK", success, HbbDecays)
+    call ReadCommandLineArgument(arg, "HbbDecays", success, H_DK)
     call ReadCommandLineArgument(arg, "ReweightDecay", success, ReweightDecay)
     call ReadCommandLineArgument(arg, "WidthScheme", success, WidthScheme)
     call ReadCommandLineArgument(arg, "WidthSchemeIn", success, WidthSchemeIn)
@@ -901,7 +917,7 @@ logical :: SetColliderEnergy
        DecayMode2 = DecayMode1
     endif
 
-    if( Process.eq.50 ) then
+    if( Process.eq.50 .or. Process.eq.51 ) then ! old and new VH
         DecayMode2=DecayMode1
         if( Collider.eq.2 ) call Error("Collider 2 not available for VH")
         if( (IsAWDecay(DecayMode1) ) .and. (Collider.ne.1) ) call Error("WH with Collider 1 only")
@@ -925,7 +941,7 @@ logical :: SetColliderEnergy
        DecayMode1 = DecayMode1 - DecayMode2
     endif
 
-    if( IsAZDecay(DecayMode1) .or. (Process.eq.50.and.IsAPhoton(DecayMode1)) ) then
+    if( IsAZDecay(DecayMode1) .or. ((Process.eq.50.or.Process.eq.51).and.IsAPhoton(DecayMode1)) ) then! new VH added
        M_V = M_Z
        Ga_V= Ga_Z
        M_Vprime = M_Zprime
@@ -985,9 +1001,9 @@ logical :: SetColliderEnergy
     endif
 
     !decay mode checks
-    if( (IsAZDecay(DecayMode1) .and. IsAZDecay(DecayMode2) .and. Process.eq.0 .and. TauDecays.lt.0) .or. (Process.eq.50 .and. IsAZDecay(DecayMode1)) .or. Process.eq.60 .or. Process.eq.66 ) then
+    if( (IsAZDecay(DecayMode1) .and. IsAZDecay(DecayMode2) .and. Process.eq.0 .and. TauDecays.lt.0) .or. ((Process.eq.50.or.Process.eq.51) .and. IsAZDecay(DecayMode1)) .or. Process.eq.60 .or. Process.eq.66 ) then ! new VH added
         includeGammaStar = (SetZgammacoupling .or. Setgammagammacoupling)
-    elseif( (IsAZDecay(DecayMode1) .and. IsAPhoton(DecayMode2) .and. Process.eq.0 .and. TauDecays.lt.0) .or. (Process.eq.50 .and. IsAPhoton(DecayMode1)) ) then
+    elseif( (IsAZDecay(DecayMode1) .and. IsAPhoton(DecayMode2) .and. Process.eq.0 .and. TauDecays.lt.0) .or. ((Process.eq.50.or.Process.eq.51) .and. IsAPhoton(DecayMode1)) ) then ! new VH added
         includeGammaStar = Setgammagammacoupling
     else if (Process.eq.67 .or. Process.eq.68 .or. Process.eq.69) then
         includeGammaStar = .true. ! Not really gamma*, but rather gamma* or gluon, set to true to manipulate phasespace generation
@@ -1017,14 +1033,14 @@ logical :: SetColliderEnergy
         stop 1
     endif
 
-    if( Process.eq.50 .and. IsAPhoton(DecayMode1) .and. .not.SetZgammacoupling .and. .not.Setgammagammacoupling ) then
+    if( (Process.eq.50.or.Process.eq.51) .and. IsAPhoton(DecayMode1) .and. .not.SetZgammacoupling .and. .not.Setgammagammacoupling ) then ! new VH added
         print *, "To produce gammaH, you need to set one of the HZgamma (ghzgs*) or Hgammagamma(ghgsgs*) couplings."
         stop 1
     endif
 
     !cut checks
     if(.not.SetpTjetcut) then
-        if(Process.eq.50) then
+        if(Process.eq.50.or.Process.eq.51) then ! new VH added
             pTjetcut = 0d0*GeV
         else
             pTjetcut = 15d0*GeV
@@ -1045,7 +1061,7 @@ logical :: SetColliderEnergy
         endif
     endif
     if(.not.SetdeltaRcut) then
-        if(Process.eq.50) then
+        if(Process.eq.50.or.Process.eq.51) then !new VH added
             Rjet = 0d0
         else
             Rjet = 0.3d0
@@ -1171,8 +1187,8 @@ logical :: SetColliderEnergy
 
 
     ! Contact terms
-    if (Process.le.2 .or. Process.eq.50) then
-        if (IsAZDecay(DecayMode1) .or. (Process.eq.50 .and. IsAPhoton(DecayMode1))) then
+    if (Process.le.2 .or. (Process.eq.50.or.Process.eq.51)) then ! new VH added
+        if (IsAZDecay(DecayMode1) .or. ((Process.eq.50.or.Process.eq.51) .and. IsAPhoton(DecayMode1))) then ! new VH added
             if ((SetHZprime .and. .not.SetZprimeff) .or. (.not.SetHZprime .and. SetZprimeff)) then
                 call Error("To use Z' contact terms, you have to set both HVZ' and Z'ff couplings")
             endif
@@ -1634,6 +1650,30 @@ include "vegas_common.f"
          VegasNc1_default = 500000
          VegasNc2_default = 10000
       endif
+      !- new VH
+      if(Process.eq.51) then
+         NDim = 20
+         if( unweighted ) NDim = NDim + 2  ! partonic channel and acceptance
+! yrnd(1:2): helicity of parton 1:2
+! yrnd(3): helicities of parton 6,7
+! yrnd(4): helicities of parton 8,9
+! yrnd(5): flavor in Z/W decay mode
+! yrnd(6:7): phi_4 and cos(theta_4) in the CM frame of Z*(3)
+! yrnd(8:9): phi_6 and cos(theta_6) in the CM frame of decay product of Z(4)
+! yrnd(10:11): phi_8 and cos(theta_8) in the CM frame of decay product of H(5)
+! yRnd(12): inv_mass(4)
+! yRnd(13): inv_mass(5)
+! yRnd(14:16): real emission phase space
+! yRnd(17): NLO integration for + distribution for PDF renormalization
+! yrnd(18:19): PDF mapping
+! yrnd(20): flavor of j in gq > WH+j
+! yrnd(21): partonic channel in unweighted events
+! yRnd(22): accept or reject in unweighted events
+         VegasIt1_default = 5
+         VegasNc0_default = 10000000
+         VegasNc1_default = 500000
+         VegasNc2_default = 10000
+      endif
       !- ttbar+H
       if(Process.eq.80) then
          call InitProcess_TTBH()
@@ -1748,6 +1788,7 @@ use ModCrossSection_HJJ
 use ModCrossSection_TTBH
 use ModCrossSection_BBBH
 use ModCrossSection_TH
+use ModCrossSection_VH
 use ModKinematics
 use ModParameters
 implicit none
@@ -1803,6 +1844,8 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
       else
             call vegas(EvalWeighted_VHiggs,VG_Result,VG_Error,VG_Chi2)
       endif
+    elseif (Process.eq.51) then! new VH
+      call vegas(EvalWeighted_VH,VG_Result,VG_Error,VG_Chi2)
     elseif (Process.eq.80) then
       call vegas(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
     elseif (Process.eq.90) then
@@ -1837,6 +1880,8 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
       else
            call vegas1(EvalWeighted_VHiggs,VG_Result,VG_Error,VG_Chi2)
       endif
+    elseif (Process.eq.51) then! new VH
+      call vegas1(EvalWeighted_VH,VG_Result,VG_Error,VG_Chi2)
     elseif (Process.eq.80) then
       call vegas1(EvalWeighted_TTBH,VG_Result,VG_Error,VG_Chi2)
     elseif (Process.eq.90) then
@@ -1872,6 +1917,10 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
             elseif (Process.eq.50) then
                 RES = 0d0
                 dum = EvalUnWeighted_VHiggs(yRnd,.false.,RES)
+                VG = VG + RES
+            elseif (Process.eq.51) then! new VH
+                RES = 0d0
+                dum = EvalUnWeighted_VH(yRnd,.false.,RES)
                 VG = VG + RES
             else
                 if (PChannel_aux.eq.0.or.PChannel_aux.eq.2) then
@@ -1941,6 +1990,8 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
                       dum = EvalUnWeighted_HJ(yRnd,.true.,RES)! RES is a dummy here
             elseif (Process.eq.50) then
                       dum = EvalUnWeighted_VHiggs(yRnd,.true.,RES)! RES is a dummy here
+            elseif (Process.eq.51) then ! new VH
+                      dum = EvalUnWeighted_VH(yRnd,.true.,RES)! RES is a dummy here
             else
                 dum = EvalUnWeighted(yRnd,.true.,RES)! RES is a dummy here
             endif
@@ -1957,6 +2008,8 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
                 dum = EvalUnWeighted_HJ(yRnd,.true.,RES)! RES is a dummy here
               elseif (Process.eq.50) then
                   dum = EvalUnWeighted_VHiggs(yRnd,.true.,RES)! RES is a dummy here
+              elseif (Process.eq.51) then ! new VH
+                  dum = EvalUnWeighted_VH(yRnd,.true.,RES)! RES is a dummy here
               else
                   dum = EvalUnWeighted(yRnd,.true.,RES)! RES is a dummy here
               endif
@@ -2053,6 +2106,7 @@ use ModCrossSection_BBBH
 use ModCrossSection_HJJ
 use ModCrossSection_TH
 use ModCrossSection_TTBH
+use ModCrossSection_VH
 use modHiggsJJ
 use modTHiggs
 use ModKinematics
@@ -3611,6 +3665,8 @@ implicit none
      call InitHisto_HJ()
   elseif (Process.eq.50) then
      call InitHisto_VHiggs()
+  elseif (Process.eq.51) then ! new VH
+     call InitHisto_VHiggs()
   elseif (Process.eq.80) then
      call InitHisto_TTBH()
   elseif (Process.eq.90) then
@@ -4599,6 +4655,7 @@ character :: arg*(500)
     if( (Process.eq.66 .or. Process.eq.68) .and. M_Reso.ge.0d0  ) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "1st Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( (Process.eq.66 .or. Process.eq.68) .and. M_Reso2.ge.0d0 ) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "2nd Resonance: spin=0, mass=",M_Reso2*100d0," width=",Ga_Reso2*100d0
     if( Process.eq.50) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
+    if( Process.eq.51) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0 ! new VH
     if( Process.eq.80) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( Process.eq.90) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
     if( Process.eq.110) write(TheUnit,"(4X,A,F7.2,A,F10.5)") "Resonance: spin=0, mass=",M_Reso*100d0," width=",Ga_Reso*100d0
@@ -4614,7 +4671,7 @@ character :: arg*(500)
     .or. (ReadLHEFile .and. TauDecays.ne.0) &
     .or. ConvertLHEFile ) &
     then
-        if( .not.ReadLHEFile .and. (ConvertLHEFile .or. Process.eq.50 .or. (Process.ge.110 .and. Process.le.114)) ) then
+        if( .not.ReadLHEFile .and. (ConvertLHEFile .or. Process.eq.50 .or. Process.eq.51 .or. (Process.ge.110 .and. Process.le.114)) ) then ! new VH added
             write(TheUnit,"(4X,A,I2,2X,A,I2)") "DecayMode1:",DecayMode1
         else if( ReadLHEFile .or. Process.le.2 .or. Process .eq. 80 ) then
             write(TheUnit,"(4X,A,I2,2X,A,I2)") "DecayMode1:",DecayMode1, "DecayMode2:",DecayMode2
@@ -4625,7 +4682,7 @@ character :: arg*(500)
     if( Process.eq.80 .or. Process.eq.110 .or. Process.eq.111 .or.Process.eq.112 .or. Process.eq.113 .or. Process.eq.114) write(TheUnit,"(4X,A,F8.4,A,F6.4)") "Top quark mass=",m_top*100d0,", width=",Ga_top*100d0
     if( Process.eq.80 .or. Process.eq.110 .or. Process.eq.111 .or. Process.eq.112 .or. Process.eq.113 .or. Process.eq.114) write(TheUnit,"(4X,A,I2)") "Top quark decay=",TOPDECAYS
     if( Process.eq.90 ) write(TheUnit,"(4X,A,F8.4,A,F6.4)") "Bottom quark mass=",m_top*100d0
-    if( Process.eq.50 .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.62 .or. (Process.ge.66 .and. Process.le.69) .or. Process.eq.90 .or. &
+    if( Process.eq.50 .or. Process.eq.51 .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.62 .or. (Process.ge.66 .and. Process.le.69) .or. Process.eq.90 .or. & ! new VH added
        ((Process.eq.80 .or. (Process.ge.110 .and. Process.le.114)) .and. m_Top.lt.10d0*GeV) ) then
         write(TheUnit,"(4X,A)") "Jet cuts:"
         write(TheUnit,"(12X,A,F8.2,A)") "pT >= ", pTjetcut/GeV, " GeV"
@@ -4634,7 +4691,7 @@ character :: arg*(500)
             write(TheUnit,"(4X,A,F8.2)") "|Deltaeta| >= ", detajetcut
             if (JetsOppositeEta) write(TheUnit,"(5X,A,F8.2)") "eta1*eta2 <= ", 0d0
         endif
-        if( Process.eq.50 .or. Process.eq.60 .or. Process.eq.61 .or. (Process.ge.66 .and. Process.le.69) .or. Process.eq.80 .or. Process.eq.90) then
+        if( Process.eq.50 .or. Process.eq.51 .or. Process.eq.60 .or. Process.eq.61 .or. (Process.ge.66 .and. Process.le.69) .or. Process.eq.80 .or. Process.eq.90) then ! new VH added
             write(TheUnit,"(8X,A,F8.2)") "DeltaR >= ", Rjet
             write(TheUnit,"(11X,A,F8.2,A)") "mJJ >= ", mJJcut/GeV, " GeV"
         endif
@@ -4650,7 +4707,7 @@ character :: arg*(500)
             write(TheUnit,"(F10.2,A,F10.2,A)") m4l_minmax(1)/GeV, " GeV <= m4l <= ", m4l_minmax(2)/GeV, " GeV"
         endif
     endif
-    if( (Process.eq.0 .or. Process.eq.2 .or. Process.eq.50) .and. includeGammaStar ) then
+    if( (Process.eq.0 .or. Process.eq.2 .or. Process.eq.50 .or. Process.eq.51) .and. includeGammaStar ) then ! new VH added
         write(TheUnit,"(6X,A,F8.2,A)") "m(gammastar) >= ", MPhotonCutoff/GeV, " GeV"
     endif
     if( (ReadLHEFile) .and. (RequestNLeptons.gt.0) ) then
@@ -4740,7 +4797,7 @@ character :: arg*(500)
     if( Process.eq.69 ) write(TheUnit,"(4X,A,L)") "Intermediate off-shell gluons: ",includeGammaStar
 
     write(TheUnit,"(4X,A)") ""
-    if( Process.eq.0 .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.62 .or. Process.eq.66 .or. Process.eq.68 .or. Process.eq.50 ) then
+    if( Process.eq.0 .or. Process.eq.60 .or. Process.eq.61 .or. Process.eq.62 .or. Process.eq.66 .or. Process.eq.68 .or. Process.eq.50 .or. Process.eq.51) then ! new VH added
         write(TheUnit,"(4X,A)") "spin-0-VV couplings: "
         write(TheUnit,"(6X,A,L)") "generate_as=",generate_as
         if( generate_as ) then

@@ -10,8 +10,7 @@ MELALibDir = $(MELADataDir)/slc6_amd64_gcc530
 MCFMLib = mcfm_704 # libmcfm_704.so
 PDFDir = $(Here)/pdfs
 VegasDir = $(Here)/vegas
-QCDLibDir = $(Here)/../lib/QCD-Loop2/lib64
-CollierDir = $(Here)/../lib/COLLIER-1.1/
+CollierDir = $(Here)/COLLIER-1.2/
 
 # compiler options, Comp='ifort' or 'gfort'
 Opt  = Yes
@@ -30,7 +29,7 @@ MyLHADir=${LHAPDF_DATA_PATH}/../../lib/
 #link MCFM libraries from MELA
 # remember to export
 #          LD_LIBRARY_PATH=/.../MELA/data/$SCRAM_ARCH/:${LD_LIBRARY_PATH}
-linkMELA = Yes
+linkMELA = No
 
 
 ifeq ($(UseLHAPDF),Yes)
@@ -40,21 +39,13 @@ else
 endif
 
 
-#include QCD Loop Integral Library
-linkQCDLoopLib = No
-
-ifeq ($(linkQCDLoopLib),Yes)
-   QCDLoopLibflags = -DuseQCDLoopLib=1
-else
-   QCDLoopLibflags = -DuseQCDLoopLib=0
-endif
-
-
 #include Collier Loop Integral Library
-linkCollierLib = No
+linkCollierLib = Yes
 
 ifeq ($(linkCollierLib),Yes)
-   CollierLibflags = -DuseCollier=1 -L$(CollierDir) -I$(CollierDir)/modules -lcollier
+#   CollierLibflags = -DuseCollier=1 -L$(CollierDir) -I$(CollierDir)/modules -lcollier
+   CollierLibflags = -DuseCollier=1 -L$(CollierDir) -I$(CollierDir) -lcollier
+   #COLLIERflags = -L$(COLLIERDir) -lcollier
 else
    CollierLibflags = -DuseCollier=0
 endif
@@ -75,7 +66,7 @@ ifeq ($(Comp),gfort)
  else
     OptOpts  = -O0 -fcheck=all
  endif
- fcomp = gfortran $(OptOpts) -ffree-line-length-none -I$(VegasDir) -I$(ModuleDir) -J$(ModuleDir) $(LHAPDFflags) $(MELAflags) $(QCDLoopLibflags) $(CollierLibflags) -Dcompiler=2
+ fcomp = gfortran $(OptOpts) -ffree-line-length-none -I$(VegasDir) -I$(ModuleDir) -J$(ModuleDir) $(LHAPDFflags) $(MELAflags) $(CollierLibflags) -Dcompiler=2
 endif
 
 
@@ -85,7 +76,7 @@ ifeq ($(Comp),ifort)
  else
     OptOpts  = -O0 -implicitnone -check bounds -check pointer -warn interfaces -ftrapuv  -diag-disable remark -debug extended -g -traceback -fpe0 -check uninit
  endif
- fcomp = ifort -fpp $(OptOpts) -module $(ModuleDir) -I$(VegasDir) -Dcompiler=1 $(LHAPDFflags) $(MELAflags) $(QCDLoopLibflags)  $(CollierLibflags)
+ fcomp = ifort -fpp $(OptOpts) -module $(ModuleDir) -I$(VegasDir) -Dcompiler=1 $(LHAPDFflags) $(MELAflags) $(CollierLibflags)
 endif
 
 
@@ -100,12 +91,14 @@ Exec = ./JHUGen
 # kinematics dependencies
 KinDep = mod_HashCollection.F90 \
          mod_Phasespace.F90 \
-         mod_Kinematics.F90
+         mod_Kinematics.F90 \
+         mod_Kinematics_VH.F90
 
 # kinematics objects
 KinObj = $(ObjectDir)/mod_HashCollection.o \
          $(ObjectDir)/mod_Phasespace.o \
-         $(ObjectDir)/mod_Kinematics.o
+         $(ObjectDir)/mod_Kinematics.o \
+         $(ObjectDir)/mod_Kinematics_VH.o
 
 ifeq ($(linkMELA),Yes)
     KinDep += mod_MCFMWrapper.F90
@@ -118,6 +111,7 @@ MainDep = mod_CrossSection.F90 \
           mod_CrossSection_TTBH.F90 \
           mod_CrossSection_BBBH.F90 \
           mod_CrossSection_TH.F90 \
+          mod_CrossSection_VH.F90 \
           mod_PMZZ.F90 \
           main.F90
 
@@ -130,32 +124,145 @@ MainObj = $(ObjectDir)/mod_CrossSection.o \
           $(ObjectDir)/mod_PMZZ.o \
           $(ObjectDir)/main.o
 
+# auxiliary dependencies
+AuxDep = mod_Misc.F90 \
+         mod_Parameters.F90 \
+         mod_VH_aux.F90 \
 
+AuxObj =  $(ObjectDir)/mod_Misc.o \
+          $(ObjectDir)/mod_Parameters.o \
+          $(ObjectDir)/mod_VH_aux.o \
+
+ggboxVHAmpDep = \
+         gg_VH_Boxes/mod_ffbH_Box7_mmm.F90 \
+         gg_VH_Boxes/mod_ffbH_Box7_ppm.F90 \
+         gg_VH_Boxes/mod_ffbH_Box7_mmp.F90 \
+         gg_VH_Boxes/mod_ffbH_Box7_ppp.F90 \
+         gg_VH_Boxes/mod_ffbH_Box8_mmm.F90 \
+         gg_VH_Boxes/mod_ffbH_Box8_ppm.F90 \
+         gg_VH_Boxes/mod_ffbH_Box8_mmp.F90 \
+         gg_VH_Boxes/mod_ffbH_Box8_ppp.F90 \
+         gg_VH_Boxes/mod_ffbH_Box9_mmm.F90 \
+         gg_VH_Boxes/mod_ffbH_Box9_ppm.F90 \
+         gg_VH_Boxes/mod_ffbH_Box9_mmp.F90 \
+         gg_VH_Boxes/mod_ffbH_Box9_ppp.F90 \
+         gg_VH_Boxes/mod_ffbH_Box10_mmm.F90 \
+         gg_VH_Boxes/mod_ffbH_Box10_ppm.F90 \
+         gg_VH_Boxes/mod_ffbH_Box10_mmp.F90 \
+         gg_VH_Boxes/mod_ffbH_Box10_ppp.F90 \
+         gg_VH_Boxes/mod_ffbH_Box11_mmm.F90 \
+         gg_VH_Boxes/mod_ffbH_Box11_ppm.F90 \
+         gg_VH_Boxes/mod_ffbH_Box11_mmp.F90 \
+         gg_VH_Boxes/mod_ffbH_Box11_ppp.F90 \
+         gg_VH_Boxes/mod_ffbH_Box12_mmm.F90 \
+         gg_VH_Boxes/mod_ffbH_Box12_ppm.F90 \
+         gg_VH_Boxes/mod_ffbH_Box12_mmp.F90 \
+         gg_VH_Boxes/mod_ffbH_Box12_ppp.F90 \
+         gg_VH_Boxes/mod_ffbH_Box7_mpm.F90 \
+		 gg_VH_Boxes/mod_ffbH_Box7_mpp.F90 \
+		 gg_VH_Boxes/mod_ffbH_Box8_mpm.F90 \
+		 gg_VH_Boxes/mod_ffbH_Box8_mpp.F90 \
+		 gg_VH_Boxes/mod_ffbH_Box9_mpm.F90 \
+		 gg_VH_Boxes/mod_ffbH_Box9_mpp.F90 \
+		 gg_VH_Boxes/mod_ffbH_Box10_mpm.F90 \
+		 gg_VH_Boxes/mod_ffbH_Box10_mpp.F90 \
+		 gg_VH_Boxes/mod_ffbH_Box11_mpm.F90 \
+		 gg_VH_Boxes/mod_ffbH_Box11_mpp.F90 \
+		 gg_VH_Boxes/mod_ffbH_Box12_mpm.F90 \
+		 gg_VH_Boxes/mod_ffbH_Box12_mpp.F90 \
+         gg_VH_Boxes/mod_ffbH_Box7_pmm.F90 \
+         gg_VH_Boxes/mod_ffbH_Box7_pmp.F90 \
+         gg_VH_Boxes/mod_ffbH_Box8_pmm.F90 \
+         gg_VH_Boxes/mod_ffbH_Box8_pmp.F90 \
+         gg_VH_Boxes/mod_ffbH_Box9_pmm.F90 \
+         gg_VH_Boxes/mod_ffbH_Box9_pmp.F90 \
+         gg_VH_Boxes/mod_ffbH_Box10_pmm.F90 \
+         gg_VH_Boxes/mod_ffbH_Box10_pmp.F90 \
+         gg_VH_Boxes/mod_ffbH_Box11_pmm.F90 \
+         gg_VH_Boxes/mod_ffbH_Box11_pmp.F90 \
+         gg_VH_Boxes/mod_ffbH_Box12_pmm.F90 \
+         gg_VH_Boxes/mod_ffbH_Box12_pmp.F90
+
+ggboxVHAmpObj = \
+          $(ObjectDir)/mod_ffbH_Box7_mmm.o \
+          $(ObjectDir)/mod_ffbH_Box7_ppm.o \
+          $(ObjectDir)/mod_ffbH_Box7_mmp.o \
+          $(ObjectDir)/mod_ffbH_Box7_ppp.o \
+          $(ObjectDir)/mod_ffbH_Box8_mmm.o \
+          $(ObjectDir)/mod_ffbH_Box8_ppm.o \
+          $(ObjectDir)/mod_ffbH_Box8_mmp.o \
+          $(ObjectDir)/mod_ffbH_Box8_ppp.o \
+          $(ObjectDir)/mod_ffbH_Box9_mmm.o \
+          $(ObjectDir)/mod_ffbH_Box9_ppm.o \
+          $(ObjectDir)/mod_ffbH_Box9_mmp.o \
+          $(ObjectDir)/mod_ffbH_Box9_ppp.o \
+          $(ObjectDir)/mod_ffbH_Box10_mmm.o \
+          $(ObjectDir)/mod_ffbH_Box10_ppm.o \
+          $(ObjectDir)/mod_ffbH_Box10_mmp.o \
+          $(ObjectDir)/mod_ffbH_Box10_ppp.o \
+          $(ObjectDir)/mod_ffbH_Box11_mmm.o \
+          $(ObjectDir)/mod_ffbH_Box11_ppm.o \
+          $(ObjectDir)/mod_ffbH_Box11_mmp.o \
+          $(ObjectDir)/mod_ffbH_Box11_ppp.o \
+          $(ObjectDir)/mod_ffbH_Box12_mmm.o \
+          $(ObjectDir)/mod_ffbH_Box12_ppm.o \
+          $(ObjectDir)/mod_ffbH_Box12_mmp.o \
+          $(ObjectDir)/mod_ffbH_Box12_ppp.o \
+          $(ObjectDir)/mod_ffbH_Box7_mpm.o \
+          $(ObjectDir)/mod_ffbH_Box7_mpp.o \
+          $(ObjectDir)/mod_ffbH_Box8_mpm.o \
+          $(ObjectDir)/mod_ffbH_Box8_mpp.o \
+          $(ObjectDir)/mod_ffbH_Box9_mpm.o \
+          $(ObjectDir)/mod_ffbH_Box9_mpp.o \
+          $(ObjectDir)/mod_ffbH_Box10_mpm.o \
+          $(ObjectDir)/mod_ffbH_Box10_mpp.o \
+          $(ObjectDir)/mod_ffbH_Box11_mpm.o \
+          $(ObjectDir)/mod_ffbH_Box11_mpp.o \
+          $(ObjectDir)/mod_ffbH_Box12_mpm.o \
+          $(ObjectDir)/mod_ffbH_Box12_mpp.o \
+          $(ObjectDir)/mod_ffbH_Box7_pmm.o \
+          $(ObjectDir)/mod_ffbH_Box7_pmp.o \
+          $(ObjectDir)/mod_ffbH_Box8_pmm.o \
+          $(ObjectDir)/mod_ffbH_Box8_pmp.o \
+          $(ObjectDir)/mod_ffbH_Box9_pmm.o \
+          $(ObjectDir)/mod_ffbH_Box9_pmp.o \
+          $(ObjectDir)/mod_ffbH_Box10_pmm.o \
+          $(ObjectDir)/mod_ffbH_Box10_pmp.o \
+          $(ObjectDir)/mod_ffbH_Box11_pmm.o \
+          $(ObjectDir)/mod_ffbH_Box11_pmp.o \
+          $(ObjectDir)/mod_ffbH_Box12_pmm.o \
+          $(ObjectDir)/mod_ffbH_Box12_pmp.o
 
 # amplitude dependencies
-AmpDep =  mod_Misc.F90 \
-          mod_Parameters.F90 \
-          mod_TopDecay.F90 \
+AmpDep =  mod_TopDecay.F90 \
           mod_Graviton.F90 \
           mod_Higgs.F90 \
           mod_Zprime.F90 \
           mod_HiggsJJ.F90 \
           mod_HiggsJ.F90 \
           mod_VHiggs.F90 \
+          mod_VH_LO.F90 \
+          mod_VH_gg.F90 \
+          mod_VH_real.F90 \
+          mod_VH_qg.F90 \
+          mod_VH_dipole.F90 \
           mod_TTBHiggs.F90 \
           mod_THiggs.F90
 
 
 # amplitude objects
-AmpObj =  $(ObjectDir)/mod_Misc.o \
-          $(ObjectDir)/mod_Parameters.o \
-          $(ObjectDir)/mod_TopDecay.o \
+AmpObj =  $(ObjectDir)/mod_TopDecay.o \
           $(ObjectDir)/mod_Graviton.o \
           $(ObjectDir)/mod_Higgs.o \
           $(ObjectDir)/mod_Zprime.o \
           $(ObjectDir)/mod_HiggsJJ.o \
           $(ObjectDir)/mod_HiggsJ.o \
           $(ObjectDir)/mod_VHiggs.o \
+          $(ObjectDir)/mod_VH_LO.o \
+          $(ObjectDir)/mod_VH_gg.o \
+          $(ObjectDir)/mod_VH_real.o \
+          $(ObjectDir)/mod_VH_qg.o \
+          $(ObjectDir)/mod_VH_dipole.o \
           $(ObjectDir)/mod_TTBHiggs.o \
           $(ObjectDir)/mod_THiggs.o
 
@@ -185,20 +292,6 @@ CPSDep = ./CPS/CALLING_cpHTO.f
 CPSObj = $(ObjectDir)/CALLING_cpHTO.o
 
 
-# #uncommented this because the library is already included in MCFMLib
-# ifeq ($(linkQCDLoopLib),Yes)
-# #   QCDLib_Obj = $(QCDLibDir)/ql/libqcdloop.a\
-# #                $(QCDLibDir)/ff/libff.a
-# #    QCDLib_Flags=
-# 
-#    QCDLib_Obj = $(QCDLibDir)/libqcdloop.a
-#    QCDLib_Flags= -Wl,-rpath,/mnt/pep/mschulze/lib/QCD-Loop2/lib64 -L/mnt/pep/mschulze/lib/QCD-Loop2/lib64 -lqcdloop -lquadmath
-# else
-#    QCDLib_Obj = 
-#    QCDLib_Flags=
-# endif
-
-
 # MadGraphDep = h_emepemep.f \
 #               h_emepemep_noint.f \
 #               h_tamtaptamtap.f \
@@ -215,7 +308,7 @@ MadGraphObj = $(ObjectDir)/gg_ttbh.o \
 
 
 
-JHUGenerator: $(CPSObj) $(PSGenObj) $(VegasObj) $(PDFObj) $(AmpObj) $(ggVHAmpObj) $(KinObj) $(MainObj)
+JHUGenerator: colliermodules $(CPSObj) $(PSGenObj) $(VegasObj) $(PDFObj) $(AuxObj) $(ggboxVHAmpObj) $(AmpObj) $(ggVHAmpObj) $(KinObj) $(MainObj)
 	@echo " linking"
 ifeq ($(UseLHAPDF),Yes)
 	echo " -> interfaced with LHAPDF"
@@ -224,9 +317,17 @@ else
 endif
 	@echo " executable file "$(Exec)" is compiled with "$(Comp)
 	@echo " "
-	$(fcomp) -o $(Exec) $(MainObj) $(KinObj) $(AmpObj) $(ggVHAmpObj) $(PSGenObj) $(VegasObj) $(PDFObj) $(CPSObj) $(LHAPDFflags) $(MELAflags) $(CollierLibflags)
+	$(fcomp) -o $(Exec) $(MainObj) $(AuxObj) $(ggboxVHAmpObj) $(KinObj) $(AmpObj) $(ggVHAmpObj) $(PSGenObj) $(VegasObj) $(PDFObj) $(CPSObj) $(LHAPDFflags) $(MELAflags) $(CollierLibflags) 
 
+$(AuxObj): $(AuxDep) $(Makefile)
+	@echo " compiling misc. and aux. tools"
+	$(fcomp) -c $(AuxDep)
+	mv *.o $(ObjectDir)
 
+$(ggboxVHAmpObj): $(ggboxVHAmpDep) $(Makefile)
+	@echo " compiling ggVH box amplitude"
+	$(fcomp) -c $(ggboxVHAmpDep)
+	mv *.o $(ObjectDir)
 
 $(AmpObj): $(AmpDep) mod_Misc.F90 mod_Parameters.F90 $(Makefile)
 	@echo " compiling amplitude routines"
@@ -287,7 +388,14 @@ $(PSGenObj): $(PSGenDep)
 # 	$(fcomp) -O0 -c $(MadGraphDep) -I/home/schulze/lib/HELAS-3.0/
 # 	mv *.o $(ObjectDir)
 
-
+colliermodules:
+	@echo " compiling COLLIER-1.2"
+#	FC=$(CompFullName) overrides FC specified in that makefile
+	(cd $(CollierDir); $(MAKE) FC=$(Comp))
+	@echo " moving Collier .mod to modules directory"
+	(cp $(CollierDir)/*.mod $(ModuleDir)/)
+#	@echo " moving Collier .o to objects directory"
+#	(cp $(CollierDir)/*.o $(objects)/)
 
 clean:
 	@echo " deleting executable, object and module files"
@@ -305,6 +413,8 @@ endif
 	rm -f objects/*.o
 	rm -f modules/*.mod
 	rm -f modules/*.f90
+	rm -f $(CollierDir)/*.mod
+	rm -f $(CollierDir)/*.o
 	rm -f *.mod
 	rm -f *.o
 	rm -f $(Exec)

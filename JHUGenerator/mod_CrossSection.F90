@@ -2209,8 +2209,8 @@ if( IsAZDecay(DecayMode1) ) then
       MomExt(3,2)=0d0
       MomExt(4,2)=-MomExt(1,2)
 
-      call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt)
-      call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut)
+      call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt)
+      call Kinematics_VHiggs(id,(/MomExt,Mom_Not_a_particle/),NBin,applyPSCut,H_DK)
       if( applyPSCut .or. PSWgt.eq.zero ) return
 
       call SetRunningScales( (/ MomExt(1:4,5),MomExt(1:4,6),MomExt(1:4,7) /) , (/ convertLHEreverse(id(3)),convertLHEreverse(id(6)),convertLHEreverse(id(7)),convertLHEreverse(id(4)) /) )
@@ -2260,8 +2260,8 @@ if( IsAZDecay(DecayMode1) ) then
       MomExt(3,2)=0d0
       MomExt(4,2)=-MomExt(1,2)
 
-      call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt)
-      call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut)
+      call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt)
+      call Kinematics_VHiggs(id,(/MomExt,Mom_Not_a_particle/),NBin,applyPSCut,H_DK)
       if( applyPSCut .or. PSWgt.eq.zero ) return
 
       FluxFac = 1d0/(2d0*ILC_Energy**2)
@@ -2293,8 +2293,8 @@ elseif( IsAWDecay(DecayMode1) ) then
       MomExt(3,2)=0d0
       MomExt(4,2)=-MomExt(1,2)
 
-      call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt)
-      call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut)
+      call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt)
+      call Kinematics_VHiggs(id,(/MomExt,Mom_Not_a_particle/),NBin,applyPSCut,H_DK)
       if( applyPSCut .or. PSWgt.eq.zero ) return
 
       call SetRunningScales( (/ MomExt(1:4,5),MomExt(1:4,6),MomExt(1:4,7) /) , (/ convertLHEreverse(id(3)),convertLHEreverse(id(6)),convertLHEreverse(id(7)),convertLHEreverse(id(4)) /) )
@@ -2353,8 +2353,8 @@ elseif( IsAPhoton(DecayMode1) ) then
       MomExt(3,2)=0d0
       MomExt(4,2)=-MomExt(1,2)
 
-      call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt,useAonshell=.true.)
-      call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut,useAonshell=.true.)
+      call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt,PhoOnshell=.true.)
+      call Kinematics_VHiggs(id,(/MomExt,Mom_Not_a_particle/),NBin,applyPSCut,H_DK,PhoOnshell=.true.)
       if( applyPSCut .or. PSWgt.eq.zero ) return
 
       call SetRunningScales( (/ MomExt(1:4,5),MomExt(1:4,6),Mom_Not_a_particle(1:4) /) , (/ convertLHEreverse(id(3)),convertLHEreverse(id(6)),Not_a_particle_,convertLHEreverse(id(4)) /) )
@@ -2391,8 +2391,8 @@ elseif( IsAPhoton(DecayMode1) ) then
       MomExt(3,2)=0d0
       MomExt(4,2)=-MomExt(1,2)
 
-      call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt,useAonshell=.true.)
-      call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut,useAonshell=.true.)
+      call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt,PhoOnshell=.true.)
+      call Kinematics_VHiggs(id,(/MomExt,Mom_Not_a_particle/),NBin,applyPSCut,H_DK,PhoOnshell=.true.)
       if( applyPSCut .or. PSWgt.eq.zero ) return
 
       FluxFac = 1d0/(2d0*ILC_Energy**2)
@@ -2752,8 +2752,8 @@ if( IsAZDecay(DecayMode1) ) then
       MomExt(3,2)=0d0
       MomExt(4,2)=-MomExt(1,2)
 
-      call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt)
-      call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut)
+      call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt)
+      call Kinematics_VHiggs(id,(/MomExt,Mom_Not_a_particle/),NBin,H_DK,applyPSCut)
       if( applyPSCut .or. PSWgt.eq.zero ) return
 
       call SetRunningScales( (/ MomExt(1:4,5),MomExt(1:4,6),MomExt(1:4,7) /) , (/ convertLHEreverse(id(3)),convertLHEreverse(id(6)),convertLHEreverse(id(7)),convertLHEreverse(id(4)) /) )
@@ -2777,8 +2777,8 @@ if( IsAZDecay(DecayMode1) ) then
       MomExt(3,2)=0d0
       MomExt(4,2)=-MomExt(1,2)
 
-      call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt)
-      call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut)
+      call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt)
+      call Kinematics_VHiggs(id,(/MomExt,Mom_Not_a_particle/),NBin,H_DK,applyPSCut)
       if( applyPSCut .or. PSWgt.eq.zero ) return
 
       FluxFac = 1d0/(2d0*ILC_Energy**2)
@@ -2802,8 +2802,8 @@ elseif( IsAWDecay(DecayMode1) ) then
       MomExt(3,2)=0d0
       MomExt(4,2)=-MomExt(1,2)
 
-      call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt)
-      call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut)
+      call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt)
+      call Kinematics_VHiggs(id,(/MomExt,Mom_Not_a_particle/),NBin,H_DK,applyPSCut)
       if( applyPSCut .or. PSWgt.eq.zero ) return
 
       call SetRunningScales( (/ MomExt(1:4,5),MomExt(1:4,6),MomExt(1:4,7) /) , (/ convertLHEreverse(id(3)),convertLHEreverse(id(6)),convertLHEreverse(id(7)),convertLHEreverse(id(4)) /) )
@@ -2830,8 +2830,8 @@ elseif( IsAPhoton(DecayMode1) ) then
       MomExt(3,2)=0d0
       MomExt(4,2)=-MomExt(1,2)
 
-      call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt,useAonshell=.true.)
-      call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut,useAonshell=.true.)
+      call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt,PhoOnshell=.true.)
+      call Kinematics_VHiggs(id,(/MomExt,Mom_Not_a_particle/),NBin,applyPSCut,H_DK,PhoOnshell=.true.)
       if( applyPSCut .or. PSWgt.eq.zero ) return
 
       call SetRunningScales( (/ MomExt(1:4,5),MomExt(1:4,6),Mom_Not_a_particle(1:4) /) , (/ convertLHEreverse(id(3)),convertLHEreverse(id(6)),Not_a_particle_,convertLHEreverse(id(4)) /) )
@@ -2855,8 +2855,8 @@ elseif( IsAPhoton(DecayMode1) ) then
       MomExt(3,2)=0d0
       MomExt(4,2)=-MomExt(1,2)
 
-      call EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt,useAonshell=.true.)
-      call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut,useAonshell=.true.)
+      call EvalPhaseSpace_VHiggs(yRnd,MomExt,inv_mass,mass,PSWgt,PhoOnshell=.true.)
+      call Kinematics_VHiggs(id,(/MomExt,Mom_Not_a_particle/),NBin,applyPSCut,H_DK,PhoOnshell=.true.)
       if( applyPSCut .or. PSWgt.eq.zero ) return
 
       FluxFac = 1d0/(2d0*ILC_Energy**2)
@@ -2936,7 +2936,7 @@ endif
     AlertCounter = AlertCounter + 1
     Res = 0d0
   elseif( EvalUnWeighted_VHiggs .gt. yRnd(17)*CS_max ) then
-    call Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut,useAonshell=(IsAPhoton(DecayMode1)))
+    call Kinematics_VHiggs(id,(/MomExt,Mom_Not_a_particle/),NBin,applyPSCut,H_DK,PhoOnshell=(IsAPhoton(DecayMode1)))
     do NHisto=1,NumHistograms
       call intoHisto(NHisto,NBin(NHisto),1d0)  ! CS_Max is the integration volume
     enddo
@@ -3104,8 +3104,8 @@ print *, "remove boost2Lab"
    call Kinematics_VHiggs(  &
       (/convertLHE(Glu_),convertLHE(Glu_),convertLHE(Z0_),convertLHE(Z0_),convertLHE(Hig_),convertLHE(ElM_),convertLHE(ElP_),convertLHE(Bot_),convertLHE(ABot_)/),&
       (/MomExt(1:4,1),MomExt(1:4,2),MomExt(1:4,3)+MomExt(1:4,4)+MomExt(1:4,5),MomExt(1:4,3)+MomExt(1:4,4),&
-        MomExt(1:4,5),MomExt(1:4,3),MomExt(1:4,4),MomExt(1:4,5),MomExt(1:4,6)/),&
-        (/1d0,1d0,1d0,1d0,1d0,1d0,1d0,1d0,1d0/),NBin,applyPSCut)  ! careful: invmass not set gives wrong angular distributions !! 
+        MomExt(1:4,5),MomExt(1:4,3),MomExt(1:4,4),MomExt(1:4,5),MomExt(1:4,6),Mom_Not_a_particle/),&
+        NBin,applyPSCut,H_DK)  ! careful: invmass not set gives wrong angular distributions !! 
    applyPSCut=.false.
    if( applyPSCut .or. PSWgt.eq.zero ) return
 
@@ -3329,7 +3329,7 @@ END FUNCTION
 
     if( EHat.lt.M_Reso+M_Z ) return
     
-    call EvalPhasespace_VHglu(yRnd(3:10),EHat,MomExt(1:4,1:7),PSWgt)! q1 q2 H34 f5 f6 glu7
+    call EvalPhasespace_VHiggsglu(yRnd(3:10),EHat,MomExt(1:4,1:7),PSWgt)! q1 q2 H34 f5 f6 glu7
 !     call boost2Lab(eta1,eta2,7,MomExt(1:4,1:7))
 
 ! call genps(4,EHat,yRnd(3:10),(/M_Reso,0d0,0d0,0d0/),MomExt(1:4,3:6),PSWgt)
@@ -3342,8 +3342,8 @@ END FUNCTION
    call Kinematics_VHiggs(  &
       (/convertLHE(Up_),convertLHE(Up_),convertLHE(Z0_),convertLHE(Z0_),convertLHE(Hig_),convertLHE(ElM_),convertLHE(ElP_),convertLHE(Bot_),convertLHE(ABot_)/),&
       (/MomExt(1:4,1),MomExt(1:4,2),MomExt(1:4,1)+MomExt(1:4,2)+MomExt(1:4,7),MomExt(1:4,5)+MomExt(1:4,6),&
-        MomExt(1:4,3)+MomExt(1:4,4),MomExt(1:4,5),MomExt(1:4,6),MomExt(1:4,3),MomExt(1:4,4)/),&
-        (/1d0,1d0,1d0,1d0,1d0,1d0,1d0,1d0,1d0/),NBin,applyPSCut)  ! careful: invmass not set gives wrong angular distributions !! 
+        MomExt(1:4,3)+MomExt(1:4,4),MomExt(1:4,5),MomExt(1:4,6),MomExt(1:4,3),MomExt(1:4,4),Mom_Not_a_particle/),&
+        NBin,applyPSCut,H_DK)  ! careful: invmass not set gives wrong angular distributions !! 
 applyPSCut=.false.; print *, "removing cuts"
 
    Mu_Fact = EHat !M_Reso
@@ -3450,8 +3450,8 @@ print *, "remove dipole 2"; if(nDipole.eq.2) cycle
                   call Kinematics_VHiggs(  &
                      (/convertLHE(Up_),convertLHE(Up_),convertLHE(Z0_),convertLHE(Z0_),convertLHE(Hig_),convertLHE(ElM_),convertLHE(ElP_),convertLHE(Bot_),convertLHE(ABot_)/),&
                      (/MomExtTd(1:4,1),MomExtTd(1:4,2),MomExtTd(1:4,1)+MomExtTd(1:4,2),MomExtTd(1:4,5)+MomExtTd(1:4,6),&
-                       MomExtTd(1:4,3)+MomExtTd(1:4,4),MomExtTd(1:4,5),MomExtTd(1:4,6),MomExtTd(1:4,3),MomExtTd(1:4,4)/),&
-                       (/1d0,1d0,1d0,1d0,1d0,1d0,1d0,1d0,1d0/),NBin,applyPSCut)  ! careful: invmass not set gives wrong angular distributions !! 
+                       MomExtTd(1:4,3)+MomExtTd(1:4,4),MomExtTd(1:4,5),MomExtTd(1:4,6),MomExtTd(1:4,3),MomExtTd(1:4,4),Mom_Not_a_particle/),&
+                       NBin,applyPSCut,H_DK)  ! careful: invmass not set gives wrong angular distributions !! 
 applyPSCut=.false.; print *, "removing cuts"                       
                   if( applyPSCut .or. Dipole.eq.(0d0,0d0) ) cycle
 
