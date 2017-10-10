@@ -3,7 +3,7 @@
          implicit integer (i-n)
          include 'vegas_common.f'
          include 'maxwt.f'
-         parameter(mprod=50*mxdim)
+         parameter(mprod=250*mxdim)
 
          data ncall/10000/,itmx/15/,nprn/1000/,acc/-1d0/,
      1   xl/mxdim*0d0/
@@ -34,13 +34,13 @@ c
          include 'vegas_common.f'
 !          include 'gridinfo.f'
          include 'maxwt.f'
-         parameter(mprod=50*mxdim)
+         parameter(mprod=250*mxdim)
          integer jj
          character*(200) gridline
-         double precision dmax(50,mxdim)! MARKUS array that saves maximum of the function fxn for each division            
-         dimension d(50,mxdim),di(50,mxdim),xin(50),r(50),
+         double precision dmax(250,mxdim)! MARKUS array that saves maximum of the function fxn for each division            
+         dimension d(250,mxdim),di(250,mxdim),xin(250),r(250),
      1   dx(mxdim),dt(mxdim),x(mxdim),kg(mxdim),ia(mxdim)
-         data ndmx/50/,alph/1.5d0/,one/1d0/,mds/0/
+         data ndmx/250/,alph/1.5d0/,one/1d0/,mds/0/
 !          data idum/-113123/
 
          if(ndim .gt. mxdim) then
@@ -370,11 +370,11 @@ c
          include 'vegas_common.f'
 !          include 'gridinfo.f'
          include 'maxwt.f'
-         parameter(mprod=50*mxdim)
+         parameter(mprod=250*mxdim)
          integer jj,kk
-         dimension d(50,mxdim),di(50,mxdim),xin(50),r(50),
+         dimension d(250,mxdim),di(250,mxdim),xin(250),r(250),
      1   dx(mxdim),dt(mxdim),x(mxdim),kg(mxdim),ia(mxdim)
-         data ndmx/50/,alph/1.5d0/,one/1d0/,mds/0/
+         data ndmx/250/,alph/1.5d0/,one/1d0/,mds/0/
 !          data idum/-113123/
          
          nd=ndmx

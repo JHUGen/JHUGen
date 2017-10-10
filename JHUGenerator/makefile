@@ -7,7 +7,7 @@ MELADir = $(Here)/../JHUGenMELAv2/MELA
 MELAFortranDir = $(MELADir)/fortran
 MELADataDir = $(MELADir)/data
 MELALibDir = $(MELADataDir)/slc6_amd64_gcc530
-MCFMLib = mcfm_704 # libmcfm_704.so
+MCFMLib = mcfm_705 # libmcfm_705.so
 PDFDir = $(Here)/pdfs
 VegasDir = $(Here)/vegas
 CollierDir = $(Here)/COLLIER-1.2/
@@ -33,7 +33,7 @@ linkMELA = No
 
 
 ifeq ($(UseLHAPDF),Yes)
-   LHAPDFflags = -L$(MyLHADir) -lLHAPDF -DuseLHAPDF=1
+   LHAPDFflags = -L$(MyLHADir) -lLHAPDF -I$(MyLHADir)/../include -DuseLHAPDF=1 -lstdc++
 else
    LHAPDFflags = -DuseLHAPDF=0
 endif
@@ -281,8 +281,12 @@ PDFObj   = $(ObjectDir)/Cteq61Pdf.o \
            $(ObjectDir)/mstwpdf.o \
            $(ObjectDir)/NNPDFDriver.o
 
-PSGenDep = genps.c \
-           boost.c
+PSGenC = genps.c \
+         boost.c
+
+PSGenDep = $(PSGenC) \
+           genps.h \
+           boost.h
 
 PSGenObj = $(ObjectDir)/genps.o \
            $(ObjectDir)/boost.o
@@ -290,6 +294,17 @@ PSGenObj = $(ObjectDir)/genps.o \
 CPSDep = ./CPS/CALLING_cpHTO.f
 
 CPSObj = $(ObjectDir)/CALLING_cpHTO.o
+
+LHAPDFInterfaceC = LHAPDFversion.cc
+
+LHAPDFInterfaceDep = $(LHAPDFInterfaceC) \
+                     LHAPDFversion.h
+
+ifeq ($(UseLHAPDF),Yes)
+LHAPDFInterfaceObj = $(ObjectDir)/LHAPDFversion.o
+else
+LHAPDFInterfaceObj =
+endif
 
 
 # MadGraphDep = h_emepemep.f \
@@ -305,6 +320,7 @@ MadGraphObj = $(ObjectDir)/gg_ttbh.o \
               $(ObjectDir)/uub_ttbh.o \
               $(ObjectDir)/switchmom.o \
               $(HOME)/lib/HELAS-3.0/libdhelas3.ifc90.a
+
 
 
 
@@ -376,12 +392,17 @@ $(CPSObj): $(CPSDep) $(Makefile)
 	$(fcomp) -c $(CPSDep)
 	mv *.o $(ObjectDir)
 
-	
-$(PSGenObj): $(PSGenDep)
+$(PSGenObj): $(PSGenDep) $(Makefile)
 	@echo " compiling phase space generator"
-	$(ccomp) -c $(PSGenDep)
+	$(ccomp) -c $(PSGenC)
 	mv *.o $(ObjectDir)
 
+ifeq ($(UseLHAPDF),Yes)
+$(LHAPDFInterfaceObj) : $(LHAPDFInterfaceDep) $(Makefile)
+	@echo " compiling LHAPDF interface"
+	$(ccomp) $(LHAPDFflags) -c $(LHAPDFInterfaceC)
+	mv *.o $(ObjectDir)
+endif
 
 # $(MadGraphObj): $(MadGraphDep)
 # 	@echo " compiling MG files"

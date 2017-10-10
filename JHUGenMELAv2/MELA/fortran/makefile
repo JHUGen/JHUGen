@@ -1,16 +1,17 @@
 ifndef ROOTSYS
 all:
 	@echo "ROOTSYS is not set. Please set ROOT environment properly"; echo
+	false
 else
 
-WORKDIR = ./
-#MODULES=$(WORKDIR)modules/
-#OBJECTS=$(WORKDIR)objects/
-MODULES=$(WORKDIR)
-OBJECTS=$(WORKDIR)
+MAINDIR = ./
+#MODULES=$(MAINDIR)modules/
+#OBJECTS=$(MAINDIR)objects/
+MODULES=$(MAINDIR)
+OBJECTS=$(MAINDIR)
 ROOFITINCLUDE = 
 RM  = /bin/rm
-INCLUDE = -I$(WORKDIR) $(ROOFITINCLUDE)
+INCLUDE = -I$(MAINDIR) $(ROOFITINCLUDE)
 Comp = gfort
 
 # Linking LHAPDF
@@ -27,12 +28,26 @@ else
    LHAPDFflags = -DuseLHAPDF=0
 endif
 
+# Linking the Collier library
+UseCOLLIER=Yes
+# directory which contains libLHAPDF.a, libLHAPDF.la, libLHAPDF.so
+MyCOLLIERDir=../data/${SCRAM_ARCH}/
+MyCOLLIERInc=../COLLIER/
+# remember to export
+#          LD_LIBRARY_PATH=/.../LHAPDF-x.y.z/lib/:${LD_LIBRARY_PATH}
+#          LHAPDF_DATA_PATH=/.../LHAPDF-x.y.z/share/LHAPDF/:${LHAPDF_DATA_PATH}
+ifeq ($(UseCOLLIER),Yes)
+   COLLIERflags = -L$(MyCOLLIERDir) -lcollier -DuseCollier=1 -I$(MyCOLLIERInc)
+else
+   COLLIERflags = -DuseCollier=0
+endif
+
 
 ifeq ($(Comp),ifort)
-	fcomp = ifort -fpp -O2 -vec-report0 -Dcompiler=1 -lifcore -fPIC
+	fcomp = ifort -fpp -O2 -vec-report0 -Dcompiler=1 -lifcore $(LHAPDFflags) $(COLLIERflags) -fPIC
 endif
 ifeq ($(Comp),gfort)
-	fcomp = gfortran -O0 -ffree-line-length-none -Dcompiler=2 $(LHAPDFflags) -fno-automatic -fno-f2c  -fPIC -g 
+	fcomp = gfortran -O0 -ffree-line-length-none -Dcompiler=2 $(LHAPDFflags) $(COLLIERflags) -fno-automatic -fno-f2c  -fPIC -g 
 endif
 
 ifeq ($(Comp),gfort)

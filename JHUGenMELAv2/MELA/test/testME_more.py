@@ -6,6 +6,7 @@ test python and some MEs
 
 import os
 import random
+import sys
 import unittest
 
 from mela import Mela, TVar
@@ -65,11 +66,11 @@ class TestMela(unittest.TestCase):
   def setUpClass(cls):
     cls.m = Mela()
   def setUp(self):
-    if ("SEED" in os.environ.keys()) and ("CIRCLE_BUILD_NUM" in os.environ.keys()):
-      """the seed will be different every time, but reproducible"""
-      random.seed(os.environ["SEED"] + os.environ["CIRCLE_BUILD_NUM"])
-    else:
-      random.seed(34567)
+    """the seed will be different every time, but reproducible"""
+    try:
+        random.seed(os.environ["SEED"] + os.environ["CIRCLE_BUILD_NUM"])
+    except KeyError:
+        random.seed(34567)
   def tearDown(self):
     self.m.resetInputEvent()
   def testcontact_decay(self):
@@ -102,11 +103,10 @@ class TestMela(unittest.TestCase):
     L1 = 10000.
 
     m = self.m
+    computeP = m.computeProdP if isprod else m.computeP
 
     ghz1, ghz1_prime2, ghzgs1_prime2 = random.uniform(-1, 1), random.uniform(-10000, 10000), random.uniform(-10000, 10000)
     m.setInputEvent_fromLHE(event, True)
-
-    computeP = m.computeProdP if isprod else m.computeP
 
     m.setProcess(*setprocessargs)
     m.ghz1 = ghz1
@@ -128,6 +128,78 @@ class TestMela(unittest.TestCase):
     me2 = computeP()
 
     self.assertEquals(me1, me2)
+    self.assertNotEquals(me1, 0)
+
+  def testzp_decay(self):
+    self.runVprime(event1_ggH, False, False, TVar.SelfDefine_spin0, TVar.JHUGen, TVar.ZZINDEPENDENT)
+  def testzp_VBF(self):
+    self.runVprime(event2_VBF, True, False, TVar.SelfDefine_spin0, TVar.JHUGen, TVar.JJVBF)
+  def testzp_ZH(self):
+    self.runVprime(event3_ZH, True, False, TVar.SelfDefine_spin0, TVar.JHUGen, TVar.Lep_ZH)
+  def testzpzp_decay(self):
+    self.runVprime(event1_ggH, False, True, TVar.SelfDefine_spin0, TVar.JHUGen, TVar.ZZINDEPENDENT)
+  def testzpzp_VBF(self):
+    self.runVprime(event2_VBF, True, True, TVar.SelfDefine_spin0, TVar.JHUGen, TVar.JJVBF)
+  def testzpzp_ZH(self):
+    self.runVprime(event3_ZH, True, True, TVar.SelfDefine_spin0, TVar.JHUGen, TVar.Lep_ZH)
+  def runVprime(self, event, isprod, usevpvp, *setprocessargs):
+    """
+    correspondence between a1 L1 L1Zg and contact terms
+    """
+
+    M_Z = 91.1876
+    Ga_Z = 2.4952
+    M_W = 80.399
+    Ga_W = 2.085
+    sitW2 = 0.23119
+
+    aL_lep = -0.53762
+    aR_lep = 0.46238
+    aL_nu = 1
+    aR_nu = 0
+
+    sitW2 = 0.23119
+    aL_up = (-2 * sitW2 * 2./3 + 1)
+    aR_up = -2 * sitW2 * 2./3
+    aL_dn = (-2 * sitW2 * -1./3 - 1)
+    aR_dn = -2 * sitW2 * -1./3
+
+    bL = (2*(1-sitW2))**.5
+
+    m = self.m
+    computeP = m.computeProdP if isprod else m.computeP
+    m.setInputEvent_fromLHE(event, True)
+
+    m.setProcess(*setprocessargs)
+    m.ghz1 = 1
+    me1 = computeP()
+
+    m.setProcess(*setprocessargs)
+
+    if usevpvp:
+        m.ghzpzp1 = 1
+    else:
+        m.ghzzp1 = 0.5
+    m.M_Zprime = M_Z
+    m.Ga_Zprime = Ga_Z
+    m.M_Wprime = M_W
+    m.Ga_Wprime = Ga_W
+
+    m.ezp_El_left = m.ezp_Mu_left = m.ezp_Ta_left = aL_lep
+    m.ezp_El_right = m.ezp_Mu_right = m.ezp_Ta_right = aR_lep
+    m.ezp_Up_left = m.ezp_Chm_left = m.ezp_Top_left = aL_up
+    m.ezp_Up_right = m.ezp_Chm_right = m.ezp_Top_right = aR_up
+    m.ezp_Dn_left = m.ezp_Str_left = m.ezp_Bot_left = aL_dn
+    m.ezp_Dn_right = m.ezp_Str_right = m.ezp_Bot_right = aR_dn
+    m.ezp_NuE_left = aL_nu
+    m.ezp_NuE_right = aR_nu
+
+    m.ewp_El_left = m.ewp_Mu_left = m.ewp_Ta_left = m.ewp_Up_left =  m.ewp_Chm_left = m.ewp_Top_left = bL
+
+    me2 = computeP()
+
+    self.assertEquals(me1, me2)
+    self.assertNotEquals(me1, 0)
 
 if __name__ == "__main__":
   unittest.main()

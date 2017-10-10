@@ -1204,11 +1204,13 @@ double TUtil::GetMass(int ipart){
   else{
     // JHUGen masses
     if (
-      ipartabs<=6
+      ipartabs<=6 // (d, u, s, c, b, t)
       ||
-      (ipartabs>=11 && ipartabs<=16)
+      (ipartabs>=11 && ipartabs<=16) // (l, nu) x (e, mu, tau)
       ||
-      ipartabs==23 || ipartabs==24 || ipartabs==25
+      ipartabs==23 || ipartabs==24 || ipartabs==25 // Z, W, H
+      ||
+      ipartabs==32 || ipartabs==34 // Z', W+-'
       ){
       const double GeV=1./100.;
       int jpart = convertLHEreverse(&ipart);
@@ -1236,6 +1238,22 @@ double TUtil::GetDecayWidth(int ipart){
     double outwidth = joutwidth/GeV;
     return outwidth;
   }
+}
+double TUtil::GetMass(const MELAParticle* part){
+  if (part==nullptr) return GetMass(-9000);
+  return GetMass(part->id);
+}
+double TUtil::GetDecayWidth(const MELAParticle* part){
+  if (part==nullptr) return GetDecayWidth(-9000);
+  return GetDecayWidth(part->id);
+}
+void TUtil::GetMassWidth(int ipart, double& m, double& ga){
+  m=TUtil::GetMass(ipart);
+  ga=TUtil::GetDecayWidth(ipart);
+}
+void TUtil::GetMassWidth(const MELAParticle* part, double& m, double& ga){
+  if (part==nullptr) return GetMassWidth(-9000, m, ga);
+  return GetMassWidth(part->id, m, ga);
 }
 
 double TUtil::InterpretScaleScheme(const TVar::Production& production, const TVar::MatrixElement& matrixElement, const TVar::EventScaleScheme& scheme, TLorentzVector p[mxpart]){
@@ -7246,14 +7264,8 @@ int TUtil::WipeMEArray(const TVar::Process& process, const TVar::Production& pro
 bool TUtil::CheckPartonMomFraction(const TLorentzVector& p0, const TLorentzVector& p1, double xx[2], const double& EBEAM, const TVar::VerbosityLevel& verbosity){
   //Make sure parton Level Energy fraction is [0,1]
   //phase space function already makes sure the parton energy fraction between [min,1]
-  //  x0 EBeam =>   <= -x1 EBeam
-  double sysPz = p0.Z() + p1.Z();
-  double sysE = p0.T()+ p1.T();
-  //Ignore the Pt doesn't make significant effect
-  //double sysPt_sqr=sysPx*sysPx+sysPy*sysPy;
-  //if(sysPt_sqr>=1.0E-10)  sysE=TMath::Sqrt(sysE*sysE-sysPt_sqr);
-  xx[0]=(sysE+sysPz)/EBEAM/2.;
-  xx[1]=(sysE-sysPz)/EBEAM/2.;
+  xx[0]=p0.P()/EBEAM;
+  xx[1]=p1.P()/EBEAM;
   if (
     xx[0]>1. || xx[0]<=xmin_.xmin
     ||
@@ -7759,21 +7771,24 @@ void TUtil::GetBoostedParticleVectors(
   double sysE = pTotal.T();
   double pz0 = (sysE+sysPz)/2.;
   double pz1 = -(sysE-sysPz)/2.;
+  double E0 = pz0;
+  double E1 = -pz1;
   int motherId[2]={ 0, 0 };
   if (melaCand->getNMothers()==2){
     for (int ip=0; ip<2; ip++) motherId[ip]=melaCand->getMother(ip)->id;
-    // Match the "assumed" M'1==(pz>0) and M'2==(pz<0) to the pz of the actual mothers:
+    // Match the "assumed" M'1==(larger signed pz) and M'2==(smaller signed pz) to the pz of the actual mothers:
     // Swap pZs to get the correct momentum matching default M1, M2.
-    if ((melaCand->getMother(0)->p4).Z()<0.) swap(pz0, pz1);
+    if (TMath::Sign(1., melaCand->getMother(0)->z()-melaCand->getMother(1)->z())!=TMath::Sign(1., pz0-pz1)){ swap(pz0, pz1); swap(E0, E1); }
     // Swap the ids of mothers and their pT=0-assumed momenta to achieve ordering as "incoming" q-qbar
     if ((motherId[0]<0 && motherId[1]>=0) || (motherId[1]>0 && motherId[0]<=0)){
       swap(pz0, pz1);
+      swap(E0, E1);
       swap(motherId[0], motherId[1]);
     }
   }
   TLorentzVector pM[2];
-  pM[0].SetXYZT(0., 0., pz0, fabs(pz0));
-  pM[1].SetXYZT(0., 0., pz1, fabs(pz1));
+  pM[0].SetXYZT(0., 0., pz0, E0);
+  pM[1].SetXYZT(0., 0., pz1, E1);
 
   // Fill the ids of the V intermediates to the candidate daughters
   mela_event.intermediateVid.clear();
