@@ -2,6 +2,8 @@
 
 {
 
+set -euo pipefail
+
 scriptdir=$(dirname $0)
 curdir=$(pwd)
 
