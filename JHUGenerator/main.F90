@@ -4504,7 +4504,7 @@ integer :: stat
             write(io_LHEOutFile ,'(A)') '<LesHouchesEvents version="1.0">'
         endif
         write(io_LHEOutFile ,'(A)') '<!--'
-        write(io_LHEOutFile ,'(A,A6,A)') 'Output from the JHUGenerator ',trim(JHUGen_Version),' described in arXiv:1001.3396 [hep-ph], arXiv:1208.4018 [hep-ph], arXiv:1309.4819 [hep-ph], arXiv:1606.03107 [hep-ph]'
+        write(io_LHEOutFile ,'(A,A,A)') 'Output from the JHUGenerator ',trim(JHUGen_Version),' described in arXiv:1001.3396 [hep-ph], arXiv:1208.4018 [hep-ph], arXiv:1309.4819 [hep-ph], arXiv:1606.03107 [hep-ph]'
 
         if( writegit ) then
             write(io_LHEOutFile,'(A)') ""
