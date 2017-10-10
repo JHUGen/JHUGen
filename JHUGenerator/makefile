@@ -121,6 +121,7 @@ MainObj = $(ObjectDir)/mod_CrossSection.o \
           $(ObjectDir)/mod_CrossSection_TTBH.o \
           $(ObjectDir)/mod_CrossSection_BBBH.o \
           $(ObjectDir)/mod_CrossSection_TH.o \
+          $(ObjectDir)/mod_CrossSection_VH.o \
           $(ObjectDir)/mod_PMZZ.o \
           $(ObjectDir)/main.o
 
@@ -333,7 +334,7 @@ else
 endif
 	@echo " executable file "$(Exec)" is compiled with "$(Comp)
 	@echo " "
-	$(fcomp) -o $(Exec) $(MainObj) $(AuxObj) $(ggboxVHAmpObj) $(KinObj) $(AmpObj) $(ggVHAmpObj) $(PSGenObj) $(VegasObj) $(PDFObj) $(CPSObj) $(LHAPDFflags) $(MELAflags) $(CollierLibflags) 
+	$(fcomp) -o $(Exec) $(MainObj) $(AuxObj) $(ggboxVHAmpObj) $(KinObj) $(AmpObj) $(ggVHAmpObj) $(PSGenObj) $(VegasObj) $(PDFObj) $(CPSObj) $(LHAPDFflags) $(MELAflags) 
 
 $(AuxObj): $(AuxDep) $(Makefile)
 	@echo " compiling misc. and aux. tools"
@@ -410,11 +411,12 @@ endif
 # 	mv *.o $(ObjectDir)
 
 colliermodules:
-	@echo " compiling COLLIER-1.2"
+#	@echo " compiling COLLIER-1.2"
 #	FC=$(CompFullName) overrides FC specified in that makefile
-	(cd $(CollierDir); $(MAKE) FC=$(Comp))
-	@echo " moving Collier .mod to modules directory"
+#	(cd $(CollierDir); $(MAKE) FC=$(Comp))
+	@echo " moving COLLIER .mod and .dylib to modules directory"
 	(cp $(CollierDir)/*.mod $(ModuleDir)/)
+	(cp $(CollierDir)/*.dylib $(ModuleDir)/)
 #	@echo " moving Collier .o to objects directory"
 #	(cp $(CollierDir)/*.o $(objects)/)
 
@@ -434,8 +436,6 @@ endif
 	rm -f objects/*.o
 	rm -f modules/*.mod
 	rm -f modules/*.f90
-	rm -f $(CollierDir)/*.mod
-	rm -f $(CollierDir)/*.o
 	rm -f *.mod
 	rm -f *.o
 	rm -f $(Exec)
