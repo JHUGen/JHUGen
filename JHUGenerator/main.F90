@@ -1734,12 +1734,18 @@ use ModMCFMWrapper
 implicit none
 integer, intent(in) :: Process
 
-   call MCFM_firsttime()
-
    if( &
       (Process.ge.66 .and. Process.le.69) &
       ) then
-      call Setup_MCFM_qqVVqq_firsttime(Process)
+      call MCFM_firsttime()
+      if( &
+         (Process.ge.66 .and. Process.le.69) &
+         ) then
+         call Setup_MCFM_qqVVqq_firsttime(Process)
+      !else if ... add more processes here
+      else
+         call Error("Don't know how to set up this process for MCFM")
+      endif
    endif
 
 end subroutine
