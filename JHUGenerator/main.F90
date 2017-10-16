@@ -1731,6 +1731,7 @@ END SUBROUTINE
 #if linkMELA==1
 subroutine SetupMCFM(Process)
 use ModMCFMWrapper
+use ModMisc
 implicit none
 integer, intent(in) :: Process
 
