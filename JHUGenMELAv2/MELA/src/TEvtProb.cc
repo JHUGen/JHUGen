@@ -51,6 +51,9 @@ myCSW_(other.myCSW_)
 void TEvtProb::Build(){
   if (verbosity>=TVar::DEBUG) cout << "Begin TEvtProb::Build" << endl;
 
+  /***** Print the MELA logo *****/
+  __modjhugenmela_MOD_printmelalogo();
+
   /***** Initialize lepton interference scheme *****/
   SetLeptonInterf(TVar::DefaultLeptonInterf);
 
