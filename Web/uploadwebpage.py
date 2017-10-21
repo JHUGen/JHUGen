@@ -91,7 +91,7 @@ def getuploadfiles(dir):
     return result
 
 class Version(object):
-    def __init__(self, version, gitcommit=None, tarballname=None, manualname=None, manualcommit=None, melacommit=None):
+    def __init__(self, version, gitcommit=None, tarballname=None, manualname=None, manualcommit=None, melav1commit=None):
         self.version = version
         if gitcommit is None: gitcommit = version
         if tarballname is None: tarballname = "JHUGenerator.{}.tar.gz".format(self.version)
@@ -101,7 +101,7 @@ class Version(object):
         self.tarballname = tarballname
         self.manualname = manualname
         self.manualcommit = manualcommit
-        self.melacommit = melacommit
+        self.melav1commit = melav1commit
 
     def getlink(self):
         return link_template.format(tarballname=self.tarballname)
@@ -134,11 +134,13 @@ class Version(object):
                 pass
 
             check_call(["git", "checkout", self.gitcommit])
-            if self.melacommit is not None:
-                check_call(["git", "checkout", self.melacommit, "--", "JHUGenMELA"])
+            if self.melav1commit is not None:
+                check_call(["git", "checkout", self.melav1commit, "--", "JHUGenMELA"])
             for folder in storefolders:
                 if os.path.exists(folder):
                     store.append(folder)
+            if "JHUGenMELA" in store and "JHUGenMELAv2" in store:
+                store.remove("JHUGenMELAv2")  #when we switched to MELAv2, we removed MELAv1
             check_call(["tar", "-cvzf", self.tarballname] + store)
             check_call(["mv", self.tarballname, WebGeneratordir])
 
@@ -160,7 +162,8 @@ def create_Download(mostrecentversion, *olderversions):
     if not os.path.exists("MCFM-precompiled"):
         check_call(["git", "clone", "git@github.com:JHUGen/MCFM-precompiled"])
     with cd("MCFM-precompiled"):
-        check_call(["git", "pull"])
+        check_call(["git", "fetch"])
+        check_call(["git", "checkout", MCFMprecompiledcommit])
 
 @contextmanager
 def cd(newdir):
@@ -215,11 +218,12 @@ Download_template = """
 #   - manualname, name of the manual pdf stored in the tarball.  Default=manJHUGenerator.(version).pdf
 #   - manualcommit, name of the commit to checkout to compile the manual.  Default=gitcommit
 #       could use a later version if the manual is updated after the generator is tagged
-#   - melacommit, name of the commit to checkout for the JHUGenMELA folder.  Default is the same
+#   - melav1commit, name of the commit to checkout for the JHUGenMELA folder.  Default is the same
 #       as the generator
 versions = (
-            Version("v7.0.2", melacommit="v6.9.8"),
-            Version("v7.0.0", gitcommit="v7.0.0.beta1", manualcommit="18221e3", melacommit="v6.9.8"),
+            #Version("v7.0.9", manualcommit="v7.0.2"),  #don't publicize new features quite yet
+            Version("v7.0.2", melav1commit="v6.9.8"),
+            Version("v7.0.0", gitcommit="v7.0.0.beta1", manualcommit="18221e3", melav1commit="v6.9.8"),
             Version("v6.9.8", manualcommit="971ad57"),
             Version("v6.9.5", manualcommit="157d32c"),
             Version("v6.8.4", gitcommit="v6.8.4.1.1"),
@@ -246,8 +250,10 @@ reallyold = (
             )
 
 #things that get stored in the tarball if present
+#If JHUGenMELA and JHUGenMELAv2 both exist, v2 is removed
+#(since we only released v2 after we deleted v1 from the repository)
 #graviton and graviton_mod_off are in the really old versions
-storefolders = ["JHUGenerator", "JHUGenMELA", "AnalyticMELA", "graviton", "graviton_mod_off"]
+storefolders = ["JHUGenerator", "JHUGenMELA", "JHUGenMELAv2", "AnalyticMELA", "graviton", "graviton_mod_off"]
 #plus the manual which is treated separately
 
 #files in this directory that should not be uploaded to the spin page
@@ -256,6 +262,7 @@ dontupload = [
               ".gitignore",
               ".git",
              ]
+MCFMprecompiledcommit = "5c2d6b85a4ec0a5c7fb58caf6116b7b084266b84"
 #end of inputs
 ########################################################################################
 

@@ -2,6 +2,8 @@
 
 {
 
+set -euo pipefail
+
 scriptdir=$(dirname $0)
 curdir=$(pwd)
 
@@ -40,7 +42,9 @@ else
   rm -rf $tmpdir
 
   make
-  mv $libname "../data/"$SCRAM_ARCH"/"$libname
+  for a in ../data/slc*; do
+    ln -s ../../COLLIER/$libname $a
+  done
 
 fi
 

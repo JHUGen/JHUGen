@@ -1373,23 +1373,71 @@ END SUBROUTINE HTO_Seval3SingleHt
 
 END SUBROUTINE EvaluateSpline
 
-function CenterWithStars(string, totallength)
+function CenterWithStars(string, totallength, align, padleft, padright)
 implicit none
 character(len=*) :: string
 integer :: totallength, nspaces, nleftspaces, nrightspaces
+integer, optional :: align, padleft, padright
+integer :: align2, padleft2, padright2
 character(len=totallength) CenterWithStars
 
-    if (len(trim(string)) .gt. totallength-2) then
-        call Error("len(trim(string)) > totallength-2!")
+    align2 = 2
+    padleft2 = 0
+    padright2 = 0
+    if (present(align)) align2 = align
+    if (present(padleft)) padleft2 = padleft
+    if (present(padright)) padright2 = padright
+
+    if (len(trim(string))+padleft2+padright2 .gt. totallength-2) then
+        call Error("len(trim(string))+padleft+padright > totallength-2!")
     endif
 
     nspaces = totallength - len(trim(string)) - 2
-    nleftspaces = nspaces/2
-    nrightspaces = nspaces-nleftspaces
 
-    CenterWithStars = "*" // repeat(" ", nleftspaces) // string // repeat(" ", nrightspaces) // "*"
+    if (align2.eq.1) then !left
+      nleftspaces = padleft2
+      nrightspaces = nspaces-nleftspaces
+    elseif (align2.eq.2) then !center
+      nleftspaces = (nspaces+padleft2-padright2)/2
+      nrightspaces = nspaces-nleftspaces
+    elseif (align2.eq.3) then !right
+      nrightspaces = padright2
+      nleftspaces = nspaces-nrightspaces
+    else
+      print *, "Unknown align value", align2
+    endif
+
+    CenterWithStars = "*" // repeat(" ", nleftspaces) // trim(string) // repeat(" ", nrightspaces) // "*"
 
 end function
+
+SUBROUTINE PrintLogo(TheUnit, title)
+use modParameters
+implicit none
+integer :: TheUnit
+integer, parameter :: linelength = 87
+character(len=*) :: title
+
+    write(TheUnit, *) " "
+    write(TheUnit, *) " ", repeat("*", linelength)
+    write(TheUnit, *) " ", CenterWithStars(trim(title)//" "//trim(JHUGen_Version), linelength)
+    write(TheUnit, *) " ", repeat("*", linelength)
+    write(TheUnit, *) " ", CenterWithStars("", linelength)
+    write(TheUnit, *) " ", CenterWithStars("Spin and parity determination of single-produced resonances at hadron colliders", linelength)
+    write(TheUnit, *) " ", CenterWithStars("", linelength)
+    write(TheUnit, *) " ", CenterWithStars("I. Anderson, S. Bolognesi, F. Caola, Y. Gao, A. Gritsan,", linelength)
+    write(TheUnit, *) " ", CenterWithStars("Z. Guo, C. Martin, K. Melnikov, R. Rontsch, H. Roskes, U. Sarica,", linelength)
+    write(TheUnit, *) " ", CenterWithStars("M. Schulze, N. Tran, A. Whitbeck, M. Xiao, Y. Zhou", linelength)
+    write(TheUnit, *) " ", CenterWithStars("Phys.Rev. D81 (2010) 075022;  arXiv:1001.3396  [hep-ph],", linelength)
+    write(TheUnit, *) " ", CenterWithStars("Phys.Rev. D86 (2012) 095031;  arXiv:1208.4018  [hep-ph],", linelength)
+    write(TheUnit, *) " ", CenterWithStars("Phys.Rev. D89 (2014) 035007;  arXiv:1309.4819  [hep-ph],", linelength)
+    write(TheUnit, *) " ", CenterWithStars("Phys.Rev. D94 (2016) 055023;  arXiv:1606.03107 [hep-ph].", linelength)
+    write(TheUnit, *) " ", CenterWithStars("", linelength)
+    write(TheUnit, *) " ", repeat("*", linelength)
+    write(TheUnit, *) " "
+return
+END SUBROUTINE
+
 
 real function infinity()
   implicit none

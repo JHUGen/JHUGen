@@ -828,5 +828,33 @@ subroutine GetDecayCouplings(VVMode,idordered,aL1,aR1,aL2,aR2)
    return
 end subroutine
 
+subroutine PrintMELALogo()
+use ModMisc
+use ModParameters
+implicit none
+integer, parameter :: TheUnit = io_stdout
+integer, parameter :: linelength = 87
+
+    write(TheUnit, *) " "
+    write(TheUnit, *) " ", repeat("*", linelength)
+    write(TheUnit, *) " ", CenterWithStars("Matrix Element Likelihood Approach (MELA)", linelength)
+    write(TheUnit, *) " ", repeat("*", linelength)
+    write(TheUnit, *) " ", CenterWithStars("", linelength)
+    write(TheUnit, *) " ", CenterWithStars("Matrix Element Method package for data analysis and Monte Carlo weights", linelength, align=1, padleft=2)
+    write(TheUnit, *) " ", CenterWithStars("for analysis of resonances produced at pp, ppbar, and e+e- colliders", linelength, align=1, padleft=2)
+    write(TheUnit, *) " ", CenterWithStars("", linelength, align=1, padleft=2)
+    write(TheUnit, *) " ", CenterWithStars("MELA interface", linelength, align=1, padleft=2)
+    write(TheUnit, *) " ", CenterWithStars("Signal calculations: Analytical, JHU Generator (JHUGen)", linelength, align=1, padleft=2)
+    write(TheUnit, *) " ", CenterWithStars("(for credits, see JHUGen list below)", linelength, align=1, padleft=2)
+    write(TheUnit, *) " ", CenterWithStars("", linelength, align=1, padleft=2)
+    write(TheUnit, *) " ", CenterWithStars("Modified signal, background, and interference calculations are based on MCFM", linelength, align=1, padleft=2)
+    write(TheUnit, *) " ", CenterWithStars("(for credits, see MCFM list below)", linelength, align=1, padleft=2)
+    write(TheUnit, *) " ", CenterWithStars("", linelength, align=1, padleft=2)
+    write(TheUnit, *) " ", CenterWithStars("For more details, see http://spin.pha.jhu.edu", linelength, align=1, padleft=2)
+    write(TheUnit, *) " ", CenterWithStars("", linelength, align=1, padleft=2)
+    write(TheUnit, *) " ", repeat("*", linelength)
+    write(TheUnit, *) " "
+end subroutine PrintMELALogo
+
 
 END MODULE ModJHUGenMELA

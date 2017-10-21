@@ -34,7 +34,7 @@ SUBROUTINE InitFirstTime(pdftable,pdfstrlength,pdfmember)
    lenLHAPDFString = pdfstrlength
 
 !---------------------------
-   call PrintLogo(io_stdout)
+   call PrintLogo(io_stdout, "JHUGen MELA")
 !---------------------------
    call ResetMubarHGabarH()
 !---------------------------
@@ -248,32 +248,5 @@ integer, intent(in) :: pdfid
    call InitPDFs()
 end subroutine
 
-
-SUBROUTINE PrintLogo(TheUnit)
-use modParameters
-use modMisc
-implicit none
-integer :: TheUnit
-integer, parameter :: linelength = 87
-
-    write(TheUnit, *) " "
-    write(TheUnit, *) " ", repeat("*", linelength)
-    write(TheUnit, *) " ", CenterWithStars("JHUGen MELA "//trim(JHUGen_Version), linelength)
-    write(TheUnit, *) " ", repeat("*", linelength)
-    write(TheUnit, *) " ", CenterWithStars("", linelength)
-    write(TheUnit, *) " ", CenterWithStars("Spin and parity determination of single-produced resonances at hadron colliders", linelength)
-    write(TheUnit, *) " ", CenterWithStars("", linelength)
-    write(TheUnit, *) " ", CenterWithStars("I. Anderson, S. Bolognesi, F. Caola, Y. Gao, A. Gritsan, Z. Guo,", linelength)
-    write(TheUnit, *) " ", CenterWithStars("C. Martin, K. Melnikov, R. Rontsch, H. Roskes, U. Sarica, M. Schulze,", linelength)
-    write(TheUnit, *) " ", CenterWithStars("N. Tran, A. Whitbeck, M. Xiao, C. You, Y. Zhou", linelength)
-    write(TheUnit, *) " ", CenterWithStars("Phys.Rev. D81 (2010) 075022;  arXiv:1001.3396  [hep-ph],", linelength)
-    write(TheUnit, *) " ", CenterWithStars("Phys.Rev. D86 (2012) 095031;  arXiv:1208.4018  [hep-ph],", linelength)
-    write(TheUnit, *) " ", CenterWithStars("Phys.Rev. D89 (2014) 035007;  arXiv:1309.4819  [hep-ph],", linelength)
-    write(TheUnit, *) " ", CenterWithStars("Phys.Rev. D94 (2016) 055023;  arXiv:1606.03107 [hep-ph].", linelength)
-    write(TheUnit, *) " ", CenterWithStars("", linelength)
-    write(TheUnit, *) " ", repeat("*", linelength)
-    write(TheUnit, *) " "
-return
-END SUBROUTINE
 
 END MODULE ModJHUGen
