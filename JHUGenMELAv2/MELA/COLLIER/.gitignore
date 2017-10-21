@@ -1,8 +1,0 @@
-*.mod
-*.F
-*.f
-*.F90
-*.o
-*.h
-DDlib/makefile
-colliertmp
