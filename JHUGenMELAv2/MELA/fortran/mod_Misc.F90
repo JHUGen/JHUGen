@@ -1373,41 +1373,21 @@ END SUBROUTINE HTO_Seval3SingleHt
 
 END SUBROUTINE EvaluateSpline
 
-function CenterWithStars(string, totallength, align, padleft, padright)
+function CenterWithStars(string, totallength)
 implicit none
 character(len=*) :: string
 integer :: totallength, nspaces, nleftspaces, nrightspaces
-integer, optional :: align, padleft, padright
-integer :: align2, padleft2, padright2
 character(len=totallength) CenterWithStars
 
-    align2 = 2
-    padleft2 = 0
-    padright2 = 0
-    if (present(align)) align2 = align
-    if (present(padleft)) padleft2 = padleft
-    if (present(padright)) padright2 = padright
-
-    if (len(trim(string))+padleft2+padright2 .gt. totallength-2) then
-        call Error("len(trim(string))+padleft+padright > totallength-2!")
+    if (len(trim(string)) .gt. totallength-2) then
+        call Error("len(trim(string)) > totallength-2!")
     endif
 
     nspaces = totallength - len(trim(string)) - 2
+    nleftspaces = nspaces/2
+    nrightspaces = nspaces-nleftspaces
 
-    if (align2.eq.1) then !left
-      nleftspaces = padleft2
-      nrightspaces = nspaces-nleftspaces
-    elseif (align2.eq.2) then !center
-      nleftspaces = (nspaces+padleft2-padright2)/2
-      nrightspaces = nspaces-nleftspaces
-    elseif (align2.eq.3) then !right
-      nrightspaces = padright2
-      nleftspaces = nspaces-nrightspaces
-    else
-      print *, "Unknown align value", align2
-    endif
-
-    CenterWithStars = "*" // repeat(" ", nleftspaces) // trim(string) // repeat(" ", nrightspaces) // "*"
+    CenterWithStars = "*" // repeat(" ", nleftspaces) // string // repeat(" ", nrightspaces) // "*"
 
 end function
 

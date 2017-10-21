@@ -42,9 +42,7 @@ else
   rm -rf $tmpdir
 
   make
-  for a in ../data/slc*; do
-    ln -s ../../COLLIER/$libname $a
-  done
+  mv $libname "../data/"$SCRAM_ARCH"/"$libname
 
 fi
 

@@ -6,4 +6,3 @@
 *.h
 DDlib/makefile
 colliertmp
-libcollier.so
