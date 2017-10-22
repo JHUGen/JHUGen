@@ -18,7 +18,6 @@
 #include "TH1F.h"
 #include "TH2F.h"
 #include "TLorentzVector.h"
-#include "MELAOutputStreamer.h"
 
 #define fbGeV2 0.389379E12
 #define smallnumber 1e-15
@@ -32,9 +31,6 @@ typedef std::vector<SimpleParticle_t> SimpleParticleCollection_t;
 
 
 namespace TVar{
-  extern MELAOutputStreamer MELAout;
-  extern MELAOutputStreamer MELAerr;
-
   enum{
     kNoAssociated=1,
     kUseAssociated_Leptons=2, // l or nu

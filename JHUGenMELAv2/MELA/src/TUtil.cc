@@ -4,6 +4,7 @@
 #include <utility>
 #include <algorithm>
 #include <cassert>
+#include "MELAStreamHelpers.hh"
 #include "TJHUGenUtils.hh"
 #include "TUtil.hh"
 #include "TMath.h"
@@ -13,8 +14,8 @@
 using namespace std;
 using TVar::event_scales_type;
 using TVar::simple_event_record;
-using TVar::MELAout;
-using TVar::MELAerr;
+using MELAStreamHelpers::MELAout;
+using MELAStreamHelpers::MELAerr;
 using namespace TJHUGenUtils;
 
 
@@ -3731,7 +3732,7 @@ double TUtil::SumMatrixElementPDF(
     RcdME->setHiggsMassWidth(masses_mcfm_.hmass, masses_mcfm_.hwidth, 0);
     RcdME->setHiggsMassWidth(spinzerohiggs_anomcoupl_.h2mass, spinzerohiggs_anomcoupl_.h2width, 1);
     if (verbosity>=TVar::DEBUG){
-      cout
+      MELAout
         << "TUtil::SumMatrixElementPDF: Set AlphaS:\n"
         << "\tBefore set, alphas scale: " << defaultRenScale << ", PDF scale: " << defaultFacScale << '\n'
         << "\trenQ: " << renQ << " ( x " << event_scales->ren_scale_factor << "), facQ: " << facQ << " ( x " << event_scales->fac_scale_factor << ")\n"
@@ -4179,13 +4180,13 @@ double TUtil::SumMatrixElementPDF(
       }
     }
 
-    if (verbosity>=TVar::DEBUG) cout
+    if (verbosity>=TVar::DEBUG) MELAout
         << "TUtil::SumMatrixElementPDF: Reset AlphaS:\n"
         << "\tBefore reset, alphas scale: " << scale_.scale
         << ", PDF scale: " << facscale_.facscale
         << endl;
     SetAlphaS(defaultRenScale, defaultFacScale, 1., 1., defaultNloop, defaultNflav, defaultPdflabel);
-    if (verbosity>=TVar::DEBUG) cout
+    if (verbosity>=TVar::DEBUG) MELAout
         << "TUtil::SumMatrixElementPDF: Reset AlphaS result:\n"
         << "\tAfter reset, alphas scale: " << scale_.scale
         << ", PDF scale: " << facscale_.facscale
@@ -4349,7 +4350,7 @@ double TUtil::JHUGenMatEl(
   RcdME->setHiggsMassWidth(masses_mcfm_.hmass, masses_mcfm_.hwidth, 0);
   RcdME->setHiggsMassWidth(spinzerohiggs_anomcoupl_.h2mass, spinzerohiggs_anomcoupl_.h2width, 1);
   if (verbosity>=TVar::DEBUG){
-    cout
+    MELAout
       << "TUtil::JHUGenMatEl: Set AlphaS:\n"
       << "\tBefore set, alphas scale: " << defaultRenScale << ", PDF scale: " << defaultFacScale << '\n'
       << "\trenQ: " << renQ << " ( x " << event_scales->ren_scale_factor << "), facQ: " << facQ << " ( x " << event_scales->fac_scale_factor << ")\n"
@@ -4516,7 +4517,7 @@ double TUtil::JHUGenMatEl(
   // Set aL/R 1,2 into RcdME
   RcdME->setVDaughterCouplings(aL1, aR1, 0);
   RcdME->setVDaughterCouplings(aL2, aR2, 1);
-  if (verbosity >= TVar::DEBUG_VERBOSE) cout
+  if (verbosity >= TVar::DEBUG_VERBOSE) MELAout
     << "TUtil::JHUGenMatEl: aL1, aR1, aL2, aR2: "
     << aL1 << ", " << aR1 << ", " << aL2 << ", " << aR2
     << endl;
@@ -4553,14 +4554,14 @@ double TUtil::JHUGenMatEl(
 
   // Reset alphas
   if (verbosity>=TVar::DEBUG){
-    cout
+    MELAout
       << "TUtil::JHUGenMatEl: Reset AlphaS:\n"
       << "\tBefore reset, alphas scale: " << scale_.scale << ", PDF scale: " << facscale_.facscale << endl;
   }
   SetAlphaS(defaultRenScale, defaultFacScale, 1., 1., defaultNloop, defaultNflav, defaultPdflabel);
   if (verbosity>=TVar::DEBUG){
     GetAlphaS(&alphasVal, &alphasmzVal);
-    cout
+    MELAout
       << "TUtil::JHUGenMatEl: Reset AlphaS result:\n"
       << "\tAfter reset, alphas scale: " << scale_.scale << ", PDF scale: " << facscale_.facscale << ", alphas(Qren): " << alphasVal << ", alphas(MZ): " << alphasmzVal << endl;
   }
@@ -4685,7 +4686,7 @@ double TUtil::HJJMatEl(
   RcdME->setHiggsMassWidth(masses_mcfm_.hmass, masses_mcfm_.hwidth, 0);
   RcdME->setHiggsMassWidth(spinzerohiggs_anomcoupl_.h2mass, spinzerohiggs_anomcoupl_.h2width, 1);
   if (verbosity>=TVar::DEBUG){
-    cout
+    MELAout
       << "TUtil::HJJMatEl: Set AlphaS:\n"
       << "\tBefore set, alphas scale: " << defaultRenScale << ", PDF scale: " << defaultFacScale << '\n'
       << "\trenQ: " << renQ << " ( x " << event_scales->ren_scale_factor << "), facQ: " << facQ << " ( x " << event_scales->fac_scale_factor << ")\n"
@@ -5472,7 +5473,7 @@ double TUtil::HJJMatEl(
     if (verbosity>=TVar::DEBUG_VERBOSE){
       MELAout << "TUtil::HJJMatEl: The pre-computed MEs:" << endl;
       for (unsigned int iswap=0; iswap<2; iswap++){
-        cout
+        MELAout
           << "\tmsq_uu_zz_ijrs1234[" << iswap << "] = " << msq_uu_zz_ijrs1234[iswap] << '\n'
           << "\tmsq_uu_zz_ijrs1243[" << iswap << "] = " << msq_uu_zz_ijrs1243[iswap] << '\n'
           << "\tmsq_dd_zz_ijrs1234[" << iswap << "] = " << msq_dd_zz_ijrs1234[iswap] << '\n'
@@ -5996,14 +5997,14 @@ double TUtil::HJJMatEl(
   */
 
   if (verbosity>=TVar::DEBUG){
-    cout
+    MELAout
       << "TUtil::HJJMatEl: Reset AlphaS:\n"
       << "\tBefore reset, alphas scale: " << scale_.scale << ", PDF scale: " << facscale_.facscale << endl;
   }
   SetAlphaS(defaultRenScale, defaultFacScale, 1., 1., defaultNloop, defaultNflav, defaultPdflabel);
   if (verbosity>=TVar::DEBUG){
     GetAlphaS(&alphasVal, &alphasmzVal);
-    cout
+    MELAout
       << "TUtil::HJJMatEl: Reset AlphaS result:\n"
       << "\tAfter reset, alphas scale: " << scale_.scale << ", PDF scale: " << facscale_.facscale << ", alphas(Qren): " << alphasVal << ", alphas(MZ): " << alphasmzVal << endl;
   }
@@ -6232,7 +6233,7 @@ double TUtil::VHiggsMatEl(
   RcdME->setHiggsMassWidth(masses_mcfm_.hmass, masses_mcfm_.hwidth, 0);
   RcdME->setHiggsMassWidth(spinzerohiggs_anomcoupl_.h2mass, spinzerohiggs_anomcoupl_.h2width, 1);
   if (verbosity>=TVar::DEBUG){
-    cout
+    MELAout
       << "TUtil::VHiggsMatEl: Set AlphaS:\n"
       << "\tBefore set, alphas scale: " << defaultRenScale << ", PDF scale: " << defaultFacScale << '\n'
       << "\trenQ: " << renQ << " ( x " << event_scales->ren_scale_factor << "), facQ: " << facQ << " ( x " << event_scales->fac_scale_factor << ")\n"
@@ -6604,14 +6605,14 @@ double TUtil::VHiggsMatEl(
   }
 
   if (verbosity>=TVar::DEBUG){
-    cout
+    MELAout
       << "TUtil::VHiggsMatEl: Reset AlphaS:\n"
       << "\tBefore reset, alphas scale: " << scale_.scale << ", PDF scale: " << facscale_.facscale << endl;
   }
   SetAlphaS(defaultRenScale, defaultFacScale, 1., 1., defaultNloop, defaultNflav, defaultPdflabel);
   if (verbosity>=TVar::DEBUG){
     GetAlphaS(&alphasVal, &alphasmzVal);
-    cout
+    MELAout
       << "TUtil::VHiggsMatEl: Reset AlphaS result:\n"
       << "\tAfter reset, alphas scale: " << scale_.scale << ", PDF scale: " << facscale_.facscale << ", alphas(Qren): " << alphasVal << ", alphas(MZ): " << alphasmzVal << endl;
   }
@@ -6652,21 +6653,21 @@ double TUtil::TTHiggsMatEl(
 
 
   if (topDecay==0 && (mela_event.pStableTops.size()<1 || mela_event.pStableAntitops.size()<1)){
-    if (verbosity>=TVar::ERROR) cerr
+    if (verbosity>=TVar::ERROR) MELAerr
       << "TUtil::TTHiggsMatEl: Number of stable tops (" << mela_event.pStableTops.size() << ")"
       << " and number of stable antitops (" << mela_event.pStableAntitops.size() << ")"
       << " in ttH process are not 1!" << endl;
     return sum_msqjk;
   }
   else if (topDecay>0 && (mela_event.pTopDaughters.size()<1 || mela_event.pAntitopDaughters.size()<1)){
-    if (verbosity>=TVar::ERROR) cerr
+    if (verbosity>=TVar::ERROR) MELAerr
       << "TUtil::TTHiggsMatEl: Number of set of top daughters (" << mela_event.pTopDaughters.size() << ")"
       << " and number of set of antitop daughters (" << mela_event.pAntitopDaughters.size() << ")"
       << " in ttH process are not 1!" << endl;
     return sum_msqjk;
   }
   else if (topDecay>0 && (mela_event.pTopDaughters.at(0).size()!=3 || mela_event.pAntitopDaughters.at(0).size()!=3)){
-    if (verbosity>=TVar::ERROR) cerr
+    if (verbosity>=TVar::ERROR) MELAerr
       << "TUtil::TTHiggsMatEl: Number of top daughters (" << mela_event.pTopDaughters.at(0).size() << ")"
       << " and number of antitop daughters (" << mela_event.pAntitopDaughters.at(0).size() << ")"
       << " in ttH process are not 3!" << endl;
@@ -6843,7 +6844,7 @@ double TUtil::TTHiggsMatEl(
   RcdME->setHiggsMassWidth(masses_mcfm_.hmass, masses_mcfm_.hwidth, 0);
   RcdME->setHiggsMassWidth(spinzerohiggs_anomcoupl_.h2mass, spinzerohiggs_anomcoupl_.h2width, 1);
   if (verbosity>=TVar::DEBUG){
-    cout
+    MELAout
       << "TUtil::TTHiggsMatEl: Set AlphaS:\n"
       << "\tBefore set, alphas scale: " << defaultRenScale << ", PDF scale: " << defaultFacScale << '\n'
       << "\trenQ: " << renQ << " ( x " << event_scales->ren_scale_factor << "), facQ: " << facQ << " ( x " << event_scales->fac_scale_factor << ")\n"
@@ -6916,7 +6917,7 @@ double TUtil::TTHiggsMatEl(
                 p4_current[Wm_pos][ix] = p4_current[Wmf_pos][ix] + p4_current[Wmfb_pos][ix]; // Re-sum W- momentum.
               }
               if (verbosity>=TVar::DEBUG){
-                cout
+                MELAout
                   << "TUtil::TTHiggsMatEl: Unswapped instance for "
                   << "b(" << b_pos << ") -> " << b1index << ", "
                   << "Wpf(" << Wpf_pos << ") -> " << f1index << ", "
@@ -6944,7 +6945,7 @@ double TUtil::TTHiggsMatEl(
               }
               for (int ix=0; ix<11; ix++){ for (int iy=0; iy<11; iy++) MatElsq[iy][ix] += MatElsq_tmp[iy][ix]; }
               if (verbosity>=TVar::DEBUG){
-                cout
+                MELAout
                   << "TUtil::TTHiggsMatEl: Swapped instance for "
                   << "b(" << b_pos << ") -> " << b1index << ", "
                   << "Wpf(" << Wpf_pos << ") -> " << f1index << ", "
@@ -6980,14 +6981,14 @@ double TUtil::TTHiggsMatEl(
   sum_msqjk = SumMEPDF(MomStore[0], MomStore[1], MatElsq, RcdME, EBEAM, verbosity);
 
   if (verbosity>=TVar::DEBUG){
-    cout
+    MELAout
       << "TUtil::TTHiggsMatEl: Reset AlphaS:\n"
       << "\tBefore reset, alphas scale: " << scale_.scale << ", PDF scale: " << facscale_.facscale << endl;
   }
   SetAlphaS(defaultRenScale, defaultFacScale, 1., 1., defaultNloop, defaultNflav, defaultPdflabel);
   if (verbosity>=TVar::DEBUG){
     GetAlphaS(&alphasVal, &alphasmzVal);
-    cout
+    MELAout
       << "TUtil::TTHiggsMatEl: Reset AlphaS result:\n"
       << "\tAfter reset, alphas scale: " << scale_.scale << ", PDF scale: " << facscale_.facscale << ", alphas(Qren): " << alphasVal << ", alphas(MZ): " << alphasmzVal << endl;
   }
@@ -7023,7 +7024,7 @@ double TUtil::BBHiggsMatEl(
     );
 
   if (mela_event.pAssociated.size()<2){
-    if (verbosity>=TVar::ERROR) cerr
+    if (verbosity>=TVar::ERROR) MELAerr
       << "TUtil::BBHiggsMatEl: Number of stable bs (" << mela_event.pAssociated.size() << ")"
       <<" in bbH process is not 2!" << endl;
     return sum_msqjk;
@@ -7120,7 +7121,7 @@ double TUtil::BBHiggsMatEl(
   RcdME->setHiggsMassWidth(masses_mcfm_.hmass, masses_mcfm_.hwidth, 0);
   RcdME->setHiggsMassWidth(spinzerohiggs_anomcoupl_.h2mass, spinzerohiggs_anomcoupl_.h2width, 1);
   if (verbosity>=TVar::DEBUG){
-    cout
+    MELAout
       << "TUtil::BBHiggsMatEl: Set AlphaS:\n"
       << "\tBefore set, alphas scale: " << defaultRenScale << ", PDF scale: " << defaultFacScale << '\n'
       << "\trenQ: " << renQ << " ( x " << event_scales->ren_scale_factor << "), facQ: " << facQ << " ( x " << event_scales->fac_scale_factor << ")\n"
@@ -7147,14 +7148,14 @@ double TUtil::BBHiggsMatEl(
   sum_msqjk = SumMEPDF(MomStore[0], MomStore[1], MatElsq, RcdME, EBEAM, verbosity);
 
   if (verbosity>=TVar::DEBUG){
-    cout
+    MELAout
       << "TUtil::BBHiggsMatEl: Reset AlphaS:\n"
       << "\tBefore reset, alphas scale: " << scale_.scale << ", PDF scale: " << facscale_.facscale << endl;
   }
   SetAlphaS(defaultRenScale, defaultFacScale, 1., 1., defaultNloop, defaultNflav, defaultPdflabel);
   if (verbosity>=TVar::DEBUG){
     GetAlphaS(&alphasVal, &alphasmzVal);
-    cout
+    MELAout
       << "TUtil::BBHiggsMatEl: Reset AlphaS result:\n"
       << "\tAfter reset, alphas scale: " << scale_.scale << ", PDF scale: " << facscale_.facscale << ", alphas(Qren): " << alphasVal << ", alphas(MZ): " << alphasmzVal << endl;
   }
@@ -8040,100 +8041,7 @@ MELATopCandidate* TUtil::ConvertTopCandidate(
 void TUtil::PrintCandidateSummary(MELACandidate* cand){
   MELAout << "***** TUtil::PrintCandidateSummary *****" << endl;
   MELAout << "Candidate: " << cand << endl;
-  if (cand!=0){
-    MELAout << "\tHas " << cand->getNMothers() << " mothers" << endl;
-    for (int ip=0; ip<cand->getNMothers(); ip++){
-      MELAParticle* part = cand->getMother(ip);
-      cout
-        << "\t\tV" << ip << " (" << part->id << ") (X,Y,Z,T)=( "
-        << part->x() << " , "
-        << part->y() << " , "
-        << part->z() << " , "
-        << part->t() << " )" << endl;
-    }
-    MELAout << "\tHas " << cand->getNSortedVs() << " sorted Vs" << endl;
-    for (int iv=0; iv<cand->getNSortedVs(); iv++){
-      cout
-        << "\t\tV" << iv << " (" << cand->getSortedV(iv)->id << ") (X,Y,Z,T)=( "
-        << cand->getSortedV(iv)->x() << " , "
-        << cand->getSortedV(iv)->y() << " , "
-        << cand->getSortedV(iv)->z() << " , "
-        << cand->getSortedV(iv)->t() << " )" << endl;
-      for (int ivd=0; ivd<cand->getSortedV(iv)->getNDaughters(); ivd++){
-        cout
-          << "\t\t- V" << iv << ivd << " (" << cand->getSortedV(iv)->getDaughter(ivd)->id << ") (X,Y,Z,T)=( "
-          << cand->getSortedV(iv)->getDaughter(ivd)->x() << " , "
-          << cand->getSortedV(iv)->getDaughter(ivd)->y() << " , "
-          << cand->getSortedV(iv)->getDaughter(ivd)->z() << " , "
-          << cand->getSortedV(iv)->getDaughter(ivd)->t() << " )" << endl;
-      }
-    }
-
-    MELAout << "\tHas " << cand->getNAssociatedLeptons() << " leptons or neutrinos" << endl;
-    for (int ip=0; ip<cand->getNAssociatedLeptons(); ip++){
-      MELAParticle* part = cand->getAssociatedLepton(ip);
-      cout
-        << "\t\tV" << ip << " (" << part->id << ") (X,Y,Z,T)=( "
-        << part->x() << " , "
-        << part->y() << " , "
-        << part->z() << " , "
-        << part->t() << " )" << endl;
-    }
-    MELAout << "\tHas " << cand->getNAssociatedPhotons() << " photons" << endl;
-    for (int ip=0; ip<cand->getNAssociatedPhotons(); ip++){
-      MELAParticle* part = cand->getAssociatedPhoton(ip);
-      cout
-        << "\t\tV" << ip << " (" << part->id << ") (X,Y,Z,T)=( "
-        << part->x() << " , "
-        << part->y() << " , "
-        << part->z() << " , "
-        << part->t() << " )" << endl;
-    }
-    MELAout << "\tHas " << cand->getNAssociatedJets() << " jets" << endl;
-    for (int ip=0; ip<cand->getNAssociatedJets(); ip++){
-      MELAParticle* part = cand->getAssociatedJet(ip);
-      cout
-        << "\t\tV" << ip << " (" << part->id << ") (X,Y,Z,T)=( "
-        << part->x() << " , "
-        << part->y() << " , "
-        << part->z() << " , "
-        << part->t() << " )" << endl;
-    }
-    MELAout << "\tHas " << cand->getNAssociatedTops() << " tops" << endl;
-    for (int ip=0; ip<cand->getNAssociatedTops(); ip++){
-      MELATopCandidate* part = cand->getAssociatedTop(ip);
-      cout
-        << "\t\tTop" << ip << " (" << part->id << ") (X,Y,Z,T)=( "
-        << part->x() << " , "
-        << part->y() << " , "
-        << part->z() << " , "
-        << part->t() << " )" << endl;
-      if (part->getLightQuark()!=0){
-        cout
-          << "\t\t- Top" << ip << " b " << " (" << part->getLightQuark()->id << ") (X,Y,Z,T)=( "
-          << part->getLightQuark()->x() << " , "
-          << part->getLightQuark()->y() << " , "
-          << part->getLightQuark()->z() << " , "
-          << part->getLightQuark()->t() << " )" << endl;
-      }
-      if (part->getWFermion()!=0){
-        cout
-          << "\t\t- Top" << ip << " Wf " << " (" << part->getWFermion()->id << ") (X,Y,Z,T)=( "
-          << part->getWFermion()->x() << " , "
-          << part->getWFermion()->y() << " , "
-          << part->getWFermion()->z() << " , "
-          << part->getWFermion()->t() << " )" << endl;
-      }
-      if (part->getWAntifermion()!=0){
-        cout
-          << "\t\t- Top" << ip << " Wfb " << " (" << part->getWAntifermion()->id << ") (X,Y,Z,T)=( "
-          << part->getWAntifermion()->x() << " , "
-          << part->getWAntifermion()->y() << " , "
-          << part->getWAntifermion()->z() << " , "
-          << part->getWAntifermion()->t() << " )" << endl;
-      }
-    }
-  }
+  if (cand) MELAout << *cand;
 }
 
 void TUtil::PrintCandidateSummary(simple_event_record* cand){
@@ -8150,7 +8058,7 @@ void TUtil::PrintCandidateSummary(simple_event_record* cand){
     MELAout << "\tHas " << cand->pMothers.size() << " mothers" << endl;
     for (unsigned int ip=0; ip<cand->pMothers.size(); ip++){
       SimpleParticle_t* part = &(cand->pMothers.at(ip));
-      cout
+      MELAout
         << "\t\tV" << ip << " (" << part->first << ") (X,Y,Z,T)=( "
         << part->second.X() << " , "
         << part->second.Y() << " , "
@@ -8162,7 +8070,7 @@ void TUtil::PrintCandidateSummary(simple_event_record* cand){
     MELAout << "\tHas " << cand->pDaughters.size() << " daughters" << endl;
     for (unsigned int ip=0; ip<cand->pDaughters.size(); ip++){
       SimpleParticle_t* part = &(cand->pDaughters.at(ip));
-      cout
+      MELAout
         << "\t\tDau[" << ip << "] (" << part->first << ") (X,Y,Z,T)=( "
         << part->second.X() << " , "
         << part->second.Y() << " , "
@@ -8172,7 +8080,7 @@ void TUtil::PrintCandidateSummary(simple_event_record* cand){
     MELAout << "\tHas " << cand->pAssociated.size() << " associated particles" << endl;
     for (unsigned int ip=0; ip<cand->pAssociated.size(); ip++){
       SimpleParticle_t* part = &(cand->pAssociated.at(ip));
-      cout
+      MELAout
         << "\t\tAPart[" << ip << "] (" << part->first << ") (X,Y,Z,T)=( "
         << part->second.X() << " , "
         << part->second.Y() << " , "
@@ -8182,7 +8090,7 @@ void TUtil::PrintCandidateSummary(simple_event_record* cand){
     MELAout << "\tHas " << cand->pStableTops.size() << " stable tops" << endl;
     for (unsigned int ip=0; ip<cand->pStableTops.size(); ip++){
       SimpleParticle_t* part = &(cand->pStableTops.at(ip));
-      cout
+      MELAout
         << "\t\tAPart[" << ip << "] (" << part->first << ") (X,Y,Z,T)=( "
         << part->second.X() << " , "
         << part->second.Y() << " , "
@@ -8192,7 +8100,7 @@ void TUtil::PrintCandidateSummary(simple_event_record* cand){
     MELAout << "\tHas " << cand->pStableAntitops.size() << " stable antitops" << endl;
     for (unsigned int ip=0; ip<cand->pStableAntitops.size(); ip++){
       SimpleParticle_t* part = &(cand->pStableAntitops.at(ip));
-      cout
+      MELAout
         << "\t\tAPart[" << ip << "] (" << part->first << ") (X,Y,Z,T)=( "
         << part->second.X() << " , "
         << part->second.Y() << " , "
@@ -8205,7 +8113,7 @@ void TUtil::PrintCandidateSummary(simple_event_record* cand){
       MELAout << "\t\tTop[" << ip << "] daughters:" << endl;
       for (unsigned int jp=0; jp<cand->pTopDaughters.at(ip).size(); jp++){
         SimpleParticle_t* part = &(cand->pTopDaughters.at(ip).at(jp));
-        cout
+        MELAout
           << "\t\t- Top daughter[" << ip << jp << "] (" << part->first << ") (X,Y,Z,T)=( "
           << part->second.X() << " , "
           << part->second.Y() << " , "
@@ -8218,7 +8126,7 @@ void TUtil::PrintCandidateSummary(simple_event_record* cand){
       MELAout << "\t\tAntitop[" << ip << "] daughters:" << endl;
       for (unsigned int jp=0; jp<cand->pAntitopDaughters.at(ip).size(); jp++){
         SimpleParticle_t* part = &(cand->pAntitopDaughters.at(ip).at(jp));
-        cout
+        MELAout
           << "\t\t- Antitop daughter[" << ip << jp << "] (" << part->first << ") (X,Y,Z,T)=( "
           << part->second.X() << " , "
           << part->second.Y() << " , "

@@ -11,6 +11,7 @@
 //-----------------------------------------------------------------------------
 
 #include "TEvtProb.hh"
+#include "MELAStreamHelpers.hh"
 
 
 ClassImp(TEvtProb)
@@ -18,8 +19,8 @@ ClassImp(TEvtProb)
 
 using namespace std;
 using namespace TUtil;
-using TVar::MELAout;
-using TVar::MELAerr;
+using MELAStreamHelpers::MELAout;
+using MELAStreamHelpers::MELAerr;
 
 
 //-----------------------------------------------------------------------------
@@ -264,7 +265,7 @@ void TEvtProb::SetHiggsMass(double mass, double wHiggs, int whichResonance){
     //SetJHUGenHiggsMassWidth(_h2mass, _h2width); // Second resonance is not implemented in JHUGen yet.
   }
 
-  if (verbosity>=TVar::DEBUG) cout
+  if (verbosity>=TVar::DEBUG) MELAout
     << "TEvtProb::SetHiggsMass(" << mass << ", " << wHiggs << ", " << whichResonance << "):\n"
     << '\t' << "hmass: " << _hmass << ", " << _hwidth << '\n'
     << '\t' << "h2mass: " << _h2mass << ", " << _h2width << '\n'
@@ -392,7 +393,7 @@ std::vector<MELATopCandidate*>* TEvtProb::GetTopCandidates(){ return &topCandLis
 // Check/test functions
 bool TEvtProb::CheckInputPresent(){
   if (melaCand==0){
-    cerr
+    MELAerr
       << "TEvtProb::CheckInputPresent: melaCand==" << melaCand << " is nullPtr!"
       << endl;
     if (candList.size()==0) return false;
@@ -685,7 +686,7 @@ double TEvtProb::XsecCalc_XVV(){
     else if (isSpinTwo) SetJHUGenSpinTwoCouplings(Gggcoupl, Gvvcoupl, Gqqcoupl);
 
     if (isSpinZero || isSpinOne || isSpinTwo) dXsec = JHUGenMatEl(process, production, matrixElement, &event_scales, &RcdME, EBEAM, verbosity);
-    else cerr
+    else MELAerr
       << "TEvtProb::XsecCalc_XVV: JHUGen ME is not spin zero, one or two! The process is described by "
       << "Process: " << TVar::ProcessName(process) << ", Production: " << TVar::ProductionName(production) << ", and ME: " << TVar::MatrixElementName(matrixElement)
       << endl;
@@ -732,7 +733,7 @@ double TEvtProb::XsecCalc_VVXVV(){
   }
   else MELAerr << "TEvtProb::XsecCalc_VVXVV: Non-MCFM Mes are not supported." << endl;
 
-  if (verbosity >= TVar::DEBUG) cout
+  if (verbosity >= TVar::DEBUG) MELAout
     << "Process " << TVar::ProcessName(process)
     << " TEvtProb::XsecCalc_VVXVV: dXsec=" << dXsec
     << endl;

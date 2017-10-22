@@ -1,13 +1,14 @@
 #include <iostream>
 #include <cassert>
+#include "MELAStreamHelpers.hh"
 #include "MELACandidate.h"
 #include "SuperDijetMela.h"
 
 
 using namespace std;
 using TVar::simple_event_record;
-using TVar::MELAout;
-using TVar::MELAerr;
+using MELAStreamHelpers::MELAout;
+using MELAStreamHelpers::MELAerr;
 
 
 SuperDijetMela::SuperDijetMela(float sqrts_, TVar::VerbosityLevel verbosity_) :

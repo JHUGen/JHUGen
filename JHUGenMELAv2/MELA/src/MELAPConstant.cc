@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include "MELAStreamHelpers.hh"
 #include "MelaPConstant.h"
 #include "TROOT.h"
 #include "TFile.h"
@@ -9,8 +10,8 @@
 
 using namespace std;
 using TVar::simple_event_record;
-using TVar::MELAout;
-using TVar::MELAerr;
+using MELAStreamHelpers::MELAout;
+using MELAStreamHelpers::MELAerr;
 
 
 MelaPConstant::MelaPConstant(

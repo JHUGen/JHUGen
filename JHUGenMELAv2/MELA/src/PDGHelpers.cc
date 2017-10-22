@@ -1,5 +1,11 @@
 #include <iostream>
 #include "PDGHelpers.h"
+#include "MELAStreamHelpers.hh"
+
+
+using MELAStreamHelpers::MELAout;
+using MELAStreamHelpers::MELAerr;
+
 
 namespace PDGHelpers{
   TVar::CandidateDecayMode HDecayMode = TVar::CandidateDecay_ZZ;
@@ -64,7 +70,7 @@ void PDGHelpers::orderParticles(
   bool allowUnknown
   ){
   ordering.clear();
-  if (testlist.size() != idlist.size()){ std::cerr << "PDGHelpers::orderParticles: List of ids and list of their tests do not have the same size!" << std::endl; return; }
+  if (testlist.size() != idlist.size()){ MELAerr << "PDGHelpers::orderParticles: List of ids and list of their tests do not have the same size!" << std::endl; return; }
   for (unsigned int itest=0; itest<testlist.size(); itest++){
     bool testFilled=false;
     for (unsigned int ipart=0; ipart<idlist.size(); ipart++){
@@ -141,7 +147,7 @@ void PDGHelpers::pairIdenticalParticles(
 
   for (unsigned int ig=0; ig<grouping.size(); ig++){
     unsigned int group_rep = grouping.at(ig).at(0);
-    if (group_rep>=ids.size()){ std::cerr << "PDGHelpers::pairIdenticalParticles: Group " << ig << " has a representative location >=ids.size (" << ids.size() << ")!" << std::endl; continue; }
+    if (group_rep>=ids.size()){ MELAerr << "PDGHelpers::pairIdenticalParticles: Group " << ig << " has a representative location >=ids.size (" << ids.size() << ")!" << std::endl; continue; }
     int group_flag = ids.at(group_rep);
     if (!PDGHelpers::isAnUnknownJet(group_flag)){ // Known particles first!
       unsigned int npairs = grouping.at(ig).size()/2;
@@ -156,7 +162,7 @@ void PDGHelpers::pairIdenticalParticles(
   if (allowUnknown){
     for (unsigned int ig=0; ig<grouping.size(); ig++){
       unsigned int group_rep = grouping.at(ig).at(0);
-      if (group_rep>=ids.size()){ std::cerr << "PDGHelpers::pairIdenticalParticles: Group " << ig << " has a representative location >=ids.size (" << ids.size() << ")!" << std::endl; continue; }
+      if (group_rep>=ids.size()){ MELAerr << "PDGHelpers::pairIdenticalParticles: Group " << ig << " has a representative location >=ids.size (" << ids.size() << ")!" << std::endl; continue; }
       int group_flag = ids.at(group_rep);
       if (!PDGHelpers::isAnUnknownJet(group_flag)) continue; // Unknown particles
       // Now that we found the unknown particles group, loop over it
@@ -224,7 +230,7 @@ int PDGHelpers::convertPythiaStatus(int pSt){
   else if (pSt==21) return -1;
   else if (pSt==22 || pSt==62) return 2;
   else{
-    std::cerr << "Unknown Pythia particle status: " << pSt << std::endl;
+    MELAerr << "Unknown Pythia particle status: " << pSt << std::endl;
     return -99;
   }
 }

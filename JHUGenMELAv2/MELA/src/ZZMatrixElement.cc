@@ -1,11 +1,12 @@
+#include "MELAStreamHelpers.hh"
 #include "ZZMatrixElement.h"
 #include "TLorentzRotation.h"
 
 
 using namespace std;
 using namespace TUtil;
-using TVar::MELAout;
-using TVar::MELAerr;
+using MELAStreamHelpers::MELAout;
+using MELAStreamHelpers::MELAerr;
 
 
 ZZMatrixElement::ZZMatrixElement(

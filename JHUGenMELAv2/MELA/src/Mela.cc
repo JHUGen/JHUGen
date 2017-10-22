@@ -29,6 +29,7 @@ Please adhere to the following coding conventions:
 #include "RooqqZZ_JHU_ZgammaZZ_fast.h"
 #include "RooqqZZ_JHU.h"
 #include "SuperMELA.h"
+#include "MELAStreamHelpers.hh"
 
 #include "RooMsgService.h"
 #include "TFile.h"
@@ -42,8 +43,8 @@ Please adhere to the following coding conventions:
 
 using namespace std;
 using namespace RooFit;
-using TVar::MELAout;
-using TVar::MELAerr;
+using MELAStreamHelpers::MELAout;
+using MELAStreamHelpers::MELAerr;
 
 
 Mela::Mela(
@@ -634,7 +635,7 @@ void Mela::computeP(
         if (myVerbosity_>=TVar::DEBUG){ // Notify first
           MELAout << "Mela::computeP: Condition (myME_ == TVar::MCFM  && myProduction_ == TVar::ZZINDEPENDENT &&  myModel_ == TVar::bkgZZ/WW/ZGamma/ZJJ)." << endl;
           vector<TLorentzVector> pDauVec = calculate4Momentum(mZZ, mZ1, mZ1, acos(costhetastar), acos(costheta1), acos(costheta2), Phi1, Phi);
-          cout
+          MELAout
             << "\tOriginal mZZ=" << mZZ << " "
             << "m1=" << mZ1 << " "
             << "m2=" << mZ2 << " "
@@ -646,7 +647,7 @@ void Mela::computeP(
           MELAout << "\tfor daughters:" << endl;
           for (int iv=0; iv<2; iv++){
             for (int idau=0; idau<min(2, melaCand->getSortedV(iv)->getNDaughters()); idau++){
-              cout
+              MELAout
                 << "id=" << melaCand->getSortedV(iv)->getDaughter(idau)->id << " "
                 << "x=" << pDauVec.at(2*iv+idau).X() << " "
                 << "y=" << pDauVec.at(2*iv+idau).Y() << " "

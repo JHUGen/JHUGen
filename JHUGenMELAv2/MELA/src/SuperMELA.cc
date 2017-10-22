@@ -1,6 +1,7 @@
 #include <sstream>
 #include <cmath>
 #include <cassert>
+#include "MELAStreamHelpers.hh"
 #include "TVar.hh"
 #include "SuperMELA.h"
 #include "MELAHXSWidth.h"
@@ -10,8 +11,8 @@
 
 using namespace std;
 using namespace RooFit;
-using TVar::MELAout;
-using TVar::MELAerr;
+using MELAStreamHelpers::MELAout;
+using MELAStreamHelpers::MELAerr;
 
 
 SuperMELA::SuperMELA(
@@ -159,7 +160,7 @@ void SuperMELA::init(){
 
   // Calculate m4l ranges for the given mH, set range of rrv
   calc_mZZ_range(mHVal_, lowMH_, highMH_);
-  if (verbose_) cout << "Range width=" << highMH_ - lowMH_ << endl;
+  if (verbose_) MELAout << "Range width=" << highMH_ - lowMH_ << endl;
   delete m4l_rrv_; m4l_rrv_=new RooRealVar("CMS_zz4l_mass", "CMS_zz4l_mass", mHVal_, lowMH_, highMH_);
   m4l_rrv_->setBins(2000, "fft");
   m4l_rrv_->setRange("shape", lowMH_, highMH_);
@@ -215,16 +216,16 @@ void SuperMELA::init(){
   delete alpha2_CB_;
   char rrvName[96];
   sprintf(rrvName, "CMS_zz4l_n_sig_%s_%d", strChan_.c_str(), int(sqrts_));
-  if (verbose_) cout << "SuperMELA::init: Constructing n_CB_ from formula " << str_n_CB.c_str() << endl;
+  if (verbose_) MELAout << "SuperMELA::init: Constructing n_CB_ from formula " << str_n_CB.c_str() << endl;
   n_CB_=new RooFormulaVar(rrvName, str_n_CB.c_str(), RooArgList(*mH_rrv_));
   sprintf(rrvName, "CMS_zz4l_alpha_sig_%s_%d", strChan_.c_str(), int(sqrts_));
-  if (verbose_) cout << "SuperMELA::init: Constructing alpha_CB_ from formula " << str_alpha_CB.c_str() << endl;
+  if (verbose_) MELAout << "SuperMELA::init: Constructing alpha_CB_ from formula " << str_alpha_CB.c_str() << endl;
   alpha_CB_=new RooFormulaVar(rrvName, str_alpha_CB.c_str(), RooArgList(*mH_rrv_));
   sprintf(rrvName, "CMS_zz4l_n2_sig_%s_%d", strChan_.c_str(), int(sqrts_));
-  if (verbose_) cout << "SuperMELA::init: Constructing n2_CB_ from formula " << str_n2_CB.c_str() << endl;
+  if (verbose_) MELAout << "SuperMELA::init: Constructing n2_CB_ from formula " << str_n2_CB.c_str() << endl;
   n2_CB_=new RooFormulaVar(rrvName, str_n2_CB.c_str(), RooArgList(*mH_rrv_));
   sprintf(rrvName, "CMS_zz4l_alpha2_sig_%s_%d", strChan_.c_str(), int(sqrts_));
-  if (verbose_) cout << "SuperMELA::init: Constructing alpha2_CB_ from formula " << str_alpha2_CB.c_str() << endl;
+  if (verbose_) MELAout << "SuperMELA::init: Constructing alpha2_CB_ from formula " << str_alpha2_CB.c_str() << endl;
   alpha2_CB_=new RooFormulaVar(rrvName, str_alpha2_CB.c_str(), RooArgList(*mH_rrv_));
 
   corr_mean_sig = new RooRealVar("CMS_zz4l_mean_sig_corrMH", "CMS_zz4l_mean_sig_corrMH", 0., -10., 10.);
@@ -301,7 +302,7 @@ void SuperMELA::init(){
   readBkgParsFromFile(v_apars);
 
   if (verbose_){
-    cout << "Size of vector with bkg shape pars is " << v_apars.size() << endl;
+    MELAout << "Size of vector with bkg shape pars is " << v_apars.size() << endl;
     MELAout << "Param [0]=" << v_apars.at(0) << " [13]=" << v_apars.at(13) << endl;
   }
 
@@ -471,7 +472,7 @@ void SuperMELA::readSigParsFromFile(
     if (fields.at(1)=="alpha2_CB"){ str_alpha2_CB=fields.at(2); alpha2OK=true; }
     if (fields.at(1)=="mean_CB"){ str_mean_CB=fields.at(2); meanOK=true; }
     if (fields.at(1)=="sigma_CB"){ str_sigma_CB=fields.at(2); sigmaOK=true; }
-    if (verbose_) cout << fields.at(1) << " == " << fields.at(2) << endl;
+    if (verbose_) MELAout << fields.at(1) << " == " << fields.at(2) << endl;
 
     if (meanOK && sigmaOK && alphaOK && nOK && alpha2OK && n2OK)break;
   }//end while loop on lines
@@ -534,7 +535,7 @@ void SuperMELA::calc_mZZ_range(const double mHVal, double& low_M, double& high_M
 #ifdef _melapkgpathstr_
   const string MELAPKGPATH = _melapkgpathstr_;
 #else
-  cout << "SuperMELA::calc_mZZ_range: MELA package path is undefined! Please modify the makefle or the makefile-equivalent!" << endl;
+  MELAout << "SuperMELA::calc_mZZ_range: MELA package path is undefined! Please modify the makefle or the makefile-equivalent!" << endl;
   assert(0);
 #endif
   string path = MELAPKGPATH + "data/HiggsTotalWidth_YR3.txt";
