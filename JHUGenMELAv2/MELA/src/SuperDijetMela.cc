@@ -3,8 +3,11 @@
 #include "MELACandidate.h"
 #include "SuperDijetMela.h"
 
+
 using namespace std;
 using TVar::simple_event_record;
+using TVar::MELAout;
+using TVar::MELAerr;
 
 
 SuperDijetMela::SuperDijetMela(float sqrts_, TVar::VerbosityLevel verbosity_) :
@@ -33,7 +36,7 @@ void SuperDijetMela::SetupResolutionModel(TVar::Production prod){
 #ifdef _melapkgpathstr_
   const string MELAPKGPATH = _melapkgpathstr_;
 #else
-  cout << "SuperDijetMela::SetupResolutionModel: MELA package path is undefined! Please modify the makefle or the makefile-equivalent!" << endl;
+  MELAout << "SuperDijetMela::SetupResolutionModel: MELA package path is undefined! Please modify the makefle or the makefile-equivalent!" << endl;
   assert(0);
 #endif
   TString path = TString(MELAPKGPATH.c_str()) + "data/resolution_mJJ_recoVStrue_";
@@ -46,7 +49,7 @@ void SuperDijetMela::SetupResolutionModel(TVar::Production prod){
     prodName = "WH";
     break;
   default:
-    cout << "SuperDijetMela::SetupResolutionModel: Production " << TVar::ProductionName(prod) << " is unknown." << endl;
+    MELAout << "SuperDijetMela::SetupResolutionModel: Production " << TVar::ProductionName(prod) << " is unknown." << endl;
     return;
   }
   path += prodName;
@@ -58,7 +61,7 @@ void SuperDijetMela::SetupResolutionModel(TVar::Production prod){
     int iprod = (int)prod;
     ResolutionModelMap[iprod] = model;
   }
-  else cerr << "SuperDijetMela::SetupResolutionModel: Model for production " << TVar::ProductionName(prod) << " cannot be built." << endl;
+  else MELAerr << "SuperDijetMela::SetupResolutionModel: Model for production " << TVar::ProductionName(prod) << " cannot be built." << endl;
 }
 float SuperDijetMela::GetConvBW(TVar::Production prod, MELACandidate* cand, bool useTrueBW){
   float result=-1;
@@ -107,7 +110,7 @@ float SuperDijetMela::GetConvBW(TVar::Production prod, MELACandidate* cand, bool
         if (mJJval>=0.) result = 1./(pow(pow(mJJval, 2)-pow(truePoleMass, 2), 2) + pow(truePoleMass*truePoleWidth, 2));
       }
 
-      if (verbosity>=TVar::DEBUG) cout
+      if (verbosity>=TVar::DEBUG) MELAout
         << "SuperDijetMela::GetConvBW[idV=" << AssociationVCompatibility << "]::"
         << "sqrt(s) = " << mJJval
         << ", true (m,Gamma) = ( " << truePoleMass << " , " << truePoleWidth << " )"
@@ -116,14 +119,14 @@ float SuperDijetMela::GetConvBW(TVar::Production prod, MELACandidate* cand, bool
     }
     else if (modelExists){
       result = ResolutionModelMap[iprod]->getVal(mJJval);
-      if (verbosity>=TVar::DEBUG) cout
+      if (verbosity>=TVar::DEBUG) MELAout
         << "SuperDijetMela::GetConvBW[" << TVar::ProductionName(prod) << "]::"
         << "sqrt(s) = " << mJJval
         << ", reco BW = " << result
         << endl;
     }
     else{
-      if (verbosity>=TVar::DEBUG) cout
+      if (verbosity>=TVar::DEBUG) MELAout
         << "SuperDijetMela::GetConvBW:: No method for " << TVar::ProductionName(prod) << " is known. "
         << "sqrt(s) = " << mJJval
         << ", return value = " << result

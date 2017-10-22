@@ -365,6 +365,8 @@ protected:
   /*****************/
   /*** Functions ***/
   /*****************/
+  void printLogo() const;
+
   bool configureAnalyticalPDFs();
   void reset_SelfDCouplings();
   void reset_PAux(); // SuperProb reset

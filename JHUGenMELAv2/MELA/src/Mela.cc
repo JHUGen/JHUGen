@@ -58,6 +58,7 @@ Mela::Mela(
   auxiliaryProb(0.),
   melaCand(0)
 {
+  this->printLogo();
   if (myVerbosity_>=TVar::DEBUG) MELAout << "Start Mela constructor" << endl;
   build(mh_);
   if (myVerbosity_>=TVar::DEBUG) MELAout << "End Mela constructor" << endl;
@@ -219,6 +220,10 @@ void Mela::build(double mh_){
   if (myVerbosity_>=TVar::DEBUG) MELAout << "End Mela::build" << endl;
 }
 
+void Mela::printLogo() const{
+  // To be written
+  // e.g. MELAout << '*'; MELAout.writeCentered("Hello world!", ' ', 51); MELAout << '*' << endl;
+}
 
 // Set-functions
 void Mela::setProcess(TVar::Process myModel, TVar::MatrixElement myME, TVar::Production myProduction){

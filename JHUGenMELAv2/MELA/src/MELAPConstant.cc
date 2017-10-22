@@ -9,6 +9,8 @@
 
 using namespace std;
 using TVar::simple_event_record;
+using TVar::MELAout;
+using TVar::MELAerr;
 
 
 MelaPConstant::MelaPConstant(
@@ -49,18 +51,18 @@ void MelaPConstant::GetFcnFromFile(const char* path, const char* spname){
     TString spname_mid = spname_core;
     fcnMid = (TSpline3*)fin->Get(spname_mid);
   }
-  else cerr << "MelaPConstant::GetFcnFromFile: Failed to open file in path " << path << endl;
+  else MELAerr << "MelaPConstant::GetFcnFromFile: Failed to open file in path " << path << endl;
   if (fin!=0 && fin->IsOpen()) fin->Close();
 }
 
 double MelaPConstant::Eval(const MelaIO* RcdME, TVar::VerbosityLevel verbosity)const{
-  if (verbosity>=TVar::DEBUG) cout << "Begin MelaPConstant::Eval" << endl;
+  if (verbosity>=TVar::DEBUG) MELAout << "Begin MelaPConstant::Eval" << endl;
 
   double result=1;
   if (RcdME->melaCand->genStatus==-1) return result;
 
   double candMass = RcdME->melaCand->m();
-  if (verbosity>=TVar::DEBUG) cout << "MelaPConstant::Eval: Candidate mass is " << candMass << endl;
+  if (verbosity>=TVar::DEBUG) MELAout << "MelaPConstant::Eval: Candidate mass is " << candMass << endl;
   if (candMass<=0.) return 0.;
   else if (fcnLow!=0 && candMass<fcnLow->GetXmax()) result = fcnLow->Eval(candMass);
   else if (fcnHigh!=0 && candMass>fcnHigh->GetXmin()) result = fcnHigh->Eval(candMass);
@@ -72,7 +74,7 @@ double MelaPConstant::Eval(const MelaIO* RcdME, TVar::VerbosityLevel verbosity)c
   }
   else return result;
 
-  if (verbosity>=TVar::DEBUG) cout << "MelaPConstant::Eval: Spline evaluated to " << result << endl;
+  if (verbosity>=TVar::DEBUG) MELAout << "MelaPConstant::Eval: Spline evaluated to " << result << endl;
 
   bool multiplyALR=false;
   bool multiplyHprop=false;
@@ -183,7 +185,7 @@ double MelaPConstant::Eval(const MelaIO* RcdME, TVar::VerbosityLevel verbosity)c
     multiplyALR=true;
   }
   else{
-    if (verbosity>=TVar::DEBUG) cout << "MelaPConstant::Eval: Multiplying " << result << " by nothing." << endl;
+    if (verbosity>=TVar::DEBUG) MELAout << "MelaPConstant::Eval: Multiplying " << result << " by nothing." << endl;
   }
 
   if (multiplyALR) result *= this->GetVDaughterCouplings(RcdME, verbosity);
@@ -192,7 +194,7 @@ double MelaPConstant::Eval(const MelaIO* RcdME, TVar::VerbosityLevel verbosity)c
   if (powAlphaSatMZ!=0) result *= this->GetAlphaSatMZ(RcdME, powAlphaSatMZ, verbosity);
   if (multiplyAVjjprop!=0) result *= this->GetAssociatedVjjPropagator(RcdME, verbosity);
 
-  if (verbosity>=TVar::DEBUG) cout << "End MelaPConstant::Eval with " << result << endl;
+  if (verbosity>=TVar::DEBUG) MELAout << "End MelaPConstant::Eval with " << result << endl;
   return result;
 }
 
@@ -202,7 +204,7 @@ double MelaPConstant::GetHPropagator(const MelaIO* RcdME, const TVar::VerbosityL
   double mh, gah;
   RcdME->getHiggsMassWidth(mh, gah, 0);
   propagator = 1./(pow(sh-pow(mh, 2), 2) + pow(mh*gah, 2));
-  if (verbosity>=TVar::DEBUG) cout
+  if (verbosity>=TVar::DEBUG) MELAout
     << "MelaPConstant::GetHPropagator: "
     << "propagatorH=" << propagator << " "
     << endl;
@@ -227,7 +229,7 @@ double MelaPConstant::GetZPropagator(const MelaIO* RcdME, const int& sigmaZ4lpro
     }
   }
   else if (sigmaZ4lprop<0.) propagator = prop_sh;
-  if (verbosity>=TVar::DEBUG) cout
+  if (verbosity>=TVar::DEBUG) MELAout
     << "MelaPConstant::GetZPropagator: "
     << "propagatorZ=" << propagator << " "
     << endl;
@@ -275,7 +277,7 @@ double MelaPConstant::GetAssociatedVjjPropagator(const MelaIO* RcdME, const TVar
     if (pJets.size()==2) mJJval = (pJets[0] + pJets[1]).M();
     if (mJJval>=0.) propagator = 1./(pow(pow(mJJval, 2)-pow(mv, 2), 2) + pow(mv*gav, 2));
   }
-  if (verbosity>=TVar::DEBUG) cout
+  if (verbosity>=TVar::DEBUG) MELAout
     << "MelaPConstant::GetAssociatedVjjPropagator: "
     << "propagatorV=" << propagator << " "
     << endl;
@@ -286,7 +288,7 @@ double MelaPConstant::GetVDaughterCouplings(const MelaIO* RcdME, const TVar::Ver
   double aL1, aR1, aL2, aR2;
   RcdME->getVDaughterCouplings(aL1, aR1, 0);
   RcdME->getVDaughterCouplings(aL2, aR2, 1);
-  if (verbosity>=TVar::DEBUG) cout
+  if (verbosity>=TVar::DEBUG) MELAout
     << "MelaPConstant::GetVDaughterCouplings: "
     << "L**2+R**2 couplings=" << pow(aL1, 2)+pow(aR1, 2) << " " << pow(aL2, 2)+pow(aR2, 2) << " "
     << endl;
@@ -298,7 +300,7 @@ double MelaPConstant::GetAlphaSatMZ(const MelaIO* RcdME, const unsigned int& pow
   double result;
   double alphasVal = RcdME->getAlphaSatMZ();
   result = pow(alphasVal, powAlphaSatMZ);
-  if (verbosity>=TVar::DEBUG) cout
+  if (verbosity>=TVar::DEBUG) MELAout
     << "MelaPConstant::GetAlphaSatMZ: "
     << "alphas(MZ)=" << alphasVal << " (**" << powAlphaSatMZ << ") "
     << endl;
