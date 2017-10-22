@@ -20,6 +20,10 @@ public:
   MELANCSpline_1D_fast();
   MELANCSpline_1D_fast(
     const char* name,
+    const char* title
+    );
+  MELANCSpline_1D_fast(
+    const char* name,
     const char* title,
     RooAbsReal& inXVar,
     const std::vector<T>& inXList,
@@ -52,7 +56,7 @@ protected:
   virtual Double_t evaluate()const;
 
 
-  ClassDef(MELANCSpline_1D_fast, 0)
+  ClassDef(MELANCSpline_1D_fast, 1)
 
 };
  

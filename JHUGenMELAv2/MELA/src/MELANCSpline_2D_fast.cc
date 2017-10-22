@@ -20,6 +20,15 @@ theYVar("theYVar", "theYVar", this)
 
 MELANCSpline_2D_fast::MELANCSpline_2D_fast(
   const char* name,
+  const char* title
+  ) :
+  MELANCSplineCore(name, title),
+  rangeYmin(1), rangeYmax(-1),
+  theYVar("theYVar", "theYVar", this)
+{}
+
+MELANCSpline_2D_fast::MELANCSpline_2D_fast(
+  const char* name,
   const char* title,
   RooAbsReal& inXVar,
   RooAbsReal& inYVar,
