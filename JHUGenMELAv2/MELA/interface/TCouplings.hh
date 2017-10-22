@@ -3,6 +3,11 @@
 
 #include <iostream>
 #include "TCouplingsBase.hh"
+#include "TVar.hh"
+
+
+using TVar::MELAout;
+using TVar::MELAerr;
 
 
 class SpinZeroCouplings{
@@ -116,8 +121,8 @@ public:
 
   void SetHVVCouplings(unsigned int index, double c_real, double c_imag, bool setWW = false, int whichResonance=1){
     if (!separateWWZZcouplings && setWW) return;
-    if (index>=SIZE_HVV){ std::cerr << "Cannot set index " << index << ", out of range for the type requested." << std::endl; }
-    else if (whichResonance<=0 || whichResonance>2) std::cerr << "Resonance " << whichResonance << " is not supported. Set it to 1 for the regular Higgs and 2 for the high-mass resonance." << std::endl;
+    if (index>=SIZE_HVV){ MELAerr << "Cannot set index " << index << ", out of range for the type requested." << std::endl; }
+    else if (whichResonance<=0 || whichResonance>2) MELAerr << "Resonance " << whichResonance << " is not supported. Set it to 1 for the regular Higgs and 2 for the high-mass resonance." << std::endl;
     else{
       if (whichResonance==1){ // First resonance
         if (setWW){
@@ -143,8 +148,8 @@ public:
   };
   void SetHVVLambdaQ2(unsigned int gType, unsigned int index, double lambda, bool setWW = false, int whichResonance=1){
     if (!separateWWZZcouplings && setWW) return;
-    if (index>=SIZE_HVV_CQSQ || gType>=SIZE_HVV_LAMBDAQSQ) std::cerr << "Cannot set index " << index <<  " for g" << (gType+1) << "_dyn, out of range." << std::endl;
-    else if (whichResonance<=0 || whichResonance>2) std::cerr << "Resonance " << whichResonance << " is not supported. Set it to 1 for the regular Higgs and 2 for the high-mass resonance." << std::endl;
+    if (index>=SIZE_HVV_CQSQ || gType>=SIZE_HVV_LAMBDAQSQ) MELAerr << "Cannot set index " << index <<  " for g" << (gType+1) << "_dyn, out of range." << std::endl;
+    else if (whichResonance<=0 || whichResonance>2) MELAerr << "Resonance " << whichResonance << " is not supported. Set it to 1 for the regular Higgs and 2 for the high-mass resonance." << std::endl;
     else{
       if (whichResonance==1){
         if (setWW) HwwLambda_qsq[gType][index] = lambda;
@@ -158,9 +163,9 @@ public:
   };
   void SetHVVSignCQ2(unsigned int index, int csign, bool setWW = false, int whichResonance=1){
     if (!separateWWZZcouplings && setWW) return;
-    if (index>=SIZE_HVV_CQSQ) std::cerr << "Cannot set index " << index << " for the c(z/w)qsq sign, out of range." << std::endl;
-    else if (csign>1 || csign<-1) std::cerr << "Invalid csign argument. It has to be in the range [-1,1] with default to 0." << std::endl;
-    else if (whichResonance<=0 || whichResonance>2) std::cerr << "Resonance " << whichResonance << " is not supported. Set it to 1 for the regular Higgs and 2 for the high-mass resonance." << std::endl;
+    if (index>=SIZE_HVV_CQSQ) MELAerr << "Cannot set index " << index << " for the c(z/w)qsq sign, out of range." << std::endl;
+    else if (csign>1 || csign<-1) MELAerr << "Invalid csign argument. It has to be in the range [-1,1] with default to 0." << std::endl;
+    else if (whichResonance<=0 || whichResonance>2) MELAerr << "Resonance " << whichResonance << " is not supported. Set it to 1 for the regular Higgs and 2 for the high-mass resonance." << std::endl;
     else{
       if (whichResonance==1){
         if (setWW) HwwCLambda_qsq[index] = csign;
@@ -173,9 +178,9 @@ public:
     }
   };
   void SetHGGCouplings(unsigned int index, double c_real, double c_imag, int whichLoop=1, int whichResonance=1){
-    if (index>=SIZE_HGG) std::cerr << "Cannot set index " << index << " for Hggcoupl, out of range for the type requested." << std::endl;
-    else if (whichResonance<=0 || whichResonance>2) std::cerr << "Resonance " << whichResonance << " is not supported. Set it to 1 for the regular Higgs and 2 for the high-mass resonance." << std::endl;
-    else if (whichLoop<=0 || whichLoop>2) std::cerr << "gg loop " << whichLoop << " is not supported. Set it to 1 for the loop that corresponds to the top/bottom couplings, or 2 for the loop that corresponds to the tprime/bprime couplings." << std::endl;
+    if (index>=SIZE_HGG) MELAerr << "Cannot set index " << index << " for Hggcoupl, out of range for the type requested." << std::endl;
+    else if (whichResonance<=0 || whichResonance>2) MELAerr << "Resonance " << whichResonance << " is not supported. Set it to 1 for the regular Higgs and 2 for the high-mass resonance." << std::endl;
+    else if (whichLoop<=0 || whichLoop>2) MELAerr << "gg loop " << whichLoop << " is not supported. Set it to 1 for the loop that corresponds to the top/bottom couplings, or 2 for the loop that corresponds to the tprime/bprime couplings." << std::endl;
     else{
       if (whichResonance==1){
         if (whichLoop==1){
@@ -200,9 +205,9 @@ public:
     }
   };
   void SetHQQCouplings(unsigned int index, double c_real, double c_imag, int qid=0, int whichResonance=1){
-    if (index>=SIZE_HQQ) std::cerr << "Cannot set index " << index << " for Hqqcoupl, out of range for the type requested." << std::endl;
-    else if (whichResonance<=0 || whichResonance>2) std::cerr << "Resonance " << whichResonance << " is not supported. Set it to 1 for the regular Higgs and 2 for the high-mass resonance." << std::endl;
-    else if (abs(qid)>8) std::cerr << "Quark id=" << qid << ">8 is not supported. Please change the id to 0-4 (qq), or one of 5 bottom), 6 (top), 7 (bprime), 8 (tprime)." << std::endl;
+    if (index>=SIZE_HQQ) MELAerr << "Cannot set index " << index << " for Hqqcoupl, out of range for the type requested." << std::endl;
+    else if (whichResonance<=0 || whichResonance>2) MELAerr << "Resonance " << whichResonance << " is not supported. Set it to 1 for the regular Higgs and 2 for the high-mass resonance." << std::endl;
+    else if (abs(qid)>8) MELAerr << "Quark id=" << qid << ">8 is not supported. Please change the id to 0-4 (qq), or one of 5 bottom), 6 (top), 7 (bprime), 8 (tprime)." << std::endl;
     else{
       if (whichResonance==1){
         if (abs(qid)<5){
@@ -252,8 +257,8 @@ public:
   };
 
   void SetHVVpCouplings(unsigned int index, double c_real, double c_imag, bool setWWp = false, int whichResonance=1){
-    if (index>=SIZE_HVV){ std::cerr << "Cannot set index " << index << ", out of range for the type requested." << std::endl; }
-    else if (whichResonance!=1) {std::cerr << "Contact terms are only for the first resonance" << std::endl;}
+    if (index>=SIZE_HVV){ MELAerr << "Cannot set index " << index << ", out of range for the type requested." << std::endl; }
+    else if (whichResonance!=1) {MELAerr << "Contact terms are only for the first resonance" << std::endl;}
     else{
       if (setWWp){
         Hwwpcoupl[index][0] = c_real;
@@ -266,8 +271,8 @@ public:
     }
   };
   void SetHVpVpCouplings(unsigned int index, double c_real, double c_imag, bool setWpWp = false, int whichResonance=1){
-    if (whichResonance!=1) { std::cerr << "Contact terms are only for the first resonance" << std::endl; }
-    else if (index>=SIZE_HVV){ std::cerr << "Cannot set index " << index << ", out of range for the type requested." << std::endl; }
+    if (whichResonance!=1) { MELAerr << "Contact terms are only for the first resonance" << std::endl; }
+    else if (index>=SIZE_HVV){ MELAerr << "Cannot set index " << index << ", out of range for the type requested." << std::endl; }
     else{
       if (setWpWp){
         Hwpwpcoupl[index][0] = c_real;
@@ -280,8 +285,8 @@ public:
     }
   };
   void SetVpffCouplings(unsigned int index, double c_real, double c_imag, bool setWpff = false, int whichResonance=1){
-    if (whichResonance!=1){ std::cerr << "Contact terms are only for the first resonance" << std::endl; }
-    else if (index>=SIZE_Vpff){ std::cerr << "Cannot set index " << index << ", out of range for the type requested." << std::endl; }
+    if (whichResonance!=1){ MELAerr << "Contact terms are only for the first resonance" << std::endl; }
+    else if (index>=SIZE_Vpff){ MELAerr << "Cannot set index " << index << ", out of range for the type requested." << std::endl; }
     else{
       if (!setWpff){
         Zpffcoupl[index][0] = c_real;
@@ -294,7 +299,7 @@ public:
           || index == gHIGGS_Vp_Str_left || index == gHIGGS_Vp_Str_right
           || index == gHIGGS_Vp_Bot_left || index == gHIGGS_Vp_Bot_right
           ) && (c_real!=0. || c_imag!=0.)
-          ) std::cerr << "No W' contact terms for neutrino, down, strange, or bottom; use the lepton or up-quark versions instead!" << std::endl;
+          ) MELAerr << "No W' contact terms for neutrino, down, strange, or bottom; use the lepton or up-quark versions instead!" << std::endl;
         else{
           Wpffcoupl[index][0] = c_real;
           Wpffcoupl[index][1] = c_imag;
@@ -375,14 +380,14 @@ public:
   SpinOneCouplings* getRef(){ return this; }
 
   void SetZVVCouplings(unsigned int index, double c_real, double c_imag){
-    if (index>=SIZE_ZVV) std::cerr << "Cannot set index " << index << " for the Zvvcoupl, out of range." << std::endl;
+    if (index>=SIZE_ZVV) MELAerr << "Cannot set index " << index << " for the Zvvcoupl, out of range." << std::endl;
     else{
       Zvvcoupl[index][0] = c_real;
       Zvvcoupl[index][1] = c_imag;
     }
   };
   void SetZQQCouplings(unsigned int index, double c_real, double c_imag){
-    if (index>=SIZE_ZQQ) std::cerr << "Cannot set index " << index << " for the Zqqcoupl, out of range." << std::endl;
+    if (index>=SIZE_ZQQ) MELAerr << "Cannot set index " << index << " for the Zqqcoupl, out of range." << std::endl;
     else{
       Zqqcoupl[index][0] = c_real;
       Zqqcoupl[index][1] = c_imag;
@@ -422,21 +427,21 @@ public:
   SpinTwoCouplings* getRef(){ return this; }
 
   void SetGVVCouplings(unsigned int index, double c_real, double c_imag){
-    if (index>=SIZE_GVV) std::cerr << "Cannot set index " << index << " for the Gvvcoupl, out of range." << std::endl;
+    if (index>=SIZE_GVV) MELAerr << "Cannot set index " << index << " for the Gvvcoupl, out of range." << std::endl;
     else{
       Gvvcoupl[index][0] = c_real;
       Gvvcoupl[index][1] = c_imag;
     }
   };
   void SetGQQCouplings(unsigned int index, double c_real, double c_imag){
-    if (index>=SIZE_GQQ) std::cerr << "Cannot set index " << index << " for the Gqqcoupl, out of range." << std::endl;
+    if (index>=SIZE_GQQ) MELAerr << "Cannot set index " << index << " for the Gqqcoupl, out of range." << std::endl;
     else{
       Gqqcoupl[index][0] = c_real;
       Gqqcoupl[index][1] = c_imag;
     }
   };
   void SetGGGCouplings(unsigned int index, double c_real, double c_imag){
-    if (index>=SIZE_GGG) std::cerr << "Cannot set index " << index << " for the Gggcoupl, out of range." << std::endl;
+    if (index>=SIZE_GGG) MELAerr << "Cannot set index " << index << " for the Gggcoupl, out of range." << std::endl;
     else{
       Gggcoupl[index][0] = c_real;
       Gggcoupl[index][1] = c_imag;

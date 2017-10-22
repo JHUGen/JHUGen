@@ -18,6 +18,8 @@ ClassImp(TEvtProb)
 
 using namespace std;
 using namespace TUtil;
+using TVar::MELAout;
+using TVar::MELAerr;
 
 
 //-----------------------------------------------------------------------------
@@ -32,12 +34,12 @@ TEvtProb::TEvtProb(
   EBEAM(ebeam),
   myCSW_(pathtoXSW)
 {
-  if (verbosity>=TVar::DEBUG) cout << "Begin TEvtProb constructor" << endl;
+  if (verbosity>=TVar::DEBUG) MELAout << "Begin TEvtProb constructor" << endl;
 
   /***** Build everything except MELAHXSWidth *****/
   Build();
 
-  if (verbosity>=TVar::DEBUG) cout << "End TEvtProb constructor" << endl;
+  if (verbosity>=TVar::DEBUG) MELAout << "End TEvtProb constructor" << endl;
 }
 TEvtProb::TEvtProb(const TEvtProb& other) :
 pathtoPDFSet_(other.pathtoPDFSet_),
@@ -49,7 +51,7 @@ myCSW_(other.myCSW_)
 
 }
 void TEvtProb::Build(){
-  if (verbosity>=TVar::DEBUG) cout << "Begin TEvtProb::Build" << endl;
+  if (verbosity>=TVar::DEBUG) MELAout << "Begin TEvtProb::Build" << endl;
 
   /***** Initialize lepton interference scheme *****/
   SetLeptonInterf(TVar::DefaultLeptonInterf);
@@ -67,23 +69,23 @@ void TEvtProb::Build(){
   ResetInputEvent();
   SetCandidateDecayMode(TVar::CandidateDecay_ZZ);
 
-  if (verbosity>=TVar::DEBUG) cout << "End TEvtProb::Build" << endl;
+  if (verbosity>=TVar::DEBUG) MELAout << "End TEvtProb::Build" << endl;
 }
 
 
 TEvtProb::~TEvtProb(){
-  if (verbosity>=TVar::DEBUG) cout << "Begin TEvtProb destructor" << endl;
+  if (verbosity>=TVar::DEBUG) MELAout << "Begin TEvtProb destructor" << endl;
 
   ResetInputEvent();
 
-  if (verbosity>=TVar::DEBUG) cout << "End TEvtProb destructor" << endl;
+  if (verbosity>=TVar::DEBUG) MELAout << "End TEvtProb destructor" << endl;
 }
 
 void TEvtProb::InitializeMCFM(){
-  if (verbosity>=TVar::DEBUG) cout << "Begin TEvtProb::InitializeMCFM" << endl;
+  if (verbosity>=TVar::DEBUG) MELAout << "Begin TEvtProb::InitializeMCFM" << endl;
 
   mcfm_init_((char *)"input.DAT", (char *)"./");
-  if (verbosity>=TVar::DEBUG) cout << "TEvtProb::TEvtProb: mcfm_init successful" << endl;
+  if (verbosity>=TVar::DEBUG) MELAout << "TEvtProb::TEvtProb: mcfm_init successful" << endl;
   energy_.sqrts = 2.*EBEAM;
   ResetQuarkMasses();
   ResetMCFM_EWKParameters(
@@ -137,17 +139,17 @@ void TEvtProb::InitializeMCFM(){
   // Constant parameters for all processes
   qlfirst_.qlfirst=false;
 
-  if (verbosity>=TVar::DEBUG) cout << "End TEvtProb::InitializeMCFM" << endl;
+  if (verbosity>=TVar::DEBUG) MELAout << "End TEvtProb::InitializeMCFM" << endl;
 }
 void TEvtProb::InitializeJHUGen(const char* pathtoPDFSet, int PDFMember){
-  if (verbosity>=TVar::DEBUG) cout << "Begin TEvtProb::InitializeJHUGen" << endl;
+  if (verbosity>=TVar::DEBUG) MELAout << "Begin TEvtProb::InitializeJHUGen" << endl;
 
   InitJHUGenMELA(pathtoPDFSet, PDFMember);
 
-  if (verbosity>=TVar::DEBUG) cout << "End TEvtProb::InitializeJHUGen" << endl;
+  if (verbosity>=TVar::DEBUG) MELAout << "End TEvtProb::InitializeJHUGen" << endl;
 }
 void TEvtProb::CrossInitialize(){
-  if (verbosity>=TVar::DEBUG) cout << "Begin TEvtProb::CrossInitialize" << endl;
+  if (verbosity>=TVar::DEBUG) MELAout << "Begin TEvtProb::CrossInitialize" << endl;
 
   /**** Initialize alphaS *****/
   const double GeV=1./100.;
@@ -155,7 +157,7 @@ void TEvtProb::CrossInitialize(){
   int init_nl, init_nf;
   __modjhugenmela_MOD_getpdfconstants(&init_Q, &init_nl, &init_nf);
   init_Q /= GeV;
-  if (verbosity>=TVar::DEBUG) cout << "TEvtProb::TEvtProb: Initializing the PDF with initial Q=" << init_Q << ", nloops=" << init_nl << ", nf=" << init_nf << endl;
+  if (verbosity>=TVar::DEBUG) MELAout << "TEvtProb::TEvtProb: Initializing the PDF with initial Q=" << init_Q << ", nloops=" << init_nl << ", nf=" << init_nf << endl;
   SetAlphaS(init_Q, init_Q, 1, 1, init_nl, init_nf, "cteq6_l"); // "cteq6_l" is just some dummy variable
 
   /**** Initialize MCFM CKM initializers in cabib.f using JHUGen defaults *****/
@@ -178,7 +180,7 @@ void TEvtProb::CrossInitialize(){
   ResetRenFacScaleMode();
   SetPrimaryHiggsMass(125.); // Should come after InitializeMCFM and InitializeJHUGen
 
-  if (verbosity>=TVar::DEBUG) cout << "End TEvtProb::CrossInitialize" << endl;
+  if (verbosity>=TVar::DEBUG) MELAout << "End TEvtProb::CrossInitialize" << endl;
 }
 
 // Set NNPDF driver path
@@ -286,7 +288,7 @@ void TEvtProb::SetInputEvent(
 }
 void TEvtProb::AppendTopCandidate(SimpleParticleCollection_t* TopDaughters){
   if (!CheckInputPresent()){
-    cerr << "TEvtProb::AppendTopCandidate: No MELACandidates are present to append this top!" << endl;
+    MELAerr << "TEvtProb::AppendTopCandidate: No MELACandidates are present to append this top!" << endl;
     return;
   }
   MELATopCandidate* cand = ConvertTopCandidate(
@@ -298,12 +300,12 @@ void TEvtProb::AppendTopCandidate(SimpleParticleCollection_t* TopDaughters){
 void TEvtProb::SetRcdCandPtr(){ RcdME.melaCand = melaCand; }
 void TEvtProb::SetCurrentCandidateFromIndex(unsigned int icand){
   if (candList.size()>icand) melaCand = candList.at(icand);
-  else cerr << "TEvtProb::SetCurrentCandidateFromIndex: icand=" << icand << ">=candList.size()=" << candList.size() << endl;
+  else MELAerr << "TEvtProb::SetCurrentCandidateFromIndex: icand=" << icand << ">=candList.size()=" << candList.size() << endl;
 }
 void TEvtProb::SetCurrentCandidate(MELACandidate* cand){
   melaCand = cand;
-  if (verbosity>=TVar::INFO && melaCand==0) cout << "TEvtProb::SetCurrentCandidate: BE CAREFUL! melaCand==0!" << endl;
-  if (verbosity>=TVar::INFO && GetCurrentCandidateIndex()<0) cout << "TEvtProb::SetCurrentCandidate: The current candidate is not in the list of candidates. It is the users' responsibility to delete this candidate and all of its associated particles." << endl;
+  if (verbosity>=TVar::INFO && melaCand==0) MELAout << "TEvtProb::SetCurrentCandidate: BE CAREFUL! melaCand==0!" << endl;
+  if (verbosity>=TVar::INFO && GetCurrentCandidateIndex()<0) MELAout << "TEvtProb::SetCurrentCandidate: The current candidate is not in the list of candidates. It is the users' responsibility to delete this candidate and all of its associated particles." << endl;
 }
 
 // Reset functions
@@ -396,7 +398,7 @@ bool TEvtProb::CheckInputPresent(){
     if (candList.size()==0) return false;
     else{
       SetCurrentCandidateFromIndex(candList.size()-1);
-      cerr << "TEvtProb::CheckInputPresent: melaCand now points to the latest candidate (cand" << (candList.size()-1) << ")" << endl;
+      MELAerr << "TEvtProb::CheckInputPresent: melaCand now points to the latest candidate (cand" << (candList.size()-1) << ")" << endl;
     }
   }
   SetRcdCandPtr(); // If input event is present, set the RcdME pointer to melaCand
@@ -407,7 +409,7 @@ bool TEvtProb::CheckInputPresent(){
 // ME functions
 // Cross-section calculations for H + 0 jet
 double TEvtProb::XsecCalc_XVV(){
-  if (verbosity>=TVar::DEBUG) cout << "Begin XsecCalc_XVV" << endl;
+  if (verbosity>=TVar::DEBUG) MELAout << "Begin XsecCalc_XVV" << endl;
   double dXsec=0;
   ResetIORecord();
   if (!CheckInputPresent()) return dXsec;
@@ -416,7 +418,7 @@ double TEvtProb::XsecCalc_XVV(){
   bool calculateME=false;
   bool needBSMHiggs=false;
   if (useMCFM){
-    if (verbosity>=TVar::DEBUG) cout << "TEvtProb::XsecCalc_XVV: Try MCFM" << endl;
+    if (verbosity>=TVar::DEBUG) MELAout << "TEvtProb::XsecCalc_XVV: Try MCFM" << endl;
     needBSMHiggs = CheckSelfDCouplings_Hgg() || CheckSelfDCouplings_Htt() || CheckSelfDCouplings_Hbb() || CheckSelfDCouplings_HVV();
     if (needBSMHiggs) SetLeptonInterf(TVar::InterfOn); // All anomalous coupling computations have to use lepton interference
 
@@ -433,10 +435,10 @@ double TEvtProb::XsecCalc_XVV(){
       SetMCFMSpinZeroCouplings(needBSMHiggs, &selfDSpinZeroCoupl, false);
       dXsec = SumMatrixElementPDF(process, production, matrixElement, leptonInterf, &event_scales, &RcdME, EBEAM, verbosity);
     }
-    else if (verbosity>=TVar::INFO) cout << "TEvtProb::XsecCalc_XVV: MCFM_chooser failed to determine the process configuration." << endl;
+    else if (verbosity>=TVar::INFO) MELAout << "TEvtProb::XsecCalc_XVV: MCFM_chooser failed to determine the process configuration." << endl;
   }
   else if (matrixElement == TVar::JHUGen){
-    if (verbosity>=TVar::DEBUG) cout << "TEvtProb::XsecCalc_XVV::Try JHUGen" << endl;
+    if (verbosity>=TVar::DEBUG) MELAout << "TEvtProb::XsecCalc_XVV::Try JHUGen" << endl;
     AllowSeparateWWCouplings(false); // HZZ couplings are used for both in spin-0
     // all the possible couplings
     double Hggcoupl[SIZE_HGG][2] ={ { 0 } };
@@ -551,29 +553,29 @@ double TEvtProb::XsecCalc_XVV(){
 
       if (verbosity>=TVar::DEBUG_VERBOSE){
         for (int j=0; j<2; j++){
-          for (int i=0; i<SIZE_HGG; i++){ if ((selfDSpinZeroCoupl.Hggcoupl)[i][j]!=0.) cout << "Hggcoupl[" << i << "][" << j << "] = " << (selfDSpinZeroCoupl.Hggcoupl)[i][j] << endl; }
+          for (int i=0; i<SIZE_HGG; i++){ if ((selfDSpinZeroCoupl.Hggcoupl)[i][j]!=0.) MELAout << "Hggcoupl[" << i << "][" << j << "] = " << (selfDSpinZeroCoupl.Hggcoupl)[i][j] << endl; }
           for (int i=0; i<SIZE_HVV; i++){
-            if ((selfDSpinZeroCoupl.Hzzcoupl)[i][j]!=0.) cout << "Hvvcoupl[" << i << "][" << j << "] = " << (selfDSpinZeroCoupl.Hzzcoupl)[i][j] << endl;
+            if ((selfDSpinZeroCoupl.Hzzcoupl)[i][j]!=0.) MELAout << "Hvvcoupl[" << i << "][" << j << "] = " << (selfDSpinZeroCoupl.Hzzcoupl)[i][j] << endl;
 
-            if ((selfDSpinZeroCoupl.Hzzpcoupl)[i][j]!=0.) cout << "Hzzpcoupl[" << i << "][" << j << "] = " << (selfDSpinZeroCoupl.Hzzpcoupl)[i][j] << endl;
-            if ((selfDSpinZeroCoupl.Hzpzpcoupl)[i][j]!=0.) cout << "Hzpzpcoupl[" << i << "][" << j << "] = " << (selfDSpinZeroCoupl.Hzpzpcoupl)[i][j] << endl;
+            if ((selfDSpinZeroCoupl.Hzzpcoupl)[i][j]!=0.) MELAout << "Hzzpcoupl[" << i << "][" << j << "] = " << (selfDSpinZeroCoupl.Hzzpcoupl)[i][j] << endl;
+            if ((selfDSpinZeroCoupl.Hzpzpcoupl)[i][j]!=0.) MELAout << "Hzpzpcoupl[" << i << "][" << j << "] = " << (selfDSpinZeroCoupl.Hzpzpcoupl)[i][j] << endl;
 
-            if ((selfDSpinZeroCoupl.Hwwpcoupl)[i][j]!=0.) cout << "Hwwpcoupl[" << i << "][" << j << "] = " << (selfDSpinZeroCoupl.Hwwpcoupl)[i][j] << endl;
-            if ((selfDSpinZeroCoupl.Hwpwpcoupl)[i][j]!=0.) cout << "Hwpwpcoupl[" << i << "][" << j << "] = " << (selfDSpinZeroCoupl.Hwpwpcoupl)[i][j] << endl;
+            if ((selfDSpinZeroCoupl.Hwwpcoupl)[i][j]!=0.) MELAout << "Hwwpcoupl[" << i << "][" << j << "] = " << (selfDSpinZeroCoupl.Hwwpcoupl)[i][j] << endl;
+            if ((selfDSpinZeroCoupl.Hwpwpcoupl)[i][j]!=0.) MELAout << "Hwpwpcoupl[" << i << "][" << j << "] = " << (selfDSpinZeroCoupl.Hwpwpcoupl)[i][j] << endl;
           }
           for (int i=0; i<SIZE_Vpff; i++){
-            if ((selfDSpinZeroCoupl.Zpffcoupl)[i][j]!=0.) cout << "Zpffcoupl[" << i << "][" << j << "] = " << (selfDSpinZeroCoupl.Zpffcoupl)[i][j] << endl;
-            if ((selfDSpinZeroCoupl.Wpffcoupl)[i][j]!=0.) cout << "Wpffcoupl[" << i << "][" << j << "] = " << (selfDSpinZeroCoupl.Wpffcoupl)[i][j] << endl;
+            if ((selfDSpinZeroCoupl.Zpffcoupl)[i][j]!=0.) MELAout << "Zpffcoupl[" << i << "][" << j << "] = " << (selfDSpinZeroCoupl.Zpffcoupl)[i][j] << endl;
+            if ((selfDSpinZeroCoupl.Wpffcoupl)[i][j]!=0.) MELAout << "Wpffcoupl[" << i << "][" << j << "] = " << (selfDSpinZeroCoupl.Wpffcoupl)[i][j] << endl;
           }
         }
         for (int j=0; j<SIZE_HVV_CQSQ; j++){
-          for (int i=0; i<SIZE_HVV_LAMBDAQSQ; i++){ if ((selfDSpinZeroCoupl.HzzLambda_qsq)[i][j]!=0.) cout << "HvvLambda_qsq[" << i << "][" << j << "] = " << (selfDSpinZeroCoupl.HzzLambda_qsq)[i][j] << endl; }
-          if ((selfDSpinZeroCoupl.HzzCLambda_qsq)[j]!=0.) cout << "HvvCLambda_qsq[" << j << "] = " << (selfDSpinZeroCoupl.HzzCLambda_qsq)[j] << endl;
+          for (int i=0; i<SIZE_HVV_LAMBDAQSQ; i++){ if ((selfDSpinZeroCoupl.HzzLambda_qsq)[i][j]!=0.) MELAout << "HvvLambda_qsq[" << i << "][" << j << "] = " << (selfDSpinZeroCoupl.HzzLambda_qsq)[i][j] << endl; }
+          if ((selfDSpinZeroCoupl.HzzCLambda_qsq)[j]!=0.) MELAout << "HvvCLambda_qsq[" << j << "] = " << (selfDSpinZeroCoupl.HzzCLambda_qsq)[j] << endl;
         }
-        cout << "M_Zprime = " << selfDSpinZeroCoupl.M_Zprime << endl;
-        cout << "Ga_Zprime = " << selfDSpinZeroCoupl.Ga_Zprime << endl;
-        cout << "M_Wprime = " << selfDSpinZeroCoupl.M_Wprime << endl;
-        cout << "Ga_Wprime = " << selfDSpinZeroCoupl.Ga_Wprime << endl;
+        MELAout << "M_Zprime = " << selfDSpinZeroCoupl.M_Zprime << endl;
+        MELAout << "Ga_Zprime = " << selfDSpinZeroCoupl.Ga_Zprime << endl;
+        MELAout << "M_Wprime = " << selfDSpinZeroCoupl.M_Wprime << endl;
+        MELAout << "Ga_Wprime = " << selfDSpinZeroCoupl.Ga_Wprime << endl;
       }
 
       isSpinZero = true;
@@ -689,22 +691,22 @@ double TEvtProb::XsecCalc_XVV(){
       << endl;
   } // end of JHUGen matrix element calculations
 
-  if (verbosity >= TVar::DEBUG) cout << "TEvtProb::XsecCalc_XVV: Process " << TVar::ProcessName(process) << " dXsec=" << dXsec << endl;
+  if (verbosity >= TVar::DEBUG) MELAout << "TEvtProb::XsecCalc_XVV: Process " << TVar::ProcessName(process) << " dXsec=" << dXsec << endl;
 
-  if (verbosity>=TVar::DEBUG) cout << "TEvtProb::XsecCalc_XVV::Reset couplings" << endl;
+  if (verbosity>=TVar::DEBUG) MELAout << "TEvtProb::XsecCalc_XVV::Reset couplings" << endl;
   ResetCouplings(); // Should come first
   if (useMCFM){ // Set defaults. Should come next...
     if (needBSMHiggs) SetLeptonInterf(TVar::DefaultLeptonInterf);
     if (calculateME) SetMCFMSpinZeroCouplings(false, &selfDSpinZeroCoupl, true); // ... because of this!
   }
   ResetRenFacScaleMode();
-  if (verbosity>=TVar::DEBUG) cout << "End XsecCalc_XVV" << endl;
+  if (verbosity>=TVar::DEBUG) MELAout << "End XsecCalc_XVV" << endl;
   return dXsec;
 }
 
 // Cross-section calculations for H(->VV) + 2 jets
 double TEvtProb::XsecCalc_VVXVV(){
-  if (verbosity>=TVar::DEBUG) cout << "Begin XsecCalc_VVXVV" << endl;
+  if (verbosity>=TVar::DEBUG) MELAout << "Begin XsecCalc_VVXVV" << endl;
   double dXsec=0;
   ResetIORecord();
   if (!CheckInputPresent()) return dXsec;
@@ -713,7 +715,7 @@ double TEvtProb::XsecCalc_VVXVV(){
   bool needBSMHiggs=false;
   bool calculateME=false;
   if (useMCFM){
-    if (verbosity>=TVar::DEBUG) cout << "TEvtProb::XsecCalc_VVXVV: Try MCFM" << endl;
+    if (verbosity>=TVar::DEBUG) MELAout << "TEvtProb::XsecCalc_VVXVV: Try MCFM" << endl;
     needBSMHiggs = CheckSelfDCouplings_HVV();
     if (needBSMHiggs) SetLeptonInterf(TVar::InterfOn); // All anomalous coupling computations have to use lepton interference
 
@@ -726,9 +728,9 @@ double TEvtProb::XsecCalc_VVXVV(){
       SetMCFMSpinZeroCouplings(needBSMHiggs, &selfDSpinZeroCoupl, false);
       dXsec = SumMatrixElementPDF(process, production, matrixElement, leptonInterf, &event_scales, &RcdME, EBEAM, verbosity);
     }
-    else if (verbosity>=TVar::INFO) cout << "TEvtProb::XsecCalc_VVXVV: MCFM_chooser failed to determine the process configuration." << endl;
+    else if (verbosity>=TVar::INFO) MELAout << "TEvtProb::XsecCalc_VVXVV: MCFM_chooser failed to determine the process configuration." << endl;
   }
-  else cerr << "TEvtProb::XsecCalc_VVXVV: Non-MCFM Mes are not supported." << endl;
+  else MELAerr << "TEvtProb::XsecCalc_VVXVV: Non-MCFM Mes are not supported." << endl;
 
   if (verbosity >= TVar::DEBUG) cout
     << "Process " << TVar::ProcessName(process)
@@ -741,13 +743,13 @@ double TEvtProb::XsecCalc_VVXVV(){
     if (calculateME) SetMCFMSpinZeroCouplings(false, &selfDSpinZeroCoupl, true); // ... because of this!
   }
   ResetRenFacScaleMode();
-  if (verbosity>=TVar::DEBUG) cout << "End XsecCalc_VVXVV" << endl;
+  if (verbosity>=TVar::DEBUG) MELAout << "End XsecCalc_VVXVV" << endl;
   return dXsec;
 }
 
 // Cross-section calculations for H + 2 jets
 double TEvtProb::XsecCalcXJJ(){
-  if (verbosity>=TVar::DEBUG) cout << "Begin XsecCalc_XJJ" << endl;
+  if (verbosity>=TVar::DEBUG) MELAout << "Begin XsecCalc_XJJ" << endl;
   if (matrixElement == TVar::MCFM) return XsecCalc_VVXVV();
   double dXsec = 0;
   ResetIORecord();
@@ -825,19 +827,19 @@ double TEvtProb::XsecCalcXJJ(){
     }
 
     dXsec = HJJMatEl(process, production, matrixElement, &event_scales, &RcdME, EBEAM, verbosity);
-    if (verbosity >= TVar::DEBUG) cout << "TEvtProb::XsecCalc_XJJ: Process " << TVar::ProcessName(process) << " dXsec=" << dXsec << endl;
+    if (verbosity >= TVar::DEBUG) MELAout << "TEvtProb::XsecCalc_XJJ: Process " << TVar::ProcessName(process) << " dXsec=" << dXsec << endl;
   }
-  else cerr << "TEvtProb::XsecCalc_XJJ: Non-JHUGen vbfMELA MEs are not supported!" << endl;
+  else MELAerr << "TEvtProb::XsecCalc_XJJ: Non-JHUGen vbfMELA MEs are not supported!" << endl;
 
   ResetCouplings();
   ResetRenFacScaleMode();
-  if (verbosity>=TVar::DEBUG) cout << "End XsecCalc_XJJ" << endl;
+  if (verbosity>=TVar::DEBUG) MELAout << "End XsecCalc_XJJ" << endl;
   return dXsec;
 }
 
 // Cross-section calculations for H + 1 jet (only SM for the moment)
 double TEvtProb::XsecCalcXJ(){
-  if (verbosity>=TVar::DEBUG) cout << "Begin XsecCalc_XJ" << endl;
+  if (verbosity>=TVar::DEBUG) MELAout << "Begin XsecCalc_XJ" << endl;
   double dXsec = 0;
   ResetIORecord();
   if (!CheckInputPresent()) return dXsec;
@@ -856,13 +858,13 @@ double TEvtProb::XsecCalcXJ(){
     SetJHUGenSpinZeroGGCouplings(Hggcoupl);
 
     dXsec = HJJMatEl(process, production, matrixElement, &event_scales, &RcdME, EBEAM, verbosity);
-    if (verbosity >= TVar::DEBUG) std::cout << "TEvtProb::XsecCalc_XJ: Process " << TVar::ProcessName(process) << " dXsec=" << dXsec << endl;
+    if (verbosity >= TVar::DEBUG) MELAout << "TEvtProb::XsecCalc_XJ: Process " << TVar::ProcessName(process) << " dXsec=" << dXsec << endl;
   }
-  else cerr << "TEvtProb::XsecCalc_XJ: Non-JHUGen HJ MEs are not supported!" << endl;
+  else MELAerr << "TEvtProb::XsecCalc_XJ: Non-JHUGen HJ MEs are not supported!" << endl;
 
   ResetCouplings();
   ResetRenFacScaleMode();
-  if (verbosity>=TVar::DEBUG) cout << "End XsecCalc_XJ" << endl;
+  if (verbosity>=TVar::DEBUG) MELAout << "End XsecCalc_XJ" << endl;
   return dXsec;
 }
 
@@ -870,7 +872,7 @@ double TEvtProb::XsecCalcXJ(){
 double TEvtProb::XsecCalc_VX(
   bool includeHiggsDecay
   ){
-  if (verbosity>=TVar::DEBUG) cout << "Begin XsecCalc_VX" << endl;
+  if (verbosity>=TVar::DEBUG) MELAout << "Begin XsecCalc_VX" << endl;
   if (matrixElement == TVar::MCFM) return XsecCalc_VVXVV();
   double dXsec = 0;
   ResetIORecord();
@@ -936,13 +938,13 @@ double TEvtProb::XsecCalc_VX(
     SetWprimeMassWidth(M_Wprime, Ga_Wprime);
 
     dXsec = VHiggsMatEl(process, production, matrixElement, &event_scales, &RcdME, EBEAM, includeHiggsDecay, verbosity);
-    if (verbosity >= TVar::DEBUG) std::cout << "TEVtProb::XsecCalc_VX: Process " << TVar::ProcessName(process) << " dXsec=" << dXsec << endl;
+    if (verbosity >= TVar::DEBUG) MELAout << "TEVtProb::XsecCalc_VX: Process " << TVar::ProcessName(process) << " dXsec=" << dXsec << endl;
   } // end of JHUGen matrix element calculations
-  else cerr << "TEVtProb::XsecCalc_VX: Non-JHUGen VH MEs are not supported!" << endl;
+  else MELAerr << "TEVtProb::XsecCalc_VX: Non-JHUGen VH MEs are not supported!" << endl;
 
   ResetCouplings();
   ResetRenFacScaleMode();
-  if (verbosity>=TVar::DEBUG) cout << "End XsecCalc_VX" << endl;
+  if (verbosity>=TVar::DEBUG) MELAout << "End XsecCalc_VX" << endl;
   return dXsec;
 }
 
@@ -950,7 +952,7 @@ double TEvtProb::XsecCalc_VX(
 double TEvtProb::XsecCalc_TTX(
   int topProcess, int topDecay
   ){
-  if (verbosity>=TVar::DEBUG) cout << "Begin XsecCalc_TTX" << endl;
+  if (verbosity>=TVar::DEBUG) MELAout << "Begin XsecCalc_TTX" << endl;
   double dXsec = 0;
   ResetIORecord();
   if (!CheckInputPresent()) return dXsec;
@@ -972,14 +974,14 @@ double TEvtProb::XsecCalc_TTX(
 
     if (production==TVar::ttH) dXsec = TTHiggsMatEl(process, production, matrixElement, &event_scales, &RcdME, EBEAM, topDecay, topProcess, verbosity);
     else if (production==TVar::bbH) dXsec = BBHiggsMatEl(process, production, matrixElement, &event_scales, &RcdME, EBEAM, topProcess, verbosity);
-    else if (verbosity >= TVar::ERROR) std::cout << "TEvtProb::XsecCalc_TTX only supports ttH and bbH productions for the moment." << endl;
-    if (verbosity >= TVar::DEBUG) std::cout << "TEvtProb::XsecCalc_TTX: Process " << TVar::ProcessName(process) << " dXsec=" << dXsec << endl;
+    else if (verbosity >= TVar::ERROR) MELAout << "TEvtProb::XsecCalc_TTX only supports ttH and bbH productions for the moment." << endl;
+    if (verbosity >= TVar::DEBUG) MELAout << "TEvtProb::XsecCalc_TTX: Process " << TVar::ProcessName(process) << " dXsec=" << dXsec << endl;
   }
-  else cerr << "TEvtProb::XsecCalc_TTX: Non-JHUGen ttH MEs are not supported!" << endl;
+  else MELAerr << "TEvtProb::XsecCalc_TTX: Non-JHUGen ttH MEs are not supported!" << endl;
 
   ResetCouplings();
   ResetRenFacScaleMode();
-  if (verbosity>=TVar::DEBUG) cout << "End XsecCalc_TTX" << endl;
+  if (verbosity>=TVar::DEBUG) MELAout << "End XsecCalc_TTX" << endl;
   return dXsec;
 }
 

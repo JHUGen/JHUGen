@@ -42,6 +42,9 @@ Please adhere to the following coding conventions:
 
 using namespace std;
 using namespace RooFit;
+using TVar::MELAout;
+using TVar::MELAerr;
+
 
 Mela::Mela(
   double LHCsqrts_,
@@ -55,9 +58,9 @@ Mela::Mela(
   auxiliaryProb(0.),
   melaCand(0)
 {
-  if (myVerbosity_>=TVar::DEBUG) cout << "Start Mela constructor" << endl;
+  if (myVerbosity_>=TVar::DEBUG) MELAout << "Start Mela constructor" << endl;
   build(mh_);
-  if (myVerbosity_>=TVar::DEBUG) cout << "End Mela constructor" << endl;
+  if (myVerbosity_>=TVar::DEBUG) MELAout << "End Mela constructor" << endl;
 }
 Mela::Mela(const Mela& other) :
 melaRandomNumber(35797),
@@ -71,19 +74,19 @@ melaCand(0)
   build(mh_);
 }
 Mela::~Mela(){
-  if (myVerbosity_>=TVar::DEBUG) cout << "Begin Mela destructor" << endl;
+  if (myVerbosity_>=TVar::DEBUG) MELAout << "Begin Mela destructor" << endl;
 
   //setRemoveLeptonMasses(false); // Use Run 1 scheme for not removing lepton masses. Notice the switch itself is defined as an extern, so it has to be set to default value at the destructor!
   setRemoveLeptonMasses(true); // Use Run 2 scheme for removing lepton masses. Notice the switch itself is defined as an extern, so it has to be set to default value at the destructor!
 
   // Delete the derived RooFit objects first...
-  if (myVerbosity_>=TVar::DEBUG) cout << "Mela destructor: Destroying analytical PDFs" << endl;
+  if (myVerbosity_>=TVar::DEBUG) MELAout << "Mela destructor: Destroying analytical PDFs" << endl;
   delete ggSpin0Model;
   delete spin1Model;
   delete spin2Model;
   delete qqZZmodel;
   // ...then delete the observables.
-  if (myVerbosity_>=TVar::DEBUG) cout << "Mela destructor: Destroying analytical PDFs observables" << endl;
+  if (myVerbosity_>=TVar::DEBUG) MELAout << "Mela destructor: Destroying analytical PDFs observables" << endl;
   delete mzz_rrv;
   delete z1mass_rrv; 
   delete z2mass_rrv; 
@@ -95,34 +98,34 @@ Mela::~Mela(){
   delete Y_rrv;
   delete upFrac_rrv;
 
-  if (myVerbosity_>=TVar::DEBUG) cout << "Mela destructor: Destroying SuperDijetMELA" << endl;
+  if (myVerbosity_>=TVar::DEBUG) MELAout << "Mela destructor: Destroying SuperDijetMELA" << endl;
   delete superDijet;
-  if (myVerbosity_>=TVar::DEBUG) cout << "Mela destructor: Destroying SuperMELA" << endl;
+  if (myVerbosity_>=TVar::DEBUG) MELAout << "Mela destructor: Destroying SuperMELA" << endl;
   delete super;
-  if (myVerbosity_>=TVar::DEBUG) cout << "Mela destructor: Destroying ZZME" << endl;
+  if (myVerbosity_>=TVar::DEBUG) MELAout << "Mela destructor: Destroying ZZME" << endl;
   delete ZZME;
 
   // Delete ME constant handles
-  if (myVerbosity_>=TVar::DEBUG) cout << "Mela destructor: Destroying PConstant handles" << endl;
+  if (myVerbosity_>=TVar::DEBUG) MELAout << "Mela destructor: Destroying PConstant handles" << endl;
   deletePConstantHandles();
 
-  if (myVerbosity_>=TVar::DEBUG) cout << "End Mela destructor" << endl;
+  if (myVerbosity_>=TVar::DEBUG) MELAout << "End Mela destructor" << endl;
 }
 void Mela::build(double mh_){
-  if (myVerbosity_>=TVar::DEBUG) cout << "Start Mela::build" << endl;
+  if (myVerbosity_>=TVar::DEBUG) MELAout << "Start Mela::build" << endl;
   //setRemoveLeptonMasses(false); // Use Run 1 scheme for not removing fermion masses
   setRemoveLeptonMasses(true); // Use Run 2 scheme for removing fermion masses to compute MEs that expect massless fermions properly
 
   const double maxSqrts = 8.;
 
   // Create symlinks to the required files, if these are not already present (do nothing otherwise)
-  if (myVerbosity_>=TVar::DEBUG) cout << "Create symlinks to the required files if these are not already present:" << endl;
+  if (myVerbosity_>=TVar::DEBUG) MELAout << "Create symlinks to the required files if these are not already present:" << endl;
 
 #ifdef _melapkgpathstr_
   const string MELAPKGPATH = _melapkgpathstr_;
-  if (myVerbosity_>=TVar::DEBUG)  cout << "\t- MELA package path: " << MELAPKGPATH << endl;
+  if (myVerbosity_>=TVar::DEBUG)  MELAout << "\t- MELA package path: " << MELAPKGPATH << endl;
 #else
-  cout << "MELA package path is undefined! Please modify the makefle or the makefile-equivalent!" << endl;
+  MELAout << "MELA package path is undefined! Please modify the makefle or the makefile-equivalent!" << endl;
   assert(0);
 #endif
 
@@ -131,13 +134,13 @@ void Mela::build(double mh_){
   const string mcfm_brsm_t = MELAPKGPATH + "data/br.sm2"; symlink(mcfm_brsm_t.c_str(), "br.sm2");
   const string mcfmInput1 = MELAPKGPATH + "data/input.DAT"; symlink(mcfmInput1.c_str(), "input.DAT");
   const string mcfmInput2 = MELAPKGPATH + "data/process.DAT"; symlink(mcfmInput2.c_str(), "process.DAT");
-  if (myVerbosity_>=TVar::DEBUG) cout << "\t- MCFM symlinks are done" << endl;
+  if (myVerbosity_>=TVar::DEBUG) MELAout << "\t- MCFM symlinks are done" << endl;
   mkdir("Pdfdata", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
   const string mcfmInput3 = MELAPKGPATH + "data/Pdfdata/cteq6l1.tbl"; symlink(mcfmInput3.c_str(), "Pdfdata/cteq6l1.tbl");
   const string mcfmInput4 = MELAPKGPATH + "data/Pdfdata/cteq6l.tbl"; symlink(mcfmInput4.c_str(), "Pdfdata/cteq6l.tbl");
-  if (myVerbosity_>=TVar::DEBUG) cout << "\t- PDF symlinks are done" << endl;
+  if (myVerbosity_>=TVar::DEBUG) MELAout << "\t- PDF symlinks are done" << endl;
 
-  if (myVerbosity_>=TVar::DEBUG) cout << "Create variables used in anaMELA" << endl;
+  if (myVerbosity_>=TVar::DEBUG) MELAout << "Create variables used in anaMELA" << endl;
   mzz_rrv = new RooRealVar("mzz", "m_{ZZ}", mh_, 0., 1000.);
   z1mass_rrv = new RooRealVar("z1mass", "m_{Z1}", 0., 160.);
   z2mass_rrv = new RooRealVar("z2mass", "m_{Z2}", 0., 200.);
@@ -160,23 +163,23 @@ void Mela::build(double mh_){
   measurables_.Phi1 = phi1_rrv;
   measurables_.Y = Y_rrv;
 
-  if (myVerbosity_>=TVar::DEBUG) cout << "Create anaMELA PDF factories" << endl;
+  if (myVerbosity_>=TVar::DEBUG) MELAout << "Create anaMELA PDF factories" << endl;
   ggSpin0Model = new ScalarPdfFactory_HVV(measurables_, false, RooSpin::kVdecayType_Zll, RooSpin::kVdecayType_Zll); // RooSpin::kVdecayType_Zll,RooSpin::kVdecayType_Zll==ZZ4l
   spin1Model = new VectorPdfFactory(z1mass_rrv, z2mass_rrv, costhetastar_rrv, costheta1_rrv, costheta2_rrv, phi_rrv, phi1_rrv, mzz_rrv);
   spin2Model = new TensorPdfFactory_ppHVV(measurables_, RooSpin::kVdecayType_Zll, RooSpin::kVdecayType_Zll);
   qqZZmodel = new RooqqZZ_JHU_ZgammaZZ_fast("qqZZmodel", "qqZZmodel", *z1mass_rrv, *z2mass_rrv, *costheta1_rrv, *costheta2_rrv, *phi_rrv, *costhetastar_rrv, *phi1_rrv, *mzz_rrv, *upFrac_rrv);
 
-  if (myVerbosity_>=TVar::DEBUG) cout << "Paths for ZZMatrixElement" << endl;
+  if (myVerbosity_>=TVar::DEBUG) MELAout << "Paths for ZZMatrixElement" << endl;
   const string path_HiggsWidthFile = MELAPKGPATH + "data/HiggsTotalWidth_YR3.txt";
-  if (myVerbosity_>=TVar::DEBUG) cout << "\t- Cross section/width file: " << path_HiggsWidthFile << endl;
+  if (myVerbosity_>=TVar::DEBUG) MELAout << "\t- Cross section/width file: " << path_HiggsWidthFile << endl;
   const string path_nnpdf = MELAPKGPATH + "data/Pdfdata/NNPDF30_lo_as_0130.LHgrid";
   char path_nnpdf_c[] = "Pdfdata/NNPDF30_lo_as_0130.LHgrid";
   int pdfmember = 0;
-  if (myVerbosity_>=TVar::DEBUG) cout << "\t- Linking NNPDF path " << path_nnpdf.c_str() << " -> " << path_nnpdf_c << endl;
+  if (myVerbosity_>=TVar::DEBUG) MELAout << "\t- Linking NNPDF path " << path_nnpdf.c_str() << " -> " << path_nnpdf_c << endl;
   symlink(path_nnpdf.c_str(), path_nnpdf_c);
-  if (myVerbosity_>=TVar::DEBUG) cout << "Start ZZMatrixElement" << endl;
+  if (myVerbosity_>=TVar::DEBUG) MELAout << "Start ZZMatrixElement" << endl;
   ZZME = new ZZMatrixElement(path_nnpdf_c, pdfmember, path_HiggsWidthFile.substr(0, path_HiggsWidthFile.length()-23).c_str(), 1000.*LHCsqrts/2., myVerbosity_);
-  if (myVerbosity_>=TVar::DEBUG) cout << "Set ZZMatrixElement masses" << endl;
+  if (myVerbosity_>=TVar::DEBUG) MELAout << "Set ZZMatrixElement masses" << endl;
   setMelaPrimaryHiggsMass(mh_);
   setMelaHiggsMass(mh_, 0); setMelaHiggsMass(-1., 1);
   setMelaHiggsWidth(-1., 0); setMelaHiggsWidth(0., 1);
@@ -194,7 +197,7 @@ void Mela::build(double mh_){
   RooMsgService::instance().setStreamStatus(1, kFALSE);
   RooMsgService::instance().setStreamStatus(0, kFALSE);// silence also the error messages, but should really be looked at.
 
-  if (myVerbosity_>=TVar::DEBUG) cout << "Start superMELA" << endl;
+  if (myVerbosity_>=TVar::DEBUG) MELAout << "Start superMELA" << endl;
   int superMELA_LHCsqrts = LHCsqrts;
   if (superMELA_LHCsqrts > maxSqrts) superMELA_LHCsqrts = maxSqrts;
   super = new SuperMELA(mh_, "4mu", superMELA_LHCsqrts); // preliminary intialization, we adjust the flavor later
@@ -213,7 +216,7 @@ void Mela::build(double mh_){
 
   // Initialize the couplings to 0 and end Mela constructor
   reset_SelfDCouplings();
-  if (myVerbosity_>=TVar::DEBUG) cout << "End Mela::build" << endl;
+  if (myVerbosity_>=TVar::DEBUG) MELAout << "End Mela::build" << endl;
 }
 
 
@@ -429,7 +432,7 @@ void Mela::computeDecayAngles(
     if (!(Phi==Phi)) Phi=0;
     if (!(Phi1==Phi1)) Phi1=0;
   }
-  else if (myVerbosity_>=TVar::DEBUG) cerr << "Mela::computeDecayAngles: No possible melaCand in TEvtProb to compute angles." << endl;
+  else if (myVerbosity_>=TVar::DEBUG) MELAerr << "Mela::computeDecayAngles: No possible melaCand in TEvtProb to compute angles." << endl;
 }
 
 // Regular probabilities
@@ -543,7 +546,7 @@ void Mela::computeP(
   float& prob,
   bool useConstant
   ){
-  if (myVerbosity_>=TVar::DEBUG) cout << "Mela: Begin computeP" << endl;
+  if (myVerbosity_>=TVar::DEBUG) MELAout << "Mela: Begin computeP" << endl;
   reset_PAux();
 
   melaCand = getCurrentCandidate();
@@ -576,7 +579,7 @@ void Mela::computeP(
         }
         else prob = pdf->getVal();
       }
-      else if (myVerbosity_>=TVar::ERROR) cerr << "Mela::computeP: The specified anaMELA configuration is not valid!" << endl;
+      else if (myVerbosity_>=TVar::ERROR) MELAerr << "Mela::computeP: The specified anaMELA configuration is not valid!" << endl;
 
       Y_rrv->setConstant(false);
     }
@@ -624,7 +627,7 @@ void Mela::computeP(
           );
 
         if (myVerbosity_>=TVar::DEBUG){ // Notify first
-          cout << "Mela::computeP: Condition (myME_ == TVar::MCFM  && myProduction_ == TVar::ZZINDEPENDENT &&  myModel_ == TVar::bkgZZ/WW/ZGamma/ZJJ)." << endl;
+          MELAout << "Mela::computeP: Condition (myME_ == TVar::MCFM  && myProduction_ == TVar::ZZINDEPENDENT &&  myModel_ == TVar::bkgZZ/WW/ZGamma/ZJJ)." << endl;
           vector<TLorentzVector> pDauVec = calculate4Momentum(mZZ, mZ1, mZ1, acos(costhetastar), acos(costheta1), acos(costheta2), Phi1, Phi);
           cout
             << "\tOriginal mZZ=" << mZZ << " "
@@ -635,7 +638,7 @@ void Mela::computeP(
             << "Phi=" << Phi << " "
             << "hs=" << costhetastar << " "
             << "Phi1=" << Phi1 << endl;
-          cout << "\tfor daughters:" << endl;
+          MELAout << "\tfor daughters:" << endl;
           for (int iv=0; iv<2; iv++){
             for (int idau=0; idau<min(2, melaCand->getSortedV(iv)->getNDaughters()); idau++){
               cout
@@ -676,9 +679,9 @@ void Mela::computeP(
               }
             }
             if (myVerbosity_>=TVar::DEBUG){ // Summarize the integrated particles
-              cout << "Mela::computeP: hs, Phi1 are now " << hs_val << " " << phi1_val << endl;
+              MELAout << "Mela::computeP: hs, Phi1 are now " << hs_val << " " << phi1_val << endl;
               for (unsigned int idau=0; idau<daughters.size(); idau++){
-                cout << "Dau " << idau << " "
+                MELAout << "Dau " << idau << " "
                   << "id=" << daughters.at(idau).first << " "
                   << "x=" << daughters.at(idau).second.X() << " "
                   << "y=" << daughters.at(idau).second.Y() << " "
@@ -696,9 +699,9 @@ void Mela::computeP(
               &partList_tmp,
               &candList_tmp
               );
-            if (myVerbosity_>=TVar::ERROR && cand_tmp==0) cerr << "Mela::computeP: Failed to construct temporary candidate!" << endl;
+            if (myVerbosity_>=TVar::ERROR && cand_tmp==0) MELAerr << "Mela::computeP: Failed to construct temporary candidate!" << endl;
             setCurrentCandidate(cand_tmp);
-            if (myVerbosity_>=TVar::DEBUG && cand_tmp!=0){ cout << "Mela::computeP: ZZINDEPENDENT calculation produces candidate:" << endl; TUtil::PrintCandidateSummary(cand_tmp); }
+            if (myVerbosity_>=TVar::DEBUG && cand_tmp!=0){ MELAout << "Mela::computeP: ZZINDEPENDENT calculation produces candidate:" << endl; TUtil::PrintCandidateSummary(cand_tmp); }
             // calculate the ME
             ZZME->computeXS(temp_prob);
             // Delete the temporary particles
@@ -717,7 +720,7 @@ void Mela::computeP(
 
   reset_SelfDCouplings();
   reset_CandRef();
-  if (myVerbosity_>=TVar::DEBUG) cout << "Mela: End computeP" << endl;
+  if (myVerbosity_>=TVar::DEBUG) MELAout << "Mela: End computeP" << endl;
 }
 
 
@@ -726,7 +729,7 @@ void Mela::computeD_CP(
   TVar::Process myType,
   float& prob
   ){
-  if (myVerbosity_>=TVar::DEBUG) cout << "Mela: Begin computeD_CP" << endl;
+  if (myVerbosity_>=TVar::DEBUG) MELAout << "Mela: Begin computeD_CP" << endl;
   double coupl_mix[nSupportedHiggses][SIZE_HVV][2] ={ { { 0 } } };
   double coupl_1[nSupportedHiggses][SIZE_HVV][2] ={ { { 0 } } };
   double coupl_2[nSupportedHiggses][SIZE_HVV][2] ={ { { 0 } } };
@@ -799,7 +802,7 @@ void Mela::computeD_CP(
     coupl_2[0][30][1] = -7591.914;
     break;
   default:
-    cout <<"Error: Not supported!"<<endl;
+    MELAout <<"Error: Not supported!"<<endl;
   }
 
   float pMix, p1, p2;
@@ -808,7 +811,7 @@ void Mela::computeD_CP(
   computeP_selfDspin0(coupl_1, p1, true);
   computeP_selfDspin0(coupl_2, p2, true);
   prob = pMix- p1- p2;
-  if (myVerbosity_>=TVar::DEBUG) cout << "Mela: End computeD_CP" << endl;
+  if (myVerbosity_>=TVar::DEBUG) MELAout << "Mela: End computeD_CP" << endl;
 }
 
 
@@ -835,13 +838,13 @@ void Mela::computeProdDecP(
   float& prob,
   bool useConstant
   ){
-  if (myVerbosity_>=TVar::DEBUG) cout << "Mela: Begin computeProdDecP" << endl;
+  if (myVerbosity_>=TVar::DEBUG) MELAout << "Mela: Begin computeProdDecP" << endl;
   reset_PAux();
   melaCand = getCurrentCandidate();
 
   bool hasFailed = false;
   if (myME_ != TVar::MCFM){
-    cout << "Mela::computeProdDecP ME is not supported for ME " << myME_ << endl;
+    MELAout << "Mela::computeProdDecP ME is not supported for ME " << myME_ << endl;
     hasFailed = true;
   }
   if (
@@ -857,7 +860,7 @@ void Mela::computeProdDecP(
     || myProduction_==TVar::JJVBF_TU || myProduction_==TVar::JJEW_TU || myProduction_==TVar::JJEWQCD_TU || myProduction_==TVar::JJQCD_TU
     )
     ){
-    cout << "Mela::computeProdDecP production mode is not supported for production " << myProduction_ << endl;
+    MELAout << "Mela::computeProdDecP production mode is not supported for production " << myProduction_ << endl;
     hasFailed = true;
   }
   if (melaCand==0) hasFailed=true;
@@ -897,7 +900,7 @@ void Mela::computeProdDecP(
 
   reset_SelfDCouplings();
   reset_CandRef();
-  if (myVerbosity_>=TVar::DEBUG) cout << "Mela: End computeProdDecP" << endl;
+  if (myVerbosity_>=TVar::DEBUG) MELAout << "Mela: End computeProdDecP" << endl;
 }
 
 
@@ -926,7 +929,7 @@ void Mela::computeProdP(
   float& prob,
   bool useConstant
   ){
-  if (myVerbosity_>=TVar::DEBUG) cout << "Mela: Begin computeProdP" << endl;
+  if (myVerbosity_>=TVar::DEBUG) MELAout << "Mela: Begin computeProdP" << endl;
   if (myProduction_ == TVar::ttH || myProduction_ == TVar::bbH) computeProdP_ttH(prob, 2, 0, useConstant);
   else if (myProduction_ == TVar::Lep_ZH || myProduction_ == TVar::Lep_WH || myProduction_ == TVar::Had_ZH || myProduction_ == TVar::Had_WH || myProduction_ == TVar::GammaH) computeProdP_VH(prob, false, useConstant);
   else{
@@ -968,11 +971,11 @@ void Mela::computeProdP(
             if (fabs(maxpz2)>0.){
               double ratio = jet2massless.Z()/maxpz2;
               double absp=sqrt(pow(jet2massless.Pt(), 2)+pow(jet2massless.Z()*ratio, 2));
-              if (myVerbosity_>=TVar::INFO) cout << "Mela::computeProdP, isJet2Fake=true case: Rescaling pz of fake jet by " << ratio << " and energy = " << absp << "." << endl;
+              if (myVerbosity_>=TVar::INFO) MELAout << "Mela::computeProdP, isJet2Fake=true case: Rescaling pz of fake jet by " << ratio << " and energy = " << absp << "." << endl;
               jet2massless.SetXYZT(jet2massless.X(), jet2massless.Y(), jet2massless.Z()*ratio, absp);
             }
             else{
-              if (myVerbosity_>=TVar::INFO) cout << "Mela::computeProdP, isJet2Fake=true case: Unable to rescaling pz of fake jet since max(|pz|)<0. Setting to 0 with appropriate energy = pT = " << jet2massless.Pt() << "." << endl;
+              if (myVerbosity_>=TVar::INFO) MELAout << "Mela::computeProdP, isJet2Fake=true case: Unable to rescaling pz of fake jet since max(|pz|)<0. Setting to 0 with appropriate energy = pT = " << jet2massless.Pt() << "." << endl;
               jet2massless.SetXYZT(jet2massless.X(), jet2massless.Y(), 0., jet2massless.Pt());
             }
           }
@@ -1169,7 +1172,7 @@ void Mela::computeProdP(
           delete yGrid;
         }
 
-        if (myVerbosity_>=TVar::DEBUG) cout << "Mela::computeProdP: Number of iterations for JVBF eta integration: " << ctr_iter << endl;
+        if (myVerbosity_>=TVar::DEBUG) MELAout << "Mela::computeProdP: Number of iterations for JVBF eta integration: " << ctr_iter << endl;
 
         auxiliaryProb = 0;
         int iGFirst=0, iGLast=nGrid-1;
@@ -1200,7 +1203,7 @@ void Mela::computeProdP(
         setCurrentCandidate(candOriginal);
         melaCand = getCurrentCandidate();
         if (myVerbosity_>=TVar::DEBUG){
-          if (melaCand!=candOriginal) cerr << "Mela::computeProdP: melaCand!=candOriginal at the end of the fake jet scenario!" << endl;
+          if (melaCand!=candOriginal) MELAerr << "Mela::computeProdP: melaCand!=candOriginal at the end of the fake jet scenario!" << endl;
         }
 
         if (fabs(prob)>0) auxiliaryProb /= prob;
@@ -1250,7 +1253,7 @@ void Mela::computeProdP(
     reset_SelfDCouplings();
     reset_CandRef();
   }
-  if (myVerbosity_>=TVar::DEBUG) cout << "Mela: End computeProdP" << endl;
+  if (myVerbosity_>=TVar::DEBUG) MELAout << "Mela: End computeProdP" << endl;
 }
 
 
@@ -1283,7 +1286,7 @@ void Mela::computeProdP_VH(
   bool includeHiggsDecay,
   bool useConstant
   ){
-  if (myVerbosity_>=TVar::DEBUG) cout << "Mela: Begin computeProdP_VH" << endl;
+  if (myVerbosity_>=TVar::DEBUG) MELAout << "Mela: Begin computeProdP_VH" << endl;
   reset_PAux();
 
   melaCand = getCurrentCandidate();
@@ -1327,7 +1330,7 @@ void Mela::computeProdP_VH(
 
   reset_SelfDCouplings();
   reset_CandRef();
-  if (myVerbosity_>=TVar::DEBUG) cout << "Mela: End computeProdP_VH" << endl;
+  if (myVerbosity_>=TVar::DEBUG) MELAout << "Mela: End computeProdP_VH" << endl;
 }
 
 
@@ -1337,7 +1340,7 @@ void Mela::computeProdP_ttH(
   int topDecay,
   bool useConstant
   ){
-  if (myVerbosity_>=TVar::DEBUG) cout << "Mela: Begin computeProdP_ttH" << endl;
+  if (myVerbosity_>=TVar::DEBUG) MELAout << "Mela: Begin computeProdP_ttH" << endl;
   reset_PAux();
 
   melaCand = getCurrentCandidate();
@@ -1378,7 +1381,7 @@ void Mela::computeProdP_ttH(
 
   reset_SelfDCouplings();
   reset_CandRef();
-  if (myVerbosity_>=TVar::DEBUG) cout << "Mela: End computeProdP_ttH" << endl;
+  if (myVerbosity_>=TVar::DEBUG) MELAout << "Mela: End computeProdP_ttH" << endl;
 }
 
 void Mela::getXPropagator(TVar::ResonancePropagatorScheme scheme, float& prop){
@@ -1411,7 +1414,7 @@ void Mela::compute4FermionWeight(float& w){ // Lepton interference using JHUGen
       ||
       !PDGHelpers::isALepton(id_original[1][1])
       ){
-      if (myVerbosity_>=TVar::ERROR) cerr << "Mela::computeWeight: Function is not implemented for decay states other than 4l/2l2l." << endl;
+      if (myVerbosity_>=TVar::ERROR) MELAerr << "Mela::computeWeight: Function is not implemented for decay states other than 4l/2l2l." << endl;
       w=0;
       hasFailed=true;
     }
@@ -1469,7 +1472,7 @@ void Mela::computePM4l(TVar::SuperMelaSyst syst, float& prob){
         ||
         (abs(id_original[0][0])==13 && abs(id_original[0][1])==13 && abs(id_original[1][0])==11 && abs(id_original[1][1])==11)
         ) super->SetDecayChannel("2e2mu");
-      else{ if (myVerbosity_>=TVar::ERROR) cerr << "Mela::computePM4l: SuperMELA is currently not implemented for decay states other than 4e. 4mu, 2e2mu." << endl; hasFailed=true; }
+      else{ if (myVerbosity_>=TVar::ERROR) MELAerr << "Mela::computePM4l: SuperMELA is currently not implemented for decay states other than 4e. 4mu, 2e2mu." << endl; hasFailed=true; }
     }
 
     if (!hasFailed){
@@ -1523,7 +1526,7 @@ void Mela::computeD_gg(
   ){
   prob=-99;
   if (myME != TVar::MCFM || myType != TVar::D_gg10){
-    cout << "Only support MCFM and D_gg10"<<endl;
+    MELAout << "Only support MCFM and D_gg10"<<endl;
     return;
   }
 
@@ -1656,7 +1659,7 @@ bool Mela::configureAnalyticalPDFs(){
     pdf = spin1Model->PDF;
     // Self-defined spin-1
     if (myModel_ == TVar::SelfDefine_spin1){
-      for (int i=0; i<SIZE_ZVV; i++){ if (selfDZvvcoupl[i][1]!=0){ if (myVerbosity_>=TVar::ERROR) cerr << "Mela::configureAnalyticalPDFs: MELA does not support complex couplings for spin-1 at the moment! " << endl; noPass=true; break; } }
+      for (int i=0; i<SIZE_ZVV; i++){ if (selfDZvvcoupl[i][1]!=0){ if (myVerbosity_>=TVar::ERROR) MELAerr << "Mela::configureAnalyticalPDFs: MELA does not support complex couplings for spin-1 at the moment! " << endl; noPass=true; break; } }
       if (!noPass){
         spin1Model->g1Val->setVal(selfDZvvcoupl[0][0]);
         spin1Model->g2Val->setVal(selfDZvvcoupl[1][0]);
@@ -1701,7 +1704,7 @@ bool Mela::configureAnalyticalPDFs(){
     if (myModel_ == TVar::H2_g10) spin2Model->addHypothesis(10, 1.);
     // Self-defined spin-2
     if (myModel_ == TVar::SelfDefine_spin2){
-      for (int i=0; i<SIZE_GVV; i++){ if (selfDGvvcoupl[i][1]!=0){ if (myVerbosity_>=TVar::ERROR) cerr << "Mela::configureAnalyticalPDFs: MELA does not support complex couplings for spin-2 at the moment! " << endl; noPass=true; break; } }
+      for (int i=0; i<SIZE_GVV; i++){ if (selfDGvvcoupl[i][1]!=0){ if (myVerbosity_>=TVar::ERROR) MELAerr << "Mela::configureAnalyticalPDFs: MELA does not support complex couplings for spin-2 at the moment! " << endl; noPass=true; break; } }
       if (!noPass){
         for (int ig=0; ig<SIZE_GVV; ig++){
           for (int im=0; im<2; im++) ((RooRealVar*)spin2Model->couplings.bList[ig][im])->setVal(selfDGvvcoupl[ig][im]);
@@ -1739,7 +1742,7 @@ bool Mela::configureAnalyticalPDFs(){
     }
   }
   else{
-    cout << "Mela::configureAnalyticalPDFs -> ERROR TVar::Process not applicable!!! ME: " << myME_ << ", model: " << myModel_ << endl;
+    MELAout << "Mela::configureAnalyticalPDFs -> ERROR TVar::Process not applicable!!! ME: " << myME_ << ", model: " << myModel_ << endl;
     noPass=true;
   }
 
@@ -1759,7 +1762,7 @@ void Mela::computeConstant(float& prob){
 }
 void Mela::setConstant(){
   float constant = 1;
-  if (melaCand==0){ if (myVerbosity_>=TVar::DEBUG) cout << "Mela::getConstant: melaCand==0" << endl; }
+  if (melaCand==0){ if (myVerbosity_>=TVar::DEBUG) MELAout << "Mela::getConstant: melaCand==0" << endl; }
   else{
     if ( // Undecayed Higgs MEs from JHUGen
       myME_ == TVar::JHUGen
@@ -1830,7 +1833,7 @@ void Mela::setConstant(){
   }
   if (std::isnan(constant) || std::isinf(constant) || constant<=0.) constant=0;
   else constant=1./constant;
-  if (myVerbosity_>=TVar::DEBUG) cout << "Mela::getConstant: Constant is " << constant << endl;
+  if (myVerbosity_>=TVar::DEBUG) MELAout << "Mela::getConstant: Constant is " << constant << endl;
   getIORecord()->setMEConst(constant);
 }
 float Mela::getConstant_JHUGenUndecayed(){
@@ -2053,7 +2056,7 @@ float Mela::getConstant_FourFermionDecay(const int& decid){
 
 
 void Mela::getPConstantHandles(){
-  if (myVerbosity_>=TVar::DEBUG) cout << "Begin Mela::getPConstantHandles" << endl;
+  if (myVerbosity_>=TVar::DEBUG) MELAout << "Begin Mela::getPConstantHandles" << endl;
 
   // Initialize the handles to 0
   for (unsigned int isch=0; isch<(unsigned int)(TVar::nFermionMassRemovalSchemes-1); isch++){
@@ -2245,7 +2248,7 @@ void Mela::getPConstantHandles(){
   pAvgSmooth_MCFM_JJQCD_bkgZZ_2mu2e = getPConstantHandle(TVar::MCFM, TVar::JJQCD, TVar::bkgZZ, filename, spname, true);
   //
 
-  if (myVerbosity_>=TVar::DEBUG) cout << "End Mela::getPConstantHandles" << endl;
+  if (myVerbosity_>=TVar::DEBUG) MELAout << "End Mela::getPConstantHandles" << endl;
 }
 MelaPConstant* Mela::getPConstantHandle(
   TVar::MatrixElement me_,
@@ -2255,21 +2258,21 @@ MelaPConstant* Mela::getPConstantHandle(
   TString spname,
   const bool useSqrts
   ){
-  if (myVerbosity_>=TVar::DEBUG) cout << "Begin Mela::getPConstantHandle" << endl;
+  if (myVerbosity_>=TVar::DEBUG) MELAout << "Begin Mela::getPConstantHandle" << endl;
 
   MelaPConstant* pchandle=0;
   string cfile_fullpath;
 
   // Get data/ path
-  if (myVerbosity_>=TVar::DEBUG) cout << "Mela::getPConstantHandle: relpath and spline name: " << relpath << ", " << spname << endl;
+  if (myVerbosity_>=TVar::DEBUG) MELAout << "Mela::getPConstantHandle: relpath and spline name: " << relpath << ", " << spname << endl;
 #ifdef _melapkgpathstr_
   const string MELAPKGPATH = _melapkgpathstr_;
 #else
-  cout << "Mela::getPConstantHandle: MELA package path is undefined! Please modify the makefle or the makefile-equivalent!" << endl;
+  MELAout << "Mela::getPConstantHandle: MELA package path is undefined! Please modify the makefle or the makefile-equivalent!" << endl;
   assert(0);
 #endif
   const string path = MELAPKGPATH + "data/";
-  if (myVerbosity_>=TVar::DEBUG) cout << "Mela::getPConstantHandle: path and spline name: " << path << ", " << spname << endl;
+  if (myVerbosity_>=TVar::DEBUG) MELAout << "Mela::getPConstantHandle: path and spline name: " << path << ", " << spname << endl;
 
   if (useSqrts){ // Loop over possible sqrts values to get the closest one
     const unsigned int npossiblesqrts=3;
@@ -2295,11 +2298,11 @@ MelaPConstant* Mela::getPConstantHandle(
       cfile_fullpath.append(".root");
       pchandle = new MelaPConstant(me_, prod_, proc_, cfile_fullpath.c_str(), spname.Data());
       if (pchandle->IsValid()){
-        if (myVerbosity_>=TVar::DEBUG) cout << "Mela::getPConstantHandle: Full path and spline name: " << cfile_fullpath << ", " << spname << " is valid." << endl;
+        if (myVerbosity_>=TVar::DEBUG) MELAout << "Mela::getPConstantHandle: Full path and spline name: " << cfile_fullpath << ", " << spname << " is valid." << endl;
         break;
       }
       else{
-        if (myVerbosity_>=TVar::DEBUG) cout << "Mela::getPConstantHandle: Full path and spline name: " << cfile_fullpath << ", " << spname << " is invalid." << endl;
+        if (myVerbosity_>=TVar::DEBUG) MELAout << "Mela::getPConstantHandle: Full path and spline name: " << cfile_fullpath << ", " << spname << " is invalid." << endl;
         deletePConstantHandle(pchandle);
       }
     }
@@ -2311,9 +2314,9 @@ MelaPConstant* Mela::getPConstantHandle(
     pchandle = new MelaPConstant(me_, prod_, proc_, cfile_fullpath.c_str(), spname.Data());
     if (!pchandle->IsValid()) deletePConstantHandle(pchandle);
   }
-  if (myVerbosity_>=TVar::DEBUG) cout << "Mela::getPConstantHandle: Full path and spline name: " << cfile_fullpath << ", " << spname << endl;
-  if (myVerbosity_>=TVar::DEBUG && pchandle==0) cerr << "Mela::getPConstantHandle: Handle of " << spname << " from " << cfile_fullpath << " is invalid!" << endl;
-  if (myVerbosity_>=TVar::DEBUG) cout << "End Mela::getPConstantHandle" << endl;
+  if (myVerbosity_>=TVar::DEBUG) MELAout << "Mela::getPConstantHandle: Full path and spline name: " << cfile_fullpath << ", " << spname << endl;
+  if (myVerbosity_>=TVar::DEBUG && pchandle==0) MELAerr << "Mela::getPConstantHandle: Handle of " << spname << " from " << cfile_fullpath << " is invalid!" << endl;
+  if (myVerbosity_>=TVar::DEBUG) MELAout << "End Mela::getPConstantHandle" << endl;
   return pchandle;
 }
 void Mela::deletePConstantHandles(){
@@ -2373,9 +2376,9 @@ void Mela::deletePConstantHandles(){
   //
 }
 void Mela::deletePConstantHandle(MelaPConstant*& handle){
-  if (myVerbosity_>=TVar::DEBUG) cout << "Mela::deletePConstantHandle: Deleting PConstant handle " << handle->GetSplineName() << " at " << handle->GetFileName() << endl;
+  if (myVerbosity_>=TVar::DEBUG) MELAout << "Mela::deletePConstantHandle: Deleting PConstant handle " << handle->GetSplineName() << " at " << handle->GetFileName() << endl;
   delete handle; handle=0;
-  if (myVerbosity_>=TVar::DEBUG) cout << "End Mela::deletePConstantHandle." << endl;
+  if (myVerbosity_>=TVar::DEBUG) MELAout << "End Mela::deletePConstantHandle." << endl;
 }
 
 
