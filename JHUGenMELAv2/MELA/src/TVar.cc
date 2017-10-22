@@ -1,5 +1,12 @@
 #include "TVar.hh"
 
+
+namespace TVar{
+  MELAOutputStreamer MELAout("", std::ios_base::out, false);
+  MELAOutputStreamer MELAerr("", std::ios_base::out, true);
+}
+
+
 TString TVar::ProcessName(TVar::Process temp){
   if (temp==TVar::HSMHiggs) return TString("HSMHiggs");
   else if (temp==TVar::H0minus) return TString("H0minus");
