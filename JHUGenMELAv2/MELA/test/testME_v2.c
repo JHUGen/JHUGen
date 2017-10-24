@@ -6,6 +6,7 @@
 #include <fstream>
 #include <cstdlib>
 #include <iomanip>
+#include <memory>
 #include "Mela.h"
 #include "TMath.h"
 #include "TLorentzVector.h"

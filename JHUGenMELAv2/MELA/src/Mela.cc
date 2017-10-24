@@ -222,8 +222,34 @@ void Mela::build(double mh_){
 }
 
 void Mela::printLogo() const{
-  // To be written
-  // e.g. MELAout << '*'; MELAout.writeCentered("Hello world!", ' ', 51); MELAout << '*' << endl;
+  vector<string> logolines;
+  logolines.push_back("MELA (Matrix Element Likelihood Approach)");
+  logolines.push_back("");
+  logolines.push_back("Data analysis and Monte Carlo weights package");
+  logolines.push_back("for analyses of resonances produced at pp, ppbar, and e+e- colliders, featuring:");
+  logolines.push_back("");
+  logolines.push_back("* JHUGenMELA *");
+  logolines.push_back("Signal calculations based on analytical pdf.s, and JHU Generator (JHUGen) matrix elements");
+  logolines.push_back("(See JHUGen credits below)");
+  logolines.push_back("");
+  logolines.push_back("* MCFM *");
+  logolines.push_back("Signal, background, and interference calculations, modified based on JHUGen matrix elements");
+  logolines.push_back("(See MCFM credits below)");
+  logolines.push_back("");
+  logolines.push_back("For more details: http://spin.pha.jhu.edu");
+  logolines.push_back("");
+  size_t maxlinesize = 0;
+  for (auto const& l:logolines) maxlinesize = std::max(maxlinesize, l.length());
+  MELAout.writeCentered("", '*', maxlinesize+10); MELAout << endl;
+  unsigned int iline=0;
+  for (auto const& l:logolines){
+    MELAout << '*';
+    MELAout.writeCentered(l, ' ', maxlinesize+8);
+    MELAout << '*' << endl;
+    if (iline==0){ MELAout.writeCentered("", '*', maxlinesize+10); MELAout << endl; }
+    iline++;
+  }
+  MELAout.writeCentered("", '*', maxlinesize+10); MELAout << endl;
 }
 
 // Set-functions
