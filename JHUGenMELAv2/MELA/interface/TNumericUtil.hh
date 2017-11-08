@@ -21,6 +21,8 @@ namespace TNumericUtil{
     triplet(){}
     T& operator[](std::size_t ipos){ return value[ipos]; } // Return by reference
     const T& operator[](std::size_t ipos)const{ return value[ipos]; } // Return by const reference
+    bool operator == (const triplet<T>& other)const{ bool res = true; for (std::size_t i=0; i<3; i++) res &= (*this)[i]==other[i]; return res; }
+    bool operator != (const triplet<T>& other)const{ return !(*this==other);  }
   };
   template<typename T> struct quadruplet{
     T value[4];
@@ -34,6 +36,8 @@ namespace TNumericUtil{
     quadruplet(){}
     T& operator[](std::size_t ipos){ return value[ipos]; } // Return by reference
     const T& operator[](std::size_t ipos)const{ return value[ipos]; } // Return by const reference
+    bool operator == (const quadruplet<T>& other)const{ bool res = true; for (std::size_t i=0; i<4; i++) res &= (*this)[i]==other[i]; return res; }
+    bool operator != (const quadruplet<T>& other)const{ return !(*this==other); }
   };
 
   typedef triplet<int> intTriplet_t;

@@ -163,7 +163,9 @@ std::vector<intQuad_t> TMCFMUtils::Hash_QQVVQQ(){
         if ((idpos<2 && ipos>=2) || (idpos>=2 && ipos<2)) idAssigned = -idAssigned;
         cfg[jcfg.at(j)[ipos]] = idAssigned;
       }
-      pcfg.push_back(cfg);
+      bool exists=false;
+      for (auto const& tmpcfg:pcfg){ if (tmpcfg==cfg){ exists=true; break; } }
+      if (!exists) pcfg.push_back(cfg);
     }
   }
   // Uncommenting the lines below prints out the hash when the library is loaded.
@@ -216,7 +218,9 @@ std::vector<intQuad_t> TMCFMUtils::Hash_QQVVQQStrong(){
         if (((idpos<2 && ipos>=2) || (idpos>=2 && ipos<2)) && !PDGHelpers::isAGluon(idAssigned)) idAssigned = -idAssigned;
         cfg[jcfg.at(j)[ipos]] = idAssigned;
       }
-      pcfg.push_back(cfg);
+      bool exists=false;
+      for (auto const& tmpcfg:pcfg){ if (tmpcfg==cfg){ exists=true; break; } }
+      if (!exists) pcfg.push_back(cfg);
     }
   }
   // Uncommenting the lines below prints out the hash when the library is loaded.
