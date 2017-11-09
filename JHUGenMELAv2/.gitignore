@@ -5,6 +5,7 @@ __init__.py
 MELA/data/*/libmcfm*.so
 MELA/data/*/libjhugen*.so
 MELA/data/*/libMELA.so
+MELA/data/*/libcollier.so
 MELA/data/*/*.pcm
 MELA/*/*/*.LHgrid*
 

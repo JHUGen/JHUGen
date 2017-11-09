@@ -7,7 +7,7 @@ MELADir = $(Here)/../JHUGenMELAv2/MELA
 MELAFortranDir = $(MELADir)/fortran
 MELADataDir = $(MELADir)/data
 MELALibDir = $(MELADataDir)/slc6_amd64_gcc530
-MCFMLib = mcfm_704 # libmcfm_704.so
+MCFMLib = mcfm_705 # libmcfm_705.so
 PDFDir = $(Here)/pdfs
 VegasDir = $(Here)/vegas
 QCDLibDir = $(Here)/../lib/QCD-Loop2/lib64
@@ -133,8 +133,8 @@ MainObj = $(ObjectDir)/mod_CrossSection.o \
 
 
 # amplitude dependencies
-AmpDep =  mod_Misc.F90 \
-          mod_Parameters.F90 \
+AmpDep =  mod_Parameters.F90 \
+          mod_Misc.F90 \
           mod_TopDecay.F90 \
           mod_Graviton.F90 \
           mod_Higgs.F90 \
@@ -147,8 +147,8 @@ AmpDep =  mod_Misc.F90 \
 
 
 # amplitude objects
-AmpObj =  $(ObjectDir)/mod_Misc.o \
-          $(ObjectDir)/mod_Parameters.o \
+AmpObj =  $(ObjectDir)/mod_Parameters.o \
+          $(ObjectDir)/mod_Misc.o \
           $(ObjectDir)/mod_TopDecay.o \
           $(ObjectDir)/mod_Graviton.o \
           $(ObjectDir)/mod_Higgs.o \

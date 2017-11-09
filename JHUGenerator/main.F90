@@ -25,8 +25,8 @@ real(8) :: VG_Result,VG_Error
    call InitVegas()
    call InitRandomSeed()
    call OpenFiles()
-   call PrintLogo(io_stdout)
-   call PrintLogo(io_LogFile)
+   call PrintLogo(io_stdout, "JHU Generator")
+   call PrintLogo(io_LogFile, "JHU Generator")
    call WriteParameters(io_stdout)
    call WriteParameters(io_LogFile)
    if ( .not. ReadLHEFile .and. .not. ConvertLHEFile .and. .not.(CalculatesXsec(Process) .and. unweighted) ) then
@@ -1731,15 +1731,22 @@ END SUBROUTINE
 #if linkMELA==1
 subroutine SetupMCFM(Process)
 use ModMCFMWrapper
+use ModMisc
 implicit none
 integer, intent(in) :: Process
-
-   call MCFM_firsttime()
 
    if( &
       (Process.ge.66 .and. Process.le.69) &
       ) then
-      call Setup_MCFM_qqVVqq_firsttime(Process)
+      call MCFM_firsttime()
+      if( &
+         (Process.ge.66 .and. Process.le.69) &
+         ) then
+         call Setup_MCFM_qqVVqq_firsttime(Process)
+      !else if ... add more processes here
+      else
+         call Error("Don't know how to set up this process for MCFM")
+      endif
    endif
 
 end subroutine
@@ -4504,7 +4511,7 @@ integer :: stat
             write(io_LHEOutFile ,'(A)') '<LesHouchesEvents version="1.0">'
         endif
         write(io_LHEOutFile ,'(A)') '<!--'
-        write(io_LHEOutFile ,'(A,A6,A)') 'Output from the JHUGenerator ',trim(JHUGen_Version),' described in arXiv:1001.3396 [hep-ph], arXiv:1208.4018 [hep-ph], arXiv:1309.4819 [hep-ph], arXiv:1606.03107 [hep-ph]'
+        write(io_LHEOutFile ,'(A,A,A)') 'Output from the JHUGenerator ',trim(JHUGen_Version),' described in arXiv:1001.3396 [hep-ph], arXiv:1208.4018 [hep-ph], arXiv:1309.4819 [hep-ph], arXiv:1606.03107 [hep-ph]'
 
         if( writegit ) then
             write(io_LHEOutFile,'(A)') ""
@@ -5257,36 +5264,3 @@ implicit none
         print *, ""
 
 END SUBROUTINE
-
-!
-
-
-SUBROUTINE PrintLogo(TheUnit)
-use modParameters
-use modMisc
-implicit none
-integer :: TheUnit
-integer, parameter :: linelength = 87
-
-    write(TheUnit, *) " "
-    write(TheUnit, *) " ", repeat("*", linelength)
-    write(TheUnit, *) " ", CenterWithStars("JHU Generator "//trim(JHUGen_Version), linelength)
-    write(TheUnit, *) " ", repeat("*", linelength)
-    write(TheUnit, *) " ", CenterWithStars("", linelength)
-    write(TheUnit, *) " ", CenterWithStars("Spin and parity determination of single-produced resonances at hadron colliders", linelength)
-    write(TheUnit, *) " ", CenterWithStars("", linelength)
-    write(TheUnit, *) " ", CenterWithStars("I. Anderson, S. Bolognesi, F. Caola, Y. Gao, A. Gritsan, Z. Guo,", linelength)
-    write(TheUnit, *) " ", CenterWithStars("C. Martin, K. Melnikov, R. Rontsch, H. Roskes, U. Sarica, M. Schulze,", linelength)
-    write(TheUnit, *) " ", CenterWithStars("N. Tran, A. Whitbeck, M. Xiao, C. You, Y. Zhou", linelength)
-    write(TheUnit, *) " ", CenterWithStars("Phys.Rev. D81 (2010) 075022;  arXiv:1001.3396  [hep-ph],", linelength)
-    write(TheUnit, *) " ", CenterWithStars("Phys.Rev. D86 (2012) 095031;  arXiv:1208.4018  [hep-ph],", linelength)
-    write(TheUnit, *) " ", CenterWithStars("Phys.Rev. D89 (2014) 035007;  arXiv:1309.4819  [hep-ph],", linelength)
-    write(TheUnit, *) " ", CenterWithStars("Phys.Rev. D94 (2016) 055023;  arXiv:1606.03107 [hep-ph].", linelength)
-    write(TheUnit, *) " ", CenterWithStars("", linelength)
-    write(TheUnit, *) " ", repeat("*", linelength)
-    write(TheUnit, *) " "
-return
-END SUBROUTINE
-
-
-
