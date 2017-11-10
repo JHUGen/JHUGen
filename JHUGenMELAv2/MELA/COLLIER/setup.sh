@@ -30,7 +30,7 @@ if [[ $# > 0 ]] && [[ "$1" == *"clean"* ]];then
     fi
   done
 
-  rm -f "../data/*/$libname"
+  rm -f ../data/*/$libname
 
 else
 
