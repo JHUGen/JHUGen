@@ -36,7 +36,6 @@ void MELAHXSWidth::build(){
     if (mass>0. && br>0.){
       mass_BR.push_back(mass);
       BR.push_back(br);
-      //cout << "mass, width = " << mass << '\t' << br << endl;
     }
   }
   file.close();
@@ -47,12 +46,10 @@ void MELAHXSWidth::build(){
     for (int ix=0; ix<indexW; ix++){
       xmhW[ix] = mass_BR.at(ix);
       sigW[ix] = BR.at(ix);
-      //cout << "mH, gH = " << xmhW[ix] << " " << sigW[ix] << endl;
     }
     double dbegin = (sigW[1]-sigW[0])/(xmhW[1]-xmhW[0]);
     double cB = (sigW[indexW-1]-sigW[indexW-2])/(pow(xmhW[indexW-1], 3)-pow(xmhW[indexW-2], 3));
     double dend = 3.*cB*pow(xmhW[indexW-1], 2);
-    //double dend = (sigW[indexW-1]-sigW[indexW-2])/(xmhW[indexW-1]-xmhW[indexW-2]);
     graphW = new TGraph(indexW, xmhW, sigW);
     gsW = new TSpline3("gsW", graphW, "b1e1", dbegin, dend);
   }
@@ -77,8 +74,6 @@ double MELAHXSWidth::HiggsWidth(double mH) const{
       result = cA + cB*pow(mH, 3);
     }
   }
-  //cout << "MELAHXSWidth::HiggsWidth: mH requested = " << mH << endl;
-  //cout << "MELAHXSWidth::HiggsWidth: GaH requested = " << result << endl;
   return result;
 }
 

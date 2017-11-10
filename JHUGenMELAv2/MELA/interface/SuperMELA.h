@@ -7,53 +7,39 @@
 #include <vector>
 #include "Mela.h"
 #include "MELACombinePdfs.h"
-#include "Riostream.h"
 #include "RooRealVar.h"
 #include "RooFormulaVar.h"
-#include "RooCBShape.h"
 #include "RooFFTConvPdf.h"
 #include "TLorentzVector.h"
 
 
 
 class SuperMELA{
-
 public:
-
-  SuperMELA(double mH=125, string channel="4mu", double LHCsqrts=8.);
+  SuperMELA(double mH=125, std::string channel="4mu", double LHCsqrts=8.);
   ~SuperMELA();
   void init();
 
-  double GetSigShapeSystematic(string parName);
-  double GetSigShapeParameter(string parName);
+  double GetSigShapeSystematic(std::string parName);
+  double GetSigShapeParameter(std::string parName);
 
   void SetVerbosity(bool verb=true){ verbose_=verb; }
-  void SetDecayChannel(string myChan);
-  void SetMH(double myMH){
-    mHVal_=myMH;
-    mH_rrv_->setVal(mHVal_);
-    if (verbose_)std::cout<<"Setting MH to "<<mHVal_<<std::endl;
-    init();
-  }
-
-  void SetPathToCards(string dirToCards){
-    pathToCards_=dirToCards;
-    if (verbose_)std::cout<<"New path to cards is "<<pathToCards_.c_str()<<std::endl;
-  }
+  void SetDecayChannel(std::string myChan);
+  void SetMH(double myMH);
+  void SetPathToCards(std::string dirToCards);
 
   std::pair<double, double> M4lProb(double m4l);
   std::pair<double, double> M4lProb(std::pair<double, double>);
 
 protected:
-
-  void splitLine(const string rawoption, vector<string>& splitoptions, char delimiter);
+  void splitLine(const std::string rawoption, std::vector<std::string>& splitoptions, char delimiter);
   void readSigParsFromFile(
-    string& str_mean_CB,
-    string& str_sigma_CB,
-    string& str_n_CB,
-    string& str_alpha_CB,
-    string& str_n2_CB,
-    string& str_alpha2_CB
+    std::string& str_mean_CB,
+    std::string& str_sigma_CB,
+    std::string& str_n_CB,
+    std::string& str_alpha_CB,
+    std::string& str_n2_CB,
+    std::string& str_alpha2_CB
     );
   void readBkgParsFromFile(std::vector<double>& apars);
   void readSigSystFromFile(
@@ -69,10 +55,10 @@ protected:
   double mHVal_;
   double sqrts_;
   double lowMH_, highMH_;
-  string strChan_;
+  std::string strChan_;
   int ch_;
   bool verbose_;
-  string pathToCards_;
+  std::string pathToCards_;
 
   RooRealVar* m4l_rrv_;
   RooRealVar* mH_rrv_;

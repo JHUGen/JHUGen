@@ -35,6 +35,10 @@ public:
   MELANCSpline_3D_fast();
   MELANCSpline_3D_fast(
     const char* name,
+    const char* title
+    );
+  MELANCSpline_3D_fast(
+    const char* name,
     const char* title,
     RooAbsReal& inXVar,
     RooAbsReal& inYVar,
@@ -80,7 +84,7 @@ protected:
   virtual Double_t evaluate()const;
 
 
-  ClassDef(MELANCSpline_3D_fast, 0)
+  ClassDef(MELANCSpline_3D_fast, 1)
 
 };
  

@@ -6,6 +6,7 @@ set -euo pipefail
 MELADIR="."
 DATA_LIB_DIR="slc6_amd64_gcc530"
 
+export SCRAM_ARCH=$DATA_LIB_DIR
 bash COLLIER/setup.sh "$@"
 
 if [[ "$#" -ge 1 ]] && [[ "$1" == *"clean"* ]];then

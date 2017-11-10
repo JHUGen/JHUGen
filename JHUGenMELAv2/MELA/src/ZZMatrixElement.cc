@@ -1,9 +1,12 @@
+#include "MELAStreamHelpers.hh"
 #include "ZZMatrixElement.h"
 #include "TLorentzRotation.h"
 
 
 using namespace std;
 using namespace TUtil;
+using MELAStreamHelpers::MELAout;
+using MELAStreamHelpers::MELAerr;
 
 
 ZZMatrixElement::ZZMatrixElement(
@@ -19,9 +22,9 @@ ZZMatrixElement::ZZMatrixElement(
   Xcal2(pathtoHiggsCSandWidth, ebeam, pathtoPDFSet, PDFMember, verbosity),
   melaCand(0)
 {
-  if (processVerbosity>=TVar::DEBUG) cout << "Begin ZZMatrixElement constructor" << endl;
+  if (processVerbosity>=TVar::DEBUG) MELAout << "Begin ZZMatrixElement constructor" << endl;
   build();
-  if (processVerbosity>=TVar::DEBUG) cout << "End ZZMatrixElement constructor" << endl;
+  if (processVerbosity>=TVar::DEBUG) MELAout << "End ZZMatrixElement constructor" << endl;
 }
 ZZMatrixElement::ZZMatrixElement(const ZZMatrixElement& other) :
 processVerbosity(other.processVerbosity),
@@ -34,7 +37,7 @@ melaCand(0) // 0 is correct in the copy constructor
 }
 
 void ZZMatrixElement::build(){
-  if (processVerbosity>=TVar::DEBUG) cout << "Begin ZZMatrixElement::build" << endl;
+  if (processVerbosity>=TVar::DEBUG) MELAout << "Begin ZZMatrixElement::build" << endl;
 
   // Set default parameters explicitly
   set_PrimaryHiggsMass(125.);
@@ -45,15 +48,14 @@ void ZZMatrixElement::build(){
   selfD_SpinOneCouplings = Xcal2.GetSelfDSpinOneCouplings();
   selfD_SpinTwoCouplings = Xcal2.GetSelfDSpinTwoCouplings();
 
-  if (processVerbosity>=TVar::DEBUG) cout << "End ZZMatrixElement::build" << endl;
+  if (processVerbosity>=TVar::DEBUG) MELAout << "End ZZMatrixElement::build" << endl;
 }
 
 ZZMatrixElement::~ZZMatrixElement(){
-  if (processVerbosity>=TVar::DEBUG) cout << "Begin ZZMatrixElement destructor" << endl;
-  /*std::cout << "End of newZZME" << std::endl;*/
+  if (processVerbosity>=TVar::DEBUG) MELAout << "Begin ZZMatrixElement destructor" << endl;
   resetPerEvent();
   reset_InputEvent();
-  if (processVerbosity>=TVar::DEBUG) cout << "End ZZMatrixElement destructor" << endl;
+  if (processVerbosity>=TVar::DEBUG) MELAout << "End ZZMatrixElement destructor" << endl;
 }
 
 
@@ -172,18 +174,18 @@ void ZZMatrixElement::append_TopCandidate(SimpleParticleCollection_t* TopDaughte
 // Set-functions that do not set anything that belongs to Xcal2
 void ZZMatrixElement::set_mHiggs(double mh_, int index){
   if (index<nSupportedHiggses && index>=0) mHiggs[index] = mh_;
-  else cerr << "ZZMatrixElement::set_mHiggs: Only resonances 0 (regular) and 1 (additional, possibly high-mass) are supported" << endl;
+  else MELAerr << "ZZMatrixElement::set_mHiggs: Only resonances 0 (regular) and 1 (additional, possibly high-mass) are supported" << endl;
 }
 void ZZMatrixElement::set_wHiggs(double gah_, int index){
   if (index<nSupportedHiggses && index>=0) wHiggs[index] = (double)gah_;
-  else cerr << "ZZMatrixElement::set_wHiggs: Only resonances 0 (regular) and 1 (additional, possibly high-mass) are supported" << endl;
+  else MELAerr << "ZZMatrixElement::set_wHiggs: Only resonances 0 (regular) and 1 (additional, possibly high-mass) are supported" << endl;
 }
 void ZZMatrixElement::set_mHiggs_wHiggs(double mh_, double gah_, int index){
   if (index<nSupportedHiggses && index>=0){
     mHiggs[index] = mh_;
     wHiggs[index] = gah_;
   }
-  else cerr << "ZZMatrixElement::set_mHiggs_wHiggs: Only resonances 0 (regular) and 1 (additional, possibly high-mass) are supported" << endl;
+  else MELAerr << "ZZMatrixElement::set_mHiggs_wHiggs: Only resonances 0 (regular) and 1 (additional, possibly high-mass) are supported" << endl;
 }
 
 // reset_MCFM_EWKParameters resets the MCFM EW parameters to those specified. This function is a wrapper around the TEvtProb version.

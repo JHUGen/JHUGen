@@ -32,7 +32,6 @@ extern "C" {
   void __modjhugenmela_MOD_getalphasalphasmz(double* val_as, double* val_asmz);
   void __modjhugenmela_MOD_getpdfconstants(double* pdfzmass, int* pdfnloops, int* pdfnf);
   void __modjhugenmela_MOD_getdecaycouplings(int* VVMode, int idordered[4], double* aL1, double* aR1, double* aL2, double* aR2);
-  void __modjhugenmela_MOD_printmelalogo();
 
 }
 

@@ -185,6 +185,7 @@ test:
     - make
     #check sync between generator and MELA
     - sdiff -s mod_Graviton.F90 ../JHUGenMELAv2/MELA/fortran/mod_Graviton.F90
+    - sdiff -s mod_HashCollection.F90 ../JHUGenMELAv2/MELA/fortran/mod_HashCollection.F90
     - sdiff -s mod_Higgs.F90 ../JHUGenMELAv2/MELA/fortran/mod_Higgs.F90
     - sdiff -s mod_HiggsJ.F90 ../JHUGenMELAv2/MELA/fortran/mod_HiggsJ.F90
     - sdiff -s mod_HiggsJJ.F90 ../JHUGenMELAv2/MELA/fortran/mod_HiggsJJ.F90
@@ -451,14 +452,14 @@ test:
       cd ../JHUGenMELAv2/MELA/test &&
       echo ".L testME_v2.c+" | root -l -b loadMELA.C &&  #won't compile if loaded from python, have to compile first in plain root
       ./testME_all.py
-    - |
-      cd ../JHUGenMELAv2/MELA/test &&
-      ./testME_more.py
       exitstatus=$?
-      if [ exitstatus -ne 0 ]; then
+      if [ $exitstatus -ne 0 ]; then
         mv ../JHUGenMELAv2/MELA/test/*.out $CIRCLE_ARTIFACTS/MELA/
       fi
       exit $exitstatus
+    - |
+      cd ../JHUGenMELAv2/MELA/test &&
+      ./testME_more.py
 
   post:
     - |

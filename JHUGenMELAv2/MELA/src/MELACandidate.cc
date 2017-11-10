@@ -1,9 +1,14 @@
 #include <algorithm>
 #include <utility>
 #include "MELACandidate.h"
+#include "MELAStreamHelpers.hh"
 #include "TMath.h"
 
+
+using MELAStreamHelpers::MELAout;
+using MELAStreamHelpers::MELAerr;
 using namespace PDGHelpers;
+
 
 MELACandidate::MELACandidate() :
 MELAParticle(),
@@ -111,12 +116,12 @@ bool MELACandidate::testShallowCopy(){ return isShallowCopy; }
 
 void MELACandidate::sortDaughters(){
   setDecayMode(PDGHelpers::HDecayMode);
-  if (debugVars::debugFlag) std::cout << "Starting MELACandidate::sortDaughters with self decay mode " << selfDecayMode << std::endl;
-  if (debugVars::debugFlag) std::cout << "Starting MELACandidate::sortDaughtersInitial" << std::endl;
+  if (debugVars::debugFlag) MELAout << "Starting MELACandidate::sortDaughters with self decay mode " << selfDecayMode << std::endl;
+  if (debugVars::debugFlag) MELAout << "Starting MELACandidate::sortDaughtersInitial" << std::endl;
   sortDaughtersInitial();
-  if (debugVars::debugFlag) std::cout << "Starting MELACandidate::sortDaughtersByBestZ1" << std::endl;
+  if (debugVars::debugFlag) MELAout << "Starting MELACandidate::sortDaughtersByBestZ1" << std::endl;
   sortDaughtersByBestZ1();
-  if (debugVars::debugFlag) std::cout << "Starting MELACandidate::createSortedVs" << std::endl;
+  if (debugVars::debugFlag) MELAout << "Starting MELACandidate::createSortedVs" << std::endl;
   createSortedVs();
 }
 
@@ -231,16 +236,16 @@ void MELACandidate::sortDaughtersInitial(){
   }
 
   if (nDaughtersBooked!=getNDaughters()){
-    if (getNDaughters()>4) std::cout << "MELACandidate::sortDaughtersInitial: Number of daughters passed " << getNDaughters() << ">4 is currently not supported." << std::endl;
-    std::cout << "MELACandidate::sortDaughtersInitial: Number of daughters passed (" << getNDaughters() << ") is not the same as number of daughters booked (" << nDaughtersBooked << ")! Aborting, no daughters can be recorded." << std::endl;
+    if (getNDaughters()>4) MELAout << "MELACandidate::sortDaughtersInitial: Number of daughters passed " << getNDaughters() << ">4 is currently not supported." << std::endl;
+    MELAout << "MELACandidate::sortDaughtersInitial: Number of daughters passed (" << getNDaughters() << ") is not the same as number of daughters booked (" << nDaughtersBooked << ")! Aborting, no daughters can be recorded." << std::endl;
     for (int idau=0; idau<getNDaughters(); idau++){
       MELAParticle* part = getDaughter(idau);
-      if (part!=0) std::cout << "\t- Passed daughter " << idau << " (X, Y, Z, T, M, Id) = "
+      if (part!=0) MELAout << "\t- Passed daughter " << idau << " (X, Y, Z, T, M, Id) = "
         << part->x() << " " << part->y() << " " << part->z() << " " << part->t() << " " << part->m() << " " << part->id << std::endl;
-      else std::cout << "\t- Passed daughter " << idau << " = 0!" << std::endl;
+      else MELAout << "\t- Passed daughter " << idau << " = 0!" << std::endl;
     }
-    for (unsigned int j=0; j<2; j++){ if (df[j]!=0) std::cout << "\t- df[" << j << "] (X, Y, Z, T, M, Id) = " << df[j]->x() << " " << df[j]->y() << " " << df[j]->z() << " " << df[j]->t() << " " << df[j]->m() << " " << df[j]->id << std::endl; }
-    for (unsigned int j=0; j<2; j++){ if (ds[j]!=0) std::cout << "\t- ds[" << j << "] (X, Y, Z, T, M, Id) = " << ds[j]->x() << " " << ds[j]->y() << " " << ds[j]->z() << " " << ds[j]->t() << " " << ds[j]->m() << " " << ds[j]->id << std::endl; }
+    for (unsigned int j=0; j<2; j++){ if (df[j]!=0) MELAout << "\t- df[" << j << "] (X, Y, Z, T, M, Id) = " << df[j]->x() << " " << df[j]->y() << " " << df[j]->z() << " " << df[j]->t() << " " << df[j]->m() << " " << df[j]->id << std::endl; }
+    for (unsigned int j=0; j<2; j++){ if (ds[j]!=0) MELAout << "\t- ds[" << j << "] (X, Y, Z, T, M, Id) = " << ds[j]->x() << " " << ds[j]->y() << " " << ds[j]->z() << " " << ds[j]->t() << " " << ds[j]->m() << " " << ds[j]->id << std::endl; }
     return;
   }
 
@@ -313,7 +318,7 @@ void MELACandidate::sortDaughtersByBestZ1(){
   TLorentzVector pZ2(0, 0, 0, 0);
   if (sortedDaughters.size()>2){ // WW, ZZ, ZW, WG, ZG
     bool dauDiffType = true;
-    if (debugVars::debugFlag) std::cout << "Ndaughters>2" << std::endl;
+    if (debugVars::debugFlag) MELAout << "Ndaughters>2" << std::endl;
 
     for (int d=0; d<std::min(2, (int)sortedDaughters.size()); d++){
       if (sortedDaughters.at(d)!=0) pZ1 = pZ1 + sortedDaughters.at(d)->p4;
@@ -322,7 +327,7 @@ void MELACandidate::sortDaughtersByBestZ1(){
       if (sortedDaughters.at(d)!=0) pZ2 = pZ2 + sortedDaughters.at(d)->p4;
     }
 
-    if (debugVars::debugFlag) std::cout << "Preliminary pZ1 and pZ2 calculated!" << std::endl;
+    if (debugVars::debugFlag) MELAout << "Preliminary pZ1 and pZ2 calculated!" << std::endl;
 
     if (sortedDaughters.size()>=4){
       if (
@@ -372,14 +377,14 @@ void MELACandidate::sortDaughtersByBestZ1(){
       ||
       (sortedDaughters.at(0)!=0 && sortedDaughters.at(1)!=0 && beginWithWPair && (sortedDaughters.at(0)->charge()+sortedDaughters.at(1)->charge())>0) // W+ / W-
       ){
-      if (debugVars::debugFlag) std::cout << "pZ1 is closer to HVVmass " << HVVmass << std::endl;
+      if (debugVars::debugFlag) MELAout << "pZ1 is closer to HVVmass " << HVVmass << std::endl;
       orderedDs[0][0]=sortedDaughters.at(0);
       orderedDs[0][1]=sortedDaughters.at(1);
       orderedDs[1][0]=((int)sortedDaughters.size()>2 ? sortedDaughters.at(2) : 0);
       orderedDs[1][1]=((int)sortedDaughters.size()>3 ? sortedDaughters.at(3) : 0);
     }
     else{
-      if (debugVars::debugFlag) std::cout << "pZ2 is closer to HVVmass " << HVVmass << std::endl;
+      if (debugVars::debugFlag) MELAout << "pZ2 is closer to HVVmass " << HVVmass << std::endl;
       orderedDs[0][0]=((int)sortedDaughters.size()>2 ? sortedDaughters.at(2) : 0);
       orderedDs[0][1]=((int)sortedDaughters.size()>3 ? sortedDaughters.at(3) : 0);
       orderedDs[1][0]=sortedDaughters.at(0);
@@ -390,7 +395,7 @@ void MELACandidate::sortDaughtersByBestZ1(){
     }
   }
   else if (sortedDaughters.size()==2){ // GG, ffbar
-    if (debugVars::debugFlag) std::cout << "Ndaughters==2" << std::endl;
+    if (debugVars::debugFlag) MELAout << "Ndaughters==2" << std::endl;
 
     if (sortedDaughters.at(0)!=0) pZ1 = pZ1 + sortedDaughters.at(0)->p4;
     if (sortedDaughters.at(1)!=0) pZ2 = pZ2 + sortedDaughters.at(1)->p4;
@@ -412,7 +417,7 @@ void MELACandidate::sortDaughtersByBestZ1(){
     (orderedDs[1][0]->id == orderedDs[0][0]->id)
     )
     ){
-    if (debugVars::debugFlag) std::cout << "Checking alternative pairings." << std::endl;
+    if (debugVars::debugFlag) MELAout << "Checking alternative pairings." << std::endl;
 
     MELAParticle* orderedDps[2][2]={ { 0 } };
 
@@ -452,7 +457,7 @@ void MELACandidate::sortDaughtersByBestZ1(){
       if (orderedDs[i][j]!=0) sortedDaughters.push_back(orderedDs[i][j]);
     }
   }
-  if (debugVars::debugFlag) std::cout << "Final number of daughters in sortedDaughters: " << sortedDaughters.size() << std::endl;
+  if (debugVars::debugFlag) MELAout << "Final number of daughters in sortedDaughters: " << sortedDaughters.size() << std::endl;
 }
 void MELACandidate::createSortedVs(){
   TLorentzVector nullVector(0, 0, 0, 0);
