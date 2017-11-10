@@ -30,19 +30,21 @@ if [[ $# > 0 ]] && [[ "$1" == *"clean"* ]];then
     fi
   done
 
-  rm -f "../data/"$SCRAM_ARCH"/"$libname
+  rm -f "../data/*/$libname"
 
 else
 
-  wget $tarweb
-  mkdir $tmpdir
-  tar -xvzf $tarname -C $tmpdir
-  rm $tarname
-  mv $tmpdir"/"$pkgdir"/src/"* ./
-  rm -rf $tmpdir
+  if ! [ -f "../data/$SCRAM_ARCH/$libname" ]; then
+    wget $tarweb
+    mkdir $tmpdir
+    tar -xvzf $tarname -C $tmpdir
+    rm $tarname
+    mv $tmpdir"/"$pkgdir"/src/"* ./
+    rm -rf $tmpdir
 
-  make
-  mv $libname "../data/"$SCRAM_ARCH"/"$libname
+    make
+    cp $libname "../data/$SCRAM_ARCH/$libname"
+  fi
 
 fi
 
