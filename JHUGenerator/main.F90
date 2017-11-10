@@ -1812,7 +1812,10 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
       call vegas(EvalWeighted_HJ,VG_Result,VG_Error,VG_Chi2)
     elseif (Process.eq.50) then
       if( PChannel.eq.0 ) then
+#if 0
+!until this amplitude is moved to its new home in Yaofu's module
             call vegas(EvalWeighted_ggVH,VG_Result,VG_Error,VG_Chi2)
+#endif
       else
             call vegas(EvalWeighted_VHiggs,VG_Result,VG_Error,VG_Chi2)
       endif
@@ -1846,7 +1849,10 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
       call vegas1(EvalWeighted_HJ,VG_Result,VG_Error,VG_Chi2)
     elseif (Process.eq.50) then
       if( PChannel.eq.0 ) then
+#if 0
+!until this amplitude is moved to its new home in Yaofu's module
            call vegas1(EvalWeighted_ggVH,VG_Result,VG_Error,VG_Chi2)
+#endif
       else
            call vegas1(EvalWeighted_VHiggs,VG_Result,VG_Error,VG_Chi2)
       endif
