@@ -11,7 +11,7 @@ MCFMLib = mcfm_705 # libmcfm_705.so
 PDFDir = $(Here)/pdfs
 VegasDir = $(Here)/vegas
 QCDLibDir = $(Here)/../lib/QCD-Loop2/lib64
-CollierDir = $(Here)/../lib/COLLIER-1.1/
+CollierDir = $(Here)/../lib/COLLIER-1.2/
 
 # compiler options, Comp='ifort' or 'gfort'
 Opt  = Yes
