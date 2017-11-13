@@ -132,10 +132,8 @@ logical, public :: HbbDecays =.false.                 ! default to false so H in
 logical, public, parameter :: importExternal_LHEinit = .true.
 !=====================================================
 
-!=====================================================
-
 ! new VH
-character(len=2), public :: VHiggs_PC = "bo"                ! VH partonic channel and mode selection, ignores PChannel, in development.
+character(len=2), public :: VHiggs_PC = "lo"                ! VH partonic channel and mode selection, ignores PChannel, in development.
                                                             ! "ee" ( = e+ e- @LO)
                                                             ! "gg" ( = triangles + boxes of gg)
                                                             ! "qq" ( = q qbar @LO)
@@ -145,7 +143,6 @@ character(len=2), public :: VHiggs_PC = "bo"                ! VH partonic channe
                                                             ! "qg" or "gq" ( = qg + gq)
                                                             ! "nl" ( = full oneloop = q qbar @LO + NLO + gg + gq)
 ! new VH
-!=====================================================
 
 !=====================================================
 !cuts - should be set on the command line
@@ -3033,7 +3030,6 @@ integer, intent(in) :: Nmax, Rmax
 #endif
 end subroutine
 !========================================================================
-
 
 
 

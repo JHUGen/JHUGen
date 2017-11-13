@@ -76,11 +76,9 @@ END PROGRAM
 subroutine InitProcessScaleSchemes() ! If schemes are set to default, reset to the appropriate numbers
    use ModParameters
    use ModMisc
-!- new VH
-#if useCollier==1 || useCollier==2
+#if useCollier==1
    use COLLIER
 #endif
-!- new VH
    implicit none
    integer :: Nmax,rmax
 
@@ -454,6 +452,7 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "VegasNc1", success, VegasNc1)
     call ReadCommandLineArgument(arg, "VegasNc2", success, VegasNc2)
     call ReadCommandLineArgument(arg, "PChannel", success, PChannel)
+    call ReadCommandLineArgument(arg, "VHiggs_PC", success, VHiggs_PC) ! new VH
     call ReadCommandLineArgument(arg, "DataFile", success, DataFile)
     call ReadCommandLineArgument(arg, "Process", success, Process)
     call ReadCommandLineArgument(arg, "DecayMode1", success, DecayMode1)
@@ -1855,7 +1854,7 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
       if( PChannel.eq.0 ) then
 #if 0
 !until this amplitude is moved to its new home in Yaofu's module
-            call vegas(EvalWeighted_ggVH,VG_Result,VG_Error,VG_Chi2)
+            call vegas(EvalWeighted_ggVHiggs,VG_Result,VG_Error,VG_Chi2)
 #endif
       else
             call vegas(EvalWeighted_VHiggs,VG_Result,VG_Error,VG_Chi2)
@@ -1894,7 +1893,7 @@ if ( (unweighted.eqv..false.) .or. (GenerateEvents.eqv..true.) ) then  !--------
       if( PChannel.eq.0 ) then
 #if 0
 !until this amplitude is moved to its new home in Yaofu's module
-           call vegas1(EvalWeighted_ggVH,VG_Result,VG_Error,VG_Chi2)
+           call vegas1(EvalWeighted_ggVHiggs,VG_Result,VG_Error,VG_Chi2)
 #endif
       else
            call vegas1(EvalWeighted_VHiggs,VG_Result,VG_Error,VG_Chi2)
@@ -3685,7 +3684,7 @@ implicit none
   elseif (Process.eq.50) then
      call InitHisto_VHiggs()
   elseif (Process.eq.51) then ! new VH
-     call InitHisto_VHiggs()
+     call InitHisto_VH()
   elseif (Process.eq.80) then
      call InitHisto_TTBH()
   elseif (Process.eq.90) then
@@ -4487,7 +4486,89 @@ END SUBROUTINE
 
 
 
+SUBROUTINE InitHisto_VH()
+use ModMisc
+use ModKinematics
+use ModParameters
+implicit none
+integer :: AllocStatus,NHisto
 
+          it_sav = 1
+          NumHistograms = 10
+          if( .not.allocated(Histo) ) then
+                allocate( Histo(1:NumHistograms), stat=AllocStatus  )
+                if( AllocStatus .ne. 0 ) call Error("Memory allocation in Histo")
+          endif
+
+          Histo(1)%Info   = "m(jj)"
+          Histo(1)%NBins  = 80
+          Histo(1)%BinSize= 20d0*GeV/80d0
+          Histo(1)%LowVal = 115d0*GeV
+          Histo(1)%SetScale= 1d0/GeV
+
+          Histo(2)%Info   = "m(ll)"
+          Histo(2)%NBins  = 80
+          Histo(2)%BinSize= 20d0*GeV/80d0
+          Histo(2)%LowVal = 75d0*GeV
+          Histo(2)%SetScale= 1d0/GeV
+
+          Histo(3)%Info   = "pt(V)"
+          Histo(3)%NBins  = 80
+          Histo(3)%BinSize= 300d0*GeV/80d0
+          Histo(3)%LowVal = 0d0*GeV
+          Histo(3)%SetScale= 1d0/GeV
+
+          Histo(4)%Info   = "pt(H)"
+          Histo(4)%NBins  = 100
+          Histo(4)%BinSize= 5d0*GeV
+          Histo(4)%LowVal = 0d0*GeV
+          Histo(4)%SetScale= 1d0/GeV
+
+          Histo(5)%Info   = "m(V*)"   ! scattering angle of Z in resonance rest frame
+          Histo(5)%NBins  = 80
+          Histo(5)%BinSize= 300d0*GeV/80d0
+          Histo(5)%LowVal = 200d0*GeV
+          Histo(5)%SetScale= 1d0/GeV
+
+          Histo(6)%Info   = "costheta1"
+          Histo(6)%NBins  = 80
+          Histo(6)%BinSize= 2d0/80d0
+          Histo(6)%LowVal = -1d0
+          Histo(6)%SetScale= 1d0
+
+          Histo(7)%Info   = "costheta2"
+          Histo(7)%NBins  = 80
+          Histo(7)%BinSize= 2d0/80d0
+          Histo(7)%LowVal = -1d0
+          Histo(7)%SetScale= 1d0
+
+          Histo(8)%Info   = "phistar1"
+          Histo(8)%NBins  = 80
+          Histo(8)%BinSize= 6.4d0/80d0
+          Histo(8)%LowVal = -3.2d0
+          Histo(8)%SetScale= 1d0
+
+          Histo(9)%Info   = "phi"
+          Histo(9)%NBins  = 80
+          Histo(9)%BinSize= 6.4d0/80d0
+          Histo(9)%LowVal = -3.2d0
+          Histo(9)%SetScale= 1d0
+
+          Histo(10)%Info   = "EHat"
+          Histo(10)%NBins  = 80
+          Histo(10)%BinSize= 10d0*GeV
+          Histo(10)%LowVal = 200d0*GeV
+          Histo(10)%SetScale= 1d0/GeV
+
+  do NHisto=1,NumHistograms
+      Histo(NHisto)%Value(:) = 0d0
+      Histo(NHisto)%Value2(:)= 0d0
+      Histo(NHisto)%Hits(:)  = 0
+  enddo
+
+
+RETURN
+END SUBROUTINE
 
 
 
@@ -4686,7 +4767,7 @@ character :: arg*(500)
     if( ConvertLHEFile ) write(TheUnit,"(4X,A)") "           (This is ConvertLHEFile mode. Resonance mass/width are read from LHE input parameters.)"
     if( HiggsDecayLengthMM.ne.0d0 ) write(TheUnit,"(4X,A,F10.5,A)") "           ctau=", HiggsDecayLengthMM, " mm"
     if( &
-         (.not.ReadLHEFile .and. (Process.le.2 .or. Process.eq.50 .or. Process.eq.60 .or. (Process.ge.66 .and. Process.le.69) .or. ((TopDecays.eq.1).and.Process.eq.80) .or. (Process.ge.110 .and. Process.le.113))) &
+         (.not.ReadLHEFile .and. (Process.le.2 .or. Process.eq.50 .or. Process.eq.51 .or. Process.eq.60 .or. (Process.ge.66 .and. Process.le.69) .or. ((TopDecays.eq.1).and.Process.eq.80) .or. (Process.ge.110 .and. Process.le.113))) & ! new VH added
     .or. (ReadLHEFile .and. TauDecays.ne.0) &
     .or. ConvertLHEFile ) &
     then
