@@ -235,7 +235,9 @@ ggboxVHAmpObj = \
           $(ObjectDir)/mod_ffbH_Box12_pmp.o
 
 # amplitude dependencies
-AmpDep =  mod_TopDecay.F90 \
+AmpDep =  mod_Parameters.F90 \
+          mod_Misc.F90 \
+          mod_TopDecay.F90 \
           mod_Graviton.F90 \
           mod_Higgs.F90 \
           mod_Zprime.F90 \
@@ -252,7 +254,9 @@ AmpDep =  mod_TopDecay.F90 \
 
 
 # amplitude objects
-AmpObj =  $(ObjectDir)/mod_TopDecay.o \
+AmpObj =  $(ObjectDir)/mod_Parameters.o \
+          $(ObjectDir)/mod_Misc.o \
+          $(ObjectDir)/mod_TopDecay.o \
           $(ObjectDir)/mod_Graviton.o \
           $(ObjectDir)/mod_Higgs.o \
           $(ObjectDir)/mod_Zprime.o \

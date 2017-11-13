@@ -1,14 +1,18 @@
+#include "MELAStreamHelpers.hh"
 #include "TMCFMUtils.hh"
 #include "TMath.h"
 
+
+using MELAStreamHelpers::MELAout;
+using MELAStreamHelpers::MELAerr;
 using namespace std;
 using namespace PDGHelpers;
-
 using namespace TNumericUtil;
 
 namespace TMCFMUtils{
   const std::vector<intQuad_t> MCFMHash_QQVVQQAny = Hash_QQVVQQAny();
 }
+
 
 void TMCFMUtils::AssociatedParticleOrdering_QQVVQQAny(int iSel, int jSel, int rSel, int sSel, int order[2]){
   const std::vector<intQuad_t>& hash = MCFMHash_QQVVQQAny;
@@ -31,7 +35,7 @@ void TMCFMUtils::AssociatedParticleOrdering_QQVVQQAny(int iSel, int jSel, int rS
         order[0]=0;
         order[1]=1;
         outFound=true;
-        //cout << "Hash requested outgoing "<< hash.at(ih)[2] << " " << hash.at(ih)[3] << ", unswapped r, s = " << rSel << " " << sSel << endl;
+        //MELAout << "Hash requested outgoing "<< hash.at(ih)[2] << " " << hash.at(ih)[3] << ", unswapped r, s = " << rSel << " " << sSel << endl;
       }
       else if (
         (PDGHelpers::isAnUnknownJet(rSel) || rSel==hash.at(ih)[3])
@@ -41,7 +45,7 @@ void TMCFMUtils::AssociatedParticleOrdering_QQVVQQAny(int iSel, int jSel, int rS
         order[0]=1;
         order[1]=0;
         outFound=true;
-        //cout << "Hash requested outgoing "<< hash.at(ih)[2] << " " << hash.at(ih)[3] << ", swapped r, s = " << rSel << " " << sSel << endl;
+        //MELAout << "Hash requested outgoing "<< hash.at(ih)[2] << " " << hash.at(ih)[3] << ", swapped r, s = " << rSel << " " << sSel << endl;
       }
     }
     // Final particles l/nu
@@ -62,7 +66,7 @@ void TMCFMUtils::AssociatedParticleOrdering_QQVVQQAny(int iSel, int jSel, int rS
         order[0]=0;
         order[1]=1;
         outFound=true;
-        //cout << "Hash requested outgoing "<< hash.at(ih)[2] << " " << hash.at(ih)[3] << ", unswapped r, s = " << rSel << " " << sSel << endl;
+        //MELAout << "Hash requested outgoing "<< hash.at(ih)[2] << " " << hash.at(ih)[3] << ", unswapped r, s = " << rSel << " " << sSel << endl;
       }
       else if (
         (
@@ -78,7 +82,7 @@ void TMCFMUtils::AssociatedParticleOrdering_QQVVQQAny(int iSel, int jSel, int rS
         order[0]=1;
         order[1]=0;
         outFound=true;
-        //cout << "Hash requested outgoing "<< hash.at(ih)[2] << " " << hash.at(ih)[3] << ", swapped r, s = " << rSel << " " << sSel << endl;
+        //MELAout << "Hash requested outgoing "<< hash.at(ih)[2] << " " << hash.at(ih)[3] << ", swapped r, s = " << rSel << " " << sSel << endl;
       }
       if (PDGHelpers::getCoupledVertex(rSel, sSel)!=PDGHelpers::getCoupledVertex(hash.at(ih)[2], hash.at(ih)[3])) outFound=false;
     }
@@ -159,15 +163,17 @@ std::vector<intQuad_t> TMCFMUtils::Hash_QQVVQQ(){
         if ((idpos<2 && ipos>=2) || (idpos>=2 && ipos<2)) idAssigned = -idAssigned;
         cfg[jcfg.at(j)[ipos]] = idAssigned;
       }
-      pcfg.push_back(cfg);
+      bool exists=false;
+      for (auto const& tmpcfg:pcfg){ if (tmpcfg==cfg){ exists=true; break; } }
+      if (!exists) pcfg.push_back(cfg);
     }
   }
   // Uncommenting the lines below prints out the hash when the library is loaded.
   /*
-  for (unsigned int ic=0; ic<pcfg.size(); ic++) std::cout
+  for (unsigned int ic=0; ic<pcfg.size(); ic++) MELAout
   << "TMCFMUtils::Hash_QQVVQQAny: Hash configuration " << ic << " requests ids=( "
   << pcfg.at(ic)[0] << ", " << pcfg.at(ic)[1] << ", " << pcfg.at(ic)[2] << ", " << pcfg.at(ic)[3]
-  << ")" << std::endl;
+  << ")" << endl;
   */
   return pcfg;
 }
@@ -212,15 +218,17 @@ std::vector<intQuad_t> TMCFMUtils::Hash_QQVVQQStrong(){
         if (((idpos<2 && ipos>=2) || (idpos>=2 && ipos<2)) && !PDGHelpers::isAGluon(idAssigned)) idAssigned = -idAssigned;
         cfg[jcfg.at(j)[ipos]] = idAssigned;
       }
-      pcfg.push_back(cfg);
+      bool exists=false;
+      for (auto const& tmpcfg:pcfg){ if (tmpcfg==cfg){ exists=true; break; } }
+      if (!exists) pcfg.push_back(cfg);
     }
   }
   // Uncommenting the lines below prints out the hash when the library is loaded.
   /*
-  for (unsigned int ic=0; ic<pcfg.size(); ic++) std::cout
+  for (unsigned int ic=0; ic<pcfg.size(); ic++) MELAout
   << "TMCFMUtils::Hash_QQVVQQAny: Hash configuration " << ic << " requests ids=( "
   << pcfg.at(ic)[0] << ", " << pcfg.at(ic)[1] << ", " << pcfg.at(ic)[2] << ", " << pcfg.at(ic)[3]
-  << ")" << std::endl;
+  << ")" << endl;
   */
   return pcfg;
 }

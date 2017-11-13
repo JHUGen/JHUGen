@@ -1,8 +1,13 @@
 #include <algorithm>
 #include <utility>
 #include "MELAParticle.h"
+#include "MELAStreamHelpers.hh"
 
+
+using MELAStreamHelpers::MELAout;
+using MELAStreamHelpers::MELAerr;
 using namespace PDGHelpers;
+
 
 namespace debugVars{
   bool debugFlag = false;
@@ -95,7 +100,7 @@ void MELAParticle::boost(const TVector3& vec, bool boostAll){
     }
     else p4.Boost(vec);
   }
-  else std::cerr
+  else MELAerr
     << "MELAParticle::boost: "
     << "|v|**2 = " << vec.Mag2() << " >=1 cannot be used to boost. "
     << "v = ( " << vec.X() << " , " << vec.Y() << " , " << vec.Z() << " )"

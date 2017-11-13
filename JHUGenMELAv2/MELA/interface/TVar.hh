@@ -31,7 +31,6 @@ typedef std::vector<SimpleParticle_t> SimpleParticleCollection_t;
 
 
 namespace TVar{
-
   enum{
     kNoAssociated=1,
     kUseAssociated_Leptons=2, // l or nu

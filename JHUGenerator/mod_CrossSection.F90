@@ -3040,7 +3040,8 @@ ENDIF! GENEVT
 
 
 
-
+#if 0
+!until the amplitudes called here are moved to their new home in Yaofu's module
  FUNCTION EvalWeighted_ggVH(yRnd,VgsWgt)
  use ModKinematics
  use ModParameters
@@ -3515,7 +3516,7 @@ applyPSCut=.false.; print *, "removing cuts"
 
 RETURN
 END FUNCTION
-
+#endif
 
 
 

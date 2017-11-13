@@ -313,8 +313,6 @@ protected:
   MelaPConstant* pAvgSmooth_JHUGen_Had_ZH_HSMHiggs[TVar::nFermionMassRemovalSchemes-1];
   //
   MelaPConstant* pAvgSmooth_JHUGen_Had_WH_HSMHiggs[TVar::nFermionMassRemovalSchemes-1];
-  //
-  MelaPConstant* pAvgSmooth_MCFM_JJQCD_bkgZJets_2l2q;
   // Decay ME constants that do not use PDFs
   //
   MelaPConstant* pAvgSmooth_JHUGen_ZZGG_HSMHiggs_4mu;
@@ -325,17 +323,17 @@ protected:
   MelaPConstant* pAvgSmooth_MCFM_ZZGG_HSMHiggs_4e;
   MelaPConstant* pAvgSmooth_MCFM_ZZGG_HSMHiggs_2mu2e;
   //
-  MelaPConstant* pAvgSmooth_MCFM_JJVBF_HSMHiggs_4mu;
-  MelaPConstant* pAvgSmooth_MCFM_JJVBF_HSMHiggs_4e;
-  MelaPConstant* pAvgSmooth_MCFM_JJVBF_HSMHiggs_2mu2e;
+  MelaPConstant* pAvgSmooth_MCFM_JJVBF_S_HSMHiggs_4mu;
+  MelaPConstant* pAvgSmooth_MCFM_JJVBF_S_HSMHiggs_4e;
+  MelaPConstant* pAvgSmooth_MCFM_JJVBF_S_HSMHiggs_2mu2e;
   //
-  MelaPConstant* pAvgSmooth_MCFM_Had_ZH_HSMHiggs_4mu;
-  MelaPConstant* pAvgSmooth_MCFM_Had_ZH_HSMHiggs_4e;
-  MelaPConstant* pAvgSmooth_MCFM_Had_ZH_HSMHiggs_2mu2e;
+  MelaPConstant* pAvgSmooth_MCFM_Had_ZH_S_HSMHiggs_4mu;
+  MelaPConstant* pAvgSmooth_MCFM_Had_ZH_S_HSMHiggs_4e;
+  MelaPConstant* pAvgSmooth_MCFM_Had_ZH_S_HSMHiggs_2mu2e;
   //
-  MelaPConstant* pAvgSmooth_MCFM_Had_WH_HSMHiggs_4mu;
-  MelaPConstant* pAvgSmooth_MCFM_Had_WH_HSMHiggs_4e;
-  MelaPConstant* pAvgSmooth_MCFM_Had_WH_HSMHiggs_2mu2e;
+  MelaPConstant* pAvgSmooth_MCFM_Had_WH_S_HSMHiggs_4mu;
+  MelaPConstant* pAvgSmooth_MCFM_Had_WH_S_HSMHiggs_4e;
+  MelaPConstant* pAvgSmooth_MCFM_Had_WH_S_HSMHiggs_2mu2e;
   //
   MelaPConstant* pAvgSmooth_MCFM_ZZGG_bkgZZ_4mu;
   MelaPConstant* pAvgSmooth_MCFM_ZZGG_bkgZZ_4e;
@@ -360,11 +358,15 @@ protected:
   MelaPConstant* pAvgSmooth_MCFM_JJQCD_bkgZZ_4mu;
   MelaPConstant* pAvgSmooth_MCFM_JJQCD_bkgZZ_4e;
   MelaPConstant* pAvgSmooth_MCFM_JJQCD_bkgZZ_2mu2e;
+  //
+  MelaPConstant* pAvgSmooth_MCFM_JJQCD_bkgZJets_2l2q;
 
 
   /*****************/
   /*** Functions ***/
   /*****************/
+  void printLogo() const;
+
   bool configureAnalyticalPDFs();
   void reset_SelfDCouplings();
   void reset_PAux(); // SuperProb reset
@@ -395,7 +397,8 @@ protected:
   float getConstant_JHUGenUndecayed();
   float getConstant_4l();
   float getConstant_2l2q();
-  float getConstant_FourFermionDecay(int decid);
+  float getConstant_4q();
+  float getConstant_FourFermionDecay(const int& decid);
 
 };
 

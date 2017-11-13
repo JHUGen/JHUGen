@@ -22,6 +22,17 @@ theZVar("theZVar", "theZVar", this)
 
 MELANCSpline_3D_fast::MELANCSpline_3D_fast(
   const char* name,
+  const char* title
+  ) :
+  MELANCSplineCore(name, title),
+  rangeYmin(1), rangeYmax(-1),
+  rangeZmin(1), rangeZmax(-1),
+  theYVar("theYVar", "theYVar", this),
+  theZVar("theZVar", "theZVar", this)
+{}
+
+MELANCSpline_3D_fast::MELANCSpline_3D_fast(
+  const char* name,
   const char* title,
   RooAbsReal& inXVar,
   RooAbsReal& inYVar,

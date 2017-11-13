@@ -1,12 +1,18 @@
 #include <sstream>
 #include <cmath>
 #include <cassert>
+#include "MELAStreamHelpers.hh"
+#include "TVar.hh"
 #include "SuperMELA.h"
 #include "MELAHXSWidth.h"
 #include "RooArgSet.h"
 #include "RooArgList.h"
 
+
+using namespace std;
 using namespace RooFit;
+using MELAStreamHelpers::MELAout;
+using MELAStreamHelpers::MELAerr;
 
 
 SuperMELA::SuperMELA(
@@ -105,13 +111,13 @@ SuperMELA::~SuperMELA(){
 }
 
 void SuperMELA::SetDecayChannel(string myChan){
-  if (verbose_) std::cout << "SuperMELA::SetDecayChannel: Switching from " << strChan_ << " to " << myChan << std::endl;
+  if (verbose_) MELAout << "SuperMELA::SetDecayChannel: Switching from " << strChan_ << " to " << myChan << endl;
   if (myChan != strChan_){ // do nothing if it's the same as before
     strChan_=myChan;
     bool newChanOK = checkChannel();
-    if (verbose_) std::cout << "Setting decay channel of SuperMELA to " << strChan_.c_str() << " , re-initializing..." << std::endl;
+    if (verbose_) MELAout << "Setting decay channel of SuperMELA to " << strChan_.c_str() << " , re-initializing..." << endl;
     init();
-    if (verbose_ && newChanOK) std::cout << "Decay channel set successfully to " << strChan_.c_str() << std::endl;
+    if (verbose_ && newChanOK) MELAout << "Decay channel set successfully to " << strChan_.c_str() << endl;
   }
 }
 
@@ -119,12 +125,12 @@ double SuperMELA::GetSigShapeSystematic(string parName){
   if (parName=="meanCB") return mean_CB_err_->getVal();
   else if (parName=="sigmaCB") return sigma_CB_err_->getVal();
   else{
-    std::cout << "Error from SuperMELA::GetSigShapeSystematic, unrecognized input: " << parName.c_str() << std::endl;
+    MELAout << "Error from SuperMELA::GetSigShapeSystematic, unrecognized input: " << parName.c_str() << endl;
     try{
       throw 40;
     }
     catch (int e){
-      if (e==40) std::cout << "Exception " << e << "  in SuperMELA::GetSigShapeSystematic! Unrecognized type of parameter requested: " << parName.c_str() << "  . Valid options are meanCB ; sigmaCB" << std::endl;
+      if (e==40) MELAout << "Exception " << e << "  in SuperMELA::GetSigShapeSystematic! Unrecognized type of parameter requested: " << parName.c_str() << "  . Valid options are meanCB ; sigmaCB" << endl;
       return 0;
     }
   }
@@ -141,7 +147,7 @@ double SuperMELA::GetSigShapeParameter(string parName){
       throw 40;
     }
     catch (int e){
-      if (e==40) std::cout << "Exception " << e << "  in SuperMELA::GetSigShapeParameter! Unrecognized type of parameter requested: " << parName.c_str() << "  . Valid options are meanCB ; sigmaCB ; alphaCB ; nCB" << std::endl;
+      if (e==40) MELAout << "Exception " << e << "  in SuperMELA::GetSigShapeParameter! Unrecognized type of parameter requested: " << parName.c_str() << "  . Valid options are meanCB ; sigmaCB ; alphaCB ; nCB" << endl;
       return 0;
     }
   }
@@ -150,11 +156,11 @@ double SuperMELA::GetSigShapeParameter(string parName){
 
 
 void SuperMELA::init(){
-  if (verbose_)std::cout << "Begin SuperMELA::init..." << std::endl;
+  if (verbose_)MELAout << "Begin SuperMELA::init..." << endl;
 
   // Calculate m4l ranges for the given mH, set range of rrv
   calc_mZZ_range(mHVal_, lowMH_, highMH_);
-  if (verbose_) cout << "Range width=" << highMH_ - lowMH_ << endl;
+  if (verbose_) MELAout << "Range width=" << highMH_ - lowMH_ << endl;
   delete m4l_rrv_; m4l_rrv_=new RooRealVar("CMS_zz4l_mass", "CMS_zz4l_mass", mHVal_, lowMH_, highMH_);
   m4l_rrv_->setBins(2000, "fft");
   m4l_rrv_->setRange("shape", lowMH_, highMH_);
@@ -166,8 +172,8 @@ void SuperMELA::init(){
   double str_sigma_CB_err_m;
   readSigSystFromFile(str_mean_CB_err_e, str_mean_CB_err_m, str_sigma_CB_err_e, str_sigma_CB_err_m);
   if (verbose_){
-    std::cout << "mean_CB systematics (ele and mu): " << str_mean_CB_err_e << " / " << str_mean_CB_err_m << std::endl;
-    std::cout << "sigma_CB systematics (ele and mu): " << str_sigma_CB_err_e << " / " << str_sigma_CB_err_m << std::endl;
+    MELAout << "mean_CB systematics (ele and mu): " << str_mean_CB_err_e << " / " << str_mean_CB_err_m << endl;
+    MELAout << "sigma_CB systematics (ele and mu): " << str_sigma_CB_err_e << " / " << str_sigma_CB_err_m << endl;
   }
 
   //delete old stuff before reinitialization
@@ -183,10 +189,10 @@ void SuperMELA::init(){
   }
   else{//2e2mu, we should have already checked that the string of the channel is a sensible one
     mean_CB_err_=new RooRealVar("mean_CB_err", "mean_CB_err", (str_mean_CB_err_m + str_mean_CB_err_e));
-    sigma_CB_err_=new RooRealVar("sigma_CB_err", "sigma_CB_err", std::sqrt(std::pow(str_sigma_CB_err_m, 2) + std::pow(str_sigma_CB_err_e, 2)));
+    sigma_CB_err_=new RooRealVar("sigma_CB_err", "sigma_CB_err", sqrt(pow(str_sigma_CB_err_m, 2) + pow(str_sigma_CB_err_e, 2)));
   }
-  if (mean_CB_err_->getVal()<0.){ std::cout << "Negative error on the m4l mean ! " << mean_CB_err_->getVal() << std::endl; }
-  if (sigma_CB_err_->getVal()<0.){ std::cout << "Negative error on the m4l sigma ! " << sigma_CB_err_->getVal() << std::endl; }
+  if (mean_CB_err_->getVal()<0.){ MELAout << "Negative error on the m4l mean ! " << mean_CB_err_->getVal() << endl; }
+  if (sigma_CB_err_->getVal()<0.){ MELAout << "Negative error on the m4l sigma ! " << sigma_CB_err_->getVal() << endl; }
 
 
   //set parameters for signal m4l shape and calculate normalization
@@ -196,12 +202,12 @@ void SuperMELA::init(){
   string str_alpha2_CB;
   string str_mean_CB;
   string str_sigma_CB;
-  if (verbose_)std::cout << "Reading signal shape formulas" << std::endl;
+  if (verbose_)MELAout << "Reading signal shape formulas" << endl;
   readSigParsFromFile(str_mean_CB, str_sigma_CB, str_n_CB, str_alpha_CB, str_n2_CB, str_alpha2_CB);
   if (verbose_){
-    std::cout << "Read from input card the following formulas: " << std::endl;
-    std::cout << "Mean RooFormula (string): " << str_mean_CB.c_str() << std::endl;
-    std::cout << "Sigma RooFormula (string): " << str_sigma_CB.c_str() << std::endl;
+    MELAout << "Read from input card the following formulas: " << endl;
+    MELAout << "Mean RooFormula (string): " << str_mean_CB.c_str() << endl;
+    MELAout << "Sigma RooFormula (string): " << str_sigma_CB.c_str() << endl;
   }
 
   delete n_CB_;
@@ -210,16 +216,16 @@ void SuperMELA::init(){
   delete alpha2_CB_;
   char rrvName[96];
   sprintf(rrvName, "CMS_zz4l_n_sig_%s_%d", strChan_.c_str(), int(sqrts_));
-  if (verbose_) cout << "SuperMELA::init: Constructing n_CB_ from formula " << str_n_CB.c_str() << endl;
+  if (verbose_) MELAout << "SuperMELA::init: Constructing n_CB_ from formula " << str_n_CB.c_str() << endl;
   n_CB_=new RooFormulaVar(rrvName, str_n_CB.c_str(), RooArgList(*mH_rrv_));
   sprintf(rrvName, "CMS_zz4l_alpha_sig_%s_%d", strChan_.c_str(), int(sqrts_));
-  if (verbose_) cout << "SuperMELA::init: Constructing alpha_CB_ from formula " << str_alpha_CB.c_str() << endl;
+  if (verbose_) MELAout << "SuperMELA::init: Constructing alpha_CB_ from formula " << str_alpha_CB.c_str() << endl;
   alpha_CB_=new RooFormulaVar(rrvName, str_alpha_CB.c_str(), RooArgList(*mH_rrv_));
   sprintf(rrvName, "CMS_zz4l_n2_sig_%s_%d", strChan_.c_str(), int(sqrts_));
-  if (verbose_) cout << "SuperMELA::init: Constructing n2_CB_ from formula " << str_n2_CB.c_str() << endl;
+  if (verbose_) MELAout << "SuperMELA::init: Constructing n2_CB_ from formula " << str_n2_CB.c_str() << endl;
   n2_CB_=new RooFormulaVar(rrvName, str_n2_CB.c_str(), RooArgList(*mH_rrv_));
   sprintf(rrvName, "CMS_zz4l_alpha2_sig_%s_%d", strChan_.c_str(), int(sqrts_));
-  if (verbose_) cout << "SuperMELA::init: Constructing alpha2_CB_ from formula " << str_alpha2_CB.c_str() << endl;
+  if (verbose_) MELAout << "SuperMELA::init: Constructing alpha2_CB_ from formula " << str_alpha2_CB.c_str() << endl;
   alpha2_CB_=new RooFormulaVar(rrvName, str_alpha2_CB.c_str(), RooArgList(*mH_rrv_));
 
   corr_mean_sig = new RooRealVar("CMS_zz4l_mean_sig_corrMH", "CMS_zz4l_mean_sig_corrMH", 0., -10., 10.);
@@ -232,7 +238,7 @@ void SuperMELA::init(){
   delete sigma_CB_;
   mean_CB_=new RooFormulaVar("CMS_zz4l_mean_m_sig", Form("(%s)+@0*@1", str_mean_CB.c_str()), RooArgList(*mH_rrv_, *corr_mean_sig));//this is normalized by mHVal_
   meanTOT_CB_=new RooFormulaVar("CMS_zz4l_mean_sig", "(@0+@1)", RooArgList(*mH_rrv_, *mean_CB_));
-  if (verbose_){ std::cout << "Signal Mean vals -> Correction: " << corr_mean_sig->getVal() << "  Mean: " << mean_CB_->getVal() << "  Total: " << meanTOT_CB_->getVal() << std::endl; }
+  if (verbose_){ MELAout << "Signal Mean vals -> Correction: " << corr_mean_sig->getVal() << "  Mean: " << mean_CB_->getVal() << "  Total: " << meanTOT_CB_->getVal() << endl; }
   sigma_CB_=new RooFormulaVar("CMS_zz4l_sigma_m_sig", Form("(%s)*(1+@0*@1)", str_sigma_CB.c_str()), RooArgList(*mH_rrv_, *corr_sigma_sig));
 
   //for high-mass one also needs a gamma RooFormulaVar, 
@@ -247,15 +253,15 @@ void SuperMELA::init(){
   width_BW_->setConstant(true);
 
   if (verbose_){
-    std::cout << "Signal shape parameter values: " << std::endl;
-    std::cout << "Mean (formula value) = " << meanTOT_CB_->getVal() << std::endl;
-    std::cout << "Sigma (formula value) = " << sigma_CB_->getVal() << std::endl;
-    std::cout << "n (formula value) = " << n_CB_->getVal() << std::endl;
-    std::cout << "alpha (formula value) = " << alpha_CB_->getVal() << std::endl;
-    std::cout << "n2 (formula value) = " << n2_CB_->getVal() << std::endl;
-    std::cout << "alpha2 (formula value) = " << alpha2_CB_->getVal() << std::endl;
-    std::cout << "Mean BW (realvar value) = " << mean_BW_->getVal() << std::endl;
-    std::cout << "Width BW (realvar value) = " << width_BW_->getVal() << std::endl;
+    MELAout << "Signal shape parameter values: " << endl;
+    MELAout << "Mean (formula value) = " << meanTOT_CB_->getVal() << endl;
+    MELAout << "Sigma (formula value) = " << sigma_CB_->getVal() << endl;
+    MELAout << "n (formula value) = " << n_CB_->getVal() << endl;
+    MELAout << "alpha (formula value) = " << alpha_CB_->getVal() << endl;
+    MELAout << "n2 (formula value) = " << n2_CB_->getVal() << endl;
+    MELAout << "alpha2 (formula value) = " << alpha2_CB_->getVal() << endl;
+    MELAout << "Mean BW (realvar value) = " << mean_BW_->getVal() << endl;
+    MELAout << "Width BW (realvar value) = " << width_BW_->getVal() << endl;
   }
 
   delete sig_FFT_;
@@ -266,10 +272,10 @@ void SuperMELA::init(){
   sig_FFT_=new RooFFTConvPdf("signal_ggH", "BW (X) CB", *m4l_rrv_, *sig_BW_, *sig_CB_, 2);
   sig_FFT_->setBufferFraction(0.2);
   if (verbose_){
-    std::cout << "Value of signal m4l CB shape is " << sig_CB_->getVal() << std::endl;
-    std::cout << "Value of signal m4l BW shape is " << sig_BW_->getVal() << std::endl;
+    MELAout << "Value of signal m4l CB shape is " << sig_CB_->getVal() << endl;
+    MELAout << "Value of signal m4l BW shape is " << sig_BW_->getVal() << endl;
     sig_FFT_->Print("v");
-    std::cout << "Value of signal m4l FFT shape is " << sig_FFT_->getVal() << std::endl;
+    MELAout << "Value of signal m4l FFT shape is " << sig_FFT_->getVal() << endl;
   }
 
   RooAbsReal* tmpint;
@@ -277,27 +283,27 @@ void SuperMELA::init(){
   tmpint = sig_CB_->createIntegral(RooArgSet(*m4l_rrv_), RooFit::Range("shape"));
   norm_sig_CB_ =tmpint->getVal();
   delete tmpint;
-  if (verbose_)std::cout << "Normalization of signal m4l CB shape is " << norm_sig_CB_ << std::endl;
+  if (verbose_)MELAout << "Normalization of signal m4l CB shape is " << norm_sig_CB_ << endl;
 
-  if (verbose_)std::cout << "\n---> Integrating Breit-Wigner:" << std::endl;
+  if (verbose_)MELAout << "\n---> Integrating Breit-Wigner:" << endl;
   tmpint = sig_BW_->createIntegral(RooArgSet(*m4l_rrv_), RooFit::Range("shape"));
   double norm_sig_BW_ =tmpint->getVal();
   delete tmpint;
-  if (verbose_)std::cout << "Normalization of signal m4l BW shape is " << norm_sig_BW_ << std::endl;
+  if (verbose_)MELAout << "Normalization of signal m4l BW shape is " << norm_sig_BW_ << endl;
 
-  if (verbose_)std::cout << "\n---> Integrating full signal:" << std::endl;
+  if (verbose_)MELAout << "\n---> Integrating full signal:" << endl;
   tmpint = sig_FFT_->createIntegral(RooArgSet(*m4l_rrv_), RooFit::Range("shape"));
   norm_sig_FFT_=tmpint->getVal();
   delete tmpint;
-  if (verbose_)std::cout << "Normalization of signal m4l shape is " << norm_sig_FFT_ << std::endl;
+  if (verbose_)MELAout << "Normalization of signal m4l shape is " << norm_sig_FFT_ << endl;
 
-  if (verbose_)std::cout << "Reading background shape parameters" << std::endl;
-  std::vector<double> v_apars;
+  if (verbose_)MELAout << "Reading background shape parameters" << endl;
+  vector<double> v_apars;
   readBkgParsFromFile(v_apars);
 
   if (verbose_){
-    cout << "Size of vector with bkg shape pars is " << v_apars.size() << endl;
-    std::cout << "Param [0]=" << v_apars.at(0) << " [13]=" << v_apars.at(13) << std::endl;
+    MELAout << "Size of vector with bkg shape pars is " << v_apars.size() << endl;
+    MELAout << "Param [0]=" << v_apars.at(0) << " [13]=" << v_apars.at(13) << endl;
   }
 
   delete a0_qqZZ_; a0_qqZZ_=new RooRealVar("CMS_zz4l_a0_qqZZ", "CMS_zz4l_a0_qqZZ", v_apars.at(0), 0., 200.);
@@ -340,6 +346,17 @@ void SuperMELA::init(){
   delete tmpint;
 }
 
+void SuperMELA::SetMH(double myMH){
+  mHVal_=myMH;
+  mH_rrv_->setVal(mHVal_);
+  if (verbose_) MELAout << "Setting MH to " << mHVal_ << endl;
+  init();
+}
+
+void SuperMELA::SetPathToCards(string dirToCards){
+  pathToCards_=dirToCards;
+  if (verbose_) MELAout << "New path to cards is " << pathToCards_ << endl;
+}
 
 void SuperMELA::splitLine(const string rawoption, vector<string>& splitoptions, char delimiter){
   string suboption=rawoption, result=rawoption;
@@ -372,24 +389,24 @@ void SuperMELA::readSigSystFromFile(
 
   //open text file
   string fCardName=pathToCards_+"inputs_"+strChan_+".txt";
-  if (verbose_) std::cout << "SuperMELA::readSigSystFromFile: Parsing signal shape systematics from input card " << fCardName.c_str() << std::endl;
+  if (verbose_) MELAout << "SuperMELA::readSigSystFromFile: Parsing signal shape systematics from input card " << fCardName.c_str() << endl;
   ifstream card(fCardName.c_str(), ios::in);
   if (!card.good()){
-    std::cerr << "SuperMELA::readSigSystFromFile: Input card " << fCardName << " is not good!" << std::endl;
+    MELAerr << "SuperMELA::readSigSystFromFile: Input card " << fCardName << " is not good!" << endl;
     assert(0);
   }
-  else if (verbose_) std::cout << "SuperMELA::readSigSystFromFile: Input card " << fCardName << " can be read!" << std::endl;
+  else if (verbose_) MELAout << "SuperMELA::readSigSystFromFile: Input card " << fCardName << " can be read!" << endl;
 
   string line;
   while (card.good()){
     getline(card, line);
-    std::vector<string> fields;
+    vector<string> fields;
     splitLine(line, fields, ' ');
 
     if (fields.size()<2 || !(fields[0]=="systematic"&&fields[1]=="param")) continue;
 
     if (fields.size()!=4){
-      std::cerr << "Error in SuperMELA::readSigSystFromFile! Incorrect format of line " << line.c_str() << std::endl;
+      MELAerr << "Error in SuperMELA::readSigSystFromFile! Incorrect format of line " << line.c_str() << endl;
       break;
     }
 
@@ -417,9 +434,9 @@ void SuperMELA::readSigSystFromFile(
     if ((!(mean_e_OK&&sigma_e_OK))&&(!(mean_m_OK&&sigma_m_OK))) throw 20;
   }
   catch (int e){
-    std::cout
+    MELAout
       << "Exception " << e << " in SuperMELA::readSigSystFromFile! Not all signal shape formulas were read " << mean_e_OK << "  " << sigma_e_OK << "  " << mean_m_OK << "  " << sigma_m_OK
-      << std::endl;
+      << endl;
   }
 
   card.close();
@@ -436,17 +453,17 @@ void SuperMELA::readSigParsFromFile(
   bool meanOK=false, sigmaOK=false, nOK=false, alphaOK=false, n2OK=false, alpha2OK=false;
   //open text file
   string fCardName=pathToCards_+"inputs_"+strChan_+".txt";
-  if (verbose_) std::cout << "Parsing input card " << fCardName.c_str() << std::endl;
+  if (verbose_) MELAout << "Parsing input card " << fCardName.c_str() << endl;
   ifstream card(fCardName.c_str(), ios::in);
   string line;
   while (card.good()){
     getline(card, line);
-    std::vector<string> fields;
+    vector<string> fields;
     splitLine(line, fields, ' ');
     if (fields.size()==0 || fields[0]!="signalShape")continue;
     //ok, we found somethign interesting
     if (fields.size()<3){
-      std::cout << "Error in SuperMELA::readSigParsFromFile! Incorrect format of line " << line.c_str() << " There should be at least three fields, I could find only " << fields.size() << " fields." << std::endl;
+      MELAout << "Error in SuperMELA::readSigParsFromFile! Incorrect format of line " << line.c_str() << " There should be at least three fields, I could find only " << fields.size() << " fields." << endl;
       break;
     }
     if (fields.at(1)=="n_CB"){ str_n_CB=fields.at(2); nOK=true; }
@@ -455,36 +472,36 @@ void SuperMELA::readSigParsFromFile(
     if (fields.at(1)=="alpha2_CB"){ str_alpha2_CB=fields.at(2); alpha2OK=true; }
     if (fields.at(1)=="mean_CB"){ str_mean_CB=fields.at(2); meanOK=true; }
     if (fields.at(1)=="sigma_CB"){ str_sigma_CB=fields.at(2); sigmaOK=true; }
-    if (verbose_) cout << fields.at(1) << " == " << fields.at(2) << endl;
+    if (verbose_) MELAout << fields.at(1) << " == " << fields.at(2) << endl;
 
     if (meanOK && sigmaOK && alphaOK && nOK && alpha2OK && n2OK)break;
   }//end while loop on lines
 
   if (!(meanOK && sigmaOK && alphaOK && nOK && alpha2OK && n2OK)){
-    std::cout << "Exception  in SuperMELA::readSigParsFromFile! Not all signal shape formulas were read " << meanOK << " " << sigmaOK << "  " << alphaOK << "  " << nOK << "  " << alpha2OK << "  " << n2OK << std::endl;
+    MELAout << "Exception  in SuperMELA::readSigParsFromFile! Not all signal shape formulas were read " << meanOK << " " << sigmaOK << "  " << alphaOK << "  " << nOK << "  " << alpha2OK << "  " << n2OK << endl;
     throw 20;
   }
 
   card.close();
 }
 
-void SuperMELA::readBkgParsFromFile(std::vector<double>& apars){
+void SuperMELA::readBkgParsFromFile(vector<double>& apars){
   const int nPars=14;
   int nFound=0;
   apars.resize(14);
   string fCardName=pathToCards_+"inputs_"+strChan_+".txt";
-  if (verbose_)std::cout << "Parsing input card " << fCardName.c_str() << std::endl;
+  if (verbose_)MELAout << "Parsing input card " << fCardName.c_str() << endl;
   ifstream card(fCardName.c_str(), ios::in);
   string line;
 
   while (card.good()){
     getline(card, line);
-    std::vector<string> fields;
+    vector<string> fields;
     splitLine(line, fields, ' ');
     if (fields.size()==0 || fields[0]!="qqZZshape")continue;
 
     if (fields.size()<3){
-      std::cout << "Error in SuperMELA::readSigParsFromFile! Incorrect format of line \'" << line.c_str() << "\' . It contains " << fields.size() << "fields (it should be 3)" << std::endl;
+      MELAout << "Error in SuperMELA::readSigParsFromFile! Incorrect format of line \'" << line.c_str() << "\' . It contains " << fields.size() << "fields (it should be 3)" << endl;
       break;
     }
 
@@ -503,9 +520,9 @@ void SuperMELA::readBkgParsFromFile(std::vector<double>& apars){
   }
   catch (int e){
     if (e==30){
-      std::cerr << "Exception from void SuperMELA::readBkgParsFromFile(std::vector<double> apars ). Mismatched number of params of qqZZ shape read from card file " << fCardName.c_str() << " ---> " << nFound << " (it should be " << nPars << std::endl;
-      for (unsigned int j=0; j<apars.size(); j++){ std::cerr << apars[j] << "   " << std::flush; }
-      std::cerr << endl;
+      MELAerr << "Exception from void SuperMELA::readBkgParsFromFile(vector<double> apars ). Mismatched number of params of qqZZ shape read from card file " << fCardName.c_str() << " ---> " << nFound << " (it should be " << nPars << endl;
+      for (unsigned int j=0; j<apars.size(); j++){ MELAerr << apars[j] << "   " << flush; }
+      MELAerr << endl;
     }
   }
   card.close();
@@ -518,12 +535,12 @@ void SuperMELA::calc_mZZ_range(const double mHVal, double& low_M, double& high_M
 #ifdef _melapkgpathstr_
   const string MELAPKGPATH = _melapkgpathstr_;
 #else
-  cout << "SuperMELA::calc_mZZ_range: MELA package path is undefined! Please modify the makefle or the makefile-equivalent!" << endl;
+  MELAout << "SuperMELA::calc_mZZ_range: MELA package path is undefined! Please modify the makefle or the makefile-equivalent!" << endl;
   assert(0);
 #endif
   string path = MELAPKGPATH + "data/HiggsTotalWidth_YR3.txt";
 
-  path.erase((std::find(path.rbegin(), path.rend(), '/').base()), path.end());
+  path.erase((find(path.rbegin(), path.rend(), '/').base()), path.end());
   MELAHXSWidth myCSW(path.c_str());
   double widthHVal =  myCSW.HiggsWidth(mHVal);
   double windowVal = max(widthHVal, 1.);
@@ -535,28 +552,28 @@ void SuperMELA::calc_mZZ_range(const double mHVal, double& low_M, double& high_M
   high_M = int(min((mHVal + 15.*windowVal), sqrts_*1000.)+0.5);
 }
 
-std::pair<double, double> SuperMELA::M4lProb(double m4l){
+pair<double, double> SuperMELA::M4lProb(double m4l){
   double Psig =-1.;
   double Pbkg =-1.;
   if (m4l<lowMH_ || m4l>highMH_){
-    if (verbose_) std::cerr << "SuperMELA::M4lProb: m4l = " << m4l << " outside range [" << lowMH_ << ", " << highMH_ << "]. Setting SuperMELA to dummy values." << std::endl;
+    if (verbose_) MELAerr << "SuperMELA::M4lProb: m4l = " << m4l << " outside range [" << lowMH_ << ", " << highMH_ << "]. Setting SuperMELA to dummy values." << endl;
   }
   else{
     m4l_rrv_->setVal(m4l);
     Psig=sig_CB_->getVal() / norm_sig_CB_;
     Pbkg=qqZZ_pdf_->getVal() / norm_bkg_qqZZ_;
     if (verbose_){
-      std::cout << "SuperMELA::M4lProb: m4l = " << m4l
+      MELAout << "SuperMELA::M4lProb: m4l = " << m4l
         << ", m4lPsig = " << Psig
         << ", m4lPbkg = " << Pbkg
-        << std::endl;
+        << endl;
     }
   }
   return make_pair(Psig, Pbkg);
 }
 
 
-std::pair<double, double> SuperMELA::M4lProb(std::pair<double, double> m4lPair){
+pair<double, double> SuperMELA::M4lProb(pair<double, double> m4lPair){
   double Psig =-1.;
   double Pbkg =-1.;
   if (
@@ -564,7 +581,7 @@ std::pair<double, double> SuperMELA::M4lProb(std::pair<double, double> m4lPair){
     ||
     (m4lPair.second<lowMH_ || m4lPair.second>highMH_)
     ){
-    if (verbose_) std::cerr << "SuperMELA::M4lProb: m4l pairs " << m4lPair.first << " - " << m4lPair.second << " outside range [" << lowMH_ << ", " << highMH_ << "]. Setting SuperMELA to dummy values." << std::endl;
+    if (verbose_) MELAerr << "SuperMELA::M4lProb: m4l pairs " << m4lPair.first << " - " << m4lPair.second << " outside range [" << lowMH_ << ", " << highMH_ << "]. Setting SuperMELA to dummy values." << endl;
   }
   else{
     m4l_rrv_->setVal(m4lPair.first);
@@ -572,10 +589,10 @@ std::pair<double, double> SuperMELA::M4lProb(std::pair<double, double> m4lPair){
     m4l_rrv_->setVal(m4lPair.second);
     Pbkg=qqZZ_pdf_->getVal() / norm_bkg_qqZZ_;
     if (verbose_){
-      std::cout << "SuperMELA::M4lProb: "
+      MELAout << "SuperMELA::M4lProb: "
         << "m4lPsig(" << m4lPair.first << ") = " << Psig
         << ", m4lPbkg(" << m4lPair.second << ") = " << Pbkg
-        << std::endl;
+        << endl;
     }
   }
   return make_pair(Psig, Pbkg);
@@ -588,7 +605,7 @@ bool SuperMELA::checkChannel(){
     }
   }
   catch (int e){
-    std::cerr << "Exception " << e << " from SuperMELA::SetDecayChannel(string myChan). Unrecognized string for decay channel: " << strChan_.c_str() << std::endl;
+    MELAerr << "Exception " << e << " from SuperMELA::SetDecayChannel(string myChan). Unrecognized string for decay channel: " << strChan_.c_str() << endl;
     return false;
   }
 

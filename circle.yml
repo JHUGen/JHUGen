@@ -34,9 +34,9 @@ machine:
     ROOT_VERSIONPART3: "08"
     ROOT_VERSIONSTRING: "${ROOT_VERSIONPART1}.${ROOT_VERSIONPART2}/${ROOT_VERSIONPART3}"
 
-    REFERENCE_LHES_USERNAME: "hroskes"
-    REFERENCE_LHES_BUILD_NUMBER: "879"
-    REFERENCE_JHUGEN_VERSION: "v7.0.4"
+    REFERENCE_LHES_USERNAME: "JHUGen"
+    REFERENCE_LHES_BUILD_NUMBER: "401"
+    REFERENCE_JHUGEN_VERSION: "v7.0.9"
 
     REFERENCE_LHES_FOLDER: "$(echo https://circleci.com/api/v1/project/$REFERENCE_LHES_USERNAME/JHUGen/$REFERENCE_LHES_BUILD_NUMBER/'artifacts/0/$CIRCLE_ARTIFACTS/reference')"
     REFERENCE_FILENAMES: "ggH_ZZ.lhe ggH_WW.lhe ggH_Zgamma.lhe ggH_gammagamma.lhe spin1_ZZ.lhe spin1_WW.lhe gg_spin2_ZZ.lhe qq_spin2_WW.lhe gg_spin2_Zgamma.lhe qq_spin2_gammagamma.lhe ZH_bb.lhe WH_Zgamma.lhe ee_gammaH_bb.lhe VBF_ZZ.lhe HJJ_WW.lhe HJ_gammagamma.lhe ttH_tautau.lhe gg_bbH_tautau.lhe qq_bbH.lhe tqH_110.lhe tqH_111.lhe tqH_112.lhe tqH_113.lhe tqH_114.lhe"
@@ -185,6 +185,7 @@ test:
     - make
     #check sync between generator and MELA
     - sdiff -s mod_Graviton.F90 ../JHUGenMELAv2/MELA/fortran/mod_Graviton.F90
+    - sdiff -s mod_HashCollection.F90 ../JHUGenMELAv2/MELA/fortran/mod_HashCollection.F90
     - sdiff -s mod_Higgs.F90 ../JHUGenMELAv2/MELA/fortran/mod_Higgs.F90
     - sdiff -s mod_HiggsJ.F90 ../JHUGenMELAv2/MELA/fortran/mod_HiggsJ.F90
     - sdiff -s mod_HiggsJJ.F90 ../JHUGenMELAv2/MELA/fortran/mod_HiggsJJ.F90
@@ -451,14 +452,14 @@ test:
       cd ../JHUGenMELAv2/MELA/test &&
       echo ".L testME_v2.c+" | root -l -b loadMELA.C &&  #won't compile if loaded from python, have to compile first in plain root
       ./testME_all.py
-    - |
-      cd ../JHUGenMELAv2/MELA/test &&
-      ./testME_more.py
       exitstatus=$?
-      if [ exitstatus -ne 0 ]; then
+      if [ $exitstatus -ne 0 ]; then
         mv ../JHUGenMELAv2/MELA/test/*.out $CIRCLE_ARTIFACTS/MELA/
       fi
       exit $exitstatus
+    - |
+      cd ../JHUGenMELAv2/MELA/test &&
+      ./testME_more.py
 
   post:
     - |

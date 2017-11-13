@@ -179,6 +179,8 @@ TUtil::MCFM_chooser: Setup is (production, process)=(ZZGG, bkgWWZZ_SMHiggs)
 TUtil::MCFM_SetupParticleCouplings(ZZGG, bkgWWZZ_SMHiggs):
 Initial configuration is WW.
 TUtil::MCFM_SetupParticleCouplings: Found a Z1 and a Z2 in WW.
+- Setting Z1->ll couplings.
+- Setting Z2->nn couplings.
 TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	runstring=test
 	Process found a Z1.
@@ -324,6 +326,8 @@ TUtil::MCFM_chooser: Setup is (production, process)=(ZZGG, bkgWWZZ)
 TUtil::MCFM_SetupParticleCouplings(ZZGG, bkgWWZZ):
 Initial configuration is WW.
 TUtil::MCFM_SetupParticleCouplings: Found a Z1 and a Z2 in WW.
+- Setting Z1->ll couplings.
+- Setting Z2->nn couplings.
 TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	runstring=test
 	Process found a Z1.
@@ -469,6 +473,8 @@ TUtil::MCFM_chooser: Setup is (production, process)=(ZZGG, HSMHiggs_WWZZ)
 TUtil::MCFM_SetupParticleCouplings(ZZGG, HSMHiggs_WWZZ):
 Initial configuration is WW.
 TUtil::MCFM_SetupParticleCouplings: Found a Z1 and a Z2 in WW.
+- Setting Z1->ll couplings.
+- Setting Z2->nn couplings.
 TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	runstring=test
 	Process found a Z1.
@@ -614,6 +620,8 @@ TUtil::MCFM_chooser: Setup is (production, process)=(ZZGG, bkgWW_SMHiggs)
 TUtil::MCFM_SetupParticleCouplings(ZZGG, bkgWW_SMHiggs):
 Initial configuration is WW.
 TUtil::MCFM_SetupParticleCouplings: Found a Z1 and a Z2 in WW.
+- Setting Z1->ll couplings.
+- Setting Z2->nn couplings.
 TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	runstring=test_ww
 	Process found a Z1.
@@ -759,6 +767,8 @@ TUtil::MCFM_chooser: Setup is (production, process)=(ZZGG, bkgWW)
 TUtil::MCFM_SetupParticleCouplings(ZZGG, bkgWW):
 Initial configuration is WW.
 TUtil::MCFM_SetupParticleCouplings: Found a Z1 and a Z2 in WW.
+- Setting Z1->ll couplings.
+- Setting Z2->nn couplings.
 TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	runstring=test_ww
 	Process found a Z1.
@@ -904,6 +914,8 @@ TUtil::MCFM_chooser: Setup is (production, process)=(ZZGG, HSMHiggs)
 TUtil::MCFM_SetupParticleCouplings(ZZGG, HSMHiggs):
 Initial configuration is WW.
 TUtil::MCFM_SetupParticleCouplings: Found a Z1 and a Z2 in WW.
+- Setting Z1->ll couplings.
+- Setting Z2->nn couplings.
 TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	runstring=test_ww
 	Process found a Z1.
@@ -1049,6 +1061,8 @@ TUtil::MCFM_chooser: Setup is (production, process)=(ZZGG, HSMHiggs)
 TUtil::MCFM_SetupParticleCouplings(ZZGG, HSMHiggs):
 Initial configuration is WW.
 TUtil::MCFM_SetupParticleCouplings: Found a Z1 and a Z2 in WW.
+- Setting Z1->ll couplings.
+- Setting Z2->nn couplings.
 TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	runstring=test_ww
 	Process found a Z1.
@@ -1194,6 +1208,8 @@ TUtil::MCFM_chooser: Setup is (production, process)=(ZZGG, HSMHiggs)
 TUtil::MCFM_SetupParticleCouplings(ZZGG, HSMHiggs):
 Initial configuration is WW.
 TUtil::MCFM_SetupParticleCouplings: Found a Z1 and a Z2 in WW.
+- Setting Z1->ll couplings.
+- Setting Z2->nn couplings.
 TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	runstring=test_ww
 	Process found a Z1.
@@ -1339,6 +1355,8 @@ TUtil::MCFM_chooser: Setup is (production, process)=(ZZGG, HSMHiggs)
 TUtil::MCFM_SetupParticleCouplings(ZZGG, HSMHiggs):
 Initial configuration is WW.
 TUtil::MCFM_SetupParticleCouplings: Found a Z1 and a Z2 in WW.
+- Setting Z1->ll couplings.
+- Setting Z2->nn couplings.
 TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	runstring=test_ww
 	Process found a Z1.
@@ -1484,6 +1502,8 @@ TUtil::MCFM_chooser: Setup is (production, process)=(ZZGG, HSMHiggs)
 TUtil::MCFM_SetupParticleCouplings(ZZGG, HSMHiggs):
 Initial configuration is WW.
 TUtil::MCFM_SetupParticleCouplings: Found a Z1 and a Z2 in WW.
+- Setting Z1->ll couplings.
+- Setting Z2->nn couplings.
 TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	runstring=test_ww
 	Process found a Z1.
@@ -1629,6 +1649,8 @@ TUtil::MCFM_chooser: Setup is (production, process)=(ZZGG, HSMHiggs)
 TUtil::MCFM_SetupParticleCouplings(ZZGG, HSMHiggs):
 Initial configuration is WW.
 TUtil::MCFM_SetupParticleCouplings: Found a Z1 and a Z2 in WW.
+- Setting Z1->ll couplings.
+- Setting Z2->nn couplings.
 TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	runstring=test_ww
 	Process found a Z1.
@@ -1774,6 +1796,8 @@ TUtil::MCFM_chooser: Setup is (production, process)=(ZZGG, HSMHiggs)
 TUtil::MCFM_SetupParticleCouplings(ZZGG, HSMHiggs):
 Initial configuration is WW.
 TUtil::MCFM_SetupParticleCouplings: Found a Z1 and a Z2 in WW.
+- Setting Z1->ll couplings.
+- Setting Z2->nn couplings.
 TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	runstring=test_ww
 	Process found a Z1.
@@ -1919,6 +1943,8 @@ TUtil::MCFM_chooser: Setup is (production, process)=(ZZGG, HSMHiggs)
 TUtil::MCFM_SetupParticleCouplings(ZZGG, HSMHiggs):
 Initial configuration is WW.
 TUtil::MCFM_SetupParticleCouplings: Found a Z1 and a Z2 in WW.
+- Setting Z1->ll couplings.
+- Setting Z2->nn couplings.
 TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	runstring=test_ww
 	Process found a Z1.
@@ -2064,6 +2090,8 @@ TUtil::MCFM_chooser: Setup is (production, process)=(ZZGG, HSMHiggs)
 TUtil::MCFM_SetupParticleCouplings(ZZGG, HSMHiggs):
 Initial configuration is WW.
 TUtil::MCFM_SetupParticleCouplings: Found a Z1 and a Z2 in WW.
+- Setting Z1->ll couplings.
+- Setting Z2->nn couplings.
 TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	runstring=test_ww
 	Process found a Z1.
@@ -2209,6 +2237,8 @@ TUtil::MCFM_chooser: Setup is (production, process)=(ZZGG, HSMHiggs)
 TUtil::MCFM_SetupParticleCouplings(ZZGG, HSMHiggs):
 Initial configuration is WW.
 TUtil::MCFM_SetupParticleCouplings: Found a Z1 and a Z2 in WW.
+- Setting Z1->ll couplings.
+- Setting Z2->nn couplings.
 TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	runstring=test_ww
 	Process found a Z1.
@@ -2354,6 +2384,8 @@ TUtil::MCFM_chooser: Setup is (production, process)=(ZZGG, HSMHiggs)
 TUtil::MCFM_SetupParticleCouplings(ZZGG, HSMHiggs):
 Initial configuration is WW.
 TUtil::MCFM_SetupParticleCouplings: Found a Z1 and a Z2 in WW.
+- Setting Z1->ll couplings.
+- Setting Z2->nn couplings.
 TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	runstring=test_ww
 	Process found a Z1.
@@ -2499,6 +2531,8 @@ TUtil::MCFM_chooser: Setup is (production, process)=(ZZGG, HSMHiggs)
 TUtil::MCFM_SetupParticleCouplings(ZZGG, HSMHiggs):
 Initial configuration is WW.
 TUtil::MCFM_SetupParticleCouplings: Found a Z1 and a Z2 in WW.
+- Setting Z1->ll couplings.
+- Setting Z2->nn couplings.
 TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	runstring=test_ww
 	Process found a Z1.
@@ -2644,6 +2678,8 @@ TUtil::MCFM_chooser: Setup is (production, process)=(ZZGG, HSMHiggs)
 TUtil::MCFM_SetupParticleCouplings(ZZGG, HSMHiggs):
 Initial configuration is WW.
 TUtil::MCFM_SetupParticleCouplings: Found a Z1 and a Z2 in WW.
+- Setting Z1->ll couplings.
+- Setting Z2->nn couplings.
 TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	runstring=test_ww
 	Process found a Z1.
@@ -2789,6 +2825,8 @@ TUtil::MCFM_chooser: Setup is (production, process)=(ZZGG, HSMHiggs)
 TUtil::MCFM_SetupParticleCouplings(ZZGG, HSMHiggs):
 Initial configuration is WW.
 TUtil::MCFM_SetupParticleCouplings: Found a Z1 and a Z2 in WW.
+- Setting Z1->ll couplings.
+- Setting Z2->nn couplings.
 TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	runstring=test_ww
 	Process found a Z1.
@@ -3776,8 +3814,10 @@ TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-0
 TUtil::MCFM_chooser: isWW=0, isZZ=1, hasZZ4fInterf=0
 TUtil::MCFM_chooser: Setup is (production, process)=(ZZGG, bkgWWZZ_SMHiggs)
 TUtil::MCFM_SetupParticleCouplings(ZZGG, bkgWWZZ_SMHiggs):
-Initial configuration is ZZ.
+Initial configuration is ZZ, ZJJ.
 TUtil::MCFM_SetupParticleCouplings: Found a W1(24) and a W2(-24) in ZZ.
+- Setting Z1->ll couplings.
+- Setting Z2->nn couplings.
 TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	runstring=test
 	Process found a Z1.
@@ -3921,8 +3961,10 @@ TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-0
 TUtil::MCFM_chooser: isWW=0, isZZ=1, hasZZ4fInterf=0
 TUtil::MCFM_chooser: Setup is (production, process)=(ZZGG, bkgWWZZ)
 TUtil::MCFM_SetupParticleCouplings(ZZGG, bkgWWZZ):
-Initial configuration is ZZ.
+Initial configuration is ZZ, ZJJ.
 TUtil::MCFM_SetupParticleCouplings: Found a W1(24) and a W2(-24) in ZZ.
+- Setting Z1->ll couplings.
+- Setting Z2->nn couplings.
 TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	runstring=test
 	Process found a Z1.
@@ -4066,8 +4108,10 @@ TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-0
 TUtil::MCFM_chooser: isWW=0, isZZ=1, hasZZ4fInterf=0
 TUtil::MCFM_chooser: Setup is (production, process)=(ZZGG, HSMHiggs_WWZZ)
 TUtil::MCFM_SetupParticleCouplings(ZZGG, HSMHiggs_WWZZ):
-Initial configuration is ZZ.
+Initial configuration is ZZ, ZJJ.
 TUtil::MCFM_SetupParticleCouplings: Found a W1(24) and a W2(-24) in ZZ.
+- Setting Z1->ll couplings.
+- Setting Z2->nn couplings.
 TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	runstring=test
 	Process found a Z1.
@@ -4211,8 +4255,10 @@ TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-0
 TUtil::MCFM_chooser: isWW=0, isZZ=1, hasZZ4fInterf=0
 TUtil::MCFM_chooser: Setup is (production, process)=(ZZGG, bkgZZ_SMHiggs)
 TUtil::MCFM_SetupParticleCouplings(ZZGG, bkgZZ_SMHiggs):
-Initial configuration is ZZ.
+Initial configuration is ZZ, ZJJ.
 TUtil::MCFM_SetupParticleCouplings: Found a W1(24) and a W2(-24) in ZZ.
+- Setting Z1->ll couplings.
+- Setting Z2->nn couplings.
 TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	runstring=test
 	Process found a Z1.
@@ -4356,8 +4402,10 @@ TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-0
 TUtil::MCFM_chooser: isWW=0, isZZ=1, hasZZ4fInterf=0
 TUtil::MCFM_chooser: Setup is (production, process)=(ZZGG, bkgZZ)
 TUtil::MCFM_SetupParticleCouplings(ZZGG, bkgZZ):
-Initial configuration is ZZ.
+Initial configuration is ZZ, ZJJ.
 TUtil::MCFM_SetupParticleCouplings: Found a W1(24) and a W2(-24) in ZZ.
+- Setting Z1->ll couplings.
+- Setting Z2->nn couplings.
 TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	runstring=test
 	Process found a Z1.
@@ -4501,8 +4549,10 @@ TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-0
 TUtil::MCFM_chooser: isWW=0, isZZ=1, hasZZ4fInterf=0
 TUtil::MCFM_chooser: Setup is (production, process)=(ZZGG, HSMHiggs)
 TUtil::MCFM_SetupParticleCouplings(ZZGG, HSMHiggs):
-Initial configuration is ZZ.
+Initial configuration is ZZ, ZJJ.
 TUtil::MCFM_SetupParticleCouplings: Found a W1(24) and a W2(-24) in ZZ.
+- Setting Z1->ll couplings.
+- Setting Z2->nn couplings.
 TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	runstring=test
 	Process found a Z1.
@@ -4646,8 +4696,10 @@ TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-0
 TUtil::MCFM_chooser: isWW=0, isZZ=1, hasZZ4fInterf=0
 TUtil::MCFM_chooser: Setup is (production, process)=(ZZGG, HSMHiggs)
 TUtil::MCFM_SetupParticleCouplings(ZZGG, HSMHiggs):
-Initial configuration is ZZ.
+Initial configuration is ZZ, ZJJ.
 TUtil::MCFM_SetupParticleCouplings: Found a W1(24) and a W2(-24) in ZZ.
+- Setting Z1->ll couplings.
+- Setting Z2->nn couplings.
 TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	runstring=test
 	Process found a Z1.
@@ -4791,8 +4843,10 @@ TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-0
 TUtil::MCFM_chooser: isWW=0, isZZ=1, hasZZ4fInterf=0
 TUtil::MCFM_chooser: Setup is (production, process)=(ZZGG, HSMHiggs)
 TUtil::MCFM_SetupParticleCouplings(ZZGG, HSMHiggs):
-Initial configuration is ZZ.
+Initial configuration is ZZ, ZJJ.
 TUtil::MCFM_SetupParticleCouplings: Found a W1(24) and a W2(-24) in ZZ.
+- Setting Z1->ll couplings.
+- Setting Z2->nn couplings.
 TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	runstring=test
 	Process found a Z1.
@@ -4936,8 +4990,10 @@ TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-0
 TUtil::MCFM_chooser: isWW=0, isZZ=1, hasZZ4fInterf=0
 TUtil::MCFM_chooser: Setup is (production, process)=(ZZGG, HSMHiggs)
 TUtil::MCFM_SetupParticleCouplings(ZZGG, HSMHiggs):
-Initial configuration is ZZ.
+Initial configuration is ZZ, ZJJ.
 TUtil::MCFM_SetupParticleCouplings: Found a W1(24) and a W2(-24) in ZZ.
+- Setting Z1->ll couplings.
+- Setting Z2->nn couplings.
 TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	runstring=test
 	Process found a Z1.
@@ -5081,8 +5137,10 @@ TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-0
 TUtil::MCFM_chooser: isWW=0, isZZ=1, hasZZ4fInterf=0
 TUtil::MCFM_chooser: Setup is (production, process)=(ZZGG, HSMHiggs)
 TUtil::MCFM_SetupParticleCouplings(ZZGG, HSMHiggs):
-Initial configuration is ZZ.
+Initial configuration is ZZ, ZJJ.
 TUtil::MCFM_SetupParticleCouplings: Found a W1(24) and a W2(-24) in ZZ.
+- Setting Z1->ll couplings.
+- Setting Z2->nn couplings.
 TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	runstring=test
 	Process found a Z1.
@@ -5226,8 +5284,10 @@ TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-0
 TUtil::MCFM_chooser: isWW=0, isZZ=1, hasZZ4fInterf=0
 TUtil::MCFM_chooser: Setup is (production, process)=(ZZGG, HSMHiggs)
 TUtil::MCFM_SetupParticleCouplings(ZZGG, HSMHiggs):
-Initial configuration is ZZ.
+Initial configuration is ZZ, ZJJ.
 TUtil::MCFM_SetupParticleCouplings: Found a W1(24) and a W2(-24) in ZZ.
+- Setting Z1->ll couplings.
+- Setting Z2->nn couplings.
 TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	runstring=test
 	Process found a Z1.
@@ -5371,8 +5431,10 @@ TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-0
 TUtil::MCFM_chooser: isWW=0, isZZ=1, hasZZ4fInterf=0
 TUtil::MCFM_chooser: Setup is (production, process)=(ZZGG, HSMHiggs)
 TUtil::MCFM_SetupParticleCouplings(ZZGG, HSMHiggs):
-Initial configuration is ZZ.
+Initial configuration is ZZ, ZJJ.
 TUtil::MCFM_SetupParticleCouplings: Found a W1(24) and a W2(-24) in ZZ.
+- Setting Z1->ll couplings.
+- Setting Z2->nn couplings.
 TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	runstring=test
 	Process found a Z1.
@@ -5516,8 +5578,10 @@ TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-0
 TUtil::MCFM_chooser: isWW=0, isZZ=1, hasZZ4fInterf=0
 TUtil::MCFM_chooser: Setup is (production, process)=(ZZGG, HSMHiggs)
 TUtil::MCFM_SetupParticleCouplings(ZZGG, HSMHiggs):
-Initial configuration is ZZ.
+Initial configuration is ZZ, ZJJ.
 TUtil::MCFM_SetupParticleCouplings: Found a W1(24) and a W2(-24) in ZZ.
+- Setting Z1->ll couplings.
+- Setting Z2->nn couplings.
 TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	runstring=test
 	Process found a Z1.
@@ -5661,8 +5725,10 @@ TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-0
 TUtil::MCFM_chooser: isWW=0, isZZ=1, hasZZ4fInterf=0
 TUtil::MCFM_chooser: Setup is (production, process)=(ZZGG, HSMHiggs)
 TUtil::MCFM_SetupParticleCouplings(ZZGG, HSMHiggs):
-Initial configuration is ZZ.
+Initial configuration is ZZ, ZJJ.
 TUtil::MCFM_SetupParticleCouplings: Found a W1(24) and a W2(-24) in ZZ.
+- Setting Z1->ll couplings.
+- Setting Z2->nn couplings.
 TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	runstring=test
 	Process found a Z1.
@@ -5806,8 +5872,10 @@ TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-0
 TUtil::MCFM_chooser: isWW=0, isZZ=1, hasZZ4fInterf=0
 TUtil::MCFM_chooser: Setup is (production, process)=(ZZGG, HSMHiggs)
 TUtil::MCFM_SetupParticleCouplings(ZZGG, HSMHiggs):
-Initial configuration is ZZ.
+Initial configuration is ZZ, ZJJ.
 TUtil::MCFM_SetupParticleCouplings: Found a W1(24) and a W2(-24) in ZZ.
+- Setting Z1->ll couplings.
+- Setting Z2->nn couplings.
 TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	runstring=test
 	Process found a Z1.
@@ -5951,8 +6019,10 @@ TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-0
 TUtil::MCFM_chooser: isWW=0, isZZ=1, hasZZ4fInterf=0
 TUtil::MCFM_chooser: Setup is (production, process)=(ZZGG, HSMHiggs)
 TUtil::MCFM_SetupParticleCouplings(ZZGG, HSMHiggs):
-Initial configuration is ZZ.
+Initial configuration is ZZ, ZJJ.
 TUtil::MCFM_SetupParticleCouplings: Found a W1(24) and a W2(-24) in ZZ.
+- Setting Z1->ll couplings.
+- Setting Z2->nn couplings.
 TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	runstring=test
 	Process found a Z1.
@@ -6096,8 +6166,10 @@ TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-0
 TUtil::MCFM_chooser: isWW=0, isZZ=1, hasZZ4fInterf=0
 TUtil::MCFM_chooser: Setup is (production, process)=(ZZGG, HSMHiggs)
 TUtil::MCFM_SetupParticleCouplings(ZZGG, HSMHiggs):
-Initial configuration is ZZ.
+Initial configuration is ZZ, ZJJ.
 TUtil::MCFM_SetupParticleCouplings: Found a W1(24) and a W2(-24) in ZZ.
+- Setting Z1->ll couplings.
+- Setting Z2->nn couplings.
 TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	runstring=test
 	Process found a Z1.
@@ -6241,8 +6313,10 @@ TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-0
 TUtil::MCFM_chooser: isWW=0, isZZ=1, hasZZ4fInterf=0
 TUtil::MCFM_chooser: Setup is (production, process)=(ZZGG, HSMHiggs)
 TUtil::MCFM_SetupParticleCouplings(ZZGG, HSMHiggs):
-Initial configuration is ZZ.
+Initial configuration is ZZ, ZJJ.
 TUtil::MCFM_SetupParticleCouplings: Found a W1(24) and a W2(-24) in ZZ.
+- Setting Z1->ll couplings.
+- Setting Z2->nn couplings.
 TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	runstring=test
 	Process found a Z1.
@@ -6386,8 +6460,10 @@ TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-0
 TUtil::MCFM_chooser: isWW=0, isZZ=1, hasZZ4fInterf=0
 TUtil::MCFM_chooser: Setup is (production, process)=(ZZGG, HSMHiggs)
 TUtil::MCFM_SetupParticleCouplings(ZZGG, HSMHiggs):
-Initial configuration is ZZ.
+Initial configuration is ZZ, ZJJ.
 TUtil::MCFM_SetupParticleCouplings: Found a W1(24) and a W2(-24) in ZZ.
+- Setting Z1->ll couplings.
+- Setting Z2->nn couplings.
 TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	runstring=test
 	Process found a Z1.
@@ -6531,8 +6607,10 @@ TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-0
 TUtil::MCFM_chooser: isWW=0, isZZ=1, hasZZ4fInterf=0
 TUtil::MCFM_chooser: Setup is (production, process)=(ZZGG, HSMHiggs)
 TUtil::MCFM_SetupParticleCouplings(ZZGG, HSMHiggs):
-Initial configuration is ZZ.
+Initial configuration is ZZ, ZJJ.
 TUtil::MCFM_SetupParticleCouplings: Found a W1(24) and a W2(-24) in ZZ.
+- Setting Z1->ll couplings.
+- Setting Z2->nn couplings.
 TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	runstring=test
 	Process found a Z1.
@@ -6676,8 +6754,10 @@ TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-0
 TUtil::MCFM_chooser: isWW=0, isZZ=1, hasZZ4fInterf=0
 TUtil::MCFM_chooser: Setup is (production, process)=(ZZGG, HSMHiggs)
 TUtil::MCFM_SetupParticleCouplings(ZZGG, HSMHiggs):
-Initial configuration is ZZ.
+Initial configuration is ZZ, ZJJ.
 TUtil::MCFM_SetupParticleCouplings: Found a W1(24) and a W2(-24) in ZZ.
+- Setting Z1->ll couplings.
+- Setting Z2->nn couplings.
 TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	runstring=test
 	Process found a Z1.
@@ -6821,8 +6901,10 @@ TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-0
 TUtil::MCFM_chooser: isWW=0, isZZ=1, hasZZ4fInterf=0
 TUtil::MCFM_chooser: Setup is (production, process)=(ZZGG, HSMHiggs)
 TUtil::MCFM_SetupParticleCouplings(ZZGG, HSMHiggs):
-Initial configuration is ZZ.
+Initial configuration is ZZ, ZJJ.
 TUtil::MCFM_SetupParticleCouplings: Found a W1(24) and a W2(-24) in ZZ.
+- Setting Z1->ll couplings.
+- Setting Z2->nn couplings.
 TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	runstring=test
 	Process found a Z1.
@@ -6966,8 +7048,10 @@ TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-0
 TUtil::MCFM_chooser: isWW=0, isZZ=1, hasZZ4fInterf=0
 TUtil::MCFM_chooser: Setup is (production, process)=(ZZGG, HSMHiggs)
 TUtil::MCFM_SetupParticleCouplings(ZZGG, HSMHiggs):
-Initial configuration is ZZ.
+Initial configuration is ZZ, ZJJ.
 TUtil::MCFM_SetupParticleCouplings: Found a W1(24) and a W2(-24) in ZZ.
+- Setting Z1->ll couplings.
+- Setting Z2->nn couplings.
 TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	runstring=test
 	Process found a Z1.
@@ -7111,8 +7195,10 @@ TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-0
 TUtil::MCFM_chooser: isWW=0, isZZ=1, hasZZ4fInterf=0
 TUtil::MCFM_chooser: Setup is (production, process)=(ZZGG, HSMHiggs)
 TUtil::MCFM_SetupParticleCouplings(ZZGG, HSMHiggs):
-Initial configuration is ZZ.
+Initial configuration is ZZ, ZJJ.
 TUtil::MCFM_SetupParticleCouplings: Found a W1(24) and a W2(-24) in ZZ.
+- Setting Z1->ll couplings.
+- Setting Z2->nn couplings.
 TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	runstring=test
 	Process found a Z1.
@@ -7256,8 +7342,10 @@ TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-0
 TUtil::MCFM_chooser: isWW=0, isZZ=1, hasZZ4fInterf=0
 TUtil::MCFM_chooser: Setup is (production, process)=(ZZGG, HSMHiggs)
 TUtil::MCFM_SetupParticleCouplings(ZZGG, HSMHiggs):
-Initial configuration is ZZ.
+Initial configuration is ZZ, ZJJ.
 TUtil::MCFM_SetupParticleCouplings: Found a W1(24) and a W2(-24) in ZZ.
+- Setting Z1->ll couplings.
+- Setting Z2->nn couplings.
 TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	runstring=test
 	Process found a Z1.
@@ -7401,8 +7489,10 @@ TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-0
 TUtil::MCFM_chooser: isWW=0, isZZ=1, hasZZ4fInterf=0
 TUtil::MCFM_chooser: Setup is (production, process)=(ZZGG, HSMHiggs)
 TUtil::MCFM_SetupParticleCouplings(ZZGG, HSMHiggs):
-Initial configuration is ZZ.
+Initial configuration is ZZ, ZJJ.
 TUtil::MCFM_SetupParticleCouplings: Found a W1(24) and a W2(-24) in ZZ.
+- Setting Z1->ll couplings.
+- Setting Z2->nn couplings.
 TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	runstring=test
 	Process found a Z1.
@@ -7546,8 +7636,10 @@ TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-0
 TUtil::MCFM_chooser: isWW=0, isZZ=1, hasZZ4fInterf=0
 TUtil::MCFM_chooser: Setup is (production, process)=(ZZGG, HSMHiggs)
 TUtil::MCFM_SetupParticleCouplings(ZZGG, HSMHiggs):
-Initial configuration is ZZ.
+Initial configuration is ZZ, ZJJ.
 TUtil::MCFM_SetupParticleCouplings: Found a W1(24) and a W2(-24) in ZZ.
+- Setting Z1->ll couplings.
+- Setting Z2->nn couplings.
 TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	runstring=test
 	Process found a Z1.
@@ -7691,8 +7783,10 @@ TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-0
 TUtil::MCFM_chooser: isWW=0, isZZ=1, hasZZ4fInterf=0
 TUtil::MCFM_chooser: Setup is (production, process)=(ZZGG, HSMHiggs)
 TUtil::MCFM_SetupParticleCouplings(ZZGG, HSMHiggs):
-Initial configuration is ZZ.
+Initial configuration is ZZ, ZJJ.
 TUtil::MCFM_SetupParticleCouplings: Found a W1(24) and a W2(-24) in ZZ.
+- Setting Z1->ll couplings.
+- Setting Z2->nn couplings.
 TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	runstring=test
 	Process found a Z1.
@@ -7836,8 +7930,10 @@ TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-0
 TUtil::MCFM_chooser: isWW=0, isZZ=1, hasZZ4fInterf=0
 TUtil::MCFM_chooser: Setup is (production, process)=(ZZGG, HSMHiggs)
 TUtil::MCFM_SetupParticleCouplings(ZZGG, HSMHiggs):
-Initial configuration is ZZ.
+Initial configuration is ZZ, ZJJ.
 TUtil::MCFM_SetupParticleCouplings: Found a W1(24) and a W2(-24) in ZZ.
+- Setting Z1->ll couplings.
+- Setting Z2->nn couplings.
 TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	runstring=test
 	Process found a Z1.
@@ -7981,8 +8077,10 @@ TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-0
 TUtil::MCFM_chooser: isWW=0, isZZ=1, hasZZ4fInterf=0
 TUtil::MCFM_chooser: Setup is (production, process)=(ZZGG, HSMHiggs)
 TUtil::MCFM_SetupParticleCouplings(ZZGG, HSMHiggs):
-Initial configuration is ZZ.
+Initial configuration is ZZ, ZJJ.
 TUtil::MCFM_SetupParticleCouplings: Found a W1(24) and a W2(-24) in ZZ.
+- Setting Z1->ll couplings.
+- Setting Z2->nn couplings.
 TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	runstring=test
 	Process found a Z1.
@@ -8126,8 +8224,10 @@ TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-0
 TUtil::MCFM_chooser: isWW=0, isZZ=1, hasZZ4fInterf=0
 TUtil::MCFM_chooser: Setup is (production, process)=(ZZGG, HSMHiggs)
 TUtil::MCFM_SetupParticleCouplings(ZZGG, HSMHiggs):
-Initial configuration is ZZ.
+Initial configuration is ZZ, ZJJ.
 TUtil::MCFM_SetupParticleCouplings: Found a W1(24) and a W2(-24) in ZZ.
+- Setting Z1->ll couplings.
+- Setting Z2->nn couplings.
 TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	runstring=test
 	Process found a Z1.
@@ -10125,7 +10225,9 @@ TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-0
 TUtil::MCFM_chooser: isWW=0, isZZ=1, hasZZ4fInterf=0
 TUtil::MCFM_chooser: Setup is (production, process)=(ZZQQB, bkgZZ)
 TUtil::MCFM_SetupParticleCouplings(ZZQQB, bkgZZ):
-Initial configuration is ZZ.
+Initial configuration is ZZ, ZJJ.
+- Setting Z1->ll couplings.
+- Setting Z2->ll couplings.
 TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	runstring=test
 	Process found a Z1.
@@ -10260,14 +10362,15 @@ TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-0
 TUtil::MCFM_chooser: isWW=0, isZZ=1, hasZZ4fInterf=0
 TUtil::MCFM_chooser: Setup is (production, process)=(JJQCD, bkgZJets)
 TUtil::MCFM_SetupParticleCouplings(JJQCD, bkgZJets):
-Initial configuration is ZZ.
+Initial configuration is ZZ, ZJJ.
+- Setting Z1->ll couplings.
 TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	runstring=test
 	Process found a Z1.
 	Process found a Z2.
-	(l1, l2) = (-0.637605, -0.637605)
-	(r1, r2) = (0.548372, 0.548372)
-	(q1, q2) = (-1, -1)
+	(l1, l2) = (-0.637605, 0)
+	(r1, r2) = (0.548372, 0)
+	(q1, q2) = (-1, 0)
 	plabels:
 	[0]=ppppeleapppppp              
 	[1]=ppeleapppppp              
@@ -10395,7 +10498,9 @@ TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-0
 TUtil::MCFM_chooser: isWW=0, isZZ=1, hasZZ4fInterf=0
 TUtil::MCFM_chooser: Setup is (production, process)=(ZZGG, bkgZZ_SMHiggs)
 TUtil::MCFM_SetupParticleCouplings(ZZGG, bkgZZ_SMHiggs):
-Initial configuration is ZZ.
+Initial configuration is ZZ, ZJJ.
+- Setting Z1->ll couplings.
+- Setting Z2->ll couplings.
 TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	runstring=test
 	Process found a Z1.
@@ -10537,7 +10642,9 @@ TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-0
 TUtil::MCFM_chooser: isWW=0, isZZ=1, hasZZ4fInterf=0
 TUtil::MCFM_chooser: Setup is (production, process)=(ZZGG, bkgZZ)
 TUtil::MCFM_SetupParticleCouplings(ZZGG, bkgZZ):
-Initial configuration is ZZ.
+Initial configuration is ZZ, ZJJ.
+- Setting Z1->ll couplings.
+- Setting Z2->ll couplings.
 TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	runstring=test
 	Process found a Z1.
@@ -10679,7 +10786,9 @@ TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-0
 TUtil::MCFM_chooser: isWW=0, isZZ=1, hasZZ4fInterf=0
 TUtil::MCFM_chooser: Setup is (production, process)=(ZZGG, HSMHiggs)
 TUtil::MCFM_SetupParticleCouplings(ZZGG, HSMHiggs):
-Initial configuration is ZZ.
+Initial configuration is ZZ, ZJJ.
+- Setting Z1->ll couplings.
+- Setting Z2->ll couplings.
 TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	runstring=test
 	Process found a Z1.
@@ -10821,7 +10930,9 @@ TUtil::CheckPartonMomFraction: xx[0]: 0.000160041, xx[1] = 0.577649, xmin = 1e-0
 TUtil::MCFM_chooser: isWW=0, isZZ=1, hasZZ4fInterf=0
 TUtil::MCFM_chooser: Setup is (production, process)=(ZZGG, HSMHiggs)
 TUtil::MCFM_SetupParticleCouplings(ZZGG, HSMHiggs):
-Initial configuration is ZZ.
+Initial configuration is ZZ, ZJJ.
+- Setting Z1->ll couplings.
+- Setting Z2->ll couplings.
 TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	runstring=test
 	Process found a Z1.
@@ -10964,6 +11075,7 @@ TUtil::MCFM_chooser: isWW=0, isZZ=0, hasZZ4fInterf=0
 TUtil::MCFM_chooser: Setup is (production, process)=(ZZQQB, bkgZGamma)
 TUtil::MCFM_SetupParticleCouplings(ZZQQB, bkgZGamma):
 Initial configuration is ZG.
+- Setting Z1->ll couplings.
 TUtil::MCFM_SetupParticleCouplings: Summary (result=1):
 	runstring=test
 	Process found a Z1.
