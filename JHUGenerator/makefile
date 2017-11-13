@@ -194,9 +194,7 @@ ggVH5AmpDep = \
 
 
 # amplitude dependencies
-AmpDep =  mod_Parameters.F90 \
-          mod_Misc.F90 \
-          mod_TopDecay.F90 \
+AmpDep =  mod_TopDecay.F90 \
           mod_Graviton.F90 \
           mod_Higgs.F90 \
           mod_Zprime.F90 \
@@ -218,9 +216,7 @@ AuxObj =  $(ObjectDir)/mod_Parameters.o \
 
 
 # amplitude objects
-AmpObj =  $(ObjectDir)/mod_Parameters.o \
-          $(ObjectDir)/mod_Misc.o \
-          $(ObjectDir)/mod_TopDecay.o \
+AmpObj =  $(ObjectDir)/mod_TopDecay.o \
           $(ObjectDir)/mod_Graviton.o \
           $(ObjectDir)/mod_Higgs.o \
           $(ObjectDir)/mod_Zprime.o \
@@ -386,7 +382,7 @@ $(ggVH5AmpObj): $(ggVH5AmpDep) $(Makefile)
 	$(fcomp) -c $(ggVH5AmpDep)
 	mv *.o $(ObjectDir)
 
-$(AmpObj): $(AmpDep) mod_Misc.F90 mod_Parameters.F90 $(Makefile)
+$(AmpObj): $(AmpDep) $(Makefile)
 	@echo " compiling amplitude routines"
 	$(fcomp) -c $(AmpDep)
 	mv *.o $(ObjectDir)
