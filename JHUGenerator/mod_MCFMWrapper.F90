@@ -1148,13 +1148,14 @@ end subroutine
 
 ! This is so sketchy
 subroutine Set_MCFMCommon_DecayZCouple_Wrapper(idferm,whichZ)
+use ModMisc
 use ModParameters
 implicit none
 integer, intent(in) :: idferm
 integer, intent(in) :: whichZ
 logical :: isZlep,isZnu,isZup,isZdn
    if(idferm.eq.0) then
-      stop("Set_MCFMCommon_DecayZCouple_Wrapper: idferm=0 is not allowed.")
+      call Error("Set_MCFMCommon_DecayZCouple_Wrapper: idferm=0 is not allowed.")
    endif
    isZlep = IsALepton(idferm)
    isZnu = IsANeutrino(idferm)
