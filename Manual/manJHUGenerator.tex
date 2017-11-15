@@ -7,6 +7,7 @@
 \usepackage{float}
 % % \usepackage{cprotect}
 \usepackage{amsmath}
+\usepackage[hidelinks]{hyperref}
 
 % \textwidth18cm
 % \addtolength{\oddsidemargin}{-2cm}
@@ -20,26 +21,26 @@
 
 \title{
 \large
-Manual for the JHU generator
+Manual for the JHU generator and MELA package
 }
 \maketitle
 \begin{center}
 \small
-For simulation of a single-produced resonance at hadron colliders \\
+For simulation, reweighting, and analysis of a single-produced resonance at hadron colliders \\
 (version v7.0.9, release date Nov. 15, 2017, manual date Nov. 15, 2017) \\
 \normalsize
 \end{center}
 
 \noindent
 The generator from \cite{Gao:2010qx,Bolognesi:2012,Anderson:2013,Gritsan:2016} is a model-independent generator for studying spin and parity properties of new resonances.
-Please cite \cite{Gao:2010qx,Bolognesi:2012,Anderson:2013,Gritsan:2016} if using the "JHU generator".
+Please cite \cite{Gao:2010qx,Bolognesi:2012,Anderson:2013,Gritsan:2016} if using the ``JHU generator''.
 The code can be downloaded from \cite{thesite}.
 The generator outputs LHE files which can be passed to parton shower programs for hadronization.
 Only relative values of cross sections are supposed to produce meaningful results, while absolute values are often subject to an arbitrary normalization.
 
 Additionally, the package includes code for computing the matrix elements standalone which can be used in a numerical matrix element analysis.
-Please reference the above papers and refer to "MELA" when using the matrix element likelihood analysis technique.
-The latter was also introduced in Ref.~\cite{Chatrchyan:2012ufa}. The matrix element package (MELA) also depend on MCFM libraries for background parameterization which should be referenced~\cite{Campbell:2010ff} when used.
+Please reference the above papers and refer to ``MELA'' when using the matrix element likelihood approach.
+The latter was also introduced in Ref.~\cite{Chatrchyan:2012ufa}. The matrix element package (MELA) also depends on MCFM libraries for background parameterization which should be referenced~\cite{Campbell:2010ff} when used.
 
 \vspace{0.5cm}
 \begin{center}
@@ -64,7 +65,7 @@ $ make
 
 \section{Quick start}
 
-Examples of running the generator.  The number of events is determined using VegasNc2.
+Examples of running the generator.  The number of events is determined using \texttt{VegasNc2}.
 \begin{itemize}
 	\item $gg$ production:
 	\begin{itemize}
@@ -676,23 +677,25 @@ These instructions are meant as an introduction to MELA and do not illustrate th
 After extracting the code, you can go to the directory \texttt{JHUGenMELA/MELA} to find code for computing matrix elements directly.
 To compile the code, simply run \texttt{./setup.sh}.  At the end, it will print two environment variables that have to be exported in order to use \texttt{MELA}.  \texttt{LD\_LIBRARY\_PATH} is needed for any use of MELA, while \texttt{PYTHONPATH} is needed to use the Python MELA interface.
 
-\textbf{Please take note: The setup relies on MCFM libraries, provided for \texttt{gfort + gcc version 5.3.0} or later, on SLC.  It probably works with other compiler versions that are not too far away.  Better portability coming soon.}
+\textbf{Please take note: The setup relies on MCFM libraries, which are downloaded from the main webpage during the \texttt{setup.sh} script.  They are provided for \texttt{gfort + gcc version 5.3.0} or later, on SLC, and probably work with other compiler versions that are not too far away.  Better portability coming soon.}
 
 MELA requires the ROOT package~\cite{root}, and the simplest way to use MELA is to compile in ROOT.  Run the \texttt|loadMELA.C| script in the test directory before compiling or loading any other scripts that rely on MELA.  It is also possible to link against the MELA code directly.
 
 \subsection{Starting out}
-To begin, create a Mela object.  For example, \verb|std::unique_ptr<Mela> m(new Mela(13, 125))| indicates a 13 TeV LHC energy and a 125 GeV Higgs boson.  It is not recommended to create multiple Mela objects simultaneously, as some parameters in Fortran will be shared between the objects.
+To begin, create a Mela object.  For example, \verb|std::unique_ptr<Mela> mela(new Mela(13, 125))| indicates a 13 TeV LHC energy and a 125 GeV Higgs boson.  It is not recommended to create multiple Mela objects simultaneously, as some parameters in Fortran will be shared between the objects.
 
 \subsection{Event input}
-The next step is to provide \texttt{m} with the particles in the event.  An event in MELA contains three sets of particles: the Higgs boson decay products (``daughters''), particles produced in association with the Higgs boson (``associated''), and the incoming partons (``mothers'').  Each particle has a PDG id and a 4-momentum.  The mothers can and should be left out when dealing with reconstructed events, since they are not known.  In that case either an empty vector or a null pointer can be used.
+The next step is to provide \texttt{mela} with the particles in the event.  An event in MELA contains three sets of particles: the Higgs boson decay products (``daughters''), particles produced in association with the Higgs boson, such as VBF jets or particles from the $V$ decay in $VH$ (``associated''), and the incoming partons (``mothers'').  Each particle has a PDG id and a 4-momentum.  The mothers can and should be left out when dealing with reconstructed events, since they are not known.  In that case either an empty vector or a null pointer can be used.  Similarly, the associated collection can be empty when there are no associated particles.
+
+If you need to calculate matrix elements for the Higgs boson decay, of course it is necessary to supply the decay products' PDG ids and momenta.  If you only need to calculate production matrix elements (VBF or $VH$, for instance), the ``daughters'' can just contain the Higgs boson itself, with id 25 and the Higgs boson's 4-momentum.
 
 To construct an event, use this syntax:
 \begin{verbatim}
 SimpleParticleCollection_t daughters, associated, mothers;
-daughters.emplace_back(11, px, py, pz, E);   //for an electron
-daughters.emplace_back(-12, px, py, pz, E);  //for an electron antineutrino
-associated.emplace_back(1, px, py, pz, E);   //for a down quark
-associated.emplace_back(0, px, py, pz, E);   //for an unknown quark or gluon
+daughters.emplace_back(11, TLorentzVector(px, py, pz, E));   //for an electron
+daughters.emplace_back(-12, TLorentzVector(px, py, pz, E));  //for an electron antineutrino
+associated.emplace_back(1, TLorentzVector(px, py, pz, E));   //for a down quark
+associated.emplace_back(0, TLorentzVector(px, py, pz, E));   //for an unknown particle, which may be a quark or a gluon
 \end{verbatim}
 
 As the final step, pass the particle collections to \texttt{m}:
@@ -705,19 +708,19 @@ The last argument tells MELA whether the event is a generator-level event (true)
 Once MELA has the event, you can calculate as many matrix elements as you want.  Each matrix element is calculated for a particular process and Higgs boson hypothesis and uses the matrix elements from a particular generator (either \texttt{JHUGen} or \texttt{MCFM}).  These are set using the \texttt{setProcess} function, with the help of the enums in \texttt{TVar.hh}.  For example
 \begin{verbatim}
 //For a Standard Model Higgs boson in gluon fusion production
-m->setProcess(TVar::HSMHiggs, TVar::JHUGen, TVar::ZZGG);
+mela->setProcess(TVar::HSMHiggs, TVar::JHUGen, TVar::ZZGG);
 //For qq->ZZ background
-m->setProcess(TVar::bkgZZ, TVar::MCFM, TVar::ZZQQB);
+mela->setProcess(TVar::bkgZZ, TVar::MCFM, TVar::ZZQQB);
 //For VBF production of a pseudoscalar Higgs boson
-m->setProcess(TVar::H0minus, TVar::JHUGen, TVar::JJVBF);
+mela->setProcess(TVar::H0minus, TVar::JHUGen, TVar::JJVBF);
 \end{verbatim}
 
 For full flexibility in the couplings, the texttt{SelfDefine} processes can be used instead of the pre-cooked ones.  In that case the couplings are set manually:
 \begin{verbatim}
-m->setProcess(TVar::SelfDefine_spin0, TVar::JHUGen, TVar::Had_ZH)
-m->selfDHzzcoupl[0][gHIGGS_VV_1][0] = 1;
-m->selfDHzzcoupl[0][gHIGGS_VV_4][0] = 1;
-m->selfDHzzcoupl[0][gHIGGS_VV_4][1] = 1;
+mela->setProcess(TVar::SelfDefine_spin0, TVar::JHUGen, TVar::Had_ZH)
+mela->selfDHzzcoupl[0][gHIGGS_VV_1][0] = 1;
+mela->selfDHzzcoupl[0][gHIGGS_VV_4][0] = 1;
+mela->selfDHzzcoupl[0][gHIGGS_VV_4][1] = 1;
 \end{verbatim}
 In the notation of the generator, this is equivalent to \texttt{ghz1=1,0 ghz4=1,1}, which sets the Standard Model coupling to $1$ and the pseudoscalar coupling to $1+i$.
 
@@ -725,9 +728,9 @@ In the notation of the generator, this is equivalent to \texttt{ghz1=1,0 ghz4=1,
 Once the event, process, and (if necessary) couplings are set, the probability can be computed using one of these functions:
 \begin{verbatim}
 float result;
-m->computeP(result, useConstant);        //for decay
-m->computeProdP(result, useConstant);    //for production
-m->computeProdDecP(result, useConstant); //for the combined matrix element, using MCFM
+mela->computeP(result, useConstant);        //for decay
+mela->computeProdP(result, useConstant);    //for production
+mela->computeProdDecP(result, useConstant); //for the combined matrix element, using MCFM
 \end{verbatim}
 The second argument affects the normalization, and should generally be set to true for reconstructed events, false for generator level events.
 
@@ -736,7 +739,7 @@ Any of these functions reset the process and couplings to their default values. 
 \subsection{Clean up}
 The last step is to call
 \begin{verbatim}
-m->resetInputEvent()
+mela->resetInputEvent()
 \end{verbatim}
 to avoid memory leaks.  This is particularly important when processing many events in one job.
 
@@ -755,8 +758,8 @@ Since text processing is simple in Python, the Python MELA interface is especial
 In going from \verb|v7.0.2| to \verb|v7.0.9| (November 15, 2017), the updates are as follows:
 
 \begin{itemize}
-	\item MELA package interface is completely rewritten and streamlined
-	\item Add the option for an intermediate $Z^\prime$ or $W^\prime$ in spin-0 resonance decay or in VBF or $VH$ production.  $V^\prime$ can have finite or infinite mass; in the second case, it is equivalent to the contact terms formulation~\cite{Gonzalez-Alonso:2014eva}
+	\item MELA package interface is completely rewritten and streamlined, including new processes implemented
+	\item Add the option for an intermediate $Z^\prime$ or $W^\prime$ in spin-0 resonance decay and in VBF and $VH$ production.  $V^\prime$ can have finite or infinite mass; in the second case, it is equivalent to the contact terms formulation~\cite{Gonzalez-Alonso:2014eva}
 \end{itemize}
 
 \noindent
