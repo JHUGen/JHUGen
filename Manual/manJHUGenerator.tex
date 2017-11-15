@@ -695,12 +695,13 @@ SimpleParticleCollection_t daughters, associated, mothers;
 daughters.emplace_back(11, TLorentzVector(px, py, pz, E));   //for an electron
 daughters.emplace_back(-12, TLorentzVector(px, py, pz, E));  //for an electron antineutrino
 associated.emplace_back(1, TLorentzVector(px, py, pz, E));   //for a down quark
-associated.emplace_back(0, TLorentzVector(px, py, pz, E));   //for an unknown particle, which may be a quark or a gluon
+associated.emplace_back(0, TLorentzVector(px, py, pz, E));   //for an unknown particle,
+                                                             //which may be a quark or a gluon
 \end{verbatim}
 
-As the final step, pass the particle collections to \texttt{m}:
+As the final step, pass the particle collections to \texttt{mela}:
 \begin{verbatim}
-m->setInputEvent(&daughters, &associated, &mothers, false);
+mela->setInputEvent(&daughters, &associated, &mothers, false);
 \end{verbatim}
 The last argument tells MELA whether the event is a generator-level event (true) or a reconstructed event (false).  This affects how the output probabilities are normalized.
 
