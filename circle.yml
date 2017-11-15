@@ -15,11 +15,11 @@ machine:
     LHAPDF_HOME: "$HOME/LHAPDF/LHAPDF-${LHAPDF_VERSION}/"
 
     PATH: "$(echo $HOME/root/bin:$HOME/CMSJHU_AnalysisMacros/JHUSpinWidthPaper_2015/LHEAnalyzer:$PATH | sed s/:$//)"
-    LD_LIBRARY_PATH: "$(echo $HOME/JHUGen/JHUGenMELAv2/MELA/data/$SCRAM_ARCH:$HOME/root/lib:$LHAPDF_HOME/lib:$LD_LIBRARY_PATH | sed s/:$//)"
+    LD_LIBRARY_PATH: "$(echo $HOME/JHUGen/JHUGenMELA/MELA/data/$SCRAM_ARCH:$HOME/root/lib:$LHAPDF_HOME/lib:$LD_LIBRARY_PATH | sed s/:$//)"
 
     SHLIB_PATH: "$(echo $HOME/root/lib:$SHLIB_PATH | sed s/:$//)"
     LIBPATH: "$(echo $HOME/root/lib:$LIBPATH | sed s/:$//)"
-    PYTHONPATH: "$(echo $HOME/JHUGen/JHUGenMELAv2/MELA/python:$LHAPDF_HOME/lib/python2.7/site-packages:$HOME/root/lib:$PYTHONPATH | sed s/:$//)"
+    PYTHONPATH: "$(echo $HOME/JHUGen/JHUGenMELA/MELA/python:$LHAPDF_HOME/lib/python2.7/site-packages:$HOME/root/lib:$PYTHONPATH | sed s/:$//)"
     MANPATH: "$(echo $HOME/root/man:$MANPATH | sed s/:$//)"
     ROOTSYS: "$HOME/root"
     DYLD_LIBRARY_PATH: "$HOME/root/lib"
@@ -179,23 +179,23 @@ test:
     #(if not, the first make will fail since we haven't compiled MELA yet)
     - sed -i -r -e "s/^(linkMELA *= *)Yes/\1No/" makefile
     - make
-    - cd ../JHUGenMELAv2/MELA && bash setup.sh
+    - cd ../JHUGenMELA/MELA && bash setup.sh
     #now turn linkMELA back on
     - sed -i -r -e "s/^(linkMELA *= *)No/\1Yes/" makefile
     - make
     #check sync between generator and MELA
-    - sdiff -s mod_Graviton.F90 ../JHUGenMELAv2/MELA/fortran/mod_Graviton.F90
-    - sdiff -s mod_HashCollection.F90 ../JHUGenMELAv2/MELA/fortran/mod_HashCollection.F90
-    - sdiff -s mod_Higgs.F90 ../JHUGenMELAv2/MELA/fortran/mod_Higgs.F90
-    - sdiff -s mod_HiggsJ.F90 ../JHUGenMELAv2/MELA/fortran/mod_HiggsJ.F90
-    - sdiff -s mod_HiggsJJ.F90 ../JHUGenMELAv2/MELA/fortran/mod_HiggsJJ.F90
-    - sdiff -s mod_Misc.F90 ../JHUGenMELAv2/MELA/fortran/mod_Misc.F90
-    - sdiff -s mod_Parameters.F90 ../JHUGenMELAv2/MELA/fortran/mod_Parameters.F90
-    - sdiff -s mod_THiggs.F90 ../JHUGenMELAv2/MELA/fortran/mod_THiggs.F90
-    - sdiff -s mod_TTBHiggs.F90 ../JHUGenMELAv2/MELA/fortran/mod_TTBHiggs.F90
-    - sdiff -s mod_TopDecay.F90 ../JHUGenMELAv2/MELA/fortran/mod_TopDecay.F90
-    - sdiff -s mod_VHiggs.F90 ../JHUGenMELAv2/MELA/fortran/mod_VHiggs.F90
-    - sdiff -s mod_Zprime.F90 ../JHUGenMELAv2/MELA/fortran/mod_Zprime.F90
+    - sdiff -s mod_Graviton.F90 ../JHUGenMELA/MELA/fortran/mod_Graviton.F90
+    - sdiff -s mod_HashCollection.F90 ../JHUGenMELA/MELA/fortran/mod_HashCollection.F90
+    - sdiff -s mod_Higgs.F90 ../JHUGenMELA/MELA/fortran/mod_Higgs.F90
+    - sdiff -s mod_HiggsJ.F90 ../JHUGenMELA/MELA/fortran/mod_HiggsJ.F90
+    - sdiff -s mod_HiggsJJ.F90 ../JHUGenMELA/MELA/fortran/mod_HiggsJJ.F90
+    - sdiff -s mod_Misc.F90 ../JHUGenMELA/MELA/fortran/mod_Misc.F90
+    - sdiff -s mod_Parameters.F90 ../JHUGenMELA/MELA/fortran/mod_Parameters.F90
+    - sdiff -s mod_THiggs.F90 ../JHUGenMELA/MELA/fortran/mod_THiggs.F90
+    - sdiff -s mod_TTBHiggs.F90 ../JHUGenMELA/MELA/fortran/mod_TTBHiggs.F90
+    - sdiff -s mod_TopDecay.F90 ../JHUGenMELA/MELA/fortran/mod_TopDecay.F90
+    - sdiff -s mod_VHiggs.F90 ../JHUGenMELA/MELA/fortran/mod_VHiggs.F90
+    - sdiff -s mod_Zprime.F90 ../JHUGenMELA/MELA/fortran/mod_Zprime.F90
     #check sync between manual, README, and ./JHUGen help
     - |
       commandlineconfigstartline=$(grep -n "[{]Command line configuration[}]" ../Manual/manJHUGenerator.tex | head -1 | sed "s/:.*//") &&
@@ -449,16 +449,16 @@ test:
 
     #now test MELA
     - |
-      cd ../JHUGenMELAv2/MELA/test &&
+      cd ../JHUGenMELA/MELA/test &&
       echo ".L testME_v2.c+" | root -l -b loadMELA.C &&  #won't compile if loaded from python, have to compile first in plain root
       ./testME_all.py
       exitstatus=$?
       if [ $exitstatus -ne 0 ]; then
-        mv ../JHUGenMELAv2/MELA/test/*.out $CIRCLE_ARTIFACTS/MELA/
+        mv ../JHUGenMELA/MELA/test/*.out $CIRCLE_ARTIFACTS/MELA/
       fi
       exit $exitstatus
     - |
-      cd ../JHUGenMELAv2/MELA/test &&
+      cd ../JHUGenMELA/MELA/test &&
       ./testME_more.py
 
   post:
