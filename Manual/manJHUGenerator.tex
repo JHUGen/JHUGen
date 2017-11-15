@@ -685,67 +685,83 @@ It is possible to interface to an LHAPDF setup instead of compiling with local P
 
 %%%%%%%%%%%
 \section{JHU Generator Matrix Elements (JHUGenMELA)}
+These instructions are meant as an introduction to MELA and do not illustrate the full flexibility provided by the package.  For further instructions, please contact the authors.
 
-After extracting the code, you can go to the directory \verb|JHUGenMELA| to find code for computing matrix elements directly.
-To compile the code, simply run \texttt{make}.
+\subsection{Compiling}
+After extracting the code, you can go to the directory \texttt{JHUGenMELAv2/MELA} to find code for computing matrix elements directly.
+To compile the code, simply run \texttt{./setup.sh}.  At the end, it will print two environment variables that have to be exported in order to use \texttt{MELA}.  \texttt{LD\_LIBRARY\_PATH} is needed for any use of MELA, while \texttt{PYTHONPATH} is needed to use the Python MELA interface.
 
-\textbf{Please take note: The setup is configured for \texttt{gfort + gcc version 4.1.2 20080704 (Red Hat 4.1.2-50)} and it is highly dependent on the compiler version.  Please configure for your own setup accordingly.}  (Using the \verb|nm| command will help decipher the module names you will need)
+\textbf{Please take note: The setup relies on MCFM libraries, provided for \texttt{gfort + gcc version 5.3.0} or later, on SLC, and it is highly dependent on the compiler version.  Better portability coming soon.}
 
-Instructions for setting up the JHUGenMELA with MCFM are in the file \verb|JHUGenMELA/ggZZ_MCFM/README|. This \verb|C++| interface also covers the native matrix elements aforementioned through the wrapper class \verb|TEvtProb|. The class currently includes the following calls:
-\begin{itemize}
-\item \verb|TEvtProb|: Constructor with argument $\sqrt{s}$ in units of GeV.
-\item \verb|SetProcess|: Set the process to be used in te calculation of the ME
-\item \verb|SetMatrixElement|: Set the matrix element (Analytical, MCFM or JHUGen)
-\item \verb|SetProduction|: Set the production (as enumerated in the TVar class)
-\item \verb|SetLeptonInterf|: Set whether lepton interference is included in decay MEs. By default, it is included for JHUGen decay MEs or MCFM $q\bar{q}$ background MEs. It is not included in the other MCFM MEs.
+MELA requires the ROOT package~\cite{root}, and the simplest way to use MELA is to compile in ROOT.  Run the \texttt|loadMELA.C| script in the test directory before compiling or loading any other scripts that rely on MELA.  It is also possible to link against the MELA code directly.
 
-\item \verb|ResetMCFM_EWKParameters|: Reset the MCFM EWK scheme and its parameters. See MCFM manual for the details on the EWK scheme.
+\subsection{Starting out}
+To begin, create a Mela object.  For example, \verb|std::unique_ptr<Mela> m(new Mela(13, 125))| indicates a 13 TeV LHC energy and a 125 GeV Higgs boson.  It is not recommended to create multiple Mela objects simultaneously, as some parameters in Fortran will be shared between the objects.
 
-\item \verb|Set_LHAgrid|: One-time call to setup the PDF path in case NNPDF 3.0 is used.
+\subsection{Event input}
+The next step is to provide \texttt{m} with the particles in the event.  An event in MELA contains three sets of particles: the Higgs boson decay products (``daughters''), particles produced in association with the Higgs boson (``associated''), and the incoming partons (``mothers'').  Each particle has a PDG id and a 4-momentum.  The mothers can and should be left out when dealing with reconstructed events, since they are not known.  In that case either an empty vector or a null pointer can be used.
 
-\item \verb|XsecCalc|: Calls to the decay MEs are handled through this function. Depending on the type of process, the self-defined coupling arrays may be ignored. Uses the following interfaced fortran subroutines:
-\begin{itemize}
-\item "modhiggs\_\_evalamp\_gg\_h\_vv": Spin-0 matrix elements for $gg$ initiated processes
-\item "modzprime\_\_evalamp\_qqb\_zprime\_vv": Spin-1 matrix elements for $q\bar{q}$ initiated processes
-\item "modzprime\_\_evalamp\_zprime\_vv": Spin-1 matrix elements production-independent
-\item "modgraviton\_\_evalamp\_qqb\_g\_vv": Spin-2 matrix elements for $q\bar{q}$ initiated processes
-\item "modgraviton\_\_evalamp\_gg\_g\_vv:" Spin-2 matrix elements for $gg$ initiated processes
-\item "modgraviton\_\_evalamp\_g\_vv": Spin-2 matrix elements production-independent
-\end{itemize}
+To construct an event, use this syntax:
+\begin{verbatim}
+SimpleParticleCollection_t daughters, associated, mothers;
+daughters.emplace_back(11, px, py, pz, E);   //for an electron
+daughters.emplace_back(-12, px, py, pz, E);  //for an electron antineutrino
+associated.emplace_back(1, px, py, pz, E);   //for a down quark
+associated.emplace_back(0, px, py, pz, E);   //for an unknown quark or gluon
+\end{verbatim}
 
-\item \verb|XsecCalcXJJ|: Calls to VBF, and $Hjj$ MEs are handled from this function. Depending on the production mode or the process, these arrays may be ignored.
-\begin{itemize}
-\item "modhiggsjj\_\_evalamp\_wbfh": Spin-0 matrix element for on-shell $VBF$ production
-\item "modhiggsjj\_\_evalamp\_sbfh": Spin-0 matrix element for on-shell $H+JJ$ QCD production
-\end{itemize}
+As the final step, pass the particle collections to \texttt{m}:
+\begin{verbatim}
+m->setInputEvent(&daughters, &associated, &mothers, false);
+\end{verbatim}
+The last argument tells MELA whether the event is a generator-level (false) event or a reconstructed event (true).  This affects how the output probabilities are normalized.
 
-\item \verb|XsecCalcXJ|: Call to the JHUGen $Hj$ ME is handled through tis routine.
-\begin{itemize}
-\item "modhiggsj\_\_evalamp\_hj": Spin-0 matrix element for on-shell $H+J$ QCD production
-\end{itemize}
+\subsection{Process selection}
+Once MELA has the event, you can calculate as many matrix elements as you want.  Each matrix element is calculated for a particular process and Higgs boson hypothesis and uses the matrix elements from a particular generator (either \texttt{JHUGen} or \texttt{MCFM}).  These are set using the \texttt{setProcess} function, with the help of the enums in \texttt{TVar.hh}.  For example
+\begin{verbatim}
+//For a Standard Model Higgs boson in gluon fusion production
+m->setProcess(TVar::HSMHiggs, TVar::JHUGen, TVar::ZZGG);
+//For qq->ZZ background
+m->setProcess(TVar::bkgZZ, TVar::MCFM, TVar::ZZQQB);
+//For VBF production of a pseudoscalar Higgs boson
+m->setProcess(TVar::H0minus, TVar::JHUGen, TVar::JJVBF);
+\end{verbatim}
 
-\item \verb|XsecCalc_VX|: Call to the JHUGen $VH$ ME is handled from this routine.
-\begin{itemize}
-\item "modvhiggs\_\_evalamp\_vhiggs": Spin-0 matrix element for on-shell $VH$ production
-\end{itemize}
+For full flexibility in the couplings, the texttt{SelfDefine} processes can be used instead of the pre-cooked ones.  In that case the couplings are set manually:
+\begin{verbatim}
+m->setProcess(TVar::SelfDefine_spin0, TVar::JHUGen, TVar::Had_ZH)
+m->selfDHzzcoupl[0][gHIGGS_VV_1][0] = 1;
+m->selfDHzzcoupl[0][gHIGGS_VV_4][0] = 1;
+m->selfDHzzcoupl[0][gHIGGS_VV_4][1] = 1;
+\end{verbatim}
+In the notation of the generator, this is equivalent to \texttt{ghz1=1,0 ghz4=1,1}, which sets the Standard Model coupling to $1$ and the pseudoscalar coupling to $1+i$.
 
-\item \verb|XsecCalc_TTX|: Call to te $t\bar{t}H$ ME is handled through this routine.
-\begin{itemize}
-\item "modttbhiggs\_\_evalxsec\_pp\_ttbh": Spin-0 matrix element for on-shell $t\bar{t}H$ production
-\item "modttbhiggs\_\_evalxsec\_pp\_bbbh": Spin-0 matrix element for on-shell $b\bar{b}H$ production
-\end{itemize}
+\subsection{Calculate}
+Once the event, process, and (if necessary) couplings are set, the probability can be computed using one of these functions:
+\begin{verbatim}
+float result;
+m->computeP(result, useConstant);        //for decay
+m->computeProdP(result, useConstant);    //for production
+m->computeProdDecP(result, useConstant); //for the combined matrix element, using MCFM
+\end{verbatim}
+The second argument affects the normalization, and should generally be set to true for reconstructed events, false for generator level events.
 
-\item \verb|SetHiggsMass|: This routine changes the Higgs mass and width used in the MCFM calculations.
+Any of these functions reset the process and couplings to their default values.  If you want to compute another probability for the same event, there is no need to call \texttt{setInputEvent} again, but you do have to call \texttt{setProcess}, as well as set the couplings if the process is \texttt{SelfDefine}.
 
-\end{itemize}
+\subsection{Clean up}
+The last step is to call
+\begin{verbatim}
+m->resetInputEvent()
+\end{verbatim}
+to avoid memory leaks.  This is particularly important when processing many events in one job.
 
-The inputs are usually the 4-vectors of the incoming patrons and outgoing particles in the CM frame of the object $X$.
-In addition the mass and width of the resonance are required as well as the ID of the outgoing particles.
-Finally the last set of inputs are the couplings themselves.  They are arrays for parameters for a given spin hypothesis
-which mirror the parameters configurable in \verb|mod_Parameters.F90|.
-Exemplary array initialization can be found in \verb|testprogram.c| for the native matrix elements or \verb|testME.C| for the interface with MCFM.
-For the interface, you can also see the beginning declarations in \verb|TVar.hh| for the list of enumerated variables, and \verb|testME.C| for example calls (eg. array filling, assignment of momenta, and passing te arguments to these routines).
-
+\subsection{Python interface}
+There is also a python interface for MELA, which works essentially the same way as the C++ interface.  For more information, use the python help function:
+\begin{verbatim}
+>>> import mela
+>>> help(mela)
+\end{verbatim}
+Python by its nature is not always suitable for large-scale data processing, where speed is often important.  On the other hand, since text processing is simple in Python, the Python MELA interface is suitable for running quick jobs on LHE files.
 %%%%%%%%%%%
 
 \section{Release notes}
@@ -1037,7 +1053,7 @@ I. Anderson, S. Bolognesi, F. Caola, Y.Y. Gao, A. V. Gritsan, C. B. Martin, K. M
 \bibitem{Gritsan:2016}
 A. V. Gritsan, R. R\"ontsch, M. Schulze, M. Xiao, ``Constraining anomalous Higgs boson couplings to the heavy flavor fermions using matrix element techniques''. Phys. Rev. D \textbf{94} (2016) 055023. arXiv:1606.03107 [hep-ph].
 \bibitem{thesite}
-See webpage: \url{spin.pha.jhu.edu}
+See webpage: \url{http://spin.pha.jhu.edu}
 \bibitem{Chatrchyan:2012ufa}
   S.~Chatrchyan {\it et al.}  [CMS Collaboration],
   ``Observation of a new boson at a mass of 125 GeV with the CMS experiment at the LHC,''
@@ -1063,6 +1079,8 @@ See webpage: \url{spin.pha.jhu.edu}
   M. Gonzalez-Alonso, A. Greljo, G. Isidori, and D. Marzocca, ``Pseudo-observables in
   Higgs decays,'' Eur.\ Phys.\ J.\ C {\bf 75} (2015) 128,
   doi:10.1140/epjc/s10052-015-3345-5, arXiv:1412.6038 [hep-ph].
+\bibitem{root}
+See webpage: \url{https://root.cern.ch}
 
 \end{thebibliography}
 
