@@ -588,21 +588,21 @@ Any modification to \verb|mod_Parameters.F90| requires recompiling JHUGen.
 The below examples are not meant to be a complete set, but rather some interesting and relevant cases.
 In many cases, the example is not the only way to produce such a scenario.
 
-\subsection{$J^P = 0^+_m$ resonance, $X \to ZZ~{\rm or}~WW$}
+\subsection{\texorpdfstring{$J^P = 0^+_m$ resonance, $X \to ZZ\text{ or }WW$}{JP=0+m resonance, X -> ZZ or WW}}
 \label{sec:exA}
 
 \begin{verbatim}
 ./JHUGen ghz1=1,0 (...other options)
 \end{verbatim}
 
-\subsection{$J^P = 0^-_m$ resonance, $X \to ZZ~{\rm or}~WW$}
+\subsection{\texorpdfstring{$J^P = 0^-_m$ resonance, $X \to ZZ\text{ or }WW$}{JP=0-m resonance, X -> ZZ or WW}}
 \label{sec:exB}
 
 \begin{verbatim}
 ./JHUGen ghz1=0,0 ghz4=1,0 (...other options)
 \end{verbatim}
 
-\subsection{$J^P = 0^+_m$ resonance, $X \to \gamma \gamma$}
+\subsection{\texorpdfstring{$J^P = 0^+_m$ resonance, $X \to \gamma \gamma$}{JP=0+m resonance, X -> gamma gamma}}
 \label{sec:exC}
 
 In practice, the example $X \to \gamma \gamma$ from this section, Sec.~\ref{sec:exC} and the next Sec.~\ref{sec:exD} are
@@ -612,21 +612,21 @@ kinematically the same but are presented only to illustrate how one takes care o
 ./JHUGen DecayMode1=7 DecayMode2=7 ghgsgs2=1,0 (...other options)
 \end{verbatim}
 
-\subsection{$J^P = 0^-_m$ resonance, $X \to \gamma \gamma$}
+\subsection{\texorpdfstring{$J^P = 0^-_m$ resonance, $X \to \gamma \gamma$}{JP=0-m resonance, X -> gamma gamma}}
 \label{sec:exD}
 
 \begin{verbatim}
 ./JHUGen DecayMode1=7 DecayMode2=7 ghgsgs4=1,0 (...other options)
 \end{verbatim}
 
-\subsection{$J^P=0^-_m$ resonance, $X\to\gamma^*\gamma^*\to4\ell$}
+\subsection{\texorpdfstring{$J^P=0^-_m$ resonance, $X\to\gamma^*\gamma^*\to4\ell$}{JP=0-m resonance, X -> gamma* gamma* -> 4l}}
 \label{sec:exE}
 
 \begin{verbatim}
 ./JHUGen DecayMode1=0 DecayMode2=0 ghz1=0,0 ghgsgs4=1,0 (...other options)
 \end{verbatim}
 
-\subsection{$J^P = 2^+_m$ resonance, $X \to ZZ\text{ or }WW\text{ or }~\gamma\gamma$}
+\subsection{\texorpdfstring{$J^P = 2^+_m$ resonance, $X \to ZZ\text{ or }WW\text{ or }~\gamma\gamma$}{JP=2+m resonance, X -> ZZ or WW or gamma gamma}}
 
 \begin{verbatim}
 ./JHUGen Process=2 a1=1,0 a2=0,0 b1=1,0 b2=0,0 b5=1,0 (...other options)
@@ -991,17 +991,17 @@ We define configurations for certain models which are defined in Table~1 of~\cit
 All couplings not specified are 0 by default except for the SM couplings \verb|ghz1| and \verb|ghg2|, which must be set to 0 explicitly if that is desired.  For protection, if any anomalous couplings in the same category are set, those couplings must be explicitly set either to 0,0 or to some other value.
 
 %%%-------- 0+
-\subsubsection{"SM-like spin-zero", $0^+$}
+\subsubsection{"SM-like spin-zero", \texorpdfstring{$0^+$}{0+}}
 
 \verb|ghz1=1,0|
 
 %%%-------- 0+h
-\subsubsection{"Higher order spin-zero", $0_h^+$}
+\subsubsection{"Higher order spin-zero", \texorpdfstring{$0_h^+$}{0h+}}
 
 \verb|ghz1=0,0 ghz2=1,0|
 
 %%%-------- 0-
-\subsubsection{"Pseudoscalar spin-zero", $0^-$}
+\subsubsection{"Pseudoscalar spin-zero", \texorpdfstring{$0^-$}{0-}}
 
 \verb|ghz1=0,0 ghz4=1,0 ghg2=0,0 ghg4=1,0|
 
@@ -1009,12 +1009,12 @@ All couplings not specified are 0 by default except for the SM couplings \verb|g
 The $Z^\prime VV$ couplings \verb|zprime_zz_1| and \verb|zprime_zz_2| are both 0 by default; at least one of them must be explicitly turned on.  The $Z^{\prime}q\bar{q}$ couplings \verb|zprime_qq_left| and \verb|zprime_qq_right| are both set to 1 by default; if one is changed, then both must be explicitly set.
 
 %%%-------- 1-
-\subsubsection{"Vector spin-one", $1^-$}
+\subsubsection{"Vector spin-one", \texorpdfstring{$1^-$}{1-}}
 
 \verb|zprime_qq_left=1,0 zprime_qq_right=0,0 zprime_zz_1=1,0|
 
 %%%-------- 1+
-\subsubsection{"Pseudovector spin-one", $1^+$}
+\subsubsection{"Pseudovector spin-one", \texorpdfstring{$1^+$}{1+}}
 
 \verb|zprime_qq_left=1,0 zprime_qq_right=0,0 zprime_zz_2=1,0|
 
@@ -1024,18 +1024,18 @@ The $Ggg$ and $GVV$ couplings \verb|a1-5| and \verb|b1-10| are set to 0 by defau
 If an exclusive production mode is desired (e.g. $q\bar{q}$ or $gg$), this is handled at command-line configuration level via the \verb|PChannel| variable.
 
 %%%-------- 2+
-\subsubsection{"Minimal Graviton, spin-two", $2^+$}
+\subsubsection{"Minimal Graviton, spin-two", \texorpdfstring{$2^+$}{2+}}
 
 
 \verb|a1=1,0 b1=1,0 b5=1,0|
 
 %%%-------- 2+h
-\subsubsection{"Higher order Graviton, spin-two", $2^+_h$}
+\subsubsection{"Higher order Graviton, spin-two", \texorpdfstring{$2^+_h$}{2+h}}
 
 \verb|a4=1,0 b4=1,0|
 
 %%%-------- 2-h
-\subsubsection{"Higher order Graviton, spin-two", $2^-_h$}
+\subsubsection{"Higher order Graviton, spin-two", \texorpdfstring{$2^-_h$}{2-h}}
 
 \verb|a5=1,0 b8=1,0|
 
