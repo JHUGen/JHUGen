@@ -2849,11 +2849,9 @@ character(len=100), intent(out) :: BeginEventLine
             FirstEvent=.true.
             BeginEventLine = trim(FirstLines)
         else
-            if( importExternal_LHEinit ) then
-                if( Index(FirstLines,"<LesHouchesEvents").ne.0 .or. Index(FirstLines,"<!--").ne.0 ) then
-                else
-                  write(io_LHEOutFile,"(A)") trim(firstlines)
-                endif
+            if( Index(FirstLines,"<LesHouchesEvents").ne.0 .or. Index(FirstLines,"<!--").ne.0 ) then
+            else
+              write(io_LHEOutFile,"(A)") trim(firstlines)
             endif
         endif
 
@@ -4534,7 +4532,7 @@ integer :: stat
         endif
         call WriteParameters(io_LHEOutFile)
 
-        if( (ReadLHEFile .or. ConvertLHEFile) .and. (importExternal_LHEinit) ) then
+        if( ReadLHEFile .or. ConvertLHEFile ) then
             write(io_LHEOutFile ,'(A)') ''
         else
             write(io_LHEOutFile ,'(A)') '-->'

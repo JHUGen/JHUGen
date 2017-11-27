@@ -262,7 +262,7 @@ enddo
 
 
 write(io_LHEOutFile,"(A)") "<event>"
-if( ReadLHEFile .and. importExternal_LHEinit .and. present(EventInfoLine) ) then
+if( ReadLHEFile .and. present(EventInfoLine) ) then
    write(io_LHEOutFile,"(I2,X,A)") NUP,trim(EventInfoLine)
 else
    write(io_LHEOutFile,"(I2,X,I3,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7)") NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
@@ -403,7 +403,7 @@ logical :: IsEmpty
         NUP_NEW = 6
     endif
 
-    if( present(EventProcessId) .and. importExternal_LHEinit) then
+    if( present(EventProcessId) ) then
         IDPRUP=EventProcessId
     else
         IDPRUP=Process
@@ -413,7 +413,7 @@ logical :: IsEmpty
     else
         XWGTUP=1.0d0
     endif
-    if( present(EventScaleAqedAqcd)  .and. importExternal_LHEinit) then
+    if( present(EventScaleAqedAqcd) ) then
         SCALUP=EventScaleAqedAqcd(1)
         AQEDUP=EventScaleAqedAqcd(2)
         AQCDUP=EventScaleAqedAqcd(3)
@@ -572,7 +572,7 @@ logical :: IsEmpty
     endif
 
 
-    if( present(EventProcessId) .and. importExternal_LHEinit) then
+    if( present(EventProcessId) ) then
         IDPRUP=EventProcessId
     else
         IDPRUP=Process
@@ -582,7 +582,7 @@ logical :: IsEmpty
     else
         XWGTUP=1.0d0
     endif
-    if( present(EventScaleAqedAqcd)  .and. importExternal_LHEinit) then
+    if( present(EventScaleAqedAqcd) ) then
         SCALUP=EventScaleAqedAqcd(1)
         AQEDUP=EventScaleAqedAqcd(2)
         AQCDUP=EventScaleAqedAqcd(3)

@@ -125,9 +125,6 @@ logical, public :: RandomizeVVdecays = .true.    ! randomize DecayMode1 and Deca
 logical, public :: UseUnformattedRead = .false.  !Set this to true if the regular reading fails for whatever reason
 
 logical, public :: H_DK =.false.                 ! default to false so H in V* > VH (Process = 50) does not decay to bbbar
-
-!leave this one as a parameter, no reason to ever turn it off
-logical, public, parameter :: importExternal_LHEinit = .true.
 !=====================================================
 
 
