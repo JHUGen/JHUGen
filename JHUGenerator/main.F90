@@ -2821,14 +2821,16 @@ SUBROUTINE InitReadLHE(BeginEventLine)
 use ModParameters
 use ModMisc
 implicit none
-logical :: FirstEvent, WroteHeader
+logical :: FirstEvent, WroteHeader, IsThisTheFirstInitLine
 character(len=160) :: FirstLines
-integer :: stat
+integer :: stat, InitFieldIndex, i, IDWTUPIndex(1:2), IDWTUP
+character(len=4) :: IDWTUPFmt
 character(len=100), intent(out) :: BeginEventLine
 
      write(io_LHEOutFile ,'(A)') '<LesHouchesEvents version="1.0">'
      FirstEvent = .false.
      WroteHeader = .false.
+     IsThisTheFirstInitLine = .false.
      do while ( .not.FirstEvent )
         read(io_LHEInFile,fmt="(A160)",IOSTAT=stat,END=99) FirstLines
         if ( FirstLines(1:4).eq."<!--" .and. .not.WroteHeader ) then
@@ -2840,9 +2842,42 @@ character(len=100), intent(out) :: BeginEventLine
             write(io_LHEOutFile, "(A)") "-->"                          ! proc card, etc.
             WroteHeader = .true.                                       !and put the Higgs mass/width in a separate comment
         endif
-        if (Index(FirstLines,"<init>").ne.0 .and. .not.WroteHeader ) then !If not now, when?
-            call InitOutput(1d0, 1d14)
-            WroteHeader = .true.
+        if( IsThisTheFirstInitLine ) then
+          !See https://arxiv.org/pdf/hep-ph/0109068v1.pdf under IDWTUP
+          !For some processes, POWHEG writes all events with a weight of 1 (or +/-1)
+          !and writes IDWTUP as 3 (-3).  When Pythia sees IDWTUP=3 (-3), it assumes
+          !all weights are 1 (+/-1) and ignores the weights (abs(weights)) written
+          !in the LHE file. If we want to modify those weights, we have to set
+          !IDWTUP to 4 (-4).
+          if( ReweightDecay .or. WidthScheme.ne.WidthSchemeIn ) then
+            InitFieldIndex = 1
+            i = 1
+            do while( InitFieldIndex.le.9 )
+              do while( FirstLines(i:i).eq." " )
+                i=i+1
+              enddo
+              if( InitFieldIndex.eq.9 ) IDWTUPIndex(1) = i
+              do while( FirstLines(i:i).ne." " )
+                i=i+1
+              enddo
+              if( InitFieldIndex.eq.9 ) IDWTUPIndex(2) = i-1
+              InitFieldIndex=InitFieldIndex+1
+            enddo
+            read(FirstLines(IDWTUPIndex(1):IDWTUPIndex(2)), fmt=*) IDWTUP
+            if( abs(IDWTUP).eq.3 ) IDWTUP = IDWTUP * 4 / 3
+
+            write(IDWTUPFmt, fmt="(A,I1,A)") "(I", IDWTUPIndex(2)-IDWTUPIndex(1)+1, ")"
+
+            write(FirstLines(IDWTUPIndex(1):IDWTUPIndex(2)), fmt=IDWTUPFmt) IDWTUP
+          endif
+          IsThisTheFirstInitLine = .false.
+        endif
+        if (Index(FirstLines,"<init>").ne.0 ) then
+            if( .not.WroteHeader ) then !If not now, when?
+                call InitOutput(1d0, 1d14)
+                WroteHeader = .true.
+            endif
+            IsThisTheFirstInitLine = .true.
         endif
 
         if( Index(FirstLines, "<event").ne.0 ) then
