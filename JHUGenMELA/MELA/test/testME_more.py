@@ -201,5 +201,45 @@ class TestMela(unittest.TestCase):
     self.assertEquals(me1, me2)
     self.assertNotEquals(me1, 0)
 
+  def testmultiplecalls_VBF(self):
+    self.runmultiplecalls(event2_VBF)
+  def testmultiplecalls_ZH(self):
+    self.runmultiplecalls(event3_ZH.replace(" 13", "  3").replace("-13", " -3"))
+
+  def runmultiplecalls(self, event):
+    m = self.m
+    m.setInputEvent_fromLHE(event, False)
+
+    firstrun = []
+    secondrun = []
+
+    for lst in firstrun, secondrun:
+      m.setProcess(TVar.SelfDefine_spin0, TVar.JHUGen, TVar.JJVBF)
+      m.ghz1 = 1
+      lst.append(m.computeProdP(True))
+      lst.append(m.getConstant())
+
+      m.setProcess(TVar.SelfDefine_spin0, TVar.JHUGen, TVar.JJQCD)
+      m.ghg2 = 1
+      lst.append(m.computeProdP(True))
+      lst.append(m.getConstant())
+
+      m.setProcess(TVar.SelfDefine_spin0, TVar.JHUGen, TVar.Had_ZH)
+      m.ghz3 = 1
+      lst.append(m.computeProdP(True))
+      lst.append(m.getConstant())
+
+      m.setProcess(TVar.SelfDefine_spin0, TVar.JHUGen, TVar.Had_WH)
+      m.ghz2_prime4 = 1
+      lst.append(m.computeProdP(True))
+      lst.append(m.getConstant())
+
+      m.setProcess(TVar.SelfDefine_spin0, TVar.JHUGen, TVar.ZZINDEPENDENT)
+      m.ghzzp1 = ezp_El_left = 1
+      lst.append(m.computeProdP(True))
+      lst.append(m.getConstant())
+
+    self.assertEquals(firstrun, secondrun)
+
 if __name__ == "__main__":
   unittest.main()
