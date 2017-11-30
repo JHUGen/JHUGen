@@ -110,6 +110,32 @@ public:
     float& costhetastar,
     float& Phi1
     );
+  void computeVBFAngles(
+    float& Q2V1,
+    float& Q2V2,
+    float& costheta1,
+    float& costheta2,
+    float& Phi,
+    float& costhetastar,
+    float& Phi1
+  );
+  void computeVBFangles_ComplexBoost(
+    float& Q2V1,
+    float& Q2V2,
+    float& costheta1_real, float& costheta1_imag,
+    float& costheta2_real, float& costheta2_imag,
+    float& Phi,
+    float& costhetastar,
+    float& Phi1
+  );
+  void computeVHAngles(
+    int idV,
+    float& costheta1,
+    float& costheta2,
+    float& Phi,
+    float& costhetastar,
+    float& Phi1
+  );
 
   void computeP_selfDspin0(
     double selfDHvvcoupl_input[nSupportedHiggses][SIZE_HVV][2],

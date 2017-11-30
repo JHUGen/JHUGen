@@ -467,6 +467,199 @@ void Mela::computeDecayAngles(
   else if (myVerbosity_>=TVar::DEBUG) MELAerr << "Mela::computeDecayAngles: No possible melaCand in TEvtProb to compute angles." << endl;
 }
 
+// VBF angles computation script of Mela to convert MELACandidates to m1, m2 etc.
+void Mela::computeVBFAngles(
+  float& Q2V1,
+  float& Q2V2,
+  float& costheta1,
+  float& costheta2,
+  float& Phi,
+  float& costhetastar,
+  float& Phi1
+){
+  Q2V1=0; Q2V2=0; costheta1=0; costheta2=0; Phi=0; costhetastar=0; Phi1=0;
+
+  if (melaCand==0) melaCand = getCurrentCandidate();
+  if (melaCand!=0){
+    TLorentzVector nullVector(0, 0, 0, 0);
+
+    std::pair<TLorentzVector*, int> inMother1(nullptr, -9000); if (melaCand->getMother(0)){ inMother1.first=&(melaCand->getMother(0)->p4); inMother1.second=melaCand->getMother(0)->id; }
+    std::pair<TLorentzVector*, int> inMother2(nullptr, -9000); if (melaCand->getMother(1)){ inMother2.first=&(melaCand->getMother(1)->p4); inMother2.second=melaCand->getMother(1)->id; }
+    std::pair<TLorentzVector, int> outApart1(nullVector, -9000); if (melaCand->getAssociatedJet(0)){ outApart1.first=melaCand->getAssociatedJet(0)->p4; outApart1.second=melaCand->getAssociatedJet(0)->id; }
+    std::pair<TLorentzVector, int> outApart2(nullVector, -9000); if (melaCand->getAssociatedJet(1)){ outApart2.first=melaCand->getAssociatedJet(1)->p4; outApart2.second=melaCand->getAssociatedJet(1)->id; }
+
+    MELAParticle* dau[2][2]={ { 0 } };
+    if (melaCand->getDecayMode()==TVar::CandidateDecay_Stable) dau[0][0]=melaCand;
+    else{
+      for (int vv=0; vv<2; vv++){
+        MELAParticle* Vi = melaCand->getSortedV(vv);
+        for (int dd=0; dd<Vi->getNDaughters(); dd++) dau[vv][dd] = Vi->getDaughter(dd);
+      }
+    }
+
+    TUtil::computeVBFangles(
+      costhetastar, costheta1, costheta2, Phi, Phi1, Q2V1, Q2V2,
+      (dau[0][0]!=0 ? dau[0][0]->p4 : nullVector), (dau[0][0]!=0 ? dau[0][0]->id : -9000),
+      (dau[0][1]!=0 ? dau[0][1]->p4 : nullVector), (dau[0][1]!=0 ? dau[0][1]->id : -9000),
+      (dau[1][0]!=0 ? dau[1][0]->p4 : nullVector), (dau[1][0]!=0 ? dau[1][0]->id : -9000),
+      (dau[1][1]!=0 ? dau[1][1]->p4 : nullVector), (dau[1][1]!=0 ? dau[1][1]->id : -9000),
+      outApart1.first, outApart1.second,
+      outApart2.first, outApart2.second,
+      inMother1.first, inMother1.second,
+      inMother2.first, inMother2.second
+    );
+
+    // Protect against NaN
+    if (!(costhetastar==costhetastar)) costhetastar=0;
+    if (!(costheta1==costheta1)) costheta1=0;
+    if (!(costheta2==costheta2)) costheta2=0;
+    if (!(Phi==Phi)) Phi=0;
+    if (!(Phi1==Phi1)) Phi1=0;
+  }
+  else if (myVerbosity_>=TVar::DEBUG) MELAerr << "Mela::computeVBFAngles: No possible melaCand in TEvtProb to compute angles." << endl;
+}
+void Mela::computeVBFangles_ComplexBoost(
+  float& Q2V1,
+  float& Q2V2,
+  float& costheta1_real, float& costheta1_imag,
+  float& costheta2_real, float& costheta2_imag,
+  float& Phi,
+  float& costhetastar,
+  float& Phi1
+){
+  Q2V1=0; Q2V2=0; costheta1_real=0; costheta2_real=0; costheta1_imag=0; costheta2_imag=0; Phi=0; costhetastar=0; Phi1=0;
+
+  if (melaCand==0) melaCand = getCurrentCandidate();
+  if (melaCand!=0){
+    TLorentzVector nullVector(0, 0, 0, 0);
+
+    std::pair<TLorentzVector*, int> inMother1(nullptr, -9000); if (melaCand->getMother(0)){ inMother1.first=&(melaCand->getMother(0)->p4); inMother1.second=melaCand->getMother(0)->id; }
+    std::pair<TLorentzVector*, int> inMother2(nullptr, -9000); if (melaCand->getMother(1)){ inMother2.first=&(melaCand->getMother(1)->p4); inMother2.second=melaCand->getMother(1)->id; }
+    std::pair<TLorentzVector, int> outApart1(nullVector, -9000); if (melaCand->getAssociatedJet(0)){ outApart1.first=melaCand->getAssociatedJet(0)->p4; outApart1.second=melaCand->getAssociatedJet(0)->id; }
+    std::pair<TLorentzVector, int> outApart2(nullVector, -9000); if (melaCand->getAssociatedJet(1)){ outApart2.first=melaCand->getAssociatedJet(1)->p4; outApart2.second=melaCand->getAssociatedJet(1)->id; }
+
+    MELAParticle* dau[2][2]={ { 0 } };
+    if (melaCand->getDecayMode()==TVar::CandidateDecay_Stable) dau[0][0]=melaCand;
+    else{
+      for (int vv=0; vv<2; vv++){
+        MELAParticle* Vi = melaCand->getSortedV(vv);
+        for (int dd=0; dd<Vi->getNDaughters(); dd++) dau[vv][dd] = Vi->getDaughter(dd);
+      }
+    }
+
+    TUtil::computeVBFangles_ComplexBoost(
+      costhetastar, costheta1_real, costheta1_imag, costheta2_real, costheta2_imag, Phi, Phi1, Q2V1, Q2V2,
+      (dau[0][0]!=0 ? dau[0][0]->p4 : nullVector), (dau[0][0]!=0 ? dau[0][0]->id : -9000),
+      (dau[0][1]!=0 ? dau[0][1]->p4 : nullVector), (dau[0][1]!=0 ? dau[0][1]->id : -9000),
+      (dau[1][0]!=0 ? dau[1][0]->p4 : nullVector), (dau[1][0]!=0 ? dau[1][0]->id : -9000),
+      (dau[1][1]!=0 ? dau[1][1]->p4 : nullVector), (dau[1][1]!=0 ? dau[1][1]->id : -9000),
+      outApart1.first, outApart1.second,
+      outApart2.first, outApart2.second,
+      inMother1.first, inMother1.second,
+      inMother2.first, inMother2.second
+    );
+
+    // Protect against NaN
+    if (!(costhetastar==costhetastar)) costhetastar=0;
+    if (!(costheta1_real==costheta1_real)) costheta1_real=0;
+    if (!(costheta2_real==costheta2_real)) costheta2_real=0;
+    if (!(costheta1_imag==costheta1_imag)) costheta1_imag=0;
+    if (!(costheta2_imag==costheta2_imag)) costheta2_imag=0;
+    if (!(Phi==Phi)) Phi=0;
+    if (!(Phi1==Phi1)) Phi1=0;
+  }
+  else if (myVerbosity_>=TVar::DEBUG) MELAerr << "Mela::computeVBFangles_ComplexBoost: No possible melaCand in TEvtProb to compute angles." << endl;
+}
+
+// VH angles computation script of Mela to convert MELACandidates to production angles.
+void Mela::computeVHAngles(
+  int idV,
+  float& costheta1,
+  float& costheta2,
+  float& Phi,
+  float& costhetastar,
+  float& Phi1
+){
+  costheta1=0; costheta2=0; Phi=0; costhetastar=0; Phi1=0;
+
+  if (melaCand==0) melaCand = getCurrentCandidate();
+  if (melaCand!=0){
+    TLorentzVector nullVector(0, 0, 0, 0);
+
+    std::pair<TLorentzVector*, int> inMother1(nullptr, -9000); if (melaCand->getMother(0)){ inMother1.first=&(melaCand->getMother(0)->p4); inMother1.second=melaCand->getMother(0)->id; }
+    std::pair<TLorentzVector*, int> inMother2(nullptr, -9000); if (melaCand->getMother(1)){ inMother2.first=&(melaCand->getMother(1)->p4); inMother2.second=melaCand->getMother(1)->id; }
+    std::pair<TLorentzVector, int> outApart1(nullVector, -9000);
+    std::pair<TLorentzVector, int> outApart2(nullVector, -9000);
+
+    MELAParticle* apartV=nullptr;
+    MELAParticle* dau[2][2]={ { 0 } };
+    if (melaCand->getDecayMode()==TVar::CandidateDecay_Stable){
+      dau[0][0]=melaCand;
+      for (auto& v:melaCand->getSortedVs()){
+        int& avid=v->id;
+        if (
+          (
+          avid==idV
+          ||
+          ((PDGHelpers::isAZBoson(avid) || PDGHelpers::isAWBoson(avid) || PDGHelpers::isAPhoton(avid)) && idV==0)
+          ||
+          ((PDGHelpers::isAZBoson(idV) || PDGHelpers::isAWBoson(idV) || PDGHelpers::isAPhoton(idV)) && avid==0)
+          )
+          &&
+          v->getDaughter(0)
+          ){ apartV=v; break; }
+      }
+    }
+    else{
+      int vv=0;
+      for (auto& Vi:melaCand->getSortedVs()){
+        if (vv<2){ for (int dd=0; dd<Vi->getNDaughters(); dd++) dau[vv][dd] = Vi->getDaughter(dd); }
+        else{
+          int& avid=Vi->id;
+          if (
+            (
+            avid==idV
+            ||
+            ((PDGHelpers::isAZBoson(avid) || PDGHelpers::isAWBoson(avid) || PDGHelpers::isAPhoton(avid)) && idV==0)
+            ||
+            ((PDGHelpers::isAZBoson(idV) || PDGHelpers::isAWBoson(idV) || PDGHelpers::isAPhoton(idV)) && avid==0)
+            )
+            &&
+            Vi->getDaughter(0)
+            ){
+            apartV=Vi; break;
+          }
+        }
+        vv++;
+      }
+    }
+    if (apartV){
+      if (apartV->getDaughter(0)){ outApart1.first=apartV->getDaughter(0)->p4; outApart1.second=apartV->getDaughter(0)->id; }
+      if (apartV->getDaughter(1)){ outApart1.first=apartV->getDaughter(1)->p4; outApart1.second=apartV->getDaughter(1)->id; }
+    }
+
+    TUtil::computeVHangles(
+      costhetastar, costheta1, costheta2, Phi, Phi1,
+      (dau[0][0]!=0 ? dau[0][0]->p4 : nullVector), (dau[0][0]!=0 ? dau[0][0]->id : -9000),
+      (dau[0][1]!=0 ? dau[0][1]->p4 : nullVector), (dau[0][1]!=0 ? dau[0][1]->id : -9000),
+      (dau[1][0]!=0 ? dau[1][0]->p4 : nullVector), (dau[1][0]!=0 ? dau[1][0]->id : -9000),
+      (dau[1][1]!=0 ? dau[1][1]->p4 : nullVector), (dau[1][1]!=0 ? dau[1][1]->id : -9000),
+      outApart1.first, outApart1.second,
+      outApart2.first, outApart2.second,
+      inMother1.first, inMother1.second,
+      inMother2.first, inMother2.second
+    );
+
+    // Protect against NaN
+    if (!(costhetastar==costhetastar)) costhetastar=0;
+    if (!(costheta1==costheta1)) costheta1=0;
+    if (!(costheta2==costheta2)) costheta2=0;
+    if (!(Phi==Phi)) Phi=0;
+    if (!(Phi1==Phi1)) Phi1=0;
+  }
+  else if (myVerbosity_>=TVar::DEBUG) MELAerr << "Mela::computeVHAngles: No possible melaCand in TEvtProb to compute angles." << endl;
+}
+
 // Regular probabilities
 void Mela::computeP_selfDspin0(
   double selfDHvvcoupl_input[nSupportedHiggses][SIZE_HVV][2],
