@@ -635,7 +635,7 @@ void Mela::computeVHAngles(
     }
     if (apartV){
       if (apartV->getDaughter(0)){ outApart1.first=apartV->getDaughter(0)->p4; outApart1.second=apartV->getDaughter(0)->id; }
-      if (apartV->getDaughter(1)){ outApart1.first=apartV->getDaughter(1)->p4; outApart1.second=apartV->getDaughter(1)->id; }
+      if (apartV->getDaughter(1)){ outApart2.first=apartV->getDaughter(1)->p4; outApart2.second=apartV->getDaughter(1)->id; }
     }
 
     TUtil::computeVHAngles(
