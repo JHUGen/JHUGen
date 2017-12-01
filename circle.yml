@@ -457,6 +457,10 @@ test:
         mv ../JHUGenMELA/MELA/test/*.out $CIRCLE_ARTIFACTS/MELA/
       fi
       exit $exitstatus
+    #test the examples in mela.py
+    - |
+      cd ../JHUGenMELA/MELA/python &&
+      python mela.py
     - |
       cd ../JHUGenMELA/MELA/test &&
       ./testME_more.py

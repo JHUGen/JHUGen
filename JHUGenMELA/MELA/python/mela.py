@@ -63,6 +63,46 @@ class Mela(object):
       );
       return result;
     }
+    vector<float> computeVBFAngles(Mela& mela) {
+      vector<float> result(7);
+      mela.computeVBFAngles(
+        result[0],
+        result[1],
+        result[2],
+        result[3],
+        result[4],
+        result[5],
+        result[6]
+      );
+      return result;
+    }
+    vector<float> computeVBFangles_ComplexBoost(Mela& mela) {
+      vector<float> result(9);
+      mela.computeVBFangles_ComplexBoost(
+        result[0],
+        result[1],
+        result[2],
+        result[3],
+        result[4],
+        result[5],
+        result[6],
+        result[7],
+        result[8]
+      );
+      return result;
+    }
+    vector<float> computeVHAngles(Mela& mela, int idV) {
+      vector<float> result(5);
+      mela.computeVHAngles(
+        idV,
+        result[0],
+        result[1],
+        result[2],
+        result[3],
+        result[4]
+      );
+      return result;
+    }
     //not implementing the computeP_selfD* functions here
     //would be easier to do in pure python but not worth it anyway
     float computeP(Mela& mela, bool useConstant) {
@@ -232,8 +272,17 @@ class Mela(object):
     self.setInputEvent(SimpleParticleCollection_t(daughters), SimpleParticleCollection_t(associated), SimpleParticleCollection_t(mothers), isgen)
 
   def getPAux(self): return ROOT.getPAux(self.__mela)
+
   DecayAngles = namedtuple("DecayAngles", "qH m1 m2 costheta1 costheta2 Phi costhetastar Phi1")
   def computeDecayAngles(self): return self.DecayAngles(*ROOT.computeDecayAngles(self.__mela))
+  VBFAngles = namedtuple("VBFAngles", "Q2V1 Q2V2 costheta1 costheta2 Phi costhetastar Phi1")
+  def computeVBFAngles(self): return self.VBFAngles(*ROOT.computeVBFAngles(self.__mela))
+  def computeVBFangles_ComplexBoost(self):
+    result = ROOT.computeVBFangles_ComplexBoost(self.__mela)
+    return self.VBFAngles(result[0], result[1], result[2]+1j*result[3], result[4]+1j*result[5], *result[6:])
+  VHAngles = namedtuple("VHAngles", "costheta1 costheta2 Phi costhetastar Phi1")
+  def computeVHAngles(self, idV): return self.VHAngles(*ROOT.computeVHAngles(self.__mela, idV))
+
   def computeP(self, useConstant=True): return ROOT.computeP(self.__mela, useConstant)
   def computeD_CP(self, myME, myType): return ROOT.computeD_CP(self.__mela, myME, myType)
   def computeProdP(self, useConstant=True): return ROOT.computeProdP(self.__mela, useConstant)
@@ -537,8 +586,8 @@ if __name__ == "__main__":
   -11 -93.72924763700000028 39.45060783929999815 -92.98363978320000456 137.79506373300000632
   """
   associated = """
-  -11 211.33318543799998679 -14.90577872979999974 3.74371777679000006 211.89127619999999297
-  12 31.22409920730000010 -37.83127789369999761 1.23465418111000003 49.06805813689999951
+  -1 211.33318543799998679 -14.90577872979999974 3.74371777679000006 211.89127619999999297
+  2 31.22409920730000010 -37.83127789369999761 1.23465418111000003 49.06805813689999951
   """
   mothers = """
   -1 0.00000000000000000 0.00000000000000000 192.71975508899998886 192.71975508899998886
@@ -565,7 +614,7 @@ if __name__ == "__main__":
               )
   for _ in couplings:
     m.ghz1, m.ghz2, m.ghz4, m.ghz1_prime2 = _
-    m.setProcess(TVar.SelfDefine_spin0, TVar.JHUGen, TVar.Lep_WH)
+    m.setProcess(TVar.SelfDefine_spin0, TVar.JHUGen, TVar.Had_WH)
     prod = m.computeProdP(False)
     m.ghz1, m.ghz2, m.ghz4, m.ghz1_prime2 = _
     m.setProcess(TVar.SelfDefine_spin0, TVar.JHUGen, TVar.ZZINDEPENDENT)
@@ -573,6 +622,9 @@ if __name__ == "__main__":
     print prod, dec, prod*dec
 
   print m.computeDecayAngles()
+  print m.computeVBFAngles()
+  print m.computeVBFangles_ComplexBoost()
+  print m.computeVHAngles(24)
   print "propagator:"
   print "   BW:", m.getXPropagator(TVar.FixedWidth)
   print "  CPS:", m.getXPropagator(TVar.CPS)
