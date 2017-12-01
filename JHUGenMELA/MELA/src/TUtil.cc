@@ -588,7 +588,7 @@ void TUtil::computeAnglesCS(
 }
 
 /***** Associated production angles *****/
-void TUtil::computeVBFangles(
+void TUtil::computeVBFAngles(
   float& costhetastar,
   float& costheta1,
   float& costheta2,
@@ -740,7 +740,7 @@ void TUtil::computeVBFangles(
   costheta1 = V1.Vect().Unit().Dot(fermion1.Vect().Unit());
   costheta2 = V2.Vect().Unit().Dot(fermion2.Vect().Unit());
 }
-void TUtil::computeVBFangles_ComplexBoost(
+void TUtil::computeVBFAngles_ComplexBoost(
   float& costhetastar,
   float& costheta1_real, float& costheta1_imag,
   float& costheta2_real, float& costheta2_imag,
@@ -888,7 +888,7 @@ void TUtil::computeVBFangles_ComplexBoost(
   Q2V1 = -(V1.M2());
   Q2V2 = -(V2.M2());
 
-  // Up to here, everything has to be the same as TUtil::computeVBFangles
+  // Up to here, everything has to be the same as TUtil::computeVBFAngles
   // Computations that would have been truly in the frame of X had V1 and V2 not been virtual:
   // Use TUtil::ComplexBoost to evade imaginary gamma problems when beta**2<0
   pair<TLorentzVector, TLorentzVector> V2_BV1 = TUtil::ComplexBoost(V1.BoostVector(), V2);
@@ -901,7 +901,7 @@ void TUtil::computeVBFangles_ComplexBoost(
   costheta2_real = -(V1_BV2.first.Vect().Unit().Dot(fermion2_BV2.first.Vect().Unit()) - V1_BV2.second.Vect().Unit().Dot(fermion2_BV2.second.Vect().Unit()));
   costheta2_imag = -(V1_BV2.first.Vect().Unit().Dot(fermion2_BV2.second.Vect().Unit()) + V1_BV2.second.Vect().Unit().Dot(fermion2_BV2.first.Vect().Unit()));
 }
-void TUtil::computeVHangles(
+void TUtil::computeVHAngles(
   float& costhetastar,
   float& costheta1,
   float& costheta2,

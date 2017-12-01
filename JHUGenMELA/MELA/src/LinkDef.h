@@ -35,8 +35,8 @@
 #pragma link C++ namespace TUtil;
 #pragma link C++ function TUtil::computeAngles;
 #pragma link C++ function TUtil::computeAnglesCS;
-#pragma link C++ function TUtil::computeVBFangles;
-#pragma link C++ function TUtil::computeVHangles;
+#pragma link C++ function TUtil::computeVBFAngles;
+#pragma link C++ function TUtil::computeVHAngles;
 #pragma link C++ function TUtil::scaleMomentumToEnergy;
 #pragma link C++ function TUtil::constrainedRemovePairMass;
 #pragma link C++ function TUtil::removeMassFromPair;

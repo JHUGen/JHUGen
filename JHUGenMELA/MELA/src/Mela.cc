@@ -497,7 +497,7 @@ void Mela::computeVBFAngles(
       }
     }
 
-    TUtil::computeVBFangles(
+    TUtil::computeVBFAngles(
       costhetastar, costheta1, costheta2, Phi, Phi1, Q2V1, Q2V2,
       (dau[0][0]!=0 ? dau[0][0]->p4 : nullVector), (dau[0][0]!=0 ? dau[0][0]->id : -9000),
       (dau[0][1]!=0 ? dau[0][1]->p4 : nullVector), (dau[0][1]!=0 ? dau[0][1]->id : -9000),
@@ -518,7 +518,7 @@ void Mela::computeVBFAngles(
   }
   else if (myVerbosity_>=TVar::DEBUG) MELAerr << "Mela::computeVBFAngles: No possible melaCand in TEvtProb to compute angles." << endl;
 }
-void Mela::computeVBFangles_ComplexBoost(
+void Mela::computeVBFAngles_ComplexBoost(
   float& Q2V1,
   float& Q2V2,
   float& costheta1_real, float& costheta1_imag,
@@ -547,7 +547,7 @@ void Mela::computeVBFangles_ComplexBoost(
       }
     }
 
-    TUtil::computeVBFangles_ComplexBoost(
+    TUtil::computeVBFAngles_ComplexBoost(
       costhetastar, costheta1_real, costheta1_imag, costheta2_real, costheta2_imag, Phi, Phi1, Q2V1, Q2V2,
       (dau[0][0]!=0 ? dau[0][0]->p4 : nullVector), (dau[0][0]!=0 ? dau[0][0]->id : -9000),
       (dau[0][1]!=0 ? dau[0][1]->p4 : nullVector), (dau[0][1]!=0 ? dau[0][1]->id : -9000),
@@ -568,7 +568,7 @@ void Mela::computeVBFangles_ComplexBoost(
     if (!(Phi==Phi)) Phi=0;
     if (!(Phi1==Phi1)) Phi1=0;
   }
-  else if (myVerbosity_>=TVar::DEBUG) MELAerr << "Mela::computeVBFangles_ComplexBoost: No possible melaCand in TEvtProb to compute angles." << endl;
+  else if (myVerbosity_>=TVar::DEBUG) MELAerr << "Mela::computeVBFAngles_ComplexBoost: No possible melaCand in TEvtProb to compute angles." << endl;
 }
 
 // VH angles computation script of Mela to convert MELACandidates to production angles.
@@ -638,7 +638,7 @@ void Mela::computeVHAngles(
       if (apartV->getDaughter(1)){ outApart1.first=apartV->getDaughter(1)->p4; outApart1.second=apartV->getDaughter(1)->id; }
     }
 
-    TUtil::computeVHangles(
+    TUtil::computeVHAngles(
       costhetastar, costheta1, costheta2, Phi, Phi1,
       (dau[0][0]!=0 ? dau[0][0]->p4 : nullVector), (dau[0][0]!=0 ? dau[0][0]->id : -9000),
       (dau[0][1]!=0 ? dau[0][1]->p4 : nullVector), (dau[0][1]!=0 ? dau[0][1]->id : -9000),

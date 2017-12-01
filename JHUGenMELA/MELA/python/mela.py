@@ -76,9 +76,9 @@ class Mela(object):
       );
       return result;
     }
-    vector<float> computeVBFangles_ComplexBoost(Mela& mela) {
+    vector<float> computeVBFAngles_ComplexBoost(Mela& mela) {
       vector<float> result(9);
-      mela.computeVBFangles_ComplexBoost(
+      mela.computeVBFAngles_ComplexBoost(
         result[0],
         result[1],
         result[2],
@@ -277,8 +277,8 @@ class Mela(object):
   def computeDecayAngles(self): return self.DecayAngles(*ROOT.computeDecayAngles(self.__mela))
   VBFAngles = namedtuple("VBFAngles", "Q2V1 Q2V2 costheta1 costheta2 Phi costhetastar Phi1")
   def computeVBFAngles(self): return self.VBFAngles(*ROOT.computeVBFAngles(self.__mela))
-  def computeVBFangles_ComplexBoost(self):
-    result = ROOT.computeVBFangles_ComplexBoost(self.__mela)
+  def computeVBFAngles_ComplexBoost(self):
+    result = ROOT.computeVBFAngles_ComplexBoost(self.__mela)
     return self.VBFAngles(result[0], result[1], result[2]+1j*result[3], result[4]+1j*result[5], *result[6:])
   VHAngles = namedtuple("VHAngles", "costheta1 costheta2 Phi costhetastar Phi1")
   def computeVHAngles(self, idV): return self.VHAngles(*ROOT.computeVHAngles(self.__mela, idV))
@@ -623,7 +623,7 @@ if __name__ == "__main__":
 
   print m.computeDecayAngles()
   print m.computeVBFAngles()
-  print m.computeVBFangles_ComplexBoost()
+  print m.computeVBFAngles_ComplexBoost()
   print m.computeVHAngles(24)
   print "propagator:"
   print "   BW:", m.getXPropagator(TVar.FixedWidth)

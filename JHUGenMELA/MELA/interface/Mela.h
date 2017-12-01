@@ -119,7 +119,7 @@ public:
     float& costhetastar,
     float& Phi1
   );
-  void computeVBFangles_ComplexBoost(
+  void computeVBFAngles_ComplexBoost(
     float& Q2V1,
     float& Q2V2,
     float& costheta1_real, float& costheta1_imag,

@@ -103,7 +103,7 @@ namespace TUtil{
     float& Phi1
     );
   // Angles of associated production
-  void computeVBFangles(
+  void computeVBFAngles(
     float& costhetastar,
     float& costheta1,
     float& costheta2,
@@ -120,7 +120,7 @@ namespace TUtil{
     TLorentzVector* injet1=0, int injet1Id=0, // Gen. partons in lab frame
     TLorentzVector* injet2=0, int injet2Id=0
     );
-  void computeVBFangles_ComplexBoost(
+  void computeVBFAngles_ComplexBoost(
     float& costhetastar,
     float& costheta1_real, float& costheta1_imag,
     float& costheta2_real, float& costheta2_imag,
@@ -137,7 +137,7 @@ namespace TUtil{
     TLorentzVector* injet1=0, int injet1Id=0, // Gen. partons in lab frame
     TLorentzVector* injet2=0, int injet2Id=0
     );
-  void computeVHangles(
+  void computeVHAngles(
     float& costhetastar,
     float& costheta1,
     float& costheta2,

@@ -2219,7 +2219,7 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_Comparison_Ping(int motherflavor=0, int 
     mela.setInputEvent(&daughters, &associated, &mothers, true);
 
     if (mothers.size()>1){
-      if (vbfvhchannel==0) TUtil::computeVBFangles(
+      if (vbfvhchannel==0) TUtil::computeVBFAngles(
         costhetastar,
         costheta1,
         costheta2,
@@ -2239,7 +2239,7 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_Comparison_Ping(int motherflavor=0, int 
         &(mothers.at(0).second), mothers.at(0).first,
         &(mothers.at(1).second), mothers.at(1).first
         );
-      else TUtil::computeVHangles(
+      else TUtil::computeVHAngles(
         costhetastar,
         costheta1,
         costheta2,
@@ -2259,7 +2259,7 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_Comparison_Ping(int motherflavor=0, int 
         );
     }
     else{
-      if (vbfvhchannel==0) TUtil::computeVBFangles(
+      if (vbfvhchannel==0) TUtil::computeVBFAngles(
         costhetastar,
         costheta1,
         costheta2,
@@ -2276,7 +2276,7 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_Comparison_Ping(int motherflavor=0, int 
         associated.at(0).second, associated.at(0).first,
         associated.at(1).second, associated.at(1).first
         );
-      else TUtil::computeVHangles(
+      else TUtil::computeVHAngles(
         costhetastar,
         costheta1,
         costheta2,
@@ -3930,7 +3930,7 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_TU_Comparison_Ping(int motherflavor=0, i
     mela.setInputEvent(&daughters_tu, &associated_tu, &mothers, true);
 
     if (mothers.size()>1){
-      if (vbfvhchannel==0) TUtil::computeVBFangles(
+      if (vbfvhchannel==0) TUtil::computeVBFAngles(
         costhetastar,
         costheta1,
         costheta2,
@@ -3950,7 +3950,7 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_TU_Comparison_Ping(int motherflavor=0, i
         &(mothers.at(0).second), mothers.at(0).first,
         &(mothers.at(1).second), mothers.at(1).first
         );
-      else TUtil::computeVHangles(
+      else TUtil::computeVHAngles(
         costhetastar,
         costheta1,
         costheta2,
@@ -3970,7 +3970,7 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_TU_Comparison_Ping(int motherflavor=0, i
         );
     }
     else{
-      if (vbfvhchannel==0) TUtil::computeVBFangles(
+      if (vbfvhchannel==0) TUtil::computeVBFAngles(
         costhetastar,
         costheta1,
         costheta2,
@@ -3987,7 +3987,7 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_TU_Comparison_Ping(int motherflavor=0, i
         associated.at(0).second, associated.at(0).first,
         associated.at(1).second, associated.at(1).first
         );
-      else TUtil::computeVHangles(
+      else TUtil::computeVHAngles(
         costhetastar,
         costheta1,
         costheta2,
@@ -4773,7 +4773,7 @@ void testME_ProdDec_MCFM_JHUGen_Comparison(int flavor=2, bool useBkgSample=false
       mela.setInputEvent(&daughters_ZZ, &associated, &mothers, true);
 
       if (mothers.size()>1){
-        if (vbfvhchannel==1) TUtil::computeVBFangles(
+        if (vbfvhchannel==1) TUtil::computeVBFAngles(
           costhetastar,
           costheta1,
           costheta2,
@@ -4793,7 +4793,7 @@ void testME_ProdDec_MCFM_JHUGen_Comparison(int flavor=2, bool useBkgSample=false
           &(mothers.at(0).second), mothers.at(0).first,
           &(mothers.at(1).second), mothers.at(1).first
           );
-        else TUtil::computeVHangles(
+        else TUtil::computeVHAngles(
           costhetastar,
           costheta1,
           costheta2,
@@ -4813,7 +4813,7 @@ void testME_ProdDec_MCFM_JHUGen_Comparison(int flavor=2, bool useBkgSample=false
           );
       }
       else{
-        if (vbfvhchannel==1) TUtil::computeVBFangles(
+        if (vbfvhchannel==1) TUtil::computeVBFAngles(
           costhetastar,
           costheta1,
           costheta2,
@@ -4830,7 +4830,7 @@ void testME_ProdDec_MCFM_JHUGen_Comparison(int flavor=2, bool useBkgSample=false
           associated.at(0).second, associated.at(0).first,
           associated.at(1).second, associated.at(1).first
           );
-        else TUtil::computeVHangles(
+        else TUtil::computeVHAngles(
           costhetastar,
           costheta1,
           costheta2,
