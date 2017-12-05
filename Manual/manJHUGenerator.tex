@@ -27,7 +27,7 @@ Manual for the JHU generator and MELA package
 \begin{center}
 \small
 For simulation, reweighting, and analysis of a single-produced resonance at hadron colliders \\
-(version v7.0.9, release date Nov. 26, 2017, manual date Nov. 26, 2017) \\
+(version v7.0.11, release date Dec. 5, 2017, manual date Dec. 5, 2017) \\
 \normalsize
 \end{center}
 
@@ -756,11 +756,12 @@ Since text processing is simple in Python, the Python MELA interface is especial
 \section{Release notes}
 
 \noindent
-In going from \verb|v7.0.2| to \verb|v7.0.9| (November 26, 2017), the updates are as follows:
+In going from \verb|v7.0.2| to \verb|v7.0.11| (December 5, 2017), the updates are as follows:
 
 \begin{itemize}
 	\item MELA package interface is completely rewritten and streamlined, including new processes implemented
 	\item Add the option for an intermediate $Z^\prime$ or $W^\prime$ in spin-0 resonance decay and in VBF and $VH$ production.  $V^\prime$ can have finite or infinite mass; in the second case, it is equivalent to the contact terms formulation~\cite{Gonzalez-Alonso:2014eva}
+        \item Fix in the \verb|<init>| block when reading an LHE file and reweighting the mass shape
 \end{itemize}
 
 \noindent
