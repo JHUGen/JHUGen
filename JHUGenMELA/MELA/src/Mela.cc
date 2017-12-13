@@ -432,31 +432,41 @@ void Mela::computeDecayAngles(
   float& Phi,
   float& costhetastar,
   float& Phi1
-  ){
+){
+  using TVar::simple_event_record;
+
   qH=0; m1=0; m2=0; costheta1=0; costheta2=0; Phi=0; costhetastar=0; Phi1=0;
 
   if (melaCand==0) melaCand = getCurrentCandidate();
   if (melaCand!=0){
     TLorentzVector nullVector(0, 0, 0, 0);
 
-    qH = melaCand->m();
-    m1 = melaCand->getSortedV(0)->m();
-    m2 = melaCand->getSortedV(1)->m();
+    int partIncCode=TVar::kNoAssociated; // Only use associated partons in the pT=0 frame boost
+    simple_event_record mela_event;
+    mela_event.AssociationCode=partIncCode;
+    TUtil::GetBoostedParticleVectors(melaCand, mela_event, myVerbosity_);
+    SimpleParticleCollection_t& daughters = mela_event.pDaughters;
 
-    if (melaCand->getSortedV(0)->getNDaughters()>=1 && melaCand->getSortedV(1)->getNDaughters()>=1){
-      MELAParticle* dau[2][2]={ { 0 } };
-      for (int vv=0; vv<2; vv++){
-        MELAParticle* Vi = melaCand->getSortedV(vv);
-        for (int dd=0; dd<Vi->getNDaughters(); dd++) dau[vv][dd] = Vi->getDaughter(dd);
-      }
-      TUtil::computeAngles(
-        (dau[0][0]!=0 ? dau[0][0]->p4 : nullVector), (dau[0][0]!=0 ? dau[0][0]->id : -9000),
-        (dau[0][1]!=0 ? dau[0][1]->p4 : nullVector), (dau[0][1]!=0 ? dau[0][1]->id : -9000),
-        (dau[1][0]!=0 ? dau[1][0]->p4 : nullVector), (dau[1][0]!=0 ? dau[1][0]->id : -9000),
-        (dau[1][1]!=0 ? dau[1][1]->p4 : nullVector), (dau[1][1]!=0 ? dau[1][1]->id : -9000),
-        costhetastar, costheta1, costheta2, Phi, Phi1
-        );
+    if (daughters.size()<2 || daughters.size()>4 || mela_event.intermediateVid.size()!=2){
+      if (myVerbosity_>=TVar::ERROR) MELAerr << "Mela::computeDecayAngles: Number of daughters " << daughters.size() << " or number of intermediate Vs " << mela_event.intermediateVid << " not supported!" << endl;
+      return;
     }
+
+    // Make sure there are exactly 4 daughters, null or not
+    if (daughters.size()%2==1){ for (unsigned int ipar=daughters.size(); ipar<4; ipar++) daughters.push_back(SimpleParticle_t(-9000, nullVector)); }
+    else if (daughters.size()==2){
+      daughters.push_back(SimpleParticle_t(-9000, nullVector));
+      daughters.insert(daughters.begin()+1, SimpleParticle_t(-9000, nullVector));
+    }
+
+    TUtil::computeAngles(
+      costhetastar, costheta1, costheta2, Phi, Phi1,
+      daughters.at(0).second, daughters.at(0).first,
+      daughters.at(1).second, daughters.at(1).first,
+      daughters.at(2).second, daughters.at(2).first,
+      daughters.at(3).second, daughters.at(3).first
+    );
+
     // Protect against NaN
     if (!(costhetastar==costhetastar)) costhetastar=0;
     if (!(costheta1==costheta1)) costheta1=0;
@@ -498,17 +508,16 @@ void Mela::computeVBFAngles(
     if ((int)aparts.size()!=nRequested_AssociatedJets){ if (myVerbosity_>=TVar::ERROR) MELAerr << "Mela::computeVBFAngles: Number of associated particles is not 2!" << endl; return; }
 
     // Make sure there are exactly 4 daughters, null or not
-    if (daughters.size()==1){ for (unsigned int ipar=daughters.size(); ipar<4; ipar++) daughters.push_back(SimpleParticle_t(-9000, nullVector)); }
-    else if (daughters.size()==2){
-      daughters.push_back(SimpleParticle_t(-9000, nullVector));
-      daughters.insert(daughters.begin()+1, SimpleParticle_t(-9000, nullVector));
-    }
-    else if (daughters.size()>4){ // Unsupported size, default to undecayed Higgs
+    if (daughters.size()>4){ // Unsupported size, default to undecayed Higgs
       SimpleParticle_t& firstPart = daughters.at(0);
       firstPart.first=25;
       for (auto it=daughters.cbegin()+1; it!=daughters.cend(); it++){ firstPart.second = firstPart.second + it->second; }
       daughters.erase(daughters.begin()+4, daughters.end());
-      for (unsigned int ipar=1; ipar<4; ipar++) daughters.at(ipar)=SimpleParticle_t(-9000, nullVector);
+    }
+    if (daughters.size()%2==1){ for (unsigned int ipar=daughters.size(); ipar<4; ipar++) daughters.push_back(SimpleParticle_t(-9000, nullVector)); }
+    else if (daughters.size()==2){
+      daughters.push_back(SimpleParticle_t(-9000, nullVector));
+      daughters.insert(daughters.begin()+1, SimpleParticle_t(-9000, nullVector));
     }
 
     TUtil::computeVBFAngles(
@@ -562,17 +571,16 @@ void Mela::computeVBFAngles_ComplexBoost(
     if ((int) aparts.size()!=nRequested_AssociatedJets){ if (myVerbosity_>=TVar::ERROR) MELAerr << "Mela::computeVBFAngles_ComplexBoost: Number of associated particles is not 2!" << endl; return; }
 
     // Make sure there are exactly 4 daughters, null or not
-    if (daughters.size()==1){ for (unsigned int ipar=daughters.size(); ipar<4; ipar++) daughters.push_back(SimpleParticle_t(-9000, nullVector)); }
-    else if (daughters.size()==2){
-      daughters.push_back(SimpleParticle_t(-9000, nullVector));
-      daughters.insert(daughters.begin()+1, SimpleParticle_t(-9000, nullVector));
-    }
-    else if (daughters.size()>4){ // Unsupported size, default to undecayed Higgs
+    if (daughters.size()>4){ // Unsupported size, default to undecayed Higgs
       SimpleParticle_t& firstPart = daughters.at(0);
       firstPart.first=25;
       for (auto it=daughters.cbegin()+1; it!=daughters.cend(); it++){ firstPart.second = firstPart.second + it->second; }
       daughters.erase(daughters.begin()+4, daughters.end());
-      for (unsigned int ipar=1; ipar<4; ipar++) daughters.at(ipar)=SimpleParticle_t(-9000, nullVector);
+    }
+    if (daughters.size()%2==1){ for (unsigned int ipar=daughters.size(); ipar<4; ipar++) daughters.push_back(SimpleParticle_t(-9000, nullVector)); }
+    else if (daughters.size()==2){
+      daughters.push_back(SimpleParticle_t(-9000, nullVector));
+      daughters.insert(daughters.begin()+1, SimpleParticle_t(-9000, nullVector));
     }
 
     TUtil::computeVBFAngles_ComplexBoost(
@@ -662,17 +670,16 @@ void Mela::computeVHAngles(
     }
 
     // Make sure there are exactly 4 daughters, null or not
-    if (daughters.size()==1){ for (unsigned int ipar=daughters.size(); ipar<4; ipar++) daughters.push_back(SimpleParticle_t(-9000, nullVector)); }
-    else if (daughters.size()==2){
-      daughters.push_back(SimpleParticle_t(-9000, nullVector));
-      daughters.insert(daughters.begin()+1, SimpleParticle_t(-9000, nullVector));
-    }
-    else if (daughters.size()>4){ // Unsupported size, default to undecayed Higgs
+    if (daughters.size()>4){ // Unsupported size, default to undecayed Higgs
       SimpleParticle_t& firstPart = daughters.at(0);
       firstPart.first=25;
       for (auto it=daughters.cbegin()+1; it!=daughters.cend(); it++){ firstPart.second = firstPart.second + it->second; }
       daughters.erase(daughters.begin()+4, daughters.end());
-      for (unsigned int ipar=1; ipar<4; ipar++) daughters.at(ipar)=SimpleParticle_t(-9000, nullVector);
+    }
+    if (daughters.size()%2==1){ for (unsigned int ipar=daughters.size(); ipar<4; ipar++) daughters.push_back(SimpleParticle_t(-9000, nullVector)); }
+    else if (daughters.size()==2){
+      daughters.push_back(SimpleParticle_t(-9000, nullVector));
+      daughters.insert(daughters.begin()+1, SimpleParticle_t(-9000, nullVector));
     }
 
     TUtil::computeVHAngles(

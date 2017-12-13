@@ -80,27 +80,27 @@ namespace TUtil{
   /// Leptons are re-ordered internally according to a standard convention:
   /// lept1 = negative-charged lepton (for OS pairs).
   void computeAngles(
-    TLorentzVector Z1_lept1, int Z1_lept1Id,
-    TLorentzVector Z1_lept2, int Z1_lept2Id,
-    TLorentzVector Z2_lept1, int Z2_lept1Id,
-    TLorentzVector Z2_lept2, int Z2_lept2Id,
     float& costhetastar,
     float& costheta1,
     float& costheta2,
     float& Phi,
-    float& Phi1
-    );
-  void computeAnglesCS(
+    float& Phi1,
     TLorentzVector Z1_lept1, int Z1_lept1Id,
     TLorentzVector Z1_lept2, int Z1_lept2Id,
     TLorentzVector Z2_lept1, int Z2_lept1Id,
-    TLorentzVector Z2_lept2, int Z2_lept2Id,
+    TLorentzVector Z2_lept2, int Z2_lept2Id
+    );
+  void computeAnglesCS(
     float pbeam,
     float& costhetastar,
     float& costheta1,
     float& costheta2,
     float& Phi,
-    float& Phi1
+    float& Phi1,
+    TLorentzVector Z1_lept1, int Z1_lept1Id,
+    TLorentzVector Z1_lept2, int Z1_lept2Id,
+    TLorentzVector Z2_lept1, int Z2_lept1Id,
+    TLorentzVector Z2_lept2, int Z2_lept2Id
     );
   // Angles of associated production
   void computeVBFAngles(

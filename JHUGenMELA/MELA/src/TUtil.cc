@@ -201,15 +201,15 @@ std::pair<TLorentzVector, TLorentzVector> TUtil::ComplexBoost(TVector3 beta, TLo
 
 /***** Decay angles *****/
 void TUtil::computeAngles(
-  TLorentzVector p4M11, int Z1_lept1Id,
-  TLorentzVector p4M12, int Z1_lept2Id,
-  TLorentzVector p4M21, int Z2_lept1Id,
-  TLorentzVector p4M22, int Z2_lept2Id,
   float& costhetastar,
   float& costheta1,
   float& costheta2,
   float& Phi,
-  float& Phi1
+  float& Phi1,
+  TLorentzVector p4M11, int Z1_lept1Id,
+  TLorentzVector p4M12, int Z1_lept2Id,
+  TLorentzVector p4M21, int Z2_lept1Id,
+  TLorentzVector p4M22, int Z2_lept2Id
   ){
   TLorentzVector nullFourVector(0, 0, 0, 0);
   if (p4M12==nullFourVector || p4M22==nullFourVector){
@@ -237,7 +237,7 @@ void TUtil::computeAngles(
 
   // Sort Z1 leptons so that:
   if (
-    Z1_lept2Id!=9000
+    Z1_lept2Id!=-9000
     &&
     (
     (Z1_lept1Id*Z1_lept2Id<0 && Z1_lept1Id<0) // for OS pairs: lep1 must be the negative one
@@ -247,7 +247,7 @@ void TUtil::computeAngles(
     ) swap(p4M11, p4M12);
   // Same for Z2 leptons
   if (
-    Z2_lept2Id!=9000
+    Z2_lept2Id!=-9000
     &&
     (
     (Z2_lept1Id*Z2_lept2Id<0 && Z2_lept1Id<0)
@@ -367,16 +367,16 @@ void TUtil::computeAngles(
   }
 }
 void TUtil::computeAnglesCS(
-  TLorentzVector p4M11, int Z1_lept1Id,
-  TLorentzVector p4M12, int Z1_lept2Id,
-  TLorentzVector p4M21, int Z2_lept1Id,
-  TLorentzVector p4M22, int Z2_lept2Id,
   float pbeam,
   float& costhetastar,
   float& costheta1,
   float& costheta2,
   float& Phi,
-  float& Phi1
+  float& Phi1,
+  TLorentzVector p4M11, int Z1_lept1Id,
+  TLorentzVector p4M12, int Z1_lept2Id,
+  TLorentzVector p4M21, int Z2_lept1Id,
+  TLorentzVector p4M22, int Z2_lept2Id
   ){
   TLorentzVector nullFourVector(0, 0, 0, 0);
   if (p4M12==nullFourVector || p4M22==nullFourVector){
@@ -1027,16 +1027,16 @@ void TUtil::computeVHAngles(
   }
 
   TUtil::computeAngles(
-    -P1, 23, // Id is 23 to avoid an attempt to remove quark mass
-    -P2, 0, // Id is 0 to avoid swapping
-    jet1massless, 23,
-    jet2massless, 0,
     costhetastar,
     costheta1,
     costheta2,
     Phi,
-    Phi1
-    );
+    Phi1,
+    -P1, 23, // Id is 23 to avoid an attempt to remove quark mass
+    -P2, 0, // Id is 0 to avoid swapping
+    jet1massless, 23,
+    jet2massless, 0
+  );
 }
 
 
@@ -4196,6 +4196,7 @@ double TUtil::SumMatrixElementPDF(
   return msqjk;
 }
 
+// ggHdec+0J or Hdec+0J
 double TUtil::JHUGenMatEl(
   const TVar::Process& process, const TVar::Production& production, const TVar::MatrixElement& matrixElement,
   event_scales_type* event_scales, MelaIO* RcdME,
@@ -4267,7 +4268,7 @@ double TUtil::JHUGenMatEl(
     verbosity
     );
   if (mela_event.pDaughters.size()<2 || mela_event.intermediateVid.size()!=2){
-    if (verbosity>=TVar::ERROR) MELAerr << "TUtil::JHUGenMatEl: Number of daughters " << mela_event.pDaughters.size() << " or number of intermediate Vs " << mela_event.intermediateVid.size() << " not supported!" << endl;
+    if (verbosity>=TVar::ERROR) MELAerr << "TUtil::JHUGenMatEl: Number of daughters " << mela_event.pDaughters.size() << " or number of intermediate Vs " << mela_event.intermediateVid << " not supported!" << endl;
     return MatElSq;
   }
 
@@ -4568,6 +4569,7 @@ double TUtil::JHUGenMatEl(
   return MatElSq;
 }
 
+// VBF and HJJ (QCD), H undecayed, includes H BW
 double TUtil::HJJMatEl(
   const TVar::Process& process, const TVar::Production& production, const TVar::MatrixElement& matrixElement,
   event_scales_type* event_scales, MelaIO* RcdME,
@@ -6011,6 +6013,7 @@ double TUtil::HJJMatEl(
   return sum_msqjk;
 }
 
+// VH, H undecayed or Hbb
 double TUtil::VHiggsMatEl(
   const TVar::Process& process, const TVar::Production& production, const TVar::MatrixElement& matrixElement,
   event_scales_type* event_scales, MelaIO* RcdME,
@@ -6619,8 +6622,7 @@ double TUtil::VHiggsMatEl(
   return sum_msqjk;
 }
 
-
-// ttH
+// ttH, H undecayed
 double TUtil::TTHiggsMatEl(
   const TVar::Process& process, const TVar::Production& production, const TVar::MatrixElement& matrixElement,
   event_scales_type* event_scales, MelaIO* RcdME,
@@ -6995,7 +6997,7 @@ double TUtil::TTHiggsMatEl(
   return sum_msqjk;
 }
 
-// bbH
+// bbH, H undecayed
 double TUtil::BBHiggsMatEl(
   const TVar::Process& process, const TVar::Production& production, const TVar::MatrixElement& matrixElement,
   event_scales_type* event_scales, MelaIO* RcdME,
