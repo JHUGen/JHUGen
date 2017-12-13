@@ -477,36 +477,50 @@ void Mela::computeVBFAngles(
   float& costhetastar,
   float& Phi1
 ){
+  using TVar::simple_event_record;
+
   Q2V1=0; Q2V2=0; costheta1=0; costheta2=0; Phi=0; costhetastar=0; Phi1=0;
 
   if (melaCand==0) melaCand = getCurrentCandidate();
   if (melaCand!=0){
     TLorentzVector nullVector(0, 0, 0, 0);
 
-    std::pair<TLorentzVector*, int> inMother1(nullptr, -9000); if (melaCand->getMother(0)){ inMother1.first=&(melaCand->getMother(0)->p4); inMother1.second=melaCand->getMother(0)->id; }
-    std::pair<TLorentzVector*, int> inMother2(nullptr, -9000); if (melaCand->getMother(1)){ inMother2.first=&(melaCand->getMother(1)->p4); inMother2.second=melaCand->getMother(1)->id; }
-    std::pair<TLorentzVector, int> outApart1(nullVector, -9000); if (melaCand->getAssociatedJet(0)){ outApart1.first=melaCand->getAssociatedJet(0)->p4; outApart1.second=melaCand->getAssociatedJet(0)->id; }
-    std::pair<TLorentzVector, int> outApart2(nullVector, -9000); if (melaCand->getAssociatedJet(1)){ outApart2.first=melaCand->getAssociatedJet(1)->p4; outApart2.second=melaCand->getAssociatedJet(1)->id; }
+    int nRequested_AssociatedJets=2;
+    int partIncCode=TVar::kUseAssociated_Jets; // Only use associated partons in the pT=0 frame boost
+    simple_event_record mela_event;
+    mela_event.AssociationCode=partIncCode;
+    mela_event.nRequested_AssociatedJets=nRequested_AssociatedJets;
+    TUtil::GetBoostedParticleVectors(melaCand, mela_event, myVerbosity_);
+    SimpleParticleCollection_t& mothers = mela_event.pMothers;
+    SimpleParticleCollection_t& aparts = mela_event.pAssociated;
+    SimpleParticleCollection_t& daughters = mela_event.pDaughters;
 
-    MELAParticle* dau[2][2]={ { 0 } };
-    if (melaCand->getDecayMode()==TVar::CandidateDecay_Stable) dau[0][0]=melaCand;
-    else{
-      for (int vv=0; vv<2; vv++){
-        MELAParticle* Vi = melaCand->getSortedV(vv);
-        for (int dd=0; dd<Vi->getNDaughters(); dd++) dau[vv][dd] = Vi->getDaughter(dd);
-      }
+    if ((int)aparts.size()!=nRequested_AssociatedJets){ if (myVerbosity_>=TVar::ERROR) MELAerr << "Mela::computeVBFAngles: Number of associated particles is not 2!" << endl; return; }
+
+    // Make sure there are exactly 4 daughters, null or not
+    if (daughters.size()==1){ for (unsigned int ipar=daughters.size(); ipar<4; ipar++) daughters.push_back(SimpleParticle_t(-9000, nullVector)); }
+    else if (daughters.size()==2){
+      daughters.push_back(SimpleParticle_t(-9000, nullVector));
+      daughters.insert(daughters.begin()+1, SimpleParticle_t(-9000, nullVector));
+    }
+    else if (daughters.size()>4){ // Unsupported size, default to undecayed Higgs
+      SimpleParticle_t& firstPart = daughters.at(0);
+      firstPart.first=25;
+      for (auto it=daughters.cbegin()+1; it!=daughters.cend(); it++){ firstPart.second = firstPart.second + it->second; }
+      daughters.erase(daughters.begin()+4, daughters.end());
+      for (unsigned int ipar=1; ipar<4; ipar++) daughters.at(ipar)=SimpleParticle_t(-9000, nullVector);
     }
 
     TUtil::computeVBFAngles(
       costhetastar, costheta1, costheta2, Phi, Phi1, Q2V1, Q2V2,
-      (dau[0][0]!=0 ? dau[0][0]->p4 : nullVector), (dau[0][0]!=0 ? dau[0][0]->id : -9000),
-      (dau[0][1]!=0 ? dau[0][1]->p4 : nullVector), (dau[0][1]!=0 ? dau[0][1]->id : -9000),
-      (dau[1][0]!=0 ? dau[1][0]->p4 : nullVector), (dau[1][0]!=0 ? dau[1][0]->id : -9000),
-      (dau[1][1]!=0 ? dau[1][1]->p4 : nullVector), (dau[1][1]!=0 ? dau[1][1]->id : -9000),
-      outApart1.first, outApart1.second,
-      outApart2.first, outApart2.second,
-      inMother1.first, inMother1.second,
-      inMother2.first, inMother2.second
+      daughters.at(0).second, daughters.at(0).first,
+      daughters.at(1).second, daughters.at(1).first,
+      daughters.at(2).second, daughters.at(2).first,
+      daughters.at(3).second, daughters.at(3).first,
+      aparts.at(0).second, aparts.at(0).first,
+      aparts.at(1).second, aparts.at(1).first,
+      &(mothers.at(0).second), mothers.at(0).first,
+      &(mothers.at(1).second), mothers.at(1).first
     );
 
     // Protect against NaN
@@ -527,36 +541,50 @@ void Mela::computeVBFAngles_ComplexBoost(
   float& costhetastar,
   float& Phi1
 ){
+  using TVar::simple_event_record;
+
   Q2V1=0; Q2V2=0; costheta1_real=0; costheta2_real=0; costheta1_imag=0; costheta2_imag=0; Phi=0; costhetastar=0; Phi1=0;
 
   if (melaCand==0) melaCand = getCurrentCandidate();
   if (melaCand!=0){
     TLorentzVector nullVector(0, 0, 0, 0);
 
-    std::pair<TLorentzVector*, int> inMother1(nullptr, -9000); if (melaCand->getMother(0)){ inMother1.first=&(melaCand->getMother(0)->p4); inMother1.second=melaCand->getMother(0)->id; }
-    std::pair<TLorentzVector*, int> inMother2(nullptr, -9000); if (melaCand->getMother(1)){ inMother2.first=&(melaCand->getMother(1)->p4); inMother2.second=melaCand->getMother(1)->id; }
-    std::pair<TLorentzVector, int> outApart1(nullVector, -9000); if (melaCand->getAssociatedJet(0)){ outApart1.first=melaCand->getAssociatedJet(0)->p4; outApart1.second=melaCand->getAssociatedJet(0)->id; }
-    std::pair<TLorentzVector, int> outApart2(nullVector, -9000); if (melaCand->getAssociatedJet(1)){ outApart2.first=melaCand->getAssociatedJet(1)->p4; outApart2.second=melaCand->getAssociatedJet(1)->id; }
+    int nRequested_AssociatedJets=2;
+    int partIncCode=TVar::kUseAssociated_Jets; // Only use associated partons in the pT=0 frame boost
+    simple_event_record mela_event;
+    mela_event.AssociationCode=partIncCode;
+    mela_event.nRequested_AssociatedJets=nRequested_AssociatedJets;
+    TUtil::GetBoostedParticleVectors(melaCand, mela_event, myVerbosity_);
+    SimpleParticleCollection_t& mothers = mela_event.pMothers;
+    SimpleParticleCollection_t& aparts = mela_event.pAssociated;
+    SimpleParticleCollection_t& daughters = mela_event.pDaughters;
 
-    MELAParticle* dau[2][2]={ { 0 } };
-    if (melaCand->getDecayMode()==TVar::CandidateDecay_Stable) dau[0][0]=melaCand;
-    else{
-      for (int vv=0; vv<2; vv++){
-        MELAParticle* Vi = melaCand->getSortedV(vv);
-        for (int dd=0; dd<Vi->getNDaughters(); dd++) dau[vv][dd] = Vi->getDaughter(dd);
-      }
+    if ((int) aparts.size()!=nRequested_AssociatedJets){ if (myVerbosity_>=TVar::ERROR) MELAerr << "Mela::computeVBFAngles_ComplexBoost: Number of associated particles is not 2!" << endl; return; }
+
+    // Make sure there are exactly 4 daughters, null or not
+    if (daughters.size()==1){ for (unsigned int ipar=daughters.size(); ipar<4; ipar++) daughters.push_back(SimpleParticle_t(-9000, nullVector)); }
+    else if (daughters.size()==2){
+      daughters.push_back(SimpleParticle_t(-9000, nullVector));
+      daughters.insert(daughters.begin()+1, SimpleParticle_t(-9000, nullVector));
+    }
+    else if (daughters.size()>4){ // Unsupported size, default to undecayed Higgs
+      SimpleParticle_t& firstPart = daughters.at(0);
+      firstPart.first=25;
+      for (auto it=daughters.cbegin()+1; it!=daughters.cend(); it++){ firstPart.second = firstPart.second + it->second; }
+      daughters.erase(daughters.begin()+4, daughters.end());
+      for (unsigned int ipar=1; ipar<4; ipar++) daughters.at(ipar)=SimpleParticle_t(-9000, nullVector);
     }
 
     TUtil::computeVBFAngles_ComplexBoost(
       costhetastar, costheta1_real, costheta1_imag, costheta2_real, costheta2_imag, Phi, Phi1, Q2V1, Q2V2,
-      (dau[0][0]!=0 ? dau[0][0]->p4 : nullVector), (dau[0][0]!=0 ? dau[0][0]->id : -9000),
-      (dau[0][1]!=0 ? dau[0][1]->p4 : nullVector), (dau[0][1]!=0 ? dau[0][1]->id : -9000),
-      (dau[1][0]!=0 ? dau[1][0]->p4 : nullVector), (dau[1][0]!=0 ? dau[1][0]->id : -9000),
-      (dau[1][1]!=0 ? dau[1][1]->p4 : nullVector), (dau[1][1]!=0 ? dau[1][1]->id : -9000),
-      outApart1.first, outApart1.second,
-      outApart2.first, outApart2.second,
-      inMother1.first, inMother1.second,
-      inMother2.first, inMother2.second
+      daughters.at(0).second, daughters.at(0).first,
+      daughters.at(1).second, daughters.at(1).first,
+      daughters.at(2).second, daughters.at(2).first,
+      daughters.at(3).second, daughters.at(3).first,
+      aparts.at(0).second, aparts.at(0).first,
+      aparts.at(1).second, aparts.at(1).first,
+      &(mothers.at(0).second), mothers.at(0).first,
+      &(mothers.at(1).second), mothers.at(1).first
     );
 
     // Protect against NaN
@@ -573,81 +601,90 @@ void Mela::computeVBFAngles_ComplexBoost(
 
 // VH angles computation script of Mela to convert MELACandidates to production angles.
 void Mela::computeVHAngles(
-  int idV,
   float& costheta1,
   float& costheta2,
   float& Phi,
   float& costhetastar,
   float& Phi1
 ){
+  using TVar::simple_event_record;
+
   costheta1=0; costheta2=0; Phi=0; costhetastar=0; Phi1=0;
 
   if (melaCand==0) melaCand = getCurrentCandidate();
   if (melaCand!=0){
     TLorentzVector nullVector(0, 0, 0, 0);
 
-    std::pair<TLorentzVector*, int> inMother1(nullptr, -9000); if (melaCand->getMother(0)){ inMother1.first=&(melaCand->getMother(0)->p4); inMother1.second=melaCand->getMother(0)->id; }
-    std::pair<TLorentzVector*, int> inMother2(nullptr, -9000); if (melaCand->getMother(1)){ inMother2.first=&(melaCand->getMother(1)->p4); inMother2.second=melaCand->getMother(1)->id; }
-    std::pair<TLorentzVector, int> outApart1(nullVector, -9000);
-    std::pair<TLorentzVector, int> outApart2(nullVector, -9000);
+    if (!(myProduction_ == TVar::Lep_ZH || myProduction_ == TVar::Lep_WH || myProduction_ == TVar::Had_ZH || myProduction_ == TVar::Had_WH || myProduction_ == TVar::GammaH)){
+      if (myVerbosity_>=TVar::ERROR) MELAerr << "Mela::computeVHAngles: Production is not supported!" << endl;
+      return;
+    }
 
-    MELAParticle* apartV=nullptr;
-    MELAParticle* dau[2][2]={ { 0 } };
-    if (melaCand->getDecayMode()==TVar::CandidateDecay_Stable){
-      dau[0][0]=melaCand;
-      for (auto& v:melaCand->getSortedVs()){
-        int& avid=v->id;
-        if (
-          (
-          avid==idV
-          ||
-          ((PDGHelpers::isAZBoson(avid) || PDGHelpers::isAWBoson(avid) || PDGHelpers::isAPhoton(avid)) && idV==0)
-          ||
-          ((PDGHelpers::isAZBoson(idV) || PDGHelpers::isAWBoson(idV) || PDGHelpers::isAPhoton(idV)) && avid==0)
-          )
-          &&
-          v->getDaughter(0)
-          ){ apartV=v; break; }
-      }
+    int nRequested_AssociatedJets=0;
+    int nRequested_AssociatedLeptons=0;
+    int nRequested_AssociatedPhotons=0;
+    int AssociationVCompatibility=0;
+    int partIncCode=TVar::kNoAssociated; // Just to avoid warnings
+    if (myProduction_ == TVar::Had_ZH || myProduction_ == TVar::Had_WH){ // Only use associated partons
+      partIncCode=TVar::kUseAssociated_Jets;
+      nRequested_AssociatedJets=2;
     }
-    else{
-      int vv=0;
-      for (auto& Vi:melaCand->getSortedVs()){
-        if (vv<2){ for (int dd=0; dd<Vi->getNDaughters(); dd++) dau[vv][dd] = Vi->getDaughter(dd); }
-        else{
-          int& avid=Vi->id;
-          if (
-            (
-            avid==idV
-            ||
-            ((PDGHelpers::isAZBoson(avid) || PDGHelpers::isAWBoson(avid) || PDGHelpers::isAPhoton(avid)) && idV==0)
-            ||
-            ((PDGHelpers::isAZBoson(idV) || PDGHelpers::isAWBoson(idV) || PDGHelpers::isAPhoton(idV)) && avid==0)
-            )
-            &&
-            Vi->getDaughter(0)
-            ){
-            apartV=Vi; break;
-          }
-        }
-        vv++;
-      }
+    else if (myProduction_ == TVar::Lep_ZH || myProduction_ == TVar::Lep_WH){ // Only use associated leptons(+)neutrinos
+      partIncCode=TVar::kUseAssociated_Leptons;
+      nRequested_AssociatedLeptons=2;
     }
-    if (apartV){
-      if (apartV->getDaughter(0)){ outApart1.first=apartV->getDaughter(0)->p4; outApart1.second=apartV->getDaughter(0)->id; }
-      if (apartV->getDaughter(1)){ outApart2.first=apartV->getDaughter(1)->p4; outApart2.second=apartV->getDaughter(1)->id; }
+    else if (myProduction_ == TVar::GammaH){ // Only use associated photon
+      partIncCode=TVar::kUseAssociated_Photons;
+      nRequested_AssociatedPhotons=1;
+    }
+    if (myProduction_==TVar::Lep_WH || myProduction_==TVar::Had_WH) AssociationVCompatibility=24;
+    else if (myProduction_==TVar::Lep_ZH || myProduction_==TVar::Had_ZH) AssociationVCompatibility=23;
+    else if (myProduction_==TVar::GammaH) AssociationVCompatibility=22;
+    simple_event_record mela_event;
+    mela_event.AssociationCode=partIncCode;
+    mela_event.AssociationVCompatibility=AssociationVCompatibility;
+    mela_event.nRequested_AssociatedJets=nRequested_AssociatedJets;
+    mela_event.nRequested_AssociatedLeptons=nRequested_AssociatedLeptons;
+    mela_event.nRequested_AssociatedPhotons=nRequested_AssociatedPhotons;
+    TUtil::GetBoostedParticleVectors(melaCand, mela_event, myVerbosity_);
+    SimpleParticleCollection_t& mothers = mela_event.pMothers;
+    SimpleParticleCollection_t& aparts = mela_event.pAssociated;
+    SimpleParticleCollection_t& daughters = mela_event.pDaughters;
+
+    if ((aparts.size()<(unsigned int) (nRequested_AssociatedJets+nRequested_AssociatedLeptons) && myProduction_!=TVar::GammaH) || (aparts.size()<(unsigned int) nRequested_AssociatedPhotons && myProduction_==TVar::GammaH)){
+      if (myVerbosity_>=TVar::ERROR){
+        MELAerr << "Mela::computeVHAngles: Number of associated particles (" << aparts.size() << ") is less than ";
+        if (myProduction_!=TVar::GammaH) MELAerr << (nRequested_AssociatedJets+nRequested_AssociatedLeptons);
+        else MELAerr << nRequested_AssociatedPhotons;
+        MELAerr << endl;
+      }
+      return;
+    }
+
+    // Make sure there are exactly 4 daughters, null or not
+    if (daughters.size()==1){ for (unsigned int ipar=daughters.size(); ipar<4; ipar++) daughters.push_back(SimpleParticle_t(-9000, nullVector)); }
+    else if (daughters.size()==2){
+      daughters.push_back(SimpleParticle_t(-9000, nullVector));
+      daughters.insert(daughters.begin()+1, SimpleParticle_t(-9000, nullVector));
+    }
+    else if (daughters.size()>4){ // Unsupported size, default to undecayed Higgs
+      SimpleParticle_t& firstPart = daughters.at(0);
+      firstPart.first=25;
+      for (auto it=daughters.cbegin()+1; it!=daughters.cend(); it++){ firstPart.second = firstPart.second + it->second; }
+      daughters.erase(daughters.begin()+4, daughters.end());
+      for (unsigned int ipar=1; ipar<4; ipar++) daughters.at(ipar)=SimpleParticle_t(-9000, nullVector);
     }
 
     TUtil::computeVHAngles(
       costhetastar, costheta1, costheta2, Phi, Phi1,
-      (dau[0][0]!=0 ? dau[0][0]->p4 : nullVector), (dau[0][0]!=0 ? dau[0][0]->id : -9000),
-      (dau[0][1]!=0 ? dau[0][1]->p4 : nullVector), (dau[0][1]!=0 ? dau[0][1]->id : -9000),
-      (dau[1][0]!=0 ? dau[1][0]->p4 : nullVector), (dau[1][0]!=0 ? dau[1][0]->id : -9000),
-      (dau[1][1]!=0 ? dau[1][1]->p4 : nullVector), (dau[1][1]!=0 ? dau[1][1]->id : -9000),
-      outApart1.first, outApart1.second,
-      outApart2.first, outApart2.second,
-      inMother1.first, inMother1.second,
-      inMother2.first, inMother2.second
+      daughters.at(0).second, daughters.at(0).first,
+      daughters.at(1).second, daughters.at(1).first,
+      daughters.at(2).second, daughters.at(2).first,
+      daughters.at(3).second, daughters.at(3).first,
+      aparts.at(0).second, aparts.at(0).first,
+      aparts.at(1).second, aparts.at(1).first,
+      &(mothers.at(0).second), mothers.at(0).first,
+      &(mothers.at(1).second), mothers.at(1).first
     );
 
     // Protect against NaN

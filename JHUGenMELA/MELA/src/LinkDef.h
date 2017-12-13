@@ -36,6 +36,7 @@
 #pragma link C++ function TUtil::computeAngles;
 #pragma link C++ function TUtil::computeAnglesCS;
 #pragma link C++ function TUtil::computeVBFAngles;
+#pragma link C++ function TUtil::computeVBFAngles_ComplexBoost;
 #pragma link C++ function TUtil::computeVHAngles;
 #pragma link C++ function TUtil::scaleMomentumToEnergy;
 #pragma link C++ function TUtil::constrainedRemovePairMass;
