@@ -458,6 +458,9 @@ void Mela::computeDecayAngles(
       daughters.push_back(SimpleParticle_t(-9000, nullVector));
       daughters.insert(daughters.begin()+1, SimpleParticle_t(-9000, nullVector));
     }
+    qH = (daughters.at(0).second+daughters.at(1).second+daughters.at(2).second+daughters.at(3).second).M();
+    m1 = (daughters.at(0).second+daughters.at(1).second).M();
+    m2 = (daughters.at(2).second+daughters.at(3).second).M();
 
     TUtil::computeAngles(
       costhetastar, costheta1, costheta2, Phi, Phi1,
