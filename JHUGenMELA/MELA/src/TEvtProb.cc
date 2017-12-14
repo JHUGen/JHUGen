@@ -340,22 +340,13 @@ void TEvtProb::ResetInputEvent(){
 
   // Clear bookkeeping objects
   // Clean MELACandidates first since they contain all other objects
-  for (unsigned int p=0; p<candList.size(); p++){
-    MELACandidate* tmpCand = (MELACandidate*)candList.at(p);
-    if (tmpCand!=0) delete tmpCand;
-  }
+  for (MELACandidate* tmpPart:candList) delete tmpPart;
   candList.clear();
   // Clean MELATopCandidates next since they contain MELAParticles
-  for (unsigned int p=0; p<topCandList.size(); p++){
-    MELATopCandidate* tmpCand = (MELATopCandidate*)topCandList.at(p);
-    if (tmpCand!=0) delete tmpCand;
-  }
+  for (MELATopCandidate* tmpPart:topCandList) delete tmpPart;
   topCandList.clear();
   // Clean all remaining MELAPArticles
-  for (unsigned int p=0; p<particleList.size(); p++){
-    MELAParticle* tmpPart = (MELAParticle*)particleList.at(p);
-    if (tmpPart!=0) delete tmpPart;
-  }
+  for (MELAParticle* tmpPart:particleList) delete tmpPart;
   particleList.clear();
 }
 

@@ -91,10 +91,10 @@ class Mela(object):
       );
       return result;
     }
-    vector<float> computeVHAngles(Mela& mela, int idV) {
+    vector<float> computeVHAngles(Mela& mela, TVar::Production prod) {
+      mela.setProcess(TVar::HSMHiggs, TVar::JHUGen, prod);
       vector<float> result(5);
       mela.computeVHAngles(
-        idV,
         result[0],
         result[1],
         result[2],
@@ -281,7 +281,7 @@ class Mela(object):
     result = ROOT.computeVBFAngles_ComplexBoost(self.__mela)
     return self.VBFAngles(result[0], result[1], result[2]+1j*result[3], result[4]+1j*result[5], *result[6:])
   VHAngles = namedtuple("VHAngles", "costheta1 costheta2 Phi costhetastar Phi1")
-  def computeVHAngles(self, idV): return self.VHAngles(*ROOT.computeVHAngles(self.__mela, idV))
+  def computeVHAngles(self, prod): return self.VHAngles(*ROOT.computeVHAngles(self.__mela, prod))
 
   def computeP(self, useConstant=True): return ROOT.computeP(self.__mela, useConstant)
   def computeD_CP(self, myME, myType): return ROOT.computeD_CP(self.__mela, myME, myType)
@@ -624,7 +624,7 @@ if __name__ == "__main__":
   print m.computeDecayAngles()
   print m.computeVBFAngles()
   print m.computeVBFAngles_ComplexBoost()
-  print m.computeVHAngles(24)
+  print m.computeVHAngles(TVar.Had_WH)
   print "propagator:"
   print "   BW:", m.getXPropagator(TVar.FixedWidth)
   print "  CPS:", m.getXPropagator(TVar.CPS)

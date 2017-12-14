@@ -129,7 +129,6 @@ public:
     float& Phi1
   );
   void computeVHAngles(
-    int idV,
     float& costheta1,
     float& costheta2,
     float& Phi,

@@ -41,6 +41,9 @@ public:
   const std::vector<MELAParticle*>& getAssociatedJets()const;
   const std::vector<MELATopCandidate*>& getAssociatedTops()const;
 
+  std::vector<MELAParticle*> getAssociatedSortedVs();
+  std::vector<MELAParticle*> getAssociatedSortedVs()const;
+
   void getRelatedParticles(std::vector<MELAParticle*>& particles);
 
   TLorentzVector getAlternativeVMomentum(int index)const;

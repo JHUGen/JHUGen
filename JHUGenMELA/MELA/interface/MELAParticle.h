@@ -58,6 +58,8 @@ public:
   std::vector<MELAParticle*>& getDaughters(){ return daughters; }
   const std::vector<MELAParticle*>& getMothers()const{ return mothers; }
   const std::vector<MELAParticle*>& getDaughters()const{ return daughters; }
+  bool hasMother(MELAParticle const* part) const;
+  bool hasDaughter(MELAParticle const* part) const;
 
   double charge()const;
   double m()const{ return p4.M(); }
@@ -84,7 +86,7 @@ public:
   MELAParticle& operator+=(const TLorentzVector& mom){ p4 += mom; return *this; }
 
   // Helper functions
-  static bool checkParticleExists(MELAParticle* myParticle, std::vector<MELAParticle*>& particleArray);
+  static bool checkParticleExists(MELAParticle const* myParticle, std::vector<MELAParticle*> const& particleArray);
 };
 
 
