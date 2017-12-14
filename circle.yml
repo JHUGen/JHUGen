@@ -454,7 +454,7 @@ test:
       ./testME_all.py
       exitstatus=$?
       if [ $exitstatus -ne 0 ]; then
-        mv ../JHUGenMELA/MELA/test/*.out $CIRCLE_ARTIFACTS/MELA/
+        mv *.out $CIRCLE_ARTIFACTS/MELA/
       fi
       exit $exitstatus
     #test the examples in mela.py
