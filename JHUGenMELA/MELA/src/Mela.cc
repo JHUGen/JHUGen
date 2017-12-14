@@ -952,13 +952,15 @@ void Mela::computeP(
             }
             if (myVerbosity_>=TVar::DEBUG){ // Summarize the integrated particles
               MELAout << "Mela::computeP: hs, Phi1 are now " << hs_val << " " << phi1_val << endl;
-              for (unsigned int idau=0; idau<daughters.size(); idau++){
+              unsigned int idau=1;
+              for (SimpleParticle_t const& tmpPart:daughters){
                 MELAout << "Dau " << idau << " "
-                  << "id=" << daughters.at(idau).first << " "
-                  << "x=" << daughters.at(idau).second.X() << " "
-                  << "y=" << daughters.at(idau).second.Y() << " "
-                  << "z=" << daughters.at(idau).second.Z() << " "
-                  << "t=" << daughters.at(idau).second.T() << endl;
+                  << "id=" << tmpPart.first << " "
+                  << "x=" << tmpPart.second.X() << " "
+                  << "y=" << tmpPart.second.Y() << " "
+                  << "z=" << tmpPart.second.Z() << " "
+                  << "t=" << tmpPart.second.T() << endl;
+                idau++;
               }
             }
             vector<MELAParticle*> partList_tmp;
@@ -977,8 +979,8 @@ void Mela::computeP(
             // calculate the ME
             ZZME->computeXS(temp_prob);
             // Delete the temporary particles
-            for (unsigned int ic=0; ic<candList_tmp.size(); ic++){ if (candList_tmp.at(ic)!=0) delete candList_tmp.at(ic); } // Only one candidate should really be here
-            for (unsigned int ip=0; ip<partList_tmp.size(); ip++){ if (partList_tmp.at(ip)!=0) delete partList_tmp.at(ip); }
+            for (MELACandidate* tmpPart:candList_tmp) delete tmpPart; // Only one candidate should really be here
+            for (MELAParticle* tmpPart:partList_tmp) delete tmpPart;
             setCurrentCandidate(melaCand);
             prob += temp_prob;
           }
@@ -1220,13 +1222,17 @@ void Mela::computeProdP(
       higgs=melaCand->p4;
       if (myProduction_ == TVar::JJQCD || myProduction_ == TVar::JJVBF){
         int njets=0;
-        for (int ip=0; ip<melaCand->getNAssociatedJets(); ip++){
-          if (melaCand->getAssociatedJet(ip)->passSelection){
-            njets++;
-            if (njets==1){
-              firstJetIndex = ip;
-              jet1 = melaCand->getAssociatedJet(ip)->p4;
+        {
+          int ip=0;
+          for (MELAParticle* tmpPart:melaCand->getAssociatedJets()){
+            if (tmpPart->passSelection){
+              njets++;
+              if (njets==1){
+                firstJetIndex = ip;
+                jet1 = tmpPart->p4;
+              }
             }
+            ip++;
           }
         }
         if (njets==1){
@@ -2563,7 +2569,7 @@ MelaPConstant* Mela::getPConstantHandle(
       }
       if (!inserted) trysqrts.push_back(val);
     }
-    for (auto& dsqrts : trysqrts){
+    for (auto& dsqrts:trysqrts){
       TString strsqrts = Form("%s_%.0f%s", relpath.Data(), dsqrts, "TeV");
       cfile_fullpath = path;
       cfile_fullpath.append(strsqrts.Data());

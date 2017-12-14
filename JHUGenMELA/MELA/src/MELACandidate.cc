@@ -1,3 +1,4 @@
+#include <iterator>
 #include <algorithm>
 #include <utility>
 #include "MELACandidate.h"
@@ -189,6 +190,31 @@ const std::vector<MELAParticle*>& MELACandidate::getAssociatedNeutrinos()const{ 
 const std::vector<MELAParticle*>& MELACandidate::getAssociatedPhotons()const{ return associatedPhotons; }
 const std::vector<MELAParticle*>& MELACandidate::getAssociatedJets()const{ return associatedJets; }
 const std::vector<MELATopCandidate*>& MELACandidate::getAssociatedTops()const{ return associatedTops; }
+
+std::vector<MELAParticle*> MELACandidate::getAssociatedSortedVs(){
+  std::vector<MELAParticle*> res;
+  std::vector<MELAParticle*>::iterator itBegin;
+  std::vector<MELAParticle*>::iterator itEnd=sortedVs.end();
+  for (std::vector<MELAParticle*>::iterator it=sortedVs.begin(); it!=itEnd; it++){
+    bool doSkip=false;
+    for (auto const& dau:sortedDaughters){ if ((*it)->hasDaughter(dau)){ doSkip=true; break; } }
+    if (!doSkip){ itBegin=it; break; }
+  }
+  std::copy(itBegin, itEnd, std::back_inserter(res));
+  return res;
+}
+std::vector<MELAParticle*> MELACandidate::getAssociatedSortedVs()const{
+  std::vector<MELAParticle*> res;
+  std::vector<MELAParticle*>::const_iterator itBegin;
+  std::vector<MELAParticle*>::const_iterator itEnd=sortedVs.cend();
+  for (std::vector<MELAParticle*>::const_iterator it=sortedVs.cbegin(); it!=itEnd; it++){
+    bool doSkip=false;
+    for (auto const& dau:sortedDaughters){ if ((*it)->hasDaughter(dau)){ doSkip=true; break; } }
+    if (!doSkip){ itBegin=it; break; }
+  }
+  std::copy(itBegin, itEnd, std::back_inserter(res));
+  return res;
+}
 
 void MELACandidate::sortDaughtersInitial(){
   bool beginWithIdPair = (
