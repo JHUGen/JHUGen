@@ -75,6 +75,7 @@ template MELAOutputStreamer& MELAOutputStreamer::operator<< <std::streambuf*>(st
 template MELAOutputStreamer& MELAOutputStreamer::operator<< <void*>(void* const& val);
 
 template<> MELAOutputStreamer& MELAOutputStreamer::operator<< <MELAParticle>(MELAParticle const& val);
+template<> MELAOutputStreamer& MELAOutputStreamer::operator<< <SimpleParticle_t>(SimpleParticle_t const& val);
 template<> MELAOutputStreamer& MELAOutputStreamer::operator<< <MELACandidate>(MELACandidate const& val);
 
 
