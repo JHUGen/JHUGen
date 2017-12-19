@@ -81,7 +81,6 @@ public:
   void setAddAssociatedByHighestPt(bool associatedByHighestPt_);
   void setShallowCopy(bool flag);
 
-  static bool checkTopCandidateExists(MELATopCandidate* myParticle, std::vector<MELATopCandidate*>& particleArray);
   static void addUnordered(MELAParticle* myParticle, std::vector<MELAParticle*>& particleArray);
   static void addUnordered(MELATopCandidate* myParticle, std::vector<MELATopCandidate*>& particleArray);
   static void addByHighestPt(MELAParticle* myParticle, std::vector<MELAParticle*>& particleArray);
@@ -104,7 +103,7 @@ protected:
   void sortDaughtersInitial();
   void sortDaughtersByBestZ1();
   void createSortedVs();
-  bool checkDaughtership(MELAParticle* myParticle)const;
+  bool checkDaughtership(MELAParticle const* myParticle)const;
   void createAssociatedVs(std::vector<MELAParticle*>& particleArray);
 
   void addAssociatedParticleToArray(MELAParticle* myParticle, std::vector<MELAParticle*>& particleArray);

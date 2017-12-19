@@ -1,6 +1,5 @@
-#include <algorithm>
-#include <utility>
 #include "MELAParticle.h"
+#include "TUtilHelpers.hh"
 #include "MELAStreamHelpers.hh"
 
 
@@ -111,6 +110,5 @@ void MELAParticle::boost(const TVector3& vec, bool boostAll){
 }
 
 bool MELAParticle::checkParticleExists(MELAParticle const* myParticle, std::vector<MELAParticle*> const& particleArray){
-  for (MELAParticle* const& part : particleArray){ if (part==myParticle) return true; }
-  return false;
+  return TUtilHelpers::checkElementExists<MELAParticle const*, MELAParticle*>(myParticle, particleArray);
 }

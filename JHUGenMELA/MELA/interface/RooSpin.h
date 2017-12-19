@@ -67,6 +67,10 @@ public:
     RooAbsReal* gamW;
     RooAbsReal* mZ;
     RooAbsReal* gamZ;
+    RooAbsReal* mWprime;
+    RooAbsReal* gamWprime;
+    RooAbsReal* mZprime;
+    RooAbsReal* gamZprime;
     RooAbsReal* Sin2ThetaW;
     RooAbsReal* vev;
   };
@@ -89,6 +93,7 @@ public:
 
   virtual void setDecayModes(RooSpin::VdecayType Vdecay1_, RooSpin::VdecayType Vdecay2_){ Vdecay1=Vdecay1_; Vdecay2=Vdecay2_; }
   virtual void getMVGamV(Double_t* mV=0, Double_t* gamV=0) const;
+  virtual void getMVprimeGamVprime(Double_t* mV=0, Double_t* gamV=0) const;
 
   virtual void defaultIntegration(){ intCodeStart=1; }
   virtual void alwaysIntegrate(Int_t code=1);
@@ -112,6 +117,10 @@ protected:
   RooRealProxy gamW;
   RooRealProxy mZ;
   RooRealProxy gamZ;
+  RooRealProxy mWprime;
+  RooRealProxy gamWprime;
+  RooRealProxy mZprime;
+  RooRealProxy gamZprime;
   RooRealProxy Sin2ThetaW;
   RooRealProxy vev;
 

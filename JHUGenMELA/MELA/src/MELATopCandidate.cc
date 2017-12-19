@@ -1,6 +1,5 @@
-#include <algorithm>
-#include <utility>
 #include "MELATopCandidate.h"
+#include "TUtilHelpers.hh"
 
 
 MELATopCandidate::MELATopCandidate(
@@ -55,4 +54,8 @@ void MELATopCandidate::swap(MELATopCandidate& particle_){
 void MELATopCandidate::setLightQuark(MELAParticle* myParticle){ lightQuark=myParticle; if (lightQuark!=0) addDaughter(lightQuark); }
 void MELATopCandidate::setWFermion(MELAParticle* myParticle){ Wferm=myParticle; if (Wferm!=0) addDaughter(Wferm); }
 void MELATopCandidate::setWAntifermion(MELAParticle* myParticle){ Wfermbar=myParticle; if (Wfermbar!=0) addDaughter(Wfermbar); }
+
+bool MELATopCandidate::checkTopCandidateExists(MELATopCandidate* myParticle, std::vector<MELATopCandidate*>& particleArray){
+  return TUtilHelpers::checkElementExists<MELATopCandidate const*, MELATopCandidate*>(myParticle, particleArray);
+}
 

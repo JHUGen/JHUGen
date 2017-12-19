@@ -1,7 +1,5 @@
-#include <iterator>
-#include <algorithm>
-#include <utility>
 #include "MELACandidate.h"
+#include "TUtilHelpers.hh"
 #include "MELAStreamHelpers.hh"
 #include "TMath.h"
 
@@ -67,18 +65,19 @@ MELACandidate* MELACandidate::shallowCopy(){
   cand->setSelected(passSelection);
   cand->setGenStatus(genStatus);
   cand->setLifetime(lifetime);
-  for (unsigned int ip=0; ip<mothers.size(); ip++) (cand->mothers).push_back(mothers.at(ip));
-  for (unsigned int ip=0; ip<daughters.size(); ip++) (cand->daughters).push_back(daughters.at(ip));
+
+  TUtilHelpers::copyVector(mothers, cand->mothers);
+  TUtilHelpers::copyVector(daughters, cand->daughters);
 
   // Copy candidate content
   cand->setShallowCopy(true);
-  for (unsigned int ip=0; ip<associatedLeptons.size(); ip++) (cand->associatedLeptons).push_back(associatedLeptons.at(ip));
-  for (unsigned int ip=0; ip<associatedNeutrinos.size(); ip++) (cand->associatedNeutrinos).push_back(associatedNeutrinos.at(ip));
-  for (unsigned int ip=0; ip<associatedPhotons.size(); ip++) (cand->associatedPhotons).push_back(associatedPhotons.at(ip));
-  for (unsigned int ip=0; ip<associatedJets.size(); ip++) (cand->associatedJets).push_back(associatedJets.at(ip));
-  for (unsigned int ip=0; ip<associatedTops.size(); ip++) (cand->associatedTops).push_back(associatedTops.at(ip));
-  for (unsigned int ip=0; ip<sortedDaughters.size(); ip++) (cand->sortedDaughters).push_back(sortedDaughters.at(ip));
-  for (unsigned int ip=0; ip<sortedVs.size(); ip++) (cand->sortedVs).push_back(sortedVs.at(ip));
+  TUtilHelpers::copyVector(associatedLeptons, cand->associatedLeptons);
+  TUtilHelpers::copyVector(associatedNeutrinos, cand->associatedNeutrinos);
+  TUtilHelpers::copyVector(associatedPhotons, cand->associatedPhotons);
+  TUtilHelpers::copyVector(associatedJets, cand->associatedJets);
+  TUtilHelpers::copyVector(associatedTops, cand->associatedTops);
+  TUtilHelpers::copyVector(sortedDaughters, cand->sortedDaughters);
+  TUtilHelpers::copyVector(sortedVs, cand->sortedVs);
 
   return cand;
 }
@@ -98,7 +97,7 @@ void MELACandidate::swap(MELACandidate& particle_){
 
 void MELACandidate::resetVs(){
   if (!isShallowCopy){ // Delete owned objects if not a shallow copy
-    for (unsigned int i=0; i<sortedVs.size(); i++) delete sortedVs.at(i);
+    for (MELAParticle*& aV:sortedVs) delete aV;
   }
   sortedVs.clear();
   isShallowCopy=false; // Should delete sortedVs now
@@ -128,21 +127,21 @@ void MELACandidate::sortDaughters(){
 
 std::vector<int> MELACandidate::getDaughterIds()const{
   std::vector<int> result;
-  for (unsigned int idau=0; idau<sortedDaughters.size(); idau++){
-    if (sortedDaughters.at(idau)!=0) result.push_back(sortedDaughters.at(idau)->id);
+  for (MELAParticle const* const& dau:sortedDaughters){
+    if (dau) result.push_back(dau->id);
   }
   return result;
 }
 std::vector<int> MELACandidate::getAssociatedParticleIds()const{
   std::vector<int> result;
-  for (unsigned int ip=0; ip<associatedLeptons.size(); ip++){
-    if (associatedLeptons.at(ip)!=0) result.push_back(associatedLeptons.at(ip)->id);
-  }
-  for (unsigned int ip=0; ip<associatedPhotons.size(); ip++){
-    if (associatedPhotons.at(ip)!=0) result.push_back(associatedPhotons.at(ip)->id);
-  }
-  for (unsigned int ip=0; ip<associatedJets.size(); ip++){
-    if (associatedJets.at(ip)!=0) result.push_back(associatedJets.at(ip)->id);
+  std::vector<std::vector<MELAParticle*> const*> list; list.reserve(3);
+  list.push_back(&associatedLeptons);
+  list.push_back(&associatedPhotons);
+  list.push_back(&associatedJets);
+  for (std::vector<MELAParticle*> const*& ll:list){
+    for (MELAParticle* const& part:(*ll)){
+      if (part) result.push_back(part->id);
+    }
   }
   return result;
 }
@@ -583,9 +582,8 @@ bool MELACandidate::daughtersInterfere()const{
   return doInterfere;
 }
 
-bool MELACandidate::checkDaughtership(MELAParticle* myParticle)const{
-  for (auto& dau:getDaughters()){ if (myParticle==dau) return true; }
-  return false;
+bool MELACandidate::checkDaughtership(MELAParticle const* myParticle)const{
+  return hasDaughter(myParticle);
 }
 
 void MELACandidate::addAssociatedLeptons(MELAParticle* myParticle){
@@ -685,16 +683,12 @@ void MELACandidate::getRelatedParticles(std::vector<MELAParticle*>& particles){
   for (auto& part:associatedJets) part->getRelatedParticles(particles);
 }
 
-bool MELACandidate::checkTopCandidateExists(MELATopCandidate* myParticle, std::vector<MELATopCandidate*>& particleArray){
-  for (auto& part : particleArray){ if (part==myParticle) return true; }
-  return false;
-}
 void MELACandidate::addUnordered(MELAParticle* myParticle, std::vector<MELAParticle*>& particleArray){
   bool inserted = MELAParticle::checkParticleExists(myParticle, particleArray); // Test if the particle is already in the vector
   if (!inserted) particleArray.push_back(myParticle);
 }
 void MELACandidate::addUnordered(MELATopCandidate* myParticle, std::vector<MELATopCandidate*>& particleArray){
-  bool inserted = MELACandidate::checkTopCandidateExists(myParticle, particleArray); // Test if the particle is already in the vector
+  bool inserted = MELATopCandidate::checkTopCandidateExists(myParticle, particleArray); // Test if the particle is already in the vector
   if (!inserted) particleArray.push_back(myParticle);
 }
 void MELACandidate::addByHighestPt(MELAParticle* myParticle, std::vector<MELAParticle*>& particleArray){
@@ -711,7 +705,7 @@ void MELACandidate::addByHighestPt(MELAParticle* myParticle, std::vector<MELAPar
   }
 }
 void MELACandidate::addByHighestPt(MELATopCandidate* myParticle, std::vector<MELATopCandidate*>& particleArray){
-  bool inserted = MELACandidate::checkTopCandidateExists(myParticle, particleArray); // Test if the particle is already in the vector
+  bool inserted = MELATopCandidate::checkTopCandidateExists(myParticle, particleArray); // Test if the particle is already in the vector
   if (!inserted){
     for (std::vector<MELATopCandidate*>::iterator it = particleArray.begin(); it<particleArray.end(); it++){
       if ((*it)->pt()<myParticle->pt()){

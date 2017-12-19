@@ -15,12 +15,14 @@ public:
   virtual ~SpinPdfFactory();
 
   virtual void getMVGamV(Double_t* mV=0, Double_t* gamV=0) const;
+  virtual void getMVprimeGamVprime(Double_t* mV=0, Double_t* gamV=0) const;
 
   virtual void makeParamsConst(bool yesNo)=0;
   virtual void makeCouplingsConst(bool yesNo)=0;
   virtual void resetHypotheses()=0;
   virtual void resetVdecay(RooSpin::VdecayType V1decay_, RooSpin::VdecayType V2decay_);
   virtual void resetVdecayParams(Double_t mWval, Double_t gamWval, Double_t mZval, Double_t gamZval, Double_t Sin2ThetaWval, Double_t vevval);
+  virtual void resetVprimeMasses(Double_t mWval, Double_t gamWval, Double_t mZval, Double_t gamZval);
   virtual void resetHiggsMassWidth(Double_t mXval, Double_t gamXval=0.);
 
   virtual void defaultIntegration(){ PDF_base->defaultIntegration(); }

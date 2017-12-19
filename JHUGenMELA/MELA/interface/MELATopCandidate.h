@@ -22,6 +22,8 @@ public:
   MELAParticle* getWFermion(){ return Wferm; }
   MELAParticle* getWAntifermion(){ return Wfermbar; }
 
+  static bool checkTopCandidateExists(MELATopCandidate* myParticle, std::vector<MELATopCandidate*>& particleArray);
+
 protected:
   MELAParticle* lightQuark;
   MELAParticle* Wferm;

@@ -7,6 +7,7 @@
 #include <cassert>
 #include "MELAStreamHelpers.hh"
 #include "TJHUGenUtils.hh"
+#include "TUtilHelpers.hh"
 #include "TUtil.hh"
 #include "TMath.h"
 #include "TLorentzRotation.h"
@@ -7414,9 +7415,8 @@ void TUtil::GetBoostedParticleVectors(
       MELAParticle* Vdau = melaCand->getSortedV(iv);
       if (Vdau!=0){
         int idtmp = Vdau->id;
-        for (int ivd=0; ivd<Vdau->getNDaughters(); ivd++){
-          MELAParticle* Vdau_i = Vdau->getDaughter(ivd);
-          if (Vdau_i!=0 && Vdau_i->passSelection) daughters.push_back(SimpleParticle_t(Vdau_i->id, Vdau_i->p4));
+        for (MELAParticle* Vdau_i:Vdau->getDaughters()){
+          if (Vdau_i && Vdau_i->passSelection) daughters.push_back(SimpleParticle_t(Vdau_i->id, Vdau_i->p4));
         }
         if (idtmp!=0 || Vdau->getNDaughters()>0){ // Avoid "empty" intermediate Vs of the MELACandidate object
           if (Vdau->getNDaughters()>=2 && PDGHelpers::isAPhoton(idtmp)) idtmp=23; // Special case to avoid V->2f with massless decay mode (could happen by mistake)
@@ -7808,26 +7808,26 @@ void TUtil::GetBoostedParticleVectors(
 
   // Fill the ids of the V intermediates to the candidate daughters
   mela_event.intermediateVid.clear();
-  std::copy(idVstar.begin(), idVstar.end(), std::back_inserter(mela_event.intermediateVid));
+  TUtilHelpers::copyVector(idVstar, mela_event.intermediateVid);
   // Fill the mothers
   mela_event.pMothers.clear();
   for (unsigned int ip=0; ip<2; ip++){ mela_event.pMothers.push_back(SimpleParticle_t(motherId[ip], pM[ip])); }
   // Fill the daughters
   mela_event.pDaughters.clear();
-  std::copy(daughters.begin(), daughters.end(), std::back_inserter(mela_event.pDaughters));
+  TUtilHelpers::copyVector(daughters, mela_event.pDaughters);
   // Fill the associated particles
   mela_event.pAssociated.clear();
-  std::copy(associated.begin(), associated.end(), std::back_inserter(mela_event.pAssociated));
+  TUtilHelpers::copyVector(associated, mela_event.pAssociated);
   // Fill the stable tops and antitops
   mela_event.pStableTops.clear();
-  std::copy(stableTops.begin(), stableTops.end(), std::back_inserter(mela_event.pStableTops));
+  TUtilHelpers::copyVector(stableTops, mela_event.pStableTops);
   mela_event.pStableAntitops.clear();
-  std::copy(stableAntitops.begin(), stableAntitops.end(), std::back_inserter(mela_event.pStableAntitops));
+  TUtilHelpers::copyVector(stableAntitops, mela_event.pStableAntitops);
   // Fill the daughters of unstable tops and antitops
   mela_event.pTopDaughters.clear();
-  std::copy(topDaughters.begin(), topDaughters.end(), std::back_inserter(mela_event.pTopDaughters));
+  TUtilHelpers::copyVector(topDaughters, mela_event.pTopDaughters);
   mela_event.pAntitopDaughters.clear();
-  std::copy(antitopDaughters.begin(), antitopDaughters.end(), std::back_inserter(mela_event.pAntitopDaughters));
+  TUtilHelpers::copyVector(antitopDaughters, mela_event.pAntitopDaughters);
 
   // This is the end of one long function.
   if (verbosity>=TVar::DEBUG){
