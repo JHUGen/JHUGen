@@ -462,6 +462,9 @@ test:
       cd ../JHUGenMELA/MELA/python &&
       python mela.py
     - |
+      cd ../JHUGenMELA/MELA/python &&
+      python3 mela.py
+    - |
       cd ../JHUGenMELA/MELA/test &&
       ./testME_more.py
 

@@ -34,10 +34,16 @@ which is useful for quick tests.
 See examples at the bottom.
 """
 
+from __future__ import print_function
 from collections import namedtuple
 import ROOT
 from pythonmelautils import MultiDimensionalCppArray, NamedTemporaryMacro, SelfDParameter, SelfDCoupling
 from ROOT import TUtil, TVar
+
+try:
+  basestring
+except NameError:
+  basestring = str
 
 class Mela(object):
   counter = 0
@@ -619,12 +625,12 @@ if __name__ == "__main__":
     m.ghz1, m.ghz2, m.ghz4, m.ghz1_prime2 = _
     m.setProcess(TVar.SelfDefine_spin0, TVar.JHUGen, TVar.ZZINDEPENDENT)
     dec = m.computeP(False)
-    print prod, dec, prod*dec
+    print(prod, dec, prod*dec)
 
-  print m.computeDecayAngles()
-  print m.computeVBFAngles()
-  print m.computeVBFAngles_ComplexBoost()
-  print m.computeVHAngles(TVar.Had_WH)
-  print "propagator:"
-  print "   BW:", m.getXPropagator(TVar.FixedWidth)
-  print "  CPS:", m.getXPropagator(TVar.CPS)
+  print(m.computeDecayAngles())
+  print(m.computeVBFAngles())
+  print(m.computeVBFAngles_ComplexBoost())
+  print(m.computeVHAngles(TVar.Had_WH))
+  print("propagator:")
+  print("   BW:", m.getXPropagator(TVar.FixedWidth))
+  print("  CPS:", m.getXPropagator(TVar.CPS))
