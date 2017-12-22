@@ -211,7 +211,7 @@ SUBROUTINE InitPDFs()
         alphas_mz=0.13939d0
         !nloops_pdf=1
      else ! Everything else
-        write(6,*),"mod_JHUGen.F90::InitPDFs: PDFSet",PDFSet,"QCD parameters are unknown. Please double-check! Stopping JHUGen..."
+        write(6,*) "mod_JHUGen.F90::InitPDFs: PDFSet",PDFSet,"QCD parameters are unknown. Please double-check! Stopping JHUGen..."
         stop
         ! Could also have used these instead of the stop statement, but why introduce arbitrary number?
         !alphas_mz = 0.13229060d0
