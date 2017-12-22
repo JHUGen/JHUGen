@@ -463,7 +463,7 @@ test:
       python mela.py
     - |
       cd ../JHUGenMELA/MELA/python &&
-      python lhefile.py --lhefile-hwithdecay=$CIRCLE_ARTIFACTS/ggH/SM.lhe --lhefile-jhugenvbfvh=$CIRCLE_ARTIFACTS/other/WH.lhe --lhefile-jhugentth=$CIRCLE_ARTIFACTS/other/ttH.lhe
+      python lhefile.py --lhefile-hwithdecay=$CIRCLE_ARTIFACTS/other/tbarH_t_ZZ.lhe --lhefile-jhugenvbfvh=$CIRCLE_ARTIFACTS/other/WH.lhe --lhefile-jhugentth=$CIRCLE_ARTIFACTS/other/ttH.lhe
     - |
       cd ../JHUGenMELA/MELA/test &&
       ./testME_more.py
