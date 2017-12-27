@@ -170,7 +170,7 @@ Double_t RooSpinTwo_7DComplex_ppHVV::evaluatePhi1PhiFactor(Int_t i1, Int_t i2, I
 
 void RooSpinTwo_7DComplex_ppHVV::evaluatePolarizationTerms(std::vector<Double_t>& Axxyyterm, const Int_t code, bool isGammaV1, bool isGammaV2) const{
   Double_t R1Val, R2Val;
-  calculateR1R2(R1Val, R2Val, isGammaV1, isGammaV2);
+  calculateVffR1R2(R1Val, R2Val, isGammaV1, isGammaV2);
 
   Double_t
     A00Re, A00Im,

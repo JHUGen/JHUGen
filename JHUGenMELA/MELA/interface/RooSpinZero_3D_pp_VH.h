@@ -32,7 +32,12 @@ public:
 protected:
 
 
-  void evaluatePolarizationTerms(Double_t& A00term, Double_t& Appterm, Double_t& Ammterm, Double_t& A00ppterm, Double_t& A00mmterm, Double_t& Appmmterm, const Int_t code, bool isGammaV1=false, bool isGammaV2=false) const;
+  void evaluatePolarizationTerms(
+    Double_t& A00term, Double_t& Appterm, Double_t& Ammterm,
+    Double_t& A00ppterm, Double_t& A00mmterm, Double_t& Appmmterm,
+    const Int_t code,
+    int VGammaVpmode1=0, int VGammaVpmode2=0
+  ) const;
 
   Double_t partonicLuminosity(Double_t mVal, Double_t YVal, Double_t sqrts) const;
 

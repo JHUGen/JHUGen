@@ -136,7 +136,13 @@ RooSpinZero::RooSpinZero(
 
   cz_q1sq("cz_q1sq", "cz_q1sq", this, (RooAbsReal&)*(_couplings.cLambda_qsq[0])),
   cz_q2sq("cz_q2sq", "cz_q2sq", this, (RooAbsReal&)*(_couplings.cLambda_qsq[1])),
-  cz_q12sq("cz_q12sq", "cz_q12sq", this, (RooAbsReal&)*(_couplings.cLambda_qsq[2]))
+  cz_q12sq("cz_q12sq", "cz_q12sq", this, (RooAbsReal&)*(_couplings.cLambda_qsq[2])),
+
+  gvvp1Val("gvvp1Val", "gvvp1Val", this, (RooAbsReal&)*(_couplings.gvvp1List[0][0])),
+  gvpvp1Val("gvpvp1Val", "gvpvp1Val", this, (RooAbsReal&)*(_couplings.gvpvp1List[0][0])),
+
+  gvvp1ValIm("gvvp1ValIm", "gvvp1ValIm", this, (RooAbsReal&)*(_couplings.gvvp1List[0][1])),
+  gvpvp1ValIm("gvpvp1ValIm", "gvpvp1ValIm", this, (RooAbsReal&)*(_couplings.gvpvp1List[0][1]))
 {}
 
 
@@ -265,10 +271,19 @@ Lambda_z40("Lambda_z40", this, other.Lambda_z40),
 
 cz_q1sq("cz_q1sq", this, other.cz_q1sq),
 cz_q2sq("cz_q2sq", this, other.cz_q2sq),
-cz_q12sq("cz_q12sq", this, other.cz_q12sq)
+cz_q12sq("cz_q12sq", this, other.cz_q12sq),
+
+gvvp1Val("gvvp1Val", this, other.gvvp1Val),
+gvpvp1Val("gvpvp1Val", this, other.gvpvp1Val),
+
+gvvp1ValIm("gvvp1ValIm", this, other.gvvp1ValIm),
+gvpvp1ValIm("gvpvp1ValIm", this, other.gvpvp1ValIm)
 {}
 
-void RooSpinZero::calculateAi(Double_t& a1Re, Double_t& a1Im, Double_t& a2Re, Double_t& a2Im, Double_t& a3Re, Double_t& a3Im, bool isGammaV1, bool isGammaV2)const{
+void RooSpinZero::calculateAi(
+  Double_t& a1Re, Double_t& a1Im, Double_t& a2Re, Double_t& a2Im, Double_t& a3Re, Double_t& a3Im,
+  int VGammaVpmode1, int VGammaVpmode2
+)const{
   Double_t mV;
   getMVGamV(&mV);
 
@@ -287,128 +302,138 @@ void RooSpinZero::calculateAi(Double_t& a1Re, Double_t& a1Im, Double_t& a2Re, Do
   Double_t g3_dynIm=0;
   Double_t g4_dynIm=0;
 
-  if (!isGammaV1 && !isGammaV2 && !(Vdecay1==RooSpin::kVdecayType_GammaOnshell || Vdecay2==RooSpin::kVdecayType_GammaOnshell)){
-    if (g1_primeVal!=0) g1_dyn += g1_primeVal * pow(Lambda_z1, 4)/(pow(Lambda_z1, 2) + pow(m1_, 2))/(pow(Lambda_z1, 2) + pow(m2_, 2));
-    if (g1_prime2Val!=0) g1_dyn += g1_prime2Val* (pow(m1_, 2) + pow(m2_, 2))/pow(Lambda_z1, 2);
-    if (g1_prime3Val!=0) g1_dyn += g1_prime3Val* (pow(m1_, 2) - pow(m2_, 2))/pow(Lambda_z1, 2);
-    if (g1_prime4Val!=0) g1_dyn += g1_prime4Val* (m12*m12)/pow(Lambda_Q, 2);
-    if (g1_prime5Val!=0) g1_dyn += g1_prime5Val* (pow(m1_, 4) + pow(m2_, 4))/pow(Lambda_z1, 4);
-    if (g1_prime6Val!=0) g1_dyn += g1_prime6Val* (pow(m1_, 4) - pow(m2_, 4))/pow(Lambda_z1, 4);
-    if (g1_prime7Val!=0) g1_dyn += g1_prime7Val* (pow(m1_, 2) * pow(m2_, 2))/pow(Lambda_z1, 4);
+  if (Vdecay1!=RooSpin::kVdecayType_GammaOnshell && Vdecay2!=RooSpin::kVdecayType_GammaOnshell){ // VV/VVp/VpVp
+    if (VGammaVpmode1==0 && VGammaVpmode2==0){ // VV
+      if (g1_primeVal!=0) g1_dyn += g1_primeVal * pow(Lambda_z1, 4)/(pow(Lambda_z1, 2) + pow(m1_, 2))/(pow(Lambda_z1, 2) + pow(m2_, 2));
+      if (g1_prime2Val!=0) g1_dyn += g1_prime2Val* (pow(m1_, 2) + pow(m2_, 2))/pow(Lambda_z1, 2);
+      if (g1_prime3Val!=0) g1_dyn += g1_prime3Val* (pow(m1_, 2) - pow(m2_, 2))/pow(Lambda_z1, 2);
+      if (g1_prime4Val!=0) g1_dyn += g1_prime4Val* (m12*m12)/pow(Lambda_Q, 2);
+      if (g1_prime5Val!=0) g1_dyn += g1_prime5Val* (pow(m1_, 4) + pow(m2_, 4))/pow(Lambda_z1, 4);
+      if (g1_prime6Val!=0) g1_dyn += g1_prime6Val* (pow(m1_, 4) - pow(m2_, 4))/pow(Lambda_z1, 4);
+      if (g1_prime7Val!=0) g1_dyn += g1_prime7Val* (pow(m1_, 2) * pow(m2_, 2))/pow(Lambda_z1, 4);
 
-    if (cz_q1sq!=0.) g1_dyn *= 1./(1.+ cz_q1sq*pow(m1_/Lambda_z11, 2));
-    if (cz_q2sq!=0.) g1_dyn *= 1./(1.+ cz_q2sq*pow(m2_/Lambda_z12, 2));
-    if (cz_q12sq!=0.) g1_dyn *= 1./(1.+ cz_q12sq*pow(m12/Lambda_z10, 2));
-    g1_dyn += g1Val;
+      if (cz_q1sq!=0.) g1_dyn *= 1./(1.+ cz_q1sq*pow(m1_/Lambda_z11, 2));
+      if (cz_q2sq!=0.) g1_dyn *= 1./(1.+ cz_q2sq*pow(m2_/Lambda_z12, 2));
+      if (cz_q12sq!=0.) g1_dyn *= 1./(1.+ cz_q12sq*pow(m12/Lambda_z10, 2));
+      g1_dyn += g1Val;
 
-    g2_dyn = g2Val;
-    if (g2_primeVal!=0) g2_dyn += g2_primeVal * pow(Lambda_z2, 4)/(pow(Lambda_z2, 2) + pow(m1_, 2))/(pow(Lambda_z2, 2) + pow(m2_, 2));
-    if (g2_prime2Val!=0) g2_dyn += g2_prime2Val* (pow(m1_, 2) + pow(m2_, 2))/pow(Lambda_z2, 2);
-    if (g2_prime3Val!=0) g2_dyn += g2_prime3Val* (pow(m1_, 2) - pow(m2_, 2))/pow(Lambda_z2, 2);
-    if (g2_prime4Val!=0) g2_dyn += g2_prime4Val* (m12*m12)/pow(Lambda_Q, 2);
-    if (g2_prime5Val!=0) g2_dyn += g2_prime5Val* (pow(m1_, 4) + pow(m2_, 4))/pow(Lambda_z2, 4);
-    if (g2_prime6Val!=0) g2_dyn += g2_prime6Val* (pow(m1_, 4) - pow(m2_, 4))/pow(Lambda_z2, 4);
-    if (g2_prime7Val!=0) g2_dyn += g2_prime7Val* (pow(m1_, 2) * pow(m2_, 2))/pow(Lambda_z2, 4);
+      g2_dyn = g2Val;
+      if (g2_primeVal!=0) g2_dyn += g2_primeVal * pow(Lambda_z2, 4)/(pow(Lambda_z2, 2) + pow(m1_, 2))/(pow(Lambda_z2, 2) + pow(m2_, 2));
+      if (g2_prime2Val!=0) g2_dyn += g2_prime2Val* (pow(m1_, 2) + pow(m2_, 2))/pow(Lambda_z2, 2);
+      if (g2_prime3Val!=0) g2_dyn += g2_prime3Val* (pow(m1_, 2) - pow(m2_, 2))/pow(Lambda_z2, 2);
+      if (g2_prime4Val!=0) g2_dyn += g2_prime4Val* (m12*m12)/pow(Lambda_Q, 2);
+      if (g2_prime5Val!=0) g2_dyn += g2_prime5Val* (pow(m1_, 4) + pow(m2_, 4))/pow(Lambda_z2, 4);
+      if (g2_prime6Val!=0) g2_dyn += g2_prime6Val* (pow(m1_, 4) - pow(m2_, 4))/pow(Lambda_z2, 4);
+      if (g2_prime7Val!=0) g2_dyn += g2_prime7Val* (pow(m1_, 2) * pow(m2_, 2))/pow(Lambda_z2, 4);
 
-    if (cz_q1sq!=0.) g2_dyn *= 1./(1.+ cz_q1sq*pow(m1_/Lambda_z21, 2));
-    if (cz_q2sq!=0.) g2_dyn *= 1./(1.+ cz_q2sq*pow(m2_/Lambda_z22, 2));
-    if (cz_q12sq!=0.) g2_dyn *= 1./(1.+ cz_q12sq*pow(m12/Lambda_z20, 2));
+      if (cz_q1sq!=0.) g2_dyn *= 1./(1.+ cz_q1sq*pow(m1_/Lambda_z21, 2));
+      if (cz_q2sq!=0.) g2_dyn *= 1./(1.+ cz_q2sq*pow(m2_/Lambda_z22, 2));
+      if (cz_q12sq!=0.) g2_dyn *= 1./(1.+ cz_q12sq*pow(m12/Lambda_z20, 2));
 
-    g3_dyn = g3Val;
-    if (g3_primeVal!=0) g3_dyn += g3_primeVal * pow(Lambda_z3, 4)/(pow(Lambda_z3, 2) + pow(m1_, 2))/(pow(Lambda_z3, 2) + pow(m2_, 2));
-    if (g3_prime2Val!=0) g3_dyn += g3_prime2Val* (pow(m1_, 2) + pow(m2_, 2))/pow(Lambda_z3, 2);
-    if (g3_prime3Val!=0) g3_dyn += g3_prime3Val* (pow(m1_, 2) - pow(m2_, 2))/pow(Lambda_z3, 2);
-    if (g3_prime4Val!=0) g3_dyn += g3_prime4Val* (m12*m12)/pow(Lambda_Q, 2);
-    if (g3_prime5Val!=0) g3_dyn += g3_prime5Val* (pow(m1_, 4) + pow(m2_, 4))/pow(Lambda_z3, 4);
-    if (g3_prime6Val!=0) g3_dyn += g3_prime6Val* (pow(m1_, 4) - pow(m2_, 4))/pow(Lambda_z3, 4);
-    if (g3_prime7Val!=0) g3_dyn += g3_prime7Val* (pow(m1_, 2) * pow(m2_, 2))/pow(Lambda_z3, 4);
+      g3_dyn = g3Val;
+      if (g3_primeVal!=0) g3_dyn += g3_primeVal * pow(Lambda_z3, 4)/(pow(Lambda_z3, 2) + pow(m1_, 2))/(pow(Lambda_z3, 2) + pow(m2_, 2));
+      if (g3_prime2Val!=0) g3_dyn += g3_prime2Val* (pow(m1_, 2) + pow(m2_, 2))/pow(Lambda_z3, 2);
+      if (g3_prime3Val!=0) g3_dyn += g3_prime3Val* (pow(m1_, 2) - pow(m2_, 2))/pow(Lambda_z3, 2);
+      if (g3_prime4Val!=0) g3_dyn += g3_prime4Val* (m12*m12)/pow(Lambda_Q, 2);
+      if (g3_prime5Val!=0) g3_dyn += g3_prime5Val* (pow(m1_, 4) + pow(m2_, 4))/pow(Lambda_z3, 4);
+      if (g3_prime6Val!=0) g3_dyn += g3_prime6Val* (pow(m1_, 4) - pow(m2_, 4))/pow(Lambda_z3, 4);
+      if (g3_prime7Val!=0) g3_dyn += g3_prime7Val* (pow(m1_, 2) * pow(m2_, 2))/pow(Lambda_z3, 4);
 
-    if (cz_q1sq!=0.) g3_dyn *= 1./(1.+ cz_q1sq*pow(m1_/Lambda_z31, 2));
-    if (cz_q2sq!=0.) g3_dyn *= 1./(1.+ cz_q2sq*pow(m2_/Lambda_z32, 2));
-    if (cz_q12sq!=0.) g3_dyn *= 1./(1.+ cz_q12sq*pow(m12/Lambda_z30, 2));
-
-
-    g4_dyn = g4Val;
-    if (g4_primeVal!=0) g4_dyn += g4_primeVal * pow(Lambda_z4, 4)/(pow(Lambda_z4, 2) + pow(m1_, 2))/(pow(Lambda_z4, 2) + pow(m2_, 2));
-    if (g4_prime2Val!=0) g4_dyn += g4_prime2Val* (pow(m1_, 2) + pow(m2_, 2))/pow(Lambda_z4, 2);
-    if (g4_prime3Val!=0) g4_dyn += g4_prime3Val* (pow(m1_, 2) - pow(m2_, 2))/pow(Lambda_z4, 2);
-    if (g4_prime4Val!=0) g4_dyn += g4_prime4Val* (m12*m12)/pow(Lambda_Q, 2);
-    if (g4_prime5Val!=0) g4_dyn += g4_prime5Val* (pow(m1_, 4) + pow(m2_, 4))/pow(Lambda_z4, 4);
-    if (g4_prime6Val!=0) g4_dyn += g4_prime6Val* (pow(m1_, 4) - pow(m2_, 4))/pow(Lambda_z4, 4);
-    if (g4_prime7Val!=0) g4_dyn += g4_prime7Val* (pow(m1_, 2) * pow(m2_, 2))/pow(Lambda_z4, 4);
-
-    if (cz_q1sq!=0.) g4_dyn *= 1./(1.+ cz_q1sq*pow(m1_/Lambda_z41, 2));
-    if (cz_q2sq!=0.) g4_dyn *= 1./(1.+ cz_q2sq*pow(m2_/Lambda_z42, 2));
-    if (cz_q12sq!=0.) g4_dyn *= 1./(1.+ cz_q12sq*pow(m12/Lambda_z40, 2));
-
-    g1_dynIm = 0;
-    if (g1_primeValIm!=0) g1_dynIm += g1_primeValIm * pow(Lambda_z1, 4)/(pow(Lambda_z1, 2) + pow(m1_, 2))/(pow(Lambda_z1, 2) + pow(m2_, 2));
-    if (g1_prime2ValIm!=0) g1_dynIm += g1_prime2ValIm* (pow(m1_, 2) + pow(m2_, 2))/pow(Lambda_z1, 2);
-    if (g1_prime3ValIm!=0) g1_dynIm += g1_prime3ValIm* (pow(m1_, 2) - pow(m2_, 2))/pow(Lambda_z1, 2);
-    if (g1_prime4ValIm!=0) g1_dynIm += g1_prime4ValIm* (m12*m12)/pow(Lambda_Q, 2);
-    if (g1_prime5ValIm!=0) g1_dynIm += g1_prime5ValIm* (pow(m1_, 4) + pow(m2_, 4))/pow(Lambda_z1, 4);
-    if (g1_prime6ValIm!=0) g1_dynIm += g1_prime6ValIm* (pow(m1_, 4) - pow(m2_, 4))/pow(Lambda_z1, 4);
-    if (g1_prime7ValIm!=0) g1_dynIm += g1_prime7ValIm* (pow(m1_, 2) * pow(m2_, 2))/pow(Lambda_z1, 4);
-
-    if (cz_q1sq!=0.) g1_dynIm *= 1./(1.+ cz_q1sq*pow(m1_/Lambda_z11, 2));
-    if (cz_q2sq!=0.) g1_dynIm *= 1./(1.+ cz_q2sq*pow(m2_/Lambda_z12, 2));
-    if (cz_q12sq!=0.) g1_dynIm *= 1./(1.+ cz_q12sq*pow(m12/Lambda_z10, 2));
-    g1_dynIm += g1ValIm;
-
-    g2_dynIm = g2ValIm;
-    if (g2_primeValIm!=0) g2_dynIm += g2_primeValIm * pow(Lambda_z2, 4)/(pow(Lambda_z2, 2) + pow(m1_, 2))/(pow(Lambda_z2, 2) + pow(m2_, 2));
-    if (g2_prime2ValIm!=0) g2_dynIm += g2_prime2ValIm* (pow(m1_, 2) + pow(m2_, 2))/pow(Lambda_z2, 2);
-    if (g2_prime3ValIm!=0) g2_dynIm += g2_prime3ValIm* (pow(m1_, 2) - pow(m2_, 2))/pow(Lambda_z2, 2);
-    if (g2_prime4ValIm!=0) g2_dynIm += g2_prime4ValIm* (m12*m12)/pow(Lambda_Q, 2);
-    if (g2_prime5ValIm!=0) g2_dynIm += g2_prime5ValIm* (pow(m1_, 4) + pow(m2_, 4))/pow(Lambda_z2, 4);
-    if (g2_prime6ValIm!=0) g2_dynIm += g2_prime6ValIm* (pow(m1_, 4) - pow(m2_, 4))/pow(Lambda_z2, 4);
-    if (g2_prime7ValIm!=0) g2_dynIm += g2_prime7ValIm* (pow(m1_, 2) * pow(m2_, 2))/pow(Lambda_z2, 4);
-
-    if (cz_q1sq!=0.) g2_dynIm *= 1./(1.+ cz_q1sq*pow(m1_/Lambda_z21, 2));
-    if (cz_q2sq!=0.) g2_dynIm *= 1./(1.+ cz_q2sq*pow(m2_/Lambda_z22, 2));
-    if (cz_q12sq!=0.) g2_dynIm *= 1./(1.+ cz_q12sq*pow(m12/Lambda_z20, 2));
-
-    g3_dynIm = g3ValIm;
-    if (g3_primeValIm!=0) g3_dynIm += g3_primeValIm * pow(Lambda_z3, 4)/(pow(Lambda_z3, 2) + pow(m1_, 2))/(pow(Lambda_z3, 2) + pow(m2_, 2));
-    if (g3_prime2ValIm!=0) g3_dynIm += g3_prime2ValIm* (pow(m1_, 2) + pow(m2_, 2))/pow(Lambda_z3, 2);
-    if (g3_prime3ValIm!=0) g3_dynIm += g3_prime3ValIm* (pow(m1_, 2) - pow(m2_, 2))/pow(Lambda_z3, 2);
-    if (g3_prime4ValIm!=0) g3_dynIm += g3_prime4ValIm* (m12*m12)/pow(Lambda_Q, 2);
-    if (g3_prime5ValIm!=0) g3_dynIm += g3_prime5ValIm* (pow(m1_, 4) + pow(m2_, 4))/pow(Lambda_z3, 4);
-    if (g3_prime6ValIm!=0) g3_dynIm += g3_prime6ValIm* (pow(m1_, 4) - pow(m2_, 4))/pow(Lambda_z3, 4);
-    if (g3_prime7ValIm!=0) g3_dynIm += g3_prime7ValIm* (pow(m1_, 2) * pow(m2_, 2))/pow(Lambda_z3, 4);
-
-    if (cz_q1sq!=0.) g3_dynIm *= 1./(1.+ cz_q1sq*pow(m1_/Lambda_z31, 2));
-    if (cz_q2sq!=0.) g3_dynIm *= 1./(1.+ cz_q2sq*pow(m2_/Lambda_z32, 2));
-    if (cz_q12sq!=0.) g3_dynIm *= 1./(1.+ cz_q12sq*pow(m12/Lambda_z30, 2));
+      if (cz_q1sq!=0.) g3_dyn *= 1./(1.+ cz_q1sq*pow(m1_/Lambda_z31, 2));
+      if (cz_q2sq!=0.) g3_dyn *= 1./(1.+ cz_q2sq*pow(m2_/Lambda_z32, 2));
+      if (cz_q12sq!=0.) g3_dyn *= 1./(1.+ cz_q12sq*pow(m12/Lambda_z30, 2));
 
 
-    g4_dynIm = g4ValIm;
-    if (g4_primeValIm!=0) g4_dynIm += g4_primeValIm * pow(Lambda_z4, 4)/(pow(Lambda_z4, 2) + pow(m1_, 2))/(pow(Lambda_z4, 2) + pow(m2_, 2));
-    if (g4_prime2ValIm!=0) g4_dynIm += g4_prime2ValIm* (pow(m1_, 2) + pow(m2_, 2))/pow(Lambda_z4, 2);
-    if (g4_prime3ValIm!=0) g4_dynIm += g4_prime3ValIm* (pow(m1_, 2) - pow(m2_, 2))/pow(Lambda_z4, 2);
-    if (g4_prime4ValIm!=0) g4_dynIm += g4_prime4ValIm* (m12*m12)/pow(Lambda_Q, 2);
-    if (g4_prime5ValIm!=0) g4_dynIm += g4_prime5ValIm* (pow(m1_, 4) + pow(m2_, 4))/pow(Lambda_z4, 4);
-    if (g4_prime6ValIm!=0) g4_dynIm += g4_prime6ValIm* (pow(m1_, 4) - pow(m2_, 4))/pow(Lambda_z4, 4);
-    if (g4_prime7ValIm!=0) g4_dynIm += g4_prime7ValIm* (pow(m1_, 2) * pow(m2_, 2))/pow(Lambda_z4, 4);
+      g4_dyn = g4Val;
+      if (g4_primeVal!=0) g4_dyn += g4_primeVal * pow(Lambda_z4, 4)/(pow(Lambda_z4, 2) + pow(m1_, 2))/(pow(Lambda_z4, 2) + pow(m2_, 2));
+      if (g4_prime2Val!=0) g4_dyn += g4_prime2Val* (pow(m1_, 2) + pow(m2_, 2))/pow(Lambda_z4, 2);
+      if (g4_prime3Val!=0) g4_dyn += g4_prime3Val* (pow(m1_, 2) - pow(m2_, 2))/pow(Lambda_z4, 2);
+      if (g4_prime4Val!=0) g4_dyn += g4_prime4Val* (m12*m12)/pow(Lambda_Q, 2);
+      if (g4_prime5Val!=0) g4_dyn += g4_prime5Val* (pow(m1_, 4) + pow(m2_, 4))/pow(Lambda_z4, 4);
+      if (g4_prime6Val!=0) g4_dyn += g4_prime6Val* (pow(m1_, 4) - pow(m2_, 4))/pow(Lambda_z4, 4);
+      if (g4_prime7Val!=0) g4_dyn += g4_prime7Val* (pow(m1_, 2) * pow(m2_, 2))/pow(Lambda_z4, 4);
 
-    if (cz_q1sq!=0.) g4_dynIm *= 1./(1.+ cz_q1sq*pow(m1_/Lambda_z41, 2));
-    if (cz_q2sq!=0.) g4_dynIm *= 1./(1.+ cz_q2sq*pow(m2_/Lambda_z42, 2));
-    if (cz_q12sq!=0.) g4_dynIm *= 1./(1.+ cz_q12sq*pow(m12/Lambda_z40, 2));
+      if (cz_q1sq!=0.) g4_dyn *= 1./(1.+ cz_q1sq*pow(m1_/Lambda_z41, 2));
+      if (cz_q2sq!=0.) g4_dyn *= 1./(1.+ cz_q2sq*pow(m2_/Lambda_z42, 2));
+      if (cz_q12sq!=0.) g4_dyn *= 1./(1.+ cz_q12sq*pow(m12/Lambda_z40, 2));
+
+      g1_dynIm = 0;
+      if (g1_primeValIm!=0) g1_dynIm += g1_primeValIm * pow(Lambda_z1, 4)/(pow(Lambda_z1, 2) + pow(m1_, 2))/(pow(Lambda_z1, 2) + pow(m2_, 2));
+      if (g1_prime2ValIm!=0) g1_dynIm += g1_prime2ValIm* (pow(m1_, 2) + pow(m2_, 2))/pow(Lambda_z1, 2);
+      if (g1_prime3ValIm!=0) g1_dynIm += g1_prime3ValIm* (pow(m1_, 2) - pow(m2_, 2))/pow(Lambda_z1, 2);
+      if (g1_prime4ValIm!=0) g1_dynIm += g1_prime4ValIm* (m12*m12)/pow(Lambda_Q, 2);
+      if (g1_prime5ValIm!=0) g1_dynIm += g1_prime5ValIm* (pow(m1_, 4) + pow(m2_, 4))/pow(Lambda_z1, 4);
+      if (g1_prime6ValIm!=0) g1_dynIm += g1_prime6ValIm* (pow(m1_, 4) - pow(m2_, 4))/pow(Lambda_z1, 4);
+      if (g1_prime7ValIm!=0) g1_dynIm += g1_prime7ValIm* (pow(m1_, 2) * pow(m2_, 2))/pow(Lambda_z1, 4);
+
+      if (cz_q1sq!=0.) g1_dynIm *= 1./(1.+ cz_q1sq*pow(m1_/Lambda_z11, 2));
+      if (cz_q2sq!=0.) g1_dynIm *= 1./(1.+ cz_q2sq*pow(m2_/Lambda_z12, 2));
+      if (cz_q12sq!=0.) g1_dynIm *= 1./(1.+ cz_q12sq*pow(m12/Lambda_z10, 2));
+      g1_dynIm += g1ValIm;
+
+      g2_dynIm = g2ValIm;
+      if (g2_primeValIm!=0) g2_dynIm += g2_primeValIm * pow(Lambda_z2, 4)/(pow(Lambda_z2, 2) + pow(m1_, 2))/(pow(Lambda_z2, 2) + pow(m2_, 2));
+      if (g2_prime2ValIm!=0) g2_dynIm += g2_prime2ValIm* (pow(m1_, 2) + pow(m2_, 2))/pow(Lambda_z2, 2);
+      if (g2_prime3ValIm!=0) g2_dynIm += g2_prime3ValIm* (pow(m1_, 2) - pow(m2_, 2))/pow(Lambda_z2, 2);
+      if (g2_prime4ValIm!=0) g2_dynIm += g2_prime4ValIm* (m12*m12)/pow(Lambda_Q, 2);
+      if (g2_prime5ValIm!=0) g2_dynIm += g2_prime5ValIm* (pow(m1_, 4) + pow(m2_, 4))/pow(Lambda_z2, 4);
+      if (g2_prime6ValIm!=0) g2_dynIm += g2_prime6ValIm* (pow(m1_, 4) - pow(m2_, 4))/pow(Lambda_z2, 4);
+      if (g2_prime7ValIm!=0) g2_dynIm += g2_prime7ValIm* (pow(m1_, 2) * pow(m2_, 2))/pow(Lambda_z2, 4);
+
+      if (cz_q1sq!=0.) g2_dynIm *= 1./(1.+ cz_q1sq*pow(m1_/Lambda_z21, 2));
+      if (cz_q2sq!=0.) g2_dynIm *= 1./(1.+ cz_q2sq*pow(m2_/Lambda_z22, 2));
+      if (cz_q12sq!=0.) g2_dynIm *= 1./(1.+ cz_q12sq*pow(m12/Lambda_z20, 2));
+
+      g3_dynIm = g3ValIm;
+      if (g3_primeValIm!=0) g3_dynIm += g3_primeValIm * pow(Lambda_z3, 4)/(pow(Lambda_z3, 2) + pow(m1_, 2))/(pow(Lambda_z3, 2) + pow(m2_, 2));
+      if (g3_prime2ValIm!=0) g3_dynIm += g3_prime2ValIm* (pow(m1_, 2) + pow(m2_, 2))/pow(Lambda_z3, 2);
+      if (g3_prime3ValIm!=0) g3_dynIm += g3_prime3ValIm* (pow(m1_, 2) - pow(m2_, 2))/pow(Lambda_z3, 2);
+      if (g3_prime4ValIm!=0) g3_dynIm += g3_prime4ValIm* (m12*m12)/pow(Lambda_Q, 2);
+      if (g3_prime5ValIm!=0) g3_dynIm += g3_prime5ValIm* (pow(m1_, 4) + pow(m2_, 4))/pow(Lambda_z3, 4);
+      if (g3_prime6ValIm!=0) g3_dynIm += g3_prime6ValIm* (pow(m1_, 4) - pow(m2_, 4))/pow(Lambda_z3, 4);
+      if (g3_prime7ValIm!=0) g3_dynIm += g3_prime7ValIm* (pow(m1_, 2) * pow(m2_, 2))/pow(Lambda_z3, 4);
+
+      if (cz_q1sq!=0.) g3_dynIm *= 1./(1.+ cz_q1sq*pow(m1_/Lambda_z31, 2));
+      if (cz_q2sq!=0.) g3_dynIm *= 1./(1.+ cz_q2sq*pow(m2_/Lambda_z32, 2));
+      if (cz_q12sq!=0.) g3_dynIm *= 1./(1.+ cz_q12sq*pow(m12/Lambda_z30, 2));
+
+
+      g4_dynIm = g4ValIm;
+      if (g4_primeValIm!=0) g4_dynIm += g4_primeValIm * pow(Lambda_z4, 4)/(pow(Lambda_z4, 2) + pow(m1_, 2))/(pow(Lambda_z4, 2) + pow(m2_, 2));
+      if (g4_prime2ValIm!=0) g4_dynIm += g4_prime2ValIm* (pow(m1_, 2) + pow(m2_, 2))/pow(Lambda_z4, 2);
+      if (g4_prime3ValIm!=0) g4_dynIm += g4_prime3ValIm* (pow(m1_, 2) - pow(m2_, 2))/pow(Lambda_z4, 2);
+      if (g4_prime4ValIm!=0) g4_dynIm += g4_prime4ValIm* (m12*m12)/pow(Lambda_Q, 2);
+      if (g4_prime5ValIm!=0) g4_dynIm += g4_prime5ValIm* (pow(m1_, 4) + pow(m2_, 4))/pow(Lambda_z4, 4);
+      if (g4_prime6ValIm!=0) g4_dynIm += g4_prime6ValIm* (pow(m1_, 4) - pow(m2_, 4))/pow(Lambda_z4, 4);
+      if (g4_prime7ValIm!=0) g4_dynIm += g4_prime7ValIm* (pow(m1_, 2) * pow(m2_, 2))/pow(Lambda_z4, 4);
+
+      if (cz_q1sq!=0.) g4_dynIm *= 1./(1.+ cz_q1sq*pow(m1_/Lambda_z41, 2));
+      if (cz_q2sq!=0.) g4_dynIm *= 1./(1.+ cz_q2sq*pow(m2_/Lambda_z42, 2));
+      if (cz_q12sq!=0.) g4_dynIm *= 1./(1.+ cz_q12sq*pow(m12/Lambda_z40, 2));
+    }
+    else if ((VGammaVpmode1==0 && VGammaVpmode2==2) || (VGammaVpmode1==2 && VGammaVpmode2==0)){ // VVp/VpV
+      g1_dyn = gvvp1Val;
+      g1_dynIm = gvvp1ValIm;
+    }
+    else if (VGammaVpmode1==2 && VGammaVpmode2==2){ // VpVp
+      g1_dyn = gvpvp1Val;
+      g1_dynIm = gvpvp1ValIm;
+    }
   }
-  else if ((!isGammaV1 || !isGammaV2) && !(Vdecay1==RooSpin::kVdecayType_GammaOnshell && Vdecay2==RooSpin::kVdecayType_GammaOnshell)){
-    if (gzgs1_prime2Val!=0 && !isGammaV1) g1_dyn += gzgs1_prime2Val* pow(m1_, 2)/pow(Lambda_zgs1, 2);
-    if (gzgs1_prime2Val!=0 && !isGammaV2) g1_dyn += gzgs1_prime2Val* pow(m2_, 2)/pow(Lambda_zgs1, 2);
+  else if (!(Vdecay1==RooSpin::kVdecayType_GammaOnshell && Vdecay2==RooSpin::kVdecayType_GammaOnshell) && (VGammaVpmode1+VGammaVpmode2)==1){ // Zgs/Zg
+    if (gzgs1_prime2Val!=0 && VGammaVpmode1==0) g1_dyn += gzgs1_prime2Val* pow(m1_, 2)/pow(Lambda_zgs1, 2);
+    if (gzgs1_prime2Val!=0 && VGammaVpmode2==0) g1_dyn += gzgs1_prime2Val* pow(m2_, 2)/pow(Lambda_zgs1, 2);
     g2_dyn = gzgs2Val;
     g3_dyn = gzgs3Val;
     g4_dyn = gzgs4Val;
 
-    if (gzgs1_prime2ValIm!=0 && !isGammaV1) g1_dynIm += gzgs1_prime2ValIm* pow(m1_, 2)/pow(Lambda_zgs1, 2);
-    if (gzgs1_prime2ValIm!=0 && !isGammaV2) g1_dynIm += gzgs1_prime2ValIm* pow(m2_, 2)/pow(Lambda_zgs1, 2);
+    if (gzgs1_prime2ValIm!=0 && VGammaVpmode1==0) g1_dynIm += gzgs1_prime2ValIm* pow(m1_, 2)/pow(Lambda_zgs1, 2);
+    if (gzgs1_prime2ValIm!=0 && VGammaVpmode2==0) g1_dynIm += gzgs1_prime2ValIm* pow(m2_, 2)/pow(Lambda_zgs1, 2);
     g2_dynIm = gzgs2ValIm;
     g3_dynIm = gzgs3ValIm;
     g4_dynIm = gzgs4ValIm;
   }
-  else{
+  else{ // gsgs/gsg/gg
     g2_dyn = ggsgs2Val;
     g3_dyn = ggsgs3Val;
     g4_dyn = ggsgs4Val;
@@ -425,7 +450,7 @@ void RooSpinZero::calculateAi(Double_t& a1Re, Double_t& a1Im, Double_t& a2Re, Do
   cout << endl;
   */
 
-  Double_t kappa = s/pow(Lambda,2);
+  Double_t kappa = s/pow(Lambda, 2);
   a3Re = -2.*g4_dyn*pow(m12, 2);
   a2Re = -(2.*g2_dyn + g3_dyn*kappa)*pow(m12, 2);
   a1Re = g1_dyn*pow(mV, 2) - a2Re*s/pow(m12, 2);
@@ -433,20 +458,55 @@ void RooSpinZero::calculateAi(Double_t& a1Re, Double_t& a1Im, Double_t& a2Re, Do
   a2Im = -(2.*g2_dynIm + g3_dynIm*kappa)*pow(m12, 2);
   a1Im = g1_dynIm*pow(mV, 2) - a2Im*s/pow(m12, 2);
 }
-void RooSpinZero::calculateAmplitudes(Double_t& A00Re, Double_t& A00Im, Double_t& AppRe, Double_t& AppIm, Double_t& AmmRe, Double_t& AmmIm, bool isGammaV1, bool isGammaV2)const{
+void RooSpinZero::calculateAmplitudes(
+  Double_t& A00Re, Double_t& A00Im, Double_t& AppRe, Double_t& AppIm, Double_t& AmmRe, Double_t& AmmIm,
+  int VGammaVpmode1, int VGammaVpmode2
+)const{
   Double_t m1_=m1; if (Vdecay1==RooSpin::kVdecayType_GammaOnshell) m1_=0;
   Double_t m2_=m2; if (Vdecay2==RooSpin::kVdecayType_GammaOnshell) m2_=0;
 
   Double_t a1Re, a2Re, a3Re, a1Im, a2Im, a3Im;
-  calculateAi(a1Re, a1Im, a2Re, a2Im, a3Re, a3Im, isGammaV1, isGammaV2);
+  calculateAi(a1Re, a1Im, a2Re, a2Im, a3Re, a3Im, VGammaVpmode1, VGammaVpmode2);
 
   Double_t propV1Re=1, propV2Re=1, propHRe=1;
   Double_t propV1Im=0, propV2Im=0, propHIm=0;
-  if (Vdecay1!=RooSpin::kVdecayType_GammaOnshell) calculatePropagator(propV1Re, propV1Im, m1_, (isGammaV1 ? 0 : 1));
-  if (Vdecay2!=RooSpin::kVdecayType_GammaOnshell) calculatePropagator(propV2Re, propV2Im, m2_, (isGammaV2 ? 0 : 1));
+  if (Vdecay1!=RooSpin::kVdecayType_GammaOnshell){
+    int proptype=-1;
+    switch (VGammaVpmode1){
+    case 0:
+      proptype=1;
+      break;
+    case 1:
+      proptype=0;
+      break;
+    case 2:
+      proptype=3;
+      break;
+    default:
+      break;
+    }
+    calculatePropagator(propV1Re, propV1Im, m1_, proptype);
+  }
+  if (Vdecay2!=RooSpin::kVdecayType_GammaOnshell){
+    int proptype=-1;
+    switch (VGammaVpmode2){
+    case 0:
+      proptype=1;
+      break;
+    case 1:
+      proptype=0;
+      break;
+    case 2:
+      proptype=3;
+      break;
+    default:
+      break;
+    }
+    calculatePropagator(propV2Re, propV2Im, m2_, proptype);
+  }
   calculatePropagator(propHRe, propHIm, m12, 2);
 
-  Double_t ampScale = calculateAmplitudeScale(isGammaV1, isGammaV2)*pow(GeVunit, 2);
+  Double_t ampScale = calculateAmplitudeScale(VGammaVpmode2, VGammaVpmode2)*pow(GeVunit, 2);
 
   Double_t eta1 = m1_ / m12;
   Double_t eta2 = m2_ / m12;

@@ -36,6 +36,12 @@ public:
   RooRealVar* ggsgs3Phase[1];
   RooRealVar* ggsgs4Phase[1];
 
+  RooRealVar* gvvp1Frac[1];
+  RooRealVar* gvvp1Phase[1];
+
+  RooRealVar* gvpvp1Frac[1];
+  RooRealVar* gvpvp1Phase[1];
+
   RooFormulaVar* gFracSum; // sum_{i, i>1}{fabs(f_ai)}
   RooFormulaVar* g1FracInterp[8]; // f_a1^interp = (f_a1<0 ? 0 : f_ai)
   RooFormulaVar* g2FracInterp[8];
@@ -50,12 +56,27 @@ public:
   RooFormulaVar* ggsgs3FracInterp[1];
   RooFormulaVar* ggsgs4FracInterp[1];
 
+  RooFormulaVar* gvvp1FracInterp[1];
+
+  RooFormulaVar* gvpvp1FracInterp[1];
+
   RooRealVar* gRatioVal[4][8];
   RooRealVar* gZGsRatioVal[4][1];
   RooRealVar* gGsGsRatioVal[3][1];
+  RooRealVar* gVVpRatioVal[1][1];
+  RooRealVar* gVpVpRatioVal[1][1];
 
   ScalarPdfFactory(RooSpin::modelMeasurables measurables_, bool acceptance_=false, RooSpin::VdecayType V1decay_=RooSpin::kVdecayType_Zll, RooSpin::VdecayType V2decay_=RooSpin::kVdecayType_Zll, Bool_t OnshellH_=true);
-  ScalarPdfFactory(RooSpin::modelMeasurables measurables_, double gRatio_[4][8], double gZGsRatio_[4][1], double gGsGsRatio_[3][1], bool pmf_applied_=false, bool acceptance_=false, RooSpin::VdecayType V1decay_=RooSpin::kVdecayType_Zll, RooSpin::VdecayType V2decay_=RooSpin::kVdecayType_Zll, Bool_t OnshellH_=true);
+  ScalarPdfFactory(
+    RooSpin::modelMeasurables measurables_,
+    double gRatio_[4][8],
+    double gZGsRatio_[4][1],
+    double gGsGsRatio_[3][1],
+    double gVVpRatio_[1][1],
+    double gVpVpRatio_[1][1],
+    bool pmf_applied_=false, bool acceptance_=false,
+    RooSpin::VdecayType V1decay_=RooSpin::kVdecayType_Zll, RooSpin::VdecayType V2decay_=RooSpin::kVdecayType_Zll, Bool_t OnshellH_=true
+  );
   virtual ~ScalarPdfFactory();
 
   virtual void makeParamsConst(bool yesNo)=0;
@@ -72,6 +93,8 @@ protected:
   double gRatio[4][8];
   double gZGsRatio[4][1];
   double gGsGsRatio[3][1];
+  double gVVpRatio[1][1];
+  double gVpVpRatio[1][1];
 
   virtual void initFractionsPhases();
   virtual void initGVals();
