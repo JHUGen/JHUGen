@@ -17,7 +17,6 @@ public:
   );
   ~ScalarPdfFactory_VH();
 
-  void makeParamsConst(bool yesNo=true);
   RooSpinZero* getPDF();
 
 protected:

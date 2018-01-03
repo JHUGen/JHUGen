@@ -79,7 +79,6 @@ public:
   );
   virtual ~ScalarPdfFactory();
 
-  virtual void makeParamsConst(bool yesNo)=0;
   virtual void makeCouplingsConst(bool yesNo=true);
   virtual void addHypothesis(int ig, int ilam, double iphase=0, double altparam_fracval=0);
   virtual void resetHypotheses();

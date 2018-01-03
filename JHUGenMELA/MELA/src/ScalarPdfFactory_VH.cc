@@ -30,25 +30,6 @@ ScalarPdfFactory_VH::~ScalarPdfFactory_VH(){
   destroyPDF();
 }
 
-void ScalarPdfFactory_VH::makeParamsConst(bool yesNo){
-  couplings.Lambda->setConstant(true);
-  couplings.Lambda_zgs1->setConstant(true);
-  couplings.Lambda_z1->setConstant(true);
-  couplings.Lambda_z2->setConstant(true);
-  couplings.Lambda_z3->setConstant(true);
-  couplings.Lambda_z4->setConstant(true);
-  couplings.Lambda_Q->setConstant(true);
-
-  ((RooRealVar*)parameters.mX)->setConstant(yesNo);
-  ((RooRealVar*)parameters.gamX)->setConstant(yesNo);
-  ((RooRealVar*)parameters.mW)->setConstant(yesNo);
-  ((RooRealVar*)parameters.gamW)->setConstant(yesNo);
-  ((RooRealVar*)parameters.mZ)->setConstant(yesNo);
-  ((RooRealVar*)parameters.gamZ)->setConstant(yesNo);
-  ((RooRealVar*)parameters.Sin2ThetaW)->setConstant(yesNo);
-  ((RooRealVar*)parameters.vev)->setConstant(yesNo);
-}
-
 void ScalarPdfFactory_VH::initPDF(){
   PDF_ILC_5D=0;
   PDF_LHC_3D=0;

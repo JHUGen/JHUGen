@@ -17,7 +17,7 @@ public:
   virtual void getMVGamV(Double_t* mV=0, Double_t* gamV=0) const;
   virtual void getMVprimeGamVprime(Double_t* mV=0, Double_t* gamV=0) const;
 
-  virtual void makeParamsConst(bool yesNo)=0;
+  virtual void makeParamsConst(bool yesNo);
   virtual void makeCouplingsConst(bool yesNo)=0;
   virtual void resetHypotheses()=0;
   virtual void resetVdecay(RooSpin::VdecayType V1decay_, RooSpin::VdecayType V2decay_);

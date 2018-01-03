@@ -14,7 +14,6 @@ public:
   TensorPdfFactory(RooSpin::modelMeasurables measurables_, RooSpin::VdecayType V1decay_=RooSpin::kVdecayType_Zll, RooSpin::VdecayType V2decay_=RooSpin::kVdecayType_Zll, Bool_t OnshellH_=true);
   virtual ~TensorPdfFactory();
 
-  virtual void makeParamsConst(bool yesNo)=0;
   virtual void makeCouplingsConst(bool yesNo=true);
   virtual void addHypothesis(int ig, double initval, double iphase=0);
   virtual void setTensorPolarization(int ig, double initval);

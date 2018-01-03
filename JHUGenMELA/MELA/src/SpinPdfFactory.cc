@@ -146,3 +146,22 @@ void SpinPdfFactory::setVariableValue(RooRealVar* var, Double_t val){
     var->setConstant(true);
   }
 }
+
+void SpinPdfFactory::makeParamsConst(bool yesNo){
+  ((RooRealVar*) parameters.mX)->setConstant(yesNo);
+  ((RooRealVar*) parameters.gamX)->setConstant(yesNo);
+  ((RooRealVar*) parameters.mW)->setConstant(yesNo);
+  ((RooRealVar*) parameters.gamW)->setConstant(yesNo);
+  ((RooRealVar*) parameters.mZ)->setConstant(yesNo);
+  ((RooRealVar*) parameters.gamZ)->setConstant(yesNo);
+  ((RooRealVar*) parameters.mWprime)->setConstant(yesNo);
+  ((RooRealVar*) parameters.gamWprime)->setConstant(yesNo);
+  ((RooRealVar*) parameters.mZprime)->setConstant(yesNo);
+  ((RooRealVar*) parameters.gamZprime)->setConstant(yesNo);
+  ((RooRealVar*) parameters.Sin2ThetaW)->setConstant(yesNo);
+  ((RooRealVar*) parameters.vev)->setConstant(yesNo);
+  ((RooRealVar*) parameters.gVprimeff_decay1_left)->setConstant(yesNo);
+  ((RooRealVar*) parameters.gVprimeff_decay1_right)->setConstant(yesNo);
+  ((RooRealVar*) parameters.gVprimeff_decay2_left)->setConstant(yesNo);
+  ((RooRealVar*) parameters.gVprimeff_decay2_right)->setConstant(yesNo);
+}
