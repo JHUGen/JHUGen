@@ -189,6 +189,9 @@ protected:
     int VGammaVpmode1=0, int VGammaVpmode2=0
   ) const;
 
+
+  virtual Bool_t computeNeededAmplitude(int VGammaVpmode1, int VGammaVpmode2) const final;
+
 };
 
 #endif

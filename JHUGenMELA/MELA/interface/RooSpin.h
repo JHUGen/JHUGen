@@ -149,6 +149,10 @@ protected:
   virtual void setProxies(modelMeasurables _measurables);
   virtual void setProxy(RooRealProxy& proxy, RooAbsReal* objectPtr);
   virtual Bool_t checkFundamentalType(const RooRealProxy& proxy) const;
+
+  // Check if some amplitudes are needed, otherwise don't even compute them
+  virtual Bool_t computeNeededAmplitude(int VGammaVpmode1, int VGammaVpmode2) const { return true; }
+
 };
 
 #endif

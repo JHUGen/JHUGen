@@ -177,20 +177,17 @@ Double_t RooSpinZero_5D_VH::evaluate() const{
   for (int VGammaVpmode1=0; VGammaVpmode1<=2; VGammaVpmode1++){
     for (int VGammaVpmode2=0; VGammaVpmode2<=2; VGammaVpmode2++){
       if (!(
-        (VGammaVpmode1==0 && VGammaVpmode2==0 && Vdecay1!=RooSpin::kVdecayType_GammaOnshell && Vdecay2!=RooSpin::kVdecayType_GammaOnshell)
+        Vdecay1!=RooSpin::kVdecayType_GammaOnshell
+        &&
+        (VGammaVpmode2==1 || Vdecay2!=RooSpin::kVdecayType_GammaOnshell)
+        )
         ||
-        (VGammaVpmode1==0 && VGammaVpmode2==1 && Vdecay1!=RooSpin::kVdecayType_GammaOnshell)
+        VGammaVpmode1==1
         ||
-        (VGammaVpmode1==1 && VGammaVpmode2==0 && Vdecay2!=RooSpin::kVdecayType_GammaOnshell)
+        (VGammaVpmode1==2 && VGammaVpmode2==1)
         ||
-        (VGammaVpmode1==1 && VGammaVpmode2==1)
-        ||
-        (VGammaVpmode1==0 && VGammaVpmode2==2 && Vdecay1!=RooSpin::kVdecayType_GammaOnshell && Vdecay2!=RooSpin::kVdecayType_GammaOnshell)
-        ||
-        (VGammaVpmode1==2 && VGammaVpmode2==0 && Vdecay1!=RooSpin::kVdecayType_GammaOnshell && Vdecay2!=RooSpin::kVdecayType_GammaOnshell)
-        ||
-        (VGammaVpmode1==2 && VGammaVpmode2==2 && Vdecay1!=RooSpin::kVdecayType_GammaOnshell && Vdecay2!=RooSpin::kVdecayType_GammaOnshell)
-        )) continue;
+        !computeNeededAmplitude(VGammaVpmode1, VGammaVpmode2)
+        ) continue;
       Double_t val_A00=0, val_App=0, val_Amm=0, val_A0p=0, val_A0m=0, val_Amp=0;
       evaluatePolarizationTerms(val_A00, val_App, val_Amm, val_A0p, val_A0m, val_Amp, code, VGammaVpmode1, VGammaVpmode2);
       value += val_A00 + val_App + val_Amm + val_A0p + val_A0m + val_Amp;

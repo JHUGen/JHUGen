@@ -343,7 +343,6 @@ void RooSpinZero::calculateAi(
       if (cz_q2sq!=0.) g3_dyn *= 1./(1.+ cz_q2sq*pow(m2_/Lambda_z32, 2));
       if (cz_q12sq!=0.) g3_dyn *= 1./(1.+ cz_q12sq*pow(m12/Lambda_z30, 2));
 
-
       g4_dyn = g4Val;
       if (g4_primeVal!=0) g4_dyn += g4_primeVal * pow(Lambda_z4, 4)/(pow(Lambda_z4, 2) + pow(m1_, 2))/(pow(Lambda_z4, 2) + pow(m2_, 2));
       if (g4_prime2Val!=0) g4_dyn += g4_prime2Val* (pow(m1_, 2) + pow(m2_, 2))/pow(Lambda_z4, 2);
@@ -396,7 +395,6 @@ void RooSpinZero::calculateAi(
       if (cz_q1sq!=0.) g3_dynIm *= 1./(1.+ cz_q1sq*pow(m1_/Lambda_z31, 2));
       if (cz_q2sq!=0.) g3_dynIm *= 1./(1.+ cz_q2sq*pow(m2_/Lambda_z32, 2));
       if (cz_q12sq!=0.) g3_dynIm *= 1./(1.+ cz_q12sq*pow(m12/Lambda_z30, 2));
-
 
       g4_dynIm = g4ValIm;
       if (g4_primeValIm!=0) g4_dynIm += g4_primeValIm * pow(Lambda_z4, 4)/(pow(Lambda_z4, 2) + pow(m1_, 2))/(pow(Lambda_z4, 2) + pow(m2_, 2));
@@ -546,3 +544,120 @@ void RooSpinZero::calculateAmplitudes(
     cout << eta1 << '\t' << eta2 << '\t' << etas << '\t' << etasp << '\t' << eta1p2 << endl;
   }
 }
+
+Bool_t RooSpinZero::computeNeededAmplitude(int VGammaVpmode1, int VGammaVpmode2) const{
+  return (
+    (
+    (VGammaVpmode1==VGammaVpmode2 && VGammaVpmode1==0) && (
+      g1Val!=0.
+      || g1_primeVal!=0.
+      || g1_prime2Val!=0.
+      || g1_prime3Val!=0.
+      || g1_prime4Val!=0.
+      || g1_prime5Val!=0.
+      || g1_prime6Val!=0.
+      || g1_prime7Val!=0.
+      || g2Val!=0.
+      || g2_primeVal!=0.
+      || g2_prime2Val!=0.
+      || g2_prime3Val!=0.
+      || g2_prime4Val!=0.
+      || g2_prime5Val!=0.
+      || g2_prime6Val!=0.
+      || g2_prime7Val!=0.
+      || g4Val!=0.
+      || g4_primeVal!=0.
+      || g4_prime2Val!=0.
+      || g4_prime3Val!=0.
+      || g4_prime4Val!=0.
+      || g4_prime5Val!=0.
+      || g4_prime6Val!=0.
+      || g4_prime7Val!=0.
+      || g3Val!=0.
+      || g3_primeVal!=0.
+      || g3_prime2Val!=0.
+      || g3_prime3Val!=0.
+      || g3_prime4Val!=0.
+      || g3_prime5Val!=0.
+      || g3_prime6Val!=0.
+      || g3_prime7Val!=0.
+
+      || g1ValIm!=0.
+      || g1_primeValIm!=0.
+      || g1_prime2ValIm!=0.
+      || g1_prime3ValIm!=0.
+      || g1_prime4ValIm!=0.
+      || g1_prime5ValIm!=0.
+      || g1_prime6ValIm!=0.
+      || g1_prime7ValIm!=0.
+      || g2ValIm!=0.
+      || g2_primeValIm!=0.
+      || g2_prime2ValIm!=0.
+      || g2_prime3ValIm!=0.
+      || g2_prime4ValIm!=0.
+      || g2_prime5ValIm!=0.
+      || g2_prime6ValIm!=0.
+      || g2_prime7ValIm!=0.
+      || g4ValIm!=0.
+      || g4_primeValIm!=0.
+      || g4_prime2ValIm!=0.
+      || g4_prime3ValIm!=0.
+      || g4_prime4ValIm!=0.
+      || g4_prime5ValIm!=0.
+      || g4_prime6ValIm!=0.
+      || g4_prime7ValIm!=0.
+      || g3ValIm!=0.
+      || g3_primeValIm!=0.
+      || g3_prime2ValIm!=0.
+      || g3_prime3ValIm!=0.
+      || g3_prime4ValIm!=0.
+      || g3_prime5ValIm!=0.
+      || g3_prime6ValIm!=0.
+      || g3_prime7ValIm!=0.
+      )
+      )
+    ||
+    (
+    ((VGammaVpmode1==0 && VGammaVpmode2==1) || (VGammaVpmode2==0 && VGammaVpmode1==1)) && (
+      gzgs1_prime2Val!=0.
+      || gzgs2Val!=0.
+      || gzgs4Val!=0.
+      || gzgs3Val!=0.
+
+      || gzgs1_prime2ValIm!=0.
+      || gzgs2ValIm!=0.
+      || gzgs4ValIm!=0.
+      || gzgs3ValIm!=0.
+      )
+      )
+    ||
+    (
+    (VGammaVpmode1==VGammaVpmode2 && VGammaVpmode1==1) && (
+      ggsgs2Val!=0.
+      || ggsgs4Val!=0.
+      || ggsgs3Val!=0.
+
+      || ggsgs2ValIm!=0.
+      || ggsgs4ValIm!=0.
+      || ggsgs3ValIm!=0.
+      )
+      )
+    ||
+    (
+    ((VGammaVpmode1==0 && VGammaVpmode2==2) || (VGammaVpmode2==0 && VGammaVpmode1==2)) && (
+      gvvp1Val!=0.
+
+      || gvvp1ValIm!=0.
+      )
+      )
+    ||
+    (
+    (VGammaVpmode1==VGammaVpmode2 && VGammaVpmode1==2) && (
+      gvpvp1Val!=0.
+
+      || gvpvp1ValIm!=0.
+      )
+      )
+    );
+}
+
