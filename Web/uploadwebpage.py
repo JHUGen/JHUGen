@@ -91,7 +91,7 @@ def getuploadfiles(dir):
     return result
 
 class Version(object):
-    def __init__(self, version, gitcommit=None, tarballname=None, manualname=None, manualcommit=None, melacommit=None):
+    def __init__(self, version, gitcommit=None, tarballname=None, manualname=None, manualcommit=None, melacommit=None, visible=True):
         self.version = version
         if gitcommit is None: gitcommit = version
         if tarballname is None: tarballname = "JHUGenerator.{}.tar.gz".format(self.version)
@@ -102,6 +102,7 @@ class Version(object):
         self.manualname = manualname
         self.manualcommit = manualcommit
         self.melacommit = melacommit
+        self.visible = visible
 
     def getlink(self):
         return link_template.format(tarballname=self.tarballname)
@@ -143,6 +144,8 @@ class Version(object):
             check_call(["mv", self.tarballname, WebGeneratordir])
 
 def create_Download(mostrecentversion, *olderversions):
+    if not mostrecentversion.visible:
+        raise ValueError("The most recent version has to be visible")
     if not os.path.exists(os.path.join(Webdir, "Manual.pdf")):
         mostrecentversion.createtarball(force=True)
         check_call(["cp", os.path.join(gitdir, mostrecentversion.manualname), os.path.join(Webdir, "Manual.pdf")])
@@ -150,7 +153,7 @@ def create_Download(mostrecentversion, *olderversions):
         version.createtarball()
     Download = Download_template.format(
                                         latest = mostrecentversion.getlink(),
-                                        older = "\n    ".join(v.getlink() for v in [mostrecentversion] + list(olderversions)),
+                                        older = "\n    ".join(v.getlink() for v in [mostrecentversion] + list(olderversions) if v.visible),
                                         reallyold = "\n    ".join(v.getlink() for v in reallyold),
                                        )
     with open(os.path.join(WebGeneratordir, "Download.html"), "w") as f:
@@ -219,7 +222,8 @@ Download_template = """
 #   - melacommit, name of the commit to checkout for the JHUGenMELA folder.  Default is the same
 #       as the generator
 versions = (
-            Version("v7.0.9", manualcommit="c14848e401c115e9e3f201bf7388cc750e4b09f3", melacommit="ebdb109745949008e16851674bb832c59ecc43a3"),
+            Version("v7.0.11"),
+            Version("v7.0.9", manualcommit="c14848e401c115e9e3f201bf7388cc750e4b09f3", melacommit="ebdb109745949008e16851674bb832c59ecc43a3", visible=False),
             Version("v7.0.2", melacommit="v6.9.8"),
             Version("v7.0.0", gitcommit="v7.0.0.beta1", manualcommit="18221e3", melacommit="v6.9.8"),
             Version("v6.9.8", manualcommit="971ad57"),
