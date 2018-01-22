@@ -3,7 +3,7 @@ implicit none
 save
 !
 !
-character(len=*),parameter :: JHUGen_Version="v7.0.11"
+character(len=*),parameter :: JHUGen_Version="v7.0.12"
 !
 !
 !=====================================================
@@ -688,22 +688,23 @@ real(dp), public, parameter :: aveqg = 1.0_dp/4.0_dp/24.0_dp
 real(dp), public, parameter :: aveqq = 1.0_dp/4.0_dp/9.0_dp
 
 ! Particle isospin and charges
-real(8), public, parameter :: T3lL= -0.5d0
-real(8), public, parameter :: T3lR=  0d0
-real(8), public, parameter :: T3nL=  0.5d0
-real(8), public, parameter :: T3nR=  0d0
-real(8), public, parameter :: T3uL= 0.5d0
-real(8), public, parameter :: T3uR= 0d0
-real(8), public, parameter :: T3dL= -0.5d0
-real(8), public, parameter :: T3dR= 0d0
-real(8), public, parameter :: QlL = -1d0
-real(8), public, parameter :: QlR = -1d0
-real(8), public, parameter :: QnL =  0d0
-real(8), public, parameter :: QnR =  0d0
-real(8), public, parameter :: QuL = 2d0/3d0
-real(8), public, parameter :: QuR = 2d0/3d0
-real(8), public, parameter :: QdL = -1d0/3d0
-real(8), public, parameter :: QdR = -1d0/3d0
+logical, public            :: ModifiedIsospinCharge = .false.
+real(8), public            :: T3lL= -0.5d0
+real(8), public            :: T3lR=  0d0
+real(8), public            :: T3nL=  0.5d0
+real(8), public            :: T3nR=  0d0
+real(8), public            :: T3uL= 0.5d0
+real(8), public            :: T3uR= 0d0
+real(8), public            :: T3dL= -0.5d0
+real(8), public            :: T3dR= 0d0
+real(8), public            :: QlL = -1d0
+real(8), public            :: QlR = -1d0
+real(8), public            :: QnL =  0d0
+real(8), public            :: QnR =  0d0
+real(8), public            :: QuL = 2d0/3d0
+real(8), public            :: QuR = 2d0/3d0
+real(8), public            :: QdL = -1d0/3d0
+real(8), public            :: QdR = -1d0/3d0
 
 
 ! V-f-fbar couplings:

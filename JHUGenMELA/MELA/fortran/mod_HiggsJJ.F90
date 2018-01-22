@@ -2357,9 +2357,7 @@ module modHiggsJJ
   function A0_ZZ_4f(j1,j2,j3,j4,za,zb,sprod,iSel,jSel)
     use modMisc
     implicit none
-    real(dp), dimension(5) :: Lz,Rz,LCT,RCT
-    real(dp), parameter, dimension(5) :: La = (/QdL,QuL,QdL,QuL,QdL/)
-    real(dp), parameter, dimension(5) :: Ra = (/QdR,QuR,QdR,QuR,QdR/)
+    real(dp), dimension(5) :: Lz,Rz,LCT,RCT,La,Ra
     complex(dp) :: A0_ZZ_4f(-1:1,-1:1)
     integer :: j1,j2,j3,j4,iSel,jSel,line1,line2
     complex(dp) :: za(4,4),zb(4,4)
@@ -2386,6 +2384,8 @@ module modHiggsJJ
 
     Lz = (/aL_Qdn,aL_Qup,aL_Qdn,aL_Qup,aL_Qdn/)
     Rz = (/aR_Qdn,aR_Qup,aR_Qdn,aR_Qup,aR_Qdn/)
+    La = (/QdL,QuL,QdL,QuL,QdL/)
+    Ra = (/QdR,QuR,QdR,QuR,QdR/)
 
     if( abs(iSel).eq.pdfTop_ .or. abs(jSel).eq.pdfTop_ ) return
     if( abs(iSel).eq.pdfGlu_ .or. abs(jSel).eq.pdfGlu_ ) return
