@@ -827,8 +827,10 @@ logical :: SetColliderEnergy
 
 
     ! Z and W parameters
-    call ReadCommandLineArgument(arg, "MZ", success, M_Z)
-    call ReadCommandLineArgument(arg, "MW", success, M_W)
+    call ReadCommandLineArgument(arg, "MZ", success, M_Z, multiply=GeV)
+    call ReadCommandLineArgument(arg, "MW", success, M_W, multiply=GeV)
+    call ReadCommandLineArgument(arg, "GaZ", success, Ga_Z, multiply=GeV)
+    call ReadCommandLineArgument(arg, "GaW", success, Ga_W, multiply=GeV)
     call ReadCommandLineArgument(arg, "T3lL", success, T3lL, success2=ModifiedIsospinCharge)
     call ReadCommandLineArgument(arg, "T3lR", success, T3lR, success2=ModifiedIsospinCharge)
     call ReadCommandLineArgument(arg, "T3nuL", success, T3nL, success2=ModifiedIsospinCharge)
@@ -4688,8 +4690,8 @@ character :: arg*(500)
         else if( ReadLHEFile .or. Process.le.2 .or. Process .eq. 80 ) then
             write(TheUnit,"(4X,A,I2,2X,A,I2)") "DecayMode1:",DecayMode1, "DecayMode2:",DecayMode2
         endif
-        if( Process.eq.60 .or. (Process.ge.66 .and. Process.le.69) .or. IsAZDecay(DecayMode1) .or. IsAZDecay(DecayMode2) ) write(TheUnit,"(4X,A,F6.3,A,F6.4)") "Z-boson: mass=",M_Z*100d0,", width=",Ga_Z*100d0
-        if( Process.eq.60 .or. (Process.ge.66 .and. Process.le.69) .or. IsAWDecay(DecayMode1) .or. IsAWDecay(DecayMode2) ) write(TheUnit,"(4X,A,F6.3,A,F6.4)") "W-boson: mass=",M_W*100d0,", width=",Ga_W*100d0
+        if( Process.eq.60 .or. (Process.ge.66 .and. Process.le.69) .or. IsAZDecay(DecayMode1) .or. IsAZDecay(DecayMode2) ) write(TheUnit,"(4X,A,F6.3,A,F7.5)") "Z-boson: mass=",M_Z*100d0,", width=",Ga_Z*100d0
+        if( Process.eq.60 .or. (Process.ge.66 .and. Process.le.69) .or. IsAWDecay(DecayMode1) .or. IsAWDecay(DecayMode2) ) write(TheUnit,"(4X,A,F6.3,A,F7.5)") "W-boson: mass=",M_W*100d0,", width=",Ga_W*100d0
         if(ModifiedIsospinCharge) then
           write(TheUnit, "(4X,A)") "Isospin and charge:"
           write(TheUnit, "(6X,A4,F6.2,4X,F6.2)") " lL:", T3lL, QlL
