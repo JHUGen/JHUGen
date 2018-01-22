@@ -155,7 +155,7 @@ if __name__ == '__main__':
               event.setProcess(TVar.SelfDefine_spin0, TVar.JHUGen, TVar.Lep_WH)
           else:
             event.setProcess(TVar.SelfDefine_spin0, TVar.JHUGen, TVar.JJVBF)
-          prob = event.computeP()
+          prob = event.computeProdP()
           self.assertNotEqual(prob, 0)
           print prob, event.computeVBFAngles(), event.computeVHAngles()
 
