@@ -71,8 +71,8 @@
           doInterference = includeInterference .and. (         &
             ((VVMode.eq.ZZMode) .and. (VVMode_swap.eq.ZZMode)) &
             )
-          if ( includeVprime .and. .not.(VVMode.eq.WWMode .or. VVMode.eq.WWMode) ) then
-              call Error("Contact terms only for ZZ or WW!")
+          if ( includeVprime .and. .not.(VVMode.eq.ZZMode .or. VVMode.eq.ZgMode .or. VVMode.eq.WWMode) ) then
+              call Error("Contact terms only for WW, ZZ or Zg!")
           endif
           do i1=1,2;  do i2=1,2;  do i3=1,2;  do i4=1,2!  sum over helicities
                   call calcHelAmp(ordering,VVMode,MY_IDUP,p(1:4,1:6),i1,i2,i3,i4,A_VV(1))
@@ -372,7 +372,6 @@
       integer, intent(in) :: MY_IDUP(6:9)
       complex(dp) :: A_VV(1:18),A0_VV(1:2)
       integer :: i3,i4,VVMode,VVmode_swap
-      real(dp) :: s
       real(dp) :: prefactor
       real(dp) :: intcolfac
       integer :: ordering(1:4),ordering_swap(1:4)
@@ -419,8 +418,8 @@
           doInterference = includeInterference .and. (         &
             ((VVMode.eq.ZZMode) .and. (VVMode_swap.eq.ZZMode)) &
             )
-          if ( includeVprime .and. .not.(VVMode.eq.WWMode .or. VVMode.eq.WWMode) ) then
-              call Error("Contact terms only for ZZ or WW!")
+          if ( includeVprime .and. .not.(VVMode.eq.ZZMode .or. VVMode.eq.ZgMode .or. VVMode.eq.WWMode) ) then
+              call Error("Contact terms only for WW, ZZ or Zg!")
           endif
           do i3=1,2;  do i4=1,2!  sum over helicities
                   call calcHelAmp2(ordering,VVMode,MY_IDUP,p(1:4,1:6),i3,i4,A_VV(1))
