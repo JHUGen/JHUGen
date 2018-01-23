@@ -10,10 +10,10 @@ character(len=*),parameter :: JHUGen_Version="v7.0.11"
 !internal
 integer, public, parameter :: dp = selected_real_kind(15)
 real(8), public, parameter :: tol = 0.0000001d0
-integer, public, parameter :: InvalidMode=-1,ZZMode=00,ZgsMode=01,gsZMode=02,gsgsMode=03,ZZpMode=04,ZpZMode=05,ZpZpMode=06
-integer, public, parameter :: WWMode=10,WWpMode=11,WpWMode=12,WpWpMode=13
-integer, public, parameter :: ggMode=20
-integer, public, parameter :: ZgMode=30,gsgMode=31
+integer, public, parameter :: InvalidMode=-1,WWMode=00,ZZMode=01,ZgsMode=02,gsZMode=03,gsgsMode=04,ZgMode=05,gsgMode=06,ggMode=07
+integer, public, parameter :: WWpMode=10,WpWMode=11,WpWpMode=12
+integer, public, parameter :: ZZpMode=20,ZpZMode=21,ZpZpMode=22
+integer, public, parameter :: gsZpMode=30,ZpgsMode=31,ZpgMode=32
 integer, public :: Collider,PChannel,Process,DecayMode1,DecayMode2,TopDecays,TauDecays
 integer, public :: VegasIt1,VegasNc0,VegasNc1,VegasNc2,PMZZEvals
 real(8), public :: Collider_Energy
@@ -299,13 +299,6 @@ real(8), public, parameter :: Lambda2 = 1000d0    *GeV      ! for second resonan
    complex(8), public :: ghz3 = (0d0,0d0)
    complex(8), public :: ghz4 = (0d0,0d0)   ! pseudoscalar
 
-   complex(8), public :: ghzgs2  = (0d0,0d0)
-   complex(8), public :: ghzgs3  = (0d0,0d0)
-   complex(8), public :: ghzgs4  = (0d0,0d0)
-   complex(8), public :: ghgsgs2 = (0d0,0d0)
-   complex(8), public :: ghgsgs3 = (0d0,0d0)
-   complex(8), public :: ghgsgs4 = (0d0,0d0)
-
 !-- parameters that define q^2 dependent form factors
    complex(8), public :: ghz1_prime = (0d0,0d0)
    complex(8), public :: ghz1_prime2= (0d0,0d0)
@@ -340,6 +333,12 @@ real(8), public, parameter :: Lambda2 = 1000d0    *GeV      ! for second resonan
    complex(8), public :: ghz4_prime7= (0d0,0d0)
 
    complex(8), public :: ghzgs1_prime2= (0d0,0d0)
+   complex(8), public :: ghzgs2  = (0d0,0d0)
+   complex(8), public :: ghzgs3  = (0d0,0d0)
+   complex(8), public :: ghzgs4  = (0d0,0d0)
+   complex(8), public :: ghgsgs2 = (0d0,0d0)
+   complex(8), public :: ghgsgs3 = (0d0,0d0)
+   complex(8), public :: ghgsgs4 = (0d0,0d0)
 
    real(8),    public, parameter :: Lambda_z1 = 10000d0*GeV
    real(8),    public, parameter :: Lambda_z2 = 10000d0*GeV
@@ -429,7 +428,88 @@ real(8), public, parameter :: Lambda2 = 1000d0    *GeV      ! for second resonan
 
 !-- HVV contact terms
    complex(8), public :: ghzzp1 = (0d0,0d0)
+   complex(8), public :: ghzzp2 = (0d0,0d0)
+   complex(8), public :: ghzzp3 = (0d0,0d0)
+   complex(8), public :: ghzzp4 = (0d0,0d0)
+
+!-- parameters that define q^2 dependent form factors
+   complex(8), public :: ghzzp1_prime = (0d0,0d0)
+   complex(8), public :: ghzzp1_prime2= (0d0,0d0)
+   complex(8), public :: ghzzp1_prime3= (0d0,0d0)
+   complex(8), public :: ghzzp1_prime4= (0d0,0d0)
+   complex(8), public :: ghzzp1_prime5= (0d0,0d0)
+   complex(8), public :: ghzzp1_prime6= (0d0,0d0)
+   complex(8), public :: ghzzp1_prime7= (0d0,0d0)
+
+   complex(8), public :: ghzzp2_prime = (0d0,0d0)
+   complex(8), public :: ghzzp2_prime2= (0d0,0d0)
+   complex(8), public :: ghzzp2_prime3= (0d0,0d0)
+   complex(8), public :: ghzzp2_prime4= (0d0,0d0)
+   complex(8), public :: ghzzp2_prime5= (0d0,0d0)
+   complex(8), public :: ghzzp2_prime6= (0d0,0d0)
+   complex(8), public :: ghzzp2_prime7= (0d0,0d0)
+
+   complex(8), public :: ghzzp3_prime = (0d0,0d0)
+   complex(8), public :: ghzzp3_prime2= (0d0,0d0)
+   complex(8), public :: ghzzp3_prime3= (0d0,0d0)
+   complex(8), public :: ghzzp3_prime4= (0d0,0d0)
+   complex(8), public :: ghzzp3_prime5= (0d0,0d0)
+   complex(8), public :: ghzzp3_prime6= (0d0,0d0)
+   complex(8), public :: ghzzp3_prime7= (0d0,0d0)
+
+   complex(8), public :: ghzzp4_prime = (0d0,0d0)
+   complex(8), public :: ghzzp4_prime2= (0d0,0d0)
+   complex(8), public :: ghzzp4_prime3= (0d0,0d0)
+   complex(8), public :: ghzzp4_prime4= (0d0,0d0)
+   complex(8), public :: ghzzp4_prime5= (0d0,0d0)
+   complex(8), public :: ghzzp4_prime6= (0d0,0d0)
+   complex(8), public :: ghzzp4_prime7= (0d0,0d0)
+
+!-- Zpgs
+   complex(8), public :: ghzpgs1_prime2= (0d0,0d0)
+   complex(8), public :: ghzpgs2  = (0d0,0d0)
+   complex(8), public :: ghzpgs3  = (0d0,0d0)
+   complex(8), public :: ghzpgs4  = (0d0,0d0)
+
+!-- ZpZp
    complex(8), public :: ghzpzp1 = (0d0,0d0)
+   complex(8), public :: ghzpzp2 = (0d0,0d0)
+   complex(8), public :: ghzpzp3 = (0d0,0d0)
+   complex(8), public :: ghzpzp4 = (0d0,0d0)
+
+!-- parameters that define q^2 dependent form factors
+   complex(8), public :: ghzpzp1_prime = (0d0,0d0)
+   complex(8), public :: ghzpzp1_prime2= (0d0,0d0)
+   complex(8), public :: ghzpzp1_prime3= (0d0,0d0)
+   complex(8), public :: ghzpzp1_prime4= (0d0,0d0)
+   complex(8), public :: ghzpzp1_prime5= (0d0,0d0)
+   complex(8), public :: ghzpzp1_prime6= (0d0,0d0)
+   complex(8), public :: ghzpzp1_prime7= (0d0,0d0)
+
+   complex(8), public :: ghzpzp2_prime = (0d0,0d0)
+   complex(8), public :: ghzpzp2_prime2= (0d0,0d0)
+   complex(8), public :: ghzpzp2_prime3= (0d0,0d0)
+   complex(8), public :: ghzpzp2_prime4= (0d0,0d0)
+   complex(8), public :: ghzpzp2_prime5= (0d0,0d0)
+   complex(8), public :: ghzpzp2_prime6= (0d0,0d0)
+   complex(8), public :: ghzpzp2_prime7= (0d0,0d0)
+
+   complex(8), public :: ghzpzp3_prime = (0d0,0d0)
+   complex(8), public :: ghzpzp3_prime2= (0d0,0d0)
+   complex(8), public :: ghzpzp3_prime3= (0d0,0d0)
+   complex(8), public :: ghzpzp3_prime4= (0d0,0d0)
+   complex(8), public :: ghzpzp3_prime5= (0d0,0d0)
+   complex(8), public :: ghzpzp3_prime6= (0d0,0d0)
+   complex(8), public :: ghzpzp3_prime7= (0d0,0d0)
+
+   complex(8), public :: ghzpzp4_prime = (0d0,0d0)
+   complex(8), public :: ghzpzp4_prime2= (0d0,0d0)
+   complex(8), public :: ghzpzp4_prime3= (0d0,0d0)
+   complex(8), public :: ghzpzp4_prime4= (0d0,0d0)
+   complex(8), public :: ghzpzp4_prime5= (0d0,0d0)
+   complex(8), public :: ghzpzp4_prime6= (0d0,0d0)
+   complex(8), public :: ghzpzp4_prime7= (0d0,0d0)
+
 
    complex(8), public :: ezp_El_left  = (0d0,0d0)
    complex(8), public :: ezp_El_right  = (0d0,0d0)
@@ -455,8 +535,82 @@ real(8), public, parameter :: Lambda2 = 1000d0    *GeV      ! for second resonan
    real(8), public :: M_Zprime = -1d0 ! <0: CT interaction, >=0: Heavy Zprime propagator
    real(8), public :: Ga_Zprime = 0d0
 !--
+!-- HVV contact terms
    complex(8), public :: ghwwp1 = (0d0,0d0)
+   complex(8), public :: ghwwp2 = (0d0,0d0)
+   complex(8), public :: ghwwp3 = (0d0,0d0)
+   complex(8), public :: ghwwp4 = (0d0,0d0)
+
+!-- parameters that define q^2 dependent form factors
+   complex(8), public :: ghwwp1_prime = (0d0,0d0)
+   complex(8), public :: ghwwp1_prime2= (0d0,0d0)
+   complex(8), public :: ghwwp1_prime3= (0d0,0d0)
+   complex(8), public :: ghwwp1_prime4= (0d0,0d0)
+   complex(8), public :: ghwwp1_prime5= (0d0,0d0)
+   complex(8), public :: ghwwp1_prime6= (0d0,0d0)
+   complex(8), public :: ghwwp1_prime7= (0d0,0d0)
+
+   complex(8), public :: ghwwp2_prime = (0d0,0d0)
+   complex(8), public :: ghwwp2_prime2= (0d0,0d0)
+   complex(8), public :: ghwwp2_prime3= (0d0,0d0)
+   complex(8), public :: ghwwp2_prime4= (0d0,0d0)
+   complex(8), public :: ghwwp2_prime5= (0d0,0d0)
+   complex(8), public :: ghwwp2_prime6= (0d0,0d0)
+   complex(8), public :: ghwwp2_prime7= (0d0,0d0)
+
+   complex(8), public :: ghwwp3_prime = (0d0,0d0)
+   complex(8), public :: ghwwp3_prime2= (0d0,0d0)
+   complex(8), public :: ghwwp3_prime3= (0d0,0d0)
+   complex(8), public :: ghwwp3_prime4= (0d0,0d0)
+   complex(8), public :: ghwwp3_prime5= (0d0,0d0)
+   complex(8), public :: ghwwp3_prime6= (0d0,0d0)
+   complex(8), public :: ghwwp3_prime7= (0d0,0d0)
+
+   complex(8), public :: ghwwp4_prime = (0d0,0d0)
+   complex(8), public :: ghwwp4_prime2= (0d0,0d0)
+   complex(8), public :: ghwwp4_prime3= (0d0,0d0)
+   complex(8), public :: ghwwp4_prime4= (0d0,0d0)
+   complex(8), public :: ghwwp4_prime5= (0d0,0d0)
+   complex(8), public :: ghwwp4_prime6= (0d0,0d0)
+   complex(8), public :: ghwwp4_prime7= (0d0,0d0)
+
    complex(8), public :: ghwpwp1 = (0d0,0d0)
+   complex(8), public :: ghwpwp2 = (0d0,0d0)
+   complex(8), public :: ghwpwp3 = (0d0,0d0)
+   complex(8), public :: ghwpwp4 = (0d0,0d0)
+
+!-- parameters that define q^2 dependent form factors
+   complex(8), public :: ghwpwp1_prime = (0d0,0d0)
+   complex(8), public :: ghwpwp1_prime2= (0d0,0d0)
+   complex(8), public :: ghwpwp1_prime3= (0d0,0d0)
+   complex(8), public :: ghwpwp1_prime4= (0d0,0d0)
+   complex(8), public :: ghwpwp1_prime5= (0d0,0d0)
+   complex(8), public :: ghwpwp1_prime6= (0d0,0d0)
+   complex(8), public :: ghwpwp1_prime7= (0d0,0d0)
+
+   complex(8), public :: ghwpwp2_prime = (0d0,0d0)
+   complex(8), public :: ghwpwp2_prime2= (0d0,0d0)
+   complex(8), public :: ghwpwp2_prime3= (0d0,0d0)
+   complex(8), public :: ghwpwp2_prime4= (0d0,0d0)
+   complex(8), public :: ghwpwp2_prime5= (0d0,0d0)
+   complex(8), public :: ghwpwp2_prime6= (0d0,0d0)
+   complex(8), public :: ghwpwp2_prime7= (0d0,0d0)
+
+   complex(8), public :: ghwpwp3_prime = (0d0,0d0)
+   complex(8), public :: ghwpwp3_prime2= (0d0,0d0)
+   complex(8), public :: ghwpwp3_prime3= (0d0,0d0)
+   complex(8), public :: ghwpwp3_prime4= (0d0,0d0)
+   complex(8), public :: ghwpwp3_prime5= (0d0,0d0)
+   complex(8), public :: ghwpwp3_prime6= (0d0,0d0)
+   complex(8), public :: ghwpwp3_prime7= (0d0,0d0)
+
+   complex(8), public :: ghwpwp4_prime = (0d0,0d0)
+   complex(8), public :: ghwpwp4_prime2= (0d0,0d0)
+   complex(8), public :: ghwpwp4_prime3= (0d0,0d0)
+   complex(8), public :: ghwpwp4_prime4= (0d0,0d0)
+   complex(8), public :: ghwpwp4_prime5= (0d0,0d0)
+   complex(8), public :: ghwpwp4_prime6= (0d0,0d0)
+   complex(8), public :: ghwpwp4_prime7= (0d0,0d0)
 
    complex(8), public :: ewp_El_left  = (0d0,0d0)
    complex(8), public :: ewp_El_right  = (0d0,0d0)
@@ -871,7 +1025,7 @@ logical :: computeQsqCompundCoupl
       if(cz_q2sq.ne.0) sWminus_signed=abs(sWminus)*dble(sign(1,cz_q2sq))
       if(cz_q12sq.ne.0) sWW_signed=abs(sWW)*dble(sign(1,cz_q12sq))
       if(cz_q1sq.ne.0 .or. cz_q2sq.ne.0 .or. cz_q12sq.ne.0) computeQsqCompundCoupl=.true.
-      if(index.eq.1) then
+      if(index.eq.1) then ! ZZ 1-4
          vvcoupl = (/ ghz1, ghz1_prime, ghz1_prime2, ghz1_prime3, ghz1_prime4, ghz1_prime5, ghz1_prime6, ghz1_prime7 /)
          lambda_v = Lambda_z1
          lambda_v120 = (/ Lambda_z11, Lambda_z12, Lambda_z10 /)
@@ -915,38 +1069,54 @@ logical :: computeQsqCompundCoupl
          vvcoupl(1) = ghgsgs4
          lambda_v = 1d0 ! Not present
          lambda_v120 = (/ Lambda_z41, Lambda_z42, Lambda_z40 /)
-      elseif(index.eq.12) then
-         vvcoupl(1) = ghzzp1
-         lambda_v = 1d0 ! Not present
+      elseif(index.eq.12) then ! ZpZ 1-4
+         vvcoupl = (/ ghzzp1, ghzzp1_prime, ghzzp1_prime2, ghzzp1_prime3, ghzzp1_prime4, ghzzp1_prime5, ghzzp1_prime6, ghzzp1_prime7 /)
+         lambda_v = Lambda_z1
          lambda_v120 = (/ Lambda_z11, Lambda_z12, Lambda_z10 /)
       elseif(index.eq.13) then
-         !zero
-         lambda_v = 1d0 ! Not present
+         vvcoupl = (/ ghzzp2, ghzzp2_prime, ghzzp2_prime2, ghzzp2_prime3, ghzzp2_prime4, ghzzp2_prime5, ghzzp2_prime6, ghzzp2_prime7 /)
+         lambda_v = Lambda_z2
          lambda_v120 = (/ Lambda_z11, Lambda_z12, Lambda_z10 /)
       elseif(index.eq.14) then
-         !zero
-         lambda_v = 1d0 ! Not present
+         vvcoupl = (/ ghzzp3, ghzzp3_prime, ghzzp3_prime2, ghzzp3_prime3, ghzzp3_prime4, ghzzp3_prime5, ghzzp3_prime6, ghzzp3_prime7 /)
+         lambda_v = Lambda_z3
          lambda_v120 = (/ Lambda_z11, Lambda_z12, Lambda_z10 /)
       elseif(index.eq.15) then
-         !zero
-         lambda_v = 1d0 ! Not present
+         vvcoupl = (/ ghzzp4, ghzzp4_prime, ghzzp4_prime2, ghzzp4_prime3, ghzzp4_prime4, ghzzp4_prime5, ghzzp4_prime6, ghzzp4_prime7 /)
+         lambda_v = Lambda_z4
          lambda_v120 = (/ Lambda_z11, Lambda_z12, Lambda_z10 /)
-      elseif(index.eq.16) then
-         vvcoupl(1) = ghzpzp1
-         lambda_v = 1d0 ! Not present
+      elseif(index.eq.16) then ! ZpZp 1-4
+         vvcoupl = (/ ghzpzp1, ghzpzp1_prime, ghzpzp1_prime2, ghzpzp1_prime3, ghzpzp1_prime4, ghzpzp1_prime5, ghzpzp1_prime6, ghzpzp1_prime7 /)
+         lambda_v = Lambda_z1
          lambda_v120 = (/ Lambda_z11, Lambda_z12, Lambda_z10 /)
       elseif(index.eq.17) then
-         !zero
-         lambda_v = 1d0 ! Not present
+         vvcoupl = (/ ghzpzp2, ghzpzp2_prime, ghzpzp2_prime2, ghzpzp2_prime3, ghzpzp2_prime4, ghzpzp2_prime5, ghzpzp2_prime6, ghzpzp2_prime7 /)
+         lambda_v = Lambda_z2
          lambda_v120 = (/ Lambda_z11, Lambda_z12, Lambda_z10 /)
       elseif(index.eq.18) then
-         !zero
-         lambda_v = 1d0 ! Not present
+         vvcoupl = (/ ghzpzp3, ghzpzp3_prime, ghzpzp3_prime2, ghzpzp3_prime3, ghzpzp3_prime4, ghzpzp3_prime5, ghzpzp3_prime6, ghzpzp3_prime7 /)
+         lambda_v = Lambda_z3
          lambda_v120 = (/ Lambda_z11, Lambda_z12, Lambda_z10 /)
       elseif(index.eq.19) then
-         !zero
-         lambda_v = 1d0 ! Not present
+         vvcoupl = (/ ghzpzp4, ghzpzp4_prime, ghzpzp4_prime2, ghzpzp4_prime3, ghzpzp4_prime4, ghzpzp4_prime5, ghzpzp4_prime6, ghzpzp4_prime7 /)
+         lambda_v = Lambda_z4
          lambda_v120 = (/ Lambda_z11, Lambda_z12, Lambda_z10 /)
+      elseif(index.eq.20) then ! Zpgs 1
+         vvcoupl(3) = ghzpgs1_prime2
+         lambda_v = Lambda_zgs1
+         lambda_v120 = (/ Lambda_z11, Lambda_z12, Lambda_z10 /)
+      elseif(index.eq.21) then ! Zpgs 2-4
+         vvcoupl(1) = ghzpgs2
+         lambda_v = 1d0 ! Not present
+         lambda_v120 = (/ Lambda_z21, Lambda_z22, Lambda_z20 /)
+      elseif(index.eq.22) then
+         vvcoupl(1) = ghzpgs3
+         lambda_v = 1d0 ! Not present
+         lambda_v120 = (/ Lambda_z31, Lambda_z32, Lambda_z30 /)
+      elseif(index.eq.23) then
+         vvcoupl(1) = ghzpgs4
+         lambda_v = 1d0 ! Not present
+         lambda_v120 = (/ Lambda_z41, Lambda_z42, Lambda_z40 /)
       endif
    else
       if(cw_q1sq.ne.0) sWplus_signed=abs(sWplus)*dble(sign(1,cw_q1sq))
@@ -970,36 +1140,36 @@ logical :: computeQsqCompundCoupl
          lambda_v = Lambda_w4
          lambda_v120 = (/ Lambda_w41, Lambda_w42, Lambda_w40 /)
       elseif(index.eq.12) then
-         vvcoupl(1) = ghwwp1
-         lambda_v = 1d0 ! Not present
+         vvcoupl = (/ ghwwp1, ghwwp1_prime, ghwwp1_prime2, ghwwp1_prime3, ghwwp1_prime4, ghwwp1_prime5, ghwwp1_prime6, ghwwp1_prime7 /)
+         lambda_v = Lambda_w1
          lambda_v120 = (/ Lambda_w11, Lambda_w12, Lambda_w10 /)
       elseif(index.eq.13) then
-         !zero
-         lambda_v = 1d0 ! Not present
+         vvcoupl = (/ ghwwp2, ghwwp2_prime, ghwwp2_prime2, ghwwp2_prime3, ghwwp2_prime4, ghwwp2_prime5, ghwwp2_prime6, ghwwp2_prime7 /)
+         lambda_v = Lambda_w2
          lambda_v120 = (/ Lambda_w11, Lambda_w12, Lambda_w10 /)
       elseif(index.eq.14) then
-         !zero
-         lambda_v = 1d0 ! Not present
+         vvcoupl = (/ ghwwp3, ghwwp3_prime, ghwwp3_prime2, ghwwp3_prime3, ghwwp3_prime4, ghwwp3_prime5, ghwwp3_prime6, ghwwp3_prime7 /)
+         lambda_v = Lambda_w3
          lambda_v120 = (/ Lambda_w11, Lambda_w12, Lambda_w10 /)
       elseif(index.eq.15) then
-         !zero
-         lambda_v = 1d0 ! Not present
+         vvcoupl = (/ ghwwp4, ghwwp4_prime, ghwwp4_prime2, ghwwp4_prime3, ghwwp4_prime4, ghwwp4_prime5, ghwwp4_prime6, ghwwp4_prime7 /)
+         lambda_v = Lambda_w4
          lambda_v120 = (/ Lambda_w11, Lambda_w12, Lambda_w10 /)
       elseif(index.eq.16) then
-         vvcoupl(1) = ghwpwp1
-         lambda_v = 1d0 ! Not present
+         vvcoupl = (/ ghwpwp1, ghwpwp1_prime, ghwpwp1_prime2, ghwpwp1_prime3, ghwpwp1_prime4, ghwpwp1_prime5, ghwpwp1_prime6, ghwpwp1_prime7 /)
+         lambda_v = Lambda_w1
          lambda_v120 = (/ Lambda_w11, Lambda_w12, Lambda_w10 /)
       elseif(index.eq.17) then
-         !zero
-         lambda_v = 1d0 ! Not present
+         vvcoupl = (/ ghwpwp2, ghwpwp2_prime, ghwpwp2_prime2, ghwpwp2_prime3, ghwpwp2_prime4, ghwpwp2_prime5, ghwpwp2_prime6, ghwpwp2_prime7 /)
+         lambda_v = Lambda_w2
          lambda_v120 = (/ Lambda_w11, Lambda_w12, Lambda_w10 /)
       elseif(index.eq.18) then
-         !zero
-         lambda_v = 1d0 ! Not present
+         vvcoupl = (/ ghwpwp3, ghwpwp3_prime, ghwpwp3_prime2, ghwpwp3_prime3, ghwpwp3_prime4, ghwpwp3_prime5, ghwpwp3_prime6, ghwpwp3_prime7 /)
+         lambda_v = Lambda_w3
          lambda_v120 = (/ Lambda_w11, Lambda_w12, Lambda_w10 /)
       elseif(index.eq.19) then
-         !zero
-         lambda_v = 1d0 ! Not present
+         vvcoupl = (/ ghwpwp4, ghwpwp4_prime, ghwpwp4_prime2, ghwpwp4_prime3, ghwpwp4_prime4, ghwpwp4_prime5, ghwpwp4_prime6, ghwpwp4_prime7 /)
+         lambda_v = Lambda_w4
          lambda_v120 = (/ Lambda_w11, Lambda_w12, Lambda_w10 /)
       endif
    endif
