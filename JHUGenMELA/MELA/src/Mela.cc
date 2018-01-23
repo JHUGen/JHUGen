@@ -339,8 +339,7 @@ void Mela::reset_SelfDCouplings(){
       }
     }
   }
-
-  //contact terms
+  // Spin-0 contact terms
   for (int im=0; im<2; im++){
     for (int ic=0; ic<SIZE_HVV; ic++){
       selfDHzzpcoupl[ic][im] = 0;
@@ -348,15 +347,7 @@ void Mela::reset_SelfDCouplings(){
       selfDHwwpcoupl[ic][im] = 0;
       selfDHwpwpcoupl[ic][im] = 0;
     }
-    for (int ic=0; ic<SIZE_Vpff; ic++) {
-      selfDZpffcoupl[ic][im] = 0;
-      selfDWpffcoupl[ic][im] = 0;
-    }
   }
-  selfDM_Zprime = -1;
-  selfDGa_Zprime = 0;
-  selfDM_Wprime = -1;
-  selfDGa_Wprime = 0;
 
   //****Spin-1****//
   for (int im=0; im<2; im++){
@@ -370,6 +361,18 @@ void Mela::reset_SelfDCouplings(){
     for (int ic=0; ic<SIZE_GGG; ic++) selfDGggcoupl[ic][im] = 0;
     for (int ic=0; ic<SIZE_GQQ; ic++) selfDGqqcoupl[ic][im] = 0;
   }
+
+  // Vprime / contact couplings
+  for (int im=0; im<2; im++){
+    for (int ic=0; ic<SIZE_Vpff; ic++) {
+      selfDZpffcoupl[ic][im] = 0;
+      selfDWpffcoupl[ic][im] = 0;
+    }
+  }
+  selfDM_Zprime = -1;
+  selfDGa_Zprime = 0;
+  selfDM_Wprime = -1;
+  selfDGa_Wprime = 0;
 
   // Did I tell you that we have a lot of them?
 }
@@ -877,15 +880,17 @@ void Mela::computeP(
           ZZME->set_SpinZeroContact(
             selfDHzzpcoupl,
             selfDHzpzpcoupl,
-            selfDZpffcoupl,
             selfDHwwpcoupl,
-            selfDHwpwpcoupl,
+            selfDHwpwpcoupl
+            );
+          ZZME->set_VprimeContactCouplings(
+            selfDZpffcoupl,
             selfDWpffcoupl,
             selfDM_Zprime,
             selfDGa_Zprime,
             selfDM_Wprime,
             selfDGa_Wprime
-            );
+          );
         }
         else if (myModel_ == TVar::SelfDefine_spin1) ZZME->set_SpinOneCouplings(selfDZqqcoupl, selfDZvvcoupl);
         else if (myModel_ == TVar::SelfDefine_spin2) ZZME->set_SpinTwoCouplings(selfDGqqcoupl, selfDGggcoupl, selfDGvvcoupl);
@@ -1159,15 +1164,17 @@ void Mela::computeProdDecP(
     ZZME->set_SpinZeroContact(
       selfDHzzpcoupl,
       selfDHzpzpcoupl,
-      selfDZpffcoupl,
       selfDHwwpcoupl,
-      selfDHwpwpcoupl,
+      selfDHwpwpcoupl
+    );
+    ZZME->set_VprimeContactCouplings(
+      selfDZpffcoupl,
       selfDWpffcoupl,
       selfDM_Zprime,
       selfDGa_Zprime,
       selfDM_Wprime,
       selfDGa_Wprime
-      );
+    );
     ZZME->computeProdXS_VVHVV(prob);
     if (useConstant) computeConstant(prob);
   }
@@ -1288,15 +1295,17 @@ void Mela::computeProdP(
           ZZME->set_SpinZeroContact(
             selfDHzzpcoupl,
             selfDHzpzpcoupl,
-            selfDZpffcoupl,
             selfDHwwpcoupl,
-            selfDHwpwpcoupl,
+            selfDHwpwpcoupl
+          );
+          ZZME->set_VprimeContactCouplings(
+            selfDZpffcoupl,
             selfDWpffcoupl,
             selfDM_Zprime,
             selfDGa_Zprime,
             selfDM_Wprime,
             selfDGa_Wprime
-            );
+          );
         }
         ZZME->computeProdXS_JJH(prob); // Higgs + 2 jets: SBF or WBF main probability
 
@@ -1341,15 +1350,17 @@ void Mela::computeProdP(
             ZZME->set_SpinZeroContact(
               selfDHzzpcoupl,
               selfDHzpzpcoupl,
-              selfDZpffcoupl,
               selfDHwwpcoupl,
-              selfDHwpwpcoupl,
+              selfDHwpwpcoupl
+            );
+            ZZME->set_VprimeContactCouplings(
+              selfDZpffcoupl,
               selfDWpffcoupl,
               selfDM_Zprime,
               selfDGa_Zprime,
               selfDM_Wprime,
               selfDGa_Wprime
-              );
+            );
             ZZME->computeProdXS_JJH(prob_temp);
           }
           pArray.push_back((double)prob_temp);
@@ -1426,15 +1437,17 @@ void Mela::computeProdP(
                 ZZME->set_SpinZeroContact(
                   selfDHzzpcoupl,
                   selfDHzpzpcoupl,
-                  selfDZpffcoupl,
                   selfDHwwpcoupl,
-                  selfDHwpwpcoupl,
+                  selfDHwpwpcoupl
+                );
+                ZZME->set_VprimeContactCouplings(
+                  selfDZpffcoupl,
                   selfDWpffcoupl,
                   selfDM_Zprime,
                   selfDGa_Zprime,
                   selfDM_Wprime,
                   selfDGa_Wprime
-                  );
+                );
               }
               ZZME->computeProdXS_JJH(prob_temp);
             }
@@ -1508,15 +1521,17 @@ void Mela::computeProdP(
             ZZME->set_SpinZeroContact(
               selfDHzzpcoupl,
               selfDHzpzpcoupl,
-              selfDZpffcoupl,
               selfDHwwpcoupl,
-              selfDHwpwpcoupl,
+              selfDHwpwpcoupl
+            );
+            ZZME->set_VprimeContactCouplings(
+              selfDZpffcoupl,
               selfDWpffcoupl,
               selfDM_Zprime,
               selfDGa_Zprime,
               selfDM_Wprime,
               selfDGa_Wprime
-              );
+            );
           }
           ZZME->computeProdXS_JJH(prob); // Higgs + 2 jets: SBF or WBF
         }
@@ -1590,15 +1605,17 @@ void Mela::computeProdP_VH(
         ZZME->set_SpinZeroContact(
           selfDHzzpcoupl,
           selfDHzpzpcoupl,
-          selfDZpffcoupl,
           selfDHwwpcoupl,
-          selfDHwpwpcoupl,
+          selfDHwpwpcoupl
+        );
+        ZZME->set_VprimeContactCouplings(
+          selfDZpffcoupl,
           selfDWpffcoupl,
           selfDM_Zprime,
           selfDGa_Zprime,
           selfDM_Wprime,
           selfDGa_Wprime
-          );
+        );
       }
       ZZME->computeProdXS_VH(prob, includeHiggsDecay); // VH
 
@@ -1643,15 +1660,17 @@ void Mela::computeProdP_ttH(
       ZZME->set_SpinZeroContact(
         selfDHzzpcoupl,
         selfDHzpzpcoupl,
-        selfDZpffcoupl,
         selfDHwwpcoupl,
-        selfDHwpwpcoupl,
+        selfDHwpwpcoupl
+      );
+      ZZME->set_VprimeContactCouplings(
+        selfDZpffcoupl,
         selfDWpffcoupl,
         selfDM_Zprime,
         selfDGa_Zprime,
         selfDM_Wprime,
         selfDGa_Wprime
-        );
+      );
     }
     ZZME->computeProdXS_ttH(prob,topProcess, topDecay);
     if (useConstant) computeConstant(prob);

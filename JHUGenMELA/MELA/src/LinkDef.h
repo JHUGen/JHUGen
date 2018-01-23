@@ -63,6 +63,7 @@
 #pragma link C++ class SpinZeroCouplings;
 #pragma link C++ class SpinOneCouplings;
 #pragma link C++ class SpinTwoCouplings;
+#pragma link C++ class VprimeCouplings;
 #pragma link C++ class TEvtProb;
 #pragma link C++ class ZZMatrixElement;
 #pragma link C++ class Mela;

@@ -10,7 +10,7 @@ using namespace std;
 
 /********** Spin-0 couplings **********/
 SpinZeroCouplings::SpinZeroCouplings(){ reset(); }
-SpinZeroCouplings::~SpinZeroCouplings(){};
+SpinZeroCouplings::~SpinZeroCouplings(){}
 
 void SpinZeroCouplings::allow_WWZZSeparation(bool doAllow){ separateWWZZcouplings = doAllow; }
 void SpinZeroCouplings::reset(){
@@ -45,10 +45,6 @@ void SpinZeroCouplings::reset(){
       H2t4t4coupl[ic][im]=0;
       H2b4b4coupl[ic][im]=0;
     }
-    for (int ic = 0; ic < SIZE_Vpff; ic++){
-      Zpffcoupl[ic][im]=0;
-      Wpffcoupl[ic][im]=0;
-    }
   }
   for (int ik=0; ik<SIZE_HVV_CQSQ; ik++){
     HzzCLambda_qsq[ik]=0;
@@ -62,10 +58,7 @@ void SpinZeroCouplings::reset(){
       H2wwLambda_qsq[ic][ik] = 100.;
     }
   }
-
-  SetZPrimeMassWidth(-1, 0);
-  SetWPrimeMassWidth(-1, 0);
-};
+}
 void SpinZeroCouplings::copy(SpinZeroCouplings& other){
   allow_WWZZSeparation(other.separateWWZZcouplings);
 
@@ -96,10 +89,6 @@ void SpinZeroCouplings::copy(SpinZeroCouplings& other){
       H2t4t4coupl[ic][im]=(other.H2t4t4coupl)[ic][im];
       H2b4b4coupl[ic][im]=(other.H2b4b4coupl)[ic][im];
     }
-    for (int ic=0; ic<SIZE_Vpff; ic++){
-      Zpffcoupl[ic][im] = (other.Zpffcoupl)[ic][im];
-      Wpffcoupl[ic][im] = (other.Wpffcoupl)[ic][im];
-    }
   }
   for (int ik=0; ik<SIZE_HVV_CQSQ; ik++){
     HzzCLambda_qsq[ik]=(other.HzzCLambda_qsq)[ik];
@@ -109,12 +98,7 @@ void SpinZeroCouplings::copy(SpinZeroCouplings& other){
       HwwLambda_qsq[ic][ik] = (other.HwwLambda_qsq)[ic][ik];
     }
   }
-
-  M_Zprime = other.M_Zprime;
-  Ga_Zprime = other.Ga_Zprime;
-  M_Wprime = other.M_Wprime;
-  Ga_Wprime = other.Ga_Wprime;
-};
+}
 SpinZeroCouplings* SpinZeroCouplings::getRef(){ return this; }
 
 void SpinZeroCouplings::SetHVVCouplings(unsigned int index, double c_real, double c_imag, bool setWW, int whichResonance){
@@ -143,7 +127,7 @@ void SpinZeroCouplings::SetHVVCouplings(unsigned int index, double c_real, doubl
       }
     }
   }
-};
+}
 void SpinZeroCouplings::SetHVVLambdaQ2(unsigned int gType, unsigned int index, double lambda, bool setWW, int whichResonance){
   if (!separateWWZZcouplings && setWW) return;
   if (index>=SIZE_HVV_CQSQ || gType>=SIZE_HVV_LAMBDAQSQ) MELAerr << "Cannot set index " << index <<  " for g" << (gType+1) << "_dyn, out of range." << endl;
@@ -158,7 +142,7 @@ void SpinZeroCouplings::SetHVVLambdaQ2(unsigned int gType, unsigned int index, d
       else H2zzLambda_qsq[gType][index] = lambda;
     }
   }
-};
+}
 void SpinZeroCouplings::SetHVVSignCQ2(unsigned int index, int csign, bool setWW, int whichResonance){
   if (!separateWWZZcouplings && setWW) return;
   if (index>=SIZE_HVV_CQSQ) MELAerr << "Cannot set index " << index << " for the c(z/w)qsq sign, out of range." << endl;
@@ -174,7 +158,7 @@ void SpinZeroCouplings::SetHVVSignCQ2(unsigned int index, int csign, bool setWW,
       else H2zzCLambda_qsq[index] = csign;
     }
   }
-};
+}
 void SpinZeroCouplings::SetHGGCouplings(unsigned int index, double c_real, double c_imag, int whichLoop, int whichResonance){
   if (index>=SIZE_HGG) MELAerr << "Cannot set index " << index << " for Hggcoupl, out of range for the type requested." << endl;
   else if (whichResonance<=0 || whichResonance>2) MELAerr << "Resonance " << whichResonance << " is not supported. Set it to 1 for the regular Higgs and 2 for the high-mass resonance." << endl;
@@ -201,7 +185,7 @@ void SpinZeroCouplings::SetHGGCouplings(unsigned int index, double c_real, doubl
       }
     }
   }
-};
+}
 void SpinZeroCouplings::SetHQQCouplings(unsigned int index, double c_real, double c_imag, int qid, int whichResonance){
   if (index>=SIZE_HQQ) MELAerr << "Cannot set index " << index << " for Hqqcoupl, out of range for the type requested." << endl;
   else if (whichResonance<=0 || whichResonance>2) MELAerr << "Resonance " << whichResonance << " is not supported. Set it to 1 for the regular Higgs and 2 for the high-mass resonance." << endl;
@@ -252,7 +236,7 @@ void SpinZeroCouplings::SetHQQCouplings(unsigned int index, double c_real, doubl
       }
     }
   }
-};
+}
 
 void SpinZeroCouplings::SetHVVpCouplings(unsigned int index, double c_real, double c_imag, bool setWWp, int whichResonance){
   if (index>=SIZE_HVV){ MELAerr << "Cannot set index " << index << ", out of range for the type requested." << endl; }
@@ -267,7 +251,7 @@ void SpinZeroCouplings::SetHVVpCouplings(unsigned int index, double c_real, doub
       Hzzpcoupl[index][1] = c_imag;
     }
   }
-};
+}
 void SpinZeroCouplings::SetHVpVpCouplings(unsigned int index, double c_real, double c_imag, bool setWpWp, int whichResonance){
   if (whichResonance!=1) { MELAerr << "Contact terms are only for the first resonance" << endl; }
   else if (index>=SIZE_HVV){ MELAerr << "Cannot set index " << index << ", out of range for the type requested." << endl; }
@@ -281,37 +265,12 @@ void SpinZeroCouplings::SetHVpVpCouplings(unsigned int index, double c_real, dou
       Hzpzpcoupl[index][1] = c_imag;
     }
   }
-};
-void SpinZeroCouplings::SetVpffCouplings(unsigned int index, double c_real, double c_imag, bool setWpff, int whichResonance){
-  if (whichResonance!=1){ MELAerr << "Contact terms are only for the first resonance" << endl; }
-  else if (index>=SIZE_Vpff){ MELAerr << "Cannot set index " << index << ", out of range for the type requested." << endl; }
-  else{
-    if (!setWpff){
-      Zpffcoupl[index][0] = c_real;
-      Zpffcoupl[index][1] = c_imag;
-    }
-    else{
-      if (
-        (index == gHIGGS_Vp_NuE_left || index == gHIGGS_Vp_NuE_right
-        || index == gHIGGS_Vp_Dn_left || index == gHIGGS_Vp_Dn_right
-        || index == gHIGGS_Vp_Str_left || index == gHIGGS_Vp_Str_right
-        || index == gHIGGS_Vp_Bot_left || index == gHIGGS_Vp_Bot_right
-        ) && (c_real!=0. || c_imag!=0.)
-        ) MELAerr << "No W' contact terms for neutrino, down, strange, or bottom; use the lepton or up-quark versions instead!" << endl;
-      else{
-        Wpffcoupl[index][0] = c_real;
-        Wpffcoupl[index][1] = c_imag;
-      }
-    }
-  }
 }
-void SpinZeroCouplings::SetZPrimeMassWidth(double inmass, double inwidth){ M_Zprime = inmass; Ga_Zprime = inwidth; }
-void SpinZeroCouplings::SetWPrimeMassWidth(double inmass, double inwidth){ M_Wprime = inmass; Ga_Wprime = inwidth; }
 
 
 /********** Spin-1 couplings **********/
 SpinOneCouplings::SpinOneCouplings(){ reset(); }
-SpinOneCouplings::~SpinOneCouplings(){};
+SpinOneCouplings::~SpinOneCouplings(){}
 
 void SpinOneCouplings::reset(){
   for (int im=0; im<2; im++){
@@ -323,13 +282,13 @@ void SpinOneCouplings::reset(){
   Zqqcoupl[0][0]=1.0;
   Zqqcoupl[1][0]=1.0;
   */
-};
+}
 void SpinOneCouplings::copy(SpinOneCouplings& other){
   for (int im=0; im<2; im++){
     for (int ic=0; ic<SIZE_ZVV; ic++) Zvvcoupl[ic][im] = (other.Zvvcoupl)[ic][im];
     for (int ic=0; ic<SIZE_ZQQ; ic++) Zqqcoupl[ic][im] = (other.Zqqcoupl)[ic][im];
   }
-};
+}
 SpinOneCouplings* SpinOneCouplings::getRef(){ return this; }
 
 void SpinOneCouplings::SetZVVCouplings(unsigned int index, double c_real, double c_imag){
@@ -338,19 +297,19 @@ void SpinOneCouplings::SetZVVCouplings(unsigned int index, double c_real, double
     Zvvcoupl[index][0] = c_real;
     Zvvcoupl[index][1] = c_imag;
   }
-};
+}
 void SpinOneCouplings::SetZQQCouplings(unsigned int index, double c_real, double c_imag){
   if (index>=SIZE_ZQQ) MELAerr << "Cannot set index " << index << " for the Zqqcoupl, out of range." << endl;
   else{
     Zqqcoupl[index][0] = c_real;
     Zqqcoupl[index][1] = c_imag;
   }
-};
+}
 
 
 /********** Spin-2 couplings **********/
 SpinTwoCouplings::SpinTwoCouplings(){ reset(); }
-SpinTwoCouplings::~SpinTwoCouplings(){};
+SpinTwoCouplings::~SpinTwoCouplings(){}
 
 void SpinTwoCouplings::reset(){
   for (int im=0; im<2; im++){
@@ -364,14 +323,14 @@ void SpinTwoCouplings::reset(){
   Gqqcoupl[1][0]=1.0;
   Gvvcoupl[0][0]=1.0;
   */
-};
+}
 void SpinTwoCouplings::copy(SpinTwoCouplings& other){
   for (int im=0; im<2; im++){
     for (int ic=0; ic<SIZE_GVV; ic++) Gvvcoupl[ic][im] = (other.Gvvcoupl)[ic][im];
     for (int ic=0; ic<SIZE_GGG; ic++) Gggcoupl[ic][im] = (other.Gggcoupl)[ic][im];
     for (int ic=0; ic<SIZE_GQQ; ic++) Gqqcoupl[ic][im] = (other.Gqqcoupl)[ic][im];
   }
-};
+}
 SpinTwoCouplings* SpinTwoCouplings::getRef(){ return this; }
 
 void SpinTwoCouplings::SetGVVCouplings(unsigned int index, double c_real, double c_imag){
@@ -380,19 +339,75 @@ void SpinTwoCouplings::SetGVVCouplings(unsigned int index, double c_real, double
     Gvvcoupl[index][0] = c_real;
     Gvvcoupl[index][1] = c_imag;
   }
-};
+}
 void SpinTwoCouplings::SetGQQCouplings(unsigned int index, double c_real, double c_imag){
   if (index>=SIZE_GQQ) MELAerr << "Cannot set index " << index << " for the Gqqcoupl, out of range." << endl;
   else{
     Gqqcoupl[index][0] = c_real;
     Gqqcoupl[index][1] = c_imag;
   }
-};
+}
 void SpinTwoCouplings::SetGGGCouplings(unsigned int index, double c_real, double c_imag){
   if (index>=SIZE_GGG) MELAerr << "Cannot set index " << index << " for the Gggcoupl, out of range." << endl;
   else{
     Gggcoupl[index][0] = c_real;
     Gggcoupl[index][1] = c_imag;
   }
-};
+}
 
+
+/********** Vprime couplings **********/
+VprimeCouplings::VprimeCouplings(){ reset(); }
+VprimeCouplings::~VprimeCouplings(){}
+
+void VprimeCouplings::reset(){
+  for (int im=0; im<2; im++){
+    for (int ic = 0; ic < SIZE_Vpff; ic++){
+      Zpffcoupl[ic][im]=0;
+      Wpffcoupl[ic][im]=0;
+    }
+  }
+
+  SetZPrimeMassWidth(-1, 0);
+  SetWPrimeMassWidth(-1, 0);
+}
+void VprimeCouplings::copy(VprimeCouplings& other){
+  for (int im=0; im<2; im++){
+    for (int ic=0; ic<SIZE_Vpff; ic++){
+      Zpffcoupl[ic][im] = (other.Zpffcoupl)[ic][im];
+      Wpffcoupl[ic][im] = (other.Wpffcoupl)[ic][im];
+    }
+  }
+
+  M_Zprime = other.M_Zprime;
+  Ga_Zprime = other.Ga_Zprime;
+  M_Wprime = other.M_Wprime;
+  Ga_Wprime = other.Ga_Wprime;
+}
+VprimeCouplings* VprimeCouplings::getRef(){ return this; }
+
+void VprimeCouplings::SetVpffCouplings(unsigned int index, double c_real, double c_imag, bool setWpff, int whichResonance){
+  if (whichResonance!=1){ MELAerr << "VprimeCouplings::SetVpffCouplings: Contact terms are only for the first resonance" << endl; }
+  else if (index>=SIZE_Vpff){ MELAerr << "VprimeCouplings::SetVpffCouplings: Cannot set index " << index << ", out of range for the type requested." << endl; }
+  else{
+    if (!setWpff){
+      Zpffcoupl[index][0] = c_real;
+      Zpffcoupl[index][1] = c_imag;
+    }
+    else{
+      if (
+        (index == gHIGGS_Vp_NuE_left || index == gHIGGS_Vp_NuE_right
+         || index == gHIGGS_Vp_Dn_left || index == gHIGGS_Vp_Dn_right
+         || index == gHIGGS_Vp_Str_left || index == gHIGGS_Vp_Str_right
+         || index == gHIGGS_Vp_Bot_left || index == gHIGGS_Vp_Bot_right
+         ) && (c_real!=0. || c_imag!=0.)
+        ) MELAerr << "No W' contact terms for neutrino, down, strange, or bottom; use the lepton or up-quark versions instead!" << endl;
+      else{
+        Wpffcoupl[index][0] = c_real;
+        Wpffcoupl[index][1] = c_imag;
+      }
+    }
+  }
+}
+void VprimeCouplings::SetZPrimeMassWidth(double inmass, double inwidth){ M_Zprime = inmass; Ga_Zprime = inwidth; }
+void VprimeCouplings::SetWPrimeMassWidth(double inmass, double inwidth){ M_Wprime = inmass; Ga_Wprime = inwidth; }

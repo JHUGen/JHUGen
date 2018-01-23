@@ -101,14 +101,8 @@ public:
   void set_SpinZeroContact(
     double selfDHzzpcoupl[SIZE_HVV][2],
     double selfDHzpzpcoupl[SIZE_HVV][2],
-    double selfDZpffcoupl[SIZE_Vpff][2],
     double selfDHwwpcoupl[SIZE_HVV][2],
-    double selfDHwpwpcoupl[SIZE_HVV][2],
-    double selfDWpffcoupl[SIZE_Vpff][2],
-    double M_Zprime,
-    double Ga_Zprime,
-    double M_Wprime,
-    double Ga_Wprime
+    double selfDHwpwpcoupl[SIZE_HVV][2]
     );
   void set_SpinOneCouplings(
     double selfDZqqcoupl[SIZE_ZQQ][2],
@@ -119,6 +113,14 @@ public:
     double selfDGggcoupl[SIZE_GGG][2],
     double selfDGvvcoupl[SIZE_GVV][2]
     );
+  void set_VprimeContactCouplings(
+    double selfDZpffcoupl[SIZE_Vpff][2],
+    double selfDWpffcoupl[SIZE_Vpff][2],
+    double M_Zprime,
+    double Ga_Zprime,
+    double M_Wprime,
+    double Ga_Wprime
+  );
 
   // Compute four-momenta from angles - not cos(theta) - only 
   std::vector<TLorentzVector> Calculate4Momentum(double Mx, double M1, double M2, double theta, double theta1, double theta2, double Phi1, double Phi);
@@ -150,6 +152,7 @@ protected:
   SpinZeroCouplings* selfD_SpinZeroCouplings;
   SpinOneCouplings* selfD_SpinOneCouplings;
   SpinTwoCouplings* selfD_SpinTwoCouplings;
+  VprimeCouplings* selfD_VprimeCouplings;
 
   MELACandidate* melaCand; // Pointer to current candidate object of Xcal2
   std::vector<MELAParticle*> tmpPartList; // Vector of pointers to the owned, temporary MELAParticles

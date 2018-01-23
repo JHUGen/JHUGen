@@ -392,6 +392,10 @@ protected:
   /*****************/
   void printLogo() const;
 
+  void setSpinZeroCouplings();
+  void setSpinOneZouplings();
+  void setSpinTwoCouplings();
+
   bool configureAnalyticalPDFs();
   void reset_SelfDCouplings();
   void reset_PAux(); // SuperProb reset
