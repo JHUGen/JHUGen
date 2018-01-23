@@ -87,10 +87,14 @@ public:
   SpinTwoCouplings* getRef();
 
   void SetGVVCouplings(unsigned int index, double c_real, double c_imag);
+  void SetGVVpCouplings(unsigned int index, double c_real, double c_imag);
+  void SetGVpVpCouplings(unsigned int index, double c_real, double c_imag);
   void SetGQQCouplings(unsigned int index, double c_real, double c_imag);
   void SetGGGCouplings(unsigned int index, double c_real, double c_imag);
 
   double Gvvcoupl[SIZE_GVV][2];
+  double Gvvpcoupl[SIZE_GVV][2];
+  double Gvpvpcoupl[SIZE_GVV][2];
   double Gqqcoupl[SIZE_GQQ][2];
   double Gggcoupl[SIZE_GGG][2];
 };

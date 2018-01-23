@@ -299,6 +299,15 @@ void ZZMatrixElement::set_SpinTwoCouplings(
   for (int ic=0; ic<SIZE_GGG; ic++) selfD_SpinTwoCouplings->SetGGGCouplings(ic, selfDGggcoupl[ic][0], selfDGggcoupl[ic][1]);
   for (int ic=0; ic<SIZE_GVV; ic++) selfD_SpinTwoCouplings->SetGVVCouplings(ic, selfDGvvcoupl[ic][0], selfDGvvcoupl[ic][1]);
 }
+void ZZMatrixElement::set_SpinTwoContact(
+  double selfDGvvpcoupl[SIZE_GVV][2],
+  double selfDGvpvpcoupl[SIZE_GVV][2]
+){
+  for (int ic=0; ic<SIZE_GVV; ic++){
+    selfD_SpinTwoCouplings->SetGVVpCouplings(ic, selfDGvvpcoupl[ic][0], selfDGvvpcoupl[ic][1]);
+    selfD_SpinTwoCouplings->SetGVpVpCouplings(ic, selfDGvpvpcoupl[ic][0], selfDGvpvpcoupl[ic][1]);
+  }
+}
 void ZZMatrixElement::set_VprimeContactCouplings(
   double selfDZpffcoupl[SIZE_Vpff][2],
   double selfDWpffcoupl[SIZE_Vpff][2],

@@ -344,6 +344,15 @@ void Mela::setSpinOneCouplings(){
 }
 void Mela::setSpinTwoCouplings(){
   ZZME->set_SpinTwoCouplings(selfDGqqcoupl, selfDGggcoupl, selfDGvvcoupl);
+  ZZME->set_SpinTwoContact(selfDGvvpcoupl, selfDGvpvpcoupl);
+  ZZME->set_VprimeContactCouplings(
+    selfDZpffcoupl,
+    selfDWpffcoupl,
+    selfDM_Zprime,
+    selfDGa_Zprime,
+    selfDM_Wprime,
+    selfDGa_Wprime
+  );
 }
 
 // Notice that this only sets the members of MELA, not TEvtProb. TEvtProb resets itself.
@@ -396,7 +405,11 @@ void Mela::reset_SelfDCouplings(){
 
   //****Spin-2****//
   for (int im=0; im<2; im++){
-    for (int ic=0; ic<SIZE_GVV; ic++) selfDGvvcoupl[ic][im] = 0;
+    for (int ic=0; ic<SIZE_GVV; ic++){
+      selfDGvvcoupl[ic][im] = 0;
+      selfDGvvpcoupl[ic][im] = 0;
+      selfDGvpvpcoupl[ic][im] = 0;
+    }
     for (int ic=0; ic<SIZE_GGG; ic++) selfDGggcoupl[ic][im] = 0;
     for (int ic=0; ic<SIZE_GQQ; ic++) selfDGqqcoupl[ic][im] = 0;
   }
@@ -1796,7 +1809,7 @@ bool Mela::configureAnalyticalPDFs(){
     if (myModel_ == TVar::H2_g10) spin2Model->addHypothesis(10, 1.);
     // Self-defined spin-2
     if (myModel_ == TVar::SelfDefine_spin2){
-      for (int i=0; i<SIZE_GVV; i++){ if (selfDGvvcoupl[i][1]!=0){ if (myVerbosity_>=TVar::ERROR) MELAerr << "Mela::configureAnalyticalPDFs: MELA does not support complex couplings for spin-2 at the moment! " << endl; noPass=true; break; } }
+      for (int i=0; i<SIZE_GVV; i++){ if (selfDGvvcoupl[i][1]!=0.){ if (myVerbosity_>=TVar::ERROR) MELAerr << "Mela::configureAnalyticalPDFs: MELA does not support complex couplings for spin-2 at the moment! " << endl; noPass=true; break; } }
       if (!noPass){
         for (int ig=0; ig<SIZE_GVV; ig++){
           for (int im=0; im<2; im++) ((RooRealVar*)spin2Model->couplings.bList[ig][im])->setVal(selfDGvvcoupl[ig][im]);

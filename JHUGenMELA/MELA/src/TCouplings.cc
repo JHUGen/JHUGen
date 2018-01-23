@@ -313,7 +313,11 @@ SpinTwoCouplings::~SpinTwoCouplings(){}
 
 void SpinTwoCouplings::reset(){
   for (int im=0; im<2; im++){
-    for (int ic=0; ic<SIZE_GVV; ic++) Gvvcoupl[ic][im] = 0;
+    for (int ic=0; ic<SIZE_GVV; ic++){
+      Gvvcoupl[ic][im] = 0;
+      Gvvpcoupl[ic][im] = 0;
+      Gvpvpcoupl[ic][im] = 0;
+    }
     for (int ic=0; ic<SIZE_GGG; ic++) Gggcoupl[ic][im] = 0;
     for (int ic=0; ic<SIZE_GQQ; ic++) Gqqcoupl[ic][im] = 0;
   }
@@ -338,6 +342,20 @@ void SpinTwoCouplings::SetGVVCouplings(unsigned int index, double c_real, double
   else{
     Gvvcoupl[index][0] = c_real;
     Gvvcoupl[index][1] = c_imag;
+  }
+}
+void SpinTwoCouplings::SetGVVpCouplings(unsigned int index, double c_real, double c_imag){
+  if (index>=SIZE_GVV) MELAerr << "Cannot set index " << index << " for the Gvvpcoupl, out of range." << endl;
+  else{
+    Gvvpcoupl[index][0] = c_real;
+    Gvvpcoupl[index][1] = c_imag;
+  }
+}
+void SpinTwoCouplings::SetGVpVpCouplings(unsigned int index, double c_real, double c_imag){
+  if (index>=SIZE_GVV) MELAerr << "Cannot set index " << index << " for the Gvpvpcoupl, out of range." << endl;
+  else{
+    Gvpvpcoupl[index][0] = c_real;
+    Gvpvpcoupl[index][1] = c_imag;
   }
 }
 void SpinTwoCouplings::SetGQQCouplings(unsigned int index, double c_real, double c_imag){

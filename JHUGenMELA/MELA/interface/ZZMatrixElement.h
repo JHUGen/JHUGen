@@ -113,6 +113,10 @@ public:
     double selfDGggcoupl[SIZE_GGG][2],
     double selfDGvvcoupl[SIZE_GVV][2]
     );
+  void set_SpinTwoContact(
+    double selfDGvvpcoupl[SIZE_GVV][2],
+    double selfDGvpvpcoupl[SIZE_GVV][2]
+  );
   void set_VprimeContactCouplings(
     double selfDZpffcoupl[SIZE_Vpff][2],
     double selfDWpffcoupl[SIZE_Vpff][2],
