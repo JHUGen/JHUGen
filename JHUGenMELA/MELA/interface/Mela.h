@@ -393,7 +393,7 @@ protected:
   void printLogo() const;
 
   void setSpinZeroCouplings();
-  void setSpinOneZouplings();
+  void setSpinOneCouplings();
   void setSpinTwoCouplings();
 
   bool configureAnalyticalPDFs();
