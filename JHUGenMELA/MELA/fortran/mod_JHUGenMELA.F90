@@ -370,9 +370,11 @@ subroutine SetSpinZeroContactTerms(zzpcoupl, zpzpcoupl, Zpffcoupl, wwpcoupl, wpw
    complex(8), intent(in) :: wpwpcoupl(39)
    complex(8), intent(in) :: Wpffcoupl(20)
 
-   includeVprime = (any(zzpcoupl.ne.czero) .or. any(zpzpcoupl.ne.czero) .or. any(Zpffcoupl.ne.czero) &
-                    .or.                                                                             &
-                    any(wwpcoupl.ne.czero) .or. any(wpwpcoupl.ne.czero) .or. any(Wpffcoupl.ne.czero))
+   includeVprime = (                                                                                      &
+                    ((any(zzpcoupl.ne.czero) .or. any(zpzpcoupl.ne.czero)) .or. any(Zpffcoupl.ne.czero)) &
+                    .or.                                                                                  &
+                    ((any(wwpcoupl.ne.czero) .or. any(wpwpcoupl.ne.czero)) .or. any(Wpffcoupl.ne.czero)) &
+                   )
 
    ghzzp1 =  zzpcoupl(1)
    ghzzp2 =  zzpcoupl(2)
@@ -565,6 +567,14 @@ subroutine SetSpinZeroContactTerms(zzpcoupl, zpzpcoupl, Zpffcoupl, wwpcoupl, wpw
    ewp_Chm_right = Wpffcoupl(16)
    ewp_Top_left = Wpffcoupl(19)
    ewp_Top_right = Wpffcoupl(20)
+
+   includeGammaStar =              &
+      includeGammaStar .or. (      &
+      ghzpgs1_prime2.ne.czero .or. &
+      ghzpgs2.ne.czero .or.        &
+      ghzpgs3.ne.czero .or.        &
+      ghzpgs4.ne.czero             &
+   )
 
 end subroutine
 
