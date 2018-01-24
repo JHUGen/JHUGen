@@ -516,8 +516,7 @@ subroutine SetSpinTwoCouplings(acoupl,vvcoupl,vvpcoupl,vpvpcoupl,qLR)
    includeVprime = (any(vvpcoupl.ne.czero) .or. any(vpvpcoupl.ne.czero))
    includeGammaStar = (                                                       &
                     any(vvcoupl(indexGammaBegin:indexVVSize).ne.czero) .or.   &
-                    any(vvpcoupl(indexGammaBegin:indexVVSize).ne.czero) .or.  &
-                    any(vpvpcoupl(indexGammaBegin:indexVVSize).ne.czero)      &
+                    any(vvpcoupl(indexGammaBegin:indexVVSize).ne.czero)       &
                    )
 
    a1 = acoupl(1)
