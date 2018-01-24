@@ -826,27 +826,7 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "GaWprime", success, Ga_Wprime, multiply=GeV, success2=SetGaWprime)
 
 
-    ! Z and W parameters
-    call ReadCommandLineArgument(arg, "MZ", success, M_Z, multiply=GeV)
-    call ReadCommandLineArgument(arg, "MW", success, M_W, multiply=GeV)
-    call ReadCommandLineArgument(arg, "GaZ", success, Ga_Z, multiply=GeV)
-    call ReadCommandLineArgument(arg, "GaW", success, Ga_W, multiply=GeV)
-    call ReadCommandLineArgument(arg, "T3lL", success, T3lL, success2=ModifiedIsospinCharge)
-    call ReadCommandLineArgument(arg, "T3lR", success, T3lR, success2=ModifiedIsospinCharge)
-    call ReadCommandLineArgument(arg, "T3nuL", success, T3nL, success2=ModifiedIsospinCharge)
-    call ReadCommandLineArgument(arg, "T3nuR", success, T3nR, success2=ModifiedIsospinCharge)
-    call ReadCommandLineArgument(arg, "T3uL", success, T3uL, success2=ModifiedIsospinCharge)
-    call ReadCommandLineArgument(arg, "T3uR", success, T3uR, success2=ModifiedIsospinCharge)
-    call ReadCommandLineArgument(arg, "T3dL", success, T3dL, success2=ModifiedIsospinCharge)
-    call ReadCommandLineArgument(arg, "T3dR", success, T3dR, success2=ModifiedIsospinCharge)
-    call ReadCommandLineArgument(arg, "QlL", success, QlL, success2=ModifiedIsospinCharge)
-    call ReadCommandLineArgument(arg, "QlR", success, QlR, success2=ModifiedIsospinCharge)
-    call ReadCommandLineArgument(arg, "QnuL", success, QnL, success2=ModifiedIsospinCharge)
-    call ReadCommandLineArgument(arg, "QnuR", success, QnR, success2=ModifiedIsospinCharge)
-    call ReadCommandLineArgument(arg, "QuL", success, QuL, success2=ModifiedIsospinCharge)
-    call ReadCommandLineArgument(arg, "QuR", success, QuR, success2=ModifiedIsospinCharge)
-    call ReadCommandLineArgument(arg, "QdL", success, QdL, success2=ModifiedIsospinCharge)
-    call ReadCommandLineArgument(arg, "QdR", success, QdR, success2=ModifiedIsospinCharge)
+    ! CKM elements
     call ReadCommandLineArgument(arg, "Vud", success, VCKM_ud, success2=SetCKM)
     call ReadCommandLineArgument(arg, "Vus", success, VCKM_us, success2=SetCKM)
     call ReadCommandLineArgument(arg, "Vcd", success, VCKM_cd, success2=SetCKM)
@@ -856,6 +836,7 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "Vub", success, VCKM_ub, success2=SetCKM, success3=SetCKMub)
     call ReadCommandLineArgument(arg, "Vcb", success, VCKM_cb, success2=SetCKM, success3=SetCKMcb)
     call ReadCommandLineArgument(arg, "Vtd", success, VCKM_td, success2=SetCKM, success3=SetCKMtd)
+
 
     !cuts
     call ReadCommandLineArgument(arg, "pTjetcut", success, pTjetcut, multiply=GeV, success2=SetpTjetcut)
@@ -4690,19 +4671,8 @@ character :: arg*(500)
         else if( ReadLHEFile .or. Process.le.2 .or. Process .eq. 80 ) then
             write(TheUnit,"(4X,A,I2,2X,A,I2)") "DecayMode1:",DecayMode1, "DecayMode2:",DecayMode2
         endif
-        if( Process.eq.60 .or. (Process.ge.66 .and. Process.le.69) .or. IsAZDecay(DecayMode1) .or. IsAZDecay(DecayMode2) ) write(TheUnit,"(4X,A,F6.3,A,F7.5)") "Z-boson: mass=",M_Z*100d0,", width=",Ga_Z*100d0
-        if( Process.eq.60 .or. (Process.ge.66 .and. Process.le.69) .or. IsAWDecay(DecayMode1) .or. IsAWDecay(DecayMode2) ) write(TheUnit,"(4X,A,F6.3,A,F7.5)") "W-boson: mass=",M_W*100d0,", width=",Ga_W*100d0
-        if(ModifiedIsospinCharge) then
-          write(TheUnit, "(4X,A)") "Isospin and charge:"
-          write(TheUnit, "(6X,A4,F6.2,4X,F6.2)") " lL:", T3lL, QlL
-          write(TheUnit, "(6X,A4,F6.2,4X,F6.2)") " lR:", T3lR, QlR
-          write(TheUnit, "(6X,A4,F6.2,4X,F6.2)") "nuL:", T3nL, QnL
-          write(TheUnit, "(6X,A4,F6.2,4X,F6.2)") "nuR:", T3nR, QnR
-          write(TheUnit, "(6X,A4,F6.2,4X,F6.2)") " uL:", T3uL, QuL
-          write(TheUnit, "(6X,A4,F6.2,4X,F6.2)") " uR:", T3uR, QuR
-          write(TheUnit, "(6X,A4,F6.2,4X,F6.2)") " dL:", T3dL, QdL
-          write(TheUnit, "(6X,A4,F6.2,4X,F6.2)") " dR:", T3dR, QdR
-        endif
+        if( Process.eq.60 .or. (Process.ge.66 .and. Process.le.69) .or. IsAZDecay(DecayMode1) .or. IsAZDecay(DecayMode2) ) write(TheUnit,"(4X,A,F6.3,A,F6.4)") "Z-boson: mass=",M_Z*100d0,", width=",Ga_Z*100d0
+        if( Process.eq.60 .or. (Process.ge.66 .and. Process.le.69) .or. IsAWDecay(DecayMode1) .or. IsAWDecay(DecayMode2) ) write(TheUnit,"(4X,A,F6.3,A,F6.4)") "W-boson: mass=",M_W*100d0,", width=",Ga_W*100d0
     endif
     if( Process.eq.80 .or. Process.eq.110 .or. Process.eq.111 .or.Process.eq.112 .or. Process.eq.113 .or. Process.eq.114) write(TheUnit,"(4X,A,F8.4,A,F6.4)") "Top quark mass=",m_top*100d0,", width=",Ga_top*100d0
     if( Process.eq.80 .or. Process.eq.110 .or. Process.eq.111 .or. Process.eq.112 .or. Process.eq.113 .or. Process.eq.114) write(TheUnit,"(4X,A,I2)") "Top quark decay=",TOPDECAYS
