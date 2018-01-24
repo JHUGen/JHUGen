@@ -91,13 +91,25 @@ RooSpinZero_7DComplex_withAccep_HVV::RooSpinZero_7DComplex_withAccep_HVV(
   ZZ4fOrdering(other.ZZ4fOrdering)
 {}
 
-void RooSpinZero_7DComplex_withAccep_HVV::evaluatePolarizationTerms(Double_t& A00term, Double_t& Appterm, Double_t& Ammterm, Double_t& A00ppterm, Double_t& A00mmterm, Double_t& Appmmterm, const Int_t code, bool isGammaV1, bool isGammaV2) const{
+void RooSpinZero_7DComplex_withAccep_HVV::evaluatePolarizationTerms(
+  Double_t& A00term, Double_t& Appterm, Double_t& Ammterm,
+  Double_t& A00ppterm, Double_t& A00mmterm, Double_t& Appmmterm,
+  const Int_t code,
+  int VGammaVpmode1, int VGammaVpmode2
+) const{
   const Double_t Pi = TMath::Pi();
 
   Double_t R1Val, R2Val;
-  calculateR1R2(R1Val, R2Val, isGammaV1, isGammaV2);
+  calculateVffR1R2(R1Val, R2Val, VGammaVpmode1==1, VGammaVpmode2==1);
+  if (VGammaVpmode1==2 || VGammaVpmode2==2){
+    Double_t RVp1Val=0, RVp2Val=0;
+    calculateVprimeffR1R2(RVp1Val, RVp2Val);
+    if (VGammaVpmode1==2) R1Val=RVp1Val;
+    if (VGammaVpmode2==2) R1Val=RVp2Val;
+  }
+
   Double_t A00Re, A00Im, AppRe, AppIm, AmmRe, AmmIm;
-  calculateAmplitudes(A00Re, A00Im, AppRe, AppIm, AmmRe, AmmIm, isGammaV1, isGammaV2);
+  calculateAmplitudes(A00Re, A00Im, AppRe, AppIm, AmmRe, AmmIm, VGammaVpmode1, VGammaVpmode2);
 
   Double_t A00 = A00Im*A00Im + A00Re*A00Re;
   Double_t App = AppIm*AppIm + AppRe*AppRe;
@@ -269,10 +281,24 @@ Double_t RooSpinZero_7DComplex_withAccep_HVV::evaluate() const{
   if (Vdecay2!=RooSpin::kVdecayType_GammaOnshell) term2Coeff = 2.*m2_*GeVunit;
 
   Double_t value = 0;
-  Double_t val_A00=0, val_App=0, val_Amm=0, val_A0p=0, val_A0m=0, val_Amp=0;
-  evaluatePolarizationTerms(val_A00, val_App, val_Amm, val_A0p, val_A0m, val_Amp, code);
-  value = val_A00 + val_App + val_Amm + val_A0p + val_A0m + val_Amp;
-  value = betaVal*term1Coeff*term2Coeff*value
+  for (int VGammaVpmode1=0; VGammaVpmode1<=2; VGammaVpmode1++){
+    for (int VGammaVpmode2=0; VGammaVpmode2<=2; VGammaVpmode2++){
+      if (!(
+        (VGammaVpmode1==1 || Vdecay1!=RooSpin::kVdecayType_GammaOnshell)
+        &&
+        (VGammaVpmode2==1 || Vdecay2!=RooSpin::kVdecayType_GammaOnshell)
+        )
+        ||
+        (VGammaVpmode1==1 && VGammaVpmode2==2) || (VGammaVpmode1==2 && VGammaVpmode2==1)
+        ||
+        !computeNeededAmplitude(VGammaVpmode1, VGammaVpmode2)
+        ) continue;
+      Double_t val_A00=0, val_App=0, val_Amm=0, val_A0p=0, val_A0m=0, val_Amp=0;
+      evaluatePolarizationTerms(val_A00, val_App, val_Amm, val_A0p, val_A0m, val_Amp, code, VGammaVpmode1, VGammaVpmode2);
+      value += val_A00 + val_App + val_Amm + val_A0p + val_A0m + val_Amp;
+    }
+  }
+  value *= betaVal*term1Coeff*term2Coeff
     *(1+aM1*m1_+bM1*m1_*m1_+cM1*m1_*m1_*m1_+dM1*m1_*m1_*m1_*m1_)
     *(1+aM2*m2_+bM2*m2_*m2_+cM2*m2_*m2_*m2_+dM2*m2_*m2_*m2_*m2_);
 
@@ -290,13 +316,7 @@ Double_t RooSpinZero_7DComplex_withAccep_HVV::evaluate() const{
     cout << "Possible sources:\n"
       << "betaVal=" << betaVal << '\t'
       << "term1Coeff=" << term1Coeff << '\t'
-      << "term2Coeff=" << term2Coeff << '\t'
-      << "A00=" << val_A00 << '\t'
-      << "App=" << val_App << '\t'
-      << "Amm=" << val_Amm << '\t'
-      << "A00pp=" << val_A0p << '\t'
-      << "A00mm=" << val_A0m << '\t'
-      << "Ammpp=" << val_Amp << '\t'
+      << "term2Coeff=" << term2Coeff
       << endl;
   }
   return value;
@@ -336,10 +356,29 @@ Double_t RooSpinZero_7DComplex_withAccep_HVV::analyticalIntegral(Int_t code, con
   if (Vdecay2!=RooSpin::kVdecayType_GammaOnshell) term2Coeff = 2.*m2_*GeVunit;
 
   Double_t value = 0;
-  Double_t val_A00=0, val_App=0, val_Amm=0, val_A0p=0, val_A0m=0, val_Amp=0;
-  evaluatePolarizationTerms(val_A00, val_App, val_Amm, val_A0p, val_A0m, val_Amp, code);
-  value = val_A00 + val_App + val_Amm + val_A0p + val_A0m + val_Amp;
-  value = betaVal*term1Coeff*term2Coeff*value
+  for (int VGammaVpmode1=0; VGammaVpmode1<=2; VGammaVpmode1++){
+    for (int VGammaVpmode2=0; VGammaVpmode2<=2; VGammaVpmode2++){
+      if (!(
+        (VGammaVpmode1==0 && VGammaVpmode2==0 && Vdecay1!=RooSpin::kVdecayType_GammaOnshell && Vdecay2!=RooSpin::kVdecayType_GammaOnshell)
+        ||
+        (VGammaVpmode1==0 && VGammaVpmode2==1 && Vdecay1!=RooSpin::kVdecayType_GammaOnshell)
+        ||
+        (VGammaVpmode1==1 && VGammaVpmode2==0 && Vdecay2!=RooSpin::kVdecayType_GammaOnshell)
+        ||
+        (VGammaVpmode1==1 && VGammaVpmode2==1)
+        ||
+        (VGammaVpmode1==0 && VGammaVpmode2==2 && Vdecay1!=RooSpin::kVdecayType_GammaOnshell && Vdecay2!=RooSpin::kVdecayType_GammaOnshell)
+        ||
+        (VGammaVpmode1==2 && VGammaVpmode2==0 && Vdecay1!=RooSpin::kVdecayType_GammaOnshell && Vdecay2!=RooSpin::kVdecayType_GammaOnshell)
+        ||
+        (VGammaVpmode1==2 && VGammaVpmode2==2 && Vdecay1!=RooSpin::kVdecayType_GammaOnshell && Vdecay2!=RooSpin::kVdecayType_GammaOnshell)
+        )) continue;
+      Double_t val_A00=0, val_App=0, val_Amm=0, val_A0p=0, val_A0m=0, val_Amp=0;
+      evaluatePolarizationTerms(val_A00, val_App, val_Amm, val_A0p, val_A0m, val_Amp, code, VGammaVpmode1, VGammaVpmode2);
+      value += val_A00 + val_App + val_Amm + val_A0p + val_A0m + val_Amp;
+    }
+  }
+  value *= betaVal*term1Coeff*term2Coeff
     *(1+aM1*m1_+bM1*m1_*m1_+cM1*m1_*m1_*m1_+dM1*m1_*m1_*m1_*m1_)
     *(1+aM2*m2_+bM2*m2_*m2_+cM2*m2_*m2_*m2_+dM2*m2_*m2_*m2_*m2_);
 
@@ -357,13 +396,7 @@ Double_t RooSpinZero_7DComplex_withAccep_HVV::analyticalIntegral(Int_t code, con
     cout << "Possible sources:\n"
       << "betaVal=" << betaVal << '\t'
       << "term1Coeff=" << term1Coeff << '\t'
-      << "term2Coeff=" << term2Coeff << '\t'
-      << "A00=" << val_A00 << '\t'
-      << "App=" << val_App << '\t'
-      << "Amm=" << val_Amm << '\t'
-      << "A00pp=" << val_A0p << '\t'
-      << "A00mm=" << val_A0m << '\t'
-      << "Ammpp=" << val_Amp << '\t'
+      << "term2Coeff=" << term2Coeff
       << endl;
   }
   return value;

@@ -48,16 +48,36 @@ void SpinPdfFactory::initVdecayParams(){
   parameters.gamW = new RooRealVar("gamW", "gamW", 2.085);
   parameters.mZ = new RooRealVar("mZ", "mZ", 91.1876);
   parameters.gamZ = new RooRealVar("gamZ", "gamZ", 2.4952);
+  parameters.mWprime = new RooRealVar("mWprime", "mWprime", 0);
+  parameters.gamWprime = new RooRealVar("gamWprime", "gamWprime", -1); // Turns off Wprime
+  parameters.mZprime = new RooRealVar("mZprime", "mZprime", 0);
+  parameters.gamZprime = new RooRealVar("gamZprime", "gamZprime", -1); // Turns off Zprime
   parameters.Sin2ThetaW = new RooRealVar("Sin2ThetaW", "Sin2ThetaW", 0.23119);
   parameters.vev = new RooRealVar("vev", "vev", vevVal);
+  parameters.gVprimeff_decay1_left = new RooRealVar("gVprimeff_decay1_left", "gVprimeff_decay1_left", 0);
+  parameters.gVprimeff_decay1_right = new RooRealVar("gVprimeff_decay1_right", "gVprimeff_decay1_right", 0);
+  parameters.gVprimeff_decay2_left = new RooRealVar("gVprimeff_decay2_left", "gVprimeff_decay2_left", 0);
+  parameters.gVprimeff_decay2_right = new RooRealVar("gVprimeff_decay2_right", "gVprimeff_decay2_right", 0);
 }
 void SpinPdfFactory::resetVdecayParams(Double_t mWval, Double_t gamWval, Double_t mZval, Double_t gamZval, Double_t Sin2ThetaWval, Double_t vevval){
-  if (dynamic_cast<RooRealVar*>(parameters.mW)!=0){ ((RooRealVar*)parameters.mW)->removeMin(); ((RooRealVar*)parameters.mW)->removeMax(); ((RooRealVar*)parameters.mW)->setConstant(false); ((RooRealVar*)parameters.mW)->setVal(mWval); ((RooRealVar*)parameters.mW)->setRange(mWval, mWval); ((RooRealVar*)parameters.mW)->setConstant(true); }
-  if (dynamic_cast<RooRealVar*>(parameters.gamW)!=0){ ((RooRealVar*)parameters.gamW)->removeMin(); ((RooRealVar*)parameters.gamW)->removeMax(); ((RooRealVar*)parameters.gamW)->setConstant(false); ((RooRealVar*)parameters.gamW)->setVal(gamWval); ((RooRealVar*)parameters.gamW)->setRange(gamWval, gamWval); ((RooRealVar*)parameters.gamW)->setConstant(true); }
-  if (dynamic_cast<RooRealVar*>(parameters.mZ)!=0){ ((RooRealVar*)parameters.mZ)->removeMin(); ((RooRealVar*)parameters.mZ)->removeMax(); ((RooRealVar*)parameters.mZ)->setConstant(false); ((RooRealVar*)parameters.mZ)->setVal(mZval); ((RooRealVar*)parameters.mZ)->setRange(mZval, mZval); ((RooRealVar*)parameters.mZ)->setConstant(true); }
-  if (dynamic_cast<RooRealVar*>(parameters.gamZ)!=0){ ((RooRealVar*)parameters.gamZ)->removeMin(); ((RooRealVar*)parameters.gamZ)->removeMax(); ((RooRealVar*)parameters.gamZ)->setConstant(false); ((RooRealVar*)parameters.gamZ)->setVal(gamZval); ((RooRealVar*)parameters.gamZ)->setRange(gamZval, gamZval); ((RooRealVar*)parameters.gamZ)->setConstant(true); }
-  if (dynamic_cast<RooRealVar*>(parameters.Sin2ThetaW)!=0){ ((RooRealVar*)parameters.Sin2ThetaW)->removeMin(); ((RooRealVar*)parameters.Sin2ThetaW)->removeMax(); ((RooRealVar*)parameters.Sin2ThetaW)->setConstant(false); ((RooRealVar*)parameters.Sin2ThetaW)->setVal(Sin2ThetaWval); ((RooRealVar*)parameters.Sin2ThetaW)->setRange(Sin2ThetaWval, Sin2ThetaWval); ((RooRealVar*)parameters.Sin2ThetaW)->setConstant(true); }
-  if (dynamic_cast<RooRealVar*>(parameters.vev)!=0){ ((RooRealVar*)parameters.vev)->removeMin(); ((RooRealVar*)parameters.vev)->removeMax(); ((RooRealVar*)parameters.vev)->setConstant(false); ((RooRealVar*)parameters.vev)->setVal(vevval); ((RooRealVar*)parameters.vev)->setRange(vevval, vevval); ((RooRealVar*)parameters.vev)->setConstant(true); }
+  SpinPdfFactory::setVariableValue(dynamic_cast<RooRealVar*>(parameters.mW), mWval);
+  SpinPdfFactory::setVariableValue(dynamic_cast<RooRealVar*>(parameters.gamW), gamWval);
+  SpinPdfFactory::setVariableValue(dynamic_cast<RooRealVar*>(parameters.mZ), mZval);
+  SpinPdfFactory::setVariableValue(dynamic_cast<RooRealVar*>(parameters.gamZ), gamZval);
+  SpinPdfFactory::setVariableValue(dynamic_cast<RooRealVar*>(parameters.Sin2ThetaW), Sin2ThetaWval);
+  SpinPdfFactory::setVariableValue(dynamic_cast<RooRealVar*>(parameters.vev), vevval);
+}
+void SpinPdfFactory::resetVprimeffCouplings(Double_t gVprimeff_decay1[2], Double_t gVprimeff_decay2[2]){
+  SpinPdfFactory::setVariableValue(dynamic_cast<RooRealVar*>(parameters.gVprimeff_decay1_left), gVprimeff_decay1[0]);
+  SpinPdfFactory::setVariableValue(dynamic_cast<RooRealVar*>(parameters.gVprimeff_decay1_right), gVprimeff_decay1[1]);
+  SpinPdfFactory::setVariableValue(dynamic_cast<RooRealVar*>(parameters.gVprimeff_decay2_left), gVprimeff_decay2[0]);
+  SpinPdfFactory::setVariableValue(dynamic_cast<RooRealVar*>(parameters.gVprimeff_decay2_right), gVprimeff_decay2[1]);
+}
+void SpinPdfFactory::resetVprimeMasses(Double_t mWval, Double_t gamWval, Double_t mZval, Double_t gamZval){
+  SpinPdfFactory::setVariableValue(dynamic_cast<RooRealVar*>(parameters.mWprime), mWval);
+  SpinPdfFactory::setVariableValue(dynamic_cast<RooRealVar*>(parameters.gamWprime), gamWval);
+  SpinPdfFactory::setVariableValue(dynamic_cast<RooRealVar*>(parameters.mZprime), mZval);
+  SpinPdfFactory::setVariableValue(dynamic_cast<RooRealVar*>(parameters.gamZprime), gamZval);
 }
 void SpinPdfFactory::getMVGamV(Double_t* mV, Double_t* gamV)const{
   if (V1decay==RooSpin::kVdecayType_Wany){
@@ -67,6 +87,20 @@ void SpinPdfFactory::getMVGamV(Double_t* mV, Double_t* gamV)const{
   else if (!(V1decay==RooSpin::kVdecayType_GammaOnshell && V2decay==RooSpin::kVdecayType_GammaOnshell)){
     if (mV!=0) (*mV)=(parameters.mZ)->getVal();
     if (gamV!=0) (*gamV)=(parameters.gamZ)->getVal();
+  }
+  else{
+    if (mV!=0) (*mV)=0;
+    if (gamV!=0) (*gamV)=0;
+  }
+}
+void SpinPdfFactory::getMVprimeGamVprime(Double_t* mV, Double_t* gamV)const{
+  if (V1decay==RooSpin::kVdecayType_Wany){
+    if (mV!=0) (*mV)=(parameters.mWprime)->getVal();
+    if (gamV!=0) (*gamV)=(parameters.gamWprime)->getVal();
+  }
+  else if (!(V1decay==RooSpin::kVdecayType_GammaOnshell && V2decay==RooSpin::kVdecayType_GammaOnshell)){
+    if (mV!=0) (*mV)=(parameters.mZprime)->getVal();
+    if (gamV!=0) (*gamV)=(parameters.gamZprime)->getVal();
   }
   else{
     if (mV!=0) (*mV)=0;
@@ -86,12 +120,48 @@ void SpinPdfFactory::destroyMassPole(){
   if (!OnshellH) delete parameters.mX;
 }
 void SpinPdfFactory::destroyVdecayParams(){
+  delete parameters.gVprimeff_decay2_right;
+  delete parameters.gVprimeff_decay2_left;
+  delete parameters.gVprimeff_decay1_right;
+  delete parameters.gVprimeff_decay1_left;
   delete parameters.vev;
   delete parameters.Sin2ThetaW;
   delete parameters.gamZ;
   delete parameters.mZ;
   delete parameters.gamW;
   delete parameters.mW;
+  delete parameters.gamZprime;
+  delete parameters.mZprime;
+  delete parameters.gamWprime;
+  delete parameters.mWprime;
 }
 
+void SpinPdfFactory::setVariableValue(RooRealVar* var, Double_t val){
+  if (var){
+    var->removeMin();
+    var->removeMax();
+    var->setConstant(false);
+    var->setVal(val);
+    var->setRange(val, val);
+    var->setConstant(true);
+  }
+}
 
+void SpinPdfFactory::makeParamsConst(bool yesNo){
+  ((RooRealVar*) parameters.mX)->setConstant(yesNo);
+  ((RooRealVar*) parameters.gamX)->setConstant(yesNo);
+  ((RooRealVar*) parameters.mW)->setConstant(yesNo);
+  ((RooRealVar*) parameters.gamW)->setConstant(yesNo);
+  ((RooRealVar*) parameters.mZ)->setConstant(yesNo);
+  ((RooRealVar*) parameters.gamZ)->setConstant(yesNo);
+  ((RooRealVar*) parameters.mWprime)->setConstant(yesNo);
+  ((RooRealVar*) parameters.gamWprime)->setConstant(yesNo);
+  ((RooRealVar*) parameters.mZprime)->setConstant(yesNo);
+  ((RooRealVar*) parameters.gamZprime)->setConstant(yesNo);
+  ((RooRealVar*) parameters.Sin2ThetaW)->setConstant(yesNo);
+  ((RooRealVar*) parameters.vev)->setConstant(yesNo);
+  ((RooRealVar*) parameters.gVprimeff_decay1_left)->setConstant(yesNo);
+  ((RooRealVar*) parameters.gVprimeff_decay1_right)->setConstant(yesNo);
+  ((RooRealVar*) parameters.gVprimeff_decay2_left)->setConstant(yesNo);
+  ((RooRealVar*) parameters.gVprimeff_decay2_right)->setConstant(yesNo);
+}

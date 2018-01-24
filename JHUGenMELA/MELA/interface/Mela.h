@@ -305,6 +305,8 @@ public:
   double selfDGqqcoupl[SIZE_GQQ][2];
   double selfDGggcoupl[SIZE_GGG][2];
   double selfDGvvcoupl[SIZE_GVV][2];
+  double selfDGvvpcoupl[SIZE_GVV][2];
+  double selfDGvpvpcoupl[SIZE_GVV][2];
   // That is a lot of them!
 
 protected:
@@ -391,6 +393,10 @@ protected:
   /*** Functions ***/
   /*****************/
   void printLogo() const;
+
+  void setSpinZeroCouplings();
+  void setSpinOneCouplings();
+  void setSpinTwoCouplings();
 
   bool configureAnalyticalPDFs();
   void reset_SelfDCouplings();

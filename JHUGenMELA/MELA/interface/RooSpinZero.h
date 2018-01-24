@@ -34,6 +34,9 @@ public:
     RooAbsReal* Lambda_z3qsq[SIZE_HVV_CQSQ];
     RooAbsReal* Lambda_z4qsq[SIZE_HVV_CQSQ];
     RooAbsReal* cLambda_qsq[SIZE_HVV_CQSQ];
+
+    RooAbsReal* gvvp1List[1][2];
+    RooAbsReal* gvpvp1List[1][2];
   };
 
   RooSpinZero(){};
@@ -163,10 +166,31 @@ protected:
   RooRealProxy cz_q2sq;
   RooRealProxy cz_q12sq;
 
-  virtual void evaluatePolarizationTerms(Double_t& A00term, Double_t& Appterm, Double_t& Ammterm, Double_t& A00ppterm, Double_t& A00mmterm, Double_t& Appmmterm, const Int_t code, bool isGammaV1=false, bool isGammaV2=false) const = 0;
 
-  virtual void calculateAi(Double_t& a1Re, Double_t& a1Im, Double_t& a2Re, Double_t& a2Im, Double_t& a3Re, Double_t& a3Im, bool isGammaV1=false, bool isGammaV2=false) const;
-  virtual void calculateAmplitudes(Double_t& A00Re, Double_t& A00Im, Double_t& AppRe, Double_t& AppIm, Double_t& AmmRe, Double_t& AmmIm, bool isGammaV1=false, bool isGammaV2=false) const;
+  RooRealProxy gvvp1Val;
+  RooRealProxy gvpvp1Val;
+
+  RooRealProxy gvvp1ValIm;
+  RooRealProxy gvpvp1ValIm;
+
+  virtual void evaluatePolarizationTerms(
+    Double_t& A00term, Double_t& Appterm, Double_t& Ammterm,
+    Double_t& A00ppterm, Double_t& A00mmterm, Double_t& Appmmterm,
+    const Int_t code,
+    int VGammaVpmode1=0, int VGammaVpmode2=0
+  ) const = 0;
+
+  virtual void calculateAi(
+    Double_t& a1Re, Double_t& a1Im, Double_t& a2Re, Double_t& a2Im, Double_t& a3Re, Double_t& a3Im,
+    int VGammaVpmode1=0, int VGammaVpmode2=0
+  ) const;
+  virtual void calculateAmplitudes(
+    Double_t& A00Re, Double_t& A00Im, Double_t& AppRe, Double_t& AppIm, Double_t& AmmRe, Double_t& AmmIm,
+    int VGammaVpmode1=0, int VGammaVpmode2=0
+  ) const;
+
+
+  virtual Bool_t computeNeededAmplitude(int VGammaVpmode1, int VGammaVpmode2) const final;
 
 };
 

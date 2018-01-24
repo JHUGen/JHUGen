@@ -16,10 +16,12 @@ public :: SetTopDecays
 public :: SetHDK
 public :: SetMuRenFac
 public :: ResetMubarHGabarH
-public :: SetSpinZeroVVCouplings,SetSpinZeroVVCouplings_NoGamma,SetDistinguishWWCouplingsFlag,SetSpinZeroContactTerms
-public :: SetSpinZeroGGCouplings,SetSpinZeroQQCouplings
+public :: ResetAmplitudeIncludes
+public :: SetDistinguishWWCouplingsFlag
+public :: SetSpinZeroGGCouplings,SetSpinZeroQQCouplings,SetSpinZeroVVCouplings
 public :: SetSpinOneCouplings
 public :: SetSpinTwoCouplings
+public :: SetVprimeContactCouplings
 
 public :: GetMVGV,GetMVPrimeGVPrime
 public :: GetAlphaSAlphaSMZ
@@ -111,12 +113,24 @@ implicit none
    gabarH=-999d0
 end subroutine
 
-subroutine SetSpinZeroVVCouplings(vvcoupl, cqsq, Lambda_qsq, useWWcoupl)
+subroutine ResetAmplitudeIncludes()
+implicit none
+   includeVprime=.false.
+   includeGammaStar=.false.
+end subroutine
+
+subroutine SetSpinZeroVVCouplings(vvcoupl, vvpcoupl, vpvpcoupl, cqsq, Lambda_qsq, useWWcoupl)
    implicit none
    complex(8), intent(in) :: vvcoupl(39)
+   complex(8), intent(in) :: vvpcoupl(39)
+   complex(8), intent(in) :: vpvpcoupl(39)
    integer, intent(in) :: cqsq(3)
    real(8), intent(in) :: Lambda_qsq(1:3,1:4)
    logical, intent(in) :: useWWcoupl
+
+   includeVprime = includeVprime .or. (                                   &
+                    (any(vvpcoupl.ne.czero) .or. any(vpvpcoupl.ne.czero)) &
+                   )
 
    if(.not.useWWcoupl) then
       cz_q1sq = cqsq(1)
@@ -182,6 +196,90 @@ subroutine SetSpinZeroVVCouplings(vvcoupl, cqsq, Lambda_qsq, useWWcoupl)
       ghz4_prime6  = vvcoupl(38)
       ghz4_prime7  = vvcoupl(39)
 
+
+      ghzzp1 =  vvpcoupl(1)
+      ghzzp2 =  vvpcoupl(2)
+      ghzzp3 =  vvpcoupl(3)
+      ghzzp4 =  vvpcoupl(4)
+
+      ghzpgs2  = vvpcoupl(5)
+      ghzpgs3  = vvpcoupl(6)
+      ghzpgs4  = vvpcoupl(7)
+
+      ghzzp1_prime = vvpcoupl(11)
+      ghzzp1_prime2= vvpcoupl(12)
+      ghzzp1_prime3= vvpcoupl(13)
+      ghzzp1_prime4= vvpcoupl(14)
+      ghzzp1_prime5= vvpcoupl(15)
+
+      ghzzp2_prime = vvpcoupl(16)
+      ghzzp2_prime2= vvpcoupl(17)
+      ghzzp2_prime3= vvpcoupl(18)
+      ghzzp2_prime4= vvpcoupl(19)
+      ghzzp2_prime5= vvpcoupl(20)
+
+      ghzzp3_prime = vvpcoupl(21)
+      ghzzp3_prime2= vvpcoupl(22)
+      ghzzp3_prime3= vvpcoupl(23)
+      ghzzp3_prime4= vvpcoupl(24)
+      ghzzp3_prime5= vvpcoupl(25)
+
+      ghzzp4_prime = vvpcoupl(26)
+      ghzzp4_prime2= vvpcoupl(27)
+      ghzzp4_prime3= vvpcoupl(28)
+      ghzzp4_prime4= vvpcoupl(29)
+      ghzzp4_prime5= vvpcoupl(30)
+
+      ghzpgs1_prime2= vvpcoupl(31)
+
+      ghzzp1_prime6  = vvpcoupl(32)
+      ghzzp1_prime7  = vvpcoupl(33)
+      ghzzp2_prime6  = vvpcoupl(34)
+      ghzzp2_prime7  = vvpcoupl(35)
+      ghzzp3_prime6  = vvpcoupl(36)
+      ghzzp3_prime7  = vvpcoupl(37)
+      ghzzp4_prime6  = vvpcoupl(38)
+      ghzzp4_prime7  = vvpcoupl(39)
+
+      ghzpzp1 =  vpvpcoupl(1)
+      ghzpzp2 =  vpvpcoupl(2)
+      ghzpzp3 =  vpvpcoupl(3)
+      ghzpzp4 =  vpvpcoupl(4)
+
+      ghzpzp1_prime = vpvpcoupl(11)
+      ghzpzp1_prime2= vpvpcoupl(12)
+      ghzpzp1_prime3= vpvpcoupl(13)
+      ghzpzp1_prime4= vpvpcoupl(14)
+      ghzpzp1_prime5= vpvpcoupl(15)
+
+      ghzpzp2_prime = vpvpcoupl(16)
+      ghzpzp2_prime2= vpvpcoupl(17)
+      ghzpzp2_prime3= vpvpcoupl(18)
+      ghzpzp2_prime4= vpvpcoupl(19)
+      ghzpzp2_prime5= vpvpcoupl(20)
+
+      ghzpzp3_prime = vpvpcoupl(21)
+      ghzpzp3_prime2= vpvpcoupl(22)
+      ghzpzp3_prime3= vpvpcoupl(23)
+      ghzpzp3_prime4= vpvpcoupl(24)
+      ghzpzp3_prime5= vpvpcoupl(25)
+
+      ghzpzp4_prime = vpvpcoupl(26)
+      ghzpzp4_prime2= vpvpcoupl(27)
+      ghzpzp4_prime3= vpvpcoupl(28)
+      ghzpzp4_prime4= vpvpcoupl(29)
+      ghzpzp4_prime5= vpvpcoupl(30)
+
+      ghzpzp1_prime6  = vpvpcoupl(32)
+      ghzpzp1_prime7  = vpvpcoupl(33)
+      ghzpzp2_prime6  = vpvpcoupl(34)
+      ghzpzp2_prime7  = vpvpcoupl(35)
+      ghzpzp3_prime6  = vpvpcoupl(36)
+      ghzpzp3_prime7  = vpvpcoupl(37)
+      ghzpzp4_prime6  = vpvpcoupl(38)
+      ghzpzp4_prime7  = vpvpcoupl(39)
+
+
       ! Set includeGammaStar based on the actual coupling values
       includeGammaStar = (          &
          ghzgs1_prime2.ne.czero .or. &
@@ -190,8 +288,12 @@ subroutine SetSpinZeroVVCouplings(vvcoupl, cqsq, Lambda_qsq, useWWcoupl)
          ghzgs4.ne.czero .or.        &
          ghgsgs2.ne.czero .or.       &
          ghgsgs3.ne.czero .or.       &
-         ghgsgs4.ne.czero            &
-      )
+         ghgsgs4.ne.czero .or.       &
+         ghzpgs1_prime2.ne.czero .or. &
+         ghzpgs2.ne.czero .or.        &
+         ghzpgs3.ne.czero .or.        &
+         ghzpgs4.ne.czero             &
+         )
 
    else
       cw_q1sq = cqsq(1)
@@ -247,135 +349,90 @@ subroutine SetSpinZeroVVCouplings(vvcoupl, cqsq, Lambda_qsq, useWWcoupl)
       ghw3_prime7  = vvcoupl(37)
       ghw4_prime6  = vvcoupl(38)
       ghw4_prime7  = vvcoupl(39)
+
+      ghwwp1 =  vvpcoupl(1)
+      ghwwp2 =  vvpcoupl(2)
+      ghwwp3 =  vvpcoupl(3)
+      ghwwp4 =  vvpcoupl(4)
+
+      ghwwp1_prime = vvpcoupl(11)
+      ghwwp1_prime2= vvpcoupl(12)
+      ghwwp1_prime3= vvpcoupl(13)
+      ghwwp1_prime4= vvpcoupl(14)
+      ghwwp1_prime5= vvpcoupl(15)
+
+      ghwwp2_prime = vvpcoupl(16)
+      ghwwp2_prime2= vvpcoupl(17)
+      ghwwp2_prime3= vvpcoupl(18)
+      ghwwp2_prime4= vvpcoupl(19)
+      ghwwp2_prime5= vvpcoupl(20)
+
+      ghwwp3_prime = vvpcoupl(21)
+      ghwwp3_prime2= vvpcoupl(22)
+      ghwwp3_prime3= vvpcoupl(23)
+      ghwwp3_prime4= vvpcoupl(24)
+      ghwwp3_prime5= vvpcoupl(25)
+
+      ghwwp4_prime = vvpcoupl(26)
+      ghwwp4_prime2= vvpcoupl(27)
+      ghwwp4_prime3= vvpcoupl(28)
+      ghwwp4_prime4= vvpcoupl(29)
+      ghwwp4_prime5= vvpcoupl(30)
+
+      ghwwp1_prime6  = vvpcoupl(32)
+      ghwwp1_prime7  = vvpcoupl(33)
+      ghwwp2_prime6  = vvpcoupl(34)
+      ghwwp2_prime7  = vvpcoupl(35)
+      ghwwp3_prime6  = vvpcoupl(36)
+      ghwwp3_prime7  = vvpcoupl(37)
+      ghwwp4_prime6  = vvpcoupl(38)
+      ghwwp4_prime7  = vvpcoupl(39)
+
+      ghwpwp1 =  vpvpcoupl(1)
+      ghwpwp2 =  vpvpcoupl(2)
+      ghwpwp3 =  vpvpcoupl(3)
+      ghwpwp4 =  vpvpcoupl(4)
+
+      ghwpwp1_prime = vpvpcoupl(11)
+      ghwpwp1_prime2= vpvpcoupl(12)
+      ghwpwp1_prime3= vpvpcoupl(13)
+      ghwpwp1_prime4= vpvpcoupl(14)
+      ghwpwp1_prime5= vpvpcoupl(15)
+
+      ghwpwp2_prime = vpvpcoupl(16)
+      ghwpwp2_prime2= vpvpcoupl(17)
+      ghwpwp2_prime3= vpvpcoupl(18)
+      ghwpwp2_prime4= vpvpcoupl(19)
+      ghwpwp2_prime5= vpvpcoupl(20)
+
+      ghwpwp3_prime = vpvpcoupl(21)
+      ghwpwp3_prime2= vpvpcoupl(22)
+      ghwpwp3_prime3= vpvpcoupl(23)
+      ghwpwp3_prime4= vpvpcoupl(24)
+      ghwpwp3_prime5= vpvpcoupl(25)
+
+      ghwpwp4_prime = vpvpcoupl(26)
+      ghwpwp4_prime2= vpvpcoupl(27)
+      ghwpwp4_prime3= vpvpcoupl(28)
+      ghwpwp4_prime4= vpvpcoupl(29)
+      ghwpwp4_prime5= vpvpcoupl(30)
+
+      ghwpwp1_prime6  = vpvpcoupl(32)
+      ghwpwp1_prime7  = vpvpcoupl(33)
+      ghwpwp2_prime6  = vpvpcoupl(34)
+      ghwpwp2_prime7  = vpvpcoupl(35)
+      ghwpwp3_prime6  = vpvpcoupl(36)
+      ghwpwp3_prime7  = vpvpcoupl(37)
+      ghwpwp4_prime6  = vpvpcoupl(38)
+      ghwpwp4_prime7  = vpvpcoupl(39)
    endif
    return
 end subroutine SetSpinZeroVVCouplings
 
-subroutine SetSpinZeroVVCouplings_NoGamma(vvcoupl, cqsq, Lambda_qsq, useWWcoupl)
+subroutine SetVprimeContactCouplings(Zpffcoupl, Wpffcoupl)
    implicit none
-   complex(8), intent(in) :: vvcoupl(32)
-   integer, intent(in) :: cqsq(3)
-   real(8), intent(in) :: Lambda_qsq(1:3,1:4)
-   logical, intent(in) :: useWWcoupl
-
-   if(.not.useWWcoupl) then
-      cz_q1sq = cqsq(1)
-      Lambda_z11 = Lambda_qsq(1,1)
-      Lambda_z21 = Lambda_qsq(1,2)
-      Lambda_z31 = Lambda_qsq(1,3)
-      Lambda_z41 = Lambda_qsq(1,4)
-      cz_q2sq = cqsq(2)
-      Lambda_z12 = Lambda_qsq(2,1)
-      Lambda_z22 = Lambda_qsq(2,2)
-      Lambda_z32 = Lambda_qsq(2,3)
-      Lambda_z42 = Lambda_qsq(2,4)
-      cz_q12sq = cqsq(3)
-      Lambda_z10 = Lambda_qsq(3,1)
-      Lambda_z20 = Lambda_qsq(3,2)
-      Lambda_z30 = Lambda_qsq(3,3)
-      Lambda_z40 = Lambda_qsq(3,4)
-
-      ghz1 = vvcoupl(1)
-      ghz2 = vvcoupl(2)
-      ghz3 = vvcoupl(3)
-      ghz4 = vvcoupl(4)
-      ghz1_prime = vvcoupl(5)
-      ghz1_prime2= vvcoupl(6)
-      ghz1_prime3= vvcoupl(7)
-      ghz1_prime4= vvcoupl(8)
-      ghz1_prime5= vvcoupl(9)
-      ghz2_prime = vvcoupl(10)
-      ghz2_prime2= vvcoupl(11)
-      ghz2_prime3= vvcoupl(12)
-      ghz2_prime4= vvcoupl(13)
-      ghz2_prime5= vvcoupl(14)
-      ghz3_prime = vvcoupl(15)
-      ghz3_prime2= vvcoupl(16)
-      ghz3_prime3= vvcoupl(17)
-      ghz3_prime4= vvcoupl(18)
-      ghz3_prime5= vvcoupl(19)
-      ghz4_prime = vvcoupl(20)
-      ghz4_prime2= vvcoupl(21)
-      ghz4_prime3= vvcoupl(22)
-      ghz4_prime4= vvcoupl(23)
-      ghz4_prime5= vvcoupl(24)
-      ghz1_prime6= vvcoupl(25)
-      ghz1_prime7= vvcoupl(26)
-      ghz2_prime6= vvcoupl(27)
-      ghz2_prime7= vvcoupl(28)
-      ghz3_prime6= vvcoupl(29)
-      ghz3_prime7= vvcoupl(30)
-      ghz4_prime6= vvcoupl(31)
-      ghz4_prime7= vvcoupl(32)
-   else
-      cw_q1sq = cqsq(1)
-      Lambda_w11 = Lambda_qsq(1,1)
-      Lambda_w21 = Lambda_qsq(1,2)
-      Lambda_w31 = Lambda_qsq(1,3)
-      Lambda_w41 = Lambda_qsq(1,4)
-      cw_q2sq = cqsq(2)
-      Lambda_w12 = Lambda_qsq(2,1)
-      Lambda_w22 = Lambda_qsq(2,2)
-      Lambda_w32 = Lambda_qsq(2,3)
-      Lambda_w42 = Lambda_qsq(2,4)
-      cw_q12sq = cqsq(3)
-      Lambda_w10 = Lambda_qsq(3,1)
-      Lambda_w20 = Lambda_qsq(3,2)
-      Lambda_w30 = Lambda_qsq(3,3)
-      Lambda_w40 = Lambda_qsq(3,4)
-
-      ghw1 = vvcoupl(1)
-      ghw2 = vvcoupl(2)
-      ghw3 = vvcoupl(3)
-      ghw4 = vvcoupl(4)
-      ghw1_prime = vvcoupl(5)
-      ghw1_prime2= vvcoupl(6)
-      ghw1_prime3= vvcoupl(7)
-      ghw1_prime4= vvcoupl(8)
-      ghw1_prime5= vvcoupl(9)
-      ghw2_prime = vvcoupl(10)
-      ghw2_prime2= vvcoupl(11)
-      ghw2_prime3= vvcoupl(12)
-      ghw2_prime4= vvcoupl(13)
-      ghw2_prime5= vvcoupl(14)
-      ghw3_prime = vvcoupl(15)
-      ghw3_prime2= vvcoupl(16)
-      ghw3_prime3= vvcoupl(17)
-      ghw3_prime4= vvcoupl(18)
-      ghw3_prime5= vvcoupl(19)
-      ghw4_prime = vvcoupl(20)
-      ghw4_prime2= vvcoupl(21)
-      ghw4_prime3= vvcoupl(22)
-      ghw4_prime4= vvcoupl(23)
-      ghw4_prime5= vvcoupl(24)
-      ghw1_prime6= vvcoupl(25)
-      ghw1_prime7= vvcoupl(26)
-      ghw2_prime6= vvcoupl(27)
-      ghw2_prime7= vvcoupl(28)
-      ghw3_prime6= vvcoupl(29)
-      ghw3_prime7= vvcoupl(30)
-      ghw4_prime6= vvcoupl(31)
-      ghw4_prime7= vvcoupl(32)
-   endif
-   return
-end subroutine SetSpinZeroVVCouplings_NoGamma
-
-subroutine SetSpinZeroContactTerms(zzpcoupl, zpzpcoupl, Zpffcoupl, wwpcoupl, wpwpcoupl, Wpffcoupl)
-   implicit none
-   complex(8), intent(in) :: zzpcoupl(39)
-   complex(8), intent(in) :: zpzpcoupl(39)
    complex(8), intent(in) :: Zpffcoupl(20)
-
-   complex(8), intent(in) :: wwpcoupl(39)
-   complex(8), intent(in) :: wpwpcoupl(39)
    complex(8), intent(in) :: Wpffcoupl(20)
-
-   includeVprime = (any(zzpcoupl.ne.czero) .or. any(zpzpcoupl.ne.czero) .or. any(Zpffcoupl.ne.czero) &
-                    .or.                                                                             &
-                    any(wwpcoupl.ne.czero) .or. any(wpwpcoupl.ne.czero) .or. any(Wpffcoupl.ne.czero))
-
-   ghzzp1 = zzpcoupl(1)
-   ghzpzp1 = zpzpcoupl(1)
 
    ezp_El_left = Zpffcoupl(1)
    ezp_El_right = Zpffcoupl(2)
@@ -398,9 +455,6 @@ subroutine SetSpinZeroContactTerms(zzpcoupl, zpzpcoupl, Zpffcoupl, wwpcoupl, wpw
    ezp_Top_left = Zpffcoupl(19)
    ezp_Top_right = Zpffcoupl(20)
 
-   ghwwp1 = wwpcoupl(1)
-   ghwpwp1 = wpwpcoupl(1)
-
    ewp_El_left = Wpffcoupl(1)
    ewp_El_right = Wpffcoupl(2)
    ewp_Mu_left = Wpffcoupl(3)
@@ -413,7 +467,6 @@ subroutine SetSpinZeroContactTerms(zzpcoupl, zpzpcoupl, Zpffcoupl, wwpcoupl, wpw
    ewp_Chm_right = Wpffcoupl(16)
    ewp_Top_left = Wpffcoupl(19)
    ewp_Top_right = Wpffcoupl(20)
-
 end subroutine
 
 subroutine SetDistinguishWWCouplingsFlag(doAllow)
@@ -452,11 +505,19 @@ subroutine SetSpinOneCouplings(qqcoupl,vvcoupl)
    return
 end subroutine SetSpinOneCouplings
 
-subroutine SetSpinTwoCouplings(acoupl,bcoupl,qLR)
+subroutine SetSpinTwoCouplings(acoupl,vvcoupl,vvpcoupl,vpvpcoupl,qLR)
    implicit none
+   integer, parameter :: indexGammaBegin=11
+   integer, parameter :: indexVVSize=20
    complex(8), intent(in) :: acoupl(1:5)
-   complex(8), intent(in) :: bcoupl(1:10)
+   complex(8), intent(in) :: vvcoupl(1:indexVVSize),vvpcoupl(1:indexVVSize),vpvpcoupl(1:indexVVSize)
    complex(8), intent(in) :: qLR(1:2)
+
+   includeVprime = (any(vvpcoupl.ne.czero) .or. any(vpvpcoupl.ne.czero))
+   includeGammaStar = (                                                       &
+                    any(vvcoupl(indexGammaBegin:indexVVSize).ne.czero) .or.   &
+                    any(vvpcoupl(indexGammaBegin:indexVVSize).ne.czero)       &
+                   )
 
    a1 = acoupl(1)
    a2 = acoupl(2)
@@ -467,16 +528,57 @@ subroutine SetSpinTwoCouplings(acoupl,bcoupl,qLR)
    graviton_qq_left  = qLR(1)
    graviton_qq_right = qLR(2)
 
-   b1 = bcoupl(1)
-   b2 = bcoupl(2)
-   b3 = bcoupl(3)
-   b4 = bcoupl(4)
-   b5 = bcoupl(5)
-   b6 = bcoupl(6)
-   b7 = bcoupl(7)
-   b8 = bcoupl(8)
-   b9 = bcoupl(9)
-   b10 = bcoupl(10)
+   b1 = vvcoupl(1)
+   b2 = vvcoupl(2)
+   b3 = vvcoupl(3)
+   b4 = vvcoupl(4)
+   b5 = vvcoupl(5)
+   b6 = vvcoupl(6)
+   b7 = vvcoupl(7)
+   b8 = vvcoupl(8)
+   b9 = vvcoupl(9)
+   b10 = vvcoupl(10)
+
+   bzgs1 = vvcoupl(11)
+   bzgs2 = vvcoupl(12)
+   bzgs3 = vvcoupl(13)
+   bzgs4 = vvcoupl(14)
+   bzgs8 = vvcoupl(15)
+
+   bgsgs1 = vvcoupl(16)
+   bgsgs2 = vvcoupl(17)
+   bgsgs3 = vvcoupl(18)
+   bgsgs4 = vvcoupl(19)
+   bgsgs8 = vvcoupl(20)
+
+   bzzp1 = vvpcoupl(1)
+   bzzp2 = vvpcoupl(2)
+   bzzp3 = vvpcoupl(3)
+   bzzp4 = vvpcoupl(4)
+   bzzp5 = vvpcoupl(5)
+   bzzp6 = vvpcoupl(6)
+   bzzp7 = vvpcoupl(7)
+   bzzp8 = vvpcoupl(8)
+   bzzp9 = vvpcoupl(9)
+   bzzp10 = vvpcoupl(10)
+
+   bzpgs1 = vvpcoupl(11)
+   bzpgs2 = vvpcoupl(12)
+   bzpgs3 = vvpcoupl(13)
+   bzpgs4 = vvpcoupl(14)
+   bzpgs8 = vvpcoupl(15)
+
+
+   bzpzp1 = vpvpcoupl(1)
+   bzpzp2 = vpvpcoupl(2)
+   bzpzp3 = vpvpcoupl(3)
+   bzpzp4 = vpvpcoupl(4)
+   bzpzp5 = vpvpcoupl(5)
+   bzpzp6 = vpvpcoupl(6)
+   bzpzp7 = vpvpcoupl(7)
+   bzpzp8 = vpvpcoupl(8)
+   bzpzp9 = vpvpcoupl(9)
+   bzpzp10 = vpvpcoupl(10)
 
    return
 end subroutine SetSpinTwoCouplings

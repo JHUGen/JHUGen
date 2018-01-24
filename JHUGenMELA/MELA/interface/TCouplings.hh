@@ -22,9 +22,6 @@ public:
 
   void SetHVVpCouplings(unsigned int index, double c_real, double c_imag, bool setWWp = false, int whichResonance=1);
   void SetHVpVpCouplings(unsigned int index, double c_real, double c_imag, bool setWpWp = false, int whichResonance=1);
-  void SetVpffCouplings(unsigned int index, double c_real, double c_imag, bool setWpff = false, int whichResonance=1);
-  void SetZPrimeMassWidth(double inmass, double inwidth);
-  void SetWPrimeMassWidth(double inmass, double inwidth);
 
   double Hggcoupl[SIZE_HGG][2];
   double Hqqcoupl[SIZE_HQQ][2];
@@ -58,16 +55,10 @@ public:
 
   double Hzzpcoupl[SIZE_HVV][2];
   double Hzpzpcoupl[SIZE_HVV][2];
-  double Zpffcoupl[SIZE_Vpff][2];
   double Hwwpcoupl[SIZE_HVV][2];
   double Hwpwpcoupl[SIZE_HVV][2];
-  double Wpffcoupl[SIZE_Vpff][2];
 
   bool separateWWZZcouplings;
-  double M_Zprime;
-  double Ga_Zprime;
-  double M_Wprime;
-  double Ga_Wprime;
 };
 
 class SpinOneCouplings{
@@ -96,12 +87,38 @@ public:
   SpinTwoCouplings* getRef();
 
   void SetGVVCouplings(unsigned int index, double c_real, double c_imag);
+  void SetGVVpCouplings(unsigned int index, double c_real, double c_imag);
+  void SetGVpVpCouplings(unsigned int index, double c_real, double c_imag);
   void SetGQQCouplings(unsigned int index, double c_real, double c_imag);
   void SetGGGCouplings(unsigned int index, double c_real, double c_imag);
 
   double Gvvcoupl[SIZE_GVV][2];
+  double Gvvpcoupl[SIZE_GVV][2];
+  double Gvpvpcoupl[SIZE_GVV][2];
   double Gqqcoupl[SIZE_GQQ][2];
   double Gggcoupl[SIZE_GGG][2];
+};
+
+class VprimeCouplings{
+public:
+  VprimeCouplings();
+  virtual ~VprimeCouplings();
+
+  void reset();
+  void copy(VprimeCouplings& other);
+  VprimeCouplings* getRef();
+
+  void SetVpffCouplings(unsigned int index, double c_real, double c_imag, bool setWpff = false, int whichResonance=1);
+  void SetZPrimeMassWidth(double inmass, double inwidth);
+  void SetWPrimeMassWidth(double inmass, double inwidth);
+
+  double Zpffcoupl[SIZE_Vpff][2];
+  double Wpffcoupl[SIZE_Vpff][2];
+
+  double M_Zprime;
+  double Ga_Zprime;
+  double M_Wprime;
+  double Ga_Wprime;
 };
 
 

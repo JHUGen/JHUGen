@@ -7,6 +7,7 @@
 #include <cassert>
 #include "MELAStreamHelpers.hh"
 #include "TJHUGenUtils.hh"
+#include "TUtilHelpers.hh"
 #include "TUtil.hh"
 #include "TMath.h"
 #include "TLorentzRotation.h"
@@ -2914,6 +2915,9 @@ void TUtil::SetJHUGenDistinguishWWCouplings(bool doAllow){
   int iAllow = (doAllow ? 1 : 0);
   __modjhugenmela_MOD_setdistinguishwwcouplingsflag(&iAllow);
 }
+void TUtil::ResetAmplitudeIncludes(){
+  __modjhugenmela_MOD_resetamplitudeincludes();
+}
 void TUtil::SetMCFMSpinZeroCouplings(bool useBSM, SpinZeroCouplings* Hcouplings, bool forceZZ){
   if (!useBSM){
     spinzerohiggs_anomcoupl_.AllowAnomalousCouplings = 0;
@@ -3547,22 +3551,21 @@ void TUtil::SetMCFMSpinZeroCouplings(bool useBSM, SpinZeroCouplings* Hcouplings,
     /***** END SECOND RESONANCE *****/
   }
 }
-void TUtil::SetJHUGenSpinZeroVVCouplings(double Hvvcoupl[SIZE_HVV][2], int Hvvcoupl_cqsq[SIZE_HVV_CQSQ], double HvvLambda_qsq[SIZE_HVV_LAMBDAQSQ][SIZE_HVV_CQSQ], bool useWWcoupl){
+void TUtil::SetJHUGenSpinZeroVVCouplings(double Hvvcoupl[SIZE_HVV][2], double Hvvpcoupl[SIZE_HVV][2], double Hvpvpcoupl[SIZE_HVV][2], int Hvvcoupl_cqsq[SIZE_HVV_CQSQ], double HvvLambda_qsq[SIZE_HVV_LAMBDAQSQ][SIZE_HVV_CQSQ], bool useWWcoupl){
   const double GeV = 1./100.;
   int iWWcoupl = (useWWcoupl ? 1 : 0);
   for (int c=0; c<SIZE_HVV_LAMBDAQSQ; c++){ for (int k=0; k<SIZE_HVV_CQSQ; k++) HvvLambda_qsq[c][k] *= GeV; } // GeV units in JHUGen
-  __modjhugenmela_MOD_setspinzerovvcouplings(Hvvcoupl, Hvvcoupl_cqsq, HvvLambda_qsq, &iWWcoupl);
-}
-void TUtil::SetJHUGenSpinZeroContactTerms(
-  double Hzzpcoupl[SIZE_HVV][2], double Hzpzpcoupl[SIZE_HVV][2], double Zpffcoupl[SIZE_Vpff][2],
-  double Hwwpcoupl[SIZE_HVV][2], double Hwpwpcoupl[SIZE_HVV][2], double Wpffcoupl[SIZE_Vpff][2]
-  ){
-  __modjhugenmela_MOD_setspinzerocontactterms(Hzzpcoupl, Hzpzpcoupl, Zpffcoupl, Hwwpcoupl, Hwpwpcoupl, Wpffcoupl);
+  __modjhugenmela_MOD_setspinzerovvcouplings(Hvvcoupl, Hvvpcoupl, Hvpvpcoupl, Hvvcoupl_cqsq, HvvLambda_qsq, &iWWcoupl);
 }
 void TUtil::SetJHUGenSpinZeroGGCouplings(double Hggcoupl[SIZE_HGG][2]){ __modjhugenmela_MOD_setspinzeroggcouplings(Hggcoupl); }
 void TUtil::SetJHUGenSpinZeroQQCouplings(double Hqqcoupl[SIZE_HQQ][2]){ __modjhugenmela_MOD_setspinzeroqqcouplings(Hqqcoupl); }
 void TUtil::SetJHUGenSpinOneCouplings(double Zqqcoupl[SIZE_ZQQ][2], double Zvvcoupl[SIZE_ZVV][2]){ __modjhugenmela_MOD_setspinonecouplings(Zqqcoupl, Zvvcoupl); }
-void TUtil::SetJHUGenSpinTwoCouplings(double Gacoupl[SIZE_GGG][2], double Gbcoupl[SIZE_GVV][2], double qLeftRightcoupl[SIZE_GQQ][2]){ __modjhugenmela_MOD_setspintwocouplings(Gacoupl, Gbcoupl, qLeftRightcoupl); }
+void TUtil::SetJHUGenSpinTwoCouplings(double Gacoupl[SIZE_GGG][2], double Gvvcoupl[SIZE_GVV][2], double Gvvpcoupl[SIZE_GVV][2], double Gvpvpcoupl[SIZE_GVV][2], double qLeftRightcoupl[SIZE_GQQ][2]){
+  __modjhugenmela_MOD_setspintwocouplings(Gacoupl, Gvvcoupl, Gvvpcoupl, Gvpvpcoupl, qLeftRightcoupl);
+}
+void TUtil::SetJHUGenVprimeContactCouplings(double Zpffcoupl[SIZE_Vpff][2], double Wpffcoupl[SIZE_Vpff][2]){
+  __modjhugenmela_MOD_setvprimecontactcouplings(Zpffcoupl, Wpffcoupl);
+}
 
 //Make sure
 // 1. tot Energy Sum < 2EBEAM
@@ -7414,9 +7417,8 @@ void TUtil::GetBoostedParticleVectors(
       MELAParticle* Vdau = melaCand->getSortedV(iv);
       if (Vdau!=0){
         int idtmp = Vdau->id;
-        for (int ivd=0; ivd<Vdau->getNDaughters(); ivd++){
-          MELAParticle* Vdau_i = Vdau->getDaughter(ivd);
-          if (Vdau_i!=0 && Vdau_i->passSelection) daughters.push_back(SimpleParticle_t(Vdau_i->id, Vdau_i->p4));
+        for (MELAParticle* Vdau_i:Vdau->getDaughters()){
+          if (Vdau_i && Vdau_i->passSelection) daughters.push_back(SimpleParticle_t(Vdau_i->id, Vdau_i->p4));
         }
         if (idtmp!=0 || Vdau->getNDaughters()>0){ // Avoid "empty" intermediate Vs of the MELACandidate object
           if (Vdau->getNDaughters()>=2 && PDGHelpers::isAPhoton(idtmp)) idtmp=23; // Special case to avoid V->2f with massless decay mode (could happen by mistake)
@@ -7808,26 +7810,26 @@ void TUtil::GetBoostedParticleVectors(
 
   // Fill the ids of the V intermediates to the candidate daughters
   mela_event.intermediateVid.clear();
-  std::copy(idVstar.begin(), idVstar.end(), std::back_inserter(mela_event.intermediateVid));
+  TUtilHelpers::copyVector(idVstar, mela_event.intermediateVid);
   // Fill the mothers
   mela_event.pMothers.clear();
   for (unsigned int ip=0; ip<2; ip++){ mela_event.pMothers.push_back(SimpleParticle_t(motherId[ip], pM[ip])); }
   // Fill the daughters
   mela_event.pDaughters.clear();
-  std::copy(daughters.begin(), daughters.end(), std::back_inserter(mela_event.pDaughters));
+  TUtilHelpers::copyVector(daughters, mela_event.pDaughters);
   // Fill the associated particles
   mela_event.pAssociated.clear();
-  std::copy(associated.begin(), associated.end(), std::back_inserter(mela_event.pAssociated));
+  TUtilHelpers::copyVector(associated, mela_event.pAssociated);
   // Fill the stable tops and antitops
   mela_event.pStableTops.clear();
-  std::copy(stableTops.begin(), stableTops.end(), std::back_inserter(mela_event.pStableTops));
+  TUtilHelpers::copyVector(stableTops, mela_event.pStableTops);
   mela_event.pStableAntitops.clear();
-  std::copy(stableAntitops.begin(), stableAntitops.end(), std::back_inserter(mela_event.pStableAntitops));
+  TUtilHelpers::copyVector(stableAntitops, mela_event.pStableAntitops);
   // Fill the daughters of unstable tops and antitops
   mela_event.pTopDaughters.clear();
-  std::copy(topDaughters.begin(), topDaughters.end(), std::back_inserter(mela_event.pTopDaughters));
+  TUtilHelpers::copyVector(topDaughters, mela_event.pTopDaughters);
   mela_event.pAntitopDaughters.clear();
-  std::copy(antitopDaughters.begin(), antitopDaughters.end(), std::back_inserter(mela_event.pAntitopDaughters));
+  TUtilHelpers::copyVector(antitopDaughters, mela_event.pAntitopDaughters);
 
   // This is the end of one long function.
   if (verbosity>=TVar::DEBUG){

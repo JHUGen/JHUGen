@@ -149,6 +149,18 @@ namespace{
     gGRAVITON_VV_9,
     gGRAVITON_VV_10,
 
+    gGRAVITON_ZA_1,
+    gGRAVITON_ZA_2,
+    gGRAVITON_ZA_3,
+    gGRAVITON_ZA_4,
+    gGRAVITON_ZA_8,
+
+    gGRAVITON_AA_1,
+    gGRAVITON_AA_2,
+    gGRAVITON_AA_3,
+    gGRAVITON_AA_4,
+    gGRAVITON_AA_8,
+
     SIZE_GVV
   };
 }

@@ -11,7 +11,6 @@ public:
   TensorPdfFactory_ppHVV(RooSpin::modelMeasurables measurables_, RooSpin::VdecayType V1decay_=RooSpin::kVdecayType_Zll, RooSpin::VdecayType V2decay_=RooSpin::kVdecayType_Zll, Bool_t OnshellH_=true);
   ~TensorPdfFactory_ppHVV();
 
-  void makeParamsConst(bool yesNo=true);
   void setZZ4fOrdering(bool flag=true);
   RooSpinTwo* getPDF(){ return (RooSpinTwo*)PDF; }
 

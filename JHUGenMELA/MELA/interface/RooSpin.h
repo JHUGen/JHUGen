@@ -67,8 +67,16 @@ public:
     RooAbsReal* gamW;
     RooAbsReal* mZ;
     RooAbsReal* gamZ;
+    RooAbsReal* mWprime;
+    RooAbsReal* gamWprime;
+    RooAbsReal* mZprime;
+    RooAbsReal* gamZprime;
     RooAbsReal* Sin2ThetaW;
     RooAbsReal* vev;
+    RooAbsReal* gVprimeff_decay1_left;
+    RooAbsReal* gVprimeff_decay1_right;
+    RooAbsReal* gVprimeff_decay2_left;
+    RooAbsReal* gVprimeff_decay2_right;
   };
 
   RooSpin();
@@ -89,6 +97,7 @@ public:
 
   virtual void setDecayModes(RooSpin::VdecayType Vdecay1_, RooSpin::VdecayType Vdecay2_){ Vdecay1=Vdecay1_; Vdecay2=Vdecay2_; }
   virtual void getMVGamV(Double_t* mV=0, Double_t* gamV=0) const;
+  virtual void getMVprimeGamVprime(Double_t* mV=0, Double_t* gamV=0) const;
 
   virtual void defaultIntegration(){ intCodeStart=1; }
   virtual void alwaysIntegrate(Int_t code=1);
@@ -112,8 +121,16 @@ protected:
   RooRealProxy gamW;
   RooRealProxy mZ;
   RooRealProxy gamZ;
+  RooRealProxy mWprime;
+  RooRealProxy gamWprime;
+  RooRealProxy mZprime;
+  RooRealProxy gamZprime;
   RooRealProxy Sin2ThetaW;
   RooRealProxy vev;
+  RooRealProxy gVprimeff_decay1_left;
+  RooRealProxy gVprimeff_decay1_right;
+  RooRealProxy gVprimeff_decay2_left;
+  RooRealProxy gVprimeff_decay2_right;
 
   RooSpin::VdecayType Vdecay1;
   RooSpin::VdecayType Vdecay2;
@@ -122,13 +139,20 @@ protected:
   const Double_t GeVunit;
 
   virtual void calculatePropagator(Double_t& propRe, Double_t& propIm, Double_t mass, Int_t propType=1) const;
-  virtual void calculateGVGA(Double_t& gV, Double_t& gA, RooSpin::VdecayType Vdecay, bool isGamma=false) const;
-  virtual void calculateR1R2(Double_t& R1Val, Double_t& R2Val, bool isGammaV1=false, bool isGammaV2=false) const;
-  virtual Double_t calculateAmplitudeScale(bool isGammaV1=false, bool isGammaV2=false) const;
+  virtual void calculateVffGVGA(Double_t& gV, Double_t& gA, RooSpin::VdecayType Vdecay, bool isGamma=false) const;
+  virtual void calculateVffR1R2(Double_t& R1Val, Double_t& R2Val, bool isGammaV1=false, bool isGammaV2=false) const;
+  virtual Double_t calculateAmplitudeScale(int VGammaVpmode1=0, int VGammaVpmode2=0) const;
+
+  virtual void calculateVprimeffGVGA(Double_t& gV, Double_t& gA, int whichVprime/*1 or 2*/) const;
+  virtual void calculateVprimeffR1R2(Double_t& R1Val, Double_t& R2Val) const;
 
   virtual void setProxies(modelMeasurables _measurables);
   virtual void setProxy(RooRealProxy& proxy, RooAbsReal* objectPtr);
   virtual Bool_t checkFundamentalType(const RooRealProxy& proxy) const;
+
+  // Check if some amplitudes are needed, otherwise don't even compute them
+  virtual Bool_t computeNeededAmplitude(int VGammaVpmode1, int VGammaVpmode2) const { return true; }
+
 };
 
 #endif

@@ -26,13 +26,25 @@ RooSpinZero_3D_pp_VH::RooSpinZero_3D_pp_VH(
 {}
 
 
-void RooSpinZero_3D_pp_VH::evaluatePolarizationTerms(Double_t& A00term, Double_t& Appterm, Double_t& Ammterm, Double_t& A00ppterm, Double_t& A00mmterm, Double_t& Appmmterm, const Int_t code, bool isGammaV1, bool isGammaV2) const{
+void RooSpinZero_3D_pp_VH::evaluatePolarizationTerms(
+  Double_t& A00term, Double_t& Appterm, Double_t& Ammterm,
+  Double_t& A00ppterm, Double_t& A00mmterm, Double_t& Appmmterm,
+  const Int_t code,
+  int VGammaVpmode1, int VGammaVpmode2
+) const{
   const Double_t Pi = TMath::Pi();
 
   Double_t R1Val, R2Val;
-  calculateR1R2(R1Val, R2Val, isGammaV1, isGammaV2);
+  calculateVffR1R2(R1Val, R2Val, VGammaVpmode1==1, VGammaVpmode2==1);
+  if (VGammaVpmode1==2 || VGammaVpmode2==2){
+    Double_t RVp1Val=0, RVp2Val=0;
+    calculateVprimeffR1R2(RVp1Val, RVp2Val);
+    if (VGammaVpmode1==2) R1Val=RVp1Val;
+    if (VGammaVpmode2==2) R1Val=RVp2Val;
+  }
+
   Double_t A00Re, A00Im, AppRe, AppIm, AmmRe, AmmIm;
-  calculateAmplitudes(A00Re, A00Im, AppRe, AppIm, AmmRe, AmmIm, isGammaV1, isGammaV2);
+  calculateAmplitudes(A00Re, A00Im, AppRe, AppIm, AmmRe, AmmIm, VGammaVpmode1, VGammaVpmode2);
 
   Double_t A00 = A00Im*A00Im + A00Re*A00Re;
   Double_t App = AppIm*AppIm + AppRe*AppRe;
@@ -168,9 +180,25 @@ Double_t RooSpinZero_3D_pp_VH::evaluate() const{
   Double_t plumi = partonicLuminosity(m1_, Y, sqrts);
 
   Double_t value = 0;
-  Double_t val_A00=0, val_App=0, val_Amm=0, val_A0p=0, val_A0m=0, val_Amp=0;
-  evaluatePolarizationTerms(val_A00, val_App, val_Amm, val_A0p, val_A0m, val_Amp, code);
-  value = val_A00 + val_App + val_Amm + val_A0p + val_A0m + val_Amp;
+  for (int VGammaVpmode1=0; VGammaVpmode1<=2; VGammaVpmode1++){
+    for (int VGammaVpmode2=0; VGammaVpmode2<=2; VGammaVpmode2++){
+      if (!(
+        Vdecay1!=RooSpin::kVdecayType_GammaOnshell
+        &&
+        (VGammaVpmode2==1 || Vdecay2!=RooSpin::kVdecayType_GammaOnshell)
+        )
+        ||
+        VGammaVpmode1==1
+        ||
+        (VGammaVpmode1==2 && VGammaVpmode2==1)
+        ||
+        !computeNeededAmplitude(VGammaVpmode1, VGammaVpmode2)
+        ) continue;
+      Double_t val_A00=0, val_App=0, val_Amm=0, val_A0p=0, val_A0m=0, val_Amp=0;
+      evaluatePolarizationTerms(val_A00, val_App, val_Amm, val_A0p, val_A0m, val_Amp, code, VGammaVpmode1, VGammaVpmode2);
+      value += val_A00 + val_App + val_Amm + val_A0p + val_A0m + val_Amp;
+    }
+  }
   value *= betaVal*term1Coeff*term2Coeff*plumi;
   return value;
 }
@@ -202,9 +230,28 @@ Double_t RooSpinZero_3D_pp_VH::analyticalIntegral(Int_t code, const char* /*rang
   Double_t plumi = partonicLuminosity(m1_, Y, sqrts);
 
   Double_t value = 0;
-  Double_t val_A00=0, val_App=0, val_Amm=0, val_A0p=0, val_A0m=0, val_Amp=0;
-  evaluatePolarizationTerms(val_A00, val_App, val_Amm, val_A0p, val_A0m, val_Amp, code);
-  value = val_A00 + val_App + val_Amm + val_A0p + val_A0m + val_Amp;
+  for (int VGammaVpmode1=0; VGammaVpmode1<=2; VGammaVpmode1++){
+    for (int VGammaVpmode2=0; VGammaVpmode2<=2; VGammaVpmode2++){
+      if (!(
+        (VGammaVpmode1==0 && VGammaVpmode2==0 && Vdecay1!=RooSpin::kVdecayType_GammaOnshell && Vdecay2!=RooSpin::kVdecayType_GammaOnshell)
+        ||
+        (VGammaVpmode1==0 && VGammaVpmode2==1 && Vdecay1!=RooSpin::kVdecayType_GammaOnshell)
+        ||
+        (VGammaVpmode1==1 && VGammaVpmode2==0 && Vdecay2!=RooSpin::kVdecayType_GammaOnshell)
+        ||
+        (VGammaVpmode1==1 && VGammaVpmode2==1)
+        ||
+        (VGammaVpmode1==0 && VGammaVpmode2==2 && Vdecay1!=RooSpin::kVdecayType_GammaOnshell && Vdecay2!=RooSpin::kVdecayType_GammaOnshell)
+        ||
+        (VGammaVpmode1==2 && VGammaVpmode2==0 && Vdecay1!=RooSpin::kVdecayType_GammaOnshell && Vdecay2!=RooSpin::kVdecayType_GammaOnshell)
+        ||
+        (VGammaVpmode1==2 && VGammaVpmode2==2 && Vdecay1!=RooSpin::kVdecayType_GammaOnshell && Vdecay2!=RooSpin::kVdecayType_GammaOnshell)
+        )) continue;
+      Double_t val_A00=0, val_App=0, val_Amm=0, val_A0p=0, val_A0m=0, val_Amp=0;
+      evaluatePolarizationTerms(val_A00, val_App, val_Amm, val_A0p, val_A0m, val_Amp, code, VGammaVpmode1, VGammaVpmode2);
+      value += val_A00 + val_App + val_Amm + val_A0p + val_A0m + val_Amp;
+    }
+  }
   value *= betaVal*term1Coeff*term2Coeff*plumi;
   return value;
 }

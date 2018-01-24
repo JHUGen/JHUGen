@@ -9,8 +9,11 @@ ScalarPdfFactory(measurables_, acceptance_, V1decay_, V2decay_, OnshellH_)
   makeParamsConst(true);
   initPDF();
 }
-ScalarPdfFactory_HVV::ScalarPdfFactory_HVV(RooSpinZero::modelMeasurables measurables_, double gRatio_[4][8], double gZGsRatio_[4][1], double gGsGsRatio_[3][1], bool pmf_applied_, bool acceptance_, RooSpin::VdecayType V1decay_, RooSpin::VdecayType V2decay_, Bool_t OnshellH_) :
-ScalarPdfFactory(measurables_, gRatio_, gZGsRatio_, gGsGsRatio_, pmf_applied_, acceptance_, V1decay_, V2decay_, OnshellH_)
+ScalarPdfFactory_HVV::ScalarPdfFactory_HVV(
+  RooSpinZero::modelMeasurables measurables_,
+  double gRatio_[4][8], double gZGsRatio_[4][1], double gGsGsRatio_[3][1], double gVVpRatio_[1][1], double gVpVpRatio_[1][1],
+  bool pmf_applied_, bool acceptance_, RooSpin::VdecayType V1decay_, RooSpin::VdecayType V2decay_, Bool_t OnshellH_
+) : ScalarPdfFactory(measurables_, gRatio_, gZGsRatio_, gGsGsRatio_, gVVpRatio_, gVpVpRatio_, pmf_applied_, acceptance_, V1decay_, V2decay_, OnshellH_)
 {
   measurables.Y=0;
   initAcceptanceParams();
@@ -144,23 +147,7 @@ void ScalarPdfFactory_HVV::destroyAcceptanceParams(){
 }
 
 void ScalarPdfFactory_HVV::makeParamsConst(bool yesNo){
-  couplings.Lambda->setConstant(true);
-  couplings.Lambda_zgs1->setConstant(true);
-  couplings.Lambda_z1->setConstant(true);
-  couplings.Lambda_z2->setConstant(true);
-  couplings.Lambda_z3->setConstant(true);
-  couplings.Lambda_z4->setConstant(true);
-  couplings.Lambda_Q->setConstant(true);
-
-  ((RooRealVar*)parameters.mX)->setConstant(yesNo);
-  ((RooRealVar*)parameters.gamX)->setConstant(yesNo);
-  ((RooRealVar*)parameters.mW)->setConstant(yesNo);
-  ((RooRealVar*)parameters.gamW)->setConstant(yesNo);
-  ((RooRealVar*)parameters.mZ)->setConstant(yesNo);
-  ((RooRealVar*)parameters.gamZ)->setConstant(yesNo);
-  ((RooRealVar*)parameters.Sin2ThetaW)->setConstant(yesNo);
-  ((RooRealVar*)parameters.vev)->setConstant(yesNo);
-
+  SpinPdfFactory::makeParamsConst(yesNo);
   if (acceptance && !yesNo){
     accepParams.aPhi->setConstant(kFALSE);
     accepParams.bPhi->setConstant(kFALSE);

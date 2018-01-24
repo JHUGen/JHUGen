@@ -9,8 +9,16 @@ acceptance(acceptance_)
 {
   initGVals();
 }
-ScalarPdfFactory::ScalarPdfFactory(RooSpin::modelMeasurables measurables_, double gRatio_[4][8], double gZGsRatio_[4][1], double gGsGsRatio_[3][1], bool pmf_applied_, bool acceptance_, RooSpin::VdecayType V1decay_, RooSpin::VdecayType V2decay_, Bool_t OnshellH_) :
-SpinPdfFactory(measurables_, V1decay_, V2decay_, OnshellH_),
+ScalarPdfFactory::ScalarPdfFactory(
+  RooSpin::modelMeasurables measurables_,
+  double gRatio_[4][8],
+  double gZGsRatio_[4][1],
+  double gGsGsRatio_[3][1],
+  double gVVpRatio_[1][1],
+  double gVpVpRatio_[1][1],
+  bool pmf_applied_, bool acceptance_,
+  RooSpin::VdecayType V1decay_, RooSpin::VdecayType V2decay_, Bool_t OnshellH_
+) : SpinPdfFactory(measurables_, V1decay_, V2decay_, OnshellH_),
 parameterization(1),
 pmf_applied(pmf_applied_),
 acceptance(acceptance_)
@@ -21,12 +29,15 @@ acceptance(acceptance_)
       if (k==0){
         gZGsRatio[v][k] = gZGsRatio_[v][k];
         if (v>0) gGsGsRatio[v-1][k] = gGsGsRatio_[v-1][k];
+        if (v==0){
+          gVVpRatio[v][k]=gVVpRatio_[v][k];
+          gVpVpRatio[v][k]=gVVpRatio_[v][k];
+        }
       }
     }
   }
   initGVals();
 }
-
 ScalarPdfFactory::~ScalarPdfFactory(){
   destroyGVals();
 }
@@ -42,6 +53,10 @@ void ScalarPdfFactory::initFractionsPhases(){
         if (v==0) gZGsRatioVal[v][k] = new RooRealVar(Form("gzgs%i_%iMixVal", v+1, k+2), Form("gzgs%i_%iMixVal", v+1, k+2), gZGsRatio[v][k]);
         else gZGsRatioVal[v][k] = new RooRealVar(Form("gzgs%i_%iMixVal", v+1, k), Form("gzgs%i_%iMixVal", v+1, k), gZGsRatio[v][k]);
         if (v>0) gGsGsRatioVal[v-1][k] = new RooRealVar(Form("ggsgs%i_%iMixVal", v+1, k), Form("ggsgs%i_%iMixVal", v+1, k), gGsGsRatio[v-1][k]);
+        if (v==0){
+          gVVpRatioVal[v][k] = new RooRealVar(Form("gvvp%i_%iMixVal", v+1, k), Form("gvvp%i_%iMixVal", v+1, k), gVVpRatio[v][k]);
+          gVpVpRatioVal[v][k] = new RooRealVar(Form("gvpvp%i_%iMixVal", v+1, k), Form("gvpvp%i_%iMixVal", v+1, k), gVpVpRatio[v][k]);
+        }
       }
 
     }
@@ -134,6 +149,20 @@ void ScalarPdfFactory::initFractionsPhases(){
       gBareFracList.add(*(ggsgs4Frac[v]));
     }
 
+    if (v==0){ // ghzzp1/ghwwp1 and ghzpzp1/ghwpwp1
+      strcore = "gvvp1";
+      strcore.Append(strapp);
+      if (gVVpRatio[0][v]!=0) gvvp1Frac[v] = new RooRealVar(strcore, strcore, 0, firstFracVal, 1);
+      else gvvp1Frac[v] = new RooRealVar(strcore, strcore, 0);
+      gBareFracList.add(*(gvvp1Frac[v]));
+
+      strcore = "gvpvp1";
+      strcore.Append(strapp);
+      if (gVpVpRatio[0][v]!=0) gvpvp1Frac[v] = new RooRealVar(strcore, strcore, 0, firstFracVal, 1);
+      else gvpvp1Frac[v] = new RooRealVar(strcore, strcore, 0);
+      gBareFracList.add(*(gvpvp1Frac[v]));
+    }
+
     if (v>0){
       strcore = "g1";
       strcore.Append(strappPhase);
@@ -192,7 +221,20 @@ void ScalarPdfFactory::initFractionsPhases(){
       if (gGsGsRatioVal[2][v]!=0) ggsgs4Phase[v] = new RooRealVar(strcore, strcore, 0, -phaseBound, phaseBound);
       else ggsgs4Phase[v] = new RooRealVar(strcore, strcore, 0);
     }
+
+    if (v==0){ // ghzzp1/ghwwp1 and ghzpzp1/ghwpwp1
+      strcore = "gvvp1";
+      strcore.Append(strappPhase);
+      if (gVVpRatio[0][v]!=0) gvvp1Phase[v] = new RooRealVar(strcore, strcore, 0, -phaseBound, phaseBound);
+      else gvvp1Phase[v] = new RooRealVar(strcore, strcore, 0);
+
+      strcore = "gvpvp1";
+      strcore.Append(strappPhase);
+      if (gVpVpRatio[0][v]!=0) gvpvp1Phase[v] = new RooRealVar(strcore, strcore, 0, -phaseBound, phaseBound);
+      else gvpvp1Phase[v] = new RooRealVar(strcore, strcore, 0);
+    }
   }
+
   TString sumFormula = "(";
   for (int gg=0; gg<gBareFracList.getSize(); gg++){
     TString bareFormula = "abs(@";
@@ -277,6 +319,18 @@ void ScalarPdfFactory::initFractionsPhases(){
       strcore.Append(strapp);
       RooArgList tmpArg_gsgs4(*(ggsgs4Frac[v]), *gFracSum);
       ggsgs4FracInterp[v] = new RooFormulaVar(strcore, strcore, "(@1>1 ? 0. : @0)", tmpArg_gsgs4);
+    }
+
+    if (v==0){ // ghzzp1/ghwwp1 and ghzpzp1/ghwpwp1
+      strcore = "gvvp1";
+      strcore.Append(strapp);
+      RooArgList tmpArg_vvp1(*(gvvp1Frac[v]), *gFracSum);
+      gvvp1FracInterp[v] = new RooFormulaVar(strcore, strcore, "(@1>1 ? 0. : @0)", tmpArg_vvp1);
+
+      strcore = "gvpvp1";
+      strcore.Append(strapp);
+      RooArgList tmpArg_vpvp1(*(gvpvp1Frac[v]), *gFracSum);
+      gvpvp1FracInterp[v] = new RooFormulaVar(strcore, strcore, "(@1>1 ? 0. : @0)", tmpArg_vpvp1);
     }
   }
   for (int v=0; v<8; v++){
@@ -364,9 +418,7 @@ void ScalarPdfFactory::initFractionsPhases(){
         else strFormulagzgs4.Append("*sin(@2)");
         RooFormulaVar* gzgs4Val = new RooFormulaVar(strcore, strcore, strFormulagzgs4, tmpArg_zgs4);
         couplings.gzgs4List[v][im] = (RooAbsReal*)gzgs4Val;
-      }
 
-      if (v==0){
         strcore = "ggsgs2";
         strcore.Append(strapp);
         RooArgList tmpArg_gsgs2(*(gGsGsRatioVal[0][v]), *(ggsgs2FracInterp[v]), *(ggsgs2Phase[v]));
@@ -393,6 +445,25 @@ void ScalarPdfFactory::initFractionsPhases(){
         else strFormulaggsgs4.Append("*sin(@2)");
         RooFormulaVar* ggsgs4Val = new RooFormulaVar(strcore, strcore, strFormulaggsgs4, tmpArg_gsgs4);
         couplings.ggsgs4List[v][im] = (RooAbsReal*)ggsgs4Val;
+
+        // ghzzp1/ghwwp1 and ghzpzp1/ghwpwp1
+        strcore = "gvvp1";
+        strcore.Append(strapp);
+        RooArgList tmpArg_vvp1(*(gVVpRatioVal[0][v]), *(gvvp1FracInterp[v]), *(gvvp1Phase[v]));
+        TString strFormulagvvp1 = "@0*sqrt(@1)";
+        if (im==0) strFormulagvvp1.Append("*cos(@2)");
+        else strFormulagvvp1.Append("*sin(@2)");
+        RooFormulaVar* gvvp1Val = new RooFormulaVar(strcore, strcore, strFormulagvvp1, tmpArg_vvp1);
+        couplings.gvvp1List[v][im] = (RooAbsReal*) gvvp1Val;
+
+        strcore = "gvpvp1";
+        strcore.Append(strapp);
+        RooArgList tmpArg_vpvp1(*(gVpVpRatioVal[0][v]), *(gvpvp1FracInterp[v]), *(gvpvp1Phase[v]));
+        TString strFormulagvpvp1 = "@0*sqrt(@1)";
+        if (im==0) strFormulagvpvp1.Append("*cos(@2)");
+        else strFormulagvpvp1.Append("*sin(@2)");
+        RooFormulaVar* gvpvp1Val = new RooFormulaVar(strcore, strcore, strFormulagvpvp1, tmpArg_vpvp1);
+        couplings.gvpvp1List[v][im] = (RooAbsReal*) gvpvp1Val;
       }
 
     }
@@ -523,7 +594,23 @@ void ScalarPdfFactory::initGVals(){
           ggsgs4Val->removeMin();
           ggsgs4Val->removeMax();
           couplings.ggsgs4List[v][im] = (RooAbsReal*)ggsgs4Val;
+        
+          // ghzzp1/ghwwp1 and ghzpzp1/ghwpwp1
+          strcore = "gvvp1";
+          strcore.Append(strapp);
+          RooRealVar* gvvp1Val = new RooRealVar(strcore, strcore, 0, -1e15, 1e15);
+          gvvp1Val->removeMin();
+          gvvp1Val->removeMax();
+          couplings.gvvp1List[v][im] = (RooAbsReal*) gvvp1Val;
+
+          strcore = "gvpvp1";
+          strcore.Append(strapp);
+          RooRealVar* gvpvp1Val = new RooRealVar(strcore, strcore, 0, -1e15, 1e15);
+          gvpvp1Val->removeMin();
+          gvpvp1Val->removeMax();
+          couplings.gvpvp1List[v][im] = (RooAbsReal*) gvpvp1Val;
         }
+
       }
     }
   }
@@ -546,6 +633,8 @@ void ScalarPdfFactory::destroyFractionsPhases(){
       delete ggsgs2FracInterp[v];
       delete ggsgs3FracInterp[v];
       delete ggsgs4FracInterp[v];
+      delete gvvp1FracInterp[v];
+      delete gvpvp1FracInterp[v];
     }
   }
   delete gFracSum;
@@ -578,6 +667,10 @@ void ScalarPdfFactory::destroyFractionsPhases(){
       delete ggsgs2Phase[v];
       delete ggsgs3Phase[v];
       delete ggsgs4Phase[v];
+      delete gvvp1Frac[v];
+      delete gvpvp1Frac[v];
+      delete gvvp1Phase[v];
+      delete gvpvp1Phase[v];
     }
   }
   for (int gg=0; gg<4; gg++){
@@ -586,6 +679,10 @@ void ScalarPdfFactory::destroyFractionsPhases(){
       if (v==0){
         delete gZGsRatioVal[gg][v];
         if (gg>0) delete gGsGsRatioVal[gg-1][v];
+        if (gg==0){
+          delete gVVpRatioVal[gg][v];
+          delete gVpVpRatioVal[gg][v];
+        }
       }
     }
   }
@@ -609,6 +706,10 @@ void ScalarPdfFactory::destroyGVals(){
         delete couplings.ggsgs3List[v][im];
         delete couplings.ggsgs4List[v][im];
       }
+      if (v==0){
+        delete couplings.gvvp1List[v][im];
+        delete couplings.gvpvp1List[v][im];
+      }
     }
   }
   if (parameterization!=0) destroyFractionsPhases();
@@ -629,8 +730,8 @@ void ScalarPdfFactory::destroyGVals(){
 }
 
 void ScalarPdfFactory::addHypothesis(int ig, int ilam, double iphase, double altparam_fracval){
-  if ((ig==4 && ilam!=2) || (ig>4 && ilam!=0)){ cerr << "Invalid ZG/GG g" << ig << "_prime" << ilam << endl; return; }
-  if (ig>=11 || ig<0){ cerr << "Invalid g" << ig << endl; return; }
+  if ((ig==4 && ilam!=2) || (ig>4 && ilam!=0)){ cerr << "Invalid ZG/GG/VVp/VpVp g" << ig << "_prime" << ilam << endl; return; }
+  if (ig>=16 || ig<0 || (ig<15 && ig>11)){ cerr << "Invalid g" << ig << endl; return; }
   if (ilam>=8 || ilam<0){ cerr << "Out-of-range g" << ig << "_prime" << ilam << endl; return; }
 
   if (parameterization==0){
@@ -713,10 +814,18 @@ void ScalarPdfFactory::addHypothesis(int ig, int ilam, double iphase, double alt
       ((RooRealVar*)couplings.ggsgs4List[ilam][0])->setVal(initval*cos(iphase));
       ((RooRealVar*)couplings.ggsgs4List[ilam][1])->setVal(initval*sin(iphase));
     }
+    else if (ig==11){
+      ((RooRealVar*) couplings.gvvp1List[ilam][0])->setVal(initval*cos(iphase));
+      ((RooRealVar*) couplings.gvvp1List[ilam][1])->setVal(initval*sin(iphase));
+    }
+    else if (ig==15){
+      ((RooRealVar*) couplings.gvpvp1List[ilam][0])->setVal(initval*cos(iphase));
+      ((RooRealVar*) couplings.gvpvp1List[ilam][1])->setVal(initval*sin(iphase));
+    }
   }
   else{
     if (ig==0 && ilam==0){ cerr << "Cannot set fa1! Try to set everything else." << endl; return; }
-    else if (ig>4 && ilam!=0){ cerr << "Cannot set fa1 for the g_primes of ZG or GG! Try to set everything else." << endl; return; }
+    else if (ig>4 && ilam!=0){ cerr << "Cannot set fa1 for the g_primes of ZG, GG, VVp or VpVp! Try to set everything else." << endl; return; }
     else if (ig==4 && ilam!=2){ cerr << "Cannot set fa1 for the g_primes of ZG or GG! Try to set everything else." << endl; return; }
     else{
       if (ig==0){
@@ -763,6 +872,14 @@ void ScalarPdfFactory::addHypothesis(int ig, int ilam, double iphase, double alt
         ggsgs4Frac[ilam]->setVal(altparam_fracval);
         ggsgs4Phase[ilam]->setVal(iphase);
       }
+      else if (ig==11){
+        gvvp1Frac[ilam]->setVal(altparam_fracval);
+        gvvp1Phase[ilam]->setVal(iphase);
+      }
+      else if (ig==15){
+        gvpvp1Frac[ilam]->setVal(altparam_fracval);
+        gvpvp1Phase[ilam]->setVal(iphase);
+      }
     }
   }
 }
@@ -785,6 +902,8 @@ void ScalarPdfFactory::resetHypotheses(){
           ((RooRealVar*)couplings.ggsgs2List[ilam][im])->setVal(0.);
           ((RooRealVar*)couplings.ggsgs3List[ilam][im])->setVal(0.);
           ((RooRealVar*)couplings.ggsgs4List[ilam][im])->setVal(0.);
+          ((RooRealVar*)couplings.gvvp1List[ilam][im])->setVal(0.);
+          ((RooRealVar*)couplings.gvpvp1List[ilam][im])->setVal(0.);
         }
       }
     }
@@ -819,6 +938,10 @@ void ScalarPdfFactory::resetHypotheses(){
           ggsgs3Phase[ilam]->setVal(0.);
           ggsgs4Frac[ilam]->setVal(0.);
           ggsgs4Phase[ilam]->setVal(0.);
+          gvvp1Frac[ilam]->setVal(0.);
+          gvvp1Phase[ilam]->setVal(0.);
+          gvpvp1Frac[ilam]->setVal(0.);
+          gvpvp1Phase[ilam]->setVal(0.);
         }
       }
     }
@@ -851,6 +974,8 @@ void ScalarPdfFactory::makeCouplingsConst(bool yesNo){
           ((RooRealVar*)couplings.ggsgs2List[ig][im])->setConstant(yesNo);
           ((RooRealVar*)couplings.ggsgs3List[ig][im])->setConstant(yesNo);
           ((RooRealVar*)couplings.ggsgs4List[ig][im])->setConstant(yesNo);
+          ((RooRealVar*)couplings.gvvp1List[ig][im])->setConstant(yesNo);
+          ((RooRealVar*)couplings.gvpvp1List[ig][im])->setConstant(yesNo);
         }
       }
     }
@@ -891,6 +1016,10 @@ void ScalarPdfFactory::makeCouplingsConst(bool yesNo){
         ggsgs3Phase[ilam]->setConstant(yesNo);
         ggsgs4Frac[ilam]->setConstant(yesNo);
         ggsgs4Phase[ilam]->setConstant(yesNo);
+        gvvp1Frac[ilam]->setConstant(yesNo);
+        gvvp1Phase[ilam]->setConstant(yesNo);
+        gvpvp1Frac[ilam]->setConstant(yesNo);
+        gvpvp1Phase[ilam]->setConstant(yesNo);
       }
     }
   }
