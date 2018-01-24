@@ -57,9 +57,50 @@
       endif
       do i1=1,2;  do i2=1,2;  do i3=1,2;  do i4=1,2!  sum over helicities
          call calcHelAmp_gg(ordering,VVMode,p(1:4,1:6),MY_IDUP,i1,i2,i3,i4,A_VV(1))
+         if( VVMode.eq.ZZMode ) then
+            if( includeGammaStar ) then
+               call calcHelAmp_gg(ordering,ZgsMode,p(1:4,1:6),MY_IDUP,i1,i2,i3,i4,A_VV(3))
+               call calcHelAmp_gg(ordering,gsZMode,p(1:4,1:6),MY_IDUP,i1,i2,i3,i4,A_VV(5))
+               call calcHelAmp_gg(ordering,gsgsMode,p(1:4,1:6),MY_IDUP,i1,i2,i3,i4,A_VV(7))
+            endif
+            if( includeVprime ) then
+               call calcHelAmp_gg(ordering,ZZpMode,p(1:4,1:6),MY_IDUP,i1,i2,i3,i4,A_VV(9))
+               call calcHelAmp_gg(ordering,ZpZMode,p(1:4,1:6),MY_IDUP,i1,i2,i3,i4,A_VV(11))
+               call calcHelAmp_gg(ordering,ZpZpMode,p(1:4,1:6),MY_IDUP,i1,i2,i3,i4,A_VV(13))
+            endif
+            if( includeGammaStar .and. includeVprime ) then
+               call calcHelAmp_gg(ordering,gsZpMode,p(1:4,1:6),MY_IDUP,i1,i2,i3,i4,A_VV(15))
+               call calcHelAmp_gg(ordering,ZpgsMode,p(1:4,1:6),MY_IDUP,i1,i2,i3,i4,A_VV(17))
+            endif
+         elseif( VVMode.eq.ZgMode ) then
+            if(includeGammaStar) then
+               call calcHelAmp_gg(ordering,gsgMode,p(1:4,1:6),MY_IDUP,i1,i2,i3,i4,A_VV(3))
+            endif
+            if( includeVprime ) then
+               call calcHelAmp_gg(ordering,ZpgMode,p(1:4,1:6),MY_IDUP,i1,i2,i3,i4,A_VV(5))
+            endif
+         elseif( VVMode.eq.WWMode .and. includeVprime ) then
+            call calcHelAmp_gg(ordering,WWpMode,p(1:4,1:6),MY_IDUP,i1,i2,i3,i4,A_VV(9))
+            call calcHelAmp_gg(ordering,WpWMode,p(1:4,1:6),MY_IDUP,i1,i2,i3,i4,A_VV(11))
+            call calcHelAmp_gg(ordering,WpWpMode,p(1:4,1:6),MY_IDUP,i1,i2,i3,i4,A_VV(13))
+         endif
 
          if( doInterference ) then
             call calcHelAmp_gg(ordering_swap,VVMode_swap,p(1:4,1:6),MY_IDUP,i1,i2,i3,i4,A_VV(2))
+            if( includeGammaStar ) then
+               call calcHelAmp_gg(ordering_swap,ZgsMode,p(1:4,1:6),MY_IDUP,i1,i2,i3,i4,A_VV(4))
+               call calcHelAmp_gg(ordering_swap,gsZMode,p(1:4,1:6),MY_IDUP,i1,i2,i3,i4,A_VV(6))
+               call calcHelAmp_gg(ordering_swap,gsgsMode,p(1:4,1:6),MY_IDUP,i1,i2,i3,i4,A_VV(8))
+            endif
+            if( includeVprime ) then
+               call calcHelAmp_gg(ordering_swap,ZZpMode,p(1:4,1:6),MY_IDUP,i1,i2,i3,i4,A_VV(10))
+               call calcHelAmp_gg(ordering_swap,ZpZMode,p(1:4,1:6),MY_IDUP,i1,i2,i3,i4,A_VV(12))
+               call calcHelAmp_gg(ordering_swap,ZpZpMode,p(1:4,1:6),MY_IDUP,i1,i2,i3,i4,A_VV(14))
+            endif
+            if( includeGammaStar .and. includeVprime ) then
+               call calcHelAmp_gg(ordering_swap,gsZpMode,p(1:4,1:6),MY_IDUP,i1,i2,i3,i4,A_VV(16))
+               call calcHelAmp_gg(ordering_swap,ZpgsMode,p(1:4,1:6),MY_IDUP,i1,i2,i3,i4,A_VV(18))
+            endif
          endif
 
          A0_VV(1) = A_VV(1)+A_VV(3)+A_VV(5)+A_VV(7)+A_VV(9)+A_VV(11)+A_VV(13)+A_VV(15)+A_VV(17) ! 3456 pieces
@@ -131,12 +172,15 @@
       complex(dp) :: e1(4),e2(4),e3(4),e4(4)
       complex(dp) :: xxx1,xxx2,xxx3,xxx4,yyy1,yyy2,yyy3,yyy4,yyy41,yyy42,yyy5,yyy6
       complex(dp) :: yyy7,abr1
+      complex(dp) :: b_dyn(1:10)
       real(dp) :: q34,MZ3,MZ4,MG
       logical :: new
       real(dp) :: rr_gam, rr
 
 
       new = .true.
+
+      b_dyn(:)=czero
 
       q1 = dcmplx(p(1,:),0d0)
       q2 = dcmplx(p(2,:),0d0)
@@ -199,24 +243,72 @@
       ! for gluon gauge invariance check the terms ~c3,c4 are needed because e1.q2 is not zero for e1-->q1
 
       if (generate_bis) then
-          rr = q34/Lambda**2! kappa for FS
+         rr = q34/Lambda**2! kappa for FS
 
-          yyy1 = q34*( b1 + b2*rr*(one+MZ3**2/q34)*(one+MZ4**2/q34) )
-          yyy2 = -b1/two + b3*rr*(1d0-(MZ3**2+MZ4**2)/(2d0*q34)) + two*b4*rr
-          yyy3 = (-b2/two - b3- two*b4)*rr/q34
-          yyy41 = -b1 - b2*(q34+MZ3**2)/Lambda**2 - b3*MZ4**2/Lambda**2
-          yyy42 = -b1 - b2*(q34+MZ4**2)/Lambda**2 - b3*MZ3**2/Lambda**2
-          yyy5 = two*b8*rr*MG**2/q34
-          yyy6 = czero
-          yyy7 = czero
-          if(VVMode.eq.ZZMode .or. VVMode.eq.WWMode) then
-             yyy1 = yyy1 + b5*M_V**2
-             yyy2 = yyy2 + b7*rr*M_V**2/q34
-             yyy41 = yyy41 - 2d0*b6*M_V**2/Lambda**2
-             yyy42 = yyy42 - 2d0*b6*M_V**2/Lambda**2
-             yyy6 = b9 * M_V**2/Lambda**2
-             yyy7 = b10 * MG**2 * M_V**2/Lambda**4
-          endif
+         if( (VVMode.eq.ZZMode) .or. (VVMode.eq.WWMode)  ) then! decay ZZ's or WW's
+            b_dyn(1)=b1
+            b_dyn(2)=b2
+            b_dyn(3)=b3
+            b_dyn(4)=b4
+            b_dyn(5)=b5
+            b_dyn(6)=b6
+            b_dyn(7)=b7
+            b_dyn(8)=b8
+            b_dyn(9)=b9
+            b_dyn(10)=b10
+         elseif( (VVMode.eq.ZgMode) .OR. (VVMode.eq.gsZMode) .OR. (VVMode.eq.ZgsMode) ) then
+            b_dyn(1)=bzgs1
+            b_dyn(2)=bzgs2
+            b_dyn(3)=bzgs3
+            b_dyn(4)=bzgs4
+            b_dyn(8)=bzgs8
+         elseif( (VVMode.eq.ggMode) .or. (VVMode.eq.gsgsMode)  .or. (VVMode.eq.gsgMode) ) then
+            b_dyn(1)=bgsgs1
+            b_dyn(2)=bgsgs2
+            b_dyn(3)=bgsgs3
+            b_dyn(4)=bgsgs4
+            b_dyn(8)=bgsgs8
+         elseif( (VVMode.eq.ZZpMode) .or. (VVMode.eq.WWpMode) .or. (VVMode.eq.ZpZMode) .or. (VVMode.eq.WpWMode) ) then
+            b_dyn(1)=bzzp1
+            b_dyn(2)=bzzp2
+            b_dyn(3)=bzzp3
+            b_dyn(4)=bzzp4
+            b_dyn(5)=bzzp5
+            b_dyn(6)=bzzp6
+            b_dyn(7)=bzzp7
+            b_dyn(8)=bzzp8
+            b_dyn(9)=bzzp9
+            b_dyn(10)=bzzp10
+         elseif( (VVMode.eq.ZpZpMode) .or. (VVMode.eq.WpWpMode) ) then
+            b_dyn(1)=bzpzp1
+            b_dyn(2)=bzpzp2
+            b_dyn(3)=bzpzp3
+            b_dyn(4)=bzpzp4
+            b_dyn(5)=bzpzp5
+            b_dyn(6)=bzpzp6
+            b_dyn(7)=bzpzp7
+            b_dyn(8)=bzpzp8
+            b_dyn(9)=bzpzp9
+            b_dyn(10)=bzpzp10
+         elseif( (VVMode.eq.ZpgMode) .OR. (VVMode.eq.gsZpMode) .OR. (VVMode.eq.ZpgsMode) ) then
+            b_dyn(1)=bzpgs1
+            b_dyn(2)=bzpgs2
+            b_dyn(3)=bzpgs3
+            b_dyn(4)=bzpgs4
+            b_dyn(8)=bzpgs8
+         else
+            print *,"VVMode",VVMode,"not implemented"
+         endif
+
+          yyy1 = q34*( b_dyn(1) + b_dyn(2)*rr*(one+MZ3**2/q34)*(one+MZ4**2/q34) ) + b_dyn(5)*M_V**2
+          yyy2 = -b_dyn(1)/two + b_dyn(3)*rr*(1d0-(MZ3**2+MZ4**2)/(2d0*q34)) + two*b_dyn(4)*rr + b_dyn(7)*rr*M_V**2/q34
+          yyy3 = (-b_dyn(2)/two - b_dyn(3)- two*b_dyn(4))*rr/q34
+          yyy41 = -b_dyn(1) - b_dyn(2)*(q34+MZ3**2)/Lambda**2 - b_dyn(3)*MZ4**2/Lambda**2 - 2d0*b_dyn(6)*M_V**2/Lambda**2
+          yyy42 = -b_dyn(1) - b_dyn(2)*(q34+MZ4**2)/Lambda**2 - b_dyn(3)*MZ3**2/Lambda**2 - 2d0*b_dyn(6)*M_V**2/Lambda**2
+          yyy5 = two*b_dyn(8)*rr*MG**2/q34
+          yyy6 = b_dyn(9) * M_V**2/Lambda**2
+          yyy7 = b_dyn(10) * MG**2 * M_V**2/Lambda**4
+
       else
           yyy1 = q34*c1/2d0
           yyy2 = c2
@@ -796,9 +888,50 @@
       endif
       do i1=1,2;  do i3=1,2;  do i4=1,2!  sum over helicities
          call calcHelAmp_qq(ordering,VVMode,p(1:4,1:6),MY_IDUP,i1,i3,i4,A_VV(1))
+         if( VVMode.eq.ZZMode ) then
+            if( includeGammaStar ) then
+               call calcHelAmp_qq(ordering,ZgsMode,p(1:4,1:6),MY_IDUP,i1,i3,i4,A_VV(3))
+               call calcHelAmp_qq(ordering,gsZMode,p(1:4,1:6),MY_IDUP,i1,i3,i4,A_VV(5))
+               call calcHelAmp_qq(ordering,gsgsMode,p(1:4,1:6),MY_IDUP,i1,i3,i4,A_VV(7))
+            endif
+            if( includeVprime ) then
+               call calcHelAmp_qq(ordering,ZZpMode,p(1:4,1:6),MY_IDUP,i1,i3,i4,A_VV(9))
+               call calcHelAmp_qq(ordering,ZpZMode,p(1:4,1:6),MY_IDUP,i1,i3,i4,A_VV(11))
+               call calcHelAmp_qq(ordering,ZpZpMode,p(1:4,1:6),MY_IDUP,i1,i3,i4,A_VV(13))
+            endif
+            if( includeGammaStar .and. includeVprime ) then
+               call calcHelAmp_qq(ordering,gsZpMode,p(1:4,1:6),MY_IDUP,i1,i3,i4,A_VV(15))
+               call calcHelAmp_qq(ordering,ZpgsMode,p(1:4,1:6),MY_IDUP,i1,i3,i4,A_VV(17))
+            endif
+         elseif( VVMode.eq.ZgMode ) then
+            if(includeGammaStar) then
+               call calcHelAmp_qq(ordering,gsgMode,p(1:4,1:6),MY_IDUP,i1,i3,i4,A_VV(3))
+            endif
+            if( includeVprime ) then
+               call calcHelAmp_qq(ordering,ZpgMode,p(1:4,1:6),MY_IDUP,i1,i3,i4,A_VV(5))
+            endif
+         elseif( VVMode.eq.WWMode .and. includeVprime ) then
+            call calcHelAmp_qq(ordering,WWpMode,p(1:4,1:6),MY_IDUP,i1,i3,i4,A_VV(9))
+            call calcHelAmp_qq(ordering,WpWMode,p(1:4,1:6),MY_IDUP,i1,i3,i4,A_VV(11))
+            call calcHelAmp_qq(ordering,WpWpMode,p(1:4,1:6),MY_IDUP,i1,i3,i4,A_VV(13))
+         endif
 
          if( doInterference ) then
-             call calcHelAmp_qq(ordering_swap,VVMode_swap,p(1:4,1:6),MY_IDUP,i1,i3,i4,A_VV(2))
+            call calcHelAmp_qq(ordering_swap,VVMode_swap,p(1:4,1:6),MY_IDUP,i1,i3,i4,A_VV(2))
+            if( includeGammaStar ) then
+               call calcHelAmp_qq(ordering_swap,ZgsMode,p(1:4,1:6),MY_IDUP,i1,i3,i4,A_VV(4))
+               call calcHelAmp_qq(ordering_swap,gsZMode,p(1:4,1:6),MY_IDUP,i1,i3,i4,A_VV(6))
+               call calcHelAmp_qq(ordering_swap,gsgsMode,p(1:4,1:6),MY_IDUP,i1,i3,i4,A_VV(8))
+            endif
+            if( includeVprime ) then
+               call calcHelAmp_qq(ordering_swap,ZZpMode,p(1:4,1:6),MY_IDUP,i1,i3,i4,A_VV(10))
+               call calcHelAmp_qq(ordering_swap,ZpZMode,p(1:4,1:6),MY_IDUP,i1,i3,i4,A_VV(12))
+               call calcHelAmp_qq(ordering_swap,ZpZpMode,p(1:4,1:6),MY_IDUP,i1,i3,i4,A_VV(14))
+            endif
+            if( includeGammaStar .and. includeVprime ) then
+               call calcHelAmp_qq(ordering_swap,gsZpMode,p(1:4,1:6),MY_IDUP,i1,i3,i4,A_VV(16))
+               call calcHelAmp_qq(ordering_swap,ZpgsMode,p(1:4,1:6),MY_IDUP,i1,i3,i4,A_VV(18))
+            endif
          endif
 
          A0_VV(1) = A_VV(1)+A_VV(3)+A_VV(5)+A_VV(7)+A_VV(9)+A_VV(11)+A_VV(13)+A_VV(15)+A_VV(17) ! 3456 pieces
@@ -876,8 +1009,11 @@
       complex(dp) :: q1(4),q2(4),q3(4),q4(4),q(4)
       complex(dp) :: e1(4),e2(4),e3(4),e4(4),abr1
       complex(dp) :: yyy1,yyy2,yyy3,yyy41,yyy42,yyy5,yyy6,yyy7,yyy4
+      complex(dp) :: b_dyn(1:10)
       real(dp) :: q34,MG,MZ3,MZ4
       real(dp) :: rr
+
+      b_dyn(:)=czero
 
       q1 = dcmplx(p(1,:),0d0)
       q2 = dcmplx(p(2,:),0d0)
@@ -938,22 +1074,69 @@
       if (generate_bis) then
           rr = q34/Lambda**2! kappa for FS
 
-          yyy1 = q34*( b1 + b2*rr*(one+MZ3**2/q34)*(one+MZ4**2/q34) )
-          yyy2 = -b1/two + b3*rr*(1d0-(MZ3**2+MZ4**2)/(2d0*q34)) + two*b4*rr
-          yyy3 = (-b2/two - b3- two*b4)*rr/q34
-          yyy41 = -b1 - b2*(q34+MZ3**2)/Lambda**2 - b3*MZ4**2/Lambda**2
-          yyy42 = -b1 - b2*(q34+MZ4**2)/Lambda**2 - b3*MZ3**2/Lambda**2
-          yyy5 = two*b8*rr*MG**2/q34
-          yyy6 = czero
-          yyy7 = czero
-          if(VVMode.eq.ZZMode .or. VVMode.eq.WWMode) then
-             yyy1 = yyy1 + b5*M_V**2
-             yyy2 = yyy2 + b7*rr*M_V**2/q34
-             yyy41 = yyy41 - 2d0*b6*M_V**2/Lambda**2
-             yyy42 = yyy42 - 2d0*b6*M_V**2/Lambda**2
-             yyy6 = b9 * M_V**2/Lambda**2
-             yyy7 = b10 * MG**2 * M_V**2/Lambda**4
-          endif
+         if( (VVMode.eq.ZZMode) .or. (VVMode.eq.WWMode)  ) then! decay ZZ's or WW's
+            b_dyn(1)=b1
+            b_dyn(2)=b2
+            b_dyn(3)=b3
+            b_dyn(4)=b4
+            b_dyn(5)=b5
+            b_dyn(6)=b6
+            b_dyn(7)=b7
+            b_dyn(8)=b8
+            b_dyn(9)=b9
+            b_dyn(10)=b10
+         elseif( (VVMode.eq.ZgMode) .OR. (VVMode.eq.gsZMode) .OR. (VVMode.eq.ZgsMode) ) then
+            b_dyn(1)=bzgs1
+            b_dyn(2)=bzgs2
+            b_dyn(3)=bzgs3
+            b_dyn(4)=bzgs4
+            b_dyn(8)=bzgs8
+         elseif( (VVMode.eq.ggMode) .or. (VVMode.eq.gsgsMode)  .or. (VVMode.eq.gsgMode) ) then
+            b_dyn(1)=bgsgs1
+            b_dyn(2)=bgsgs2
+            b_dyn(3)=bgsgs3
+            b_dyn(4)=bgsgs4
+            b_dyn(8)=bgsgs8
+         elseif( (VVMode.eq.ZZpMode) .or. (VVMode.eq.WWpMode) .or. (VVMode.eq.ZpZMode) .or. (VVMode.eq.WpWMode) ) then
+            b_dyn(1)=bzzp1
+            b_dyn(2)=bzzp2
+            b_dyn(3)=bzzp3
+            b_dyn(4)=bzzp4
+            b_dyn(5)=bzzp5
+            b_dyn(6)=bzzp6
+            b_dyn(7)=bzzp7
+            b_dyn(8)=bzzp8
+            b_dyn(9)=bzzp9
+            b_dyn(10)=bzzp10
+         elseif( (VVMode.eq.ZpZpMode) .or. (VVMode.eq.WpWpMode) ) then
+            b_dyn(1)=bzpzp1
+            b_dyn(2)=bzpzp2
+            b_dyn(3)=bzpzp3
+            b_dyn(4)=bzpzp4
+            b_dyn(5)=bzpzp5
+            b_dyn(6)=bzpzp6
+            b_dyn(7)=bzpzp7
+            b_dyn(8)=bzpzp8
+            b_dyn(9)=bzpzp9
+            b_dyn(10)=bzpzp10
+         elseif( (VVMode.eq.ZpgMode) .OR. (VVMode.eq.gsZpMode) .OR. (VVMode.eq.ZpgsMode) ) then
+            b_dyn(1)=bzpgs1
+            b_dyn(2)=bzpgs2
+            b_dyn(3)=bzpgs3
+            b_dyn(4)=bzpgs4
+            b_dyn(8)=bzpgs8
+         else
+            print *,"VVMode",VVMode,"not implemented"
+         endif
+
+          yyy1 = q34*( b_dyn(1) + b_dyn(2)*rr*(one+MZ3**2/q34)*(one+MZ4**2/q34) ) + b_dyn(5)*M_V**2
+          yyy2 = -b_dyn(1)/two + b_dyn(3)*rr*(1d0-(MZ3**2+MZ4**2)/(2d0*q34)) + two*b_dyn(4)*rr + b_dyn(7)*rr*M_V**2/q34
+          yyy3 = (-b_dyn(2)/two - b_dyn(3)- two*b_dyn(4))*rr/q34
+          yyy41 = -b_dyn(1) - b_dyn(2)*(q34+MZ3**2)/Lambda**2 - b_dyn(3)*MZ4**2/Lambda**2 - 2d0*b_dyn(6)*M_V**2/Lambda**2
+          yyy42 = -b_dyn(1) - b_dyn(2)*(q34+MZ4**2)/Lambda**2 - b_dyn(3)*MZ3**2/Lambda**2 - 2d0*b_dyn(6)*M_V**2/Lambda**2
+          yyy5 = two*b_dyn(8)*rr*MG**2/q34
+          yyy6 = b_dyn(9) * M_V**2/Lambda**2
+          yyy7 = b_dyn(10) * MG**2 * M_V**2/Lambda**4
       else
           yyy1 = q34*c1/2d0
           yyy2 = c2
@@ -1119,9 +1302,50 @@
       endif
       do i1 =-2,2;  do i3=1,2;  do i4=1,2!  sum over helicities
          call calcHelAmp2(ordering,VVMode,p(1:4,1:6),MY_IDUP,i1,i3,i4,A_VV(1))
+         if( VVMode.eq.ZZMode ) then
+            if( includeGammaStar ) then
+               call calcHelAmp2(ordering,ZgsMode,p(1:4,1:6),MY_IDUP,i1,i3,i4,A_VV(3))
+               call calcHelAmp2(ordering,gsZMode,p(1:4,1:6),MY_IDUP,i1,i3,i4,A_VV(5))
+               call calcHelAmp2(ordering,gsgsMode,p(1:4,1:6),MY_IDUP,i1,i3,i4,A_VV(7))
+            endif
+            if( includeVprime ) then
+               call calcHelAmp2(ordering,ZZpMode,p(1:4,1:6),MY_IDUP,i1,i3,i4,A_VV(9))
+               call calcHelAmp2(ordering,ZpZMode,p(1:4,1:6),MY_IDUP,i1,i3,i4,A_VV(11))
+               call calcHelAmp2(ordering,ZpZpMode,p(1:4,1:6),MY_IDUP,i1,i3,i4,A_VV(13))
+            endif
+            if( includeGammaStar .and. includeVprime ) then
+               call calcHelAmp2(ordering,gsZpMode,p(1:4,1:6),MY_IDUP,i1,i3,i4,A_VV(15))
+               call calcHelAmp2(ordering,ZpgsMode,p(1:4,1:6),MY_IDUP,i1,i3,i4,A_VV(17))
+            endif
+         elseif( VVMode.eq.ZgMode ) then
+            if(includeGammaStar) then
+               call calcHelAmp2(ordering,gsgMode,p(1:4,1:6),MY_IDUP,i1,i3,i4,A_VV(3))
+            endif
+            if( includeVprime ) then
+               call calcHelAmp2(ordering,ZpgMode,p(1:4,1:6),MY_IDUP,i1,i3,i4,A_VV(5))
+            endif
+         elseif( VVMode.eq.WWMode .and. includeVprime ) then
+            call calcHelAmp2(ordering,WWpMode,p(1:4,1:6),MY_IDUP,i1,i3,i4,A_VV(9))
+            call calcHelAmp2(ordering,WpWMode,p(1:4,1:6),MY_IDUP,i1,i3,i4,A_VV(11))
+            call calcHelAmp2(ordering,WpWpMode,p(1:4,1:6),MY_IDUP,i1,i3,i4,A_VV(13))
+         endif
 
          if( doInterference ) then
-             call calcHelAmp2(ordering_swap,VVMode_swap,p(1:4,1:6),MY_IDUP,i1,i3,i4,A_VV(2))
+            call calcHelAmp2(ordering_swap,VVMode_swap,p(1:4,1:6),MY_IDUP,i1,i3,i4,A_VV(2))
+            if( includeGammaStar ) then
+               call calcHelAmp2(ordering_swap,ZgsMode,p(1:4,1:6),MY_IDUP,i1,i3,i4,A_VV(4))
+               call calcHelAmp2(ordering_swap,gsZMode,p(1:4,1:6),MY_IDUP,i1,i3,i4,A_VV(6))
+               call calcHelAmp2(ordering_swap,gsgsMode,p(1:4,1:6),MY_IDUP,i1,i3,i4,A_VV(8))
+            endif
+            if( includeVprime ) then
+               call calcHelAmp2(ordering_swap,ZZpMode,p(1:4,1:6),MY_IDUP,i1,i3,i4,A_VV(10))
+               call calcHelAmp2(ordering_swap,ZpZMode,p(1:4,1:6),MY_IDUP,i1,i3,i4,A_VV(12))
+               call calcHelAmp2(ordering_swap,ZpZpMode,p(1:4,1:6),MY_IDUP,i1,i3,i4,A_VV(14))
+            endif
+            if( includeGammaStar .and. includeVprime ) then
+               call calcHelAmp2(ordering_swap,gsZpMode,p(1:4,1:6),MY_IDUP,i1,i3,i4,A_VV(16))
+               call calcHelAmp2(ordering_swap,ZpgsMode,p(1:4,1:6),MY_IDUP,i1,i3,i4,A_VV(18))
+            endif
          endif
 
          A0_VV(1) = A_VV(1)+A_VV(3)+A_VV(5)+A_VV(7)+A_VV(9)+A_VV(11)+A_VV(13)+A_VV(15)+A_VV(17) ! 3456 pieces
@@ -1186,9 +1410,12 @@
       complex(dp) :: q1(4),q2(4),q3(4),q4(4),q(4)
       complex(dp) :: e1(4),e2(4),e3(4),e4(4),e0(4)
       complex(dp) :: yyy1,yyy2,yyy3,yyy41,yyy42,yyy5,yyy6,yyy7
+      complex(dp) :: b_dyn(1:10)
       real(dp) :: q34,MG,MZ3,MZ4
       real(dp) :: rr
       real(dp),parameter :: sqrt6=dsqrt(6d0)
+
+      b_dyn(:)=czero
 
       q1 = dcmplx(p(1,:),0d0)
       q2 = dcmplx(p(2,:),0d0)
@@ -1278,22 +1505,70 @@
       if (generate_bis) then
           rr = q34/Lambda**2! kappa for FS
 
-          yyy1 = q34*( b1 + b2*rr*(one+MZ3**2/q34)*(one+MZ4**2/q34) )
-          yyy2 = -b1/two + b3*rr*(1d0-(MZ3**2+MZ4**2)/(2d0*q34)) + two*b4*rr
-          yyy3 = (-b2/two - b3- two*b4)*rr/q34
-          yyy41 = -b1 - b2*(q34+MZ3**2)/Lambda**2 - b3*MZ4**2/Lambda**2
-          yyy42 = -b1 - b2*(q34+MZ4**2)/Lambda**2 - b3*MZ3**2/Lambda**2
-          yyy5 = two*b8*rr*MG**2/q34
-          yyy6 = czero
-          yyy7 = czero
-          if(VVMode.eq.ZZMode .or. VVMode.eq.WWMode) then
-             yyy1 = yyy1 + b5*M_V**2
-             yyy2 = yyy2 + b7*rr*M_V**2/q34
-             yyy41 = yyy41 - 2d0*b6*M_V**2/Lambda**2
-             yyy42 = yyy42 - 2d0*b6*M_V**2/Lambda**2
-             yyy6 = b9 * M_V**2/Lambda**2
-             yyy7 = b10 * MG**2 * M_V**2/Lambda**4
-          endif
+         if( (VVMode.eq.ZZMode) .or. (VVMode.eq.WWMode)  ) then! decay ZZ's or WW's
+            b_dyn(1)=b1
+            b_dyn(2)=b2
+            b_dyn(3)=b3
+            b_dyn(4)=b4
+            b_dyn(5)=b5
+            b_dyn(6)=b6
+            b_dyn(7)=b7
+            b_dyn(8)=b8
+            b_dyn(9)=b9
+            b_dyn(10)=b10
+         elseif( (VVMode.eq.ZgMode) .OR. (VVMode.eq.gsZMode) .OR. (VVMode.eq.ZgsMode) ) then
+            b_dyn(1)=bzgs1
+            b_dyn(2)=bzgs2
+            b_dyn(3)=bzgs3
+            b_dyn(4)=bzgs4
+            b_dyn(8)=bzgs8
+         elseif( (VVMode.eq.ggMode) .or. (VVMode.eq.gsgsMode)  .or. (VVMode.eq.gsgMode) ) then
+            b_dyn(1)=bgsgs1
+            b_dyn(2)=bgsgs2
+            b_dyn(3)=bgsgs3
+            b_dyn(4)=bgsgs4
+            b_dyn(8)=bgsgs8
+         elseif( (VVMode.eq.ZZpMode) .or. (VVMode.eq.WWpMode) .or. (VVMode.eq.ZpZMode) .or. (VVMode.eq.WpWMode) ) then
+            b_dyn(1)=bzzp1
+            b_dyn(2)=bzzp2
+            b_dyn(3)=bzzp3
+            b_dyn(4)=bzzp4
+            b_dyn(5)=bzzp5
+            b_dyn(6)=bzzp6
+            b_dyn(7)=bzzp7
+            b_dyn(8)=bzzp8
+            b_dyn(9)=bzzp9
+            b_dyn(10)=bzzp10
+         elseif( (VVMode.eq.ZpZpMode) .or. (VVMode.eq.WpWpMode) ) then
+            b_dyn(1)=bzpzp1
+            b_dyn(2)=bzpzp2
+            b_dyn(3)=bzpzp3
+            b_dyn(4)=bzpzp4
+            b_dyn(5)=bzpzp5
+            b_dyn(6)=bzpzp6
+            b_dyn(7)=bzpzp7
+            b_dyn(8)=bzpzp8
+            b_dyn(9)=bzpzp9
+            b_dyn(10)=bzpzp10
+         elseif( (VVMode.eq.ZpgMode) .OR. (VVMode.eq.gsZpMode) .OR. (VVMode.eq.ZpgsMode) ) then
+            b_dyn(1)=bzpgs1
+            b_dyn(2)=bzpgs2
+            b_dyn(3)=bzpgs3
+            b_dyn(4)=bzpgs4
+            b_dyn(8)=bzpgs8
+         else
+            print *,"VVMode",VVMode,"not implemented"
+         endif
+
+          yyy1 = q34*( b_dyn(1) + b_dyn(2)*rr*(one+MZ3**2/q34)*(one+MZ4**2/q34) ) + b_dyn(5)*M_V**2
+          yyy2 = -b_dyn(1)/two + b_dyn(3)*rr*(1d0-(MZ3**2+MZ4**2)/(2d0*q34)) + two*b_dyn(4)*rr + b_dyn(7)*rr*M_V**2/q34
+          yyy3 = (-b_dyn(2)/two - b_dyn(3)- two*b_dyn(4))*rr/q34
+          yyy41 = -b_dyn(1) - b_dyn(2)*(q34+MZ3**2)/Lambda**2 - b_dyn(3)*MZ4**2/Lambda**2 - 2d0*b_dyn(6)*M_V**2/Lambda**2
+          yyy42 = -b_dyn(1) - b_dyn(2)*(q34+MZ4**2)/Lambda**2 - b_dyn(3)*MZ3**2/Lambda**2 - 2d0*b_dyn(6)*M_V**2/Lambda**2
+          yyy5 = two*b_dyn(8)*rr*MG**2/q34
+          yyy6 = b_dyn(9) * M_V**2/Lambda**2
+          yyy7 = b_dyn(10) * MG**2 * M_V**2/Lambda**4
+
       else
           yyy1 = q34*c1/2d0
           yyy2 = c2

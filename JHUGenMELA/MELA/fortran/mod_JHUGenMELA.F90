@@ -507,9 +507,18 @@ end subroutine SetSpinOneCouplings
 
 subroutine SetSpinTwoCouplings(acoupl,vvcoupl,vvpcoupl,vpvpcoupl,qLR)
    implicit none
+   integer, parameter :: indexGammaBegin=11
+   integer, parameter :: indexVVSize=20
    complex(8), intent(in) :: acoupl(1:5)
-   complex(8), intent(in) :: vvcoupl(1:10),vvpcoupl(1:10),vpvpcoupl(1:10)
+   complex(8), intent(in) :: vvcoupl(1:indexVVSize),vvpcoupl(1:indexVVSize),vpvpcoupl(1:indexVVSize)
    complex(8), intent(in) :: qLR(1:2)
+
+   includeVprime = (any(vvpcoupl.ne.czero) .or. any(vpvpcoupl.ne.czero))
+   includeGammaStar = (                                                       &
+                    any(vvcoupl(indexGammaBegin:indexVVSize).ne.czero) .or.   &
+                    any(vvpcoupl(indexGammaBegin:indexVVSize).ne.czero) .or.  &
+                    any(vpvpcoupl(indexGammaBegin:indexVVSize).ne.czero)      &
+                   )
 
    a1 = acoupl(1)
    a2 = acoupl(2)
@@ -530,6 +539,47 @@ subroutine SetSpinTwoCouplings(acoupl,vvcoupl,vvpcoupl,vpvpcoupl,qLR)
    b8 = vvcoupl(8)
    b9 = vvcoupl(9)
    b10 = vvcoupl(10)
+
+   bzgs1 = vvcoupl(11)
+   bzgs2 = vvcoupl(12)
+   bzgs3 = vvcoupl(13)
+   bzgs4 = vvcoupl(14)
+   bzgs8 = vvcoupl(15)
+
+   bgsgs1 = vvcoupl(16)
+   bgsgs2 = vvcoupl(17)
+   bgsgs3 = vvcoupl(18)
+   bgsgs4 = vvcoupl(19)
+   bgsgs8 = vvcoupl(20)
+
+   bzzp1 = vvpcoupl(1)
+   bzzp2 = vvpcoupl(2)
+   bzzp3 = vvpcoupl(3)
+   bzzp4 = vvpcoupl(4)
+   bzzp5 = vvpcoupl(5)
+   bzzp6 = vvpcoupl(6)
+   bzzp7 = vvpcoupl(7)
+   bzzp8 = vvpcoupl(8)
+   bzzp9 = vvpcoupl(9)
+   bzzp10 = vvpcoupl(10)
+
+   bzpgs1 = vvpcoupl(11)
+   bzpgs2 = vvpcoupl(12)
+   bzpgs3 = vvpcoupl(13)
+   bzpgs4 = vvpcoupl(14)
+   bzpgs8 = vvpcoupl(15)
+
+
+   bzpzp1 = vpvpcoupl(1)
+   bzpzp2 = vpvpcoupl(2)
+   bzpzp3 = vpvpcoupl(3)
+   bzpzp4 = vpvpcoupl(4)
+   bzpzp5 = vpvpcoupl(5)
+   bzpzp6 = vpvpcoupl(6)
+   bzpzp7 = vpvpcoupl(7)
+   bzpzp8 = vpvpcoupl(8)
+   bzpzp9 = vpvpcoupl(9)
+   bzpzp10 = vpvpcoupl(10)
 
    return
 end subroutine SetSpinTwoCouplings

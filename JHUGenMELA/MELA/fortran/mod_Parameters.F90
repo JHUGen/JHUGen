@@ -806,16 +806,58 @@ real(8), public, parameter :: Lambda2 = 1000d0    *GeV      ! for second resonan
   logical, public, parameter :: generate_bis = .true.
   logical, public, parameter :: use_dynamic_MG = .true.
 
-  complex(8), public :: b1 = (0d0,0d0)  !  all b' below are g's in the draft
+  !  all b' below are g's in the draft
+  complex(8), public :: b1 = (0d0,0d0)
   complex(8), public :: b2 = (0d0,0d0)
   complex(8), public :: b3 = (0d0,0d0)
   complex(8), public :: b4 = (0d0,0d0)
-  complex(8), public :: b5 = (0d0,0d0)
-  complex(8), public :: b6 = (0d0,0d0)
-  complex(8), public :: b7 = (0d0,0d0)
+  complex(8), public :: b5 = (0d0,0d0)  ! this coupling does not contribute to V+gamma final states
+  complex(8), public :: b6 = (0d0,0d0)  ! this coupling does not contribute to V+gamma final states
+  complex(8), public :: b7 = (0d0,0d0)  ! this coupling does not contribute to V+gamma final states
   complex(8), public :: b8 = (0d0,0d0)
-  complex(8), public :: b9 = (0d0,0d0)  ! this coupling does not contribute to gamma+gamma final states
-  complex(8), public :: b10 =(0d0,0d0)  ! this coupling does not contribute to gamma+gamma final states
+  complex(8), public :: b9 = (0d0,0d0)  ! this coupling does not contribute to V+gamma final states
+  complex(8), public :: b10 =(0d0,0d0)  ! this coupling does not contribute to V+gamma final states
+
+  complex(8), public :: bzzp1 = (0d0,0d0)
+  complex(8), public :: bzzp2 = (0d0,0d0)
+  complex(8), public :: bzzp3 = (0d0,0d0)
+  complex(8), public :: bzzp4 = (0d0,0d0)
+  complex(8), public :: bzzp5 = (0d0,0d0)
+  complex(8), public :: bzzp6 = (0d0,0d0)
+  complex(8), public :: bzzp7 = (0d0,0d0)
+  complex(8), public :: bzzp8 = (0d0,0d0)
+  complex(8), public :: bzzp9 = (0d0,0d0)
+  complex(8), public :: bzzp10 =(0d0,0d0)
+
+  complex(8), public :: bzpzp1 = (0d0,0d0)
+  complex(8), public :: bzpzp2 = (0d0,0d0)
+  complex(8), public :: bzpzp3 = (0d0,0d0)
+  complex(8), public :: bzpzp4 = (0d0,0d0)
+  complex(8), public :: bzpzp5 = (0d0,0d0)
+  complex(8), public :: bzpzp6 = (0d0,0d0)
+  complex(8), public :: bzpzp7 = (0d0,0d0)
+  complex(8), public :: bzpzp8 = (0d0,0d0)
+  complex(8), public :: bzpzp9 = (0d0,0d0)
+  complex(8), public :: bzpzp10 =(0d0,0d0)
+
+  complex(8), public :: bzgs1 = (0d0,0d0)
+  complex(8), public :: bzgs2 = (0d0,0d0)
+  complex(8), public :: bzgs3 = (0d0,0d0)
+  complex(8), public :: bzgs4 = (0d0,0d0)
+  complex(8), public :: bzgs8 = (0d0,0d0)
+
+  complex(8), public :: bgsgs1 = (0d0,0d0)
+  complex(8), public :: bgsgs2 = (0d0,0d0)
+  complex(8), public :: bgsgs3 = (0d0,0d0)
+  complex(8), public :: bgsgs4 = (0d0,0d0)
+  complex(8), public :: bgsgs8 = (0d0,0d0)
+
+  complex(8), public :: bzpgs1 = (0d0,0d0)
+  complex(8), public :: bzpgs2 = (0d0,0d0)
+  complex(8), public :: bzpgs3 = (0d0,0d0)
+  complex(8), public :: bzpgs4 = (0d0,0d0)
+  complex(8), public :: bzpgs8 = (0d0,0d0)
+
 
   complex(8), public, parameter  :: c1 = (1.0d0,0d0)
   complex(8), public, parameter  :: c2 = (0d0,0d0)
