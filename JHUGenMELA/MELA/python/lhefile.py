@@ -145,19 +145,22 @@ if __name__ == '__main__':
 
     @unittest.skipUnless(args.lhefile_jhugenvbfvh, "needs --lhefile-jhugenvbfvh argument")
     def testJHUGenVBFVH(self):
-      with LHEFile_JHUGenVBFVH(args.lhefile_jhugenvbfvh) as f:
+      with LHEFile_JHUGenVBFVH(args.lhefile_jhugenvbfvh, isgen=False) as f:
         for event, i in itertools.izip(f, range(10)):
           event.ghz1 = 1
           if any(11 <= abs(p.first) <= 16 for p in event.associated):
             if sum(p.first for p in event.associated) == 0:
+              VHprocess = TVar.Lep_ZH
               event.setProcess(TVar.SelfDefine_spin0, TVar.JHUGen, TVar.Lep_ZH)
             else:
+              VHprocess = TVar.Lep_WH
               event.setProcess(TVar.SelfDefine_spin0, TVar.JHUGen, TVar.Lep_WH)
           else:
+            VHprocess = TVar.Had_ZH
             event.setProcess(TVar.SelfDefine_spin0, TVar.JHUGen, TVar.JJVBF)
           prob = event.computeProdP()
           self.assertNotEqual(prob, 0)
-          print prob, event.computeVBFAngles(), event.computeVHAngles()
+          print prob, event.computeVBFAngles(), event.computeVHAngles(VHprocess)
 
     @unittest.skipUnless(args.lhefile_jhugentth, "needs --lhefile-jhugentth argument")
     def testJHUGenttH(self):
