@@ -2,9 +2,675 @@ MODULE ModKinematics
 implicit none
 save
 
-public :: GetBWPropagator,ReweightBWPropagator,SetRunningScales,setPDFs,EvalAlphaS
 
-CONTAINS
+type :: Histogram
+    integer :: NBins
+    real(8) :: BinSize
+    real(8) :: LowVal
+    real(8) :: SetScale
+    real(8) :: Value(0:300)
+    real(8) :: Value2(0:300)
+    integer :: Hits(0:300)
+    character :: Info*(50)
+end type
+
+integer,public :: it_sav
+type(Histogram),allocatable :: Histo(:)
+
+contains
+
+
+
+
+SUBROUTINE WriteOutEvent(Mom,MY_IDUP,ICOLUP,MomFSPartons,EventWeight,EventInfoLine,PDFLine,MOTHUP_Parton)
+use ModParameters
+use modMisc
+implicit none
+real(8) :: Mom(1:4,1:6)
+real(8),optional :: MomFSPartons(:,:)
+real(8),optional :: EventWeight
+character(len=160),optional :: EventInfoLine,PDFLine
+integer,optional :: MOTHUP_Parton(:,:)
+real(8) :: Spin, Lifetime,s34,s36,s45,s56,smallestInv
+real(8) :: XFV(1:4), Z1FV(1:4), Z2FV(1:4)
+real(8) :: MomDummy(1:4,1:4+maxpart)
+real(8) :: Part1Mass,Part2Mass,XMass,V1Mass,V2Mass,L11Mass,L12Mass,L21Mass,L22Mass,tmp,PartonMass(1:4+maxpart)
+integer :: a,b,c,NumFSPartons
+integer :: MY_IDUP(:),ICOLUP(:,:)
+integer :: LHE_IDUP(1:7+maxpart),i,ISTUP(1:7+maxpart),MOTHUP(1:2,1:7+maxpart)
+integer :: NUP,IDPRUP
+real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP,mZ1,mZ2,HiggsDKLength
+character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0)"
+
+
+
+! For description of the LHE format see http://arxiv.org/abs/hep-ph/0109068 and http://arxiv.org/abs/hep-ph/0609017
+! The LHE numbering scheme can be found here: http://pdg.lbl.gov/mc_particle_id_contents.html and http://lhapdf.hepforge.org/manual#tth_sEcA
+
+
+
+do i=1,9
+    LHE_IDUP(i) = convertLHE( MY_IDUP(i) )
+enddo
+
+! NUP changes for gamma gamma final state
+if ( LHE_IDUP(4).eq.22 .and. LHE_IDUP(5).eq.22 ) then! photon+photon FS
+    NUP=5
+elseif ( LHE_IDUP(4).ne.22 .and. LHE_IDUP(5).eq.22 ) then! Z+photon FS
+    NUP=7
+else! ZZ or WW FS
+    NUP=9
+endif
+
+
+
+IDPRUP=Process
+if( present(EventWeight) ) then
+    XWGTUP=EventWeight
+else
+    XWGTUP=1.0d0
+endif
+
+SCALUP=Mu_Fact * 100d0
+AQEDUP=alpha_QED
+AQCDUP=alphas
+
+ISTUP(1) = -1
+ISTUP(2) = -1
+ISTUP(3) = 2
+ISTUP(4) = 2
+ISTUP(5) = 2
+ISTUP(6) = 1
+ISTUP(7) = 1
+ISTUP(8) = 1
+ISTUP(9) = 1
+
+if ( LHE_IDUP(4).eq.22 .and. LHE_IDUP(5).eq.22 ) then! photon+photon FS
+    ISTUP(4) = 1
+    ISTUP(5) = 1
+elseif ( LHE_IDUP(4).ne.22 .and. LHE_IDUP(5).eq.22 ) then! Z+photon FS
+    ISTUP(4) = 2
+    ISTUP(5) = 1
+    ISTUP(6) = 1
+    ISTUP(7) = 1
+endif
+
+
+
+MOTHUP(1,1) = 0
+MOTHUP(2,1) = 0
+MOTHUP(1,2) = 0
+MOTHUP(2,2) = 0
+MOTHUP(1,3) = 1
+MOTHUP(2,3) = 2
+MOTHUP(1,4) = 3
+MOTHUP(2,4) = 3
+MOTHUP(1,5) = 3
+MOTHUP(2,5) = 3
+MOTHUP(1,6) = 4
+MOTHUP(2,6) = 4
+MOTHUP(1,7) = 4
+MOTHUP(2,7) = 4
+MOTHUP(1,8) = 5
+MOTHUP(2,8) = 5
+MOTHUP(1,9) = 5
+MOTHUP(2,9) = 5
+
+
+
+
+if( present(MOTHUP_Parton) ) then
+   MOTHUP(1:2,1) = MOTHUP_Parton(1:2,1)
+   MOTHUP(1:2,2) = MOTHUP_Parton(1:2,2)
+endif
+
+
+NumFSPartons=0
+if( present(MomFSPartons) ) then ! add additional FS partons
+    NumFSPartons = size(MomFSPartons,2)
+    do a=1,NumFSPartons
+       NUP=NUP+1
+       LHE_IDUP(9+a) = convertLHE( MY_IDUP(9+a  ) )
+       ISTUP(9+a) = 1
+       if( present(MOTHUP_Parton) ) then
+          MOTHUP(1:2,9+a) = MOTHUP_Parton(1:2,2+a)
+       else
+          MOTHUP(1:2,9+a) = (/ mod(a,2)+1,mod(a,2)+1 /) !  = (1,1), (2,2), (1,1), ...
+       endif
+       MomDummy(1,6+a) = 100.0d0*MomFSPartons(1,a)
+       MomDummy(2,6+a) = 100.0d0*MomFSPartons(2,a)
+       MomDummy(3,6+a) = 100.0d0*MomFSPartons(3,a)
+       MomDummy(4,6+a) = 100.0d0*MomFSPartons(4,a)
+    enddo
+endif
+
+
+LHE_IDUP(3) = 25
+if( Process.eq.1 ) LHE_IDUP(3) = 32
+if( Process.eq.2 ) LHE_IDUP(3) = 39
+Lifetime = 0.0d0
+Spin = 0.1d0
+call getHiggsDecayLength(HiggsDKLength)
+
+
+do a=1,6
+    MomDummy(1,a) = 100.0d0*Mom(1,a)
+    MomDummy(2,a) = 100.0d0*Mom(2,a)
+    MomDummy(3,a) = 100.0d0*Mom(3,a)
+    MomDummy(4,a) = 100.0d0*Mom(4,a)
+enddo
+
+do b=1,4! V boson momenta
+    Z1FV(b) = MomDummy(b,3)+MomDummy(b,4)
+    Z2FV(b) = MomDummy(b,5)+MomDummy(b,6)
+enddo
+
+do c=1,4! X resonance momentum
+    XFV(c) = Z1FV(c) + Z2FV(c)
+enddo
+
+
+! check energy-momentum conservation when we don't use "adjusted kinematics"
+if( (OffShellV1).or.(OffShellV2).or.(IsAPhoton(DecayMode2)) ) then
+    do c=1,4! loop over components of 4-momentum
+          tmp=Mom(c,1)+Mom(c,2)-Mom(c,3)-Mom(c,4)-Mom(c,5)-Mom(c,6)
+          do a=1,NumFSPartons
+              tmp=tmp-MomFSPartons(c,a)
+          enddo
+          if( abs(tmp)/Mom(1,1).gt.1d-5 ) print *, "Error: energy-momentum violation!",c,abs(tmp)/Mom(1,1)
+    enddo
+endif
+
+
+
+!  associte lepton pairs to MOTHUP
+if( (IsAZDecay(DecayMode1)).and.(IsAZDecay(DecayMode2)) .and. abs(LHE_IDUP(7)).eq.abs(LHE_IDUP(9)) ) then
+     s34 = Get_MInv( Mom(1:4,3)+Mom(1:4,4) )
+     s56 = Get_MInv( Mom(1:4,5)+Mom(1:4,6) )
+     s36 = Get_MInv( Mom(1:4,3)+Mom(1:4,6) )
+     s45 = Get_MInv( Mom(1:4,4)+Mom(1:4,5) )
+     smallestInv = minloc((/dabs(s34-M_V),dabs(s56-M_V),dabs(s36-M_V),dabs(s45-M_V)/),1)
+     if( smallestInv.eq.3 .or. smallestInv.eq.4 ) then
+        call swapi(MOTHUP(1,6),MOTHUP(1,8))
+        call swapi(MOTHUP(2,6),MOTHUP(2,8))
+        call swapi(ICOLUP(1,6),ICOLUP(1,8))
+        call swapi(ICOLUP(2,6),ICOLUP(2,8))
+        Z1FV(1:4) = MomDummy(1:4,3)+MomDummy(1:4,6)
+        Z2FV(1:4) = MomDummy(1:4,5)+MomDummy(1:4,4)
+     endif
+endif
+
+
+
+
+
+! calculating and checking masses
+tmp = (MomDummy(1:4,1)).dot.(MomDummy(1:4,1))
+if( tmp.lt. -1d-3 ) print *, "Error 1: large negative mass!",tmp
+Part1Mass = dSQRT(dabs(tmp))
+
+tmp = (MomDummy(1:4,2)).dot.(MomDummy(1:4,2))
+if( tmp.lt. -1d-3 ) print *, "Error 2: large negative mass!",tmp
+Part2Mass = dSQRT(dabs(tmp))
+
+tmp = (XFV(1:4)).dot.(XFV(1:4))
+if( tmp.lt. -1d-3 ) print *, "Error 3: large negative mass!",tmp
+XMass = dSQRT(dabs(tmp))
+
+tmp = (Z1FV(1:4)).dot.(Z1FV(1:4))
+if( tmp.lt. -1d-3 ) print *, "Error 4: large negative mass!",tmp
+V1Mass = dSQRT(dabs(tmp))
+if( V1Mass.lt.1d-5 ) V1Mass=0d0
+
+tmp = (Z2FV(1:4)).dot.(Z2FV(1:4))
+if( tmp.lt. -1d-3 ) print *, "Error 5: large negative mass!",tmp
+V2Mass = dSQRT(dabs(tmp))
+if( V2Mass.lt.1d-5 ) V2Mass=0d0
+
+tmp = (MomDummy(1:4,3)).dot.(MomDummy(1:4,3))
+if( tmp.lt. -1d-3 ) print *, "Error 6: large negative mass!",tmp
+L12Mass = dSQRT(dABS(tmp))
+if( L12Mass.lt.1d-6 ) L12Mass=0d0
+if( tmp.lt.0d0 ) MomDummy(1,3) = MomDummy(1,3) + 1d-7
+
+tmp = (MomDummy(1:4,4)).dot.(MomDummy(1:4,4))
+if( tmp.lt. -1d-3 ) print *, "Error 7: large negative mass!",tmp
+L11Mass = dSQRT(dABS(tmp))
+if( L11Mass.lt.1d-6 ) L11Mass=0d0
+if( tmp.lt.0d0 ) MomDummy(1,4) = MomDummy(1,4) + 1d-7
+
+tmp = (MomDummy(1:4,5)).dot.(MomDummy(1:4,5))
+if( tmp.lt. -1d-3 ) print *, "Error 8: large negative mass!",tmp
+L22Mass = dSQRT(dABS(tmp))
+if( L22Mass.lt.1d-6 ) L22Mass=0d0
+if( tmp.lt.0d0 ) MomDummy(1,5) = MomDummy(1,5) + 1d-7
+
+tmp = (MomDummy(1:4,6)).dot.(MomDummy(1:4,6))
+if( tmp.lt. -1d-3 ) print *, "Error 9: large negative mass!",tmp
+L21Mass = dSQRT(dABS(tmp))
+if( L21Mass.lt.1d-6 ) L21Mass=0d0
+if( tmp.lt.0d0 ) MomDummy(1,6) = MomDummy(1,6) + 1d-7
+
+do a=1,NumFSPartons
+    tmp = (MomDummy(1:4,6+a)).dot.(MomDummy(1:4,6+a))
+    PartonMass(a) = dSQRT(dabs(tmp))
+enddo
+
+
+
+
+
+
+write(io_LHEOutFile,"(A)") "<event>"
+if( ReadLHEFile .and. present(EventInfoLine) ) then
+   write(io_LHEOutFile,"(I2,X,A)") NUP,trim(EventInfoLine)
+else
+   write(io_LHEOutFile,"(I2,X,I3,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7)") NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
+!  in order of appearance:
+!  (*) number of particles in the event
+!  (*) process ID (user defined)
+!  (*) weighted or unweighted events: +1=unweighted, otherwise= see manual
+!  (*) pdf factorization scale in GeV
+!  (*) alpha_QED coupling for this event
+!  (*) alpha_s coupling for this event
+endif
+
+! parton_a
+i=1
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,1),MomDummy(1,1),Part1Mass,Lifetime,Spin
+
+! parton_b
+i=2
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,2),MomDummy(1,2),Part2Mass,Lifetime,Spin
+
+! X
+i=3
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),XFV(2:4),XFV(1),XMass,HiggsDKLength,Spin
+
+! V1
+i=4
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),Z1FV(2:4),Z1FV(1),V1Mass,Lifetime,Spin
+
+! V2
+i=5
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),Z2FV(2:4),Z2FV(1),V2Mass,Lifetime,Spin
+
+! decay product 1 (V1): l-, nu or q
+i=7
+if (LHE_IDUP(i).gt.Not_a_particle_) then
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,3),MomDummy(1,3),L12Mass,Lifetime,Spin
+endif
+
+! decay product 2 (V1): l+, nubar or qbar
+i=6
+if (LHE_IDUP(i).gt.Not_a_particle_) then
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,4),MomDummy(1,4),L11Mass,Lifetime,Spin
+endif
+
+! decay product 1 (V2): l-, nu or q
+i=9
+if (LHE_IDUP(i).gt.Not_a_particle_) then
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,5),MomDummy(1,5),L22Mass,Lifetime,Spin
+endif
+
+! decay product 2 (V2): l+, nubar or qbar
+i=8
+if (LHE_IDUP(i).gt.Not_a_particle_) then
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,6),MomDummy(1,6),L21Mass,Lifetime,Spin
+endif
+
+! additional F.S. partons
+do a=1,NumFSPartons
+    write(io_LHEOutFile,fmt1) LHE_IDUP(9+a),ISTUP(9+a), MOTHUP(1,9+a),MOTHUP(2,9+a), ICOLUP(1,9+a),ICOLUP(2,9+a),MomDummy(2:4,6+a),MomDummy(1,6+a),PartonMass(a),Lifetime,Spin
+enddo
+
+if( present(PDFLine) ) then
+  if( PDFLine.ne."" ) write(io_LHEOutFile,"(A)") trim(PDFLine)
+endif
+
+write(io_LHEOutFile,"(A)") "</event>"
+
+
+! print * ,"check ", LHE_IDUP(6),MomDummy(1:4,4)
+! print * ,"check ", LHE_IDUP(7),MomDummy(1:4,3)
+! print * ,"check ", LHE_IDUP(8),MomDummy(1:4,6)
+! print * ,"check ", LHE_IDUP(9),MomDummy(1:4,5)
+
+! print * ,"check ", LHE_IDUP(6),L11Mass
+! print * ,"check ", LHE_IDUP(7),L12Mass
+! print * ,"check ", LHE_IDUP(8),L21Mass
+! print * ,"check ", LHE_IDUP(9),L22Mass
+! pause
+
+RETURN
+END SUBROUTINE
+
+
+
+
+SUBROUTINE WriteOutEvent_NEW(NUP,IDUP,ISTUP,MOTHUP,ICOLUP,Mom,HiggsDK_Mom,Mass,iHiggs,HiggsDK_IDUP,HiggsDK_ICOLUP,EventProcessId,EventWeight,EventScaleAqedAqcd,BeginEventLine,InputFmt0,Empty)
+use ModParameters
+use modMisc
+implicit none
+real(8) :: Mom(:,:),HiggsDK_Mom(:,:),Mass(:)
+! real(8),optional :: MomFSPartons(:,:)
+integer,optional :: EventProcessId
+real(8),optional :: EventWeight
+real(8),optional :: EventScaleAqedAqcd(1:3)
+character(len=*),optional :: BeginEventLine
+character(len=*),optional :: InputFmt0
+! integer,optional :: MOTHUP_Parton(:,:)
+real(8) :: Spin, Lifetime, s34,s56,s36,s45,smallestInv
+integer :: IDUP(:),ISTUP(:),MOTHUP(:,:),ICOLUP(:,:)
+integer :: HiggsDK_IDUP(:),HiggsDK_ICOLUP(:,:),HiggsDK_ISTUP(4:9),HiggsDK_MOTHUP(1:2,4:9)
+integer :: i,iHiggs
+integer :: NUP,NUP_NEW,IDPRUP
+real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP,HiggsDKLength
+character(len=*),parameter :: DefaultFmt0 = "I2,X,I3,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7"
+character(len=*),parameter :: Fmt1 = "6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0"
+integer :: indent
+character(len=150) :: IndentedFmt0, IndentedFmt1
+logical,optional :: Empty
+logical :: IsEmpty
+
+
+!   For description of the LHE format see http://arxiv.org/abs/hep-ph/0109068 and http://arxiv.org/abs/hep-ph/0609017
+!   The LHE numbering scheme can be found here: http://pdg.lbl.gov/mc_particle_id_contents.html and http://lhapdf.hepforge.org/manual#tth_sEcA
+
+
+!     assignments:
+!     HiggsDK_Mom(1:4,1) --> HiggsDK_IDUP(4)! V1
+!     HiggsDK_Mom(1:4,2) --> HiggsDK_IDUP(5)! V2
+!     HiggsDK_Mom(1:4,3) --> HiggsDK_IDUP(7)! l-
+!     HiggsDK_Mom(1:4,4) --> HiggsDK_IDUP(6)! l+
+!     HiggsDK_Mom(1:4,5) --> HiggsDK_IDUP(9)! l-
+!     HiggsDK_Mom(1:4,6) --> HiggsDK_IDUP(8)! l+
+
+    if( present(Empty) ) then
+        IsEmpty = Empty
+    else
+        IsEmpty = .false.
+    endif
+
+    ! NUP changes for gamma gamma final state
+    if( IsEmpty ) then
+        NUP_NEW = -NUP
+    elseif ( IsAPhoton(DecayMode1) .and. IsAPhoton(DecayMode2) ) then! photon+photon FS
+        NUP_NEW = 2
+    elseif ( IsAZDecay(DecayMode1) .and. IsAPhoton(DecayMode2) ) then! Z+photon FS
+        NUP_NEW = 4
+    else! ZZ or WW FS
+        NUP_NEW = 6
+    endif
+
+    if( present(EventProcessId) ) then
+        IDPRUP=EventProcessId
+    else
+        IDPRUP=Process
+    endif
+    if( present(EventWeight) ) then
+        XWGTUP=EventWeight
+    else
+        XWGTUP=1.0d0
+    endif
+    if( present(EventScaleAqedAqcd) ) then
+        SCALUP=EventScaleAqedAqcd(1)
+        AQEDUP=EventScaleAqedAqcd(2)
+        AQCDUP=EventScaleAqedAqcd(3)
+    else
+        SCALUP=Mu_Fact * 100d0
+        AQEDUP=alpha_QED
+        AQCDUP=alphas
+    endif
+    ISTUP(iHiggs) = 2
+    if ( IsAPhoton(DecayMode1) .and. IsAPhoton(DecayMode2) ) then! photon+photon FS
+        HiggsDK_ISTUP(4:9) = (/1,1,0,0,0,0/)
+        HiggsDK_MOTHUP(1:2,4) = (/iHiggs,iHiggs/)
+        HiggsDK_MOTHUP(1:2,5) = (/iHiggs,iHiggs/)
+        HiggsDK_MOTHUP(1:2,6:9) = 0
+    elseif ( IsAZDecay(DecayMode1) .and. IsAPhoton(DecayMode2) ) then! Z+photon FS
+        HiggsDK_ISTUP(4:9) = (/2,1,1,1,0,0/)
+        HiggsDK_MOTHUP(1:2,4) = (/iHiggs,iHiggs/)
+        HiggsDK_MOTHUP(1:2,5) = (/iHiggs,iHiggs/)
+        HiggsDK_MOTHUP(1:2,6) = (/1,1/) + NUP
+        HiggsDK_MOTHUP(1:2,7) = (/1,1/) + NUP
+        HiggsDK_MOTHUP(1:2,8:9) = 0
+    else
+        HiggsDK_ISTUP(4:9) = (/2,2,1,1,1,1/)
+        HiggsDK_MOTHUP(1:2,4) = (/iHiggs,iHiggs/)
+        HiggsDK_MOTHUP(1:2,5) = (/iHiggs,iHiggs/)
+        HiggsDK_MOTHUP(1:2,6) = (/1,1/) + NUP
+        HiggsDK_MOTHUP(1:2,7) = (/1,1/) + NUP
+        HiggsDK_MOTHUP(1:2,8) = (/2,2/) + NUP
+        HiggsDK_MOTHUP(1:2,9) = (/2,2/) + NUP
+    endif
+
+    Lifetime = 0.0d0
+    Spin = 0.1d0
+    call getHiggsDecayLength(HiggsDKLength)
+
+    !  associte lepton pairs to MOTHUP
+    if( (IsAZDecay(DecayMode1)).and.(IsAZDecay(DecayMode2)) .and. abs(HiggsDK_IDUP(7)).eq.abs(HiggsDK_IDUP(9)) ) then
+        s34 = Get_MInv( HiggsDK_Mom(1:4,3)+HiggsDK_Mom(1:4,4) )
+        s56 = Get_MInv( HiggsDK_Mom(1:4,5)+HiggsDK_Mom(1:4,6) )
+        s36 = Get_MInv( HiggsDK_Mom(1:4,3)+HiggsDK_Mom(1:4,6) )
+        s45 = Get_MInv( HiggsDK_Mom(1:4,4)+HiggsDK_Mom(1:4,5) )
+        smallestInv = minloc((/dabs(s34-M_V),dabs(s56-M_V),dabs(s36-M_V),dabs(s45-M_V)/),1)
+        if( smallestInv.eq.3 .or. smallestInv.eq.4 ) then
+            call swapi(HiggsDK_MOTHUP(1,6),HiggsDK_MOTHUP(1,8))
+            call swapi(HiggsDK_MOTHUP(2,6),HiggsDK_MOTHUP(2,8))
+            call swapi(HiggsDK_ICOLUP(1,6),HiggsDK_ICOLUP(1,8))
+            call swapi(HiggsDK_ICOLUP(2,6),HiggsDK_ICOLUP(2,8))
+            HiggsDK_Mom(1:4,1) = HiggsDK_Mom(1:4,3)+ HiggsDK_Mom(1:4,6)
+            HiggsDK_Mom(1:4,2) = HiggsDK_Mom(1:4,4)+ HiggsDK_Mom(1:4,5)
+        endif
+    endif
+
+    if (present(BeginEventLine)) then
+        write(io_LHEOutFile, "(A)") trim(BeginEventLine)
+        indent = 0
+        do while (BeginEventLine(indent+1:indent+1).eq." ")
+            indent = indent+1
+        end do
+    else
+        write(io_LHEOutFile,"(A)") "<event>"
+        indent = 0
+    endif
+    if (present(InputFmt0)) then
+        IndentedFmt0=InputFmt0
+    else
+        if (indent.eq.0) then
+            write(IndentedFmt0, "(A,A,A)") "(", DefaultFmt0, ")"
+        else
+            write(IndentedFmt0, "(A,I1,A,A,A)") "(", indent, "X,", DefaultFmt0, ")"
+        endif
+    endif
+    if (indent.eq.0) then
+        write(IndentedFmt1, "(A,A,A)") "(", Fmt1, ")"
+    else
+        write(IndentedFmt1, "(A,I1,A,A,A)") "(", indent, "X,", Fmt1, ")"
+    endif
+    write(io_LHEOutFile,IndentedFmt0) NUP+NUP_NEW,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
+    !  in order of appearance:
+    !  (*) number of particles in the event
+    !  (*) process ID (user defined)
+    !  (*) weighted or unweighted events: +1=unweighted, otherwise= see manual
+    !  (*) pdf factorization scale in GeV
+    !  (*) alpha_QED coupling for this event
+    !  (*) alpha_s coupling for this event
+
+
+    if( .not. IsEmpty ) then
+!       write out existing particles
+        do i = 1, NUP
+            if( i.eq.iHiggs ) then
+               write(io_LHEOutFile,IndentedFmt1) IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),  &
+                                                 Mom(2:4,i)/GeV,Mom(1,i)/GeV, Mass(i)/GeV,HiggsDKLength, Spin
+            else
+               write(io_LHEOutFile,IndentedFmt1) IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),  &
+                                                 Mom(2:4,i)/GeV,Mom(1,i)/GeV, Mass(i)/GeV,Lifetime, Spin
+            endif
+        enddo
+
+
+!       write new intermediate particles and Higgs decay products
+        call swap_mom(HiggsDK_Mom(1:4,3),HiggsDK_Mom(1:4,4))! swap to account for flipped asignments
+        call swap_mom(HiggsDK_Mom(1:4,5),HiggsDK_Mom(1:4,6))! swap to account for flipped asignments
+        do i = 4,4 + (NUP_NEW-1)
+            write(io_LHEOutFile,IndentedFmt1) HiggsDK_IDUP(i),HiggsDK_ISTUP(i), HiggsDK_MOTHUP(1,i),HiggsDK_MOTHUP(2,i), HiggsDK_ICOLUP(1,i),HiggsDK_ICOLUP(2,i),  &
+                                              HiggsDK_Mom(2:4,i-3)/GeV,HiggsDK_Mom(1,i-3)/GeV, get_MInv(HiggsDK_Mom(1:4,i-3))/GeV, Lifetime, Spin
+        enddo
+    endif
+
+RETURN
+END SUBROUTINE
+
+
+
+
+SUBROUTINE WriteOutEvent_HFF(NUP,IDUP,ISTUP,MOTHUP,ICOLUP,Mom,HiggsDK_Mom,Mass,iHiggs,HiggsDK_IDUP,HiggsDK_ICOLUP,EventProcessId,EventWeight,EventScaleAqedAqcd,BeginEventLine,InputFmt0,Empty)
+use ModParameters
+use modMisc
+implicit none
+real(8) :: Mom(:,:),HiggsDK_Mom(:,:),Mass(:)
+integer,optional :: EventProcessId
+real(8),optional :: EventWeight
+real(8),optional :: EventScaleAqedAqcd(1:3)
+character(len=*),optional :: BeginEventLine
+character(len=*),optional :: InputFmt0
+real(8) :: Spin, Lifetime, s34,s56,s36,s45,smallestInv
+integer :: IDUP(:),ISTUP(:),MOTHUP(:,:),ICOLUP(:,:)
+integer :: HiggsDK_IDUP(:),HiggsDK_ICOLUP(:,:),HiggsDK_ISTUP(4:13),HiggsDK_MOTHUP(1:2,4:13)
+integer :: i,iHiggs
+integer :: NUP,NUP_NEW,IDPRUP
+real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP,HiggsDKLength
+character(len=*),parameter :: DefaultFmt0 = "I2,X,I3,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7"
+character(len=*),parameter :: Fmt1 = "6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0"
+integer :: indent
+character(len=150) :: IndentedFmt0, IndentedFmt1
+integer, parameter :: inLeft=1, inRight=2, Hig=3, tauP=4, tauM=5, Wp=6, Wm=7,   nu=8, nubar_tau=9, lepP=10,   lepM=11, nu_tau=12, nubar=13
+logical,optional :: Empty
+logical :: IsEmpty
+
+
+!   For description of the LHE format see http://arxiv.org/abs/hep-ph/0109068 and http://arxiv.org/abs/hep-ph/0609017
+!   The LHE numbering scheme can be found here: http://pdg.lbl.gov/mc_particle_id_contents.html and http://lhapdf.hepforge.org/manual#tth_sEcA
+
+
+    if( present(Empty) ) then
+        IsEmpty = Empty
+    else
+        IsEmpty = .false.
+    endif
+
+    if( IsEmpty ) then
+        NUP_NEW = -NUP
+    elseif( TauDecays.eq.0 ) then
+        NUP_NEW = 2
+    else
+        NUP_NEW = 10
+    endif
+
+
+    if( present(EventProcessId) ) then
+        IDPRUP=EventProcessId
+    else
+        IDPRUP=Process
+    endif
+    if( present(EventWeight) ) then
+        XWGTUP=EventWeight
+    else
+        XWGTUP=1.0d0
+    endif
+    if( present(EventScaleAqedAqcd) ) then
+        SCALUP=EventScaleAqedAqcd(1)
+        AQEDUP=EventScaleAqedAqcd(2)
+        AQCDUP=EventScaleAqedAqcd(3)
+    else
+        SCALUP=Mu_Fact * 100d0
+        AQEDUP=alpha_QED
+        AQCDUP=alphas
+    endif
+    ISTUP(iHiggs) = 2
+    if ( TauDecays.eq.0 ) then
+        HiggsDK_ISTUP(4:5) = (/1,1/)
+        HiggsDK_MOTHUP(1:2,4) = (/iHiggs,iHiggs/)
+        HiggsDK_MOTHUP(1:2,5) = (/iHiggs,iHiggs/)
+        HiggsDK_MOTHUP(1:2,6:11) = 0
+    else
+        HiggsDK_ISTUP(4:13) = (/2,2,2,2,1,1,1,1,1,1/)
+        HiggsDK_MOTHUP(1:2,tauP)     = (/iHiggs,iHiggs/)
+        HiggsDK_MOTHUP(1:2,tauM)     = (/iHiggs,iHiggs/)
+        HiggsDK_MOTHUP(1:2,Wp)       = (/1,1/) + NUP
+        HiggsDK_MOTHUP(1:2,nubar_tau)= (/1,1/) + NUP
+        HiggsDK_MOTHUP(1:2,Wm)       = (/2,2/) + NUP
+        HiggsDK_MOTHUP(1:2,nu_tau)   = (/2,2/) + NUP
+        HiggsDK_MOTHUP(1:2,nu)       = (/3,3/) + NUP
+        HiggsDK_MOTHUP(1:2,lepP)     = (/3,3/) + NUP
+        HiggsDK_MOTHUP(1:2,lepM)     = (/4,4/) + NUP
+        HiggsDK_MOTHUP(1:2,nubar)    = (/4,4/) + NUP
+    endif
+
+    Lifetime = 0.0d0
+    Spin = 0.1d0
+    call getHiggsDecayLength(HiggsDKLength)
+
+
+    if (present(BeginEventLine)) then
+        write(io_LHEOutFile, "(A)") trim(BeginEventLine)
+        indent = 0
+        do while (BeginEventLine(indent+1:indent+1).eq." ")
+            indent = indent+1
+        end do
+    else
+        write(io_LHEOutFile,"(A)") "<event>"
+        indent = 0
+    endif
+    if (present(InputFmt0)) then
+        IndentedFmt0=InputFmt0
+    else
+        if (indent.eq.0) then
+            write(IndentedFmt0, "(A,A,A)") "(", DefaultFmt0, ")"
+        else
+            write(IndentedFmt0, "(A,I1,A,A,A)") "(", indent, "X,", DefaultFmt0, ")"
+        endif
+    endif
+    if (indent.eq.0) then
+        write(IndentedFmt1, "(A,A,A)") "(", Fmt1, ")"
+    else
+        write(IndentedFmt1, "(A,I1,A,A,A)") "(", indent, "X,", Fmt1, ")"
+    endif
+    write(io_LHEOutFile,IndentedFmt0) NUP+NUP_NEW,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
+    !  in order of appearance:
+    !  (*) number of particles in the event
+    !  (*) process ID (user defined)
+    !  (*) weighted or unweighted events: +1=unweighted, otherwise= see manual
+    !  (*) pdf factorization scale in GeV
+    !  (*) alpha_QED coupling for this event
+    !  (*) alpha_s coupling for this event
+
+
+    if( .not. IsEmpty ) then
+!       write out existing particles
+        do i = 1, NUP
+            if( i.eq.iHiggs ) then
+               write(io_LHEOutFile,IndentedFmt1) IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),  &
+                                                 Mom(2:4,i)/GeV,Mom(1,i)/GeV, Mass(i)/GeV,HiggsDKLength, Spin
+            else
+               write(io_LHEOutFile,IndentedFmt1) IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),  &
+                                                 Mom(2:4,i)/GeV,Mom(1,i)/GeV, Mass(i)/GeV,Lifetime, Spin
+            endif
+        enddo
+
+!       write new intermediate particles and Higgs decay products
+        do i = 4,4 + (NUP_NEW-1)
+            write(io_LHEOutFile,IndentedFmt1) HiggsDK_IDUP(i),HiggsDK_ISTUP(i), HiggsDK_MOTHUP(1,i),HiggsDK_MOTHUP(2,i), HiggsDK_ICOLUP(1,i),HiggsDK_ICOLUP(2,i),  &
+                                              HiggsDK_Mom(2:4,i)/GeV,HiggsDK_Mom(1,i)/GeV, get_MInv(HiggsDK_Mom(1:4,i))/GeV, Lifetime, Spin
+        enddo
+    endif
+
+RETURN
+END SUBROUTINE
 
 
 SUBROUTINE ShiftMass(p1,p2,m1,m2,p1hat,p2hat,MassWeight)
@@ -65,6 +731,1993 @@ END SUBROUTINE
 
 
 
+SUBROUTINE WriteOutEvent_HJ(Mom,MY_IDUP,ICOLUP,MomRealGlu,EventWeight,EventInfoLine)
+use ModParameters
+implicit none
+real(8) :: Mom(1:4,1:4)
+real(8),optional :: MomRealGlu(1:4)
+character(len=160),optional :: EventInfoLine
+real(8),optional :: EventWeight
+real(8) :: Spin, Lifetime
+! real(8) :: XFV(1:4), Z1FV(1:4), Z2FV(1:4)
+real(8) :: MomDummy(1:4,1:5)
+real(8) :: Part1Mass,Part2Mass,Part3Mass,Part4Mass,XMass
+integer :: a,b,c
+integer :: MY_IDUP(:),LHE_IDUP(1:10),i,ISTUP(1:10),MOTHUP(1:2,1:10),ICOLUP(:,:)
+integer :: NUP,IDPRUP
+real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP,HiggsDKLength
+character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0)"
+
+
+
+! For description of the LHE format see http://arxiv.org/abs/hep-ph/0109068 and http://arxiv.org/abs/hep-ph/0609017
+! The LHE numbering scheme can be found here: http://pdg.lbl.gov/mc_particle_id_contents.html and http://lhapdf.hepforge.org/manual#tth_sEcA
+
+
+do i=1,4
+    LHE_IDUP(i) = convertLHE( MY_IDUP(i) )
+enddo
+
+
+IDPRUP=Process
+SCALUP=Mu_Fact * 100d0
+AQEDUP=alpha_QED
+AQCDUP=alphas
+
+ISTUP(1) = -1
+ISTUP(2) = -1
+ISTUP(3) = 1
+ISTUP(4) = 1
+
+
+MOTHUP(1,1) = 0
+MOTHUP(2,1) = 0
+MOTHUP(1,2) = 0
+MOTHUP(2,2) = 0
+MOTHUP(1,3) = 1
+MOTHUP(2,3) = 2
+MOTHUP(1,4) = 1
+MOTHUP(2,4) = 2
+
+
+NUP=4
+
+if( present(EventWeight) ) then
+    XWGTUP=EventWeight
+else
+    XWGTUP=1.0d0
+endif
+
+Lifetime = 0.0d0
+Spin = 0.1d0
+call getHiggsDecayLength(HiggsDKLength)
+
+do a=1,4
+    MomDummy(1,a) = 100.0d0*Mom(1,a)
+    MomDummy(2,a) = 100.0d0*Mom(2,a)
+    MomDummy(3,a) = 100.0d0*Mom(3,a)
+    MomDummy(4,a) = 100.0d0*Mom(4,a)
+enddo
+
+! do b=1,4
+!     Z1FV(b) = MomDummy(b,1)-MomDummy(b,3)
+!     Z2FV(b) = MomDummy(b,2)+MomDummy(b,4)
+! enddo
+
+
+Part1Mass = 0d0
+Part2Mass = 0d0
+Part4Mass = 0d0
+XMass = M_Reso* 100d0
+
+
+
+write(io_LHEOutFile,"(A)") "<event>"
+if( .not. ReadLHEFile ) write(io_LHEOutFile,"(I2,X,I3,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7)") NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
+! in order of appearance:
+! (*) number of particles in the event
+! (*) process ID (user defined)
+! (*) weighted or unweighted events: +1=unweighted, otherwise= see manual
+! (*) pdf factorization scale in GeV
+! (*) alpha_QED coupling for this event
+! (*) alpha_s coupling for this event
+
+
+
+! parton_a
+i=1
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),Part1Mass,Lifetime,Spin
+
+! parton_b
+i=2
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),Part2Mass,Lifetime,Spin
+
+! H
+i=3
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),XMass,HiggsDKLength,Spin
+
+! j1
+i=4
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),Part4Mass,Lifetime,Spin
+
+
+write(io_LHEOutFile,"(A)") "</event>"
+
+
+
+END SUBROUTINE
+
+
+SUBROUTINE WriteOutEvent_HJJ_fulldecay(Mom,MY_IDUP,ICOLUP,EventWeight)
+use ModParameters
+use ModMisc
+implicit none
+integer,parameter :: NUP=10
+real(8) :: Mom(1:4,1:NUP),xRnd,s34,s36,s45,s56
+real(8),optional :: EventWeight
+integer :: MY_IDUP(1:NUP),ICOLUP(1:2,1:NUP),LHE_IDUP(1:NUP),ISTUP(1:NUP),MOTHUP(1:2,1:NUP)
+integer :: IDPRUP,i,smallestInv
+real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP,Lifetime,Spin,MomDummy(1:4,1:NUP),TheMass,mjj
+character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0)"
+integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, Lep1M=8, Lep2P=9, Lep2M=10
+integer, parameter :: LHA2M_ID(-6:6)  = (/-5,-6,-3,-4,-1,-2,10,2,1,4,3,6,5/)
+logical :: canbeVBF, canbeVH, isVHlike
+! For description of the LHE format see http://arxiv.org/abs/hep-ph/0109068 and http://arxiv.org/abs/hep-ph/0609017
+! The LHE numbering scheme can be found here: http://pdg.lbl.gov/mc_particle_id_contents.html and http://lhapdf.hepforge.org/manual#tth_sEcA
+
+
+      IDPRUP=Process
+      SCALUP=Mu_Fact * 100d0
+      AQEDUP=alpha_QED
+      AQCDUP=alphas
+
+      ISTUP(1:2) = -1
+      MOTHUP(1:2,1:2) = 0
+
+      canbeVH = .false.
+      canbeVBF = .false.
+
+      !try VBF first because there are more options there, but overwrite with VH if that's better
+
+      if( MY_IDUP(1).gt.0 ) then ! quark
+        ICOLUP(1:2,1) = (/501,000/)
+      else! anti-quark
+        ICOLUP(1:2,1) = (/000,501/)
+      endif
+      if( MY_IDUP(2).gt.0 ) then! quark
+        ICOLUP(1:2,2) = (/502,000/)
+      else! anti-quark
+        ICOLUP(1:2,2) = (/000,502/)
+      endif
+
+      !WW is typically larger xsec, so choose that if possible, then ZZ
+      if(       abs(CoupledVertex((/MY_IDUP(1),-MY_IDUP(3)/), -1)) .eq. abs(Wp_) &
+          .and. abs(CoupledVertex((/MY_IDUP(2),-MY_IDUP(4)/), -1)) .eq. abs(Wp_)) then
+        ICOLUP(1:2,3) = ICOLUP(1:2,1)
+        ICOLUP(1:2,4) = ICOLUP(1:2,2)
+        canbeVBF = .true.
+      elseif(       abs(CoupledVertex((/MY_IDUP(1),-MY_IDUP(4)/), -1)) .eq. abs(Wp_) &
+              .and. abs(CoupledVertex((/MY_IDUP(2),-MY_IDUP(3)/), -1)) .eq. abs(Wp_)) then
+        ICOLUP(1:2,3) = ICOLUP(1:2,2)
+        ICOLUP(1:2,4) = ICOLUP(1:2,1)
+        canbeVBF = .true.
+      elseif(       abs(CoupledVertex((/MY_IDUP(1),-MY_IDUP(3)/), -1)) .eq. abs(Z0_) &
+              .and. abs(CoupledVertex((/MY_IDUP(2),-MY_IDUP(4)/), -1)) .eq. abs(Z0_)) then
+        ICOLUP(1:2,3) = ICOLUP(1:2,1)
+        ICOLUP(1:2,4) = ICOLUP(1:2,2)
+        canbeVBF = .true.
+      elseif(       abs(CoupledVertex((/MY_IDUP(1),-MY_IDUP(4)/), -1)) .eq. abs(Z0_) &
+              .and. abs(CoupledVertex((/MY_IDUP(2),-MY_IDUP(3)/), -1)) .eq. abs(Z0_)) then
+        ICOLUP(1:2,3) = ICOLUP(1:2,2)
+        ICOLUP(1:2,4) = ICOLUP(1:2,1)
+        canbeVBF = .true.
+      endif
+
+      if( CoupledVertex(MY_IDUP(1:2), -1) .ne. Not_a_particle_ .and. CoupledVertex(MY_IDUP(3:4), -1) .ne. Not_a_particle_) then
+        canbeVH = .true.
+      endif
+
+      if( .not. canbeVH .and. .not. canbeVBF) then
+        print *, "Event doesn't make sense"
+        print *, MY_IDUP(1:4)
+        stop 1
+      endif
+
+      if( canbeVH .and. canbeVBF ) then
+        mjj = Get_MInv( Mom(1:4,3)+Mom(1:4,4) )
+        if( abs(CoupledVertex(MY_IDUP(1:2), -1)).eq.Wp_ ) then
+          isVHlike = ( mjj .gt. M_W-2d0*Ga_W .and. mjj .lt. M_W+2d0*Ga_W )
+        else
+          isVHlike = ( mjj .gt. M_Z-2d0*Ga_Z .and. mjj .lt. M_Z+2d0*Ga_Z )
+        endif
+      elseif( canbeVH ) then
+        isVHlike = .true.
+      endif
+
+      if( isVHlike ) then
+        if( MY_IDUP(1).gt.0 ) then ! quark
+          ICOLUP(1:2,1) = (/501,000/)
+          ICOLUP(1:2,2) = (/000,501/)
+        else! anti-quark
+          ICOLUP(1:2,1) = (/000,501/)
+          ICOLUP(1:2,2) = (/501,000/)
+        endif
+        if( MY_IDUP(3).gt.0 ) then ! quark
+          ICOLUP(1:2,3) = (/502,000/)
+          ICOLUP(1:2,4) = (/000,502/)
+        else! anti-quark
+          ICOLUP(1:2,3) = (/000,502/)
+          ICOLUP(1:2,4) = (/502,000/)
+        endif
+      endif
+
+      ISTUP(3:10) = +1
+      MOTHUP(1:2,3)= (/1,2/)
+      MOTHUP(1:2,4)= (/1,2/)
+      
+      if( MY_IDUP(3).eq.10 ) then ! 10 = LHA2M_ID(0) for the case where MY_IDUP(3:4) are not set (i.e. deterministicME=.false.). 10 doesn't mean gluon here
+         call random_number(xRnd)
+         if( xRnd.lt.0.5d0 ) then! ZZ fusion
+                MY_IDUP(3:4)= (/MY_IDUP(1),MY_IDUP(2)/)
+         else! WW fusion
+                MY_IDUP(3) = -GetCKMPartner( MY_IDUP(1) )
+                MY_IDUP(4) = -GetCKMPartner( MY_IDUP(2) )
+                if( abs(MY_IDUP(3)).eq.Top_ ) MY_IDUP(3) = MY_IDUP(1)
+                if( abs(MY_IDUP(4)).eq.Top_ ) MY_IDUP(4) = MY_IDUP(2)
+         endif
+         call Error("This shouldn't be able to happen anymore, assert false")
+      endif
+      
+      ISTUP(5:6) = 2
+      ICOLUP(1:2,5:6) = 0
+      MOTHUP(1:2,5)=(/1,2/)
+      MOTHUP(1:2,6)=(/1,2/) 
+
+      MOTHUP(1:2,7 )= (/5,5/)
+      MOTHUP(1:2,8 )= (/5,5/)
+      MOTHUP(1:2,9 )= (/6,6/)
+      MOTHUP(1:2,10)= (/6,6/)
+            
+      
+      
+      
+
+      if( present(EventWeight) ) then
+          XWGTUP=EventWeight
+      else
+          XWGTUP=1.0d0
+      endif
+      Lifetime = 0.0d0
+      Spin     = 0.1d0
+
+
+      do i=1,NUP
+          LHE_IDUP(i) = convertLHE( MY_IDUP(i) )
+          MomDummy(1,i) = 100.0d0*Mom(1,i)
+          MomDummy(2,i) = 100.0d0*Mom(2,i)
+          MomDummy(3,i) = 100.0d0*Mom(3,i)
+          MomDummy(4,i) = 100.0d0*Mom(4,i)
+      enddo
+
+
+!  associte lepton pairs to MOTHUP
+      if( MY_IDUP(7).eq.MY_IDUP(9) ) then
+          s34 = Get_MInv( Mom(1:4,7)+Mom(1:4,8) )
+          s56 = Get_MInv( Mom(1:4,9)+Mom(1:4,10) )
+          s36 = Get_MInv( Mom(1:4,7)+Mom(1:4,10) )
+          s45 = Get_MInv( Mom(1:4,8)+Mom(1:4,9) )
+          smallestInv = minloc((/dabs(s34-M_V),dabs(s56-M_V),dabs(s36-M_V),dabs(s45-M_V)/),1)
+          if( smallestInv.eq.3 .or. smallestInv.eq.4 ) then
+              call swapi(MOTHUP(1,7),MOTHUP(1,9))
+              call swapi(MOTHUP(2,7),MOTHUP(2,9))
+              call swapi(ICOLUP(1,7),ICOLUP(1,9))
+              call swapi(ICOLUP(2,7),ICOLUP(2,9))
+              MomDummy(1:4,5) = MomDummy(1:4,9)+MomDummy(1:4,8)
+              MomDummy(1:4,6) = MomDummy(1:4,7)+MomDummy(1:4,10)
+          else
+              !The Z's are not always lined up this way already, for reasons I don't understand.
+              MomDummy(1:4,5) = MomDummy(1:4,7)+MomDummy(1:4,8)
+              MomDummy(1:4,6) = MomDummy(1:4,9)+MomDummy(1:4,10)
+          endif
+      endif
+
+
+write(io_LHEOutFile,"(A)") "<event>"
+write(io_LHEOutFile,"(I2,X,I3,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7)") NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
+! in order of appearance:
+! (*) number of particles in the event
+! (*) process ID (user defined)
+! (*) weighted or unweighted events: +1=unweighted, otherwise= see manual
+! (*) pdf factorization scale in GeV
+! (*) alpha_QED coupling for this event
+! (*) alpha_s coupling for this event
+
+
+do i=1,NUP
+     TheMass = get_Minv(MomDummy(:,i))
+     if( i.le.4  ) TheMass = 0.0d0  ! setting quark masses to zero
+     write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),TheMass,Lifetime,Spin
+enddo
+
+write(io_LHEOutFile,"(A)") "</event>"
+
+
+RETURN
+END SUBROUTINE
+
+
+
+
+
+SUBROUTINE WriteOutEvent_TTBH(Mom,MY_IDUP,ICOLUP,EventWeight)
+use ModParameters
+use ModMisc
+implicit none
+real(8) :: Mom(1:4,1:13)
+real(8),optional :: EventWeight
+integer :: MY_IDUP(1:13),ICOLUP(1:2,1:13),LHE_IDUP(1:13),ISTUP(1:13),MOTHUP(1:2,1:13)
+integer :: NUP,IDPRUP,i
+real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP,Lifetime,Spin,MomDummy(1:4,1:13),TheMass
+character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0)"
+integer, parameter :: inLeft=1,inRight=2,Hbos=3,tbar=4,t=5,  bbar=6,Wm=7,lepM=8,nubar=9,  b=10,Wp=11,lepP=12,nu=13
+
+
+! For description of the LHE format see http://arxiv.org/abs/hep-ph/0109068 and http://arxiv.org/abs/hep-ph/0609017
+! The LHE numbering scheme can be found here: http://pdg.lbl.gov/mc_particle_id_contents.html and http://lhapdf.hepforge.org/manual#tth_sEcA
+
+
+
+IDPRUP=Process
+SCALUP=Mu_Fact * 100d0
+AQEDUP=alpha_QED
+AQCDUP=alphas
+
+
+
+MOTHUP(1:2,inLeft) = (/0,0/);             ISTUP(inLeft) = -1
+MOTHUP(1:2,inRight)= (/0,0/);             ISTUP(inRight)= -1
+
+MOTHUP(1:2,Hbos)   = (/inLeft,inRight/);  ISTUP(Hbos)   = +1
+MOTHUP(1:2,tbar)   = (/inLeft,inRight/);  ISTUP(tbar)   = +2
+MOTHUP(1:2,t)      = (/inLeft,inRight/);  ISTUP(t)      = +2
+
+MOTHUP(1:2,bbar)   = (/tbar,tbar/);       ISTUP(bbar)   = +1
+MOTHUP(1:2,Wm)     = (/tbar,tbar/);       ISTUP(Wm)     = +2
+MOTHUP(1:2,lepM)   = (/Wm,Wm/);           ISTUP(lepM)   = +1
+MOTHUP(1:2,nubar)  = (/Wm,Wm/);           ISTUP(nubar)  = +1
+
+MOTHUP(1:2,b)      = (/t,t/);             ISTUP(b)      = +1
+MOTHUP(1:2,Wp)     = (/t,t/);             ISTUP(Wp)     = +2
+MOTHUP(1:2,lepP)   = (/Wp,Wp/);           ISTUP(lepP)   = +1
+MOTHUP(1:2,nu)     = (/Wp,Wp/);           ISTUP(nu)     = +1
+
+
+if( TopDecays.eq.0 ) then
+   NUP = 5
+   ISTUP(tbar)   = +1
+   ISTUP(t)      = +1
+else
+   NUP=13
+endif
+
+if( present(EventWeight) ) then
+    XWGTUP=EventWeight
+else
+    XWGTUP=1.0d0
+endif
+Lifetime = 0.0d0
+Spin     = 0.1d0
+
+
+do i=1,5
+    LHE_IDUP(i) = convertLHE( MY_IDUP(i) )
+    MomDummy(1,i) = 100.0d0*Mom(1,i)
+    MomDummy(2,i) = 100.0d0*Mom(2,i)
+    MomDummy(3,i) = 100.0d0*Mom(3,i)
+    MomDummy(4,i) = 100.0d0*Mom(4,i)
+enddo
+
+if( TopDecays.ne.0 ) then
+      ! introduce b-quark mass for LHE output
+!       call ShiftMass(Mom(1:4,b),   Mom(1:4,Wp),m_bot,M_W,  MomDummy(1:4,b),   MomDummy(1:4,Wp) )
+!       call ShiftMass(Mom(1:4,bbar),Mom(1:4,Wm),m_bot,M_W,  MomDummy(1:4,bbar),MomDummy(1:4,Wm) )
+      MomDummy(1:4,b)   = Mom(1:4,b)
+      MomDummy(1:4,bbar)= Mom(1:4,bbar)
+      MomDummy(1:4,Wp)  = Mom(1:4,Wp)
+      MomDummy(1:4,Wm)  = Mom(1:4,Wm)
+
+      ! introduce lepton/quark masses for LHE output
+      call ShiftMass(Mom(1:4,LepP),Mom(1:4,Wp)-Mom(1:4,LepP), GetMass(MY_IDUP(LepP)),0d0,  MomDummy(1:4,LepP),MomDummy(1:4,Nu) )
+      call ShiftMass(Mom(1:4,LepM),Mom(1:4,Wm)-Mom(1:4,LepM), GetMass(MY_IDUP(LepM)),0d0,  MomDummy(1:4,LepM),MomDummy(1:4,Nubar) )
+
+      do i=6,13
+          LHE_IDUP(i) = convertLHE( MY_IDUP(i) )
+          MomDummy(1,i) = 100.0d0*MomDummy(1,i)
+          MomDummy(2,i) = 100.0d0*MomDummy(2,i)
+          MomDummy(3,i) = 100.0d0*MomDummy(3,i)
+          MomDummy(4,i) = 100.0d0*MomDummy(4,i)
+      enddo
+endif
+
+
+write(io_LHEOutFile,"(A)") "<event>"
+write(io_LHEOutFile,"(I2,X,I3,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7)") NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
+! in order of appearance:
+! (*) number of particles in the event
+! (*) process ID (user defined)
+! (*) weighted or unweighted events: +1=unweighted, otherwise= see manual
+! (*) pdf factorization scale in GeV
+! (*) alpha_QED coupling for this event
+! (*) alpha_s coupling for this event
+
+do i=1,NUP
+!      TheMass = GetMass( MY_IDUP(i) )*100d0
+     TheMass = get_Minv(MomDummy(:,i))
+     if( i.le.2  ) TheMass = 0.0d0  ! setting initial parton masses to zero
+     write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),TheMass,Lifetime,Spin
+enddo
+write(io_LHEOutFile,"(A)") "</event>"
+
+
+RETURN
+END SUBROUTINE
+
+
+
+
+
+SUBROUTINE WriteOutEvent_BBBH(Mom,MY_IDUP,ICOLUP,EventWeight)
+use ModParameters
+implicit none
+real(8) :: Mom(1:4,1:11)
+real(8),optional :: EventWeight
+integer :: MY_IDUP(1:11),ICOLUP(1:2,1:11),LHE_IDUP(1:5),ISTUP(1:5),MOTHUP(1:2,1:5)
+integer :: NUP,IDPRUP,i
+real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP,Lifetime,Spin,MomDummy(1:4,1:13)
+character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0)"
+integer, parameter :: bbar=4,b=5,Hbos=3,inLeft=1,inRight=2
+
+
+! For description of the LHE format see http://arxiv.org/abs/hep-ph/0109068 and http://arxiv.org/abs/hep-ph/0609017
+! The LHE numbering scheme can be found here: http://pdg.lbl.gov/mc_particle_id_contents.html and http://lhapdf.hepforge.org/manual#tth_sEcA
+
+
+do i=1,5
+    LHE_IDUP(i) = convertLHE( MY_IDUP(i) )
+enddo
+
+
+IDPRUP=Process
+SCALUP=Mu_Fact * 100d0
+AQEDUP=alpha_QED
+AQCDUP=alphas
+
+ISTUP(1:5) = (/-1,-1,1,1,1/)
+
+
+MOTHUP(1:2,inLeft)  = (/0,0/)
+MOTHUP(1:2,inRight) = (/0,0/)
+MOTHUP(1:2,Hbos)    = (/1,2/)
+MOTHUP(1:2,bbar)    = (/1,2/)
+MOTHUP(1:2,b)       = (/1,2/)
+
+
+NUP = 5
+
+
+if( present(EventWeight) ) then
+    XWGTUP=EventWeight
+else
+    XWGTUP=1.0d0
+endif
+
+Lifetime = 0.0d0
+Spin     = 0.1d0
+
+do i=1,11
+    MomDummy(1,i) = 100.0d0*Mom(1,i)
+    MomDummy(2,i) = 100.0d0*Mom(2,i)
+    MomDummy(3,i) = 100.0d0*Mom(3,i)
+    MomDummy(4,i) = 100.0d0*Mom(4,i)
+enddo
+
+
+
+write(io_LHEOutFile,"(A)") "<event>"
+write(io_LHEOutFile,"(I2,X,I3,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7)") NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
+! in order of appearance:
+! (*) number of particles in the event
+! (*) process ID (user defined)
+! (*) weighted or unweighted events: +1=unweighted, otherwise= see manual
+! (*) pdf factorization scale in GeV
+! (*) alpha_QED coupling for this event
+! (*) alpha_s coupling for this event
+
+
+
+! parton_a
+i=1
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
+
+! parton_b
+i=2
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),0d0,Lifetime,Spin
+
+! H
+i=3
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),M_Reso*100d0,Lifetime,Spin
+
+! bb
+i=4
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),m_top*100d0,Lifetime,Spin
+
+! b
+i=5
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),m_top*100d0,Lifetime,Spin
+
+
+
+write(io_LHEOutFile,"(A)") "</event>"
+
+
+
+
+END SUBROUTINE
+
+
+
+
+
+
+
+SUBROUTINE WriteOutEvent_TH(Mom,MY_IDUP,ICOLUP,EventWeight)
+use ModParameters
+use ModMisc
+implicit none
+real(8) :: Mom(1:4,1:9)
+real(8),optional :: EventWeight
+integer :: MY_IDUP(1:9),ICOLUP(1:2,1:9),LHE_IDUP(1:9),ISTUP(1:9),MOTHUP(1:2,1:9)
+integer :: NUP,IDPRUP,i
+real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP,Lifetime,Spin,MomDummy(1:4,1:13),TheMass
+character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0)"
+integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9
+
+
+! For description of the LHE format see http://arxiv.org/abs/hep-ph/0109068 and http://arxiv.org/abs/hep-ph/0609017
+! The LHE numbering scheme can be found here: http://pdg.lbl.gov/mc_particle_id_contents.html and http://lhapdf.hepforge.org/manual#tth_sEcA
+
+
+
+IDPRUP=Process
+SCALUP=Mu_Fact * 100d0
+AQEDUP=alpha_QED
+AQCDUP=alphas
+
+
+
+MOTHUP(1:2,inLeft) = (/0,0/);             ISTUP(inLeft) = -1
+MOTHUP(1:2,inRight)= (/0,0/);             ISTUP(inRight)= -1
+
+MOTHUP(1:2,Hbos)   = (/inLeft,inRight/);  ISTUP(Hbos)   = +1
+MOTHUP(1:2,t)      = (/inLeft,inRight/);  ISTUP(t)      = +2
+MOTHUP(1:2,qout)   = (/inLeft,inRight/);  ISTUP(qout)   = +1
+
+MOTHUP(1:2,b)      = (/t,t/);             ISTUP(b)      = +1
+MOTHUP(1:2,W)      = (/t,t/);             ISTUP(W)      = +2
+MOTHUP(1:2,lep)    = (/W,W/);             ISTUP(lep)    = +1
+MOTHUP(1:2,nu)     = (/W,W/);             ISTUP(nu)     = +1
+
+
+if( TopDecays.eq.0 ) then
+   NUP = 5
+   ISTUP(t)      = +1
+else
+   NUP=9
+endif
+
+if( present(EventWeight) ) then
+    XWGTUP=EventWeight
+else
+    XWGTUP=1.0d0
+endif
+Lifetime = 0.0d0
+Spin     = 0.1d0
+
+
+do i=1,5
+    LHE_IDUP(i) = convertLHE( MY_IDUP(i) )
+    MomDummy(1,i) = 100.0d0*Mom(1,i)
+    MomDummy(2,i) = 100.0d0*Mom(2,i)
+    MomDummy(3,i) = 100.0d0*Mom(3,i)
+    MomDummy(4,i) = 100.0d0*Mom(4,i)
+enddo
+
+if( TopDecays.ne.0 ) then
+      ! introduce b-quark mass for LHE output
+!       call ShiftMass(Mom(1:4,b),   Mom(1:4,W),m_bot,M_W,  MomDummy(1:4,b),   MomDummy(1:4,W) )
+      MomDummy(1:4,b) = Mom(1:4,b)
+      MomDummy(1:4,W) = Mom(1:4,W)
+
+      ! introduce lepton/quark masses for LHE output
+      call ShiftMass(Mom(1:4,Lep),Mom(1:4,W)-Mom(1:4,Lep), GetMass(MY_IDUP(Lep)),0d0,  MomDummy(1:4,Lep),MomDummy(1:4,Nu) )
+
+      do i=6,9
+          LHE_IDUP(i) = convertLHE( MY_IDUP(i) )
+          MomDummy(1,i) = 100.0d0*MomDummy(1,i)
+          MomDummy(2,i) = 100.0d0*MomDummy(2,i)
+          MomDummy(3,i) = 100.0d0*MomDummy(3,i)
+          MomDummy(4,i) = 100.0d0*MomDummy(4,i)
+      enddo
+endif
+
+
+
+write(io_LHEOutFile,"(A)") "<event>"
+write(io_LHEOutFile,"(I2,X,I3,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7)") NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
+! in order of appearance:
+! (*) number of particles in the event
+! (*) process ID (user defined)
+! (*) weighted or unweighted events: +1=unweighted, otherwise= see manual
+! (*) pdf factorization scale in GeV
+! (*) alpha_QED coupling for this event
+! (*) alpha_s coupling for this event
+
+do i=1,NUP
+!      TheMass = GetMass( MY_IDUP(i) )*100d0
+     TheMass = get_Minv(MomDummy(:,i))
+     if( i.le.2  ) TheMass = 0.0d0  ! setting initial parton masses to zero
+     write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),TheMass,Lifetime,Spin
+enddo
+write(io_LHEOutFile,"(A)") "</event>"
+
+
+RETURN
+END SUBROUTINE
+
+
+
+
+
+
+SUBROUTINE WriteOutEvent_HVBF(Mom,MY_IDUP,ICOLUP,MomRealGlu,EventWeight,EventInfoLine)
+use ModParameters
+implicit none
+real(8) :: Mom(1:4,1:5)
+real(8),optional :: MomRealGlu(1:4)
+character(len=170),optional :: EventInfoLine
+real(8),optional :: EventWeight
+real(8) :: Spin, Lifetime
+! real(8) :: XFV(1:4), Z1FV(1:4), Z2FV(1:4)
+real(8) :: MomDummy(1:4,1:5)
+real(8) :: Part1Mass,Part2Mass,Part3Mass,Part4Mass,XMass
+integer :: a,b,c
+integer :: MY_IDUP(:),LHE_IDUP(1:10),i,ISTUP(1:10),MOTHUP(1:2,1:10),ICOLUP(:,:)
+integer :: NUP,IDPRUP
+real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP,HiggsDKLength
+character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0)"
+
+
+
+! For description of the LHE format see http://arxiv.org/abs/hep-ph/0109068 and http://arxiv.org/abs/hep-ph/0609017
+! The LHE numbering scheme can be found here: http://pdg.lbl.gov/mc_particle_id_contents.html and http://lhapdf.hepforge.org/manual#tth_sEcA
+
+
+do i=1,5
+    LHE_IDUP(i) = convertLHE( MY_IDUP(i) )
+enddo
+
+
+IDPRUP=Process
+SCALUP=Mu_Fact * 100d0
+AQEDUP=alpha_QED
+AQCDUP=alphas
+
+ISTUP(1) = -1
+ISTUP(2) = -1
+ISTUP(3) = 1
+ISTUP(4) = 1
+ISTUP(5) = 1
+
+
+! this is not correct: intermediate VV's need to be added
+! MOTHUP(1,1) = 0
+! MOTHUP(2,1) = 0
+! MOTHUP(1,2) = 0
+! MOTHUP(2,2) = 0
+! MOTHUP(1,3) = 1
+! MOTHUP(2,3) = 1
+! MOTHUP(1,4) = 2
+! MOTHUP(2,4) = 2
+! MOTHUP(1,5) = 1
+! MOTHUP(2,5) = 2
+
+MOTHUP(1,1) = 0
+MOTHUP(2,1) = 0
+MOTHUP(1,2) = 0
+MOTHUP(2,2) = 0
+MOTHUP(1,3) = 1
+MOTHUP(2,3) = 2
+MOTHUP(1,4) = 1
+MOTHUP(2,4) = 2
+MOTHUP(1,5) = 1
+MOTHUP(2,5) = 2
+
+
+NUP=5
+
+if( present(EventWeight) ) then
+    XWGTUP=EventWeight
+else
+    XWGTUP=1.0d0
+endif
+
+Lifetime = 0.0d0
+Spin = 0.1d0
+call getHiggsDecayLength(HiggsDKLength)
+
+do a=1,5
+    MomDummy(1,a) = 100.0d0*Mom(1,a)
+    MomDummy(2,a) = 100.0d0*Mom(2,a)
+    MomDummy(3,a) = 100.0d0*Mom(3,a)
+    MomDummy(4,a) = 100.0d0*Mom(4,a)
+enddo
+
+! do b=1,4
+!     Z1FV(b) = MomDummy(b,1)-MomDummy(b,3)
+!     Z2FV(b) = MomDummy(b,2)+MomDummy(b,4)
+! enddo
+
+
+Part1Mass = 0d0
+Part2Mass = 0d0
+Part3Mass = 0d0
+Part4Mass = 0d0
+XMass = M_Reso* 100d0
+
+
+
+write(io_LHEOutFile,"(A)") "<event>"
+if( .not. ReadLHEFile ) write(io_LHEOutFile,"(I2,X,I3,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7)") NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
+! in order of appearance:
+! (*) number of particles in the event
+! (*) process ID (user defined)
+! (*) weighted or unweighted events: +1=unweighted, otherwise= see manual
+! (*) pdf factorization scale in GeV
+! (*) alpha_QED coupling for this event
+! (*) alpha_s coupling for this event
+
+
+
+! parton_a
+i=1
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),Part1Mass,Lifetime,Spin
+
+! parton_b
+i=2
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),Part2Mass,Lifetime,Spin
+
+! j1
+i=3
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),Part3Mass,Lifetime,Spin
+
+! j2
+i=4
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),Part4Mass,Lifetime,Spin
+
+! H
+i=5
+write(io_LHEOutFile,fmt1) LHE_IDUP(i),ISTUP(i), MOTHUP(1,i),MOTHUP(2,i), ICOLUP(1,i),ICOLUP(2,i),MomDummy(2:4,i),MomDummy(1,i),XMass,HiggsDKLength,Spin
+
+
+write(io_LHEOutFile,"(A)") "</event>"
+
+! if( dabs(MomDummy(2,1)+MomDummy(2,2)+MomDummy(2,3)+MomDummy(2,4)+MomDummy(2,5)).gt. 1d-10 ) then
+!     print *, "checker",MomDummy(2,1)+MomDummy(2,2)+MomDummy(2,3)+MomDummy(2,4)+MomDummy(2,5)
+!     pause
+! endif
+
+
+END SUBROUTINE
+
+
+
+
+SUBROUTINE WriteOutEvent_VHiggs(id,helicity,MomExt,inv_mass,EventWeight)
+use ModParameters
+implicit none
+double precision, intent(in) :: MomExt(1:4,1:9), inv_mass(9)
+!double precision, intent(in) :: beam_h(2)
+double precision helicity(9)
+real(8) :: MomDummy(1:4,1:9), MassDummy(9)
+integer :: id(9)
+integer :: ICOLUP(4,2)
+real(8) :: EventWeight
+real(8) :: Spin
+integer :: i
+integer :: NUP,IDPRUP
+real(8) :: XWGTUP,SCALUP,AQEDUP,AQCDUP,HiggsDKLength
+character(len=*),parameter :: Fmt1 = "(6X,I3,2X,I3,3X,I2,3X,I2,2X,I3,2X,I3,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,X,1PE18.11,1PE18.11,X,1F3.0)"
+
+
+
+MomDummy = MomExt/GeV
+MassDummy = inv_mass/GeV
+
+IDPRUP=Process
+SCALUP=Mu_Fact/GeV
+AQEDUP=alpha_QED
+AQCDUP=alphas
+
+call getHiggsDecayLength(HiggsDKLength)
+
+NUP = 4
+if(H_DK) NUP=NUP+2
+if(.not.IsAPhoton(DecayMode1)) NUP=NUP+2
+
+    XWGTUP=EventWeight
+
+write(io_LHEOutFile,"(A)") "<event>"
+if( .not. ReadLHEFile ) write(io_LHEOutFile,"(I2,X,I3,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7,2X,1PE14.7)") NUP,IDPRUP,XWGTUP,SCALUP,AQEDUP,AQCDUP
+
+helicity(3:5)=0d0
+Spin = 0.1d0
+
+if(COLLIDER.eq.0)then
+  ICOLUP=0
+else
+  if(id(1).gt.0)then
+    ICOLUP(1,1)=503
+    ICOLUP(1,2)=0
+    ICOLUP(2,1)=0
+    ICOLUP(2,2)=503
+  else
+    ICOLUP(1,1)=0
+    ICOLUP(1,2)=503
+    ICOLUP(2,1)=503
+    ICOLUP(2,2)=0
+  endif
+endif
+
+if((id(6).eq.convertLHE(Up_)).or.(id(6).eq.convertLHE(Dn_)).or.(id(6).eq.convertLHE(Str_)).or.(id(6).eq.convertLHE(Chm_)).or.(id(6).eq.convertLHE(Bot_)))then
+    ICOLUP(3,1)=502
+    ICOLUP(3,2)=0
+    ICOLUP(4,1)=0
+    ICOLUP(4,2)=502
+elseif((id(6).eq.convertLHE(AUp_)).or.(id(6).eq.convertLHE(ADn_)).or.(id(6).eq.convertLHE(AStr_)).or.(id(6).eq.convertLHE(AChm_)).or.(id(6).eq.convertLHE(ABot_)))then
+    ICOLUP(3,1)=0
+    ICOLUP(3,2)=502
+    ICOLUP(4,1)=502
+    ICOLUP(4,2)=0
+else
+    ICOLUP(3:4,1:2)=0
+endif
+
+do i=1,2
+    write(io_LHEOutFile,fmt1) id(i), -1,0,0,ICOLUP(i,1),ICOLUP(i,2),MomDummy(2:4,i), MomDummy(1,i), 0.0d0, 0.0d0, Spin
+enddo
+
+if(IsAPhoton(DecayMode1)) then
+  write(io_LHEOutFile,fmt1) id(4), 1,1,2,0,0,MomDummy(2:4,4), MomDummy(1,4), MassDummy(4), 0d0, Spin
+else
+  write(io_LHEOutFile,fmt1) id(4), 2,1,2,0,0,MomDummy(2:4,4), MomDummy(1,4), MassDummy(4), 0d0, Spin
+endif
+
+if(H_DK.eqv..true.)then
+  write(io_LHEOutFile,fmt1) id(5), 2,1,2,0,0,MomDummy(2:4,5), MomDummy(1,5), MassDummy(5), HiggsDKLength, Spin
+else
+  write(io_LHEOutFile,fmt1) id(5), 1,1,2,0,0,MomDummy(2:4,5), MomDummy(1,5), MassDummy(5), HiggsDKLength, Spin
+endif
+
+if(.not.IsAPhoton(DecayMode1)) then
+  write(io_LHEOutFile,fmt1) id(6), 1,3,3,ICOLUP(3,1),ICOLUP(3,2),MomDummy(2:4,6), MomDummy(1,6), MassDummy(6), 0.0d0, Spin
+  write(io_LHEOutFile,fmt1) id(7), 1,3,3,ICOLUP(4,1),ICOLUP(4,2),MomDummy(2:4,7), MomDummy(1,7), MassDummy(7), 0.0d0, Spin
+endif
+
+if(H_DK.eqv..true.)then
+  write(io_LHEOutFile,fmt1) id(8), 1,4,4,501,0,MomDummy(2:4,8), MomDummy(1,8), MassDummy(8), 0.0d0, Spin
+  write(io_LHEOutFile,fmt1) id(9), 1,4,4,0,501,MomDummy(2:4,9), MomDummy(1,9), MassDummy(9), 0.0d0, Spin
+endif
+
+write(io_LHEOutFile,"(A)") "</event>"
+
+
+END SUBROUTINE
+
+
+
+
+
+
+
+subroutine AdjustKinematics(eta1,eta2,MomExt,MomDK,xgr,xz2,xz1,MomExt_f,MomDK_f)
+ use ModParameters
+ use ModMisc
+#if compiler==1
+ use ifport
+#endif
+ implicit none
+ real(8) :: eta1,eta2,MomExt(1:4,1:4),MomDK(1:4,1:4),xgr,xz1,xz2
+ real(8) :: MomG(1:4),MomBoost(1:4),MomZ1(1:4),MomZ2(1:4)
+ real(8) :: Moml1_1(1:4),Moml1_2(1:4),Moml2_1(1:4),Moml2_2(1:4)
+ real(8) :: EZ,  EZ1, EZ2, pz, MZ1, MZ2,  xmax, xx1, xx2
+ real(8) :: pz12, MomExt_f(1:4,1:4), MomDK_f(1:4,1:4)
+ real(8) :: MZ, MG, MomG_f(1:4)
+
+!---- summarize all the momenta / before the invariant mass adjustments
+
+    MomZ1(1:4) = MomExt(1:4,3)
+    MomZ2(1:4) = MomExt(1:4,4)
+
+    MomG = MomZ1+MomZ2
+
+    Moml1_1(1:4) = MomDK(1:4,1)
+    Moml1_2(1:4) = MomDK(1:4,2)
+
+    Moml2_1(1:4) = MomDK(1:4,3)
+    Moml2_2(1:4) = MomDK(1:4,4)
+
+!----- begin with the invariant mass adjustment starting from the ``Gravition''
+
+    MomExt_f(:,:) = 0d0
+
+    xmax = atan((Collider_Energy**2-M_Reso**2)/M_Reso/Ga_Reso) + atan(M_Reso/Ga_Reso)
+    MG=dsqrt(M_Reso**2 + M_Reso*Ga_Reso*tan(xgr*xmax-atan(M_Reso/Ga_Reso)))
+
+    if ((MG/M_Reso*eta1.gt.1d0).or.(MG/M_Reso*eta2.gt.1d0)) return
+
+    MomExt_f(:,1) =MG/M_Reso*MomExt(:,1)
+    MomExt_f(:,2) =MG/M_Reso*MomExt(:,2)
+
+    MomG_f(1:4) = MomExt_f(1:4,1)+MomExt_f(1:4,2)
+
+
+!--------------------------------------------------------
+
+    MomBoost(1) = MomG(1)
+    MomBoost(2:4) = -MomG(2:4)
+
+    call boost(MomZ1(1:4),MomBoost(1:4),M_Reso)
+    call boost(MomZ2(1:4),MomBoost(1:4),M_Reso)
+
+
+ !-- energies and momenta of the Z's in Gr rest frame
+     EZ = M_Reso/two
+     pz = sqrt(EZ**2 - M_V**2)
+
+ !--- generate two more random numbers, to get invariant masses of the two Z's
+
+    xmax = atan((mG**2-M_V**2)/M_V/Ga_V) + atan(M_V/Ga_V)
+    MZ1=dsqrt(M_V**2 + M_V*Ga_V*tan(xz2*xmax-atan(M_V/Ga_V)))
+    MZ2=dsqrt(M_V**2 + M_V*Ga_V*tan(xz1*xmax-atan(M_V/Ga_V)))
+
+
+    if (mG.lt.(MZ1 + MZ2))  return                ! reject events which can not happen
+
+    EZ1 = (mG**2 + MZ1**2 - MZ2**2)/2d0/mG
+    EZ2 = (mG**2 + MZ2**2 - MZ1**2)/2d0/mG
+    pz12 = sqrt(EZ1**2 - MZ1**2)
+
+ !-- calculating the proper Z-four vectors in the Grav rest frame
+
+    MomZ1(1) = MomZ1(1)*EZ1/Ez
+    MomZ1(2:4) = MomZ1(2:4)*pz12/pz
+
+    MomZ2(1) = MomZ2(1)*EZ2/Ez
+    MomZ2(2:4)= MomZ2(2:4)*pz12/pz
+
+ !-- boost the new vectors into the lab frame
+
+    call boost(MomZ1(1:4),MomG_f(1:4),mG)
+    call boost(MomZ2(1:4),MomG_f(1:4),mG)
+
+
+ !-- now, do the same exercise with the leptons
+
+ !--- first Z
+    MomBoost(1)   =  MomExt(1,3)
+    MomBoost(2:4) = -MomExt(2:4,3)
+
+    call boost(Moml1_1(1:4),MomBoost,M_V)
+    call boost(Moml1_2(1:4),MomBoost,M_V)
+
+    Moml1_1 = MZ1/M_V*Moml1_1
+    Moml1_2 = MZ1/M_V*Moml1_2
+
+    call boost(Moml1_1(1:4),MomZ1(1:4),mZ1)
+    call boost(Moml1_2(1:4),MomZ1(1:4),mZ1)
+
+ !-- second Z
+    MomBoost(1)   =  MomExt(1,4)
+    MomBoost(2:4) = -MomExt(2:4,4)
+
+    call boost(Moml2_1(1:4),MomBoost,M_V)
+    call boost(Moml2_2(1:4),MomBoost,M_V)
+
+    Moml2_1 = MZ2/M_V*Moml2_1
+    Moml2_2 = MZ2/M_V*Moml2_2
+
+    call boost(Moml2_1(1:4),MomZ2(1:4),mZ2)
+    call boost(Moml2_2(1:4),MomZ2(1:4),mZ2)
+
+
+ !--- now the full collection of all 4-vectors ; with off-shell kinematics
+
+    MomExt_f(1:4,3) = MomZ1(1:4)
+    MomExt_f(1:4,4) = MomZ2(1:4)
+
+    MomDK_f(1:4,1) = Moml1_1(1:4)
+    MomDK_f(1:4,2) = Moml1_2(1:4)
+    MomDK_f(1:4,3) = Moml2_1(1:4)
+    MomDK_f(1:4,4) = Moml2_2(1:4)
+
+
+end subroutine AdjustKinematics
+
+
+
+
+
+SUBROUTINE Kinematics(NumPart,MomExt,MomDK,applyPSCut,NBin)
+use ModMisc
+use ModParameters
+implicit none
+real(8) :: MomExt(:,:),MomDK(:,:), mZ1, mZ2, MReso, ml12,ml34,ml14,ml32
+real(8) :: MomLepP(1:4),MomLepM(1:4),MomBoost(1:4),BeamAxis(1:4),ScatteringAxis(1:4),dummy(1:4)
+real(8) :: MomLept(1:4,1:4),MomLeptX(1:4,1:4),MomLeptPlane1(2:4),MomLeptPlane2(2:4),MomBeamScatterPlane(2:4)
+logical :: applyPSCut
+integer :: NumPart,NBin(:)
+real(8) :: pT_lepM,pT_lepP,y_lepM,y_lepP,MomFerm(1:4),MomZ2(1:4),MomReso(1:4),CosTheta1,Phi,Phi1,signPhi,signPhi1
+real(8) :: CosPhi_LepPZ,InvM_Lep,CosPhi_LepPlanes,CosThetaZ,CosThetaStar
+real(8),parameter :: Rsep_ll=0.2d0
+
+!  W^+/Z(MomExt(:,3))    -->    e^+(MomDK(:,2)) + nu_e(MomDK(:,1))       /   e^+(MomDK(:,2)) + e^-(MomDK(:,1))
+!  W^-/Z(MomExt(:,4))    -->    e^-(MomDK(:,3)) + nubar_e(MomDK(:,4))    /   e^-(MomDK(:,3)) + e^+(MomDK(:,4))
+
+!   MomDK(:,i): i=1 fermion
+!   MomDK(:,i): i=2 anti-fermion
+!   MomDK(:,i): i=3 fermion'
+!   MomDK(:,i): i=4 anti-fermion'
+
+      applyPSCut = .false.
+
+
+
+
+!--- compute the invariant mass of the resonance
+      MReso = sqrt(abs(   2d0*(MomExt(1:4,1).dot.MomExt(1:4,2))  ))
+
+
+
+! !     associte lepton pairs
+!       mZ1 = Get_MInv( MomDK(1:4,1)+MomDK(1:4,2) )
+!       mZ2 = Get_MInv( MomDK(1:4,1)+MomDK(1:4,4) )
+!       if( dabs(mZ1-m_V) .lt. dabs(mZ2-m_V)  ) then
+!           MomLept(1:4,1) = MomDK(1:4,1)
+!           MomLept(1:4,2) = MomDK(1:4,2)
+!           MomLept(1:4,3) = MomDK(1:4,3)
+!           MomLept(1:4,4) = MomDK(1:4,4)
+!       else
+!           MomLept(1:4,1) = MomDK(1:4,1)
+!           MomLept(1:4,2) = MomDK(1:4,4)
+!           MomLept(1:4,3) = MomDK(1:4,3)
+!           MomLept(1:4,4) = MomDK(1:4,2)
+!       endif
+
+!     MC truth for lepton pairs
+      MomLept(1:4,1:4) = MomDK(1:4,1:4)
+
+
+!--- compute the invariant mass of the two vector bosons, assuming Z1->l1+l2 and Z2->l3+l4
+      mZ1 = sqrt(abs( 2d0*(MomLept(1:4,1).dot.MomLept(1:4,2))  ))
+      mZ2 = sqrt(abs( 2d0*(MomLept(1:4,3).dot.MomLept(1:4,4))  ))
+
+      ml12 = mZ1
+      ml34 = mZ2
+      ml14 = sqrt(abs( 2d0*(MomLept(1:4,1).dot.MomLept(1:4,4))  ))
+      ml32 = sqrt(abs( 2d0*(MomLept(1:4,3).dot.MomLept(1:4,2))  ))
+
+
+!   compute pT of leptons in the lab frame
+      pT_lepP = get_PT(MomLept(1:4,2))
+      pT_lepM = get_PT(MomLept(1:4,3))
+
+      y_lepP = get_eta(MomLept(1:4,2))
+      y_lepM = get_eta(MomLept(1:4,3))
+
+
+
+!       if( includeGammaStar ) then ! cut out collinear singularity when intermediate photons are present
+!           if( get_R(MomLept(1:4,1),MomLept(1:4,2)).lt.Rsep_ll ) then
+!               applyPSCut = .true.
+!               return
+!           endif
+!           if( get_R(MomLept(1:4,1),MomLept(1:4,3)).lt.Rsep_ll ) then
+!               applyPSCut = .true.
+!               return
+!           endif
+!           if( get_R(MomLept(1:4,1),MomLept(1:4,4)).lt.Rsep_ll ) then
+!               applyPSCut = .true.
+!               return
+!           endif
+!           if( get_R(MomLept(1:4,2),MomLept(1:4,3)).lt.Rsep_ll ) then
+!               applyPSCut = .true.
+!               return
+!           endif
+!           if( get_R(MomLept(1:4,2),MomLept(1:4,4)).lt.Rsep_ll ) then
+!               applyPSCut = .true.
+!               return
+!           endif
+!           if( get_R(MomLept(1:4,3),MomLept(1:4,4)).lt.Rsep_ll ) then
+!               applyPSCut = .true.
+!               return
+!           endif
+!       endif
+
+
+! construct cos(theta1): angle between direction of fermion from Z1 and negative direction of opposite Z in Z1 rest frame
+
+! this is not fully correct: first, all momenta should be boosted into the resonance rest frame
+
+      MomBoost(1)   = +MomExt(1,3)
+      MomBoost(2:4) = -MomExt(2:4,3)
+
+      MomFerm(1:4)  = MomLept(1:4,1)
+      call boost(MomFerm(1:4),MomBoost(1:4),mZ1)! boost fermion from Z1 into Z1 rest frame
+
+      MomZ2(1) = MomExt(1,4)
+      MomZ2(2:4) = -MomExt(2:4,4)
+      call boost(MomZ2(1:4),MomBoost(1:4),mZ1)! boost -Z2 into Z1 rest frame
+
+      CosTheta1 = Get_CosAlpha( MomFerm(1:4),MomZ2(1:4) )
+
+
+
+
+
+
+! construct Phi: angle between lepton planes in resonance rest frame
+!                equivalent to angle between normal vectors of lepton planes in resonance rest frame
+
+      MomReso(1:4)= MomExt(1:4,3) + MomExt(1:4,4)
+      MomBoost(1)   = +MomReso(1)
+      MomBoost(2:4) = -MomReso(2:4)
+      MomLeptX(1:4,1:4) = MomLept(1:4,1:4)
+      ScatteringAxis(1:4) = MomExt(1:4,3)
+      call boost(MomLeptX(1:4,1),MomBoost(1:4),MReso)! boost all leptons into the resonance frame
+      call boost(MomLeptX(1:4,2),MomBoost(1:4),MReso)
+      call boost(MomLeptX(1:4,3),MomBoost(1:4),MReso)
+      call boost(MomLeptX(1:4,4),MomBoost(1:4),MReso)
+      call boost(ScatteringAxis(1:4),MomBoost(1:4),MReso)
+
+
+!     orthogonal vectors defined as p(fermion) x p(antifermion)
+      MomLeptPlane1(2:4) = (MomLeptX(2:4,1)).cross.(MomLeptX(2:4,2))! orthogonal vector to lepton plane
+      MomLeptPlane1(2:4) = MomLeptPlane1(2:4)/dsqrt( MomLeptPlane1(2)**2+MomLeptPlane1(3)**2+MomLeptPlane1(4)**2 )! normalize
+
+      MomLeptPlane2(2:4) = (MomLeptX(2:4,3)).cross.(MomLeptX(2:4,4))! orthogonal vector to lepton plane
+      MomLeptPlane2(2:4) = MomLeptPlane2(2:4)/dsqrt( MomLeptPlane2(2)**2+MomLeptPlane2(3)**2+MomLeptPlane2(4)**2 )! normalize
+
+!     get the sign
+      dummy(2:4) = (MomLeptPlane1(2:4)).cross.(MomLeptPlane2(2:4))
+      signPhi = sign(1d0,  (dummy(2)*ScatteringAxis(2)+dummy(3)*ScatteringAxis(3)+dummy(4)*ScatteringAxis(4))  )! use q1
+
+      Phi = signPhi * acos(-1d0*(MomLeptPlane1(2)*MomLeptPlane2(2) + MomLeptPlane1(3)*MomLeptPlane2(3) + MomLeptPlane1(4)*MomLeptPlane2(4)))
+
+!print *, "phi",phi
+!pause
+
+! phi(ll)
+! Phi = acos((MomLept(2,2)*MomLept(2,3) + MomLept(3,2)*MomLept(3,3))/dsqrt(MomLept(2,2)**2+MomLept(3,2)**2)/dsqrt(MomLept(2,3)**2+MomLept(3,3)**2) )
+
+
+
+
+! construct cos(theta*):    scattering angle of Z's in graviton rest frame
+
+      MomReso(1:4)= MomExt(1:4,3) + MomExt(1:4,4)
+      MomBoost(1)   = +MomReso(1)
+      MomBoost(2:4) = -MomReso(2:4)
+      MomZ2(1:4) = MomExt(1:4,4)
+!       if( mz1.lt.mz2 ) then
+!           MomZ2(1:4) = MomExt(1:4,3)
+!       else
+!           MomZ2(1:4) = MomExt(1:4,4)
+!       endif
+      call boost(MomZ2(1:4),MomBoost(1:4),MReso)
+      CosThetaStar = Get_CosTheta( MomZ2(1:4) )
+
+! print *, MomReso(1:4)
+!       MomZ2(1:4) = MomReso(1:4)
+!       call boost(MomZ2(1:4),MomBoost(1:4),MReso)
+! print *, MomZ2(1:4)
+! pause
+
+
+
+! construct Phi1:  angle between beam-scattering plane and the lepton plane of Z1 in the resonance rest frame
+
+      BeamAxis(1:4) = (/1d0,0d0,0d0,1d0/)!  energy components are dummies here and will not be used
+      ScatteringAxis(1:4) = MomExt(1:4,3)
+      MomReso(1:4)= MomExt(1:4,3) + MomExt(1:4,4)
+      MomBoost(1)   = +MomReso(1)
+      MomBoost(2:4) = -MomReso(2:4)
+!       call boost(BeamAxis(1:4),MomBoost(1:4),MReso)
+      call boost(ScatteringAxis(1:4),MomBoost(1:4),MReso)
+
+
+      MomBeamScatterPlane(2:4) = (BeamAxis(2:4)).cross.(ScatteringAxis(2:4))! orthogonal vector to beam-scattering plane
+      MomBeamScatterPlane(2:4) = MomBeamScatterPlane(2:4)/dsqrt( MomBeamScatterPlane(2)**2+MomBeamScatterPlane(3)**2+MomBeamScatterPlane(4)**2 )
+
+!     get the sign
+      dummy(2:4) = (MomLeptPlane1(2:4)).cross.(MomBeamScatterPlane(2:4))
+      signPhi1 = sign(1d0,  (dummy(2)*ScatteringAxis(2)+dummy(3)*ScatteringAxis(3)+dummy(4)*ScatteringAxis(4))  )! use q1
+
+      Phi1 = signPhi1 * acos(MomLeptPlane1(2)*MomBeamScatterPlane(2) + MomLeptPlane1(3)*MomBeamScatterPlane(3) + MomLeptPlane1(4)*MomBeamScatterPlane(4))
+
+
+!     binning
+      NBin(1)  = WhichBin(1,pT_lepP)
+      NBin(2)  = WhichBin(2,pT_lepM)
+      NBin(3)  = WhichBin(3,y_lepP)
+      NBin(4)  = WhichBin(4,y_lepM)
+      NBin(5)  = WhichBin(5,CosThetaStar)
+      NBin(6)  = WhichBin(6,Phi1)
+      NBin(7)  = WhichBin(7,CosTheta1)
+      NBin(8)  = WhichBin(8,Phi)
+if( mz1.gt.mz2 ) then
+      NBin(9)  = WhichBin(9,mZ2)
+      NBin(10) = WhichBin(10,mZ1)
+else
+      NBin(9)  = WhichBin(9,mZ1)
+      NBin(10) = WhichBin(10,mZ2)
+endif
+      NBin(11) = WhichBin(11,mReso)
+      NBin(12) = WhichBin(12,ml12)
+      NBin(13) = WhichBin(13,ml34)
+      NBin(14) = WhichBin(14,ml14)
+      NBin(15) = WhichBin(15,ml32)
+
+      NBin(16:18) = 1!  this is for the l+/l- total cross sections
+
+RETURN
+END SUBROUTINE
+
+
+
+
+
+SUBROUTINE Kinematics_HVBF(NumPart,MomExt,applyPSCut,NBin)
+use ModMisc
+use ModParameters
+implicit none
+real(8) :: MomExt(:,:), mZ1, mZ2, MReso
+real(8) :: MomLepP(1:4),MomLepM(1:4),MomBoost(1:4),BeamAxis(1:4),ScatteringAxis(1:4),dummy(1:4)
+real(8) :: MomLept(1:4,1:4),MomLeptX(1:4,1:4),MomLeptPlane1(2:4),MomLeptPlane2(2:4),MomBeamScatterPlane(2:4)
+logical :: applyPSCut
+integer :: NumPart,NBin(:)
+real(8) :: m_jj,y_j1,y_j2,dphi_jj,dy_j1j2,pT_jl,pT_j1,pT_j2,pT_H,m_4l
+integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, Higgs=5
+
+
+       applyPSCut = .false.
+
+       m_jj = get_MInv( MomExt(1:4,outTop)+MomExt(1:4,outBot) )
+       y_j1 = get_eta(MomExt(1:4,outTop))
+       y_j2 = get_eta(MomExt(1:4,outBot))
+       pT_H = get_PT(MomExt(1:4,Higgs))
+       pT_j1= get_PT(MomExt(1:4,outTop))
+       pT_j2= get_PT(MomExt(1:4,outBot))
+       pT_jl = max(pT_j1,pT_j2)
+       dy_j1j2 = y_j1 - y_j2
+       m_4l = get_MInv(MomExt(1:4,Higgs))
+
+!        if( abs(y_j1).lt.1d0 .or. abs(y_j2).lt.1d0 .or. y_j1*y_j2.gt.0d0 ) then
+!           applyPSCut=.true.
+!           return
+!        endif
+
+       if(  pT_j1.lt.pTjetcut .or. pT_j2.lt.pTjetcut .or. m_jj.lt.mJJcut)  then
+          applyPSCut=.true.
+          return
+       endif
+
+
+       dphi_jj = abs( Get_PHI(MomExt(1:4,3)) - Get_PHI(MomExt(1:4,4)) )
+       if( dphi_jj.gt.Pi ) dphi_jj=2d0*Pi-dphi_jj
+
+
+ !     binning
+       NBin(:) = 1
+       NBin(1)  = WhichBin(1,m_jj)
+       NBin(2)  = WhichBin(2,dphi_jj)
+       NBin(3)  = WhichBin(3,pT_H)
+       NBin(4)  = WhichBin(4,pT_jl)
+       NBin(5)  = WhichBin(5,dy_j1j2)
+       NBin(6)  = WhichBin(6,y_j1)
+       NBin(7)  = WhichBin(7,y_j2)
+       NBin(8)  = WhichBin(8,m_4l)
+
+
+RETURN
+END SUBROUTINE
+
+
+
+
+
+SUBROUTINE Kinematics_HVBF_fulldecay(MomExt,applyPSCut,NBin)
+use ModMisc
+use ModParameters
+implicit none
+real(8) :: MomExt(:,:), mZ1, mZ2, MReso
+real(8) :: MomLepP(1:4),MomLepM(1:4),MomBoost(1:4),BeamAxis(1:4),ScatteringAxis(1:4),dummy(1:4)
+real(8) :: MomLept(1:4,1:4),MomLeptX(1:4,1:4),MomLeptPlane1(2:4),MomLeptPlane2(2:4),MomBeamScatterPlane(2:4)
+logical :: applyPSCut
+integer :: NBin(:)
+real(8) :: m_jj,y_j1,y_j2,dphi_jj,dy_j1j2,pT_jl,pT_j1,pT_j2,pT_H,m_4l,dR_j1j2
+real(8) :: pT_l1,pT_l2,pT_l3,pT_l4,y_l1,y_l2,y_l3,y_l4
+real(8) :: Phi1,signPhi1,MomReso(1:4),dRjj
+integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, Lep1M=8, Lep2P=9, Lep2M=10
+
+
+       applyPSCut = .false.
+
+       m_jj = get_MInv( MomExt(1:4,outTop)+MomExt(1:4,outBot) )
+       m_4l = get_MInv( MomExt(1:4,Lep1P)+MomExt(1:4,Lep1M)+MomExt(1:4,Lep2P)+MomExt(1:4,Lep2M) )
+       y_j1 = get_eta(MomExt(1:4,outTop))
+       y_j2 = get_eta(MomExt(1:4,outBot))
+       pT_H = get_PT(MomExt(1:4,V1)+MomExt(1:4,V2))
+       pT_j1= get_PT(MomExt(1:4,outTop))
+       pT_j2= get_PT(MomExt(1:4,outBot))
+       pT_l1= get_PT(MomExt(1:4,Lep1P))
+       pT_l2= get_PT(MomExt(1:4,Lep1M))
+       pT_l3= get_PT(MomExt(1:4,Lep2P))
+       pT_l4= get_PT(MomExt(1:4,Lep2M))
+       y_l1= get_eta(MomExt(1:4,Lep1P))
+       y_l2= get_eta(MomExt(1:4,Lep1M))
+       y_l3= get_eta(MomExt(1:4,Lep2P))
+       y_l4= get_eta(MomExt(1:4,Lep2M))
+       dRjj = get_R(MomExt(1:4,outTop), MomExt(1:4,outBot))
+       pT_jl = max(pT_j1,pT_j2)
+       dy_j1j2 = y_j1 - y_j2
+       dR_j1j2 = get_R(MomExt(1:4,outTop), MomExt(1:4,outBot))
+
+       mZ1 = get_MInv(MomExt(1:4,Lep1P)+MomExt(1:4,Lep1M))
+       mZ2 = get_MInv(MomExt(1:4,Lep2P)+MomExt(1:4,Lep2M))
+
+
+       if( mZ1.lt.MPhotonCutoff ) then
+          applyPSCut=.true.
+          return
+       endif
+       if( mZ2.lt.MPhotonCutoff ) then
+          applyPSCut=.true.
+          return
+       endif
+!       if( m_4l.lt.70d0*GeV ) then
+!          applyPSCut=.true.
+!          return
+!       endif
+
+       if( pT_l1.lt.pTlepcut .or. pT_l2.lt.pTlepcut .or. pT_l3.lt.pTlepcut .or. pT_l4.lt.pTlepcut ) then
+          applyPSCut=.true.
+          return
+       endif
+
+       if( dabs(y_l1).gt.etalepcut .or. dabs(y_l2).gt.etalepcut .or. dabs(y_l3).gt.etalepcut .or. dabs(y_l4).gt.etalepcut ) then
+          applyPSCut=.true.
+          return
+       endif
+
+
+
+!      VERY loose VBF cuts
+!        if( m_jj.lt.400d0*GeV ) then
+!           applyPSCut=.true.
+!           return
+!        endif
+!        if( m4l_minmax(1).eq.-1d0*GeV .and. dabs(m_4l-m_reso).gt.5d0*GeV ) then
+!           applyPSCut=.true.
+!           return
+!        endif
+
+!        if( dabs(m_4l).lt.70d0*GeV ) then
+!           applyPSCut=.true.
+!           return
+!        endif
+
+
+        if( abs(y_j1).gt.etajetcut .or. abs(y_j2).gt.etajetcut ) then
+           applyPSCut=.true.
+           return
+        endif
+
+        if( abs(y_j1-y_j2).lt.detajetcut .or. (JetsOppositeEta .and. y_j1*y_j2.gt.0d0) ) then
+           applyPSCut=.true.
+           return
+        endif
+
+        if(  pT_j1.lt.pTjetcut .or. pT_j2.lt.pTjetcut .or. m_jj.lt.mJJcut .or. dR_j1j2.lt.Rjet)  then
+           applyPSCut=.true.
+           return
+        endif
+
+       if( dRjj.lt.Rjet ) then
+          applyPSCut=.true.
+          return
+       endif
+
+       dphi_jj = abs( Get_PHI(MomExt(1:4,3)) - Get_PHI(MomExt(1:4,4)) )
+       if( dphi_jj.gt.Pi ) dphi_jj=2d0*Pi-dphi_jj
+
+
+! construct Phi1:  angle between beam-scattering plane and the lepton plane of Z1 in the resonance rest frame
+      MReso=m_4l
+
+      MomReso(1:4)= MomExt(1:4,V1) + MomExt(1:4,V2)
+      MomBoost(1)   = +MomReso(1)
+      MomBoost(2:4) = -MomReso(2:4)
+
+!!      if( dabs( get_MInv(MomExt(1:4,V1)) - get_MInv(MomLept(1:4,1)+MomLept(1:4,2))) .lt.     )
+
+      MomLeptX(1:4,1) = MomExt(1:4,Lep1P)
+      MomLeptX(1:4,2) = MomExt(1:4,Lep1M)
+      call boost(MomLeptX(1:4,1),MomBoost(1:4),MReso)! boost all leptons into the resonance frame
+      call boost(MomLeptX(1:4,2),MomBoost(1:4),MReso)
+
+!     orthogonal vectors defined as p(fermion) x p(antifermion)
+      MomLeptPlane1(2:4) = (MomLeptX(2:4,1)).cross.(MomLeptX(2:4,2))! orthogonal vector to lepton plane
+      MomLeptPlane1(2:4) = MomLeptPlane1(2:4)/dsqrt( MomLeptPlane1(2)**2+MomLeptPlane1(3)**2+MomLeptPlane1(4)**2 )! normalize
+
+
+
+
+      BeamAxis(1:4) = (/1d0,0d0,0d0,1d0/)!  energy components are dummies here and will not be used
+      ScatteringAxis(1:4) = MomExt(1:4,V1)  ! Z1
+      MomReso(1:4)= MomExt(1:4,V1) + MomExt(1:4,V2)   !Z1+Z2
+      MomBoost(1)   = +MomReso(1)
+      MomBoost(2:4) = -MomReso(2:4)
+!       call boost(BeamAxis(1:4),MomBoost(1:4),MReso)
+      call boost(ScatteringAxis(1:4),MomBoost(1:4),MReso)
+
+      MomBeamScatterPlane(2:4) = (BeamAxis(2:4)).cross.(ScatteringAxis(2:4))! orthogonal vector to beam-scattering plane
+      MomBeamScatterPlane(2:4) = MomBeamScatterPlane(2:4)/dsqrt( MomBeamScatterPlane(2)**2+MomBeamScatterPlane(3)**2+MomBeamScatterPlane(4)**2 )
+
+!     get the sign
+      dummy(2:4) = (MomLeptPlane1(2:4)).cross.(MomBeamScatterPlane(2:4))
+      signPhi1 = sign(1d0,  (dummy(2)*ScatteringAxis(2)+dummy(3)*ScatteringAxis(3)+dummy(4)*ScatteringAxis(4))  )! use q1
+
+      Phi1 = signPhi1 * acos(MomLeptPlane1(2)*MomBeamScatterPlane(2) + MomLeptPlane1(3)*MomBeamScatterPlane(3) + MomLeptPlane1(4)*MomBeamScatterPlane(4))
+ !     binning
+       NBin(:) = 1
+       NBin(1)  = WhichBin(1,m_jj)
+       NBin(2)  = WhichBin(2,dphi_jj)
+       NBin(3)  = WhichBin(3,pT_H)
+       NBin(4)  = WhichBin(4,pT_jl)
+       NBin(5)  = WhichBin(5,dy_j1j2)
+       NBin(6)  = WhichBin(6,mZ1)
+       NBin(7)  = WhichBin(7,mZ2)
+       NBin(8)  = WhichBin(8,m_4l)
+       NBin(9)  = WhichBin(9,m_4l)
+       NBin(10) = WhichBin(10,Phi1)
+
+
+RETURN
+END SUBROUTINE
+
+
+
+
+
+
+
+SUBROUTINE Kinematics_HJ(NumPart,MomExt,applyPSCut,NBin)
+use ModMisc
+use ModParameters
+implicit none
+real(8) :: MomExt(:,:)!,mZ1, mZ2, MReso
+!real(8) :: MomLepP(1:4),MomLepM(1:4),MomBoost(1:4),BeamAxis(1:4),ScatteringAxis(1:4),dummy(1:4)
+!real(8) :: MomLept(1:4,1:4),MomLeptX(1:4,1:4),MomLeptPlane1(2:4),MomLeptPlane2(2:4),MomBeamScatterPlane(2:4)
+logical :: applyPSCut
+integer :: NBin(:),NumPart!NumHadr,JetList(1:2),NJEt,PartList(1:2)
+!real(8) :: pT_lepM,pT_lepP,y_lepM,y_lepP,MomFerm(1:4),MomZ2(1:4),MomReso(1:4),CosTheta1,Phi,Phi1,signPhi,signPhi1
+!real(8) :: CosPhi_LepPZ,InvM_Lep,CosPhi_LepPlanes,CosThetaZ,CosThetaStar
+real(8) :: MomHadr(1:4,1:2),MomJet(1:4,1:2),pT_j1!,pT_j2,pT_3, pT_4,m_jj,dphi_jj
+
+
+
+applyPSCut = .false.
+
+
+!    NJet=0
+    MomHadr(1:4,1)=MomExt(1:4,4)
+!    NumHadr=1
+!    PartList=(/1,2/)
+!    JetList(1:2) = (/1,2/)
+    MomJet(1:4,1) = MomHadr(1:4,1)
+!    call JetAlgo_kt(Rjet,PartList(1:NumHadr),MomHadr(1:4,1:NumHadr),NJet,JetList(1:NumHadr),MomJet(1:4,1:NumHadr)) ! hard protojets in beam pipe are counted as jets
+!    call pT_order(NumHadr,MomJet(1:4,1:NumHadr))! pT-order
+
+!    if( Njet.ne.2 ) then
+!      applyPSCut=.true.
+!      return
+!    endif
+
+    pT_j1 = get_PT(MomJet(1:4,1))
+
+    if( pT_j1.lt.ptjetcut) then
+    !print *, "cut",pT_j1
+      applyPSCut=.true.
+      return
+    endif
+
+ !     binning
+       NBin(1)  = WhichBin(1,pT_j1)
+
+
+RETURN
+END SUBROUTINE
+
+
+
+
+
+
+
+
+
+SUBROUTINE Kinematics_HJJ(NumPart,MomExt,applyPSCut,NBin)
+use ModMisc
+use ModParameters
+implicit none
+real(8) :: MomExt(:,:),mZ1, mZ2, MReso
+real(8) :: MomLepP(1:4),MomLepM(1:4),MomBoost(1:4),BeamAxis(1:4),ScatteringAxis(1:4),dummy(1:4)
+real(8) :: MomLept(1:4,1:4),MomLeptX(1:4,1:4),MomLeptPlane1(2:4),MomLeptPlane2(2:4),MomBeamScatterPlane(2:4)
+logical :: applyPSCut
+integer :: NumPart,NBin(:),NumHadr,JetList(1:2),NJEt,PartList(1:2)
+real(8) :: pT_lepM,pT_lepP,y_lepM,y_lepP,MomFerm(1:4),MomZ2(1:4),MomReso(1:4),CosTheta1,Phi,Phi1,signPhi,signPhi1
+real(8) :: CosPhi_LepPZ,InvM_Lep,CosPhi_LepPlanes,CosThetaZ,CosThetaStar,y_j1,y_j2,dy_j1j2
+real(8) :: pT_3, pT_4,MomHadr(1:4,1:2),MomJet(1:4,1:2),pT_j1,pT_j2,m_jj,dphi_jj,pT_H
+
+
+
+applyPSCut = .false.
+
+
+    NJet=0
+    MomHadr(1:4,1:2)=MomExt(1:4,3:4)
+    NumHadr=2
+    PartList=(/1,2/)
+    JetList(1:2) = (/1,2/)
+    MomJet(1:4,1:2) = MomHadr(1:4,1:2)
+    call JetAlgo_kt(Rjet,PartList(1:NumHadr),MomHadr(1:4,1:NumHadr),NJet,JetList(1:NumHadr),MomJet(1:4,1:NumHadr)) ! hard protojets in beam pipe are counted as jets
+    call pT_order(NumHadr,MomJet(1:4,1:NumHadr))! pT-order
+
+
+    if( Njet.ne.2 ) then
+      applyPSCut=.true.
+      return
+    endif
+
+    pT_j1 = get_PT(momjet(1:4,1))
+    pT_j2 = get_PT(momjet(1:4,2))
+
+    pT_H = get_PT(MomExt(1:4,5))
+
+    y_j1 = get_ETA(momjet(1:4,1))
+    y_j2 = get_ETA(momjet(1:4,2))
+
+   dy_j1j2 = y_j1 - y_j2
+
+
+
+    m_jj = get_MInv( MomJet(1:4,1)+MomJet(1:4,2) )
+
+    if( pT_j1.lt.ptjetcut .or. pT_j2.lt.ptjetcut .or. m_jj.lt.mJJcut) then
+      applyPSCut=.true.
+      return
+    endif
+
+    dphi_jj = abs( Get_PHI(MomJet(1:4,1)) - Get_PHI(MomJet(1:4,2)) )
+    if( dphi_jj.gt.Pi ) dphi_jj=2d0*Pi-dphi_jj
+
+
+ !     binning
+       NBin(:) = 1
+       NBin(1)  = WhichBin(1,m_jj)
+       NBin(2)  = WhichBin(2,dphi_jj)
+       NBin(3)  = WhichBin(3,pT_H)
+       NBin(4)  = WhichBin(4,y_j1)
+       NBin(5)  = WhichBin(5,y_j2)
+       NBin(6)  = WhichBin(6,dy_j1j2)
+
+
+RETURN
+END SUBROUTINE
+
+
+
+SUBROUTINE Kinematics_VHiggs(id,MomExt,inv_mass,NBin,applyPSCut,useAonshell)
+use ModMisc
+use ModParameters
+implicit none
+
+logical, optional :: useAonshell
+logical :: applyPSCut
+integer :: NumPart,NBin(:),id(:)
+real(8) :: m_jj,y_j1,y_j2,dphi_jj, m_ll, pt_V, pt_H, pt1, pt2, deltaR, m_Vstar, costheta1, costheta2, phistar1, phi
+double precision MomBoost(1:4), MomFerm(1:4), inv_mass(1:9), MomLeptX(1:4,1:4), ScatteringAxis(1:4), MomReso(1:4)
+double precision MomLeptPlane1(2:4), MomLeptPlane2(2:4), dummy(2:4), signPhi,EHat
+double precision, intent(in) :: MomExt(1:4,1:9)! 1:in 2:in 3:V* 4:V 5:H 6,7: q(Z)q(Z) 8,9: q(h)q(H)
+logical :: hasAonshell
+
+     hasAonshell = .false.
+     if(present(useAonshell)) then
+        hasAonshell=useAonshell
+     endif
+
+     applyPSCut = .false.
+     m_jj = get_MInv(MomExt(1:4,5))
+     m_ll = get_MInv(MomExt(1:4,4))
+     m_Vstar = get_MInv(MomExt(1:4,3))
+
+     pt_H = get_PT(MomExt(1:4,5))
+     pt_V = get_PT(MomExt(1:4,4))
+     
+     EHat = MomExt(1,1)+MomExt(1,2)
+
+      if(.not.hasAonshell) then
+         if(m_ll.le.getMass(convertLHEreverse(id(6)))+getMass(convertLHEreverse(id(7))))then
+            applyPSCut=.true.
+         endif
+         if(includeGammaStar .and. .not.IsAWDecay(DecayMode1) .and. (m_ll.lt.MPhotonCutoff .or. m_Vstar.lt.MPhotonCutoff))then
+            applyPSCut=.true.
+         endif
+         if(IsAQuark(convertLHEreverse(id(6)))) then
+            pt1 = get_PT(MomExt(1:4,6))
+            pt2 = get_PT(MomExt(1:4,7))
+            deltaR = get_R(MomExt(1:4,6), MomExt(1:4,7))
+            if(m_ll.lt.mJJcut .or. pt1.lt.ptjetcut .or. pt2.lt.ptjetcut .or. deltaR.lt.Rjet) then
+               applyPSCut=.true.
+            endif
+         endif
+      else
+         if(includeGammaStar .and. m_Vstar.lt.MPhotonCutoff)then
+            applyPSCut=.true.
+         endif
+      endif
+      if(H_DK) then
+         if(m_jj.le.(getMass(convertLHEreverse(id(8)))+getMass(convertLHEreverse(id(9)))))then
+            applyPSCut=.true.
+         endif
+         if(IsAQuark(convertLHEreverse(id(8)))) then
+            pt1 = get_PT(MomExt(1:4,8))
+            pt2 = get_PT(MomExt(1:4,9))
+            deltaR = get_R(MomExt(1:4,8), MomExt(1:4,9))
+            if(m_jj.lt.mJJcut .or. pt1.lt.ptjetcut .or. pt2.lt.ptjetcut .or. deltaR.lt.Rjet) then
+               applyPSCut=.true.
+            endif
+         endif
+      else
+         if(dabs(m_jj-M_Reso).gt.10d0*Ga_Reso) then
+            applyPSCut=.true.
+         endif
+      endif
+
+!-- FIND PLOTTING BINS
+!costheta1 - production angle
+      MomBoost(1)   = -MomExt(1,3)
+      MomBoost(2:4) = +MomExt(2:4,3)
+      if(id(2).lt.0) then
+         MomFerm(1:4)  = -MomExt(1:4,2)
+      else
+         MomFerm(1:4)  = -MomExt(1:4,1)
+      endif
+      call boost(MomFerm(1:4),MomBoost(1:4),inv_mass(3))! boost fermion from Z1 into Z1 rest frame
+      costheta1 = Get_CosAlpha( MomFerm(1:4), -MomExt(1:4,3) )
+
+!phistar1
+      MomReso(1:4)  = -MomExt(1:4,5)
+      MomBoost(1)   = +MomReso(1)
+      MomBoost(2:4) = -MomReso(2:4)
+      if(id(2).lt.0) then
+         MomLeptX(1:4,1) = -MomExt(1:4,2)
+         MomLeptX(1:4,2) = -MomExt(1:4,1)
+      else
+         MomLeptX(1:4,1) = -MomExt(1:4,1)
+         MomLeptX(1:4,2) = -MomExt(1:4,2)
+      endif
+      if(id(8).gt.0) then
+         MomLeptX(1:4,3) = MomExt(1:4,8)
+         MomLeptX(1:4,4) = MomExt(1:4,9)
+      else
+         MomLeptX(1:4,3) = MomExt(1:4,9)
+         MomLeptX(1:4,4) = MomExt(1:4,8)
+      endif
+      call boost(MomLeptX(1:4,1),MomBoost(1:4),inv_mass(5))! boost all leptons into the resonance frame
+      call boost(MomLeptX(1:4,2),MomBoost(1:4),inv_mass(5))
+      call boost(MomLeptX(1:4,3),MomBoost(1:4),inv_mass(5))
+      call boost(MomLeptX(1:4,4),MomBoost(1:4),inv_mass(5))
+      ScatteringAxis(1:4) = MomLeptX(1:4,3)-MomLeptX(1:4,4)
+      ScatteringAxis(1:4) = ScatteringAxis(1:4) / dsqrt(dabs(ScatteringAxis(2)**2+ScatteringAxis(3)**2+ScatteringAxis(4)**2 +1d-15 ))
+!     orthogonal vectors defined as p(fermion) x p(antifermion)
+      MomLeptPlane1(2:4) = (MomLeptX(2:4,1)).cross.(MomLeptX(2:4,2))! orthogonal vector to lepton plane
+      MomLeptPlane1(2:4) = MomLeptPlane1(2:4)/dsqrt(dabs(MomLeptPlane1(2)**2+MomLeptPlane1(3)**2+MomLeptPlane1(4)**2 +1d-15) )! normalize
+      MomLeptPlane2(2:4) = (ScatteringAxis(2:4)).cross.(MomLeptX(2:4,1)+MomLeptX(2:4,2))
+      MomLeptPlane2(2:4) = MomLeptPlane2(2:4)/dsqrt(dabs(MomLeptPlane2(2)**2+MomLeptPlane2(3)**2+MomLeptPlane2(4)**2 +1d-15 ))! normalize
+!     get the sign
+      dummy(2:4) = (MomLeptPlane1(2:4)).cross.(MomLeptPlane2(2:4))
+      signPhi = sign(1d0,  (dummy(2)*(MomLeptX(2,1)+MomLeptX(2,2))+dummy(3)*(MomLeptX(3,1)+MomLeptX(3,2))+dummy(4)*(MomLeptX(4,1)+MomLeptX(4,2)))  )! use q1
+      Phistar1 = signPhi * acos(MomLeptPlane1(2)*MomLeptPlane2(2) + MomLeptPlane1(3)*MomLeptPlane2(3) + MomLeptPlane1(4)*MomLeptPlane2(4))
+
+
+      costheta2=0d0
+      phi=0d0
+      if(.not.hasAonshell) then
+
+!costheta2 - Z2 decay angle
+         MomBoost(1)   = +MomExt(1,4)
+         MomBoost(2:4) = -MomExt(2:4,4)
+         if(id(6).gt.0) then
+            MomFerm(1:4)  = MomExt(1:4,6)
+         else
+            MomFerm(1:4)  = MomExt(1:4,7)
+         endif
+         call boost(MomFerm(1:4),MomBoost(1:4),inv_mass(4))! boost fermion from Z2 into Z2 rest frame
+         costheta2 = Get_CosAlpha( MomFerm(1:4),MomExt(1:4,4) )
+
+!phi
+         MomReso(1:4)  = -MomExt(1:4,5)
+         MomBoost(1)   = +MomReso(1)
+         MomBoost(2:4) = -MomReso(2:4)
+         if(id(2).lt.0) then
+            MomLeptX(1:4,1) = -MomExt(1:4,2)
+            MomLeptX(1:4,2) = -MomExt(1:4,1)
+         else
+            MomLeptX(1:4,1) = -MomExt(1:4,1)
+            MomLeptX(1:4,2) = -MomExt(1:4,2)
+         endif
+         if(id(6).gt.0) then
+            MomLeptX(1:4,3) = MomExt(1:4,6)
+            MomLeptX(1:4,4) = MomExt(1:4,7)
+         else
+            MomLeptX(1:4,3) = MomExt(1:4,7)
+            MomLeptX(1:4,4) = MomExt(1:4,6)
+         endif
+!     orthogonal vectors defined as p(fermion) x p(antifermion)
+         MomLeptPlane1(2:4) = (MomLeptX(2:4,1)).cross.(MomLeptX(2:4,2))! orthogonal vector to lepton plane
+         MomLeptPlane1(2:4) = MomLeptPlane1(2:4)/dsqrt( MomLeptPlane1(2)**2+MomLeptPlane1(3)**2+MomLeptPlane1(4)**2 )! normalize
+         MomLeptPlane2(2:4) = (MomLeptX(2:4,3)).cross.(MomLeptX(2:4,4))! orthogonal vector to lepton plane
+         MomLeptPlane2(2:4) = MomLeptPlane2(2:4)/dsqrt( MomLeptPlane2(2)**2+MomLeptPlane2(3)**2+MomLeptPlane2(4)**2 )! normalize
+!     get the sign
+         dummy(2:4) = (MomLeptPlane1(2:4)).cross.(MomLeptPlane2(2:4))
+         signPhi = sign(1d0,  (dummy(2)*(MomLeptX(2,1)+MomLeptX(2,2))+dummy(3)*(MomLeptX(3,1)+MomLeptX(3,2))+dummy(4)*(MomLeptX(4,1)+MomLeptX(4,2)))  )! use q1
+         phi = signPhi * acos(-1d0*(MomLeptPlane1(2)*MomLeptPlane2(2) + MomLeptPlane1(3)*MomLeptPlane2(3) + MomLeptPlane1(4)*MomLeptPlane2(4)))
+
+      endif
+
+!     binning
+     NBin(1)  = WhichBin(1,m_jj)
+     NBin(2)  = WhichBin(2,m_ll)
+     NBin(3)  = WhichBin(3,pt_V)
+     NBin(4)  = WhichBin(4,pt_H)
+     NBin(5)  = WhichBin(5,m_Vstar)
+     Nbin(6)  = WhichBin(6,costheta1)
+     Nbin(7)  = WhichBin(7,costheta2)
+     Nbin(8)  = WhichBin(8,phistar1)
+     Nbin(9)  = WhichBin(9,phi)
+     Nbin(10) = WhichBin(10,EHat)
+     
+
+RETURN
+END SUBROUTINE Kinematics_VHiggs
+
+
+
+
+SUBROUTINE Kinematics_TTBH(Mom,applyPSCut,NBin)
+use ModParameters
+use ModMisc
+! use modTTBH
+implicit none
+real(8) :: Mom(1:4,1:13),MomMELA(1:4,1:13)
+logical :: applyPSCut
+integer :: NBin(:)
+real(8) :: pT_t,pT_H,pT_tbar,MatElSq_H0,MatElSq_H1,D_0minus
+real(8) :: mt,mtbar,mttbar,mWp,mWm,pT_b,pT_l,pT_miss
+integer, parameter :: inLeft=1,inRight=2,Hbos=3,tbar=4,t=5,  bbar=6,Wm=7,lepM=8,nubar=9,  b=10,Wp=11,lepP=12,nu=13
+logical,save :: FirstTime=.true.
+
+
+    applyPSCut = .false.
+
+    pT_t = get_PT(Mom(1:4,t))
+    pT_tbar = get_PT(Mom(1:4,tbar))
+    pT_H = get_PT(Mom(1:4,Hbos))
+    pT_b = get_PT(Mom(1:4,b))
+    pT_l = get_PT(Mom(1:4,LepP))
+    pT_miss = get_PT(Mom(1:4,nu)+Mom(1:4,nubar))
+    mt = get_MInv(Mom(1:4,t))
+    mtbar = get_MInv(Mom(1:4,tbar))
+    mttbar = get_MInv(Mom(1:4,t)+Mom(1:4,tbar))
+    mWp = get_MInv(Mom(1:4,Wp))
+    mWm = get_MInv(Mom(1:4,Wm))
+
+    if( m_Top.lt.10d0*GeV  .and. (pT_t.lt.pTjetcut .or. pT_tbar.lt.pTjetcut .or. mttbar.lt.mJJcut) ) applyPSCut=.true.
+
+
+!     if( FirstTime ) then
+! !       call NNPDFDriver("./pdfs/NNPDF30_lo_as_0130.LHgrid",33)
+! !       call NNinitPDF(0)
+!       call InitProcess_TTBH(m_Reso,m_top)
+!       FirstTime = .false.
+!     endif
+!     MomMELA(1:4,1) = -(/         65d0,           0.0000000000000000d0, 0.0000000000000000d0,      65d0           /)
+!     MomMELA(1:4,2) = -(/         65d0,           0.0000000000000000d0, 0.0000000000000000d0,     -65d0           /)
+!     MomMELA(1:4,3:11) = Mom(1:4,3:11)  remap here because of new W bosons
+!     MomMELA(1:4,12:13) = 0d0
+!
+!     call EvalXSec_PP_TTBH(MomMELA(1:4,1:13),(/(1d0,0d0),(0d0,0d0)/),TopDecays,2,MatElSq_H0)
+!     call EvalXSec_PP_TTBH(MomMELA(1:4,1:13),(/(0d0,0d0),(1d0,0d0)/),TopDecays,2,MatElSq_H1)
+!
+!     D_0minus = MatElSq_H0/(MatElSq_H0 + 2d0*MatElSq_H1 )
+
+    D_0minus=0d0
+
+!   binning
+    NBin(1)  = WhichBin(1,pT_t)
+    NBin(2)  = WhichBin(2,pT_H)
+    NBin(3)  = WhichBin(3,mt)
+    NBin(4)  = WhichBin(4,mtbar)
+    NBin(5)  = WhichBin(5,mWp)
+    NBin(6)  = WhichBin(6,mWm)
+    NBin(7)  = WhichBin(7,pT_b)
+    NBin(8)  = WhichBin(8,pT_l)
+    NBin(9)  = WhichBin(9,pT_miss)
+    NBin(10) = WhichBin(10,D_0minus)
+
+
+
+RETURN
+END SUBROUTINE
+
+
+
+SUBROUTINE Kinematics_BBBH(Mom,applyPSCut,NBin)
+use ModParameters
+use ModMisc
+implicit none
+real(8) :: Mom(1:4,1:11)
+logical :: applyPSCut
+integer :: NBin(:)
+real(8) :: pT_b,pT_H,pT_bbar,mbbbar
+integer, parameter :: bbar=4,b=5,Hbos=3,inLeft=1,inRight=2
+
+
+    applyPSCut = .false.
+
+    pT_b = get_PT(Mom(1:4,b))
+    pT_bbar = get_PT(Mom(1:4,bbar))
+    pT_H = get_PT(Mom(1:4,Hbos))
+    mbbbar = get_MInv(Mom(1:4,b)+Mom(1:4,bbar))
+
+    if( pT_b.lt.pTjetcut .or. pT_bbar.lt.pTjetcut .or. mbbbar.lt.mJJcut) applyPSCut=.true.
+
+!   binning
+    NBin(1)  = WhichBin(1,pT_b)
+    NBin(2)  = WhichBin(2,pT_H)
+
+
+RETURN
+END SUBROUTINE
+
+
+
+
+
+SUBROUTINE Kinematics_TH(Mom,applyPSCut,NBin)
+use ModParameters
+use ModMisc
+! use ModTH
+implicit none
+real(8) :: Mom(1:4,1:9),MomMELA(1:4,1:9)
+logical :: applyPSCut
+integer :: NBin(:)
+real(8) :: pT_Top,pT_Higgs,pT_j,eta_j,eta_top,eta_Higgs,y_Higgs,y_top,y_j,MatElSq_H0,MatElSq_H1,D_0minus
+integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4,ljet=5,bbar=6, lepP=8,nu=9
+logical,save :: FirstTime=.true.
+
+
+    applyPSCut = .false.
+
+
+       pT_Top  = get_PT(Mom(1:4,t))
+       pT_Higgs= get_PT(Mom(1:4,Hbos))
+       pT_j= get_PT(Mom(1:4,ljet))
+
+       y_top=get_eta(Mom(1:4,t))
+       y_Higgs=get_eta(Mom(1:4,Hbos))
+       y_j=get_eta(Mom(1:4,ljet))
+
+
+    if( m_Top.lt.10d0*GeV  .and. (pT_top.lt.pTjetcut) ) applyPSCut=.true.
+
+
+
+D_0minus = 0d0
+! !     if( FirstTime ) then
+! ! !       call NNPDFDriver("./pdfs/NNPDF30_lo_as_0130.LHgrid",33)
+! ! !       call NNinitPDF(0)
+! !       call InitProcess_TTBH(m_Reso,m_top)
+! !       FirstTime = .false.
+! !     endif
+!     MomMELA(1:4,1) = -(/         65d0,           0.0000000000000000d0, 0.0000000000000000d0,      65d0           /)
+!     MomMELA(1:4,2) = -(/         65d0,           0.0000000000000000d0, 0.0000000000000000d0,     -65d0           /)
+!     MomMELA(1:4,3:9) = Mom(1:4,3:9)
+!
+!     call EvalXSec_PP_TH(MomMELA,(/(1d0,0d0),(0d0,0d0)/),TopDecays,MatElSq_H0)
+!     call EvalXSec_PP_TH(MomMELA,(/(0d0,0d0),(1d0,0d0)/),TopDecays,MatElSq_H1)
+!
+!     MatElSq_H0 = MatElSq_H0 !/40d0
+!     MatElSq_H1 = MatElSq_H1 !/147d0
+
+!     D_0minus = MatElSq_H0/(MatElSq_H0 + 1d0*MatElSq_H1 )
+
+
+
+!   binning
+
+       NBin(1) = WhichBin(1,pT_Top)
+       NBin(2) = WhichBin(2,y_Top)
+       NBin(3) = WhichBin(3,pT_j)
+       NBin(4) = WhichBin(4,y_j)
+       NBin(5) = WhichBin(5,pT_Higgs)
+       NBin(6) = WhichBin(6,y_Higgs)
+       NBin(7) = WhichBin(7,D_0minus)
+
+
+
+RETURN
+END SUBROUTINE
+
+
+
+
+
+SUBROUTINE Kinematics_Htautau(Mom,applyPSCut,NBin)
+use ModParameters
+use ModMisc
+implicit none
+real(8) :: Mom(:,:)
+logical :: applyPSCut
+integer :: NBin(:)
+real(8) :: m_tauP,m_tauM,m_Wp,m_Wm,y_tauM,y_tauP
+integer, parameter :: inLeft=1, inRight=2, Hig=3, tauP=4, tauM=5, Wp=6, Wm=7,   nu=8, nubar_tau=9, lepP=10,   lepM=11, nu_tau=12, nubar=13
+
+
+    applyPSCut = .false.
+
+    m_tauP = get_MInv(Mom(1:4,tauP))
+    m_tauM = get_MInv(Mom(1:4,tauM))
+    m_Wp   = get_MInv(Mom(1:4,Wp))
+    m_Wm   = get_MInv(Mom(1:4,Wm))
+    y_tauP = get_ETA(Mom(1:4,tauP))
+    y_tauM = get_ETA(Mom(1:4,tauM))
+
+
+
+!   binning
+    NBin(:)=1
+    NBin(1) = WhichBin(1,m_tauP)
+    NBin(2) = WhichBin(2,m_tauM)
+    NBin(3) = WhichBin(3,m_Wp)
+    NBin(4) = WhichBin(4,m_Wm)
+    NBin(5) = WhichBin(5,y_tauP)
+    NBin(6) = WhichBin(6,y_tauM)
+
+RETURN
+END SUBROUTINE
+
 FUNCTION ZLepBranching(xRnd)
 use ModParameters
 implicit none
@@ -102,6 +2755,8 @@ integer :: ZLepBranching_flat
 
 RETURN
 END FUNCTION
+
+
 
 FUNCTION ZLepPlusTauBranching(xRnd)
 use ModParameters
@@ -144,6 +2799,8 @@ integer :: ZLepPlusTauBranching_flat
 RETURN
 END FUNCTION
 
+
+
 FUNCTION ZNuBranching(xRnd)
 use ModParameters
 implicit none
@@ -185,6 +2842,9 @@ integer :: ZNuBranching_flat
 RETURN
 END FUNCTION
 
+
+
+
 FUNCTION ZQuaBranching_flat(xRnd)
 use ModParameters
 implicit none
@@ -215,6 +2875,8 @@ real(8),parameter :: yyyy=Ncol*xxxx
 RETURN
 END FUNCTION
 
+
+
 FUNCTION ZQuaBranching(xRnd)
 use ModParameters
 implicit none
@@ -242,6 +2904,13 @@ real(8),parameter :: yyyy=Ncol*xxxx
 
 RETURN
 END FUNCTION
+
+
+
+
+
+
+
 
 FUNCTION ZAnyBranching_flat(xRnd)
 use ModParameters
@@ -319,6 +2988,9 @@ real(8),parameter :: yy=Ncol*xx
 RETURN
 END FUNCTION
 
+
+
+
 FUNCTION ZAnyBranching(xRnd)
 use ModParameters
 implicit none
@@ -390,6 +3062,11 @@ integer :: ZAnyBranching
 RETURN
 END FUNCTION
 
+
+
+
+
+
 FUNCTION WLepBranching(xRnd)
 use ModParameters
 implicit none
@@ -425,6 +3102,7 @@ integer :: WLepBranching_flat
 
 RETURN
 END FUNCTION
+
 
 FUNCTION WLepPlusTauBranching(xRnd)
 use ModParameters
@@ -467,6 +3145,8 @@ integer :: WLepPlusTauBranching_flat
 RETURN
 END FUNCTION
 
+
+
 FUNCTION WQuaUpBranching(xRnd)
 use ModParameters
 implicit none
@@ -504,6 +3184,7 @@ integer :: WQuaUpBranching_flat
 RETURN
 END FUNCTION
 
+
 FUNCTION WAnyBranching_flat(xRnd)
 use ModParameters
 implicit none
@@ -531,6 +3212,10 @@ real(8),parameter :: yy=Ncol*xx
 
 RETURN
 END FUNCTION
+
+
+
+
 
 FUNCTION WAnyBranching(xRnd)
 use ModParameters
@@ -576,6 +3261,10 @@ integer :: WAnyBranching
 
 RETURN
 END FUNCTION
+
+
+
+
 
 SUBROUTINE VVBranchings(MY_IDUP,ICOLUP,ColorBase)
 use ModParameters
@@ -777,6 +3466,10 @@ real(8) :: DKRnd
 RETURN
 END SUBROUTINE
 
+
+
+
+
 FUNCTION GetCKMPartner( Flavor )
 use modMisc
 use modParameters
@@ -895,6 +3588,7 @@ real(8) :: FlavorRnd,sumCKM,Vsq(1:3)
 RETURN
 END FUNCTION
 
+
 FUNCTION GetCKMPartner_flat( Flavor )
 use modMisc
 use modParameters
@@ -971,6 +3665,297 @@ END FUNCTION
 
 
 
+SUBROUTINE BranchingCounter(MY_IDUP)
+use ModParameters
+implicit none
+integer :: MY_IDUP(6:9)
+
+
+    if( IsAZDecay(DecayMode1) ) then
+        if(  all(MY_IDUP(6:7)-(/ElP_,ElM_/).eq.0) &
+        .or. all(MY_IDUP(6:7)-(/MuP_,MuM_/).eq.0) &
+        .or. all(MY_IDUP(6:7)-(/TaP_,TaM_/).eq.0) &
+          )  Br_Z_ll_counter=Br_Z_ll_counter+1
+
+        if(  all(MY_IDUP(6:7)-(/ANuE_,NuE_/).eq.0) &
+        .or. all(MY_IDUP(6:7)-(/ANuM_,NuM_/).eq.0) &
+        .or. all(MY_IDUP(6:7)-(/ANuT_,NuT_/).eq.0) &
+          )  Br_Z_inv_counter=Br_Z_inv_counter+1
+
+        if(  all(MY_IDUP(6:7)-(/ADn_,Dn_/).eq.0) &
+        .or. all(MY_IDUP(6:7)-(/AStr_,Str_/).eq.0) &
+        .or. all(MY_IDUP(6:7)-(/ABot_,Bot_/).eq.0) &
+          )  Br_Z_dd_counter=Br_Z_dd_counter+1
+
+        if(  all(MY_IDUP(6:7)-(/AUp_,Up_/).eq.0) &
+        .or. all(MY_IDUP(6:7)-(/AChm_,Chm_/).eq.0) &
+          )  Br_Z_uu_counter=Br_Z_uu_counter+1
+
+    elseif( IsAWDecay(DecayMode1) ) then
+        if(  all(MY_IDUP(6:7)-(/ElP_,NuE_/).eq.0) &
+        .or. all(MY_IDUP(6:7)-(/MuP_,NuM_/).eq.0) &
+        .or. all(MY_IDUP(6:7)-(/TaP_,NuT_/).eq.0) &
+          )  Br_W_ll_counter=Br_W_ll_counter+1
+
+        if(  all(MY_IDUP(6:7)-(/ADn_,Up_/).eq.0) &
+        .or. all(MY_IDUP(6:7)-(/AStr_,Chm_/).eq.0) &
+          )  Br_W_ud_counter=Br_W_ud_counter+1
+
+    elseif( IsAPhoton(DecayMode1) ) then
+    endif
+
+RETURN
+END SUBROUTINE
+
+
+
+
+
+FUNCTION WhichBin(NHisto,Value)
+implicit none
+integer :: WhichBin,NHisto
+real(8) :: Value
+
+   WhichBin = (Value-Histo(NHisto)%LowVal)/Histo(NHisto)%BinSize + 1
+   if( WhichBin.lt.0 ) then
+      WhichBin = 0
+   elseif( WhichBin.gt.Histo(NHisto)%NBins ) then
+      WhichBin = Histo(NHisto)%NBins+1
+   endif
+
+RETURN
+END FUNCTION
+
+
+
+
+SUBROUTINE IntoHisto(NHisto,NBin,Value)
+implicit none
+integer :: NHisto,NBin
+real(8) :: Value
+
+     Histo(NHisto)%Value(NBin) = Histo(NHisto)%Value(NBin)  + Value
+     Histo(NHisto)%Value2(NBin)= Histo(NHisto)%Value2(NBin) + Value**2
+     Histo(NHisto)%Hits(NBin)  = Histo(NHisto)%Hits(NBin)+1
+
+RETURN
+END SUBROUTINE
+
+
+
+
+
+
+
+SUBROUTINE boost2Lab(x1,x2,NumPart,Mom)
+implicit none
+real(8) Mom(1:4,1:NumPart)
+real(8) x1,x2
+real(8) gamma,betagamma,MomTmp1,MomTmp4
+integer :: i,NumPart
+
+  gamma     = (x1+x2)/2d0/dsqrt(x1*x2)
+  betagamma = (x2-x1)/2d0/dsqrt(x1*x2)
+
+  do i=1,NumPart
+      MomTmp1=Mom(1,i)
+      MomTmp4=Mom(4,i)
+      Mom(1,i)= gamma*MomTmp1 - betagamma*MomTmp4
+      Mom(4,i)= gamma*MomTmp4 - betagamma*MomTmp1
+  enddo
+
+RETURN
+END SUBROUTINE
+
+
+
+SUBROUTINE getHiggsDecayLength(ctau)
+use ModParameters
+implicit none
+real(8) :: x,xp,xpp,Len0,propa,ctau,ctau0
+integer :: loop
+
+
+     ctau  = 0d0
+     ctau0 = HiggsDecayLengthMM
+     if( ctau0.lt.1d-16 ) RETURN
+
+     do loop=1,4000000!  4Mio. tries otherwise return zero
+          call random_number(x)
+          xp = 10*x*ctau0             ! scan between 0..10*ctau0
+
+          propa = dexp( -xp/(ctau0) ) ! the max of propa is 1.0
+          call random_number(xpp)
+          if( xpp.lt.propa ) then!   accept
+                ctau = xp
+                RETURN
+          endif
+     enddo
+
+
+RETURN
+END SUBROUTINE
+
+
+
+
+SUBROUTINE SmearExternal(xRnd,Mass,Width,MinEnergy,MaxEnergy,invMass,Jacobi)
+use ModParameters
+real(8) :: xRnd,Mass,Width,invMass,Jacobi,MinEnergy,MaxEnergy
+real(8) :: r,rmin,rmax,BW
+
+
+IF( Width.lt.(1d-6)*GeV ) THEN
+   invMass = Mass
+   Jacobi  = 1d0
+ELSE
+   rmin=1d0/(Width*Mass) * datan( (MinEnergy**2-Mass**2)/(Width*Mass)  )
+   rmax=1d0/(Width*Mass) * datan( (MaxEnergy**2-Mass**2)/(Width*Mass)  )
+   r = xRnd*(rmax-rmin) + rmin
+
+   invMass = dsqrt(dabs( Mass*Width * dtan( Mass*Width*r )  +  Mass**2 ))
+!    BW = (invMass**2 - Mass**2)**2 + Mass**2 * Width**2            ! Breit-Wiegner propagator
+   BW = (Mass**2 * Width**2) * ( dtan( Mass*Width*r )**2 + 1d0 )    ! equivalent to above
+
+   Jacobi  = (rmax-rmin) * BW   /(2d0*Pi)                           ! this Jacobian has [GeV^2]; it becomes [GeV^-2] when hitting the sq. propagator
+ENDIF                                                               ! factor 2*Pi comes from integr. measure
+
+
+return
+END SUBROUTINE
+
+
+
+
+SUBROUTINE PDFMapping(MapType,yRnd,eta1,eta2,Ehat,sHatJacobi,EhatMin)
+use ModParameters
+use ModMisc
+implicit none
+integer :: MapType
+real(8) :: yRnd(1:2),eta1,eta2,EHat,sHatJacobi,tau,nPotMap,z,sbar,fmax
+real(8) :: etamin, Ymax, Y, Ymin, MThresh
+real(8), optional :: EhatMin
+
+  if( present(EhatMin) ) then
+    MThresh = EhatMin
+  else
+    MThresh = M_Reso
+  endif
+
+  if( MapType.eq.1 ) then!  no mapping
+      eta1 = yRnd(1)
+      eta2 = yRnd(2)
+      sHatJacobi = 1d0
+  elseif( MapType.eq.2 ) then!  exponential mapping
+      tau = (MThresh/Collider_Energy)**2
+      eta1 = tau**yRnd(1)
+      eta2 = tau**( (1d0-yRnd(1))*yRnd(2) )
+      sHatJacobi = dlog(tau)**2*(1d0-yRnd(1))*eta1*eta2
+  elseif( MapType.eq.3 ) then!  linear mapping
+      tau = (MThresh/Collider_Energy)**2
+      eta1 = (1d0-tau)*yRnd(1) + tau
+      eta2 = ((1d0-tau)*yRnd(1))/((1d0-tau)*yRnd(1)+tau)*yRnd(2) + tau/((1d0-tau)*yRnd(1)+tau)
+      sHatJacobi = (1d0-tau)*((1d0-tau)*yRnd(1))/((1d0-tau)*yRnd(1)+tau)
+  elseif( MapType.eq.4 ) then!  MCFM mapping
+      tau = dexp(dlog(((MThresh/Collider_Energy)**2))*yRnd(1))
+      eta1 = dsqrt(tau)*dexp(0.5d0*dlog(tau)*(1d0-2d0*yRnd(2)))
+      eta2 = dsqrt(tau)/dexp(0.5d0*dlog(tau)*(1d0-2d0*yRnd(2)))
+      sHatJacobi = dlog(((MThresh/Collider_Energy)**2))*tau*dlog(tau)
+  elseif( MapType.eq.5 ) then!  nPotMap mapping
+!       nPotMap = 0.5d0
+!       tau = (MThresh/Collider_Energy)**2
+!       yRnd(1) = yRnd(1)**nPotMap
+!       yRnd(2) = yRnd(2)**nPotMap
+!       eta1 = (1d0-tau) * yRnd(1) + tau
+!       eta2 = ((1d0-tau)*yRnd(1))/((1d0-tau)*yRnd(1)+tau)*yRnd(2) + tau/((1d0-tau)*yRnd(1)+tau)
+!       sHatJacobi=(1d0-tau)*((1d0-tau)*yRnd(1))/((1d0-tau)*yRnd(1)+tau)*nPotMap**2*((yRnd(1)*yRnd(2))**(1d0/nPotMap))**(nPotMap-1d0)
+  elseif( MapType.eq.10 ) then!  Breit-Wigner mapping
+      fmax = 1d0/M_Reso/Ga_Reso * ( datan((Collider_Energy**2-M_Reso**2)/M_Reso/Ga_Reso) - datan(-M_Reso/Ga_Reso) )
+      sbar = M_Reso*Ga_Reso * dtan(fmax*yRnd(1)*M_Reso*Ga_Reso - datan(M_Reso/Ga_Reso) ) + M_Reso**2
+      z = sbar/Collider_Energy**2
+      eta1 = z + (1d0-z)*yRnd(2)
+      eta2 = z/eta1
+      sHatJacobi = fmax/Collider_Energy**2 * (1d0-z)/eta1  * ( (sbar - M_Reso**2)**2 + M_Reso**2*Ga_Reso**2 )
+
+  elseif (MapType.eq.11) then ! delta-function map
+
+     etamin = M_Reso**2/Collider_Energy**2
+     eta2 = etamin + (1d0-etamin)*yRnd(2)
+     eta1 = etamin/eta2
+     fmax = 0.5d0*pi/M_Reso**3/Ga_Reso
+     sHatJacobi = fmax*etamin/eta2* ( (Collider_Energy**2*eta1*eta2 - M_Reso**2)**2 + M_Reso**2*Ga_Reso**2 )
+
+  elseif (MapType.eq.12) then ! delta-function map / new
+     Ymax = dlog(Collider_Energy/M_Reso)
+     Y = -Ymax + 2d0*Ymax*yRnd(2)
+     eta1 = M_Reso/Collider_Energy*exp(Y)
+     eta2 = M_Reso/Collider_Energy*exp(-Y)
+     fmax = 0.5d0*pi/M_Reso**3/Ga_Reso*2d0*Ymax
+     sHatJacobi = fmax*(M_Reso**2*Ga_Reso**2 )
+
+! ! ! !
+!       fmax = 1d0/M_Reso/Ga_Reso * ( datan((Collider_Energy**2-M_Reso**2)/M_Reso/Ga_Reso) - datan(-M_Reso/Ga_Reso) )
+!       sbar = M_Reso**2
+!       z = sbar/Collider_Energy**2
+!       eta1 = z + (1d0-z)*yRnd(2)
+!       eta2 = z/eta1
+!       sHatJacobi = fmax/Collider_Energy**2 * (1d0-z)/eta1  * ( (sbar - M_Reso**2)**2 + M_Reso**2*Ga_Reso**2 )
+! ! ! ! ! !
+
+
+  elseif( MapType.eq.13 ) then!  Breit-Wigner mapping with M = M_Z + M_h
+      fmax = 1d0/(M_Reso+M_Z)/Ga_Z * ( datan((Collider_Energy**2-(M_Reso+M_Z)**2)/(M_Reso+M_Z)/Ga_Z) - datan(-(M_Reso+M_Z)/Ga_Z) )
+      sbar = (M_Reso+M_Z)*Ga_Z * dtan(fmax*yRnd(1)*(M_Reso+M_Z)*Ga_Z - datan((M_Reso+M_Z)/Ga_Z) ) + (M_Reso+M_Z)**2
+      z = sbar/Collider_Energy**2
+      eta1 = z + (1d0-z)*yRnd(2)
+      eta2 = z/eta1
+      sHatJacobi = fmax/Collider_Energy**2 * (1d0-z)/eta1  * ( (sbar - (M_Reso+M_Z)**2)**2 + (M_Reso+M_Z)**2*Ga_Z**2 )
+
+  elseif( MapType.eq.14 ) then! Z-Higgs associate production
+      etamin = (M_Reso+M_Z-2d0*Ga_Z)/Collider_Energy
+      z = 1d0/(1d0-etamin)
+      Ymin = ((z-1d0)/(z-yRnd(1)))**2
+      Ymax = 1d0 / Ymin
+      Ymin = 0.5d0*dlog(Ymin)
+      Ymax = 0.5d0*dlog(Ymax)
+      Y = Ymin + yrnd(2)*(Ymax-Ymin)
+      eta1 = (z-1d0)/(z-yRnd(1))*dexp(Y)
+      eta2 = (z-1d0)/(z-yRnd(1))*dexp(-Y)
+      sHatJacobi = 2d0*(z-1d0)**2/(z-yRnd(1))**3*(Ymax-Ymin)
+
+  elseif( MapType.eq.15 ) then! W-Higgs associate production
+      etamin = (M_Reso+M_W-2d0*Ga_W)/Collider_Energy
+      z = 1d0/(1d0-etamin)
+      Ymin = ((z-1d0)/(z-yRnd(1)))**2
+      Ymax = 1d0 / Ymin
+      Ymin = 0.5d0*dlog(Ymin)
+      Ymax = 0.5d0*dlog(Ymax)
+      Y = Ymin + yrnd(2)*(Ymax-Ymin)
+      eta1 = (z-1d0)/(z-yRnd(1))*dexp(Y)
+      eta2 = (z-1d0)/(z-yRnd(1))*dexp(-Y)
+      sHatJacobi = 2d0*(z-1d0)**2/(z-yRnd(1))**3*(Ymax-Ymin)
+
+  elseif( MapType.eq.16 ) then! H+j
+      etamin = (M_Reso-3d0*Ga_Reso)/Collider_Energy
+      z = 1d0/(1d0-etamin)
+      Ymin = ((z-1d0)/(z-yRnd(1)))**2
+      Ymax = 1d0 / Ymin
+      Ymin = 0.5d0*dlog(Ymin)
+      Ymax = 0.5d0*dlog(Ymax)
+      Y = Ymin + yrnd(2)*(Ymax-Ymin)
+      eta1 = (z-1d0)/(z-yRnd(1))*dexp(Y)
+      eta2 = (z-1d0)/(z-yRnd(1))*dexp(-Y)
+      sHatJacobi = 2d0*(z-1d0)**2/(z-yRnd(1))**3*(Ymax-Ymin)
+  else
+      call Error("PDF mapping not available")
+  endif
+
+  EHat = Collider_Energy*dsqrt(eta1*eta2)
+
+RETURN
+END SUBROUTINE
+
+
 FUNCTION GetBWPropagator(sHat, scheme)
 use modMisc
 use modParameters
@@ -1006,7 +3991,7 @@ integer :: scheme
 
         !print *, dsqrt(dabs(sHat))/GeV, gabarH/GeV, BigGamma/GeV
     elseif( scheme.eq.0 ) then  !remove the propagator completely
-        GetBWPropagator = 1d0
+        GetBWPropagator = 1
     else
         print *, "Invalid scheme: ", scheme
         stop 1
@@ -1036,26 +4021,1907 @@ END FUNCTION
 
 
 
-
-SUBROUTINE boost2Lab(x1,x2,NumPart,Mom)
+RECURSIVE SUBROUTINE JetAlgo_kt(Rsep_jet,PartonList,MomParton,NJet,JetList,MomJet)  ! initial call must have NJet=0 and MomJet(1:4,:) = MomPartons(1:4,:)
+use ModMisc
+use ModParameters
 implicit none
-real(8) Mom(1:4,1:NumPart)
-real(8) x1,x2
-real(8) gamma,betagamma,MomTmp1,MomTmp4
-integer :: i,NumPart
+integer :: PartonList(:), JetList(:)
+real(8) :: MomParton(:,:)
+integer :: NJet
+real(8) :: MomJet(:,:)
+real(8) :: Rsep_jet
+integer :: NParton,i,j,k,dii_minp,dij_minp,ij(1:120,1:2)  ! max. partons=8, (8-1)! =5040  ! max. partons=6, (6-1)! =120
+real(8) :: dii(1:6),dij(1:120),Rij,dii_min,dij_min!,eta(1:5),phi(1:5)
 
-  gamma     = (x1+x2)/2d0/dsqrt(x1*x2)
-  betagamma = (x2-x1)/2d0/dsqrt(x1*x2)
 
-  do i=1,NumPart
-      MomTmp1=Mom(1,i)
-      MomTmp4=Mom(4,i)
-      Mom(1,i)= gamma*MomTmp1 - betagamma*MomTmp4
-      Mom(4,i)= gamma*MomTmp4 - betagamma*MomTmp1
-  enddo
+NParton = size(PartonList)
+if( NParton.eq.0 ) then
+    return
+elseif( NParton.eq.1 ) then
+!   print *, "HARD JET", PartonList(NParton)
+   NJet = NJet +1
+   JetList(NJet) = PartonList(NParton)
+   return
+endif
+
+!generate dii, dij
+do i=1,NParton
+   dii(i) = get_PT2(MomParton(1:4,PartonList(i)))**(-1d0)
+enddo
+
+k=0
+do i=1,NParton-1
+do j=i+1,NParton
+   k = k+1
+   Rij = get_R( MomParton(1:4,PartonList(i)), MomParton(1:4,PartonList(j)) )
+   dij(k) = dmin1(dii(i),dii(j)) * (Rij/Rsep_jet)**2
+   ij(k,1)=i
+   ij(k,2)=j
+enddo
+enddo
+!!print *, dii(1:NParton)
+!!print *, dij(1:k)
+
+
+! find minima
+dii_min=dii(1)
+dii_minp=1
+do i=2,NParton
+  if( dii(i).lt.dii_min ) then
+    dii_min = dii(i)
+    dii_minp= i
+  endif
+enddo
+
+dij_min=dij(1)
+dij_minp=1
+do i=2,k
+  if( dij(i).lt.dij_min ) then
+    dij_min = dij(i)
+    dij_minp= i
+  endif
+enddo
+
+
+if( dii_min.lt.dij_min ) then ! no recombination
+   NJet = NJet +1
+   k=0
+!   print *, "HARD JET", PartonList(dii_minp)
+   JetList(NJet) = PartonList(dii_minp)
+   MomJet(1:4,PartonList(dii_minp)) = MomParton(1:4,PartonList(dii_minp))
+   do i=1,NParton!  remove momenta dii_minp from parton list
+      if( i.eq.dii_minp ) cycle
+      k=k+1
+      PartonList(k) = PartonList(i)
+   enddo
+   call JetAlgo_kt(Rsep_jet,PartonList(1:k),MomParton(:,:),NJet,JetList(:),MomJet(:,:))
+else ! recombination of dij(dij_min)
+!    if( RecombPrescr.eq.1 ) then
+!         MomJet(1:4,PartonList(ij(dij_minp,1))) = EllisSoperComb(MomJet(1:4,PartonList(ij(dij_minp,1))),MomJet(1:4,PartonList(ij(dij_minp,2))))   ! Ellis-Soper combination
+!    else
+        MomJet(1:4,PartonList(ij(dij_minp,1))) = MomJet(1:4,PartonList(ij(dij_minp,1))) + MomJet(1:4,PartonList(ij(dij_minp,2)))                 ! four vector addition
+!    endif
+   MomJet(1:4,PartonList(ij(dij_minp,2))) = 0d0
+   k=0
+!   print *, "RECOMB.",PartonList(ij(dij_minp,1)),PartonList(ij(dij_minp,2))
+   do i=1,NParton!  remove momenta j from parton list
+      if( i.eq.ij(dij_minp,2) ) then
+         cycle
+      endif
+      k=k+1
+      PartonList(k) = PartonList(i)
+   enddo
+   call JetAlgo_kt(Rsep_jet,PartonList(1:k),MomJet(:,:),NJet,JetList(:),MomJet(:,:))
+endif
+
+return
+END SUBROUTINE
+
+
+
+
+
+SUBROUTINE TTbar_OnShellProjection(MomIn,MomOut)
+use modParameters
+use modMisc
+implicit none
+real(8) :: MomIn(:,:),MomOut(:,:),MomTmp(1:4)
+integer, parameter :: inLeft=1,inRight=2,Hbos=3,tbar=4,t=5,  bbar=6,Wm=7,lepM=8,nubar=9,  b=10,Wp=11,lepP=12,nu=13
+
+
+    call ShiftMass(MomIn(1:4,tbar),MomIn(1:4,t),m_top,m_top,MomOut(1:4,tbar),MomOut(1:4,t))! project top momenta on-shell
+
+    MomTmp(1:4) = MomOut(1:4,t) - MomIn(1:4,Wp)
+    call ShiftMass(MomTmp,MomIn(1:4,Wp),m_Bot,m_W,MomOut(1:4,b),MomOut(1:4,Wp))! project b and W+ on-shell
+
+    MomTmp(1:4) = MomOut(1:4,tbar) - MomIn(1:4,Wm)
+    call ShiftMass(MomTmp,MomIn(1:4,Wm),m_Bot,m_W,MomOut(1:4,bbar),MomOut(1:4,Wm))! project bbar and W- on-shell
+
+    MomTmp(1:4) = MomOut(1:4,Wp) - MomIn(1:4,lepP)                                ! project W+ decay products on-shell
+    MomOut(1:4,nu)   = MomTmp(1:4) - (MomTmp(1:4).dot.MomTmp(1:4))/2d0/(MomTmp(1:4).dot.MomIn(1:4,lepP)) * MomIn(1:4,lepP)
+    MomOut(1:4,lepP) = (1d0 + (MomTmp(1:4).dot.MomTmp(1:4))/2d0/(MomTmp(1:4).dot.MomIn(1:4,lepP))) * MomIn(1:4,lepP)
+
+    MomTmp(1:4) = MomOut(1:4,Wm) - MomIn(1:4,lepM)                                ! project W- decay products on-shell
+    MomOut(1:4,nubar) = MomTmp(1:4) - (MomTmp(1:4).dot.MomTmp(1:4))/2d0/(MomTmp(1:4).dot.MomIn(1:4,lepM)) * MomIn(1:4,lepM)
+    MomOut(1:4,lepM)  = (1d0 + (MomTmp(1:4).dot.MomTmp(1:4))/2d0/(MomTmp(1:4).dot.MomIn(1:4,lepM))) * MomIn(1:4,lepM)
+
+return
+END SUBROUTINE
+
+
+
+
+SUBROUTINE TTbar_OffShellProjection(MomIn,MomOut,Jacobian)
+use modParameters
+use modMisc
+implicit none
+real(8) :: MomIn(:,:),MomOut(:,:),MomTmp(1:4),Jacobian
+real(8) :: xRndWidth(2:5),BW_Mass(2:5),BW_Jacobi(2:5)
+integer, parameter :: inLeft=1,inRight=2,Hbos=3,tbar=4,t=5,  bbar=6,Wm=7,lepM=8,nubar=9,  b=10,Wp=11,lepP=12,nu=13
+
+
+    call random_number(xRndWidth)
+
+    call SmearExternal(xRndWidth(2),m_top,Ga_Top,m_top-6d0*Ga_Top,m_top+6d0*Ga_Top,BW_Mass(2),BW_Jacobi(2))
+    call SmearExternal(xRndWidth(3),m_top,Ga_Top,m_top-6d0*Ga_Top,m_top+6d0*Ga_Top,BW_Mass(3),BW_Jacobi(3))
+    call SmearExternal(xRndWidth(4),m_W,Ga_W,m_W-6d0*Ga_W,m_W+6d0*Ga_W,BW_Mass(4),BW_Jacobi(4))
+    call SmearExternal(xRndWidth(5),m_W,Ga_W,m_W-6d0*Ga_W,m_W+6d0*Ga_W,BW_Mass(5),BW_Jacobi(5))
+    Jacobian = BW_Jacobi(2) * BW_Jacobi(3) * BW_Jacobi(4) * BW_Jacobi(5)
+
+! print *, "smeared mt",(BW_Mass(2:3)-m_top)*100d0
+! print *, "smeared mw",(BW_Mass(4:5)-m_w)*100d0
+
+    call ShiftMass(MomIn(1:4,tbar),MomIn(1:4,t),BW_Mass(2),BW_Mass(3),MomOut(1:4,tbar),MomOut(1:4,t))
+
+    MomTmp(1:4) = MomOut(1:4,t) - MomIn(1:4,Wp)
+    call ShiftMass(MomTmp,MomIn(1:4,Wp),m_Bot,BW_Mass(4),MomOut(1:4,b),MomOut(1:4,Wp))! project b and W+ on-shell
+
+    MomTmp(1:4) = MomOut(1:4,tbar) - MomIn(1:4,Wm)
+    call ShiftMass(MomTmp,MomIn(1:4,Wm),m_Bot,BW_Mass(5),MomOut(1:4,bbar),MomOut(1:4,Wm))! project bbar and W- on-shell
+
+    MomTmp(1:4) = MomOut(1:4,Wp) - MomIn(1:4,lepP)                                ! project W+ decay products on-shell
+    MomOut(1:4,nu)   = MomTmp(1:4) - (MomTmp(1:4).dot.MomTmp(1:4))/2d0/(MomTmp(1:4).dot.MomIn(1:4,lepP)) * MomIn(1:4,lepP)
+    MomOut(1:4,lepP) = (1d0 + (MomTmp(1:4).dot.MomTmp(1:4))/2d0/(MomTmp(1:4).dot.MomIn(1:4,lepP))) * MomIn(1:4,lepP)
+
+    MomTmp(1:4) = MomOut(1:4,Wm) - MomIn(1:4,lepM)                                ! project W- decay products on-shell
+    MomOut(1:4,nubar) = MomTmp(1:4) - (MomTmp(1:4).dot.MomTmp(1:4))/2d0/(MomTmp(1:4).dot.MomIn(1:4,lepM)) * MomIn(1:4,lepM)
+    MomOut(1:4,lepM)  = (1d0 + (MomTmp(1:4).dot.MomTmp(1:4))/2d0/(MomTmp(1:4).dot.MomIn(1:4,lepM))) * MomIn(1:4,lepM)
+
+return
+END SUBROUTINE
+
+
+
+SUBROUTINE Top_OffShellProjection(MomIn,MomOut,Jacobian)
+use modParameters
+use modMisc
+implicit none
+real(8) :: MomIn(:,:),MomOut(:,:),MomTmp(1:4),Jacobian
+real(8) :: xRndWidth(1:2),BW_Mass(1:2),BW_Jacobi(1:2)
+integer, parameter :: inLeft=1,inRight=2,Hbos=3,t=4, qout=5, b=6,W=7,lep=8,nu=9
+
+
+    call random_number(xRndWidth)
+
+    call SmearExternal(xRndWidth(1),m_top,Ga_Top,m_top-6*Ga_Top,m_top+6*Ga_Top,BW_Mass(1),BW_Jacobi(1))
+    call SmearExternal(xRndWidth(2),m_W,Ga_W,m_W-6d0*Ga_W,m_W+6d0*Ga_W,BW_Mass(2),BW_Jacobi(2))
+    Jacobian = BW_Jacobi(1) * BW_Jacobi(2)
+
+! print *, "smeared mt",BW_Mass(1)
+! print *, "smeared mw",BW_Mass(2)
+
+    call ShiftMass(MomIn(1:4,t),MomIn(1:4,qout),BW_Mass(1),0d0,MomOut(1:4,t),MomOut(1:4,qout))
+
+    MomTmp(1:4) = MomOut(1:4,t) - MomIn(1:4,W)
+    call ShiftMass(MomTmp,MomIn(1:4,W),m_Bot,BW_Mass(2),MomOut(1:4,b),MomOut(1:4,W))! project b and W on-shell
+
+    MomTmp(1:4) = MomOut(1:4,W) - MomIn(1:4,lep)                                ! project W decay products on-shell
+    MomOut(1:4,nu)   = MomTmp(1:4) - (MomTmp(1:4).dot.MomTmp(1:4))/2d0/(MomTmp(1:4).dot.MomIn(1:4,lep)) * MomIn(1:4,lep)
+    MomOut(1:4,lep) = (1d0 + (MomTmp(1:4).dot.MomTmp(1:4))/2d0/(MomTmp(1:4).dot.MomIn(1:4,lep))) * MomIn(1:4,lep)
+
+return
+END SUBROUTINE
+
+
+
+
+
+SUBROUTINE EvalPhasespace_2to3ArbMass(EHat,Mass,xRndPS,Mom,PSWgt)
+use ModParameters
+implicit none
+real(8) :: EHat
+real(8) :: PSWgt,PSWgt2,PSWgt3,Mass(1:3)
+real(8) :: xRndPS(1:5)
+real(8) :: Mom(1:4,1:5),TmpMom(1:4)
+! real(8) :: MomDK(1:4,1:6)
+! integer :: NPart,i
+! real(8) :: vel,parx,theta ! for checks
+integer :: Pcol1,Pcol2,Steps
+real(8) :: SingDepth,velo,parx
+real(8),parameter :: NPr=3, PiWgtPr = (2d0*Pi)**(4-NPr*3) * (4d0*Pi)**(NPr-1)
+
+
+  call genps(3,Ehat,xRndPS(1:5),Mass,Mom(1:4,3:5),PSWgt)
+  PSWgt = PSWgt*PiWgtPr
+
+!   call yeti3(Ehat,xRndPS(1:5),(/m_Top,m_Top,Mass/),Mom(1:4,3:5),PSWgt)
+!   TmpMom(1:4) = Mom(1:4,3)
+!   Mom(1:4,3)  = Mom(1:4,5)
+!   Mom(1:4,5)  = TmpMom(1:4)
+
+!  particles on the beam axis:
+
+   Mom(1,1) =  EHat*0.5d0
+   Mom(2,1) =  0d0
+   Mom(3,1) =  0d0
+   Mom(4,1) = +EHat*0.5d0
+
+   Mom(1,2) =  EHat*0.5d0
+   Mom(2,2) =  0d0
+   Mom(3,2) =  0d0
+   Mom(4,2) = -EHat*0.5d0
+
+
+return
+END SUBROUTINE
+
+SUBROUTINE EvalPhasespace_2to3M(EHat,Mass,xRndPS,Mom,PSWgt,Width)
+use ModParameters
+implicit none
+real(8) :: EHat,PSWgt,PSWgt2,PSWgt3,Mass(1:3)
+real(8), optional :: Width(1:3)
+real(8) :: xRndPS(1:5),xRndWidth(1:3),BW_Jacobi(1:3)
+real(8) :: Mom(1:4,1:5),TmpMom(1:4),BW_Mass(1:3)
+! real(8) :: MomDK(1:4,1:6)
+! integer :: NPart,i
+! real(8) :: vel,parx,theta ! for checks
+integer :: Pcol1,Pcol2,Steps
+real(8) :: SingDepth,velo,parx
+real(8),parameter :: NPr=3, PiWgtPr = (2d0*Pi)**(4-NPr*3) * (4d0*Pi)**(NPr-1)
+
+  if( present(Width) ) then
+      call random_number(xRndWidth)
+
+      call SmearExternal(xRndWidth(1),Mass(1),Width(1),Mass(1)-6d0*Width(1),Mass(1)+6d0*Width(1),BW_Mass(1),BW_Jacobi(1))
+      call SmearExternal(xRndWidth(2),Mass(2),Width(2),Mass(2)-6d0*Width(2),Mass(2)+6d0*Width(2),BW_Mass(2),BW_Jacobi(2))
+      call SmearExternal(xRndWidth(3),Mass(3),Width(3),Mass(3)-6d0*Width(3),Mass(3)+6d0*Width(3),BW_Mass(3),BW_Jacobi(3))
+
+      call genps(3,Ehat,xRndPS(1:5),BW_Mass,Mom(1:4,3:5),PSWgt)
+      PSWgt = PSWgt*PiWgtPr                             &
+              * BW_Jacobi(1)*BW_Jacobi(2)*BW_Jacobi(3)  &  ! maybe add factors for higgs
+              * (2d0*Ga_Top*m_Top)**2                   &  ! remove narrow-width prefactor
+              * (Ga_Top**2 * m_Top**2)**2                  ! and replace by on-shell propagator to restore correct scaling
+
+  else
+      call genps(3,Ehat,xRndPS(1:5),Mass,Mom(1:4,3:5),PSWgt)
+      PSWgt = PSWgt*PiWgtPr
+  endif
+
+
+!   call yeti3(Ehat,xRndPS(1:5),(/m_Top,m_Top,Mass/),Mom(1:4,3:5),PSWgt)
+!   TmpMom(1:4) = Mom(1:4,3)
+!   Mom(1:4,3)  = Mom(1:4,5)
+!   Mom(1:4,5)  = TmpMom(1:4)
+
+!  particles on the beam axis:
+   Mom(1,1) =  EHat*0.5d0
+   Mom(2,1) =  0d0
+   Mom(3,1) =  0d0
+   Mom(4,1) = +EHat*0.5d0
+
+   Mom(1,2) =  EHat*0.5d0
+   Mom(2,2) =  0d0
+   Mom(3,2) =  0d0
+   Mom(4,2) = -EHat*0.5d0
+
+
+return
+END SUBROUTINE
+
+SUBROUTINE EvalPhasespace_TopDecay(TopMom,xRndPS,MomDK,PSWgt)!  top quark decay phase space
+use ModParameters
+implicit none
+real(8) :: PSWgt,PSWgt2,PSWgt3
+real(8) :: TopMom(1:4),WMom(1:4)
+real(8) :: MomDK(:,:)
+real(8) :: xRndPS(:)
+real(8),parameter :: N2=2, PiWgt2 = (2d0*Pi)**(4-N2*3) * (4d0*Pi)**(N2-1)
+real(8),parameter :: N3=3, PiWgt3 = (2d0*Pi)**(4-N3*3) * (4d0*Pi)**(N3-1)
+real(8),parameter :: N4=4, PiWgt4 = (2d0*Pi)**(4-N4*3) * (4d0*Pi)**(N4-1)
+
+!     MomDK(1:4,i): i= 1:bottom, 2:lepton, 3:neutrino
+      call genps(2,m_Top,xRndPS(1:2),(/0d0,m_W/),MomDK(1:4,1:2),PSWgt2)! top decay
+      WMom(1:4) = MomDK(1:4,2)
+      call genps(2,m_W,xRndPS(3:4),(/0d0,0d0/),MomDK(1:4,2:3),PSWgt3)! W decay
+!     boost leptons to the W frame:
+      call boost(MomDK(1:4,2),WMom(1:4),m_W)
+      call boost(MomDK(1:4,3),WMom(1:4),m_W)
+!     boost all guys to the top frame:
+      call boost(MomDK(1:4,1),TopMom(1:4),m_Top)
+      call boost(MomDK(1:4,2),TopMom(1:4),m_Top)
+      call boost(MomDK(1:4,3),TopMom(1:4),m_Top)
+      PSWgt = PSWgt2*PiWgt2 * PSWgt3*PiWgt2
 
 RETURN
 END SUBROUTINE
+
+SUBROUTINE EvalPhasespace_tautau(xRnd,pHiggs,MY_IDUP,Mom,Jac)
+use ModParameters
+use ModPhasespace
+use ModMisc
+implicit none
+real(8) :: xRnd(:), pHiggs(:), Mom(:,:)
+integer :: MY_IDUP(1:2)
+real(8) :: Jac,Jac1,Jac2,Jac3,Jac4,Jac5,Jac6,Jac7,Jac8,Jac9
+real(8) :: Minvsq_tau1,Minvsq_tau2,Minvsq_Wp,Minvsq_Wm
+real(8),parameter :: m_nu = 0d0, m_lep=0d0
+integer, parameter :: inLeft=1, inRight=2, Hig=3, tauP=4, tauM=5, Wp=6, Wm=7,   nu=8, nubar_tau=9, lepP=10,   lepM=11, nu_tau=12, nubar=13
+
+
+
+
+!  H-->tau tau (NWA)
+   Jac1 = s_channel_prop_decay(pHiggs,(/m_tau,ga_tau,m_tau,m_tau/),(/m_tau,ga_tau,m_tau,m_tau/),xRnd(1:2),Mom(:,tauP),Mom(:,tauM))
+
+!  tau-->W nu (BW)
+   Jac2 = s_channel_prop_decay(Mom(:,tauP),(/m_W,ga_W,0d0,m_tau/),(/m_nu,0d0,0d0,0d0/),xRnd(3:5),Mom(:,Wp),Mom(:,nubar_tau))
+   Jac3 = s_channel_prop_decay(Mom(:,tauM),(/m_W,ga_W,0d0,m_tau/),(/m_nu,0d0,0d0,0d0/),xRnd(6:8),Mom(:,Wm),Mom(:,nu_tau))
+
+!  W-->l nu (ONSH)
+   Jac4 = s_channel_prop_decay(Mom(:,Wp),(/m_Lep,0d0,0d0,0d0/),(/m_nu,0d0,0d0,0d0/),xRnd( 9:10),Mom(:,LepP),Mom(:,nu))
+   Jac5 = s_channel_prop_decay(Mom(:,Wm),(/m_Lep,0d0,0d0,0d0/),(/m_nu,0d0,0d0,0d0/),xRnd(11:12),Mom(:,LepM),Mom(:,nubar))
+
+   Jac = Jac1*Jac2*Jac4*Jac3*Jac5 * PSNorm6
+
+
+!    print *, "OS checker",dsqrt(pHiggs.dot.pHiggs )
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,tauP).dot.Mom(1:4,tauP) ))
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,tauM).dot.Mom(1:4,tauM) ))
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,Wp).dot.Mom(1:4,Wp) ))
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,Wm).dot.Mom(1:4,Wm) ))
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,nu).dot.Mom(1:4,nu) ))
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,nu_tau).dot.Mom(1:4,nu_tau) ))
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,nubar_tau).dot.Mom(1:4,nubar_tau) ))
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,nubar).dot.Mom(1:4,nubar) ))
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,lepP).dot.Mom(1:4,lepP) ))
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,lepM).dot.Mom(1:4,lepM) ))
+!    print *, "----------"
+!    print *, "Mom.cons. ",pHiggs(1:4)-Mom(1:4,tauP)-Mom(1:4,tauM)
+!    print *, "Mom.cons. ",Mom(1:4,tauP) - Mom(1:4,nubar_tau)-Mom(1:4,Wp)
+!    print *, "Mom.cons. ",Mom(1:4,tauM) - Mom(1:4,nu_tau)-Mom(1:4,Wm)
+!    print *, "Mom.cons. ",Mom(1:4,Wp) - Mom(1:4,nu)-Mom(1:4,lepP)
+!    print *, "Mom.cons. ",Mom(1:4,Wm) - Mom(1:4,nubar)-Mom(1:4,lepM)
+!    pause
+
+
+RETURN
+END SUBROUTINE
+
+SUBROUTINE EvalPhaseSpace_VH(yRnd,MomExt,inv_mass,mass,PSWgt,useAonshell)
+use ModParameters
+implicit none
+
+      logical, optional :: useAonshell
+      real(8), intent(in) :: yRnd(1:20),mass(9,2)
+      real(8) :: phi, beta, gamma
+      real(8) :: temp_vector(4), temp_boost(4)
+      integer :: i
+      real(8), parameter :: Twopi = 2d0 * Pi
+      real(8) :: MomExt(1:4,1:9)
+      real(8) :: MomDummy(1:4)
+      !double precision four_momentum(7,4)
+      real(8), intent(out) :: PSWgt,inv_mass(9)
+! 1=E, 2,3,4=p_x,y,z
+!psg_mass(mass, width)
+      real(8) :: cm_abs3p(9)
+      real(8) :: cm_sin_theta(9), cm_cos_theta(9)
+      real(8) :: cm_sin_phi(9), cm_cos_phi(9)
+!use Cauchy distribution for Breit-Wigner distribution for the invariant mass of 2 and 3?
+!      logical, parameter :: breit_wigner = .true.
+      real(8) :: jacobian4, jacobian5
+      logical :: hasAonshell
+
+      hasAonshell = .false.
+      if(present(useAonshell)) then
+         hasAonshell=useAonshell
+      endif
+
+!3333333333
+!invariant mass of 3
+      if(mass(3,2).gt.0d0 .and. mass(3,1).gt.0d0) then
+         inv_mass(3) = dsqrt((MomExt(1,3)+MomExt(4,3))*(MomExt(1,3)-MomExt(4,3)))
+      else
+         inv_mass(3) = mass(3,1)
+      endif
+      if(mass(4,2).gt.0d0 .and. mass(4,1).gt.0d0) then
+         inv_mass(4) = dsqrt(dabs(bw_sq(yRnd(12),mass(4,1), mass(4,2), inv_mass(3)**2, jacobian4)))
+      else
+         inv_mass(4) = mass(4,1)
+         jacobian4=1d0
+      endif
+      if(mass(5,2).gt.0d0 .and. mass(5,1).gt.0d0) then
+         inv_mass(5) = dsqrt(dabs(bw_sq(yRnd(13),mass(5,1), mass(5,2), (inv_mass(3)-inv_mass(4))**2, jacobian5)))
+      else
+         inv_mass(5) = mass(5,1)
+         jacobian5=1d0
+      endif
+
+!444444444444
+!energy of 4 in the CM frame of 3
+      if(dabs(inv_mass(3)).gt.0d0) then
+         MomExt(1,4)=(inv_mass(3)**2+(inv_mass(4)+inv_mass(5))*(inv_mass(4)-inv_mass(5)))/2d0/inv_mass(3)
+      else
+         MomExt(1,4)=0d0
+      endif
+!|3-momentum| of 4 in the CM frame of 3
+      cm_abs3p(4) = dsqrt((MomExt(1,4)+inv_mass(4)) * (MomExt(1,4)-inv_mass(4)))
+!generating cos(theta_4) and phi_4 in the CM frame of 3
+      cm_cos_theta(4) = yRnd(6)
+      cm_cos_theta(4) = cm_cos_theta(4)*2d0-1d0
+      cm_sin_theta(4) = dsqrt((1d0+cm_cos_theta(4))  *(1d0-cm_cos_theta(4)))
+      phi = yRnd(7)
+      phi=Twopi*phi
+      cm_cos_phi(4) = dcos(phi)
+      cm_sin_phi(4) = dsin(phi)
+!3-momentum of 4 in the CM frame of 3
+      MomExt(2,4)=cm_abs3p(4)*cm_sin_theta(4)*cm_cos_phi(4)
+      MomExt(3,4)=cm_abs3p(4)*cm_sin_theta(4)*cm_sin_phi(4)
+      MomExt(4,4)=cm_abs3p(4)*cm_cos_theta(4)
+!boost the 4-momentum of 4 to the lab frame
+!x and y components stay the same
+!z component
+      beta = MomExt(4,3)/MomExt(1,3)
+      gamma = 1d0/dsqrt((1d0+beta)*(1d0-beta))
+      MomDummy(1:4)=MomExt(1:4,4)
+      MomExt(4,4)=(MomDummy(4)+MomDummy(1)*beta) *gamma
+!energy
+      MomExt(1,4)=(MomDummy(1)+MomDummy(4)*beta) *gamma
+
+!555555555555555555
+      MomExt(1:4,5) = MomExt(1:4,3) - MomExt(1:4,4)
+
+!666666666666666666
+      if(.not.hasAonshell) then
+!invariant mass of 6
+         inv_mass(6)=0d0
+!energy of 6 in the CM frame of 4
+         MomExt(1,6)=inv_mass(4)/2d0
+!|3-momentum| of 6 in the CM frame of 4
+         cm_abs3p(6)=MomExt(1,6)
+!generating cos(theta_6) and phi_6 in the CM frame of 4
+!z-axis is along the boost of 2
+         cm_cos_theta(6) = yRnd(8)
+         cm_cos_theta(6) = cm_cos_theta(6)*2d0-1d0
+         cm_sin_theta(6) = dsqrt((1d0+cm_cos_theta(6)) *(1d0-cm_cos_theta(6)))
+         cm_cos_phi(6) = yRnd(9)
+         phi=Twopi*cm_cos_phi(6)
+         cm_cos_phi(6) = dcos(phi)
+         cm_sin_phi(6) = dsin(phi)
+!3-momentum of 6 in the CM frame of 4
+         MomExt(2,6)=cm_abs3p(6)*cm_sin_theta(6)*cm_cos_phi(6)
+         MomExt(3,6)=cm_abs3p(6)*cm_sin_theta(6)*cm_sin_phi(6)
+         MomExt(4,6)=cm_abs3p(6)*cm_cos_theta(6)
+!boost the 4-momentum of 6 to the lab frame
+         temp_vector = MomExt(1:4,6)
+         temp_boost = MomExt(1:4,4)
+         call LORENTZ(temp_vector, temp_boost)
+         MomExt(1:4,6) = temp_vector
+      else
+         MomExt(1:4,6)=MomExt(1:4,4)
+      endif
+
+!7777777777777777777777
+!invariant mass of 7
+      inv_mass(7)=0d0
+!4-momentum of 7 (lab frame) by energy-momentum conservation
+      MomExt(1:4,7)=MomExt(1:4,4)-MomExt(1:4,6)
+
+!8888888888888888888888
+!invariant mass of 8
+      inv_mass(8)=0d0
+!energy of 8 in the CM frame of 5
+      MomExt(1,8)=inv_mass(5)/2d0
+!|3-momentum| of 8 in the CM frame of 5
+      cm_abs3p(8)=MomExt(1,8)
+!generating cos(theta_8) and phi_8 in the CM frame of 5
+!z-axis is along the boost of 5
+      cm_cos_theta(8) = yRnd(10)
+      cm_cos_theta(8) = cm_cos_theta(8)*2d0-1d0
+      cm_sin_theta(8) = dsqrt((1d0+cm_cos_theta(8)) *(1d0-cm_cos_theta(8)))
+      cm_cos_phi(8) = yRnd(11)
+      phi=Twopi*cm_cos_phi(8)
+      cm_cos_phi(8) = dcos(phi)
+      cm_sin_phi(8) = dsin(phi)
+!3-momentum of 8 in the CM frame of 5
+!x and y components are not necessary, yet
+      MomExt(2,8)=cm_abs3p(8)*cm_sin_theta(8)*cm_cos_phi(8)
+      MomExt(3,8)=cm_abs3p(8)*cm_sin_theta(8)*cm_sin_phi(8)
+      MomExt(4,8)=cm_abs3p(8)*cm_cos_theta(8)
+!boost the 4-momentum of 6 to the lab frame
+      temp_vector = MomExt(1:4,8)
+      temp_boost = MomExt(1:4,5)
+      call LORENTZ(temp_vector, temp_boost)
+      MomExt(1:4,8) = temp_vector
+
+!9999999999999999999999
+!invariant mass of 9
+      inv_mass(9)=0d0
+!4-momentum of 9 (lab frame) by energy-momentum conservation
+      MomExt(1:4,9)=MomExt(1:4,5)-MomExt(1:4,8)
+
+      if(inv_mass(3).gt.0d0) then
+         PSWgt = jacobian4*jacobian5*cm_abs3p(4)/(4d0*pi)/inv_mass(3)
+      else
+         PSWgt = jacobian4*jacobian5/(4d0*pi)
+      endif
+      if(.not.hasAonshell) then
+         PSWgt = PSWgt/(16d0*pi**2)
+      endif
+      if(H_DK) then
+         PSWgt = PSWgt/(16d0*pi**2)
+      endif
+      !print *,  "()",inv_mass, jacobian4, jacobian5, cm_abs3p(4), PSWgt, "()"
+
+!do i=4,7
+!print *, dsqrt(dabs(four_momentum(i,:).dot.four_momentum(i,:)))
+!enddo
+!pause
+
+RETURN
+END SUBROUTINE
+
+
+
+
+
+SUBROUTINE EvalPhasespace_VH2(xRnd,Energy,Mom,Jac)
+use ModParameters
+use ModPhasespace
+use ModMisc
+implicit none
+real(8) :: xchannel,xRnd(1:8), Energy, Mom(1:4,1:6)
+real(8) :: Jac,Jac1,Jac2,Jac3,Jac4,Jac5
+real(8) :: s34,s56,Mom_DummyX(1:4),Mom_DummyZ(1:4),Mom_DummyH(1:4)
+
+
+   Mom(1:4,1) = 0.5d0*Energy * (/+1d0,0d0,0d0,+1d0/)
+   Mom(1:4,2) = 0.5d0*Energy * (/+1d0,0d0,0d0,-1d0/)
+
+   
+! decaying higgs
+!    ! masses
+!    Jac1 = s_channel_propagator(M_V**2,Ga_V,0d0,(Energy-m_Reso)**2,xRnd(1),s34)  ! Z-->34
+!    Jac2 = s_channel_propagator(M_Reso**2,Ga_Reso,0d0,(Energy-dsqrt(s34))**2,xRnd(2),s56)  ! H--> 56
+! 
+! !  splittings
+!    Mom_DummyX(1:4) = (/Energy,0d0,0d0,0d0/)   
+!    Jac3 = s_channel_decay(Mom_DummyX(1:4),s34,s56,xRnd(3:4),Mom_DummyZ(:),Mom_DummyH(:)) ! Z* --> ZH
+!    Jac4 = s_channel_decay(Mom_DummyZ(:),0d0,0d0,xRnd(5:6),Mom(:,3),Mom(:,4)) !  Z --> 34
+!    Jac5 = s_channel_decay(Mom_DummyH(:),0d0,0d0,xRnd(7:8),Mom(:,5),Mom(:,6)) !  H --> 56
+!    Jac = Jac1*Jac2*Jac3*Jac4*Jac5 * PSNorm4 
+
+
+
+
+!  stable higgs
+   ! masses
+   Jac1 = s_channel_propagator(M_V**2,Ga_V,0d0,(Energy-m_Reso)**2,xRnd(1),s34)  ! Z-->34
+
+!  splittings
+   Mom_DummyX(1:4) = (/Energy,0d0,0d0,0d0/)   
+   Jac2 = s_channel_decay(Mom_DummyX(1:4),s34,m_Reso**2,xRnd(2:3),Mom_DummyZ(:),Mom_DummyH(:)) ! Z* --> ZH
+   Jac3 = s_channel_decay(Mom_DummyZ(:),0d0,0d0,xRnd(4:5),Mom(:,3),Mom(:,4)) !  Z --> 34
+   Mom(:,5) = Mom_DummyH(:)
+   Mom(:,6) = 0d0
+   Jac = Jac1*Jac2*Jac3* PSNorm3
+
+
+
+   if( isNan(jac) ) then
+      print *, "EvalPhasespace_V NaN"
+      print *, Energy
+      print *, s34,s56
+      print *, Jac1,Jac2,Jac3,Jac4,Jac5
+      print *, xRnd  
+      Jac = 0d0
+   endif
+
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,3).dot.Mom(1:4,3) ))
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,4).dot.Mom(1:4,4) ))
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,5).dot.Mom(1:4,5) ))
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,6).dot.Mom(1:4,6) ))
+!    print *, "----------"
+!    print *, "Mom.cons. ",Mom(1:4,1)+Mom(1:4,2)-Mom(1:4,3)-Mom(1:4,4)-Mom(1:4,5)-Mom(1:4,6)
+!    print *, "Mom.cons. ",Mom_DummyX(1:4)-Mom_DummyZ(1:4)-Mom_DummyH(1:4)
+!    print *, "Mom.cons. ",Mom_DummyZ(1:4)-Mom(1:4,3)-Mom(1:4,4)
+!    print *, "Mom.cons. ",Mom_DummyH(1:4)-Mom(1:4,5)-Mom(1:4,6)
+!    print *, "----------"
+!    print *, "Inv.mass  ",get_MInv(Mom_DummyX(1:4))*100d0
+!    print *, "Inv.mass  ",get_MInv(Mom_DummyZ(1:4))*100d0
+!    print *, "Inv.mass  ",get_MInv(Mom_DummyH(1:4))*100d0
+!    pause
+   
+   
+   
+RETURN
+END SUBROUTINE
+
+
+
+
+
+
+SUBROUTINE EvalPhasespace_VHglu(xRnd,Energy,Mom,Jac)! ordering 1,2:in  3,4:Higgs  56:Z  7:glu
+use ModParameters
+use ModPhasespace
+use ModMisc
+implicit none
+real(8) :: xchannel,xRnd(1:8), Energy, Mom(1:4,1:7)
+real(8) :: Jac,Jac1,Jac2,Jac3,Jac4,Jac5
+real(8) :: s45,s345,Mom_DummyX(1:4),Mom_DummyZ(1:4),Mom_DummyZ2(1:4)
+real(8) :: SingDepth
+integer :: Pcol1,Pcol2,Steps
+
+   Mom(1:4,1) = 0.5d0*Energy * (/+1d0,0d0,0d0,+1d0/)
+   Mom(1:4,2) = 0.5d0*Energy * (/+1d0,0d0,0d0,-1d0/)
+
+!  stable Higgs,  decay not yet implemented but momenta 3+4 are allocated 
+   ! masses
+   Jac1 = s_channel_propagator(M_V**2,0d0,M_Reso**2,Energy**2,xRnd(1),s345)     ! Z*+H
+   Jac2 = s_channel_propagator(M_V**2,Ga_V,0d0,(dsqrt(s345)-m_Reso)**2,xRnd(2),s45)  ! Z-->56
+
+
+!  splittings
+   Mom_DummyX(1:4) = (/Energy,0d0,0d0,0d0/)   
+   Jac3 = s_channel_decay(Mom_DummyX(1:4),s345,0d0,xRnd(3:4),Mom_DummyZ(:),Mom(:,7)) ! Z* + glu
+   Jac4 = s_channel_decay(Mom_DummyZ(1:4),s45,M_Reso**2,xRnd(5:6),Mom_DummyZ2(:),Mom(:,3)) ! Z + H
+   Mom(1:4,4) = 0d0
+   Jac5 = s_channel_decay(Mom_DummyZ2(:),0d0,0d0,xRnd(7:8),Mom(:,5),Mom(:,6)) !  Z --> 56
+   Jac = Jac1*Jac2*Jac3*Jac4*Jac5* PSNorm4
+
+   
+!    this is for the soft/collinear limit checks only!!
+!         Pcol1= 6 -1
+!         Pcol2= 6 -1
+!         SingDepth = 1e-13
+!         Steps = 10
+!         call gensing(4,Energy,(/M_Reso,0d0,0d0,0d0/),Mom(1:4,4:7),Pcol1,Pcol2,SingDepth,Steps)
+!         Mom(1:4,3) = Mom(1:4,4)
+!         Mom(1:4,4) = 0d0
+! !       call genps(4,Energy,xRnd(1:8),(/M_Reso,0d0,0d0,0d0/),(/Mom(1:4,3),Mom(1:4,5),Mom(1:4,6),Mom(1:4,7)/),Jac)
+!         print *, "generating singular phase space"
+!         Jac=1d0        
+        
+!    end check
+   
+
+   if( isNan(jac) ) then
+      print *, "EvalPhasespace_VHglu NaN"
+      print *, Energy
+      print *, s345,s45
+      print *, Jac1,Jac2,Jac3,Jac4,Jac5
+      print *, xRnd  
+      Jac = 0d0
+   endif   
+   
+RETURN
+END SUBROUTINE
+
+
+
+
+
+SUBROUTINE EvalPhasespace_2to2(EHat,Masses,xRndPS,Mom,PSWgt)
+use ModMisc
+use ModParameters
+implicit none
+real(8) :: EHat,Masses(1:2)
+real(8) :: PSWgt,PSWgt2,PSWgt3,PSWgt4,PSWgt5
+real(8) :: Mom(1:4,1:4),MomW(1:4),xRndPS(1:2)
+integer,parameter :: N2=2
+real(8),parameter :: PiWgt2 = (2d0*Pi)**(4-N2*3) * (4d0*Pi)**(N2-1)
+
+   call genps(2,Ehat,xRndPS(1:2),Masses,Mom(1:4,3:4),PSWgt)
+   PSWgt = PSWgt*PiWgt2
+
+
+!  particles on the beam axis:
+   Mom(1,1) =  EHat*0.5d0
+   Mom(2,1) =  0d0
+   Mom(3,1) =  0d0
+   Mom(4,1) = +EHat*0.5d0
+
+   Mom(1,2) =  EHat*0.5d0
+   Mom(2,2) =  0d0
+   Mom(3,2) =  0d0
+   Mom(4,2) = -EHat*0.5d0
+
+return
+END SUBROUTINE
+
+SUBROUTINE EvalPhasespace_2(EHat,Masses,xRndPS,Mom,PSWgt)
+use ModMisc
+use ModParameters
+implicit none
+real(8) :: EHat,Masses(1:2)
+real(8) :: PSWgt,PSWgt2,PSWgt3,PSWgt4,PSWgt5
+real(8) :: Mom(1:4,1:2),xRndPS(1:2)
+integer,parameter :: N2=2
+real(8),parameter :: PiWgt2 = (2d0*Pi)**(4-N2*3) * (4d0*Pi)**(N2-1)
+
+   call genps(2,Ehat,xRndPS(1:2),Masses,Mom(1:4,1:2),PSWgt)
+   PSWgt = PSWgt*PiWgt2
+
+return
+END SUBROUTINE
+
+SUBROUTINE EvalPhasespace_VDecay(VMom,MV,ML1,ML2,xRndPS,MomDK,PSWgt)
+use ModMisc
+use ModParameters
+implicit none
+real(8) :: PSWgt,PSWgt2,PSWgt3
+real(8) :: VMom(1:4),MomChk(1:4,1:3)
+real(8) :: MomDK(1:4,1:2)
+real(8) :: xRndPS(1:2),MV,ML1,ML2
+integer,parameter :: N2=2
+real(8),parameter :: PiWgt2 = (2d0*Pi)**(4-N2*3) * (4d0*Pi)**(N2-1)
+
+
+   if( MV.ne.0d0 ) then
+      call genps(2,MV,xRndPS(1:2),(/ML1,ML2/),MomDK(1:4,1:2),PSWgt2)
+!     boost all guys to the V boson frame:
+      call boost(MomDK(1:4,1),VMom(1:4),MV)
+      call boost(MomDK(1:4,2),VMom(1:4),MV)
+      PSWgt = PSWgt2*PiWgt2
+   else! this is for photons
+      MomDK(1:4,1) = VMom(1:4)
+      MomDK(1:4,2) = 0d0
+   endif
+
+
+RETURN
+END SUBROUTINE
+
+SUBROUTINE EvalPhasespace_VBF(EHat,M_H,xRndPS,Mom,PSWgt)
+  use modParameters
+  use modMisc
+  implicit none
+  real(8), intent(in) :: Ehat, M_H, xRndPS(5)
+  real(8), intent(out) :: Mom(1:4,1:5), PSWgt
+  real(8) :: slocal, mhsq, emax, x7, x8, x9, x10, x13
+  real(8) :: E6, cos2, sin2, phi2, cos6, sin6, phi6, qhsq, PSWup, PSWdn, PSWdc
+  real(8) :: qh(4), n6(4)
+
+  Mom = zero
+  PSWgt = zero
+
+  x7 = xRndPS(1)
+  x8 = xRndPS(2)
+  x9 = xRndPS(3)
+  x10 = xRndPS(4)
+  x13 = xRndPS(5)
+
+  slocal = Ehat**2
+  mhsq = m_H**2
+
+  cos2 = one-two*x7
+  sin2 = dsqrt(dabs(one-cos2**2))
+  phi2 = two*pi * x8
+  cos6 = -one + two*x9
+  sin6 = dsqrt(dabs(one-cos6**2))
+  phi6 = two*pi * x10
+  qhsq = mhsq + (slocal-mhsq)*x13
+
+  emax = (slocal-qhsq)/(two*Ehat)
+
+  Mom(:,1) = Ehat/two * (/one,zero,zero,one/)
+  Mom(:,2) = Ehat/two * (/one,zero,zero,-one/)
+
+  Mom(:,3) = emax * (/one,sin2*dcos(phi2),sin2*dsin(phi2),cos2/)
+
+  qh = Mom(:,1)+Mom(:,2)-Mom(:,3)
+  n6 = (/one,sin6*dcos(phi6),sin6*dsin(phi6),cos6/)
+  E6 = (qhsq-mhsq)/two/MinkowskyProduct(qh,n6)
+
+  Mom(:,4) = E6 * n6(:)
+
+  Mom(:,5) = Mom(:,1)+Mom(:,2)-Mom(:,3)-Mom(:,4) !-- Higgs momentum
+
+  !-- PS weight below
+  PSWup = one/8.0d0/pi * (one-qhsq/slocal)
+  PSWdn = E6/4.0d0/pi/MinkowskyProduct(qh,n6)
+  PSWdc = one !-- no decay for the time being
+
+  PSWgt = PSWup * PSWdn * PSWdc * (slocal-mhsq)/(two*pi)
+
+  RETURN
+END SUBROUTINE
+
+SUBROUTINE EvalPhasespace_VBF_NEW(EHat,xRndPS,Mom,PSWgt)
+use modParameters
+use modMisc
+implicit none
+real(8) :: EHat,xRndPS(:),Mom(:,:),PSWgt
+real(8) :: s1,s2,y1,y2,phi1,phi2,Th1,Th2
+real(8) :: E1,cos_Th1,sin_Th1,sin_phi1,cos_phi1
+real(8) :: E2,cos_Th2,sin_Th2,sin_phi2,cos_phi2
+real(8) :: x1,x2,x3
+integer,parameter :: N2=3
+real(8),parameter :: PiWgt = (2d0*Pi)**(4-N2*3)
+
+! xRndPS(1:5) = (/ 0.9d0, 0.9d0, 0.5d0, 0.4d0, 0.78d0 /)
+
+
+!   s1   = EHat*0.5d0 * ( -1d0 + xRndPS(1) )
+!   s2   = EHat*0.5d0 * ( -1d0 + xRndPS(2) )
+  s1   = -EHat**2 * (1d0-M_Reso**2/EHat**2) * ( xRndPS(1) )
+  s2   = -EHat**2 * (1d0-M_Reso**2/EHat**2) * ( xRndPS(2) )
+
+  y1   = -10d0 + xRndPS(3)*(20d0)
+  y2   = -10d0 + xRndPS(4)*(20d0)
+  phi1 = 2d0*Pi * xRndPS(5)
+
+  E1 = -s1/Ehat * dexp(y1) * dcosh(y1)
+  E2 = -s2/Ehat * dexp(-y2) * dcosh(-y2)
+
+  Th1 = 2d0*datan( exp(-y1) )
+  Th2 = 2d0*datan( exp(+y2) )
+
+  x1 = 2d0*E1*E2*dsin(phi1)*dsin(Th1)*dsin(Th2)
+  x2 = 2d0*E1*E2*dcos(phi1)*dsin(Th1)*dsin(Th2)
+  x3 = 2d0*E1*E2 - (E1+E2)*Ehat - M_Reso**2 + s1 + s2 - E2*Ehat*dcos(Th2) + E1*dcos(Th1)*(Ehat + 2*E2*dcos(Th2))
+
+if( x1**4 + x1**2*x2**2 - x1**2*x3**2 .lt. 0d0 ) then
+ PSWgt = 0d0
+ return
+endif
+
+
+!  print *, ""
+!  print *, "Ehat",Ehat*100d0
+!  print *, "E1",e1*100d0
+!  print *, "E2",e2*100d0
+!  print *, "-sqrt(s1)",-dsqrt(dabs(s1*100d0**2))
+!  print *, "-sqrt(s2)",-dsqrt(dabs(s2*100d0**2))
+!  print *, "y1",y1
+!  print *, "y2",y2
+!
+!  print *, "Th1,cos(Th1)",Th1,dcos(th1)
+!  print *, "Th2,cos(Th2)",Th2,dcos(th2)
+!  print *, "phi1,cos(phi1)",phi1,dcos(phi1)
+!
+!  print *, "x1",x1
+!  print *, "x2",x2
+!  print *, "x3",x3
+!  print *, x1**4 + x1**2*x2**2 - x1**2*x3**2
+!  print *, (x1**2 + x2**2)
+!
+!   phi2 = dATan2( (-x3 + (x2**2*x3)/(x1**2 + x2**2) + x2*dsqrt(-(x1**2*(-x1**2 - x2**2 + x3**2)))/(x1**2 + x2**2))/x1,   &
+!                  (-(x2*x3) - dsqrt(x1**4 + x1**2*x2**2 - x1**2*x3**2))/(x1**2 + x2**2)                                  &
+!                )
+!    print *, "sol1",phi2
+!
+!
+  phi2 = dATan2( (-x3 + (x2**2*x3)/(x1**2 + x2**2) - x2*dsqrt(-(x1**2*(-x1**2 - x2**2 + x3**2)))/(x1**2 + x2**2))/x1,   &
+                 (-(x2*x3) + dsqrt(x1**4 + x1**2*x2**2 - x1**2*x3**2))/(x1**2 + x2**2)                                  &
+               )
+!    print *, "sol2",phi2
+
+!    print *, "chekcer",   -(x1*x3)/(x1**2+x2**2)  +  dsqrt((x1**2 * x3**2)/(x1**2+x2**2)**2/4d0 +(x2**2-x3**2)/(x1**2+x2**2) )
+!    print *, "chekcer",   -(x1*x3)/(x1**2+x2**2)  -  dsqrt((x1**2 * x3**2)/(x1**2+x2**2)**2/4d0 +(x2**2-x3**2)/(x1**2+x2**2) )
+!    print *, "chekcer",   (x1**2 * x3**2)/(x1**2+x2**2)**2/4d0 + (x2**2-x3**2)/(x1**2+x2**2)
+!    pause
+
+
+  sin_Th1 = dsin(Th1)
+  cos_Th1 = dcos(Th1)
+  sin_Th2 = dsin(Th2)
+  cos_Th2 = dcos(Th2)
+  sin_phi1= dsin(phi1)
+  cos_phi1= dcos(phi1)
+  sin_phi2= dsin(phi2)
+  cos_phi2= dcos(phi2)
+
+  Mom(1:4,1) = EHat*0.5d0 *(/1d0,0d0,0d0,+1d0/)
+  Mom(1:4,2) = EHat*0.5d0 *(/1d0,0d0,0d0,-1d0/)
+  Mom(1:4,3) = E1 * (/ 1d0, sin_Th1*sin_phi1, sin_Th1*cos_phi1, cos_Th1 /)
+  Mom(1:4,4) = E2 * (/ 1d0, sin_Th2*sin_phi2, sin_Th2*cos_phi2, cos_Th2 /)
+  Mom(1:4,5) = Mom(1:4,1)+Mom(1:4,2) - Mom(1:4,3)- Mom(1:4,4)- Mom(1:4,5)
+
+  PSWgt = 1d0/dcosh(y1)**2/dcosh(y2)**2 * PiWgt * (EHat**2 * (1d0-M_Reso**2/EHat**2))**2 * (20d0)**2 * 2d0*pi  &
+          / dabs( x1*dcos(phi2) - x2*dsin(phi2) )
+
+RETURN
+END SUBROUTINE
+
+SUBROUTINE EvalPhasespace_VBF_or_HJJ(xchannel,xRnd,Energy,Mom,Jac)
+use ModParameters
+use ModPhasespace
+use ModMisc
+implicit none
+real(8) :: xchannel,xRnd(:), Energy, Mom(:,:)
+real(8) :: Jac,Jac1,Jac2,Jac3,Mom_ij_Dummy(1:4),s35,s45,minmax(1:2)
+real(8) :: tMassSq
+
+!tMassSq=(M_Reso*0.5d0)**2
+tMassSq=(M_Reso)**2
+
+Mom(1:4,1) = 0.5d0*Energy * (/+1d0,0d0,0d0,+1d0/)
+Mom(1:4,2) = 0.5d0*Energy * (/+1d0,0d0,0d0,-1d0/)
+
+if ( xchannel.lt.0.25 ) then
+
+   Jac1 = k_l(xRnd(1),M_Reso**2,Energy**2,s35)                                                                           !  int d(s35)
+   Jac2 = t_channel_prop_decay(Mom(1:4,1),Mom(1:4,2),tMassSq,s35,0d0,xRnd(2:3),Mom_ij_Dummy(1:4),Mom(1:4,4))              !  1+2 --> (35)+4
+   Jac3 = t_channel_prop_decay(Mom(1:4,1),Mom(1:4,2)-Mom(1:4,4),tMassSq,0d0,M_Reso**2,xRnd(4:5),Mom(1:4,3),Mom(1:4,5))    !  1+(24) --> 3+5
+   Jac = Jac1*Jac2*Jac3 * PSNorm3                                                                                        !  combine
+
+elseif ( xchannel.lt.0.5 ) then
+
+   Jac1 = k_l(xRnd(1),M_Reso**2,Energy**2,s35)                                                                           !  int d(s35)
+   Jac2 = t_channel_prop_decay(Mom(1:4,1),Mom(1:4,2),tMassSq,s35,0d0,xRnd(2:3),Mom_ij_Dummy(1:4),Mom(1:4,4))              !  1+2 --> (35)+4
+   Jac3 = t_channel_prop_decay(Mom(1:4,1)-Mom(1:4,4),Mom(1:4,2),tMassSq,0d0,M_Reso**2,xRnd(4:5),Mom(1:4,3),Mom(1:4,5))    !  (14)+2 --> 3+5
+   Jac  = Jac1*Jac2*Jac3 * PSNorm3                                                                                       !  combine
+
+elseif ( xchannel.lt.0.75 ) then
+
+   Jac1 = k_l(xRnd(1),M_Reso**2,Energy**2,s45)                                                                           !  int d(s45)
+   Jac2 = t_channel_prop_decay(Mom(1:4,1),Mom(1:4,2),tMassSq,s45,0d0,xRnd(2:3),Mom_ij_Dummy(1:4),Mom(1:4,3))              !  1+2 --> (45)+3
+   Jac3 = t_channel_prop_decay(Mom(1:4,1),Mom(1:4,2)-Mom(1:4,3),tMassSq,0d0,M_Reso**2,xRnd(4:5),Mom(1:4,4),Mom(1:4,5))    !  1+(23) --> 4+5
+   Jac  = Jac1*Jac2*Jac3 * PSNorm3                                                                                       !  combine
+
+else
+
+   Jac1 = k_l(xRnd(1),M_Reso**2,Energy**2,s45)                                                                           !  int d(s45)
+   Jac2 = t_channel_prop_decay(Mom(1:4,1),Mom(1:4,2),tMassSq,s45,0d0,xRnd(2:3),Mom_ij_Dummy(1:4),Mom(1:4,3))              !  1+2 --> (45)+3
+   Jac3 = t_channel_prop_decay(Mom(1:4,1)-Mom(1:4,3),Mom(1:4,2),tMassSq,0d0,M_Reso**2,xRnd(4:5),Mom(1:4,4),Mom(1:4,5))    !  (13)+2 --> 4+5
+   Jac  = Jac1*Jac2*Jac3 * PSNorm3                                                                                       !  combine
+
+endif
+
+if( isnan(Jac) ) then! THIS SHOULD BE REMOVED AFTER DEBUGGING
+   Jac = 0d0
+   print *, "ERROR in EvalPhasespace_VBF_or_HJJ: NaN Jac",Energy,xchannel,xRnd
+endif
+
+RETURN
+END SUBROUTINE
+
+SUBROUTINE EvalPhasespace_VBF_NEW2(xchannel,xRnd,Energy,Mom,Jac)
+use ModParameters
+use ModPhasespace
+use ModMisc
+implicit none
+real(8) :: xchannel,xRnd(:), Energy, Mom(:,:)
+integer :: iChannel
+real(8) :: Jac,Jac1,Jac2,Jac3,Mom_ij_Dummy(1:4),s35,s45,minmax(1:2)
+integer, parameter :: NumChannels=4
+integer, parameter :: inLeft=1, inRight=2, qup=3, qdn=4, Higgs=5
+
+
+   Mom(1:4,1) = 0.5d0*Energy * (/+1d0,0d0,0d0,+1d0/)
+   Mom(1:4,2) = 0.5d0*Energy * (/+1d0,0d0,0d0,-1d0/)
+
+
+   iChannel = int(xchannel * NumChannels)+1
+
+IF( iChannel.EQ.1 ) THEN
+
+   Jac1 = k_l(xRnd(1),M_Reso**2,Energy**2,s35)                                                                           !  int d(s35)
+!  equival.: call get_minmax_s(Energy**2,0d0,M_Reso**2,0d0,minmax); Jac1 = k_l(xRnd(5),minmax(1),minmax(2),s35)
+   Jac2 = t_channel_prop_decay(Mom(1:4,1),Mom(1:4,2),M_W**2,s35,0d0,xRnd(2:3),Mom_ij_Dummy(1:4),Mom(1:4,4))              !  1+2 --> (35)+4
+   Jac3 = t_channel_prop_decay(Mom(1:4,1),Mom(1:4,2)-Mom(1:4,4),M_W**2,0d0,M_Reso**2,xRnd(4:5),Mom(1:4,3),Mom(1:4,5))    !  1+(24) --> 3+5
+   Jac = Jac1*Jac2*Jac3 * PSNorm3                                                                                        !  combine
+
+ELSEIF( iChannel.EQ.2 ) THEN
+
+   Jac1 = k_l(xRnd(1),M_Reso**2,Energy**2,s35)                                                                           !  int d(s35)
+   Jac2 = t_channel_prop_decay(Mom(1:4,1),Mom(1:4,2),M_Z**2,s35,0d0,xRnd(2:3),Mom_ij_Dummy(1:4),Mom(1:4,4))              !  1+2 --> (35)+4
+   Jac3 = t_channel_prop_decay(Mom(1:4,1),Mom(1:4,2)-Mom(1:4,4),M_Z**2,0d0,M_Reso**2,xRnd(4:5),Mom(1:4,3),Mom(1:4,5))    !  1+(24) --> 3+5
+   Jac  = Jac1*Jac2*Jac3 * PSNorm3                                                                                       !  combine
+
+ELSEIF( iChannel.EQ.3 ) THEN
+
+   Jac1 = k_l(xRnd(1),M_Reso**2,Energy**2,s45)                                                                           !  int d(s45)
+   Jac2 = t_channel_prop_decay(Mom(1:4,1),Mom(1:4,2),M_W**2,s45,0d0,xRnd(2:3),Mom_ij_Dummy(1:4),Mom(1:4,3))              !  1+2 --> (45)+3
+   Jac3 = t_channel_prop_decay(Mom(1:4,1),Mom(1:4,2)-Mom(1:4,3),M_W**2,0d0,M_Reso**2,xRnd(4:5),Mom(1:4,4),Mom(1:4,5))    !  1+(23) --> 4+5
+   Jac  = Jac1*Jac2*Jac3 * PSNorm3                                                                                       !  combine
+
+ELSEIF( iChannel.EQ.4 ) THEN
+
+   Jac1 = k_l(xRnd(1),M_Reso**2,Energy**2,s45)                                                                           !  int d(s45)
+   Jac2 = t_channel_prop_decay(Mom(1:4,1),Mom(1:4,2),M_Z**2,s45,0d0,xRnd(2:3),Mom_ij_Dummy(1:4),Mom(1:4,3))              !  1+2 --> (45)+3
+   Jac3 = t_channel_prop_decay(Mom(1:4,1),Mom(1:4,2)-Mom(1:4,3),M_Z**2,0d0,M_Reso**2,xRnd(4:5),Mom(1:4,4),Mom(1:4,5))    !  1+(23) --> 4+5
+   Jac  = Jac1*Jac2*Jac3 * PSNorm3                                                                                       !  combine
+
+ELSE
+   print *, xchannel , NumChannels
+   call Error("PS channel not available in EvalPhasespace_VBF_NEW2",ichannel)
+ENDIF
+
+
+      if( IsNaN(Jac) ) then! THIS SHOULD BE REMOVED AFTER DEBUGGING
+         Jac = 0d0
+         print *, "ERROR in EvalPhasespace_VBF_NEW2, NaN Jac",Energy,xchannel,xRnd
+         print *, "ERROR in Channel",ichannel
+      endif
+
+
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,3).dot.Mom(1:4,3) ))
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,4).dot.Mom(1:4,4) ))
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,5).dot.Mom(1:4,5) ))
+!    print *, "----------"
+!    print *, "Mom.cons. ",Mom(1:4,1)+Mom(1:4,2)-Mom(1:4,3)-Mom(1:4,4)-Mom(1:4,5)
+!    pause
+
+
+
+RETURN
+END SUBROUTINE
+
+SUBROUTINE EvalPhasespace_VBF_deterministic(xchannel,xRnd,Energy,iSel,jSel,rSel,sSel,Mom,Jac) ! TESTING PURPOSES
+use ModParameters
+use ModPhasespace
+use ModMisc
+implicit none
+integer, intent(in) :: iSel,jSel,rSel,sSel
+real(8) :: xchannel, xRnd(:), Energy, Mom(:,:)
+integer :: jz1, jz2, jw1, jw2 ! incoming partons
+integer :: kz1, kz2, kw1, kw2 ! outgoing partons
+logical :: ZZ_fusion,WW_fusion
+real(8) :: Jac,Jac1,Jac2,Jac3,Mom_ij_Dummy(1:4),s35,s45
+
+   Mom(1:4,1) = 0.5d0*Energy * (/+1d0,0d0,0d0,+1d0/)
+   Mom(1:4,2) = 0.5d0*Energy * (/+1d0,0d0,0d0,-1d0/)
+
+	ZZ_fusion=.false.
+	WW_fusion=.false.
+
+	jz1 = 1
+	jz2 = 2
+	jw1 = jz1
+	jw2 = jz2
+
+	if( &
+	(iSel.eq.rSel .and. jSel.eq.sSel) &
+	.or. &
+	(iSel.eq.sSel .and. jSel.eq.rSel) &
+	) then
+	   ZZ_fusion=.true.
+	   if( iSel.eq.sSel .and. jSel.eq.rSel ) then
+	      kz1 = 4
+	      kz2 = 3
+	   else
+	      kz1 = 3
+		  kz2 = 4
+	   endif
+	endif
+
+	if( &
+	( (sign(iSel,rSel).eq.iSel .and. sign(jSel,sSel).eq.jSel) .and. (abs(iSel-rSel).eq.1 .or. abs(iSel-rSel).eq.3 .or. abs(iSel-rSel).eq.5) .and. (abs(jSel-sSel).eq.1 .or. abs(jSel-sSel).eq.3 .or. abs(jSel-sSel).eq.5) ) &
+	.or. &
+	( (sign(iSel,sSel).eq.iSel .and. sign(jSel,rSel).eq.jSel) .and. (abs(iSel-sSel).eq.1 .or. abs(iSel-sSel).eq.3 .or. abs(iSel-sSel).eq.5) .and. (abs(jSel-rSel).eq.1 .or. abs(jSel-rSel).eq.3 .or. abs(jSel-rSel).eq.5) ) &
+	) then
+	   WW_fusion=.true.
+	   ! W_is W_jr fusion
+	   if( (sign(iSel,sSel).eq.iSel .and. sign(jSel,rSel).eq.jSel) .and. (abs(iSel-sSel).eq.1 .or. abs(iSel-sSel).eq.3 .or. abs(iSel-sSel).eq.5) .and. (abs(jSel-rSel).eq.1 .or. abs(jSel-rSel).eq.3 .or. abs(jSel-rSel).eq.5) ) then
+	      kw1 = 4
+	      kw2 = 3
+	   else	! W_ir W_js fusion
+	      kw1 = 3
+	      kw2 = 4
+	   endif
+	endif
+
+   if(WW_fusion .and. .not.ZZ_fusion) then
+      if(xchannel .lt. 0.5) then
+         Jac1 = k_l(xRnd(1),M_Reso**2,Energy**2,s35)                                                                                   !  int d(s35)
+         Jac2 = t_channel_prop_decay(Mom(1:4,jw1),Mom(1:4,jw2),M_W**2,s35,0d0,xRnd(2:3),Mom_ij_Dummy(1:4),Mom(1:4,kw2))                !  1+2 --> (35)+4
+         Jac3 = t_channel_prop_decay(Mom(1:4,jw1),Mom(1:4,jw2)-Mom(1:4,kw2),M_W**2,0d0,M_Reso**2,xRnd(4:5),Mom(1:4,kw1),Mom(1:4,5))    !  1+(24) --> 3+5
+         Jac = Jac1*Jac2*Jac3 * PSNorm3                                                                                                !  combine
+      else
+         Jac1 = k_l(xRnd(1),M_Reso**2,Energy**2,s45)                                                                                   !  int d(s45)
+         Jac2 = t_channel_prop_decay(Mom(1:4,jw1),Mom(1:4,jw2),M_W**2,0d0,s45,xRnd(2:3),Mom(1:4,kw1),Mom_ij_Dummy(1:4))                !  1+2 --> 3+(45)
+         Jac3 = t_channel_prop_decay(Mom(1:4,jw1)-Mom(1:4,kw1),Mom(1:4,jw2),M_W**2,0d0,M_Reso**2,xRnd(4:5),Mom(1:4,kw2),Mom(1:4,5))    !  (13)+2 --> 4+5
+         Jac = Jac1*Jac2*Jac3 * PSNorm3                                                                                                !  combine
+      endif
+   elseif(ZZ_fusion .and. .not.WW_fusion) then
+      if(iSel .eq.jSel) then
+         if(xchannel .lt. 0.25) then
+            Jac1 = k_l(xRnd(1),M_Reso**2,Energy**2,s35)                                                                                   !  int d(s35)
+            Jac2 = t_channel_prop_decay(Mom(1:4,jz1),Mom(1:4,jz2),M_Z**2,s35,0d0,xRnd(2:3),Mom_ij_Dummy(1:4),Mom(1:4,kz2))                !  1+2 --> (35)+4
+            Jac3 = t_channel_prop_decay(Mom(1:4,jz1),Mom(1:4,jz2)-Mom(1:4,kz2),M_Z**2,0d0,M_Reso**2,xRnd(4:5),Mom(1:4,kz1),Mom(1:4,5))    !  1+(24) --> 3+5
+            Jac = Jac1*Jac2*Jac3 * PSNorm3                                                                                                !  combine
+         elseif(xchannel .lt. 0.5) then
+            Jac1 = k_l(xRnd(1),M_Reso**2,Energy**2,s45)                                                                                   !  int d(s45)
+            Jac2 = t_channel_prop_decay(Mom(1:4,jz1),Mom(1:4,jz2),M_Z**2,0d0,s45,xRnd(2:3),Mom(1:4,kz1),Mom_ij_Dummy(1:4))                !  1+2 --> 3+(45)
+            Jac3 = t_channel_prop_decay(Mom(1:4,jz1)-Mom(1:4,kz1),Mom(1:4,jz2),M_Z**2,0d0,M_Reso**2,xRnd(4:5),Mom(1:4,kz2),Mom(1:4,5))    !  (13)+2 --> 4+5
+            Jac = Jac1*Jac2*Jac3 * PSNorm3                                                                                                !  combine
+         elseif(xchannel .lt. 0.75) then
+            Jac1 = k_l(xRnd(1),M_Reso**2,Energy**2,s35)                                                                                   !  int d(s35)
+            Jac2 = t_channel_prop_decay(Mom(1:4,jz2),Mom(1:4,jz1),M_Z**2,s35,0d0,xRnd(2:3),Mom_ij_Dummy(1:4),Mom(1:4,kz2))                !  2+1 --> (35)+4
+            Jac3 = t_channel_prop_decay(Mom(1:4,jz2),Mom(1:4,jz1)-Mom(1:4,kz2),M_Z**2,0d0,M_Reso**2,xRnd(4:5),Mom(1:4,kz1),Mom(1:4,5))    !  2+(14) --> 3+5
+            Jac = Jac1*Jac2*Jac3 * PSNorm3                                                                                                !  combine
+         else
+            Jac1 = k_l(xRnd(1),M_Reso**2,Energy**2,s45)                                                                                   !  int d(s45)
+            Jac2 = t_channel_prop_decay(Mom(1:4,jz2),Mom(1:4,jz1),M_Z**2,0d0,s45,xRnd(2:3),Mom(1:4,kz1),Mom_ij_Dummy(1:4))                !  2+1 --> 3+(45)
+            Jac3 = t_channel_prop_decay(Mom(1:4,jz2)-Mom(1:4,kz1),Mom(1:4,jz1),M_Z**2,0d0,M_Reso**2,xRnd(4:5),Mom(1:4,kz2),Mom(1:4,5))    !  (23)+1 --> 4+5
+            Jac = Jac1*Jac2*Jac3 * PSNorm3                                                                                                !  combine
+         endif
+	  else
+         if(xchannel .lt. 0.5) then
+            Jac1 = k_l(xRnd(1),M_Reso**2,Energy**2,s35)                                                                                   !  int d(s35)
+            Jac2 = t_channel_prop_decay(Mom(1:4,jz1),Mom(1:4,jz2),M_Z**2,s35,0d0,xRnd(2:3),Mom_ij_Dummy(1:4),Mom(1:4,kz2))                !  1+2 --> (35)+4
+            Jac3 = t_channel_prop_decay(Mom(1:4,jz1),Mom(1:4,jz2)-Mom(1:4,kz2),M_Z**2,0d0,M_Reso**2,xRnd(4:5),Mom(1:4,kz1),Mom(1:4,5))    !  1+(24) --> 3+5
+            Jac = Jac1*Jac2*Jac3 * PSNorm3                                                                                                !  combine
+         else
+            Jac1 = k_l(xRnd(1),M_Reso**2,Energy**2,s45)                                                                                   !  int d(s45)
+            Jac2 = t_channel_prop_decay(Mom(1:4,jz1),Mom(1:4,jz2),M_Z**2,0d0,s45,xRnd(2:3),Mom(1:4,kz1),Mom_ij_Dummy(1:4))                !  1+2 --> 3+(45)
+            Jac3 = t_channel_prop_decay(Mom(1:4,jz1)-Mom(1:4,kz1),Mom(1:4,jz2),M_Z**2,0d0,M_Reso**2,xRnd(4:5),Mom(1:4,kz2),Mom(1:4,5))    !  (13)+2 --> 4+5
+            Jac = Jac1*Jac2*Jac3 * PSNorm3                                                                                                !  combine
+         endif
+	  endif
+   elseif(ZZ_fusion .and. WW_fusion) then
+      if(xchannel .lt. 0.25) then
+         Jac1 = k_l(xRnd(1),M_Reso**2,Energy**2,s35)                                                                                   !  int d(s35)
+         Jac2 = t_channel_prop_decay(Mom(1:4,jz1),Mom(1:4,jz2),M_Z**2,s35,0d0,xRnd(2:3),Mom_ij_Dummy(1:4),Mom(1:4,kz2))                !  1+2 --> (35)+4
+         Jac3 = t_channel_prop_decay(Mom(1:4,jz1),Mom(1:4,jz2)-Mom(1:4,kz2),M_Z**2,0d0,M_Reso**2,xRnd(4:5),Mom(1:4,kz1),Mom(1:4,5))    !  1+(24) --> 3+5
+         Jac = Jac1*Jac2*Jac3 * PSNorm3                                                                                                !  combine
+      elseif(xchannel .lt. 0.5) then
+         Jac1 = k_l(xRnd(1),M_Reso**2,Energy**2,s45)                                                                                   !  int d(s45)
+         Jac2 = t_channel_prop_decay(Mom(1:4,jz1),Mom(1:4,jz2),M_Z**2,0d0,s45,xRnd(2:3),Mom(1:4,kz1),Mom_ij_Dummy(1:4))                !  1+2 --> 3+(45)
+         Jac3 = t_channel_prop_decay(Mom(1:4,jz1)-Mom(1:4,kz1),Mom(1:4,jz2),M_Z**2,0d0,M_Reso**2,xRnd(4:5),Mom(1:4,kz2),Mom(1:4,5))    !  (13)+2 --> 4+5
+         Jac = Jac1*Jac2*Jac3 * PSNorm3                                                                                                !  combine
+      elseif(xchannel .lt. 0.75) then
+         Jac1 = k_l(xRnd(1),M_Reso**2,Energy**2,s35)                                                                                   !  int d(s35)
+         Jac2 = t_channel_prop_decay(Mom(1:4,jw1),Mom(1:4,jw2),M_W**2,s35,0d0,xRnd(2:3),Mom_ij_Dummy(1:4),Mom(1:4,kw2))                !  1+2 --> (35)+4
+         Jac3 = t_channel_prop_decay(Mom(1:4,jw1),Mom(1:4,jw2)-Mom(1:4,kw2),M_W**2,0d0,M_Reso**2,xRnd(4:5),Mom(1:4,kw1),Mom(1:4,5))    !  1+(24) --> 3+5
+         Jac = Jac1*Jac2*Jac3 * PSNorm3                                                                                                !  combine
+      else
+         Jac1 = k_l(xRnd(1),M_Reso**2,Energy**2,s45)                                                                                   !  int d(s45)
+         Jac2 = t_channel_prop_decay(Mom(1:4,jw1),Mom(1:4,jw2),M_W**2,0d0,s45,xRnd(2:3),Mom(1:4,kw1),Mom_ij_Dummy(1:4))                !  1+2 --> 3+(45)
+         Jac3 = t_channel_prop_decay(Mom(1:4,jw1)-Mom(1:4,kw1),Mom(1:4,jw2),M_W**2,0d0,M_Reso**2,xRnd(4:5),Mom(1:4,kw2),Mom(1:4,5))    !  (13)+2 --> 4+5
+         Jac = Jac1*Jac2*Jac3 * PSNorm3                                                                                                !  combine
+      endif
+
+   endif
+
+      if( IsNaN(Jac) ) then! THIS SHOULD BE REMOVED AFTER DEBUGGING
+         Jac = 0d0
+         print *, "ERROR in EvalPhasespace_VBF_deterministic, NaN Jac",Energy,xchannel,xRnd
+      endif
+
+RETURN
+END SUBROUTINE
+
+
+
+
+
+SUBROUTINE EvalPhasespace_VBF_H4f(xchannel,xRnd,Energy,Mom,Jac,EqualLeptons)
+use ModParameters
+use ModPhasespace
+use ModMisc
+implicit none
+real(8) :: xchannel,xRnd(:), Energy, Mom(:,:)
+integer :: EqualLeptons
+integer :: iChannel
+real(8) :: Jac,Jac1,Jac2,Jac3,Jac4,Jac5,Jac6,Jac7,Jac8,Jac9
+real(8) :: s3H,s4H,s56,s78,s910,s34,s35,s46,Mom_Dummy(1:4),Mom_Dummy2(1:4),xRndLeptInterf,Emin,Emax
+real(8), parameter :: RescaleWidth=1d0
+integer, parameter :: NumChannels=5   !7
+integer,parameter :: inTop=1, inBot=2, outTop=3, outBot=4, V1=5, V2=6, Lep1P=7, Lep1M=8, Lep2P=9, Lep2M=10
+
+
+   Mom(1:4,1) = 0.5d0*Energy * (/+1d0,0d0,0d0,+1d0/)
+   Mom(1:4,2) = 0.5d0*Energy * (/+1d0,0d0,0d0,-1d0/)
+
+!    iChannel = int(xchannel * NumChannels -1d-10)+1
+   
+! DebugCounter(0) = DebugCounter(0) + 1
+! DebugCounter(iChannel) = DebugCounter(iChannel) + 1
+
+! if( xchannel.gt.0.5d0 ) then
+! if( m4l_minmax(1).ge.300d0*GeV ) then
+  iChannel = 5
+! endif
+! else
+! iChannel =6
+! endif
+
+
+! call random_number(xchannel)
+
+
+!   if( m4l_minmax(1).lt.0d0 ) then
+!      if( xchannel.lt.1d0/3d0 ) then
+!        Emin = 100d0*GeV
+!        Emax = M_Reso-Ga_Reso
+!      elseif(  xchannel.gt.2d0/3d0 ) then
+!        Emin = -1d0
+!        Emax = -1d0
+!      else
+!        Emin = M_Reso+Ga_Reso
+!        Emax = Collider_Energy
+!      endif
+!      
+!   elseif( m4l_minmax(1).gt.M_Reso+Ga_Reso ) then 
+!        Emin = m4l_minmax(1)
+!        Emax = dmin1( Collider_Energy,m4l_minmax(2) )
+!   else
+!      if( xchannel.lt.1d0/3d0 ) then
+!        Emin = dmax1( 0d0,m4l_minmax(1) )
+!        Emax = M_Reso-RescaleWidth*Ga_Reso
+!      elseif(  xchannel.gt.2d0/3d0 ) then
+!        Emin = -1d0
+!        Emax = -1d0
+!      else
+!        Emin = M_Reso+RescaleWidth*Ga_Reso
+!        Emax = dmin1( Collider_Energy,m4l_minmax(2) )
+!      endif
+!   endif
+  
+  EMin = m4l_minmax(1)
+  EMax = m4l_minmax(2)
+  
+  if( EMin.lt.0d0 .or. EMin.gt.EMax ) call Error("m4l_minmax is not set correctly")
+  
+  
+IF( iChannel.EQ.1 ) THEN! 34 + WW-->H-->ZZ
+
+!  masses
+   if( Emin.lt.0d0 ) then
+      Jac1 = s_channel_propagator(M_Reso**2,RescaleWidth*Ga_Reso,0d0,Energy**2,xRnd(1),s56)                   !  int d(s56)    = Higgs resonance
+   else
+      Jac1 = k_l(xRnd(1),Emin**2,min(Energy**2,Emax**2),s56)                                            !  int d(s56)    = linear mapping
+   endif
+   Jac2 = k_l(xRnd(2),s56,Energy**2,s3H)                                                                                          !  int d(s3H)
+   Jac3 = s_channel_propagator(M_Z**2,Ga_Z,0d0,s56,xRnd(3),s78)                                                                   !  int d(s78)    = Z1
+   Jac4 = s_channel_propagator(M_Z**2,Ga_Z,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)                                           !  int d(s910) = Z2
+
+!  splittings
+   Jac5 = t_channel_prop_decay(Mom(:,1),Mom(:,2),M_W**2,s3H,0d0,xRnd(5:6),Mom_Dummy(1:4),Mom(:,4))                                !  1+2 --> (3H)+4
+   Jac6 = t_channel_prop_decay(Mom(:,1),Mom(:,2)-Mom(:,4),M_W**2,0d0,s56,xRnd(7:8),Mom(:,3),Mom_Dummy(1:4))                       !  1+(24) --> 3+H
+   Jac7 = s_channel_decay(Mom_Dummy(1:4),s78,s910,xRnd(9:10),Mom(:,5),Mom(:,6))                                                   !  H --> 5+6
+   Jac8 = s_channel_decay(Mom(:,5),0d0,0d0,xRnd(11:12),Mom(:,7),Mom(:,8))                                                         !  5 --> 7+8
+   Jac9 = s_channel_decay(Mom(:,6),0d0,0d0,xRnd(13:14),Mom(:,9),Mom(:,10))                                                        !  6 --> 9+10
+
+
+
+ELSEIF( iChannel.EQ.2 ) THEN! 43 + WW-->H-->ZZ
+
+!  masses
+   if( Emin.lt.0d0 ) then
+      Jac1 = s_channel_propagator(M_Reso**2,RescaleWidth*Ga_Reso,0d0,Energy**2,xRnd(1),s56)                                                    !  int d(s56)    = Higgs resonance
+   else
+      Jac1 = k_l(xRnd(1),Emin**2,min(Energy**2,Emax**2),s56)                                            !  int d(s56)    = linear mapping
+   endif
+   Jac2 = k_l(xRnd(2),s56,Energy**2,s4H)                                                                                          !  int d(s4H)
+   Jac3 = s_channel_propagator(M_Z**2,Ga_Z,0d0,s56,xRnd(3),s78)                                                                   !  int d(s78)    = Z1
+   Jac4 = s_channel_propagator(M_Z**2,Ga_Z,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)                                           !  int d(s910) = Z2
+
+!  splittings
+   Jac5 = t_channel_prop_decay(Mom(:,1),Mom(:,2),M_W**2,s4H,0d0,xRnd(5:6),Mom_Dummy(1:4),Mom(:,3))                                !  1+2 --> (4H)+3
+   Jac6 = t_channel_prop_decay(Mom(:,1),Mom(:,2)-Mom(:,3),M_W**2,0d0,s56,xRnd(7:8),Mom(:,4),Mom_Dummy(1:4))                       !  1+(23) --> 4+H
+   Jac7 = s_channel_decay(Mom_Dummy(1:4),s78,s910,xRnd(9:10),Mom(:,5),Mom(:,6))                                                   !  H --> 5+6
+   Jac8 = s_channel_decay(Mom(:,5),0d0,0d0,xRnd(11:12),Mom(:,7),Mom(:,8))                                                         !  5 --> 7+8
+   Jac9 = s_channel_decay(Mom(:,6),0d0,0d0,xRnd(13:14),Mom(:,9),Mom(:,10))                                                        !  6 --> 9+10
+
+   
+   
+ELSEIF( iChannel.EQ.3 ) THEN! 34 + ZZ-->H-->ZZ
+
+!  masses
+   if( Emin.lt.0d0 ) then
+      Jac1 = s_channel_propagator(M_Reso**2,RescaleWidth*Ga_Reso,0d0,Energy**2,xRnd(1),s56)                                                    !  int d(s56)    = Higgs resonance
+   else
+      Jac1 = k_l(xRnd(1),Emin**2,min(Energy**2,Emax**2),s56)                                            !  int d(s56)    = linear mapping
+   endif
+   Jac2 = k_l(xRnd(2),s56,Energy**2,s3H)                                                                                          !  int d(s3H)
+   Jac3 = s_channel_propagator(M_Z**2,Ga_Z,0d0,s56,xRnd(3),s78)                                                                   !  int d(s78)    = Z1
+   Jac4 = s_channel_propagator(M_Z**2,Ga_Z,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)                                           !  int d(s910) = Z2
+
+!  splittings
+   Jac5 = t_channel_prop_decay(Mom(:,1),Mom(:,2),M_Z**2,s3H,0d0,xRnd(5:6),Mom_Dummy(1:4),Mom(:,4))                                !  1+2 --> (3H)+4
+   Jac6 = t_channel_prop_decay(Mom(:,1),Mom(:,2)-Mom(:,4),M_Z**2,0d0,s56,xRnd(7:8),Mom(:,3),Mom_Dummy(1:4))                       !  1+(24) --> 3+H
+   Jac7 = s_channel_decay(Mom_Dummy(1:4),s78,s910,xRnd(9:10),Mom(:,5),Mom(:,6))                                                   !  H --> 5+6
+   Jac8 = s_channel_decay(Mom(:,5),0d0,0d0,xRnd(11:12),Mom(:,7),Mom(:,8))                                                         !  5 --> 7+8
+   Jac9 = s_channel_decay(Mom(:,6),0d0,0d0,xRnd(13:14),Mom(:,9),Mom(:,10))                                                        !  6 --> 9+10
+
+
+ELSEIF( iChannel.EQ.4 ) THEN! 43 + ZZ-->H-->ZZ
+
+!  masses
+   if( Emin.lt.0d0 ) then
+      Jac1 = s_channel_propagator(M_Reso**2,RescaleWidth*Ga_Reso,0d0,Energy**2,xRnd(1),s56)                                                    !  int d(s56)    = Higgs resonance
+   else
+      Jac1 = k_l(xRnd(1),Emin**2,min(Energy**2,Emax**2),s56)                                            !  int d(s56)    = linear mapping
+   endif
+   Jac2 = k_l(xRnd(2),s56,Energy**2,s4H)                                                                                          !  int d(s4H)
+   Jac3 = s_channel_propagator(M_Z**2,Ga_Z,0d0,s56,xRnd(3),s78)                                                                   !  int d(s78)    = Z1
+   Jac4 = s_channel_propagator(M_Z**2,Ga_Z,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)                                           !  int d(s910) = Z2
+
+!  splittings
+   Jac5 = t_channel_prop_decay(Mom(:,1),Mom(:,2),M_Z**2,s4H,0d0,xRnd(5:6),Mom_Dummy(1:4),Mom(:,3))                                !  1+2 --> (4H)+3
+   Jac6 = t_channel_prop_decay(Mom(:,1),Mom(:,2)-Mom(:,3),M_Z**2,0d0,s56,xRnd(7:8),Mom(:,4),Mom_Dummy(1:4))                       !  1+(23) --> 4+H
+   Jac7 = s_channel_decay(Mom_Dummy(1:4),s78,s910,xRnd(9:10),Mom(:,5),Mom(:,6))                                                   !  H --> 5+6
+   Jac8 = s_channel_decay(Mom(:,5),0d0,0d0,xRnd(11:12),Mom(:,7),Mom(:,8))                                                         !  5 --> 7+8
+   Jac9 = s_channel_decay(Mom(:,6),0d0,0d0,xRnd(13:14),Mom(:,9),Mom(:,10))                                                        !  6 --> 9+10
+
+   
+   
+! ELSEIF( iChannel.EQ.5 ) THEN
+! 
+! 
+! 
+! !  Z boson emissions from either of the two quark lines with t-channel Z
+! 
+!    Jac1 = s_channel_propagator(M_Z**2,Ga_Z,0d0,Energy**2,xRnd(1),s78)                  
+!    Jac2 = s_channel_propagator(M_Z**2,Ga_Z,0d0,(Energy-dsqrt(s78))**2,xRnd(2),s910)    
+! 
+!    Jac3 = s_channel_propagator(0d0,0d0,s78,(Energy-dsqrt(s910))**2,xRnd(3),s35)                                                          
+!    Jac4 = s_channel_propagator(0d0,0d0,s910,(Energy-dsqrt(s35))**2,xRnd(4),s46)    
+!    Jac5 = t_channel_prop_decay(Mom(:,1),Mom(:,2),M_Z**2,s35,s46,xRnd(5:6),Mom_Dummy(1:4),Mom_Dummy2(1:4))
+! 
+!    Jac6 = s_channel_decay(Mom_Dummy(1:4),0d0,s78,xRnd(7:8),Mom(:,3),Mom(:,5))                                              
+!    Jac7 = s_channel_decay(Mom_Dummy2(1:4),0d0,s910,xRnd(9:10),Mom(:,4),Mom(:,6))
+! 
+!    Jac8 = s_channel_decay(Mom(:,5),0d0,0d0,xRnd(11:12),Mom(:,7),Mom(:,8))  
+!    Jac9 = s_channel_decay(Mom(:,6),0d0,0d0,xRnd(13:14),Mom(:,9),Mom(:,10)) 
+!  
+! 
+! ! -------------------------------
+! 
+!    
+! ELSEIF( iChannel.EQ.6 ) THEN
+! 
+! !  W boson emissions from either of the two quark lines with t-channel W   (??? why??)
+!  
+!    Jac1 = s_channel_propagator(M_W**2,Ga_W,0d0,Energy**2,xRnd(1),s78)                  
+!    Jac2 = s_channel_propagator(M_W**2,Ga_W,0d0,(Energy-dsqrt(s78))**2,xRnd(2),s910)    
+! 
+!    Jac3 = s_channel_propagator(0d0,0d0,s78,(Energy-dsqrt(s910))**2,xRnd(3),s35)                                                          
+!    Jac4 = s_channel_propagator(0d0,0d0,s910,(Energy-dsqrt(s35))**2,xRnd(4),s46)    
+!    Jac5 = t_channel_prop_decay(Mom(:,1),Mom(:,2),M_W**2,s35,s46,xRnd(5:6),Mom_Dummy(1:4),Mom_Dummy2(1:4))
+! 
+!    Jac6 = s_channel_decay(Mom_Dummy(1:4),0d0,s78,xRnd(7:8),Mom(:,3),Mom(:,5))                                              
+!    Jac7 = s_channel_decay(Mom_Dummy2(1:4),0d0,s910,xRnd(9:10),Mom(:,4),Mom(:,6))
+! 
+!    Jac8 = s_channel_decay(Mom(:,5),0d0,0d0,xRnd(11:12),Mom(:,7),Mom(:,8))  
+!    Jac9 = s_channel_decay(Mom(:,6),0d0,0d0,xRnd(13:14),Mom(:,9),Mom(:,10)) 
+!  
+
+ 
+ 
+ 
+
+! -------------------------------
+
+
+   
+ELSEIF( iChannel.EQ.5 ) THEN
+
+
+!  ZH phase space with flat Z-->jj propagator
+   
+   
+!  masses
+   if( Emin.gt.M_Reso+2*Ga_Reso .or. Process.eq.67 ) then 
+      Jac1 = k_l(xRnd(1),Emin**2,min(Energy**2,Emax**2),s56)
+   else
+!       Jac1 = k_BreitWigner_Quadr(xRnd(1),M_Reso**2,Ga_Reso,Emin**2,Emax**2,s56)
+     Jac1 = k_BreitWigner(xRnd(1),M_Reso**2,Ga_Reso,Emin**2,Emax**2,s56)
+   endif  
+   
+      
+!    Jac2 = s_channel_propagator(M_Z**2,Ga_Z,0d0,(Energy-dsqrt(s56))**2,xRnd(2),s34)
+   Jac2 = k_l(xRnd(2),mJJcut**2,(Energy-dsqrt(s56))**2,s34)    ! s34 = mjj^2, hence the minumum is set to mJJcut                                       
+   Jac3 = s_channel_propagator(M_Z**2,Ga_Z,0d0,s56,xRnd(3),s78)                                                             
+   Jac4 = s_channel_propagator(M_Z**2,Ga_Z,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)                                         
+   
+!  splittings
+   Jac5 = s_channel_decay((/Energy,0d0,0d0,0d0/),s34,s56,xRnd(5:6),Mom_Dummy(:),Mom_Dummy2(:)) !   Z* --> Z+H
+   Jac6 = s_channel_decay(Mom_Dummy(:),0d0,0d0,xRnd(7:8),Mom(:,3),Mom(:,4)) !  Z --> 34
+   Jac7 = s_channel_decay(Mom_Dummy2(:),s78,s910,xRnd(9:10),Mom(:,5),Mom(:,6))  !   H --> ZZ
+   
+   if( includeInterference .and. EqualLeptons.eq.0 ) then!   EqualLeptons=0 means equal leptons
+      call random_number(xRndLeptInterf)
+      if( xRndLeptInterf.gt.0.5d0 ) then
+          Jac8 = s_channel_decay(Mom(:,5),0d0,0d0,xRnd(11:12),Mom(:,9),Mom(:,8))       !   Z --> ffbar                                    
+          Jac9 = s_channel_decay(Mom(:,6),0d0,0d0,xRnd(13:14),Mom(:,7),Mom(:,10))      !   Z --> ffbar  
+      else
+          Jac8 = s_channel_decay(Mom(:,5),0d0,0d0,xRnd(11:12),Mom(:,7),Mom(:,8))       !   Z --> ffbar                                    
+          Jac9 = s_channel_decay(Mom(:,6),0d0,0d0,xRnd(13:14),Mom(:,9),Mom(:,10))      !   Z --> ffbar  
+      endif
+      Jac8 = Jac8 * 2d0
+   else
+      Jac8 = s_channel_decay(Mom(:,5),0d0,0d0,xRnd(11:12),Mom(:,7),Mom(:,8))       !   Z --> ffbar                                    
+      Jac9 = s_channel_decay(Mom(:,6),0d0,0d0,xRnd(13:14),Mom(:,9),Mom(:,10))      !   Z --> ffbar  
+   endif
+
+   
+ELSEIF( iChannel.EQ.6 ) THEN
+
+
+!  ZH phase space with BW Z-->jj propagator
+   
+
+!  masses
+   if( Emin.lt.0d0 ) then
+      Jac1 = s_channel_propagator(M_Reso**2,RescaleWidth*Ga_Reso,0d0,Energy**2,xRnd(1),s56)                                       
+   else
+      Jac1 = k_l(xRnd(1),Emin**2,min(Energy**2,Emax**2),s56)                                           
+   endif   
+   Jac2 = s_channel_propagator(M_Z**2,Ga_Z,mJJcut**2,(Energy-dsqrt(s56))**2,xRnd(2),s34) ! s34 = mjj^2, hence the minumum is set to mJJcut       
+!    Jac2 = k_l(xRnd(2),0d0,(Energy-dsqrt(s56))**2,s34)                                           
+   Jac3 = s_channel_propagator(M_Z**2,Ga_Z,0d0,s56,xRnd(3),s78)                                                             
+   Jac4 = s_channel_propagator(M_Z**2,Ga_Z,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)                                         
+   
+   
+!  splittings
+   Jac5 = s_channel_decay((/Energy,0d0,0d0,0d0/),s34,s56,xRnd(5:6),Mom_Dummy(:),Mom_Dummy2(:)) !   Z* --> Z+H
+   Jac6 = s_channel_decay(Mom_Dummy(:),0d0,0d0,xRnd(7:8),Mom(:,3),Mom(:,4)) !  Z --> 34
+   Jac7 = s_channel_decay(Mom_Dummy2(:),s78,s910,xRnd(9:10),Mom(:,5),Mom(:,6))  !   H --> ZZ                                            
+   Jac8 = s_channel_decay(Mom(:,5),0d0,0d0,xRnd(11:12),Mom(:,7),Mom(:,8))       !   Z --> ffbar                                    
+   Jac9 = s_channel_decay(Mom(:,6),0d0,0d0,xRnd(13:14),Mom(:,9),Mom(:,10))      !   Z --> ffbar  
+   
+
+ 
+   
+   
+ELSEIF( iChannel.EQ.7 ) THEN
+
+
+!  WH phase space with BW W-->jj propagator
+   
+
+!  masses
+   if( Emin.lt.0d0 ) then
+      Jac1 = s_channel_propagator(M_Reso**2,RescaleWidth*Ga_Reso,0d0,Energy**2,xRnd(1),s56)                                       
+   else
+      Jac1 = k_l(xRnd(1),Emin**2,min(Energy**2,Emax**2),s56)                                           
+   endif   
+   Jac2 = s_channel_propagator(M_W**2,Ga_W,mJJcut**2,(Energy-dsqrt(s56))**2,xRnd(2),s34) ! s34 = mjj^2, hence the minumum is set to mJJcut       
+!    Jac2 = k_l(xRnd(2),0d0,(Energy-dsqrt(s56))**2,s34)                                           
+   Jac3 = s_channel_propagator(M_Z**2,Ga_Z,0d0,s56,xRnd(3),s78)                                                             
+   Jac4 = s_channel_propagator(M_Z**2,Ga_Z,0d0,(dsqrt(s56)-dsqrt(s78))**2,xRnd(4),s910)                                         
+   
+   
+!  splittings
+   Jac5 = s_channel_decay((/Energy,0d0,0d0,0d0/),s34,s56,xRnd(5:6),Mom_Dummy(:),Mom_Dummy2(:)) !   Z* --> Z+H
+   Jac6 = s_channel_decay(Mom_Dummy(:),0d0,0d0,xRnd(7:8),Mom(:,3),Mom(:,4)) !  Z --> 34
+   Jac7 = s_channel_decay(Mom_Dummy2(:),s78,s910,xRnd(9:10),Mom(:,5),Mom(:,6))  !   H --> ZZ                                            
+   Jac8 = s_channel_decay(Mom(:,5),0d0,0d0,xRnd(11:12),Mom(:,7),Mom(:,8))       !   Z --> ffbar                                    
+   Jac9 = s_channel_decay(Mom(:,6),0d0,0d0,xRnd(13:14),Mom(:,9),Mom(:,10))      !   Z --> ffbar  
+   
+
+ 
+ 
+ELSEIF( iChannel.EQ.999 ) THEN
+
+   call genps(6,Energy,xRnd(1:14),(/0d0,0d0,0d0,0d0,0d0,0d0/),Mom(1:4,3:8),Jac)
+   Mom(1:4,10)= Mom(1:4,8)
+   Mom(1:4,9) = Mom(1:4,7)
+   Mom(1:4,8) = Mom(1:4,6)
+   Mom(1:4,7) = Mom(1:4,5)
+   Mom(1:4,5) = Mom(1:4,7)+Mom(1:4,8)
+   Mom(1:4,6) = Mom(1:4,9)+Mom(1:4,10)
+   Jac = Jac * (2d0*Pi)**(4-(6)*3) * (4d0*Pi)**((6)-1)
+   RETURN
+
+ELSE
+   call Error("PS channel not available in EvalPhasespace_VBF_H4f",ichannel)
+ENDIF
+
+
+   Jac = Jac1*Jac2*Jac3*Jac4*Jac5*Jac6*Jac7*Jac8*Jac9 * PSNorm6
+
+
+
+   if( isNan(jac) ) then
+      print *, "EvalPhasespace_VBF_H4f NaN"
+      print *, Jac1,Jac2,Jac3,Jac4,Jac5,Jac6,Jac7,Jac8,Jac9,ichannel
+      Jac = 0d0
+   endif
+
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,3).dot.Mom(1:4,3) ))
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,4).dot.Mom(1:4,4) ))
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,7).dot.Mom(1:4,7) ))
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,8).dot.Mom(1:4,8) ))
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,9).dot.Mom(1:4,9) ))
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,10).dot.Mom(1:4,10) ))
+!    print *, "----------"
+!    print *, "Mom.cons. ",Mom(1:4,1)+Mom(1:4,2)-Mom(1:4,3)-Mom(1:4,4)-Mom(1:4,7)-Mom(1:4,8)-Mom(1:4,9)-Mom(1:4,10)
+!    print *, "Mom.cons. ",Mom_Dummy(1:4)-Mom(1:4,5)-Mom(1:4,6)
+!    print *, "Mom.cons. ",Mom(1:4,5)-Mom(1:4,7)-Mom(1:4,8)
+!    print *, "Mom.cons. ",Mom(1:4,6)-Mom(1:4,9)-Mom(1:4,10)
+!    print *, "----------"
+!    print *, "Inv.mass  ",get_MInv(Mom_Dummy(1:4))*100d0
+!    print *, "Inv.mass  ",get_MInv(Mom(1:4,5))*100d0
+!    print *, "Inv.mass  ",get_MInv(Mom(1:4,6))*100d0
+!    pause
+
+
+
+RETURN
+END SUBROUTINE
+
+
+SUBROUTINE EvalPhasespace_H4f(xchannel,xRnd,Energy,Mom,id,Jac)
+use ModParameters
+use ModPhasespace
+use ModMisc
+implicit none
+real(8) :: xchannel,xRnd(1:8), Energy, Mom(4,8)
+integer, intent(in) :: id(1:4) ! 4f ids
+integer :: iChannel
+real(8) :: Jac,Jac1,Jac2,Jac3,Jac4,Jac5,Jac6,Jac7,Jac8,Jac9
+real(8) :: s3H,s4H,s56,s78,s910,Mom_Dummy(1:4),xRndOffShellZ,vectormass(1:2,1:2)
+integer :: NumChannels
+
+   NumChannels=4 ! IMPORTANT: Have to set it here rather than declaration!
+   iChannel = 1
+   Jac1=1d0;Jac2=1d0;Jac3=1d0;Jac4=1d0;Jac5=1d0;Jac6=1d0;Jac7=1d0;Jac8=1d0;Jac9=1d0;Jac=1d0;
+   s56=Energy**2
+
+   vectormass(1,1)=M_V ! Test is already done in main.90
+   vectormass(1,2)=Ga_V ! Test is already done in main.90
+   if( IsAZDecay(DecayMode2) ) then
+      vectormass(2,1)=M_Z
+      vectormass(2,2)=Ga_Z
+   elseif( IsAWDecay(DecayMode2) ) then
+      vectormass(2,1)=M_W
+      vectormass(2,2)=Ga_W
+   elseif( IsAPhoton(DecayMode2) ) then
+      vectormass(2,1)=0d0
+      vectormass(2,2)=0d0
+   endif
+
+   Mom(1:4,1) = 0.5d0*Energy * (/+1d0,0d0,0d0,+1d0/)
+   Mom(1:4,2) = 0.5d0*Energy * (/+1d0,0d0,0d0,-1d0/)
+
+   ! If does not have 4f-interference, then use the first two channels only
+   if(.not.includeInterference .or. (IsAWDecay(DecayMode1).and.IsAWDecay(DecayMode2)) .or. .not.(id(1).eq.id(3) .and. id(2).eq.id(4)) ) then
+      NumChannels=2
+   endif
+
+   ! Ordering becomes important if the on-shellness of V1 and V2 are not specified to be the same.
+   ! If one V is off-shell and the other is on-shell, or if exactly one decay mode is a photon, use the first channel.
+   if((OffShellV1.neqv.OffShellV2) .or. ((IsAPhoton(DecayMode1) .or. IsAPhoton(DecayMode2)) .and. DecayMode1.ne.DecayMode2 )) then
+      !print *,"Passes this if-statement!"
+      NumChannels=1
+   endif
+   if(NumChannels.gt.1) then
+      iChannel = int(xchannel * NumChannels -1d-10)+1
+   endif
+
+   !print *, "PS channel / NumChannels ",iChannel,NumChannels
+
+   ! masses
+   if(OffShellV1) then
+      if(OffShellV2) then ! OffXVV=X11
+         Jac2 = s_channel_propagator((vectormass(1,1))**2,vectormass(1,2),0d0,s56,xRnd(1),s78)                                          !  int d(s78)    = Z1
+         Jac3 = s_channel_propagator((vectormass(2,1))**2,vectormass(2,2),0d0,(Energy-dsqrt(s78))**2,xRnd(2),s910)                  !  int d(s910)   = Z2
+      else                ! OffXVV=X10
+         s910 = (vectormass(2,1))**2                                                                                                    !  int d(s910)   = Z2
+         Jac2 = s_channel_propagator((vectormass(1,1))**2,vectormass(1,2),0d0,(Energy-dsqrt(s910))**2,xRnd(1),s78)                  !  int d(s78)    = Z1
+      endif
+   else
+      s78 = (vectormass(1,1))**2                                                                                                        !  int d(s78)    = Z1
+      if(OffShellV2) then ! OffXVV=X01
+         Jac3 = s_channel_propagator((vectormass(2,1))**2,vectormass(2,2),0d0,(Energy-dsqrt(s78))**2,xRnd(2),s910)                  !  int d(s910)   = Z2
+      else                ! OffXVV=X00
+         s910 = (vectormass(2,1))**2                                                                                                    !  int d(s910)   = Z2
+         if( s910.gt.((dsqrt(s56)-dsqrt(s910))**2) ) Jac3=0d0
+      endif
+   endif
+
+   !print *, "x",xrnd(1:2)
+   !print *, "s",s56,s78,s910
+   !pause
+
+   Jac = Jac1*Jac2*Jac3
+   if(Jac.eq.0d0) return ! Checkpoint for on/off-shellness
+
+   Mom_Dummy(1:4) = (/Energy,0d0,0d0,0d0/)
+
+!  splittings
+IF( iChannel.EQ.1 ) THEN
+   Jac4 = s_channel_decay(Mom_Dummy(1:4),s78,s910,xRnd(3:4),Mom(:,3),Mom(:,4))                                                   !  H --> 5+6
+   if(.not.IsAPhoton(DecayMode1)) then
+      Jac5 = s_channel_decay(Mom(:,3),0d0,0d0,xRnd(5:6),Mom(:,5),Mom(:,6))                                                       !  5 --> 7+8
+   else
+      Mom(:,5) = Mom(:,3)
+      Mom(:,6) = 0d0
+   endif
+   if(.not.IsAPhoton(DecayMode2)) then
+      Jac6 = s_channel_decay(Mom(:,4),0d0,0d0,xRnd(7:8),Mom(:,7),Mom(:,8))                                                       !  6 --> 9+10
+   else
+      Mom(:,7) = Mom(:,4)
+      Mom(:,8) = 0d0
+   endif
+ELSEIF( iChannel.EQ.2 ) THEN
+   Jac4 = s_channel_decay(Mom_Dummy(1:4),s78,s910,xRnd(3:4),Mom(:,4),Mom(:,3))                                                   !  H --> 6+5
+   if(.not.IsAPhoton(DecayMode2)) then
+      Jac5 = s_channel_decay(Mom(:,3),0d0,0d0,xRnd(5:6),Mom(:,5),Mom(:,6))                                                       !  5 --> 7+8
+   else
+      Mom(:,5) = Mom(:,3)
+      Mom(:,6) = 0d0
+   endif
+   if(.not.IsAPhoton(DecayMode1)) then
+      Jac6 = s_channel_decay(Mom(:,4),0d0,0d0,xRnd(7:8),Mom(:,7),Mom(:,8))                                                       !  6 --> 9+10
+   else
+      Mom(:,7) = Mom(:,4)
+      Mom(:,8) = 0d0
+   endif
+
+ELSEIF( iChannel.EQ.3 ) THEN                                                                                                     !  Interference scenarios
+   Jac4 = s_channel_decay(Mom_Dummy(1:4),s78,s910,xRnd(3:4),Mom(:,3),Mom(:,4))                                                   !  H --> 5+6
+   Jac5 = s_channel_decay(Mom(:,3),0d0,0d0,xRnd(5:6),Mom(:,7),Mom(:,6))                                                          !  5 --> 9+8
+   Jac6 = s_channel_decay(Mom(:,4),0d0,0d0,xRnd(7:8),Mom(:,5),Mom(:,8))                                                          !  6 --> 7+10
+ELSEIF( iChannel.EQ.4 ) THEN
+   Jac4 = s_channel_decay(Mom_Dummy(1:4),s78,s910,xRnd(3:4),Mom(:,4),Mom(:,3))                                                   !  H --> 6+5
+   Jac5 = s_channel_decay(Mom(:,3),0d0,0d0,xRnd(5:6),Mom(:,7),Mom(:,6))                                                          !  5 --> 9+8
+   Jac6 = s_channel_decay(Mom(:,4),0d0,0d0,xRnd(7:8),Mom(:,5),Mom(:,8))                                                          !  6 --> 7+10
+ENDIF
+
+   Jac = Jac*Jac4*Jac5*Jac6 * PSNorm4  !*NumChannels                                                                                 !  combine
+
+   !print *, energy,dsqrt(s56)
+   !print *,"Generated momenta: "
+   !print *,Mom(:,3)
+   !print *,Mom(:,4)
+   !print *,Mom(:,5)
+   !print *,Mom(:,6)
+   !print *,Mom(:,7)
+   !print *,Mom(:,8)
+   !pause
+
+
+   if( isNan(jac) ) then
+      print *, "EvalPhasespace_H4f NaN"
+      print *, Energy
+      print *, s56,s78,s910
+      print *, Jac1,Jac2,Jac3,Jac4,Jac5,Jac6,ichannel
+      print *, xchannel,xRnd
+!       pause
+      Jac = 0d0
+   endif
+
+!    print *, "iChannel",ichannel
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,3).dot.Mom(1:4,3) ))
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,4).dot.Mom(1:4,4) ))
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,7).dot.Mom(1:4,7) ))
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,8).dot.Mom(1:4,8) ))
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,9).dot.Mom(1:4,9) ))
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,10).dot.Mom(1:4,10) ))
+!    print *, "----------"
+!    print *, "Mom.cons. ",Mom(1:4,1)+Mom(1:4,2)-Mom(1:4,5)-Mom(1:4,6)-Mom(1:4,7)-Mom(1:4,8)
+!    print *, "Mom.cons. ",Mom_Dummy(1:4)-Mom(1:4,3)-Mom(1:4,4)
+!    print *, "Mom.cons. ",Mom(1:4,3)-Mom(1:4,5)-Mom(1:4,6)
+!    print *, "Mom.cons. ",Mom(1:4,4)-Mom(1:4,7)-Mom(1:4,8)
+!    print *, "----------"
+!    print *, "Inv.mass  ",get_MInv(Mom_Dummy(1:4))*100d0
+!    print *, "Inv.mass  ",get_MInv(Mom(1:4,3)+Mom(1:4,4))*100d0
+!    print *, "Inv.mass  ",get_MInv(Mom(1:4,3))*100d0
+!    print *, "Inv.mass  ",get_MInv(Mom(1:4,4))*100d0
+!    pause
+
+
+
+RETURN
+END SUBROUTINE
+
+SUBROUTINE EvalPhasespace_H4f_OLD(xchannel,xRnd,Energy,Mom,Jac)
+use ModParameters
+use ModPhasespace
+use ModMisc
+implicit none
+real(8) :: xchannel,xRnd(1:8), Energy, Mom(4,8)
+integer :: iChannel
+real(8) :: Jac,Jac1,Jac2,Jac3,Jac4,Jac5,Jac6,Jac7,Jac8,Jac9
+real(8) :: s3H,s4H,s56,s78,s910,Mom_Dummy(1:4)
+real(8), parameter :: RescaleWidth=10d0
+integer :: NumChannels=   4
+
+
+   Mom(1:4,1) = 0.5d0*Energy * (/+1d0,0d0,0d0,+1d0/)
+   Mom(1:4,2) = 0.5d0*Energy * (/+1d0,0d0,0d0,-1d0/)
+
+   if( .not. includeInterference ) NumChannels=2
+   iChannel = int(xchannel * NumChannels -1d-10)+1
+!    print *, "PS channel ",iChannel
+
+! if( iChannel.eq.2 ) iChannel=1! turn this on only when mX > 2mV
+! if( iChannel.eq.4 ) iChannel=3
+
+
+
+IF( iChannel.EQ.1 ) THEN
+
+
+!  masses
+   Jac1=1d0; s56=Energy**2
+! print *, "entering Jac2"
+   Jac2 = s_channel_propagator(M_V**2,Ga_V,0d0,s56,xRnd(1),s78)                                                                   !  int d(s78)    = Z1
+! print *, "entering Jac3"
+   Jac3 = s_channel_propagator(M_V**2,Ga_V,0d0,(Energy-dsqrt(s78))**2,xRnd(2),s910)                                           !  int d(s910) = Z2
+
+
+!    print *, "x",xrnd(1:2)
+!    print *, "s",s56,s78,s910;pause
+
+!  splittings
+   Mom_Dummy(1:4) = (/Energy,0d0,0d0,0d0/)
+   Jac4 = s_channel_decay(Mom_Dummy(1:4),s78,s910,xRnd(3:4),Mom(:,3),Mom(:,4))                                                   !  H --> 5+6
+   Jac5 = s_channel_decay(Mom(:,3),0d0,0d0,xRnd(5:6),Mom(:,5),Mom(:,6))                                                         !  5 --> 7+8
+   Jac6 = s_channel_decay(Mom(:,4),0d0,0d0,xRnd(7:8),Mom(:,7),Mom(:,8))                                                        !  6 --> 9+10
+
+   Jac = Jac1*Jac2*Jac3*Jac4*Jac5*Jac6 * PSNorm4  !*NumChannels                                                         !  combine
+
+
+ELSEIF( iChannel.EQ.2 ) THEN
+
+!  masses
+   Jac1=1d0; s56=Energy**2
+   Jac2 = s_channel_propagator(M_V**2,Ga_V,0d0,s56,xRnd(1),s78)                                                                   !  int d(s78)    = Z1
+   Jac3 = s_channel_propagator(M_V**2,Ga_V,0d0,(Energy-dsqrt(s78))**2,xRnd(2),s910)                                           !  int d(s910) = Z2
+
+!  splittings
+   Mom_Dummy(1:4) = (/Energy,0d0,0d0,0d0/)
+   Jac4 = s_channel_decay(Mom_Dummy(1:4),s78,s910,xRnd(3:4),Mom(:,4),Mom(:,3))                                                   !  H --> 5+6
+   Jac5 = s_channel_decay(Mom(:,3),0d0,0d0,xRnd(5:6),Mom(:,5),Mom(:,6))                                                         !  5 --> 7+8
+   Jac6 = s_channel_decay(Mom(:,4),0d0,0d0,xRnd(7:8),Mom(:,7),Mom(:,8))                                                        !  6 --> 9+10
+
+   Jac = Jac1*Jac2*Jac3*Jac4*Jac5*Jac6 * PSNorm4  !*NumChannels                                                         !  combine
+
+
+
+ELSEIF( iChannel.EQ.3 ) THEN
+
+!  masses
+   Jac1=1d0; s56=Energy**2
+   Jac2 = s_channel_propagator(M_V**2,Ga_V,0d0,s56,xRnd(1),s78)                                                                   !  int d(s78)    = Z1
+   Jac3 = s_channel_propagator(M_V**2,Ga_V,0d0,(Energy-dsqrt(s78))**2,xRnd(2),s910)                                           !  int d(s910) = Z2
+
+!  splittings
+   Mom_Dummy(1:4) = (/Energy,0d0,0d0,0d0/)
+   Jac4 = s_channel_decay(Mom_Dummy(1:4),s78,s910,xRnd(3:4),Mom(:,3),Mom(:,4))                                                   !  H --> 5+6
+   Jac5 = s_channel_decay(Mom(:,3),0d0,0d0,xRnd(5:6),Mom(:,7),Mom(:,6))                                                         !  5 --> 7+8
+   Jac6 = s_channel_decay(Mom(:,4),0d0,0d0,xRnd(7:8),Mom(:,5),Mom(:,8))                                                        !  6 --> 9+10
+
+   Jac = Jac1*Jac2*Jac3*Jac4*Jac5*Jac6 * PSNorm4  !*NumChannels                                                         !  combine
+
+
+ELSEIF( iChannel.EQ.4 ) THEN
+
+!  masses
+   Jac1=1d0; s56=Energy**2
+   Jac2 = s_channel_propagator(M_V**2,Ga_V,0d0,s56,xRnd(1),s78)                                                                   !  int d(s78)    = Z1
+   Jac3 = s_channel_propagator(M_V**2,Ga_V,0d0,(Energy-dsqrt(s78))**2,xRnd(2),s910)                                           !  int d(s910) = Z2
+
+!  splittings
+   Mom_Dummy(1:4) = (/Energy,0d0,0d0,0d0/)
+   Jac4 = s_channel_decay(Mom_Dummy(1:4),s78,s910,xRnd(3:4),Mom(:,4),Mom(:,3))                                                   !  H --> 5+6
+   Jac5 = s_channel_decay(Mom(:,3),0d0,0d0,xRnd(5:6),Mom(:,7),Mom(:,6))                                                         !  5 --> 7+8
+   Jac6 = s_channel_decay(Mom(:,4),0d0,0d0,xRnd(7:8),Mom(:,5),Mom(:,8))                                                        !  6 --> 9+10
+
+   Jac = Jac1*Jac2*Jac3*Jac4*Jac5*Jac6 * PSNorm4  !*NumChannels                                                         !  combine
+
+
+ENDIF
+
+! print *, energy,dsqrt(s56);pause
+
+
+   if( isNan(jac) ) then
+      print *, "EvalPhasespace_H4f NaN"
+      print *, Energy
+      print *, s56,s78,s910
+      print *, Jac1,Jac2,Jac3,Jac4,Jac5,Jac6,ichannel
+      print *, xchannel,xRnd
+!       pause
+      Jac = 0d0
+   endif
+
+!    print *, "iChannel",ichannel
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,3).dot.Mom(1:4,3) ))
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,4).dot.Mom(1:4,4) ))
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,7).dot.Mom(1:4,7) ))
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,8).dot.Mom(1:4,8) ))
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,9).dot.Mom(1:4,9) ))
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,10).dot.Mom(1:4,10) ))
+!    print *, "----------"
+!    print *, "Mom.cons. ",Mom(1:4,1)+Mom(1:4,2)-Mom(1:4,5)-Mom(1:4,6)-Mom(1:4,7)-Mom(1:4,8)
+!    print *, "Mom.cons. ",Mom_Dummy(1:4)-Mom(1:4,3)-Mom(1:4,4)
+!    print *, "Mom.cons. ",Mom(1:4,3)-Mom(1:4,5)-Mom(1:4,6)
+!    print *, "Mom.cons. ",Mom(1:4,4)-Mom(1:4,7)-Mom(1:4,8)
+!    print *, "----------"
+!    print *, "Inv.mass  ",get_MInv(Mom_Dummy(1:4))*100d0
+!    print *, "Inv.mass  ",get_MInv(Mom(1:4,3)+Mom(1:4,4))*100d0
+!    print *, "Inv.mass  ",get_MInv(Mom(1:4,3))*100d0
+!    print *, "Inv.mass  ",get_MInv(Mom(1:4,4))*100d0
+!    pause
+
+
+
+RETURN
+END SUBROUTINE
+
+SUBROUTINE EvalPhasespace_HVga(xRnd,Energy,Mom,Jac) ! H-->gaga or H-->Zga phase space
+use ModParameters
+use ModPhasespace
+use ModMisc
+implicit none
+real(8) :: xRnd(:), Energy, s56,s78, Mom(:,:)
+real(8) :: Jac,Jac1,Jac2,Jac3,Mom_Dummy(1:4)
+
+
+   Mom(1:4,1) = 0.5d0*Energy * (/+1d0,0d0,0d0,+1d0/)
+   Mom(1:4,2) = 0.5d0*Energy * (/+1d0,0d0,0d0,-1d0/)
+
+   Mom_Dummy(1:4) = (/Energy,0d0,0d0,0d0/)
+   if( .not.IsAPhoton(DecayMode1) ) then
+      s56=Energy**2
+      Jac1 = s_channel_propagator(M_V**2,Ga_V,0d0,s56,xRnd(1),s78)
+      Jac2 = s_channel_decay(Mom_Dummy(1:4),s78,0d0,xRnd(2:3),Mom(:,3),Mom(:,7))
+      Jac3 = s_channel_decay(Mom(:,3),0d0,0d0,xRnd(4:5),Mom(:,5),Mom(:,6))
+      Jac = Jac1 * Jac2 * Jac3 * PSNorm3
+   else
+      Jac1 = s_channel_decay(Mom_Dummy(1:4),0d0,0d0,xRnd(1:2),Mom(:,5),Mom(:,7))
+      Jac = Jac1 * PSNorm2
+   endif
+
+   if( isNan(jac) ) then
+      print *, "EvalPhasespace_Hgaga NaN"
+      print *, Energy,Jac
+      print *, xRnd
+!       pause
+      Jac = 0d0
+   endif
+
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,3).dot.Mom(1:4,3) ))
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,4).dot.Mom(1:4,4) ))
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,5).dot.Mom(1:4,5) ))
+!    print *, "OS checker", dsqrt( dabs(Mom(1:4,6).dot.Mom(1:4,6) ))
+!    print *, "----------"
+!    if( .not.IsAPhoton(DecayMode1) ) then
+!       print *, "Mom.cons. ",Mom(1:4,1)+Mom(1:4,2)-Mom(1:4,4) -Mom(1:4,5)-Mom(1:4,6)
+!       print *, "Mom.cons. ",Mom(1:4,3)-Mom(1:4,5)-Mom(1:4,6)
+!    else
+!       print *, "Mom.cons. ",Mom(1:4,1)+Mom(1:4,2)-Mom(1:4,3) -Mom(1:4,4)
+!    endif
+!    print *, "----------"
+!    pause
+
+
+
+RETURN
+END SUBROUTINE
+
+
+
+
+
+! Breit-Wigner mass^2
+function bw_sq(x, m, ga, smax, jacobian)
+implicit none
+real(8) :: bw_sq
+real(8), intent(in) :: m, ga, smax,x
+real(8) :: xmin, xmax,xprime
+real(8), intent(out) :: jacobian
+
+xmin=-datan(m/ga)/m/ga
+xmax=-datan((-smax+m**2)/ga/m)/ga/m
+xprime=x*(xmax-xmin)+xmin
+bw_sq=m**2+dtan(xprime*ga*m)*ga*m
+jacobian=(ga*m)**2 * (1d0+dtan(ga*m*xprime)**2) * (xmax-xmin)
+
+return
+end function bw_sq
+
+
+
 
 !LORENTZ.F
 !VERSION 20130123
@@ -1064,6 +5930,7 @@ END SUBROUTINE
 !(vector) based on another four vector (boost). The primed and
 !unprimed frames have their axes in parallel to one another.
 !Rotation is not performed by this subroutine.
+
       subroutine LORENTZ(vector, boost)
 
       implicit none
@@ -1113,6 +5980,9 @@ END SUBROUTINE
 
       return
       END subroutine LORENTZ
+
+
+
 ! KRONECKER_DELTA.F
 !
 ! KRONECKER_DELTA(i,j)
@@ -1259,8 +6129,12 @@ integer idx,ip
    Mu_Fact = abs(Mu_Fact) * MuFacMultiplier
    Mu_Ren = abs(Mu_Ren) * MuRenMultiplier
 
+
 return
 end subroutine SetRunningScales
+
+
+
 
 SUBROUTINE setPDFs(x1,x2,pdf)
 use ModParameters
@@ -1470,6 +6344,9 @@ pdf(:,:) = dabs(pdf(:,:))
 RETURN
 END SUBROUTINE
 
+
+
+
 SUBROUTINE CTEQ6(X,SCALE,UPV,DNV,USEA,DSEA,STR,CHM,BOT,GLU)
 implicit none
 double precision X,SCALE,UPV,DNV,USEA,DSEA,STR,CHM,BOT,GLU
@@ -1492,6 +6369,10 @@ double precision Q,xsave,qsave,Ctq6Pdf,D,U
          Q=qsave
 RETURN
 END SUBROUTINE
+
+
+
+
 
 ! QCD scale from MCFM
 ! Implementation into JHUGen by Ulascan Sarica, Dec. 2015
