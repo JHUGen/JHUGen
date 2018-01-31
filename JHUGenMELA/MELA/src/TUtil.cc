@@ -4435,16 +4435,16 @@ double TUtil::JHUGenMatEl(
   }
 
   // Variables to set L1/2 and R1/2 couplings into RcdME
-  const int ZZmode=0, WWmode=10, ggmode=20, Zgmode=30;
-  int VVmode=-1;
-  if (PDGHelpers::isAWBoson(mela_event.intermediateVid.at(0)) && PDGHelpers::isAWBoson(mela_event.intermediateVid.at(1))) VVmode=WWmode;
-  else if (PDGHelpers::isAZBoson(mela_event.intermediateVid.at(0)) && PDGHelpers::isAZBoson(mela_event.intermediateVid.at(1))) VVmode=ZZmode;
-  else if (PDGHelpers::isAPhoton(mela_event.intermediateVid.at(0)) && PDGHelpers::isAPhoton(mela_event.intermediateVid.at(1))) VVmode=ggmode;
+  const int InvalidMode=-1, WWMode=0, ZZMode=1, ZgMode=5, ggMode=7;
+  int VVMode=InvalidMode;
+  if (PDGHelpers::isAWBoson(mela_event.intermediateVid.at(0)) && PDGHelpers::isAWBoson(mela_event.intermediateVid.at(1))) VVMode=WWMode;
+  else if (PDGHelpers::isAZBoson(mela_event.intermediateVid.at(0)) && PDGHelpers::isAZBoson(mela_event.intermediateVid.at(1))) VVMode=ZZMode;
+  else if (PDGHelpers::isAPhoton(mela_event.intermediateVid.at(0)) && PDGHelpers::isAPhoton(mela_event.intermediateVid.at(1))) VVMode=ggMode;
   else if (
     (PDGHelpers::isAZBoson(mela_event.intermediateVid.at(0)) && PDGHelpers::isAPhoton(mela_event.intermediateVid.at(1)))
     ||
     (PDGHelpers::isAZBoson(mela_event.intermediateVid.at(1)) && PDGHelpers::isAPhoton(mela_event.intermediateVid.at(0)))
-    ) VVmode=Zgmode;
+    ) VVMode=ZgMode;
   double aL1=0, aL2=0, aR1=0, aR2=0;
 
   int nNonZero=0;
@@ -4472,7 +4472,7 @@ double TUtil::JHUGenMatEl(
 
       // Sum over possible left/right couplings of the Vs
       double aLRtmp[4]={ 0 };
-      __modjhugenmela_MOD_getdecaycouplings(&VVmode, MYIDUP, &(aLRtmp[0]), &(aLRtmp[1]), &(aLRtmp[2]), &(aLRtmp[3]));
+      __modjhugenmela_MOD_getdecaycouplings(&VVMode, MYIDUP, &(aLRtmp[0]), &(aLRtmp[1]), &(aLRtmp[2]), &(aLRtmp[3]));
       if (idarray[0].size()>1){
         aL1 = sqrt(pow(aL1, 2)+pow(aLRtmp[0], 2));
         aR1 = sqrt(pow(aR1, 2)+pow(aLRtmp[1], 2));
