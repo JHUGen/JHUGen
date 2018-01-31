@@ -1715,8 +1715,8 @@ void testME_VBF_JHUGen_Ping(int erg_tev=13, bool useConstants=false, shared_ptr<
       Phi1MELA
     );
 
-    cout << "TUtil complex VBF angles: " << costheta1re << " " << costheta2re << " " << Phi << " " << costhetastar << " " << Phi1 << " " << Q2V1 << " " << Q2V2 << endl;
-    cout << "MELA complex VBF angles: " << costheta1reMELA << " " << costheta2reMELA << " " << PhiMELA << " " << costhetastarMELA << " " << Phi1MELA << " " << Q2V1MELA << " " << Q2V2MELA << endl;
+    cout << "TUtil complex VBF angles: " << costheta1re << " " << costheta1im << " " << costheta2re << " " << costheta2im << " " << Phi << " " << costhetastar << " " << Phi1 << " " << Q2V1 << " " << Q2V2 << endl;
+    cout << "MELA complex VBF angles: " << costheta1reMELA << " " << costheta1imMELA << " " << costheta2reMELA << " " << costheta2imMELA << " " << PhiMELA << " " << costhetastarMELA << " " << Phi1MELA << " " << Q2V1MELA << " " << Q2V2MELA << endl;
 
     mela.resetInputEvent();
     cout << "Removed..." << endl;
