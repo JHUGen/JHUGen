@@ -469,7 +469,7 @@ test:
       python lhefile.py --lhefile-hwithdecay=$CIRCLE_ARTIFACTS/other/tbarH_t_ZZ.lhe --lhefile-jhugenvbfvh=$CIRCLE_ARTIFACTS/other/WH.lhe --lhefile-jhugentth=$CIRCLE_ARTIFACTS/other/ttH.lhe
     - |
       cd ../JHUGenMELA/MELA/test &&
-      ./testME_more.py
+      ./testME_more.py "$(expr $SEED + $CIRCLE_BUILD_NUM)"
 
   post:
     - |
