@@ -213,6 +213,13 @@ test:
         if ! grep -q $a ../Manual/manJHUGenerator.tex &&
            ! grep -q ${a/w/z} ../Manual/manJHUGenerator.tex &&      #ghw*, etc. are mentioned collectively
            ! grep -q ${a/2z/z} ../Manual/manJHUGenerator.tex &&     #second resonance couplings are too
+           ! grep -q ${a/zzp/z} ../Manual/manJHUGenerator.tex &&    #same for contact terms
+           ! grep -q ${a/zpzp/z} ../Manual/manJHUGenerator.tex &&   #same for contact terms
+           ! grep -q ${a/zpgs/zgs} ../Manual/manJHUGenerator.tex && #same for contact terms
+           ! grep -q ${a/wwp/z} ../Manual/manJHUGenerator.tex &&    #same for contact terms
+           ! grep -q ${a/wpwp/z} ../Manual/manJHUGenerator.tex &&   #same for contact terms
+           ! grep -q ${a/zzp/} ../Manual/manJHUGenerator.tex &&     #spin 2 contact terms
+           ! grep -q ${a/zpzp/} ../Manual/manJHUGenerator.tex &&    #spin 2 contact terms
            ! grep -q ${a/2gsgs/gsgs} ../Manual/manJHUGenerator.tex &&
            ! grep -q ${a/Lambda2/Lambda} ../Manual/manJHUGenerator.tex &&
            ! grep -q ${a/2w/z} ../Manual/manJHUGenerator.tex &&

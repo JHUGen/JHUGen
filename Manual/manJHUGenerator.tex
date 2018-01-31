@@ -482,14 +482,15 @@ Each \verb|ghzX|, \verb|ghzX_primeY|, \verb|Lambda_zXY|, and \verb|cz_qXsq| para
 \label{contactterms}
 
 JHUGen also supports a spin zero resonance coupling to a new spin-1 boson, $Z^\prime$ or $W^\prime$, in VBF and VH production and in decay.
-These couplings are set by
+These couplings are set by parameters equivalent to the $HZZ$ couplings.  For example,
 \begin{verbatim}
 complex(8), public :: ghzzp1 = (0d0,0d0)
 complex(8), public :: ghzpzp1 = (0d0,0d0)
+complex(8), public :: ghzpgs2 = (0d0,0d0)
 \end{verbatim}
-where \verb|ghzzp1| controls the $HZZ^\prime$ coupling and \verb|ghzpzp1| controls the $HZ^\prime Z^\prime$ coupling.
+give couplings for $HZZ^\prime$, $HZ^\prime Z^\prime$, and $HZ^\prime\gamma$ that are equivalent to \verb|ghz1| or \verb|ghzgs2|.  All supported couplings for $HZZ$ have equivalent couplings for $HZZ^\prime$ and $HZ^\prime Z^\prime$, and all supported couplings for $HZ\gamma$ have equivalent couplings for $HZ^\prime\gamma$.
 
-As in the $WW$ case, by default the $HWW^\prime$ and $HW^\prime W^\prime$ couplings are assumed to be the same as $HZZ^\prime$ and $HZ^\prime Z^\prime$.  In VBF production, the equivalent couplings \verb|ghwwp1| and \verb|ghwpwp1| can be set.  If any of the $HWW$, $HWW^\prime$, or $HW^\prime W^\prime$ couplings are set explicitly, $HW({}^\prime)W(^{\prime})$ is completely separated from $HZ({}^\prime)Z(^{\prime})$, and the specified couplings are used instead.
+As in the $WW$ case, by default the $HWW^\prime$ and $HW^\prime W^\prime$ couplings are assumed to be the same as $HZZ^\prime$ and $HZ^\prime Z^\prime$.  In VBF production, the equivalent couplings \verb|ghwwp*| and \verb|ghwpwp*| can be set.  If any of the $HWW$, $HWW^\prime$, or $HW^\prime W^\prime$ couplings are set explicitly, $HW({}^\prime)W(^{\prime})$ is completely separated from $HZ({}^\prime)Z(^{\prime})$, and the specified couplings are used instead.
 
 The couplings between $V^\prime$ and fermions are set by
 \begin{verbatim}
@@ -525,7 +526,7 @@ The couplings between $V^\prime$ and fermions are set by
 \end{verbatim}
 The $W^\prime$ equivalent of the CKM matrix is assumed to be diagonal.
 
-By default, $V^\prime$ is assumed to have infinite mass.  Under these conditions, setting \verb|ghzzp| and  some of the $V^\prime ff$ couplings to nonzero values is equivalent to the contact terms described in \cite{Gonzalez-Alonso:2014eva}.  $Z^\prime$ ($W^\prime$) can also be given finite mass by setting its mass \verb|MZprime| (\verb|MWprime|) and width \verb|GaZprime| (\verb|GaWprime|) on the command line.
+By default, $V^\prime$ is assumed to have infinite mass.  Under these conditions, setting \verb|ghzzp1| and  some of the $V^\prime ff$ couplings to nonzero values is equivalent to the contact terms described in \cite{Gonzalez-Alonso:2014eva}.  $Z^\prime$ ($W^\prime$) can also be given finite mass by setting its mass \verb|MZprime| (\verb|MWprime|) and width \verb|GaZprime| (\verb|GaWprime|) on the command line.
 
 
 
@@ -546,11 +547,10 @@ complex(8), public :: zprime_zz_2 =  (0.0d0,0d0)!  =1 for JP=1+
 \label{spin2}
 
 \noindent
-The \verb|a*| parameters control the coupling of a spin-2 resonance to gluons in the production mechanism.  The \verb|b*| parameters control the decay.
+The \verb|a*| parameters control the coupling of a spin-2 resonance to gluons in the production mechanism.  The \verb|b*| parameters control the decay to either $ZZ$ or $WW$ (\verb|b|), $Z\gamma$ (\verb|zgs|), or $\gamma\gamma$ (\verb|gsgs|).
 The spin-2 couplings are described by Eq.(18) from Ref.~\cite{Bolognesi:2012}, and can be set on the command line.
 
 \begin{verbatim}
-
 complex(8), public :: a1 = (1.0d0,0d0)    ! g1  -- c.f. note
 complex(8), public :: a2 = (0.0d0,0d0)    ! g2
 complex(8), public :: a3 = (0.0d0,0d0)    ! g3
@@ -560,7 +560,7 @@ complex(8), public :: a5 = (0.0d0,0d0)    ! pseudoscalar, g8
 complex(8), public :: graviton_qq_left  = (1.0d0,0d0)! graviton coupling to quarks
 complex(8), public :: graviton_qq_right = (1.0d0,0d0)
 
-complex(8), public :: b1 = (1.0d0,0d0)
+complex(8), public :: b1 = (0.0d0,0d0)
 complex(8), public :: b2 = (0.0d0,0d0)
 complex(8), public :: b3 = (0.0d0,0d0)
 complex(8), public :: b4 = (0.0d0,0d0)
@@ -570,9 +570,23 @@ complex(8), public :: b7 = (0.0d0,0d0)
 complex(8), public :: b8 = (0.0d0,0d0)
 complex(8), public :: b9 = (0.0d0,0d0)
 complex(8), public :: b10 =(0.0d0,0d0)
+
+complex(8), public :: bzgs1 = (0.0d0,0d0)
+complex(8), public :: bzgs2 = (0.0d0,0d0)
+complex(8), public :: bzgs3 = (0.0d0,0d0)
+complex(8), public :: bzgs4 = (0.0d0,0d0)
+complex(8), public :: bzgs8 = (0.0d0,0d0)
+
+complex(8), public :: bgsgs1 = (0.0d0,0d0)
+complex(8), public :: bgsgs2 = (0.0d0,0d0)
+complex(8), public :: bgsgs3 = (0.0d0,0d0)
+complex(8), public :: bgsgs4 = (0.0d0,0d0)
+complex(8), public :: bgsgs8 = (0.0d0,0d0)
 \end{verbatim}
 
-\subsection{Configuration in parameter file }
+As in the spin 0 case, decay to $Z^\prime$ is fully supported.  Each of the parameters listed above for $VV$ has an equivalent parameter that describes the spin 2 resonance's coupling to $VV^\prime$ and $V^\prime V^\prime$; examples include \verb|bzzp1| and \verb|bzpzp2|.  Similarly, the parameters describing the decay to $Z\gamma$ have equivalent parameters, such as \verb|bzpgs3|, that describe the decay to $Z^\prime\gamma$.  The parameters controlling the mass, width, and fermion couplings of $Z^\prime$ and $W^\prime$ are described above in Section \ref{contactterms}.
+
+\subsection{Configuration in parameter file}
 
 Some more advanced parameters can be found in \verb|mod_Parameters.F90|.  These include SM parameters such as the masses of particles and electroweak couplings, which can be changed for precise syncing with other generators used, for example.  Look for the \verb|!constants| section.
 
