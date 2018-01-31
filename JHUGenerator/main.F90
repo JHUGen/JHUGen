@@ -374,10 +374,12 @@ logical :: SetColliderEnergy
    SetAnomalousSpin1qq=.false.
    Setspin1qqleft=.false.
    Setspin1qqright=.false.
+   Setspin1VV=.false.
    SetAnomalousSpin2gg=.false.
    SetAnomalousSpin2qq=.false.
    Setspin2qqleft=.false.
    Setspin2qqright=.false.
+   Setspin2VV=.false.
    SetAnomalousHff=.false.
    Setkappa=.false.
 

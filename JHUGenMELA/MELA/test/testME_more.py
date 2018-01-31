@@ -140,6 +140,7 @@ class TestMela(unittest.TestCase):
           if spin == 0:
               for i in range(1, 5):
                   for j in range(8):
+                      if j in (3, 6) and not usevpvp: continue #for ZZ', q1^2-q2^2 is defined differently
                       coupling = "ghz{}".format(i)
                       if j: coupling += "_prime"
                       if j>1: coupling += str(j)
