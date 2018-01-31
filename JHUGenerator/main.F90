@@ -331,7 +331,7 @@ integer :: NumArgs,NArg
 logical :: help, DryRun, success, SetLastArgument, interfSet
 logical :: SetRenScheme, SetMuRenMultiplier, SetFacScheme, SetMuFacMultiplier
 logical :: SetAnomalousSpin0gg, Setghg2, SetAnomalousSpin0ZZ, Setghz1
-logical :: SetZgammacoupling, Setgammagammacoupling
+logical :: SetZgammacoupling, Setgammagammacoupling, SetZprimegammacoupling
 logical :: SetAnomalousSpin1qq, Setspin1qqleft, Setspin1qqright, SetSpin1VV
 logical :: SetAnomalousSpin2gg, SetAnomalousSpin2qq, Setspin2qqleft, Setspin2qqright, SetSpin2VV
 logical :: SetAnomalousHff, Setkappa
@@ -371,6 +371,7 @@ logical :: SetColliderEnergy
    Setghz1=.false.
    SetZgammacoupling=.false.
    Setgammagammacoupling=.false.
+   SetZprimegammacoupling=.false.
    SetAnomalousSpin1qq=.false.
    Setspin1qqleft=.false.
    Setspin1qqright=.false.
@@ -836,10 +837,10 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "ghzzp4_prime7", success, ghzzp4_prime7, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
 
     !spin 0 Zpgamma couplings
-    call ReadCommandLineArgument(arg, "ghzpgs1_prime2", success, ghzpgs1_prime2, success2=SetZgammacoupling, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "ghzpgs2", success, ghzpgs2, success2=SetZgammacoupling, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "ghzpgs3", success, ghzpgs3, success2=SetZgammacoupling, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "ghzpgs4", success, ghzpgs4, success2=SetZgammacoupling, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzpgs1_prime2", success, ghzpgs1_prime2, success2=SetZgammacoupling, success3=includeVprime, success4=SetHZprime, success5=SetZprimegammacoupling)
+    call ReadCommandLineArgument(arg, "ghzpgs2", success, ghzpgs2, success2=SetZgammacoupling, success3=includeVprime, success4=SetHZprime, success5=SetZprimegammacoupling)
+    call ReadCommandLineArgument(arg, "ghzpgs3", success, ghzpgs3, success2=SetZgammacoupling, success3=includeVprime, success4=SetHZprime, success5=SetZprimegammacoupling)
+    call ReadCommandLineArgument(arg, "ghzpgs4", success, ghzpgs4, success2=SetZgammacoupling, success3=includeVprime, success4=SetHZprime, success5=SetZprimegammacoupling)
 
     !spin 0 ZpZp couplings
     call ReadCommandLineArgument(arg, "ghzpzp1", success, ghzpzp1, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
@@ -1467,6 +1468,11 @@ logical :: SetColliderEnergy
         call Error("If you set the width of Wprime, you also have to set the mass! MWprime=...")
     endif
 
+    if( (Process.eq.50 .or. Process.eq.60) .and. SetZprimegammacoupling ) then
+        call Error("Z'gamma couplings are not implemented for VBF or VH")
+        !If you implement them and remove this error, also edit the Vprimekwargs function
+        !in MELA/test/testME_more.py to not remove the Z'gamma couplings for process = 50 or 60
+    endif
 
     ! Spin-1
     if( Process.eq.1) then

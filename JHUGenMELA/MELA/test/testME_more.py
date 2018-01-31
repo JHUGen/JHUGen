@@ -135,9 +135,9 @@ class TestMela(unittest.TestCase):
     self.assertEquals(me1, me2)
     self.assertNotEquals(me1, 0)
 
-  def Vprimekwargs(self, spin, usevpvp):
+  def Vprimekwargs(self, process, usevpvp):
       def couplings():
-          if spin == 0:
+          if process in (0, 50, 60):
               for i in range(1, 5):
                   for j in range(8):
                       if j in (3, 6) and not usevpvp: continue #for ZZ', q1^2-q2^2 is defined differently
@@ -145,14 +145,14 @@ class TestMela(unittest.TestCase):
                       if j: coupling += "_prime"
                       if j>1: coupling += str(j)
                       yield coupling
-              if not usevpvp:
+              if process == 0 and not usevpvp:
                   yield "ghzgs1_prime2"; yield "ghzgs2"; yield "ghzgs3"; yield "ghzgs4"
-          elif spin == 2:
+          elif process == 2:
               for i in range(1, 11): yield "b{}".format(i)
               if not usevpvp:
                   for i in range(1, 5)+[8]: yield "bzgs".format(i)
           else:
-              assert False
+              assert False, process
 
       return {coupling:
          (random.uniform(0, 1) + random.uniform(0, 1) * 1j)
@@ -164,17 +164,17 @@ class TestMela(unittest.TestCase):
   def testzp_spin2(self):
     self.runVprime(event1_ggH, False, False, TVar.SelfDefine_spin2, TVar.JHUGen, TVar.ZZINDEPENDENT, **self.Vprimekwargs(2, False))
   def testzp_VBF(self):
-    self.runVprime(event2_VBF, True, False, TVar.SelfDefine_spin0, TVar.JHUGen, TVar.JJVBF, **self.Vprimekwargs(0, False))
+    self.runVprime(event2_VBF, True, False, TVar.SelfDefine_spin0, TVar.JHUGen, TVar.JJVBF, **self.Vprimekwargs(60, False))
   def testzp_ZH(self):
-    self.runVprime(event3_ZH, True, False, TVar.SelfDefine_spin0, TVar.JHUGen, TVar.Lep_ZH, **self.Vprimekwargs(0, False))
+    self.runVprime(event3_ZH, True, False, TVar.SelfDefine_spin0, TVar.JHUGen, TVar.Lep_ZH, **self.Vprimekwargs(50, False))
   def testzpzp_decay(self):
     self.runVprime(event1_ggH, False, True, TVar.SelfDefine_spin0, TVar.JHUGen, TVar.ZZINDEPENDENT, **self.Vprimekwargs(0, True))
   def testzp_spin2(self):
     self.runVprime(event1_ggH, False, True, TVar.SelfDefine_spin2, TVar.JHUGen, TVar.ZZINDEPENDENT, **self.Vprimekwargs(2, True))
   def testzpzp_VBF(self):
-    self.runVprime(event2_VBF, True, True, TVar.SelfDefine_spin0, TVar.JHUGen, TVar.JJVBF, **self.Vprimekwargs(0, True))
+    self.runVprime(event2_VBF, True, True, TVar.SelfDefine_spin0, TVar.JHUGen, TVar.JJVBF, **self.Vprimekwargs(60, True))
   def testzpzp_ZH(self):
-    self.runVprime(event3_ZH, True, True, TVar.SelfDefine_spin0, TVar.JHUGen, TVar.Lep_ZH, **self.Vprimekwargs(0, True))
+    self.runVprime(event3_ZH, True, True, TVar.SelfDefine_spin0, TVar.JHUGen, TVar.Lep_ZH, **self.Vprimekwargs(50, True))
   def runVprime(self, event, isprod, usevpvp, *setprocessargs, **couplings):
     """
     test that with mZ' == mZ, we get the same behavor with Z and Z'
