@@ -27,7 +27,7 @@ Manual for the JHU generator and MELA package
 \begin{center}
 \small
 For simulation, reweighting, and analysis of a single-produced resonance at hadron colliders \\
-(version v7.0.11, release date Dec. 5, 2017, manual date Dec. 5, 2017) \\
+(version v7.1.0, release date Feb. 2, 2017, manual date Feb. 2, 2017) \\
 \normalsize
 \end{center}
 
@@ -590,7 +590,7 @@ As in the spin 0 case, decay to $Z^\prime$ is fully supported.  Each of the para
 
 Some more advanced parameters can be found in \verb|mod_Parameters.F90|.  These include SM parameters such as the masses of particles and electroweak couplings, which can be changed for precise syncing with other generators used, for example.  Look for the \verb|!constants| section.
 
-\verb|mod_Parameters.F90| also contains alternate schemes for setting the spin 0 and spin 2 couplings, specified by Eq.~(11) of \cite{Bolognesi:2012} instead of Eq.~(9) and Eq.~(20) instead of Eq.~(18).  To enable these couplings, set \verb|generate_as| to \verb|.true.| and set the \verb|ahg*| and \verb|ahz*| couplings for spin 0, or set \verb|generate_bis| to \verb|.false.| and set the \verb|c*| couplings for spin 2.
+\verb|mod_Parameters.F90| also contains alternate schemes for setting the spin 0 and spin 2 couplings, specified by Eq.~(11) and Eq.~(20) of \cite{Bolognesi:2012} instead of Eq.~(9) and Eq.~(18).  To enable these couplings, set \verb|generate_as| to \verb|.true.| and set the \verb|ahg*| and \verb|ahz*| couplings for spin 0, or set \verb|generate_bis| to \verb|.false.| and set the \verb|c*| couplings for spin 2.
 
 Note that these alternate couplings only work for processes 0 and 2, not for other production modes that use spin 0 couplings.
 
@@ -770,20 +770,20 @@ Since text processing is simple in Python, the Python MELA interface is especial
 \section{Release notes}
 
 \noindent
-In going from \verb|v7.0.2| to \verb|v7.0.11| (December 5, 2017), the updates are as follows:
+In going from \verb|v7.0.2| to \verb|v7.1.0| (February 2, 2017), the updates are as follows:
 
 \begin{itemize}
-	\item MELA package interface is completely rewritten and streamlined, including new processes implemented
-	\item Add the option for an intermediate $Z^\prime$ or $W^\prime$ in spin-0 resonance decay and in VBF and $VH$ production.  $V^\prime$ can have finite or infinite mass; in the second case, it is equivalent to the contact terms formulation~\cite{Gonzalez-Alonso:2014eva}
-        \item Fix in the \verb|<init>| block when reading an LHE file and reweighting the mass shape
+\item MELA package interface is completely rewritten and streamlined, including new processes implemented
+\item Add the option for an intermediate $Z^\prime$ or $W^\prime$ in spin 0 and spin 2 resonance decay and in VBF and $VH$ production.  $V^\prime$ can have finite or infinite mass; in the second case, the \verb|ghzzp1| coupling is equivalent to the contact terms formulation~\cite{Gonzalez-Alonso:2014eva}
+\item Fix in the \verb|<init>| block when reading an LHE file and reweighting the mass shape
 \end{itemize}
 
 \noindent
 In going from \verb|v7.0.0| to \verb|v7.0.2| (October 4, 2016), the updates are as follows:
 
 \begin{itemize}
-	\item Improvements in $WH$, $VBF$, $H+JJ$, $ttH$, $bbH$, and $t+H$ production.
-	\item New process 114, which combines all $t+H$ channels together.
+\item Improvements in $WH$, $VBF$, $H+JJ$, $ttH$, $bbH$, and $t+H$ production.
+\item New process 114, which combines all $t+H$ channels together.
 \end{itemize}
 
 \noindent
