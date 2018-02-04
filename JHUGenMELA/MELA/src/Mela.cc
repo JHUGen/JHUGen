@@ -416,7 +416,7 @@ void Mela::reset_SelfDCouplings(){
 
   // Vprime / contact couplings
   for (int im=0; im<2; im++){
-    for (int ic=0; ic<SIZE_Vpff; ic++) {
+    for (int ic=0; ic<SIZE_Vpff; ic++){
       selfDZpffcoupl[ic][im] = 0;
       selfDWpffcoupl[ic][im] = 0;
     }
@@ -578,11 +578,11 @@ void Mela::computeVBFAngles(
       daughters.insert(daughters.begin()+1, SimpleParticle_t(-9000, nullVector));
     }
 
-    if (myVerbosity_>=TVar::DEBUG) {
-      MELAout << "Mela::computeVBFAngles: Giving the following particles to TUtil::computeVBFAngles" << endl;
-      for (int i = 0; i <= 3; i++) MELAout << daughters.at(i) << endl;
-      for (int i = 0; i <= 1; i++) MELAout << aparts.at(i) << endl;
-      for (int i = 0; i <= 1; i++) MELAout << mothers.at(i) << endl;
+    if (myVerbosity_>=TVar::DEBUG){
+      MELAout << "Mela::computeVBFAngles: Giving the following particles to TUtil::computeVBFAngles:" << endl;
+      for (unsigned int i=0; i<std::min(daughters.size(), (SimpleParticleCollection_t::size_type) 4); i++) MELAout << daughters.at(i) << endl;
+      for (unsigned int i=0; i<std::min(aparts.size(), (SimpleParticleCollection_t::size_type) 2); i++) MELAout << aparts.at(i) << endl;
+      for (unsigned int i=0; i<std::min(mothers.size(), (SimpleParticleCollection_t::size_type) 2); i++) MELAout << mothers.at(i) << endl;
     }
 
     TUtil::computeVBFAngles(
@@ -604,9 +604,11 @@ void Mela::computeVBFAngles(
     if (!(Phi==Phi)) Phi=0;
     if (!(Phi1==Phi1)) Phi1=0;
 
-    if (myVerbosity_>=TVar::DEBUG) MELAout << "Mela::computeVBFAngles: result = " << Q2V1 << ", " << Q2V2
-                                           << ", " << costheta1 << ", " << costheta2 << ", " << Phi << ", "
-                                           << costhetastar << ", " << Phi1 << endl;
+    if (myVerbosity_>=TVar::DEBUG) MELAout
+      << "Mela::computeVBFAngles: (Q2_1, Q2_2, h1, h2, Phi, hs, Phi1) = "
+      << Q2V1 << ", " << Q2V2 << ", "
+      << costheta1 << ", " << costheta2 << ", " << Phi << ", "
+      << costhetastar << ", " << Phi1 << endl;
   }
   else if (myVerbosity_>=TVar::DEBUG) MELAerr << "Mela::computeVBFAngles: No possible melaCand in TEvtProb to compute angles." << endl;
 }
@@ -677,6 +679,12 @@ void Mela::computeVBFAngles_ComplexBoost(
                                            << ", " << costheta1_real << " + " << costheta1_imag << "i, "
                                            << costheta2_real << " + " << costheta2_imag << "i, " << Phi << ", "
                                            << costhetastar << ", " << Phi1 << endl;
+    if (myVerbosity_>=TVar::DEBUG) MELAout
+      << "Mela::computeVBFAngles_ComplexBoost: (Q2_1, Q2_2, h1, h2, Phi, hs, Phi1) = "
+      << Q2V1 << ", " << Q2V2 << ", "
+      << costheta1_real << " + " << costheta1_imag << "i, "
+      << costheta2_real << " + " << costheta2_imag << "i, "
+      << Phi << ", " << costhetastar << ", " << Phi1 << endl;
   }
   else if (myVerbosity_>=TVar::DEBUG) MELAerr << "Mela::computeVBFAngles_ComplexBoost: No possible melaCand in TEvtProb to compute angles." << endl;
 }
@@ -775,9 +783,10 @@ void Mela::computeVHAngles(
     if (!(Phi==Phi)) Phi=0;
     if (!(Phi1==Phi1)) Phi1=0;
 
-    if (myVerbosity_>=TVar::DEBUG) MELAout << "Mela::computeVHAngles: result = "
-                                           << costheta1 << ", " << costheta2 << ", " << Phi << ", "
-                                           << costhetastar << ", " << Phi1 << endl;
+    if (myVerbosity_>=TVar::DEBUG) MELAout
+      << "Mela::computeVHAngles: (h1, h2, Phi, hs, Phi1) = "
+      << costheta1 << ", " << costheta2 << ", " << Phi << ", "
+      << costhetastar << ", " << Phi1 << endl;
   }
   else if (myVerbosity_>=TVar::DEBUG) MELAerr << "Mela::computeVHAngles: No possible melaCand in TEvtProb to compute angles." << endl;
 }
@@ -981,9 +990,9 @@ void Mela::computeP(
         double phi1_max = TMath::Pi();
         double phi1_step = (phi1_max - phi1_min) / double(gridsize_phi1);
 
-        for (int i_hs = 0; i_hs < gridsize_hs + 1; i_hs++) {
+        for (int i_hs = 0; i_hs < gridsize_hs + 1; i_hs++){
           double hs_val = hs_min + i_hs * hs_step;
-          for (int i_phi1 = 0; i_phi1 < gridsize_phi1 +1; i_phi1++) {
+          for (int i_phi1 = 0; i_phi1 < gridsize_phi1 + 1; i_phi1++){
             double phi1_val = phi1_min + i_phi1 * phi1_step;
             float temp_prob=0;
 
