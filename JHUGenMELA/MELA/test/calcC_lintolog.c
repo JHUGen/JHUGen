@@ -3097,7 +3097,7 @@ void get_PAvgProfile_MCFM_JJPROD_S_HSMHiggs_13TeV(TString strprod, int sqrts=13,
     cout << "Nentries = " << nEntries << " | mzz = " << firstVal << " - " << lastVal << "(" << infimum << ", " << supremum << ")" << endl;
 
     float divisor=15000;
-    if (prod==TVar::Had_ZH_S || prod==TVar::Had_WH_S) divisor=15000;
+    if (prod==TVar::Had_ZH_S || prod==TVar::Had_WH_S) divisor=12000;
     int nbins = index[ic].size()/divisor;
     const int nbins_th=10/*50*/;
     while (nbins<nbins_th){
@@ -3560,7 +3560,7 @@ void get_PAvgProfile_MCFM_JJPROD_bkgZZ_13TeV(TString strprod, int sqrts=13, bool
 
     float divisor=25000*(ic==2)+40000*(ic<2);
     if (prod==TVar::Had_ZH) divisor=15000;
-    if (prod==TVar::Had_WH) divisor=25000;
+    if (prod==TVar::Had_WH) divisor=15000;
     int nbins = index[ic].size()/divisor;
     int nbins_th=10/*50*/;
     if (prod==TVar::Had_WH) nbins_th=8;
@@ -8276,13 +8276,20 @@ void produce_PAvgSmooth_MCFM_JJPROD_S_HSMHiggs(TString strprod, int sqrts=13){
   }
   TVar::MatrixElement me = TVar::MCFM;
   TVar::Process proc = TVar::HSMHiggs;
+  //generic_PAvgSmoothProducer_withDecay(
+  //  me, prod, proc,
+  //  "../data/pAvgLinToLog_ANALYTICAL_ZZGG_HSMHiggs.root", "tg_anaPdfInt",
+  //  &getPatch_a0plusa1timesX,
+  //  &getPatch_a0plusa1overX,
+  //  sqrts
+  //  );
   generic_PAvgSmoothProducer_withDecay(
     me, prod, proc,
-    "../data/pAvgLinToLog_ANALYTICAL_ZZGG_HSMHiggs.root", "tg_anaPdfInt",
-    &getPatch_a0plusa1timesX,
-    &getPatch_a0plusa1overX,
-    sqrts
-    );
+    &getFcn_a0plusa1timesX,
+    &getFcn_a0plusa1overX,
+    sqrts,
+    true, false
+  );
 }
 
 /* SPECIFIC COMMENT: PATCHING DONE USING FUNCTIONS */
