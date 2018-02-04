@@ -35,6 +35,14 @@ template<> MELAOutputStreamer& MELAOutputStreamer::operator<< <MELAParticle>(MEL
     << val.t() << " )";
   return *this;
 }
+template<> MELAOutputStreamer& MELAOutputStreamer::operator<< <SimpleParticle_t>(SimpleParticle_t const& val){
+  *this << "(" << val.first << ") (X,Y,Z,T)=( "
+    << val.second.X() << " , "
+    << val.second.Y() << " , "
+    << val.second.Z() << " , "
+    << val.second.T() << " )";
+  return *this;
+}
 template<> MELAOutputStreamer& MELAOutputStreamer::operator<< <MELACandidate>(MELACandidate const& val){
   int ip=0;
   *this << "\tHas " << val.getNMothers() << " mothers" << endl;

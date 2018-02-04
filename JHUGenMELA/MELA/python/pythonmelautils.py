@@ -145,7 +145,7 @@ class MultiDimensionalCppArray(object):
       if self.getitem is None: self.compilecpp(self.writecpp())
       if item >= self.dimensions[0]:
         raise IndexError("Index {} out of range (0-{})".format(item, self.dimensions[0]))
-      return self.getitem(*(self.othercppargs.values()+[item]))
+      return self.getitem(*(list(self.othercppargs.values())+[item]))
 
   def __setitem__(self, item, value):
     if self.ndim > 1:
@@ -154,7 +154,7 @@ class MultiDimensionalCppArray(object):
       if self.setitem is None: self.compilecpp()
       if item >= self.dimensions[0]:
         raise IndexError("Index {} out of range (0-{})".format(item, self.dimensions[0]))
-      self.setitem(*(self.othercppargs.values()+[item, value]))
+      self.setitem(*(list(self.othercppargs.values())+[item, value]))
 
 class SelfDParameter(object):
   def __init__(self, arrayname, *indices):

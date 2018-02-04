@@ -34,10 +34,16 @@ which is useful for quick tests.
 See examples at the bottom.
 """
 
+from __future__ import print_function
 from collections import namedtuple
 import ROOT
 from pythonmelautils import MultiDimensionalCppArray, NamedTemporaryMacro, SelfDParameter, SelfDCoupling
 from ROOT import TUtil, TVar
+
+try:
+  basestring
+except NameError:
+  basestring = str
 
 class Mela(object):
   counter = 0
@@ -196,6 +202,8 @@ class Mela(object):
                ("selfDGqqcoupl", (ROOT.py_SIZE_GQQ, 2)),
                ("selfDGggcoupl", (ROOT.py_SIZE_GGG, 2)),
                ("selfDGvvcoupl", (ROOT.py_SIZE_GVV, 2)),
+               ("selfDGvvpcoupl", (ROOT.py_SIZE_GVV, 2)),
+               ("selfDGvpvpcoupl", (ROOT.py_SIZE_GVV, 2)),
               )
 
     f = None
@@ -426,7 +434,87 @@ class Mela(object):
   kappa_tilde = SelfDCoupling("selfDHqqcoupl", 0, ROOT.py_gHIGGS_KAPPA_TILDE)
 
   ghzzp1 = SelfDCoupling("selfDHzzpcoupl", ROOT.py_gHIGGS_VV_1)
+  ghzzp2 = SelfDCoupling("selfDHzzpcoupl", ROOT.py_gHIGGS_VV_2)
+  ghzzp3 = SelfDCoupling("selfDHzzpcoupl", ROOT.py_gHIGGS_VV_3)
+  ghzzp4 = SelfDCoupling("selfDHzzpcoupl", ROOT.py_gHIGGS_VV_4)
+
+  ghzpgs2 = SelfDCoupling("selfDHzzpcoupl", ROOT.py_gHIGGS_ZA_2)
+  ghzpgs3 = SelfDCoupling("selfDHzzpcoupl", ROOT.py_gHIGGS_ZA_3)
+  ghzpgs4 = SelfDCoupling("selfDHzzpcoupl", ROOT.py_gHIGGS_ZA_4)
+
+  ghzzp1_prime = SelfDCoupling("selfDHzzpcoupl", ROOT.py_gHIGGS_VV_1_PRIME)
+  ghzzp1_prime2 = SelfDCoupling("selfDHzzpcoupl", ROOT.py_gHIGGS_VV_1_PRIME2)
+  ghzzp1_prime3 = SelfDCoupling("selfDHzzpcoupl", ROOT.py_gHIGGS_VV_1_PRIME3)
+  ghzzp1_prime4 = SelfDCoupling("selfDHzzpcoupl", ROOT.py_gHIGGS_VV_1_PRIME4)
+  ghzzp1_prime5 = SelfDCoupling("selfDHzzpcoupl", ROOT.py_gHIGGS_VV_1_PRIME5)
+
+  ghzzp2_prime = SelfDCoupling("selfDHzzpcoupl", ROOT.py_gHIGGS_VV_2_PRIME)
+  ghzzp2_prime2 = SelfDCoupling("selfDHzzpcoupl", ROOT.py_gHIGGS_VV_2_PRIME2)
+  ghzzp2_prime3 = SelfDCoupling("selfDHzzpcoupl", ROOT.py_gHIGGS_VV_2_PRIME3)
+  ghzzp2_prime4 = SelfDCoupling("selfDHzzpcoupl", ROOT.py_gHIGGS_VV_2_PRIME4)
+  ghzzp2_prime5 = SelfDCoupling("selfDHzzpcoupl", ROOT.py_gHIGGS_VV_2_PRIME5)
+
+  ghzzp3_prime = SelfDCoupling("selfDHzzpcoupl", ROOT.py_gHIGGS_VV_3_PRIME)
+  ghzzp3_prime2 = SelfDCoupling("selfDHzzpcoupl", ROOT.py_gHIGGS_VV_3_PRIME2)
+  ghzzp3_prime3 = SelfDCoupling("selfDHzzpcoupl", ROOT.py_gHIGGS_VV_3_PRIME3)
+  ghzzp3_prime4 = SelfDCoupling("selfDHzzpcoupl", ROOT.py_gHIGGS_VV_3_PRIME4)
+  ghzzp3_prime5 = SelfDCoupling("selfDHzzpcoupl", ROOT.py_gHIGGS_VV_3_PRIME5)
+
+  ghzzp4_prime = SelfDCoupling("selfDHzzpcoupl", ROOT.py_gHIGGS_VV_4_PRIME)
+  ghzzp4_prime2 = SelfDCoupling("selfDHzzpcoupl", ROOT.py_gHIGGS_VV_4_PRIME2)
+  ghzzp4_prime3 = SelfDCoupling("selfDHzzpcoupl", ROOT.py_gHIGGS_VV_4_PRIME3)
+  ghzzp4_prime4 = SelfDCoupling("selfDHzzpcoupl", ROOT.py_gHIGGS_VV_4_PRIME4)
+  ghzzp4_prime5 = SelfDCoupling("selfDHzzpcoupl", ROOT.py_gHIGGS_VV_4_PRIME5)
+
+  ghzpgs1_prime2 = SelfDCoupling("selfDHzzpcoupl", ROOT.py_gHIGGS_ZA_1_PRIME2)
+
+  ghzzp1_prime6 = SelfDCoupling("selfDHzzpcoupl", ROOT.py_gHIGGS_VV_1_PRIME6)
+  ghzzp1_prime7 = SelfDCoupling("selfDHzzpcoupl", ROOT.py_gHIGGS_VV_1_PRIME7)
+  ghzzp2_prime6 = SelfDCoupling("selfDHzzpcoupl", ROOT.py_gHIGGS_VV_2_PRIME6)
+  ghzzp2_prime7 = SelfDCoupling("selfDHzzpcoupl", ROOT.py_gHIGGS_VV_2_PRIME7)
+  ghzzp3_prime6 = SelfDCoupling("selfDHzzpcoupl", ROOT.py_gHIGGS_VV_3_PRIME6)
+  ghzzp3_prime7 = SelfDCoupling("selfDHzzpcoupl", ROOT.py_gHIGGS_VV_3_PRIME7)
+  ghzzp4_prime6 = SelfDCoupling("selfDHzzpcoupl", ROOT.py_gHIGGS_VV_3_PRIME6)
+  ghzzp4_prime7 = SelfDCoupling("selfDHzzpcoupl", ROOT.py_gHIGGS_VV_3_PRIME7)
+
   ghzpzp1 = SelfDCoupling("selfDHzpzpcoupl", ROOT.py_gHIGGS_VV_1)
+  ghzpzp2 = SelfDCoupling("selfDHzpzpcoupl", ROOT.py_gHIGGS_VV_2)
+  ghzpzp3 = SelfDCoupling("selfDHzpzpcoupl", ROOT.py_gHIGGS_VV_3)
+  ghzpzp4 = SelfDCoupling("selfDHzpzpcoupl", ROOT.py_gHIGGS_VV_4)
+
+  ghzpzp1_prime = SelfDCoupling("selfDHzpzpcoupl", ROOT.py_gHIGGS_VV_1_PRIME)
+  ghzpzp1_prime2 = SelfDCoupling("selfDHzpzpcoupl", ROOT.py_gHIGGS_VV_1_PRIME2)
+  ghzpzp1_prime3 = SelfDCoupling("selfDHzpzpcoupl", ROOT.py_gHIGGS_VV_1_PRIME3)
+  ghzpzp1_prime4 = SelfDCoupling("selfDHzpzpcoupl", ROOT.py_gHIGGS_VV_1_PRIME4)
+  ghzpzp1_prime5 = SelfDCoupling("selfDHzpzpcoupl", ROOT.py_gHIGGS_VV_1_PRIME5)
+
+  ghzpzp2_prime = SelfDCoupling("selfDHzpzpcoupl", ROOT.py_gHIGGS_VV_2_PRIME)
+  ghzpzp2_prime2 = SelfDCoupling("selfDHzpzpcoupl", ROOT.py_gHIGGS_VV_2_PRIME2)
+  ghzpzp2_prime3 = SelfDCoupling("selfDHzpzpcoupl", ROOT.py_gHIGGS_VV_2_PRIME3)
+  ghzpzp2_prime4 = SelfDCoupling("selfDHzpzpcoupl", ROOT.py_gHIGGS_VV_2_PRIME4)
+  ghzpzp2_prime5 = SelfDCoupling("selfDHzpzpcoupl", ROOT.py_gHIGGS_VV_2_PRIME5)
+
+  ghzpzp3_prime = SelfDCoupling("selfDHzpzpcoupl", ROOT.py_gHIGGS_VV_3_PRIME)
+  ghzpzp3_prime2 = SelfDCoupling("selfDHzpzpcoupl", ROOT.py_gHIGGS_VV_3_PRIME2)
+  ghzpzp3_prime3 = SelfDCoupling("selfDHzpzpcoupl", ROOT.py_gHIGGS_VV_3_PRIME3)
+  ghzpzp3_prime4 = SelfDCoupling("selfDHzpzpcoupl", ROOT.py_gHIGGS_VV_3_PRIME4)
+  ghzpzp3_prime5 = SelfDCoupling("selfDHzpzpcoupl", ROOT.py_gHIGGS_VV_3_PRIME5)
+
+  ghzpzp4_prime = SelfDCoupling("selfDHzpzpcoupl", ROOT.py_gHIGGS_VV_4_PRIME)
+  ghzpzp4_prime2 = SelfDCoupling("selfDHzpzpcoupl", ROOT.py_gHIGGS_VV_4_PRIME2)
+  ghzpzp4_prime3 = SelfDCoupling("selfDHzpzpcoupl", ROOT.py_gHIGGS_VV_4_PRIME3)
+  ghzpzp4_prime4 = SelfDCoupling("selfDHzpzpcoupl", ROOT.py_gHIGGS_VV_4_PRIME4)
+  ghzpzp4_prime5 = SelfDCoupling("selfDHzpzpcoupl", ROOT.py_gHIGGS_VV_4_PRIME5)
+
+  ghzpzp1_prime6 = SelfDCoupling("selfDHzpzpcoupl", ROOT.py_gHIGGS_VV_1_PRIME6)
+  ghzpzp1_prime7 = SelfDCoupling("selfDHzpzpcoupl", ROOT.py_gHIGGS_VV_1_PRIME7)
+  ghzpzp2_prime6 = SelfDCoupling("selfDHzpzpcoupl", ROOT.py_gHIGGS_VV_2_PRIME6)
+  ghzpzp2_prime7 = SelfDCoupling("selfDHzpzpcoupl", ROOT.py_gHIGGS_VV_2_PRIME7)
+  ghzpzp3_prime6 = SelfDCoupling("selfDHzpzpcoupl", ROOT.py_gHIGGS_VV_3_PRIME6)
+  ghzpzp3_prime7 = SelfDCoupling("selfDHzpzpcoupl", ROOT.py_gHIGGS_VV_3_PRIME7)
+  ghzpzp4_prime6 = SelfDCoupling("selfDHzpzpcoupl", ROOT.py_gHIGGS_VV_3_PRIME6)
+  ghzpzp4_prime7 = SelfDCoupling("selfDHzpzpcoupl", ROOT.py_gHIGGS_VV_3_PRIME7)
+
   ezp_El_left = SelfDCoupling("selfDZpffcoupl", ROOT.py_gHIGGS_Vp_El_left)
   ezp_El_right = SelfDCoupling("selfDZpffcoupl", ROOT.py_gHIGGS_Vp_El_right)
   ezp_Mu_left = SelfDCoupling("selfDZpffcoupl", ROOT.py_gHIGGS_Vp_Mu_left)
@@ -492,6 +580,46 @@ class Mela(object):
   b8 = SelfDCoupling("selfDGvvcoupl", ROOT.py_gGRAVITON_VV_8)
   b9 = SelfDCoupling("selfDGvvcoupl", ROOT.py_gGRAVITON_VV_9)
   b10 = SelfDCoupling("selfDGvvcoupl", ROOT.py_gGRAVITON_VV_10)
+
+  bzgs1 = SelfDCoupling("selfDGvvcoupl", ROOT.py_gGRAVITON_ZA_1)
+  bzgs2 = SelfDCoupling("selfDGvvcoupl", ROOT.py_gGRAVITON_ZA_2)
+  bzgs3 = SelfDCoupling("selfDGvvcoupl", ROOT.py_gGRAVITON_ZA_3)
+  bzgs4 = SelfDCoupling("selfDGvvcoupl", ROOT.py_gGRAVITON_ZA_4)
+  bzgs8 = SelfDCoupling("selfDGvvcoupl", ROOT.py_gGRAVITON_ZA_8)
+
+  bgsgs1 = SelfDCoupling("selfDGvvcoupl", ROOT.py_gGRAVITON_AA_1)
+  bgsgs2 = SelfDCoupling("selfDGvvcoupl", ROOT.py_gGRAVITON_AA_2)
+  bgsgs3 = SelfDCoupling("selfDGvvcoupl", ROOT.py_gGRAVITON_AA_3)
+  bgsgs4 = SelfDCoupling("selfDGvvcoupl", ROOT.py_gGRAVITON_AA_4)
+  bgsgs8 = SelfDCoupling("selfDGvvcoupl", ROOT.py_gGRAVITON_AA_8)
+
+  bzzp1 = SelfDCoupling("selfDGvvpcoupl", ROOT.py_gGRAVITON_VV_1)
+  bzzp2 = SelfDCoupling("selfDGvvpcoupl", ROOT.py_gGRAVITON_VV_2)
+  bzzp3 = SelfDCoupling("selfDGvvpcoupl", ROOT.py_gGRAVITON_VV_3)
+  bzzp4 = SelfDCoupling("selfDGvvpcoupl", ROOT.py_gGRAVITON_VV_4)
+  bzzp5 = SelfDCoupling("selfDGvvpcoupl", ROOT.py_gGRAVITON_VV_5)
+  bzzp6 = SelfDCoupling("selfDGvvpcoupl", ROOT.py_gGRAVITON_VV_6)
+  bzzp7 = SelfDCoupling("selfDGvvpcoupl", ROOT.py_gGRAVITON_VV_7)
+  bzzp8 = SelfDCoupling("selfDGvvpcoupl", ROOT.py_gGRAVITON_VV_8)
+  bzzp9 = SelfDCoupling("selfDGvvpcoupl", ROOT.py_gGRAVITON_VV_9)
+  bzzp10 = SelfDCoupling("selfDGvvpcoupl", ROOT.py_gGRAVITON_VV_10)
+
+  bzpgs1 = SelfDCoupling("selfDGvvpcoupl", ROOT.py_gGRAVITON_ZA_1)
+  bzpgs2 = SelfDCoupling("selfDGvvpcoupl", ROOT.py_gGRAVITON_ZA_2)
+  bzpgs3 = SelfDCoupling("selfDGvvpcoupl", ROOT.py_gGRAVITON_ZA_3)
+  bzpgs4 = SelfDCoupling("selfDGvvpcoupl", ROOT.py_gGRAVITON_ZA_4)
+  bzpgs8 = SelfDCoupling("selfDGvvpcoupl", ROOT.py_gGRAVITON_ZA_8)
+
+  bzpzp1 = SelfDCoupling("selfDGvpvpcoupl", ROOT.py_gGRAVITON_VV_1)
+  bzpzp2 = SelfDCoupling("selfDGvpvpcoupl", ROOT.py_gGRAVITON_VV_2)
+  bzpzp3 = SelfDCoupling("selfDGvpvpcoupl", ROOT.py_gGRAVITON_VV_3)
+  bzpzp4 = SelfDCoupling("selfDGvpvpcoupl", ROOT.py_gGRAVITON_VV_4)
+  bzpzp5 = SelfDCoupling("selfDGvpvpcoupl", ROOT.py_gGRAVITON_VV_5)
+  bzpzp6 = SelfDCoupling("selfDGvpvpcoupl", ROOT.py_gGRAVITON_VV_6)
+  bzpzp7 = SelfDCoupling("selfDGvpvpcoupl", ROOT.py_gGRAVITON_VV_7)
+  bzpzp8 = SelfDCoupling("selfDGvpvpcoupl", ROOT.py_gGRAVITON_VV_8)
+  bzpzp9 = SelfDCoupling("selfDGvpvpcoupl", ROOT.py_gGRAVITON_VV_9)
+  bzpzp10 = SelfDCoupling("selfDGvpvpcoupl", ROOT.py_gGRAVITON_VV_10)
 
 
 
@@ -619,12 +747,12 @@ if __name__ == "__main__":
     m.ghz1, m.ghz2, m.ghz4, m.ghz1_prime2 = _
     m.setProcess(TVar.SelfDefine_spin0, TVar.JHUGen, TVar.ZZINDEPENDENT)
     dec = m.computeP(False)
-    print prod, dec, prod*dec
+    print(prod, dec, prod*dec)
 
-  print m.computeDecayAngles()
-  print m.computeVBFAngles()
-  print m.computeVBFAngles_ComplexBoost()
-  print m.computeVHAngles(TVar.Had_WH)
-  print "propagator:"
-  print "   BW:", m.getXPropagator(TVar.FixedWidth)
-  print "  CPS:", m.getXPropagator(TVar.CPS)
+  print(m.computeDecayAngles())
+  print(m.computeVBFAngles())
+  print(m.computeVBFAngles_ComplexBoost())
+  print(m.computeVHAngles(TVar.Had_WH))
+  print("propagator:")
+  print("   BW:", m.getXPropagator(TVar.FixedWidth))
+  print("  CPS:", m.getXPropagator(TVar.CPS))

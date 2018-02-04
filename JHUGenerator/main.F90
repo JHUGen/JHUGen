@@ -331,9 +331,9 @@ integer :: NumArgs,NArg
 logical :: help, DryRun, success, SetLastArgument, interfSet
 logical :: SetRenScheme, SetMuRenMultiplier, SetFacScheme, SetMuFacMultiplier
 logical :: SetAnomalousSpin0gg, Setghg2, SetAnomalousSpin0ZZ, Setghz1
-logical :: SetZgammacoupling, Setgammagammacoupling
-logical :: SetAnomalousSpin1qq, Setspin1qqleft, Setspin1qqright
-logical :: SetAnomalousSpin2gg, SetAnomalousSpin2qq, Setspin2qqleft, Setspin2qqright
+logical :: SetZgammacoupling, Setgammagammacoupling, SetZprimegammacoupling
+logical :: SetAnomalousSpin1qq, Setspin1qqleft, Setspin1qqright, SetSpin1VV
+logical :: SetAnomalousSpin2gg, SetAnomalousSpin2qq, Setspin2qqleft, Setspin2qqright, SetSpin2VV
 logical :: SetAnomalousHff, Setkappa
 logical :: SetZprimeff, SetWprimeff, SetHZprime, SetHWprime
 logical :: SetMZprime, SetGaZprime, SetMWprime, SetGaWprime
@@ -371,13 +371,16 @@ logical :: SetColliderEnergy
    Setghz1=.false.
    SetZgammacoupling=.false.
    Setgammagammacoupling=.false.
+   SetZprimegammacoupling=.false.
    SetAnomalousSpin1qq=.false.
    Setspin1qqleft=.false.
    Setspin1qqright=.false.
+   Setspin1VV=.false.
    SetAnomalousSpin2gg=.false.
    SetAnomalousSpin2qq=.false.
    Setspin2qqleft=.false.
    Setspin2qqright=.false.
+   Setspin2VV=.false.
    SetAnomalousHff=.false.
    Setkappa=.false.
 
@@ -628,8 +631,8 @@ logical :: SetColliderEnergy
     !spin 1
     call ReadCommandLineArgument(arg, "zprime_qq_left", success, zprime_qq_left, success2=SetAnomalousSpin1qq, success3=Setspin1qqleft)
     call ReadCommandLineArgument(arg, "zprime_qq_right", success, zprime_qq_right, success2=SetAnomalousSpin1qq, success3=Setspin1qqright)
-    call ReadCommandLineArgument(arg, "zprime_zz_1", success, zprime_zz_1)
-    call ReadCommandLineArgument(arg, "zprime_zz_2", success, zprime_zz_2)
+    call ReadCommandLineArgument(arg, "zprime_zz_1", success, zprime_zz_1, success2=SetSpin1VV)
+    call ReadCommandLineArgument(arg, "zprime_zz_2", success, zprime_zz_2, success2=SetSpin1VV)
 
     !spin 2
     call ReadCommandLineArgument(arg, "a1", success, a1, success2=SetAnomalousSpin2gg)
@@ -639,16 +642,28 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "a5", success, a5, success2=SetAnomalousSpin2gg)
     call ReadCommandLineArgument(arg, "graviton_qq_left", success, graviton_qq_left, success2=SetAnomalousSpin2qq, success3=Setspin2qqleft)
     call ReadCommandLineArgument(arg, "graviton_qq_right", success, graviton_qq_right, success2=SetAnomalousSpin2qq, success3=Setspin2qqright)
-    call ReadCommandLineArgument(arg, "b1", success, b1)
-    call ReadCommandLineArgument(arg, "b2", success, b2)
-    call ReadCommandLineArgument(arg, "b3", success, b3)
-    call ReadCommandLineArgument(arg, "b4", success, b4)
-    call ReadCommandLineArgument(arg, "b5", success, b5)
-    call ReadCommandLineArgument(arg, "b6", success, b6)
-    call ReadCommandLineArgument(arg, "b7", success, b7)
-    call ReadCommandLineArgument(arg, "b8", success, b8)
-    call ReadCommandLineArgument(arg, "b9", success, b9)
-    call ReadCommandLineArgument(arg, "b10", success, b10)
+    call ReadCommandLineArgument(arg, "b1", success, b1, success2=SetSpin2VV)
+    call ReadCommandLineArgument(arg, "b2", success, b2, success2=SetSpin2VV)
+    call ReadCommandLineArgument(arg, "b3", success, b3, success2=SetSpin2VV)
+    call ReadCommandLineArgument(arg, "b4", success, b4, success2=SetSpin2VV)
+    call ReadCommandLineArgument(arg, "b5", success, b5, success2=SetSpin2VV)
+    call ReadCommandLineArgument(arg, "b6", success, b6, success2=SetSpin2VV)
+    call ReadCommandLineArgument(arg, "b7", success, b7, success2=SetSpin2VV)
+    call ReadCommandLineArgument(arg, "b8", success, b8, success2=SetSpin2VV)
+    call ReadCommandLineArgument(arg, "b9", success, b9, success2=SetSpin2VV)
+    call ReadCommandLineArgument(arg, "b10", success, b10, success2=SetSpin2VV)
+
+    call ReadCommandLineArgument(arg, "bzgs1", success, bzgs1, success2=SetSpin2VV, success3=SetZgammacoupling)
+    call ReadCommandLineArgument(arg, "bzgs2", success, bzgs2, success2=SetSpin2VV, success3=SetZgammacoupling)
+    call ReadCommandLineArgument(arg, "bzgs3", success, bzgs3, success2=SetSpin2VV, success3=SetZgammacoupling)
+    call ReadCommandLineArgument(arg, "bzgs4", success, bzgs4, success2=SetSpin2VV, success3=SetZgammacoupling)
+    call ReadCommandLineArgument(arg, "bzgs8", success, bzgs8, success2=SetSpin2VV, success3=SetZgammacoupling)
+
+    call ReadCommandLineArgument(arg, "bgsgs1", success, bgsgs1, success2=SetSpin2VV, success3=Setgammagammacoupling)
+    call ReadCommandLineArgument(arg, "bgsgs2", success, bgsgs2, success2=SetSpin2VV, success3=Setgammagammacoupling)
+    call ReadCommandLineArgument(arg, "bgsgs3", success, bgsgs3, success2=SetSpin2VV, success3=Setgammagammacoupling)
+    call ReadCommandLineArgument(arg, "bgsgs4", success, bgsgs4, success2=SetSpin2VV, success3=Setgammagammacoupling)
+    call ReadCommandLineArgument(arg, "bgsgs8", success, bgsgs8, success2=SetSpin2VV, success3=Setgammagammacoupling)
 
     !Hff couplings
     call ReadCommandLineArgument(arg, "kappa", success, kappa, success2=SetAnomalousHff, success3=Setkappa)
@@ -783,8 +798,116 @@ logical :: SetColliderEnergy
 
 
     !contact interactions
+    !spin 0 ZZp couplings
     call ReadCommandLineArgument(arg, "ghzzp1", success, ghzzp1, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzzp2", success, ghzzp2, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzzp3", success, ghzzp3, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzzp4", success, ghzzp4, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+
+    call ReadCommandLineArgument(arg, "ghzzp1_prime", success, ghzzp1_prime, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzzp1_prime2", success, ghzzp1_prime2, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzzp1_prime3", success, ghzzp1_prime3, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzzp1_prime4", success, ghzzp1_prime4, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzzp1_prime5", success, ghzzp1_prime5, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzzp1_prime6", success, ghzzp1_prime6, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzzp1_prime7", success, ghzzp1_prime7, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+
+    call ReadCommandLineArgument(arg, "ghzzp2_prime", success, ghzzp2_prime, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzzp2_prime2", success, ghzzp2_prime2, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzzp2_prime3", success, ghzzp2_prime3, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzzp2_prime4", success, ghzzp2_prime4, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzzp2_prime5", success, ghzzp2_prime5, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzzp2_prime6", success, ghzzp2_prime6, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzzp2_prime7", success, ghzzp2_prime7, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+
+    call ReadCommandLineArgument(arg, "ghzzp3_prime", success, ghzzp3_prime, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzzp3_prime2", success, ghzzp3_prime2, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzzp3_prime3", success, ghzzp3_prime3, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzzp3_prime4", success, ghzzp3_prime4, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzzp3_prime5", success, ghzzp3_prime5, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzzp3_prime6", success, ghzzp3_prime6, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzzp3_prime7", success, ghzzp3_prime7, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+
+    call ReadCommandLineArgument(arg, "ghzzp4_prime", success, ghzzp4_prime, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzzp4_prime2", success, ghzzp4_prime2, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzzp4_prime3", success, ghzzp4_prime3, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzzp4_prime4", success, ghzzp4_prime4, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzzp4_prime5", success, ghzzp4_prime5, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzzp4_prime6", success, ghzzp4_prime6, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzzp4_prime7", success, ghzzp4_prime7, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+
+    !spin 0 Zpgamma couplings
+    call ReadCommandLineArgument(arg, "ghzpgs1_prime2", success, ghzpgs1_prime2, success2=SetZgammacoupling, success3=includeVprime, success4=SetHZprime, success5=SetZprimegammacoupling)
+    call ReadCommandLineArgument(arg, "ghzpgs2", success, ghzpgs2, success2=SetZgammacoupling, success3=includeVprime, success4=SetHZprime, success5=SetZprimegammacoupling)
+    call ReadCommandLineArgument(arg, "ghzpgs3", success, ghzpgs3, success2=SetZgammacoupling, success3=includeVprime, success4=SetHZprime, success5=SetZprimegammacoupling)
+    call ReadCommandLineArgument(arg, "ghzpgs4", success, ghzpgs4, success2=SetZgammacoupling, success3=includeVprime, success4=SetHZprime, success5=SetZprimegammacoupling)
+
+    !spin 0 ZpZp couplings
     call ReadCommandLineArgument(arg, "ghzpzp1", success, ghzpzp1, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzpzp2", success, ghzpzp2, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzpzp3", success, ghzpzp3, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzpzp4", success, ghzpzp4, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+
+    call ReadCommandLineArgument(arg, "ghzpzp1_prime", success, ghzpzp1_prime, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzpzp1_prime2", success, ghzpzp1_prime2, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzpzp1_prime3", success, ghzpzp1_prime3, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzpzp1_prime4", success, ghzpzp1_prime4, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzpzp1_prime5", success, ghzpzp1_prime5, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzpzp1_prime6", success, ghzpzp1_prime6, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzpzp1_prime7", success, ghzpzp1_prime7, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+
+    call ReadCommandLineArgument(arg, "ghzpzp2_prime", success, ghzpzp2_prime, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzpzp2_prime2", success, ghzpzp2_prime2, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzpzp2_prime3", success, ghzpzp2_prime3, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzpzp2_prime4", success, ghzpzp2_prime4, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzpzp2_prime5", success, ghzpzp2_prime5, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzpzp2_prime6", success, ghzpzp2_prime6, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzpzp2_prime7", success, ghzpzp2_prime7, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+
+    call ReadCommandLineArgument(arg, "ghzpzp3_prime", success, ghzpzp3_prime, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzpzp3_prime2", success, ghzpzp3_prime2, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzpzp3_prime3", success, ghzpzp3_prime3, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzpzp3_prime4", success, ghzpzp3_prime4, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzpzp3_prime5", success, ghzpzp3_prime5, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzpzp3_prime6", success, ghzpzp3_prime6, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzpzp3_prime7", success, ghzpzp3_prime7, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+
+    call ReadCommandLineArgument(arg, "ghzpzp4_prime", success, ghzpzp4_prime, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzpzp4_prime2", success, ghzpzp4_prime2, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzpzp4_prime3", success, ghzpzp4_prime3, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzpzp4_prime4", success, ghzpzp4_prime4, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzpzp4_prime5", success, ghzpzp4_prime5, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzpzp4_prime6", success, ghzpzp4_prime6, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzpzp4_prime7", success, ghzpzp4_prime7, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
+
+    call ReadCommandLineArgument(arg, "bzzp1", success, bzzp1, success2=SetSpin2VV, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "bzzp2", success, bzzp2, success2=SetSpin2VV, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "bzzp3", success, bzzp3, success2=SetSpin2VV, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "bzzp4", success, bzzp4, success2=SetSpin2VV, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "bzzp5", success, bzzp5, success2=SetSpin2VV, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "bzzp6", success, bzzp6, success2=SetSpin2VV, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "bzzp7", success, bzzp7, success2=SetSpin2VV, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "bzzp8", success, bzzp8, success2=SetSpin2VV, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "bzzp9", success, bzzp9, success2=SetSpin2VV, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "bzzp10", success, bzzp10, success2=SetSpin2VV, success3=includeVprime, success4=SetHZprime)
+
+    call ReadCommandLineArgument(arg, "bzpzp1", success, bzpzp1, success2=SetSpin2VV, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "bzpzp2", success, bzpzp2, success2=SetSpin2VV, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "bzpzp3", success, bzpzp3, success2=SetSpin2VV, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "bzpzp4", success, bzpzp4, success2=SetSpin2VV, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "bzpzp5", success, bzpzp5, success2=SetSpin2VV, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "bzpzp6", success, bzpzp6, success2=SetSpin2VV, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "bzpzp7", success, bzpzp7, success2=SetSpin2VV, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "bzpzp8", success, bzpzp8, success2=SetSpin2VV, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "bzpzp9", success, bzpzp9, success2=SetSpin2VV, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "bzpzp10", success, bzpzp10, success2=SetSpin2VV, success3=includeVprime, success4=SetHZprime)
+
+    call ReadCommandLineArgument(arg, "bzpgs1", success, bzpgs1, success2=SetSpin2VV, success3=SetZgammacoupling, success4=includeVprime, success5=SetHZprime)
+    call ReadCommandLineArgument(arg, "bzpgs2", success, bzpgs2, success2=SetSpin2VV, success3=SetZgammacoupling, success4=includeVprime, success5=SetHZprime)
+    call ReadCommandLineArgument(arg, "bzpgs3", success, bzpgs3, success2=SetSpin2VV, success3=SetZgammacoupling, success4=includeVprime, success5=SetHZprime)
+    call ReadCommandLineArgument(arg, "bzpgs4", success, bzpgs4, success2=SetSpin2VV, success3=SetZgammacoupling, success4=includeVprime, success5=SetHZprime)
+    call ReadCommandLineArgument(arg, "bzpgs8", success, bzpgs8, success2=SetSpin2VV, success3=SetZgammacoupling, success4=includeVprime, success5=SetHZprime)
+
     call ReadCommandLineArgument(arg, "ezp_El_left", success, ezp_El_left, success2=SetZprimeff)
     call ReadCommandLineArgument(arg, "ezp_El_right", success, ezp_El_right, success2=SetZprimeff)
     call ReadCommandLineArgument(arg, "ezp_Mu_left", success, ezp_Mu_left, success2=SetZprimeff)
@@ -808,8 +931,82 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "MZprime", success, M_Zprime, multiply=GeV, success2=SetMZprime)
     call ReadCommandLineArgument(arg, "GaZprime", success, Ga_Zprime, multiply=GeV, success2=SetGaZprime)
 
+    !spin 0 WWp couplings
     call ReadCommandLineArgument(arg, "ghwwp1", success, ghwwp1, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwwp2", success, ghwwp2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwwp3", success, ghwwp3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwwp4", success, ghwwp4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+
+    call ReadCommandLineArgument(arg, "ghwwp1_prime", success, ghwwp1_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwwp1_prime2", success, ghwwp1_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwwp1_prime3", success, ghwwp1_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwwp1_prime4", success, ghwwp1_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwwp1_prime5", success, ghwwp1_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwwp1_prime6", success, ghwwp1_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwwp1_prime7", success, ghwwp1_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+
+    call ReadCommandLineArgument(arg, "ghwwp2_prime", success, ghwwp2_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwwp2_prime2", success, ghwwp2_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwwp2_prime3", success, ghwwp2_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwwp2_prime4", success, ghwwp2_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwwp2_prime5", success, ghwwp2_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwwp2_prime6", success, ghwwp2_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwwp2_prime7", success, ghwwp2_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+
+    call ReadCommandLineArgument(arg, "ghwwp3_prime", success, ghwwp3_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwwp3_prime2", success, ghwwp3_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwwp3_prime3", success, ghwwp3_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwwp3_prime4", success, ghwwp3_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwwp3_prime5", success, ghwwp3_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwwp3_prime6", success, ghwwp3_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwwp3_prime7", success, ghwwp3_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+
+    call ReadCommandLineArgument(arg, "ghwwp4_prime", success, ghwwp4_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwwp4_prime2", success, ghwwp4_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwwp4_prime3", success, ghwwp4_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwwp4_prime4", success, ghwwp4_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwwp4_prime5", success, ghwwp4_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwwp4_prime6", success, ghwwp4_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwwp4_prime7", success, ghwwp4_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+
+    !spin 0 WpWp couplings
     call ReadCommandLineArgument(arg, "ghwpwp1", success, ghwpwp1, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwpwp2", success, ghwpwp2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwpwp3", success, ghwpwp3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwpwp4", success, ghwpwp4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+
+    call ReadCommandLineArgument(arg, "ghwpwp1_prime", success, ghwpwp1_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwpwp1_prime2", success, ghwpwp1_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwpwp1_prime3", success, ghwpwp1_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwpwp1_prime4", success, ghwpwp1_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwpwp1_prime5", success, ghwpwp1_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwpwp1_prime6", success, ghwpwp1_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwpwp1_prime7", success, ghwpwp1_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+
+    call ReadCommandLineArgument(arg, "ghwpwp2_prime", success, ghwpwp2_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwpwp2_prime2", success, ghwpwp2_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwpwp2_prime3", success, ghwpwp2_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwpwp2_prime4", success, ghwpwp2_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwpwp2_prime5", success, ghwpwp2_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwpwp2_prime6", success, ghwpwp2_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwpwp2_prime7", success, ghwpwp2_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+
+    call ReadCommandLineArgument(arg, "ghwpwp3_prime", success, ghwpwp3_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwpwp3_prime2", success, ghwpwp3_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwpwp3_prime3", success, ghwpwp3_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwpwp3_prime4", success, ghwpwp3_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwpwp3_prime5", success, ghwpwp3_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwpwp3_prime6", success, ghwpwp3_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwpwp3_prime7", success, ghwpwp3_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+
+    call ReadCommandLineArgument(arg, "ghwpwp4_prime", success, ghwpwp4_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwpwp4_prime2", success, ghwpwp4_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwpwp4_prime3", success, ghwpwp4_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwpwp4_prime4", success, ghwpwp4_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwpwp4_prime5", success, ghwpwp4_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwpwp4_prime6", success, ghwpwp4_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwpwp4_prime7", success, ghwpwp4_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0ZZ, success4=includeVprime, success5=SetHWprime)
+
     call ReadCommandLineArgument(arg, "ewp_El_left", success, ewp_El_left, success2=SetWprimeff)
     call ReadCommandLineArgument(arg, "ewp_El_right", success, ewp_El_right, success2=SetWprimeff)
     call ReadCommandLineArgument(arg, "ewp_Mu_left", success, ewp_Mu_left, success2=SetWprimeff)
@@ -985,9 +1182,9 @@ logical :: SetColliderEnergy
     endif
 
     !decay mode checks
-    if( (IsAZDecay(DecayMode1) .and. IsAZDecay(DecayMode2) .and. Process.eq.0 .and. TauDecays.lt.0) .or. (Process.eq.50 .and. IsAZDecay(DecayMode1)) .or. Process.eq.60 .or. Process.eq.66 ) then
+    if( (IsAZDecay(DecayMode1) .and. IsAZDecay(DecayMode2) .and. (Process.eq.0 .or. Process.eq.2) .and. TauDecays.lt.0) .or. (Process.eq.50 .and. IsAZDecay(DecayMode1)) .or. Process.eq.60 .or. Process.eq.66 ) then
         includeGammaStar = (SetZgammacoupling .or. Setgammagammacoupling)
-    elseif( (IsAZDecay(DecayMode1) .and. IsAPhoton(DecayMode2) .and. Process.eq.0 .and. TauDecays.lt.0) .or. (Process.eq.50 .and. IsAPhoton(DecayMode1)) ) then
+    elseif( (IsAZDecay(DecayMode1) .and. IsAPhoton(DecayMode2) .and. (Process.eq.0 .or. Process.eq.2) .and. TauDecays.lt.0) .or. (Process.eq.50 .and. IsAPhoton(DecayMode1)) ) then
         includeGammaStar = Setgammagammacoupling
     else if (Process.eq.67 .or. Process.eq.68 .or. Process.eq.69) then
         includeGammaStar = .true. ! Not really gamma*, but rather gamma* or gluon, set to true to manipulate phasespace generation
@@ -1007,13 +1204,21 @@ logical :: SetColliderEnergy
     endif
 
 
-    if( IsAZDecay(DecayMode1) .and. IsAPhoton(DecayMode2) .and. .not.SetZgammacoupling .and. .not.Setgammagammacoupling .and. (Process.eq.0)) then
-        print *, "To decay the resonance to Z+photon, you need to set one of the HZgamma (ghzgs*) or Hgammagamma (ghgsgs*) couplings."
+    if( IsAZDecay(DecayMode1) .and. IsAPhoton(DecayMode2) .and. .not.SetZgammacoupling .and. .not.Setgammagammacoupling .and. (Process.eq.0 .or. Process.eq.2)) then
+        if (Process.eq.0) then
+          print *, "To decay the resonance to Z+photon, you need to set one of the HZgamma (ghzgs*) or Hgammagamma (ghgsgs*) couplings."
+        else if (Process.eq.2) then
+          print *, "To decay the resonance to Z+photon, you need to set one of the GZgamma (bzgs*) or Ggammagamma (bgsgs*) couplings."
+        end if
         stop 1
     endif
 
-    if( IsAPhoton(DecayMode1) .and. IsAPhoton(DecayMode2) .and. .not.Setgammagammacoupling .and. (Process.eq.0)) then
-        print *, "To decay the resonance to photon+photon, you need to set one of the Hgammagamma (ghgsgs*) couplings."
+    if( IsAPhoton(DecayMode1) .and. IsAPhoton(DecayMode2) .and. .not.Setgammagammacoupling .and. (Process.eq.0 .or. Process.eq.2)) then
+        if (Process.eq.0) then
+          print *, "To decay the resonance to photon+photon, you need to set one of the Hgammagamma (ghgsgs*) couplings."
+        else if (Process.eq.2) then
+          print *, "To decay the resonance to photon+photon, you need to set one of the Ggammagamma (bgsgs*) couplings."
+        end if
         stop 1
     endif
 
@@ -1158,6 +1363,30 @@ logical :: SetColliderEnergy
     !---------------------------------------!
     !            Check couplings            !
     !---------------------------------------!
+
+    if( Process.eq.1 ) then
+      if( SetAnomalousSpin0gg .or. SetAnomalousSpin0ZZ .or. SetAnomalousHff ) then
+        call Error("There is no point setting spin 0 couplings for spin 1 production")
+      endif
+      if( SetAnomalousSpin2gg .or. SetAnomalousSpin2qq .or. SetSpin2VV ) then
+        call Error("There is no point setting spin 2 couplings for spin 1 production")
+      endif
+    else if( Process.eq.2 ) then
+      if( SetAnomalousSpin0gg .or. SetAnomalousSpin0ZZ .or. SetAnomalousHff ) then
+        call Error("There is no point setting spin 0 couplings for spin 2 production")
+      endif
+      if( SetAnomalousSpin1qq .or. SetSpin1VV ) then
+        call Error("There is no point setting spin 1 couplings for spin 2 production")
+      endif
+    else !spin 0
+      if( SetAnomalousSpin1qq .or. SetSpin1VV ) then
+        call Error("There is no point setting spin 1 couplings for spin 0 production")
+      endif
+      if( SetAnomalousSpin2gg .or. SetAnomalousSpin2qq .or. SetSpin2VV ) then
+        call Error("There is no point setting spin 2 couplings for spin 0 production")
+      endif
+    endif
+
     ! Spin-0 (incomplete)
     if( SetAnomalousSpin0gg .and. .not.Setghg2 ) then
         call Error("If you set an anomalous spin 0 gg coupling, you need to explicitly set ghg2 as well. This coupling is initialized to a non-zero value.")
@@ -1239,6 +1468,11 @@ logical :: SetColliderEnergy
         call Error("If you set the width of Wprime, you also have to set the mass! MWprime=...")
     endif
 
+    if( (Process.eq.50 .or. Process.eq.60) .and. SetZprimegammacoupling ) then
+        call Error("Z'gamma couplings are not implemented for VBF or VH")
+        !If you implement them and remove this error, also edit the Vprimekwargs function
+        !in MELA/test/testME_more.py to not remove the Z'gamma couplings for process = 50 or 60
+    endif
 
     ! Spin-1
     if( Process.eq.1) then
@@ -1264,11 +1498,8 @@ logical :: SetColliderEnergy
        if ((a1.eq.czero .and. a2.eq.czero .and. a3.eq.czero .and. a4.eq.czero .and. a5.eq.czero) .and. PChannel.ne.1) then
           call Error("In spin 2 gg production, the couplings cannot all be zero. You can use PChannel=1 for qq-only production, or explicitly set at least one of the gg couplings a1, a2, a3, a4, or a5 non-zero.")
        endif
-       if (b1.eq.czero .and. b2.eq.czero .and. b3.eq.czero .and. b4.eq.czero .and. b5.eq.czero .and. b6.eq.czero .and. b7.eq.czero .and. b8.eq.czero .and. b9.eq.czero .and. b10.eq.czero) then
-          call Error("Spin 2 VV decay cannot be done with zero couplings.  You need to explicitly set b1, b2, b3, b4, b5, b6, b7, b8, b9, or b10 non-zero.")
-       endif
-       if (.not.(OffShellV1 .and. OffShellV2) .and. (b5.ne.czero .or. b6.ne.czero .or. b7.ne.czero .or. b9.ne.czero .or. b10.ne.czero)) then
-          call Error("Spin 2 Z+gamma or gamma+gamma decay cannot be done with b5-7 or b9-10.")
+       if (.not. SetSpin2VV) then
+          call Error("For spin 2 production you need to explicitly set one of the spin 2 couplings to ZZ, Zgamma, gammagamma, ZZ', Z'Z', or Z'gamma non-zero.")
        endif
     endif
 
@@ -1403,7 +1634,7 @@ SUBROUTINE InitPDFs()
         alphas_mz=0.13939d0
         !nloops_pdf=1
      else ! Everything else
-        write(6,*),"main.F90::InitPDFs: PDFSet",PDFSet,"QCD parameters are unknown. Please double-check! Stopping JHUGen..."
+        write(6,*) "main.F90::InitPDFs: PDFSet",PDFSet,"QCD parameters are unknown. Please double-check! Stopping JHUGen..."
         stop
         ! Could also have used these instead of the stop statement, but why introduce arbitrary number?
         !alphas_mz = 0.13229060d0
@@ -4671,8 +4902,8 @@ character :: arg*(500)
         else if( ReadLHEFile .or. Process.le.2 .or. Process .eq. 80 ) then
             write(TheUnit,"(4X,A,I2,2X,A,I2)") "DecayMode1:",DecayMode1, "DecayMode2:",DecayMode2
         endif
-        if( Process.eq.60 .or. (Process.ge.66 .and. Process.le.69) .or. IsAZDecay(DecayMode1) .or. IsAZDecay(DecayMode2) ) write(TheUnit,"(4X,A,F6.3,A,F6.4)") "Z-boson: mass=",M_Z*100d0,", width=",Ga_Z*100d0
-        if( Process.eq.60 .or. (Process.ge.66 .and. Process.le.69) .or. IsAWDecay(DecayMode1) .or. IsAWDecay(DecayMode2) ) write(TheUnit,"(4X,A,F6.3,A,F6.4)") "W-boson: mass=",M_W*100d0,", width=",Ga_W*100d0
+        if( Process.eq.60 .or. (Process.ge.66 .and. Process.le.69) .or. IsAZDecay(DecayMode1) .or. IsAZDecay(DecayMode2) ) write(TheUnit,"(4X,A,F6.3,A,F6.4)") "Z boson: mass=",M_Z*100d0,", width=",Ga_Z*100d0
+        if( Process.eq.60 .or. (Process.ge.66 .and. Process.le.69) .or. IsAWDecay(DecayMode1) .or. IsAWDecay(DecayMode2) ) write(TheUnit,"(4X,A,F6.3,A,F6.4)") "W boson: mass=",M_W*100d0,", width=",Ga_W*100d0
     endif
     if( Process.eq.80 .or. Process.eq.110 .or. Process.eq.111 .or.Process.eq.112 .or. Process.eq.113 .or. Process.eq.114) write(TheUnit,"(4X,A,F8.4,A,F6.4)") "Top quark mass=",m_top*100d0,", width=",Ga_top*100d0
     if( Process.eq.80 .or. Process.eq.110 .or. Process.eq.111 .or. Process.eq.112 .or. Process.eq.113 .or. Process.eq.114) write(TheUnit,"(4X,A,I2)") "Top quark decay=",TOPDECAYS
@@ -4810,18 +5041,6 @@ character :: arg*(500)
             if( cdabs(ghz2 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghz2=",ghz2,"i"
             if( cdabs(ghz3 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghz3=",ghz3,"i"
             if( cdabs(ghz4 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghz4=",ghz4,"i"
-            if( includeGammaStar .or. IsAPhoton(DecayMode2) ) then
-                if( includeGammaStar .or. IsAZDecay(DecayMode1) ) then
-                    if( cdabs(ghzgs2 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzgs2=",ghzgs2,"i"
-                    if( cdabs(ghzgs3 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzgs3=",ghzgs3,"i"
-                    if( cdabs(ghzgs4 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzgs4=",ghzgs4,"i"
-                endif
-                if( includeGammaStar .or. IsAPhoton(DecayMode1) ) then
-                    if( cdabs(ghgsgs2 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghgsgs2=",ghgsgs2,"i"
-                    if( cdabs(ghgsgs3 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghgsgs3=",ghgsgs3,"i"
-                    if( cdabs(ghgsgs4 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghgsgs4=",ghgsgs4,"i"
-                endif
-            endif
             if( cdabs(ghz1_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz1_prime= ",ghz1_prime ,"i,","Lambda_z1=",Lambda_z1/GeV
             if( cdabs(ghz1_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz1_prime2=",ghz1_prime2,"i,","Lambda_z1=",Lambda_z1/GeV
             if( cdabs(ghz1_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz1_prime3=",ghz1_prime3,"i,","Lambda_z1=",Lambda_z1/GeV
@@ -4850,7 +5069,77 @@ character :: arg*(500)
             if( cdabs(ghz4_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz4_prime5=",ghz4_prime5,"i,","Lambda_z4=",Lambda_z4/GeV
             if( cdabs(ghz4_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz4_prime6=",ghz4_prime6,"i,","Lambda_z4=",Lambda_z4/GeV
             if( cdabs(ghz4_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghz4_prime7=",ghz4_prime7,"i,","Lambda_z4=",Lambda_z4/GeV
+            if( cdabs(ghzgs2 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzgs2=",ghzgs2,"i"
+            if( cdabs(ghzgs3 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzgs3=",ghzgs3,"i"
+            if( cdabs(ghzgs4 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzgs4=",ghzgs4,"i"
             if( cdabs(ghzgs1_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,2X,A,1PE12.4)") "ghzgs1_prime2=",ghzgs1_prime2,"i,","Lambda_zgs1=",Lambda_zgs1/GeV
+            if( cdabs(ghgsgs2 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghgsgs2=",ghgsgs2,"i"
+            if( cdabs(ghgsgs3 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghgsgs3=",ghgsgs3,"i"
+            if( cdabs(ghgsgs4 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghgsgs4=",ghgsgs4,"i"
+            if( cdabs(ghzzp1 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzzp1=",ghzzp1,"i"
+            if( cdabs(ghzzp2 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzzp2=",ghzzp2,"i"
+            if( cdabs(ghzzp3 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzzp3=",ghzzp3,"i"
+            if( cdabs(ghzzp4 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzzp4=",ghzzp4,"i"
+            if( cdabs(ghzzp1_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp1_prime= ",ghzzp1_prime ,"i,","Lambda_z1=",Lambda_z1/GeV
+            if( cdabs(ghzzp1_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp1_prime2=",ghzzp1_prime2,"i,","Lambda_z1=",Lambda_z1/GeV
+            if( cdabs(ghzzp1_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp1_prime3=",ghzzp1_prime3,"i,","Lambda_z1=",Lambda_z1/GeV
+            if( cdabs(ghzzp1_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp1_prime4=",ghzzp1_prime4,"i,","Lambda_z1=",Lambda_z1/GeV
+            if( cdabs(ghzzp1_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp1_prime5=",ghzzp1_prime5,"i,","Lambda_z1=",Lambda_z1/GeV
+            if( cdabs(ghzzp1_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp1_prime6=",ghzzp1_prime6,"i,","Lambda_z1=",Lambda_z1/GeV
+            if( cdabs(ghzzp1_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp1_prime7=",ghzzp1_prime7,"i,","Lambda_z1=",Lambda_z1/GeV
+            if( cdabs(ghzzp2_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp2_prime= ",ghzzp2_prime ,"i,","Lambda_z2=",Lambda_z2/GeV
+            if( cdabs(ghzzp2_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp2_prime2=",ghzzp2_prime2,"i,","Lambda_z2=",Lambda_z2/GeV
+            if( cdabs(ghzzp2_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp2_prime3=",ghzzp2_prime3,"i,","Lambda_z2=",Lambda_z2/GeV
+            if( cdabs(ghzzp2_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp2_prime4=",ghzzp2_prime4,"i,","Lambda_z2=",Lambda_z2/GeV
+            if( cdabs(ghzzp2_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp2_prime5=",ghzzp2_prime5,"i,","Lambda_z2=",Lambda_z2/GeV
+            if( cdabs(ghzzp2_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp2_prime6=",ghzzp2_prime6,"i,","Lambda_z2=",Lambda_z2/GeV
+            if( cdabs(ghzzp2_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp2_prime7=",ghzzp2_prime7,"i,","Lambda_z2=",Lambda_z2/GeV
+            if( cdabs(ghzzp3_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp3_prime= ",ghzzp3_prime ,"i,","Lambda_z3=",Lambda_z3/GeV
+            if( cdabs(ghzzp3_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp3_prime2=",ghzzp3_prime2,"i,","Lambda_z3=",Lambda_z3/GeV
+            if( cdabs(ghzzp3_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp3_prime3=",ghzzp3_prime3,"i,","Lambda_z3=",Lambda_z3/GeV
+            if( cdabs(ghzzp3_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp3_prime4=",ghzzp3_prime4,"i,","Lambda_z3=",Lambda_z3/GeV
+            if( cdabs(ghzzp3_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp3_prime5=",ghzzp3_prime5,"i,","Lambda_z3=",Lambda_z3/GeV
+            if( cdabs(ghzzp3_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp3_prime6=",ghzzp3_prime6,"i,","Lambda_z3=",Lambda_z3/GeV
+            if( cdabs(ghzzp3_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp3_prime7=",ghzzp3_prime7,"i,","Lambda_z3=",Lambda_z3/GeV
+            if( cdabs(ghzzp4_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp4_prime= ",ghzzp4_prime ,"i,","Lambda_z4=",Lambda_z4/GeV
+            if( cdabs(ghzzp4_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp4_prime2=",ghzzp4_prime2,"i,","Lambda_z4=",Lambda_z4/GeV
+            if( cdabs(ghzzp4_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp4_prime3=",ghzzp4_prime3,"i,","Lambda_z4=",Lambda_z4/GeV
+            if( cdabs(ghzzp4_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp4_prime4=",ghzzp4_prime4,"i,","Lambda_z4=",Lambda_z4/GeV
+            if( cdabs(ghzzp4_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp4_prime5=",ghzzp4_prime5,"i,","Lambda_z4=",Lambda_z4/GeV
+            if( cdabs(ghzzp4_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp4_prime6=",ghzzp4_prime6,"i,","Lambda_z4=",Lambda_z4/GeV
+            if( cdabs(ghzzp4_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzzp4_prime7=",ghzzp4_prime7,"i,","Lambda_z4=",Lambda_z4/GeV
+            if( cdabs(ghzpgs2 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzpgs2=",ghzpgs2,"i"
+            if( cdabs(ghzpgs3 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzpgs3=",ghzpgs3,"i"
+            if( cdabs(ghzpgs4 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzpgs4=",ghzpgs4,"i"
+            if( cdabs(ghzpgs1_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,2X,A,1PE12.4)") "ghzpgs1_prime2=",ghzpgs1_prime2,"i,","Lambda_zgs1=",Lambda_zgs1/GeV
+            if( cdabs(ghzpzp1_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp1_prime= ",ghzpzp1_prime ,"i,","Lambda_z1=",Lambda_z1/GeV
+            if( cdabs(ghzpzp1_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp1_prime2=",ghzpzp1_prime2,"i,","Lambda_z1=",Lambda_z1/GeV
+            if( cdabs(ghzpzp1_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp1_prime3=",ghzpzp1_prime3,"i,","Lambda_z1=",Lambda_z1/GeV
+            if( cdabs(ghzpzp1_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp1_prime4=",ghzpzp1_prime4,"i,","Lambda_z1=",Lambda_z1/GeV
+            if( cdabs(ghzpzp1_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp1_prime5=",ghzpzp1_prime5,"i,","Lambda_z1=",Lambda_z1/GeV
+            if( cdabs(ghzpzp1_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp1_prime6=",ghzpzp1_prime6,"i,","Lambda_z1=",Lambda_z1/GeV
+            if( cdabs(ghzpzp1_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp1_prime7=",ghzpzp1_prime7,"i,","Lambda_z1=",Lambda_z1/GeV
+            if( cdabs(ghzpzp2_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp2_prime= ",ghzpzp2_prime ,"i,","Lambda_z2=",Lambda_z2/GeV
+            if( cdabs(ghzpzp2_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp2_prime2=",ghzpzp2_prime2,"i,","Lambda_z2=",Lambda_z2/GeV
+            if( cdabs(ghzpzp2_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp2_prime3=",ghzpzp2_prime3,"i,","Lambda_z2=",Lambda_z2/GeV
+            if( cdabs(ghzpzp2_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp2_prime4=",ghzpzp2_prime4,"i,","Lambda_z2=",Lambda_z2/GeV
+            if( cdabs(ghzpzp2_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp2_prime5=",ghzpzp2_prime5,"i,","Lambda_z2=",Lambda_z2/GeV
+            if( cdabs(ghzpzp2_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp2_prime6=",ghzpzp2_prime6,"i,","Lambda_z2=",Lambda_z2/GeV
+            if( cdabs(ghzpzp2_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp2_prime7=",ghzpzp2_prime7,"i,","Lambda_z2=",Lambda_z2/GeV
+            if( cdabs(ghzpzp3_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp3_prime= ",ghzpzp3_prime ,"i,","Lambda_z3=",Lambda_z3/GeV
+            if( cdabs(ghzpzp3_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp3_prime2=",ghzpzp3_prime2,"i,","Lambda_z3=",Lambda_z3/GeV
+            if( cdabs(ghzpzp3_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp3_prime3=",ghzpzp3_prime3,"i,","Lambda_z3=",Lambda_z3/GeV
+            if( cdabs(ghzpzp3_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp3_prime4=",ghzpzp3_prime4,"i,","Lambda_z3=",Lambda_z3/GeV
+            if( cdabs(ghzpzp3_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp3_prime5=",ghzpzp3_prime5,"i,","Lambda_z3=",Lambda_z3/GeV
+            if( cdabs(ghzpzp3_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp3_prime6=",ghzpzp3_prime6,"i,","Lambda_z3=",Lambda_z3/GeV
+            if( cdabs(ghzpzp3_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp3_prime7=",ghzpzp3_prime7,"i,","Lambda_z3=",Lambda_z3/GeV
+            if( cdabs(ghzpzp4_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp4_prime= ",ghzpzp4_prime ,"i,","Lambda_z4=",Lambda_z4/GeV
+            if( cdabs(ghzpzp4_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp4_prime2=",ghzpzp4_prime2,"i,","Lambda_z4=",Lambda_z4/GeV
+            if( cdabs(ghzpzp4_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp4_prime3=",ghzpzp4_prime3,"i,","Lambda_z4=",Lambda_z4/GeV
+            if( cdabs(ghzpzp4_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp4_prime4=",ghzpzp4_prime4,"i,","Lambda_z4=",Lambda_z4/GeV
+            if( cdabs(ghzpzp4_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp4_prime5=",ghzpzp4_prime5,"i,","Lambda_z4=",Lambda_z4/GeV
+            if( cdabs(ghzpzp4_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp4_prime6=",ghzpzp4_prime6,"i,","Lambda_z4=",Lambda_z4/GeV
+            if( cdabs(ghzpzp4_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp4_prime7=",ghzpzp4_prime7,"i,","Lambda_z4=",Lambda_z4/GeV
             if( cz_q1sq.ne.0) then
                write(TheUnit,"(6X,A,1PE12.4)") "Lambda_z11= ",Lambda_z11/GeV
                write(TheUnit,"(6X,A,1PE12.4)") "Lambda_z21= ",Lambda_z21/GeV
@@ -4903,6 +5192,70 @@ character :: arg*(500)
                if( cdabs(ghw4_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw4_prime5=",ghw4_prime5,"i,","Lambda_w4=",Lambda_w4/GeV
                if( cdabs(ghw4_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw4_prime6=",ghw4_prime6,"i,","Lambda_w4=",Lambda_w4/GeV
                if( cdabs(ghw4_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghw4_prime7=",ghw4_prime7,"i,","Lambda_w4=",Lambda_w4/GeV
+               if( cdabs(ghwwp1 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghwwp1=",ghwwp1,"i"
+               if( cdabs(ghwwp2 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghwwp2=",ghwwp2,"i"
+               if( cdabs(ghwwp3 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghwwp3=",ghwwp3,"i"
+               if( cdabs(ghwwp4 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghwwp4=",ghwwp4,"i"
+               if( cdabs(ghwwp1_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp1_prime= ",ghwwp1_prime ,"i,","Lambda_w1=",Lambda_w1/GeV
+               if( cdabs(ghwwp1_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp1_prime2=",ghwwp1_prime2,"i,","Lambda_w1=",Lambda_w1/GeV
+               if( cdabs(ghwwp1_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp1_prime3=",ghwwp1_prime3,"i,","Lambda_w1=",Lambda_w1/GeV
+               if( cdabs(ghwwp1_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp1_prime4=",ghwwp1_prime4,"i,","Lambda_w1=",Lambda_w1/GeV
+               if( cdabs(ghwwp1_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp1_prime5=",ghwwp1_prime5,"i,","Lambda_w1=",Lambda_w1/GeV
+               if( cdabs(ghwwp1_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp1_prime6=",ghwwp1_prime6,"i,","Lambda_w1=",Lambda_w1/GeV
+               if( cdabs(ghwwp1_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp1_prime7=",ghwwp1_prime7,"i,","Lambda_w1=",Lambda_w1/GeV
+               if( cdabs(ghwwp2_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp2_prime= ",ghwwp2_prime ,"i,","Lambda_w2=",Lambda_w2/GeV
+               if( cdabs(ghwwp2_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp2_prime2=",ghwwp2_prime2,"i,","Lambda_w2=",Lambda_w2/GeV
+               if( cdabs(ghwwp2_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp2_prime3=",ghwwp2_prime3,"i,","Lambda_w2=",Lambda_w2/GeV
+               if( cdabs(ghwwp2_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp2_prime4=",ghwwp2_prime4,"i,","Lambda_w2=",Lambda_w2/GeV
+               if( cdabs(ghwwp2_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp2_prime5=",ghwwp2_prime5,"i,","Lambda_w2=",Lambda_w2/GeV
+               if( cdabs(ghwwp2_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp2_prime6=",ghwwp2_prime6,"i,","Lambda_w2=",Lambda_w2/GeV
+               if( cdabs(ghwwp2_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp2_prime7=",ghwwp2_prime7,"i,","Lambda_w2=",Lambda_w2/GeV
+               if( cdabs(ghwwp3_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp3_prime= ",ghwwp3_prime ,"i,","Lambda_w3=",Lambda_w3/GeV
+               if( cdabs(ghwwp3_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp3_prime2=",ghwwp3_prime2,"i,","Lambda_w3=",Lambda_w3/GeV
+               if( cdabs(ghwwp3_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp3_prime3=",ghwwp3_prime3,"i,","Lambda_w3=",Lambda_w3/GeV
+               if( cdabs(ghwwp3_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp3_prime4=",ghwwp3_prime4,"i,","Lambda_w3=",Lambda_w3/GeV
+               if( cdabs(ghwwp3_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp3_prime5=",ghwwp3_prime5,"i,","Lambda_w3=",Lambda_w3/GeV
+               if( cdabs(ghwwp3_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp3_prime6=",ghwwp3_prime6,"i,","Lambda_w3=",Lambda_w3/GeV
+               if( cdabs(ghwwp3_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp3_prime7=",ghwwp3_prime7,"i,","Lambda_w3=",Lambda_w3/GeV
+               if( cdabs(ghwwp4_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp4_prime= ",ghwwp4_prime ,"i,","Lambda_w4=",Lambda_w4/GeV
+               if( cdabs(ghwwp4_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp4_prime2=",ghwwp4_prime2,"i,","Lambda_w4=",Lambda_w4/GeV
+               if( cdabs(ghwwp4_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp4_prime3=",ghwwp4_prime3,"i,","Lambda_w4=",Lambda_w4/GeV
+               if( cdabs(ghwwp4_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp4_prime4=",ghwwp4_prime4,"i,","Lambda_w4=",Lambda_w4/GeV
+               if( cdabs(ghwwp4_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp4_prime5=",ghwwp4_prime5,"i,","Lambda_w4=",Lambda_w4/GeV
+               if( cdabs(ghwwp4_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp4_prime6=",ghwwp4_prime6,"i,","Lambda_w4=",Lambda_w4/GeV
+               if( cdabs(ghwwp4_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwwp4_prime7=",ghwwp4_prime7,"i,","Lambda_w4=",Lambda_w4/GeV
+               if( cdabs(ghwpwp1 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghwpwp1=",ghwpwp1,"i"
+               if( cdabs(ghwpwp2 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghwpwp2=",ghwpwp2,"i"
+               if( cdabs(ghwpwp3 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghwpwp3=",ghwpwp3,"i"
+               if( cdabs(ghwpwp4 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghwpwp4=",ghwpwp4,"i"
+               if( cdabs(ghwpwp1_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp1_prime= ",ghwpwp1_prime ,"i,","Lambda_w1=",Lambda_w1/GeV
+               if( cdabs(ghwpwp1_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp1_prime2=",ghwpwp1_prime2,"i,","Lambda_w1=",Lambda_w1/GeV
+               if( cdabs(ghwpwp1_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp1_prime3=",ghwpwp1_prime3,"i,","Lambda_w1=",Lambda_w1/GeV
+               if( cdabs(ghwpwp1_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp1_prime4=",ghwpwp1_prime4,"i,","Lambda_w1=",Lambda_w1/GeV
+               if( cdabs(ghwpwp1_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp1_prime5=",ghwpwp1_prime5,"i,","Lambda_w1=",Lambda_w1/GeV
+               if( cdabs(ghwpwp1_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp1_prime6=",ghwpwp1_prime6,"i,","Lambda_w1=",Lambda_w1/GeV
+               if( cdabs(ghwpwp1_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp1_prime7=",ghwpwp1_prime7,"i,","Lambda_w1=",Lambda_w1/GeV
+               if( cdabs(ghwpwp2_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp2_prime= ",ghwpwp2_prime ,"i,","Lambda_w2=",Lambda_w2/GeV
+               if( cdabs(ghwpwp2_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp2_prime2=",ghwpwp2_prime2,"i,","Lambda_w2=",Lambda_w2/GeV
+               if( cdabs(ghwpwp2_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp2_prime3=",ghwpwp2_prime3,"i,","Lambda_w2=",Lambda_w2/GeV
+               if( cdabs(ghwpwp2_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp2_prime4=",ghwpwp2_prime4,"i,","Lambda_w2=",Lambda_w2/GeV
+               if( cdabs(ghwpwp2_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp2_prime5=",ghwpwp2_prime5,"i,","Lambda_w2=",Lambda_w2/GeV
+               if( cdabs(ghwpwp2_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp2_prime6=",ghwpwp2_prime6,"i,","Lambda_w2=",Lambda_w2/GeV
+               if( cdabs(ghwpwp2_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp2_prime7=",ghwpwp2_prime7,"i,","Lambda_w2=",Lambda_w2/GeV
+               if( cdabs(ghwpwp3_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp3_prime= ",ghwpwp3_prime ,"i,","Lambda_w3=",Lambda_w3/GeV
+               if( cdabs(ghwpwp3_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp3_prime2=",ghwpwp3_prime2,"i,","Lambda_w3=",Lambda_w3/GeV
+               if( cdabs(ghwpwp3_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp3_prime3=",ghwpwp3_prime3,"i,","Lambda_w3=",Lambda_w3/GeV
+               if( cdabs(ghwpwp3_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp3_prime4=",ghwpwp3_prime4,"i,","Lambda_w3=",Lambda_w3/GeV
+               if( cdabs(ghwpwp3_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp3_prime5=",ghwpwp3_prime5,"i,","Lambda_w3=",Lambda_w3/GeV
+               if( cdabs(ghwpwp3_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp3_prime6=",ghwpwp3_prime6,"i,","Lambda_w3=",Lambda_w3/GeV
+               if( cdabs(ghwpwp3_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp3_prime7=",ghwpwp3_prime7,"i,","Lambda_w3=",Lambda_w3/GeV
+               if( cdabs(ghwpwp4_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp4_prime= ",ghwpwp4_prime ,"i,","Lambda_w4=",Lambda_w4/GeV
+               if( cdabs(ghwpwp4_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp4_prime2=",ghwpwp4_prime2,"i,","Lambda_w4=",Lambda_w4/GeV
+               if( cdabs(ghwpwp4_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp4_prime3=",ghwpwp4_prime3,"i,","Lambda_w4=",Lambda_w4/GeV
+               if( cdabs(ghwpwp4_prime4).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp4_prime4=",ghwpwp4_prime4,"i,","Lambda_w4=",Lambda_w4/GeV
+               if( cdabs(ghwpwp4_prime5).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp4_prime5=",ghwpwp4_prime5,"i,","Lambda_w4=",Lambda_w4/GeV
+               if( cdabs(ghwpwp4_prime6).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp4_prime6=",ghwpwp4_prime6,"i,","Lambda_w4=",Lambda_w4/GeV
+               if( cdabs(ghwpwp4_prime7).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghwpwp4_prime7=",ghwpwp4_prime7,"i,","Lambda_w4=",Lambda_w4/GeV
                if( cw_q1sq.ne.0) then
                   write(TheUnit,"(6X,A,1PE12.4)") "Lambda_w11= ",Lambda_w11/GeV
                   write(TheUnit,"(6X,A,1PE12.4)") "Lambda_w21= ",Lambda_w21/GeV
@@ -4922,7 +5275,54 @@ character :: arg*(500)
                   write(TheUnit,"(6X,A,1PE12.4)") "Lambda_w40= ",Lambda_w40/GeV
                endif
             endif
-
+        endif
+        if(includeVprime) then
+            if( Process.eq.60 .or. (Process.ge.66 .and. Process.le.69) .or. IsAZDecay(DecayMode1) .or. IsAZDecay(DecayMode2) ) then
+                if(M_Zprime.gt.0d0) then
+                  write(TheUnit,"(4X,A,F6.3,A,F6.4)") "Z' boson: mass=",M_Zprime*100d0,", width=",Ga_Zprime*100d0
+                else
+                  write(TheUnit,"(4X,A,F6.3,A,F6.4)") "Z' boson: heavy mass limit (contact interaction)"
+                endif
+                if( cdabs(ezp_El_left  ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ezp_El_left=  ",ezp_El_left  ,"i"
+                if( cdabs(ezp_El_right ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ezp_El_right= ",ezp_El_right ,"i"
+                if( cdabs(ezp_Mu_left  ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ezp_Mu_left=  ",ezp_Mu_left  ,"i"
+                if( cdabs(ezp_Mu_right ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ezp_Mu_right= ",ezp_Mu_right ,"i"
+                if( cdabs(ezp_Ta_left  ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ezp_Ta_left=  ",ezp_Ta_left  ,"i"
+                if( cdabs(ezp_Ta_right ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ezp_Ta_right= ",ezp_Ta_right ,"i"
+                if( cdabs(ezp_NuE_left ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ezp_NuE_left= ",ezp_NuE_left ,"i"
+                if( cdabs(ezp_NuE_right).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ezp_NuE_right=",ezp_NuE_right,"i"
+                if( cdabs(ezp_Up_left  ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ezp_Up_left=  ",ezp_Up_left  ,"i"
+                if( cdabs(ezp_Up_right ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ezp_Up_right= ",ezp_Up_right ,"i"
+                if( cdabs(ezp_Dn_left  ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ezp_Dn_left=  ",ezp_Dn_left  ,"i"
+                if( cdabs(ezp_Dn_right ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ezp_Dn_right= ",ezp_Dn_right ,"i"
+                if( cdabs(ezp_Str_left ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ezp_Str_left= ",ezp_Str_left ,"i"
+                if( cdabs(ezp_Str_right).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ezp_Str_right=",ezp_Str_right,"i"
+                if( cdabs(ezp_Chm_left ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ezp_Chm_left= ",ezp_Chm_left ,"i"
+                if( cdabs(ezp_Chm_right).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ezp_Chm_right=",ezp_Chm_right,"i"
+                if( cdabs(ezp_Bot_left ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ezp_Bot_left= ",ezp_Bot_left ,"i"
+                if( cdabs(ezp_Bot_right).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ezp_Bot_right=",ezp_Bot_right,"i"
+                if( cdabs(ezp_Top_left ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ezp_Top_left= ",ezp_Top_left ,"i"
+                if( cdabs(ezp_Top_right).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ezp_Top_right=",ezp_Top_right,"i"
+            endif
+            if( Process.eq.60 .or. (Process.ge.66 .and. Process.le.69) .or. IsAWDecay(DecayMode1) .or. IsAWDecay(DecayMode2) ) then
+                if(M_Wprime.gt.0d0) then
+                  write(TheUnit,"(4X,A,F6.3,A,F6.4)") "W' boson: mass=",M_Wprime*100d0,", width=",Ga_Wprime*100d0
+                else
+                  write(TheUnit,"(4X,A,F6.3,A,F6.4)") "W' boson: mass=heavy (contact interaction)"
+                endif
+                if( cdabs(ewp_El_left  ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ewp_El_left=  ",ewp_El_left  ,"i"
+                if( cdabs(ewp_El_right ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ewp_El_right= ",ewp_El_right ,"i"
+                if( cdabs(ewp_Mu_left  ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ewp_Mu_left=  ",ewp_Mu_left  ,"i"
+                if( cdabs(ewp_Mu_right ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ewp_Mu_right= ",ewp_Mu_right ,"i"
+                if( cdabs(ewp_Ta_left  ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ewp_Ta_left=  ",ewp_Ta_left  ,"i"
+                if( cdabs(ewp_Ta_right ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ewp_Ta_right= ",ewp_Ta_right ,"i"
+                if( cdabs(ewp_Up_left  ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ewp_Up_left=  ",ewp_Up_left  ,"i"
+                if( cdabs(ewp_Up_right ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ewp_Up_right= ",ewp_Up_right ,"i"
+                if( cdabs(ewp_Chm_left ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ewp_Chm_left= ",ewp_Chm_left ,"i"
+                if( cdabs(ewp_Chm_right).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ewp_Chm_right=",ewp_Chm_right,"i"
+                if( cdabs(ewp_Top_left ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ewp_Top_left= ",ewp_Top_left ,"i"
+                if( cdabs(ewp_Top_right).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ewp_Top_right=",ewp_Top_right,"i"
+            endif
         endif
     elseif( Process.eq.1 ) then
         write(TheUnit,"(4X,A)") "spin-1-VV couplings: "
@@ -4940,16 +5340,56 @@ character :: arg*(500)
         write(TheUnit,"(6X,A,2E16.8,A1)") "a4 =",a4,"i"
         write(TheUnit,"(6X,A,2E16.8,A1)") "a5 =",a5,"i"
         if( generate_bis ) then
-            write(TheUnit,"(6X,A,2E16.8,A1)") "b1 =",b1,"i"
-            write(TheUnit,"(6X,A,2E16.8,A1)") "b2 =",b2,"i"
-            write(TheUnit,"(6X,A,2E16.8,A1)") "b3 =",b3,"i"
-            write(TheUnit,"(6X,A,2E16.8,A1)") "b4 =",b4,"i"
-            write(TheUnit,"(6X,A,2E16.8,A1)") "b5 =",b5,"i"
-            write(TheUnit,"(6X,A,2E16.8,A1)") "b6 =",b6,"i"
-            write(TheUnit,"(6X,A,2E16.8,A1)") "b7 =",b7,"i"
-            write(TheUnit,"(6X,A,2E16.8,A1)") "b8 =",b8,"i"
-            write(TheUnit,"(6X,A,2E16.8,A1)") "b9 =",b9,"i"
-            write(TheUnit,"(6X,A,2E16.8,A1)") "b10=",b10,"i"
+            if (b1.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "b1 =",b1,"i"
+            if (b2.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "b2 =",b2,"i"
+            if (b3.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "b3 =",b3,"i"
+            if (b4.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "b4 =",b4,"i"
+            if (b5.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "b5 =",b5,"i"
+            if (b6.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "b6 =",b6,"i"
+            if (b7.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "b7 =",b7,"i"
+            if (b8.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "b8 =",b8,"i"
+            if (b9.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "b9 =",b9,"i"
+            if (b10.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "b10=",b10,"i"
+
+            if (bzgs1.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzgs1 =",bzgs1,"i"
+            if (bzgs2.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzgs2 =",bzgs2,"i"
+            if (bzgs3.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzgs3 =",bzgs3,"i"
+            if (bzgs4.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzgs4 =",bzgs4,"i"
+            if (bzgs8.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzgs8 =",bzgs8,"i"
+
+            if (bgsgs1.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bgsgs1 =",bgsgs1,"i"
+            if (bgsgs2.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bgsgs2 =",bgsgs2,"i"
+            if (bgsgs3.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bgsgs3 =",bgsgs3,"i"
+            if (bgsgs4.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bgsgs4 =",bgsgs4,"i"
+            if (bgsgs8.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bgsgs8 =",bgsgs8,"i"
+
+            if (bzzp1.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzzp1 =",bzzp1,"i"
+            if (bzzp2.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzzp2 =",bzzp2,"i"
+            if (bzzp3.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzzp3 =",bzzp3,"i"
+            if (bzzp4.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzzp4 =",bzzp4,"i"
+            if (bzzp5.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzzp5 =",bzzp5,"i"
+            if (bzzp6.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzzp6 =",bzzp6,"i"
+            if (bzzp7.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzzp7 =",bzzp7,"i"
+            if (bzzp8.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzzp8 =",bzzp8,"i"
+            if (bzzp9.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzzp9 =",bzzp9,"i"
+            if (bzzp10.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzzp10=",bzzp10,"i"
+
+            if (bzpzp1.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzpzp1 =",bzpzp1,"i"
+            if (bzpzp2.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzpzp2 =",bzpzp2,"i"
+            if (bzpzp3.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzpzp3 =",bzpzp3,"i"
+            if (bzpzp4.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzpzp4 =",bzpzp4,"i"
+            if (bzpzp5.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzpzp5 =",bzpzp5,"i"
+            if (bzpzp6.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzpzp6 =",bzpzp6,"i"
+            if (bzpzp7.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzpzp7 =",bzpzp7,"i"
+            if (bzpzp8.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzpzp8 =",bzpzp8,"i"
+            if (bzpzp9.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzpzp9 =",bzpzp9,"i"
+            if (bzpzp10.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzpzp10=",bzpzp10,"i"
+
+            if (bzpgs1.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzpgs1 =",bzpgs1,"i"
+            if (bzpgs2.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzpgs2 =",bzpgs2,"i"
+            if (bzpgs3.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzpgs3 =",bzpgs3,"i"
+            if (bzpgs4.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzpgs4 =",bzpgs4,"i"
+            if (bzpgs8.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzpgs8 =",bzpgs8,"i"
         else
             write(TheUnit,"(6X,A,2E16.8,A1)") "c1 =",c1,"i"
             write(TheUnit,"(6X,A,2E16.8,A1)") "c2 =",c2,"i"

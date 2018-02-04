@@ -578,6 +578,13 @@ void Mela::computeVBFAngles(
       daughters.insert(daughters.begin()+1, SimpleParticle_t(-9000, nullVector));
     }
 
+    if (myVerbosity_>=TVar::DEBUG) {
+      MELAout << "Mela::computeVBFAngles: Giving the following particles to TUtil::computeVBFAngles" << endl;
+      for (int i = 0; i <= 3; i++) MELAout << daughters.at(i) << endl;
+      for (int i = 0; i <= 1; i++) MELAout << aparts.at(i) << endl;
+      for (int i = 0; i <= 1; i++) MELAout << mothers.at(i) << endl;
+    }
+
     TUtil::computeVBFAngles(
       costhetastar, costheta1, costheta2, Phi, Phi1, Q2V1, Q2V2,
       daughters.at(0).second, daughters.at(0).first,
@@ -596,6 +603,10 @@ void Mela::computeVBFAngles(
     if (!(costheta2==costheta2)) costheta2=0;
     if (!(Phi==Phi)) Phi=0;
     if (!(Phi1==Phi1)) Phi1=0;
+
+    if (myVerbosity_>=TVar::DEBUG) MELAout << "Mela::computeVBFAngles: result = " << Q2V1 << ", " << Q2V2
+                                           << ", " << costheta1 << ", " << costheta2 << ", " << Phi << ", "
+                                           << costhetastar << ", " << Phi1 << endl;
   }
   else if (myVerbosity_>=TVar::DEBUG) MELAerr << "Mela::computeVBFAngles: No possible melaCand in TEvtProb to compute angles." << endl;
 }
@@ -661,6 +672,11 @@ void Mela::computeVBFAngles_ComplexBoost(
     if (!(costheta2_imag==costheta2_imag)) costheta2_imag=0;
     if (!(Phi==Phi)) Phi=0;
     if (!(Phi1==Phi1)) Phi1=0;
+
+    if (myVerbosity_>=TVar::DEBUG) MELAout << "Mela::computeVBFAngles_ComplexBoost: result = " << Q2V1 << ", " << Q2V2
+                                           << ", " << costheta1_real << " + " << costheta1_imag << "i, "
+                                           << costheta2_real << " + " << costheta2_imag << "i, " << Phi << ", "
+                                           << costhetastar << ", " << Phi1 << endl;
   }
   else if (myVerbosity_>=TVar::DEBUG) MELAerr << "Mela::computeVBFAngles_ComplexBoost: No possible melaCand in TEvtProb to compute angles." << endl;
 }
@@ -682,7 +698,7 @@ void Mela::computeVHAngles(
     TLorentzVector nullVector(0, 0, 0, 0);
 
     if (!(myProduction_ == TVar::Lep_ZH || myProduction_ == TVar::Lep_WH || myProduction_ == TVar::Had_ZH || myProduction_ == TVar::Had_WH || myProduction_ == TVar::GammaH)){
-      if (myVerbosity_>=TVar::ERROR) MELAerr << "Mela::computeVHAngles: Production is not supported!" << endl;
+      if (myVerbosity_>=TVar::ERROR) MELAerr << "Mela::computeVHAngles: Production is not supported! " << ProductionName(myProduction_) << endl;
       return;
     }
 
@@ -758,6 +774,10 @@ void Mela::computeVHAngles(
     if (!(costheta2==costheta2)) costheta2=0;
     if (!(Phi==Phi)) Phi=0;
     if (!(Phi1==Phi1)) Phi1=0;
+
+    if (myVerbosity_>=TVar::DEBUG) MELAout << "Mela::computeVHAngles: result = "
+                                           << costheta1 << ", " << costheta2 << ", " << Phi << ", "
+                                           << costhetastar << ", " << Phi1 << endl;
   }
   else if (myVerbosity_>=TVar::DEBUG) MELAerr << "Mela::computeVHAngles: No possible melaCand in TEvtProb to compute angles." << endl;
 }

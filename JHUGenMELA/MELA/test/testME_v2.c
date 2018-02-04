@@ -1364,6 +1364,36 @@ void testME_VH_JHUGen_Ping(int erg_tev=13, bool useConstants=false, shared_ptr<M
         cout << "Ideal BW: " << idealBW << '\n' << endl;
 
         cout << "*******************************************************" << endl;
+
+        float costhetastar = 0, costheta1 = 0, costheta2 = 0, Phi = 0, Phi1 = 0;
+        float costhetastarMELA = 0, costheta1MELA = 0, costheta2MELA = 0, PhiMELA = 0, Phi1MELA = 0;
+        TUtil::computeVHAngles(
+          costhetastar,
+          costheta1,
+          costheta2,
+          Phi,
+          Phi1,
+
+          daughters.at(0).second, daughters.at(0).first,
+          daughters.at(1).second, daughters.at(1).first,
+          daughters.at(2).second, daughters.at(2).first,
+          daughters.at(3).second, daughters.at(3).first,
+
+          aparticles.at(0).second, aparticles.at(0).first,
+          aparticles.at(1).second, aparticles.at(1).first
+        );
+        if (prod != TVar::GammaH) //fixme!
+        mela.computeVHAngles(
+          costheta1MELA,
+          costheta2MELA,
+          PhiMELA,
+          costhetastarMELA,
+          Phi1MELA
+        );
+
+        cout << "TUtil " << TVar::ProductionName(prod) << " angles: " << costheta1 << " " << costheta2 << " " << Phi << " " << costhetastar << " " << Phi1 << endl;
+        cout << "MELA " << TVar::ProductionName(prod) << " angles: " << costheta1MELA << " " << costheta2MELA << " " << PhiMELA << " " << costhetastarMELA << " " << Phi1MELA << endl;
+
       }
     }
 
@@ -1624,6 +1654,69 @@ void testME_VBF_JHUGen_Ping(int erg_tev=13, bool useConstants=false, shared_ptr<
         cout << "*******************************************************" << endl;
       }
     }
+
+    float costhetastar, costheta1re, costheta1im, costheta2re, costheta2im, Phi, Phi1, Q2V1, Q2V2;
+    float costhetastarMELA, costheta1reMELA, costheta1imMELA, costheta2reMELA, costheta2imMELA, PhiMELA, Phi1MELA, Q2V1MELA, Q2V2MELA;
+
+    TUtil::computeVBFAngles(
+      costhetastar,
+      costheta1re,
+      costheta2re,
+      Phi,
+      Phi1,
+      Q2V1,
+      Q2V2,
+
+      daughters.at(0).second, daughters.at(0).first,
+      daughters.at(1).second, daughters.at(1).first,
+      daughters.at(2).second, daughters.at(2).first,
+      daughters.at(3).second, daughters.at(3).first,
+
+      aparticles.at(0).second, aparticles.at(0).first,
+      aparticles.at(1).second, aparticles.at(1).first
+    );
+    mela.computeVBFAngles(
+      Q2V1MELA,
+      Q2V2MELA,
+      costheta1reMELA,
+      costheta2reMELA,
+      PhiMELA,
+      costhetastarMELA,
+      Phi1MELA
+    );
+
+    cout << "TUtil VBF angles: " << costheta1re << " " << costheta2re << " " << Phi << " " << costhetastar << " " << Phi1 << " " << Q2V1 << " " << Q2V2 << endl;
+    cout << "MELA VBF angles: " << costheta1reMELA << " " << costheta2reMELA << " " << PhiMELA << " " << costhetastarMELA << " " << Phi1MELA << " " << Q2V1MELA << " " << Q2V2MELA << endl;
+
+    TUtil::computeVBFAngles_ComplexBoost(
+      costhetastar,
+      costheta1re, costheta1im,
+      costheta2re, costheta2im,
+      Phi,
+      Phi1,
+      Q2V1,
+      Q2V2,
+
+      daughters.at(0).second, daughters.at(0).first,
+      daughters.at(1).second, daughters.at(1).first,
+      daughters.at(2).second, daughters.at(2).first,
+      daughters.at(3).second, daughters.at(3).first,
+
+      aparticles.at(0).second, aparticles.at(0).first,
+      aparticles.at(1).second, aparticles.at(1).first
+    );
+    mela.computeVBFAngles_ComplexBoost(
+      Q2V1MELA,
+      Q2V2MELA,
+      costheta1reMELA, costheta1imMELA,
+      costheta2reMELA, costheta2imMELA,
+      PhiMELA,
+      costhetastarMELA,
+      Phi1MELA
+    );
+
+    cout << "TUtil complex VBF angles: " << costheta1re << " " << costheta1im << " " << costheta2re << " " << costheta2im << " " << Phi << " " << costhetastar << " " << Phi1 << " " << Q2V1 << " " << Q2V2 << endl;
+    cout << "MELA complex VBF angles: " << costheta1reMELA << " " << costheta1imMELA << " " << costheta2reMELA << " " << costheta2imMELA << " " << PhiMELA << " " << costhetastarMELA << " " << Phi1MELA << " " << Q2V1MELA << " " << Q2V2MELA << endl;
 
     mela.resetInputEvent();
     cout << "Removed..." << endl;
@@ -2657,7 +2750,7 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_Comparison_Ping(int motherflavor=0, int 
     p_prod_fa3AA_dec_fa3AA_VAJHU.prodme *= propagator; p_prod_fa3AA_dec_fa3AA_VAJHU.multiplyarray(propagator);
 
     p_prod_0mplus_dec_0mplus_VAJHU.proddecme = p_prod_0mplus_dec_0mplus_VAJHU.prodme*p_prod_0mplus_dec_0mplus_VAJHU.decme; p_prod_0mplus_dec_0mplus_VAJHU.multiplyarray(p_prod_0mplus_dec_0mplus_VAJHU.decme);
-    if (isZZWW==ZZWWdec_onevertexflag){ // MCFM setting below turns off ZZ anomalous couplings if WH with WW couplings tested, so we should do the same here. 
+    if (isZZWW==ZZWWdec_onevertexflag){ // MCFM setting below turns off ZZ anomalous couplings if WH with WW couplings tested, so we should do the same here.
       p_prod_0minus_dec_0minus_VAJHU.proddecme = p_prod_0minus_dec_0minus_VAJHU.prodme*p_prod_0mplus_dec_0mplus_VAJHU.decme; p_prod_0minus_dec_0minus_VAJHU.multiplyarray(p_prod_0mplus_dec_0mplus_VAJHU.decme);
       p_prod_fa3_dec_fa3_VAJHU.proddecme = p_prod_fa3_dec_fa3_VAJHU.prodme*p_prod_0mplus_dec_0mplus_VAJHU.decme; p_prod_fa3_dec_fa3_VAJHU.multiplyarray(p_prod_0mplus_dec_0mplus_VAJHU.decme);
     }
@@ -4035,14 +4128,14 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_TU_Comparison_Ping(int motherflavor=0, i
     // Reset these in case the function needs to be repeated
     spinzerohiggs_anomcoupl_.AnomalCouplDK=1;
     spinzerohiggs_anomcoupl_.AnomalCouplPR=1;
-    
+
     mela.setProcess(TVar::HSMHiggs, TVar::MCFM, prod);
     mela.setRenFacScaleMode(TVar::Fixed_mH, TVar::Fixed_mH, 1, 1);
     if (isZZWW!=2){ mela.selfDHzzcoupl[0][gHIGGS_VV_1][0]=1; if (isZZWW==1) mela.differentiate_HWW_HZZ=true; }
     else{ mela.selfDHwwcoupl[0][gHIGGS_VV_1][0]=1; mela.differentiate_HWW_HZZ=true; }
     mela.computeProdDecP(p_prod_0mplus_dec_0mplus_VAMCFM.proddecme, false);
     mela.getIORecord()->getUnweightedMEArray(p_prod_0mplus_dec_0mplus_VAMCFM.mearray);
-    
+
     mela.setRenFacScaleMode(TVar::Fixed_mH, TVar::Fixed_mH, 1, 1);
     if (isZZWW!=2){ mela.selfDHzzcoupl[0][gHIGGS_VV_4][0]=1; if (isZZWW==1) mela.differentiate_HWW_HZZ=true; }
     else{ mela.selfDHwwcoupl[0][gHIGGS_VV_4][0]=1; mela.differentiate_HWW_HZZ=true; }
@@ -4120,14 +4213,14 @@ void testME_ProdDec_MCFM_JHUGen_WBFZZWW_TU_Comparison_Ping(int motherflavor=0, i
 
     cout << "MCFM production chosen: " << TVar::ProductionName(prod_tu) << endl;
     cout << "spinzerohiggs_anomcoupl_.AnomalCouplDK=" << spinzerohiggs_anomcoupl_.AnomalCouplDK << endl;
-    
+
     mela.setProcess(TVar::HSMHiggs, TVar::MCFM, prod_tu);
     mela.setRenFacScaleMode(TVar::Fixed_mH, TVar::Fixed_mH, 1, 1);
     if (isZZWW!=2){ mela.selfDHzzcoupl[0][gHIGGS_VV_1][0]=1; if (isZZWW==1) mela.differentiate_HWW_HZZ=true; }
     else{ mela.selfDHwwcoupl[0][gHIGGS_VV_1][0]=1; mela.differentiate_HWW_HZZ=true; }
     mela.computeProdDecP(p_prod_tu_0mplus_dec_0mplus_VAMCFM.proddecme, false);
     mela.getIORecord()->getUnweightedMEArray(p_prod_tu_0mplus_dec_0mplus_VAMCFM.mearray);
-    
+
     mela.setRenFacScaleMode(TVar::Fixed_mH, TVar::Fixed_mH, 1, 1);
     if (isZZWW!=2){ mela.selfDHzzcoupl[0][gHIGGS_VV_4][0]=1; if (isZZWW==1) mela.differentiate_HWW_HZZ=true; }
     else{ mela.selfDHwwcoupl[0][gHIGGS_VV_4][0]=1; mela.differentiate_HWW_HZZ=true; }
