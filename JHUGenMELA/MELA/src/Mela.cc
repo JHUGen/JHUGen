@@ -90,8 +90,8 @@ Mela::~Mela(){
   // ...then delete the observables.
   if (myVerbosity_>=TVar::DEBUG) MELAout << "Mela destructor: Destroying analytical PDFs observables" << endl;
   delete mzz_rrv;
-  delete z1mass_rrv; 
-  delete z2mass_rrv; 
+  delete z1mass_rrv;
+  delete z2mass_rrv;
   delete costhetastar_rrv;
   delete costheta1_rrv;
   delete costheta2_rrv;
@@ -1689,9 +1689,9 @@ void Mela::computeD_gg(
 
 
 bool Mela::configureAnalyticalPDFs(){
-  // 
-  // Configure the analytical calculations 
-  // 
+  //
+  // Configure the analytical calculations
+  //
   bool noPass=false;
   pdf=0;
 
