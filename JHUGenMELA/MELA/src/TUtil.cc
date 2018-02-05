@@ -656,35 +656,35 @@ void TUtil::computeVBFAngles(
   // Transform incoming partons back to original frame
   P1.Transform(movingframe.Inverse());
   P2.Transform(movingframe.Inverse());
-  //movingframe, HJJ, and HJJ_T will not be used anymore
-  if (injet1!=0 && injet2!=0){ // Handle gen. partons if they are available
-    if (fabs((*injet1+*injet2).P()-pHJJ.P())<pHJJ.P()*1e-4){
-      P1=*injet1;
-      P2=*injet2;
-      if (P1.Z() < P2.Z()){
-        swap(P1, P2);
-        swap(injet1Id, injet2Id);
-      }
-      // In the case of gen. partons, check if the intermediates are a Z or a W.
-      int diff1Id = jet1Id-injet1Id;
-      int diff2Id = jet2Id-injet2Id;
-      if (
-        !( // THIS IS A NOT-IF!
-        (diff1Id==0 && diff2Id==0 && !(injet1Id==21 || injet2Id==21)) // Two Z bosons
+  pHJJ.Transform(movingframe.Inverse());
+  // movingframe and HJJ_T will not be used anymore
+  // Handle gen. partons if they are available
+  if (injet1 && injet2 && fabs((*injet1+*injet2).P()-pHJJ.P())<pHJJ.P()*1e-4){
+    P1=*injet1;
+    P2=*injet2;
+    if (P1.Z() < P2.Z()){
+      swap(P1, P2);
+      swap(injet1Id, injet2Id);
+    }
+    // In the case of gen. partons, check if the intermediates are a Z or a W.
+    int diff1Id = jet1Id-injet1Id;
+    int diff2Id = jet2Id-injet2Id;
+    if (
+      !( // THIS IS A NOT-IF!
+      (diff1Id==0 && diff2Id==0 && !(injet1Id==21 || injet2Id==21)) // Two Z bosons
         ||
         ((fabs(diff1Id)==1 || fabs(diff1Id)==3 || fabs(diff1Id)==5) && (fabs(diff2Id)==1 || fabs(diff2Id)==3 || fabs(diff2Id)==5)) // Two W bosons, do not check W+ vs W-
         )
+      ){
+      int diff12Id = jet1Id-injet2Id;
+      int diff21Id = jet2Id-injet1Id;
+      if (
+        ((diff12Id==0 || diff21Id==0) && !(injet1Id==21 || injet2Id==21)) // At least one Z boson
+        ||
+        ((fabs(diff12Id)==1 || fabs(diff12Id)==3 || fabs(diff12Id)==5) || (fabs(diff21Id)==1 || fabs(diff21Id)==3 || fabs(diff21Id)==5)) // At least one W boson
         ){
-        int diff12Id = jet1Id-injet2Id;
-        int diff21Id = jet2Id-injet1Id;
-        if (
-          ((diff12Id==0 || diff21Id==0) && !(injet1Id==21 || injet2Id==21)) // At least one Z boson
-          ||
-          ((fabs(diff12Id)==1 || fabs(diff12Id)==3 || fabs(diff12Id)==5) || (fabs(diff21Id)==1 || fabs(diff21Id)==3 || fabs(diff21Id)==5)) // At least one W boson
-          ){
-          swap(P1, P2);
-          swap(injet1Id, injet2Id);
-        }
+        swap(P1, P2);
+        swap(injet1Id, injet2Id);
       }
     }
   }
@@ -808,35 +808,35 @@ void TUtil::computeVBFAngles_ComplexBoost(
   // Transform incoming partons back to original frame
   P1.Transform(movingframe.Inverse());
   P2.Transform(movingframe.Inverse());
-  //movingframe, HJJ, and HJJ_T will not be used anymore
-  if (injet1!=0 && injet2!=0){ // Handle gen. partons if they are available
-    if (fabs((*injet1+*injet2).P()-pHJJ.P())<pHJJ.P()*1e-4){
-      P1=*injet1;
-      P2=*injet2;
-      if (P1.Z() < P2.Z()){
-        swap(P1, P2);
-        swap(injet1Id, injet2Id);
-      }
-      // In the case of gen. partons, check if the intermediates are a Z or a W.
-      int diff1Id = jet1Id-injet1Id;
-      int diff2Id = jet2Id-injet2Id;
-      if (
-        !( // THIS IS A NOT-IF!
-        (diff1Id==0 && diff2Id==0 && !(injet1Id==21 || injet2Id==21)) // Two Z bosons
+  pHJJ.Transform(movingframe.Inverse());
+  // movingframe and HJJ_T will not be used anymore
+  // Handle gen. partons if they are available
+  if (injet1 && injet2 && fabs((*injet1+*injet2).P()-pHJJ.P())<pHJJ.P()*1e-4){
+    P1=*injet1;
+    P2=*injet2;
+    if (P1.Z() < P2.Z()){
+      swap(P1, P2);
+      swap(injet1Id, injet2Id);
+    }
+    // In the case of gen. partons, check if the intermediates are a Z or a W.
+    int diff1Id = jet1Id-injet1Id;
+    int diff2Id = jet2Id-injet2Id;
+    if (
+      !( // THIS IS A NOT-IF!
+      (diff1Id==0 && diff2Id==0 && !(injet1Id==21 || injet2Id==21)) // Two Z bosons
         ||
         ((fabs(diff1Id)==1 || fabs(diff1Id)==3 || fabs(diff1Id)==5) && (fabs(diff2Id)==1 || fabs(diff2Id)==3 || fabs(diff2Id)==5)) // Two W bosons, do not check W+ vs W-
         )
+      ){
+      int diff12Id = jet1Id-injet2Id;
+      int diff21Id = jet2Id-injet1Id;
+      if (
+        ((diff12Id==0 || diff21Id==0) && !(injet1Id==21 || injet2Id==21)) // At least one Z boson
+        ||
+        ((fabs(diff12Id)==1 || fabs(diff12Id)==3 || fabs(diff12Id)==5) || (fabs(diff21Id)==1 || fabs(diff21Id)==3 || fabs(diff21Id)==5)) // At least one W boson
         ){
-        int diff12Id = jet1Id-injet2Id;
-        int diff21Id = jet2Id-injet1Id;
-        if (
-          ((diff12Id==0 || diff21Id==0) && !(injet1Id==21 || injet2Id==21)) // At least one Z boson
-          ||
-          ((fabs(diff12Id)==1 || fabs(diff12Id)==3 || fabs(diff12Id)==5) || (fabs(diff21Id)==1 || fabs(diff21Id)==3 || fabs(diff21Id)==5)) // At least one W boson
-          ){
-          swap(P1, P2);
-          swap(injet1Id, injet2Id);
-        }
+        swap(P1, P2);
+        swap(injet1Id, injet2Id);
       }
     }
   }
@@ -975,20 +975,20 @@ void TUtil::computeVHAngles(
   // Transform incoming partons back to the original frame
   P1.Transform(movingframe.Inverse());
   P2.Transform(movingframe.Inverse());
-  //movingframe, HJJ, and HJJ_T will not be used anymore
-  if (injet1!=0 && injet2!=0){ // Handle gen. partons if they are available
-    if (fabs((*injet1+*injet2).P()-pHJJ.P())<=pHJJ.P()*1e-4){
-      P1=*injet1;
-      P2=*injet2;
-      // Apply convention for incoming (!) particles
-      if (
-        (injet1Id*injet2Id<0 && injet1Id>0) // for OS pairs: parton 2 must be the particle
-        ||
-        (injet1Id*injet2Id>0 && P1.Z()>=P2.Z()) //for SS pairs: use random deterministic convention
-        ){
-        swap(P1, P2);
-        swap(injet1Id, injet2Id);
-      }
+  pHJJ.Transform(movingframe.Inverse());
+  // movingframe and HJJ_T will not be used anymore
+  // Handle gen. partons if they are available
+  if (injet1 && injet2 && fabs((*injet1+*injet2).P()-pHJJ.P())<pHJJ.P()*1e-4){
+    P1=*injet1;
+    P2=*injet2;
+    // Apply convention for incoming (!) particles
+    if (
+      (injet1Id*injet2Id<0 && injet1Id>0) // for OS pairs: parton 2 must be the particle
+      ||
+      (injet1Id*injet2Id>0 && P1.Z()>=P2.Z()) //for SS pairs: use random deterministic convention
+      ){
+      swap(P1, P2);
+      swap(injet1Id, injet2Id);
     }
   }
 

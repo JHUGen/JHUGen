@@ -1366,33 +1366,14 @@ void testME_VH_JHUGen_Ping(int erg_tev=13, bool useConstants=false, shared_ptr<M
         cout << "*******************************************************" << endl;
 
         float costhetastar = 0, costheta1 = 0, costheta2 = 0, Phi = 0, Phi1 = 0;
-        float costhetastarMELA = 0, costheta1MELA = 0, costheta2MELA = 0, PhiMELA = 0, Phi1MELA = 0;
-        TUtil::computeVHAngles(
-          costhetastar,
+        if (prod != TVar::GammaH) mela.computeVHAngles(
           costheta1,
           costheta2,
           Phi,
-          Phi1,
-
-          daughters.at(0).second, daughters.at(0).first,
-          daughters.at(1).second, daughters.at(1).first,
-          daughters.at(2).second, daughters.at(2).first,
-          daughters.at(3).second, daughters.at(3).first,
-
-          aparticles.at(0).second, aparticles.at(0).first,
-          aparticles.at(1).second, aparticles.at(1).first
+          costhetastar,
+          Phi1
         );
-        if (prod != TVar::GammaH) //fixme!
-        mela.computeVHAngles(
-          costheta1MELA,
-          costheta2MELA,
-          PhiMELA,
-          costhetastarMELA,
-          Phi1MELA
-        );
-
-        cout << "TUtil " << TVar::ProductionName(prod) << " angles: " << costheta1 << " " << costheta2 << " " << Phi << " " << costhetastar << " " << Phi1 << endl;
-        cout << "MELA " << TVar::ProductionName(prod) << " angles: " << costheta1MELA << " " << costheta2MELA << " " << PhiMELA << " " << costhetastarMELA << " " << Phi1MELA << endl;
+        cout << "VH (" << TVar::ProductionName(prod) << ") angles: " << costheta1 << " " << costheta2 << " " << Phi << " " << costhetastar << " " << Phi1 << endl;
 
       }
     }
@@ -1656,69 +1637,26 @@ void testME_VBF_JHUGen_Ping(int erg_tev=13, bool useConstants=false, shared_ptr<
     }
 
     float costhetastar, costheta1re, costheta1im, costheta2re, costheta2im, Phi, Phi1, Q2V1, Q2V2;
-    float costhetastarMELA, costheta1reMELA, costheta1imMELA, costheta2reMELA, costheta2imMELA, PhiMELA, Phi1MELA, Q2V1MELA, Q2V2MELA;
-
-    TUtil::computeVBFAngles(
-      costhetastar,
+    mela.computeVBFAngles(
+      Q2V1,
+      Q2V2,
       costheta1re,
       costheta2re,
       Phi,
-      Phi1,
+      costhetastar,
+      Phi1
+    );
+    cout << "Lab-frame VBF angles: " << costheta1re << " " << costheta2re << " " << Phi << " " << costhetastar << " " << Phi1 << " " << Q2V1 << " " << Q2V2 << endl;
+    mela.computeVBFAngles_ComplexBoost(
       Q2V1,
       Q2V2,
-
-      daughters.at(0).second, daughters.at(0).first,
-      daughters.at(1).second, daughters.at(1).first,
-      daughters.at(2).second, daughters.at(2).first,
-      daughters.at(3).second, daughters.at(3).first,
-
-      aparticles.at(0).second, aparticles.at(0).first,
-      aparticles.at(1).second, aparticles.at(1).first
-    );
-    mela.setVerbosity(TVar::DEBUG);
-    mela.computeVBFAngles(
-      Q2V1MELA,
-      Q2V2MELA,
-      costheta1reMELA,
-      costheta2reMELA,
-      PhiMELA,
-      costhetastarMELA,
-      Phi1MELA
-    );
-    mela.setVerbosity(verbosity);
-
-    cout << "TUtil VBF angles: " << costheta1re << " " << costheta2re << " " << Phi << " " << costhetastar << " " << Phi1 << " " << Q2V1 << " " << Q2V2 << endl;
-    cout << "MELA VBF angles: " << costheta1reMELA << " " << costheta2reMELA << " " << PhiMELA << " " << costhetastarMELA << " " << Phi1MELA << " " << Q2V1MELA << " " << Q2V2MELA << endl;
-
-    TUtil::computeVBFAngles_ComplexBoost(
-      costhetastar,
       costheta1re, costheta1im,
       costheta2re, costheta2im,
       Phi,
-      Phi1,
-      Q2V1,
-      Q2V2,
-
-      daughters.at(0).second, daughters.at(0).first,
-      daughters.at(1).second, daughters.at(1).first,
-      daughters.at(2).second, daughters.at(2).first,
-      daughters.at(3).second, daughters.at(3).first,
-
-      aparticles.at(0).second, aparticles.at(0).first,
-      aparticles.at(1).second, aparticles.at(1).first
+      costhetastar,
+      Phi1
     );
-    mela.computeVBFAngles_ComplexBoost(
-      Q2V1MELA,
-      Q2V2MELA,
-      costheta1reMELA, costheta1imMELA,
-      costheta2reMELA, costheta2imMELA,
-      PhiMELA,
-      costhetastarMELA,
-      Phi1MELA
-    );
-
-    cout << "TUtil complex VBF angles: " << costheta1re << " " << costheta1im << " " << costheta2re << " " << costheta2im << " " << Phi << " " << costhetastar << " " << Phi1 << " " << Q2V1 << " " << Q2V2 << endl;
-    cout << "MELA complex VBF angles: " << costheta1reMELA << " " << costheta1imMELA << " " << costheta2reMELA << " " << costheta2imMELA << " " << PhiMELA << " " << costhetastarMELA << " " << Phi1MELA << " " << Q2V1MELA << " " << Q2V2MELA << endl;
+    cout << "Complex VBF angles: " << costheta1re << " " << costheta1im << " " << costheta2re << " " << costheta2im << " " << Phi << " " << costhetastar << " " << Phi1 << " " << Q2V1 << " " << Q2V2 << endl;
 
     mela.resetInputEvent();
     cout << "Removed..." << endl;
