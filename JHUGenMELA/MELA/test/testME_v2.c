@@ -1675,6 +1675,7 @@ void testME_VBF_JHUGen_Ping(int erg_tev=13, bool useConstants=false, shared_ptr<
       aparticles.at(0).second, aparticles.at(0).first,
       aparticles.at(1).second, aparticles.at(1).first
     );
+    mela.setVerbosity(TVar::DEBUG);
     mela.computeVBFAngles(
       Q2V1MELA,
       Q2V2MELA,
@@ -1684,6 +1685,7 @@ void testME_VBF_JHUGen_Ping(int erg_tev=13, bool useConstants=false, shared_ptr<
       costhetastarMELA,
       Phi1MELA
     );
+    mela.setVerbosity(verbosity);
 
     cout << "TUtil VBF angles: " << costheta1re << " " << costheta2re << " " << Phi << " " << costhetastar << " " << Phi1 << " " << Q2V1 << " " << Q2V2 << endl;
     cout << "MELA VBF angles: " << costheta1reMELA << " " << costheta2reMELA << " " << PhiMELA << " " << costhetastarMELA << " " << Phi1MELA << " " << Q2V1MELA << " " << Q2V2MELA << endl;
