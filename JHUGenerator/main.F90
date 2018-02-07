@@ -509,14 +509,14 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "ghz4", success, ghz4, success2=SetAnomalousSpin0ZZ)
 
     !spin 0 Zgamma couplings
-    call ReadCommandLineArgument(arg, "ghzgs2", success, ghzgs2, success2=SetZgammacoupling)
-    call ReadCommandLineArgument(arg, "ghzgs3", success, ghzgs3, success2=SetZgammacoupling)
-    call ReadCommandLineArgument(arg, "ghzgs4", success, ghzgs4, success2=SetZgammacoupling)
+    call ReadCommandLineArgument(arg, "ghzgs2", success, ghzgs2, success2=SetAnomalousSpin0ZZ, success3=SetZgammacoupling)
+    call ReadCommandLineArgument(arg, "ghzgs3", success, ghzgs3, success2=SetAnomalousSpin0ZZ, success3=SetZgammacoupling)
+    call ReadCommandLineArgument(arg, "ghzgs4", success, ghzgs4, success2=SetAnomalousSpin0ZZ, success3=SetZgammacoupling)
 
     !spin 0 gammagamma couplings
-    call ReadCommandLineArgument(arg, "ghgsgs2", success, ghgsgs2, success2=Setgammagammacoupling)
-    call ReadCommandLineArgument(arg, "ghgsgs3", success, ghgsgs3, success2=Setgammagammacoupling)
-    call ReadCommandLineArgument(arg, "ghgsgs4", success, ghgsgs4, success2=Setgammagammacoupling)
+    call ReadCommandLineArgument(arg, "ghgsgs2", success, ghgsgs2, success2=SetAnomalousSpin0ZZ, success3=Setgammagammacoupling)
+    call ReadCommandLineArgument(arg, "ghgsgs3", success, ghgsgs3, success2=SetAnomalousSpin0ZZ, success3=Setgammagammacoupling)
+    call ReadCommandLineArgument(arg, "ghgsgs4", success, ghgsgs4, success2=SetAnomalousSpin0ZZ, success3=Setgammagammacoupling)
 
     !spin 0 ZZ momentum dependent couplings
     call ReadCommandLineArgument(arg, "ghz1_prime", success, ghz1_prime, success2=SetAnomalousSpin0ZZ)
@@ -552,7 +552,7 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "ghz4_prime7", success, ghz4_prime7, success2=SetAnomalousSpin0ZZ)
 
     !spin 0 Zgamma momentum dependent coupling
-    call ReadCommandLineArgument(arg, "ghzgs1_prime2", success, ghzgs1_prime2, success2=SetZgammacoupling)
+    call ReadCommandLineArgument(arg, "ghzgs1_prime2", success, ghzgs1_prime2, success2=SetAnomalousSpin0ZZ, success3=SetZgammacoupling)
 
     ! Sign of q1,2,12**2 for the Lambda's, set to 1 or -1 to get q**2-dependence from these form factor Lambdas
     call ReadCommandLineArgument(arg, "cz_q1sq", success, cz_q1sq, success2=SetAnomalousSpin0ZZ)
@@ -677,14 +677,14 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "gh2z4", success, gh2z4, success2=SetAnomalousSpin0ZZ)
 
     !spin 0 Zgamma couplings
-    call ReadCommandLineArgument(arg, "gh2zgs2", success, gh2zgs2, success2=SetZgammacoupling)
-    call ReadCommandLineArgument(arg, "gh2zgs3", success, gh2zgs3, success2=SetZgammacoupling)
-    call ReadCommandLineArgument(arg, "gh2zgs4", success, gh2zgs4, success2=SetZgammacoupling)
+    call ReadCommandLineArgument(arg, "gh2zgs2", success, gh2zgs2, success2=SetAnomalousSpin0ZZ, success3=SetZgammacoupling)
+    call ReadCommandLineArgument(arg, "gh2zgs3", success, gh2zgs3, success2=SetAnomalousSpin0ZZ, success3=SetZgammacoupling)
+    call ReadCommandLineArgument(arg, "gh2zgs4", success, gh2zgs4, success2=SetAnomalousSpin0ZZ, success3=SetZgammacoupling)
 
     !spin 0 gammagamma couplings
-    call ReadCommandLineArgument(arg, "gh2gsgs2", success, gh2gsgs2, success2=Setgammagammacoupling)
-    call ReadCommandLineArgument(arg, "gh2gsgs3", success, gh2gsgs3, success2=Setgammagammacoupling)
-    call ReadCommandLineArgument(arg, "gh2gsgs4", success, gh2gsgs4, success2=Setgammagammacoupling)
+    call ReadCommandLineArgument(arg, "gh2gsgs2", success, gh2gsgs2, success2=SetAnomalousSpin0ZZ, success3=Setgammagammacoupling)
+    call ReadCommandLineArgument(arg, "gh2gsgs3", success, gh2gsgs3, success2=SetAnomalousSpin0ZZ, success3=Setgammagammacoupling)
+    call ReadCommandLineArgument(arg, "gh2gsgs4", success, gh2gsgs4, success2=SetAnomalousSpin0ZZ, success3=Setgammagammacoupling)
 
     !spin 0 ZZ momentum dependent couplings
     call ReadCommandLineArgument(arg, "gh2z1_prime", success, gh2z1_prime, success2=SetAnomalousSpin0ZZ)
@@ -720,7 +720,7 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "gh2z4_prime7", success, gh2z4_prime7, success2=SetAnomalousSpin0ZZ)
 
     !spin 0 Zgamma momentum dependent coupling
-    call ReadCommandLineArgument(arg, "gh2zgs1_prime2", success, gh2zgs1_prime2, success2=SetZgammacoupling)
+    call ReadCommandLineArgument(arg, "gh2zgs1_prime2", success, gh2zgs1_prime2, success2=SetAnomalousSpin0ZZ, success3=SetZgammacoupling)
 
     ! Sign of q1,2,12**2 for the Lambda's, set to 1 or -1 to get q**2-dependence from these form factor Lambdas
     call ReadCommandLineArgument(arg, "c2z_q1sq", success, c2z_q1sq, success2=SetAnomalousSpin0ZZ)
@@ -837,10 +837,10 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "ghzzp4_prime7", success, ghzzp4_prime7, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
 
     !spin 0 Zpgamma couplings
-    call ReadCommandLineArgument(arg, "ghzpgs1_prime2", success, ghzpgs1_prime2, success2=SetZgammacoupling, success3=includeVprime, success4=SetHZprime, success5=SetZprimegammacoupling)
-    call ReadCommandLineArgument(arg, "ghzpgs2", success, ghzpgs2, success2=SetZgammacoupling, success3=includeVprime, success4=SetHZprime, success5=SetZprimegammacoupling)
-    call ReadCommandLineArgument(arg, "ghzpgs3", success, ghzpgs3, success2=SetZgammacoupling, success3=includeVprime, success4=SetHZprime, success5=SetZprimegammacoupling)
-    call ReadCommandLineArgument(arg, "ghzpgs4", success, ghzpgs4, success2=SetZgammacoupling, success3=includeVprime, success4=SetHZprime, success5=SetZprimegammacoupling)
+    call ReadCommandLineArgument(arg, "ghzpgs1_prime2", success, ghzpgs1_prime2, success2=SetAnomalousSpin0ZZ, success3=SetZgammacoupling, success4=includeVprime, success5=SetHZprime, success6=SetZprimegammacoupling)
+    call ReadCommandLineArgument(arg, "ghzpgs2", success, ghzpgs2, success2=SetAnomalousSpin0ZZ, success3=SetZgammacoupling, success4=includeVprime, success5=SetHZprime, success6=SetZprimegammacoupling)
+    call ReadCommandLineArgument(arg, "ghzpgs3", success, ghzpgs3, success2=SetAnomalousSpin0ZZ, success3=SetZgammacoupling, success4=includeVprime, success5=SetHZprime, success6=SetZprimegammacoupling)
+    call ReadCommandLineArgument(arg, "ghzpgs4", success, ghzpgs4, success2=SetAnomalousSpin0ZZ, success3=SetZgammacoupling, success4=includeVprime, success5=SetHZprime, success6=SetZprimegammacoupling)
 
     !spin 0 ZpZp couplings
     call ReadCommandLineArgument(arg, "ghzpzp1", success, ghzpzp1, success2=SetAnomalousSpin0ZZ, success3=includeVprime, success4=SetHZprime)
@@ -902,11 +902,11 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "bzpzp9", success, bzpzp9, success2=SetSpin2VV, success3=includeVprime, success4=SetHZprime)
     call ReadCommandLineArgument(arg, "bzpzp10", success, bzpzp10, success2=SetSpin2VV, success3=includeVprime, success4=SetHZprime)
 
-    call ReadCommandLineArgument(arg, "bzpgs1", success, bzpgs1, success2=SetSpin2VV, success3=SetZgammacoupling, success4=includeVprime, success5=SetHZprime)
-    call ReadCommandLineArgument(arg, "bzpgs2", success, bzpgs2, success2=SetSpin2VV, success3=SetZgammacoupling, success4=includeVprime, success5=SetHZprime)
-    call ReadCommandLineArgument(arg, "bzpgs3", success, bzpgs3, success2=SetSpin2VV, success3=SetZgammacoupling, success4=includeVprime, success5=SetHZprime)
-    call ReadCommandLineArgument(arg, "bzpgs4", success, bzpgs4, success2=SetSpin2VV, success3=SetZgammacoupling, success4=includeVprime, success5=SetHZprime)
-    call ReadCommandLineArgument(arg, "bzpgs8", success, bzpgs8, success2=SetSpin2VV, success3=SetZgammacoupling, success4=includeVprime, success5=SetHZprime)
+    call ReadCommandLineArgument(arg, "bzpgs1", success, bzpgs1, success2=SetSpin2VV, success3=SetZgammacoupling, success4=includeVprime, success5=SetHZprime, success6=SetZprimegammacoupling)
+    call ReadCommandLineArgument(arg, "bzpgs2", success, bzpgs2, success2=SetSpin2VV, success3=SetZgammacoupling, success4=includeVprime, success5=SetHZprime, success6=SetZprimegammacoupling)
+    call ReadCommandLineArgument(arg, "bzpgs3", success, bzpgs3, success2=SetSpin2VV, success3=SetZgammacoupling, success4=includeVprime, success5=SetHZprime, success6=SetZprimegammacoupling)
+    call ReadCommandLineArgument(arg, "bzpgs4", success, bzpgs4, success2=SetSpin2VV, success3=SetZgammacoupling, success4=includeVprime, success5=SetHZprime, success6=SetZprimegammacoupling)
+    call ReadCommandLineArgument(arg, "bzpgs8", success, bzpgs8, success2=SetSpin2VV, success3=SetZgammacoupling, success4=includeVprime, success5=SetHZprime, success6=SetZprimegammacoupling)
 
     call ReadCommandLineArgument(arg, "ezp_El_left", success, ezp_El_left, success2=SetZprimeff)
     call ReadCommandLineArgument(arg, "ezp_El_right", success, ezp_El_right, success2=SetZprimeff)
@@ -1391,7 +1391,7 @@ logical :: SetColliderEnergy
     if( SetAnomalousSpin0gg .and. .not.Setghg2 ) then
         call Error("If you set an anomalous spin 0 gg coupling, you need to explicitly set ghg2 as well. This coupling is initialized to a non-zero value.")
     endif
-    if( .not.Setghz1 .and. OffShellV1 .and. OffShellV2 .and. (SetAnomalousSpin0ZZ .or. ((SetZgammacoupling .or. Setgammagammacoupling) .and. IsAZDecay(DecayMode1)))) then
+    if( .not.Setghz1 .and. OffShellV1 .and. OffShellV2 .and. SetAnomalousSpin0ZZ) then
         call Error("If you set an anomalous spin 0 VV coupling, you need to explicitly set ghz1 as well. This couplings is initialized to a non-zero value.")
     endif
     if( SetAnomalousHff .and. .not.Setkappa ) then

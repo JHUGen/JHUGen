@@ -3,7 +3,7 @@ implicit none
 save
 !
 !
-character(len=*),parameter :: JHUGen_Version="v7.1.0"
+character(len=*),parameter :: JHUGen_Version="v7.1.1"
 !
 !
 !=====================================================
@@ -2477,17 +2477,17 @@ end subroutine ComputeQCDVariables
 
 !ReadCommandLineArgument is overloaded.  Pass the type needed as "dest"
 !success is set to true if the argument passed matches argumentname, otherwise it's left alone
-!same for success2, success3, success4, and success5 (optional, can be used for other things, see main.F90)
+!same for success2, success3, success4, success5, and success6 (optional, can be used for other things, see main.F90)
 !SetLastArgument (optional) is set to true if the argument matches, otherwise it's set to false
 !for examples of all of them see main.F90
 
-subroutine ReadCommandLineArgument_logical(argument, argumentname, success, dest, SetLastArgument, success2, success3, success4, success5)
+subroutine ReadCommandLineArgument_logical(argument, argumentname, success, dest, SetLastArgument, success2, success3, success4, success5, success6)
 implicit none
 character(len=*) :: argument, argumentname
 logical, intent(inout) :: dest
 logical, intent(inout) :: success
 integer :: length
-logical, optional, intent(inout) :: SetLastArgument, success2, success3, success4, success5
+logical, optional, intent(inout) :: SetLastArgument, success2, success3, success4, success5, success6
 integer :: temp_int
 character(len=*), parameter :: numbers = "0123456789"
 
@@ -2503,6 +2503,7 @@ character(len=*), parameter :: numbers = "0123456789"
         if (present(success3)) success3=.true.
         if (present(success4)) success4=.true.
         if (present(success5)) success5=.true.
+        if (present(success6)) success6 = .true.
     elseif( trim(argument).eq."No"//trim(argumentname) ) then
         dest=.false.
         success=.true.
@@ -2511,6 +2512,7 @@ character(len=*), parameter :: numbers = "0123456789"
         if (present(success3)) success3=.true.
         if (present(success4)) success4=.true.
         if (present(success5)) success5=.true.
+        if (present(success6)) success6 = .true.
     elseif( argument(1:length+1) .eq. trim(argumentname)//"=" ) then
         if( Index(numbers, argument(length+2:length+2)) .ne. 0 ) then
             read(argument(length+2:len(argument)), *) temp_int
@@ -2521,6 +2523,7 @@ character(len=*), parameter :: numbers = "0123456789"
             if (present(success3)) success3=.true.
             if (present(success4)) success4=.true.
             if (present(success5)) success5=.true.
+            if (present(success6)) success6 = .true.
         else
             read(argument(length+2:len(argument)), *) dest
             success=.true.
@@ -2529,18 +2532,19 @@ character(len=*), parameter :: numbers = "0123456789"
             if (present(success3)) success3=.true.
             if (present(success4)) success4=.true.
             if (present(success5)) success5=.true.
+            if (present(success6)) success6 = .true.
         endif
     endif
 
 end subroutine ReadCommandLineArgument_logical
 
 
-subroutine ReadCommandLineArgument_integer(argument, argumentname, success, dest, SetLastArgument, success2, success3, success4, success5, multiply)
+subroutine ReadCommandLineArgument_integer(argument, argumentname, success, dest, SetLastArgument, success2, success3, success4, success5, success6, multiply)
 implicit none
 character(len=*) :: argument, argumentname
 integer, intent(inout) :: dest
 logical, intent(inout) :: success
-logical, optional, intent(inout) :: SetLastArgument, success2, success3, success4, success5
+logical, optional, intent(inout) :: SetLastArgument, success2, success3, success4, success5, success6
 integer, optional, intent(in) :: multiply
 integer :: length
 
@@ -2557,17 +2561,18 @@ integer :: length
         if (present(success3)) success3=.true.
         if (present(success4)) success4=.true.
         if (present(success5)) success5=.true.
+        if (present(success6)) success6 = .true.
     endif
 
 end subroutine ReadCommandLineArgument_integer
 
 
-subroutine ReadCommandLineArgument_real8(argument, argumentname, success, dest, SetLastArgument, success2, success3, success4, success5, multiply)
+subroutine ReadCommandLineArgument_real8(argument, argumentname, success, dest, SetLastArgument, success2, success3, success4, success5, success6, multiply)
 implicit none
 character(len=*) :: argument, argumentname
 real(8), intent(inout) :: dest
 logical, intent(inout) :: success
-logical, optional, intent(inout) :: SetLastArgument, success2, success3, success4, success5
+logical, optional, intent(inout) :: SetLastArgument, success2, success3, success4, success5, success6
 real(8), optional, intent(in) :: multiply
 integer :: length
 
@@ -2584,18 +2589,19 @@ integer :: length
         if (present(success3)) success3=.true.
         if (present(success4)) success4=.true.
         if (present(success5)) success5=.true.
+        if (present(success6)) success6 = .true.
     endif
 
 end subroutine ReadCommandLineArgument_real8
 
 
-subroutine ReadCommandLineArgument_complex8(argument, argumentname, success, dest, SetLastArgument, success2, success3, success4, success5, multiply, multiplyreal)
+subroutine ReadCommandLineArgument_complex8(argument, argumentname, success, dest, SetLastArgument, success2, success3, success4, success5, success6, multiply, multiplyreal)
 implicit none
 character(len=*) :: argument, argumentname
 complex(8), intent(inout) :: dest
 real(8) :: re, im
 logical, intent(inout) :: success
-logical, optional, intent(inout) :: SetLastArgument, success2, success3, success4, success5
+logical, optional, intent(inout) :: SetLastArgument, success2, success3, success4, success5, success6
 complex(8), optional, intent(in) :: multiply
 real(8), optional, intent(in) :: multiplyreal
 integer :: length
@@ -2624,17 +2630,18 @@ integer :: length
         if (present(success3)) success3=.true.
         if (present(success4)) success4=.true.
         if (present(success5)) success5=.true.
+        if (present(success6)) success6 = .true.
     endif
 
 end subroutine ReadCommandLineArgument_complex8
 
 
-subroutine ReadCommandLineArgument_string(argument, argumentname, success, dest, SetLastArgument, success2, success3, success4, success5)
+subroutine ReadCommandLineArgument_string(argument, argumentname, success, dest, SetLastArgument, success2, success3, success4, success5, success6)
 implicit none
 character(len=*) :: argument, argumentname
 character(len=*), intent(inout) :: dest
 logical, intent(inout) :: success
-logical, optional, intent(inout) :: SetLastArgument, success2, success3, success4, success5
+logical, optional, intent(inout) :: SetLastArgument, success2, success3, success4, success5, success6
 integer :: length
 
     if (present(SetLastArgument)) SetLastArgument=.false.
@@ -2653,6 +2660,7 @@ integer :: length
         if (present(success3)) success3=.true.
         if (present(success4)) success4=.true.
         if (present(success5)) success5=.true.
+        if (present(success6)) success6 = .true.
     endif
 
 end subroutine ReadCommandLineArgument_string
