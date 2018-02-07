@@ -5363,6 +5363,22 @@ character :: arg*(500)
             if (bgsgs4.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bgsgs4 =",bgsgs4,"i"
             if (bgsgs8.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bgsgs8 =",bgsgs8,"i"
 
+            if (includeVprime) then
+                if (IsAZDecay(DecayMode1) .or. IsAZDecay(DecayMode2)) then
+                    if(M_Zprime.gt.0d0) then
+                      write(TheUnit,"(4X,A,F6.3,A,F6.4)") "Z' boson: mass=",M_Zprime*100d0,", width=",Ga_Zprime*100d0
+                    else
+                      write(TheUnit,"(4X,A,F6.3,A,F6.4)") "Z' boson: heavy mass limit (contact interaction)"
+                    endif
+                elseif (IsAWDecay(DecayMode1) .or. IsAWDecay(DecayMode2)) then
+                    if(M_Wprime.gt.0d0) then
+                      write(TheUnit,"(4X,A,F6.3,A,F6.4)") "W' boson: mass=",M_Wprime*100d0,", width=",Ga_Wprime*100d0
+                    else
+                      write(TheUnit,"(4X,A,F6.3,A,F6.4)") "W' boson: heavy mass limit (contact interaction)"
+                    endif
+                endif
+            endif
+
             if (bzzp1.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzzp1 =",bzzp1,"i"
             if (bzzp2.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzzp2 =",bzzp2,"i"
             if (bzzp3.ne.0) write(TheUnit,"(6X,A,2E16.8,A1)") "bzzp3 =",bzzp3,"i"
