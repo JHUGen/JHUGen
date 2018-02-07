@@ -39,7 +39,7 @@ using namespace RooFit;
 
 TString inputdir_7TeV = "/work-zfs/lhc/ianderso/hep/CJLST/140519/PRODFSR";
 TString inputdir_8TeV = "/work-zfs/lhc/ianderso/hep/CJLST/140519b/PRODFSR_8TeV";
-TString inputdir_13TeV = "/work-zfs/lhc/CJLSTtrees/170929";
+TString inputdir_13TeV = "/work-zfs/lhc/CJLSTtrees/180121";
 
 
 template<typename T> void addByLowest(std::vector<T>& valArray, T val, bool unique){
@@ -310,6 +310,7 @@ vector<TString> constructSamplesList(TString strsample, float sqrts){
       samples.push_back("VBFH270");
       samples.push_back("VBFH300");
       samples.push_back("VBFH350");
+      samples.push_back("VBFH400");
       samples.push_back("VBFH450");
       samples.push_back("VBFH500");
       samples.push_back("VBFH550");
@@ -347,7 +348,6 @@ vector<TString> constructSamplesList(TString strsample, float sqrts){
       samples.push_back("WminusH130");
       samples.push_back("WminusH135");
       samples.push_back("WminusH140");
-      samples.push_back("WminusH145");
       samples.push_back("WminusH150");
       samples.push_back("WminusH155");
       samples.push_back("WminusH160");
@@ -356,9 +356,25 @@ vector<TString> constructSamplesList(TString strsample, float sqrts){
       samples.push_back("WminusH175");
       samples.push_back("WminusH180");
       samples.push_back("WminusH190");
-      samples.push_back("WminusH200");
       samples.push_back("WminusH210");
       samples.push_back("WminusH230");
+      samples.push_back("WminusH250");
+      samples.push_back("WminusH270");
+      samples.push_back("WminusH300");
+      samples.push_back("WminusH350");
+      samples.push_back("WminusH400");
+      samples.push_back("WminusH450");
+      samples.push_back("WminusH500");
+      samples.push_back("WminusH550");
+      samples.push_back("WminusH600");
+      samples.push_back("WminusH700");
+      samples.push_back("WminusH750");
+      samples.push_back("WminusH800");
+      samples.push_back("WminusH900");
+      samples.push_back("WminusH1000");
+      samples.push_back("WminusH2000");
+      samples.push_back("WminusH2500");
+      samples.push_back("WminusH3000");
       samples.push_back("WplusH115");
       samples.push_back("WplusH120");
       samples.push_back("WplusH124");
@@ -367,7 +383,6 @@ vector<TString> constructSamplesList(TString strsample, float sqrts){
       samples.push_back("WplusH130");
       samples.push_back("WplusH135");
       samples.push_back("WplusH140");
-      samples.push_back("WplusH145");
       samples.push_back("WplusH150");
       samples.push_back("WplusH155");
       samples.push_back("WplusH160");
@@ -376,9 +391,25 @@ vector<TString> constructSamplesList(TString strsample, float sqrts){
       samples.push_back("WplusH175");
       samples.push_back("WplusH180");
       samples.push_back("WplusH190");
-      samples.push_back("WplusH200");
       samples.push_back("WplusH210");
       samples.push_back("WplusH230");
+      samples.push_back("WplusH250");
+      samples.push_back("WplusH270");
+      samples.push_back("WplusH300");
+      samples.push_back("WplusH350");
+      samples.push_back("WplusH400");
+      samples.push_back("WplusH450");
+      samples.push_back("WplusH500");
+      samples.push_back("WplusH550");
+      samples.push_back("WplusH600");
+      samples.push_back("WplusH700");
+      samples.push_back("WplusH750");
+      samples.push_back("WplusH800");
+      samples.push_back("WplusH900");
+      samples.push_back("WplusH1000");
+      samples.push_back("WplusH2000");
+      samples.push_back("WplusH2500");
+      samples.push_back("WplusH3000");
     }
   }
   else if (strsample=="ZH"){
@@ -404,7 +435,6 @@ vector<TString> constructSamplesList(TString strsample, float sqrts){
       samples.push_back("ZH130");
       samples.push_back("ZH135");
       samples.push_back("ZH140");
-      samples.push_back("ZH145");
       samples.push_back("ZH150");
       samples.push_back("ZH155");
       samples.push_back("ZH160");
@@ -413,9 +443,25 @@ vector<TString> constructSamplesList(TString strsample, float sqrts){
       samples.push_back("ZH175");
       samples.push_back("ZH180");
       samples.push_back("ZH190");
-      samples.push_back("ZH200");
       samples.push_back("ZH210");
       samples.push_back("ZH230");
+      samples.push_back("ZH250");
+      samples.push_back("ZH270");
+      samples.push_back("ZH300");
+      samples.push_back("ZH350");
+      samples.push_back("ZH400");
+      samples.push_back("ZH450");
+      samples.push_back("ZH500");
+      samples.push_back("ZH550");
+      samples.push_back("ZH600");
+      samples.push_back("ZH700");
+      samples.push_back("ZH750");
+      samples.push_back("ZH800");
+      samples.push_back("ZH900");
+      samples.push_back("ZH1000");
+      samples.push_back("ZH2000");
+      samples.push_back("ZH2500");
+      samples.push_back("ZH3000");
     }
   }
   else if (strsample=="JJQCD"){
@@ -2427,8 +2473,6 @@ OUTPUT ME DIVIDED BY
 - H(1) PROPAGATOR
 - Ideal mJJ propagator is taken out in WH or ZH.
 - Reco mJJ propagator is multiplied.
-//ZH AND WH SAMPLES ARE COMBINED TOGETHER BECAUSE
-//V2 PROPAGATOR IS REMOVED AND V1 PROPAGATOR DOES NOT MAKE MUCH DIFFERENCE.
 */
 void get_PAvgProfile_JHUGen_HadVH_HSMHiggs_13TeV(TString strprod, int sqrts=13, bool recalculate = true){
   if (!(strprod == "Had_ZH" || strprod == "Had_WH")) return;
@@ -2485,7 +2529,7 @@ void get_PAvgProfile_JHUGen_HadVH_HSMHiggs_13TeV(TString strprod, int sqrts=13, 
   float phi1 = 1.8828257;
   float ZZPt, ZZPhi, ZZEta;
   short Z1Flav, Z2Flav;
-  float xsec, ngen, genHEPMCweight;
+  float genxsec=0, genBR=0, ngen=0, genHEPMCweight=0;
   float wgt=1;
   float rewgt=1;
   bool doRewgt=false;
@@ -2526,20 +2570,17 @@ void get_PAvgProfile_JHUGen_HadVH_HSMHiggs_13TeV(TString strprod, int sqrts=13, 
               strrecalcbranch = "p_HadZH_SIG_ghz1_1_JHUGen_JECNominal";
               strrecalcconstbranch = "pConst_HadZH_SIG_ghz1_1_JHUGen_JECNominal";
             }
-            else if (prod==TVar::Had_WH && tree->GetBranchStatus("pConst_HadWH_SIG_ghv1_1_JHUGen_JECNominal")!=0){
-              strrecalcbranch = "p_HadWH_SIG_ghv1_1_JHUGen_JECNominal";
-              strrecalcconstbranch = "pConst_HadWH_SIG_ghv1_1_JHUGen_JECNominal";
+            else if (prod==TVar::Had_WH && tree->GetBranchStatus("pConst_HadWH_SIG_ghw1_1_JHUGen_JECNominal")!=0){
+              strrecalcbranch = "p_HadWH_SIG_ghw1_1_JHUGen_JECNominal";
+              strrecalcconstbranch = "pConst_HadWH_SIG_ghw1_1_JHUGen_JECNominal";
             }
             else recalculate=true;
             if (prod==TVar::Had_ZH && tree->GetBranchStatus("p_HadZH_mavjj_JECNominal")!=0) strpmavjjbranch="p_HadZH_mavjj_JECNominal";
             else if (prod==TVar::Had_WH && tree->GetBranchStatus("p_HadWH_mavjj_JECNominal")!=0) strpmavjjbranch="p_HadWH_mavjj_JECNominal";
             else recomputePmavjj=true;
           }
-          if (prod==TVar::Had_ZH && tree->GetBranchStatus("p_Gen_ZH_SIG_ghz1_1_MCFM")!=0) strrewgtbranch = "p_Gen_ZH_SIG_ghz1_1_MCFM";
-          else if (prod==TVar::Had_WH && tree->GetBranchStatus("p_Gen_WH_SIG_ghv1_1_MCFM")!=0) strrewgtbranch = "p_Gen_WH_SIG_ghv1_1_MCFM";
-          else if (prod==TVar::JJVBF && tree->GetBranchStatus("p_Gen_VBF_SIG_ghv1_1_MCFM")!=0) strrewgtbranch = "p_Gen_VBF_SIG_ghv1_1_MCFM";
           tree->SetBranchStatus("*", 0);
-          tree->SetBranchStatus("xsec", 1); tree->SetBranchAddress("xsec", &xsec);
+          tree->SetBranchStatus("genxsec", 1); tree->SetBranchAddress("genxsec", &genxsec); tree->SetBranchStatus("genBR", 1); tree->SetBranchAddress("genBR", &genBR);
           tree->SetBranchStatus("genHEPMCweight", 1); tree->SetBranchAddress("genHEPMCweight", &genHEPMCweight);
           tree->SetBranchStatus("nCleanedJetsPt30", 1); tree->SetBranchAddress("nCleanedJetsPt30", &NJets30);
           tree->SetBranchStatus("JetPt", 1); tree->SetBranchAddress("JetPt", &JetPt);
@@ -2563,12 +2604,6 @@ void get_PAvgProfile_JHUGen_HadVH_HSMHiggs_13TeV(TString strprod, int sqrts=13, 
           tree->SetBranchStatus("LepPhi", 1); tree->SetBranchAddress("LepPhi", &LepPhi);
           tree->SetBranchStatus("Z1Flav", 1); tree->SetBranchAddress("Z1Flav", &Z1Flav);
           tree->SetBranchStatus("Z2Flav", 1); tree->SetBranchAddress("Z2Flav", &Z2Flav);
-          if (strrewgtbranch!=""){
-            tree->SetBranchStatus(strrewgtbranch, 1); tree->SetBranchAddress(strrewgtbranch, &rewgt);
-            cout << "Reweighting is applied from branch " << strrewgtbranch << endl;
-          }
-          //else doRewgt=true; // Do not reweight signal!!!
-          else cout << "No reweighting branch is found." << endl;
           if (!recalculate){
             tree->SetBranchStatus(strrecalcbranch, 1); tree->SetBranchAddress(strrecalcbranch, &mesq_calc);
             tree->SetBranchStatus(strrecalcconstbranch, 1); tree->SetBranchAddress(strrecalcconstbranch, &cconst_calc);
@@ -2583,7 +2618,7 @@ void get_PAvgProfile_JHUGen_HadVH_HSMHiggs_13TeV(TString strprod, int sqrts=13, 
           else if (recomputePmavjj) cout << "Recomputing P_V(mJJ)" << endl;
           else cout << "No valid P_V(mJJ)" << endl;
           tree->GetEntry(0);
-          cout << "Cross section = " << xsec << endl;
+          cout << "Cross section = " << genxsec*genBR << endl;
 
           TH1F* htmp = (TH1F*)finput->Get(COUNTERS_NAME);
           pair<float, float> nsum(htmp->GetBinContent(1), htmp->GetBinContent(41)); // No PU reweighting
@@ -2616,7 +2651,7 @@ void get_PAvgProfile_JHUGen_HadVH_HSMHiggs_13TeV(TString strprod, int sqrts=13, 
     for (unsigned int ix=0; ix<it->second.size(); ix++){
       it->second.at(ix)->GetEntry(0);
       sum_ngen += nGenMap[it->second.at(ix)].first;
-      sum_xsec += xsec;
+      sum_xsec += genxsec*genBR;
     }
     float overallWeight = sum_ngen/sum_xsec;
     for (unsigned int ix=0; ix<it->second.size(); ix++){
@@ -2714,7 +2749,7 @@ void get_PAvgProfile_JHUGen_HadVH_HSMHiggs_13TeV(TString strprod, int sqrts=13, 
         continue;
       }
       TTree* tree = findTree(treeList, getEv);
-      wgt = fabs(xsec*genHEPMCweight*nGenMap[tree].first*rewgt);
+      wgt = fabs(genxsec*genBR*genHEPMCweight*nGenMap[tree].first*rewgt);
 
       TLorentzVector jet[2], higgs;
       for (int ij=0; ij<2; ij++) jet[ij].SetPtEtaPhiM(JetPt->at(ij), JetEta->at(ij), JetPhi->at(ij), JetMass->at(ij));
@@ -2895,7 +2930,7 @@ void get_PAvgProfile_MCFM_JJPROD_S_HSMHiggs_13TeV(TString strprod, int sqrts=13,
   float phi1 = 1.8828257;
   float ZZPt, ZZPhi, ZZEta;
   short Z1Flav, Z2Flav;
-  float xsec, ngen, genHEPMCweight;
+  float genxsec=0, genBR=0, ngen=0, genHEPMCweight=0;
   float wgt=1;
   float rewgt=1;
   bool doRewgt=false;
@@ -2931,13 +2966,13 @@ void get_PAvgProfile_MCFM_JJPROD_S_HSMHiggs_13TeV(TString strprod, int sqrts=13,
         if (tree!=0){
           cout << TREE_NAME << " is found." << endl;
           if (!recalculate){
-            if (prod==TVar::Had_ZH_S && tree->GetBranchStatus("pConst_HadZH_S_SIG_ghv1_1_MCFM_JECNominal")!=0){
-              strrecalcbranch = "p_HadZH_S_SIG_ghv1_1_MCFM_JECNominal";
-              strrecalcconstbranch = "pConst_HadZH_S_SIG_ghv1_1_MCFM_JECNominal";
+            if (prod==TVar::Had_ZH_S && tree->GetBranchStatus("pConst_HadZH_S_SIG_ghz1_1_MCFM_JECNominal")!=0){
+              strrecalcbranch = "p_HadZH_S_SIG_ghz1_1_MCFM_JECNominal";
+              strrecalcconstbranch = "pConst_HadZH_S_SIG_ghz1_1_MCFM_JECNominal";
             }
-            else if (prod==TVar::Had_WH_S && tree->GetBranchStatus("pConst_Had_WH_S_SIG_ghv1_1_MCFM_JECNominal")!=0){
-              strrecalcbranch = "p_Had_WH_S_SIG_ghv1_1_MCFM_JECNominal";
-              strrecalcconstbranch = "pConst_Had_WH_S_SIG_ghv1_1_MCFM_JECNominal";
+            else if (prod==TVar::Had_WH_S && tree->GetBranchStatus("pConst_HadWH_S_SIG_ghv1_1_MCFM_JECNominal")!=0){
+              strrecalcbranch = "p_HadWH_S_SIG_ghv1_1_MCFM_JECNominal";
+              strrecalcconstbranch = "pConst_HadWH_S_SIG_ghv1_1_MCFM_JECNominal";
             }
             else if (prod==TVar::JJVBF_S && tree->GetBranchStatus("pConst_JJVBF_S_SIG_ghv1_1_MCFM_JECNominal")!=0){
               strrecalcbranch = "p_JJVBF_S_SIG_ghv1_1_MCFM_JECNominal";
@@ -2948,11 +2983,8 @@ void get_PAvgProfile_MCFM_JJPROD_S_HSMHiggs_13TeV(TString strprod, int sqrts=13,
             else if (prod==TVar::Had_WH_S && tree->GetBranchStatus("p_HadWH_mavjj_JECNominal")!=0) strpmavjjbranch="p_HadWH_mavjj_JECNominal";
             else if (prod!=TVar::JJVBF_S) recomputePmavjj=true;
           }
-          if (prod==TVar::Had_ZH_S && tree->GetBranchStatus("p_Gen_ZH_SIG_ghz1_1_MCFM")!=0) strrewgtbranch = "p_Gen_ZH_SIG_ghz1_1_MCFM";
-          else if (prod==TVar::Had_WH_S && tree->GetBranchStatus("p_Gen_WH_SIG_ghv1_1_MCFM")!=0) strrewgtbranch = "p_Gen_WH_SIG_ghv1_1_MCFM";
-          else if (prod==TVar::JJVBF_S && tree->GetBranchStatus("p_Gen_VBF_SIG_ghv1_1_MCFM")!=0) strrewgtbranch = "p_Gen_VBF_SIG_ghv1_1_MCFM";
           tree->SetBranchStatus("*", 0);
-          tree->SetBranchStatus("xsec", 1); tree->SetBranchAddress("xsec", &xsec);
+          tree->SetBranchStatus("genxsec", 1); tree->SetBranchAddress("genxsec", &genxsec); tree->SetBranchStatus("genBR", 1); tree->SetBranchAddress("genBR", &genBR);
           tree->SetBranchStatus("genHEPMCweight", 1); tree->SetBranchAddress("genHEPMCweight", &genHEPMCweight);
           tree->SetBranchStatus("nCleanedJetsPt30", 1); tree->SetBranchAddress("nCleanedJetsPt30", &NJets30);
           tree->SetBranchStatus("JetPt", 1); tree->SetBranchAddress("JetPt", &JetPt);
@@ -2976,12 +3008,6 @@ void get_PAvgProfile_MCFM_JJPROD_S_HSMHiggs_13TeV(TString strprod, int sqrts=13,
           tree->SetBranchStatus("LepPhi", 1); tree->SetBranchAddress("LepPhi", &LepPhi);
           tree->SetBranchStatus("Z1Flav", 1); tree->SetBranchAddress("Z1Flav", &Z1Flav);
           tree->SetBranchStatus("Z2Flav", 1); tree->SetBranchAddress("Z2Flav", &Z2Flav);
-          if (strrewgtbranch!=""){
-            tree->SetBranchStatus(strrewgtbranch, 1); tree->SetBranchAddress(strrewgtbranch, &rewgt);
-            cout << "Reweighting is applied from branch " << strrewgtbranch << endl;
-          }
-          //else doRewgt=true; // Do not reweight signal!!!
-          else cout << "No reweighting branch is found." << endl;
           if (!recalculate){
             tree->SetBranchStatus(strrecalcbranch, 1); tree->SetBranchAddress(strrecalcbranch, &mesq_calc);
             tree->SetBranchStatus(strrecalcconstbranch, 1); tree->SetBranchAddress(strrecalcconstbranch, &cconst_calc);
@@ -2997,7 +3023,7 @@ void get_PAvgProfile_MCFM_JJPROD_S_HSMHiggs_13TeV(TString strprod, int sqrts=13,
           else cout << "No valid P_V(mJJ)" << endl;
 
           tree->GetEntry(0);
-          cout << "Cross section = " << xsec << endl;
+          cout << "Cross section = " << genxsec*genBR << endl;
 
           TH1F* htmp = (TH1F*)finput->Get(COUNTERS_NAME);
           pair<float, float> nsum(htmp->GetBinContent(1), htmp->GetBinContent(41)); // No PU reweighting
@@ -3030,7 +3056,7 @@ void get_PAvgProfile_MCFM_JJPROD_S_HSMHiggs_13TeV(TString strprod, int sqrts=13,
     for (unsigned int ix=0; ix<it->second.size(); ix++){
       it->second.at(ix)->GetEntry(0);
       sum_ngen += nGenMap[it->second.at(ix)].first;
-      sum_xsec += xsec;
+      sum_xsec += genxsec*genBR;
     }
     float overallWeight = sum_ngen/sum_xsec;
     for (unsigned int ix=0; ix<it->second.size(); ix++){
@@ -3071,7 +3097,7 @@ void get_PAvgProfile_MCFM_JJPROD_S_HSMHiggs_13TeV(TString strprod, int sqrts=13,
     cout << "Nentries = " << nEntries << " | mzz = " << firstVal << " - " << lastVal << "(" << infimum << ", " << supremum << ")" << endl;
 
     float divisor=15000;
-    if (prod==TVar::Had_ZH_S || prod==TVar::Had_WH_S) divisor=15000;
+    if (prod==TVar::Had_ZH_S || prod==TVar::Had_WH_S) divisor=12000;
     int nbins = index[ic].size()/divisor;
     const int nbins_th=10/*50*/;
     while (nbins<nbins_th){
@@ -3137,7 +3163,7 @@ void get_PAvgProfile_MCFM_JJPROD_S_HSMHiggs_13TeV(TString strprod, int sqrts=13,
           continue;
         }
         TTree* tree = findTree(treeList, getEv);
-        wgt = fabs(xsec*genHEPMCweight*nGenMap[tree].first*rewgt);
+        wgt = fabs(genxsec*genBR*genHEPMCweight*nGenMap[tree].first*rewgt);
 
         TLorentzVector jet[2], higgs;
         for (int ij=0; ij<2; ij++) jet[ij].SetPtEtaPhiM(JetPt->at(ij), JetEta->at(ij), JetPhi->at(ij), JetMass->at(ij));
@@ -3200,7 +3226,7 @@ void get_PAvgProfile_MCFM_JJPROD_S_HSMHiggs_13TeV(TString strprod, int sqrts=13,
           propagatorV = 1./(pow(pow(mjj, 2)-pow(mv, 2), 2) + pow(mv*gav, 2));
           mesq_conserveDifermMass /= propagatorV;
           if (recomputePmavjj){
-            mela.setProcess(TVar::HSMHiggs, TVar::JHUGen, ((prod==TVar::Had_ZH_S || prod==TVar::Had_ZH) ? TVar::Had_ZH : TVar::Had_WH));
+            mela.setProcess(TVar::HSMHiggs, TVar::JHUGen, (prod==TVar::Had_ZH_S ? TVar::Had_ZH : TVar::Had_WH));
             mela.computeDijetConvBW(pmavjj, false);
           }
           mesq_conserveDifermMass *= pmavjj;
@@ -3337,7 +3363,7 @@ void get_PAvgProfile_MCFM_JJPROD_bkgZZ_13TeV(TString strprod, int sqrts=13, bool
   float phi1 = 1.8828257;
   float ZZPt, ZZPhi, ZZEta;
   short Z1Flav, Z2Flav;
-  float xsec, ngen, genHEPMCweight;
+  float genxsec=0, genBR=0, ngen=0, genHEPMCweight=0;
   float wgt=1;
   float rewgt=1;
   bool doRewgt=false;
@@ -3377,9 +3403,9 @@ void get_PAvgProfile_MCFM_JJPROD_bkgZZ_13TeV(TString strprod, int sqrts=13, bool
               strrecalcbranch = "p_HadZH_BKG_MCFM_JECNominal";
               strrecalcconstbranch = "pConst_HadZH_BKG_MCFM_JECNominal";
             }
-            else if (prod==TVar::Had_WH && tree->GetBranchStatus("pConst_Had_WH_BKG_MCFM_JECNominal")!=0){
-              strrecalcbranch = "p_Had_WH_BKG_MCFM_JECNominal";
-              strrecalcconstbranch = "pConst_Had_WH_BKG_MCFM_JECNominal";
+            else if (prod==TVar::Had_WH && tree->GetBranchStatus("pConst_HadWH_BKG_MCFM_JECNominal")!=0){
+              strrecalcbranch = "p_HadWH_BKG_MCFM_JECNominal";
+              strrecalcconstbranch = "pConst_HadWH_BKG_MCFM_JECNominal";
             }
             else if (prod==TVar::JJVBF && tree->GetBranchStatus("pConst_JJVBF_BKG_MCFM_JECNominal")!=0){
               strrecalcbranch = "p_JJVBF_BKG_MCFM_JECNominal";
@@ -3391,11 +3417,8 @@ void get_PAvgProfile_MCFM_JJPROD_bkgZZ_13TeV(TString strprod, int sqrts=13, bool
             else if (prod!=TVar::JJVBF) recomputePmavjj=true;
           }
           if (tree->GetBranchStatus("p_Gen_JJEW_BKG_MCFM")!=0) strrewgtbranch = "p_Gen_JJEW_BKG_MCFM";
-          //if (prod==TVar::Had_ZH && tree->GetBranchStatus("p_Gen_ZH_BKG_MCFM")!=0) strrewgtbranch = "p_Gen_ZH_BKG_MCFM";
-          //else if (prod==TVar::Had_WH && tree->GetBranchStatus("p_Gen_WH_BKG_MCFM")!=0) strrewgtbranch = "p_Gen_WH_BKG_MCFM";
-          //else if (prod==TVar::JJVBF && tree->GetBranchStatus("p_Gen_VBF_BKG_MCFM")!=0) strrewgtbranch = "p_Gen_VBF_BKG_MCFM";
           tree->SetBranchStatus("*", 0);
-          tree->SetBranchStatus("xsec", 1); tree->SetBranchAddress("xsec", &xsec);
+          tree->SetBranchStatus("genxsec", 1); tree->SetBranchAddress("genxsec", &genxsec); tree->SetBranchStatus("genBR", 1); tree->SetBranchAddress("genBR", &genBR);
           tree->SetBranchStatus("genHEPMCweight", 1); tree->SetBranchAddress("genHEPMCweight", &genHEPMCweight);
           tree->SetBranchStatus("GenHMass", 1); tree->SetBranchAddress("GenHMass", &GenHMass);
           tree->SetBranchStatus("nCleanedJetsPt30", 1); tree->SetBranchAddress("nCleanedJetsPt30", &NJets30);
@@ -3462,7 +3485,7 @@ void get_PAvgProfile_MCFM_JJPROD_bkgZZ_13TeV(TString strprod, int sqrts=13, bool
             tree->SetBranchStatus("LHEAssociatedParticleId", 1); tree->SetBranchAddress("LHEAssociatedParticleId", &LHEAssociatedParticleId);
           }
           tree->GetEntry(0);
-          cout << "Cross section = " << xsec << endl;
+          cout << "Cross section = " << genxsec*genBR << endl;
 
           TH1F* htmp = (TH1F*)finput->Get(COUNTERS_NAME);
           pair<float, float> nsum(htmp->GetBinContent(1), htmp->GetBinContent(41)); // No PU reweighting
@@ -3495,7 +3518,7 @@ void get_PAvgProfile_MCFM_JJPROD_bkgZZ_13TeV(TString strprod, int sqrts=13, bool
     for (unsigned int ix=0; ix<it->second.size(); ix++){
       it->second.at(ix)->GetEntry(0);
       sum_ngen += nGenMap[it->second.at(ix)].first;
-      sum_xsec += xsec;
+      sum_xsec += genxsec*genBR;
     }
     float overallWeight = sum_ngen/sum_xsec;
     for (unsigned int ix=0; ix<it->second.size(); ix++){
@@ -3537,7 +3560,7 @@ void get_PAvgProfile_MCFM_JJPROD_bkgZZ_13TeV(TString strprod, int sqrts=13, bool
 
     float divisor=25000*(ic==2)+40000*(ic<2);
     if (prod==TVar::Had_ZH) divisor=15000;
-    if (prod==TVar::Had_WH) divisor=25000;
+    if (prod==TVar::Had_WH) divisor=15000;
     int nbins = index[ic].size()/divisor;
     int nbins_th=10/*50*/;
     if (prod==TVar::Had_WH) nbins_th=8;
@@ -3605,6 +3628,7 @@ void get_PAvgProfile_MCFM_JJPROD_bkgZZ_13TeV(TString strprod, int sqrts=13, bool
         TTree* tree = findTree(treeList, getEv);
 
         // Divide out the signal H propagator in the reweighting denominator = Multiply with the H BW
+        // Why? So that reweighting is not affected by the reweighting out of the BW
         {
           float& samplePoleMass = mass_map[tree];
           float samplePoleWidth = 0;
@@ -3613,7 +3637,7 @@ void get_PAvgProfile_MCFM_JJPROD_bkgZZ_13TeV(TString strprod, int sqrts=13, bool
             rewgt /= pow(pow(GenHMass, 2)-pow(samplePoleMass, 2), 2) + pow(samplePoleMass*samplePoleWidth, 2);
           }
         }
-        wgt = fabs(xsec*genHEPMCweight*nGenMap[tree].first*rewgt);
+        wgt = fabs(genxsec*genBR*genHEPMCweight*nGenMap[tree].first*rewgt);
 
         TLorentzVector jet[2], higgs;
         for (int ij=0; ij<2; ij++) jet[ij].SetPtEtaPhiM(JetPt->at(ij), JetEta->at(ij), JetPhi->at(ij), JetMass->at(ij));
@@ -3802,7 +3826,7 @@ void get_PAvgProfile_MCFM_JJQCD_bkgZZ_13TeV(int sqrts=13, bool recalculate = tru
   float phi1 = 1.8828257;
   float ZZPt, ZZPhi, ZZEta;
   short Z1Flav, Z2Flav;
-  float xsec, ngen, genHEPMCweight;
+  float genxsec=0, genBR=0, ngen=0, genHEPMCweight=0;
   float wgt=1;
 
   TString cinput_main;
@@ -3832,7 +3856,7 @@ void get_PAvgProfile_MCFM_JJQCD_bkgZZ_13TeV(int sqrts=13, bool recalculate = tru
           cout << TREE_NAME << " is found." << endl;
           if (!recalculate && tree->GetBranchStatus("pConst_JJQCD_BKG_MCFM_JECNominal")==0) recalculate=true;
           tree->SetBranchStatus("*", 0);
-          tree->SetBranchStatus("xsec", 1); tree->SetBranchAddress("xsec", &xsec);
+          tree->SetBranchStatus("genxsec", 1); tree->SetBranchAddress("genxsec", &genxsec); tree->SetBranchStatus("genBR", 1); tree->SetBranchAddress("genBR", &genBR);
           tree->SetBranchStatus("genHEPMCweight", 1); tree->SetBranchAddress("genHEPMCweight", &genHEPMCweight);
           tree->SetBranchStatus("nCleanedJetsPt30", 1); tree->SetBranchAddress("nCleanedJetsPt30", &NJets30);
           tree->SetBranchStatus("JetPt", 1); tree->SetBranchAddress("JetPt", &JetPt);
@@ -3864,7 +3888,7 @@ void get_PAvgProfile_MCFM_JJQCD_bkgZZ_13TeV(int sqrts=13, bool recalculate = tru
           }
           else cout << "ME needs to be recalculated!" << endl;
           tree->GetEntry(0);
-          cout << "Cross section = " << xsec << endl;
+          cout << "Cross section = " << genxsec*genBR << endl;
 
           TH1F* htmp = (TH1F*)finput->Get(COUNTERS_NAME);
           pair<float, float> nsum(htmp->GetBinContent(1), htmp->GetBinContent(41)); // No PU reweighting
@@ -3895,7 +3919,7 @@ void get_PAvgProfile_MCFM_JJQCD_bkgZZ_13TeV(int sqrts=13, bool recalculate = tru
     for (unsigned int ix=0; ix<it->second.size(); ix++){
       it->second.at(ix)->GetEntry(0);
       sum_ngen += nGenMap[it->second.at(ix)].first;
-      sum_xsec += xsec;
+      sum_xsec += genxsec*genBR;
     }
     float overallWeight = sum_ngen/sum_xsec;
     for (unsigned int ix=0; ix<it->second.size(); ix++){
@@ -4000,7 +4024,7 @@ void get_PAvgProfile_MCFM_JJQCD_bkgZZ_13TeV(int sqrts=13, bool recalculate = tru
           continue;
         }
         TTree* tree = findTree(treeList, getEv);
-        wgt = fabs(xsec*genHEPMCweight*nGenMap[tree].first);
+        wgt = fabs(genxsec*genBR*genHEPMCweight*nGenMap[tree].first);
 
         TLorentzVector jet[2], higgs;
         for (int ij=0; ij<2; ij++) jet[ij].SetPtEtaPhiM(JetPt->at(ij), JetEta->at(ij), JetPhi->at(ij), JetMass->at(ij));
@@ -8252,13 +8276,20 @@ void produce_PAvgSmooth_MCFM_JJPROD_S_HSMHiggs(TString strprod, int sqrts=13){
   }
   TVar::MatrixElement me = TVar::MCFM;
   TVar::Process proc = TVar::HSMHiggs;
+  //generic_PAvgSmoothProducer_withDecay(
+  //  me, prod, proc,
+  //  "../data/pAvgLinToLog_ANALYTICAL_ZZGG_HSMHiggs.root", "tg_anaPdfInt",
+  //  &getPatch_a0plusa1timesX,
+  //  &getPatch_a0plusa1overX,
+  //  sqrts
+  //  );
   generic_PAvgSmoothProducer_withDecay(
     me, prod, proc,
-    "../data/pAvgLinToLog_ANALYTICAL_ZZGG_HSMHiggs.root", "tg_anaPdfInt",
-    &getPatch_a0plusa1timesX,
-    &getPatch_a0plusa1overX,
-    sqrts
-    );
+    &getFcn_a0plusa1timesX,
+    &getFcn_a0plusa1overX,
+    sqrts,
+    true, false
+  );
 }
 
 /* SPECIFIC COMMENT: PATCHING DONE USING FUNCTIONS */

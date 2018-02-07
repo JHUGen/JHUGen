@@ -4,17 +4,8 @@
 test python and some MEs
 """
 
-if __name__ == "__main__":
-  import argparse
-  parser = argparse.ArgumentParser()
-  parser.add_argument("seed", type=int)
-  parser.add_argument('unittest_args', nargs='*')
-  args = parser.parse_args()
-  seed = args.seed
-
 import os
 import random
-import re
 import sys
 import unittest
 
@@ -75,7 +66,11 @@ class TestMela(unittest.TestCase):
   def setUpClass(cls):
     cls.m = Mela()
   def setUp(self):
-    random.seed(seed)
+    """the seed will be different every time, but reproducible"""
+    try:
+        random.seed(os.environ["SEED"] + os.environ["CIRCLE_BUILD_NUM"])
+    except KeyError:
+        random.seed(34567)
   def tearDown(self):
     self.m.resetInputEvent()
   def testcontact_decay(self):
@@ -135,49 +130,21 @@ class TestMela(unittest.TestCase):
     self.assertEquals(me1, me2)
     self.assertNotEquals(me1, 0)
 
-  def Vprimekwargs(self, process, usevpvp):
-      def couplings():
-          if process in (0, 50, 60):
-              for i in range(1, 5):
-                  for j in range(8):
-                      if j in (3, 6) and not usevpvp: continue #for ZZ', q1^2-q2^2 is defined differently
-                      coupling = "ghz{}".format(i)
-                      if j: coupling += "_prime"
-                      if j>1: coupling += str(j)
-                      yield coupling
-              if process == 0 and not usevpvp:
-                  yield "ghzgs1_prime2"; yield "ghzgs2"; yield "ghzgs3"; yield "ghzgs4"
-          elif process == 2:
-              for i in range(1, 11): yield "b{}".format(i)
-              if not usevpvp:
-                  for i in range(1, 5)+[8]: yield "bzgs".format(i)
-          else:
-              assert False, process
-
-      return {coupling:
-         (random.uniform(0, 1) + random.uniform(0, 1) * 1j)
-       * (10000 if "prime" in coupling else 1)
-           for coupling in couplings()}
-
   def testzp_decay(self):
-    self.runVprime(event1_ggH, False, False, TVar.SelfDefine_spin0, TVar.JHUGen, TVar.ZZINDEPENDENT, **self.Vprimekwargs(0, False))
-  def testzp_spin2(self):
-    self.runVprime(event1_ggH, False, False, TVar.SelfDefine_spin2, TVar.JHUGen, TVar.ZZINDEPENDENT, **self.Vprimekwargs(2, False))
+    self.runVprime(event1_ggH, False, False, TVar.SelfDefine_spin0, TVar.JHUGen, TVar.ZZINDEPENDENT)
   def testzp_VBF(self):
-    self.runVprime(event2_VBF, True, False, TVar.SelfDefine_spin0, TVar.JHUGen, TVar.JJVBF, **self.Vprimekwargs(60, False))
+    self.runVprime(event2_VBF, True, False, TVar.SelfDefine_spin0, TVar.JHUGen, TVar.JJVBF)
   def testzp_ZH(self):
-    self.runVprime(event3_ZH, True, False, TVar.SelfDefine_spin0, TVar.JHUGen, TVar.Lep_ZH, **self.Vprimekwargs(50, False))
+    self.runVprime(event3_ZH, True, False, TVar.SelfDefine_spin0, TVar.JHUGen, TVar.Lep_ZH)
   def testzpzp_decay(self):
-    self.runVprime(event1_ggH, False, True, TVar.SelfDefine_spin0, TVar.JHUGen, TVar.ZZINDEPENDENT, **self.Vprimekwargs(0, True))
-  def testzp_spin2(self):
-    self.runVprime(event1_ggH, False, True, TVar.SelfDefine_spin2, TVar.JHUGen, TVar.ZZINDEPENDENT, **self.Vprimekwargs(2, True))
+    self.runVprime(event1_ggH, False, True, TVar.SelfDefine_spin0, TVar.JHUGen, TVar.ZZINDEPENDENT)
   def testzpzp_VBF(self):
-    self.runVprime(event2_VBF, True, True, TVar.SelfDefine_spin0, TVar.JHUGen, TVar.JJVBF, **self.Vprimekwargs(60, True))
+    self.runVprime(event2_VBF, True, True, TVar.SelfDefine_spin0, TVar.JHUGen, TVar.JJVBF)
   def testzpzp_ZH(self):
-    self.runVprime(event3_ZH, True, True, TVar.SelfDefine_spin0, TVar.JHUGen, TVar.Lep_ZH, **self.Vprimekwargs(50, True))
-  def runVprime(self, event, isprod, usevpvp, *setprocessargs, **couplings):
+    self.runVprime(event3_ZH, True, True, TVar.SelfDefine_spin0, TVar.JHUGen, TVar.Lep_ZH)
+  def runVprime(self, event, isprod, usevpvp, *setprocessargs):
     """
-    test that with mZ' == mZ, we get the same behavor with Z and Z'
+    correspondence between a1 L1 L1Zg and contact terms
     """
 
     M_Z = 91.1876
@@ -204,30 +171,15 @@ class TestMela(unittest.TestCase):
     m.setInputEvent_fromLHE(event, True)
 
     m.setProcess(*setprocessargs)
-    for coupling, value in couplings.iteritems():
-      if re.match("(ghz[1-4](_prime[2-7]?)?|b([1-9]|10))", coupling):
-        pass
-      elif re.match("(ghzgs([2-4]|1_prime2)|bzgs[12348])", coupling):
-        if usevpvp:
-          raise ValueError("Can't use gs coupling {} for vpvp test".format(coupling))
-      else:
-        raise ValueError("Invalid coupling {}".format(coupling))
-      setattr(m, coupling, value)
-
+    m.ghz1 = 1
     me1 = computeP()
 
     m.setProcess(*setprocessargs)
 
-    m.a1 = 1
-    for coupling, value in couplings.iteritems():
-      if usevpvp:
-        newcoupling = coupling.replace("ghz", "ghzpzp").replace("b", "bzpzp")
-      else:
-        newcoupling = coupling.replace("ghz", "ghzzp").replace("b", "bzzp").replace("zzpgs", "zpgs").replace("zzpzgs", "zpgs")
-        if "gs" not in coupling:
-          value /= 2
-      assert newcoupling != coupling
-      setattr(m, newcoupling, value)
+    if usevpvp:
+        m.ghzpzp1 = 1
+    else:
+        m.ghzzp1 = 0.5
     m.M_Zprime = M_Z
     m.Ga_Zprime = Ga_Z
     m.M_Wprime = M_W
@@ -290,4 +242,4 @@ class TestMela(unittest.TestCase):
     self.assertEquals(firstrun, secondrun)
 
 if __name__ == "__main__":
-  unittest.main(argv=[sys.argv[0]]+args.unittest_args)
+  unittest.main()

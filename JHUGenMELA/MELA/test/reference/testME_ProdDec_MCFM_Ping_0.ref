@@ -6895,19 +6895,19 @@ TEvtProb::SetHiggsMass(125, -1, -1):
 	MCFM h2mass: -1, 0
 Begin MelaPConstant::Eval
 MelaPConstant::Eval: Candidate mass is 124.227
-MelaPConstant::Eval: Spline evaluated to -6.42895
+MelaPConstant::Eval: Spline evaluated to -6.42185
 MelaPConstant::GetVDaughterCouplings: L**2+R**2 couplings=0.707251 0.707251 
 MelaPConstant::GetHPropagator: propagatorH=2.69676e-05 
-End MelaPConstant::Eval with 5.02384e-12
+End MelaPConstant::Eval with 5.10665e-12
 Begin MelaPConstant::Eval
 MelaPConstant::Eval: Candidate mass is 124.227
-MelaPConstant::Eval: Spline evaluated to -10.3076
+MelaPConstant::Eval: Spline evaluated to -10.2848
 MelaPConstant::GetVDaughterCouplings: L**2+R**2 couplings=0.707251 0.707251 
 MelaPConstant::GetZPropagator: propagatorZ=26.8695 
-End MelaPConstant::Eval with 6.61927e-10
-Mela::getConstant: Constant is 1.49936e+09
+End MelaPConstant::Eval with 6.97589e-10
+Mela::getConstant: Constant is 1.42309e+09
 Mela: End computeProdDecP
-pVAMCFM_wbfZZ_Had_ZH_total: 4.46943e-07
+pVAMCFM_wbfZZ_Had_ZH_total: 4.24208e-07
 
 Mela: Begin computeProdDecP
 TEvtProb::SetHiggsMass(125, -1, 1):
@@ -7053,13 +7053,13 @@ TEvtProb::SetHiggsMass(125, -1, -1):
 	MCFM h2mass: -1, 0
 Begin MelaPConstant::Eval
 MelaPConstant::Eval: Candidate mass is 124.227
-MelaPConstant::Eval: Spline evaluated to -10.3076
+MelaPConstant::Eval: Spline evaluated to -10.2848
 MelaPConstant::GetVDaughterCouplings: L**2+R**2 couplings=0.707251 0.707251 
 MelaPConstant::GetZPropagator: propagatorZ=26.8695 
-End MelaPConstant::Eval with 6.61927e-10
-Mela::getConstant: Constant is 1.51074e+09
+End MelaPConstant::Eval with 6.97589e-10
+Mela::getConstant: Constant is 1.43351e+09
 Mela: End computeProdDecP
-pVAMCFM_wbfZZ_Had_ZH_bkg: 4.52094e-07
+pVAMCFM_wbfZZ_Had_ZH_bkg: 4.28982e-07
 
 Mela: Begin computeProdDecP
 TEvtProb::SetHiggsMass(125, -1, 1):
@@ -7205,13 +7205,13 @@ TEvtProb::SetHiggsMass(125, -1, -1):
 	MCFM h2mass: -1, 0
 Begin MelaPConstant::Eval
 MelaPConstant::Eval: Candidate mass is 124.227
-MelaPConstant::Eval: Spline evaluated to -6.42895
+MelaPConstant::Eval: Spline evaluated to -6.42185
 MelaPConstant::GetVDaughterCouplings: L**2+R**2 couplings=0.707251 0.707251 
 MelaPConstant::GetHPropagator: propagatorH=2.69676e-05 
-End MelaPConstant::Eval with 5.02384e-12
-Mela::getConstant: Constant is 1.99051e+11
+End MelaPConstant::Eval with 5.10665e-12
+Mela::getConstant: Constant is 1.95823e+11
 Mela: End computeProdDecP
-pVAMCFM_wbfZZ_Had_ZH_sig: 1.338e-08
+pVAMCFM_wbfZZ_Had_ZH_sig: 1.31631e-08
 
 Mela: Begin computeProdDecP
 TEvtProb::SetHiggsMass(125, -1, 1):
@@ -8698,19 +8698,19 @@ TEvtProb::SetHiggsMass(125, -1, -1):
 	MCFM h2mass: -1, 0
 Begin MelaPConstant::Eval
 MelaPConstant::Eval: Candidate mass is 124.227
-MelaPConstant::Eval: Spline evaluated to -6.42895
+MelaPConstant::Eval: Spline evaluated to -6.42185
 MelaPConstant::GetVDaughterCouplings: L**2+R**2 couplings=0.707251 0.707251 
 MelaPConstant::GetHPropagator: propagatorH=2.69676e-05 
-End MelaPConstant::Eval with 5.02384e-12
+End MelaPConstant::Eval with 5.10665e-12
 Begin MelaPConstant::Eval
 MelaPConstant::Eval: Candidate mass is 124.227
-MelaPConstant::Eval: Spline evaluated to -10.3076
+MelaPConstant::Eval: Spline evaluated to -10.2848
 MelaPConstant::GetVDaughterCouplings: L**2+R**2 couplings=0.707251 0.707251 
 MelaPConstant::GetZPropagator: propagatorZ=26.8695 
-End MelaPConstant::Eval with 6.61927e-10
-Mela::getConstant: Constant is 1.49936e+09
+End MelaPConstant::Eval with 6.97589e-10
+Mela::getConstant: Constant is 1.42309e+09
 Mela: End computeProdDecP
-pVAMCFM_wbfZZ_Had_ZH_S_total: 4.46891e-07
+pVAMCFM_wbfZZ_Had_ZH_S_total: 4.24159e-07
 
 Mela: Begin computeProdDecP
 TEvtProb::SetHiggsMass(125, -1, 1):
@@ -8856,13 +8856,13 @@ TEvtProb::SetHiggsMass(125, -1, -1):
 	MCFM h2mass: -1, 0
 Begin MelaPConstant::Eval
 MelaPConstant::Eval: Candidate mass is 124.227
-MelaPConstant::Eval: Spline evaluated to -10.3076
+MelaPConstant::Eval: Spline evaluated to -10.2848
 MelaPConstant::GetVDaughterCouplings: L**2+R**2 couplings=0.707251 0.707251 
 MelaPConstant::GetZPropagator: propagatorZ=26.8695 
-End MelaPConstant::Eval with 6.61927e-10
-Mela::getConstant: Constant is 1.51074e+09
+End MelaPConstant::Eval with 6.97589e-10
+Mela::getConstant: Constant is 1.43351e+09
 Mela: End computeProdDecP
-pVAMCFM_wbfZZ_Had_ZH_S_bkg: 4.52094e-07
+pVAMCFM_wbfZZ_Had_ZH_S_bkg: 4.28982e-07
 
 Mela: Begin computeProdDecP
 TEvtProb::SetHiggsMass(125, -1, 1):
@@ -9008,13 +9008,13 @@ TEvtProb::SetHiggsMass(125, -1, -1):
 	MCFM h2mass: -1, 0
 Begin MelaPConstant::Eval
 MelaPConstant::Eval: Candidate mass is 124.227
-MelaPConstant::Eval: Spline evaluated to -6.42895
+MelaPConstant::Eval: Spline evaluated to -6.42185
 MelaPConstant::GetVDaughterCouplings: L**2+R**2 couplings=0.707251 0.707251 
 MelaPConstant::GetHPropagator: propagatorH=2.69676e-05 
-End MelaPConstant::Eval with 5.02384e-12
-Mela::getConstant: Constant is 1.99051e+11
+End MelaPConstant::Eval with 5.10665e-12
+Mela::getConstant: Constant is 1.95823e+11
 Mela: End computeProdDecP
-pVAMCFM_wbfZZ_Had_ZH_S_sig: 1.32832e-08
+pVAMCFM_wbfZZ_Had_ZH_S_sig: 1.30678e-08
 
 Mela: Begin computeProdDecP
 TEvtProb::SetHiggsMass(125, -1, 1):
@@ -10501,19 +10501,19 @@ TEvtProb::SetHiggsMass(125, -1, -1):
 	MCFM h2mass: -1, 0
 Begin MelaPConstant::Eval
 MelaPConstant::Eval: Candidate mass is 124.227
-MelaPConstant::Eval: Spline evaluated to -6.42895
+MelaPConstant::Eval: Spline evaluated to -6.42185
 MelaPConstant::GetVDaughterCouplings: L**2+R**2 couplings=0.707251 0.707251 
 MelaPConstant::GetHPropagator: propagatorH=2.69676e-05 
-End MelaPConstant::Eval with 5.02384e-12
+End MelaPConstant::Eval with 5.10665e-12
 Begin MelaPConstant::Eval
 MelaPConstant::Eval: Candidate mass is 124.227
-MelaPConstant::Eval: Spline evaluated to -10.3076
+MelaPConstant::Eval: Spline evaluated to -10.2848
 MelaPConstant::GetVDaughterCouplings: L**2+R**2 couplings=0.707251 0.707251 
 MelaPConstant::GetZPropagator: propagatorZ=26.8695 
-End MelaPConstant::Eval with 6.61927e-10
-Mela::getConstant: Constant is 1.49936e+09
+End MelaPConstant::Eval with 6.97589e-10
+Mela::getConstant: Constant is 1.42309e+09
 Mela: End computeProdDecP
-pVAMCFM_wbfZZ_Had_ZH_TU_total: 4.4874e-07
+pVAMCFM_wbfZZ_Had_ZH_TU_total: 4.25914e-07
 
 Mela: Begin computeProdDecP
 TEvtProb::SetHiggsMass(125, -1, 1):
@@ -10659,13 +10659,13 @@ TEvtProb::SetHiggsMass(125, -1, -1):
 	MCFM h2mass: -1, 0
 Begin MelaPConstant::Eval
 MelaPConstant::Eval: Candidate mass is 124.227
-MelaPConstant::Eval: Spline evaluated to -10.3076
+MelaPConstant::Eval: Spline evaluated to -10.2848
 MelaPConstant::GetVDaughterCouplings: L**2+R**2 couplings=0.707251 0.707251 
 MelaPConstant::GetZPropagator: propagatorZ=26.8695 
-End MelaPConstant::Eval with 6.61927e-10
-Mela::getConstant: Constant is 1.51074e+09
+End MelaPConstant::Eval with 6.97589e-10
+Mela::getConstant: Constant is 1.43351e+09
 Mela: End computeProdDecP
-pVAMCFM_wbfZZ_Had_ZH_TU_bkg: 4.52094e-07
+pVAMCFM_wbfZZ_Had_ZH_TU_bkg: 4.28982e-07
 
 Mela: Begin computeProdDecP
 TEvtProb::SetHiggsMass(125, -1, 1):
@@ -10811,13 +10811,13 @@ TEvtProb::SetHiggsMass(125, -1, -1):
 	MCFM h2mass: -1, 0
 Begin MelaPConstant::Eval
 MelaPConstant::Eval: Candidate mass is 124.227
-MelaPConstant::Eval: Spline evaluated to -6.42895
+MelaPConstant::Eval: Spline evaluated to -6.42185
 MelaPConstant::GetVDaughterCouplings: L**2+R**2 couplings=0.707251 0.707251 
 MelaPConstant::GetHPropagator: propagatorH=2.69676e-05 
-End MelaPConstant::Eval with 5.02384e-12
-Mela::getConstant: Constant is 1.99051e+11
+End MelaPConstant::Eval with 5.10665e-12
+Mela::getConstant: Constant is 1.95823e+11
 Mela: End computeProdDecP
-pVAMCFM_wbfZZ_Had_ZH_TU_sig: 8.09539e-12
+pVAMCFM_wbfZZ_Had_ZH_TU_sig: 7.9641e-12
 
 Mela: Begin computeProdDecP
 TEvtProb::SetHiggsMass(125, -1, 1):
@@ -12304,19 +12304,19 @@ TEvtProb::SetHiggsMass(125, -1, -1):
 	MCFM h2mass: -1, 0
 Begin MelaPConstant::Eval
 MelaPConstant::Eval: Candidate mass is 124.227
-MelaPConstant::Eval: Spline evaluated to -6.20995
+MelaPConstant::Eval: Spline evaluated to -6.16483
 MelaPConstant::GetVDaughterCouplings: L**2+R**2 couplings=0.707251 0.707251 
 MelaPConstant::GetHPropagator: propagatorH=2.69676e-05 
-End MelaPConstant::Eval with 8.31837e-12
+End MelaPConstant::Eval with 9.22911e-12
 Begin MelaPConstant::Eval
 MelaPConstant::Eval: Candidate mass is 124.227
-MelaPConstant::Eval: Spline evaluated to -10.7696
+MelaPConstant::Eval: Spline evaluated to -10.7628
 MelaPConstant::GetVDaughterCouplings: L**2+R**2 couplings=0.707251 0.707251 
 MelaPConstant::GetZPropagator: propagatorZ=26.8695 
-End MelaPConstant::Eval with 2.28479e-10
-Mela::getConstant: Constant is 4.22301e+09
+End MelaPConstant::Eval with 2.32048e-10
+Mela::getConstant: Constant is 4.14462e+09
 Mela: End computeProdDecP
-pVAMCFM_wbfZZ_Had_WH_total: 3.1437e-06
+pVAMCFM_wbfZZ_Had_WH_total: 3.08534e-06
 
 Mela: Begin computeProdDecP
 TEvtProb::SetHiggsMass(125, -1, 1):
@@ -12462,13 +12462,13 @@ TEvtProb::SetHiggsMass(125, -1, -1):
 	MCFM h2mass: -1, 0
 Begin MelaPConstant::Eval
 MelaPConstant::Eval: Candidate mass is 124.227
-MelaPConstant::Eval: Spline evaluated to -10.7696
+MelaPConstant::Eval: Spline evaluated to -10.7628
 MelaPConstant::GetVDaughterCouplings: L**2+R**2 couplings=0.707251 0.707251 
 MelaPConstant::GetZPropagator: propagatorZ=26.8695 
-End MelaPConstant::Eval with 2.28479e-10
-Mela::getConstant: Constant is 4.37676e+09
+End MelaPConstant::Eval with 2.32048e-10
+Mela::getConstant: Constant is 4.30946e+09
 Mela: End computeProdDecP
-pVAMCFM_wbfZZ_Had_WH_bkg: 3.27675e-06
+pVAMCFM_wbfZZ_Had_WH_bkg: 3.22636e-06
 
 Mela: Begin computeProdDecP
 TEvtProb::SetHiggsMass(125, -1, 1):
@@ -12614,13 +12614,13 @@ TEvtProb::SetHiggsMass(125, -1, -1):
 	MCFM h2mass: -1, 0
 Begin MelaPConstant::Eval
 MelaPConstant::Eval: Candidate mass is 124.227
-MelaPConstant::Eval: Spline evaluated to -6.20995
+MelaPConstant::Eval: Spline evaluated to -6.16483
 MelaPConstant::GetVDaughterCouplings: L**2+R**2 couplings=0.707251 0.707251 
 MelaPConstant::GetHPropagator: propagatorH=2.69676e-05 
-End MelaPConstant::Eval with 8.31837e-12
-Mela::getConstant: Constant is 1.20216e+11
+End MelaPConstant::Eval with 9.22911e-12
+Mela::getConstant: Constant is 1.08353e+11
 Mela: End computeProdDecP
-pVAMCFM_wbfZZ_Had_WH_sig: 1.27901e-08
+pVAMCFM_wbfZZ_Had_WH_sig: 1.1528e-08
 
 Mela: Begin computeProdDecP
 TEvtProb::SetHiggsMass(125, -1, 1):
@@ -14107,19 +14107,19 @@ TEvtProb::SetHiggsMass(125, -1, -1):
 	MCFM h2mass: -1, 0
 Begin MelaPConstant::Eval
 MelaPConstant::Eval: Candidate mass is 124.227
-MelaPConstant::Eval: Spline evaluated to -6.20995
+MelaPConstant::Eval: Spline evaluated to -6.16483
 MelaPConstant::GetVDaughterCouplings: L**2+R**2 couplings=0.707251 0.707251 
 MelaPConstant::GetHPropagator: propagatorH=2.69676e-05 
-End MelaPConstant::Eval with 8.31837e-12
+End MelaPConstant::Eval with 9.22911e-12
 Begin MelaPConstant::Eval
 MelaPConstant::Eval: Candidate mass is 124.227
-MelaPConstant::Eval: Spline evaluated to -10.7696
+MelaPConstant::Eval: Spline evaluated to -10.7628
 MelaPConstant::GetVDaughterCouplings: L**2+R**2 couplings=0.707251 0.707251 
 MelaPConstant::GetZPropagator: propagatorZ=26.8695 
-End MelaPConstant::Eval with 2.28479e-10
-Mela::getConstant: Constant is 4.22301e+09
+End MelaPConstant::Eval with 2.32048e-10
+Mela::getConstant: Constant is 4.14462e+09
 Mela: End computeProdDecP
-pVAMCFM_wbfZZ_Had_WH_S_total: 3.1437e-06
+pVAMCFM_wbfZZ_Had_WH_S_total: 3.08534e-06
 
 Mela: Begin computeProdDecP
 TEvtProb::SetHiggsMass(125, -1, 1):
@@ -14265,13 +14265,13 @@ TEvtProb::SetHiggsMass(125, -1, -1):
 	MCFM h2mass: -1, 0
 Begin MelaPConstant::Eval
 MelaPConstant::Eval: Candidate mass is 124.227
-MelaPConstant::Eval: Spline evaluated to -10.7696
+MelaPConstant::Eval: Spline evaluated to -10.7628
 MelaPConstant::GetVDaughterCouplings: L**2+R**2 couplings=0.707251 0.707251 
 MelaPConstant::GetZPropagator: propagatorZ=26.8695 
-End MelaPConstant::Eval with 2.28479e-10
-Mela::getConstant: Constant is 4.37676e+09
+End MelaPConstant::Eval with 2.32048e-10
+Mela::getConstant: Constant is 4.30946e+09
 Mela: End computeProdDecP
-pVAMCFM_wbfZZ_Had_WH_S_bkg: 3.27675e-06
+pVAMCFM_wbfZZ_Had_WH_S_bkg: 3.22636e-06
 
 Mela: Begin computeProdDecP
 TEvtProb::SetHiggsMass(125, -1, 1):
@@ -14417,13 +14417,13 @@ TEvtProb::SetHiggsMass(125, -1, -1):
 	MCFM h2mass: -1, 0
 Begin MelaPConstant::Eval
 MelaPConstant::Eval: Candidate mass is 124.227
-MelaPConstant::Eval: Spline evaluated to -6.20995
+MelaPConstant::Eval: Spline evaluated to -6.16483
 MelaPConstant::GetVDaughterCouplings: L**2+R**2 couplings=0.707251 0.707251 
 MelaPConstant::GetHPropagator: propagatorH=2.69676e-05 
-End MelaPConstant::Eval with 8.31837e-12
-Mela::getConstant: Constant is 1.20216e+11
+End MelaPConstant::Eval with 9.22911e-12
+Mela::getConstant: Constant is 1.08353e+11
 Mela: End computeProdDecP
-pVAMCFM_wbfZZ_Had_WH_S_sig: 1.27901e-08
+pVAMCFM_wbfZZ_Had_WH_S_sig: 1.1528e-08
 
 Mela: Begin computeProdDecP
 TEvtProb::SetHiggsMass(125, -1, 1):
@@ -15910,19 +15910,19 @@ TEvtProb::SetHiggsMass(125, -1, -1):
 	MCFM h2mass: -1, 0
 Begin MelaPConstant::Eval
 MelaPConstant::Eval: Candidate mass is 124.227
-MelaPConstant::Eval: Spline evaluated to -6.20995
+MelaPConstant::Eval: Spline evaluated to -6.16483
 MelaPConstant::GetVDaughterCouplings: L**2+R**2 couplings=0.707251 0.707251 
 MelaPConstant::GetHPropagator: propagatorH=2.69676e-05 
-End MelaPConstant::Eval with 8.31837e-12
+End MelaPConstant::Eval with 9.22911e-12
 Begin MelaPConstant::Eval
 MelaPConstant::Eval: Candidate mass is 124.227
-MelaPConstant::Eval: Spline evaluated to -10.7696
+MelaPConstant::Eval: Spline evaluated to -10.7628
 MelaPConstant::GetVDaughterCouplings: L**2+R**2 couplings=0.707251 0.707251 
 MelaPConstant::GetZPropagator: propagatorZ=26.8695 
-End MelaPConstant::Eval with 2.28479e-10
-Mela::getConstant: Constant is 4.22301e+09
+End MelaPConstant::Eval with 2.32048e-10
+Mela::getConstant: Constant is 4.14462e+09
 Mela: End computeProdDecP
-pVAMCFM_wbfZZ_Had_WH_TU_total: 3.16164e-06
+pVAMCFM_wbfZZ_Had_WH_TU_total: 3.10295e-06
 
 Mela: Begin computeProdDecP
 TEvtProb::SetHiggsMass(125, -1, 1):
@@ -16068,13 +16068,13 @@ TEvtProb::SetHiggsMass(125, -1, -1):
 	MCFM h2mass: -1, 0
 Begin MelaPConstant::Eval
 MelaPConstant::Eval: Candidate mass is 124.227
-MelaPConstant::Eval: Spline evaluated to -10.7696
+MelaPConstant::Eval: Spline evaluated to -10.7628
 MelaPConstant::GetVDaughterCouplings: L**2+R**2 couplings=0.707251 0.707251 
 MelaPConstant::GetZPropagator: propagatorZ=26.8695 
-End MelaPConstant::Eval with 2.28479e-10
-Mela::getConstant: Constant is 4.37676e+09
+End MelaPConstant::Eval with 2.32048e-10
+Mela::getConstant: Constant is 4.30946e+09
 Mela: End computeProdDecP
-pVAMCFM_wbfZZ_Had_WH_TU_bkg: 3.27675e-06
+pVAMCFM_wbfZZ_Had_WH_TU_bkg: 3.22636e-06
 
 Mela: Begin computeProdDecP
 TEvtProb::SetHiggsMass(125, -1, 1):
@@ -16220,11 +16220,11 @@ TEvtProb::SetHiggsMass(125, -1, -1):
 	MCFM h2mass: -1, 0
 Begin MelaPConstant::Eval
 MelaPConstant::Eval: Candidate mass is 124.227
-MelaPConstant::Eval: Spline evaluated to -6.20995
+MelaPConstant::Eval: Spline evaluated to -6.16483
 MelaPConstant::GetVDaughterCouplings: L**2+R**2 couplings=0.707251 0.707251 
 MelaPConstant::GetHPropagator: propagatorH=2.69676e-05 
-End MelaPConstant::Eval with 8.31837e-12
-Mela::getConstant: Constant is 1.20216e+11
+End MelaPConstant::Eval with 9.22911e-12
+Mela::getConstant: Constant is 1.08353e+11
 Mela: End computeProdDecP
 pVAMCFM_wbfZZ_Had_WH_TU_sig: 0
 
@@ -17719,16 +17719,16 @@ MelaPConstant::GetHPropagator: propagatorH=2.69676e-05
 End MelaPConstant::Eval with 1.18508e-10
 Begin MelaPConstant::Eval
 MelaPConstant::Eval: Candidate mass is 124.227
-MelaPConstant::Eval: Spline evaluated to -6.42895
+MelaPConstant::Eval: Spline evaluated to -6.42185
 MelaPConstant::GetVDaughterCouplings: L**2+R**2 couplings=0.707251 0.707251 
 MelaPConstant::GetHPropagator: propagatorH=2.69676e-05 
-End MelaPConstant::Eval with 5.02384e-12
+End MelaPConstant::Eval with 5.10665e-12
 Begin MelaPConstant::Eval
 MelaPConstant::Eval: Candidate mass is 124.227
-MelaPConstant::Eval: Spline evaluated to -6.20995
+MelaPConstant::Eval: Spline evaluated to -6.16483
 MelaPConstant::GetVDaughterCouplings: L**2+R**2 couplings=0.707251 0.707251 
 MelaPConstant::GetHPropagator: propagatorH=2.69676e-05 
-End MelaPConstant::Eval with 8.31837e-12
+End MelaPConstant::Eval with 9.22911e-12
 Begin MelaPConstant::Eval
 MelaPConstant::Eval: Candidate mass is 124.227
 MelaPConstant::Eval: Spline evaluated to -9.59894
@@ -17737,19 +17737,19 @@ MelaPConstant::GetZPropagator: propagatorZ=26.8695
 End MelaPConstant::Eval with 3.38426e-09
 Begin MelaPConstant::Eval
 MelaPConstant::Eval: Candidate mass is 124.227
-MelaPConstant::Eval: Spline evaluated to -10.3076
+MelaPConstant::Eval: Spline evaluated to -10.2848
 MelaPConstant::GetVDaughterCouplings: L**2+R**2 couplings=0.707251 0.707251 
 MelaPConstant::GetZPropagator: propagatorZ=26.8695 
-End MelaPConstant::Eval with 6.61927e-10
+End MelaPConstant::Eval with 6.97589e-10
 Begin MelaPConstant::Eval
 MelaPConstant::Eval: Candidate mass is 124.227
-MelaPConstant::Eval: Spline evaluated to -10.7696
+MelaPConstant::Eval: Spline evaluated to -10.7628
 MelaPConstant::GetVDaughterCouplings: L**2+R**2 couplings=0.707251 0.707251 
 MelaPConstant::GetZPropagator: propagatorZ=26.8695 
-End MelaPConstant::Eval with 2.28479e-10
-Mela::getConstant: Constant is 2.26937e+08
+End MelaPConstant::Eval with 2.32048e-10
+Mela::getConstant: Constant is 2.24884e+08
 Mela: End computeProdDecP
-pVAMCFM_wbfZZ_JJEW_total: 2.38785e-07
+pVAMCFM_wbfZZ_JJEW_total: 2.36625e-07
 
 Mela: Begin computeProdDecP
 TEvtProb::SetHiggsMass(125, -1, 1):
@@ -17901,19 +17901,19 @@ MelaPConstant::GetZPropagator: propagatorZ=26.8695
 End MelaPConstant::Eval with 3.38426e-09
 Begin MelaPConstant::Eval
 MelaPConstant::Eval: Candidate mass is 124.227
-MelaPConstant::Eval: Spline evaluated to -10.3076
+MelaPConstant::Eval: Spline evaluated to -10.2848
 MelaPConstant::GetVDaughterCouplings: L**2+R**2 couplings=0.707251 0.707251 
 MelaPConstant::GetZPropagator: propagatorZ=26.8695 
-End MelaPConstant::Eval with 6.61927e-10
+End MelaPConstant::Eval with 6.97589e-10
 Begin MelaPConstant::Eval
 MelaPConstant::Eval: Candidate mass is 124.227
-MelaPConstant::Eval: Spline evaluated to -10.7696
+MelaPConstant::Eval: Spline evaluated to -10.7628
 MelaPConstant::GetVDaughterCouplings: L**2+R**2 couplings=0.707251 0.707251 
 MelaPConstant::GetZPropagator: propagatorZ=26.8695 
-End MelaPConstant::Eval with 2.28479e-10
-Mela::getConstant: Constant is 2.33936e+08
+End MelaPConstant::Eval with 2.32048e-10
+Mela::getConstant: Constant is 2.31809e+08
 Mela: End computeProdDecP
-pVAMCFM_wbfZZ_JJEW_bkg: 2.45372e-07
+pVAMCFM_wbfZZ_JJEW_bkg: 2.43141e-07
 
 Mela: Begin computeProdDecP
 TEvtProb::SetHiggsMass(125, -1, 1):
@@ -18065,19 +18065,19 @@ MelaPConstant::GetHPropagator: propagatorH=2.69676e-05
 End MelaPConstant::Eval with 1.18508e-10
 Begin MelaPConstant::Eval
 MelaPConstant::Eval: Candidate mass is 124.227
-MelaPConstant::Eval: Spline evaluated to -6.42895
+MelaPConstant::Eval: Spline evaluated to -6.42185
 MelaPConstant::GetVDaughterCouplings: L**2+R**2 couplings=0.707251 0.707251 
 MelaPConstant::GetHPropagator: propagatorH=2.69676e-05 
-End MelaPConstant::Eval with 5.02384e-12
+End MelaPConstant::Eval with 5.10665e-12
 Begin MelaPConstant::Eval
 MelaPConstant::Eval: Candidate mass is 124.227
-MelaPConstant::Eval: Spline evaluated to -6.20995
+MelaPConstant::Eval: Spline evaluated to -6.16483
 MelaPConstant::GetVDaughterCouplings: L**2+R**2 couplings=0.707251 0.707251 
 MelaPConstant::GetHPropagator: propagatorH=2.69676e-05 
-End MelaPConstant::Eval with 8.31837e-12
-Mela::getConstant: Constant is 7.58435e+09
+End MelaPConstant::Eval with 9.22911e-12
+Mela::getConstant: Constant is 7.52762e+09
 Mela: End computeProdDecP
-pVAMCFM_wbfZZ_JJEW_sig: 1.75911e-09
+pVAMCFM_wbfZZ_JJEW_sig: 1.74595e-09
 
 Mela: Begin computeProdDecP
 TEvtProb::SetHiggsMass(125, -1, 1):
@@ -19570,16 +19570,16 @@ MelaPConstant::GetHPropagator: propagatorH=2.69676e-05
 End MelaPConstant::Eval with 1.18508e-10
 Begin MelaPConstant::Eval
 MelaPConstant::Eval: Candidate mass is 124.227
-MelaPConstant::Eval: Spline evaluated to -6.42895
+MelaPConstant::Eval: Spline evaluated to -6.42185
 MelaPConstant::GetVDaughterCouplings: L**2+R**2 couplings=0.707251 0.707251 
 MelaPConstant::GetHPropagator: propagatorH=2.69676e-05 
-End MelaPConstant::Eval with 5.02384e-12
+End MelaPConstant::Eval with 5.10665e-12
 Begin MelaPConstant::Eval
 MelaPConstant::Eval: Candidate mass is 124.227
-MelaPConstant::Eval: Spline evaluated to -6.20995
+MelaPConstant::Eval: Spline evaluated to -6.16483
 MelaPConstant::GetVDaughterCouplings: L**2+R**2 couplings=0.707251 0.707251 
 MelaPConstant::GetHPropagator: propagatorH=2.69676e-05 
-End MelaPConstant::Eval with 8.31837e-12
+End MelaPConstant::Eval with 9.22911e-12
 Begin MelaPConstant::Eval
 MelaPConstant::Eval: Candidate mass is 124.227
 MelaPConstant::Eval: Spline evaluated to -9.59894
@@ -19588,19 +19588,19 @@ MelaPConstant::GetZPropagator: propagatorZ=26.8695
 End MelaPConstant::Eval with 3.38426e-09
 Begin MelaPConstant::Eval
 MelaPConstant::Eval: Candidate mass is 124.227
-MelaPConstant::Eval: Spline evaluated to -10.3076
+MelaPConstant::Eval: Spline evaluated to -10.2848
 MelaPConstant::GetVDaughterCouplings: L**2+R**2 couplings=0.707251 0.707251 
 MelaPConstant::GetZPropagator: propagatorZ=26.8695 
-End MelaPConstant::Eval with 6.61927e-10
+End MelaPConstant::Eval with 6.97589e-10
 Begin MelaPConstant::Eval
 MelaPConstant::Eval: Candidate mass is 124.227
-MelaPConstant::Eval: Spline evaluated to -10.7696
+MelaPConstant::Eval: Spline evaluated to -10.7628
 MelaPConstant::GetVDaughterCouplings: L**2+R**2 couplings=0.707251 0.707251 
 MelaPConstant::GetZPropagator: propagatorZ=26.8695 
-End MelaPConstant::Eval with 2.28479e-10
-Mela::getConstant: Constant is 2.26937e+08
+End MelaPConstant::Eval with 2.32048e-10
+Mela::getConstant: Constant is 2.24884e+08
 Mela: End computeProdDecP
-pVAMCFM_wbfZZ_JJEW_S_total: 2.3879e-07
+pVAMCFM_wbfZZ_JJEW_S_total: 2.3663e-07
 
 Mela: Begin computeProdDecP
 TEvtProb::SetHiggsMass(125, -1, 1):
@@ -19752,19 +19752,19 @@ MelaPConstant::GetZPropagator: propagatorZ=26.8695
 End MelaPConstant::Eval with 3.38426e-09
 Begin MelaPConstant::Eval
 MelaPConstant::Eval: Candidate mass is 124.227
-MelaPConstant::Eval: Spline evaluated to -10.3076
+MelaPConstant::Eval: Spline evaluated to -10.2848
 MelaPConstant::GetVDaughterCouplings: L**2+R**2 couplings=0.707251 0.707251 
 MelaPConstant::GetZPropagator: propagatorZ=26.8695 
-End MelaPConstant::Eval with 6.61927e-10
+End MelaPConstant::Eval with 6.97589e-10
 Begin MelaPConstant::Eval
 MelaPConstant::Eval: Candidate mass is 124.227
-MelaPConstant::Eval: Spline evaluated to -10.7696
+MelaPConstant::Eval: Spline evaluated to -10.7628
 MelaPConstant::GetVDaughterCouplings: L**2+R**2 couplings=0.707251 0.707251 
 MelaPConstant::GetZPropagator: propagatorZ=26.8695 
-End MelaPConstant::Eval with 2.28479e-10
-Mela::getConstant: Constant is 2.33936e+08
+End MelaPConstant::Eval with 2.32048e-10
+Mela::getConstant: Constant is 2.31809e+08
 Mela: End computeProdDecP
-pVAMCFM_wbfZZ_JJEW_S_bkg: 2.45372e-07
+pVAMCFM_wbfZZ_JJEW_S_bkg: 2.43141e-07
 
 Mela: Begin computeProdDecP
 TEvtProb::SetHiggsMass(125, -1, 1):
@@ -19916,19 +19916,19 @@ MelaPConstant::GetHPropagator: propagatorH=2.69676e-05
 End MelaPConstant::Eval with 1.18508e-10
 Begin MelaPConstant::Eval
 MelaPConstant::Eval: Candidate mass is 124.227
-MelaPConstant::Eval: Spline evaluated to -6.42895
+MelaPConstant::Eval: Spline evaluated to -6.42185
 MelaPConstant::GetVDaughterCouplings: L**2+R**2 couplings=0.707251 0.707251 
 MelaPConstant::GetHPropagator: propagatorH=2.69676e-05 
-End MelaPConstant::Eval with 5.02384e-12
+End MelaPConstant::Eval with 5.10665e-12
 Begin MelaPConstant::Eval
 MelaPConstant::Eval: Candidate mass is 124.227
-MelaPConstant::Eval: Spline evaluated to -6.20995
+MelaPConstant::Eval: Spline evaluated to -6.16483
 MelaPConstant::GetVDaughterCouplings: L**2+R**2 couplings=0.707251 0.707251 
 MelaPConstant::GetHPropagator: propagatorH=2.69676e-05 
-End MelaPConstant::Eval with 8.31837e-12
-Mela::getConstant: Constant is 7.58435e+09
+End MelaPConstant::Eval with 9.22911e-12
+Mela::getConstant: Constant is 7.52762e+09
 Mela: End computeProdDecP
-pVAMCFM_wbfZZ_JJEW_S_sig: 1.75398e-09
+pVAMCFM_wbfZZ_JJEW_S_sig: 1.74086e-09
 
 Mela: Begin computeProdDecP
 TEvtProb::SetHiggsMass(125, -1, 1):
@@ -21421,16 +21421,16 @@ MelaPConstant::GetHPropagator: propagatorH=2.69676e-05
 End MelaPConstant::Eval with 1.18508e-10
 Begin MelaPConstant::Eval
 MelaPConstant::Eval: Candidate mass is 124.227
-MelaPConstant::Eval: Spline evaluated to -6.42895
+MelaPConstant::Eval: Spline evaluated to -6.42185
 MelaPConstant::GetVDaughterCouplings: L**2+R**2 couplings=0.707251 0.707251 
 MelaPConstant::GetHPropagator: propagatorH=2.69676e-05 
-End MelaPConstant::Eval with 5.02384e-12
+End MelaPConstant::Eval with 5.10665e-12
 Begin MelaPConstant::Eval
 MelaPConstant::Eval: Candidate mass is 124.227
-MelaPConstant::Eval: Spline evaluated to -6.20995
+MelaPConstant::Eval: Spline evaluated to -6.16483
 MelaPConstant::GetVDaughterCouplings: L**2+R**2 couplings=0.707251 0.707251 
 MelaPConstant::GetHPropagator: propagatorH=2.69676e-05 
-End MelaPConstant::Eval with 8.31837e-12
+End MelaPConstant::Eval with 9.22911e-12
 Begin MelaPConstant::Eval
 MelaPConstant::Eval: Candidate mass is 124.227
 MelaPConstant::Eval: Spline evaluated to -9.59894
@@ -21439,19 +21439,19 @@ MelaPConstant::GetZPropagator: propagatorZ=26.8695
 End MelaPConstant::Eval with 3.38426e-09
 Begin MelaPConstant::Eval
 MelaPConstant::Eval: Candidate mass is 124.227
-MelaPConstant::Eval: Spline evaluated to -10.3076
+MelaPConstant::Eval: Spline evaluated to -10.2848
 MelaPConstant::GetVDaughterCouplings: L**2+R**2 couplings=0.707251 0.707251 
 MelaPConstant::GetZPropagator: propagatorZ=26.8695 
-End MelaPConstant::Eval with 6.61927e-10
+End MelaPConstant::Eval with 6.97589e-10
 Begin MelaPConstant::Eval
 MelaPConstant::Eval: Candidate mass is 124.227
-MelaPConstant::Eval: Spline evaluated to -10.7696
+MelaPConstant::Eval: Spline evaluated to -10.7628
 MelaPConstant::GetVDaughterCouplings: L**2+R**2 couplings=0.707251 0.707251 
 MelaPConstant::GetZPropagator: propagatorZ=26.8695 
-End MelaPConstant::Eval with 2.28479e-10
-Mela::getConstant: Constant is 2.26937e+08
+End MelaPConstant::Eval with 2.32048e-10
+Mela::getConstant: Constant is 2.24884e+08
 Mela: End computeProdDecP
-pVAMCFM_wbfZZ_JJEW_TU_total: 2.38025e-07
+pVAMCFM_wbfZZ_JJEW_TU_total: 2.35872e-07
 
 Mela: Begin computeProdDecP
 TEvtProb::SetHiggsMass(125, -1, 1):
@@ -21603,19 +21603,19 @@ MelaPConstant::GetZPropagator: propagatorZ=26.8695
 End MelaPConstant::Eval with 3.38426e-09
 Begin MelaPConstant::Eval
 MelaPConstant::Eval: Candidate mass is 124.227
-MelaPConstant::Eval: Spline evaluated to -10.3076
+MelaPConstant::Eval: Spline evaluated to -10.2848
 MelaPConstant::GetVDaughterCouplings: L**2+R**2 couplings=0.707251 0.707251 
 MelaPConstant::GetZPropagator: propagatorZ=26.8695 
-End MelaPConstant::Eval with 6.61927e-10
+End MelaPConstant::Eval with 6.97589e-10
 Begin MelaPConstant::Eval
 MelaPConstant::Eval: Candidate mass is 124.227
-MelaPConstant::Eval: Spline evaluated to -10.7696
+MelaPConstant::Eval: Spline evaluated to -10.7628
 MelaPConstant::GetVDaughterCouplings: L**2+R**2 couplings=0.707251 0.707251 
 MelaPConstant::GetZPropagator: propagatorZ=26.8695 
-End MelaPConstant::Eval with 2.28479e-10
-Mela::getConstant: Constant is 2.33936e+08
+End MelaPConstant::Eval with 2.32048e-10
+Mela::getConstant: Constant is 2.31809e+08
 Mela: End computeProdDecP
-pVAMCFM_wbfZZ_JJEW_TU_bkg: 2.45372e-07
+pVAMCFM_wbfZZ_JJEW_TU_bkg: 2.43141e-07
 
 Mela: Begin computeProdDecP
 TEvtProb::SetHiggsMass(125, -1, 1):
@@ -21767,19 +21767,19 @@ MelaPConstant::GetHPropagator: propagatorH=2.69676e-05
 End MelaPConstant::Eval with 1.18508e-10
 Begin MelaPConstant::Eval
 MelaPConstant::Eval: Candidate mass is 124.227
-MelaPConstant::Eval: Spline evaluated to -6.42895
+MelaPConstant::Eval: Spline evaluated to -6.42185
 MelaPConstant::GetVDaughterCouplings: L**2+R**2 couplings=0.707251 0.707251 
 MelaPConstant::GetHPropagator: propagatorH=2.69676e-05 
-End MelaPConstant::Eval with 5.02384e-12
+End MelaPConstant::Eval with 5.10665e-12
 Begin MelaPConstant::Eval
 MelaPConstant::Eval: Candidate mass is 124.227
-MelaPConstant::Eval: Spline evaluated to -6.20995
+MelaPConstant::Eval: Spline evaluated to -6.16483
 MelaPConstant::GetVDaughterCouplings: L**2+R**2 couplings=0.707251 0.707251 
 MelaPConstant::GetHPropagator: propagatorH=2.69676e-05 
-End MelaPConstant::Eval with 8.31837e-12
-Mela::getConstant: Constant is 7.58435e+09
+End MelaPConstant::Eval with 9.22911e-12
+Mela::getConstant: Constant is 7.52762e+09
 Mela: End computeProdDecP
-pVAMCFM_wbfZZ_JJEW_TU_sig: 3.76315e-13
+pVAMCFM_wbfZZ_JJEW_TU_sig: 3.73501e-13
 
 Removing Mela candidates
 Summary:

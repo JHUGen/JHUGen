@@ -3,7 +3,7 @@ MCFM production chosen: JJVBF_S
 spinzerohiggs_anomcoupl_.AnomalCouplDK=1
 Production variables:
 	mJJ = 830.608
-	Phi = 0.354914
+	Phi = -0.0707847
 	JHUGen (mass, width): (125, 0.00407)
 	JHUGen propagator: 4.39991e-07
 Bkg
