@@ -5112,6 +5112,10 @@ character :: arg*(500)
             if( cdabs(ghzpgs3 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzpgs3=",ghzpgs3,"i"
             if( cdabs(ghzpgs4 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzpgs4=",ghzpgs4,"i"
             if( cdabs(ghzpgs1_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,2X,A,1PE12.4)") "ghzpgs1_prime2=",ghzpgs1_prime2,"i,","Lambda_zgs1=",Lambda_zgs1/GeV
+            if( cdabs(ghzpzp1 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzpzp1=",ghzpzp1,"i"
+            if( cdabs(ghzpzp2 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzpzp2=",ghzpzp2,"i"
+            if( cdabs(ghzpzp3 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzpzp3=",ghzpzp3,"i"
+            if( cdabs(ghzpzp4 ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A1)") "ghzpzp4=",ghzpzp4,"i"
             if( cdabs(ghzpzp1_prime ).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp1_prime= ",ghzpzp1_prime ,"i,","Lambda_z1=",Lambda_z1/GeV
             if( cdabs(ghzpzp1_prime2).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp1_prime2=",ghzpzp1_prime2,"i,","Lambda_z1=",Lambda_z1/GeV
             if( cdabs(ghzpzp1_prime3).ne.0d0 ) write(TheUnit,"(6X,A,2E16.8,A2,4X,A,1PE12.4)") "ghzpzp1_prime3=",ghzpzp1_prime3,"i,","Lambda_z1=",Lambda_z1/GeV
