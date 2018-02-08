@@ -3,6 +3,8 @@
 (
 set -euo pipefail
 
+cd $(dirname $0)
+
 MELADIR="."
 DATA_LIB_DIR="slc6_amd64_gcc530"
 
