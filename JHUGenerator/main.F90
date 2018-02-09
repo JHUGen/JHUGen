@@ -331,7 +331,9 @@ integer :: NumArgs,NArg
 logical :: help, DryRun, success, SetLastArgument, interfSet
 logical :: SetRenScheme, SetMuRenMultiplier, SetFacScheme, SetMuFacMultiplier
 logical :: SetAnomalousSpin0gg, Setghg2, SetAnomalousSpin0VV, Setghz1
+logical :: SetZZcoupling, SetZZprimecoupling, SetZprimeZprimecoupling
 logical :: SetZgammacoupling, Setgammagammacoupling, SetZprimegammacoupling
+logical :: SetWWcoupling, SetWWprimecoupling, SetWprimeWprimecoupling
 logical :: SetAnomalousSpin1qq, Setspin1qqleft, Setspin1qqright, SetSpin1VV
 logical :: SetAnomalousSpin2gg, SetAnomalousSpin2qq, Setspin2qqleft, Setspin2qqright, SetSpin2VV
 logical :: SetAnomalousHff, Setkappa
@@ -369,9 +371,15 @@ logical :: SetColliderEnergy
    Setghg2=.false.
    SetAnomalousSpin0VV=.false.
    Setghz1=.false.
+   SetZZcoupling=.false.
+   SetZZprimecoupling=.false.
+   SetZprimeZprimecoupling=.false.
    SetZgammacoupling=.false.
    Setgammagammacoupling=.false.
    SetZprimegammacoupling=.false.
+   SetWWcoupling=.false.
+   SetWWprimecoupling=.false.
+   SetWprimeWprimecoupling=.false.
    SetAnomalousSpin1qq=.false.
    Setspin1qqleft=.false.
    Setspin1qqright=.false.
@@ -504,9 +512,9 @@ logical :: SetColliderEnergy
 
     !spin 0 ZZ couplings
     call ReadCommandLineArgument(arg, "ghz1", success, ghz1, success2=SetAnomalousSpin0VV, success3=Setghz1)
-    call ReadCommandLineArgument(arg, "ghz2", success, ghz2, success2=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "ghz3", success, ghz3, success2=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "ghz4", success, ghz4, success2=SetAnomalousSpin0VV)
+    call ReadCommandLineArgument(arg, "ghz2", success, ghz2, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "ghz3", success, ghz3, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "ghz4", success, ghz4, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
 
     !spin 0 Zgamma couplings
     call ReadCommandLineArgument(arg, "ghzgs2", success, ghzgs2, success2=SetAnomalousSpin0VV, success3=SetZgammacoupling)
@@ -519,37 +527,37 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "ghgsgs4", success, ghgsgs4, success2=SetAnomalousSpin0VV, success3=Setgammagammacoupling)
 
     !spin 0 ZZ momentum dependent couplings
-    call ReadCommandLineArgument(arg, "ghz1_prime", success, ghz1_prime, success2=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "ghz1_prime2", success, ghz1_prime2, success2=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "ghz1_prime3", success, ghz1_prime3, success2=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "ghz1_prime4", success, ghz1_prime4, success2=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "ghz1_prime5", success, ghz1_prime5, success2=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "ghz1_prime6", success, ghz1_prime6, success2=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "ghz1_prime7", success, ghz1_prime7, success2=SetAnomalousSpin0VV)
+    call ReadCommandLineArgument(arg, "ghz1_prime", success, ghz1_prime, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "ghz1_prime2", success, ghz1_prime2, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "ghz1_prime3", success, ghz1_prime3, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "ghz1_prime4", success, ghz1_prime4, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "ghz1_prime5", success, ghz1_prime5, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "ghz1_prime6", success, ghz1_prime6, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "ghz1_prime7", success, ghz1_prime7, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
 
-    call ReadCommandLineArgument(arg, "ghz2_prime", success, ghz2_prime, success2=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "ghz2_prime2", success, ghz2_prime2, success2=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "ghz2_prime3", success, ghz2_prime3, success2=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "ghz2_prime4", success, ghz2_prime4, success2=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "ghz2_prime5", success, ghz2_prime5, success2=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "ghz2_prime6", success, ghz2_prime6, success2=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "ghz2_prime7", success, ghz2_prime7, success2=SetAnomalousSpin0VV)
+    call ReadCommandLineArgument(arg, "ghz2_prime", success, ghz2_prime, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "ghz2_prime2", success, ghz2_prime2, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "ghz2_prime3", success, ghz2_prime3, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "ghz2_prime4", success, ghz2_prime4, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "ghz2_prime5", success, ghz2_prime5, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "ghz2_prime6", success, ghz2_prime6, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "ghz2_prime7", success, ghz2_prime7, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
 
-    call ReadCommandLineArgument(arg, "ghz3_prime", success, ghz3_prime, success2=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "ghz3_prime2", success, ghz3_prime2, success2=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "ghz3_prime3", success, ghz3_prime3, success2=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "ghz3_prime4", success, ghz3_prime4, success2=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "ghz3_prime5", success, ghz3_prime5, success2=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "ghz3_prime6", success, ghz3_prime6, success2=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "ghz3_prime7", success, ghz3_prime7, success2=SetAnomalousSpin0VV)
+    call ReadCommandLineArgument(arg, "ghz3_prime", success, ghz3_prime, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "ghz3_prime2", success, ghz3_prime2, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "ghz3_prime3", success, ghz3_prime3, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "ghz3_prime4", success, ghz3_prime4, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "ghz3_prime5", success, ghz3_prime5, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "ghz3_prime6", success, ghz3_prime6, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "ghz3_prime7", success, ghz3_prime7, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
 
-    call ReadCommandLineArgument(arg, "ghz4_prime", success, ghz4_prime, success2=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "ghz4_prime2", success, ghz4_prime2, success2=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "ghz4_prime3", success, ghz4_prime3, success2=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "ghz4_prime4", success, ghz4_prime4, success2=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "ghz4_prime5", success, ghz4_prime5, success2=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "ghz4_prime6", success, ghz4_prime6, success2=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "ghz4_prime7", success, ghz4_prime7, success2=SetAnomalousSpin0VV)
+    call ReadCommandLineArgument(arg, "ghz4_prime", success, ghz4_prime, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "ghz4_prime2", success, ghz4_prime2, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "ghz4_prime3", success, ghz4_prime3, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "ghz4_prime4", success, ghz4_prime4, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "ghz4_prime5", success, ghz4_prime5, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "ghz4_prime6", success, ghz4_prime6, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "ghz4_prime7", success, ghz4_prime7, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
 
     !spin 0 Zgamma momentum dependent coupling
     call ReadCommandLineArgument(arg, "ghzgs1_prime2", success, ghzgs1_prime2, success2=SetAnomalousSpin0VV, success3=SetZgammacoupling)
@@ -573,42 +581,42 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "Lambda_z40", success, Lambda_z40, multiply=GeV, success2=SetAnomalousSpin0VV)
 
     !spin 0 WW couplings
-    call ReadCommandLineArgument(arg, "ghw1", success, ghw1, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "ghw2", success, ghw2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "ghw3", success, ghw3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "ghw4", success, ghw4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
+    call ReadCommandLineArgument(arg, "ghw1", success, ghw1, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
+    call ReadCommandLineArgument(arg, "ghw2", success, ghw2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
+    call ReadCommandLineArgument(arg, "ghw3", success, ghw3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
+    call ReadCommandLineArgument(arg, "ghw4", success, ghw4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
 
-    call ReadCommandLineArgument(arg, "ghw1_prime", success, ghw1_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "ghw1_prime2", success, ghw1_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "ghw1_prime3", success, ghw1_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "ghw1_prime4", success, ghw1_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "ghw1_prime5", success, ghw1_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "ghw1_prime6", success, ghw1_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "ghw1_prime7", success, ghw1_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
+    call ReadCommandLineArgument(arg, "ghw1_prime", success, ghw1_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
+    call ReadCommandLineArgument(arg, "ghw1_prime2", success, ghw1_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
+    call ReadCommandLineArgument(arg, "ghw1_prime3", success, ghw1_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
+    call ReadCommandLineArgument(arg, "ghw1_prime4", success, ghw1_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
+    call ReadCommandLineArgument(arg, "ghw1_prime5", success, ghw1_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
+    call ReadCommandLineArgument(arg, "ghw1_prime6", success, ghw1_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
+    call ReadCommandLineArgument(arg, "ghw1_prime7", success, ghw1_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
 
-    call ReadCommandLineArgument(arg, "ghw2_prime", success, ghw2_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "ghw2_prime2", success, ghw2_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "ghw2_prime3", success, ghw2_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "ghw2_prime4", success, ghw2_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "ghw2_prime5", success, ghw2_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "ghw2_prime6", success, ghw2_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "ghw2_prime7", success, ghw2_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
+    call ReadCommandLineArgument(arg, "ghw2_prime", success, ghw2_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
+    call ReadCommandLineArgument(arg, "ghw2_prime2", success, ghw2_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
+    call ReadCommandLineArgument(arg, "ghw2_prime3", success, ghw2_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
+    call ReadCommandLineArgument(arg, "ghw2_prime4", success, ghw2_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
+    call ReadCommandLineArgument(arg, "ghw2_prime5", success, ghw2_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
+    call ReadCommandLineArgument(arg, "ghw2_prime6", success, ghw2_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
+    call ReadCommandLineArgument(arg, "ghw2_prime7", success, ghw2_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
 
-    call ReadCommandLineArgument(arg, "ghw3_prime", success, ghw3_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "ghw3_prime2", success, ghw3_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "ghw3_prime3", success, ghw3_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "ghw3_prime4", success, ghw3_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "ghw3_prime5", success, ghw3_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "ghw3_prime6", success, ghw3_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "ghw3_prime7", success, ghw3_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
+    call ReadCommandLineArgument(arg, "ghw3_prime", success, ghw3_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
+    call ReadCommandLineArgument(arg, "ghw3_prime2", success, ghw3_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
+    call ReadCommandLineArgument(arg, "ghw3_prime3", success, ghw3_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
+    call ReadCommandLineArgument(arg, "ghw3_prime4", success, ghw3_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
+    call ReadCommandLineArgument(arg, "ghw3_prime5", success, ghw3_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
+    call ReadCommandLineArgument(arg, "ghw3_prime6", success, ghw3_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
+    call ReadCommandLineArgument(arg, "ghw3_prime7", success, ghw3_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
 
-    call ReadCommandLineArgument(arg, "ghw4_prime", success, ghw4_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "ghw4_prime2", success, ghw4_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "ghw4_prime3", success, ghw4_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "ghw4_prime4", success, ghw4_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "ghw4_prime5", success, ghw4_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "ghw4_prime6", success, ghw4_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "ghw4_prime7", success, ghw4_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
+    call ReadCommandLineArgument(arg, "ghw4_prime", success, ghw4_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
+    call ReadCommandLineArgument(arg, "ghw4_prime2", success, ghw4_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
+    call ReadCommandLineArgument(arg, "ghw4_prime3", success, ghw4_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
+    call ReadCommandLineArgument(arg, "ghw4_prime4", success, ghw4_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
+    call ReadCommandLineArgument(arg, "ghw4_prime5", success, ghw4_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
+    call ReadCommandLineArgument(arg, "ghw4_prime6", success, ghw4_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
+    call ReadCommandLineArgument(arg, "ghw4_prime7", success, ghw4_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
 
     ! Sign of q1,2,12**2 for the Lambda's, set to 1 or -1 to get q**2-dependence from these form factor Lambdas
     call ReadCommandLineArgument(arg, "cw_q1sq", success, cw_q1sq, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
@@ -631,8 +639,8 @@ logical :: SetColliderEnergy
     !spin 1
     call ReadCommandLineArgument(arg, "zprime_qq_left", success, zprime_qq_left, success2=SetAnomalousSpin1qq, success3=Setspin1qqleft)
     call ReadCommandLineArgument(arg, "zprime_qq_right", success, zprime_qq_right, success2=SetAnomalousSpin1qq, success3=Setspin1qqright)
-    call ReadCommandLineArgument(arg, "zprime_zz_1", success, zprime_zz_1, success2=SetSpin1VV)
-    call ReadCommandLineArgument(arg, "zprime_zz_2", success, zprime_zz_2, success2=SetSpin1VV)
+    call ReadCommandLineArgument(arg, "zprime_zz_1", success, zprime_zz_1, success2=SetSpin1VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "zprime_zz_2", success, zprime_zz_2, success2=SetSpin1VV, success3=SetZZcoupling)
 
     !spin 2
     call ReadCommandLineArgument(arg, "a1", success, a1, success2=SetAnomalousSpin2gg)
@@ -642,16 +650,16 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "a5", success, a5, success2=SetAnomalousSpin2gg)
     call ReadCommandLineArgument(arg, "graviton_qq_left", success, graviton_qq_left, success2=SetAnomalousSpin2qq, success3=Setspin2qqleft)
     call ReadCommandLineArgument(arg, "graviton_qq_right", success, graviton_qq_right, success2=SetAnomalousSpin2qq, success3=Setspin2qqright)
-    call ReadCommandLineArgument(arg, "b1", success, b1, success2=SetSpin2VV)
-    call ReadCommandLineArgument(arg, "b2", success, b2, success2=SetSpin2VV)
-    call ReadCommandLineArgument(arg, "b3", success, b3, success2=SetSpin2VV)
-    call ReadCommandLineArgument(arg, "b4", success, b4, success2=SetSpin2VV)
-    call ReadCommandLineArgument(arg, "b5", success, b5, success2=SetSpin2VV)
-    call ReadCommandLineArgument(arg, "b6", success, b6, success2=SetSpin2VV)
-    call ReadCommandLineArgument(arg, "b7", success, b7, success2=SetSpin2VV)
-    call ReadCommandLineArgument(arg, "b8", success, b8, success2=SetSpin2VV)
-    call ReadCommandLineArgument(arg, "b9", success, b9, success2=SetSpin2VV)
-    call ReadCommandLineArgument(arg, "b10", success, b10, success2=SetSpin2VV)
+    call ReadCommandLineArgument(arg, "b1", success, b1, success2=SetSpin2VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "b2", success, b2, success2=SetSpin2VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "b3", success, b3, success2=SetSpin2VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "b4", success, b4, success2=SetSpin2VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "b5", success, b5, success2=SetSpin2VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "b6", success, b6, success2=SetSpin2VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "b7", success, b7, success2=SetSpin2VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "b8", success, b8, success2=SetSpin2VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "b9", success, b9, success2=SetSpin2VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "b10", success, b10, success2=SetSpin2VV, success3=SetZZcoupling)
 
     call ReadCommandLineArgument(arg, "bzgs1", success, bzgs1, success2=SetSpin2VV, success3=SetZgammacoupling)
     call ReadCommandLineArgument(arg, "bzgs2", success, bzgs2, success2=SetSpin2VV, success3=SetZgammacoupling)
@@ -671,10 +679,10 @@ logical :: SetColliderEnergy
 
 !   similar as above for the 2nd resonance in offshell VBF
     !spin 0 ZZ couplings
-    call ReadCommandLineArgument(arg, "gh2z1", success, gh2z1, success2=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "gh2z2", success, gh2z2, success2=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "gh2z3", success, gh2z3, success2=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "gh2z4", success, gh2z4, success2=SetAnomalousSpin0VV)
+    call ReadCommandLineArgument(arg, "gh2z1", success, gh2z1, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "gh2z2", success, gh2z2, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "gh2z3", success, gh2z3, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "gh2z4", success, gh2z4, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
 
     !spin 0 Zgamma couplings
     call ReadCommandLineArgument(arg, "gh2zgs2", success, gh2zgs2, success2=SetAnomalousSpin0VV, success3=SetZgammacoupling)
@@ -687,37 +695,37 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "gh2gsgs4", success, gh2gsgs4, success2=SetAnomalousSpin0VV, success3=Setgammagammacoupling)
 
     !spin 0 ZZ momentum dependent couplings
-    call ReadCommandLineArgument(arg, "gh2z1_prime", success, gh2z1_prime, success2=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "gh2z1_prime2", success, gh2z1_prime2, success2=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "gh2z1_prime3", success, gh2z1_prime3, success2=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "gh2z1_prime4", success, gh2z1_prime4, success2=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "gh2z1_prime5", success, gh2z1_prime5, success2=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "gh2z1_prime6", success, gh2z1_prime6, success2=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "gh2z1_prime7", success, gh2z1_prime7, success2=SetAnomalousSpin0VV)
+    call ReadCommandLineArgument(arg, "gh2z1_prime", success, gh2z1_prime, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "gh2z1_prime2", success, gh2z1_prime2, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "gh2z1_prime3", success, gh2z1_prime3, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "gh2z1_prime4", success, gh2z1_prime4, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "gh2z1_prime5", success, gh2z1_prime5, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "gh2z1_prime6", success, gh2z1_prime6, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "gh2z1_prime7", success, gh2z1_prime7, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
 
-    call ReadCommandLineArgument(arg, "gh2z2_prime", success, gh2z2_prime, success2=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "gh2z2_prime2", success, gh2z2_prime2, success2=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "gh2z2_prime3", success, gh2z2_prime3, success2=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "gh2z2_prime4", success, gh2z2_prime4, success2=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "gh2z2_prime5", success, gh2z2_prime5, success2=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "gh2z2_prime6", success, gh2z2_prime6, success2=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "gh2z2_prime7", success, gh2z2_prime7, success2=SetAnomalousSpin0VV)
+    call ReadCommandLineArgument(arg, "gh2z2_prime", success, gh2z2_prime, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "gh2z2_prime2", success, gh2z2_prime2, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "gh2z2_prime3", success, gh2z2_prime3, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "gh2z2_prime4", success, gh2z2_prime4, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "gh2z2_prime5", success, gh2z2_prime5, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "gh2z2_prime6", success, gh2z2_prime6, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "gh2z2_prime7", success, gh2z2_prime7, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
 
-    call ReadCommandLineArgument(arg, "gh2z3_prime", success, gh2z3_prime, success2=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "gh2z3_prime2", success, gh2z3_prime2, success2=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "gh2z3_prime3", success, gh2z3_prime3, success2=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "gh2z3_prime4", success, gh2z3_prime4, success2=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "gh2z3_prime5", success, gh2z3_prime5, success2=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "gh2z3_prime6", success, gh2z3_prime6, success2=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "gh2z3_prime7", success, gh2z3_prime7, success2=SetAnomalousSpin0VV)
+    call ReadCommandLineArgument(arg, "gh2z3_prime", success, gh2z3_prime, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "gh2z3_prime2", success, gh2z3_prime2, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "gh2z3_prime3", success, gh2z3_prime3, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "gh2z3_prime4", success, gh2z3_prime4, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "gh2z3_prime5", success, gh2z3_prime5, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "gh2z3_prime6", success, gh2z3_prime6, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "gh2z3_prime7", success, gh2z3_prime7, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
 
-    call ReadCommandLineArgument(arg, "gh2z4_prime", success, gh2z4_prime, success2=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "gh2z4_prime2", success, gh2z4_prime2, success2=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "gh2z4_prime3", success, gh2z4_prime3, success2=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "gh2z4_prime4", success, gh2z4_prime4, success2=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "gh2z4_prime5", success, gh2z4_prime5, success2=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "gh2z4_prime6", success, gh2z4_prime6, success2=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "gh2z4_prime7", success, gh2z4_prime7, success2=SetAnomalousSpin0VV)
+    call ReadCommandLineArgument(arg, "gh2z4_prime", success, gh2z4_prime, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "gh2z4_prime2", success, gh2z4_prime2, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "gh2z4_prime3", success, gh2z4_prime3, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "gh2z4_prime4", success, gh2z4_prime4, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "gh2z4_prime5", success, gh2z4_prime5, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "gh2z4_prime6", success, gh2z4_prime6, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
+    call ReadCommandLineArgument(arg, "gh2z4_prime7", success, gh2z4_prime7, success2=SetAnomalousSpin0VV, success3=SetZZcoupling)
 
     !spin 0 Zgamma momentum dependent coupling
     call ReadCommandLineArgument(arg, "gh2zgs1_prime2", success, gh2zgs1_prime2, success2=SetAnomalousSpin0VV, success3=SetZgammacoupling)
@@ -741,42 +749,42 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "Lambda2_z40", success, Lambda2_z40, multiply=GeV, success2=SetAnomalousSpin0VV)
 
     !spin 0 WW couplings
-    call ReadCommandLineArgument(arg, "gh2w1", success, gh2w1, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "gh2w2", success, gh2w2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "gh2w3", success, gh2w3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "gh2w4", success, gh2w4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
+    call ReadCommandLineArgument(arg, "gh2w1", success, gh2w1, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
+    call ReadCommandLineArgument(arg, "gh2w2", success, gh2w2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
+    call ReadCommandLineArgument(arg, "gh2w3", success, gh2w3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
+    call ReadCommandLineArgument(arg, "gh2w4", success, gh2w4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
 
-    call ReadCommandLineArgument(arg, "gh2w1_prime", success, gh2w1_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "gh2w1_prime2", success, gh2w1_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "gh2w1_prime3", success, gh2w1_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "gh2w1_prime4", success, gh2w1_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "gh2w1_prime5", success, gh2w1_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "gh2w1_prime6", success, gh2w1_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "gh2w1_prime7", success, gh2w1_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
+    call ReadCommandLineArgument(arg, "gh2w1_prime", success, gh2w1_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
+    call ReadCommandLineArgument(arg, "gh2w1_prime2", success, gh2w1_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
+    call ReadCommandLineArgument(arg, "gh2w1_prime3", success, gh2w1_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
+    call ReadCommandLineArgument(arg, "gh2w1_prime4", success, gh2w1_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
+    call ReadCommandLineArgument(arg, "gh2w1_prime5", success, gh2w1_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
+    call ReadCommandLineArgument(arg, "gh2w1_prime6", success, gh2w1_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
+    call ReadCommandLineArgument(arg, "gh2w1_prime7", success, gh2w1_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
 
-    call ReadCommandLineArgument(arg, "gh2w2_prime", success, gh2w2_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "gh2w2_prime2", success, gh2w2_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "gh2w2_prime3", success, gh2w2_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "gh2w2_prime4", success, gh2w2_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "gh2w2_prime5", success, gh2w2_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "gh2w2_prime6", success, gh2w2_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "gh2w2_prime7", success, gh2w2_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
+    call ReadCommandLineArgument(arg, "gh2w2_prime", success, gh2w2_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
+    call ReadCommandLineArgument(arg, "gh2w2_prime2", success, gh2w2_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
+    call ReadCommandLineArgument(arg, "gh2w2_prime3", success, gh2w2_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
+    call ReadCommandLineArgument(arg, "gh2w2_prime4", success, gh2w2_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
+    call ReadCommandLineArgument(arg, "gh2w2_prime5", success, gh2w2_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
+    call ReadCommandLineArgument(arg, "gh2w2_prime6", success, gh2w2_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
+    call ReadCommandLineArgument(arg, "gh2w2_prime7", success, gh2w2_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
 
-    call ReadCommandLineArgument(arg, "gh2w3_prime", success, gh2w3_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "gh2w3_prime2", success, gh2w3_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "gh2w3_prime3", success, gh2w3_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "gh2w3_prime4", success, gh2w3_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "gh2w3_prime5", success, gh2w3_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "gh2w3_prime6", success, gh2w3_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "gh2w3_prime7", success, gh2w3_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
+    call ReadCommandLineArgument(arg, "gh2w3_prime", success, gh2w3_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
+    call ReadCommandLineArgument(arg, "gh2w3_prime2", success, gh2w3_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
+    call ReadCommandLineArgument(arg, "gh2w3_prime3", success, gh2w3_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
+    call ReadCommandLineArgument(arg, "gh2w3_prime4", success, gh2w3_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
+    call ReadCommandLineArgument(arg, "gh2w3_prime5", success, gh2w3_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
+    call ReadCommandLineArgument(arg, "gh2w3_prime6", success, gh2w3_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
+    call ReadCommandLineArgument(arg, "gh2w3_prime7", success, gh2w3_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
 
-    call ReadCommandLineArgument(arg, "gh2w4_prime", success, gh2w4_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "gh2w4_prime2", success, gh2w4_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "gh2w4_prime3", success, gh2w4_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "gh2w4_prime4", success, gh2w4_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "gh2w4_prime5", success, gh2w4_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "gh2w4_prime6", success, gh2w4_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
-    call ReadCommandLineArgument(arg, "gh2w4_prime7", success, gh2w4_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
+    call ReadCommandLineArgument(arg, "gh2w4_prime", success, gh2w4_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
+    call ReadCommandLineArgument(arg, "gh2w4_prime2", success, gh2w4_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
+    call ReadCommandLineArgument(arg, "gh2w4_prime3", success, gh2w4_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
+    call ReadCommandLineArgument(arg, "gh2w4_prime4", success, gh2w4_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
+    call ReadCommandLineArgument(arg, "gh2w4_prime5", success, gh2w4_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
+    call ReadCommandLineArgument(arg, "gh2w4_prime6", success, gh2w4_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
+    call ReadCommandLineArgument(arg, "gh2w4_prime7", success, gh2w4_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=SetWWcoupling)
 
     ! Sign of q1,2,12**2 for the Lambda's, set to 1 or -1 to get q**2-dependence from these form factor Lambdas
     call ReadCommandLineArgument(arg, "c2w_q1sq", success, c2w_q1sq, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV)
@@ -799,114 +807,114 @@ logical :: SetColliderEnergy
 
     !contact interactions
     !spin 0 ZZp couplings
-    call ReadCommandLineArgument(arg, "ghzzp1", success, ghzzp1, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "ghzzp2", success, ghzzp2, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "ghzzp3", success, ghzzp3, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "ghzzp4", success, ghzzp4, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzzp1", success, ghzzp1, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling)
+    call ReadCommandLineArgument(arg, "ghzzp2", success, ghzzp2, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling)
+    call ReadCommandLineArgument(arg, "ghzzp3", success, ghzzp3, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling)
+    call ReadCommandLineArgument(arg, "ghzzp4", success, ghzzp4, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling)
 
-    call ReadCommandLineArgument(arg, "ghzzp1_prime", success, ghzzp1_prime, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "ghzzp1_prime2", success, ghzzp1_prime2, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "ghzzp1_prime3", success, ghzzp1_prime3, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "ghzzp1_prime4", success, ghzzp1_prime4, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "ghzzp1_prime5", success, ghzzp1_prime5, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "ghzzp1_prime6", success, ghzzp1_prime6, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "ghzzp1_prime7", success, ghzzp1_prime7, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzzp1_prime", success, ghzzp1_prime, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling)
+    call ReadCommandLineArgument(arg, "ghzzp1_prime2", success, ghzzp1_prime2, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling)
+    call ReadCommandLineArgument(arg, "ghzzp1_prime3", success, ghzzp1_prime3, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling)
+    call ReadCommandLineArgument(arg, "ghzzp1_prime4", success, ghzzp1_prime4, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling)
+    call ReadCommandLineArgument(arg, "ghzzp1_prime5", success, ghzzp1_prime5, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling)
+    call ReadCommandLineArgument(arg, "ghzzp1_prime6", success, ghzzp1_prime6, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling)
+    call ReadCommandLineArgument(arg, "ghzzp1_prime7", success, ghzzp1_prime7, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling)
 
-    call ReadCommandLineArgument(arg, "ghzzp2_prime", success, ghzzp2_prime, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "ghzzp2_prime2", success, ghzzp2_prime2, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "ghzzp2_prime3", success, ghzzp2_prime3, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "ghzzp2_prime4", success, ghzzp2_prime4, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "ghzzp2_prime5", success, ghzzp2_prime5, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "ghzzp2_prime6", success, ghzzp2_prime6, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "ghzzp2_prime7", success, ghzzp2_prime7, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzzp2_prime", success, ghzzp2_prime, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling)
+    call ReadCommandLineArgument(arg, "ghzzp2_prime2", success, ghzzp2_prime2, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling)
+    call ReadCommandLineArgument(arg, "ghzzp2_prime3", success, ghzzp2_prime3, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling)
+    call ReadCommandLineArgument(arg, "ghzzp2_prime4", success, ghzzp2_prime4, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling)
+    call ReadCommandLineArgument(arg, "ghzzp2_prime5", success, ghzzp2_prime5, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling)
+    call ReadCommandLineArgument(arg, "ghzzp2_prime6", success, ghzzp2_prime6, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling)
+    call ReadCommandLineArgument(arg, "ghzzp2_prime7", success, ghzzp2_prime7, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling)
 
-    call ReadCommandLineArgument(arg, "ghzzp3_prime", success, ghzzp3_prime, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "ghzzp3_prime2", success, ghzzp3_prime2, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "ghzzp3_prime3", success, ghzzp3_prime3, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "ghzzp3_prime4", success, ghzzp3_prime4, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "ghzzp3_prime5", success, ghzzp3_prime5, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "ghzzp3_prime6", success, ghzzp3_prime6, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "ghzzp3_prime7", success, ghzzp3_prime7, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzzp3_prime", success, ghzzp3_prime, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling)
+    call ReadCommandLineArgument(arg, "ghzzp3_prime2", success, ghzzp3_prime2, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling)
+    call ReadCommandLineArgument(arg, "ghzzp3_prime3", success, ghzzp3_prime3, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling)
+    call ReadCommandLineArgument(arg, "ghzzp3_prime4", success, ghzzp3_prime4, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling)
+    call ReadCommandLineArgument(arg, "ghzzp3_prime5", success, ghzzp3_prime5, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling)
+    call ReadCommandLineArgument(arg, "ghzzp3_prime6", success, ghzzp3_prime6, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling)
+    call ReadCommandLineArgument(arg, "ghzzp3_prime7", success, ghzzp3_prime7, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling)
 
-    call ReadCommandLineArgument(arg, "ghzzp4_prime", success, ghzzp4_prime, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "ghzzp4_prime2", success, ghzzp4_prime2, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "ghzzp4_prime3", success, ghzzp4_prime3, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "ghzzp4_prime4", success, ghzzp4_prime4, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "ghzzp4_prime5", success, ghzzp4_prime5, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "ghzzp4_prime6", success, ghzzp4_prime6, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "ghzzp4_prime7", success, ghzzp4_prime7, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzzp4_prime", success, ghzzp4_prime, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling)
+    call ReadCommandLineArgument(arg, "ghzzp4_prime2", success, ghzzp4_prime2, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling)
+    call ReadCommandLineArgument(arg, "ghzzp4_prime3", success, ghzzp4_prime3, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling)
+    call ReadCommandLineArgument(arg, "ghzzp4_prime4", success, ghzzp4_prime4, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling)
+    call ReadCommandLineArgument(arg, "ghzzp4_prime5", success, ghzzp4_prime5, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling)
+    call ReadCommandLineArgument(arg, "ghzzp4_prime6", success, ghzzp4_prime6, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling)
+    call ReadCommandLineArgument(arg, "ghzzp4_prime7", success, ghzzp4_prime7, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZZprimecoupling)
 
     !spin 0 Zpgamma couplings
-    call ReadCommandLineArgument(arg, "ghzpgs1_prime2", success, ghzpgs1_prime2, success2=SetAnomalousSpin0VV, success3=SetZgammacoupling, success4=includeVprime, success5=SetHZprime, success6=SetZprimegammacoupling)
-    call ReadCommandLineArgument(arg, "ghzpgs2", success, ghzpgs2, success2=SetAnomalousSpin0VV, success3=SetZgammacoupling, success4=includeVprime, success5=SetHZprime, success6=SetZprimegammacoupling)
-    call ReadCommandLineArgument(arg, "ghzpgs3", success, ghzpgs3, success2=SetAnomalousSpin0VV, success3=SetZgammacoupling, success4=includeVprime, success5=SetHZprime, success6=SetZprimegammacoupling)
-    call ReadCommandLineArgument(arg, "ghzpgs4", success, ghzpgs4, success2=SetAnomalousSpin0VV, success3=SetZgammacoupling, success4=includeVprime, success5=SetHZprime, success6=SetZprimegammacoupling)
+    call ReadCommandLineArgument(arg, "ghzpgs1_prime2", success, ghzpgs1_prime2, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimegammacoupling)
+    call ReadCommandLineArgument(arg, "ghzpgs2", success, ghzpgs2, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimegammacoupling)
+    call ReadCommandLineArgument(arg, "ghzpgs3", success, ghzpgs3, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimegammacoupling)
+    call ReadCommandLineArgument(arg, "ghzpgs4", success, ghzpgs4, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimegammacoupling)
 
     !spin 0 ZpZp couplings
-    call ReadCommandLineArgument(arg, "ghzpzp1", success, ghzpzp1, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "ghzpzp2", success, ghzpzp2, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "ghzpzp3", success, ghzpzp3, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "ghzpzp4", success, ghzpzp4, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzpzp1", success, ghzpzp1, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling)
+    call ReadCommandLineArgument(arg, "ghzpzp2", success, ghzpzp2, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling)
+    call ReadCommandLineArgument(arg, "ghzpzp3", success, ghzpzp3, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling)
+    call ReadCommandLineArgument(arg, "ghzpzp4", success, ghzpzp4, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling)
 
-    call ReadCommandLineArgument(arg, "ghzpzp1_prime", success, ghzpzp1_prime, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "ghzpzp1_prime2", success, ghzpzp1_prime2, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "ghzpzp1_prime3", success, ghzpzp1_prime3, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "ghzpzp1_prime4", success, ghzpzp1_prime4, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "ghzpzp1_prime5", success, ghzpzp1_prime5, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "ghzpzp1_prime6", success, ghzpzp1_prime6, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "ghzpzp1_prime7", success, ghzpzp1_prime7, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzpzp1_prime", success, ghzpzp1_prime, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling)
+    call ReadCommandLineArgument(arg, "ghzpzp1_prime2", success, ghzpzp1_prime2, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling)
+    call ReadCommandLineArgument(arg, "ghzpzp1_prime3", success, ghzpzp1_prime3, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling)
+    call ReadCommandLineArgument(arg, "ghzpzp1_prime4", success, ghzpzp1_prime4, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling)
+    call ReadCommandLineArgument(arg, "ghzpzp1_prime5", success, ghzpzp1_prime5, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling)
+    call ReadCommandLineArgument(arg, "ghzpzp1_prime6", success, ghzpzp1_prime6, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling)
+    call ReadCommandLineArgument(arg, "ghzpzp1_prime7", success, ghzpzp1_prime7, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling)
 
-    call ReadCommandLineArgument(arg, "ghzpzp2_prime", success, ghzpzp2_prime, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "ghzpzp2_prime2", success, ghzpzp2_prime2, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "ghzpzp2_prime3", success, ghzpzp2_prime3, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "ghzpzp2_prime4", success, ghzpzp2_prime4, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "ghzpzp2_prime5", success, ghzpzp2_prime5, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "ghzpzp2_prime6", success, ghzpzp2_prime6, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "ghzpzp2_prime7", success, ghzpzp2_prime7, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzpzp2_prime", success, ghzpzp2_prime, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling)
+    call ReadCommandLineArgument(arg, "ghzpzp2_prime2", success, ghzpzp2_prime2, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling)
+    call ReadCommandLineArgument(arg, "ghzpzp2_prime3", success, ghzpzp2_prime3, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling)
+    call ReadCommandLineArgument(arg, "ghzpzp2_prime4", success, ghzpzp2_prime4, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling)
+    call ReadCommandLineArgument(arg, "ghzpzp2_prime5", success, ghzpzp2_prime5, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling)
+    call ReadCommandLineArgument(arg, "ghzpzp2_prime6", success, ghzpzp2_prime6, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling)
+    call ReadCommandLineArgument(arg, "ghzpzp2_prime7", success, ghzpzp2_prime7, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling)
 
-    call ReadCommandLineArgument(arg, "ghzpzp3_prime", success, ghzpzp3_prime, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "ghzpzp3_prime2", success, ghzpzp3_prime2, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "ghzpzp3_prime3", success, ghzpzp3_prime3, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "ghzpzp3_prime4", success, ghzpzp3_prime4, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "ghzpzp3_prime5", success, ghzpzp3_prime5, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "ghzpzp3_prime6", success, ghzpzp3_prime6, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "ghzpzp3_prime7", success, ghzpzp3_prime7, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzpzp3_prime", success, ghzpzp3_prime, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling)
+    call ReadCommandLineArgument(arg, "ghzpzp3_prime2", success, ghzpzp3_prime2, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling)
+    call ReadCommandLineArgument(arg, "ghzpzp3_prime3", success, ghzpzp3_prime3, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling)
+    call ReadCommandLineArgument(arg, "ghzpzp3_prime4", success, ghzpzp3_prime4, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling)
+    call ReadCommandLineArgument(arg, "ghzpzp3_prime5", success, ghzpzp3_prime5, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling)
+    call ReadCommandLineArgument(arg, "ghzpzp3_prime6", success, ghzpzp3_prime6, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling)
+    call ReadCommandLineArgument(arg, "ghzpzp3_prime7", success, ghzpzp3_prime7, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling)
 
-    call ReadCommandLineArgument(arg, "ghzpzp4_prime", success, ghzpzp4_prime, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "ghzpzp4_prime2", success, ghzpzp4_prime2, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "ghzpzp4_prime3", success, ghzpzp4_prime3, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "ghzpzp4_prime4", success, ghzpzp4_prime4, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "ghzpzp4_prime5", success, ghzpzp4_prime5, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "ghzpzp4_prime6", success, ghzpzp4_prime6, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "ghzpzp4_prime7", success, ghzpzp4_prime7, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "ghzpzp4_prime", success, ghzpzp4_prime, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling)
+    call ReadCommandLineArgument(arg, "ghzpzp4_prime2", success, ghzpzp4_prime2, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling)
+    call ReadCommandLineArgument(arg, "ghzpzp4_prime3", success, ghzpzp4_prime3, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling)
+    call ReadCommandLineArgument(arg, "ghzpzp4_prime4", success, ghzpzp4_prime4, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling)
+    call ReadCommandLineArgument(arg, "ghzpzp4_prime5", success, ghzpzp4_prime5, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling)
+    call ReadCommandLineArgument(arg, "ghzpzp4_prime6", success, ghzpzp4_prime6, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling)
+    call ReadCommandLineArgument(arg, "ghzpzp4_prime7", success, ghzpzp4_prime7, success2=SetAnomalousSpin0VV, success3=includeVprime, success4=SetZprimeZprimecoupling)
 
-    call ReadCommandLineArgument(arg, "bzzp1", success, bzzp1, success2=SetSpin2VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "bzzp2", success, bzzp2, success2=SetSpin2VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "bzzp3", success, bzzp3, success2=SetSpin2VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "bzzp4", success, bzzp4, success2=SetSpin2VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "bzzp5", success, bzzp5, success2=SetSpin2VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "bzzp6", success, bzzp6, success2=SetSpin2VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "bzzp7", success, bzzp7, success2=SetSpin2VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "bzzp8", success, bzzp8, success2=SetSpin2VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "bzzp9", success, bzzp9, success2=SetSpin2VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "bzzp10", success, bzzp10, success2=SetSpin2VV, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "bzzp1", success, bzzp1, success2=SetSpin2VV, success3=includeVprime, success4=SetZZprimecoupling)
+    call ReadCommandLineArgument(arg, "bzzp2", success, bzzp2, success2=SetSpin2VV, success3=includeVprime, success4=SetZZprimecoupling)
+    call ReadCommandLineArgument(arg, "bzzp3", success, bzzp3, success2=SetSpin2VV, success3=includeVprime, success4=SetZZprimecoupling)
+    call ReadCommandLineArgument(arg, "bzzp4", success, bzzp4, success2=SetSpin2VV, success3=includeVprime, success4=SetZZprimecoupling)
+    call ReadCommandLineArgument(arg, "bzzp5", success, bzzp5, success2=SetSpin2VV, success3=includeVprime, success4=SetZZprimecoupling)
+    call ReadCommandLineArgument(arg, "bzzp6", success, bzzp6, success2=SetSpin2VV, success3=includeVprime, success4=SetZZprimecoupling)
+    call ReadCommandLineArgument(arg, "bzzp7", success, bzzp7, success2=SetSpin2VV, success3=includeVprime, success4=SetZZprimecoupling)
+    call ReadCommandLineArgument(arg, "bzzp8", success, bzzp8, success2=SetSpin2VV, success3=includeVprime, success4=SetZZprimecoupling)
+    call ReadCommandLineArgument(arg, "bzzp9", success, bzzp9, success2=SetSpin2VV, success3=includeVprime, success4=SetZZprimecoupling)
+    call ReadCommandLineArgument(arg, "bzzp10", success, bzzp10, success2=SetSpin2VV, success3=includeVprime, success4=SetZZprimecoupling)
 
-    call ReadCommandLineArgument(arg, "bzpzp1", success, bzpzp1, success2=SetSpin2VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "bzpzp2", success, bzpzp2, success2=SetSpin2VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "bzpzp3", success, bzpzp3, success2=SetSpin2VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "bzpzp4", success, bzpzp4, success2=SetSpin2VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "bzpzp5", success, bzpzp5, success2=SetSpin2VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "bzpzp6", success, bzpzp6, success2=SetSpin2VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "bzpzp7", success, bzpzp7, success2=SetSpin2VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "bzpzp8", success, bzpzp8, success2=SetSpin2VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "bzpzp9", success, bzpzp9, success2=SetSpin2VV, success3=includeVprime, success4=SetHZprime)
-    call ReadCommandLineArgument(arg, "bzpzp10", success, bzpzp10, success2=SetSpin2VV, success3=includeVprime, success4=SetHZprime)
+    call ReadCommandLineArgument(arg, "bzpzp1", success, bzpzp1, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimeZprimecoupling)
+    call ReadCommandLineArgument(arg, "bzpzp2", success, bzpzp2, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimeZprimecoupling)
+    call ReadCommandLineArgument(arg, "bzpzp3", success, bzpzp3, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimeZprimecoupling)
+    call ReadCommandLineArgument(arg, "bzpzp4", success, bzpzp4, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimeZprimecoupling)
+    call ReadCommandLineArgument(arg, "bzpzp5", success, bzpzp5, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimeZprimecoupling)
+    call ReadCommandLineArgument(arg, "bzpzp6", success, bzpzp6, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimeZprimecoupling)
+    call ReadCommandLineArgument(arg, "bzpzp7", success, bzpzp7, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimeZprimecoupling)
+    call ReadCommandLineArgument(arg, "bzpzp8", success, bzpzp8, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimeZprimecoupling)
+    call ReadCommandLineArgument(arg, "bzpzp9", success, bzpzp9, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimeZprimecoupling)
+    call ReadCommandLineArgument(arg, "bzpzp10", success, bzpzp10, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimeZprimecoupling)
 
-    call ReadCommandLineArgument(arg, "bzpgs1", success, bzpgs1, success2=SetSpin2VV, success3=SetZgammacoupling, success4=includeVprime, success5=SetHZprime, success6=SetZprimegammacoupling)
-    call ReadCommandLineArgument(arg, "bzpgs2", success, bzpgs2, success2=SetSpin2VV, success3=SetZgammacoupling, success4=includeVprime, success5=SetHZprime, success6=SetZprimegammacoupling)
-    call ReadCommandLineArgument(arg, "bzpgs3", success, bzpgs3, success2=SetSpin2VV, success3=SetZgammacoupling, success4=includeVprime, success5=SetHZprime, success6=SetZprimegammacoupling)
-    call ReadCommandLineArgument(arg, "bzpgs4", success, bzpgs4, success2=SetSpin2VV, success3=SetZgammacoupling, success4=includeVprime, success5=SetHZprime, success6=SetZprimegammacoupling)
-    call ReadCommandLineArgument(arg, "bzpgs8", success, bzpgs8, success2=SetSpin2VV, success3=SetZgammacoupling, success4=includeVprime, success5=SetHZprime, success6=SetZprimegammacoupling)
+    call ReadCommandLineArgument(arg, "bzpgs1", success, bzpgs1, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimegammacoupling)
+    call ReadCommandLineArgument(arg, "bzpgs2", success, bzpgs2, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimegammacoupling)
+    call ReadCommandLineArgument(arg, "bzpgs3", success, bzpgs3, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimegammacoupling)
+    call ReadCommandLineArgument(arg, "bzpgs4", success, bzpgs4, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimegammacoupling)
+    call ReadCommandLineArgument(arg, "bzpgs8", success, bzpgs8, success2=SetSpin2VV, success3=includeVprime, success4=SetZprimegammacoupling)
 
     call ReadCommandLineArgument(arg, "ezp_El_left", success, ezp_El_left, success2=SetZprimeff)
     call ReadCommandLineArgument(arg, "ezp_El_right", success, ezp_El_right, success2=SetZprimeff)
@@ -932,80 +940,80 @@ logical :: SetColliderEnergy
     call ReadCommandLineArgument(arg, "GaZprime", success, Ga_Zprime, multiply=GeV, success2=SetGaZprime)
 
     !spin 0 WWp couplings
-    call ReadCommandLineArgument(arg, "ghwwp1", success, ghwwp1, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
-    call ReadCommandLineArgument(arg, "ghwwp2", success, ghwwp2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
-    call ReadCommandLineArgument(arg, "ghwwp3", success, ghwwp3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
-    call ReadCommandLineArgument(arg, "ghwwp4", success, ghwwp4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwwp1", success, ghwwp1, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling)
+    call ReadCommandLineArgument(arg, "ghwwp2", success, ghwwp2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling)
+    call ReadCommandLineArgument(arg, "ghwwp3", success, ghwwp3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling)
+    call ReadCommandLineArgument(arg, "ghwwp4", success, ghwwp4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling)
 
-    call ReadCommandLineArgument(arg, "ghwwp1_prime", success, ghwwp1_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
-    call ReadCommandLineArgument(arg, "ghwwp1_prime2", success, ghwwp1_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
-    call ReadCommandLineArgument(arg, "ghwwp1_prime3", success, ghwwp1_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
-    call ReadCommandLineArgument(arg, "ghwwp1_prime4", success, ghwwp1_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
-    call ReadCommandLineArgument(arg, "ghwwp1_prime5", success, ghwwp1_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
-    call ReadCommandLineArgument(arg, "ghwwp1_prime6", success, ghwwp1_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
-    call ReadCommandLineArgument(arg, "ghwwp1_prime7", success, ghwwp1_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwwp1_prime", success, ghwwp1_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling)
+    call ReadCommandLineArgument(arg, "ghwwp1_prime2", success, ghwwp1_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling)
+    call ReadCommandLineArgument(arg, "ghwwp1_prime3", success, ghwwp1_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling)
+    call ReadCommandLineArgument(arg, "ghwwp1_prime4", success, ghwwp1_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling)
+    call ReadCommandLineArgument(arg, "ghwwp1_prime5", success, ghwwp1_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling)
+    call ReadCommandLineArgument(arg, "ghwwp1_prime6", success, ghwwp1_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling)
+    call ReadCommandLineArgument(arg, "ghwwp1_prime7", success, ghwwp1_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling)
 
-    call ReadCommandLineArgument(arg, "ghwwp2_prime", success, ghwwp2_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
-    call ReadCommandLineArgument(arg, "ghwwp2_prime2", success, ghwwp2_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
-    call ReadCommandLineArgument(arg, "ghwwp2_prime3", success, ghwwp2_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
-    call ReadCommandLineArgument(arg, "ghwwp2_prime4", success, ghwwp2_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
-    call ReadCommandLineArgument(arg, "ghwwp2_prime5", success, ghwwp2_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
-    call ReadCommandLineArgument(arg, "ghwwp2_prime6", success, ghwwp2_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
-    call ReadCommandLineArgument(arg, "ghwwp2_prime7", success, ghwwp2_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwwp2_prime", success, ghwwp2_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling)
+    call ReadCommandLineArgument(arg, "ghwwp2_prime2", success, ghwwp2_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling)
+    call ReadCommandLineArgument(arg, "ghwwp2_prime3", success, ghwwp2_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling)
+    call ReadCommandLineArgument(arg, "ghwwp2_prime4", success, ghwwp2_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling)
+    call ReadCommandLineArgument(arg, "ghwwp2_prime5", success, ghwwp2_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling)
+    call ReadCommandLineArgument(arg, "ghwwp2_prime6", success, ghwwp2_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling)
+    call ReadCommandLineArgument(arg, "ghwwp2_prime7", success, ghwwp2_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling)
 
-    call ReadCommandLineArgument(arg, "ghwwp3_prime", success, ghwwp3_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
-    call ReadCommandLineArgument(arg, "ghwwp3_prime2", success, ghwwp3_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
-    call ReadCommandLineArgument(arg, "ghwwp3_prime3", success, ghwwp3_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
-    call ReadCommandLineArgument(arg, "ghwwp3_prime4", success, ghwwp3_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
-    call ReadCommandLineArgument(arg, "ghwwp3_prime5", success, ghwwp3_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
-    call ReadCommandLineArgument(arg, "ghwwp3_prime6", success, ghwwp3_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
-    call ReadCommandLineArgument(arg, "ghwwp3_prime7", success, ghwwp3_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwwp3_prime", success, ghwwp3_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling)
+    call ReadCommandLineArgument(arg, "ghwwp3_prime2", success, ghwwp3_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling)
+    call ReadCommandLineArgument(arg, "ghwwp3_prime3", success, ghwwp3_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling)
+    call ReadCommandLineArgument(arg, "ghwwp3_prime4", success, ghwwp3_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling)
+    call ReadCommandLineArgument(arg, "ghwwp3_prime5", success, ghwwp3_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling)
+    call ReadCommandLineArgument(arg, "ghwwp3_prime6", success, ghwwp3_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling)
+    call ReadCommandLineArgument(arg, "ghwwp3_prime7", success, ghwwp3_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling)
 
-    call ReadCommandLineArgument(arg, "ghwwp4_prime", success, ghwwp4_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
-    call ReadCommandLineArgument(arg, "ghwwp4_prime2", success, ghwwp4_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
-    call ReadCommandLineArgument(arg, "ghwwp4_prime3", success, ghwwp4_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
-    call ReadCommandLineArgument(arg, "ghwwp4_prime4", success, ghwwp4_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
-    call ReadCommandLineArgument(arg, "ghwwp4_prime5", success, ghwwp4_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
-    call ReadCommandLineArgument(arg, "ghwwp4_prime6", success, ghwwp4_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
-    call ReadCommandLineArgument(arg, "ghwwp4_prime7", success, ghwwp4_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwwp4_prime", success, ghwwp4_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling)
+    call ReadCommandLineArgument(arg, "ghwwp4_prime2", success, ghwwp4_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling)
+    call ReadCommandLineArgument(arg, "ghwwp4_prime3", success, ghwwp4_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling)
+    call ReadCommandLineArgument(arg, "ghwwp4_prime4", success, ghwwp4_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling)
+    call ReadCommandLineArgument(arg, "ghwwp4_prime5", success, ghwwp4_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling)
+    call ReadCommandLineArgument(arg, "ghwwp4_prime6", success, ghwwp4_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling)
+    call ReadCommandLineArgument(arg, "ghwwp4_prime7", success, ghwwp4_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWWprimecoupling)
 
     !spin 0 WpWp couplings
-    call ReadCommandLineArgument(arg, "ghwpwp1", success, ghwpwp1, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
-    call ReadCommandLineArgument(arg, "ghwpwp2", success, ghwpwp2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
-    call ReadCommandLineArgument(arg, "ghwpwp3", success, ghwpwp3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
-    call ReadCommandLineArgument(arg, "ghwpwp4", success, ghwpwp4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwpwp1", success, ghwpwp1, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling)
+    call ReadCommandLineArgument(arg, "ghwpwp2", success, ghwpwp2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling)
+    call ReadCommandLineArgument(arg, "ghwpwp3", success, ghwpwp3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling)
+    call ReadCommandLineArgument(arg, "ghwpwp4", success, ghwpwp4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling)
 
-    call ReadCommandLineArgument(arg, "ghwpwp1_prime", success, ghwpwp1_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
-    call ReadCommandLineArgument(arg, "ghwpwp1_prime2", success, ghwpwp1_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
-    call ReadCommandLineArgument(arg, "ghwpwp1_prime3", success, ghwpwp1_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
-    call ReadCommandLineArgument(arg, "ghwpwp1_prime4", success, ghwpwp1_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
-    call ReadCommandLineArgument(arg, "ghwpwp1_prime5", success, ghwpwp1_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
-    call ReadCommandLineArgument(arg, "ghwpwp1_prime6", success, ghwpwp1_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
-    call ReadCommandLineArgument(arg, "ghwpwp1_prime7", success, ghwpwp1_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwpwp1_prime", success, ghwpwp1_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling)
+    call ReadCommandLineArgument(arg, "ghwpwp1_prime2", success, ghwpwp1_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling)
+    call ReadCommandLineArgument(arg, "ghwpwp1_prime3", success, ghwpwp1_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling)
+    call ReadCommandLineArgument(arg, "ghwpwp1_prime4", success, ghwpwp1_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling)
+    call ReadCommandLineArgument(arg, "ghwpwp1_prime5", success, ghwpwp1_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling)
+    call ReadCommandLineArgument(arg, "ghwpwp1_prime6", success, ghwpwp1_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling)
+    call ReadCommandLineArgument(arg, "ghwpwp1_prime7", success, ghwpwp1_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling)
 
-    call ReadCommandLineArgument(arg, "ghwpwp2_prime", success, ghwpwp2_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
-    call ReadCommandLineArgument(arg, "ghwpwp2_prime2", success, ghwpwp2_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
-    call ReadCommandLineArgument(arg, "ghwpwp2_prime3", success, ghwpwp2_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
-    call ReadCommandLineArgument(arg, "ghwpwp2_prime4", success, ghwpwp2_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
-    call ReadCommandLineArgument(arg, "ghwpwp2_prime5", success, ghwpwp2_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
-    call ReadCommandLineArgument(arg, "ghwpwp2_prime6", success, ghwpwp2_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
-    call ReadCommandLineArgument(arg, "ghwpwp2_prime7", success, ghwpwp2_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwpwp2_prime", success, ghwpwp2_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling)
+    call ReadCommandLineArgument(arg, "ghwpwp2_prime2", success, ghwpwp2_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling)
+    call ReadCommandLineArgument(arg, "ghwpwp2_prime3", success, ghwpwp2_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling)
+    call ReadCommandLineArgument(arg, "ghwpwp2_prime4", success, ghwpwp2_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling)
+    call ReadCommandLineArgument(arg, "ghwpwp2_prime5", success, ghwpwp2_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling)
+    call ReadCommandLineArgument(arg, "ghwpwp2_prime6", success, ghwpwp2_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling)
+    call ReadCommandLineArgument(arg, "ghwpwp2_prime7", success, ghwpwp2_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling)
 
-    call ReadCommandLineArgument(arg, "ghwpwp3_prime", success, ghwpwp3_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
-    call ReadCommandLineArgument(arg, "ghwpwp3_prime2", success, ghwpwp3_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
-    call ReadCommandLineArgument(arg, "ghwpwp3_prime3", success, ghwpwp3_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
-    call ReadCommandLineArgument(arg, "ghwpwp3_prime4", success, ghwpwp3_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
-    call ReadCommandLineArgument(arg, "ghwpwp3_prime5", success, ghwpwp3_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
-    call ReadCommandLineArgument(arg, "ghwpwp3_prime6", success, ghwpwp3_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
-    call ReadCommandLineArgument(arg, "ghwpwp3_prime7", success, ghwpwp3_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwpwp3_prime", success, ghwpwp3_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling)
+    call ReadCommandLineArgument(arg, "ghwpwp3_prime2", success, ghwpwp3_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling)
+    call ReadCommandLineArgument(arg, "ghwpwp3_prime3", success, ghwpwp3_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling)
+    call ReadCommandLineArgument(arg, "ghwpwp3_prime4", success, ghwpwp3_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling)
+    call ReadCommandLineArgument(arg, "ghwpwp3_prime5", success, ghwpwp3_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling)
+    call ReadCommandLineArgument(arg, "ghwpwp3_prime6", success, ghwpwp3_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling)
+    call ReadCommandLineArgument(arg, "ghwpwp3_prime7", success, ghwpwp3_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling)
 
-    call ReadCommandLineArgument(arg, "ghwpwp4_prime", success, ghwpwp4_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
-    call ReadCommandLineArgument(arg, "ghwpwp4_prime2", success, ghwpwp4_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
-    call ReadCommandLineArgument(arg, "ghwpwp4_prime3", success, ghwpwp4_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
-    call ReadCommandLineArgument(arg, "ghwpwp4_prime4", success, ghwpwp4_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
-    call ReadCommandLineArgument(arg, "ghwpwp4_prime5", success, ghwpwp4_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
-    call ReadCommandLineArgument(arg, "ghwpwp4_prime6", success, ghwpwp4_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
-    call ReadCommandLineArgument(arg, "ghwpwp4_prime7", success, ghwpwp4_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetHWprime)
+    call ReadCommandLineArgument(arg, "ghwpwp4_prime", success, ghwpwp4_prime, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling)
+    call ReadCommandLineArgument(arg, "ghwpwp4_prime2", success, ghwpwp4_prime2, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling)
+    call ReadCommandLineArgument(arg, "ghwpwp4_prime3", success, ghwpwp4_prime3, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling)
+    call ReadCommandLineArgument(arg, "ghwpwp4_prime4", success, ghwpwp4_prime4, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling)
+    call ReadCommandLineArgument(arg, "ghwpwp4_prime5", success, ghwpwp4_prime5, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling)
+    call ReadCommandLineArgument(arg, "ghwpwp4_prime6", success, ghwpwp4_prime6, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling)
+    call ReadCommandLineArgument(arg, "ghwpwp4_prime7", success, ghwpwp4_prime7, success2=distinguish_HWWcouplings, success3=SetAnomalousSpin0VV, success4=includeVprime, success5=SetWprimeWprimecoupling)
 
     call ReadCommandLineArgument(arg, "ewp_El_left", success, ewp_El_left, success2=SetWprimeff)
     call ReadCommandLineArgument(arg, "ewp_El_right", success, ewp_El_right, success2=SetWprimeff)
@@ -1052,6 +1060,9 @@ logical :: SetColliderEnergy
         call Error("Unknown command line argument: " // trim(arg))
     endif
    enddo
+
+   SetHZprime = SetZZprimecoupling .or. SetZprimeZprimecoupling .or. SetZprimegammacoupling
+   SetHWprime = SetWWprimecoupling .or. SetWprimeWprimecoupling
 
     !================================
     !Command line argument processing
@@ -1139,6 +1150,25 @@ logical :: SetColliderEnergy
        Ga_Vprime = 0d0
     endif
 
+    M_V_ps = M_V
+    Ga_V_ps = Ga_V
+    M_Z_ps = M_Z
+    Ga_Z_ps = Ga_Z
+    M_W_ps = M_W
+    Ga_W_ps = Ga_W
+
+    if(ghz1.eq.0d0 .and. .not.SetZZcoupling .and. .not.SetZgammacoupling .and. .not.SetZZprimecoupling &
+                   .and. (SetZprimeZprimecoupling .or. SetZprimegammacoupling) &
+                   .and. Process.le.2 .and. (SetMZprime.and.IsAZDecay(DecayMode1) .or. SetMWprime.and.IsAWDecay(DecayMode1))) then
+       !need more complicated logic here if this is done for VBF
+       M_V_ps = M_Vprime
+       Ga_V_ps = Ga_Vprime
+       M_Z_ps = M_Zprime
+       Ga_Z_ps = Ga_Zprime
+       M_W_ps = M_Wprime
+       Ga_W_ps = Ga_Wprime
+    endif
+
     !ReadLHE and ConvertLHE
     !MUST HAPPEN BEFORE DETERMINING INTERFERENCE
     !so that the mass and width can be read
@@ -1183,7 +1213,7 @@ logical :: SetColliderEnergy
 
     !decay mode checks
     if( (IsAZDecay(DecayMode1) .and. IsAZDecay(DecayMode2) .and. (Process.eq.0 .or. Process.eq.2) .and. TauDecays.lt.0) .or. (Process.eq.50 .and. IsAZDecay(DecayMode1)) .or. Process.eq.60 .or. Process.eq.66 ) then
-        includeGammaStar = (SetZgammacoupling .or. Setgammagammacoupling)
+        includeGammaStar = (SetZgammacoupling .or. Setgammagammacoupling .or. SetZprimegammacoupling)
     elseif( (IsAZDecay(DecayMode1) .and. IsAPhoton(DecayMode2) .and. (Process.eq.0 .or. Process.eq.2) .and. TauDecays.lt.0) .or. (Process.eq.50 .and. IsAPhoton(DecayMode1)) ) then
         includeGammaStar = Setgammagammacoupling
     else if (Process.eq.67 .or. Process.eq.68 .or. Process.eq.69) then
@@ -1204,7 +1234,7 @@ logical :: SetColliderEnergy
     endif
 
 
-    if( IsAZDecay(DecayMode1) .and. IsAPhoton(DecayMode2) .and. .not.SetZgammacoupling .and. .not.Setgammagammacoupling .and. (Process.eq.0 .or. Process.eq.2)) then
+    if( IsAZDecay(DecayMode1) .and. IsAPhoton(DecayMode2) .and. .not.SetZgammacoupling .and. .not.Setgammagammacoupling .and. .not.SetZprimegammacoupling .and. (Process.eq.0 .or. Process.eq.2)) then
         if (Process.eq.0) then
           print *, "To decay the resonance to Z+photon, you need to set one of the HZgamma (ghzgs*) or Hgammagamma (ghgsgs*) couplings."
         else if (Process.eq.2) then
@@ -1222,7 +1252,7 @@ logical :: SetColliderEnergy
         stop 1
     endif
 
-    if( Process.eq.50 .and. IsAPhoton(DecayMode1) .and. .not.SetZgammacoupling .and. .not.Setgammagammacoupling ) then
+    if( Process.eq.50 .and. IsAPhoton(DecayMode1) .and. .not.SetZgammacoupling .and. .not.Setgammagammacoupling .and. .not.SetZprimegammacoupling ) then
         print *, "To produce gammaH, you need to set one of the HZgamma (ghzgs*) or Hgammagamma(ghgsgs*) couplings."
         stop 1
     endif

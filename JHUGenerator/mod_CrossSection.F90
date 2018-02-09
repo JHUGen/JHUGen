@@ -413,46 +413,46 @@ include 'csmaxvalue.f'
   yz2 = yRnd(11)
   offzchannel = yRnd(15) ! variable to decide which Z is ``on''- and which Z is off- the mass-shell
   if ((OffShellV1.eqv..true.).and.(OffShellV2.eqv..true.)) then
-        if(M_Reso.gt.2d0*M_V) then
+        if(M_Reso.gt.2d0*M_V_ps) then
             EZ_max = EHat
-            dr = datan((EZ_max**2-M_V**2)/(Ga_V*M_V)) + datan(M_V/Ga_V)
-            MZ1 = dsqrt( M_V*Ga_V * dtan(dr*yz1-datan(M_V/Ga_V)) + M_V**2 )
-            sHatJacobi = sHatJacobi * dr/(Ga_V*M_V) * ( (MZ1**2 - M_V**2)**2 + M_V**2*Ga_V**2 )
+            dr = datan((EZ_max**2-M_V_ps**2)/(Ga_V_ps*M_V_ps)) + datan(M_V_ps/Ga_V_ps)
+            MZ1 = dsqrt( M_V_ps*Ga_V_ps * dtan(dr*yz1-datan(M_V_ps/Ga_V_ps)) + M_V_ps**2 )
+            sHatJacobi = sHatJacobi * dr/(Ga_V_ps*M_V_ps) * ( (MZ1**2 - M_V_ps**2)**2 + M_V_ps**2*Ga_V_ps**2 )
 
             EZ_max = EHat - MZ1*0.99d0
-            dr = datan((EZ_max**2-M_V**2)/(Ga_V*M_V)) + datan(M_V/Ga_V)
-            MZ2 = dsqrt( M_V*Ga_V * dtan(dr*yz2-datan(M_V/Ga_V)) + M_V**2 )
-            sHatJacobi = sHatJacobi*dr/(Ga_V*M_V)*( (MZ2**2 - M_V**2)**2 + M_V**2*Ga_V**2 )
+            dr = datan((EZ_max**2-M_V_ps**2)/(Ga_V_ps*M_V_ps)) + datan(M_V_ps/Ga_V_ps)
+            MZ2 = dsqrt( M_V_ps*Ga_V_ps * dtan(dr*yz2-datan(M_V_ps/Ga_V_ps)) + M_V_ps**2 )
+            sHatJacobi = sHatJacobi*dr/(Ga_V_ps*M_V_ps)*( (MZ2**2 - M_V_ps**2)**2 + M_V_ps**2*Ga_V_ps**2 )
 
-        else   !M_Reso.le.2d0*M_V
+        else   !M_Reso.le.2d0*M_V_ps
             if (offzchannel.le.0.5d0) then
                 EZ_max = EHat
-                dr = datan((EZ_max**2-M_V**2)/(Ga_V*M_V)) + datan(M_V/Ga_V)
-                MZ1 = dsqrt( M_V*Ga_V * dtan(dr*yz1-datan(M_V/Ga_V)) + M_V**2 )
+                dr = datan((EZ_max**2-M_V_ps**2)/(Ga_V_ps*M_V_ps)) + datan(M_V_ps/Ga_V_ps)
+                MZ1 = dsqrt( M_V_ps*Ga_V_ps * dtan(dr*yz1-datan(M_V_ps/Ga_V_ps)) + M_V_ps**2 )
                 MZ2 = abs(EHat - MZ1*0.999999999999999d0)*dsqrt(dabs(dble(yz2)))
-                sHatJacobi = sHatJacobi * dr/(Ga_V*M_V) * 1d0/(  &
-                1d0/((MZ1**2 - M_V**2)**2 + M_V**2*Ga_V**2 )     &
-                + 1d0/((MZ2**2 - M_V**2)**2 + M_V**2*Ga_V**2 ) )
+                sHatJacobi = sHatJacobi * dr/(Ga_V_ps*M_V_ps) * 1d0/(  &
+                1d0/((MZ1**2 - M_V_ps**2)**2 + M_V_ps**2*Ga_V_ps**2 )     &
+                + 1d0/((MZ2**2 - M_V_ps**2)**2 + M_V_ps**2*Ga_V_ps**2 ) )
                 sHatJacobi = sHatJacobi *(EHat - MZ1*0.999)**2
             elseif(offzchannel.gt.0.5d0) then
                 EZ_max = EHat
-                dr = datan((EZ_max**2-M_V**2)/(Ga_V*M_V)) + datan(M_V/Ga_V)
-                MZ2 = dsqrt( M_V*Ga_V * dtan(dr*yz2-datan(M_V/Ga_V)) + M_V**2 )
+                dr = datan((EZ_max**2-M_V_ps**2)/(Ga_V_ps*M_V_ps)) + datan(M_V_ps/Ga_V_ps)
+                MZ2 = dsqrt( M_V_ps*Ga_V_ps * dtan(dr*yz2-datan(M_V_ps/Ga_V_ps)) + M_V_ps**2 )
                 MZ1 = abs(EHat - MZ2*0.999999999999999d0)*dsqrt(dabs(dble(yz1)))
-                sHatJacobi = sHatJacobi * dr/(Ga_V*M_V) * 1d0/( &
-                1d0/((MZ1**2 - M_V**2)**2 + M_V**2*Ga_V**2 )    &
-                + 1d0/((MZ2**2 - M_V**2)**2 + M_V**2*Ga_V**2 ) )
+                sHatJacobi = sHatJacobi * dr/(Ga_V_ps*M_V_ps) * 1d0/( &
+                1d0/((MZ1**2 - M_V_ps**2)**2 + M_V_ps**2*Ga_V_ps**2 )    &
+                + 1d0/((MZ2**2 - M_V_ps**2)**2 + M_V_ps**2*Ga_V_ps**2 ) )
                 sHatJacobi = sHatJacobi *(EHat - MZ2*0.999)**2
             endif
        endif
 
   elseif((OffShellV1.eqv..false.).and.(OffShellV2.eqv..true.)) then
         MZ1 = getMass(MY_IDUP(4))
-        if(M_Reso.gt.2d0*M_V) then
+        if(M_Reso.gt.2d0*M_V_ps) then
             EZ_max = EHat - MZ1*0.99
-            dr = datan((EZ_max**2-M_V**2)/(Ga_V*M_V)) + datan(M_V/Ga_V)
-            MZ2 = dsqrt( M_V*Ga_V * dtan(dr*yz2-datan(M_V/Ga_V)) + M_V**2 )
-            sHatJacobi = sHatJacobi*dr/(Ga_V*M_V)*( (MZ2**2 - M_V**2)**2 + M_V**2*Ga_V**2 )
+            dr = datan((EZ_max**2-M_V_ps**2)/(Ga_V_ps*M_V_ps)) + datan(M_V_ps/Ga_V_ps)
+            MZ2 = dsqrt( M_V_ps*Ga_V_ps * dtan(dr*yz2-datan(M_V_ps/Ga_V_ps)) + M_V_ps**2 )
+            sHatJacobi = sHatJacobi*dr/(Ga_V_ps*M_V_ps)*( (MZ2**2 - M_V_ps**2)**2 + M_V_ps**2*Ga_V_ps**2 )
         else
             MZ2 = abs(EHat - MZ1*0.999999999999999d0)*dsqrt(abs(dble(yz2)))
             sHatJacobi = sHatJacobi *(EHat - MZ1*0.999)**2
@@ -460,11 +460,11 @@ include 'csmaxvalue.f'
 
   elseif((OffShellV1.eqv..true.).and.(OffShellV2.eqv..false.)) then
         MZ2 = getMass(MY_IDUP(5))
-        if(M_Reso.gt.2d0*M_V) then
+        if(M_Reso.gt.2d0*M_V_ps) then
             EZ_max = EHat - MZ2*0.99
-            dr = datan((EZ_max**2-M_V**2)/(Ga_V*M_V)) + datan(M_V/Ga_V)
-            MZ1 = dsqrt( M_V*Ga_V * dtan(dr*yz1-datan(M_V/Ga_V)) + M_V**2 )
-            sHatJacobi = sHatJacobi*dr/(Ga_V*M_V)*( (MZ1**2 - M_V**2)**2 + M_V**2*Ga_V**2 )
+            dr = datan((EZ_max**2-M_V_ps**2)/(Ga_V_ps*M_V_ps)) + datan(M_V_ps/Ga_V_ps)
+            MZ1 = dsqrt( M_V_ps*Ga_V_ps * dtan(dr*yz1-datan(M_V_ps/Ga_V_ps)) + M_V_ps**2 )
+            sHatJacobi = sHatJacobi*dr/(Ga_V_ps*M_V_ps)*( (MZ1**2 - M_V_ps**2)**2 + M_V_ps**2*Ga_V_ps**2 )
          else
             MZ1 = abs(EHat - MZ2*0.999999999999999d0)*dsqrt(abs(dble(yz2)))
             sHatJacobi = sHatJacobi *(EHat - MZ2*0.999)**2
@@ -528,6 +528,7 @@ include 'csmaxvalue.f'
     if( (OffShellV1).or.(OffShellV2).or.(IsAPhoton(DecayMode1)) ) then
         call Kinematics(4,MomExt,MomDK,applyPSCut,NBin)
     else
+        call Error("This should not happen anymore")
         call AdjustKinematics(eta1,eta2,MomExt,MomDK,yRnd(9),yRnd(10),yRnd(11),MomExt_f,MomDK_f)
         call Kinematics(4,MomExt_f,MomDK_f,applyPSCut,NBin)
     endif
@@ -754,46 +755,46 @@ END FUNCTION
 !     yz2 = yRnd(11)
 !     offzchannel = yRnd(12) ! variable to decide which Z is ``on''- and which Z is off- the mass-shell
 !   if ((OffShellV1.eqv..true.).and.(OffShellV2.eqv..true.)) then
-!         if(M_Reso.gt.2d0*M_V) then
+!         if(M_Reso.gt.2d0*M_V_ps) then
 !             EZ_max = EHat
-!             dr = datan((EZ_max**2-M_V**2)/(Ga_V*M_V)) + datan(M_V/Ga_V)
-!             MZ1 = dsqrt( M_V*Ga_V * dtan(dr*yz1-datan(M_V/Ga_V)) + M_V**2 )
-!             sHatJacobi = sHatJacobi * dr/(Ga_V*M_V) * ( (MZ1**2 - M_V**2)**2 + M_V**2*Ga_V**2 )
+!             dr = datan((EZ_max**2-M_V_ps**2)/(Ga_V_ps*M_V_ps)) + datan(M_V_ps/Ga_V_ps)
+!             MZ1 = dsqrt( M_V_ps*Ga_V_ps * dtan(dr*yz1-datan(M_V_ps/Ga_V_ps)) + M_V_ps**2 )
+!             sHatJacobi = sHatJacobi * dr/(Ga_V_ps*M_V_ps) * ( (MZ1**2 - M_V_ps**2)**2 + M_V_ps**2*Ga_V_ps**2 )
 !
 !             EZ_max = EHat - MZ1*0.99d0
-!             dr = datan((EZ_max**2-M_V**2)/(Ga_V*M_V)) + datan(M_V/Ga_V)
-!             MZ2 = dsqrt( M_V*Ga_V * dtan(dr*yz2-datan(M_V/Ga_V)) + M_V**2 )
-!             sHatJacobi = sHatJacobi*dr/(Ga_V*M_V)*( (MZ2**2 - M_V**2)**2 + M_V**2*Ga_V**2 )
+!             dr = datan((EZ_max**2-M_V_ps**2)/(Ga_V_ps*M_V_ps)) + datan(M_V_ps/Ga_V_ps)
+!             MZ2 = dsqrt( M_V_ps*Ga_V_ps * dtan(dr*yz2-datan(M_V_ps/Ga_V_ps)) + M_V_ps**2 )
+!             sHatJacobi = sHatJacobi*dr/(Ga_V_ps*M_V_ps)*( (MZ2**2 - M_V_ps**2)**2 + M_V_ps**2*Ga_V_ps**2 )
 !
-!         elseif(M_Reso.lt.2d0*M_V) then
+!         elseif(M_Reso.lt.2d0*M_V_ps) then
 !             if (offzchannel.le.0.5d0) then
 !                 EZ_max = EHat
-!                 dr = datan((EZ_max**2-M_V**2)/(Ga_V*M_V)) + datan(M_V/Ga_V)
-!                 MZ1 = dsqrt( M_V*Ga_V * dtan(dr*yz1-datan(M_V/Ga_V)) + M_V**2 )
+!                 dr = datan((EZ_max**2-M_V_ps**2)/(Ga_V_ps*M_V_ps)) + datan(M_V_ps/Ga_V_ps)
+!                 MZ1 = dsqrt( M_V_ps*Ga_V_ps * dtan(dr*yz1-datan(M_V_ps/Ga_V_ps)) + M_V_ps**2 )
 !                 MZ2 = abs(EHat - MZ1*0.999999999999999d0)*dsqrt(dabs(dble(yz2)))
-!                 sHatJacobi = sHatJacobi * dr/(Ga_V*M_V) * 1d0/(  &
-!                 1d0/((MZ1**2 - M_V**2)**2 + M_V**2*Ga_V**2 )     &
-!                 + 1d0/((MZ2**2 - M_V**2)**2 + M_V**2*Ga_V**2 ) )
+!                 sHatJacobi = sHatJacobi * dr/(Ga_V_ps*M_V_ps) * 1d0/(  &
+!                 1d0/((MZ1**2 - M_V_ps**2)**2 + M_V_ps**2*Ga_V_ps**2 )     &
+!                 + 1d0/((MZ2**2 - M_V_ps**2)**2 + M_V_ps**2*Ga_V_ps**2 ) )
 !                 sHatJacobi = sHatJacobi *(EHat - MZ1*0.999)**2
 !             elseif(offzchannel.gt.0.5d0) then
 !                 EZ_max = EHat
-!                 dr = datan((EZ_max**2-M_V**2)/(Ga_V*M_V)) + datan(M_V/Ga_V)
-!                 MZ2 = dsqrt( M_V*Ga_V * dtan(dr*yz2-datan(M_V/Ga_V)) + M_V**2 )
+!                 dr = datan((EZ_max**2-M_V_ps**2)/(Ga_V_ps*M_V_ps)) + datan(M_V_ps/Ga_V_ps)
+!                 MZ2 = dsqrt( M_V_ps*Ga_V_ps * dtan(dr*yz2-datan(M_V_ps/Ga_V_ps)) + M_V_ps**2 )
 !                 MZ1 = abs(EHat - MZ2*0.999999999999999d0)*dsqrt(dabs(dble(yz1)))
-!                 sHatJacobi = sHatJacobi * dr/(Ga_V*M_V) * 1d0/( &
-!                 1d0/((MZ1**2 - M_V**2)**2 + M_V**2*Ga_V**2 )    &
-!                 + 1d0/((MZ2**2 - M_V**2)**2 + M_V**2*Ga_V**2 ) )
+!                 sHatJacobi = sHatJacobi * dr/(Ga_V_ps*M_V_ps) * 1d0/( &
+!                 1d0/((MZ1**2 - M_V_ps**2)**2 + M_V_ps**2*Ga_V_ps**2 )    &
+!                 + 1d0/((MZ2**2 - M_V_ps**2)**2 + M_V_ps**2*Ga_V_ps**2 ) )
 !                 sHatJacobi = sHatJacobi *(EHat - MZ2*0.999)**2
 !             endif
 !        endif
 !
 !   elseif((OffShellV1.eqv..false.).and.(OffShellV2.eqv..true.)) then
 !         MZ1 = getMass(MY_IDUP(4))
-!         if(M_Reso.gt.2d0*M_V) then
+!         if(M_Reso.gt.2d0*M_V_ps) then
 !             EZ_max = EHat - MZ1*0.99
-!             dr = datan((EZ_max**2-M_V**2)/(Ga_V*M_V)) + datan(M_V/Ga_V)
-!             MZ2 = dsqrt( M_V*Ga_V * dtan(dr*yz2-datan(M_V/Ga_V)) + M_V**2 )
-!             sHatJacobi = sHatJacobi*dr/(Ga_V*M_V)*( (MZ2**2 - M_V**2)**2 + M_V**2*Ga_V**2 )
+!             dr = datan((EZ_max**2-M_V_ps**2)/(Ga_V_ps*M_V_ps)) + datan(M_V_ps/Ga_V_ps)
+!             MZ2 = dsqrt( M_V_ps*Ga_V_ps * dtan(dr*yz2-datan(M_V_ps/Ga_V_ps)) + M_V_ps**2 )
+!             sHatJacobi = sHatJacobi*dr/(Ga_V_ps*M_V_ps)*( (MZ2**2 - M_V_ps**2)**2 + M_V_ps**2*Ga_V_ps**2 )
 !         else
 !             MZ2 = abs(EHat - MZ1*0.999999999999999d0)*dsqrt(abs(dble(yz2)))
 !             sHatJacobi = sHatJacobi *(EHat - MZ1*0.999)**2
@@ -801,11 +802,11 @@ END FUNCTION
 !
 !   elseif((OffShellV1.eqv..true.).and.(OffShellV2.eqv..false.)) then
 !         MZ2 = getMass(MY_IDUP(5))
-!         if(M_Reso.gt.2d0*M_V) then
+!         if(M_Reso.gt.2d0*M_V_ps) then
 !             EZ_max = EHat - MZ2*0.99
-!             dr = datan((EZ_max**2-M_V**2)/(Ga_V*M_V)) + datan(M_V/Ga_V)
-!             MZ1 = dsqrt( M_V*Ga_V * dtan(dr*yz1-datan(M_V/Ga_V)) + M_V**2 )
-!             sHatJacobi = sHatJacobi*dr/(Ga_V*M_V)*( (MZ1**2 - M_V**2)**2 + M_V**2*Ga_V**2 )
+!             dr = datan((EZ_max**2-M_V_ps**2)/(Ga_V_ps*M_V_ps)) + datan(M_V_ps/Ga_V_ps)
+!             MZ1 = dsqrt( M_V_ps*Ga_V_ps * dtan(dr*yz1-datan(M_V_ps/Ga_V_ps)) + M_V_ps**2 )
+!             sHatJacobi = sHatJacobi*dr/(Ga_V_ps*M_V_ps)*( (MZ1**2 - M_V_ps**2)**2 + M_V_ps**2*Ga_V_ps**2 )
 !          else
 !             MZ1 = abs(EHat - MZ2*0.999999999999999d0)*dsqrt(abs(dble(yz2)))
 !             sHatJacobi = sHatJacobi *(EHat - MZ2*0.999)**2
@@ -890,6 +891,7 @@ END FUNCTION
 !     if( (OffShellV1).or.(OffShellV2).or.(IsAPhoton(DecayMode2)) ) then
 !         call Kinematics(4,MomExt,MomDK,applyPSCut,NBin)
 !     else
+!         call Error("This should not happen anymore")
 !         call AdjustKinematics(eta1,eta2,MomExt,MomDK,yRnd(9),yRnd(10),yRnd(11),MomExt_f,MomDK_f)
 !         call Kinematics(4,MomExt_f,MomDK_f,applyPSCut,NBin)
 !     endif
@@ -1116,46 +1118,46 @@ include 'csmaxvalue.f'
   yz2 = yRnd(11)
   offzchannel = yRnd(15) ! variable to decide which Z is ``on''- and which Z is off- the mass-shell
   if ((OffShellV1.eqv..true.).and.(OffShellV2.eqv..true.)) then
-        if(M_Reso.gt.2d0*M_V) then
+        if(M_Reso.gt.2d0*M_V_ps) then
             EZ_max = EHat
-            dr = datan((EZ_max**2-M_V**2)/(Ga_V*M_V)) + datan(M_V/Ga_V)
-            MZ1 = dsqrt( M_V*Ga_V * dtan(dr*yz1-datan(M_V/Ga_V)) + M_V**2 )
-            sHatJacobi = sHatJacobi * dr/(Ga_V*M_V) * ( (MZ1**2 - M_V**2)**2 + M_V**2*Ga_V**2 )
+            dr = datan((EZ_max**2-M_V_ps**2)/(Ga_V_ps*M_V_ps)) + datan(M_V_ps/Ga_V_ps)
+            MZ1 = dsqrt( M_V_ps*Ga_V_ps * dtan(dr*yz1-datan(M_V_ps/Ga_V_ps)) + M_V_ps**2 )
+            sHatJacobi = sHatJacobi * dr/(Ga_V_ps*M_V_ps) * ( (MZ1**2 - M_V_ps**2)**2 + M_V_ps**2*Ga_V_ps**2 )
 
             EZ_max = EHat - MZ1*0.99d0
-            dr = datan((EZ_max**2-M_V**2)/(Ga_V*M_V)) + datan(M_V/Ga_V)
-            MZ2 = dsqrt( M_V*Ga_V * dtan(dr*yz2-datan(M_V/Ga_V)) + M_V**2 )
-            sHatJacobi = sHatJacobi*dr/(Ga_V*M_V)*( (MZ2**2 - M_V**2)**2 + M_V**2*Ga_V**2 )
+            dr = datan((EZ_max**2-M_V_ps**2)/(Ga_V_ps*M_V_ps)) + datan(M_V_ps/Ga_V_ps)
+            MZ2 = dsqrt( M_V_ps*Ga_V_ps * dtan(dr*yz2-datan(M_V_ps/Ga_V_ps)) + M_V_ps**2 )
+            sHatJacobi = sHatJacobi*dr/(Ga_V_ps*M_V_ps)*( (MZ2**2 - M_V_ps**2)**2 + M_V_ps**2*Ga_V_ps**2 )
 
-        elseif(M_Reso.lt.2d0*M_V) then
+        elseif(M_Reso.lt.2d0*M_V_ps) then
             if (offzchannel.le.0.5d0) then
                 EZ_max = EHat
-                dr = datan((EZ_max**2-M_V**2)/(Ga_V*M_V)) + datan(M_V/Ga_V)
-                MZ1 = dsqrt( M_V*Ga_V * dtan(dr*yz1-datan(M_V/Ga_V)) + M_V**2 )
+                dr = datan((EZ_max**2-M_V_ps**2)/(Ga_V_ps*M_V_ps)) + datan(M_V_ps/Ga_V_ps)
+                MZ1 = dsqrt( M_V_ps*Ga_V_ps * dtan(dr*yz1-datan(M_V_ps/Ga_V_ps)) + M_V_ps**2 )
                 MZ2 = abs(EHat - MZ1*0.999999999999999d0)*dsqrt(dabs(dble(yz2)))
-                sHatJacobi = sHatJacobi * dr/(Ga_V*M_V) * 1d0/(  &
-                1d0/((MZ1**2 - M_V**2)**2 + M_V**2*Ga_V**2 )     &
-                + 1d0/((MZ2**2 - M_V**2)**2 + M_V**2*Ga_V**2 ) )
+                sHatJacobi = sHatJacobi * dr/(Ga_V_ps*M_V_ps) * 1d0/(  &
+                1d0/((MZ1**2 - M_V_ps**2)**2 + M_V_ps**2*Ga_V_ps**2 )     &
+                + 1d0/((MZ2**2 - M_V_ps**2)**2 + M_V_ps**2*Ga_V_ps**2 ) )
                 sHatJacobi = sHatJacobi *(EHat - MZ1*0.999d0)**2
             elseif(offzchannel.gt.0.5d0) then
                 EZ_max = EHat
-                dr = datan((EZ_max**2-M_V**2)/(Ga_V*M_V)) + datan(M_V/Ga_V)
-                MZ2 = dsqrt( M_V*Ga_V * dtan(dr*yz2-datan(M_V/Ga_V)) + M_V**2 )
+                dr = datan((EZ_max**2-M_V_ps**2)/(Ga_V_ps*M_V_ps)) + datan(M_V_ps/Ga_V_ps)
+                MZ2 = dsqrt( M_V_ps*Ga_V_ps * dtan(dr*yz2-datan(M_V_ps/Ga_V_ps)) + M_V_ps**2 )
                 MZ1 = abs(EHat - MZ2*0.999999999999999d0)*dsqrt(dabs(dble(yz1)))
-                sHatJacobi = sHatJacobi * dr/(Ga_V*M_V) * 1d0/( &
-                1d0/((MZ1**2 - M_V**2)**2 + M_V**2*Ga_V**2 )    &
-                + 1d0/((MZ2**2 - M_V**2)**2 + M_V**2*Ga_V**2 ) )
+                sHatJacobi = sHatJacobi * dr/(Ga_V_ps*M_V_ps) * 1d0/( &
+                1d0/((MZ1**2 - M_V_ps**2)**2 + M_V_ps**2*Ga_V_ps**2 )    &
+                + 1d0/((MZ2**2 - M_V_ps**2)**2 + M_V_ps**2*Ga_V_ps**2 ) )
                 sHatJacobi = sHatJacobi *(EHat - MZ2*0.999d0)**2
             endif
        endif
 
   elseif((OffShellV1.eqv..false.).and.(OffShellV2.eqv..true.)) then
         MZ1 = getMass(MY_IDUP(4))
-        if(M_Reso.gt.2d0*M_V) then
+        if(M_Reso.gt.2d0*M_V_ps) then
             EZ_max = EHat - MZ1*0.99d0
-            dr = datan((EZ_max**2-M_V**2)/(Ga_V*M_V)) + datan(M_V/Ga_V)
-            MZ2 = dsqrt( M_V*Ga_V * dtan(dr*yz2-datan(M_V/Ga_V)) + M_V**2 )
-            sHatJacobi = sHatJacobi*dr/(Ga_V*M_V)*( (MZ2**2 - M_V**2)**2 + M_V**2*Ga_V**2 )
+            dr = datan((EZ_max**2-M_V_ps**2)/(Ga_V_ps*M_V_ps)) + datan(M_V_ps/Ga_V_ps)
+            MZ2 = dsqrt( M_V_ps*Ga_V_ps * dtan(dr*yz2-datan(M_V_ps/Ga_V_ps)) + M_V_ps**2 )
+            sHatJacobi = sHatJacobi*dr/(Ga_V_ps*M_V_ps)*( (MZ2**2 - M_V_ps**2)**2 + M_V_ps**2*Ga_V_ps**2 )
         else
             MZ2 = abs(EHat - MZ1*0.999999999999999d0)*dsqrt(abs(dble(yz2)))
             sHatJacobi = sHatJacobi *(EHat - MZ1*0.999)**2
@@ -1163,11 +1165,11 @@ include 'csmaxvalue.f'
 
   elseif((OffShellV1.eqv..true.).and.(OffShellV2.eqv..false.)) then
         MZ2 = getMass(MY_IDUP(5))
-        if(M_Reso.gt.2d0*M_V) then
+        if(M_Reso.gt.2d0*M_V_ps) then
             EZ_max = EHat - MZ2*0.99d0
-            dr = datan((EZ_max**2-M_V**2)/(Ga_V*M_V)) + datan(M_V/Ga_V)
-            MZ1 = dsqrt( M_V*Ga_V * dtan(dr*yz1-datan(M_V/Ga_V)) + M_V**2 )
-            sHatJacobi = sHatJacobi*dr/(Ga_V*M_V)*( (MZ1**2 - M_V**2)**2 + M_V**2*Ga_V**2 )
+            dr = datan((EZ_max**2-M_V_ps**2)/(Ga_V_ps*M_V_ps)) + datan(M_V_ps/Ga_V_ps)
+            MZ1 = dsqrt( M_V_ps*Ga_V_ps * dtan(dr*yz1-datan(M_V_ps/Ga_V_ps)) + M_V_ps**2 )
+            sHatJacobi = sHatJacobi*dr/(Ga_V_ps*M_V_ps)*( (MZ1**2 - M_V_ps**2)**2 + M_V_ps**2*Ga_V_ps**2 )
          else
             MZ1 = abs(EHat - MZ2*0.999999999999999d0)*dsqrt(abs(dble(yz2)))
             sHatJacobi = sHatJacobi *(EHat - MZ2*0.999d0)**2
@@ -1259,6 +1261,7 @@ include 'csmaxvalue.f'
     if( (OffShellV1).or.(OffShellV2).or.(IsAPhoton(DecayMode2)) ) then
         call Kinematics(4,MomExt,MomDK,applyPSCut,NBin)
     else
+        call Error("This should not happen anymore")
         call AdjustKinematics(eta1,eta2,MomExt,MomDK,yRnd(9),yRnd(10),yRnd(11),MomExt_f,MomDK_f)
         call Kinematics(4,MomExt_f,MomDK_f,applyPSCut,NBin)
     endif
@@ -3747,46 +3750,46 @@ END FUNCTION
     yz2 = yRnd(11)
     offzchannel = yRnd(12) ! variable to decide which Z is ``on''- and which Z is off- the mass-shell
   if ((OffShellV1.eqv..true.).and.(OffShellV2.eqv..true.)) then
-        if(M_Reso.gt.2d0*M_V) then
+        if(M_Reso.gt.2d0*M_V_ps) then
             EZ_max = EHat
-            dr = datan((EZ_max**2-M_V**2)/(Ga_V*M_V)) + datan(M_V/Ga_V)
-            MZ1 = dsqrt( M_V*Ga_V * dtan(dr*yz1-datan(M_V/Ga_V)) + M_V**2 )
-            sHatJacobi = sHatJacobi * dr/(Ga_V*M_V) * ( (MZ1**2 - M_V**2)**2 + M_V**2*Ga_V**2 )
+            dr = datan((EZ_max**2-M_V_ps**2)/(Ga_V_ps*M_V_ps)) + datan(M_V_ps/Ga_V_ps)
+            MZ1 = dsqrt( M_V_ps*Ga_V_ps * dtan(dr*yz1-datan(M_V_ps/Ga_V_ps)) + M_V_ps**2 )
+            sHatJacobi = sHatJacobi * dr/(Ga_V_ps*M_V_ps) * ( (MZ1**2 - M_V_ps**2)**2 + M_V_ps**2*Ga_V_ps**2 )
 
             EZ_max = EHat - MZ1*0.99d0
-            dr = datan((EZ_max**2-M_V**2)/(Ga_V*M_V)) + datan(M_V/Ga_V)
-            MZ2 = dsqrt( M_V*Ga_V * dtan(dr*yz2-datan(M_V/Ga_V)) + M_V**2 )
-            sHatJacobi = sHatJacobi*dr/(Ga_V*M_V)*( (MZ2**2 - M_V**2)**2 + M_V**2*Ga_V**2 )
+            dr = datan((EZ_max**2-M_V_ps**2)/(Ga_V_ps*M_V_ps)) + datan(M_V_ps/Ga_V_ps)
+            MZ2 = dsqrt( M_V_ps*Ga_V_ps * dtan(dr*yz2-datan(M_V_ps/Ga_V_ps)) + M_V_ps**2 )
+            sHatJacobi = sHatJacobi*dr/(Ga_V_ps*M_V_ps)*( (MZ2**2 - M_V_ps**2)**2 + M_V_ps**2*Ga_V_ps**2 )
 
-        else   !M_Reso.le.2d0*M_V
+        else   !M_Reso.le.2d0*M_V_ps
             if (offzchannel.le.0.5d0) then
                 EZ_max = EHat
-                dr = datan((EZ_max**2-M_V**2)/(Ga_V*M_V)) + datan(M_V/Ga_V)
-                MZ1 = dsqrt( M_V*Ga_V * dtan(dr*yz1-datan(M_V/Ga_V)) + M_V**2 )
+                dr = datan((EZ_max**2-M_V_ps**2)/(Ga_V_ps*M_V_ps)) + datan(M_V_ps/Ga_V_ps)
+                MZ1 = dsqrt( M_V_ps*Ga_V_ps * dtan(dr*yz1-datan(M_V_ps/Ga_V_ps)) + M_V_ps**2 )
                 MZ2 = abs(EHat - MZ1*0.999999999999999d0)*dsqrt(dabs(dble(yz2)))
-                sHatJacobi = sHatJacobi * dr/(Ga_V*M_V) * 1d0/(  &
-                1d0/((MZ1**2 - M_V**2)**2 + M_V**2*Ga_V**2 )     &
-                + 1d0/((MZ2**2 - M_V**2)**2 + M_V**2*Ga_V**2 ) )
+                sHatJacobi = sHatJacobi * dr/(Ga_V_ps*M_V_ps) * 1d0/(  &
+                1d0/((MZ1**2 - M_V_ps**2)**2 + M_V_ps**2*Ga_V_ps**2 )     &
+                + 1d0/((MZ2**2 - M_V_ps**2)**2 + M_V_ps**2*Ga_V_ps**2 ) )
                 sHatJacobi = sHatJacobi *(EHat - MZ1*0.999)**2
             elseif(offzchannel.gt.0.5d0) then
                 EZ_max = EHat
-                dr = datan((EZ_max**2-M_V**2)/(Ga_V*M_V)) + datan(M_V/Ga_V)
-                MZ2 = dsqrt( M_V*Ga_V * dtan(dr*yz2-datan(M_V/Ga_V)) + M_V**2 )
+                dr = datan((EZ_max**2-M_V_ps**2)/(Ga_V_ps*M_V_ps)) + datan(M_V_ps/Ga_V_ps)
+                MZ2 = dsqrt( M_V_ps*Ga_V_ps * dtan(dr*yz2-datan(M_V_ps/Ga_V_ps)) + M_V_ps**2 )
                 MZ1 = abs(EHat - MZ2*0.999999999999999d0)*dsqrt(dabs(dble(yz1)))
-                sHatJacobi = sHatJacobi * dr/(Ga_V*M_V) * 1d0/( &
-                1d0/((MZ1**2 - M_V**2)**2 + M_V**2*Ga_V**2 )    &
-                + 1d0/((MZ2**2 - M_V**2)**2 + M_V**2*Ga_V**2 ) )
+                sHatJacobi = sHatJacobi * dr/(Ga_V_ps*M_V_ps) * 1d0/( &
+                1d0/((MZ1**2 - M_V_ps**2)**2 + M_V_ps**2*Ga_V_ps**2 )    &
+                + 1d0/((MZ2**2 - M_V_ps**2)**2 + M_V_ps**2*Ga_V_ps**2 ) )
                 sHatJacobi = sHatJacobi *(EHat - MZ2*0.999)**2
             endif
        endif
 
   elseif((OffShellV1.eqv..false.).and.(OffShellV2.eqv..true.)) then
         MZ1 = getMass(MY_IDUP(4))
-        if(M_Reso.gt.2d0*M_V) then
+        if(M_Reso.gt.2d0*M_V_ps) then
             EZ_max = EHat - MZ1*0.99
-            dr = datan((EZ_max**2-M_V**2)/(Ga_V*M_V)) + datan(M_V/Ga_V)
-            MZ2 = dsqrt( M_V*Ga_V * dtan(dr*yz2-datan(M_V/Ga_V)) + M_V**2 )
-            sHatJacobi = sHatJacobi*dr/(Ga_V*M_V)*( (MZ2**2 - M_V**2)**2 + M_V**2*Ga_V**2 )
+            dr = datan((EZ_max**2-M_V_ps**2)/(Ga_V_ps*M_V_ps)) + datan(M_V_ps/Ga_V_ps)
+            MZ2 = dsqrt( M_V_ps*Ga_V_ps * dtan(dr*yz2-datan(M_V_ps/Ga_V_ps)) + M_V_ps**2 )
+            sHatJacobi = sHatJacobi*dr/(Ga_V_ps*M_V_ps)*( (MZ2**2 - M_V_ps**2)**2 + M_V_ps**2*Ga_V_ps**2 )
         else
             MZ2 = abs(EHat - MZ1*0.999999999999999d0)*dsqrt(abs(dble(yz2)))
             sHatJacobi = sHatJacobi *(EHat - MZ1*0.999)**2
@@ -3794,11 +3797,11 @@ END FUNCTION
 
   elseif((OffShellV1.eqv..true.).and.(OffShellV2.eqv..false.)) then
         MZ2 = getMass(MY_IDUP(5))
-        if(M_Reso.gt.2d0*M_V) then
+        if(M_Reso.gt.2d0*M_V_ps) then
             EZ_max = EHat - MZ2*0.99
-            dr = datan((EZ_max**2-M_V**2)/(Ga_V*M_V)) + datan(M_V/Ga_V)
-            MZ1 = dsqrt( M_V*Ga_V * dtan(dr*yz1-datan(M_V/Ga_V)) + M_V**2 )
-            sHatJacobi = sHatJacobi*dr/(Ga_V*M_V)*( (MZ1**2 - M_V**2)**2 + M_V**2*Ga_V**2 )
+            dr = datan((EZ_max**2-M_V_ps**2)/(Ga_V_ps*M_V_ps)) + datan(M_V_ps/Ga_V_ps)
+            MZ1 = dsqrt( M_V_ps*Ga_V_ps * dtan(dr*yz1-datan(M_V_ps/Ga_V_ps)) + M_V_ps**2 )
+            sHatJacobi = sHatJacobi*dr/(Ga_V_ps*M_V_ps)*( (MZ1**2 - M_V_ps**2)**2 + M_V_ps**2*Ga_V_ps**2 )
          else
             MZ1 = abs(EHat - MZ2*0.999999999999999d0)*dsqrt(abs(dble(yz2)))
             sHatJacobi = sHatJacobi *(EHat - MZ2*0.999)**2
@@ -3860,6 +3863,7 @@ END FUNCTION
     if( (OffShellV1).or.(OffShellV2).or.(IsAPhoton(DecayMode2)) ) then
         call Kinematics(4,MomExt,MomDK,applyPSCut,NBin)
     else
+        call Error("This should not happen anymore")
         call AdjustKinematics(eta1,eta2,MomExt,MomDK,yRnd(9),yRnd(10),yRnd(11),MomExt_f,MomDK_f)
         call Kinematics(4,MomExt_f,MomDK_f,applyPSCut,NBin)
     endif

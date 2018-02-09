@@ -5564,14 +5564,14 @@ integer :: NumChannels
    Jac1=1d0;Jac2=1d0;Jac3=1d0;Jac4=1d0;Jac5=1d0;Jac6=1d0;Jac7=1d0;Jac8=1d0;Jac9=1d0;Jac=1d0;
    s56=Energy**2
 
-   vectormass(1,1)=M_V ! Test is already done in main.90
-   vectormass(1,2)=Ga_V ! Test is already done in main.90
+   vectormass(1,1)=M_V_ps ! Test is already done in main.90
+   vectormass(1,2)=Ga_V_ps ! Test is already done in main.90
    if( IsAZDecay(DecayMode2) ) then
-      vectormass(2,1)=M_Z
-      vectormass(2,2)=Ga_Z
+      vectormass(2,1)=M_Z_ps
+      vectormass(2,2)=Ga_Z_ps
    elseif( IsAWDecay(DecayMode2) ) then
-      vectormass(2,1)=M_W
-      vectormass(2,2)=Ga_W
+      vectormass(2,1)=M_W_ps
+      vectormass(2,2)=Ga_W_ps
    elseif( IsAPhoton(DecayMode2) ) then
       vectormass(2,1)=0d0
       vectormass(2,2)=0d0
@@ -5743,9 +5743,9 @@ IF( iChannel.EQ.1 ) THEN
 !  masses
    Jac1=1d0; s56=Energy**2
 ! print *, "entering Jac2"
-   Jac2 = s_channel_propagator(M_V**2,Ga_V,0d0,s56,xRnd(1),s78)                                                                   !  int d(s78)    = Z1
+   Jac2 = s_channel_propagator(M_V_ps**2,Ga_V_ps,0d0,s56,xRnd(1),s78)                                                                   !  int d(s78)    = Z1
 ! print *, "entering Jac3"
-   Jac3 = s_channel_propagator(M_V**2,Ga_V,0d0,(Energy-dsqrt(s78))**2,xRnd(2),s910)                                           !  int d(s910) = Z2
+   Jac3 = s_channel_propagator(M_V_ps**2,Ga_V_ps,0d0,(Energy-dsqrt(s78))**2,xRnd(2),s910)                                           !  int d(s910) = Z2
 
 
 !    print *, "x",xrnd(1:2)
@@ -5764,8 +5764,8 @@ ELSEIF( iChannel.EQ.2 ) THEN
 
 !  masses
    Jac1=1d0; s56=Energy**2
-   Jac2 = s_channel_propagator(M_V**2,Ga_V,0d0,s56,xRnd(1),s78)                                                                   !  int d(s78)    = Z1
-   Jac3 = s_channel_propagator(M_V**2,Ga_V,0d0,(Energy-dsqrt(s78))**2,xRnd(2),s910)                                           !  int d(s910) = Z2
+   Jac2 = s_channel_propagator(M_V_ps**2,Ga_V_ps,0d0,s56,xRnd(1),s78)                                                                   !  int d(s78)    = Z1
+   Jac3 = s_channel_propagator(M_V_ps**2,Ga_V_ps,0d0,(Energy-dsqrt(s78))**2,xRnd(2),s910)                                           !  int d(s910) = Z2
 
 !  splittings
    Mom_Dummy(1:4) = (/Energy,0d0,0d0,0d0/)
@@ -5781,8 +5781,8 @@ ELSEIF( iChannel.EQ.3 ) THEN
 
 !  masses
    Jac1=1d0; s56=Energy**2
-   Jac2 = s_channel_propagator(M_V**2,Ga_V,0d0,s56,xRnd(1),s78)                                                                   !  int d(s78)    = Z1
-   Jac3 = s_channel_propagator(M_V**2,Ga_V,0d0,(Energy-dsqrt(s78))**2,xRnd(2),s910)                                           !  int d(s910) = Z2
+   Jac2 = s_channel_propagator(M_V_ps**2,Ga_V_ps,0d0,s56,xRnd(1),s78)                                                                   !  int d(s78)    = Z1
+   Jac3 = s_channel_propagator(M_V_ps**2,Ga_V_ps,0d0,(Energy-dsqrt(s78))**2,xRnd(2),s910)                                           !  int d(s910) = Z2
 
 !  splittings
    Mom_Dummy(1:4) = (/Energy,0d0,0d0,0d0/)
@@ -5797,8 +5797,8 @@ ELSEIF( iChannel.EQ.4 ) THEN
 
 !  masses
    Jac1=1d0; s56=Energy**2
-   Jac2 = s_channel_propagator(M_V**2,Ga_V,0d0,s56,xRnd(1),s78)                                                                   !  int d(s78)    = Z1
-   Jac3 = s_channel_propagator(M_V**2,Ga_V,0d0,(Energy-dsqrt(s78))**2,xRnd(2),s910)                                           !  int d(s910) = Z2
+   Jac2 = s_channel_propagator(M_V_ps**2,Ga_V_ps,0d0,s56,xRnd(1),s78)                                                                   !  int d(s78)    = Z1
+   Jac3 = s_channel_propagator(M_V_ps**2,Ga_V_ps,0d0,(Energy-dsqrt(s78))**2,xRnd(2),s910)                                           !  int d(s910) = Z2
 
 !  splittings
    Mom_Dummy(1:4) = (/Energy,0d0,0d0,0d0/)
@@ -5863,7 +5863,7 @@ real(8) :: Jac,Jac1,Jac2,Jac3,Mom_Dummy(1:4)
    Mom_Dummy(1:4) = (/Energy,0d0,0d0,0d0/)
    if( .not.IsAPhoton(DecayMode1) ) then
       s56=Energy**2
-      Jac1 = s_channel_propagator(M_V**2,Ga_V,0d0,s56,xRnd(1),s78)
+      Jac1 = s_channel_propagator(M_V_ps**2,Ga_V_ps,0d0,s56,xRnd(1),s78)
       Jac2 = s_channel_decay(Mom_Dummy(1:4),s78,0d0,xRnd(2:3),Mom(:,3),Mom(:,7))
       Jac3 = s_channel_decay(Mom(:,3),0d0,0d0,xRnd(4:5),Mom(:,5),Mom(:,6))
       Jac = Jac1 * Jac2 * Jac3 * PSNorm3
