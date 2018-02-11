@@ -269,13 +269,13 @@ void SuperMELA::init(){
   delete sig_BW_;
   sig_CB_ =new MELADoubleCB("signalCB_ggH", "signalCB_ggH", *m4l_rrv_, *meanTOT_CB_, *sigma_CB_, *alpha_CB_, *n_CB_, *alpha2_CB_, *n2_CB_);
   sig_BW_ =new MELARelBWUFParam("signalBW_ggH", "signalBW_ggH", *m4l_rrv_, *mean_BW_, *width_BW_);
-  sig_FFT_=new RooFFTConvPdf("signal_ggH", "BW (X) CB", *m4l_rrv_, *sig_BW_, *sig_CB_, 2);
-  sig_FFT_->setBufferFraction(0.2);
+  //sig_FFT_=new RooFFTConvPdf("signal_ggH", "BW (X) CB", *m4l_rrv_, *sig_BW_, *sig_CB_, 2);
+  //sig_FFT_->setBufferFraction(0.2);
   if (verbose_){
     MELAout << "Value of signal m4l CB shape is " << sig_CB_->getVal() << endl;
     MELAout << "Value of signal m4l BW shape is " << sig_BW_->getVal() << endl;
-    sig_FFT_->Print("v");
-    MELAout << "Value of signal m4l FFT shape is " << sig_FFT_->getVal() << endl;
+    //sig_FFT_->Print("v");
+    //MELAout << "Value of signal m4l FFT shape is " << sig_FFT_->getVal() << endl;
   }
 
   RooAbsReal* tmpint;
@@ -291,11 +291,13 @@ void SuperMELA::init(){
   delete tmpint;
   if (verbose_)MELAout << "Normalization of signal m4l BW shape is " << norm_sig_BW_ << endl;
 
+  /*
   if (verbose_)MELAout << "\n---> Integrating full signal:" << endl;
   tmpint = sig_FFT_->createIntegral(RooArgSet(*m4l_rrv_), RooFit::Range("shape"));
   norm_sig_FFT_=tmpint->getVal();
   delete tmpint;
   if (verbose_)MELAout << "Normalization of signal m4l shape is " << norm_sig_FFT_ << endl;
+  */
 
   if (verbose_)MELAout << "Reading background shape parameters" << endl;
   vector<double> v_apars;
