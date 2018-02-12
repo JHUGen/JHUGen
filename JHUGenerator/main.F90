@@ -1157,9 +1157,10 @@ logical :: SetColliderEnergy
     M_W_ps = M_W
     Ga_W_ps = Ga_W
 
-    if(ghz1.eq.0d0 .and. .not.SetZZcoupling .and. .not.SetZgammacoupling .and. .not.SetZZprimecoupling &
-                   .and. (SetZprimeZprimecoupling .or. SetZprimegammacoupling) &
-                   .and. Process.le.2 .and. (SetMZprime.and.IsAZDecay(DecayMode1) .or. SetMWprime.and.IsAWDecay(DecayMode1))) then
+    if(      .not.SetZZcoupling .and. .not.SetZgammacoupling .and. .not.SetZZprimecoupling &
+       .and. (Process.ne.0 .or. ghz1.eq.0d0) &    !for Process=0 you have to have explicitly turned off the SM coupling
+       .and. (SetZprimeZprimecoupling .or. SetZprimegammacoupling) &
+       .and. Process.le.2 .and. (SetMZprime.and.IsAZDecay(DecayMode1) .or. SetMWprime.and.IsAWDecay(DecayMode1))) then
        !need more complicated logic here if this is done for VBF
        M_V_ps = M_Vprime
        Ga_V_ps = Ga_Vprime
