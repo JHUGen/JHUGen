@@ -61,7 +61,7 @@ Mela* getMela(double sqrts, double mh, TVar::VerbosityLevel verbosity=TVar::ERRO
 
 shared_ptr<Mela> makemelaptr(int erg_tev, float mPOLE, TVar::VerbosityLevel verbosity){
   //function to make a shared_ptr in python, no idea how to do it directly
-  return shared_ptr<Mela>(new Mela(erg_tev, mPOLE, verbosity));
+  return make_shared<Mela>(erg_tev, mPOLE, verbosity);
 }
 
 
@@ -1419,6 +1419,7 @@ void testME_Dec_JHUGen_Ping(int erg_tev=13, bool useConstants=false, shared_ptr<
   if (!melaptr) melaptr.reset(new Mela(erg_tev, mPOLE, verbosity));
   Mela& mela = *melaptr;
   TVar::VerbosityLevel bkpverbosity = mela.getVerbosity();
+  auto bkpprecision = cout.precision(10);
   mela.setVerbosity(verbosity);
   if (verbosity>=TVar::DEBUG) cout << "Mela is initialized" << endl;
   //mela.resetMCFM_EWKParameters(1.16639E-05, 1./128., 79.9549392, 91.1876, 0.23119);
@@ -1687,6 +1688,7 @@ void testME_Dec_JHUGen_Ping(int erg_tev=13, bool useConstants=false, shared_ptr<
   cout.rdbuf(coutbuf);
   tout.close();
   mela.setVerbosity(bkpverbosity);
+  cout.precision(bkpprecision);
 }
 
 void testME_VBF_JHUGen_Ping(int erg_tev=13, bool useConstants=false, shared_ptr<Mela> melaptr=nullptr){
