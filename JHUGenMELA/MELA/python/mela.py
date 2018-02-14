@@ -266,7 +266,7 @@ class Mela(object):
           if mother1 != mother2 or mother1 is None:
             associated.append(line)
             break
-          if ids[mother1] == 25:
+          if ids[mother1] in (25, 39):
             daughters.append(line)
             break
           mother2 = mother2s[mother1]
