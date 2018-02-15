@@ -21,6 +21,7 @@ ratiosMCFMJHUGenHadWH = defaultdict(set)
 badbkgratios = set()
 different = set()
 badangles = set()
+badselfD = set()
 messedup = set()
 
 referencefiles = os.listdir("reference")
@@ -147,6 +148,21 @@ for j, ref in enumerate(referencefiles, start=1):
         if tutilline != melaline:
           badangles.add(newfile)
 
+  if "_selfD:" in content:
+    pendingselfD = {}
+    for line in content.split("\n"):
+      if "hadronic Z-BF" in line: break
+      match = re.match("(p.*)_selfD: ([0-9.e+-]*)", line)
+      if match:
+        if float(match.group(2)) != pendingselfD.get(match.group(1)):
+          print float(match.group(2)), pendingselfD.get(match.group(1))
+        if float(match.group(2)) != pendingselfD.pop(match.group(1), None):
+          badselfD.add(newfile)
+      else:
+        match = re.match("(p.*): ([0-9.e+-]*)", line)
+        if match:
+          pendingselfD[match.group(1)] = float(match.group(2))
+
   print j, "/", len(referencefiles)
 
 errors = []
@@ -166,6 +182,8 @@ if badbkgratios:
   errors.append("The following files have bad ratios between manual and automatic background:\n  "+"\n  ".join(sorted(badbkgratios)))
 if badangles:
   errors.append("The following files have inconsistent angles between MELA and TUtil:\n  "+"\n  ".join(sorted(badangles)))
+if badselfD:
+  errors.append("The following files have inconsistent MEs between predefined and selfD hypotheses:\n  "+"\n  ".join(sorted(badselfD)))
 
 if errors:
   raise RuntimeError("\n\n\n".join(errors))

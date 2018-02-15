@@ -61,7 +61,7 @@ Mela* getMela(double sqrts, double mh, TVar::VerbosityLevel verbosity=TVar::ERRO
 
 shared_ptr<Mela> makemelaptr(int erg_tev, float mPOLE, TVar::VerbosityLevel verbosity){
   //function to make a shared_ptr in python, no idea how to do it directly
-  return shared_ptr<Mela>(new Mela(erg_tev, mPOLE, verbosity));
+  return make_shared<Mela>(erg_tev, mPOLE, verbosity);
 }
 
 
@@ -1384,6 +1384,292 @@ void testME_VH_JHUGen_Ping(int erg_tev=13, bool useConstants=false, shared_ptr<M
   cout.rdbuf(coutbuf);
   tout.close();
   mela.setVerbosity(bkpverbosity);
+}
+
+void testME_Dec_JHUGen_Ping(int erg_tev=13, bool useConstants=false, shared_ptr<Mela> melaptr=nullptr){
+  TString strtout = Form("testME_Dec_JHUGen_Ping_%iTeV_%i.out", erg_tev, (int)useConstants);
+  ofstream tout(strtout.Data());
+  streambuf* coutbuf = cout.rdbuf();
+  cout.rdbuf(tout.rdbuf());
+
+  float mPOLE=125.;
+  float wPOLE=4.07e-3;
+
+  TVar::VerbosityLevel verbosity = TVar::ERROR;
+  if (verbosity>=TVar::DEBUG) cout << "Initializing Mela..." << endl;
+  if (!melaptr) melaptr.reset(new Mela(erg_tev, mPOLE, verbosity));
+  Mela& mela = *melaptr;
+  TVar::VerbosityLevel bkpverbosity = mela.getVerbosity();
+  auto bkpprecision = cout.precision(10);
+  mela.setVerbosity(verbosity);
+  if (verbosity>=TVar::DEBUG) cout << "Mela is initialized" << endl;
+  //mela.resetMCFM_EWKParameters(1.16639E-05, 1./128., 79.9549392, 91.1876, 0.23119);
+
+  int GenLep1Id=0, GenLep2Id=0, GenLep3Id=0, GenLep4Id=0;
+  const int nEntries = 6;
+  double a1_array[nEntries][4] ={
+    { 1365.4973807340846, 10.289826593755228, 25.205694382277809, -1365.2259480507332 },
+    { 238.65751023078761, 9.2808858562825005, 15.827726043466324, -237.95116187061188 },
+    { 101.52463181523598, 27.359569630718468, -0.90299073100241323, -97.764458892691749 },
+    { 22.786181013986834, -0.15136300982222117, -0.90077551414353962, -22.767866345236371 },
+    { 101.67043553688544, 2.1169375132239789, 0.77953005873937187, -101.64540506443268 },
+    { 24.717634703436786, -1.1722249478288802, -5.9599387484197646, -23.959684558009428 }
+  };
+  double a2_array[nEntries][4] ={
+    { 1895.7562628816693, 25.837804322120054, -28.821887970086259, -1895.3610513294620 },
+    { 317.81904277258536, 2.5882005498984775, 21.352807448987718, -317.09037005377883 },
+    { 180.10885677707822, -6.7240759244122792, 35.742176497019194, -176.39865053838915 },
+    { 471.71918486784784, -35.976267906053060, 4.5169691019519895, -470.32360615864354 },
+    { 95.655512770627581, -13.986023919404957, -37.960063551193414, -86.679881365440792 },
+    { 49.137252081251319, -19.463268758477309, -28.879247017597017, -34.664676589120688 }
+  };
+  double l1_array[nEntries][4] ={
+    { 51.374202, 25.924766, 12.290178, 42.616376 },
+    { 51.374202, 25.924766, 12.290178, 42.616376 },
+    { 1365.4973807340846, 10.289826593755228, 25.205694382277809, -1365.2259480507332 }, // Massless
+    { 1365.4973807340846, 10.289826593755228, 25.205694382277809, -1365.2259480507332 }, // Massless
+    { 1365.4973848483, 10.289826593755228, 25.205694382277809, -1365.2259480507332 }, // Muon via E
+    { 1365.4973848483, 10.289826593755228, 25.205694382277809, -1365.2259480507332 } // Muon via E
+  };
+  double l2_array[nEntries][4] ={
+    { 271.875752, 70.427173, -11.138146, 261.769598 },
+    { 21.481452, 9.489680, -9.336587, 16.858699 },
+    { 22.786181013986834, -0.15136300982222117, -0.90077551414353962, -22.767866345236371 },
+    { 471.71918486784784, -35.976267906053060, 4.5169691019519895, -470.32360615864354 },
+    { 22.7864275656, -0.15136300982222117, -0.90077551414353962, -22.767866345236371 },
+    { 471.7191967775, -35.976267906053060, 4.5169691019519895, -470.32360615864354 }
+  };
+  double l3_array[nEntries][4] ={
+    { 75.823478, -16.640412, 23.246999, 70.227220 },
+    { 75.823478, -16.640412, 23.246999, 70.227220 },
+    { 1895.7562628816693, 25.837804322120054, -28.821887970086259, -1895.3610513294620 },
+    { 1895.7562628816693, 25.837804322120054, -28.821887970086259, -1895.3610513294620 },
+    { 1895.7562658451, 25.837804322120054, -28.821887970086259, -1895.3610513294620 },
+    { 1895.7562658451, 25.837804322120054, -28.821887970086259, -1895.3610513294620 }
+  };
+  double l4_array[nEntries][4] ={
+    { 21.481452, 9.489680, -9.336587, 16.858699 },
+    { 271.875752, 70.427173, -11.138146, 261.769598 },
+    { 471.71918486784784, -35.976267906053060, 4.5169691019519895, -470.32360615864354 },
+    { 22.786181013986834, -0.15136300982222117, -0.90077551414353962, -22.767866345236371 },
+    { 471.7191967775, -35.976267906053060, 4.5169691019519895, -470.32360615864354 },
+    { 22.7864275656, -0.15136300982222117, -0.90077551414353962, -22.767866345236371 }
+  };
+
+  // Decay mode does not matter, just use something
+  GenLep1Id=13;
+  GenLep2Id=-13;
+  GenLep3Id=11;
+  GenLep4Id=-11;
+
+  for (int ev = 2; ev < 3; ev++){
+    SimpleParticleCollection_t aparticles;
+    TLorentzVector pAPart[2];
+    pAPart[0].SetXYZT(a1_array[ev][1], a1_array[ev][2], a1_array[ev][3], a1_array[ev][0]);
+    pAPart[1].SetXYZT(a2_array[ev][1], a2_array[ev][2], a2_array[ev][3], a2_array[ev][0]);
+    for (unsigned int iap=0; iap<2; iap++) aparticles.push_back(SimpleParticle_t(0, pAPart[iap])); // q q'
+    for (unsigned int iap=0; iap<2; iap++) aparticles.push_back(SimpleParticle_t((1-2*iap)*13, pAPart[iap])); // l- l+
+    for (unsigned int iap=0; iap<2; iap++) aparticles.push_back(SimpleParticle_t((1-2*iap)*14, pAPart[iap])); // nub nu
+    for (unsigned int iap=0; iap<1; iap++) aparticles.push_back(SimpleParticle_t(22, pAPart[iap])); // gamma
+
+    int idOrdered[4] ={ GenLep1Id, GenLep2Id, GenLep3Id, GenLep4Id };
+    TLorentzVector pOrdered[4];
+    pOrdered[0].SetXYZT(l1_array[ev][1], l1_array[ev][2], l1_array[ev][3], l1_array[ev][0]);
+    pOrdered[1].SetXYZT(l2_array[ev][1], l2_array[ev][2], l2_array[ev][3], l2_array[ev][0]);
+    pOrdered[2].SetXYZT(l3_array[ev][1], l3_array[ev][2], l3_array[ev][3], l3_array[ev][0]);
+    pOrdered[3].SetXYZT(l4_array[ev][1], l4_array[ev][2], l4_array[ev][3], l4_array[ev][0]);
+    SimpleParticleCollection_t daughters;
+    for (unsigned int idau=0; idau<4; idau++) daughters.push_back(SimpleParticle_t(idOrdered[idau], pOrdered[idau]));
+
+    mela.setCandidateDecayMode(TVar::CandidateDecay_ZZ);
+    mela.setInputEvent(&daughters, &aparticles, (SimpleParticleCollection_t*)0, false);
+
+    cout << "*******************************************************" << endl;
+    for (int ic=0; ic<mela.getNCandidates(); ic++){
+      cout << "Summary of candidate " << ic << ":" << endl;
+      mela.setCurrentCandidateFromIndex(ic);
+      TUtil::PrintCandidateSummary(mela.getCurrentCandidate());
+      cout << "*******************************************************" << endl;
+    }
+    cout << "*******************************************************" << endl;
+    cout << endl;
+
+    int cindex;
+    cindex=0;
+    mela.setCurrentCandidateFromIndex(cindex);
+
+    TString strlh[3]={ "leptonic", "hadronic", "photonic" };
+    TString strzwh[3]={ "ZH", "WH", "GammaH" };
+    TVar::Production prod;
+
+    cout << "*******************************************************" << endl;
+    cout << "Computing MEs for ZZ decay" << endl;
+
+    float p0mplus=0;
+    mela.setProcess(TVar::HSMHiggs, TVar::JHUGen, TVar::ZZGG);
+    mela.computeP(p0mplus, useConstants);
+    cout << "p0mplus: " << p0mplus << '\n' << endl;
+
+    float p0g1prime2=0;
+    mela.setProcess(TVar::H0_g1prime2, TVar::JHUGen, TVar::ZZGG);
+    mela.computeP(p0g1prime2, useConstants);
+    cout << "p0g1prime2: " << p0g1prime2 << '\n' << endl;
+
+    float p0hplus=0;
+    mela.setProcess(TVar::H0hplus, TVar::JHUGen, TVar::ZZGG);
+    mela.computeP(p0hplus, useConstants);
+    cout << "p0hplus: " << p0hplus << '\n' << endl;
+
+    float p0minus=0;
+    mela.setProcess(TVar::H0minus, TVar::JHUGen, TVar::ZZGG);
+    mela.computeP(p0minus, useConstants);
+    cout << "p0minus: " << p0minus << '\n' << endl;
+
+    float p0gzgs1prime2=0;
+    mela.setProcess(TVar::H0_Zgsg1prime2, TVar::JHUGen, TVar::ZZGG);
+    mela.computeP(p0gzgs1prime2, useConstants);
+    cout << "p0gzgs1prime2: " << p0gzgs1prime2 << '\n' << endl;
+
+    float p0hpluszgs=0;
+    mela.setProcess(TVar::H0_Zgs, TVar::JHUGen, TVar::ZZGG);
+    mela.computeP(p0hpluszgs, useConstants);
+    cout << "p0hpluszgs: " << p0hpluszgs << '\n' << endl;
+
+    // SelfD MEs
+    float p0mplus_selfD=0;
+    mela.setProcess(TVar::SelfDefine_spin0, TVar::JHUGen, TVar::ZZGG);
+    mela.selfDHggcoupl[0][gHIGGS_GG_2][0]=1;
+    mela.selfDHzzcoupl[0][gHIGGS_VV_1][0]=1;
+    mela.computeP(p0mplus_selfD, useConstants);
+    cout << "p0mplus_selfD: " << p0mplus_selfD << '\n' << endl;
+
+    float p0mplus_selfD_CT=0;
+    mela.setProcess(TVar::SelfDefine_spin0, TVar::JHUGen, TVar::ZZGG);
+    double xw = 0.23119;
+    mela.selfDHggcoupl[0][gHIGGS_GG_2][0]=1;
+    mela.selfDHzpzpcoupl[gHIGGS_VV_1][0]=1;
+    mela.selfDZpffcoupl[gHIGGS_Vp_NuE_left][0]=0.5*2.;
+    mela.selfDZpffcoupl[gHIGGS_Vp_El_left][0]=(-xw*(-1.)-0.5)*2.;
+    mela.selfDZpffcoupl[gHIGGS_Vp_Mu_left][0]=(-xw*(-1.)-0.5)*2.;
+    mela.selfDZpffcoupl[gHIGGS_Vp_Ta_left][0]=(-xw*(-1.)-0.5)*2.;
+    mela.selfDZpffcoupl[gHIGGS_Vp_Dn_left][0]=(-xw*(-1./3.)-0.5)*2.;
+    mela.selfDZpffcoupl[gHIGGS_Vp_Up_left][0]=(-xw*(2./3.)+0.5)*2.;
+    mela.selfDZpffcoupl[gHIGGS_Vp_Str_left][0]=(-xw*(-1./3.)-0.5)*2.;
+    mela.selfDZpffcoupl[gHIGGS_Vp_Chm_left][0]=(-xw*(2./3.)+0.5)*2.;
+    mela.selfDZpffcoupl[gHIGGS_Vp_Bot_left][0]=(-xw*(-1./3.)-0.5)*2.;
+    mela.selfDZpffcoupl[gHIGGS_Vp_El_right][0]=(-xw*(-1.))*2.;
+    mela.selfDZpffcoupl[gHIGGS_Vp_Mu_right][0]=(-xw*(-1.))*2.;
+    mela.selfDZpffcoupl[gHIGGS_Vp_Ta_right][0]=(-xw*(-1.))*2.;
+    mela.selfDZpffcoupl[gHIGGS_Vp_Dn_right][0]=(-xw*(-1./3.))*2.;
+    mela.selfDZpffcoupl[gHIGGS_Vp_Up_right][0]=(-xw*(2./3.))*2.;
+    mela.selfDZpffcoupl[gHIGGS_Vp_Str_right][0]=(-xw*(-1./3.))*2.;
+    mela.selfDZpffcoupl[gHIGGS_Vp_Chm_right][0]=(-xw*(2./3.))*2.;
+    mela.selfDZpffcoupl[gHIGGS_Vp_Bot_right][0]=(-xw*(-1./3.))*2.;
+    mela.selfDM_Zprime=91.1876;
+    mela.selfDGa_Zprime=2.4952;
+    mela.computeP(p0mplus_selfD_CT, useConstants);
+    cout << "p0mplus_selfD_CT: " << p0mplus_selfD_CT << '\n' << endl;
+
+    float p0g1prime2_selfD=0;
+    mela.setProcess(TVar::SelfDefine_spin0, TVar::JHUGen, TVar::ZZGG);
+    mela.selfDHggcoupl[0][gHIGGS_GG_2][0]=1;
+    mela.selfDHzzcoupl[0][gHIGGS_VV_1_PRIME2][0]=1;
+    mela.computeP(p0g1prime2_selfD, useConstants);
+    cout << "p0g1prime2_selfD: " << p0g1prime2_selfD << '\n' << endl;
+
+    float p0hplus_selfD=0;
+    mela.setProcess(TVar::SelfDefine_spin0, TVar::JHUGen, TVar::ZZGG);
+    mela.selfDHggcoupl[0][gHIGGS_GG_2][0]=1;
+    mela.selfDHzzcoupl[0][gHIGGS_VV_2][0]=1;
+    mela.computeP(p0hplus_selfD, useConstants);
+    cout << "p0hplus_selfD: " << p0hplus_selfD << '\n' << endl;
+
+    float p0minus_selfD=0;
+    mela.setProcess(TVar::SelfDefine_spin0, TVar::JHUGen, TVar::ZZGG);
+    mela.selfDHggcoupl[0][gHIGGS_GG_2][0]=1;
+    mela.selfDHzzcoupl[0][gHIGGS_VV_4][0]=1;
+    mela.computeP(p0minus_selfD, useConstants);
+    cout << "p0minus_selfD: " << p0minus_selfD << '\n' << endl;
+
+    float p0gzgs1prime2_selfD=0;
+    mela.setProcess(TVar::SelfDefine_spin0, TVar::JHUGen, TVar::ZZGG);
+    mela.selfDHggcoupl[0][gHIGGS_GG_2][0]=1;
+    mela.selfDHzzcoupl[0][gHIGGS_ZA_1_PRIME2][0]=1;
+    mela.computeP(p0gzgs1prime2_selfD, useConstants);
+    cout << "p0gzgs1prime2_selfD: " << p0gzgs1prime2_selfD << '\n' << endl;
+
+    float p0hpluszgs_selfD=0;
+    mela.setProcess(TVar::SelfDefine_spin0, TVar::JHUGen, TVar::ZZGG);
+    mela.selfDHggcoupl[0][gHIGGS_GG_2][0]=1;
+    mela.selfDHzzcoupl[0][gHIGGS_ZA_2][0]=1;
+    mela.computeP(p0hpluszgs_selfD, useConstants);
+    cout << "p0hpluszgs_selfD: " << p0hpluszgs_selfD << '\n' << endl;
+
+    cout << "*******************************************************" << endl;
+
+    float p2mplus=0;
+    mela.setProcess(TVar::H2_g1g5, TVar::JHUGen, TVar::ZZGG);
+    mela.computeP(p2mplus, useConstants);
+    cout << "p2mplus: " << p2mplus << '\n' << endl;
+
+    float p2bplus=0;
+    mela.setProcess(TVar::H2_g5, TVar::JHUGen, TVar::ZZGG);
+    mela.computeP(p2bplus, useConstants);
+    cout << "p2bplus: " << p2bplus << '\n' << endl;
+
+    float p2mplus_selfD=0;
+    mela.setProcess(TVar::SelfDefine_spin2, TVar::JHUGen, TVar::ZZGG);
+    mela.selfDGggcoupl[gGRAVITON_GG_1][0] = 1;
+    mela.selfDGvvcoupl[gGRAVITON_VV_1][0] = 1;
+    mela.selfDGvvcoupl[gGRAVITON_VV_5][0] = 1;
+    mela.computeP(p2mplus_selfD, useConstants);
+    cout << "p2mplus_selfD: " << p2mplus_selfD << '\n' << endl;
+
+    float p2bplus_selfD=0;
+    mela.setProcess(TVar::SelfDefine_spin2, TVar::JHUGen, TVar::ZZGG);
+    mela.selfDGggcoupl[gGRAVITON_GG_1][0] = 1;
+    mela.selfDGvvcoupl[gGRAVITON_VV_5][0] = 1;
+    mela.computeP(p2bplus_selfD, useConstants);
+    cout << "p2bplus_selfD: " << p2bplus_selfD << '\n' << endl;
+
+    cout << "*******************************************************" << endl;
+
+    float costhetastar = 0, costheta1 = 0, costheta2 = 0, Phi = 0, Phi1 = 0;
+    float costhetastarMELA = 0, costheta1MELA = 0, costheta2MELA = 0, PhiMELA = 0, Phi1MELA = 0, m1MELA = 0, m2MELA = 0, m4lMELA = 0;
+    TUtil::computeAngles(
+      costhetastar,
+      costheta1,
+      costheta2,
+      Phi,
+      Phi1,
+
+      daughters.at(2).second, daughters.at(2).first,
+      daughters.at(3).second, daughters.at(3).first,
+      daughters.at(0).second, daughters.at(0).first,
+      daughters.at(1).second, daughters.at(1).first
+    );
+    mela.computeDecayAngles(
+      m4lMELA,
+      m1MELA,
+      m2MELA,
+      costheta1MELA,
+      costheta2MELA,
+      PhiMELA,
+      costhetastarMELA,
+      Phi1MELA
+    );
+
+    cout << "TUtil decay angles: " << costheta1 << " " << costheta2 << " " << Phi << " " << costhetastar << " " << Phi1 << endl;
+    cout << "MELA decay angles: " << costheta1MELA << " " << costheta2MELA << " " << PhiMELA << " " << costhetastarMELA << " " << Phi1MELA << endl;
+    cout << "MELA masses: " << m4lMELA << " " << m1MELA << " " << m2MELA << endl;
+
+    mela.resetInputEvent();
+  }
+
+  cout.rdbuf(coutbuf);
+  tout.close();
+  mela.setVerbosity(bkpverbosity);
+  cout.precision(bkpprecision);
 }
 
 void testME_VBF_JHUGen_Ping(int erg_tev=13, bool useConstants=false, shared_ptr<Mela> melaptr=nullptr){
