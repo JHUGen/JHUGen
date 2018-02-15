@@ -192,26 +192,26 @@ const std::vector<MELATopCandidate*>& MELACandidate::getAssociatedTops()const{ r
 
 std::vector<MELAParticle*> MELACandidate::getAssociatedSortedVs(){
   std::vector<MELAParticle*> res;
-  std::vector<MELAParticle*>::iterator itBegin;
   std::vector<MELAParticle*>::iterator itEnd=sortedVs.end();
+  std::vector<MELAParticle*>::iterator itBegin=itEnd;
   for (std::vector<MELAParticle*>::iterator it=sortedVs.begin(); it!=itEnd; it++){
     bool doSkip=false;
     for (auto const& dau:sortedDaughters){ if ((*it)->hasDaughter(dau)){ doSkip=true; break; } }
     if (!doSkip){ itBegin=it; break; }
   }
-  std::copy(itBegin, itEnd, std::back_inserter(res));
+  if (itBegin!=itEnd) std::copy(itBegin, itEnd, std::back_inserter(res));
   return res;
 }
 std::vector<MELAParticle*> MELACandidate::getAssociatedSortedVs()const{
   std::vector<MELAParticle*> res;
-  std::vector<MELAParticle*>::const_iterator itBegin;
   std::vector<MELAParticle*>::const_iterator itEnd=sortedVs.cend();
+  std::vector<MELAParticle*>::const_iterator itBegin=itEnd;
   for (std::vector<MELAParticle*>::const_iterator it=sortedVs.cbegin(); it!=itEnd; it++){
     bool doSkip=false;
     for (auto const& dau:sortedDaughters){ if ((*it)->hasDaughter(dau)){ doSkip=true; break; } }
     if (!doSkip){ itBegin=it; break; }
   }
-  std::copy(itBegin, itEnd, std::back_inserter(res));
+  if (itBegin!=itEnd) std::copy(itBegin, itEnd, std::back_inserter(res));
   return res;
 }
 
