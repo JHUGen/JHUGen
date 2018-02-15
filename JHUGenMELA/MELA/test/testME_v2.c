@@ -1605,35 +1605,6 @@ void testME_Dec_JHUGen_Ping(int erg_tev=13, bool useConstants=false, shared_ptr<
     mela.computeP(p0hpluszgs_selfD, useConstants);
     cout << "p0hpluszgs_selfD: " << p0hpluszgs_selfD << '\n' << endl;
 
-    cout << "*******************************************************" << endl;
-
-    float p2mplus=0;
-    mela.setProcess(TVar::H2_g1g5, TVar::JHUGen, TVar::ZZGG);
-    mela.computeP(p2mplus, useConstants);
-    cout << "p2mplus: " << p2mplus << '\n' << endl;
-
-    float p2bplus=0;
-    mela.setProcess(TVar::H2_g5, TVar::JHUGen, TVar::ZZGG);
-    mela.computeP(p2bplus, useConstants);
-    cout << "p2bplus: " << p2bplus << '\n' << endl;
-
-    float p2mplus_selfD=0;
-    mela.setProcess(TVar::SelfDefine_spin2, TVar::JHUGen, TVar::ZZGG);
-    mela.selfDGggcoupl[gGRAVITON_GG_1][0] = 1;
-    mela.selfDGvvcoupl[gGRAVITON_VV_1][0] = 1;
-    mela.selfDGvvcoupl[gGRAVITON_VV_5][0] = 1;
-    mela.computeP(p2mplus_selfD, useConstants);
-    cout << "p2mplus_selfD: " << p2mplus_selfD << '\n' << endl;
-
-    float p2bplus_selfD=0;
-    mela.setProcess(TVar::SelfDefine_spin2, TVar::JHUGen, TVar::ZZGG);
-    mela.selfDGggcoupl[gGRAVITON_GG_1][0] = 1;
-    mela.selfDGvvcoupl[gGRAVITON_VV_5][0] = 1;
-    mela.computeP(p2bplus_selfD, useConstants);
-    cout << "p2bplus_selfD: " << p2bplus_selfD << '\n' << endl;
-
-    cout << "*******************************************************" << endl;
-
     float costhetastar = 0, costheta1 = 0, costheta2 = 0, Phi = 0, Phi1 = 0;
     float costhetastarMELA = 0, costheta1MELA = 0, costheta2MELA = 0, PhiMELA = 0, Phi1MELA = 0, m1MELA = 0, m2MELA = 0, m4lMELA = 0;
     TUtil::computeAngles(
