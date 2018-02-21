@@ -65,6 +65,11 @@ mZprime("mZprime", "mZprime", this, (RooAbsReal&)*(_parameters.mZprime)),
 gamZprime("gamZprime", "gamZprime", this, (RooAbsReal&)*(_parameters.gamZprime)),
 Sin2ThetaW("Sin2ThetaW", "Sin2ThetaW", this, (RooAbsReal&)*(_parameters.Sin2ThetaW)),
 vev("vev", "vev", this, (RooAbsReal&)*(_parameters.vev)),
+gVprimeff_decay1_left("gVprimeff_decay1_left", "gVprimeff_decay1_left", this, (RooAbsReal&)*(_parameters.gVprimeff_decay1_left)),
+gVprimeff_decay1_right("gVprimeff_decay1_right", "gVprimeff_decay1_right", this, (RooAbsReal&)*(_parameters.gVprimeff_decay1_right)),
+gVprimeff_decay2_left("gVprimeff_decay2_left", "gVprimeff_decay2_left", this, (RooAbsReal&)*(_parameters.gVprimeff_decay2_left)),
+gVprimeff_decay2_right("gVprimeff_decay2_right", "gVprimeff_decay2_right", this, (RooAbsReal&)*(_parameters.gVprimeff_decay2_right)),
+
 
 Vdecay1(_Vdecay1), Vdecay2(_Vdecay2),
 intCodeStart(1),
@@ -99,6 +104,10 @@ RooSpin::RooSpin(const RooSpin& other, const char* name) :
   gamZprime("gamZprime", this, other.gamZprime),
   Sin2ThetaW("Sin2ThetaW", this, other.Sin2ThetaW),
   vev("vev", this, other.vev),
+  gVprimeff_decay1_left("gVprimeff_decay1_left", this, other.gVprimeff_decay1_left),
+  gVprimeff_decay1_right("gVprimeff_decay1_right", this, other.gVprimeff_decay1_right),
+  gVprimeff_decay2_left("gVprimeff_decay2_left", this, other.gVprimeff_decay2_left),
+  gVprimeff_decay2_right("gVprimeff_decay2_right", this, other.gVprimeff_decay2_right),
 
   Vdecay1(other.Vdecay1), Vdecay2(other.Vdecay2),
   intCodeStart(other.intCodeStart),
@@ -325,9 +334,9 @@ void RooSpin::calculateVprimeffGVGA(Double_t& gV, Double_t& gA, int whichVprime/
 void RooSpin::calculateVprimeffR1R2(Double_t& R1Val, Double_t& R2Val) const{
   R1Val=0; R2Val=0;
   Double_t gV1=0, gV2=0, gA1=0, gA2=0;
-  calculateVprimeffGVGA(gV1, gA1, Vdecay1);
+  calculateVprimeffGVGA(gV1, gA1, 1);
   if (gV1!=0. || gA1!=0.) R1Val = 2.*gV1*gA1/(pow(gV1, 2) + pow(gA1, 2));
-  calculateVprimeffGVGA(gV2, gA2, Vdecay2);
+  calculateVprimeffGVGA(gV2, gA2, 2);
   if (gV2!=0. || gA2!=0.) R2Val = 2.*gV2*gA2/(pow(gV2, 2) + pow(gA2, 2));
 }
 void RooSpin::getMVprimeGamVprime(Double_t* mV, Double_t* gamV)const{
