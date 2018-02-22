@@ -68,14 +68,15 @@ class LHEEvent_StableHiggs(LHEEvent):
     daughters, mothers, associated = [], [], []
     for line in lines:
       id, status, mother1, mother2 = (int(_) for _ in line.split()[0:4])
-      ids.append(id)
       if (1 <= abs(id) <= 6 or abs(id) == 21) and not isgen:
         line = line.replace(str(id), "0", 1)  #replace the first instance of the jet id with 0, which means unknown jet
       if status == -1 and isgen:
         mothers.append(line)
       if id == 25:
+        if status != 1:
+          raise ValueError("Higgs has status {}, expected it to be 1\n\n".format(status) + "\n".join(lines))
         daughters.append(line)
-      if id in (0, 1, 2, 3, 4, 5, 11, 12, 13, 14, 15, 16) and status == 1:
+      if abs(id) in (0, 1, 2, 3, 4, 5, 11, 12, 13, 14, 15, 16) and status == 1:
         associated.append(line)
 
     if len(daughters) != 1:
@@ -157,7 +158,11 @@ class LHEFileBase(object):
             pass
 
   def _setInputEvent(self, event):
-    self.setInputEvent(*self.lheeventclass(event, self.isgen))
+    lheevent = self.lheeventclass(event, self.isgen)
+    self.daughters = lheevent.daughters
+    self.associated = lheevent.associated
+    self.mothers = lheevent.mothers
+    self.setInputEvent(*lheevent)
 
   @classmethod
   def _LHEclassattributes(cls):
