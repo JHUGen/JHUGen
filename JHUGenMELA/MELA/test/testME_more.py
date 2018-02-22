@@ -111,7 +111,7 @@ class TestMela(unittest.TestCase):
     computeP = m.computeProdP if isprod else m.computeP
 
     ghz1, ghz1_prime2, ghzgs1_prime2 = random.uniform(-1, 1), random.uniform(-10000, 10000), random.uniform(-10000, 10000)
-    m.setInputEvent_fromLHE(event, True)
+    m.setInputEvent_fromLHE_Hwithdecay(event, True)
 
     m.setProcess(*setprocessargs)
     m.ghz1 = ghz1
@@ -201,7 +201,7 @@ class TestMela(unittest.TestCase):
 
     m = self.m
     computeP = m.computeProdP if isprod else m.computeP
-    m.setInputEvent_fromLHE(event, True)
+    m.setInputEvent_fromLHE_Hwithdecay(event, True)
 
     m.setProcess(*setprocessargs)
     for coupling, value in couplings.iteritems():
@@ -256,7 +256,7 @@ class TestMela(unittest.TestCase):
 
   def runmultiplecalls(self, event):
     m = self.m
-    m.setInputEvent_fromLHE(event, False)
+    m.setInputEvent_fromLHE_Hwithdecay(event, False)
 
     firstrun = []
     secondrun = []
@@ -284,7 +284,7 @@ class TestMela(unittest.TestCase):
 
       m.setProcess(TVar.SelfDefine_spin0, TVar.JHUGen, TVar.ZZINDEPENDENT)
       m.ghzzp1 = ezp_El_left = 1
-      lst.append(m.computeProdP(True))
+      lst.append(m.computeP(True))
       lst.append(m.getConstant())
 
     self.assertEquals(firstrun, secondrun)

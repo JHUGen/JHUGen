@@ -23,13 +23,14 @@ SimpleParticle_t and SimpleParticleCollection_t are implemented to take inputs i
 ...                                         #...other daughters
 ...                                        ])
 
-There's also a function for convenience
->>> m.setInputEvent_fromLHE('''
+There are also a few functions for convenience
+>>> m.setInputEvent_fromLHE_Hwithdecay( #or _StableHiggs or _JHUGenVBFVH, or _JHUGenttH
+... '''
 ... <event>
 ... #(...)
 ... </event>
 ... ''')
-which is useful for quick tests.
+which are useful for quick tests.
 
 See examples at the bottom.
 """
@@ -241,43 +242,22 @@ class Mela(object):
     else:
       super(Mela, self).__setattr__(name, value)
 
-  def setInputEvent_fromLHE(self, event, isgen):
-    lines = event.split("\n")
-    lines = [line for line in lines if not ("<event>" in line or "</event>" in line or not line.split("#")[0].strip())]
-    nparticles, _, _, _, _, _ = lines[0].split()
-    nparticles = int(nparticles)
-    if nparticles != len(lines)-1:
-      raise ValueError("Wrong number of particles! Should be {}, have {}".replace(nparticles, len(lines)-1))
-    daughters, mothers, associated = [], [], []
-    ids = [None]
-    mother1s = [None]
-    mother2s = [None]
-    for line in lines[1:]:
-      id, status, mother1, mother2 = (int(_) for _ in line.split()[0:4])
-      ids.append(id)
-      mother1s.append(mother1)
-      mother2s.append(mother2)
-      if (1 <= abs(id) <= 6 or abs(id) == 21) and not isgen:
-        line = line.replace(str(id), "0", 1)  #replace the first instance of the jet id with 0, which means unknown jet
-      if status == -1:
-        mothers.append(line)
-      elif status == 1 and (1 <= abs(id) <= 6 or 11 <= abs(id) <= 16 or abs(id) in (21, 22)):
-        while True:
-          if mother1 != mother2 or mother1 is None:
-            associated.append(line)
-            break
-          if ids[mother1] in (25, 39):
-            daughters.append(line)
-            break
-          mother2 = mother2s[mother1]
-          mother1 = mother1s[mother1]
-    #print "mothers"
-    #for _ in mothers: print _
-    #print "daughters"
-    #for _ in daughters: print _
-    #print "associated"
-    #for _ in associated: print _
-    self.setInputEvent(SimpleParticleCollection_t(daughters), SimpleParticleCollection_t(associated), SimpleParticleCollection_t(mothers), isgen)
+  def setInputEvent_fromLHE_Hwithdecay(self, event, isgen=False):
+    "For any LHE event that writes H (id=25 or 39) explicitly and decays it"
+    from lhefile import LHEEvent_Hwithdecay
+    self.setInputEvent(*LHEEvent_Hwithdecay(event, isgen))
+  def setInputEvent_fromLHE_StableHiggs(self, event, isgen=False):
+    "For any LHE event that writes H (id=25) explicitly and doesn't decay it"
+    from lhefile import LHEEvent_StableHiggs
+    self.setInputEvent(*LHEEvent_StableHiggs(event, isgen))
+  def setInputEvent_fromLHE_JHUGenVBFVH(self, event, isgen=False):
+    "For undecayed JHUGen VBF and VH (same as StableHiggs, but insists on exactly 2 associated particles)"
+    from lhefile import LHEEvent_JHUGenVBFVH
+    self.setInputEvent(*LHEEvent_JHUGenVBFVH(event, isgen))
+  def setInputEvent_fromLHE_JHUGenttH(self, event, isgen=False):
+    "For undecayed JHUGen ttH (same as StableHiggs, but insists on exactly 6 associated particles)"
+    from lhefile import LHEEvent_JHUGenttH
+    self.setInputEvent(*LHEEvent_JHUGenttH(event, isgen))
 
   def getPAux(self): return ROOT.getPAux(self.__mela)
 
@@ -729,7 +709,7 @@ if __name__ == "__main__":
                   True,
                  )
   #or:
-  #m.setInputEvent_fromLHE(event1)
+  #m.setInputEvent_fromLHE_Hwithdecay(event1)
 
   couplings = (
                (1, 0, 0, 0),

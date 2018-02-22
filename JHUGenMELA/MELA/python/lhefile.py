@@ -1,4 +1,5 @@
 import abc
+import collections
 import re
 
 if __name__ == "__main__":
@@ -13,7 +14,86 @@ if __name__ == "__main__":
 
 import ROOT
 
-from mela import Mela, SimpleParticleCollection_t
+from mela import Mela, SimpleParticle_t, SimpleParticleCollection_t
+
+InputEvent = collections.namedtuple("InputEvent", "daughters associated mothers isgen")
+
+class LHEEvent(InputEvent):
+  __metaclass__ = abc.ABCMeta
+  def __new__(cls, event, isgen):
+    lines = event.split("\n")
+    lines = [line for line in lines if not ("<event>" in line or "</event>" in line or not line.split("#")[0].strip())]
+    nparticles, _, _, _, _, _ = lines[0].split()
+    nparticles = int(nparticles)
+    if nparticles != len(lines)-1:
+      raise ValueError("Wrong number of particles! Should be {}, have {}".replace(nparticles, len(lines)-1))
+    daughters, associated, mothers = (SimpleParticleCollection_t(_) for _ in cls.extracteventparticles(lines[1:], isgen))
+    return super(LHEEvent, cls).__new__(cls, daughters, associated, mothers, isgen)
+
+  @abc.abstractmethod
+  def extracteventparticles(cls, lines, isgen): "has to be a classmethod that returns daughters, associated, mothers"
+
+class LHEEvent_Hwithdecay(LHEEvent):
+  @classmethod
+  def extracteventparticles(cls, lines, isgen):
+    daughters, mothers, associated = [], [], []
+    ids = [None]
+    mother1s = [None]
+    mother2s = [None]
+    for line in lines:
+      id, status, mother1, mother2 = (int(_) for _ in line.split()[0:4])
+      ids.append(id)
+      if (1 <= abs(id) <= 6 or abs(id) == 21) and not isgen:
+        line = line.replace(str(id), "0", 1)  #replace the first instance of the jet id with 0, which means unknown jet
+      mother1s.append(mother1)
+      mother2s.append(mother2)
+      if status == -1 and isgen:
+        mothers.append(line)
+      elif status == 1 and (1 <= abs(id) <= 6 or 11 <= abs(id) <= 16 or abs(id) in (21, 22)):
+        while True:
+          if mother1 != mother2 or mother1 is None:
+            associated.append(line)
+            break
+          if ids[mother1] in (25, 39):
+            daughters.append(line)
+            break
+          mother2 = mother2s[mother1]
+          mother1 = mother1s[mother1]
+
+    return daughters, associated, mothers
+
+class LHEEvent_StableHiggs(LHEEvent):
+  @classmethod
+  def extracteventparticles(cls, lines, isgen):
+    daughters, mothers, associated = [], [], []
+    for line in lines:
+      id, status, mother1, mother2 = (int(_) for _ in line.split()[0:4])
+      ids.append(id)
+      if (1 <= abs(id) <= 6 or abs(id) == 21) and not isgen:
+        line = line.replace(str(id), "0", 1)  #replace the first instance of the jet id with 0, which means unknown jet
+      if status == -1 and isgen:
+        mothers.append(line)
+      if id == 25:
+        daughters.append(line)
+      if id in (0, 1, 2, 3, 4, 5, 11, 12, 13, 14, 15, 16) and status == 1:
+        associated.append(line)
+
+    if len(daughters) != 1:
+      raise ValueError("More than one H in the event??\n\n"+"\n".join(lines))
+    if cls.nassociatedparticles is not None and len(associated) != cls.nassociatedparticles:
+      raise ValueError("Wrong number of associated particles (expected {}, found {})\n\n".format(cls.nassociatedparticles, len(associated))+"\n".join(lines))
+    if len(mothers) != 2 and isgen:
+      raise ValueError("{} mothers in the event??\n\n".format(len(mothers))+"\n".join(lines))
+
+    return daughters, associated, mothers
+
+  nassociatedparticles = None
+
+class LHEEvent_JHUGenVBFVH(LHEEvent_StableHiggs):
+  nassociatedparticles = 2
+
+class LHEEvent_JHUGenttH(LHEEvent_StableHiggs):
+  nassociatedparticles = 6
 
 class LHEFileBase(object):
   """
@@ -76,12 +156,12 @@ class LHEFileBase(object):
           except:
             pass
 
-  @abc.abstractmethod
-  def _setInputEvent(self, event): pass
+  def _setInputEvent(self, event):
+    self.setInputEvent(*self.lheeventclass(event, self.isgen))
 
   @classmethod
   def _LHEclassattributes(cls):
-    return "filename", "f", "mela", "isgen"
+    return "filename", "f", "mela", "isgen", "daughters", "mothers", "associated"
 
   def __getattr__(self, attr):
     if attr == "mela": raise RuntimeError("Something is wrong, trying to access mela before it's created")
@@ -93,43 +173,13 @@ class LHEFileBase(object):
       setattr(self.mela, attr, value)
 
 class LHEFile_Hwithdecay(LHEFileBase):
-  def _setInputEvent(self, event):
-    self.mela.setInputEvent_fromLHE(event, self.isgen)
-
+  lheeventclass = LHEEvent_Hwithdecay
+class LHEFile_StableHiggs(LHEFileBase):
+  lheeventclass = LHEEvent_StableHiggs
 class LHEFile_JHUGenVBFVH(LHEFileBase):
-  def _setInputEvent(self, event):
-    self.ids = [int(line.split()[0]) for line in event.strip().split("\n")[2:-1]]
-    if not self.isgen:
-      event = re.sub("^( *-?)([12345]|21) ", r"\g<1>0 ", event, flags=re.MULTILINE)
-    particles = event.strip().split("\n")[2:-1]  #remove the first 2 lines, <event> and event info, and the last line, </event>
-    self.daughters = SimpleParticleCollection_t([particle for particle in particles if int(particle.split()[0]) == 25])
-    self.associated = SimpleParticleCollection_t([particle for particle in particles
-                             if abs(int(particle.split()[0])) in (0, 1, 2, 3, 4, 5, 11, 12, 13, 14, 15, 16)
-                             and int(particle.split()[1]) == 1])
-    self.mothers = SimpleParticleCollection_t([particle for particle in particles if int(particle.split()[1]) == -1])
-    assert len(self.daughters) == 1 and len(self.associated) == len(self.mothers) == 2
-    self.mela.setInputEvent(self.daughters, self.associated, self.mothers, self.isgen)
-  @classmethod
-  def _LHEclassattributes(cls):
-    return super(LHEFile_JHUGenVBFVH, cls)._LHEclassattributes() + ("daughters", "mothers", "associated", "ids")
-
+  lheeventclass = LHEEvent_JHUGenVBFVH
 class LHEFile_JHUGenttH(LHEFileBase):
-  def _setInputEvent(self, event):
-    self.ids = [int(line.split()[0]) for line in event.strip().split("\n")[2:-1]]
-    if not self.isgen:
-      event = re.sub("^( *-?)([12345]|21) ", r"\g<1>0 ", event, flags=re.MULTILINE)
-    particles = event.strip().split("\n")[2:-1]  #remove the first 2 lines, <event> and event info, and the last line, </event>
-    self.daughters = SimpleParticleCollection_t([particle for particle in particles if int(particle.split()[0]) == 25])
-    self.associated = SimpleParticleCollection_t([particle for particle in particles
-                             if abs(int(particle.split()[0])) in (0, 1, 2, 3, 4, 5, 11, 12, 13, 14, 15, 16)
-                             and int(particle.split()[1]) == 1])
-    self.mothers = SimpleParticleCollection_t([particle for particle in particles if int(particle.split()[1]) == -1])
-    assert len(self.daughters) == 1 and len(self.associated) == 6 and len(self.mothers) == 2
-    self.mela.setInputEvent(self.daughters, self.associated, self.mothers, self.isgen)
-  @classmethod
-  def _LHEclassattributes(cls):
-    return super(LHEFile_JHUGenttH, cls)._LHEclassattributes() + ("daughters", "mothers", "associated", "ids")
-
+  lheeventclass = LHEEvent_JHUGenttH
 
 if __name__ == '__main__':
   class TestLHEFiles(unittest.TestCase):
