@@ -39,16 +39,26 @@ using namespace RooFit;
 
 TString inputdir_7TeV = "/work-zfs/lhc/ianderso/hep/CJLST/140519/PRODFSR";
 TString inputdir_8TeV = "/work-zfs/lhc/ianderso/hep/CJLST/140519b/PRODFSR_8TeV";
-TString inputdir_13TeV = "/work-zfs/lhc/CJLSTtrees/180121";
+TString inputdir_13TeV = "/work-zfs/lhc/CJLSTtrees/180214_2016MC";
 
 
 template<typename T> void addByLowest(std::vector<T>& valArray, T val, bool unique){
   bool inserted = false;
-  for (typename std::vector<T>::iterator it = valArray.begin(); it<valArray.end(); it++){
-    if (*it>val || (!unique && *it==val)){
-      inserted=true;
-      valArray.insert(it, val);
-      break;
+  if (unique){
+    for (typename std::vector<T>::iterator it = valArray.begin(); it<valArray.end(); it++){
+      if (*it==val){
+        inserted=true;
+        break;
+      }
+    }
+  }
+  if (!inserted){
+    for (typename std::vector<T>::iterator it = valArray.begin(); it<valArray.end(); it++){
+      if (*it>=val){
+        inserted=true;
+        valArray.insert(it, val);
+        break;
+      }
     }
   }
   if (!inserted) valArray.push_back(val);
@@ -296,6 +306,7 @@ vector<TString> constructSamplesList(TString strsample, float sqrts){
       samples.push_back("VBFH130");
       samples.push_back("VBFH135");
       samples.push_back("VBFH140");
+      samples.push_back("VBFH145");
       samples.push_back("VBFH150");
       samples.push_back("VBFH155");
       samples.push_back("VBFH160");
@@ -304,6 +315,7 @@ vector<TString> constructSamplesList(TString strsample, float sqrts){
       samples.push_back("VBFH175");
       samples.push_back("VBFH180");
       samples.push_back("VBFH190");
+      samples.push_back("VBFH200");
       samples.push_back("VBFH210");
       samples.push_back("VBFH230");
       samples.push_back("VBFH250");
@@ -320,6 +332,7 @@ vector<TString> constructSamplesList(TString strsample, float sqrts){
       samples.push_back("VBFH800");
       samples.push_back("VBFH900");
       samples.push_back("VBFH1000");
+      samples.push_back("VBFH1500");
       samples.push_back("VBFH2000");
       samples.push_back("VBFH2500");
       samples.push_back("VBFH3000");
@@ -348,6 +361,7 @@ vector<TString> constructSamplesList(TString strsample, float sqrts){
       samples.push_back("WminusH130");
       samples.push_back("WminusH135");
       samples.push_back("WminusH140");
+      samples.push_back("WminusH145");
       samples.push_back("WminusH150");
       samples.push_back("WminusH155");
       samples.push_back("WminusH160");
@@ -356,6 +370,7 @@ vector<TString> constructSamplesList(TString strsample, float sqrts){
       samples.push_back("WminusH175");
       samples.push_back("WminusH180");
       samples.push_back("WminusH190");
+      samples.push_back("WminusH200");
       samples.push_back("WminusH210");
       samples.push_back("WminusH230");
       samples.push_back("WminusH250");
@@ -372,6 +387,7 @@ vector<TString> constructSamplesList(TString strsample, float sqrts){
       samples.push_back("WminusH800");
       samples.push_back("WminusH900");
       samples.push_back("WminusH1000");
+      samples.push_back("WminusH1500");
       samples.push_back("WminusH2000");
       samples.push_back("WminusH2500");
       samples.push_back("WminusH3000");
@@ -383,6 +399,7 @@ vector<TString> constructSamplesList(TString strsample, float sqrts){
       samples.push_back("WplusH130");
       samples.push_back("WplusH135");
       samples.push_back("WplusH140");
+      samples.push_back("WplusH145");
       samples.push_back("WplusH150");
       samples.push_back("WplusH155");
       samples.push_back("WplusH160");
@@ -391,6 +408,7 @@ vector<TString> constructSamplesList(TString strsample, float sqrts){
       samples.push_back("WplusH175");
       samples.push_back("WplusH180");
       samples.push_back("WplusH190");
+      samples.push_back("WplusH200");
       samples.push_back("WplusH210");
       samples.push_back("WplusH230");
       samples.push_back("WplusH250");
@@ -407,6 +425,7 @@ vector<TString> constructSamplesList(TString strsample, float sqrts){
       samples.push_back("WplusH800");
       samples.push_back("WplusH900");
       samples.push_back("WplusH1000");
+      samples.push_back("WplusH1500");
       samples.push_back("WplusH2000");
       samples.push_back("WplusH2500");
       samples.push_back("WplusH3000");
@@ -435,6 +454,7 @@ vector<TString> constructSamplesList(TString strsample, float sqrts){
       samples.push_back("ZH130");
       samples.push_back("ZH135");
       samples.push_back("ZH140");
+      samples.push_back("ZH145");
       samples.push_back("ZH150");
       samples.push_back("ZH155");
       samples.push_back("ZH160");
@@ -443,6 +463,7 @@ vector<TString> constructSamplesList(TString strsample, float sqrts){
       samples.push_back("ZH175");
       samples.push_back("ZH180");
       samples.push_back("ZH190");
+      samples.push_back("ZH200");
       samples.push_back("ZH210");
       samples.push_back("ZH230");
       samples.push_back("ZH250");
@@ -459,6 +480,7 @@ vector<TString> constructSamplesList(TString strsample, float sqrts){
       samples.push_back("ZH800");
       samples.push_back("ZH900");
       samples.push_back("ZH1000");
+      samples.push_back("ZH1500");
       samples.push_back("ZH2000");
       samples.push_back("ZH2500");
       samples.push_back("ZH3000");
@@ -512,6 +534,7 @@ vector<TString> constructSamplesList(TString strsample, float sqrts){
       samples.push_back("ggH126");
       samples.push_back("ggH130");
       samples.push_back("ggH135");
+      samples.push_back("ggH140");
       samples.push_back("ggH145");
       samples.push_back("ggH150");
       samples.push_back("ggH155");
@@ -6802,6 +6825,25 @@ TSpline3* convertTSpline5ToTspline3(TSpline5* sp){
 }
 
 /* SPECIFIC COMMENT: Get a1 and a2 as well as a TF1 object for the formula a0+a1*exp(x) */
+TF1* getFcn_a0(TSpline3* sp, double xmin, double xmax, bool useLowBound){
+  double x, y, s;
+  if (useLowBound) x = sp->GetXmin();
+  else x = sp->GetXmax();
+  y = sp->Eval(x);
+
+  double a0;
+  a0 = y;
+
+  TString fcnName;
+  if (useLowBound) fcnName = Form("lowFcn_%s", sp->GetName());
+  else fcnName = Form("highFcn_%s", sp->GetName());
+  TF1* fcn = new TF1(fcnName, "[0]", xmin, xmax);
+  fcn->SetParameter(0, a0);
+
+  return fcn;
+}
+
+/* SPECIFIC COMMENT: Get a1 and a2 as well as a TF1 object for the formula a0+a1*exp(x) */
 TF1* getFcn_a0plusa1expX(TSpline3* sp, double xmin, double xmax, bool useLowBound){
   double x, y, s;
   if (useLowBound) x = sp->GetXmin();
@@ -7272,7 +7314,10 @@ TGraphErrors* removePointsBetween(TGraphErrors* tgSlice, double xmin, double xma
   double xexyey[4][nbins_slice];
   unsigned int ctr=0;
   for (unsigned int iy=0; iy<nbins_slice; iy++){
-    if (xexyey_slice[0][iy]<=xmax && xexyey_slice[0][iy]>=xmin) continue;
+    if (xexyey_slice[0][iy]<=xmax && xexyey_slice[0][iy]>=xmin){
+      cout << "Point to remove with X: " << xexyey_slice[0][iy] << endl;
+      continue;
+    }
     for (unsigned int ix=0; ix<4; ix++) xexyey[ix][ctr] = xexyey_slice[ix][iy];
     cout << "Point " << ctr << " X: " << xexyey[0][ctr] << endl;
     ctr++;
@@ -7325,6 +7370,51 @@ TGraphErrors* replacePointsBetween(TGraphErrors* tgSlice, double xmin, double xm
   tgSlice_new->SetName(tgSlice->GetName());
   tgSlice_new->SetTitle(tgSlice->GetTitle());
   return tgSlice_new;
+}
+
+void addPoint(TGraphErrors*& tg, double x, double y, double ex, double ey){
+  TString strname = tg->GetName();
+  TString strtitle = tg->GetTitle();
+  TString strxtitle = tg->GetXaxis()->GetTitle();
+  TString strytitle = tg->GetYaxis()->GetTitle();
+
+  vector<double> xarray;
+  vector<double> yarray;
+  vector<double> exarray;
+  vector<double> eyarray;
+  xarray.push_back(x);
+  yarray.push_back(y);
+  exarray.push_back(ex);
+  eyarray.push_back(ey);
+  for (int ip=0; ip<tg->GetN(); ip++){
+    if (tg->GetX()[ip]!=x){
+      xarray.push_back(tg->GetX()[ip]);
+      yarray.push_back(tg->GetY()[ip]);
+      exarray.push_back(tg->GetEX()[ip]);
+      eyarray.push_back(tg->GetEY()[ip]);
+    }
+  }
+  vector<pair<double, int>> xorder;
+  for (unsigned int ip=0; ip<xarray.size(); ip++) addByLowest<double, int>(xorder, xarray.at(ip), ip);
+
+  double* xynew[4];
+  for (unsigned int i=0; i<4; i++) xynew[i] = new double[xorder.size()];
+  for (unsigned int ip=0; ip<xarray.size(); ip++){
+    unsigned int pos = xorder[ip].second;
+    xynew[0][ip] = xarray[pos];
+    xynew[1][ip] = yarray[pos];
+    xynew[2][ip] = exarray[pos];
+    xynew[3][ip] = eyarray[pos];
+  }
+
+  delete tg;
+
+  tg = new TGraphErrors(xorder.size(), xynew[0], xynew[1], xynew[2], xynew[3]);
+  tg->SetName(strname);
+  tg->SetTitle(strtitle);
+  tg->GetXaxis()->SetTitle(strxtitle);
+  tg->GetYaxis()->SetTitle(strytitle);
+  for (unsigned int i=0; i<4; i++) delete[] xynew[i];
 }
 
 TGraphErrors* addPoint(TGraphErrors* tgSlice, double x){
@@ -7400,6 +7490,92 @@ TGraphErrors* addPointAfterBin(TGraphErrors* tgSlice, int abin){
   return tgSlice_new;
 }
 
+struct PointRedivision{
+  unsigned int npoints;
+  double xlow;
+  double xhigh;
+  PointRedivision(unsigned int n, double xl, double xh) : npoints(n), xlow(xl), xhigh(xh){}
+};
+
+void rebinAverageME(
+  TGraphErrors*& tg, TTree*& tree, TProfile*& pmass,
+  PointRedivision& rediv,
+  float& ZZMass, float& mesq, float& weight
+){
+  cout << "Old set of boundaries: " << endl;
+  for (int ibin=1; ibin<=pmass->GetNbinsX()+1; ibin++) cout << pmass->GetXaxis()->GetBinLowEdge(ibin) << " ";
+  cout << endl;
+
+  int binlow=pmass->GetXaxis()->FindBin(rediv.xlow);
+  int binhigh=pmass->GetXaxis()->FindBin(rediv.xhigh);
+  float redivlow, redivhigh;
+  if (binlow==0) binlow=1; redivlow=pmass->GetXaxis()->GetBinLowEdge(binlow);
+  if (binhigh==0) binhigh=1; redivhigh=pmass->GetXaxis()->GetBinUpEdge(binhigh);
+  cout << "Rebinning between " << redivlow << " and " << redivhigh << endl;
+
+  vector<float> massvals;
+  for (int ev=0; ev<tree->GetEntries(); ev++){
+    tree->GetEntry(ev);
+    if (ZZMass<redivlow || ZZMass>=redivhigh) continue;
+    massvals.push_back(ZZMass);
+  }
+  std::sort(massvals.begin(), massvals.end());
+  cout << massvals.size() << " events in this range" << endl;
+  vector<float> xboundaries;
+  unsigned int nevts_collected=massvals.size();
+  addByLowest(xboundaries, redivlow, true);
+  addByLowest(xboundaries, redivhigh, true);
+  for (unsigned int ip=1; ip<rediv.npoints; ip++) addByLowest(xboundaries, float((massvals.at(nevts_collected/rediv.npoints*ip) + massvals.at(nevts_collected/rediv.npoints*ip+1))*0.5), true);
+  cout << "Additional x boundaries: ";
+  for (unsigned int ip=0; ip<xboundaries.size(); ip++) cout << xboundaries.at(ip) << " ";
+  cout << endl;
+
+  TProfile* hvar = new TProfile("mass", "", rediv.npoints, xboundaries.data()); hvar->Sumw2();
+  TProfile* hmesq = new TProfile("mesq", "", rediv.npoints, xboundaries.data()); hmesq->Sumw2();
+  for (int ev=0; ev<tree->GetEntries(); ev++){
+    tree->GetEntry(ev);
+    if (ZZMass<redivlow || ZZMass>=redivhigh) continue;
+    hvar->Fill(ZZMass, ZZMass, weight);
+    hmesq->Fill(ZZMass, mesq, weight);
+  }
+
+  { TGraphErrors* tgnew = removePointsBetween(tg, redivlow, redivhigh); delete tg; tg=tgnew; }
+  for (int ibin=1; ibin<=hvar->GetNbinsX(); ibin++){
+    double xadd=hvar->GetBinContent(ibin);
+    double exadd=hvar->GetBinError(ibin);
+    double yadd=hmesq->GetBinContent(ibin);
+    double eyadd=hmesq->GetBinError(ibin);
+    eyadd=log10(eyadd)/yadd;
+    yadd=log10(yadd);
+    addPoint(tg, xadd, yadd, exadd, eyadd);
+    cout << "Added point " << xadd << ", " << yadd << " for range [ " << hvar->GetXaxis()->GetBinLowEdge(ibin) << ", " << hvar->GetXaxis()->GetBinUpEdge(ibin) << " ]" << endl;
+  }
+  delete hmesq;
+  delete hvar;
+
+  TString pmassname=pmass->GetName();
+  TString pmasstitle=pmass->GetTitle();
+  TString pmassxtitle=pmass->GetXaxis()->GetTitle();
+  TString pmassytitle=pmass->GetYaxis()->GetTitle();
+  vector<float> pmassboundaries;
+  for (int ibin=1; ibin<=pmass->GetNbinsX()+1; ibin++){
+    if (ibin>=binlow && ibin<=binhigh+1) continue;
+    addByLowest(pmassboundaries, float(pmass->GetXaxis()->GetBinLowEdge(ibin)), true);
+  }
+  for (float& bb:xboundaries) addByLowest(pmassboundaries, bb, true);
+  assert((int) pmassboundaries.size()==tg->GetN()+1);
+  delete pmass;
+  pmass = new TProfile(pmassname, pmasstitle, pmassboundaries.size()-1, pmassboundaries.data());
+  for (int ibin=1; ibin<=tg->GetN(); ibin++){
+    pmass->SetBinContent(ibin, tg->GetX()[ibin-1]);
+    pmass->SetBinError(ibin, tg->GetEX()[ibin-1]);
+  }
+
+  cout << "New set of boundaries: " << endl;
+  for (int ibin=1; ibin<=pmass->GetNbinsX()+1; ibin++) cout << pmass->GetXaxis()->GetBinLowEdge(ibin) << " ";
+  cout << endl;
+}
+
 
 /* SPECIFIC COMMENT: NONE */
 void generic_PAvgSmoothProducer(
@@ -7407,8 +7583,10 @@ void generic_PAvgSmoothProducer(
   TF1* (*lowf)(TSpline3*, double, double, bool),
   TF1* (*highf)(TSpline3*, double, double, bool),
   int sqrts=-1,
-  bool useFaithfulSlopes=false
-  ){
+  bool useFaithfulLowSlopes=false,
+  bool useFaithfulHighSlopes=false,
+  vector<PointRedivision>* redivision=nullptr
+){
   TString strme = MatrixElementName(me);
   TString strprod = ProductionName(prod);
   TString strproc = ProcessName(proc);
@@ -7425,14 +7603,34 @@ void generic_PAvgSmoothProducer(
     "tg_P_MomentumToEnergy"
   };
   const double xmin=0;
-  const double xmax=(sqrts>0 ? (double)sqrts*1000. : 15000.);
+  const double xmax=(sqrts>0 ? (double) sqrts*1000. : 15000.);
 
   for (unsigned int ig=0; ig<ngraphs; ig++){
     finput->cd();
-    TGraphErrors* tg = 0;
-    tg = (TGraphErrors*)finput->Get(strtg[ig]);
-    if (tg==0){ cerr << strtg[ig] << " does not exist." << endl; continue; }
-    foutput->cd();
+    TGraphErrors* tgin = 0;
+    tgin = (TGraphErrors*) finput->Get(strtg[ig]);
+    if (tgin==0){ cerr << strtg[ig] << " does not exist." << endl; continue; }
+    TGraphErrors* tg = new TGraphErrors(*tgin);
+    if (redivision){
+      TTree* tree = (TTree*) finput->Get("FinalTree");
+      if (!tree) cerr << "Final tree does not exist, so cannot apply redivision" << endl;
+      else{
+        float ZZMass, weight, mesq;
+        tree->SetBranchAddress("ZZMass", &ZZMass);
+        tree->SetBranchAddress("weight", &weight);
+        if (ig==0) tree->SetBranchAddress("mesq_conserveDifermMass", &mesq);
+        else tree->SetBranchAddress("mesq_jetPtoEScale", &mesq);
+        TProfile* pmass = (TProfile*) finput->Get("candMass");
+        for (PointRedivision& rediv:*redivision){
+          rebinAverageME(
+            tg, tree, pmass,
+            rediv,
+            ZZMass, mesq, weight
+          );
+        }
+      }
+    }
+
     foutput->WriteTObject(tg);
 
     int n = tg->GetN();
@@ -7441,15 +7639,13 @@ void generic_PAvgSmoothProducer(
     double* yy = tg->GetY();
     double* ey = tg->GetEY();
 
-    TSpline3* sp;
-    if (!useFaithfulSlopes) sp = convertGraphToSpline3(tg);
-    else sp = convertGraphToSpline3_FaithfulSlopes(tg);
+    TSpline3* sp = convertGraphToSpline3_FaithfulSlopes(tg, (double*)nullptr, (double*)nullptr, useFaithfulLowSlopes, useFaithfulHighSlopes);
     double tglow = xx[0];
     double tghigh = xx[tg->GetN()-1];
     TF1* lowFcn = lowf(sp, xmin, tglow, true);
     TF1* highFcn = highf(sp, tghigh, xmax, false);
-    lowFcn->SetNpx((int)(tglow-xmin)*5);
-    highFcn->SetNpx((int)(xmax-tghigh)*5);
+    lowFcn->SetNpx((int) (tglow-xmin)*5);
+    highFcn->SetNpx((int) (xmax-tghigh)*5);
 
     vector<pair<double, double>> points;
     for (double xval=xmin; xval<tglow; xval+=1){
@@ -7459,8 +7655,8 @@ void generic_PAvgSmoothProducer(
     for (int ix=0; ix<n; ix++){
       addByLowest<double, double>(points, xx[ix], yy[ix]);
     }
-    int tghigh_int = ((int)((tghigh+1.)/100.+0.5))*100;
-    if (tghigh>=(double)tghigh_int) tghigh_int+=100;
+    int tghigh_int = ((int) ((tghigh+1.)/100.+0.5))*100;
+    if (tghigh>=(double) tghigh_int) tghigh_int+=100;
     for (double xval=tghigh_int; xval<=xmax; xval+=100){
       double yval = highFcn->Eval(xval);
       addByLowest<double, double>(points, xval, yval);
@@ -7501,6 +7697,7 @@ void generic_PAvgSmoothProducer(
     delete sp;
     delete tg_updated;
     for (unsigned int i=0; i<2; i++) delete[] xy_new[i];
+    delete tg;
   }
   foutput->Close();
   finput->Close();
@@ -7513,7 +7710,8 @@ void generic_PAvgSmoothProducer_withDecay(
   TF1* (*highf)(TSpline3*, double, double, bool),
   int sqrts=-1,
   bool useFaithfulLowSlopes=false,
-  bool useFaithfulHighSlopes=false
+  bool useFaithfulHighSlopes=false,
+  vector<PointRedivision>* redivision=nullptr
   ){
   TString strme = MatrixElementName(me);
   TString strprod = ProductionName(prod);
@@ -7536,9 +7734,35 @@ void generic_PAvgSmoothProducer_withDecay(
 
   for (unsigned int ig=0; ig<ngraphs; ig++){
     finput->cd();
-    TGraphErrors* tg = 0;
-    tg = (TGraphErrors*)finput->Get(strtg[ig]);
-    if (tg==0){ cerr << strtg[ig] << " does not exist." << endl; continue; }
+    TGraphErrors* tgin = 0;
+    tgin = (TGraphErrors*) finput->Get(strtg[ig]);
+    if (tgin==0){ cerr << strtg[ig] << " does not exist." << endl; continue; }
+    TGraphErrors* tg = new TGraphErrors(*tgin);
+    if (redivision){
+      TTree* tree;
+      if (ig==0) tree = (TTree*) finput->Get("FinalTree_4mu");
+      else if (ig==1) tree = (TTree*) finput->Get("FinalTree_4e");
+      else tree = (TTree*) finput->Get("FinalTree_2mu2e");
+      if (!tree) cerr << "Final tree does not exist, so cannot apply redivision" << endl;
+      else{
+        float ZZMass, weight, mesq;
+        tree->SetBranchAddress("ZZMass", &ZZMass);
+        tree->SetBranchAddress("weight", &weight);
+        tree->SetBranchAddress("mesq_conserveDifermMass", &mesq);
+        TProfile* pmass;
+        if (ig==0) pmass = (TProfile*) finput->Get("candMass_4mu");
+        else if (ig==1) pmass = (TProfile*) finput->Get("candMass_4e");
+        else pmass = (TProfile*) finput->Get("candMass_2mu2e");
+        for (PointRedivision& rediv:*redivision){
+          rebinAverageME(
+            tg, tree, pmass,
+            rediv,
+            ZZMass, mesq, weight
+          );
+        }
+      }
+    }
+
     foutput->cd();
     foutput->WriteTObject(tg);
 
@@ -7606,6 +7830,7 @@ void generic_PAvgSmoothProducer_withDecay(
     delete sp;
     delete tg_updated;
     for (unsigned int i=0; i<2; i++) delete[] xy_new[i];
+    delete tg;
   }
   foutput->Close();
   finput->Close();
@@ -7617,7 +7842,8 @@ void generic_PAvgSmoothProducer_withDecay(
   TString strpatchpath, TString strpatchname,
   TGraph* (*lowpatcher)(TSpline3*, TSpline3*, double, double, bool, bool),
   TGraph* (*highpatcher)(TSpline3*, TSpline3*, double, double, bool, bool),
-  int sqrts=-1
+  int sqrts=-1,
+  vector<PointRedivision>* redivision=nullptr
   ){
   TString strme = MatrixElementName(me);
   TString strprod = ProductionName(prod);
@@ -7645,9 +7871,35 @@ void generic_PAvgSmoothProducer_withDecay(
 
   for (unsigned int ig=0; ig<ngraphs; ig++){
     finput->cd();
-    TGraphErrors* tg = 0;
-    tg = (TGraphErrors*)finput->Get(strtg[ig]);
-    if (tg==0){ cerr << strtg[ig] << " does not exist." << endl; continue; }
+    TGraphErrors* tgin = 0;
+    tgin = (TGraphErrors*) finput->Get(strtg[ig]);
+    if (tgin==0){ cerr << strtg[ig] << " does not exist." << endl; continue; }
+    TGraphErrors* tg = new TGraphErrors(*tgin);
+    if (redivision){
+      TTree* tree;
+      if (ig==0) tree = (TTree*) finput->Get("FinalTree_4mu");
+      else if (ig==1) tree = (TTree*) finput->Get("FinalTree_4e");
+      else tree = (TTree*) finput->Get("FinalTree_2mu2e");
+      if (!tree) cerr << "Final tree does not exist, so cannot apply redivision" << endl;
+      else{
+        float ZZMass, weight, mesq;
+        tree->SetBranchAddress("ZZMass", &ZZMass);
+        tree->SetBranchAddress("weight", &weight);
+        tree->SetBranchAddress("mesq_conserveDifermMass", &mesq);
+        TProfile* pmass;
+        if (ig==0) pmass = (TProfile*) finput->Get("candMass_4mu");
+        else if (ig==1) pmass = (TProfile*) finput->Get("candMass_4e");
+        else pmass = (TProfile*) finput->Get("candMass_2mu2e");
+        for (PointRedivision& rediv:*redivision){
+          rebinAverageME(
+            tg, tree, pmass,
+            rediv,
+            ZZMass, mesq, weight
+          );
+        }
+      }
+    }
+
     foutput->cd();
     foutput->WriteTObject(tg);
 
@@ -7722,6 +7974,7 @@ void generic_PAvgSmoothProducer_withDecay(
     delete sp;
     delete tg_updated;
     for (unsigned int i=0; i<2; i++) delete[] xy_new[i];
+    delete tg;
   }
 
   delete sppatch;
@@ -7736,7 +7989,8 @@ void generic_PAvgSmoothProducer_withDecay(
   TString strpatchpath2, TString strpatchname2,
   TGraph* (*lowpatcher)(TSpline3*, TSpline3*, double, double, bool, bool),
   TGraph* (*highpatcher)(TSpline3*, TSpline3*, double, double, bool, bool),
-  int sqrts=-1
+  int sqrts=-1,
+  vector<PointRedivision>* redivision=nullptr
   ){
   TString strme = MatrixElementName(me);
   TString strprod = ProductionName(prod);
@@ -7768,9 +8022,35 @@ void generic_PAvgSmoothProducer_withDecay(
 
   for (unsigned int ig=0; ig<ngraphs; ig++){
     finput->cd();
-    TGraphErrors* tg = 0;
-    tg = (TGraphErrors*)finput->Get(strtg[ig]);
-    if (tg==0){ cerr << strtg[ig] << " does not exist." << endl; continue; }
+    TGraphErrors* tgin = 0;
+    tgin = (TGraphErrors*) finput->Get(strtg[ig]);
+    if (tgin==0){ cerr << strtg[ig] << " does not exist." << endl; continue; }
+    TGraphErrors* tg = new TGraphErrors(*tgin);
+    if (redivision){
+      TTree* tree;
+      if (ig==0) tree = (TTree*) finput->Get("FinalTree_4mu");
+      else if (ig==1) tree = (TTree*) finput->Get("FinalTree_4e");
+      else tree = (TTree*) finput->Get("FinalTree_2mu2e");
+      if (!tree) cerr << "Final tree does not exist, so cannot apply redivision" << endl;
+      else{
+        float ZZMass, weight, mesq;
+        tree->SetBranchAddress("ZZMass", &ZZMass);
+        tree->SetBranchAddress("weight", &weight);
+        tree->SetBranchAddress("mesq_conserveDifermMass", &mesq);
+        TProfile* pmass;
+        if (ig==0) pmass = (TProfile*) finput->Get("candMass_4mu");
+        else if (ig==1) pmass = (TProfile*) finput->Get("candMass_4e");
+        else pmass = (TProfile*) finput->Get("candMass_2mu2e");
+        for (PointRedivision& rediv:*redivision){
+          rebinAverageME(
+            tg, tree, pmass,
+            rediv,
+            ZZMass, mesq, weight
+          );
+        }
+      }
+    }
+
     foutput->cd();
     foutput->WriteTObject(tg);
 
@@ -7847,6 +8127,7 @@ void generic_PAvgSmoothProducer_withDecay(
     delete sp;
     delete tg_updated;
     for (unsigned int i=0; i<2; i++) delete[] xy_new[i];
+    delete tg;
   }
 
   delete sppatch2;
@@ -7863,7 +8144,8 @@ void generic_PAvgSmoothProducer_withDecay(
   TString strpatchpath, TString strpatchname,
   TF1* (*lowf)(TSpline3*, double, double, bool),
   TGraph* (*highpatcher)(TSpline3*, TSpline3*, double, double, bool, bool),
-  int sqrts=-1
+  int sqrts=-1,
+  vector<PointRedivision>* redivision=nullptr
   ){
   TString strme = MatrixElementName(me);
   TString strprod = ProductionName(prod);
@@ -7891,9 +8173,35 @@ void generic_PAvgSmoothProducer_withDecay(
 
   for (unsigned int ig=0; ig<ngraphs; ig++){
     finput->cd();
-    TGraphErrors* tg = 0;
-    tg = (TGraphErrors*)finput->Get(strtg[ig]);
-    if (tg==0){ cerr << strtg[ig] << " does not exist." << endl; continue; }
+    TGraphErrors* tgin = 0;
+    tgin = (TGraphErrors*) finput->Get(strtg[ig]);
+    if (tgin==0){ cerr << strtg[ig] << " does not exist." << endl; continue; }
+    TGraphErrors* tg = new TGraphErrors(*tgin);
+    if (redivision){
+      TTree* tree;
+      if (ig==0) tree = (TTree*) finput->Get("FinalTree_4mu");
+      else if (ig==1) tree = (TTree*) finput->Get("FinalTree_4e");
+      else tree = (TTree*) finput->Get("FinalTree_2mu2e");
+      if (!tree) cerr << "Final tree does not exist, so cannot apply redivision" << endl;
+      else{
+        float ZZMass, weight, mesq;
+        tree->SetBranchAddress("ZZMass", &ZZMass);
+        tree->SetBranchAddress("weight", &weight);
+        tree->SetBranchAddress("mesq_conserveDifermMass", &mesq);
+        TProfile* pmass;
+        if (ig==0) pmass = (TProfile*) finput->Get("candMass_4mu");
+        else if (ig==1) pmass = (TProfile*) finput->Get("candMass_4e");
+        else pmass = (TProfile*) finput->Get("candMass_2mu2e");
+        for (PointRedivision& rediv:*redivision){
+          rebinAverageME(
+            tg, tree, pmass,
+            rediv,
+            ZZMass, mesq, weight
+          );
+        }
+      }
+    }
+
     foutput->cd();
     foutput->WriteTObject(tg);
 
@@ -7967,6 +8275,7 @@ void generic_PAvgSmoothProducer_withDecay(
     delete sp;
     delete tg_updated;
     for (unsigned int i=0; i<2; i++) delete[] xy_new[i];
+    delete tg;
   }
 
   delete sppatch;
@@ -7980,7 +8289,8 @@ void generic_PAvgSmoothProducer_withDecay(
   TString strpatchpath, TString strpatchname,
   TGraph* (*lowpatcher)(TSpline3*, TSpline3*, double, double, bool, bool),
   TF1* (*highf)(TSpline3*, double, double, bool),
-  int sqrts=-1
+  int sqrts=-1,
+  vector<PointRedivision>* redivision=nullptr
   ){
   TString strme = MatrixElementName(me);
   TString strprod = ProductionName(prod);
@@ -8008,9 +8318,35 @@ void generic_PAvgSmoothProducer_withDecay(
 
   for (unsigned int ig=0; ig<ngraphs; ig++){
     finput->cd();
-    TGraphErrors* tg = 0;
-    tg = (TGraphErrors*)finput->Get(strtg[ig]);
-    if (tg==0){ cerr << strtg[ig] << " does not exist." << endl; continue; }
+    TGraphErrors* tgin = 0;
+    tgin = (TGraphErrors*) finput->Get(strtg[ig]);
+    if (tgin==0){ cerr << strtg[ig] << " does not exist." << endl; continue; }
+    TGraphErrors* tg = new TGraphErrors(*tgin);
+    if (redivision){
+      TTree* tree;
+      if (ig==0) tree = (TTree*) finput->Get("FinalTree_4mu");
+      else if (ig==1) tree = (TTree*) finput->Get("FinalTree_4e");
+      else tree = (TTree*) finput->Get("FinalTree_2mu2e");
+      if (!tree) cerr << "Final tree does not exist, so cannot apply redivision" << endl;
+      else{
+        float ZZMass, weight, mesq;
+        tree->SetBranchAddress("ZZMass", &ZZMass);
+        tree->SetBranchAddress("weight", &weight);
+        tree->SetBranchAddress("mesq_conserveDifermMass", &mesq);
+        TProfile* pmass;
+        if (ig==0) pmass = (TProfile*) finput->Get("candMass_4mu");
+        else if (ig==1) pmass = (TProfile*) finput->Get("candMass_4e");
+        else pmass = (TProfile*) finput->Get("candMass_2mu2e");
+        for (PointRedivision& rediv:*redivision){
+          rebinAverageME(
+            tg, tree, pmass,
+            rediv,
+            ZZMass, mesq, weight
+          );
+        }
+      }
+    }
+
     foutput->cd();
     foutput->WriteTObject(tg);
 
@@ -8084,6 +8420,7 @@ void generic_PAvgSmoothProducer_withDecay(
     delete sp;
     delete tg_updated;
     for (unsigned int i=0; i<2; i++) delete[] xy_new[i];
+    delete tg;
   }
 
   delete sppatch;
@@ -8199,12 +8536,18 @@ void produce_PAvgSmooth_JHUGen_HadVH_HSMHiggs(TString strprod, int sqrts=13){
   }
   TVar::MatrixElement me = TVar::JHUGen;
   TVar::Process proc = TVar::HSMHiggs;
+  vector<PointRedivision> redivs;
+  redivs.emplace_back(2, 90, 90);
+  redivs.emplace_back(2, 90, 90);
+  redivs.emplace_back(2, 90, 90);
+  redivs.emplace_back(4, 1600, 3000);
   generic_PAvgSmoothProducer(
     me, prod, proc,
-    &getFcn_a0plusa1timesX,
+    &getFcn_a0plusa1expX,
     &getFcn_a0plusa1overX,
     sqrts,
-    false
+    false, false,
+    &redivs
     );
 }
 
@@ -8283,12 +8626,30 @@ void produce_PAvgSmooth_MCFM_JJPROD_S_HSMHiggs(TString strprod, int sqrts=13){
   //  &getPatch_a0plusa1overX,
   //  sqrts
   //  );
+  vector<PointRedivision> redivs;
+  if (prod==TVar::Had_ZH_S || prod==TVar::Had_WH_S){
+    redivs.emplace_back(2, 90, 90);
+    redivs.emplace_back(2, 90, 90);
+    redivs.emplace_back(2, 90, 90);
+
+    redivs.emplace_back(4, 1600, 3000);
+
+    vector<float> redivmultiplesA{ 192.072, 210.622, 243.901, 272.591, 331.305, 392.596, 449.076, 504.783, 565.813, 640.583, 729.157, 822.262, 945.274 };
+    vector<float> redivmultiplesB{ 195.798, 215.901, 249.163, 286.182, 346.839, 406.022, 464.092, 522.738, 588.661, 672.415, 764.014, 862.423, 1015.89 };
+    for (unsigned int irm=0; irm<redivmultiplesA.size()-1; irm++){
+      if (prod==TVar::Had_ZH_S && (irm==0 || irm==2)) continue;
+      float xlow=std::max(redivmultiplesA.at(irm), redivmultiplesB.at(irm))+1e-2;
+      float xhigh=std::min(redivmultiplesA.at(irm+1), redivmultiplesB.at(irm+1))-1e-2;
+      redivs.emplace_back(1, xlow, xhigh);
+    }
+  }
   generic_PAvgSmoothProducer_withDecay(
     me, prod, proc,
     &getFcn_a0plusa1timesX,
     &getFcn_a0plusa1overX,
     sqrts,
-    true, false
+    true, false,
+    &redivs
   );
 }
 
@@ -8297,29 +8658,40 @@ void produce_PAvgSmooth_MCFM_JJPROD_bkgZZ(TString strprod, int sqrts=13){
   if (!(strprod == "Had_ZH" || strprod == "Had_WH" || strprod == "JJVBF")) return;
 
   TVar::Production prod;
-  for (int iprod=(int)TVar::JJVBF; iprod<(int)TVar::nProductions; iprod++){
+  for (int iprod=(int) TVar::JJVBF; iprod<(int) TVar::nProductions; iprod++){
     prod = (TVar::Production)iprod;
     if (TVar::ProductionName(prod)==strprod) break;
   }
   TVar::MatrixElement me = TVar::MCFM;
   TVar::Process proc = TVar::bkgZZ;
   if (prod!=TVar::JJVBF){
+    vector<PointRedivision> redivs;
+    redivs.emplace_back(2, 90, 90);
+    redivs.emplace_back(2, 90, 90);
+    redivs.emplace_back(2, 90, 90);
+    if (prod==TVar::Had_ZH) redivs.emplace_back(5, 125.3, 170);
+    else{
+      redivs.emplace_back(1, 105, 118);
+      redivs.emplace_back(1, 120, 125);
+    }
     generic_PAvgSmoothProducer_withDecay(
       me, prod, proc,
       //"../data/pAvgLinToLog_ANALYTICAL_ZZQQB_bkgZZ.root", "tg_anaPdfInt",
       &getFcn_a0plusa1timesX,
       &getFcn_a0plusa1overX,
       sqrts,
-      true, false
-      );
+      true, false,
+      &redivs
+    );
   }
   else{
     generic_PAvgSmoothProducer_withDecay(
       me, prod, proc,
       &getFcn_a0plusa1timesX,
       &getFcn_a0plusa1timesX,
-      sqrts
-      );
+      sqrts,
+      false, false
+    );
   }
 }
 
