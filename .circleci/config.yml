@@ -78,7 +78,15 @@ jobs:
               ./bootstrap.sh &&
               (./b2 || true)
             fi
-      - run: cd JHUGenMELA/MELA/ && ./setup.sh
+      - run:
+          name: compile mela
+          command: |
+            cd JHUGenMELA/MELA/
+            ./setup.sh
+            #this is needed because cmsenv happens in $BASH_ENV,
+            #so $SCRAM_ARCH is overwritten for MELA/COLLIER/setup.sh
+            #after being set in MELA/setup.sh
+            mv data/$SCRAM_ARCH/libcollier.so data/slc6_amd64_gcc530/libcollier.so
       - save_cache:
           key: v2_boost_1_61_0
           paths: ~/boost_1_61_0
@@ -90,6 +98,7 @@ jobs:
             - JHUGenerator
             - JHUGenMELA
             - Manual
+            - .git
 
   generator_reference:
     <<: *env
@@ -152,9 +161,10 @@ jobs:
       - run:
           name: "download reference lhes"
           command: |
-            exitstatus=0 &&
-            mkdir reference compare_to_reference && cd reference &&
-            JHUGEN_VERSION=$(grep -i JHUGen_Version ~/JHUGen/JHUGenerator/mod_Parameters.F90 | sed -r ''s|.*"(.*)".*|\1|g'') &&
+            exitstatus=0
+            mkdir reference
+            cd reference
+            JHUGEN_VERSION=$(grep -i JHUGen_Version ~/JHUGen/JHUGenerator/mod_Parameters.F90 | sed -r ''s|.*"(.*)".*|\1|g'')
             for filename in $REFERENCE_FILENAMES; do
               wget "https://circleci.com/api/v1/project/$REFERENCE_LHES_USERNAME/JHUGen/$REFERENCE_LHES_BUILD_NUMBER/"'artifacts/0/$CIRCLE_ARTIFACTS/reference/'$filename &&
               sed -i -r "s/(Output from the JHUGenerator )$REFERENCE_JHUGEN_VERSION/\1$JHUGEN_VERSION/" $filename ||
@@ -179,7 +189,7 @@ jobs:
               echo $filename
               echo "================"
               echo
-              sdiff -s reference/$filename compare_to_reference/$filename && echo "no change" || (
+              sdiff -s reference/$filename compare_to_reference/$filename && echo "no change" || {
                 exitstatus=1
                 touch ~/reference_check/reference_failed
                 if [ $filename == $REFERENCE_FILENAME_GGH ]; then
@@ -188,7 +198,7 @@ jobs:
                 if [ $filename == $REFERENCE_FILENAME_VBF ] || [ $filename == $REFERENCE_FILENAME_HJJ ]; then
                   touch ~/reference_check/reference_failed_VBF
                 fi
-              )
+              }
             done
             exit $exitstatus
       - run:
@@ -217,7 +227,6 @@ jobs:
           key: v1_boost_1_61_0
       - run: mkdir -p $LHEDIR/
 
-      - run: ./JHUGen PDFSet=3 VegasNc0=100000 ghzgs2=1,0 DecayMode1=0 DecayMode2=7 ReadLHE=$LHEDIR/tH_all.lhe DataFile=$LHEDIR/tH_all_Zgamma.lhe
       #gg/qqbar -> spin0/1/2
       - run: ./JHUGen PDFSet=3 Process=0  VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/spin0_Zgamma     DecayMode1=9  DecayMode2=7 ghzgs2=1,0
       - run: ./JHUGen PDFSet=3 Process=0  VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/spin0_gammagamma DecayMode1=7  DecayMode2=7 ghgsgs2=1,0
@@ -516,7 +525,7 @@ jobs:
             commandlineconfigstartline=$(grep -n "[{]Command line configuration[}]" Manual/manJHUGenerator.tex | head -1 | sed "s/:.*//") &&
             startline=$(expr $(tail -n +$commandlineconfigstartline Manual/manJHUGenerator.tex | grep -n "begin[{]verbatim[}]" | head -1 | sed "s/:.*//") + $commandlineconfigstartline) &&
             endline=$(expr $(tail -n +$commandlineconfigstartline Manual/manJHUGenerator.tex | grep -n "end[{]verbatim[}]" | head -1 | sed "s/:.*//") + $commandlineconfigstartline - 2) &&
-            sdiff -sb <(grep "^  " README) <(sed -n "${startline},${endline}p" Manual/manJHUGenerator.tex | sed "s/See below/See manual/")
+            sdiff -sb <(grep "^  " JHUGenerator/README) <(sed -n "${startline},${endline}p" Manual/manJHUGenerator.tex | sed "s/See below/See manual/")
             when: always
       - run:
           name: "check sync between README and ./JHUGen help"
@@ -529,19 +538,19 @@ jobs:
             exitstatus=0
             for a in $(grep -i 'call *ReadCommandLineArgument' JHUGenerator/main.F90 | grep -v '!undocumented' | sed -r 's/.*"(.*)".*/\1/'); do
               if ! grep -q $a Manual/manJHUGenerator.tex &&
-                 ! grep -q ${a/w/z} ../Manual/manJHUGenerator.tex &&      #ghw*, etc. are mentioned collectively
-                 ! grep -q ${a/2z/z} ../Manual/manJHUGenerator.tex &&     #second resonance couplings are too
-                 ! grep -q ${a/zzp/z} ../Manual/manJHUGenerator.tex &&    #same for contact terms
-                 ! grep -q ${a/zpzp/z} ../Manual/manJHUGenerator.tex &&   #same for contact terms
-                 ! grep -q ${a/zpgs/zgs} ../Manual/manJHUGenerator.tex && #same for contact terms
-                 ! grep -q ${a/wwp/z} ../Manual/manJHUGenerator.tex &&    #same for contact terms
-                 ! grep -q ${a/wpwp/z} ../Manual/manJHUGenerator.tex &&   #same for contact terms
-                 ! grep -q ${a/zzp/} ../Manual/manJHUGenerator.tex &&     #spin 2 contact terms
-                 ! grep -q ${a/zpzp/} ../Manual/manJHUGenerator.tex &&    #spin 2 contact terms
-                 ! grep -q ${a/2gsgs/gsgs} ../Manual/manJHUGenerator.tex &&
-                 ! grep -q ${a/Lambda2/Lambda} ../Manual/manJHUGenerator.tex &&
-                 ! grep -q ${a/2w/z} ../Manual/manJHUGenerator.tex &&
-                 ! grep -q ${a/Lambda2_w/Lambda_z} ../Manual/manJHUGenerator.tex
+                 ! grep -q ${a/w/z} Manual/manJHUGenerator.tex &&      #ghw*, etc. are mentioned collectively
+                 ! grep -q ${a/2z/z} Manual/manJHUGenerator.tex &&     #second resonance couplings are too
+                 ! grep -q ${a/zzp/z} Manual/manJHUGenerator.tex &&    #same for contact terms
+                 ! grep -q ${a/zpzp/z} Manual/manJHUGenerator.tex &&   #same for contact terms
+                 ! grep -q ${a/zpgs/zgs} Manual/manJHUGenerator.tex && #same for contact terms
+                 ! grep -q ${a/wwp/z} Manual/manJHUGenerator.tex &&    #same for contact terms
+                 ! grep -q ${a/wpwp/z} Manual/manJHUGenerator.tex &&   #same for contact terms
+                 ! grep -q ${a/zzp/} Manual/manJHUGenerator.tex &&     #spin 2 contact terms
+                 ! grep -q ${a/zpzp/} Manual/manJHUGenerator.tex &&    #spin 2 contact terms
+                 ! grep -q ${a/2gsgs/gsgs} Manual/manJHUGenerator.tex &&
+                 ! grep -q ${a/Lambda2/Lambda} Manual/manJHUGenerator.tex &&
+                 ! grep -q ${a/2w/z} Manual/manJHUGenerator.tex &&
+                 ! grep -q ${a/Lambda2_w/Lambda_z} Manual/manJHUGenerator.tex
               then
                 echo "$a is undocumented!"
                 exitstatus=1
@@ -602,7 +611,7 @@ jobs:
 
 workflows:
   version: 2
-  build-test-and-deploy:
+  all-tests:
     jobs:
       - build
       - generator_reference:
