@@ -4764,7 +4764,7 @@ double TUtil::HJJMatEl(
               ){
               __modhiggsjj_MOD_evalamp_sbfh_unsymm_sa_select_exact(p4, &isel, &jsel, &ssel, &rsel, &msq_tmp);
               MatElsq[jsel+5][isel+5] += msq_tmp; // Assign only those that match gen. info, if present at all.
-              if (verbosity >= TVar::DEBUG_VERBOSE) MELAout << "Channel (isel, jsel, rsel, ssel)=" << isel << ", " << jsel << ", " << rsel << ", " << ssel << '\t' <<  msq_tmp << endl;
+              if (verbosity >= TVar::DEBUG_VERBOSE) MELAout << "Channel (isel, jsel, rsel, ssel)=" << isel << ", " << jsel << ", " << ssel << ", " << rsel << '\t' <<  msq_tmp << endl;
             }
           }
           else{ // gg->gg
@@ -4797,7 +4797,7 @@ double TUtil::HJJMatEl(
             ){
             __modhiggsjj_MOD_evalamp_sbfh_unsymm_sa_select_exact(p4, &isel, &jsel, &ssel, &rsel, &msq_tmp);
             MatElsq[jsel+5][isel+5] += msq_tmp; // Assign only those that match gen. info, if present at all.
-            if (verbosity >= TVar::DEBUG_VERBOSE) MELAout << "Channel (isel, jsel, rsel, ssel)=" << isel << ", " << jsel << ", " << rsel << ", " << ssel << '\t' <<  msq_tmp << endl;
+            if (verbosity >= TVar::DEBUG_VERBOSE) MELAout << "Channel (isel, jsel, rsel, ssel)=" << isel << ", " << jsel << ", " << ssel << ", " << rsel << '\t' <<  msq_tmp << endl;
           }
         }
         else if ((isel>0 && jsel<0) || (isel<0 && jsel>0)){ // qQb/qbQ->?
@@ -4818,22 +4818,30 @@ double TUtil::HJJMatEl(
             else{ rsel=2; ssel=-2; }
             // The amplitude is aready multiplied by nf-1, so no need to calculate everything (nf-1) times.
             if (
-              (partonIsUnknown[2] || MYIDUP_tmp[2]==rsel)
-              &&
-              (partonIsUnknown[3] || MYIDUP_tmp[3]==ssel)
+              (partonIsUnknown[2] && partonIsUnknown[3])
+              ||
+              (partonIsUnknown[2] && std::abs(MYIDUP_tmp[3])!=std::abs(isel) && MYIDUP_tmp[3]<0)
+              ||
+              (std::abs(MYIDUP_tmp[2])!=std::abs(isel) && MYIDUP_tmp[2]>0 && partonIsUnknown[3])
+              ||
+              (std::abs(MYIDUP_tmp[2])!=std::abs(isel) && MYIDUP_tmp[2]==-MYIDUP_tmp[3] && MYIDUP_tmp[2]>0)
               ){
               __modhiggsjj_MOD_evalamp_sbfh_unsymm_sa_select_exact(p4, &isel, &jsel, &rsel, &ssel, &msq_tmp);
               MatElsq[jsel+5][isel+5] += msq_tmp; // Assign only those that match gen. info, if present at all.
               if (verbosity >= TVar::DEBUG_VERBOSE) MELAout << "Channel (isel, jsel, rsel, ssel)=" << isel << ", " << jsel << ", " << rsel << ", " << ssel << '\t' <<  msq_tmp << endl;
             }
             if (
-              (partonIsUnknown[2] || MYIDUP_tmp[2]==ssel)
-              &&
-              (partonIsUnknown[3] || MYIDUP_tmp[3]==rsel)
+              (partonIsUnknown[2] && partonIsUnknown[3])
+              ||
+              (partonIsUnknown[2] && std::abs(MYIDUP_tmp[3])!=std::abs(isel) && MYIDUP_tmp[3]>0)
+              ||
+              (std::abs(MYIDUP_tmp[2])!=std::abs(isel) && MYIDUP_tmp[2]<0 && partonIsUnknown[3])
+              ||
+              (std::abs(MYIDUP_tmp[2])!=std::abs(isel) && MYIDUP_tmp[2]==-MYIDUP_tmp[3] && MYIDUP_tmp[2]<0)
               ){
               __modhiggsjj_MOD_evalamp_sbfh_unsymm_sa_select_exact(p4, &isel, &jsel, &ssel, &rsel, &msq_tmp);
               MatElsq[jsel+5][isel+5] += msq_tmp; // Assign only those that match gen. info, if present at all.
-              if (verbosity >= TVar::DEBUG_VERBOSE) MELAout << "Channel (isel, jsel, rsel, ssel)=" << isel << ", " << jsel << ", " << rsel << ", " << ssel << '\t' <<  msq_tmp << endl;
+              if (verbosity >= TVar::DEBUG_VERBOSE) MELAout << "Channel (isel, jsel, rsel, ssel)=" << isel << ", " << jsel << ", " << ssel << ", " << rsel << '\t' <<  msq_tmp << endl;
             }
           }
           else{ // qQb/qbQ->qQb/qbQ
@@ -4876,7 +4884,7 @@ double TUtil::HJJMatEl(
             ){
             __modhiggsjj_MOD_evalamp_sbfh_unsymm_sa_select_exact(p4, &isel, &jsel, &ssel, &rsel, &msq_tmp);
             MatElsq[jsel+5][isel+5] += msq_tmp; // Assign only those that match gen. info, if present at all.
-            if (verbosity >= TVar::DEBUG_VERBOSE) MELAout << "Channel (isel, jsel, rsel, ssel)=" << isel << ", " << jsel << ", " << rsel << ", " << ssel << '\t' <<  msq_tmp << endl;
+            if (verbosity >= TVar::DEBUG_VERBOSE) MELAout << "Channel (isel, jsel, rsel, ssel)=" << isel << ", " << jsel << ", " << ssel << ", " << rsel << '\t' <<  msq_tmp << endl;
           }
         }
       } // End unswapped isel>=jsel cases
@@ -4913,7 +4921,7 @@ double TUtil::HJJMatEl(
             ){
             __modhiggsjj_MOD_evalamp_sbfh_unsymm_sa_select_exact(p4, &isel, &jsel, &ssel, &rsel, &msq_tmp);
             MatElsq[jsel+5][isel+5] += msq_tmp; // Assign only those that match gen. info, if present at all.
-            if (verbosity >= TVar::DEBUG_VERBOSE) MELAout << "Channel (isel, jsel, rsel, ssel)=" << isel << ", " << jsel << ", " << rsel << ", " << ssel << '\t' <<  msq_tmp << endl;
+            if (verbosity >= TVar::DEBUG_VERBOSE) MELAout << "Channel (isel, jsel, rsel, ssel)=" << isel << ", " << jsel << ", " << ssel << ", " << rsel << '\t' <<  msq_tmp << endl;
           }
         }
         else if ((isel>0 && jsel<0) || (isel<0 && jsel>0)){ // qQb/qbQ->?
@@ -4934,22 +4942,30 @@ double TUtil::HJJMatEl(
             else{ rsel=2; ssel=-2; }
             // The amplitude is aready multiplied by nf-1, so no need to calculate everything (nf-1) times.
             if (
-              (partonIsUnknown[2] || MYIDUP_tmp[2]==rsel)
-              &&
-              (partonIsUnknown[3] || MYIDUP_tmp[3]==ssel)
+              (partonIsUnknown[2] && partonIsUnknown[3])
+              ||
+              (partonIsUnknown[2] && std::abs(MYIDUP_tmp[3])!=std::abs(isel) && MYIDUP_tmp[3]<0)
+              ||
+              (std::abs(MYIDUP_tmp[2])!=std::abs(isel) && MYIDUP_tmp[2]>0 && partonIsUnknown[3])
+              ||
+              (std::abs(MYIDUP_tmp[2])!=std::abs(isel) && MYIDUP_tmp[2]==-MYIDUP_tmp[3] && MYIDUP_tmp[2]>0)
               ){
               __modhiggsjj_MOD_evalamp_sbfh_unsymm_sa_select_exact(p4, &isel, &jsel, &rsel, &ssel, &msq_tmp);
               MatElsq[jsel+5][isel+5] += msq_tmp; // Assign only those that match gen. info, if present at all.
               if (verbosity >= TVar::DEBUG_VERBOSE) MELAout << "Channel (isel, jsel, rsel, ssel)=" << isel << ", " << jsel << ", " << rsel << ", " << ssel << '\t' <<  msq_tmp << endl;
             }
             if (
-              (partonIsUnknown[2] || MYIDUP_tmp[2]==ssel)
-              &&
-              (partonIsUnknown[3] || MYIDUP_tmp[3]==rsel)
+              (partonIsUnknown[2] && partonIsUnknown[3])
+              ||
+              (partonIsUnknown[2] && std::abs(MYIDUP_tmp[3])!=std::abs(isel) && MYIDUP_tmp[3]>0)
+              ||
+              (std::abs(MYIDUP_tmp[2])!=std::abs(isel) && MYIDUP_tmp[2]<0 && partonIsUnknown[3])
+              ||
+              (std::abs(MYIDUP_tmp[2])!=std::abs(isel) && MYIDUP_tmp[2]==-MYIDUP_tmp[3] && MYIDUP_tmp[2]<0)
               ){
               __modhiggsjj_MOD_evalamp_sbfh_unsymm_sa_select_exact(p4, &isel, &jsel, &ssel, &rsel, &msq_tmp);
               MatElsq[jsel+5][isel+5] += msq_tmp; // Assign only those that match gen. info, if present at all.
-              if (verbosity >= TVar::DEBUG_VERBOSE) MELAout << "Channel (isel, jsel, rsel, ssel)=" << isel << ", " << jsel << ", " << rsel << ", " << ssel << '\t' <<  msq_tmp << endl;
+              if (verbosity >= TVar::DEBUG_VERBOSE) MELAout << "Channel (isel, jsel, rsel, ssel)=" << isel << ", " << jsel << ", " << ssel << ", " << rsel << '\t' <<  msq_tmp << endl;
             }
           }
           else{ // qQb/qbQ->qQb/qbQ
@@ -4969,7 +4985,7 @@ double TUtil::HJJMatEl(
               ){
               __modhiggsjj_MOD_evalamp_sbfh_unsymm_sa_select_exact(p4, &isel, &jsel, &ssel, &rsel, &msq_tmp);
               MatElsq[jsel+5][isel+5] += msq_tmp; // Assign only those that match gen. info, if present at all.
-              if (verbosity >= TVar::DEBUG_VERBOSE) MELAout << "Channel (isel, jsel, rsel, ssel)=" << isel << ", " << jsel << ", " << rsel << ", " << ssel << '\t' <<  msq_tmp << endl;
+              if (verbosity >= TVar::DEBUG_VERBOSE) MELAout << "Channel (isel, jsel, rsel, ssel)=" << isel << ", " << jsel << ", " << ssel << ", " << rsel << '\t' <<  msq_tmp << endl;
             }
           }
         }
@@ -4992,7 +5008,7 @@ double TUtil::HJJMatEl(
             ){
             __modhiggsjj_MOD_evalamp_sbfh_unsymm_sa_select_exact(p4, &isel, &jsel, &ssel, &rsel, &msq_tmp);
             MatElsq[jsel+5][isel+5] += msq_tmp; // Assign only those that match gen. info, if present at all.
-            if (verbosity >= TVar::DEBUG_VERBOSE) MELAout << "Channel (isel, jsel, rsel, ssel)=" << isel << ", " << jsel << ", " << rsel << ", " << ssel << '\t' <<  msq_tmp << endl;
+            if (verbosity >= TVar::DEBUG_VERBOSE) MELAout << "Channel (isel, jsel, rsel, ssel)=" << isel << ", " << jsel << ", " << ssel << ", " << rsel << '\t' <<  msq_tmp << endl;
           }
         }
       } // End swapped isel<jsel cases
