@@ -142,7 +142,7 @@ subroutine MCFM_firsttime()
 
    double complex Hzzcoupl(1:SIZE_HVV)
    double complex Hwwcoupl(1:SIZE_HVV)
-   
+
    double precision Hb4b4_mb_4gen
    double precision Ht4t4_mt_4gen
 
@@ -160,10 +160,10 @@ subroutine MCFM_firsttime()
 
    integer separateWWZZcouplings
 
-   
+
    double complex H2zzcoupl(1:SIZE_HVV)
    double complex H2wwcoupl(1:SIZE_HVV)
-   
+
    double precision H2LambdaBSM
    double precision H2Lambda_Q
    double precision H2Lambda_zgs1
@@ -175,9 +175,8 @@ subroutine MCFM_firsttime()
 
    integer H2zzCLambda_qsq(1:SIZE_HVV_CQSQ)
    integer H2wwCLambda_qsq(1:SIZE_HVV_CQSQ)
-   
-   
-   
+
+
    inputfile='input.DAT'
    workdir='./'
 
@@ -198,7 +197,7 @@ subroutine MCFM_firsttime()
       twidth_in, &
       tauwidth_in &
       )
-      
+
    call Init_MCFMCommon_masses( &
       md_in, mu_in, ms_in, mc_in, mb_in, mt_in, &
       mel_in, mmu_in, mtau_in, &
@@ -227,17 +226,17 @@ subroutine MCFM_firsttime()
    Hb4b4coupl(:)=0d0
    Ht4t4_mt_4gen=10000d0
    Hb4b4_mb_4gen=10000d0
-   call GetSpinZeroVVCouplings(1,Hzzcoupl, HzzCLambda_qsq, HzzLambda_qsq, HzzLambda, HLambda_zgs1, HLambda_Q, .false.)
-   call GetSpinZeroVVCouplings(1,Hwwcoupl, HwwCLambda_qsq, HwwLambda_qsq, HwwLambda, HLambda_zgs1, HLambda_Q, .true.)
+   call GetSpinZeroVVCouplings(1, .false., Hzzcoupl, HzzCLambda_qsq, HzzLambda_qsq, HzzLambda, HLambda_zgs1, HLambda_Q)
+   call GetSpinZeroVVCouplings(1, .true., Hwwcoupl, HwwCLambda_qsq, HwwLambda_qsq, HwwLambda, HLambda_zgs1, HLambda_Q)
    call GetDistinguishWWCouplingsFlag(separateWWZZcouplings)
 
 !  second resonance
-   call GetSpinZeroVVCouplings(2,H2zzcoupl, H2zzCLambda_qsq, H2zzLambda_qsq, H2zzLambda, H2Lambda_zgs1, H2Lambda_Q, .false.)
-   call GetSpinZeroVVCouplings(2,H2wwcoupl, H2wwCLambda_qsq, H2wwLambda_qsq, H2wwLambda, H2Lambda_zgs1, H2Lambda_Q, .true.)
+   call GetSpinZeroVVCouplings(2, .false., H2zzcoupl, H2zzCLambda_qsq, H2zzLambda_qsq, H2zzLambda, H2Lambda_zgs1, H2Lambda_Q)
+   call GetSpinZeroVVCouplings(2, .true.,  H2wwcoupl, H2wwCLambda_qsq, H2wwLambda_qsq, H2wwLambda, H2Lambda_zgs1, H2Lambda_Q)
 
    call qlinit()
- 
- 
+
+
    call Init_MCFMCommon_spinzerohiggs_anomcoupl(Hggcoupl,Httcoupl,Hbbcoupl,Hg4g4coupl,Ht4t4coupl,Hb4b4coupl,    &
                                                 Hzzcoupl,Hwwcoupl,     &
                                                 Hb4b4_mb_4gen,Ht4t4_mt_4gen,HLambdaBSM,HLambda_Q,HLambda_zgs1,HzzLambda,HwwLambda,    &
@@ -248,8 +247,8 @@ subroutine MCFM_firsttime()
                                                 H2zzCLambda_qsq,H2wwCLambda_qsq,H2zzLambda_qsq,H2wwLambda_qsq,H2zzLambda,  &
                                                 H2wwLambda,H2Lambda_zgs1,H2Lambda_Q,H2LambdaBSM &
                                                )
-          
- 
+
+
 end subroutine
 
 
@@ -346,16 +345,6 @@ subroutine Init_MCFMCommon_masses( &
    zwidth = zwidth_in
 end subroutine
 
-
-
-
-
-
-
-
-
-
-
 subroutine Init_MCFMCommon_spinzerohiggs_anomcoupl( &
    Hggcoupl, &
    Httcoupl, &
@@ -382,8 +371,8 @@ subroutine Init_MCFMCommon_spinzerohiggs_anomcoupl( &
    HwwCLambda_qsq, &
 
    separateWWZZcouplings, &
-   
-   h2mass_in, h2width_in, & 
+
+   h2mass_in, h2width_in, &
    H2zzcoupl,H2wwcoupl,   &
    H2zzCLambda_qsq,H2wwCLambda_qsq,H2zzLambda_qsq,H2wwLambda_qsq,H2zzLambda,H2wwLambda,H2Lambda_zgs1,H2Lambda_Q,H2LambdaBSM &
    )
@@ -414,12 +403,12 @@ subroutine Init_MCFMCommon_spinzerohiggs_anomcoupl( &
    integer HwwCLambda_qsq(1:SIZE_HVV_CQSQ)
 
    integer separateWWZZcouplings
-   
+
    double precision h2mass_in, h2width_in
 
    double complex H2zzcoupl(1:SIZE_HVV)
    double complex H2wwcoupl(1:SIZE_HVV)
-   
+
    double precision H2LambdaBSM
    double precision H2Lambda_Q
    double precision H2Lambda_zgs1
@@ -431,10 +420,10 @@ subroutine Init_MCFMCommon_spinzerohiggs_anomcoupl( &
 
    integer H2zzCLambda_qsq(1:SIZE_HVV_CQSQ)
    integer H2wwCLambda_qsq(1:SIZE_HVV_CQSQ)
-      
-   
-   
-   
+
+
+
+
    ! MCFM declarations
    integer AllowAnomalousCouplings
    integer distinguish_HWWcouplings
@@ -532,7 +521,7 @@ subroutine Init_MCFMCommon_spinzerohiggs_anomcoupl( &
    double complex gh2w1_prime7,gh2w2_prime7,gh2w3_prime7,gh2w4_prime7
 
 
-   
+
       common/spinzerohiggs_anomcoupl/     &
         AllowAnomalousCouplings,     &
         distinguish_HWWcouplings,     &
@@ -625,12 +614,12 @@ subroutine Init_MCFMCommon_spinzerohiggs_anomcoupl( &
         gh2w1_prime4,gh2w2_prime4,gh2w3_prime4,gh2w4_prime4,     &
         gh2w1_prime5,gh2w2_prime5,gh2w3_prime5,gh2w4_prime5,     &
         gh2w1_prime6,gh2w2_prime6,gh2w3_prime6,gh2w4_prime6,     &
-        gh2w1_prime7,gh2w2_prime7,gh2w3_prime7,gh2w4_prime7    
+        gh2w1_prime7,gh2w2_prime7,gh2w3_prime7,gh2w4_prime7
 
 
-   
-   
-   
+
+
+
    ! Begin assignments
    AllowAnomalousCouplings = 1
    distinguish_HWWcouplings = separateWWZZcouplings
@@ -844,7 +833,7 @@ subroutine Init_MCFMCommon_spinzerohiggs_anomcoupl( &
 
    h2mass= h2mass_in
    h2width = h2width_in
-   
+
    Lambda2BSM = H2LambdaBSM
    Lambda2_Q = H2Lambda_Q
 
@@ -1047,18 +1036,12 @@ subroutine Init_MCFMCommon_spinzerohiggs_anomcoupl( &
    return
 end subroutine
 
-
-
-
 subroutine Init_MCFMCommon_ewscheme()
    implicit none
    integer ewscheme
    common/ewscheme/ewscheme
    ewscheme=3
 end subroutine
-
-
-
 
 subroutine Init_MCFMCommon_ewinput(Gf_inp_in,aemmz_inp_in,xw_inp_in,wmass_inp_in,zmass_inp_in)
    implicit none
@@ -1074,18 +1057,16 @@ end subroutine
 
 
 
-function MCFMParticleLabel(pid, useQJ)
+function MCFMParticleLabel(pid, useQJ, useExtendedConventions)
    use ModParameters
    implicit none
    character*2 MCFMParticleLabel
    integer, intent(in) :: pid
-   logical, optional :: useQJ
+   logical :: useQJ, useExtendedConventions
    if (pid.eq.0) then
       MCFMParticleLabel='pp'
-      if (present(useQJ)) then
-         if (useQJ) then
-            MCFMParticleLabel='qj'
-         endif
+      if (useQJ) then
+         MCFMParticleLabel='qj'
       endif
    else if (pid.eq.Glu_) then
       MCFMParticleLabel='ig'
@@ -1117,49 +1098,64 @@ function MCFMParticleLabel(pid, useQJ)
       MCFMParticleLabel='ml'
    else if (pid.eq.TaM_) then
       MCFMParticleLabel='tl'
-   else if (pid.eq.NuE_) then
-      MCFMParticleLabel='nl'
-   else if (pid.eq.NuM_) then
-      MCFMParticleLabel='nl'
-   else if (pid.eq.NuT_) then
-      MCFMParticleLabel='nl'
    else if (pid.eq.ElP_) then
       MCFMParticleLabel='ea'
    else if (pid.eq.MuP_) then
       MCFMParticleLabel='ma'
    else if (pid.eq.TaP_) then
       MCFMParticleLabel='ta'
-   else if (pid.eq.ANuE_) then
-      MCFMParticleLabel='na'
-   else if (pid.eq.ANuM_) then
-      MCFMParticleLabel='na'
-   else if (pid.eq.ANuT_) then
-      MCFMParticleLabel='na'
+   else if (isANeutrino(pid)) then
+      if (.not.useExtendedConventions) then
+         if (pid.eq.NuE_ .or. pid.eq.NuM_ .or. pid.eq.NuT_) then
+            MCFMParticleLabel='nl'
+         else
+            MCFMParticleLabel='na'
+         endif
+      else
+         if (pid.eq.NuE_) then
+            MCFMParticleLabel='ne'
+         else if (pid.eq.NuM_) then
+            MCFMParticleLabel='nm'
+         else if (pid.eq.NuT_) then
+            MCFMParticleLabel='nt'
+         else if (pid.eq.ANuE_) then
+            MCFMParticleLabel='ke'
+         else if (pid.eq.ANuM_) then
+            MCFMParticleLabel='km'
+         else if (pid.eq.ANuT_) then
+            MCFMParticleLabel='kt'
+         endif
+      endif
    else
       MCFMParticleLabel='  '
    endif
 end function
-subroutine SetupParticleLabels(pid_MCFM)
+subroutine SetupParticleLabels(pid_MCFM,imin,imax, useQJ, useExtendedConventions)
    implicit none
    integer, intent(in) :: pid_MCFM(1:mxpart)
-   integer :: i
+   integer :: i,imin,imax
+   logical :: useQJ, useExtendedConventions
    ! MCFM declarations
    character*2 plabel(mxpart)
    common/plabel/plabel
-   do i=1,mxpart
-      plabel(i)=MCFMParticleLabel(pid_MCFM(i))
+
+   if (imin .lt. 1) imin=1
+   if (imax .gt. mxpart) imax=mxpart
+   do i=imin,imax
+      plabel(i)=MCFMParticleLabel(pid_MCFM(i), useQJ, useExtendedConventions)
    enddo
 end subroutine
 
 ! This is so sketchy
 subroutine Set_MCFMCommon_DecayZCouple_Wrapper(idferm,whichZ)
+use ModMisc
 use ModParameters
 implicit none
 integer, intent(in) :: idferm
 integer, intent(in) :: whichZ
 logical :: isZlep,isZnu,isZup,isZdn
    if(idferm.eq.0) then
-      stop("pid(3)=0 is not allowed in qqVVqq processes")
+      call Error("Set_MCFMCommon_DecayZCouple_Wrapper: idferm=0 is not allowed.")
    endif
    isZlep = IsALepton(idferm)
    isZnu = IsANeutrino(idferm)
@@ -1256,14 +1252,15 @@ subroutine GetMassesWidths( &
    mtau_in = getMass(TaM_)/GeV
    tauwidth_in = getDecayWidth(TaM_)/GeV
 
-   hmass_in = getMass(Hig_)/GeV
-   hwidth_in = getDecayWidth(Hig_)/GeV
-   h2mass_in = getMass(Hig2_)/GeV
-   h2width_in = getDecayWidth(Hig2_)/GeV
    wmass_in = getMass(Wp_)/GeV
    wwidth_in = getDecayWidth(Wp_)/GeV
    zmass_in = getMass(Z0_)/GeV
    zwidth_in = getDecayWidth(Z0_)/GeV
+
+   hmass_in = getHiggsMass(1)/GeV
+   hwidth_in = getHiggsDecayWidth(1)/GeV
+   h2mass_in = getHiggsMass(2)/GeV
+   h2width_in = getHiggsDecayWidth(2)/GeV
 end subroutine
 
 
@@ -1279,7 +1276,7 @@ end subroutine
 
 
 
-subroutine GetSpinZeroVVCouplings(NReso,vvcoupl, cqsq, Lambda_qsq, Lambdag, Lambdag_zgs1, Lambdag_Q, useWWcoupl)
+subroutine GetSpinZeroVVCouplings(NReso, useWWcoupl, vvcoupl, cqsq, Lambda_qsq, Lambdag, Lambdag_zgs1, Lambdag_Q)
    use ModParameters
    implicit none
    integer, intent(in) :: NReso
@@ -1295,295 +1292,291 @@ subroutine GetSpinZeroVVCouplings(NReso,vvcoupl, cqsq, Lambda_qsq, Lambdag, Lamb
    Lambdag(:)=0d0
 
 
-if(NReso.eq.1) then! first (Higgs) resonance
-   Lambdag_zgs1 = Lambda_zgs1
-   Lambdag_Q = Lambda_Q
-   if(.not.useWWcoupl) then
-      Lambdag(1) = Lambda_z1
-      Lambdag(2) = Lambda_z2
-      Lambdag(3) = Lambda_z3
-      Lambdag(4) = Lambda_z4
+   if (NReso.eq.1) then! first (Higgs) resonance
+      Lambdag_zgs1 = Lambda_zgs1
+      Lambdag_Q = Lambda_Q
+      if(.not.useWWcoupl) then
+         Lambdag(1) = Lambda_z1
+         Lambdag(2) = Lambda_z2
+         Lambdag(3) = Lambda_z3
+         Lambdag(4) = Lambda_z4
 
-      cqsq(1) = cz_q1sq
-      Lambda_qsq(1,1) = Lambda_z11
-      Lambda_qsq(1,2) = Lambda_z21
-      Lambda_qsq(1,3) = Lambda_z31
-      Lambda_qsq(1,4) = Lambda_z41
-      cqsq(2) = cz_q2sq
-      Lambda_qsq(2,1) = Lambda_z12
-      Lambda_qsq(2,2) = Lambda_z22
-      Lambda_qsq(2,3) = Lambda_z32
-      Lambda_qsq(2,4) = Lambda_z42
-      cqsq(3) = cz_q12sq
-      Lambda_qsq(3,1) = Lambda_z10
-      Lambda_qsq(3,2) = Lambda_z20
-      Lambda_qsq(3,3) = Lambda_z30
-      Lambda_qsq(3,4) = Lambda_z40
+         cqsq(1) = cz_q1sq
+         Lambda_qsq(1,1) = Lambda_z11
+         Lambda_qsq(1,2) = Lambda_z21
+         Lambda_qsq(1,3) = Lambda_z31
+         Lambda_qsq(1,4) = Lambda_z41
+         cqsq(2) = cz_q2sq
+         Lambda_qsq(2,1) = Lambda_z12
+         Lambda_qsq(2,2) = Lambda_z22
+         Lambda_qsq(2,3) = Lambda_z32
+         Lambda_qsq(2,4) = Lambda_z42
+         cqsq(3) = cz_q12sq
+         Lambda_qsq(3,1) = Lambda_z10
+         Lambda_qsq(3,2) = Lambda_z20
+         Lambda_qsq(3,3) = Lambda_z30
+         Lambda_qsq(3,4) = Lambda_z40
 
-      vvcoupl(1) = ghz1
-      vvcoupl(2) = ghz2
-      vvcoupl(3) = ghz3
-      vvcoupl(4) = ghz4
+         vvcoupl(1) = ghz1
+         vvcoupl(2) = ghz2
+         vvcoupl(3) = ghz3
+         vvcoupl(4) = ghz4
 
-      vvcoupl(5) = ghzgs2
-      vvcoupl(6) = ghzgs3
-      vvcoupl(7) = ghzgs4
-      vvcoupl(8) = ghgsgs2
-      vvcoupl(9) = ghgsgs3
-      vvcoupl(10) = ghgsgs4
+         vvcoupl(5) = ghzgs2
+         vvcoupl(6) = ghzgs3
+         vvcoupl(7) = ghzgs4
+         vvcoupl(8) = ghgsgs2
+         vvcoupl(9) = ghgsgs3
+         vvcoupl(10) = ghgsgs4
 
-      vvcoupl(11) = ghz1_prime
-      vvcoupl(12) = ghz1_prime2
-      vvcoupl(13) = ghz1_prime3
-      vvcoupl(14) = ghz1_prime4
-      vvcoupl(15) = ghz1_prime5
+         vvcoupl(11) = ghz1_prime
+         vvcoupl(12) = ghz1_prime2
+         vvcoupl(13) = ghz1_prime3
+         vvcoupl(14) = ghz1_prime4
+         vvcoupl(15) = ghz1_prime5
 
-      vvcoupl(16) = ghz2_prime
-      vvcoupl(17) = ghz2_prime2
-      vvcoupl(18) = ghz2_prime3
-      vvcoupl(19) = ghz2_prime4
-      vvcoupl(20) = ghz2_prime5
+         vvcoupl(16) = ghz2_prime
+         vvcoupl(17) = ghz2_prime2
+         vvcoupl(18) = ghz2_prime3
+         vvcoupl(19) = ghz2_prime4
+         vvcoupl(20) = ghz2_prime5
 
-      vvcoupl(21) = ghz3_prime
-      vvcoupl(22) = ghz3_prime2
-      vvcoupl(23) = ghz3_prime3
-      vvcoupl(24) = ghz3_prime4
-      vvcoupl(25) = ghz3_prime5
+         vvcoupl(21) = ghz3_prime
+         vvcoupl(22) = ghz3_prime2
+         vvcoupl(23) = ghz3_prime3
+         vvcoupl(24) = ghz3_prime4
+         vvcoupl(25) = ghz3_prime5
 
-      vvcoupl(26) = ghz4_prime
-      vvcoupl(27) = ghz4_prime2
-      vvcoupl(28) = ghz4_prime3
-      vvcoupl(29) = ghz4_prime4
-      vvcoupl(30) = ghz4_prime5
+         vvcoupl(26) = ghz4_prime
+         vvcoupl(27) = ghz4_prime2
+         vvcoupl(28) = ghz4_prime3
+         vvcoupl(29) = ghz4_prime4
+         vvcoupl(30) = ghz4_prime5
 
-      vvcoupl(31) = ghzgs1_prime2
+         vvcoupl(31) = ghzgs1_prime2
 
-      vvcoupl(32) = ghz1_prime6
-      vvcoupl(33) = ghz1_prime7
-      vvcoupl(34) = ghz2_prime6
-      vvcoupl(35) = ghz2_prime7
-      vvcoupl(36) = ghz3_prime6
-      vvcoupl(37) = ghz3_prime7
-      vvcoupl(38) = ghz4_prime6
-      vvcoupl(39) = ghz4_prime7
+         vvcoupl(32) = ghz1_prime6
+         vvcoupl(33) = ghz1_prime7
+         vvcoupl(34) = ghz2_prime6
+         vvcoupl(35) = ghz2_prime7
+         vvcoupl(36) = ghz3_prime6
+         vvcoupl(37) = ghz3_prime7
+         vvcoupl(38) = ghz4_prime6
+         vvcoupl(39) = ghz4_prime7
 
-   else
-      Lambdag(1) = Lambda_w1
-      Lambdag(2) = Lambda_w2
-      Lambdag(3) = Lambda_w3
-      Lambdag(4) = Lambda_w4
+      else
+         Lambdag(1) = Lambda_w1
+         Lambdag(2) = Lambda_w2
+         Lambdag(3) = Lambda_w3
+         Lambdag(4) = Lambda_w4
 
-      cqsq(1) = cw_q1sq
-      Lambda_qsq(1,1) = Lambda_w11
-      Lambda_qsq(1,2) = Lambda_w21
-      Lambda_qsq(1,3) = Lambda_w31
-      Lambda_qsq(1,4) = Lambda_w41
-      cqsq(2) = cw_q2sq
-      Lambda_qsq(2,1) = Lambda_w12
-      Lambda_qsq(2,2) = Lambda_w22
-      Lambda_qsq(2,3) = Lambda_w32
-      Lambda_qsq(2,4) = Lambda_w42
-      cqsq(3) = cw_q12sq
-      Lambda_qsq(3,1) = Lambda_w10
-      Lambda_qsq(3,2) = Lambda_w20
-      Lambda_qsq(3,3) = Lambda_w30
-      Lambda_qsq(3,4) = Lambda_w40
+         cqsq(1) = cw_q1sq
+         Lambda_qsq(1,1) = Lambda_w11
+         Lambda_qsq(1,2) = Lambda_w21
+         Lambda_qsq(1,3) = Lambda_w31
+         Lambda_qsq(1,4) = Lambda_w41
+         cqsq(2) = cw_q2sq
+         Lambda_qsq(2,1) = Lambda_w12
+         Lambda_qsq(2,2) = Lambda_w22
+         Lambda_qsq(2,3) = Lambda_w32
+         Lambda_qsq(2,4) = Lambda_w42
+         cqsq(3) = cw_q12sq
+         Lambda_qsq(3,1) = Lambda_w10
+         Lambda_qsq(3,2) = Lambda_w20
+         Lambda_qsq(3,3) = Lambda_w30
+         Lambda_qsq(3,4) = Lambda_w40
 
-      vvcoupl(1) = ghw1
-      vvcoupl(2) = ghw2
-      vvcoupl(3) = ghw3
-      vvcoupl(4) = ghw4
+         vvcoupl(1) = ghw1
+         vvcoupl(2) = ghw2
+         vvcoupl(3) = ghw3
+         vvcoupl(4) = ghw4
 
-      vvcoupl(5:10) = czero
+         vvcoupl(5:10) = czero
 
-      vvcoupl(11) = ghw1_prime
-      vvcoupl(12) = ghw1_prime2
-      vvcoupl(13) = ghw1_prime3
-      vvcoupl(14) = ghw1_prime4
-      vvcoupl(15) = ghw1_prime5
+         vvcoupl(11) = ghw1_prime
+         vvcoupl(12) = ghw1_prime2
+         vvcoupl(13) = ghw1_prime3
+         vvcoupl(14) = ghw1_prime4
+         vvcoupl(15) = ghw1_prime5
 
-      vvcoupl(16) = ghw2_prime
-      vvcoupl(17) = ghw2_prime2
-      vvcoupl(18) = ghw2_prime3
-      vvcoupl(19) = ghw2_prime4
-      vvcoupl(20) = ghw2_prime5
+         vvcoupl(16) = ghw2_prime
+         vvcoupl(17) = ghw2_prime2
+         vvcoupl(18) = ghw2_prime3
+         vvcoupl(19) = ghw2_prime4
+         vvcoupl(20) = ghw2_prime5
 
-      vvcoupl(21) = ghw3_prime
-      vvcoupl(22) = ghw3_prime2
-      vvcoupl(23) = ghw3_prime3
-      vvcoupl(24) = ghw3_prime4
-      vvcoupl(25) = ghw3_prime5
+         vvcoupl(21) = ghw3_prime
+         vvcoupl(22) = ghw3_prime2
+         vvcoupl(23) = ghw3_prime3
+         vvcoupl(24) = ghw3_prime4
+         vvcoupl(25) = ghw3_prime5
 
-      vvcoupl(26) = ghw4_prime
-      vvcoupl(27) = ghw4_prime2
-      vvcoupl(28) = ghw4_prime3
-      vvcoupl(29) = ghw4_prime4
-      vvcoupl(30) = ghw4_prime5
+         vvcoupl(26) = ghw4_prime
+         vvcoupl(27) = ghw4_prime2
+         vvcoupl(28) = ghw4_prime3
+         vvcoupl(29) = ghw4_prime4
+         vvcoupl(30) = ghw4_prime5
 
-      vvcoupl(31) = czero
+         vvcoupl(31) = czero
 
-      vvcoupl(32) = ghw1_prime6
-      vvcoupl(33) = ghw1_prime7
-      vvcoupl(34) = ghw2_prime6
-      vvcoupl(35) = ghw2_prime7
-      vvcoupl(36) = ghw3_prime6
-      vvcoupl(37) = ghw3_prime7
-      vvcoupl(38) = ghw4_prime6
-      vvcoupl(39) = ghw4_prime7
-   endif
+         vvcoupl(32) = ghw1_prime6
+         vvcoupl(33) = ghw1_prime7
+         vvcoupl(34) = ghw2_prime6
+         vvcoupl(35) = ghw2_prime7
+         vvcoupl(36) = ghw3_prime6
+         vvcoupl(37) = ghw3_prime7
+         vvcoupl(38) = ghw4_prime6
+         vvcoupl(39) = ghw4_prime7
+      endif
 
-   Lambda_qsq(:,:)=Lambda_qsq(:,:)/GeV
-   Lambdag(:)=Lambdag(:)/GeV
-   Lambdag_zgs1 = Lambdag_zgs1/GeV
-   Lambdag_Q = Lambdag_Q/GeV
+      Lambda_qsq(:,:)=Lambda_qsq(:,:)/GeV
+      Lambdag(:)=Lambdag(:)/GeV
+      Lambdag_zgs1 = Lambdag_zgs1/GeV
+      Lambdag_Q = Lambdag_Q/GeV
 
-   
-else! second resonance
+   else! second resonance
+      Lambdag_zgs1 = Lambda2_zgs1
+      Lambdag_Q = Lambda2_Q
+      if(.not.useWWcoupl) then
+         Lambdag(1) = Lambda2_z1
+         Lambdag(2) = Lambda2_z2
+         Lambdag(3) = Lambda2_z3
+         Lambdag(4) = Lambda2_z4
 
+         cqsq(1) = c2z_q1sq
+         Lambda_qsq(1,1) = Lambda2_z11
+         Lambda_qsq(1,2) = Lambda2_z21
+         Lambda_qsq(1,3) = Lambda2_z31
+         Lambda_qsq(1,4) = Lambda2_z41
+         cqsq(2) = c2z_q2sq
+         Lambda_qsq(2,1) = Lambda2_z12
+         Lambda_qsq(2,2) = Lambda2_z22
+         Lambda_qsq(2,3) = Lambda2_z32
+         Lambda_qsq(2,4) = Lambda2_z42
+         cqsq(3) = c2z_q12sq
+         Lambda_qsq(3,1) = Lambda2_z10
+         Lambda_qsq(3,2) = Lambda2_z20
+         Lambda_qsq(3,3) = Lambda2_z30
+         Lambda_qsq(3,4) = Lambda2_z40
 
-   Lambdag_zgs1 = Lambda2_zgs1
-   Lambdag_Q = Lambda2_Q
-   if(.not.useWWcoupl) then
-      Lambdag(1) = Lambda2_z1
-      Lambdag(2) = Lambda2_z2
-      Lambdag(3) = Lambda2_z3
-      Lambdag(4) = Lambda2_z4
+         vvcoupl(1) = gh2z1
+         vvcoupl(2) = gh2z2
+         vvcoupl(3) = gh2z3
+         vvcoupl(4) = gh2z4
 
-      cqsq(1) = cz_q1sq
-      Lambda_qsq(1,1) = Lambda2_z11
-      Lambda_qsq(1,2) = Lambda2_z21
-      Lambda_qsq(1,3) = Lambda2_z31
-      Lambda_qsq(1,4) = Lambda2_z41
-      cqsq(2) = cz_q2sq
-      Lambda_qsq(2,1) = Lambda2_z12
-      Lambda_qsq(2,2) = Lambda2_z22
-      Lambda_qsq(2,3) = Lambda2_z32
-      Lambda_qsq(2,4) = Lambda2_z42
-      cqsq(3) = cz_q12sq
-      Lambda_qsq(3,1) = Lambda2_z10
-      Lambda_qsq(3,2) = Lambda2_z20
-      Lambda_qsq(3,3) = Lambda2_z30
-      Lambda_qsq(3,4) = Lambda2_z40
+         vvcoupl(5) = gh2zgs2
+         vvcoupl(6) = gh2zgs3
+         vvcoupl(7) = gh2zgs4
+         vvcoupl(8) = gh2gsgs2
+         vvcoupl(9) = gh2gsgs3
+         vvcoupl(10) = gh2gsgs4
 
-      vvcoupl(1) = gh2z1
-      vvcoupl(2) = gh2z2
-      vvcoupl(3) = gh2z3
-      vvcoupl(4) = gh2z4
+         vvcoupl(11) = gh2z1_prime
+         vvcoupl(12) = gh2z1_prime2
+         vvcoupl(13) = gh2z1_prime3
+         vvcoupl(14) = gh2z1_prime4
+         vvcoupl(15) = gh2z1_prime5
 
-      vvcoupl(5) = gh2zgs2
-      vvcoupl(6) = gh2zgs3
-      vvcoupl(7) = gh2zgs4
-      vvcoupl(8) = gh2gsgs2
-      vvcoupl(9) = gh2gsgs3
-      vvcoupl(10) = gh2gsgs4
+         vvcoupl(16) = gh2z2_prime
+         vvcoupl(17) = gh2z2_prime2
+         vvcoupl(18) = gh2z2_prime3
+         vvcoupl(19) = gh2z2_prime4
+         vvcoupl(20) = gh2z2_prime5
 
-      vvcoupl(11) = gh2z1_prime
-      vvcoupl(12) = gh2z1_prime2
-      vvcoupl(13) = gh2z1_prime3
-      vvcoupl(14) = gh2z1_prime4
-      vvcoupl(15) = gh2z1_prime5
+         vvcoupl(21) = gh2z3_prime
+         vvcoupl(22) = gh2z3_prime2
+         vvcoupl(23) = gh2z3_prime3
+         vvcoupl(24) = gh2z3_prime4
+         vvcoupl(25) = gh2z3_prime5
 
-      vvcoupl(16) = gh2z2_prime
-      vvcoupl(17) = gh2z2_prime2
-      vvcoupl(18) = gh2z2_prime3
-      vvcoupl(19) = gh2z2_prime4
-      vvcoupl(20) = gh2z2_prime5
+         vvcoupl(26) = gh2z4_prime
+         vvcoupl(27) = gh2z4_prime2
+         vvcoupl(28) = gh2z4_prime3
+         vvcoupl(29) = gh2z4_prime4
+         vvcoupl(30) = gh2z4_prime5
 
-      vvcoupl(21) = gh2z3_prime
-      vvcoupl(22) = gh2z3_prime2
-      vvcoupl(23) = gh2z3_prime3
-      vvcoupl(24) = gh2z3_prime4
-      vvcoupl(25) = gh2z3_prime5
+         vvcoupl(31) = gh2zgs1_prime2
 
-      vvcoupl(26) = gh2z4_prime
-      vvcoupl(27) = gh2z4_prime2
-      vvcoupl(28) = gh2z4_prime3
-      vvcoupl(29) = gh2z4_prime4
-      vvcoupl(30) = gh2z4_prime5
+         vvcoupl(32) = gh2z1_prime6
+         vvcoupl(33) = gh2z1_prime7
+         vvcoupl(34) = gh2z2_prime6
+         vvcoupl(35) = gh2z2_prime7
+         vvcoupl(36) = gh2z3_prime6
+         vvcoupl(37) = gh2z3_prime7
+         vvcoupl(38) = gh2z4_prime6
+         vvcoupl(39) = gh2z4_prime7
 
-      vvcoupl(31) = gh2zgs1_prime2
+      else
+         Lambdag(1) = Lambda2_w1
+         Lambdag(2) = Lambda2_w2
+         Lambdag(3) = Lambda2_w3
+         Lambdag(4) = Lambda2_w4
 
-      vvcoupl(32) = gh2z1_prime6
-      vvcoupl(33) = gh2z1_prime7
-      vvcoupl(34) = gh2z2_prime6
-      vvcoupl(35) = gh2z2_prime7
-      vvcoupl(36) = gh2z3_prime6
-      vvcoupl(37) = gh2z3_prime7
-      vvcoupl(38) = gh2z4_prime6
-      vvcoupl(39) = gh2z4_prime7
+         cqsq(1) = c2w_q1sq
+         Lambda_qsq(1,1) = Lambda2_w11
+         Lambda_qsq(1,2) = Lambda2_w21
+         Lambda_qsq(1,3) = Lambda2_w31
+         Lambda_qsq(1,4) = Lambda2_w41
+         cqsq(2) = c2w_q2sq
+         Lambda_qsq(2,1) = Lambda2_w12
+         Lambda_qsq(2,2) = Lambda2_w22
+         Lambda_qsq(2,3) = Lambda2_w32
+         Lambda_qsq(2,4) = Lambda2_w42
+         cqsq(3) = c2w_q12sq
+         Lambda_qsq(3,1) = Lambda2_w10
+         Lambda_qsq(3,2) = Lambda2_w20
+         Lambda_qsq(3,3) = Lambda2_w30
+         Lambda_qsq(3,4) = Lambda2_w40
 
-   else
-      Lambdag(1) = Lambda2_w1
-      Lambdag(2) = Lambda2_w2
-      Lambdag(3) = Lambda2_w3
-      Lambdag(4) = Lambda2_w4
+         vvcoupl(1) = gh2w1
+         vvcoupl(2) = gh2w2
+         vvcoupl(3) = gh2w3
+         vvcoupl(4) = gh2w4
 
-      cqsq(1) = cw_q1sq
-      Lambda_qsq(1,1) = Lambda2_w11
-      Lambda_qsq(1,2) = Lambda2_w21
-      Lambda_qsq(1,3) = Lambda2_w31
-      Lambda_qsq(1,4) = Lambda2_w41
-      cqsq(2) = cw_q2sq
-      Lambda_qsq(2,1) = Lambda2_w12
-      Lambda_qsq(2,2) = Lambda2_w22
-      Lambda_qsq(2,3) = Lambda2_w32
-      Lambda_qsq(2,4) = Lambda2_w42
-      cqsq(3) = cw_q12sq
-      Lambda_qsq(3,1) = Lambda2_w10
-      Lambda_qsq(3,2) = Lambda2_w20
-      Lambda_qsq(3,3) = Lambda2_w30
-      Lambda_qsq(3,4) = Lambda2_w40
+         vvcoupl(5:10) = czero
 
-      vvcoupl(1) = gh2w1
-      vvcoupl(2) = gh2w2
-      vvcoupl(3) = gh2w3
-      vvcoupl(4) = gh2w4
+         vvcoupl(11) = gh2w1_prime
+         vvcoupl(12) = gh2w1_prime2
+         vvcoupl(13) = gh2w1_prime3
+         vvcoupl(14) = gh2w1_prime4
+         vvcoupl(15) = gh2w1_prime5
 
-      vvcoupl(5:10) = czero
+         vvcoupl(16) = gh2w2_prime
+         vvcoupl(17) = gh2w2_prime2
+         vvcoupl(18) = gh2w2_prime3
+         vvcoupl(19) = gh2w2_prime4
+         vvcoupl(20) = gh2w2_prime5
 
-      vvcoupl(11) = gh2w1_prime
-      vvcoupl(12) = gh2w1_prime2
-      vvcoupl(13) = gh2w1_prime3
-      vvcoupl(14) = gh2w1_prime4
-      vvcoupl(15) = gh2w1_prime5
+         vvcoupl(21) = gh2w3_prime
+         vvcoupl(22) = gh2w3_prime2
+         vvcoupl(23) = gh2w3_prime3
+         vvcoupl(24) = gh2w3_prime4
+         vvcoupl(25) = gh2w3_prime5
 
-      vvcoupl(16) = gh2w2_prime
-      vvcoupl(17) = gh2w2_prime2
-      vvcoupl(18) = gh2w2_prime3
-      vvcoupl(19) = gh2w2_prime4
-      vvcoupl(20) = gh2w2_prime5
+         vvcoupl(26) = gh2w4_prime
+         vvcoupl(27) = gh2w4_prime2
+         vvcoupl(28) = gh2w4_prime3
+         vvcoupl(29) = gh2w4_prime4
+         vvcoupl(30) = gh2w4_prime5
 
-      vvcoupl(21) = gh2w3_prime
-      vvcoupl(22) = gh2w3_prime2
-      vvcoupl(23) = gh2w3_prime3
-      vvcoupl(24) = gh2w3_prime4
-      vvcoupl(25) = gh2w3_prime5
+         vvcoupl(31) = czero
 
-      vvcoupl(26) = gh2w4_prime
-      vvcoupl(27) = gh2w4_prime2
-      vvcoupl(28) = gh2w4_prime3
-      vvcoupl(29) = gh2w4_prime4
-      vvcoupl(30) = gh2w4_prime5
+         vvcoupl(32) = gh2w1_prime6
+         vvcoupl(33) = gh2w1_prime7
+         vvcoupl(34) = gh2w2_prime6
+         vvcoupl(35) = gh2w2_prime7
+         vvcoupl(36) = gh2w3_prime6
+         vvcoupl(37) = gh2w3_prime7
+         vvcoupl(38) = gh2w4_prime6
+         vvcoupl(39) = gh2w4_prime7
+      endif
 
-      vvcoupl(31) = czero
+      Lambda_qsq(:,:)=Lambda_qsq(:,:)/GeV
+      Lambdag(:)=Lambdag(:)/GeV
+      Lambdag_zgs1 = Lambdag_zgs1/GeV
+      Lambdag_Q = Lambdag_Q/GeV
 
-      vvcoupl(32) = gh2w1_prime6
-      vvcoupl(33) = gh2w1_prime7
-      vvcoupl(34) = gh2w2_prime6
-      vvcoupl(35) = gh2w2_prime7
-      vvcoupl(36) = gh2w3_prime6
-      vvcoupl(37) = gh2w3_prime7
-      vvcoupl(38) = gh2w4_prime6
-      vvcoupl(39) = gh2w4_prime7
-   endif
-
-   Lambda_qsq(:,:)=Lambda_qsq(:,:)/GeV
-   Lambdag(:)=Lambdag(:)/GeV
-   Lambdag_zgs1 = Lambdag_zgs1/GeV
-   Lambdag_Q = Lambdag_Q/GeV
-
-endif! end second resonance 
-
+   endif! end second resonance
 
 end subroutine
 
@@ -1678,7 +1671,7 @@ mtausq, mcsq, mbsq
    if (iProc.eq.66) then ! Signal-only
       MCFM_runstring="wbfHO"
    else if (iProc.eq.67) then ! Bkg-only
-      MCFM_runstring="wbfHO"
+      MCFM_runstring="wbfBO"
    else if (iProc.eq.68) then  ! Signal+bkg
       MCFM_runstring="wbfALL" ! Doesn't matter what it is
    else
@@ -1707,14 +1700,15 @@ end subroutine
 
 
 
-function Setup_MCFM_qqVVqq(pid_MCFM_in,p_MCFM_in,pid_MCFM,p_MCFM)
+function Setup_MCFM_qqVVqq(pid_MCFM_in,p_MCFM_in,pid_MCFM,p_MCFM,ZWcode)
+use ModParameters, only : Z0_, includeInterference
 implicit none
 logical :: Setup_MCFM_qqVVqq
 integer, intent(in) :: pid_MCFM_in(1:mxpart)
 real(8), intent(in) :: p_MCFM_in(1:mxpart,1:4)
-integer, intent(out) :: pid_MCFM(1:mxpart)
+integer, intent(out) :: pid_MCFM(1:mxpart),ZWcode
 real(8), intent(out) :: p_MCFM(1:mxpart,1:4)
-integer :: decayOrdering(1:4)
+integer :: decayOrdering(1:4),idV(1:2),idVswap(1:2)
 integer :: apartOrdering(1:2)
 integer :: ip
 
@@ -1731,7 +1725,10 @@ common/zcouple/l,r,q1,l1,r1,q2,l2,r2,le,ln,re,rn,sin2w
    p_MCFM(:,:) = p_MCFM_in(:,:)
 
    ! Assign ordered daughter momenta
-   call Check_DaughterOrdering_MCFM_qqVVqq(pid_MCFM_in(3:6),decayOrdering)
+   call Check_DaughterOrdering_MCFM_qqVVqq(pid_MCFM_in(3:6),decayOrdering,idV,idVswap,ZWcode)
+   if (any(decayOrdering .lt. 0)) then
+      return
+   endif
    do ip=0,3
       p_MCFM(3+ip,:) = p_MCFM_in(3+decayOrdering(ip+1),:)
       pid_MCFM(3+ip) = pid_MCFM_in(3+decayOrdering(ip+1))
@@ -1745,18 +1742,18 @@ common/zcouple/l,r,q1,l1,r1,q2,l2,r2,le,ln,re,rn,sin2w
       return
    else
       do ip=0,1
-      p_MCFM(7+ip,:) = p_MCFM_in(7+apartOrdering(ip+1),:)
-      pid_MCFM(7+ip) = pid_MCFM_in(7+apartOrdering(ip+1))
+         p_MCFM(7+ip,:) = p_MCFM_in(7+apartOrdering(ip+1),:)
+         pid_MCFM(7+ip) = pid_MCFM_in(7+apartOrdering(ip+1))
       enddo
    endif
 
    ! Turn 4f interference on as needed
-   if( &
-   abs(pid_MCFM_in(3)).eq.abs(pid_MCFM_in(5)) .and. abs(pid_MCFM_in(4)).eq.abs(pid_MCFM_in(6)) &
-   .and. pid_MCFM_in(3).ne.0 .and. pid_MCFM_in(6).ne.6 &
-   ) then
+   if( includeInterference .and. idV(1).eq.idV(2) .and. idVswap(1).eq.idVswap(2) .and. idVswap(1).eq.idV(1) .and. idV(1).eq.Z0_ ) then
       vsymfact=0.5d0
       interference=.true.
+   else
+      vsymfact=1d0
+      interference=.false.
    endif
 
    ! Set l1, l2
@@ -1773,21 +1770,29 @@ common/zcouple/l,r,q1,l1,r1,q2,l2,r2,le,ln,re,rn,sin2w
 end function
 
 ! Subroutines to check and pass the ordering for the decay particles in the "main" system (e.g. H->4f decay)
-subroutine Check_DaughterOrdering_MCFM_qqVVqq(idPart,order)
-use ModParameters
+subroutine Check_DaughterOrdering_MCFM_qqVVqq(idPart,order,idV,idVswap,ZWcode)
+use ModParameters, only : includeInterference, Z0_, Wp_, Wm_, Top_, Not_a_particle_, CoupledVertex, IsALepton, IsDownTypeQuark, IsANeutrino, IsUpTypeQuark
 use ModMisc
 implicit none
 integer, intent(in) :: idPart(1:4)
-integer, intent(out) :: order(1:4)
-integer :: ip, idV(1:2)
+integer, intent(out) :: order(1:4),idV(1:2),idVswap(1:2),ZWcode
+integer :: ip
 logical :: isZZ, isWW
+integer, parameter :: doZZ=1,doWW=2,doZZorWW=3
 
 character*30 runstring
 common/runstring/runstring
 
    order(:)=(/ 0,1,2,3 /)
    idV(:)=0
+   idVswap(:)=Not_a_particle_
 
+   do ip=1,4
+      if(abs(idPart(ip)) .eq. abs(Top_)) then
+         order(:)=-1
+         exit
+      endif
+   enddo
    if( idPart(1).ne.0 .and. idPart(2).ne.0) then
       idV(1)=CoupledVertex(idPart(1:2),-1)
    endif
@@ -1795,7 +1800,7 @@ common/runstring/runstring
       idV(2)=CoupledVertex(idPart(3:4),-1)
    endif
    isZZ = (idV(1).eq.Z0_ .or. idV(1).eq.0) .and. (idV(2).eq.Z0_ .or. idV(2).eq.0)
-   isWW = (idV(1).eq.abs(Wp_) .or. idV(1).eq.0) .and. (idV(2).eq.abs(Wp_) .or. idV(2).eq.0)
+   isWW = (abs(idV(1)).eq.abs(Wp_) .or. idV(1).eq.0) .and. (abs(idV(2)).eq.abs(Wp_) .or. idV(2).eq.0)
 
    if ( &
    isZZ .and. (&
@@ -1810,233 +1815,50 @@ common/runstring/runstring
    ) then
       call swap(order(1),order(3))
       call swap(order(2),order(4))
+      call swap(idV(1),idV(2))
    endif
 
+   if(includeInterference) then
+      idVswap(:)=0
+      if( idPart(2).ne.0 .and. idPart(3).ne.0) then
+         idVswap(1)=CoupledVertex((/idPart(3),idPart(2)/),-1)
+      endif
+      if( idPart(1).ne.0 .and. idPart(4).ne.0) then
+         idVswap(2)=CoupledVertex((/idPart(1),idPart(4)/),-1)
+      endif
+   endif
    if (isWW) then
       call swap(order(1),order(3))
-      runstring = trim(MCFM_runstring) // '_ww' ! wbfXY_ww needed to have WW-only final state since we use qq_VVqq process. This needs to be changed somehow if we want to simulate ZZ+WW->4f
+      if(any(idVswap.eq.0) .or. any(idVswap.eq.Not_a_particle_)) then
+         runstring = trim(MCFM_runstring) // '_ww'
+         ZWcode=doWW
+      else ! ZZ combination allowed
+         runstring = trim(MCFM_runstring)
+         ZWcode=doZZorWW
+      endif
+   else
+      if(any(idVswap.eq.0) .or. any(idVswap.eq.Not_a_particle_) .or. all(idVswap.eq.Z0_)) then
+         runstring = trim(MCFM_runstring) // '_zz'
+         ZWcode=doZZ
+      else
+         runstring = trim(MCFM_runstring)
+         ZWcode=doZZorWW
+      endif
    endif
 end subroutine
 
 ! Subroutines to check and pass the ordering for the associated particles
 subroutine Check_APartHash_MCFM_qqVVqq(idAPart,order) ! idAPart is in JHU convention
-use ModParameters
+use ModHashCollection
 implicit none
 integer, intent(in) :: idAPart(1:4)
 integer, intent(out) :: order(1:2) ! Final state ordering; initial state remains the same
-integer, parameter :: hashSize = 204
-integer :: hash(1:4,1:hashSize),ih
+integer, parameter :: hashSize = Hash_MCFM_qqVVqq_Size
+integer, pointer :: hash(:,:)
+integer :: ih
 logical  :: outFound
 
-   hash(:,1) = (/ Up_ , Chm_ , Up_ , Chm_ /)
-   hash(:,2) = (/ Dn_ , Str_ , Dn_ , Str_ /)
-   hash(:,3) = (/ Dn_ , Bot_ , Dn_ , Bot_ /)
-   hash(:,4) = (/ Str_ , Bot_ , Str_ , Bot_ /)
-   hash(:,5) = (/ Up_ , Str_ , Up_ , Str_ /)
-   hash(:,6) = (/ Up_ , Bot_ , Up_ , Bot_ /)
-   hash(:,7) = (/ Chm_ , Bot_ , Chm_ , Bot_ /)
-   hash(:,8) = (/ Dn_ , Chm_ , Dn_ , Chm_ /)
-   hash(:,9) = (/ Dn_ , Up_ , Dn_ , Up_ /)
-   hash(:,10) = (/ Str_ , Chm_ , Str_ , Chm_ /)
-   hash(:,11) = (/ Dn_ , Chm_ , Up_ , Str_ /)
-   hash(:,12) = (/ Up_ , Str_ , Dn_ , Chm_ /)
-   hash(:,13) = (/ Up_ , Up_ , Up_ , Up_ /)
-   hash(:,14) = (/ Chm_ , Chm_ , Chm_ , Chm_ /)
-   hash(:,15) = (/ Dn_ , Dn_ , Dn_ , Dn_ /)
-   hash(:,16) = (/ Str_ , Str_ , Str_ , Str_ /)
-   hash(:,17) = (/ Bot_ , Bot_ , Bot_ , Bot_ /)
-   hash(:,18) = (/ Chm_ , Up_ , Up_ , Chm_ /)
-   hash(:,19) = (/ Str_ , Dn_ , Dn_ , Str_ /)
-   hash(:,20) = (/ Bot_ , Dn_ , Dn_ , Bot_ /)
-   hash(:,21) = (/ Bot_ , Str_ , Str_ , Bot_ /)
-   hash(:,22) = (/ Str_ , Up_ , Up_ , Str_ /)
-   hash(:,23) = (/ Bot_ , Up_ , Up_ , Bot_ /)
-   hash(:,24) = (/ Bot_ , Chm_ , Chm_ , Bot_ /)
-   hash(:,25) = (/ Chm_ , Dn_ , Dn_ , Chm_ /)
-   hash(:,26) = (/ Up_ , Dn_ , Dn_ , Up_ /)
-   hash(:,27) = (/ Chm_ , Str_ , Str_ , Chm_ /)
-   hash(:,28) = (/ Chm_ , Dn_ , Up_ , Str_ /)
-   hash(:,29) = (/ Str_ , Up_ , Dn_ , Chm_ /)
-   hash(:,30) = (/ Up_ , Up_ , Up_ , Up_ /)
-   hash(:,31) = (/ Chm_ , Chm_ , Chm_ , Chm_ /)
-   hash(:,32) = (/ Dn_ , Dn_ , Dn_ , Dn_ /)
-   hash(:,33) = (/ Str_ , Str_ , Str_ , Str_ /)
-   hash(:,34) = (/ Bot_ , Bot_ , Bot_ , Bot_ /)
-
-   hash(:,35) = (/ AChm_ , AUp_ , AChm_ , AUp_ /)
-   hash(:,36) = (/ AStr_ , ADn_ , AStr_ , ADn_ /)
-   hash(:,37) = (/ ABot_ , ADn_ , ABot_ , ADn_ /)
-   hash(:,38) = (/ ABot_ , AStr_ , ABot_ , AStr_ /)
-   hash(:,39) = (/ AStr_ , AUp_ , AStr_ , AUp_ /)
-   hash(:,40) = (/ ABot_ , AUp_ , ABot_ , AUp_ /)
-   hash(:,41) = (/ ABot_ , AChm_ , ABot_ , AChm_ /)
-   hash(:,42) = (/ AChm_ , ADn_ , AChm_ , ADn_ /)
-   hash(:,43) = (/ AUp_ , ADn_ , AUp_ , ADn_ /)
-   hash(:,44) = (/ AChm_ , AStr_ , AChm_ , AStr_ /)
-   hash(:,45) = (/ AStr_ , AUp_ , AChm_ , ADn_ /)
-   hash(:,46) = (/ AChm_ , ADn_ , AStr_ , AUp_ /)
-   hash(:,47) = (/ AUp_ , AUp_ , AUp_ , AUp_ /)
-   hash(:,48) = (/ AChm_ , AChm_ , AChm_ , AChm_ /)
-   hash(:,49) = (/ ADn_ , ADn_ , ADn_ , ADn_ /)
-   hash(:,50) = (/ AStr_ , AStr_ , AStr_ , AStr_ /)
-   hash(:,51) = (/ ABot_ , ABot_ , ABot_ , ABot_ /)
-   hash(:,52) = (/ AUp_ , AChm_ , AChm_ , AUp_ /)
-   hash(:,53) = (/ ADn_ , AStr_ , AStr_ , ADn_ /)
-   hash(:,54) = (/ ADn_ , ABot_ , ABot_ , ADn_ /)
-   hash(:,55) = (/ AStr_ , ABot_ , ABot_ , AStr_ /)
-   hash(:,56) = (/ AUp_ , AStr_ , AStr_ , AUp_ /)
-   hash(:,57) = (/ AUp_ , ABot_ , ABot_ , AUp_ /)
-   hash(:,58) = (/ AChm_ , ABot_ , ABot_ , AChm_ /)
-   hash(:,59) = (/ ADn_ , AChm_ , AChm_ , ADn_ /)
-   hash(:,60) = (/ ADn_ , AUp_ , AUp_ , ADn_ /)
-   hash(:,61) = (/ AStr_ , AChm_ , AChm_ , AStr_ /)
-   hash(:,62) = (/ AUp_ , AStr_ , AChm_ , ADn_ /)
-   hash(:,63) = (/ ADn_ , AChm_ , AStr_ , AUp_ /)
-   hash(:,64) = (/ AUp_ , AUp_ , AUp_ , AUp_ /)
-   hash(:,65) = (/ AChm_ , AChm_ , AChm_ , AChm_ /)
-   hash(:,66) = (/ ADn_ , ADn_ , ADn_ , ADn_ /)
-   hash(:,67) = (/ AStr_ , AStr_ , AStr_ , AStr_ /)
-   hash(:,68) = (/ ABot_ , ABot_ , ABot_ , ABot_ /)
-
-   hash(:,69) = (/ AUp_ , Chm_ , AUp_ , Chm_ /)
-   hash(:,70) = (/ ADn_ , Str_ , ADn_ , Str_ /)
-   hash(:,71) = (/ ADn_ , Bot_ , ADn_ , Bot_ /)
-   hash(:,72) = (/ AStr_ , Bot_ , AStr_ , Bot_ /)
-   hash(:,73) = (/ AUp_ , Str_ , AUp_ , Str_ /)
-   hash(:,74) = (/ AUp_ , Bot_ , AUp_ , Bot_ /)
-   hash(:,75) = (/ AChm_ , Bot_ , AChm_ , Bot_ /)
-   hash(:,76) = (/ ADn_ , Chm_ , ADn_ , Chm_ /)
-   hash(:,77) = (/ ADn_ , Up_ , ADn_ , Up_ /)
-   hash(:,78) = (/ AStr_ , Chm_ , AStr_ , Chm_ /)
-   hash(:,79) = (/ AUp_ , Chm_ , ADn_ , Str_ /)
-   hash(:,80) = (/ ADn_ , Str_ , AUp_ , Chm_ /)
-   hash(:,81) = (/ AUp_ , Up_ , AUp_ , Up_ /)
-   hash(:,82) = (/ AChm_ , Chm_ , AChm_ , Chm_ /)
-   hash(:,83) = (/ ADn_ , Dn_ , ADn_ , Dn_ /)
-   hash(:,84) = (/ AStr_ , Str_ , AStr_ , Str_ /)
-   hash(:,85) = (/ ABot_ , Bot_ , ABot_ , Bot_ /)
-   hash(:,86) = (/ AChm_ , Up_ , AChm_ , Up_ /)
-   hash(:,87) = (/ AStr_ , Dn_ , AStr_ , Dn_ /)
-   hash(:,88) = (/ ABot_ , Dn_ , ABot_ , Dn_ /)
-   hash(:,89) = (/ ABot_ , Str_ , ABot_ , Str_ /)
-   hash(:,90) = (/ AStr_ , Up_ , AStr_ , Up_ /)
-   hash(:,91) = (/ ABot_ , Up_ , ABot_ , Up_ /)
-   hash(:,92) = (/ ABot_ , Chm_ , ABot_ , Chm_ /)
-   hash(:,93) = (/ AChm_ , Dn_ , AChm_ , Dn_ /)
-   hash(:,94) = (/ AUp_ , Dn_ , AUp_ , Dn_ /)
-   hash(:,95) = (/ AChm_ , Str_ , AChm_ , Str_ /)
-   hash(:,96) = (/ AStr_ , Dn_ , AChm_ , Up_ /)
-   hash(:,97) = (/ AChm_ , Up_ , AStr_ , Dn_ /)
-   hash(:,98) = (/ AUp_ , Up_ , AUp_ , Up_ /)
-   hash(:,99) = (/ AChm_ , Chm_ , AChm_ , Chm_ /)
-   hash(:,100) = (/ ADn_ , Dn_ , ADn_ , Dn_ /)
-   hash(:,101) = (/ AStr_ , Str_ , AStr_ , Str_ /)
-   hash(:,102) = (/ ABot_ , Bot_ , ABot_ , Bot_ /)
-
-   hash(:,103) = (/ Chm_ , AUp_ , AUp_ , Chm_ /)
-   hash(:,104) = (/ Str_ , ADn_ , ADn_ , Str_ /)
-   hash(:,105) = (/ Bot_ , ADn_ , ADn_ , Bot_ /)
-   hash(:,106) = (/ Bot_ , AStr_ , AStr_ , Bot_ /)
-   hash(:,107) = (/ Str_ , AUp_ , AUp_ , Str_ /)
-   hash(:,108) = (/ Bot_ , AUp_ , AUp_ , Bot_ /)
-   hash(:,109) = (/ Bot_ , AChm_ , AChm_ , Bot_ /)
-   hash(:,110) = (/ Chm_ , ADn_ , ADn_ , Chm_ /)
-   hash(:,111) = (/ Up_ , ADn_ , ADn_ , Up_ /)
-   hash(:,112) = (/ Chm_ , AStr_ , AStr_ , Chm_ /)
-   hash(:,113) = (/ Chm_ , AUp_ , ADn_ , Str_ /)
-   hash(:,114) = (/ Str_ , ADn_ , AUp_ , Chm_ /)
-   hash(:,115) = (/ Up_ , AUp_ , AUp_ , Up_ /)
-   hash(:,116) = (/ Chm_ , AChm_ , AChm_ , Chm_ /)
-   hash(:,117) = (/ Dn_ , ADn_ , ADn_ , Dn_ /)
-   hash(:,118) = (/ Str_ , AStr_ , AStr_ , Str_ /)
-   hash(:,119) = (/ Bot_ , ABot_ , ABot_ , Bot_ /)
-   hash(:,120) = (/ Up_ , AChm_ , AChm_ , Up_ /)
-   hash(:,121) = (/ Dn_ , AStr_ , AStr_ , Dn_ /)
-   hash(:,122) = (/ Dn_ , ABot_ , ABot_ , Dn_ /)
-   hash(:,123) = (/ Str_ , ABot_ , ABot_ , Str_ /)
-   hash(:,124) = (/ Up_ , AStr_ , AStr_ , Up_ /)
-   hash(:,125) = (/ Up_ , ABot_ , ABot_ , Up_ /)
-   hash(:,126) = (/ Chm_ , ABot_ , ABot_ , Chm_ /)
-   hash(:,127) = (/ Dn_ , AChm_ , AChm_ , Dn_ /)
-   hash(:,128) = (/ Dn_ , AUp_ , AUp_ , Dn_ /)
-   hash(:,129) = (/ Str_ , AChm_ , AChm_ , Str_ /)
-   hash(:,130) = (/ Dn_ , AStr_ , AChm_ , Up_ /)
-   hash(:,131) = (/ Up_ , AChm_ , AStr_ , Dn_ /)
-   hash(:,132) = (/ Up_ , AUp_ , AUp_ , Up_ /)
-   hash(:,133) = (/ Chm_ , AChm_ , AChm_ , Chm_ /)
-   hash(:,134) = (/ Dn_ , ADn_ , ADn_ , Dn_ /)
-   hash(:,135) = (/ Str_ , AStr_ , AStr_ , Str_ /)
-   hash(:,136) = (/ Bot_ , ABot_ , ABot_ , Bot_ /)
-
-   hash(:,137) = (/ Up_ , AUp_ , AChm_ , Chm_ /)
-   hash(:,138) = (/ Dn_ , ADn_ , AStr_ , Str_ /)
-   hash(:,139) = (/ Dn_ , ADn_ , ABot_ , Bot_ /)
-   hash(:,140) = (/ Str_ , AStr_ , ABot_ , Bot_ /)
-   hash(:,141) = (/ Up_ , AUp_ , AStr_ , Str_ /)
-   hash(:,142) = (/ Up_ , AUp_ , ABot_ , Bot_ /)
-   hash(:,143) = (/ Chm_ , AChm_ , ABot_ , Bot_ /)
-   hash(:,144) = (/ Dn_ , ADn_ , AChm_ , Chm_ /)
-   hash(:,145) = (/ Dn_ , ADn_ , AUp_ , Up_ /)
-   hash(:,146) = (/ Str_ , AStr_ , AChm_ , Chm_ /)
-   hash(:,147) = (/ Dn_ , AUp_ , AChm_ , Str_ /)
-   hash(:,148) = (/ Up_ , ADn_ , AStr_ , Chm_ /)
-   hash(:,149) = (/ Up_ , AUp_ , AUp_ , Up_ /)
-   hash(:,150) = (/ Chm_ , AChm_ , AChm_ , Chm_ /)
-   hash(:,151) = (/ Dn_ , ADn_ , ADn_ , Dn_ /)
-   hash(:,152) = (/ Str_ , AStr_ , AStr_ , Str_ /)
-   hash(:,153) = (/ Bot_ , ABot_ , ABot_ , Bot_ /)
-   hash(:,154) = (/ Chm_ , AChm_ , AUp_ , Up_ /)
-   hash(:,155) = (/ Str_ , AStr_ , ADn_ , Dn_ /)
-   hash(:,156) = (/ Bot_ , ABot_ , ADn_ , Dn_ /)
-   hash(:,157) = (/ Bot_ , ABot_ , AStr_ , Str_ /)
-   hash(:,158) = (/ Str_ , AStr_ , AUp_ , Up_ /)
-   hash(:,159) = (/ Bot_ , ABot_ , AUp_ , Up_ /)
-   hash(:,160) = (/ Bot_ , ABot_ , AChm_ , Chm_ /)
-   hash(:,161) = (/ Chm_ , AChm_ , ADn_ , Dn_ /)
-   hash(:,162) = (/ Up_ , AUp_ , ADn_ , Dn_ /)
-   hash(:,163) = (/ Chm_ , AChm_ , AStr_ , Str_ /)
-   hash(:,164) = (/ Chm_ , AStr_ , ADn_ , Up_ /)
-   hash(:,165) = (/ Str_ , AChm_ , AUp_ , Dn_ /)
-   hash(:,166) = (/ Up_ , AUp_ , AUp_ , Up_ /)
-   hash(:,167) = (/ Chm_ , AChm_ , AChm_ , Chm_ /)
-   hash(:,168) = (/ Dn_ , ADn_ , ADn_ , Dn_ /)
-   hash(:,169) = (/ Str_ , AStr_ , AStr_ , Str_ /)
-   hash(:,170) = (/ Bot_ , ABot_ , ABot_ , Bot_ /)
-
-   hash(:,171) = (/ AUp_ , Up_ , AChm_ , Chm_ /)
-   hash(:,172) = (/ ADn_ , Dn_ , AStr_ , Str_ /)
-   hash(:,173) = (/ ADn_ , Dn_ , ABot_ , Bot_ /)
-   hash(:,174) = (/ AStr_ , Str_ , ABot_ , Bot_ /)
-   hash(:,175) = (/ AUp_ , Up_ , AStr_ , Str_ /)
-   hash(:,176) = (/ AUp_ , Up_ , ABot_ , Bot_ /)
-   hash(:,177) = (/ AChm_ , Chm_ , ABot_ , Bot_ /)
-   hash(:,178) = (/ ADn_ , Dn_ , AChm_ , Chm_ /)
-   hash(:,179) = (/ ADn_ , Dn_ , AUp_ , Up_ /)
-   hash(:,180) = (/ AStr_ , Str_ , AChm_ , Chm_ /)
-   hash(:,181) = (/ AUp_ , Dn_ , AChm_ , Str_ /)
-   hash(:,182) = (/ ADn_ , Up_ , AStr_ , Chm_ /)
-   hash(:,183) = (/ AUp_ , Up_ , AUp_ , Up_ /)
-   hash(:,184) = (/ AChm_ , Chm_ , AChm_ , Chm_ /)
-   hash(:,185) = (/ ADn_ , Dn_ , ADn_ , Dn_ /)
-   hash(:,186) = (/ AStr_ , Str_ , AStr_ , Str_ /)
-   hash(:,187) = (/ ABot_ , Bot_ , ABot_ , Bot_ /)
-   hash(:,188) = (/ AChm_ , Chm_ , AUp_ , Up_ /)
-   hash(:,189) = (/ AStr_ , Str_ , ADn_ , Dn_ /)
-   hash(:,190) = (/ ABot_ , Bot_ , ADn_ , Dn_ /)
-   hash(:,191) = (/ ABot_ , Bot_ , AStr_ , Str_ /)
-   hash(:,192) = (/ AStr_ , Str_ , AUp_ , Up_ /)
-   hash(:,193) = (/ ABot_ , Bot_ , AUp_ , Up_ /)
-   hash(:,194) = (/ ABot_ , Bot_ , AChm_ , Chm_ /)
-   hash(:,195) = (/ AChm_ , Chm_ , ADn_ , Dn_ /)
-   hash(:,196) = (/ AUp_ , Up_ , ADn_ , Dn_ /)
-   hash(:,197) = (/ AChm_ , Chm_ , AStr_ , Str_ /)
-   hash(:,198) = (/ AStr_ , Chm_ , ADn_ , Up_ /)
-   hash(:,199) = (/ AChm_ , Str_ , AUp_ , Dn_ /)
-   hash(:,200) = (/ AUp_ , Up_ , AUp_ , Up_ /)
-   hash(:,201) = (/ AChm_ , Chm_ , AChm_ , Chm_ /)
-   hash(:,202) = (/ ADn_ , Dn_ , ADn_ , Dn_ /)
-   hash(:,203) = (/ AStr_ , Str_ , AStr_ , Str_ /)
-   hash(:,204) = (/ ABot_ , Bot_ , ABot_ , Bot_ /)
+   hash => Hash_MCFM_qqVVqq
 
    outFound=.false.
    order(:)=-1
@@ -2044,26 +1866,26 @@ logical  :: outFound
    do ih=1,hashSize
       if ( &
       .not.( &
-      (idAPart(1).eq.0 .or. idAPart(1).eq.hash(1,ih)) &
+      (idAPart(1).eq.0 .or. idAPart(1).eq.hash(ih,1)) &
       .and. &
-      (idAPart(2).eq.0 .or. idAPart(2).eq.hash(2,ih)) &
+      (idAPart(2).eq.0 .or. idAPart(2).eq.hash(ih,2)) &
       ) &
       ) cycle
 
       ! Final particles are q
-      if (abs(idAPart(3)).lt.6 .and. abs(idAPart(4)).lt.6) then
+      if ((IsALightQuark(idAPart(3)) .or. idAPart(3).eq.0) .and. (IsALightQuark(idAPart(4)) .or. idAPart(4).eq.0)) then
          if ( &
-         (idAPart(3).eq.0 .or. idAPart(3).eq.hash(3,ih)) &
+         (idAPart(3).eq.0 .or. idAPart(3).eq.hash(ih,3)) &
          .and. &
-         (idAPart(4).eq.0 .or. idAPart(4).eq.hash(4,ih)) &
+         (idAPart(4).eq.0 .or. idAPart(4).eq.hash(ih,4)) &
          ) then
             order(1)=0
             order(2)=1
             outFound=.true.
          else if ( &
-         (idAPart(3).eq.0 .or. idAPart(3).eq.hash(4,ih)) &
+         (idAPart(3).eq.0 .or. idAPart(3).eq.hash(ih,4)) &
          .and. &
-         (idAPart(4).eq.0 .or. idAPart(4).eq.hash(3,ih)) &
+         (idAPart(4).eq.0 .or. idAPart(4).eq.hash(ih,3)) &
          ) then
             order(1)=1
             order(2)=0
@@ -2071,17 +1893,17 @@ logical  :: outFound
          endif
       ! Final particles l/nu
       else if ((IsALepton(idAPart(3)) .or. IsANeutrino(idAPart(3))) .and. (IsALepton(idAPart(4)) .or. IsANeutrino(idAPart(4)))) then
-         if (abs(hash(1,ih)).eq.abs(hash(2,ih)) .and. abs(hash(1,ih)).eq.abs(hash(3,ih)) .and. abs(hash(1,ih)).eq.abs(hash(4,ih))) cycle ! Do not consider the ordering in uquq_uquq or dqdq_dqdq
+         if (abs(hash(ih,1)).eq.abs(hash(ih,2)) .and. abs(hash(ih,1)).eq.abs(hash(ih,3)) .and. abs(hash(ih,1)).eq.abs(hash(ih,4))) cycle ! Do not consider the ordering in uquq_uquq or dqdq_dqdq
 
          if ( &
          ( &
-         sign(1, idAPart(3)).eq.sign(1, hash(3,ih)) .and. &
-         ((IsALepton(idAPart(3)) .and. IsDownTypeQuark(hash(3,ih))) .or. (IsANeutrino(idAPart(3)) .and. IsUpTypeQuark(hash(3,ih)))) &
+         sign(1, idAPart(3)).eq.sign(1, hash(ih,3)) .and. &
+         ((IsALepton(idAPart(3)) .and. IsDownTypeQuark(hash(ih,3))) .or. (IsANeutrino(idAPart(3)) .and. IsUpTypeQuark(hash(ih,3)))) &
          ) &
          .and. &
          ( &
-         sign(1, idAPart(4)).eq.sign(1, hash(4,ih)) .and. &
-         ((IsALepton(idAPart(4)) .and. IsDownTypeQuark(hash(4,ih))) .or. (IsANeutrino(idAPart(4)) .and. IsUpTypeQuark(hash(4,ih)))) &
+         sign(1, idAPart(4)).eq.sign(1, hash(ih,4)) .and. &
+         ((IsALepton(idAPart(4)) .and. IsDownTypeQuark(hash(ih,4))) .or. (IsANeutrino(idAPart(4)) .and. IsUpTypeQuark(hash(ih,4)))) &
          ) &
          ) then
             order(1)=0
@@ -2089,20 +1911,20 @@ logical  :: outFound
             outFound=.true.
          else if ( &
          ( &
-         sign(1, idAPart(3)).eq.sign(1, hash(4,ih)) .and. &
-         ((IsALepton(idAPart(3)) .and. IsDownTypeQuark(hash(4,ih))) .or. (IsANeutrino(idAPart(3)) .and. IsUpTypeQuark(hash(4,ih)))) &
+         sign(1, idAPart(3)).eq.sign(1, hash(ih,4)) .and. &
+         ((IsALepton(idAPart(3)) .and. IsDownTypeQuark(hash(ih,4))) .or. (IsANeutrino(idAPart(3)) .and. IsUpTypeQuark(hash(ih,4)))) &
          ) &
          .and. &
          ( &
-         sign(1, idAPart(4)).eq.sign(1, hash(3,ih)) .and. &
-         ((IsALepton(idAPart(4)) .and. IsDownTypeQuark(hash(3,ih))) .or. (IsANeutrino(idAPart(4)) .and. IsUpTypeQuark(hash(3,ih)))) &
+         sign(1, idAPart(4)).eq.sign(1, hash(ih,3)) .and. &
+         ((IsALepton(idAPart(4)) .and. IsDownTypeQuark(hash(ih,3))) .or. (IsANeutrino(idAPart(4)) .and. IsUpTypeQuark(hash(ih,3)))) &
          ) &
          ) then
             order(1)=1
             order(2)=0
             outFound=.true.
          endif
-         outFound = ( CoupledVertex(idAPart(3:4), -1).eq.CoupledVertex(hash(3:4,ih),-1) )
+         outFound = ( CoupledVertex(idAPart(3:4), -1).eq.CoupledVertex(hash(ih,3:4),-1) )
       endif
       if (outFound) then
          exit
@@ -2111,31 +1933,35 @@ logical  :: outFound
 
 end subroutine
 
-subroutine EvalAmp_qqVVqq(idin, pin, ZWcode, msq)
+subroutine EvalAmp_qqVVqq(idin, pin, msq)
 use ModParameters
 use ModMisc
 implicit none
 integer, intent(in) :: idin(1:mxpart)
 real(8), intent(in) :: pin(1:mxpart,1:4)
 real(8)             :: pin_MCFMconv(1:mxpart,1:4)
-integer, intent(in) :: ZWcode
-integer :: id_MCFM(1:mxpart)
+integer :: ZWcode
+integer :: id_MCFM(1:mxpart),id_MCFM_78swap(1:mxpart),idDummy(1:mxpart)
 real(8) :: p_MCFM(1:mxpart,1:4)
 real(8) :: msq(-5:5,-5:5),msq_tmp(-5:5,-5:5)
 integer, parameter :: doZZ=1,doWW=2,doZZorWW=3
-logical :: doCompute
-integer :: i,j
+logical :: doCompute,doNotWipe
+integer :: i,j,ip
 
    msq(:,:)=0d0
    msq_tmp(:,:)=0d0
 
    pin_MCFMconv(:,:)=pin(:,:)/GeV
 
-   doCompute = Setup_MCFM_qqVVqq(idin,pin_MCFMconv,id_MCFM,p_MCFM)
+   doCompute = Setup_MCFM_qqVVqq(idin,pin_MCFMconv,id_MCFM,p_MCFM,ZWcode)
    if (doCompute) then
-      call SetupParticleLabels(id_MCFM) ! Assign plabels 
+      idDummy=idin
+      id_MCFM_78swap=id_MCFM
+      call swap(id_MCFM_78swap(7),id_MCFM_78swap(8))
+
       if(ZWcode.eq.doZZ) then
          if (Process.ge.66 .and. Process.le.68) then
+            call SetupParticleLabels(id_MCFM,1,8,.true.,.true.) ! Assign plabels
             call qq_zzqq(p_MCFM,msq)
             if (id_MCFM(7).eq.0 .and. id_MCFM(8).eq.0) then ! Calculate for swapped momentum combination
                call swap(p_MCFM(7,:),p_MCFM(8,:)) ! Swap just the momenta
@@ -2146,8 +1972,7 @@ integer :: i,j
                enddo
             else if (id_MCFM(7).eq.0 .or. id_MCFM(8).eq.0) then ! Calculate for wrong combination
                call swap(p_MCFM(7,:),p_MCFM(8,:)) ! Swap the momenta
-               call swap(id_MCFM(7),id_MCFM(8)) ! Swap the ids
-               call SetupParticleLabels(id_MCFM) ! Reassign plabels
+               call SetupParticleLabels(id_MCFM_78swap,7,8,.true.,.true.) ! Assign plabels
                call qq_zzqq(p_MCFM,msq_tmp)
                do i=-5,5
                do j=-5,5
@@ -2158,6 +1983,7 @@ integer :: i,j
                enddo
             endif
          else if (Process.eq.69) then ! Or some other number?
+            call SetupParticleLabels(id_MCFM,1,8,.false.,.true.) ! Assign plabels
             call qq_zzqqstrong(p_MCFM,msq)
             if (id_MCFM(7).eq.0 .and. id_MCFM(8).eq.0) then ! Calculate for swapped momentum combination
                call swap(p_MCFM(7,:),p_MCFM(8,:)) ! Swap just the momenta
@@ -2169,13 +1995,13 @@ integer :: i,j
                enddo
                ! Subtract qqb->gg, which was counted twice
                id_MCFM(7:8)=Glu_
-               call SetupParticleLabels(id_MCFM) ! Reassign plabels
+               call SetupParticleLabels(id_MCFM,7,8,.false.,.true.) ! Assign plabels
+               id_MCFM(7:8)=0
                call qq_zzqqstrong(p_MCFM,msq_tmp)
                msq = msq - msq_tmp
             else if (id_MCFM(7).eq.0 .or. id_MCFM(8).eq.0) then ! Calculate for wrong combination
                call swap(p_MCFM(7,:),p_MCFM(8,:)) ! Swap the momenta
-               call swap(id_MCFM(7),id_MCFM(8)) ! Swap the ids
-               call SetupParticleLabels(id_MCFM) ! Reassign plabels
+               call SetupParticleLabels(id_MCFM_78swap,7,8,.false.,.true.) ! Assign plabels
                call qq_zzqqstrong(p_MCFM,msq_tmp)
                do i=-5,5
                do j=-5,5
@@ -2188,6 +2014,7 @@ integer :: i,j
          endif
       else if(ZWcode.eq.doWW) then
          if (Process.ge.66 .and. Process.le.68) then
+            call SetupParticleLabels(id_MCFM,1,8,.true.,.true.) ! Assign plabels
             call qq_wwqq(p_MCFM,msq)
             if (id_MCFM(7).eq.0 .and. id_MCFM(8).eq.0) then ! Calculate for swapped momentum combination
                call swap(p_MCFM(7,:),p_MCFM(8,:)) ! Swap just the momenta
@@ -2198,8 +2025,7 @@ integer :: i,j
                enddo
             else if (id_MCFM(7).eq.0 .or. id_MCFM(8).eq.0) then ! Calculate for wrong combination
                call swap(p_MCFM(7,:),p_MCFM(8,:)) ! Swap the momenta
-               call swap(id_MCFM(7),id_MCFM(8)) ! Swap the ids
-               call SetupParticleLabels(id_MCFM) ! Reassign plabels
+               call SetupParticleLabels(id_MCFM_78swap,7,8,.true.,.true.) ! Assign plabels
                call qq_wwqq(p_MCFM,msq_tmp)
                do i=-5,5
                do j=-5,5
@@ -2209,7 +2035,8 @@ integer :: i,j
                enddo
                enddo
             endif
-         else if (Process.eq.69) then ! Or some other number?
+         else if (Process.eq.69) then
+            call SetupParticleLabels(id_MCFM,1,8,.false.,.true.) ! Assign plabels
             call qq_wwqqstrong(p_MCFM,msq)
             if (id_MCFM(7).eq.0 .and. id_MCFM(8).eq.0) then ! Calculate for swapped momentum combination
                call swap(p_MCFM(7,:),p_MCFM(8,:)) ! Swap just the momenta
@@ -2221,13 +2048,13 @@ integer :: i,j
                enddo
                ! Subtract qqb->gg, which was counted twice
                id_MCFM(7:8)=Glu_
-               call SetupParticleLabels(id_MCFM) ! Reassign plabels
+               call SetupParticleLabels(id_MCFM,7,8,.false.,.true.) ! Assign plabels
+               id_MCFM(7:8)=0
                call qq_wwqqstrong(p_MCFM,msq_tmp)
                msq = msq - msq_tmp
             else if (id_MCFM(7).eq.0 .or. id_MCFM(8).eq.0) then ! Calculate for wrong combination
                call swap(p_MCFM(7,:),p_MCFM(8,:)) ! Swap the momenta
-               call swap(id_MCFM(7),id_MCFM(8)) ! Swap the ids
-               call SetupParticleLabels(id_MCFM) ! Reassign plabels
+               call SetupParticleLabels(id_MCFM_78swap,7,8,.false.,.true.) ! Assign plabels
                call qq_wwqqstrong(p_MCFM,msq_tmp)
                do i=-5,5
                do j=-5,5
@@ -2240,6 +2067,7 @@ integer :: i,j
          endif
       else if(ZWcode.eq.doZZorWW) then
          if (Process.ge.66 .and. Process.le.68) then
+            call SetupParticleLabels(id_MCFM,1,8,.true.,.true.) ! Assign plabels
             call qq_vvqq(p_MCFM,msq)
             if (id_MCFM(7).eq.0 .and. id_MCFM(8).eq.0) then ! Calculate for swapped momentum combination
                call swap(p_MCFM(7,:),p_MCFM(8,:)) ! Swap just the momenta
@@ -2250,8 +2078,7 @@ integer :: i,j
                enddo
             else if (id_MCFM(7).eq.0 .or. id_MCFM(8).eq.0) then ! Calculate for wrong combination
                call swap(p_MCFM(7,:),p_MCFM(8,:)) ! Swap the momenta
-               call swap(id_MCFM(7),id_MCFM(8)) ! Swap the ids
-               call SetupParticleLabels(id_MCFM) ! Reassign plabels
+               call SetupParticleLabels(id_MCFM_78swap,7,8,.true.,.true.) ! Assign plabels
                call qq_vvqq(p_MCFM,msq_tmp)
                do i=-5,5
                do j=-5,5
@@ -2263,6 +2090,21 @@ integer :: i,j
             endif
          endif
       endif
+
+      ! Wipe the MEs that are not supposed to exist
+      do i=-5,5;do j=-5,5
+         doNotWipe=.false.
+         if ( &
+         ( id_MCFM(1).eq.0 .or. id_MCFM(1).eq.convertFromPartIndex(i) ) .and. &
+         ( id_MCFM(2).eq.0 .or. id_MCFM(2).eq.convertFromPartIndex(j) ) &
+         ) then
+            idDummy(1)=convertFromPartIndex(i); idDummy(2)=convertFromPartIndex(j)
+            doNotWipe = Setup_MCFM_qqVVqq(idDummy,pin_MCFMconv,id_MCFM_78swap,p_MCFM,ZWcode) ! no longer using the last threee arguments
+         endif
+         if (.not. doNotWipe) then
+            msq(i,j)=0d0
+         endif
+      enddo;enddo
 
    endif
 

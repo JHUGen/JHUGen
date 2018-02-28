@@ -11,6 +11,7 @@ See the manual for more details
 
 command line parameter quick reference:
   help:                Print all command line options
+  DryRun:              Check that the command line is valid, then exit
   Process configuration:
     Collider:          1=LHC (default), 2=Tevatron, 0=e+e-
     ColliderEnergy:    in TeV.  default is 13 TeV for LHC, 1.96 TeV for Tevatron,
@@ -78,7 +79,7 @@ command line parameter quick reference:
     MuFacMultiplier:   Multiplier for the factorization scale chosen by FacScheme
     RenScheme:         QCD renormalization scale scheme
     MuRenMultiplier:   Multiplier for the renormalization scale chosen by RenScheme
-  Lepton filter:
+  Lepton and jet filter:
     FilterNLept:       For decay mode, reject events that have less than FilterNLept leptons
     FilterOSPairs:     For decay mode, reject events that have less than FilterOSPairs pairs of
                        sign leptons of any flavor.
@@ -86,6 +87,8 @@ command line parameter quick reference:
                        opposite-sign-same-flavor leptons.
     CountTauAsAny:     For FilterOSSFPairs, taus can stand in place of electrons or muons
                        of the same charge.
+    FilterNJets:       For decay mode, reject events that have less than FilterNJets quarks
+                       and/or gluons
     WriteFailedEvents: Write events that fail in the LHE file, but with a weight of 0
                        (off by default)
   Higgs propagator and decay width:

@@ -2,12 +2,12 @@ Here = $(PWD)
 Makefile=makefile
 ModuleDir = $(Here)/modules
 ObjectDir = $(Here)/objects
-MELADir = $(Here)/../JHUGenMELAv2/MELA
-#MELADir = $(Here)/../../Ulascan/JHUGen/JHUGenMELAv2/MELA
+MELADir = $(Here)/../JHUGenMELA/MELA
+#MELADir = $(Here)/../../Ulascan/JHUGen/JHUGenMELA/MELA
 MELAFortranDir = $(MELADir)/fortran
 MELADataDir = $(MELADir)/data
 MELALibDir = $(MELADataDir)/slc6_amd64_gcc530
-MCFMLib = mcfm_703 # libmcfm_703.so
+MCFMLib = mcfm_705 # libmcfm_705.so
 PDFDir = $(Here)/pdfs
 VegasDir = $(Here)/vegas
 QCDLibDir = $(Here)/../lib/QCD-Loop2/lib64
@@ -34,7 +34,7 @@ linkMELA = Yes
 
 
 ifeq ($(UseLHAPDF),Yes)
-   LHAPDFflags = -L$(MyLHADir) -lLHAPDF -DuseLHAPDF=1
+   LHAPDFflags = -L$(MyLHADir) -lLHAPDF -I$(MyLHADir)/../include -DuseLHAPDF=1 -lstdc++
 else
    LHAPDFflags = -DuseLHAPDF=0
 endif
@@ -54,7 +54,7 @@ endif
 linkCollierLib = No
 
 ifeq ($(linkCollierLib),Yes)
-   CollierLibflags = -DuseCollier=1 -L$(CollierDir) -lcollier
+   CollierLibflags = -DuseCollier=1 -L$(CollierDir) -I$(CollierDir)/modules -lcollier
 else
    CollierLibflags = -DuseCollier=0
 endif
@@ -98,11 +98,13 @@ Exec = ./JHUGen
 
 
 # kinematics dependencies
-KinDep = mod_Phasespace.F90 \
+KinDep = mod_HashCollection.F90 \
+         mod_Phasespace.F90 \
          mod_Kinematics.F90
 
 # kinematics objects
-KinObj = $(ObjectDir)/mod_Phasespace.o \
+KinObj = $(ObjectDir)/mod_HashCollection.o \
+         $(ObjectDir)/mod_Phasespace.o \
          $(ObjectDir)/mod_Kinematics.o
 
 ifeq ($(linkMELA),Yes)
@@ -131,8 +133,8 @@ MainObj = $(ObjectDir)/mod_CrossSection.o \
 
 
 # amplitude dependencies
-AmpDep = mod_Misc.F90 \
-          mod_Parameters.F90 \
+AmpDep =  mod_Parameters.F90 \
+          mod_Misc.F90 \
           mod_TopDecay.F90 \
           mod_Graviton.F90 \
           mod_Higgs.F90 \
@@ -145,8 +147,8 @@ AmpDep = mod_Misc.F90 \
 
 
 # amplitude objects
-AmpObj =  $(ObjectDir)/mod_Misc.o \
-          $(ObjectDir)/mod_Parameters.o \
+AmpObj =  $(ObjectDir)/mod_Parameters.o \
+          $(ObjectDir)/mod_Misc.o \
           $(ObjectDir)/mod_TopDecay.o \
           $(ObjectDir)/mod_Graviton.o \
           $(ObjectDir)/mod_Higgs.o \
@@ -172,8 +174,12 @@ PDFObj   = $(ObjectDir)/Cteq61Pdf.o \
            $(ObjectDir)/mstwpdf.o \
            $(ObjectDir)/NNPDFDriver.o
 
-PSGenDep = genps.c \
-           boost.c
+PSGenC = genps.c \
+         boost.c
+
+PSGenDep = $(PSGenC) \
+           genps.h \
+           boost.h
 
 PSGenObj = $(ObjectDir)/genps.o \
            $(ObjectDir)/boost.o
@@ -181,6 +187,17 @@ PSGenObj = $(ObjectDir)/genps.o \
 CPSDep = ./CPS/CALLING_cpHTO.f
 
 CPSObj = $(ObjectDir)/CALLING_cpHTO.o
+
+LHAPDFInterfaceC = LHAPDFversion.cc
+
+LHAPDFInterfaceDep = $(LHAPDFInterfaceC) \
+                     LHAPDFversion.h
+
+ifeq ($(UseLHAPDF),Yes)
+LHAPDFInterfaceObj = $(ObjectDir)/LHAPDFversion.o
+else
+LHAPDFInterfaceObj =
+endif
 
 
 # #uncommented this because the library is already included in MCFMLib
@@ -213,7 +230,7 @@ MadGraphObj = $(ObjectDir)/gg_ttbh.o \
 
 
 
-JHUGenerator: $(CPSObj) $(PSGenObj) $(VegasObj) $(PDFObj) $(AmpObj) $(ggVHAmpObj) $(KinObj) $(MainObj)
+JHUGenerator: $(CPSObj) $(PSGenObj) $(VegasObj) $(PDFObj) $(AmpObj) $(ggVHAmpObj) $(KinObj) $(LHAPDFInterfaceObj) $(MainObj)
 	@echo " linking"
 ifeq ($(UseLHAPDF),Yes)
 	echo " -> interfaced with LHAPDF"
@@ -222,7 +239,7 @@ else
 endif
 	@echo " executable file "$(Exec)" is compiled with "$(Comp)
 	@echo " "
-	$(fcomp) -o $(Exec) $(MainObj) $(KinObj) $(AmpObj) $(ggVHAmpObj) $(PSGenObj) $(VegasObj) $(PDFObj) $(CPSObj) $(LHAPDFflags) $(MELAflags) $(CollierLibflags)
+	$(fcomp) -o $(Exec) $(MainObj) $(KinObj) $(AmpObj) $(ggVHAmpObj) $(PSGenObj) $(VegasObj) $(PDFObj) $(CPSObj) $(LHAPDFInterfaceObj) $(LHAPDFflags) $(MELAflags) $(CollierLibflags)
 
 
 
@@ -273,12 +290,17 @@ $(CPSObj): $(CPSDep) $(Makefile)
 	$(fcomp) -c $(CPSDep)
 	mv *.o $(ObjectDir)
 
-	
-$(PSGenObj): $(PSGenDep)
+$(PSGenObj): $(PSGenDep) $(Makefile)
 	@echo " compiling phase space generator"
-	$(ccomp) -c $(PSGenDep)
+	$(ccomp) -c $(PSGenC)
 	mv *.o $(ObjectDir)
 
+ifeq ($(UseLHAPDF),Yes)
+$(LHAPDFInterfaceObj) : $(LHAPDFInterfaceDep) $(Makefile)
+	@echo " compiling LHAPDF interface"
+	$(ccomp) $(LHAPDFflags) -c $(LHAPDFInterfaceC)
+	mv *.o $(ObjectDir)
+endif
 
 # $(MadGraphObj): $(MadGraphDep)
 # 	@echo " compiling MG files"
