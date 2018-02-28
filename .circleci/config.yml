@@ -1,6 +1,6 @@
 env: &env
   docker:
-    - image: cmssw/cmssw:CMSSW_8_0_20
+    - image: cmssw/cmssw:CMSSW_9_3_2
       environment:
         PATH: "/home/cmsbld/githack/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
         LIBRARY_PATH: "/home/cmsbld/boost_1_61_0/stage/lib"
@@ -26,8 +26,8 @@ cmsrelcmsenv: &cmsrelcmsenv
     echo "source /opt/cms/cmsset_default.sh" >> $BASH_ENV
     source $BASH_ENV
     cd $HOME
-    scram p CMSSW CMSSW_8_0_20
-    echo 'cd ~/CMSSW_8_0_20 && eval $(scram ru -sh) && cd - > /dev/null' >> $BASH_ENV
+    scram p CMSSW CMSSW_9_3_2
+    echo 'cd ~/CMSSW_9_3_2 && eval $(scram ru -sh) && cd - > /dev/null' >> $BASH_ENV
 
 version: 2
 jobs:
