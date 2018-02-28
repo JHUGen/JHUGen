@@ -587,7 +587,7 @@ jobs:
             exit $exitcode
           when: always
       - run: grep 'linkQCDLoopLib *= *No' makefile
-      - run: 'linkCollierLib *= *No' makefile
+      - run: grep 'linkCollierLib *= *No' makefile
 
       - run:
           name: "check that newlines are not annoying"
