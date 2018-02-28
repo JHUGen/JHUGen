@@ -526,7 +526,6 @@ jobs:
             startline=$(expr $(tail -n +$commandlineconfigstartline Manual/manJHUGenerator.tex | grep -n "begin[{]verbatim[}]" | head -1 | sed "s/:.*//") + $commandlineconfigstartline) &&
             endline=$(expr $(tail -n +$commandlineconfigstartline Manual/manJHUGenerator.tex | grep -n "end[{]verbatim[}]" | head -1 | sed "s/:.*//") + $commandlineconfigstartline - 2) &&
             sdiff -sb <(grep "^  " JHUGenerator/README) <(sed -n "${startline},${endline}p" Manual/manJHUGenerator.tex | sed "s/See below/See manual/")
-            when: always
       - run:
           name: "check sync between README and ./JHUGen help"
           command: sdiff -sb <(grep "^  " JHUGenerator/README) <(cd JHUGenerator && ./JHUGen help 2> /dev/null | grep "[^ ]")
@@ -569,8 +568,8 @@ jobs:
           name: "check compiling and running with LHAPDF linked"
           command: |
             exitcode=0
+            cd JHUGenerator
             (
-              cd JHUGenerator
               sed -i -r -e "s/^(UseLHAPDF *= *)No/\1Yes/" makefile
               make
             ) || exitcode=$?
@@ -586,8 +585,8 @@ jobs:
           name: "check compiling and running with linkMELA off"
           command: |
             exitcode=0
+            cd JHUGenerator
             (
-              cd JHUGenerator
               sed -i -r -e "s/^(linkMELA *= *)Yes/\1No/" makefile
               make
               ./JHUGen Process=50 VegasNc0=10000 VegasNc2=100
