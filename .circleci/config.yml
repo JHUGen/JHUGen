@@ -452,9 +452,10 @@ jobs:
       - run:
           name: ""
           command: |
+            cd python
             (
-              cd ../JHUGenerator
-              LHEDIR=../JHUGenMELA/python/
+              LHEDIR=$(pwd -P)
+              cd ../../../JHUGenerator
               #this duplicates some work done before, but it's really quick (<1 minute total)
               ./JHUGen Process=50 VegasNc0=10000 VegasNc2=100 DecayMode1=11 DataFile=$LHEDIR/WH.lhe
               ./JHUGen Process=50 VegasNc0=10000 VegasNc2=100 DecayMode1=11 DataFile=$LHEDIR/WH.lhe
@@ -462,7 +463,6 @@ jobs:
               ./JHUGen PDFSet=3 VegasNc0=100000 DecayMode1=1 DecayMode2=1 ReadLHE=$LHEDIR/tbarH_t.lhe DataFile=$LHEDIR/tbarH_t_ZZ
               ./JHUGen PDFSet=3 Process=80  VegasNc0=100000 VegasNc2=100 DataFile=$LHEDIR/ttH DecayMode1=11 DecayMode2=11 TopDK=1
             )
-            cd python
             python lhefile.py --lhefile-hwithdecay=tbarH_t_ZZ.lhe --lhefile-jhugenvbfvh=WH.lhe --lhefile-jhugentth=ttH.lhe ||
             mv *.lhe ~/artifacts/MELA/
       - store_artifacts:
@@ -601,6 +601,8 @@ jobs:
       - run:
           name: "check that newlines are not annoying"
           command: |
+            #https://unix.stackexchange.com/a/277228
+            alias dos2unix="perl -pi -e 's/\r\n/\n/g'"
             dos2unix $(git ls-files)
             git diff --exit-code
 
