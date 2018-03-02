@@ -164,7 +164,7 @@ jobs:
             exitstatus=0
             mkdir reference
             cd reference
-            JHUGEN_VERSION=$(grep -i JHUGen_Version ~/JHUGen/JHUGenerator/mod_Parameters.F90 | sed -r ''s|.*"(.*)".*|\1|g'')
+            JHUGEN_VERSION=$(grep -i JHUGen_Version ~/JHUGen/JHUGenerator/mod_Parameters.F90 | sed -r 's|.*"(.*)".*|\1|g')
             for filename in $REFERENCE_FILENAMES; do
               wget "https://circleci.com/api/v1/project/$REFERENCE_LHES_USERNAME/JHUGen/$REFERENCE_LHES_BUILD_NUMBER/"'artifacts/0/$CIRCLE_ARTIFACTS/reference/'$filename &&
               sed -i -r "s/(Output from the JHUGenerator )$REFERENCE_JHUGEN_VERSION/\1$JHUGEN_VERSION/" $filename ||
@@ -290,7 +290,7 @@ jobs:
       - run:
           name: checklhe
           command: |
-            python ~/checklhe/checklhe.py $(find $LHEDIR -name *.lhe) | tee checklheoutput.txt
+            ../.circleci/checklhe/checklhe.py $(find $LHEDIR -name *.lhe) | tee checklheoutput.txt
             ! grep -q '!' checklheoutput.txt
           when: always
       - store_artifacts:
@@ -594,13 +594,12 @@ jobs:
             git checkout -- makefile
             exit $exitcode
           when: always
-      - run: grep 'linkQCDLoopLib *= *No' makefile
-      - run: grep 'linkCollierLib *= *No' makefile
+      - run: grep 'linkQCDLoopLib *= *No' JHUGenerator/makefile
+      - run: grep 'linkCollierLib *= *No' JHUGenerator/makefile
 
       - run:
           name: "check that newlines are not annoying"
           command: |
-            cd ../
             dos2unix $(git ls-files)
             git diff --exit-code
 
