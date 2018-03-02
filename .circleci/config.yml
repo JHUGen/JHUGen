@@ -8,7 +8,7 @@ env: &env
         LD_LIBRARY_PATH: "/home/cmsbld/JHUGen/JHUGenMELA/MELA/data/slc6_amd64_gcc530"
         PYTHONPATH: "/home/cmsbld/JHUGen/JHUGenMELA/MELA/python"
 
-        REFERENCE_LHES_USERNAME: "hrokses"
+        REFERENCE_LHES_USERNAME: "hroskes"
         REFERENCE_LHES_BUILD_NUMBER: "997"
         REFERENCE_JHUGEN_VERSION: "v7.1.1"
 
