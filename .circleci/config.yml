@@ -602,6 +602,7 @@ jobs:
           name: "check that newlines are not annoying"
           command: |
             #https://unix.stackexchange.com/a/277228
+            shopt -s expand_aliases
             alias dos2unix="perl -pi -e 's/\r\n/\n/g'"
             dos2unix $(git ls-files)
             git diff --exit-code
