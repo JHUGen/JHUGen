@@ -2,7 +2,7 @@ env: &env
   docker:
     - image: cmssw/cmssw:CMSSW_9_3_2
       environment:
-        PATH: "/home/cmsbld/githack/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+        PATH: "/home/cmsbld/dos2unix-7.4.0/:/home/cmsbld/githack/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
         LIBRARY_PATH: "/home/cmsbld/boost_1_61_0/stage/lib"
         CPATH: "/home/cmsbld/boost_1_61_0"
         LD_LIBRARY_PATH: "/home/cmsbld/JHUGen/JHUGenMELA/MELA/data/slc6_amd64_gcc530"
@@ -613,14 +613,26 @@ jobs:
       - run: grep 'linkQCDLoopLib *= *No' JHUGenerator/makefile
       - run: grep 'linkCollierLib *= *No' JHUGenerator/makefile
 
+      - restore_cache:
+          key: v1_dos2unix-7.4.0
+      - run:
+          name: "download dos2unix"
+          command: |
+            cd
+            if ! [ -d ~/dos2unix-7.4.0 ]; then
+              wget https://downloads.sourceforge.net/project/dos2unix/dos2unix/7.4.0/dos2unix-7.4.0.tar.gz
+              tar -xvzf dos2unix-7.4.0.tar.gz
+              cd dos2unix-7.4.0
+              make
+            fi
       - run:
           name: "check that newlines are not annoying"
           command: |
-            #https://unix.stackexchange.com/a/277228
-            shopt -s expand_aliases
-            alias dos2unix="perl -pi -e 's/\r\n/\n/g'"
             dos2unix $(git ls-files)
             git diff --exit-code
+      - save_cache:
+          key: v1_dos2unix-7.4.0
+          paths: ~/dos2unix-7.4.0
 
       - store_artifacts:
           path:
