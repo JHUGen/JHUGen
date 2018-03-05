@@ -625,6 +625,7 @@ jobs:
               wget https://downloads.sourceforge.net/project/dos2unix/dos2unix/7.4.0/dos2unix-7.4.0.tar.gz
               tar -xvzf dos2unix-7.4.0.tar.gz
               cd dos2unix-7.4.0
+              sed -i -r "s/(ENABLE_NLS *=)/#\1/" Makefile
               make
             fi
       - run:
