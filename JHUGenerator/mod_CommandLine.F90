@@ -12,7 +12,7 @@ end interface savevalue
 
 type SaveValues
   character(len=100) :: logicalnames(1:100), integernames(1:100), real8names(1:100), complex8names(1:100), stringnames(1:100)
-  integer :: logicalupto, integerupto, real8upto, complex8upto, stringupto
+  integer :: nlogicals, nintegers, nreal8s, ncomplex8s, nstrings
   logical :: logicals(1:100)
   integer :: integers(1:100)
   real(8) :: real8s(1:100)
@@ -24,6 +24,9 @@ contains
   procedure :: savevalue_real8
   procedure :: savevalue_complex8
   procedure :: savevalue_string
+  procedure :: sort => SortSaveValues
+  procedure :: WriteToFile => WriteSaveValuesToFile
+  procedure :: ReadFromFile => ReadSaveValuesFromFile
 end type SaveValues
 
 interface SaveValues
@@ -35,17 +38,18 @@ contains
 function SaveValuesConstructor() result(self)
 implicit none
 type(SaveValues) :: self
-  self%logicalupto = 0
-  self%integerupto = 0
-  self%real8upto = 0
-  self%complex8upto = 0
-  self%stringupto = 0
+  self%nlogicals = 0
+  self%nintegers = 0
+  self%nreal8s = 0
+  self%ncomplex8s = 0
+  self%nstrings = 0
 
-  self%logicalnames(:) = ""
-  self%integernames(:) = ""
-  self%real8names(:) = ""
-  self%complex8names(:) = ""
-  self%stringnames(:) = ""
+  self%logicalnames(:) = "NONE"
+  self%integernames(:) = "NONE"
+  self%real8names(:) = "NONE"
+  self%complex8names(:) = "NONE"
+  self%stringnames(:) = "NONE"
+  self%strings(:) = "NONE"
 end function SaveValuesConstructor
 
 subroutine savevalue_logical(self, name, value)
@@ -55,9 +59,9 @@ class(SaveValues) :: self
 character(len=*) :: name
 logical :: value
   if (len(name) .gt. 100) call Error("Parameter name is too long: "//name)
-  self%logicalnames(self%logicalupto) = name
-  self%logicals(self%logicalupto) = value
-  self%logicalupto = self%logicalupto + 1
+  self%nlogicals = self%nlogicals + 1
+  self%logicalnames(self%nlogicals) = name
+  self%logicals(self%nlogicals) = value
 end subroutine savevalue_logical
 
 subroutine savevalue_integer(self, name, value)
@@ -67,9 +71,9 @@ class(SaveValues) :: self
 character(len=*) :: name
 integer :: value
   if (len(name) .gt. 100) call Error("Parameter name is too long: "//name)
-  self%integernames(self%integerupto) = name
-  self%integers(self%integerupto) = value
-  self%integerupto = self%integerupto + 1
+  self%nintegers = self%nintegers + 1
+  self%integernames(self%nintegers) = name
+  self%integers(self%nintegers) = value
 end subroutine savevalue_integer
 
 subroutine savevalue_real8(self, name, value)
@@ -79,9 +83,9 @@ class(SaveValues) :: self
 character(len=*) :: name
 real(8) :: value
   if (len(name) .gt. 100) call Error("Parameter name is too long: "//name)
-  self%real8names(self%real8upto) = name
-  self%real8s(self%real8upto) = value
-  self%real8upto = self%real8upto + 1
+  self%nreal8s = self%nreal8s + 1
+  self%real8names(self%nreal8s) = name
+  self%real8s(self%nreal8s) = value
 end subroutine savevalue_real8
 
 subroutine savevalue_complex8(self, name, value)
@@ -91,9 +95,9 @@ class(SaveValues) :: self
 character(len=*) :: name
 complex(8) :: value
   if (len(name) .gt. 100) call Error("Parameter name is too long: "//name)
-  self%complex8names(self%complex8upto) = name
-  self%complex8s(self%complex8upto) = value
-  self%complex8upto = self%complex8upto + 1
+  self%ncomplex8s = self%ncomplex8s + 1
+  self%complex8names(self%ncomplex8s) = name
+  self%complex8s(self%ncomplex8s) = value
 end subroutine savevalue_complex8
 
 subroutine savevalue_string(self, name, value)
@@ -104,10 +108,127 @@ character(len=*) :: name
 character(len=*) :: value
   if (len(name) .gt. 100) call Error("Parameter name is too long: "//name)
   if (len(value) .gt. 100) call Error("Parameter value is too long: "//value)
-  self%stringnames(self%stringupto) = name
-  self%strings(self%stringupto) = value
-  self%stringupto = self%stringupto + 1
+  self%nstrings = self%nstrings + 1
+  self%stringnames(self%nstrings) = name
+  self%strings(self%nstrings) = value
 end subroutine savevalue_string
+
+subroutine SortSaveValues(self)
+use modmisc
+implicit none
+class(SaveValues) :: self
+  call BubleSort(self%nlogicals, self%logicalnames(1:self%nlogicals), self%logicals(1:self%nlogicals))
+  call BubleSort(self%nintegers, self%integernames(1:self%nintegers), self%integers(1:self%nintegers))
+  call BubleSort(self%nreal8s, self%real8names(1:self%nreal8s), self%real8s(1:self%nreal8s))
+  call BubleSort(self%ncomplex8s, self%complex8names(1:self%ncomplex8s), self%complex8s(1:self%ncomplex8s))
+  call BubleSort(self%nstrings, self%stringnames(1:self%nstrings), self%strings(1:self%nstrings))
+end subroutine SortSaveValues
+
+subroutine WriteSaveValuesToFile(self, filename)
+use ModParameters
+implicit none
+class(SaveValues) :: self
+character(len=*) :: filename
+call self%sort()
+open(unit=io_TmpFile, file=filename,form='formatted',status='replace')
+write(io_TmpFile,fmt=*) self%nlogicals, self%logicalnames, self%logicals
+write(io_TmpFile,fmt=*) self%nintegers, self%integernames, self%integers
+write(io_TmpFile,fmt=*) self%nreal8s, self%real8names, self%real8s
+write(io_TmpFile,fmt=*) self%ncomplex8s, self%complex8names, self%complex8s
+write(io_TmpFile,fmt=*) self%nstrings, self%stringnames, self%strings
+close(unit=io_TmpFile)
+end subroutine WriteSaveValuesToFile
+
+subroutine ReadSaveValuesFromFile(self, filename)
+use ModParameters
+implicit none
+class(SaveValues) :: self
+character(len=*) :: filename
+open(unit=io_TmpFile, file=filename,form='formatted',status='old')
+read(io_TmpFile,fmt=*) self%nlogicals, self%logicalnames, self%logicals
+read(io_TmpFile,fmt=*) self%nintegers, self%integernames, self%integers
+read(io_TmpFile,fmt=*) self%nreal8s, self%real8names, self%real8s
+read(io_TmpFile,fmt=*) self%ncomplex8s, self%complex8names, self%complex8s
+read(io_TmpFile,fmt=*) self%nstrings, self%stringnames, self%strings
+close(unit=io_TmpFile)
+call self%sort()
+end subroutine ReadSaveValuesFromFile
+
+subroutine CompareSaveValues(new, old)
+implicit none
+class(SaveValues) :: new, old
+integer :: i
+call new%sort()
+call old%sort()
+
+do i=1, max(new%nlogicals, old%nlogicals)
+  if (new%logicalnames(i) .gt. old%logicalnames(i) .or. i.gt.old%nlogicals) then
+    print *, trim(new%logicalnames(i)), " is set to ", new%logicals(i), ", but was previously not set.  Can't do ReadCSmax."
+    stop 1
+  else if (new%logicalnames(i) .lt. old%logicalnames(i) .or. i.gt.new%nlogicals) then
+    print *, trim(old%logicalnames(i)), " was previously set to ", old%logicals(i), ", but is not set now.  Can't do ReadCSmax"
+    stop 1
+  else if (new%logicals(i) .neqv. old%logicals(i)) then
+    print *, trim(old%logicalnames(i)), " was previously set to ", old%logicals(i), ", but is now set to ", new%logicals(i), ".  Can't do ReadCSmax"
+    stop 1
+  endif
+end do
+
+do i=1, max(new%nintegers, old%nintegers)
+  if (new%integernames(i) .gt. old%integernames(i) .or. i.gt.old%nintegers) then
+    print *, trim(new%integernames(i)), " is set to ", new%integers(i), ", but was previously not set.  Can't do ReadCSmax."
+    stop 1
+  else if (new%integernames(i) .lt. old%integernames(i) .or. i.gt.new%nintegers) then
+    print *, trim(old%integernames(i)), " was previously set to ", old%integers(i), ", but is not set now.  Can't do ReadCSmax"
+    stop 1
+  else if (new%integers(i) .ne. old%integers(i)) then
+    print *, trim(old%integernames(i)), " was previously set to ", old%integers(i), ", but is now set to ", new%integers(i), ".  Can't do ReadCSmax"
+    stop 1
+  endif
+end do
+
+do i=1, max(new%nreal8s, old%nreal8s)
+  if (new%real8names(i) .gt. old%real8names(i) .or. i.gt.old%nreal8s) then
+    print *, trim(new%real8names(i)), " is set to ", new%real8s(i), ", but was previously not set.  Can't do ReadCSmax."
+    stop 1
+  else if (new%real8names(i) .lt. old%real8names(i) .or. i.gt.new%nreal8s) then
+    print *, trim(old%real8names(i)), " was previously set to ", old%real8s(i), ", but is not set now.  Can't do ReadCSmax"
+    stop 1
+  else if (new%real8s(i) .ne. old%real8s(i)) then
+    print *, trim(old%real8names(i)), " was previously set to ", old%real8s(i), ", but is now set to ", new%real8s(i), ".  Can't do ReadCSmax"
+    stop 1
+  endif
+end do
+
+do i=1, max(new%ncomplex8s, old%ncomplex8s)
+  if (new%complex8names(i) .gt. old%complex8names(i) .or. i.gt.old%ncomplex8s) then
+    print *, trim(new%complex8names(i)), " is set to ", new%complex8s(i), ", but was previously not set.  Can't do ReadCSmax."
+    stop 1
+  else if (new%complex8names(i) .lt. old%complex8names(i) .or. i.gt.new%ncomplex8s) then
+    print *, new%complex8names(1:new%ncomplex8s)
+    print *, old%complex8names(1:old%ncomplex8s)
+    print *, trim(old%complex8names(i)), " was previously set to ", old%complex8s(i), ", but is not set now.  Can't do ReadCSmax"
+    stop 1
+  else if (new%complex8s(i) .ne. old%complex8s(i)) then
+    print *, trim(old%complex8names(i)), " was previously set to ", old%complex8s(i), ", but is now set to ", new%complex8s(i), ".  Can't do ReadCSmax"
+    stop 1
+  endif
+end do
+
+do i=1, max(new%nstrings, old%nstrings)
+  if (new%stringnames(i) .gt. old%stringnames(i) .or. i.gt.old%nstrings) then
+    print *, trim(new%stringnames(i)), " is set to ", trim(new%strings(i)), ", but was previously not set.  Can't do ReadCSmax."
+    stop 1
+  else if (new%stringnames(i) .lt. old%stringnames(i) .or. i.gt.new%nstrings) then
+    print *, trim(old%stringnames(i)), " was previously set to ", trim(old%strings(i)), ", but is not set now.  Can't do ReadCSmax"
+    stop 1
+  else if (new%strings(i) .ne. old%strings(i)) then
+    print *, trim(old%stringnames(i)), " was previously set to ", trim(old%strings(i)), ", but is now set to ", trim(new%strings(i)), ".  Can't do ReadCSmax"
+    stop 1
+  endif
+end do
+
+end subroutine CompareSaveValues
 
 !ReadCommandLineArgument is overloaded.  Pass the type needed as "dest"
 !success is set to true if the argument passed matches argumentname, otherwise it's left alone

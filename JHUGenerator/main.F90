@@ -344,7 +344,8 @@ logical :: SetCKM,SetCKMub,SetCKMcb,SetCKMtd
 logical :: SetpTjetcut, Setetajetcut, Setdetajetcut, SetdeltaRcut
 logical :: SetpTlepcut, Setetalepcut, SetMPhotonCutoff
 logical :: SetColliderEnergy
-type(SaveValues) :: tosave
+integer :: i
+type(SaveValues) :: tosave, oldsavevalues
 
    help = .false.
    DryRun = .false.
@@ -415,6 +416,8 @@ type(SaveValues) :: tosave
    SetColliderEnergy=.false.
 
    DataFile="./data/output"
+
+   tosave = SaveValues()
 
 #if compiler==1
    NumArgs = NArgs()-1
@@ -1068,6 +1071,20 @@ type(SaveValues) :: tosave
     !================================
     !Command line argument processing
     !================================
+
+    i = len(trim(DataFile))
+    if( DataFile(i-3:i).eq.".lhe" ) then
+        !print *, DataFile
+        DataFile = DataFile(1:i-4)
+        !print *, DataFile
+    endif
+
+    if (ReadCSmax) then
+      call oldsavevalues%ReadFromFile(trim(DataFile)//"_commandlineinfo.txt")
+      call CompareSaveValues(tosave, oldsavevalues)
+    else
+      call tosave%WriteToFile(trim(DataFile)//"_commandlineinfo.txt")
+    endif
 
     !PChannel
 
@@ -2172,11 +2189,11 @@ elseif(unweighted.eqv..true.) then  !----------------------- unweighted events
             PChannel = PChannel_aux
         enddo
 
-        open(unit=io_CSmaxFile,file='CSmax.bin',form='unformatted',status='replace')
+        open(unit=io_CSmaxFile,file=trim(DataFile)//'_CSmax.bin',form='unformatted',status='replace')
         WRITE(io_CSmaxFile) CSMAX
         close(io_CSmaxFile)
     else
-        open(unit=io_CSmaxFile,file='CSmax.bin',form='unformatted')
+        open(unit=io_CSmaxFile,file=trim(DataFile)//'_CSmax.bin',form='unformatted')
         READ(io_CSmaxFile) CSMAX
         close(io_CSmaxFile)
     endif
@@ -2537,7 +2554,7 @@ if( UseBetaVersion ) then
         call vegas_get_calls(calls1)
         CrossSec(:,:) = CrossSec(:,:)/dble(itmx)
 
-        open(unit=io_TmpFile,file=trim(DataFile)//'_griddata.txt',form='formatted',status='replace')
+        open(unit=io_TmpFile,file=trim(DataFile)//'_gridinfo.txt',form='formatted',status='replace')
         write(io_TmpFile,fmt=*) calls1
         write(io_TmpFile,fmt=*) CrossSec
         write(io_TmpFile,fmt=*) CrossSecMax
@@ -2748,11 +2765,11 @@ else! not beta version
                 VG(:,:) = VG(:,:) + RES(:,:)
                 PChannel = PChannel_aux
         enddo
-        open(unit=io_CSmaxFile,file='CSmax.bin',form='unformatted',status='replace')
+        open(unit=io_CSmaxFile,file=trim(DataFile)//'_CSmax.bin',form='unformatted',status='replace')
         WRITE(io_CSmaxFile) CSMAX,VG
         close(io_CSmaxFile)
     else
-        open(unit=io_CSmaxFile,file='CSmax.bin',form='unformatted')
+        open(unit=io_CSmaxFile,file=trim(DataFile)//'_CSmax.bin',form='unformatted')
         READ(io_CSmaxFile) CSMAX,VG
         close(io_CSmaxFile)
     endif
@@ -3854,13 +3871,6 @@ integer :: i
    if( .not.FilesOpened ) then
        FilesOpened = .true.
        call system('mkdir -p ./data')! -p is suppressing error messages if directory already exists
-
-       i = len(trim(DataFile))
-       if( DataFile(i-3:i).eq.".lhe" ) then
-           !print *, DataFile
-           DataFile = DataFile(1:i-4)
-           !print *, DataFile
-       endif
 
        print *, ""
        if( unweighted ) then
