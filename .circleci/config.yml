@@ -320,6 +320,8 @@ jobs:
       - restore_cache:
           key: v1_analyzer
       - run:
+          <<: *cmsrelcmsenv
+      - run:
           command: |
             cd
             if ! [ -d ~/CMSJHU_AnalysisMacros/ ]; then
@@ -333,9 +335,6 @@ jobs:
           paths: ~/CMSJHU_AnalysisMacros/
 
       - run: '! [ -f reference_check/reference_failed_ggH ]'
-      - run:
-          <<: *cmsrelcmsenv
-          when: on_fail
       - run:
           command: echo "export LHEDIR=$HOME/artifacts/ggH" >> $BASH_ENV
           when: on_fail
@@ -384,6 +383,8 @@ jobs:
       - restore_cache:
           key: v1_analyzer
       - run:
+          <<: *cmsrelcmsenv
+      - run:
           command: |
             cd
             if ! [ -d ~/CMSJHU_AnalysisMacros/ ]; then
@@ -397,9 +398,6 @@ jobs:
           paths: ~/CMSJHU_AnalysisMacros/
 
       - run: '! [ -f reference_check/reference_failed_VBF ]'
-      - run:
-          <<: *cmsrelcmsenv
-          when: on_fail
       - run:
           command: echo "export LHEDIR=$HOME/artifacts/VBF" >> $BASH_ENV
           when: on_fail
