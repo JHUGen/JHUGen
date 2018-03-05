@@ -112,13 +112,11 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/JHUGen
-      - attach_workspace:
-          at: ~/reference_check
       - run:
           <<: *cmsrelcmsenv
       - restore_cache:
           key: v1_boost_1_61_0
-      - run: mkdir -p ~/reference_check/ compare_to_reference
+      - run: mkdir -p reference_check compare_to_reference
 
       - run: ./JHUGen Seed=$SEED PDFSet=3 Process=0 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/ggH_ZZ DecayMode1=9 DecayMode2=9 $REFERENCE_COUPLINGS_SPIN0
       - run: ./JHUGen Seed=$SEED PDFSet=3 Process=0 VegasNc0=100000 VegasNc2=100 DataFile=compare_to_reference/ggH_WW DecayMode1=11 DecayMode2=11 $REFERENCE_COUPLINGS_SPIN0
@@ -177,17 +175,16 @@ jobs:
             for filename in $REFERENCE_FILENAMES; do
               fullname="$(grep $filename /tmp/artifacts.txt)" &&
               wget "$fullname" &&
-              sed -i -r "s/(Output from the JHUGenerator )$REFERENCE_JHUGEN_VERSION/\1$JHUGEN_VERSION/" $filename ||
-              exitstatus=1
-            done
-            if [ $exitstatus -ne 0 ]; then
-              touch ~/reference_check/reference_failed
-              if [ $filename == $REFERENCE_FILENAME_GGH ]; then
-                touch ~/reference_check/reference_failed_ggH
-              fi
-              if [ $filename == $REFERENCE_FILENAME_VBF ] || [ $filename == $REFERENCE_FILENAME_HJJ ]; then
-                touch ~/reference_check/reference_failed_VBF
-              fi
+              sed -i -r "s/(Output from the JHUGenerator )$REFERENCE_JHUGEN_VERSION/\1$JHUGEN_VERSION/" $filename || {
+                exitstatus=1
+                touch reference_check/reference_failed
+                if [ $filename == $REFERENCE_FILENAME_GGH ]; then
+                  touch reference_check/reference_failed_ggH
+                fi
+                if [ $filename == $REFERENCE_FILENAME_VBF ] || [ $filename == $REFERENCE_FILENAME_HJJ ]; then
+                  touch reference_check/reference_failed_VBF
+                fi
+              }
             fi
             exit $exitstatus
       - run:
@@ -202,21 +199,21 @@ jobs:
                 echo
                 sdiff -s reference/$filename compare_to_reference/$filename && echo "no change" || {
                   exitstatus=1
-                  touch ~/reference_check/reference_failed
+                  touch reference_check/reference_failed
                   if [ $filename == $REFERENCE_FILENAME_GGH ]; then
-                    touch ~/reference_check/reference_failed_ggH
+                    touch reference_check/reference_failed_ggH
                   fi
                   if [ $filename == $REFERENCE_FILENAME_VBF ] || [ $filename == $REFERENCE_FILENAME_HJJ ]; then
-                    touch ~/reference_check/reference_failed_VBF
+                    touch reference_check/reference_failed_VBF
                   fi
                 }
               done
-            } |& tee ~/reference_check/output
-            echo $exitstatus > ~/reference_check/exit_status
+            } |& tee reference_check/output
+            echo $exitstatus > reference_check/exit_status
             #do NOT exit $exitstatus
             #if the ggH or VBF files have changed, this job needs to succeed
             #so that the dependent jobs to make plots run
-            #a separate job reference_check will actually exit $(cat ~/reference_check/exit_status)
+            #a separate job reference_check will actually exit $(cat reference_check/exit_status)
       - run:
           name: "save reference"
           command: |
@@ -226,9 +223,9 @@ jobs:
       - store_artifacts:
           path: ~/artifacts/reference_lhes
       - persist_to_workspace:
-          root: ~/reference_check
+          root: ~/JHUGen
           paths:
-            - "."
+            - JHUGenerator/reference_check
 
   generator_syntax:
     <<: *env
@@ -318,8 +315,6 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/JHUGen
-      - attach_workspace:
-          at: ~/reference_check
       - restore_cache:
           key: v1_boost_1_61_0
       - restore_cache:
@@ -337,7 +332,7 @@ jobs:
           key: v1_analyzer
           paths: ~/CMSJHU_AnalysisMacros/
 
-      - run: '! [ -f ~/reference_check/reference_failed_ggH ]'
+      - run: '! [ -f reference_check/reference_failed_ggH ]'
       - run:
           <<: *cmsrelcmsenv
           when: on_fail
@@ -384,8 +379,6 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/JHUGen
-      - attach_workspace:
-          at: ~/reference_check
       - restore_cache:
           key: v1_boost_1_61_0
       - restore_cache:
@@ -403,7 +396,7 @@ jobs:
           key: v1_analyzer
           paths: ~/CMSJHU_AnalysisMacros/
 
-      - run: '! [ -f ~/reference_check/reference_failed_VBF ]'
+      - run: '! [ -f reference_check/reference_failed_VBF ]'
       - run:
           <<: *cmsrelcmsenv
           when: on_fail
@@ -649,11 +642,12 @@ jobs:
       #no need to spend lots of time downloading the CMSSW image
       #when all we use is cat
       - image: library/alpine
+    working_directory: ~/JHUGen/JHUGenerator
     steps:
       - attach_workspace:
-          at: ~/reference_check
-      - run: cat ~/reference_check/output
-      - run: exit $(cat ~/reference_check/exit_status)
+          at: ~/JHUGen
+      - run: cat reference_check/output
+      - run: exit $(cat reference_check/exit_status)
 
 workflows:
   version: 2
